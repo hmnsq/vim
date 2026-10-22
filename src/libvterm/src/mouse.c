@@ -1,101 +1,101 @@
-#include "vterm_internal.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vterm_internal.h"
 
-#include "utf8.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+ਸਥਿਰ ਖਾਲੀ output_mouse(VTermState *state, ਪੂਰਨ ਕੋਡ, ਪੂਰਨ pressed, ਪੂਰਨ modifiers, ਪੂਰਨ ਖਾਨਾ, ਪੂਰਨ ਪੰਕਤੀ)
 {
   modifiers <<= 2;
 
-  switch(state->mouse_protocol) {
-  case MOUSE_X10:
-    if(col + 0x21 > 0xff)
-      col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
-      row = 0xff - 0x21;
+  ਚੋਣ(state->mouse_protocol) {
+  ਹਾਲਤ MOUSE_X10:
+    ਜੇ(ਖਾਨਾ + 0x21 > 0xff)
+      ਖਾਨਾ = 0xff - 0x21;
+    ਜੇ(ਪੰਕਤੀ + 0x21 > 0xff)
+      ਪੰਕਤੀ = 0xff - 0x21;
 
-    if(!pressed)
-      code = 3;
+    ਜੇ(!pressed)
+      ਕੋਡ = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
-        (code | modifiers) + 0x20, col + 0x21, row + 0x21);
-    break;
+    vterm_ਧੱਕੋ_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
+        (ਕੋਡ | modifiers) + 0x20, ਖਾਨਾ + 0x21, ਪੰਕਤੀ + 0x21);
+    ਰੋਕੋ;
 
-  case MOUSE_UTF8:
+  ਹਾਲਤ MOUSE_UTF8:
     {
-      char utf8[18]; size_t len = 0;
+      ਅੱਖਰ utf8[18]; size_t len = 0;
 
-      if(!pressed)
-        code = 3;
+      ਜੇ(!pressed)
+        ਕੋਡ = 3;
 
-      len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
-      len += fill_utf8(col + 0x21, utf8 + len);
-      len += fill_utf8(row + 0x21, utf8 + len);
+      len += fill_utf8((ਕੋਡ | modifiers) + 0x20, utf8 + len);
+      len += fill_utf8(ਖਾਨਾ + 0x21, utf8 + len);
+      len += fill_utf8(ਪੰਕਤੀ + 0x21, utf8 + len);
       utf8[len] = 0;
 
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
+      vterm_ਧੱਕੋ_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
-    break;
+    ਰੋਕੋ;
 
-  case MOUSE_SGR:
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
-        code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
-    break;
+  ਹਾਲਤ MOUSE_SGR:
+    vterm_ਧੱਕੋ_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
+        ਕੋਡ | modifiers, ਖਾਨਾ + 1, ਪੰਕਤੀ + 1, pressed ? 'M' : 'm');
+    ਰੋਕੋ;
 
-  case MOUSE_RXVT:
-    if(!pressed)
-      code = 3;
+  ਹਾਲਤ MOUSE_RXVT:
+    ਜੇ(!pressed)
+      ਕੋਡ = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
-        code | modifiers, col + 1, row + 1);
-    break;
+    vterm_ਧੱਕੋ_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
+        ਕੋਡ | modifiers, ਖਾਨਾ + 1, ਪੰਕਤੀ + 1);
+    ਰੋਕੋ;
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+ਖਾਲੀ vterm_mouse_move(VTerm *vt, ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  ਜੇ(ਖਾਨਾ == state->mouse_ਖਾਨਾ && ਪੰਕਤੀ == state->mouse_ਪੰਕਤੀ)
+    ਵਾਪਸ;
 
-  state->mouse_col = col;
-  state->mouse_row = row;
+  state->mouse_ਖਾਨਾ = ਖਾਨਾ;
+  state->mouse_ਪੰਕਤੀ = ਪੰਕਤੀ;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  ਜੇ((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
-                 state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
-                 state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
-    output_mouse(state, button-1 + 0x20, 1, mod, col, row);
+    ਪੂਰਨ button = state->mouse_buttons & MOUSE_BUTTON_ਖੱਬਾ ? 1 :
+                 state->mouse_buttons & MOUSE_BUTTON_ਵਿਚਕਾਰ ? 2 :
+                 state->mouse_buttons & MOUSE_BUTTON_ਸੱਜਾ ? 3 : 4;
+    output_mouse(state, button-1 + 0x20, 1, mod, ਖਾਨਾ, ਪੰਕਤੀ);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+ਖਾਲੀ vterm_mouse_button(VTerm *vt, ਪੂਰਨ button, ਪੂਰਨ pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  ਪੂਰਨ old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  ਜੇ(button > 0 && button <= 3) {
+    ਜੇ(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    ਨਹੀਂਤਾਂ
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  ਜੇ(state->mouse_buttons == old_buttons && button < 4)
+    ਵਾਪਸ;
+  ਜੇ (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    ਵਾਪਸ;
 
-  if(!state->mouse_flags)
-    return;
+  ਜੇ(!state->mouse_flags)
+    ਵਾਪਸ;
 
-  if(button < 4) {
-    output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
+  ਜੇ(button < 4) {
+    output_mouse(state, button-1, pressed, mod, state->mouse_ਖਾਨਾ, state->mouse_ਪੰਕਤੀ);
   }
-  else if(button < 8) {
-    output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
+  ਨਹੀਂਤਾਂ ਜੇ(button < 8) {
+    output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_ਖਾਨਾ, state->mouse_ਪੰਕਤੀ);
   }
 }

@@ -18,40 +18,40 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <string.h>
 
-	int
-main(int argc, char **argv)
+	ਪੂਰਨ
+ਮੁੱਖ(ਪੂਰਨ argc, ਅੱਖਰ **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	ਅੱਖਰ ਬਫਰ[BUFSIZ];
+	ਅੱਖਰ *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	ਜਦੋਂ (fgets(ਬਫਰ, BUFSIZ, stdin) != ਨਿਰਾ)
 	{
-		for (p = buffer; *p != 0; p++)
+		ਲਈ (p = ਬਫਰ; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			ਜੇ (ਲੜੀ_ਤੁਲਨਾ(p, "charset=utf-8", 13) == 0
+				|| ਲੜੀ_ਤੁਲਨਾ(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				ਜਦੋਂ (p[1] != '\n')
 					++p;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				ਜੇ (*(ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ *)p >= 0xA1)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					ਅੱਖਰ_ਲਿਖੋ(*p++);
+					ਜੇ (*p == '\\')
+						ਅੱਖਰ_ਲਿਖੋ(*p);
 				}
-				putchar(*p);
+				ਅੱਖਰ_ਲਿਖੋ(*p);
 			}
 		}
 	}

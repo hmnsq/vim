@@ -11,70 +11,70 @@
  * fileio.c: read from and write to a file
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(__TANDEM)
+#ਜੇ defined(__TANDEM)
 # include <limits.h>		// for SSIZE_MAX
-#endif
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ
+#ਜੇ (defined(UNIX) || defined(VMS)) && defined(FEAT_EVAL)
 # include <pwd.h>
 # include <grp.h>
-#endif
-#if defined(VMS) && defined(HAVE_XOS_R_H)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(VMS) && defined(HAVE_XOS_R_H)
 # include <x11/xos_r.h>
-#endif
+#ਜੇ_ਅੰਤ
 
 // Is there any system that doesn't have access()?
-#define USE_MCH_ACCESS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USE_MCH_ACCESS
 
 // Bitmask with 0x80 set in each byte of a long_u word, used to detect
 // non-ASCII bytes (high bit set) in multiple bytes at once.
-#define NONASCII_MASK (((long_u)-1 / 0xFF) * 0x80)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NONASCII_ਨਕਾਬ (((long_u)-1 / 0xFF) * 0x80)
 
-#if defined(__hpux) && !defined(HAVE_DIRFD)
+#ਜੇ defined(__hpux) && !defined(HAVE_DIRFD)
 # define dirfd(x) ((x)->__dd_fd)
 # define HAVE_DIRFD
-#endif
+#ਜੇ_ਅੰਤ
 
-static char_u *next_fenc(char_u **pp, int *alloced);
-#ifdef FEAT_EVAL
-static char_u *readfile_charconvert(char_u *fname, char_u *fenc, int *fdp);
-#endif
-#ifdef FEAT_CRYPT
-static char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, long *sizep, off_T *filesizep, int newfile, char_u *fname, int *did_ask);
-#endif
-static linenr_T readfile_linenr(linenr_T linecnt, char_u *p, char_u *endp);
-static char_u *check_for_bom(char_u *p, long size, int *lenp, int flags);
+ਸਥਿਰ char_u *ਅਗਲਾ_fenc(char_u **pp, ਪੂਰਨ *alloced);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+ਸਥਿਰ char_u *readfile_charconvert(char_u *fname, char_u *fenc, ਪੂਰਨ *fdp);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+ਸਥਿਰ char_u *check_for_cryptkey(char_u *cryptkey, char_u *ptr, ਲੰਮਾ *sizep, off_T *filesizep, ਪੂਰਨ newfile, char_u *fname, ਪੂਰਨ *did_ask);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ linenr_T readfile_linenr(linenr_T linecnt, char_u *p, char_u *endp);
+ਸਥਿਰ char_u *check_for_bom(char_u *p, ਲੰਮਾ ਮਾਪ, ਪੂਰਨ *lenp, ਪੂਰਨ flags);
 
-#ifdef FEAT_EVAL
-static int readdirex_sort;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+ਸਥਿਰ ਪੂਰਨ readdirex_ਛਾਂਟੋ;
+#ਜੇ_ਅੰਤ
 
-    void
+    ਖਾਲੀ
 filemess(
     buf_T	*buf,
     char_u	*name,
     char_u	*s,
-    int		attr)
+    ਪੂਰਨ		attr)
 {
-    int		msg_scroll_save;
-    int		prev_msg_col = msg_col;
+    ਪੂਰਨ		ਸੁਨੇਹਾ_scroll_save;
+    ਪੂਰਨ		prev_ਸੁਨੇਹਾ_ਖਾਨਾ = ਸੁਨੇਹਾ_ਖਾਨਾ;
     size_t	len;
 
-    if (msg_silent != 0)
-	return;
-    msg_add_fname(buf, name);	    // put file name in IObuff with quotes
+    ਜੇ (ਸੁਨੇਹਾ_silent != 0)
+	ਵਾਪਸ;
+    ਸੁਨੇਹਾ_ਜੋੜੋ_fname(buf, name);	    // put file name in IObuff with quotes
 
     // If it's extremely long, truncate it.
     len = STRLEN(IObuff);
-    if (len > IOSIZE - 100)
+    ਜੇ (len > IOSIZE - 100)
     {
 	len = IOSIZE - 100;
 	IObuff[len] = NUL;
     }
 
     // Avoid an over-long translation to cause trouble.
-    if (*s != NUL)
+    ਜੇ (*s != NUL)
 	STRNCPY(IObuff + len, s, 99);
 
     /*
@@ -82,21 +82,21 @@ filemess(
      * For further ones overwrite the previous one, reset msg_scroll before
      * calling filemess().
      */
-    msg_scroll_save = msg_scroll;
-    if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
-	msg_scroll = FALSE;
-    if (!msg_scroll)	// wait a bit when overwriting an error msg
+    ਸੁਨੇਹਾ_scroll_save = ਸੁਨੇਹਾ_scroll;
+    ਜੇ (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
+	ਸੁਨੇਹਾ_scroll = FALSE;
+    ਜੇ (!ਸੁਨੇਹਾ_scroll)	// wait a bit when overwriting an error msg
 	check_for_delay(FALSE);
-    msg_start();
-    if (prev_msg_col != 0 && msg_col == 0)
-	msg_putchar('\r');  // overwrite any previous message.
-    msg_scroll = msg_scroll_save;
-    msg_scrolled_ign = TRUE;
+    ਸੁਨੇਹਾ_ਸ਼ੁਰੂ();
+    ਜੇ (prev_ਸੁਨੇਹਾ_ਖਾਨਾ != 0 && ਸੁਨੇਹਾ_ਖਾਨਾ == 0)
+	ਸੁਨੇਹਾ_putchar('\r');  // overwrite any previous message.
+    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_scroll_save;
+    ਸੁਨੇਹਾ_scrolled_ign = TRUE;
     // may truncate the message to avoid a hit-return prompt
-    msg_outtrans_attr(msg_may_trunc(FALSE, IObuff), attr);
-    msg_clr_eos();
-    out_flush();
-    msg_scrolled_ign = FALSE;
+    ਸੁਨੇਹਾ_outtrans_attr(ਸੁਨੇਹਾ_may_trunc(FALSE, IObuff), attr);
+    ਸੁਨੇਹਾ_clr_eos();
+    ਬਾਹਰਲਾ_flush();
+    ਸੁਨੇਹਾ_scrolled_ign = FALSE;
 }
 
 /*
@@ -125,115 +125,115 @@ filemess(
  *
  * return FAIL for failure, NOTDONE for directory (failure), or OK
  */
-    int
+    ਪੂਰਨ
 readfile(
     char_u	*fname,
     char_u	*sfname,
     linenr_T	from,
-    linenr_T	lines_to_skip,
-    linenr_T	lines_to_read,
+    linenr_T	ਸਤਰਾਂ_ਮੰਜ਼ਿਲ_skip,
+    linenr_T	ਸਤਰਾਂ_ਮੰਜ਼ਿਲ_read,
     exarg_T	*eap,			// can be NULL!
-    int		flags)
+    ਪੂਰਨ		flags)
 {
-    int		retval = FAIL;	// jump to "theend" instead of returning
-    int		fd = 0;
-    int		newfile = (flags & READ_NEW);
-    int		check_readonly;
-    int		filtering = (flags & READ_FILTER);
-    int		read_stdin = (flags & READ_STDIN);
-    int		read_buffer = (flags & READ_BUFFER);
-    int		read_fifo = (flags & READ_FIFO);
-    int		set_options = newfile || read_buffer
-					   || (eap != NULL && eap->read_edit);
+    ਪੂਰਨ		retval = FAIL;	// jump to "theend" instead of returning
+    ਪੂਰਨ		fd = 0;
+    ਪੂਰਨ		newfile = (flags & READ_NEW);
+    ਪੂਰਨ		check_readonly;
+    ਪੂਰਨ		filtering = (flags & READ_FILTER);
+    ਪੂਰਨ		read_stdin = (flags & READ_STDIN);
+    ਪੂਰਨ		read_ਬਫਰ = (flags & READ_ਬਫਰ);
+    ਪੂਰਨ		read_fifo = (flags & READ_FIFO);
+    ਪੂਰਨ		ਸੈੱਟ_options = newfile || read_ਬਫਰ
+					   || (eap != ਨਿਰਾ && eap->read_edit);
     linenr_T	read_buf_lnum = 1;	// next line to read from curbuf
-    colnr_T	read_buf_col = 0;	// next char to read from this line
+    colnr_T	read_buf_ਖਾਨਾ = 0;	// next char to read from this line
     char_u	c;
     linenr_T	lnum = from;
-    char_u	*ptr = NULL;		// pointer into read buffer
-    char_u	*buffer = NULL;		// read buffer
-    char_u	*new_buffer = NULL;	// init to shut up gcc
-    char_u	*line_start = NULL;	// init to shut up gcc
-    int		wasempty;		// buffer was empty before reading
+    char_u	*ptr = ਨਿਰਾ;		// pointer into read buffer
+    char_u	*ਬਫਰ = ਨਿਰਾ;		// read buffer
+    char_u	*new_ਬਫਰ = ਨਿਰਾ;	// init to shut up gcc
+    char_u	*ਸਤਰ_ਸ਼ੁਰੂ = ਨਿਰਾ;	// init to shut up gcc
+    ਪੂਰਨ		wasempty;		// buffer was empty before reading
     colnr_T	len;
-    long	size = 0;
+    ਲੰਮਾ	ਮਾਪ = 0;
     char_u	*p;
     off_T	filesize = 0;
-    int		skip_read = FALSE;
-#ifdef FEAT_CRYPT
+    ਪੂਰਨ		skip_read = FALSE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
     off_T       filesize_disk = 0;      // file size read from disk
-    off_T       filesize_count = 0;     // counter
-    char_u	*cryptkey = NULL;
-    int		did_ask_for_key = FALSE;
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+    off_T       filesize_ਗਿਣਤੀ = 0;     // counter
+    char_u	*cryptkey = ਨਿਰਾ;
+    ਪੂਰਨ		did_ask_for_ਕੁੰਜੀ = FALSE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
     context_sha256_T sha_ctx;
-    int		read_undo_file = FALSE;
-#endif
-    int		split = 0;		// number of split lines
-#define UNKNOWN	 0x0fffffff		// file size is unknown
+    ਪੂਰਨ		read_undo_file = FALSE;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		ਵੰਡੋ = 0;		// number of split lines
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ UNKNOWN	 0x0fffffff		// file size is unknown
     linenr_T	linecnt;
-    int		error = FALSE;		// errors encountered
-    int		ff_error = EOL_UNKNOWN; // file format with errors
-    long	linerest = 0;		// remaining chars in line
-#ifdef UNIX
-    int		perm = 0;
-    int		swap_mode = -1;		// protection bits for swap file
-#else
-    int		perm;
-#endif
-    int		fileformat = 0;		// end-of-line format
-    int		keep_fileformat = FALSE;
+    ਪੂਰਨ		error = FALSE;		// errors encountered
+    ਪੂਰਨ		ff_error = EOL_UNKNOWN; // file format with errors
+    ਲੰਮਾ	linerest = 0;		// remaining chars in line
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+    ਪੂਰਨ		perm = 0;
+    ਪੂਰਨ		ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ = -1;		// protection bits for swap file
+#ਨਹੀਂਤਾਂ
+    ਪੂਰਨ		perm;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		fileformat = 0;		// end-of-line format
+    ਪੂਰਨ		keep_fileformat = FALSE;
     stat_T	st;
-    int		file_readonly;
-    linenr_T	skip_count = 0;
-    linenr_T	read_count = 0;
-    int		msg_save = msg_scroll;
+    ਪੂਰਨ		file_readonly;
+    linenr_T	skip_ਗਿਣਤੀ = 0;
+    linenr_T	read_ਗਿਣਤੀ = 0;
+    ਪੂਰਨ		ਸੁਨੇਹਾ_save = ਸੁਨੇਹਾ_scroll;
     linenr_T	read_no_eol_lnum = 0;   // non-zero lnum when last line of
 					// last read was missing the eol
-    int		try_mac;
-    int		try_dos;
-    int		try_unix;
-    int		file_rewind = FALSE;
-    int		can_retry;
+    ਪੂਰਨ		try_mac;
+    ਪੂਰਨ		try_dos;
+    ਪੂਰਨ		try_unix;
+    ਪੂਰਨ		file_rewind = FALSE;
+    ਪੂਰਨ		can_retry;
     linenr_T	conv_error = 0;		// line nr with conversion error
     linenr_T	illegal_byte = 0;	// line nr with illegal byte
-    int		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
+    ਪੂਰਨ		keep_dest_enc = FALSE;	// don't retry when char doesn't fit
 					// in destination encoding
-    int		bad_char_behavior = BAD_REPLACE;
+    ਪੂਰਨ		bad_char_behavior = BAD_REPLACE;
 					// BAD_KEEP, BAD_DROP or character to
 					// replace with
-    char_u	*tmpname = NULL;	// name of 'charconvert' output file
-    int		fio_flags = 0;
+    char_u	*tmpname = ਨਿਰਾ;	// name of 'charconvert' output file
+    ਪੂਰਨ		fio_flags = 0;
     char_u	*fenc;			// fileencoding to use
-    int		fenc_alloced;		// fenc_next is in allocated memory
-    char_u	*fenc_next = NULL;	// next item in 'fencs' or NULL
-    int		advance_fenc = FALSE;
-    long	real_size = 0;
-#ifdef USE_ICONV
+    ਪੂਰਨ		fenc_alloced;		// fenc_next is in allocated memory
+    char_u	*fenc_ਅਗਲਾ = ਨਿਰਾ;	// next item in 'fencs' or NULL
+    ਪੂਰਨ		advance_fenc = FALSE;
+    ਲੰਮਾ	real_ਮਾਪ = 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
     iconv_t	iconv_fd = (iconv_t)-1;	// descriptor for iconv() or -1
 # ifdef FEAT_EVAL
-    int		did_iconv = FALSE;	// TRUE when iconv() failed and trying
+    ਪੂਰਨ		did_iconv = FALSE;	// TRUE when iconv() failed and trying
 					// 'charconvert' next
 # endif
-#endif
-    int		converted = FALSE;	// TRUE if conversion done
-    int		notconverted = FALSE;	// TRUE if conversion wanted but it
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		converted = FALSE;	// TRUE if conversion done
+    ਪੂਰਨ		notconverted = FALSE;	// TRUE if conversion wanted but it
 					// wasn't possible
     char_u	conv_rest[CONV_RESTLEN];
-    int		conv_restlen = 0;	// nr of bytes in conv_rest[]
-    pos_T	orig_start;
+    ਪੂਰਨ		conv_restlen = 0;	// nr of bytes in conv_rest[]
+    pos_T	orig_ਸ਼ੁਰੂ;
     buf_T	*old_curbuf;
     char_u	*old_b_ffname;
     char_u	*old_b_fname;
-    int		using_b_ffname;
-    int		using_b_fname;
-    static char *msg_is_a_directory = N_("is a directory");
-#ifdef FEAT_CRYPT
-    int		eof = FALSE;
-#endif
-#ifdef FEAT_SODIUM
-    int		may_need_lseek = FALSE;
-#endif
+    ਪੂਰਨ		using_b_ffname;
+    ਪੂਰਨ		using_b_fname;
+    ਸਥਿਰ ਅੱਖਰ *ਸੁਨੇਹਾ_is_a_directory = N_("is a directory");
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+    ਪੂਰਨ		eof = FALSE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SODIUM
+    ਪੂਰਨ		may_need_lseek = FALSE;
+#ਜੇ_ਅੰਤ
     size_t	fnamelen = 0;
 
     curbuf->b_au_did_filetype = false; // reset before triggering any autocommands
@@ -246,14 +246,14 @@ readfile(
      * Don't do this for a read from a filter.
      * Only do this when 'cpoptions' contains the 'f' flag.
      */
-    if (curbuf->b_ffname == NULL
+    ਜੇ (curbuf->b_ffname == ਨਿਰਾ
 	    && !filtering
-	    && fname != NULL
-	    && vim_strchr(p_cpo, CPO_FNAMER) != NULL
+	    && fname != ਨਿਰਾ
+	    && vim_strchr(p_cpo, CPO_FNAMER) != ਨਿਰਾ
 	    && !(flags & READ_DUMMY))
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
-	    goto theend;
+	ਜੇ (ਸੈੱਟ_rw_fname(fname, sfname) == FAIL)
+	    ਜਾਓ theend;
     }
 
     // Remember the initial values of curbuf, curbuf->b_ffname and
@@ -280,105 +280,105 @@ readfile(
      * Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
      * another directory, which we don't detect.
      */
-    if (sfname == NULL)
+    ਜੇ (sfname == ਨਿਰਾ)
 	sfname = fname;
-#if defined(UNIX)
+#ਜੇ defined(UNIX)
     fname = sfname;
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * The BufReadCmd and FileReadCmd events intercept the reading process by
      * executing the associated commands instead.
      */
-    if (!filtering && !read_stdin && !read_buffer)
+    ਜੇ (!filtering && !read_stdin && !read_ਬਫਰ)
     {
-	orig_start = curbuf->b_op_start;
+	orig_ਸ਼ੁਰੂ = curbuf->b_op_ਸ਼ੁਰੂ;
 
 	// Set '[ mark to the line above where the lines go (line 1 if zero).
-	curbuf->b_op_start.lnum = ((from == 0) ? 1 : from);
-	curbuf->b_op_start.col = 0;
+	curbuf->b_op_ਸ਼ੁਰੂ.lnum = ((from == 0) ? 1 : from);
+	curbuf->b_op_ਸ਼ੁਰੂ.ਖਾਨਾ = 0;
 
-	if (newfile)
+	ਜੇ (newfile)
 	{
-	    if (apply_autocmds_exarg(EVENT_BUFREADCMD, NULL, sfname,
+	    ਜੇ (apply_autocmds_exarg(EVENT_BUFREADCMD, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap))
 	    {
 		retval = OK;
-#ifdef FEAT_EVAL
-		if (aborting())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+		ਜੇ (aborting())
 		    retval = FAIL;
-#endif
+#ਜੇ_ਅੰਤ
 		// The BufReadCmd code usually uses ":read" to get the text and
 		// perhaps ":file" to change the buffer name. But we should
 		// consider this to work like ":edit", thus reset the
 		// BF_NOTEDITED flag.  Then ":write" will work to overwrite the
 		// same file.
-		if (retval == OK)
+		ਜੇ (retval == OK)
 		    curbuf->b_flags &= ~BF_NOTEDITED;
-		goto theend;
+		ਜਾਓ theend;
 	    }
 	}
-	else if (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
-							    FALSE, NULL, eap))
+	ਨਹੀਂਤਾਂ ਜੇ (apply_autocmds_exarg(EVENT_FILEREADCMD, sfname, sfname,
+							    FALSE, ਨਿਰਾ, eap))
 	{
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	    retval = aborting() ? FAIL : OK;
-#else
+#ਨਹੀਂਤਾਂ
 	    retval = OK;
-#endif
-	    goto theend;
+#ਜੇ_ਅੰਤ
+	    ਜਾਓ theend;
 	}
 
-	curbuf->b_op_start = orig_start;
+	curbuf->b_op_ਸ਼ੁਰੂ = orig_ਸ਼ੁਰੂ;
 
-	if (flags & READ_NOFILE)
+	ਜੇ (flags & READ_NOFILE)
 	{
 	    // Return NOTDONE instead of FAIL so that BufEnter can be triggered
 	    // and other operations don't fail.
 	    retval = NOTDONE;
-	    goto theend;
+	    ਜਾਓ theend;
 	}
     }
 
-    if ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
-	msg_scroll = FALSE;	// overwrite previous file message
-    else
-	msg_scroll = TRUE;	// don't overwrite previous file message
+    ਜੇ ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
+	ਸੁਨੇਹਾ_scroll = FALSE;	// overwrite previous file message
+    ਨਹੀਂਤਾਂ
+	ਸੁਨੇਹਾ_scroll = TRUE;	// don't overwrite previous file message
 
-    if (fname != NULL && *fname != NUL)
+    ਜੇ (fname != ਨਿਰਾ && *fname != NUL)
     {
 	fnamelen = STRLEN(fname);
 
 	// If the name is too long we might crash further on, quit here.
-	if (fnamelen >= MAXPATHL)
+	ਜੇ (fnamelen >= MAXPATHL)
 	{
 	    filemess(curbuf, fname, (char_u *)_("Illegal file name"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ਸੁਨੇਹਾ_ਸਿਰਾ();
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+	    ਜਾਓ theend;
 	}
 
 	// If the name ends in a path separator, we can't open it.  Check here,
 	// because reading the file may actually work, but then creating the
 	// swap file may destroy it!  Reported on MS-DOS and Win 95.
-	if (after_pathsep(fname, fname + fnamelen))
+	ਜੇ (after_pathsep(fname, fname + fnamelen))
 	{
-	    filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    filemess(curbuf, fname, (char_u *)_(ਸੁਨੇਹਾ_is_a_directory), 0);
+	    ਸੁਨੇਹਾ_ਸਿਰਾ();
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
 	    retval = NOTDONE;
-	    goto theend;
+	    ਜਾਓ theend;
 	}
     }
-#if defined(UNIX) || defined(VMS)
-    if (!read_stdin && fname != NULL)
+#ਜੇ defined(UNIX) || defined(VMS)
+    ਜੇ (!read_stdin && fname != ਨਿਰਾ)
 	perm = mch_getperm(fname);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (!read_stdin && !read_buffer && !read_fifo)
+    ਜੇ (!read_stdin && !read_ਬਫਰ && !read_fifo)
     {
-#if defined(UNIX) || defined(VMS)
-	if (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
+#ਜੇ defined(UNIX) || defined(VMS)
+	ਜੇ (perm >= 0 && !S_ISREG(perm)		    // not a regular file ...
 		      && !S_ISFIFO(perm)	    // ... or fifo
 		      && !S_ISSOCK(perm)	    // ... or socket
 # ifdef OPEN_CHR_FILES
@@ -391,35 +391,35 @@ readfile(
 	     * On Unix it is possible to read a directory, so we have to
 	     * check for it before the mch_open().
 	     */
-	    if (S_ISDIR(perm))
+	    ਜੇ (S_ISDIR(perm))
 	    {
-		filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
+		filemess(curbuf, fname, (char_u *)_(ਸੁਨੇਹਾ_is_a_directory), 0);
 		retval = NOTDONE;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		filemess(curbuf, fname, (char_u *)_("is not a file"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ਸੁਨੇਹਾ_ਸਿਰਾ();
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+	    ਜਾਓ theend;
 	}
-#endif
-#if defined(MSWIN)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(MSWIN)
 	/*
 	 * MS-Windows allows opening a device, but we will probably get stuck
 	 * trying to read it.
 	 */
-	if (!p_odev && mch_nodetype(fname) == NODE_WRITABLE)
+	ਜੇ (!p_odev && mch_nodetype(fname) == ਗੰਢ_WRITABLE)
 	{
 	    filemess(curbuf, fname, (char_u *)_("is a device (disabled with 'opendevice' option)"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
-	    goto theend;
+	    ਸੁਨੇਹਾ_ਸਿਰਾ();
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+	    ਜਾਓ theend;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // Set default or forced 'fileformat' and 'binary'.
-    set_file_options(set_options, eap);
+    ਸੈੱਟ_file_options(ਸੈੱਟ_options, eap);
 
     /*
      * When opening a new file we take the readonly flag from the file.
@@ -428,21 +428,21 @@ readfile(
      * Only set/reset b_p_ro when BF_CHECK_RO is set.
      */
     check_readonly = (newfile && (curbuf->b_flags & BF_CHECK_RO));
-    if (check_readonly && !readonlymode)
+    ਜੇ (check_readonly && !readonlymode)
 	curbuf->b_p_ro = FALSE;
 
-    if (newfile && !read_stdin && !read_buffer && !read_fifo)
+    ਜੇ (newfile && !read_stdin && !read_ਬਫਰ && !read_fifo)
     {
 	// Remember time of file.
-	if (mch_stat((char *)fname, &st) >= 0)
+	ਜੇ (mch_stat((ਅੱਖਰ *)fname, &st) >= 0)
 	{
-	    buf_store_time(curbuf, &st, fname);
+	    buf_store_ਸਮਾਂ(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
 	    curbuf->b_mtime_read_ns = curbuf->b_mtime_ns;
-#ifdef FEAT_CRYPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
 	    filesize_disk = st.st_size;
-#endif
-#ifdef UNIX
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 	    /*
 	     * Use the protection bits of the original file for the swap file.
 	     * This makes it possible for others to read the name of the
@@ -454,22 +454,22 @@ readfile(
 	     * not be able to write to the file ourselves.
 	     * Setting the bits is done below, after creating the swap file.
 	     */
-	    swap_mode = (st.st_mode & 0644) | 0600;
-#endif
-#ifdef VMS
+	    ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ = (st.st_ਬਹੁਲਕ & 0644) | 0600;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 	    curbuf->b_fab_rfm = st.st_fab_rfm;
 	    curbuf->b_fab_rat = st.st_fab_rat;
 	    curbuf->b_fab_mrs = st.st_fab_mrs;
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    curbuf->b_mtime = 0;
 	    curbuf->b_mtime_ns = 0;
 	    curbuf->b_mtime_read = 0;
 	    curbuf->b_mtime_read_ns = 0;
-	    curbuf->b_orig_size = 0;
-	    curbuf->b_orig_mode = 0;
+	    curbuf->b_orig_ਮਾਪ = 0;
+	    curbuf->b_orig_ਬਹੁਲਕ = 0;
 	}
 
 	// Reset the "new file" flag.  It will be set again below when the
@@ -482,60 +482,60 @@ readfile(
  * for Amiga: check readonly by trying to open the file for writing
  */
     file_readonly = FALSE;
-    if (read_stdin)
+    ਜੇ (read_stdin)
     {
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 	// Force binary I/O on stdin to avoid CR-LF -> LF conversion.
-	setmode(0, O_BINARY);
-#endif
+	setmode(0, O_ਦੁਆਧਾਰੀ);
+#ਜੇ_ਅੰਤ
     }
-    else if (!read_buffer)
+    ਨਹੀਂਤਾਂ ਜੇ (!read_ਬਫਰ)
     {
-#ifdef USE_MCH_ACCESS
-	if (
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_MCH_ACCESS
+	ਜੇ (
 # ifdef UNIX
 	    !(perm & 0222) ||
 # endif
-				mch_access((char *)fname, W_OK))
+				mch_access((ਅੱਖਰ *)fname, W_OK))
 	    file_readonly = TRUE;
-	fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-#else
-	if (!newfile
+	fd = mch_open((ਅੱਖਰ *)fname, O_RDONLY | O_EXTRA, 0);
+#ਨਹੀਂਤਾਂ
+	ਜੇ (!newfile
 		|| readonlymode
-		|| (fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0)
+		|| (fd = mch_open((ਅੱਖਰ *)fname, O_RDWR | O_EXTRA, 0)) < 0)
 	{
 	    file_readonly = TRUE;
 	    // try to open ro
-	    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+	    fd = mch_open((ਅੱਖਰ *)fname, O_RDONLY | O_EXTRA, 0);
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if (fd < 0)			    // cannot open at all
+    ਜੇ (fd < 0)			    // cannot open at all
     {
-#ifndef UNIX
-	int	isdir_f;
-#endif
-	msg_scroll = msg_save;
-#ifndef UNIX
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ UNIX
+	ਪੂਰਨ	isdir_f;
+#ਜੇ_ਅੰਤ
+	ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ UNIX
 	/*
 	 * On Amiga we can't open a directory, check here.
 	 */
 	isdir_f = (mch_isdir(fname));
 	perm = mch_getperm(fname);  // check if the file exists
-	if (isdir_f)
+	ਜੇ (isdir_f)
 	{
-	    filemess(curbuf, sfname, (char_u *)_(msg_is_a_directory), 0);
+	    filemess(curbuf, sfname, (char_u *)_(ਸੁਨੇਹਾ_is_a_directory), 0);
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	}
-	else
-#endif
-	    if (newfile)
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਜੇ (newfile)
 	    {
-		if (perm < 0
-#ifdef ENOENT
+		ਜੇ (perm < 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ENOENT
 			&& errno == ENOENT
-#endif
+#ਜੇ_ਅੰਤ
 		   )
 		{
 		    /*
@@ -547,105 +547,105 @@ readfile(
 		    // Create a swap file now, so that other Vims are warned
 		    // that we are editing this file.  Don't do this for a
 		    // "nofile" or "nowrite" buffer type.
-		    if (!bt_dontwrite(curbuf))
+		    ਜੇ (!bt_dontwrite(curbuf))
 		    {
-			check_need_swap(newfile);
+			check_need_ਅਦਲਾ_ਬਦਲੀ(newfile);
 			// SwapExists autocommand may mess things up
-			if (curbuf != old_curbuf
+			ਜੇ (curbuf != old_curbuf
 				|| (using_b_ffname
 					&& (old_b_ffname != curbuf->b_ffname))
 				|| (using_b_fname
 					 && (old_b_fname != curbuf->b_fname)))
 			{
-			    emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-			    goto theend;
+			    emsg(_(e_autocommands_ਬਦਲਿਆ_ਬਫਰ_or_ਬਫਰ_name));
+			    ਜਾਓ theend;
 			}
 		    }
-		    if (dir_of_file_exists(fname))
+		    ਜੇ (dir_ਦਾ_file_exists(fname))
 			filemess(curbuf, sfname,
-					      (char_u *)new_file_message(), 0);
-		    else
+					      (char_u *)new_file_ਸੁਨੇਹਾ(), 0);
+		    ਨਹੀਂਤਾਂ
 			filemess(curbuf, sfname,
 					   (char_u *)_("[New DIRECTORY]"), 0);
-#ifdef FEAT_VIMINFO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VIMINFO
 		    // Even though this is a new file, it might have been
 		    // edited before and deleted.  Get the old marks.
 		    check_marks_read();
-#endif
+#ਜੇ_ਅੰਤ
 		    // Set forced 'fileencoding'.
-		    if (eap != NULL)
-			set_forced_fenc(eap);
+		    ਜੇ (eap != ਨਿਰਾ)
+			ਸੈੱਟ_forced_fenc(eap);
 		    apply_autocmds_exarg(EVENT_BUFNEWFILE, sfname, sfname,
 							  FALSE, curbuf, eap);
 		    // remember the current fileformat
 		    save_file_ff(curbuf);
 
-#if defined(FEAT_EVAL)
-		    if (!aborting())   // autocmds may abort script processing
-#endif
+#ਜੇ defined(FEAT_EVAL)
+		    ਜੇ (!aborting())   // autocmds may abort script processing
+#ਜੇ_ਅੰਤ
 			retval = OK;	    // a new file is not an error
-		    goto theend;
+		    ਜਾਓ theend;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    filemess(curbuf, sfname, (char_u *)(
-#ifdef EFBIG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ EFBIG
 			    (errno == EFBIG) ? _("[File too big]") :
-#endif
-#ifdef EOVERFLOW
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ EOVERFLOW
 			    (errno == EOVERFLOW) ? _("[File too big]") :
-#endif
+#ਜੇ_ਅੰਤ
 						_("[Permission Denied]")), 0);
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 		}
 	    }
 
-	goto theend;
+	ਜਾਓ theend;
     }
 
     /*
      * Only set the 'ro' flag for readonly files the first time they are
      * loaded.	Help files always get readonly mode
      */
-    if ((check_readonly && file_readonly) || curbuf->b_help)
+    ਜੇ ((check_readonly && file_readonly) || curbuf->b_help)
 	curbuf->b_p_ro = TRUE;
 
-    if (set_options)
+    ਜੇ (ਸੈੱਟ_options)
     {
 	// Don't change 'eol' if reading from buffer as it will already be
 	// correctly set when reading stdin.
-	if (!read_buffer)
+	ਜੇ (!read_ਬਫਰ)
 	{
 	    curbuf->b_p_eof = FALSE;
-	    curbuf->b_start_eof = FALSE;
+	    curbuf->b_ਸ਼ੁਰੂ_eof = FALSE;
 	    curbuf->b_p_eol = TRUE;
-	    curbuf->b_start_eol = TRUE;
+	    curbuf->b_ਸ਼ੁਰੂ_eol = TRUE;
 	}
 	curbuf->b_p_bomb = FALSE;
-	curbuf->b_start_bomb = FALSE;
+	curbuf->b_ਸ਼ੁਰੂ_bomb = FALSE;
     }
 
     // Create a swap file now, so that other Vims are warned that we are
     // editing this file.
     // Don't do this for a "nofile" or "nowrite" buffer type.
-    if (!bt_dontwrite(curbuf))
+    ਜੇ (!bt_dontwrite(curbuf))
     {
-	check_need_swap(newfile);
-	if (!read_stdin && (curbuf != old_curbuf
+	check_need_ਅਦਲਾ_ਬਦਲੀ(newfile);
+	ਜੇ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))))
 	{
-	    emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	    if (!read_buffer)
+	    emsg(_(e_autocommands_ਬਦਲਿਆ_ਬਫਰ_or_ਬਫਰ_name));
+	    ਜੇ (!read_ਬਫਰ)
 		close(fd);
-	    goto theend;
+	    ਜਾਓ theend;
 	}
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 	// Set swap file protection bits after creating it.
-	if (swap_mode > 0 && curbuf->b_ml.ml_mfp != NULL
-			  && curbuf->b_ml.ml_mfp->mf_fname != NULL)
+	ਜੇ (ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ > 0 && curbuf->b_ml.ml_mfp != ਨਿਰਾ
+			  && curbuf->b_ml.ml_mfp->mf_fname != ਨਿਰਾ)
 	{
-	    char_u *swap_fname = curbuf->b_ml.ml_mfp->mf_fname;
+	    char_u *ਅਦਲਾ_ਬਦਲੀ_fname = curbuf->b_ml.ml_mfp->mf_fname;
 
 	    /*
 	     * If the group-read bit is set but not the world-read bit, then
@@ -654,31 +654,31 @@ readfile(
 	     * avoids making the swap file readable to more users when the
 	     * primary group of the user is too permissive.
 	     */
-	    if ((swap_mode & 044) == 040)
+	    ਜੇ ((ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ & 044) == 040)
 	    {
-		stat_T	swap_st;
+		stat_T	ਅਦਲਾ_ਬਦਲੀ_st;
 
-		if (mch_stat((char *)swap_fname, &swap_st) >= 0
-			&& st.st_gid != swap_st.st_gid
+		ਜੇ (mch_stat((ਅੱਖਰ *)ਅਦਲਾ_ਬਦਲੀ_fname, &ਅਦਲਾ_ਬਦਲੀ_st) >= 0
+			&& st.st_gid != ਅਦਲਾ_ਬਦਲੀ_st.st_gid
 # ifdef HAVE_FCHOWN
 			&& fchown(curbuf->b_ml.ml_mfp->mf_fd, -1, st.st_gid)
 									  == -1
 # endif
 		   )
-		    swap_mode &= 0600;
+		    ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ &= 0600;
 	    }
 
-	    (void)mch_setperm(swap_fname, (long)swap_mode);
+	    (ਖਾਲੀ)mch_setperm(ਅਦਲਾ_ਬਦਲੀ_fname, (ਲੰਮਾ)ਅਦਲਾ_ਬਦਲੀ_ਬਹੁਲਕ);
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // If "Quit" selected at ATTENTION dialog, don't load the file
-    if (swap_exists_action == SEA_QUIT)
+    ਜੇ (ਅਦਲਾ_ਬਦਲੀ_exists_action == SEA_QUIT)
     {
-	if (!read_buffer && !read_stdin)
+	ਜੇ (!read_ਬਫਰ && !read_stdin)
 	    close(fd);
-	goto theend;
+	ਜਾਓ theend;
     }
 
     ++no_wait_return;	    // don't wait for return yet
@@ -686,24 +686,24 @@ readfile(
     /*
      * Set '[ mark to the line above where the lines go (line 1 if zero).
      */
-    orig_start = curbuf->b_op_start;
-    curbuf->b_op_start.lnum = ((from == 0) ? 1 : from);
-    curbuf->b_op_start.col = 0;
+    orig_ਸ਼ੁਰੂ = curbuf->b_op_ਸ਼ੁਰੂ;
+    curbuf->b_op_ਸ਼ੁਰੂ.lnum = ((from == 0) ? 1 : from);
+    curbuf->b_op_ਸ਼ੁਰੂ.ਖਾਨਾ = 0;
 
-    try_mac = (vim_strchr(p_ffs, 'm') != NULL);
-    try_dos = (vim_strchr(p_ffs, 'd') != NULL);
-    try_unix = (vim_strchr(p_ffs, 'x') != NULL);
+    try_mac = (vim_strchr(p_ffs, 'm') != ਨਿਰਾ);
+    try_dos = (vim_strchr(p_ffs, 'd') != ਨਿਰਾ);
+    try_unix = (vim_strchr(p_ffs, 'x') != ਨਿਰਾ);
 
-    if (!read_buffer)
+    ਜੇ (!read_ਬਫਰ)
     {
-	int	m = msg_scroll;
-	int	n = msg_scrolled;
+	ਪੂਰਨ	m = ਸੁਨੇਹਾ_scroll;
+	ਪੂਰਨ	n = ਸੁਨੇਹਾ_scrolled;
 
 	/*
 	 * The file must be closed again, the autocommands may want to change
 	 * the file before reading it.
 	 */
-	if (!read_stdin)
+	ਜੇ (!read_stdin)
 	    close(fd);		// ignore errors
 
 	/*
@@ -711,37 +711,37 @@ readfile(
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
-	if (filtering)
-	    apply_autocmds_exarg(EVENT_FILTERREADPRE, NULL, sfname,
+	ਸੁਨੇਹਾ_scroll = TRUE;
+	ਜੇ (filtering)
+	    apply_autocmds_exarg(EVENT_FILTERREADPRE, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap);
-	else if (read_stdin)
-	    apply_autocmds_exarg(EVENT_STDINREADPRE, NULL, sfname,
+	ਨਹੀਂਤਾਂ ਜੇ (read_stdin)
+	    apply_autocmds_exarg(EVENT_STDINREADPRE, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile)
-	    apply_autocmds_exarg(EVENT_BUFREADPRE, NULL, sfname,
+	ਨਹੀਂਤਾਂ ਜੇ (newfile)
+	    apply_autocmds_exarg(EVENT_BUFREADPRE, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap);
-	else
+	ਨਹੀਂਤਾਂ
 	    apply_autocmds_exarg(EVENT_FILEREADPRE, sfname, sfname,
-							    FALSE, NULL, eap);
+							    FALSE, ਨਿਰਾ, eap);
 	// autocommands may have changed it
-	try_mac = (vim_strchr(p_ffs, 'm') != NULL);
-	try_dos = (vim_strchr(p_ffs, 'd') != NULL);
-	try_unix = (vim_strchr(p_ffs, 'x') != NULL);
-	curbuf->b_op_start = orig_start;
+	try_mac = (vim_strchr(p_ffs, 'm') != ਨਿਰਾ);
+	try_dos = (vim_strchr(p_ffs, 'd') != ਨਿਰਾ);
+	try_unix = (vim_strchr(p_ffs, 'x') != ਨਿਰਾ);
+	curbuf->b_op_ਸ਼ੁਰੂ = orig_ਸ਼ੁਰੂ;
 
-	if (msg_scrolled == n)
-	    msg_scroll = m;
+	ਜੇ (ਸੁਨੇਹਾ_scrolled == n)
+	    ਸੁਨੇਹਾ_scroll = m;
 
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	ਜੇ (aborting())	    // autocmds may abort script processing
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
-	    goto theend;
+	    ਜਾਓ theend;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	/*
 	 * Don't allow the autocommands to change the current buffer.
 	 * Try to re-open the file.
@@ -749,26 +749,26 @@ readfile(
 	 * Don't allow the autocommands to change the buffer name either
 	 * (cd for example) if it invalidates fname or sfname.
 	 */
-	if (!read_stdin && (curbuf != old_curbuf
+	ਜੇ (!read_stdin && (curbuf != old_curbuf
 		|| (using_b_ffname && (old_b_ffname != curbuf->b_ffname))
 		|| (using_b_fname && (old_b_fname != curbuf->b_fname))
-		|| (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
+		|| (fd = mch_open((ਅੱਖਰ *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
-	    if (fd < 0)
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+	    ਜੇ (fd < 0)
 		emsg(_(e_readpre_autocommands_made_file_unreadable));
-	    else
-		emsg(_(e_readpre_autocommands_must_not_change_current_buffer));
+	    ਨਹੀਂਤਾਂ
+		emsg(_(e_readpre_autocommands_must_not_change_current_ਬਫਰ));
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
-	    goto theend;
+	    ਜਾਓ theend;
 	}
     }
 
     // Autocommands may add lines to the file, need to check if it is empty
-    wasempty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    wasempty = (curbuf->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ);
 
-    if (!recoverymode && !filtering && !(flags & READ_DUMMY))
+    ਜੇ (!recoverymode && !filtering && !(flags & READ_DUMMY))
     {
 	/*
 	 * Show the user that we are busy reading the input.  Sometimes this
@@ -776,73 +776,73 @@ readfile(
 	 * still be running, don't move the cursor to the last line, unless
 	 * always using the GUI.
 	 */
-	if (read_stdin)
+	ਜੇ (read_stdin)
 	{
-	    if (!is_not_a_term())
+	    ਜੇ (!is_not_a_ਪਦ())
 	    {
-#ifndef ALWAYS_USE_GUI
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ ALWAYS_USE_GUI
 # ifdef VIMDLL
-		if (!gui.in_use)
+		ਜੇ (!gui.ਵਿੱਚ_use)
 # endif
-		    mch_msg(_("Vim: Reading from stdin...\n"));
-#endif
-#ifdef FEAT_GUI
+		    mch_ਸੁਨੇਹਾ(_("Vim: Reading from stdin...\n"));
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		// Also write a message in the GUI window, if there is one.
-		if (gui.in_use && !gui.dying && !gui.starting)
+		ਜੇ (gui.ਵਿੱਚ_use && !gui.dying && !gui.starting)
 		{
 		    size_t  plen = STRLEN(_("Reading from stdin..."));
 
 		    // make a copy, gui_write() may try to change it
 		    p = vim_strnsave((char_u *)_("Reading from stdin..."), plen);
-		    if (p != NULL)
+		    ਜੇ (p != ਨਿਰਾ)
 		    {
-			gui_write(p, (int)plen);
+			gui_write(p, (ਪੂਰਨ)plen);
 			vim_free(p);
 		    }
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 	}
-	else if (!read_buffer)
+	ਨਹੀਂਤਾਂ ਜੇ (!read_ਬਫਰ)
 	    filemess(curbuf, sfname, (char_u *)"", 0);
     }
 
-    msg_scroll = FALSE;			// overwrite the file message
+    ਸੁਨੇਹਾ_scroll = FALSE;			// overwrite the file message
 
     /*
      * Set linecnt now, before the "retry" caused by a wrong guess for
      * fileformat, and after the autocommands, which may change them.
      */
-    linecnt = curbuf->b_ml.ml_line_count;
+    linecnt = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
     // "++bad=" argument.
-    if (eap != NULL && eap->bad_char != 0)
+    ਜੇ (eap != ਨਿਰਾ && eap->bad_char != 0)
     {
 	bad_char_behavior = eap->bad_char;
-	if (set_options)
+	ਜੇ (ਸੈੱਟ_options)
 	    curbuf->b_bad_char = eap->bad_char;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	curbuf->b_bad_char = 0;
 
     /*
      * Decide which 'encoding' to use or use first.
      */
-    if (eap != NULL && eap->force_enc != 0)
+    ਜੇ (eap != ਨਿਰਾ && eap->force_enc != 0)
     {
 	fenc = enc_canonize(eap->cmd + eap->force_enc);
 	fenc_alloced = TRUE;
 	keep_dest_enc = TRUE;
     }
-    else if (curbuf->b_p_bin)
+    ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_p_bin)
     {
 	fenc = (char_u *)"";		// binary: don't convert
 	fenc_alloced = FALSE;
     }
-    else if (curbuf->b_help)
+    ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_help)
     {
 	char_u	    firstline[80];
-	int	    fc;
+	ਪੂਰਨ	    fc;
 
 	// Help files are either utf-8 or latin1.  Try utf-8 first, if this
 	// fails it must be latin1.
@@ -852,46 +852,46 @@ readfile(
 	// That is only in *.??x files.
 	fenc = (char_u *)"latin1";
 	c = enc_utf8;
-	if (!c && !read_stdin)
+	ਜੇ (!c && !read_stdin)
 	{
 	    fc = fname[fnamelen - 1];
-	    if (TOLOWER_ASC(fc) == 'x')
+	    ਜੇ (TOLOWER_ASC(fc) == 'x')
 	    {
 		// Read the first line (and a bit more).  Immediately rewind to
 		// the start of the file.  If the read() fails "len" is -1.
 		len = read_eintr(fd, firstline, 80);
 		vim_lseek(fd, (off_T)0L, SEEK_SET);
-		for (p = firstline; p < firstline + len; ++p)
-		    if (*p >= 0x80)
+		ਲਈ (p = firstline; p < firstline + len; ++p)
+		    ਜੇ (*p >= 0x80)
 		    {
 			c = TRUE;
-			break;
+			ਰੋਕੋ;
 		    }
 	    }
 	}
 
-	if (c)
+	ਜੇ (c)
 	{
-	    fenc_next = fenc;
+	    fenc_ਅਗਲਾ = fenc;
 	    fenc = (char_u *)"utf-8";
 
 	    // When the file is utf-8 but a character doesn't fit in
 	    // 'encoding' don't retry.  In help text editing utf-8 bytes
 	    // doesn't make sense.
-	    if (!enc_utf8)
+	    ਜੇ (!enc_utf8)
 		keep_dest_enc = TRUE;
 	}
 	fenc_alloced = FALSE;
     }
-    else if (*p_fencs == NUL)
+    ਨਹੀਂਤਾਂ ਜੇ (*p_fencs == NUL)
     {
 	fenc = curbuf->b_p_fenc;	// use format from buffer
 	fenc_alloced = FALSE;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	fenc_next = p_fencs;		// try items in 'fileencodings'
-	fenc = next_fenc(&fenc_next, &fenc_alloced);
+	fenc_ਅਗਲਾ = p_fencs;		// try items in 'fileencodings'
+	fenc = ਅਗਲਾ_fenc(&fenc_ਅਗਲਾ, &fenc_alloced);
     }
 
     /*
@@ -915,27 +915,27 @@ readfile(
      */
 retry:
 
-    if (file_rewind)
+    ਜੇ (file_rewind)
     {
-	if (read_buffer)
+	ਜੇ (read_ਬਫਰ)
 	{
 	    read_buf_lnum = 1;
-	    read_buf_col = 0;
+	    read_buf_ਖਾਨਾ = 0;
 	}
-	else if (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
+	ਨਹੀਂਤਾਂ ਜੇ (read_stdin || vim_lseek(fd, (off_T)0L, SEEK_SET) != 0)
 	{
 	    // Can't rewind the file, give up.
 	    error = TRUE;
-	    goto failed;
+	    ਜਾਓ failed;
 	}
 	// Delete the previously read lines.
-	while (lnum > from)
+	ਜਦੋਂ (lnum > from)
 	    ml_delete(lnum--);
 	file_rewind = FALSE;
-	if (set_options)
+	ਜੇ (ਸੈੱਟ_options)
 	{
 	    curbuf->b_p_bomb = FALSE;
-	    curbuf->b_start_bomb = FALSE;
+	    curbuf->b_ਸ਼ੁਰੂ_bomb = FALSE;
 	}
 	conv_error = 0;
     }
@@ -944,65 +944,65 @@ retry:
      * When retrying with another "fenc" and the first time "fileformat"
      * will be reset.
      */
-    if (keep_fileformat)
+    ਜੇ (keep_fileformat)
 	keep_fileformat = FALSE;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (eap != NULL && eap->force_ff != 0)
+	ਜੇ (eap != ਨਿਰਾ && eap->force_ff != 0)
 	{
 	    fileformat = get_fileformat_force(curbuf, eap);
 	    try_unix = try_dos = try_mac = FALSE;
 	}
-	else if (curbuf->b_p_bin)
+	ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_p_bin)
 	    fileformat = EOL_UNIX;		// binary: use Unix format
-	else if (*p_ffs == NUL)
+	ਨਹੀਂਤਾਂ ਜੇ (*p_ffs == NUL)
 	    fileformat = get_fileformat(curbuf);// use format from buffer
-	else
+	ਨਹੀਂਤਾਂ
 	    fileformat = EOL_UNKNOWN;		// detect from file
     }
 
-#ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+    ਜੇ (iconv_fd != (iconv_t)-1)
     {
 	// aborted conversion with iconv(), close the descriptor
 	iconv_close(iconv_fd);
 	iconv_fd = (iconv_t)-1;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (advance_fenc)
+    ਜੇ (advance_fenc)
     {
 	/*
 	 * Try the next entry in 'fileencodings'.
 	 */
 	advance_fenc = FALSE;
 
-	if (eap != NULL && eap->force_enc != 0)
+	ਜੇ (eap != ਨਿਰਾ && eap->force_enc != 0)
 	{
 	    // Conversion given with "++cc=" wasn't possible, read
 	    // without conversion.
 	    notconverted = TRUE;
 	    conv_error = 0;
-	    if (fenc_alloced)
+	    ਜੇ (fenc_alloced)
 		vim_free(fenc);
 	    fenc = (char_u *)"";
 	    fenc_alloced = FALSE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (fenc_alloced)
+	    ਜੇ (fenc_alloced)
 		vim_free(fenc);
-	    if (fenc_next != NULL)
+	    ਜੇ (fenc_ਅਗਲਾ != ਨਿਰਾ)
 	    {
-		fenc = next_fenc(&fenc_next, &fenc_alloced);
+		fenc = ਅਗਲਾ_fenc(&fenc_ਅਗਲਾ, &fenc_alloced);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		fenc = (char_u *)"";
 		fenc_alloced = FALSE;
 	    }
 	}
-	if (tmpname != NULL)
+	ਜੇ (tmpname != ਨਿਰਾ)
 	{
 	    mch_remove(tmpname);		// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -1015,11 +1015,11 @@ retry:
      */
     fio_flags = 0;
     converted = need_conversion(fenc);
-    if (converted)
+    ਜੇ (converted)
     {
 	// "ucs-bom" means we need to check the first bytes of the file
 	// for a BOM.
-	if (STRCMP(fenc, ENC_UCSBOM) == 0)
+	ਜੇ (STRCMP(fenc, ENC_UCSBOM) == 0)
 	    fio_flags = FIO_UCSBOM;
 
 	/*
@@ -1031,43 +1031,43 @@ retry:
 	 * conversion to UTF-8 except how the resulting character is put in
 	 * the buffer.
 	 */
-	else if (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 	    fio_flags = get_fio_flags(fenc);
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	/*
 	 * Conversion from an MS-Windows codepage to UTF-8 or another codepage
 	 * is handled with MultiByteToWideChar().
 	 */
-	if (fio_flags == 0)
+	ਜੇ (fio_flags == 0)
 	    fio_flags = get_win_fio_flags(fenc);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef MACOS_CONVERT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_CONVERT
 	// Conversion from Apple MacRoman to latin1 or UTF-8
-	if (fio_flags == 0)
+	ਜੇ (fio_flags == 0)
 	    fio_flags = get_mac_fio_flags(fenc);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef USE_ICONV
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
 	/*
 	 * Try using iconv() if we can't convert internally.
 	 */
-	if (fio_flags == 0
+	ਜੇ (fio_flags == 0
 # ifdef FEAT_EVAL
 		&& !did_iconv
 # endif
 		)
 	    iconv_fd = (iconv_t)my_iconv_open(
 				  enc_utf8 ? (char_u *)"utf-8" : p_enc, fenc);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	/*
 	 * Use the 'charconvert' expression when conversion is required
 	 * and we can't do it internally or with iconv().
 	 */
-	if (fio_flags == 0 && !read_stdin && !read_buffer && *p_ccv != NUL
+	ਜੇ (fio_flags == 0 && !read_stdin && !read_ਬਫਰ && *p_ccv != NUL
 						    && !read_fifo
 # ifdef USE_ICONV
 						    && iconv_fd == (iconv_t)-1
@@ -1079,37 +1079,37 @@ retry:
 # endif
 	    // Skip conversion when it's already done (retry for wrong
 	    // "fileformat").
-	    if (tmpname == NULL)
+	    ਜੇ (tmpname == ਨਿਰਾ)
 	    {
 		tmpname = readfile_charconvert(fname, fenc, &fd);
-		if (tmpname == NULL)
+		ਜੇ (tmpname == ਨਿਰਾ)
 		{
 		    // Conversion failed.  Try another one.
 		    advance_fenc = TRUE;
-		    if (fd < 0)
+		    ਜੇ (fd < 0)
 		    {
 			// Re-opening the original file failed!
 			emsg(_(e_conversion_mad_file_unreadable));
 			error = TRUE;
-			goto failed;
+			ਜਾਓ failed;
 		    }
-		    goto retry;
+		    ਜਾਓ retry;
 		}
 	    }
 	}
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	{
-	    if (fio_flags == 0
-#ifdef USE_ICONV
+	    ਜੇ (fio_flags == 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
 		    && iconv_fd == (iconv_t)-1
-#endif
+#ਜੇ_ਅੰਤ
 	       )
 	    {
 		// Conversion wanted but we can't.
 		// Try the next conversion in 'fileencodings'
 		advance_fenc = TRUE;
-		goto retry;
+		ਜਾਓ retry;
 	    }
 	}
     }
@@ -1119,39 +1119,39 @@ retry:
     // stdin or fixed at a specific encoding.
     can_retry = (*fenc != NUL && !read_stdin && !read_fifo && !keep_dest_enc);
 
-    if (!skip_read)
+    ਜੇ (!skip_read)
     {
 	linerest = 0;
 	filesize = 0;
-#ifdef FEAT_CRYPT
-	filesize_count = 0;
-#endif
-	skip_count = lines_to_skip;
-	read_count = lines_to_read;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+	filesize_ਗਿਣਤੀ = 0;
+#ਜੇ_ਅੰਤ
+	skip_ਗਿਣਤੀ = ਸਤਰਾਂ_ਮੰਜ਼ਿਲ_skip;
+	read_ਗਿਣਤੀ = ਸਤਰਾਂ_ਮੰਜ਼ਿਲ_read;
 	conv_restlen = 0;
-#ifdef FEAT_PERSISTENT_UNDO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
 	read_undo_file = (newfile && (flags & READ_KEEP_UNDO) == 0
-				  && curbuf->b_ffname != NULL
+				  && curbuf->b_ffname != ਨਿਰਾ
 				  && curbuf->b_p_udf
 				  && !filtering
 				  && !read_fifo
 				  && !read_stdin
-				  && !read_buffer);
-	if (read_undo_file)
-	    sha256_start(&sha_ctx);
-#endif
-#ifdef FEAT_CRYPT
-	if (curbuf->b_cryptstate != NULL)
+				  && !read_ਬਫਰ);
+	ਜੇ (read_undo_file)
+	    sha256_ਸ਼ੁਰੂ(&sha_ctx);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+	ਜੇ (curbuf->b_cryptstate != ਨਿਰਾ)
 	{
 	    // Need to free the state, but keep the key, don't want to ask for
 	    // it again.
 	    crypt_free_state(curbuf->b_cryptstate);
-	    curbuf->b_cryptstate = NULL;
+	    curbuf->b_cryptstate = ਨਿਰਾ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    while (!error && !got_int)
+    ਜਦੋਂ (!error && !got_int)
     {
 	/*
 	 * We allocate as much space for the file as we can get, plus
@@ -1159,18 +1159,18 @@ retry:
 	 * The amount is limited by the fact that read() only can read
 	 * up to max_unsigned characters (and other things).
 	 */
-	if (!skip_read)
+	ਜੇ (!skip_read)
 	{
-#if defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
-		size = SSIZE_MAX;		    // use max I/O size, 52K
-#else
+#ਜੇ defined(SSIZE_MAX) && (SSIZE_MAX < 0x10000L)
+		ਮਾਪ = SSIZE_MAX;		    // use max I/O size, 52K
+#ਨਹੀਂਤਾਂ
 		// Use buffer >= 64K.  Add linerest to double the size if the
 		// line gets very long, to avoid a lot of copying. But don't
 		// read more than 1 Mbyte at a time, so we can be interrupted.
-		size = 0x10000L + linerest;
-		if (size > 0x100000L)
-		    size = 0x100000L;
-#endif
+		ਮਾਪ = 0x10000L + linerest;
+		ਜੇ (ਮਾਪ > 0x100000L)
+		    ਮਾਪ = 0x100000L;
+#ਜੇ_ਅੰਤ
 	}
 
 	// Protect against the argument of lalloc() going negative.
@@ -1179,34 +1179,34 @@ retry:
 	// after that read, the line length won't exceed MAXCOL - 1 (because
 	// we add 1 for the NUL when casting to colnr_T).  If this check fires,
 	// we insert a synthetic newline immediately, so linerest doesn't grow.
-	if (size < 0 || size + linerest + 1 < 0 || linerest >= MAXCOL - size)
+	ਜੇ (ਮਾਪ < 0 || ਮਾਪ + linerest + 1 < 0 || linerest >= MAXCOL - ਮਾਪ)
 	{
-	    ++split;
+	    ++ਵੰਡੋ;
 	    *ptr = NL;		    // split line by inserting a NL
-	    size = 1;
+	    ਮਾਪ = 1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (!skip_read)
+	    ਜੇ (!skip_read)
 	    {
-		for ( ; size >= 10; size = (long)((long_u)size >> 1))
+		ਲਈ ( ; ਮਾਪ >= 10; ਮਾਪ = (ਲੰਮਾ)((long_u)ਮਾਪ >> 1))
 		{
-		    if ((new_buffer = lalloc(size + linerest + 1,
-							      FALSE)) != NULL)
-			break;
+		    ਜੇ ((new_ਬਫਰ = lalloc(ਮਾਪ + linerest + 1,
+							      FALSE)) != ਨਿਰਾ)
+			ਰੋਕੋ;
 		}
-		if (new_buffer == NULL)
+		ਜੇ (new_ਬਫਰ == ਨਿਰਾ)
 		{
-		    do_outofmem_msg((long_u)(size * 2 + linerest + 1));
+		    do_outofmem_ਸੁਨੇਹਾ((long_u)(ਮਾਪ * 2 + linerest + 1));
 		    error = TRUE;
-		    break;
+		    ਰੋਕੋ;
 		}
-		if (linerest)	// copy characters from the previous buffer
-		    mch_memmove(new_buffer, ptr - linerest, (size_t)linerest);
-		vim_free(buffer);
-		buffer = new_buffer;
-		ptr = buffer + linerest;
-		line_start = buffer;
+		ਜੇ (linerest)	// copy characters from the previous buffer
+		    mch_memmove(new_ਬਫਰ, ptr - linerest, (size_t)linerest);
+		vim_free(ਬਫਰ);
+		ਬਫਰ = new_ਬਫਰ;
+		ptr = ਬਫਰ + linerest;
+		ਸਤਰ_ਸ਼ੁਰੂ = ਬਫਰ;
 
 		// May need room to translate into.
 		// For iconv() we don't really know the required space, use a
@@ -1218,104 +1218,104 @@ retry:
 		// multiple of 2
 		// ucs-4 to utf-8: 4 bytes become up to 6 bytes, size must be
 		// multiple of 4
-		real_size = (int)size;
-#ifdef USE_ICONV
-		if (iconv_fd != (iconv_t)-1)
-		    size = size / ICONV_MULT;
-		else
-#endif
-		    if (fio_flags & FIO_LATIN1)
-		    size = size / 2;
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
-		    size = (size * 2 / 3) & ~1;
-		else if (fio_flags & FIO_UCS4)
-		    size = (size * 2 / 3) & ~3;
-		else if (fio_flags == FIO_UCSBOM)
-		    size = size / ICONV_MULT;	// worst case
-#ifdef MSWIN
-		else if (fio_flags & FIO_CODEPAGE)
-		    size = size / ICONV_MULT;	// also worst case
-#endif
-#ifdef MACOS_CONVERT
-		else if (fio_flags & FIO_MACROMAN)
-		    size = size / ICONV_MULT;	// also worst case
-#endif
+		real_ਮਾਪ = (ਪੂਰਨ)ਮਾਪ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+		ਜੇ (iconv_fd != (iconv_t)-1)
+		    ਮਾਪ = ਮਾਪ / ICONV_MULT;
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		    ਜੇ (fio_flags & FIO_LATIN1)
+		    ਮਾਪ = ਮਾਪ / 2;
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		    ਮਾਪ = (ਮਾਪ * 2 / 3) & ~1;
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags & FIO_UCS4)
+		    ਮਾਪ = (ਮਾਪ * 2 / 3) & ~3;
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags == FIO_UCSBOM)
+		    ਮਾਪ = ਮਾਪ / ICONV_MULT;	// worst case
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags & FIO_CODEPAGE)
+		    ਮਾਪ = ਮਾਪ / ICONV_MULT;	// also worst case
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_CONVERT
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags & FIO_MACROMAN)
+		    ਮਾਪ = ਮਾਪ / ICONV_MULT;	// also worst case
+#ਜੇ_ਅੰਤ
 
-		if (conv_restlen > 0)
+		ਜੇ (conv_restlen > 0)
 		{
 		    // Insert unconverted bytes from previous line.
 		    mch_memmove(ptr, conv_rest, conv_restlen);
 		    ptr += conv_restlen;
-		    size -= conv_restlen;
+		    ਮਾਪ -= conv_restlen;
 		}
 
-		if (read_buffer)
+		ਜੇ (read_ਬਫਰ)
 		{
 		    /*
 		     * Read bytes from curbuf.  Used for converting text read
 		     * from stdin.
 		     */
-		    if (read_buf_lnum > from)
-			size = 0;
-		    else
+		    ਜੇ (read_buf_lnum > from)
+			ਮਾਪ = 0;
+		    ਨਹੀਂਤਾਂ
 		    {
-			int	n, ni;
-			long	tlen;
+			ਪੂਰਨ	n, ni;
+			ਲੰਮਾ	tlen;
 
 			tlen = 0;
-			for (;;)
+			ਲਈ (;;)
 			{
-			    p = ml_get(read_buf_lnum) + read_buf_col;
-			    n = ml_get_len(read_buf_lnum) - read_buf_col;
-			    if ((int)tlen + n + 1 > size)
+			    p = ml_get(read_buf_lnum) + read_buf_ਖਾਨਾ;
+			    n = ml_get_len(read_buf_lnum) - read_buf_ਖਾਨਾ;
+			    ਜੇ ((ਪੂਰਨ)tlen + n + 1 > ਮਾਪ)
 			    {
 				// Filled up to "size", append partial line.
 				// Change NL to NUL to reverse the effect done
 				// below.
-				n = (int)(size - tlen);
-				for (ni = 0; ni < n; ++ni)
+				n = (ਪੂਰਨ)(ਮਾਪ - tlen);
+				ਲਈ (ni = 0; ni < n; ++ni)
 				{
-				    if (p[ni] == NL)
+				    ਜੇ (p[ni] == NL)
 					ptr[tlen++] = NUL;
-				    else
+				    ਨਹੀਂਤਾਂ
 					ptr[tlen++] = p[ni];
 				}
-				read_buf_col += n;
-				break;
+				read_buf_ਖਾਨਾ += n;
+				ਰੋਕੋ;
 			    }
 
 			    // Append whole line and new-line.  Change NL
 			    // to NUL to reverse the effect done below.
-			    for (ni = 0; ni < n; ++ni)
+			    ਲਈ (ni = 0; ni < n; ++ni)
 			    {
-				if (p[ni] == NL)
+				ਜੇ (p[ni] == NL)
 				    ptr[tlen++] = NUL;
-				else
+				ਨਹੀਂਤਾਂ
 				    ptr[tlen++] = p[ni];
 			    }
 			    ptr[tlen++] = NL;
-			    read_buf_col = 0;
-			    if (++read_buf_lnum > from)
+			    read_buf_ਖਾਨਾ = 0;
+			    ਜੇ (++read_buf_lnum > from)
 			    {
 				// When the last line didn't have an
 				// end-of-line don't add it now either.
-				if (!curbuf->b_p_eol)
+				ਜੇ (!curbuf->b_p_eol)
 				    --tlen;
-				size = tlen;
-#ifdef FEAT_CRYPT
+				ਮਾਪ = tlen;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
 				eof = TRUE;
-#endif
-				break;
+#ਜੇ_ਅੰਤ
+				ਰੋਕੋ;
 			    }
 			}
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    /*
 		     * Read bytes from the file.
 		     */
-#ifdef FEAT_SODIUM
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SODIUM
 		    // Let the crypt layer work with a buffer size of 8192
 		    //
 		    // Sodium encryption requires a fixed block size to
@@ -1329,53 +1329,53 @@ retry:
 		    //
 		    // Be careful with changing it, it needs to stay the same
 		    // for reading back previously encrypted files!
-		    if (filesize == 0)
+		    ਜੇ (filesize == 0)
 		    {
 			// set size to 8K + Sodium Crypt Metadata
-			size = WRITEBUFSIZE + crypt_get_max_header_len()
+			ਮਾਪ = WRITEBUFSIZE + crypt_get_max_ਸਿਰਲੇਖ_len()
 			    + crypto_secretstream_xchacha20poly1305_HEADERBYTES
 				+ crypto_secretstream_xchacha20poly1305_ABYTES;
 			may_need_lseek = TRUE;
 		    }
 
-		    else if (filesize > 0 && (curbuf->b_cryptstate != NULL
-				&& crypt_method_is_sodium(
-					     curbuf->b_cryptstate->method_nr)))
+		    ਨਹੀਂਤਾਂ ਜੇ (filesize > 0 && (curbuf->b_cryptstate != ਨਿਰਾ
+				&& crypt_ਵਿਧੀ_is_sodium(
+					     curbuf->b_cryptstate->ਵਿਧੀ_nr)))
 		    {
-			size = WRITEBUFSIZE + crypto_secretstream_xchacha20poly1305_ABYTES;
+			ਮਾਪ = WRITEBUFSIZE + crypto_secretstream_xchacha20poly1305_ABYTES;
 			// need to rewind by - add_len from CRYPT_M_SOD2 (see
 			// description above)
-			if (curbuf->b_cryptstate->method_nr == CRYPT_M_SOD
+			ਜੇ (curbuf->b_cryptstate->ਵਿਧੀ_nr == CRYPT_M_SOD
 						     && !eof && may_need_lseek)
 			{
-			    lseek(fd, crypt_get_header_len(
-					       curbuf->b_cryptstate->method_nr)
-				       - crypt_get_max_header_len(), SEEK_CUR);
+			    lseek(fd, crypt_get_ਸਿਰਲੇਖ_len(
+					       curbuf->b_cryptstate->ਵਿਧੀ_nr)
+				       - crypt_get_max_ਸਿਰਲੇਖ_len(), SEEK_CUR);
 			    may_need_lseek = FALSE;
 			}
 		    }
-#endif
-		    long read_size = size;
-		    size = read_eintr(fd, ptr, read_size);
-#ifdef FEAT_CRYPT
+#ਜੇ_ਅੰਤ
+		    ਲੰਮਾ read_ਮਾਪ = ਮਾਪ;
+		    ਮਾਪ = read_eintr(fd, ptr, read_ਮਾਪ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
 		    // Did we reach end of file?
-		    filesize_count += size;
-		    eof = (size < read_size || filesize_count == filesize_disk);
-#endif
+		    filesize_ਗਿਣਤੀ += ਮਾਪ;
+		    eof = (ਮਾਪ < read_ਮਾਪ || filesize_ਗਿਣਤੀ == filesize_disk);
+#ਜੇ_ਅੰਤ
 		}
 
-#ifdef FEAT_CRYPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
 		/*
 		 * At start of file: Check for magic number of encryption.
 		 */
-		if (filesize == 0 && size > 0)
+		ਜੇ (filesize == 0 && ਮਾਪ > 0)
 		{
-		    cryptkey = check_for_cryptkey(cryptkey, ptr, &size,
+		    cryptkey = check_for_cryptkey(cryptkey, ptr, &ਮਾਪ,
 						  &filesize, newfile, sfname,
-						  &did_ask_for_key);
-# if defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
-		    if (curbuf->b_cryptstate != NULL
-				 && !crypt_works_inplace(curbuf->b_cryptstate))
+						  &did_ask_for_ਕੁੰਜੀ);
+# ਜੇ defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
+		    ਜੇ (curbuf->b_cryptstate != ਨਿਰਾ
+				 && !crypt_ਚੱਲਦਾ_inplace(curbuf->b_cryptstate))
 			// reading undo file requires crypt_decode_inplace()
 			read_undo_file = FALSE;
 # endif
@@ -1384,85 +1384,85 @@ retry:
 		 * Decrypt the read bytes.  This is done before checking for
 		 * EOF because the crypt layer may be buffering.
 		 */
-		if (cryptkey != NULL && curbuf->b_cryptstate != NULL
-								   && size > 0)
+		ਜੇ (cryptkey != ਨਿਰਾ && curbuf->b_cryptstate != ਨਿਰਾ
+								   && ਮਾਪ > 0)
 		{
 # ifdef CRYPT_NOT_INPLACE
-		    if (crypt_works_inplace(curbuf->b_cryptstate))
+		    ਜੇ (crypt_ਚੱਲਦਾ_inplace(curbuf->b_cryptstate))
 		    {
 # endif
 			crypt_decode_inplace(curbuf->b_cryptstate, ptr,
-								    size, eof);
+								    ਮਾਪ, eof);
 # ifdef CRYPT_NOT_INPLACE
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			char_u	*newptr = NULL;
-			int	decrypted_size;
+			char_u	*newptr = ਨਿਰਾ;
+			ਪੂਰਨ	decrypted_ਮਾਪ;
 
-			decrypted_size = crypt_decode_alloc(
-				    curbuf->b_cryptstate, ptr, size,
+			decrypted_ਮਾਪ = crypt_decode_alloc(
+				    curbuf->b_cryptstate, ptr, ਮਾਪ,
 								 &newptr, eof);
 
-			if (decrypted_size < 0)
+			ਜੇ (decrypted_ਮਾਪ < 0)
 			{
 			    // error message already given
 			    error = TRUE;
 			    vim_free(newptr);
-			    break;
+			    ਰੋਕੋ;
 			}
 			// If the crypt layer is buffering, not producing
 			// anything yet, need to read more.
-			if (decrypted_size == 0)
-			    continue;
+			ਜੇ (decrypted_ਮਾਪ == 0)
+			    ਜਾਰੀ;
 
-			if (linerest == 0)
+			ਜੇ (linerest == 0)
 			{
 			    // Simple case: reuse returned buffer (may be
 			    // NULL, checked later).
-			    new_buffer = newptr;
+			    new_ਬਫਰ = newptr;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
-			    long_u	new_size;
+			    long_u	new_ਮਾਪ;
 
 			    // Need new buffer to add bytes carried over.
-			    new_size = (long_u)(decrypted_size + linerest + 1);
-			    new_buffer = lalloc(new_size, FALSE);
-			    if (new_buffer == NULL)
+			    new_ਮਾਪ = (long_u)(decrypted_ਮਾਪ + linerest + 1);
+			    new_ਬਫਰ = lalloc(new_ਮਾਪ, FALSE);
+			    ਜੇ (new_ਬਫਰ == ਨਿਰਾ)
 			    {
-				do_outofmem_msg(new_size);
+				do_outofmem_ਸੁਨੇਹਾ(new_ਮਾਪ);
 				error = TRUE;
-				break;
+				ਰੋਕੋ;
 			    }
 
-			    mch_memmove(new_buffer, buffer, linerest + conv_restlen);
-			    if (newptr != NULL)
-				mch_memmove(new_buffer + linerest + conv_restlen,
-					newptr, decrypted_size);
+			    mch_memmove(new_ਬਫਰ, ਬਫਰ, linerest + conv_restlen);
+			    ਜੇ (newptr != ਨਿਰਾ)
+				mch_memmove(new_ਬਫਰ + linerest + conv_restlen,
+					newptr, decrypted_ਮਾਪ);
 			    vim_free(newptr);
 			}
 
-			if (new_buffer != NULL)
+			ਜੇ (new_ਬਫਰ != ਨਿਰਾ)
 			{
-			    vim_free(buffer);
-			    buffer = new_buffer;
-			    new_buffer = NULL;
-			    line_start = buffer;
-			    ptr = buffer + linerest + conv_restlen;
-			    real_size = size;
+			    vim_free(ਬਫਰ);
+			    ਬਫਰ = new_ਬਫਰ;
+			    new_ਬਫਰ = ਨਿਰਾ;
+			    ਸਤਰ_ਸ਼ੁਰੂ = ਬਫਰ;
+			    ptr = ਬਫਰ + linerest + conv_restlen;
+			    real_ਮਾਪ = ਮਾਪ;
 			}
-			size = decrypted_size;
+			ਮਾਪ = decrypted_ਮਾਪ;
 		    }
 # endif
 		}
-#endif
+#ਜੇ_ਅੰਤ
 
-		if (size <= 0)
+		ਜੇ (ਮਾਪ <= 0)
 		{
-		    if (size < 0)		    // read error
+		    ਜੇ (ਮਾਪ < 0)		    // read error
 			error = TRUE;
-		    else if (conv_restlen > 0)
+		    ਨਹੀਂਤਾਂ ਜੇ (conv_restlen > 0)
 		    {
 			/*
 			 * Reached end-of-file but some trailing bytes could
@@ -1470,53 +1470,53 @@ retry:
 			 */
 
 			// When we did a conversion report an error.
-			if (fio_flags != 0
-#ifdef USE_ICONV
+			ਜੇ (fio_flags != 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
 				|| iconv_fd != (iconv_t)-1
-#endif
+#ਜੇ_ਅੰਤ
 			   )
 			{
-			    if (can_retry)
-				goto rewind_retry;
-			    if (conv_error == 0)
-				conv_error = curbuf->b_ml.ml_line_count
+			    ਜੇ (can_retry)
+				ਜਾਓ rewind_retry;
+			    ਜੇ (conv_error == 0)
+				conv_error = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ
 								- linecnt + 1;
 			}
 			// Remember the first linenr with an illegal byte
-			else if (illegal_byte == 0)
-			    illegal_byte = curbuf->b_ml.ml_line_count
+			ਨਹੀਂਤਾਂ ਜੇ (illegal_byte == 0)
+			    illegal_byte = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ
 								- linecnt + 1;
-			if (bad_char_behavior == BAD_DROP)
+			ਜੇ (bad_char_behavior == BAD_DROP)
 			{
 			    *(ptr - conv_restlen) = NUL;
 			    conv_restlen = 0;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    // Replace the trailing bytes with the replacement
 			    // character if we were converting; if we weren't,
 			    // leave the UTF8 checking code to do it, as it
 			    // works slightly differently.
-			    if (bad_char_behavior != BAD_KEEP && (fio_flags != 0
-#ifdef USE_ICONV
+			    ਜੇ (bad_char_behavior != BAD_KEEP && (fio_flags != 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
 				    || iconv_fd != (iconv_t)-1
-#endif
+#ਜੇ_ਅੰਤ
 			       ))
 			    {
-				while (conv_restlen > 0)
+				ਜਦੋਂ (conv_restlen > 0)
 				{
 				    *(--ptr) = bad_char_behavior;
 				    --conv_restlen;
 				}
 			    }
 			    fio_flags = 0;	// don't convert this
-#ifdef USE_ICONV
-			    if (iconv_fd != (iconv_t)-1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+			    ਜੇ (iconv_fd != (iconv_t)-1)
 			    {
 				iconv_close(iconv_fd);
 				iconv_fd = (iconv_t)-1;
 			    }
-#endif
+#ਜੇ_ਅੰਤ
 			}
 		    }
 		}
@@ -1529,146 +1529,146 @@ retry:
 	     * converting with 'charconvert' or when a BOM has already been
 	     * found.
 	     */
-	    if ((filesize == 0
-#ifdef FEAT_CRYPT
-		   || (cryptkey != NULL
-			&& filesize == crypt_get_header_len(
-						 crypt_get_method_nr(curbuf)))
-#endif
+	    ਜੇ ((filesize == 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+		   || (cryptkey != ਨਿਰਾ
+			&& filesize == crypt_get_ਸਿਰਲੇਖ_len(
+						 crypt_get_ਵਿਧੀ_nr(curbuf)))
+#ਜੇ_ਅੰਤ
 		       )
 		    && (fio_flags == FIO_UCSBOM
 			|| (!curbuf->b_p_bomb
-			    && tmpname == NULL
+			    && tmpname == ਨਿਰਾ
 			    && (*fenc == 'u' || (*fenc == NUL && enc_utf8)))))
 	    {
 		char_u	*ccname;
-		int	blen;
+		ਪੂਰਨ	blen;
 
 		// no BOM detection in a short file or in binary mode
-		if (size < 2 || curbuf->b_p_bin)
-		    ccname = NULL;
-		else
-		    ccname = check_for_bom(ptr, size, &blen,
+		ਜੇ (ਮਾਪ < 2 || curbuf->b_p_bin)
+		    ccname = ਨਿਰਾ;
+		ਨਹੀਂਤਾਂ
+		    ccname = check_for_bom(ptr, ਮਾਪ, &blen,
 		      fio_flags == FIO_UCSBOM ? FIO_ALL : get_fio_flags(fenc));
-		if (ccname != NULL)
+		ਜੇ (ccname != ਨਿਰਾ)
 		{
 		    // Remove BOM from the text
 		    filesize += blen;
-		    size -= blen;
-		    mch_memmove(ptr, ptr + blen, (size_t)size);
-		    if (set_options)
+		    ਮਾਪ -= blen;
+		    mch_memmove(ptr, ptr + blen, (size_t)ਮਾਪ);
+		    ਜੇ (ਸੈੱਟ_options)
 		    {
 			curbuf->b_p_bomb = TRUE;
-			curbuf->b_start_bomb = TRUE;
+			curbuf->b_ਸ਼ੁਰੂ_bomb = TRUE;
 		    }
 		}
 
-		if (fio_flags == FIO_UCSBOM)
+		ਜੇ (fio_flags == FIO_UCSBOM)
 		{
-		    if (ccname == NULL)
+		    ਜੇ (ccname == ਨਿਰਾ)
 		    {
 			// No BOM detected: retry with next encoding.
 			advance_fenc = TRUE;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			// BOM detected: set "fenc" and jump back
-			if (fenc_alloced)
+			ਜੇ (fenc_alloced)
 			    vim_free(fenc);
 			fenc = ccname;
 			fenc_alloced = FALSE;
 		    }
 		    // retry reading without getting new bytes or rewinding
 		    skip_read = TRUE;
-		    goto retry;
+		    ਜਾਓ retry;
 		}
 	    }
 
 	    // Include not converted bytes.
 	    ptr -= conv_restlen;
-	    size += conv_restlen;
+	    ਮਾਪ += conv_restlen;
 	    conv_restlen = 0;
 	    /*
 	     * Break here for a read error or end-of-file.
 	     */
-	    if (size <= 0)
-		break;
+	    ਜੇ (ਮਾਪ <= 0)
+		ਰੋਕੋ;
 
 
-#ifdef USE_ICONV
-	    if (iconv_fd != (iconv_t)-1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+	    ਜੇ (iconv_fd != (iconv_t)-1)
 	    {
 		/*
 		 * Attempt conversion of the read bytes to 'encoding' using
 		 * iconv().
 		 */
-		const char	*fromp;
-		char		*top;
-		size_t		from_size;
-		size_t		to_size;
+		ਅਚਲ ਅੱਖਰ	*fromp;
+		ਅੱਖਰ		*ਸਿਖਰ;
+		size_t		from_ਮਾਪ;
+		size_t		ਮੰਜ਼ਿਲ_ਮਾਪ;
 
-		fromp = (char *)ptr;
-		from_size = size;
-		ptr += size;
-		top = (char *)ptr;
-		to_size = real_size - size;
+		fromp = (ਅੱਖਰ *)ptr;
+		from_ਮਾਪ = ਮਾਪ;
+		ptr += ਮਾਪ;
+		ਸਿਖਰ = (ਅੱਖਰ *)ptr;
+		ਮੰਜ਼ਿਲ_ਮਾਪ = real_ਮਾਪ - ਮਾਪ;
 
 		/*
 		 * If there is conversion error or not enough room try using
 		 * another conversion.  Except for when there is no
 		 * alternative (help files).
 		 */
-		while ((iconv(iconv_fd, (void *)&fromp, &from_size,
-							       &top, &to_size)
+		ਜਦੋਂ ((iconv(iconv_fd, (ਖਾਲੀ *)&fromp, &from_ਮਾਪ,
+							       &ਸਿਖਰ, &ਮੰਜ਼ਿਲ_ਮਾਪ)
 			    == (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
-						  || from_size > CONV_RESTLEN)
+						  || from_ਮਾਪ > CONV_RESTLEN)
 		{
-		    if (can_retry)
-			goto rewind_retry;
-		    if (conv_error == 0)
+		    ਜੇ (can_retry)
+			ਜਾਓ rewind_retry;
+		    ਜੇ (conv_error == 0)
 			conv_error = readfile_linenr(linecnt,
-							  ptr, (char_u *)top);
+							  ptr, (char_u *)ਸਿਖਰ);
 
 		    // Deal with a bad byte and continue with the next.
 		    ++fromp;
-		    --from_size;
-		    if (bad_char_behavior == BAD_KEEP)
+		    --from_ਮਾਪ;
+		    ਜੇ (bad_char_behavior == BAD_KEEP)
 		    {
-			*top++ = *(fromp - 1);
-			--to_size;
+			*ਸਿਖਰ++ = *(fromp - 1);
+			--ਮੰਜ਼ਿਲ_ਮਾਪ;
 		    }
-		    else if (bad_char_behavior != BAD_DROP)
+		    ਨਹੀਂਤਾਂ ਜੇ (bad_char_behavior != BAD_DROP)
 		    {
-			*top++ = bad_char_behavior;
-			--to_size;
+			*ਸਿਖਰ++ = bad_char_behavior;
+			--ਮੰਜ਼ਿਲ_ਮਾਪ;
 		    }
 		}
 
-		if (from_size > 0)
+		ਜੇ (from_ਮਾਪ > 0)
 		{
 		    // Some remaining characters, keep them for the next
 		    // round.
-		    mch_memmove(conv_rest, (char_u *)fromp, from_size);
-		    conv_restlen = (int)from_size;
+		    mch_memmove(conv_rest, (char_u *)fromp, from_ਮਾਪ);
+		    conv_restlen = (ਪੂਰਨ)from_ਮਾਪ;
 		}
 
 		// move the linerest to before the converted characters
-		line_start = ptr - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
-		size = (long)((char_u *)top - ptr);
+		ਸਤਰ_ਸ਼ੁਰੂ = ptr - linerest;
+		mch_memmove(ਸਤਰ_ਸ਼ੁਰੂ, ਬਫਰ, (size_t)linerest);
+		ਮਾਪ = (ਲੰਮਾ)((char_u *)ਸਿਖਰ - ptr);
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
-	    if (fio_flags & FIO_CODEPAGE)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਜੇ (fio_flags & FIO_CODEPAGE)
 	    {
 		char_u	*src, *dst;
 		WCHAR	ucs2buf[3];
-		int	ucs2len;
-		int	codepage = FIO_GET_CP(fio_flags);
-		int	bytelen;
-		int	found_bad;
-		char	replstr[2];
+		ਪੂਰਨ	ucs2len;
+		ਪੂਰਨ	codepage = FIO_GET_CP(fio_flags);
+		ਪੂਰਨ	bytelen;
+		ਪੂਰਨ	ਮਿਲਿਆ_bad;
+		ਅੱਖਰ	replstr[2];
 
 		/*
 		 * Conversion from an MS-Windows codepage or UTF-8 to UTF-8 or
@@ -1683,9 +1683,9 @@ retry:
 		 */
 
 		// Replacement string for WideCharToMultiByte().
-		if (bad_char_behavior > 0)
+		ਜੇ (bad_char_behavior > 0)
 		    replstr[0] = bad_char_behavior;
-		else
+		ਨਹੀਂਤਾਂ
 		    replstr[0] = '?';
 		replstr[1] = NUL;
 
@@ -1693,155 +1693,155 @@ retry:
 		 * Move the bytes to the end of the buffer, so that we have
 		 * room to put the result at the start.
 		 */
-		src = ptr + real_size - size;
-		mch_memmove(src, ptr, size);
+		src = ptr + real_ਮਾਪ - ਮਾਪ;
+		mch_memmove(src, ptr, ਮਾਪ);
 
 		/*
 		 * Do the conversion.
 		 */
 		dst = ptr;
-		while (size > 0)
+		ਜਦੋਂ (ਮਾਪ > 0)
 		{
-		    found_bad = FALSE;
+		    ਮਿਲਿਆ_bad = FALSE;
 
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-		    if (codepage == CP_UTF8)
+		    ਜੇ (codepage == CP_UTF8)
 		    {
 			// Handle CP_UTF8 input ourselves to be able to handle
 			// trailing bytes properly.
 			// Get one UTF-8 character from src.
-			bytelen = (int)utf_ptr2len_len(src, size);
-			if (bytelen > size)
+			bytelen = (ਪੂਰਨ)utf_ptr2len_len(src, ਮਾਪ);
+			ਜੇ (bytelen > ਮਾਪ)
 			{
 			    // Only got some bytes of a character.  Normally
 			    // it's put in "conv_rest", but if it's too long
 			    // deal with it as if they were illegal bytes.
-			    if (bytelen <= CONV_RESTLEN)
-				break;
+			    ਜੇ (bytelen <= CONV_RESTLEN)
+				ਰੋਕੋ;
 
 			    // weird overlong byte sequence
-			    bytelen = size;
-			    found_bad = TRUE;
+			    bytelen = ਮਾਪ;
+			    ਮਿਲਿਆ_bad = TRUE;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
-			    int	    u8c = utf_ptr2char(src);
+			    ਪੂਰਨ	    u8c = utf_ptr2char(src);
 
-			    if (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
-				found_bad = TRUE;
+			    ਜੇ (u8c > 0xffff || (*src >= 0x80 && bytelen == 1))
+				ਮਿਲਿਆ_bad = TRUE;
 			    ucs2buf[0] = u8c;
 			    ucs2len = 1;
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 # endif
 		    {
 			// We don't know how long the byte sequence is, try
 			// from one to three bytes.
-			for (bytelen = 1; bytelen <= size && bytelen <= 3;
+			ਲਈ (bytelen = 1; bytelen <= ਮਾਪ && bytelen <= 3;
 								    ++bytelen)
 			{
-			    ucs2len = MultiByteToWideChar(codepage,
+			    ucs2len = Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char(codepage,
 							 MB_ERR_INVALID_CHARS,
 							 (LPCSTR)src, bytelen,
 								   ucs2buf, 3);
-			    if (ucs2len > 0)
-				break;
+			    ਜੇ (ucs2len > 0)
+				ਰੋਕੋ;
 			}
-			if (ucs2len == 0)
+			ਜੇ (ucs2len == 0)
 			{
 			    // If we have only one byte then it's probably an
 			    // incomplete byte sequence.  Otherwise discard
 			    // one byte as a bad character.
-			    if (size == 1)
-				break;
-			    found_bad = TRUE;
+			    ਜੇ (ਮਾਪ == 1)
+				ਰੋਕੋ;
+			    ਮਿਲਿਆ_bad = TRUE;
 			    bytelen = 1;
 			}
 		    }
 
-		    if (!found_bad)
+		    ਜੇ (!ਮਿਲਿਆ_bad)
 		    {
-			int	i;
+			ਪੂਰਨ	i;
 
 			// Convert "ucs2buf[ucs2len]" to 'enc' in "dst".
-			if (enc_utf8)
+			ਜੇ (enc_utf8)
 			{
 			    // From UCS-2 to UTF-8.  Cannot fail.
-			    for (i = 0; i < ucs2len; ++i)
+			    ਲਈ (i = 0; i < ucs2len; ++i)
 				dst += utf_char2bytes(ucs2buf[i], dst);
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    BOOL	bad = FALSE;
-			    int		dstlen;
+			    ਪੂਰਨ		dstlen;
 
 			    // From UCS-2 to "enc_codepage".  If the
 			    // conversion uses the default character "?",
 			    // the data doesn't fit in this encoding.
-			    dstlen = WideCharToMultiByte(enc_codepage, 0,
+			    dstlen = Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte(enc_codepage, 0,
 				    (LPCWSTR)ucs2buf, ucs2len,
-				    (LPSTR)dst, (int)(src - dst),
+				    (LPSTR)dst, (ਪੂਰਨ)(src - dst),
 				    replstr, &bad);
-			    if (bad)
-				found_bad = TRUE;
-			    else
+			    ਜੇ (bad)
+				ਮਿਲਿਆ_bad = TRUE;
+			    ਨਹੀਂਤਾਂ
 				dst += dstlen;
 			}
 		    }
 
-		    if (found_bad)
+		    ਜੇ (ਮਿਲਿਆ_bad)
 		    {
 			// Deal with bytes we can't convert.
-			if (can_retry)
-			    goto rewind_retry;
-			if (conv_error == 0)
+			ਜੇ (can_retry)
+			    ਜਾਓ rewind_retry;
+			ਜੇ (conv_error == 0)
 			    conv_error = readfile_linenr(linecnt, ptr, dst);
-			if (bad_char_behavior != BAD_DROP)
+			ਜੇ (bad_char_behavior != BAD_DROP)
 			{
-			    if (bad_char_behavior == BAD_KEEP)
+			    ਜੇ (bad_char_behavior == BAD_KEEP)
 			    {
 				mch_memmove(dst, src, bytelen);
 				dst += bytelen;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 				*dst++ = bad_char_behavior;
 			}
 		    }
 
 		    src += bytelen;
-		    size -= bytelen;
+		    ਮਾਪ -= bytelen;
 		}
 
-		if (size > 0)
+		ਜੇ (ਮਾਪ > 0)
 		{
 		    // An incomplete byte sequence remaining.
-		    mch_memmove(conv_rest, src, size);
-		    conv_restlen = size;
+		    mch_memmove(conv_rest, src, ਮਾਪ);
+		    conv_restlen = ਮਾਪ;
 		}
 
 		// The new size is equal to how much "dst" was advanced.
-		size = (long)(dst - ptr);
+		ਮਾਪ = (ਲੰਮਾ)(dst - ptr);
 	    }
-	    else
-#endif
-#ifdef MACOS_CONVERT
-	    if (fio_flags & FIO_MACROMAN)
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_CONVERT
+	    ਜੇ (fio_flags & FIO_MACROMAN)
 	    {
 		/*
 		 * Conversion from Apple MacRoman char encoding to UTF-8 or
 		 * latin1.  This is in os_mac_conv.c.
 		 */
-		if (macroman2enc(ptr, &size, real_size) == FAIL)
-		    goto rewind_retry;
+		ਜੇ (macroman2enc(ptr, &ਮਾਪ, real_ਮਾਪ) == FAIL)
+		    ਜਾਓ rewind_retry;
 	    }
-	    else
-#endif
-	    if (fio_flags != 0)
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਜੇ (fio_flags != 0)
 	    {
-		int	u8c;
+		ਪੂਰਨ	u8c;
 		char_u	*dest;
-		char_u	*tail = NULL;
+		char_u	*ਪੂਛ = ਨਿਰਾ;
 
 		/*
 		 * "enc_utf8" set: Convert Unicode or Latin1 to UTF-8.
@@ -1851,108 +1851,108 @@ retry:
 		 * "dest" points to after where the UTF-8 bytes go, "p" points
 		 * to after the next character to convert.
 		 */
-		dest = ptr + real_size;
-		if (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
+		dest = ptr + real_ਮਾਪ;
+		ਜੇ (fio_flags == FIO_LATIN1 || fio_flags == FIO_UTF8)
 		{
-		    p = ptr + size;
-		    if (fio_flags == FIO_UTF8)
+		    p = ptr + ਮਾਪ;
+		    ਜੇ (fio_flags == FIO_UTF8)
 		    {
 			// Check for a trailing incomplete UTF-8 sequence
-			tail = ptr + size - 1;
-			while (tail > ptr && (*tail & 0xc0) == 0x80)
-			    --tail;
-			if (tail + utf_byte2len(*tail) <= ptr + size)
-			    tail = NULL;
-			else
-			    p = tail;
+			ਪੂਛ = ptr + ਮਾਪ - 1;
+			ਜਦੋਂ (ਪੂਛ > ptr && (*ਪੂਛ & 0xc0) == 0x80)
+			    --ਪੂਛ;
+			ਜੇ (ਪੂਛ + utf_byte2len(*ਪੂਛ) <= ptr + ਮਾਪ)
+			    ਪੂਛ = ਨਿਰਾ;
+			ਨਹੀਂਤਾਂ
+			    p = ਪੂਛ;
 		    }
 		}
-		else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		ਨਹੀਂਤਾਂ ਜੇ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		{
 		    // Check for a trailing byte
-		    p = ptr + (size & ~1);
-		    if (size & 1)
-			tail = p;
-		    if ((fio_flags & FIO_UTF16) && p > ptr)
+		    p = ptr + (ਮਾਪ & ~1);
+		    ਜੇ (ਮਾਪ & 1)
+			ਪੂਛ = p;
+		    ਜੇ ((fio_flags & FIO_UTF16) && p > ptr)
 		    {
 			// Check for a trailing leading word
-			if (fio_flags & FIO_ENDIAN_L)
+			ਜੇ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if (u8c >= 0xd800 && u8c <= 0xdbff)
-			    tail = p;
-			else
+			ਜੇ (u8c >= 0xd800 && u8c <= 0xdbff)
+			    ਪੂਛ = p;
+			ਨਹੀਂਤਾਂ
 			    p += 2;
 		    }
 		}
-		else //  FIO_UCS4
+		ਨਹੀਂਤਾਂ //  FIO_UCS4
 		{
 		    // Check for trailing 1, 2 or 3 bytes
-		    p = ptr + (size & ~3);
-		    if (size & 3)
-			tail = p;
+		    p = ptr + (ਮਾਪ & ~3);
+		    ਜੇ (ਮਾਪ & 3)
+			ਪੂਛ = p;
 		}
 
 		// If there is a trailing incomplete sequence move it to
 		// conv_rest[].
-		if (tail != NULL)
+		ਜੇ (ਪੂਛ != ਨਿਰਾ)
 		{
-		    conv_restlen = (int)((ptr + size) - tail);
-		    mch_memmove(conv_rest, (char_u *)tail, conv_restlen);
-		    size -= conv_restlen;
+		    conv_restlen = (ਪੂਰਨ)((ptr + ਮਾਪ) - ਪੂਛ);
+		    mch_memmove(conv_rest, (char_u *)ਪੂਛ, conv_restlen);
+		    ਮਾਪ -= conv_restlen;
 		}
 
 
-		while (p > ptr)
+		ਜਦੋਂ (p > ptr)
 		{
-		    if (fio_flags & FIO_LATIN1)
+		    ਜੇ (fio_flags & FIO_LATIN1)
 			u8c = *--p;
-		    else if (fio_flags & (FIO_UCS2 | FIO_UTF16))
+		    ਨਹੀਂਤਾਂ ਜੇ (fio_flags & (FIO_UCS2 | FIO_UTF16))
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			ਜੇ (fio_flags & FIO_ENDIAN_L)
 			{
 			    u8c = (*--p << 8);
 			    u8c += *--p;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    u8c = *--p;
 			    u8c += (*--p << 8);
 			}
-			if ((fio_flags & FIO_UTF16)
+			ਜੇ ((fio_flags & FIO_UTF16)
 					    && u8c >= 0xdc00 && u8c <= 0xdfff)
 			{
-			    int u16c;
+			    ਪੂਰਨ u16c;
 
-			    if (p == ptr)
+			    ਜੇ (p == ptr)
 			    {
 				// Missing leading word.
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ਜੇ (can_retry)
+				    ਜਾਓ rewind_retry;
+				ਜੇ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ਜੇ (bad_char_behavior == BAD_DROP)
+				    ਜਾਰੀ;
+				ਜੇ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 
 			    // found second word of double-word, get the first
 			    // word and compute the resulting character
-			    if (fio_flags & FIO_ENDIAN_L)
+			    ਜੇ (fio_flags & FIO_ENDIAN_L)
 			    {
 				u16c = (*--p << 8);
 				u16c += *--p;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				u16c = *--p;
 				u16c += (*--p << 8);
@@ -1961,273 +1961,273 @@ retry:
 							      + (u8c & 0x3ff);
 
 			    // Check if the word is indeed a leading word.
-			    if (u16c < 0xd800 || u16c > 0xdbff)
+			    ਜੇ (u16c < 0xd800 || u16c > 0xdbff)
 			    {
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ਜੇ (can_retry)
+				    ਜਾਓ rewind_retry;
+				ਜੇ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ਜੇ (bad_char_behavior == BAD_DROP)
+				    ਜਾਰੀ;
+				ਜੇ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    else if (fio_flags & FIO_UCS4)
+		    ਨਹੀਂਤਾਂ ਜੇ (fio_flags & FIO_UCS4)
 		    {
-			if (fio_flags & FIO_ENDIAN_L)
+			ਜੇ (fio_flags & FIO_ENDIAN_L)
 			{
-			    u8c = (unsigned)*--p << 24;
-			    u8c += (unsigned)*--p << 16;
-			    u8c += (unsigned)*--p << 8;
+			    u8c = (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 24;
+			    u8c += (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 16;
+			    u8c += (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 8;
 			    u8c += *--p;
 			}
-			else	// big endian
+			ਨਹੀਂਤਾਂ	// big endian
 			{
 			    u8c = *--p;
-			    u8c += (unsigned)*--p << 8;
-			    u8c += (unsigned)*--p << 16;
-			    u8c += (unsigned)*--p << 24;
+			    u8c += (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 8;
+			    u8c += (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 16;
+			    u8c += (ਬਿਨਾਨਿਸ਼ਾਨੀ)*--p << 24;
 			}
 		    }
-		    else    // UTF-8
+		    ਨਹੀਂਤਾਂ    // UTF-8
 		    {
-			if (*--p < 0x80)
+			ਜੇ (*--p < 0x80)
 			    u8c = *p;
-			else
+			ਨਹੀਂਤਾਂ
 			{
-			    len = utf_head_off(ptr, p);
+			    len = utf_ਸਿਰ_off(ptr, p);
 			    p -= len;
 			    u8c = utf_ptr2char(p);
-			    if (len == 0)
+			    ਜੇ (len == 0)
 			    {
 				// Not a valid UTF-8 character, retry with
 				// another fenc when possible, otherwise just
 				// report the error.
-				if (can_retry)
-				    goto rewind_retry;
-				if (conv_error == 0)
+				ਜੇ (can_retry)
+				    ਜਾਓ rewind_retry;
+				ਜੇ (conv_error == 0)
 				    conv_error = readfile_linenr(linecnt,
 								      ptr, p);
-				if (bad_char_behavior == BAD_DROP)
-				    continue;
-				if (bad_char_behavior != BAD_KEEP)
+				ਜੇ (bad_char_behavior == BAD_DROP)
+				    ਜਾਰੀ;
+				ਜੇ (bad_char_behavior != BAD_KEEP)
 				    u8c = bad_char_behavior;
 			    }
 			}
 		    }
-		    if (enc_utf8)	// produce UTF-8
+		    ਜੇ (enc_utf8)	// produce UTF-8
 		    {
 			dest -= utf_char2len(u8c);
-			(void)utf_char2bytes(u8c, dest);
+			(ਖਾਲੀ)utf_char2bytes(u8c, dest);
 		    }
-		    else		// produce Latin1
+		    ਨਹੀਂਤਾਂ		// produce Latin1
 		    {
 			--dest;
-			if (u8c >= 0x100)
+			ਜੇ (u8c >= 0x100)
 			{
 			    // character doesn't fit in latin1, retry with
 			    // another fenc when possible, otherwise just
 			    // report the error.
-			    if (can_retry)
-				goto rewind_retry;
-			    if (conv_error == 0)
+			    ਜੇ (can_retry)
+				ਜਾਓ rewind_retry;
+			    ਜੇ (conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
-			    if (bad_char_behavior == BAD_DROP)
+			    ਜੇ (bad_char_behavior == BAD_DROP)
 				++dest;
-			    else if (bad_char_behavior == BAD_KEEP)
+			    ਨਹੀਂਤਾਂ ਜੇ (bad_char_behavior == BAD_KEEP)
 				*dest = u8c;
-			    else if (eap != NULL && eap->bad_char != 0)
+			    ਨਹੀਂਤਾਂ ਜੇ (eap != ਨਿਰਾ && eap->bad_char != 0)
 				*dest = bad_char_behavior;
-			    else
+			    ਨਹੀਂਤਾਂ
 				*dest = 0xBF;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			    *dest = u8c;
 		    }
 		}
 
 		// move the linerest to before the converted characters
-		line_start = dest - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
-		size = (long)((ptr + real_size) - dest);
+		ਸਤਰ_ਸ਼ੁਰੂ = dest - linerest;
+		mch_memmove(ਸਤਰ_ਸ਼ੁਰੂ, ਬਫਰ, (size_t)linerest);
+		ਮਾਪ = (ਲੰਮਾ)((ptr + real_ਮਾਪ) - dest);
 		ptr = dest;
 	    }
-	    else if (enc_utf8 && !curbuf->b_p_bin)
+	    ਨਹੀਂਤਾਂ ਜੇ (enc_utf8 && !curbuf->b_p_bin)
 	    {
-		int  incomplete_tail = FALSE;
+		ਪੂਰਨ  incomplete_ਪੂਛ = FALSE;
 
 		// Reading UTF-8: Check if the bytes are valid UTF-8.
-		for (p = ptr; ; )
+		ਲਈ (p = ptr; ; )
 		{
-		    int	 todo;
-		    int	 l;
+		    ਪੂਰਨ	 todo;
+		    ਪੂਰਨ	 l;
 
 		    // Skip ASCII bytes quickly using word-at-a-time check.
 		    {
-			char_u *ascii_end = ptr + size;
-			while (ascii_end - p >= (long)sizeof(long_u))
+			char_u *ascii_ਸਿਰਾ = ptr + ਮਾਪ;
+			ਜਦੋਂ (ascii_ਸਿਰਾ - p >= (ਲੰਮਾ)ਆਕਾਰ(long_u))
 			{
-			    long_u word;
-			    memcpy(&word, p, sizeof(long_u));
-			    if (word & NONASCII_MASK)
-				break;
-			    p += sizeof(long_u);
+			    long_u ਸ਼ਬਦ;
+			    ਸਮ੍ਰਿਤੀ_ਨਕਲ(&ਸ਼ਬਦ, p, ਆਕਾਰ(long_u));
+			    ਜੇ (ਸ਼ਬਦ & NONASCII_ਨਕਾਬ)
+				ਰੋਕੋ;
+			    p += ਆਕਾਰ(long_u);
 			}
-			while (p < ascii_end && *p < 0x80)
+			ਜਦੋਂ (p < ascii_ਸਿਰਾ && *p < 0x80)
 			    ++p;
 		    }
 
-		    todo = (int)((ptr + size) - p);
-		    if (todo <= 0)
-			break;
-		    if (*p >= 0x80)
+		    todo = (ਪੂਰਨ)((ptr + ਮਾਪ) - p);
+		    ਜੇ (todo <= 0)
+			ਰੋਕੋ;
+		    ਜੇ (*p >= 0x80)
 		    {
 			// A length of 1 means it's an illegal byte.  Accept
 			// an incomplete character at the end though, the next
 			// read() will get the next bytes, we'll check it
 			// then.
 			l = utf_ptr2len_len(p, todo);
-			if (l > todo && !incomplete_tail)
+			ਜੇ (l > todo && !incomplete_ਪੂਛ)
 			{
 			    // Avoid retrying with a different encoding when
 			    // a truncated file is more likely, or attempting
 			    // to read the rest of an incomplete sequence when
 			    // we have already done so.
-			    if (p > ptr || filesize > 0)
-				incomplete_tail = TRUE;
+			    ਜੇ (p > ptr || filesize > 0)
+				incomplete_ਪੂਛ = TRUE;
 			    // Incomplete byte sequence, move it to conv_rest[]
 			    // and try to read the rest of it, unless we've
 			    // already done so.
-			    if (p > ptr)
+			    ਜੇ (p > ptr)
 			    {
 				conv_restlen = todo;
 				mch_memmove(conv_rest, p, conv_restlen);
-				size -= conv_restlen;
-				break;
+				ਮਾਪ -= conv_restlen;
+				ਰੋਕੋ;
 			    }
 			}
-			if (l == 1 || l > todo)
+			ਜੇ (l == 1 || l > todo)
 			{
 			    // Illegal byte.  If we can try another encoding
 			    // do that, unless at EOF where a truncated
 			    // file is more likely than a conversion error.
-			    if (can_retry && !incomplete_tail)
-				break;
-#ifdef USE_ICONV
+			    ਜੇ (can_retry && !incomplete_ਪੂਛ)
+				ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
 			    // When we did a conversion report an error.
-			    if (iconv_fd != (iconv_t)-1 && conv_error == 0)
+			    ਜੇ (iconv_fd != (iconv_t)-1 && conv_error == 0)
 				conv_error = readfile_linenr(linecnt, ptr, p);
-#endif
+#ਜੇ_ਅੰਤ
 			    // Remember the first linenr with an illegal byte
-			    if (conv_error == 0 && illegal_byte == 0)
+			    ਜੇ (conv_error == 0 && illegal_byte == 0)
 				illegal_byte = readfile_linenr(linecnt, ptr, p);
 
 			    // Drop, keep or replace the bad byte.
-			    if (bad_char_behavior == BAD_DROP)
+			    ਜੇ (bad_char_behavior == BAD_DROP)
 			    {
 				mch_memmove(p, p + 1, todo - 1);
-				--size;
+				--ਮਾਪ;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
-				if (bad_char_behavior != BAD_KEEP)
+				ਜੇ (bad_char_behavior != BAD_KEEP)
 				    *p = bad_char_behavior;
 				++p;
 			    }
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			    p += l;
 		    }
 		}
-		if (p < ptr + size && !incomplete_tail)
+		ਜੇ (p < ptr + ਮਾਪ && !incomplete_ਪੂਛ)
 		{
 		    // Detected a UTF-8 error.
 rewind_retry:
 		    // Retry reading with another conversion.
-#if defined(FEAT_EVAL) && defined(USE_ICONV)
-		    if (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
+#ਜੇ defined(FEAT_EVAL) && defined(USE_ICONV)
+		    ਜੇ (*p_ccv != NUL && iconv_fd != (iconv_t)-1)
 			// iconv() failed, try 'charconvert'
 			did_iconv = TRUE;
-		    else
-#endif
+		    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 			// use next item from 'fileencodings'
 			advance_fenc = TRUE;
 		    file_rewind = TRUE;
-		    goto retry;
+		    ਜਾਓ retry;
 		}
 	    }
 
 	    // count the number of characters (after conversion!)
-	    filesize += size;
+	    filesize += ਮਾਪ;
 
 	    /*
 	     * when reading the first part of a file: guess EOL type
 	     */
-	    if (fileformat == EOL_UNKNOWN)
+	    ਜੇ (fileformat == EOL_UNKNOWN)
 	    {
 		// First try finding a NL, for Dos and Unix
-		if (try_dos || try_unix)
+		ਜੇ (try_dos || try_unix)
 		{
 		    // Reset the carriage return counter.
-		    if (try_mac)
+		    ਜੇ (try_mac)
 			try_mac = 1;
 
-		    for (p = ptr; p < ptr + size; ++p)
+		    ਲਈ (p = ptr; p < ptr + ਮਾਪ; ++p)
 		    {
-			if (*p == NL)
+			ਜੇ (*p == NL)
 			{
-			    if (!try_unix
+			    ਜੇ (!try_unix
 				    || (try_dos && p > ptr && p[-1] == CAR))
 				fileformat = EOL_DOS;
-			    else
+			    ਨਹੀਂਤਾਂ
 				fileformat = EOL_UNIX;
-			    break;
+			    ਰੋਕੋ;
 			}
-			else if (*p == CAR && try_mac)
+			ਨਹੀਂਤਾਂ ਜੇ (*p == CAR && try_mac)
 			    try_mac++;
 		    }
 
 		    // Don't give in to EOL_UNIX if EOL_MAC is more likely
-		    if (fileformat == EOL_UNIX && try_mac)
+		    ਜੇ (fileformat == EOL_UNIX && try_mac)
 		    {
 			// Need to reset the counters when retrying fenc.
 			try_mac = 1;
 			try_unix = 1;
-			for (; p >= ptr && *p != CAR; p--)
+			ਲਈ (; p >= ptr && *p != CAR; p--)
 			    ;
-			if (p >= ptr)
+			ਜੇ (p >= ptr)
 			{
-			    for (p = ptr; p < ptr + size; ++p)
+			    ਲਈ (p = ptr; p < ptr + ਮਾਪ; ++p)
 			    {
-				if (*p == NL)
+				ਜੇ (*p == NL)
 				    try_unix++;
-				else if (*p == CAR)
+				ਨਹੀਂਤਾਂ ਜੇ (*p == CAR)
 				    try_mac++;
 			    }
-			    if (try_mac > try_unix)
+			    ਜੇ (try_mac > try_unix)
 				fileformat = EOL_MAC;
 			}
 		    }
-		    else if (fileformat == EOL_UNKNOWN && try_mac == 1)
+		    ਨਹੀਂਤਾਂ ਜੇ (fileformat == EOL_UNKNOWN && try_mac == 1)
 			// Looking for CR but found no end-of-line markers at
 			// all: use the default format.
 			fileformat = default_fileformat();
 		}
 
 		// No NL found: may use Mac format
-		if (fileformat == EOL_UNKNOWN && try_mac)
+		ਜੇ (fileformat == EOL_UNKNOWN && try_mac)
 		    fileformat = EOL_MAC;
 
 		// Still nothing found?  Use first format in 'ffs'
-		if (fileformat == EOL_UNKNOWN)
+		ਜੇ (fileformat == EOL_UNKNOWN)
 		    fileformat = default_fileformat();
 
 		// if editing a new file: may set p_tx and p_ff
-		if (set_options)
-		    set_fileformat(fileformat, OPT_LOCAL);
+		ਜੇ (ਸੈੱਟ_options)
+		    ਸੈੱਟ_fileformat(fileformat, OPT_LOCAL);
 	    }
 	}
 
@@ -2235,92 +2235,92 @@ rewind_retry:
 	 * This loop is executed once for every character read.
 	 * Keep it fast!
 	 */
-	if (fileformat == EOL_MAC)
+	ਜੇ (fileformat == EOL_MAC)
 	{
 	    --ptr;
-	    while (++ptr, --size >= 0)
+	    ਜਦੋਂ (++ptr, --ਮਾਪ >= 0)
 	    {
 		// catch most common case first
-		if ((c = *ptr) != NUL && c != CAR && c != NL)
-		    continue;
-		if (c == NUL)
+		ਜੇ ((c = *ptr) != NUL && c != CAR && c != NL)
+		    ਜਾਰੀ;
+		ਜੇ (c == NUL)
 		    *ptr = NL;	// NULs are replaced by newlines!
-		else if (c == NL)
+		ਨਹੀਂਤਾਂ ਜੇ (c == NL)
 		    *ptr = CAR;	// NLs are replaced by CRs!
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    if (skip_count == 0)
+		    ਜੇ (skip_ਗਿਣਤੀ == 0)
 		    {
 			*ptr = NUL;	    // end of line
-			len = (colnr_T) (ptr - line_start + 1);
-			if (ml_append(lnum, line_start, len, newfile) == FAIL)
+			len = (colnr_T) (ptr - ਸਤਰ_ਸ਼ੁਰੂ + 1);
+			ਜੇ (ml_append(lnum, ਸਤਰ_ਸ਼ੁਰੂ, len, newfile) == FAIL)
 			{
 			    error = TRUE;
-			    break;
+			    ਰੋਕੋ;
 			}
-#ifdef FEAT_PERSISTENT_UNDO
-			if (read_undo_file)
-			    sha256_update(&sha_ctx, line_start, len);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
+			ਜੇ (read_undo_file)
+			    sha256_update(&sha_ctx, ਸਤਰ_ਸ਼ੁਰੂ, len);
+#ਜੇ_ਅੰਤ
 			++lnum;
-			if (--read_count == 0)
+			ਜੇ (--read_ਗਿਣਤੀ == 0)
 			{
 			    error = TRUE;	// break loop
-			    line_start = ptr;	// nothing left to write
-			    break;
+			    ਸਤਰ_ਸ਼ੁਰੂ = ptr;	// nothing left to write
+			    ਰੋਕੋ;
 			}
 		    }
-		    else
-			--skip_count;
-		    line_start = ptr + 1;
+		    ਨਹੀਂਤਾਂ
+			--skip_ਗਿਣਤੀ;
+		    ਸਤਰ_ਸ਼ੁਰੂ = ptr + 1;
 		}
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Use memchr() for SIMD-optimized newline scanning instead
 	    // of scanning each byte individually.
-	    char_u *end = ptr + size;
+	    char_u *ਸਿਰਾ = ptr + ਮਾਪ;
 
-	    while (ptr < end)
+	    ਜਦੋਂ (ptr < ਸਿਰਾ)
 	    {
-		char_u *nl = (char_u *)memchr(ptr, NL, end - ptr);
-		char_u *nul_scan;
+		char_u *nl = (char_u *)memchr(ptr, NL, ਸਿਰਾ - ptr);
+		char_u *nul_ਜਾਂਚ;
 
-		if (nl == NULL)
+		ਜੇ (nl == ਨਿਰਾ)
 		{
 		    // No more newlines in buffer.
 		    // Replace any NUL bytes with NL in remaining data.
-		    while ((nul_scan = (char_u *)memchr(ptr, NUL,
-						      end - ptr)) != NULL)
+		    ਜਦੋਂ ((nul_ਜਾਂਚ = (char_u *)memchr(ptr, NUL,
+						      ਸਿਰਾ - ptr)) != ਨਿਰਾ)
 		    {
-			*nul_scan = NL;
-			ptr = nul_scan + 1;
+			*nul_ਜਾਂਚ = NL;
+			ptr = nul_ਜਾਂਚ + 1;
 		    }
-		    ptr = end;
-		    break;
+		    ptr = ਸਿਰਾ;
+		    ਰੋਕੋ;
 		}
 
 		// Replace NUL bytes with NL before the newline.
 		{
-		    char_u *scan = ptr;
-		    while ((nul_scan = (char_u *)memchr(scan, NUL,
-						       nl - scan)) != NULL)
+		    char_u *ਜਾਂਚ = ptr;
+		    ਜਦੋਂ ((nul_ਜਾਂਚ = (char_u *)memchr(ਜਾਂਚ, NUL,
+						       nl - ਜਾਂਚ)) != ਨਿਰਾ)
 		    {
-			*nul_scan = NL;
-			scan = nul_scan + 1;
+			*nul_ਜਾਂਚ = NL;
+			ਜਾਂਚ = nul_ਜਾਂਚ + 1;
 		    }
 		}
 
 		// Process the newline.
 		ptr = nl;
-		if (skip_count == 0)
+		ਜੇ (skip_ਗਿਣਤੀ == 0)
 		{
 		    *ptr = NUL;		// end of line
-		    len = (colnr_T)(ptr - line_start + 1);
-		    if (fileformat == EOL_DOS)
+		    len = (colnr_T)(ptr - ਸਤਰ_ਸ਼ੁਰੂ + 1);
+		    ਜੇ (fileformat == EOL_DOS)
 		    {
-			if (ptr > line_start && ptr[-1] == CAR)
+			ਜੇ (ptr > ਸਤਰ_ਸ਼ੁਰੂ && ptr[-1] == CAR)
 			{
 			    // remove CR before NL
 			    ptr[-1] = NUL;
@@ -2332,55 +2332,55 @@ rewind_retry:
 			 * the lines read so far and start all over again.
 			 * Otherwise give an error message later.
 			 */
-			else if (ff_error != EOL_DOS)
+			ਨਹੀਂਤਾਂ ਜੇ (ff_error != EOL_DOS)
 			{
-			    if (   try_unix
+			    ਜੇ (   try_unix
 				&& !read_stdin
-				&& (read_buffer
+				&& (read_ਬਫਰ
 				    || vim_lseek(fd, (off_T)0L, SEEK_SET)
 								      == 0))
 			    {
 				fileformat = EOL_UNIX;
-				if (set_options)
-				    set_fileformat(EOL_UNIX, OPT_LOCAL);
+				ਜੇ (ਸੈੱਟ_options)
+				    ਸੈੱਟ_fileformat(EOL_UNIX, OPT_LOCAL);
 				file_rewind = TRUE;
 				keep_fileformat = TRUE;
-				goto retry;
+				ਜਾਓ retry;
 			    }
 			    ff_error = EOL_DOS;
 			}
 		    }
-		    if (ml_append(lnum, line_start, len, newfile) == FAIL)
+		    ਜੇ (ml_append(lnum, ਸਤਰ_ਸ਼ੁਰੂ, len, newfile) == FAIL)
 		    {
 			error = TRUE;
-			break;
+			ਰੋਕੋ;
 		    }
-#ifdef FEAT_PERSISTENT_UNDO
-		    if (read_undo_file)
-			sha256_update(&sha_ctx, line_start, len);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
+		    ਜੇ (read_undo_file)
+			sha256_update(&sha_ctx, ਸਤਰ_ਸ਼ੁਰੂ, len);
+#ਜੇ_ਅੰਤ
 		    ++lnum;
-		    if (--read_count == 0)
+		    ਜੇ (--read_ਗਿਣਤੀ == 0)
 		    {
 			error = TRUE;	    // break loop
-			line_start = ptr;   // nothing left to write
-			break;
+			ਸਤਰ_ਸ਼ੁਰੂ = ptr;   // nothing left to write
+			ਰੋਕੋ;
 		    }
 		}
-		else
-		    --skip_count;
-		line_start = ptr + 1;
+		ਨਹੀਂਤਾਂ
+		    --skip_ਗਿਣਤੀ;
+		ਸਤਰ_ਸ਼ੁਰੂ = ptr + 1;
 		++ptr;
 	    }
-	    size = -1;
+	    ਮਾਪ = -1;
 	}
-	linerest = (long)(ptr - line_start);
+	linerest = (ਲੰਮਾ)(ptr - ਸਤਰ_ਸ਼ੁਰੂ);
 	ui_breakcheck();
     }
 
 failed:
     // not an error, max. number of lines reached
-    if (error && read_count == 0)
+    ਜੇ (error && read_ਗਿਣਤੀ == 0)
 	error = FALSE;
 
     // In Dos format ignore a trailing CTRL-Z, unless 'binary' is set.
@@ -2389,90 +2389,90 @@ failed:
     // system that keeps file length properly the CTRL-Z should be dropped.
     // Set the 'endoffile' option so the user can decide what to write later.
     // In Unix format the CTRL-Z is just another character.
-    if (linerest != 0
+    ਜੇ (linerest != 0
 	    && !curbuf->b_p_bin
 	    && fileformat == EOL_DOS
 	    && ptr[-1] == Ctrl_Z)
     {
 	ptr--;
 	linerest--;
-	if (set_options)
+	ਜੇ (ਸੈੱਟ_options)
 	    curbuf->b_p_eof = TRUE;
     }
 
     // If we get EOF in the middle of a line, note the fact by resetting
     // 'endofline' and add the line normally.
-    if (!error
+    ਜੇ (!error
 	    && !got_int
 	    && linerest != 0)
     {
 	// remember for when writing
-	if (set_options)
+	ਜੇ (ਸੈੱਟ_options)
 	    curbuf->b_p_eol = FALSE;
 	*ptr = NUL;
-	len = (colnr_T)(ptr - line_start + 1);
-	if (ml_append(lnum, line_start, len, newfile) == FAIL)
+	len = (colnr_T)(ptr - ਸਤਰ_ਸ਼ੁਰੂ + 1);
+	ਜੇ (ml_append(lnum, ਸਤਰ_ਸ਼ੁਰੂ, len, newfile) == FAIL)
 	    error = TRUE;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-#ifdef FEAT_PERSISTENT_UNDO
-	    if (read_undo_file)
-		sha256_update(&sha_ctx, line_start, len);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
+	    ਜੇ (read_undo_file)
+		sha256_update(&sha_ctx, ਸਤਰ_ਸ਼ੁਰੂ, len);
+#ਜੇ_ਅੰਤ
 	    read_no_eol_lnum = ++lnum;
 	}
     }
 
-    if (set_options)
+    ਜੇ (ਸੈੱਟ_options)
 	save_file_ff(curbuf);		// remember the current file format
 
-#ifdef FEAT_CRYPT
-    if (curbuf->b_cryptstate != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+    ਜੇ (curbuf->b_cryptstate != ਨਿਰਾ)
     {
 	crypt_free_state(curbuf->b_cryptstate);
-	curbuf->b_cryptstate = NULL;
+	curbuf->b_cryptstate = ਨਿਰਾ;
     }
-    if (cryptkey != NULL && cryptkey != curbuf->b_p_key)
-	crypt_free_key(cryptkey);
+    ਜੇ (cryptkey != ਨਿਰਾ && cryptkey != curbuf->b_p_ਕੁੰਜੀ)
+	crypt_free_ਕੁੰਜੀ(cryptkey);
     // Don't set cryptkey to NULL, it's used below as a flag that
     // encryption was used.
-#endif
+#ਜੇ_ਅੰਤ
 
     // If editing a new file: set 'fenc' for the current buffer.
     // Also for ":read ++edit file".
-    if (set_options)
-	set_string_option_direct((char_u *)"fenc", -1, fenc,
+    ਜੇ (ਸੈੱਟ_options)
+	ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"fenc", -1, fenc,
 						       OPT_FREE|OPT_LOCAL, 0);
-    if (fenc_alloced)
+    ਜੇ (fenc_alloced)
 	vim_free(fenc);
-#ifdef USE_ICONV
-    if (iconv_fd != (iconv_t)-1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+    ਜੇ (iconv_fd != (iconv_t)-1)
 	iconv_close(iconv_fd);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (!read_buffer && !read_stdin)
+    ਜੇ (!read_ਬਫਰ && !read_stdin)
 	close(fd);				// errors are ignored
-#ifdef HAVE_FD_CLOEXEC
-    else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_FD_CLOEXEC
+    ਨਹੀਂਤਾਂ
     {
-	int fdflags = fcntl(fd, F_GETFD);
+	ਪੂਰਨ fdflags = fcntl(fd, F_GETFD);
 
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(fd, F_SETFD, fdflags | FD_CLOEXEC);
+	ਜੇ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (ਖਾਲੀ)fcntl(fd, F_SETFD, fdflags | FD_CLOEXEC);
     }
-#endif
-    vim_free(buffer);
+#ਜੇ_ਅੰਤ
+    vim_free(ਬਫਰ);
 
-#ifdef HAVE_DUP
-    if (read_stdin)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_DUP
+    ਜੇ (read_stdin)
     {
 	// Use stderr for stdin, makes shell commands work.
 	close(0);
 	vim_ignored = dup(2);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (tmpname != NULL)
+    ਜੇ (tmpname != ਨਿਰਾ)
     {
 	mch_remove(tmpname);		// delete converted file
 	vim_free(tmpname);
@@ -2482,198 +2482,198 @@ failed:
     /*
      * In recovery mode everything but autocommands is skipped.
      */
-    if (!recoverymode)
+    ਜੇ (!recoverymode)
     {
 	// need to delete the last line, which comes from the empty buffer
-	if (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_EMPTY))
+	ਜੇ (newfile && wasempty && !(curbuf->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ))
 	{
-#ifdef FEAT_NETBEANS_INTG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 0;
-#endif
-	    ml_delete(curbuf->b_ml.ml_line_count);
-#ifdef FEAT_NETBEANS_INTG
+#ਜੇ_ਅੰਤ
+	    ml_delete(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 1;
-#endif
+#ਜੇ_ਅੰਤ
 	    --linecnt;
 	}
-	linecnt = curbuf->b_ml.ml_line_count - linecnt;
-	if (filesize == 0)
+	linecnt = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - linecnt;
+	ਜੇ (filesize == 0)
 	    linecnt = 0;
-	if (newfile || read_buffer)
+	ਜੇ (newfile || read_ਬਫਰ)
 	{
 	    redraw_curbuf_later(UPD_NOT_VALID);
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	    // After reading the text into the buffer the diff info needs to
 	    // be updated.
 	    diff_invalidate(curbuf);
-#endif
-#ifdef FEAT_FOLDING
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 	    // All folds in the window are invalid now.  Mark them for update
 	    // before triggering autocommands.
 	    foldUpdateAll(curwin);
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else if (linecnt)		// appended at least one line
-	    appended_lines_mark(from, linecnt);
+	ਨਹੀਂਤਾਂ ਜੇ (linecnt)		// appended at least one line
+	    appended_ਸਤਰਾਂ_mark(from, linecnt);
 
-#ifndef ALWAYS_USE_GUI
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ ALWAYS_USE_GUI
 	/*
 	 * If we were reading from the same terminal as where messages go,
 	 * the screen will have been messed up.
 	 * Switch on raw mode now and clear the screen.
 	 */
-	if (read_stdin)
+	ਜੇ (read_stdin)
 	{
 	    settmode(TMODE_RAW);	// set to raw mode
 	    starttermcap();
 	    screenclear();
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
-	if (got_int)
+	ਜੇ (got_int)
 	{
-	    if (!(flags & READ_DUMMY))
+	    ਜੇ (!(flags & READ_DUMMY))
 	    {
 		filemess(curbuf, sfname, (char_u *)_(e_interrupted), 0);
-		if (newfile)
+		ਜੇ (newfile)
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    }
-	    msg_scroll = msg_save;
-#ifdef FEAT_VIMINFO
+	    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VIMINFO
 	    check_marks_read();
-#endif
+#ਜੇ_ਅੰਤ
 	    retval = OK;	// an interrupt isn't really an error
-	    goto theend;
+	    ਜਾਓ theend;
 	}
 
-	if (!filtering && !(flags & READ_DUMMY))
+	ਜੇ (!filtering && !(flags & READ_DUMMY))
 	{
-	    int	buflen;
+	    ਪੂਰਨ	buflen;
 
-	    msg_add_fname(curbuf, sfname);   // fname in IObuff with quotes
+	    ਸੁਨੇਹਾ_ਜੋੜੋ_fname(curbuf, sfname);   // fname in IObuff with quotes
 	    c = FALSE;
 
-	    buflen = (int)STRLEN(IObuff);
-#ifdef UNIX
-	    if (S_ISFIFO(perm))			    // fifo
+	    buflen = (ਪੂਰਨ)STRLEN(IObuff);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+	    ਜੇ (S_ISFIFO(perm))			    // fifo
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[fifo]"));
 		c = TRUE;
 	    }
-	    if (S_ISSOCK(perm))			    // or socket
+	    ਜੇ (S_ISSOCK(perm))			    // or socket
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[socket]"));
 		c = TRUE;
 	    }
 # ifdef OPEN_CHR_FILES
-	    if (S_ISCHR(perm))			    // or character special
+	    ਜੇ (S_ISCHR(perm))			    // or character special
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[character special]"));
 		c = TRUE;
 	    }
 # endif
-#endif
-	    if (curbuf->b_p_ro)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (curbuf->b_p_ro)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			"%s", shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 		c = TRUE;
 	    }
-	    if (read_no_eol_lnum)
+	    ਜੇ (read_no_eol_lnum)
 	    {
-		msg_add_eol();
+		ਸੁਨੇਹਾ_ਜੋੜੋ_eol();
 		c = TRUE;
 	    }
-	    if (ff_error == EOL_DOS)
+	    ਜੇ (ff_error == EOL_DOS)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[CR missing]"));
 		c = TRUE;
 	    }
-	    if (split)
+	    ਜੇ (ਵੰਡੋ)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[long lines split]"));
 		c = TRUE;
 	    }
-	    if (notconverted)
+	    ਜੇ (notconverted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[NOT converted]"));
 		c = TRUE;
 	    }
-	    else if (converted)
+	    ਨਹੀਂਤਾਂ ਜੇ (converted)
 	    {
-		buflen += vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		buflen += vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[converted]"));
 		c = TRUE;
 	    }
-#ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+	    ਜੇ (cryptkey != ਨਿਰਾ)
 	    {
-		crypt_append_msg(curbuf);
+		crypt_append_ਸੁਨੇਹਾ(curbuf);
 		c = TRUE;
 	    }
-#endif
-	    if (conv_error != 0)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (conv_error != 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
-			_("[CONVERSION ERROR in line %ld]"), (long)conv_error);
+		vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
+			_("[CONVERSION ERROR in line %ld]"), (ਲੰਮਾ)conv_error);
 		c = TRUE;
 	    }
-	    else if (illegal_byte > 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (illegal_byte > 0)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
-			_("[ILLEGAL BYTE in line %ld]"), (long)illegal_byte);
+		vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
+			_("[ILLEGAL BYTE in line %ld]"), (ਲੰਮਾ)illegal_byte);
 		c = TRUE;
 	    }
-	    else if (error)
+	    ਨਹੀਂਤਾਂ ਜੇ (error)
 	    {
-		vim_snprintf((char *)IObuff + buflen, IOSIZE - buflen,
+		vim_snprintf((ਅੱਖਰ *)IObuff + buflen, IOSIZE - buflen,
 			_("[READ ERRORS]"));
 		c = TRUE;
 	    }
-	    if (msg_add_fileformat(fileformat))
+	    ਜੇ (ਸੁਨੇਹਾ_ਜੋੜੋ_fileformat(fileformat))
 		c = TRUE;
-#ifdef FEAT_CRYPT
-	    if (cryptkey != NULL)
-		msg_add_lines(c, (long)linecnt, filesize
-			 - crypt_get_header_len(crypt_get_method_nr(curbuf)));
-	    else
-#endif
-		msg_add_lines(c, (long)linecnt, filesize);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+	    ਜੇ (cryptkey != ਨਿਰਾ)
+		ਸੁਨੇਹਾ_ਜੋੜੋ_ਸਤਰਾਂ(c, (ਲੰਮਾ)linecnt, filesize
+			 - crypt_get_ਸਿਰਲੇਖ_len(crypt_get_ਵਿਧੀ_nr(curbuf)));
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		ਸੁਨੇਹਾ_ਜੋੜੋ_ਸਤਰਾਂ(c, (ਲੰਮਾ)linecnt, filesize);
 
-	    VIM_CLEAR(keep_msg);
-	    msg_scrolled_ign = TRUE;
-#ifdef ALWAYS_USE_GUI
+	    VIM_CLEAR(keep_ਸੁਨੇਹਾ);
+	    ਸੁਨੇਹਾ_scrolled_ign = TRUE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ALWAYS_USE_GUI
 	    // Don't show the message when reading stdin, it would end up in a
 	    // message box (which might be shown when exiting!)
-	    if (read_stdin || read_buffer)
-		p = msg_may_trunc(FALSE, IObuff);
-	    else
-#endif
+	    ਜੇ (read_stdin || read_ਬਫਰ)
+		p = ਸੁਨੇਹਾ_may_trunc(FALSE, IObuff);
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    {
-		if (msg_col > 0)
-		    msg_putchar('\r');  // overwrite previous message
-		p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
+		ਜੇ (ਸੁਨੇਹਾ_ਖਾਨਾ > 0)
+		    ਸੁਨੇਹਾ_putchar('\r');  // overwrite previous message
+		p = (char_u *)ਸੁਨੇਹਾ_trunc_attr((ਅੱਖਰ *)IObuff, FALSE, 0);
 	    }
-	    if (read_stdin || read_buffer || restart_edit != 0
-		    || (msg_scrolled != 0 && !need_wait_return))
+	    ਜੇ (read_stdin || read_ਬਫਰ || restart_edit != 0
+		    || (ਸੁਨੇਹਾ_scrolled != 0 && !need_wait_return))
 		// Need to repeat the message after redrawing when:
 		// - When reading from stdin (the screen will be cleared next).
 		// - When restart_edit is set (otherwise there will be a delay
 		//   before redrawing).
 		// - When the screen was scrolled but there is no wait-return
 		//   prompt.
-		set_keep_msg(p, 0);
-	    msg_scrolled_ign = FALSE;
+		ਸੈੱਟ_keep_ਸੁਨੇਹਾ(p, 0);
+	    ਸੁਨੇਹਾ_scrolled_ign = FALSE;
 	}
 
 	// with errors writing the file requires ":w!"
-	if (newfile && (error
+	ਜੇ (newfile && (error
 		    || conv_error != 0
 		    || (illegal_byte > 0 && bad_char_behavior != BAD_KEEP)))
 	    curbuf->b_p_ro = TRUE;
@@ -2684,23 +2684,23 @@ failed:
 	 * In Ex mode: cursor at last new line.
 	 * Otherwise: cursor at first new line.
 	 */
-	if (exmode_active)
+	ਜੇ (exmode_ਸਰਗਰਮ)
 	    curwin->w_cursor.lnum = from + linecnt;
-	else
+	ਨਹੀਂਤਾਂ
 	    curwin->w_cursor.lnum = from + 1;
 	check_cursor_lnum();
 	beginline(BL_WHITE | BL_FIX);	    // on first non-blank
 
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	ਜੇ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set '[ and '] marks to the newly read lines.
-	    curbuf->b_op_start.lnum = from + 1;
-	    curbuf->b_op_start.col = 0;
-	    curbuf->b_op_end.lnum = from + linecnt;
-	    curbuf->b_op_end.col = 0;
+	    curbuf->b_op_ਸ਼ੁਰੂ.lnum = from + 1;
+	    curbuf->b_op_ਸ਼ੁਰੂ.ਖਾਨਾ = 0;
+	    curbuf->b_op_ਸਿਰਾ.lnum = from + linecnt;
+	    curbuf->b_op_ਸਿਰਾ.ਖਾਨਾ = 0;
 	}
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	/*
 	 * Work around a weird problem: When a file has two links (only
 	 * possible on NTFS) and we write through one link, then stat() it
@@ -2708,23 +2708,23 @@ failed:
 	 * It's correct again after reading the file, thus reset the timestamp
 	 * here.
 	 */
-	if (newfile && !read_stdin && !read_buffer
-					 && mch_stat((char *)fname, &st) >= 0)
+	ਜੇ (newfile && !read_stdin && !read_ਬਫਰ
+					 && mch_stat((ਅੱਖਰ *)fname, &st) >= 0)
 	{
-	    buf_store_time(curbuf, &st, fname);
+	    buf_store_ਸਮਾਂ(curbuf, &st, fname);
 	    curbuf->b_mtime_read = curbuf->b_mtime;
 	    curbuf->b_mtime_read_ns = curbuf->b_mtime_ns;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
-    msg_scroll = msg_save;
+    ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_save;
 
-#ifdef FEAT_VIMINFO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VIMINFO
     /*
      * Get the marks before executing autocommands, so they can be used there.
      */
     check_marks_read();
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * We remember if the last line of the read didn't have
@@ -2736,30 +2736,30 @@ failed:
 
     // When reloading a buffer put the cursor at the first line that is
     // different.
-    if (flags & READ_KEEP_UNDO)
-	u_find_first_changed();
+    ਜੇ (flags & READ_KEEP_UNDO)
+	u_ਲੱਭੋ_ਪਹਿਲਾ_ਬਦਲਿਆ();
 
-#ifdef FEAT_PERSISTENT_UNDO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
     /*
      * When opening a new file locate undo info and read it.
      */
-    if (read_undo_file)
+    ਜੇ (read_undo_file)
     {
-	char_u	hash[UNDO_HASH_SIZE];
+	char_u	hash[UNDO_HASH_ਮਾਪ];
 
-	sha256_finish(&sha_ctx, hash);
-	u_read_undo(NULL, hash, fname);
+	sha256_ਅੰਤ(&sha_ctx, hash);
+	u_read_undo(ਨਿਰਾ, hash, fname);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (!read_stdin && !read_fifo && (!read_buffer || sfname != NULL))
+    ਜੇ (!read_stdin && !read_fifo && (!read_ਬਫਰ || sfname != ਨਿਰਾ))
     {
-	int m = msg_scroll;
-	int n = msg_scrolled;
+	ਪੂਰਨ m = ਸੁਨੇਹਾ_scroll;
+	ਪੂਰਨ n = ਸੁਨੇਹਾ_scrolled;
 
 	// Save the fileformat now, otherwise the buffer will be considered
 	// modified if the format/encoding was automatically detected.
-	if (set_options)
+	ਜੇ (ਸੈੱਟ_options)
 	    save_file_ff(curbuf);
 
 	/*
@@ -2767,15 +2767,15 @@ failed:
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
-	if (filtering)
-	    apply_autocmds_exarg(EVENT_FILTERREADPOST, NULL, sfname,
+	ਸੁਨੇਹਾ_scroll = TRUE;
+	ਜੇ (filtering)
+	    apply_autocmds_exarg(EVENT_FILTERREADPOST, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap);
-	else if (newfile || (read_buffer && sfname != NULL))
+	ਨਹੀਂਤਾਂ ਜੇ (newfile || (read_ਬਫਰ && sfname != ਨਿਰਾ))
 	{
-	    apply_autocmds_exarg(EVENT_BUFREADPOST, NULL, sfname,
+	    apply_autocmds_exarg(EVENT_BUFREADPOST, ਨਿਰਾ, sfname,
 							  FALSE, curbuf, eap);
-	    if (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
+	    ਜੇ (!curbuf->b_au_did_filetype && *curbuf->b_p_ft != NUL)
 		/*
 		 * EVENT_FILETYPE was not triggered but the buffer already has a
 		 * filetype. Trigger EVENT_FILETYPE using the existing filetype.
@@ -2783,53 +2783,53 @@ failed:
 		apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
 			TRUE, curbuf);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    apply_autocmds_exarg(EVENT_FILEREADPOST, sfname, sfname,
-							    FALSE, NULL, eap);
-	if (msg_scrolled == n)
-	    msg_scroll = m;
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
-	    goto theend;
-#endif
+							    FALSE, ਨਿਰਾ, eap);
+	ਜੇ (ਸੁਨੇਹਾ_scrolled == n)
+	    ਸੁਨੇਹਾ_scroll = m;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	ਜੇ (aborting())	    // autocmds may abort script processing
+	    ਜਾਓ theend;
+#ਜੇ_ਅੰਤ
     }
 
-    if (!(recoverymode && error))
+    ਜੇ (!(recoverymode && error))
 	retval = OK;
 
 theend:
-    if (curbuf->b_ml.ml_mfp != NULL
+    ਜੇ (curbuf->b_ml.ml_mfp != ਨਿਰਾ
 		       && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	// OK to sync the swap file now
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
-#if defined(OPEN_CHR_FILES)
+#ਜੇ defined(OPEN_CHR_FILES)
 /*
  * Returns TRUE if the file name argument is of the form "/dev/fd/\d\+",
  * which is the name of files used for process substitution output by
  * some shells on some operating systems, e.g., bash on SunOS.
  * Do not accept "/dev/fd/[012]", opening these may hang Vim.
  */
-    int
+    ਪੂਰਨ
 is_dev_fd_file(char_u *fname)
 {
-    return (STRNCMP(fname, "/dev/fd/", 8) == 0
+    ਵਾਪਸ (STRNCMP(fname, "/dev/fd/", 8) == 0
 	    && VIM_ISDIGIT(fname[8])
 	    && *skipdigits(fname + 9) == NUL
 	    && (fname[9] != NUL
 		|| (fname[8] != '0' && fname[8] != '1' && fname[8] != '2')));
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * From the current line count and characters read after that, estimate the
  * line number where we are now.
  * Used for error messages that include a line number.
  */
-    static linenr_T
+    ਸਥਿਰ linenr_T
 readfile_linenr(
     linenr_T	linecnt,	// line count before reading more bytes
     char_u	*p,		// start of more bytes read
@@ -2838,11 +2838,11 @@ readfile_linenr(
     char_u	*s;
     linenr_T	lnum;
 
-    lnum = curbuf->b_ml.ml_line_count - linecnt + 1;
-    for (s = p; s < endp; ++s)
-	if (*s == '\n')
+    lnum = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - linecnt + 1;
+    ਲਈ (s = p; s < endp; ++s)
+	ਜੇ (*s == '\n')
 	    ++lnum;
-    return lnum;
+    ਵਾਪਸ lnum;
 }
 
 /*
@@ -2850,14 +2850,14 @@ readfile_linenr(
  * equal to the buffer "buf".  Used for calling readfile().
  * Returns OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 prep_exarg(exarg_T *eap, buf_T *buf)
 {
-    eap->cmd = alloc(15 + (unsigned)STRLEN(buf->b_p_fenc));
-    if (eap->cmd == NULL)
-	return FAIL;
+    eap->cmd = alloc(15 + (ਬਿਨਾਨਿਸ਼ਾਨੀ)STRLEN(buf->b_p_fenc));
+    ਜੇ (eap->cmd == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    sprintf((char *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
+    sprintf((ਅੱਖਰ *)eap->cmd, "e ++enc=%s", buf->b_p_fenc);
     eap->force_enc = 8;
     eap->bad_char = buf->b_bad_char;
     eap->force_ff = *buf->b_p_ff;
@@ -2865,47 +2865,47 @@ prep_exarg(exarg_T *eap, buf_T *buf)
     eap->force_bin = buf->b_p_bin ? FORCE_BIN : FORCE_NOBIN;
     eap->read_edit = FALSE;
     eap->forceit = FALSE;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Set default or forced 'fileformat' and 'binary'.
  */
-    void
-set_file_options(int set_options, exarg_T *eap)
+    ਖਾਲੀ
+ਸੈੱਟ_file_options(ਪੂਰਨ ਸੈੱਟ_options, exarg_T *eap)
 {
     // set default 'fileformat'
-    if (set_options)
+    ਜੇ (ਸੈੱਟ_options)
     {
-	if (eap != NULL && eap->force_ff != 0)
-	    set_fileformat(get_fileformat_force(curbuf, eap), OPT_LOCAL);
-	else if (*p_ffs != NUL)
-	    set_fileformat(default_fileformat(), OPT_LOCAL);
+	ਜੇ (eap != ਨਿਰਾ && eap->force_ff != 0)
+	    ਸੈੱਟ_fileformat(get_fileformat_force(curbuf, eap), OPT_LOCAL);
+	ਨਹੀਂਤਾਂ ਜੇ (*p_ffs != NUL)
+	    ਸੈੱਟ_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
     // set or reset 'binary'
-    if (eap != NULL && eap->force_bin != 0)
+    ਜੇ (eap != ਨਿਰਾ && eap->force_bin != 0)
     {
-	int	oldval = curbuf->b_p_bin;
+	ਪੂਰਨ	oldval = curbuf->b_p_bin;
 
 	curbuf->b_p_bin = (eap->force_bin == FORCE_BIN);
-	set_options_bin(oldval, curbuf->b_p_bin, OPT_LOCAL);
+	ਸੈੱਟ_options_bin(oldval, curbuf->b_p_bin, OPT_LOCAL);
     }
 }
 
 /*
  * Set forced 'fileencoding'.
  */
-    void
-set_forced_fenc(exarg_T *eap)
+    ਖਾਲੀ
+ਸੈੱਟ_forced_fenc(exarg_T *eap)
 {
-    if (eap->force_enc == 0)
-	return;
+    ਜੇ (eap->force_enc == 0)
+	ਵਾਪਸ;
 
     char_u *fenc = enc_canonize(eap->cmd + eap->force_enc);
 
-    if (fenc != NULL)
-	set_string_option_direct((char_u *)"fenc", -1,
+    ਜੇ (fenc != ਨਿਰਾ)
+	ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"fenc", -1,
 		fenc, OPT_FREE|OPT_LOCAL, 0);
     vim_free(fenc);
 }
@@ -2918,47 +2918,47 @@ set_forced_fenc(exarg_T *eap)
  * When *pp is not set to NULL, the result is in allocated memory and "alloced"
  * is set to TRUE.
  */
-    static char_u *
-next_fenc(char_u **pp, int *alloced)
+    ਸਥਿਰ char_u *
+ਅਗਲਾ_fenc(char_u **pp, ਪੂਰਨ *alloced)
 {
     char_u	*p;
     char_u	*r;
 
     *alloced = FALSE;
-    if (**pp == NUL)
+    ਜੇ (**pp == NUL)
     {
-	*pp = NULL;
-	return (char_u *)"";
+	*pp = ਨਿਰਾ;
+	ਵਾਪਸ (char_u *)"";
     }
     p = vim_strchr(*pp, ',');
-    if (p == NULL)
+    ਜੇ (p == ਨਿਰਾ)
     {
 	r = enc_canonize(*pp);
 	*pp += STRLEN(*pp);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	r = vim_strnsave(*pp, p - *pp);
 	*pp = p + 1;
-	if (r != NULL)
+	ਜੇ (r != ਨਿਰਾ)
 	{
 	    p = enc_canonize(r);
 	    vim_free(r);
 	    r = p;
 	}
     }
-    if (r != NULL)
+    ਜੇ (r != ਨਿਰਾ)
 	*alloced = TRUE;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// out of memory
 	r = (char_u *)"";
-	*pp = NULL;
+	*pp = ਨਿਰਾ;
     }
-    return r;
+    ਵਾਪਸ r;
 }
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 /*
  * Convert a file with the 'charconvert' expression.
  * This closes the file which is to be read, converts it and opens the
@@ -2967,36 +2967,36 @@ next_fenc(char_u **pp, int *alloced)
  * after reading it).
  * Returns NULL if the conversion failed ("*fdp" is not set) .
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 readfile_charconvert(
     char_u	*fname,		// name of input file
     char_u	*fenc,		// converted from
-    int		*fdp)		// in/out: file descriptor of file
+    ਪੂਰਨ		*fdp)		// in/out: file descriptor of file
 {
     char_u	*tmpname;
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
 
     tmpname = vim_tempname('r', FALSE);
-    if (tmpname == NULL)
+    ਜੇ (tmpname == ਨਿਰਾ)
 	errmsg = _("Can't find temp file for conversion");
-    else
+    ਨਹੀਂਤਾਂ
     {
 	close(*fdp);		// close the input file, ignore errors
 	*fdp = -1;
-	if (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
+	ਜੇ (eval_charconvert(fenc, enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						      fname, tmpname) == FAIL)
 	    errmsg = _("Conversion with 'charconvert' failed");
-	if (errmsg == NULL && (*fdp = mch_open((char *)tmpname,
+	ਜੇ (errmsg == ਨਿਰਾ && (*fdp = mch_open((ਅੱਖਰ *)tmpname,
 						  O_RDONLY | O_EXTRA, 0)) < 0)
 	    errmsg = _("can't read output of 'charconvert'");
     }
 
-    if (errmsg != NULL)
+    ਜੇ (errmsg != ਨਿਰਾ)
     {
 	// Don't use emsg(), it breaks mappings, the retry with
 	// another type of conversion might still work.
-	msg(errmsg);
-	if (tmpname != NULL)
+	ਸੁਨੇਹਾ(errmsg);
+	ਜੇ (tmpname != ਨਿਰਾ)
 	{
 	    mch_remove(tmpname);	// delete converted file
 	    VIM_CLEAR(tmpname);
@@ -3004,91 +3004,91 @@ readfile_charconvert(
     }
 
     // If the input file is closed, open it (caller should check for error).
-    if (*fdp < 0)
-	*fdp = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
+    ਜੇ (*fdp < 0)
+	*fdp = mch_open((ਅੱਖਰ *)fname, O_RDONLY | O_EXTRA, 0);
 
-    return tmpname;
+    ਵਾਪਸ tmpname;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CRYPT)
+#ਜੇ defined(FEAT_CRYPT)
 /*
  * Check for magic number used for encryption.  Applies to the current buffer.
  * If found, the magic number is removed from ptr[*sizep] and *sizep and
  * *filesizep are updated.
  * Return the (new) encryption key, NULL for no encryption.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 check_for_cryptkey(
     char_u	*cryptkey,	// previous encryption key or NULL
     char_u	*ptr,		// pointer to read bytes
-    long	*sizep,		// length of read bytes
+    ਲੰਮਾ	*sizep,		// length of read bytes
     off_T	*filesizep,	// nr of bytes used from file
-    int		newfile,	// editing a new buffer
+    ਪੂਰਨ		newfile,	// editing a new buffer
     char_u	*fname,		// file name to display
-    int		*did_ask)	// flag: whether already asked for key
+    ਪੂਰਨ		*did_ask)	// flag: whether already asked for key
 {
-    int method = crypt_method_nr_from_magic((char *)ptr, *sizep);
-    int b_p_ro = curbuf->b_p_ro;
+    ਪੂਰਨ ਵਿਧੀ = crypt_ਵਿਧੀ_nr_from_magic((ਅੱਖਰ *)ptr, *sizep);
+    ਪੂਰਨ b_p_ro = curbuf->b_p_ro;
 
-    if (method >= 0)
+    ਜੇ (ਵਿਧੀ >= 0)
     {
 	// Mark the buffer as read-only until the decryption has taken place.
 	// Avoids accidentally overwriting the file with garbage.
 	curbuf->b_p_ro = TRUE;
 
 	// Set the cryptmethod local to the buffer.
-	crypt_set_cm_option(curbuf, method);
-	if (cryptkey == NULL && !*did_ask)
+	crypt_ਸੈੱਟ_cm_option(curbuf, ਵਿਧੀ);
+	ਜੇ (cryptkey == ਨਿਰਾ && !*did_ask)
 	{
-	    if (*curbuf->b_p_key)
+	    ਜੇ (*curbuf->b_p_ਕੁੰਜੀ)
 	    {
-		cryptkey = curbuf->b_p_key;
+		cryptkey = curbuf->b_p_ਕੁੰਜੀ;
 		crypt_check_swapfile_curbuf();
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// When newfile is TRUE, store the typed key in the 'key'
 		// option and don't free it.  bf needs hash of the key saved.
 		// Don't ask for the key again when first time Enter was hit.
 		// Happens when retrying to detect encoding.
-		smsg(_(need_key_msg), fname);
-		msg_scroll = TRUE;
-		crypt_check_method(method);
-		cryptkey = crypt_get_key(newfile, FALSE);
+		smsg(_(need_ਕੁੰਜੀ_ਸੁਨੇਹਾ), fname);
+		ਸੁਨੇਹਾ_scroll = TRUE;
+		crypt_check_ਵਿਧੀ(ਵਿਧੀ);
+		cryptkey = crypt_get_ਕੁੰਜੀ(newfile, FALSE);
 		*did_ask = TRUE;
 
 		// check if empty key entered
-		if (cryptkey != NULL && *cryptkey == NUL)
+		ਜੇ (cryptkey != ਨਿਰਾ && *cryptkey == NUL)
 		{
-		    if (cryptkey != curbuf->b_p_key)
+		    ਜੇ (cryptkey != curbuf->b_p_ਕੁੰਜੀ)
 			vim_free(cryptkey);
-		    cryptkey = NULL;
+		    cryptkey = ਨਿਰਾ;
 		}
 	    }
 	}
 
-	if (cryptkey != NULL)
+	ਜੇ (cryptkey != ਨਿਰਾ)
 	{
-	    int header_len;
+	    ਪੂਰਨ ਸਿਰਲੇਖ_len;
 
-	    header_len = crypt_get_header_len(method);
-	    if (*sizep < header_len)
+	    ਸਿਰਲੇਖ_len = crypt_get_ਸਿਰਲੇਖ_len(ਵਿਧੀ);
+	    ਜੇ (*sizep < ਸਿਰਲੇਖ_len)
 	    {
 		// invalid header, buffer can't be encrypted
-		if (cryptkey != curbuf->b_p_key)
+		ਜੇ (cryptkey != curbuf->b_p_ਕੁੰਜੀ)
 		    vim_free(cryptkey);
-		return NULL;
+		ਵਾਪਸ ਨਿਰਾ;
 	    }
 
-	    curbuf->b_cryptstate = crypt_create_from_header(
-							method, cryptkey, ptr);
-	    crypt_set_cm_option(curbuf, method);
+	    curbuf->b_cryptstate = crypt_create_from_ਸਿਰਲੇਖ(
+							ਵਿਧੀ, cryptkey, ptr);
+	    crypt_ਸੈੱਟ_cm_option(curbuf, ਵਿਧੀ);
 
 	    // Remove cryptmethod specific header from the text.
-	    *filesizep += header_len;
-	    *sizep -= header_len;
-	    mch_memmove(ptr, ptr + header_len, (size_t)*sizep);
+	    *filesizep += ਸਿਰਲੇਖ_len;
+	    *sizep -= ਸਿਰਲੇਖ_len;
+	    mch_memmove(ptr, ptr + ਸਿਰਲੇਖ_len, (size_t)*sizep);
 
 	    // Restore the read-only flag.
 	    curbuf->b_p_ro = b_p_ro;
@@ -3096,113 +3096,113 @@ check_for_cryptkey(
     }
     // When starting to edit a new file which does not have encryption, clear
     // the 'key' option, except when starting up (called with -x argument)
-    else if (newfile && *curbuf->b_p_key != NUL && !starting)
-	set_option_value_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
+    ਨਹੀਂਤਾਂ ਜੇ (newfile && *curbuf->b_p_ਕੁੰਜੀ != NUL && !starting)
+	ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
 
-    return cryptkey;
+    ਵਾਪਸ cryptkey;
 }
-#endif  // FEAT_CRYPT
+#ਜੇ_ਅੰਤ  // FEAT_CRYPT
 
 /*
  * Return TRUE if a file appears to be read-only from the file permissions.
  */
-    int
+    ਪੂਰਨ
 check_file_readonly(
     char_u	*fname,		// full path to file
-    int		perm UNUSED)	// known permissions on file
+    ਪੂਰਨ		perm ਅਣਵਰਤਿਆ)	// known permissions on file
 {
-#ifndef USE_MCH_ACCESS
-    int	    fd = 0;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USE_MCH_ACCESS
+    ਪੂਰਨ	    fd = 0;
+#ਜੇ_ਅੰਤ
 
-    return (
-#ifdef USE_MCH_ACCESS
+    ਵਾਪਸ (
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_MCH_ACCESS
 # ifdef UNIX
 	(perm & 0222) == 0 ||
 # endif
-	mch_access((char *)fname, W_OK)
-#else
-	(fd = mch_open((char *)fname, O_RDWR | O_EXTRA, 0)) < 0
+	mch_access((ਅੱਖਰ *)fname, W_OK)
+#ਨਹੀਂਤਾਂ
+	(fd = mch_open((ਅੱਖਰ *)fname, O_RDWR | O_EXTRA, 0)) < 0
 					? TRUE : (close(fd), FALSE)
-#endif
+#ਜੇ_ਅੰਤ
 	);
 }
 
-#if defined(HAVE_FSYNC)
+#ਜੇ defined(HAVE_FSYNC)
 /*
  * Call fsync() with Mac-specific exception.
  * Return fsync() result: zero for success.
  */
-    int
-vim_fsync(int fd)
+    ਪੂਰਨ
+vim_fsync(ਪੂਰਨ fd)
 {
-    int r;
+    ਪੂਰਨ r;
 
 # ifdef MACOS_X
     r = fcntl(fd, F_FULLFSYNC);
-    if (r != 0)  // F_FULLFSYNC not working or not supported
+    ਜੇ (r != 0)  // F_FULLFSYNC not working or not supported
 # endif
 	r = fsync(fd);
-    return r;
+    ਵਾਪਸ r;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set the name of the current buffer.  Use when the buffer doesn't have a
  * name and a ":r" or ":w" command with a file name is used.
  */
-    int
-set_rw_fname(char_u *fname, char_u *sfname)
+    ਪੂਰਨ
+ਸੈੱਟ_rw_fname(char_u *fname, char_u *sfname)
 {
     buf_T	*buf = curbuf;
 
     // It's like the unnamed buffer is deleted....
-    if (curbuf->b_p_bl)
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
-    apply_autocmds(EVENT_BUFWIPEOUT, NULL, NULL, FALSE, curbuf);
-#ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
-#endif
-    if (curbuf != buf)
+    ਜੇ (curbuf->b_p_bl)
+	apply_autocmds(EVENT_BUFDELETE, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFWIPEOUT, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (aborting())	    // autocmds may abort script processing
+	ਵਾਪਸ FAIL;
+#ਜੇ_ਅੰਤ
+    ਜੇ (curbuf != buf)
     {
 	// We are in another buffer now, don't do the renaming.
-	emsg(_(e_autocommands_changed_buffer_or_buffer_name));
-	return FAIL;
+	emsg(_(e_autocommands_ਬਦਲਿਆ_ਬਫਰ_or_ਬਫਰ_name));
+	ਵਾਪਸ FAIL;
     }
 
-    if (setfname(curbuf, fname, sfname, FALSE) == OK)
+    ਜੇ (setfname(curbuf, fname, sfname, FALSE) == OK)
 	curbuf->b_flags |= BF_NOTEDITED;
 
     // ....and a new named one is created
-    apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, curbuf);
-    if (curbuf->b_p_bl)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-#ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
-#endif
+    apply_autocmds(EVENT_BUFNEW, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
+    ਜੇ (curbuf->b_p_bl)
+	apply_autocmds(EVENT_BUFADD, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (aborting())	    // autocmds may abort script processing
+	ਵਾਪਸ FAIL;
+#ਜੇ_ਅੰਤ
 
     // Do filetype detection now if 'filetype' is empty.
-    if (*curbuf->b_p_ft == NUL)
+    ਜੇ (*curbuf->b_p_ft == NUL)
     {
-	if (au_has_group((char_u *)"filetypedetect"))
-	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", FALSE, NULL);
+	ਜੇ (au_has_ਸਮੂਹ((char_u *)"filetypedetect"))
+	    (ਖਾਲੀ)do_doautocmd((char_u *)"filetypedetect BufRead", FALSE, ਨਿਰਾ);
 	do_modelines(0);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Put file name into IObuff with quotes.
  */
-    void
-msg_add_fname(buf_T *buf, char_u *fname)
+    ਖਾਲੀ
+ਸੁਨੇਹਾ_ਜੋੜੋ_fname(buf_T *buf, char_u *fname)
 {
     size_t  IObufflen = 0;
 
-    if (fname == NULL)
+    ਜੇ (fname == ਨਿਰਾ)
 	fname = (char_u *)"-stdin-";
     IObuff[IObufflen++] = '"';
     IObufflen += home_replace(buf, fname, IObuff + IObufflen, IOSIZE - 4, TRUE);
@@ -3213,51 +3213,51 @@ msg_add_fname(buf_T *buf, char_u *fname)
  * Append message for text mode to IObuff.
  * Return TRUE if something appended.
  */
-    int
-msg_add_fileformat(int eol_type)
+    ਪੂਰਨ
+ਸੁਨੇਹਾ_ਜੋੜੋ_fileformat(ਪੂਰਨ eol_type)
 {
-#ifndef USE_CRNL
-    if (eol_type == EOL_DOS)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USE_CRNL
+    ਜੇ (eol_type == EOL_DOS)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[dos]") : _("[dos format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ਪਾਠ) ? _("[dos]") : _("[dos format]"));
+	ਵਾਪਸ TRUE;
     }
-#endif
-    if (eol_type == EOL_MAC)
+#ਜੇ_ਅੰਤ
+    ਜੇ (eol_type == EOL_MAC)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[mac]") : _("[mac format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ਪਾਠ) ? _("[mac]") : _("[mac format]"));
+	ਵਾਪਸ TRUE;
     }
-#ifdef USE_CRNL
-    if (eol_type == EOL_UNIX)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_CRNL
+    ਜੇ (eol_type == EOL_UNIX)
     {
-	STRCAT(IObuff, shortmess(SHM_TEXT) ? _("[unix]") : _("[unix format]"));
-	return TRUE;
+	STRCAT(IObuff, shortmess(SHM_ਪਾਠ) ? _("[unix]") : _("[unix format]"));
+	ਵਾਪਸ TRUE;
     }
-#endif
-    return FALSE;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Append line and character count to IObuff.
  */
-    void
-msg_add_lines(
-    int	    insert_space,
-    long    lnum,
+    ਖਾਲੀ
+ਸੁਨੇਹਾ_ਜੋੜੋ_ਸਤਰਾਂ(
+    ਪੂਰਨ	    ਪਾਓ_space,
+    ਲੰਮਾ    lnum,
     off_T   nchars)
 {
-    int  len = (int)STRLEN(IObuff);
+    ਪੂਰਨ  len = (ਪੂਰਨ)STRLEN(IObuff);
 
-    if (shortmess(SHM_LINES))
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+    ਜੇ (shortmess(SHM_ਸਤਰਾਂ))
+	vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - (size_t)len,
 		// l10n: L as in line, B as in byte
-		_("%s%ldL, %lldB"), insert_space ? " " : "", lnum, (varnumber_T)nchars);
-    else
+		_("%s%ldL, %lldB"), ਪਾਓ_space ? " " : "", lnum, (varnumber_T)nchars);
+    ਨਹੀਂਤਾਂ
     {
-	len += vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
-		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), insert_space ? " " : "", lnum);
-	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
+	len += vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - (size_t)len,
+		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), ਪਾਓ_space ? " " : "", lnum);
+	vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - (size_t)len,
 		NGETTEXT("%lld byte", "%lld bytes", nchars), (varnumber_T)nchars);
     }
 }
@@ -3265,27 +3265,27 @@ msg_add_lines(
 /*
  * Append message for missing line separator to IObuff.
  */
-    void
-msg_add_eol(void)
+    ਖਾਲੀ
+ਸੁਨੇਹਾ_ਜੋੜੋ_eol(ਖਾਲੀ)
 {
-    STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]") : _("[Incomplete last line]"));
+    STRCAT(IObuff, shortmess(SHM_ਆਖਰੀ) ? _("[noeol]") : _("[Incomplete last line]"));
 }
 
-    int
-time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
+    ਪੂਰਨ
+ਸਮਾਂ_differs(stat_T *st, ਲੰਮਾ mtime, ਲੰਮਾ mtime_ns ਅਣਵਰਤਿਆ)
 {
-    return
-#ifdef ST_MTIM_NSEC
-	(long)st->ST_MTIM_NSEC != mtime_ns ||
-#endif
-#if defined(__linux__) || defined(MSWIN)
+    ਵਾਪਸ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ST_MTIM_NSEC
+	(ਲੰਮਾ)st->ST_MTIM_NSEC != mtime_ns ||
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(__linux__) || defined(MSWIN)
 	// On a FAT filesystem, esp. under Linux, there are only 5 bits to store
 	// the seconds.  Since the roundoff is done when flushing the inode, the
 	// time may change unexpectedly by one second!!!
-	(long)st->st_mtime - mtime > 1 || mtime - (long)st->st_mtime > 1
-#else
-	(long)st->st_mtime != mtime
-#endif
+	(ਲੰਮਾ)st->st_mtime - mtime > 1 || mtime - (ਲੰਮਾ)st->st_mtime > 1
+#ਨਹੀਂਤਾਂ
+	(ਲੰਮਾ)st->st_mtime != mtime
+#ਜੇ_ਅੰਤ
 	;
 }
 
@@ -3293,19 +3293,19 @@ time_differs(stat_T *st, long mtime, long mtime_ns UNUSED)
  * Return TRUE if file encoding "fenc" requires conversion from or to
  * 'encoding'.
  */
-    int
+    ਪੂਰਨ
 need_conversion(char_u *fenc)
 {
-    int		same_encoding;
-    int		enc_flags;
-    int		fenc_flags;
+    ਪੂਰਨ		same_encoding;
+    ਪੂਰਨ		enc_flags;
+    ਪੂਰਨ		fenc_flags;
 
-    if (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
+    ਜੇ (*fenc == NUL || STRCMP(p_enc, fenc) == 0)
     {
 	same_encoding = TRUE;
 	fenc_flags = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Ignore difference between "ansi" and "latin1", "ucs-4" and
 	// "ucs-4be", etc.
@@ -3313,16 +3313,16 @@ need_conversion(char_u *fenc)
 	fenc_flags = get_fio_flags(fenc);
 	same_encoding = (enc_flags != 0 && fenc_flags == enc_flags);
     }
-    if (same_encoding)
+    ਜੇ (same_encoding)
     {
 	// Specified encoding matches with 'encoding'.  This requires
 	// conversion when 'encoding' is Unicode but not UTF-8.
-	return enc_unicode != 0;
+	ਵਾਪਸ enc_unicode != 0;
     }
 
     // Encodings differ.  However, conversion is not needed when 'enc' is any
     // Unicode encoding and the file is UTF-8.
-    return !(enc_utf8 && fenc_flags == FIO_UTF8);
+    ਵਾਪਸ !(enc_utf8 && fenc_flags == FIO_UTF8);
 }
 
 /*
@@ -3330,86 +3330,86 @@ need_conversion(char_u *fenc)
  * internal conversion.
  * if "ptr" is an empty string, use 'encoding'.
  */
-    int
+    ਪੂਰਨ
 get_fio_flags(char_u *ptr)
 {
-    int		prop;
+    ਪੂਰਨ		prop;
 
-    if (*ptr == NUL)
+    ਜੇ (*ptr == NUL)
 	ptr = p_enc;
 
     prop = enc_canon_props(ptr);
-    if (prop & ENC_UNICODE)
+    ਜੇ (prop & ENC_UNICODE)
     {
-	if (prop & ENC_2BYTE)
+	ਜੇ (prop & ENC_2BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS2 | FIO_ENDIAN_L;
-	    return FIO_UCS2;
+	    ਜੇ (prop & ENC_ENDIAN_L)
+		ਵਾਪਸ FIO_UCS2 | FIO_ENDIAN_L;
+	    ਵਾਪਸ FIO_UCS2;
 	}
-	if (prop & ENC_4BYTE)
+	ਜੇ (prop & ENC_4BYTE)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UCS4 | FIO_ENDIAN_L;
-	    return FIO_UCS4;
+	    ਜੇ (prop & ENC_ENDIAN_L)
+		ਵਾਪਸ FIO_UCS4 | FIO_ENDIAN_L;
+	    ਵਾਪਸ FIO_UCS4;
 	}
-	if (prop & ENC_2WORD)
+	ਜੇ (prop & ENC_2_ਸ਼ਬਦ)
 	{
-	    if (prop & ENC_ENDIAN_L)
-		return FIO_UTF16 | FIO_ENDIAN_L;
-	    return FIO_UTF16;
+	    ਜੇ (prop & ENC_ENDIAN_L)
+		ਵਾਪਸ FIO_UTF16 | FIO_ENDIAN_L;
+	    ਵਾਪਸ FIO_UTF16;
 	}
-	return FIO_UTF8;
+	ਵਾਪਸ FIO_UTF8;
     }
-    if (prop & ENC_LATIN1)
-	return FIO_LATIN1;
+    ਜੇ (prop & ENC_LATIN1)
+	ਵਾਪਸ FIO_LATIN1;
     // must be ENC_DBCS, requires iconv()
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 /*
  * Check "ptr" for a MS-Windows codepage name and return the FIO_ flags needed
  * for the conversion MS-Windows can do for us.  Also accept "utf-8".
  * Used for conversion between 'encoding' and 'fileencoding'.
  */
-    int
+    ਪੂਰਨ
 get_win_fio_flags(char_u *ptr)
 {
-    int		cp;
+    ਪੂਰਨ		cp;
 
     // Cannot do this when 'encoding' is not utf-8 and not a codepage.
-    if (!enc_utf8 && enc_codepage <= 0)
-	return 0;
+    ਜੇ (!enc_utf8 && enc_codepage <= 0)
+	ਵਾਪਸ 0;
 
     cp = encname2codepage(ptr);
-    if (cp == 0)
+    ਜੇ (cp == 0)
     {
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	if (STRCMP(ptr, "utf-8") == 0)
+	ਜੇ (STRCMP(ptr, "utf-8") == 0)
 	    cp = CP_UTF8;
-	else
+	ਨਹੀਂਤਾਂ
 # endif
-	    return 0;
+	    ਵਾਪਸ 0;
     }
-    return FIO_PUT_CP(cp) | FIO_CODEPAGE;
+    ਵਾਪਸ FIO_PUT_CP(cp) | FIO_CODEPAGE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(MACOS_CONVERT)
+#ਜੇ defined(MACOS_CONVERT)
 /*
  * Check "ptr" for a Carbon supported encoding and return the FIO_ flags
  * needed for the internal conversion to/from utf-8 or latin1.
  */
-    int
+    ਪੂਰਨ
 get_mac_fio_flags(char_u *ptr)
 {
-    if ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
+    ਜੇ ((enc_utf8 || STRCMP(p_enc, "latin1") == 0)
 				     && (enc_canon_props(ptr) & ENC_MACROMAN))
-	return FIO_MACROMAN;
-    return 0;
+	ਵਾਪਸ FIO_MACROMAN;
+    ਵਾਪਸ 0;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Check for a Unicode BOM (Byte Order Mark) at the start of p[size].
@@ -3417,46 +3417,46 @@ get_mac_fio_flags(char_u *ptr)
  * Return the name of the encoding and set "*lenp" to the length.
  * Returns NULL when no BOM found.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 check_for_bom(
     char_u	*p,
-    long	size,
-    int		*lenp,
-    int		flags)
+    ਲੰਮਾ	ਮਾਪ,
+    ਪੂਰਨ		*lenp,
+    ਪੂਰਨ		flags)
 {
-    char	*name = NULL;
-    int		len = 2;
+    ਅੱਖਰ	*name = ਨਿਰਾ;
+    ਪੂਰਨ		len = 2;
 
-    if (p[0] == 0xef && p[1] == 0xbb && size >= 3 && p[2] == 0xbf
+    ਜੇ (p[0] == 0xef && p[1] == 0xbb && ਮਾਪ >= 3 && p[2] == 0xbf
 	    && (flags == FIO_ALL || flags == FIO_UTF8 || flags == 0))
     {
 	name = "utf-8";		// EF BB BF
 	len = 3;
     }
-    else if (p[0] == 0xff && p[1] == 0xfe)
+    ਨਹੀਂਤਾਂ ਜੇ (p[0] == 0xff && p[1] == 0xfe)
     {
-	if (size >= 4 && p[2] == 0 && p[3] == 0
+	ਜੇ (ਮਾਪ >= 4 && p[2] == 0 && p[3] == 0
 	    && (flags == FIO_ALL || flags == (FIO_UCS4 | FIO_ENDIAN_L)))
 	{
 	    name = "ucs-4le";	// FF FE 00 00
 	    len = 4;
 	}
-	else if (flags == (FIO_UCS2 | FIO_ENDIAN_L))
+	ਨਹੀਂਤਾਂ ਜੇ (flags == (FIO_UCS2 | FIO_ENDIAN_L))
 	    name = "ucs-2le";	// FF FE
-	else if (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
+	ਨਹੀਂਤਾਂ ਜੇ (flags == FIO_ALL || flags == (FIO_UTF16 | FIO_ENDIAN_L))
 	    // utf-16le is preferred, it also works for ucs-2le text
 	    name = "utf-16le";	// FF FE
     }
-    else if (p[0] == 0xfe && p[1] == 0xff
+    ਨਹੀਂਤਾਂ ਜੇ (p[0] == 0xfe && p[1] == 0xff
 	    && (flags == FIO_ALL || flags == FIO_UCS2 || flags == FIO_UTF16))
     {
 	// Default to utf-16, it works also for ucs-2 text.
-	if (flags == FIO_UCS2)
+	ਜੇ (flags == FIO_UCS2)
 	    name = "ucs-2";	// FE FF
-	else
+	ਨਹੀਂਤਾਂ
 	    name = "utf-16";	// FE FF
     }
-    else if (size >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
+    ਨਹੀਂਤਾਂ ਜੇ (ਮਾਪ >= 4 && p[0] == 0 && p[1] == 0 && p[2] == 0xfe
 	    && p[3] == 0xff && (flags == FIO_ALL || flags == FIO_UCS4))
     {
 	name = "ucs-4";		// 00 00 FE FF
@@ -3464,7 +3464,7 @@ check_for_bom(
     }
 
     *lenp = len;
-    return (char_u *)name;
+    ਵਾਪਸ (char_u *)name;
 }
 
 /*
@@ -3473,22 +3473,22 @@ check_for_bom(
  * Returns "full_path" or pointer into "full_path" if shortened.
  */
     char_u *
-shorten_fname1(char_u *full_path)
+shorten_fname1(char_u *ਭਰਿਆ_ਰਸਤਾ)
 {
     char_u	*dirname;
-    char_u	*p = full_path;
+    char_u	*p = ਭਰਿਆ_ਰਸਤਾ;
 
     dirname = alloc(MAXPATHL);
-    if (dirname == NULL)
-	return full_path;
-    if (mch_dirname(dirname, MAXPATHL) == OK)
+    ਜੇ (dirname == ਨਿਰਾ)
+	ਵਾਪਸ ਭਰਿਆ_ਰਸਤਾ;
+    ਜੇ (mch_dirname(dirname, MAXPATHL) == OK)
     {
-	p = shorten_fname(full_path, dirname);
-	if (p == NULL || *p == NUL)
-	    p = full_path;
+	p = shorten_fname(ਭਰਿਆ_ਰਸਤਾ, dirname);
+	ਜੇ (p == ਨਿਰਾ || *p == NUL)
+	    p = ਭਰਿਆ_ਰਸਤਾ;
     }
     vim_free(dirname);
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -3498,51 +3498,51 @@ shorten_fname1(char_u *full_path)
  * otherwise.
  */
     char_u *
-shorten_fname(char_u *full_path, char_u *dir_name)
+shorten_fname(char_u *ਭਰਿਆ_ਰਸਤਾ, char_u *dir_name)
 {
-    int		len;
+    ਪੂਰਨ		len;
     char_u	*p;
 
-    if (full_path == NULL)
-	return NULL;
-    len = (int)STRLEN(dir_name);
-    if (fnamencmp(dir_name, full_path, len) == 0)
+    ਜੇ (ਭਰਿਆ_ਰਸਤਾ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    len = (ਪੂਰਨ)STRLEN(dir_name);
+    ਜੇ (fnamencmp(dir_name, ਭਰਿਆ_ਰਸਤਾ, len) == 0)
     {
-	p = full_path + len;
-#if defined(MSWIN)
+	p = ਭਰਿਆ_ਰਸਤਾ + len;
+#ਜੇ defined(MSWIN)
 	/*
 	 * MS-Windows: when a file is in the root directory, dir_name will end
 	 * in a slash, since C: by itself does not define a specific dir. In
 	 * this case p may already be correct. <negri>
 	 */
-	if (!((len > 2) && (*(p - 2) == ':')))
-#endif
+	ਜੇ (!((len > 2) && (*(p - 2) == ':')))
+#ਜੇ_ਅੰਤ
 	{
-	    if (vim_ispathsep(*p))
-		do
+	    ਜੇ (vim_ispathsep(*p))
+		ਕਰੋ
 		    ++p;
-		while (vim_ispathsep_nocolon(*p));
-#ifndef VMS   // the path separator is always part of the path
-	    else
-		p = NULL;
-#endif
+		ਜਦੋਂ (vim_ispathsep_nocolon(*p));
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ VMS   // the path separator is always part of the path
+	    ਨਹੀਂਤਾਂ
+		p = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 	}
     }
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
     /*
      * When using a file in the current drive, remove the drive name:
      * "A:\dir\file" -> "\dir\file".  This helps when moving a session file on
      * a floppy from "A:\dir" to "B:\dir".
      */
-    else if (len > 3
-	    && TOUPPER_LOC(full_path[0]) == TOUPPER_LOC(dir_name[0])
-	    && full_path[1] == ':'
-	    && vim_ispathsep(full_path[2]))
-	p = full_path + 2;
-#endif
-    else
-	p = NULL;
-    return p;
+    ਨਹੀਂਤਾਂ ਜੇ (len > 3
+	    && TOUPPER_LOC(ਭਰਿਆ_ਰਸਤਾ[0]) == TOUPPER_LOC(dir_name[0])
+	    && ਭਰਿਆ_ਰਸਤਾ[1] == ':'
+	    && vim_ispathsep(ਭਰਿਆ_ਰਸਤਾ[2]))
+	p = ਭਰਿਆ_ਰਸਤਾ + 2;
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
+	p = ਨਿਰਾ;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -3554,27 +3554,27 @@ shorten_fname(char_u *full_path, char_u *dir_name)
  * For buffers that have buftype "nofile" or "scratch": never change the file
  * name.
  */
-    void
-shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
+    ਖਾਲੀ
+shorten_buf_fname(buf_T *buf, char_u *dirname, ਪੂਰਨ force)
 {
     char_u	*p;
 
-    if (buf->b_fname != NULL
+    ਜੇ (buf->b_fname != ਨਿਰਾ
 	    && !bt_nofilename(buf)
-	    && !path_with_url(buf->b_fname)
+	    && !ਰਸਤਾ_with_url(buf->b_fname)
 	    && (force
-		|| buf->b_sfname == NULL
-		|| mch_isFullName(buf->b_sfname)))
+		|| buf->b_sfname == ਨਿਰਾ
+		|| mch_is_ਭਰਿਆ_Name(buf->b_sfname)))
     {
-	if (buf->b_sfname != buf->b_ffname)
+	ਜੇ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
 	p = shorten_fname(buf->b_ffname, dirname);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    buf->b_sfname = vim_strsave(p);
 	    buf->b_fname = buf->b_sfname;
 	}
-	if (p == NULL || buf->b_fname == NULL)
+	ਜੇ (p == ਨਿਰਾ || buf->b_fname == ਨਿਰਾ)
 	    buf->b_fname = buf->b_ffname;
     }
 }
@@ -3582,8 +3582,8 @@ shorten_buf_fname(buf_T *buf, char_u *dirname, int force)
 /*
  * Shorten filenames for all buffers.
  */
-    void
-shorten_fnames(int force)
+    ਖਾਲੀ
+shorten_fnames(ਪੂਰਨ force)
 {
     char_u	dirname[MAXPATHL];
     buf_T	*buf;
@@ -3597,35 +3597,35 @@ shorten_fnames(int force)
 	// also have a swap file.
 	mf_fullname(buf->b_ml.ml_mfp);
     }
-    status_redraw_all();
+    ਸਥਿਤੀ_redraw_all();
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ਜੇ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     popup_update_preview_title();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#if (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
+#ਜੇ (defined(FEAT_DND) && defined(FEAT_GUI_GTK)) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_HAIKU)
 /*
  * Shorten all filenames in "fnames[count]" by current directory.
  */
-    void
-shorten_filenames(char_u **fnames, int count)
+    ਖਾਲੀ
+shorten_filenames(char_u **fnames, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
-    int		i;
+    ਪੂਰਨ		i;
     char_u	dirname[MAXPATHL];
     char_u	*p;
 
-    if (fnames == NULL || count < 1)
-	return;
-    mch_dirname(dirname, sizeof(dirname));
-    for (i = 0; i < count; ++i)
+    ਜੇ (fnames == ਨਿਰਾ || ਗਿਣਤੀ_2 < 1)
+	ਵਾਪਸ;
+    mch_dirname(dirname, ਆਕਾਰ(dirname));
+    ਲਈ (i = 0; i < ਗਿਣਤੀ_2; ++i)
     {
-	if ((p = shorten_fname(fnames[i], dirname)) != NULL)
+	ਜੇ ((p = shorten_fname(fnames[i], dirname)) != ਨਿਰਾ)
 	{
 	    // shorten_fname() returns pointer in given "fnames[i]".  If free
 	    // "fnames[i]" first, "p" becomes invalid.  So we need to copy
@@ -3636,7 +3636,7 @@ shorten_filenames(char_u **fnames, int count)
 	}
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Add extension to file name - change path/fo.o.h to path/fo.o.h.ext or
@@ -3653,60 +3653,60 @@ shorten_filenames(char_u **fnames, int count)
 modname(
     char_u *fname,
     char_u *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ਪੂਰਨ	    prepend_dot)	// may prepend a '.' to file name
 {
-    return buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
+    ਵਾਪਸ buf_modname((curbuf->b_p_sn || curbuf->b_shortname),
 						     fname, ext, prepend_dot);
 }
 
     char_u *
 buf_modname(
-    int	    shortname,		// use 8.3 file name
+    ਪੂਰਨ	    shortname,		// use 8.3 file name
     char_u  *fname,
     char_u  *ext,
-    int	    prepend_dot)	// may prepend a '.' to file name
+    ਪੂਰਨ	    prepend_dot)	// may prepend a '.' to file name
 {
     char_u	*retval;
     char_u	*s;
     char_u	*e;
     char_u	*ptr;
     size_t	ptrlen;
-    int		fnamelen, extlen;
+    ਪੂਰਨ		fnamelen, extlen;
 
-    extlen = (int)STRLEN(ext);
+    extlen = (ਪੂਰਨ)STRLEN(ext);
 
     /*
      * If there is no file name we must get the name of the current directory
      * (we need the full path in case :cd is used).
      */
-    if (fname == NULL || *fname == NUL)
+    ਜੇ (fname == ਨਿਰਾ || *fname == NUL)
     {
 	retval = alloc(MAXPATHL + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
-	if (mch_dirname(retval, MAXPATHL) == FAIL ||
-				     (fnamelen = (int)STRLEN(retval)) == 0)
+	ਜੇ (retval == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
+	ਜੇ (mch_dirname(retval, MAXPATHL) == FAIL ||
+				     (fnamelen = (ਪੂਰਨ)STRLEN(retval)) == 0)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	if (!after_pathsep(retval, retval + fnamelen))
+	ਜੇ (!after_pathsep(retval, retval + fnamelen))
 	{
 	    retval[fnamelen++] = PATHSEP;
 	    retval[fnamelen] = NUL;
 	}
 	prepend_dot = FALSE;	    // nothing to prepend a dot to
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	fnamelen = (int)STRLEN(fname);
+	fnamelen = (ਪੂਰਨ)STRLEN(fname);
 	retval = alloc(fnamelen + extlen + 3);
-	if (retval == NULL)
-	    return NULL;
+	ਜੇ (retval == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 	STRCPY(retval, fname);
-#ifdef VMS
-	vms_remove_version(retval); // we do not need versions here
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
+	vms_remove_ਸੰਸਕਰਣ(retval); // we do not need versions here
+#ਜੇ_ਅੰਤ
     }
 
     /*
@@ -3715,21 +3715,21 @@ buf_modname(
      * Then truncate what is after the '/', '\' or ':' to 8 characters for
      * MSDOS and 26 characters for AMIGA, a lot more for UNIX.
      */
-    for (ptr = retval + fnamelen; ptr > retval; MB_PTR_BACK(retval, ptr))
+    ਲਈ (ptr = retval + fnamelen; ptr > retval; MB_PTR_ਪਿੱਠ(retval, ptr))
     {
-	if (*ext == '.' && shortname)
-	    if (*ptr == '.')	// replace '.' by '_'
+	ਜੇ (*ext == '.' && shortname)
+	    ਜੇ (*ptr == '.')	// replace '.' by '_'
 		*ptr = '_';
-	if (vim_ispathsep(*ptr))
+	ਜੇ (vim_ispathsep(*ptr))
 	{
 	    ++ptr;
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
     // the file name has at most BASENAMELEN characters.
     ptrlen = (size_t)(fnamelen - (ptr - retval));
-    if (ptrlen > (unsigned)BASENAMELEN)
+    ਜੇ (ptrlen > (ਬਿਨਾਨਿਸ਼ਾਨੀ)BASENAMELEN)
     {
 	ptrlen = BASENAMELEN;
 	ptr[ptrlen] = NUL;
@@ -3740,26 +3740,26 @@ buf_modname(
     /*
      * For 8.3 file names we may have to reduce the length.
      */
-    if (shortname)
+    ਜੇ (shortname)
     {
 	/*
 	 * If there is no file name, or the file name ends in '/', and the
 	 * extension starts with '.', put a '_' before the dot, because just
 	 * ".ext" is invalid.
 	 */
-	if (fname == NULL || *fname == NUL
+	ਜੇ (fname == ਨਿਰਾ || *fname == NUL
 				   || vim_ispathsep(fname[STRLEN(fname) - 1]))
 	{
-	    if (*ext == '.')
+	    ਜੇ (*ext == '.')
 		*s++ = '_';
 	}
 	/*
 	 * If the extension starts with '.', truncate the base name at 8
 	 * characters
 	 */
-	else if (*ext == '.')
+	ਨਹੀਂਤਾਂ ਜੇ (*ext == '.')
 	{
-	    if ((size_t)(s - ptr) > (size_t)8)
+	    ਜੇ ((size_t)(s - ptr) > (size_t)8)
 	    {
 		s = ptr + 8;
 		*s = '\0';
@@ -3769,24 +3769,24 @@ buf_modname(
 	 * If the extension doesn't start with '.', and the file name
 	 * doesn't have an extension yet, append a '.'
 	 */
-	else if ((e = vim_strchr(ptr, '.')) == NULL)
+	ਨਹੀਂਤਾਂ ਜੇ ((e = vim_strchr(ptr, '.')) == ਨਿਰਾ)
 	    *s++ = '.';
 	/*
 	 * If the extension doesn't start with '.', and there already is an
 	 * extension, it may need to be truncated
 	 */
-	else if ((int)(ptrlen - (e - retval)) + extlen > 4)
+	ਨਹੀਂਤਾਂ ਜੇ ((ਪੂਰਨ)(ptrlen - (e - retval)) + extlen > 4)
 	    s = e + 4 - extlen;
     }
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     /*
      * If there is no file name, and the extension starts with '.', put a
      * '_' before the dot, because just ".ext" may be invalid if it's on a
      * FAT partition, and on HPFS it doesn't matter.
      */
-    else if ((fname == NULL || *fname == NUL) && *ext == '.')
+    ਨਹੀਂਤਾਂ ਜੇ ((fname == ਨਿਰਾ || *fname == NUL) && *ext == '.')
 	*s++ = '_';
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * Append the extension.
@@ -3796,7 +3796,7 @@ buf_modname(
     /*
      * Prepend the dot.
      */
-    if (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
+    ਜੇ (prepend_dot && !shortname && *(e = gettail(retval)) != '.')
     {
 	mch_memmove(e + 1, e, (size_t)(((fnamelen + extlen) - (e - retval)) + 1));	// +1 for NUL
 	*e = '.';
@@ -3806,21 +3806,21 @@ buf_modname(
      * Check that, after appending the extension, the file name is really
      * different.
      */
-    if (fname != NULL && STRCMP(fname, retval) == 0)
+    ਜੇ (fname != ਨਿਰਾ && STRCMP(fname, retval) == 0)
     {
 	// we search for a character that can be replaced by '_'
-	while (--s >= ptr)
+	ਜਦੋਂ (--s >= ptr)
 	{
-	    if (*s != '_')
+	    ਜੇ (*s != '_')
 	    {
 		*s = '_';
-		break;
+		ਰੋਕੋ;
 	    }
 	}
-	if (s < ptr)	// fname was "________.<ext>", how tricky!
+	ਜੇ (s < ptr)	// fname was "________.<ext>", how tricky!
 	    *ptr = 'v';
     }
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -3828,35 +3828,35 @@ buf_modname(
  * rest of the line is thrown away.  Returns TRUE for end-of-file.
  * If the line is truncated then buf[size - 2] will not be NUL.
  */
-    int
-vim_fgets(char_u *buf, int size, FILE *fp)
+    ਪੂਰਨ
+vim_fgets(char_u *buf, ਪੂਰਨ ਮਾਪ, FILE *fp)
 {
-    char	*eof;
-#define FGETS_SIZE 200
-    char	tbuf[FGETS_SIZE];
+    ਅੱਖਰ	*eof;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FGETS_ਮਾਪ 200
+    ਅੱਖਰ	tbuf[FGETS_ਮਾਪ];
 
     // safety check
-    if (size < 2)
+    ਜੇ (ਮਾਪ < 2)
     {
-	if (size == 1)
+	ਜੇ (ਮਾਪ == 1)
 	    buf[0] = NUL;
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
 
-    buf[size - 2] = NUL;
-    eof = fgets((char *)buf, size, fp);
-    if (buf[size - 2] != NUL && buf[size - 2] != '\n')
+    buf[ਮਾਪ - 2] = NUL;
+    eof = fgets((ਅੱਖਰ *)buf, ਮਾਪ, fp);
+    ਜੇ (buf[ਮਾਪ - 2] != NUL && buf[ਮਾਪ - 2] != '\n')
     {
-	buf[size - 1] = NUL;	    // Truncate the line
+	buf[ਮਾਪ - 1] = NUL;	    // Truncate the line
 
 	// Now throw away the rest of the line:
-	do
+	ਕਰੋ
 	{
-	    tbuf[FGETS_SIZE - 2] = NUL;
-	    vim_ignoredp = fgets((char *)tbuf, FGETS_SIZE, fp);
-	} while (tbuf[FGETS_SIZE - 2] != NUL && tbuf[FGETS_SIZE - 2] != '\n');
+	    tbuf[FGETS_ਮਾਪ - 2] = NUL;
+	    vim_ignoredp = fgets((ਅੱਖਰ *)tbuf, FGETS_ਮਾਪ, fp);
+	} ਜਦੋਂ (tbuf[FGETS_ਮਾਪ - 2] != NUL && tbuf[FGETS_ਮਾਪ - 2] != '\n');
     }
-    return (eof == NULL);
+    ਵਾਪਸ (eof == ਨਿਰਾ);
 }
 
 /*
@@ -3864,96 +3864,96 @@ vim_fgets(char_u *buf, int size, FILE *fp)
  * function will (attempts to?) copy the file across if rename fails -- webb
  * Return -1 for failure, 0 for success.
  */
-    int
-vim_rename(char_u *from, char_u *to)
+    ਪੂਰਨ
+vim_rename(char_u *from, char_u *ਮੰਜ਼ਿਲ)
 {
-    int		n;
-    int		ret;
-#ifdef AMIGA
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		ret;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AMIGA
     BPTR	flock;
-#endif
+#ਜੇ_ਅੰਤ
     stat_T	st;
-    int		use_tmp_file = FALSE;
+    ਪੂਰਨ		use_tmp_file = FALSE;
 
     /*
      * When the names are identical, there is nothing to do.  When they refer
      * to the same file (ignoring case and slash/backslash differences) but
      * the file name differs we need to go through a temp file.
      */
-    if (fnamecmp(from, to) == 0)
+    ਜੇ (fnamecmp(from, ਮੰਜ਼ਿਲ) == 0)
     {
-	if (p_fic && STRCMP(gettail(from), gettail(to)) != 0)
+	ਜੇ (p_fic && STRCMP(gettail(from), gettail(ਮੰਜ਼ਿਲ)) != 0)
 	    use_tmp_file = TRUE;
-	else
-	    return 0;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ 0;
     }
 
     /*
      * Fail if the "from" file doesn't exist.  Avoids that "to" is deleted.
      */
-    if (mch_stat((char *)from, &st) < 0)
-	return -1;
+    ਜੇ (mch_stat((ਅੱਖਰ *)from, &st) < 0)
+	ਵਾਪਸ -1;
 
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
     {
-	stat_T	st_to;
+	stat_T	st_ਮੰਜ਼ਿਲ;
 
 	// It's possible for the source and destination to be the same file.
 	// This happens when "from" and "to" differ in case and are on a FAT32
 	// filesystem.  In that case go through a temp file name.
-	if (mch_stat((char *)to, &st_to) >= 0
-		&& st.st_dev == st_to.st_dev
-		&& st.st_ino == st_to.st_ino)
+	ਜੇ (mch_stat((ਅੱਖਰ *)ਮੰਜ਼ਿਲ, &st_ਮੰਜ਼ਿਲ) >= 0
+		&& st.st_dev == st_ਮੰਜ਼ਿਲ.st_dev
+		&& st.st_ino == st_ਮੰਜ਼ਿਲ.st_ino)
 	    use_tmp_file = TRUE;
     }
-#endif
-#ifdef MSWIN
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     {
 	BY_HANDLE_FILE_INFORMATION info1, info2;
 
 	// It's possible for the source and destination to be the same file.
 	// In that case go through a temp file name.  This makes rename("foo",
 	// "./foo") a no-op (in a complicated way).
-	if (win32_fileinfo(from, &info1) == FILEINFO_OK
-		&& win32_fileinfo(to, &info2) == FILEINFO_OK
-		&& info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber
-		&& info1.nFileIndexHigh == info2.nFileIndexHigh
-		&& info1.nFileIndexLow == info2.nFileIndexLow)
+	ਜੇ (win32_fileinfo(from, &info1) == FILEINFO_OK
+		&& win32_fileinfo(ਮੰਜ਼ਿਲ, &info2) == FILEINFO_OK
+		&& info1.dw_Volume_Serial_ਸੰਖਿਆ == info2.dw_Volume_Serial_ਸੰਖਿਆ
+		&& info1.n_File_ਸੂਚਕਾਂਕ_ਉੱਚਾ == info2.n_File_ਸੂਚਕਾਂਕ_ਉੱਚਾ
+		&& info1.n_File_ਸੂਚਕਾਂਕ_ਨੀਵਾਂ == info2.n_File_ਸੂਚਕਾਂਕ_ਨੀਵਾਂ)
 	    use_tmp_file = TRUE;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (use_tmp_file)
+    ਜੇ (use_tmp_file)
     {
-	char	tempname[MAXPATHL + 1];
+	ਅੱਖਰ	tempname[MAXPATHL + 1];
 
 	/*
 	 * Find a name that doesn't exist and is in the same directory.
 	 * Rename "from" to "tempname" and then rename "tempname" to "to".
 	 */
-	if (STRLEN(from) >= MAXPATHL - 5)
-	    return -1;
+	ਜੇ (STRLEN(from) >= MAXPATHL - 5)
+	    ਵਾਪਸ -1;
 	STRCPY(tempname, from);
-	for (n = 123; n < 99999; ++n)
+	ਲਈ (n = 123; n < 99999; ++n)
 	{
-	    sprintf((char *)gettail((char_u *)tempname), "%d", n);
-	    if (mch_stat(tempname, &st) < 0)
+	    sprintf((ਅੱਖਰ *)gettail((char_u *)tempname), "%d", n);
+	    ਜੇ (mch_stat(tempname, &st) < 0)
 	    {
-		if (mch_rename((char *)from, tempname) == 0)
+		ਜੇ (mch_rename((ਅੱਖਰ *)from, tempname) == 0)
 		{
-		    if (mch_rename(tempname, (char *)to) == 0)
-			return 0;
+		    ਜੇ (mch_rename(tempname, (ਅੱਖਰ *)ਮੰਜ਼ਿਲ) == 0)
+			ਵਾਪਸ 0;
 		    // Strange, the second step failed.  Try moving the
 		    // file back and return failure.
-		    (void)mch_rename(tempname, (char *)from);
-		    return -1;
+		    (ਖਾਲੀ)mch_rename(tempname, (ਅੱਖਰ *)from);
+		    ਵਾਪਸ -1;
 		}
 		// If it fails for one temp name it will most likely fail
 		// for any temp name, give up.
-		return -1;
+		ਵਾਪਸ -1;
 	    }
 	}
-	return -1;
+	ਵਾਪਸ -1;
     }
 
     /*
@@ -3962,7 +3962,7 @@ vim_rename(char_u *from, char_u *to)
      * two files when the mch_rename() fails.
      */
 
-#ifdef AMIGA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AMIGA
     /*
      * With MSDOS-compatible filesystems (crossdos, messydos) it is possible
      * that the name of the "to" file is the same as the "from" file, even
@@ -3976,34 +3976,34 @@ vim_rename(char_u *from, char_u *to)
      * original file will be somewhere else so the backup isn't really
      * important. If autoscripting is off the rename may fail.
      */
-    flock = Lock((UBYTE *)from, (long)VIM_ACCESS_READ);
-#endif
-    mch_remove(to);
-#ifdef AMIGA
-    if (flock)
-	UnLock(flock);
-#endif
+    flock = ਤਾਲਾ_2((UBYTE *)from, (ਲੰਮਾ)VIM_ACCESS_READ);
+#ਜੇ_ਅੰਤ
+    mch_remove(ਮੰਜ਼ਿਲ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AMIGA
+    ਜੇ (flock)
+	Un_ਤਾਲਾ(flock);
+#ਜੇ_ਅੰਤ
 
     /*
      * First try a normal rename, return if it works.
      */
-    if (mch_rename((char *)from, (char *)to) == 0)
-	return 0;
+    ਜੇ (mch_rename((ਅੱਖਰ *)from, (ਅੱਖਰ *)ਮੰਜ਼ਿਲ) == 0)
+	ਵਾਪਸ 0;
 
     /*
      * Rename() failed, try copying the file.
      */
-    ret = vim_copyfile(from, to);
-    if (ret != OK)
-	return -1;
+    ret = vim_copyfile(from, ਮੰਜ਼ਿਲ);
+    ਜੇ (ret != OK)
+	ਵਾਪਸ -1;
 
     /*
      * Remove copied original file
      */
-    if (mch_stat((char *)from, &st) >= 0)
+    ਜੇ (mch_stat((ਅੱਖਰ *)from, &st) >= 0)
 	mch_remove(from);
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 
@@ -4011,115 +4011,115 @@ vim_rename(char_u *from, char_u *to)
  * Create the new file with same permissions as the original.
  * Return FAIL for failure, OK for success.
  */
-    int
-vim_copyfile(char_u *from, char_u *to)
+    ਪੂਰਨ
+vim_copyfile(char_u *from, char_u *ਮੰਜ਼ਿਲ)
 {
-    int		fd_in;
-    int		fd_out;
-    int		n;
-    char	*errmsg = NULL;
-    char	*buffer;
-    long	perm;
-#ifdef HAVE_ACL
+    ਪੂਰਨ		fd_ਵਿੱਚ;
+    ਪੂਰਨ		fd_ਬਾਹਰਲਾ;
+    ਪੂਰਨ		n;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
+    ਅੱਖਰ	*ਬਫਰ;
+    ਲੰਮਾ	perm;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
     vim_acl_T	acl;		// ACL from original file
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_READLINK
-    int		ret;
-    int		len;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_READLINK
+    ਪੂਰਨ		ret;
+    ਪੂਰਨ		len;
     stat_T	st;
-    char	linkbuf[MAXPATHL + 1];
+    ਅੱਖਰ	linkbuf[MAXPATHL + 1];
 
-    ret = mch_lstat((char *)from, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    ret = mch_lstat((ਅੱਖਰ *)from, &st);
+    ਜੇ (ret >= 0 && S_ISLNK(st.st_ਬਹੁਲਕ))
     {
 	ret = -1;
 
-	len = readlink((char *)from, linkbuf, MAXPATHL);
-	if (len > 0)
+	len = readlink((ਅੱਖਰ *)from, linkbuf, MAXPATHL);
+	ਜੇ (len > 0)
 	{
 	    linkbuf[len] = NUL;
 
 	    // Create link
-	    ret = symlink(linkbuf, (char *)to);
+	    ret = symlink(linkbuf, (ਅੱਖਰ *)ਮੰਜ਼ਿਲ);
 	}
 
-	return ret == 0 ? OK : FAIL;
+	ਵਾਪਸ ret == 0 ? OK : FAIL;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     perm = mch_getperm(from);
-#ifdef HAVE_ACL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
     // For systems that support ACL: get the ACL from the original file.
     acl = mch_get_acl(from);
-#endif
-    fd_in = mch_open((char *)from, O_RDONLY|O_EXTRA, 0);
-    if (fd_in == -1)
+#ਜੇ_ਅੰਤ
+    fd_ਵਿੱਚ = mch_open((ਅੱਖਰ *)from, O_RDONLY|O_EXTRA, 0);
+    ਜੇ (fd_ਵਿੱਚ == -1)
     {
-#ifdef HAVE_ACL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ਜੇ_ਅੰਤ
+	ਵਾਪਸ FAIL;
     }
 
     // Create the new file with same permissions as the original.
-    fd_out = mch_open((char *)to,
-		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (int)perm);
-    if (fd_out == -1)
+    fd_ਬਾਹਰਲਾ = mch_open((ਅੱਖਰ *)ਮੰਜ਼ਿਲ,
+		       O_CREAT|O_EXCL|O_WRONLY|O_EXTRA|O_NOFOLLOW, (ਪੂਰਨ)perm);
+    ਜੇ (fd_ਬਾਹਰਲਾ == -1)
     {
-	close(fd_in);
-#ifdef HAVE_ACL
+	close(fd_ਵਿੱਚ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ਜੇ_ਅੰਤ
+	ਵਾਪਸ FAIL;
     }
 
-    buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)
+    ਬਫਰ = alloc(WRITEBUFSIZE);
+    ਜੇ (ਬਫਰ == ਨਿਰਾ)
     {
-	close(fd_out);
-	close(fd_in);
-#ifdef HAVE_ACL
+	close(fd_ਬਾਹਰਲਾ);
+	close(fd_ਵਿੱਚ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
 	mch_free_acl(acl);
-#endif
-	return FAIL;
+#ਜੇ_ਅੰਤ
+	ਵਾਪਸ FAIL;
     }
 
-    while ((n = read_eintr(fd_in, buffer, WRITEBUFSIZE)) > 0)
-	if (write_eintr(fd_out, buffer, n) != n)
+    ਜਦੋਂ ((n = read_eintr(fd_ਵਿੱਚ, ਬਫਰ, WRITEBUFSIZE)) > 0)
+	ਜੇ (write_eintr(fd_ਬਾਹਰਲਾ, ਬਫਰ, n) != n)
 	{
-	    errmsg = _(e_error_writing_to_str);
-	    break;
+	    errmsg = _(e_error_writing_ਮੰਜ਼ਿਲ_str);
+	    ਰੋਕੋ;
 	}
 
-    vim_free(buffer);
-    close(fd_in);
-    if (close(fd_out) < 0)
+    vim_free(ਬਫਰ);
+    close(fd_ਵਿੱਚ);
+    ਜੇ (close(fd_ਬਾਹਰਲਾ) < 0)
 	errmsg = _(e_error_closing_str);
-    if (n < 0)
+    ਜੇ (n < 0)
     {
 	errmsg = _(e_error_reading_str);
-	to = from;
+	ਮੰਜ਼ਿਲ = from;
     }
-#ifndef UNIX	    // for Unix mch_open() already set the permission
-    mch_setperm(to, perm);
-#endif
-#ifdef HAVE_ACL
-    mch_set_acl(to, acl);
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ UNIX	    // for Unix mch_open() already set the permission
+    mch_setperm(ਮੰਜ਼ਿਲ, perm);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ACL
+    mch_ਸੈੱਟ_acl(ਮੰਜ਼ਿਲ, acl);
     mch_free_acl(acl);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
-    mch_copy_sec(from, to);
-#endif
-    if (errmsg != NULL)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+    mch_copy_sec(from, ਮੰਜ਼ਿਲ);
+#ਜੇ_ਅੰਤ
+    ਜੇ (errmsg != ਨਿਰਾ)
     {
-	semsg(errmsg, to);
-	return FAIL;
+	semsg(errmsg, ਮੰਜ਼ਿਲ);
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-static int already_warned = FALSE;
+ਸਥਿਰ ਪੂਰਨ already_warned = FALSE;
 
 /*
  * Check if any not hidden buffer has been changed.
@@ -4129,32 +4129,32 @@ static int already_warned = FALSE;
  * Returns TRUE if some message was written (screen should be redrawn and
  * cursor positioned).
  */
-    int
+    ਪੂਰਨ
 check_timestamps(
-    int		focus)		// called for GUI focus event
+    ਪੂਰਨ		focus)		// called for GUI focus event
 {
     buf_T	*buf;
-    int		didit = 0;
-    int		n;
+    ਪੂਰਨ		didit = 0;
+    ਪੂਰਨ		n;
 
     // Don't check timestamps while system() or another low-level function may
     // cause us to lose and gain focus.
-    if (no_check_timestamps > 0)
-	return FALSE;
+    ਜੇ (no_check_timestamps > 0)
+	ਵਾਪਸ FALSE;
 
     // Avoid doing a check twice.  The OK/Reload dialog can cause a focus
     // event and we would keep on checking if the file is steadily growing.
     // Do check again after typing something.
-    if (focus && did_check_timestamps)
+    ਜੇ (focus && did_check_timestamps)
     {
 	need_check_timestamps = TRUE;
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    if (!stuff_empty() || global_busy || !typebuf_typed()
-			|| autocmd_busy || curbuf_lock > 0 || allbuf_lock > 0)
+    ਜੇ (!stuff_ਖਾਲੀ_ਥਾਵਾਂ() || global_busy || !typebuf_typed()
+			|| autocmd_busy || curbuf_ਤਾਲਾ > 0 || allbuf_ਤਾਲਾ > 0)
 	need_check_timestamps = TRUE;		// check later
-    else
+    ਨਹੀਂਤਾਂ
     {
 	++no_wait_return;
 	did_check_timestamps = TRUE;
@@ -4162,33 +4162,33 @@ check_timestamps(
 	FOR_ALL_BUFFERS(buf)
 	{
 	    // Only check buffers in a window.
-	    if (buf->b_nwindows > 0)
+	    ਜੇ (buf->b_nwindows > 0)
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
+		ਸੈੱਟ_bufref(&bufref, buf);
 		n = buf_check_timestamp(buf, focus);
-		if (didit < n)
+		ਜੇ (didit < n)
 		    didit = n;
-		if (n > 0 && !bufref_valid(&bufref))
+		ਜੇ (n > 0 && !bufref_valid(&bufref))
 		{
 		    // Autocommands have removed the buffer, start at the
 		    // first one again.
 		    buf = firstbuf;
-		    continue;
+		    ਜਾਰੀ;
 		}
 	    }
 	}
 	--no_wait_return;
 	need_check_timestamps = FALSE;
-	if (need_wait_return && didit == 2)
+	ਜੇ (need_wait_return && didit == 2)
 	{
 	    // make sure msg isn't overwritten
-	    msg_puts("\n");
-	    out_flush();
+	    ਸੁਨੇਹਾ_puts("\n");
+	    ਬਾਹਰਲਾ_flush();
 	}
     }
-    return didit;
+    ਵਾਪਸ didit;
 }
 
 /*
@@ -4196,44 +4196,44 @@ check_timestamps(
  * Return OK or FAIL.  When FAIL "tobuf" is incomplete and/or "frombuf" is not
  * empty.
  */
-    static int
-move_lines(buf_T *frombuf, buf_T *tobuf)
+    ਸਥਿਰ ਪੂਰਨ
+move_ਸਤਰਾਂ(buf_T *frombuf, buf_T *tobuf)
 {
     buf_T	*tbuf = curbuf;
-    int		retval = OK;
+    ਪੂਰਨ		retval = OK;
     linenr_T	lnum;
     char_u	*p;
 
     // Copy the lines in "frombuf" to "tobuf".
     curbuf = tobuf;
-    for (lnum = 1; lnum <= frombuf->b_ml.ml_line_count; ++lnum)
+    ਲਈ (lnum = 1; lnum <= frombuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; ++lnum)
     {
 	p = vim_strnsave(ml_get_buf(frombuf, lnum, FALSE), ml_get_buf_len(frombuf, lnum));
-	if (p == NULL || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
+	ਜੇ (p == ਨਿਰਾ || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
 	{
 	    vim_free(p);
 	    retval = FAIL;
-	    break;
+	    ਰੋਕੋ;
 	}
 	vim_free(p);
     }
 
     // Delete all the lines in "frombuf".
-    if (retval != FAIL)
+    ਜੇ (retval != FAIL)
     {
 	curbuf = frombuf;
-	for (lnum = curbuf->b_ml.ml_line_count; lnum > 0; --lnum)
-	    if (ml_delete(lnum) == FAIL)
+	ਲਈ (lnum = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; lnum > 0; --lnum)
+	    ਜੇ (ml_delete(lnum) == FAIL)
 	    {
 		// Oops!  We could try putting back the saved lines, but that
 		// might fail again...
 		retval = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
     }
 
     curbuf = tbuf;
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -4243,84 +4243,84 @@ move_lines(buf_T *frombuf, buf_T *tobuf)
  * return 2 if a message has been displayed.
  * return 0 otherwise.
  */
-    int
+    ਪੂਰਨ
 buf_check_timestamp(
     buf_T	*buf,
-    int		focus UNUSED)	// called for GUI focus event
+    ਪੂਰਨ		focus ਅਣਵਰਤਿਆ)	// called for GUI focus event
 {
     stat_T	st;
-    int		stat_res;
-    int		retval = 0;
-    char	*mesg = NULL;
-    char	*mesg2 = "";
-    int		helpmesg = FALSE;
-    enum {
+    ਪੂਰਨ		stat_res;
+    ਪੂਰਨ		retval = 0;
+    ਅੱਖਰ	*mesg = ਨਿਰਾ;
+    ਅੱਖਰ	*mesg2 = "";
+    ਪੂਰਨ		helpmesg = FALSE;
+    ਗਿਣਤੀ {
 	RELOAD_NONE,
-	RELOAD_NORMAL,
+	RELOAD_ਸਾਧਾਰਨ,
 	RELOAD_DETECT
     }		reload = RELOAD_NONE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-    int		can_reload = FALSE;
-#endif
-    off_T	orig_size = buf->b_orig_size;
-    int		orig_mode = buf->b_orig_mode;
-#ifdef FEAT_GUI
-    int		save_mouse_correct = need_mouse_correct;
-#endif
-    static int	busy = FALSE;
-    int		n;
+#ਜੇ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+    ਪੂਰਨ		can_reload = FALSE;
+#ਜੇ_ਅੰਤ
+    off_T	orig_ਮਾਪ = buf->b_orig_ਮਾਪ;
+    ਪੂਰਨ		orig_ਬਹੁਲਕ = buf->b_orig_ਬਹੁਲਕ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਪੂਰਨ		save_mouse_correct = need_mouse_correct;
+#ਜੇ_ਅੰਤ
+    ਸਥਿਰ ਪੂਰਨ	busy = FALSE;
+    ਪੂਰਨ		n;
     bufref_T	bufref;
 
-    set_bufref(&bufref, buf);
+    ਸੈੱਟ_bufref(&bufref, buf);
 
     // If there is no file name, the buffer is not loaded, 'buftype' is
     // set, we are in the middle of a save or being called recursively: ignore
     // this buffer.
-    if (buf->b_ffname == NULL
-	    || buf->b_ml.ml_mfp == NULL
-	    || !bt_normal(buf)
+    ਜੇ (buf->b_ffname == ਨਿਰਾ
+	    || buf->b_ml.ml_mfp == ਨਿਰਾ
+	    || !bt_ਸਾਧਾਰਨ(buf)
 	    || buf->b_saving
 	    || busy
-#ifdef FEAT_NETBEANS_INTG
-	    || isNetbeansBuffer(buf)
-#endif
-#ifdef FEAT_TERMINAL
-	    || buf->b_term != NULL
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
+	    || is_Netbeans_ਬਫਰ(buf)
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	    || buf->b_ਪਦ != ਨਿਰਾ
+#ਜੇ_ਅੰਤ
 	    )
-	return 0;
+	ਵਾਪਸ 0;
 
-    if (       !(buf->b_flags & BF_NOTEDITED)
+    ਜੇ (       !(buf->b_flags & BF_NOTEDITED)
 	    && buf->b_mtime != 0
-	    && ((stat_res = mch_stat((char *)buf->b_ffname, &st)) < 0
-		|| time_differs(&st, buf->b_mtime, buf->b_mtime_ns)
-		|| st.st_size != buf->b_orig_size
-#ifdef HAVE_ST_MODE
-		|| (int)st.st_mode != buf->b_orig_mode
-#else
-		|| mch_getperm(buf->b_ffname) != buf->b_orig_mode
-#endif
+	    && ((stat_res = mch_stat((ਅੱਖਰ *)buf->b_ffname, &st)) < 0
+		|| ਸਮਾਂ_differs(&st, buf->b_mtime, buf->b_mtime_ns)
+		|| st.st_size != buf->b_orig_ਮਾਪ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ST_ਬਹੁਲਕ
+		|| (ਪੂਰਨ)st.st_ਬਹੁਲਕ != buf->b_orig_ਬਹੁਲਕ
+#ਨਹੀਂਤਾਂ
+		|| mch_getperm(buf->b_ffname) != buf->b_orig_ਬਹੁਲਕ
+#ਜੇ_ਅੰਤ
 		))
     {
-	long prev_b_mtime = buf->b_mtime;
+	ਲੰਮਾ prev_b_mtime = buf->b_mtime;
 
 	retval = 1;
 
 	// set b_mtime to stop further warnings (e.g., when executing
 	// FileChangedShell autocmd)
-	if (stat_res < 0)
+	ਜੇ (stat_res < 0)
 	{
 	    // Check the file again later to see if it re-appears.
 	    buf->b_mtime = -1;
-	    buf->b_orig_size = 0;
-	    buf->b_orig_mode = 0;
+	    buf->b_orig_ਮਾਪ = 0;
+	    buf->b_orig_ਬਹੁਲਕ = 0;
 	}
-	else
-	    buf_store_time(buf, &st, buf->b_ffname);
+	ਨਹੀਂਤਾਂ
+	    buf_store_ਸਮਾਂ(buf, &st, buf->b_ffname);
 
 	// Don't do anything for a directory.  Might contain the file
 	// explorer.
-	if (mch_isdir(buf->b_fname))
+	ਜੇ (mch_isdir(buf->b_fname))
 	    ;
 
 	/*
@@ -4328,55 +4328,55 @@ buf_check_timestamp(
 	 * exists, reload the buffer.  Use the buffer-local option value if it
 	 * was set, the global option value otherwise.
 	 */
-	else if ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
-				       && !bufIsChanged(buf) && stat_res >= 0)
-	    reload = RELOAD_NORMAL;
-	else
+	ਨਹੀਂਤਾਂ ਜੇ ((buf->b_p_ar >= 0 ? buf->b_p_ar : p_ar)
+				       && !buf_Is_ਬਦਲਿਆ(buf) && stat_res >= 0)
+	    reload = RELOAD_ਸਾਧਾਰਨ;
+	ਨਹੀਂਤਾਂ
 	{
-	    char    *reason;
-#ifdef FEAT_EVAL
+	    ਅੱਖਰ    *reason;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	    size_t  reasonlen;
-#endif
+#ਜੇ_ਅੰਤ
 
-	    if (stat_res < 0)
+	    ਜੇ (stat_res < 0)
 	    {
 		reason = "deleted";
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("deleted");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-	    else if (bufIsChanged(buf))
+	    ਨਹੀਂਤਾਂ ਜੇ (buf_Is_ਬਦਲਿਆ(buf))
 	    {
 		reason = "conflict";
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("conflict");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 	    /*
 	     * Check if the file contents really changed to avoid giving a
 	     * warning when only the timestamp was set (e.g., checked out of
 	     * CVS).  Always warn when the buffer was changed.
 	     */
-	    else if (orig_size != buf->b_orig_size || buf_contents_changed(buf))
+	    ਨਹੀਂਤਾਂ ਜੇ (orig_ਮਾਪ != buf->b_orig_ਮਾਪ || buf_contents_ਬਦਲਿਆ(buf))
 	    {
 		reason = "changed";
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("changed");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-	    else if (orig_mode != buf->b_orig_mode)
+	    ਨਹੀਂਤਾਂ ਜੇ (orig_ਬਹੁਲਕ != buf->b_orig_ਬਹੁਲਕ)
 	    {
 		reason = "mode";
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("mode");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		reason = "time";
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		reasonlen = STRLEN_LITERAL("time");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 
 	    /*
@@ -4385,61 +4385,61 @@ buf_check_timestamp(
 	     * Avoid being called recursively by setting "busy".
 	     */
 	    busy = TRUE;
-#ifdef FEAT_EVAL
-	    set_vim_var_string(VV_FCS_REASON, (char_u *)reason, (int)reasonlen);
-	    set_vim_var_string(VV_FCS_CHOICE, (char_u *)"", 0);
-#endif
-	    ++allbuf_lock;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	    ਸੈੱਟ_vim_var_string(VV_FCS_REASON, (char_u *)reason, (ਪੂਰਨ)reasonlen);
+	    ਸੈੱਟ_vim_var_string(VV_FCS_CHOICE, (char_u *)"", 0);
+#ਜੇ_ਅੰਤ
+	    ++allbuf_ਤਾਲਾ;
 	    n = apply_autocmds(EVENT_FILECHANGEDSHELL,
 				      buf->b_fname, buf->b_fname, FALSE, buf);
-	    --allbuf_lock;
+	    --allbuf_ਤਾਲਾ;
 	    busy = FALSE;
-	    if (n)
+	    ਜੇ (n)
 	    {
-		if (!bufref_valid(&bufref))
-		    emsg(_(e_filechangedshell_autocommand_deleted_buffer));
-#ifdef FEAT_EVAL
+		ਜੇ (!bufref_valid(&bufref))
+		    emsg(_(e_filechangedshell_autocommand_deleted_ਬਫਰ));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		char_u	*s = get_vim_var_str(VV_FCS_CHOICE);
-		if (STRCMP(s, "reload") == 0 && *reason != 'd')
-		    reload = RELOAD_NORMAL;
-		else if (STRCMP(s, "edit") == 0)
+		ਜੇ (STRCMP(s, "reload") == 0 && *reason != 'd')
+		    reload = RELOAD_ਸਾਧਾਰਨ;
+		ਨਹੀਂਤਾਂ ਜੇ (STRCMP(s, "edit") == 0)
 		    reload = RELOAD_DETECT;
-		else if (STRCMP(s, "ask") == 0)
+		ਨਹੀਂਤਾਂ ਜੇ (STRCMP(s, "ask") == 0)
 		    n = FALSE;
-		else
-#endif
-		    return 2;
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		    ਵਾਪਸ 2;
 	    }
-	    if (!n)
+	    ਜੇ (!n)
 	    {
-		if (*reason == 'd')
+		ਜੇ (*reason == 'd')
 		{
 		    // Only give the message once.
-		    if (prev_b_mtime != -1)
-			mesg = _(e_file_str_no_longer_available);
+		    ਜੇ (prev_b_mtime != -1)
+			mesg = _(e_file_str_no_longer_ਉਪਲਬਧ);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    helpmesg = TRUE;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 		    can_reload = TRUE;
-#endif
-		    if (reason[2] == 'n')
+#ਜੇ_ਅੰਤ
+		    ਜੇ (reason[2] == 'n')
 		    {
 			mesg = _("W12: Warning: File \"%s\" has changed and the buffer was changed in Vim as well");
 			mesg2 = _("See \":help W12\" for more info.");
 		    }
-		    else if (reason[1] == 'h')
+		    ਨਹੀਂਤਾਂ ਜੇ (reason[1] == 'h')
 		    {
 			mesg = _("W11: Warning: File \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W11\" for more info.");
 		    }
-		    else if (*reason == 'm')
+		    ਨਹੀਂਤਾਂ ਜੇ (*reason == 'm')
 		    {
 			mesg = _("W16: Warning: Mode of file \"%s\" has changed since editing started");
 			mesg2 = _("See \":help W16\" for more info.");
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			// Only timestamp changed, store it to avoid a warning
 			// in check_mtime() later.
@@ -4451,86 +4451,86 @@ buf_check_timestamp(
 	}
 
     }
-    else if ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
+    ਨਹੀਂਤਾਂ ਜੇ ((buf->b_flags & BF_NEW) && !(buf->b_flags & BF_NEW_W)
 						&& vim_fexists(buf->b_ffname))
     {
 	retval = 1;
 	mesg = _("W13: Warning: File \"%s\" has been created after editing started");
 	buf->b_flags |= BF_NEW_W;
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 	can_reload = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if (mesg != NULL)
+    ਜੇ (mesg != ਨਿਰਾ)
     {
-	char_u *path;
+	char_u *ਰਸਤਾ;
 
-	path = home_replace_save(buf, buf->b_fname);
-	if (path != NULL)
+	ਰਸਤਾ = home_replace_save(buf, buf->b_fname);
+	ਜੇ (ਰਸਤਾ != ਨਿਰਾ)
 	{
 	    size_t  tbufsize;
-	    char    *tbuf;
+	    ਅੱਖਰ    *tbuf;
 
-	    if (!helpmesg)
+	    ਜੇ (!helpmesg)
 		mesg2 = "";
-	    tbufsize = STRLEN(mesg) + STRLEN(path) + 2 + STRLEN(mesg2) + 1; // +2 for either '\n' or "; "
+	    tbufsize = STRLEN(mesg) + STRLEN(ਰਸਤਾ) + 2 + STRLEN(mesg2) + 1; // +2 for either '\n' or "; "
 									    // and +1 for NUL
 	    tbuf = alloc(tbufsize);
-	    if (tbuf != NULL)
+	    ਜੇ (tbuf != ਨਿਰਾ)
 	    {
-		int tbuflen;
+		ਪੂਰਨ tbuflen;
 
-		tbuflen = vim_snprintf(tbuf, tbufsize, mesg, path);
-#ifdef FEAT_EVAL
+		tbuflen = vim_snprintf(tbuf, tbufsize, mesg, ਰਸਤਾ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		// Set warningmsg here, before the unimportant and output-specific
 		// mesg2 has been appended.
-		set_vim_var_string(VV_WARNINGMSG, (char_u *)tbuf, tbuflen);
-#endif
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
-		if (can_reload)
+		ਸੈੱਟ_vim_var_string(VV_WARNINGMSG, (char_u *)tbuf, tbuflen);
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+		ਜੇ (can_reload)
 		{
-		    if (*mesg2 != NUL)
+		    ਜੇ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "\n%s", mesg2);
-		    switch (do_dialog(VIM_WARNING, (char_u *)_("Warning"),
+		    ਚੋਣ (do_dialog(VIM_WARNING, (char_u *)_("Warning"),
 			    (char_u *)tbuf,
 			    (char_u *)_("&OK\n&Load File\nLoad File &and Options"),
-			    1, NULL, TRUE))
+			    1, ਨਿਰਾ, TRUE))
 		    {
-			case 2:
-			    reload = RELOAD_NORMAL;
-			    break;
-			case 3:
+			ਹਾਲਤ 2:
+			    reload = RELOAD_ਸਾਧਾਰਨ;
+			    ਰੋਕੋ;
+			ਹਾਲਤ 3:
 			    reload = RELOAD_DETECT;
-			    break;
+			    ਰੋਕੋ;
 		    }
 		}
-		else
-#endif
-		if (State > MODE_NORMAL_BUSY || (State & MODE_CMDLINE)
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		ਜੇ (State > ਬਹੁਲਕ_ਸਾਧਾਰਨ_BUSY || (State & ਬਹੁਲਕ_CMDLINE)
 								 || already_warned)
 		{
-		    if (*mesg2 != NUL)
+		    ਜੇ (*mesg2 != NUL)
 			vim_snprintf(tbuf + tbuflen, tbufsize - tbuflen, "; %s", mesg2);
 		    emsg(tbuf);
 		    retval = 2;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    if (!autocmd_busy)
+		    ਜੇ (!autocmd_busy)
 		    {
-			msg_start();
-			msg_puts_attr(tbuf, HL_ATTR(HLF_E) + MSG_HIST);
-			if (*mesg2 != NUL)
-			    msg_puts_attr(mesg2, HL_ATTR(HLF_W) + MSG_HIST);
-			msg_clr_eos();
-			(void)msg_end();
-			if (emsg_silent == 0 && !in_assert_fails)
+			ਸੁਨੇਹਾ_ਸ਼ੁਰੂ();
+			ਸੁਨੇਹਾ_puts_attr(tbuf, HL_ATTR(HLF_E) + ਸੁਨੇਹਾ_HIST);
+			ਜੇ (*mesg2 != NUL)
+			    ਸੁਨੇਹਾ_puts_attr(mesg2, HL_ATTR(HLF_W) + ਸੁਨੇਹਾ_HIST);
+			ਸੁਨੇਹਾ_clr_eos();
+			(ਖਾਲੀ)ਸੁਨੇਹਾ_ਸਿਰਾ();
+			ਜੇ (emsg_silent == 0 && !ਵਿੱਚ_assert_fails)
 			{
-			    out_flush();
-#ifdef FEAT_GUI
-			    if (!focus)
-#endif
+			    ਬਾਹਰਲਾ_flush();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+			    ਜੇ (!focus)
+#ਜੇ_ਅੰਤ
 				// give the user some time to think about it
 				ui_delay(1004L, TRUE);
 
@@ -4543,40 +4543,40 @@ buf_check_timestamp(
 	    }
 
 	    vim_free(tbuf);
-	    vim_free(path);
+	    vim_free(ਰਸਤਾ);
 	}
     }
 
-    if (reload != RELOAD_NONE)
+    ਜੇ (reload != RELOAD_NONE)
     {
 	// Reload the buffer.
-	buf_reload(buf, orig_mode, reload == RELOAD_DETECT);
-#ifdef FEAT_PERSISTENT_UNDO
-	if (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != NULL)
+	buf_reload(buf, orig_ਬਹੁਲਕ, reload == RELOAD_DETECT);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PERSISTENT_UNDO
+	ਜੇ (bufref_valid(&bufref) && buf->b_p_udf && buf->b_ffname != ਨਿਰਾ)
 	{
-	    char_u	    hash[UNDO_HASH_SIZE];
+	    char_u	    hash[UNDO_HASH_ਮਾਪ];
 	    buf_T	    *save_curbuf = curbuf;
 
 	    // Any existing undo file is unusable, write it now.
 	    curbuf = buf;
 	    u_compute_hash(hash);
-	    u_write_undo(NULL, FALSE, buf, hash);
+	    u_write_undo(ਨਿਰਾ, FALSE, buf, hash);
 	    curbuf = save_curbuf;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // Trigger FileChangedShell when the file was changed in any way.
-    if (bufref_valid(&bufref) && retval != 0)
-	(void)apply_autocmds(EVENT_FILECHANGEDSHELLPOST,
+    ਜੇ (bufref_valid(&bufref) && retval != 0)
+	(ਖਾਲੀ)apply_autocmds(EVENT_FILECHANGEDSHELLPOST,
 				      buf->b_fname, buf->b_fname, FALSE, buf);
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // restore this in case an autocommand has set it; it would break
     // 'mousefocus'
     need_mouse_correct = save_mouse_correct;
-#endif
+#ਜੇ_ਅੰਤ
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -4585,48 +4585,48 @@ buf_check_timestamp(
  * "orig_mode" is buf->b_orig_mode before the need for reloading was detected.
  * buf->b_orig_mode may have been reset already.
  */
-    void
-buf_reload(buf_T *buf, int orig_mode, int reload_options)
+    ਖਾਲੀ
+buf_reload(buf_T *buf, ਪੂਰਨ orig_ਬਹੁਲਕ, ਪੂਰਨ reload_options)
 {
     exarg_T	ea;
     pos_T	old_cursor;
     linenr_T	old_topline;
-    int		old_ro = buf->b_p_ro;
+    ਪੂਰਨ		old_ro = buf->b_p_ro;
     buf_T	*savebuf;
     bufref_T	bufref;
-    int		saved = OK;
+    ਪੂਰਨ		saved = OK;
     aco_save_T	aco;
-    int		flags = READ_NEW;
-    int		prepped = OK;
+    ਪੂਰਨ		flags = READ_NEW;
+    ਪੂਰਨ		prepped = OK;
 
     // Set curwin/curbuf for "buf" and save some things.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf != buf)
+    ਜੇ (curbuf != buf)
     {
 	// Failed to find a window for "buf", it is dangerous to continue,
 	// better bail out.
-	return;
+	ਵਾਪਸ;
     }
 
     // Unless reload_options is set, we only want to read the text from the
     // file, not reset the syntax highlighting, clear marks, diff status, etc.
     // Force the fileformat and encoding to be the same.
-    if (reload_options)
-	CLEAR_FIELD(ea);
-    else
+    ਜੇ (reload_options)
+	CLEAR_ਖੇਤਰ(ea);
+    ਨਹੀਂਤਾਂ
 	prepped = prep_exarg(&ea, buf);
 
-    if (prepped == OK)
+    ਜੇ (prepped == OK)
     {
 	old_cursor = curwin->w_cursor;
 	old_topline = curwin->w_topline;
 
-	if (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur)
+	ਜੇ (p_ur < 0 || curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ <= p_ur)
 	{
 	    // Save all the text, so that the reload can be undone.
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    saved = u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE);
+	    saved = u_savecommon(0, curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1, 0, TRUE);
 	    flags |= READ_KEEP_UNDO;
 	}
 
@@ -4637,109 +4637,109 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	 * the old contents.  Can't use memory only, the file might be
 	 * too big.  Use a hidden buffer to move the buffer contents to.
 	 */
-	if (BUFEMPTY() || saved == FAIL)
-	    savebuf = NULL;
-	else
+	ਜੇ (BUFEMPTY() || saved == FAIL)
+	    savebuf = ਨਿਰਾ;
+	ਨਹੀਂਤਾਂ
 	{
 	    // Allocate a buffer without putting it in the buffer list.
-	    savebuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-	    set_bufref(&bufref, savebuf);
-	    if (savebuf != NULL && buf == curbuf)
+	    savebuf = buflist_new(ਨਿਰਾ, ਨਿਰਾ, (linenr_T)1, BLN_DUMMY);
+	    ਸੈੱਟ_bufref(&bufref, savebuf);
+	    ਜੇ (savebuf != ਨਿਰਾ && buf == curbuf)
 	    {
 		// Open the memline.
 		curbuf = savebuf;
-		curwin->w_buffer = savebuf;
+		curwin->w_ਬਫਰ = savebuf;
 		saved = ml_open(curbuf);
 		curbuf = buf;
-		curwin->w_buffer = buf;
+		curwin->w_ਬਫਰ = buf;
 	    }
-	    if (savebuf == NULL || saved == FAIL || buf != curbuf
-				      || move_lines(buf, savebuf) == FAIL)
+	    ਜੇ (savebuf == ਨਿਰਾ || saved == FAIL || buf != curbuf
+				      || move_ਸਤਰਾਂ(buf, savebuf) == FAIL)
 	    {
 		semsg(_(e_could_not_prepare_for_reloading_str), buf->b_fname);
 		saved = FAIL;
 	    }
 	}
 
-	if (saved == OK)
+	ਜੇ (saved == OK)
 	{
-	    int old_msg_silent = msg_silent;
+	    ਪੂਰਨ old_ਸੁਨੇਹਾ_silent = ਸੁਨੇਹਾ_silent;
 
 	    curbuf->b_flags |= BF_CHECK_RO;	// check for RO again
 	    curbuf->b_keep_filetype = true;	// don't detect 'filetype'
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;
+	    ਜੇ (shortmess(SHM_FILEINFO))
+		ਸੁਨੇਹਾ_silent = 1;
 
-	    if (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
+	    ਜੇ (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
 			(linenr_T)0,
 			(linenr_T)MAXLNUM, &ea, flags) != OK)
 	    {
-#if defined(FEAT_EVAL)
-		if (!aborting())
-#endif
+#ਜੇ defined(FEAT_EVAL)
+		ਜੇ (!aborting())
+#ਜੇ_ਅੰਤ
 		    semsg(_(e_could_not_reload_str), buf->b_fname);
-		if (savebuf != NULL && bufref_valid(&bufref) && buf == curbuf)
+		ਜੇ (savebuf != ਨਿਰਾ && bufref_valid(&bufref) && buf == curbuf)
 		{
 		    // Put the text back from the save buffer.  First
 		    // delete any lines that readfile() added.
-		    while (!BUFEMPTY())
-			if (ml_delete(buf->b_ml.ml_line_count) == FAIL)
-			    break;
-		    (void)move_lines(savebuf, buf);
+		    ਜਦੋਂ (!BUFEMPTY())
+			ਜੇ (ml_delete(buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ) == FAIL)
+			    ਰੋਕੋ;
+		    (ਖਾਲੀ)move_ਸਤਰਾਂ(savebuf, buf);
 		}
 	    }
-	    else if (buf == curbuf)  // "buf" still valid
+	    ਨਹੀਂਤਾਂ ਜੇ (buf == curbuf)  // "buf" still valid
 	    {
 		// Mark the buffer as unmodified and free undo info.
 		unchanged(buf, TRUE, TRUE);
-		if ((flags & READ_KEEP_UNDO) == 0)
+		ਜੇ ((flags & READ_KEEP_UNDO) == 0)
 		    u_clearallandblockfree(buf);
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Mark all undo states as changed.
 		    u_unchanged(curbuf);
 		}
 	    }
 
-	    msg_silent = old_msg_silent;
+	    ਸੁਨੇਹਾ_silent = old_ਸੁਨੇਹਾ_silent;
 	}
 	vim_free(ea.cmd);
 
-	if (savebuf != NULL && bufref_valid(&bufref))
-	    wipe_buffer(savebuf, FALSE);
+	ਜੇ (savebuf != ਨਿਰਾ && bufref_valid(&bufref))
+	    wipe_ਬਫਰ(savebuf, FALSE);
 
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	// Invalidate diff info if necessary.
 	diff_invalidate(curbuf);
-#endif
+#ਜੇ_ਅੰਤ
 
 	// Restore the topline and cursor position and check it (lines may
 	// have been removed).
-	if (old_topline > curbuf->b_ml.ml_line_count)
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
-	else
+	ਜੇ (old_topline > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    curwin->w_topline = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+	ਨਹੀਂਤਾਂ
 	    curwin->w_topline = old_topline;
 	curwin->w_cursor = old_cursor;
 	check_cursor();
 	update_topline();
 	curbuf->b_keep_filetype = false;
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 	{
 	    win_T	*wp;
 	    tabpage_T	*tp;
 
 	    // Update folds unless they are defined manually.
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
-		if (wp->w_buffer == curwin->w_buffer
+		ਜੇ (wp->w_ਬਫਰ == curwin->w_ਬਫਰ
 			&& !foldmethodIsManual(wp))
 		    foldUpdateAll(wp);
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	// If the mode didn't change and 'readonly' was set, keep the old
 	// value; the user probably used the ":view" command.  But don't
 	// reset it, might have had a read error.
-	if (orig_mode == curbuf->b_orig_mode)
+	ਜੇ (orig_ਬਹੁਲਕ == curbuf->b_orig_ਬਹੁਲਕ)
 	    curbuf->b_p_ro |= old_ro;
 
 	// Modelines must override settings done by autocommands.
@@ -4751,321 +4751,321 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
     // Careful: autocommands may have made "buf" invalid!
 }
 
-    void
-buf_store_time(buf_T *buf, stat_T *st, char_u *fname UNUSED)
+    ਖਾਲੀ
+buf_store_ਸਮਾਂ(buf_T *buf, stat_T *st, char_u *fname ਅਣਵਰਤਿਆ)
 {
-    buf->b_mtime = (long)st->st_mtime;
-#ifdef ST_MTIM_NSEC
-    buf->b_mtime_ns = (long)st->ST_MTIM_NSEC;
-#else
+    buf->b_mtime = (ਲੰਮਾ)st->st_mtime;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ST_MTIM_NSEC
+    buf->b_mtime_ns = (ਲੰਮਾ)st->ST_MTIM_NSEC;
+#ਨਹੀਂਤਾਂ
     buf->b_mtime_ns = 0;
-#endif
-    buf->b_orig_size = st->st_size;
-#ifdef HAVE_ST_MODE
-    buf->b_orig_mode = (int)st->st_mode;
-#else
-    buf->b_orig_mode = mch_getperm(fname);
-#endif
+#ਜੇ_ਅੰਤ
+    buf->b_orig_ਮਾਪ = st->st_size;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ST_ਬਹੁਲਕ
+    buf->b_orig_ਬਹੁਲਕ = (ਪੂਰਨ)st->st_ਬਹੁਲਕ;
+#ਨਹੀਂਤਾਂ
+    buf->b_orig_ਬਹੁਲਕ = mch_getperm(fname);
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Adjust the line with missing eol, used for the next write.
  * Used for do_filter(), when the input lines for the filter are deleted.
  */
-    void
-write_lnum_adjust(linenr_T offset)
+    ਖਾਲੀ
+write_lnum_adjust(linenr_T ਵਿੱਥ)
 {
-    if (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
-	curbuf->b_no_eol_lnum += offset;
+    ਜੇ (curbuf->b_no_eol_lnum != 0)	// only if there is a missing eol
+	curbuf->b_no_eol_lnum += ਵਿੱਥ;
 }
 
 // Subfuncions for readdirex()
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 # ifdef MSWIN
-    static char_u *
-getfpermwfd(WIN32_FIND_DATAW *wfd, char_u *perm)
+    ਸਥਿਰ char_u *
+getfpermwfd(WIN32_ਲੱਭੋ_DATAW *wfd, char_u *perm)
 {
     stat_T	    st;
-    unsigned short  st_mode;
-    DWORD	    flag = wfd->dwFileAttributes;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ  st_ਬਹੁਲਕ;
+    DWORD	    flag = wfd->dw_File_ਗੁਣ;
     WCHAR	    *wp;
 
-    st_mode = (flag & FILE_ATTRIBUTE_DIRECTORY)
+    st_ਬਹੁਲਕ = (flag & FILE_ATTRIBUTE_DIRECTORY)
 					? (_S_IFDIR | _S_IEXEC) : _S_IFREG;
-    st_mode |= (flag & FILE_ATTRIBUTE_READONLY)
+    st_ਬਹੁਲਕ |= (flag & FILE_ATTRIBUTE_READONLY)
 					? _S_IREAD : (_S_IREAD | _S_IWRITE);
 
     wp = wcsrchr(wfd->cFileName, L'.');
-    if (wp != NULL)
+    ਜੇ (wp != ਨਿਰਾ)
     {
-	if (_wcsicmp(wp, L".exe") == 0 ||
+	ਜੇ (_wcsicmp(wp, L".exe") == 0 ||
 		_wcsicmp(wp, L".com") == 0 ||
 		_wcsicmp(wp, L".cmd") == 0 ||
 		_wcsicmp(wp, L".bat") == 0)
-	    st_mode |= _S_IEXEC;
+	    st_ਬਹੁਲਕ |= _S_IEXEC;
     }
 
     // Copy user bits to group/other.
-    st_mode |= (st_mode & 0700) >> 3;
-    st_mode |= (st_mode & 0700) >> 6;
+    st_ਬਹੁਲਕ |= (st_ਬਹੁਲਕ & 0700) >> 3;
+    st_ਬਹੁਲਕ |= (st_ਬਹੁਲਕ & 0700) >> 6;
 
-    st.st_mode = st_mode;
-    return getfpermst(&st, perm);
+    st.st_ਬਹੁਲਕ = st_ਬਹੁਲਕ;
+    ਵਾਪਸ getfpermst(&st, perm);
 }
 
-    static void
-getftypewfd(WIN32_FIND_DATAW *wfd, string_T *ret)
+    ਸਥਿਰ ਖਾਲੀ
+getftypewfd(WIN32_ਲੱਭੋ_DATAW *wfd, string_T *ret)
 {
-    DWORD flag = wfd->dwFileAttributes;
-    DWORD tag = wfd->dwReserved0;
+    DWORD flag = wfd->dw_File_ਗੁਣ;
+    DWORD ਟੈਗ = wfd->dwReserved0;
 
-    if (flag & FILE_ATTRIBUTE_REPARSE_POINT)
+    ਜੇ (flag & FILE_ATTRIBUTE_REPARSE_ਬਿੰਦੂ)
     {
-	if (tag == IO_REPARSE_TAG_MOUNT_POINT)
+	ਜੇ (ਟੈਗ == IO_REPARSE_ਟੈਗ_MOUNT_ਬਿੰਦੂ)
 	{
 	    ret->string = (char_u *)"junction";
-	    ret->length = STRLEN_LITERAL("junction");
-	    return;
+	    ret->ਲੰਮਾਈ = STRLEN_LITERAL("junction");
+	    ਵਾਪਸ;
 	}
-	if (tag == IO_REPARSE_TAG_SYMLINK)
+	ਜੇ (ਟੈਗ == IO_REPARSE_ਟੈਗ_SYMLINK)
 	{
-	    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+	    ਜੇ (flag & FILE_ATTRIBUTE_DIRECTORY)
 	    {
 		ret->string = (char_u *)"linkd";
-		ret->length = STRLEN_LITERAL("linkd");
-		return;
+		ret->ਲੰਮਾਈ = STRLEN_LITERAL("linkd");
+		ਵਾਪਸ;
 	    }
 
 	    ret->string = (char_u *)"link";
-	    ret->length = STRLEN_LITERAL("link");
-	    return;
+	    ret->ਲੰਮਾਈ = STRLEN_LITERAL("link");
+	    ਵਾਪਸ;
 	}
 
 	// unknown reparse point type
 	ret->string = (char_u *)"reparse";
-	ret->length = STRLEN_LITERAL("reparse");
-	return;
+	ret->ਲੰਮਾਈ = STRLEN_LITERAL("reparse");
+	ਵਾਪਸ;
     }
 
-    if (flag & FILE_ATTRIBUTE_DIRECTORY)
+    ਜੇ (flag & FILE_ATTRIBUTE_DIRECTORY)
     {
 	ret->string = (char_u *)"dir";
-	ret->length = STRLEN_LITERAL("dir");
-	return;
+	ret->ਲੰਮਾਈ = STRLEN_LITERAL("dir");
+	ਵਾਪਸ;
     }
 
     ret->string = (char_u *)"file";
-    ret->length = STRLEN_LITERAL("file");
+    ret->ਲੰਮਾਈ = STRLEN_LITERAL("file");
 }
 
-    static dict_T *
-create_readdirex_item(WIN32_FIND_DATAW *wfd)
+    ਸਥਿਰ dict_T *
+create_readdirex_ਵਸਤੂ(WIN32_ਲੱਭੋ_DATAW *wfd)
 {
-    dict_T	*item;
+    dict_T	*ਵਸਤੂ;
     char_u	*p;
-    varnumber_T	size, time;
+    varnumber_T	ਮਾਪ, ਸਮਾਂ;
     char_u	permbuf[] = "---------";
     string_T	s;
 
-    item = dict_alloc();
-    if (item == NULL)
-	return NULL;
-    item->dv_refcount++;
+    ਵਸਤੂ = dict_alloc();
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਸਤੂ->dv_refcount++;
 
-    p = utf16_to_enc(wfd->cFileName, NULL);
-    if (p == NULL)
-	goto theend;
-    if (dict_add_string(item, "name", p) == FAIL)
+    p = utf16_ਮੰਜ਼ਿਲ_enc(wfd->cFileName, ਨਿਰਾ);
+    ਜੇ (p == ਨਿਰਾ)
+	ਜਾਓ theend;
+    ਜੇ (dict_ਜੋੜੋ_string(ਵਸਤੂ, "name", p) == FAIL)
     {
 	vim_free(p);
-	goto theend;
+	ਜਾਓ theend;
     }
     vim_free(p);
 
-    size = (((varnumber_T)wfd->nFileSizeHigh) << 32) | wfd->nFileSizeLow;
-    if (dict_add_number(item, "size", size) == FAIL)
-	goto theend;
+    ਮਾਪ = (((varnumber_T)wfd->n_File_ਮਾਪ_ਉੱਚਾ) << 32) | wfd->n_File_ਮਾਪ_ਨੀਵਾਂ;
+    ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "size", ਮਾਪ) == FAIL)
+	ਜਾਓ theend;
 
     // Convert FILETIME to unix time.
-    time = (((((varnumber_T)wfd->ftLastWriteTime.dwHighDateTime) << 32) |
-		wfd->ftLastWriteTime.dwLowDateTime)
+    ਸਮਾਂ = (((((varnumber_T)wfd->ft_ਆਖਰੀ_Write_ਸਮਾਂ.dw_ਉੱਚਾ_Date_ਸਮਾਂ) << 32) |
+		wfd->ft_ਆਖਰੀ_Write_ਸਮਾਂ.dw_ਨੀਵਾਂ_Date_ਸਮਾਂ)
 	    - 116444736000000000) / 10000000;
-    if (dict_add_number(item, "time", time) == FAIL)
-	goto theend;
+    ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "time", ਸਮਾਂ) == FAIL)
+	ਜਾਓ theend;
 
     getftypewfd(wfd, &s);
-    if (dict_add_string_len(item, "type", s.string, (int)s.length) == FAIL)
-	goto theend;
-    if (dict_add_string(item, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
-	goto theend;
+    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "type", s.string, (ਪੂਰਨ)s.ਲੰਮਾਈ) == FAIL)
+	ਜਾਓ theend;
+    ਜੇ (dict_ਜੋੜੋ_string(ਵਸਤੂ, "perm", getfpermwfd(wfd, permbuf)) == FAIL)
+	ਜਾਓ theend;
 
-    if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
-	goto theend;
-    if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
-	goto theend;
+    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "user", (char_u *)"", 0) == FAIL)
+	ਜਾਓ theend;
+    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "group", (char_u *)"", 0) == FAIL)
+	ਜਾਓ theend;
 
-    return item;
+    ਵਾਪਸ ਵਸਤੂ;
 
 theend:
-    dict_unref(item);
-    return NULL;
+    dict_unref(ਵਸਤੂ);
+    ਵਾਪਸ ਨਿਰਾ;
 }
-# else
-    static dict_T *
-create_readdirex_item(char_u *path, char_u *name)
+# ਨਹੀਂਤਾਂ
+    ਸਥਿਰ dict_T *
+create_readdirex_ਵਸਤੂ(char_u *ਰਸਤਾ, char_u *name)
 {
-    dict_T	*item;
-    char	*p;
+    dict_T	*ਵਸਤੂ;
+    ਅੱਖਰ	*p;
     size_t	pathlen, len;
     size_t	namelen;
     stat_T	st;
-    int		ret, link = FALSE;
-    varnumber_T	size;
+    ਪੂਰਨ		ret, link = FALSE;
+    varnumber_T	ਮਾਪ;
     char_u	permbuf[] = "---------";
-    string_T	q = {NULL, 0};
-    struct passwd *pw;
-    struct group  *gr;
+    string_T	q = {ਨਿਰਾ, 0};
+    ਬਣਤਰ passwd *pw;
+    ਬਣਤਰ ਸਮੂਹ  *gr;
 
-    item = dict_alloc();
-    if (item == NULL)
-	return NULL;
-    item->dv_refcount++;
+    ਵਸਤੂ = dict_alloc();
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਸਤੂ->dv_refcount++;
 
-    pathlen = STRLEN(path);
+    pathlen = STRLEN(ਰਸਤਾ);
     namelen = STRLEN(name);
     len = pathlen + 1 + namelen + 1;
     p = alloc(len);
-    if (p == NULL)
-	goto theend;
-    if (pathlen > 0 && path[pathlen - 1] == '/')
-	vim_snprintf(p, len, "%s%s", path, name);
-    else
-	vim_snprintf(p, len, "%s/%s", path, name);
+    ਜੇ (p == ਨਿਰਾ)
+	ਜਾਓ theend;
+    ਜੇ (pathlen > 0 && ਰਸਤਾ[pathlen - 1] == '/')
+	vim_snprintf(p, len, "%s%s", ਰਸਤਾ, name);
+    ਨਹੀਂਤਾਂ
+	vim_snprintf(p, len, "%s/%s", ਰਸਤਾ, name);
     ret = mch_lstat(p, &st);
-    if (ret >= 0 && S_ISLNK(st.st_mode))
+    ਜੇ (ret >= 0 && S_ISLNK(st.st_ਬਹੁਲਕ))
     {
 	link = TRUE;
 	ret = mch_stat(p, &st);
-	if (ret < 0)
-	    STR_LITERAL_SET(q, "link");
+	ਜੇ (ret < 0)
+	    STR_LITERAL_ਸੈੱਟ(q, "link");
     }
     vim_free(p);
 
-    if (dict_add_string_len(item, "name", name, (int)namelen) == FAIL)
-	goto theend;
+    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "name", name, (ਪੂਰਨ)namelen) == FAIL)
+	ਜਾਓ theend;
 
-    if (ret >= 0)
+    ਜੇ (ret >= 0)
     {
-	size = (varnumber_T)st.st_size;
-	if (S_ISDIR(st.st_mode))
-	    size = 0;
+	ਮਾਪ = (varnumber_T)st.st_size;
+	ਜੇ (S_ISDIR(st.st_ਬਹੁਲਕ))
+	    ਮਾਪ = 0;
 	// non-perfect check for overflow
-	else if ((off_T)size != (off_T)st.st_size)
-	    size = -2;
-	if (dict_add_number(item, "size", size) == FAIL)
-	    goto theend;
-	if (dict_add_number(item, "time", (varnumber_T)st.st_mtime) == FAIL)
-	    goto theend;
+	ਨਹੀਂਤਾਂ ਜੇ ((off_T)ਮਾਪ != (off_T)st.st_size)
+	    ਮਾਪ = -2;
+	ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "size", ਮਾਪ) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "time", (varnumber_T)st.st_mtime) == FAIL)
+	    ਜਾਓ theend;
 
-	if (link)
+	ਜੇ (link)
 	{
-	    if (S_ISDIR(st.st_mode))
-		STR_LITERAL_SET(q, "linkd");
-	    else
-		STR_LITERAL_SET(q, "link");
+	    ਜੇ (S_ISDIR(st.st_ਬਹੁਲਕ))
+		STR_LITERAL_ਸੈੱਟ(q, "linkd");
+	    ਨਹੀਂਤਾਂ
+		STR_LITERAL_ਸੈੱਟ(q, "link");
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    q.string = getftypest(&st);
-	    q.length = STRLEN(q.string);
+	    q.ਲੰਮਾਈ = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
-	    goto theend;
-	if (dict_add_string(item, "perm", getfpermst(&st, permbuf)) == FAIL)
-	    goto theend;
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "type", q.string, (ਪੂਰਨ)q.ਲੰਮਾਈ) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (dict_ਜੋੜੋ_string(ਵਸਤੂ, "perm", getfpermst(&st, permbuf)) == FAIL)
+	    ਜਾਓ theend;
 
 	pw = getpwuid(st.st_uid);
-	if (pw == NULL)
-	    STR_LITERAL_SET(q, "");
-	else
+	ਜੇ (pw == ਨਿਰਾ)
+	    STR_LITERAL_ਸੈੱਟ(q, "");
+	ਨਹੀਂਤਾਂ
 	{
 	    q.string = (char_u *)pw->pw_name;
-	    q.length = STRLEN(q.string);
+	    q.ਲੰਮਾਈ = STRLEN(q.string);
 	}
-	if (dict_add_string_len(item, "user", q.string, (int)q.length) == FAIL)
-	    goto theend;
-#  if !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "user", q.string, (ਪੂਰਨ)q.ਲੰਮਾਈ) == FAIL)
+	    ਜਾਓ theend;
+#  ਜੇ !defined(VMS) || (defined(VMS) && defined(HAVE_XOS_R_H))
 	gr = getgrgid(st.st_gid);
-	if (gr == NULL)
-	    STR_LITERAL_SET(q, "");
-	else
+	ਜੇ (gr == ਨਿਰਾ)
+	    STR_LITERAL_ਸੈੱਟ(q, "");
+	ਨਹੀਂਤਾਂ
 	{
 	    q.string = (char_u *)gr->gr_name;
-	    q.length = STRLEN(q.string);
+	    q.ਲੰਮਾਈ = STRLEN(q.string);
 	}
 #  endif
-	if (dict_add_string_len(item, "group", q.string, (int)q.length) == FAIL)
-	    goto theend;
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "group", q.string, (ਪੂਰਨ)q.ਲੰਮਾਈ) == FAIL)
+	    ਜਾਓ theend;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (dict_add_number(item, "size", -1) == FAIL)
-	    goto theend;
-	if (dict_add_number(item, "time", -1) == FAIL)
-	    goto theend;
-	if (q.string == NULL)
+	ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "size", -1) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (dict_ਜੋੜੋ_ਸੰਖਿਆ(ਵਸਤੂ, "time", -1) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (q.string == ਨਿਰਾ)
 	{
-	    if (dict_add_string_len(item, "type", (char_u *)"", 0) == FAIL)
-		goto theend;
+	    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "type", (char_u *)"", 0) == FAIL)
+		ਜਾਓ theend;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (dict_add_string_len(item, "type", q.string, (int)q.length) == FAIL)
-		goto theend;
+	    ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "type", q.string, (ਪੂਰਨ)q.ਲੰਮਾਈ) == FAIL)
+		ਜਾਓ theend;
 	}
-	if (dict_add_string_len(item, "perm", (char_u *)"", 0) == FAIL)
-	    goto theend;
-	if (dict_add_string_len(item, "user", (char_u *)"", 0) == FAIL)
-	    goto theend;
-	if (dict_add_string_len(item, "group", (char_u *)"", 0) == FAIL)
-	    goto theend;
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "perm", (char_u *)"", 0) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "user", (char_u *)"", 0) == FAIL)
+	    ਜਾਓ theend;
+	ਜੇ (dict_ਜੋੜੋ_string_len(ਵਸਤੂ, "group", (char_u *)"", 0) == FAIL)
+	    ਜਾਓ theend;
     }
-    return item;
+    ਵਾਪਸ ਵਸਤੂ;
 
 theend:
-    dict_unref(item);
-    return NULL;
+    dict_unref(ਵਸਤੂ);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 # endif
 
-    static int
-compare_readdirex_item(const void *p1, const void *p2)
+    ਸਥਿਰ ਪੂਰਨ
+compare_readdirex_ਵਸਤੂ(ਅਚਲ ਖਾਲੀ *p1, ਅਚਲ ਖਾਲੀ *p2)
 {
     char_u  *name1, *name2;
 
     name1 = dict_get_string(*(dict_T**)p1, "name", FALSE);
     name2 = dict_get_string(*(dict_T**)p2, "name", FALSE);
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(name1, name2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(name1, name2);
+    ਜੇ (readdirex_ਛਾਂਟੋ == READDIR_ਛਾਂਟੋ_BYTE)
+	ਵਾਪਸ STRCMP(name1, name2);
+    ਜੇ (readdirex_ਛਾਂਟੋ == READDIR_ਛਾਂਟੋ_IC)
+	ਵਾਪਸ STRICMP(name1, name2);
 
-    return STRCOLL(name1, name2);
+    ਵਾਪਸ STRCOLL(name1, name2);
 }
 
-    static int
-compare_readdir_item(const void *s1, const void *s2)
+    ਸਥਿਰ ਪੂਰਨ
+compare_readdir_ਵਸਤੂ(ਅਚਲ ਖਾਲੀ *s1, ਅਚਲ ਖਾਲੀ *s2)
 {
-    if (readdirex_sort == READDIR_SORT_BYTE)
-	return STRCMP(*(char **)s1, *(char **)s2);
-    if (readdirex_sort == READDIR_SORT_IC)
-	return STRICMP(*(char **)s1, *(char **)s2);
+    ਜੇ (readdirex_ਛਾਂਟੋ == READDIR_ਛਾਂਟੋ_BYTE)
+	ਵਾਪਸ STRCMP(*(ਅੱਖਰ **)s1, *(ਅੱਖਰ **)s2);
+    ਜੇ (readdirex_ਛਾਂਟੋ == READDIR_ਛਾਂਟੋ_IC)
+	ਵਾਪਸ STRICMP(*(ਅੱਖਰ **)s1, *(ਅੱਖਰ **)s2);
 
-    return STRCOLL(*(char **)s1, *(char **)s2);
+    ਵਾਪਸ STRCOLL(*(ਅੱਖਰ **)s1, *(ਅੱਖਰ **)s2);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
+#ਜੇ defined(TEMPDIRNAMES) || defined(FEAT_EVAL)
 /*
  * Core part of "readdir()" and "readdirex()" function.
  * Retrieve the list of files/directories of "path" into "gap".
@@ -5073,286 +5073,286 @@ compare_readdir_item(const void *s1, const void *s2)
  * If "withattr" is FALSE, retrieve the names only.
  * Return OK for success, FAIL for failure.
  */
-    int
+    ਪੂਰਨ
 readdir_core(
     garray_T	*gap,
-    char_u	*path,
-    int		withattr UNUSED,
-    void	*context,
-    int		(*checkitem)(void *context, void *item),
-    int		sort)
+    char_u	*ਰਸਤਾ,
+    ਪੂਰਨ		withattr ਅਣਵਰਤਿਆ,
+    ਖਾਲੀ	*context,
+    ਪੂਰਨ		(*checkitem)(ਖਾਲੀ *context, ਖਾਲੀ *ਵਸਤੂ),
+    ਪੂਰਨ		ਛਾਂਟੋ)
 {
-    int			failed = FALSE;
+    ਪੂਰਨ			failed = FALSE;
     char_u		*p;
 # ifdef MSWIN
     char_u		*buf;
-    int			ok;
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAW    wfd;
-    WCHAR		*wn = NULL;	// UTF-16 name, NULL when not used.
-    char_u		*p_end;
-# else
+    ਪੂਰਨ			ok;
+    HANDLE		h_ਲੱਭੋ = INVALID_HANDLE_ਮੁੱਲ;
+    WIN32_ਲੱਭੋ_DATAW    wfd;
+    WCHAR		*wn = ਨਿਰਾ;	// UTF-16 name, NULL when not used.
+    char_u		*p_ਸਿਰਾ;
+# ਨਹੀਂਤਾਂ
     DIR			*dirp;
-    struct dirent	*dp;
+    ਬਣਤਰ dirent	*dp;
 # endif
 
-    ga_init2(gap, sizeof(void *), 20);
+    ga_init2(gap, ਆਕਾਰ(ਖਾਲੀ *), 20);
 
 # ifdef FEAT_EVAL
-#  define FREE_ITEM(item)   do { \
-	if (withattr) \
-	    dict_unref((dict_T*)(item)); \
-	else \
-	    vim_free(item); \
-    } while (0)
+#  define FREE_ਵਸਤੂ(ਵਸਤੂ)   ਕਰੋ { \
+	ਜੇ (withattr) \
+	    dict_unref((dict_T*)(ਵਸਤੂ)); \
+	ਨਹੀਂਤਾਂ \
+	    vim_free(ਵਸਤੂ); \
+    } ਜਦੋਂ (0)
 
-    readdirex_sort = READDIR_SORT_BYTE;
-# else
-#  define FREE_ITEM(item)   vim_free(item)
+    readdirex_ਛਾਂਟੋ = READDIR_ਛਾਂਟੋ_BYTE;
+# ਨਹੀਂਤਾਂ
+#  define FREE_ਵਸਤੂ(ਵਸਤੂ)   vim_free(ਵਸਤੂ)
 # endif
 
 # ifdef MSWIN
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
-    STRNCPY(buf, path, MAXPATHL-5);
-    p = p_end = buf + STRLEN(buf);
-    MB_PTR_BACK(buf, p);
-    if (*p == '\\' || *p == '/')
-	p_end = p;
-    STRCPY(p_end, "\\*");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    STRNCPY(buf, ਰਸਤਾ, MAXPATHL-5);
+    p = p_ਸਿਰਾ = buf + STRLEN(buf);
+    MB_PTR_ਪਿੱਠ(buf, p);
+    ਜੇ (*p == '\\' || *p == '/')
+	p_ਸਿਰਾ = p;
+    STRCPY(p_ਸਿਰਾ, "\\*");
 
-    wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
-	hFind = FindFirstFileW(wn, &wfd);
-    ok = (hFind != INVALID_HANDLE_VALUE);
-    if (!ok)
+    wn = enc_ਮੰਜ਼ਿਲ_utf16(buf, ਨਿਰਾ);
+    ਜੇ (wn != ਨਿਰਾ)
+	h_ਲੱਭੋ = ਲੱਭੋ_ਪਹਿਲਾ_File_W(wn, &wfd);
+    ok = (h_ਲੱਭੋ != INVALID_HANDLE_ਮੁੱਲ);
+    ਜੇ (!ok)
     {
 	failed = TRUE;
-	semsg(_(e_cant_open_file_str), path);
+	semsg(_(e_cant_open_file_str), ਰਸਤਾ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	while (ok)
+	ਜਦੋਂ (ok)
 	{
-	    int	    ignore;
-	    void    *item;
+	    ਪੂਰਨ	    ignore;
+	    ਖਾਲੀ    *ਵਸਤੂ;
 	    WCHAR   *wp;
 
 	    wp = wfd.cFileName;
 	    ignore = wp[0] == L'.' &&
 		    (wp[1] == NUL ||
 		     (wp[1] == L'.' && wp[2] == NUL));
-	    if (ignore)
+	    ਜੇ (ignore)
 	    {
-		ok = FindNextFileW(hFind, &wfd);
-		continue;
+		ok = ਲੱਭੋ_ਅਗਲਾ_File_W(h_ਲੱਭੋ, &wfd);
+		ਜਾਰੀ;
 	    }
 #  ifdef FEAT_EVAL
-	    if (withattr)
-		item = (void*)create_readdirex_item(&wfd);
-	    else
+	    ਜੇ (withattr)
+		ਵਸਤੂ = (ਖਾਲੀ*)create_readdirex_ਵਸਤੂ(&wfd);
+	    ਨਹੀਂਤਾਂ
 #  endif
-		item = (void*)utf16_to_enc(wfd.cFileName, NULL);
-	    if (item == NULL)
+		ਵਸਤੂ = (ਖਾਲੀ*)utf16_ਮੰਜ਼ਿਲ_enc(wfd.cFileName, ਨਿਰਾ);
+	    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 	    {
 		failed = TRUE;
-		break;
+		ਰੋਕੋ;
 	    }
 
-	    if (!ignore && checkitem != NULL)
+	    ਜੇ (!ignore && checkitem != ਨਿਰਾ)
 	    {
-		int r = checkitem(context, item);
+		ਪੂਰਨ r = checkitem(context, ਵਸਤੂ);
 
-		if (r < 0)
+		ਜੇ (r < 0)
 		{
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ਵਸਤੂ(ਵਸਤੂ);
+		    ਰੋਕੋ;
 		}
-		if (r == 0)
+		ਜੇ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    ਜੇ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
-		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		ਜੇ (ga_grow(gap, 1) == OK)
+		    ((ਖਾਲੀ**)gap->ga_ਅੰਕੜੇ)[gap->ga_len++] = ਵਸਤੂ;
+		ਨਹੀਂਤਾਂ
 		{
 		    failed = TRUE;
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ਵਸਤੂ(ਵਸਤੂ);
+		    ਰੋਕੋ;
 		}
 	    }
-	    else
-		FREE_ITEM(item);
+	    ਨਹੀਂਤਾਂ
+		FREE_ਵਸਤੂ(ਵਸਤੂ);
 
-	    ok = FindNextFileW(hFind, &wfd);
+	    ok = ਲੱਭੋ_ਅਗਲਾ_File_W(h_ਲੱਭੋ, &wfd);
 	}
-	FindClose(hFind);
+	ਲੱਭੋ_Close(h_ਲੱਭੋ);
     }
 
     vim_free(buf);
     vim_free(wn);
-# else	// MSWIN
-    dirp = opendir((char *)path);
-    if (dirp == NULL)
+# ਨਹੀਂਤਾਂ	// MSWIN
+    dirp = opendir((ਅੱਖਰ *)ਰਸਤਾ);
+    ਜੇ (dirp == ਨਿਰਾ)
     {
 	failed = TRUE;
-	semsg(_(e_cant_open_file_str), path);
+	semsg(_(e_cant_open_file_str), ਰਸਤਾ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (;;)
+	ਲਈ (;;)
 	{
-	    int	    ignore;
-	    void    *item;
+	    ਪੂਰਨ	    ignore;
+	    ਖਾਲੀ    *ਵਸਤੂ;
 
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    ਜੇ (dp == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    p = (char_u *)dp->d_name;
 
 	    ignore = p[0] == '.' &&
 		    (p[1] == NUL ||
 		     (p[1] == '.' && p[2] == NUL));
-	    if (ignore)
-		continue;
+	    ਜੇ (ignore)
+		ਜਾਰੀ;
 #  ifdef FEAT_EVAL
-	    if (withattr)
-		item = (void*)create_readdirex_item(path, p);
-	    else
+	    ਜੇ (withattr)
+		ਵਸਤੂ = (ਖਾਲੀ*)create_readdirex_ਵਸਤੂ(ਰਸਤਾ, p);
+	    ਨਹੀਂਤਾਂ
 #  endif
-		item = (void*)vim_strsave(p);
-	    if (item == NULL)
+		ਵਸਤੂ = (ਖਾਲੀ*)vim_strsave(p);
+	    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 	    {
 		failed = TRUE;
-		break;
+		ਰੋਕੋ;
 	    }
 
-	    if (checkitem != NULL)
+	    ਜੇ (checkitem != ਨਿਰਾ)
 	    {
-		int r = checkitem(context, item);
+		ਪੂਰਨ r = checkitem(context, ਵਸਤੂ);
 
-		if (r < 0)
+		ਜੇ (r < 0)
 		{
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ਵਸਤੂ(ਵਸਤੂ);
+		    ਰੋਕੋ;
 		}
-		if (r == 0)
+		ਜੇ (r == 0)
 		    ignore = TRUE;
 	    }
 
-	    if (!ignore)
+	    ਜੇ (!ignore)
 	    {
-		if (ga_grow(gap, 1) == OK)
-		    ((void**)gap->ga_data)[gap->ga_len++] = item;
-		else
+		ਜੇ (ga_grow(gap, 1) == OK)
+		    ((ਖਾਲੀ**)gap->ga_ਅੰਕੜੇ)[gap->ga_len++] = ਵਸਤੂ;
+		ਨਹੀਂਤਾਂ
 		{
 		    failed = TRUE;
-		    FREE_ITEM(item);
-		    break;
+		    FREE_ਵਸਤੂ(ਵਸਤੂ);
+		    ਰੋਕੋ;
 		}
 	    }
-	    else
-		FREE_ITEM(item);
+	    ਨਹੀਂਤਾਂ
+		FREE_ਵਸਤੂ(ਵਸਤੂ);
 	}
 
 	closedir(dirp);
     }
 # endif	// MSWIN
 
-# undef FREE_ITEM
+# undef FREE_ਵਸਤੂ
 
-    if (!failed && gap->ga_len > 0 && sort > READDIR_SORT_NONE)
+    ਜੇ (!failed && gap->ga_len > 0 && ਛਾਂਟੋ > READDIR_ਛਾਂਟੋ_NONE)
     {
 # ifdef FEAT_EVAL
-	readdirex_sort = sort;
-	if (withattr)
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(dict_T*),
-		    compare_readdirex_item);
-	else
-	    qsort((void*)gap->ga_data, (size_t)gap->ga_len, sizeof(char_u *),
-		    compare_readdir_item);
-# else
-	    sort_strings((char_u **)gap->ga_data, gap->ga_len);
+	readdirex_ਛਾਂਟੋ = ਛਾਂਟੋ;
+	ਜੇ (withattr)
+	    qsort((ਖਾਲੀ*)gap->ga_ਅੰਕੜੇ, (size_t)gap->ga_len, ਆਕਾਰ(dict_T*),
+		    compare_readdirex_ਵਸਤੂ);
+	ਨਹੀਂਤਾਂ
+	    qsort((ਖਾਲੀ*)gap->ga_ਅੰਕੜੇ, (size_t)gap->ga_len, ਆਕਾਰ(char_u *),
+		    compare_readdir_ਵਸਤੂ);
+# ਨਹੀਂਤਾਂ
+	    ਛਾਂਟੋ_ਲੜੀਆਂ((char_u **)gap->ga_ਅੰਕੜੇ, gap->ga_len);
 # endif
     }
 
-    return failed ? FAIL : OK;
+    ਵਾਪਸ failed ? FAIL : OK;
 }
 
 /*
  * Delete "name" and everything in it, recursively.
  * return 0 for success, -1 if some file was not deleted.
  */
-    int
+    ਪੂਰਨ
 delete_recursive(char_u *name)
 {
-    int result = 0;
+    ਪੂਰਨ ਨਤੀਜਾ = 0;
 
     // A symbolic link to a directory itself is deleted, not the directory it
     // points to.
-    if (
-# if defined(UNIX) || defined(MSWIN)
+    ਜੇ (
+# ਜੇ defined(UNIX) || defined(MSWIN)
 	 mch_isrealdir(name)
-# else
+# ਨਹੀਂਤਾਂ
 	 mch_isdir(name)
 # endif
 	    )
     {
-	char_u	    *exp = vim_strsave(name);
+	char_u	    *ਘਾਤਾਂਕ = vim_strsave(name);
 	garray_T    ga;
 
-	if (exp == NULL)
-	    return -1;
-	if (readdir_core(&ga, exp, FALSE, NULL, NULL, READDIR_SORT_NONE) == OK)
+	ਜੇ (ਘਾਤਾਂਕ == ਨਿਰਾ)
+	    ਵਾਪਸ -1;
+	ਜੇ (readdir_core(&ga, ਘਾਤਾਂਕ, FALSE, ਨਿਰਾ, ਨਿਰਾ, READDIR_ਛਾਂਟੋ_NONE) == OK)
 	{
-	    int	len = vim_snprintf((char *)NameBuff, MAXPATHL, "%s/", exp);
-	    int	i;
+	    ਪੂਰਨ	len = vim_snprintf((ਅੱਖਰ *)NameBuff, MAXPATHL, "%s/", ਘਾਤਾਂਕ);
+	    ਪੂਰਨ	i;
 
-	    for (i = 0; i < ga.ga_len; ++i)
+	    ਲਈ (i = 0; i < ga.ga_len; ++i)
 	    {
-		vim_snprintf((char *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_data)[i]);
-		if (delete_recursive(NameBuff) != 0)
+		vim_snprintf((ਅੱਖਰ *)NameBuff + len, MAXPATHL - len, "%s", ((char_u **)ga.ga_ਅੰਕੜੇ)[i]);
+		ਜੇ (delete_recursive(NameBuff) != 0)
 		    // Remember the failure but continue deleting any further
 		    // entries.
-		    result = -1;
+		    ਨਤੀਜਾ = -1;
 	    }
-	    ga_clear_strings(&ga);
-	    if (mch_rmdir(exp) != 0)
-		result = -1;
+	    ga_clear_ਲੜੀਆਂ(&ga);
+	    ਜੇ (mch_rmdir(ਘਾਤਾਂਕ) != 0)
+		ਨਤੀਜਾ = -1;
 	}
-	else
-	    result = -1;
-	vim_free(exp);
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ = -1;
+	vim_free(ਘਾਤਾਂਕ);
     }
-    else
-	result = mch_remove(name) == 0 ? 0 : -1;
+    ਨਹੀਂਤਾਂ
+	ਨਤੀਜਾ = mch_remove(name) == 0 ? 0 : -1;
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(TEMPDIRNAMES)
-static long	temp_count = 0;		// Temp filename counter.
+#ਜੇ defined(TEMPDIRNAMES)
+ਸਥਿਰ ਲੰਮਾ	ਆਰਜ਼ੀ_ਗਿਣਤੀ = 0;		// Temp filename counter.
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ਜੇ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
 /*
  * Open temporary directory and take file lock to prevent
  * to be auto-cleaned.
  */
-   static void
-vim_opentempdir(void)
+   ਸਥਿਰ ਖਾਲੀ
+vim_opentempdir(ਖਾਲੀ)
 {
-    DIR *dp = NULL;
+    DIR *dp = ਨਿਰਾ;
 
-    if (vim_tempdir_dp != NULL)
-	return;
+    ਜੇ (vim_tempdir_dp != ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    dp = opendir((const char*)vim_tempdir);
-    if (dp == NULL)
-	return;
+    dp = opendir((ਅਚਲ ਅੱਖਰ*)vim_tempdir);
+    ਜੇ (dp == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     vim_tempdir_dp = dp;
     flock(dirfd(vim_tempdir_dp), LOCK_SH);
@@ -5361,40 +5361,40 @@ vim_opentempdir(void)
 /*
  * Close temporary directory - it automatically release file lock.
  */
-   static void
-vim_closetempdir(void)
+   ਸਥਿਰ ਖਾਲੀ
+vim_closetempdir(ਖਾਲੀ)
 {
-    if (vim_tempdir_dp == NULL)
-	return;
+    ਜੇ (vim_tempdir_dp == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     closedir(vim_tempdir_dp);
-    vim_tempdir_dp = NULL;
+    vim_tempdir_dp = ਨਿਰਾ;
 }
 
 /*
  * Return true if the temp directory we created is gone.
  */
-    static bool
-vim_tempdir_gone(void)
+    ਸਥਿਰ bool
+vim_tempdir_gone(ਖਾਲੀ)
 {
     stat_T	st;
 
-    if (vim_tempdir_dp == NULL)
-	return false;
-    return fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
+    ਜੇ (vim_tempdir_dp == ਨਿਰਾ)
+	ਵਾਪਸ false;
+    ਵਾਪਸ fstat(dirfd(vim_tempdir_dp), &st) < 0 || st.st_nlink == 0;
 }
 # endif
 
 /*
  * Delete the temp directory and all files it contains.
  */
-    void
-vim_deltempdir(void)
+    ਖਾਲੀ
+vim_deltempdir(ਖਾਲੀ)
 {
-    if (vim_tempdir == NULL)
-	return;
+    ਜੇ (vim_tempdir == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ਜੇ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_closetempdir();
 # endif
     // remove the trailing path separator
@@ -5408,31 +5408,31 @@ vim_deltempdir(void)
  * it in "vim_tempdir".  This avoids that using ":cd" would confuse us.
  * "tempdir" must be no longer than MAXPATHL.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 vim_settempdir(char_u *tempdir)
 {
     char_u	*buf;
     size_t	buflen;
 
     buf = alloc(MAXPATHL + 2);
-    if (buf == NULL)
-	return;
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (vim_FullName(tempdir, buf, MAXPATHL, FALSE) == FAIL)
+    ਜੇ (vim_ਭਰਿਆ_Name(tempdir, buf, MAXPATHL, FALSE) == FAIL)
 	STRCPY(buf, tempdir);
     buflen = STRLEN(buf);
-    if (!after_pathsep(buf, buf + buflen))
+    ਜੇ (!after_pathsep(buf, buf + buflen))
     {
 	STRCPY(buf + buflen, PATHSEPSTR);
-	buflen += sizeof(PATHSEP);
+	buflen += ਆਕਾਰ(PATHSEP);
     }
     vim_tempdir = vim_strnsave(buf, buflen);
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ਜੇ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     vim_opentempdir();
 # endif
     vim_free(buf);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * vim_tempname(): Return a unique name that can be used for a temp file.
@@ -5445,27 +5445,27 @@ vim_settempdir(char_u *tempdir)
  */
     char_u  *
 vim_tempname(
-    int	    extra_char UNUSED,  // char to use in the name instead of '?'
-    int	    keep UNUSED)
+    ਪੂਰਨ	    extra_char ਅਣਵਰਤਿਆ,  // char to use in the name instead of '?'
+    ਪੂਰਨ	    keep ਅਣਵਰਤਿਆ)
 {
-#ifdef USE_TMPNAM
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_TMPNAM
     char_u	itmp[L_tmpnam];	// use tmpnam()
-#elif defined(MSWIN)
+#ਜਾਂਜੇ defined(MSWIN)
     WCHAR	itmp[TEMPNAMELEN];
-#else
+#ਨਹੀਂਤਾਂ
     char_u	itmp[TEMPNAMELEN];
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef TEMPDIRNAMES
-    static char	*(tempdirs[]) = {TEMPDIRNAMES};
-    int		i;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ TEMPDIRNAMES
+    ਸਥਿਰ ਅੱਖਰ	*(tempdirs[]) = {TEMPDIRNAMES};
+    ਪੂਰਨ		i;
 # ifndef EEXIST
     stat_T	st;
 # endif
 
-# if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
+# ਜੇ defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
     // if the temp directory is gone, force re-creation of it
-    if (vim_tempdir != NULL && vim_tempdir_gone())
+    ਜੇ (vim_tempdir != ਨਿਰਾ && vim_tempdir_gone())
     {
 	vim_closetempdir();
 	VIM_CLEAR(vim_tempdir);
@@ -5479,34 +5479,34 @@ vim_tempname(
      * It's also a bit faster, because we only need to check for an existing
      * file when creating the directory and not for each temp file.
      */
-    if (vim_tempdir == NULL)
+    ਜੇ (vim_tempdir == ਨਿਰਾ)
     {
 	/*
 	 * Try the entries in TEMPDIRNAMES to create the temp directory.
 	 */
-	for (i = 0; i < (int)ARRAY_LENGTH(tempdirs); ++i)
+	ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(tempdirs); ++i)
 	{
 # ifndef HAVE_MKDTEMP
-	    long	nr;
-	    long	off;
+	    ਲੰਮਾ	nr;
+	    ਲੰਮਾ	off;
 # endif
 	    size_t	itmplen;
 
 	    // Expand $TMP, leave room for "/v1100000/999999999".
 	    // Skip the directory check if the expansion fails.
 	    itmplen = expand_env((char_u *)tempdirs[i], itmp, TEMPNAMELEN - 20);
-	    if (itmp[0] != '$' && mch_isdir(itmp))
+	    ਜੇ (itmp[0] != '$' && mch_isdir(itmp))
 	    {
 		// directory exists
-		if (!after_pathsep(itmp, itmp + itmplen))
+		ਜੇ (!after_pathsep(itmp, itmp + itmplen))
 		{
 		    STRCPY(itmp + itmplen, PATHSEPSTR);
-		    itmplen += sizeof(PATHSEP);
+		    itmplen += ਆਕਾਰ(PATHSEP);
 		}
 
 # ifdef HAVE_MKDTEMP
 		{
-#  if defined(UNIX) || defined(VMS)
+#  ਜੇ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    mode_t	umask_save = umask(077);
@@ -5514,92 +5514,92 @@ vim_tempname(
 		    // Leave room for filename
 		    STRCPY(itmp + itmplen, "vXXXXXX");
 		    itmplen += STRLEN_LITERAL("vXXXXXX");
-		    if (mkdtemp((char *)itmp) != NULL)
+		    ਜੇ (mkdtemp((ਅੱਖਰ *)itmp) != ਨਿਰਾ)
 			vim_settempdir(itmp);
-#  if defined(UNIX) || defined(VMS)
-		    (void)umask(umask_save);
+#  ਜੇ defined(UNIX) || defined(VMS)
+		    (ਖਾਲੀ)umask(umask_save);
 #  endif
 		}
-# else
+# ਨਹੀਂਤਾਂ
 		// Get an arbitrary number of up to 6 digits.  When it's
 		// unlikely that it already exists it will be faster,
 		// otherwise it doesn't matter.  The use of mkdir() avoids any
 		// security problems because of the predictable number.
-		nr = (mch_get_pid() + (long)time(NULL)) % 1000000L;
+		nr = (mch_get_pid() + (ਲੰਮਾ)ਸਮਾਂ(ਨਿਰਾ)) % 1000000L;
 
 		// Try up to 10000 different values until we find a name that
 		// doesn't exist.
-		for (off = 0; off < 10000L; ++off)
+		ਲਈ (off = 0; off < 10000L; ++off)
 		{
-		    int		r;
-#  if defined(UNIX) || defined(VMS)
+		    ਪੂਰਨ		r;
+#  ਜੇ defined(UNIX) || defined(VMS)
 		    mode_t	umask_save;
 #  endif
 
-		    vim_snprintf((char *)itmp + itmplen, sizeof(itmp) - itmplen, "v%ld", nr + off);
+		    vim_snprintf((ਅੱਖਰ *)itmp + itmplen, ਆਕਾਰ(itmp) - itmplen, "v%ld", nr + off);
 #  ifndef EEXIST
 		    // If mkdir() does not set errno to EEXIST, check for
 		    // existing file here.  There is a race condition then,
 		    // although it's fail-safe.
-		    if (mch_stat((char *)itmp, &st) >= 0)
-			continue;
+		    ਜੇ (mch_stat((ਅੱਖਰ *)itmp, &st) >= 0)
+			ਜਾਰੀ;
 #  endif
-#  if defined(UNIX) || defined(VMS)
+#  ਜੇ defined(UNIX) || defined(VMS)
 		    // Make sure the umask doesn't remove the executable bit.
 		    // "repl" has been reported to use "177".
 		    umask_save = umask(077);
 #  endif
 		    r = vim_mkdir(itmp, 0700);
-#  if defined(UNIX) || defined(VMS)
-		    (void)umask(umask_save);
+#  ਜੇ defined(UNIX) || defined(VMS)
+		    (ਖਾਲੀ)umask(umask_save);
 #  endif
-		    if (r == 0)
+		    ਜੇ (r == 0)
 		    {
 			vim_settempdir(itmp);
-			break;
+			ਰੋਕੋ;
 		    }
 #  ifdef EEXIST
 		    // If the mkdir() didn't fail because the file/dir exists,
 		    // we probably can't create any dir here, try another
 		    // place.
-		    if (errno != EEXIST)
+		    ਜੇ (errno != EEXIST)
 #  endif
-			break;
+			ਰੋਕੋ;
 		}
 # endif // HAVE_MKDTEMP
-		if (vim_tempdir != NULL)
-		    break;
+		ਜੇ (vim_tempdir != ਨਿਰਾ)
+		    ਰੋਕੋ;
 	    }
 	}
     }
 
-    if (vim_tempdir != NULL)
+    ਜੇ (vim_tempdir != ਨਿਰਾ)
     {
 	// There is no need to check if the file exists, because we own the
 	// directory and nobody else creates a file in it.
-	int itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s%ld", vim_tempdir, temp_count++);
-	return vim_strnsave(itmp, (size_t)itmplen);
+	ਪੂਰਨ itmplen = vim_snprintf((ਅੱਖਰ *)itmp, ਆਕਾਰ(itmp), "%s%ld", vim_tempdir, ਆਰਜ਼ੀ_ਗਿਣਤੀ++);
+	ਵਾਪਸ vim_strnsave(itmp, (size_t)itmplen);
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 
-#else // TEMPDIRNAMES
+#ਨਹੀਂਤਾਂ // TEMPDIRNAMES
     char_u	*p;
 
 # ifdef MSWIN
-    WCHAR	wszTempFile[_MAX_PATH + 1];
+    WCHAR	wsz_ਆਰਜ਼ੀ_File[MAX_ਰਸਤਾ_2 + 1];
     WCHAR	buf4[4];
     WCHAR	*chartab = L"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char_u	*retval;
     char_u	*shname;
-    long	i;
+    ਲੰਮਾ	i;
 
     wcscpy(itmp, L"");
-    if (GetTempPathW(_MAX_PATH, wszTempFile) == 0)
+    ਜੇ (Get_ਆਰਜ਼ੀ_ਰਸਤਾ_W(MAX_ਰਸਤਾ_2, wsz_ਆਰਜ਼ੀ_File) == 0)
     {
-	wszTempFile[0] = L'.';	// GetTempPathW() failed, use current dir
-	wszTempFile[1] = L'\\';
-	wszTempFile[2] = NUL;
+	wsz_ਆਰਜ਼ੀ_File[0] = L'.';	// GetTempPathW() failed, use current dir
+	wsz_ਆਰਜ਼ੀ_File[1] = L'\\';
+	wsz_ਆਰਜ਼ੀ_File[2] = NUL;
     }
     wcscpy(buf4, L"VIM");
 
@@ -5607,86 +5607,86 @@ vim_tempname(
     i = mch_get_pid() + extra_char;
     buf4[1] = chartab[i % 36];
     buf4[2] = chartab[(i / 36) % 36];
-    if (GetTempFileNameW(wszTempFile, buf4, 0, itmp) == 0)
-	return NULL;
-    if (!keep)
+    ਜੇ (Get_ਆਰਜ਼ੀ_File_Name_W(wsz_ਆਰਜ਼ੀ_File, buf4, 0, itmp) == 0)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (!keep)
 	// GetTempFileNameW() will create the file, we don't want that
-	(void)DeleteFileW(itmp);
+	(ਖਾਲੀ)DeleteFileW(itmp);
 
     // Backslashes in a temp file name cause problems when filtering with
     // "sh".  NOTE: This also checks 'shellcmdflag' to help those people who
     // didn't set 'shellslash' but only if not using PowerShell.
-    retval = utf16_to_enc(itmp, NULL);
-    if (retval == NULL)
-	return NULL;
+    retval = utf16_ਮੰਜ਼ਿਲ_enc(itmp, ਨਿਰਾ);
+    ਜੇ (retval == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
     shname = gettail(p_sh);
-    if ((*p_shcf == '-' && !(strstr((char *)shname, "powershell") != NULL
-			     || strstr((char *)shname, "pwsh") != NULL ))
+    ਜੇ ((*p_shcf == '-' && !(ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)shname, "powershell") != ਨਿਰਾ
+			     || ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)shname, "pwsh") != ਨਿਰਾ ))
 								    || p_ssl)
-	for (p = retval; *p; ++p)
-	    if (*p == '\\')
+	ਲਈ (p = retval; *p; ++p)
+	    ਜੇ (*p == '\\')
 		*p = '/';
-    return retval;
+    ਵਾਪਸ retval;
 
-# else // MSWIN
-    int		itmplen;
+# ਨਹੀਂਤਾਂ // MSWIN
+    ਪੂਰਨ		itmplen;
 
 #  ifdef USE_TMPNAM
     // tmpnam() will make its own name
-    p = tmpnam((char *)itmp);
-    if (p == NULL || *p == NUL)
-	return NULL;
-#  else
+    p = tmpnam((ਅੱਖਰ *)itmp);
+    ਜੇ (p == ਨਿਰਾ || *p == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
+#  ਨਹੀਂਤਾਂ
 
 #   ifdef VMS_TEMPNAM
     // mktemp() is not working on VMS.  It seems to be
     // a do-nothing function. Therefore we use tempnam().
-    vim_snprintf((char *)itmp, sizeof(itmp), "VIM%c", extra_char);
-    p = (char_u *)tempnam("tmp:", (char *)itmp);
-    if (p != NULL)
+    vim_snprintf((ਅੱਖਰ *)itmp, ਆਕਾਰ(itmp), "VIM%c", extra_char);
+    p = (char_u *)tempnam("tmp:", (ਅੱਖਰ *)itmp);
+    ਜੇ (p != ਨਿਰਾ)
     {
 	// VMS will use '.LIS' if we don't explicitly specify an extension,
 	// and VIM will then be unable to find the file later
-	itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s.txt", p);
-	free(p);
+	itmplen = vim_snprintf((ਅੱਖਰ *)itmp, ਆਕਾਰ(itmp), "%s.txt", p);
+	ਮੁਕਤ(p);
     }
-    else
-	return NULL;
-#   else
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ ਨਿਰਾ;
+#   ਨਹੀਂਤਾਂ
     STRCPY(itmp, TEMPNAME);
     itmplen = STRLEN_LITERAL(TEMPNAME);
-    if ((p = vim_strchr(itmp, '?')) != NULL)
+    ਜੇ ((p = vim_strchr(itmp, '?')) != ਨਿਰਾ)
 	*p = extra_char;
-    if (mktemp((char *)itmp) == NULL)
-	return NULL;
+    ਜੇ (mktemp((ਅੱਖਰ *)itmp) == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 #   endif
 #  endif
 
-    return vim_strnsave(itmp, (size_t)itmplen);
+    ਵਾਪਸ vim_strnsave(itmp, (size_t)itmplen);
 # endif // MSWIN
-#endif // TEMPDIRNAMES
+#ਜੇ_ਅੰਤ // TEMPDIRNAMES
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ਜੇ defined(BACKSLASH_ਵਿੱਚ_FILENAME)
 /*
  * Convert all backslashes in fname to forward slashes in-place, unless when
  * it looks like a URL.
  */
-    void
+    ਖਾਲੀ
 forward_slash(char_u *fname)
 {
     char_u	*p;
 
-    if (path_with_url(fname))
-	return;
-    for (p = fname; *p != NUL; ++p)
+    ਜੇ (ਰਸਤਾ_with_url(fname))
+	ਵਾਪਸ;
+    ਲਈ (p = fname; *p != NUL; ++p)
 	// The Big5 encoding can have '\' in the trail byte.
-	if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+	ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 	    ++p;
-	else if (*p == '\\')
+	ਨਹੀਂਤਾਂ ਜੇ (*p == '\\')
 	    *p = '/';
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Try matching a filename with a "pattern" ("prog" is NULL), or use the
@@ -5695,23 +5695,23 @@ forward_slash(char_u *fname)
  * Used for autocommands and 'wildignore'.
  * Returns TRUE if there is a match, FALSE otherwise.
  */
-    int
-match_file_pat(
-    char_u	*pattern,		// pattern to match with
+    ਪੂਰਨ
+ਮੇਲ_file_pat(
+    char_u	*ਨਮੂਨਾ,		// pattern to match with
     regprog_T	**prog,			// pre-compiled regprog or NULL
     char_u	*fname,			// full path of file name
     char_u	*sfname,		// short file name or NULL
-    char_u	*tail,			// tail of path
-    int		allow_dirs)		// allow matching with dir
+    char_u	*ਪੂਛ,			// tail of path
+    ਪੂਰਨ		allow_dirs)		// allow matching with dir
 {
     regmatch_T	regmatch;
-    int		result = FALSE;
+    ਪੂਰਨ		ਨਤੀਜਾ = FALSE;
 
     regmatch.rm_ic = p_fic; // ignore case if 'fileignorecase' is set
-    if (prog != NULL)
+    ਜੇ (prog != ਨਿਰਾ)
 	regmatch.regprog = *prog;
-    else
-	regmatch.regprog = vim_regcomp(pattern, RE_MAGIC);
+    ਨਹੀਂਤਾਂ
+	regmatch.regprog = vim_regcomp(ਨਮੂਨਾ, RE_MAGIC);
 
     /*
      * Try for a match with the pattern with:
@@ -5719,19 +5719,19 @@ match_file_pat(
      * 2. the short file name, when the pattern has a '/'.
      * 3. the tail of the file name, when the pattern has no '/'.
      */
-    if (regmatch.regprog != NULL
+    ਜੇ (regmatch.regprog != ਨਿਰਾ
 	     && ((allow_dirs
 		     && (vim_regexec(&regmatch, fname, (colnr_T)0)
-			 || (sfname != NULL
+			 || (sfname != ਨਿਰਾ
 			     && vim_regexec(&regmatch, sfname, (colnr_T)0))))
-		 || (!allow_dirs && vim_regexec(&regmatch, tail, (colnr_T)0))))
-	result = TRUE;
+		 || (!allow_dirs && vim_regexec(&regmatch, ਪੂਛ, (colnr_T)0))))
+	ਨਤੀਜਾ = TRUE;
 
-    if (prog != NULL)
+    ਜੇ (prog != ਨਿਰਾ)
 	*prog = regmatch.regprog;
-    else
+    ਨਹੀਂਤਾਂ
 	vim_regfree(regmatch.regprog);
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
@@ -5739,33 +5739,33 @@ match_file_pat(
  * "list" is a comma-separated list of patterns, like 'wildignore'.
  * "sfname" is the short file name or NULL, "ffname" the long file name.
  */
-    int
-match_file_list(char_u *list, char_u *sfname, char_u *ffname)
+    ਪੂਰਨ
+ਮੇਲ_file_list(char_u *list, char_u *sfname, char_u *ffname)
 {
     char_u	buf[MAXPATHL];
-    char_u	*tail;
+    char_u	*ਪੂਛ;
     char_u	*regpat;
-    char	allow_dirs;
-    int		match;
+    ਅੱਖਰ	allow_dirs;
+    ਪੂਰਨ		ਮੇਲ;
     char_u	*p;
 
-    tail = gettail(sfname);
+    ਪੂਛ = gettail(sfname);
 
     // try all patterns in 'wildignore'
     p = list;
-    while (*p)
+    ਜਦੋਂ (*p)
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
-	regpat = file_pat_to_reg_pat(buf, NULL, &allow_dirs, FALSE);
-	if (regpat == NULL)
-	    break;
-	match = match_file_pat(regpat, NULL, ffname, sfname,
-						       tail, (int)allow_dirs);
+	regpat = file_pat_ਮੰਜ਼ਿਲ_reg_pat(buf, ਨਿਰਾ, &allow_dirs, FALSE);
+	ਜੇ (regpat == ਨਿਰਾ)
+	    ਰੋਕੋ;
+	ਮੇਲ = ਮੇਲ_file_pat(regpat, ਨਿਰਾ, ffname, sfname,
+						       ਪੂਛ, (ਪੂਰਨ)allow_dirs);
 	vim_free(regpat);
-	if (match)
-	    return TRUE;
+	ਜੇ (ਮੇਲ)
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -5780,113 +5780,113 @@ match_file_list(char_u *list, char_u *sfname, char_u *ffname)
  * Returns NULL when out of memory.
  */
     char_u *
-file_pat_to_reg_pat(
+file_pat_ਮੰਜ਼ਿਲ_reg_pat(
     char_u	*pat,
-    char_u	*pat_end,	// first char after pattern or NULL
-    char	*allow_dirs,	// Result passed back out in here
-    int		no_bslash UNUSED) // Don't use a backward slash as pathsep
+    char_u	*pat_ਸਿਰਾ,	// first char after pattern or NULL
+    ਅੱਖਰ	*allow_dirs,	// Result passed back out in here
+    ਪੂਰਨ		no_bslash ਅਣਵਰਤਿਆ) // Don't use a backward slash as pathsep
 {
-    int		size = 2; // '^' at start, '$' at end
+    ਪੂਰਨ		ਮਾਪ = 2; // '^' at start, '$' at end
     char_u	*endp;
     char_u	*reg_pat;
     char_u	*p;
-    int		i;
-    int		nested = 0;
-    int		add_dollar = TRUE;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		nested = 0;
+    ਪੂਰਨ		ਜੋੜੋ_dollar = TRUE;
 
-    if (allow_dirs != NULL)
+    ਜੇ (allow_dirs != ਨਿਰਾ)
 	*allow_dirs = FALSE;
-    if (pat_end == NULL)
-	pat_end = pat + STRLEN(pat);
+    ਜੇ (pat_ਸਿਰਾ == ਨਿਰਾ)
+	pat_ਸਿਰਾ = pat + STRLEN(pat);
 
-    for (p = pat; p < pat_end; p++)
+    ਲਈ (p = pat; p < pat_ਸਿਰਾ; p++)
     {
-	switch (*p)
+	ਚੋਣ (*p)
 	{
-	    case '*':
-	    case '.':
-	    case ',':
-	    case '{':
-	    case '}':
-	    case '~':
-		size += 2;	// extra backslash
-		break;
-#ifdef BACKSLASH_IN_FILENAME
-	    case '\\':
-	    case '/':
-		size += 4;	// could become "[\/]"
-		break;
-#endif
-	    default:
-		size++;
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+	    ਹਾਲਤ '*':
+	    ਹਾਲਤ '.':
+	    ਹਾਲਤ ',':
+	    ਹਾਲਤ '{':
+	    ਹਾਲਤ '}':
+	    ਹਾਲਤ '~':
+		ਮਾਪ += 2;	// extra backslash
+		ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+	    ਹਾਲਤ '\\':
+	    ਹਾਲਤ '/':
+		ਮਾਪ += 4;	// could become "[\/]"
+		ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	    ਮੂਲ:
+		ਮਾਪ++;
+		ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		{
 		    ++p;
-		    ++size;
+		    ++ਮਾਪ;
 		}
-		break;
+		ਰੋਕੋ;
 	}
     }
-    reg_pat = alloc(size + 1);
-    if (reg_pat == NULL)
-	return NULL;
+    reg_pat = alloc(ਮਾਪ + 1);
+    ਜੇ (reg_pat == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     i = 0;
 
-    if (pat[0] == '*')
-	while (pat[0] == '*' && pat < pat_end - 1)
+    ਜੇ (pat[0] == '*')
+	ਜਦੋਂ (pat[0] == '*' && pat < pat_ਸਿਰਾ - 1)
 	    pat++;
-    else
+    ਨਹੀਂਤਾਂ
 	reg_pat[i++] = '^';
-    endp = pat_end - 1;
-    if (endp >= pat && *endp == '*')
+    endp = pat_ਸਿਰਾ - 1;
+    ਜੇ (endp >= pat && *endp == '*')
     {
-	while (endp - pat > 0 && *endp == '*')
+	ਜਦੋਂ (endp - pat > 0 && *endp == '*')
 	    endp--;
-	add_dollar = FALSE;
+	ਜੋੜੋ_dollar = FALSE;
     }
-    for (p = pat; *p && nested >= 0 && p <= endp; p++)
+    ਲਈ (p = pat; *p && nested >= 0 && p <= endp; p++)
     {
-	switch (*p)
+	ਚੋਣ (*p)
 	{
-	    case '*':
+	    ਹਾਲਤ '*':
 		reg_pat[i++] = '.';
 		reg_pat[i++] = '*';
-		while (p[1] == '*')	// "**" matches like "*"
+		ਜਦੋਂ (p[1] == '*')	// "**" matches like "*"
 		    ++p;
-		break;
-	    case '.':
-	    case '~':
+		ਰੋਕੋ;
+	    ਹਾਲਤ '.':
+	    ਹਾਲਤ '~':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = *p;
-		break;
-	    case '?':
+		ਰੋਕੋ;
+	    ਹਾਲਤ '?':
 		reg_pat[i++] = '.';
-		break;
-	    case '\\':
-		if (p[1] == NUL)
-		    break;
-#ifdef BACKSLASH_IN_FILENAME
-		if (!no_bslash)
+		ਰੋਕੋ;
+	    ਹਾਲਤ '\\':
+		ਜੇ (p[1] == NUL)
+		    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+		ਜੇ (!no_bslash)
 		{
 		    // translate:
 		    // "\x" to "\\x"  e.g., "dir\file"
 		    // "\*" to "\\.*" e.g., "dir\*.c"
 		    // "\?" to "\\."  e.g., "dir\??.c"
 		    // "\+" to "\+"   e.g., "fileX\+.c"
-		    if ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
+		    ਜੇ ((vim_isfilec(p[1]) || p[1] == '*' || p[1] == '?')
 			    && p[1] != '+')
 		    {
 			reg_pat[i++] = '[';
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '/';
 			reg_pat[i++] = ']';
-			if (allow_dirs != NULL)
+			ਜੇ (allow_dirs != ਨਿਰਾ)
 			    *allow_dirs = TRUE;
-			break;
+			ਰੋਕੋ;
 		    }
 		}
-#endif
+#ਜੇ_ਅੰਤ
 		// Undo escaping from ExpandEscape():
 		// foo\?bar -> foo?bar
 		// foo\%bar -> foo%bar
@@ -5896,130 +5896,130 @@ file_pat_to_reg_pat(
 		// regexp.
 		// An escaped { must be unescaped since we use magic not
 		// verymagic.  Use "\\\{n,m\}"" to get "\{n,m}".
-		if (*++p == '?'
-#ifdef BACKSLASH_IN_FILENAME
+		ਜੇ (*++p == '?'
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
 			&& no_bslash
-#endif
+#ਜੇ_ਅੰਤ
 			)
 		    reg_pat[i++] = '?';
-		else
-		    if (*p == ',' || *p == '%' || *p == '#'
+		ਨਹੀਂਤਾਂ
+		    ਜੇ (*p == ',' || *p == '%' || *p == '#'
 			       || vim_isspace(*p) || *p == '{' || *p == '}')
 			reg_pat[i++] = *p;
-		    else if (*p == '\\' && p[1] == '\\' && p[2] == '{')
+		    ਨਹੀਂਤਾਂ ਜੇ (*p == '\\' && p[1] == '\\' && p[2] == '{')
 		    {
 			reg_pat[i++] = '\\';
 			reg_pat[i++] = '{';
 			p += 2;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			if (allow_dirs != NULL && vim_ispathsep(*p)
-#ifdef BACKSLASH_IN_FILENAME
+			ਜੇ (allow_dirs != ਨਿਰਾ && vim_ispathsep(*p)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
 				&& (!no_bslash || *p != '\\')
-#endif
+#ਜੇ_ਅੰਤ
 				)
 			    *allow_dirs = TRUE;
 			reg_pat[i++] = '\\';
-			if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+			ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 			    reg_pat[i++] = *p++;
 			reg_pat[i++] = *p;
 		    }
-		break;
-#ifdef BACKSLASH_IN_FILENAME
-	    case '/':
+		ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+	    ਹਾਲਤ '/':
 		reg_pat[i++] = '[';
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '/';
 		reg_pat[i++] = ']';
-		if (allow_dirs != NULL)
+		ਜੇ (allow_dirs != ਨਿਰਾ)
 		    *allow_dirs = TRUE;
-		break;
-#endif
-	    case '{':
+		ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	    ਹਾਲਤ '{':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = '(';
 		nested++;
-		break;
-	    case '}':
+		ਰੋਕੋ;
+	    ਹਾਲਤ '}':
 		reg_pat[i++] = '\\';
 		reg_pat[i++] = ')';
 		--nested;
-		break;
-	    case ',':
-		if (nested)
+		ਰੋਕੋ;
+	    ਹਾਲਤ ',':
+		ਜੇ (nested)
 		{
 		    reg_pat[i++] = '\\';
 		    reg_pat[i++] = '|';
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    reg_pat[i++] = ',';
-		break;
-	    default:
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
+		ਰੋਕੋ;
+	    ਮੂਲ:
+		ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) > 1)
 		    reg_pat[i++] = *p++;
-		else if (allow_dirs != NULL && vim_ispathsep(*p))
+		ਨਹੀਂਤਾਂ ਜੇ (allow_dirs != ਨਿਰਾ && vim_ispathsep(*p))
 		    *allow_dirs = TRUE;
 		reg_pat[i++] = *p;
-		break;
+		ਰੋਕੋ;
 	}
     }
-    if (add_dollar)
+    ਜੇ (ਜੋੜੋ_dollar)
 	reg_pat[i++] = '$';
     reg_pat[i] = NUL;
-    if (nested != 0)
+    ਜੇ (nested != 0)
     {
-	if (nested < 0)
+	ਜੇ (nested < 0)
 	    emsg(_(e_missing_open_curly));
-	else
+	ਨਹੀਂਤਾਂ
 	    emsg(_(e_missing_close_curly));
 	VIM_CLEAR(reg_pat);
     }
-    return reg_pat;
+    ਵਾਪਸ reg_pat;
 }
 
-#if defined(EINTR)
+#ਜੇ defined(EINTR)
 /*
  * Version of read() that retries when interrupted by EINTR (possibly
  * by a SIGWINCH).
  */
-    long
-read_eintr(int fd, void *buf, size_t bufsize)
+    ਲੰਮਾ
+read_eintr(ਪੂਰਨ fd, ਖਾਲੀ *buf, size_t bufsize)
 {
-    long ret;
+    ਲੰਮਾ ret;
 
-    for (;;)
+    ਲਈ (;;)
     {
 	ret = vim_read(fd, buf, bufsize);
-	if (ret >= 0 || errno != EINTR)
-	    break;
+	ਜੇ (ret >= 0 || errno != EINTR)
+	    ਰੋਕੋ;
     }
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Version of write() that retries when interrupted by EINTR (possibly
  * by a SIGWINCH).
  */
-    long
-write_eintr(int fd, void *buf, size_t bufsize)
+    ਲੰਮਾ
+write_eintr(ਪੂਰਨ fd, ਖਾਲੀ *buf, size_t bufsize)
 {
-    long    ret = 0;
-    long    wlen;
+    ਲੰਮਾ    ret = 0;
+    ਲੰਮਾ    wlen;
 
     // Repeat the write() so long it didn't fail, other than being interrupted
     // by a signal.
-    while (ret < (long)bufsize)
+    ਜਦੋਂ (ret < (ਲੰਮਾ)bufsize)
     {
-	wlen = vim_write(fd, (char *)buf + ret, bufsize - ret);
-	if (wlen < 0)
+	wlen = vim_write(fd, (ਅੱਖਰ *)buf + ret, bufsize - ret);
+	ਜੇ (wlen < 0)
 	{
-	    if (errno != EINTR)
-		break;
+	    ਜੇ (errno != EINTR)
+		ਰੋਕੋ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    ret += wlen;
     }
-    return ret;
+    ਵਾਪਸ ret;
 }
-#endif
+#ਜੇ_ਅੰਤ

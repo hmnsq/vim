@@ -11,136 +11,136 @@
  * help.c: functions for Vim help
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 /*
  * ":help": open a read-only window on a help file
  */
-    void
+    ਖਾਲੀ
 ex_help(exarg_T *eap)
 {
     char_u	*arg;
-    char_u	*tag;
+    char_u	*ਟੈਗ;
     FILE	*helpfd;	// file descriptor of help file
-    int		n;
-    int		i;
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		i;
     win_T	*wp;
-    int		num_matches;
+    ਪੂਰਨ		ਅੰਕ_matches;
     char_u	**matches;
     char_u	*p;
-    int		empty_fnum = 0;
-    int		alt_fnum = 0;
+    ਪੂਰਨ		ਖਾਲੀ_ਥਾਵਾਂ_fnum = 0;
+    ਪੂਰਨ		alt_fnum = 0;
     buf_T	*buf;
-#ifdef FEAT_MULTI_LANG
-    int		len;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਪੂਰਨ		len;
     char_u	*lang;
-#endif
-#ifdef FEAT_FOLDING
-    int		old_KeyTyped = KeyTyped;
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+    ਪੂਰਨ		old_ਕੁੰਜੀ_Typed = ਕੁੰਜੀ_Typed;
+#ਜੇ_ਅੰਤ
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ਜੇ (ERROR_IF_ANY_POPUP_ਖਿੜਕੀ)
+	ਵਾਪਸ;
 
-    if (eap != NULL)
+    ਜੇ (eap != ਨਿਰਾ)
     {
 	// A ":help" command ends at the first LF, or at a '|' that is
 	// followed by some text.  Set nextcmd to the following command.
-	for (arg = eap->arg; *arg; ++arg)
+	ਲਈ (arg = eap->arg; *arg; ++arg)
 	{
-	    if (*arg == '\n' || *arg == '\r'
+	    ਜੇ (*arg == '\n' || *arg == '\r'
 		    || (*arg == '|' && arg[1] != NUL && arg[1] != '|'))
 	    {
 		*arg++ = NUL;
 		eap->nextcmd = arg;
-		break;
+		ਰੋਕੋ;
 	    }
 	}
 	arg = eap->arg;
 
-	if (eap->forceit && *arg == NUL && !curbuf->b_help)
+	ਜੇ (eap->forceit && *arg == NUL && !curbuf->b_help)
 	{
 	    emsg(_(e_dont_panic));
-	    return;
+	    ਵਾਪਸ;
 	}
 
-	if (eap->skip)	    // not executing commands
-	    return;
+	ਜੇ (eap->skip)	    // not executing commands
+	    ਵਾਪਸ;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	arg = (char_u *)"";
 
     // remove trailing blanks
     p = arg + STRLEN(arg) - 1;
-    while (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
+    ਜਦੋਂ (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
 	*p-- = NUL;
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     // Check for a specified language
     lang = check_help_lang(arg);
-#endif
+#ਜੇ_ਅੰਤ
 
     // When no argument given go to the index.
-    if (*arg == NUL)
+    ਜੇ (*arg == NUL)
 	arg = (char_u *)"help.txt";
 
     // Check if there is a match for the argument.
-    n = find_help_tags(arg, &num_matches, &matches,
-						 eap != NULL && eap->forceit);
+    n = ਲੱਭੋ_help_ਟੈਗ_ਸੂਚੀ(arg, &ਅੰਕ_matches, &matches,
+						 eap != ਨਿਰਾ && eap->forceit);
 
     i = 0;
-#ifdef FEAT_MULTI_LANG
-    if (n != FAIL && lang != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਜੇ (n != FAIL && lang != ਨਿਰਾ)
 	// Find first item with the requested language.
-	for (i = 0; i < num_matches; ++i)
+	ਲਈ (i = 0; i < ਅੰਕ_matches; ++i)
 	{
-	    len = (int)STRLEN(matches[i]);
-	    if (len > 3 && matches[i][len - 3] == '@'
+	    len = (ਪੂਰਨ)STRLEN(matches[i]);
+	    ਜੇ (len > 3 && matches[i][len - 3] == '@'
 				  && STRICMP(matches[i] + len - 2, lang) == 0)
-		break;
+		ਰੋਕੋ;
 	}
-#endif
-    if (i >= num_matches || n == FAIL)
+#ਜੇ_ਅੰਤ
+    ਜੇ (i >= ਅੰਕ_matches || n == FAIL)
     {
-#ifdef FEAT_MULTI_LANG
-	if (lang != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+	ਜੇ (lang != ਨਿਰਾ)
 	    semsg(_(e_sorry_no_str_help_for_str), lang, arg);
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    semsg(_(e_sorry_no_help_for_str), arg);
-	if (n != FAIL)
-	    FreeWild(num_matches, matches);
-	return;
+	ਜੇ (n != FAIL)
+	    FreeWild(ਅੰਕ_matches, matches);
+	ਵਾਪਸ;
     }
 
     // The first match (in the requested language) is the best match.
-    tag = vim_strsave(matches[i]);
-    FreeWild(num_matches, matches);
+    ਟੈਗ = vim_strsave(matches[i]);
+    FreeWild(ਅੰਕ_matches, matches);
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 
     // Re-use an existing help window or open a new one.
     // Always open a new one for ":tab help".
-    if (!bt_help(curwin->w_buffer) || cmdmod.cmod_tab != 0)
+    ਜੇ (!bt_help(curwin->w_ਬਫਰ) || cmdmod.cmod_tab != 0)
     {
-	if (cmdmod.cmod_tab != 0)
-	    wp = NULL;
-	else
+	ਜੇ (cmdmod.cmod_tab != 0)
+	    wp = ਨਿਰਾ;
+	ਨਹੀਂਤਾਂ
 	    FOR_ALL_WINDOWS(wp)
-		if (bt_help(wp->w_buffer))
-		    break;
-	if (wp != NULL && wp->w_buffer->b_nwindows > 0)
+		ਜੇ (bt_help(wp->w_ਬਫਰ))
+		    ਰੋਕੋ;
+	ਜੇ (wp != ਨਿਰਾ && wp->w_ਬਫਰ->b_nwindows > 0)
 	    win_enter(wp, TRUE);
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // There is no help window yet.
 	    // Try to open the file specified by the "helpfile" option.
-	    if ((helpfd = mch_fopen((char *)p_hf, READBIN)) == NULL)
+	    ਜੇ ((helpfd = mch_fopen((ਅੱਖਰ *)p_hf, READBIN)) == ਨਿਰਾ)
 	    {
 		smsg(_("Sorry, help file \"%s\" not found"), p_hf);
-		goto erret;
+		ਜਾਓ erret;
 	    }
 	    fclose(helpfd);
 
@@ -148,78 +148,78 @@ ex_help(exarg_T *eap)
 	    // specified, the current window is vertically split and
 	    // narrow.
 	    n = WSP_HELP;
-	    if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
-						  && curwin->w_width < 80)
-		n |= p_sb ? WSP_BOT : WSP_TOP;
-	    if (win_split(0, n) == FAIL)
-		goto erret;
+	    ਜੇ (cmdmod.cmod_ਵੰਡੋ == 0 && curwin->w_ਚੌੜਾਈ != Columns
+						  && curwin->w_ਚੌੜਾਈ < 80)
+		n |= p_sb ? WSP_BOT : WSP_ਸਿਖਰ;
+	    ਜੇ (win_ਵੰਡੋ(0, n) == FAIL)
+		ਜਾਓ erret;
 
-	    if (curwin->w_height < p_hh)
-		win_setheight((int)p_hh);
+	    ਜੇ (curwin->w_ਉਚਾਈ < p_hh)
+		win_setheight((ਪੂਰਨ)p_hh);
 
 	    // Open help file (do_ecmd() will set b_help flag, readfile() will
 	    // set b_p_ro flag).
 	    // Set the alternate file to the previously edited file.
 	    alt_fnum = curbuf->b_fnum;
-	    (void)do_ecmd(0, NULL, NULL, NULL, ECMD_LASTL,
-			  ECMD_HIDE + ECMD_SET_HELP,
-			  NULL);  // buffer is still open, don't store info
-	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+	    (ਖਾਲੀ)do_ecmd(0, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ECMD_LASTL,
+			  ECMD_HIDE + ECMD_ਸੈੱਟ_HELP,
+			  ਨਿਰਾ);  // buffer is still open, don't store info
+	    ਜੇ ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = alt_fnum;
-	    empty_fnum = curbuf->b_fnum;
+	    ਖਾਲੀ_ਥਾਵਾਂ_fnum = curbuf->b_fnum;
 	}
     }
 
-    if (!p_im)
+    ਜੇ (!p_im)
 	restart_edit = 0;	    // don't want insert mode in help file
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
     // Restore KeyTyped, setting 'filetype=help' may reset it.
     // It is needed for do_tag top open folds under the cursor.
-    KeyTyped = old_KeyTyped;
-#endif
+    ਕੁੰਜੀ_Typed = old_ਕੁੰਜੀ_Typed;
+#ਜੇ_ਅੰਤ
 
-    if (tag != NULL)
-	do_tag(tag, DT_HELP, 1, FALSE, TRUE);
+    ਜੇ (ਟੈਗ != ਨਿਰਾ)
+	do_ਟੈਗ(ਟੈਗ, DT_HELP, 1, FALSE, TRUE);
 
     // Delete the empty buffer if we're not using it.  Careful: autocommands
     // may have jumped to another window, check that the buffer is not in a
     // window.
-    if (empty_fnum != 0 && curbuf->b_fnum != empty_fnum)
+    ਜੇ (ਖਾਲੀ_ਥਾਵਾਂ_fnum != 0 && curbuf->b_fnum != ਖਾਲੀ_ਥਾਵਾਂ_fnum)
     {
-	buf = buflist_findnr(empty_fnum);
-	if (buf != NULL && buf->b_nwindows == 0)
-	    wipe_buffer(buf, TRUE);
+	buf = buflist_findnr(ਖਾਲੀ_ਥਾਵਾਂ_fnum);
+	ਜੇ (buf != ਨਿਰਾ && buf->b_nwindows == 0)
+	    wipe_ਬਫਰ(buf, TRUE);
     }
 
     // keep the previous alternate file
-    if (alt_fnum != 0 && curwin->w_alt_fnum == empty_fnum
+    ਜੇ (alt_fnum != 0 && curwin->w_alt_fnum == ਖਾਲੀ_ਥਾਵਾਂ_fnum
 				    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = alt_fnum;
 
 erret:
-    vim_free(tag);
+    vim_free(ਟੈਗ);
 }
 
 /*
  * ":helpclose": Close one help window
  */
-    void
-ex_helpclose(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_helpclose(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (bt_help(win->w_buffer))
+	ਜੇ (bt_help(win->w_ਬਫਰ))
 	{
 	    win_close(win, FALSE);
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 }
 
-#if defined(FEAT_MULTI_LANG)
+#ਜੇ defined(FEAT_MULTI_LANG)
 /*
  * In an argument search for a language specifiers in the form "@xx".
  * Changes the "@" to NUL if found, and returns a pointer to "xx".
@@ -228,17 +228,17 @@ ex_helpclose(exarg_T *eap UNUSED)
     char_u *
 check_help_lang(char_u *arg)
 {
-    int len = (int)STRLEN(arg);
+    ਪੂਰਨ len = (ਪੂਰਨ)STRLEN(arg);
 
-    if (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
+    ਜੇ (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
 					       && ASCII_ISALPHA(arg[len - 1]))
     {
 	arg[len - 3] = NUL;		// remove the '@'
-	return arg + len - 2;
+	ਵਾਪਸ arg + len - 2;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return a heuristic indicating how well the given string matches.  The
@@ -251,19 +251,19 @@ check_help_lang(char_u *arg)
  * Assumption is made that the matched_string passed has already been found to
  * match some string for which help is requested.  webb.
  */
-    int
+    ਪੂਰਨ
 help_heuristic(
     char_u	*matched_string,
-    int		offset,			// offset for match
-    int		wrong_case)		// no matching case
+    ਪੂਰਨ		ਵਿੱਥ,			// offset for match
+    ਪੂਰਨ		wrong_case)		// no matching case
 {
-    int		num_letters;
+    ਪੂਰਨ		ਅੰਕ_letters;
     char_u	*p;
 
-    num_letters = 0;
-    for (p = matched_string; *p; p++)
-	if (ASCII_ISALNUM(*p))
-	    num_letters++;
+    ਅੰਕ_letters = 0;
+    ਲਈ (p = matched_string; *p; p++)
+	ਜੇ (ASCII_ISALNUM(*p))
+	    ਅੰਕ_letters++;
 
     // Multiply the number of letters by 100 to give it a much bigger
     // weighting than the number of characters.
@@ -272,41 +272,41 @@ help_heuristic(
     // somewhere in the last half.
     // If the match is more than 2 chars from the start, multiply by 200 to
     // put it after matches at the start.
-    if (ASCII_ISALNUM(matched_string[offset]) && offset > 0
-				 && ASCII_ISALNUM(matched_string[offset - 1]))
-	offset += 10000;
-    else if (offset > 2)
-	offset *= 200;
-    if (wrong_case)
-	offset += 5000;
+    ਜੇ (ASCII_ISALNUM(matched_string[ਵਿੱਥ]) && ਵਿੱਥ > 0
+				 && ASCII_ISALNUM(matched_string[ਵਿੱਥ - 1]))
+	ਵਿੱਥ += 10000;
+    ਨਹੀਂਤਾਂ ਜੇ (ਵਿੱਥ > 2)
+	ਵਿੱਥ *= 200;
+    ਜੇ (wrong_case)
+	ਵਿੱਥ += 5000;
     // Features are less interesting than the subjects themselves, but "+"
     // alone is not a feature.
-    if (matched_string[0] == '+' && matched_string[1] != NUL)
-	offset += 100;
-    return (int)(100 * num_letters + STRLEN(matched_string) + offset);
+    ਜੇ (matched_string[0] == '+' && matched_string[1] != NUL)
+	ਵਿੱਥ += 100;
+    ਵਾਪਸ (ਪੂਰਨ)(100 * ਅੰਕ_letters + STRLEN(matched_string) + ਵਿੱਥ);
 }
 
 /*
  * Compare functions for qsort() below, that checks the help heuristics number
  * that has been put after the tagname by find_tags().
  */
-    static int
-help_compare(const void *s1, const void *s2)
+    ਸਥਿਰ ਪੂਰਨ
+help_compare(ਅਚਲ ਖਾਲੀ *s1, ਅਚਲ ਖਾਲੀ *s2)
 {
-    char    *p1;
-    char    *p2;
-    int	    cmp;
+    ਅੱਖਰ    *p1;
+    ਅੱਖਰ    *p2;
+    ਪੂਰਨ	    cmp;
 
-    p1 = *(char **)s1 + strlen(*(char **)s1) + 1;
-    p2 = *(char **)s2 + strlen(*(char **)s2) + 1;
+    p1 = *(ਅੱਖਰ **)s1 + ਲੜੀ_ਲੰਬਾਈ(*(ਅੱਖਰ **)s1) + 1;
+    p2 = *(ਅੱਖਰ **)s2 + ਲੜੀ_ਲੰਬਾਈ(*(ਅੱਖਰ **)s2) + 1;
 
     // Compare by help heuristic number first.
     cmp = strcmp(p1, p2);
-    if (cmp != 0)
-	return cmp;
+    ਜੇ (cmp != 0)
+	ਵਾਪਸ cmp;
 
     // Compare by strings as tie-breaker when same heuristic number.
-    return strcmp(*(char **)s1, *(char **)s2);
+    ਵਾਪਸ strcmp(*(ਅੱਖਰ **)s1, *(ਅੱਖਰ **)s2);
 }
 
 /*
@@ -315,18 +315,18 @@ help_compare(const void *s1, const void *s2)
  * The matches will be sorted with a "best" match algorithm.
  * When "keep_lang" is TRUE try keeping the language of the current buffer.
  */
-    int
-find_help_tags(
+    ਪੂਰਨ
+ਲੱਭੋ_help_ਟੈਗ_ਸੂਚੀ(
     char_u	*arg,
-    int		*num_matches,
+    ਪੂਰਨ		*ਅੰਕ_matches,
     char_u	***matches,
-    int		keep_lang)
+    ਪੂਰਨ		keep_lang)
 {
     char_u	*s, *d;
-    int		i;
+    ਪੂਰਨ		i;
     // Specific tags that either have a specific replacement or won't go
     // through the generic rules.
-    static char *(except_tbl[][2]) = {
+    ਸਥਿਰ ਅੱਖਰ *(except_tbl[][2]) = {
 	{"*",		"star"},
 	{"g*",		"gstar"},
 	{"[*",		"[star"},
@@ -367,81 +367,81 @@ find_help_tags(
 	{"s/\\2",	"s/\\\\2"},
 	{"s/\\3",	"s/\\\\3"},
 	{"s/\\9",	"s/\\\\9"},
-	{NULL, NULL}
+	{ਨਿਰਾ, ਨਿਰਾ}
     };
-    static char *(expr_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
+    ਸਥਿਰ ਅੱਖਰ *(ਵਿਅੰਜਕ_ਸਾਰਣੀ[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
 				   ">=?", ">?", "is?", "isnot?"};
-    int flags;
+    ਪੂਰਨ flags;
 
     d = IObuff;		    // assume IObuff is long enough!
     d[0] = NUL;
 
-    if (STRNICMP(arg, "expr-", 5) == 0)
+    ਜੇ (STRNICMP(arg, "expr-", 5) == 0)
     {
 	// When the string starting with "expr-" and containing '?' and matches
 	// the table, it is taken literally (but ~ is escaped).  Otherwise '?'
 	// is recognized as a wildcard.
-	for (i = (int)ARRAY_LENGTH(expr_table); --i >= 0; )
-	    if (STRCMP(arg + 5, expr_table[i]) == 0)
+	ਲਈ (i = (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(ਵਿਅੰਜਕ_ਸਾਰਣੀ); --i >= 0; )
+	    ਜੇ (STRCMP(arg + 5, ਵਿਅੰਜਕ_ਸਾਰਣੀ[i]) == 0)
 	    {
-		int si = 0, di = 0;
+		ਪੂਰਨ si = 0, di = 0;
 
-		for (;;)
+		ਲਈ (;;)
 		{
-		    if (arg[si] == '~')
+		    ਜੇ (arg[si] == '~')
 			d[di++] = '\\';
 		    d[di++] = arg[si];
-		    if (arg[si] == NUL)
-			break;
+		    ਜੇ (arg[si] == NUL)
+			ਰੋਕੋ;
 		    ++si;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Recognize a few exceptions to the rule.  Some strings that contain
 	// '*'are changed to "star", otherwise '*' is recognized as a wildcard.
-	for (i = 0; except_tbl[i][0] != NULL; ++i)
-	    if (STRCMP(arg, except_tbl[i][0]) == 0)
+	ਲਈ (i = 0; except_tbl[i][0] != ਨਿਰਾ; ++i)
+	    ਜੇ (STRCMP(arg, except_tbl[i][0]) == 0)
 	    {
 		STRCPY(d, except_tbl[i][1]);
-		break;
+		ਰੋਕੋ;
 	    }
     }
 
-    if (d[0] == NUL)	// no match in table
+    ਜੇ (d[0] == NUL)	// no match in table
     {
 	// Replace "\S" with "/\\S", etc.  Otherwise every tag is matched.
 	// Also replace "\%^" and "\%(", they match every tag too.
 	// Also "\zs", "\z1", etc.
 	// Also "\@<", "\@=", "\@<=", etc.
 	// And also "\_$" and "\_^".
-	if (arg[0] == '\\'
+	ਜੇ (arg[0] == '\\'
 		&& ((arg[1] != NUL && arg[2] == NUL)
-		    || (vim_strchr((char_u *)"%_z@", arg[1]) != NULL
+		    || (vim_strchr((char_u *)"%_z@", arg[1]) != ਨਿਰਾ
 							   && arg[2] != NUL)))
 	{
-	    vim_snprintf((char *)d, IOSIZE, "/\\\\%s", arg + 1);
+	    vim_snprintf((ਅੱਖਰ *)d, IOSIZE, "/\\\\%s", arg + 1);
 	    // Check for "/\\_$", should be "/\\_\$"
-	    if (d[3] == '_' && d[4] == '$')
+	    ਜੇ (d[3] == '_' && d[4] == '$')
 		STRCPY(d + 4, "\\$");
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	  // Replace:
 	  // "[:...:]" with "\[:...:]"
 	  // "[++...]" with "\[++...]"
 	  // "\{" with "\\{"		   -- matching "} \}"
-	    if ((arg[0] == '[' && (arg[1] == ':'
+	    ਜੇ ((arg[0] == '[' && (arg[1] == ':'
 			 || (arg[1] == '+' && arg[2] == '+')))
 		    || (arg[0] == '\\' && arg[1] == '{'))
 	      *d++ = '\\';
 
 	  // If tag starts with "('", skip the "(". Fixes CTRL-] on ('option'.
-	  if (*arg == '(' && arg[1] == '\'')
+	  ਜੇ (*arg == '(' && arg[1] == '\'')
 	      arg++;
-	  for (s = arg; *s; ++s)
+	  ਲਈ (s = arg; *s; ++s)
 	  {
 	    // Replace "|" with "bar" and '"' with "quote" to match the name of
 	    // the tags for these commands.
@@ -449,60 +449,60 @@ find_help_tags(
 	    // completion.
 	    // Insert a backslash before '~', '$' and '.' to avoid their
 	    // special meaning.
-	    if (d - IObuff > IOSIZE - 10)	// getting too long!?
-		break;
-	    switch (*s)
+	    ਜੇ (d - IObuff > IOSIZE - 10)	// getting too long!?
+		ਰੋਕੋ;
+	    ਚੋਣ (*s)
 	    {
-		case '|':   STRCPY(d, "bar");
+		ਹਾਲਤ '|':   STRCPY(d, "bar");
 			    d += 3;
-			    continue;
-		case '"':   STRCPY(d, "quote");
+			    ਜਾਰੀ;
+		ਹਾਲਤ '"':   STRCPY(d, "quote");
 			    d += 5;
-			    continue;
-		case '*':   *d++ = '.';
-			    break;
-		case '?':   *d++ = '.';
-			    continue;
-		case '$':
-		case '.':
-		case '~':   *d++ = '\\';
-			    break;
+			    ਜਾਰੀ;
+		ਹਾਲਤ '*':   *d++ = '.';
+			    ਰੋਕੋ;
+		ਹਾਲਤ '?':   *d++ = '.';
+			    ਜਾਰੀ;
+		ਹਾਲਤ '$':
+		ਹਾਲਤ '.':
+		ਹਾਲਤ '~':   *d++ = '\\';
+			    ਰੋਕੋ;
 	    }
 
 	    // Replace "^x" by "CTRL-X". Don't do this for "^_" to make
 	    // ":help i_^_CTRL-D" work.
 	    // Insert '-' before and after "CTRL-X" when applicable.
-	    if (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
-			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != NULL)))
+	    ਜੇ (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
+			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != ਨਿਰਾ)))
 	    {
-		if (d > IObuff && d[-1] != '_' && d[-1] != '\\')
+		ਜੇ (d > IObuff && d[-1] != '_' && d[-1] != '\\')
 		    *d++ = '_';		// prepend a '_' to make x_CTRL-x
 		STRCPY(d, "CTRL-");
 		d += 5;
-		if (*s < ' ')
+		ਜੇ (*s < ' ')
 		{
 		    *d++ = *s + '@';
-		    if (d[-1] == '\\')
+		    ਜੇ (d[-1] == '\\')
 			*d++ = '\\';	// double a backslash
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    *d++ = *++s;
-		if (s[1] != NUL && s[1] != '_')
+		ਜੇ (s[1] != NUL && s[1] != '_')
 		    *d++ = '_';		// append a '_'
-		continue;
+		ਜਾਰੀ;
 	    }
-	    else if (*s == '^')		// "^" or "CTRL-^" or "^_"
+	    ਨਹੀਂਤਾਂ ਜੇ (*s == '^')		// "^" or "CTRL-^" or "^_"
 		*d++ = '\\';
 
 	    // Insert a backslash before a backslash after a slash, for search
 	    // pattern tags: "/\|" --> "/\\|".
-	    else if (s[0] == '\\' && s[1] != '\\'
+	    ਨਹੀਂਤਾਂ ਜੇ (s[0] == '\\' && s[1] != '\\'
 					       && *arg == '/' && s == arg + 1)
 		*d++ = '\\';
 
 	    // "CTRL-\_" -> "CTRL-\\_" to avoid the special meaning of "\_" in
 	    // "CTRL-\_CTRL-N"
-	    if (STRNICMP(s, "CTRL-\\_", 7) == 0)
+	    ਜੇ (STRNICMP(s, "CTRL-\\_", 7) == 0)
 	    {
 		STRCPY(d, "CTRL-\\\\");
 		d += 7;
@@ -513,34 +513,34 @@ find_help_tags(
 
 	    // If tag contains "({" or "([", tag terminates at the "(".
 	    // This is for help on functions, e.g.: abs({expr}).
-	    if (*s == '(' && (s[1] == '{' || s[1] =='['))
-		break;
+	    ਜੇ (*s == '(' && (s[1] == '{' || s[1] =='['))
+		ਰੋਕੋ;
 
 	    // If tag starts with ', toss everything after a second '. Fixes
 	    // CTRL-] on 'option'. (would include the trailing '.').
-	    if (*s == '\'' && s > arg && *arg == '\'')
-		break;
+	    ਜੇ (*s == '\'' && s > arg && *arg == '\'')
+		ਰੋਕੋ;
 	    // Also '{' and '}'.
-	    if (*s == '}' && s > arg && *arg == '{')
-		break;
+	    ਜੇ (*s == '}' && s > arg && *arg == '{')
+		ਰੋਕੋ;
 	  }
 	  *d = NUL;
 
-	  if (*IObuff == '`')
+	  ਜੇ (*IObuff == '`')
 	  {
-	      if (d > IObuff + 2 && d[-1] == '`')
+	      ਜੇ (d > IObuff + 2 && d[-1] == '`')
 	      {
 		  // remove the backticks from `command`
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-2] = NUL;
 	      }
-	      else if (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
+	      ਨਹੀਂਤਾਂ ਜੇ (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
 	      {
 		  // remove the backticks and comma from `command`,
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-3] = NUL;
 	      }
-	      else if (d > IObuff + 4 && d[-3] == '`'
+	      ਨਹੀਂਤਾਂ ਜੇ (d > IObuff + 4 && d[-3] == '`'
 					     && d[-2] == '\\' && d[-1] == '.')
 	      {
 		  // remove the backticks and dot from `command`\.
@@ -552,39 +552,39 @@ find_help_tags(
     }
 
     *matches = (char_u **)"";
-    *num_matches = 0;
-    flags = TAG_HELP | TAG_REGEXP | TAG_NAMES | TAG_VERBOSE | TAG_NO_TAGFUNC;
-    if (keep_lang)
-	flags |= TAG_KEEP_LANG;
-    if (find_tags(IObuff, num_matches, matches, flags, (int)MAXCOL, NULL) == OK
-	    && *num_matches > 0)
+    *ਅੰਕ_matches = 0;
+    flags = ਟੈਗ_HELP | ਟੈਗ_REGEXP | ਟੈਗ_ਨਾਂ | ਟੈਗ_VERBOSE | ਟੈਗ_NO_TAGFUNC;
+    ਜੇ (keep_lang)
+	flags |= ਟੈਗ_KEEP_LANG;
+    ਜੇ (ਲੱਭੋ_ਟੈਗ_ਸੂਚੀ(IObuff, ਅੰਕ_matches, matches, flags, (ਪੂਰਨ)MAXCOL, ਨਿਰਾ) == OK
+	    && *ਅੰਕ_matches > 0)
     {
 	// Sort the matches found on the heuristic number that is after the
 	// tag name.
-	qsort((void *)*matches, (size_t)*num_matches,
-					      sizeof(char_u *), help_compare);
+	qsort((ਖਾਲੀ *)*matches, (size_t)*ਅੰਕ_matches,
+					      ਆਕਾਰ(char_u *), help_compare);
 	// Delete more than TAG_MANY to reduce the size of the listing.
-	while (*num_matches > TAG_MANY)
-	    vim_free((*matches)[--*num_matches]);
+	ਜਦੋਂ (*ਅੰਕ_matches > ਟੈਗ_MANY)
+	    vim_free((*matches)[--*ਅੰਕ_matches]);
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 /*
  * Cleanup matches for help tags:
  * Remove "@ab" if the top of 'helplang' is "ab" and the language of the first
  * tag matches it.  Otherwise remove "@en" if "en" is the only language.
  */
-    void
-cleanup_help_tags(int num_file, char_u **file)
+    ਖਾਲੀ
+cleanup_help_ਟੈਗ_ਸੂਚੀ(ਪੂਰਨ ਅੰਕ_file, char_u **file)
 {
-    int		i, j;
-    int		len;
+    ਪੂਰਨ		i, j;
+    ਪੂਰਨ		len;
     char_u	buf[4];
     char_u	*p = buf;
 
-    if (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
+    ਜੇ (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
     {
 	*p++ = '@';
 	*p++ = p_hlg[0];
@@ -592,53 +592,53 @@ cleanup_help_tags(int num_file, char_u **file)
     }
     *p = NUL;
 
-    for (i = 0; i < num_file; ++i)
+    ਲਈ (i = 0; i < ਅੰਕ_file; ++i)
     {
-	len = (int)STRLEN(file[i]) - 3;
-	if (len <= 0)
-	    continue;
-	if (STRCMP(file[i] + len, "@en") == 0)
+	len = (ਪੂਰਨ)STRLEN(file[i]) - 3;
+	ਜੇ (len <= 0)
+	    ਜਾਰੀ;
+	ਜੇ (STRCMP(file[i] + len, "@en") == 0)
 	{
 	    // Sorting on priority means the same item in another language may
 	    // be anywhere.  Search all items for a match up to the "@en".
-	    for (j = 0; j < num_file; ++j)
-		if (j != i && (int)STRLEN(file[j]) == len + 3
+	    ਲਈ (j = 0; j < ਅੰਕ_file; ++j)
+		ਜੇ (j != i && (ਪੂਰਨ)STRLEN(file[j]) == len + 3
 			   && STRNCMP(file[i], file[j], len + 1) == 0)
-		    break;
-	    if (j == num_file)
+		    ਰੋਕੋ;
+	    ਜੇ (j == ਅੰਕ_file)
 		// item only exists with @en, remove it
 		file[i][len] = NUL;
 	}
     }
 
-    if (*buf != NUL)
-	for (i = 0; i < num_file; ++i)
+    ਜੇ (*buf != NUL)
+	ਲਈ (i = 0; i < ਅੰਕ_file; ++i)
 	{
-	    len = (int)STRLEN(file[i]) - 3;
-	    if (len <= 0)
-		continue;
-	    if (STRCMP(file[i] + len, buf) == 0)
+	    len = (ਪੂਰਨ)STRLEN(file[i]) - 3;
+	    ਜੇ (len <= 0)
+		ਜਾਰੀ;
+	    ਜੇ (STRCMP(file[i] + len, buf) == 0)
 	    {
 		// remove the default language
 		file[i][len] = NUL;
 	    }
 	}
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Called when starting to edit a buffer for a help file.
  */
-    void
-prepare_help_buffer(void)
+    ਖਾਲੀ
+prepare_help_ਬਫਰ(ਖਾਲੀ)
 {
     char_u	*p;
 
     curbuf->b_help = true;
-#ifdef FEAT_QUICKFIX
-    set_string_option_direct((char_u *)"buftype", -1,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_QUICKFIX
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"buftype", -1,
 				     (char_u *)"help", OPT_FREE|OPT_LOCAL, 0);
-#endif
+#ਜੇ_ਅੰਤ
 
     // Always set these options after jumping to a help tag, because the
     // user may have an autocommand that gets in the way.
@@ -648,18 +648,18 @@ prepare_help_buffer(void)
     // latin1 word characters (for translated help files).
     // Only set it when needed, buf_init_chartab() is some work.
     p = (char_u *)"!-~,^*,^|,^\",192-255";
-    if (STRCMP(curbuf->b_p_isk, p) != 0)
+    ਜੇ (STRCMP(curbuf->b_p_isk, p) != 0)
     {
-	set_string_option_direct((char_u *)"isk", -1, p, OPT_FREE|OPT_LOCAL, 0);
+	ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"isk", -1, p, OPT_FREE|OPT_LOCAL, 0);
 	check_buf_options(curbuf);
-	(void)buf_init_chartab(curbuf, FALSE);
+	(ਖਾਲੀ)buf_init_chartab(curbuf, FALSE);
     }
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
     // Don't use the global foldmethod.
-    set_string_option_direct((char_u *)"fdm", -1, (char_u *)"manual",
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"fdm", -1, (char_u *)"manual",
 						       OPT_FREE|OPT_LOCAL, 0);
-#endif
+#ਜੇ_ਅੰਤ
 
     curbuf->b_p_ts = 8;		// 'tabstop' is 8
     curwin->w_p_list = FALSE;	// no list mode
@@ -669,83 +669,83 @@ prepare_help_buffer(void)
     curwin->w_p_nu = 0;		// no line numbers
     curwin->w_p_rnu = 0;	// no relative line numbers
     RESET_BINDING(curwin);	// no scroll or cursor binding
-#ifdef FEAT_ARABIC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
     curwin->w_p_arab = FALSE;	// no arabic mode
-#endif
-#ifdef FEAT_RIGHTLEFT
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
     curwin->w_p_rl  = FALSE;	// help window is left-to-right
-#endif
-#ifdef FEAT_FOLDING
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
     curwin->w_p_fen = FALSE;	// No folding in the help window
-#endif
-#ifdef FEAT_DIFF
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     curwin->w_p_diff = FALSE;	// No 'diff'
-#endif
-#ifdef FEAT_SPELL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     curwin->w_p_spell = FALSE;	// No spell checking
-#endif
+#ਜੇ_ਅੰਤ
 
-    set_buflisted(FALSE);
+    ਸੈੱਟ_buflisted(FALSE);
 }
 
 /*
  * After reading a help file: May cleanup a help buffer when syntax
  * highlighting is not used.
  */
-    void
-fix_help_buffer(void)
+    ਖਾਲੀ
+fix_help_ਬਫਰ(ਖਾਲੀ)
 {
     linenr_T	lnum;
-    char_u	*line;
-    int		in_example = FALSE;
-    int		len;
+    char_u	*ਸਤਰ;
+    ਪੂਰਨ		ਵਿੱਚ_example = FALSE;
+    ਪੂਰਨ		len;
     char_u	*fname;
     char_u	*p;
     char_u	*rt;
-    int		mustfree;
+    ਪੂਰਨ		mustfree;
 
     // Set filetype to "help" if still needed.
-    if (STRCMP(curbuf->b_p_ft, "help") != 0)
+    ਜੇ (STRCMP(curbuf->b_p_ft, "help") != 0)
     {
-	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	++curbuf_ਤਾਲਾ;
+	ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"ft",
 					      0L, (char_u *)"help", OPT_LOCAL);
-	--curbuf_lock;
+	--curbuf_ਤਾਲਾ;
     }
 
-#ifdef FEAT_SYN_HL
-    if (!syntax_present(curwin))
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਜੇ (!syntax_present(curwin))
+#ਜੇ_ਅੰਤ
     {
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	ਲਈ (lnum = 1; lnum <= curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
+	    ਸਤਰ = ml_get_buf(curbuf, lnum, FALSE);
 	    len = ml_get_buf_len(curbuf, lnum);
-	    if (in_example && len > 0 && !VIM_ISWHITE(line[0]))
+	    ਜੇ (ਵਿੱਚ_example && len > 0 && !VIM_ISWHITE(ਸਤਰ[0]))
 	    {
 		// End of example: non-white or '<' in first column.
-		if (line[0] == '<')
+		ਜੇ (ਸਤਰ[0] == '<')
 		{
 		    // blank-out a '<' in the first column
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[0] = ' ';
+		    ਸਤਰ = ml_get_buf(curbuf, lnum, TRUE);
+		    ਸਤਰ[0] = ' ';
 		}
-		in_example = FALSE;
+		ਵਿੱਚ_example = FALSE;
 	    }
-	    if (!in_example && len > 0)
+	    ਜੇ (!ਵਿੱਚ_example && len > 0)
 	    {
-		if (line[len - 1] == '>' && (len == 1 || line[len - 2] == ' '))
+		ਜੇ (ਸਤਰ[len - 1] == '>' && (len == 1 || ਸਤਰ[len - 2] == ' '))
 		{
 		    // blank-out a '>' in the last column (start of example)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
-		    in_example = TRUE;
+		    ਸਤਰ = ml_get_buf(curbuf, lnum, TRUE);
+		    ਸਤਰ[len - 1] = ' ';
+		    ਵਿੱਚ_example = TRUE;
 		}
-		else if (line[len - 1] == '~')
+		ਨਹੀਂਤਾਂ ਜੇ (ਸਤਰ[len - 1] == '~')
 		{
 		    // blank-out a '~' at the end of line (header marker)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    ਸਤਰ = ml_get_buf(curbuf, lnum, TRUE);
+		    ਸਤਰ[len - 1] = ' ';
 		}
 	    }
 	}
@@ -754,132 +754,132 @@ fix_help_buffer(void)
     // In the "help.txt" and "help.abx" file, add the locally added help
     // files.  This uses the very first line in the help file.
     fname = gettail(curbuf->b_fname);
-    if (fnamecmp(fname, "help.txt") == 0
-#ifdef FEAT_MULTI_LANG
+    ਜੇ (fnamecmp(fname, "help.txt") == 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 	|| (fnamencmp(fname, "help.", 5) == 0
 	    && ASCII_ISALPHA(fname[5])
 	    && ASCII_ISALPHA(fname[6])
 	    && TOLOWER_ASC(fname[7]) == 'x'
 	    && fname[8] == NUL)
-#endif
+#ਜੇ_ਅੰਤ
 	)
     {
-	for (lnum = 1; lnum < curbuf->b_ml.ml_line_count; ++lnum)
+	ਲਈ (lnum = 1; lnum < curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
-	    if (strstr((char *)line, "*local-additions*") == NULL)
-		continue;
+	    ਸਤਰ = ml_get_buf(curbuf, lnum, FALSE);
+	    ਜੇ (ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)ਸਤਰ, "*local-additions*") == ਨਿਰਾ)
+		ਜਾਰੀ;
 
 	    // Go through all directories in 'runtimepath', skipping
 	    // $VIMRUNTIME.
 	    p = p_rtp;
-	    while (*p != NUL)
+	    ਜਦੋਂ (*p != NUL)
 	    {
-		int NameBufflen;
+		ਪੂਰਨ NameBufflen;
 
 		NameBufflen = copy_option_part(&p, NameBuff, MAXPATHL, ",");
 		mustfree = FALSE;
 		rt = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-		if (rt != NULL &&
+		ਜੇ (rt != ਨਿਰਾ &&
 			    fullpathcmp(rt, NameBuff, FALSE, TRUE) != FPC_SAME)
 		{
-		    int		fcount;
+		    ਪੂਰਨ		fcount;
 		    char_u	**fnames;
 		    FILE	*fd;
 		    char_u	*s;
-		    int		fi;
+		    ਪੂਰਨ		fi;
 		    vimconv_T	vc;
 		    char_u	*cp;
 
 		    // Find all "doc/ *.txt" files in this directory.
-		    if (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
+		    ਜੇ (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
 		    {
 			STRCPY(NameBuff + NameBufflen, PATHSEPSTR);
-			NameBufflen += sizeof(PATHSEP);
+			NameBufflen += ਆਕਾਰ(PATHSEP);
 		    }
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 		    STRCPY(NameBuff + NameBufflen, "doc/*.??[tx]");
-#else
+#ਨਹੀਂਤਾਂ
 		    STRCPY(NameBuff + NameBufflen, "doc/*.txt");
-#endif
-		    if (gen_expand_wildcards(1, &NameBuff, &fcount,
+#ਜੇ_ਅੰਤ
+		    ਜੇ (gen_expand_wildcards(1, &NameBuff, &fcount,
 					 &fnames, EW_FILE|EW_SILENT) == OK
 			    && fcount > 0)
 		    {
-#ifdef FEAT_MULTI_LANG
-			int	i1, i2;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+			ਪੂਰਨ	i1, i2;
 			char_u	*f1, *f2;
 			char_u	*t1, *t2;
 			char_u	*e1, *e2;
 
 			// If foo.abx is found use it instead of foo.txt in
 			// the same directory.
-			for (i1 = 0; i1 < fcount; ++i1)
+			ਲਈ (i1 = 0; i1 < fcount; ++i1)
 			{
 			    f1 = fnames[i1];
 			    t1 = gettail(f1);
 			    e1 = vim_strrchr(t1, '.');
-			    if (e1 == NULL)
-				continue;
-			    if (fnamecmp(e1, ".txt") != 0
+			    ਜੇ (e1 == ਨਿਰਾ)
+				ਜਾਰੀ;
+			    ਜੇ (fnamecmp(e1, ".txt") != 0
 					       && fnamecmp(e1, fname + 4) != 0)
 			    {
 				// Not .txt and not .abx, remove it.
 				VIM_CLEAR(fnames[i1]);
-				continue;
+				ਜਾਰੀ;
 			    }
 
-			    for (i2 = i1 + 1; i2 < fcount; ++i2)
+			    ਲਈ (i2 = i1 + 1; i2 < fcount; ++i2)
 			    {
 				f2 = fnames[i2];
-				if (f2 == NULL)
-				    continue;
+				ਜੇ (f2 == ਨਿਰਾ)
+				    ਜਾਰੀ;
 				t2 = gettail(f2);
 				e2 = vim_strrchr(t2, '.');
-				if (e2 == NULL)
-				    continue;
-				if (e1 - f1 != e2 - f2
+				ਜੇ (e2 == ਨਿਰਾ)
+				    ਜਾਰੀ;
+				ਜੇ (e1 - f1 != e2 - f2
 					    || fnamencmp(f1, f2, e1 - f1) != 0)
-				    continue;
-				if (fnamecmp(e1, ".txt") == 0
+				    ਜਾਰੀ;
+				ਜੇ (fnamecmp(e1, ".txt") == 0
 					       && fnamecmp(e2, fname + 4) == 0)
 				    // use .abx instead of .txt
 				    VIM_CLEAR(fnames[i1]);
 			    }
 			}
-#endif
-			for (fi = 0; fi < fcount; ++fi)
+#ਜੇ_ਅੰਤ
+			ਲਈ (fi = 0; fi < fcount; ++fi)
 			{
-			    if (fnames[fi] == NULL)
-				continue;
-			    fd = mch_fopen((char *)fnames[fi], "r");
-			    if (fd != NULL)
+			    ਜੇ (fnames[fi] == ਨਿਰਾ)
+				ਜਾਰੀ;
+			    fd = mch_fopen((ਅੱਖਰ *)fnames[fi], "r");
+			    ਜੇ (fd != ਨਿਰਾ)
 			    {
 				vim_fgets(IObuff, IOSIZE, fd);
-				if (IObuff[0] == '*'
+				ਜੇ (IObuff[0] == '*'
 					&& (s = vim_strchr(IObuff + 1, '*'))
-								  != NULL)
+								  != ਨਿਰਾ)
 				{
-				    int	this_utf = MAYBE;
+				    ਪੂਰਨ	this_utf = MAYBE;
 
 				    // Change tag definition to a
 				    // reference and remove <CR>/<NL>.
 				    IObuff[0] = '|';
 				    *s = '|';
-				    while (*s != NUL)
+				    ਜਦੋਂ (*s != NUL)
 				    {
-					if (*s == '\r' || *s == '\n')
+					ਜੇ (*s == '\r' || *s == '\n')
 					    *s = NUL;
 					// The text is utf-8 when a byte
 					// above 127 is found and no
 					// illegal byte sequence is found.
-					if (*s >= 0x80 && this_utf != FALSE)
+					ਜੇ (*s >= 0x80 && this_utf != FALSE)
 					{
-					    int	l;
+					    ਪੂਰਨ	l;
 
 					    this_utf = TRUE;
 					    l = utf_ptr2len(s);
-					    if (l == 1)
+					    ਜੇ (l == 1)
 						this_utf = FALSE;
 					    s += l - 1;
 					}
@@ -890,25 +890,25 @@ fix_help_buffer(void)
 				    // conversion to the current
 				    // 'encoding' may be required.
 				    vc.vc_type = CONV_NONE;
-				    convert_setup(&vc, (char_u *)(
+				    convert_ਤਿਆਰੀ(&vc, (char_u *)(
 						this_utf == TRUE ? "utf-8"
 						      : "latin1"), p_enc);
-				    if (vc.vc_type == CONV_NONE)
+				    ਜੇ (vc.vc_type == CONV_NONE)
 					// No conversion needed.
 					cp = IObuff;
-				    else
+				    ਨਹੀਂਤਾਂ
 				    {
 					// Do the conversion.  If it fails
 					// use the unconverted text.
 					cp = string_convert(&vc, IObuff,
-								    NULL);
-					if (cp == NULL)
+								    ਨਿਰਾ);
+					ਜੇ (cp == ਨਿਰਾ)
 					    cp = IObuff;
 				    }
-				    convert_setup(&vc, NULL, NULL);
+				    convert_ਤਿਆਰੀ(&vc, ਨਿਰਾ, ਨਿਰਾ);
 
 				    ml_append(lnum, cp, (colnr_T)0, FALSE);
-				    if (cp != IObuff)
+				    ਜੇ (cp != IObuff)
 					vim_free(cp);
 				    ++lnum;
 				}
@@ -918,10 +918,10 @@ fix_help_buffer(void)
 			FreeWild(fcount, fnames);
 		    }
 		}
-		if (mustfree)
+		ਜੇ (mustfree)
 		    vim_free(rt);
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 }
@@ -929,8 +929,8 @@ fix_help_buffer(void)
 /*
  * ":exusage"
  */
-    void
-ex_exusage(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_exusage(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
     do_cmdline_cmd((char_u *)"help ex-cmd-index");
 }
@@ -938,8 +938,8 @@ ex_exusage(exarg_T *eap UNUSED)
 /*
  * ":viusage"
  */
-    void
-ex_viusage(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_viusage(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
     do_cmdline_cmd((char_u *)"help normal-index");
 }
@@ -947,174 +947,174 @@ ex_viusage(exarg_T *eap UNUSED)
 /*
  * Generate tags in one help directory.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 helptags_one(
     char_u	*dir,		// doc directory
     char_u	*ext,		// suffix, ".txt", ".itx", ".frx", etc.
     char_u	*tagfname,	// "tags" for English, "tags-fr" for French.
-    int		add_help_tags,	// add "help-tags" tag
-    int		ignore_writeerr)    // ignore write error
+    ਪੂਰਨ		ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ,	// add "help-tags" tag
+    ਪੂਰਨ		ignore_writeerr)    // ignore write error
 {
-    FILE	*fd_tags;
+    FILE	*fd_ਟੈਗ_ਸੂਚੀ;
     FILE	*fd;
     garray_T	ga;
-    int		res;
-    int		filecount;
+    ਪੂਰਨ		res;
+    ਪੂਰਨ		filecount;
     char_u	**files;
     char_u	*p1, *p2;
-    int		fi;
+    ਪੂਰਨ		fi;
     char_u	*s;
-    int		i;
+    ਪੂਰਨ		i;
     char_u	*fname;
-    int		dirlen;
-    int		utf8 = MAYBE;
-    int		this_utf8;
-    int		firstline;
-    int		in_example;
-    int		mix = FALSE;	// detected mixed encodings
+    ਪੂਰਨ		dirlen;
+    ਪੂਰਨ		utf8 = MAYBE;
+    ਪੂਰਨ		this_utf8;
+    ਪੂਰਨ		firstline;
+    ਪੂਰਨ		ਵਿੱਚ_example;
+    ਪੂਰਨ		mix = FALSE;	// detected mixed encodings
 
     // Find all *.txt files.
-    dirlen = (int)STRLEN(dir);
+    dirlen = (ਪੂਰਨ)STRLEN(dir);
     STRCPY(NameBuff, dir);
     STRCAT(NameBuff, "/**/*");
     STRCAT(NameBuff, ext);
     res = gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 							    EW_FILE|EW_SILENT);
-    if (res == FAIL || filecount == 0)
+    ਜੇ (res == FAIL || filecount == 0)
     {
-	if (!got_int)
-	    semsg(_(e_no_match_str_1), NameBuff);
-	if (res != FAIL)
+	ਜੇ (!got_int)
+	    semsg(_(e_no_ਮੇਲ_str_1), NameBuff);
+	ਜੇ (res != FAIL)
 	    FreeWild(filecount, files);
-	return;
+	ਵਾਪਸ;
     }
 
     // Open the tags file for writing.
     // Do this before scanning through all the files.
     STRCPY(NameBuff, dir);
-    add_pathsep(NameBuff);
+    ਜੋੜੋ_pathsep(NameBuff);
     STRCAT(NameBuff, tagfname);
-    fd_tags = mch_fopen((char *)NameBuff, "w");
-    if (fd_tags == NULL)
+    fd_ਟੈਗ_ਸੂਚੀ = mch_fopen((ਅੱਖਰ *)NameBuff, "w");
+    ਜੇ (fd_ਟੈਗ_ਸੂਚੀ == ਨਿਰਾ)
     {
-	if (!ignore_writeerr)
+	ਜੇ (!ignore_writeerr)
 	    semsg(_(e_cannot_open_str_for_writing_1), NameBuff);
 	FreeWild(filecount, files);
-	return;
+	ਵਾਪਸ;
     }
 
     // If using the "++t" argument or generating tags for "$VIMRUNTIME/doc"
     // add the "help-tags" tag.
-    ga_init2(&ga, sizeof(char_u *), 100);
-    if (add_help_tags || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
+    ga_init2(&ga, ਆਕਾਰ(char_u *), 100);
+    ਜੇ (ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
 						dir, FALSE, TRUE) == FPC_SAME)
     {
-	if (ga_grow(&ga, 1) == FAIL)
+	ਜੇ (ga_grow(&ga, 1) == FAIL)
 	    got_int = TRUE;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    s = alloc(18 + (unsigned)STRLEN(tagfname));
-	    if (s == NULL)
+	    s = alloc(18 + (ਬਿਨਾਨਿਸ਼ਾਨੀ)STRLEN(tagfname));
+	    ਜੇ (s == ਨਿਰਾ)
 		got_int = TRUE;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		sprintf((char *)s, "help-tags\t%s\t1\n", tagfname);
-		((char_u **)ga.ga_data)[ga.ga_len] = s;
+		sprintf((ਅੱਖਰ *)s, "help-tags\t%s\t1\n", tagfname);
+		((char_u **)ga.ga_ਅੰਕੜੇ)[ga.ga_len] = s;
 		++ga.ga_len;
 	    }
 	}
     }
 
     // Go over all the files and extract the tags.
-    for (fi = 0; fi < filecount && !got_int; ++fi)
+    ਲਈ (fi = 0; fi < filecount && !got_int; ++fi)
     {
-	fd = mch_fopen((char *)files[fi], "r");
-	if (fd == NULL)
+	fd = mch_fopen((ਅੱਖਰ *)files[fi], "r");
+	ਜੇ (fd == ਨਿਰਾ)
 	{
-	    semsg(_(e_unable_to_open_str_for_reading), files[fi]);
-	    continue;
+	    semsg(_(e_unable_ਮੰਜ਼ਿਲ_open_str_for_reading), files[fi]);
+	    ਜਾਰੀ;
 	}
 	fname = files[fi] + dirlen + 1;
 
-	in_example = FALSE;
+	ਵਿੱਚ_example = FALSE;
 	firstline = TRUE;
-	while (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
+	ਜਦੋਂ (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
 	{
-	    if (firstline)
+	    ਜੇ (firstline)
 	    {
 		// Detect utf-8 file by a non-ASCII char in the first line.
 		this_utf8 = MAYBE;
-		for (s = IObuff; *s != NUL; ++s)
-		    if (*s >= 0x80)
+		ਲਈ (s = IObuff; *s != NUL; ++s)
+		    ਜੇ (*s >= 0x80)
 		    {
-			int l;
+			ਪੂਰਨ l;
 
 			this_utf8 = TRUE;
 			l = utf_ptr2len(s);
-			if (l == 1)
+			ਜੇ (l == 1)
 			{
 			    // Illegal UTF-8 byte sequence.
 			    this_utf8 = FALSE;
-			    break;
+			    ਰੋਕੋ;
 			}
 			s += l - 1;
 		    }
-		if (this_utf8 == MAYBE)	    // only ASCII characters found
+		ਜੇ (this_utf8 == MAYBE)	    // only ASCII characters found
 		    this_utf8 = FALSE;
-		if (utf8 == MAYBE)	    // first file
+		ਜੇ (utf8 == MAYBE)	    // first file
 		    utf8 = this_utf8;
-		else if (utf8 != this_utf8)
+		ਨਹੀਂਤਾਂ ਜੇ (utf8 != this_utf8)
 		{
-		    semsg(_(e_mix_of_help_file_encodings_within_language_str), files[fi]);
+		    semsg(_(e_mix_ਦਾ_help_file_encodings_within_language_str), files[fi]);
 		    mix = !got_int;
 		    got_int = TRUE;
 		}
 		firstline = FALSE;
 	    }
-	    if (in_example)
+	    ਜੇ (ਵਿੱਚ_example)
 	    {
 		// skip over example; a non-white in the first column ends it
-		if (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
-		    continue;
-		in_example = FALSE;
+		ਜੇ (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
+		    ਜਾਰੀ;
+		ਵਿੱਚ_example = FALSE;
 	    }
 	    p1 = vim_strchr(IObuff, '*');	// find first '*'
-	    while (p1 != NULL)
+	    ਜਦੋਂ (p1 != ਨਿਰਾ)
 	    {
 		// Use vim_strbyte() instead of vim_strchr() so that when
 		// 'encoding' is dbcs it still works, don't find '*' in the
 		// second byte.
 		p2 = vim_strbyte(p1 + 1, '*');	// find second '*'
-		if (p2 != NULL && p2 > p1 + 1)	// skip "*" and "**"
+		ਜੇ (p2 != ਨਿਰਾ && p2 > p1 + 1)	// skip "*" and "**"
 		{
-		    for (s = p1 + 1; s < p2; ++s)
-			if (*s == ' ' || *s == '\t' || *s == '|')
-			    break;
+		    ਲਈ (s = p1 + 1; s < p2; ++s)
+			ਜੇ (*s == ' ' || *s == '\t' || *s == '|')
+			    ਰੋਕੋ;
 
 		    // Only accept a *tag* when it consists of valid
 		    // characters, there is white space before it and is
 		    // followed by a white character or end-of-line.
-		    if (s == p2
+		    ਜੇ (s == p2
 			    && (p1 == IObuff || p1[-1] == ' ' || p1[-1] == '\t')
-			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != NULL
+			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != ਨਿਰਾ
 				|| s[1] == '\0'))
 		    {
 			*p2 = '\0';
 			++p1;
-			if (ga_grow(&ga, 1) == FAIL)
+			ਜੇ (ga_grow(&ga, 1) == FAIL)
 			{
 			    got_int = TRUE;
-			    break;
+			    ਰੋਕੋ;
 			}
 			s = alloc(p2 - p1 + STRLEN(fname) + 2);
-			if (s == NULL)
+			ਜੇ (s == ਨਿਰਾ)
 			{
 			    got_int = TRUE;
-			    break;
+			    ਰੋਕੋ;
 			}
-			((char_u **)ga.ga_data)[ga.ga_len] = s;
+			((char_u **)ga.ga_ਅੰਕੜੇ)[ga.ga_len] = s;
 			++ga.ga_len;
-			sprintf((char *)s, "%s\t%s", p1, fname);
+			sprintf((ਅੱਖਰ *)s, "%s\t%s", p1, fname);
 
 			// find next '*'
 			p2 = vim_strchr(p2 + 1, '*');
@@ -1123,16 +1123,16 @@ helptags_one(
 		p1 = p2;
 	    }
 	    size_t off = STRLEN(IObuff);
-	    if (off >= 2 && IObuff[off - 1] == '\n')
+	    ਜੇ (off >= 2 && IObuff[off - 1] == '\n')
 	    {
 		off -= 2;
-		while (off > 0 && (ASCII_ISLOWER(IObuff[off])
+		ਜਦੋਂ (off > 0 && (ASCII_ISLOWER(IObuff[off])
 						  || VIM_ISDIGIT(IObuff[off])))
 		    off--;
-		if (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
-		    in_example = TRUE;
+		ਜੇ (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
+		    ਵਿੱਚ_example = TRUE;
 	    }
-	    line_breakcheck();
+	    ਸਤਰ_breakcheck();
 	}
 
 	fclose(fd);
@@ -1140,111 +1140,111 @@ helptags_one(
 
     FreeWild(filecount, files);
 
-    if (!got_int)
+    ਜੇ (!got_int)
     {
 	// Sort the tags.
-	if (ga.ga_data != NULL)
-	    sort_strings((char_u **)ga.ga_data, ga.ga_len);
+	ਜੇ (ga.ga_ਅੰਕੜੇ != ਨਿਰਾ)
+	    ਛਾਂਟੋ_ਲੜੀਆਂ((char_u **)ga.ga_ਅੰਕੜੇ, ga.ga_len);
 
 	// Check for duplicates.
-	for (i = 1; i < ga.ga_len; ++i)
+	ਲਈ (i = 1; i < ga.ga_len; ++i)
 	{
-	    p1 = ((char_u **)ga.ga_data)[i - 1];
-	    p2 = ((char_u **)ga.ga_data)[i];
-	    while (*p1 == *p2)
+	    p1 = ((char_u **)ga.ga_ਅੰਕੜੇ)[i - 1];
+	    p2 = ((char_u **)ga.ga_ਅੰਕੜੇ)[i];
+	    ਜਦੋਂ (*p1 == *p2)
 	    {
-		if (*p2 == '\t')
+		ਜੇ (*p2 == '\t')
 		{
 		    *p2 = NUL;
-		    vim_snprintf((char *)NameBuff, MAXPATHL,
-			    _(e_duplicate_tag_str_in_file_str_str),
-				     ((char_u **)ga.ga_data)[i], dir, p2 + 1);
-		    emsg((char *)NameBuff);
+		    vim_snprintf((ਅੱਖਰ *)NameBuff, MAXPATHL,
+			    _(e_duplicate_ਟੈਗ_str_ਵਿੱਚ_file_str_str),
+				     ((char_u **)ga.ga_ਅੰਕੜੇ)[i], dir, p2 + 1);
+		    emsg((ਅੱਖਰ *)NameBuff);
 		    *p2 = '\t';
-		    break;
+		    ਰੋਕੋ;
 		}
 		++p1;
 		++p2;
 	    }
 	}
 
-	if (utf8 == TRUE)
-	    fprintf(fd_tags, "!_TAG_FILE_ENCODING\tutf-8\t//\n");
+	ਜੇ (utf8 == TRUE)
+	    fprintf(fd_ਟੈਗ_ਸੂਚੀ, "!_TAG_FILE_ENCODING\tutf-8\t//\n");
 
 	// Write the tags into the file.
-	for (i = 0; i < ga.ga_len; ++i)
+	ਲਈ (i = 0; i < ga.ga_len; ++i)
 	{
-	    s = ((char_u **)ga.ga_data)[i];
-	    if (STRNCMP(s, "help-tags\t", 10) == 0)
+	    s = ((char_u **)ga.ga_ਅੰਕੜੇ)[i];
+	    ਜੇ (STRNCMP(s, "help-tags\t", 10) == 0)
 		// help-tags entry was added in formatted form
-		fputs((char *)s, fd_tags);
-	    else
+		fputs((ਅੱਖਰ *)s, fd_ਟੈਗ_ਸੂਚੀ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		fprintf(fd_tags, "%s\t/*", s);
-		for (p1 = s; *p1 != '\t'; ++p1)
+		fprintf(fd_ਟੈਗ_ਸੂਚੀ, "%s\t/*", s);
+		ਲਈ (p1 = s; *p1 != '\t'; ++p1)
 		{
 		    // insert backslash before '\\' and '/'
-		    if (*p1 == '\\' || *p1 == '/')
-			putc('\\', fd_tags);
-		    putc(*p1, fd_tags);
+		    ਜੇ (*p1 == '\\' || *p1 == '/')
+			putc('\\', fd_ਟੈਗ_ਸੂਚੀ);
+		    putc(*p1, fd_ਟੈਗ_ਸੂਚੀ);
 		}
-		fprintf(fd_tags, "*\n");
+		fprintf(fd_ਟੈਗ_ਸੂਚੀ, "*\n");
 	    }
 	}
     }
-    if (mix)
+    ਜੇ (mix)
 	got_int = FALSE;    // continue with other languages
 
-    for (i = 0; i < ga.ga_len; ++i)
-	vim_free(((char_u **)ga.ga_data)[i]);
+    ਲਈ (i = 0; i < ga.ga_len; ++i)
+	vim_free(((char_u **)ga.ga_ਅੰਕੜੇ)[i]);
     ga_clear(&ga);
-    fclose(fd_tags);	    // there is no check for an error...
+    fclose(fd_ਟੈਗ_ਸੂਚੀ);	    // there is no check for an error...
 }
 
 /*
  * Generate tags in one help directory, taking care of translations.
  */
-    static void
-do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
+    ਸਥਿਰ ਖਾਲੀ
+do_helptags(char_u *dirname, ਪੂਰਨ ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ, ਪੂਰਨ ignore_writeerr)
 {
-#ifdef FEAT_MULTI_LANG
-    int		len;
-    int		i, j;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		i, j;
     garray_T	ga;
     char_u	lang[2];
     char_u	ext[5];
     char_u	fname[8];
-    int		filecount;
+    ਪੂਰਨ		filecount;
     char_u	**files;
 
     // Get a list of all files in the help directory and in subdirectories.
     STRCPY(NameBuff, dirname);
-    add_pathsep(NameBuff);
+    ਜੋੜੋ_pathsep(NameBuff);
     STRCAT(NameBuff, "**");
-    if (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
+    ਜੇ (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 						    EW_FILE|EW_SILENT) == FAIL
 	    || filecount == 0)
     {
-	semsg(_(e_no_match_str_1), NameBuff);
-	return;
+	semsg(_(e_no_ਮੇਲ_str_1), NameBuff);
+	ਵਾਪਸ;
     }
 
     // Go over all files in the directory to find out what languages are
     // present.
     ga_init2(&ga, 1, 10);
-    for (i = 0; i < filecount; ++i)
+    ਲਈ (i = 0; i < filecount; ++i)
     {
-	len = (int)STRLEN(files[i]);
-	if (len <= 4)
-	    continue;
+	len = (ਪੂਰਨ)STRLEN(files[i]);
+	ਜੇ (len <= 4)
+	    ਜਾਰੀ;
 
-	if (STRICMP(files[i] + len - 4, ".txt") == 0)
+	ਜੇ (STRICMP(files[i] + len - 4, ".txt") == 0)
 	{
 	    // ".txt" -> language "en"
 	    lang[0] = 'e';
 	    lang[1] = 'n';
 	}
-	else if (files[i][len - 4] == '.'
+	ਨਹੀਂਤਾਂ ਜੇ (files[i][len - 4] == '.'
 		&& ASCII_ISALPHA(files[i][len - 3])
 		&& ASCII_ISALPHA(files[i][len - 2])
 		&& TOLOWER_ASC(files[i][len - 1]) == 'x')
@@ -1253,93 +1253,93 @@ do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
 	    lang[0] = TOLOWER_ASC(files[i][len - 3]);
 	    lang[1] = TOLOWER_ASC(files[i][len - 2]);
 	}
-	else
-	    continue;
+	ਨਹੀਂਤਾਂ
+	    ਜਾਰੀ;
 
 	// Did we find this language already?
-	for (j = 0; j < ga.ga_len; j += 2)
-	    if (STRNCMP(lang, ((char_u *)ga.ga_data) + j, 2) == 0)
-		break;
-	if (j == ga.ga_len)
+	ਲਈ (j = 0; j < ga.ga_len; j += 2)
+	    ਜੇ (STRNCMP(lang, ((char_u *)ga.ga_ਅੰਕੜੇ) + j, 2) == 0)
+		ਰੋਕੋ;
+	ਜੇ (j == ga.ga_len)
 	{
 	    // New language, add it.
-	    if (ga_grow(&ga, 2) == FAIL)
-		break;
-	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[0];
-	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[1];
+	    ਜੇ (ga_grow(&ga, 2) == FAIL)
+		ਰੋਕੋ;
+	    ((char_u *)ga.ga_ਅੰਕੜੇ)[ga.ga_len++] = lang[0];
+	    ((char_u *)ga.ga_ਅੰਕੜੇ)[ga.ga_len++] = lang[1];
 	}
     }
 
     // Loop over the found languages to generate a tags file for each one.
-    for (j = 0; j < ga.ga_len; j += 2)
+    ਲਈ (j = 0; j < ga.ga_len; j += 2)
     {
 	STRCPY(fname, "tags-xx");
-	fname[5] = ((char_u *)ga.ga_data)[j];
-	fname[6] = ((char_u *)ga.ga_data)[j + 1];
-	if (fname[5] == 'e' && fname[6] == 'n')
+	fname[5] = ((char_u *)ga.ga_ਅੰਕੜੇ)[j];
+	fname[6] = ((char_u *)ga.ga_ਅੰਕੜੇ)[j + 1];
+	ਜੇ (fname[5] == 'e' && fname[6] == 'n')
 	{
 	    // English is an exception: use ".txt" and "tags".
 	    fname[4] = NUL;
 	    STRCPY(ext, ".txt");
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Language "ab" uses ".abx" and "tags-ab".
 	    STRCPY(ext, ".xxx");
 	    ext[1] = fname[5];
 	    ext[2] = fname[6];
 	}
-	helptags_one(dirname, ext, fname, add_help_tags, ignore_writeerr);
+	helptags_one(dirname, ext, fname, ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ, ignore_writeerr);
     }
 
     ga_clear(&ga);
     FreeWild(filecount, files);
 
-#else
+#ਨਹੀਂਤਾਂ
     // No language support, just use "*.txt" and "tags".
-    helptags_one(dirname, (char_u *)".txt", (char_u *)"tags", add_help_tags,
+    helptags_one(dirname, (char_u *)".txt", (char_u *)"tags", ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ,
 							    ignore_writeerr);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    static void
-helptags_cb(char_u *fname, void *cookie)
+    ਸਥਿਰ ਖਾਲੀ
+helptags_cb(char_u *fname, ਖਾਲੀ *cookie)
 {
-    do_helptags(fname, *(int *)cookie, TRUE);
+    do_helptags(fname, *(ਪੂਰਨ *)cookie, TRUE);
 }
 
 /*
  * ":helptags"
  */
-    void
+    ਖਾਲੀ
 ex_helptags(exarg_T *eap)
 {
     expand_T	xpc;
     char_u	*dirname;
-    int		add_help_tags = FALSE;
+    ਪੂਰਨ		ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ = FALSE;
 
     // Check for ":helptags ++t {dir}".
-    if (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
+    ਜੇ (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
     {
-	add_help_tags = TRUE;
+	ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ = TRUE;
 	eap->arg = skipwhite(eap->arg + 3);
     }
 
-    if (STRCMP(eap->arg, "ALL") == 0)
+    ਜੇ (STRCMP(eap->arg, "ALL") == 0)
     {
-	do_in_path(p_rtp, "", (char_u *)"doc", DIP_ALL + DIP_DIR,
-						 helptags_cb, &add_help_tags);
+	do_ਵਿੱਚ_ਰਸਤਾ(p_rtp, "", (char_u *)"doc", DIP_ALL + DIP_DIR,
+						 helptags_cb, &ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
-	dirname = ExpandOne(&xpc, eap->arg, NULL,
+	dirname = ExpandOne(&xpc, eap->arg, ਨਿਰਾ,
 			    WILD_LIST_NOTFOUND|WILD_SILENT, WILD_EXPAND_FREE);
-	if (dirname == NULL || !mch_isdir(dirname))
+	ਜੇ (dirname == ਨਿਰਾ || !mch_isdir(dirname))
 	    semsg(_(e_not_a_directory_str), eap->arg);
-	else
-	    do_helptags(dirname, add_help_tags, FALSE);
+	ਨਹੀਂਤਾਂ
+	    do_helptags(dirname, ਜੋੜੋ_help_ਟੈਗ_ਸੂਚੀ, FALSE);
 	vim_free(dirname);
     }
 }

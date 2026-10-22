@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+ਬਣਤਰ BMenu;
+ਬਣਤਰ BMenu_ਵਸਤੂ;
+ਬਣਤਰ BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+ਬਣਤਰ VimApp;
+ਬਣਤਰ VimFormView;
+ਬਣਤਰ Vim_ਪਾਠ_Area_View;
+ਬਣਤਰ Vim_ਖਿੜਕੀ;
+ਬਣਤਰ VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+ਬਾਹਰੀ ਪੂਰਨ vim_ਤਾਲਾ_screen();
+ਬਾਹਰੀ ਖਾਲੀ vim_unlock_screen();
 
-#ifndef __cplusplus
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ BMenu BMenu;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ BMenu_ਵਸਤੂ BMenu_ਵਸਤੂ;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ BPictureButton BPictureButton;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ Vim_ਖਿੜਕੀ Vim_ਖਿੜਕੀ;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ VimFormView VimFormView;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ Vim_ਪਾਠ_Area_View Vim_ਪਾਠ_Area_View;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ VimApp VimApp;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ VimScrollBar VimScrollBar;
 
-#endif
+#ਜੇ_ਅੰਤ

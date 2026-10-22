@@ -68,406 +68,406 @@
  * convenient and necessary.
  */
 
-extern "C" {
+ਬਾਹਰੀ "C" {
 
-#include <assert.h>
-#include <float.h>
-#include <syslog.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <assert.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <float.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <syslog.h>
 
-#include "vim.h"
-#include "version.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "version.h"
 
 }   // extern "C"
 
 // ---------------- start of header part ----------------
 
 //#include <Alert.h>
-#include <Application.h>
-#include <Beep.h>
-#include <Bitmap.h>
-#include <Box.h>
-#include <Button.h>
-#include <Clipboard.h>
-#include <Debug.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Application.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Beep.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Bitmap.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Box.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Button.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Clipboard.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Debug.h>
 //#include <Directory.h>
 //#include <Entry.h>
-#include <File.h>
-#include <FilePanel.h>
-#include <FindDirectory.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <File.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <FilePanel.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <FindDirectory.h>
 //#include <Font.h>
-#include <IconUtils.h>
-#include <Input.h>
-#include <ListView.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <IconUtils.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Input.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <ListView.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <MenuBar.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <MenuItem.h>
 //#include <MessageQueue.h>
 //#include <OS.h>
-#include <Path.h>
-#include <PictureButton.h>
-#include <PopUpMenu.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Path.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <PictureButton.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <PopUpMenu.h>
 //#include <Region.h>
-#include <Resources.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Resources.h>
 //#include <Roster.h>
-#include <Screen.h>
-#include <ScrollBar.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <StringView.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Screen.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <ScrollBar.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <ScrollView.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <String.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <StringView.h>
 //#include <SupportDefs.h>
-#include <TabView.h>
-#include <TextControl.h>
-#include <TextView.h>
-#include <TranslationUtils.h>
-#include <TranslatorFormats.h>
-#include <View.h>
-#include <Window.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <TabView.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <TextControl.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <TextView.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <TranslationUtils.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <TranslatorFormats.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <View.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Window.h>
 
-class VimApp;
-class VimFormView;
-class VimTextAreaView;
-class VimWindow;
-class VimToolbar;
-class VimTabLine;
+ਵਰਗ VimApp;
+ਵਰਗ VimFormView;
+ਵਰਗ Vim_ਪਾਠ_Area_View;
+ਵਰਗ Vim_ਖਿੜਕੀ;
+ਵਰਗ VimToolbar;
+ਵਰਗ Vim_Tab_ਸਤਰ;
 
-extern key_map *keyMap;
-extern char *keyMapChars;
+ਬਾਹਰੀ ਕੁੰਜੀ_map *ਕੁੰਜੀ_Map;
+ਬਾਹਰੀ ਅੱਖਰ *ਕੁੰਜੀ_Map_Chars;
 
-extern int main(int argc, char **argv);
+ਬਾਹਰੀ ਪੂਰਨ ਮੁੱਖ(ਪੂਰਨ argc, ਅੱਖਰ **argv);
 
-#ifndef B_MAX_PORT_COUNT
-#define B_MAX_PORT_COUNT    255
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ B_MAX_ਪੋਰਟ_ਗਿਣਤੀ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ B_MAX_ਪੋਰਟ_ਗਿਣਤੀ    255
+#ਜੇ_ਅੰਤ
 
 // VimApp seems comparable to the X "vimShell"
-class VimApp: public BApplication
+ਵਰਗ VimApp: ਜਨਤਕ BApplication
 {
-    typedef BApplication Inherited;
-    public:
-    VimApp(const char *appsig);
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BApplication Inherited;
+    ਜਨਤਕ:
+    VimApp(ਅਚਲ ਅੱਖਰ *appsig);
     ~VimApp();
 
     // callbacks:
-#if 0
-    virtual void DispatchMessage(BMessage *m, BHandler *h)
+#ਜੇ 0
+    ਆਭਾਸੀ ਖਾਲੀ Dispatch_ਸੁਨੇਹਾ(BMessage *m, BHandler *h)
     {
-	m->PrintToStream();
-	Inherited::DispatchMessage(m, h);
+	m->Print_ਮੰਜ਼ਿਲ_ਧਾਰਾ();
+	Inherited::Dispatch_ਸੁਨੇਹਾ(m, h);
     }
-#endif
-    virtual void ReadyToRun();
-    virtual void ArgvReceived(int32 argc, char **argv);
-    virtual void RefsReceived(BMessage *m);
-    virtual bool QuitRequested();
-    virtual void MessageReceived(BMessage *m);
+#ਜੇ_ਅੰਤ
+    ਆਭਾਸੀ ਖਾਲੀ Ready_ਮੰਜ਼ਿਲ_ਲੜੀਵਾਰ();
+    ਆਭਾਸੀ ਖਾਲੀ ArgvReceived(int32 argc, ਅੱਖਰ **argv);
+    ਆਭਾਸੀ ਖਾਲੀ RefsReceived(BMessage *m);
+    ਆਭਾਸੀ ਤਾਰਕਿਕ QuitRequested();
+    ਆਭਾਸੀ ਖਾਲੀ ਸੁਨੇਹਾ_Received(BMessage *m);
 
-    static void SendRefs(BMessage *m, bool changedir);
+    ਸਥਿਰ ਖਾਲੀ SendRefs(BMessage *m, ਤਾਰਕਿਕ changedir);
 
     sem_id	fFilePanelSem;
     BFilePanel*	fFilePanel;
-    BPath	fBrowsedPath;
-    private:
+    BPath	f_Browsed_ਰਸਤਾ;
+    ਨਿਜੀ:
 };
 
-class VimWindow: public BWindow
+ਵਰਗ Vim_ਖਿੜਕੀ: ਜਨਤਕ BWindow
 {
-    typedef BWindow Inherited;
-    public:
-    VimWindow();
-    ~VimWindow();
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BWindow Inherited;
+    ਜਨਤਕ:
+    Vim_ਖਿੜਕੀ();
+    ~Vim_ਖਿੜਕੀ();
 
-    virtual void DispatchMessage(BMessage *m, BHandler *h);
-    virtual void WindowActivated(bool active);
-    virtual bool QuitRequested();
+    ਆਭਾਸੀ ਖਾਲੀ Dispatch_ਸੁਨੇਹਾ(BMessage *m, BHandler *h);
+    ਆਭਾਸੀ ਖਾਲੀ ਖਿੜਕੀ_Activated(ਤਾਰਕਿਕ ਸਰਗਰਮ);
+    ਆਭਾਸੀ ਤਾਰਕਿਕ QuitRequested();
 
     VimFormView	    *formView;
 
-    private:
-    void init();
+    ਨਿਜੀ:
+    ਖਾਲੀ init();
 
-    bool is_fullscreen = false;
-    BRect saved_frame;
-    window_look saved_look;
+    ਤਾਰਕਿਕ is_fullscreen = ਝੂਠ;
+    BRect saved_ਚੌਖਟਾ;
+    ਖਿੜਕੀ_look saved_look;
 };
 
-class VimFormView: public BView
+ਵਰਗ VimFormView: ਜਨਤਕ BView
 {
-    typedef BView Inherited;
-    public:
-    VimFormView(BRect frame);
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BView Inherited;
+    ਜਨਤਕ:
+    VimFormView(BRect ਚੌਖਟਾ);
     ~VimFormView();
 
     // callbacks:
-    virtual void AllAttached();
-    virtual void FrameResized(float new_width, float new_height);
+    ਆਭਾਸੀ ਖਾਲੀ AllAttached();
+    ਆਭਾਸੀ ਖਾਲੀ ਚੌਖਟਾ_Resized(ਦਸ਼ਮਲਵ new_ਚੌੜਾਈ, ਦਸ਼ਮਲਵ new_ਉਚਾਈ);
 
-#define MENUBAR_MARGIN	1
-    float MenuHeight() const
-    { return menuBar ? menuBar->Frame().Height() + MENUBAR_MARGIN: 0; }
-    BMenuBar *MenuBar() const
-    { return menuBar; }
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MENUBAR_MARGIN	1
+    ਦਸ਼ਮਲਵ Menu_ਉਚਾਈ() ਅਚਲ
+    { ਵਾਪਸ menuBar ? menuBar->ਚੌਖਟਾ_2().ਉਚਾਈ_2() + MENUBAR_MARGIN: 0; }
+    BMenuBar *MenuBar() ਅਚਲ
+    { ਵਾਪਸ menuBar; }
 
-    private:
-    void init(BRect);
+    ਨਿਜੀ:
+    ਖਾਲੀ init(BRect);
 
     BMenuBar	    *menuBar;
-    VimTextAreaView *textArea;
+    Vim_ਪਾਠ_Area_View *ਪਾਠ_Area;
 
-#ifdef FEAT_TOOLBAR
-    public:
-    float ToolbarHeight() const;
-    VimToolbar *ToolBar() const
-    { return toolBar; }
-    private:
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਜਨਤਕ:
+    ਦਸ਼ਮਲਵ Toolbar_ਉਚਾਈ() ਅਚਲ;
+    VimToolbar *ToolBar() ਅਚਲ
+    { ਵਾਪਸ toolBar; }
+    ਨਿਜੀ:
     VimToolbar	    *toolBar;
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_TABLINE
-    public:
-    VimTabLine *TabLine() const	{ return tabLine; }
-    bool IsShowingTabLine() const { return showingTabLine; }
-    void SetShowingTabLine(bool showing) { showingTabLine = showing;	}
-    float TablineHeight() const;
-    private:
-    VimTabLine	*tabLine;
-    int	showingTabLine;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+    ਜਨਤਕ:
+    Vim_Tab_ਸਤਰ *Tab_ਸਤਰ() ਅਚਲ	{ ਵਾਪਸ tab_ਸਤਰ; }
+    ਤਾਰਕਿਕ Is_Showing_Tab_ਸਤਰ() ਅਚਲ { ਵਾਪਸ showing_Tab_ਸਤਰ; }
+    ਖਾਲੀ ਸੈੱਟ_Showing_Tab_ਸਤਰ(ਤਾਰਕਿਕ showing) { showing_Tab_ਸਤਰ = showing;	}
+    ਦਸ਼ਮਲਵ Tabline_ਉਚਾਈ() ਅਚਲ;
+    ਨਿਜੀ:
+    Vim_Tab_ਸਤਰ	*tab_ਸਤਰ;
+    ਪੂਰਨ	showing_Tab_ਸਤਰ;
+#ਜੇ_ਅੰਤ
 };
 
-class VimTextAreaView: public BView
+ਵਰਗ Vim_ਪਾਠ_Area_View: ਜਨਤਕ BView
 {
-    typedef BView Inherited;
-    public:
-    VimTextAreaView(BRect frame);
-    ~VimTextAreaView();
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BView Inherited;
+    ਜਨਤਕ:
+    Vim_ਪਾਠ_Area_View(BRect ਚੌਖਟਾ);
+    ~Vim_ਪਾਠ_Area_View();
 
     // callbacks:
-    virtual void Draw(BRect updateRect);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
-    virtual void MouseDown(BPoint point);
-    virtual void MouseUp(BPoint point);
-    virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-    virtual void MessageReceived(BMessage *m);
+    ਆਭਾਸੀ ਖਾਲੀ Draw(BRect updateRect);
+    ਆਭਾਸੀ ਖਾਲੀ ਕੁੰਜੀ_ਥੱਲੇ(ਅਚਲ ਅੱਖਰ *ਬਾਈਟਾਂ, int32 ਅੰਕ_ਬਾਈਟਾਂ_2);
+    ਆਭਾਸੀ ਖਾਲੀ Mouse_ਥੱਲੇ(BPoint ਬਿੰਦੂ);
+    ਆਭਾਸੀ ਖਾਲੀ Mouse_ਉੱਪਰ(BPoint ਬਿੰਦੂ);
+    ਆਭਾਸੀ ਖਾਲੀ MouseMoved(BPoint ਬਿੰਦੂ, uint32 transit, ਅਚਲ BMessage *ਸੁਨੇਹਾ_2);
+    ਆਭਾਸੀ ਖਾਲੀ ਸੁਨੇਹਾ_Received(BMessage *m);
 
     // own functions:
-    int mchInitFont(char_u *name);
-    void mchDrawString(int row, int col, char_u *s, int len, int flags);
-    void mchClearBlock(int row1, int col1, int row2, int col2);
-    void mchClearAll();
-    void mchDeleteLines(int row, int num_lines);
-    void mchInsertLines(int row, int num_lines);
+    ਪੂਰਨ mchInitFont(char_u *name);
+    ਖਾਲੀ mchDrawString(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ, char_u *s, ਪੂਰਨ len, ਪੂਰਨ flags);
+    ਖਾਲੀ mch_Clear_ਖੰਡ(ਪੂਰਨ row1, ਪੂਰਨ col1, ਪੂਰਨ row2, ਪੂਰਨ col2);
+    ਖਾਲੀ mchClearAll();
+    ਖਾਲੀ mch_Delete_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ);
+    ਖਾਲੀ mch_ਪਾਓ_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ);
 
-    static void guiSendMouseEvent(int button, int x, int y, int repeated_click, int_u modifiers);
-    static void guiMouseMoved(int x, int y);
-    static void guiBlankMouse(bool should_hide);
-    static int_u mouseModifiersToVim(int32 beModifiers);
+    ਸਥਿਰ ਖਾਲੀ guiSendMouseEvent(ਪੂਰਨ button, ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ repeated_click, int_u modifiers);
+    ਸਥਿਰ ਖਾਲੀ guiMouseMoved(ਪੂਰਨ x, ਪੂਰਨ y);
+    ਸਥਿਰ ਖਾਲੀ guiBlankMouse(ਤਾਰਕਿਕ should_hide);
+    ਸਥਿਰ int_u mouse_Modifiers_ਮੰਜ਼ਿਲ_Vim(int32 beModifiers);
 
-    int32 mouseDragEventCount;
+    int32 mouse_Drag_Event_ਗਿਣਤੀ;
 
-#ifdef FEAT_MBYTE_IME
-    void DrawIMString(void);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+    ਖਾਲੀ DrawIMString(ਖਾਲੀ);
+#ਜੇ_ਅੰਤ
 
-    private:
-    void init(BRect);
+    ਨਿਜੀ:
+    ਖਾਲੀ init(BRect);
 
     int_u	vimMouseButton;
     int_u	vimMouseModifiers;
 
-#ifdef FEAT_MBYTE_IME
-    struct {
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+    ਬਣਤਰ {
 	BMessenger* messenger;
-	BMessage* message;
+	BMessage* ਸੁਨੇਹਾ_2;
 	BPoint location;
-	int row;
-	int col;
-	int count;
+	ਪੂਰਨ ਪੰਕਤੀ;
+	ਪੂਰਨ ਖਾਨਾ;
+	ਪੂਰਨ ਗਿਣਤੀ_2;
     } IMData;
-#endif
+#ਜੇ_ਅੰਤ
 };
 
-class VimScrollBar: public BScrollBar
+ਵਰਗ VimScrollBar: ਜਨਤਕ BScrollBar
 {
-    typedef BScrollBar Inherited;
-    public:
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BScrollBar Inherited;
+    ਜਨਤਕ:
     VimScrollBar(scrollbar_T *gsb, orientation posture);
     ~VimScrollBar();
 
-    virtual void ValueChanged(float newValue);
-    virtual void MouseUp(BPoint where);
-    void SetValue(float newval);
+    ਆਭਾਸੀ ਖਾਲੀ ਮੁੱਲ_ਬਦਲਿਆ_2(ਦਸ਼ਮਲਵ new_ਮੁੱਲ);
+    ਆਭਾਸੀ ਖਾਲੀ Mouse_ਉੱਪਰ(BPoint where);
+    ਖਾਲੀ ਸੈੱਟ_ਮੁੱਲ(ਦਸ਼ਮਲਵ newval);
     scrollbar_T *getGsb()
-    { return gsb; }
+    { ਵਾਪਸ gsb; }
 
-    int32	scrollEventCount;
+    int32	scroll_Event_ਗਿਣਤੀ;
 
-    private:
+    ਨਿਜੀ:
     scrollbar_T *gsb;
-    float   ignoreValue;
+    ਦਸ਼ਮਲਵ   ignore_ਮੁੱਲ;
 };
 
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 
-class VimToolbar : public BBox
+ਵਰਗ VimToolbar : ਜਨਤਕ BBox
 {
-    static BBitmap *normalButtonsBitmap;
-    static BBitmap *grayedButtonsBitmap;
+    ਸਥਿਰ BBitmap *ਸਾਧਾਰਨ_Buttons_Bitmap;
+    ਸਥਿਰ BBitmap *grayedButtonsBitmap;
 
-    BBitmap *LoadVimBitmap(const char* fileName);
-    bool GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed);
-    bool ModifyBitmapToGrayed(BBitmap *bitmap);
+    BBitmap *ਲੱਦੋ_Vim_Bitmap(ਅਚਲ ਅੱਖਰ* fileName);
+    ਤਾਰਕਿਕ GetPictureFromBitmap(BPicture *picture_ਮੰਜ਼ਿਲ, int32 ਸੂਚਕਾਂਕ, BBitmap *bitmapFrom, ਤਾਰਕਿਕ pressed);
+    ਤਾਰਕਿਕ Modify_Bitmap_ਮੰਜ਼ਿਲ_Grayed(BBitmap *bitmap);
 
     BList fButtonsList;
-    void InvalidateLayout();
+    ਖਾਲੀ InvalidateLayout();
 
-    public:
-    VimToolbar(BRect frame, const char * name);
+    ਜਨਤਕ:
+    VimToolbar(BRect ਚੌਖਟਾ, ਅਚਲ ਅੱਖਰ * name);
     ~VimToolbar();
 
-    bool PrepareButtonBitmaps();
+    ਤਾਰਕਿਕ PrepareButtonBitmaps();
 
-    bool AddButton(int32 index, vimmenu_T *menu);
-    bool RemoveButton(vimmenu_T *menu);
-    bool GrayButton(vimmenu_T *menu, int grey);
+    ਤਾਰਕਿਕ ਜੋੜੋ_Button(int32 ਸੂਚਕਾਂਕ, vimmenu_T *menu);
+    ਤਾਰਕਿਕ RemoveButton(vimmenu_T *menu);
+    ਤਾਰਕਿਕ ਸਲੇਟੀ_Button(vimmenu_T *menu, ਪੂਰਨ grey);
 
-    float ToolbarHeight() const;
-    virtual void AttachedToWindow();
+    ਦਸ਼ਮਲਵ Toolbar_ਉਚਾਈ() ਅਚਲ;
+    ਆਭਾਸੀ ਖਾਲੀ Attached_ਮੰਜ਼ਿਲ_ਖਿੜਕੀ();
 };
 
-BBitmap *VimToolbar::normalButtonsBitmap  = NULL;
-BBitmap *VimToolbar::grayedButtonsBitmap  = NULL;
+BBitmap *VimToolbar::ਸਾਧਾਰਨ_Buttons_Bitmap  = ਨਿਰਾ;
+BBitmap *VimToolbar::grayedButtonsBitmap  = ਨਿਰਾ;
 
-const float ToolbarMargin = 3.;
-const float ButtonMargin  = 3.;
+ਅਚਲ ਦਸ਼ਮਲਵ ToolbarMargin = 3.;
+ਅਚਲ ਦਸ਼ਮਲਵ ButtonMargin  = 3.;
 
-#endif //FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ //FEAT_TOOLBAR
 
-#ifdef FEAT_GUI_TABLINE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
 
-class VimTabLine : public BTabView
+ਵਰਗ Vim_Tab_ਸਤਰ : ਜਨਤਕ BTabView
 {
-    public:
-	class VimTab : public BTab {
-	    public:
-		VimTab() : BTab(new BView(BRect(), "-Empty-", 0, 0)) {}
+    ਜਨਤਕ:
+	ਵਰਗ VimTab : ਜਨਤਕ BTab {
+	    ਜਨਤਕ:
+		VimTab() : BTab(ਨਵਾਂ BView(BRect(), "-Empty-", 0, 0)) {}
 
-	    virtual void Select(BView* owner);
+	    ਆਭਾਸੀ ਖਾਲੀ Select(BView* owner);
 	};
 
-	VimTabLine(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
-	       B_FOLLOW_LEFT | B_FOLLOW_TOP | B_FOLLOW_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS) {}
+	Vim_Tab_ਸਤਰ(BRect r) : BTabView(r, "vimTabLine", B_ਚੌੜਾਈ_FROM_LABEL,
+	       B_FOLLOW_ਖੱਬਾ | B_FOLLOW_ਸਿਖਰ | B_FOLLOW_ਸੱਜਾ, B_WILL_DRAW | B_ਚੌਖਟਾ_EVENTS) {}
 
-    float TablineHeight() const;
-    virtual void MouseDown(BPoint point);
+    ਦਸ਼ਮਲਵ Tabline_ਉਚਾਈ() ਅਚਲ;
+    ਆਭਾਸੀ ਖਾਲੀ Mouse_ਥੱਲੇ(BPoint ਬਿੰਦੂ);
 };
 
-#endif //FEAT_GUI_TABLINE
+#ਜੇ_ਅੰਤ //FEAT_GUI_TABLINE
 
 
 // For caching the fonts that are used;
 // Vim seems rather sloppy in this regard.
-class VimFont: public BFont
+ਵਰਗ VimFont: ਜਨਤਕ BFont
 {
-    typedef BFont Inherited;
-    public:
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BFont Inherited;
+    ਜਨਤਕ:
     VimFont();
-    VimFont(const VimFont *rhs);
-    VimFont(const BFont *rhs);
-    VimFont(const VimFont &rhs);
+    VimFont(ਅਚਲ VimFont *rhs);
+    VimFont(ਅਚਲ BFont *rhs);
+    VimFont(ਅਚਲ VimFont &rhs);
     ~VimFont();
 
-    VimFont *next;
-    int refcount;
+    VimFont *ਅਗਲਾ;
+    ਪੂਰਨ refcount;
     char_u *name;
 
-    private:
-    void init();
+    ਨਿਜੀ:
+    ਖਾਲੀ init();
 };
 
-#if defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_GUI_DIALOG)
 
-class VimDialog : public BWindow
+ਵਰਗ VimDialog : ਜਨਤਕ BWindow
 {
-    typedef BWindow Inherited;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BWindow Inherited;
 
-    BButton* _CreateButton(int32 which, const char* label);
+    BButton* _CreateButton(int32 which, ਅਚਲ ਅੱਖਰ* label);
 
-    public:
+    ਜਨਤਕ:
 
-    class View : public BView {
-	typedef BView Inherited;
+    ਵਰਗ View : ਜਨਤਕ BView {
+	ਕਿਸਮਪਰਿਭਾਸ਼ਾ BView Inherited;
 
-	public:
-	View(BRect frame);
+	ਜਨਤਕ:
+	View(BRect ਚੌਖਟਾ);
 	~View();
 
-	virtual void Draw(BRect updateRect);
-	void InitIcon(int32 type);
+	ਆਭਾਸੀ ਖਾਲੀ Draw(BRect updateRect);
+	ਖਾਲੀ InitIcon(int32 type);
 
-	private:
+	ਨਿਜੀ:
 	BBitmap*    fIconBitmap;
     };
 
-    VimDialog(int type, const char *title, const char *message,
-	    const char *buttons, int dfltbutton, const char *textfield,
-	    int ex_cmd);
+    VimDialog(ਪੂਰਨ type, ਅਚਲ ਅੱਖਰ *title, ਅਚਲ ਅੱਖਰ *ਸੁਨੇਹਾ_2,
+	    ਅਚਲ ਅੱਖਰ *buttons, ਪੂਰਨ dfltbutton, ਅਚਲ ਅੱਖਰ *textfield,
+	    ਪੂਰਨ ex_cmd);
     ~VimDialog();
 
-    int Go();
+    ਪੂਰਨ Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    ਆਭਾਸੀ ਖਾਲੀ ਸੁਨੇਹਾ_Received(BMessage *ਸੁਨੇਹਾ);
 
-    private:
+    ਨਿਜੀ:
     sem_id	    fDialogSem;
-    int		    fDialogValue;
+    ਪੂਰਨ		    f_Dialog_ਮੁੱਲ;
     BList	    fButtonsList;
-    BTextView*	    fMessageView;
-    BTextControl*   fInputControl;
-    const char*	    fInputValue;
+    BTextView*	    f_ਸੁਨੇਹਾ_View;
+    BTextControl*   f_ਨਿਵੇਸ਼_Control;
+    ਅਚਲ ਅੱਖਰ*	    f_ਨਿਵੇਸ਼_ਮੁੱਲ;
 };
 
-class VimSelectFontDialog : public BWindow
+ਵਰਗ VimSelectFontDialog : ਜਨਤਕ BWindow
 {
-    typedef BWindow Inherited;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ BWindow Inherited;
 
-    void _CleanList(BListView* list);
-    void _UpdateFontStyles();
-    void _UpdateSizeInputPreview();
-    void _UpdateFontPreview();
-    bool _UpdateFromListItem(BListView* list, char* text, int textSize);
-    public:
+    ਖਾਲੀ _CleanList(BListView* list);
+    ਖਾਲੀ _UpdateFontStyles();
+    ਖਾਲੀ Update_ਮਾਪ_ਨਿਵੇਸ਼_Preview();
+    ਖਾਲੀ _UpdateFontPreview();
+    ਤਾਰਕਿਕ Update_From_List_ਵਸਤੂ(BListView* list, ਅੱਖਰ* ਪਾਠ, ਪੂਰਨ ਪਾਠ_ਮਾਪ);
+    ਜਨਤਕ:
 
-    VimSelectFontDialog(font_family* family, font_style* style, float* size);
+    VimSelectFontDialog(font_family* family, font_style* style, ਦਸ਼ਮਲਵ* ਮਾਪ);
     ~VimSelectFontDialog();
 
-    bool Go();
+    ਤਾਰਕਿਕ Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    ਆਭਾਸੀ ਖਾਲੀ ਸੁਨੇਹਾ_Received(BMessage *ਸੁਨੇਹਾ);
 
-    private:
-    status_t	    fStatus;
+    ਨਿਜੀ:
+    ਸਥਿਤੀ_t	    f_ਸਥਿਤੀ;
     sem_id	    fDialogSem;
-    bool	    fDialogValue;
+    ਤਾਰਕਿਕ	    f_Dialog_ਮੁੱਲ;
     font_family*    fFamily;
     font_style*	    fStyle;
-    float*	    fSize;
+    ਦਸ਼ਮਲਵ*	    f_ਮਾਪ;
     font_family	    fFontFamily;
     font_style	    fFontStyle;
-    float	    fFontSize;
+    ਦਸ਼ਮਲਵ	    f_Font_ਮਾਪ;
     BStringView*    fPreview;
     BListView*	    fFamiliesList;
     BListView*	    fStylesList;
     BListView*	    fSizesList;
-    BTextControl*   fSizesInput;
+    BTextControl*   f_Sizes_ਨਿਵੇਸ਼;
 };
 
-#endif // FEAT_GUI_DIALOG
+#ਜੇ_ਅੰਤ // FEAT_GUI_DIALOG
 
 // ---------------- end of GUI classes ----------------
 
-struct MainArgs {
-    int	     argc;
-    char    **argv;
+ਬਣਤਰ Main_ਦਲੀਲਾਂ {
+    ਪੂਰਨ	     argc;
+    ਅੱਖਰ    **argv;
 };
 
 // These messages are copied through the VDCMP.
@@ -475,123 +475,123 @@ struct MainArgs {
 // They must be of POD type (Plain Old Data)
 // as the C++ standard calls them.
 
-#define	KEY_MSG_BUFSIZ	7
-#if KEY_MSG_BUFSIZ < MAX_KEY_CODE_LEN
-#error Increase KEY_MSG_BUFSIZ!
-#endif
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ	7
+#ਜੇ ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ < MAX_ਕੁੰਜੀ_ਕੋਡ_LEN
+#ਗਲਤੀ Increase ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ!
+#ਜੇ_ਅੰਤ
 
-struct VimKeyMsg {
-    char_u  length;
-    char_u  chars[KEY_MSG_BUFSIZ];  // contains Vim encoding
-    bool    csi_escape;
+ਬਣਤਰ Vim_ਕੁੰਜੀ_ਸੁਨੇਹਾ {
+    char_u  ਲੰਮਾਈ;
+    char_u  chars[ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ];  // contains Vim encoding
+    ਤਾਰਕਿਕ    csi_escape;
 };
 
-struct VimResizeMsg {
-    int	    width;
-    int	    height;
+ਬਣਤਰ Vim_Resize_ਸੁਨੇਹਾ {
+    ਪੂਰਨ	    ਚੌੜਾਈ;
+    ਪੂਰਨ	    ਉਚਾਈ;
 };
 
-struct VimScrollBarMsg {
+ਬਣਤਰ Vim_Scroll_Bar_ਸੁਨੇਹਾ {
     VimScrollBar *sb;
-    long    value;
-    int	    stillDragging;
+    ਲੰਮਾ    ਮੁੱਲ;
+    ਪੂਰਨ	    stillDragging;
 };
 
-struct VimMenuMsg {
+ਬਣਤਰ Vim_Menu_ਸੁਨੇਹਾ {
     vimmenu_T	*guiMenu;
 };
 
-struct VimMouseMsg {
-    int	    button;
-    int	    x;
-    int	    y;
-    int	    repeated_click;
+ਬਣਤਰ Vim_Mouse_ਸੁਨੇਹਾ {
+    ਪੂਰਨ	    button;
+    ਪੂਰਨ	    x;
+    ਪੂਰਨ	    y;
+    ਪੂਰਨ	    repeated_click;
     int_u   modifiers;
 };
 
-struct VimMouseMovedMsg {
-    int	    x;
-    int	    y;
+ਬਣਤਰ Vim_Mouse_Moved_ਸੁਨੇਹਾ {
+    ਪੂਰਨ	    x;
+    ਪੂਰਨ	    y;
 };
 
-struct VimFocusMsg {
-    bool    active;
+ਬਣਤਰ Vim_Focus_ਸੁਨੇਹਾ {
+    ਤਾਰਕਿਕ    ਸਰਗਰਮ;
 };
 
-struct VimRefsMsg {
-    BMessage   *message;
-    bool    changedir;
+ਬਣਤਰ Vim_Refs_ਸੁਨੇਹਾ {
+    BMessage   *ਸੁਨੇਹਾ_2;
+    ਤਾਰਕਿਕ    changedir;
 };
 
-struct VimTablineMsg {
-    int	    index;
+ਬਣਤਰ Vim_Tabline_ਸੁਨੇਹਾ {
+    ਪੂਰਨ	    ਸੂਚਕਾਂਕ;
 };
 
-struct VimTablineMenuMsg {
-    int	    index;
-    int	    event;
+ਬਣਤਰ Vim_Tabline_Menu_ਸੁਨੇਹਾ {
+    ਪੂਰਨ	    ਸੂਚਕਾਂਕ;
+    ਪੂਰਨ	    event;
 };
 
-struct VimMsg {
-    enum VimMsgType {
-	Key, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
+ਬਣਤਰ Vim_ਸੁਨੇਹਾ {
+    ਗਿਣਤੀ Vim_ਸੁਨੇਹਾ_Type {
+	ਕੁੰਜੀ_2, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
     };
 
-    union {
-	struct VimKeyMsg    Key;
-	struct VimResizeMsg NewSize;
-	struct VimScrollBarMsg	Scroll;
-	struct VimMenuMsg   Menu;
-	struct VimMouseMsg  Mouse;
-	struct VimMouseMovedMsg	MouseMoved;
-	struct VimFocusMsg  Focus;
-	struct VimRefsMsg   Refs;
-	struct VimTablineMsg	Tabline;
-	struct VimTablineMenuMsg    TablineMenu;
+    ਸੰਘ {
+	ਬਣਤਰ Vim_ਕੁੰਜੀ_ਸੁਨੇਹਾ    ਕੁੰਜੀ_2;
+	ਬਣਤਰ Vim_Resize_ਸੁਨੇਹਾ New_ਮਾਪ;
+	ਬਣਤਰ Vim_Scroll_Bar_ਸੁਨੇਹਾ	Scroll;
+	ਬਣਤਰ Vim_Menu_ਸੁਨੇਹਾ   Menu;
+	ਬਣਤਰ Vim_Mouse_ਸੁਨੇਹਾ  Mouse;
+	ਬਣਤਰ Vim_Mouse_Moved_ਸੁਨੇਹਾ	MouseMoved;
+	ਬਣਤਰ Vim_Focus_ਸੁਨੇਹਾ  Focus;
+	ਬਣਤਰ Vim_Refs_ਸੁਨੇਹਾ   Refs;
+	ਬਣਤਰ Vim_Tabline_ਸੁਨੇਹਾ	Tabline;
+	ਬਣਤਰ Vim_Tabline_Menu_ਸੁਨੇਹਾ    TablineMenu;
     } u;
 };
 
-#define RGB(r, g, b)	((char_u)(r) << 16 | (char_u)(g) << 8 | (char_u)(b) << 0)
-#define GUI_TO_RGB(g)	{ (char_u)((g) >> 16), (char_u)((g) >> 8), (char_u)((g) >> 0), 255 }
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RGB(r, g, b)	((char_u)(r) << 16 | (char_u)(g) << 8 | (char_u)(b) << 0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GUI_ਮੰਜ਼ਿਲ_RGB(g)	{ (char_u)((g) >> 16), (char_u)((g) >> 8), (char_u)((g) >> 0), 255 }
 
 // ---------------- end of header part ----------------
 
-static struct specialkey
+ਸਥਿਰ ਬਣਤਰ specialkey
 {
-    uint16  BeKeys;
-#define KEY(a,b)    ((a)<<8|(b))
-#define K(a)	    KEY(0,a)		// for ASCII codes
-#define F(b)	    KEY(1,b)		// for scancodes
+    uint16  Be_ਕੁੰਜੀਆਂ;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਕੁੰਜੀ_3(a,b)    ((a)<<8|(b))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ K(a)	    ਕੁੰਜੀ_3(0,a)		// for ASCII codes
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ F(b)	    ਕੁੰਜੀ_3(1,b)		// for scancodes
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ਕੁੰਜੀਆਂ[] =
 {
-    {K(B_UP_ARROW),	'k', 'u'},
-    {K(B_DOWN_ARROW),	    'k', 'd'},
-    {K(B_LEFT_ARROW),	    'k', 'l'},
-    {K(B_RIGHT_ARROW),	    'k', 'r'},
+    {K(B_ਉੱਪਰ_ARROW),	'k', 'u'},
+    {K(B_ਥੱਲੇ_ARROW),	    'k', 'd'},
+    {K(B_ਖੱਬਾ_ARROW),	    'k', 'l'},
+    {K(B_ਸੱਜਾ_ARROW),	    'k', 'r'},
     {K(B_BACKSPACE),	    'k', 'b'},
-    {K(B_INSERT),	'k', 'I'},
+    {K(B_ਪਾਓ),	'k', 'I'},
     {K(B_DELETE),	'k', 'D'},
     {K(B_HOME),		'k', 'h'},
-    {K(B_END),		'@', '7'},
-    {K(B_PAGE_UP),	'k', 'P'},	// XK_Prior
-    {K(B_PAGE_DOWN),	    'k', 'N'},	    // XK_Next,
+    {K(B_ਸਿਰਾ),		'@', '7'},
+    {K(B_ਪੰਨਾ_ਉੱਪਰ),	'k', 'P'},	// XK_Prior
+    {K(B_ਪੰਨਾ_ਥੱਲੇ),	    'k', 'N'},	    // XK_Next,
 
-#define FIRST_FUNCTION_KEY  11
-    {F(B_F1_KEY),	'k', '1'},
-    {F(B_F2_KEY),	'k', '2'},
-    {F(B_F3_KEY),	'k', '3'},
-    {F(B_F4_KEY),	'k', '4'},
-    {F(B_F5_KEY),	'k', '5'},
-    {F(B_F6_KEY),	'k', '6'},
-    {F(B_F7_KEY),	'k', '7'},
-    {F(B_F8_KEY),	'k', '8'},
-    {F(B_F9_KEY),	'k', '9'},
-    {F(B_F10_KEY),	'k', ';'},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਪਹਿਲਾ_FUNCTION_ਕੁੰਜੀ  11
+    {F(B_F1_ਕੁੰਜੀ),	'k', '1'},
+    {F(B_F2_ਕੁੰਜੀ),	'k', '2'},
+    {F(B_F3_ਕੁੰਜੀ),	'k', '3'},
+    {F(B_F4_ਕੁੰਜੀ),	'k', '4'},
+    {F(B_F5_ਕੁੰਜੀ),	'k', '5'},
+    {F(B_F6_ਕੁੰਜੀ),	'k', '6'},
+    {F(B_F7_ਕੁੰਜੀ),	'k', '7'},
+    {F(B_F8_ਕੁੰਜੀ),	'k', '8'},
+    {F(B_F9_ਕੁੰਜੀ),	'k', '9'},
+    {F(B_F10_ਕੁੰਜੀ),	'k', ';'},
 
-    {F(B_F11_KEY),	'F', '1'},
-    {F(B_F12_KEY),	'F', '2'},
+    {F(B_F11_ਕੁੰਜੀ),	'F', '1'},
+    {F(B_F12_ਕੁੰਜੀ),	'F', '2'},
     //	{XK_F13,	    'F', '3'},	// would be print screen
     // sysreq
     {F(0x0F),		'F', '4'},	// scroll lock
@@ -618,9 +618,9 @@ static struct specialkey
     //	{XK_F35,	'F', 'P'},	// keysymdef.h defines up to F35
 
     //	{XK_Help,	'%', '1'},	// XK_Help
-    {F(B_PRINT_KEY),	    '%', '9'},
+    {F(B_PRINT_ਕੁੰਜੀ),	    '%', '9'},
 
-#if 0
+#ਜੇ 0
     // Keypad keys:
     {F(0x48),	    'k', 'l'},	    // XK_KP_Left
     {F(0x4A),	    'k', 'r'},	    // XK_KP_Right
@@ -633,26 +633,26 @@ static struct specialkey
     {F(0x39),	    'k', 'P'},	    // XK_KP_Prior
     {F(0x60),	    'k', 'N'},	    // XK_KP_Next
     {F(0x49),	    '&', '8'},	    // XK_Undo, keypad 5
-#endif
+#ਜੇ_ਅੰਤ
 
     // End of list marker:
     {0,		    0, 0}
 };
 
-#define NUM_SPECIAL_KEYS    ARRAY_LENGTH(special_keys)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਅੰਕ_SPECIAL_ਕੁੰਜੀਆਂ    ARRAY_ਲੰਮਾਈ(special_ਕੁੰਜੀਆਂ)
 
 // ---------------- VimApp ----------------
 
-    static void
-docd(BPath &path)
+    ਸਥਿਰ ਖਾਲੀ
+docd(BPath &ਰਸਤਾ)
 {
-    mch_chdir((char *)path.Path());
+    mch_chdir((ਅੱਖਰ *)ਰਸਤਾ.ਰਸਤਾ_2());
     // Do this to get the side effects of a :cd command
     do_cmdline_cmd((char_u *)"cd .");
 }
 
-	static void
-drop_callback(void *cookie)
+	ਸਥਿਰ ਖਾਲੀ
+drop_callback(ਖਾਲੀ *cookie)
 {
     // TODO here we could handle going to a specific position in the dropped
     // file (see src/gui_mac.c, deleted in 8.2.1422)
@@ -661,119 +661,119 @@ drop_callback(void *cookie)
 }
 
     // Really handle dropped files and folders.
-	static void
-RefsReceived(BMessage *m, bool changedir)
+	ਸਥਿਰ ਖਾਲੀ
+RefsReceived(BMessage *m, ਤਾਰਕਿਕ changedir)
 {
     uint32 type;
-    int32 count;
+    int32 ਗਿਣਤੀ_2;
 
-    m->PrintToStream();
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
-	    m->GetInfo("refs", &type, &count);
-	    if (type != B_REF_TYPE)
-		goto bad;
-	    break;
-	case B_ARGV_RECEIVED:
-	    m->GetInfo("argv", &type, &count);
-	    if (type != B_STRING_TYPE)
-		goto bad;
-	    if (changedir) {
-		char *dirname;
-		if (m->FindString("cwd", (const char **) &dirname) == B_OK) {
+    m->Print_ਮੰਜ਼ਿਲ_ਧਾਰਾ();
+    ਚੋਣ (m->what) {
+	ਹਾਲਤ B_REFS_RECEIVED:
+	ਹਾਲਤ B_SIMPLE_ਅੰਕੜੇ:
+	    m->GetInfo("refs", &type, &ਗਿਣਤੀ_2);
+	    ਜੇ (type != B_REF_TYPE)
+		ਜਾਓ bad;
+	    ਰੋਕੋ;
+	ਹਾਲਤ B_ARGV_RECEIVED:
+	    m->GetInfo("argv", &type, &ਗਿਣਤੀ_2);
+	    ਜੇ (type != B_STRING_TYPE)
+		ਜਾਓ bad;
+	    ਜੇ (changedir) {
+		ਅੱਖਰ *dirname;
+		ਜੇ (m->ਲੱਭੋ_String("cwd", (ਅਚਲ ਅੱਖਰ **) &dirname) == B_OK) {
 		    chdir(dirname);
 		    do_cmdline_cmd((char_u *)"cd .");
 		}
 	    }
-	    break;
-	default:
+	    ਰੋਕੋ;
+	ਮੂਲ:
 bad:
 	    /*fprintf(stderr, "bad!\n"); */
-	    delete m;
-	    return;
+	    ਮਿਟਾਓ m;
+	    ਵਾਪਸ;
     }
 
-#ifdef FEAT_VISUAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VISUAL
     reset_VIsual();
-#endif
+#ਜੇ_ਅੰਤ
 
     char_u  **fnames;
-    fnames = (char_u **) alloc(count * sizeof(char_u *));
-    int fname_index = 0;
+    fnames = (char_u **) alloc(ਗਿਣਤੀ_2 * ਆਕਾਰ(char_u *));
+    ਪੂਰਨ fname_ਸੂਚਕਾਂਕ = 0;
 
-    switch (m->what) {
-	case B_REFS_RECEIVED:
-	case B_SIMPLE_DATA:
+    ਚੋਣ (m->what) {
+	ਹਾਲਤ B_REFS_RECEIVED:
+	ਹਾਲਤ B_SIMPLE_ਅੰਕੜੇ:
 	    // fprintf(stderr, "case B_REFS_RECEIVED\n");
-	    for (int i = 0; i < count; ++i)
+	    ਲਈ (ਪੂਰਨ i = 0; i < ਗਿਣਤੀ_2; ++i)
 	    {
-		entry_ref ref;
-		if (m->FindRef("refs", i, &ref) == B_OK) {
-		    BEntry entry(&ref, false);
-		    BPath path;
-		    entry.GetPath(&path);
+		ਇੰਦਰਾਜ_ref ref;
+		ਜੇ (m->ਲੱਭੋ_Ref("refs", i, &ref) == B_OK) {
+		    BEntry ਇੰਦਰਾਜ(&ref, ਝੂਠ);
+		    BPath ਰਸਤਾ;
+		    ਇੰਦਰਾਜ.Get_ਰਸਤਾ(&ਰਸਤਾ);
 
 		    // Change to parent directory?
-		    if (changedir) {
+		    ਜੇ (changedir) {
 			BPath parentpath;
-			path.GetParent(&parentpath);
+			ਰਸਤਾ.Get_ਮਾਪਾ(&parentpath);
 			docd(parentpath);
 		    }
 
 		    // Is it a directory? If so, cd into it.
 		    BDirectory bdir(&ref);
-		    if (bdir.InitCheck() == B_OK) {
+		    ਜੇ (bdir.InitCheck() == B_OK) {
 			// don't cd if we already did it
-			if (!changedir)
-			    docd(path);
-		    } else {
+			ਜੇ (!changedir)
+			    docd(ਰਸਤਾ);
+		    } ਨਹੀਂਤਾਂ {
 			mch_dirname(IObuff, IOSIZE);
-			char_u *fname = shorten_fname((char_u *)path.Path(), IObuff);
-			if (fname == NULL)
-			    fname = (char_u *)path.Path();
-			fnames[fname_index++] = vim_strsave(fname);
+			char_u *fname = shorten_fname((char_u *)ਰਸਤਾ.ਰਸਤਾ_2(), IObuff);
+			ਜੇ (fname == ਨਿਰਾ)
+			    fname = (char_u *)ਰਸਤਾ.ਰਸਤਾ_2();
+			fnames[fname_ਸੂਚਕਾਂਕ++] = vim_strsave(fname);
 			// fprintf(stderr, "%s\n", fname);
 		    }
 
 		    // Only do it for the first file/dir
-		    changedir = false;
+		    changedir = ਝੂਠ;
 		}
 	    }
-	    break;
-	case B_ARGV_RECEIVED:
+	    ਰੋਕੋ;
+	ਹਾਲਤ B_ARGV_RECEIVED:
 	    // fprintf(stderr, "case B_ARGV_RECEIVED\n");
-	    for (int i = 1; i < count; ++i)
+	    ਲਈ (ਪੂਰਨ i = 1; i < ਗਿਣਤੀ_2; ++i)
 	    {
-		char *fname;
+		ਅੱਖਰ *fname;
 
-		if (m->FindString("argv", i, (const char **) &fname) == B_OK) {
-		    fnames[fname_index++] = vim_strsave((char_u *)fname);
+		ਜੇ (m->ਲੱਭੋ_String("argv", i, (ਅਚਲ ਅੱਖਰ **) &fname) == B_OK) {
+		    fnames[fname_ਸੂਚਕਾਂਕ++] = vim_strsave((char_u *)fname);
 		}
 	    }
-	    break;
-	default:
+	    ਰੋਕੋ;
+	ਮੂਲ:
 	    // fprintf(stderr, "case default\n");
-	    break;
+	    ਰੋਕੋ;
     }
 
-    delete m;
+    ਮਿਟਾਓ m;
 
     // Handle the drop, :edit to get to the file
-    if (fname_index > 0) {
-	handle_drop(fname_index, fnames, FALSE, drop_callback, NULL);
+    ਜੇ (fname_ਸੂਚਕਾਂਕ > 0) {
+	handle_drop(fname_ਸੂਚਕਾਂਕ, fnames, FALSE, drop_callback, ਨਿਰਾ);
 
 	setcursor();
-	out_flush();
-    } else {
+	ਬਾਹਰਲਾ_flush();
+    } ਨਹੀਂਤਾਂ {
 	vim_free(fnames);
     }
 }
 
-VimApp::VimApp(const char *appsig):
+VimApp::VimApp(ਅਚਲ ਅੱਖਰ *appsig):
     BApplication(appsig),
     fFilePanelSem(-1),
-    fFilePanel(NULL)
+    fFilePanel(ਨਿਰਾ)
 {
 }
 
@@ -781,8 +781,8 @@ VimApp::~VimApp()
 {
 }
 
-    void
-VimApp::ReadyToRun()
+    ਖਾਲੀ
+VimApp::Ready_ਮੰਜ਼ਿਲ_ਲੜੀਵਾਰ()
 {
     /*
      * Apparently signals are inherited by the created thread -
@@ -792,105 +792,105 @@ VimApp::ReadyToRun()
     mch_signal(SIGQUIT, SIG_IGN);
 }
 
-    void
-VimApp::ArgvReceived(int32 arg_argc, char **arg_argv)
+    ਖਾਲੀ
+VimApp::ArgvReceived(int32 arg_argc, ਅੱਖਰ **arg_argv)
 {
-    if (!IsLaunching()) {
+    ਜੇ (!IsLaunching()) {
 	/*
 	 * This can happen if we are set to Single or Exclusive
 	 * Launch. Be nice and open the file(s).
 	 */
-	if (gui.vimWindow)
-	    gui.vimWindow->Minimize(false);
-	BMessage *m = CurrentMessage();
-	DetachCurrentMessage();
-	SendRefs(m, true);
+	ਜੇ (gui.vim_ਖਿੜਕੀ)
+	    gui.vim_ਖਿੜਕੀ->Minimize(ਝੂਠ);
+	BMessage *m = Current_ਸੁਨੇਹਾ();
+	Detach_Current_ਸੁਨੇਹਾ();
+	SendRefs(m, ਸੱਚ);
     }
 }
 
-    void
+    ਖਾਲੀ
 VimApp::RefsReceived(BMessage *m)
 {
     // Horrible hack!!! XXX XXX XXX
     // The real problem is that b_start_ffc is set too late for
     // the initial empty buffer. As a result the window will be
     // split instead of abandoned.
-    int limit = 15;
-    while (--limit >= 0 && (curbuf == NULL || curbuf->b_start_ffc == 0))
+    ਪੂਰਨ ਹੱਦਬੰਦੀ = 15;
+    ਜਦੋਂ (--ਹੱਦਬੰਦੀ >= 0 && (curbuf == ਨਿਰਾ || curbuf->b_ਸ਼ੁਰੂ_ffc == 0))
 	snooze(100000);    //  0.1 s
-    if (gui.vimWindow)
-	gui.vimWindow->Minimize(false);
-    DetachCurrentMessage();
-    SendRefs(m, true);
+    ਜੇ (gui.vim_ਖਿੜਕੀ)
+	gui.vim_ਖਿੜਕੀ->Minimize(ਝੂਠ);
+    Detach_Current_ਸੁਨੇਹਾ();
+    SendRefs(m, ਸੱਚ);
 }
 
 /*
  * Pass a BMessage on to the main() thread.
  * Caller must have detached the message.
  */
-    void
-VimApp::SendRefs(BMessage *m, bool changedir)
+    ਖਾਲੀ
+VimApp::SendRefs(BMessage *m, ਤਾਰਕਿਕ changedir)
 {
-    VimRefsMsg rm;
-    rm.message = m;
+    Vim_Refs_ਸੁਨੇਹਾ rm;
+    rm.ਸੁਨੇਹਾ_2 = m;
     rm.changedir = changedir;
 
-    write_port(gui.vdcmp, VimMsg::Refs, &rm, sizeof(rm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Refs, &rm, ਆਕਾਰ(rm));
     //	calls ::RefsReceived
 }
 
-    void
-VimApp::MessageReceived(BMessage *m)
+    ਖਾਲੀ
+VimApp::ਸੁਨੇਹਾ_Received(BMessage *m)
 {
-    switch (m->what) {
-	case 'save':
+    ਚੋਣ (m->what) {
+	ਹਾਲਤ 'save':
 	    {
-		entry_ref refDirectory;
-		m->FindRef("directory", &refDirectory);
-		fBrowsedPath.SetTo(&refDirectory);
+		ਇੰਦਰਾਜ_ref refDirectory;
+		m->ਲੱਭੋ_Ref("directory", &refDirectory);
+		f_Browsed_ਰਸਤਾ.ਸੈੱਟ_ਮੰਜ਼ਿਲ(&refDirectory);
 		BString strName;
-		m->FindString("name", &strName);
-		fBrowsedPath.Append(strName.String());
+		m->ਲੱਭੋ_String("name", &strName);
+		f_Browsed_ਰਸਤਾ.Append(strName.String());
 	    }
-	    break;
-	case 'open':
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'open':
 	    {
-		entry_ref ref;
-		m->FindRef("refs", &ref);
-		fBrowsedPath.SetTo(&ref);
+		ਇੰਦਰਾਜ_ref ref;
+		m->ਲੱਭੋ_Ref("refs", &ref);
+		f_Browsed_ਰਸਤਾ.ਸੈੱਟ_ਮੰਜ਼ਿਲ(&ref);
 	    }
-	    break;
-	case B_CANCEL:
+	    ਰੋਕੋ;
+	ਹਾਲਤ B_CANCEL:
 	    {
 		BFilePanel *panel;
-		m->FindPointer("source", (void**)&panel);
-		if (fFilePanelSem != -1 && panel == fFilePanel)
+		m->ਲੱਭੋ_ਸੂਚਕ("source", (ਖਾਲੀ**)&panel);
+		ਜੇ (fFilePanelSem != -1 && panel == fFilePanel)
 		{
 		    delete_sem(fFilePanelSem);
 		    fFilePanelSem = -1;
 		}
 
 	    }
-	    break;
-	default:
-	    Inherited::MessageReceived(m);
-	    break;
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    Inherited::ਸੁਨੇਹਾ_Received(m);
+	    ਰੋਕੋ;
     }
 }
 
-    bool
+    ਤਾਰਕਿਕ
 VimApp::QuitRequested()
 {
-    (void)Inherited::QuitRequested();
-    return false;
+    (ਖਾਲੀ)Inherited::QuitRequested();
+    ਵਾਪਸ ਝੂਠ;
 }
 
 // ---------------- VimWindow ----------------
 
-VimWindow::VimWindow():
+Vim_ਖਿੜਕੀ::Vim_ਖਿੜਕੀ():
     BWindow(BRect(40, 40, 150, 150),
 	    "Vim",
-	    B_TITLED_WINDOW,
+	    B_TITLED_ਖਿੜਕੀ,
 	    0,
 	    B_CURRENT_WORKSPACE)
 
@@ -898,214 +898,214 @@ VimWindow::VimWindow():
     init();
 }
 
-VimWindow::~VimWindow()
+Vim_ਖਿੜਕੀ::~Vim_ਖਿੜਕੀ()
 {
-    if (formView) {
-	RemoveChild(formView);
-	delete formView;
+    ਜੇ (formView) {
+	Remove_ਬੱਚਾ(formView);
+	ਮਿਟਾਓ formView;
     }
-    gui.vimWindow = NULL;
+    gui.vim_ਖਿੜਕੀ = ਨਿਰਾ;
 }
 
-    void
-VimWindow::init()
+    ਖਾਲੀ
+Vim_ਖਿੜਕੀ::init()
 {
     // Attach the VimFormView
-    formView = new VimFormView(Bounds());
-    if (formView != NULL) {
-	AddChild(formView);
+    formView = ਨਵਾਂ VimFormView(Bounds());
+    ਜੇ (formView != ਨਿਰਾ) {
+	ਜੋੜੋ_ਬੱਚਾ(formView);
     }
 }
 
-#if 0  //  disabled in zeta patch
-    void
-VimWindow::DispatchMessage(BMessage *m, BHandler *h)
+#ਜੇ 0  //  disabled in zeta patch
+    ਖਾਲੀ
+Vim_ਖਿੜਕੀ::Dispatch_ਸੁਨੇਹਾ(BMessage *m, BHandler *h)
 {
     /*
      * Route B_MOUSE_UP messages to MouseUp(), in
      * a manner that should be compatible with the
      * intended future system behaviour.
      */
-    switch (m->what) {
-	case B_MOUSE_UP:
+    ਚੋਣ (m->what) {
+	ਹਾਲਤ B_MOUSE_ਉੱਪਰ:
 	    //	if (!h) h = PreferredHandler();
 	    //	gcc isn't happy without this extra set of braces, complains about
 	    //	jump to case label crosses init of 'class BView * v'
 	    //	richard@whitequeen.com jul 99
 	    {
 		BView *v = dynamic_cast<BView *>(h);
-		if (v) {
+		ਜੇ (v) {
 		    // m->PrintToStream();
 		    BPoint where;
-		    m->FindPoint("where", &where);
-		    v->MouseUp(where);
-		} else {
-		    Inherited::DispatchMessage(m, h);
+		    m->ਲੱਭੋ_ਬਿੰਦੂ("where", &where);
+		    v->Mouse_ਉੱਪਰ(where);
+		} ਨਹੀਂਤਾਂ {
+		    Inherited::Dispatch_ਸੁਨੇਹਾ(m, h);
 		}
 	    }
-	    break;
-	default:
-	    Inherited::DispatchMessage(m, h);
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    Inherited::Dispatch_ਸੁਨੇਹਾ(m, h);
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-VimWindow::WindowActivated(bool active)
+    ਖਾਲੀ
+Vim_ਖਿੜਕੀ::ਖਿੜਕੀ_Activated(ਤਾਰਕਿਕ ਸਰਗਰਮ)
 {
-    Inherited::WindowActivated(active);
+    Inherited::ਖਿੜਕੀ_Activated(ਸਰਗਰਮ);
     // the textArea gets the keyboard action
-    if (active && gui.vimTextArea)
-	gui.vimTextArea->MakeFocus(true);
+    ਜੇ (ਸਰਗਰਮ && gui.vim_ਪਾਠ_Area)
+	gui.vim_ਪਾਠ_Area->MakeFocus(ਸੱਚ);
 
-    struct VimFocusMsg fm;
-    fm.active = active;
+    ਬਣਤਰ Vim_Focus_ਸੁਨੇਹਾ fm;
+    fm.ਸਰਗਰਮ = ਸਰਗਰਮ;
 
-    write_port(gui.vdcmp, VimMsg::Focus, &fm, sizeof(fm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Focus, &fm, ਆਕਾਰ(fm));
 }
 
-    bool
-VimWindow::QuitRequested()
+    ਤਾਰਕਿਕ
+Vim_ਖਿੜਕੀ::QuitRequested()
 {
-    struct VimKeyMsg km;
-    km.length = 5;
-    memcpy((char *)km.chars, "\033:qa\r", km.length);
-    km.csi_escape = false;
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
-    return false;
+    ਬਣਤਰ Vim_ਕੁੰਜੀ_ਸੁਨੇਹਾ km;
+    km.ਲੰਮਾਈ = 5;
+    ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)km.chars, "\033:qa\r", km.ਲੰਮਾਈ);
+    km.csi_escape = ਝੂਠ;
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::ਕੁੰਜੀ_2, &km, ਆਕਾਰ(km));
+    ਵਾਪਸ ਝੂਠ;
 }
-    void
-VimWindow::DispatchMessage(BMessage *m, BHandler *h)
+    ਖਾਲੀ
+Vim_ਖਿੜਕੀ::Dispatch_ਸੁਨੇਹਾ(BMessage *m, BHandler *h)
 {
-    bool should_propagate = true;
+    ਤਾਰਕਿਕ should_propagate = ਸੱਚ;
 
-    switch (m->what)
+    ਚੋਣ (m->what)
     {
-	case B_KEY_DOWN:
+	ਹਾਲਤ B_ਕੁੰਜੀ_ਥੱਲੇ:
 	    {
 		int32 scancode = 0;
 		int32 beModifiers = 0;
-		m->FindInt32("raw_char", &scancode);
-		m->FindInt32("modifiers", &beModifiers);
+		m->ਲੱਭੋ_Int32("raw_char", &scancode);
+		m->ਲੱਭੋ_Int32("modifiers", &beModifiers);
 
-		if (scancode == B_ENTER && (beModifiers & B_LEFT_COMMAND_KEY))
+		ਜੇ (scancode == B_ENTER && (beModifiers & B_ਖੱਬਾ_COMMAND_ਕੁੰਜੀ))
 		    {
-			should_propagate = false;
-			if (this->is_fullscreen)
+			should_propagate = ਝੂਠ;
+			ਜੇ (ਇਹ->is_fullscreen)
 			    {
-				this->is_fullscreen = false;
-				ResizeTo(this->saved_frame.Width(), this->saved_frame.Height());
-				MoveTo(this->saved_frame.left, this->saved_frame.top);
-				SetLook(this->saved_look);
-				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
-			    } else {
-				this->saved_frame = Frame();
-				this->saved_look = Look();
-				this->is_fullscreen = true;
-				BScreen s(this);
-				SetLook(B_NO_BORDER_WINDOW_LOOK);
-				ResizeTo(s.Frame().Width() + 1, s.Frame().Height() + 1);
-				MoveTo(s.Frame().left, s.Frame().top);
-				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
+				ਇਹ->is_fullscreen = ਝੂਠ;
+				Resize_ਮੰਜ਼ਿਲ(ਇਹ->saved_ਚੌਖਟਾ.ਚੌੜਾਈ_2(), ਇਹ->saved_ਚੌਖਟਾ.ਉਚਾਈ_2());
+				Move_ਮੰਜ਼ਿਲ(ਇਹ->saved_ਚੌਖਟਾ.ਖੱਬੇ, ਇਹ->saved_ਚੌਖਟਾ.ਸਿਖਰ);
+				ਸੈੱਟ_Look(ਇਹ->saved_look);
+				ਸੈੱਟ_Flags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
+			    } ਨਹੀਂਤਾਂ {
+				ਇਹ->saved_ਚੌਖਟਾ = ਚੌਖਟਾ_2();
+				ਇਹ->saved_look = Look();
+				ਇਹ->is_fullscreen = ਸੱਚ;
+				BScreen s(ਇਹ);
+				ਸੈੱਟ_Look(B_NO_BORDER_ਖਿੜਕੀ_LOOK);
+				Resize_ਮੰਜ਼ਿਲ(s.ਚੌਖਟਾ_2().ਚੌੜਾਈ_2() + 1, s.ਚੌਖਟਾ_2().ਉਚਾਈ_2() + 1);
+				Move_ਮੰਜ਼ਿਲ(s.ਚੌਖਟਾ_2().ਖੱਬੇ, s.ਚੌਖਟਾ_2().ਸਿਖਰ);
+				ਸੈੱਟ_Flags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 			    }
 		    }
 	    }
     }
 
-    if (should_propagate)
-	Inherited::DispatchMessage(m, h);
+    ਜੇ (should_propagate)
+	Inherited::Dispatch_ਸੁਨੇਹਾ(m, h);
 }
 
 
 // ---------------- VimFormView ----------------
 
-VimFormView::VimFormView(BRect frame):
-    BView(frame, "VimFormView", B_FOLLOW_ALL_SIDES,
-	    B_WILL_DRAW | B_FRAME_EVENTS),
-    menuBar(NULL),
-#ifdef FEAT_TOOLBAR
-    toolBar(NULL),
-#endif
-#ifdef FEAT_GUI_TABLINE
+VimFormView::VimFormView(BRect ਚੌਖਟਾ):
+    BView(ਚੌਖਟਾ, "VimFormView", B_FOLLOW_ALL_SIDES,
+	    B_WILL_DRAW | B_ਚੌਖਟਾ_EVENTS),
+    menuBar(ਨਿਰਾ),
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    toolBar(ਨਿਰਾ),
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
 //  showingTabLine(false),
-    tabLine(NULL),
-#endif
-    textArea(NULL)
+    tab_ਸਤਰ(ਨਿਰਾ),
+#ਜੇ_ਅੰਤ
+    ਪਾਠ_Area(ਨਿਰਾ)
 {
-    init(frame);
+    init(ਚੌਖਟਾ);
 }
 
 VimFormView::~VimFormView()
 {
-    if (menuBar) {
-	RemoveChild(menuBar);
-#ifdef never
+    ਜੇ (menuBar) {
+	Remove_ਬੱਚਾ(menuBar);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ never
 	//  deleting the menuBar leads to SEGV on exit
 	//  richard@whitequeen.com Jul 99
-	delete menuBar;
-#endif
+	ਮਿਟਾਓ menuBar;
+#ਜੇ_ਅੰਤ
     }
 
-#ifdef FEAT_TOOLBAR
-    delete toolBar;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਮਿਟਾਓ toolBar;
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_TABLINE
-    delete tabLine;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+    ਮਿਟਾਓ tab_ਸਤਰ;
+#ਜੇ_ਅੰਤ
 
-    if (textArea) {
-	RemoveChild(textArea);
-	delete textArea;
+    ਜੇ (ਪਾਠ_Area) {
+	Remove_ਬੱਚਾ(ਪਾਠ_Area);
+	ਮਿਟਾਓ ਪਾਠ_Area;
     }
-    gui.vimForm = NULL;
+    gui.vimForm = ਨਿਰਾ;
 }
 
-    void
-VimFormView::init(BRect frame)
+    ਖਾਲੀ
+VimFormView::init(BRect ਚੌਖਟਾ)
 {
-    menuBar = new BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
+    menuBar = ਨਵਾਂ BMenuBar(BRect(0,0,-MENUBAR_MARGIN,-MENUBAR_MARGIN),
 	    "VimMenuBar");
 
-    AddChild(menuBar);
+    ਜੋੜੋ_ਬੱਚਾ(menuBar);
 
-#ifdef FEAT_TOOLBAR
-    toolBar = new VimToolbar(BRect(0,0,0,0), "VimToolBar");
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    toolBar = ਨਵਾਂ VimToolbar(BRect(0,0,0,0), "VimToolBar");
     toolBar->PrepareButtonBitmaps();
-    AddChild(toolBar);
-#endif
+    ਜੋੜੋ_ਬੱਚਾ(toolBar);
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_TABLINE
-    tabLine = new VimTabLine(BRect(0,0,0,0));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+    tab_ਸਤਰ = ਨਵਾਂ Vim_Tab_ਸਤਰ(BRect(0,0,0,0));
 //  tabLine->PrepareButtonBitmaps();
-    AddChild(tabLine);
-#endif
+    ਜੋੜੋ_ਬੱਚਾ(tab_ਸਤਰ);
+#ਜੇ_ਅੰਤ
 
-    BRect remaining = frame;
-    textArea = new VimTextAreaView(remaining);
-    AddChild(textArea);
+    BRect ਬਚਿਆ = ਚੌਖਟਾ;
+    ਪਾਠ_Area = ਨਵਾਂ Vim_ਪਾਠ_Area_View(ਬਚਿਆ);
+    ਜੋੜੋ_ਬੱਚਾ(ਪਾਠ_Area);
     // The textArea will be resized later when menus are added
 
-    gui.vimForm = this;
+    gui.vimForm = ਇਹ;
 }
 
-#ifdef FEAT_TOOLBAR
-    float
-VimFormView::ToolbarHeight() const
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਦਸ਼ਮਲਵ
+VimFormView::Toolbar_ਉਚਾਈ() ਅਚਲ
 {
-    return toolBar ? toolBar->ToolbarHeight() : 0.;
+    ਵਾਪਸ toolBar ? toolBar->Toolbar_ਉਚਾਈ() : 0.;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_TABLINE
-    float
-VimFormView::TablineHeight() const
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+    ਦਸ਼ਮਲਵ
+VimFormView::Tabline_ਉਚਾਈ() ਅਚਲ
 {
-    return (tabLine && IsShowingTabLine()) ? tabLine->TablineHeight() : 0.;
+    ਵਾਪਸ (tab_ਸਤਰ && Is_Showing_Tab_ਸਤਰ()) ? tab_ਸਤਰ->Tabline_ਉਚਾਈ() : 0.;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
+    ਖਾਲੀ
 VimFormView::AllAttached()
 {
     /*
@@ -1115,65 +1115,65 @@ VimFormView::AllAttached()
     mch_signal(SIGINT, SIG_IGN);
     mch_signal(SIGQUIT, SIG_IGN);
 
-    if (menuBar && textArea) {
+    ਜੇ (menuBar && ਪਾਠ_Area) {
 	/*
 	 * Resize the textArea to fill the space left over by the menu.
 	 * This is somewhat futile since it will be done again once
 	 * menus are added to the menu bar.
 	 */
-	BRect remaining = Bounds();
+	BRect ਬਚਿਆ = Bounds();
 
-#ifdef FEAT_MENU
-	remaining.top += MenuHeight();
-	menuBar->ResizeTo(remaining.right, remaining.top);
-	gui.menu_height = (int) MenuHeight();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
+	ਬਚਿਆ.ਸਿਖਰ += Menu_ਉਚਾਈ();
+	menuBar->Resize_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਸੱਜੇ, ਬਚਿਆ.ਸਿਖਰ);
+	gui.menu_ਉਚਾਈ = (ਪੂਰਨ) Menu_ਉਚਾਈ();
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_TOOLBAR
-	toolBar->MoveTo(remaining.left, remaining.top);
-	toolBar->ResizeTo(remaining.right, ToolbarHeight());
-	remaining.top += ToolbarHeight();
-	gui.toolbar_height = ToolbarHeight();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+	toolBar->Move_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਖੱਬੇ, ਬਚਿਆ.ਸਿਖਰ);
+	toolBar->Resize_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਸੱਜੇ, Toolbar_ਉਚਾਈ());
+	ਬਚਿਆ.ਸਿਖਰ += Toolbar_ਉਚਾਈ();
+	gui.toolbar_ਉਚਾਈ = Toolbar_ਉਚਾਈ();
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_TABLINE
-	tabLine->MoveTo(remaining.left, remaining.top);
-	tabLine->ResizeTo(remaining.right + 1, TablineHeight());
-	remaining.top += TablineHeight();
-	gui.tabline_height = TablineHeight();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+	tab_ਸਤਰ->Move_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਖੱਬੇ, ਬਚਿਆ.ਸਿਖਰ);
+	tab_ਸਤਰ->Resize_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਸੱਜੇ + 1, Tabline_ਉਚਾਈ());
+	ਬਚਿਆ.ਸਿਖਰ += Tabline_ਉਚਾਈ();
+	gui.tabline_ਉਚਾਈ = Tabline_ਉਚਾਈ();
+#ਜੇ_ਅੰਤ
 
-	textArea->ResizeTo(remaining.Width(), remaining.Height());
-	textArea->MoveTo(remaining.left, remaining.top);
+	ਪਾਠ_Area->Resize_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਚੌੜਾਈ_2(), ਬਚਿਆ.ਉਚਾਈ_2());
+	ਪਾਠ_Area->Move_ਮੰਜ਼ਿਲ(ਬਚਿਆ.ਖੱਬੇ, ਬਚਿਆ.ਸਿਖਰ);
     }
 
 
     Inherited::AllAttached();
 }
 
-    void
-VimFormView::FrameResized(float new_width, float new_height)
+    ਖਾਲੀ
+VimFormView::ਚੌਖਟਾ_Resized(ਦਸ਼ਮਲਵ new_ਚੌੜਾਈ, ਦਸ਼ਮਲਵ new_ਉਚਾਈ)
 {
-    struct VimResizeMsg sm;
-    int adjust_h, adjust_w;
+    ਬਣਤਰ Vim_Resize_ਸੁਨੇਹਾ sm;
+    ਪੂਰਨ adjust_h, adjust_w;
 
-    new_width += 1;	//  adjust from width to number of pixels occupied
-    new_height += 1;
+    new_ਚੌੜਾਈ += 1;	//  adjust from width to number of pixels occupied
+    new_ਉਚਾਈ += 1;
 
-    sm.width = (int) new_width;
-    sm.height = (int) new_height;
-    adjust_w = ((int)new_width - gui_get_base_width()) % gui.char_width;
-    adjust_h = ((int)new_height - gui_get_base_height()) % gui.char_height;
+    sm.ਚੌੜਾਈ = (ਪੂਰਨ) new_ਚੌੜਾਈ;
+    sm.ਉਚਾਈ = (ਪੂਰਨ) new_ਉਚਾਈ;
+    adjust_w = ((ਪੂਰਨ)new_ਚੌੜਾਈ - gui_get_ਅਧਾਰ_ਚੌੜਾਈ()) % gui.char_ਚੌੜਾਈ;
+    adjust_h = ((ਪੂਰਨ)new_ਉਚਾਈ - gui_get_ਅਧਾਰ_ਉਚਾਈ()) % gui.char_ਉਚਾਈ;
 
-    if (adjust_w > 0 || adjust_h > 0) {
-	sm.width  -= adjust_w;
-	sm.height -= adjust_h;
+    ਜੇ (adjust_w > 0 || adjust_h > 0) {
+	sm.ਚੌੜਾਈ  -= adjust_w;
+	sm.ਉਚਾਈ -= adjust_h;
     }
 
-    write_port(gui.vdcmp, VimMsg::Resize, &sm, sizeof(sm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Resize, &sm, ਆਕਾਰ(sm));
     //	calls gui_resize_shell(new_width, new_height);
 
-    return;
+    ਵਾਪਸ;
 
     /*
      * The area below the vertical scrollbar is erased to the colour
@@ -1185,47 +1185,47 @@ VimFormView::FrameResized(float new_width, float new_height)
 
 // ---------------- VimTextAreaView ----------------
 
-VimTextAreaView::VimTextAreaView(BRect frame):
-    BView(frame, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
-#ifdef FEAT_MBYTE_IME
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INPUT_METHOD_AWARE
-#else
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
-#endif
+Vim_ਪਾਠ_Area_View::Vim_ਪਾਠ_Area_View(BRect ਚੌਖਟਾ):
+    BView(ਚੌਖਟਾ, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+	B_WILL_DRAW | B_ਭਰਿਆ_UPDATE_ON_RESIZE | B_ਨਿਵੇਸ਼_ਵਿਧੀ_AWARE
+#ਨਹੀਂਤਾਂ
+	B_WILL_DRAW | B_ਭਰਿਆ_UPDATE_ON_RESIZE
+#ਜੇ_ਅੰਤ
 	),
-    mouseDragEventCount(0)
+    mouse_Drag_Event_ਗਿਣਤੀ(0)
 {
-#ifdef FEAT_MBYTE_IME
-    IMData.messenger = NULL;
-    IMData.message = NULL;
-#endif
-    init(frame);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+    IMData.messenger = ਨਿਰਾ;
+    IMData.ਸੁਨੇਹਾ_2 = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+    init(ਚੌਖਟਾ);
 }
 
-VimTextAreaView::~VimTextAreaView()
+Vim_ਪਾਠ_Area_View::~Vim_ਪਾਠ_Area_View()
 {
-    gui.vimTextArea = NULL;
+    gui.vim_ਪਾਠ_Area = ਨਿਰਾ;
 }
 
-    void
-VimTextAreaView::init(BRect frame)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::init(BRect ਚੌਖਟਾ)
 {
     // set up global var for fast access
-    gui.vimTextArea = this;
+    gui.vim_ਪਾਠ_Area = ਇਹ;
 
     /*
      * Tell the app server not to erase the view: we will
      * fill it in completely by ourselves.
      * (Does this really work? Even if not, it won't harm either.)
      */
-    SetViewColor(B_TRANSPARENT_32_BIT);
-#define PEN_WIDTH   1
-    SetPenSize(PEN_WIDTH);
-#define W_WIDTH(curwin)   0
+    ਸੈੱਟ_View_Color(B_TRANSPARENT_32_ਦੋਆਧਾਰੀ_ਅੰਕ);
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PEN_ਚੌੜਾਈ   1
+    ਸੈੱਟ_Pen_ਮਾਪ(PEN_ਚੌੜਾਈ);
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ W_ਚੌੜਾਈ(curwin)   0
 }
 
-    void
-VimTextAreaView::Draw(BRect updateRect)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::Draw(BRect updateRect)
 {
     /*
      * XXX Other ports call here:
@@ -1238,43 +1238,43 @@ VimTextAreaView::Draw(BRect updateRect)
      *	No need to use gui.vimWindow->Lock(): we are locked already.
      *	However, it would not hurt.
      */
-    rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
-    SetLowColor(rgb);
-    FillRect(updateRect, B_SOLID_LOW);
-    gui_redraw((int) updateRect.left, (int) updateRect.top,
-	    (int) (updateRect.Width() + PEN_WIDTH), (int) (updateRect.Height() + PEN_WIDTH));
+    rgb_color rgb = GUI_ਮੰਜ਼ਿਲ_RGB(gui.ਪਿੱਠ_pixel);
+    ਸੈੱਟ_ਨੀਵਾਂ_Color(rgb);
+    FillRect(updateRect, B_SOLID_ਨੀਵਾਂ);
+    gui_redraw((ਪੂਰਨ) updateRect.ਖੱਬੇ, (ਪੂਰਨ) updateRect.ਸਿਖਰ,
+	    (ਪੂਰਨ) (updateRect.ਚੌੜਾਈ_2() + PEN_ਚੌੜਾਈ), (ਪੂਰਨ) (updateRect.ਉਚਾਈ_2() + PEN_ਚੌੜਾਈ));
 
     // Clear the border areas if needed
-    SetLowColor(rgb);
+    ਸੈੱਟ_ਨੀਵਾਂ_Color(rgb);
 
-    if (updateRect.left < FILL_X(0))	//  left border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.top < FILL_Y(0)) //	top border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    updateRect.right, FILL_Y(0)-PEN_WIDTH), B_SOLID_LOW);
-    if (updateRect.right >= FILL_X(Columns)) //  right border
-	FillRect(BRect(FILL_X((int)Columns), updateRect.top,
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.bottom >= FILL_Y(Rows))   //  bottom border
-	FillRect(BRect(updateRect.left, FILL_Y((int)Rows),
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
+    ਜੇ (updateRect.ਖੱਬੇ < FILL_X(0))	//  left border
+	FillRect(BRect(updateRect.ਖੱਬੇ, updateRect.ਸਿਖਰ,
+		    FILL_X(0)-PEN_ਚੌੜਾਈ, updateRect.bottom), B_SOLID_ਨੀਵਾਂ);
+    ਜੇ (updateRect.ਸਿਖਰ < FILL_Y(0)) //	top border
+	FillRect(BRect(updateRect.ਖੱਬੇ, updateRect.ਸਿਖਰ,
+		    updateRect.ਸੱਜੇ, FILL_Y(0)-PEN_ਚੌੜਾਈ), B_SOLID_ਨੀਵਾਂ);
+    ਜੇ (updateRect.ਸੱਜੇ >= FILL_X(Columns)) //  right border
+	FillRect(BRect(FILL_X((ਪੂਰਨ)Columns), updateRect.ਸਿਖਰ,
+		    updateRect.ਸੱਜੇ, updateRect.bottom), B_SOLID_ਨੀਵਾਂ);
+    ਜੇ (updateRect.bottom >= FILL_Y(ਪੰਕਤੀਆਂ))   //  bottom border
+	FillRect(BRect(updateRect.ਖੱਬੇ, FILL_Y((ਪੂਰਨ)ਪੰਕਤੀਆਂ),
+		    updateRect.ਸੱਜੇ, updateRect.bottom), B_SOLID_ਨੀਵਾਂ);
 
-#ifdef FEAT_MBYTE_IME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
     DrawIMString();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    void
-VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::ਕੁੰਜੀ_ਥੱਲੇ(ਅਚਲ ਅੱਖਰ *ਬਾਈਟਾਂ, int32 ਅੰਕ_ਬਾਈਟਾਂ_2)
 {
-    struct VimKeyMsg km;
+    ਬਣਤਰ Vim_ਕੁੰਜੀ_ਸੁਨੇਹਾ km;
     char_u *dest = km.chars;
 
-    bool canHaveVimModifiers = false;
+    ਤਾਰਕਿਕ canHaveVimModifiers = ਝੂਠ;
 
-    BMessage *msg = Window()->CurrentMessage();
-    assert(msg);
+    BMessage *ਸੁਨੇਹਾ = ਖਿੜਕੀ()->Current_ਸੁਨੇਹਾ();
+    ਪ੍ਰਤਿਜ੍ਞਾ(ਸੁਨੇਹਾ);
     // msg->PrintToStream();
 
     /*
@@ -1287,32 +1287,32 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
      * TODO: I'm not quite happy with detection of special
      * keys. Perhaps I should use scan codes after all...
      */
-    if (numBytes > 1) {
+    ਜੇ (ਅੰਕ_ਬਾਈਟਾਂ_2 > 1) {
 	// This cannot be a special key
-	if (numBytes > KEY_MSG_BUFSIZ)
-	    numBytes = KEY_MSG_BUFSIZ;	    //	should never happen... ???
-	km.length = numBytes;
-	memcpy((char *)dest, bytes, numBytes);
-	km.csi_escape = true;
-    } else {
+	ਜੇ (ਅੰਕ_ਬਾਈਟਾਂ_2 > ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ)
+	    ਅੰਕ_ਬਾਈਟਾਂ_2 = ਕੁੰਜੀ_ਸੁਨੇਹਾ_BUFSIZ;	    //	should never happen... ???
+	km.ਲੰਮਾਈ = ਅੰਕ_ਬਾਈਟਾਂ_2;
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)dest, ਬਾਈਟਾਂ, ਅੰਕ_ਬਾਈਟਾਂ_2);
+	km.csi_escape = ਸੱਚ;
+    } ਨਹੀਂਤਾਂ {
 	int32 scancode = 0;
-	msg->FindInt32("key", &scancode);
+	ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("key", &scancode);
 
 	int32 beModifiers = 0;
-	msg->FindInt32("modifiers", &beModifiers);
+	ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("modifiers", &beModifiers);
 
 	char_u string[3];
-	int len = 0;
-	km.length = 0;
+	ਪੂਰਨ len = 0;
+	km.ਲੰਮਾਈ = 0;
 
 	/*
 	 * For normal, printable ASCII characters, don't look them up
 	 * to check if they might be a special key. They aren't.
 	 */
-	assert(B_BACKSPACE <= 0x20);
-	assert(B_DELETE == 0x7F);
-	if (((char_u)bytes[0] <= 0x20 || (char_u)bytes[0] == 0x7F) &&
-		numBytes == 1) {
+	ਪ੍ਰਤਿਜ੍ਞਾ(B_BACKSPACE <= 0x20);
+	ਪ੍ਰਤਿਜ੍ਞਾ(B_DELETE == 0x7F);
+	ਜੇ (((char_u)ਬਾਈਟਾਂ[0] <= 0x20 || (char_u)ਬਾਈਟਾਂ[0] == 0x7F) &&
+		ਅੰਕ_ਬਾਈਟਾਂ_2 == 1) {
 	    /*
 	     * Due to the great nature of Be's mapping of special keys,
 	     * viz. into the range of the control characters,
@@ -1320,10 +1320,10 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	     * if it is special without using ctrl. So, only if ctrl is
 	     * used, we need to check it unmodified.
 	     */
-	    if (beModifiers & B_CONTROL_KEY) {
-		int index = keyMap->normal_map[scancode];
-		int newNumBytes = keyMapChars[index];
-		char_u *newBytes = (char_u *)&keyMapChars[index + 1];
+	    ਜੇ (beModifiers & B_CONTROL_ਕੁੰਜੀ) {
+		ਪੂਰਨ ਸੂਚਕਾਂਕ = ਕੁੰਜੀ_Map->ਸਾਧਾਰਨ_map[scancode];
+		ਪੂਰਨ new_ਅੰਕ_ਬਾਈਟਾਂ = ਕੁੰਜੀ_Map_Chars[ਸੂਚਕਾਂਕ];
+		char_u *new_ਬਾਈਟਾਂ = (char_u *)&ਕੁੰਜੀ_Map_Chars[ਸੂਚਕਾਂਕ + 1];
 
 		/*
 		 * Check if still special without the control key.
@@ -1331,69 +1331,69 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 		 * different values with modifiers (DEL).
 		 * Otherwise we could simply have checked for equality.
 		 */
-		if (newNumBytes != 1 || (*newBytes > 0x20 &&
-			    *newBytes != 0x7F )) {
-		    goto notspecial;
+		ਜੇ (new_ਅੰਕ_ਬਾਈਟਾਂ != 1 || (*new_ਬਾਈਟਾਂ > 0x20 &&
+			    *new_ਬਾਈਟਾਂ != 0x7F )) {
+		    ਜਾਓ notspecial;
 		}
-		bytes = (char *)newBytes;
+		ਬਾਈਟਾਂ = (ਅੱਖਰ *)new_ਬਾਈਟਾਂ;
 	    }
-	    canHaveVimModifiers = true;
+	    canHaveVimModifiers = ਸੱਚ;
 
 	    uint16 beoskey;
-	    int first, last;
+	    ਪੂਰਨ ਪਹਿਲਾ, ਆਖਰੀ;
 
 	    /*
 	     * If numBytes == 0 that probably always indicates a special key.
 	     * (does not happen yet)
 	     */
-	    if (numBytes == 0 || bytes[0] == B_FUNCTION_KEY) {
+	    ਜੇ (ਅੰਕ_ਬਾਈਟਾਂ_2 == 0 || ਬਾਈਟਾਂ[0] == B_FUNCTION_ਕੁੰਜੀ) {
 		beoskey = F(scancode);
-		first = FIRST_FUNCTION_KEY;
-		last = NUM_SPECIAL_KEYS;
-	    } else if (*bytes == '\n' && scancode == 0x47) {
+		ਪਹਿਲਾ = ਪਹਿਲਾ_FUNCTION_ਕੁੰਜੀ;
+		ਆਖਰੀ = ਅੰਕ_SPECIAL_ਕੁੰਜੀਆਂ;
+	    } ਨਹੀਂਤਾਂ ਜੇ (*ਬਾਈਟਾਂ == '\n' && scancode == 0x47) {
 		// remap the (non-keypad) ENTER key from \n to \r.
 		string[0] = '\r';
 		len = 1;
-		first = last = 0;
-	    } else {
-		beoskey = K(bytes[0]);
-		first = 0;
-		last = FIRST_FUNCTION_KEY;
+		ਪਹਿਲਾ = ਆਖਰੀ = 0;
+	    } ਨਹੀਂਤਾਂ {
+		beoskey = K(ਬਾਈਟਾਂ[0]);
+		ਪਹਿਲਾ = 0;
+		ਆਖਰੀ = ਪਹਿਲਾ_FUNCTION_ਕੁੰਜੀ;
 	    }
 
-	    for (int i = first; i < last; i++) {
-		if (special_keys[i].BeKeys == beoskey) {
+	    ਲਈ (ਪੂਰਨ i = ਪਹਿਲਾ; i < ਆਖਰੀ; i++) {
+		ਜੇ (special_ਕੁੰਜੀਆਂ[i].Be_ਕੁੰਜੀਆਂ == beoskey) {
 		    string[0] = CSI;
-		    string[1] = special_keys[i].vim_code0;
-		    string[2] = special_keys[i].vim_code1;
+		    string[1] = special_ਕੁੰਜੀਆਂ[i].vim_code0;
+		    string[2] = special_ਕੁੰਜੀਆਂ[i].vim_code1;
 		    len = 3;
 		}
 	    }
 	}
 notspecial:
-	if (len == 0) {
-	    string[0] = bytes[0];
+	ਜੇ (len == 0) {
+	    string[0] = ਬਾਈਟਾਂ[0];
 	    len = 1;
 	}
 
 	// Special keys (and a few others) may have modifiers
-#if 0
-	if (len == 3 ||
-		bytes[0] == B_SPACE || bytes[0] == B_TAB ||
-		bytes[0] == B_RETURN || bytes[0] == '\r' ||
-		bytes[0] == B_ESCAPE)
-#else
-	    if (canHaveVimModifiers)
-#endif
+#ਜੇ 0
+	ਜੇ (len == 3 ||
+		ਬਾਈਟਾਂ[0] == B_SPACE || ਬਾਈਟਾਂ[0] == B_TAB ||
+		ਬਾਈਟਾਂ[0] == B_RETURN || ਬਾਈਟਾਂ[0] == '\r' ||
+		ਬਾਈਟਾਂ[0] == B_ESCAPE)
+#ਨਹੀਂਤਾਂ
+	    ਜੇ (canHaveVimModifiers)
+#ਜੇ_ਅੰਤ
 	    {
-		int modifiers;
+		ਪੂਰਨ modifiers;
 		modifiers = 0;
-		if (beModifiers & B_SHIFT_KEY)
-		    modifiers |= MOD_MASK_SHIFT;
-		if (beModifiers & B_CONTROL_KEY)
-		    modifiers |= MOD_MASK_CTRL;
-		if (beModifiers & B_OPTION_KEY)
-		    modifiers |= MOD_MASK_ALT;
+		ਜੇ (beModifiers & B_ਖਿਸਕਾਓ_ਕੁੰਜੀ)
+		    modifiers |= MOD_ਨਕਾਬ_ਖਿਸਕਾਓ;
+		ਜੇ (beModifiers & B_CONTROL_ਕੁੰਜੀ)
+		    modifiers |= MOD_ਨਕਾਬ_CTRL;
+		ਜੇ (beModifiers & B_OPTION_ਕੁੰਜੀ)
+		    modifiers |= MOD_ਨਕਾਬ_ALT;
 
 		/*
 		 * For some keys a shift modifier is translated into another key
@@ -1401,58 +1401,58 @@ notspecial:
 		 * string[0] != CSI? (Not for BeOS, since len == 3 implies
 		 * string[0] == CSI...)
 		 */
-		int key;
-		if (string[0] == CSI && len == 3)
-		    key = TO_SPECIAL(string[1], string[2]);
-		else
-		    key = string[0];
-		key = simplify_key(key, &modifiers);
-		if (IS_SPECIAL(key))
+		ਪੂਰਨ ਕੁੰਜੀ;
+		ਜੇ (string[0] == CSI && len == 3)
+		    ਕੁੰਜੀ = ਮੰਜ਼ਿਲ_SPECIAL(string[1], string[2]);
+		ਨਹੀਂਤਾਂ
+		    ਕੁੰਜੀ = string[0];
+		ਕੁੰਜੀ = simplify_ਕੁੰਜੀ(ਕੁੰਜੀ, &modifiers);
+		ਜੇ (IS_SPECIAL(ਕੁੰਜੀ))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
+		    string[1] = K_ਦੂਜਾ(ਕੁੰਜੀ);
+		    string[2] = K_ਤੀਜਾ(ਕੁੰਜੀ);
 		    len = 3;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    string[0] = key;
+		    string[0] = ਕੁੰਜੀ;
 		    len = 1;
 		}
 
-		if (modifiers)
+		ਜੇ (modifiers)
 		{
 		    *dest++ = CSI;
 		    *dest++ = KS_MODIFIER;
 		    *dest++ = modifiers;
-		    km.length = 3;
+		    km.ਲੰਮਾਈ = 3;
 		}
 	    }
-	memcpy((char *)dest, string, len);
-	km.length += len;
-	km.csi_escape = false;
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)dest, string, len);
+	km.ਲੰਮਾਈ += len;
+	km.csi_escape = ਝੂਠ;
     }
 
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::ਕੁੰਜੀ_2, &km, ਆਕਾਰ(km));
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh && !gui.pointer_hidden)
+    ਜੇ (p_mh && !gui.ਸੂਚਕ_hidden)
     {
-	guiBlankMouse(true);
-	gui.pointer_hidden = TRUE;
+	guiBlankMouse(ਸੱਚ);
+	gui.ਸੂਚਕ_hidden = TRUE;
     }
 }
-void
-VimTextAreaView::guiSendMouseEvent(
-	int	button,
-	int	x,
-	int	y,
-	int	repeated_click,
+ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::guiSendMouseEvent(
+	ਪੂਰਨ	button,
+	ਪੂਰਨ	x,
+	ਪੂਰਨ	y,
+	ਪੂਰਨ	repeated_click,
 	int_u	modifiers)
 {
-    VimMouseMsg mm;
+    Vim_Mouse_ਸੁਨੇਹਾ mm;
 
     mm.button = button;
     mm.x = x;
@@ -1460,42 +1460,42 @@ VimTextAreaView::guiSendMouseEvent(
     mm.repeated_click = repeated_click;
     mm.modifiers = modifiers;
 
-    write_port(gui.vdcmp, VimMsg::Mouse, &mm, sizeof(mm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Mouse, &mm, ਆਕਾਰ(mm));
     //	calls gui_send_mouse_event()
 
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    ਜੇ (gui.ਸੂਚਕ_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(ਝੂਠ);
+	gui.ਸੂਚਕ_hidden = FALSE;
     }
 }
 
-void
-VimTextAreaView::guiMouseMoved(
-	int	x,
-	int	y)
+ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::guiMouseMoved(
+	ਪੂਰਨ	x,
+	ਪੂਰਨ	y)
 {
-    VimMouseMovedMsg mm;
+    Vim_Mouse_Moved_ਸੁਨੇਹਾ mm;
 
     mm.x = x;
     mm.y = y;
 
-    write_port(gui.vdcmp, VimMsg::MouseMoved, &mm, sizeof(mm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::MouseMoved, &mm, ਆਕਾਰ(mm));
 
-    if (gui.pointer_hidden)
+    ਜੇ (gui.ਸੂਚਕ_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(ਝੂਠ);
+	gui.ਸੂਚਕ_hidden = FALSE;
     }
 }
 
-    void
-VimTextAreaView::guiBlankMouse(bool should_hide)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::guiBlankMouse(ਤਾਰਕਿਕ should_hide)
 {
-    if (should_hide) {
+    ਜੇ (should_hide) {
 	// gui.vimApp->HideCursor();
 	gui.vimApp->ObscureCursor();
 	/*
@@ -1503,227 +1503,227 @@ VimTextAreaView::guiBlankMouse(bool should_hide)
 	 * Vim's idea of mouse visibility does not necessarily
 	 * correspond to reality.
 	 */
-    } else {
+    } ਨਹੀਂਤਾਂ {
 	// gui.vimApp->ShowCursor();
     }
 }
 
     int_u
-VimTextAreaView::mouseModifiersToVim(int32 beModifiers)
+Vim_ਪਾਠ_Area_View::mouse_Modifiers_ਮੰਜ਼ਿਲ_Vim(int32 beModifiers)
 {
     int_u vim_modifiers = 0x0;
 
-    if (beModifiers & B_SHIFT_KEY)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (beModifiers & B_CONTROL_KEY)
+    ਜੇ (beModifiers & B_ਖਿਸਕਾਓ_ਕੁੰਜੀ)
+	vim_modifiers |= MOUSE_ਖਿਸਕਾਓ;
+    ਜੇ (beModifiers & B_CONTROL_ਕੁੰਜੀ)
 	vim_modifiers |= MOUSE_CTRL;
-    if (beModifiers & B_OPTION_KEY)	// Alt or Meta key
+    ਜੇ (beModifiers & B_OPTION_ਕੁੰਜੀ)	// Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
-    return vim_modifiers;
+    ਵਾਪਸ vim_modifiers;
 }
 
-    void
-VimTextAreaView::MouseDown(BPoint point)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::Mouse_ਥੱਲੇ(BPoint ਬਿੰਦੂ)
 {
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = ਖਿੜਕੀ()->Current_ਸੁਨੇਹਾ();
+    ਪ੍ਰਤਿਜ੍ਞਾ(m);
 
     int32 buttons = 0;
-    m->FindInt32("buttons", &buttons);
+    m->ਲੱਭੋ_Int32("buttons", &buttons);
 
-    int vimButton;
+    ਪੂਰਨ vimButton;
 
-    if (buttons & B_PRIMARY_MOUSE_BUTTON)
-	vimButton = MOUSE_LEFT;
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON)
-	vimButton = MOUSE_RIGHT;
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
-	vimButton = MOUSE_MIDDLE;
-    else
-	return;		// Unknown button
+    ਜੇ (buttons & B_PRIMARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ਖੱਬਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (buttons & B_SECONDARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ਸੱਜਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (buttons & B_TERTIARY_MOUSE_BUTTON)
+	vimButton = MOUSE_ਵਿਚਕਾਰ;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ;		// Unknown button
 
     vimMouseButton = 1;	    // don't care which one
 
     // Handle multiple clicks
     int32 clicks = 0;
-    m->FindInt32("clicks", &clicks);
+    m->ਲੱਭੋ_Int32("clicks", &clicks);
 
     int32 modifiers = 0;
-    m->FindInt32("modifiers", &modifiers);
+    m->ਲੱਭੋ_Int32("modifiers", &modifiers);
 
-    vimMouseModifiers = mouseModifiersToVim(modifiers);
+    vimMouseModifiers = mouse_Modifiers_ਮੰਜ਼ਿਲ_Vim(modifiers);
 
-    guiSendMouseEvent(vimButton, point.x, point.y,
+    guiSendMouseEvent(vimButton, ਬਿੰਦੂ.x, ਬਿੰਦੂ.y,
 	    clicks > 1 /* = repeated_click*/, vimMouseModifiers);
 }
 
-    void
-VimTextAreaView::MouseUp(BPoint point)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::Mouse_ਉੱਪਰ(BPoint ਬਿੰਦੂ)
 {
     vimMouseButton = 0;
 
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = ਖਿੜਕੀ()->Current_ਸੁਨੇਹਾ();
+    ਪ੍ਰਤਿਜ੍ਞਾ(m);
     // m->PrintToStream();
 
     int32 modifiers = 0;
-    m->FindInt32("modifiers", &modifiers);
+    m->ਲੱਭੋ_Int32("modifiers", &modifiers);
 
-    vimMouseModifiers = mouseModifiersToVim(modifiers);
+    vimMouseModifiers = mouse_Modifiers_ਮੰਜ਼ਿਲ_Vim(modifiers);
 
-    guiSendMouseEvent(MOUSE_RELEASE, point.x, point.y,
+    guiSendMouseEvent(MOUSE_RELEASE, ਬਿੰਦੂ.x, ਬਿੰਦੂ.y,
 	    0 /* = repeated_click*/, vimMouseModifiers);
 
-    Inherited::MouseUp(point);
+    Inherited::Mouse_ਉੱਪਰ(ਬਿੰਦੂ);
 }
 
-    void
-VimTextAreaView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::MouseMoved(BPoint ਬਿੰਦੂ, uint32 transit, ਅਚਲ BMessage *ਸੁਨੇਹਾ_2)
 {
     /*
      * if our pointer is currently hidden, then we should show it.
      */
-    if (gui.pointer_hidden)
+    ਜੇ (gui.ਸੂਚਕ_hidden)
     {
-	guiBlankMouse(false);
-	gui.pointer_hidden = FALSE;
+	guiBlankMouse(ਝੂਠ);
+	gui.ਸੂਚਕ_hidden = FALSE;
     }
 
-    if (!vimMouseButton) {    // could also check m->"buttons"
-	guiMouseMoved(point.x, point.y);
-	return;
+    ਜੇ (!vimMouseButton) {    // could also check m->"buttons"
+	guiMouseMoved(ਬਿੰਦੂ.x, ਬਿੰਦੂ.y);
+	ਵਾਪਸ;
     }
 
-    atomic_add(&mouseDragEventCount, 1);
+    atomic_ਜੋੜੋ(&mouse_Drag_Event_ਗਿਣਤੀ, 1);
 
     // Don't care much about "transit"
-    guiSendMouseEvent(MOUSE_DRAG, point.x, point.y, 0, vimMouseModifiers);
+    guiSendMouseEvent(MOUSE_DRAG, ਬਿੰਦੂ.x, ਬਿੰਦੂ.y, 0, vimMouseModifiers);
 }
 
-    void
-VimTextAreaView::MessageReceived(BMessage *m)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::ਸੁਨੇਹਾ_Received(BMessage *m)
 {
-    switch (m->what) {
-	case 'menu':
+    ਚੋਣ (m->what) {
+	ਹਾਲਤ 'menu':
 	    {
-		VimMenuMsg mm;
-		mm.guiMenu = NULL;  // in case no pointer in msg
-		m->FindPointer("VimMenu", (void **)&mm.guiMenu);
-		write_port(gui.vdcmp, VimMsg::Menu, &mm, sizeof(mm));
+		Vim_Menu_ਸੁਨੇਹਾ mm;
+		mm.guiMenu = ਨਿਰਾ;  // in case no pointer in msg
+		m->ਲੱਭੋ_ਸੂਚਕ("VimMenu", (ਖਾਲੀ **)&mm.guiMenu);
+		write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Menu, &mm, ਆਕਾਰ(mm));
 	    }
-	    break;
-	case B_MOUSE_WHEEL_CHANGED:
+	    ਰੋਕੋ;
+	ਹਾਲਤ B_MOUSE_WHEEL_ਬਦਲਿਆ:
 	    {
 		VimScrollBar* scb = curwin->w_scrollbars[1].id;
-		float small=0, big=0, dy=0;
-		m->FindFloat("be:wheel_delta_y", &dy);
-		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy*3);
-		scb->ValueChanged(scb->Value());
-#if 0
+		ਦਸ਼ਮਲਵ small=0, big=0, dy=0;
+		m->ਲੱਭੋ_Float("be:wheel_delta_y", &dy);
+		scb->Get_ਕਦਮਾਂ(&small, &big);
+		scb->ਸੈੱਟ_ਮੁੱਲ(scb->ਮੁੱਲ_2()+small*dy*3);
+		scb->ਮੁੱਲ_ਬਦਲਿਆ_2(scb->ਮੁੱਲ_2());
+#ਜੇ 0
 		scb = curwin->w_scrollbars[0].id;
-		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy);
-		scb->ValueChanged(scb->Value());
-#endif
+		scb->Get_ਕਦਮਾਂ(&small, &big);
+		scb->ਸੈੱਟ_ਮੁੱਲ(scb->ਮੁੱਲ_2()+small*dy);
+		scb->ਮੁੱਲ_ਬਦਲਿਆ_2(scb->ਮੁੱਲ_2());
+#ਜੇ_ਅੰਤ
 	    }
-	    break;
-#ifdef FEAT_MBYTE_IME
-	case B_INPUT_METHOD_EVENT:
+	    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+	ਹਾਲਤ B_ਨਿਵੇਸ਼_ਵਿਧੀ_EVENT:
 	    {
 		int32 opcode;
-		m->FindInt32("be:opcode", &opcode);
-		switch(opcode)
+		m->ਲੱਭੋ_Int32("be:opcode", &opcode);
+		ਚੋਣ(opcode)
 		{
-		    case B_INPUT_METHOD_STARTED:
-			if (!IMData.messenger) delete IMData.messenger;
-			IMData.messenger = new BMessenger();
-			m->FindMessenger("be:reply_to", IMData.messenger);
-			break;
-		    case B_INPUT_METHOD_CHANGED:
+		    ਹਾਲਤ B_ਨਿਵੇਸ਼_ਵਿਧੀ_STARTED:
+			ਜੇ (!IMData.messenger) ਮਿਟਾਓ IMData.messenger;
+			IMData.messenger = ਨਵਾਂ BMessenger();
+			m->ਲੱਭੋ_Messenger("be:reply_to", IMData.messenger);
+			ਰੋਕੋ;
+		    ਹਾਲਤ B_ਨਿਵੇਸ਼_ਵਿਧੀ_ਬਦਲਿਆ:
 			{
 			    BString str;
-			    bool confirmed;
-			    if (IMData.message) *(IMData.message) = *m;
-			    else	       IMData.message = new BMessage(*m);
+			    ਤਾਰਕਿਕ confirmed;
+			    ਜੇ (IMData.ਸੁਨੇਹਾ_2) *(IMData.ਸੁਨੇਹਾ_2) = *m;
+			    ਨਹੀਂਤਾਂ	       IMData.ਸੁਨੇਹਾ_2 = ਨਵਾਂ BMessage(*m);
 			    DrawIMString();
-			    m->FindBool("be:confirmed", &confirmed);
-			    if (confirmed)
+			    m->ਲੱਭੋ_Bool("be:confirmed", &confirmed);
+			    ਜੇ (confirmed)
 			    {
-				m->FindString("be:string", &str);
+				m->ਲੱਭੋ_String("be:string", &str);
 				char_u *chars = (char_u*)str.String();
-				struct VimKeyMsg km;
-				km.csi_escape = true;
-				int clen;
-				int i = 0;
-				while (i < str.Length())
+				ਬਣਤਰ Vim_ਕੁੰਜੀ_ਸੁਨੇਹਾ km;
+				km.csi_escape = ਸੱਚ;
+				ਪੂਰਨ clen;
+				ਪੂਰਨ i = 0;
+				ਜਦੋਂ (i < str.ਲੰਮਾਈ_2())
 				{
 				    clen = utf_ptr2len(chars+i);
-				    memcpy(km.chars, chars+i, clen);
-				    km.length = clen;
-				    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+				    ਸਮ੍ਰਿਤੀ_ਨਕਲ(km.chars, chars+i, clen);
+				    km.ਲੰਮਾਈ = clen;
+				    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::ਕੁੰਜੀ_2, &km, ਆਕਾਰ(km));
 				    i += clen;
 				}
 			    }
 			}
-			break;
-		    case B_INPUT_METHOD_LOCATION_REQUEST:
+			ਰੋਕੋ;
+		    ਹਾਲਤ B_ਨਿਵੇਸ਼_ਵਿਧੀ_LOCATION_REQUEST:
 			{
-			    BMessage msg(B_INPUT_METHOD_EVENT);
-			    msg.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
-			    msg.AddPoint("be:location_reply", IMData.location);
-			    msg.AddFloat("be:height_reply", FILL_Y(1));
-			    IMData.messenger->SendMessage(&msg);
+			    BMessage ਸੁਨੇਹਾ(B_ਨਿਵੇਸ਼_ਵਿਧੀ_EVENT);
+			    ਸੁਨੇਹਾ.ਜੋੜੋ_Int32("be:opcode", B_ਨਿਵੇਸ਼_ਵਿਧੀ_LOCATION_REQUEST);
+			    ਸੁਨੇਹਾ.ਜੋੜੋ_ਬਿੰਦੂ("be:location_reply", IMData.location);
+			    ਸੁਨੇਹਾ.ਜੋੜੋ_Float("be:height_reply", FILL_Y(1));
+			    IMData.messenger->Send_ਸੁਨੇਹਾ(&ਸੁਨੇਹਾ);
 			}
-			break;
-		    case B_INPUT_METHOD_STOPPED:
-			delete IMData.messenger;
-			delete IMData.message;
-			IMData.messenger = NULL;
-			IMData.message = NULL;
-			break;
+			ਰੋਕੋ;
+		    ਹਾਲਤ B_ਨਿਵੇਸ਼_ਵਿਧੀ_STOPPED:
+			ਮਿਟਾਓ IMData.messenger;
+			ਮਿਟਾਓ IMData.ਸੁਨੇਹਾ_2;
+			IMData.messenger = ਨਿਰਾ;
+			IMData.ਸੁਨੇਹਾ_2 = ਨਿਰਾ;
+			ਰੋਕੋ;
 		}
 	    }
 	    // TODO: sz: break here???
-#endif
-	default:
-	    if (m->WasDropped()) {
-		BWindow *w = Window();
-		w->DetachCurrentMessage();
-		w->Minimize(false);
-		VimApp::SendRefs(m, (modifiers() & B_SHIFT_KEY) != 0);
-	    } else {
-		Inherited::MessageReceived(m);
+#ਜੇ_ਅੰਤ
+	ਮੂਲ:
+	    ਜੇ (m->WasDropped()) {
+		BWindow *w = ਖਿੜਕੀ();
+		w->Detach_Current_ਸੁਨੇਹਾ();
+		w->Minimize(ਝੂਠ);
+		VimApp::SendRefs(m, (modifiers() & B_ਖਿਸਕਾਓ_ਕੁੰਜੀ) != 0);
+	    } ਨਹੀਂਤਾਂ {
+		Inherited::ਸੁਨੇਹਾ_Received(m);
 	    }
-	    break;
+	    ਰੋਕੋ;
     }
 }
 
-    int
-VimTextAreaView::mchInitFont(char_u *name)
+    ਪੂਰਨ
+Vim_ਪਾਠ_Area_View::mchInitFont(char_u *name)
 {
     VimFont *newFont = (VimFont *)gui_mch_get_font(name, 1);
-    if (newFont != NOFONT) {
+    ਜੇ (newFont != NOFONT) {
 	gui.norm_font = (GuiFont)newFont;
-	gui_mch_set_font((GuiFont)newFont);
-	if (name && STRCMP(name, "*") != 0)
-	    hl_set_font_name(name);
+	gui_mch_ਸੈੱਟ_font((GuiFont)newFont);
+	ਜੇ (name && STRCMP(name, "*") != 0)
+	    hl_ਸੈੱਟ_font_name(name);
 
-	SetDrawingMode(B_OP_COPY);
+	ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_COPY);
 
 	/*
 	 * Try to load other fonts for bold, italic, and bold-italic.
 	 * We should also try to work out what font to use for these when they are
 	 * not specified by X resources, but we don't yet.
 	 */
-	return OK;
+	ਵਾਪਸ OK;
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
-    void
-VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::mchDrawString(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ, char_u *s, ਪੂਰਨ len, ਪੂਰਨ flags)
 {
     /*
      * First we must erase the area, because DrawString won't do
@@ -1732,116 +1732,116 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
      * should be set when appropriate!!!
      * (Rectangles include the bottom and right edge)
      */
-    if (!(flags & DRAW_TRANSP)) {
-	int cells;
+    ਜੇ (!(flags & DRAW_TRANSP)) {
+	ਪੂਰਨ cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	ਲਈ (ਪੂਰਨ i=0; i<len; i++) {
+	    ਪੂਰਨ cn = utf_ptr2cells((char_u *)(s+i));
+	    ਜੇ (cn<4) cells += cn;
 	}
 
-	BRect r(FILL_X(col), FILL_Y(row),
-		FILL_X(col + cells) - PEN_WIDTH, FILL_Y(row + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	BRect r(FILL_X(ਖਾਨਾ), FILL_Y(ਪੰਕਤੀ),
+		FILL_X(ਖਾਨਾ + cells) - PEN_ਚੌੜਾਈ, FILL_Y(ਪੰਕਤੀ + 1) - PEN_ਚੌੜਾਈ);
+	FillRect(r, B_SOLID_ਨੀਵਾਂ);
     }
 
     BFont font;
-    this->GetFont(&font);
-    if (!font.IsFixed())
+    ਇਹ->GetFont(&font);
+    ਜੇ (!font.IsFixed())
     {
-	char* p = (char*)s;
+	ਅੱਖਰ* p = (ਅੱਖਰ*)s;
 	int32 clen, lastpos = 0;
 	BPoint where;
-	int cells;
-	while ((p - (char*)s) < len) {
+	ਪੂਰਨ cells;
+	ਜਦੋਂ ((p - (ਅੱਖਰ*)s) < len) {
 	    clen = utf_ptr2len((u_char*)p);
-	    where.Set(TEXT_X(col+lastpos), TEXT_Y(row));
+	    where.ਸੈੱਟ(ਪਾਠ_X(ਖਾਨਾ+lastpos), ਪਾਠ_Y(ਪੰਕਤੀ));
 	    DrawString(p, clen, where);
-	    if (flags & DRAW_BOLD) {
+	    ਜੇ (flags & DRAW_BOLD) {
 		where.x += 1.0;
-		SetDrawingMode(B_OP_BLEND);
+		ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_BLEND);
 		DrawString(p, clen, where);
-		SetDrawingMode(B_OP_COPY);
+		ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_COPY);
 	    }
 	    cells = utf_ptr2cells((char_u *)p);
-	    if (cells<4) lastpos += cells;
-	    else	lastpos++;
+	    ਜੇ (cells<4) lastpos += cells;
+	    ਨਹੀਂਤਾਂ	lastpos++;
 	    p += clen;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	BPoint where(TEXT_X(col), TEXT_Y(row));
-	DrawString((char*)s, len, where);
-	if (flags & DRAW_BOLD) {
+	BPoint where(ਪਾਠ_X(ਖਾਨਾ), ਪਾਠ_Y(ਪੰਕਤੀ));
+	DrawString((ਅੱਖਰ*)s, len, where);
+	ਜੇ (flags & DRAW_BOLD) {
 	    where.x += 1.0;
-	    SetDrawingMode(B_OP_BLEND);
-	    DrawString((char*)s, len, where);
-	    SetDrawingMode(B_OP_COPY);
+	    ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_BLEND);
+	    DrawString((ਅੱਖਰ*)s, len, where);
+	    ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_COPY);
 	}
     }
 
-    if (flags & DRAW_UNDERL) {
-	int cells;
+    ਜੇ (flags & DRAW_UNDERL) {
+	ਪੂਰਨ cells;
 	cells = 0;
-	for (int i=0; i<len; i++) {
-	    int cn = utf_ptr2cells((char_u *)(s+i));
-	    if (cn<4) cells += cn;
+	ਲਈ (ਪੂਰਨ i=0; i<len; i++) {
+	    ਪੂਰਨ cn = utf_ptr2cells((char_u *)(s+i));
+	    ਜੇ (cn<4) cells += cn;
 	}
 
-	BPoint start(FILL_X(col), FILL_Y(row + 1) - PEN_WIDTH);
-	BPoint end(FILL_X(col + cells) - PEN_WIDTH, start.y);
+	BPoint ਸ਼ੁਰੂ(FILL_X(ਖਾਨਾ), FILL_Y(ਪੰਕਤੀ + 1) - PEN_ਚੌੜਾਈ);
+	BPoint ਸਿਰਾ(FILL_X(ਖਾਨਾ + cells) - PEN_ਚੌੜਾਈ, ਸ਼ੁਰੂ.y);
 
-	StrokeLine(start, end);
+	Stroke_ਸਤਰ(ਸ਼ੁਰੂ, ਸਿਰਾ);
     }
 }
 
-void
-VimTextAreaView::mchClearBlock(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::mch_Clear_ਖੰਡ(
+	ਪੂਰਨ	row1,
+	ਪੂਰਨ	col1,
+	ਪੂਰਨ	row2,
+	ਪੂਰਨ	col2)
 {
     BRect r(FILL_X(col1), FILL_Y(row1),
-	    FILL_X(col2 + 1) - PEN_WIDTH, FILL_Y(row2 + 1) - PEN_WIDTH);
-    gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(r, B_SOLID_LOW);
+	    FILL_X(col2 + 1) - PEN_ਚੌੜਾਈ, FILL_Y(row2 + 1) - PEN_ਚੌੜਾਈ);
+    gui_mch_ਸੈੱਟ_bg_color(gui.ਪਿੱਠ_pixel);
+    FillRect(r, B_SOLID_ਨੀਵਾਂ);
 }
 
-    void
-VimTextAreaView::mchClearAll()
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::mchClearAll()
 {
-    gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(Bounds(), B_SOLID_LOW);
+    gui_mch_ਸੈੱਟ_bg_color(gui.ਪਿੱਠ_pixel);
+    FillRect(Bounds(), B_SOLID_ਨੀਵਾਂ);
 }
 
 /*
  * mchDeleteLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchDeleteLines(int row, int num_lines)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::mch_Delete_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ)
 {
-    BRect source, dest;
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row + num_lines);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
+    BRect ਸਰੋਤ, dest;
+    ਸਰੋਤ.ਖੱਬੇ = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    ਸਰੋਤ.ਸਿਖਰ = FILL_Y(ਪੰਕਤੀ + ਅੰਕ_ਸਤਰਾਂ);
+    ਸਰੋਤ.ਸੱਜੇ = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - PEN_ਚੌੜਾਈ;
+    ਸਰੋਤ.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_ਚੌੜਾਈ;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    dest.ਖੱਬੇ = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    dest.ਸਿਖਰ = FILL_Y(ਪੰਕਤੀ);
+    dest.ਸੱਜੇ = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - PEN_ਚੌੜਾਈ;
+    dest.bottom = FILL_Y(gui.scroll_region_bot - ਅੰਕ_ਸਤਰਾਂ + 1) - PEN_ਚੌੜਾਈ;
 
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	// Clear one column more for when bold has spilled over
-	CopyBits(source, dest);
-	gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-		gui.scroll_region_left,
-		gui.scroll_region_bot, gui.scroll_region_right);
+	Copy_ਬਿੱਟ(ਸਰੋਤ, dest);
+	gui_clear_ਖੰਡ(gui.scroll_region_bot - ਅੰਕ_ਸਤਰਾਂ + 1,
+		gui.scroll_region_ਖੱਬਾ,
+		gui.scroll_region_bot, gui.scroll_region_ਸੱਜਾ);
 
 
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
 	/*
 	 * The Draw() callback will be called now if some of the source
 	 * bits were not in the visible region.
@@ -1854,30 +1854,30 @@ VimTextAreaView::mchDeleteLines(int row, int num_lines)
 /*
  * mchInsertLines() Lock()s the window by itself.
  */
-    void
-VimTextAreaView::mchInsertLines(int row, int num_lines)
+    ਖਾਲੀ
+Vim_ਪਾਠ_Area_View::mch_ਪਾਓ_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ)
 {
-    BRect source, dest;
+    BRect ਸਰੋਤ, dest;
 
     // XXX Attempt at a hack:
-    gui.vimWindow->UpdateIfNeeded();
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    gui.vim_ਖਿੜਕੀ->UpdateIfNeeded();
+    ਸਰੋਤ.ਖੱਬੇ = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    ਸਰੋਤ.ਸਿਖਰ = FILL_Y(ਪੰਕਤੀ);
+    ਸਰੋਤ.ਸੱਜੇ = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - PEN_ਚੌੜਾਈ;
+    ਸਰੋਤ.bottom = FILL_Y(gui.scroll_region_bot - ਅੰਕ_ਸਤਰਾਂ + 1) - PEN_ਚੌੜਾਈ;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row + num_lines);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
+    dest.ਖੱਬੇ = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    dest.ਸਿਖਰ = FILL_Y(ਪੰਕਤੀ + ਅੰਕ_ਸਤਰਾਂ);
+    dest.ਸੱਜੇ = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - PEN_ਚੌੜਾਈ;
+    dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_ਚੌੜਾਈ;
 
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	// Clear one column more for when bold has spilled over
-	CopyBits(source, dest);
-	gui_clear_block(row, gui.scroll_region_left,
-		row + num_lines - 1, gui.scroll_region_right);
+	Copy_ਬਿੱਟ(ਸਰੋਤ, dest);
+	gui_clear_ਖੰਡ(ਪੰਕਤੀ, gui.scroll_region_ਖੱਬਾ,
+		ਪੰਕਤੀ + ਅੰਕ_ਸਤਰਾਂ - 1, gui.scroll_region_ਸੱਜਾ);
 
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
 	/*
 	 * The Draw() callback will be called now if some of the source
 	 * bits were not in the visible region.
@@ -1893,75 +1893,75 @@ VimTextAreaView::mchInsertLines(int row, int num_lines)
     }
 }
 
-#ifdef FEAT_MBYTE_IME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
 /*
  * DrawIMString draws string with IMData.message.
  */
-void VimTextAreaView::DrawIMString(void)
+ਖਾਲੀ Vim_ਪਾਠ_Area_View::DrawIMString(ਖਾਲੀ)
 {
-    static const rgb_color r_highlight = {255, 152, 152, 255},
+    ਸਥਿਰ ਅਚਲ rgb_color r_highlight = {255, 152, 152, 255},
 		 b_highlight = {152, 203, 255, 255};
     BString str;
-    const char* s;
-    int len;
-    BMessage* msg = IMData.message;
-    if (!msg)
-	return;
-    gui_redraw_block(IMData.row, 0,
-	    IMData.row + IMData.count, W_WIDTH(curwin), GUI_MON_NOCLEAR);
-    bool confirmed = false;
-    msg->FindBool("be:confirmed", &confirmed);
-    if (confirmed)
-	return;
-    rgb_color hcolor = HighColor(), lcolor = LowColor();
-    msg->FindString("be:string", &str);
+    ਅਚਲ ਅੱਖਰ* s;
+    ਪੂਰਨ len;
+    BMessage* ਸੁਨੇਹਾ = IMData.ਸੁਨੇਹਾ_2;
+    ਜੇ (!ਸੁਨੇਹਾ)
+	ਵਾਪਸ;
+    gui_redraw_ਖੰਡ(IMData.ਪੰਕਤੀ, 0,
+	    IMData.ਪੰਕਤੀ + IMData.ਗਿਣਤੀ_2, W_ਚੌੜਾਈ(curwin), GUI_MON_NOCLEAR);
+    ਤਾਰਕਿਕ confirmed = ਝੂਠ;
+    ਸੁਨੇਹਾ->ਲੱਭੋ_Bool("be:confirmed", &confirmed);
+    ਜੇ (confirmed)
+	ਵਾਪਸ;
+    rgb_color hcolor = ਉੱਚਾ_Color(), lcolor = ਨੀਵਾਂ_Color();
+    ਸੁਨੇਹਾ->ਲੱਭੋ_String("be:string", &str);
     s = str.String();
-    len = str.Length();
-    SetHighColor(0, 0, 0);
-    IMData.row = gui.row;
-    IMData.col = gui.col;
-    int32 sel_start = 0, sel_end = 0;
-    msg->FindInt32("be:selection", 0, &sel_start);
-    msg->FindInt32("be:selection", 1, &sel_end);
-    int clen, cn;
-    BPoint pos(IMData.col, 0);
+    len = str.ਲੰਮਾਈ_2();
+    ਸੈੱਟ_ਉੱਚਾ_Color(0, 0, 0);
+    IMData.ਪੰਕਤੀ = gui.ਪੰਕਤੀ;
+    IMData.ਖਾਨਾ = gui.ਖਾਨਾ;
+    int32 sel_ਸ਼ੁਰੂ = 0, sel_ਸਿਰਾ = 0;
+    ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("be:selection", 0, &sel_ਸ਼ੁਰੂ);
+    ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("be:selection", 1, &sel_ਸਿਰਾ);
+    ਪੂਰਨ clen, cn;
+    BPoint pos(IMData.ਖਾਨਾ, 0);
     BRect r;
     BPoint where;
-    IMData.location = ConvertToScreen(
-	    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
-    for (int i=0; i<len; i+=clen)
+    IMData.location = Convert_ਮੰਜ਼ਿਲ_Screen(
+	    BPoint(FILL_X(pos.x), FILL_Y(IMData.ਪੰਕਤੀ + pos.y)));
+    ਲਈ (ਪੂਰਨ i=0; i<len; i+=clen)
     {
 	cn = utf_ptr2cells((char_u *)(s+i));
 	clen = utf_ptr2len((char_u *)(s+i));
-	if (pos.x + cn > W_WIDTH(curwin))
+	ਜੇ (pos.x + cn > W_ਚੌੜਾਈ(curwin))
 	{
 	    pos.y++;
 	    pos.x = 0;
 	}
-	if (sel_start<=i && i<sel_end)
+	ਜੇ (sel_ਸ਼ੁਰੂ<=i && i<sel_ਸਿਰਾ)
 	{
-	    SetLowColor(r_highlight);
-	    IMData.location = ConvertToScreen(
-		    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
+	    ਸੈੱਟ_ਨੀਵਾਂ_Color(r_highlight);
+	    IMData.location = Convert_ਮੰਜ਼ਿਲ_Screen(
+		    BPoint(FILL_X(pos.x), FILL_Y(IMData.ਪੰਕਤੀ + pos.y)));
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    SetLowColor(b_highlight);
+	    ਸੈੱਟ_ਨੀਵਾਂ_Color(b_highlight);
 	}
-	r.Set(FILL_X(pos.x), FILL_Y(IMData.row + pos.y),
-		FILL_X(pos.x + cn) - PEN_WIDTH,
-		FILL_Y(IMData.row + pos.y + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
-	where.Set(TEXT_X(pos.x), TEXT_Y(IMData.row + pos.y));
+	r.ਸੈੱਟ(FILL_X(pos.x), FILL_Y(IMData.ਪੰਕਤੀ + pos.y),
+		FILL_X(pos.x + cn) - PEN_ਚੌੜਾਈ,
+		FILL_Y(IMData.ਪੰਕਤੀ + pos.y + 1) - PEN_ਚੌੜਾਈ);
+	FillRect(r, B_SOLID_ਨੀਵਾਂ);
+	where.ਸੈੱਟ(ਪਾਠ_X(pos.x), ਪਾਠ_Y(IMData.ਪੰਕਤੀ + pos.y));
 	DrawString((s+i), clen, where);
 	pos.x += cn;
     }
-    IMData.count = (int)pos.y;
+    IMData.ਗਿਣਤੀ_2 = (ਪੂਰਨ)pos.y;
 
-    SetHighColor(hcolor);
-    SetLowColor(lcolor);
+    ਸੈੱਟ_ਉੱਚਾ_Color(hcolor);
+    ਸੈੱਟ_ਨੀਵਾਂ_Color(lcolor);
 }
-#endif
+#ਜੇ_ਅੰਤ
 // ---------------- VimScrollBar ----------------
 
 /*
@@ -1975,27 +1975,27 @@ void VimTextAreaView::DrawIMString(void)
 VimScrollBar::VimScrollBar(scrollbar_T *g, orientation posture):
     BScrollBar(posture == B_HORIZONTAL ?  BRect(-100,-100,-10,-90) :
 	    BRect(-100,-100,-90,-10),
-	    "vim scrollbar", (BView *)NULL,
+	    "vim scrollbar", (BView *)ਨਿਰਾ,
 	    0.0, 10.0, posture),
-    ignoreValue(-1),
-    scrollEventCount(0)
+    ignore_ਮੁੱਲ(-1),
+    scroll_Event_ਗਿਣਤੀ(0)
 {
     gsb = g;
-    SetResizingMode(B_FOLLOW_NONE);
+    ਸੈੱਟ_Resizing_ਬਹੁਲਕ(B_FOLLOW_NONE);
 }
 
 VimScrollBar::~VimScrollBar()
 {
 }
 
-    void
-VimScrollBar::ValueChanged(float newValue)
+    ਖਾਲੀ
+VimScrollBar::ਮੁੱਲ_ਬਦਲਿਆ_2(ਦਸ਼ਮਲਵ new_ਮੁੱਲ)
 {
-    if (ignoreValue >= 0.0 && newValue == ignoreValue) {
-	ignoreValue = -1;
-	return;
+    ਜੇ (ignore_ਮੁੱਲ >= 0.0 && new_ਮੁੱਲ == ignore_ਮੁੱਲ) {
+	ignore_ਮੁੱਲ = -1;
+	ਵਾਪਸ;
     }
-    ignoreValue = -1;
+    ignore_ਮੁੱਲ = -1;
     /*
      * We want to throttle the amount of scroll messages generated.
      * Normally I presume you won't get a new message before we've
@@ -2004,15 +2004,15 @@ VimScrollBar::ValueChanged(float newValue)
      * scroll events there are (or will be) in the VDCMP, and the
      * throttling happens at the receiving end.
      */
-    atomic_add(&scrollEventCount, 1);
+    atomic_ਜੋੜੋ(&scroll_Event_ਗਿਣਤੀ, 1);
 
-    struct VimScrollBarMsg sm;
+    ਬਣਤਰ Vim_Scroll_Bar_ਸੁਨੇਹਾ sm;
 
-    sm.sb = this;
-    sm.value = (long) newValue;
+    sm.sb = ਇਹ;
+    sm.ਮੁੱਲ = (ਲੰਮਾ) new_ਮੁੱਲ;
     sm.stillDragging = TRUE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::ScrollBar, &sm, ਆਕਾਰ(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, TRUE);
 }
@@ -2024,35 +2024,35 @@ VimScrollBar::ValueChanged(float newValue)
  * is outside... This has some funny effects... XXX
  * So we do special processing when the window de/activates.
  */
-    void
-VimScrollBar::MouseUp(BPoint where)
+    ਖਾਲੀ
+VimScrollBar::Mouse_ਉੱਪਰ(BPoint where)
 {
     // BMessage *m = Window()->CurrentMessage();
     // m->PrintToStream();
 
-    atomic_add(&scrollEventCount, 1);
+    atomic_ਜੋੜੋ(&scroll_Event_ਗਿਣਤੀ, 1);
 
-    struct VimScrollBarMsg sm;
+    ਬਣਤਰ Vim_Scroll_Bar_ਸੁਨੇਹਾ sm;
 
-    sm.sb = this;
-    sm.value = (long) Value();
+    sm.sb = ਇਹ;
+    sm.ਮੁੱਲ = (ਲੰਮਾ) ਮੁੱਲ_2();
     sm.stillDragging = FALSE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::ScrollBar, &sm, ਆਕਾਰ(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, FALSE);
 
-    Inherited::MouseUp(where);
+    Inherited::Mouse_ਉੱਪਰ(where);
 }
 
-    void
-VimScrollBar::SetValue(float newValue)
+    ਖਾਲੀ
+VimScrollBar::ਸੈੱਟ_ਮੁੱਲ(ਦਸ਼ਮਲਵ new_ਮੁੱਲ)
 {
-    if (newValue == Value())
-	return;
+    ਜੇ (new_ਮੁੱਲ == ਮੁੱਲ_2())
+	ਵਾਪਸ;
 
-    ignoreValue = newValue;
-    Inherited::SetValue(newValue);
+    ignore_ਮੁੱਲ = new_ਮੁੱਲ;
+    Inherited::ਸੈੱਟ_ਮੁੱਲ(new_ਮੁੱਲ);
 }
 
 // ---------------- VimFont ----------------
@@ -2062,17 +2062,17 @@ VimFont::VimFont(): BFont()
     init();
 }
 
-VimFont::VimFont(const VimFont *rhs): BFont(rhs)
+VimFont::VimFont(ਅਚਲ VimFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const BFont *rhs): BFont(rhs)
+VimFont::VimFont(ਅਚਲ BFont *rhs): BFont(rhs)
 {
     init();
 }
 
-VimFont::VimFont(const VimFont &rhs): BFont(rhs)
+VimFont::VimFont(ਅਚਲ VimFont &rhs): BFont(rhs)
 {
     init();
 }
@@ -2081,510 +2081,510 @@ VimFont::~VimFont()
 {
 }
 
-    void
+    ਖਾਲੀ
 VimFont::init()
 {
-    next = NULL;
+    ਅਗਲਾ = ਨਿਰਾ;
     refcount = 1;
-    name = NULL;
+    name = ਨਿਰਾ;
 }
 
 // ---------------- VimDialog ----------------
 
-#if defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_GUI_DIALOG)
 
-const unsigned int  kVimDialogButtonMsg = 'VMDB';
-const unsigned int  kVimDialogIconStripeWidth = 30;
-const unsigned int  kVimDialogButtonsSpacingX = 9;
-const unsigned int  kVimDialogButtonsSpacingY = 4;
-const unsigned int  kVimDialogSpacingX = 6;
-const unsigned int  kVimDialogSpacingY = 10;
-const unsigned int  kVimDialogMinimalWidth  = 310;
-const unsigned int  kVimDialogMinimalHeight = 75;
-const BRect	    kDefaultRect =
-BRect(0, 0, kVimDialogMinimalWidth, kVimDialogMinimalHeight);
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_Button_ਸੁਨੇਹਾ = 'VMDB';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_Icon_Stripe_ਚੌੜਾਈ = 30;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  kVimDialogButtonsSpacingX = 9;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  kVimDialogButtonsSpacingY = 4;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  kVimDialogSpacingX = 6;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  kVimDialogSpacingY = 10;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_ਨਿਊਨਤਮ_ਚੌੜਾਈ  = 310;
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_ਨਿਊਨਤਮ_ਉਚਾਈ = 75;
+ਅਚਲ BRect	    kDefaultRect =
+BRect(0, 0, k_Vim_Dialog_ਨਿਊਨਤਮ_ਚੌੜਾਈ, k_Vim_Dialog_ਨਿਊਨਤਮ_ਉਚਾਈ);
 
-VimDialog::VimDialog(int type, const char *title, const char *message,
-	const char *buttons, int dfltbutton, const char *textfield, int ex_cmd)
-: BWindow(kDefaultRect, title, B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+VimDialog::VimDialog(ਪੂਰਨ type, ਅਚਲ ਅੱਖਰ *title, ਅਚਲ ਅੱਖਰ *ਸੁਨੇਹਾ_2,
+	ਅਚਲ ਅੱਖਰ *buttons, ਪੂਰਨ dfltbutton, ਅਚਲ ਅੱਖਰ *textfield, ਪੂਰਨ ex_cmd)
+: BWindow(kDefaultRect, title, B_TITLED_ਖਿੜਕੀ_LOOK, B_MODAL_APP_ਖਿੜਕੀ_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fDialogSem(-1)
-    , fDialogValue(dfltbutton)
-    , fMessageView(NULL)
-    , fInputControl(NULL)
-    , fInputValue(textfield)
+    , f_Dialog_ਮੁੱਲ(dfltbutton)
+    , f_ਸੁਨੇਹਾ_View(ਨਿਰਾ)
+    , f_ਨਿਵੇਸ਼_Control(ਨਿਰਾ)
+    , f_ਨਿਵੇਸ਼_ਮੁੱਲ(textfield)
 {
     //	master view
-    VimDialog::View* view = new VimDialog::View(Bounds());
-    if (view == NULL)
-	return;
+    VimDialog::View* view = ਨਵਾਂ VimDialog::View(Bounds());
+    ਜੇ (view == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (title == NULL)
-	SetTitle("Vim " VIM_VERSION_MEDIUM);
+    ਜੇ (title == ਨਿਰਾ)
+	ਸੈੱਟ_Title("Vim " VIM_ਸੰਸਕਰਣ_MEDIUM);
 
-    AddChild(view);
+    ਜੋੜੋ_ਬੱਚਾ(view);
 
     //	icon
     view->InitIcon(type);
 
     //	buttons
     int32 which = 1;
-    float maxButtonWidth  = 0;
-    float maxButtonHeight = 0;
-    float buttonsWidth	  = 0;
-    float buttonsHeight   = 0;
+    ਦਸ਼ਮਲਵ max_Button_ਚੌੜਾਈ  = 0;
+    ਦਸ਼ਮਲਵ max_Button_ਉਚਾਈ = 0;
+    ਦਸ਼ਮਲਵ buttons_ਚੌੜਾਈ	  = 0;
+    ਦਸ਼ਮਲਵ buttons_ਉਚਾਈ   = 0;
     BString strButtons(buttons);
     strButtons.RemoveAll("&");
-    do
+    ਕਰੋ
     {
-	int32 end = strButtons.FindFirst('\n');
-	if (end != B_ERROR)
-	    strButtons.SetByteAt(end, '\0');
+	int32 ਸਿਰਾ = strButtons.ਲੱਭੋ_ਪਹਿਲਾ('\n');
+	ਜੇ (ਸਿਰਾ != B_ERROR)
+	    strButtons.ਸੈੱਟ_Byte_At(ਸਿਰਾ, '\0');
 
 	BButton *button = _CreateButton(which++, strButtons.String());
-	view->AddChild(button);
-	fButtonsList.AddItem(button);
+	view->ਜੋੜੋ_ਬੱਚਾ(button);
+	fButtonsList.ਜੋੜੋ_ਵਸਤੂ(button);
 
-	maxButtonWidth	= max_c(maxButtonWidth,  button->Bounds().Width());
-	maxButtonHeight = max_c(maxButtonHeight, button->Bounds().Height());
-	buttonsWidth   += button->Bounds().Width();
-	buttonsHeight  += button->Bounds().Height();
+	max_Button_ਚੌੜਾਈ	= max_c(max_Button_ਚੌੜਾਈ,  button->Bounds().ਚੌੜਾਈ_2());
+	max_Button_ਉਚਾਈ = max_c(max_Button_ਉਚਾਈ, button->Bounds().ਉਚਾਈ_2());
+	buttons_ਚੌੜਾਈ   += button->Bounds().ਚੌੜਾਈ_2();
+	buttons_ਉਚਾਈ  += button->Bounds().ਉਚਾਈ_2();
 
-	if (end == B_ERROR)
-	    break;
+	ਜੇ (ਸਿਰਾ == B_ERROR)
+	    ਰੋਕੋ;
 
-	strButtons.Remove(0, end + 1);
-    } while (true);
+	strButtons.Remove(0, ਸਿਰਾ + 1);
+    } ਜਦੋਂ (ਸੱਚ);
 
-    int32 buttonsCount = fButtonsList.CountItems();
-    buttonsWidth      += kVimDialogButtonsSpacingX * (buttonsCount - 1);
-    buttonsHeight     += kVimDialogButtonsSpacingY * (buttonsCount - 1);
-    float dialogWidth  = buttonsWidth + kVimDialogIconStripeWidth +
+    int32 buttons_ਗਿਣਤੀ = fButtonsList.ਗਿਣਤੀ_ਚੀਜ਼ਾਂ();
+    buttons_ਚੌੜਾਈ      += kVimDialogButtonsSpacingX * (buttons_ਗਿਣਤੀ - 1);
+    buttons_ਉਚਾਈ     += kVimDialogButtonsSpacingY * (buttons_ਗਿਣਤੀ - 1);
+    ਦਸ਼ਮਲਵ dialog_ਚੌੜਾਈ  = buttons_ਚੌੜਾਈ + k_Vim_Dialog_Icon_Stripe_ਚੌੜਾਈ +
 	kVimDialogSpacingX * 2;
-    float dialogHeight = maxButtonHeight + kVimDialogSpacingY * 3;
+    ਦਸ਼ਮਲਵ dialog_ਉਚਾਈ = max_Button_ਉਚਾਈ + kVimDialogSpacingY * 3;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    bool vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL) ||
-	dialogWidth >= gui.vimWindow->Bounds().Width();
-    if (vertical) {
-	dialogWidth  -= buttonsWidth;
-	dialogWidth  += maxButtonWidth;
-	dialogHeight -= maxButtonHeight;
-	dialogHeight += buttonsHeight;
+    ਤਾਰਕਿਕ vertical = (vim_strchr(p_go, GO_VERTICAL) != ਨਿਰਾ) ||
+	dialog_ਚੌੜਾਈ >= gui.vim_ਖਿੜਕੀ->Bounds().ਚੌੜਾਈ_2();
+    ਜੇ (vertical) {
+	dialog_ਚੌੜਾਈ  -= buttons_ਚੌੜਾਈ;
+	dialog_ਚੌੜਾਈ  += max_Button_ਚੌੜਾਈ;
+	dialog_ਉਚਾਈ -= max_Button_ਉਚਾਈ;
+	dialog_ਉਚਾਈ += buttons_ਉਚਾਈ;
     }
 
-    dialogWidth  = max_c(dialogWidth,  kVimDialogMinimalWidth);
+    dialog_ਚੌੜਾਈ  = max_c(dialog_ਚੌੜਾਈ,  k_Vim_Dialog_ਨਿਊਨਤਮ_ਚੌੜਾਈ);
 
     //	message view
-    BRect rect(0, 0, dialogWidth, 0);
-    rect.left  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
-    rect.top   += kVimDialogSpacingY;
-    rect.right -= kVimDialogSpacingX;
-    rect.bottom = rect.top;
-    fMessageView = new BTextView(rect, "_tv_", rect.OffsetByCopy(B_ORIGIN),
-	    B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+    BRect rect(0, 0, dialog_ਚੌੜਾਈ, 0);
+    rect.ਖੱਬੇ  += k_Vim_Dialog_Icon_Stripe_ਚੌੜਾਈ + 16 + kVimDialogSpacingX;
+    rect.ਸਿਖਰ   += kVimDialogSpacingY;
+    rect.ਸੱਜੇ -= kVimDialogSpacingX;
+    rect.bottom = rect.ਸਿਖਰ;
+    f_ਸੁਨੇਹਾ_View = ਨਵਾਂ BTextView(rect, "_tv_", rect.ਵਿੱਥ_By_Copy(B_ORIGIN),
+	    B_FOLLOW_ਖੱਬਾ | B_FOLLOW_ਸਿਖਰ, B_WILL_DRAW);
 
-    fMessageView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-    rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-    fMessageView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
-    fMessageView->SetText(message);
-    fMessageView->MakeEditable(false);
-    fMessageView->MakeSelectable(false);
-    fMessageView->SetWordWrap(true);
-    AddChild(fMessageView);
+    f_ਸੁਨੇਹਾ_View->ਸੈੱਟ_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
+    rgb_color ਪਾਠ_Color = ui_color(B_PANEL_ਪਾਠ_COLOR);
+    f_ਸੁਨੇਹਾ_View->ਸੈੱਟ_Font_And_Color(be_plain_font, B_FONT_ALL, &ਪਾਠ_Color);
+    f_ਸੁਨੇਹਾ_View->ਸੈੱਟ_ਪਾਠ(ਸੁਨੇਹਾ_2);
+    f_ਸੁਨੇਹਾ_View->MakeEditable(ਝੂਠ);
+    f_ਸੁਨੇਹਾ_View->MakeSelectable(ਝੂਠ);
+    f_ਸੁਨੇਹਾ_View->ਸੈੱਟ_ਸ਼ਬਦ_Wrap(ਸੱਚ);
+    ਜੋੜੋ_ਬੱਚਾ(f_ਸੁਨੇਹਾ_View);
 
-    float messageHeight = fMessageView->TextHeight(0, fMessageView->CountLines());
-    fMessageView->ResizeBy(0, messageHeight);
-    fMessageView->SetTextRect(BRect(0, 0, rect.Width(), messageHeight));
+    ਦਸ਼ਮਲਵ ਸੁਨੇਹਾ_ਉਚਾਈ = f_ਸੁਨੇਹਾ_View->ਪਾਠ_ਉਚਾਈ(0, f_ਸੁਨੇਹਾ_View->ਗਿਣਤੀ_ਸਤਰਾਂ());
+    f_ਸੁਨੇਹਾ_View->ResizeBy(0, ਸੁਨੇਹਾ_ਉਚਾਈ);
+    f_ਸੁਨੇਹਾ_View->ਸੈੱਟ_ਪਾਠ_Rect(BRect(0, 0, rect.ਚੌੜਾਈ_2(), ਸੁਨੇਹਾ_ਉਚਾਈ));
 
-    dialogHeight += messageHeight;
+    dialog_ਉਚਾਈ += ਸੁਨੇਹਾ_ਉਚਾਈ;
 
     //	input view
-    if (fInputValue != NULL) {
-	rect.top     =
-	    rect.bottom += messageHeight + kVimDialogSpacingY;
-	fInputControl = new BTextControl(rect, "_iv_", NULL, fInputValue, NULL,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
-	fInputControl->TextView()->SetText(fInputValue);
-	fInputControl->TextView()->SetWordWrap(false);
-	AddChild(fInputControl);
+    ਜੇ (f_ਨਿਵੇਸ਼_ਮੁੱਲ != ਨਿਰਾ) {
+	rect.ਸਿਖਰ     =
+	    rect.bottom += ਸੁਨੇਹਾ_ਉਚਾਈ + kVimDialogSpacingY;
+	f_ਨਿਵੇਸ਼_Control = ਨਵਾਂ BTextControl(rect, "_iv_", ਨਿਰਾ, f_ਨਿਵੇਸ਼_ਮੁੱਲ, ਨਿਰਾ,
+		B_FOLLOW_ਖੱਬਾ | B_FOLLOW_ਸਿਖਰ, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
+	f_ਨਿਵੇਸ਼_Control->ਪਾਠ_View()->ਸੈੱਟ_ਪਾਠ(f_ਨਿਵੇਸ਼_ਮੁੱਲ);
+	f_ਨਿਵੇਸ਼_Control->ਪਾਠ_View()->ਸੈੱਟ_ਸ਼ਬਦ_Wrap(ਝੂਠ);
+	ਜੋੜੋ_ਬੱਚਾ(f_ਨਿਵੇਸ਼_Control);
 
-	float width = 0.f, height = 0.f;
-	fInputControl->GetPreferredSize(&width, &height);
-	fInputControl->MakeFocus(true);
+	ਦਸ਼ਮਲਵ ਚੌੜਾਈ = 0.f, ਉਚਾਈ = 0.f;
+	f_ਨਿਵੇਸ਼_Control->Get_Preferred_ਮਾਪ(&ਚੌੜਾਈ, &ਉਚਾਈ);
+	f_ਨਿਵੇਸ਼_Control->MakeFocus(ਸੱਚ);
 
-	dialogHeight += height + kVimDialogSpacingY * 1.5;
+	dialog_ਉਚਾਈ += ਉਚਾਈ + kVimDialogSpacingY * 1.5;
     }
 
-    dialogHeight = max_c(dialogHeight, kVimDialogMinimalHeight);
+    dialog_ਉਚਾਈ = max_c(dialog_ਉਚਾਈ, k_Vim_Dialog_ਨਿਊਨਤਮ_ਉਚਾਈ);
 
-    ResizeTo(dialogWidth, dialogHeight);
-    MoveTo((gui.vimWindow->Bounds().Width() - dialogWidth) / 2,
-	    (gui.vimWindow->Bounds().Height() - dialogHeight) / 2);
+    Resize_ਮੰਜ਼ਿਲ(dialog_ਚੌੜਾਈ, dialog_ਉਚਾਈ);
+    Move_ਮੰਜ਼ਿਲ((gui.vim_ਖਿੜਕੀ->Bounds().ਚੌੜਾਈ_2() - dialog_ਚੌੜਾਈ) / 2,
+	    (gui.vim_ਖਿੜਕੀ->Bounds().ਉਚਾਈ_2() - dialog_ਉਚਾਈ) / 2);
 
     //	adjust layout of buttons
-    float buttonWidth = max_c(maxButtonWidth, rect.Width() * 0.66);
-    BPoint origin(dialogWidth, dialogHeight);
-    origin.x -= kVimDialogSpacingX + (vertical ? buttonWidth : buttonsWidth);
-    origin.y -= kVimDialogSpacingY + (vertical ? buttonsHeight	: maxButtonHeight);
+    ਦਸ਼ਮਲਵ button_ਚੌੜਾਈ = max_c(max_Button_ਚੌੜਾਈ, rect.ਚੌੜਾਈ_2() * 0.66);
+    BPoint origin(dialog_ਚੌੜਾਈ, dialog_ਉਚਾਈ);
+    origin.x -= kVimDialogSpacingX + (vertical ? button_ਚੌੜਾਈ : buttons_ਚੌੜਾਈ);
+    origin.y -= kVimDialogSpacingY + (vertical ? buttons_ਉਚਾਈ	: max_Button_ਉਚਾਈ);
 
-    for (int32 i = 0 ; i < buttonsCount; i++) {
-	BButton *button = (BButton*)fButtonsList.ItemAt(i);
-	button->MoveTo(origin);
-	if (vertical) {
-	    origin.y += button->Frame().Height() + kVimDialogButtonsSpacingY;
-	    button->ResizeTo(buttonWidth, button->Frame().Height());
-	} else
-	    origin.x += button->Frame().Width() + kVimDialogButtonsSpacingX;
+    ਲਈ (int32 i = 0 ; i < buttons_ਗਿਣਤੀ; i++) {
+	BButton *button = (BButton*)fButtonsList.ਵਸਤੂ_At(i);
+	button->Move_ਮੰਜ਼ਿਲ(origin);
+	ਜੇ (vertical) {
+	    origin.y += button->ਚੌਖਟਾ_2().ਉਚਾਈ_2() + kVimDialogButtonsSpacingY;
+	    button->Resize_ਮੰਜ਼ਿਲ(button_ਚੌੜਾਈ, button->ਚੌਖਟਾ_2().ਉਚਾਈ_2());
+	} ਨਹੀਂਤਾਂ
+	    origin.x += button->ਚੌਖਟਾ_2().ਚੌੜਾਈ_2() + kVimDialogButtonsSpacingX;
 
-	if (dfltbutton == i + 1) {
-	    button->MakeDefault(true);
-	    button->MakeFocus(fInputControl == NULL);
+	ਜੇ (dfltbutton == i + 1) {
+	    button->MakeDefault(ਸੱਚ);
+	    button->MakeFocus(f_ਨਿਵੇਸ਼_Control == ਨਿਰਾ);
 	}
     }
 }
 
 VimDialog::~VimDialog()
 {
-    if (fDialogSem > B_OK)
+    ਜੇ (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    int
+    ਪੂਰਨ
 VimDialog::Go()
 {
     fDialogSem = create_sem(0, "VimDialogSem");
-    if (fDialogSem < B_OK) {
+    ਜੇ (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	ਵਾਪਸ f_Dialog_ਮੁੱਲ;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    ਜਦੋਂ (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    int retValue = fDialogValue;
-    if (fInputValue != NULL)
-	vim_strncpy((char_u*)fInputValue, (char_u*)fInputControl->Text(), IOSIZE - 1);
+    ਪੂਰਨ ret_ਮੁੱਲ = f_Dialog_ਮੁੱਲ;
+    ਜੇ (f_ਨਿਵੇਸ਼_ਮੁੱਲ != ਨਿਰਾ)
+	vim_strncpy((char_u*)f_ਨਿਵੇਸ਼_ਮੁੱਲ, (char_u*)f_ਨਿਵੇਸ਼_Control->ਪਾਠ_2(), IOSIZE - 1);
 
-    if (Lock())
+    ਜੇ (ਤਾਲਾ_2())
 	Quit();
 
-    return retValue;
+    ਵਾਪਸ ret_ਮੁੱਲ;
 }
 
-void VimDialog::MessageReceived(BMessage *msg)
+ਖਾਲੀ VimDialog::ਸੁਨੇਹਾ_Received(BMessage *ਸੁਨੇਹਾ)
 {
     int32 which = 0;
-    if (msg->what != kVimDialogButtonMsg ||
-	    msg->FindInt32("which", &which) != B_OK)
-	return BWindow::MessageReceived(msg);
+    ਜੇ (ਸੁਨੇਹਾ->what != k_Vim_Dialog_Button_ਸੁਨੇਹਾ ||
+	    ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("which", &which) != B_OK)
+	ਵਾਪਸ BWindow::ਸੁਨੇਹਾ_Received(ਸੁਨੇਹਾ);
 
-    fDialogValue = which;
+    f_Dialog_ਮੁੱਲ = which;
     delete_sem(fDialogSem);
     fDialogSem = -1;
 }
 
-BButton* VimDialog::_CreateButton(int32 which, const char* label)
+BButton* VimDialog::_CreateButton(int32 which, ਅਚਲ ਅੱਖਰ* label)
 {
-    BMessage *message = new BMessage(kVimDialogButtonMsg);
-    message->AddInt32("which", which);
+    BMessage *ਸੁਨੇਹਾ_2 = ਨਵਾਂ BMessage(k_Vim_Dialog_Button_ਸੁਨੇਹਾ);
+    ਸੁਨੇਹਾ_2->ਜੋੜੋ_Int32("which", which);
 
     BRect rect(0, 0, 0, 0);
     BString name;
     name << "_b" << which << "_";
 
-    BButton* button = new BButton(rect, name.String(), label, message,
-	    B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+    BButton* button = ਨਵਾਂ BButton(rect, name.String(), label, ਸੁਨੇਹਾ_2,
+	    B_FOLLOW_ਸੱਜਾ | B_FOLLOW_BOTTOM);
 
-    float width = 0.f, height = 0.f;
-    button->GetPreferredSize(&width, &height);
-    button->ResizeTo(width, height);
+    ਦਸ਼ਮਲਵ ਚੌੜਾਈ = 0.f, ਉਚਾਈ = 0.f;
+    button->Get_Preferred_ਮਾਪ(&ਚੌੜਾਈ, &ਉਚਾਈ);
+    button->Resize_ਮੰਜ਼ਿਲ(ਚੌੜਾਈ, ਉਚਾਈ);
 
-    return button;
+    ਵਾਪਸ button;
 }
 
-VimDialog::View::View(BRect frame)
-    :	BView(frame, "VimDialogView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-    fIconBitmap(NULL)
+VimDialog::View::View(BRect ਚੌਖਟਾ)
+    :	BView(ਚੌਖਟਾ, "VimDialogView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+    fIconBitmap(ਨਿਰਾ)
 {
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    ਸੈੱਟ_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 VimDialog::View::~View()
 {
-    delete fIconBitmap;
+    ਮਿਟਾਓ fIconBitmap;
 }
 
-void VimDialog::View::Draw(BRect updateRect)
+ਖਾਲੀ VimDialog::View::Draw(BRect updateRect)
 {
     BRect stripeRect = Bounds();
-    stripeRect.right = kVimDialogIconStripeWidth;
-    SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+    stripeRect.ਸੱਜੇ = k_Vim_Dialog_Icon_Stripe_ਚੌੜਾਈ;
+    ਸੈੱਟ_ਉੱਚਾ_Color(tint_color(ViewColor(), B_DARKEN_1_TINT));
     FillRect(stripeRect);
 
-    if (fIconBitmap == NULL)
-	return;
+    ਜੇ (fIconBitmap == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    SetDrawingMode(B_OP_ALPHA);
-    SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+    ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_ALPHA);
+    ਸੈੱਟ_Blending_ਬਹੁਲਕ(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
     DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
 }
 
-void VimDialog::View::InitIcon(int32 type)
+ਖਾਲੀ VimDialog::View::InitIcon(int32 type)
 {
-    if (type == VIM_GENERIC)
-	return;
+    ਜੇ (type == VIM_GENERIC)
+	ਵਾਪਸ;
 
-    BPath path;
-    status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-    if (status != B_OK) {
-	fprintf(stderr, "Cannot retrieve app info:%s\n", strerror(status));
-	return;
+    BPath ਰਸਤਾ;
+    ਸਥਿਤੀ_t ਸਥਿਤੀ = ਲੱਭੋ_directory(B_BEOS_SERVERS_DIRECTORY, &ਰਸਤਾ);
+    ਜੇ (ਸਥਿਤੀ != B_OK) {
+	fprintf(stderr, "Cannot retrieve app info:%s\n", strerror(ਸਥਿਤੀ));
+	ਵਾਪਸ;
     }
 
-    path.Append("app_server");
+    ਰਸਤਾ.Append("app_server");
 
-    BFile file(path.Path(), O_RDONLY);
-    if (file.InitCheck() != B_OK) {
+    BFile file(ਰਸਤਾ.ਰਸਤਾ_2(), O_RDONLY);
+    ਜੇ (file.InitCheck() != B_OK) {
 	fprintf(stderr, "App file assignment failed:%s\n",
 		strerror(file.InitCheck()));
-	return;
+	ਵਾਪਸ;
     }
 
     BResources resources(&file);
-    if (resources.InitCheck() != B_OK) {
+    ਜੇ (resources.InitCheck() != B_OK) {
 	fprintf(stderr, "App server resources assignment failed:%s\n",
 		strerror(resources.InitCheck()));
-	return;
+	ਵਾਪਸ;
     }
 
-    const char *name = "";
-    switch(type) {
-	case VIM_ERROR:	    name = "stop"; break;
-	case VIM_WARNING:   name = "warn"; break;
-	case VIM_INFO:	    name = "info"; break;
-	case VIM_QUESTION:  name = "idea"; break;
-	default: return;
+    ਅਚਲ ਅੱਖਰ *name = "";
+    ਚੋਣ(type) {
+	ਹਾਲਤ VIM_ERROR:	    name = "stop"; ਰੋਕੋ;
+	ਹਾਲਤ VIM_WARNING:   name = "warn"; ਰੋਕੋ;
+	ਹਾਲਤ VIM_INFO:	    name = "info"; ਰੋਕੋ;
+	ਹਾਲਤ VIM_QUESTION:  name = "idea"; ਰੋਕੋ;
+	ਮੂਲ: ਵਾਪਸ;
     }
 
-    int32 iconSize = 32;
-    fIconBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-    if (fIconBitmap == NULL || fIconBitmap->InitCheck() != B_OK) {
+    int32 icon_ਮਾਪ_2 = 32;
+    fIconBitmap = ਨਵਾਂ BBitmap(BRect(0, 0, icon_ਮਾਪ_2 - 1, icon_ਮਾਪ_2 - 1), 0, B_RGBA32);
+    ਜੇ (fIconBitmap == ਨਿਰਾ || fIconBitmap->InitCheck() != B_OK) {
 	fprintf(stderr, "Icon bitmap allocation failed:%s\n",
-		(fIconBitmap == NULL) ? "null" : strerror(fIconBitmap->InitCheck()));
-	return;
+		(fIconBitmap == ਨਿਰਾ) ? "null" : strerror(fIconBitmap->InitCheck()));
+	ਵਾਪਸ;
     }
 
-    size_t size = 0;
-    const uint8* iconData = NULL;
+    size_t ਮਾਪ = 0;
+    ਅਚਲ uint8* icon_ਅੰਕੜੇ = ਨਿਰਾ;
     //	try vector icon first?
-    iconData = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, name, &size);
-    if (iconData != NULL && BIconUtils::GetVectorIcon(iconData, size, fIconBitmap) == B_OK)
-	return;
+    icon_ਅੰਕੜੇ = (ਅਚਲ uint8*)resources.ਲੱਦੋ_Resource(B_ਸਦਿਸ਼_ICON_TYPE, name, &ਮਾਪ);
+    ਜੇ (icon_ਅੰਕੜੇ != ਨਿਰਾ && BIconUtils::Get_ਸਦਿਸ਼_Icon(icon_ਅੰਕੜੇ, ਮਾਪ, fIconBitmap) == B_OK)
+	ਵਾਪਸ;
 
     //	try bitmap icon now
-    iconData = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE, name, &size);
-    if (iconData == NULL) {
+    icon_ਅੰਕੜੇ = (ਅਚਲ uint8*)resources.ਲੱਦੋ_Resource(B_LARGE_ICON_TYPE, name, &ਮਾਪ);
+    ਜੇ (icon_ਅੰਕੜੇ == ਨਿਰਾ) {
 	fprintf(stderr, "Bitmap icon resource not found\n");
-	delete fIconBitmap;
-	fIconBitmap = NULL;
-	return;
+	ਮਿਟਾਓ fIconBitmap;
+	fIconBitmap = ਨਿਰਾ;
+	ਵਾਪਸ;
     }
 
-    if (fIconBitmap->ColorSpace() != B_CMAP8)
-	BIconUtils::ConvertFromCMAP8(iconData, iconSize, iconSize, iconSize, fIconBitmap);
+    ਜੇ (fIconBitmap->ColorSpace() != B_CMAP8)
+	BIconUtils::ConvertFromCMAP8(icon_ਅੰਕੜੇ, icon_ਮਾਪ_2, icon_ਮਾਪ_2, icon_ਮਾਪ_2, fIconBitmap);
 }
 
-const unsigned int  kVimDialogOKButtonMsg = 'FDOK';
-const unsigned int  kVimDialogCancelButtonMsg = 'FDCN';
-const unsigned int  kVimDialogSizeInputMsg = 'SICH';
-const unsigned int  kVimDialogFamilySelectMsg = 'MSFM';
-const unsigned int  kVimDialogStyleSelectMsg = 'MSST';
-const unsigned int  kVimDialogSizeSelectMsg = 'MSSZ';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_OKButton_ਸੁਨੇਹਾ = 'FDOK';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_Cancel_Button_ਸੁਨੇਹਾ = 'FDCN';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_ਮਾਪ_ਨਿਵੇਸ਼_ਸੁਨੇਹਾ = 'SICH';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_Family_Select_ਸੁਨੇਹਾ = 'MSFM';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_Style_Select_ਸੁਨੇਹਾ = 'MSST';
+ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ  k_Vim_Dialog_ਮਾਪ_Select_ਸੁਨੇਹਾ = 'MSSZ';
 
-VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, float* size)
-: BWindow(kDefaultRect, "Font Selection", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, ਦਸ਼ਮਲਵ* ਮਾਪ)
+: BWindow(kDefaultRect, "Font Selection", B_TITLED_ਖਿੜਕੀ_LOOK, B_MODAL_APP_ਖਿੜਕੀ_FEEL,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
-    , fStatus(B_NO_INIT)
+    , f_ਸਥਿਤੀ(B_NO_INIT)
     , fDialogSem(-1)
-    , fDialogValue(false)
+    , f_Dialog_ਮੁੱਲ(ਝੂਠ)
     , fFamily(family)
     , fStyle(style)
-    , fSize(size)
-    , fFontSize(*size)
+    , f_ਮਾਪ(ਮਾਪ)
+    , f_Font_ਮਾਪ(*ਮਾਪ)
     , fPreview(0)
     , fFamiliesList(0)
     , fStylesList(0)
     , fSizesList(0)
-    , fSizesInput(0)
+    , f_Sizes_ਨਿਵੇਸ਼(0)
 {
-    strncpy(fFontFamily, *family, B_FONT_FAMILY_LENGTH);
-    strncpy(fFontStyle, *style, B_FONT_STYLE_LENGTH);
+    strncpy(fFontFamily, *family, B_FONT_FAMILY_ਲੰਮਾਈ);
+    strncpy(fFontStyle, *style, B_FONT_STYLE_ਲੰਮਾਈ);
 
     //	"client" area view
-    BBox *clientBox = new BBox(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
-		    B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
+    BBox *clientBox = ਨਵਾਂ BBox(Bounds(), B_ਖਾਲੀ_ਥਾਵਾਂ_STRING, B_FOLLOW_ALL_SIDES,
+		    B_WILL_DRAW | B_ਚੌਖਟਾ_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
 		    B_PLAIN_BORDER);
-    AddChild(clientBox);
+    ਜੋੜੋ_ਬੱਚਾ(clientBox);
 
     //	client view
     BRect RC = clientBox->Bounds();
     RC.InsetBy(kVimDialogSpacingX, kVimDialogSpacingY);
-    BRect rc(RC.LeftTop(), RC.LeftTop());
+    BRect rc(RC.ਖੱਬਾ_ਸਿਖਰ(), RC.ਖੱਬਾ_ਸਿਖਰ());
 
     //	at first create all controls
-    fPreview = new BStringView(rc, "preview", "DejaVu Sans Mono");
-    clientBox->AddChild(fPreview);
+    fPreview = ਨਵਾਂ BStringView(rc, "preview", "DejaVu Sans Mono");
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(fPreview);
 
-    BBox* boxDivider = new BBox(rc, B_EMPTY_STRING,
+    BBox* boxDivider = ਨਵਾਂ BBox(rc, B_ਖਾਲੀ_ਥਾਵਾਂ_STRING,
 	    B_FOLLOW_NONE, B_WILL_DRAW, B_FANCY_BORDER);
-    clientBox->AddChild(boxDivider);
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(boxDivider);
 
-    BStringView *labelFamily = new BStringView(rc, "labelFamily", "Family:");
-    clientBox->AddChild(labelFamily);
-    labelFamily->ResizeToPreferred();
+    BStringView *labelFamily = ਨਵਾਂ BStringView(rc, "labelFamily", "Family:");
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(labelFamily);
+    labelFamily->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
-    BStringView *labelStyle = new BStringView(rc, "labelStyle", "Style:");
-    clientBox->AddChild(labelStyle);
-    labelStyle->ResizeToPreferred();
+    BStringView *labelStyle = ਨਵਾਂ BStringView(rc, "labelStyle", "Style:");
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(labelStyle);
+    labelStyle->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
-    BStringView *labelSize = new BStringView(rc, "labelSize", "Size:");
-    clientBox->AddChild(labelSize);
-    labelSize->ResizeToPreferred();
+    BStringView *label_ਮਾਪ = ਨਵਾਂ BStringView(rc, "labelSize", "Size:");
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(label_ਮਾਪ);
+    label_ਮਾਪ->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
-    fFamiliesList = new BListView(rc, "listFamily",
+    fFamiliesList = ਨਵਾਂ BListView(rc, "listFamily",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollFamilies = new BScrollView("scrollFamily",
-	    fFamiliesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollFamilies);
+    BScrollView *scrollFamilies = ਨਵਾਂ BScrollView("scrollFamily",
+	    fFamiliesList, B_FOLLOW_ਖੱਬਾ_ਸੱਜਾ, 0, ਝੂਠ, ਸੱਚ);
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(scrollFamilies);
 
-    fStylesList= new BListView(rc, "listStyles",
+    fStylesList= ਨਵਾਂ BListView(rc, "listStyles",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollStyles = new BScrollView("scrollStyle",
-	    fStylesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollStyles);
+    BScrollView *scrollStyles = ਨਵਾਂ BScrollView("scrollStyle",
+	    fStylesList, B_FOLLOW_ਖੱਬਾ_ਸੱਜਾ, 0, ਝੂਠ, ਸੱਚ);
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(scrollStyles);
 
-    fSizesInput = new BTextControl(rc, "inputSize", NULL, "???",
-	    new BMessage(kVimDialogSizeInputMsg));
-    clientBox->AddChild(fSizesInput);
-    fSizesInput->ResizeToPreferred();
+    f_Sizes_ਨਿਵੇਸ਼ = ਨਵਾਂ BTextControl(rc, "inputSize", ਨਿਰਾ, "???",
+	    ਨਵਾਂ BMessage(k_Vim_Dialog_ਮਾਪ_ਨਿਵੇਸ਼_ਸੁਨੇਹਾ));
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(f_Sizes_ਨਿਵੇਸ਼);
+    f_Sizes_ਨਿਵੇਸ਼->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
-    fSizesList = new BListView(rc, "listSizes",
+    fSizesList = ਨਵਾਂ BListView(rc, "listSizes",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-    BScrollView *scrollSizes = new BScrollView("scrollSize",
-	    fSizesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
-    clientBox->AddChild(scrollSizes);
+    BScrollView *scrollSizes = ਨਵਾਂ BScrollView("scrollSize",
+	    fSizesList, B_FOLLOW_ਖੱਬਾ_ਸੱਜਾ, 0, ਝੂਠ, ਸੱਚ);
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(scrollSizes);
 
-    BButton *buttonOK = new BButton(rc, "buttonOK", "OK",
-			new BMessage(kVimDialogOKButtonMsg));
-    clientBox->AddChild(buttonOK);
-    buttonOK->ResizeToPreferred();
+    BButton *buttonOK = ਨਵਾਂ BButton(rc, "buttonOK", "OK",
+			ਨਵਾਂ BMessage(k_Vim_Dialog_OKButton_ਸੁਨੇਹਾ));
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(buttonOK);
+    buttonOK->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
-    BButton *buttonCancel = new BButton(rc, "buttonCancel", "Cancel",
-			new BMessage(kVimDialogCancelButtonMsg));
-    clientBox->AddChild(buttonCancel);
-    buttonCancel->ResizeToPreferred();
+    BButton *buttonCancel = ਨਵਾਂ BButton(rc, "buttonCancel", "Cancel",
+			ਨਵਾਂ BMessage(k_Vim_Dialog_Cancel_Button_ਸੁਨੇਹਾ));
+    clientBox->ਜੋੜੋ_ਬੱਚਾ(buttonCancel);
+    buttonCancel->Resize_ਮੰਜ਼ਿਲ_Preferred();
 
     //	layout controls
-    float lineHeight = labelFamily->Bounds().Height();
-    float previewHeight = lineHeight * 3;
-    float offsetYLabels = previewHeight + kVimDialogSpacingY;
-    float offsetYLists = offsetYLabels + lineHeight + kVimDialogSpacingY / 2;
-    float offsetYSizes = offsetYLists + fSizesInput->Bounds().Height() + kVimDialogSpacingY / 2;
-    float listsHeight = lineHeight * 9;
-    float offsetYButtons = offsetYLists + listsHeight +  kVimDialogSpacingY;
-    float maxControlsHeight = offsetYButtons + buttonOK->Bounds().Height();
-    float familiesWidth = labelFamily->Bounds().Width() * 5;
-    float offsetXStyles = familiesWidth + kVimDialogSpacingX;
-    float stylesWidth = labelStyle->Bounds().Width() * 4;
-    float offsetXSizes = offsetXStyles + stylesWidth + kVimDialogSpacingX;
-    float sizesWidth = labelSize->Bounds().Width() * 2;
-    float maxControlsWidth = offsetXSizes + sizesWidth;
+    ਦਸ਼ਮਲਵ ਸਤਰ_ਉਚਾਈ = labelFamily->Bounds().ਉਚਾਈ_2();
+    ਦਸ਼ਮਲਵ preview_ਉਚਾਈ = ਸਤਰ_ਉਚਾਈ * 3;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_YLabels = preview_ਉਚਾਈ + kVimDialogSpacingY;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_YLists = ਵਿੱਥ_YLabels + ਸਤਰ_ਉਚਾਈ + kVimDialogSpacingY / 2;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_YSizes = ਵਿੱਥ_YLists + f_Sizes_ਨਿਵੇਸ਼->Bounds().ਉਚਾਈ_2() + kVimDialogSpacingY / 2;
+    ਦਸ਼ਮਲਵ lists_ਉਚਾਈ = ਸਤਰ_ਉਚਾਈ * 9;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_YButtons = ਵਿੱਥ_YLists + lists_ਉਚਾਈ +  kVimDialogSpacingY;
+    ਦਸ਼ਮਲਵ max_Controls_ਉਚਾਈ = ਵਿੱਥ_YButtons + buttonOK->Bounds().ਉਚਾਈ_2();
+    ਦਸ਼ਮਲਵ families_ਚੌੜਾਈ = labelFamily->Bounds().ਚੌੜਾਈ_2() * 5;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_XStyles = families_ਚੌੜਾਈ + kVimDialogSpacingX;
+    ਦਸ਼ਮਲਵ styles_ਚੌੜਾਈ = labelStyle->Bounds().ਚੌੜਾਈ_2() * 4;
+    ਦਸ਼ਮਲਵ ਵਿੱਥ_XSizes = ਵਿੱਥ_XStyles + styles_ਚੌੜਾਈ + kVimDialogSpacingX;
+    ਦਸ਼ਮਲਵ sizes_ਚੌੜਾਈ = label_ਮਾਪ->Bounds().ਚੌੜਾਈ_2() * 2;
+    ਦਸ਼ਮਲਵ max_Controls_ਚੌੜਾਈ = ਵਿੱਥ_XSizes + sizes_ਚੌੜਾਈ;
 
-    ResizeTo(maxControlsWidth + kVimDialogSpacingX * 2,
-	maxControlsHeight + kVimDialogSpacingY * 2);
+    Resize_ਮੰਜ਼ਿਲ(max_Controls_ਚੌੜਾਈ + kVimDialogSpacingX * 2,
+	max_Controls_ਉਚਾਈ + kVimDialogSpacingY * 2);
 
-    BRect rcVim = gui.vimWindow->Frame();
-    MoveTo(rcVim.left + (rcVim.Width() - Frame().Width()) / 2,
-	    rcVim.top + (rcVim.Height() - Frame().Height()) / 2);
+    BRect rcVim = gui.vim_ਖਿੜਕੀ->ਚੌਖਟਾ_2();
+    Move_ਮੰਜ਼ਿਲ(rcVim.ਖੱਬੇ + (rcVim.ਚੌੜਾਈ_2() - ਚੌਖਟਾ_2().ਚੌੜਾਈ_2()) / 2,
+	    rcVim.ਸਿਖਰ + (rcVim.ਉਚਾਈ_2() - ਚੌਖਟਾ_2().ਉਚਾਈ_2()) / 2);
 
-    fPreview->ResizeTo(maxControlsWidth, previewHeight);
-    fPreview->SetAlignment(B_ALIGN_CENTER);
+    fPreview->Resize_ਮੰਜ਼ਿਲ(max_Controls_ਚੌੜਾਈ, preview_ਉਚਾਈ);
+    fPreview->ਸੈੱਟ_Alignment(B_ALIGN_CENTER);
 
-    boxDivider->MoveBy(0.f, previewHeight + kVimDialogSpacingY / 2);
-    boxDivider->ResizeTo(maxControlsWidth, 1.f);
+    boxDivider->MoveBy(0.f, preview_ਉਚਾਈ + kVimDialogSpacingY / 2);
+    boxDivider->Resize_ਮੰਜ਼ਿਲ(max_Controls_ਚੌੜਾਈ, 1.f);
 
-    labelFamily->MoveBy(0.f, offsetYLabels);
-    labelStyle->MoveBy(offsetXStyles, offsetYLabels);
-    labelSize->MoveBy(offsetXSizes, offsetYLabels);
+    labelFamily->MoveBy(0.f, ਵਿੱਥ_YLabels);
+    labelStyle->MoveBy(ਵਿੱਥ_XStyles, ਵਿੱਥ_YLabels);
+    label_ਮਾਪ->MoveBy(ਵਿੱਥ_XSizes, ਵਿੱਥ_YLabels);
 
     //	text control alignment issues
-    float insetX = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
-    float insetY = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
+    ਦਸ਼ਮਲਵ insetX = f_Sizes_ਨਿਵੇਸ਼->ਪਾਠ_View()->Bounds().ਚੌੜਾਈ_2() - f_Sizes_ਨਿਵੇਸ਼->Bounds().ਚੌੜਾਈ_2();
+    ਦਸ਼ਮਲਵ insetY = f_Sizes_ਨਿਵੇਸ਼->ਪਾਠ_View()->Bounds().ਚੌੜਾਈ_2() - f_Sizes_ਨਿਵੇਸ਼->Bounds().ਚੌੜਾਈ_2();
 
-    scrollFamilies->MoveBy(0.f, offsetYLists);
-    scrollStyles->MoveBy(offsetXStyles, offsetYLists);
-    fSizesInput->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
-    scrollSizes->MoveBy(offsetXSizes, offsetYSizes);
+    scrollFamilies->MoveBy(0.f, ਵਿੱਥ_YLists);
+    scrollStyles->MoveBy(ਵਿੱਥ_XStyles, ਵਿੱਥ_YLists);
+    f_Sizes_ਨਿਵੇਸ਼->MoveBy(ਵਿੱਥ_XSizes + insetX / 2, ਵਿੱਥ_YLists + insetY / 2);
+    scrollSizes->MoveBy(ਵਿੱਥ_XSizes, ਵਿੱਥ_YSizes);
 
-    fSizesInput->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
+    f_Sizes_ਨਿਵੇਸ਼->ਸੈੱਟ_Alignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
 
-    scrollFamilies->ResizeTo(familiesWidth, listsHeight);
-    scrollStyles->ResizeTo(stylesWidth, listsHeight);
-    fSizesInput->ResizeTo(sizesWidth, fSizesInput->Bounds().Height());
-    scrollSizes->ResizeTo(sizesWidth,
-	    listsHeight - (offsetYSizes - offsetYLists));
+    scrollFamilies->Resize_ਮੰਜ਼ਿਲ(families_ਚੌੜਾਈ, lists_ਉਚਾਈ);
+    scrollStyles->Resize_ਮੰਜ਼ਿਲ(styles_ਚੌੜਾਈ, lists_ਉਚਾਈ);
+    f_Sizes_ਨਿਵੇਸ਼->Resize_ਮੰਜ਼ਿਲ(sizes_ਚੌੜਾਈ, f_Sizes_ਨਿਵੇਸ਼->Bounds().ਉਚਾਈ_2());
+    scrollSizes->Resize_ਮੰਜ਼ਿਲ(sizes_ਚੌੜਾਈ,
+	    lists_ਉਚਾਈ - (ਵਿੱਥ_YSizes - ਵਿੱਥ_YLists));
 
-    buttonOK->MoveBy(maxControlsWidth - buttonOK->Bounds().Width(), offsetYButtons);
-    buttonCancel->MoveBy(maxControlsWidth - buttonOK->Bounds().Width()
-	    - buttonCancel->Bounds().Width() - kVimDialogSpacingX, offsetYButtons);
+    buttonOK->MoveBy(max_Controls_ਚੌੜਾਈ - buttonOK->Bounds().ਚੌੜਾਈ_2(), ਵਿੱਥ_YButtons);
+    buttonCancel->MoveBy(max_Controls_ਚੌੜਾਈ - buttonOK->Bounds().ਚੌੜਾਈ_2()
+	    - buttonCancel->Bounds().ਚੌੜਾਈ_2() - kVimDialogSpacingX, ਵਿੱਥ_YButtons);
 
     //	fill lists
-    int selIndex = -1;
-    int count = count_font_families();
-    for (int i = 0; i < count; i++) {
+    ਪੂਰਨ sel_ਸੂਚਕਾਂਕ = -1;
+    ਪੂਰਨ ਗਿਣਤੀ_2 = ਗਿਣਤੀ_font_families();
+    ਲਈ (ਪੂਰਨ i = 0; i < ਗਿਣਤੀ_2; i++) {
 	font_family family;
-	if (get_font_family(i, &family ) == B_OK) {
-	    fFamiliesList->AddItem(new BStringItem((const char*)family));
-	    if (strncmp(family, fFontFamily, B_FONT_FAMILY_LENGTH) == 0)
-		selIndex = i;
+	ਜੇ (get_font_family(i, &family ) == B_OK) {
+	    fFamiliesList->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BString_ਵਸਤੂ((ਅਚਲ ਅੱਖਰ*)family));
+	    ਜੇ (ਲੜੀ_ਤੁਲਨਾ(family, fFontFamily, B_FONT_FAMILY_ਲੰਮਾਈ) == 0)
+		sel_ਸੂਚਕਾਂਕ = i;
 	}
     }
 
-    if (selIndex >= 0) {
-	fFamiliesList->Select(selIndex);
-	fFamiliesList->ScrollToSelection();
+    ਜੇ (sel_ਸੂਚਕਾਂਕ >= 0) {
+	fFamiliesList->Select(sel_ਸੂਚਕਾਂਕ);
+	fFamiliesList->Scroll_ਮੰਜ਼ਿਲ_Selection();
     }
 
     _UpdateFontStyles();
 
-    selIndex = -1;
-    for (int size = 8, index = 0; size <= 18; size++, index++) {
+    sel_ਸੂਚਕਾਂਕ = -1;
+    ਲਈ (ਪੂਰਨ ਮਾਪ = 8, ਸੂਚਕਾਂਕ = 0; ਮਾਪ <= 18; ਮਾਪ++, ਸੂਚਕਾਂਕ++) {
 	BString str;
-	str << size;
-	fSizesList->AddItem(new BStringItem(str));
-	if (size == fFontSize)
-	    selIndex = index;
+	str << ਮਾਪ;
+	fSizesList->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BString_ਵਸਤੂ(str));
+	ਜੇ (ਮਾਪ == f_Font_ਮਾਪ)
+	    sel_ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ;
 
     }
 
-    if (selIndex >= 0) {
-	fSizesList->Select(selIndex);
-	fSizesList->ScrollToSelection();
+    ਜੇ (sel_ਸੂਚਕਾਂਕ >= 0) {
+	fSizesList->Select(sel_ਸੂਚਕਾਂਕ);
+	fSizesList->Scroll_ਮੰਜ਼ਿਲ_Selection();
     }
 
-    fFamiliesList->SetSelectionMessage(new BMessage(kVimDialogFamilySelectMsg));
-    fStylesList->SetSelectionMessage(new BMessage(kVimDialogStyleSelectMsg));
-    fSizesList->SetSelectionMessage(new BMessage(kVimDialogSizeSelectMsg));
-    fSizesInput->SetModificationMessage(new BMessage(kVimDialogSizeInputMsg));
+    fFamiliesList->ਸੈੱਟ_Selection_ਸੁਨੇਹਾ(ਨਵਾਂ BMessage(k_Vim_Dialog_Family_Select_ਸੁਨੇਹਾ));
+    fStylesList->ਸੈੱਟ_Selection_ਸੁਨੇਹਾ(ਨਵਾਂ BMessage(k_Vim_Dialog_Style_Select_ਸੁਨੇਹਾ));
+    fSizesList->ਸੈੱਟ_Selection_ਸੁਨੇਹਾ(ਨਵਾਂ BMessage(k_Vim_Dialog_ਮਾਪ_Select_ਸੁਨੇਹਾ));
+    f_Sizes_ਨਿਵੇਸ਼->ਸੈੱਟ_Modification_ਸੁਨੇਹਾ(ਨਵਾਂ BMessage(k_Vim_Dialog_ਮਾਪ_ਨਿਵੇਸ਼_ਸੁਨੇਹਾ));
 
-    _UpdateSizeInputPreview();
+    Update_ਮਾਪ_ਨਿਵੇਸ਼_Preview();
     _UpdateFontPreview();
 
-    fStatus = B_OK;
+    f_ਸਥਿਤੀ = B_OK;
 }
 
 VimSelectFontDialog::~VimSelectFontDialog()
@@ -2593,561 +2593,561 @@ VimSelectFontDialog::~VimSelectFontDialog()
     _CleanList(fStylesList);
     _CleanList(fSizesList);
 
-    if (fDialogSem > B_OK)
+    ਜੇ (fDialogSem > B_OK)
 	delete_sem(fDialogSem);
 }
 
-    void
+    ਖਾਲੀ
 VimSelectFontDialog::_CleanList(BListView* list)
 {
-    while (0 < list->CountItems())
-	delete (dynamic_cast<BStringItem*>(list->RemoveItem((int32)0)));
+    ਜਦੋਂ (0 < list->ਗਿਣਤੀ_ਚੀਜ਼ਾਂ())
+	ਮਿਟਾਓ (dynamic_cast<BString_ਵਸਤੂ*>(list->Remove_ਵਸਤੂ((int32)0)));
 }
 
-    bool
+    ਤਾਰਕਿਕ
 VimSelectFontDialog::Go()
 {
-    if (fStatus != B_OK) {
+    ਜੇ (f_ਸਥਿਤੀ != B_OK) {
 	Quit();
-	return NOFONT;
+	ਵਾਪਸ NOFONT;
     }
 
     fDialogSem = create_sem(0, "VimFontSelectDialogSem");
-    if (fDialogSem < B_OK) {
+    ਜੇ (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	ਵਾਪਸ f_Dialog_ਮੁੱਲ;
     }
 
     Show();
 
-    while (acquire_sem(fDialogSem) == B_INTERRUPTED);
+    ਜਦੋਂ (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    bool retValue = fDialogValue;
+    ਤਾਰਕਿਕ ret_ਮੁੱਲ = f_Dialog_ਮੁੱਲ;
 
-    if (Lock())
+    ਜੇ (ਤਾਲਾ_2())
 	Quit();
 
-    return retValue;
+    ਵਾਪਸ ret_ਮੁੱਲ;
 }
 
 
-void VimSelectFontDialog::_UpdateFontStyles()
+ਖਾਲੀ VimSelectFontDialog::_UpdateFontStyles()
 {
     _CleanList(fStylesList);
 
-    int32 selIndex = -1;
-    int32 count = count_font_styles(fFontFamily);
-    for (int32 i = 0; i < count; i++) {
+    int32 sel_ਸੂਚਕਾਂਕ = -1;
+    int32 ਗਿਣਤੀ_2 = ਗਿਣਤੀ_font_styles(fFontFamily);
+    ਲਈ (int32 i = 0; i < ਗਿਣਤੀ_2; i++) {
 	font_style style;
 	uint32 flags = 0;
-	if (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
-	    fStylesList->AddItem(new BStringItem((const char*)style));
-	    if (strncmp(style, fFontStyle, B_FONT_STYLE_LENGTH) == 0)
-		selIndex = i;
+	ਜੇ (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
+	    fStylesList->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BString_ਵਸਤੂ((ਅਚਲ ਅੱਖਰ*)style));
+	    ਜੇ (ਲੜੀ_ਤੁਲਨਾ(style, fFontStyle, B_FONT_STYLE_ਲੰਮਾਈ) == 0)
+		sel_ਸੂਚਕਾਂਕ = i;
 	}
     }
 
-    if (selIndex >= 0) {
-	fStylesList->Select(selIndex);
-	fStylesList->ScrollToSelection();
-    } else
+    ਜੇ (sel_ਸੂਚਕਾਂਕ >= 0) {
+	fStylesList->Select(sel_ਸੂਚਕਾਂਕ);
+	fStylesList->Scroll_ਮੰਜ਼ਿਲ_Selection();
+    } ਨਹੀਂਤਾਂ
 	fStylesList->Select(0);
 }
 
 
-void VimSelectFontDialog::_UpdateSizeInputPreview()
+ਖਾਲੀ VimSelectFontDialog::Update_ਮਾਪ_ਨਿਵੇਸ਼_Preview()
 {
-    char buf[10] = {0};
-    vim_snprintf(buf, sizeof(buf), (char*)"%.0f", fFontSize);
-    fSizesInput->SetText(buf);
+    ਅੱਖਰ buf[10] = {0};
+    vim_snprintf(buf, ਆਕਾਰ(buf), (ਅੱਖਰ*)"%.0f", f_Font_ਮਾਪ);
+    f_Sizes_ਨਿਵੇਸ਼->ਸੈੱਟ_ਪਾਠ(buf);
 }
 
 
-void VimSelectFontDialog::_UpdateFontPreview()
+ਖਾਲੀ VimSelectFontDialog::_UpdateFontPreview()
 {
     BFont font;
     fPreview->GetFont(&font);
-    font.SetSize(fFontSize);
-    font.SetFamilyAndStyle(fFontFamily, fFontStyle);
-    fPreview->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
+    font.ਸੈੱਟ_ਮਾਪ(f_Font_ਮਾਪ);
+    font.ਸੈੱਟ_Family_And_Style(fFontFamily, fFontStyle);
+    fPreview->ਸੈੱਟ_Font(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_ਮਾਪ);
 
     BString str;
-    str << fFontFamily << " " << fFontStyle << ", " << (int)fFontSize << " pt.";
-    fPreview->SetText(str);
+    str << fFontFamily << " " << fFontStyle << ", " << (ਪੂਰਨ)f_Font_ਮਾਪ << " pt.";
+    fPreview->ਸੈੱਟ_ਪਾਠ(str);
 }
 
 
-    bool
-VimSelectFontDialog::_UpdateFromListItem(BListView* list, char* text, int textSize)
+    ਤਾਰਕਿਕ
+VimSelectFontDialog::Update_From_List_ਵਸਤੂ(BListView* list, ਅੱਖਰ* ਪਾਠ, ਪੂਰਨ ਪਾਠ_ਮਾਪ)
 {
-    int32 index = list->CurrentSelection();
-    if (index < 0)
-	return false;
-    BStringItem* item = (BStringItem*)list->ItemAt(index);
-    if (item == NULL)
-	return false;
-    strncpy(text, item->Text(), textSize);
-    return true;
+    int32 ਸੂਚਕਾਂਕ = list->CurrentSelection();
+    ਜੇ (ਸੂਚਕਾਂਕ < 0)
+	ਵਾਪਸ ਝੂਠ;
+    BString_ਵਸਤੂ* ਵਸਤੂ = (BString_ਵਸਤੂ*)list->ਵਸਤੂ_At(ਸੂਚਕਾਂਕ);
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਵਾਪਸ ਝੂਠ;
+    strncpy(ਪਾਠ, ਵਸਤੂ->ਪਾਠ_2(), ਪਾਠ_ਮਾਪ);
+    ਵਾਪਸ ਸੱਚ;
 }
 
 
-void VimSelectFontDialog::MessageReceived(BMessage *msg)
+ਖਾਲੀ VimSelectFontDialog::ਸੁਨੇਹਾ_Received(BMessage *ਸੁਨੇਹਾ)
 {
-    switch (msg->what) {
-	case kVimDialogOKButtonMsg:
-	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_LENGTH);
-	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_LENGTH);
-	    *fSize = fFontSize;
-	    fDialogValue = true;
-	case kVimDialogCancelButtonMsg:
+    ਚੋਣ (ਸੁਨੇਹਾ->what) {
+	ਹਾਲਤ k_Vim_Dialog_OKButton_ਸੁਨੇਹਾ:
+	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_ਲੰਮਾਈ);
+	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_ਲੰਮਾਈ);
+	    *f_ਮਾਪ = f_Font_ਮਾਪ;
+	    f_Dialog_ਮੁੱਲ = ਸੱਚ;
+	ਹਾਲਤ k_Vim_Dialog_Cancel_Button_ਸੁਨੇਹਾ:
 	    delete_sem(fDialogSem);
 	    fDialogSem = -1;
-	    return;
-	case B_KEY_UP:
+	    ਵਾਪਸ;
+	ਹਾਲਤ B_ਕੁੰਜੀ_ਉੱਪਰ:
 	    {
-		int32 key = 0;
-		if (msg->FindInt32("raw_char", &key) == B_OK
-			&& key == B_ESCAPE) {
+		int32 ਕੁੰਜੀ = 0;
+		ਜੇ (ਸੁਨੇਹਾ->ਲੱਭੋ_Int32("raw_char", &ਕੁੰਜੀ) == B_OK
+			&& ਕੁੰਜੀ == B_ESCAPE) {
 		    delete_sem(fDialogSem);
 		    fDialogSem = -1;
 		}
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case kVimDialogFamilySelectMsg:
-	    if (_UpdateFromListItem(fFamiliesList,
-		    fFontFamily, B_FONT_FAMILY_LENGTH)) {
+	ਹਾਲਤ k_Vim_Dialog_Family_Select_ਸੁਨੇਹਾ:
+	    ਜੇ (Update_From_List_ਵਸਤੂ(fFamiliesList,
+		    fFontFamily, B_FONT_FAMILY_ਲੰਮਾਈ)) {
 		_UpdateFontStyles();
 		_UpdateFontPreview();
 	    }
-	    break;
-	case kVimDialogStyleSelectMsg:
-	    if (_UpdateFromListItem(fStylesList,
-		    fFontStyle, B_FONT_STYLE_LENGTH))
+	    ਰੋਕੋ;
+	ਹਾਲਤ k_Vim_Dialog_Style_Select_ਸੁਨੇਹਾ:
+	    ਜੇ (Update_From_List_ਵਸਤੂ(fStylesList,
+		    fFontStyle, B_FONT_STYLE_ਲੰਮਾਈ))
 		_UpdateFontPreview();
-	    break;
-	case kVimDialogSizeSelectMsg:
+	    ਰੋਕੋ;
+	ਹਾਲਤ k_Vim_Dialog_ਮਾਪ_Select_ਸੁਨੇਹਾ:
 	    {
-		char buf[10] = {0};
-		if (_UpdateFromListItem(fSizesList, buf, sizeof(buf))) {
-		    float size = atof(buf);
-		    if (size > 0.f) {
-			fFontSize = size;
-			_UpdateSizeInputPreview();
+		ਅੱਖਰ buf[10] = {0};
+		ਜੇ (Update_From_List_ਵਸਤੂ(fSizesList, buf, ਆਕਾਰ(buf))) {
+		    ਦਸ਼ਮਲਵ ਮਾਪ = atof(buf);
+		    ਜੇ (ਮਾਪ > 0.f) {
+			f_Font_ਮਾਪ = ਮਾਪ;
+			Update_ਮਾਪ_ਨਿਵੇਸ਼_Preview();
 			_UpdateFontPreview();
 		    }
 		}
 	    }
-	    break;
-	case kVimDialogSizeInputMsg:
+	    ਰੋਕੋ;
+	ਹਾਲਤ k_Vim_Dialog_ਮਾਪ_ਨਿਵੇਸ਼_ਸੁਨੇਹਾ:
 	    {
-		float size = atof(fSizesInput->Text());
-		if (size > 0.f) {
-		    fFontSize = size;
+		ਦਸ਼ਮਲਵ ਮਾਪ = atof(f_Sizes_ਨਿਵੇਸ਼->ਪਾਠ_2());
+		ਜੇ (ਮਾਪ > 0.f) {
+		    f_Font_ਮਾਪ = ਮਾਪ;
 		    _UpdateFontPreview();
 		}
 	    }
-	    break;
-	default:
-	    break;
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    ਰੋਕੋ;
     }
-    return BWindow::MessageReceived(msg);
+    ਵਾਪਸ BWindow::ਸੁਨੇਹਾ_Received(ਸੁਨੇਹਾ);
 }
 
-#endif // FEAT_GUI_DIALOG
+#ਜੇ_ਅੰਤ // FEAT_GUI_DIALOG
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 
 //  some forward declaration required by toolbar functions...
-static BMessage * MenuMessage(vimmenu_T *menu);
+ਸਥਿਰ BMessage * Menu_ਸੁਨੇਹਾ(vimmenu_T *menu);
 
-VimToolbar::VimToolbar(BRect frame, const char *name) :
-    BBox(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
+VimToolbar::VimToolbar(BRect ਚੌਖਟਾ, ਅਚਲ ਅੱਖਰ *name) :
+    BBox(ਚੌਖਟਾ, name, B_FOLLOW_ਖੱਬਾ | B_FOLLOW_ਸਿਖਰ, B_WILL_DRAW | B_ਚੌਖਟਾ_EVENTS, B_PLAIN_BORDER)
 {
 }
 
 VimToolbar::~VimToolbar()
 {
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++)
-	delete (BPictureButton*)fButtonsList.ItemAt(i);
-    fButtonsList.MakeEmpty();
+    int32 ਗਿਣਤੀ_2 = fButtonsList.ਗਿਣਤੀ_ਚੀਜ਼ਾਂ();
+    ਲਈ (int32 i = 0; i < ਗਿਣਤੀ_2; i++)
+	ਮਿਟਾਓ (BPictureButton*)fButtonsList.ਵਸਤੂ_At(i);
+    fButtonsList.Make_ਖਾਲੀ_ਥਾਵਾਂ();
 
-    delete normalButtonsBitmap;
-    delete grayedButtonsBitmap;
-    normalButtonsBitmap    = NULL;
-    grayedButtonsBitmap  = NULL;
+    ਮਿਟਾਓ ਸਾਧਾਰਨ_Buttons_Bitmap;
+    ਮਿਟਾਓ grayedButtonsBitmap;
+    ਸਾਧਾਰਨ_Buttons_Bitmap    = ਨਿਰਾ;
+    grayedButtonsBitmap  = ਨਿਰਾ;
 }
 
-    void
-VimToolbar::AttachedToWindow()
+    ਖਾਲੀ
+VimToolbar::Attached_ਮੰਜ਼ਿਲ_ਖਿੜਕੀ()
 {
-    BBox::AttachedToWindow();
+    BBox::Attached_ਮੰਜ਼ਿਲ_ਖਿੜਕੀ();
 
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    ਸੈੱਟ_View_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-    float
-VimToolbar::ToolbarHeight() const
+    ਦਸ਼ਮਲਵ
+VimToolbar::Toolbar_ਉਚਾਈ() ਅਚਲ
 {
-    float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
-    return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
+    ਦਸ਼ਮਲਵ ਮਾਪ = ਨਿਰਾ == ਸਾਧਾਰਨ_Buttons_Bitmap ? 18. : ਸਾਧਾਰਨ_Buttons_Bitmap->Bounds().ਉਚਾਈ_2();
+    ਵਾਪਸ ਮਾਪ + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
 }
 
-    bool
-VimToolbar::ModifyBitmapToGrayed(BBitmap *bitmap)
+    ਤਾਰਕਿਕ
+VimToolbar::Modify_Bitmap_ਮੰਜ਼ਿਲ_Grayed(BBitmap *bitmap)
 {
-    float height = bitmap->Bounds().Height();
-    float width  = bitmap->Bounds().Width();
+    ਦਸ਼ਮਲਵ ਉਚਾਈ = bitmap->Bounds().ਉਚਾਈ_2();
+    ਦਸ਼ਮਲਵ ਚੌੜਾਈ  = bitmap->Bounds().ਚੌੜਾਈ_2();
 
-    rgb_color *bits = (rgb_color*)bitmap->Bits();
-    int32 pixels = bitmap->BitsLength() / 4;
-    for (int32 i = 0; i < pixels; i++) {
-	bits[i].red = bits[i].green =
-	bits[i].blue = ((uint32)bits[i].red + bits[i].green + bits[i].blue) / 3;
-	bits[i].alpha /= 4;
+    rgb_color *ਬਿੱਟ = (rgb_color*)bitmap->ਬਿੱਟ_2();
+    int32 pixels = bitmap->ਬਿੱਟ_ਲੰਮਾਈ() / 4;
+    ਲਈ (int32 i = 0; i < pixels; i++) {
+	ਬਿੱਟ[i].red = ਬਿੱਟ[i].green =
+	ਬਿੱਟ[i].blue = ((uint32)ਬਿੱਟ[i].red + ਬਿੱਟ[i].green + ਬਿੱਟ[i].blue) / 3;
+	ਬਿੱਟ[i].alpha /= 4;
     }
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-    bool
+    ਤਾਰਕਿਕ
 VimToolbar::PrepareButtonBitmaps()
 {
     //	first try to load potentially customized $VIRUNTIME/bitmaps/builtin-tools.png
-    normalButtonsBitmap = LoadVimBitmap("builtin-tools.png");
-    if (normalButtonsBitmap == NULL)
+    ਸਾਧਾਰਨ_Buttons_Bitmap = ਲੱਦੋ_Vim_Bitmap("builtin-tools.png");
+    ਜੇ (ਸਾਧਾਰਨ_Buttons_Bitmap == ਨਿਰਾ)
 	//  customized not found? dig application resources for "builtin-tools" one
-	normalButtonsBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "builtin-tools");
+	ਸਾਧਾਰਨ_Buttons_Bitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "builtin-tools");
 
-    if (normalButtonsBitmap == NULL)
-	return false;
+    ਜੇ (ਸਾਧਾਰਨ_Buttons_Bitmap == ਨਿਰਾ)
+	ਵਾਪਸ ਝੂਠ;
 
     BMessage archive;
-    normalButtonsBitmap->Archive(&archive);
+    ਸਾਧਾਰਨ_Buttons_Bitmap->Archive(&archive);
 
-    grayedButtonsBitmap = new BBitmap(&archive);
-    if (grayedButtonsBitmap == NULL)
-	return false;
+    grayedButtonsBitmap = ਨਵਾਂ BBitmap(&archive);
+    ਜੇ (grayedButtonsBitmap == ਨਿਰਾ)
+	ਵਾਪਸ ਝੂਠ;
 
     //	modify grayed bitmap
-    ModifyBitmapToGrayed(grayedButtonsBitmap);
+    Modify_Bitmap_ਮੰਜ਼ਿਲ_Grayed(grayedButtonsBitmap);
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-BBitmap *VimToolbar::LoadVimBitmap(const char* fileName)
+BBitmap *VimToolbar::ਲੱਦੋ_Vim_Bitmap(ਅਚਲ ਅੱਖਰ* fileName)
 {
-    BBitmap *bitmap = NULL;
+    BBitmap *bitmap = ਨਿਰਾ;
 
-    int mustfree = 0;
-    char_u* runtimePath = vim_getenv((char_u*)"VIMRUNTIME", &mustfree);
-    if (runtimePath != NULL && fileName != NULL) {
-	BString strPath((char*)runtimePath);
-	strPath << "/bitmaps/" << fileName;
-	bitmap = BTranslationUtils::GetBitmap(strPath.String());
+    ਪੂਰਨ mustfree = 0;
+    char_u* runtime_ਰਸਤਾ = vim_getenv((char_u*)"VIMRUNTIME", &mustfree);
+    ਜੇ (runtime_ਰਸਤਾ != ਨਿਰਾ && fileName != ਨਿਰਾ) {
+	BString str_ਰਸਤਾ((ਅੱਖਰ*)runtime_ਰਸਤਾ);
+	str_ਰਸਤਾ << "/bitmaps/" << fileName;
+	bitmap = BTranslationUtils::GetBitmap(str_ਰਸਤਾ.String());
     }
 
-    if (mustfree)
-	vim_free(runtimePath);
+    ਜੇ (mustfree)
+	vim_free(runtime_ਰਸਤਾ);
 
-    return bitmap;
+    ਵਾਪਸ bitmap;
 }
 
-    bool
-VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitmapFrom, bool pressed)
+    ਤਾਰਕਿਕ
+VimToolbar::GetPictureFromBitmap(BPicture *picture_ਮੰਜ਼ਿਲ, int32 ਸੂਚਕਾਂਕ, BBitmap *bitmapFrom, ਤਾਰਕਿਕ pressed)
 {
-    float size = bitmapFrom->Bounds().Height() + 1.;
+    ਦਸ਼ਮਲਵ ਮਾਪ = bitmapFrom->Bounds().ਉਚਾਈ_2() + 1.;
 
-    BView view(BRect(0, 0, size, size), "", 0, 0);
+    BView view(BRect(0, 0, ਮਾਪ, ਮਾਪ), "", 0, 0);
 
-    AddChild(&view);
-    view.BeginPicture(pictureTo);
+    ਜੋੜੋ_ਬੱਚਾ(&view);
+    view.BeginPicture(picture_ਮੰਜ਼ਿਲ);
 
-    view.SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    view.ਸੈੱਟ_ਉੱਚਾ_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
     view.FillRect(view.Bounds());
-    view.SetDrawingMode(B_OP_OVER);
+    view.ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_OVER);
 
-    BRect source(0, 0, size - 1, size - 1);
-    BRect destination(source);
+    BRect ਸਰੋਤ(0, 0, ਮਾਪ - 1, ਮਾਪ - 1);
+    BRect destination(ਸਰੋਤ);
 
-    source.OffsetBy(size * index, 0);
-    destination.OffsetBy(ButtonMargin, ButtonMargin);
+    ਸਰੋਤ.ਵਿੱਥ_By(ਮਾਪ * ਸੂਚਕਾਂਕ, 0);
+    destination.ਵਿੱਥ_By(ButtonMargin, ButtonMargin);
 
-    view.DrawBitmap(bitmapFrom, source, destination);
+    view.DrawBitmap(bitmapFrom, ਸਰੋਤ, destination);
 
-    if (pressed)	{
+    ਜੇ (pressed)	{
 	rgb_color shineColor  = ui_color(B_SHINE_COLOR);
 	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
-	size += ButtonMargin * 2 - 1;
-	view.BeginLineArray(4);
-	view.AddLine(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
-	view.AddLine(BPoint(size, 0),	 BPoint(size, size), shineColor);
-	view.AddLine(BPoint(size, size), BPoint(0, size),    shineColor);
-	view.AddLine(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
-	view.EndLineArray();
+	ਮਾਪ += ButtonMargin * 2 - 1;
+	view.Begin_ਸਤਰ_Array(4);
+	view.ਜੋੜੋ_ਸਤਰ(BPoint(0, 0),	 BPoint(ਮਾਪ, 0),    shadowColor);
+	view.ਜੋੜੋ_ਸਤਰ(BPoint(ਮਾਪ, 0),	 BPoint(ਮਾਪ, ਮਾਪ), shineColor);
+	view.ਜੋੜੋ_ਸਤਰ(BPoint(ਮਾਪ, ਮਾਪ), BPoint(0, ਮਾਪ),    shineColor);
+	view.ਜੋੜੋ_ਸਤਰ(BPoint(0, ਮਾਪ),	 BPoint(0, 0),	     shadowColor);
+	view.ਸਿਰਾ_ਸਤਰ_Array();
     }
 
-    view.EndPicture();
-    RemoveChild(&view);
+    view.ਸਿਰਾ_Picture();
+    Remove_ਬੱਚਾ(&view);
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-    bool
-VimToolbar::AddButton(int32 index, vimmenu_T *menu)
+    ਤਾਰਕਿਕ
+VimToolbar::ਜੋੜੋ_Button(int32 ਸੂਚਕਾਂਕ, vimmenu_T *menu)
 {
-    BPictureButton *button = NULL;
-    if (!menu_is_separator(menu->name)) {
-	float size = normalButtonsBitmap ?
-	    normalButtonsBitmap->Bounds().Height() + 1. + ButtonMargin * 2 : 18.;
-	BRect frame(0, 0, size, size);
+    BPictureButton *button = ਨਿਰਾ;
+    ਜੇ (!menu_is_separator(menu->name)) {
+	ਦਸ਼ਮਲਵ ਮਾਪ = ਸਾਧਾਰਨ_Buttons_Bitmap ?
+	    ਸਾਧਾਰਨ_Buttons_Bitmap->Bounds().ਉਚਾਈ_2() + 1. + ButtonMargin * 2 : 18.;
+	BRect ਚੌਖਟਾ(0, 0, ਮਾਪ, ਮਾਪ);
 	BPicture pictureOn;
 	BPicture pictureOff;
-	BPicture pictureGray;
+	BPicture picture_ਸਲੇਟੀ;
 
-	if (menu->iconfile == NULL && menu->iconidx >= 0 && normalButtonsBitmap) {
-	    GetPictureFromBitmap(&pictureOn,  menu->iconidx, normalButtonsBitmap, true);
-	    GetPictureFromBitmap(&pictureOff, menu->iconidx, normalButtonsBitmap, false);
-	    GetPictureFromBitmap(&pictureGray, menu->iconidx, grayedButtonsBitmap, false);
-	} else {
+	ਜੇ (menu->iconfile == ਨਿਰਾ && menu->iconidx >= 0 && ਸਾਧਾਰਨ_Buttons_Bitmap) {
+	    GetPictureFromBitmap(&pictureOn,  menu->iconidx, ਸਾਧਾਰਨ_Buttons_Bitmap, ਸੱਚ);
+	    GetPictureFromBitmap(&pictureOff, menu->iconidx, ਸਾਧਾਰਨ_Buttons_Bitmap, ਝੂਠ);
+	    GetPictureFromBitmap(&picture_ਸਲੇਟੀ, menu->iconidx, grayedButtonsBitmap, ਝੂਠ);
+	} ਨਹੀਂਤਾਂ {
 
-	    char_u buffer[MAXPATHL] = {0};
-	    BBitmap *bitmap = NULL;
+	    char_u ਬਫਰ[MAXPATHL] = {0};
+	    BBitmap *bitmap = ਨਿਰਾ;
 
-	    if (menu->iconfile) {
-		gui_find_iconfile(menu->iconfile, buffer, (char*)"png");
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    ਜੇ (menu->iconfile) {
+		gui_ਲੱਭੋ_iconfile(menu->iconfile, ਬਫਰ, (ਅੱਖਰ*)"png");
+		bitmap = BTranslationUtils::GetBitmap((ਅੱਖਰ*)ਬਫਰ);
 	    }
 
-	    if (bitmap == NULL && gui_find_bitmap(menu->name, buffer, (char*)"png") == OK)
-		bitmap = BTranslationUtils::GetBitmap((char*)buffer);
+	    ਜੇ (bitmap == ਨਿਰਾ && gui_ਲੱਭੋ_bitmap(menu->name, ਬਫਰ, (ਅੱਖਰ*)"png") == OK)
+		bitmap = BTranslationUtils::GetBitmap((ਅੱਖਰ*)ਬਫਰ);
 
-	    if (bitmap == NULL)
-		bitmap = new BBitmap(BRect(0, 0, size, size), B_RGB32);
+	    ਜੇ (bitmap == ਨਿਰਾ)
+		bitmap = ਨਵਾਂ BBitmap(BRect(0, 0, ਮਾਪ, ਮਾਪ), B_RGB32);
 
-	    GetPictureFromBitmap(&pictureOn,   0, bitmap, true);
-	    GetPictureFromBitmap(&pictureOff,  0, bitmap, false);
-	    ModifyBitmapToGrayed(bitmap);
-	    GetPictureFromBitmap(&pictureGray, 0, bitmap, false);
+	    GetPictureFromBitmap(&pictureOn,   0, bitmap, ਸੱਚ);
+	    GetPictureFromBitmap(&pictureOff,  0, bitmap, ਝੂਠ);
+	    Modify_Bitmap_ਮੰਜ਼ਿਲ_Grayed(bitmap);
+	    GetPictureFromBitmap(&picture_ਸਲੇਟੀ, 0, bitmap, ਝੂਠ);
 
-	    delete bitmap;
+	    ਮਿਟਾਓ bitmap;
 	}
 
-	button = new BPictureButton(frame, (char*)menu->name,
-		    &pictureOff, &pictureOn, MenuMessage(menu));
+	button = ਨਵਾਂ BPictureButton(ਚੌਖਟਾ, (ਅੱਖਰ*)menu->name,
+		    &pictureOff, &pictureOn, Menu_ਸੁਨੇਹਾ(menu));
 
-	button->SetDisabledOn(&pictureGray);
-	button->SetDisabledOff(&pictureGray);
+	button->ਸੈੱਟ_Disabled_On(&picture_ਸਲੇਟੀ);
+	button->ਸੈੱਟ_Disabled_Off(&picture_ਸਲੇਟੀ);
 
-	button->SetTarget(gui.vimTextArea);
+	button->ਸੈੱਟ_ਨਿਸ਼ਾਨਾ(gui.vim_ਪਾਠ_Area);
 
-	AddChild(button);
+	ਜੋੜੋ_ਬੱਚਾ(button);
 
 	menu->button = button;
     }
 
-    bool result = fButtonsList.AddItem(button, index);
+    ਤਾਰਕਿਕ ਨਤੀਜਾ = fButtonsList.ਜੋੜੋ_ਵਸਤੂ(button, ਸੂਚਕਾਂਕ);
     InvalidateLayout();
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
-    bool
+    ਤਾਰਕਿਕ
 VimToolbar::RemoveButton(vimmenu_T *menu)
 {
-    if (menu->button) {
-	if (fButtonsList.RemoveItem(menu->button)) {
-	    delete menu->button;
-	    menu->button = NULL;
+    ਜੇ (menu->button) {
+	ਜੇ (fButtonsList.Remove_ਵਸਤੂ(menu->button)) {
+	    ਮਿਟਾਓ menu->button;
+	    menu->button = ਨਿਰਾ;
 	}
     }
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-    bool
-VimToolbar::GrayButton(vimmenu_T *menu, int grey)
+    ਤਾਰਕਿਕ
+VimToolbar::ਸਲੇਟੀ_Button(vimmenu_T *menu, ਪੂਰਨ grey)
 {
-    if (menu->button) {
-	int32 index = fButtonsList.IndexOf(menu->button);
-	if (index >= 0)
-	    menu->button->SetEnabled(grey ? false : true);
+    ਜੇ (menu->button) {
+	int32 ਸੂਚਕਾਂਕ = fButtonsList.ਸੂਚਕਾਂਕ_ਦਾ(menu->button);
+	ਜੇ (ਸੂਚਕਾਂਕ >= 0)
+	    menu->button->ਸੈੱਟ_Enabled(grey ? ਝੂਠ : ਸੱਚ);
     }
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-    void
+    ਖਾਲੀ
 VimToolbar::InvalidateLayout()
 {
-    int32 offset = ToolbarMargin;
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++) {
-	BPictureButton *button = (BPictureButton *)fButtonsList.ItemAt(i);
-	if (button) {
-	    button->MoveTo(offset, ToolbarMargin);
-	    offset += button->Bounds().Width() + ToolbarMargin;
-	} else
-	    offset += ToolbarMargin * 3;
+    int32 ਵਿੱਥ = ToolbarMargin;
+    int32 ਗਿਣਤੀ_2 = fButtonsList.ਗਿਣਤੀ_ਚੀਜ਼ਾਂ();
+    ਲਈ (int32 i = 0; i < ਗਿਣਤੀ_2; i++) {
+	BPictureButton *button = (BPictureButton *)fButtonsList.ਵਸਤੂ_At(i);
+	ਜੇ (button) {
+	    button->Move_ਮੰਜ਼ਿਲ(ਵਿੱਥ, ToolbarMargin);
+	    ਵਿੱਥ += button->Bounds().ਚੌੜਾਈ_2() + ToolbarMargin;
+	} ਨਹੀਂਤਾਂ
+	    ਵਿੱਥ += ToolbarMargin * 3;
     }
 }
 
-#endif /*FEAT_TOOLBAR*/
+#ਜੇ_ਅੰਤ /*FEAT_TOOLBAR*/
 
-#if defined(FEAT_GUI_TABLINE)
+#ਜੇ defined(FEAT_GUI_TABLINE)
 
-    float
-VimTabLine::TablineHeight() const
+    ਦਸ਼ਮਲਵ
+Vim_Tab_ਸਤਰ::Tabline_ਉਚਾਈ() ਅਚਲ
 {
 //  float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
 //  return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
-    return TabHeight(); //  + ToolbarMargin;
+    ਵਾਪਸ Tab_ਉਚਾਈ(); //  + ToolbarMargin;
 }
 
-void
-VimTabLine::MouseDown(BPoint point)
+ਖਾਲੀ
+Vim_Tab_ਸਤਰ::Mouse_ਥੱਲੇ(BPoint ਬਿੰਦੂ)
 {
-    if (!gui_mch_showing_tabline())
-	return;
+    ਜੇ (!gui_mch_showing_tabline())
+	ਵਾਪਸ;
 
-    BMessage *m = Window()->CurrentMessage();
-    assert(m);
+    BMessage *m = ਖਿੜਕੀ()->Current_ਸੁਨੇਹਾ();
+    ਪ੍ਰਤਿਜ੍ਞਾ(m);
 
     int32 buttons = 0;
-    m->FindInt32("buttons", &buttons);
+    m->ਲੱਭੋ_Int32("buttons", &buttons);
 
     int32 clicks = 0;
-    m->FindInt32("clicks", &clicks);
+    m->ਲੱਭੋ_Int32("clicks", &clicks);
 
-    int index = 0; //  0 means here - no tab found
-    for (int i = 0; i < CountTabs(); i++) {
-	if (TabFrame(i).Contains(point)) {
-	    index = i + 1; //  indexes are 1-based
-	    break;
+    ਪੂਰਨ ਸੂਚਕਾਂਕ = 0; //  0 means here - no tab found
+    ਲਈ (ਪੂਰਨ i = 0; i < ਗਿਣਤੀ_Tabs(); i++) {
+	ਜੇ (Tab_ਚੌਖਟਾ(i).ਸ਼ਾਮਲ_ਹੈ_2(ਬਿੰਦੂ)) {
+	    ਸੂਚਕਾਂਕ = i + 1; //  indexes are 1-based
+	    ਰੋਕੋ;
 	}
     }
 
-    int event = -1;
+    ਪੂਰਨ event = -1;
 
-    if ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
+    ਜੇ ((buttons & B_PRIMARY_MOUSE_BUTTON) && clicks > 1)
 	//  left button double click on - create new tab
 	event = TABLINE_MENU_NEW;
 
-    else if (buttons & B_TERTIARY_MOUSE_BUTTON)
+    ਨਹੀਂਤਾਂ ਜੇ (buttons & B_TERTIARY_MOUSE_BUTTON)
 	//  middle button click - close the pointed tab
 	//  or create new one in case empty space
-	event = index > 0 ? TABLINE_MENU_CLOSE : TABLINE_MENU_NEW;
+	event = ਸੂਚਕਾਂਕ > 0 ? TABLINE_MENU_CLOSE : TABLINE_MENU_NEW;
 
-    else if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+    ਨਹੀਂਤਾਂ ਜੇ (buttons & B_SECONDARY_MOUSE_BUTTON) {
 	//  right button click - show context menu
-	BPopUpMenu* popUpMenu = new BPopUpMenu("tabLineContextMenu", false, false);
-	popUpMenu->AddItem(new BMenuItem(_("Close tabi R"), new BMessage(TABLINE_MENU_CLOSE)));
-	popUpMenu->AddItem(new BMenuItem(_("New tab    T"), new BMessage(TABLINE_MENU_NEW)));
-	popUpMenu->AddItem(new BMenuItem(_("Open tab..."), new BMessage(TABLINE_MENU_OPEN)));
+	BPop_ਉੱਪਰ_Menu* ਕੱਢੋ_ਉੱਪਰ_Menu = ਨਵਾਂ BPop_ਉੱਪਰ_Menu("tabLineContextMenu", ਝੂਠ, ਝੂਠ);
+	ਕੱਢੋ_ਉੱਪਰ_Menu->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BMenu_ਵਸਤੂ(_("Close tabi R"), ਨਵਾਂ BMessage(TABLINE_MENU_CLOSE)));
+	ਕੱਢੋ_ਉੱਪਰ_Menu->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BMenu_ਵਸਤੂ(_("New tab    T"), ਨਵਾਂ BMessage(TABLINE_MENU_NEW)));
+	ਕੱਢੋ_ਉੱਪਰ_Menu->ਜੋੜੋ_ਵਸਤੂ(ਨਵਾਂ BMenu_ਵਸਤੂ(_("Open tab..."), ਨਵਾਂ BMessage(TABLINE_MENU_OPEN)));
 
-	ConvertToScreen(&point);
-	BMenuItem* item = popUpMenu->Go(point);
-	if (item != NULL) {
-	    event = item->Command();
+	Convert_ਮੰਜ਼ਿਲ_Screen(&ਬਿੰਦੂ);
+	BMenu_ਵਸਤੂ* ਵਸਤੂ = ਕੱਢੋ_ਉੱਪਰ_Menu->Go(ਬਿੰਦੂ);
+	ਜੇ (ਵਸਤੂ != ਨਿਰਾ) {
+	    event = ਵਸਤੂ->Command();
 	}
 
-	delete popUpMenu;
+	ਮਿਟਾਓ ਕੱਢੋ_ਉੱਪਰ_Menu;
 
-    } else {
+    } ਨਹੀਂਤਾਂ {
 	//  default processing
-	BTabView::MouseDown(point);
-	return;
+	BTabView::Mouse_ਥੱਲੇ(ਬਿੰਦੂ);
+	ਵਾਪਸ;
     }
 
-    if (event < 0)
-	return;
+    ਜੇ (event < 0)
+	ਵਾਪਸ;
 
-    VimTablineMenuMsg tmm;
-    tmm.index = index;
+    Vim_Tabline_Menu_ਸੁਨੇਹਾ tmm;
+    tmm.ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ;
     tmm.event = event;
-    write_port(gui.vdcmp, VimMsg::TablineMenu, &tmm, sizeof(tmm));
+    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::TablineMenu, &tmm, ਆਕਾਰ(tmm));
 }
 
-void
-VimTabLine::VimTab::Select(BView* owner)
+ਖਾਲੀ
+Vim_Tab_ਸਤਰ::VimTab::Select(BView* owner)
 {
     BTab::Select(owner);
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
+    ਜੇ (tab_ਸਤਰ != ਨਿਰਾ) {
 
 	int32 i = 0;
-	for (; i < tabLine->CountTabs(); i++)
-	    if (this == tabLine->TabAt(i))
-		break;
+	ਲਈ (; i < tab_ਸਤਰ->ਗਿਣਤੀ_Tabs(); i++)
+	    ਜੇ (ਇਹ == tab_ਸਤਰ->TabAt(i))
+		ਰੋਕੋ;
 
 //	printf("%d:%d:%s\n", i, tabLine->CountTabs(), tabLine->TabAt(i)->Label());
-	if (i < tabLine->CountTabs()) {
-	    VimTablineMsg tm;
-	    tm.index = i + 1;
-	    write_port(gui.vdcmp, VimMsg::Tabline, &tm, sizeof(tm));
+	ਜੇ (i < tab_ਸਤਰ->ਗਿਣਤੀ_Tabs()) {
+	    Vim_Tabline_ਸੁਨੇਹਾ tm;
+	    tm.ਸੂਚਕਾਂਕ = i + 1;
+	    write_ਪੋਰਟ(gui.vdcmp, Vim_ਸੁਨੇਹਾ::Tabline, &tm, ਆਕਾਰ(tm));
 	}
     }
 }
 
-#endif //  defined(FEAT_GUI_TABLINE)
+#ਜੇ_ਅੰਤ //  defined(FEAT_GUI_TABLINE)
 
 // ---------------- ----------------
 
 //  some global variables
-static char appsig[] = "application/x-vnd.Haiku-Vim-8";
-key_map *keyMap;
-char *keyMapChars;
-int main_exitcode = 127;
+ਸਥਿਰ ਅੱਖਰ appsig[] = "application/x-vnd.Haiku-Vim-8";
+ਕੁੰਜੀ_map *ਕੁੰਜੀ_Map;
+ਅੱਖਰ *ਕੁੰਜੀ_Map_Chars;
+ਪੂਰਨ main_exitcode = 127;
 
-    status_t
+    ਸਥਿਤੀ_t
 gui_haiku_process_event(bigtime_t timeout)
 {
-    struct VimMsg vm;
+    ਬਣਤਰ Vim_ਸੁਨੇਹਾ vm;
     int32 what;
-    ssize_t size;
+    ssize_t ਮਾਪ;
 
-    size = read_port_etc(gui.vdcmp, &what, &vm, sizeof(vm),
+    ਮਾਪ = read_ਪੋਰਟ_etc(gui.vdcmp, &what, &vm, ਆਕਾਰ(vm),
 	    B_TIMEOUT, timeout);
 
-    if (size >= 0) {
-	switch (what) {
-	    case VimMsg::Key:
+    ਜੇ (ਮਾਪ >= 0) {
+	ਚੋਣ (what) {
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::ਕੁੰਜੀ_2:
 		{
-		    char_u *string = vm.u.Key.chars;
-		    int len = vm.u.Key.length;
-		    if (len == 1 && string[0] == Ctrl_chr('C')) {
-			trash_input_buf();
+		    char_u *string = vm.u.ਕੁੰਜੀ_2.chars;
+		    ਪੂਰਨ len = vm.u.ਕੁੰਜੀ_2.ਲੰਮਾਈ;
+		    ਜੇ (len == 1 && string[0] == Ctrl_chr('C')) {
+			trash_ਨਿਵੇਸ਼_buf();
 			got_int = TRUE;
 		    }
 
-		    if (vm.u.Key.csi_escape)
-#ifndef FEAT_MBYTE_IME
+		    ਜੇ (vm.u.ਕੁੰਜੀ_2.csi_escape)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
 		    {
-			int	i;
+			ਪੂਰਨ	i;
 			char_u	buf[2];
 
-			for (i = 0; i < len; ++i)
+			ਲਈ (i = 0; i < len; ++i)
 			{
-			    add_to_input_buf(string + i, 1);
-			    if (string[i] == CSI)
+			    ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(string + i, 1);
+			    ਜੇ (string[i] == CSI)
 			    {
 				// Turn CSI into K_CSI.
 				buf[0] = KS_EXTRA;
-				buf[1] = (int)KE_CSI;
-				add_to_input_buf(buf, 2);
+				buf[1] = (ਪੂਰਨ)KE_CSI;
+				ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(buf, 2);
 			    }
 			}
 		    }
-#else
-			add_to_input_buf_csi(string, len);
-#endif
-		    else
-			add_to_input_buf(string, len);
+#ਨਹੀਂਤਾਂ
+			ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf_csi(string, len);
+#ਜੇ_ਅੰਤ
+		    ਨਹੀਂਤਾਂ
+			ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(string, len);
 		}
-		break;
-	    case VimMsg::Resize:
-		gui_resize_shell(vm.u.NewSize.width, vm.u.NewSize.height);
-		break;
-	    case VimMsg::ScrollBar:
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Resize:
+		gui_resize_shell(vm.u.New_ਮਾਪ.ਚੌੜਾਈ, vm.u.New_ਮਾਪ.ਉਚਾਈ);
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::ScrollBar:
 		{
 		    /*
 		     * If loads of scroll messages queue up, use only the last
@@ -3155,66 +3155,66 @@ gui_haiku_process_event(bigtime_t timeout)
 		     * This is not perfect yet anyway: these events are queued
 		     * yet again, this time in the keyboard input buffer.
 		     */
-		    int32 oldCount =
-			atomic_add(&vm.u.Scroll.sb->scrollEventCount, -1);
-		    if (oldCount <= 1 || !vm.u.Scroll.stillDragging)
+		    int32 old_ਗਿਣਤੀ =
+			atomic_ਜੋੜੋ(&vm.u.Scroll.sb->scroll_Event_ਗਿਣਤੀ, -1);
+		    ਜੇ (old_ਗਿਣਤੀ <= 1 || !vm.u.Scroll.stillDragging)
 			gui_drag_scrollbar(vm.u.Scroll.sb->getGsb(),
-				vm.u.Scroll.value, vm.u.Scroll.stillDragging);
+				vm.u.Scroll.ਮੁੱਲ, vm.u.Scroll.stillDragging);
 		}
-		break;
-#if defined(FEAT_MENU)
-	    case VimMsg::Menu:
+		ਰੋਕੋ;
+#ਜੇ defined(FEAT_MENU)
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Menu:
 		gui_menu_cb(vm.u.Menu.guiMenu);
-		break;
-#endif
-	    case VimMsg::Mouse:
+		ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Mouse:
 		{
-		    int32 oldCount;
-		    if (vm.u.Mouse.button == MOUSE_DRAG)
-			oldCount =
-			    atomic_add(&gui.vimTextArea->mouseDragEventCount, -1);
-		    else
-			oldCount = 0;
-		    if (oldCount <= 1)
+		    int32 old_ਗਿਣਤੀ;
+		    ਜੇ (vm.u.Mouse.button == MOUSE_DRAG)
+			old_ਗਿਣਤੀ =
+			    atomic_ਜੋੜੋ(&gui.vim_ਪਾਠ_Area->mouse_Drag_Event_ਗਿਣਤੀ, -1);
+		    ਨਹੀਂਤਾਂ
+			old_ਗਿਣਤੀ = 0;
+		    ਜੇ (old_ਗਿਣਤੀ <= 1)
 			gui_send_mouse_event(vm.u.Mouse.button, vm.u.Mouse.x,
 				vm.u.Mouse.y, vm.u.Mouse.repeated_click,
 				vm.u.Mouse.modifiers);
 		}
-		break;
-	    case VimMsg::MouseMoved:
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::MouseMoved:
 		{
 		    gui_mouse_moved(vm.u.MouseMoved.x, vm.u.MouseMoved.y);
 		}
-		break;
-	    case VimMsg::Focus:
-		gui.in_focus = vm.u.Focus.active;
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Focus:
+		gui.ਵਿੱਚ_focus = vm.u.Focus.ਸਰਗਰਮ;
 		// XXX Signal that scrollbar dragging has stopped?
 		// This is needed because we don't get a MouseUp if
 		// that happens while outside the window... :-(
-		if (gui.dragged_sb) {
+		ਜੇ (gui.dragged_sb) {
 		    gui.dragged_sb = SBAR_NONE;
 		}
 		//  gui_update_cursor(TRUE, FALSE);
-		break;
-	    case VimMsg::Refs:
-		::RefsReceived(vm.u.Refs.message, vm.u.Refs.changedir);
-		break;
-	    case VimMsg::Tabline:
-		send_tabline_event(vm.u.Tabline.index);
-		break;
-	    case VimMsg::TablineMenu:
-		send_tabline_menu_event(vm.u.TablineMenu.index, vm.u.TablineMenu.event);
-		break;
-	    default:
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Refs:
+		::RefsReceived(vm.u.Refs.ਸੁਨੇਹਾ_2, vm.u.Refs.changedir);
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::Tabline:
+		send_tabline_event(vm.u.Tabline.ਸੂਚਕਾਂਕ);
+		ਰੋਕੋ;
+	    ਹਾਲਤ Vim_ਸੁਨੇਹਾ::TablineMenu:
+		send_tabline_menu_event(vm.u.TablineMenu.ਸੂਚਕਾਂਕ, vm.u.TablineMenu.event);
+		ਰੋਕੋ;
+	    ਮੂਲ:
 		//  unrecognised message, ignore it
-		break;
+		ਰੋਕੋ;
 	}
     }
 
     /*
      * If size < B_OK, it is an error code.
      */
-    return size;
+    ਵਾਪਸ ਮਾਪ;
 }
 
 /*
@@ -3230,79 +3230,79 @@ gui_haiku_process_event(bigtime_t timeout)
  * If there is no window, don't call Lock() but do succeed.
  */
 
-    int
-vim_lock_screen()
+    ਪੂਰਨ
+vim_ਤਾਲਾ_screen()
 {
-    return !gui.vimWindow || gui.vimWindow->Lock();
+    ਵਾਪਸ !gui.vim_ਖਿੜਕੀ || gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2();
 }
 
-    void
+    ਖਾਲੀ
 vim_unlock_screen()
 {
-    if (gui.vimWindow)
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ)
+	gui.vim_ਖਿੜਕੀ->Unlock();
 }
 
-#define RUN_BAPPLICATION_IN_NEW_THREAD	0
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਲੜੀਵਾਰ_BAPPLICATION_ਵਿੱਚ_NEW_THREAD	0
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#ਜੇ ਲੜੀਵਾਰ_BAPPLICATION_ਵਿੱਚ_NEW_THREAD
 
     int32
-run_vimapp(void *args)
+ਲੜੀਵਾਰ_vimapp(ਖਾਲੀ *ਦਲੀਲਾਂ)
 {
     VimApp app(appsig);
 
     gui.vimApp = &app;
-    app.Run();		    // Run until Quit() called
+    app.ਲੜੀਵਾਰ_2();		    // Run until Quit() called
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-#else
+#ਨਹੀਂਤਾਂ
 
     int32
-call_main(void *args)
+call_main(ਖਾਲੀ *ਦਲੀਲਾਂ)
 {
-    struct MainArgs *ma = (MainArgs *)args;
+    ਬਣਤਰ Main_ਦਲੀਲਾਂ *ma = (Main_ਦਲੀਲਾਂ *)ਦਲੀਲਾਂ;
 
-    return main(ma->argc, ma->argv);
+    ਵਾਪਸ ਮੁੱਖ(ma->argc, ma->argv);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Parse the GUI related command-line arguments.  Any arguments used are
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
+    ਖਾਲੀ
 gui_mch_prepare(
-	int	*argc,
-	char	**argv)
+	ਪੂਰਨ	*argc,
+	ਅੱਖਰ	**argv)
 {
     /*
      * We don't have any command line arguments for the BeOS GUI yet,
      * but this is an excellent place to create our Application object.
      */
-    if (!gui.vimApp) {
+    ਜੇ (!gui.vimApp) {
 	thread_info tinfo;
-	get_thread_info(find_thread(NULL), &tinfo);
+	get_thread_info(ਲੱਭੋ_thread(ਨਿਰਾ), &tinfo);
 
 	// May need the port very early on to process RefsReceived()
-	gui.vdcmp = create_port(B_MAX_PORT_COUNT, "vim VDCMP");
+	gui.vdcmp = create_ਪੋਰਟ(B_MAX_ਪੋਰਟ_ਗਿਣਤੀ, "vim VDCMP");
 
-#if RUN_BAPPLICATION_IN_NEW_THREAD
-	thread_id tid = spawn_thread(run_vimapp, "vim VimApp",
-		tinfo.priority, NULL);
-	if (tid >= B_OK) {
+#ਜੇ ਲੜੀਵਾਰ_BAPPLICATION_ਵਿੱਚ_NEW_THREAD
+	thread_id tid = spawn_thread(ਲੜੀਵਾਰ_vimapp, "vim VimApp",
+		tinfo.ਤਰਜੀਹ, ਨਿਰਾ);
+	ਜੇ (tid >= B_OK) {
 	    resume_thread(tid);
-	} else {
+	} ਨਹੀਂਤਾਂ {
 	    getout(1);
 	}
-#else
-	MainArgs ma = { *argc, argv };
+#ਨਹੀਂਤਾਂ
+	Main_ਦਲੀਲਾਂ ma = { *argc, argv };
 	thread_id tid = spawn_thread(call_main, "vim main()",
-		tinfo.priority, &ma);
-	if (tid >= B_OK) {
+		tinfo.ਤਰਜੀਹ, &ma);
+	ਜੇ (tid >= B_OK) {
 	    VimApp app(appsig);
 
 	    gui.vimApp = &app;
@@ -3313,19 +3313,19 @@ gui_mch_prepare(
 	     * There will be no infinite recursion since
 	     * gui.vimApp is set now.
 	     */
-	    app.Run();		    // Run until Quit() called
+	    app.ਲੜੀਵਾਰ_2();		    // Run until Quit() called
 	    // fprintf(stderr, "app.Run() returned...\n");
-	    status_t dummy_exitcode;
-	    (void)wait_for_thread(tid, &dummy_exitcode);
+	    ਸਥਿਤੀ_t dummy_exitcode;
+	    (ਖਾਲੀ)wait_for_thread(tid, &dummy_exitcode);
 
 	    /*
 	     * This path should be the normal one taken to exit Vim.
 	     * The main() thread calls mch_exit() which calls
 	     * gui_mch_exit() which terminates its thread.
 	     */
-	    exit(main_exitcode);
+	    ਬਾਹਰ_ਨਿਕਲੋ(main_exitcode);
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
     // Don't fork() when starting the GUI. Spawned threads are not
     // duplicated with a fork(). The result is a mess.
@@ -3343,10 +3343,10 @@ gui_mch_prepare(
      * too early to see the command line parsing. Tough.
      * On the other hand, it starts the gui for vim file & which is nice.
      */
-    if (!isatty(0)) {
-	struct stat stat_stdin, stat_dev_null;
+    ਜੇ (!isatty(0)) {
+	ਬਣਤਰ stat stat_stdin, stat_dev_null;
 
-	if (fstat(0, &stat_stdin) == -1 ||
+	ਜੇ (fstat(0, &stat_stdin) == -1 ||
 		stat("/dev/null", &stat_dev_null) == -1 ||
 		(stat_stdin.st_dev == stat_dev_null.st_dev &&
 		 stat_stdin.st_ino == stat_dev_null.st_ino))
@@ -3358,46 +3358,46 @@ gui_mch_prepare(
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    ਪੂਰਨ
+gui_mch_init_check(ਖਾਲੀ)
 {
-    return OK;	    // TODO: GUI can always be started?
+    ਵਾਪਸ OK;	    // TODO: GUI can always be started?
 }
 
 /*
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
+    ਪੂਰਨ
 gui_mch_init()
 {
     display_errors();
     gui.def_norm_pixel = RGB(0x00, 0x00, 0x00);	//  black
-    gui.def_back_pixel = RGB(0xFF, 0xFF, 0xFF);	//  white
+    gui.def_ਪਿੱਠ_pixel = RGB(0xFF, 0xFF, 0xFF);	//  white
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.ਪਿੱਠ_pixel = gui.def_ਪਿੱਠ_pixel;
 
-    gui.scrollbar_width = (int) B_V_SCROLL_BAR_WIDTH;
-    gui.scrollbar_height = (int) B_H_SCROLL_BAR_HEIGHT;
-#ifdef FEAT_MENU
-    gui.menu_height = 19;   //	initial guess -
+    gui.scrollbar_ਚੌੜਾਈ = (ਪੂਰਨ) B_V_SCROLL_BAR_ਚੌੜਾਈ;
+    gui.scrollbar_ਉਚਾਈ = (ਪੂਰਨ) B_H_SCROLL_BAR_ਉਚਾਈ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
+    gui.menu_ਉਚਾਈ = 19;   //	initial guess -
     //	correct for my default settings
-#endif
-    gui.border_offset = 3;  //	coordinates are inside window borders
+#ਜੇ_ਅੰਤ
+    gui.border_ਵਿੱਥ = 3;  //	coordinates are inside window borders
 
-    if (gui.vdcmp < B_OK)
-	return FAIL;
-    get_key_map(&keyMap, &keyMapChars);
+    ਜੇ (gui.vdcmp < B_OK)
+	ਵਾਪਸ FAIL;
+    get_ਕੁੰਜੀ_map(&ਕੁੰਜੀ_Map, &ਕੁੰਜੀ_Map_Chars);
 
-    gui.vimWindow = new VimWindow();	// hidden and locked
-    if (!gui.vimWindow)
-	return FAIL;
+    gui.vim_ਖਿੜਕੀ = ਨਵਾਂ Vim_ਖਿੜਕੀ();	// hidden and locked
+    ਜੇ (!gui.vim_ਖਿੜਕੀ)
+	ਵਾਪਸ FAIL;
 
-    gui.vimWindow->Run();	// Run() unlocks but does not show
+    gui.vim_ਖਿੜਕੀ->ਲੜੀਵਾਰ_2();	// Run() unlocks but does not show
 
     // Get the colors from the "Normal" group (set in syntax.c or in a vimrc
     // file)
-    set_normal_colors();
+    ਸੈੱਟ_ਸਾਧਾਰਨ_colors();
 
     /*
      * Check that none of the colors are the same as the background color
@@ -3410,82 +3410,82 @@ gui_mch_init()
 
     gui_mch_new_colors();	// window must exist for this
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
+    ਖਾਲੀ
 gui_mch_new_colors()
 {
-    rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
+    rgb_color rgb = GUI_ਮੰਜ਼ਿਲ_RGB(gui.ਪਿੱਠ_pixel);
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimForm->SetViewColor(rgb);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vimForm->ਸੈੱਟ_View_Color(rgb);
 	//  Does this not have too much effect for those small rectangles?
 	gui.vimForm->Invalidate();
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    ਪੂਰਨ
 gui_mch_open()
 {
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    ਜੇ (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_ਸੈੱਟ_winpos(gui_win_x, gui_win_y);
 
     // Actually open the window
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Show();
-	gui.vimWindow->Unlock();
-	return OK;
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->Show();
+	gui.vim_ਖਿੜਕੀ->Unlock();
+	ਵਾਪਸ OK;
     }
 
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
-    void
-gui_mch_exit(int vim_exitcode)
+    ਖਾਲੀ
+gui_mch_exit(ਪੂਰਨ vim_exitcode)
 {
-    if (gui.vimWindow) {
-	thread_id tid = gui.vimWindow->Thread();
-	gui.vimWindow->Lock();
-	gui.vimWindow->Quit();
+    ਜੇ (gui.vim_ਖਿੜਕੀ) {
+	thread_id tid = gui.vim_ਖਿੜਕੀ->Thread();
+	gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2();
+	gui.vim_ਖਿੜਕੀ->Quit();
 	// Wait until it is truly gone
 	int32 exitcode;
 	wait_for_thread(tid, &exitcode);
     }
-    delete_port(gui.vdcmp);
-#if !RUN_BAPPLICATION_IN_NEW_THREAD
+    delete_ਪੋਰਟ(gui.vdcmp);
+#ਜੇ !ਲੜੀਵਾਰ_BAPPLICATION_ਵਿੱਚ_NEW_THREAD
     /*
      * We are in the main() thread - quit the App thread and
      * quit ourselves (passing on the exitcode). Use a global since the
      * value from exit_thread() is only used if wait_for_thread() is
      * called in time (race condition).
      */
-#endif
-    if (gui.vimApp) {
-	VimTextAreaView::guiBlankMouse(false);
+#ਜੇ_ਅੰਤ
+    ਜੇ (gui.vimApp) {
+	Vim_ਪਾਠ_Area_View::guiBlankMouse(ਝੂਠ);
 
 	main_exitcode = vim_exitcode;
-#if RUN_BAPPLICATION_IN_NEW_THREAD
+#ਜੇ ਲੜੀਵਾਰ_BAPPLICATION_ਵਿੱਚ_NEW_THREAD
 	thread_id tid = gui.vimApp->Thread();
 	int32 exitcode;
-	gui.vimApp->Lock();
+	gui.vimApp->ਤਾਲਾ_2();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
 	wait_for_thread(tid, &exitcode);
-#else
-	gui.vimApp->Lock();
+#ਨਹੀਂਤਾਂ
+	gui.vimApp->ਤਾਲਾ_2();
 	gui.vimApp->Quit();
 	gui.vimApp->Unlock();
 	// suicide
 	exit_thread(vim_exitcode);
-#endif
+#ਜੇ_ਅੰਤ
     }
     // If we are somehow still here, let mch_exit() handle things.
 }
@@ -3493,130 +3493,130 @@ gui_mch_exit(int vim_exitcode)
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ਪੂਰਨ
+gui_mch_get_winpos(ਪੂਰਨ *x, ਪੂਰਨ *y)
 {
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	BRect r;
-	r = gui.vimWindow->Frame();
-	gui.vimWindow->Unlock();
-	*x = (int)r.left;
-	*y = (int)r.top;
-	return OK;
+	r = gui.vim_ਖਿੜਕੀ->ਚੌਖਟਾ_2();
+	gui.vim_ਖਿੜਕੀ->Unlock();
+	*x = (ਪੂਰਨ)r.ਖੱਬੇ;
+	*y = (ਪੂਰਨ)r.ਸਿਖਰ;
+	ਵਾਪਸ OK;
     }
-    else
-	return FAIL;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ FAIL;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_winpos(ਪੂਰਨ x, ਪੂਰਨ y)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->MoveTo(x, y);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->Move_ਮੰਜ਼ਿਲ(x, y);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-void
-gui_mch_set_shellsize(
-	int	width,
-	int	height,
-	int	min_width,
-	int	min_height,
-	int	base_width,
-	int	base_height,
-	int	direction) // TODO: utilize?
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_shellsize(
+	ਪੂਰਨ	ਚੌੜਾਈ,
+	ਪੂਰਨ	ਉਚਾਈ,
+	ਪੂਰਨ	min_ਚੌੜਾਈ,
+	ਪੂਰਨ	min_ਉਚਾਈ,
+	ਪੂਰਨ	ਅਧਾਰ_ਚੌੜਾਈ,
+	ਪੂਰਨ	ਅਧਾਰ_ਉਚਾਈ,
+	ਪੂਰਨ	direction) // TODO: utilize?
 {
     /*
      * We are basically given the size of the VimForm, if I understand
      * correctly. Since it fills the window completely, this will also
      * be the size of the window.
      */
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->ResizeTo(width - PEN_WIDTH, height - PEN_WIDTH);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->Resize_ਮੰਜ਼ਿਲ(ਚੌੜਾਈ - PEN_ਚੌੜਾਈ, ਉਚਾਈ - PEN_ਚੌੜਾਈ);
 
 	// set size limits
-	float minWidth, maxWidth, minHeight, maxHeight;
+	ਦਸ਼ਮਲਵ min_ਚੌੜਾਈ_2, max_ਚੌੜਾਈ, min_ਉਚਾਈ_2, max_ਉਚਾਈ;
 
-	gui.vimWindow->GetSizeLimits(&minWidth, &maxWidth,
-		&minHeight, &maxHeight);
-	gui.vimWindow->SetSizeLimits(min_width, maxWidth,
-		min_height, maxHeight);
+	gui.vim_ਖਿੜਕੀ->Get_ਮਾਪ_Limits(&min_ਚੌੜਾਈ_2, &max_ਚੌੜਾਈ,
+		&min_ਉਚਾਈ_2, &max_ਉਚਾਈ);
+	gui.vim_ਖਿੜਕੀ->ਸੈੱਟ_ਮਾਪ_Limits(min_ਚੌੜਾਈ, max_ਚੌੜਾਈ,
+		min_ਉਚਾਈ, max_ਉਚਾਈ);
 
 	/*
 	 * Set the resizing alignment depending on font size.
 	 */
-	gui.vimWindow->SetWindowAlignment(
+	gui.vim_ਖਿੜਕੀ->ਸੈੱਟ_ਖਿੜਕੀ_Alignment(
 		B_PIXEL_ALIGNMENT,	//  window_alignment mode,
 		1,		//  int32 h,
 		0,		//  int32 hOffset = 0,
-		gui.char_width,	    //	int32 width = 0,
-		base_width,	    //	int32 widthOffset = 0,
+		gui.char_ਚੌੜਾਈ,	    //	int32 width = 0,
+		ਅਧਾਰ_ਚੌੜਾਈ,	    //	int32 widthOffset = 0,
 		1,		//  int32 v = 0,
 		0,		//  int32 vOffset = 0,
-		gui.char_height,	//  int32 height = 0,
-		base_height	    //	int32 heightOffset = 0
+		gui.char_ਉਚਾਈ,	//  int32 height = 0,
+		ਅਧਾਰ_ਉਚਾਈ	    //	int32 heightOffset = 0
 		);
 
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-void
+ਖਾਲੀ
 gui_mch_get_screen_dimensions(
-	int	*screen_w,
-	int	*screen_h)
+	ਪੂਰਨ	*screen_w,
+	ਪੂਰਨ	*screen_h)
 {
-    BRect frame;
+    BRect ਚੌਖਟਾ;
 
     {
-	BScreen screen(gui.vimWindow);
+	BScreen screen(gui.vim_ਖਿੜਕੀ);
 
-	if (screen.IsValid()) {
-	    frame = screen.Frame();
-	} else {
-	    frame.right = 640;
-	    frame.bottom = 480;
+	ਜੇ (screen.IsValid()) {
+	    ਚੌਖਟਾ = screen.ਚੌਖਟਾ_2();
+	} ਨਹੀਂਤਾਂ {
+	    ਚੌਖਟਾ.ਸੱਜੇ = 640;
+	    ਚੌਖਟਾ.bottom = 480;
 	}
     }
 
     // XXX approximations...
-    *screen_w = (int) frame.right - 2 * gui.scrollbar_width - 20;
-    *screen_h = (int) frame.bottom - gui.scrollbar_height
-#ifdef FEAT_MENU
-	- gui.menu_height
-#endif
+    *screen_w = (ਪੂਰਨ) ਚੌਖਟਾ.ਸੱਜੇ - 2 * gui.scrollbar_ਚੌੜਾਈ - 20;
+    *screen_h = (ਪੂਰਨ) ਚੌਖਟਾ.bottom - gui.scrollbar_ਉਚਾਈ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
+	- gui.menu_ਉਚਾਈ
+#ਜੇ_ਅੰਤ
 	- 30;
 }
 
-void
-gui_mch_set_text_area_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_ਪਾਠ_area_pos(
+	ਪੂਰਨ	x,
+	ਪੂਰਨ	y,
+	ਪੂਰਨ	w,
+	ਪੂਰਨ	h)
 {
-    if (!gui.vimTextArea)
-	return;
+    ਜੇ (!gui.vim_ਪਾਠ_Area)
+	ਵਾਪਸ;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->MoveTo(x, y);
-	gui.vimTextArea->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->Move_ਮੰਜ਼ਿਲ(x, y);
+	gui.vim_ਪਾਠ_Area->Resize_ਮੰਜ਼ਿਲ(w - PEN_ਚੌੜਾਈ, h - PEN_ਚੌੜਾਈ);
 
-#ifdef FEAT_GUI_TABLINE
-	if (gui.vimForm->TabLine() != NULL) {
-	    gui.vimForm->TabLine()->ResizeTo(w, gui.vimForm->TablineHeight());
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+	ਜੇ (gui.vimForm->Tab_ਸਤਰ() != ਨਿਰਾ) {
+	    gui.vimForm->Tab_ਸਤਰ()->Resize_ਮੰਜ਼ਿਲ(w, gui.vimForm->Tabline_ਉਚਾਈ());
 	}
-#endif // FEAT_GUI_TABLINE
+#ਜੇ_ਅੰਤ // FEAT_GUI_TABLINE
 
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
@@ -3625,49 +3625,49 @@ gui_mch_set_text_area_pos(
  * Scrollbar stuff:
  */
 
-void
+ਖਾਲੀ
 gui_mch_enable_scrollbar(
 	scrollbar_T *sb,
-	int	flag)
+	ਪੂਰਨ	flag)
 {
     VimScrollBar *vsb = sb->id;
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	/*
 	 * This function is supposed to be idempotent, but Show()/Hide()
 	 * is not. Therefore we test if they are needed.
 	 */
-	if (flag) {
-	    if (vsb->IsHidden()) {
+	ਜੇ (flag) {
+	    ਜੇ (vsb->IsHidden()) {
 		vsb->Show();
 	    }
-	} else {
-	    if (!vsb->IsHidden()) {
+	} ਨਹੀਂਤਾਂ {
+	    ਜੇ (!vsb->IsHidden()) {
 		vsb->Hide();
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-void
-gui_mch_set_scrollbar_thumb(
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_thumb(
 	scrollbar_T *sb,
-	int	val,
-	int	size,
-	int	max)
+	ਪੂਰਨ	val,
+	ਪੂਰਨ	ਮਾਪ,
+	ਪੂਰਨ	max)
 {
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	VimScrollBar *s = sb->id;
-	if (max == 0) {
-	    s->SetValue(0);
-	    s->SetRange(0.0, 0.0);
-	} else {
-	    s->SetProportion((float)size / (max + 1.0));
-	    s->SetSteps(1.0, size > 5 ? size - 2 : size);
-#ifndef SCROLL_PAST_END	    //	really only defined in gui.c...
-	    max = max + 1 - size;
-#endif
-	    if (max < s->Value()) {
+	ਜੇ (max == 0) {
+	    s->ਸੈੱਟ_ਮੁੱਲ(0);
+	    s->ਸੈੱਟ_Range(0.0, 0.0);
+	} ਨਹੀਂਤਾਂ {
+	    s->ਸੈੱਟ_Proportion((ਦਸ਼ਮਲਵ)ਮਾਪ / (max + 1.0));
+	    s->ਸੈੱਟ_ਕਦਮਾਂ(1.0, ਮਾਪ > 5 ? ਮਾਪ - 2 : ਮਾਪ);
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SCROLL_PAST_ਸਿਰਾ	    //	really only defined in gui.c...
+	    max = max + 1 - ਮਾਪ;
+#ਜੇ_ਅੰਤ
+	    ਜੇ (max < s->ਮੁੱਲ_2()) {
 		/*
 		 * If the new maximum is lower than the current value,
 		 * setting it would cause the value to be clipped and
@@ -3675,93 +3675,93 @@ gui_mch_set_scrollbar_thumb(
 		 * We avoid this by setting the value first, because
 		 * it presumably is <= max.
 		 */
-		s->SetValue(val);
-		s->SetRange(0.0, max);
-	    } else {
+		s->ਸੈੱਟ_ਮੁੱਲ(val);
+		s->ਸੈੱਟ_Range(0.0, max);
+	    } ਨਹੀਂਤਾਂ {
 		/*
 		 * In the other case, set the range first, since the
 		 * new value might be higher than the current max.
 		 */
-		s->SetRange(0.0, max);
-		s->SetValue(val);
+		s->ਸੈੱਟ_Range(0.0, max);
+		s->ਸੈੱਟ_ਮੁੱਲ(val);
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-void
-gui_mch_set_scrollbar_pos(
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_pos(
 	scrollbar_T *sb,
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+	ਪੂਰਨ	x,
+	ਪੂਰਨ	y,
+	ਪੂਰਨ	w,
+	ਪੂਰਨ	h)
 {
-    if (gui.vimWindow->Lock()) {
-	BRect winb = gui.vimWindow->Bounds();
-	float vsbx = x, vsby = y;
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	BRect winb = gui.vim_ਖਿੜਕੀ->Bounds();
+	ਦਸ਼ਮਲਵ vsbx = x, vsby = y;
 	VimScrollBar *vsb = sb->id;
-	vsb->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
-	if (winb.right-(x+w)<w) vsbx = winb.right - (w - PEN_WIDTH);
-	vsb->MoveTo(vsbx, vsby);
-	gui.vimWindow->Unlock();
+	vsb->Resize_ਮੰਜ਼ਿਲ(w - PEN_ਚੌੜਾਈ, h - PEN_ਚੌੜਾਈ);
+	ਜੇ (winb.ਸੱਜੇ-(x+w)<w) vsbx = winb.ਸੱਜੇ - (w - PEN_ਚੌੜਾਈ);
+	vsb->Move_ਮੰਜ਼ਿਲ(vsbx, vsby);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_xpadding(ਖਾਲੀ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_ypadding(ਖਾਲੀ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-void
+ਖਾਲੀ
 gui_mch_create_scrollbar(
 	scrollbar_T *sb,
-	int	orient)	    // SBAR_VERT or SBAR_HORIZ
+	ਪੂਰਨ	orient)	    // SBAR_VERT or SBAR_HORIZ
 {
     orientation posture =
 	(orient == SBAR_HORIZ) ? B_HORIZONTAL : B_VERTICAL;
 
-    VimScrollBar *vsb = sb->id = new VimScrollBar(sb, posture);
-    if (gui.vimWindow->Lock()) {
-	vsb->SetTarget(gui.vimTextArea);
+    VimScrollBar *vsb = sb->id = ਨਵਾਂ VimScrollBar(sb, posture);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	vsb->ਸੈੱਟ_ਨਿਸ਼ਾਨਾ(gui.vim_ਪਾਠ_Area);
 	vsb->Hide();
-	gui.vimForm->AddChild(vsb);
-	gui.vimWindow->Unlock();
+	gui.vimForm->ਜੋੜੋ_ਬੱਚਾ(vsb);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-#if defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
-void
+#ਜੇ defined(FEAT_WINDOWS) || defined(FEAT_GUI_HAIKU)
+ਖਾਲੀ
 gui_mch_destroy_scrollbar(
 	scrollbar_T *sb)
 {
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	sb->id->RemoveSelf();
-	delete sb->id;
-	gui.vimWindow->Unlock();
+	ਮਿਟਾਓ sb->id;
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Cursor does not flash
  */
-    int
-gui_mch_is_blink_off(void)
+    ਪੂਰਨ
+gui_mch_is_blink_off(ਖਾਲੀ)
 {
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -3773,21 +3773,21 @@ gui_mch_is_blink_off(void)
  * BLINK_ON blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BLINK_NONE  0
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BLINK_OFF   1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BLINK_ON    2
 
-static int	blink_state = BLINK_NONE;
-static long_u	    blink_waittime = 700;
-static long_u	    blink_ontime = 400;
-static long_u	    blink_offtime = 250;
-static int  blink_timer = 0;
+ਸਥਿਰ ਪੂਰਨ	blink_state = BLINK_NONE;
+ਸਥਿਰ long_u	    blink_waittime = 700;
+ਸਥਿਰ long_u	    blink_ontime = 400;
+ਸਥਿਰ long_u	    blink_offtime = 250;
+ਸਥਿਰ ਪੂਰਨ  blink_timer = 0;
 
-void
-gui_mch_set_blinking(
-	long	waittime,
-	long	on,
-	long	off)
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_blinking(
+	ਲੰਮਾ	waittime,
+	ਲੰਮਾ	on,
+	ਲੰਮਾ	off)
 {
     // TODO
     blink_waittime = waittime;
@@ -3798,16 +3798,16 @@ gui_mch_set_blinking(
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ਖਾਲੀ
+gui_mch_stop_blink(ਪੂਰਨ may_call_gui_update_cursor)
 {
     // TODO
-    if (blink_timer != 0)
+    ਜੇ (blink_timer != 0)
     {
 	// XtRemoveTimeOut(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF)
+    ਜੇ (blink_state == BLINK_OFF)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -3816,14 +3816,14 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink()
+    ਖਾਲੀ
+gui_mch_ਸ਼ੁਰੂ_blink()
 {
     // TODO
-    if (blink_timer != 0)
+    ਜੇ (blink_timer != 0)
 	;// XtRemoveTimeOut(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ਜੇ (blink_waittime && blink_ontime && blink_offtime && gui.ਵਿੱਚ_focus)
     {
 	blink_timer = 1; // XtAppAddTimeOut(app_context, blink_waittime,
 	blink_state = BLINK_ON;
@@ -3835,200 +3835,200 @@ gui_mch_start_blink()
  * Initialise vim to use the font with the given name.	Return FAIL if the font
  * could not be loaded, OK otherwise.
  */
-int
+ਪੂਰਨ
 gui_mch_init_font(
 	char_u	    *font_name,
-	int	    fontset)
+	ਪੂਰਨ	    fontset)
 {
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
-	int rc = gui.vimTextArea->mchInitFont(font_name);
-	gui.vimWindow->Unlock();
+	ਪੂਰਨ rc = gui.vim_ਪਾਠ_Area->mchInitFont(font_name);
+	gui.vim_ਖਿੜਕੀ->Unlock();
 
-	return rc;
+	ਵਾਪਸ rc;
     }
 
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 
-    int
+    ਪੂਰਨ
 gui_mch_adjust_charsize()
 {
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 
-    int
-gui_mch_font_dialog(font_family* family, font_style* style, float* size)
+    ਪੂਰਨ
+gui_mch_font_dialog(font_family* family, font_style* style, ਦਸ਼ਮਲਵ* ਮਾਪ)
 {
-#if defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_GUI_DIALOG)
 	// gui.vimWindow->Unlock();
-    VimSelectFontDialog *dialog = new VimSelectFontDialog(family, style, size);
-    bool ret = dialog->Go();
-	delete dialog;
-	return ret;
-#else
-    return NOFONT;
-#endif // FEAT_GUI_DIALOG
+    VimSelectFontDialog *dialog = ਨਵਾਂ VimSelectFontDialog(family, style, ਮਾਪ);
+    ਤਾਰਕਿਕ ret = dialog->Go();
+	ਮਿਟਾਓ dialog;
+	ਵਾਪਸ ret;
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ NOFONT;
+#ਜੇ_ਅੰਤ // FEAT_GUI_DIALOG
 }
 
 
 GuiFont
 gui_mch_get_font(
 	char_u	    *name,
-	int	    giveErrorIfMissing)
+	ਪੂਰਨ	    giveErrorIfMissing)
 {
-    static VimFont *fontList = NULL;
+    ਸਥਿਰ VimFont *fontList = ਨਿਰਾ;
 
-    if (!gui.in_use)	//  can't do this when GUI not running
-	return NOFONT;
+    ਜੇ (!gui.ਵਿੱਚ_use)	//  can't do this when GUI not running
+	ਵਾਪਸ NOFONT;
 
     //	storage for locally modified name;
-    const int buff_size = B_FONT_FAMILY_LENGTH + B_FONT_STYLE_LENGTH + 20;
-    static char font_name[buff_size] = {0};
+    ਅਚਲ ਪੂਰਨ buff_ਮਾਪ = B_FONT_FAMILY_ਲੰਮਾਈ + B_FONT_STYLE_ਲੰਮਾਈ + 20;
+    ਸਥਿਰ ਅੱਖਰ font_name[buff_ਮਾਪ] = {0};
     font_family family = {0};
     font_style	style  = {0};
-    float size = 0.f;
+    ਦਸ਼ਮਲਵ ਮਾਪ = 0.f;
 
-    if (name == 0 && be_fixed_font == 0) {
-	if (giveErrorIfMissing)
+    ਜੇ (name == 0 && be_fixed_font == 0) {
+	ਜੇ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	ਵਾਪਸ NOFONT;
     }
 
-    bool useSelectGUI = false;
-    if (name != NULL)
-	if (STRCMP(name, "*") == 0) {
-	    useSelectGUI = true;
-	    STRNCPY(font_name, hl_get_font_name(), buff_size);
-	} else
-	    STRNCPY(font_name, name, buff_size);
+    ਤਾਰਕਿਕ useSelectGUI = ਝੂਠ;
+    ਜੇ (name != ਨਿਰਾ)
+	ਜੇ (STRCMP(name, "*") == 0) {
+	    useSelectGUI = ਸੱਚ;
+	    STRNCPY(font_name, hl_get_font_name(), buff_ਮਾਪ);
+	} ਨਹੀਂਤਾਂ
+	    STRNCPY(font_name, name, buff_ਮਾਪ);
 
-    if (font_name[0] == 0) {
+    ਜੇ (font_name[0] == 0) {
 	be_fixed_font->GetFamilyAndStyle(&family, &style);
-	size = be_fixed_font->Size();
-	vim_snprintf(font_name, buff_size,
-	    (char*)"%s/%s/%.0f", family, style, size);
+	ਮਾਪ = be_fixed_font->ਮਾਪ_2();
+	vim_snprintf(font_name, buff_ਮਾਪ,
+	    (ਅੱਖਰ*)"%s/%s/%.0f", family, style, ਮਾਪ);
     }
 
     //	replace underscores with spaces
-    char* end = 0;
-    while (end = strchr((char *)font_name, '_'))
-	*end = ' ';
+    ਅੱਖਰ* ਸਿਰਾ = 0;
+    ਜਦੋਂ (ਸਿਰਾ = strchr((ਅੱਖਰ *)font_name, '_'))
+	*ਸਿਰਾ = ' ';
 
     //	store the name before strtok corrupt the buffer ;-)
-    static char buff[buff_size] = {0};
-    STRNCPY(buff, font_name, buff_size);
-    STRNCPY(family, strtok(buff, "/\0"), B_FONT_FAMILY_LENGTH);
-    char* style_s = strtok(0, "/\0");
-    if (style_s != 0)
-	STRNCPY(style, style_s, B_FONT_STYLE_LENGTH);
-    size = atof((style_s != 0) ? strtok(0, "/\0") : "0");
+    ਸਥਿਰ ਅੱਖਰ buff[buff_ਮਾਪ] = {0};
+    STRNCPY(buff, font_name, buff_ਮਾਪ);
+    STRNCPY(family, strtok(buff, "/\0"), B_FONT_FAMILY_ਲੰਮਾਈ);
+    ਅੱਖਰ* style_s = strtok(0, "/\0");
+    ਜੇ (style_s != 0)
+	STRNCPY(style, style_s, B_FONT_STYLE_ਲੰਮਾਈ);
+    ਮਾਪ = atof((style_s != 0) ? strtok(0, "/\0") : "0");
 
-    if (useSelectGUI) {
-	if (gui_mch_font_dialog(&family, &style, &size) == NOFONT)
-	    return FAIL;
+    ਜੇ (useSelectGUI) {
+	ਜੇ (gui_mch_font_dialog(&family, &style, &ਮਾਪ) == NOFONT)
+	    ਵਾਪਸ FAIL;
 	//  compose for further processing
-	vim_snprintf(font_name, buff_size,
-		(char*)"%s/%s/%.0f", family, style, size);
-	hl_set_font_name((char_u*)font_name);
+	vim_snprintf(font_name, buff_ਮਾਪ,
+		(ਅੱਖਰ*)"%s/%s/%.0f", family, style, ਮਾਪ);
+	hl_ਸੈੱਟ_font_name((char_u*)font_name);
 
 	//  Set guifont to the name of the selected font.
 	char_u* new_p_guifont = (char_u*)alloc(STRLEN(font_name) + 1);
-	if (new_p_guifont != NULL) {
+	ਜੇ (new_p_guifont != ਨਿਰਾ) {
 	    STRCPY(new_p_guifont, font_name);
 	    vim_free(p_guifont);
 	    p_guifont = new_p_guifont;
 	    //	Replace spaces in the font name with underscores.
-	    for ( ; *new_p_guifont; ++new_p_guifont)
-		if (*new_p_guifont == ' ')
+	    ਲਈ ( ; *new_p_guifont; ++new_p_guifont)
+		ਜੇ (*new_p_guifont == ' ')
 		    *new_p_guifont = '_';
 	}
     }
 
     VimFont *flp;
-    for (flp = fontList; flp; flp = flp->next) {
-	if (STRCMP(font_name, flp->name) == 0) {
+    ਲਈ (flp = fontList; flp; flp = flp->ਅਗਲਾ) {
+	ਜੇ (STRCMP(font_name, flp->name) == 0) {
 	    flp->refcount++;
-	    return (GuiFont)flp;
+	    ਵਾਪਸ (GuiFont)flp;
 	}
     }
 
-    VimFont *font = new VimFont();
+    VimFont *font = ਨਵਾਂ VimFont();
     font->name = vim_strsave((char_u*)font_name);
 
-    if (count_font_styles(family) <= 0) {
-	if (giveErrorIfMissing)
+    ਜੇ (ਗਿਣਤੀ_font_styles(family) <= 0) {
+	ਜੇ (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), font->name);
-	delete font;
-	return NOFONT;
+	ਮਿਟਾਓ font;
+	ਵਾਪਸ NOFONT;
     }
 
     //	Remember font in the static list for later use
-    font->next = fontList;
+    font->ਅਗਲਾ = fontList;
     fontList = font;
 
-    font->SetFamilyAndStyle(family, style);
-    if (size > 0.f)
-	font->SetSize(size);
+    font->ਸੈੱਟ_Family_And_Style(family, style);
+    ਜੇ (ਮਾਪ > 0.f)
+	font->ਸੈੱਟ_ਮਾਪ(ਮਾਪ);
 
-    font->SetSpacing(B_FIXED_SPACING);
-    font->SetEncoding(B_UNICODE_UTF8);
+    font->ਸੈੱਟ_Spacing(B_FIXED_SPACING);
+    font->ਸੈੱਟ_Encoding(B_UNICODE_UTF8);
 
-    return (GuiFont)font;
+    ਵਾਪਸ (GuiFont)font;
 }
 
 /*
  * Set the current text font.
  */
-void
-gui_mch_set_font(
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_font(
 	GuiFont	font)
 {
-    if (gui.vimWindow->Lock()) {
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	VimFont *vf = (VimFont *)font;
 
-	gui.vimTextArea->SetFont(vf);
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_Font(vf);
 
-	gui.char_width = (int) vf->StringWidth("n");
-	font_height fh;
-	vf->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + 0.9999)
-	    + (int)(fh.descent + 0.9999) + (int)(fh.leading + 0.9999);
-	gui.char_ascent = (int)(fh.ascent + 0.9999);
+	gui.char_ਚੌੜਾਈ = (ਪੂਰਨ) vf->String_ਚੌੜਾਈ("n");
+	font_ਉਚਾਈ fh;
+	vf->Get_ਉਚਾਈ(&fh);
+	gui.char_ਉਚਾਈ = (ਪੂਰਨ)(fh.ascent + 0.9999)
+	    + (ਪੂਰਨ)(fh.descent + 0.9999) + (ਪੂਰਨ)(fh.leading + 0.9999);
+	gui.char_ascent = (ਪੂਰਨ)(fh.ascent + 0.9999);
 
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 // XXX TODO This is apparently never called...
-void
+ਖਾਲੀ
 gui_mch_free_font(
 	GuiFont	font)
 {
-    if (font == NOFONT)
-	return;
+    ਜੇ (font == NOFONT)
+	ਵਾਪਸ;
     VimFont *f = (VimFont *)font;
-    if (--f->refcount <= 0) {
-	if (f->refcount < 0)
+    ਜੇ (--f->refcount <= 0) {
+	ਜੇ (f->refcount < 0)
 	    fprintf(stderr, "VimFont: refcount < 0\n");
-	delete f;
+	ਮਿਟਾਓ f;
     }
 }
 
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ vim_strsave(name);
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
+    ਪੂਰਨ
 gui_mch_adjust_charheight()
 {
 
@@ -4045,16 +4045,16 @@ gui_mch_adjust_charheight()
 // #endif
     {
 	VimFont *font = (VimFont *)gui.norm_font;
-	font_height fh = {0};
-	font->GetHeight(&fh);
-	gui.char_height = (int)(fh.ascent + fh.descent + 0.5) + p_linespace;
-	gui.char_ascent = (int)(fh.ascent + 0.5) + p_linespace / 2;
+	font_ਉਚਾਈ fh = {0};
+	font->Get_ਉਚਾਈ(&fh);
+	gui.char_ਉਚਾਈ = (ਪੂਰਨ)(fh.ascent + fh.descent + 0.5) + p_linespace;
+	gui.char_ascent = (ਪੂਰਨ)(fh.ascent + 0.5) + p_linespace / 2;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    ਖਾਲੀ
+gui_mch_getmouse(ਪੂਰਨ *x, ਪੂਰਨ *y)
 {
     fprintf(stderr, "gui_mch_getmouse");
 
@@ -4072,8 +4072,8 @@ gui_mch_getmouse(int *x, int *y)
      }
 }
 
-    void
-gui_mch_mousehide(int hide)
+    ਖਾਲੀ
+gui_mch_mousehide(ਪੂਰਨ hide)
 {
     fprintf(stderr, "gui_mch_getmouse");
     //	TODO
@@ -4089,186 +4089,186 @@ guicolor_T
 gui_mch_get_color(
 	char_u	*name)
 {
-    return gui_get_color_cmn(name);
+    ਵਾਪਸ gui_get_color_cmn(name);
 }
 
 /*
  * Set the current text foreground color.
  */
-void
-gui_mch_set_fg_color(
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_fg_color(
 	guicolor_T  color)
 {
-    rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetHighColor(rgb);
-	gui.vimWindow->Unlock();
+    rgb_color rgb = GUI_ਮੰਜ਼ਿਲ_RGB(color);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_ਉੱਚਾ_Color(rgb);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Set the current text background color.
  */
-void
-gui_mch_set_bg_color(
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_bg_color(
 	guicolor_T  color)
 {
-    rgb_color rgb = GUI_TO_RGB(color);
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetLowColor(rgb);
-	gui.vimWindow->Unlock();
+    rgb_color rgb = GUI_ਮੰਜ਼ਿਲ_RGB(color);
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_ਨੀਵਾਂ_Color(rgb);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T	color)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_sp_color(guicolor_T	color)
 {
     // prev_sp_color = color;
 }
 
-void
+ਖਾਲੀ
 gui_mch_draw_string(
-	int	row,
-	int	col,
+	ਪੂਰਨ	ਪੰਕਤੀ,
+	ਪੂਰਨ	ਖਾਨਾ,
 	char_u	*s,
-	int	len,
-	int	flags)
+	ਪੂਰਨ	len,
+	ਪੂਰਨ	flags)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchDrawString(row, col, s, len, flags);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->mchDrawString(ਪੰਕਤੀ, ਖਾਨਾ, s, len, flags);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 	guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ਪੂਰਨ r, ਪੂਰਨ g, ਪੂਰਨ b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ਵਾਪਸ gui_get_rgb_color_cmn(r, g, b);
 }
 
 
 // Return OK if the key with the termcap name "name" is supported.
-int
+ਪੂਰਨ
 gui_mch_haskey(
 	char_u	*name)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    for (i = 0; special_keys[i].BeKeys != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    ਲਈ (i = 0; special_ਕੁੰਜੀਆਂ[i].Be_ਕੁੰਜੀਆਂ != 0; i++)
+	ਜੇ (name[0] == special_ਕੁੰਜੀਆਂ[i].vim_code0 &&
+		name[1] == special_ਕੁੰਜੀਆਂ[i].vim_code1)
+	    ਵਾਪਸ OK;
+    ਵਾਪਸ FAIL;
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_beep()
 {
     ::beep();
 }
 
-    void
-gui_mch_flash(int msec)
+    ਖਾਲੀ
+gui_mch_flash(ਪੂਰਨ msec)
 {
     // Do a visual beep by reversing the foreground and background colors
 
-    if (gui.vimWindow->Lock()) {
-	BRect rect = gui.vimTextArea->Bounds();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	BRect rect = gui.vim_ਪਾਠ_Area->Bounds();
 
-	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->Sync();
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_INVERT);
+	gui.vim_ਪਾਠ_Area->FillRect(rect);
+	gui.vim_ਪਾਠ_Area->Sync();
 	snooze(msec * 1000);	 // wait for a few msec
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->SetDrawingMode(B_OP_COPY);
-	gui.vimTextArea->Flush();
-	gui.vimWindow->Unlock();
+	gui.vim_ਪਾਠ_Area->FillRect(rect);
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_COPY);
+	gui.vim_ਪਾਠ_Area->Flush();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-void
+ਖਾਲੀ
 gui_mch_invert_rectangle(
-	int	r,
-	int	c,
-	int	nr,
-	int	nc)
+	ਪੂਰਨ	r,
+	ਪੂਰਨ	c,
+	ਪੂਰਨ	nr,
+	ਪੂਰਨ	nc)
 {
     BRect rect;
-    rect.left = FILL_X(c);
-    rect.top = FILL_Y(r);
-    rect.right = rect.left + nc * gui.char_width - PEN_WIDTH;
-    rect.bottom = rect.top + nr * gui.char_height - PEN_WIDTH;
+    rect.ਖੱਬੇ = FILL_X(c);
+    rect.ਸਿਖਰ = FILL_Y(r);
+    rect.ਸੱਜੇ = rect.ਖੱਬੇ + nc * gui.char_ਚੌੜਾਈ - PEN_ਚੌੜਾਈ;
+    rect.bottom = rect.ਸਿਖਰ + nr * gui.char_ਉਚਾਈ - PEN_ਚੌੜਾਈ;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
-	gui.vimTextArea->FillRect(rect);
-	gui.vimTextArea->SetDrawingMode(B_OP_COPY);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_INVERT);
+	gui.vim_ਪਾਠ_Area->FillRect(rect);
+	gui.vim_ਪਾਠ_Area->ਸੈੱਟ_Drawing_ਬਹੁਲਕ(B_OP_COPY);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
+    ਖਾਲੀ
 gui_mch_iconify()
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Minimize(true);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->Minimize(ਸੱਚ);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_foreground(ਖਾਲੀ)
 {
     // TODO
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set the window title
  */
-void
+ਖਾਲੀ
 gui_mch_settitle(
 	char_u	*title,
 	char_u	*icon)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->SetTitle((char *)title);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->ਸੈੱਟ_Title((ਅੱਖਰ *)title);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    ਖਾਲੀ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_ਸੈੱਟ_fg_color(color);
 
     BRect r;
-    r.left = FILL_X(gui.col);
-    r.top = FILL_Y(gui.row);
-    int cells = utf_off2cells(LineOffset[gui.row] + gui.col, 100); // TODO-TODO
-    if (cells>=4) cells = 1;
-    r.right = r.left + cells*gui.char_width - PEN_WIDTH;
-    r.bottom = r.top + gui.char_height - PEN_WIDTH;
+    r.ਖੱਬੇ = FILL_X(gui.ਖਾਨਾ);
+    r.ਸਿਖਰ = FILL_Y(gui.ਪੰਕਤੀ);
+    ਪੂਰਨ cells = utf_off2cells(ਸਤਰ_ਵਿੱਥ[gui.ਪੰਕਤੀ] + gui.ਖਾਨਾ, 100); // TODO-TODO
+    ਜੇ (cells>=4) cells = 1;
+    r.ਸੱਜੇ = r.ਖੱਬੇ + cells*gui.char_ਚੌੜਾਈ - PEN_ਚੌੜਾਈ;
+    r.bottom = r.ਸਿਖਰ + gui.char_ਉਚਾਈ - PEN_ਚੌੜਾਈ;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->StrokeRect(r);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->StrokeRect(r);
+	gui.vim_ਖਿੜਕੀ->Unlock();
 	// gui_mch_flush();
     }
 }
@@ -4276,28 +4276,28 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
 /*
  * Draw part of a cursor, only w pixels wide, and h pixels high.
  */
-void
+ਖਾਲੀ
 gui_mch_draw_part_cursor(
-	int	w,
-	int	h,
+	ਪੂਰਨ	w,
+	ਪੂਰਨ	h,
 	guicolor_T  color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_ਸੈੱਟ_fg_color(color);
 
     BRect r;
-    r.left =
-#ifdef FEAT_RIGHTLEFT
+    r.ਖੱਬੇ =
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
 	// vertical line should be on the right of current point
-	CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-	FILL_X(gui.col);
-    r.right = r.left + w - PEN_WIDTH;
-    r.bottom = FILL_Y(gui.row + 1) - PEN_WIDTH;
-    r.top = r.bottom - h + PEN_WIDTH;
+	CURSOR_BAR_ਸੱਜਾ ? FILL_X(gui.ਖਾਨਾ + 1) - w :
+#ਜੇ_ਅੰਤ
+	FILL_X(gui.ਖਾਨਾ);
+    r.ਸੱਜੇ = r.ਖੱਬੇ + w - PEN_ਚੌੜਾਈ;
+    r.bottom = FILL_Y(gui.ਪੰਕਤੀ + 1) - PEN_ਚੌੜਾਈ;
+    r.ਸਿਖਰ = r.bottom - h + PEN_ਚੌੜਾਈ;
 
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->FillRect(r);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->FillRect(r);
+	gui.vim_ਖਿੜਕੀ->Unlock();
 	// gui_mch_flush();
     }
 }
@@ -4308,12 +4308,12 @@ gui_mch_draw_part_cursor(
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
+    ਖਾਲੀ
 gui_mch_update()
 {
     gui_mch_flush();
-    while (port_count(gui.vdcmp) > 0 &&
-	    !vim_is_input_buf_full() &&
+    ਜਦੋਂ (ਪੋਰਟ_ਗਿਣਤੀ(gui.vdcmp) > 0 &&
+	    !vim_is_ਨਿਵੇਸ਼_buf_ਭਰਿਆ() &&
 	    gui_haiku_process_event(0) >= B_OK)
 	/* nothing */ ;
 }
@@ -4327,57 +4327,57 @@ gui_mch_update()
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-int
+ਪੂਰਨ
 gui_mch_wait_for_chars(
-	long	wtime)
+	ਲੰਮਾ	wtime)
 {
-    int		focus;
+    ਪੂਰਨ		focus;
     bigtime_t	until, timeout;
-    status_t	st;
+    ਸਥਿਤੀ_t	st;
 
-    if (wtime >= 0)
+    ਜੇ (wtime >= 0)
     {
 	timeout = wtime * 1000;
-	until = system_time() + timeout;
+	until = system_ਸਮਾਂ() + timeout;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	timeout = B_INFINITE_TIMEOUT;
 
-    focus = gui.in_focus;
-    for (;;)
+    focus = gui.ਵਿੱਚ_focus;
+    ਲਈ (;;)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ਜੇ (gui.ਵਿੱਚ_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    ਜੇ (gui.ਵਿੱਚ_focus)
+		gui_mch_ਸ਼ੁਰੂ_blink();
+	    ਨਹੀਂਤਾਂ
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.ਵਿੱਚ_focus;
 	}
 
 	gui_mch_flush();
 
-#ifdef MESSAGE_QUEUE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸੁਨੇਹਾ_ਕਤਾਰ
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_ਜੋੜੋ_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	ਜੇ (did_ਜੋੜੋ_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    ਰੋਕੋ;
 # endif
-# ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+# ifdef FEAT_ਕੰਮ_CHANNEL
+	ਜੇ (has_any_channel())
 	{
-	    if (wtime < 0 || timeout > 20000)
+	    ਜੇ (wtime < 0 || timeout > 20000)
 		timeout = 20000;
 	}
-	else if (wtime < 0)
+	ਨਹੀਂਤਾਂ ਜੇ (wtime < 0)
 	    timeout = B_INFINITE_TIMEOUT;
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 	/*
 	 * Don't use gui_mch_update() because then we will spin-lock until a
@@ -4387,23 +4387,23 @@ gui_mch_wait_for_chars(
 	 */
 	st = gui_haiku_process_event(timeout);
 
-	if (input_available())
-	    return OK;
-	if (st < B_OK)		// includes B_TIMED_OUT
-	    return FAIL;
+	ਜੇ (ਨਿਵੇਸ਼_ਉਪਲਬਧ())
+	    ਵਾਪਸ OK;
+	ਜੇ (st < B_OK)		// includes B_TIMED_OUT
+	    ਵਾਪਸ FAIL;
 
 	/*
 	 * Calculate how much longer we're willing to wait for the
 	 * next event.
 	 */
-	if (wtime >= 0)
+	ਜੇ (wtime >= 0)
 	{
-	    timeout = until - system_time();
-	    if (timeout < 0)
-		break;
+	    timeout = until - system_ਸਮਾਂ();
+	    ਜੇ (timeout < 0)
+		ਰੋਕੋ;
 	}
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 
 }
 
@@ -4415,40 +4415,40 @@ gui_mch_wait_for_chars(
  * Flush any output to the screen. This is typically called before
  * the app goes to sleep.
  */
-    void
+    ਖਾਲੀ
 gui_mch_flush()
 {
     //	does this need to lock the window? Apparently not but be safe.
-    if (gui.vimWindow->Lock()) {
-	gui.vimWindow->Flush();
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਖਿੜਕੀ->Flush();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
-    return;
+    ਵਾਪਸ;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-void
-gui_mch_clear_block(
-	int	row1,
-	int	col1,
-	int	row2,
-	int	col2)
+ਖਾਲੀ
+gui_mch_clear_ਖੰਡ(
+	ਪੂਰਨ	row1,
+	ਪੂਰਨ	col1,
+	ਪੂਰਨ	row2,
+	ਪੂਰਨ	col2)
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchClearBlock(row1, col1, row2, col2);
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->mch_Clear_ਖੰਡ(row1, col1, row2, col2);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_clear_all()
 {
-    if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->mchClearAll();
-	gui.vimWindow->Unlock();
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	gui.vim_ਪਾਠ_Area->mchClearAll();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
@@ -4456,49 +4456,49 @@ gui_mch_clear_all()
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-void
-gui_mch_delete_lines(
-	int	row,
-	int	num_lines)
+ਖਾਲੀ
+gui_mch_delete_ਸਤਰਾਂ(
+	ਪੂਰਨ	ਪੰਕਤੀ,
+	ਪੂਰਨ	ਅੰਕ_ਸਤਰਾਂ)
 {
-    gui.vimTextArea->mchDeleteLines(row, num_lines);
+    gui.vim_ਪਾਠ_Area->mch_Delete_ਸਤਰਾਂ(ਪੰਕਤੀ, ਅੰਕ_ਸਤਰਾਂ);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-void
-gui_mch_insert_lines(
-	int	row,
-	int	num_lines)
+ਖਾਲੀ
+gui_mch_ਪਾਓ_ਸਤਰਾਂ(
+	ਪੂਰਨ	ਪੰਕਤੀ,
+	ਪੂਰਨ	ਅੰਕ_ਸਤਰਾਂ)
 {
-    gui.vimTextArea->mchInsertLines(row, num_lines);
+    gui.vim_ਪਾਠ_Area->mch_ਪਾਓ_ਸਤਰਾਂ(ਪੰਕਤੀ, ਅੰਕ_ਸਤਰਾਂ);
 }
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-void
+ਖਾਲੀ
 gui_mch_enable_menu(
-	int	flag)
+	ਪੂਰਨ	flag)
 {
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
 	BMenuBar *menubar = gui.vimForm->MenuBar();
-	menubar->SetEnabled(flag);
-	gui.vimWindow->Unlock();
+	menubar->ਸੈੱਟ_Enabled(flag);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-void
-gui_mch_set_menu_pos(
-	int	x,
-	int	y,
-	int	w,
-	int	h)
+ਖਾਲੀ
+gui_mch_ਸੈੱਟ_menu_pos(
+	ਪੂਰਨ	x,
+	ਪੂਰਨ	y,
+	ਪੂਰਨ	w,
+	ਪੂਰਨ	h)
 {
     // It will be in the right place anyway
 }
@@ -4506,26 +4506,26 @@ gui_mch_set_menu_pos(
 /*
  * Add a sub menu to the menu bar.
  */
-void
-gui_mch_add_menu(
+ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu(
 	vimmenu_T   *menu,
-	int	idx)
+	ਪੂਰਨ	idx)
 {
-    vimmenu_T	*parent = menu->parent;
+    vimmenu_T	*ਮਾਪਾ = menu->ਮਾਪਾ;
 
     //	popup menu - just create it unattached
-    if (menu_is_popup(menu->name) && parent == NULL) {
-	BPopUpMenu* popUpMenu = new BPopUpMenu((const char*)menu->name, false, false);
-	menu->submenu_id = popUpMenu;
-	menu->id = NULL;
-	return;
+    ਜੇ (menu_is_popup(menu->name) && ਮਾਪਾ == ਨਿਰਾ) {
+	BPop_ਉੱਪਰ_Menu* ਕੱਢੋ_ਉੱਪਰ_Menu = ਨਵਾਂ BPop_ਉੱਪਰ_Menu((ਅਚਲ ਅੱਖਰ*)menu->name, ਝੂਠ, ਝੂਠ);
+	menu->submenu_id = ਕੱਢੋ_ਉੱਪਰ_Menu;
+	menu->id = ਨਿਰਾ;
+	ਵਾਪਸ;
     }
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == NULL))
-	return;
+    ਜੇ (!menu_is_menubar(menu->name)
+	    || (ਮਾਪਾ != ਨਿਰਾ && ਮਾਪਾ->submenu_id == ਨਿਰਾ))
+	ਵਾਪਸ;
 
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
 	// Major re-write of the menu code, it was failing with memory corruption when
 	// we started loading multiple files (the Buffer menu)
@@ -4537,55 +4537,55 @@ gui_mch_add_menu(
 
 	BMenu *tmp;
 
-	if ( parent )
-	    tmp = parent->submenu_id;
-	else
+	ਜੇ ( ਮਾਪਾ )
+	    tmp = ਮਾਪਾ->submenu_id;
+	ਨਹੀਂਤਾਂ
 	    tmp = gui.vimForm->MenuBar();
 	//  make sure we don't try and add the same menu twice. The Buffers menu tries to
 	//  do this and Be starts to crash...
 
-	if ( ! tmp->FindItem((const char *) menu->dname)) {
+	ਜੇ ( ! tmp->ਲੱਭੋ_ਵਸਤੂ((ਅਚਲ ਅੱਖਰ *) menu->dname)) {
 
-	    BMenu *bmenu = new BMenu((char *)menu->dname);
+	    BMenu *bmenu = ਨਵਾਂ BMenu((ਅੱਖਰ *)menu->dname);
 
 	    menu->submenu_id = bmenu;
 
 	    //	when we add a BMenu to another Menu, it creates the interconnecting BMenuItem
-	    tmp->AddItem(bmenu);
+	    tmp->ਜੋੜੋ_ਵਸਤੂ(bmenu);
 
 	    //	Now it's safe to query the menu for the associated MenuItem...
-	    menu->id = tmp->FindItem((const char *) menu->dname);
+	    menu->id = tmp->ਲੱਭੋ_ਵਸਤੂ((ਅਚਲ ਅੱਖਰ *) menu->dname);
 
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    ਖਾਲੀ
+gui_mch_toggle_tearoffs(ਪੂਰਨ enable)
 {
     // no tearoff menus
 }
 
-    static BMessage *
-MenuMessage(vimmenu_T *menu)
+    ਸਥਿਰ BMessage *
+Menu_ਸੁਨੇਹਾ(vimmenu_T *menu)
 {
-    BMessage *m = new BMessage('menu');
-    m->AddPointer("VimMenu", (void *)menu);
+    BMessage *m = ਨਵਾਂ BMessage('menu');
+    m->ਜੋੜੋ_ਸੂਚਕ("VimMenu", (ਖਾਲੀ *)menu);
 
-    return m;
+    ਵਾਪਸ m;
 }
 
 /*
  * Add a menu item to a menu
  */
-void
-gui_mch_add_menu_item(
+ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu_ਵਸਤੂ(
 	vimmenu_T   *menu,
-	int	idx)
+	ਪੂਰਨ	idx)
 {
-    int	    mnemonic = 0;
-    vimmenu_T	*parent = menu->parent;
+    ਪੂਰਨ	    mnemonic = 0;
+    vimmenu_T	*ਮਾਪਾ = menu->ਮਾਪਾ;
 
     // TODO: use menu->actext
     // This is difficult, since on Be, an accelerator must be a single char
@@ -4593,57 +4593,57 @@ gui_mch_add_menu_item(
     //
     // Punt for Now...
     // richard@whiequeen.com jul 99
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
-#ifdef FEAT_TOOLBAR
-	if (menu_is_toolbar(parent->name)) {
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+	ਜੇ (menu_is_toolbar(ਮਾਪਾ->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
-		toolbar->AddButton(idx, menu);
+	    ਜੇ (toolbar != ਨਿਰਾ) {
+		toolbar->ਜੋੜੋ_Button(idx, menu);
 	    }
-	} else
-#endif
+	} ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 
-	if (parent->submenu_id != NULL || menu_is_popup(parent->name)) {
-	    if (menu_is_separator(menu->name)) {
-		BSeparatorItem *item = new BSeparatorItem();
-		parent->submenu_id->AddItem(item);
-		menu->id = item;
-		menu->submenu_id = NULL;
+	ਜੇ (ਮਾਪਾ->submenu_id != ਨਿਰਾ || menu_is_popup(ਮਾਪਾ->name)) {
+	    ਜੇ (menu_is_separator(menu->name)) {
+		BSeparator_ਵਸਤੂ *ਵਸਤੂ = ਨਵਾਂ BSeparator_ਵਸਤੂ();
+		ਮਾਪਾ->submenu_id->ਜੋੜੋ_ਵਸਤੂ(ਵਸਤੂ);
+		menu->id = ਵਸਤੂ;
+		menu->submenu_id = ਨਿਰਾ;
 	    }
-	    else {
-		BMenuItem *item = new BMenuItem((char *)menu->dname,
-			MenuMessage(menu));
-		item->SetTarget(gui.vimTextArea);
-		item->SetTrigger((char) menu->mnemonic);
-		parent->submenu_id->AddItem(item);
-		menu->id = item;
-		menu->submenu_id = NULL;
+	    ਨਹੀਂਤਾਂ {
+		BMenu_ਵਸਤੂ *ਵਸਤੂ = ਨਵਾਂ BMenu_ਵਸਤੂ((ਅੱਖਰ *)menu->dname,
+			Menu_ਸੁਨੇਹਾ(menu));
+		ਵਸਤੂ->ਸੈੱਟ_ਨਿਸ਼ਾਨਾ(gui.vim_ਪਾਠ_Area);
+		ਵਸਤੂ->ਸੈੱਟ_Trigger((ਅੱਖਰ) menu->mnemonic);
+		ਮਾਪਾ->submenu_id->ਜੋੜੋ_ਵਸਤੂ(ਵਸਤੂ);
+		menu->id = ਵਸਤੂ;
+		menu->submenu_id = ਨਿਰਾ;
 	    }
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Destroy the machine specific menu widget.
  */
-void
+ਖਾਲੀ
 gui_mch_destroy_menu(
 	vimmenu_T   *menu)
 {
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
-#ifdef FEAT_TOOLBAR
-	if (menu->parent && menu_is_toolbar(menu->parent->name)) {
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+	ਜੇ (menu->ਮਾਪਾ && menu_is_toolbar(menu->ਮਾਪਾ->name)) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
+	    ਜੇ (toolbar != ਨਿਰਾ) {
 		toolbar->RemoveButton(menu);
 	    }
-	} else
-#endif
+	} ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	{
-	    assert(menu->submenu_id == NULL || menu->submenu_id->CountItems() == 0);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(menu->submenu_id == ਨਿਰਾ || menu->submenu_id->ਗਿਣਤੀ_ਚੀਜ਼ਾਂ() == 0);
 	    /*
 	     * Detach this menu from its parent, so that it is not deleted
 	     * twice once we get to delete that parent.
@@ -4652,150 +4652,150 @@ gui_mch_destroy_menu(
 	     * removed and deleted before).
 	     */
 	    BMenu *bmenu = menu->id->Menu();
-	    if (bmenu)
+	    ਜੇ (bmenu)
 	    {
-		bmenu->RemoveItem(menu->id);
+		bmenu->Remove_ਵਸਤੂ(menu->id);
 		/*
 		 * If we removed the last item from the menu bar,
 		 * resize it out of sight.
 		 */
-		if (bmenu == gui.vimForm->MenuBar() && bmenu->CountItems() == 0)
+		ਜੇ (bmenu == gui.vimForm->MenuBar() && bmenu->ਗਿਣਤੀ_ਚੀਜ਼ਾਂ() == 0)
 		{
-		    bmenu->ResizeTo(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
+		    bmenu->Resize_ਮੰਜ਼ਿਲ(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
 		}
 	    }
-	    delete menu->id;
-	    menu->id = NULL;
-	    menu->submenu_id = NULL;
+	    ਮਿਟਾਓ menu->id;
+	    menu->id = ਨਿਰਾ;
+	    menu->submenu_id = ਨਿਰਾ;
 
-	    gui.menu_height = (int) gui.vimForm->MenuHeight();
+	    gui.menu_ਉਚਾਈ = (ਪੂਰਨ) gui.vimForm->Menu_ਉਚਾਈ();
 	}
-	gui.vimWindow->Unlock();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
 }
 
 /*
  * Make a menu either grey or not grey.
  */
-void
+ਖਾਲੀ
 gui_mch_menu_grey(
 	vimmenu_T   *menu,
-	int	grey)
+	ਪੂਰਨ	grey)
 {
-#ifdef FEAT_TOOLBAR
-    if (menu->parent && menu_is_toolbar(menu->parent->name)) {
-	if (gui.vimWindow->Lock()) {
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਜੇ (menu->ਮਾਪਾ && menu_is_toolbar(menu->ਮਾਪਾ->name)) {
+	ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	    VimToolbar *toolbar = gui.vimForm->ToolBar();
-	    if (toolbar != NULL) {
-		toolbar->GrayButton(menu, grey);
+	    ਜੇ (toolbar != ਨਿਰਾ) {
+		toolbar->ਸਲੇਟੀ_Button(menu, grey);
 	    }
-	    gui.vimWindow->Unlock();
+	    gui.vim_ਖਿੜਕੀ->Unlock();
 	}
-    } else
-#endif
-    if (menu->id != NULL)
-	menu->id->SetEnabled(!grey);
+    } ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+    ਜੇ (menu->id != ਨਿਰਾ)
+	menu->id->ਸੈੱਟ_Enabled(!grey);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-void
+ਖਾਲੀ
 gui_mch_menu_hidden(
 	vimmenu_T   *menu,
-	int	hidden)
+	ਪੂਰਨ	hidden)
 {
-    if (menu->id != NULL)
-	menu->id->SetEnabled(!hidden);
+    ਜੇ (menu->id != ਨਿਰਾ)
+	menu->id->ਸੈੱਟ_Enabled(!hidden);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
+    ਖਾਲੀ
 gui_mch_draw_menubar()
 {
     // Nothing to do in BeOS
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    if (!menu_is_popup(menu->name) || menu->submenu_id == NULL)
-	return;
+    ਜੇ (!menu_is_popup(menu->name) || menu->submenu_id == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    BPopUpMenu* popupMenu = dynamic_cast<BPopUpMenu*>(menu->submenu_id);
-    if (popupMenu == NULL)
-	return;
+    BPop_ਉੱਪਰ_Menu* popupMenu = dynamic_cast<BPop_ਉੱਪਰ_Menu*>(menu->submenu_id);
+    ਜੇ (popupMenu == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    BPoint point;
-    if (gui.vimWindow->Lock()) {
+    BPoint ਬਿੰਦੂ;
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
 	uint32 buttons = 0;
-	gui.vimTextArea->GetMouse(&point, &buttons);
-	gui.vimTextArea->ConvertToScreen(&point);
-	gui.vimWindow->Unlock();
+	gui.vim_ਪਾਠ_Area->GetMouse(&ਬਿੰਦੂ, &buttons);
+	gui.vim_ਪਾਠ_Area->Convert_ਮੰਜ਼ਿਲ_Screen(&ਬਿੰਦੂ);
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
-    popupMenu->Go(point, true);
+    popupMenu->Go(ਬਿੰਦੂ, ਸੱਚ);
 }
 
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU
 
 // Mouse stuff
 
-#ifdef FEAT_CLIPBOARD
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CLIPBOARD
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
-char textplain[] = "text/plain";
-char vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
+ਅੱਖਰ textplain[] = "text/plain";
+ਅੱਖਰ vimselectiontype[] = "application/x-vnd.Rhialto-Vim-selectiontype";
 
 /*
  * Get the current selection and put it in the clipboard register.
  */
-    void
+    ਖਾਲੀ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    ਜੇ (be_clipboard->ਤਾਲਾ_2())
     {
-	BMessage *m = be_clipboard->Data();
+	BMessage *m = be_clipboard->ਅੰਕੜੇ_2();
 	// m->PrintToStream();
 
-	char_u *string = NULL;
+	char_u *string = ਨਿਰਾ;
 	ssize_t stringlen = -1;
 
-	if (m->FindData(textplain, B_MIME_TYPE,
-		    (const void **)&string, &stringlen) == B_OK
-		|| m->FindString("text", (const char **)&string) == B_OK)
+	ਜੇ (m->ਲੱਭੋ_ਅੰਕੜੇ(textplain, B_MIME_TYPE,
+		    (ਅਚਲ ਖਾਲੀ **)&string, &stringlen) == B_OK
+		|| m->ਲੱਭੋ_String("text", (ਅਚਲ ਅੱਖਰ **)&string) == B_OK)
 	{
-	    if (stringlen == -1)
+	    ਜੇ (stringlen == -1)
 		stringlen = STRLEN(string);
 
-	    int type;
-	    char *seltype;
+	    ਪੂਰਨ type;
+	    ਅੱਖਰ *seltype;
 	    ssize_t seltypelen;
 
 	    /*
 	     * Try to get the special vim selection type first
 	     */
-	    if (m->FindData(vimselectiontype, B_MIME_TYPE,
-			(const void **)&seltype, &seltypelen) == B_OK)
+	    ਜੇ (m->ਲੱਭੋ_ਅੰਕੜੇ(vimselectiontype, B_MIME_TYPE,
+			(ਅਚਲ ਖਾਲੀ **)&seltype, &seltypelen) == B_OK)
 	    {
-		switch (*seltype)
+		ਚੋਣ (*seltype)
 		{
-		    default:
-		    case 'L':	type = MLINE;	break;
-		    case 'C':	type = MCHAR;	break;
-#ifdef FEAT_VISUAL
-		    case 'B':	type = MBLOCK;	break;
-#endif
+		    ਮੂਲ:
+		    ਹਾਲਤ 'L':	type = MLINE;	ਰੋਕੋ;
+		    ਹਾਲਤ 'C':	type = MCHAR;	ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VISUAL
+		    ਹਾਲਤ 'B':	type = MBLOCK;	ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Otherwise use heuristic as documented
 		type = memchr(string, stringlen, '\n') ? MLINE : MCHAR;
 	    }
-	    clip_yank_selection(type, string, (long)stringlen, cbd);
+	    clip_yank_selection(type, string, (ਲੰਮਾ)stringlen, cbd);
 	}
 	be_clipboard->Unlock();
     }
@@ -4803,7 +4803,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.
  */
-    void
+    ਖਾਲੀ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     // Nothing needs to be done here
@@ -4812,56 +4812,56 @@ clip_mch_lose_selection(Clipboard_T *cbd)
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
+    ਪੂਰਨ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd)
+    ਖਾਲੀ
+clip_mch_ਸੈੱਟ_selection(Clipboard_T *cbd)
 {
-    if (be_clipboard->Lock())
+    ਜੇ (be_clipboard->ਤਾਲਾ_2())
     {
 	be_clipboard->Clear();
-	BMessage *m = be_clipboard->Data();
-	assert(m);
+	BMessage *m = be_clipboard->ਅੰਕੜੇ_2();
+	ਪ੍ਰਤਿਜ੍ਞਾ(m);
 
 	// If the '*' register isn't already filled in, fill it in now
 	cbd->owned = TRUE;
 	clip_get_selection(cbd);
 	cbd->owned = FALSE;
 
-	char_u	*str = NULL;
-	long_u	count;
-	int type;
+	char_u	*str = ਨਿਰਾ;
+	long_u	ਗਿਣਤੀ_2;
+	ਪੂਰਨ type;
 
-	type = clip_convert_selection(&str, &count, cbd);
+	type = clip_convert_selection(&str, &ਗਿਣਤੀ_2, cbd);
 
-	if (type < 0)
-	    return;
+	ਜੇ (type < 0)
+	    ਵਾਪਸ;
 
-	m->AddData(textplain, B_MIME_TYPE, (void *)str, count);
+	m->ਜੋੜੋ_ਅੰਕੜੇ(textplain, B_MIME_TYPE, (ਖਾਲੀ *)str, ਗਿਣਤੀ_2);
 
 	// Add type of selection
-	char	vtype;
-	switch (type)
+	ਅੱਖਰ	vtype;
+	ਚੋਣ (type)
 	{
-	    default:
-	    case MLINE:    vtype = 'L';    break;
-	    case MCHAR:    vtype = 'C';    break;
-#ifdef FEAT_VISUAL
-	    case MBLOCK:   vtype = 'B';    break;
-#endif
+	    ਮੂਲ:
+	    ਹਾਲਤ MLINE:    vtype = 'L';    ਰੋਕੋ;
+	    ਹਾਲਤ MCHAR:    vtype = 'C';    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VISUAL
+	    ਹਾਲਤ MBLOCK:   vtype = 'B';    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 	}
-	m->AddData(vimselectiontype, B_MIME_TYPE, (void *)&vtype, 1);
+	m->ਜੋੜੋ_ਅੰਕੜੇ(vimselectiontype, B_MIME_TYPE, (ਖਾਲੀ *)&vtype, 1);
 
 	vim_free(str);
 
@@ -4870,9 +4870,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
     }
 }
 
-#endif	// FEAT_CLIPBOARD
+#ਜੇ_ਅੰਤ	// FEAT_CLIPBOARD
 
-#ifdef FEAT_BROWSE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_BROWSE
 /*
  * Pop open a file browser and return the file selected, in allocated memory,
  * or NULL if Cancel is hit.
@@ -4893,47 +4893,47 @@ clip_mch_set_selection(Clipboard_T *cbd)
  */
 char_u *
 gui_mch_browse(
-	int saving,
+	ਪੂਰਨ saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
 	char_u *initdir,
 	char_u *filter)
 {
-    gui.vimApp->fFilePanel = new BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
-	    NULL, NULL, 0, false,
-	    new BMessage((saving == TRUE) ? 'save' : 'open'), NULL, true);
+    gui.vimApp->fFilePanel = ਨਵਾਂ BFilePanel((saving == TRUE) ? B_SAVE_PANEL : B_OPEN_PANEL,
+	    ਨਿਰਾ, ਨਿਰਾ, 0, ਝੂਠ,
+	    ਨਵਾਂ BMessage((saving == TRUE) ? 'save' : 'open'), ਨਿਰਾ, ਸੱਚ);
 
-    gui.vimApp->fBrowsedPath.Unset();
+    gui.vimApp->f_Browsed_ਰਸਤਾ.Unset();
 
-    gui.vimApp->fFilePanel->Window()->SetTitle((char*)title);
-    gui.vimApp->fFilePanel->SetPanelDirectory((const char*)initdir);
+    gui.vimApp->fFilePanel->ਖਿੜਕੀ()->ਸੈੱਟ_Title((ਅੱਖਰ*)title);
+    gui.vimApp->fFilePanel->ਸੈੱਟ_Panel_Directory((ਅਚਲ ਅੱਖਰ*)initdir);
 
     gui.vimApp->fFilePanel->Show();
 
     gui.vimApp->fFilePanelSem = create_sem(0, "FilePanelSem");
 
-    while (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
+    ਜਦੋਂ (acquire_sem(gui.vimApp->fFilePanelSem) == B_INTERRUPTED);
 
-    char_u *fileName = NULL;
-    status_t result = gui.vimApp->fBrowsedPath.InitCheck();
-    if (result == B_OK) {
-	fileName = vim_strsave((char_u*)gui.vimApp->fBrowsedPath.Path());
-    } else
-	if (result != B_NO_INIT) {
+    char_u *fileName = ਨਿਰਾ;
+    ਸਥਿਤੀ_t ਨਤੀਜਾ = gui.vimApp->f_Browsed_ਰਸਤਾ.InitCheck();
+    ਜੇ (ਨਤੀਜਾ == B_OK) {
+	fileName = vim_strsave((char_u*)gui.vimApp->f_Browsed_ਰਸਤਾ.ਰਸਤਾ_2());
+    } ਨਹੀਂਤਾਂ
+	ਜੇ (ਨਤੀਜਾ != B_NO_INIT) {
 	    fprintf(stderr, "gui_mch_browse: BPath error: %#08x (%s)\n",
-		    result, strerror(result));
+		    ਨਤੀਜਾ, strerror(ਨਤੀਜਾ));
 	}
 
-    delete gui.vimApp->fFilePanel;
-    gui.vimApp->fFilePanel = NULL;
+    ਮਿਟਾਓ gui.vimApp->fFilePanel;
+    gui.vimApp->fFilePanel = ਨਿਰਾ;
 
-    return fileName;
+    ਵਾਪਸ fileName;
 }
-#endif // FEAT_BROWSE
+#ਜੇ_ਅੰਤ // FEAT_BROWSE
 
 
-#if defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_GUI_DIALOG)
 
 /*
  * Create a dialog dynamically from the parameter strings.
@@ -4952,24 +4952,24 @@ gui_mch_browse(
  * If stubbing out this fn, return 1.
  */
 
-int
+ਪੂਰਨ
 gui_mch_dialog(
-	int	 type,
+	ਪੂਰਨ	 type,
 	char_u	*title,
-	char_u	*message,
+	char_u	*ਸੁਨੇਹਾ_2,
 	char_u	*buttons,
-	int	 dfltbutton,
+	ਪੂਰਨ	 dfltbutton,
 	char_u	*textfield,
-	int ex_cmd)
+	ਪੂਰਨ ex_cmd)
 {
-    VimDialog *dialog = new VimDialog(type, (char*)title, (char*)message,
-	    (char*)buttons, dfltbutton, (char*)textfield, ex_cmd);
-    bool ret = dialog->Go();
-    delete dialog;
-	return ret;
+    VimDialog *dialog = ਨਵਾਂ VimDialog(type, (ਅੱਖਰ*)title, (ਅੱਖਰ*)ਸੁਨੇਹਾ_2,
+	    (ਅੱਖਰ*)buttons, dfltbutton, (ਅੱਖਰ*)textfield, ex_cmd);
+    ਤਾਰਕਿਕ ret = dialog->Go();
+    ਮਿਟਾਓ dialog;
+	ਵਾਪਸ ret;
 }
 
-#endif // FEAT_GUI_DIALOG
+#ਜੇ_ਅੰਤ // FEAT_GUI_DIALOG
 
 
 /*
@@ -4978,80 +4978,80 @@ gui_mch_dialog(
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    rgb_color rgb = GUI_TO_RGB(pixel);
+    rgb_color rgb = GUI_ਮੰਜ਼ਿਲ_RGB(pixel);
 
-    return ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
+    ਵਾਪਸ ((rgb.red & 0xff) << 16) + ((rgb.green & 0xff) << 8)
 	+ (rgb.blue & 0xff);
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    ਖਾਲੀ
+gui_mch_setmouse(ਪੂਰਨ x, ਪੂਰਨ y)
 {
     TRACE();
     // TODO
 }
 
-#ifdef FEAT_MBYTE_IME
-    void
-im_set_position(int row, int col)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MBYTE_IME
+    ਖਾਲੀ
+im_ਸੈੱਟ_position(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ)
 {
-    if (gui.vimWindow->Lock())
+    ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2())
     {
-	gui.vimTextArea->DrawIMString();
-	gui.vimWindow->Unlock();
+	gui.vim_ਪਾਠ_Area->DrawIMString();
+	gui.vim_ਖਿੜਕੀ->Unlock();
     }
-    return;
+    ਵਾਪਸ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-gui_mch_show_toolbar(int showit)
+    ਖਾਲੀ
+gui_mch_show_toolbar(ਪੂਰਨ showit)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
-    gui.toolbar_height = (toolbar && showit) ? toolbar->ToolbarHeight() : 0.;
+    gui.toolbar_ਉਚਾਈ = (toolbar && showit) ? toolbar->Toolbar_ਉਚਾਈ() : 0.;
 }
 
-    void
-gui_mch_set_toolbar_pos(int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_toolbar_pos(ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
     VimToolbar *toolbar = gui.vimForm->ToolBar();
-    if (toolbar != NULL) {
-	if (gui.vimWindow->Lock()) {
-	    toolbar->MoveTo(x, y);
-	    toolbar->ResizeTo(w - 1, h - 1);
-	    gui.vimWindow->Unlock();
+    ਜੇ (toolbar != ਨਿਰਾ) {
+	ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	    toolbar->Move_ਮੰਜ਼ਿਲ(x, y);
+	    toolbar->Resize_ਮੰਜ਼ਿਲ(w - 1, h - 1);
+	    gui.vim_ਖਿੜਕੀ->Unlock();
 	}
     }
 }
 
-#if defined(FEAT_GUI_TABLINE)
+#ਜੇ defined(FEAT_GUI_TABLINE)
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    ਖਾਲੀ
+gui_mch_show_tabline(ਪੂਰਨ showit)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
 
-    if (tabLine == NULL)
-	return;
+    ਜੇ (tab_ਸਤਰ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (!showit != !gui.vimForm->IsShowingTabLine()) {
-	gui.vimForm->SetShowingTabLine(showit != 0);
-	gui.tabline_height = gui.vimForm->TablineHeight();
+    ਜੇ (!showit != !gui.vimForm->Is_Showing_Tab_ਸਤਰ()) {
+	gui.vimForm->ਸੈੱਟ_Showing_Tab_ਸਤਰ(showit != 0);
+	gui.tabline_ਉਚਾਈ = gui.vimForm->Tabline_ਉਚਾਈ();
     }
 }
 
-    void
-gui_mch_set_tabline_pos(int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_tabline_pos(ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
-	if (gui.vimWindow->Lock()) {
-	    tabLine->MoveTo(x, y);
-	    tabLine->ResizeTo(w - 1, h - 1);
-	    gui.vimWindow->Unlock();
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
+    ਜੇ (tab_ਸਤਰ != ਨਿਰਾ) {
+	ਜੇ (gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2()) {
+	    tab_ਸਤਰ->Move_ਮੰਜ਼ਿਲ(x, y);
+	    tab_ਸਤਰ->Resize_ਮੰਜ਼ਿਲ(w - 1, h - 1);
+	    gui.vim_ਖਿੜਕੀ->Unlock();
 	}
     }
 }
@@ -5059,73 +5059,73 @@ gui_mch_set_tabline_pos(int x, int y, int w, int h)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
+    ਪੂਰਨ
 gui_mch_showing_tabline()
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    return tabLine != NULL && gui.vimForm->IsShowingTabLine();
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
+    ਵਾਪਸ tab_ਸਤਰ != ਨਿਰਾ && gui.vimForm->Is_Showing_Tab_ਸਤਰ();
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
+    ਖਾਲੀ
 gui_mch_update_tabline()
 {
     tabpage_T	*tp;
-    int	    nr = 0;
-    int	    curtabidx = 0;
+    ਪੂਰਨ	    nr = 0;
+    ਪੂਰਨ	    curtabidx = 0;
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
 
-    if (tabLine == NULL)
-	return;
+    ਜੇ (tab_ਸਤਰ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    gui.vimWindow->Lock();
+    gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2();
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr) {
-	if (tp == curtab)
+    ਲਈ (tp = ਪਹਿਲਾ_tabpage; tp != ਨਿਰਾ; tp = tp->tp_ਅਗਲਾ, ++nr) {
+	ਜੇ (tp == curtab)
 	    curtabidx = nr;
 
-	BTab* tab = tabLine->TabAt(nr);
+	BTab* tab = tab_ਸਤਰ->TabAt(nr);
 
-	if (tab == NULL) {
-	    tab = new VimTabLine::VimTab();
-	    tabLine->AddTab(NULL, tab);
+	ਜੇ (tab == ਨਿਰਾ) {
+	    tab = ਨਵਾਂ Vim_Tab_ਸਤਰ::VimTab();
+	    tab_ਸਤਰ->ਜੋੜੋ_Tab(ਨਿਰਾ, tab);
 	}
 
 	get_tabline_label(tp, FALSE);
-	tab->SetLabel((const char*)NameBuff);
-	tabLine->Invalidate();
+	tab->ਸੈੱਟ_Label((ਅਚਲ ਅੱਖਰ*)NameBuff);
+	tab_ਸਤਰ->Invalidate();
     }
 
     // Remove any old labels.
-    while (nr < tabLine->CountTabs())
-	tabLine->RemoveTab(nr);
+    ਜਦੋਂ (nr < tab_ਸਤਰ->ਗਿਣਤੀ_Tabs())
+	tab_ਸਤਰ->RemoveTab(nr);
 
-    if (tabLine->Selection() != curtabidx)
-	tabLine->Select(curtabidx);
+    ਜੇ (tab_ਸਤਰ->Selection() != curtabidx)
+	tab_ਸਤਰ->Select(curtabidx);
 
-    gui.vimWindow->Unlock();
+    gui.vim_ਖਿੜਕੀ->Unlock();
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_curtab(ਪੂਰਨ nr)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine == NULL)
-	return;
+    Vim_Tab_ਸਤਰ *tab_ਸਤਰ = gui.vimForm->Tab_ਸਤਰ();
+    ਜੇ (tab_ਸਤਰ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    gui.vimWindow->Lock();
+    gui.vim_ਖਿੜਕੀ->ਤਾਲਾ_2();
 
-    if (tabLine->Selection() != nr -1)
-	tabLine->Select(nr -1);
+    ਜੇ (tab_ਸਤਰ->Selection() != nr -1)
+	tab_ਸਤਰ->Select(nr -1);
 
-    gui.vimWindow->Unlock();
+    gui.vim_ਖਿੜਕੀ->Unlock();
 }
 
-#endif // FEAT_GUI_TABLINE
+#ਜੇ_ਅੰਤ // FEAT_GUI_TABLINE

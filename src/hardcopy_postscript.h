@@ -7,12 +7,12 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef HARDCOPY_POSTSCRIPT_H
-#define HARDCOPY_POSTSCRIPT_H
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HARDCOPY_POSTSCRIPT_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HARDCOPY_POSTSCRIPT_H
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_POSTSCRIPT)
+#ਜੇ defined(FEAT_POSTSCRIPT)
 
 # define OPT_MBFONT_USECOURIER  0
 # define OPT_MBFONT_ASCII       1
@@ -20,10 +20,10 @@
 # define OPT_MBFONT_BOLD	3
 # define OPT_MBFONT_OBLIQUE     4
 # define OPT_MBFONT_BOLDOBLIQUE 5
-# define OPT_MBFONT_NUM_OPTIONS 6
+# define OPT_MBFONT_ਅੰਕ_OPTIONS 6
 
-extern option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS];
+ਬਾਹਰੀ option_ਸਾਰਣੀ_T mbfont_opts[OPT_MBFONT_ਅੰਕ_OPTIONS];
 
-#endif
+#ਜੇ_ਅੰਤ
 
-#endif
+#ਜੇ_ਅੰਤ

@@ -38,37 +38,37 @@
  * in tl_scrollback are no longer used.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_TERMINAL)
+#ਜੇ defined(FEAT_TERMINAL)
 
-#ifndef MIN
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MIN
 # define MIN(x,y) ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MAX
 # define MAX(x,y) ((x) > (y) ? (x) : (y))
-#endif
+#ਜੇ_ਅੰਤ
 
-#include "libvterm/include/vterm.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "libvterm/include/vterm.h"
 
 // This is VTermScreenCell without the characters, thus much smaller.
-typedef struct {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
     VTermScreenCellAttrs	attrs;
-    char			width;
+    ਅੱਖਰ			ਚੌੜਾਈ;
     VTermColor			fg;
     VTermColor			bg;
 } cellattr_T;
 
-typedef struct sb_line_S {
-    int		sb_cols;	// can differ per line
-    int		sb_bytes;	// length in bytes of text
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ sb_ਸਤਰ_S {
+    ਪੂਰਨ		sb_ਖਾਨੇ_ਗਿਣਤੀ;	// can differ per line
+    ਪੂਰਨ		sb_ਬਾਈਟਾਂ;	// length in bytes of text
     cellattr_T	*sb_cells;	// allocated
     cellattr_T	sb_fill_attr;	// for short line
-    char_u	*sb_text;	// for tl_scrollback_postponed
+    char_u	*sb_ਪਾਠ;	// for tl_scrollback_postponed
     char_u	continuation;
-} sb_line_T;
+} sb_ਸਤਰ_T;
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 # ifndef HPCON
 #  define HPCON VOID*
 # endif
@@ -78,174 +78,174 @@ typedef struct sb_line_S {
 # ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
 #  define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 # endif
-typedef struct _DYN_STARTUPINFOEXW
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ _DYN_STARTUPINFOEXW
 {
     STARTUPINFOW StartupInfo;
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList;
 } DYN_STARTUPINFOEXW, *PDYN_STARTUPINFOEXW;
-#endif
+#ਜੇ_ਅੰਤ
 
 // typedef term_T in structs.h
-struct terminal_S {
-    term_T	*tl_next;
+ਬਣਤਰ terminal_S {
+    ਪਦ_T	*tl_ਅਗਲਾ;
 
     VTerm	*tl_vterm;
-    job_T	*tl_job;
-    buf_T	*tl_buffer;
-#if defined(FEAT_GUI)
-    int		tl_system;	// when non-zero used for :!cmd output
-    int		tl_toprow;	// row with first line of system terminal
-#endif
+    ਕੰਮ_T	*tl_ਕੰਮ;
+    buf_T	*tl_ਬਫਰ;
+#ਜੇ defined(FEAT_GUI)
+    ਪੂਰਨ		tl_system;	// when non-zero used for :!cmd output
+    ਪੂਰਨ		tl_toprow;	// row with first line of system terminal
+#ਜੇ_ਅੰਤ
 
     // Set when setting the size of a vterm, reset after redrawing.
-    int		tl_vterm_size_changed;
+    ਪੂਰਨ		tl_vterm_ਮਾਪ_ਬਦਲਿਆ;
 
-    int		tl_normal_mode; // TRUE: Terminal-Normal mode
-    int		tl_channel_closing;
-    int		tl_channel_closed;
-    int		tl_channel_recently_closed; // still need to handle tl_finish
+    ਪੂਰਨ		tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ; // TRUE: Terminal-Normal mode
+    ਪੂਰਨ		tl_channel_closing;
+    ਪੂਰਨ		tl_channel_closed;
+    ਪੂਰਨ		tl_channel_recently_closed; // still need to handle tl_finish
 
-    int		tl_finish;
-#define TL_FINISH_UNSET	    NUL
-#define TL_FINISH_CLOSE	    'c'	// ++close or :terminal without argument
-#define TL_FINISH_NOCLOSE   'n'	// ++noclose
-#define TL_FINISH_OPEN	    'o'	// ++open
+    ਪੂਰਨ		tl_ਅੰਤ;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TL_ਅੰਤ_UNSET	    NUL
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TL_ਅੰਤ_CLOSE	    'c'	// ++close or :terminal without argument
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TL_ਅੰਤ_NOCLOSE   'n'	// ++noclose
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TL_ਅੰਤ_OPEN	    'o'	// ++open
     char_u	*tl_opencmd;
     char_u	*tl_eof_chars;
     char_u	*tl_api;	// prefix for terminal API function
 
     char_u	*tl_arg0_cmd;	// To format the status bar
 
-#ifdef MSWIN
-    void	*tl_winpty_config;
-    void	*tl_winpty;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਖਾਲੀ	*tl_winpty_config;
+    ਖਾਲੀ	*tl_winpty;
 
     HPCON	tl_conpty;
     DYN_STARTUPINFOEXW tl_siex;	// Structure that always needs to be hold
 
-    FILE	*tl_out_fd;
-#endif
-#if defined(FEAT_SESSION)
+    FILE	*tl_ਬਾਹਰਲਾ_fd;
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_SESSION)
     char_u	*tl_command;
-#endif
+#ਜੇ_ਅੰਤ
     char_u	*tl_kill;
 
     // last known vterm size
-    int		tl_rows;
-    int		tl_cols;
+    ਪੂਰਨ		tl_ਪੰਕਤੀਆਂ;
+    ਪੂਰਨ		tl_ਖਾਨੇ_ਗਿਣਤੀ;
 
     char_u	*tl_title; // NULL or allocated
-    char_u	*tl_status_text; // NULL or allocated
+    char_u	*tl_ਸਥਿਤੀ_ਪਾਠ; // NULL or allocated
 
     // Range of screen rows to update.  Zero based.
-    int		tl_dirty_row_start; // MAX_ROW if nothing dirty
-    int		tl_dirty_row_end;   // row below last one to update
-    int		tl_dirty_snapshot;  // text updated after making snapshot
-#ifdef FEAT_TIMERS
-    int		tl_timer_set;
+    ਪੂਰਨ		tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ; // MAX_ROW if nothing dirty
+    ਪੂਰਨ		tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ;   // row below last one to update
+    ਪੂਰਨ		tl_dirty_snapshot;  // text updated after making snapshot
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TIMERS
+    ਪੂਰਨ		tl_timer_ਸੈੱਟ;
     proftime_T	tl_timer_due;
-#endif
-    int		tl_postponed_scroll;	// to be scrolled up
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		tl_postponed_scroll;	// to be scrolled up
 
     garray_T	tl_scrollback;
-    int		tl_scrollback_scrolled;
+    ਪੂਰਨ		tl_scrollback_scrolled;
     garray_T	tl_scrollback_postponed;
-    int		tl_scrollback_snapshot;
-    int		tl_buffer_scrolled;
+    ਪੂਰਨ		tl_scrollback_snapshot;
+    ਪੂਰਨ		tl_ਬਫਰ_scrolled;
 
     char_u	*tl_highlight_name; // replaces "Terminal"; allocated
 
     cellattr_T	tl_default_color;
 
-    linenr_T	tl_top_diff_rows;   // rows of top diff file or zero
-    linenr_T	tl_bot_diff_rows;   // rows of bottom diff file
+    linenr_T	tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ;   // rows of top diff file or zero
+    linenr_T	tl_bot_diff_ਪੰਕਤੀਆਂ;   // rows of bottom diff file
 
     VTermPos	tl_cursor_pos;
-    int		tl_cursor_visible;
-    int		tl_cursor_blink;
-    int		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
+    ਪੂਰਨ		tl_cursor_visible;
+    ਪੂਰਨ		tl_cursor_blink;
+    ਪੂਰਨ		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
     char_u	*tl_cursor_color; // NULL or allocated
 
     long_u	*tl_palette; // array of 16 colors specified by term_start, can
 			     // be NULL
-    int		tl_using_altscreen;
+    ਪੂਰਨ		tl_using_altscreen;
     garray_T	tl_osc_buf;	    // incomplete OSC string
 };
 
-#define TMODE_ONCE 1	    // CTRL-\ CTRL-N used
-#define TMODE_LOOP 2	    // CTRL-W N used
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TMODE_ONCE 1	    // CTRL-\ CTRL-N used
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TMODE_LOOP 2	    // CTRL-W N used
 
 /*
  * List of all active terminals.
  */
-static term_T *first_term = NULL;
+ਸਥਿਰ ਪਦ_T *ਪਹਿਲਾ_ਪਦ = ਨਿਰਾ;
 
 // Terminal active in terminal_loop().
-static term_T *in_terminal_loop = NULL;
+ਸਥਿਰ ਪਦ_T *ਵਿੱਚ_terminal_loop = ਨਿਰਾ;
 
-#ifdef MSWIN
-static BOOL has_winpty = FALSE;
-static BOOL has_conpty = FALSE;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+ਸਥਿਰ BOOL has_winpty = FALSE;
+ਸਥਿਰ BOOL has_conpty = FALSE;
+#ਜੇ_ਅੰਤ
 
-#define MAX_ROW 999999	    // used for tl_dirty_row_end to update all rows
-#define KEY_BUF_LEN 200
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MAX_ਪੰਕਤੀ 999999	    // used for tl_dirty_row_end to update all rows
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਕੁੰਜੀ_BUF_LEN 200
 
-#define FOR_ALL_TERMS(term)	\
-    for ((term) = first_term; (term) != NULL; (term) = (term)->tl_next)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FOR_ALL_TERMS(ਪਦ)	\
+    ਲਈ ((ਪਦ) = ਪਹਿਲਾ_ਪਦ; (ਪਦ) != ਨਿਰਾ; (ਪਦ) = (ਪਦ)->tl_ਅਗਲਾ)
 
 /*
  * Functions with separate implementation for MS-Windows and Unix-like systems.
  */
-static int term_and_job_init(term_T *term, typval_T *argvar, char **argv, jobopt_T *opt, jobopt_T *orig_opt);
-static int create_pty_only(term_T *term, jobopt_T *opt);
-static void term_report_winsize(term_T *term, int rows, int cols);
-static void term_free_vterm(term_T *term);
-#ifdef FEAT_GUI
-static void update_system_term(term_T *term);
-#endif
+ਸਥਿਰ ਪੂਰਨ ਪਦ_and_ਕੰਮ_init(ਪਦ_T *ਪਦ, typval_T *argvar, ਅੱਖਰ **argv, jobopt_T *opt, jobopt_T *orig_opt);
+ਸਥਿਰ ਪੂਰਨ create_pty_only(ਪਦ_T *ਪਦ, jobopt_T *opt);
+ਸਥਿਰ ਖਾਲੀ ਪਦ_report_winsize(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ);
+ਸਥਿਰ ਖਾਲੀ ਪਦ_free_vterm(ਪਦ_T *ਪਦ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+ਸਥਿਰ ਖਾਲੀ update_system_ਪਦ(ਪਦ_T *ਪਦ);
+#ਜੇ_ਅੰਤ
 
-static void handle_postponed_scrollback(term_T *term);
+ਸਥਿਰ ਖਾਲੀ handle_postponed_scrollback(ਪਦ_T *ਪਦ);
 
 // The character that we know (or assume) that the terminal expects for the
 // backspace key.
-static int term_backspace_char = BS;
+ਸਥਿਰ ਪੂਰਨ ਪਦ_backspace_char = BS;
 
 // Store the last set and the desired cursor properties, so that we only update
 // them when needed.  Doing it unnecessary may result in flicker.
-static char_u	*last_set_cursor_color = NULL;
-static char_u	*desired_cursor_color = NULL;
-static int	last_set_cursor_shape = -1;
-static int	desired_cursor_shape = -1;
-static int	last_set_cursor_blink = -1;
-static int	desired_cursor_blink = -1;
+ਸਥਿਰ char_u	*ਆਖਰੀ_ਸੈੱਟ_cursor_color = ਨਿਰਾ;
+ਸਥਿਰ char_u	*desired_cursor_color = ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ	ਆਖਰੀ_ਸੈੱਟ_cursor_shape = -1;
+ਸਥਿਰ ਪੂਰਨ	desired_cursor_shape = -1;
+ਸਥਿਰ ਪੂਰਨ	ਆਖਰੀ_ਸੈੱਟ_cursor_blink = -1;
+ਸਥਿਰ ਪੂਰਨ	desired_cursor_blink = -1;
 
 
 ///////////////////////////////////////
 // 1. Generic code for all systems.
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 cursor_color_equal(char_u *lhs_color, char_u *rhs_color)
 {
-    if (lhs_color != NULL && rhs_color != NULL)
-	return STRCMP(lhs_color, rhs_color) == 0;
-    return lhs_color == NULL && rhs_color == NULL;
+    ਜੇ (lhs_color != ਨਿਰਾ && rhs_color != ਨਿਰਾ)
+	ਵਾਪਸ STRCMP(lhs_color, rhs_color) == 0;
+    ਵਾਪਸ lhs_color == ਨਿਰਾ && rhs_color == ਨਿਰਾ;
 }
 
-    static void
-cursor_color_copy(char_u **to_color, char_u *from_color)
+    ਸਥਿਰ ਖਾਲੀ
+cursor_color_copy(char_u **ਮੰਜ਼ਿਲ_color, char_u *from_color)
 {
     // Avoid a free & alloc if the value is already right.
-    if (cursor_color_equal(*to_color, from_color))
-	return;
-    vim_free(*to_color);
-    *to_color = (from_color == NULL) ? NULL : vim_strsave(from_color);
+    ਜੇ (cursor_color_equal(*ਮੰਜ਼ਿਲ_color, from_color))
+	ਵਾਪਸ;
+    vim_free(*ਮੰਜ਼ਿਲ_color);
+    *ਮੰਜ਼ਿਲ_color = (from_color == ਨਿਰਾ) ? ਨਿਰਾ : vim_strsave(from_color);
 }
 
-    static char_u *
+    ਸਥਿਰ char_u *
 cursor_color_get(char_u *color)
 {
-    return (color == NULL) ? (char_u *)"" : color;
+    ਵਾਪਸ (color == ਨਿਰਾ) ? (char_u *)"" : color;
 }
 
 
@@ -255,89 +255,89 @@ cursor_color_get(char_u *color)
  * Sets "rows" and/or "cols" to zero when it should follow the window size.
  * Return TRUE if the size is the minimum size: "24*80".
  */
-    static int
-parse_termwinsize(win_T *wp, int *rows, int *cols)
+    ਸਥਿਰ ਪੂਰਨ
+parse_termwinsize(win_T *wp, ਪੂਰਨ *ਪੰਕਤੀਆਂ_2, ਪੂਰਨ *ਖਾਨੇ_ਗਿਣਤੀ)
 {
-    int	minsize = FALSE;
+    ਪੂਰਨ	minsize = FALSE;
 
-    *rows = 0;
-    *cols = 0;
+    *ਪੰਕਤੀਆਂ_2 = 0;
+    *ਖਾਨੇ_ਗਿਣਤੀ = 0;
 
-    if (*wp->w_p_tws == NUL)
-	return FALSE;
+    ਜੇ (*wp->w_p_tws == NUL)
+	ਵਾਪਸ FALSE;
 
     char_u *p = vim_strchr(wp->w_p_tws, 'x');
 
     // Syntax of value was already checked when it's set.
-    if (p == NULL)
+    ਜੇ (p == ਨਿਰਾ)
     {
 	minsize = TRUE;
 	p = vim_strchr(wp->w_p_tws, '*');
     }
-    *rows = atoi((char *)wp->w_p_tws);
-    *cols = atoi((char *)p + 1);
-    if (*rows > VTERM_MAX_ROWS)
-	*rows = VTERM_MAX_ROWS;
-    if (*cols > VTERM_MAX_COLS)
-	*cols = VTERM_MAX_COLS;
-    return minsize;
+    *ਪੰਕਤੀਆਂ_2 = atoi((ਅੱਖਰ *)wp->w_p_tws);
+    *ਖਾਨੇ_ਗਿਣਤੀ = atoi((ਅੱਖਰ *)p + 1);
+    ਜੇ (*ਪੰਕਤੀਆਂ_2 > VTERM_MAX_ਪੰਕਤੀਆਂ)
+	*ਪੰਕਤੀਆਂ_2 = VTERM_MAX_ਪੰਕਤੀਆਂ;
+    ਜੇ (*ਖਾਨੇ_ਗਿਣਤੀ > VTERM_MAX_ਖਾਨੇ_ਗਿਣਤੀ)
+	*ਖਾਨੇ_ਗਿਣਤੀ = VTERM_MAX_ਖਾਨੇ_ਗਿਣਤੀ;
+    ਵਾਪਸ minsize;
 }
 
 /*
  * Determine the terminal size from 'termwinsize' and the current window.
  */
-    static void
-set_term_and_win_size(term_T *term, jobopt_T *opt)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_ਪਦ_and_win_ਮਾਪ(ਪਦ_T *ਪਦ, jobopt_T *opt)
 {
-    int rows, cols;
-    int	minsize;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ;
+    ਪੂਰਨ	minsize;
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (ਪਦ->tl_system)
     {
 	// Use the entire screen (excluding the tabpanel area) for the system
 	// commands.  However, it will start at the command line and scroll up
 	// as needed, using tl_toprow.
-	term->tl_rows = Rows;
-	term->tl_cols = topframe->fr_width;
-	return;
+	ਪਦ->tl_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ;
+	ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = topframe->fr_ਚੌੜਾਈ;
+	ਵਾਪਸ;
     }
-#endif
-    term->tl_rows = curwin->w_height;
-    term->tl_cols = curwin->w_width;
+#ਜੇ_ਅੰਤ
+    ਪਦ->tl_ਪੰਕਤੀਆਂ = curwin->w_ਉਚਾਈ;
+    ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = curwin->w_ਚੌੜਾਈ;
 
-    minsize = parse_termwinsize(curwin, &rows, &cols);
-    if (minsize)
+    minsize = parse_termwinsize(curwin, &ਪੰਕਤੀਆਂ_2, &ਖਾਨੇ_ਗਿਣਤੀ);
+    ਜੇ (minsize)
     {
-	if (term->tl_rows < rows)
-	    term->tl_rows = rows;
-	if (term->tl_cols < cols)
-	    term->tl_cols = cols;
+	ਜੇ (ਪਦ->tl_ਪੰਕਤੀਆਂ < ਪੰਕਤੀਆਂ_2)
+	    ਪਦ->tl_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ_2;
+	ਜੇ (ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ < ਖਾਨੇ_ਗਿਣਤੀ)
+	    ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
     }
-    if ((opt->jo_set2 & JO2_TERM_ROWS))
-	term->tl_rows = opt->jo_term_rows;
-    else if (rows != 0)
-	term->tl_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS))
-	term->tl_cols = opt->jo_term_cols;
-    else if (cols != 0)
-	term->tl_cols = cols;
+    ਜੇ ((opt->jo_set2 & JO2_ਪਦ_ਪੰਕਤੀਆਂ))
+	ਪਦ->tl_ਪੰਕਤੀਆਂ = opt->jo_ਪਦ_ਪੰਕਤੀਆਂ;
+    ਨਹੀਂਤਾਂ ਜੇ (ਪੰਕਤੀਆਂ_2 != 0)
+	ਪਦ->tl_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ_2;
+    ਜੇ ((opt->jo_set2 & JO2_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ))
+	ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ;
+    ਨਹੀਂਤਾਂ ਜੇ (ਖਾਨੇ_ਗਿਣਤੀ != 0)
+	ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
 
-    if (!opt->jo_hidden)
+    ਜੇ (!opt->jo_hidden)
     {
-	if (term->tl_rows != curwin->w_height)
-	    win_setheight_win(term->tl_rows, curwin);
-	if (term->tl_cols != curwin->w_width)
-	    win_setwidth_win(term->tl_cols, curwin);
+	ਜੇ (ਪਦ->tl_ਪੰਕਤੀਆਂ != curwin->w_ਉਚਾਈ)
+	    win_setheight_win(ਪਦ->tl_ਪੰਕਤੀਆਂ, curwin);
+	ਜੇ (ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ != curwin->w_ਚੌੜਾਈ)
+	    win_setwidth_win(ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ, curwin);
 
 	// Set 'winsize' now to avoid a resize at the next redraw.
-	if (!minsize && *curwin->w_p_tws != NUL)
+	ਜੇ (!minsize && *curwin->w_p_tws != NUL)
 	{
 	    char_u buf[100];
 
-	    vim_snprintf((char *)buf, 100, "%dx%d",
-						 term->tl_rows, term->tl_cols);
-	    set_option_value_give_err((char_u *)"termwinsize",
+	    vim_snprintf((ਅੱਖਰ *)buf, 100, "%dx%d",
+						 ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
+	    ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"termwinsize",
 							   0L, buf, OPT_LOCAL);
 	}
     }
@@ -347,61 +347,61 @@ set_term_and_win_size(term_T *term, jobopt_T *opt)
  * Initialize job options for a terminal job.
  * Caller may overrule some of them.
  */
-    void
-init_job_options(jobopt_T *opt)
+    ਖਾਲੀ
+init_ਕੰਮ_options(jobopt_T *opt)
 {
-    clear_job_options(opt);
+    clear_ਕੰਮ_options(opt);
 
-    opt->jo_mode = CH_MODE_RAW;
-    opt->jo_out_mode = CH_MODE_RAW;
-    opt->jo_err_mode = CH_MODE_RAW;
-    opt->jo_set = JO_MODE | JO_OUT_MODE | JO_ERR_MODE;
+    opt->jo_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_RAW;
+    opt->jo_ਬਾਹਰਲਾ_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_RAW;
+    opt->jo_err_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_RAW;
+    opt->jo_ਸੈੱਟ = JO_ਬਹੁਲਕ | JO_ਬਾਹਰਲਾ_ਬਹੁਲਕ | JO_ERR_ਬਹੁਲਕ;
 }
 
 /*
  * Set job options mandatory for a terminal job.
  */
-    static void
-setup_job_options(jobopt_T *opt, int rows, int cols)
+    ਸਥਿਰ ਖਾਲੀ
+ਤਿਆਰੀ_ਕੰਮ_options(jobopt_T *opt, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
-#ifndef MSWIN
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stdout
     // here.
-    if (!(opt->jo_set & JO_OUT_IO))
-#endif
+    ਜੇ (!(opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_IO))
+#ਜੇ_ਅੰਤ
     {
 	// Connect stdout to the terminal.
-	opt->jo_io[PART_OUT] = JIO_BUFFER;
-	opt->jo_io_buf[PART_OUT] = curbuf->b_fnum;
-	opt->jo_modifiable[PART_OUT] = 0;
-	opt->jo_set |= JO_OUT_IO + JO_OUT_BUF + JO_OUT_MODIFIABLE;
+	opt->jo_io[PART_ਬਾਹਰਲਾ] = JIO_ਬਫਰ;
+	opt->jo_io_buf[PART_ਬਾਹਰਲਾ] = curbuf->b_fnum;
+	opt->jo_modifiable[PART_ਬਾਹਰਲਾ] = 0;
+	opt->jo_ਸੈੱਟ |= JO_ਬਾਹਰਲਾ_IO + JO_ਬਾਹਰਲਾ_BUF + JO_ਬਾਹਰਲਾ_MODIFIABLE;
     }
 
-#ifndef MSWIN
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stderr
     // here.
-    if (!(opt->jo_set & JO_ERR_IO))
-#endif
+    ਜੇ (!(opt->jo_ਸੈੱਟ & JO_ERR_IO))
+#ਜੇ_ਅੰਤ
     {
 	// Connect stderr to the terminal.
-	opt->jo_io[PART_ERR] = JIO_BUFFER;
+	opt->jo_io[PART_ERR] = JIO_ਬਫਰ;
 	opt->jo_io_buf[PART_ERR] = curbuf->b_fnum;
 	opt->jo_modifiable[PART_ERR] = 0;
-	opt->jo_set |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
+	opt->jo_ਸੈੱਟ |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
     }
 
     opt->jo_pty = TRUE;
-    if ((opt->jo_set2 & JO2_TERM_ROWS) == 0)
-	opt->jo_term_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS) == 0)
-	opt->jo_term_cols = cols;
+    ਜੇ ((opt->jo_set2 & JO2_ਪਦ_ਪੰਕਤੀਆਂ) == 0)
+	opt->jo_ਪਦ_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ_2;
+    ਜੇ ((opt->jo_set2 & JO2_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ) == 0)
+	opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
 }
 
 /*
  * Flush messages on channels.
  */
-    static void
-term_flush_messages(void)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_flush_messages(ਖਾਲੀ)
 {
     mch_check_messages();
     parse_queued_messages();
@@ -411,22 +411,22 @@ term_flush_messages(void)
  * Close a terminal buffer (and its window).  Used when creating the terminal
  * fails.
  */
-    static void
-term_close_buffer(buf_T *buf, buf_T *old_curbuf)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_close_ਬਫਰ(buf_T *buf, buf_T *old_curbuf)
 {
     free_terminal(buf);
-    if (old_curbuf != NULL)
+    ਜੇ (old_curbuf != ਨਿਰਾ)
     {
 	--curbuf->b_nwindows;
 	curbuf = old_curbuf;
-	curwin->w_buffer = curbuf;
+	curwin->w_ਬਫਰ = curbuf;
 	++curbuf->b_nwindows;
     }
     CHECK_CURBUF;
 
     // Wiping out the buffer will also close the window and call
     // free_terminal().
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_ਬਫਰ(DOBUF_WIPE, DOBUF_ਪਹਿਲਾ, FORWARD, buf->b_fnum, TRUE);
 }
 
 /*
@@ -437,197 +437,197 @@ term_close_buffer(buf_T *buf, buf_T *old_curbuf)
  * Returns NULL when failed.
  */
     buf_T *
-term_start(
+ਪਦ_ਸ਼ੁਰੂ(
 	typval_T    *argvar,
-	char	    **argv,
+	ਅੱਖਰ	    **argv,
 	jobopt_T    *opt,
-	int	    flags)
+	ਪੂਰਨ	    flags)
 {
-    exarg_T	split_ea;
+    exarg_T	ਵੰਡੋ_ea;
     win_T	*old_curwin = curwin;
-    term_T	*term;
-    buf_T	*old_curbuf = NULL;
-    int		res;
+    ਪਦ_T	*ਪਦ;
+    buf_T	*old_curbuf = ਨਿਰਾ;
+    ਪੂਰਨ		res;
     buf_T	*newbuf;
-    int		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
+    ਪੂਰਨ		vertical = opt->jo_vertical || (cmdmod.cmod_ਵੰਡੋ & WSP_VERT);
     jobopt_T	orig_opt;  // only partly filled
     pos_T	save_cursor;
 
-    if (check_restricted() || check_secure())
-	return NULL;
-    if (cmdwin_type != 0)
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (cmdwin_type != 0)
     {
-	emsg(_(e_cannot_open_terminal_from_command_line_window));
-	return NULL;
+	emsg(_(e_cannot_open_terminal_from_command_ਸਤਰ_ਖਿੜਕੀ));
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if ((opt->jo_set & (JO_IN_IO + JO_OUT_IO + JO_ERR_IO))
-					 == (JO_IN_IO + JO_OUT_IO + JO_ERR_IO)
-	|| (!(opt->jo_set & JO_OUT_IO) && (opt->jo_set & JO_OUT_BUF))
-	|| (!(opt->jo_set & JO_ERR_IO) && (opt->jo_set & JO_ERR_BUF))
-	|| (argvar != NULL
+    ਜੇ ((opt->jo_ਸੈੱਟ & (JO_ਵਿੱਚ_IO + JO_ਬਾਹਰਲਾ_IO + JO_ERR_IO))
+					 == (JO_ਵਿੱਚ_IO + JO_ਬਾਹਰਲਾ_IO + JO_ERR_IO)
+	|| (!(opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_IO) && (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_BUF))
+	|| (!(opt->jo_ਸੈੱਟ & JO_ERR_IO) && (opt->jo_ਸੈੱਟ & JO_ERR_BUF))
+	|| (argvar != ਨਿਰਾ
 	    && argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
-	    && argvar->vval.v_list->lv_first == &range_list_item))
+	    && argvar->vval.v_list != ਨਿਰਾ
+	    && argvar->vval.v_list->lv_ਪਹਿਲਾ == &range_list_ਵਸਤੂ))
     {
-	emsg(_(e_invalid_argument));
-	return NULL;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    term = ALLOC_CLEAR_ONE(term_T);
-    if (term == NULL)
-	return NULL;
-    term->tl_dirty_row_end = MAX_ROW;
-    term->tl_cursor_visible = TRUE;
-    term->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_BLOCK;
-    term->tl_finish = opt->jo_term_finish;
-#ifdef FEAT_GUI
-    term->tl_system = (flags & TERM_START_SYSTEM);
-#endif
-    ga_init2(&term->tl_scrollback, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_scrollback_postponed, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_osc_buf, sizeof(char), 300);
+    ਪਦ = ALLOC_CLEAR_ONE(ਪਦ_T);
+    ਜੇ (ਪਦ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = MAX_ਪੰਕਤੀ;
+    ਪਦ->tl_cursor_visible = TRUE;
+    ਪਦ->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_ਖੰਡ;
+    ਪਦ->tl_ਅੰਤ = opt->jo_ਪਦ_ਅੰਤ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਪਦ->tl_system = (flags & ਪਦ_ਸ਼ੁਰੂ_SYSTEM);
+#ਜੇ_ਅੰਤ
+    ga_init2(&ਪਦ->tl_scrollback, ਆਕਾਰ(sb_ਸਤਰ_T), 300);
+    ga_init2(&ਪਦ->tl_scrollback_postponed, ਆਕਾਰ(sb_ਸਤਰ_T), 300);
+    ga_init2(&ਪਦ->tl_osc_buf, ਆਕਾਰ(ਅੱਖਰ), 300);
 
     setpcmark();
-    CLEAR_FIELD(split_ea);
-    if (opt->jo_curwin)
+    CLEAR_ਖੇਤਰ(ਵੰਡੋ_ea);
+    ਜੇ (opt->jo_curwin)
     {
 	// Create a new buffer in the current window.
-	if (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
+	ਜੇ (!can_abandon(curbuf, flags & ਪਦ_ਸ਼ੁਰੂ_FORCEIT))
 	{
-	    no_write_message();
-	    vim_free(term);
-	    return NULL;
+	    no_write_ਸੁਨੇਹਾ();
+	    vim_free(ਪਦ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	if (do_ecmd(0, NULL, NULL, &split_ea, ECMD_ONE,
-		      (buf_hide(curwin->w_buffer) ? ECMD_HIDE : 0)
-			  + ((flags & TERM_START_FORCEIT) ? ECMD_FORCEIT : 0),
+	ਜੇ (do_ecmd(0, ਨਿਰਾ, ਨਿਰਾ, &ਵੰਡੋ_ea, ECMD_ONE,
+		      (buf_hide(curwin->w_ਬਫਰ) ? ECMD_HIDE : 0)
+			  + ((flags & ਪਦ_ਸ਼ੁਰੂ_FORCEIT) ? ECMD_FORCEIT : 0),
 							       curwin) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(ਪਦ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
-    else if (opt->jo_hidden || (flags & TERM_START_SYSTEM))
+    ਨਹੀਂਤਾਂ ਜੇ (opt->jo_hidden || (flags & ਪਦ_ਸ਼ੁਰੂ_SYSTEM))
     {
 	buf_T *buf;
 
 	// Create a new buffer without a window. Make it the current buffer for
 	// a moment to be able to do the initializations.
-	buf = buflist_new((char_u *)"", NULL, (linenr_T)0,
+	buf = buflist_new((char_u *)"", ਨਿਰਾ, (linenr_T)0,
 							 BLN_NEW | BLN_LISTED);
-	if (buf == NULL || ml_open(buf) == FAIL)
+	ਜੇ (buf == ਨਿਰਾ || ml_open(buf) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(ਪਦ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	old_curbuf = curbuf;
 	--curbuf->b_nwindows;
 	curbuf = buf;
 	save_cursor = curwin->w_cursor;
-	curwin->w_buffer = buf;
+	curwin->w_ਬਫਰ = buf;
 	++curbuf->b_nwindows;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Open a new window or tab.
-	split_ea.cmdidx = CMD_new;
-	split_ea.cmd = (char_u *)"new";
-	split_ea.arg = (char_u *)"";
-	if (opt->jo_term_rows > 0 && !vertical)
+	ਵੰਡੋ_ea.cmdidx = CMD_new;
+	ਵੰਡੋ_ea.cmd = (char_u *)"new";
+	ਵੰਡੋ_ea.arg = (char_u *)"";
+	ਜੇ (opt->jo_ਪਦ_ਪੰਕਤੀਆਂ > 0 && !vertical)
 	{
-	    split_ea.line2 = opt->jo_term_rows;
-	    split_ea.addr_count = 1;
+	    ਵੰਡੋ_ea.line2 = opt->jo_ਪਦ_ਪੰਕਤੀਆਂ;
+	    ਵੰਡੋ_ea.addr_ਗਿਣਤੀ = 1;
 	}
-	if (opt->jo_term_cols > 0 && vertical)
+	ਜੇ (opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ > 0 && vertical)
 	{
-	    split_ea.line2 = opt->jo_term_cols;
-	    split_ea.addr_count = 1;
+	    ਵੰਡੋ_ea.line2 = opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ;
+	    ਵੰਡੋ_ea.addr_ਗਿਣਤੀ = 1;
 	}
 
-	int cmod_split_modified = FALSE;
-	if (vertical)
+	ਪੂਰਨ cmod_ਵੰਡੋ_modified = FALSE;
+	ਜੇ (vertical)
 	{
-	    if (!(cmdmod.cmod_split & WSP_VERT))
-		cmod_split_modified = TRUE;
-	    cmdmod.cmod_split |= WSP_VERT;
+	    ਜੇ (!(cmdmod.cmod_ਵੰਡੋ & WSP_VERT))
+		cmod_ਵੰਡੋ_modified = TRUE;
+	    cmdmod.cmod_ਵੰਡੋ |= WSP_VERT;
 	}
-	ex_splitview(&split_ea);
-	if (cmod_split_modified)
-	    cmdmod.cmod_split &= ~WSP_VERT;
-	if (curwin == old_curwin)
+	ex_splitview(&ਵੰਡੋ_ea);
+	ਜੇ (cmod_ਵੰਡੋ_modified)
+	    cmdmod.cmod_ਵੰਡੋ &= ~WSP_VERT;
+	ਜੇ (curwin == old_curwin)
 	{
 	    // split failed
-	    vim_free(term);
-	    return NULL;
+	    vim_free(ਪਦ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
-    term->tl_buffer = curbuf;
-    curbuf->b_term = term;
+    ਪਦ->tl_ਬਫਰ = curbuf;
+    curbuf->b_ਪਦ = ਪਦ;
 
-    if (!opt->jo_hidden)
+    ਜੇ (!opt->jo_hidden)
     {
 	// Only one size was taken care of with :new, do the other one.  With
 	// "curwin" both need to be done.
-	if (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
-	    win_setheight(opt->jo_term_rows);
-	if (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
-	    win_setwidth(opt->jo_term_cols);
+	ਜੇ (opt->jo_ਪਦ_ਪੰਕਤੀਆਂ > 0 && (opt->jo_curwin || vertical))
+	    win_setheight(opt->jo_ਪਦ_ਪੰਕਤੀਆਂ);
+	ਜੇ (opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ > 0 && (opt->jo_curwin || !vertical))
+	    win_setwidth(opt->jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ);
     }
 
     // Link the new terminal in the list of active terminals.
-    term->tl_next = first_term;
-    first_term = term;
+    ਪਦ->tl_ਅਗਲਾ = ਪਹਿਲਾ_ਪਦ;
+    ਪਹਿਲਾ_ਪਦ = ਪਦ;
 
-    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPRE, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
 
-    if (opt->jo_term_name != NULL)
+    ਜੇ (opt->jo_ਪਦ_name != ਨਿਰਾ)
     {
 	vim_free(curbuf->b_ffname);
-	curbuf->b_ffname = vim_strsave(opt->jo_term_name);
+	curbuf->b_ffname = vim_strsave(opt->jo_ਪਦ_name);
     }
-    else if (argv != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (argv != ਨਿਰਾ)
     {
 	vim_free(curbuf->b_ffname);
 	curbuf->b_ffname = vim_strsave((char_u *)"!system");
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int	i;
+	ਪੂਰਨ	i;
 	size_t	len;
 	char_u	*cmd, *p;
 
-	if (argvar->v_type == VAR_STRING)
+	ਜੇ (argvar->v_type == VAR_STRING)
 	{
 	    cmd = argvar->vval.v_string;
-	    if (cmd == NULL)
+	    ਜੇ (cmd == ਨਿਰਾ)
 		cmd = (char_u *)"";
-	    else if (STRCMP(cmd, "NONE") == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "NONE") == 0)
 		cmd = (char_u *)"pty";
 	}
-	else if (argvar->v_type != VAR_LIST
-		|| argvar->vval.v_list == NULL
+	ਨਹੀਂਤਾਂ ਜੇ (argvar->v_type != VAR_LIST
+		|| argvar->vval.v_list == ਨਿਰਾ
 		|| argvar->vval.v_list->lv_len == 0
 		|| (cmd = tv_get_string_chk(
-			       &argvar->vval.v_list->lv_first->li_tv)) == NULL)
+			       &argvar->vval.v_list->lv_ਪਹਿਲਾ->li_tv)) == ਨਿਰਾ)
 	    cmd = (char_u*)"";
 
 	len = STRLEN(cmd) + 10;
 	p = alloc(len);
 
-	for (i = 0; p != NULL; ++i)
+	ਲਈ (i = 0; p != ਨਿਰਾ; ++i)
 	{
 	    // Prepend a ! to the command name to avoid the buffer name equals
 	    // the executable, otherwise ":w!" would overwrite it.
-	    if (i == 0)
-		vim_snprintf((char *)p, len, "!%s", cmd);
-	    else
-		vim_snprintf((char *)p, len, "!%s (%d)", cmd, i);
-	    if (buflist_findname(p) == NULL)
+	    ਜੇ (i == 0)
+		vim_snprintf((ਅੱਖਰ *)p, len, "!%s", cmd);
+	    ਨਹੀਂਤਾਂ
+		vim_snprintf((ਅੱਖਰ *)p, len, "!%s (%d)", cmd, i);
+	    ਜੇ (buflist_findname(p) == ਨਿਰਾ)
 	    {
 		vim_free(curbuf->b_ffname);
 		curbuf->b_ffname = p;
-		break;
+		ਰੋਕੋ;
 	    }
 	}
     }
@@ -635,15 +635,15 @@ term_start(
     curbuf->b_sfname = vim_strsave(curbuf->b_ffname);
     curbuf->b_fname = curbuf->b_ffname;
 
-    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPOST, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
 
-    if (opt->jo_term_opencmd != NULL)
-	term->tl_opencmd = vim_strsave(opt->jo_term_opencmd);
+    ਜੇ (opt->jo_ਪਦ_opencmd != ਨਿਰਾ)
+	ਪਦ->tl_opencmd = vim_strsave(opt->jo_ਪਦ_opencmd);
 
-    if (opt->jo_eof_chars != NULL)
-	term->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
+    ਜੇ (opt->jo_eof_chars != ਨਿਰਾ)
+	ਪਦ->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
 
-    set_string_option_direct((char_u *)"buftype", -1,
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"buftype", -1,
 				  (char_u *)"terminal", OPT_FREE|OPT_LOCAL, 0);
     // Avoid that 'buftype' is reset when this buffer is entered.
     curbuf->b_p_initialized = true;
@@ -652,132 +652,132 @@ term_start(
     // the job finished.
     curbuf->b_p_ma = FALSE;
 
-    set_term_and_win_size(term, opt);
-#ifdef MSWIN
-    mch_memmove(orig_opt.jo_io, opt->jo_io, sizeof(orig_opt.jo_io));
-#endif
-    setup_job_options(opt, term->tl_rows, term->tl_cols);
+    ਸੈੱਟ_ਪਦ_and_win_ਮਾਪ(ਪਦ, opt);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    mch_memmove(orig_opt.jo_io, opt->jo_io, ਆਕਾਰ(orig_opt.jo_io));
+#ਜੇ_ਅੰਤ
+    ਤਿਆਰੀ_ਕੰਮ_options(opt, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
 
-    if (flags & TERM_START_NOJOB)
-	return curbuf;
+    ਜੇ (flags & ਪਦ_ਸ਼ੁਰੂ_NOJOB)
+	ਵਾਪਸ curbuf;
 
-#if defined(FEAT_SESSION)
+#ਜੇ defined(FEAT_SESSION)
     // Remember the command for the session file.
-    if (opt->jo_term_norestore || argv != NULL)
-	term->tl_command = vim_strsave((char_u *)"NONE");
-    else if (argvar->v_type == VAR_STRING)
+    ਜੇ (opt->jo_ਪਦ_norestore || argv != ਨਿਰਾ)
+	ਪਦ->tl_command = vim_strsave((char_u *)"NONE");
+    ਨਹੀਂਤਾਂ ਜੇ (argvar->v_type == VAR_STRING)
     {
 	char_u	*cmd = argvar->vval.v_string;
 
-	if (cmd != NULL && STRCMP(cmd, p_sh) != 0)
-	    term->tl_command = vim_strsave(cmd);
+	ਜੇ (cmd != ਨਿਰਾ && STRCMP(cmd, p_sh) != 0)
+	    ਪਦ->tl_command = vim_strsave(cmd);
     }
-    else if (argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
+    ਨਹੀਂਤਾਂ ਜੇ (argvar->v_type == VAR_LIST
+	    && argvar->vval.v_list != ਨਿਰਾ
 	    && argvar->vval.v_list->lv_len > 0)
     {
 	garray_T	ga;
-	listitem_T	*item;
+	listitem_T	*ਵਸਤੂ;
 
 	ga_init2(&ga, 1, 100);
-	FOR_ALL_LIST_ITEMS(argvar->vval.v_list, item)
+	FOR_ALL_LIST_ਚੀਜ਼ਾਂ(argvar->vval.v_list, ਵਸਤੂ)
 	{
-	    char_u *s = tv_get_string_chk(&item->li_tv);
+	    char_u *s = tv_get_string_chk(&ਵਸਤੂ->li_tv);
 	    char_u *p;
 
-	    if (s == NULL)
-		break;
+	    ਜੇ (s == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    p = vim_strsave_fnameescape(s, VSE_NONE);
-	    if (p == NULL)
-		break;
+	    ਜੇ (p == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    ga_concat(&ga, p);
 	    vim_free(p);
 	    ga_append(&ga, ' ');
 	}
-	if (item == NULL)
+	ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 	{
 	    ga_append(&ga, NUL);
-	    term->tl_command = ga.ga_data;
+	    ਪਦ->tl_command = ga.ga_ਅੰਕੜੇ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    ga_clear(&ga);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (opt->jo_term_kill != NULL)
+    ਜੇ (opt->jo_ਪਦ_kill != ਨਿਰਾ)
     {
-	char_u *p = skiptowhite(opt->jo_term_kill);
+	char_u *p = skiptowhite(opt->jo_ਪਦ_kill);
 
-	term->tl_kill = vim_strnsave(opt->jo_term_kill, p - opt->jo_term_kill);
+	ਪਦ->tl_kill = vim_strnsave(opt->jo_ਪਦ_kill, p - opt->jo_ਪਦ_kill);
     }
 
-    if (opt->jo_term_api != NULL)
+    ਜੇ (opt->jo_ਪਦ_api != ਨਿਰਾ)
     {
-	char_u *p = skiptowhite(opt->jo_term_api);
+	char_u *p = skiptowhite(opt->jo_ਪਦ_api);
 
-	term->tl_api = vim_strnsave(opt->jo_term_api, p - opt->jo_term_api);
+	ਪਦ->tl_api = vim_strnsave(opt->jo_ਪਦ_api, p - opt->jo_ਪਦ_api);
     }
-    else
-	term->tl_api = vim_strsave((char_u *)"Tapi_");
+    ਨਹੀਂਤਾਂ
+	ਪਦ->tl_api = vim_strsave((char_u *)"Tapi_");
 
-    if (opt->jo_set2 & JO2_TERM_HIGHLIGHT)
-	term->tl_highlight_name = vim_strsave(opt->jo_term_highlight);
+    ਜੇ (opt->jo_set2 & JO2_ਪਦ_HIGHLIGHT)
+	ਪਦ->tl_highlight_name = vim_strsave(opt->jo_ਪਦ_highlight);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Save the user-defined palette, it is only used in GUI (or 'tgc' is on).
-    if (opt->jo_set2 & JO2_ANSI_COLORS)
+    ਜੇ (opt->jo_set2 & JO2_ANSI_COLORS)
     {
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-	if (term->tl_palette == NULL)
+	ਪਦ->tl_palette = ALLOC_MULT(long_u, 16);
+	ਜੇ (ਪਦ->tl_palette == ਨਿਰਾ)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(ਪਦ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	memcpy(term->tl_palette, opt->jo_ansi_colors, sizeof(long_u) * 16);
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ(ਪਦ->tl_palette, opt->jo_ansi_colors, ਆਕਾਰ(long_u) * 16);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     // System dependent: setup the vterm and maybe start the job in it.
-    if (argv == NULL
+    ਜੇ (argv == ਨਿਰਾ
 	    && argvar->v_type == VAR_STRING
-	    && argvar->vval.v_string != NULL
+	    && argvar->vval.v_string != ਨਿਰਾ
 	    && STRCMP(argvar->vval.v_string, "NONE") == 0)
-	res = create_pty_only(term, opt);
-    else
-	res = term_and_job_init(term, argvar, argv, opt, &orig_opt);
+	res = create_pty_only(ਪਦ, opt);
+    ਨਹੀਂਤਾਂ
+	res = ਪਦ_and_ਕੰਮ_init(ਪਦ, argvar, argv, opt, &orig_opt);
 
     newbuf = curbuf;
-    if (res == OK)
+    ਜੇ (res == OK)
     {
 	// Get and remember the size we ended up with.  Update the pty.
-	vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-	term_report_winsize(term, term->tl_rows, term->tl_cols);
-#ifdef FEAT_GUI
-	if (term->tl_system)
+	vterm_get_ਮਾਪ(ਪਦ->tl_vterm, &ਪਦ->tl_ਪੰਕਤੀਆਂ, &ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
+	ਪਦ_report_winsize(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (ਪਦ->tl_system)
 	{
 	    // display first line below typed command
-	    term->tl_toprow = msg_row + 1;
-	    term->tl_dirty_row_end = 0;
+	    ਪਦ->tl_toprow = ਸੁਨੇਹਾ_ਪੰਕਤੀ + 1;
+	    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = 0;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// Make sure we don't get stuck on sending keys to the job, it leads to
 	// a deadlock if the job is waiting for Vim to read.
-	channel_set_nonblock(term->tl_job->jv_channel, PART_IN);
+	channel_ਸੈੱਟ_nonblock(ਪਦ->tl_ਕੰਮ->jv_channel, PART_ਵਿੱਚ);
 
-	if (old_curbuf != NULL)
+	ਜੇ (old_curbuf != ਨਿਰਾ)
 	{
 	    --curbuf->b_nwindows;
 	    curbuf = old_curbuf;
-	    curwin->w_buffer = curbuf;
+	    curwin->w_ਬਫਰ = curbuf;
 	    curwin->w_cursor = save_cursor;
 	    ++curbuf->b_nwindows;
 	}
-	else if (vgetc_busy
-#ifdef FEAT_TIMERS
+	ਨਹੀਂਤਾਂ ਜੇ (vgetc_busy
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TIMERS
 		|| timer_busy
-#endif
-		|| input_busy)
+#ਜੇ_ਅੰਤ
+		|| ਨਿਵੇਸ਼_busy)
 	{
 	    char_u ignore[4];
 
@@ -791,211 +791,211 @@ term_start(
 	    typebuf_was_filled = TRUE;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	term_close_buffer(curbuf, old_curbuf);
-	return NULL;
+	ਪਦ_close_ਬਫਰ(curbuf, old_curbuf);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    apply_autocmds(EVENT_TERMINALOPEN, NULL, NULL, FALSE, newbuf);
-    if (!opt->jo_hidden && !(flags & TERM_START_SYSTEM))
-	apply_autocmds(EVENT_TERMINALWINOPEN, NULL, NULL, FALSE, newbuf);
-    return newbuf;
+    apply_autocmds(EVENT_TERMINALOPEN, ਨਿਰਾ, ਨਿਰਾ, FALSE, newbuf);
+    ਜੇ (!opt->jo_hidden && !(flags & ਪਦ_ਸ਼ੁਰੂ_SYSTEM))
+	apply_autocmds(EVENT_TERMINALWINOPEN, ਨਿਰਾ, ਨਿਰਾ, FALSE, newbuf);
+    ਵਾਪਸ newbuf;
 }
 
 /*
  * ":terminal": open a terminal window and execute a job in it.
  */
-    void
+    ਖਾਲੀ
 ex_terminal(exarg_T *eap)
 {
     typval_T	argvar[2];
     jobopt_T	opt;
-    int		opt_shell = FALSE;
+    ਪੂਰਨ		opt_shell = FALSE;
     char_u	*cmd;
-    char_u	*tofree = NULL;
-    int		scroll_save = msg_scroll;
+    char_u	*tofree = ਨਿਰਾ;
+    ਪੂਰਨ		scroll_save = ਸੁਨੇਹਾ_scroll;
 
-    msg_scroll = FALSE;		// don't scroll here
+    ਸੁਨੇਹਾ_scroll = FALSE;		// don't scroll here
     autowrite_all();
-    msg_scroll = scroll_save;
+    ਸੁਨੇਹਾ_scroll = scroll_save;
 
-    init_job_options(&opt);
+    init_ਕੰਮ_options(&opt);
 
     cmd = eap->arg;
-    while (*cmd == '+' && *(cmd + 1) == '+')
+    ਜਦੋਂ (*cmd == '+' && *(cmd + 1) == '+')
     {
 	char_u  *p, *ep;
 
 	cmd += 2;
 	p = skiptowhite(cmd);
 	ep = vim_strchr(cmd, '=');
-	if (ep != NULL)
+	ਜੇ (ep != ਨਿਰਾ)
 	{
-	    if (ep < p)
+	    ਜੇ (ep < p)
 		p = ep;
-	    else
-		ep = NULL;
+	    ਨਹੀਂਤਾਂ
+		ep = ਨਿਰਾ;
 	}
 
 	// Note: Keep this in sync with get_terminalopt_name.
 
-#define OPTARG_HAS(name) ((int)(p - cmd) == sizeof(name) - 1 \
-				 && STRNICMP(cmd, name, sizeof(name) - 1) == 0)
-	if (OPTARG_HAS("close"))
-	    opt.jo_term_finish = 'c';
-	else if (OPTARG_HAS("noclose"))
-	    opt.jo_term_finish = 'n';
-	else if (OPTARG_HAS("open"))
-	    opt.jo_term_finish = 'o';
-	else if (OPTARG_HAS("curwin"))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPTARG_HAS(name) ((ਪੂਰਨ)(p - cmd) == ਆਕਾਰ(name) - 1 \
+				 && STRNICMP(cmd, name, ਆਕਾਰ(name) - 1) == 0)
+	ਜੇ (OPTARG_HAS("close"))
+	    opt.jo_ਪਦ_ਅੰਤ = 'c';
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("noclose"))
+	    opt.jo_ਪਦ_ਅੰਤ = 'n';
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("open"))
+	    opt.jo_ਪਦ_ਅੰਤ = 'o';
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("curwin"))
 	    opt.jo_curwin = 1;
-	else if (OPTARG_HAS("hidden"))
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("hidden"))
 	    opt.jo_hidden = 1;
-	else if (OPTARG_HAS("norestore"))
-	    opt.jo_term_norestore = 1;
-	else if (OPTARG_HAS("shell"))
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("norestore"))
+	    opt.jo_ਪਦ_norestore = 1;
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("shell"))
 	    opt_shell = TRUE;
-	else if (OPTARG_HAS("kill") && ep != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("kill") && ep != ਨਿਰਾ)
 	{
-	    opt.jo_set2 |= JO2_TERM_KILL;
-	    opt.jo_term_kill = ep + 1;
+	    opt.jo_set2 |= JO2_ਪਦ_KILL;
+	    opt.jo_ਪਦ_kill = ep + 1;
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("api"))
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("api"))
 	{
-	    opt.jo_set2 |= JO2_TERM_API;
-	    if (ep != NULL)
+	    opt.jo_set2 |= JO2_ਪਦ_API;
+	    ਜੇ (ep != ਨਿਰਾ)
 	    {
-		opt.jo_term_api = ep + 1;
+		opt.jo_ਪਦ_api = ep + 1;
 		p = skiptowhite(cmd);
 	    }
-	    else
-		opt.jo_term_api = NULL;
+	    ਨਹੀਂਤਾਂ
+		opt.jo_ਪਦ_api = ਨਿਰਾ;
 	}
-	else if (OPTARG_HAS("rows") && ep != NULL && SAFE_isdigit(ep[1]))
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("rows") && ep != ਨਿਰਾ && ਸੁਰੱਖਿਅਤ_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_ROWS;
-	    opt.jo_term_rows = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_ਪਦ_ਪੰਕਤੀਆਂ;
+	    opt.jo_ਪਦ_ਪੰਕਤੀਆਂ = atoi((ਅੱਖਰ *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("cols") && ep != NULL && SAFE_isdigit(ep[1]))
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("cols") && ep != ਨਿਰਾ && ਸੁਰੱਖਿਅਤ_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_COLS;
-	    opt.jo_term_cols = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ;
+	    opt.jo_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ = atoi((ਅੱਖਰ *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("eof") && ep != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (OPTARG_HAS("eof") && ep != ਨਿਰਾ)
 	{
-	    char_u *buf = NULL;
-	    char_u *keys;
+	    char_u *buf = ਨਿਰਾ;
+	    char_u *ਕੁੰਜੀਆਂ;
 
 	    vim_free(opt.jo_eof_chars);
 	    p = skiptowhite(cmd);
 	    *p = NUL;
-	    keys = replace_termcodes(ep + 1, &buf, 0,
-		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, NULL);
+	    ਕੁੰਜੀਆਂ = replace_termcodes(ep + 1, &buf, 0,
+		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, ਨਿਰਾ);
 	    opt.jo_set2 |= JO2_EOF_CHARS;
-	    opt.jo_eof_chars = vim_strsave(keys);
+	    opt.jo_eof_chars = vim_strsave(ਕੁੰਜੀਆਂ);
 	    vim_free(buf);
 	    *p = ' ';
 	}
-#ifdef MSWIN
-	else if ((int)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
-								 && ep != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਨਹੀਂਤਾਂ ਜੇ ((ਪੂਰਨ)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
+								 && ep != ਨਿਰਾ)
 	{
-	    int tty_type = NUL;
+	    ਪੂਰਨ tty_type = NUL;
 
 	    p = skiptowhite(cmd);
-	    if (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
+	    ਜੇ (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
 		tty_type = 'w';
-	    else if (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
 		tty_type = 'c';
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "type");
-		goto theend;
+		semsg(_(e_invalid_ਮੁੱਲ_for_ਦਲੀਲ_str), "type");
+		ਜਾਓ theend;
 	    }
 	    opt.jo_set2 |= JO2_TTY_TYPE;
 	    opt.jo_tty_type = tty_type;
 	}
-#endif
-	else
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ
 	{
-	    if (*p)
+	    ਜੇ (*p)
 		*p = NUL;
 	    semsg(_(e_invalid_attribute_str), cmd);
-	    goto theend;
+	    ਜਾਓ theend;
 	}
-#undef OPTARG_HAS
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ OPTARG_HAS
 	cmd = skipwhite(p);
     }
-    if (*cmd == NUL)
+    ਜੇ (*cmd == NUL)
     {
 	// Make a copy of 'shell', an autocommand may change the option.
 	tofree = cmd = vim_strsave(p_sh);
 
 	// default to close when the shell exits
-	if (opt.jo_term_finish == NUL)
-	    opt.jo_term_finish = TL_FINISH_CLOSE;
+	ਜੇ (opt.jo_ਪਦ_ਅੰਤ == NUL)
+	    opt.jo_ਪਦ_ਅੰਤ = TL_ਅੰਤ_CLOSE;
     }
 
-    if (eap->addr_count > 0)
+    ਜੇ (eap->addr_ਗਿਣਤੀ > 0)
     {
 	// Write lines from current buffer to the job.
-	opt.jo_set |= JO_IN_IO | JO_IN_BUF | JO_IN_TOP | JO_IN_BOT;
-	opt.jo_io[PART_IN] = JIO_BUFFER;
-	opt.jo_io_buf[PART_IN] = curbuf->b_fnum;
-	opt.jo_in_top = eap->line1;
-	opt.jo_in_bot = eap->line2;
+	opt.jo_ਸੈੱਟ |= JO_ਵਿੱਚ_IO | JO_ਵਿੱਚ_BUF | JO_ਵਿੱਚ_ਸਿਖਰ | JO_ਵਿੱਚ_BOT;
+	opt.jo_io[PART_ਵਿੱਚ] = JIO_ਬਫਰ;
+	opt.jo_io_buf[PART_ਵਿੱਚ] = curbuf->b_fnum;
+	opt.jo_ਵਿੱਚ_ਸਿਖਰ = eap->line1;
+	opt.jo_ਵਿੱਚ_bot = eap->line2;
     }
 
-    if (opt_shell && tofree == NULL)
+    ਜੇ (opt_shell && tofree == ਨਿਰਾ)
     {
-#ifdef UNIX
-	char	**argv = NULL;
-	char_u	*tofree1 = NULL;
-	char_u	*tofree2 = NULL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+	ਅੱਖਰ	**argv = ਨਿਰਾ;
+	char_u	*tofree1 = ਨਿਰਾ;
+	char_u	*tofree2 = ਨਿਰਾ;
 
 	// :term ++shell command
-	if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
-	    term_start(NULL, argv, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+	ਜੇ (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
+	    ਪਦ_ਸ਼ੁਰੂ(ਨਿਰਾ, argv, &opt, eap->forceit ? ਪਦ_ਸ਼ੁਰੂ_FORCEIT : 0);
 	vim_free(argv);
 	vim_free(tofree1);
 	vim_free(tofree2);
-	goto theend;
-#else
+	ਜਾਓ theend;
+#ਨਹੀਂਤਾਂ
 # ifdef MSWIN
 	long_u	    cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 	char_u	    *newcmd;
 
 	newcmd = alloc(cmdlen);
-	if (newcmd == NULL)
-	    goto theend;
+	ਜੇ (newcmd == ਨਿਰਾ)
+	    ਜਾਓ theend;
 	tofree = newcmd;
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	vim_snprintf((ਅੱਖਰ *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
 	cmd = newcmd;
-# else
+# ਨਹੀਂਤਾਂ
 	emsg(_(e_sorry_plusplusshell_not_supported_on_this_system));
-	goto theend;
+	ਜਾਓ theend;
 # endif
-#endif
+#ਜੇ_ਅੰਤ
     }
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = cmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    term_start(argvar, NULL, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+    ਪਦ_ਸ਼ੁਰੂ(argvar, ਨਿਰਾ, &opt, eap->forceit ? ਪਦ_ਸ਼ੁਰੂ_FORCEIT : 0);
 
 theend:
     vim_free(tofree);
     vim_free(opt.jo_eof_chars);
 }
 
-    static char_u *
-get_terminalopt_name(expand_T *xp UNUSED, int idx)
+    ਸਥਿਰ char_u *
+get_terminalopt_name(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
     // Note: Keep this in sync with ex_terminal.
-    static char *(p_termopt_values[]) =
+    ਸਥਿਰ ਅੱਖਰ *(p_termopt_ਮੁੱਲਾਂ[]) =
     {
 	"close",
 	"noclose",
@@ -1012,18 +1012,18 @@ get_terminalopt_name(expand_T *xp UNUSED, int idx)
 	"api=",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termopt_values))
-	return (char_u*)p_termopt_values[idx];
-    return NULL;
+    ਜੇ (idx < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(p_termopt_ਮੁੱਲਾਂ))
+	ਵਾਪਸ (char_u*)p_termopt_ਮੁੱਲਾਂ[idx];
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static char_u *
-get_termkill_name(expand_T *xp UNUSED, int idx)
+    ਸਥਿਰ char_u *
+get_termkill_name(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
     // These are platform-specific values used for job_stop(). They are defined
     // in each platform's mch_signal_job(). Just use a unified auto-complete
     // list for simplicity.
-    static char *(p_termkill_values[]) =
+    ਸਥਿਰ ਅੱਖਰ *(p_termkill_ਮੁੱਲਾਂ[]) =
     {
 	"term",
 	"hup",
@@ -1033,160 +1033,160 @@ get_termkill_name(expand_T *xp UNUSED, int idx)
 	"winch",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termkill_values))
-	return (char_u*)p_termkill_values[idx];
-    return NULL;
+    ਜੇ (idx < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(p_termkill_ਮੁੱਲਾਂ))
+	ਵਾਪਸ (char_u*)p_termkill_ਮੁੱਲਾਂ[idx];
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Command-line expansion for :terminal [options]
  */
-    int
+    ਪੂਰਨ
 expand_terminal_opt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	ਪੂਰਨ	    *ਅੰਕ_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > xp->xp_ਸਤਰ && *(xp->xp_ਨਮੂਨਾ-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, ਪੂਰਨ) = ਨਿਰਾ;
 
-	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 4
-		&& STRNCMP(name_end - 4, "kill", 4) == 0)
+	char_u *name_ਸਿਰਾ = xp->xp_ਨਮੂਨਾ - 1;
+	ਜੇ (name_ਸਿਰਾ - xp->xp_ਸਤਰ >= 4
+		&& STRNCMP(name_ਸਿਰਾ - 4, "kill", 4) == 0)
 	    cb = get_termkill_name;
 
-	if (cb != NULL)
+	ਜੇ (cb != ਨਿਰਾ)
 	{
-	    return ExpandGeneric(
+	    ਵਾਪਸ ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    ਅੰਕ_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    return ExpandGeneric(
+    ਵਾਪਸ ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    ਅੰਕ_Matches,
 	    get_terminalopt_name,
 	    FALSE);
 }
 
-#if defined(FEAT_SESSION)
+#ਜੇ defined(FEAT_SESSION)
 /*
  * Write a :terminal command to the session file to restore the terminal in
  * window "wp".
  * Return FAIL if writing fails.
  */
-    int
-term_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
+    ਪੂਰਨ
+ਪਦ_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
 {
-    const int	bufnr = wp->w_buffer->b_fnum;
-    term_T	*term = wp->w_buffer->b_term;
+    ਅਚਲ ਪੂਰਨ	bufnr = wp->w_ਬਫਰ->b_fnum;
+    ਪਦ_T	*ਪਦ = wp->w_ਬਫਰ->b_ਪਦ;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    ਜੇ (terminal_bufs != ਨਿਰਾ && wp->w_ਬਫਰ->b_nwindows > 1)
     {
 	// There are multiple views into this terminal buffer. We don't want to
 	// create the terminal multiple times. If it's the first time, create,
 	// otherwise link to the first buffer.
-	char	    id_as_str[NUMBUFLEN];
-	hashitem_T  *entry;
+	ਅੱਖਰ	    id_as_str[NUMBUFLEN];
+	hashitem_T  *ਇੰਦਰਾਜ;
 
-	vim_snprintf(id_as_str, sizeof(id_as_str), "%d", bufnr);
+	vim_snprintf(id_as_str, ਆਕਾਰ(id_as_str), "%d", bufnr);
 
-	entry = hash_find(terminal_bufs, (char_u *)id_as_str);
-	if (!HASHITEM_EMPTY(entry))
+	ਇੰਦਰਾਜ = hash_ਲੱਭੋ(terminal_bufs, (char_u *)id_as_str);
+	ਜੇ (!HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(ਇੰਦਰਾਜ))
 	{
 	    // we've already opened this terminal buffer
-	    if (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
-		return FAIL;
-	    return put_eol(fd);
+	    ਜੇ (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
+		ਵਾਪਸ FAIL;
+	    ਵਾਪਸ put_eol(fd);
 	}
     }
 
     // Create the terminal and run the command.  This is not without
     // risk, but let's assume the user only creates a session when this
     // will be OK.
-    if (fprintf(fd, "exe ':terminal ++curwin"
+    ਜੇ (fprintf(fd, "exe ':terminal ++curwin"
 		" ++cols=' .. ((&columns * %d + %ld) / %ld)"
 		" .. ' ++rows=' .. ((&lines * %d + %ld) / %ld) ",
-		term->tl_cols, Columns / 2, Columns,
-		term->tl_rows, Rows / 2, Rows) < 0)
-	return FAIL;
+		ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ, Columns / 2, Columns,
+		ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪੰਕਤੀਆਂ / 2, ਪੰਕਤੀਆਂ) < 0)
+	ਵਾਪਸ FAIL;
 # ifdef MSWIN
-    if (fprintf(fd, ".. ' ++type=%s' ", term->tl_job->jv_tty_type) < 0)
-	return FAIL;
+    ਜੇ (fprintf(fd, ".. ' ++type=%s' ", ਪਦ->tl_ਕੰਮ->jv_tty_type) < 0)
+	ਵਾਪਸ FAIL;
 # endif
-    if (term->tl_command != NULL)
+    ਜੇ (ਪਦ->tl_command != ਨਿਰਾ)
     {
-	char_u *quoted_command = string_quote(term->tl_command, FALSE);
-	if (quoted_command == NULL)
-	    return FAIL;
+	char_u *quoted_command = string_quote(ਪਦ->tl_command, FALSE);
+	ਜੇ (quoted_command == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	int ret = fputs(".. ' ' .. ", fd) < 0
-		    || fputs((char *)quoted_command, fd) < 0;
+	ਪੂਰਨ ret = fputs(".. ' ' .. ", fd) < 0
+		    || fputs((ਅੱਖਰ *)quoted_command, fd) < 0;
 	vim_free(quoted_command);
-	if (ret)
-	    return FAIL;
+	ਜੇ (ret)
+	    ਵਾਪਸ FAIL;
     }
-    if (put_eol(fd) != OK)
-	return FAIL;
+    ਜੇ (put_eol(fd) != OK)
+	ਵਾਪਸ FAIL;
 
-    if (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
-	return FAIL;
+    ਜੇ (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
+	ਵਾਪਸ FAIL;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    ਜੇ (terminal_bufs != ਨਿਰਾ && wp->w_ਬਫਰ->b_nwindows > 1)
     {
-	char *hash_key = alloc(NUMBUFLEN);
+	ਅੱਖਰ *hash_ਕੁੰਜੀ = alloc(NUMBUFLEN);
 
-	vim_snprintf(hash_key, NUMBUFLEN, "%d", bufnr);
-	hash_add(terminal_bufs, (char_u *)hash_key, "terminal session");
+	vim_snprintf(hash_ਕੁੰਜੀ, NUMBUFLEN, "%d", bufnr);
+	hash_ਜੋੜੋ(terminal_bufs, (char_u *)hash_ਕੁੰਜੀ, "terminal session");
     }
 
-    return put_eol(fd);
+    ਵਾਪਸ put_eol(fd);
 }
 
 /*
  * Return TRUE if "buf" has a terminal that should be restored.
  */
-    int
-term_should_restore(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_should_restore(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
+    ਪਦ_T	*ਪਦ = buf->b_ਪਦ;
 
-    return term != NULL && (term->tl_command == NULL
-				     || STRCMP(term->tl_command, "NONE") != 0);
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ && (ਪਦ->tl_command == ਨਿਰਾ
+				     || STRCMP(ਪਦ->tl_command, "NONE") != 0);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Free the scrollback buffer for "term".
  */
-    static void
-free_scrollback(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+free_scrollback(ਪਦ_T *ਪਦ)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    for (i = 0; i < term->tl_scrollback.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback);
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback_postponed.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback_postponed);
+    ਲਈ (i = 0; i < ਪਦ->tl_scrollback.ga_len; ++i)
+	vim_free(((sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ + i)->sb_cells);
+    ga_clear(&ਪਦ->tl_scrollback);
+    ਲਈ (i = 0; i < ਪਦ->tl_scrollback_postponed.ga_len; ++i)
+	vim_free(((sb_ਸਤਰ_T *)ਪਦ->tl_scrollback_postponed.ga_ਅੰਕੜੇ + i)->sb_cells);
+    ga_clear(&ਪਦ->tl_scrollback_postponed);
 }
 
 
 // Terminals that need to be freed soon.
-static term_T	*terminals_to_free = NULL;
+ਸਥਿਰ ਪਦ_T	*terminals_ਮੰਜ਼ਿਲ_free = ਨਿਰਾ;
 
 /*
  * Free a terminal and everything it refers to.
@@ -1196,73 +1196,73 @@ static term_T	*terminals_to_free = NULL;
  * because callbacks may wipe out a buffer while the terminal is still
  * referenced.
  */
-    void
+    ਖਾਲੀ
 free_terminal(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
-    term_T	*tp;
+    ਪਦ_T	*ਪਦ = buf->b_ਪਦ;
+    ਪਦ_T	*tp;
 
-    if (term == NULL)
-	return;
+    ਜੇ (ਪਦ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Unlink the terminal form the list of terminals.
-    if (first_term == term)
-	first_term = term->tl_next;
-    else
-	for (tp = first_term; tp->tl_next != NULL; tp = tp->tl_next)
-	    if (tp->tl_next == term)
+    ਜੇ (ਪਹਿਲਾ_ਪਦ == ਪਦ)
+	ਪਹਿਲਾ_ਪਦ = ਪਦ->tl_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	ਲਈ (tp = ਪਹਿਲਾ_ਪਦ; tp->tl_ਅਗਲਾ != ਨਿਰਾ; tp = tp->tl_ਅਗਲਾ)
+	    ਜੇ (tp->tl_ਅਗਲਾ == ਪਦ)
 	    {
-		tp->tl_next = term->tl_next;
-		break;
+		tp->tl_ਅਗਲਾ = ਪਦ->tl_ਅਗਲਾ;
+		ਰੋਕੋ;
 	    }
 
-    if (term->tl_job != NULL)
+    ਜੇ (ਪਦ->tl_ਕੰਮ != ਨਿਰਾ)
     {
-	if (term->tl_job->jv_status != JOB_ENDED
-		&& term->tl_job->jv_status != JOB_FINISHED
-		&& term->tl_job->jv_status != JOB_FAILED)
-	    job_stop(term->tl_job, NULL, "kill");
-	job_unref(term->tl_job);
+	ਜੇ (ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ != ਕੰਮ_ENDED
+		&& ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ != ਕੰਮ_ਮੁਕੰਮਲ
+		&& ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ != ਕੰਮ_FAILED)
+	    ਕੰਮ_stop(ਪਦ->tl_ਕੰਮ, ਨਿਰਾ, "kill");
+	ਕੰਮ_unref(ਪਦ->tl_ਕੰਮ);
     }
-    term->tl_next = terminals_to_free;
-    terminals_to_free = term;
+    ਪਦ->tl_ਅਗਲਾ = terminals_ਮੰਜ਼ਿਲ_free;
+    terminals_ਮੰਜ਼ਿਲ_free = ਪਦ;
 
-    buf->b_term = NULL;
-    if (in_terminal_loop == term)
-	in_terminal_loop = NULL;
+    buf->b_ਪਦ = ਨਿਰਾ;
+    ਜੇ (ਵਿੱਚ_terminal_loop == ਪਦ)
+	ਵਿੱਚ_terminal_loop = ਨਿਰਾ;
 }
 
-    void
-free_unused_terminals(void)
+    ਖਾਲੀ
+free_ਅਣਵਰਤਿਆ_terminals(ਖਾਲੀ)
 {
-    while (terminals_to_free != NULL)
+    ਜਦੋਂ (terminals_ਮੰਜ਼ਿਲ_free != ਨਿਰਾ)
     {
-	term_T	    *term = terminals_to_free;
+	ਪਦ_T	    *ਪਦ = terminals_ਮੰਜ਼ਿਲ_free;
 
-	terminals_to_free = term->tl_next;
+	terminals_ਮੰਜ਼ਿਲ_free = ਪਦ->tl_ਅਗਲਾ;
 
-	free_scrollback(term);
-	ga_clear(&term->tl_osc_buf);
+	free_scrollback(ਪਦ);
+	ga_clear(&ਪਦ->tl_osc_buf);
 
-	term_free_vterm(term);
-	vim_free(term->tl_api);
-	vim_free(term->tl_title);
-#ifdef FEAT_SESSION
-	vim_free(term->tl_command);
-#endif
-	vim_free(term->tl_kill);
-	vim_free(term->tl_status_text);
-	vim_free(term->tl_opencmd);
-	vim_free(term->tl_eof_chars);
-	vim_free(term->tl_arg0_cmd);
-#ifdef MSWIN
-	if (term->tl_out_fd != NULL)
-	    fclose(term->tl_out_fd);
-#endif
-	vim_free(term->tl_highlight_name);
-	vim_free(term->tl_cursor_color);
-	vim_free(term->tl_palette);
-	vim_free(term);
+	ਪਦ_free_vterm(ਪਦ);
+	vim_free(ਪਦ->tl_api);
+	vim_free(ਪਦ->tl_title);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SESSION
+	vim_free(ਪਦ->tl_command);
+#ਜੇ_ਅੰਤ
+	vim_free(ਪਦ->tl_kill);
+	vim_free(ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ);
+	vim_free(ਪਦ->tl_opencmd);
+	vim_free(ਪਦ->tl_eof_chars);
+	vim_free(ਪਦ->tl_arg0_cmd);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਜੇ (ਪਦ->tl_ਬਾਹਰਲਾ_fd != ਨਿਰਾ)
+	    fclose(ਪਦ->tl_ਬਾਹਰਲਾ_fd);
+#ਜੇ_ਅੰਤ
+	vim_free(ਪਦ->tl_highlight_name);
+	vim_free(ਪਦ->tl_cursor_color);
+	vim_free(ਪਦ->tl_palette);
+	vim_free(ਪਦ);
     }
 }
 
@@ -1271,304 +1271,304 @@ free_unused_terminals(void)
  * when writing buffer lines to the job it can be another.  This makes it
  * possible to do "1,5term vim -".
  */
-    static ch_part_T
-get_tty_part(term_T *term UNUSED)
+    ਸਥਿਰ ch_part_T
+get_tty_part(ਪਦ_T *ਪਦ ਅਣਵਰਤਿਆ)
 {
-#ifdef UNIX
-    ch_part_T	parts[3] = {PART_IN, PART_OUT, PART_ERR};
-    int		i;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+    ch_part_T	parts[3] = {PART_ਵਿੱਚ, PART_ਬਾਹਰਲਾ, PART_ERR};
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < 3; ++i)
+    ਲਈ (i = 0; i < 3; ++i)
     {
-	int fd = term->tl_job->jv_channel->ch_part[parts[i]].ch_fd;
+	ਪੂਰਨ fd = ਪਦ->tl_ਕੰਮ->jv_channel->ch_part[parts[i]].ch_fd;
 
-	if (mch_isatty(fd))
-	    return parts[i];
+	ਜੇ (mch_isatty(fd))
+	    ਵਾਪਸ parts[i];
     }
-#endif
-    return PART_IN;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ PART_ਵਿੱਚ;
 }
 
 /*
  * Read any vterm output and send it on the channel.
  */
-    static void
-term_forward_output(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_forward_output(ਪਦ_T *ਪਦ)
 {
-    VTerm *vterm = term->tl_vterm;
-    char   buf[KEY_BUF_LEN];
-    size_t curlen = vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    VTerm *vterm = ਪਦ->tl_vterm;
+    ਅੱਖਰ   buf[ਕੁੰਜੀ_BUF_LEN];
+    size_t curlen = vterm_output_read(vterm, buf, ਕੁੰਜੀ_BUF_LEN);
 
-    if (curlen > 0)
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-					     (char_u *)buf, (int)curlen, NULL);
+    ਜੇ (curlen > 0)
+	channel_send(ਪਦ->tl_ਕੰਮ->jv_channel, get_tty_part(ਪਦ),
+					     (char_u *)buf, (ਪੂਰਨ)curlen, ਨਿਰਾ);
 }
 
 /*
  * Write job output "msg[len]" to the vterm.
  */
-    static void
-term_write_job_output(term_T *term, char_u *msg_arg, size_t len_arg)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_write_ਕੰਮ_output(ਪਦ_T *ਪਦ, char_u *ਸੁਨੇਹਾ_arg, size_t len_arg)
 {
-    char_u	*msg = msg_arg;
+    char_u	*ਸੁਨੇਹਾ = ਸੁਨੇਹਾ_arg;
     size_t	len = len_arg;
-    VTerm	*vterm = term->tl_vterm;
-    size_t	prevlen = vterm_output_get_buffer_current(vterm);
-    size_t	limit = term->tl_buffer->b_p_twsl * term->tl_cols * 3;
+    VTerm	*vterm = ਪਦ->tl_vterm;
+    size_t	prevlen = vterm_output_get_ਬਫਰ_current(vterm);
+    size_t	ਹੱਦਬੰਦੀ = ਪਦ->tl_ਬਫਰ->b_p_twsl * ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ * 3;
 
     // Limit the length to 'termwinscroll' * cols * 3 bytes.  Keep the text at
     // the end.
-    if (len > limit)
+    ਜੇ (len > ਹੱਦਬੰਦੀ)
     {
-	char_u *p = msg + len - limit;
+	char_u *p = ਸੁਨੇਹਾ + len - ਹੱਦਬੰਦੀ;
 
-	p -= (*mb_head_off)(msg, p);
-	len -= p - msg;
-	msg = p;
+	p -= (*mb_ਸਿਰ_off)(ਸੁਨੇਹਾ, p);
+	len -= p - ਸੁਨੇਹਾ;
+	ਸੁਨੇਹਾ = p;
     }
 
-    vterm_input_write(vterm, (char *)msg, len);
+    vterm_ਨਿਵੇਸ਼_write(vterm, (ਅੱਖਰ *)ਸੁਨੇਹਾ, len);
 
     // flush vterm buffer when vterm responded to control sequence
-    if (prevlen != vterm_output_get_buffer_current(vterm))
-	term_forward_output(term);
+    ਜੇ (prevlen != vterm_output_get_ਬਫਰ_current(vterm))
+	ਪਦ_forward_output(ਪਦ);
 
     // this invokes the damage callbacks
     vterm_screen_flush_damage(vterm_obtain_screen(vterm));
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 position_cursor(win_T *wp, VTermPos *pos)
 {
-    wp->w_wrow = MIN(pos->row, MAX(0, wp->w_height - 1));
-    wp->w_wcol = MIN(pos->col, MAX(0, wp->w_width - 1));
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    wp->w_wrow = MIN(pos->ਪੰਕਤੀ, MAX(0, wp->w_ਉਚਾਈ - 1));
+    wp->w_wcol = MIN(pos->ਖਾਨਾ, MAX(0, wp->w_ਚੌੜਾਈ - 1));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (popup_is_popup(wp))
     {
-	wp->w_wrow += popup_top_extra(wp);
-	wp->w_wcol += popup_left_extra(wp);
+	wp->w_wrow += popup_ਸਿਖਰ_extra(wp);
+	wp->w_wcol += popup_ਖੱਬਾ_extra(wp);
 	wp->w_flags |= WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	wp->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
-#endif
+#ਜੇ_ਅੰਤ
     wp->w_valid |= (VALID_WCOL|VALID_WROW);
 }
 
-    static void
-update_cursor(term_T *term, int redraw)
+    ਸਥਿਰ ਖਾਲੀ
+update_cursor(ਪਦ_T *ਪਦ, ਪੂਰਨ redraw)
 {
-    if (term->tl_normal_mode)
-	return;
-#ifdef FEAT_GUI
-    if (term->tl_system)
-	windgoto(term->tl_cursor_pos.row + term->tl_toprow,
-		firstwin->w_wincol + term->tl_cursor_pos.col);
-    else
-#endif
-    if (!term_job_running(term))
+    ਜੇ (ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
+	ਵਾਪਸ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (ਪਦ->tl_system)
+	windgoto(ਪਦ->tl_cursor_pos.ਪੰਕਤੀ + ਪਦ->tl_toprow,
+		firstwin->w_wincol + ਪਦ->tl_cursor_pos.ਖਾਨਾ);
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+    ਜੇ (!ਪਦ_ਕੰਮ_running(ਪਦ))
 	// avoid the cursor positioned below the last used line
 	setcursor();
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// do not use the window cursor position
-	position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
+	position_cursor(curwin, &curbuf->b_ਪਦ->tl_cursor_pos);
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
 		 curwin->w_wincol + curwin->w_wcol);
     }
-    if (redraw)
+    ਜੇ (redraw)
     {
 	aco_save_T	aco;
 
-	if (term->tl_buffer == curbuf && term->tl_cursor_visible)
+	ਜੇ (ਪਦ->tl_ਬਫਰ == curbuf && ਪਦ->tl_cursor_visible)
 	    cursor_on();
-	out_flush();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+	ਬਾਹਰਲਾ_flush();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (gui.ਵਿੱਚ_use)
 	{
 	    gui_update_cursor(FALSE, FALSE);
 	    gui_mch_flush();
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	// Make sure an invoked autocmd doesn't delete the buffer (and the
 	// terminal) under our fingers.
-	++term->tl_buffer->b_locked;
+	++ਪਦ->tl_ਬਫਰ->b_locked;
 
 	// save and restore curwin and curbuf, in case the autocmd changes them
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDT, NULL, NULL, FALSE, term->tl_buffer);
+	apply_autocmds(EVENT_TEXTCHANGEDT, ਨਿਰਾ, ਨਿਰਾ, FALSE, ਪਦ->tl_ਬਫਰ);
 	aucmd_restbuf(&aco);
 
-	--term->tl_buffer->b_locked;
+	--ਪਦ->tl_ਬਫਰ->b_locked;
     }
 }
 
 /*
  * Find the location of a scrollbackline in the buffer
  */
-    static void
-scrollbackline_pos_in_buf(term_T *term, int row, linenr_T *lnum, int *start_col, size_t *start_pos)
+    ਸਥਿਰ ਖਾਲੀ
+scrollbackline_pos_ਵਿੱਚ_buf(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀ, linenr_T *lnum, ਪੂਰਨ *ਸ਼ੁਰੂ_ਖਾਨਾ, size_t *ਸ਼ੁਰੂ_pos)
 {
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_lnum = term->tl_buffer_scrolled;
+    sb_ਸਤਰ_T	*ਸਤਰਾਂ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ;
+    linenr_T    calc_lnum = ਪਦ->tl_ਬਫਰ_scrolled;
     size_t      calc_pos = 0;
-    int         calc_col = 0;
-    int         i;
+    ਪੂਰਨ         calc_ਖਾਨਾ = 0;
+    ਪੂਰਨ         i;
 
-    if (row < 0 || row >= term->tl_scrollback.ga_len)
-	return;
+    ਜੇ (ਪੰਕਤੀ < 0 || ਪੰਕਤੀ >= ਪਦ->tl_scrollback.ga_len)
+	ਵਾਪਸ;
 
-    if (row > term->tl_scrollback_scrolled)
+    ਜੇ (ਪੰਕਤੀ > ਪਦ->tl_scrollback_scrolled)
     {
 	// Lookback how far along in the top line we are
-	for (i = term->tl_scrollback_scrolled + 1; i > 0 && lines[i].continuation; --i)
+	ਲਈ (i = ਪਦ->tl_scrollback_scrolled + 1; i > 0 && ਸਤਰਾਂ[i].continuation; --i)
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += ਸਤਰਾਂ[i - 1].sb_ਬਾਈਟਾਂ;
+	    calc_ਖਾਨਾ += ਸਤਰਾਂ[i - 1].sb_ਖਾਨੇ_ਗਿਣਤੀ;
 	}
-	i = term->tl_scrollback_scrolled + 1;
-	calc_lnum = term->tl_buffer_scrolled + 1;
+	i = ਪਦ->tl_scrollback_scrolled + 1;
+	calc_lnum = ਪਦ->tl_ਬਫਰ_scrolled + 1;
 	// Do not count this line's bytes/cols twice
-	if (lines[i].continuation)
+	ਜੇ (ਸਤਰਾਂ[i].continuation)
 	    ++i;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	i = 1;
 	calc_lnum = 1;
     }
 
-    for (; i <= row; ++i)
+    ਲਈ (; i <= ਪੰਕਤੀ; ++i)
     {
-	if (!lines[i].continuation)
+	ਜੇ (!ਸਤਰਾਂ[i].continuation)
 	{
 	    ++calc_lnum;
 	    calc_pos = 0;
-	    calc_col = 0;
+	    calc_ਖਾਨਾ = 0;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += ਸਤਰਾਂ[i - 1].sb_ਬਾਈਟਾਂ;
+	    calc_ਖਾਨਾ += ਸਤਰਾਂ[i - 1].sb_ਖਾਨੇ_ਗਿਣਤੀ;
 	}
     }
 
     *lnum = calc_lnum;
-    if (start_col)
-	*start_col = calc_col;
-    if (start_pos)
-	*start_pos = calc_pos;
+    ਜੇ (ਸ਼ੁਰੂ_ਖਾਨਾ)
+	*ਸ਼ੁਰੂ_ਖਾਨਾ = calc_ਖਾਨਾ;
+    ਜੇ (ਸ਼ੁਰੂ_pos)
+	*ਸ਼ੁਰੂ_pos = calc_pos;
 }
 
 /*
  * Find the location of a buffer line in the scrollback
  */
-    static void
-bufline_pos_in_scrollback(term_T *term, linenr_T lnum, int col, int *row, int *wrapped_col)
+    ਸਥਿਰ ਖਾਲੀ
+bufline_pos_ਵਿੱਚ_scrollback(ਪਦ_T *ਪਦ, linenr_T lnum, ਪੂਰਨ ਖਾਨਾ, ਪੂਰਨ *ਪੰਕਤੀ, ਪੂਰਨ *wrapped_ਖਾਨਾ)
 {
-    buf_T	*buf = term->tl_buffer;
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_row = term->tl_scrollback_scrolled;
-    int         calc_col = col;
+    buf_T	*buf = ਪਦ->tl_ਬਫਰ;
+    sb_ਸਤਰ_T	*ਸਤਰਾਂ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ;
+    linenr_T    calc_ਪੰਕਤੀ = ਪਦ->tl_scrollback_scrolled;
+    ਪੂਰਨ         calc_ਖਾਨਾ = ਖਾਨਾ;
     linenr_T    l;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	return;
+    ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਵਾਪਸ;
 
-    if (lnum > term->tl_buffer_scrolled)
+    ਜੇ (lnum > ਪਦ->tl_ਬਫਰ_scrolled)
     {
-	calc_row = term->tl_scrollback_scrolled;
-	l = term->tl_buffer_scrolled + 1;
+	calc_ਪੰਕਤੀ = ਪਦ->tl_scrollback_scrolled;
+	l = ਪਦ->tl_ਬਫਰ_scrolled + 1;
 
-	while (calc_row < term->tl_scrollback.ga_len && lines[calc_row].continuation)
-	    ++calc_row;
+	ਜਦੋਂ (calc_ਪੰਕਤੀ < ਪਦ->tl_scrollback.ga_len && ਸਤਰਾਂ[calc_ਪੰਕਤੀ].continuation)
+	    ++calc_ਪੰਕਤੀ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	calc_row = 0;
+	calc_ਪੰਕਤੀ = 0;
 	l = 1;
     }
 
-    while (calc_row < term->tl_scrollback.ga_len && l < lnum)
+    ਜਦੋਂ (calc_ਪੰਕਤੀ < ਪਦ->tl_scrollback.ga_len && l < lnum)
     {
-	++calc_row;
-	if (!lines[calc_row].continuation)
+	++calc_ਪੰਕਤੀ;
+	ਜੇ (!ਸਤਰਾਂ[calc_ਪੰਕਤੀ].continuation)
 	    ++l;
     }
 
-    while (calc_row + 1 < term->tl_scrollback.ga_len && lines[calc_row + 1].continuation
-	    && calc_col >= lines[calc_row].sb_cols)
+    ਜਦੋਂ (calc_ਪੰਕਤੀ + 1 < ਪਦ->tl_scrollback.ga_len && ਸਤਰਾਂ[calc_ਪੰਕਤੀ + 1].continuation
+	    && calc_ਖਾਨਾ >= ਸਤਰਾਂ[calc_ਪੰਕਤੀ].sb_ਖਾਨੇ_ਗਿਣਤੀ)
     {
-	calc_col -= lines[calc_row].sb_cols;
-	++calc_row;
+	calc_ਖਾਨਾ -= ਸਤਰਾਂ[calc_ਪੰਕਤੀ].sb_ਖਾਨੇ_ਗਿਣਤੀ;
+	++calc_ਪੰਕਤੀ;
     }
 
-    if (row)
-	*row = calc_row;
-    if (wrapped_col)
-	*wrapped_col = calc_col;
+    ਜੇ (ਪੰਕਤੀ)
+	*ਪੰਕਤੀ = calc_ਪੰਕਤੀ;
+    ਜੇ (wrapped_ਖਾਨਾ)
+	*wrapped_ਖਾਨਾ = calc_ਖਾਨਾ;
 }
 
 /*
  * Invoked when "msg" output from a job was received.  Write it to the terminal
  * of "buffer".
  */
-    void
-write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
+    ਖਾਲੀ
+write_ਮੰਜ਼ਿਲ_ਪਦ(buf_T *ਬਫਰ, char_u *ਸੁਨੇਹਾ, channel_T *channel)
 {
-    size_t	len = STRLEN(msg);
-    term_T	*term = buffer->b_term;
+    size_t	len = STRLEN(ਸੁਨੇਹਾ);
+    ਪਦ_T	*ਪਦ = ਬਫਰ->b_ਪਦ;
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     // Win32: Cannot redirect output of the job, intercept it here and write to
     // the file.
-    if (term->tl_out_fd != NULL)
+    ਜੇ (ਪਦ->tl_ਬਾਹਰਲਾ_fd != ਨਿਰਾ)
     {
-	ch_log(channel, "Writing %d bytes to output file", (int)len);
-	fwrite(msg, len, 1, term->tl_out_fd);
-	return;
+	ch_log(channel, "Writing %d bytes to output file", (ਪੂਰਨ)len);
+	fwrite(ਸੁਨੇਹਾ, len, 1, ਪਦ->tl_ਬਾਹਰਲਾ_fd);
+	ਵਾਪਸ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (term->tl_vterm == NULL)
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
     {
-	ch_log(channel, "NOT writing %d bytes to terminal", (int)len);
-	return;
+	ch_log(channel, "NOT writing %d bytes to terminal", (ਪੂਰਨ)len);
+	ਵਾਪਸ;
     }
-    ch_log(channel, "writing %d bytes to terminal", (int)len);
+    ch_log(channel, "writing %d bytes to terminal", (ਪੂਰਨ)len);
     cursor_off();
-    term_write_job_output(term, msg, len);
+    ਪਦ_write_ਕੰਮ_output(ਪਦ, ਸੁਨੇਹਾ, len);
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (ਪਦ->tl_system)
     {
 	// show system output, scrolling up the screen as needed
-	update_system_term(term);
-	update_cursor(term, TRUE);
+	update_system_ਪਦ(ਪਦ);
+	update_cursor(ਪਦ, TRUE);
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     // In Terminal-Normal mode we are displaying the buffer, not the terminal
     // contents, thus no screen update is needed.
-    if (!term->tl_normal_mode)
+    ਜੇ (!ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
     {
 	// Don't use update_screen() when editing the command line, it gets
 	// cleared.
 	// TODO: only update once in a while.
-	ch_log(term->tl_job->jv_channel, "updating screen");
-	if (buffer == curbuf && (State & MODE_CMDLINE) == 0)
+	ch_log(ਪਦ->tl_ਕੰਮ->jv_channel, "updating screen");
+	ਜੇ (ਬਫਰ == curbuf && (State & ਬਹੁਲਕ_CMDLINE) == 0)
 	{
 	    update_screen(UPD_VALID_NO_UPDATE);
-#if defined(FEAT_TABPANEL)
-	    if (redraw_tabpanel)
+#ਜੇ defined(FEAT_TABPANEL)
+	    ਜੇ (redraw_tabpanel)
 		draw_tabpanel();
-#endif
+#ਜੇ_ਅੰਤ
 	    // update_screen() can be slow, check the terminal wasn't closed
 	    // already
-	    if (buffer == curbuf && curbuf->b_term != NULL)
-		update_cursor(curbuf->b_term, TRUE);
+	    ਜੇ (ਬਫਰ == curbuf && curbuf->b_ਪਦ != ਨਿਰਾ)
+		update_cursor(curbuf->b_ਪਦ, TRUE);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    redraw_after_callback(TRUE, FALSE);
     }
 }
@@ -1576,129 +1576,129 @@ write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
 /*
  * Send a mouse position and click to the vterm
  */
-    static int
-term_send_mouse(VTerm *vterm, int button, int pressed)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_send_mouse(VTerm *vterm, ਪੂਰਨ button, ਪੂਰਨ pressed)
 {
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    row = mouse_row - W_WINROW(curwin);
-    int		    col = mouse_col - curwin->w_wincol;
+    ਪੂਰਨ		    ਪੰਕਤੀ = mouse_ਪੰਕਤੀ - W_WINROW(curwin);
+    ਪੂਰਨ		    ਖਾਨਾ = mouse_ਖਾਨਾ - curwin->w_wincol;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(curwin))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (popup_is_popup(curwin))
     {
-	row -= popup_top_extra(curwin);
-	col -= popup_left_extra(curwin);
+	ਪੰਕਤੀ -= popup_ਸਿਖਰ_extra(curwin);
+	ਖਾਨਾ -= popup_ਖੱਬਾ_extra(curwin);
     }
-#endif
-    vterm_mouse_move(vterm, row, col, mod);
-    if (button != 0)
+#ਜੇ_ਅੰਤ
+    vterm_mouse_move(vterm, ਪੰਕਤੀ, ਖਾਨਾ, mod);
+    ਜੇ (button != 0)
 	vterm_mouse_button(vterm, button, pressed, mod);
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-static int enter_mouse_col = -1;
-static int enter_mouse_row = -1;
+ਸਥਿਰ ਪੂਰਨ enter_mouse_ਖਾਨਾ = -1;
+ਸਥਿਰ ਪੂਰਨ enter_mouse_ਪੰਕਤੀ = -1;
 
 /*
  * Handle a mouse click, drag or release.
  * Return TRUE when a mouse event is sent to the terminal.
  */
-    static int
-term_mouse_click(VTerm *vterm, int key)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_mouse_click(VTerm *vterm, ਪੂਰਨ ਕੁੰਜੀ)
 {
-#if defined(FEAT_CLIPBOARD)
+#ਜੇ defined(FEAT_CLIPBOARD)
     // For modeless selection mouse drag and release events are ignored, unless
     // they are preceded with a mouse down event
-    static int	    ignore_drag_release = TRUE;
+    ਸਥਿਰ ਪੂਰਨ	    ignore_drag_release = TRUE;
     VTermState	    *state;
     VTermMouseState mouse_state;
 
 
     state = vterm_obtain_state(vterm);
-    if (state == NULL)
-	return FALSE;
+    ਜੇ (state == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
     vterm_state_get_mousestate(state, &mouse_state);
-    if (mouse_state.flags == 0)
+    ਜੇ (mouse_state.flags == 0)
     {
 	// Terminal is not using the mouse, use modeless selection.
-	switch (key)
+	ਚੋਣ (ਕੁੰਜੀ)
 	{
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	ਹਾਲਤ K_LEFTDRAG:
+	ਹਾਲਤ K_LEFTRELEASE:
+	ਹਾਲਤ K_RIGHTDRAG:
+	ਹਾਲਤ K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
+		ਜੇ (ignore_drag_release)
 		{
-		    int save_mouse_col, save_mouse_row;
+		    ਪੂਰਨ save_mouse_ਖਾਨਾ, save_mouse_ਪੰਕਤੀ;
 
-		    if (enter_mouse_col < 0)
-			break;
+		    ਜੇ (enter_mouse_ਖਾਨਾ < 0)
+			ਰੋਕੋ;
 
 		    // mouse click in the window gave us focus, handle that
 		    // click now
-		    save_mouse_col = mouse_col;
-		    save_mouse_row = mouse_row;
-		    mouse_col = enter_mouse_col;
-		    mouse_row = enter_mouse_row;
-		    clip_modeless(MOUSE_LEFT, TRUE, FALSE);
-		    mouse_col = save_mouse_col;
-		    mouse_row = save_mouse_row;
+		    save_mouse_ਖਾਨਾ = mouse_ਖਾਨਾ;
+		    save_mouse_ਪੰਕਤੀ = mouse_ਪੰਕਤੀ;
+		    mouse_ਖਾਨਾ = enter_mouse_ਖਾਨਾ;
+		    mouse_ਪੰਕਤੀ = enter_mouse_ਪੰਕਤੀ;
+		    clip_modeless(MOUSE_ਖੱਬਾ, TRUE, FALSE);
+		    mouse_ਖਾਨਾ = save_mouse_ਖਾਨਾ;
+		    mouse_ਪੰਕਤੀ = save_mouse_ਪੰਕਤੀ;
 		}
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
-		if (key == K_LEFTRELEASE || key == K_RIGHTRELEASE)
+	ਹਾਲਤ K_LEFTMOUSE:
+	ਹਾਲਤ K_RIGHTMOUSE:
+		ਜੇ (ਕੁੰਜੀ == K_LEFTRELEASE || ਕੁੰਜੀ == K_RIGHTRELEASE)
 		    ignore_drag_release = TRUE;
-		else
+		ਨਹੀਂਤਾਂ
 		    ignore_drag_release = FALSE;
 		// Should we call mouse_has() here?
-		if (clip_star.available)
+		ਜੇ (clip_ਤਾਰਾ.ਉਪਲਬਧ)
 		{
-		    int	    button, is_click, is_drag;
+		    ਪੂਰਨ	    button, is_click, is_drag;
 
-		    button = get_mouse_button(KEY2TERMCAP1(key),
+		    button = get_mouse_button(KEY2TERMCAP1(ਕੁੰਜੀ),
 							 &is_click, &is_drag);
-		    if (mouse_model_popup() && button == MOUSE_LEFT
-					       && (mod_mask & MOD_MASK_SHIFT))
+		    ਜੇ (mouse_model_popup() && button == MOUSE_ਖੱਬਾ
+					       && (mod_ਨਕਾਬ & MOD_ਨਕਾਬ_ਖਿਸਕਾਓ))
 		    {
 			// Translate shift-left to right button.
-			button = MOUSE_RIGHT;
-			mod_mask &= ~MOD_MASK_SHIFT;
+			button = MOUSE_ਸੱਜਾ;
+			mod_ਨਕਾਬ &= ~MOD_ਨਕਾਬ_ਖਿਸਕਾਓ;
 		    }
 		    clip_modeless(button, is_click, is_drag);
 		}
-		break;
+		ਰੋਕੋ;
 
-	case K_MIDDLEMOUSE:
-		if (clip_star.available)
-		    insert_reg('*', TRUE);
-		break;
+	ਹਾਲਤ K_MIDDLEMOUSE:
+		ਜੇ (clip_ਤਾਰਾ.ਉਪਲਬਧ)
+		    ਪਾਓ_reg('*', TRUE);
+		ਰੋਕੋ;
 	}
-	enter_mouse_col = -1;
-	return FALSE;
+	enter_mouse_ਖਾਨਾ = -1;
+	ਵਾਪਸ FALSE;
     }
-#endif
-    enter_mouse_col = -1;
+#ਜੇ_ਅੰਤ
+    enter_mouse_ਖਾਨਾ = -1;
 
-    switch (key)
+    ਚੋਣ (ਕੁੰਜੀ)
     {
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTDRAG:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:	term_send_mouse(vterm, 1, 0); break;
-	case K_MOUSEMOVE:	term_send_mouse(vterm, 0, 0); break;
-	case K_MIDDLEMOUSE:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLEDRAG:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLERELEASE:	term_send_mouse(vterm, 2, 0); break;
-	case K_RIGHTMOUSE:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTDRAG:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTRELEASE:	term_send_mouse(vterm, 3, 0); break;
+	ਹਾਲਤ K_LEFTMOUSE:
+	ਹਾਲਤ K_LEFTMOUSE_NM:	ਪਦ_send_mouse(vterm, 1, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_LEFTDRAG:	ਪਦ_send_mouse(vterm, 1, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_LEFTRELEASE:
+	ਹਾਲਤ K_LEFTRELEASE_NM:	ਪਦ_send_mouse(vterm, 1, 0); ਰੋਕੋ;
+	ਹਾਲਤ K_MOUSEMOVE:	ਪਦ_send_mouse(vterm, 0, 0); ਰੋਕੋ;
+	ਹਾਲਤ K_MIDDLEMOUSE:	ਪਦ_send_mouse(vterm, 2, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_MIDDLEDRAG:	ਪਦ_send_mouse(vterm, 2, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_MIDDLERELEASE:	ਪਦ_send_mouse(vterm, 2, 0); ਰੋਕੋ;
+	ਹਾਲਤ K_RIGHTMOUSE:	ਪਦ_send_mouse(vterm, 3, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_RIGHTDRAG:	ਪਦ_send_mouse(vterm, 3, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_RIGHTRELEASE:	ਪਦ_send_mouse(vterm, 3, 0); ਰੋਕੋ;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -1706,181 +1706,181 @@ term_mouse_click(VTerm *vterm, int key)
  * job.
  * Return the number of bytes in "buf".
  */
-    static int
-term_convert_key(term_T *term, int c, int modmask, char *buf)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_convert_ਕੁੰਜੀ(ਪਦ_T *ਪਦ, ਪੂਰਨ c, ਪੂਰਨ modmask, ਅੱਖਰ *buf)
 {
-    VTerm	    *vterm = term->tl_vterm;
-    VTermKey	    key = VTERM_KEY_NONE;
+    VTerm	    *vterm = ਪਦ->tl_vterm;
+    VTerm_ਕੁੰਜੀ	    ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_NONE;
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    other = FALSE;
+    ਪੂਰਨ		    other = FALSE;
 
-    switch (c)
+    ਚੋਣ (c)
     {
 	// don't use VTERM_KEY_ENTER, it may do an unwanted conversion
 
-	case K_BS:
-#ifdef MSWIN
+	ਹਾਲਤ K_BS:
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    else
-#endif
+	    ਜੇ (ਪਦ->tl_conpty)
+		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_BACKSPACE;
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		// don't use VTERM_KEY_BACKSPACE, it always becomes 0x7f DEL
-		c = term_backspace_char;
-	    break;
+		c = ਪਦ_backspace_char;
+	    ਰੋਕੋ;
 
-#ifdef MSWIN
-	case BS:
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਹਾਲਤ BS:
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    break;
-#endif
+	    ਜੇ (ਪਦ->tl_conpty)
+		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_BACKSPACE;
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 
-	case ESC:		key = VTERM_KEY_ESCAPE; break;
-	case K_DEL:		key = VTERM_KEY_DEL; break;
-	case K_DOWN:		key = VTERM_KEY_DOWN; break;
-	case K_S_DOWN:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_DOWN; break;
-	case K_END:		key = VTERM_KEY_END; break;
-	case K_S_END:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_END; break;
-	case K_C_END:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_END; break;
-	case K_F10:		key = VTERM_KEY_FUNCTION(10); break;
-	case K_F11:		key = VTERM_KEY_FUNCTION(11); break;
-	case K_F12:		key = VTERM_KEY_FUNCTION(12); break;
-	case K_F1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_F2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_F3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_F4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_F5:		key = VTERM_KEY_FUNCTION(5); break;
-	case K_F6:		key = VTERM_KEY_FUNCTION(6); break;
-	case K_F7:		key = VTERM_KEY_FUNCTION(7); break;
-	case K_F8:		key = VTERM_KEY_FUNCTION(8); break;
-	case K_F9:		key = VTERM_KEY_FUNCTION(9); break;
-	case K_HOME:		key = VTERM_KEY_HOME; break;
-	case K_S_HOME:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_HOME; break;
-	case K_C_HOME:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_HOME; break;
-	case K_INS:		key = VTERM_KEY_INS; break;
-	case K_K0:		key = VTERM_KEY_KP_0; break;
-	case K_K1:		key = VTERM_KEY_KP_1; break;
-	case K_K2:		key = VTERM_KEY_KP_2; break;
-	case K_K3:		key = VTERM_KEY_KP_3; break;
-	case K_K4:		key = VTERM_KEY_KP_4; break;
-	case K_K5:		key = VTERM_KEY_KP_5; break;
-	case K_K6:		key = VTERM_KEY_KP_6; break;
-	case K_K7:		key = VTERM_KEY_KP_7; break;
-	case K_K8:		key = VTERM_KEY_KP_8; break;
-	case K_K9:		key = VTERM_KEY_KP_9; break;
-	case K_KDEL:		key = VTERM_KEY_DEL; break; // TODO
-	case K_KDIVIDE:		key = VTERM_KEY_KP_DIVIDE; break;
-	case K_KEND:		key = VTERM_KEY_KP_1; break; // TODO
-	case K_KENTER:		key = VTERM_KEY_KP_ENTER; break;
-	case K_KHOME:		key = VTERM_KEY_KP_7; break; // TODO
-	case K_KINS:		key = VTERM_KEY_KP_0; break; // TODO
-	case K_KMINUS:		key = VTERM_KEY_KP_MINUS; break;
-	case K_KMULTIPLY:	key = VTERM_KEY_KP_MULT; break;
-	case K_KPAGEDOWN:	key = VTERM_KEY_KP_3; break; // TODO
-	case K_KPAGEUP:		key = VTERM_KEY_KP_9; break; // TODO
-	case K_KPLUS:		key = VTERM_KEY_KP_PLUS; break;
-	case K_KPOINT:		key = VTERM_KEY_KP_PERIOD; break;
-	case K_LEFT:		key = VTERM_KEY_LEFT; break;
-	case K_S_LEFT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_LEFT; break;
-	case K_C_LEFT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_LEFT; break;
-	case K_PAGEDOWN:	key = VTERM_KEY_PAGEDOWN; break;
-	case K_PAGEUP:		key = VTERM_KEY_PAGEUP; break;
-	case K_RIGHT:		key = VTERM_KEY_RIGHT; break;
-	case K_S_RIGHT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_RIGHT; break;
-	case K_C_RIGHT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_RIGHT; break;
-	case K_UP:		key = VTERM_KEY_UP; break;
-	case K_S_UP:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_UP; break;
-	case TAB:		key = VTERM_KEY_TAB; break;
-	case K_S_TAB:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_TAB; break;
+	ਹਾਲਤ ESC:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ESCAPE; ਰੋਕੋ;
+	ਹਾਲਤ K_DEL:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_DEL; ਰੋਕੋ;
+	ਹਾਲਤ K_ਥੱਲੇ:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਥੱਲੇ; ਰੋਕੋ;
+	ਹਾਲਤ K_S_ਥੱਲੇ:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਥੱਲੇ; ਰੋਕੋ;
+	ਹਾਲਤ K_ਸਿਰਾ:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸਿਰਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_S_ਸਿਰਾ:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸਿਰਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_C_ਸਿਰਾ:		mod = VTERM_MOD_CTRL;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸਿਰਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_F10:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(10); ਰੋਕੋ;
+	ਹਾਲਤ K_F11:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(11); ਰੋਕੋ;
+	ਹਾਲਤ K_F12:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(12); ਰੋਕੋ;
+	ਹਾਲਤ K_F1:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(1); ਰੋਕੋ;
+	ਹਾਲਤ K_F2:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(2); ਰੋਕੋ;
+	ਹਾਲਤ K_F3:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(3); ਰੋਕੋ;
+	ਹਾਲਤ K_F4:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(4); ਰੋਕੋ;
+	ਹਾਲਤ K_F5:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(5); ਰੋਕੋ;
+	ਹਾਲਤ K_F6:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(6); ਰੋਕੋ;
+	ਹਾਲਤ K_F7:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(7); ਰੋਕੋ;
+	ਹਾਲਤ K_F8:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(8); ਰੋਕੋ;
+	ਹਾਲਤ K_F9:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(9); ਰੋਕੋ;
+	ਹਾਲਤ K_HOME:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_HOME; ਰੋਕੋ;
+	ਹਾਲਤ K_S_HOME:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_HOME; ਰੋਕੋ;
+	ਹਾਲਤ K_C_HOME:		mod = VTERM_MOD_CTRL;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_HOME; ਰੋਕੋ;
+	ਹਾਲਤ K_INS:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_INS; ਰੋਕੋ;
+	ਹਾਲਤ K_K0:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_0; ਰੋਕੋ;
+	ਹਾਲਤ K_K1:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_1; ਰੋਕੋ;
+	ਹਾਲਤ K_K2:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_2; ਰੋਕੋ;
+	ਹਾਲਤ K_K3:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_3; ਰੋਕੋ;
+	ਹਾਲਤ K_K4:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_4; ਰੋਕੋ;
+	ਹਾਲਤ K_K5:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_5; ਰੋਕੋ;
+	ਹਾਲਤ K_K6:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_6; ਰੋਕੋ;
+	ਹਾਲਤ K_K7:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_7; ਰੋਕੋ;
+	ਹਾਲਤ K_K8:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_8; ਰੋਕੋ;
+	ਹਾਲਤ K_K9:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_9; ਰੋਕੋ;
+	ਹਾਲਤ K_KDEL:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_DEL; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KDIVIDE:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_DIVIDE; ਰੋਕੋ;
+	ਹਾਲਤ K_KEND:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_1; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KENTER:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_ENTER; ਰੋਕੋ;
+	ਹਾਲਤ K_KHOME:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_7; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KINS:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_0; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KMINUS:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_MINUS; ਰੋਕੋ;
+	ਹਾਲਤ K_KMULTIPLY:	ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_MULT; ਰੋਕੋ;
+	ਹਾਲਤ K_KPAGEDOWN:	ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_3; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KPAGEUP:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_9; ਰੋਕੋ; // TODO
+	ਹਾਲਤ K_KPLUS:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_PLUS; ਰੋਕੋ;
+	ਹਾਲਤ K_KPOINT:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_KP_PERIOD; ਰੋਕੋ;
+	ਹਾਲਤ K_ਖੱਬਾ:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਖੱਬਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_S_ਖੱਬਾ:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਖੱਬਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_C_ਖੱਬਾ:		mod = VTERM_MOD_CTRL;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਖੱਬਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_PAGEDOWN:	ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_PAGEDOWN; ਰੋਕੋ;
+	ਹਾਲਤ K_PAGEUP:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_PAGEUP; ਰੋਕੋ;
+	ਹਾਲਤ K_ਸੱਜਾ:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸੱਜਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_S_ਸੱਜਾ:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸੱਜਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_C_ਸੱਜਾ:		mod = VTERM_MOD_CTRL;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਸੱਜਾ; ਰੋਕੋ;
+	ਹਾਲਤ K_ਉੱਪਰ:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਉੱਪਰ; ਰੋਕੋ;
+	ਹਾਲਤ K_S_ਉੱਪਰ:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_ਉੱਪਰ; ਰੋਕੋ;
+	ਹਾਲਤ TAB:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_TAB; ਰੋਕੋ;
+	ਹਾਲਤ K_S_TAB:		mod = VTERM_MOD_ਖਿਸਕਾਓ;
+				ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_TAB; ਰੋਕੋ;
 
-	case K_MOUSEUP:		other = term_send_mouse(vterm, 5, 1); break;
-	case K_MOUSEDOWN:	other = term_send_mouse(vterm, 4, 1); break;
-	case K_MOUSELEFT:	other = term_send_mouse(vterm, 7, 1); break;
-	case K_MOUSERIGHT:	other = term_send_mouse(vterm, 6, 1); break;
+	ਹਾਲਤ K_MOUSEUP:		other = ਪਦ_send_mouse(vterm, 5, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_MOUSEDOWN:	other = ਪਦ_send_mouse(vterm, 4, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_MOUSELEFT:	other = ਪਦ_send_mouse(vterm, 7, 1); ਰੋਕੋ;
+	ਹਾਲਤ K_MOUSERIGHT:	other = ਪਦ_send_mouse(vterm, 6, 1); ਰੋਕੋ;
 
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:	if (!term_mouse_click(vterm, c))
-				    return 0;
+	ਹਾਲਤ K_LEFTMOUSE:
+	ਹਾਲਤ K_LEFTMOUSE_NM:
+	ਹਾਲਤ K_LEFTDRAG:
+	ਹਾਲਤ K_LEFTRELEASE:
+	ਹਾਲਤ K_LEFTRELEASE_NM:
+	ਹਾਲਤ K_MOUSEMOVE:
+	ਹਾਲਤ K_MIDDLEMOUSE:
+	ਹਾਲਤ K_MIDDLEDRAG:
+	ਹਾਲਤ K_MIDDLERELEASE:
+	ਹਾਲਤ K_RIGHTMOUSE:
+	ਹਾਲਤ K_RIGHTDRAG:
+	ਹਾਲਤ K_RIGHTRELEASE:	ਜੇ (!ਪਦ_mouse_click(vterm, c))
+				    ਵਾਪਸ 0;
 				other = TRUE;
-				break;
+				ਰੋਕੋ;
 
-	case K_X1MOUSE:		/* TODO */ return 0;
-	case K_X1DRAG:		/* TODO */ return 0;
-	case K_X1RELEASE:	/* TODO */ return 0;
-	case K_X2MOUSE:		/* TODO */ return 0;
-	case K_X2DRAG:		/* TODO */ return 0;
-	case K_X2RELEASE:	/* TODO */ return 0;
+	ਹਾਲਤ K_X1MOUSE:		/* TODO */ ਵਾਪਸ 0;
+	ਹਾਲਤ K_X1DRAG:		/* TODO */ ਵਾਪਸ 0;
+	ਹਾਲਤ K_X1RELEASE:	/* TODO */ ਵਾਪਸ 0;
+	ਹਾਲਤ K_X2MOUSE:		/* TODO */ ਵਾਪਸ 0;
+	ਹਾਲਤ K_X2DRAG:		/* TODO */ ਵਾਪਸ 0;
+	ਹਾਲਤ K_X2RELEASE:	/* TODO */ ਵਾਪਸ 0;
 
-	case K_IGNORE:		return 0;
-	case K_NOP:		return 0;
-	case K_UNDO:		return 0;
-	case K_HELP:		return 0;
-	case K_XF1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_XF2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_XF3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_XF4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_SELECT:		return 0;
-#ifdef FEAT_GUI
-	case K_VER_SCROLLBAR:	return 0;
-	case K_HOR_SCROLLBAR:	return 0;
-#endif
-#ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:		return 0;
-	case K_TABMENU:		return 0;
-#endif
-#ifdef FEAT_NETBEANS_INTG
-	case K_F21:		key = VTERM_KEY_FUNCTION(21); break;
-#endif
-#ifdef FEAT_DND
-	case K_DROP:		return 0;
-#endif
-	case K_CURSORHOLD:	return 0;
-	case K_PS:		vterm_keyboard_start_paste(vterm);
+	ਹਾਲਤ K_IGNORE:		ਵਾਪਸ 0;
+	ਹਾਲਤ K_NOP:		ਵਾਪਸ 0;
+	ਹਾਲਤ K_UNDO:		ਵਾਪਸ 0;
+	ਹਾਲਤ K_HELP:		ਵਾਪਸ 0;
+	ਹਾਲਤ K_XF1:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(1); ਰੋਕੋ;
+	ਹਾਲਤ K_XF2:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(2); ਰੋਕੋ;
+	ਹਾਲਤ K_XF3:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(3); ਰੋਕੋ;
+	ਹਾਲਤ K_XF4:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(4); ਰੋਕੋ;
+	ਹਾਲਤ K_SELECT:		ਵਾਪਸ 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਹਾਲਤ K_VER_SCROLLBAR:	ਵਾਪਸ 0;
+	ਹਾਲਤ K_HOR_SCROLLBAR:	ਵਾਪਸ 0;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_TABLINE
+	ਹਾਲਤ K_TABLINE:		ਵਾਪਸ 0;
+	ਹਾਲਤ K_TABMENU:		ਵਾਪਸ 0;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
+	ਹਾਲਤ K_F21:		ਕੁੰਜੀ = VTERM_ਕੁੰਜੀ_FUNCTION(21); ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DND
+	ਹਾਲਤ K_DROP:		ਵਾਪਸ 0;
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ K_CURSORHOLD:	ਵਾਪਸ 0;
+	ਹਾਲਤ K_PS:		vterm_keyboard_ਸ਼ੁਰੂ_paste(vterm);
 				other = TRUE;
-				break;
-	case K_PE:		vterm_keyboard_end_paste(vterm);
+				ਰੋਕੋ;
+	ਹਾਲਤ K_PE:		vterm_keyboard_ਸਿਰਾ_paste(vterm);
 				other = TRUE;
-				break;
+				ਰੋਕੋ;
     }
 
     // add modifiers for the typed key
-    if (modmask & MOD_MASK_SHIFT)
-	mod |= VTERM_MOD_SHIFT;
-    if (modmask & MOD_MASK_CTRL)
+    ਜੇ (modmask & MOD_ਨਕਾਬ_ਖਿਸਕਾਓ)
+	mod |= VTERM_MOD_ਖਿਸਕਾਓ;
+    ਜੇ (modmask & MOD_ਨਕਾਬ_CTRL)
 	mod |= VTERM_MOD_CTRL;
-    if (modmask & (MOD_MASK_ALT | MOD_MASK_META))
+    ਜੇ (modmask & (MOD_ਨਕਾਬ_ALT | MOD_ਨਕਾਬ_META))
 	mod |= VTERM_MOD_ALT;
 
     // Ctrl-Shift-i may have the key "I" instead of "i", but for the kitty
     // keyboard protocol should use "i".  Applies to all ascii letters.
-    if (ASCII_ISUPPER(c)
+    ਜੇ (ASCII_ISUPPER(c)
 	    && vterm_is_kitty_keyboard(vterm)
-	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_SHIFT))
+	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_ਖਿਸਕਾਓ))
 	c = TOLOWER_ASC(c);
 
     /*
@@ -1888,15 +1888,15 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
      * - Write keys to vterm: vterm_keyboard_key()
      * - Write output to channel.
      */
-    if (key != VTERM_KEY_NONE)
+    ਜੇ (ਕੁੰਜੀ != VTERM_ਕੁੰਜੀ_NONE)
 	// Special key, let vterm convert it.
-	vterm_keyboard_key(vterm, key, mod);
-    else if (!other)
+	vterm_keyboard_ਕੁੰਜੀ(vterm, ਕੁੰਜੀ, mod);
+    ਨਹੀਂਤਾਂ ਜੇ (!other)
 	// Normal character, let vterm convert it.
 	vterm_keyboard_unichar(vterm, c, mod);
 
     // Read back the converted escape sequence.
-    return (int)vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    ਵਾਪਸ (ਪੂਰਨ)vterm_output_read(vterm, buf, ਕੁੰਜੀ_BUF_LEN);
 }
 
 /*
@@ -1904,58 +1904,58 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
  * If "check_job_status" is TRUE update the job status.
  * NOTE: "term" may be freed by callbacks.
  */
-    static int
-term_job_running_check(term_T *term, int check_job_status)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_ਕੰਮ_running_check(ਪਦ_T *ਪਦ, ਪੂਰਨ check_ਕੰਮ_ਸਥਿਤੀ)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    if (term == NULL
-	|| term->tl_job == NULL
-	|| !channel_is_open(term->tl_job->jv_channel))
-	return FALSE;
+    ਜੇ (ਪਦ == ਨਿਰਾ
+	|| ਪਦ->tl_ਕੰਮ == ਨਿਰਾ
+	|| !channel_is_open(ਪਦ->tl_ਕੰਮ->jv_channel))
+	ਵਾਪਸ FALSE;
 
-    job_T *job = term->tl_job;
+    ਕੰਮ_T *ਕੰਮ = ਪਦ->tl_ਕੰਮ;
 
     // Careful: Checking the job status may invoke callbacks, which close
     // the buffer and terminate "term".  However, "job" will not be freed
     // yet.
-    if (check_job_status)
-	job_status(job);
-    return (job->jv_status == JOB_STARTED
-	    || (job->jv_channel != NULL && job->jv_channel->ch_keep_open));
+    ਜੇ (check_ਕੰਮ_ਸਥਿਤੀ)
+	ਕੰਮ_ਸਥਿਤੀ(ਕੰਮ);
+    ਵਾਪਸ (ਕੰਮ->jv_ਸਥਿਤੀ == ਕੰਮ_STARTED
+	    || (ਕੰਮ->jv_channel != ਨਿਰਾ && ਕੰਮ->jv_channel->ch_keep_open));
 }
 
 /*
  * Return TRUE if the job for "term" is still running.
  */
-    int
-term_job_running(term_T *term)
+    ਪੂਰਨ
+ਪਦ_ਕੰਮ_running(ਪਦ_T *ਪਦ)
 {
-    return term_job_running_check(term, FALSE);
+    ਵਾਪਸ ਪਦ_ਕੰਮ_running_check(ਪਦ, FALSE);
 }
 
 /*
  * Return TRUE if the job for "term" is still running, ignoring the job was
  * "NONE".
  */
-    int
-term_job_running_not_none(term_T *term)
+    ਪੂਰਨ
+ਪਦ_ਕੰਮ_running_not_none(ਪਦ_T *ਪਦ)
 {
-    return term_job_running(term) && !term_none_open(term);
+    ਵਾਪਸ ਪਦ_ਕੰਮ_running(ਪਦ) && !ਪਦ_none_open(ਪਦ);
 }
 
 /*
  * Return TRUE if "term" has an active channel and used ":term NONE".
  */
-    int
-term_none_open(term_T *term)
+    ਪੂਰਨ
+ਪਦ_none_open(ਪਦ_T *ਪਦ)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    return term != NULL
-	&& term->tl_job != NULL
-	&& channel_is_open(term->tl_job->jv_channel)
-	&& term->tl_job->jv_channel->ch_keep_open;
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ
+	&& ਪਦ->tl_ਕੰਮ != ਨਿਰਾ
+	&& channel_is_open(ਪਦ->tl_ਕੰਮ->jv_channel)
+	&& ਪਦ->tl_ਕੰਮ->jv_channel->ch_keep_open;
 }
 
 //
@@ -1963,18 +1963,18 @@ term_none_open(term_T *term)
 // Return OK when the user confirms to kill it.
 // Return FAIL if the user selects otherwise.
 //
-    int
-term_confirm_stop(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_confirm_stop(buf_T *buf)
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int	ret;
+    char_u	buff[DIALOG_ਸੁਨੇਹਾ_ਮਾਪ];
+    ਪੂਰਨ	ret;
 
-    dialog_msg(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
-    ret = vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1);
-    if (ret == VIM_YES)
-	return OK;
-    else
-	return FAIL;
+    dialog_ਸੁਨੇਹਾ(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
+    ret = vim_dialog_yesno(VIM_QUESTION, ਨਿਰਾ, buff, 1);
+    ਜੇ (ret == VIM_YES)
+	ਵਾਪਸ OK;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ FAIL;
 }
 
 /*
@@ -1982,125 +1982,125 @@ term_confirm_stop(buf_T *buf)
  * Return OK when the job finished.
  * Return FAIL when the job is still running.
  */
-    int
-term_try_stop_job(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_try_stop_ਕੰਮ(buf_T *buf)
 {
-    int	    count;
-    char    *how = (char *)buf->b_term->tl_kill;
+    ਪੂਰਨ	    ਗਿਣਤੀ_2;
+    ਅੱਖਰ    *how = (ਅੱਖਰ *)buf->b_ਪਦ->tl_kill;
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-    if ((how == NULL || *how == NUL)
+#ਜੇ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+    ਜੇ ((how == ਨਿਰਾ || *how == NUL)
 			  && (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
     {
-	if (term_confirm_stop(buf) == OK)
+	ਜੇ (ਪਦ_confirm_stop(buf) == OK)
 	    how = "kill";
-	else
-	    return FAIL;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ FAIL;
     }
-#endif
-    if (how == NULL || *how == NUL)
-	return FAIL;
+#ਜੇ_ਅੰਤ
+    ਜੇ (how == ਨਿਰਾ || *how == NUL)
+	ਵਾਪਸ FAIL;
 
-    job_stop(buf->b_term->tl_job, NULL, how);
+    ਕੰਮ_stop(buf->b_ਪਦ->tl_ਕੰਮ, ਨਿਰਾ, how);
 
     // wait for up to a second for the job to die
-    for (count = 0; count < 100; ++count)
+    ਲਈ (ਗਿਣਤੀ_2 = 0; ਗਿਣਤੀ_2 < 100; ++ਗਿਣਤੀ_2)
     {
-	job_T *job;
+	ਕੰਮ_T *ਕੰਮ;
 
 	// buffer, terminal and job may be cleaned up while waiting
-	if (!buf_valid(buf)
-		|| buf->b_term == NULL
-		|| buf->b_term->tl_job == NULL)
-	    return OK;
-	job = buf->b_term->tl_job;
+	ਜੇ (!buf_valid(buf)
+		|| buf->b_ਪਦ == ਨਿਰਾ
+		|| buf->b_ਪਦ->tl_ਕੰਮ == ਨਿਰਾ)
+	    ਵਾਪਸ OK;
+	ਕੰਮ = buf->b_ਪਦ->tl_ਕੰਮ;
 
 	// Call job_status() to update jv_status. It may cause the job to be
 	// cleaned up but it won't be freed.
-	job_status(job);
-	if (job->jv_status >= JOB_ENDED)
-	    return OK;
+	ਕੰਮ_ਸਥਿਤੀ(ਕੰਮ);
+	ਜੇ (ਕੰਮ->jv_ਸਥਿਤੀ >= ਕੰਮ_ENDED)
+	    ਵਾਪਸ OK;
 
 	ui_delay(10L, TRUE);
-	term_flush_messages();
+	ਪਦ_flush_messages();
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Add the last line of the scrollback buffer to the buffer in the window.
  */
-    static void
-add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
+    ਸਥਿਰ ਖਾਲੀ
+ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ_T *ਪਦ, char_u *ਪਾਠ, ਪੂਰਨ len, ਪੂਰਨ append)
 {
-    buf_T	*buf = term->tl_buffer;
-    int		empty = (buf->b_ml.ml_flags & ML_EMPTY);
-    linenr_T	lnum = buf->b_ml.ml_line_count;
+    buf_T	*buf = ਪਦ->tl_ਬਫਰ;
+    ਪੂਰਨ		ਖਾਲੀ_ਥਾਵਾਂ_2 = (buf->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ);
+    linenr_T	lnum = buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
-#ifdef MSWIN
-    char_u *tmp = text;
-    if (!enc_utf8 && enc_codepage > 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    char_u *tmp = ਪਾਠ;
+    ਜੇ (!enc_utf8 && enc_codepage > 0)
     {
-	WCHAR   *ret = NULL;
-	int	length = 0;
+	WCHAR   *ret = ਨਿਰਾ;
+	ਪੂਰਨ	ਲੰਮਾਈ = 0;
 
-	MultiByteToWideChar_alloc(CP_UTF8, 0, (char*)text, len + 1,
-							   &ret, &length);
-	if (ret != NULL)
+	Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char_alloc(CP_UTF8, 0, (ਅੱਖਰ*)ਪਾਠ, len + 1,
+							   &ret, &ਲੰਮਾਈ);
+	ਜੇ (ret != ਨਿਰਾ)
 	{
-	    WideCharToMultiByte_alloc(enc_codepage, 0,
-				      ret, length, (char **)&text, &len, 0, 0);
+	    Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte_alloc(enc_codepage, 0,
+				      ret, ਲੰਮਾਈ, (ਅੱਖਰ **)&ਪਾਠ, &len, 0, 0);
 	    vim_free(ret);
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (append)
+    ਜੇ (append)
     {
-	char_u *prev_text = ml_get_buf(buf, lnum, FALSE);
-	size_t prev_len = STRLEN(prev_text);
+	char_u *prev_ਪਾਠ = ml_get_buf(buf, lnum, FALSE);
+	size_t prev_len = STRLEN(prev_ਪਾਠ);
 
 	char_u *both = alloc(len + prev_len + 2);
-	if (both == NULL)
-	    return;
-	vim_strncpy(both, prev_text, prev_len + 1);
-	vim_strncpy(both + prev_len, text, len + 1);
+	ਜੇ (both == ਨਿਰਾ)
+	    ਵਾਪਸ;
+	vim_strncpy(both, prev_ਪਾਠ, prev_len + 1);
+	vim_strncpy(both + prev_len, ਪਾਠ, len + 1);
 
 	curbuf = buf;
 	ml_replace(lnum, both, FALSE);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_ਬਫਰ;
     }
-    else
-	ml_append_buf(buf, lnum, text, len + 1, FALSE);
+    ਨਹੀਂਤਾਂ
+	ml_append_buf(buf, lnum, ਪਾਠ, len + 1, FALSE);
 
-#ifdef MSWIN
-    if (tmp != text)
-	vim_free(text);
-#endif
-    if (empty)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (tmp != ਪਾਠ)
+	vim_free(ਪਾਠ);
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਖਾਲੀ_ਥਾਵਾਂ_2)
     {
 	// Delete the empty line that was in the empty buffer.
 	curbuf = buf;
 	ml_delete(1);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_ਬਫਰ;
     }
 }
 
-    static void
-cell2cellattr(const VTermScreenCell *cell, cellattr_T *attr)
+    ਸਥਿਰ ਖਾਲੀ
+cell2cellattr(ਅਚਲ VTermScreenCell *cell, cellattr_T *attr)
 {
-    attr->width = cell->width;
+    attr->ਚੌੜਾਈ = cell->ਚੌੜਾਈ;
     attr->attrs = cell->attrs;
     attr->fg = cell->fg;
     attr->bg = cell->bg;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 equal_celattr(cellattr_T *a, cellattr_T *b)
 {
     // We only compare the RGB colors, ignoring the ANSI index and type.
     // Thus black set explicitly is equal the background black.
-    return a->fg.red == b->fg.red
+    ਵਾਪਸ a->fg.red == b->fg.red
 	&& a->fg.green == b->fg.green
 	&& a->fg.blue == b->fg.blue
 	&& a->bg.red == b->bg.red
@@ -2112,31 +2112,31 @@ equal_celattr(cellattr_T *a, cellattr_T *b)
  * Add an empty scrollback line to "term".  When "lnum" is not zero, add the
  * line at this position.  Otherwise at the end.
  */
-    static int
-add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
+    ਸਥਿਰ ਪੂਰਨ
+ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ_T *ਪਦ, cellattr_T *fill_attr, ਪੂਰਨ lnum)
 {
-    if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	return FALSE;
+    ਜੇ (ga_grow(&ਪਦ->tl_scrollback, 1) == FAIL)
+	ਵਾਪਸ FALSE;
 
-    sb_line_T *line = (sb_line_T *)term->tl_scrollback.ga_data
-	+ term->tl_scrollback.ga_len;
+    sb_ਸਤਰ_T *ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ
+	+ ਪਦ->tl_scrollback.ga_len;
 
-    if (lnum > 0)
+    ਜੇ (lnum > 0)
     {
-	int i;
+	ਪੂਰਨ i;
 
-	for (i = 0; i < term->tl_scrollback.ga_len - lnum; ++i)
+	ਲਈ (i = 0; i < ਪਦ->tl_scrollback.ga_len - lnum; ++i)
 	{
-	    *line = *(line - 1);
-	    --line;
+	    *ਸਤਰ = *(ਸਤਰ - 1);
+	    --ਸਤਰ;
 	}
     }
-    line->sb_cols = 0;
-    line->sb_bytes = 0;
-    line->sb_cells = NULL;
-    line->sb_fill_attr = *fill_attr;
-    ++term->tl_scrollback.ga_len;
-    return OK;
+    ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ = 0;
+    ਸਤਰ->sb_ਬਾਈਟਾਂ = 0;
+    ਸਤਰ->sb_cells = ਨਿਰਾ;
+    ਸਤਰ->sb_fill_attr = *fill_attr;
+    ++ਪਦ->tl_scrollback.ga_len;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2144,187 +2144,187 @@ add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
  * Used before adding a new scrollback line or updating the buffer for lines
  * displayed in the terminal.
  */
-    static void
-cleanup_scrollback(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+cleanup_scrollback(ਪਦ_T *ਪਦ)
 {
-    sb_line_T	*line;
+    sb_ਸਤਰ_T	*ਸਤਰ;
     garray_T	*gap;
     char_u	*bufline;
-    size_t      bufline_length;
+    size_t      bufline_ਲੰਮਾਈ;
 
-    curbuf = term->tl_buffer;
-    gap = &term->tl_scrollback;
-    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-    bufline_length = STRLEN(bufline);
-    while (term->tl_scrollback_snapshot && gap->ga_len > 0)
+    curbuf = ਪਦ->tl_ਬਫਰ;
+    gap = &ਪਦ->tl_scrollback;
+    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, FALSE);
+    bufline_ਲੰਮਾਈ = STRLEN(bufline);
+    ਜਦੋਂ (ਪਦ->tl_scrollback_snapshot && gap->ga_len > 0)
     {
-	line = (sb_line_T *)gap->ga_data + gap->ga_len - 1;
-	if (line->sb_bytes < 0 || (size_t)line->sb_bytes > bufline_length)
-	    break;
-	bufline_length -= line->sb_bytes;
-	if (!bufline_length)
+	ਸਤਰ = (sb_ਸਤਰ_T *)gap->ga_ਅੰਕੜੇ + gap->ga_len - 1;
+	ਜੇ (ਸਤਰ->sb_ਬਾਈਟਾਂ < 0 || (size_t)ਸਤਰ->sb_ਬਾਈਟਾਂ > bufline_ਲੰਮਾਈ)
+	    ਰੋਕੋ;
+	bufline_ਲੰਮਾਈ -= ਸਤਰ->sb_ਬਾਈਟਾਂ;
+	ਜੇ (!bufline_ਲੰਮਾਈ)
 	{
-	    ml_delete(curbuf->b_ml.ml_line_count);
-	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-	    bufline_length = STRLEN(bufline);
+	    ml_delete(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ);
+	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, FALSE);
+	    bufline_ਲੰਮਾਈ = STRLEN(bufline);
 	}
-	vim_free(line->sb_cells);
+	vim_free(ਸਤਰ->sb_cells);
 	--gap->ga_len;
-	--term->tl_scrollback_snapshot;
+	--ਪਦ->tl_scrollback_snapshot;
     }
-    if (bufline_length < STRLEN(bufline))
+    ਜੇ (bufline_ਲੰਮਾਈ < STRLEN(bufline))
     {
-	char_u *shortened = vim_strnsave(bufline, bufline_length);
-	ml_replace(curbuf->b_ml.ml_line_count, shortened, FALSE);
+	char_u *shortened = vim_strnsave(bufline, bufline_ਲੰਮਾਈ);
+	ml_replace(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, shortened, FALSE);
     }
-    curbuf = curwin->w_buffer;
-    if (curbuf == term->tl_buffer)
+    curbuf = curwin->w_ਬਫਰ;
+    ਜੇ (curbuf == ਪਦ->tl_ਬਫਰ)
 	check_cursor();
 }
 
 /*
  * Add the current lines of the terminal to scrollback and to the buffer.
  */
-    static void
-update_snapshot(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+update_snapshot(ਪਦ_T *ਪਦ)
 {
     VTermScreen	    *screen;
     VTermState	    *state;
-    int		    len;
-    int		    lines_skipped = 0;
+    ਪੂਰਨ		    len;
+    ਪੂਰਨ		    ਸਤਰਾਂ_skipped = 0;
     VTermPos	    pos;
     VTermScreenCell cell;
     cellattr_T	    fill_attr, new_fill_attr;
     cellattr_T	    *p;
 
-    ch_log(term->tl_job == NULL ? NULL : term->tl_job->jv_channel,
+    ch_log(ਪਦ->tl_ਕੰਮ == ਨਿਰਾ ? ਨਿਰਾ : ਪਦ->tl_ਕੰਮ->jv_channel,
 				  "Adding terminal window snapshot to buffer");
 
     // First remove the lines that were appended before, they might be
     // outdated.
-    cleanup_scrollback(term);
+    cleanup_scrollback(ਪਦ);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
-    fill_attr = new_fill_attr = term->tl_default_color;
-    for (pos.row = 0; pos.row < term->tl_rows; ++pos.row)
+    screen = vterm_obtain_screen(ਪਦ->tl_vterm);
+    state = vterm_obtain_state(ਪਦ->tl_vterm);
+    fill_attr = new_fill_attr = ਪਦ->tl_default_color;
+    ਲਈ (pos.ਪੰਕਤੀ = 0; pos.ਪੰਕਤੀ < ਪਦ->tl_ਪੰਕਤੀਆਂ; ++pos.ਪੰਕਤੀ)
     {
 	len = 0;
-	for (pos.col = 0; pos.col < term->tl_cols; ++pos.col)
-	    if (vterm_screen_get_cell(screen, pos, &cell) != 0
+	ਲਈ (pos.ਖਾਨਾ = 0; pos.ਖਾਨਾ < ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ; ++pos.ਖਾਨਾ)
+	    ਜੇ (vterm_screen_get_cell(screen, pos, &cell) != 0
 						       && cell.chars[0] != NUL)
 	    {
-		len = pos.col + 1;
-		new_fill_attr = term->tl_default_color;
+		len = pos.ਖਾਨਾ + 1;
+		new_fill_attr = ਪਦ->tl_default_color;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		// Assume the last attr is the filler attr.
 		cell2cellattr(&cell, &new_fill_attr);
 
-	if (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
-	    ++lines_skipped;
-	else
+	ਜੇ (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
+	    ++ਸਤਰਾਂ_skipped;
+	ਨਹੀਂਤਾਂ
 	{
-	    while (lines_skipped > 0)
+	    ਜਦੋਂ (ਸਤਰਾਂ_skipped > 0)
 	    {
 		// Line was skipped, add an empty line.
-		--lines_skipped;
-		if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+		--ਸਤਰਾਂ_skipped;
+		ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &fill_attr, 0) == OK)
 		{
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		    ++term->tl_scrollback_snapshot;
+		    ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, (char_u *)"", 0, 0);
+		    ++ਪਦ->tl_scrollback_snapshot;
 		}
 	    }
 
-	    if (len == 0)
-		p = NULL;
-	    else
+	    ਜੇ (len == 0)
+		p = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ
 		p = ALLOC_MULT(cellattr_T, len);
-	    if ((p != NULL || len == 0)
-				     && ga_grow(&term->tl_scrollback, 1) == OK)
+	    ਜੇ ((p != ਨਿਰਾ || len == 0)
+				     && ga_grow(&ਪਦ->tl_scrollback, 1) == OK)
 	    {
 		garray_T    ga;
-		int	    width;
-		const VTermLineInfo *lineinfo;
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		ਪੂਰਨ	    ਚੌੜਾਈ;
+		ਅਚਲ VTerm_ਸਤਰ_Info *lineinfo;
+		sb_ਸਤਰ_T   *ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ
+						  + ਪਦ->tl_scrollback.ga_len;
 
-		lineinfo = vterm_state_get_lineinfo(state, pos.row);
+		lineinfo = vterm_state_get_lineinfo(state, pos.ਪੰਕਤੀ);
 
 		ga_init2(&ga, 1, 100);
-		for (pos.col = 0; pos.col < len; pos.col += width)
+		ਲਈ (pos.ਖਾਨਾ = 0; pos.ਖਾਨਾ < len; pos.ਖਾਨਾ += ਚੌੜਾਈ)
 		{
-		    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		    ਜੇ (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		    {
-			width = 1;
-			CLEAR_POINTER(p + pos.col);
-			if (ga_grow(&ga, 1) == OK)
+			ਚੌੜਾਈ = 1;
+			CLEAR_ਸੂਚਕ(p + pos.ਖਾਨਾ);
+			ਜੇ (ga_grow(&ga, 1) == OK)
 			    ga.ga_len += utf_char2bytes(' ',
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			width = cell.width;
+			ਚੌੜਾਈ = cell.ਚੌੜਾਈ;
 
-			cell2cellattr(&cell, &p[pos.col]);
-			if (width == 2)
+			cell2cellattr(&cell, &p[pos.ਖਾਨਾ]);
+			ਜੇ (ਚੌੜਾਈ == 2)
 			    // second cell of double-width character has the
 			    // same attributes.
-			    p[pos.col + 1] = p[pos.col];
+			    p[pos.ਖਾਨਾ + 1] = p[pos.ਖਾਨਾ];
 
 			// Each character can be up to 6 bytes.
-			if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 6) == OK)
+			ਜੇ (ga_grow(&ga, VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL * 6) == OK)
 			{
-			    int	    i;
-			    int	    c;
+			    ਪੂਰਨ	    i;
+			    ਪੂਰਨ	    c;
 
-			    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
+			    ਲਈ (i = 0; i < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL &&
 				    ((c = cell.chars[i]) > 0 || i == 0); ++i)
 				ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len);
 			}
 		    }
 		}
-		line->sb_cols = len;
-		line->sb_bytes = ga.ga_len;
-		line->sb_cells = p;
-		line->sb_fill_attr = new_fill_attr;
-		line->continuation = (char_u)lineinfo->continuation;
+		ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ = len;
+		ਸਤਰ->sb_ਬਾਈਟਾਂ = ga.ga_len;
+		ਸਤਰ->sb_cells = p;
+		ਸਤਰ->sb_fill_attr = new_fill_attr;
+		ਸਤਰ->continuation = (char_u)lineinfo->continuation;
 		fill_attr = new_fill_attr;
-		++term->tl_scrollback.ga_len;
-		++term->tl_scrollback_snapshot;
+		++ਪਦ->tl_scrollback.ga_len;
+		++ਪਦ->tl_scrollback_snapshot;
 
-		if (ga_grow(&ga, 1) == FAIL)
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		else
+		ਜੇ (ga_grow(&ga, 1) == FAIL)
+		    ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, (char_u *)"", 0, 0);
+		ਨਹੀਂਤਾਂ
 		{
-		    *((char_u *)ga.ga_data + ga.ga_len) = NUL;
-		    add_scrollback_line_to_buffer(term, ga.ga_data, ga.ga_len,
+		    *((char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len) = NUL;
+		    ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, ga.ga_ਅੰਕੜੇ, ga.ga_len,
 						  lineinfo->continuation);
 		}
 		ga_clear(&ga);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		vim_free(p);
 	}
     }
 
     // Add trailing empty lines.
-    for (pos.row = term->tl_scrollback.ga_len;
-	    pos.row < term->tl_scrollback_scrolled + term->tl_cursor_pos.row;
-	    ++pos.row)
+    ਲਈ (pos.ਪੰਕਤੀ = ਪਦ->tl_scrollback.ga_len;
+	    pos.ਪੰਕਤੀ < ਪਦ->tl_scrollback_scrolled + ਪਦ->tl_cursor_pos.ਪੰਕਤੀ;
+	    ++pos.ਪੰਕਤੀ)
     {
-	if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+	ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &fill_attr, 0) == OK)
 	{
-	    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-	    ++term->tl_scrollback_snapshot;
+	    ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, (char_u *)"", 0, 0);
+	    ++ਪਦ->tl_scrollback_snapshot;
 	}
     }
 
-    term->tl_dirty_snapshot = FALSE;
-#ifdef FEAT_TIMERS
-    term->tl_timer_set = FALSE;
-#endif
+    ਪਦ->tl_dirty_snapshot = FALSE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TIMERS
+    ਪਦ->tl_timer_ਸੈੱਟ = FALSE;
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -2332,20 +2332,20 @@ update_snapshot(term_T *term)
  * encountered when using a terminal in a popup window.
  * Return TRUE if "*wp" was set to the next window.
  */
-    static int
-for_all_windows_and_curwin(win_T **wp, int *did_curwin)
+    ਸਥਿਰ ਪੂਰਨ
+for_all_windows_and_curwin(win_T **wp, ਪੂਰਨ *did_curwin)
 {
-    if (*wp == NULL)
+    ਜੇ (*wp == ਨਿਰਾ)
 	*wp = firstwin;
-    else if ((*wp)->w_next != NULL)
-	*wp = (*wp)->w_next;
-    else if (!*did_curwin)
+    ਨਹੀਂਤਾਂ ਜੇ ((*wp)->w_ਅਗਲਾ != ਨਿਰਾ)
+	*wp = (*wp)->w_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (!*did_curwin)
 	*wp = curwin;
-    else
-	return FALSE;
-    if (*wp == curwin)
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ FALSE;
+    ਜੇ (*wp == curwin)
 	*did_curwin = TRUE;
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -2354,35 +2354,35 @@ for_all_windows_and_curwin(win_T **wp, int *did_curwin)
  * Terminal-Normal mode.
  * When "redraw" is TRUE redraw the windows that show the terminal.
  */
-    void
-may_move_terminal_to_buffer(term_T *term, int redraw)
+    ਖਾਲੀ
+may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ_T *ਪਦ, ਪੂਰਨ redraw)
 {
-    if (term->tl_vterm == NULL)
-	return;
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Update the snapshot only if something changes or the buffer does not
     // have all the lines.
-    if (term->tl_dirty_snapshot || term->tl_buffer->b_ml.ml_line_count
-					       <= term->tl_buffer_scrolled)
-	update_snapshot(term);
+    ਜੇ (ਪਦ->tl_dirty_snapshot || ਪਦ->tl_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ
+					       <= ਪਦ->tl_ਬਫਰ_scrolled)
+	update_snapshot(ਪਦ);
 
-    if (redraw)
+    ਜੇ (redraw)
     {
-	win_T	    *wp = NULL;
-	int	    did_curwin = FALSE;
+	win_T	    *wp = ਨਿਰਾ;
+	ਪੂਰਨ	    did_curwin = FALSE;
 
-	while (for_all_windows_and_curwin(&wp, &did_curwin))
+	ਜਦੋਂ (for_all_windows_and_curwin(&wp, &did_curwin))
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	    {
-		wp->w_cursor.lnum = term->tl_buffer->b_ml.ml_line_count;
-		wp->w_cursor.col = 0;
+		wp->w_cursor.lnum = ਪਦ->tl_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+		wp->w_cursor.ਖਾਨਾ = 0;
 		wp->w_valid = 0;
-		if (wp->w_cursor.lnum >= wp->w_height)
+		ਜੇ (wp->w_cursor.lnum >= wp->w_ਉਚਾਈ)
 		{
-		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_height + 1;
+		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_ਉਚਾਈ + 1;
 
-		    if (wp->w_topline < min_topline)
+		    ਜੇ (wp->w_topline < min_topline)
 			wp->w_topline = min_topline;
 		}
 		redraw_win_later(wp, UPD_NOT_VALID);
@@ -2391,51 +2391,51 @@ may_move_terminal_to_buffer(term_T *term, int redraw)
     }
 }
 
-#if defined(FEAT_TIMERS)
+#ਜੇ defined(FEAT_TIMERS)
 /*
  * Check if any terminal timer expired.  If so, copy text from the terminal to
  * the buffer.
  * Return the time until the next timer will expire.
  */
-    int
-term_check_timers(int next_due_arg, proftime_T *now)
+    ਪੂਰਨ
+ਪਦ_check_timers(ਪੂਰਨ ਅਗਲਾ_due_arg, proftime_T *now)
 {
-    term_T  *term;
-    int	    next_due = next_due_arg;
+    ਪਦ_T  *ਪਦ;
+    ਪੂਰਨ	    ਅਗਲਾ_due = ਅਗਲਾ_due_arg;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(ਪਦ)
     {
-	if (term->tl_timer_set && !term->tl_normal_mode)
+	ਜੇ (ਪਦ->tl_timer_ਸੈੱਟ && !ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
 	{
-	    long    this_due = proftime_time_left(&term->tl_timer_due, now);
+	    ਲੰਮਾ    this_due = proftime_ਸਮਾਂ_ਖੱਬਾ(&ਪਦ->tl_timer_due, now);
 
-	    if (this_due <= 1)
+	    ਜੇ (this_due <= 1)
 	    {
-		term->tl_timer_set = FALSE;
-		may_move_terminal_to_buffer(term, FALSE);
+		ਪਦ->tl_timer_ਸੈੱਟ = FALSE;
+		may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, FALSE);
 	    }
-	    else if (next_due == -1 || next_due > this_due)
-		next_due = this_due;
+	    ਨਹੀਂਤਾਂ ਜੇ (ਅਗਲਾ_due == -1 || ਅਗਲਾ_due > this_due)
+		ਅਗਲਾ_due = this_due;
 	}
     }
 
-    return next_due;
+    ਵਾਪਸ ਅਗਲਾ_due;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * When "normal_mode" is TRUE set the terminal to Terminal-Normal mode,
  * otherwise end it.
  */
-    static void
-set_terminal_mode(term_T *term, int normal_mode)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_terminal_ਬਹੁਲਕ(ਪਦ_T *ਪਦ, ਪੂਰਨ ਸਾਧਾਰਨ_ਬਹੁਲਕ)
 {
-    term->tl_normal_mode = normal_mode;
+    ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ = ਸਾਧਾਰਨ_ਬਹੁਲਕ;
     may_trigger_modechanged();
-    if (!normal_mode)
-	handle_postponed_scrollback(term);
-    VIM_CLEAR(term->tl_status_text);
-    if (term->tl_buffer == curbuf)
+    ਜੇ (!ਸਾਧਾਰਨ_ਬਹੁਲਕ)
+	handle_postponed_scrollback(ਪਦ);
+    VIM_CLEAR(ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ);
+    ਜੇ (ਪਦ->tl_ਬਫਰ == curbuf)
 	maketitle();
 }
 
@@ -2443,75 +2443,75 @@ set_terminal_mode(term_T *term, int normal_mode)
  * Called after the job is finished and Terminal mode is not active:
  * Move the vterm contents into the scrollback buffer and free the vterm.
  */
-    static void
-cleanup_vterm(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+cleanup_vterm(ਪਦ_T *ਪਦ)
 {
-    set_terminal_mode(term, FALSE);
-    if (term->tl_finish != TL_FINISH_CLOSE)
-	may_move_terminal_to_buffer(term, TRUE);
-    term_free_vterm(term);
+    ਸੈੱਟ_terminal_ਬਹੁਲਕ(ਪਦ, FALSE);
+    ਜੇ (ਪਦ->tl_ਅੰਤ != TL_ਅੰਤ_CLOSE)
+	may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, TRUE);
+    ਪਦ_free_vterm(ਪਦ);
 }
 
 /*
  * Switch from Terminal-Job mode to Terminal-Normal mode.
  * Suspends updating the terminal window.
  */
-    static void
-term_enter_normal_mode(void)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_enter_ਸਾਧਾਰਨ_ਬਹੁਲਕ(ਖਾਲੀ)
 {
-    term_T     *term = curbuf->b_term;
+    ਪਦ_T     *ਪਦ = curbuf->b_ਪਦ;
     linenr_T   lnum;
-    int        col;
+    ਪੂਰਨ        ਖਾਨਾ;
 
-    set_terminal_mode(term, TRUE);
+    ਸੈੱਟ_terminal_ਬਹੁਲਕ(ਪਦ, TRUE);
 
     // Append the current terminal contents to the buffer.
-    may_move_terminal_to_buffer(term, TRUE);
+    may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, TRUE);
 
     // Move the window cursor to the position of the cursor in the
     // terminal.
-    lnum = term->tl_buffer_scrolled + 1 + term->tl_cursor_pos.row;
-    col = term->tl_cursor_pos.col;
-    scrollbackline_pos_in_buf(term, term->tl_cursor_pos.row + term->tl_scrollback_scrolled, &lnum, &col, NULL);
+    lnum = ਪਦ->tl_ਬਫਰ_scrolled + 1 + ਪਦ->tl_cursor_pos.ਪੰਕਤੀ;
+    ਖਾਨਾ = ਪਦ->tl_cursor_pos.ਖਾਨਾ;
+    scrollbackline_pos_ਵਿੱਚ_buf(ਪਦ, ਪਦ->tl_cursor_pos.ਪੰਕਤੀ + ਪਦ->tl_scrollback_scrolled, &lnum, &ਖਾਨਾ, ਨਿਰਾ);
 
     curwin->w_cursor.lnum = lnum;
     check_cursor();
-    if (coladvance(col) == FAIL)
+    ਜੇ (coladvance(ਖਾਨਾ) == FAIL)
 	coladvance(MAXCOL);
-    curwin->w_set_curswant = true;
-    curwin->w_topline = term->tl_buffer_scrolled + 1;
+    curwin->w_ਸੈੱਟ_curswant = true;
+    curwin->w_topline = ਪਦ->tl_ਬਫਰ_scrolled + 1;
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are in
  * Terminal-Normal mode.
  */
-    int
-term_in_normal_mode(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_ਵਿੱਚ_ਸਾਧਾਰਨ_ਬਹੁਲਕ(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    ਪਦ_T *ਪਦ = buf->b_ਪਦ;
 
-    return term != NULL && term->tl_normal_mode;
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ && ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ;
 }
 
 /*
  * Switch from Terminal-Normal mode to Terminal-Job mode.
  * Restores updating the terminal window.
  */
-    void
-term_enter_job_mode(void)
+    ਖਾਲੀ
+ਪਦ_enter_ਕੰਮ_ਬਹੁਲਕ(ਖਾਲੀ)
 {
-    term_T	*term = curbuf->b_term;
+    ਪਦ_T	*ਪਦ = curbuf->b_ਪਦ;
 
-    set_terminal_mode(term, FALSE);
+    ਸੈੱਟ_terminal_ਬਹੁਲਕ(ਪਦ, FALSE);
 
-    if (term->tl_channel_closed)
-	cleanup_vterm(term);
-    redraw_buf_and_status_later(curbuf, UPD_NOT_VALID);
-#ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(curwin))
+    ਜੇ (ਪਦ->tl_channel_closed)
+	cleanup_vterm(ਪਦ);
+    redraw_buf_and_ਸਥਿਤੀ_later(curbuf, UPD_NOT_VALID);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (WIN_IS_POPUP(curwin))
 	redraw_later(UPD_NOT_VALID);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -2520,43 +2520,43 @@ term_enter_job_mode(void)
  * vgetc().  Therefore vgetorpeek() will call check_no_reduce_keys() to update
  * "no_reduce_keys" before using it.
  */
-typedef enum {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਗਿਣਤੀ {
     NRKS_NONE,	    // initial value
     NRKS_CHECK,	    // modify_other_keys was off before calling vgetc()
-    NRKS_SET,	    // no_reduce_keys was incremented in term_vgetc() or
+    NRKS_ਸੈੱਟ,	    // no_reduce_keys was incremented in term_vgetc() or
 		    // check_no_reduce_keys(), must be decremented.
-} reduce_key_state_T;
+} reduce_ਕੁੰਜੀ_state_T;
 
-static reduce_key_state_T  no_reduce_key_state = NRKS_NONE;
+ਸਥਿਰ reduce_ਕੁੰਜੀ_state_T  no_reduce_ਕੁੰਜੀ_state = NRKS_NONE;
 
 /*
  * Return TRUE if the term is using modifyOtherKeys level 2 or the kitty
  * keyboard protocol.
  */
-    static int
-vterm_using_key_protocol(void)
+    ਸਥਿਰ ਪੂਰਨ
+vterm_using_ਕੁੰਜੀ_protocol(ਖਾਲੀ)
 {
-    return curbuf->b_term != NULL
-	&& curbuf->b_term->tl_vterm != NULL
-	&& (vterm_is_modify_other_keys(curbuf->b_term->tl_vterm)
-		|| vterm_is_kitty_keyboard(curbuf->b_term->tl_vterm));
+    ਵਾਪਸ curbuf->b_ਪਦ != ਨਿਰਾ
+	&& curbuf->b_ਪਦ->tl_vterm != ਨਿਰਾ
+	&& (vterm_is_modify_other_ਕੁੰਜੀਆਂ(curbuf->b_ਪਦ->tl_vterm)
+		|| vterm_is_kitty_keyboard(curbuf->b_ਪਦ->tl_vterm));
 }
 
-    void
-check_no_reduce_keys(void)
+    ਖਾਲੀ
+check_no_reduce_ਕੁੰਜੀਆਂ(ਖਾਲੀ)
 {
-    if (no_reduce_key_state != NRKS_CHECK
-	    || no_reduce_keys >= 1
-	    || curbuf->b_term == NULL
-	    || curbuf->b_term->tl_vterm == NULL)
-	return;
+    ਜੇ (no_reduce_ਕੁੰਜੀ_state != NRKS_CHECK
+	    || no_reduce_ਕੁੰਜੀਆਂ >= 1
+	    || curbuf->b_ਪਦ == ਨਿਰਾ
+	    || curbuf->b_ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (vterm_using_key_protocol())
+    ਜੇ (vterm_using_ਕੁੰਜੀ_protocol())
     {
 	// "modify_other_keys" or kitty keyboard protocol was enabled while
 	// waiting.
-	no_reduce_key_state = NRKS_SET;
-	++no_reduce_keys;
+	no_reduce_ਕੁੰਜੀ_state = NRKS_ਸੈੱਟ;
+	++no_reduce_ਕੁੰਜੀਆਂ;
     }
 }
 
@@ -2565,207 +2565,207 @@ check_no_reduce_keys(void)
  * Note: while waiting a terminal may be closed and freed if the channel is
  * closed and ++close was used.  This may even happen before we get here.
  */
-    static int
-term_vgetc(void)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_vgetc(ਖਾਲੀ)
 {
-    int c;
-    int save_State = State;
+    ਪੂਰਨ c;
+    ਪੂਰਨ save_State = State;
 
-    State = MODE_TERMINAL;
+    State = ਬਹੁਲਕ_TERMINAL;
     got_int = FALSE;
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     ctrl_break_was_pressed = FALSE;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (vterm_using_key_protocol())
+    ਜੇ (vterm_using_ਕੁੰਜੀ_protocol())
     {
-	++no_reduce_keys;
-	no_reduce_key_state = NRKS_SET;
+	++no_reduce_ਕੁੰਜੀਆਂ;
+	no_reduce_ਕੁੰਜੀ_state = NRKS_ਸੈੱਟ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	no_reduce_key_state = NRKS_CHECK;
+	no_reduce_ਕੁੰਜੀ_state = NRKS_CHECK;
     }
 
     c = vgetc();
     got_int = FALSE;
     State = save_State;
 
-    if (no_reduce_key_state == NRKS_SET)
-	--no_reduce_keys;
-    no_reduce_key_state = NRKS_NONE;
+    ਜੇ (no_reduce_ਕੁੰਜੀ_state == NRKS_ਸੈੱਟ)
+	--no_reduce_ਕੁੰਜੀਆਂ;
+    no_reduce_ਕੁੰਜੀ_state = NRKS_NONE;
 
-    return c;
+    ਵਾਪਸ c;
 }
 
-static int	mouse_was_outside = FALSE;
+ਸਥਿਰ ਪੂਰਨ	mouse_was_outside = FALSE;
 
 /*
  * Send key "c" with modifiers "modmask" to terminal.
  * Return FAIL when the key needs to be handled in Normal mode.
  * Return OK when the key was dropped or sent to the terminal.
  */
-    int
-send_keys_to_term(term_T *term, int c, int modmask, int typed)
+    ਪੂਰਨ
+send_ਕੁੰਜੀਆਂ_ਮੰਜ਼ਿਲ_ਪਦ(ਪਦ_T *ਪਦ, ਪੂਰਨ c, ਪੂਰਨ modmask, ਪੂਰਨ typed)
 {
-    char	msg[KEY_BUF_LEN];
+    ਅੱਖਰ	ਸੁਨੇਹਾ[ਕੁੰਜੀ_BUF_LEN];
     size_t	len;
-    int		dragging_outside = FALSE;
+    ਪੂਰਨ		dragging_outside = FALSE;
 
     // Catch keys that need to be handled as in Normal mode.
-    switch (c)
+    ਚੋਣ (c)
     {
-	case NUL:
-	case K_ZERO:
-	    if (typed)
+	ਹਾਲਤ NUL:
+	ਹਾਲਤ K_ZERO:
+	    ਜੇ (typed)
 		stuffcharReadbuff(c);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 
-	case K_TABLINE:
+	ਹਾਲਤ K_TABLINE:
 	    stuffcharReadbuff(c);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 
-	case K_IGNORE:
-	case K_CANCEL:  // used for :normal when running out of chars
-	    return FAIL;
+	ਹਾਲਤ K_IGNORE:
+	ਹਾਲਤ K_CANCEL:  // used for :normal when running out of chars
+	    ਵਾਪਸ FAIL;
 
-	case K_LEFTDRAG:
-	case K_MIDDLEDRAG:
-	case K_RIGHTDRAG:
-	case K_X1DRAG:
-	case K_X2DRAG:
+	ਹਾਲਤ K_LEFTDRAG:
+	ਹਾਲਤ K_MIDDLEDRAG:
+	ਹਾਲਤ K_RIGHTDRAG:
+	ਹਾਲਤ K_X1DRAG:
+	ਹਾਲਤ K_X2DRAG:
 	    dragging_outside = mouse_was_outside;
 	    // FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTRELEASE:
-	case K_X1MOUSE:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2RELEASE:
+	ਹਾਲਤ K_LEFTMOUSE:
+	ਹਾਲਤ K_LEFTMOUSE_NM:
+	ਹਾਲਤ K_LEFTRELEASE:
+	ਹਾਲਤ K_LEFTRELEASE_NM:
+	ਹਾਲਤ K_MOUSEMOVE:
+	ਹਾਲਤ K_MIDDLEMOUSE:
+	ਹਾਲਤ K_MIDDLERELEASE:
+	ਹਾਲਤ K_RIGHTMOUSE:
+	ਹਾਲਤ K_RIGHTRELEASE:
+	ਹਾਲਤ K_X1MOUSE:
+	ਹਾਲਤ K_X1RELEASE:
+	ਹਾਲਤ K_X2MOUSE:
+	ਹਾਲਤ K_X2RELEASE:
 
-	case K_MOUSEUP:
-	case K_MOUSEDOWN:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
+	ਹਾਲਤ K_MOUSEUP:
+	ਹਾਲਤ K_MOUSEDOWN:
+	ਹਾਲਤ K_MOUSELEFT:
+	ਹਾਲਤ K_MOUSERIGHT:
 	    {
-		int	row = mouse_row;
-		int	col = mouse_col;
+		ਪੂਰਨ	ਪੰਕਤੀ = mouse_ਪੰਕਤੀ;
+		ਪੂਰਨ	ਖਾਨਾ = mouse_ਖਾਨਾ;
 
-#ifdef FEAT_PROP_POPUP
-		if (popup_is_popup(curwin))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		ਜੇ (popup_is_popup(curwin))
 		{
-		    row -= popup_top_extra(curwin);
-		    col -= popup_left_extra(curwin);
+		    ਪੰਕਤੀ -= popup_ਸਿਖਰ_extra(curwin);
+		    ਖਾਨਾ -= popup_ਖੱਬਾ_extra(curwin);
 		}
-#endif
-		if (row < W_WINROW(curwin)
-			|| row >= (W_WINROW(curwin) + curwin->w_height)
-			|| col < curwin->w_wincol
-			|| col >= W_ENDCOL(curwin)
+#ਜੇ_ਅੰਤ
+		ਜੇ (ਪੰਕਤੀ < W_WINROW(curwin)
+			|| ਪੰਕਤੀ >= (W_WINROW(curwin) + curwin->w_ਉਚਾਈ)
+			|| ਖਾਨਾ < curwin->w_wincol
+			|| ਖਾਨਾ >= W_ENDCOL(curwin)
 			|| dragging_outside)
 		{
 		    // click or scroll outside the current window or on status
 		    // line or vertical separator
-		    if (typed)
+		    ਜੇ (typed)
 		    {
 			stuffcharReadbuff(c);
 			mouse_was_outside = TRUE;
 		    }
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case K_COMMAND:
-	case K_SCRIPT_COMMAND:
-	    return do_cmdkey_command(c, 0);
+	ਹਾਲਤ K_COMMAND:
+	ਹਾਲਤ K_SCRIPT_COMMAND:
+	    ਵਾਪਸ do_cmdkey_command(c, 0);
     }
-    if (typed)
+    ਜੇ (typed)
 	mouse_was_outside = FALSE;
 
     // Convert the typed key to a sequence of bytes for the job.
-    len = term_convert_key(term, c, modmask, msg);
-    if (len > 0)
+    len = ਪਦ_convert_ਕੁੰਜੀ(ਪਦ, c, modmask, ਸੁਨੇਹਾ);
+    ਜੇ (len > 0)
 	// TODO: if FAIL is returned, stop?
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						(char_u *)msg, (int)len, NULL);
+	channel_send(ਪਦ->tl_ਕੰਮ->jv_channel, get_tty_part(ਪਦ),
+						(char_u *)ਸੁਨੇਹਾ, (ਪੂਰਨ)len, ਨਿਰਾ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Handle CTRL-W "": send register contents to the job.
  */
-    static void
-term_paste_register(int prev_c UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_paste_ਰਜਿਸਟਰ(ਪੂਰਨ prev_c ਅਣਵਰਤਿਆ)
 {
-    int		c;
+    ਪੂਰਨ		c;
     list_T	*l;
-    listitem_T	*item;
-    long	reglen = 0;
-    int		type;
+    listitem_T	*ਵਸਤੂ;
+    ਲੰਮਾ	reglen = 0;
+    ਪੂਰਨ		type;
 
-    if (add_to_showcmd(prev_c))
-    if (add_to_showcmd('"'))
-	out_flush();
+    ਜੇ (ਜੋੜੋ_ਮੰਜ਼ਿਲ_showcmd(prev_c))
+    ਜੇ (ਜੋੜੋ_ਮੰਜ਼ਿਲ_showcmd('"'))
+	ਬਾਹਰਲਾ_flush();
 
-    c = term_vgetc();
+    c = ਪਦ_vgetc();
     clear_showcmd();
 
-    if (!term_use_loop())
+    ਜੇ (!ਪਦ_use_loop())
 	// job finished while waiting for a character
-	return;
+	ਵਾਪਸ;
 
     // CTRL-W "= prompt for expression to evaluate.
-    if (c == '=' && get_expr_register() != '=')
-	return;
-    if (!term_use_loop())
+    ਜੇ (c == '=' && get_ਵਿਅੰਜਕ_ਰਜਿਸਟਰ() != '=')
+	ਵਾਪਸ;
+    ਜੇ (!ਪਦ_use_loop())
 	// job finished while waiting for a character
-	return;
+	ਵਾਪਸ;
 
     l = (list_T *)get_reg_contents(c, GREG_LIST);
-    if (l == NULL)
-	return;
+    ਜੇ (l == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     type = get_reg_type(c, &reglen);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(l, ਵਸਤੂ)
     {
-	char_u *s = tv_get_string(&item->li_tv);
-#ifdef MSWIN
+	char_u *s = tv_get_string(&ਵਸਤੂ->li_tv);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	char_u *tmp = s;
 
-	if (!enc_utf8 && enc_codepage > 0)
+	ਜੇ (!enc_utf8 && enc_codepage > 0)
 	{
-	    WCHAR   *ret = NULL;
-	    int	length = 0;
+	    WCHAR   *ret = ਨਿਰਾ;
+	    ਪੂਰਨ	ਲੰਮਾਈ = 0;
 
-	    MultiByteToWideChar_alloc(enc_codepage, 0, (char *)s,
-		    (int)STRLEN(s), &ret, &length);
-	    if (ret != NULL)
+	    Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char_alloc(enc_codepage, 0, (ਅੱਖਰ *)s,
+		    (ਪੂਰਨ)STRLEN(s), &ret, &ਲੰਮਾਈ);
+	    ਜੇ (ret != ਨਿਰਾ)
 	    {
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-			ret, length, (char **)&s, &length, 0, 0);
+		Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte_alloc(CP_UTF8, 0,
+			ret, ਲੰਮਾਈ, (ਅੱਖਰ **)&s, &ਲੰਮਾਈ, 0, 0);
 		vim_free(ret);
 	    }
 	}
-#endif
-	channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		s, (int)STRLEN(s), NULL);
-#ifdef MSWIN
-	if (tmp != s)
+#ਜੇ_ਅੰਤ
+	channel_send(curbuf->b_ਪਦ->tl_ਕੰਮ->jv_channel, PART_ਵਿੱਚ,
+		s, (ਪੂਰਨ)STRLEN(s), ਨਿਰਾ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਜੇ (tmp != s)
 	    vim_free(s);
-#endif
+#ਜੇ_ਅੰਤ
 
-	if (item->li_next != NULL || type == MLINE)
-	    channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		    (char_u *)"\r", 1, NULL);
+	ਜੇ (ਵਸਤੂ->li_ਅਗਲਾ != ਨਿਰਾ || type == MLINE)
+	    channel_send(curbuf->b_ਪਦ->tl_ਕੰਮ->jv_channel, PART_ਵਿੱਚ,
+		    (char_u *)"\r", 1, ਨਿਰਾ);
     }
     list_free(l);
 }
@@ -2774,114 +2774,114 @@ term_paste_register(int prev_c UNUSED)
  * Return TRUE when waiting for a character in the terminal, the cursor of the
  * terminal should be displayed.
  */
-    int
-terminal_is_active(void)
+    ਪੂਰਨ
+terminal_is_ਸਰਗਰਮ(ਖਾਲੀ)
 {
-    return in_terminal_loop != NULL;
+    ਵਾਪਸ ਵਿੱਚ_terminal_loop != ਨਿਰਾ;
 }
 
 /*
  * Return the highlight group ID for the terminal and the window.
  */
-    static int
-term_get_highlight_id(term_T *term, win_T *wp)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_get_highlight_id(ਪਦ_T *ਪਦ, win_T *wp)
 {
     char_u *name;
 
-    if (wp != NULL && wp->w_hlfwin_id != 0)
+    ਜੇ (wp != ਨਿਰਾ && wp->w_hlfwin_id != 0)
 	name = syn_id2name(wp->w_hlfwin_id);
-    else if (term->tl_highlight_name != NULL)
-	name = term->tl_highlight_name;
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ->tl_highlight_name != ਨਿਰਾ)
+	name = ਪਦ->tl_highlight_name;
+    ਨਹੀਂਤਾਂ
 	name = (char_u*)"Terminal";
 
-    return syn_name2id(name);
+    ਵਾਪਸ syn_name2id(name);
 }
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
     cursorentry_T *
-term_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
+ਪਦ_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
 {
-    term_T		 *term = in_terminal_loop;
-    static cursorentry_T entry;
-    int			 id;
-    guicolor_T		 term_fg = INVALCOLOR;
-    guicolor_T		 term_bg = INVALCOLOR;
+    ਪਦ_T		 *ਪਦ = ਵਿੱਚ_terminal_loop;
+    ਸਥਿਰ cursorentry_T ਇੰਦਰਾਜ;
+    ਪੂਰਨ			 id;
+    guicolor_T		 ਪਦ_fg = INVALCOLOR;
+    guicolor_T		 ਪਦ_bg = INVALCOLOR;
 
-    CLEAR_FIELD(entry);
-    entry.shape = entry.mshape =
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_LEFT ? SHAPE_VER :
-	SHAPE_BLOCK;
-    entry.percentage = 20;
-    if (term->tl_cursor_blink)
+    CLEAR_ਖੇਤਰ(ਇੰਦਰਾਜ);
+    ਇੰਦਰਾਜ.shape = ਇੰਦਰਾਜ.mshape =
+	ਪਦ->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
+	ਪਦ->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_ਖੱਬਾ ? SHAPE_VER :
+	SHAPE_ਖੰਡ;
+    ਇੰਦਰਾਜ.percentage = 20;
+    ਜੇ (ਪਦ->tl_cursor_blink)
     {
-	entry.blinkwait = 700;
-	entry.blinkon = 400;
-	entry.blinkoff = 250;
+	ਇੰਦਰਾਜ.blinkwait = 700;
+	ਇੰਦਰਾਜ.blinkon = 400;
+	ਇੰਦਰਾਜ.blinkoff = 250;
     }
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, curwin);
-    if (id != 0)
-	syn_id2colors(id, &term_fg, &term_bg);
-    if (term_bg != INVALCOLOR)
-	*fg = term_bg;
-    else
-	*fg = gui.back_pixel;
+    id = ਪਦ_get_highlight_id(ਪਦ, curwin);
+    ਜੇ (id != 0)
+	syn_id2colors(id, &ਪਦ_fg, &ਪਦ_bg);
+    ਜੇ (ਪਦ_bg != INVALCOLOR)
+	*fg = ਪਦ_bg;
+    ਨਹੀਂਤਾਂ
+	*fg = gui.ਪਿੱਠ_pixel;
 
-    if (term->tl_cursor_color == NULL)
+    ਜੇ (ਪਦ->tl_cursor_color == ਨਿਰਾ)
     {
-	if (term_fg != INVALCOLOR)
-	    *bg = term_fg;
-	else
+	ਜੇ (ਪਦ_fg != INVALCOLOR)
+	    *bg = ਪਦ_fg;
+	ਨਹੀਂਤਾਂ
 	    *bg = gui.norm_pixel;
     }
-    else
-	*bg = color_name2handle(term->tl_cursor_color);
-    entry.name = "n";
-    entry.used_for = SHAPE_CURSOR;
+    ਨਹੀਂਤਾਂ
+	*bg = color_name2handle(ਪਦ->tl_cursor_color);
+    ਇੰਦਰਾਜ.name = "n";
+    ਇੰਦਰਾਜ.ਵਰਤਿਆ_for = SHAPE_CURSOR;
 
-    return &entry;
+    ਵਾਪਸ &ਇੰਦਰਾਜ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    static void
-may_output_cursor_props(void)
+    ਸਥਿਰ ਖਾਲੀ
+may_output_cursor_props(ਖਾਲੀ)
 {
-    if (!cursor_color_equal(last_set_cursor_color, desired_cursor_color)
-	    || last_set_cursor_shape != desired_cursor_shape
-	    || last_set_cursor_blink != desired_cursor_blink)
+    ਜੇ (!cursor_color_equal(ਆਖਰੀ_ਸੈੱਟ_cursor_color, desired_cursor_color)
+	    || ਆਖਰੀ_ਸੈੱਟ_cursor_shape != desired_cursor_shape
+	    || ਆਖਰੀ_ਸੈੱਟ_cursor_blink != desired_cursor_blink)
     {
-	cursor_color_copy(&last_set_cursor_color, desired_cursor_color);
-	last_set_cursor_shape = desired_cursor_shape;
-	last_set_cursor_blink = desired_cursor_blink;
-	term_cursor_color(cursor_color_get(desired_cursor_color));
-	if (desired_cursor_shape == -1 || desired_cursor_blink == -1)
+	cursor_color_copy(&ਆਖਰੀ_ਸੈੱਟ_cursor_color, desired_cursor_color);
+	ਆਖਰੀ_ਸੈੱਟ_cursor_shape = desired_cursor_shape;
+	ਆਖਰੀ_ਸੈੱਟ_cursor_blink = desired_cursor_blink;
+	ਪਦ_cursor_color(cursor_color_get(desired_cursor_color));
+	ਜੇ (desired_cursor_shape == -1 || desired_cursor_blink == -1)
 	    // this will restore the initial cursor style, if possible
 	    ui_cursor_shape_forced(TRUE);
-	else
-	    term_cursor_shape(desired_cursor_shape, desired_cursor_blink);
+	ਨਹੀਂਤਾਂ
+	    ਪਦ_cursor_shape(desired_cursor_shape, desired_cursor_blink);
     }
 }
 
 /*
  * Set the cursor color and shape, if not last set to these.
  */
-    static void
-may_set_cursor_props(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+may_ਸੈੱਟ_cursor_props(ਪਦ_T *ਪਦ)
 {
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // For the GUI the cursor properties are obtained with
     // term_get_cursor_shape().
-    if (gui.in_use)
-	return;
-#endif
-    if (in_terminal_loop == term)
+    ਜੇ (gui.ਵਿੱਚ_use)
+	ਵਾਪਸ;
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਵਿੱਚ_terminal_loop == ਪਦ)
     {
-	cursor_color_copy(&desired_cursor_color, term->tl_cursor_color);
-	desired_cursor_shape = term->tl_cursor_shape;
-	desired_cursor_blink = term->tl_cursor_blink;
+	cursor_color_copy(&desired_cursor_color, ਪਦ->tl_cursor_color);
+	desired_cursor_shape = ਪਦ->tl_cursor_shape;
+	desired_cursor_blink = ਪਦ->tl_cursor_blink;
 	may_output_cursor_props();
     }
 }
@@ -2889,14 +2889,14 @@ may_set_cursor_props(term_T *term)
 /*
  * Reset the desired cursor properties and restore them when needed.
  */
-    static void
-prepare_restore_cursor_props(void)
+    ਸਥਿਰ ਖਾਲੀ
+prepare_restore_cursor_props(ਖਾਲੀ)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	return;
-#endif
-    cursor_color_copy(&desired_cursor_color, NULL);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (gui.ਵਿੱਚ_use)
+	ਵਾਪਸ;
+#ਜੇ_ਅੰਤ
+    cursor_color_copy(&desired_cursor_color, ਨਿਰਾ);
     desired_cursor_shape = -1;
     desired_cursor_blink = -1;
     may_output_cursor_props();
@@ -2907,78 +2907,78 @@ prepare_restore_cursor_props(void)
  * keys to the job.
  * If "check_job_status" is TRUE update the job status.
  */
-    static int
-term_use_loop_check(int check_job_status)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_use_loop_check(ਪੂਰਨ check_ਕੰਮ_ਸਥਿਤੀ)
 {
-    term_T *term = curbuf->b_term;
+    ਪਦ_T *ਪਦ = curbuf->b_ਪਦ;
 
-    return term != NULL
-	&& !term->tl_normal_mode
-	&& term->tl_vterm != NULL
-	&& term_job_running_check(term, check_job_status);
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ
+	&& !ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ
+	&& ਪਦ->tl_vterm != ਨਿਰਾ
+	&& ਪਦ_ਕੰਮ_running_check(ਪਦ, check_ਕੰਮ_ਸਥਿਤੀ);
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are sending
  * keys to the job.
  */
-    int
-term_use_loop(void)
+    ਪੂਰਨ
+ਪਦ_use_loop(ਖਾਲੀ)
 {
-    return term_use_loop_check(FALSE);
+    ਵਾਪਸ ਪਦ_use_loop_check(FALSE);
 }
 
 /*
  * Called when entering a window with the mouse.  If this is a terminal window
  * we may want to change state.
  */
-    void
-term_win_entered(void)
+    ਖਾਲੀ
+ਪਦ_win_entered(ਖਾਲੀ)
 {
-    term_T *term = curbuf->b_term;
+    ਪਦ_T *ਪਦ = curbuf->b_ਪਦ;
 
-    if (term == NULL)
-	return;
+    ਜੇ (ਪਦ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (term_use_loop_check(TRUE))
+    ਜੇ (ਪਦ_use_loop_check(TRUE))
     {
 	reset_VIsual_and_resel();
-	if (State & MODE_INSERT)
-	    stop_insert_mode = TRUE;
+	ਜੇ (State & ਬਹੁਲਕ_ਪਾਓ)
+	    stop_ਪਾਓ_ਬਹੁਲਕ = TRUE;
     }
     mouse_was_outside = FALSE;
-    enter_mouse_col = mouse_col;
-    enter_mouse_row = mouse_row;
+    enter_mouse_ਖਾਨਾ = mouse_ਖਾਨਾ;
+    enter_mouse_ਪੰਕਤੀ = mouse_ਪੰਕਤੀ;
 }
 
-    void
-term_focus_change(int in_focus)
+    ਖਾਲੀ
+ਪਦ_focus_change(ਪੂਰਨ ਵਿੱਚ_focus)
 {
-    term_T *term = curbuf->b_term;
+    ਪਦ_T *ਪਦ = curbuf->b_ਪਦ;
 
-    if (term == NULL || term->tl_vterm == NULL)
-	return;
+    ਜੇ (ਪਦ == ਨਿਰਾ || ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    VTermState	*state = vterm_obtain_state(term->tl_vterm);
+    VTermState	*state = vterm_obtain_state(ਪਦ->tl_vterm);
 
-    if (in_focus)
-	vterm_state_focus_in(state);
-    else
-	vterm_state_focus_out(state);
-    term_forward_output(term);
+    ਜੇ (ਵਿੱਚ_focus)
+	vterm_state_focus_ਵਿੱਚ(state);
+    ਨਹੀਂਤਾਂ
+	vterm_state_focus_ਬਾਹਰਲਾ(state);
+    ਪਦ_forward_output(ਪਦ);
 }
 
 /*
  * vgetc() may not include CTRL in the key when modify_other_keys is set.
  * Return the Ctrl-key value in that case.
  */
-    static int
-raw_c_to_ctrl(int c)
+    ਸਥਿਰ ਪੂਰਨ
+raw_c_ਮੰਜ਼ਿਲ_ctrl(ਪੂਰਨ c)
 {
-    if ((mod_mask & MOD_MASK_CTRL)
+    ਜੇ ((mod_ਨਕਾਬ & MOD_ਨਕਾਬ_CTRL)
 	    && ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_')))
-	return c & 0x1f;
-    return c;
+	ਵਾਪਸ c & 0x1f;
+    ਵਾਪਸ c;
 }
 
 /*
@@ -2986,15 +2986,15 @@ raw_c_to_ctrl(int c)
  * Also when the Kitty keyboard protocol is used.
  * May set "mod_mask".
  */
-    static int
-ctrl_to_raw_c(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ctrl_ਮੰਜ਼ਿਲ_raw_c(ਪੂਰਨ c)
 {
-    if (c < 0x20 && vterm_using_key_protocol())
+    ਜੇ (c < 0x20 && vterm_using_ਕੁੰਜੀ_protocol())
     {
-	mod_mask |= MOD_MASK_CTRL;
-	return c + '@';
+	mod_ਨਕਾਬ |= MOD_ਨਕਾਬ_CTRL;
+	ਵਾਪਸ c + '@';
     }
-    return c;
+    ਵਾਪਸ c;
 }
 
 /*
@@ -3006,154 +3006,154 @@ ctrl_to_raw_c(int c)
  * Returns OK if a typed character is to be handled in Normal mode, FAIL if
  * the terminal was closed.
  */
-    int
-terminal_loop(int blocking)
+    ਪੂਰਨ
+terminal_loop(ਪੂਰਨ blocking)
 {
-    int		c;
-    int		raw_c;
-    int		termwinkey = 0;
-    int		ret;
-#ifdef UNIX
-    int		tty_fd = curbuf->b_term->tl_job->jv_channel
-				 ->ch_part[get_tty_part(curbuf->b_term)].ch_fd;
-#endif
-    int		restore_cursor = FALSE;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		raw_c;
+    ਪੂਰਨ		termwinkey = 0;
+    ਪੂਰਨ		ret;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+    ਪੂਰਨ		tty_fd = curbuf->b_ਪਦ->tl_ਕੰਮ->jv_channel
+				 ->ch_part[get_tty_part(curbuf->b_ਪਦ)].ch_fd;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		restore_cursor = FALSE;
 
     // Remember the terminal we are sending keys to.  However, the terminal
     // might be closed while waiting for a character, e.g. typing "exit" in a
     // shell and ++close was used.  Therefore use curbuf->b_term instead of a
     // stored reference.
-    in_terminal_loop = curbuf->b_term;
+    ਵਿੱਚ_terminal_loop = curbuf->b_ਪਦ;
 
-    if (*curwin->w_p_twk != NUL)
+    ਜੇ (*curwin->w_p_twk != NUL)
     {
-	termwinkey = string_to_key(curwin->w_p_twk, TRUE);
-	if (termwinkey == Ctrl_W)
+	termwinkey = string_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(curwin->w_p_twk, TRUE);
+	ਜੇ (termwinkey == Ctrl_W)
 	    termwinkey = 0;
     }
-    position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
-    may_set_cursor_props(curbuf->b_term);
+    position_cursor(curwin, &curbuf->b_ਪਦ->tl_cursor_pos);
+    may_ਸੈੱਟ_cursor_props(curbuf->b_ਪਦ);
 
-    while (blocking || vpeekc_nomap() != NUL)
+    ਜਦੋਂ (blocking || vpeekc_nomap() != NUL)
     {
-#ifdef FEAT_GUI
-	if (curbuf->b_term != NULL && !curbuf->b_term->tl_system)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (curbuf->b_ਪਦ != ਨਿਰਾ && !curbuf->b_ਪਦ->tl_system)
+#ਜੇ_ਅੰਤ
 	    // TODO: skip screen update when handling a sequence of keys.
 	    // Repeat redrawing in case a message is received while redrawing.
-	    while (must_redraw != 0)
-		if (update_screen(0) == FAIL)
-		    break;
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	    ਜਦੋਂ (must_redraw != 0)
+		ਜੇ (update_screen(0) == FAIL)
+		    ਰੋਕੋ;
+	ਜੇ (!ਪਦ_use_loop_check(TRUE) || ਵਿੱਚ_terminal_loop != curbuf->b_ਪਦ)
 	    // job finished while redrawing
-	    break;
+	    ਰੋਕੋ;
 
-	update_cursor(curbuf->b_term, FALSE);
+	update_cursor(curbuf->b_ਪਦ, FALSE);
 	restore_cursor = TRUE;
 
-	raw_c = term_vgetc();
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	raw_c = ਪਦ_vgetc();
+	ਜੇ (!ਪਦ_use_loop_check(TRUE) || ਵਿੱਚ_terminal_loop != curbuf->b_ਪਦ)
 	{
 	    // Job finished while waiting for a character.  Push back the
 	    // received character.
-	    if (raw_c != K_IGNORE)
+	    ਜੇ (raw_c != K_IGNORE)
 		vungetc(raw_c);
-	    break;
+	    ਰੋਕੋ;
 	}
-	if (raw_c == K_IGNORE)
-	    continue;
-	c = raw_c_to_ctrl(raw_c);
+	ਜੇ (raw_c == K_IGNORE)
+	    ਜਾਰੀ;
+	c = raw_c_ਮੰਜ਼ਿਲ_ctrl(raw_c);
 
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 	/*
 	 * The shell or another program may change the tty settings.  Getting
 	 * them for every typed character is a bit of overhead, but it's needed
 	 * for the first character typed, e.g. when Vim starts in a shell.
 	 */
-	if (mch_isatty(tty_fd))
+	ਜੇ (mch_isatty(tty_fd))
 	{
 	    ttyinfo_T info;
 
 	    // Get the current backspace character of the pty.
-	    if (get_tty_info(tty_fd, &info) == OK)
-		term_backspace_char = info.backspace;
+	    ਜੇ (get_tty_info(tty_fd, &info) == OK)
+		ਪਦ_backspace_char = info.backspace;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// On Windows winpty handles CTRL-C, don't send a CTRL_C_EVENT.
 	// Use CTRL-BREAK to kill the job.
-	if (ctrl_break_was_pressed)
-	    mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
-#endif
+	ਜੇ (ctrl_break_was_pressed)
+	    mch_signal_ਕੰਮ(curbuf->b_ਪਦ->tl_ਕੰਮ, (char_u *)"kill");
+#ਜੇ_ਅੰਤ
 	// Was either CTRL-W (termwinkey) or CTRL-\ pressed?
 	// Not in a system terminal.
-	if ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
-#ifdef FEAT_GUI
-		&& !curbuf->b_term->tl_system
-#endif
+	ਜੇ ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+		&& !curbuf->b_ਪਦ->tl_system
+#ਜੇ_ਅੰਤ
 		)
 	{
-	    int	    prev_c = c;
-	    int	    prev_raw_c = raw_c;
-	    int	    prev_mod_mask = mod_mask;
+	    ਪੂਰਨ	    prev_c = c;
+	    ਪੂਰਨ	    prev_raw_c = raw_c;
+	    ਪੂਰਨ	    prev_mod_ਨਕਾਬ = mod_ਨਕਾਬ;
 
-	    if (add_to_showcmd(c))
-		out_flush();
+	    ਜੇ (ਜੋੜੋ_ਮੰਜ਼ਿਲ_showcmd(c))
+		ਬਾਹਰਲਾ_flush();
 
-	    raw_c = term_vgetc();
-	    c = raw_c_to_ctrl(raw_c);
+	    raw_c = ਪਦ_vgetc();
+	    c = raw_c_ਮੰਜ਼ਿਲ_ctrl(raw_c);
 
 	    clear_showcmd();
 
-	    if (!term_use_loop_check(TRUE)
-					 || in_terminal_loop != curbuf->b_term)
+	    ਜੇ (!ਪਦ_use_loop_check(TRUE)
+					 || ਵਿੱਚ_terminal_loop != curbuf->b_ਪਦ)
 		// job finished while waiting for a character
-		break;
+		ਰੋਕੋ;
 
-	    if (prev_c == Ctrl_BSL)
+	    ਜੇ (prev_c == Ctrl_BSL)
 	    {
-		if (c == Ctrl_N)
+		ਜੇ (c == Ctrl_N)
 		{
 		    // CTRL-\ CTRL-N : go to Terminal-Normal mode.
-		    term_enter_normal_mode();
+		    ਪਦ_enter_ਸਾਧਾਰਨ_ਬਹੁਲਕ();
 		    ret = FAIL;
-		    goto theend;
+		    ਜਾਓ theend;
 		}
 		// Send both keys to the terminal, first one here, second one
 		// below.
-		send_keys_to_term(curbuf->b_term, prev_raw_c, prev_mod_mask,
+		send_ਕੁੰਜੀਆਂ_ਮੰਜ਼ਿਲ_ਪਦ(curbuf->b_ਪਦ, prev_raw_c, prev_mod_ਨਕਾਬ,
 									 TRUE);
 	    }
-	    else if (c == Ctrl_C)
+	    ਨਹੀਂਤਾਂ ਜੇ (c == Ctrl_C)
 	    {
 		// "CTRL-W CTRL-C" or 'termwinkey' CTRL-C: end the job
-		mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
+		mch_signal_ਕੰਮ(curbuf->b_ਪਦ->tl_ਕੰਮ, (char_u *)"kill");
 	    }
-	    else if (c == '.')
+	    ਨਹੀਂਤਾਂ ਜੇ (c == '.')
 	    {
 		// "CTRL-W .": send CTRL-W to the job
 		// "'termwinkey' .": send 'termwinkey' to the job
-		raw_c = ctrl_to_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
+		raw_c = ctrl_ਮੰਜ਼ਿਲ_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
 	    }
-	    else if (c == Ctrl_BSL)
+	    ਨਹੀਂਤਾਂ ਜੇ (c == Ctrl_BSL)
 	    {
 		// "CTRL-W CTRL-\": send CTRL-\ to the job
-		raw_c = ctrl_to_raw_c(Ctrl_BSL);
+		raw_c = ctrl_ਮੰਜ਼ਿਲ_raw_c(Ctrl_BSL);
 	    }
-	    else if (c == 'N')
+	    ਨਹੀਂਤਾਂ ਜੇ (c == 'N')
 	    {
 		// CTRL-W N : go to Terminal-Normal mode.
-		term_enter_normal_mode();
+		ਪਦ_enter_ਸਾਧਾਰਨ_ਬਹੁਲਕ();
 		ret = FAIL;
-		goto theend;
+		ਜਾਓ theend;
 	    }
-	    else if (c == '"')
+	    ਨਹੀਂਤਾਂ ਜੇ (c == '"')
 	    {
-		term_paste_register(prev_c);
-		continue;
+		ਪਦ_paste_ਰਜਿਸਟਰ(prev_c);
+		ਜਾਰੀ;
 	    }
-	    else if (termwinkey == 0 || c != termwinkey)
+	    ਨਹੀਂਤਾਂ ਜੇ (termwinkey == 0 || c != termwinkey)
 	    {
 		// space for CTRL-W, modifier, multi-byte char and NUL
 		char_u buf[1 + 3 + MB_MAXBYTES + 1];
@@ -3161,59 +3161,59 @@ terminal_loop(int blocking)
 		// Put the command into the typeahead buffer, when using the
 		// stuff buffer KeyStuffed is set and 'langmap' won't be used.
 		buf[0] = Ctrl_W;
-		buf[special_to_buf(c, mod_mask, FALSE, buf + 1) + 1] = NUL;
+		buf[special_ਮੰਜ਼ਿਲ_buf(c, mod_ਨਕਾਬ, FALSE, buf + 1) + 1] = NUL;
 		ins_typebuf(buf, REMAP_NONE, 0, TRUE, FALSE);
 		ret = OK;
-		goto theend;
+		ਜਾਓ theend;
 	    }
 	}
-#ifdef MSWIN
-	if (!enc_utf8 && has_mbyte && raw_c >= 0x80)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਜੇ (!enc_utf8 && has_mbyte && raw_c >= 0x80)
 	{
 	    WCHAR   wc;
 	    char_u  mb[3];
 
-	    mb[0] = (unsigned)raw_c >> 8;
+	    mb[0] = (ਬਿਨਾਨਿਸ਼ਾਨੀ)raw_c >> 8;
 	    mb[1] = raw_c;
-	    if (MultiByteToWideChar(GetACP(), 0, (char*)mb, 2, &wc, 1) > 0)
+	    ਜੇ (Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char(GetACP(), 0, (ਅੱਖਰ*)mb, 2, &wc, 1) > 0)
 		raw_c = wc;
 	}
-#endif
-	if (send_keys_to_term(curbuf->b_term, raw_c, mod_mask, TRUE) != OK)
+#ਜੇ_ਅੰਤ
+	ਜੇ (send_ਕੁੰਜੀਆਂ_ਮੰਜ਼ਿਲ_ਪਦ(curbuf->b_ਪਦ, raw_c, mod_ਨਕਾਬ, TRUE) != OK)
 	{
-	    if (raw_c == K_MOUSEMOVE)
+	    ਜੇ (raw_c == K_MOUSEMOVE)
 		// We are sure to come back here, don't reset the cursor color
 		// and shape to avoid flickering.
 		restore_cursor = FALSE;
 
 	    ret = OK;
-	    goto theend;
+	    ਜਾਓ theend;
 	}
     }
     ret = FAIL;
 
 theend:
-    in_terminal_loop = NULL;
-    if (restore_cursor)
+    ਵਿੱਚ_terminal_loop = ਨਿਰਾ;
+    ਜੇ (restore_cursor)
 	prepare_restore_cursor_props();
 
     // Move a snapshot of the screen contents to the buffer, so that completion
     // works in other buffers.
-    if (curbuf->b_term != NULL && !curbuf->b_term->tl_normal_mode)
-	may_move_terminal_to_buffer(curbuf->b_term, FALSE);
+    ਜੇ (curbuf->b_ਪਦ != ਨਿਰਾ && !curbuf->b_ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
+	may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(curbuf->b_ਪਦ, FALSE);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-    static void
-may_toggle_cursor(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+may_toggle_cursor(ਪਦ_T *ਪਦ)
 {
-    if (in_terminal_loop != term)
-	return;
+    ਜੇ (ਵਿੱਚ_terminal_loop != ਪਦ)
+	ਵਾਪਸ;
 
-    if (term->tl_cursor_visible)
+    ਜੇ (ਪਦ->tl_cursor_visible)
 	cursor_on();
-    else
+    ਨਹੀਂਤਾਂ
 	cursor_off();
 }
 
@@ -3221,172 +3221,172 @@ may_toggle_cursor(term_T *term)
  * Reverse engineer the RGB value into a cterm color index.
  * First color is 1.  Return 0 if no match found (default color).
  */
-    static int
-color2index(VTermColor *color, int fg, int *boldp)
+    ਸਥਿਰ ਪੂਰਨ
+color2index(VTermColor *color, ਪੂਰਨ fg, ਪੂਰਨ *boldp)
 {
-    int red = color->red;
-    int blue = color->blue;
-    int green = color->green;
+    ਪੂਰਨ red = color->red;
+    ਪੂਰਨ blue = color->blue;
+    ਪੂਰਨ green = color->green;
 
     *boldp = FALSE;
 
-    if (VTERM_COLOR_IS_INVALID(color))
-	return 0;
+    ਜੇ (VTERM_COLOR_IS_INVALID(color))
+	ਵਾਪਸ 0;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
+    ਜੇ (VTERM_COLOR_IS_ਸੂਚਕਾਂਕਿਤ(color))
     {
 	// Use the color as-is if possible, give up otherwise.
-	if (color->index < t_colors)
+	ਜੇ (color->ਸੂਚਕਾਂਕ < t_colors)
 	{
-	    uint8_t index = color->index;
-#ifdef MSWIN
+	    uint8_t ਸੂਚਕਾਂਕ = color->ਸੂਚਕਾਂਕ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	    // Convert ANSI palette to cterm color index.
 	    // cterm_ansi_idx is a table for the reverse conversion from cterm
 	    // color index to ANSI palette. However, the current table can
 	    // be used for this conversion as well.
 	    // Note: If the contents of cterm_ansi_idx change in the future, a
 	    // different table may be needed for this purpose.
-	    if (index < 16)
-		index = cterm_ansi_idx[index];
-#endif
-	    return index + 1;
+	    ਜੇ (ਸੂਚਕਾਂਕ < 16)
+		ਸੂਚਕਾਂਕ = cterm_ansi_idx[ਸੂਚਕਾਂਕ];
+#ਜੇ_ਅੰਤ
+	    ਵਾਪਸ ਸੂਚਕਾਂਕ + 1;
 	}
 	// 8-color terminals can actually display twice as many colors by
 	// setting the high-intensity/bold bit.
-	else if (t_colors == 8 && fg && color->index < 16)
+	ਨਹੀਂਤਾਂ ਜੇ (t_colors == 8 && fg && color->ਸੂਚਕਾਂਕ < 16)
 	{
 	    *boldp = TRUE;
-	    return (color->index & 7) + 1;
+	    ਵਾਪਸ (color->ਸੂਚਕਾਂਕ & 7) + 1;
 	}
-	return 0;
+	ਵਾਪਸ 0;
     }
 
-    if (t_colors >= 256)
+    ਜੇ (t_colors >= 256)
     {
-	if (red == blue && red == green)
+	ਜੇ (red == blue && red == green)
 	{
 	    // 24-color greyscale plus white and black
-	    static int cutoff[23] = {
+	    ਸਥਿਰ ਪੂਰਨ cutoff[23] = {
 		    0x0D, 0x17, 0x21, 0x2B, 0x35, 0x3F, 0x49, 0x53, 0x5D, 0x67,
 		    0x71, 0x7B, 0x85, 0x8F, 0x99, 0xA3, 0xAD, 0xB7, 0xC1, 0xCB,
 		    0xD5, 0xDF, 0xE9};
-	    int i;
+	    ਪੂਰਨ i;
 
-	    if (red < 5)
-		return 17; // 00/00/00
-	    if (red > 245) // ff/ff/ff
-		return 232;
-	    for (i = 0; i < 23; ++i)
-		if (red < cutoff[i])
-		    return i + 233;
-	    return 256;
+	    ਜੇ (red < 5)
+		ਵਾਪਸ 17; // 00/00/00
+	    ਜੇ (red > 245) // ff/ff/ff
+		ਵਾਪਸ 232;
+	    ਲਈ (i = 0; i < 23; ++i)
+		ਜੇ (red < cutoff[i])
+		    ਵਾਪਸ i + 233;
+	    ਵਾਪਸ 256;
 	}
 	{
-	    static int cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
-	    int ri, gi, bi;
+	    ਸਥਿਰ ਪੂਰਨ cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
+	    ਪੂਰਨ ri, gi, bi;
 
 	    // 216-color cube
-	    for (ri = 0; ri < 5; ++ri)
-		if (red < cutoff[ri])
-		    break;
-	    for (gi = 0; gi < 5; ++gi)
-		if (green < cutoff[gi])
-		    break;
-	    for (bi = 0; bi < 5; ++bi)
-		if (blue < cutoff[bi])
-		    break;
-	    return 17 + ri * 36 + gi * 6 + bi;
+	    ਲਈ (ri = 0; ri < 5; ++ri)
+		ਜੇ (red < cutoff[ri])
+		    ਰੋਕੋ;
+	    ਲਈ (gi = 0; gi < 5; ++gi)
+		ਜੇ (green < cutoff[gi])
+		    ਰੋਕੋ;
+	    ਲਈ (bi = 0; bi < 5; ++bi)
+		ਜੇ (blue < cutoff[bi])
+		    ਰੋਕੋ;
+	    ਵਾਪਸ 17 + ri * 36 + gi * 6 + bi;
 	}
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 /*
  * Convert Vterm attributes to highlight flags.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 vtermAttr2hl(VTermScreenCellAttrs *cellattrs)
 {
-    int attr = 0;
+    ਪੂਰਨ attr = 0;
 
-    if (cellattrs->bold)
+    ਜੇ (cellattrs->bold)
 	attr |= HL_BOLD;
-    if (cellattrs->underline)
+    ਜੇ (cellattrs->underline)
 	attr |= HL_UNDERLINE;
-    if (cellattrs->italic)
+    ਜੇ (cellattrs->italic)
 	attr |= HL_ITALIC;
-    if (cellattrs->strike)
+    ਜੇ (cellattrs->strike)
 	attr |= HL_STRIKETHROUGH;
-    if (cellattrs->reverse)
+    ਜੇ (cellattrs->ਉਲਟ)
 	attr |= HL_INVERSE;
-    return attr;
+    ਵਾਪਸ attr;
 }
 
 /*
  * Store Vterm attributes in "cell" from highlight flags.
  */
-    static void
-hl2vtermAttr(int attr, cellattr_T *cell)
+    ਸਥਿਰ ਖਾਲੀ
+hl2vtermAttr(ਪੂਰਨ attr, cellattr_T *cell)
 {
-    CLEAR_FIELD(cell->attrs);
-    if (attr & HL_BOLD)
+    CLEAR_ਖੇਤਰ(cell->attrs);
+    ਜੇ (attr & HL_BOLD)
 	cell->attrs.bold = 1;
-    if (attr & HL_UNDERLINE)
+    ਜੇ (attr & HL_UNDERLINE)
 	cell->attrs.underline = 1;
-    if (attr & HL_ITALIC)
+    ਜੇ (attr & HL_ITALIC)
 	cell->attrs.italic = 1;
-    if (attr & HL_STRIKETHROUGH)
+    ਜੇ (attr & HL_STRIKETHROUGH)
 	cell->attrs.strike = 1;
-    if (attr & HL_INVERSE)
-	cell->attrs.reverse = 1;
+    ਜੇ (attr & HL_INVERSE)
+	cell->attrs.ਉਲਟ = 1;
 }
 
 /*
  * Convert the attributes of a vterm cell into an attribute index.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 cell2attr(
-	term_T			*term,
+	ਪਦ_T			*ਪਦ,
 	win_T			*wp,
 	VTermScreenCellAttrs	*cellattrs,
 	VTermColor		*cellfg,
 	VTermColor		*cellbg)
 {
-    int attr = vtermAttr2hl(cellattrs);
+    ਪੂਰਨ attr = vtermAttr2hl(cellattrs);
     VTermColor *fg = cellfg;
     VTermColor *bg = cellbg;
-    int is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
-    int is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
+    ਪੂਰਨ is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
+    ਪੂਰਨ is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
 
-    if (is_default_fg || is_default_bg)
+    ਜੇ (is_default_fg || is_default_bg)
     {
-	if (wp != NULL && wp->w_hlfwin_id != 0)
+	ਜੇ (wp != ਨਿਰਾ && wp->w_hlfwin_id != 0)
 	{
-	    if (is_default_fg)
-		fg = &wp->w_term_hlfwin.fg;
-	    if (is_default_bg)
-		bg = &wp->w_term_hlfwin.bg;
+	    ਜੇ (is_default_fg)
+		fg = &wp->w_ਪਦ_hlfwin.fg;
+	    ਜੇ (is_default_bg)
+		bg = &wp->w_ਪਦ_hlfwin.bg;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (is_default_fg)
-		fg = &term->tl_default_color.fg;
-	    if (is_default_bg)
-		bg = &term->tl_default_color.bg;
+	    ਜੇ (is_default_fg)
+		fg = &ਪਦ->tl_default_color.fg;
+	    ਜੇ (is_default_bg)
+		bg = &ਪਦ->tl_default_color.bg;
 	}
     }
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
 	guicolor_T guifg = gui_mch_get_rgb_color(fg->red, fg->green, fg->blue);
 	guicolor_T guibg = gui_mch_get_rgb_color(bg->red, bg->green, bg->blue);
-	return get_gui_attr_idx(attr, guifg, guibg);
+	ਵਾਪਸ get_gui_attr_idx(attr, guifg, guibg);
     }
-    else
-#endif
-#ifdef FEAT_TERMGUICOLORS
-    if (p_tgc)
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMGUICOLORS
+    ਜੇ (p_tgc)
     {
 	guicolor_T tgcfg = VTERM_COLOR_IS_INVALID(fg)
 	    ? INVALCOLOR
@@ -3394,258 +3394,258 @@ cell2attr(
 	guicolor_T tgcbg = VTERM_COLOR_IS_INVALID(bg)
 	    ? INVALCOLOR
 	    : gui_get_rgb_color_cmn(bg->red, bg->green, bg->blue);
-	return get_tgc_attr_idx(attr, tgcfg, tgcbg);
+	ਵਾਪਸ get_tgc_attr_idx(attr, tgcfg, tgcbg);
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     {
-	int bold = MAYBE;
-	int ctermfg = color2index(fg, TRUE, &bold);
-	int ctermbg = color2index(bg, FALSE, &bold);
+	ਪੂਰਨ bold = MAYBE;
+	ਪੂਰਨ ctermfg = color2index(fg, TRUE, &bold);
+	ਪੂਰਨ ctermbg = color2index(bg, FALSE, &bold);
 
 	// with 8 colors set the bold attribute to get a bright foreground
-	if (bold == TRUE)
+	ਜੇ (bold == TRUE)
 	    attr |= HL_BOLD;
 
-	return get_cterm_attr_idx(attr, ctermfg, ctermbg);
+	ਵਾਪਸ get_cterm_attr_idx(attr, ctermfg, ctermbg);
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static void
-set_dirty_snapshot(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_dirty_snapshot(ਪਦ_T *ਪਦ)
 {
-    term->tl_dirty_snapshot = TRUE;
-#ifdef FEAT_TIMERS
-    if (!term->tl_normal_mode)
+    ਪਦ->tl_dirty_snapshot = TRUE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TIMERS
+    ਜੇ (!ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
     {
 	// Update the snapshot after 100 msec of not getting updates.
-	profile_setlimit(100L, &term->tl_timer_due);
-	term->tl_timer_set = TRUE;
+	profile_setlimit(100L, &ਪਦ->tl_timer_due);
+	ਪਦ->tl_timer_ਸੈੱਟ = TRUE;
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    static int
-handle_damage(VTermRect rect, void *user)
+    ਸਥਿਰ ਪੂਰਨ
+handle_damage(VTermRect rect, ਖਾਲੀ *user)
 {
-    term_T *term = (term_T *)user;
+    ਪਦ_T *ਪਦ = (ਪਦ_T *)user;
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, rect.start_row);
-    term->tl_dirty_row_end = MAX(term->tl_dirty_row_end, rect.end_row);
-    set_dirty_snapshot(term);
-    redraw_buf_later(term->tl_buffer, UPD_SOME_VALID);
-    return 1;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ = MIN(ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ, rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ);
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = MAX(ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ, rect.ਸਿਰਾ_ਪੰਕਤੀ);
+    ਸੈੱਟ_dirty_snapshot(ਪਦ);
+    redraw_buf_later(ਪਦ->tl_ਬਫਰ, UPD_SOME_VALID);
+    ਵਾਪਸ 1;
 }
 
-    static void
-term_scroll_up(term_T *term, int start_row, int count)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_scroll_ਉੱਪਰ(ਪਦ_T *ਪਦ, ਪੂਰਨ ਸ਼ੁਰੂ_ਪੰਕਤੀ, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
-    win_T		 *wp = NULL;
-    int			 did_curwin = FALSE;
+    win_T		 *wp = ਨਿਰਾ;
+    ਪੂਰਨ			 did_curwin = FALSE;
     VTermColor		 fg, bg;
     VTermScreenCellAttrs attr;
-    int			 clear_attr;
+    ਪੂਰਨ			 clear_attr;
 
-    CLEAR_FIELD(attr);
+    CLEAR_ਖੇਤਰ(attr);
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    ਜਦੋਂ (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	{
 	    // Set the color to clear lines with.
-	    vterm_state_get_default_colors(vterm_obtain_state(term->tl_vterm),
+	    vterm_state_get_default_colors(vterm_obtain_state(ਪਦ->tl_vterm),
 								     &fg, &bg);
-	    clear_attr = cell2attr(term, wp, &attr, &fg, &bg);
-	    win_del_lines(wp, start_row, count, FALSE, FALSE, clear_attr);
+	    clear_attr = cell2attr(ਪਦ, wp, &attr, &fg, &bg);
+	    win_del_ਸਤਰਾਂ(wp, ਸ਼ੁਰੂ_ਪੰਕਤੀ, ਗਿਣਤੀ_2, FALSE, FALSE, clear_attr);
 	}
     }
 }
 
-    static int
-handle_moverect(VTermRect dest, VTermRect src, void *user)
+    ਸਥਿਰ ਪੂਰਨ
+handle_moverect(VTermRect dest, VTermRect src, ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
-    int		count = src.start_row - dest.start_row;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
+    ਪੂਰਨ		ਗਿਣਤੀ_2 = src.ਸ਼ੁਰੂ_ਪੰਕਤੀ - dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ;
 
     // Scrolling up is done much more efficiently by deleting lines instead of
     // redrawing the text. But avoid doing this multiple times, postpone until
     // the redraw happens.
-    if (dest.start_col == src.start_col
-	    && dest.end_col == src.end_col
-	    && dest.start_row < src.start_row)
+    ਜੇ (dest.ਸ਼ੁਰੂ_ਖਾਨਾ == src.ਸ਼ੁਰੂ_ਖਾਨਾ
+	    && dest.ਸਿਰਾ_ਖਾਨਾ == src.ਸਿਰਾ_ਖਾਨਾ
+	    && dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ < src.ਸ਼ੁਰੂ_ਪੰਕਤੀ)
     {
-	if (dest.start_row == 0)
-	    term->tl_postponed_scroll += count;
-	else
-	    term_scroll_up(term, dest.start_row, count);
+	ਜੇ (dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ == 0)
+	    ਪਦ->tl_postponed_scroll += ਗਿਣਤੀ_2;
+	ਨਹੀਂਤਾਂ
+	    ਪਦ_scroll_ਉੱਪਰ(ਪਦ, dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ, ਗਿਣਤੀ_2);
     }
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, dest.start_row);
-    term->tl_dirty_row_end = MIN(term->tl_dirty_row_end, dest.end_row);
-    set_dirty_snapshot(term);
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ = MIN(ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ, dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ);
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = MIN(ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ, dest.ਸਿਰਾ_ਪੰਕਤੀ);
+    ਸੈੱਟ_dirty_snapshot(ਪਦ);
 
     // Note sure if the scrolling will work correctly, let's do a complete
     // redraw later.
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
-    return 1;
+    redraw_buf_later(ਪਦ->tl_ਬਫਰ, UPD_NOT_VALID);
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 handle_movecursor(
 	VTermPos pos,
-	VTermPos oldpos UNUSED,
-	int visible,
-	void *user)
+	VTermPos oldpos ਅਣਵਰਤਿਆ,
+	ਪੂਰਨ visible,
+	ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
-    win_T	*wp = NULL;
-    int		did_curwin = FALSE;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
+    win_T	*wp = ਨਿਰਾ;
+    ਪੂਰਨ		did_curwin = FALSE;
 
-    term->tl_cursor_pos = pos;
-    term->tl_cursor_visible = visible;
+    ਪਦ->tl_cursor_pos = pos;
+    ਪਦ->tl_cursor_visible = visible;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    ਜਦੋਂ (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	    position_cursor(wp, &pos);
     }
-    if (term->tl_buffer == curbuf && !term->tl_normal_mode)
+    ਜੇ (ਪਦ->tl_ਬਫਰ == curbuf && !ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
 	// Don't redraw here, it will be done after
 	// vterm_input_write() is finished.
-	update_cursor(term, FALSE);
+	update_cursor(ਪਦ, FALSE);
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 handle_settermprop(
 	VTermProp prop,
-	VTermValue *value,
-	void *user)
+	VTerm_ਮੁੱਲ *ਮੁੱਲ,
+	ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
-    char_u	*strval = NULL;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
+    char_u	*strval = ਨਿਰਾ;
 
-    switch (prop)
+    ਚੋਣ (prop)
     {
-	case VTERM_PROP_TITLE:
-	    if (disable_vterm_title_for_testing)
-		break;
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    vim_free(term->tl_title);
+	ਹਾਲਤ VTERM_PROP_TITLE:
+	    ਜੇ (disable_vterm_title_for_testing)
+		ਰੋਕੋ;
+	    strval = vim_strnsave((char_u *)ਮੁੱਲ->string.str,
+							    ਮੁੱਲ->string.len);
+	    ਜੇ (strval == ਨਿਰਾ)
+		ਰੋਕੋ;
+	    vim_free(ਪਦ->tl_title);
 	    // a blank title isn't useful, make it empty, so that "running" is
 	    // displayed
-	    if (*skipwhite(strval) == NUL)
-		term->tl_title = NULL;
+	    ਜੇ (*skipwhite(strval) == NUL)
+		ਪਦ->tl_title = ਨਿਰਾ;
 	    // Same as blank
-	    else if (term->tl_arg0_cmd != NULL
-		    && STRNCMP(term->tl_arg0_cmd, strval,
-					  (int)STRLEN(term->tl_arg0_cmd)) == 0)
-		term->tl_title = NULL;
+	    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ->tl_arg0_cmd != ਨਿਰਾ
+		    && STRNCMP(ਪਦ->tl_arg0_cmd, strval,
+					  (ਪੂਰਨ)STRLEN(ਪਦ->tl_arg0_cmd)) == 0)
+		ਪਦ->tl_title = ਨਿਰਾ;
 	    // Empty corrupted data of winpty
-	    else if (STRNCMP("  - ", strval, 4) == 0)
-		term->tl_title = NULL;
-#ifdef MSWIN
-	    else if (!enc_utf8 && enc_codepage > 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP("  - ", strval, 4) == 0)
+		ਪਦ->tl_title = ਨਿਰਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਨਹੀਂਤਾਂ ਜੇ (!enc_utf8 && enc_codepage > 0)
 	    {
-		WCHAR   *ret = NULL;
-		int	length = 0;
+		WCHAR   *ret = ਨਿਰਾ;
+		ਪੂਰਨ	ਲੰਮਾਈ = 0;
 
-		MultiByteToWideChar_alloc(CP_UTF8, 0,
-			(char*)value->string.str,
-					(int)value->string.len, &ret, &length);
-		if (ret != NULL)
+		Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char_alloc(CP_UTF8, 0,
+			(ਅੱਖਰ*)ਮੁੱਲ->string.str,
+					(ਪੂਰਨ)ਮੁੱਲ->string.len, &ret, &ਲੰਮਾਈ);
+		ਜੇ (ret != ਨਿਰਾ)
 		{
-		    WideCharToMultiByte_alloc(enc_codepage, 0,
-					ret, length, (char**)&term->tl_title,
-					&length, 0, 0);
+		    Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte_alloc(enc_codepage, 0,
+					ret, ਲੰਮਾਈ, (ਅੱਖਰ**)&ਪਦ->tl_title,
+					&ਲੰਮਾਈ, 0, 0);
 		    vim_free(ret);
 		}
 	    }
-#endif
-	    else
+#ਜੇ_ਅੰਤ
+	    ਨਹੀਂਤਾਂ
 	    {
-		term->tl_title = strval;
-		strval = NULL;
+		ਪਦ->tl_title = strval;
+		strval = ਨਿਰਾ;
 	    }
-	    VIM_CLEAR(term->tl_status_text);
-	    if (term == curbuf->b_term)
+	    VIM_CLEAR(ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ);
+	    ਜੇ (ਪਦ == curbuf->b_ਪਦ)
 	    {
 		maketitle();
-		curwin->w_redr_status = true;
+		curwin->w_redr_ਸਥਿਤੀ = true;
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case VTERM_PROP_CURSORVISIBLE:
-	    term->tl_cursor_visible = value->boolean;
-	    may_toggle_cursor(term);
-	    out_flush();
-	    break;
+	ਹਾਲਤ VTERM_PROP_CURSORVISIBLE:
+	    ਪਦ->tl_cursor_visible = ਮੁੱਲ->boolean;
+	    may_toggle_cursor(ਪਦ);
+	    ਬਾਹਰਲਾ_flush();
+	    ਰੋਕੋ;
 
-	case VTERM_PROP_CURSORBLINK:
-	    term->tl_cursor_blink = value->boolean;
-	    may_set_cursor_props(term);
-	    break;
+	ਹਾਲਤ VTERM_PROP_CURSORBLINK:
+	    ਪਦ->tl_cursor_blink = ਮੁੱਲ->boolean;
+	    may_ਸੈੱਟ_cursor_props(ਪਦ);
+	    ਰੋਕੋ;
 
-	case VTERM_PROP_CURSORSHAPE:
-	    term->tl_cursor_shape = value->number;
-	    may_set_cursor_props(term);
-	    break;
+	ਹਾਲਤ VTERM_PROP_CURSORSHAPE:
+	    ਪਦ->tl_cursor_shape = ਮੁੱਲ->ਸੰਖਿਆ;
+	    may_ਸੈੱਟ_cursor_props(ਪਦ);
+	    ਰੋਕੋ;
 
-	case VTERM_PROP_CURSORCOLOR:
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    cursor_color_copy(&term->tl_cursor_color, strval);
-	    may_set_cursor_props(term);
-	    break;
+	ਹਾਲਤ VTERM_PROP_CURSORCOLOR:
+	    strval = vim_strnsave((char_u *)ਮੁੱਲ->string.str,
+							    ਮੁੱਲ->string.len);
+	    ਜੇ (strval == ਨਿਰਾ)
+		ਰੋਕੋ;
+	    cursor_color_copy(&ਪਦ->tl_cursor_color, strval);
+	    may_ਸੈੱਟ_cursor_props(ਪਦ);
+	    ਰੋਕੋ;
 
-	case VTERM_PROP_ALTSCREEN:
+	ਹਾਲਤ VTERM_PROP_ALTSCREEN:
 	    // TODO: do anything else?
-	    term->tl_using_altscreen = value->boolean;
-	    break;
+	    ਪਦ->tl_using_altscreen = ਮੁੱਲ->boolean;
+	    ਰੋਕੋ;
 
-	default:
-	    break;
+	ਮੂਲ:
+	    ਰੋਕੋ;
     }
     vim_free(strval);
 
     // Always return 1, otherwise vterm doesn't store the value internally.
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
  * The job running in the terminal resized the terminal.
  */
-    static int
-handle_resize(int rows, int cols, void *user)
+    ਸਥਿਰ ਪੂਰਨ
+handle_resize(ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
     win_T	*wp;
 
-    term->tl_rows = rows;
-    term->tl_cols = cols;
-    if (term->tl_vterm_size_changed)
+    ਪਦ->tl_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ_2;
+    ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
+    ਜੇ (ਪਦ->tl_vterm_ਮਾਪ_ਬਦਲਿਆ)
 	// Size was set by vterm_set_size(), don't set the window size.
-	term->tl_vterm_size_changed = FALSE;
-    else
+	ਪਦ->tl_vterm_ਮਾਪ_ਬਦਲਿਆ = FALSE;
+    ਨਹੀਂਤਾਂ
     {
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	    {
-		win_setheight_win(rows, wp);
-		win_setwidth_win(cols, wp);
+		win_setheight_win(ਪੰਕਤੀਆਂ_2, wp);
+		win_setwidth_win(ਖਾਨੇ_ਗਿਣਤੀ, wp);
 	    }
 	}
-	redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+	redraw_buf_later(ਪਦ->tl_ਬਫਰ, UPD_NOT_VALID);
     }
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
@@ -3654,46 +3654,46 @@ handle_resize(int rows, int cols, void *user)
  * "gap" points to tl_scrollback or tl_scrollback_postponed.
  * "update_buffer" is TRUE when the buffer should be updated.
  */
-    static void
-limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
+    ਸਥਿਰ ਖਾਲੀ
+ਹੱਦਬੰਦੀ_scrollback(ਪਦ_T *ਪਦ, garray_T *gap, ਪੂਰਨ update_ਬਫਰ)
 {
-    if (gap->ga_len < term->tl_buffer->b_p_twsl)
-	return;
+    ਜੇ (gap->ga_len < ਪਦ->tl_ਬਫਰ->b_p_twsl)
+	ਵਾਪਸ;
 
-    int	todo = MAX(term->tl_buffer->b_p_twsl / 10,
-				     gap->ga_len - term->tl_buffer->b_p_twsl);
-    int	i;
-    sb_line_T *sb_lines = (sb_line_T *)gap->ga_data;
+    ਪੂਰਨ	todo = MAX(ਪਦ->tl_ਬਫਰ->b_p_twsl / 10,
+				     gap->ga_len - ਪਦ->tl_ਬਫਰ->b_p_twsl);
+    ਪੂਰਨ	i;
+    sb_ਸਤਰ_T *sb_ਸਤਰਾਂ = (sb_ਸਤਰ_T *)gap->ga_ਅੰਕੜੇ;
 
-    curbuf = term->tl_buffer;
-    for (i = 0; i < todo; ++i)
+    curbuf = ਪਦ->tl_ਬਫਰ;
+    ਲਈ (i = 0; i < todo; ++i)
     {
-	if (update_buffer && (!sb_lines[i].continuation || !i))
+	ਜੇ (update_ਬਫਰ && (!sb_ਸਤਰਾਂ[i].continuation || !i))
 	{
 	    ml_delete(1);
-	    --term->tl_buffer_scrolled;
+	    --ਪਦ->tl_ਬਫਰ_scrolled;
 	}
-	vim_free(sb_lines[i].sb_cells);
+	vim_free(sb_ਸਤਰਾਂ[i].sb_cells);
     }
     // Continue until end of wrapped line
-    for (; todo < gap->ga_len && sb_lines[todo].continuation; ++todo)
-	vim_free(sb_lines[todo].sb_cells);
-    curbuf = curwin->w_buffer;
+    ਲਈ (; todo < gap->ga_len && sb_ਸਤਰਾਂ[todo].continuation; ++todo)
+	vim_free(sb_ਸਤਰਾਂ[todo].sb_cells);
+    curbuf = curwin->w_ਬਫਰ;
 
     gap->ga_len -= todo;
-    mch_memmove(gap->ga_data,
-		(sb_line_T *)gap->ga_data + todo,
-		sizeof(sb_line_T) * gap->ga_len);
-    if (update_buffer)
+    mch_memmove(gap->ga_ਅੰਕੜੇ,
+		(sb_ਸਤਰ_T *)gap->ga_ਅੰਕੜੇ + todo,
+		ਆਕਾਰ(sb_ਸਤਰ_T) * gap->ga_len);
+    ਜੇ (update_ਬਫਰ)
     {
 	win_T *curwin_save = curwin;
-	win_T *wp = NULL;
+	win_T *wp = ਨਿਰਾ;
 
-	term->tl_scrollback_scrolled -= todo;
+	ਪਦ->tl_scrollback_scrolled -= todo;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	    {
 		curwin = wp;
 		check_cursor();
@@ -3707,181 +3707,181 @@ limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
 /*
  * Handle a line that is pushed off the top of the screen.
  */
-    static int
-handle_pushline(int cols, const VTermScreenCell *cells, int continuation, void *user)
+    ਸਥਿਰ ਪੂਰਨ
+handle_pushline(ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਅਚਲ VTermScreenCell *cells, ਪੂਰਨ continuation, ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
     garray_T	*gap;
-    int		update_buffer;
+    ਪੂਰਨ		update_ਬਫਰ;
 
-    if (term->tl_normal_mode)
+    ਜੇ (ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
     {
 	// In Terminal-Normal mode the user interacts with the buffer, thus we
 	// must not change it. Postpone adding the scrollback lines.
-	gap = &term->tl_scrollback_postponed;
-	update_buffer = FALSE;
+	gap = &ਪਦ->tl_scrollback_postponed;
+	update_ਬਫਰ = FALSE;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// First remove the lines that were appended before, the pushed line
 	// goes above it.
-	cleanup_scrollback(term);
-	gap = &term->tl_scrollback;
-	update_buffer = TRUE;
+	cleanup_scrollback(ਪਦ);
+	gap = &ਪਦ->tl_scrollback;
+	update_ਬਫਰ = TRUE;
     }
 
-    limit_scrollback(term, gap, update_buffer);
+    ਹੱਦਬੰਦੀ_scrollback(ਪਦ, gap, update_ਬਫਰ);
 
-    if (ga_grow(gap, 1) == FAIL)
-	return 0;
+    ਜੇ (ga_grow(gap, 1) == FAIL)
+	ਵਾਪਸ 0;
 
-    cellattr_T	*p = NULL;
-    int		len = 0;
-    int		i;
-    int		c;
-    int		col;
-    int		text_len;
-    char_u		*text;
-    sb_line_T	*line;
+    cellattr_T	*p = ਨਿਰਾ;
+    ਪੂਰਨ		len = 0;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		ਖਾਨਾ;
+    ਪੂਰਨ		ਪਾਠ_len;
+    char_u		*ਪਾਠ;
+    sb_ਸਤਰ_T	*ਸਤਰ;
     garray_T	ga;
-    cellattr_T	fill_attr = term->tl_default_color;
+    cellattr_T	fill_attr = ਪਦ->tl_default_color;
 
     // do not store empty cells at the end
-    for (i = 0; i < cols; ++i)
-	if (cells[i].chars[0] != 0)
+    ਲਈ (i = 0; i < ਖਾਨੇ_ਗਿਣਤੀ; ++i)
+	ਜੇ (cells[i].chars[0] != 0)
 	    len = i + 1;
-	else
+	ਨਹੀਂਤਾਂ
 	    cell2cellattr(&cells[i], &fill_attr);
 
     ga_init2(&ga, 1, 100);
-    if (len > 0)
+    ਜੇ (len > 0)
 	p = ALLOC_MULT(cellattr_T, len);
-    if (p != NULL)
+    ਜੇ (p != ਨਿਰਾ)
     {
-	for (col = 0; col < len; col += cells[col].width)
+	ਲਈ (ਖਾਨਾ = 0; ਖਾਨਾ < len; ਖਾਨਾ += cells[ਖਾਨਾ].ਚੌੜਾਈ)
 	{
-	    if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 4) == FAIL)
+	    ਜੇ (ga_grow(&ga, VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL * 4) == FAIL)
 	    {
 		ga.ga_len = 0;
-		break;
+		ਰੋਕੋ;
 	    }
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
-		    ((c = cells[col].chars[i]) > 0 || i == 0); ++i)
+	    ਲਈ (i = 0; i < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL &&
+		    ((c = cells[ਖਾਨਾ].chars[i]) > 0 || i == 0); ++i)
 		ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-			(char_u *)ga.ga_data + ga.ga_len);
-	    cell2cellattr(&cells[col], &p[col]);
+			(char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len);
+	    cell2cellattr(&cells[ਖਾਨਾ], &p[ਖਾਨਾ]);
 	}
     }
-    if (ga_grow(&ga, 1) == FAIL)
+    ਜੇ (ga_grow(&ga, 1) == FAIL)
     {
-	if (update_buffer)
-	    text = (char_u *)"";
-	else
-	    text = vim_strsave((char_u *)"");
-	text_len = 0;
+	ਜੇ (update_ਬਫਰ)
+	    ਪਾਠ = (char_u *)"";
+	ਨਹੀਂਤਾਂ
+	    ਪਾਠ = vim_strsave((char_u *)"");
+	ਪਾਠ_len = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	text = ga.ga_data;
-	text_len = ga.ga_len;
-	*(text + text_len) = NUL;
+	ਪਾਠ = ga.ga_ਅੰਕੜੇ;
+	ਪਾਠ_len = ga.ga_len;
+	*(ਪਾਠ + ਪਾਠ_len) = NUL;
     }
-    if (update_buffer)
-	add_scrollback_line_to_buffer(term, text, text_len, continuation);
+    ਜੇ (update_ਬਫਰ)
+	ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, ਪਾਠ, ਪਾਠ_len, continuation);
 
-    line = (sb_line_T *)gap->ga_data + gap->ga_len;
-    line->sb_cols = len;
-    line->sb_bytes = text_len;
-    line->sb_cells = p;
-    line->sb_fill_attr = fill_attr;
-    line->continuation = (char_u)continuation;
-    if (update_buffer)
+    ਸਤਰ = (sb_ਸਤਰ_T *)gap->ga_ਅੰਕੜੇ + gap->ga_len;
+    ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ = len;
+    ਸਤਰ->sb_ਬਾਈਟਾਂ = ਪਾਠ_len;
+    ਸਤਰ->sb_cells = p;
+    ਸਤਰ->sb_fill_attr = fill_attr;
+    ਸਤਰ->continuation = (char_u)continuation;
+    ਜੇ (update_ਬਫਰ)
     {
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	if (!continuation)
-	    ++term->tl_buffer_scrolled;
+	ਸਤਰ->sb_ਪਾਠ = ਨਿਰਾ;
+	++ਪਦ->tl_scrollback_scrolled;
+	ਜੇ (!continuation)
+	    ++ਪਦ->tl_ਬਫਰ_scrolled;
 	ga_clear(&ga);  // free the text
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	line->sb_text = text;
+	ਸਤਰ->sb_ਪਾਠ = ਪਾਠ;
 	ga_init(&ga);  // text is kept in tl_scrollback_postponed
     }
     ++gap->ga_len;
-    return 0; // ignored
+    ਵਾਪਸ 0; // ignored
 }
 
 /*
  * Called when leaving Terminal-Normal mode: deal with any scrollback that was
  * received and stored in tl_scrollback_postponed.
  */
-    static void
-handle_postponed_scrollback(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+handle_postponed_scrollback(ਪਦ_T *ਪਦ)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    if (term->tl_scrollback_postponed.ga_len == 0)
-	return;
-    ch_log(NULL, "Moving postponed scrollback to scrollback");
+    ਜੇ (ਪਦ->tl_scrollback_postponed.ga_len == 0)
+	ਵਾਪਸ;
+    ch_log(ਨਿਰਾ, "Moving postponed scrollback to scrollback");
 
     // First remove the lines that were appended before, the pushed lines go
     // above it.
-    cleanup_scrollback(term);
+    cleanup_scrollback(ਪਦ);
 
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
+    ਲਈ (i = 0; i < ਪਦ->tl_scrollback_postponed.ga_len; ++i)
     {
-	char_u		*text;
-	sb_line_T	*pp_line;
-	sb_line_T	*line;
+	char_u		*ਪਾਠ;
+	sb_ਸਤਰ_T	*pp_ਸਤਰ;
+	sb_ਸਤਰ_T	*ਸਤਰ;
 
-	if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	    break;
-	pp_line = (sb_line_T *)term->tl_scrollback_postponed.ga_data + i;
+	ਜੇ (ga_grow(&ਪਦ->tl_scrollback, 1) == FAIL)
+	    ਰੋਕੋ;
+	pp_ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback_postponed.ga_ਅੰਕੜੇ + i;
 
-	text = pp_line->sb_text;
-	if (text == NULL)
-	    text = (char_u *)"";
-	add_scrollback_line_to_buffer(term, text, (int)STRLEN(text), pp_line->continuation);
-	vim_free(pp_line->sb_text);
+	ਪਾਠ = pp_ਸਤਰ->sb_ਪਾਠ;
+	ਜੇ (ਪਾਠ == ਨਿਰਾ)
+	    ਪਾਠ = (char_u *)"";
+	ਜੋੜੋ_scrollback_ਸਤਰ_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, ਪਾਠ, (ਪੂਰਨ)STRLEN(ਪਾਠ), pp_ਸਤਰ->continuation);
+	vim_free(pp_ਸਤਰ->sb_ਪਾਠ);
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data
-						 + term->tl_scrollback.ga_len;
-	line->sb_cols = pp_line->sb_cols;
-	line->sb_bytes = pp_line->sb_bytes;
-	line->sb_cells = pp_line->sb_cells;
-	line->sb_fill_attr = pp_line->sb_fill_attr;
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	++term->tl_scrollback.ga_len;
-	if (!pp_line->continuation)
-	    ++term->tl_buffer_scrolled;
+	ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ
+						 + ਪਦ->tl_scrollback.ga_len;
+	ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ = pp_ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ;
+	ਸਤਰ->sb_ਬਾਈਟਾਂ = pp_ਸਤਰ->sb_ਬਾਈਟਾਂ;
+	ਸਤਰ->sb_cells = pp_ਸਤਰ->sb_cells;
+	ਸਤਰ->sb_fill_attr = pp_ਸਤਰ->sb_fill_attr;
+	ਸਤਰ->sb_ਪਾਠ = ਨਿਰਾ;
+	++ਪਦ->tl_scrollback_scrolled;
+	++ਪਦ->tl_scrollback.ga_len;
+	ਜੇ (!pp_ਸਤਰ->continuation)
+	    ++ਪਦ->tl_ਬਫਰ_scrolled;
     }
 
-    ga_clear(&term->tl_scrollback_postponed);
-    limit_scrollback(term, &term->tl_scrollback, TRUE);
+    ga_clear(&ਪਦ->tl_scrollback_postponed);
+    ਹੱਦਬੰਦੀ_scrollback(ਪਦ, &ਪਦ->tl_scrollback, TRUE);
 }
 
 /*
  * Called when the terminal wants to ring the system bell.
  */
-    static int
-handle_bell(void *user UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+handle_bell(ਖਾਲੀ *user ਅਣਵਰਤਿਆ)
 {
-    vim_beep(BO_TERM);
-    return 0;
+    vim_beep(BO_ਪਦ);
+    ਵਾਪਸ 0;
 }
 
-static VTermScreenCallbacks screen_callbacks = {
+ਸਥਿਰ VTermScreenCallbacks screen_callbacks = {
     handle_damage,		// damage
     handle_moverect,		// moverect
     handle_movecursor,		// movecursor
     handle_settermprop,		// settermprop
     handle_bell,		// bell
     handle_resize,		// resize
-    NULL,			// sb_pushline
-    NULL,			// sb_popline
-    NULL,			// sb_clear
+    ਨਿਰਾ,			// sb_pushline
+    ਨਿਰਾ,			// sb_popline
+    ਨਿਰਾ,			// sb_clear
     handle_pushline	// sb_pushline4
 };
 
@@ -3890,170 +3890,170 @@ static VTermScreenCallbacks screen_callbacks = {
  * Must be called only when updating_screen is FALSE.
  * Returns TRUE when a buffer was closed (list of terminals may have changed).
  */
-    static int
-term_after_channel_closed(term_T *term)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_after_channel_closed(ਪਦ_T *ਪਦ)
 {
     // Unless in Terminal-Normal mode: clear the vterm.
-    if (!term->tl_normal_mode)
+    ਜੇ (!ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
     {
-	int	fnum = term->tl_buffer->b_fnum;
+	ਪੂਰਨ	fnum = ਪਦ->tl_ਬਫਰ->b_fnum;
 
-	cleanup_vterm(term);
+	cleanup_vterm(ਪਦ);
 
-	if (term->tl_finish == TL_FINISH_CLOSE)
+	ਜੇ (ਪਦ->tl_ਅੰਤ == TL_ਅੰਤ_CLOSE)
 	{
 	    aco_save_T	aco;
-	    int		do_set_w_locked = term->tl_buffer->b_nwindows == 0;
-#ifdef FEAT_PROP_POPUP
-	    win_T	*pwin = NULL;
+	    ਪੂਰਨ		do_ਸੈੱਟ_w_locked = ਪਦ->tl_ਬਫਰ->b_nwindows == 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    win_T	*pwin = ਨਿਰਾ;
 
 	    // If this was a terminal in a popup window, go back to the
 	    // previous window.
-	    if (popup_is_popup(curwin) && curbuf == term->tl_buffer)
+	    ਜੇ (popup_is_popup(curwin) && curbuf == ਪਦ->tl_ਬਫਰ)
 	    {
 		pwin = curwin;
-		if (win_valid(prevwin))
+		ਜੇ (win_valid(prevwin))
 		    win_enter(prevwin, FALSE);
 	    }
-	    else
-#endif
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    // If this is the last normal window: exit Vim.
-	    if (term->tl_buffer->b_nwindows > 0 && only_one_window())
+	    ਜੇ (ਪਦ->tl_ਬਫਰ->b_nwindows > 0 && only_one_ਖਿੜਕੀ())
 	    {
 		exarg_T ea;
 
-		CLEAR_FIELD(ea);
+		CLEAR_ਖੇਤਰ(ea);
 		ex_quit(&ea);
-		return TRUE;
+		ਵਾਪਸ TRUE;
 	    }
 
 	    // ++close or term_finish == "close"
-	    ch_log(NULL, "terminal job finished, closing window");
-	    aucmd_prepbuf(&aco, term->tl_buffer);
-	    if (curbuf == term->tl_buffer)
+	    ch_log(ਨਿਰਾ, "terminal job finished, closing window");
+	    aucmd_prepbuf(&aco, ਪਦ->tl_ਬਫਰ);
+	    ਜੇ (curbuf == ਪਦ->tl_ਬਫਰ)
 	    {
 		win_T	*wp = curwin;
 
 		// Avoid closing the window if we temporarily use it.
-		if (is_aucmd_win(wp))
-		    do_set_w_locked = TRUE;
-		if (do_set_w_locked)
+		ਜੇ (is_aucmd_win(wp))
+		    do_ਸੈੱਟ_w_locked = TRUE;
+		ਜੇ (do_ਸੈੱਟ_w_locked)
 		    ++wp->w_locked;
 		do_bufdel(DOBUF_WIPE, (char_u *)"", 1, fnum, fnum, FALSE);
-		if (do_set_w_locked)
+		ਜੇ (do_ਸੈੱਟ_w_locked)
 		    --wp->w_locked;
 		aucmd_restbuf(&aco);
 	    }
-#ifdef FEAT_PROP_POPUP
-	    if (pwin != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    ਜੇ (pwin != ਨਿਰਾ)
 		popup_close_with_retval(pwin, 0);
-#endif
-	    return TRUE;
+#ਜੇ_ਅੰਤ
+	    ਵਾਪਸ TRUE;
 	}
-	if (term->tl_finish == TL_FINISH_OPEN
-				   && term->tl_buffer->b_nwindows == 0)
+	ਜੇ (ਪਦ->tl_ਅੰਤ == TL_ਅੰਤ_OPEN
+				   && ਪਦ->tl_ਬਫਰ->b_nwindows == 0)
 	{
-	    char    *cmd = term->tl_opencmd == NULL
+	    ਅੱਖਰ    *cmd = ਪਦ->tl_opencmd == ਨਿਰਾ
 				? "botright sbuf %d"
-				: (char *)term->tl_opencmd;
-	    size_t  len = strlen(cmd) + 50;
-	    char    *buf = alloc(len);
+				: (ਅੱਖਰ *)ਪਦ->tl_opencmd;
+	    size_t  len = ਲੜੀ_ਲੰਬਾਈ(cmd) + 50;
+	    ਅੱਖਰ    *buf = alloc(len);
 
-	    if (buf != NULL)
+	    ਜੇ (buf != ਨਿਰਾ)
 	    {
-		ch_log(NULL, "terminal job finished, opening window");
+		ch_log(ਨਿਰਾ, "terminal job finished, opening window");
 		vim_snprintf(buf, len, cmd, fnum);
 		do_cmdline_cmd((char_u *)buf);
 		vim_free(buf);
 	    }
 	}
-	else
-	    ch_log(NULL, "terminal job finished");
+	ਨਹੀਂਤਾਂ
+	    ch_log(ਨਿਰਾ, "terminal job finished");
     }
 
-    redraw_buf_and_status_later(term->tl_buffer, UPD_NOT_VALID);
-    return FALSE;
+    redraw_buf_and_ਸਥਿਤੀ_later(ਪਦ->tl_ਬਫਰ, UPD_NOT_VALID);
+    ਵਾਪਸ FALSE;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ਜੇ defined(FEAT_PROP_POPUP)
 /*
  * If the current window is a terminal in a popup window and the job has
  * finished, close the popup window and to back to the previous window.
  * Otherwise return FAIL.
  */
-    int
-may_close_term_popup(void)
+    ਪੂਰਨ
+may_close_ਪਦ_popup(ਖਾਲੀ)
 {
-    if (!popup_is_popup(curwin) || curbuf->b_term == NULL
-				 || term_job_running_not_none(curbuf->b_term))
-	return FAIL;
+    ਜੇ (!popup_is_popup(curwin) || curbuf->b_ਪਦ == ਨਿਰਾ
+				 || ਪਦ_ਕੰਮ_running_not_none(curbuf->b_ਪਦ))
+	ਵਾਪਸ FAIL;
 
     win_T *pwin = curwin;
 
-    if (win_valid(prevwin))
+    ਜੇ (win_valid(prevwin))
 	win_enter(prevwin, FALSE);
     popup_close_with_retval(pwin, 0);
-    return OK;
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Called when a channel is going to be closed, before invoking the close
  * callback.
  */
-    void
-term_channel_closing(channel_T *ch)
+    ਖਾਲੀ
+ਪਦ_channel_closing(channel_T *ch)
 {
-    term_T *term;
+    ਪਦ_T *ਪਦ;
 
-    for (term = first_term; term != NULL; term = term->tl_next)
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
-	    term->tl_channel_closing = TRUE;
+    ਲਈ (ਪਦ = ਪਹਿਲਾ_ਪਦ; ਪਦ != ਨਿਰਾ; ਪਦ = ਪਦ->tl_ਅਗਲਾ)
+	ਜੇ (ਪਦ->tl_ਕੰਮ == ch->ch_ਕੰਮ && !ਪਦ->tl_channel_closed)
+	    ਪਦ->tl_channel_closing = TRUE;
 }
 
 /*
  * Called when a channel has been closed.
  * If this was a channel for a terminal window then finish it up.
  */
-    void
-term_channel_closed(channel_T *ch)
+    ਖਾਲੀ
+ਪਦ_channel_closed(channel_T *ch)
 {
-    term_T *term;
-    term_T *next_term;
-    int	    did_one = FALSE;
+    ਪਦ_T *ਪਦ;
+    ਪਦ_T *ਅਗਲਾ_ਪਦ;
+    ਪੂਰਨ	    did_one = FALSE;
 
-    for (term = first_term; term != NULL; term = next_term)
+    ਲਈ (ਪਦ = ਪਹਿਲਾ_ਪਦ; ਪਦ != ਨਿਰਾ; ਪਦ = ਅਗਲਾ_ਪਦ)
     {
-	next_term = term->tl_next;
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
+	ਅਗਲਾ_ਪਦ = ਪਦ->tl_ਅਗਲਾ;
+	ਜੇ (ਪਦ->tl_ਕੰਮ == ch->ch_ਕੰਮ && !ਪਦ->tl_channel_closed)
 	{
-	    term->tl_channel_closed = TRUE;
+	    ਪਦ->tl_channel_closed = TRUE;
 	    did_one = TRUE;
 
-	    VIM_CLEAR(term->tl_title);
-	    VIM_CLEAR(term->tl_status_text);
-#ifdef MSWIN
-	    if (term->tl_out_fd != NULL)
+	    VIM_CLEAR(ਪਦ->tl_title);
+	    VIM_CLEAR(ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਜੇ (ਪਦ->tl_ਬਾਹਰਲਾ_fd != ਨਿਰਾ)
 	    {
-		fclose(term->tl_out_fd);
-		term->tl_out_fd = NULL;
+		fclose(ਪਦ->tl_ਬਾਹਰਲਾ_fd);
+		ਪਦ->tl_ਬਾਹਰਲਾ_fd = ਨਿਰਾ;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
-	    if (updating_screen)
+	    ਜੇ (updating_screen)
 	    {
 		// Cannot open or close windows now.  Can happen when
 		// 'lazyredraw' is set.
-		term->tl_channel_recently_closed = TRUE;
-		continue;
+		ਪਦ->tl_channel_recently_closed = TRUE;
+		ਜਾਰੀ;
 	    }
 
-	    if (term_after_channel_closed(term))
-		next_term = first_term;
+	    ਜੇ (ਪਦ_after_channel_closed(ਪਦ))
+		ਅਗਲਾ_ਪਦ = ਪਹਿਲਾ_ਪਦ;
 	}
     }
 
-    if (did_one)
+    ਜੇ (did_one)
     {
 	redraw_statuslines();
 
@@ -4061,12 +4061,12 @@ term_channel_closed(channel_T *ch)
 	ins_char_typebuf(K_IGNORE, 0);
 	typebuf_was_filled = TRUE;
 
-	term = curbuf->b_term;
-	if (term != NULL)
+	ਪਦ = curbuf->b_ਪਦ;
+	ਜੇ (ਪਦ != ਨਿਰਾ)
 	{
-	    if (term->tl_job == ch->ch_job)
+	    ਜੇ (ਪਦ->tl_ਕੰਮ == ch->ch_ਕੰਮ)
 		maketitle();
-	    update_cursor(term, term->tl_cursor_visible);
+	    update_cursor(ਪਦ, ਪਦ->tl_cursor_visible);
 	}
     }
 }
@@ -4075,21 +4075,21 @@ term_channel_closed(channel_T *ch)
  * To be called after resetting updating_screen: handle any terminal where the
  * channel was closed.
  */
-    void
-term_check_channel_closed_recently(void)
+    ਖਾਲੀ
+ਪਦ_check_channel_closed_recently(ਖਾਲੀ)
 {
-    term_T *term;
-    term_T *next_term;
+    ਪਦ_T *ਪਦ;
+    ਪਦ_T *ਅਗਲਾ_ਪਦ;
 
-    for (term = first_term; term != NULL; term = next_term)
+    ਲਈ (ਪਦ = ਪਹਿਲਾ_ਪਦ; ਪਦ != ਨਿਰਾ; ਪਦ = ਅਗਲਾ_ਪਦ)
     {
-	next_term = term->tl_next;
-	if (term->tl_channel_recently_closed)
+	ਅਗਲਾ_ਪਦ = ਪਦ->tl_ਅਗਲਾ;
+	ਜੇ (ਪਦ->tl_channel_recently_closed)
 	{
-	    term->tl_channel_recently_closed = FALSE;
-	    if (term_after_channel_closed(term))
+	    ਪਦ->tl_channel_recently_closed = FALSE;
+	    ਜੇ (ਪਦ_after_channel_closed(ਪਦ))
 		// start over, the list may have changed
-		next_term = first_term;
+		ਅਗਲਾ_ਪਦ = ਪਹਿਲਾ_ਪਦ;
 	}
     }
 }
@@ -4098,273 +4098,273 @@ term_check_channel_closed_recently(void)
  * Fill one screen line from a line of the terminal.
  * Advances "pos" to past the last column.
  */
-    static void
-term_line2screenline(
-	term_T		*term,
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_line2screenline(
+	ਪਦ_T		*ਪਦ,
 	win_T		*wp,
 	VTermScreen	*screen,
 	VTermPos	*pos,
-	int		max_col)
+	ਪੂਰਨ		max_ਖਾਨਾ)
 {
-    int off = screen_get_current_line_off();
+    ਪੂਰਨ off = screen_get_current_ਸਤਰ_off();
 
-    for (pos->col = 0; pos->col < max_col; )
+    ਲਈ (pos->ਖਾਨਾ = 0; pos->ਖਾਨਾ < max_ਖਾਨਾ; )
     {
 	VTermScreenCell cell;
-	int		c;
+	ਪੂਰਨ		c;
 
-	if (vterm_screen_get_cell(screen, *pos, &cell) == 0)
-	    CLEAR_FIELD(cell);
+	ਜੇ (vterm_screen_get_cell(screen, *pos, &cell) == 0)
+	    CLEAR_ਖੇਤਰ(cell);
 
 	c = cell.chars[0];
-	if (c == NUL)
+	ਜੇ (c == NUL)
 	{
-	    ScreenLines[off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = NUL;
+	    Screen_ਸਤਰਾਂ[off] = ' ';
+	    ਜੇ (enc_utf8)
+		Screen_ਸਤਰਾਂ_UC[off] = NUL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (enc_utf8)
+	    ਜੇ (enc_utf8)
 	    {
-		int i;
+		ਪੂਰਨ i;
 
 		// composing chars
-		for (i = 0; i < Screen_mco
-			      && i + 1 < VTERM_MAX_CHARS_PER_CELL; ++i)
+		ਲਈ (i = 0; i < Screen_mco
+			      && i + 1 < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL; ++i)
 		{
-		    ScreenLinesC[i][off] = cell.chars[i + 1];
-		    if (cell.chars[i + 1] == 0)
-			break;
+		    Screen_ਸਤਰਾਂ_C[i][off] = cell.chars[i + 1];
+		    ਜੇ (cell.chars[i + 1] == 0)
+			ਰੋਕੋ;
 		}
-		if (c >= 0x80 || (Screen_mco > 0
-					 && ScreenLinesC[0][off] != 0))
+		ਜੇ (c >= 0x80 || (Screen_mco > 0
+					 && Screen_ਸਤਰਾਂ_C[0][off] != 0))
 		{
-		    ScreenLines[off] = ' ';
-		    ScreenLinesUC[off] = c;
+		    Screen_ਸਤਰਾਂ[off] = ' ';
+		    Screen_ਸਤਰਾਂ_UC[off] = c;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    ScreenLines[off] = c;
-		    ScreenLinesUC[off] = NUL;
+		    Screen_ਸਤਰਾਂ[off] = c;
+		    Screen_ਸਤਰਾਂ_UC[off] = NUL;
 		}
 	    }
-#ifdef MSWIN
-	    else if (has_mbyte && c >= 0x80)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਨਹੀਂਤਾਂ ਜੇ (has_mbyte && c >= 0x80)
 	    {
 		char_u	mb[MB_MAXBYTES+1];
 		WCHAR	wc = c;
 
-		if (WideCharToMultiByte(GetACP(), 0, &wc, 1,
-					       (char*)mb, 2, 0, 0) > 1)
+		ਜੇ (Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte(GetACP(), 0, &wc, 1,
+					       (ਅੱਖਰ*)mb, 2, 0, 0) > 1)
 		{
-		    ScreenLines[off] = mb[0];
-		    ScreenLines[off + 1] = mb[1];
-		    cell.width = mb_ptr2cells(mb);
+		    Screen_ਸਤਰਾਂ[off] = mb[0];
+		    Screen_ਸਤਰਾਂ[off + 1] = mb[1];
+		    cell.ਚੌੜਾਈ = mb_ptr2cells(mb);
 		}
-		else
-		    ScreenLines[off] = c;
+		ਨਹੀਂਤਾਂ
+		    Screen_ਸਤਰਾਂ[off] = c;
 	    }
-#endif
-	    else
+#ਜੇ_ਅੰਤ
+	    ਨਹੀਂਤਾਂ
 		// This will only store the lower byte of "c".
-		ScreenLines[off] = c;
+		Screen_ਸਤਰਾਂ[off] = c;
 	}
-	ScreenAttrs[off] = cell2attr(term, wp, &cell.attrs, &cell.fg,
+	ScreenAttrs[off] = cell2attr(ਪਦ, wp, &cell.attrs, &cell.fg,
 								     &cell.bg);
 
-	++pos->col;
+	++pos->ਖਾਨਾ;
 	++off;
-	if (cell.width == 2)
+	ਜੇ (cell.ਚੌੜਾਈ == 2)
 	{
 	    // don't set the second byte to NUL for a DBCS encoding, it
 	    // has been set above
-	    if (enc_utf8)
+	    ਜੇ (enc_utf8)
 	    {
-		ScreenLinesUC[off] = NUL;
-		ScreenLines[off] = NUL;
+		Screen_ਸਤਰਾਂ_UC[off] = NUL;
+		Screen_ਸਤਰਾਂ[off] = NUL;
 	    }
-	    else if (!has_mbyte)
+	    ਨਹੀਂਤਾਂ ਜੇ (!has_mbyte)
 	    {
 		// Can't show a double-width character with a single-byte
 		// 'encoding', just use a space.
-		ScreenLines[off] = ' ';
+		Screen_ਸਤਰਾਂ[off] = ' ';
 		ScreenAttrs[off] = ScreenAttrs[off - 1];
 	    }
 
-	    ++pos->col;
+	    ++pos->ਖਾਨਾ;
 	    ++off;
 	}
     }
 }
 
-#if defined(FEAT_GUI)
-    static void
-update_system_term(term_T *term)
+#ਜੇ defined(FEAT_GUI)
+    ਸਥਿਰ ਖਾਲੀ
+update_system_ਪਦ(ਪਦ_T *ਪਦ)
 {
     VTermPos	    pos;
     VTermScreen	    *screen;
 
-    if (term->tl_vterm == NULL)
-	return;
-    screen = vterm_obtain_screen(term->tl_vterm);
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
+    screen = vterm_obtain_screen(ਪਦ->tl_vterm);
 
     // Scroll up to make more room for terminal lines if needed.
     // Use the cursor position to determine how much to scroll, because
     // ConPTY may damage all rows on initialization even when most are
     // empty, which would cause unnecessary scrolling.
-    while (term->tl_toprow > 0
-		  && (Rows - term->tl_toprow) < term->tl_cursor_pos.row + 1)
+    ਜਦੋਂ (ਪਦ->tl_toprow > 0
+		  && (ਪੰਕਤੀਆਂ - ਪਦ->tl_toprow) < ਪਦ->tl_cursor_pos.ਪੰਕਤੀ + 1)
     {
-	int save_p_more = p_more;
+	ਪੂਰਨ save_p_ਹੋਰ = p_ਹੋਰ;
 
-	p_more = FALSE;
-	msg_row = Rows - 1;
-	msg_puts("\n");
-	p_more = save_p_more;
-	--term->tl_toprow;
+	p_ਹੋਰ = FALSE;
+	ਸੁਨੇਹਾ_ਪੰਕਤੀ = ਪੰਕਤੀਆਂ - 1;
+	ਸੁਨੇਹਾ_puts("\n");
+	p_ਹੋਰ = save_p_ਹੋਰ;
+	--ਪਦ->tl_toprow;
     }
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-						  && pos.row < Rows; ++pos.row)
+    ਲਈ (pos.ਪੰਕਤੀ = ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ; pos.ਪੰਕਤੀ < ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ
+						  && pos.ਪੰਕਤੀ < ਪੰਕਤੀਆਂ; ++pos.ਪੰਕਤੀ)
     {
-	if (pos.row < term->tl_rows)
+	ਜੇ (pos.ਪੰਕਤੀ < ਪਦ->tl_ਪੰਕਤੀਆਂ)
 	{
-	    int max_col = MIN(topframe->fr_width, term->tl_cols);
+	    ਪੂਰਨ max_ਖਾਨਾ = MIN(topframe->fr_ਚੌੜਾਈ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
 
-	    term_line2screenline(term, NULL, screen, &pos, max_col);
+	    ਪਦ_line2screenline(ਪਦ, ਨਿਰਾ, screen, &pos, max_ਖਾਨਾ);
 	}
-	else
-	    pos.col = 0;
+	ਨਹੀਂਤਾਂ
+	    pos.ਖਾਨਾ = 0;
 
-	screen_line(curwin, term->tl_toprow + pos.row,
-		firstwin->w_wincol, pos.col, topframe->fr_width, -1, 0);
+	screen_ਸਤਰ(curwin, ਪਦ->tl_toprow + pos.ਪੰਕਤੀ,
+		firstwin->w_wincol, pos.ਖਾਨਾ, topframe->fr_ਚੌੜਾਈ, -1, 0);
     }
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ = MAX_ਪੰਕਤੀ;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = 0;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE if window "wp" is to be redrawn with term_update_window().
  * Returns FALSE when there is no terminal running in this window or it is in
  * Terminal-Normal mode.
  */
-    int
-term_do_update_window(win_T *wp)
+    ਪੂਰਨ
+ਪਦ_do_update_ਖਿੜਕੀ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    ਪਦ_T	*ਪਦ = wp->w_ਬਫਰ->b_ਪਦ;
 
-    return term != NULL && term->tl_vterm != NULL && !term->tl_normal_mode;
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ && ਪਦ->tl_vterm != ਨਿਰਾ && !ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ;
 }
 
 /*
  * Called to update a window that contains an active terminal.
  */
-    void
-term_update_window(win_T *wp)
+    ਖਾਲੀ
+ਪਦ_update_ਖਿੜਕੀ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    ਪਦ_T	*ਪਦ = wp->w_ਬਫਰ->b_ਪਦ;
     VTerm	*vterm;
     VTermScreen *screen;
     VTermState	*state;
     VTermPos	pos;
-    int		rows, cols;
-    int		newrows, newcols;
-    int		minsize;
+    ਪੂਰਨ		ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ;
+    ਪੂਰਨ		newrows, newcols;
+    ਪੂਰਨ		minsize;
     win_T	*twp;
 
-    vterm = term->tl_vterm;
+    vterm = ਪਦ->tl_vterm;
     screen = vterm_obtain_screen(vterm);
     state = vterm_obtain_state(vterm);
 
     // We use UPD_NOT_VALID on a resize or scroll, redraw everything then.
     // With UPD_SOME_VALID only redraw what was marked dirty.
-    if (wp->w_redr_type > UPD_SOME_VALID)
+    ਜੇ (wp->w_redr_type > UPD_SOME_VALID)
     {
-	term->tl_dirty_row_start = 0;
-	term->tl_dirty_row_end = MAX_ROW;
+	ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ = 0;
+	ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = MAX_ਪੰਕਤੀ;
 
-	if (term->tl_postponed_scroll > 0
-			      && term->tl_postponed_scroll < term->tl_rows / 3)
+	ਜੇ (ਪਦ->tl_postponed_scroll > 0
+			      && ਪਦ->tl_postponed_scroll < ਪਦ->tl_ਪੰਕਤੀਆਂ / 3)
 	    // Scrolling is usually faster than redrawing, when there are only
 	    // a few lines to scroll.
-	    term_scroll_up(term, 0, term->tl_postponed_scroll);
-	term->tl_postponed_scroll = 0;
+	    ਪਦ_scroll_ਉੱਪਰ(ਪਦ, 0, ਪਦ->tl_postponed_scroll);
+	ਪਦ->tl_postponed_scroll = 0;
     }
 
     /*
      * If the window was resized a redraw will be triggered and we get here.
      * Adjust the size of the vterm unless 'termwinsize' specifies a fixed size.
      */
-    minsize = parse_termwinsize(wp, &rows, &cols);
+    minsize = parse_termwinsize(wp, &ਪੰਕਤੀਆਂ_2, &ਖਾਨੇ_ਗਿਣਤੀ);
 
     newrows = 99999;
     newcols = 99999;
-    for (twp = firstwin; ; twp = twp->w_next)
+    ਲਈ (twp = firstwin; ; twp = twp->w_ਅਗਲਾ)
     {
 	// Always use curwin, it may be a popup window.
-	win_T *wwp = twp == NULL ? curwin : twp;
+	win_T *wwp = twp == ਨਿਰਾ ? curwin : twp;
 
 	// When more than one window shows the same terminal, use the
 	// smallest size.
-	if (wwp->w_buffer == term->tl_buffer)
+	ਜੇ (wwp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
 	{
-	    newrows = MIN(newrows, wwp->w_height);
-	    newcols = MIN(newcols, wwp->w_width);
+	    newrows = MIN(newrows, wwp->w_ਉਚਾਈ);
+	    newcols = MIN(newcols, wwp->w_ਚੌੜਾਈ);
 	}
-	if (twp == NULL)
-	    break;
+	ਜੇ (twp == ਨਿਰਾ)
+	    ਰੋਕੋ;
     }
-    if (newrows == 99999 || newcols == 99999)
-	return; // safety exit
-    newrows = rows == 0 ? newrows : minsize ? MAX(rows, newrows) : rows;
-    newcols = cols == 0 ? newcols : minsize ? MAX(cols, newcols) : cols;
+    ਜੇ (newrows == 99999 || newcols == 99999)
+	ਵਾਪਸ; // safety exit
+    newrows = ਪੰਕਤੀਆਂ_2 == 0 ? newrows : minsize ? MAX(ਪੰਕਤੀਆਂ_2, newrows) : ਪੰਕਤੀਆਂ_2;
+    newcols = ਖਾਨੇ_ਗਿਣਤੀ == 0 ? newcols : minsize ? MAX(ਖਾਨੇ_ਗਿਣਤੀ, newcols) : ਖਾਨੇ_ਗਿਣਤੀ;
 
     // If no cell is visible there is no point in resizing.  Also, vterm can't
     // handle a zero height.
-    if (newrows == 0 || newcols == 0)
-	return;
+    ਜੇ (newrows == 0 || newcols == 0)
+	ਵਾਪਸ;
 
-    if (term->tl_rows != newrows || term->tl_cols != newcols)
+    ਜੇ (ਪਦ->tl_ਪੰਕਤੀਆਂ != newrows || ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ != newcols)
     {
-	term->tl_vterm_size_changed = TRUE;
-	vterm_set_size(vterm, newrows, newcols);
-	ch_log(term->tl_job->jv_channel, "Resizing terminal to %d lines",
+	ਪਦ->tl_vterm_ਮਾਪ_ਬਦਲਿਆ = TRUE;
+	vterm_ਸੈੱਟ_ਮਾਪ(vterm, newrows, newcols);
+	ch_log(ਪਦ->tl_ਕੰਮ->jv_channel, "Resizing terminal to %d lines",
 								      newrows);
-	term_report_winsize(term, newrows, newcols);
+	ਪਦ_report_winsize(ਪਦ, newrows, newcols);
 
 	// Updating the terminal size will cause the snapshot to be cleared.
 	// When not in terminal_loop() we need to restore it.
-	if (term != in_terminal_loop)
-	    may_move_terminal_to_buffer(term, FALSE);
+	ਜੇ (ਪਦ != ਵਿੱਚ_terminal_loop)
+	    may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(ਪਦ, FALSE);
     }
 
     // The cursor may have been moved when resizing.
     vterm_state_get_cursorpos(state, &pos);
     position_cursor(wp, &pos);
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-					  && pos.row < wp->w_height; ++pos.row)
+    ਲਈ (pos.ਪੰਕਤੀ = ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ; pos.ਪੰਕਤੀ < ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ
+					  && pos.ਪੰਕਤੀ < wp->w_ਉਚਾਈ; ++pos.ਪੰਕਤੀ)
     {
-	if (pos.row < term->tl_rows)
+	ਜੇ (pos.ਪੰਕਤੀ < ਪਦ->tl_ਪੰਕਤੀਆਂ)
 	{
-	    int max_col = MIN(wp->w_width, term->tl_cols);
+	    ਪੂਰਨ max_ਖਾਨਾ = MIN(wp->w_ਚੌੜਾਈ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
 
-	    term_line2screenline(term, wp, screen, &pos, max_col);
+	    ਪਦ_line2screenline(ਪਦ, wp, screen, &pos, max_ਖਾਨਾ);
 	}
-	else
-	    pos.col = 0;
+	ਨਹੀਂਤਾਂ
+	    pos.ਖਾਨਾ = 0;
 
-	screen_line(wp, wp->w_winrow + pos.row
-#ifdef FEAT_MENU
-				+ winbar_height(wp)
-#endif
-				, wp->w_wincol, pos.col, wp->w_width, -1,
-#ifdef FEAT_PROP_POPUP
+	screen_ਸਤਰ(wp, wp->w_winrow + pos.ਪੰਕਤੀ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
+				+ winbar_ਉਚਾਈ(wp)
+#ਜੇ_ਅੰਤ
+				, wp->w_wincol, pos.ਖਾਨਾ, wp->w_ਚੌੜਾਈ, -1,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 				popup_is_popup(wp) ? SLF_POPUP :
-#endif
+#ਜੇ_ਅੰਤ
 				0);
     }
 }
@@ -4372,58 +4372,58 @@ term_update_window(win_T *wp)
 /*
  * Called after updating all windows: may reset dirty rows.
  */
-    void
-term_did_update_window(win_T *wp)
+    ਖਾਲੀ
+ਪਦ_did_update_ਖਿੜਕੀ(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    ਪਦ_T	*ਪਦ = wp->w_ਬਫਰ->b_ਪਦ;
 
-    if (term == NULL || term->tl_vterm == NULL || term->tl_normal_mode
+    ਜੇ (ਪਦ == ਨਿਰਾ || ਪਦ->tl_vterm == ਨਿਰਾ || ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ
 						|| wp->w_redr_type != 0)
-	return;
+	ਵਾਪਸ;
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸ਼ੁਰੂ = MAX_ਪੰਕਤੀ;
+    ਪਦ->tl_dirty_ਪੰਕਤੀ_ਸਿਰਾ = 0;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished.
  */
-    int
-term_is_finished(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_is_ਮੁਕੰਮਲ(buf_T *buf)
 {
-    return buf->b_term != NULL && buf->b_term->tl_vterm == NULL;
+    ਵਾਪਸ buf->b_ਪਦ != ਨਿਰਾ && buf->b_ਪਦ->tl_vterm == ਨਿਰਾ;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished or we
  * are in Terminal-Normal mode, thus we show the buffer contents.
  */
-    int
-term_show_buffer(buf_T *buf)
+    ਪੂਰਨ
+ਪਦ_show_ਬਫਰ(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    ਪਦ_T *ਪਦ = buf->b_ਪਦ;
 
-    return term != NULL && (term->tl_vterm == NULL || term->tl_normal_mode);
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ && (ਪਦ->tl_vterm == ਨਿਰਾ || ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ);
 }
 
 /*
  * The current buffer is going to be changed.  If there is terminal
  * highlighting remove it now.
  */
-    void
-term_change_in_curbuf(void)
+    ਖਾਲੀ
+ਪਦ_change_ਵਿੱਚ_curbuf(ਖਾਲੀ)
 {
-    term_T *term = curbuf->b_term;
+    ਪਦ_T *ਪਦ = curbuf->b_ਪਦ;
 
-    if (!term_is_finished(curbuf) || term->tl_scrollback.ga_len <= 0)
-	return;
+    ਜੇ (!ਪਦ_is_ਮੁਕੰਮਲ(curbuf) || ਪਦ->tl_scrollback.ga_len <= 0)
+	ਵਾਪਸ;
 
-    free_scrollback(term);
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+    free_scrollback(ਪਦ);
+    redraw_buf_later(ਪਦ->tl_ਬਫਰ, UPD_NOT_VALID);
 
     // The buffer is now like a normal buffer, it cannot be easily
     // abandoned when changed.
-    set_string_option_direct((char_u *)"buftype", -1,
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ((char_u *)"buftype", -1,
 	    (char_u *)"", OPT_FREE|OPT_LOCAL, 0);
 }
 
@@ -4431,46 +4431,46 @@ term_change_in_curbuf(void)
  * Get the screen attribute for a position in the buffer.
  * Use a negative "col" to get the filler background color.
  */
-    int
-term_get_attr(win_T *wp, linenr_T lnum, int col)
+    ਪੂਰਨ
+ਪਦ_get_attr(win_T *wp, linenr_T lnum, ਪੂਰਨ ਖਾਨਾ)
 {
-    buf_T	*buf = wp->w_buffer;
-    term_T	*term = buf->b_term;
-    sb_line_T	*line;
+    buf_T	*buf = wp->w_ਬਫਰ;
+    ਪਦ_T	*ਪਦ = buf->b_ਪਦ;
+    sb_ਸਤਰ_T	*ਸਤਰ;
     cellattr_T	*cellattr;
-    int         sb_line = -1;
-    int         sb_col = col;
+    ਪੂਰਨ         sb_ਸਤਰ = -1;
+    ਪੂਰਨ         sb_ਖਾਨਾ = ਖਾਨਾ;
 
-    if (term->tl_scrollback.ga_len)
-	bufline_pos_in_scrollback(term, lnum, col, &sb_line, &sb_col);
+    ਜੇ (ਪਦ->tl_scrollback.ga_len)
+	bufline_pos_ਵਿੱਚ_scrollback(ਪਦ, lnum, ਖਾਨਾ, &sb_ਸਤਰ, &sb_ਖਾਨਾ);
 
-    if (sb_line < 0)
-	cellattr = &term->tl_default_color;
-    else
+    ਜੇ (sb_ਸਤਰ < 0)
+	cellattr = &ਪਦ->tl_default_color;
+    ਨਹੀਂਤਾਂ
     {
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_line;
-	if (sb_col < 0 || sb_col >= line->sb_cols)
-	    cellattr = &line->sb_fill_attr;
-	else
-	    cellattr = line->sb_cells + sb_col;
+	ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ + sb_ਸਤਰ;
+	ਜੇ (sb_ਖਾਨਾ < 0 || sb_ਖਾਨਾ >= ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ)
+	    cellattr = &ਸਤਰ->sb_fill_attr;
+	ਨਹੀਂਤਾਂ
+	    cellattr = ਸਤਰ->sb_cells + sb_ਖਾਨਾ;
     }
-    return cell2attr(term, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
+    ਵਾਪਸ cell2attr(ਪਦ, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
 }
 
 /*
  * Convert a cterm color number 0 - 255 to RGB.
  * This is compatible with xterm.
  */
-    static void
-cterm_color2vterm(int nr, VTermColor *rgb)
+    ਸਥਿਰ ਖਾਲੀ
+cterm_color2vterm(ਪੂਰਨ nr, VTermColor *rgb)
 {
-    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->index);
-    if (rgb->index == 0)
+    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->ਸੂਚਕਾਂਕ);
+    ਜੇ (rgb->ਸੂਚਕਾਂਕ == 0)
 	rgb->type = VTERM_COLOR_RGB;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	rgb->type = VTERM_COLOR_INDEXED;
-	--rgb->index;
+	rgb->type = VTERM_COLOR_ਸੂਚਕਾਂਕਿਤ;
+	--rgb->ਸੂਚਕਾਂਕ;
     }
 }
 
@@ -4479,14 +4479,14 @@ cterm_color2vterm(int nr, VTermColor *rgb)
  * Returns TRUE if color is set to "fg" and "bg".
  * Otherwise returns FALSE.
  */
-    static int
-get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
+    ਸਥਿਰ ਪੂਰਨ
+get_vterm_color_from_synid(ਪੂਰਨ id, VTermColor *fg, VTermColor *bg)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Use the actual color for the GUI and when 'termguicolors' is set.
-    if (0
+    ਜੇ (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.ਵਿੱਚ_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
@@ -4500,122 +4500,122 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	guicolor_T fg_rgb = INVALCOLOR;
 	guicolor_T bg_rgb = INVALCOLOR;
 
-	if (id > 0)
+	ਜੇ (id > 0)
 	    syn_id2colors(id, &fg_rgb, &bg_rgb);
 
-	if (fg_rgb != INVALCOLOR)
+	ਜੇ (fg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(fg_rgb);
-	    fg->red = (unsigned)(rgb >> 16);
-	    fg->green = (unsigned)(rgb >> 8) & 255;
-	    fg->blue = (unsigned)rgb & 255;
+	    fg->red = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb >> 16);
+	    fg->green = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb >> 8) & 255;
+	    fg->blue = (ਬਿਨਾਨਿਸ਼ਾਨੀ)rgb & 255;
 	    fg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (bg_rgb != INVALCOLOR)
+	ਜੇ (bg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(bg_rgb);
-	    bg->red = (unsigned)(rgb >> 16);
-	    bg->green = (unsigned)(rgb >> 8) & 255;
-	    bg->blue = (unsigned)rgb & 255;
+	    bg->red = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb >> 16);
+	    bg->green = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb >> 8) & 255;
+	    bg->blue = (ਬਿਨਾਨਿਸ਼ਾਨੀ)rgb & 255;
 	    bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
-    else
-#endif
-    if (t_colors >= 16)
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+    ਜੇ (t_colors >= 16)
     {
-	int cterm_fg = -1;
-	int cterm_bg = -1;
+	ਪੂਰਨ cterm_fg = -1;
+	ਪੂਰਨ cterm_bg = -1;
 
-	if (id > 0)
+	ਜੇ (id > 0)
 	    syn_id2cterm_bg(id, &cterm_fg, &cterm_bg);
 
-	if (cterm_fg >= 0)
+	ਜੇ (cterm_fg >= 0)
 	{
 	    cterm_color2vterm(cterm_fg, fg);
 	    fg->type |= VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (cterm_bg >= 0)
+	ਜੇ (cterm_bg >= 0)
 	{
 	    cterm_color2vterm(cterm_bg, bg);
 	    bg->type |= VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
 
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    void
-term_reset_hlfwin(win_T *wp)
+    ਖਾਲੀ
+ਪਦ_reset_hlfwin(win_T *wp)
 {
-    wp->w_term_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
-    wp->w_term_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
+    wp->w_ਪਦ_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
+    wp->w_ਪਦ_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
 /*
  * Cache the color of HLF_WIN.
  */
-    void
-term_update_hlfwin(win_T *wp)
+    ਖਾਲੀ
+ਪਦ_update_hlfwin(win_T *wp)
 {
-    int id = wp->w_hlfwin_id;
+    ਪੂਰਨ id = wp->w_hlfwin_id;
 
-    if (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
-		&wp->w_term_hlfwin.fg, &wp->w_term_hlfwin.bg))
-	term_reset_hlfwin(wp);
+    ਜੇ (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
+		&wp->w_ਪਦ_hlfwin.fg, &wp->w_ਪਦ_hlfwin.bg))
+	ਪਦ_reset_hlfwin(wp);
 }
 
 /*
  * Called when option 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_hlfwin_all(void)
+    ਖਾਲੀ
+ਪਦ_update_hlfwin_all(ਖਾਲੀ)
 {
-    win_T	 *wp = NULL;
-    int		 did_curwin = FALSE;
+    win_T	 *wp = ਨਿਰਾ;
+    ਪੂਰਨ		 did_curwin = FALSE;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
-	term_update_hlfwin(wp);
+    ਜਦੋਂ (for_all_windows_and_curwin(&wp, &did_curwin))
+	ਪਦ_update_hlfwin(wp);
 }
 
 /*
  * Initialize term->tl_default_color from the environment.
  */
-    void
-term_init_default_colors(term_T *term)
+    ਖਾਲੀ
+ਪਦ_init_default_colors(ਪਦ_T *ਪਦ)
 {
     VTermColor	    *fg, *bg;
-    int		    fgval, bgval;
-    int		    id;
+    ਪੂਰਨ		    fgval, bgval;
+    ਪੂਰਨ		    id;
 
-    CLEAR_FIELD(term->tl_default_color.attrs);
-    term->tl_default_color.width = 1;
-    fg = &term->tl_default_color.fg;
-    bg = &term->tl_default_color.bg;
+    CLEAR_ਖੇਤਰ(ਪਦ->tl_default_color.attrs);
+    ਪਦ->tl_default_color.ਚੌੜਾਈ = 1;
+    fg = &ਪਦ->tl_default_color.fg;
+    bg = &ਪਦ->tl_default_color.bg;
 
     // Vterm uses a default black background.  Set it to white when
     // 'background' is "light".
-    if (*p_bg == 'l')
+    ਜੇ (*p_bg == 'l')
     {
 	fgval = 0;
 	bgval = 255;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	fgval = 255;
 	bgval = 0;
@@ -4626,227 +4626,227 @@ term_init_default_colors(term_T *term)
     bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, NULL);
+    id = ਪਦ_get_highlight_id(ਪਦ, ਨਿਰਾ);
 
-    if (!get_vterm_color_from_synid(id, fg, bg))
+    ਜੇ (!get_vterm_color_from_synid(id, fg, bg))
     {
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	int tmp;
-#endif
+#ਜੇ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	ਪੂਰਨ tmp;
+#ਜੇ_ਅੰਤ
 
 	// In an MS-Windows console we know the normal colors.
-	if (cterm_normal_fg_color > 0)
+	ਜੇ (cterm_ਸਾਧਾਰਨ_fg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_fg_color - 1, fg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_ਸਾਧਾਰਨ_fg_color - 1, fg);
+#ਜੇ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    ਜੇ (!gui.ਵਿੱਚ_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_fg_color(&fg->red, &fg->green, &fg->blue);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMRESPONSE
+	ਨਹੀਂਤਾਂ
+	    ਪਦ_get_fg_color(&fg->red, &fg->green, &fg->blue);
+#ਜੇ_ਅੰਤ
 
-	if (cterm_normal_bg_color > 0)
+	ਜੇ (cterm_ਸਾਧਾਰਨ_bg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_bg_color - 1, bg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_ਸਾਧਾਰਨ_bg_color - 1, bg);
+#ਜੇ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    ਜੇ (!gui.ਵਿੱਚ_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_bg_color(&bg->red, &bg->green, &bg->blue);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMRESPONSE
+	ਨਹੀਂਤਾਂ
+	    ਪਦ_get_bg_color(&bg->red, &bg->green, &bg->blue);
+#ਜੇ_ਅੰਤ
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if the user-defined palette (either g:terminal_ansi_colors or the
  * "ansi_colors" argument in term_start()) shall be applied.
  */
-    static int
-term_use_palette(void)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_use_palette(ਖਾਲੀ)
 {
-    if (0
+    ਜੇ (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.ਵਿੱਚ_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
 # endif
        )
-	return TRUE;
-    return FALSE;
+	ਵਾਪਸ TRUE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Set the 16 ANSI colors from array of RGB values
  */
-    static void
-set_vterm_palette(VTerm *vterm, long_u *rgb)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_vterm_palette(VTerm *vterm, long_u *rgb)
 {
-    int		index = 0;
+    ਪੂਰਨ		ਸੂਚਕਾਂਕ = 0;
     VTermState	*state = vterm_obtain_state(vterm);
 
-    for (; index < 16; index++)
+    ਲਈ (; ਸੂਚਕਾਂਕ < 16; ਸੂਚਕਾਂਕ++)
     {
 	VTermColor	color;
 
 	color.type = VTERM_COLOR_RGB;
-	color.red = (unsigned)(rgb[index] >> 16);
-	color.green = (unsigned)(rgb[index] >> 8) & 255;
-	color.blue = (unsigned)rgb[index] & 255;
-	color.index = 0;
-	vterm_state_set_palette_color(state, index, &color);
+	color.red = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb[ਸੂਚਕਾਂਕ] >> 16);
+	color.green = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(rgb[ਸੂਚਕਾਂਕ] >> 8) & 255;
+	color.blue = (ਬਿਨਾਨਿਸ਼ਾਨੀ)rgb[ਸੂਚਕਾਂਕ] & 255;
+	color.ਸੂਚਕਾਂਕ = 0;
+	vterm_state_ਸੈੱਟ_palette_color(state, ਸੂਚਕਾਂਕ, &color);
     }
 }
 
 /*
  * Set the ANSI color palette from a list of colors
  */
-    static int
-set_ansi_colors_list(VTerm *vterm, list_T *list)
+    ਸਥਿਰ ਪੂਰਨ
+ਸੈੱਟ_ansi_colors_list(VTerm *vterm, list_T *list)
 {
-    int		n = 0;
+    ਪੂਰਨ		n = 0;
     long_u	rgb[16];
     listitem_T	*li;
 
-    for (li = list->lv_first; li != NULL && n < 16; li = li->li_next, n++)
+    ਲਈ (li = list->lv_ਪਹਿਲਾ; li != ਨਿਰਾ && n < 16; li = li->li_ਅਗਲਾ, n++)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return FAIL;
+	ਜੇ (color_name == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
-	    return FAIL;
+	ਜੇ (guicolor == INVALCOLOR)
+	    ਵਾਪਸ FAIL;
 
 	rgb[n] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    if (n != 16 || li != NULL)
-	return FAIL;
+    ਜੇ (n != 16 || li != ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    set_vterm_palette(vterm, rgb);
+    ਸੈੱਟ_vterm_palette(vterm, rgb);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Initialize the ANSI color palette from g:terminal_ansi_colors[0:15]
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 init_vterm_ansi_colors(VTerm *vterm)
 {
-    dictitem_T	*var = find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE);
+    dictitem_T	*var = ਲੱਭੋ_var((char_u *)"g:terminal_ansi_colors", ਨਿਰਾ, TRUE);
 
-    if (var == NULL)
-	return;
+    ਜੇ (var == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (var->di_tv.v_type != VAR_LIST
-	    || var->di_tv.vval.v_list == NULL
-	    || var->di_tv.vval.v_list->lv_first == &range_list_item
-	    || set_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
-	semsg(_(e_invalid_argument_str), "g:terminal_ansi_colors");
+    ਜੇ (var->di_tv.v_type != VAR_LIST
+	    || var->di_tv.vval.v_list == ਨਿਰਾ
+	    || var->di_tv.vval.v_list->lv_ਪਹਿਲਾ == &range_list_ਵਸਤੂ
+	    || ਸੈੱਟ_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
+	semsg(_(e_invalid_ਦਲੀਲ_str), "g:terminal_ansi_colors");
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Handles a "drop" command from the job in the terminal.
  * "item" is the file name, "item->li_next" may have options.
  */
-    static void
-handle_drop_command(listitem_T *item)
+    ਸਥਿਰ ਖਾਲੀ
+handle_drop_command(listitem_T *ਵਸਤੂ)
 {
-    char_u	*fname = tv_get_string(&item->li_tv);
-    listitem_T	*opt_item = item->li_next;
-    int		bufnr;
+    char_u	*fname = tv_get_string(&ਵਸਤੂ->li_tv);
+    listitem_T	*opt_ਵਸਤੂ = ਵਸਤੂ->li_ਅਗਲਾ;
+    ਪੂਰਨ		bufnr;
     win_T	*wp;
     tabpage_T   *tp;
     exarg_T	ea;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ਨਿਰਾ;
 
-    bufnr = buflist_add(fname, BLN_LISTED | BLN_NOOPT);
+    bufnr = buflist_ਜੋੜੋ(fname, BLN_LISTED | BLN_NOOPT);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer->b_fnum == bufnr)
+	ਜੇ (wp->w_ਬਫਰ->b_fnum == bufnr)
 	{
 	    // buffer is in a window already, go there
 	    goto_tabpage_win(tp, wp);
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 
-    CLEAR_FIELD(ea);
+    CLEAR_ਖੇਤਰ(ea);
 
-    if (opt_item != NULL && opt_item->li_tv.v_type == VAR_DICT
-					&& opt_item->li_tv.vval.v_dict != NULL)
+    ਜੇ (opt_ਵਸਤੂ != ਨਿਰਾ && opt_ਵਸਤੂ->li_tv.v_type == VAR_DICT
+					&& opt_ਵਸਤੂ->li_tv.vval.v_dict != ਨਿਰਾ)
     {
-	dict_T *dict = opt_item->li_tv.vval.v_dict;
+	dict_T *dict = opt_ਵਸਤੂ->li_tv.vval.v_dict;
 	char_u *p;
 
 	p = dict_get_string(dict, "ff", FALSE);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	    p = dict_get_string(dict, "fileformat", FALSE);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
-	    if (check_ff_value(p) == FAIL)
-		ch_log(NULL, "Invalid ff argument to drop: %s", p);
-	    else
+	    ਜੇ (check_ff_ਮੁੱਲ(p) == FAIL)
+		ch_log(ਨਿਰਾ, "Invalid ff argument to drop: %s", p);
+	    ਨਹੀਂਤਾਂ
 		ea.force_ff = *p;
 	}
 	p = dict_get_string(dict, "enc", FALSE);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	    p = dict_get_string(dict, "encoding", FALSE);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    ea.cmd = alloc(STRLEN(p) + 12);
-	    if (ea.cmd != NULL)
+	    ਜੇ (ea.cmd != ਨਿਰਾ)
 	    {
-		sprintf((char *)ea.cmd, "sbuf ++enc=%s", p);
+		sprintf((ਅੱਖਰ *)ea.cmd, "sbuf ++enc=%s", p);
 		ea.force_enc = 11;
 		tofree = ea.cmd;
 	    }
 	}
 
 	p = dict_get_string(dict, "bad", FALSE);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	    get_bad_opt(p, &ea);
 
-	if (dict_has_key(dict, "bin"))
+	ਜੇ (dict_has_ਕੁੰਜੀ(dict, "bin"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "binary"))
+	ਜੇ (dict_has_ਕੁੰਜੀ(dict, "binary"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "nobin"))
+	ਜੇ (dict_has_ਕੁੰਜੀ(dict, "nobin"))
 	    ea.force_bin = FORCE_NOBIN;
-	if (dict_has_key(dict, "nobinary"))
+	ਜੇ (dict_has_ਕੁੰਜੀ(dict, "nobinary"))
 	    ea.force_bin = FORCE_NOBIN;
     }
 
     // open in new window, like ":split fname"
-    if (ea.cmd == NULL)
+    ਜੇ (ea.cmd == ਨਿਰਾ)
 	ea.cmd = (char_u *)"split";
     ea.arg = fname;
-    ea.cmdidx = CMD_split;
+    ea.cmdidx = CMD_ਵੰਡੋ;
     ex_splitview(&ea);
 
     vim_free(tofree);
@@ -4855,50 +4855,50 @@ handle_drop_command(listitem_T *item)
 /*
  * Return TRUE if "func" starts with "pat" and "pat" isn't empty.
  */
-    static int
-is_permitted_term_api(char_u *func, char_u *pat)
+    ਸਥਿਰ ਪੂਰਨ
+is_permitted_ਪਦ_api(char_u *func, char_u *pat)
 {
-    return pat != NULL && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
+    ਵਾਪਸ pat != ਨਿਰਾ && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
 }
 
 /*
  * Handles a function call from the job running in a terminal.
  * "item" is the function name, "item->li_next" has the arguments.
  */
-    static void
-handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
+    ਸਥਿਰ ਖਾਲੀ
+handle_call_command(ਪਦ_T *ਪਦ, channel_T *channel, listitem_T *ਵਸਤੂ)
 {
     char_u	*func;
     typval_T	argvars[2];
     typval_T	rettv;
     funcexe_T	funcexe;
 
-    if (item->li_next == NULL)
+    ਜੇ (ਵਸਤੂ->li_ਅਗਲਾ == ਨਿਰਾ)
     {
 	ch_log(channel, "Missing function arguments for call");
-	return;
+	ਵਾਪਸ;
     }
-    func = tv_get_string(&item->li_tv);
+    func = tv_get_string(&ਵਸਤੂ->li_tv);
 
-    if (!is_permitted_term_api(func, term->tl_api))
+    ਜੇ (!is_permitted_ਪਦ_api(func, ਪਦ->tl_api))
     {
 	ch_log(channel, "Unpermitted function: %s", func);
-	return;
+	ਵਾਪਸ;
     }
 
-    argvars[0].v_type = VAR_NUMBER;
-    argvars[0].vval.v_number = term->tl_buffer->b_fnum;
-    argvars[1] = item->li_next->li_tv;
-    CLEAR_FIELD(funcexe);
+    argvars[0].v_type = VAR_ਸੰਖਿਆ;
+    argvars[0].vval.v_ਸੰਖਿਆ = ਪਦ->tl_ਬਫਰ->b_fnum;
+    argvars[1] = ਵਸਤੂ->li_ਅਗਲਾ->li_tv;
+    CLEAR_ਖੇਤਰ(funcexe);
     funcexe.fe_firstline = 1L;
     funcexe.fe_lastline = 1L;
     funcexe.fe_evaluate = TRUE;
-    if (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
+    ਜੇ (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
     {
 	clear_tv(&rettv);
 	ch_log(channel, "Function %s called", func);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ch_log(channel, "Calling function %s failed", func);
 }
 
@@ -4910,20 +4910,20 @@ handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
  * UTF-8 bytes. Thus we don't need to deal with invalid UTF-8
  * encoding bytes like 0xfe, 0xff.
  */
-    static size_t
-url_decode(const char *src, const size_t len, char_u *dst)
+    ਸਥਿਰ size_t
+url_decode(ਅਚਲ ਅੱਖਰ *src, ਅਚਲ size_t len, char_u *dst)
 {
     size_t i = 0, j = 0;
 
-    while (i < len)
+    ਜਦੋਂ (i < len)
     {
-	if (src[i] == '%' && i + 2 < len)
+	ਜੇ (src[i] == '%' && i + 2 < len)
 	{
 	    dst[j] = hexhex2nr((char_u *)&src[i + 1]);
 	    j++;
 	    i += 3;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    dst[j] = src[i];
 	    i++;
@@ -4931,7 +4931,7 @@ url_decode(const char *src, const size_t len, char_u *dst)
 	}
     }
     dst[j] = '\0';
-    return j;
+    ਵਾਪਸ j;
 }
 
 /*
@@ -4942,30 +4942,30 @@ url_decode(const char *src, const size_t len, char_u *dst)
  * and what VTerm provides via VTermStringFragment is
  * "file://HOSTNAME/CURRENT/DIR"
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 sync_shell_dir(garray_T *gap)
 {
-    int       offset = 7;  // len of "file://" is 7
-    char      *pos = (char *)gap->ga_data + offset;
+    ਪੂਰਨ       ਵਿੱਥ = 7;  // len of "file://" is 7
+    ਅੱਖਰ      *pos = (ਅੱਖਰ *)gap->ga_ਅੰਕੜੇ + ਵਿੱਥ;
     char_u    *new_dir;
 
     // remove HOSTNAME to get PWD
-    while (offset < (int)gap->ga_len && *pos != '/' )
+    ਜਦੋਂ (ਵਿੱਥ < (ਪੂਰਨ)gap->ga_len && *pos != '/' )
     {
-	++offset;
+	++ਵਿੱਥ;
 	++pos;
     }
 
-    if (offset >= (int)gap->ga_len)
+    ਜੇ (ਵਿੱਥ >= (ਪੂਰਨ)gap->ga_len)
     {
-	semsg(_(e_failed_to_extract_pwd_from_str_check_your_shell_config),
-								 gap->ga_data);
-	return;
+	semsg(_(e_failed_ਮੰਜ਼ਿਲ_ਕੱਢੋ_pwd_from_str_check_your_shell_config),
+								 gap->ga_ਅੰਕੜੇ);
+	ਵਾਪਸ;
     }
 
-    new_dir = alloc(gap->ga_len - offset + 1);
-    url_decode(pos, gap->ga_len-offset, new_dir);
-    changedir_func(new_dir, TRUE, CDSCOPE_WINDOW);
+    new_dir = alloc(gap->ga_len - ਵਿੱਥ + 1);
+    url_decode(pos, gap->ga_len-ਵਿੱਥ, new_dir);
+    changedir_func(new_dir, TRUE, CDSCOPE_ਖਿੜਕੀ);
     vim_free(new_dir);
 }
 
@@ -4973,124 +4973,124 @@ sync_shell_dir(garray_T *gap)
  * Called by libvterm when it cannot recognize an OSC sequence.
  * We recognize a terminal API command.
  */
-    static int
-parse_osc(int command, VTermStringFragment frag, void *user)
+    ਸਥਿਰ ਪੂਰਨ
+parse_osc(ਪੂਰਨ command, VTermStringFragment frag, ਖਾਲੀ *user)
 {
-    term_T	*term = (term_T *)user;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
     js_read_T	reader;
     typval_T	tv;
-    channel_T	*channel = term->tl_job == NULL ? NULL
-						    : term->tl_job->jv_channel;
-    garray_T	*gap = &term->tl_osc_buf;
+    channel_T	*channel = ਪਦ->tl_ਕੰਮ == ਨਿਰਾ ? ਨਿਰਾ
+						    : ਪਦ->tl_ਕੰਮ->jv_channel;
+    garray_T	*gap = &ਪਦ->tl_osc_buf;
 
     // We recognize only OSC 5 1 ; {command} and OSC 7 ; {command}
-    if (command != 51 && (command != 7 || !p_asd))
-	return 0;
+    ਜੇ (command != 51 && (command != 7 || !p_asd))
+	ਵਾਪਸ 0;
 
     // Concatenate what was received until the final piece is found.
-    if (ga_grow(gap, (int)frag.len + 1) == FAIL)
+    ਜੇ (ga_grow(gap, (ਪੂਰਨ)frag.len + 1) == FAIL)
     {
 	ga_clear(gap);
-	return 1;
+	ਵਾਪਸ 1;
     }
-    mch_memmove((char *)gap->ga_data + gap->ga_len, frag.str, frag.len);
-    gap->ga_len += (int)frag.len;
-    if (!frag.final)
-	return 1;
+    mch_memmove((ਅੱਖਰ *)gap->ga_ਅੰਕੜੇ + gap->ga_len, frag.str, frag.len);
+    gap->ga_len += (ਪੂਰਨ)frag.len;
+    ਜੇ (!frag.final)
+	ਵਾਪਸ 1;
 
-    ((char *)gap->ga_data)[gap->ga_len] = 0;
+    ((ਅੱਖਰ *)gap->ga_ਅੰਕੜੇ)[gap->ga_len] = 0;
 
-    if (command == 7)
+    ਜੇ (command == 7)
     {
 	sync_shell_dir(gap);
 	ga_clear(gap);
-	return 1;
+	ਵਾਪਸ 1;
     }
 
-    reader.js_buf = gap->ga_data;
-    reader.js_fill = NULL;
-    reader.js_used = 0;
-    if (json_decode(&reader, &tv, 0) == OK
+    reader.js_buf = gap->ga_ਅੰਕੜੇ;
+    reader.js_fill = ਨਿਰਾ;
+    reader.js_ਵਰਤਿਆ = 0;
+    ਜੇ (json_decode(&reader, &tv, 0) == OK
 	    && tv.v_type == VAR_LIST
-	    && tv.vval.v_list != NULL)
+	    && tv.vval.v_list != ਨਿਰਾ)
     {
-	listitem_T *item = tv.vval.v_list->lv_first;
+	listitem_T *ਵਸਤੂ = tv.vval.v_list->lv_ਪਹਿਲਾ;
 
-	if (item == NULL)
+	ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 	    ch_log(channel, "Missing command");
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    char_u	*cmd = tv_get_string(&item->li_tv);
+	    char_u	*cmd = tv_get_string(&ਵਸਤੂ->li_tv);
 
 	    // Make sure an invoked command doesn't delete the buffer (and the
 	    // terminal) under our fingers.
-	    ++term->tl_buffer->b_locked;
+	    ++ਪਦ->tl_ਬਫਰ->b_locked;
 
-	    item = item->li_next;
-	    if (item == NULL)
+	    ਵਸਤੂ = ਵਸਤੂ->li_ਅਗਲਾ;
+	    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 		ch_log(channel, "Missing argument for %s", cmd);
-	    else if (STRCMP(cmd, "drop") == 0)
-		handle_drop_command(item);
-	    else if (STRCMP(cmd, "call") == 0)
-		handle_call_command(term, channel, item);
-	    else
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "drop") == 0)
+		handle_drop_command(ਵਸਤੂ);
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "call") == 0)
+		handle_call_command(ਪਦ, channel, ਵਸਤੂ);
+	    ਨਹੀਂਤਾਂ
 		ch_log(channel, "Invalid command received: %s", cmd);
-	    --term->tl_buffer->b_locked;
+	    --ਪਦ->tl_ਬਫਰ->b_locked;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ch_log(channel, "Invalid JSON received");
 
     ga_clear(gap);
     clear_tv(&tv);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
  * Called by libvterm when it cannot recognize a CSI sequence.
  * We recognize the window position report.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 parse_csi(
-	const char  *leader UNUSED,
-	const long  args[],
-	int	    argcount,
-	const char  *intermed UNUSED,
-	char	    command,
-	void	    *user)
+	ਅਚਲ ਅੱਖਰ  *leader ਅਣਵਰਤਿਆ,
+	ਅਚਲ ਲੰਮਾ  ਦਲੀਲਾਂ[],
+	ਪੂਰਨ	    argcount,
+	ਅਚਲ ਅੱਖਰ  *intermed ਅਣਵਰਤਿਆ,
+	ਅੱਖਰ	    command,
+	ਖਾਲੀ	    *user)
 {
-    term_T	*term = (term_T *)user;
-    char	buf[100];
-    int		len;
-    int		x = 0;
-    int		y = 0;
+    ਪਦ_T	*ਪਦ = (ਪਦ_T *)user;
+    ਅੱਖਰ	buf[100];
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		x = 0;
+    ਪੂਰਨ		y = 0;
     win_T	*wp;
 
     // We recognize only CSI 13 t
-    if (command != 't' || argcount != 1 || args[0] != 13)
-	return 0; // not handled
+    ਜੇ (command != 't' || argcount != 1 || ਦਲੀਲਾਂ[0] != 13)
+	ਵਾਪਸ 0; // not handled
 
     // When getting the window position is not possible or it fails it results
     // in zero/zero.
-#if defined(FEAT_GUI) \
+#ਜੇ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
-    (void)ui_get_winpos(&x, &y, (varnumber_T)100);
-#endif
+    (ਖਾਲੀ)ui_get_winpos(&x, &y, (varnumber_T)100);
+#ਜੇ_ਅੰਤ
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == term->tl_buffer)
-	    break;
-    if (wp != NULL)
+	ਜੇ (wp->w_ਬਫਰ == ਪਦ->tl_ਬਫਰ)
+	    ਰੋਕੋ;
+    ਜੇ (wp != ਨਿਰਾ)
     {
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (gui.ਵਿੱਚ_use)
 	{
-	    x += wp->w_wincol * gui.char_width;
-	    y += W_WINROW(wp) * gui.char_height;
+	    x += wp->w_wincol * gui.char_ਚੌੜਾਈ;
+	    y += W_WINROW(wp) * gui.char_ਉਚਾਈ;
 	}
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	{
 	    // We roughly estimate the position of the terminal window inside
 	    // the Vim window by assuming a 10 x 7 character cell.
@@ -5100,38 +5100,38 @@ parse_csi(
     }
 
     len = vim_snprintf(buf, 100, "\x1b[3;%d;%dt", x, y);
-    channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						     (char_u *)buf, len, NULL);
-    return 1;
+    channel_send(ਪਦ->tl_ਕੰਮ->jv_channel, get_tty_part(ਪਦ),
+						     (char_u *)buf, len, ਨਿਰਾ);
+    ਵਾਪਸ 1;
 }
 
-static VTermStateFallbacks state_fallbacks = {
-    NULL,		// control
+ਸਥਿਰ VTermStateFallbacks state_fallbacks = {
+    ਨਿਰਾ,		// control
     parse_csi,		// csi
     parse_osc,		// osc
-    NULL,		// dcs
-    NULL,		// apc
-    NULL,		// pm
-    NULL		// sos
+    ਨਿਰਾ,		// dcs
+    ਨਿਰਾ,		// apc
+    ਨਿਰਾ,		// pm
+    ਨਿਰਾ		// sos
 };
 
 /*
  * Use Vim's allocation functions for vterm so profiling works.
  */
-    static void *
-vterm_malloc(size_t size, void *data UNUSED)
+    ਸਥਿਰ ਖਾਲੀ *
+vterm_malloc(size_t ਮਾਪ, ਖਾਲੀ *ਅੰਕੜੇ ਅਣਵਰਤਿਆ)
 {
     // make sure that the length is not zero
-    return alloc_clear(size == 0 ? 1L : size);
+    ਵਾਪਸ alloc_clear(ਮਾਪ == 0 ? 1L : ਮਾਪ);
 }
 
-    static void
-vterm_memfree(void *ptr, void *data UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+vterm_memfree(ਖਾਲੀ *ptr, ਖਾਲੀ *ਅੰਕੜੇ ਅਣਵਰਤਿਆ)
 {
     vim_free(ptr);
 }
 
-static VTermAllocatorFunctions vterm_allocator = {
+ਸਥਿਰ VTermAllocatorFunctions vterm_allocator = {
   &vterm_malloc,
   &vterm_memfree
 };
@@ -5140,45 +5140,45 @@ static VTermAllocatorFunctions vterm_allocator = {
  * Create a new vterm and initialize it.
  * Return FAIL when out of memory.
  */
-    static int
-create_vterm(term_T *term, int rows, int cols)
+    ਸਥਿਰ ਪੂਰਨ
+create_vterm(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
     VTerm	    *vterm;
     VTermScreen	    *screen;
     VTermState	    *state;
-    VTermValue	    value;
+    VTerm_ਮੁੱਲ	    ਮੁੱਲ;
 
-    vterm = vterm_new_with_allocator(rows, cols, &vterm_allocator, NULL);
-    term->tl_vterm = vterm;
-    if (vterm == NULL)
-	return FAIL;
+    vterm = vterm_new_with_allocator(ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ, &vterm_allocator, ਨਿਰਾ);
+    ਪਦ->tl_vterm = vterm;
+    ਜੇ (vterm == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // Allocate screen and state here, so we can bail out if that fails.
     state = vterm_obtain_state(vterm);
     screen = vterm_obtain_screen(vterm);
-    if (state == NULL || screen == NULL)
+    ਜੇ (state == ਨਿਰਾ || screen == ਨਿਰਾ)
     {
 	vterm_free(vterm);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    vterm_screen_set_callbacks(screen, &screen_callbacks, term);
-    vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
+    vterm_screen_ਸੈੱਟ_callbacks(screen, &screen_callbacks, ਪਦ);
+    vterm_screen_ਸੈੱਟ_damage_ਮਿਲਾਓ(screen, VTERM_DAMAGE_SCROLL);
     vterm_screen_callbacks_has_pushline4(screen);
     // TODO: depends on 'encoding'.
-    vterm_set_utf8(vterm, 1);
+    vterm_ਸੈੱਟ_utf8(vterm, 1);
 
-    term_init_default_colors(term);
+    ਪਦ_init_default_colors(ਪਦ);
 
-    vterm_state_set_default_colors(
+    vterm_state_ਸੈੱਟ_default_colors(
 	    state,
-	    &term->tl_default_color.fg,
-	    &term->tl_default_color.bg);
+	    &ਪਦ->tl_default_color.fg,
+	    &ਪਦ->tl_default_color.bg);
 
-    if (t_colors < 16)
+    ਜੇ (t_colors < 16)
 	// Less than 16 colors: assume that bold means using a bright color for
 	// the foreground color.
-	vterm_state_set_bold_highbright(vterm_obtain_state(vterm), 1);
+	vterm_state_ਸੈੱਟ_bold_highbright(vterm_obtain_state(vterm), 1);
 
     // Required to initialize most things.
     vterm_screen_reset(screen, 1 /* hard */);
@@ -5189,75 +5189,75 @@ create_vterm(term_T *term, int rows, int cols)
     // For unix do not use a blinking cursor.  In an xterm this causes the
     // cursor to blink if it's blinking in the xterm.
     // For Windows we respect the system wide setting.
-#ifdef MSWIN
-    if (GetCaretBlinkTime() == INFINITE)
-	value.boolean = 0;
-    else
-	value.boolean = 1;
-#else
-    value.boolean = 0;
-#endif
-    vterm_state_set_termprop(state, VTERM_PROP_CURSORBLINK, &value);
-    vterm_state_set_unrecognised_fallbacks(state, &state_fallbacks, term);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (Get_Caret_Blink_ਸਮਾਂ() == INFINITE)
+	ਮੁੱਲ.boolean = 0;
+    ਨਹੀਂਤਾਂ
+	ਮੁੱਲ.boolean = 1;
+#ਨਹੀਂਤਾਂ
+    ਮੁੱਲ.boolean = 0;
+#ਜੇ_ਅੰਤ
+    vterm_state_ਸੈੱਟ_termprop(state, VTERM_PROP_CURSORBLINK, &ਮੁੱਲ);
+    vterm_state_ਸੈੱਟ_unrecognised_fallbacks(state, &state_fallbacks, ਪਦ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Reset the terminal palette to its default value.
  */
-    static void
-term_reset_palette(VTerm *vterm)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_reset_palette(VTerm *vterm)
 {
     VTermState	*state = vterm_obtain_state(vterm);
-    int		index;
+    ਪੂਰਨ		ਸੂਚਕਾਂਕ;
 
-    for (index = 0; index < 16; index++)
+    ਲਈ (ਸੂਚਕਾਂਕ = 0; ਸੂਚਕਾਂਕ < 16; ਸੂਚਕਾਂਕ++)
     {
 	VTermColor	color;
 
-	color.type = VTERM_COLOR_INDEXED;
-	ansi_color2rgb(index, &color.red, &color.green, &color.blue,
-		&color.index);
+	color.type = VTERM_COLOR_ਸੂਚਕਾਂਕਿਤ;
+	ansi_color2rgb(ਸੂਚਕਾਂਕ, &color.red, &color.green, &color.blue,
+		&color.ਸੂਚਕਾਂਕ);
 	// The first valid index starts at 1.
-	color.index -= 1;
+	color.ਸੂਚਕਾਂਕ -= 1;
 
-	vterm_state_set_palette_color(state, index, &color);
+	vterm_state_ਸੈੱਟ_palette_color(state, ਸੂਚਕਾਂਕ, &color);
     }
 }
 
-    static void
-term_update_palette(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_update_palette(ਪਦ_T *ਪਦ)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette()
-	    && (term->tl_palette != NULL
-		|| find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE)
-								      != NULL))
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ਜੇ (ਪਦ_use_palette()
+	    && (ਪਦ->tl_palette != ਨਿਰਾ
+		|| ਲੱਭੋ_var((char_u *)"g:terminal_ansi_colors", ਨਿਰਾ, TRUE)
+								      != ਨਿਰਾ))
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ਜੇ (ਪਦ->tl_palette != ਨਿਰਾ)
+	    ਸੈੱਟ_vterm_palette(ਪਦ->tl_vterm, ਪਦ->tl_palette);
+	ਨਹੀਂਤਾਂ
+	    init_vterm_ansi_colors(ਪਦ->tl_vterm);
     }
-    else
-#endif
-	term_reset_palette(term->tl_vterm);
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	ਪਦ_reset_palette(ਪਦ->tl_vterm);
 }
 
 /*
  * Called when option 'termguicolors' is changed.
  */
-    void
-term_update_palette_all(void)
+    ਖਾਲੀ
+ਪਦ_update_palette_all(ਖਾਲੀ)
 {
-    term_T *term;
+    ਪਦ_T *ਪਦ;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(ਪਦ)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_update_palette(term);
+	ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	    ਜਾਰੀ;
+	ਪਦ_update_palette(ਪਦ);
     }
 }
 
@@ -5265,20 +5265,20 @@ term_update_palette_all(void)
  * Called when option 'background' or 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_colors_all(void)
+    ਖਾਲੀ
+ਪਦ_update_colors_all(ਖਾਲੀ)
 {
-    term_T *term;
+    ਪਦ_T *ਪਦ;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(ਪਦ)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_init_default_colors(term);
-	vterm_state_set_default_colors(
-		vterm_obtain_state(term->tl_vterm),
-		&term->tl_default_color.fg,
-		&term->tl_default_color.bg);
+	ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	    ਜਾਰੀ;
+	ਪਦ_init_default_colors(ਪਦ);
+	vterm_state_ਸੈੱਟ_default_colors(
+		vterm_obtain_state(ਪਦ->tl_vterm),
+		&ਪਦ->tl_default_color.fg,
+		&ਪਦ->tl_default_color.bg);
     }
 }
 
@@ -5286,66 +5286,66 @@ term_update_colors_all(void)
  * Return the text to show for the buffer name and status.
  */
     char_u *
-term_get_status_text(term_T *term)
+ਪਦ_get_ਸਥਿਤੀ_ਪਾਠ(ਪਦ_T *ਪਦ)
 {
-    if (term->tl_status_text != NULL)
-	return term->tl_status_text;
+    ਜੇ (ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ != ਨਿਰਾ)
+	ਵਾਪਸ ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ;
 
     char_u *txt;
     size_t len;
     char_u *fname;
 
-    if (term->tl_normal_mode)
+    ਜੇ (ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
     {
-	if (term_job_running(term))
+	ਜੇ (ਪਦ_ਕੰਮ_running(ਪਦ))
 	    txt = (char_u *)_("Terminal");
-	else
+	ਨਹੀਂਤਾਂ
 	    txt = (char_u *)_("Terminal-finished");
     }
-    else if (term->tl_title != NULL)
-	txt = term->tl_title;
-    else if (term_none_open(term))
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ->tl_title != ਨਿਰਾ)
+	txt = ਪਦ->tl_title;
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_none_open(ਪਦ))
 	txt = (char_u *)_("active");
-    else if (term_job_running(term))
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_ਕੰਮ_running(ਪਦ))
 	txt = (char_u *)_("running");
-    else
+    ਨਹੀਂਤਾਂ
 	txt = (char_u *)_("finished");
-    fname = buf_get_fname(term->tl_buffer);
+    fname = buf_get_fname(ਪਦ->tl_ਬਫਰ);
     len = 9 + STRLEN(fname) + STRLEN(txt);
-    term->tl_status_text = alloc(len);
-    if (term->tl_status_text != NULL)
-	vim_snprintf((char *)term->tl_status_text, len, "%s [%s]",
+    ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ = alloc(len);
+    ਜੇ (ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ != ਨਿਰਾ)
+	vim_snprintf((ਅੱਖਰ *)ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ, len, "%s [%s]",
 		fname, txt);
-    return term->tl_status_text;
+    ਵਾਪਸ ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ;
 }
 
 /*
  * Clear the cached value of the status text.
  */
-    void
-term_clear_status_text(term_T *term)
+    ਖਾਲੀ
+ਪਦ_clear_ਸਥਿਤੀ_ਪਾਠ(ਪਦ_T *ਪਦ)
 {
-    VIM_CLEAR(term->tl_status_text);
+    VIM_CLEAR(ਪਦ->tl_ਸਥਿਤੀ_ਪਾਠ);
 }
 
 /*
  * Mark references in jobs of terminals.
  */
-    int
-set_ref_in_term(int copyID)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_ਪਦ(ਪੂਰਨ copyID)
 {
-    int		abort = FALSE;
-    term_T	*term;
+    ਪੂਰਨ		abort = FALSE;
+    ਪਦ_T	*ਪਦ;
     typval_T	tv;
 
-    for (term = first_term; !abort && term != NULL; term = term->tl_next)
-	if (term->tl_job != NULL)
+    ਲਈ (ਪਦ = ਪਹਿਲਾ_ਪਦ; !abort && ਪਦ != ਨਿਰਾ; ਪਦ = ਪਦ->tl_ਅਗਲਾ)
+	ਜੇ (ਪਦ->tl_ਕੰਮ != ਨਿਰਾ)
 	{
-	    tv.v_type = VAR_JOB;
-	    tv.vval.v_job = term->tl_job;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    tv.v_type = VAR_ਕੰਮ;
+	    tv.vval.v_ਕੰਮ = ਪਦ->tl_ਕੰਮ;
+	    abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_ਵਸਤੂ(&tv, copyID, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ);
 	}
-    return abort;
+    ਵਾਪਸ abort;
 }
 
 /*
@@ -5353,47 +5353,47 @@ set_ref_in_term(int copyID)
  * Returns NULL when the buffer is not for a terminal window and logs a message
  * with "where".
  */
-    static buf_T *
-term_get_buf(typval_T *argvars, char *where)
+    ਸਥਿਰ buf_T *
+ਪਦ_get_buf(typval_T *argvars, ਅੱਖਰ *where)
 {
     buf_T *buf;
 
     ++emsg_off;
     buf = tv_get_buf(&argvars[0], FALSE);
     --emsg_off;
-    if (buf == NULL || buf->b_term == NULL)
+    ਜੇ (buf == ਨਿਰਾ || buf->b_ਪਦ == ਨਿਰਾ)
     {
-	(void)tv_get_number(&argvars[0]);    // issue errmsg if type error
-	ch_log(NULL, "%s: invalid buffer argument", where);
-	return NULL;
+	(ਖਾਲੀ)tv_get_ਸੰਖਿਆ(&argvars[0]);    // issue errmsg if type error
+	ch_log(ਨਿਰਾ, "%s: invalid buffer argument", where);
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    return buf;
+    ਵਾਪਸ buf;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 clear_cell(VTermScreenCell *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_ਖੇਤਰ(*cell);
     cell->fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
-    static void
-dump_term_color(FILE *fd, VTermColor *color)
+    ਸਥਿਰ ਖਾਲੀ
+dump_ਪਦ_color(FILE *fd, VTermColor *color)
 {
-    int index;
+    ਪੂਰਨ ਸੂਚਕਾਂਕ;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
-	index = color->index + 1;
-    else if (color->type == 0)
+    ਜੇ (VTERM_COLOR_IS_ਸੂਚਕਾਂਕਿਤ(color))
+	ਸੂਚਕਾਂਕ = color->ਸੂਚਕਾਂਕ + 1;
+    ਨਹੀਂਤਾਂ ਜੇ (color->type == 0)
 	// use RGB values
-	index = 255;
-    else
+	ਸੂਚਕਾਂਕ = 255;
+    ਨਹੀਂਤਾਂ
 	// default color
-	index = 0;
+	ਸੂਚਕਾਂਕ = 0;
     fprintf(fd, "%02x%02x%02x%d",
-	    (int)color->red, (int)color->green, (int)color->blue,
-	    index);
+	    (ਪੂਰਨ)color->red, (ਪੂਰਨ)color->green, (ਪੂਰਨ)color->blue,
+	    ਸੂਚਕਾਂਕ);
 }
 
 /*
@@ -5418,14 +5418,14 @@ dump_term_color(FILE *fd, VTermColor *color)
  * Repeating the previous screen cell:
  *    @{count}
  */
-    void
-f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_dumpwrite(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     char_u	*fname;
-    int		max_height = 0;
-    int		max_width = 0;
+    ਪੂਰਨ		max_ਉਚਾਈ_2 = 0;
+    ਪੂਰਨ		max_ਚੌੜਾਈ_2 = 0;
     stat_T	st;
     FILE	*fd;
     VTermPos	pos;
@@ -5434,121 +5434,121 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
     VTermState	*state;
     VTermPos	cursor_pos;
 
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_dumpwrite()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
+    buf = ਪਦ_get_buf(argvars, "term_dumpwrite()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
     {
-	emsg(_(e_job_already_finished));
-	return;
+	emsg(_(e_ਕੰਮ_already_ਮੁਕੰਮਲ));
+	ਵਾਪਸ;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return;
+	ਜੇ (check_for_dict_arg(argvars, 2) == FAIL)
+	    ਵਾਪਸ;
 	d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	ਜੇ (d != ਨਿਰਾ)
 	{
-	    max_height = dict_get_number(d, "rows");
-	    max_width = dict_get_number(d, "columns");
+	    max_ਉਚਾਈ_2 = dict_get_ਸੰਖਿਆ(d, "rows");
+	    max_ਚੌੜਾਈ_2 = dict_get_ਸੰਖਿਆ(d, "columns");
 	}
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
-    if (mch_stat((char *)fname, &st) >= 0)
+    ਜੇ (fname == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (mch_stat((ਅੱਖਰ *)fname, &st) >= 0)
     {
 	semsg(_(e_file_exists_str), fname);
-	return;
+	ਵਾਪਸ;
     }
 
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, WRITEBIN)) == NULL)
+    ਜੇ (*fname == NUL || (fd = mch_fopen((ਅੱਖਰ *)fname, WRITEBIN)) == ਨਿਰਾ)
     {
 	semsg(_(e_cant_create_file_str), *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	ਵਾਪਸ;
     }
 
     clear_cell(&prev_cell);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
+    screen = vterm_obtain_screen(ਪਦ->tl_vterm);
+    state = vterm_obtain_state(ਪਦ->tl_vterm);
     vterm_state_get_cursorpos(state, &cursor_pos);
 
-    for (pos.row = 0; (max_height == 0 || pos.row < max_height)
-					 && pos.row < term->tl_rows; ++pos.row)
+    ਲਈ (pos.ਪੰਕਤੀ = 0; (max_ਉਚਾਈ_2 == 0 || pos.ਪੰਕਤੀ < max_ਉਚਾਈ_2)
+					 && pos.ਪੰਕਤੀ < ਪਦ->tl_ਪੰਕਤੀਆਂ; ++pos.ਪੰਕਤੀ)
     {
-	int		repeat = 0;
+	ਪੂਰਨ		repeat = 0;
 
-	for (pos.col = 0; (max_width == 0 || pos.col < max_width)
-					 && pos.col < term->tl_cols; ++pos.col)
+	ਲਈ (pos.ਖਾਨਾ = 0; (max_ਚੌੜਾਈ_2 == 0 || pos.ਖਾਨਾ < max_ਚੌੜਾਈ_2)
+					 && pos.ਖਾਨਾ < ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ; ++pos.ਖਾਨਾ)
 	{
 	    VTermScreenCell cell;
-	    int		    same_attr;
-	    int		    same_chars = TRUE;
-	    int		    i;
-	    int		    is_cursor_pos = (pos.col == cursor_pos.col
-						 && pos.row == cursor_pos.row);
+	    ਪੂਰਨ		    same_attr;
+	    ਪੂਰਨ		    same_chars = TRUE;
+	    ਪੂਰਨ		    i;
+	    ਪੂਰਨ		    is_cursor_pos = (pos.ਖਾਨਾ == cursor_pos.ਖਾਨਾ
+						 && pos.ਪੰਕਤੀ == cursor_pos.ਪੰਕਤੀ);
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+	    ਜੇ (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		clear_cell(&cell);
 
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    ਲਈ (i = 0; i < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL; ++i)
 	    {
-		int c = cell.chars[i];
-		int pc = prev_cell.chars[i];
-		int should_break = c == NUL || pc == NUL;
+		ਪੂਰਨ c = cell.chars[i];
+		ਪੂਰਨ pc = prev_cell.chars[i];
+		ਪੂਰਨ should_break = c == NUL || pc == NUL;
 
 		// For the first character NUL is the same as space.
-		if (i == 0)
+		ਜੇ (i == 0)
 		{
 		    c = (c == NUL) ? ' ' : c;
 		    pc = (pc == NUL) ? ' ' : pc;
 		}
-		if (c != pc)
+		ਜੇ (c != pc)
 		    same_chars = FALSE;
-		if (should_break)
-		    break;
+		ਜੇ (should_break)
+		    ਰੋਕੋ;
 	    }
 	    same_attr = vtermAttr2hl(&cell.attrs)
 					      == vtermAttr2hl(&prev_cell.attrs)
 			&& vterm_color_is_equal(&cell.fg, &prev_cell.fg)
 			&& vterm_color_is_equal(&cell.bg, &prev_cell.bg);
-	    if (same_chars && cell.width == prev_cell.width && same_attr
+	    ਜੇ (same_chars && cell.ਚੌੜਾਈ == prev_cell.ਚੌੜਾਈ && same_attr
 							     && !is_cursor_pos)
 	    {
 		++repeat;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (repeat > 0)
+		ਜੇ (repeat > 0)
 		{
 		    fprintf(fd, "@%d", repeat);
 		    repeat = 0;
 		}
 		fputs(is_cursor_pos ? ">" : "|", fd);
 
-		if (cell.chars[0] == NUL)
+		ਜੇ (cell.chars[0] == NUL)
 		    fputs(" ", fd);
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    char_u	charbuf[10];
-		    int		len;
+		    ਪੂਰਨ		len;
 
-		    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL
+		    ਲਈ (i = 0; i < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL
 						  && cell.chars[i] != NUL; ++i)
 		    {
 			len = utf_char2bytes(cell.chars[i], charbuf);
@@ -5559,33 +5559,33 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		// When only the characters differ we don't write anything, the
 		// following "|", "@" or NL will indicate using the same
 		// attributes.
-		if (cell.width != prev_cell.width || !same_attr)
+		ਜੇ (cell.ਚੌੜਾਈ != prev_cell.ਚੌੜਾਈ || !same_attr)
 		{
-		    if (cell.width == 2)
+		    ਜੇ (cell.ਚੌੜਾਈ == 2)
 			fputs("*", fd);
-		    else
+		    ਨਹੀਂਤਾਂ
 			fputs("+", fd);
 
-		    if (same_attr)
+		    ਜੇ (same_attr)
 		    {
 			fputs("&", fd);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			fprintf(fd, "%d", vtermAttr2hl(&cell.attrs));
-			if (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
+			ਜੇ (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
 			    fputs("&", fd);
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.fg);
+			    dump_ਪਦ_color(fd, &cell.fg);
 			}
-			if (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
+			ਜੇ (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
 			    fputs("&", fd);
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.bg);
+			    dump_ਪਦ_color(fd, &cell.bg);
 			}
 		    }
 		}
@@ -5593,10 +5593,10 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		prev_cell = cell;
 	    }
 
-	    if (cell.width == 2)
-		++pos.col;
+	    ਜੇ (cell.ਚੌੜਾਈ == 2)
+		++pos.ਖਾਨਾ;
 	}
-	if (repeat > 0)
+	ਜੇ (repeat > 0)
 	    fprintf(fd, "@%d", repeat);
 	fputs("\n", fd);
     }
@@ -5607,26 +5607,26 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * Called when a dump is corrupted.  Put a breakpoint here when debugging.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 dump_is_corrupt(garray_T *gap)
 {
     GA_CONCAT_LITERAL(gap, "CORRUPT");
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 append_cell(garray_T *gap, cellattr_T *cell)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ਜੇ (ga_grow(gap, 1) == FAIL)
+	ਵਾਪਸ;
 
-    *(((cellattr_T *)gap->ga_data) + gap->ga_len) = *cell;
+    *(((cellattr_T *)gap->ga_ਅੰਕੜੇ) + gap->ga_len) = *cell;
     ++gap->ga_len;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 clear_cellattr(cellattr_T *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_ਖੇਤਰ(*cell);
     cell->fg.type = VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_DEFAULT_BG;
 }
@@ -5635,125 +5635,125 @@ clear_cellattr(cellattr_T *cell)
  * Read the dump file from "fd" and append lines to the current buffer.
  * Return the cell width of the longest line.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 read_dump_file(FILE *fd, VTermPos *cursor_pos)
 {
-    int		    c;
-    garray_T	    ga_text;
+    ਪੂਰਨ		    c;
+    garray_T	    ga_ਪਾਠ;
     garray_T	    ga_cell;
-    string_T	    prev_char = {NULL, 0};
-    int		    attr = 0;
+    string_T	    prev_char = {ਨਿਰਾ, 0};
+    ਪੂਰਨ		    attr = 0;
     cellattr_T	    cell;
-    cellattr_T	    empty_cell;
-    term_T	    *term = curbuf->b_term;
-    int		    max_cells = 0;
-    int		    start_row = term->tl_scrollback.ga_len;
+    cellattr_T	    ਖਾਲੀ_ਥਾਵਾਂ_cell;
+    ਪਦ_T	    *ਪਦ = curbuf->b_ਪਦ;
+    ਪੂਰਨ		    max_cells = 0;
+    ਪੂਰਨ		    ਸ਼ੁਰੂ_ਪੰਕਤੀ = ਪਦ->tl_scrollback.ga_len;
 
-    ga_init2(&ga_text, 1, 90);
-    ga_init2(&ga_cell, sizeof(cellattr_T), 90);
+    ga_init2(&ga_ਪਾਠ, 1, 90);
+    ga_init2(&ga_cell, ਆਕਾਰ(cellattr_T), 90);
     clear_cellattr(&cell);
-    clear_cellattr(&empty_cell);
-    cursor_pos->row = -1;
-    cursor_pos->col = -1;
+    clear_cellattr(&ਖਾਲੀ_ਥਾਵਾਂ_cell);
+    cursor_pos->ਪੰਕਤੀ = -1;
+    cursor_pos->ਖਾਨਾ = -1;
 
     c = fgetc(fd);
-    for (;;)
+    ਲਈ (;;)
     {
-	if (c == EOF)
-	    break;
-	if (c == '\r')
+	ਜੇ (c == EOF)
+	    ਰੋਕੋ;
+	ਜੇ (c == '\r')
 	{
 	    // DOS line endings?  Ignore.
 	    c = fgetc(fd);
 	}
-	else if (c == '\n')
+	ਨਹੀਂਤਾਂ ਜੇ (c == '\n')
 	{
 	    // End of a line: append it to the buffer.
-	    if (ga_text.ga_data == NULL)
-		dump_is_corrupt(&ga_text);
-	    if (ga_grow(&term->tl_scrollback, 1) == OK)
+	    ਜੇ (ga_ਪਾਠ.ga_ਅੰਕੜੇ == ਨਿਰਾ)
+		dump_is_corrupt(&ga_ਪਾਠ);
+	    ਜੇ (ga_grow(&ਪਦ->tl_scrollback, 1) == OK)
 	    {
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		sb_ਸਤਰ_T   *ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ
+						  + ਪਦ->tl_scrollback.ga_len;
 
-		if (max_cells < ga_cell.ga_len)
+		ਜੇ (max_cells < ga_cell.ga_len)
 		    max_cells = ga_cell.ga_len;
-		line->sb_cols = ga_cell.ga_len;
-		line->sb_bytes = ga_text.ga_len;
-		line->sb_cells = ga_cell.ga_data;
-		line->sb_fill_attr = term->tl_default_color;
-		line->continuation = 0;
-		++term->tl_scrollback.ga_len;
+		ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ = ga_cell.ga_len;
+		ਸਤਰ->sb_ਬਾਈਟਾਂ = ga_ਪਾਠ.ga_len;
+		ਸਤਰ->sb_cells = ga_cell.ga_ਅੰਕੜੇ;
+		ਸਤਰ->sb_fill_attr = ਪਦ->tl_default_color;
+		ਸਤਰ->continuation = 0;
+		++ਪਦ->tl_scrollback.ga_len;
 		ga_init(&ga_cell);
 
-		ga_append(&ga_text, NUL);
-		ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+		ga_append(&ga_ਪਾਠ, NUL);
+		ml_append(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, ga_ਪਾਠ.ga_ਅੰਕੜੇ,
+							ga_ਪਾਠ.ga_len, FALSE);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ga_clear(&ga_cell);
-	    ga_text.ga_len = 0;
+	    ga_ਪਾਠ.ga_len = 0;
 
 	    c = fgetc(fd);
 	}
-	else if (c == '|' || c == '>')
+	ਨਹੀਂਤਾਂ ਜੇ (c == '|' || c == '>')
 	{
-	    int prev_len = ga_text.ga_len;
+	    ਪੂਰਨ prev_len = ga_ਪਾਠ.ga_len;
 
-	    if (c == '>')
+	    ਜੇ (c == '>')
 	    {
-		if (cursor_pos->row != -1)
-		    dump_is_corrupt(&ga_text);	// duplicate cursor
-		cursor_pos->row = term->tl_scrollback.ga_len - start_row;
-		cursor_pos->col = ga_cell.ga_len;
+		ਜੇ (cursor_pos->ਪੰਕਤੀ != -1)
+		    dump_is_corrupt(&ga_ਪਾਠ);	// duplicate cursor
+		cursor_pos->ਪੰਕਤੀ = ਪਦ->tl_scrollback.ga_len - ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+		cursor_pos->ਖਾਨਾ = ga_cell.ga_len;
 	    }
 
 	    // normal character(s) followed by "+", "*", "|", "@" or NL
 	    c = fgetc(fd);
-	    if (c != EOF)
-		ga_append(&ga_text, c);
-	    for (;;)
+	    ਜੇ (c != EOF)
+		ga_append(&ga_ਪਾਠ, c);
+	    ਲਈ (;;)
 	    {
 		c = fgetc(fd);
-		if (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
+		ਜੇ (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
 						      || c == EOF || c == '\n')
-		    break;
-		ga_append(&ga_text, c);
+		    ਰੋਕੋ;
+		ga_append(&ga_ਪਾਠ, c);
 	    }
 
 	    // save the character for repeating it
 	    VIM_CLEAR_STRING(prev_char);
-	    if (ga_text.ga_data != NULL)
+	    ਜੇ (ga_ਪਾਠ.ga_ਅੰਕੜੇ != ਨਿਰਾ)
 	    {
-		prev_char.length = (size_t)(ga_text.ga_len - prev_len);
+		prev_char.ਲੰਮਾਈ = (size_t)(ga_ਪਾਠ.ga_len - prev_len);
 		prev_char.string = vim_strnsave(
-		    ((char_u *)ga_text.ga_data) + prev_len,
-		    prev_char.length);
-		if (prev_char.string == NULL)
-		    prev_char.length = 0;
+		    ((char_u *)ga_ਪਾਠ.ga_ਅੰਕੜੇ) + prev_len,
+		    prev_char.ਲੰਮਾਈ);
+		ਜੇ (prev_char.string == ਨਿਰਾ)
+		    prev_char.ਲੰਮਾਈ = 0;
 	    }
 
-	    if (c == '@' || c == '|' || c == '>' || c == '\n')
+	    ਜੇ (c == '@' || c == '|' || c == '>' || c == '\n')
 	    {
 		// use all attributes from previous cell
 	    }
-	    else if (c == '+' || c == '*')
+	    ਨਹੀਂਤਾਂ ਜੇ (c == '+' || c == '*')
 	    {
-		int is_bg;
+		ਪੂਰਨ is_bg;
 
-		cell.width = c == '+' ? 1 : 2;
+		cell.ਚੌੜਾਈ = c == '+' ? 1 : 2;
 
 		c = fgetc(fd);
-		if (c == '&')
+		ਜੇ (c == '&')
 		{
 		    // use same attr as previous cell
 		    c = fgetc(fd);
 		}
-		else if (SAFE_isdigit(c))
+		ਨਹੀਂਤਾਂ ਜੇ (ਸੁਰੱਖਿਅਤ_isdigit(c))
 		{
 		    // get the decimal attribute
 		    attr = 0;
-		    while (SAFE_isdigit(c))
+		    ਜਦੋਂ (ਸੁਰੱਖਿਅਤ_isdigit(c))
 		    {
 			attr = attr * 10 + (c - '0');
 			c = fgetc(fd);
@@ -5761,16 +5761,16 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 		    hl2vtermAttr(attr, &cell);
 
 		    // is_bg == 0: fg, is_bg == 1: bg
-		    for (is_bg = 0; is_bg <= 1; ++is_bg)
+		    ਲਈ (is_bg = 0; is_bg <= 1; ++is_bg)
 		    {
-			if (c == '&')
+			ਜੇ (c == '&')
 			{
 			    // use same color as previous cell
 			    c = fgetc(fd);
 			}
-			else if (c == '#')
+			ਨਹੀਂਤਾਂ ਜੇ (c == '#')
 			{
-			    int red, green, blue, index = 0, type;
+			    ਪੂਰਨ red, green, blue, ਸੂਚਕਾਂਕ = 0, type;
 
 			    c = fgetc(fd);
 			    red = hex2nr(c);
@@ -5785,409 +5785,409 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 			    c = fgetc(fd);
 			    blue = (blue << 4) + hex2nr(c);
 			    c = fgetc(fd);
-			    if (!SAFE_isdigit(c))
-				dump_is_corrupt(&ga_text);
-			    while (SAFE_isdigit(c))
+			    ਜੇ (!ਸੁਰੱਖਿਅਤ_isdigit(c))
+				dump_is_corrupt(&ga_ਪਾਠ);
+			    ਜਦੋਂ (ਸੁਰੱਖਿਅਤ_isdigit(c))
 			    {
-				index = index * 10 + (c - '0');
+				ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ * 10 + (c - '0');
 				c = fgetc(fd);
 			    }
-			    if (index == 0 || index == 255)
+			    ਜੇ (ਸੂਚਕਾਂਕ == 0 || ਸੂਚਕਾਂਕ == 255)
 			    {
 				type = VTERM_COLOR_RGB;
-				if (index == 0)
+				ਜੇ (ਸੂਚਕਾਂਕ == 0)
 				{
-				    if (is_bg)
+				    ਜੇ (is_bg)
 					type |= VTERM_COLOR_DEFAULT_BG;
-				    else
+				    ਨਹੀਂਤਾਂ
 					type |= VTERM_COLOR_DEFAULT_FG;
 				}
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
-				type = VTERM_COLOR_INDEXED;
-				index -= 1;
+				type = VTERM_COLOR_ਸੂਚਕਾਂਕਿਤ;
+				ਸੂਚਕਾਂਕ -= 1;
 			    }
-			    if (is_bg)
+			    ਜੇ (is_bg)
 			    {
 				cell.bg.type = type;
 				cell.bg.red = red;
 				cell.bg.green = green;
 				cell.bg.blue = blue;
-				cell.bg.index = index;
+				cell.bg.ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				cell.fg.type = type;
 				cell.fg.red = red;
 				cell.fg.green = green;
 				cell.fg.blue = blue;
-				cell.fg.index = index;
+				cell.fg.ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ;
 			    }
 			}
-			else
-			    dump_is_corrupt(&ga_text);
+			ਨਹੀਂਤਾਂ
+			    dump_is_corrupt(&ga_ਪਾਠ);
 		    }
 		}
-		else
-		    dump_is_corrupt(&ga_text);
+		ਨਹੀਂਤਾਂ
+		    dump_is_corrupt(&ga_ਪਾਠ);
 	    }
-	    else
-		dump_is_corrupt(&ga_text);
+	    ਨਹੀਂਤਾਂ
+		dump_is_corrupt(&ga_ਪਾਠ);
 
 	    append_cell(&ga_cell, &cell);
-	    if (cell.width == 2)
-		append_cell(&ga_cell, &empty_cell);
+	    ਜੇ (cell.ਚੌੜਾਈ == 2)
+		append_cell(&ga_cell, &ਖਾਲੀ_ਥਾਵਾਂ_cell);
 	}
-	else if (c == '@')
+	ਨਹੀਂਤਾਂ ਜੇ (c == '@')
 	{
-	    if (prev_char.string == NULL)
-		dump_is_corrupt(&ga_text);
-	    else
+	    ਜੇ (prev_char.string == ਨਿਰਾ)
+		dump_is_corrupt(&ga_ਪਾਠ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		int count = 0;
+		ਪੂਰਨ ਗਿਣਤੀ_2 = 0;
 
 		// repeat previous character, get the count
-		for (;;)
+		ਲਈ (;;)
 		{
 		    c = fgetc(fd);
-		    if (!SAFE_isdigit(c))
-			break;
-		    count = count * 10 + (c - '0');
+		    ਜੇ (!ਸੁਰੱਖਿਅਤ_isdigit(c))
+			ਰੋਕੋ;
+		    ਗਿਣਤੀ_2 = ਗਿਣਤੀ_2 * 10 + (c - '0');
 		}
 
-		while (count-- > 0)
+		ਜਦੋਂ (ਗਿਣਤੀ_2-- > 0)
 		{
-		    ga_concat_len(&ga_text, prev_char.string, prev_char.length);
+		    ga_concat_len(&ga_ਪਾਠ, prev_char.string, prev_char.ਲੰਮਾਈ);
 		    append_cell(&ga_cell, &cell);
 		}
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    dump_is_corrupt(&ga_text);
+	    dump_is_corrupt(&ga_ਪਾਠ);
 	    c = fgetc(fd);
 	}
     }
 
-    if (ga_text.ga_len > 0)
+    ਜੇ (ga_ਪਾਠ.ga_len > 0)
     {
 	// trailing characters after last NL
-	dump_is_corrupt(&ga_text);
-	ga_append(&ga_text, NUL);
-	ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+	dump_is_corrupt(&ga_ਪਾਠ);
+	ga_append(&ga_ਪਾਠ, NUL);
+	ml_append(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, ga_ਪਾਠ.ga_ਅੰਕੜੇ,
+							ga_ਪਾਠ.ga_len, FALSE);
     }
 
-    ga_clear(&ga_text);
+    ga_clear(&ga_ਪਾਠ);
     ga_clear(&ga_cell);
     vim_free(prev_char.string);
 
-    return max_cells;
+    ਵਾਪਸ max_cells;
 }
 
 /*
  * Return an allocated string with at least "text_width" "=" characters and
  * "fname" inserted in the middle.
  */
-    static char_u *
-get_separator(int text_width, char_u *fname)
+    ਸਥਿਰ char_u *
+get_separator(ਪੂਰਨ ਪਾਠ_ਚੌੜਾਈ, char_u *fname)
 {
-    int	    width = MAX(text_width, curwin->w_width);
+    ਪੂਰਨ	    ਚੌੜਾਈ = MAX(ਪਾਠ_ਚੌੜਾਈ, curwin->w_ਚੌੜਾਈ);
     char_u  *textline;
-    int	    fname_size;
+    ਪੂਰਨ	    fname_ਮਾਪ;
     char_u  *p = fname;
-    int	    i;
+    ਪੂਰਨ	    i;
     size_t  off;
 
-    textline = alloc(width + STRLEN(fname) + 1);
-    if (textline == NULL)
-	return NULL;
+    textline = alloc(ਚੌੜਾਈ + STRLEN(fname) + 1);
+    ਜੇ (textline == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    fname_size = vim_strsize(fname);
-    if (fname_size < width - 8)
+    fname_ਮਾਪ = vim_strsize(fname);
+    ਜੇ (fname_ਮਾਪ < ਚੌੜਾਈ - 8)
     {
 	// enough room, don't use the full window width
-	width = MAX(text_width, fname_size + 8);
+	ਚੌੜਾਈ = MAX(ਪਾਠ_ਚੌੜਾਈ, fname_ਮਾਪ + 8);
     }
-    else if (fname_size > width - 8)
+    ਨਹੀਂਤਾਂ ਜੇ (fname_ਮਾਪ > ਚੌੜਾਈ - 8)
     {
 	// full name doesn't fit, use only the tail
 	p = gettail(fname);
-	fname_size = vim_strsize(p);
+	fname_ਮਾਪ = vim_strsize(p);
     }
     // skip characters until the name fits
-    while (fname_size > width - 8)
+    ਜਦੋਂ (fname_ਮਾਪ > ਚੌੜਾਈ - 8)
     {
 	p += (*mb_ptr2len)(p);
-	fname_size = vim_strsize(p);
+	fname_ਮਾਪ = vim_strsize(p);
     }
 
-    for (i = 0; i < (width - fname_size) / 2 - 1; ++i)
+    ਲਈ (i = 0; i < (ਚੌੜਾਈ - fname_ਮਾਪ) / 2 - 1; ++i)
 	textline[i] = '=';
     textline[i++] = ' ';
 
     STRCPY(textline + i, p);
     off = STRLEN(textline);
     textline[off] = ' ';
-    for (i = 1; i < (width - fname_size) / 2; ++i)
+    ਲਈ (i = 1; i < (ਚੌੜਾਈ - fname_ਮਾਪ) / 2; ++i)
 	textline[off + i] = '=';
     textline[off + i] = NUL;
 
-    return textline;
+    ਵਾਪਸ textline;
 }
 
 /*
  * Common for "term_dumpdiff()" and "term_dumpload()".
  */
-    static void
-term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_ਲੱਦੋ_dump(typval_T *argvars, typval_T *rettv, ਪੂਰਨ do_diff)
 {
     jobopt_T	opt;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ਨਿਰਾ;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*fname1;
-    char_u	*fname2 = NULL;
-    char_u	*fname_tofree = NULL;
+    char_u	*fname2 = ਨਿਰਾ;
+    char_u	*fname_tofree = ਨਿਰਾ;
     FILE	*fd1;
-    FILE	*fd2 = NULL;
-    char_u	*textline = NULL;
+    FILE	*fd2 = ਨਿਰਾ;
+    char_u	*textline = ਨਿਰਾ;
 
     // First open the files.  If this fails bail out.
     fname1 = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (do_diff)
+    ਜੇ (do_diff)
 	fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (fname1 == NULL || (do_diff && fname2 == NULL))
+    ਜੇ (fname1 == ਨਿਰਾ || (do_diff && fname2 == ਨਿਰਾ))
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਵਾਪਸ;
     }
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((ਅੱਖਰ *)fname1, READBIN);
+    ਜੇ (fd1 == ਨਿਰਾ)
     {
 	semsg(_(e_cant_read_file_str), fname1);
-	return;
+	ਵਾਪਸ;
     }
-    if (do_diff)
+    ਜੇ (do_diff)
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((ਅੱਖਰ *)fname2, READBIN);
+	ਜੇ (fd2 == ਨਿਰਾ)
 	{
 	    fclose(fd1);
 	    semsg(_(e_cant_read_file_str), fname2);
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 
-    init_job_options(&opt);
-    if (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[do_diff ? 2 : 1], &opt, 0,
-		    JO2_TERM_NAME + JO2_TERM_COLS + JO2_TERM_ROWS
+    init_ਕੰਮ_options(&opt);
+    ਜੇ (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
+	    && get_ਕੰਮ_options(&argvars[do_diff ? 2 : 1], &opt, 0,
+		    JO2_ਪਦ_NAME + JO2_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ + JO2_ਪਦ_ਪੰਕਤੀਆਂ
 		    + JO2_VERTICAL + JO2_CURWIN + JO2_NORESTORE) == FAIL)
-	goto theend;
+	ਜਾਓ theend;
 
-    if (opt.jo_term_name == NULL)
+    ਜੇ (opt.jo_ਪਦ_name == ਨਿਰਾ)
     {
 	size_t len = STRLEN(fname1) + 12;
 
 	fname_tofree = alloc(len);
-	if (fname_tofree != NULL)
+	ਜੇ (fname_tofree != ਨਿਰਾ)
 	{
-	    vim_snprintf((char *)fname_tofree, len, "dump diff %s", fname1);
-	    opt.jo_term_name = fname_tofree;
+	    vim_snprintf((ਅੱਖਰ *)fname_tofree, len, "dump diff %s", fname1);
+	    opt.jo_ਪਦ_name = fname_tofree;
 	}
     }
 
-    if (opt.jo_bufnr_buf != NULL)
+    ਜੇ (opt.jo_bufnr_buf != ਨਿਰਾ)
     {
 	win_T *wp = buf_jump_open_win(opt.jo_bufnr_buf);
 
 	// With "bufnr" argument: enter the window with this buffer and make it
 	// empty.
-	if (wp == NULL)
-	    semsg(_(e_invalid_argument_str), "bufnr");
-	else
+	ਜੇ (wp == ਨਿਰਾ)
+	    semsg(_(e_invalid_ਦਲੀਲ_str), "bufnr");
+	ਨਹੀਂਤਾਂ
 	{
 	    buf = curbuf;
-	    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+	    ਜਦੋਂ (!(curbuf->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ))
 		ml_delete((linenr_T)1);
-	    free_scrollback(curbuf->b_term);
+	    free_scrollback(curbuf->b_ਪਦ);
 	    redraw_later(UPD_NOT_VALID);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	// Create a new terminal window.
-	buf = term_start(&argvars[0], NULL, &opt, TERM_START_NOJOB);
+	buf = ਪਦ_ਸ਼ੁਰੂ(&argvars[0], ਨਿਰਾ, &opt, ਪਦ_ਸ਼ੁਰੂ_NOJOB);
 
-    if (buf != NULL && buf->b_term != NULL)
+    ਜੇ (buf != ਨਿਰਾ && buf->b_ਪਦ != ਨਿਰਾ)
     {
-	int		i;
+	ਪੂਰਨ		i;
 	linenr_T	bot_lnum;
 	linenr_T	lnum;
-	term_T		*term = buf->b_term;
-	int		width;
-	int		width2;
+	ਪਦ_T		*ਪਦ = buf->b_ਪਦ;
+	ਪੂਰਨ		ਚੌੜਾਈ;
+	ਪੂਰਨ		width2;
 	VTermPos	cursor_pos1;
 	VTermPos	cursor_pos2;
 
-	term_init_default_colors(term);
+	ਪਦ_init_default_colors(ਪਦ);
 
-	rettv->vval.v_number = buf->b_fnum;
+	rettv->vval.v_ਸੰਖਿਆ = buf->b_fnum;
 
 	// read the files, fill the buffer with the diff
-	width = read_dump_file(fd1, &cursor_pos1);
+	ਚੌੜਾਈ = read_dump_file(fd1, &cursor_pos1);
 
 	// position the cursor
-	if (cursor_pos1.row >= 0)
+	ਜੇ (cursor_pos1.ਪੰਕਤੀ >= 0)
 	{
-	    curwin->w_cursor.lnum = cursor_pos1.row + 1;
-	    coladvance(cursor_pos1.col);
+	    curwin->w_cursor.lnum = cursor_pos1.ਪੰਕਤੀ + 1;
+	    coladvance(cursor_pos1.ਖਾਨਾ);
 	}
 
 	// Delete the empty line that was in the empty buffer.
 	ml_delete(1);
 
 	// For term_dumpload() we are done here.
-	if (!do_diff)
-	    goto theend;
+	ਜੇ (!do_diff)
+	    ਜਾਓ theend;
 
-	term->tl_top_diff_rows = curbuf->b_ml.ml_line_count;
+	ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
-	textline = get_separator(width, fname1);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
+	textline = get_separator(ਚੌੜਾਈ, fname1);
+	ਜੇ (textline == ਨਿਰਾ)
+	    ਜਾਓ theend;
+	ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &ਪਦ->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, textline, 0, FALSE);
 	vim_free(textline);
 
-	textline = get_separator(width, fname2);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
-	textline[width] = NUL;
+	textline = get_separator(ਚੌੜਾਈ, fname2);
+	ਜੇ (textline == ਨਿਰਾ)
+	    ਜਾਓ theend;
+	ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &ਪਦ->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ, textline, 0, FALSE);
+	textline[ਚੌੜਾਈ] = NUL;
 
-	bot_lnum = curbuf->b_ml.ml_line_count;
+	bot_lnum = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 	width2 = read_dump_file(fd2, &cursor_pos2);
-	if (width2 > width)
+	ਜੇ (width2 > ਚੌੜਾਈ)
 	{
 	    vim_free(textline);
 	    textline = alloc(width2 + 1);
-	    if (textline == NULL)
-		goto theend;
-	    width = width2;
-	    textline[width] = NUL;
+	    ਜੇ (textline == ਨਿਰਾ)
+		ਜਾਓ theend;
+	    ਚੌੜਾਈ = width2;
+	    textline[ਚੌੜਾਈ] = NUL;
 	}
-	term->tl_bot_diff_rows = curbuf->b_ml.ml_line_count - bot_lnum;
+	ਪਦ->tl_bot_diff_ਪੰਕਤੀਆਂ = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - bot_lnum;
 
-	for (lnum = 1; lnum <= term->tl_top_diff_rows; ++lnum)
+	ਲਈ (lnum = 1; lnum <= ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ; ++lnum)
 	{
-	    if (lnum + bot_lnum > curbuf->b_ml.ml_line_count)
+	    ਜੇ (lnum + bot_lnum > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	    {
 		// bottom part has fewer rows, fill with "-"
-		for (i = 0; i < width; ++i)
+		ਲਈ (i = 0; i < ਚੌੜਾਈ; ++i)
 		    textline[i] = '-';
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		char_u *line1;
 		char_u *line2;
 		char_u *p1;
 		char_u *p2;
-		int	col;
-		sb_line_T   *sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
-		cellattr_T *cellattr1 = (sb_line + lnum - 1)->sb_cells;
-		cellattr_T *cellattr2 = (sb_line + lnum + bot_lnum - 1)
+		ਪੂਰਨ	ਖਾਨਾ;
+		sb_ਸਤਰ_T   *sb_ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ;
+		cellattr_T *cellattr1 = (sb_ਸਤਰ + lnum - 1)->sb_cells;
+		cellattr_T *cellattr2 = (sb_ਸਤਰ + lnum + bot_lnum - 1)
 								    ->sb_cells;
 
 		// Make a copy, getting the second line will invalidate it.
 		line1 = vim_strsave(ml_get(lnum));
-		if (line1 == NULL)
-		    break;
+		ਜੇ (line1 == ਨਿਰਾ)
+		    ਰੋਕੋ;
 		p1 = line1;
 
 		line2 = ml_get(lnum + bot_lnum);
 		p2 = line2;
-		for (col = 0; col < width && *p1 != NUL && *p2 != NUL; ++col)
+		ਲਈ (ਖਾਨਾ = 0; ਖਾਨਾ < ਚੌੜਾਈ && *p1 != NUL && *p2 != NUL; ++ਖਾਨਾ)
 		{
-		    int len1 = utfc_ptr2len(p1);
-		    int len2 = utfc_ptr2len(p2);
+		    ਪੂਰਨ len1 = utfc_ptr2len(p1);
+		    ਪੂਰਨ len2 = utfc_ptr2len(p2);
 
-		    textline[col] = ' ';
-		    if (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
+		    textline[ਖਾਨਾ] = ' ';
+		    ਜੇ (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
 			// text differs
-			textline[col] = 'X';
-		    else if (lnum == cursor_pos1.row + 1
-			    && col == cursor_pos1.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[ਖਾਨਾ] = 'X';
+		    ਨਹੀਂਤਾਂ ਜੇ (lnum == cursor_pos1.ਪੰਕਤੀ + 1
+			    && ਖਾਨਾ == cursor_pos1.ਖਾਨਾ
+			    && (cursor_pos1.ਪੰਕਤੀ != cursor_pos2.ਪੰਕਤੀ
+					|| cursor_pos1.ਖਾਨਾ != cursor_pos2.ਖਾਨਾ))
 			// cursor in first but not in second
-			textline[col] = '>';
-		    else if (lnum == cursor_pos2.row + 1
-			    && col == cursor_pos2.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[ਖਾਨਾ] = '>';
+		    ਨਹੀਂਤਾਂ ਜੇ (lnum == cursor_pos2.ਪੰਕਤੀ + 1
+			    && ਖਾਨਾ == cursor_pos2.ਖਾਨਾ
+			    && (cursor_pos1.ਪੰਕਤੀ != cursor_pos2.ਪੰਕਤੀ
+					|| cursor_pos1.ਖਾਨਾ != cursor_pos2.ਖਾਨਾ))
 			// cursor in second but not in first
-			textline[col] = '<';
-		    else if (cellattr1 != NULL && cellattr2 != NULL)
+			textline[ਖਾਨਾ] = '<';
+		    ਨਹੀਂਤਾਂ ਜੇ (cellattr1 != ਨਿਰਾ && cellattr2 != ਨਿਰਾ)
 		    {
-			if ((cellattr1 + col)->width
-						   != (cellattr2 + col)->width)
-			    textline[col] = 'w';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->fg,
-						   &(cellattr2 + col)->fg))
-			    textline[col] = 'f';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->bg,
-						   &(cellattr2 + col)->bg))
-			    textline[col] = 'b';
-			else if (vtermAttr2hl(&(cellattr1 + col)->attrs)
-				  != vtermAttr2hl(&((cellattr2 + col)->attrs)))
-			    textline[col] = 'a';
+			ਜੇ ((cellattr1 + ਖਾਨਾ)->ਚੌੜਾਈ
+						   != (cellattr2 + ਖਾਨਾ)->ਚੌੜਾਈ)
+			    textline[ਖਾਨਾ] = 'w';
+			ਨਹੀਂਤਾਂ ਜੇ (!vterm_color_is_equal(&(cellattr1 + ਖਾਨਾ)->fg,
+						   &(cellattr2 + ਖਾਨਾ)->fg))
+			    textline[ਖਾਨਾ] = 'f';
+			ਨਹੀਂਤਾਂ ਜੇ (!vterm_color_is_equal(&(cellattr1 + ਖਾਨਾ)->bg,
+						   &(cellattr2 + ਖਾਨਾ)->bg))
+			    textline[ਖਾਨਾ] = 'b';
+			ਨਹੀਂਤਾਂ ਜੇ (vtermAttr2hl(&(cellattr1 + ਖਾਨਾ)->attrs)
+				  != vtermAttr2hl(&((cellattr2 + ਖਾਨਾ)->attrs)))
+			    textline[ਖਾਨਾ] = 'a';
 		    }
 		    p1 += len1;
 		    p2 += len2;
 		    // TODO: handle different width
 		}
 
-		while (col < width)
+		ਜਦੋਂ (ਖਾਨਾ < ਚੌੜਾਈ)
 		{
-		    if (*p1 == NUL && *p2 == NUL)
-			textline[col] = '?';
-		    else if (*p1 == NUL)
+		    ਜੇ (*p1 == NUL && *p2 == NUL)
+			textline[ਖਾਨਾ] = '?';
+		    ਨਹੀਂਤਾਂ ਜੇ (*p1 == NUL)
 		    {
-			textline[col] = '+';
+			textline[ਖਾਨਾ] = '+';
 			p2 += utfc_ptr2len(p2);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			textline[col] = '-';
+			textline[ਖਾਨਾ] = '-';
 			p1 += utfc_ptr2len(p1);
 		    }
-		    ++col;
+		    ++ਖਾਨਾ;
 		}
 
 		vim_free(line1);
 	    }
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &ਪਦ->tl_default_color,
+						 ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ) == OK)
+		ml_append(ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ + lnum, textline, 0, FALSE);
 	    ++bot_lnum;
 	}
 
-	while (lnum + bot_lnum <= curbuf->b_ml.ml_line_count)
+	ਜਦੋਂ (lnum + bot_lnum <= curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	{
 	    // bottom part has more rows, fill with "+"
-	    for (i = 0; i < width; ++i)
+	    ਲਈ (i = 0; i < ਚੌੜਾਈ; ++i)
 		textline[i] = '+';
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    ਜੇ (ਜੋੜੋ_ਖਾਲੀ_ਥਾਵਾਂ_scrollback(ਪਦ, &ਪਦ->tl_default_color,
+						 ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ) == OK)
+		ml_append(ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ + lnum, textline, 0, FALSE);
 	    ++lnum;
 	    ++bot_lnum;
 	}
 
-	term->tl_cols = width;
+	ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ = ਚੌੜਾਈ;
 
 	// looks better without wrapping
 	curwin->w_p_wrap = 0;
@@ -6197,7 +6197,7 @@ theend:
     vim_free(textline);
     vim_free(fname_tofree);
     fclose(fd1);
-    if (fd2 != NULL)
+    ਜੇ (fd2 != ਨਿਰਾ)
 	fclose(fd2);
 }
 
@@ -6206,169 +6206,169 @@ theend:
  * bottom files.
  * Return FAIL when this is not possible.
  */
-    int
-term_swap_diff(void)
+    ਪੂਰਨ
+ਪਦ_ਅਦਲਾ_ਬਦਲੀ_diff(ਖਾਲੀ)
 {
-    term_T	*term = curbuf->b_term;
-    linenr_T	line_count;
-    linenr_T	top_rows;
-    linenr_T	bot_rows;
-    linenr_T	bot_start;
+    ਪਦ_T	*ਪਦ = curbuf->b_ਪਦ;
+    linenr_T	ਸਤਰ_ਗਿਣਤੀ;
+    linenr_T	ਸਿਖਰ_ਪੰਕਤੀਆਂ;
+    linenr_T	bot_ਪੰਕਤੀਆਂ;
+    linenr_T	bot_ਸ਼ੁਰੂ;
     linenr_T	lnum;
     char_u	*p;
-    sb_line_T	*sb_line;
+    sb_ਸਤਰ_T	*sb_ਸਤਰ;
 
-    if (term == NULL
-	    || !term_is_finished(curbuf)
-	    || term->tl_top_diff_rows == 0
-	    || term->tl_scrollback.ga_len == 0)
-	return FAIL;
+    ਜੇ (ਪਦ == ਨਿਰਾ
+	    || !ਪਦ_is_ਮੁਕੰਮਲ(curbuf)
+	    || ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ == 0
+	    || ਪਦ->tl_scrollback.ga_len == 0)
+	ਵਾਪਸ FAIL;
 
-    line_count = curbuf->b_ml.ml_line_count;
-    top_rows = term->tl_top_diff_rows;
-    bot_rows = term->tl_bot_diff_rows;
-    bot_start = line_count - bot_rows;
-    sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
+    ਸਤਰ_ਗਿਣਤੀ = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+    ਸਿਖਰ_ਪੰਕਤੀਆਂ = ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ;
+    bot_ਪੰਕਤੀਆਂ = ਪਦ->tl_bot_diff_ਪੰਕਤੀਆਂ;
+    bot_ਸ਼ੁਰੂ = ਸਤਰ_ਗਿਣਤੀ - bot_ਪੰਕਤੀਆਂ;
+    sb_ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ;
 
     // move lines from top to above the bottom part
-    for (lnum = 1; lnum <= top_rows; ++lnum)
+    ਲਈ (lnum = 1; lnum <= ਸਿਖਰ_ਪੰਕਤੀਆਂ; ++lnum)
     {
 	p = vim_strsave(ml_get(1));
-	if (p == NULL)
-	    return OK;
-	ml_append(bot_start, p, 0, FALSE);
+	ਜੇ (p == ਨਿਰਾ)
+	    ਵਾਪਸ OK;
+	ml_append(bot_ਸ਼ੁਰੂ, p, 0, FALSE);
 	ml_delete(1);
 	vim_free(p);
     }
 
     // move lines from bottom to the top
-    for (lnum = 1; lnum <= bot_rows; ++lnum)
+    ਲਈ (lnum = 1; lnum <= bot_ਪੰਕਤੀਆਂ; ++lnum)
     {
-	p = vim_strsave(ml_get(bot_start + lnum));
-	if (p == NULL)
-	    return OK;
-	ml_delete(bot_start + lnum);
+	p = vim_strsave(ml_get(bot_ਸ਼ੁਰੂ + lnum));
+	ਜੇ (p == ਨਿਰਾ)
+	    ਵਾਪਸ OK;
+	ml_delete(bot_ਸ਼ੁਰੂ + lnum);
 	ml_append(lnum - 1, p, 0, FALSE);
 	vim_free(p);
     }
 
     // move top title to bottom
-    p = vim_strsave(ml_get(bot_rows + 1));
-    if (p == NULL)
-	return OK;
-    ml_append(line_count - top_rows - 1, p, 0, FALSE);
-    ml_delete(bot_rows + 1);
+    p = vim_strsave(ml_get(bot_ਪੰਕਤੀਆਂ + 1));
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ OK;
+    ml_append(ਸਤਰ_ਗਿਣਤੀ - ਸਿਖਰ_ਪੰਕਤੀਆਂ - 1, p, 0, FALSE);
+    ml_delete(bot_ਪੰਕਤੀਆਂ + 1);
     vim_free(p);
 
     // move bottom title to top
-    p = vim_strsave(ml_get(line_count - top_rows));
-    if (p == NULL)
-	return OK;
-    ml_delete(line_count - top_rows);
-    ml_append(bot_rows, p, 0, FALSE);
+    p = vim_strsave(ml_get(ਸਤਰ_ਗਿਣਤੀ - ਸਿਖਰ_ਪੰਕਤੀਆਂ));
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ OK;
+    ml_delete(ਸਤਰ_ਗਿਣਤੀ - ਸਿਖਰ_ਪੰਕਤੀਆਂ);
+    ml_append(bot_ਪੰਕਤੀਆਂ, p, 0, FALSE);
     vim_free(p);
 
-    if (top_rows == bot_rows)
+    ਜੇ (ਸਿਖਰ_ਪੰਕਤੀਆਂ == bot_ਪੰਕਤੀਆਂ)
     {
 	// rows counts are equal, can swap cell properties
-	for (lnum = 0; lnum < top_rows; ++lnum)
+	ਲਈ (lnum = 0; lnum < ਸਿਖਰ_ਪੰਕਤੀਆਂ; ++lnum)
 	{
-	    sb_line_T	temp;
+	    sb_ਸਤਰ_T	ਆਰਜ਼ੀ;
 
-	    temp = *(sb_line + lnum);
-	    *(sb_line + lnum) = *(sb_line + bot_start + lnum);
-	    *(sb_line + bot_start + lnum) = temp;
+	    ਆਰਜ਼ੀ = *(sb_ਸਤਰ + lnum);
+	    *(sb_ਸਤਰ + lnum) = *(sb_ਸਤਰ + bot_ਸ਼ੁਰੂ + lnum);
+	    *(sb_ਸਤਰ + bot_ਸ਼ੁਰੂ + lnum) = ਆਰਜ਼ੀ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	size_t		size = sizeof(sb_line_T) * term->tl_scrollback.ga_len;
-	sb_line_T	*temp = alloc(size);
+	size_t		ਮਾਪ = ਆਕਾਰ(sb_ਸਤਰ_T) * ਪਦ->tl_scrollback.ga_len;
+	sb_ਸਤਰ_T	*ਆਰਜ਼ੀ = alloc(ਮਾਪ);
 
 	// need to copy cell properties into temp memory
-	if (temp != NULL)
+	ਜੇ (ਆਰਜ਼ੀ != ਨਿਰਾ)
 	{
-	    mch_memmove(temp, term->tl_scrollback.ga_data, size);
-	    mch_memmove(term->tl_scrollback.ga_data,
-		    temp + bot_start,
-		    sizeof(sb_line_T) * bot_rows);
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data + bot_rows,
-		    temp + top_rows,
-		    sizeof(sb_line_T) * (line_count - top_rows - bot_rows));
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data
-						       + line_count - top_rows,
-		    temp,
-		    sizeof(sb_line_T) * top_rows);
-	    vim_free(temp);
+	    mch_memmove(ਆਰਜ਼ੀ, ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ, ਮਾਪ);
+	    mch_memmove(ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ,
+		    ਆਰਜ਼ੀ + bot_ਸ਼ੁਰੂ,
+		    ਆਕਾਰ(sb_ਸਤਰ_T) * bot_ਪੰਕਤੀਆਂ);
+	    mch_memmove((sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ + bot_ਪੰਕਤੀਆਂ,
+		    ਆਰਜ਼ੀ + ਸਿਖਰ_ਪੰਕਤੀਆਂ,
+		    ਆਕਾਰ(sb_ਸਤਰ_T) * (ਸਤਰ_ਗਿਣਤੀ - ਸਿਖਰ_ਪੰਕਤੀਆਂ - bot_ਪੰਕਤੀਆਂ));
+	    mch_memmove((sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ
+						       + ਸਤਰ_ਗਿਣਤੀ - ਸਿਖਰ_ਪੰਕਤੀਆਂ,
+		    ਆਰਜ਼ੀ,
+		    ਆਕਾਰ(sb_ਸਤਰ_T) * ਸਿਖਰ_ਪੰਕਤੀਆਂ);
+	    vim_free(ਆਰਜ਼ੀ);
 	}
     }
 
-    term->tl_top_diff_rows = bot_rows;
-    term->tl_bot_diff_rows = top_rows;
+    ਪਦ->tl_ਸਿਖਰ_diff_ਪੰਕਤੀਆਂ = bot_ਪੰਕਤੀਆਂ;
+    ਪਦ->tl_bot_diff_ਪੰਕਤੀਆਂ = ਸਿਖਰ_ਪੰਕਤੀਆਂ;
 
     update_screen(UPD_NOT_VALID);
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * "term_dumpdiff(filename, filename, options)" function
  */
-    void
-f_term_dumpdiff(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_dumpdiff(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    term_load_dump(argvars, rettv, TRUE);
+    ਪਦ_ਲੱਦੋ_dump(argvars, rettv, TRUE);
 }
 
 /*
  * "term_dumpload(filename, options)" function
  */
-    void
-f_term_dumpload(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_dumpload(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    term_load_dump(argvars, rettv, FALSE);
+    ਪਦ_ਲੱਦੋ_dump(argvars, rettv, FALSE);
 }
 
 /*
  * "term_getaltscreen(buf)" function
  */
-    void
-f_term_getaltscreen(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getaltscreen(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getaltscreen()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_using_altscreen;
+    buf = ਪਦ_get_buf(argvars, "term_getaltscreen()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    rettv->vval.v_ਸੰਖਿਆ = buf->b_ਪਦ->tl_using_altscreen;
 }
 
 /*
  * "term_getattr(attr, name)" function
  */
-    void
-f_term_getattr(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getattr(typval_T *argvars, typval_T *rettv)
 {
-    int	    attr;
+    ਪੂਰਨ	    attr;
     size_t  i;
     char_u  *name;
 
-    static struct {
-	char	    *name;
-	int	    attr;
+    ਸਥਿਰ ਬਣਤਰ {
+	ਅੱਖਰ	    *name;
+	ਪੂਰਨ	    attr;
     } attrs[] = {
 	{"bold",      HL_BOLD},
 	{"italic",    HL_ITALIC},
@@ -6377,278 +6377,278 @@ f_term_getattr(typval_T *argvars, typval_T *rettv)
 	{"reverse",   HL_INVERSE},
     };
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    attr = tv_get_number(&argvars[0]);
+    attr = tv_get_ਸੰਖਿਆ(&argvars[0]);
     name = tv_get_string_chk(&argvars[1]);
-    if (name == NULL)
-	return;
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (attr > HL_ALL)
+    ਜੇ (attr > HL_ALL)
 	attr = syn_attr2attr(attr);
-    for (i = 0; i < ARRAY_LENGTH(attrs); ++i)
-	if (STRCMP(name, attrs[i].name) == 0)
+    ਲਈ (i = 0; i < ARRAY_ਲੰਮਾਈ(attrs); ++i)
+	ਜੇ (STRCMP(name, attrs[i].name) == 0)
 	{
-	    rettv->vval.v_number = (attr & attrs[i].attr) != 0 ? 1 : 0;
-	    break;
+	    rettv->vval.v_ਸੰਖਿਆ = (attr & attrs[i].attr) != 0 ? 1 : 0;
+	    ਰੋਕੋ;
 	}
 }
 
 /*
  * "term_getcursor(buf)" function
  */
-    void
-f_term_getcursor(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getcursor(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getcursor()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = ਪਦ_get_buf(argvars, "term_getcursor()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
 
     l = rettv->vval.v_list;
-    list_append_number(l, term->tl_cursor_pos.row + 1);
-    list_append_number(l, term->tl_cursor_pos.col + 1);
+    list_append_ਸੰਖਿਆ(l, ਪਦ->tl_cursor_pos.ਪੰਕਤੀ + 1);
+    list_append_ਸੰਖਿਆ(l, ਪਦ->tl_cursor_pos.ਖਾਨਾ + 1);
 
     d = dict_alloc();
-    if (d == NULL)
-	return;
+    ਜੇ (d == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    dict_add_number(d, "visible", term->tl_cursor_visible);
-    dict_add_number(d, "blink", blink_state_is_inverted()
-	    ? !term->tl_cursor_blink : term->tl_cursor_blink);
-    dict_add_number(d, "shape", term->tl_cursor_shape);
-    dict_add_string(d, "color", cursor_color_get(term->tl_cursor_color));
-    if (list_append_dict(l, d) == FAIL)
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "visible", ਪਦ->tl_cursor_visible);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "blink", blink_state_is_inverted()
+	    ? !ਪਦ->tl_cursor_blink : ਪਦ->tl_cursor_blink);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "shape", ਪਦ->tl_cursor_shape);
+    dict_ਜੋੜੋ_string(d, "color", cursor_color_get(ਪਦ->tl_cursor_color));
+    ਜੇ (list_append_dict(l, d) == FAIL)
 	dict_unref(d);
 }
 
 /*
  * "term_getjob(buf)" function
  */
-    void
-f_term_getjob(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getjob(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getjob()");
-    if (buf == NULL)
+    buf = ਪਦ_get_buf(argvars, "term_getjob()");
+    ਜੇ (buf == ਨਿਰਾ)
     {
-	if (in_vim9script())
+	ਜੇ (ਵਿੱਚ_vim9script())
 	{
-	    rettv->v_type = VAR_JOB;
-	    rettv->vval.v_job = NULL;
+	    rettv->v_type = VAR_ਕੰਮ;
+	    rettv->vval.v_ਕੰਮ = ਨਿਰਾ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
+	    rettv->vval.v_ਸੰਖਿਆ = VVAL_NULL;
 	}
-	return;
+	ਵਾਪਸ;
     }
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = buf->b_term->tl_job;
-    if (rettv->vval.v_job != NULL)
-	++rettv->vval.v_job->jv_refcount;
+    rettv->v_type = VAR_ਕੰਮ;
+    rettv->vval.v_ਕੰਮ = buf->b_ਪਦ->tl_ਕੰਮ;
+    ਜੇ (rettv->vval.v_ਕੰਮ != ਨਿਰਾ)
+	++rettv->vval.v_ਕੰਮ->jv_refcount;
 }
 
-    static int
-get_row_number(typval_T *tv, term_T *term)
+    ਸਥਿਰ ਪੂਰਨ
+get_ਪੰਕਤੀ_ਸੰਖਿਆ(typval_T *tv, ਪਦ_T *ਪਦ)
 {
-    if (tv->v_type == VAR_STRING
-	    && tv->vval.v_string != NULL
+    ਜੇ (tv->v_type == VAR_STRING
+	    && tv->vval.v_string != ਨਿਰਾ
 	    && STRCMP(tv->vval.v_string, ".") == 0)
-	return term->tl_cursor_pos.row;
-    return (int)tv_get_number(tv) - 1;
+	ਵਾਪਸ ਪਦ->tl_cursor_pos.ਪੰਕਤੀ;
+    ਵਾਪਸ (ਪੂਰਨ)tv_get_ਸੰਖਿਆ(tv) - 1;
 }
 
 /*
  * "term_getline(buf, row)" function
  */
-    void
-f_term_getline(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    term_T	    *term;
-    int		    row;
+    ਪਦ_T	    *ਪਦ;
+    ਪੂਰਨ		    ਪੰਕਤੀ;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getline()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    row = get_row_number(&argvars[1], term);
+    buf = ਪਦ_get_buf(argvars, "term_getline()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਪੰਕਤੀ = get_ਪੰਕਤੀ_ਸੰਖਿਆ(&argvars[1], ਪਦ);
 
-    if (term->tl_vterm == NULL)
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
     {
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
-	int	  sb_row = term->tl_scrollback_scrolled + row;
-	sb_line_T *line;
+	size_t	  ਵਿੱਥ = 0;
+	ਪੂਰਨ	  sb_ਪੰਕਤੀ = ਪਦ->tl_scrollback_scrolled + ਪੰਕਤੀ;
+	sb_ਸਤਰ_T *ਸਤਰ;
 
-	if (sb_row < 0 || sb_row >= term->tl_scrollback.ga_len)
-	    return;
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	ਜੇ (sb_ਪੰਕਤੀ < 0 || sb_ਪੰਕਤੀ >= ਪਦ->tl_scrollback.ga_len)
+	    ਵਾਪਸ;
+	ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ + sb_ਪੰਕਤੀ;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_ਵਿੱਚ_buf(ਪਦ, sb_ਪੰਕਤੀ, &lnum, ਨਿਰਾ, &ਵਿੱਥ);
 
 	// vterm is finished, get the text from the buffer
-	if (lnum > 0 && lnum <= buf->b_ml.ml_line_count)
+	ਜੇ (lnum > 0 && lnum <= buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	{
 	    char_u *p = ml_get_buf(buf, lnum, FALSE);
-	    if (STRLEN(p) >= offset + line->sb_bytes)
-		rettv->vval.v_string = vim_strnsave(p + offset, line->sb_bytes);
+	    ਜੇ (STRLEN(p) >= ਵਿੱਥ + ਸਤਰ->sb_ਬਾਈਟਾਂ)
+		rettv->vval.v_string = vim_strnsave(p + ਵਿੱਥ, ਸਤਰ->sb_ਬਾਈਟਾਂ);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	VTermScreen	*screen = vterm_obtain_screen(term->tl_vterm);
+	VTermScreen	*screen = vterm_obtain_screen(ਪਦ->tl_vterm);
 	VTermRect	rect;
-	int		len;
+	ਪੂਰਨ		len;
 	char_u		*p;
 
-	if (row < 0 || row >= term->tl_rows)
-	    return;
-	len = term->tl_cols * MB_MAXBYTES + 1;
+	ਜੇ (ਪੰਕਤੀ < 0 || ਪੰਕਤੀ >= ਪਦ->tl_ਪੰਕਤੀਆਂ)
+	    ਵਾਪਸ;
+	len = ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ * MB_MAXBYTES + 1;
 	p = alloc(len);
-	if (p == NULL)
-	    return;
+	ਜੇ (p == ਨਿਰਾ)
+	    ਵਾਪਸ;
 	rettv->vval.v_string = p;
 
-	rect.start_col = 0;
-	rect.end_col = term->tl_cols;
-	rect.start_row = row;
-	rect.end_row = row + 1;
-	p[vterm_screen_get_text(screen, (char *)p, len, rect)] = NUL;
+	rect.ਸ਼ੁਰੂ_ਖਾਨਾ = 0;
+	rect.ਸਿਰਾ_ਖਾਨਾ = ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ;
+	rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ = ਪੰਕਤੀ;
+	rect.ਸਿਰਾ_ਪੰਕਤੀ = ਪੰਕਤੀ + 1;
+	p[vterm_screen_get_ਪਾਠ(screen, (ਅੱਖਰ *)p, len, rect)] = NUL;
     }
 }
 
 /*
  * "term_getscrolled(buf)" function
  */
-    void
-f_term_getscrolled(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getscrolled(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getscrolled()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_buffer_scrolled;
+    buf = ਪਦ_get_buf(argvars, "term_getscrolled()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    rettv->vval.v_ਸੰਖਿਆ = buf->b_ਪਦ->tl_ਬਫਰ_scrolled;
 }
 
 /*
  * "term_getsize(buf)" function
  */
-    void
-f_term_getsize(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getsize(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getsize()");
-    if (buf == NULL)
-	return;
+    buf = ਪਦ_get_buf(argvars, "term_getsize()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     l = rettv->vval.v_list;
-    list_append_number(l, buf->b_term->tl_rows);
-    list_append_number(l, buf->b_term->tl_cols);
+    list_append_ਸੰਖਿਆ(l, buf->b_ਪਦ->tl_ਪੰਕਤੀਆਂ);
+    list_append_ਸੰਖਿਆ(l, buf->b_ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
 }
 
 /*
  * "term_setsize(buf, rows, cols)" function
  */
-    void
-f_term_setsize(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_setsize(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    term_T	*term;
-    varnumber_T rows, cols;
+    ਪਦ_T	*ਪਦ;
+    varnumber_T ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
+		|| check_for_ਸੰਖਿਆ_arg(argvars, 1) == FAIL
+		|| check_for_ਸੰਖਿਆ_arg(argvars, 2) == FAIL))
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_setsize()");
-    if (buf == NULL)
+    buf = ਪਦ_get_buf(argvars, "term_setsize()");
+    ਜੇ (buf == ਨਿਰਾ)
     {
-	emsg(_(e_not_terminal_buffer));
-	return;
+	emsg(_(e_not_terminal_ਬਫਰ));
+	ਵਾਪਸ;
     }
-    if (buf->b_term->tl_vterm == NULL)
-	return;
-    term = buf->b_term;
-    rows = tv_get_number(&argvars[1]);
-    rows = rows <= 0 ? term->tl_rows : rows;
-    cols = tv_get_number(&argvars[2]);
-    cols = cols <= 0 ? term->tl_cols : cols;
-    vterm_set_size(term->tl_vterm, rows, cols);
+    ਜੇ (buf->b_ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਪੰਕਤੀਆਂ_2 = tv_get_ਸੰਖਿਆ(&argvars[1]);
+    ਪੰਕਤੀਆਂ_2 = ਪੰਕਤੀਆਂ_2 <= 0 ? ਪਦ->tl_ਪੰਕਤੀਆਂ : ਪੰਕਤੀਆਂ_2;
+    ਖਾਨੇ_ਗਿਣਤੀ = tv_get_ਸੰਖਿਆ(&argvars[2]);
+    ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ <= 0 ? ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ : ਖਾਨੇ_ਗਿਣਤੀ;
+    vterm_ਸੈੱਟ_ਮਾਪ(ਪਦ->tl_vterm, ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ);
     // handle_resize() will resize the windows
 
     // Get and remember the size we ended up with.  Update the pty.
-    vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-    term_report_winsize(term, term->tl_rows, term->tl_cols);
+    vterm_get_ਮਾਪ(ਪਦ->tl_vterm, &ਪਦ->tl_ਪੰਕਤੀਆਂ, &ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
+    ਪਦ_report_winsize(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ);
 }
 
 /*
  * "term_getstatus(buf)" function
  */
-    void
-f_term_getstatus(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getstatus(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     char_u	val[100];
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getstatus()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = ਪਦ_get_buf(argvars, "term_getstatus()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
 
-    if (term_job_running(term))
+    ਜੇ (ਪਦ_ਕੰਮ_running(ਪਦ))
 	STRCPY(val, "running");
-    else
+    ਨਹੀਂਤਾਂ
 	STRCPY(val, "finished");
-    if (term->tl_normal_mode)
+    ਜੇ (ਪਦ->tl_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
 	STRCAT(val, ",normal");
     rettv->vval.v_string = vim_strsave(val);
 }
@@ -6656,163 +6656,163 @@ f_term_getstatus(typval_T *argvars, typval_T *rettv)
 /*
  * "term_gettitle(buf)" function
  */
-    void
-f_term_gettitle(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_gettitle(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_gettitle()");
-    if (buf == NULL)
-	return;
+    buf = ਪਦ_get_buf(argvars, "term_gettitle()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (buf->b_term->tl_title != NULL)
-	rettv->vval.v_string = vim_strsave(buf->b_term->tl_title);
+    ਜੇ (buf->b_ਪਦ->tl_title != ਨਿਰਾ)
+	rettv->vval.v_string = vim_strsave(buf->b_ਪਦ->tl_title);
 }
 
 /*
  * "term_gettty(buf)" function
  */
-    void
-f_term_gettty(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_gettty(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    char_u	*p = NULL;
-    int		num = 0;
+    char_u	*p = ਨਿਰਾ;
+    ਪੂਰਨ		ਅੰਕ = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     rettv->v_type = VAR_STRING;
-    buf = term_get_buf(argvars, "term_gettty()");
-    if (buf == NULL)
-	return;
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	num = tv_get_bool(&argvars[1]);
+    buf = ਪਦ_get_buf(argvars, "term_gettty()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
+	ਅੰਕ = tv_get_bool(&argvars[1]);
 
-    switch (num)
+    ਚੋਣ (ਅੰਕ)
     {
-	case 0:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_out;
-	    break;
-	case 1:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_in;
-	    break;
-	default:
-	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	    return;
+	ਹਾਲਤ 0:
+	    ਜੇ (buf->b_ਪਦ->tl_ਕੰਮ != ਨਿਰਾ)
+		p = buf->b_ਪਦ->tl_ਕੰਮ->jv_tty_ਬਾਹਰਲਾ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 1:
+	    ਜੇ (buf->b_ਪਦ->tl_ਕੰਮ != ਨਿਰਾ)
+		p = buf->b_ਪਦ->tl_ਕੰਮ->jv_tty_ਵਿੱਚ;
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    semsg(_(e_invalid_ਦਲੀਲ_str), tv_get_string(&argvars[1]));
+	    ਵਾਪਸ;
     }
-    if (p != NULL)
+    ਜੇ (p != ਨਿਰਾ)
 	rettv->vval.v_string = vim_strsave(p);
 }
 
 /*
  * "term_list()" function
  */
-    void
-f_term_list(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_list(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    term_T	*tp;
+    ਪਦ_T	*tp;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL || first_term == NULL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL || ਪਹਿਲਾ_ਪਦ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     l = rettv->vval.v_list;
     FOR_ALL_TERMS(tp)
-	if (tp->tl_buffer != NULL)
-	    if (list_append_number(l,
-				   (varnumber_T)tp->tl_buffer->b_fnum) == FAIL)
-		return;
+	ਜੇ (tp->tl_ਬਫਰ != ਨਿਰਾ)
+	    ਜੇ (list_append_ਸੰਖਿਆ(l,
+				   (varnumber_T)tp->tl_ਬਫਰ->b_fnum) == FAIL)
+		ਵਾਪਸ;
 }
 
 /*
  * "term_scrape(buf, row)" function
  */
-    void
-f_term_scrape(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_scrape(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    VTermScreen	    *screen = NULL;
+    VTermScreen	    *screen = ਨਿਰਾ;
     VTermPos	    pos;
     list_T	    *l;
-    term_T	    *term;
+    ਪਦ_T	    *ਪਦ;
     char_u	    *p;
-    sb_line_T	    *line;
+    sb_ਸਤਰ_T	    *ਸਤਰ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_scrape()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = ਪਦ_get_buf(argvars, "term_scrape()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
 
     l = rettv->vval.v_list;
-    pos.row = get_row_number(&argvars[1], term);
+    pos.ਪੰਕਤੀ = get_ਪੰਕਤੀ_ਸੰਖਿਆ(&argvars[1], ਪਦ);
 
-    if (term->tl_vterm != NULL)
+    ਜੇ (ਪਦ->tl_vterm != ਨਿਰਾ)
     {
-	screen = vterm_obtain_screen(term->tl_vterm);
-	if (screen == NULL)  // can't really happen
-	    return;
-	p = NULL;
-	line = NULL;
+	screen = vterm_obtain_screen(ਪਦ->tl_vterm);
+	ਜੇ (screen == ਨਿਰਾ)  // can't really happen
+	    ਵਾਪਸ;
+	p = ਨਿਰਾ;
+	ਸਤਰ = ਨਿਰਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int	  sb_row = term->tl_scrollback_scrolled + pos.row;
+	ਪੂਰਨ	  sb_ਪੰਕਤੀ = ਪਦ->tl_scrollback_scrolled + pos.ਪੰਕਤੀ;
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
+	size_t	  ਵਿੱਥ = 0;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_ਵਿੱਚ_buf(ਪਦ, sb_ਪੰਕਤੀ, &lnum, ਨਿਰਾ, &ਵਿੱਥ);
 
-	if (sb_row >= term->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_line_count)
-	    return;
+	ਜੇ (sb_ਪੰਕਤੀ >= ਪਦ->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਵਾਪਸ;
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	ਸਤਰ = (sb_ਸਤਰ_T *)ਪਦ->tl_scrollback.ga_ਅੰਕੜੇ + sb_ਪੰਕਤੀ;
 	p = ml_get_buf(buf, lnum, FALSE);
 
-	if (STRLEN(p) < offset + line->sb_bytes)
-	    return;
+	ਜੇ (STRLEN(p) < ਵਿੱਥ + ਸਤਰ->sb_ਬਾਈਟਾਂ)
+	    ਵਾਪਸ;
 
-	p += offset;
+	p += ਵਿੱਥ;
     }
 
-    for (pos.col = 0; pos.col < term->tl_cols; )
+    ਲਈ (pos.ਖਾਨਾ = 0; pos.ਖਾਨਾ < ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ; )
     {
 	dict_T		*dcell;
-	int		width;
+	ਪੂਰਨ		ਚੌੜਾਈ;
 	VTermScreenCellAttrs attrs;
 	VTermColor	fg, bg;
 	char_u		rgb[8];
 	size_t		rgblen;
-	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_PER_CELL + 1];
+	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL + 1];
 	size_t		mbslen;
-	int		i;
+	ਪੂਰਨ		i;
 
-	if (screen == NULL)
+	ਜੇ (screen == ਨਿਰਾ)
 	{
 	    cellattr_T	*cellattr;
 
 	    // vterm has finished, get the cell from scrollback
-	    if (pos.col >= line->sb_cols)
-		break;
-	    cellattr = line->sb_cells + pos.col;
-	    width = cellattr->width;
+	    ਜੇ (pos.ਖਾਨਾ >= ਸਤਰ->sb_ਖਾਨੇ_ਗਿਣਤੀ)
+		ਰੋਕੋ;
+	    cellattr = ਸਤਰ->sb_cells + pos.ਖਾਨਾ;
+	    ਚੌੜਾਈ = cellattr->ਚੌੜਾਈ;
 	    attrs = cellattr->attrs;
 	    fg = cellattr->fg;
 	    bg = cellattr->bg;
@@ -6821,380 +6821,380 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 	    mbs[mbslen] = NUL;
 	    p += mbslen;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    VTermScreenCell cell;
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
-		break;
+	    ਜੇ (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		ਰੋਕੋ;
 
 	    mbslen = 0;
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    ਲਈ (i = 0; i < VTERM_MAX_CHARS_ਪ੍ਰਤੀ_CELL; ++i)
 	    {
-		if (cell.chars[i] == 0)
-		    break;
-		mbslen += (*utf_char2bytes)((int)cell.chars[i], mbs + mbslen);
+		ਜੇ (cell.chars[i] == 0)
+		    ਰੋਕੋ;
+		mbslen += (*utf_char2bytes)((ਪੂਰਨ)cell.chars[i], mbs + mbslen);
 	    }
 	    mbs[mbslen] = NUL;
-	    width = cell.width;
+	    ਚੌੜਾਈ = cell.ਚੌੜਾਈ;
 	    attrs = cell.attrs;
 	    fg = cell.fg;
 	    bg = cell.bg;
 	}
 	dcell = dict_alloc();
-	if (dcell == NULL)
-	    break;
-	if (list_append_dict(l, dcell) == FAIL)
+	ਜੇ (dcell == ਨਿਰਾ)
+	    ਰੋਕੋ;
+	ਜੇ (list_append_dict(l, dcell) == FAIL)
 	{
 	    dict_unref(dcell);
-	    break;
+	    ਰੋਕੋ;
 	}
 
-	dict_add_string_len(dcell, "chars", mbs, (int)mbslen);
+	dict_ਜੋੜੋ_string_len(dcell, "chars", mbs, (ਪੂਰਨ)mbslen);
 
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	rgblen = vim_snprintf_safelen((ਅੱਖਰ *)rgb, ਆਕਾਰ(rgb),
 	    "#%02x%02x%02x", fg.red, fg.green, fg.blue);
-	dict_add_string_len(dcell, "fg", rgb, (int)rgblen);
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	dict_ਜੋੜੋ_string_len(dcell, "fg", rgb, (ਪੂਰਨ)rgblen);
+	rgblen = vim_snprintf_safelen((ਅੱਖਰ *)rgb, ਆਕਾਰ(rgb),
 	    "#%02x%02x%02x", bg.red, bg.green, bg.blue);
-	dict_add_string_len(dcell, "bg", rgb, (int)rgblen);
+	dict_ਜੋੜੋ_string_len(dcell, "bg", rgb, (ਪੂਰਨ)rgblen);
 
-	dict_add_number(dcell, "attr",
-				      cell2attr(term, NULL, &attrs, &fg, &bg));
-	dict_add_number(dcell, "width", width);
+	dict_ਜੋੜੋ_ਸੰਖਿਆ(dcell, "attr",
+				      cell2attr(ਪਦ, ਨਿਰਾ, &attrs, &fg, &bg));
+	dict_ਜੋੜੋ_ਸੰਖਿਆ(dcell, "width", ਚੌੜਾਈ);
 
-	++pos.col;
-	if (width == 2)
-	    ++pos.col;
+	++pos.ਖਾਨਾ;
+	ਜੇ (ਚੌੜਾਈ == 2)
+	    ++pos.ਖਾਨਾ;
     }
 }
 
 /*
  * "term_sendkeys(buf, keys)" function
  */
-    void
-f_term_sendkeys(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_sendkeys(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    char_u	*msg;
-    term_T	*term;
+    char_u	*ਸੁਨੇਹਾ;
+    ਪਦ_T	*ਪਦ;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_sendkeys()");
-    if (buf == NULL)
-	return;
+    buf = ਪਦ_get_buf(argvars, "term_sendkeys()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    msg = tv_get_string_chk(&argvars[1]);
-    if (msg == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    ਸੁਨੇਹਾ = tv_get_string_chk(&argvars[1]);
+    ਜੇ (ਸੁਨੇਹਾ == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    while (*msg != NUL)
+    ਜਦੋਂ (*ਸੁਨੇਹਾ != NUL)
     {
-	int c;
+	ਪੂਰਨ c;
 
-	if (*msg == K_SPECIAL && msg[1] != NUL && msg[2] != NUL)
+	ਜੇ (*ਸੁਨੇਹਾ == K_SPECIAL && ਸੁਨੇਹਾ[1] != NUL && ਸੁਨੇਹਾ[2] != NUL)
 	{
-	    c = TO_SPECIAL(msg[1], msg[2]);
-	    msg += 3;
+	    c = ਮੰਜ਼ਿਲ_SPECIAL(ਸੁਨੇਹਾ[1], ਸੁਨੇਹਾ[2]);
+	    ਸੁਨੇਹਾ += 3;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    c = PTR2CHAR(msg);
-	    msg += MB_CPTR2LEN(msg);
+	    c = PTR2CHAR(ਸੁਨੇਹਾ);
+	    ਸੁਨੇਹਾ += MB_CPTR2LEN(ਸੁਨੇਹਾ);
 	}
-	send_keys_to_term(term, c, 0, FALSE);
+	send_ਕੁੰਜੀਆਂ_ਮੰਜ਼ਿਲ_ਪਦ(ਪਦ, c, 0, FALSE);
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * "term_getansicolors(buf)" function
  */
-    void
-f_term_getansicolors(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_getansicolors(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     VTermState	*state;
     VTermColor  color;
     char_u	hexbuf[10];
-    int		index;
+    ਪੂਰਨ		ਸੂਚਕਾਂਕ;
     list_T	*list;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_getansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = ਪਦ_get_buf(argvars, "term_getansicolors()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     list = rettv->vval.v_list;
-    state = vterm_obtain_state(term->tl_vterm);
-    for (index = 0; index < 16; index++)
+    state = vterm_obtain_state(ਪਦ->tl_vterm);
+    ਲਈ (ਸੂਚਕਾਂਕ = 0; ਸੂਚਕਾਂਕ < 16; ਸੂਚਕਾਂਕ++)
     {
 	size_t	hexbuflen;
 
-	vterm_state_get_palette_color(state, index, &color);
-	hexbuflen = vim_snprintf_safelen((char *)hexbuf, sizeof(hexbuf),
+	vterm_state_get_palette_color(state, ਸੂਚਕਾਂਕ, &color);
+	hexbuflen = vim_snprintf_safelen((ਅੱਖਰ *)hexbuf, ਆਕਾਰ(hexbuf),
 	    "#%02x%02x%02x", color.red, color.green, color.blue);
-	if (list_append_string(list, hexbuf, (int)hexbuflen) == FAIL)
-	    return;
+	ਜੇ (list_append_string(list, hexbuf, (ਪੂਰਨ)hexbuflen) == FAIL)
+	    ਵਾਪਸ;
     }
 }
 
 /*
  * "term_setansicolors(buf, list)" function
  */
-    void
-f_term_setansicolors(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_setansicolors(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     listitem_T	*li;
-    int		n = 0;
+    ਪੂਰਨ		n = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_setansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = ਪਦ_get_buf(argvars, "term_setansicolors()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    ਜੇ (ਪਦ->tl_vterm == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    ਜੇ (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[1].vval.v_list->lv_first == &range_list_item
+    ਜੇ (argvars[1].vval.v_list->lv_ਪਹਿਲਾ == &range_list_ਵਸਤੂ
 	    || argvars[1].vval.v_list->lv_len != 16)
     {
-	semsg(_(e_invalid_value_for_argument_str), "\"colors\"");
-	return;
+	semsg(_(e_invalid_ਮੁੱਲ_for_ਦਲੀਲ_str), "\"colors\"");
+	ਵਾਪਸ;
     }
 
-    if (term->tl_palette == NULL)
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-    if (term->tl_palette == NULL)
-	return;
+    ਜੇ (ਪਦ->tl_palette == ਨਿਰਾ)
+	ਪਦ->tl_palette = ALLOC_MULT(long_u, 16);
+    ਜੇ (ਪਦ->tl_palette == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(argvars[1].vval.v_list, li)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return;
+	ਜੇ (color_name == ਨਿਰਾ)
+	    ਵਾਪਸ;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
+	ਜੇ (guicolor == INVALCOLOR)
 	{
 	    semsg(_(e_cannot_allocate_color_str), color_name);
-	    return;
+	    ਵਾਪਸ;
 	}
 
-	term->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
+	ਪਦ->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    term_update_palette(term);
+    ਪਦ_update_palette(ਪਦ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * "term_setapi(buf, api)" function
  */
-    void
-f_term_setapi(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_setapi(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     char_u	*api;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_setapi()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_api);
+    buf = ਪਦ_get_buf(argvars, "term_setapi()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    vim_free(ਪਦ->tl_api);
     api = tv_get_string_chk(&argvars[1]);
-    if (api != NULL)
-	term->tl_api = vim_strsave(api);
-    else
-	term->tl_api = NULL;
+    ਜੇ (api != ਨਿਰਾ)
+	ਪਦ->tl_api = vim_strsave(api);
+    ਨਹੀਂਤਾਂ
+	ਪਦ->tl_api = ਨਿਰਾ;
 }
 
 /*
  * "term_setrestore(buf, command)" function
  */
-    void
-f_term_setrestore(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_setrestore(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-#if defined(FEAT_SESSION)
+#ਜੇ defined(FEAT_SESSION)
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     char_u	*cmd;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_setrestore()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_command);
+    buf = ਪਦ_get_buf(argvars, "term_setrestore()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    vim_free(ਪਦ->tl_command);
     cmd = tv_get_string_chk(&argvars[1]);
-    if (cmd != NULL)
-	term->tl_command = vim_strsave(cmd);
-    else
-	term->tl_command = NULL;
-#endif
+    ਜੇ (cmd != ਨਿਰਾ)
+	ਪਦ->tl_command = vim_strsave(cmd);
+    ਨਹੀਂਤਾਂ
+	ਪਦ->tl_command = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * "term_setkill(buf, how)" function
  */
-    void
-f_term_setkill(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_setkill(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
     char_u	*how;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_setkill()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_kill);
+    buf = ਪਦ_get_buf(argvars, "term_setkill()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਪਦ = buf->b_ਪਦ;
+    vim_free(ਪਦ->tl_kill);
     how = tv_get_string_chk(&argvars[1]);
-    if (how != NULL)
-	term->tl_kill = vim_strsave(how);
-    else
-	term->tl_kill = NULL;
+    ਜੇ (how != ਨਿਰਾ)
+	ਪਦ->tl_kill = vim_strsave(how);
+    ਨਹੀਂਤਾਂ
+	ਪਦ->tl_kill = ਨਿਰਾ;
 }
 
 /*
  * "term_start(command, options)" function
  */
-    void
-f_term_start(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਪਦ_ਸ਼ੁਰੂ(typval_T *argvars, typval_T *rettv)
 {
     jobopt_T	opt;
     buf_T	*buf;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    init_job_options(&opt);
-    if (argvars[1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[1], &opt,
+    init_ਕੰਮ_options(&opt);
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN
+	    && get_ਕੰਮ_options(&argvars[1], &opt,
 		JO_TIMEOUT_ALL + JO_STOPONEXIT
-		    + JO_CALLBACK + JO_OUT_CALLBACK + JO_ERR_CALLBACK
-		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_OUT_IO,
-		JO2_TERM_NAME + JO2_TERM_FINISH + JO2_HIDDEN + JO2_TERM_OPENCMD
-		    + JO2_TERM_COLS + JO2_TERM_ROWS + JO2_VERTICAL + JO2_CURWIN
+		    + JO_CALLBACK + JO_ਬਾਹਰਲਾ_CALLBACK + JO_ERR_CALLBACK
+		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_ਬਾਹਰਲਾ_IO,
+		JO2_ਪਦ_NAME + JO2_ਪਦ_ਅੰਤ + JO2_HIDDEN + JO2_ਪਦ_OPENCMD
+		    + JO2_ਪਦ_ਖਾਨੇ_ਗਿਣਤੀ + JO2_ਪਦ_ਪੰਕਤੀਆਂ + JO2_VERTICAL + JO2_CURWIN
 		    + JO2_CWD + JO2_ENV + JO2_EOF_CHARS
-		    + JO2_NORESTORE + JO2_TERM_KILL + JO2_TERM_HIGHLIGHT
-		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_TERM_API) == FAIL)
-	return;
+		    + JO2_NORESTORE + JO2_ਪਦ_KILL + JO2_ਪਦ_HIGHLIGHT
+		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_ਪਦ_API) == FAIL)
+	ਵਾਪਸ;
 
-    buf = term_start(&argvars[0], NULL, &opt, 0);
+    buf = ਪਦ_ਸ਼ੁਰੂ(&argvars[0], ਨਿਰਾ, &opt, 0);
 
-    if (buf != NULL && buf->b_term != NULL)
-	rettv->vval.v_number = buf->b_fnum;
+    ਜੇ (buf != ਨਿਰਾ && buf->b_ਪਦ != ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ = buf->b_fnum;
 }
 
 /*
  * "term_wait" function
  */
-    void
-f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ਪਦ_wait(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਬਫਰ_arg(argvars, 0) == FAIL
+		|| check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    buf = term_get_buf(argvars, "term_wait()");
-    if (buf == NULL)
-	return;
-    if (buf->b_term->tl_job == NULL)
+    buf = ਪਦ_get_buf(argvars, "term_wait()");
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (buf->b_ਪਦ->tl_ਕੰਮ == ਨਿਰਾ)
     {
-	ch_log(NULL, "term_wait(): no job to wait for");
-	return;
+	ch_log(ਨਿਰਾ, "term_wait(): no job to wait for");
+	ਵਾਪਸ;
     }
-    if (buf->b_term->tl_job->jv_channel == NULL)
+    ਜੇ (buf->b_ਪਦ->tl_ਕੰਮ->jv_channel == ਨਿਰਾ)
 	// channel is closed, nothing to do
-	return;
+	ਵਾਪਸ;
 
     // Get the job status, this will detect a job that finished.
-    if (!buf->b_term->tl_job->jv_channel->ch_keep_open
-	    && STRCMP(job_status(buf->b_term->tl_job), "dead") == 0)
+    ਜੇ (!buf->b_ਪਦ->tl_ਕੰਮ->jv_channel->ch_keep_open
+	    && STRCMP(ਕੰਮ_ਸਥਿਤੀ(buf->b_ਪਦ->tl_ਕੰਮ), "dead") == 0)
     {
 	// The job is dead, keep reading channel I/O until the channel is
 	// closed. buf->b_term may become NULL if the terminal was closed while
 	// waiting.
-	ch_log(NULL, "term_wait(): waiting for channel to close");
-	while (buf->b_term != NULL && !buf->b_term->tl_channel_closed)
+	ch_log(ਨਿਰਾ, "term_wait(): waiting for channel to close");
+	ਜਦੋਂ (buf->b_ਪਦ != ਨਿਰਾ && !buf->b_ਪਦ->tl_channel_closed)
 	{
-	    term_flush_messages();
+	    ਪਦ_flush_messages();
 
 	    ui_delay(10L, FALSE);
-	    if (!buf_valid(buf))
+	    ਜੇ (!buf_valid(buf))
 		// If the terminal is closed when the channel is closed the
 		// buffer disappears.
-		break;
-	    if (buf->b_term == NULL || buf->b_term->tl_channel_closing)
+		ਰੋਕੋ;
+	    ਜੇ (buf->b_ਪਦ == ਨਿਰਾ || buf->b_ਪਦ->tl_channel_closing)
 		// came here from a close callback, only wait one time
-		break;
+		ਰੋਕੋ;
 	}
 
-	term_flush_messages();
+	ਪਦ_flush_messages();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	long wait = 10L;
+	ਲੰਮਾ wait = 10L;
 
-	term_flush_messages();
+	ਪਦ_flush_messages();
 
 	// Wait for some time for any channel I/O.
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    wait = tv_get_number(&argvars[1]);
+	ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
+	    wait = tv_get_ਸੰਖਿਆ(&argvars[1]);
 	ui_delay(wait, TRUE);
 
 	// Flushing messages on channels is hopefully sufficient.
 	// TODO: is there a better way?
-	term_flush_messages();
+	ਪਦ_flush_messages();
     }
 }
 
@@ -7202,37 +7202,37 @@ f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
  * Called when a channel has sent all the lines to a terminal.
  * Send a CTRL-D to mark the end of the text.
  */
-    void
-term_send_eof(channel_T *ch)
+    ਖਾਲੀ
+ਪਦ_send_eof(channel_T *ch)
 {
-    term_T	*term;
+    ਪਦ_T	*ਪਦ;
 
-    FOR_ALL_TERMS(term)
-	if (term->tl_job == ch->ch_job)
+    FOR_ALL_TERMS(ਪਦ)
+	ਜੇ (ਪਦ->tl_ਕੰਮ == ch->ch_ਕੰਮ)
 	{
-	    if (term->tl_eof_chars != NULL)
+	    ਜੇ (ਪਦ->tl_eof_chars != ਨਿਰਾ)
 	    {
-		channel_send(ch, PART_IN, term->tl_eof_chars,
-					(int)STRLEN(term->tl_eof_chars), NULL);
-		channel_send(ch, PART_IN, (char_u *)"\r", 1, NULL);
+		channel_send(ch, PART_ਵਿੱਚ, ਪਦ->tl_eof_chars,
+					(ਪੂਰਨ)STRLEN(ਪਦ->tl_eof_chars), ਨਿਰਾ);
+		channel_send(ch, PART_ਵਿੱਚ, (char_u *)"\r", 1, ਨਿਰਾ);
 	    }
-#ifdef MSWIN
-	    else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਨਹੀਂਤਾਂ
 		// Default: CTRL-D
-		channel_send(ch, PART_IN, (char_u *)"\004\r", 2, NULL);
-#endif
+		channel_send(ch, PART_ਵਿੱਚ, (char_u *)"\004\r", 2, ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
 	}
 }
 
-#if defined(FEAT_GUI)
-    job_T *
-term_getjob(term_T *term)
+#ਜੇ defined(FEAT_GUI)
+    ਕੰਮ_T *
+ਪਦ_getjob(ਪਦ_T *ਪਦ)
 {
-    return term != NULL ? term->tl_job : NULL;
+    ਵਾਪਸ ਪਦ != ਨਿਰਾ ? ਪਦ->tl_ਕੰਮ : ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 
 ///////////////////////////////////////
 // 2. MS-Windows implementation.
@@ -7241,19 +7241,19 @@ HRESULT (WINAPI *pCreatePseudoConsole)(COORD, HANDLE, HANDLE, DWORD, HPCON*);
 HRESULT (WINAPI *pResizePseudoConsole)(HPCON, COORD);
 HRESULT (WINAPI *pClosePseudoConsole)(HPCON);
 BOOL (WINAPI *pInitializeProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD, PSIZE_T);
-BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, SIZE_T, PVOID, PSIZE_T);
-void (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
+BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, ਮਾਪ_T, PVOID, PSIZE_T);
+ਖਾਲੀ (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
 
-    static int
-dyn_conpty_init(int verbose)
+    ਸਥਿਰ ਪੂਰਨ
+dyn_conpty_init(ਪੂਰਨ verbose)
 {
-    static HMODULE	hKerneldll = NULL;
-    int			i;
-    static struct
+    ਸਥਿਰ HMODULE	hKerneldll = ਨਿਰਾ;
+    ਪੂਰਨ			i;
+    ਸਥਿਰ ਬਣਤਰ
     {
-	char	*name;
+	ਅੱਖਰ	*name;
 	FARPROC	*ptr;
-    } conpty_entry[] =
+    } conpty_ਇੰਦਰਾਜ[] =
     {
 	{"CreatePseudoConsole", (FARPROC*)&pCreatePseudoConsole},
 	{"ResizePseudoConsole", (FARPROC*)&pResizePseudoConsole},
@@ -7264,88 +7264,88 @@ dyn_conpty_init(int verbose)
 				(FARPROC*)&pUpdateProcThreadAttribute},
 	{"DeleteProcThreadAttributeList",
 				(FARPROC*)&pDeleteProcThreadAttributeList},
-	{NULL, NULL}
+	{ਨਿਰਾ, ਨਿਰਾ}
     };
 
-    if (!has_conpty_working())
+    ਜੇ (!has_conpty_working())
     {
-	if (verbose)
-	    emsg(_(e_conpty_is_not_available));
-	return FAIL;
+	ਜੇ (verbose)
+	    emsg(_(e_conpty_is_not_ਉਪਲਬਧ));
+	ਵਾਪਸ FAIL;
     }
 
     // No need to initialize twice.
-    if (hKerneldll)
-	return OK;
+    ਜੇ (hKerneldll)
+	ਵਾਪਸ OK;
 
-    hKerneldll = vimLoadLib("kernel32.dll");
-    for (i = 0; conpty_entry[i].name != NULL
-					&& conpty_entry[i].ptr != NULL; ++i)
+    hKerneldll = vim_ਲੱਦੋ_Lib("kernel32.dll");
+    ਲਈ (i = 0; conpty_ਇੰਦਰਾਜ[i].name != ਨਿਰਾ
+					&& conpty_ਇੰਦਰਾਜ[i].ptr != ਨਿਰਾ; ++i)
     {
-	if ((*conpty_entry[i].ptr = (FARPROC)GetProcAddress(hKerneldll,
-						conpty_entry[i].name)) == NULL)
+	ਜੇ ((*conpty_ਇੰਦਰਾਜ[i].ptr = (FARPROC)Get_Proc_ਪਤਾ(hKerneldll,
+						conpty_ਇੰਦਰਾਜ[i].name)) == ਨਿਰਾ)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), conpty_entry[i].name);
-	    hKerneldll = NULL;
-	    return FAIL;
+	    ਜੇ (verbose)
+		semsg(_(e_could_not_ਲੱਦੋ_library_function_str), conpty_ਇੰਦਰਾਜ[i].name);
+	    hKerneldll = ਨਿਰਾ;
+	    ਵਾਪਸ FAIL;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    static int
-conpty_term_and_job_init(
-	term_T	    *term,
+    ਸਥਿਰ ਪੂਰਨ
+conpty_ਪਦ_and_ਕੰਮ_init(
+	ਪਦ_T	    *ਪਦ,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	ਅੱਖਰ	    **argv ਅਣਵਰਤਿਆ,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cmd_wchar_copy = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
-    HANDLE	    jo = NULL;
+    WCHAR	    *cmd_wchar = ਨਿਰਾ;
+    WCHAR	    *cmd_wchar_copy = ਨਿਰਾ;
+    WCHAR	    *cwd_wchar = ਨਿਰਾ;
+    WCHAR	    *env_wchar = ਨਿਰਾ;
+    channel_T	    *channel = ਨਿਰਾ;
+    ਕੰਮ_T	    *ਕੰਮ = ਨਿਰਾ;
+    HANDLE	    jo = ਨਿਰਾ;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = ਨਿਰਾ;
     HRESULT	    hr;
     COORD	    consize;
-    SIZE_T	    breq;
+    ਮਾਪ_T	    breq;
     PROCESS_INFORMATION proc_info;
-    HANDLE	    i_theirs = NULL;
-    HANDLE	    o_theirs = NULL;
-    HANDLE	    i_ours = NULL;
-    HANDLE	    o_ours = NULL;
-    char	    *errmsg = NULL;
+    HANDLE	    i_theirs = ਨਿਰਾ;
+    HANDLE	    o_theirs = ਨਿਰਾ;
+    HANDLE	    i_ours = ਨਿਰਾ;
+    HANDLE	    o_ours = ਨਿਰਾ;
+    ਅੱਖਰ	    *errmsg = ਨਿਰਾ;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, ਆਕਾਰ(ਅੱਖਰ*), 20);
+    ga_init2(&ga_env, ਆਕਾਰ(ਅੱਖਰ*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    ਜੇ (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    ਨਹੀਂਤਾਂ ਜੇ (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	ਜੇ (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    ਜਾਓ failed;
+	cmd = ga_cmd.ga_ਅੰਕੜੇ;
     }
-    if (cmd == NULL || *cmd == NUL)
+    ਜੇ (cmd == ਨਿਰਾ || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਜਾਓ failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    ਪਦ->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_ਮੰਜ਼ਿਲ_utf16(cmd, ਨਿਰਾ);
 
-    if (cmd_wchar != NULL)
+    ਜੇ (cmd_wchar != ਨਿਰਾ)
     {
 	// Request by CreateProcessW
 	breq = wcslen(cmd_wchar) + 1 + 1;	// Addition of NUL by API
@@ -7354,113 +7354,113 @@ conpty_term_and_job_init(
     }
 
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    ਜੇ (cmd_wchar == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ਜੇ (opt->jo_cwd != ਨਿਰਾ)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_ਮੰਜ਼ਿਲ_utf16(opt->jo_cwd, ਨਿਰਾ);
+	ਜੇ (cwd_wchar == ਨਿਰਾ)
+	    ਜਾਓ failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_ਅੰਕੜੇ;
 
-    if (!CreatePipe(&i_theirs, &i_ours, NULL, 0))
-	goto failed;
-    if (!CreatePipe(&o_ours, &o_theirs, NULL, 0))
-	goto failed;
+    ਜੇ (!CreatePipe(&i_theirs, &i_ours, ਨਿਰਾ, 0))
+	ਜਾਓ failed;
+    ਜੇ (!CreatePipe(&o_ours, &o_theirs, ਨਿਰਾ, 0))
+	ਜਾਓ failed;
 
-    consize.X = term->tl_cols;
-    consize.Y = term->tl_rows;
+    consize.X = ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ;
+    consize.Y = ਪਦ->tl_ਪੰਕਤੀਆਂ;
     hr = pCreatePseudoConsole(consize, i_theirs, o_theirs, 0,
-							     &term->tl_conpty);
-    if (FAILED(hr))
-	goto failed;
+							     &ਪਦ->tl_conpty);
+    ਜੇ (FAILED(hr))
+	ਜਾਓ failed;
 
-    term->tl_siex.StartupInfo.cb = sizeof(term->tl_siex);
+    ਪਦ->tl_siex.StartupInfo.cb = ਆਕਾਰ(ਪਦ->tl_siex);
 
     // Explicitly invalidate std handles to prevent inheritance of
     // the debugger's stdout (e.g., in Visual Studio debugging sessions),
     // which could cause job output to go to the debugger instead of
     // the intended ConPTY, even with bInheritHandles set to FALSE in CreateProcess.
-    term->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-    term->tl_siex.StartupInfo.hStdInput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_VALUE;
+    ਪਦ->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    ਪਦ->tl_siex.StartupInfo.h_Std_ਨਿਵੇਸ਼ = INVALID_HANDLE_ਮੁੱਲ;
+    ਪਦ->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_ਮੁੱਲ;
+    ਪਦ->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_ਮੁੱਲ;
 
     // Set up pipe inheritance safely: Vista or later.
-    pInitializeProcThreadAttributeList(NULL, 1, 0, &breq);
-    term->tl_siex.lpAttributeList = alloc(breq);
-    if (!term->tl_siex.lpAttributeList)
-	goto failed;
-    if (!pInitializeProcThreadAttributeList(term->tl_siex.lpAttributeList, 1,
+    pInitializeProcThreadAttributeList(ਨਿਰਾ, 1, 0, &breq);
+    ਪਦ->tl_siex.lpAttributeList = alloc(breq);
+    ਜੇ (!ਪਦ->tl_siex.lpAttributeList)
+	ਜਾਓ failed;
+    ਜੇ (!pInitializeProcThreadAttributeList(ਪਦ->tl_siex.lpAttributeList, 1,
 								     0, &breq))
-	goto failed;
-    if (!pUpdateProcThreadAttribute(
-	    term->tl_siex.lpAttributeList, 0,
-	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, term->tl_conpty,
-	    sizeof(HPCON), NULL, NULL))
-	goto failed;
+	ਜਾਓ failed;
+    ਜੇ (!pUpdateProcThreadAttribute(
+	    ਪਦ->tl_siex.lpAttributeList, 0,
+	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, ਪਦ->tl_conpty,
+	    ਆਕਾਰ(HPCON), ਨਿਰਾ, ਨਿਰਾ))
+	ਜਾਓ failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    ਕੰਮ = ਕੰਮ_alloc();
+    ਜੇ (ਕੰਮ == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ਜੇ (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	ਪੂਰਨ argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &ਕੰਮ->jv_argv, &argc);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int argc;
+	ਪੂਰਨ argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &ਕੰਮ->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਵਿੱਚ_BUF)
+	ਕੰਮ->jv_ਵਿੱਚ_buf = buflist_findnr(opt->jo_io_buf[PART_ਵਿੱਚ]);
 
-    if (!CreateProcessW(NULL, cmd_wchar_copy, NULL, NULL, FALSE,
+    ਜੇ (!CreateProcessW(ਨਿਰਾ, cmd_wchar_copy, ਨਿਰਾ, ਨਿਰਾ, FALSE,
 	    EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT
-	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_MODE,
+	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_ਬਹੁਲਕ,
 	    env_wchar, cwd_wchar,
-	    &term->tl_siex.StartupInfo, &proc_info))
+	    &ਪਦ->tl_siex.StartupInfo, &proc_info))
     {
 	errmsg = GetWin32Error();
-	goto failed;
+	ਜਾਓ failed;
     }
 
     CloseHandle(i_theirs);
     CloseHandle(o_theirs);
 
-    channel_set_pipes(channel,
+    channel_ਸੈੱਟ_pipes(channel,
 	    (sock_T)i_ours,
 	    (sock_T)o_ours,
 	    (sock_T)o_ours);
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_ਪਾਠ_ਬਹੁਲਕ = TRUE;
 
     // Use to explicitly delete anonymous pipe handle.
     // In addition, it is used to prevent the pipe from being closed when input
     // from a buffer etc. is finished.
     channel->ch_anonymous_pipe = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_ਕੰਮ_Object(ਨਿਰਾ, ਨਿਰਾ);
+    ਜੇ (jo == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    if (!AssignProcessToJobObject(jo, proc_info.hProcess))
+    ਜੇ (!ਸੌਂਪੋ_Process_ਮੰਜ਼ਿਲ_ਕੰਮ_Object(jo, proc_info.hProcess))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ਨਿਰਾ;
     }
 
     ResumeThread(proc_info.hThread);
@@ -7471,44 +7471,44 @@ conpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    ਜੇ (create_vterm(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ) == FAIL)
+	ਜਾਓ failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ਜੇ (ਪਦ_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ਜੇ (ਪਦ->tl_palette != ਨਿਰਾ)
+	    ਸੈੱਟ_vterm_palette(ਪਦ->tl_vterm, ਪਦ->tl_palette);
+	ਨਹੀਂਤਾਂ
+	    init_vterm_ansi_colors(ਪਦ->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_ਸੈੱਟ_ਕੰਮ(channel, ਕੰਮ, opt);
+    ਕੰਮ_ਸੈੱਟ_options(ਕੰਮ, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info = proc_info;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_type = vim_strsave((char_u *)"conpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    ਕੰਮ->jv_channel = channel;
+    ਕੰਮ->jv_proc_info = proc_info;
+    ਕੰਮ->jv_ਕੰਮ_object = jo;
+    ਕੰਮ->jv_ਸਥਿਤੀ = ਕੰਮ_STARTED;
+    ਕੰਮ->jv_tty_type = vim_strsave((char_u *)"conpty");
+    ++ਕੰਮ->jv_refcount;
+    ਪਦ->tl_ਕੰਮ = ਕੰਮ;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    ਜੇ (orig_opt->jo_io[PART_ਬਾਹਰਲਾ] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_ਬਾਹਰਲਾ];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	ਪਦ->tl_ਬਾਹਰਲਾ_fd = mch_fopen((ਅੱਖਰ *)fname, WRITEBIN);
+	ਜੇ (ਪਦ->tl_ਬਾਹਰਲਾ_fd == ਨਿਰਾ)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 
 failed:
     ga_clear(&ga_cmd);
@@ -7516,112 +7516,112 @@ failed:
     vim_free(cmd_wchar);
     vim_free(cmd_wchar_copy);
     vim_free(cwd_wchar);
-    if (channel != NULL)
+    ਜੇ (channel != ਨਿਰਾ)
 	channel_clear(channel);
-    if (job != NULL)
+    ਜੇ (ਕੰਮ != ਨਿਰਾ)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	ਕੰਮ->jv_channel = ਨਿਰਾ;
+	ਕੰਮ_cleanup(ਕੰਮ);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    ਪਦ->tl_ਕੰਮ = ਨਿਰਾ;
+    ਜੇ (jo != ਨਿਰਾ)
 	CloseHandle(jo);
 
-    if (term->tl_siex.lpAttributeList != NULL)
+    ਜੇ (ਪਦ->tl_siex.lpAttributeList != ਨਿਰਾ)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(ਪਦ->tl_siex.lpAttributeList);
+	vim_free(ਪਦ->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (o_theirs != NULL)
+    ਪਦ->tl_siex.lpAttributeList = ਨਿਰਾ;
+    ਜੇ (o_theirs != ਨਿਰਾ)
 	CloseHandle(o_theirs);
-    if (o_ours != NULL)
+    ਜੇ (o_ours != ਨਿਰਾ)
 	CloseHandle(o_ours);
-    if (i_ours != NULL)
+    ਜੇ (i_ours != ਨਿਰਾ)
 	CloseHandle(i_ours);
-    if (i_theirs != NULL)
+    ਜੇ (i_theirs != ਨਿਰਾ)
 	CloseHandle(i_theirs);
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    ਜੇ (ਪਦ->tl_conpty != ਨਿਰਾ)
+	pClosePseudoConsole(ਪਦ->tl_conpty);
+    ਪਦ->tl_conpty = ਨਿਰਾ;
     // Propagate errors that occur in CreateProcess
-    if (errmsg)
+    ਜੇ (errmsg)
 	semsg("CreateProcess failed: %s", errmsg);
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
-    static void
-conpty_term_report_winsize(term_T *term, int rows, int cols)
+    ਸਥਿਰ ਖਾਲੀ
+conpty_ਪਦ_report_winsize(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
     COORD consize;
 
-    consize.X = cols;
-    consize.Y = rows;
-    pResizePseudoConsole(term->tl_conpty, consize);
+    consize.X = ਖਾਨੇ_ਗਿਣਤੀ;
+    consize.Y = ਪੰਕਤੀਆਂ_2;
+    pResizePseudoConsole(ਪਦ->tl_conpty, consize);
 }
 
-    static void
-term_free_conpty(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_free_conpty(ਪਦ_T *ਪਦ)
 {
-    if (term->tl_siex.lpAttributeList != NULL)
+    ਜੇ (ਪਦ->tl_siex.lpAttributeList != ਨਿਰਾ)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(ਪਦ->tl_siex.lpAttributeList);
+	vim_free(ਪਦ->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    ਪਦ->tl_siex.lpAttributeList = ਨਿਰਾ;
+    ਜੇ (ਪਦ->tl_conpty != ਨਿਰਾ)
+	pClosePseudoConsole(ਪਦ->tl_conpty);
+    ਪਦ->tl_conpty = ਨਿਰਾ;
 }
 
-    int
-use_conpty(void)
+    ਪੂਰਨ
+use_conpty(ਖਾਲੀ)
 {
-    return has_conpty;
+    ਵਾਪਸ has_conpty;
 }
 
 # define WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN 1ul
 # define WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN 2ull
-# define WINPTY_MOUSE_MODE_FORCE		2
+# define WINPTY_MOUSE_ਬਹੁਲਕ_FORCE		2
 
-void* (*winpty_config_new)(UINT64, void*);
-void* (*winpty_open)(void*, void*);
-void* (*winpty_spawn_config_new)(UINT64, void*, LPCWSTR, void*, void*, void*);
-BOOL (*winpty_spawn)(void*, void*, HANDLE*, HANDLE*, DWORD*, void*);
-void (*winpty_config_set_mouse_mode)(void*, int);
-void (*winpty_config_set_initial_size)(void*, int, int);
-LPCWSTR (*winpty_conin_name)(void*);
-LPCWSTR (*winpty_conout_name)(void*);
-LPCWSTR (*winpty_conerr_name)(void*);
-void (*winpty_free)(void*);
-void (*winpty_config_free)(void*);
-void (*winpty_spawn_config_free)(void*);
-void (*winpty_error_free)(void*);
-LPCWSTR (*winpty_error_msg)(void*);
-BOOL (*winpty_set_size)(void*, int, int, void*);
-HANDLE (*winpty_agent_process)(void*);
+ਖਾਲੀ* (*winpty_config_new)(UINT64, ਖਾਲੀ*);
+ਖਾਲੀ* (*winpty_open)(ਖਾਲੀ*, ਖਾਲੀ*);
+ਖਾਲੀ* (*winpty_spawn_config_new)(UINT64, ਖਾਲੀ*, LPCWSTR, ਖਾਲੀ*, ਖਾਲੀ*, ਖਾਲੀ*);
+BOOL (*winpty_spawn)(ਖਾਲੀ*, ਖਾਲੀ*, HANDLE*, HANDLE*, DWORD*, ਖਾਲੀ*);
+ਖਾਲੀ (*winpty_config_ਸੈੱਟ_mouse_ਬਹੁਲਕ)(ਖਾਲੀ*, ਪੂਰਨ);
+ਖਾਲੀ (*winpty_config_ਸੈੱਟ_initial_ਮਾਪ)(ਖਾਲੀ*, ਪੂਰਨ, ਪੂਰਨ);
+LPCWSTR (*winpty_conin_name)(ਖਾਲੀ*);
+LPCWSTR (*winpty_conout_name)(ਖਾਲੀ*);
+LPCWSTR (*winpty_conerr_name)(ਖਾਲੀ*);
+ਖਾਲੀ (*winpty_free)(ਖਾਲੀ*);
+ਖਾਲੀ (*winpty_config_free)(ਖਾਲੀ*);
+ਖਾਲੀ (*winpty_spawn_config_free)(ਖਾਲੀ*);
+ਖਾਲੀ (*winpty_error_free)(ਖਾਲੀ*);
+LPCWSTR (*winpty_error_ਸੁਨੇਹਾ)(ਖਾਲੀ*);
+BOOL (*winpty_ਸੈੱਟ_ਮਾਪ)(ਖਾਲੀ*, ਪੂਰਨ, ਪੂਰਨ, ਖਾਲੀ*);
+HANDLE (*winpty_agent_process)(ਖਾਲੀ*);
 
 # define WINPTY_DLL "winpty.dll"
 
-static HINSTANCE hWinPtyDLL = NULL;
+ਸਥਿਰ HINSTANCE hWinPtyDLL = ਨਿਰਾ;
 
-    static int
-dyn_winpty_init(int verbose)
+    ਸਥਿਰ ਪੂਰਨ
+dyn_winpty_init(ਪੂਰਨ verbose)
 {
-    int i;
-    static struct
+    ਪੂਰਨ i;
+    ਸਥਿਰ ਬਣਤਰ
     {
-	char	    *name;
+	ਅੱਖਰ	    *name;
 	FARPROC	    *ptr;
-    } winpty_entry[] =
+    } winpty_ਇੰਦਰਾਜ[] =
     {
 	{"winpty_conerr_name", (FARPROC*)&winpty_conerr_name},
 	{"winpty_config_free", (FARPROC*)&winpty_config_free},
 	{"winpty_config_new", (FARPROC*)&winpty_config_new},
 	{"winpty_config_set_mouse_mode",
-				      (FARPROC*)&winpty_config_set_mouse_mode},
+				      (FARPROC*)&winpty_config_ਸੈੱਟ_mouse_ਬਹੁਲਕ},
 	{"winpty_config_set_initial_size",
-				    (FARPROC*)&winpty_config_set_initial_size},
+				    (FARPROC*)&winpty_config_ਸੈੱਟ_initial_ਮਾਪ},
 	{"winpty_conin_name", (FARPROC*)&winpty_conin_name},
 	{"winpty_conout_name", (FARPROC*)&winpty_conout_name},
 	{"winpty_error_free", (FARPROC*)&winpty_error_free},
@@ -7630,178 +7630,178 @@ dyn_winpty_init(int verbose)
 	{"winpty_spawn", (FARPROC*)&winpty_spawn},
 	{"winpty_spawn_config_free", (FARPROC*)&winpty_spawn_config_free},
 	{"winpty_spawn_config_new", (FARPROC*)&winpty_spawn_config_new},
-	{"winpty_error_msg", (FARPROC*)&winpty_error_msg},
-	{"winpty_set_size", (FARPROC*)&winpty_set_size},
+	{"winpty_error_msg", (FARPROC*)&winpty_error_ਸੁਨੇਹਾ},
+	{"winpty_set_size", (FARPROC*)&winpty_ਸੈੱਟ_ਮਾਪ},
 	{"winpty_agent_process", (FARPROC*)&winpty_agent_process},
-	{NULL, NULL}
+	{ਨਿਰਾ, ਨਿਰਾ}
     };
 
     // No need to initialize twice.
-    if (hWinPtyDLL)
-	return OK;
+    ਜੇ (hWinPtyDLL)
+	ਵਾਪਸ OK;
     // Load winpty.dll, prefer using the 'winptydll' option, fall back to just
     // winpty.dll.
-    if (*p_winptydll != NUL)
-	hWinPtyDLL = vimLoadLib((char *)p_winptydll);
-    if (!hWinPtyDLL)
-	hWinPtyDLL = vimLoadLib(WINPTY_DLL);
-    if (!hWinPtyDLL)
+    ਜੇ (*p_winptydll != NUL)
+	hWinPtyDLL = vim_ਲੱਦੋ_Lib((ਅੱਖਰ *)p_winptydll);
+    ਜੇ (!hWinPtyDLL)
+	hWinPtyDLL = vim_ਲੱਦੋ_Lib(WINPTY_DLL);
+    ਜੇ (!hWinPtyDLL)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str),
+	ਜੇ (verbose)
+	    semsg(_(e_could_not_ਲੱਦੋ_library_str_str),
 		    (*p_winptydll != NUL ? p_winptydll : (char_u *)WINPTY_DLL),
 		    GetWin32Error());
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    for (i = 0; winpty_entry[i].name != NULL
-					 && winpty_entry[i].ptr != NULL; ++i)
+    ਲਈ (i = 0; winpty_ਇੰਦਰਾਜ[i].name != ਨਿਰਾ
+					 && winpty_ਇੰਦਰਾਜ[i].ptr != ਨਿਰਾ; ++i)
     {
-	if ((*winpty_entry[i].ptr = (FARPROC)GetProcAddress(hWinPtyDLL,
-					      winpty_entry[i].name)) == NULL)
+	ਜੇ ((*winpty_ਇੰਦਰਾਜ[i].ptr = (FARPROC)Get_Proc_ਪਤਾ(hWinPtyDLL,
+					      winpty_ਇੰਦਰਾਜ[i].name)) == ਨਿਰਾ)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), winpty_entry[i].name);
-	    hWinPtyDLL = NULL;
-	    return FAIL;
+	    ਜੇ (verbose)
+		semsg(_(e_could_not_ਲੱਦੋ_library_function_str), winpty_ਇੰਦਰਾਜ[i].name);
+	    hWinPtyDLL = ਨਿਰਾ;
+	    ਵਾਪਸ FAIL;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    static int
-winpty_term_and_job_init(
-	term_T	    *term,
+    ਸਥਿਰ ਪੂਰਨ
+winpty_ਪਦ_and_ਕੰਮ_init(
+	ਪਦ_T	    *ਪਦ,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	ਅੱਖਰ	    **argv ਅਣਵਰਤਿਆ,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
+    WCHAR	    *cmd_wchar = ਨਿਰਾ;
+    WCHAR	    *cwd_wchar = ਨਿਰਾ;
+    WCHAR	    *env_wchar = ਨਿਰਾ;
+    channel_T	    *channel = ਨਿਰਾ;
+    ਕੰਮ_T	    *ਕੰਮ = ਨਿਰਾ;
     DWORD	    error;
-    HANDLE	    jo = NULL;
-    HANDLE	    child_process_handle;
-    HANDLE	    child_thread_handle;
-    void	    *winpty_err = NULL;
-    void	    *spawn_config = NULL;
+    HANDLE	    jo = ਨਿਰਾ;
+    HANDLE	    ਬੱਚਾ_process_handle;
+    HANDLE	    ਬੱਚਾ_thread_handle;
+    ਖਾਲੀ	    *winpty_err = ਨਿਰਾ;
+    ਖਾਲੀ	    *spawn_config = ਨਿਰਾ;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = ਨਿਰਾ;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, ਆਕਾਰ(ਅੱਖਰ*), 20);
+    ga_init2(&ga_env, ਆਕਾਰ(ਅੱਖਰ*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    ਜੇ (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    ਨਹੀਂਤਾਂ ਜੇ (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	ਜੇ (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    ਜਾਓ failed;
+	cmd = ga_cmd.ga_ਅੰਕੜੇ;
     }
-    if (cmd == NULL || *cmd == NUL)
+    ਜੇ (cmd == ਨਿਰਾ || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਜਾਓ failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    ਪਦ->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_ਮੰਜ਼ਿਲ_utf16(cmd, ਨਿਰਾ);
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    ਜੇ (cmd_wchar == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ਜੇ (opt->jo_cwd != ਨਿਰਾ)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_ਮੰਜ਼ਿਲ_utf16(opt->jo_cwd, ਨਿਰਾ);
+	ਜੇ (cwd_wchar == ਨਿਰਾ)
+	    ਜਾਓ failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_ਅੰਕੜੇ;
 
-    term->tl_winpty_config = winpty_config_new(0, &winpty_err);
-    if (term->tl_winpty_config == NULL)
-	goto failed;
+    ਪਦ->tl_winpty_config = winpty_config_new(0, &winpty_err);
+    ਜੇ (ਪਦ->tl_winpty_config == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    winpty_config_set_mouse_mode(term->tl_winpty_config,
-						    WINPTY_MOUSE_MODE_FORCE);
-    winpty_config_set_initial_size(term->tl_winpty_config,
-						 term->tl_cols, term->tl_rows);
-    term->tl_winpty = winpty_open(term->tl_winpty_config, &winpty_err);
-    if (term->tl_winpty == NULL)
-	goto failed;
+    winpty_config_ਸੈੱਟ_mouse_ਬਹੁਲਕ(ਪਦ->tl_winpty_config,
+						    WINPTY_MOUSE_ਬਹੁਲਕ_FORCE);
+    winpty_config_ਸੈੱਟ_initial_ਮਾਪ(ਪਦ->tl_winpty_config,
+						 ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ, ਪਦ->tl_ਪੰਕਤੀਆਂ);
+    ਪਦ->tl_winpty = winpty_open(ਪਦ->tl_winpty_config, &winpty_err);
+    ਜੇ (ਪਦ->tl_winpty == ਨਿਰਾ)
+	ਜਾਓ failed;
 
     spawn_config = winpty_spawn_config_new(
 	    WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN |
 		WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN,
-	    NULL,
+	    ਨਿਰਾ,
 	    cmd_wchar,
 	    cwd_wchar,
 	    env_wchar,
 	    &winpty_err);
-    if (spawn_config == NULL)
-	goto failed;
+    ਜੇ (spawn_config == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    ਕੰਮ = ਕੰਮ_alloc();
+    ਜੇ (ਕੰਮ == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ਜੇ (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	ਪੂਰਨ argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &ਕੰਮ->jv_argv, &argc);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int argc;
+	ਪੂਰਨ argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &ਕੰਮ->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਵਿੱਚ_BUF)
+	ਕੰਮ->jv_ਵਿੱਚ_buf = buflist_findnr(opt->jo_io_buf[PART_ਵਿੱਚ]);
 
-    if (!winpty_spawn(term->tl_winpty, spawn_config, &child_process_handle,
-	    &child_thread_handle, &error, &winpty_err))
-	goto failed;
+    ਜੇ (!winpty_spawn(ਪਦ->tl_winpty, spawn_config, &ਬੱਚਾ_process_handle,
+	    &ਬੱਚਾ_thread_handle, &error, &winpty_err))
+	ਜਾਓ failed;
 
-    channel_set_pipes(channel,
+    channel_ਸੈੱਟ_pipes(channel,
 	(sock_T)CreateFileW(
-	    winpty_conin_name(term->tl_winpty),
-	    GENERIC_WRITE, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conin_name(ਪਦ->tl_winpty),
+	    GENERIC_WRITE, 0, ਨਿਰਾ,
+	    OPEN_EXISTING, 0, ਨਿਰਾ),
 	(sock_T)CreateFileW(
-	    winpty_conout_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conout_name(ਪਦ->tl_winpty),
+	    GENERIC_READ, 0, ਨਿਰਾ,
+	    OPEN_EXISTING, 0, ਨਿਰਾ),
 	(sock_T)CreateFileW(
-	    winpty_conerr_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL));
+	    winpty_conerr_name(ਪਦ->tl_winpty),
+	    GENERIC_READ, 0, ਨਿਰਾ,
+	    OPEN_EXISTING, 0, ਨਿਰਾ));
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_ਪਾਠ_ਬਹੁਲਕ = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_ਕੰਮ_Object(ਨਿਰਾ, ਨਿਰਾ);
+    ਜੇ (jo == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    if (!AssignProcessToJobObject(jo, child_process_handle))
+    ਜੇ (!ਸੌਂਪੋ_Process_ਮੰਜ਼ਿਲ_ਕੰਮ_Object(jo, ਬੱਚਾ_process_handle))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = ਨਿਰਾ;
     }
 
     winpty_spawn_config_free(spawn_config);
@@ -7809,86 +7809,86 @@ winpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    ਜੇ (create_vterm(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ) == FAIL)
+	ਜਾਓ failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ਜੇ (ਪਦ_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ਜੇ (ਪਦ->tl_palette != ਨਿਰਾ)
+	    ਸੈੱਟ_vterm_palette(ਪਦ->tl_vterm, ਪਦ->tl_palette);
+	ਨਹੀਂਤਾਂ
+	    init_vterm_ansi_colors(ਪਦ->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_ਸੈੱਟ_ਕੰਮ(channel, ਕੰਮ, opt);
+    ਕੰਮ_ਸੈੱਟ_options(ਕੰਮ, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info.hProcess = child_process_handle;
-    job->jv_proc_info.dwProcessId = GetProcessId(child_process_handle);
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_in = utf16_to_enc(
-	    (short_u *)winpty_conin_name(term->tl_winpty), NULL);
-    job->jv_tty_out = utf16_to_enc(
-	    (short_u *)winpty_conout_name(term->tl_winpty), NULL);
-    job->jv_tty_type = vim_strsave((char_u *)"winpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    ਕੰਮ->jv_channel = channel;
+    ਕੰਮ->jv_proc_info.hProcess = ਬੱਚਾ_process_handle;
+    ਕੰਮ->jv_proc_info.dwProcessId = GetProcessId(ਬੱਚਾ_process_handle);
+    ਕੰਮ->jv_ਕੰਮ_object = jo;
+    ਕੰਮ->jv_ਸਥਿਤੀ = ਕੰਮ_STARTED;
+    ਕੰਮ->jv_tty_ਵਿੱਚ = utf16_ਮੰਜ਼ਿਲ_enc(
+	    (short_u *)winpty_conin_name(ਪਦ->tl_winpty), ਨਿਰਾ);
+    ਕੰਮ->jv_tty_ਬਾਹਰਲਾ = utf16_ਮੰਜ਼ਿਲ_enc(
+	    (short_u *)winpty_conout_name(ਪਦ->tl_winpty), ਨਿਰਾ);
+    ਕੰਮ->jv_tty_type = vim_strsave((char_u *)"winpty");
+    ++ਕੰਮ->jv_refcount;
+    ਪਦ->tl_ਕੰਮ = ਕੰਮ;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    ਜੇ (orig_opt->jo_io[PART_ਬਾਹਰਲਾ] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_ਬਾਹਰਲਾ];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	ਪਦ->tl_ਬਾਹਰਲਾ_fd = mch_fopen((ਅੱਖਰ *)fname, WRITEBIN);
+	ਜੇ (ਪਦ->tl_ਬਾਹਰਲਾ_fd == ਨਿਰਾ)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 
 failed:
     ga_clear(&ga_cmd);
     ga_clear(&ga_env);
     vim_free(cmd_wchar);
     vim_free(cwd_wchar);
-    if (spawn_config != NULL)
+    ਜੇ (spawn_config != ਨਿਰਾ)
 	winpty_spawn_config_free(spawn_config);
-    if (channel != NULL)
+    ਜੇ (channel != ਨਿਰਾ)
 	channel_clear(channel);
-    if (job != NULL)
+    ਜੇ (ਕੰਮ != ਨਿਰਾ)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	ਕੰਮ->jv_channel = ਨਿਰਾ;
+	ਕੰਮ_cleanup(ਕੰਮ);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    ਪਦ->tl_ਕੰਮ = ਨਿਰਾ;
+    ਜੇ (jo != ਨਿਰਾ)
 	CloseHandle(jo);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (winpty_err != NULL)
+    ਜੇ (ਪਦ->tl_winpty != ਨਿਰਾ)
+	winpty_free(ਪਦ->tl_winpty);
+    ਪਦ->tl_winpty = ਨਿਰਾ;
+    ਜੇ (ਪਦ->tl_winpty_config != ਨਿਰਾ)
+	winpty_config_free(ਪਦ->tl_winpty_config);
+    ਪਦ->tl_winpty_config = ਨਿਰਾ;
+    ਜੇ (winpty_err != ਨਿਰਾ)
     {
-	char *msg = (char *)utf16_to_enc(
-				(short_u *)winpty_error_msg(winpty_err), NULL);
+	ਅੱਖਰ *ਸੁਨੇਹਾ = (ਅੱਖਰ *)utf16_ਮੰਜ਼ਿਲ_enc(
+				(short_u *)winpty_error_ਸੁਨੇਹਾ(winpty_err), ਨਿਰਾ);
 
-	if (msg != NULL)
+	ਜੇ (ਸੁਨੇਹਾ != ਨਿਰਾ)
 	{
-	    emsg(msg);
-	    vim_free(msg);
+	    emsg(ਸੁਨੇਹਾ);
+	    vim_free(ਸੁਨੇਹਾ);
 	}
 	winpty_error_free(winpty_err);
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
@@ -7896,164 +7896,164 @@ failed:
  * Store a reference in "term".
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_and_ਕੰਮ_init(
+	ਪਦ_T	    *ਪਦ,
 	typval_T    *argvar,
-	char	    **argv,
+	ਅੱਖਰ	    **argv,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    int		    use_winpty = FALSE;
-    int		    use_conpty = FALSE;
-    int		    tty_type = *p_twt;
+    ਪੂਰਨ		    use_winpty = FALSE;
+    ਪੂਰਨ		    use_conpty = FALSE;
+    ਪੂਰਨ		    tty_type = *p_twt;
 
     has_winpty = dyn_winpty_init(FALSE) != FAIL ? TRUE : FALSE;
     has_conpty = dyn_conpty_init(FALSE) != FAIL ? TRUE : FALSE;
 
-    if (!has_winpty && !has_conpty)
+    ਜੇ (!has_winpty && !has_conpty)
 	// If neither is available give the errors for winpty, since when
 	// conpty is not available it can't be installed either.
-	return dyn_winpty_init(TRUE);
+	ਵਾਪਸ dyn_winpty_init(TRUE);
 
-    if (opt->jo_tty_type != NUL)
+    ਜੇ (opt->jo_tty_type != NUL)
 	tty_type = opt->jo_tty_type;
 
-    if (tty_type == NUL)
+    ਜੇ (tty_type == NUL)
     {
-	if (has_conpty && (is_conpty_stable() || !has_winpty))
+	ਜੇ (has_conpty && (is_conpty_stable() || !has_winpty))
 	    use_conpty = TRUE;
-	else if (has_winpty)
+	ਨਹੀਂਤਾਂ ਜੇ (has_winpty)
 	    use_winpty = TRUE;
 	// else: error
     }
-    else if (tty_type == 'w')	// winpty
+    ਨਹੀਂਤਾਂ ਜੇ (tty_type == 'w')	// winpty
     {
-	if (has_winpty)
+	ਜੇ (has_winpty)
 	    use_winpty = TRUE;
     }
-    else if (tty_type == 'c')	// conpty
+    ਨਹੀਂਤਾਂ ਜੇ (tty_type == 'c')	// conpty
     {
-	if (has_conpty)
+	ਜੇ (has_conpty)
 	    use_conpty = TRUE;
-	else
-	    return dyn_conpty_init(TRUE);
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ dyn_conpty_init(TRUE);
     }
 
-    if (use_conpty)
-	return conpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    ਜੇ (use_conpty)
+	ਵਾਪਸ conpty_ਪਦ_and_ਕੰਮ_init(ਪਦ, argvar, argv, opt, orig_opt);
 
-    if (use_winpty)
-	return winpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    ਜੇ (use_winpty)
+	ਵਾਪਸ winpty_ਪਦ_and_ਕੰਮ_init(ਪਦ, argvar, argv, opt, orig_opt);
 
     // error
-    return dyn_winpty_init(TRUE);
+    ਵਾਪਸ dyn_winpty_init(TRUE);
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *options)
+    ਸਥਿਰ ਪੂਰਨ
+create_pty_only(ਪਦ_T *ਪਦ, jobopt_T *options)
 {
-    HANDLE	    hPipeIn = INVALID_HANDLE_VALUE;
-    HANDLE	    hPipeOut = INVALID_HANDLE_VALUE;
-    char	    in_name[80], out_name[80];
-    channel_T	    *channel = NULL;
+    HANDLE	    h_Pipe_ਵਿੱਚ = INVALID_HANDLE_ਮੁੱਲ;
+    HANDLE	    h_Pipe_ਬਾਹਰਲਾ = INVALID_HANDLE_ਮੁੱਲ;
+    ਅੱਖਰ	    ਵਿੱਚ_name[80], ਬਾਹਰਲਾ_name[80];
+    channel_T	    *channel = ਨਿਰਾ;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ਜੇ (create_vterm(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    vim_snprintf(in_name, sizeof(in_name), "\\\\.\\pipe\\vim-%d-in-%d",
+    vim_snprintf(ਵਿੱਚ_name, ਆਕਾਰ(ਵਿੱਚ_name), "\\\\.\\pipe\\vim-%d-in-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeIn = CreateNamedPipe(in_name, PIPE_ACCESS_OUTBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_ਵਿੱਚ = CreateNamedPipe(ਵਿੱਚ_name, PIPE_ACCESS_OUTBOUND,
+	    PIPE_TYPE_ਸੁਨੇਹਾ | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, NMPWAIT_NOWAIT, NULL);
-    if (hPipeIn == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, NMPWAIT_NOWAIT, ਨਿਰਾ);
+    ਜੇ (h_Pipe_ਵਿੱਚ == INVALID_HANDLE_ਮੁੱਲ)
+	ਜਾਓ failed;
 
-    vim_snprintf(out_name, sizeof(out_name), "\\\\.\\pipe\\vim-%d-out-%d",
+    vim_snprintf(ਬਾਹਰਲਾ_name, ਆਕਾਰ(ਬਾਹਰਲਾ_name), "\\\\.\\pipe\\vim-%d-out-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeOut = CreateNamedPipe(out_name, PIPE_ACCESS_INBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_ਬਾਹਰਲਾ = CreateNamedPipe(ਬਾਹਰਲਾ_name, PIPE_ACCESS_INBOUND,
+	    PIPE_TYPE_ਸੁਨੇਹਾ | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, 0, NULL);
-    if (hPipeOut == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, 0, ਨਿਰਾ);
+    ਜੇ (h_Pipe_ਬਾਹਰਲਾ == INVALID_HANDLE_ਮੁੱਲ)
+	ਜਾਓ failed;
 
-    ConnectNamedPipe(hPipeIn, NULL);
-    ConnectNamedPipe(hPipeOut, NULL);
+    ConnectNamedPipe(h_Pipe_ਵਿੱਚ, ਨਿਰਾ);
+    ConnectNamedPipe(h_Pipe_ਬਾਹਰਲਾ, ਨਿਰਾ);
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	goto failed;
-    ++term->tl_job->jv_refcount;
+    ਪਦ->tl_ਕੰਮ = ਕੰਮ_alloc();
+    ਜੇ (ਪਦ->tl_ਕੰਮ == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ++ਪਦ->tl_ਕੰਮ->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ = ਕੰਮ_ਮੁਕੰਮਲ;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
-    term->tl_job->jv_channel = channel;
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
+	ਜਾਓ failed;
+    ਪਦ->tl_ਕੰਮ->jv_channel = channel;
     channel->ch_keep_open = TRUE;
     channel->ch_named_pipe = TRUE;
 
-    channel_set_pipes(channel,
-	(sock_T)hPipeIn,
-	(sock_T)hPipeOut,
-	(sock_T)hPipeOut);
-    channel_set_job(channel, term->tl_job, options);
-    term->tl_job->jv_tty_in = vim_strsave((char_u*)in_name);
-    term->tl_job->jv_tty_out = vim_strsave((char_u*)out_name);
+    channel_ਸੈੱਟ_pipes(channel,
+	(sock_T)h_Pipe_ਵਿੱਚ,
+	(sock_T)h_Pipe_ਬਾਹਰਲਾ,
+	(sock_T)h_Pipe_ਬਾਹਰਲਾ);
+    channel_ਸੈੱਟ_ਕੰਮ(channel, ਪਦ->tl_ਕੰਮ, options);
+    ਪਦ->tl_ਕੰਮ->jv_tty_ਵਿੱਚ = vim_strsave((char_u*)ਵਿੱਚ_name);
+    ਪਦ->tl_ਕੰਮ->jv_tty_ਬਾਹਰਲਾ = vim_strsave((char_u*)ਬਾਹਰਲਾ_name);
 
-    return OK;
+    ਵਾਪਸ OK;
 
 failed:
-    if (hPipeIn != NULL)
-	CloseHandle(hPipeIn);
-    if (hPipeOut != NULL)
-	CloseHandle(hPipeOut);
-    return FAIL;
+    ਜੇ (h_Pipe_ਵਿੱਚ != ਨਿਰਾ)
+	CloseHandle(h_Pipe_ਵਿੱਚ);
+    ਜੇ (h_Pipe_ਬਾਹਰਲਾ != ਨਿਰਾ)
+	CloseHandle(h_Pipe_ਬਾਹਰਲਾ);
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_free_vterm(ਪਦ_T *ਪਦ)
 {
-    term_free_conpty(term);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    ਪਦ_free_conpty(ਪਦ);
+    ਜੇ (ਪਦ->tl_winpty != ਨਿਰਾ)
+	winpty_free(ਪਦ->tl_winpty);
+    ਪਦ->tl_winpty = ਨਿਰਾ;
+    ਜੇ (ਪਦ->tl_winpty_config != ਨਿਰਾ)
+	winpty_config_free(ਪਦ->tl_winpty_config);
+    ਪਦ->tl_winpty_config = ਨਿਰਾ;
+    ਜੇ (ਪਦ->tl_vterm != ਨਿਰਾ)
+	vterm_free(ਪਦ->tl_vterm);
+    ਪਦ->tl_vterm = ਨਿਰਾ;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_report_winsize(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
-    if (term->tl_conpty)
-	conpty_term_report_winsize(term, rows, cols);
-    if (term->tl_winpty)
-	winpty_set_size(term->tl_winpty, cols, rows, NULL);
+    ਜੇ (ਪਦ->tl_conpty)
+	conpty_ਪਦ_report_winsize(ਪਦ, ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ);
+    ਜੇ (ਪਦ->tl_winpty)
+	winpty_ਸੈੱਟ_ਮਾਪ(ਪਦ->tl_winpty, ਖਾਨੇ_ਗਿਣਤੀ, ਪੰਕਤੀਆਂ_2, ਨਿਰਾ);
 }
 
-    int
-terminal_enabled(void)
+    ਪੂਰਨ
+terminal_enabled(ਖਾਲੀ)
 {
-    return dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
+    ਵਾਪਸ dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
 }
 
-#else
+#ਨਹੀਂਤਾਂ
 
 ///////////////////////////////////////
 // 3. Unix-like implementation.
@@ -8065,90 +8065,90 @@ terminal_enabled(void)
  * When "argv" is not NULL then "argvar" is not used.
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    ਸਥਿਰ ਪੂਰਨ
+ਪਦ_and_ਕੰਮ_init(
+	ਪਦ_T	    *ਪਦ,
 	typval_T    *argvar,
-	char	    **argv,
+	ਅੱਖਰ	    **argv,
 	jobopt_T    *opt,
-	jobopt_T    *orig_opt UNUSED)
+	jobopt_T    *orig_opt ਅਣਵਰਤਿਆ)
 {
-    term->tl_arg0_cmd = NULL;
+    ਪਦ->tl_arg0_cmd = ਨਿਰਾ;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ਜੇ (create_vterm(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ) == FAIL)
+	ਵਾਪਸ FAIL;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# ਜੇ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ਜੇ (ਪਦ_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	ਜੇ (ਪਦ->tl_palette != ਨਿਰਾ)
+	    ਸੈੱਟ_vterm_palette(ਪਦ->tl_vterm, ਪਦ->tl_palette);
+	ਨਹੀਂਤਾਂ
+	    init_vterm_ansi_colors(ਪਦ->tl_vterm);
     }
 # endif
 
     // This may change a string in "argvar".
-    term->tl_job = job_start(argvar, argv, opt, &term->tl_job);
-    if (term->tl_job != NULL)
-	++term->tl_job->jv_refcount;
+    ਪਦ->tl_ਕੰਮ = ਕੰਮ_ਸ਼ੁਰੂ(argvar, argv, opt, &ਪਦ->tl_ਕੰਮ);
+    ਜੇ (ਪਦ->tl_ਕੰਮ != ਨਿਰਾ)
+	++ਪਦ->tl_ਕੰਮ->jv_refcount;
 
-    return term->tl_job != NULL
-	&& term->tl_job->jv_channel != NULL
-	&& term->tl_job->jv_status != JOB_FAILED ? OK : FAIL;
+    ਵਾਪਸ ਪਦ->tl_ਕੰਮ != ਨਿਰਾ
+	&& ਪਦ->tl_ਕੰਮ->jv_channel != ਨਿਰਾ
+	&& ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ != ਕੰਮ_FAILED ? OK : FAIL;
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *opt)
+    ਸਥਿਰ ਪੂਰਨ
+create_pty_only(ਪਦ_T *ਪਦ, jobopt_T *opt)
 {
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    ਜੇ (create_vterm(ਪਦ, ਪਦ->tl_ਪੰਕਤੀਆਂ, ਪਦ->tl_ਖਾਨੇ_ਗਿਣਤੀ) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	return FAIL;
-    ++term->tl_job->jv_refcount;
+    ਪਦ->tl_ਕੰਮ = ਕੰਮ_alloc();
+    ਜੇ (ਪਦ->tl_ਕੰਮ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ++ਪਦ->tl_ਕੰਮ->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    ਪਦ->tl_ਕੰਮ->jv_ਸਥਿਤੀ = ਕੰਮ_ਮੁਕੰਮਲ;
 
-    return mch_create_pty_channel(term->tl_job, opt);
+    ਵਾਪਸ mch_create_pty_channel(ਪਦ->tl_ਕੰਮ, opt);
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_free_vterm(ਪਦ_T *ਪਦ)
 {
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    ਜੇ (ਪਦ->tl_vterm != ਨਿਰਾ)
+	vterm_free(ਪਦ->tl_vterm);
+    ਪਦ->tl_vterm = ਨਿਰਾ;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    ਸਥਿਰ ਖਾਲੀ
+ਪਦ_report_winsize(ਪਦ_T *ਪਦ, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
     // Use an ioctl() to report the new window size to the job.
-    if (term->tl_job == NULL || term->tl_job->jv_channel == NULL)
-	return;
+    ਜੇ (ਪਦ->tl_ਕੰਮ == ਨਿਰਾ || ਪਦ->tl_ਕੰਮ->jv_channel == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    int fd = -1;
-    int part;
+    ਪੂਰਨ fd = -1;
+    ਪੂਰਨ part;
 
-    for (part = PART_OUT; part < PART_COUNT; ++part)
+    ਲਈ (part = PART_ਬਾਹਰਲਾ; part < PART_ਗਿਣਤੀ; ++part)
     {
-	fd = term->tl_job->jv_channel->ch_part[part].ch_fd;
-	if (mch_isatty(fd))
-	    break;
+	fd = ਪਦ->tl_ਕੰਮ->jv_channel->ch_part[part].ch_fd;
+	ਜੇ (mch_isatty(fd))
+	    ਰੋਕੋ;
     }
-    if (part < PART_COUNT && mch_report_winsize(fd, rows, cols) == OK)
-	mch_signal_job(term->tl_job, (char_u *)"winch");
+    ਜੇ (part < PART_ਗਿਣਤੀ && mch_report_winsize(fd, ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ) == OK)
+	mch_signal_ਕੰਮ(ਪਦ->tl_ਕੰਮ, (char_u *)"winch");
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-#endif // FEAT_TERMINAL
+#ਜੇ_ਅੰਤ // FEAT_TERMINAL

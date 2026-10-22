@@ -11,110 +11,110 @@
  * usercmd.c: User defined command support
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-typedef struct ucmd
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ ucmd
 {
     char_u	*uc_name;	// The command name
     size_t	uc_namelen;	// The length of the command name (excluding the NUL)
     long_u	uc_argt;	// The argument type
     char_u	*uc_rep;	// The command's replacement string
-    long	uc_def;		// The default value for a range/count
-    int		uc_compl;	// completion type
+    ਲੰਮਾ	uc_def;		// The default value for a range/count
+    ਪੂਰਨ		uc_compl;	// completion type
     cmd_addr_T	uc_addr_type;	// The command's address type
     sctx_T	uc_script_ctx;	// SCTX where the command was defined
-    int		uc_flags;	// some UC_ flags
-    int		uc_compl_opt;	// completion options (UCC_ flags)
-#ifdef FEAT_EVAL
+    ਪੂਰਨ		uc_flags;	// some UC_ flags
+    ਪੂਰਨ		uc_compl_opt;	// completion options (UCC_ flags)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     char_u	*uc_compl_arg;	// completion argument if any
-#endif
+#ਜੇ_ਅੰਤ
 } ucmd_T;
 
 // List of all user commands.
-static garray_T ucmds = {0, 0, sizeof(ucmd_T), 4, NULL};
+ਸਥਿਰ garray_T ucmds = {0, 0, ਆਕਾਰ(ucmd_T), 4, ਨਿਰਾ};
 
 // When non-zero it is not allowed to add or remove user commands
-static int ucmd_locked = 0;
+ਸਥਿਰ ਪੂਰਨ ucmd_locked = 0;
 
-#define USER_CMD(i) (&((ucmd_T *)(ucmds.ga_data))[i])
-#define USER_CMD_GA(gap, i) (&((ucmd_T *)((gap)->ga_data))[i])
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USER_CMD(i) (&((ucmd_T *)(ucmds.ga_ਅੰਕੜੇ))[i])
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USER_CMD_GA(gap, i) (&((ucmd_T *)((gap)->ga_ਅੰਕੜੇ))[i])
 
 /*
  * List of names for completion for ":command" with the EXPAND_ flag.
  * Must be alphabetical on the 'value' field for completion and because
  * it is used by bsearch()!
  */
-static keyvalue_T command_complete_tab[] =
+ਸਥਿਰ keyvalue_T command_complete_tab[] =
 {
-    KEYVALUE_ENTRY(EXPAND_ARGLIST, "arglist"),
-    KEYVALUE_ENTRY(EXPAND_AUGROUP, "augroup"),
-    KEYVALUE_ENTRY(EXPAND_BEHAVE, "behave"),
-#if defined(FEAT_EVAL)
-    KEYVALUE_ENTRY(EXPAND_BREAKPOINT, "breakpoint"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_BUFFERS, "buffer"),
-    KEYVALUE_ENTRY(EXPAND_COLORS, "color"),
-    KEYVALUE_ENTRY(EXPAND_COMMANDS, "command"),
-    KEYVALUE_ENTRY(EXPAND_COMPILER, "compiler"),
-#if defined(FEAT_CSCOPE)
-    KEYVALUE_ENTRY(EXPAND_CSCOPE, "cscope"),
-#endif
-#if defined(FEAT_EVAL)
-    KEYVALUE_ENTRY(EXPAND_USER_DEFINED, "custom"),
-    KEYVALUE_ENTRY(EXPAND_USER_LIST, "customlist"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_DIFF_BUFFERS, "diff_buffer"),
-    KEYVALUE_ENTRY(EXPAND_DIRECTORIES, "dir"),
-    KEYVALUE_ENTRY(EXPAND_DIRS_IN_CDPATH, "dir_in_path"),
-    KEYVALUE_ENTRY(EXPAND_ENV_VARS, "environment"),
-    KEYVALUE_ENTRY(EXPAND_EVENTS, "event"),
-    KEYVALUE_ENTRY(EXPAND_EXPRESSION, "expression"),
-    KEYVALUE_ENTRY(EXPAND_FILES, "file"),
-    KEYVALUE_ENTRY(EXPAND_FILES_IN_PATH, "file_in_path"),
-    KEYVALUE_ENTRY(EXPAND_FILETYPE, "filetype"),
-    KEYVALUE_ENTRY(EXPAND_FILETYPECMD, "filetypecmd"),
-    KEYVALUE_ENTRY(EXPAND_FUNCTIONS, "function"),
-    KEYVALUE_ENTRY(EXPAND_HELP, "help"),
-    KEYVALUE_ENTRY(EXPAND_HIGHLIGHT, "highlight"),
-    KEYVALUE_ENTRY(EXPAND_HISTORY, "history"),
-#if defined(FEAT_KEYMAP)
-    KEYVALUE_ENTRY(EXPAND_KEYMAP, "keymap"),
-#endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    KEYVALUE_ENTRY(EXPAND_LOCALES, "locale"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_MAPCLEAR, "mapclear"),
-    KEYVALUE_ENTRY(EXPAND_MAPPINGS, "mapping"),
-    KEYVALUE_ENTRY(EXPAND_MENUS, "menu"),
-    KEYVALUE_ENTRY(EXPAND_MESSAGES, "messages"),
-    KEYVALUE_ENTRY(EXPAND_SETTINGS, "option"),
-    KEYVALUE_ENTRY(EXPAND_PACKADD, "packadd"),
-    KEYVALUE_ENTRY(EXPAND_RETAB, "retab"),
-    KEYVALUE_ENTRY(EXPAND_RUNTIME, "runtime"),
-#if defined(FEAT_EVAL)
-    KEYVALUE_ENTRY(EXPAND_SCRIPTNAMES, "scriptnames"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_SHELLCMD, "shellcmd"),
-    KEYVALUE_ENTRY(EXPAND_SHELLCMDLINE, "shellcmdline"),
-#if defined(FEAT_SIGNS)
-    KEYVALUE_ENTRY(EXPAND_SIGN, "sign"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_OWNSYNTAX, "syntax"),
-#if defined(FEAT_PROFILE)
-    KEYVALUE_ENTRY(EXPAND_SYNTIME, "syntime"),
-#endif
-    KEYVALUE_ENTRY(EXPAND_TAGS, "tag"),
-    KEYVALUE_ENTRY(EXPAND_TAGS_LISTFILES, "tag_listfiles"),
-    KEYVALUE_ENTRY(EXPAND_USER, "user"),
-    KEYVALUE_ENTRY(EXPAND_USER_VARS, "var")
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_ARGLIST, "arglist"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_AUGROUP, "augroup"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_BEHAVE, "behave"),
+#ਜੇ defined(FEAT_EVAL)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_BREAKPOINT, "breakpoint"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_BUFFERS, "buffer"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_COLORS, "color"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_COMMANDS, "command"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_COMPILER, "compiler"),
+#ਜੇ defined(FEAT_CSCOPE)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_CSCOPE, "cscope"),
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_EVAL)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_USER_DEFINED, "custom"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_USER_LIST, "customlist"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_DIFF_BUFFERS, "diff_buffer"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_DIRECTORIES, "dir"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_DIRS_ਵਿੱਚ_CDPATH, "dir_in_path"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_ENV_VARS, "environment"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_EVENTS, "event"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_ਵਿਅੰਜਕ, "expression"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_FILES, "file"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_FILES_ਵਿੱਚ_ਰਸਤਾ, "file_in_path"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_FILETYPE, "filetype"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_FILETYPECMD, "filetypecmd"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_FUNCTIONS, "function"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_HELP, "help"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_HIGHLIGHT, "highlight"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_HISTORY, "history"),
+#ਜੇ defined(FEAT_KEYMAP)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_KEYMAP, "keymap"),
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_LOCALES, "locale"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_MAPCLEAR, "mapclear"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_MAPPINGS, "mapping"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_MENUS, "menu"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_MESSAGES, "messages"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SETTINGS, "option"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_PACKADD, "packadd"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_RETAB, "retab"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_RUNTIME, "runtime"),
+#ਜੇ defined(FEAT_EVAL)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SCRIPTNAMES, "scriptnames"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SHELLCMD, "shellcmd"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SHELLCMDLINE, "shellcmdline"),
+#ਜੇ defined(FEAT_SIGNS)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SIGN, "sign"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_OWNSYNTAX, "syntax"),
+#ਜੇ defined(FEAT_PROFILE)
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_SYNTIME, "syntime"),
+#ਜੇ_ਅੰਤ
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_ਟੈਗ_ਸੂਚੀ, "tag"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_ਟੈਗ_ਸੂਚੀ_LISTFILES, "tag_listfiles"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_USER, "user"),
+    KEYVALUE_ਇੰਦਰਾਜ(EXPAND_USER_VARS, "var")
 };
 
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    cmd_addr_T key;
-    char *fullname;
+    cmd_addr_T ਕੁੰਜੀ;
+    ਅੱਖਰ *fullname;
     size_t fullnamelen;
-    char *shortname;
+    ਅੱਖਰ *shortname;
     size_t shortnamelen;
 } addrtype_T;
 
@@ -122,21 +122,21 @@ typedef struct
  * List of names of address types.  Must be alphabetical for completion.
  * Must be sorted by the 'fullname' field because it is used by bsearch()!
  */
-#define ADDRTYPE_ENTRY(k, fn, sn) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ADDRTYPE_ਇੰਦਰਾਜ(k, fn, sn) \
 	{(k), (fn), STRLEN_LITERAL(fn), (sn), STRLEN_LITERAL(sn)}
-static addrtype_T addr_type_complete_tab[] =
+ਸਥਿਰ addrtype_T addr_type_complete_tab[] =
 {
-    ADDRTYPE_ENTRY(ADDR_ARGUMENTS, "arguments", "arg"),
-    ADDRTYPE_ENTRY(ADDR_BUFFERS, "buffers", "buf"),
-    ADDRTYPE_ENTRY(ADDR_LINES, "lines", "line"),
-    ADDRTYPE_ENTRY(ADDR_LOADED_BUFFERS, "loaded_buffers", "load"),
-    ADDRTYPE_ENTRY(ADDR_OTHER, "other", "?"),
-    ADDRTYPE_ENTRY(ADDR_QUICKFIX, "quickfix", "qf"),
-    ADDRTYPE_ENTRY(ADDR_TABS, "tabs", "tab"),
-    ADDRTYPE_ENTRY(ADDR_WINDOWS, "windows", "win")
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_ARGUMENTS, "arguments", "arg"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_BUFFERS, "buffers", "buf"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_ਸਤਰਾਂ, "lines", "line"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_LOADED_BUFFERS, "loaded_buffers", "load"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_OTHER, "other", "?"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_QUICKFIX, "quickfix", "qf"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_TABS, "tabs", "tab"),
+    ADDRTYPE_ਇੰਦਰਾਜ(ADDR_WINDOWS, "windows", "win")
 };
 
-static int cmp_addr_type(const void *a, const void *b);
+ਸਥਿਰ ਪੂਰਨ cmp_addr_type(ਅਚਲ ਖਾਲੀ *a, ਅਚਲ ਖਾਲੀ *b);
 
 /*
  * Search for a user command that matches "eap->cmd".
@@ -145,289 +145,289 @@ static int cmp_addr_type(const void *a, const void *b);
  * Return NULL if there is no matching command.
  */
     char_u *
-find_ucmd(
+ਲੱਭੋ_ucmd(
     exarg_T	*eap,
     char_u	*p,	 // end of the command (possibly including count)
-    int		*full,	 // set to TRUE for a full match
+    ਪੂਰਨ		*ਭਰਿਆ,	 // set to TRUE for a full match
     expand_T	*xp,	 // used for completion, NULL otherwise
-    int		*complp) // completion flags or NULL
+    ਪੂਰਨ		*complp) // completion flags or NULL
 {
-    int		len = (int)(p - eap->cmd);
-    int		j, k, matchlen = 0;
+    ਪੂਰਨ		len = (ਪੂਰਨ)(p - eap->cmd);
+    ਪੂਰਨ		j, k, matchlen = 0;
     ucmd_T	*uc;
-    int		found = FALSE;
-    int		possible = FALSE;
+    ਪੂਰਨ		ਮਿਲਿਆ = FALSE;
+    ਪੂਰਨ		possible = FALSE;
     char_u	*cp, *np;	    // Point into typed cmd and test name
     garray_T	*gap;
-    int		amb_local = FALSE;  // Found ambiguous buffer-local command,
+    ਪੂਰਨ		amb_local = FALSE;  // Found ambiguous buffer-local command,
 				    // only full match global is accepted.
 
     /*
      * Look for buffer-local user commands first, then global ones.
      */
-    gap = &prevwin_curwin()->w_buffer->b_ucmds;
-    for (;;)
+    gap = &prevwin_curwin()->w_ਬਫਰ->b_ucmds;
+    ਲਈ (;;)
     {
-	for (j = 0; j < gap->ga_len; ++j)
+	ਲਈ (j = 0; j < gap->ga_len; ++j)
 	{
 	    uc = USER_CMD_GA(gap, j);
 	    cp = eap->cmd;
 	    np = uc->uc_name;
 	    k = 0;
-	    while (k < len && *np != NUL && *cp++ == *np++)
+	    ਜਦੋਂ (k < len && *np != NUL && *cp++ == *np++)
 		k++;
-	    if (k == len || (*np == NUL && vim_isdigit(eap->cmd[k])))
+	    ਜੇ (k == len || (*np == NUL && vim_isdigit(eap->cmd[k])))
 	    {
 		// If finding a second match, the command is ambiguous.  But
 		// not if a buffer-local command wasn't a full match and a
 		// global command is a full match.
-		if (k == len && found && *np != NUL)
+		ਜੇ (k == len && ਮਿਲਿਆ && *np != NUL)
 		{
-		    if (gap == &ucmds)
-			return NULL;
+		    ਜੇ (gap == &ucmds)
+			ਵਾਪਸ ਨਿਰਾ;
 		    amb_local = TRUE;
 		}
 
-		if (!found || (k == len && *np == NUL))
+		ਜੇ (!ਮਿਲਿਆ || (k == len && *np == NUL))
 		{
 		    // If we matched up to a digit, then there could
 		    // be another command including the digit that we
 		    // should use instead.
-		    if (k == len)
-			found = TRUE;
-		    else
+		    ਜੇ (k == len)
+			ਮਿਲਿਆ = TRUE;
+		    ਨਹੀਂਤਾਂ
 			possible = TRUE;
 
-		    if (gap == &ucmds)
+		    ਜੇ (gap == &ucmds)
 			eap->cmdidx = CMD_USER;
-		    else
+		    ਨਹੀਂਤਾਂ
 			eap->cmdidx = CMD_USER_BUF;
-		    eap->argt = (long)uc->uc_argt;
+		    eap->argt = (ਲੰਮਾ)uc->uc_argt;
 		    eap->useridx = j;
 		    eap->addr_type = uc->uc_addr_type;
 
-		    if (complp != NULL)
+		    ਜੇ (complp != ਨਿਰਾ)
 			*complp = uc->uc_compl;
-#ifdef FEAT_EVAL
-		    if (xp != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+		    ਜੇ (xp != ਨਿਰਾ)
 		    {
 			xp->xp_arg = uc->uc_compl_arg;
 			xp->xp_complete_opt = uc->uc_compl_opt;
 			xp->xp_script_ctx = uc->uc_script_ctx;
 			xp->xp_script_ctx.sc_lnum += SOURCING_LNUM;
 		    }
-#endif
+#ਜੇ_ਅੰਤ
 		    // Do not search for further abbreviations
 		    // if this is an exact match.
 		    matchlen = k;
-		    if (k == len && *np == NUL)
+		    ਜੇ (k == len && *np == NUL)
 		    {
-			if (full != NULL)
-			    *full = TRUE;
+			ਜੇ (ਭਰਿਆ != ਨਿਰਾ)
+			    *ਭਰਿਆ = TRUE;
 			amb_local = FALSE;
-			break;
+			ਰੋਕੋ;
 		    }
 		}
 	    }
 	}
 
 	// Stop if we found a full match or searched all.
-	if (j < gap->ga_len || gap == &ucmds)
-	    break;
+	ਜੇ (j < gap->ga_len || gap == &ucmds)
+	    ਰੋਕੋ;
 	gap = &ucmds;
     }
 
     // Only found ambiguous matches.
-    if (amb_local)
+    ਜੇ (amb_local)
     {
-	if (xp != NULL)
+	ਜੇ (xp != ਨਿਰਾ)
 	    xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // The match we found may be followed immediately by a number.  Move "p"
     // back to point to it.
-    if (found || possible)
-	return p + (matchlen - len);
-    return p;
+    ਜੇ (ਮਿਲਿਆ || possible)
+	ਵਾਪਸ p + (matchlen - len);
+    ਵਾਪਸ p;
 }
 
 /*
  * Set completion context for :command
  */
     char_u *
-set_context_in_user_cmd(expand_T *xp, char_u *arg_in)
+ਸੈੱਟ_context_ਵਿੱਚ_user_cmd(expand_T *xp, char_u *arg_ਵਿੱਚ)
 {
-    char_u	*arg = arg_in;
+    char_u	*arg = arg_ਵਿੱਚ;
     char_u	*p;
 
     // Check for attributes
-    while (*arg == '-')
+    ਜਦੋਂ (*arg == '-')
     {
 	arg++;	    // Skip "-"
 	p = skiptowhite(arg);
-	if (*p == NUL)
+	ਜੇ (*p == NUL)
 	{
 	    // Cursor is still in the attribute
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 	    {
 		// No "=", so complete attribute names
 		xp->xp_context = EXPAND_USER_CMD_FLAGS;
-		xp->xp_pattern = arg;
-		return NULL;
+		xp->xp_ਨਮੂਨਾ = arg;
+		ਵਾਪਸ ਨਿਰਾ;
 	    }
 
 	    // For the -complete, -nargs and -addr attributes, we complete
 	    // their arguments as well.
-	    if (STRNICMP(arg, "complete", p - arg) == 0)
+	    ਜੇ (STRNICMP(arg, "complete", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_COMPLETE;
-		xp->xp_pattern = p + 1;
+		xp->xp_ਨਮੂਨਾ = p + 1;
 	    }
-	    else if (STRNICMP(arg, "completeopt", p - arg) == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(arg, "completeopt", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_COMPLETEOPT;
 		// xp_pattern points to the last comma-separated item being
 		// typed so that completion replaces only that item.
-		xp->xp_pattern = p + 1;
-		for (char_u *c = p + 1; *c != NUL; ++c)
-		    if (*c == ',')
-			xp->xp_pattern = c + 1;
+		xp->xp_ਨਮੂਨਾ = p + 1;
+		ਲਈ (char_u *c = p + 1; *c != NUL; ++c)
+		    ਜੇ (*c == ',')
+			xp->xp_ਨਮੂਨਾ = c + 1;
 	    }
-	    else if (STRNICMP(arg, "nargs", p - arg) == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(arg, "nargs", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_NARGS;
-		xp->xp_pattern = p + 1;
+		xp->xp_ਨਮੂਨਾ = p + 1;
 	    }
-	    else if (STRNICMP(arg, "addr", p - arg) == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(arg, "addr", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_ADDR_TYPE;
-		xp->xp_pattern = p + 1;
+		xp->xp_ਨਮੂਨਾ = p + 1;
 	    }
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	arg = skipwhite(p);
     }
 
     // After the attributes comes the new command name
     p = skiptowhite(arg);
-    if (*p == NUL)
+    ਜੇ (*p == NUL)
     {
 	xp->xp_context = EXPAND_USER_COMMANDS;
-	xp->xp_pattern = arg;
-	return NULL;
+	xp->xp_ਨਮੂਨਾ = arg;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // And finally comes a normal command
-    return skipwhite(p);
+    ਵਾਪਸ skipwhite(p);
 }
 
 /*
  * Set the completion context for the argument of a user defined command.
  */
     char_u *
-set_context_in_user_cmdarg(
-	char_u		*cmd UNUSED,
+ਸੈੱਟ_context_ਵਿੱਚ_user_cmdarg(
+	char_u		*cmd ਅਣਵਰਤਿਆ,
 	char_u		*arg,
-	long		argt,
-	int		context,
+	ਲੰਮਾ		argt,
+	ਪੂਰਨ		context,
 	expand_T	*xp,
-	int		forceit)
+	ਪੂਰਨ		forceit)
 {
     char_u	*p;
 
-    if (context == EXPAND_NOTHING)
-	return NULL;
+    ਜੇ (context == EXPAND_NOTHING)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (argt & EX_XFILE)
+    ਜੇ (argt & EX_XFILE)
     {
 	// EX_XFILE: file names are handled before this call
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-#ifdef FEAT_MENU
-    if (context == EXPAND_MENUS)
-	return set_context_in_menu_cmd(xp, cmd, arg, forceit);
-#endif
-    if (context == EXPAND_COMMANDS)
-	return arg;
-    if (context == EXPAND_MAPPINGS)
-	return set_context_in_map_cmd(xp, (char_u *)"map", arg, forceit, FALSE,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
+    ਜੇ (context == EXPAND_MENUS)
+	ਵਾਪਸ ਸੈੱਟ_context_ਵਿੱਚ_menu_cmd(xp, cmd, arg, forceit);
+#ਜੇ_ਅੰਤ
+    ਜੇ (context == EXPAND_COMMANDS)
+	ਵਾਪਸ arg;
+    ਜੇ (context == EXPAND_MAPPINGS)
+	ਵਾਪਸ ਸੈੱਟ_context_ਵਿੱਚ_map_cmd(xp, (char_u *)"map", arg, forceit, FALSE,
 							FALSE, CMD_map);
     // Find start of last argument.
-    if (!(argt & EX_ARGSPACE))
+    ਜੇ (!(argt & EX_ARGSPACE))
     {
 	p = arg;
-	while (*p)
+	ਜਦੋਂ (*p)
 	{
-	    if (*p == ' ')
+	    ਜੇ (*p == ' ')
 		// argument starts after a space
 		arg = p + 1;
-	    else if (*p == '\\' && *(p + 1) != NUL)
+	    ਨਹੀਂਤਾਂ ਜੇ (*p == '\\' && *(p + 1) != NUL)
 		++p; // skip over escaped character
 	    MB_PTR_ADV(p);
 	}
     }
-    xp->xp_pattern = arg;
+    xp->xp_ਨਮੂਨਾ = arg;
     xp->xp_context = context;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
     char_u *
-expand_user_command_name(int idx)
+expand_user_command_name(ਪੂਰਨ idx)
 {
-    return get_user_commands(NULL, idx - (int)CMD_SIZE);
+    ਵਾਪਸ get_user_commands(ਨਿਰਾ, idx - (ਪੂਰਨ)CMD_ਮਾਪ);
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of user command names.
  */
     char_u *
-get_user_commands(expand_T *xp UNUSED, int idx)
+get_user_commands(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
     // In cmdwin, the alternative buffer should be used.
-    buf_T *buf = prevwin_curwin()->w_buffer;
+    buf_T *buf = prevwin_curwin()->w_ਬਫਰ;
 
-    if (idx < buf->b_ucmds.ga_len)
-	return USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
+    ਜੇ (idx < buf->b_ucmds.ga_len)
+	ਵਾਪਸ USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
 
     idx -= buf->b_ucmds.ga_len;
-    if (idx < ucmds.ga_len)
+    ਜੇ (idx < ucmds.ga_len)
     {
-	int	i;
+	ਪੂਰਨ	i;
 	char_u  *name = USER_CMD(idx)->uc_name;
 
-	for (i = 0; i < buf->b_ucmds.ga_len; ++i)
-	    if (STRCMP(name, USER_CMD_GA(&buf->b_ucmds, i)->uc_name) == 0)
+	ਲਈ (i = 0; i < buf->b_ucmds.ga_len; ++i)
+	    ਜੇ (STRCMP(name, USER_CMD_GA(&buf->b_ucmds, i)->uc_name) == 0)
 		// global command is overruled by buffer-local one
-		return (char_u *)"";
-	return name;
+		ਵਾਪਸ (char_u *)"";
+	ਵਾਪਸ name;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 /*
  * Get the name of user command "idx".  "cmdidx" can be CMD_USER or
  * CMD_USER_BUF.
  * Returns NULL if the command is not found.
  */
     char_u *
-get_user_command_name(int idx, int cmdidx)
+get_user_command_name(ਪੂਰਨ idx, ਪੂਰਨ cmdidx)
 {
-    if (cmdidx == CMD_USER && idx < ucmds.ga_len)
-	return USER_CMD(idx)->uc_name;
-    if (cmdidx == CMD_USER_BUF)
+    ਜੇ (cmdidx == CMD_USER && idx < ucmds.ga_len)
+	ਵਾਪਸ USER_CMD(idx)->uc_name;
+    ਜੇ (cmdidx == CMD_USER_BUF)
     {
 	// In cmdwin, the alternative buffer should be used.
-	buf_T *buf = prevwin_curwin()->w_buffer;
+	buf_T *buf = prevwin_curwin()->w_ਬਫਰ;
 
-	if (idx < buf->b_ucmds.ga_len)
-	    return USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
+	ਜੇ (idx < buf->b_ucmds.ga_len)
+	    ਵਾਪਸ USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -435,42 +435,42 @@ get_user_command_name(int idx, int cmdidx)
  * "cmdidx" is CMD_USER or CMD_USER_BUF.
  * Returns FAIL when the command is not found.
  */
-    int
-user_command_info(int idx, int cmdidx, dict_T *d)
+    ਪੂਰਨ
+user_command_info(ਪੂਰਨ idx, ਪੂਰਨ cmdidx, dict_T *d)
 {
     garray_T	*gap = cmdidx == CMD_USER_BUF
-				? &prevwin_curwin()->w_buffer->b_ucmds : &ucmds;
+				? &prevwin_curwin()->w_ਬਫਰ->b_ucmds : &ucmds;
     ucmd_T	*uc;
     char_u	*compl;
 
-    if (idx >= gap->ga_len)
-	return FAIL;
+    ਜੇ (idx >= gap->ga_len)
+	ਵਾਪਸ FAIL;
     uc = USER_CMD_GA(gap, idx);
-    dict_add_string(d, "name", uc->uc_name);
-    dict_add_string(d, "kind", (char_u *)"user");
-    dict_add_bool(d, "available", TRUE);
+    dict_ਜੋੜੋ_string(d, "name", uc->uc_name);
+    dict_ਜੋੜੋ_string(d, "kind", (char_u *)"user");
+    dict_ਜੋੜੋ_bool(d, "available", TRUE);
     ex_command_attrs(d, uc->uc_argt, uc->uc_addr_type, uc->uc_def);
-    dict_add_bool(d, "buffer", cmdidx == CMD_USER_BUF);
-    compl = cmdcomplete_type_to_str(uc->uc_compl, uc->uc_compl_arg);
-    dict_add_string(d, "complete", compl == NULL ? (char_u *)"" : compl);
+    dict_ਜੋੜੋ_bool(d, "buffer", cmdidx == CMD_USER_BUF);
+    compl = cmdcomplete_type_ਮੰਜ਼ਿਲ_str(uc->uc_compl, uc->uc_compl_arg);
+    dict_ਜੋੜੋ_string(d, "complete", compl == ਨਿਰਾ ? (char_u *)"" : compl);
     vim_free(compl);
-    dict_add_string(d, "definition", uc->uc_rep);
-    dict_add_number(d, "sid", uc->uc_script_ctx.sc_sid);
-    dict_add_number(d, "lnum", uc->uc_script_ctx.sc_lnum);
-    return OK;
+    dict_ਜੋੜੋ_string(d, "definition", uc->uc_rep);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "sid", uc->uc_script_ctx.sc_sid);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "lnum", uc->uc_script_ctx.sc_lnum);
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Function given to ExpandGeneric() to obtain the list of user address type
  * names.
  */
     char_u *
-get_user_cmd_addr_type(expand_T *xp UNUSED, int idx)
+get_user_cmd_addr_type(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(addr_type_complete_tab))
-	return NULL;
-    return (char_u *)addr_type_complete_tab[idx].fullname;
+    ਜੇ (idx < 0 || idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(addr_type_complete_tab))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ (char_u *)addr_type_complete_tab[idx].fullname;
 }
 
 /*
@@ -478,29 +478,29 @@ get_user_cmd_addr_type(expand_T *xp UNUSED, int idx)
  * attributes.
  */
     char_u *
-get_user_cmd_flags(expand_T *xp UNUSED, int idx)
+get_user_cmd_flags(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    static char *user_cmd_flags[] = {
+    ਸਥਿਰ ਅੱਖਰ *user_cmd_flags[] = {
 	"addr", "bang", "bar", "buffer", "complete",
 	"completeopt", "count", "nargs", "range", "register", "keepscript"
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_flags))
-	return NULL;
-    return (char_u *)user_cmd_flags[idx];
+    ਜੇ (idx < 0 || idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(user_cmd_flags))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ (char_u *)user_cmd_flags[idx];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of values for -nargs.
  */
     char_u *
-get_user_cmd_nargs(expand_T *xp UNUSED, int idx)
+get_user_cmd_nargs(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    static char *user_cmd_nargs[] = {"0", "1", "_", "*", "?", "+"};
+    ਸਥਿਰ ਅੱਖਰ *user_cmd_nargs[] = {"0", "1", "_", "*", "?", "+"};
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_nargs))
-	return NULL;
-    return (char_u *)user_cmd_nargs[idx];
+    ਜੇ (idx < 0 || idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(user_cmd_nargs))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ (char_u *)user_cmd_nargs[idx];
 }
 
 /*
@@ -508,18 +508,18 @@ get_user_cmd_nargs(expand_T *xp UNUSED, int idx)
  * -complete.
  */
     char_u *
-get_user_cmd_complete(expand_T *xp UNUSED, int idx)
+get_user_cmd_complete(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(command_complete_tab))
-	return NULL;
-    return command_complete_tab[idx].value.string;
+    ਜੇ (idx < 0 || idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(command_complete_tab))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ command_complete_tab[idx].ਮੁੱਲ.string;
 }
 
 /*
  * Names of options accepted by -completeopt= for :command.  Keep in sync with
  * parse_completeopt_arg() below.
  */
-static char *user_cmd_completeopt_tab[] = {
+ਸਥਿਰ ਅੱਖਰ *user_cmd_completeopt_tab[] = {
     "escape"
 };
 
@@ -528,175 +528,175 @@ static char *user_cmd_completeopt_tab[] = {
  * -completeopt.
  */
     char_u *
-get_user_cmd_completeopt(expand_T *xp UNUSED, int idx)
+get_user_cmd_completeopt(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_completeopt_tab))
-	return NULL;
-    return (char_u *)user_cmd_completeopt_tab[idx];
+    ਜੇ (idx < 0 || idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(user_cmd_completeopt_tab))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ (char_u *)user_cmd_completeopt_tab[idx];
 }
 
 /*
  * Return the row in the command_complete_tab table that contains the given key.
  */
-    static keyvalue_T *
-get_commandtype(int expand)
+    ਸਥਿਰ keyvalue_T *
+get_commandtype(ਪੂਰਨ expand)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(command_complete_tab); ++i)
-	if (command_complete_tab[i].key == expand)
-	    return &command_complete_tab[i];
+    ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(command_complete_tab); ++i)
+	ਜੇ (command_complete_tab[i].ਕੁੰਜੀ == expand)
+	    ਵਾਪਸ &command_complete_tab[i];
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 /*
  * Get the name of completion type "expand" as an allocated string.
  * "compl_arg" is the function name for "custom" and "customlist" types.
  * Returns NULL if no completion is available or on allocation failure.
  */
     char_u *
-cmdcomplete_type_to_str(int expand, char_u *compl_arg)
+cmdcomplete_type_ਮੰਜ਼ਿਲ_str(ਪੂਰਨ expand, char_u *compl_arg)
 {
     keyvalue_T *kv;
     char_u     *cmd_compl;
 
     kv = get_commandtype(expand);
-    if (kv == NULL || kv->value.string == NULL)
-	return NULL;
+    ਜੇ (kv == ਨਿਰਾ || kv->ਮੁੱਲ.string == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    cmd_compl = kv->value.string;
-    if (expand == EXPAND_USER_LIST || expand == EXPAND_USER_DEFINED)
+    cmd_compl = kv->ਮੁੱਲ.string;
+    ਜੇ (expand == EXPAND_USER_LIST || expand == EXPAND_USER_DEFINED)
     {
-	char_u	*buffer;
+	char_u	*ਬਫਰ;
 
-	buffer = alloc(STRLEN(cmd_compl) + STRLEN(compl_arg) + 2);
-	if (buffer == NULL)
-	    return NULL;
-	sprintf((char *)buffer, "%s,%s", cmd_compl, compl_arg);
-	return buffer;
+	ਬਫਰ = alloc(STRLEN(cmd_compl) + STRLEN(compl_arg) + 2);
+	ਜੇ (ਬਫਰ == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
+	sprintf((ਅੱਖਰ *)ਬਫਰ, "%s,%s", cmd_compl, compl_arg);
+	ਵਾਪਸ ਬਫਰ;
     }
 
-    return vim_strsave(cmd_compl);
+    ਵਾਪਸ vim_strsave(cmd_compl);
 }
 
 /*
  * Get the index of completion type "complete_str".
  * Returns EXPAND_NOTHING if no match found.
  */
-    int
-cmdcomplete_str_to_type(char_u *complete_str)
+    ਪੂਰਨ
+cmdcomplete_str_ਮੰਜ਼ਿਲ_type(char_u *complete_str)
 {
-    keyvalue_T target;
-    keyvalue_T *entry;
-    static keyvalue_T *last_entry = NULL;	// cached result
+    keyvalue_T ਨਿਸ਼ਾਨਾ;
+    keyvalue_T *ਇੰਦਰਾਜ;
+    ਸਥਿਰ keyvalue_T *ਆਖਰੀ_ਇੰਦਰਾਜ = ਨਿਰਾ;	// cached result
 
-    if (STRNCMP(complete_str, "custom,", 7) == 0)
-	return EXPAND_USER_DEFINED;
-    if (STRNCMP(complete_str, "customlist,", 11) == 0)
-	return EXPAND_USER_LIST;
+    ਜੇ (STRNCMP(complete_str, "custom,", 7) == 0)
+	ਵਾਪਸ EXPAND_USER_DEFINED;
+    ਜੇ (STRNCMP(complete_str, "customlist,", 11) == 0)
+	ਵਾਪਸ EXPAND_USER_LIST;
 
-    target.key = 0;
-    target.value.string = complete_str;
-    target.value.length = 0;			// not used, see cmp_keyvalue_value()
+    ਨਿਸ਼ਾਨਾ.ਕੁੰਜੀ = 0;
+    ਨਿਸ਼ਾਨਾ.ਮੁੱਲ.string = complete_str;
+    ਨਿਸ਼ਾਨਾ.ਮੁੱਲ.ਲੰਮਾਈ = 0;			// not used, see cmp_keyvalue_value()
 
-    if (last_entry != NULL && cmp_keyvalue_value(&target, last_entry) == 0)
-	entry = last_entry;
-    else
+    ਜੇ (ਆਖਰੀ_ਇੰਦਰਾਜ != ਨਿਰਾ && cmp_keyvalue_ਮੁੱਲ(&ਨਿਸ਼ਾਨਾ, ਆਖਰੀ_ਇੰਦਰਾਜ) == 0)
+	ਇੰਦਰਾਜ = ਆਖਰੀ_ਇੰਦਰਾਜ;
+    ਨਹੀਂਤਾਂ
     {
-	entry = (keyvalue_T *)bsearch(&target,
+	ਇੰਦਰਾਜ = (keyvalue_T *)bsearch(&ਨਿਸ਼ਾਨਾ,
 	    &command_complete_tab,
-	    ARRAY_LENGTH(command_complete_tab),
-	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value);
-	if (entry == NULL)
-	    return EXPAND_NOTHING;
+	    ARRAY_ਲੰਮਾਈ(command_complete_tab),
+	    ਆਕਾਰ(command_complete_tab[0]),
+	    cmp_keyvalue_ਮੁੱਲ);
+	ਜੇ (ਇੰਦਰਾਜ == ਨਿਰਾ)
+	    ਵਾਪਸ EXPAND_NOTHING;
 
-	last_entry = entry;
+	ਆਖਰੀ_ਇੰਦਰਾਜ = ਇੰਦਰਾਜ;
     }
 
-    return entry->key;
+    ਵਾਪਸ ਇੰਦਰਾਜ->ਕੁੰਜੀ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * List user commands starting with "name[name_len]".
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 uc_list(char_u *name, size_t name_len)
 {
-    int		i, j;
-    int		found = FALSE;
+    ਪੂਰਨ		i, j;
+    ਪੂਰਨ		ਮਿਲਿਆ = FALSE;
     ucmd_T	*cmd;
-    int		len;
-    int		over;
-    long	a;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		over;
+    ਲੰਮਾ	a;
     garray_T	*gap;
-    keyvalue_T	*entry;
+    keyvalue_T	*ਇੰਦਰਾਜ;
 
     // don't allow for adding or removing user commands here
     ++ucmd_locked;
 
     // In cmdwin, the alternative buffer should be used.
-    gap = &prevwin_curwin()->w_buffer->b_ucmds;
-    for (;;)
+    gap = &prevwin_curwin()->w_ਬਫਰ->b_ucmds;
+    ਲਈ (;;)
     {
-	for (i = 0; i < gap->ga_len; ++i)
+	ਲਈ (i = 0; i < gap->ga_len; ++i)
 	{
 	    cmd = USER_CMD_GA(gap, i);
-	    a = (long)cmd->uc_argt;
+	    a = (ਲੰਮਾ)cmd->uc_argt;
 
 	    // Skip commands which don't match the requested prefix and
 	    // commands filtered out.
-	    if (STRNCMP(name, cmd->uc_name, name_len) != 0
-		    || message_filtered(cmd->uc_name))
-		continue;
+	    ਜੇ (STRNCMP(name, cmd->uc_name, name_len) != 0
+		    || ਸੁਨੇਹਾ_filtered(cmd->uc_name))
+		ਜਾਰੀ;
 
 	    // Put out the title first time
-	    if (!found)
-		msg_puts_title(_("\n    Name              Args Address Complete    Definition"));
-	    found = TRUE;
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
+	    ਜੇ (!ਮਿਲਿਆ)
+		ਸੁਨੇਹਾ_puts_title(_("\n    Name              Args Address Complete    Definition"));
+	    ਮਿਲਿਆ = TRUE;
+	    ਸੁਨੇਹਾ_putchar('\n');
+	    ਜੇ (got_int)
+		ਰੋਕੋ;
 
 	    // Special cases
 	    len = 4;
-	    if (a & EX_BANG)
+	    ਜੇ (a & EX_BANG)
 	    {
-		msg_putchar('!');
+		ਸੁਨੇਹਾ_putchar('!');
 		--len;
 	    }
-	    if (a & EX_REGSTR)
+	    ਜੇ (a & EX_REGSTR)
 	    {
-		msg_putchar('"');
+		ਸੁਨੇਹਾ_putchar('"');
 		--len;
 	    }
-	    if (gap != &ucmds)
+	    ਜੇ (gap != &ucmds)
 	    {
-		msg_putchar('b');
+		ਸੁਨੇਹਾ_putchar('b');
 		--len;
 	    }
-	    if (a & EX_TRLBAR)
+	    ਜੇ (a & EX_TRLBAR)
 	    {
-		msg_putchar('|');
+		ਸੁਨੇਹਾ_putchar('|');
 		--len;
 	    }
-	    if (len != 0)
-		msg_puts(&"    "[4 - len]);
+	    ਜੇ (len != 0)
+		ਸੁਨੇਹਾ_puts(&"    "[4 - len]);
 
-	    msg_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
-	    len = (int)cmd->uc_namelen + 4;
+	    ਸੁਨੇਹਾ_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
+	    len = (ਪੂਰਨ)cmd->uc_namelen + 4;
 
-	    if (len < 21)
+	    ਜੇ (len < 21)
 	    {
 		// Field padding spaces   12345678901234567
-		static char spaces[18] = "                 ";
-		msg_puts(&spaces[len - 4]);
+		ਸਥਿਰ ਅੱਖਰ spaces[18] = "                 ";
+		ਸੁਨੇਹਾ_puts(&spaces[len - 4]);
 		len = 21;
 	    }
-	    msg_putchar(' ');
+	    ਸੁਨੇਹਾ_putchar(' ');
 	    ++len;
 
 	    // "over" is how much longer the name is than the column width for
@@ -705,182 +705,182 @@ uc_list(char_u *name, size_t name_len)
 	    len = 0;
 
 	    // Arguments
-	    switch ((int)(a & (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE)))
+	    ਚੋਣ ((ਪੂਰਨ)(a & (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE)))
 	    {
-		case 0:				IObuff[len++] = '0'; break;
-		case (EX_EXTRA):		IObuff[len++] = '*'; break;
-		case (EX_EXTRA|EX_NOSPC):	IObuff[len++] = '?'; break;
-		case (EX_EXTRA|EX_NEEDARG):	IObuff[len++] = '+'; break;
-		case (EX_EXTRA|EX_NOSPC|EX_NEEDARG): IObuff[len++] = '1'; break;
-		case (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE): IObuff[len++] = '_'; break;
+		ਹਾਲਤ 0:				IObuff[len++] = '0'; ਰੋਕੋ;
+		ਹਾਲਤ (EX_EXTRA):		IObuff[len++] = '*'; ਰੋਕੋ;
+		ਹਾਲਤ (EX_EXTRA|EX_NOSPC):	IObuff[len++] = '?'; ਰੋਕੋ;
+		ਹਾਲਤ (EX_EXTRA|EX_NEEDARG):	IObuff[len++] = '+'; ਰੋਕੋ;
+		ਹਾਲਤ (EX_EXTRA|EX_NOSPC|EX_NEEDARG): IObuff[len++] = '1'; ਰੋਕੋ;
+		ਹਾਲਤ (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE): IObuff[len++] = '_'; ਰੋਕੋ;
 	    }
 
-	    do
+	    ਕਰੋ
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 5 - over);
+	    } ਜਦੋਂ (len < 5 - over);
 
 	    // Address / Range
-	    if (a & (EX_RANGE|EX_COUNT))
+	    ਜੇ (a & (EX_RANGE|EX_ਗਿਣਤੀ))
 	    {
-		if (a & EX_COUNT)
+		ਜੇ (a & EX_ਗਿਣਤੀ)
 		{
 		    // -count=N
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%ldc", cmd->uc_def);
+		    len += vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - len, "%ldc", cmd->uc_def);
 		}
-		else if (a & EX_DFLALL)
+		ਨਹੀਂਤਾਂ ਜੇ (a & EX_DFLALL)
 		    IObuff[len++] = '%';
-		else if (cmd->uc_def >= 0)
+		ਨਹੀਂਤਾਂ ਜੇ (cmd->uc_def >= 0)
 		{
 		    // -range=N
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%ld", cmd->uc_def);
+		    len += vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - len, "%ld", cmd->uc_def);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    IObuff[len++] = '.';
 	    }
 
-	    do
+	    ਕਰੋ
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 8 - over);
+	    } ਜਦੋਂ (len < 8 - over);
 
 	    // Address Type
-	    for (j = 0; j < (int)ARRAY_LENGTH(addr_type_complete_tab); ++j)
-		if (addr_type_complete_tab[j].key != ADDR_LINES
-			&& addr_type_complete_tab[j].key == cmd->uc_addr_type)
+	    ਲਈ (j = 0; j < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(addr_type_complete_tab); ++j)
+		ਜੇ (addr_type_complete_tab[j].ਕੁੰਜੀ != ADDR_ਸਤਰਾਂ
+			&& addr_type_complete_tab[j].ਕੁੰਜੀ == cmd->uc_addr_type)
 		{
 		    STRCPY(IObuff + len, addr_type_complete_tab[j].shortname);
-		    len += (int)addr_type_complete_tab[j].shortnamelen;
-		    break;
+		    len += (ਪੂਰਨ)addr_type_complete_tab[j].shortnamelen;
+		    ਰੋਕੋ;
 		}
 
-	    do
+	    ਕਰੋ
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 13 - over);
+	    } ਜਦੋਂ (len < 13 - over);
 
 	    // Completion
-	    entry = get_commandtype(cmd->uc_compl);
-	    if (entry != NULL)
+	    ਇੰਦਰਾਜ = get_commandtype(cmd->uc_compl);
+	    ਜੇ (ਇੰਦਰਾਜ != ਨਿਰਾ)
 	    {
-		STRCPY(IObuff + len, entry->value.string);
-		len += (int)entry->value.length;
-#ifdef FEAT_EVAL
-		if (p_verbose > 0 && cmd->uc_compl_arg != NULL)
+		STRCPY(IObuff + len, ਇੰਦਰਾਜ->ਮੁੱਲ.string);
+		len += (ਪੂਰਨ)ਇੰਦਰਾਜ->ਮੁੱਲ.ਲੰਮਾਈ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+		ਜੇ (p_verbose > 0 && cmd->uc_compl_arg != ਨਿਰਾ)
 		{
 		    size_t uc_compl_arglen = STRLEN(cmd->uc_compl_arg);
 
-		    if (uc_compl_arglen < 200)
+		    ਜੇ (uc_compl_arglen < 200)
 		    {
 			IObuff[len++] = ',';
 			STRCPY(IObuff + len, cmd->uc_compl_arg);
-			len += (int)uc_compl_arglen;
+			len += (ਪੂਰਨ)uc_compl_arglen;
 		    }
 		}
-		if (p_verbose > 0 && (cmd->uc_compl_opt & UCC_ESCAPE))
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len,
+		ਜੇ (p_verbose > 0 && (cmd->uc_compl_opt & UCC_ESCAPE))
+		    len += vim_snprintf((ਅੱਖਰ *)IObuff + len, IOSIZE - len,
 						       " -completeopt=escape");
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 
-	    do
+	    ਕਰੋ
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 25 - over);
+	    } ਜਦੋਂ (len < 25 - over);
 
 	    IObuff[len] = NUL;
-	    msg_outtrans(IObuff);
+	    ਸੁਨੇਹਾ_outtrans(IObuff);
 
-	    msg_outtrans_special(cmd->uc_rep, FALSE,
+	    ਸੁਨੇਹਾ_outtrans_special(cmd->uc_rep, FALSE,
 					     name_len == 0 ? Columns - 47 : 0);
-#ifdef FEAT_EVAL
-	    if (p_verbose > 0)
-		last_set_msg(cmd->uc_script_ctx);
-#endif
-	    out_flush();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	    ਜੇ (p_verbose > 0)
+		ਆਖਰੀ_ਸੈੱਟ_ਸੁਨੇਹਾ(cmd->uc_script_ctx);
+#ਜੇ_ਅੰਤ
+	    ਬਾਹਰਲਾ_flush();
 	    ui_breakcheck();
-	    if (got_int)
-		break;
+	    ਜੇ (got_int)
+		ਰੋਕੋ;
 	}
-	if (gap == &ucmds || i < gap->ga_len)
-	    break;
+	ਜੇ (gap == &ucmds || i < gap->ga_len)
+	    ਰੋਕੋ;
 	gap = &ucmds;
     }
 
-    if (!found)
-	msg(_("No user-defined commands found"));
+    ਜੇ (!ਮਿਲਿਆ)
+	ਸੁਨੇਹਾ(_("No user-defined commands found"));
 
     --ucmd_locked;
 }
 
-    char *
-uc_fun_cmd(void)
+    ਅੱਖਰ *
+uc_fun_cmd(ਖਾਲੀ)
 {
-    static char_u fcmd[] = {0x84, 0xaf, 0x60, 0xb9, 0xaf, 0xb5, 0x60, 0xa4,
+    ਸਥਿਰ char_u fcmd[] = {0x84, 0xaf, 0x60, 0xb9, 0xaf, 0xb5, 0x60, 0xa4,
 			    0xa5, 0xad, 0xa1, 0xae, 0xa4, 0x60, 0xa1, 0x60,
 			    0xb3, 0xa8, 0xb2, 0xb5, 0xa2, 0xa2, 0xa5, 0xb2,
 			    0xb9, 0x7f, 0};
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; fcmd[i]; ++i)
+    ਲਈ (i = 0; fcmd[i]; ++i)
 	IObuff[i] = fcmd[i] - 0x40;
     IObuff[i] = NUL;
-    return (char *)IObuff;
+    ਵਾਪਸ (ਅੱਖਰ *)IObuff;
 }
 
 /*
  * Parse address type argument
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 parse_addr_type_arg(
-    char_u	*value,
-    int		vallen,
+    char_u	*ਮੁੱਲ,
+    ਪੂਰਨ		vallen,
     cmd_addr_T	*addr_type_arg)
 {
-    addrtype_T target;
-    addrtype_T *entry;
-    static addrtype_T *last_entry;	// cached result
+    addrtype_T ਨਿਸ਼ਾਨਾ;
+    addrtype_T *ਇੰਦਰਾਜ;
+    ਸਥਿਰ addrtype_T *ਆਖਰੀ_ਇੰਦਰਾਜ;	// cached result
 
-    target.key = 0;
-    target.fullname = (char *)value;
-    target.fullnamelen = vallen;
+    ਨਿਸ਼ਾਨਾ.ਕੁੰਜੀ = 0;
+    ਨਿਸ਼ਾਨਾ.fullname = (ਅੱਖਰ *)ਮੁੱਲ;
+    ਨਿਸ਼ਾਨਾ.fullnamelen = vallen;
 
-    if (last_entry != NULL && cmp_addr_type(&target, last_entry) == 0)
-	entry = last_entry;
-    else
+    ਜੇ (ਆਖਰੀ_ਇੰਦਰਾਜ != ਨਿਰਾ && cmp_addr_type(&ਨਿਸ਼ਾਨਾ, ਆਖਰੀ_ਇੰਦਰਾਜ) == 0)
+	ਇੰਦਰਾਜ = ਆਖਰੀ_ਇੰਦਰਾਜ;
+    ਨਹੀਂਤਾਂ
     {
-	entry = (addrtype_T *)bsearch(&target,
+	ਇੰਦਰਾਜ = (addrtype_T *)bsearch(&ਨਿਸ਼ਾਨਾ,
 	    &addr_type_complete_tab,
-	    ARRAY_LENGTH(addr_type_complete_tab),
-	    sizeof(addr_type_complete_tab[0]),
+	    ARRAY_ਲੰਮਾਈ(addr_type_complete_tab),
+	    ਆਕਾਰ(addr_type_complete_tab[0]),
 	    cmp_addr_type);
-	if (entry == NULL)
+	ਜੇ (ਇੰਦਰਾਜ == ਨਿਰਾ)
 	{
-	    int i;
-	    char_u	*err = value;
+	    ਪੂਰਨ i;
+	    char_u	*err = ਮੁੱਲ;
 
-	    for (i = 0; err[i] != NUL && !VIM_ISWHITE(err[i]); i++)
+	    ਲਈ (i = 0; err[i] != NUL && !VIM_ISWHITE(err[i]); i++)
 		;
 	    err[i] = NUL;
-	    semsg(_(e_invalid_address_type_value_str), err);
-	    return FAIL;
+	    semsg(_(e_invalid_ਪਤਾ_type_ਮੁੱਲ_str), err);
+	    ਵਾਪਸ FAIL;
 	}
 
-	last_entry = entry;
+	ਆਖਰੀ_ਇੰਦਰਾਜ = ਇੰਦਰਾਜ;
     }
 
-    *addr_type_arg = entry->key;
+    *addr_type_arg = ਇੰਦਰਾਜ->ਕੁੰਜੀ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    static int
-cmp_addr_type(const void *a, const void *b)
+    ਸਥਿਰ ਪੂਰਨ
+cmp_addr_type(ਅਚਲ ਖਾਲੀ *a, ਅਚਲ ਖਾਲੀ *b)
 {
     addrtype_T *at1 = (addrtype_T *)a;
     addrtype_T *at2 = (addrtype_T *)b;
 
-    return STRNCMP(at1->fullname, at2->fullname, MAX(at1->fullnamelen, at2->fullnamelen));
+    ਵਾਪਸ STRNCMP(at1->fullname, at2->fullname, MAX(at1->fullnamelen, at2->fullnamelen));
 }
 
 /*
@@ -890,90 +890,90 @@ cmp_addr_type(const void *a, const void *b)
  * copied to allocated memory and stored in "*compl_arg".
  * Returns FAIL if something is wrong.
  */
-    int
+    ਪੂਰਨ
 parse_compl_arg(
-    char_u	*value,
-    int		vallen,
-    int		*complp,
-    long	*argt,
-    char_u	**compl_arg UNUSED)
+    char_u	*ਮੁੱਲ,
+    ਪੂਰਨ		vallen,
+    ਪੂਰਨ		*complp,
+    ਲੰਮਾ	*argt,
+    char_u	**compl_arg ਅਣਵਰਤਿਆ)
 {
-    char_u	*arg = NULL;
-#if defined(FEAT_EVAL)
+    char_u	*arg = ਨਿਰਾ;
+#ਜੇ defined(FEAT_EVAL)
     size_t	arglen = 0;
-#endif
-    int		i;
-    int		valend = vallen;
-    keyvalue_T	target;
-    keyvalue_T	*entry;
-    static keyvalue_T	*last_entry = NULL;	    // cached result
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		valend = vallen;
+    keyvalue_T	ਨਿਸ਼ਾਨਾ;
+    keyvalue_T	*ਇੰਦਰਾਜ;
+    ਸਥਿਰ keyvalue_T	*ਆਖਰੀ_ਇੰਦਰਾਜ = ਨਿਰਾ;	    // cached result
 
     // Look for any argument part - which is the part after any ','
-    for (i = 0; i < vallen; ++i)
+    ਲਈ (i = 0; i < vallen; ++i)
     {
-	if (value[i] == ',')
+	ਜੇ (ਮੁੱਲ[i] == ',')
 	{
-	    arg = &value[i + 1];
-#if defined(FEAT_EVAL)
+	    arg = &ਮੁੱਲ[i + 1];
+#ਜੇ defined(FEAT_EVAL)
 	    arglen = vallen - i - 1;
-#endif
+#ਜੇ_ਅੰਤ
 	    valend = i;
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
-    target.key = 0;
-    target.value.string = value;
-    target.value.length = valend;
+    ਨਿਸ਼ਾਨਾ.ਕੁੰਜੀ = 0;
+    ਨਿਸ਼ਾਨਾ.ਮੁੱਲ.string = ਮੁੱਲ;
+    ਨਿਸ਼ਾਨਾ.ਮੁੱਲ.ਲੰਮਾਈ = valend;
 
-    if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
-	entry = last_entry;
-    else
+    ਜੇ (ਆਖਰੀ_ਇੰਦਰਾਜ != ਨਿਰਾ && cmp_keyvalue_ਮੁੱਲ_n(&ਨਿਸ਼ਾਨਾ, ਆਖਰੀ_ਇੰਦਰਾਜ) == 0)
+	ਇੰਦਰਾਜ = ਆਖਰੀ_ਇੰਦਰਾਜ;
+    ਨਹੀਂਤਾਂ
     {
-	entry = (keyvalue_T *)bsearch(&target,
+	ਇੰਦਰਾਜ = (keyvalue_T *)bsearch(&ਨਿਸ਼ਾਨਾ,
 	    &command_complete_tab,
-	    ARRAY_LENGTH(command_complete_tab),
-	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value_n);
-	if (entry == NULL)
+	    ARRAY_ਲੰਮਾਈ(command_complete_tab),
+	    ਆਕਾਰ(command_complete_tab[0]),
+	    cmp_keyvalue_ਮੁੱਲ_n);
+	ਜੇ (ਇੰਦਰਾਜ == ਨਿਰਾ)
 	{
-	    semsg(_(e_invalid_complete_value_str), value);
-	    return FAIL;
+	    semsg(_(e_invalid_complete_ਮੁੱਲ_str), ਮੁੱਲ);
+	    ਵਾਪਸ FAIL;
 	}
 
-	last_entry = entry;
+	ਆਖਰੀ_ਇੰਦਰਾਜ = ਇੰਦਰਾਜ;
     }
 
-    *complp = entry->key;
-    if (*complp == EXPAND_BUFFERS)
+    *complp = ਇੰਦਰਾਜ->ਕੁੰਜੀ;
+    ਜੇ (*complp == EXPAND_BUFFERS)
 	*argt |= EX_BUFNAME;
-    else if (*complp == EXPAND_DIRECTORIES || *complp == EXPAND_FILES || *complp == EXPAND_SHELLCMDLINE)
+    ਨਹੀਂਤਾਂ ਜੇ (*complp == EXPAND_DIRECTORIES || *complp == EXPAND_FILES || *complp == EXPAND_SHELLCMDLINE)
 	*argt |= EX_XFILE;
 
-    if (
-#if defined(FEAT_EVAL)
+    ਜੇ (
+#ਜੇ defined(FEAT_EVAL)
 	*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST
 								&&
-#endif
-								arg != NULL)
+#ਜੇ_ਅੰਤ
+								arg != ਨਿਰਾ)
     {
-	emsg(_(e_completion_argument_only_allowed_for_custom_completion));
-	return FAIL;
+	emsg(_(e_completion_ਦਲੀਲ_only_allowed_for_custom_completion));
+	ਵਾਪਸ FAIL;
     }
 
-#if defined(FEAT_EVAL)
-    if ((*complp == EXPAND_USER_DEFINED || *complp == EXPAND_USER_LIST)
-							       && arg == NULL)
+#ਜੇ defined(FEAT_EVAL)
+    ਜੇ ((*complp == EXPAND_USER_DEFINED || *complp == EXPAND_USER_LIST)
+							       && arg == ਨਿਰਾ)
     {
-	emsg(_(e_custom_completion_requires_function_argument));
-	return FAIL;
+	emsg(_(e_custom_completion_requires_function_ਦਲੀਲ));
+	ਵਾਪਸ FAIL;
     }
 
-    if (arg != NULL)
+    ਜੇ (arg != ਨਿਰਾ)
 	*compl_arg = vim_strnsave(arg, arglen);
-#endif
+#ਜੇ_ਅੰਤ
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -982,343 +982,343 @@ parse_compl_arg(
  * "*compl_opt".
  * Returns FAIL on an unknown name.
  */
-    static int
-parse_completeopt_arg(char_u *value, int vallen, int *compl_opt)
+    ਸਥਿਰ ਪੂਰਨ
+parse_completeopt_arg(char_u *ਮੁੱਲ, ਪੂਰਨ vallen, ਪੂਰਨ *compl_opt)
 {
-    char_u  *p = value;
-    char_u  *end = value + vallen;
-    int	    flags = 0;
+    char_u  *p = ਮੁੱਲ;
+    char_u  *ਸਿਰਾ = ਮੁੱਲ + vallen;
+    ਪੂਰਨ	    flags = 0;
 
-    if (vallen == 0)
+    ਜੇ (vallen == 0)
     {
-	semsg(_(e_argument_required_for_str), "-completeopt");
-	return FAIL;
+	semsg(_(e_ਦਲੀਲ_required_for_str), "-completeopt");
+	ਵਾਪਸ FAIL;
     }
 
-    while (p < end)
+    ਜਦੋਂ (p < ਸਿਰਾ)
     {
 	char_u	*comma;
 	size_t	itemlen;
-	int	matched = FALSE;
-	int	i;
+	ਪੂਰਨ	matched = FALSE;
+	ਪੂਰਨ	i;
 
 	comma = vim_strchr(p, ',');
-	if (comma == NULL || comma > end)
-	    itemlen = (size_t)(end - p);
-	else
+	ਜੇ (comma == ਨਿਰਾ || comma > ਸਿਰਾ)
+	    itemlen = (size_t)(ਸਿਰਾ - p);
+	ਨਹੀਂਤਾਂ
 	    itemlen = (size_t)(comma - p);
 
-	if (itemlen == 0)
+	ਜੇ (itemlen == 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
-	    return FAIL;
+	    semsg(_(e_invalid_ਮੁੱਲ_for_ਦਲੀਲ_str), "completeopt");
+	    ਵਾਪਸ FAIL;
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(user_cmd_completeopt_tab); ++i)
+	ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(user_cmd_completeopt_tab); ++i)
 	{
-	    char *name = user_cmd_completeopt_tab[i];
+	    ਅੱਖਰ *name = user_cmd_completeopt_tab[i];
 
-	    if (STRLEN(name) == itemlen
+	    ਜੇ (STRLEN(name) == itemlen
 				   && STRNCMP(p, name, itemlen) == 0)
 	    {
-		if (STRCMP(name, "escape") == 0)
+		ਜੇ (STRCMP(name, "escape") == 0)
 		    flags |= UCC_ESCAPE;
 		matched = TRUE;
-		break;
+		ਰੋਕੋ;
 	    }
 	}
-	if (!matched)
+	ਜੇ (!matched)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
-	    return FAIL;
+	    semsg(_(e_invalid_ਮੁੱਲ_for_ਦਲੀਲ_str), "completeopt");
+	    ਵਾਪਸ FAIL;
 	}
 
 	p += itemlen;
-	if (p < end && *p == ',')
+	ਜੇ (p < ਸਿਰਾ && *p == ',')
 	    ++p;
     }
 
     *compl_opt |= flags;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Scan attributes in the ":command" command.
  * Return FAIL when something is wrong.
  */
-    static int
-uc_scan_attr(
+    ਸਥਿਰ ਪੂਰਨ
+uc_ਜਾਂਚ_attr(
     char_u	*attr,
     size_t	len,
-    long	*argt,
-    long	*def,
-    int		*flags,
-    int		*complp,
+    ਲੰਮਾ	*argt,
+    ਲੰਮਾ	*def,
+    ਪੂਰਨ		*flags,
+    ਪੂਰਨ		*complp,
     char_u	**compl_arg,
-    int		*compl_opt,
+    ਪੂਰਨ		*compl_opt,
     cmd_addr_T	*addr_type_arg)
 {
     char_u	*p;
 
-    if (len == 0)
+    ਜੇ (len == 0)
     {
 	emsg(_(e_no_attribute_specified));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     // First, try the simple attributes (no arguments)
-    if (STRNICMP(attr, "bang", len) == 0)
+    ਜੇ (STRNICMP(attr, "bang", len) == 0)
 	*argt |= EX_BANG;
-    else if (STRNICMP(attr, "buffer", len) == 0)
-	*flags |= UC_BUFFER;
-    else if (STRNICMP(attr, "register", len) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "buffer", len) == 0)
+	*flags |= UC_ਬਫਰ;
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "register", len) == 0)
 	*argt |= EX_REGSTR;
-    else if (STRNICMP(attr, "keepscript", len) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "keepscript", len) == 0)
 	*argt |= EX_KEEPSCRIPT;
-    else if (STRNICMP(attr, "bar", len) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "bar", len) == 0)
 	*argt |= EX_TRLBAR;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int	i;
-	char_u	*val = NULL;
+	ਪੂਰਨ	i;
+	char_u	*val = ਨਿਰਾ;
 	size_t	vallen = 0;
 	size_t	attrlen = len;
 
 	// Look for the attribute name - which is the part before any '='
-	for (i = 0; i < (int)len; ++i)
+	ਲਈ (i = 0; i < (ਪੂਰਨ)len; ++i)
 	{
-	    if (attr[i] == '=')
+	    ਜੇ (attr[i] == '=')
 	    {
 		val = &attr[i + 1];
 		vallen = len - i - 1;
 		attrlen = i;
-		break;
+		ਰੋਕੋ;
 	    }
 	}
 
-	if (STRNICMP(attr, "nargs", attrlen) == 0)
+	ਜੇ (STRNICMP(attr, "nargs", attrlen) == 0)
 	{
-	    if (vallen == 1)
+	    ਜੇ (vallen == 1)
 	    {
-		if (*val == '0')
+		ਜੇ (*val == '0')
 		    // Do nothing - this is the default
 		    ;
-		else if (*val == '1')
+		ਨਹੀਂਤਾਂ ਜੇ (*val == '1')
 		    *argt |= (EX_EXTRA | EX_NOSPC | EX_NEEDARG);
-		else if (*val == '*')
+		ਨਹੀਂਤਾਂ ਜੇ (*val == '*')
 		    *argt |= EX_EXTRA;
-		else if (*val == '?')
+		ਨਹੀਂਤਾਂ ਜੇ (*val == '?')
 		    *argt |= (EX_EXTRA | EX_NOSPC);
-		else if (*val == '+')
+		ਨਹੀਂਤਾਂ ਜੇ (*val == '+')
 		    *argt |= (EX_EXTRA | EX_NEEDARG);
-		else if (*val == '_')
+		ਨਹੀਂਤਾਂ ਜੇ (*val == '_')
 		    *argt |= (EX_EXTRA | EX_NOSPC | EX_NEEDARG | EX_ARGSPACE);
-		else
-		    goto wrong_nargs;
+		ਨਹੀਂਤਾਂ
+		    ਜਾਓ wrong_nargs;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 wrong_nargs:
-		emsg(_(e_invalid_number_of_arguments));
-		return FAIL;
+		emsg(_(e_invalid_ਸੰਖਿਆ_ਦਾ_arguments));
+		ਵਾਪਸ FAIL;
 	    }
 	}
-	else if (STRNICMP(attr, "range", attrlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "range", attrlen) == 0)
 	{
 	    *argt |= EX_RANGE;
-	    if (vallen == 1 && *val == '%')
+	    ਜੇ (vallen == 1 && *val == '%')
 		*argt |= EX_DFLALL;
-	    else if (val != NULL)
+	    ਨਹੀਂਤਾਂ ਜੇ (val != ਨਿਰਾ)
 	    {
 		p = val;
-		if (*def >= 0)
+		ਜੇ (*def >= 0)
 		{
-two_count:
-		    emsg(_(e_count_cannot_be_specified_twice));
-		    return FAIL;
+two_ਗਿਣਤੀ:
+		    emsg(_(e_ਗਿਣਤੀ_cannot_be_specified_twice));
+		    ਵਾਪਸ FAIL;
 		}
 
 		*def = getdigits(&p);
 		*argt |= EX_ZEROR;
 
-		if (p != val + vallen || vallen == 0)
+		ਜੇ (p != val + vallen || vallen == 0)
 		{
-invalid_count:
-		    emsg(_(e_invalid_default_value_for_count));
-		    return FAIL;
+invalid_ਗਿਣਤੀ:
+		    emsg(_(e_invalid_default_ਮੁੱਲ_for_ਗਿਣਤੀ));
+		    ਵਾਪਸ FAIL;
 		}
 	    }
 	    // default for -range is using buffer lines
-	    if (*addr_type_arg == ADDR_NONE)
-		*addr_type_arg = ADDR_LINES;
+	    ਜੇ (*addr_type_arg == ADDR_NONE)
+		*addr_type_arg = ADDR_ਸਤਰਾਂ;
 	}
-	else if (STRNICMP(attr, "count", attrlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "count", attrlen) == 0)
 	{
-	    *argt |= (EX_COUNT | EX_ZEROR | EX_RANGE);
+	    *argt |= (EX_ਗਿਣਤੀ | EX_ZEROR | EX_RANGE);
 	    // default for -count is using any number
-	    if (*addr_type_arg == ADDR_NONE)
+	    ਜੇ (*addr_type_arg == ADDR_NONE)
 		*addr_type_arg = ADDR_OTHER;
 
-	    if (val != NULL)
+	    ਜੇ (val != ਨਿਰਾ)
 	    {
 		p = val;
-		if (*def >= 0)
-		    goto two_count;
+		ਜੇ (*def >= 0)
+		    ਜਾਓ two_ਗਿਣਤੀ;
 
 		*def = getdigits(&p);
 
-		if (p != val + vallen)
-		    goto invalid_count;
+		ਜੇ (p != val + vallen)
+		    ਜਾਓ invalid_ਗਿਣਤੀ;
 	    }
 
-	    if (*def < 0)
+	    ਜੇ (*def < 0)
 		*def = 0;
 	}
-	else if (STRNICMP(attr, "complete", attrlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "complete", attrlen) == 0)
 	{
-	    if (val == NULL)
+	    ਜੇ (val == ਨਿਰਾ)
 	    {
-		semsg(_(e_argument_required_for_str), "-complete");
-		return FAIL;
+		semsg(_(e_ਦਲੀਲ_required_for_str), "-complete");
+		ਵਾਪਸ FAIL;
 	    }
 
-	    if (parse_compl_arg(val, (int)vallen, complp, argt, compl_arg)
+	    ਜੇ (parse_compl_arg(val, (ਪੂਰਨ)vallen, complp, argt, compl_arg)
 								      == FAIL)
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	}
-	else if (STRNICMP(attr, "completeopt", attrlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "completeopt", attrlen) == 0)
 	{
-	    if (val == NULL)
+	    ਜੇ (val == ਨਿਰਾ)
 	    {
-		semsg(_(e_argument_required_for_str), "-completeopt");
-		return FAIL;
+		semsg(_(e_ਦਲੀਲ_required_for_str), "-completeopt");
+		ਵਾਪਸ FAIL;
 	    }
 
-	    if (parse_completeopt_arg(val, (int)vallen, compl_opt) == FAIL)
-		return FAIL;
+	    ਜੇ (parse_completeopt_arg(val, (ਪੂਰਨ)vallen, compl_opt) == FAIL)
+		ਵਾਪਸ FAIL;
 	}
-	else if (STRNICMP(attr, "addr", attrlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(attr, "addr", attrlen) == 0)
 	{
 	    *argt |= EX_RANGE;
-	    if (val == NULL)
+	    ਜੇ (val == ਨਿਰਾ)
 	    {
-		semsg(_(e_argument_required_for_str), "-addr");
-		return FAIL;
+		semsg(_(e_ਦਲੀਲ_required_for_str), "-addr");
+		ਵਾਪਸ FAIL;
 	    }
-	    if (parse_addr_type_arg(val, (int)vallen, addr_type_arg) == FAIL)
-		return FAIL;
-	    if (*addr_type_arg != ADDR_LINES)
+	    ਜੇ (parse_addr_type_arg(val, (ਪੂਰਨ)vallen, addr_type_arg) == FAIL)
+		ਵਾਪਸ FAIL;
+	    ਜੇ (*addr_type_arg != ADDR_ਸਤਰਾਂ)
 		*argt |= EX_ZEROR;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    char_u ch = attr[len];
 	    attr[len] = '\0';
 	    semsg(_(e_invalid_attribute_str), attr);
 	    attr[len] = ch;
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Add a user command to the list or replace an existing one.
  */
-    static int
-uc_add_command(
+    ਸਥਿਰ ਪੂਰਨ
+uc_ਜੋੜੋ_command(
     char_u	*name,
     size_t	name_len,
     char_u	*rep,
-    long	argt,
-    long	def,
-    int		flags,
-    int		compl,
-    char_u	*compl_arg UNUSED,
-    int		compl_opt,
+    ਲੰਮਾ	argt,
+    ਲੰਮਾ	def,
+    ਪੂਰਨ		flags,
+    ਪੂਰਨ		compl,
+    char_u	*compl_arg ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		compl_opt,
     cmd_addr_T	addr_type,
-    int		force)
+    ਪੂਰਨ		force)
 {
-    ucmd_T	*cmd = NULL;
+    ucmd_T	*cmd = ਨਿਰਾ;
     char_u	*p;
-    int		i;
-    int		cmp = 1;
-    char_u	*rep_buf = NULL;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		cmp = 1;
+    char_u	*rep_buf = ਨਿਰਾ;
     garray_T	*gap;
 
-    replace_termcodes(rep, &rep_buf, 0, 0, NULL);
-    if (rep_buf == NULL)
+    replace_termcodes(rep, &rep_buf, 0, 0, ਨਿਰਾ);
+    ਜੇ (rep_buf == ਨਿਰਾ)
     {
 	// can't replace termcodes - try using the string as is
 	rep_buf = vim_strsave(rep);
 
 	// give up if out of memory
-	if (rep_buf == NULL)
-	    return FAIL;
+	ਜੇ (rep_buf == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
     }
 
     // get address of growarray: global or in curbuf
-    if (flags & UC_BUFFER)
+    ਜੇ (flags & UC_ਬਫਰ)
     {
 	gap = &curbuf->b_ucmds;
-	if (gap->ga_itemsize == 0)
-	    ga_init2(gap, sizeof(ucmd_T), 4);
+	ਜੇ (gap->ga_itemsize == 0)
+	    ga_init2(gap, ਆਕਾਰ(ucmd_T), 4);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	gap = &ucmds;
 
     // Search for the command in the already defined commands.
-    for (i = 0; i < gap->ga_len; ++i)
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
     {
 	cmd = USER_CMD_GA(gap, i);
 	cmp = STRNCMP(name, cmd->uc_name, name_len);
-	if (cmp == 0)
+	ਜੇ (cmp == 0)
 	{
-	    if (name_len < cmd->uc_namelen)
+	    ਜੇ (name_len < cmd->uc_namelen)
 		cmp = -1;
-	    else if (name_len > cmd->uc_namelen)
+	    ਨਹੀਂਤਾਂ ਜੇ (name_len > cmd->uc_namelen)
 		cmp = 1;
 	}
 
-	if (cmp == 0)
+	ਜੇ (cmp == 0)
 	{
 	    // Command can be replaced with "command!" and when sourcing the
 	    // same script again, but only once.
-	    if (!force
-#ifdef FEAT_EVAL
+	    ਜੇ (!force
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		    && (cmd->uc_script_ctx.sc_sid != current_sctx.sc_sid
 			  || cmd->uc_script_ctx.sc_seq == current_sctx.sc_seq)
-#endif
+#ਜੇ_ਅੰਤ
 		    )
 	    {
-		semsg(_(e_command_already_exists_add_bang_to_replace_it_str),
+		semsg(_(e_command_already_exists_ਜੋੜੋ_bang_ਮੰਜ਼ਿਲ_replace_it_str),
 									 name);
-		goto fail;
+		ਜਾਓ fail;
 	    }
 
 	    VIM_CLEAR(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 	    VIM_CLEAR(cmd->uc_compl_arg);
-#endif
-	    break;
+#ਜੇ_ਅੰਤ
+	    ਰੋਕੋ;
 	}
 
 	// Stop as soon as we pass the name to add
-	if (cmp < 0)
-	    break;
+	ਜੇ (cmp < 0)
+	    ਰੋਕੋ;
     }
 
     // Extend the array unless we're replacing an existing command
-    if (cmp != 0)
+    ਜੇ (cmp != 0)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    goto fail;
-	if ((p = vim_strnsave(name, name_len)) == NULL)
-	    goto fail;
+	ਜੇ (ga_grow(gap, 1) == FAIL)
+	    ਜਾਓ fail;
+	ਜੇ ((p = vim_strnsave(name, name_len)) == ਨਿਰਾ)
+	    ਜਾਓ fail;
 
 	cmd = USER_CMD_GA(gap, i);
-	mch_memmove(cmd + 1, cmd, (gap->ga_len - i) * sizeof(ucmd_T));
+	mch_memmove(cmd + 1, cmd, (gap->ga_len - i) * ਆਕਾਰ(ucmd_T));
 
 	++gap->ga_len;
 
@@ -1332,23 +1332,23 @@ uc_add_command(
     cmd->uc_compl = compl;
     cmd->uc_compl_opt = compl_opt;
     cmd->uc_script_ctx = current_sctx;
-    if (flags & UC_VIM9)
-	cmd->uc_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
+    ਜੇ (flags & UC_VIM9)
+	cmd->uc_script_ctx.sc_ਸੰਸਕਰਣ = SCRIPT_ਸੰਸਕਰਣ_VIM9;
     cmd->uc_flags = flags & UC_VIM9;
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     cmd->uc_script_ctx.sc_lnum += SOURCING_LNUM;
     cmd->uc_compl_arg = compl_arg;
-#endif
+#ਜੇ_ਅੰਤ
     cmd->uc_addr_type = addr_type;
 
-    return OK;
+    ਵਾਪਸ OK;
 
 fail:
     vim_free(rep_buf);
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     vim_free(compl_arg);
-#endif
-    return FAIL;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ FAIL;
 }
 
 /*
@@ -1356,163 +1356,163 @@ fail:
  * Used for ":command" and ":autocmd".
  */
     char_u *
-may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
+may_get_cmd_ਖੰਡ(exarg_T *eap, char_u *p, char_u **tofree, ਪੂਰਨ *flags)
 {
     char_u *retp = p;
-    char_u *block = find_cmd_block_start(p);
+    char_u *ਖੰਡ = ਲੱਭੋ_cmd_ਖੰਡ_ਸ਼ੁਰੂ(p);
 
-    if (block != NULL && eap->ea_getline != NULL)
+    ਜੇ (ਖੰਡ != ਨਿਰਾ && eap->ea_getline != ਨਿਰਾ)
     {
 	garray_T    ga;
-	char_u	    *line = NULL;
+	char_u	    *ਸਤਰ = ਨਿਰਾ;
 
-	ga_init2(&ga, sizeof(char_u *), 10);
-	if (ga_copy_string(&ga, p) == FAIL)
-	    return retp;
+	ga_init2(&ga, ਆਕਾਰ(char_u *), 10);
+	ਜੇ (ga_copy_string(&ga, p) == FAIL)
+	    ਵਾਪਸ retp;
 
 	// If the argument ends in "}" it must have been concatenated already
 	// for ISN_EXEC.
-	if (p[STRLEN(p) - 1] != '}')
+	ਜੇ (p[STRLEN(p) - 1] != '}')
 	    // Read lines between '{' and '}'.  Does not support nesting or
 	    // here-doc constructs.
-	    for (;;)
+	    ਲਈ (;;)
 	    {
-		vim_free(line);
-		if ((line = eap->ea_getline(':', eap->cookie,
-					   0, GETLINE_CONCAT_CONTBAR)) == NULL)
+		vim_free(ਸਤਰ);
+		ਜੇ ((ਸਤਰ = eap->ea_getline(':', eap->cookie,
+					   0, GETLINE_CONCAT_CONTBAR)) == ਨਿਰਾ)
 		{
 		    emsg(_(e_missing_rcurly));
-		    break;
+		    ਰੋਕੋ;
 		}
-		if (ga_copy_string(&ga, line) == FAIL)
-		    break;
-		if (*skipwhite(line) == '}')
-		    break;
+		ਜੇ (ga_copy_string(&ga, ਸਤਰ) == FAIL)
+		    ਰੋਕੋ;
+		ਜੇ (*skipwhite(ਸਤਰ) == '}')
+		    ਰੋਕੋ;
 	    }
-	vim_free(line);
-	retp = *tofree = ga_concat_strings(&ga, "\n");
-	if (retp == NULL)
+	vim_free(ਸਤਰ);
+	retp = *tofree = ga_concat_ਲੜੀਆਂ(&ga, "\n");
+	ਜੇ (retp == ਨਿਰਾ)
 	    retp = p;
-	ga_clear_strings(&ga);
+	ga_clear_ਲੜੀਆਂ(&ga);
 	// Only the command owning the block uses Vim9 syntax.  A command with
 	// the block nested in it keeps the syntax of its script.
-	if (block == p)
+	ਜੇ (ਖੰਡ == p)
 	    *flags |= UC_VIM9;
     }
-    return retp;
+    ਵਾਪਸ retp;
 }
 
 /*
  * Read the block of commands that may follow and throw it away.
  * Used for ":command" and ":autocmd" while skipping.
  */
-    void
-skip_cmd_block(exarg_T *eap)
+    ਖਾਲੀ
+skip_cmd_ਖੰਡ(exarg_T *eap)
 {
-    char_u	*tofree = NULL;
-    int		flags = 0;
+    char_u	*tofree = ਨਿਰਾ;
+    ਪੂਰਨ		flags = 0;
 
-    (void)may_get_cmd_block(eap, eap->cmd, &tofree, &flags);
+    (ਖਾਲੀ)may_get_cmd_ਖੰਡ(eap, eap->cmd, &tofree, &flags);
     vim_free(tofree);
 }
 
 /*
  * ":command ..." implementation
  */
-    void
+    ਖਾਲੀ
 ex_command(exarg_T *eap)
 {
     char_u	*name;
-    char_u	*end;
+    char_u	*ਸਿਰਾ;
     char_u	*p;
-    long	argt = 0;
-    long	def = -1;
-    int		flags = 0;
-    int		compl = EXPAND_NOTHING;
-    char_u	*compl_arg = NULL;
-    int		compl_opt = 0;
+    ਲੰਮਾ	argt = 0;
+    ਲੰਮਾ	def = -1;
+    ਪੂਰਨ		flags = 0;
+    ਪੂਰਨ		compl = EXPAND_NOTHING;
+    char_u	*compl_arg = ਨਿਰਾ;
+    ਪੂਰਨ		compl_opt = 0;
     cmd_addr_T	addr_type_arg = ADDR_NONE;
-    int		has_attr = (eap->arg[0] == '-');
-    int		name_len;
+    ਪੂਰਨ		has_attr = (eap->arg[0] == '-');
+    ਪੂਰਨ		name_len;
 
-    if (eap->skip)
+    ਜੇ (eap->skip)
     {
-	skip_cmd_block(eap);
-	return;
+	skip_cmd_ਖੰਡ(eap);
+	ਵਾਪਸ;
     }
 
     p = eap->arg;
 
     // Check for attributes
-    while (*p == '-')
+    ਜਦੋਂ (*p == '-')
     {
 	++p;
-	end = skiptowhite(p);
-	if (uc_scan_attr(p, end - p, &argt, &def, &flags, &compl,
+	ਸਿਰਾ = skiptowhite(p);
+	ਜੇ (uc_ਜਾਂਚ_attr(p, ਸਿਰਾ - p, &argt, &def, &flags, &compl,
 			       &compl_arg, &compl_opt, &addr_type_arg) == FAIL)
-	    goto theend;
-	p = skipwhite(end);
+	    ਜਾਓ theend;
+	p = skipwhite(ਸਿਰਾ);
     }
 
     // Get the name (if any) and skip to the following argument
     name = p;
-    if (ASCII_ISALPHA(*p))
-	while (ASCII_ISALNUM(*p))
+    ਜੇ (ASCII_ISALPHA(*p))
+	ਜਦੋਂ (ASCII_ISALNUM(*p))
 	    ++p;
-    if (!ends_excmd2(eap->arg, p) && !VIM_ISWHITE(*p))
+    ਜੇ (!ਸਿਰੇ_excmd2(eap->arg, p) && !VIM_ISWHITE(*p))
     {
 	emsg(_(e_invalid_command_name));
-	goto theend;
+	ਜਾਓ theend;
     }
-    end = p;
-    name_len = (int)(end - name);
+    ਸਿਰਾ = p;
+    name_len = (ਪੂਰਨ)(ਸਿਰਾ - name);
 
     // If there is nothing after the name, and no attributes were specified,
     // we are listing commands
-    p = skipwhite(end);
-    if (!has_attr && ends_excmd2(eap->arg, p))
+    p = skipwhite(ਸਿਰਾ);
+    ਜੇ (!has_attr && ਸਿਰੇ_excmd2(eap->arg, p))
     {
 	uc_list(name, name_len);
     }
-    else if (!ASCII_ISUPPER(*name))
+    ਨਹੀਂਤਾਂ ਜੇ (!ASCII_ISUPPER(*name))
     {
-	emsg(_(e_user_defined_commands_must_start_with_an_uppercase_letter));
+	emsg(_(e_user_defined_commands_must_ਸ਼ੁਰੂ_with_an_uppercase_letter));
     }
-    else if ((name_len == 1 && *name == 'X')
+    ਨਹੀਂਤਾਂ ਜੇ ((name_len == 1 && *name == 'X')
 	  || (name_len <= 4
 		  && STRNCMP(name, "Next", name_len > 4 ? 4 : name_len) == 0))
     {
-	emsg(_(e_reserved_name_cannot_be_used_for_user_defined_command));
+	emsg(_(e_reserved_name_cannot_be_ਵਰਤਿਆ_for_user_defined_command));
     }
-    else if (compl > 0 && (argt & EX_EXTRA) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (compl > 0 && (argt & EX_EXTRA) == 0)
     {
 	// Some plugins rely on silently ignoring the mistake, only make this
 	// an error in Vim9 script.
-	if (in_vim9script())
-	    emsg(_(e_complete_used_without_allowing_arguments));
-	else
-	    give_warning_with_source(
-		       (char_u *)_(e_complete_used_without_allowing_arguments),
+	ਜੇ (ਵਿੱਚ_vim9script())
+	    emsg(_(e_complete_ਵਰਤਿਆ_without_allowing_arguments));
+	ਨਹੀਂਤਾਂ
+	    give_warning_with_ਸਰੋਤ(
+		       (char_u *)_(e_complete_ਵਰਤਿਆ_without_allowing_arguments),
 								   TRUE, TRUE);
     }
-    else if ((compl_opt & UCC_ESCAPE) && (argt & EX_ARGSPACE))
+    ਨਹੀਂਤਾਂ ਜੇ ((compl_opt & UCC_ESCAPE) && (argt & EX_ARGSPACE))
     {
 	// -nargs=_ disables the argument splitter, so escaping spaces in
 	// inserted matches has no effect.  Reject the combination instead of
 	// silently ignoring it.
-	emsg(_(e_completeopt_escape_cannot_be_used_with_nargs_underscore));
+	emsg(_(e_completeopt_escape_cannot_be_ਵਰਤਿਆ_with_nargs_underscore));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	char_u *tofree = NULL;
+	char_u *tofree = ਨਿਰਾ;
 
-	p = may_get_cmd_block(eap, p, &tofree, &flags);
+	p = may_get_cmd_ਖੰਡ(eap, p, &tofree, &flags);
 
-	uc_add_command(name, end - name, p, argt, def, flags, compl, compl_arg,
+	uc_ਜੋੜੋ_command(name, ਸਿਰਾ - name, p, argt, def, flags, compl, compl_arg,
 					compl_opt, addr_type_arg, eap->forceit);
 	vim_free(tofree);
 
-	return;  // success
+	ਵਾਪਸ;  // success
     }
 
 theend:
@@ -1523,11 +1523,11 @@ theend:
  * ":comclear" implementation
  * Clear all user commands, global and for current buffer.
  */
-    void
-ex_comclear(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_comclear(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
     uc_clear(&ucmds);
-    if (curbuf != NULL)
+    ਜੇ (curbuf != ਨਿਰਾ)
 	uc_clear(&curbuf->b_ucmds);
 }
 
@@ -1535,38 +1535,38 @@ ex_comclear(exarg_T *eap UNUSED)
  * If ucmd_locked is set give an error and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-is_ucmd_locked(void)
+    ਸਥਿਰ ਪੂਰਨ
+is_ucmd_locked(ਖਾਲੀ)
 {
-    if (ucmd_locked > 0)
+    ਜੇ (ucmd_locked > 0)
     {
 	emsg(_(e_cannot_change_user_commands_while_listing));
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Clear all user commands for "gap".
  */
-    void
+    ਖਾਲੀ
 uc_clear(garray_T *gap)
 {
-    int		i;
+    ਪੂਰਨ		i;
     ucmd_T	*cmd;
 
-    if (is_ucmd_locked())
-	return;
+    ਜੇ (is_ucmd_locked())
+	ਵਾਪਸ;
 
-    for (i = 0; i < gap->ga_len; ++i)
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
     {
 	cmd = USER_CMD_GA(gap, i);
 	vim_free(cmd->uc_name);
 	cmd->uc_namelen = 0;
 	vim_free(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 	vim_free(cmd->uc_compl_arg);
-#endif
+#ਜੇ_ਅੰਤ
     }
     ga_clear(gap);
 }
@@ -1574,102 +1574,102 @@ uc_clear(garray_T *gap)
 /*
  * ":delcommand" implementation
  */
-    void
+    ਖਾਲੀ
 ex_delcommand(exarg_T *eap)
 {
-    int		i = 0;
-    ucmd_T	*cmd = NULL;
-    int		res = -1;
+    ਪੂਰਨ		i = 0;
+    ucmd_T	*cmd = ਨਿਰਾ;
+    ਪੂਰਨ		res = -1;
     garray_T	*gap;
     char_u	*arg = eap->arg;
-    int		buffer_only = FALSE;
+    ਪੂਰਨ		ਬਫਰ_only = FALSE;
 
-    if (STRNCMP(arg, "-buffer", 7) == 0 && VIM_ISWHITE(arg[7]))
+    ਜੇ (STRNCMP(arg, "-buffer", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
-	buffer_only = TRUE;
+	ਬਫਰ_only = TRUE;
 	arg = skipwhite(arg + 7);
     }
 
     gap = &curbuf->b_ucmds;
-    for (;;)
+    ਲਈ (;;)
     {
-	for (i = 0; i < gap->ga_len; ++i)
+	ਲਈ (i = 0; i < gap->ga_len; ++i)
 	{
 	    cmd = USER_CMD_GA(gap, i);
 	    res = STRCMP(arg, cmd->uc_name);
-	    if (res <= 0)
-		break;
+	    ਜੇ (res <= 0)
+		ਰੋਕੋ;
 	}
-	if (gap == &ucmds || res == 0 || buffer_only)
-	    break;
+	ਜੇ (gap == &ucmds || res == 0 || ਬਫਰ_only)
+	    ਰੋਕੋ;
 	gap = &ucmds;
     }
 
-    if (res != 0)
+    ਜੇ (res != 0)
     {
-	semsg(_(buffer_only
-		    ? e_no_such_user_defined_command_in_current_buffer_str
+	semsg(_(ਬਫਰ_only
+		    ? e_no_such_user_defined_command_ਵਿੱਚ_current_ਬਫਰ_str
 		    : e_no_such_user_defined_command_str), arg);
-	return;
+	ਵਾਪਸ;
     }
 
-    if (is_ucmd_locked())
-	return;
+    ਜੇ (is_ucmd_locked())
+	ਵਾਪਸ;
 
     vim_free(cmd->uc_name);
     vim_free(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     vim_free(cmd->uc_compl_arg);
-#endif
+#ਜੇ_ਅੰਤ
 
     --gap->ga_len;
 
-    if (i < gap->ga_len)
-	mch_memmove(cmd, cmd + 1, (gap->ga_len - i) * sizeof(ucmd_T));
+    ਜੇ (i < gap->ga_len)
+	mch_memmove(cmd, cmd + 1, (gap->ga_len - i) * ਆਕਾਰ(ucmd_T));
 }
 
 /*
  * Split and quote args for <f-args>.
  */
-    static char_u *
-uc_split_args(char_u *arg, size_t *lenp)
+    ਸਥਿਰ char_u *
+uc_ਵੰਡੋ_ਦਲੀਲਾਂ(char_u *arg, size_t *lenp)
 {
     char_u *buf;
     char_u *p;
     char_u *q;
-    int len;
+    ਪੂਰਨ len;
 
     // Precalculate length
     p = arg;
     len = 2; // Initial and final quotes
 
-    while (*p)
+    ਜਦੋਂ (*p)
     {
-	if (p[0] == '\\' && p[1] == '\\')
+	ਜੇ (p[0] == '\\' && p[1] == '\\')
 	{
 	    len += 2;
 	    p += 2;
 	}
-	else if (p[0] == '\\' && VIM_ISWHITE(p[1]))
+	ਨਹੀਂਤਾਂ ਜੇ (p[0] == '\\' && VIM_ISWHITE(p[1]))
 	{
 	    len += 1;
 	    p += 2;
 	}
-	else if (*p == '\\' || *p == '"')
+	ਨਹੀਂਤਾਂ ਜੇ (*p == '\\' || *p == '"')
 	{
 	    len += 2;
 	    p += 1;
 	}
-	else if (VIM_ISWHITE(*p))
+	ਨਹੀਂਤਾਂ ਜੇ (VIM_ISWHITE(*p))
 	{
 	    p = skipwhite(p);
-	    if (*p == NUL)
-		break;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	    len += 4; // ", "
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int charlen = (*mb_ptr2len)(p);
+	    ਪੂਰਨ charlen = (*mb_ptr2len)(p);
 
 	    len += charlen;
 	    p += charlen;
@@ -1677,44 +1677,44 @@ uc_split_args(char_u *arg, size_t *lenp)
     }
 
     buf = alloc(len + 1);
-    if (buf == NULL)
+    ਜੇ (buf == ਨਿਰਾ)
     {
 	*lenp = 0;
-	return buf;
+	ਵਾਪਸ buf;
     }
 
     p = arg;
     q = buf;
     *q++ = '"';
-    while (*p)
+    ਜਦੋਂ (*p)
     {
-	if (p[0] == '\\' && p[1] == '\\')
+	ਜੇ (p[0] == '\\' && p[1] == '\\')
 	{
 	    *q++ = '\\';
 	    *q++ = '\\';
 	    p += 2;
 	}
-	else if (p[0] == '\\' && VIM_ISWHITE(p[1]))
+	ਨਹੀਂਤਾਂ ਜੇ (p[0] == '\\' && VIM_ISWHITE(p[1]))
 	{
 	    *q++ = p[1];
 	    p += 2;
 	}
-	else if (*p == '\\' || *p == '"')
+	ਨਹੀਂਤਾਂ ਜੇ (*p == '\\' || *p == '"')
 	{
 	    *q++ = '\\';
 	    *q++ = *p++;
 	}
-	else if (VIM_ISWHITE(*p))
+	ਨਹੀਂਤਾਂ ਜੇ (VIM_ISWHITE(*p))
 	{
 	    p = skipwhite(p);
-	    if (*p == NUL)
-		break;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	    *q++ = '"';
 	    *q++ = ',';
 	    *q++ = ' ';
 	    *q++ = '"';
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    MB_COPY_CHAR(p, q);
 	}
@@ -1723,20 +1723,20 @@ uc_split_args(char_u *arg, size_t *lenp)
     *q = NUL;
 
     *lenp = len;
-    return buf;
+    ਵਾਪਸ buf;
 }
 
-    static size_t
-add_cmd_modifier(
+    ਸਥਿਰ size_t
+ਜੋੜੋ_cmd_modifier(
     char_u	*buf,
     size_t	buflen,
-    char	*mod_str,
+    ਅੱਖਰ	*mod_str,
     size_t	mod_strlen,
-    int		*multi_mods)
+    ਪੂਰਨ		*multi_mods)
 {
-    if (buf != NULL)
+    ਜੇ (buf != ਨਿਰਾ)
     {
-	if (*multi_mods)
+	ਜੇ (*multi_mods)
 	{
 	    STRCPY(buf + buflen, " ");	// the separating space
 	    ++buflen;
@@ -1744,12 +1744,12 @@ add_cmd_modifier(
 	STRCPY(buf + buflen, mod_str);
     }
 
-    if (*multi_mods)
+    ਜੇ (*multi_mods)
 	++mod_strlen;			// +1 for the separating space
-    else
+    ਨਹੀਂਤਾਂ
 	*multi_mods = 1;
 
-    return mod_strlen;
+    ਵਾਪਸ mod_strlen;
 }
 
 /*
@@ -1757,52 +1757,52 @@ add_cmd_modifier(
  * was added.  Return the number of bytes added.
  */
     size_t
-add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
+ਜੋੜੋ_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, ਪੂਰਨ *multi_mods)
 {
     size_t buflen = 0;
 
     // :aboveleft and :leftabove
-    if (cmod->cmod_split & WSP_ABOVE)
-	buflen += add_cmd_modifier(buf, buflen, "aboveleft", STRLEN_LITERAL("aboveleft"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_ABOVE)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "aboveleft", STRLEN_LITERAL("aboveleft"), multi_mods);
     // :belowright and :rightbelow
-    if (cmod->cmod_split & WSP_BELOW)
-	buflen += add_cmd_modifier(buf, buflen, "belowright", STRLEN_LITERAL("belowright"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_ਹੇਠਾਂ)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "belowright", STRLEN_LITERAL("belowright"), multi_mods);
     // :botright
-    if (cmod->cmod_split & WSP_BOT)
-	buflen += add_cmd_modifier(buf, buflen, "botright", STRLEN_LITERAL("botright"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_BOT)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "botright", STRLEN_LITERAL("botright"), multi_mods);
 
     // :tab
-    if (cmod->cmod_tab > 0)
+    ਜੇ (cmod->cmod_tab > 0)
     {
-	int tabnr = cmod->cmod_tab - 1;
+	ਪੂਰਨ tabnr = cmod->cmod_tab - 1;
 
-	if (tabnr == tabpage_index(curtab))
+	ਜੇ (tabnr == tabpage_ਸੂਚਕਾਂਕ(curtab))
 	{
 	    // For compatibility, don't add a tabpage number if it is the same
 	    // as the default number for :tab.
-	    buflen += add_cmd_modifier(buf, buflen, "tab", STRLEN_LITERAL("tab"), multi_mods);
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "tab", STRLEN_LITERAL("tab"), multi_mods);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    char tab_buf[NUMBUFLEN + 3];
+	    ਅੱਖਰ tab_buf[NUMBUFLEN + 3];
 	    size_t tab_buflen;
 
-	    tab_buflen = vim_snprintf(tab_buf, sizeof(tab_buf), "%dtab", tabnr);
-	    buflen += add_cmd_modifier(buf, buflen, tab_buf, tab_buflen, multi_mods);
+	    tab_buflen = vim_snprintf(tab_buf, ਆਕਾਰ(tab_buf), "%dtab", tabnr);
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, tab_buf, tab_buflen, multi_mods);
 	}
     }
 
     // :topleft
-    if (cmod->cmod_split & WSP_TOP)
-	buflen += add_cmd_modifier(buf, buflen, "topleft", STRLEN_LITERAL("topleft"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_ਸਿਖਰ)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "topleft", STRLEN_LITERAL("topleft"), multi_mods);
     // :vertical
-    if (cmod->cmod_split & WSP_VERT)
-	buflen += add_cmd_modifier(buf, buflen, "vertical", STRLEN_LITERAL("vertical"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_VERT)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "vertical", STRLEN_LITERAL("vertical"), multi_mods);
     // :horizontal
-    if (cmod->cmod_split & WSP_HOR)
-	buflen += add_cmd_modifier(buf, buflen, "horizontal", STRLEN_LITERAL("horizontal"), multi_mods);
+    ਜੇ (cmod->cmod_ਵੰਡੋ & WSP_HOR)
+	buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "horizontal", STRLEN_LITERAL("horizontal"), multi_mods);
 
-    return buflen;
+    ਵਾਪਸ buflen;
 }
 
 /*
@@ -1810,90 +1810,90 @@ add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
  * If "buf" is NULL just return the length.
  */
     size_t
-produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
+produce_cmdmods(char_u *buf, cmdmod_T *cmod, ਪੂਰਨ quote)
 {
     size_t  buflen = 0;
-    int	    multi_mods = 0;
-    int	    i;
-    static keyvalue_T mod_entry_tab[] =
+    ਪੂਰਨ	    multi_mods = 0;
+    ਪੂਰਨ	    i;
+    ਸਥਿਰ keyvalue_T mod_ਇੰਦਰਾਜ_tab[] =
     {
-#ifdef FEAT_BROWSE_CMD
-	KEYVALUE_ENTRY(CMOD_BROWSE, "browse"),
-#endif
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	KEYVALUE_ENTRY(CMOD_CONFIRM, "confirm"),
-#endif
-	KEYVALUE_ENTRY(CMOD_HIDE, "hide"),
-	KEYVALUE_ENTRY(CMOD_KEEPALT, "keepalt"),
-	KEYVALUE_ENTRY(CMOD_KEEPJUMPS, "keepjumps"),
-	KEYVALUE_ENTRY(CMOD_KEEPMARKS, "keepmarks"),
-	KEYVALUE_ENTRY(CMOD_KEEPPATTERNS, "keeppatterns"),
-	KEYVALUE_ENTRY(CMOD_LOCKMARKS, "lockmarks"),
-	KEYVALUE_ENTRY(CMOD_NOSWAPFILE, "noswapfile"),
-	KEYVALUE_ENTRY(CMOD_UNSILENT, "unsilent"),
-	KEYVALUE_ENTRY(CMOD_NOAUTOCMD, "noautocmd"),
-#ifdef HAVE_SANDBOX
-	KEYVALUE_ENTRY(CMOD_SANDBOX, "sandbox"),
-#endif
-	KEYVALUE_ENTRY(CMOD_LEGACY, "legacy")
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_BROWSE_CMD
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_BROWSE, "browse"),
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_CONFIRM, "confirm"),
+#ਜੇ_ਅੰਤ
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_HIDE, "hide"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_KEEPALT, "keepalt"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_KEEPJUMPS, "keepjumps"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_KEEPMARKS, "keepmarks"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_KEEPPATTERNS, "keeppatterns"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_LOCKMARKS, "lockmarks"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_NOSWAPFILE, "noswapfile"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_UNSILENT, "unsilent"),
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_NOAUTOCMD, "noautocmd"),
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_SANDBOX
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_SANDBOX, "sandbox"),
+#ਜੇ_ਅੰਤ
+	KEYVALUE_ਇੰਦਰਾਜ(CMOD_LEGACY, "legacy")
     };
 
-    if (quote)
+    ਜੇ (quote)
     {
 	++buflen;
-	if (buf != NULL)
+	ਜੇ (buf != ਨਿਰਾ)
 	{
 	    *buf = '"';
 	    *(buf + buflen) = NUL;
 	}
     }
-    else
-    if (buf != NULL)
+    ਨਹੀਂਤਾਂ
+    ਜੇ (buf != ਨਿਰਾ)
 	*buf = NUL;
 
     // the modifiers that are simple flags
-    for (i = 0; i < (int)ARRAY_LENGTH(mod_entry_tab); ++i)
-	if (cmod->cmod_flags & mod_entry_tab[i].key)
-	    buflen += add_cmd_modifier(buf, buflen,
-		    (char *)mod_entry_tab[i].value.string,
-		    mod_entry_tab[i].value.length, &multi_mods);
+    ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(mod_ਇੰਦਰਾਜ_tab); ++i)
+	ਜੇ (cmod->cmod_flags & mod_ਇੰਦਰਾਜ_tab[i].ਕੁੰਜੀ)
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen,
+		    (ਅੱਖਰ *)mod_ਇੰਦਰਾਜ_tab[i].ਮੁੱਲ.string,
+		    mod_ਇੰਦਰਾਜ_tab[i].ਮੁੱਲ.ਲੰਮਾਈ, &multi_mods);
 
     // :silent
-    if (cmod->cmod_flags & CMOD_SILENT)
+    ਜੇ (cmod->cmod_flags & CMOD_SILENT)
     {
-	if (cmod->cmod_flags & CMOD_ERRSILENT)
-	    buflen += add_cmd_modifier(buf, buflen, "silent!",
+	ਜੇ (cmod->cmod_flags & CMOD_ERRSILENT)
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "silent!",
 		    STRLEN_LITERAL("silent!"), &multi_mods);
-	else
-	    buflen += add_cmd_modifier(buf, buflen, "silent",
+	ਨਹੀਂਤਾਂ
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "silent",
 		    STRLEN_LITERAL("silent"), &multi_mods);
     }
 
     // :verbose
-    if (cmod->cmod_verbose > 0)
+    ਜੇ (cmod->cmod_verbose > 0)
     {
-	int verbose_value = cmod->cmod_verbose - 1;
+	ਪੂਰਨ verbose_ਮੁੱਲ = cmod->cmod_verbose - 1;
 
-	if (verbose_value == 1)
-	    buflen += add_cmd_modifier(buf, buflen, "verbose", STRLEN_LITERAL("verbose"), &multi_mods);
-	else
+	ਜੇ (verbose_ਮੁੱਲ == 1)
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, "verbose", STRLEN_LITERAL("verbose"), &multi_mods);
+	ਨਹੀਂਤਾਂ
 	{
-	    char verbose_buf[NUMBUFLEN];
+	    ਅੱਖਰ verbose_buf[NUMBUFLEN];
 	    size_t verbose_buflen;
 
-	    verbose_buflen = vim_snprintf(verbose_buf, sizeof(verbose_buf), "%dverbose", verbose_value);
-	    buflen += add_cmd_modifier(buf, buflen, verbose_buf, verbose_buflen, &multi_mods);
+	    verbose_buflen = vim_snprintf(verbose_buf, ਆਕਾਰ(verbose_buf), "%dverbose", verbose_ਮੁੱਲ);
+	    buflen += ਜੋੜੋ_cmd_modifier(buf, buflen, verbose_buf, verbose_buflen, &multi_mods);
 	}
     }
 
     // flags from cmod->cmod_split
-    buflen += add_win_cmd_modifiers((buf == NULL) ? NULL : buf + buflen, cmod, &multi_mods);
+    buflen += ਜੋੜੋ_win_cmd_modifiers((buf == ਨਿਰਾ) ? ਨਿਰਾ : buf + buflen, cmod, &multi_mods);
 
-    if (quote)
+    ਜੇ (quote)
     {
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	    ++buflen;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    *(buf + buflen) = '"';
 	    ++buflen;
@@ -1901,7 +1901,7 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
 	}
     }
 
-    return buflen;
+    ਵਾਪਸ buflen;
 }
 
 /*
@@ -1913,34 +1913,34 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
  * Returns the length of the replacement, which has been added to "buf".
  * Returns -1 if there was no match, and only the "<" has been copied.
  */
-    static size_t
-uc_check_code(
-    char_u	*code,
+    ਸਥਿਰ size_t
+uc_check_ਕੋਡ(
+    char_u	*ਕੋਡ,
     size_t	len,
     char_u	*buf,
     ucmd_T	*cmd,		// the user command we're expanding
     exarg_T	*eap,		// ex arguments
-    char_u	**split_buf,
-    size_t	*split_len)
+    char_u	**ਵੰਡੋ_buf,
+    size_t	*ਵੰਡੋ_len)
 {
-    size_t	result = 0;
-    char_u	*p = code + 1;
+    size_t	ਨਤੀਜਾ = 0;
+    char_u	*p = ਕੋਡ + 1;
     size_t	l = len - 2;
-    int		quote = 0;
-    enum {
-	ct_ARGS,
+    ਪੂਰਨ		quote = 0;
+    ਗਿਣਤੀ {
+	ct_ਦਲੀਲਾਂ,
 	ct_BANG,
-	ct_COUNT,
+	ct_ਗਿਣਤੀ,
 	ct_LINE1,
 	ct_LINE2,
 	ct_RANGE,
 	ct_MODS,
-	ct_REGISTER,
+	ct_ਰਜਿਸਟਰ,
 	ct_LT,
 	ct_NONE
     } type = ct_NONE;
 
-    if ((vim_strchr((char_u *)"qQfF", *p) != NULL) && p[1] == '-')
+    ਜੇ ((vim_strchr((char_u *)"qQfF", *p) != ਨਿਰਾ) && p[1] == '-')
     {
 	quote = (*p == 'q' || *p == 'Q') ? 1 : 2;
 	p += 2;
@@ -1948,260 +1948,260 @@ uc_check_code(
     }
 
     ++l;
-    if (l <= 1)
+    ਜੇ (l <= 1)
 	type = ct_NONE;
-    else if (STRNICMP(p, "args>", l) == 0)
-	type = ct_ARGS;
-    else if (STRNICMP(p, "bang>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "args>", l) == 0)
+	type = ct_ਦਲੀਲਾਂ;
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "bang>", l) == 0)
 	type = ct_BANG;
-    else if (STRNICMP(p, "count>", l) == 0)
-	type = ct_COUNT;
-    else if (STRNICMP(p, "line1>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "count>", l) == 0)
+	type = ct_ਗਿਣਤੀ;
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "line1>", l) == 0)
 	type = ct_LINE1;
-    else if (STRNICMP(p, "line2>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "line2>", l) == 0)
 	type = ct_LINE2;
-    else if (STRNICMP(p, "range>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "range>", l) == 0)
 	type = ct_RANGE;
-    else if (STRNICMP(p, "lt>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "lt>", l) == 0)
 	type = ct_LT;
-    else if (STRNICMP(p, "reg>", l) == 0 || STRNICMP(p, "register>", l) == 0)
-	type = ct_REGISTER;
-    else if (STRNICMP(p, "mods>", l) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "reg>", l) == 0 || STRNICMP(p, "register>", l) == 0)
+	type = ct_ਰਜਿਸਟਰ;
+    ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "mods>", l) == 0)
 	type = ct_MODS;
 
-    switch (type)
+    ਚੋਣ (type)
     {
-    case ct_ARGS:
+    ਹਾਲਤ ct_ਦਲੀਲਾਂ:
 	// Simple case first
-	if (*eap->arg == NUL)
+	ਜੇ (*eap->arg == NUL)
 	{
-	    if (quote == 1)
+	    ਜੇ (quote == 1)
 	    {
-		result = 2;
-		if (buf != NULL)
+		ਨਤੀਜਾ = 2;
+		ਜੇ (buf != ਨਿਰਾ)
 		    STRCPY(buf, "''");
 	    }
-	    else
-		result = 0;
-	    break;
+	    ਨਹੀਂਤਾਂ
+		ਨਤੀਜਾ = 0;
+	    ਰੋਕੋ;
 	}
 
 	// When specified there is a single argument don't split it.
 	// Works for ":Cmd %" when % is "a b c".
-	if ((eap->argt & EX_NOSPC) && quote == 2)
+	ਜੇ ((eap->argt & EX_NOSPC) && quote == 2)
 	    quote = 1;
 
-	switch (quote)
+	ਚੋਣ (quote)
 	{
-	case 0: // No quoting, no splitting
-	    result = STRLEN(eap->arg);
-	    if (buf != NULL)
+	ਹਾਲਤ 0: // No quoting, no splitting
+	    ਨਤੀਜਾ = STRLEN(eap->arg);
+	    ਜੇ (buf != ਨਿਰਾ)
 		STRCPY(buf, eap->arg);
-	    break;
-	case 1: // Quote, but don't split
+	    ਰੋਕੋ;
+	ਹਾਲਤ 1: // Quote, but don't split
 	{
 	    // For -completeopt=escape give <q-args> the logical value: a
 	    // backslash before a space, tab or backslash is collapsed.
-	    int	unesc = (cmd->uc_compl_opt & UCC_ESCAPE) != 0;
+	    ਪੂਰਨ	unesc = (cmd->uc_compl_opt & UCC_ESCAPE) != 0;
 
-	    result = STRLEN(eap->arg) + 2;
-	    for (p = eap->arg; *p; ++p)
+	    ਨਤੀਜਾ = STRLEN(eap->arg) + 2;
+	    ਲਈ (p = eap->arg; *p; ++p)
 	    {
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
+		ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
 		    // DBCS can contain \ in a trail byte, skip the
 		    // double-byte character.
 		    ++p;
-		else if (unesc && *p == '\\'
+		ਨਹੀਂਤਾਂ ਜੇ (unesc && *p == '\\'
 				     && (VIM_ISWHITE(p[1]) || p[1] == '\\'))
 		{
-		    if (VIM_ISWHITE(p[1]))
-			--result;
+		    ਜੇ (VIM_ISWHITE(p[1]))
+			--ਨਤੀਜਾ;
 		    ++p;
 		}
-		else
-		     if (*p == '\\' || *p == '"')
-		    ++result;
+		ਨਹੀਂਤਾਂ
+		     ਜੇ (*p == '\\' || *p == '"')
+		    ++ਨਤੀਜਾ;
 	    }
 
-	    if (buf != NULL)
+	    ਜੇ (buf != ਨਿਰਾ)
 	    {
 		*buf++ = '"';
-		for (p = eap->arg; *p; ++p)
+		ਲਈ (p = eap->arg; *p; ++p)
 		{
-		    if (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
+		    ਜੇ (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
 			// DBCS can contain \ in a trail byte, copy the
 			// double-byte character to avoid escaping.
 			*buf++ = *p++;
-		    else if (unesc && *p == '\\'
+		    ਨਹੀਂਤਾਂ ਜੇ (unesc && *p == '\\'
 				     && (VIM_ISWHITE(p[1]) || p[1] == '\\'))
 		    {
 			++p;	// drop the escaping backslash
-			if (*p == '\\')
+			ਜੇ (*p == '\\')
 			    *buf++ = '\\';	// re-escape for the quotes
 		    }
-		    else
-			 if (*p == '\\' || *p == '"')
+		    ਨਹੀਂਤਾਂ
+			 ਜੇ (*p == '\\' || *p == '"')
 			*buf++ = '\\';
 		    *buf++ = *p;
 		}
 		*buf = '"';
 	    }
 
-	    break;
+	    ਰੋਕੋ;
 	}
-	case 2: // Quote and split (<f-args>)
+	ਹਾਲਤ 2: // Quote and split (<f-args>)
 	    // This is hard, so only do it once, and cache the result
-	    if (*split_buf == NULL)
-		*split_buf = uc_split_args(eap->arg, split_len);
+	    ਜੇ (*ਵੰਡੋ_buf == ਨਿਰਾ)
+		*ਵੰਡੋ_buf = uc_ਵੰਡੋ_ਦਲੀਲਾਂ(eap->arg, ਵੰਡੋ_len);
 
-	    result = *split_len;
-	    if (buf != NULL && result != 0)
-		STRCPY(buf, *split_buf);
+	    ਨਤੀਜਾ = *ਵੰਡੋ_len;
+	    ਜੇ (buf != ਨਿਰਾ && ਨਤੀਜਾ != 0)
+		STRCPY(buf, *ਵੰਡੋ_buf);
 
-	    break;
+	    ਰੋਕੋ;
 	}
-	break;
+	ਰੋਕੋ;
 
-    case ct_BANG:
-	result = eap->forceit ? 1 : 0;
-	if (quote)
-	    result += 2;
-	if (buf != NULL)
+    ਹਾਲਤ ct_BANG:
+	ਨਤੀਜਾ = eap->forceit ? 1 : 0;
+	ਜੇ (quote)
+	    ਨਤੀਜਾ += 2;
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    if (quote)
+	    ਜੇ (quote)
 		*buf++ = '"';
-	    if (eap->forceit)
+	    ਜੇ (eap->forceit)
 		*buf++ = '!';
-	    if (quote)
+	    ਜੇ (quote)
 		*buf = '"';
 	}
-	break;
+	ਰੋਕੋ;
 
-    case ct_LINE1:
-    case ct_LINE2:
-    case ct_RANGE:
-    case ct_COUNT:
+    ਹਾਲਤ ct_LINE1:
+    ਹਾਲਤ ct_LINE2:
+    ਹਾਲਤ ct_RANGE:
+    ਹਾਲਤ ct_ਗਿਣਤੀ:
     {
-	char num_buf[NUMBUFLEN];
-	long num = (type == ct_LINE1) ? eap->line1 :
+	ਅੱਖਰ ਅੰਕ_buf[NUMBUFLEN];
+	ਲੰਮਾ ਅੰਕ = (type == ct_LINE1) ? eap->line1 :
 		   (type == ct_LINE2) ? eap->line2 :
-		   (type == ct_RANGE) ? eap->addr_count :
-		   (eap->addr_count > 0) ? eap->line2 : cmd->uc_def;
-	size_t num_len;
+		   (type == ct_RANGE) ? eap->addr_ਗਿਣਤੀ :
+		   (eap->addr_ਗਿਣਤੀ > 0) ? eap->line2 : cmd->uc_def;
+	size_t ਅੰਕ_len;
 
-	num_len = vim_snprintf(num_buf, sizeof(num_buf), "%ld", num);
-	result = num_len;
+	ਅੰਕ_len = vim_snprintf(ਅੰਕ_buf, ਆਕਾਰ(ਅੰਕ_buf), "%ld", ਅੰਕ);
+	ਨਤੀਜਾ = ਅੰਕ_len;
 
-	if (quote)
-	    result += 2;
+	ਜੇ (quote)
+	    ਨਤੀਜਾ += 2;
 
-	if (buf != NULL)
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    if (quote)
+	    ਜੇ (quote)
 		*buf++ = '"';
-	    STRCPY(buf, num_buf);
-	    buf += num_len;
-	    if (quote)
+	    STRCPY(buf, ਅੰਕ_buf);
+	    buf += ਅੰਕ_len;
+	    ਜੇ (quote)
 		*buf = '"';
 	}
 
-	break;
+	ਰੋਕੋ;
     }
 
-    case ct_MODS:
+    ਹਾਲਤ ct_MODS:
     {
-	result = produce_cmdmods(buf, &cmdmod, quote);
-	break;
+	ਨਤੀਜਾ = produce_cmdmods(buf, &cmdmod, quote);
+	ਰੋਕੋ;
     }
 
-    case ct_REGISTER:
-	result = eap->regname ? 1 : 0;
-	if (quote)
-	    result += 2;
-	if (buf != NULL)
+    ਹਾਲਤ ct_ਰਜਿਸਟਰ:
+	ਨਤੀਜਾ = eap->regname ? 1 : 0;
+	ਜੇ (quote)
+	    ਨਤੀਜਾ += 2;
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    if (quote)
+	    ਜੇ (quote)
 		*buf++ = '\'';
-	    if (eap->regname)
+	    ਜੇ (eap->regname)
 		*buf++ = eap->regname;
-	    if (quote)
+	    ਜੇ (quote)
 		*buf = '\'';
 	}
-	break;
+	ਰੋਕੋ;
 
-    case ct_LT:
-	result = 1;
-	if (buf != NULL)
+    ਹਾਲਤ ct_LT:
+	ਨਤੀਜਾ = 1;
+	ਜੇ (buf != ਨਿਰਾ)
 	    *buf = '<';
-	break;
+	ਰੋਕੋ;
 
-    default:
+    ਮੂਲ:
 	// Not recognized: just copy the '<' and return -1.
-	result = (size_t)-1;
-	if (buf != NULL)
+	ਨਤੀਜਾ = (size_t)-1;
+	ਜੇ (buf != ਨਿਰਾ)
 	    *buf = '<';
-	break;
+	ਰੋਕੋ;
     }
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
  * Execute a user defined command.
  */
-    void
+    ਖਾਲੀ
 do_ucmd(exarg_T *eap)
 {
     char_u	*buf;
     char_u	*p;
     char_u	*q;
 
-    char_u	*start;
-    char_u	*end = NULL;
+    char_u	*ਸ਼ੁਰੂ;
+    char_u	*ਸਿਰਾ = ਨਿਰਾ;
     char_u	*ksp;
     size_t	len, totlen;
 
-    size_t	split_len = 0;
-    char_u	*split_buf = NULL;
+    size_t	ਵੰਡੋ_len = 0;
+    char_u	*ਵੰਡੋ_buf = ਨਿਰਾ;
     ucmd_T	*cmd;
     sctx_T	save_current_sctx;
-    int		restore_current_sctx = FALSE;
-#ifdef FEAT_EVAL
-    int		restore_script_version = 0;
-#endif
+    ਪੂਰਨ		restore_current_sctx = FALSE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਪੂਰਨ		restore_script_ਸੰਸਕਰਣ = 0;
+#ਜੇ_ਅੰਤ
 
-    if (eap->cmdidx == CMD_USER)
+    ਜੇ (eap->cmdidx == CMD_USER)
 	cmd = USER_CMD(eap->useridx);
-    else
-	cmd = USER_CMD_GA(&prevwin_curwin()->w_buffer->b_ucmds, eap->useridx);
+    ਨਹੀਂਤਾਂ
+	cmd = USER_CMD_GA(&prevwin_curwin()->w_ਬਫਰ->b_ucmds, eap->useridx);
 
     /*
      * Replace <> in the command by the arguments.
      * First round: "buf" is NULL, compute length, allocate "buf".
      * Second round: copy result into "buf".
      */
-    buf = NULL;
-    for (;;)
+    buf = ਨਿਰਾ;
+    ਲਈ (;;)
     {
-	p = cmd->uc_rep;    // source
+	p = cmd->uc_rep;    //ਸਰੋਤ
 	q = buf;	    // destination
 	totlen = 0;
 
-	for (;;)
+	ਲਈ (;;)
 	{
-	    start = vim_strchr(p, '<');
-	    if (start != NULL)
-		end = vim_strchr(start + 1, '>');
-	    if (buf != NULL)
+	    ਸ਼ੁਰੂ = vim_strchr(p, '<');
+	    ਜੇ (ਸ਼ੁਰੂ != ਨਿਰਾ)
+		ਸਿਰਾ = vim_strchr(ਸ਼ੁਰੂ + 1, '>');
+	    ਜੇ (buf != ਨਿਰਾ)
 	    {
-		for (ksp = p; *ksp != NUL && *ksp != K_SPECIAL; ++ksp)
+		ਲਈ (ksp = p; *ksp != NUL && *ksp != K_SPECIAL; ++ksp)
 		    ;
-		if (*ksp == K_SPECIAL
-			&& (start == NULL || ksp < start || end == NULL)
+		ਜੇ (*ksp == K_SPECIAL
+			&& (ਸ਼ੁਰੂ == ਨਿਰਾ || ksp < ਸ਼ੁਰੂ || ਸਿਰਾ == ਨਿਰਾ)
 			&& ((ksp[1] == KS_SPECIAL && ksp[2] == KE_FILLER)
-#ifdef FEAT_GUI
-			    || (ksp[1] == KS_EXTRA && ksp[2] == (int)KE_CSI)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+			    || (ksp[1] == KS_EXTRA && ksp[2] == (ਪੂਰਨ)KE_CSI)
+#ਜੇ_ਅੰਤ
 			    ))
 		{
 		    // K_SPECIAL has been put in the buffer as K_SPECIAL
@@ -2209,96 +2209,96 @@ do_ucmd(exarg_T *eap)
 		    // do_cmdline() doesn't handle that, so convert it back.
 		    // Also change K_SPECIAL KS_EXTRA KE_CSI into CSI.
 		    len = ksp - p;
-		    if (len > 0)
+		    ਜੇ (len > 0)
 		    {
 			mch_memmove(q, p, len);
 			q += len;
 		    }
 		    *q++ = ksp[1] == KS_SPECIAL ? K_SPECIAL : CSI;
 		    p = ksp + 3;
-		    continue;
+		    ਜਾਰੀ;
 		}
 	    }
 
 	    // break if no <item> is found
-	    if (start == NULL || end == NULL)
-		break;
+	    ਜੇ (ਸ਼ੁਰੂ == ਨਿਰਾ || ਸਿਰਾ == ਨਿਰਾ)
+		ਰੋਕੋ;
 
 	    // Include the '>'
-	    ++end;
+	    ++ਸਿਰਾ;
 
 	    // Take everything up to the '<'
-	    len = start - p;
-	    if (buf == NULL)
+	    len = ਸ਼ੁਰੂ - p;
+	    ਜੇ (buf == ਨਿਰਾ)
 		totlen += len;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		mch_memmove(q, p, len);
 		q += len;
 	    }
 
-	    len = uc_check_code(start, end - start, q, cmd, eap,
-			     &split_buf, &split_len);
-	    if (len == (size_t)-1)
+	    len = uc_check_ਕੋਡ(ਸ਼ੁਰੂ, ਸਿਰਾ - ਸ਼ੁਰੂ, q, cmd, eap,
+			     &ਵੰਡੋ_buf, &ਵੰਡੋ_len);
+	    ਜੇ (len == (size_t)-1)
 	    {
 		// no match, continue after '<'
-		p = start + 1;
+		p = ਸ਼ੁਰੂ + 1;
 		len = 1;
 	    }
-	    else
-		p = end;
-	    if (buf == NULL)
+	    ਨਹੀਂਤਾਂ
+		p = ਸਿਰਾ;
+	    ਜੇ (buf == ਨਿਰਾ)
 		totlen += len;
-	    else
+	    ਨਹੀਂਤਾਂ
 		q += len;
 	}
-	if (buf != NULL)	    // second time here, finished
+	ਜੇ (buf != ਨਿਰਾ)	    // second time here, finished
 	{
 	    STRCPY(q, p);
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	totlen += STRLEN(p);	    // Add on the trailing characters
 	buf = alloc(totlen + 1);
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	{
-	    vim_free(split_buf);
-	    return;
+	    vim_free(ਵੰਡੋ_buf);
+	    ਵਾਪਸ;
 	}
     }
 
-    if ((cmd->uc_argt & EX_KEEPSCRIPT) == 0)
+    ਜੇ ((cmd->uc_argt & EX_KEEPSCRIPT) == 0)
     {
 	restore_current_sctx = TRUE;
 	save_current_sctx = current_sctx;
-	current_sctx.sc_version = cmd->uc_script_ctx.sc_version;
-#ifdef FEAT_EVAL
+	current_sctx.sc_ਸੰਸਕਰਣ = cmd->uc_script_ctx.sc_ਸੰਸਕਰਣ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	current_sctx.sc_sid = cmd->uc_script_ctx.sc_sid;
-	if (cmd->uc_flags & UC_VIM9)
+	ਜੇ (cmd->uc_flags & UC_VIM9)
 	{
 	    // In a {} block variables use Vim9 script rules, even in a legacy
 	    // script.
-	    restore_script_version =
-				  SCRIPT_ITEM(current_sctx.sc_sid)->sn_version;
-	    SCRIPT_ITEM(current_sctx.sc_sid)->sn_version = SCRIPT_VERSION_VIM9;
+	    restore_script_ਸੰਸਕਰਣ =
+				  SCRIPT_ਵਸਤੂ(current_sctx.sc_sid)->sn_ਸੰਸਕਰਣ;
+	    SCRIPT_ਵਸਤੂ(current_sctx.sc_sid)->sn_ਸੰਸਕਰਣ = SCRIPT_ਸੰਸਕਰਣ_VIM9;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    (void)do_cmdline(buf, eap->ea_getline, eap->cookie,
+    (ਖਾਲੀ)do_cmdline(buf, eap->ea_getline, eap->cookie,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 
     // Careful: Do not use "cmd" here, it may have become invalid if a user
     // command was added.
-    if (restore_current_sctx)
+    ਜੇ (restore_current_sctx)
     {
-#ifdef FEAT_EVAL
-	if (restore_script_version != 0)
-	    SCRIPT_ITEM(current_sctx.sc_sid)->sn_version =
-							restore_script_version;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	ਜੇ (restore_script_ਸੰਸਕਰਣ != 0)
+	    SCRIPT_ਵਸਤੂ(current_sctx.sc_sid)->sn_ਸੰਸਕਰਣ =
+							restore_script_ਸੰਸਕਰਣ;
+#ਜੇ_ਅੰਤ
 	current_sctx = save_current_sctx;
     }
     vim_free(buf);
-    vim_free(split_buf);
+    vim_free(ਵੰਡੋ_buf);
 }

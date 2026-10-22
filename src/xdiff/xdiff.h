@@ -20,141 +20,141 @@
  *
  */
 
-#if !defined(XDIFF_H)
-#define XDIFF_H
+#ਜੇ !defined(XDIFF_H)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDIFF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* #ifdef __cplusplus */
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
+ਬਾਹਰੀ "C" {
+#ਜੇ_ਅੰਤ /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
-#define XDF_NEED_MINIMAL (1 << 0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_NEED_ਨਿਊਨਤਮ (1 << 0)
 
-#define XDF_IGNORE_WHITESPACE (1 << 1)
-#define XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
-#define XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
-#define XDF_IGNORE_CR_AT_EOL (1 << 4)
-#define XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_IGNORE_WHITESPACE (1 << 1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_IGNORE_CR_AT_EOL (1 << 4)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
 			      XDF_IGNORE_WHITESPACE_CHANGE | \
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_IGNORE_BLANK_ਸਤਰਾਂ (1 << 7)
 
-#define XDF_PATIENCE_DIFF (1 << 14)
-#define XDF_HISTOGRAM_DIFF (1 << 15)
-#define XDF_DIFF_ALGORITHM_MASK (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
-#define XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_MASK)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_PATIENCE_DIFF (1 << 14)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_HISTOGRAM_DIFF (1 << 15)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_DIFF_ALGORITHM_ਨਕਾਬ (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_ਨਕਾਬ)
 
-#define XDF_INDENT_HEURISTIC (1 << 23)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDF_INDENT_HEURISTIC (1 << 23)
 
 /* xdemitconf_t.flags */
-#define XDL_EMIT_FUNCNAMES (1 << 0)
-#define XDL_EMIT_NO_HUNK_HDR (1 << 1)
-#define XDL_EMIT_FUNCCONTEXT (1 << 2)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_EMIT_FUNCNAMES (1 << 0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_EMIT_NO_HUNK_HDR (1 << 1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_EMIT_FUNCCONTEXT (1 << 2)
 
 /* merge simplification levels */
-#define XDL_MERGE_MINIMAL 0
-#define XDL_MERGE_EAGER 1
-#define XDL_MERGE_ZEALOUS 2
-#define XDL_MERGE_ZEALOUS_ALNUM 3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_ਨਿਊਨਤਮ 0
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_EAGER 1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_ZEALOUS 2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_ZEALOUS_ALNUM 3
 
 /* merge favor modes */
-#define XDL_MERGE_FAVOR_OURS 1
-#define XDL_MERGE_FAVOR_THEIRS 2
-#define XDL_MERGE_FAVOR_UNION 3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_FAVOR_OURS 1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_FAVOR_THEIRS 2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_FAVOR_UNION 3
 
 /* merge output styles */
-#define XDL_MERGE_DIFF3 1
-#define XDL_MERGE_ZEALOUS_DIFF3 2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_DIFF3 1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ਮਿਲਾਓ_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
-	long size;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_mmfile {
+	ਅੱਖਰ *ptr;
+	ਲੰਮਾ ਮਾਪ;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
-	long size;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_mmbuffer {
+	ਅੱਖਰ *ptr;
+	ਲੰਮਾ ਮਾਪ;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
-	unsigned long flags;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xpparam {
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #ਜੇ 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
-#endif
+#ਜੇ_ਅੰਤ
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	ਅੱਖਰ **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
-			long old_begin, long old_nr,
-			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xdemitcb {
+	ਖਾਲੀ *priv;
+	ਪੂਰਨ (*ਬਾਹਰਲਾ_hunk)(ਖਾਲੀ *,
+			ਲੰਮਾ old_begin, ਲੰਮਾ old_nr,
+			ਲੰਮਾ new_begin, ਲੰਮਾ new_nr,
+			ਅਚਲ ਅੱਖਰ *func, ਲੰਮਾ funclen);
+	ਪੂਰਨ (*ਬਾਹਰਲਾ_ਸਤਰ)(ਖਾਲੀ *, mmbuffer_t *, ਪੂਰਨ);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਲੰਮਾ (*ਲੱਭੋ_func_t)(ਅਚਲ ਅੱਖਰ *ਸਤਰ, ਲੰਮਾ ਸਤਰ_len, ਅੱਖਰ *ਬਫਰ, ਲੰਮਾ ਬਫਰ_ਮਾਪ_3, ਖਾਲੀ *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*xdl_emit_hunk_consume_func_t)(ਲੰਮਾ ਸ਼ੁਰੂ_a, ਲੰਮਾ ਗਿਣਤੀ_a,
+					    ਲੰਮਾ ਸ਼ੁਰੂ_b, ਲੰਮਾ ਗਿਣਤੀ_b,
+					    ਖਾਲੀ *cb_ਅੰਕੜੇ_2);
 
-typedef struct s_xdemitconf {
-	long ctxlen;
-	long interhunkctxlen;
-	unsigned long flags;
-	find_func_t find_func;
-	void *find_func_priv;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xdemitconf {
+	ਲੰਮਾ ctxlen;
+	ਲੰਮਾ interhunkctxlen;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ flags;
+	ਲੱਭੋ_func_t ਲੱਭੋ_func;
+	ਖਾਲੀ *ਲੱਭੋ_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
-	long bsize;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_bdiffparam {
+	ਲੰਮਾ bsize;
 } bdiffparam_t;
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 # include "[]vim.h"
-#else
+#ਨਹੀਂਤਾਂ
 # include "../vim.h"
-#endif
+#ਜੇ_ਅੰਤ
 
-#define xdl_malloc(x) lalloc((x), TRUE)
-#define xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
-#define xdl_free(ptr) vim_free(ptr)
-#define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ xdl_malloc(x) lalloc((x), TRUE)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ xdl_free(ptr) vim_free(ptr)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
-long xdl_mmfile_size(mmfile_t *mmf);
+ਖਾਲੀ *xdl_mmfile_ਪਹਿਲਾ(mmfile_t *mmf, ਲੰਮਾ *ਮਾਪ);
+ਲੰਮਾ xdl_mmfile_ਮਾਪ(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+ਪੂਰਨ xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ਅਚਲ *xpp,
+	     xdemitconf_t ਅਚਲ *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	ਪੂਰਨ marker_ਮਾਪ;
+	ਪੂਰਨ level;
+	ਪੂਰਨ favor;
+	ਪੂਰਨ style;
+	ਅਚਲ ਅੱਖਰ *ancestor;	/* label for orig */
+	ਅਚਲ ਅੱਖਰ *file1;	/* label for mf1 */
+	ਅਚਲ ਅੱਖਰ *file2;	/* label for mf2 */
 } xmparam_t;
 
-#define DEFAULT_CONFLICT_MARKER_SIZE 7
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFAULT_CONFLICT_MARKER_ਮਾਪ 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+ਪੂਰਨ xdl_ਮਿਲਾਓ(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t ਅਚਲ *xmp, mmbuffer_t *ਨਤੀਜਾ);
 
-#ifdef __cplusplus
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
 }
-#endif /* #ifdef __cplusplus */
+#ਜੇ_ਅੰਤ /* #ifdef __cplusplus */
 
-#endif /* #if !defined(XDIFF_H) */
+#ਜੇ_ਅੰਤ /* #if !defined(XDIFF_H) */

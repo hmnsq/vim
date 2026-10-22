@@ -12,199 +12,199 @@
  * async debugging.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 // Log file opened with ch_logfile().
-static FILE *log_fd = NULL;
-static char_u *log_name = NULL;
-#ifdef FEAT_RELTIME
-static proftime_T log_start;
-#endif
+ਸਥਿਰ FILE *log_fd = ਨਿਰਾ;
+ਸਥਿਰ char_u *log_name = ਨਿਰਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RELTIME
+ਸਥਿਰ proftime_T log_ਸ਼ੁਰੂ;
+#ਜੇ_ਅੰਤ
 
-    void
+    ਖਾਲੀ
 ch_logfile(char_u *fname, char_u *opt)
 {
-    FILE	*file = NULL;
-    char	*mode = "a";
+    FILE	*file = ਨਿਰਾ;
+    ਅੱਖਰ	*ਬਹੁਲਕ = "a";
 
-    if (log_fd != NULL)
+    ਜੇ (log_fd != ਨਿਰਾ)
     {
-	if (*fname != NUL)
-	    ch_log(NULL, "closing this logfile, opening %s", fname);
-	else
-	    ch_log(NULL, "closing logfile %s", log_name);
+	ਜੇ (*fname != NUL)
+	    ch_log(ਨਿਰਾ, "closing this logfile, opening %s", fname);
+	ਨਹੀਂਤਾਂ
+	    ch_log(ਨਿਰਾ, "closing logfile %s", log_name);
 	fclose(log_fd);
     }
 
     // The "a" flag overrules the "w" flag.
-    if (vim_strchr(opt, 'a') == NULL && vim_strchr(opt, 'w') != NULL)
-	mode = "w";
-    ch_log_output = vim_strchr(opt, 'o') != NULL ? LOG_ALWAYS : FALSE;
+    ਜੇ (vim_strchr(opt, 'a') == ਨਿਰਾ && vim_strchr(opt, 'w') != ਨਿਰਾ)
+	ਬਹੁਲਕ = "w";
+    ch_log_output = vim_strchr(opt, 'o') != ਨਿਰਾ ? LOG_ALWAYS : FALSE;
 
-    if (*fname != NUL)
+    ਜੇ (*fname != NUL)
     {
-	file = fopen((char *)fname, mode);
-	if (file == NULL)
+	file = fopen((ਅੱਖਰ *)fname, ਬਹੁਲਕ);
+	ਜੇ (file == ਨਿਰਾ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    return;
+	    ਵਾਪਸ;
 	}
 	vim_free(log_name);
 	log_name = vim_strsave(fname);
     }
     log_fd = file;
 
-    if (log_fd != NULL)
+    ਜੇ (log_fd != ਨਿਰਾ)
     {
 	fprintf(log_fd, "==== start log session %s ====\n",
-						 get_ctime(time(NULL), FALSE));
+						 get_ctime(ਸਮਾਂ(ਨਿਰਾ), FALSE));
 	// flush now, if fork/exec follows it could be written twice
 	fflush(log_fd);
-#ifdef FEAT_RELTIME
-	profile_start(&log_start);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RELTIME
+	profile_ਸ਼ੁਰੂ(&log_ਸ਼ੁਰੂ);
+#ਜੇ_ਅੰਤ
     }
 }
 
-    int
-ch_log_active(void)
+    ਪੂਰਨ
+ch_log_ਸਰਗਰਮ(ਖਾਲੀ)
 {
-    return log_fd != NULL;
+    ਵਾਪਸ log_fd != ਨਿਰਾ;
 }
 
-    static void
-ch_log_lead(const char *what, channel_T *ch UNUSED, ch_part_T part UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+ch_log_lead(ਅਚਲ ਅੱਖਰ *what, channel_T *ch ਅਣਵਰਤਿਆ, ch_part_T part ਅਣਵਰਤਿਆ)
 {
-    if (log_fd == NULL)
-	return;
+    ਜੇ (log_fd == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-#ifdef FEAT_RELTIME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RELTIME
     proftime_T log_now;
 
-    profile_start(&log_now);
-    profile_sub(&log_now, &log_start);
-    fprintf(log_fd, "%s ", profile_msg(&log_now));
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    if (ch != NULL)
+    profile_ਸ਼ੁਰੂ(&log_now);
+    profile_sub(&log_now, &log_ਸ਼ੁਰੂ);
+    fprintf(log_fd, "%s ", profile_ਸੁਨੇਹਾ(&log_now));
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+    ਜੇ (ch != ਨਿਰਾ)
     {
-	if (part < PART_COUNT)
-	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_names[part]);
-	else
+	ਜੇ (part < PART_ਗਿਣਤੀ)
+	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_ਨਾਂ[part]);
+	ਨਹੀਂਤਾਂ
 	    fprintf(log_fd, "%son %d: ", what, ch->ch_id);
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	fprintf(log_fd, "%s: ", what);
 }
 
-#ifndef PROTO  // prototype is in proto.h
-    void
-ch_log(channel_T *ch, const char *fmt, ...)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ PROTO  // prototype is in proto.h
+    ਖਾਲੀ
+ch_log(channel_T *ch, ਅਚਲ ਅੱਖਰ *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    ਜੇ (log_fd == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     va_list ap;
 
-    ch_log_lead("", ch, PART_COUNT);
+    ch_log_lead("", ch, PART_ਗਿਣਤੀ);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_ਸੁਨੇਹਾ = 0;
 }
 
-    void
-ch_error(channel_T *ch, const char *fmt, ...)
+    ਖਾਲੀ
+ch_error(channel_T *ch, ਅਚਲ ਅੱਖਰ *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    ਜੇ (log_fd == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     va_list ap;
 
-    ch_log_lead("ERR ", ch, PART_COUNT);
+    ch_log_lead("ERR ", ch, PART_ਗਿਣਤੀ);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_ਸੁਨੇਹਾ = 0;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_JOB_CHANNEL)
+#ਜੇ defined(FEAT_ਕੰਮ_CHANNEL)
 /*
  * Log a message "buf[len]" for channel "ch" part "part".
  * Only to be called when ch_log_active() returns TRUE.
  */
-    void
+    ਖਾਲੀ
 ch_log_literal(
-	char	    *lead,
+	ਅੱਖਰ	    *lead,
 	channel_T   *ch,
 	ch_part_T   part,
 	char_u	    *buf,
-	int	    len)
+	ਪੂਰਨ	    len)
 {
     ch_log_lead(lead, ch, part);
     fprintf(log_fd, "'");
-    vim_ignored = (int)fwrite(buf, len, 1, log_fd);
+    vim_ignored = (ਪੂਰਨ)fwrite(buf, len, 1, log_fd);
     fprintf(log_fd, "'\n");
     fflush(log_fd);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * "ch_log()" function
  */
-    void
-f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_log(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-    char_u	*msg;
-    channel_T	*channel = NULL;
+    char_u	*ਸੁਨੇਹਾ;
+    channel_T	*channel = ਨਿਰਾ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_chan_or_job_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_chan_or_ਕੰਮ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    msg = tv_get_string(&argvars[0]);
-#if defined(FEAT_JOB_CHANNEL)
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਸੁਨੇਹਾ = tv_get_string(&argvars[0]);
+#ਜੇ defined(FEAT_ਕੰਮ_CHANNEL)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
 	channel = get_channel_arg(&argvars[1], FALSE, FALSE, 0);
-#endif
+#ਜੇ_ਅੰਤ
 
     // Prepend "ch_log()" to make it easier to find these entries in the
     // logfile.
-    ch_log(channel, "ch_log(): %s", msg);
+    ch_log(channel, "ch_log(): %s", ਸੁਨੇਹਾ);
 }
 
 /*
  * "ch_logfile()" function
  */
-    void
-f_ch_logfile(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_logfile(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     char_u *fname;
     char_u *opt = (char_u *)"";
     char_u buf[NUMBUFLEN];
 
     // Don't open a file in restricted mode.
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     fname = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_STRING)
+    ਜੇ (argvars[1].v_type == VAR_STRING)
 	opt = tv_get_string_buf(&argvars[1], buf);
     ch_logfile(fname, opt);
 }
 
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL

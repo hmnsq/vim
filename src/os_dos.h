@@ -13,33 +13,33 @@
  * Some of these may have been defined in the makefile or feature.h.
  */
 
-#ifndef SYS_VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE		"$VIM\\vimrc"
-#endif
-#ifndef USR_VIMRC_FILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_VIMRC_FILE
 # define USR_VIMRC_FILE		"$HOME\\_vimrc"
-#endif
-#ifndef USR_VIMRC_FILE2
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_VIMRC_FILE2
 # define USR_VIMRC_FILE2	"$HOME\\vimfiles\\vimrc"
-#endif
-#ifndef USR_VIMRC_FILE3
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_VIMRC_FILE3
 # define USR_VIMRC_FILE3	"$VIM\\_vimrc"
-#endif
-#ifndef VIM_DEFAULTS_FILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE	"$VIMRUNTIME\\defaults.vim"
-#endif
-#ifndef EVIM_FILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ EVIM_FILE
 # define EVIM_FILE		"$VIMRUNTIME\\evim.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef USR_EXRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_EXRC_FILE
 # define USR_EXRC_FILE		"$HOME\\_exrc"
-#endif
-#ifndef USR_EXRC_FILE2
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_EXRC_FILE2
 # define USR_EXRC_FILE2		"$VIM\\_exrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 # ifndef SYS_GVIMRC_FILE
 #  define SYS_GVIMRC_FILE	"$VIM\\gvimrc"
 # endif
@@ -55,61 +55,61 @@
 # ifndef SYS_MENU_FILE
 #  define SYS_MENU_FILE		"$VIMRUNTIME\\menu.vim"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef SYS_OPTWIN_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYS_OPTWIN_FILE
 # define SYS_OPTWIN_FILE	"$VIMRUNTIME\\optwin.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_VIMINFO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  define VIMINFO_FILE		"$HOME\\_viminfo"
 # endif
 # ifndef VIMINFO_FILE2
 #  define VIMINFO_FILE2		"$VIM\\_viminfo"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ VIMRC_FILE
 # define VIMRC_FILE	"_vimrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef EXRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ EXRC_FILE
 # define EXRC_FILE	"_exrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 # ifndef GVIMRC_FILE
 #  define GVIMRC_FILE	"_gvimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_HELPFILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_HELPFILE
 # define DFLT_HELPFILE	"$VIMRUNTIME\\doc\\help.txt"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef SYNTAX_FNAME
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYNTAX_FNAME
 # define SYNTAX_FNAME	"$VIMRUNTIME\\syntax\\%s.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_BDIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_BDIR
 # define DFLT_BDIR	".,$TEMP,c:\\tmp,c:\\temp" // default for 'backupdir'
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_VDIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_VDIR
 # define DFLT_VDIR	"$HOME/vimfiles/view"	// default for 'viewdir'
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_DIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_DIR
 # define DFLT_DIR	".,$TEMP,c:\\tmp,c:\\temp" // default for 'directory'
-#endif
+#ਜੇ_ਅੰਤ
 
-#define DFLT_ERRORFILE		"errors.err"
-#define DFLT_RUNTIMEPATH	"$HOME/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$HOME/vimfiles/after,$VIM/vimfiles/after"
-#define CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DFLT_ERRORFILE		"errors.err"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DFLT_RUNTIMEPATH	"$HOME/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$HOME/vimfiles/after,$VIM/vimfiles/after"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
 
-#define CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
-#define BACKSLASH_IN_FILENAME
-#define USE_CRNL		// lines end in CR-NL instead of NL
-#define HAVE_DUP		// have dup()
-#define HAVE_ST_MODE		// have stat.st_mode
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BACKSLASH_ਵਿੱਚ_FILENAME
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USE_CRNL		// lines end in CR-NL instead of NL
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_DUP		// have dup()
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_ST_ਬਹੁਲਕ		// have stat.st_mode

@@ -6,9 +6,9 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifdef PROTO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ PROTO
 
 # define WINAPI
 
-#endif
+#ਜੇ_ਅੰਤ
 

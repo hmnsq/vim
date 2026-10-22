@@ -1,77 +1,77 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#ਅਨ੍ਤਰ੍ਭਾਵ	<stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ	<stdlib.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ	<string.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ	<unixio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ	"vim.h"
+ਪੂਰਨ ਮੁੱਖ(ਪੂਰਨ argc, ਅੱਖਰ *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    ਅੱਖਰ	cmd[132], buf[BUFSIZ], *argp, *error_file, ਨਿਸ਼ਾਨਾ[132], *mms;
+    ਪੂਰਨ		err = 0, err_ਸਤਰ = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    ਜਦੋਂ (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	ਜੇ (*argp == '-')
 	{
-	    switch (*++argp)
+	    ਚੋਣ (*++argp)
 	    {
-		case 'm':
+		ਹਾਲਤ 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    ਰੋਕੋ;
+		ਹਾਲਤ 'e':
+		    ਜੇ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    ਰੋਕੋ;
+		ਮੂਲ:
+		    ਰੋਕੋ;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (*target)
-		strcat(target, " ");
-	    strcat(target, argp);
+	    ਜੇ (*ਨਿਸ਼ਾਨਾ)
+		strcat(ਨਿਸ਼ਾਨਾ, " ");
+	    strcat(ਨਿਸ਼ਾਨਾ, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
-								 mms, target);
+    vim_snprintf(cmd, ਆਕਾਰ(cmd), "%s/output=tmp:errors.vim_tmp %s",
+								 mms, ਨਿਸ਼ਾਨਾ);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    ਜਦੋਂ (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	ਜੇ (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
-	    buf[strlen(buf)-1] = '\0';
+	    err_ਸਤਰ++;
+	    buf[ਲੜੀ_ਲੰਬਾਈ(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (err_line)
+	    ਜੇ (err_ਸਤਰ)
 	    {
-		if (strstr(buf, _("At line")))
+		ਜੇ (ਲੜੀ_ਖੋਜ(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_ਸਤਰ = 0;
 		    fprintf(fpo, "@");
 		}
-		else
-		    buf[strlen(buf)-1] = '\0';
+		ਨਹੀਂਤਾਂ
+		    buf[ਲੜੀ_ਲੰਬਾਈ(buf)-1] = '\0';
 	    }
 	}
 	fprintf(fpo, "%s", buf);
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    ਜਦੋਂ (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
-    exit(err ? 44 : 1);
-    return(0);
+    ਬਾਹਰ_ਨਿਕਲੋ(err ? 44 : 1);
+    ਵਾਪਸ(0);
 }

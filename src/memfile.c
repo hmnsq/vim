@@ -32,61 +32,61 @@
  * file is opened.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 /*
  * Some systems have the page size in statfs.f_bsize, some in stat.st_blksize
  */
-#ifdef HAVE_ST_BLKSIZE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_ST_BLKSIZE
 # define STATFS stat
 # define F_BSIZE st_blksize
 # define fstatfs(fd, buf, len, nul) mch_fstat((fd), (buf))
-#else
+#ਨਹੀਂਤਾਂ
 # ifdef HAVE_SYS_STATFS_H
 #  include <sys/statfs.h>
 #  define STATFS statfs
 #  define F_BSIZE f_bsize
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * for Amiga Dos 2.0x we use Flush
  */
-#ifdef AMIGA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AMIGA
 # ifdef FEAT_ARP
-extern int dos2;			// this is in os_amiga.c
+ਬਾਹਰੀ ਪੂਰਨ dos2;			// this is in os_amiga.c
 # endif
 # ifdef SASC
 #  include <ios1.h>			// for chkufb()
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#define MEMFILE_PAGE_SIZE 4096		// default page size
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MEMFILE_ਪੰਨਾ_ਮਾਪ 4096		// default page size
 
-static long_u	total_mem_used = 0;	// total memory used for memfiles
+ਸਥਿਰ long_u	ਕੁੱਲ_mem_ਵਰਤਿਆ = 0;	// total memory used for memfiles
 
-static void mf_ins_hash(memfile_T *, bhdr_T *);
-static void mf_rem_hash(memfile_T *, bhdr_T *);
-static bhdr_T *mf_find_hash(memfile_T *, blocknr_T);
-static void mf_ins_used(memfile_T *, bhdr_T *);
-static void mf_rem_used(memfile_T *, bhdr_T *);
-static bhdr_T *mf_release(memfile_T *, int);
-static bhdr_T *mf_alloc_bhdr(memfile_T *, int);
-static void mf_free_bhdr(bhdr_T *);
-static void mf_ins_free(memfile_T *, bhdr_T *);
-static bhdr_T *mf_rem_free(memfile_T *);
-static int  mf_read(memfile_T *, bhdr_T *);
-static int  mf_write(memfile_T *, bhdr_T *);
-static int  mf_write_block(memfile_T *mfp, bhdr_T *hp, off_T offset, unsigned size);
-static int  mf_trans_add(memfile_T *, bhdr_T *);
-static void mf_do_open(memfile_T *, char_u *, int);
-static void mf_hash_init(mf_hashtab_T *);
-static void mf_hash_free(mf_hashtab_T *);
-static void mf_hash_free_all(mf_hashtab_T *);
-static mf_hashitem_T *mf_hash_find(mf_hashtab_T *, blocknr_T);
-static void mf_hash_add_item(mf_hashtab_T *, mf_hashitem_T *);
-static void mf_hash_rem_item(mf_hashtab_T *, mf_hashitem_T *);
-static int mf_hash_grow(mf_hashtab_T *);
+ਸਥਿਰ ਖਾਲੀ mf_ins_hash(memfile_T *, bhdr_T *);
+ਸਥਿਰ ਖਾਲੀ mf_rem_hash(memfile_T *, bhdr_T *);
+ਸਥਿਰ bhdr_T *mf_ਲੱਭੋ_hash(memfile_T *, blocknr_T);
+ਸਥਿਰ ਖਾਲੀ mf_ins_ਵਰਤਿਆ(memfile_T *, bhdr_T *);
+ਸਥਿਰ ਖਾਲੀ mf_rem_ਵਰਤਿਆ(memfile_T *, bhdr_T *);
+ਸਥਿਰ bhdr_T *mf_release(memfile_T *, ਪੂਰਨ);
+ਸਥਿਰ bhdr_T *mf_alloc_bhdr(memfile_T *, ਪੂਰਨ);
+ਸਥਿਰ ਖਾਲੀ mf_free_bhdr(bhdr_T *);
+ਸਥਿਰ ਖਾਲੀ mf_ins_free(memfile_T *, bhdr_T *);
+ਸਥਿਰ bhdr_T *mf_rem_free(memfile_T *);
+ਸਥਿਰ ਪੂਰਨ  mf_read(memfile_T *, bhdr_T *);
+ਸਥਿਰ ਪੂਰਨ  mf_write(memfile_T *, bhdr_T *);
+ਸਥਿਰ ਪੂਰਨ  mf_write_ਖੰਡ(memfile_T *mfp, bhdr_T *hp, off_T ਵਿੱਥ, ਬਿਨਾਨਿਸ਼ਾਨੀ ਮਾਪ);
+ਸਥਿਰ ਪੂਰਨ  mf_trans_ਜੋੜੋ(memfile_T *, bhdr_T *);
+ਸਥਿਰ ਖਾਲੀ mf_do_open(memfile_T *, char_u *, ਪੂਰਨ);
+ਸਥਿਰ ਖਾਲੀ mf_hash_init(mf_hashtab_T *);
+ਸਥਿਰ ਖਾਲੀ mf_hash_free(mf_hashtab_T *);
+ਸਥਿਰ ਖਾਲੀ mf_hash_free_all(mf_hashtab_T *);
+ਸਥਿਰ mf_hashitem_T *mf_hash_ਲੱਭੋ(mf_hashtab_T *, blocknr_T);
+ਸਥਿਰ ਖਾਲੀ mf_hash_ਜੋੜੋ_ਵਸਤੂ(mf_hashtab_T *, mf_hashitem_T *);
+ਸਥਿਰ ਖਾਲੀ mf_hash_rem_ਵਸਤੂ(mf_hashtab_T *, mf_hashitem_T *);
+ਸਥਿਰ ਪੂਰਨ mf_hash_grow(mf_hashtab_T *);
 
 /*
  * The functions for using a memfile:
@@ -117,49 +117,49 @@ static int mf_hash_grow(mf_hashtab_T *);
  * return value: identifier for this memory block file.
  */
     memfile_T *
-mf_open(char_u *fname, int flags)
+mf_open(char_u *fname, ਪੂਰਨ flags)
 {
     memfile_T		*mfp;
-    off_T		size;
-#if defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
+    off_T		ਮਾਪ;
+#ਜੇ defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
 # define USE_FSTATFS
-    struct STATFS	stf;
-#endif
+    ਬਣਤਰ STATFS	stf;
+#ਜੇ_ਅੰਤ
 
-    if ((mfp = ALLOC_ONE(memfile_T)) == NULL)
-	return NULL;
+    ਜੇ ((mfp = ALLOC_ONE(memfile_T)) == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (fname == NULL)	    // no file for this memfile, use memory only
+    ਜੇ (fname == ਨਿਰਾ)	    // no file for this memfile, use memory only
     {
-	mfp->mf_fname = NULL;
-	mfp->mf_ffname = NULL;
+	mfp->mf_fname = ਨਿਰਾ;
+	mfp->mf_ffname = ਨਿਰਾ;
 	mfp->mf_fd = -1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	mf_do_open(mfp, fname, flags);	// try to open the file
 
 	// if the file cannot be opened, return here
-	if (mfp->mf_fd < 0)
+	ਜੇ (mfp->mf_fd < 0)
 	{
 	    vim_free(mfp);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
 
-    mfp->mf_free_first = NULL;		// free list is empty
-    mfp->mf_used_first = NULL;		// used list is empty
-    mfp->mf_used_last = NULL;
+    mfp->mf_free_ਪਹਿਲਾ = ਨਿਰਾ;		// free list is empty
+    mfp->mf_ਵਰਤਿਆ_ਪਹਿਲਾ = ਨਿਰਾ;		// used list is empty
+    mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ = ਨਿਰਾ;
     mfp->mf_dirty = MF_DIRTY_NO;
-    mfp->mf_used_count = 0;
+    mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ = 0;
     mf_hash_init(&mfp->mf_hash);
     mf_hash_init(&mfp->mf_trans);
-    mfp->mf_page_size = MEMFILE_PAGE_SIZE;
-#ifdef FEAT_CRYPT
-    mfp->mf_old_key = NULL;
-#endif
+    mfp->mf_ਪੰਨਾ_ਮਾਪ = MEMFILE_ਪੰਨਾ_ਮਾਪ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+    mfp->mf_old_ਕੁੰਜੀ = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
-#ifdef USE_FSTATFS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_FSTATFS
     /*
      * Try to set the page size equal to the block size of the device.
      * Speeds up I/O a lot.
@@ -167,22 +167,22 @@ mf_open(char_u *fname, int flags)
      * in ml_recover().  The size used here may be wrong, therefore
      * mf_blocknr_max must be rounded up.
      */
-    if (mfp->mf_fd >= 0
-	    && fstatfs(mfp->mf_fd, &stf, sizeof(struct statfs), 0) == 0
-	    && stf.F_BSIZE >= MIN_SWAP_PAGE_SIZE
-	    && stf.F_BSIZE <= MAX_SWAP_PAGE_SIZE)
-	mfp->mf_page_size = stf.F_BSIZE;
-#endif
+    ਜੇ (mfp->mf_fd >= 0
+	    && fstatfs(mfp->mf_fd, &stf, ਆਕਾਰ(ਬਣਤਰ statfs), 0) == 0
+	    && stf.F_BSIZE >= MIN_ਅਦਲਾ_ਬਦਲੀ_ਪੰਨਾ_ਮਾਪ
+	    && stf.F_BSIZE <= MAX_ਅਦਲਾ_ਬਦਲੀ_ਪੰਨਾ_ਮਾਪ)
+	mfp->mf_ਪੰਨਾ_ਮਾਪ = stf.F_BSIZE;
+#ਜੇ_ਅੰਤ
 
-    if (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
-		  || (size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
+    ਜੇ (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
+		  || (ਮਾਪ = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	mfp->mf_blocknr_max = 0;	// no file or empty file
-    else
-	mfp->mf_blocknr_max = (blocknr_T)((size + mfp->mf_page_size - 1)
-							 / mfp->mf_page_size);
+    ਨਹੀਂਤਾਂ
+	mfp->mf_blocknr_max = (blocknr_T)((ਮਾਪ + mfp->mf_ਪੰਨਾ_ਮਾਪ - 1)
+							 / mfp->mf_ਪੰਨਾ_ਮਾਪ);
     mfp->mf_blocknr_min = -1;
-    mfp->mf_neg_count = 0;
-    mfp->mf_infile_count = mfp->mf_blocknr_max;
+    mfp->mf_neg_ਗਿਣਤੀ = 0;
+    mfp->mf_infile_ਗਿਣਤੀ = mfp->mf_blocknr_max;
 
     /*
      * Compute maximum number of pages ('maxmem' is in Kbyte):
@@ -190,20 +190,20 @@ mf_open(char_u *fname, int flags)
      * Avoid overflow by first reducing page size as much as possible.
      */
     {
-	int	    shift = 10;
-	unsigned    page_size = mfp->mf_page_size;
+	ਪੂਰਨ	    ਖਿਸਕਾਓ = 10;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ    ਪੰਨਾ_ਮਾਪ = mfp->mf_ਪੰਨਾ_ਮਾਪ;
 
-	while (shift > 0 && (page_size & 1) == 0)
+	ਜਦੋਂ (ਖਿਸਕਾਓ > 0 && (ਪੰਨਾ_ਮਾਪ & 1) == 0)
 	{
-	    page_size = page_size >> 1;
-	    --shift;
+	    ਪੰਨਾ_ਮਾਪ = ਪੰਨਾ_ਮਾਪ >> 1;
+	    --ਖਿਸਕਾਓ;
 	}
-	mfp->mf_used_count_max = (p_mm << shift) / page_size;
-	if (mfp->mf_used_count_max < 10)
-	    mfp->mf_used_count_max = 10;
+	mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ_max = (p_mm << ਖਿਸਕਾਓ) / ਪੰਨਾ_ਮਾਪ;
+	ਜੇ (mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ_max < 10)
+	    mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ_max = 10;
     }
 
-    return mfp;
+    ਵਾਪਸ mfp;
 }
 
 /*
@@ -216,43 +216,43 @@ mf_open(char_u *fname, int flags)
  *
  * return value: FAIL if file could not be opened, OK otherwise
  */
-    int
+    ਪੂਰਨ
 mf_open_file(memfile_T *mfp, char_u *fname)
 {
     mf_do_open(mfp, fname, O_RDWR|O_CREAT|O_EXCL); // try to open the file
 
-    if (mfp->mf_fd < 0)
-	return FAIL;
+    ਜੇ (mfp->mf_fd < 0)
+	ਵਾਪਸ FAIL;
 
     mfp->mf_dirty = MF_DIRTY_YES;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Close a memory file and delete the associated file if 'del_file' is TRUE.
  */
-    void
-mf_close(memfile_T *mfp, int del_file)
+    ਖਾਲੀ
+mf_close(memfile_T *mfp, ਪੂਰਨ del_file)
 {
     bhdr_T	*hp, *nextp;
 
-    if (mfp == NULL)		    // safety check
-	return;
-    if (mfp->mf_fd >= 0)
+    ਜੇ (mfp == ਨਿਰਾ)		    // safety check
+	ਵਾਪਸ;
+    ਜੇ (mfp->mf_fd >= 0)
     {
-	if (close(mfp->mf_fd) < 0)
-	    emsg(_(e_close_error_on_swap_file));
+	ਜੇ (close(mfp->mf_fd) < 0)
+	    emsg(_(e_close_error_on_ਅਦਲਾ_ਬਦਲੀ_file));
     }
-    if (del_file && mfp->mf_fname != NULL)
+    ਜੇ (del_file && mfp->mf_fname != ਨਿਰਾ)
 	mch_remove(mfp->mf_fname);
 					    // free entries in used list
-    for (hp = mfp->mf_used_first; hp != NULL; hp = nextp)
+    ਲਈ (hp = mfp->mf_ਵਰਤਿਆ_ਪਹਿਲਾ; hp != ਨਿਰਾ; hp = nextp)
     {
-	total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
-	nextp = hp->bh_next;
+	ਕੁੱਲ_mem_ਵਰਤਿਆ -= (long_u)hp->bh_ਪੰਨਾ_ਗਿਣਤੀ * mfp->mf_ਪੰਨਾ_ਮਾਪ;
+	nextp = hp->bh_ਅਗਲਾ;
 	mf_free_bhdr(hp);
     }
-    while (mfp->mf_free_first != NULL)	    // free entries in free list
+    ਜਦੋਂ (mfp->mf_free_ਪਹਿਲਾ != ਨਿਰਾ)	    // free entries in free list
 	vim_free(mf_rem_free(mfp));
     mf_hash_free(&mfp->mf_hash);
     mf_hash_free_all(&mfp->mf_trans);	    // free hashtable and its items
@@ -264,33 +264,33 @@ mf_close(memfile_T *mfp, int del_file)
 /*
  * Close the swap file for a memfile.  Used when 'swapfile' is reset.
  */
-    void
+    ਖਾਲੀ
 mf_close_file(
     buf_T	*buf,
-    int		getlines)	// get all lines into memory?
+    ਪੂਰਨ		getlines)	// get all lines into memory?
 {
     memfile_T	*mfp;
     linenr_T	lnum;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd < 0)		// nothing to close
-	return;
+    ਜੇ (mfp == ਨਿਰਾ || mfp->mf_fd < 0)		// nothing to close
+	ਵਾਪਸ;
 
-    if (getlines)
+    ਜੇ (getlines)
     {
 	// get all blocks in memory by accessing all lines (clumsy!)
 	mf_dont_release = TRUE;
-	for (lnum = 1; lnum <= buf->b_ml.ml_line_count; ++lnum)
-	    (void)ml_get_buf(buf, lnum, FALSE);
+	ਲਈ (lnum = 1; lnum <= buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; ++lnum)
+	    (ਖਾਲੀ)ml_get_buf(buf, lnum, FALSE);
 	mf_dont_release = FALSE;
 	// TODO: should check if all blocks are really in core
     }
 
-    if (close(mfp->mf_fd) < 0)			// close the file
-	emsg(_(e_close_error_on_swap_file));
+    ਜੇ (close(mfp->mf_fd) < 0)			// close the file
+	emsg(_(e_close_error_on_ਅਦਲਾ_ਬਦਲੀ_file));
     mfp->mf_fd = -1;
 
-    if (mfp->mf_fname != NULL)
+    ਜੇ (mfp->mf_fname != ਨਿਰਾ)
     {
 	mch_remove(mfp->mf_fname);		// delete the swap file
 	VIM_CLEAR(mfp->mf_fname);
@@ -302,13 +302,13 @@ mf_close_file(
  * Set new size for a memfile.  Used when block 0 of a swapfile has been read
  * and the size it indicates differs from what was guessed.
  */
-    void
-mf_new_page_size(memfile_T *mfp, unsigned new_size)
+    ਖਾਲੀ
+mf_new_ਪੰਨਾ_ਮਾਪ(memfile_T *mfp, ਬਿਨਾਨਿਸ਼ਾਨੀ new_ਮਾਪ)
 {
     // Correct the memory used for block 0 to the new size, because it will be
     // freed with that size later on.
-    total_mem_used += new_size - mfp->mf_page_size;
-    mfp->mf_page_size = new_size;
+    ਕੁੱਲ_mem_ਵਰਤਿਆ += new_ਮਾਪ - mfp->mf_ਪੰਨਾ_ਮਾਪ;
+    mfp->mf_ਪੰਨਾ_ਮਾਪ = new_ਮਾਪ;
 }
 
 /*
@@ -317,7 +317,7 @@ mf_new_page_size(memfile_T *mfp, unsigned new_size)
  *   negative: TRUE if negative block number desired (data block)
  */
     bhdr_T *
-mf_new(memfile_T *mfp, int negative, int page_count)
+mf_new(memfile_T *mfp, ਪੂਰਨ negative, ਪੂਰਨ ਪੰਨਾ_ਗਿਣਤੀ)
 {
     bhdr_T	*hp;	// new bhdr_T
     bhdr_T	*freep;	// first block in free list
@@ -327,7 +327,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * If we reached the maximum size for the used memory blocks, release one
      * If a bhdr_T is returned, use it and adjust the page_count if necessary.
      */
-    hp = mf_release(mfp, page_count);
+    hp = mf_release(mfp, ਪੰਨਾ_ਗਿਣਤੀ);
 
 /*
  * Decide on the number to use:
@@ -335,8 +335,8 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Otherwise use mf_block_min for a negative number, mf_block_max for
  * a positive number.
  */
-    freep = mfp->mf_free_first;
-    if (!negative && freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_ਪਹਿਲਾ;
+    ਜੇ (!negative && freep != ਨਿਰਾ && freep->bh_ਪੰਨਾ_ਗਿਣਤੀ >= ਪੰਨਾ_ਗਿਣਤੀ)
     {
 	/*
 	 * If the block in the free list has more pages, take only the number
@@ -348,57 +348,57 @@ mf_new(memfile_T *mfp, int negative, int page_count)
 	 * If the number of pages matches and mf_release() returned a bhdr_T,
 	 * just use the number and free the bhdr_T from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	ਜੇ (freep->bh_ਪੰਨਾ_ਗਿਣਤੀ > ਪੰਨਾ_ਗਿਣਤੀ)
 	{
-	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-		return NULL;
+	    ਜੇ (hp == ਨਿਰਾ && (hp = mf_alloc_bhdr(mfp, ਪੰਨਾ_ਗਿਣਤੀ)) == ਨਿਰਾ)
+		ਵਾਪਸ ਨਿਰਾ;
 	    hp->bh_bnum = freep->bh_bnum;
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += ਪੰਨਾ_ਗਿਣਤੀ;
+	    freep->bh_ਪੰਨਾ_ਗਿਣਤੀ -= ਪੰਨਾ_ਗਿਣਤੀ;
 	}
-	else if (hp == NULL)	    // need to allocate memory for this block
+	ਨਹੀਂਤਾਂ ਜੇ (hp == ਨਿਰਾ)	    // need to allocate memory for this block
 	{
-	    if ((p = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
-		return NULL;
+	    ਜੇ ((p = alloc((size_t)mfp->mf_ਪੰਨਾ_ਮਾਪ * ਪੰਨਾ_ਗਿਣਤੀ)) == ਨਿਰਾ)
+		ਵਾਪਸ ਨਿਰਾ;
 	    hp = mf_rem_free(mfp);
-	    hp->bh_data = p;
+	    hp->bh_ਅੰਕੜੇ = p;
 	}
-	else		    // use the number, remove entry from free list
+	ਨਹੀਂਤਾਂ		    // use the number, remove entry from free list
 	{
 	    freep = mf_rem_free(mfp);
 	    hp->bh_bnum = freep->bh_bnum;
 	    vim_free(freep);
 	}
     }
-    else	// get a new number
+    ਨਹੀਂਤਾਂ	// get a new number
     {
-	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-	    return NULL;
-	if (negative)
+	ਜੇ (hp == ਨਿਰਾ && (hp = mf_alloc_bhdr(mfp, ਪੰਨਾ_ਗਿਣਤੀ)) == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
+	ਜੇ (negative)
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_min--;
-	    mfp->mf_neg_count++;
+	    mfp->mf_neg_ਗਿਣਤੀ++;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_max;
-	    mfp->mf_blocknr_max += page_count;
+	    mfp->mf_blocknr_max += ਪੰਨਾ_ਗਿਣਤੀ;
 	}
     }
     hp->bh_flags = BH_LOCKED | BH_DIRTY;	// new block is always dirty
     mfp->mf_dirty = MF_DIRTY_YES;
-    hp->bh_page_count = page_count;
-    mf_ins_used(mfp, hp);
+    hp->bh_ਪੰਨਾ_ਗਿਣਤੀ = ਪੰਨਾ_ਗਿਣਤੀ;
+    mf_ins_ਵਰਤਿਆ(mfp, hp);
     mf_ins_hash(mfp, hp);
 
     /*
      * Init the data to all zero, to avoid reading uninitialized data.
      * This also avoids that the passwd file ends up in the swap file!
      */
-    (void)vim_memset((char *)(hp->bh_data), 0,
-				      (size_t)mfp->mf_page_size * page_count);
+    (ਖਾਲੀ)vim_memset((ਅੱਖਰ *)(hp->bh_ਅੰਕੜੇ), 0,
+				      (size_t)mfp->mf_ਪੰਨਾ_ਮਾਪ * ਪੰਨਾ_ਗਿਣਤੀ);
 
-    return hp;
+    ਵਾਪਸ hp;
 }
 
 /*
@@ -407,21 +407,21 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Note: The caller should first check a negative nr with mf_trans_del()
  */
     bhdr_T *
-mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
+mf_get(memfile_T *mfp, blocknr_T nr, ਪੂਰਨ ਪੰਨਾ_ਗਿਣਤੀ)
 {
     bhdr_T    *hp;
 						// doesn't exist
-    if (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
-	return NULL;
+    ਜੇ (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
+	ਵਾਪਸ ਨਿਰਾ;
 
     /*
      * see if it is in the cache
      */
-    hp = mf_find_hash(mfp, nr);
-    if (hp == NULL)	// not in the hash list
+    hp = mf_ਲੱਭੋ_hash(mfp, nr);
+    ਜੇ (hp == ਨਿਰਾ)	// not in the hash list
     {
-	if (nr < 0 || nr >= mfp->mf_infile_count)   // can't be in the file
-	    return NULL;
+	ਜੇ (nr < 0 || nr >= mfp->mf_infile_ਗਿਣਤੀ)   // can't be in the file
+	    ਵਾਪਸ ਨਿਰਾ;
 
 	// could check here if the block is in the free list
 
@@ -430,32 +430,32 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
 	 * If so, use that block.
 	 * If not, allocate a new block.
 	 */
-	hp = mf_release(mfp, page_count);
-	if (hp == NULL && page_count > 0)
-	    hp = mf_alloc_bhdr(mfp, page_count);
-	if (hp == NULL)
-	    return NULL;
+	hp = mf_release(mfp, ਪੰਨਾ_ਗਿਣਤੀ);
+	ਜੇ (hp == ਨਿਰਾ && ਪੰਨਾ_ਗਿਣਤੀ > 0)
+	    hp = mf_alloc_bhdr(mfp, ਪੰਨਾ_ਗਿਣਤੀ);
+	ਜੇ (hp == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 
 	hp->bh_bnum = nr;
 	hp->bh_flags = 0;
-	hp->bh_page_count = page_count;
-	if (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
+	hp->bh_ਪੰਨਾ_ਗਿਣਤੀ = ਪੰਨਾ_ਗਿਣਤੀ;
+	ਜੇ (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
 	{
 	    mf_free_bhdr(hp);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	mf_rem_used(mfp, hp);	// remove from list, insert in front below
+	mf_rem_ਵਰਤਿਆ(mfp, hp);	// remove from list, insert in front below
 	mf_rem_hash(mfp, hp);
     }
 
     hp->bh_flags |= BH_LOCKED;
-    mf_ins_used(mfp, hp);	// put in front of used list
+    mf_ins_ਵਰਤਿਆ(mfp, hp);	// put in front of used list
     mf_ins_hash(mfp, hp);	// put in front of hash list
 
-    return hp;
+    ਵਾਪਸ hp;
 }
 
 /*
@@ -466,46 +466,46 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
  *
  *  no return value, function cannot fail
  */
-    void
+    ਖਾਲੀ
 mf_put(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    int		dirty,
-    int		infile)
+    ਪੂਰਨ		dirty,
+    ਪੂਰਨ		infile)
 {
-    int		flags;
+    ਪੂਰਨ		flags;
 
     flags = hp->bh_flags;
 
-    if ((flags & BH_LOCKED) == 0)
-	iemsg(e_block_was_not_locked);
+    ਜੇ ((flags & BH_LOCKED) == 0)
+	iemsg(e_ਖੰਡ_was_not_locked);
     flags &= ~BH_LOCKED;
-    if (dirty)
+    ਜੇ (dirty)
     {
 	flags |= BH_DIRTY;
-	if (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
+	ਜੇ (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
 	    mfp->mf_dirty = MF_DIRTY_YES;
     }
     hp->bh_flags = flags;
-    if (infile)
-	mf_trans_add(mfp, hp);	    // may translate negative in positive nr
+    ਜੇ (infile)
+	mf_trans_ਜੋੜੋ(mfp, hp);	    // may translate negative in positive nr
 }
 
 /*
  * block *hp is no longer in used, may put it in the free list of memfile *mfp
  */
-    void
+    ਖਾਲੀ
 mf_free(memfile_T *mfp, bhdr_T *hp)
 {
-    vim_free(hp->bh_data);	// free the memory
+    vim_free(hp->bh_ਅੰਕੜੇ);	// free the memory
     mf_rem_hash(mfp, hp);	// get *hp out of the hash list
-    mf_rem_used(mfp, hp);	// get *hp out of the used list
-    if (hp->bh_bnum < 0)
+    mf_rem_ਵਰਤਿਆ(mfp, hp);	// get *hp out of the used list
+    ਜੇ (hp->bh_bnum < 0)
     {
 	vim_free(hp);		// don't want negative numbers in free list
-	mfp->mf_neg_count--;
+	mfp->mf_neg_ਗਿਣਤੀ--;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	mf_ins_free(mfp, hp);	// put *hp in the free list
 }
 
@@ -522,18 +522,18 @@ mf_free(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    int
-mf_sync(memfile_T *mfp, int flags)
+    ਪੂਰਨ
+mf_sync(memfile_T *mfp, ਪੂਰਨ flags)
 {
-    int		status;
+    ਪੂਰਨ		ਸਥਿਤੀ;
     bhdr_T	*hp;
-    int		got_int_save = got_int;
+    ਪੂਰਨ		got_int_save = got_int;
 
-    if (mfp->mf_fd < 0)
+    ਜੇ (mfp->mf_fd < 0)
     {
 	// there is no file, nothing to do
 	mfp->mf_dirty = MF_DIRTY_NO;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     // Only a CTRL-C while writing will break us here, not one typed
@@ -546,119 +546,119 @@ mf_sync(memfile_T *mfp, int flags)
      * Then we only try to write blocks within the existing file. If that also
      * fails then we give up.
      */
-    status = OK;
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (((flags & MFS_ALL) || hp->bh_bnum >= 0)
+    ਸਥਿਤੀ = OK;
+    ਲਈ (hp = mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ; hp != ਨਿਰਾ; hp = hp->bh_prev)
+	ਜੇ (((flags & MFS_ALL) || hp->bh_bnum >= 0)
 		&& (hp->bh_flags & BH_DIRTY)
-		&& (status == OK || (hp->bh_bnum >= 0
-		    && hp->bh_bnum < mfp->mf_infile_count)))
+		&& (ਸਥਿਤੀ == OK || (hp->bh_bnum >= 0
+		    && hp->bh_bnum < mfp->mf_infile_ਗਿਣਤੀ)))
 	{
-	    if ((flags & MFS_ZERO) && hp->bh_bnum != 0)
-		continue;
-	    if (mf_write(mfp, hp) == FAIL)
+	    ਜੇ ((flags & MFS_ZERO) && hp->bh_bnum != 0)
+		ਜਾਰੀ;
+	    ਜੇ (mf_write(mfp, hp) == FAIL)
 	    {
-		if (status == FAIL)	// double error: quit syncing
-		    break;
-		status = FAIL;
+		ਜੇ (ਸਥਿਤੀ == FAIL)	// double error: quit syncing
+		    ਰੋਕੋ;
+		ਸਥਿਤੀ = FAIL;
 	    }
-	    if (flags & MFS_STOP)
+	    ਜੇ (flags & MFS_STOP)
 	    {
 		// Stop when char available now.
-		if (ui_char_avail())
-		    break;
+		ਜੇ (ui_char_avail())
+		    ਰੋਕੋ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ui_breakcheck();
-	    if (got_int)
-		break;
+	    ਜੇ (got_int)
+		ਰੋਕੋ;
 	}
 
     /*
      * If the whole list is flushed, the memfile is not dirty anymore.
      * In case of an error this flag is also set, to avoid trying all the time.
      */
-    if (hp == NULL || status == FAIL)
+    ਜੇ (hp == ਨਿਰਾ || ਸਥਿਤੀ == FAIL)
 	mfp->mf_dirty = MF_DIRTY_NO;
 
-    if ((flags & MFS_FLUSH) && *p_sws != NUL)
+    ਜੇ ((flags & MFS_FLUSH) && *p_sws != NUL)
     {
-#if defined(UNIX)
+#ਜੇ defined(UNIX)
 # ifdef HAVE_FSYNC
 	/*
 	 * most Unixes have the very useful fsync() function, just what we need.
 	 */
-	if (STRCMP(p_sws, "fsync") == 0)
+	ਜੇ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    ਜੇ (vim_fsync(mfp->mf_fd))
+		ਸਥਿਤੀ = FAIL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 # endif
 # ifdef HAVE_SYNC
 	    sync();
-# else
-	    fflush(NULL);
+# ਨਹੀਂਤਾਂ
+	    fflush(ਨਿਰਾ);
 # endif
-#endif
-#ifdef VMS
-	if (STRCMP(p_sws, "fsync") == 0)
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
+	ਜੇ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    ਜੇ (vim_fsync(mfp->mf_fd))
+		ਸਥਿਤੀ = FAIL;
 	}
-#endif
-#ifdef MSWIN
-	if (_commit(mfp->mf_fd))
-	    status = FAIL;
-#endif
-#ifdef AMIGA
-# if defined(__AROS__) || defined(__amigaos4__)
-	if (vim_fsync(mfp->mf_fd) != 0)
-	    status = FAIL;
-# else
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਜੇ (_commit(mfp->mf_fd))
+	    ਸਥਿਤੀ = FAIL;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AMIGA
+# ਜੇ defined(__AROS__) || defined(__amigaos4__)
+	ਜੇ (vim_fsync(mfp->mf_fd) != 0)
+	    ਸਥਿਤੀ = FAIL;
+# ਨਹੀਂਤਾਂ
 	/*
 	 * Flush() only exists for AmigaDos 2.0.
 	 * For 1.3 it should be done with close() + open(), but then the risk
 	 * is that the open() may fail and lose the file....
 	 */
 #  ifdef FEAT_ARP
-	if (dos2)
+	ਜੇ (dos2)
 #  endif
 #  ifdef SASC
 	{
-	    struct UFB *fp = chkufb(mfp->mf_fd);
+	    ਬਣਤਰ UFB *fp = chkufb(mfp->mf_fd);
 
-	    if (fp != NULL)
+	    ਜੇ (fp != ਨਿਰਾ)
 		Flush(fp->ufbfh);
 	}
-#  else
-#   if defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
+#  ਨਹੀਂਤਾਂ
+#   ਜੇ defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
 	{
-#    if defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
+#    ਜੇ defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
 	    // Have function (in libnix at least),
 	    // but ain't got no prototype anywhere.
-	    extern unsigned long fdtofh(int filedescriptor);
+	    ਬਾਹਰੀ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ fdtofh(ਪੂਰਨ filedescriptor);
 #    endif
-#    if !defined(__libnix__)
-	    fflush(NULL);
-#    else
+#    ਜੇ !defined(__libnix__)
+	    fflush(ਨਿਰਾ);
+#    ਨਹੀਂਤਾਂ
 	    BPTR fh = (BPTR)fdtofh(mfp->mf_fd);
 
-	    if (fh != 0)
+	    ਜੇ (fh != 0)
 		Flush(fh);
 #    endif
 	}
-#   else // assume Manx
+#   ਨਹੀਂਤਾਂ // assume Manx
 	    Flush(_devtab[mfp->mf_fd].fd);
 #   endif
 #  endif
 # endif
-#endif // AMIGA
+#ਜੇ_ਅੰਤ // AMIGA
     }
 
     got_int |= got_int_save;
 
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
 /*
@@ -666,13 +666,13 @@ mf_sync(memfile_T *mfp, int flags)
  * the dirty flag.  These are blocks that need to be written to a newly
  * created swapfile.
  */
-    void
-mf_set_dirty(memfile_T *mfp)
+    ਖਾਲੀ
+mf_ਸੈੱਟ_dirty(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (hp->bh_bnum > 0)
+    ਲਈ (hp = mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ; hp != ਨਿਰਾ; hp = hp->bh_prev)
+	ਜੇ (hp->bh_bnum > 0)
 	    hp->bh_flags |= BH_DIRTY;
     mfp->mf_dirty = MF_DIRTY_YES;
 }
@@ -680,63 +680,63 @@ mf_set_dirty(memfile_T *mfp)
 /*
  * insert block *hp in front of hashlist of memfile *mfp
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_ins_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_add_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_ਜੋੜੋ_ਵਸਤੂ(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * remove block *hp from hashlist of memfile list *mfp
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_rem_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_rem_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_rem_ਵਸਤੂ(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * look in hash lists of memfile *mfp for block header with number 'nr'
  */
-    static bhdr_T *
-mf_find_hash(memfile_T *mfp, blocknr_T nr)
+    ਸਥਿਰ bhdr_T *
+mf_ਲੱਭੋ_hash(memfile_T *mfp, blocknr_T nr)
 {
-    return (bhdr_T *)mf_hash_find(&mfp->mf_hash, nr);
+    ਵਾਪਸ (bhdr_T *)mf_hash_ਲੱਭੋ(&mfp->mf_hash, nr);
 }
 
 /*
  * insert block *hp in front of used list of memfile *mfp
  */
-    static void
-mf_ins_used(memfile_T *mfp, bhdr_T *hp)
+    ਸਥਿਰ ਖਾਲੀ
+mf_ins_ਵਰਤਿਆ(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_used_first;
-    mfp->mf_used_first = hp;
-    hp->bh_prev = NULL;
-    if (hp->bh_next == NULL)	    // list was empty, adjust last pointer
-	mfp->mf_used_last = hp;
-    else
-	hp->bh_next->bh_prev = hp;
-    mfp->mf_used_count += hp->bh_page_count;
-    total_mem_used += (long_u)hp->bh_page_count * mfp->mf_page_size;
+    hp->bh_ਅਗਲਾ = mfp->mf_ਵਰਤਿਆ_ਪਹਿਲਾ;
+    mfp->mf_ਵਰਤਿਆ_ਪਹਿਲਾ = hp;
+    hp->bh_prev = ਨਿਰਾ;
+    ਜੇ (hp->bh_ਅਗਲਾ == ਨਿਰਾ)	    // list was empty, adjust last pointer
+	mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ = hp;
+    ਨਹੀਂਤਾਂ
+	hp->bh_ਅਗਲਾ->bh_prev = hp;
+    mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ += hp->bh_ਪੰਨਾ_ਗਿਣਤੀ;
+    ਕੁੱਲ_mem_ਵਰਤਿਆ += (long_u)hp->bh_ਪੰਨਾ_ਗਿਣਤੀ * mfp->mf_ਪੰਨਾ_ਮਾਪ;
 }
 
 /*
  * remove block *hp from used list of memfile *mfp
  */
-    static void
-mf_rem_used(memfile_T *mfp, bhdr_T *hp)
+    ਸਥਿਰ ਖਾਲੀ
+mf_rem_ਵਰਤਿਆ(memfile_T *mfp, bhdr_T *hp)
 {
-    if (hp->bh_next == NULL)	    // last block in used list
-	mfp->mf_used_last = hp->bh_prev;
-    else
-	hp->bh_next->bh_prev = hp->bh_prev;
-    if (hp->bh_prev == NULL)	    // first block in used list
-	mfp->mf_used_first = hp->bh_next;
-    else
-	hp->bh_prev->bh_next = hp->bh_next;
-    mfp->mf_used_count -= hp->bh_page_count;
-    total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+    ਜੇ (hp->bh_ਅਗਲਾ == ਨਿਰਾ)	    // last block in used list
+	mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ = hp->bh_prev;
+    ਨਹੀਂਤਾਂ
+	hp->bh_ਅਗਲਾ->bh_prev = hp->bh_prev;
+    ਜੇ (hp->bh_prev == ਨਿਰਾ)	    // first block in used list
+	mfp->mf_ਵਰਤਿਆ_ਪਹਿਲਾ = hp->bh_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	hp->bh_prev->bh_ਅਗਲਾ = hp->bh_ਅਗਲਾ;
+    mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ -= hp->bh_ਪੰਨਾ_ਗਿਣਤੀ;
+    ਕੁੱਲ_mem_ਵਰਤਿਆ -= (long_u)hp->bh_ਪੰਨਾ_ਗਿਣਤੀ * mfp->mf_ਪੰਨਾ_ਮਾਪ;
 }
 
 /*
@@ -748,35 +748,35 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
  *
  * Returns NULL if no block is released.
  */
-    static bhdr_T *
-mf_release(memfile_T *mfp, int page_count)
+    ਸਥਿਰ bhdr_T *
+mf_release(memfile_T *mfp, ਪੂਰਨ ਪੰਨਾ_ਗਿਣਤੀ)
 {
     bhdr_T	*hp;
-    int		need_release;
+    ਪੂਰਨ		need_release;
     buf_T	*buf;
 
     // don't release while in mf_close_file()
-    if (mf_dont_release)
-	return NULL;
+    ਜੇ (mf_dont_release)
+	ਵਾਪਸ ਨਿਰਾ;
 
     /*
      * Need to release a block if the number of blocks for this memfile is
      * higher than the maximum or total memory used is over 'maxmemtot'
      */
-    need_release = ((mfp->mf_used_count >= mfp->mf_used_count_max)
-				  || (total_mem_used >> 10) >= (long_u)p_mmt);
+    need_release = ((mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ >= mfp->mf_ਵਰਤਿਆ_ਗਿਣਤੀ_max)
+				  || (ਕੁੱਲ_mem_ਵਰਤਿਆ >> 10) >= (long_u)p_mmt);
 
     /*
      * Try to create a swap file if the amount of memory used is getting too
      * high.
      */
-    if (mfp->mf_fd < 0 && need_release && p_uc)
+    ਜੇ (mfp->mf_fd < 0 && need_release && p_uc)
     {
 	// find for which buffer this memfile is
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp == mfp)
-		break;
-	if (buf != NULL && buf->b_may_swap)
+	    ਜੇ (buf->b_ml.ml_mfp == mfp)
+		ਰੋਕੋ;
+	ਜੇ (buf != ਨਿਰਾ && buf->b_may_ਅਦਲਾ_ਬਦਲੀ)
 	    ml_open_file(buf);
     }
 
@@ -788,42 +788,42 @@ mf_release(memfile_T *mfp, int page_count)
      *	  and
      *	total memory used is not up to 'maxmemtot'
      */
-    if (mfp->mf_fd < 0 || !need_release)
-	return NULL;
+    ਜੇ (mfp->mf_fd < 0 || !need_release)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (!(hp->bh_flags & BH_LOCKED))
-	    break;
-    if (hp == NULL)	// not a single one that can be released
-	return NULL;
+    ਲਈ (hp = mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ; hp != ਨਿਰਾ; hp = hp->bh_prev)
+	ਜੇ (!(hp->bh_flags & BH_LOCKED))
+	    ਰੋਕੋ;
+    ਜੇ (hp == ਨਿਰਾ)	// not a single one that can be released
+	ਵਾਪਸ ਨਿਰਾ;
 
     /*
      * If the block is dirty, write it.
      * If the write fails we don't free it.
      */
-    if ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
-	return NULL;
+    ਜੇ ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    mf_rem_used(mfp, hp);
+    mf_rem_ਵਰਤਿਆ(mfp, hp);
     mf_rem_hash(mfp, hp);
 
     /*
      * If a bhdr_T is returned, make sure that the page_count of bh_data is
      * right
      */
-    if (hp->bh_page_count != page_count)
+    ਜੇ (hp->bh_ਪੰਨਾ_ਗਿਣਤੀ != ਪੰਨਾ_ਗਿਣਤੀ)
     {
-	VIM_CLEAR(hp->bh_data);
-	if (page_count > 0)
-	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count);
-	if (hp->bh_data == NULL)
+	VIM_CLEAR(hp->bh_ਅੰਕੜੇ);
+	ਜੇ (ਪੰਨਾ_ਗਿਣਤੀ > 0)
+	    hp->bh_ਅੰਕੜੇ = alloc((size_t)mfp->mf_ਪੰਨਾ_ਮਾਪ * ਪੰਨਾ_ਗਿਣਤੀ);
+	ਜੇ (hp->bh_ਅੰਕੜੇ == ਨਿਰਾ)
 	{
 	    vim_free(hp);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	hp->bh_page_count = page_count;
+	hp->bh_ਪੰਨਾ_ਗਿਣਤੀ = ਪੰਨਾ_ਗਿਣਤੀ;
     }
-    return hp;
+    ਵਾਪਸ hp;
 }
 
 /*
@@ -832,99 +832,99 @@ mf_release(memfile_T *mfp, int page_count)
  *
  * return TRUE if any memory was released
  */
-    int
-mf_release_all(void)
+    ਪੂਰਨ
+mf_release_all(ਖਾਲੀ)
 {
     buf_T	*buf;
     memfile_T	*mfp;
     bhdr_T	*hp;
-    int		retval = FALSE;
+    ਪੂਰਨ		retval = FALSE;
 
     FOR_ALL_BUFFERS(buf)
     {
 	mfp = buf->b_ml.ml_mfp;
-	if (mfp != NULL)
+	ਜੇ (mfp != ਨਿਰਾ)
 	{
 	    // If no swap file yet, may open one
-	    if (mfp->mf_fd < 0 && buf->b_may_swap)
+	    ਜੇ (mfp->mf_fd < 0 && buf->b_may_ਅਦਲਾ_ਬਦਲੀ)
 		ml_open_file(buf);
 
 	    // only if there is a swapfile
-	    if (mfp->mf_fd >= 0)
+	    ਜੇ (mfp->mf_fd >= 0)
 	    {
-		for (hp = mfp->mf_used_last; hp != NULL; )
+		ਲਈ (hp = mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ; hp != ਨਿਰਾ; )
 		{
-		    if (!(hp->bh_flags & BH_LOCKED)
+		    ਜੇ (!(hp->bh_flags & BH_LOCKED)
 			    && (!(hp->bh_flags & BH_DIRTY)
 				|| mf_write(mfp, hp) != FAIL))
 		    {
-			mf_rem_used(mfp, hp);
+			mf_rem_ਵਰਤਿਆ(mfp, hp);
 			mf_rem_hash(mfp, hp);
 			mf_free_bhdr(hp);
-			hp = mfp->mf_used_last;	// re-start, list was changed
+			hp = mfp->mf_ਵਰਤਿਆ_ਆਖਰੀ;	// re-start, list was changed
 			retval = TRUE;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			hp = hp->bh_prev;
 		}
 	    }
 	}
     }
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Allocate a block header and a block of memory for it.
  */
-    static bhdr_T *
-mf_alloc_bhdr(memfile_T *mfp, int page_count)
+    ਸਥਿਰ bhdr_T *
+mf_alloc_bhdr(memfile_T *mfp, ਪੂਰਨ ਪੰਨਾ_ਗਿਣਤੀ)
 {
     bhdr_T	*hp;
 
-    if ((hp = ALLOC_ONE(bhdr_T)) == NULL)
-	return NULL;
+    ਜੇ ((hp = ALLOC_ONE(bhdr_T)) == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+    ਜੇ ((hp->bh_ਅੰਕੜੇ = alloc((size_t)mfp->mf_ਪੰਨਾ_ਮਾਪ * ਪੰਨਾ_ਗਿਣਤੀ)) == ਨਿਰਾ)
     {
 	vim_free(hp);	    // not enough memory
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    hp->bh_page_count = page_count;
-    return hp;
+    hp->bh_ਪੰਨਾ_ਗਿਣਤੀ = ਪੰਨਾ_ਗਿਣਤੀ;
+    ਵਾਪਸ hp;
 }
 
 /*
  * Free a block header and the block of memory for it.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_free_bhdr(bhdr_T *hp)
 {
-    vim_free(hp->bh_data);
+    vim_free(hp->bh_ਅੰਕੜੇ);
     vim_free(hp);
 }
 
 /*
  * Insert entry *hp in the free list.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_ins_free(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_free_first;
-    mfp->mf_free_first = hp;
+    hp->bh_ਅਗਲਾ = mfp->mf_free_ਪਹਿਲਾ;
+    mfp->mf_free_ਪਹਿਲਾ = hp;
 }
 
 /*
  * remove the first entry from the free list and return a pointer to it
  * Note: caller must check that mfp->mf_free_first is not NULL!
  */
-    static bhdr_T *
+    ਸਥਿਰ bhdr_T *
 mf_rem_free(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    hp = mfp->mf_free_first;
-    mfp->mf_free_first = hp->bh_next;
-    return hp;
+    hp = mfp->mf_free_ਪਹਿਲਾ;
+    mfp->mf_free_ਪਹਿਲਾ = hp->bh_ਅਗਲਾ;
+    ਵਾਪਸ hp;
 }
 
 /*
@@ -932,38 +932,38 @@ mf_rem_free(memfile_T *mfp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 mf_read(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;
-    unsigned	page_size;
-    unsigned	size;
+    off_T	ਵਿੱਥ;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਪੰਨਾ_ਮਾਪ;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਮਾਪ;
 
-    if (mfp->mf_fd < 0)	    // there is no file, can't read
-	return FAIL;
+    ਜੇ (mfp->mf_fd < 0)	    // there is no file, can't read
+	ਵਾਪਸ FAIL;
 
-    page_size = mfp->mf_page_size;
-    offset = (off_T)page_size * hp->bh_bnum;
-    size = page_size * hp->bh_page_count;
-    if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+    ਪੰਨਾ_ਮਾਪ = mfp->mf_ਪੰਨਾ_ਮਾਪ;
+    ਵਿੱਥ = (off_T)ਪੰਨਾ_ਮਾਪ * hp->bh_bnum;
+    ਮਾਪ = ਪੰਨਾ_ਮਾਪ * hp->bh_ਪੰਨਾ_ਗਿਣਤੀ;
+    ਜੇ (vim_lseek(mfp->mf_fd, ਵਿੱਥ, SEEK_SET) != ਵਿੱਥ)
     {
-	PERROR(_(e_seek_error_in_swap_file_read));
-	return FAIL;
+	PERROR(_(e_seek_error_ਵਿੱਚ_ਅਦਲਾ_ਬਦਲੀ_file_read));
+	ਵਾਪਸ FAIL;
     }
-    if ((unsigned)read_eintr(mfp->mf_fd, hp->bh_data, size) != size)
+    ਜੇ ((ਬਿਨਾਨਿਸ਼ਾਨੀ)read_eintr(mfp->mf_fd, hp->bh_ਅੰਕੜੇ, ਮਾਪ) != ਮਾਪ)
     {
-	PERROR(_(e_read_error_in_swap_file));
-	return FAIL;
+	PERROR(_(e_read_error_ਵਿੱਚ_ਅਦਲਾ_ਬਦਲੀ_file));
+	ਵਾਪਸ FAIL;
     }
 
-#ifdef FEAT_CRYPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
     // Decrypt if 'key' is set and this is a data block. And when changing the
     // key.
-    if (*mfp->mf_buffer->b_p_key != NUL || mfp->mf_old_key != NULL)
-	ml_decrypt_data(mfp, hp->bh_data, offset, size);
-#endif
+    ਜੇ (*mfp->mf_ਬਫਰ->b_p_ਕੁੰਜੀ != NUL || mfp->mf_old_ਕੁੰਜੀ != ਨਿਰਾ)
+	ml_decrypt_ਅੰਕੜੇ(mfp, hp->bh_ਅੰਕੜੇ, ਵਿੱਥ, ਮਾਪ);
+#ਜੇ_ਅੰਤ
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -971,25 +971,25 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 mf_write(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;	    // offset in the file
+    off_T	ਵਿੱਥ;	    // offset in the file
     blocknr_T	nr;	    // block nr which is being written
     bhdr_T	*hp2;
-    unsigned	page_size;  // number of bytes in a page
-    unsigned	page_count; // number of pages written
-    unsigned	size;	    // number of bytes written
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਪੰਨਾ_ਮਾਪ;  // number of bytes in a page
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਪੰਨਾ_ਗਿਣਤੀ; // number of pages written
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਮਾਪ;	    // number of bytes written
 
-    if (mfp->mf_fd < 0 && !mfp->mf_reopen)
+    ਜੇ (mfp->mf_fd < 0 && !mfp->mf_reopen)
 	// there is no file and there was no file, can't write
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
-    if (hp->bh_bnum < 0)	// must assign file block number
-	if (mf_trans_add(mfp, hp) == FAIL)
-	    return FAIL;
+    ਜੇ (hp->bh_bnum < 0)	// must assign file block number
+	ਜੇ (mf_trans_ਜੋੜੋ(mfp, hp) == FAIL)
+	    ਵਾਪਸ FAIL;
 
-    page_size = mfp->mf_page_size;
+    ਪੰਨਾ_ਮਾਪ = mfp->mf_ਪੰਨਾ_ਮਾਪ;
 
     /*
      * We don't want gaps in the file. Write the blocks in front of *hp
@@ -997,73 +997,73 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
      * If block 'mf_infile_count' is not in the hash list, it has been
      * freed. Fill the space in the file with data from the current block.
      */
-    for (;;)
+    ਲਈ (;;)
     {
-	int attempt;
+	ਪੂਰਨ attempt;
 
 	nr = hp->bh_bnum;
-	if (nr > mfp->mf_infile_count)		// beyond end of file
+	ਜੇ (nr > mfp->mf_infile_ਗਿਣਤੀ)		// beyond end of file
 	{
-	    nr = mfp->mf_infile_count;
-	    hp2 = mf_find_hash(mfp, nr);	// NULL caught below
+	    nr = mfp->mf_infile_ਗਿਣਤੀ;
+	    hp2 = mf_ਲੱਭੋ_hash(mfp, nr);	// NULL caught below
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    hp2 = hp;
 
-	offset = (off_T)page_size * nr;
-	if (hp2 == NULL)	    // freed block, fill with dummy data
-	    page_count = 1;
-	else
-	    page_count = hp2->bh_page_count;
-	size = page_size * page_count;
+	ਵਿੱਥ = (off_T)ਪੰਨਾ_ਮਾਪ * nr;
+	ਜੇ (hp2 == ਨਿਰਾ)	    // freed block, fill with dummy data
+	    ਪੰਨਾ_ਗਿਣਤੀ = 1;
+	ਨਹੀਂਤਾਂ
+	    ਪੰਨਾ_ਗਿਣਤੀ = hp2->bh_ਪੰਨਾ_ਗਿਣਤੀ;
+	ਮਾਪ = ਪੰਨਾ_ਮਾਪ * ਪੰਨਾ_ਗਿਣਤੀ;
 
-	for (attempt = 1; attempt <= 2; ++attempt)
+	ਲਈ (attempt = 1; attempt <= 2; ++attempt)
 	{
-	    if (mfp->mf_fd >= 0)
+	    ਜੇ (mfp->mf_fd >= 0)
 	    {
-		if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+		ਜੇ (vim_lseek(mfp->mf_fd, ਵਿੱਥ, SEEK_SET) != ਵਿੱਥ)
 		{
-		    PERROR(_(e_seek_error_in_swap_file_write));
-		    return FAIL;
+		    PERROR(_(e_seek_error_ਵਿੱਚ_ਅਦਲਾ_ਬਦਲੀ_file_write));
+		    ਵਾਪਸ FAIL;
 		}
-		if (mf_write_block(mfp,
-				   hp2 == NULL ? hp : hp2, offset, size) == OK)
-		    break;
+		ਜੇ (mf_write_ਖੰਡ(mfp,
+				   hp2 == ਨਿਰਾ ? hp : hp2, ਵਿੱਥ, ਮਾਪ) == OK)
+		    ਰੋਕੋ;
 	    }
 
-	    if (attempt == 1)
+	    ਜੇ (attempt == 1)
 	    {
 		// If the swap file is on a network drive, and the network
 		// gets disconnected and then re-connected, we can maybe fix it
 		// by closing and then re-opening the file.
-		if (mfp->mf_fd >= 0)
+		ਜੇ (mfp->mf_fd >= 0)
 		    close(mfp->mf_fd);
-		mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, mfp->mf_flags);
+		mfp->mf_fd = mch_open_rw((ਅੱਖਰ *)mfp->mf_fname, mfp->mf_flags);
 		mfp->mf_reopen = (mfp->mf_fd < 0);
 	    }
-	    if (attempt == 2 || mfp->mf_fd < 0)
+	    ਜੇ (attempt == 2 || mfp->mf_fd < 0)
 	    {
 		// Avoid repeating the error message, this mostly happens when
 		// the disk is full. We give the message again only after a
 		// successful write or when hitting a key. We keep on trying,
 		// in case some space becomes available.
-		if (!did_swapwrite_msg)
-		    emsg(_(e_write_error_in_swap_file));
-		did_swapwrite_msg = TRUE;
-		return FAIL;
+		ਜੇ (!did_swapwrite_ਸੁਨੇਹਾ)
+		    emsg(_(e_write_error_ਵਿੱਚ_ਅਦਲਾ_ਬਦਲੀ_file));
+		did_swapwrite_ਸੁਨੇਹਾ = TRUE;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 
-	did_swapwrite_msg = FALSE;
-	if (hp2 != NULL)		    // written a non-dummy block
+	did_swapwrite_ਸੁਨੇਹਾ = FALSE;
+	ਜੇ (hp2 != ਨਿਰਾ)		    // written a non-dummy block
 	    hp2->bh_flags &= ~BH_DIRTY;
 					    // appended to the file
-	if (nr + (blocknr_T)page_count > mfp->mf_infile_count)
-	    mfp->mf_infile_count = nr + page_count;
-	if (nr == hp->bh_bnum)		    // written the desired block
-	    break;
+	ਜੇ (nr + (blocknr_T)ਪੰਨਾ_ਗਿਣਤੀ > mfp->mf_infile_ਗਿਣਤੀ)
+	    mfp->mf_infile_ਗਿਣਤੀ = nr + ਪੰਨਾ_ਗਿਣਤੀ;
+	ਜੇ (nr == hp->bh_bnum)		    // written the desired block
+	    ਰੋਕੋ;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1071,35 +1071,35 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
  * Takes care of encryption.
  * Return FAIL or OK.
  */
-    static int
-mf_write_block(
+    ਸਥਿਰ ਪੂਰਨ
+mf_write_ਖੰਡ(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    off_T	offset UNUSED,
-    unsigned	size)
+    off_T	ਵਿੱਥ ਅਣਵਰਤਿਆ,
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	ਮਾਪ)
 {
-    char_u	*data = hp->bh_data;
-    int		result = OK;
+    char_u	*ਅੰਕੜੇ = hp->bh_ਅੰਕੜੇ;
+    ਪੂਰਨ		ਨਤੀਜਾ = OK;
 
-#ifdef FEAT_CRYPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
     // Encrypt if 'key' is set and this is a data block.
-    if (*mfp->mf_buffer->b_p_key != NUL)
+    ਜੇ (*mfp->mf_ਬਫਰ->b_p_ਕੁੰਜੀ != NUL)
     {
-	data = ml_encrypt_data(mfp, data, offset, size);
-	if (data == NULL)
-	    return FAIL;
+	ਅੰਕੜੇ = ml_encrypt_ਅੰਕੜੇ(mfp, ਅੰਕੜੇ, ਵਿੱਥ, ਮਾਪ);
+	ਜੇ (ਅੰਕੜੇ == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if ((unsigned)write_eintr(mfp->mf_fd, data, size) != size)
-	result = FAIL;
+    ਜੇ ((ਬਿਨਾਨਿਸ਼ਾਨੀ)write_eintr(mfp->mf_fd, ਅੰਕੜੇ, ਮਾਪ) != ਮਾਪ)
+	ਨਤੀਜਾ = FAIL;
 
-#ifdef FEAT_CRYPT
-    if (data != hp->bh_data)
-	vim_free(data);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+    ਜੇ (ਅੰਕੜੇ != hp->bh_ਅੰਕੜੇ)
+	vim_free(ਅੰਕੜੇ);
+#ਜੇ_ਅੰਤ
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
@@ -1107,49 +1107,49 @@ mf_write_block(
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
-mf_trans_add(memfile_T *mfp, bhdr_T *hp)
+    ਸਥਿਰ ਪੂਰਨ
+mf_trans_ਜੋੜੋ(memfile_T *mfp, bhdr_T *hp)
 {
     bhdr_T	*freep;
     blocknr_T	new_bnum;
     NR_TRANS	*np;
-    int		page_count;
+    ਪੂਰਨ		ਪੰਨਾ_ਗਿਣਤੀ;
 
-    if (hp->bh_bnum >= 0)		    // it's already positive
-	return OK;
+    ਜੇ (hp->bh_bnum >= 0)		    // it's already positive
+	ਵਾਪਸ OK;
 
-    if ((np = ALLOC_ONE(NR_TRANS)) == NULL)
-	return FAIL;
+    ਜੇ ((np = ALLOC_ONE(NR_TRANS)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
 /*
  * Get a new number for the block.
  * If the first item in the free list has sufficient pages, use its number
  * Otherwise use mf_blocknr_max.
  */
-    freep = mfp->mf_free_first;
-    page_count = hp->bh_page_count;
-    if (freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_ਪਹਿਲਾ;
+    ਪੰਨਾ_ਗਿਣਤੀ = hp->bh_ਪੰਨਾ_ਗਿਣਤੀ;
+    ਜੇ (freep != ਨਿਰਾ && freep->bh_ਪੰਨਾ_ਗਿਣਤੀ >= ਪੰਨਾ_ਗਿਣਤੀ)
     {
 	new_bnum = freep->bh_bnum;
 	/*
 	 * If the page count of the free block was larger, reduce it.
 	 * If the page count matches, remove the block from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	ਜੇ (freep->bh_ਪੰਨਾ_ਗਿਣਤੀ > ਪੰਨਾ_ਗਿਣਤੀ)
 	{
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += ਪੰਨਾ_ਗਿਣਤੀ;
+	    freep->bh_ਪੰਨਾ_ਗਿਣਤੀ -= ਪੰਨਾ_ਗਿਣਤੀ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    freep = mf_rem_free(mfp);
 	    vim_free(freep);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	new_bnum = mfp->mf_blocknr_max;
-	mfp->mf_blocknr_max += page_count;
+	mfp->mf_blocknr_max += ਪੰਨਾ_ਗਿਣਤੀ;
     }
 
     np->nt_old_bnum = hp->bh_bnum;	    // adjust number
@@ -1160,9 +1160,9 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     mf_ins_hash(mfp, hp);		    // insert in new hash list
 
     // Insert "np" into "mf_trans" hashtable with key "np->nt_old_bnum"
-    mf_hash_add_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_ਜੋੜੋ_ਵਸਤੂ(&mfp->mf_trans, (mf_hashitem_T *)np);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1176,20 +1176,20 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
     NR_TRANS	*np;
     blocknr_T	new_bnum;
 
-    np = (NR_TRANS *)mf_hash_find(&mfp->mf_trans, old_nr);
+    np = (NR_TRANS *)mf_hash_ਲੱਭੋ(&mfp->mf_trans, old_nr);
 
-    if (np == NULL)		// not found
-	return old_nr;
+    ਜੇ (np == ਨਿਰਾ)		// not found
+	ਵਾਪਸ old_nr;
 
-    mfp->mf_neg_count--;
+    mfp->mf_neg_ਗਿਣਤੀ--;
     new_bnum = np->nt_new_bnum;
 
     // remove entry from the trans list
-    mf_hash_rem_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_rem_ਵਸਤੂ(&mfp->mf_trans, (mf_hashitem_T *)np);
 
     vim_free(np);
 
-    return new_bnum;
+    ਵਾਪਸ new_bnum;
 }
 
 /*
@@ -1197,34 +1197,34 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
  * Only called when creating or renaming the swapfile.	Either way it's a new
  * name so we must work out the full path name.
  */
-    void
-mf_set_ffname(memfile_T *mfp)
+    ਖਾਲੀ
+mf_ਸੈੱਟ_ffname(memfile_T *mfp)
 {
-    mfp->mf_ffname = FullName_save(mfp->mf_fname, FALSE);
+    mfp->mf_ffname = ਭਰਿਆ_Name_save(mfp->mf_fname, FALSE);
 }
 
 /*
  * Make the name of the file used for the memfile a full path.
  * Used before doing a :cd
  */
-    void
+    ਖਾਲੀ
 mf_fullname(memfile_T *mfp)
 {
-    if (mfp == NULL || mfp->mf_fname == NULL || mfp->mf_ffname == NULL)
-	return;
+    ਜੇ (mfp == ਨਿਰਾ || mfp->mf_fname == ਨਿਰਾ || mfp->mf_ffname == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     vim_free(mfp->mf_fname);
     mfp->mf_fname = mfp->mf_ffname;
-    mfp->mf_ffname = NULL;
+    mfp->mf_ffname = ਨਿਰਾ;
 }
 
 /*
  * return TRUE if there are any translations pending for 'mfp'
  */
-    int
+    ਪੂਰਨ
 mf_need_trans(memfile_T *mfp)
 {
-    return (mfp->mf_fname != NULL && mfp->mf_neg_count > 0);
+    ਵਾਪਸ (mfp->mf_fname != ਨਿਰਾ && mfp->mf_neg_ਗਿਣਤੀ > 0);
 }
 
 /*
@@ -1232,15 +1232,15 @@ mf_need_trans(memfile_T *mfp)
  * The "fname" must be in allocated memory, and is consumed (also when an
  * error occurs).
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_do_open(
     memfile_T	*mfp,
     char_u	*fname,
-    int		flags)		// flags for open()
+    ਪੂਰਨ		flags)		// flags for open()
 {
-#ifdef HAVE_LSTAT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_LSTAT
     stat_T	sb;
-#endif
+#ਜੇ_ਅੰਤ
 
     mfp->mf_fname = fname;
 
@@ -1249,60 +1249,60 @@ mf_do_open(
      * not possible after the open on the Amiga.
      * fname cannot be NameBuff, because it must have been allocated.
      */
-    mf_set_ffname(mfp);
-#if defined(MSWIN)
+    mf_ਸੈੱਟ_ffname(mfp);
+#ਜੇ defined(MSWIN)
     /*
      * A ":!cd e:xxx" may change the directory without us knowing, use the
      * full pathname always.  Careful: This frees fname!
      */
     mf_fullname(mfp);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_LSTAT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_LSTAT
     /*
      * Extra security check: When creating a swap file it really shouldn't
      * exist yet.  If there is a symbolic link, this is most likely an attack.
      */
-    if ((flags & O_CREAT) && mch_lstat((char *)mfp->mf_fname, &sb) >= 0)
+    ਜੇ ((flags & O_CREAT) && mch_lstat((ਅੱਖਰ *)mfp->mf_fname, &sb) >= 0)
     {
 	mfp->mf_fd = -1;
-	emsg(_(e_swap_file_already_exists_symlink_attack));
+	emsg(_(e_ਅਦਲਾ_ਬਦਲੀ_file_already_exists_symlink_attack));
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     {
 	/*
 	 * try to open the file
 	 */
 	flags |= O_EXTRA | O_NOFOLLOW;
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// Prevent handle inheritance that cause problems with Cscope
 	// (swap file may not be deleted if cscope connection was open after
 	// the file)
 	flags |= O_NOINHERIT;
-#endif
+#ਜੇ_ਅੰਤ
 	mfp->mf_flags = flags;
-	mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, flags);
+	mfp->mf_fd = mch_open_rw((ਅੱਖਰ *)mfp->mf_fname, flags);
     }
 
     /*
      * If the file cannot be opened, use memory only
      */
-    if (mfp->mf_fd < 0)
+    ਜੇ (mfp->mf_fd < 0)
     {
 	VIM_CLEAR(mfp->mf_fname);
 	VIM_CLEAR(mfp->mf_ffname);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-#ifdef HAVE_FD_CLOEXEC
-	int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_FD_CLOEXEC
+	ਪੂਰਨ fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	ਜੇ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (ਖਾਲੀ)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	mch_copy_sec(fname, mfp->mf_fname);
-#endif
+#ਜੇ_ਅੰਤ
 	mch_hide(mfp->mf_fname);    // try setting the 'hidden' flag
     }
 }
@@ -1316,45 +1316,45 @@ mf_do_open(
  * MHT_GROWTH_FACTOR when the average number of items per bucket
  * exceeds 2 ^ MHT_LOG_LOAD_FACTOR.
  */
-#define MHT_LOG_LOAD_FACTOR 6
-#define MHT_GROWTH_FACTOR   2   // must be a power of two
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MHT_LOG_ਲੱਦੋ_ਗੁਣਕ 6
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MHT_GROWTH_ਗੁਣਕ   2   // must be a power of two
 
 /*
  * Initialize an empty hash table.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_hash_init(mf_hashtab_T *mht)
 {
-    CLEAR_POINTER(mht);
+    CLEAR_ਸੂਚਕ(mht);
     mht->mht_buckets = mht->mht_small_buckets;
-    mht->mht_mask = MHT_INIT_SIZE - 1;
+    mht->mht_ਨਕਾਬ = MHT_INIT_ਮਾਪ - 1;
 }
 
 /*
  * Free the array of a hash table.  Does not free the items it contains!
  * The hash table must not be used again without another mf_hash_init() call.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_hash_free(mf_hashtab_T *mht)
 {
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    ਜੇ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 }
 
 /*
  * Free the array of a hash table and all the items it contains.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 mf_hash_free_all(mf_hashtab_T *mht)
 {
     long_u	    idx;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *next;
+    mf_hashitem_T   *ਅਗਲਾ;
 
-    for (idx = 0; idx <= mht->mht_mask; idx++)
-	for (mhi = mht->mht_buckets[idx]; mhi != NULL; mhi = next)
+    ਲਈ (idx = 0; idx <= mht->mht_ਨਕਾਬ; idx++)
+	ਲਈ (mhi = mht->mht_buckets[idx]; mhi != ਨਿਰਾ; mhi = ਅਗਲਾ)
 	{
-	    next = mhi->mhi_next;
+	    ਅਗਲਾ = mhi->mhi_ਅਗਲਾ;
 	    vim_free(mhi);
 	}
 
@@ -1365,44 +1365,44 @@ mf_hash_free_all(mf_hashtab_T *mht)
  * Find "key" in hashtable "mht".
  * Returns a pointer to a mf_hashitem_T or NULL if the item was not found.
  */
-    static mf_hashitem_T *
-mf_hash_find(mf_hashtab_T *mht, blocknr_T key)
+    ਸਥਿਰ mf_hashitem_T *
+mf_hash_ਲੱਭੋ(mf_hashtab_T *mht, blocknr_T ਕੁੰਜੀ)
 {
     mf_hashitem_T   *mhi;
 
-    mhi = mht->mht_buckets[key & mht->mht_mask];
-    while (mhi != NULL && mhi->mhi_key != key)
-	mhi = mhi->mhi_next;
+    mhi = mht->mht_buckets[ਕੁੰਜੀ & mht->mht_ਨਕਾਬ];
+    ਜਦੋਂ (mhi != ਨਿਰਾ && mhi->mhi_ਕੁੰਜੀ != ਕੁੰਜੀ)
+	mhi = mhi->mhi_ਅਗਲਾ;
 
-    return mhi;
+    ਵਾਪਸ mhi;
 }
 
 /*
  * Add item "mhi" to hashtable "mht".
  * "mhi" must not be NULL.
  */
-    static void
-mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    ਸਥਿਰ ਖਾਲੀ
+mf_hash_ਜੋੜੋ_ਵਸਤੂ(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     long_u	    idx;
 
-    idx = mhi->mhi_key & mht->mht_mask;
-    mhi->mhi_next = mht->mht_buckets[idx];
-    mhi->mhi_prev = NULL;
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi;
+    idx = mhi->mhi_ਕੁੰਜੀ & mht->mht_ਨਕਾਬ;
+    mhi->mhi_ਅਗਲਾ = mht->mht_buckets[idx];
+    mhi->mhi_prev = ਨਿਰਾ;
+    ਜੇ (mhi->mhi_ਅਗਲਾ != ਨਿਰਾ)
+	mhi->mhi_ਅਗਲਾ->mhi_prev = mhi;
     mht->mht_buckets[idx] = mhi;
 
-    mht->mht_count++;
+    mht->mht_ਗਿਣਤੀ++;
 
     /*
      * Grow hashtable when we have more thank 2^MHT_LOG_LOAD_FACTOR
      * items per bucket on average
      */
-    if (mht->mht_fixed == 0
-	&& (mht->mht_count >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
+    ਜੇ (mht->mht_fixed == 0
+	&& (mht->mht_ਗਿਣਤੀ >> MHT_LOG_ਲੱਦੋ_ਗੁਣਕ) > mht->mht_ਨਕਾਬ)
     {
-	if (mf_hash_grow(mht) == FAIL)
+	ਜੇ (mf_hash_grow(mht) == FAIL)
 	{
 	    // stop trying to grow after first failure to allocate memory
 	    mht->mht_fixed = 1;
@@ -1414,18 +1414,18 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * Remove item "mhi" from hashtable "mht".
  * "mhi" must not be NULL and must have been inserted into "mht".
  */
-    static void
-mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    ਸਥਿਰ ਖਾਲੀ
+mf_hash_rem_ਵਸਤੂ(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
-    if (mhi->mhi_prev == NULL)
-	mht->mht_buckets[mhi->mhi_key & mht->mht_mask] = mhi->mhi_next;
-    else
-	mhi->mhi_prev->mhi_next = mhi->mhi_next;
+    ਜੇ (mhi->mhi_prev == ਨਿਰਾ)
+	mht->mht_buckets[mhi->mhi_ਕੁੰਜੀ & mht->mht_ਨਕਾਬ] = mhi->mhi_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	mhi->mhi_prev->mhi_ਅਗਲਾ = mhi->mhi_ਅਗਲਾ;
 
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi->mhi_prev;
+    ਜੇ (mhi->mhi_ਅਗਲਾ != ਨਿਰਾ)
+	mhi->mhi_ਅਗਲਾ->mhi_prev = mhi->mhi_prev;
 
-    mht->mht_count--;
+    mht->mht_ਗਿਣਤੀ--;
 
     // We could shrink the table here, but it typically takes little memory,
     // so why bother?
@@ -1436,26 +1436,26 @@ mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * rehash items.
  * Returns FAIL when out of memory.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 mf_hash_grow(mf_hashtab_T *mht)
 {
     long_u	    i, j;
-    int		    shift;
+    ਪੂਰਨ		    ਖਿਸਕਾਓ;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *tails[MHT_GROWTH_FACTOR];
+    mf_hashitem_T   *tails[MHT_GROWTH_ਗੁਣਕ];
     mf_hashitem_T   **buckets;
-    size_t	    size;
+    size_t	    ਮਾਪ;
 
-    size = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR * sizeof(void *);
-    buckets = lalloc_clear(size, FALSE);
-    if (buckets == NULL)
-	return FAIL;
+    ਮਾਪ = (mht->mht_ਨਕਾਬ + 1) * MHT_GROWTH_ਗੁਣਕ * ਆਕਾਰ(ਖਾਲੀ *);
+    buckets = lalloc_clear(ਮਾਪ, FALSE);
+    ਜੇ (buckets == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    shift = 0;
-    while ((mht->mht_mask >> shift) != 0)
-	shift++;
+    ਖਿਸਕਾਓ = 0;
+    ਜਦੋਂ ((mht->mht_ਨਕਾਬ >> ਖਿਸਕਾਓ) != 0)
+	ਖਿਸਕਾਓ++;
 
-    for (i = 0; i <= mht->mht_mask; i++)
+    ਲਈ (i = 0; i <= mht->mht_ਨਕਾਬ; i++)
     {
 	/*
 	 * Traverse the items in the i-th original bucket and move them into
@@ -1468,35 +1468,35 @@ mf_hash_grow(mf_hashtab_T *mht)
 	 * a power of two.
 	 */
 
-	CLEAR_FIELD(tails);
+	CLEAR_ਖੇਤਰ(tails);
 
-	for (mhi = mht->mht_buckets[i]; mhi != NULL; mhi = mhi->mhi_next)
+	ਲਈ (mhi = mht->mht_buckets[i]; mhi != ਨਿਰਾ; mhi = mhi->mhi_ਅਗਲਾ)
 	{
-	    j = (mhi->mhi_key >> shift) & (MHT_GROWTH_FACTOR - 1);
-	    if (tails[j] == NULL)
+	    j = (mhi->mhi_ਕੁੰਜੀ >> ਖਿਸਕਾਓ) & (MHT_GROWTH_ਗੁਣਕ - 1);
+	    ਜੇ (tails[j] == ਨਿਰਾ)
 	    {
-		buckets[i + (j << shift)] = mhi;
+		buckets[i + (j << ਖਿਸਕਾਓ)] = mhi;
 		tails[j] = mhi;
-		mhi->mhi_prev = NULL;
+		mhi->mhi_prev = ਨਿਰਾ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		tails[j]->mhi_next = mhi;
+		tails[j]->mhi_ਅਗਲਾ = mhi;
 		mhi->mhi_prev = tails[j];
 		tails[j] = mhi;
 	    }
 	}
 
-	for (j = 0; j < MHT_GROWTH_FACTOR; j++)
-	    if (tails[j] != NULL)
-		tails[j]->mhi_next = NULL;
+	ਲਈ (j = 0; j < MHT_GROWTH_ਗੁਣਕ; j++)
+	    ਜੇ (tails[j] != ਨਿਰਾ)
+		tails[j]->mhi_ਅਗਲਾ = ਨਿਰਾ;
     }
 
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    ਜੇ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 
     mht->mht_buckets = buckets;
-    mht->mht_mask = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR - 1;
+    mht->mht_ਨਕਾਬ = (mht->mht_ਨਕਾਬ + 1) * MHT_GROWTH_ਗੁਣਕ - 1;
 
-    return OK;
+    ਵਾਪਸ OK;
 }

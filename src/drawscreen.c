@@ -63,57 +63,57 @@
  *   update_screen() called to redraw.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-static void win_update(win_T *wp);
-#ifdef FEAT_STL_OPT
-static void redraw_custom_statusline(win_T *wp);
-#endif
-static void borrow_stl_vsep_hl(void);
-#if defined(FEAT_SEARCH_EXTRA) || defined(FEAT_CLIPBOARD)
-static int  did_update_one_window;
-#endif
+ਸਥਿਰ ਖਾਲੀ win_update(win_T *wp);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+ਸਥਿਰ ਖਾਲੀ redraw_custom_statusline(win_T *wp);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਖਾਲੀ borrow_stl_vsep_hl(ਖਾਲੀ);
+#ਜੇ defined(FEAT_ਖੋਜ_EXTRA) || defined(FEAT_CLIPBOARD)
+ਸਥਿਰ ਪੂਰਨ  did_update_one_ਖਿੜਕੀ;
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_EVAL
-static void redraw_listener_cleanup(void);
-static void invoke_redraw_listener_start_or_end(bool start);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+ਸਥਿਰ ਖਾਲੀ redraw_listener_cleanup(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ invoke_redraw_listener_ਸ਼ੁਰੂ_or_ਸਿਰਾ(bool ਸ਼ੁਰੂ);
+#ਜੇ_ਅੰਤ
 
 /*
  * Based on the current value of curwin->w_topline, transfer a screenfull
  * of stuff from Filemem to ScreenLines[], and update curwin->w_botline.
  * Return OK when the screen was updated, FAIL if it was not done.
  */
-    int
-update_screen(int type_arg)
+    ਪੂਰਨ
+update_screen(ਪੂਰਨ type_arg)
 {
-    int		type = type_arg;
+    ਪੂਰਨ		type = type_arg;
     win_T	*wp;
-    static int	did_intro = FALSE;
-#ifdef FEAT_GUI
-    int		did_one = FALSE;
-    int		did_undraw = FALSE;
-    int		gui_cursor_col = 0;
-    int		gui_cursor_row = 0;
-#endif
-    int		no_update = FALSE;
-    int		save_pum_will_redraw = pum_will_redraw;
-#ifdef FEAT_PROP_POPUP
-    int		did_redraw_window = FALSE;
-#endif
+    ਸਥਿਰ ਪੂਰਨ	did_intro = FALSE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਪੂਰਨ		did_one = FALSE;
+    ਪੂਰਨ		did_undraw = FALSE;
+    ਪੂਰਨ		gui_cursor_ਖਾਨਾ = 0;
+    ਪੂਰਨ		gui_cursor_ਪੰਕਤੀ = 0;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		no_update = FALSE;
+    ਪੂਰਨ		save_pum_will_redraw = pum_will_redraw;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਪੂਰਨ		did_redraw_ਖਿੜਕੀ = FALSE;
+#ਜੇ_ਅੰਤ
     bool	override_success;
 
     // Don't do anything if the screen structures are (not yet) valid.
-    if (!screen_valid(TRUE))
-	return FAIL;
+    ਜੇ (!screen_valid(TRUE))
+	ਵਾਪਸ FAIL;
 
-    if (type == UPD_VALID_NO_UPDATE)
+    ਜੇ (type == UPD_VALID_NO_UPDATE)
     {
 	no_update = TRUE;
 	type = 0;
     }
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     {
 	buf_T *buf;
 
@@ -121,17 +121,17 @@ update_screen(int type_arg)
 	FOR_ALL_BUFFERS(buf)
 	    invoke_listeners(buf);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     // May have postponed updating diffs.
-    if (need_diff_redraw)
+    ਜੇ (need_diff_redraw)
 	diff_redraw(TRUE);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (must_redraw)
+    ਜੇ (must_redraw)
     {
-	if (type < must_redraw)	    // use maximal type
+	ਜੇ (type < must_redraw)	    // use maximal type
 	    type = must_redraw;
 
 	// must_redraw is reset here, so that when we run into some weird
@@ -142,60 +142,60 @@ update_screen(int type_arg)
     }
 
     // May need to update w_lines[].
-    if (curwin->w_lines_valid == 0 && type < UPD_NOT_VALID
-#ifdef FEAT_TERMINAL
-	    && !term_do_update_window(curwin)
-#endif
+    ਜੇ (curwin->w_ਸਤਰਾਂ_valid == 0 && type < UPD_NOT_VALID
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	    && !ਪਦ_do_update_ਖਿੜਕੀ(curwin)
+#ਜੇ_ਅੰਤ
 		)
 	type = UPD_NOT_VALID;
 
     // Postpone the redrawing when it's not needed and when being called
     // recursively.
-    if (!redrawing() || updating_screen)
+    ਜੇ (!redrawing() || updating_screen)
     {
 	redraw_later(type);		// remember type for next time
 	must_redraw = type;
-	if (type > UPD_INVERTED_ALL)
-	    curwin->w_lines_valid = 0;	// don't use w_lines[].wl_size now
-	return FAIL;
+	ਜੇ (type > UPD_INVERTED_ALL)
+	    curwin->w_ਸਤਰਾਂ_valid = 0;	// don't use w_lines[].wl_size now
+	ਵਾਪਸ FAIL;
     }
     updating_screen = TRUE;
 
     // Hide the cursor while redrawing when sync output is not active, to
     // avoid visible cursor flicker on terminals like Windows ConPTY.
-    int hid_cursor = !sync_output_active();
-    if (hid_cursor)
+    ਪੂਰਨ hid_cursor = !sync_output_ਸਰਗਰਮ();
+    ਜੇ (hid_cursor)
 	cursor_off();
-    term_set_sync_output(TERM_SYNC_OUTPUT_ENABLE);
+    ਪਦ_ਸੈੱਟ_sync_output(ਪਦ_SYNC_OUTPUT_ENABLE);
 
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
     // Update popup_mask if needed.  This may set w_redraw_top and w_redraw_bot
     // in some windows.
-    may_update_popup_mask(type);
-#endif
+    may_update_popup_ਨਕਾਬ(type);
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     ++display_tick;	    // let syntax code know we're in a next round of
 			    // display updating
-#endif
-    if (no_update)
-	++no_win_do_lines_ins;
+#ਜੇ_ਅੰਤ
+    ਜੇ (no_update)
+	++no_win_do_ਸਤਰਾਂ_ins;
 
     // if the screen was scrolled up when displaying a message, scroll it down
-    if (msg_scrolled)
+    ਜੇ (ਸੁਨੇਹਾ_scrolled)
     {
 	clear_cmdline = TRUE;
-	if (type != UPD_CLEAR)
+	ਜੇ (type != UPD_CLEAR)
 	{
-	    if (msg_scrolled > Rows - 5)	    // redrawing is faster
+	    ਜੇ (ਸੁਨੇਹਾ_scrolled > ਪੰਕਤੀਆਂ - 5)	    // redrawing is faster
 	    {
 		type = UPD_NOT_VALID;
 		redraw_as_cleared();
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		check_for_delay(FALSE);
-		if (screen_ins_lines(0, 0, msg_scrolled, (int)Rows, 0, NULL)
+		ਜੇ (screen_ins_ਸਤਰਾਂ(0, 0, ਸੁਨੇਹਾ_scrolled, (ਪੂਰਨ)ਪੰਕਤੀਆਂ, 0, ਨਿਰਾ)
 								       == FAIL)
 		{
 		    type = UPD_NOT_VALID;
@@ -203,34 +203,34 @@ update_screen(int type_arg)
 		}
 		FOR_ALL_WINDOWS(wp)
 		{
-		    if (wp->w_winrow < msg_scrolled)
+		    ਜੇ (wp->w_winrow < ਸੁਨੇਹਾ_scrolled)
 		    {
-			if (W_WINROW(wp) + wp->w_height > msg_scrolled
-				&& wp->w_redr_type < UPD_REDRAW_TOP
-				&& wp->w_lines_valid > 0
-				&& wp->w_topline == wp->w_lines[0].wl_lnum)
+			ਜੇ (W_WINROW(wp) + wp->w_ਉਚਾਈ > ਸੁਨੇਹਾ_scrolled
+				&& wp->w_redr_type < UPD_REDRAW_ਸਿਖਰ
+				&& wp->w_ਸਤਰਾਂ_valid > 0
+				&& wp->w_topline == wp->w_ਸਤਰਾਂ[0].wl_lnum)
 			{
-			    wp->w_upd_rows = msg_scrolled - W_WINROW(wp);
-			    wp->w_redr_type = UPD_REDRAW_TOP;
+			    wp->w_upd_ਪੰਕਤੀਆਂ = ਸੁਨੇਹਾ_scrolled - W_WINROW(wp);
+			    wp->w_redr_type = UPD_REDRAW_ਸਿਖਰ;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    wp->w_redr_type = UPD_NOT_VALID;
-			    if (W_WINROW(wp) + wp->w_height
-					 + wp->w_status_height <= msg_scrolled)
-				wp->w_redr_status = true;
+			    ਜੇ (W_WINROW(wp) + wp->w_ਉਚਾਈ
+					 + wp->w_ਸਥਿਤੀ_ਉਚਾਈ <= ਸੁਨੇਹਾ_scrolled)
+				wp->w_redr_ਸਥਿਤੀ = true;
 			}
 		    }
 		}
-		if (!no_update)
+		ਜੇ (!no_update)
 		    redraw_cmdline = TRUE;
 		redraw_tabline = TRUE;
 	    }
-#if defined(FEAT_TABPANEL)
+#ਜੇ defined(FEAT_TABPANEL)
 	    redraw_tabpanel = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	msg_scrolled = 0;
+	ਸੁਨੇਹਾ_scrolled = 0;
 	need_wait_return = FALSE;
     }
 
@@ -238,10 +238,10 @@ update_screen(int type_arg)
     compute_cmdrow();
 
     // Check for changed highlighting
-    if (need_highlight_changed)
-	highlight_changed();
+    ਜੇ (need_highlight_ਬਦਲਿਆ)
+	highlight_ਬਦਲਿਆ();
 
-    if (type == UPD_CLEAR)		// first clear screen
+    ਜੇ (type == UPD_CLEAR)		// first clear screen
     {
 	screenclear();		// will reset clear_cmdline
 	type = UPD_NOT_VALID;
@@ -249,95 +249,95 @@ update_screen(int type_arg)
 	must_redraw = 0;
     }
 
-    if (clear_cmdline)		// going to clear cmdline (done below)
+    ਜੇ (clear_cmdline)		// going to clear cmdline (done below)
 	check_for_delay(FALSE);
 
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
     // Force redraw when width of 'number' or 'relativenumber' column
     // changes.
-    if (curwin->w_redr_type < UPD_NOT_VALID
+    ਜੇ (curwin->w_redr_type < UPD_NOT_VALID
 	   && curwin->w_nrwidth != ((curwin->w_p_nu || curwin->w_p_rnu)
-				    ? number_width(curwin) : 0))
+				    ? ਸੰਖਿਆ_ਚੌੜਾਈ(curwin) : 0))
 	curwin->w_redr_type = UPD_NOT_VALID;
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_EVAL
-    invoke_redraw_listener_start_or_end(true);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    invoke_redraw_listener_ਸ਼ੁਰੂ_or_ਸਿਰਾ(true);
+#ਜੇ_ਅੰਤ
 
     // Only start redrawing if there is really something to do.
-    if (type == UPD_INVERTED)
+    ਜੇ (type == UPD_INVERTED)
 	update_curswant();
-    if (curwin->w_redr_type < type
+    ਜੇ (curwin->w_redr_type < type
 	    && !((type == UPD_VALID
-		    && curwin->w_lines[0].wl_valid
-#ifdef FEAT_DIFF
+		    && curwin->w_ਸਤਰਾਂ[0].wl_valid
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    && curwin->w_topfill == curwin->w_old_topfill
 		    && curwin->w_botfill == curwin->w_old_botfill
-#endif
-		    && curwin->w_topline == curwin->w_lines[0].wl_lnum)
+#ਜੇ_ਅੰਤ
+		    && curwin->w_topline == curwin->w_ਸਤਰਾਂ[0].wl_lnum)
 		|| (type == UPD_INVERTED
-		    && VIsual_active
+		    && VIsual_ਸਰਗਰਮ
 		    && curwin->w_old_cursor_lnum == curwin->w_cursor.lnum
-		    && curwin->w_old_visual_mode == VIsual_mode
+		    && curwin->w_old_visual_ਬਹੁਲਕ == VIsual_ਬਹੁਲਕ
 		    && (curwin->w_valid & VALID_VIRTCOL)
 		    && curwin->w_old_curswant == curwin->w_curswant)
 		))
 	curwin->w_redr_type = type;
 
     // Redraw the tab pages line if needed.
-    if (redraw_tabline || type >= UPD_NOT_VALID)
+    ਜੇ (redraw_tabline || type >= UPD_NOT_VALID)
 	draw_tabline();
 
-#if defined(FEAT_TABPANEL)
-    if (redraw_tabpanel || type >= UPD_NOT_VALID)
+#ਜੇ defined(FEAT_TABPANEL)
+    ਜੇ (redraw_tabpanel || type >= UPD_NOT_VALID)
 	draw_tabpanel();
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // Correct stored syntax highlighting info for changes in each displayed
     // buffer.  Each buffer must only be done once.
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_buffer->b_mod_set)
+	ਜੇ (wp->w_ਬਫਰ->b_mod_ਸੈੱਟ)
 	{
 	    win_T	*wwp;
 
 	    // Check if we already did this buffer.
-	    for (wwp = firstwin; wwp != wp; wwp = wwp->w_next)
-		if (wwp->w_buffer == wp->w_buffer)
-		    break;
-	    if (wwp == wp && syntax_present(wp))
-		syn_stack_apply_changes(wp->w_buffer);
+	    ਲਈ (wwp = firstwin; wwp != wp; wwp = wwp->w_ਅਗਲਾ)
+		ਜੇ (wwp->w_ਬਫਰ == wp->w_ਬਫਰ)
+		    ਰੋਕੋ;
+	    ਜੇ (wwp == wp && syntax_present(wp))
+		syn_ਢੇਰ_apply_changes(wp->w_ਬਫਰ);
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (pum_redraw_in_same_position())
+    ਜੇ (pum_redraw_ਵਿੱਚ_same_position())
 	// Avoid flicker if the popup menu is going to be redrawn in the same
 	// position.
 	pum_will_redraw = TRUE;
 
     // Go from top to bottom through the windows, redrawing the ones that need
     // it.
-#if defined(FEAT_SEARCH_EXTRA) || defined(FEAT_CLIPBOARD)
-    did_update_one_window = FALSE;
-#endif
-#ifdef FEAT_SEARCH_EXTRA
-    screen_search_hl.rm.regprog = NULL;
-#endif
+#ਜੇ defined(FEAT_ਖੋਜ_EXTRA) || defined(FEAT_CLIPBOARD)
+    did_update_one_ਖਿੜਕੀ = FALSE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+    screen_ਖੋਜ_hl.rm.regprog = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
     FOR_ALL_WINDOWS(wp)
     {
-	override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	override_success = ਧੱਕੋ_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	if (wp->w_redr_type != 0)
+	ਜੇ (wp->w_redr_type != 0)
 	{
 	    cursor_off();
-#ifdef FEAT_PROP_POPUP
-	    did_redraw_window = TRUE;
-#endif
-#ifdef FEAT_GUI
-	    if (!did_one)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    did_redraw_ਖਿੜਕੀ = TRUE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	    ਜੇ (!did_one)
 	    {
 		did_one = TRUE;
 
@@ -346,32 +346,32 @@ update_screen(int type_arg)
 		// it.
 		// Also remove the cursor if it needs to be hidden due to an
 		// ongoing cursor-less sleep.
-		if (gui.in_use && (wp == curwin || cursor_is_sleeping()))
+		ਜੇ (gui.ਵਿੱਚ_use && (wp == curwin || cursor_is_sleeping()))
 		{
-		    gui_cursor_col = gui.cursor_col;
-		    gui_cursor_row = gui.cursor_row;
+		    gui_cursor_ਖਾਨਾ = gui.cursor_ਖਾਨਾ;
+		    gui_cursor_ਪੰਕਤੀ = gui.cursor_ਪੰਕਤੀ;
 		    gui_undraw_cursor();
 		    did_undraw = TRUE;
 		}
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	    win_update(wp);
 	}
 
 	// redraw status line after the window to minimize cursor movement
-	if (wp->w_redr_status)
+	ਜੇ (wp->w_redr_ਸਥਿਤੀ)
 	{
 	    cursor_off();
-	    win_redr_status(wp, TRUE); // any popup menu will be redrawn below
+	    win_redr_ਸਥਿਤੀ(wp, TRUE); // any popup menu will be redrawn below
 	}
 
-	if (override_success)
-	    pop_highlight_overrides();
+	ਜੇ (override_success)
+	    ਕੱਢੋ_highlight_overrides();
 
     }
-#if defined(FEAT_SEARCH_EXTRA)
-    end_search_hl();
-#endif
+#ਜੇ defined(FEAT_ਖੋਜ_EXTRA)
+    ਸਿਰਾ_ਖੋਜ_hl();
+#ਜੇ_ਅੰਤ
 
     // May need to redraw the popup menu.
     pum_will_redraw = save_pum_will_redraw;
@@ -379,11 +379,11 @@ update_screen(int type_arg)
 
     // Redraw vertical separators to update VertSplit/VertSplitNC highlights
     // when the current window has changed.
-    if (redraw_vseps)
+    ਜੇ (redraw_vseps)
     {
 	redraw_vseps = FALSE;
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_vsep_width > 0)
+	    ਜੇ (wp->w_vsep_ਚੌੜਾਈ > 0)
 		draw_vsep_win(wp, 0);
     }
 
@@ -392,92 +392,92 @@ update_screen(int type_arg)
     // Reset b_mod_set flags.  Going through all windows is probably faster
     // than going through all buffers (there could be many buffers).
     FOR_ALL_WINDOWS(wp)
-	wp->w_buffer->b_mod_set = false;
+	wp->w_ਬਫਰ->b_mod_ਸੈੱਟ = false;
 
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
     // Display popup windows on top of the windows and command line.
-    if (did_redraw_window || popup_need_redraw())
+    ਜੇ (did_redraw_ਖਿੜਕੀ || popup_need_redraw())
 	update_popups(win_update);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_TERMINAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
     FOR_ALL_WINDOWS(wp)
 	// If this window contains a terminal, after redrawing all windows, the
 	// dirty row range can be reset.
-	term_did_update_window(wp);
-#endif
+	ਪਦ_did_update_ਖਿੜਕੀ(wp);
+#ਜੇ_ਅੰਤ
 
     after_updating_screen(TRUE);
 
     // Clear or redraw the command line.  Done last, because scrolling may
     // mess up the command line.
-    if (clear_cmdline || redraw_cmdline || redraw_mode)
+    ਜੇ (clear_cmdline || redraw_cmdline || redraw_ਬਹੁਲਕ)
 	showmode();
 
-    if (no_update)
-	--no_win_do_lines_ins;
+    ਜੇ (no_update)
+	--no_win_do_ਸਤਰਾਂ_ins;
 
     // May put up an introductory message when not editing a file
-    if (!did_intro)
-	maybe_intro_message();
+    ਜੇ (!did_intro)
+	maybe_intro_ਸੁਨੇਹਾ();
     did_intro = TRUE;
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // Redraw the cursor and update the scrollbars when all screen updating is
     // done.
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
-	if (did_undraw && !gui_mch_is_blink_off())
+	ਜੇ (did_undraw && !gui_mch_is_blink_off())
 	{
 	    mch_disable_flush();
-	    out_flush();	// required before updating the cursor
+	    ਬਾਹਰਲਾ_flush();	// required before updating the cursor
 	    mch_enable_flush();
 
 	    // Put the GUI position where the cursor was, gui_update_cursor()
 	    // uses that.
-	    gui.col = gui_cursor_col;
-	    gui.row = gui_cursor_row;
-	    gui.col = mb_fix_col(gui.col, gui.row);
+	    gui.ਖਾਨਾ = gui_cursor_ਖਾਨਾ;
+	    gui.ਪੰਕਤੀ = gui_cursor_ਪੰਕਤੀ;
+	    gui.ਖਾਨਾ = mb_fix_ਖਾਨਾ(gui.ਖਾਨਾ, gui.ਪੰਕਤੀ);
 	    gui_update_cursor(FALSE, FALSE);
 	    gui_may_flush();
-	    screen_cur_col = gui.col;
-	    screen_cur_row = gui.row;
+	    screen_cur_ਖਾਨਾ = gui.ਖਾਨਾ;
+	    screen_cur_ਪੰਕਤੀ = gui.ਪੰਕਤੀ;
 	}
-	else
-	    out_flush();
+	ਨਹੀਂਤਾਂ
+	    ਬਾਹਰਲਾ_flush();
 	gui_update_scrollbars(FALSE);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_IMAGE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_IMAGE
     // Make sure to do this last!
     draw_image_placements();
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_EVAL
-    invoke_redraw_listener_start_or_end(false);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    invoke_redraw_listener_ਸ਼ੁਰੂ_or_ਸਿਰਾ(false);
     redraw_listener_cleanup();
-#endif
+#ਜੇ_ਅੰਤ
 
-    term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
-    if (hid_cursor)
+    ਪਦ_ਸੈੱਟ_sync_output(ਪਦ_SYNC_OUTPUT_DISABLE);
+    ਜੇ (hid_cursor)
 	cursor_on();
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Return the row for drawing the statusline and the ruler of window "wp".
  */
-    int
-statusline_row(win_T *wp)
+    ਪੂਰਨ
+statusline_ਪੰਕਤੀ(win_T *wp)
 {
-#if defined(FEAT_PROP_POPUP)
+#ਜੇ defined(FEAT_PROP_POPUP)
     // If the window is really zero height the winbar isn't displayed.
-    if (wp->w_frame->fr_height == wp->w_status_height && !popup_is_popup(wp))
-	return wp->w_winrow;
-#endif
-    return W_WINROW(wp) + wp->w_height;
+    ਜੇ (wp->w_ਚੌਖਟਾ->fr_ਉਚਾਈ == wp->w_ਸਥਿਤੀ_ਉਚਾਈ && !popup_is_popup(wp))
+	ਵਾਪਸ wp->w_winrow;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ W_WINROW(wp) + wp->w_ਉਚਾਈ;
 }
 
 /*
@@ -487,136 +487,136 @@ statusline_row(win_T *wp)
  * If "ignore_pum" is TRUE, also redraw statusline when the popup menu is
  * displayed.
  */
-    void
-win_redr_status(win_T *wp, int ignore_pum UNUSED)
+    ਖਾਲੀ
+win_redr_ਸਥਿਤੀ(win_T *wp, ਪੂਰਨ ignore_pum ਅਣਵਰਤਿਆ)
 {
-    int		row;
-    int		fillchar;
-    int		attr;
-    int		i;
-    static int  busy = FALSE;
+    ਪੂਰਨ		ਪੰਕਤੀ;
+    ਪੂਰਨ		fillchar;
+    ਪੂਰਨ		attr;
+    ਪੂਰਨ		i;
+    ਸਥਿਰ ਪੂਰਨ  busy = FALSE;
 
     // It's possible to get here recursively when 'statusline' (indirectly)
     // invokes ":redrawstatus".  Simply ignore the call then.
-    if (busy)
-	return;
+    ਜੇ (busy)
+	ਵਾਪਸ;
     busy = TRUE;
 
-    row = statusline_row(wp);
+    ਪੰਕਤੀ = statusline_ਪੰਕਤੀ(wp);
 
-    wp->w_redr_status = false;
-    if (wp->w_status_height == 0)
+    wp->w_redr_ਸਥਿਤੀ = false;
+    ਜੇ (wp->w_ਸਥਿਤੀ_ਉਚਾਈ == 0)
     {
 	// no status line, can only be last window
 	redraw_cmdline = TRUE;
     }
-    else if (!redrawing()
+    ਨਹੀਂਤਾਂ ਜੇ (!redrawing()
 	    // don't update status line when popup menu is visible and may be
 	    // drawn over it, unless it will be redrawn later
 	    || (!ignore_pum && pum_visible()))
     {
 	// Don't redraw right now, do it later.
-	wp->w_redr_status = true;
+	wp->w_redr_ਸਥਿਤੀ = true;
     }
-#ifdef FEAT_STL_OPT
-    else if (*p_stl != NUL || *wp->w_p_stl != NUL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+    ਨਹੀਂਤਾਂ ਜੇ (*p_stl != NUL || *wp->w_p_stl != NUL)
     {
 	// redraw custom status line
 	redraw_custom_statusline(wp);
     }
-#endif
-    else
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
     {
 	char_u	*p;
-	int	plen;
-	int	NameBufflen;
-	int	this_ru_col;
-	int	n;			// scratch value
+	ਪੂਰਨ	plen;
+	ਪੂਰਨ	NameBufflen;
+	ਪੂਰਨ	this_ru_ਖਾਨਾ;
+	ਪੂਰਨ	n;			// scratch value
 
-	fillchar = fillchar_status(&attr, wp);
+	fillchar = fillchar_ਸਥਿਤੀ(&attr, wp);
 
-	get_trans_bufname(wp->w_buffer);
+	get_trans_bufname(wp->w_ਬਫਰ);
 	p = NameBuff;
-	plen = (int)STRLEN(p);
+	plen = (ਪੂਰਨ)STRLEN(p);
 
-	if ((bt_help(wp->w_buffer)
-#ifdef FEAT_QUICKFIX
+	ਜੇ ((bt_help(wp->w_ਬਫਰ)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_QUICKFIX
 		    || wp->w_p_pvw
-#endif
-		    || bufIsChanged(wp->w_buffer)
-		    || wp->w_buffer->b_p_ro)
+#ਜੇ_ਅੰਤ
+		    || buf_Is_ਬਦਲਿਆ(wp->w_ਬਫਰ)
+		    || wp->w_ਬਫਰ->b_p_ro)
 		&& plen < MAXPATHL - 1)
 	{
 	    *(p + plen++) = ' ';	// replace NUL with space
 	    *(p + plen) = NUL;		// NUL terminate the string
 	}
-	if (bt_help(wp->w_buffer))
-	    plen += vim_snprintf((char *)p + plen, MAXPATHL - plen, "%s", _("[Help]"));
-#ifdef FEAT_QUICKFIX
-	if (wp->w_p_pvw)
-	    plen += vim_snprintf((char *)p + plen, MAXPATHL - plen, "%s", _("[Preview]"));
-#endif
-	if (bufIsChanged(wp->w_buffer) && !bt_terminal(wp->w_buffer))
-	    plen += vim_snprintf((char *)p + plen, MAXPATHL - plen, "%s", "[+]");
-	if (wp->w_buffer->b_p_ro)
-	    plen += vim_snprintf((char *)p + plen, MAXPATHL - plen, "%s", _("[RO]"));
+	ਜੇ (bt_help(wp->w_ਬਫਰ))
+	    plen += vim_snprintf((ਅੱਖਰ *)p + plen, MAXPATHL - plen, "%s", _("[Help]"));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_QUICKFIX
+	ਜੇ (wp->w_p_pvw)
+	    plen += vim_snprintf((ਅੱਖਰ *)p + plen, MAXPATHL - plen, "%s", _("[Preview]"));
+#ਜੇ_ਅੰਤ
+	ਜੇ (buf_Is_ਬਦਲਿਆ(wp->w_ਬਫਰ) && !bt_terminal(wp->w_ਬਫਰ))
+	    plen += vim_snprintf((ਅੱਖਰ *)p + plen, MAXPATHL - plen, "%s", "[+]");
+	ਜੇ (wp->w_ਬਫਰ->b_p_ro)
+	    plen += vim_snprintf((ਅੱਖਰ *)p + plen, MAXPATHL - plen, "%s", _("[RO]"));
 
-	this_ru_col = ru_col - (cmdline_width - wp->w_width);
-	n = (wp->w_width + 1) / 2;
-	if (this_ru_col < n)
-	    this_ru_col = n;
-	if (this_ru_col <= 1)
+	this_ru_ਖਾਨਾ = ru_ਖਾਨਾ - (cmdline_ਚੌੜਾਈ - wp->w_ਚੌੜਾਈ);
+	n = (wp->w_ਚੌੜਾਈ + 1) / 2;
+	ਜੇ (this_ru_ਖਾਨਾ < n)
+	    this_ru_ਖਾਨਾ = n;
+	ਜੇ (this_ru_ਖਾਨਾ <= 1)
 	{
 	    p = (char_u *)"<";		// No room for file name!
 	    plen = 1;
 	}
-	else if (has_mbyte)
+	ਨਹੀਂਤਾਂ ਜੇ (has_mbyte)
 	{
 	    // Count total number of display cells.
 	    plen = mb_string2cells(p, -1);
 
 	    // Find first character that will fit.
 	    // Going from start to end is much faster for DBCS.
-	    for (i = 0; p[i] != NUL && plen >= this_ru_col - 1;
+	    ਲਈ (i = 0; p[i] != NUL && plen >= this_ru_ਖਾਨਾ - 1;
 		    i += (*mb_ptr2len)(p + i))
 		plen -= (*mb_ptr2cells)(p + i);
-	    if (i > 0)
+	    ਜੇ (i > 0)
 	    {
 		p = p + i - 1;
 		*p = '<';
 		++plen;
 	    }
 	}
-	else if (plen > this_ru_col - 1)
+	ਨਹੀਂਤਾਂ ਜੇ (plen > this_ru_ਖਾਨਾ - 1)
 	{
-	    p += plen - (this_ru_col - 1);
+	    p += plen - (this_ru_ਖਾਨਾ - 1);
 	    *p = '<';
-	    plen = this_ru_col - 1;
+	    plen = this_ru_ਖਾਨਾ - 1;
 	}
 
-	screen_puts(p, row, wp->w_wincol, attr);
-	screen_fill(row, row + 1, plen + wp->w_wincol,
-		    this_ru_col + wp->w_wincol, fillchar, fillchar, attr);
+	screen_puts(p, ਪੰਕਤੀ, wp->w_wincol, attr);
+	screen_fill(ਪੰਕਤੀ, ਪੰਕਤੀ + 1, plen + wp->w_wincol,
+		    this_ru_ਖਾਨਾ + wp->w_wincol, fillchar, fillchar, attr);
 	// Fill extra status line rows entirely with fillchar.
-	for (i = 1; i < wp->w_status_height; i++)
-	    screen_fill(row + i, row + i + 1, wp->w_wincol,
+	ਲਈ (i = 1; i < wp->w_ਸਥਿਤੀ_ਉਚਾਈ; i++)
+	    screen_fill(ਪੰਕਤੀ + i, ਪੰਕਤੀ + i + 1, wp->w_wincol,
 			W_ENDCOL(wp), fillchar, fillchar, attr);
-	if ((NameBufflen = get_keymap_str(wp, (char_u *)"<%s>", NameBuff, MAXPATHL)) > 0
-		&& (this_ru_col - plen) > (NameBufflen + 1))
-	    screen_puts(NameBuff, row, (int)(this_ru_col - NameBufflen
+	ਜੇ ((NameBufflen = get_keymap_str(wp, (char_u *)"<%s>", NameBuff, MAXPATHL)) > 0
+		&& (this_ru_ਖਾਨਾ - plen) > (NameBufflen + 1))
+	    screen_puts(NameBuff, ਪੰਕਤੀ, (ਪੂਰਨ)(this_ru_ਖਾਨਾ - NameBufflen
 						   - 1 + wp->w_wincol), attr);
 
 	win_redr_ruler(wp, TRUE, ignore_pum);
 
 	// Draw the 'showcmd' information if 'showcmdloc' == "statusline".
-	if (p_sc && *p_sloc == 's')
+	ਜੇ (p_sc && *p_sloc == 's')
 	{
-	    n = this_ru_col - plen - 2;		    // perform the calculation here so we only do it once
-	    int	width = MIN(10, n);
+	    n = this_ru_ਖਾਨਾ - plen - 2;		    // perform the calculation here so we only do it once
+	    ਪੂਰਨ	ਚੌੜਾਈ = MIN(10, n);
 
-	    if (width > 0)
-		screen_puts_len(showcmd_buf, width, row,
-				wp->w_wincol + this_ru_col - width - 1, attr);
+	    ਜੇ (ਚੌੜਾਈ > 0)
+		screen_puts_len(showcmd_buf, ਚੌੜਾਈ, ਪੰਕਤੀ,
+				wp->w_wincol + this_ru_ਖਾਨਾ - ਚੌੜਾਈ - 1, attr);
 	    showcmd_update_clear_state();
 	}
     }
@@ -624,14 +624,14 @@ win_redr_status(win_T *wp, int ignore_pum UNUSED)
     /*
      * May need to draw the character below the vertical separator.
      */
-    if (wp->w_vsep_width != 0 && wp->w_status_height != 0 && redrawing())
+    ਜੇ (wp->w_vsep_ਚੌੜਾਈ != 0 && wp->w_ਸਥਿਤੀ_ਉਚਾਈ != 0 && redrawing())
     {
-	for (i = 0; i < wp->w_status_height; i++)
+	ਲਈ (i = 0; i < wp->w_ਸਥਿਤੀ_ਉਚਾਈ; i++)
 	{
-	    int r = row + i;
-	    if (stl_connected(wp))
-		fillchar = fillchar_status(&attr, wp);
-	    else
+	    ਪੂਰਨ r = ਪੰਕਤੀ + i;
+	    ਜੇ (stl_connected(wp))
+		fillchar = fillchar_ਸਥਿਤੀ(&attr, wp);
+	    ਨਹੀਂਤਾਂ
 		fillchar = fillchar_vsep(&attr, wp, r);
 	    screen_putchar(fillchar, r, W_ENDCOL(wp), attr);
 	}
@@ -651,264 +651,264 @@ win_redr_status(win_T *wp, int ignore_pum UNUSED)
  * Called for every cursor movement, thus only cells whose attribute changed
  * are written to the screen.
  */
-    static void
-borrow_stl_vsep_hl(void)
+    ਸਥਿਰ ਖਾਲੀ
+borrow_stl_vsep_hl(ਖਾਲੀ)
 {
-    win_T   *left = NULL;
-    win_T   *right = NULL;
+    win_T   *ਖੱਬਾ = ਨਿਰਾ;
+    win_T   *ਸੱਜਾ = ਨਿਰਾ;
 
     // In silent Ex mode the screen is not allocated, so LineOffset and
     // ScreenAttrs are NULL; there is nothing to borrow.
-    if (!redrawing() || ScreenLines == NULL)
-	return;
+    ਜੇ (!redrawing() || Screen_ਸਤਰਾਂ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    FOR_ALL_WINDOWS(left)
+    FOR_ALL_WINDOWS(ਖੱਬਾ)
     {
-	if (left->w_status_height == 0 || left->w_vsep_width == 0)
-	    continue;
+	ਜੇ (ਖੱਬਾ->w_ਸਥਿਤੀ_ਉਚਾਈ == 0 || ਖੱਬਾ->w_vsep_ਚੌੜਾਈ == 0)
+	    ਜਾਰੀ;
 	// A window of zero width has no status line cell to borrow from.
-	if (left->w_width == 0)
-	    continue;
-	if (!stl_connected(left))
-	    continue;
+	ਜੇ (ਖੱਬਾ->w_ਚੌੜਾਈ == 0)
+	    ਜਾਰੀ;
+	ਜੇ (!stl_connected(ਖੱਬਾ))
+	    ਜਾਰੀ;
 
 	// Find a right neighbour whose status line rows overlap.
-	win_T	*neighbour = NULL;
-	int start = 0;
-	int end = 0;
+	win_T	*neighbour = ਨਿਰਾ;
+	ਪੂਰਨ ਸ਼ੁਰੂ = 0;
+	ਪੂਰਨ ਸਿਰਾ = 0;
 
-	FOR_ALL_WINDOWS(right)
+	FOR_ALL_WINDOWS(ਸੱਜਾ)
 	{
-	    if (right == left || right->w_status_height == 0)
-		continue;
-	    if (right->w_wincol != W_ENDCOL(left) + 1)
-		continue;
-	    int l_stl_row = W_WINROW(left) + left->w_height;
-	    int r_stl_row = W_WINROW(right) + right->w_height;
+	    ਜੇ (ਸੱਜਾ == ਖੱਬਾ || ਸੱਜਾ->w_ਸਥਿਤੀ_ਉਚਾਈ == 0)
+		ਜਾਰੀ;
+	    ਜੇ (ਸੱਜਾ->w_wincol != W_ENDCOL(ਖੱਬਾ) + 1)
+		ਜਾਰੀ;
+	    ਪੂਰਨ l_stl_ਪੰਕਤੀ = W_WINROW(ਖੱਬਾ) + ਖੱਬਾ->w_ਉਚਾਈ;
+	    ਪੂਰਨ r_stl_ਪੰਕਤੀ = W_WINROW(ਸੱਜਾ) + ਸੱਜਾ->w_ਉਚਾਈ;
 
-	    start = l_stl_row > r_stl_row ? l_stl_row : r_stl_row;
-	    end = l_stl_row + left->w_status_height
-				< r_stl_row + right->w_status_height
-		? l_stl_row + left->w_status_height
-		: r_stl_row + right->w_status_height;
-	    if (start < end)
+	    ਸ਼ੁਰੂ = l_stl_ਪੰਕਤੀ > r_stl_ਪੰਕਤੀ ? l_stl_ਪੰਕਤੀ : r_stl_ਪੰਕਤੀ;
+	    ਸਿਰਾ = l_stl_ਪੰਕਤੀ + ਖੱਬਾ->w_ਸਥਿਤੀ_ਉਚਾਈ
+				< r_stl_ਪੰਕਤੀ + ਸੱਜਾ->w_ਸਥਿਤੀ_ਉਚਾਈ
+		? l_stl_ਪੰਕਤੀ + ਖੱਬਾ->w_ਸਥਿਤੀ_ਉਚਾਈ
+		: r_stl_ਪੰਕਤੀ + ਸੱਜਾ->w_ਸਥਿਤੀ_ਉਚਾਈ;
+	    ਜੇ (ਸ਼ੁਰੂ < ਸਿਰਾ)
 	    {
-		neighbour = right;
-		break;
+		neighbour = ਸੱਜਾ;
+		ਰੋਕੋ;
 	    }
 	}
-	if (neighbour == NULL)
-	    continue;
+	ਜੇ (neighbour == ਨਿਰਾ)
+	    ਜਾਰੀ;
 
 	// For non-current pairs only borrow when the status fillchar is a
 	// space; otherwise the visible character would be repainted with a
 	// foreign highlight.
-	int	hl;
-	if (left != curwin && neighbour != curwin
-		&& fillchar_status(&hl, left) != ' ')
-	    continue;
+	ਪੂਰਨ	hl;
+	ਜੇ (ਖੱਬਾ != curwin && neighbour != curwin
+		&& fillchar_ਸਥਿਤੀ(&hl, ਖੱਬਾ) != ' ')
+	    ਜਾਰੀ;
 
 	// Source: prefer curwin's side; otherwise left window's right edge.
-	int dst_col = W_ENDCOL(left);
-	int src_col = (neighbour == curwin)
-				? neighbour->w_wincol : W_ENDCOL(left) - 1;
+	ਪੂਰਨ dst_ਖਾਨਾ = W_ENDCOL(ਖੱਬਾ);
+	ਪੂਰਨ src_ਖਾਨਾ = (neighbour == curwin)
+				? neighbour->w_wincol : W_ENDCOL(ਖੱਬਾ) - 1;
 
 	// The windows may be laid out for a size the screen does not have yet.
-	if (dst_col >= screen_Columns || src_col >= screen_Columns)
-	    continue;
-	if (end > screen_Rows)
-	    end = screen_Rows;
+	ਜੇ (dst_ਖਾਨਾ >= screen_Columns || src_ਖਾਨਾ >= screen_Columns)
+	    ਜਾਰੀ;
+	ਜੇ (ਸਿਰਾ > screen_ਪੰਕਤੀਆਂ)
+	    ਸਿਰਾ = screen_ਪੰਕਤੀਆਂ;
 
-	for (int r = start; r < end; r++)
+	ਲਈ (ਪੂਰਨ r = ਸ਼ੁਰੂ; r < ਸਿਰਾ; r++)
 	{
-	    unsigned	dst_off = LineOffset[r] + dst_col;
-	    sattr_T	attr = ScreenAttrs[LineOffset[r] + src_col];
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ	dst_off = ਸਤਰ_ਵਿੱਥ[r] + dst_ਖਾਨਾ;
+	    sattr_T	attr = ScreenAttrs[ਸਤਰ_ਵਿੱਥ[r] + src_ਖਾਨਾ];
 
-	    if (ScreenAttrs[dst_off] != attr)
+	    ਜੇ (ScreenAttrs[dst_off] != attr)
 	    {
 		ScreenAttrs[dst_off] = attr;
-		screen_char(dst_off, r, dst_col);
+		screen_char(dst_off, r, dst_ਖਾਨਾ);
 	    }
 	}
     }
 }
 
-#ifdef FEAT_STL_OPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
 /*
  * Redraw the status line according to 'statusline' and take care of any
  * errors encountered.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 redraw_custom_statusline(win_T *wp)
 {
-    static int	    entered = FALSE;
+    ਸਥਿਰ ਪੂਰਨ	    entered = FALSE;
 
     // When called recursively return.  This can happen when the statusline
     // contains an expression that triggers a redraw.
-    if (entered)
-	return;
+    ਜੇ (entered)
+	ਵਾਪਸ;
     entered = TRUE;
 
     win_redr_custom(wp, FALSE);
     entered = FALSE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Show current status info in ruler and various other places
  * If always is FALSE, only show ruler if position has changed.
  */
-    void
-showruler(int always)
+    ਖਾਲੀ
+showruler(ਪੂਰਨ always)
 {
-    if (!always && !redrawing())
-	return;
-    if (pum_visible())
+    ਜੇ (!always && !redrawing())
+	ਵਾਪਸ;
+    ਜੇ (pum_visible())
     {
 	// Don't redraw right now, do it later.
-	curwin->w_redr_status = true;
-	return;
+	curwin->w_redr_ਸਥਿਤੀ = true;
+	ਵਾਪਸ;
     }
-#if defined(FEAT_STL_OPT)
-    if ((*p_stl != NUL || *curwin->w_p_stl != NUL) && curwin->w_status_height)
+#ਜੇ defined(FEAT_STL_OPT)
+    ਜੇ ((*p_stl != NUL || *curwin->w_p_stl != NUL) && curwin->w_ਸਥਿਤੀ_ਉਚਾਈ)
     {
 	redraw_custom_statusline(curwin);
 	borrow_stl_vsep_hl();
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	win_redr_ruler(curwin, always, FALSE);
 
-    if (need_maketitle
-#ifdef FEAT_STL_OPT
-	    || (p_icon && (stl_syntax & STL_IN_ICON))
-	    || (p_title && (stl_syntax & STL_IN_TITLE))
-#endif
+    ਜੇ (need_maketitle
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+	    || (p_icon && (stl_syntax & STL_ਵਿੱਚ_ICON))
+	    || (p_title && (stl_syntax & STL_ਵਿੱਚ_TITLE))
+#ਜੇ_ਅੰਤ
        )
 	maketitle();
 
     // Redraw the tab pages line if needed.
-    if (redraw_tabline)
+    ਜੇ (redraw_tabline)
 	draw_tabline();
 
-#if defined(FEAT_TABPANEL)
-    if (redraw_tabpanel)
+#ਜੇ defined(FEAT_TABPANEL)
+    ਜੇ (redraw_tabpanel)
 	draw_tabpanel();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    void
-win_redr_ruler(win_T *wp, int always, int ignore_pum)
+    ਖਾਲੀ
+win_redr_ruler(win_T *wp, ਪੂਰਨ always, ਪੂਰਨ ignore_pum)
 {
-    int	empty_line = FALSE;
+    ਪੂਰਨ	ਖਾਲੀ_ਥਾਵਾਂ_ਸਤਰ = FALSE;
 
     // If 'ruler' off don't do anything
-    if (!p_ru)
-	return;
+    ਜੇ (!p_ru)
+	ਵਾਪਸ;
 
     /*
      * Check if cursor.lnum is valid, since win_redr_ruler() may be called
      * after deleting lines, before cursor.lnum is corrected.
      */
-    if (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_line_count)
-	return;
+    ਜੇ (wp->w_cursor.lnum > wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਵਾਪਸ;
 
     // Don't draw the ruler while doing insert-completion, it might overwrite
     // the (long) mode message.
-    if (wp == lastwin && lastwin->w_status_height == 0)
-	if (edit_submode != NULL)
-	    return;
+    ਜੇ (wp == lastwin && lastwin->w_ਸਥਿਤੀ_ਉਚਾਈ == 0)
+	ਜੇ (edit_submode != ਨਿਰਾ)
+	    ਵਾਪਸ;
 
     // Don't draw the ruler when the popup menu is visible, it may overlap.
     // Except when the popup menu will be redrawn anyway.
-    if (!ignore_pum && pum_visible())
-	return;
+    ਜੇ (!ignore_pum && pum_visible())
+	ਵਾਪਸ;
 
-#ifdef FEAT_STL_OPT
-    if (*p_ruf)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+    ਜੇ (*p_ruf)
     {
 	win_redr_custom(wp, TRUE);
-	return;
+	ਵਾਪਸ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * Check if not in Insert mode and the line is empty (will show "0-1").
      */
-    if ((State & MODE_INSERT) == 0
-		&& *ml_get_buf(wp->w_buffer, wp->w_cursor.lnum, FALSE) == NUL)
-	empty_line = TRUE;
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) == 0
+		&& *ml_get_buf(wp->w_ਬਫਰ, wp->w_cursor.lnum, FALSE) == NUL)
+	ਖਾਲੀ_ਥਾਵਾਂ_ਸਤਰ = TRUE;
 
     /*
      * Only draw the ruler when something changed.
      */
     validate_virtcol_win(wp);
-    if (       redraw_cmdline
+    ਜੇ (       redraw_cmdline
 	    || always
 	    || wp->w_cursor.lnum != wp->w_ru_cursor.lnum
-	    || wp->w_cursor.col != wp->w_ru_cursor.col
+	    || wp->w_cursor.ਖਾਨਾ != wp->w_ru_cursor.ਖਾਨਾ
 	    || wp->w_virtcol != wp->w_ru_virtcol
 	    || wp->w_cursor.coladd != wp->w_ru_cursor.coladd
 	    || wp->w_topline != wp->w_ru_topline
-	    || wp->w_buffer->b_ml.ml_line_count != wp->w_ru_line_count
-#ifdef FEAT_DIFF
+	    || wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ != wp->w_ru_ਸਤਰ_ਗਿਣਤੀ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	    || wp->w_topfill != wp->w_ru_topfill
-#endif
-	    || empty_line != wp->w_ru_empty)
+#ਜੇ_ਅੰਤ
+	    || ਖਾਲੀ_ਥਾਵਾਂ_ਸਤਰ != wp->w_ru_ਖਾਲੀ_ਥਾਵਾਂ)
     {
-	int	row;
-	int	fillchar;
-	int	attr;
-	int	off;
-	int	width;
+	ਪੂਰਨ	ਪੰਕਤੀ;
+	ਪੂਰਨ	fillchar;
+	ਪੂਰਨ	attr;
+	ਪੂਰਨ	off;
+	ਪੂਰਨ	ਚੌੜਾਈ;
 	colnr_T	virtcol;
-#define RULER_BUF_LEN 70
-	char_u	buffer[RULER_BUF_LEN];
-	int	bufferlen;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RULER_BUF_LEN 70
+	char_u	ਬਫਰ[RULER_BUF_LEN];
+	ਪੂਰਨ	bufferlen;
 	char_u	rel_pos[RULER_BUF_LEN];
-	int	rel_poslen;
-	int	this_ru_col;
-	int	n1;			    // scratch value
-	int	n2;			    // scratch value
+	ਪੂਰਨ	rel_poslen;
+	ਪੂਰਨ	this_ru_ਖਾਨਾ;
+	ਪੂਰਨ	n1;			    // scratch value
+	ਪੂਰਨ	n2;			    // scratch value
 	bool	override_success =
-	    push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	    ਧੱਕੋ_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 	cursor_off();
-	if (wp->w_status_height)
+	ਜੇ (wp->w_ਸਥਿਤੀ_ਉਚਾਈ)
 	{
-	    row = statusline_row(wp);
-	    fillchar = fillchar_status(&attr, wp);
+	    ਪੰਕਤੀ = statusline_ਪੰਕਤੀ(wp);
+	    fillchar = fillchar_ਸਥਿਤੀ(&attr, wp);
 	    off = wp->w_wincol;
-	    width = wp->w_width;
+	    ਚੌੜਾਈ = wp->w_ਚੌੜਾਈ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    row = Rows - 1;
+	    ਪੰਕਤੀ = ਪੰਕਤੀਆਂ - 1;
 	    fillchar = ' ';
 	    attr = 0;
-	    off = cmdline_col_off;
-	    width = cmdline_width;
+	    off = cmdline_ਖਾਨਾ_off;
+	    ਚੌੜਾਈ = cmdline_ਚੌੜਾਈ;
 	}
 
 	// In list mode virtcol needs to be recomputed
 	virtcol = wp->w_virtcol;
-	if (wp->w_p_list && wp->w_lcs_chars.tab1 == NUL)
+	ਜੇ (wp->w_p_list && wp->w_lcs_chars.tab1 == NUL)
 	{
 	    wp->w_p_list = FALSE;
-	    getvvcol(wp, &wp->w_cursor, NULL, &virtcol, NULL, 0);
+	    getvvcol(wp, &wp->w_cursor, ਨਿਰਾ, &virtcol, ਨਿਰਾ, 0);
 	    wp->w_p_list = TRUE;
 	}
 
 	// row number, column number is appended
 	// l10n: leave as-is unless a space after the comma is preferred
 	// l10n: do not add any row/column label, due to the limited space
-	bufferlen = vim_snprintf((char *)buffer, RULER_BUF_LEN, _("%ld,"),
-		(wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
+	bufferlen = vim_snprintf((ਅੱਖਰ *)ਬਫਰ, RULER_BUF_LEN, _("%ld,"),
+		(wp->w_ਬਫਰ->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ)
 		    ? 0L
-		    : (long)(wp->w_cursor.lnum));
-	bufferlen += col_print(buffer + bufferlen, RULER_BUF_LEN - bufferlen,
-			empty_line ? 0 : (int)wp->w_cursor.col + 1,
-			(int)virtcol + 1);
+		    : (ਲੰਮਾ)(wp->w_cursor.lnum));
+	bufferlen += ਖਾਨਾ_print(ਬਫਰ + bufferlen, RULER_BUF_LEN - bufferlen,
+			ਖਾਲੀ_ਥਾਵਾਂ_ਸਤਰ ? 0 : (ਪੂਰਨ)wp->w_cursor.ਖਾਨਾ + 1,
+			(ਪੂਰਨ)virtcol + 1);
 
 	/*
 	 * Add a "50%" if there is room for it.
@@ -917,69 +917,69 @@ win_redr_ruler(win_T *wp, int always, int ignore_pum)
 	 */
 	rel_poslen = get_rel_pos(wp, rel_pos, RULER_BUF_LEN);
 	n1 = bufferlen + vim_strsize(rel_pos);
-	if (wp->w_status_height == 0)	// can't use last char of screen
+	ਜੇ (wp->w_ਸਥਿਤੀ_ਉਚਾਈ == 0)	// can't use last char of screen
 	    ++n1;
 
-	this_ru_col = ru_col - (cmdline_width - width);
+	this_ru_ਖਾਨਾ = ru_ਖਾਨਾ - (cmdline_ਚੌੜਾਈ - ਚੌੜਾਈ);
 	// Never use more than half the window/screen width, leave the other
 	// half for the filename.
-	n2 = (width + 1) / 2;
-	if (this_ru_col < n2)
-	    this_ru_col = n2;
-	if (this_ru_col + n1 < width)
+	n2 = (ਚੌੜਾਈ + 1) / 2;
+	ਜੇ (this_ru_ਖਾਨਾ < n2)
+	    this_ru_ਖਾਨਾ = n2;
+	ਜੇ (this_ru_ਖਾਨਾ + n1 < ਚੌੜਾਈ)
 	{
 	    // need at least space for rel_pos + NUL
-	    while (this_ru_col + n1 < width
+	    ਜਦੋਂ (this_ru_ਖਾਨਾ + n1 < ਚੌੜਾਈ
 		    && RULER_BUF_LEN > bufferlen + rel_poslen + 1)	// +1 for NUL
 	    {
-		if (has_mbyte)
-		    bufferlen += (*mb_char2bytes)(fillchar, buffer + bufferlen);
-		else
-		    buffer[bufferlen++] = fillchar;
+		ਜੇ (has_mbyte)
+		    bufferlen += (*mb_char2bytes)(fillchar, ਬਫਰ + bufferlen);
+		ਨਹੀਂਤਾਂ
+		    ਬਫਰ[bufferlen++] = fillchar;
 		++n1;
 	    }
-	    bufferlen += vim_snprintf((char *)buffer + bufferlen, RULER_BUF_LEN - bufferlen,
+	    bufferlen += vim_snprintf((ਅੱਖਰ *)ਬਫਰ + bufferlen, RULER_BUF_LEN - bufferlen,
 			    "%s", rel_pos);
 	}
 	// Truncate at window boundary.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
-	    for (n1 = 0, n2 = 0; buffer[n1] != NUL; n1 += (*mb_ptr2len)(buffer + n1))
+	    ਲਈ (n1 = 0, n2 = 0; ਬਫਰ[n1] != NUL; n1 += (*mb_ptr2len)(ਬਫਰ + n1))
 	    {
-		n2 += (*mb_ptr2cells)(buffer + n1);
-		if (this_ru_col + n2 > width)
+		n2 += (*mb_ptr2cells)(ਬਫਰ + n1);
+		ਜੇ (this_ru_ਖਾਨਾ + n2 > ਚੌੜਾਈ)
 		{
 		    bufferlen = n1;
-		    buffer[bufferlen] = NUL;
-		    break;
+		    ਬਫਰ[bufferlen] = NUL;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
-	else if (this_ru_col + bufferlen > width)
+	ਨਹੀਂਤਾਂ ਜੇ (this_ru_ਖਾਨਾ + bufferlen > ਚੌੜਾਈ)
 	{
-	    bufferlen = width - this_ru_col;
-	    buffer[bufferlen] = NUL;
+	    bufferlen = ਚੌੜਾਈ - this_ru_ਖਾਨਾ;
+	    ਬਫਰ[bufferlen] = NUL;
 	}
 
-	screen_puts(buffer, row, this_ru_col + off, attr);
+	screen_puts(ਬਫਰ, ਪੰਕਤੀ, this_ru_ਖਾਨਾ + off, attr);
 	n1 = redraw_cmdline;
-	screen_fill(row, row + 1,
-		this_ru_col + off + bufferlen,
-		(off + width),
+	screen_fill(ਪੰਕਤੀ, ਪੰਕਤੀ + 1,
+		this_ru_ਖਾਨਾ + off + bufferlen,
+		(off + ਚੌੜਾਈ),
 		fillchar, fillchar, attr);
 	// don't redraw the cmdline because of showing the ruler
 	redraw_cmdline = n1;
 	wp->w_ru_cursor = wp->w_cursor;
 	wp->w_ru_virtcol = wp->w_virtcol;
-	wp->w_ru_empty = empty_line;
+	wp->w_ru_ਖਾਲੀ_ਥਾਵਾਂ = ਖਾਲੀ_ਥਾਵਾਂ_ਸਤਰ;
 	wp->w_ru_topline = wp->w_topline;
-	wp->w_ru_line_count = wp->w_buffer->b_ml.ml_line_count;
-#ifdef FEAT_DIFF
+	wp->w_ru_ਸਤਰ_ਗਿਣਤੀ = wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	wp->w_ru_topfill = wp->w_topfill;
-#endif
+#ਜੇ_ਅੰਤ
 
-	if (override_success)
-	    pop_highlight_overrides();
+	ਜੇ (override_success)
+	    ਕੱਢੋ_highlight_overrides();
     }
 }
 
@@ -987,107 +987,107 @@ win_redr_ruler(win_T *wp, int always, int ignore_pum)
  * To be called when "updating_screen" was set before and now the postponed
  * side effects may take place.
  */
-    void
-after_updating_screen(int may_resize_shell UNUSED)
+    ਖਾਲੀ
+after_updating_screen(ਪੂਰਨ may_resize_shell ਅਣਵਰਤਿਆ)
 {
     updating_screen = FALSE;
-#ifdef FEAT_GUI
-    if (may_resize_shell)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (may_resize_shell)
 	gui_may_resize_shell();
-#endif
-#ifdef FEAT_TERMINAL
-    term_check_channel_closed_recently();
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+    ਪਦ_check_channel_closed_recently();
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_DROP_FILE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_DROP_FILE
     // If handle_drop() was called while updating_screen was TRUE need to
     // handle the drop now.
     handle_any_postponed_drop();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Update all windows that are editing the current buffer.
  */
-    void
-update_curbuf(int type)
+    ਖਾਲੀ
+update_curbuf(ਪੂਰਨ type)
 {
     redraw_curbuf_later(type);
     update_screen(type);
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_MENU) || defined(FEAT_FOLDING)
 /*
  * Copy "text" to ScreenLines using "attr".
  * Returns the next screen column.
  */
-    static int
-text_to_screenline(win_T *wp, char_u *text, int col)
+    ਸਥਿਰ ਪੂਰਨ
+ਪਾਠ_ਮੰਜ਼ਿਲ_screenline(win_T *wp, char_u *ਪਾਠ, ਪੂਰਨ ਖਾਨਾ)
 {
-    int		off = (int)(current_ScreenLine - ScreenLines);
+    ਪੂਰਨ		off = (ਪੂਰਨ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
 
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
-	int	cells;
-	int	u8c, u8cc[MAX_MCO];
-	int	i;
-	int	idx;
-	int	c_len;
+	ਪੂਰਨ	cells;
+	ਪੂਰਨ	u8c, u8cc[MAX_MCO];
+	ਪੂਰਨ	i;
+	ਪੂਰਨ	idx;
+	ਪੂਰਨ	c_len;
 	char_u	*p;
 # ifdef FEAT_ARABIC
-	int	prev_c = 0;		// previous Arabic character
-	int	prev_c1 = 0;		// first composing char for prev_c
+	ਪੂਰਨ	prev_c = 0;		// previous Arabic character
+	ਪੂਰਨ	prev_c1 = 0;		// first composing char for prev_c
 # endif
 
 # ifdef FEAT_RIGHTLEFT
-	if (wp->w_p_rl)
+	ਜੇ (wp->w_p_rl)
 	    idx = off;
-	else
+	ਨਹੀਂਤਾਂ
 # endif
-	    idx = off + col;
+	    idx = off + ਖਾਨਾ;
 
 	// Store multibyte characters in ScreenLines[] et al. correctly.
-	for (p = text; *p != NUL; )
+	ਲਈ (p = ਪਾਠ; *p != NUL; )
 	{
 	    cells = (*mb_ptr2cells)(p);
 	    c_len = (*mb_ptr2len)(p);
-	    if (col + cells > wp->w_width)
-		break;
+	    ਜੇ (ਖਾਨਾ + cells > wp->w_ਚੌੜਾਈ)
+		ਰੋਕੋ;
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
-		idx = off + wp->w_width - col - cells;
+	    ਜੇ (wp->w_p_rl)
+		idx = off + wp->w_ਚੌੜਾਈ - ਖਾਨਾ - cells;
 # endif
-	    ScreenLines[idx] = *p;
-	    if (enc_utf8)
+	    Screen_ਸਤਰਾਂ[idx] = *p;
+	    ਜੇ (enc_utf8)
 	    {
 		u8c = utfc_ptr2char(p, u8cc);
-		if (*p < 0x80 && u8cc[0] == 0)
+		ਜੇ (*p < 0x80 && u8cc[0] == 0)
 		{
-		    ScreenLinesUC[idx] = 0;
+		    Screen_ਸਤਰਾਂ_UC[idx] = 0;
 # ifdef FEAT_ARABIC
 		    prev_c = u8c;
 # endif
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 # ifdef FEAT_ARABIC
-		    if (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
+		    ਜੇ (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
 		    {
 			// Do Arabic shaping.
-			int	pc, pc1, nc;
-			int	pcc[MAX_MCO];
-			int	firstbyte = *p;
+			ਪੂਰਨ	pc, pc1, nc;
+			ਪੂਰਨ	pcc[MAX_MCO];
+			ਪੂਰਨ	firstbyte = *p;
 
 			// The idea of what is the previous and next
 			// character depends on 'rightleft'.
-			if (wp->w_p_rl)
+			ਜੇ (wp->w_p_rl)
 			{
 			    pc = prev_c;
 			    pc1 = prev_c1;
 			    nc = utf_ptr2char(p + c_len);
 			    prev_c1 = u8cc[0];
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    pc = utfc_ptr2char(p + c_len, pcc);
 			    nc = prev_c;
@@ -1097,171 +1097,171 @@ text_to_screenline(win_T *wp, char_u *text, int col)
 
 			u8c = arabic_shape(u8c, &firstbyte, &u8cc[0],
 								 pc, pc1, nc);
-			ScreenLines[idx] = firstbyte;
+			Screen_ਸਤਰਾਂ[idx] = firstbyte;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			prev_c = u8c;
 # endif
 		    // Non-BMP character: display as ? or fullwidth ?.
-		    ScreenLinesUC[idx] = u8c;
-		    for (i = 0; i < Screen_mco; ++i)
+		    Screen_ਸਤਰਾਂ_UC[idx] = u8c;
+		    ਲਈ (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][idx] = u8cc[i];
-			if (u8cc[i] == 0)
-			    break;
+			Screen_ਸਤਰਾਂ_C[i][idx] = u8cc[i];
+			ਜੇ (u8cc[i] == 0)
+			    ਰੋਕੋ;
 		    }
 		}
-		if (cells > 1)
-		    ScreenLines[idx + 1] = 0;
+		ਜੇ (cells > 1)
+		    Screen_ਸਤਰਾਂ[idx + 1] = 0;
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && *p == 0x8e)
+	    ਨਹੀਂਤਾਂ ਜੇ (enc_dbcs == DBCS_JPNU && *p == 0x8e)
 		// double-byte single width character
 		ScreenLines2[idx] = p[1];
-	    else if (cells > 1)
+	    ਨਹੀਂਤਾਂ ਜੇ (cells > 1)
 		// double-width character
-		ScreenLines[idx + 1] = p[1];
-	    col += cells;
+		Screen_ਸਤਰਾਂ[idx + 1] = p[1];
+	    ਖਾਨਾ += cells;
 	    idx += cells;
 	    p += c_len;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int len = (int)STRLEN(text);
-	int n = wp->w_width - col;
+	ਪੂਰਨ len = (ਪੂਰਨ)STRLEN(ਪਾਠ);
+	ਪੂਰਨ n = wp->w_ਚੌੜਾਈ - ਖਾਨਾ;
 
-	if (len > n)
+	ਜੇ (len > n)
 	    len = n;
-	if (len > 0)
+	ਜੇ (len > 0)
 	{
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
-		mch_memmove(current_ScreenLine, text, len);
-	    else
+	    ਜੇ (wp->w_p_rl)
+		mch_memmove(current_Screen_ਸਤਰ, ਪਾਠ, len);
+	    ਨਹੀਂਤਾਂ
 # endif
-		mch_memmove(current_ScreenLine + col, text, len);
-	    col += len;
+		mch_memmove(current_Screen_ਸਤਰ + ਖਾਨਾ, ਪਾਠ, len);
+	    ਖਾਨਾ += len;
 	}
     }
-    return col;
+    ਵਾਪਸ ਖਾਨਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_MENU
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
 /*
  * Draw the window toolbar.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 redraw_win_toolbar(win_T *wp)
 {
     vimmenu_T	*menu;
-    int		item_idx = 0;
-    int		item_count = 0;
-    int		col = 0;
-    int		next_col;
-    int		off = (int)(current_ScreenLine - ScreenLines);
+    ਪੂਰਨ		ਵਸਤੂ_idx = 0;
+    ਪੂਰਨ		ਵਸਤੂ_ਗਿਣਤੀ = 0;
+    ਪੂਰਨ		ਖਾਨਾ = 0;
+    ਪੂਰਨ		ਅਗਲਾ_ਖਾਨਾ;
+    ਪੂਰਨ		off = (ਪੂਰਨ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
     bool	override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
-    int		fill_attr = syn_name2attr((char_u *)"ToolbarLine");
-    int		button_attr = syn_name2attr((char_u *)"ToolbarButton");
+	ਧੱਕੋ_highlight_overrides(wp->w_hl, wp->w_hl_len);
+    ਪੂਰਨ		fill_attr = syn_name2attr((char_u *)"ToolbarLine");
+    ਪੂਰਨ		button_attr = syn_name2attr((char_u *)"ToolbarButton");
 
-    vim_free(wp->w_winbar_items);
-    FOR_ALL_CHILD_MENUS(wp->w_winbar, menu)
-	++item_count;
-    wp->w_winbar_items = ALLOC_CLEAR_MULT(winbar_item_T, item_count + 1);
+    vim_free(wp->w_winbar_ਚੀਜ਼ਾਂ);
+    FOR_ALL_ਬੱਚਾ_MENUS(wp->w_winbar, menu)
+	++ਵਸਤੂ_ਗਿਣਤੀ;
+    wp->w_winbar_ਚੀਜ਼ਾਂ = ALLOC_CLEAR_MULT(winbar_ਵਸਤੂ_T, ਵਸਤੂ_ਗਿਣਤੀ + 1);
 
     // TODO: use fewer spaces if there is not enough room
-    for (menu = wp->w_winbar->children;
-			  menu != NULL && col < wp->w_width; menu = menu->next)
+    ਲਈ (menu = wp->w_winbar->children;
+			  menu != ਨਿਰਾ && ਖਾਨਾ < wp->w_ਚੌੜਾਈ; menu = menu->ਅਗਲਾ)
     {
-	space_to_screenline(off + col, fill_attr);
-	if (++col >= wp->w_width)
-	    break;
-	if (col > 1)
+	space_ਮੰਜ਼ਿਲ_screenline(off + ਖਾਨਾ, fill_attr);
+	ਜੇ (++ਖਾਨਾ >= wp->w_ਚੌੜਾਈ)
+	    ਰੋਕੋ;
+	ਜੇ (ਖਾਨਾ > 1)
 	{
-	    space_to_screenline(off + col, fill_attr);
-	    if (++col >= wp->w_width)
-		break;
+	    space_ਮੰਜ਼ਿਲ_screenline(off + ਖਾਨਾ, fill_attr);
+	    ਜੇ (++ਖਾਨਾ >= wp->w_ਚੌੜਾਈ)
+		ਰੋਕੋ;
 	}
 
-	wp->w_winbar_items[item_idx].wb_startcol = col;
-	space_to_screenline(off + col, button_attr);
-	if (++col >= wp->w_width)
-	    break;
+	wp->w_winbar_ਚੀਜ਼ਾਂ[ਵਸਤੂ_idx].wb_startcol = ਖਾਨਾ;
+	space_ਮੰਜ਼ਿਲ_screenline(off + ਖਾਨਾ, button_attr);
+	ਜੇ (++ਖਾਨਾ >= wp->w_ਚੌੜਾਈ)
+	    ਰੋਕੋ;
 
-	next_col = text_to_screenline(wp, menu->name, col);
-	while (col < next_col)
+	ਅਗਲਾ_ਖਾਨਾ = ਪਾਠ_ਮੰਜ਼ਿਲ_screenline(wp, menu->name, ਖਾਨਾ);
+	ਜਦੋਂ (ਖਾਨਾ < ਅਗਲਾ_ਖਾਨਾ)
 	{
-	    ScreenAttrs[off + col] = button_attr;
-	    ++col;
+	    ScreenAttrs[off + ਖਾਨਾ] = button_attr;
+	    ++ਖਾਨਾ;
 	}
-	wp->w_winbar_items[item_idx].wb_endcol = col;
-	wp->w_winbar_items[item_idx].wb_menu = menu;
-	++item_idx;
+	wp->w_winbar_ਚੀਜ਼ਾਂ[ਵਸਤੂ_idx].wb_endcol = ਖਾਨਾ;
+	wp->w_winbar_ਚੀਜ਼ਾਂ[ਵਸਤੂ_idx].wb_menu = menu;
+	++ਵਸਤੂ_idx;
 
-	if (col >= wp->w_width)
-	    break;
-	space_to_screenline(off + col, button_attr);
-	++col;
+	ਜੇ (ਖਾਨਾ >= wp->w_ਚੌੜਾਈ)
+	    ਰੋਕੋ;
+	space_ਮੰਜ਼ਿਲ_screenline(off + ਖਾਨਾ, button_attr);
+	++ਖਾਨਾ;
     }
-    while (col < wp->w_width)
+    ਜਦੋਂ (ਖਾਨਾ < wp->w_ਚੌੜਾਈ)
     {
-	space_to_screenline(off + col, fill_attr);
-	++col;
+	space_ਮੰਜ਼ਿਲ_screenline(off + ਖਾਨਾ, fill_attr);
+	++ਖਾਨਾ;
     }
-    wp->w_winbar_items[item_idx].wb_menu = NULL; // end marker
+    wp->w_winbar_ਚੀਜ਼ਾਂ[ਵਸਤੂ_idx].wb_menu = ਨਿਰਾ; // end marker
 
-    screen_line(wp, wp->w_winrow, wp->w_wincol, wp->w_width,
-							  wp->w_width, -1, 0);
+    screen_ਸਤਰ(wp, wp->w_winrow, wp->w_wincol, wp->w_ਚੌੜਾਈ,
+							  wp->w_ਚੌੜਾਈ, -1, 0);
 
-    if (override_success)
-	pop_highlight_overrides();
+    ਜੇ (override_success)
+	ਕੱਢੋ_highlight_overrides();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_FOLDING)
 /*
  * Copy "buf[len]" to ScreenLines["off"] and set attributes to "attr".
  */
-    static void
-copy_text_attr(
-    int		off,
+    ਸਥਿਰ ਖਾਲੀ
+copy_ਪਾਠ_attr(
+    ਪੂਰਨ		off,
     char_u	*buf,
-    int		len,
-    int		attr)
+    ਪੂਰਨ		len,
+    ਪੂਰਨ		attr)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    mch_memmove(ScreenLines + off, buf, (size_t)len);
-    if (enc_utf8)
-	vim_memset(ScreenLinesUC + off, 0, sizeof(u8char_T) * (size_t)len);
-    for (i = 0; i < len; ++i)
+    mch_memmove(Screen_ਸਤਰਾਂ + off, buf, (size_t)len);
+    ਜੇ (enc_utf8)
+	vim_memset(Screen_ਸਤਰਾਂ_UC + off, 0, ਆਕਾਰ(u8char_T) * (size_t)len);
+    ਲਈ (i = 0; i < len; ++i)
 	ScreenAttrs[off + i] = attr;
 }
 
 /*
  * Display one folded line.
  */
-    static void
-fold_line(
+    ਸਥਿਰ ਖਾਲੀ
+fold_ਸਤਰ(
     win_T	*wp,
-    long	fold_count,
+    ਲੰਮਾ	fold_ਗਿਣਤੀ,
     foldinfo_T	*foldinfo,
     linenr_T	lnum,
-    int		row)
+    ਪੂਰਨ		ਪੰਕਤੀ)
 {
     // Max value of 'foldcolumn' is 12 and maximum number of bytes in a
     // multi-byte character is MAX_MCO.
     char_u	buf[MAX_MCO * 12 + 1];
-    pos_T	*top, *bot;
-    linenr_T	lnume = lnum + fold_count - 1;
-    int		len;
-    char_u	*text;
-    int		fdc;
-    int		col;
-    int		txtcol;
-    int		off = (int)(current_ScreenLine - ScreenLines);
-    int		ri;
+    pos_T	*ਸਿਖਰ, *bot;
+    linenr_T	lnume = lnum + fold_ਗਿਣਤੀ - 1;
+    ਪੂਰਨ		len;
+    char_u	*ਪਾਠ;
+    ਪੂਰਨ		fdc;
+    ਪੂਰਨ		ਖਾਨਾ;
+    ਪੂਰਨ		txtcol;
+    ਪੂਰਨ		off = (ਪੂਰਨ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
+    ਪੂਰਨ		ri;
 
     // Build the fold line:
     // 1. Add the cmdwin_type for the command-line window
@@ -1270,308 +1270,308 @@ fold_line(
     // 4. Compose the text
     // 5. Add the text
     // 6. set highlighting for the Visual area an other text
-    col = 0;
+    ਖਾਨਾ = 0;
 
     // 1. Add the cmdwin_type for the command-line window
     // Ignores 'rightleft', this window is never right-left.
-    if (wp == cmdwin_win)
+    ਜੇ (wp == cmdwin_win)
     {
-	ScreenLines[off] = cmdwin_type;
+	Screen_ਸਤਰਾਂ[off] = cmdwin_type;
 	ScreenAttrs[off] = HL_ATTR(HLF_AT);
-	if (enc_utf8)
-	    ScreenLinesUC[off] = 0;
-	++col;
+	ਜੇ (enc_utf8)
+	    Screen_ਸਤਰਾਂ_UC[off] = 0;
+	++ਖਾਨਾ;
     }
 
 # ifdef FEAT_RIGHTLEFT
 #  define RL_MEMSET(p, v, l) \
-    do { \
-	if (wp->w_p_rl) \
-	    for (ri = 0; ri < (l); ++ri) \
-	       ScreenAttrs[off + (wp->w_width - (p) - (l)) + ri] = v; \
-	 else \
-	    for (ri = 0; ri < (l); ++ri) \
+    ਕਰੋ { \
+	ਜੇ (wp->w_p_rl) \
+	    ਲਈ (ri = 0; ri < (l); ++ri) \
+	       ScreenAttrs[off + (wp->w_ਚੌੜਾਈ - (p) - (l)) + ri] = v; \
+	 ਨਹੀਂਤਾਂ \
+	    ਲਈ (ri = 0; ri < (l); ++ri) \
 	       ScreenAttrs[off + (p) + ri] = v; \
-    } while (0)
-# else
+    } ਜਦੋਂ (0)
+# ਨਹੀਂਤਾਂ
 #  define RL_MEMSET(p, v, l) \
-    do { \
-	for (ri = 0; ri < l; ++ri) \
+    ਕਰੋ { \
+	ਲਈ (ri = 0; ri < l; ++ri) \
 	    ScreenAttrs[off + (p) + ri] = v; \
-    } while (0)
+    } ਜਦੋਂ (0)
 # endif
 
     // 2. Add the 'foldcolumn'
     //    Reduce the width when there is not enough space.
-    fdc = compute_foldcolumn(wp, col);
-    if (fdc > 0)
+    fdc = compute_foldcolumn(wp, ਖਾਨਾ);
+    ਜੇ (fdc > 0)
     {
 	char_u	*p;
-	int	i;
-	int	idx;
+	ਪੂਰਨ	i;
+	ਪੂਰਨ	idx;
 
 	fill_foldcolumn(buf, wp, TRUE, lnum);
 	p = buf;
-	for (i = 0; i < fdc; i++)
+	ਲਈ (i = 0; i < fdc; i++)
 	{
-	    int		ch;
+	    ਪੂਰਨ		ch;
 
-	    if (has_mbyte)
+	    ਜੇ (has_mbyte)
 		ch = mb_ptr2char_adv(&p);
-	    else
+	    ਨਹੀਂਤਾਂ
 		ch = *p++;
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
-		idx = off + wp->w_width - i - 1 - col;
-	    else
+	    ਜੇ (wp->w_p_rl)
+		idx = off + wp->w_ਚੌੜਾਈ - i - 1 - ਖਾਨਾ;
+	    ਨਹੀਂਤਾਂ
 # endif
-		idx = off + col + i;
-	    if (enc_utf8)
+		idx = off + ਖਾਨਾ + i;
+	    ਜੇ (enc_utf8)
 	    {
-		if (ch >= 0x80)
+		ਜੇ (ch >= 0x80)
 		{
-		    ScreenLinesUC[idx] = ch;
-		    ScreenLinesC[0][idx] = 0;
-		    ScreenLines[idx] = 0x80;
+		    Screen_ਸਤਰਾਂ_UC[idx] = ch;
+		    Screen_ਸਤਰਾਂ_C[0][idx] = 0;
+		    Screen_ਸਤਰਾਂ[idx] = 0x80;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    ScreenLines[idx] = ch;
-		    ScreenLinesUC[idx] = 0;
+		    Screen_ਸਤਰਾਂ[idx] = ch;
+		    Screen_ਸਤਰਾਂ_UC[idx] = 0;
 		}
 	    }
-	    else
-		ScreenLines[idx] = ch;
+	    ਨਹੀਂਤਾਂ
+		Screen_ਸਤਰਾਂ[idx] = ch;
 	}
 
-	RL_MEMSET(col, HL_ATTR(HLF_FC), fdc);
-	col += fdc;
+	RL_MEMSET(ਖਾਨਾ, HL_ATTR(HLF_FC), fdc);
+	ਖਾਨਾ += fdc;
     }
 
     // Set all attributes of the 'number' or 'relativenumber' column and the
-    // text
-    RL_MEMSET(col, HL_ATTR(HLF_FL), wp->w_width - col);
+    //ਪਾਠ
+    RL_MEMSET(ਖਾਨਾ, HL_ATTR(HLF_FL), wp->w_ਚੌੜਾਈ - ਖਾਨਾ);
 
 # ifdef FEAT_SIGNS
     // If signs are being displayed, add two spaces.
-    if (signcolumn_on(wp))
+    ਜੇ (signcolumn_on(wp))
     {
-	len = wp->w_width - col;
-	if (len > 0)
+	len = wp->w_ਚੌੜਾਈ - ਖਾਨਾ;
+	ਜੇ (len > 0)
 	{
-	    if (len > 2)
+	    ਜੇ (len > 2)
 		len = 2;
 #  ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+	    ਜੇ (wp->w_p_rl)
 		// the line number isn't reversed
-		copy_text_attr(off + wp->w_width - len - col,
+		copy_ਪਾਠ_attr(off + wp->w_ਚੌੜਾਈ - len - ਖਾਨਾ,
 					(char_u *)"  ", len, HL_ATTR(HLF_FL));
-	    else
+	    ਨਹੀਂਤਾਂ
 #  endif
-		copy_text_attr(off + col, (char_u *)"  ", len, HL_ATTR(HLF_FL));
-	    col += len;
+		copy_ਪਾਠ_attr(off + ਖਾਨਾ, (char_u *)"  ", len, HL_ATTR(HLF_FL));
+	    ਖਾਨਾ += len;
 	}
     }
 # endif
 
     // 3. Add the 'number' or 'relativenumber' column
-    if (wp->w_p_nu || wp->w_p_rnu)
+    ਜੇ (wp->w_p_nu || wp->w_p_rnu)
     {
-	len = wp->w_width - col;
-	if (len > 0)
+	len = wp->w_ਚੌੜਾਈ - ਖਾਨਾ;
+	ਜੇ (len > 0)
 	{
-	    int	    w = number_width(wp);
-	    long    num;
-	    char    *fmt = "%*ld ";
+	    ਪੂਰਨ	    w = ਸੰਖਿਆ_ਚੌੜਾਈ(wp);
+	    ਲੰਮਾ    ਅੰਕ;
+	    ਅੱਖਰ    *fmt = "%*ld ";
 
-	    if (len > w + 1)
+	    ਜੇ (len > w + 1)
 		len = w + 1;
 
-	    if (wp->w_p_nu && !wp->w_p_rnu)
+	    ਜੇ (wp->w_p_nu && !wp->w_p_rnu)
 		// 'number' + 'norelativenumber'
-		num = (long)lnum;
-	    else
+		ਅੰਕ = (ਲੰਮਾ)lnum;
+	    ਨਹੀਂਤਾਂ
 	    {
 		// 'relativenumber', don't use negative numbers
-		num = labs((long)get_cursor_rel_lnum(wp, lnum));
-		if (num == 0 && wp->w_p_nu && wp->w_p_rnu)
+		ਅੰਕ = labs((ਲੰਮਾ)get_cursor_rel_lnum(wp, lnum));
+		ਜੇ (ਅੰਕ == 0 && wp->w_p_nu && wp->w_p_rnu)
 		{
 		    // 'number' + 'relativenumber': cursor line shows absolute
 		    // line number
-		    num = lnum;
+		    ਅੰਕ = lnum;
 		    fmt = "%-*ld ";
 		}
 	    }
 
-	    vim_snprintf((char *)buf, sizeof(buf), fmt, w, num);
+	    vim_snprintf((ਅੱਖਰ *)buf, ਆਕਾਰ(buf), fmt, w, ਅੰਕ);
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+	    ਜੇ (wp->w_p_rl)
 		// the line number isn't reversed
-		copy_text_attr(off + wp->w_width - len - col, buf, len,
+		copy_ਪਾਠ_attr(off + wp->w_ਚੌੜਾਈ - len - ਖਾਨਾ, buf, len,
 							     HL_ATTR(HLF_FL));
-	    else
+	    ਨਹੀਂਤਾਂ
 # endif
-		copy_text_attr(off + col, buf, len, HL_ATTR(HLF_FL));
-	    col += len;
+		copy_ਪਾਠ_attr(off + ਖਾਨਾ, buf, len, HL_ATTR(HLF_FL));
+	    ਖਾਨਾ += len;
 	}
     }
 
     // 4. Compose the folded-line string with 'foldtext', if set.
-    text = get_foldtext(wp, lnum, lnume, foldinfo, buf);
+    ਪਾਠ = get_foldtext(wp, lnum, lnume, foldinfo, buf);
 
-    txtcol = col;	// remember where text starts
+    txtcol = ਖਾਨਾ;	// remember where text starts
 
     // 5. move the text to current_ScreenLine.  Fill up with "fold" from
     //    'fillchars'.
     //    Right-left text is put in columns 0 - number-col, normal text is put
     //    in columns number-col - window-width.
-    col = text_to_screenline(wp, text, col);
+    ਖਾਨਾ = ਪਾਠ_ਮੰਜ਼ਿਲ_screenline(wp, ਪਾਠ, ਖਾਨਾ);
 
     // Fill the rest of the line with the fold filler
-    while (col < wp->w_width)
+    ਜਦੋਂ (ਖਾਨਾ < wp->w_ਚੌੜਾਈ)
     {
-	int c = wp->w_fill_chars.fold;
-	int idx = off + col;
+	ਪੂਰਨ c = wp->w_fill_chars.fold;
+	ਪੂਰਨ idx = off + ਖਾਨਾ;
 
 # ifdef FEAT_RIGHTLEFT
-	if (wp->w_p_rl)
-	    idx = off + wp->w_width - 1 - col;
+	ਜੇ (wp->w_p_rl)
+	    idx = off + wp->w_ਚੌੜਾਈ - 1 - ਖਾਨਾ;
 # endif
 
-	if (enc_utf8)
+	ਜੇ (enc_utf8)
 	{
-	    if (c >= 0x80)
+	    ਜੇ (c >= 0x80)
 	    {
-		ScreenLinesUC[idx] = c;
-		ScreenLinesC[0][idx] = 0;
-		ScreenLines[idx] = 0x80; // avoid storing zero
+		Screen_ਸਤਰਾਂ_UC[idx] = c;
+		Screen_ਸਤਰਾਂ_C[0][idx] = 0;
+		Screen_ਸਤਰਾਂ[idx] = 0x80; // avoid storing zero
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		ScreenLinesUC[idx] = 0;
-		ScreenLines[idx] = c;
+		Screen_ਸਤਰਾਂ_UC[idx] = 0;
+		Screen_ਸਤਰਾਂ[idx] = c;
 	    }
 	}
-	else
-	    ScreenLines[idx] = c;
-	++col;
+	ਨਹੀਂਤਾਂ
+	    Screen_ਸਤਰਾਂ[idx] = c;
+	++ਖਾਨਾ;
     }
 
-    if (text != buf)
-	vim_free(text);
+    ਜੇ (ਪਾਠ != buf)
+	vim_free(ਪਾਠ);
 
     // 6. set highlighting for the Visual area an other text.
     // If all folded lines are in the Visual area, highlight the line.
-    if (VIsual_active && wp->w_buffer == curwin->w_buffer)
+    ਜੇ (VIsual_ਸਰਗਰਮ && wp->w_ਬਫਰ == curwin->w_ਬਫਰ)
     {
-	if (LTOREQ_POS(curwin->w_cursor, VIsual))
+	ਜੇ (LTOREQ_POS(curwin->w_cursor, VIsual))
 	{
 	    // Visual is after curwin->w_cursor
-	    top = &curwin->w_cursor;
+	    ਸਿਖਰ = &curwin->w_cursor;
 	    bot = &VIsual;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Visual is before curwin->w_cursor
-	    top = &VIsual;
+	    ਸਿਖਰ = &VIsual;
 	    bot = &curwin->w_cursor;
 	}
-	if (lnum >= top->lnum
+	ਜੇ (lnum >= ਸਿਖਰ->lnum
 		&& lnume <= bot->lnum
-		&& (VIsual_mode != 'v'
-		    || ((lnum > top->lnum
-			    || (lnum == top->lnum
-				&& top->col == 0))
+		&& (VIsual_ਬਹੁਲਕ != 'v'
+		    || ((lnum > ਸਿਖਰ->lnum
+			    || (lnum == ਸਿਖਰ->lnum
+				&& ਸਿਖਰ->ਖਾਨਾ == 0))
 			&& (lnume < bot->lnum
 			    || (lnume == bot->lnum
-				&& (bot->col - (*p_sel == 'e'))
-				    >= ml_get_buf_len(wp->w_buffer, lnume))))))
+				&& (bot->ਖਾਨਾ - (*p_sel == 'e'))
+				    >= ml_get_buf_len(wp->w_ਬਫਰ, lnume))))))
 	{
-	    if (VIsual_mode == Ctrl_V)
+	    ਜੇ (VIsual_ਬਹੁਲਕ == Ctrl_V)
 	    {
 		// Visual block mode: highlight the chars part of the block
-		if (wp->w_old_cursor_fcol + txtcol < (colnr_T)wp->w_width)
+		ਜੇ (wp->w_old_cursor_fcol + txtcol < (colnr_T)wp->w_ਚੌੜਾਈ)
 		{
-		    if (wp->w_old_cursor_lcol != MAXCOL
+		    ਜੇ (wp->w_old_cursor_lcol != MAXCOL
 			     && wp->w_old_cursor_lcol + txtcol
-						       < (colnr_T)wp->w_width)
+						       < (colnr_T)wp->w_ਚੌੜਾਈ)
 			len = wp->w_old_cursor_lcol;
-		    else
-			len = wp->w_width - txtcol;
+		    ਨਹੀਂਤਾਂ
+			len = wp->w_ਚੌੜਾਈ - txtcol;
 		    RL_MEMSET(wp->w_old_cursor_fcol + txtcol, HL_ATTR(HLF_V),
-					    len - (int)wp->w_old_cursor_fcol);
+					    len - (ਪੂਰਨ)wp->w_old_cursor_fcol);
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Set all attributes of the text
-		RL_MEMSET(txtcol, HL_ATTR(HLF_V), wp->w_width - txtcol);
+		RL_MEMSET(txtcol, HL_ATTR(HLF_V), wp->w_ਚੌੜਾਈ - txtcol);
 	    }
 	}
     }
 
 # ifdef FEAT_SYN_HL
     // Show colorcolumn in the fold line, but let cursorcolumn override it.
-    if (wp->w_p_cc_cols)
+    ਜੇ (wp->w_p_cc_ਖਾਨੇ_ਗਿਣਤੀ)
     {
-	int i = 0;
-	int j = wp->w_p_cc_cols[i];
-	int old_txtcol = txtcol;
+	ਪੂਰਨ i = 0;
+	ਪੂਰਨ j = wp->w_p_cc_ਖਾਨੇ_ਗਿਣਤੀ[i];
+	ਪੂਰਨ old_txtcol = txtcol;
 
-	while (j > -1)
+	ਜਦੋਂ (j > -1)
 	{
 	    txtcol += j;
-	    if (wp->w_p_wrap)
+	    ਜੇ (wp->w_p_wrap)
 		txtcol -= wp->w_skipcol;
-	    else
+	    ਨਹੀਂਤਾਂ
 		txtcol -= wp->w_leftcol;
-	    if (txtcol >= 0 && txtcol < wp->w_width)
+	    ਜੇ (txtcol >= 0 && txtcol < wp->w_ਚੌੜਾਈ)
 		ScreenAttrs[off + txtcol] = hl_combine_attr(
 				    ScreenAttrs[off + txtcol], HL_ATTR(HLF_MC));
 	    txtcol = old_txtcol;
-	    j = wp->w_p_cc_cols[++i];
+	    j = wp->w_p_cc_ਖਾਨੇ_ਗਿਣਤੀ[++i];
 	}
     }
 
     // Show 'cursorcolumn' in the fold line.
-    if (wp->w_p_cuc)
+    ਜੇ (wp->w_p_cuc)
     {
 	txtcol += wp->w_virtcol;
-	if (wp->w_p_wrap)
+	ਜੇ (wp->w_p_wrap)
 	    txtcol -= wp->w_skipcol;
-	else
+	ਨਹੀਂਤਾਂ
 	    txtcol -= wp->w_leftcol;
-	if (txtcol >= 0 && txtcol < wp->w_width)
+	ਜੇ (txtcol >= 0 && txtcol < wp->w_ਚੌੜਾਈ)
 	    ScreenAttrs[off + txtcol] = hl_combine_attr(
 				 ScreenAttrs[off + txtcol], HL_ATTR(HLF_CUC));
     }
 # endif
 
-    screen_line(wp, row + W_WINROW(wp), wp->w_wincol, wp->w_width, wp->w_width,
+    screen_ਸਤਰ(wp, ਪੰਕਤੀ + W_WINROW(wp), wp->w_wincol, wp->w_ਚੌੜਾਈ, wp->w_ਚੌੜਾਈ,
 	    -1, 0);
 
     // Update w_cline_height and w_cline_folded if the cursor line was
     // updated (saves a call to plines() later).
-    if (wp == curwin
+    ਜੇ (wp == curwin
 	    && lnum <= curwin->w_cursor.lnum
 	    && lnume >= curwin->w_cursor.lnum)
     {
-	curwin->w_cline_row = row;
-	curwin->w_cline_height = 1;
+	curwin->w_cline_ਪੰਕਤੀ = ਪੰਕਤੀ;
+	curwin->w_cline_ਉਚਾਈ = 1;
 	curwin->w_cline_folded = true;
 	curwin->w_valid |= (VALID_CHEIGHT|VALID_CROW);
     }
 
 # ifdef FEAT_CONCEAL
     // When the line was not folded w_wrow may have been set, recompute it.
-    if (wp == curwin
+    ਜੇ (wp == curwin
 	    && wp->w_cursor.lnum >= lnum
 	    && wp->w_cursor.lnum <= lnume
-	    && conceal_cursor_line(wp))
+	    && conceal_cursor_ਸਤਰ(wp))
 	curs_columns(TRUE);
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Update a single window.
@@ -1601,240 +1601,240 @@ fold_line(
  * mid: from mid_start to mid_end (update inversion or changed text)
  * bot: from bot_start to last row (when scrolled up)
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 win_update(win_T *wp)
 {
-    buf_T	*buf = wp->w_buffer;
-    int		type;
-    int		top_end = 0;	// Below last row of the top area that needs
+    buf_T	*buf = wp->w_ਬਫਰ;
+    ਪੂਰਨ		type;
+    ਪੂਰਨ		ਸਿਖਰ_ਸਿਰਾ = 0;	// Below last row of the top area that needs
 				// updating.  0 when no top area updating.
-    int		mid_start = 999;// first row of the mid area that needs
+    ਪੂਰਨ		mid_ਸ਼ੁਰੂ = 999;// first row of the mid area that needs
 				// updating.  999 when no mid area updating.
-    int		mid_end = 0;	// Below last row of the mid area that needs
+    ਪੂਰਨ		mid_ਸਿਰਾ = 0;	// Below last row of the mid area that needs
 				// updating.  0 when no mid area updating.
-    int		bot_start = 999;// first row of the bot area that needs
+    ਪੂਰਨ		bot_ਸ਼ੁਰੂ = 999;// first row of the bot area that needs
 				// updating.  999 when no bot area updating
-    int		scrolled_down = FALSE;	// TRUE when scrolled down when
+    ਪੂਰਨ		scrolled_ਥੱਲੇ = FALSE;	// TRUE when scrolled down when
 					// w_topline got smaller a bit
-    int		scrolled_for_mod = FALSE;   // TRUE after scrolling for changed
-					    // lines
-#ifdef FEAT_SEARCH_EXTRA
-    int		top_to_mod = FALSE;    // redraw above mod_top
-#endif
+    ਪੂਰਨ		scrolled_for_mod = FALSE;   // TRUE after scrolling for changed
+					    //ਸਤਰਾਂ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+    ਪੂਰਨ		ਸਿਖਰ_ਮੰਜ਼ਿਲ_mod = FALSE;    // redraw above mod_top
+#ਜੇ_ਅੰਤ
 
-    int		row;		// current window row to display
+    ਪੂਰਨ		ਪੰਕਤੀ;		// current window row to display
     linenr_T	lnum;		// current buffer lnum to display
-    int		idx;		// current index in w_lines[]
-    int		srow;		// starting row of the current line
+    ਪੂਰਨ		idx;		// current index in w_lines[]
+    ਪੂਰਨ		srow;		// starting row of the current line
 
-    int		eof = FALSE;	// if TRUE, we hit the end of the file
-    int		didline = FALSE; // if TRUE, we finished the last line
-    int		i;
-    long	j;
-    static int	recursive = FALSE;	// being called recursively
+    ਪੂਰਨ		eof = FALSE;	// if TRUE, we hit the end of the file
+    ਪੂਰਨ		didline = FALSE; // if TRUE, we finished the last line
+    ਪੂਰਨ		i;
+    ਲੰਮਾ	j;
+    ਸਥਿਰ ਪੂਰਨ	recursive = FALSE;	// being called recursively
     linenr_T	old_botline = wp->w_botline;
-#ifdef FEAT_CONCEAL
-    int		old_wrow = wp->w_wrow;
-    int		old_wcol = wp->w_wcol;
-#endif
-#ifdef FEAT_FOLDING
-    long	fold_count;
-#endif
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+    ਪੂਰਨ		old_wrow = wp->w_wrow;
+    ਪੂਰਨ		old_wcol = wp->w_wcol;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+    ਲੰਮਾ	fold_ਗਿਣਤੀ;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // remember what happened to the previous line, to know if
     // check_visual_highlight() can be used
 # define DID_NONE 1	// didn't update a line
-# define DID_LINE 2	// updated a normal line
+# define DID_ਸਤਰ 2	// updated a normal line
 # define DID_FOLD 3	// updated a folded line
-    int		did_update = DID_NONE;
-    linenr_T	syntax_last_parsed = 0;		// last parsed text line
-#endif
-    linenr_T	mod_top = 0;
+    ਪੂਰਨ		did_update = DID_NONE;
+    linenr_T	syntax_ਆਖਰੀ_parsed = 0;		// last parsed text line
+#ਜੇ_ਅੰਤ
+    linenr_T	mod_ਸਿਖਰ = 0;
     linenr_T	mod_bot = 0;
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA)
-    int		save_got_int;
-#endif
+#ਜੇ defined(FEAT_SYN_HL) || defined(FEAT_ਖੋਜ_EXTRA)
+    ਪੂਰਨ		save_got_int;
+#ਜੇ_ਅੰਤ
     bool	override_success;
 
-#if defined(FEAT_SEARCH_EXTRA) || defined(FEAT_CLIPBOARD)
+#ਜੇ defined(FEAT_ਖੋਜ_EXTRA) || defined(FEAT_CLIPBOARD)
     // This needs to be done only for the first window when update_screen() is
     // called.
-    if (!did_update_one_window)
+    ਜੇ (!did_update_one_ਖਿੜਕੀ)
     {
-	did_update_one_window = TRUE;
-# ifdef FEAT_SEARCH_EXTRA
-	start_search_hl();
+	did_update_one_ਖਿੜਕੀ = TRUE;
+# ifdef FEAT_ਖੋਜ_EXTRA
+	ਸ਼ੁਰੂ_ਖੋਜ_hl();
 # endif
 # ifdef FEAT_CLIPBOARD
 	// When Visual area changed, may have to update selection.
-	if (clip_star.available && clip_isautosel_star())
-	    clip_update_selection(&clip_star);
-	if (clip_plus.available && clip_isautosel_plus())
+	ਜੇ (clip_ਤਾਰਾ.ਉਪਲਬਧ && clip_isautosel_ਤਾਰਾ())
+	    clip_update_selection(&clip_ਤਾਰਾ);
+	ਜੇ (clip_plus.ਉਪਲਬਧ && clip_isautosel_plus())
 	    clip_update_selection(&clip_plus);
 # endif
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // 'cursorcolumn' is drawn with w_virtcol, make sure it is up to date.
     // This may set w_redr_type, thus do it before using it below.
-    if (wp->w_p_cuc)
+    ਜੇ (wp->w_p_cuc)
 	validate_virtcol_win(wp);
-#endif
+#ਜੇ_ਅੰਤ
 
     type = wp->w_redr_type;
 
-    if (type == UPD_NOT_VALID)
+    ਜੇ (type == UPD_NOT_VALID)
     {
-	wp->w_redr_status = true;
-	wp->w_lines_valid = 0;
+	wp->w_redr_ਸਥਿਤੀ = true;
+	wp->w_ਸਤਰਾਂ_valid = 0;
     }
 
     // Window frame is zero-height: nothing to draw.
-    if (wp->w_height + WINBAR_HEIGHT(wp) == 0
-	    || (wp->w_frame->fr_height == wp->w_status_height
-#if defined(FEAT_PROP_POPUP)
+    ਜੇ (wp->w_ਉਚਾਈ + WINBAR_ਉਚਾਈ(wp) == 0
+	    || (wp->w_ਚੌਖਟਾ->fr_ਉਚਾਈ == wp->w_ਸਥਿਤੀ_ਉਚਾਈ
+#ਜੇ defined(FEAT_PROP_POPUP)
 		&& !popup_is_popup(wp)
-#endif
+#ਜੇ_ਅੰਤ
 	       ))
     {
 	wp->w_redr_type = 0;
-	return;
+	ਵਾਪਸ;
     }
 
     // Window is zero-width: Only need to draw the separator.
-    if (wp->w_width == 0)
+    ਜੇ (wp->w_ਚੌੜਾਈ == 0)
     {
 	// draw the vertical separator right of this window
 	draw_vsep_win(wp, 0);
 	wp->w_redr_type = 0;
-	return;
+	ਵਾਪਸ;
     }
 
-    override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+    override_success = ਧੱਕੋ_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 
-#ifdef FEAT_TERMINAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
     // If this window contains a terminal, redraw works completely differently.
-    if (term_do_update_window(wp))
+    ਜੇ (ਪਦ_do_update_ਖਿੜਕੀ(wp))
     {
-	term_update_window(wp);
+	ਪਦ_update_ਖਿੜਕੀ(wp);
 # ifdef FEAT_MENU
 	// Draw the window toolbar, if there is one.
-	if (winbar_height(wp) > 0)
+	ਜੇ (winbar_ਉਚਾਈ(wp) > 0)
 	    redraw_win_toolbar(wp);
 # endif
 	wp->w_redr_type = 0;
-	if (override_success)
-	    pop_highlight_overrides();
-	return;
+	ਜੇ (override_success)
+	    ਕੱਢੋ_highlight_overrides();
+	ਵਾਪਸ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SEARCH_EXTRA
-    init_search_hl(wp, &screen_search_hl);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+    init_ਖੋਜ_hl(wp, &screen_ਖੋਜ_hl);
+#ਜੇ_ਅੰਤ
 
     // Make sure skipcol is valid, it depends on various options and the window
     // width.
-    if (wp->w_skipcol > 0 && wp->w_width > win_col_off(wp))
+    ਜੇ (wp->w_skipcol > 0 && wp->w_ਚੌੜਾਈ > win_ਖਾਨਾ_off(wp))
     {
-	int w = 0;
-	int width1 = wp->w_width - win_col_off(wp);
-	int width2 = width1 + win_col_off2(wp);
-	int add = width1;
+	ਪੂਰਨ w = 0;
+	ਪੂਰਨ width1 = wp->w_ਚੌੜਾਈ - win_ਖਾਨਾ_off(wp);
+	ਪੂਰਨ width2 = width1 + win_ਖਾਨਾ_off2(wp);
+	ਪੂਰਨ ਜੋੜੋ = width1;
 
-	while (w < wp->w_skipcol)
+	ਜਦੋਂ (w < wp->w_skipcol)
 	{
-	    if (w > 0)
-		add = width2;
-	    w += add;
+	    ਜੇ (w > 0)
+		ਜੋੜੋ = width2;
+	    w += ਜੋੜੋ;
 	}
-	if (w != wp->w_skipcol)
+	ਜੇ (w != wp->w_skipcol)
 	    // always round down, the higher value may not be valid
-	    wp->w_skipcol = w - add;
+	    wp->w_skipcol = w - ਜੋੜੋ;
     }
 
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
     // Force redraw when width of 'number' or 'relativenumber' column
     // changes.
-    i = (wp->w_p_nu || wp->w_p_rnu) ? number_width(wp) : 0;
-    if (wp->w_nrwidth != i)
+    i = (wp->w_p_nu || wp->w_p_rnu) ? ਸੰਖਿਆ_ਚੌੜਾਈ(wp) : 0;
+    ਜੇ (wp->w_nrwidth != i)
     {
 	type = UPD_NOT_VALID;
 	wp->w_nrwidth = i;
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 
     {
 	// Set mod_top to the first line that needs displaying because of
 	// changes.  Set mod_bot to the first line after the changes.
-	mod_top = wp->w_redraw_top;
-	if (wp->w_redraw_bot != 0)
+	mod_ਸਿਖਰ = wp->w_redraw_ਸਿਖਰ;
+	ਜੇ (wp->w_redraw_bot != 0)
 	    mod_bot = wp->w_redraw_bot + 1;
-	else
+	ਨਹੀਂਤਾਂ
 	    mod_bot = 0;
-	if (buf->b_mod_set)
+	ਜੇ (buf->b_mod_ਸੈੱਟ)
 	{
-	    if (mod_top == 0 || mod_top > buf->b_mod_top)
+	    ਜੇ (mod_ਸਿਖਰ == 0 || mod_ਸਿਖਰ > buf->b_mod_ਸਿਖਰ)
 	    {
-		mod_top = buf->b_mod_top;
-#ifdef FEAT_SYN_HL
+		mod_ਸਿਖਰ = buf->b_mod_ਸਿਖਰ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 		// Need to redraw lines above the change that may be included
 		// in a pattern match.
-		if (syntax_present(wp))
+		ਜੇ (syntax_present(wp))
 		{
-		    mod_top -= buf->b_s.b_syn_sync_linebreaks;
-		    if (mod_top < 1)
-			mod_top = 1;
+		    mod_ਸਿਖਰ -= buf->b_s.b_syn_sync_linebreaks;
+		    ਜੇ (mod_ਸਿਖਰ < 1)
+			mod_ਸਿਖਰ = 1;
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-	    if (mod_bot == 0 || mod_bot < buf->b_mod_bot)
+	    ਜੇ (mod_bot == 0 || mod_bot < buf->b_mod_bot)
 		mod_bot = buf->b_mod_bot;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
 	    // When 'hlsearch' is on and using a multi-line search pattern, a
 	    // change in one line may make the Search highlighting in a
 	    // previous line invalid.  Simple solution: redraw all visible
 	    // lines above the change.
 	    // Same for a match pattern.
-	    if (screen_search_hl.rm.regprog != NULL
-		    && re_multiline(screen_search_hl.rm.regprog))
-		top_to_mod = TRUE;
-	    else
+	    ਜੇ (screen_ਖੋਜ_hl.rm.regprog != ਨਿਰਾ
+		    && re_multiline(screen_ਖੋਜ_hl.rm.regprog))
+		ਸਿਖਰ_ਮੰਜ਼ਿਲ_mod = TRUE;
+	    ਨਹੀਂਤਾਂ
 	    {
-		matchitem_T *cur = wp->w_match_head;
+		matchitem_T *cur = wp->w_ਮੇਲ_ਸਿਰ;
 
-		while (cur != NULL)
+		ਜਦੋਂ (cur != ਨਿਰਾ)
 		{
-		    if (cur->mit_match.regprog != NULL
-				       && re_multiline(cur->mit_match.regprog))
+		    ਜੇ (cur->mit_ਮੇਲ.regprog != ਨਿਰਾ
+				       && re_multiline(cur->mit_ਮੇਲ.regprog))
 		    {
-			top_to_mod = TRUE;
-			break;
+			ਸਿਖਰ_ਮੰਜ਼ਿਲ_mod = TRUE;
+			ਰੋਕੋ;
 		    }
-		    cur = cur->mit_next;
+		    cur = cur->mit_ਅਗਲਾ;
 		}
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
-#ifdef FEAT_SEARCH_EXTRA
-	if (search_hl_has_cursor_lnum > 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+	ਜੇ (ਖੋਜ_hl_has_cursor_lnum > 0)
 	{
 	    // CurSearch was used last time, need to redraw the line with it to
 	    // avoid having two matches highlighted with CurSearch.
-	    if (mod_top == 0 || mod_top > search_hl_has_cursor_lnum)
-		mod_top = search_hl_has_cursor_lnum;
-	    if (mod_bot == 0 || mod_bot < search_hl_has_cursor_lnum + 1)
-		mod_bot = search_hl_has_cursor_lnum + 1;
+	    ਜੇ (mod_ਸਿਖਰ == 0 || mod_ਸਿਖਰ > ਖੋਜ_hl_has_cursor_lnum)
+		mod_ਸਿਖਰ = ਖੋਜ_hl_has_cursor_lnum;
+	    ਜੇ (mod_bot == 0 || mod_bot < ਖੋਜ_hl_has_cursor_lnum + 1)
+		mod_bot = ਖੋਜ_hl_has_cursor_lnum + 1;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_FOLDING
-	if (mod_top != 0 && hasAnyFolding(wp))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	ਜੇ (mod_ਸਿਖਰ != 0 && hasAnyFolding(wp))
 	{
 	    linenr_T	lnumt, lnumb;
 
@@ -1850,73 +1850,73 @@ win_update(win_T *wp)
 	    // to this line.  If there is no valid entry, use MAXLNUM.
 	    lnumt = wp->w_topline;
 	    lnumb = MAXLNUM;
-	    for (i = 0; i < wp->w_lines_valid; ++i)
-		if (wp->w_lines[i].wl_valid)
+	    ਲਈ (i = 0; i < wp->w_ਸਤਰਾਂ_valid; ++i)
+		ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_valid)
 		{
-		    if (wp->w_lines[i].wl_lastlnum < mod_top)
-			lnumt = wp->w_lines[i].wl_lastlnum + 1;
-		    if (lnumb == MAXLNUM && wp->w_lines[i].wl_lnum >= mod_bot)
+		    ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_lastlnum < mod_ਸਿਖਰ)
+			lnumt = wp->w_ਸਤਰਾਂ[i].wl_lastlnum + 1;
+		    ਜੇ (lnumb == MAXLNUM && wp->w_ਸਤਰਾਂ[i].wl_lnum >= mod_bot)
 		    {
-			lnumb = wp->w_lines[i].wl_lnum;
+			lnumb = wp->w_ਸਤਰਾਂ[i].wl_lnum;
 			// When there is a fold column it might need updating
 			// in the next line ("J" just above an open fold).
-			if (compute_foldcolumn(wp, 0) > 0)
+			ਜੇ (compute_foldcolumn(wp, 0) > 0)
 			    ++lnumb;
 		    }
 		}
 
-	    (void)hasFoldingWin(wp, mod_top, &mod_top, NULL, TRUE, NULL);
-	    if (mod_top > lnumt)
-		mod_top = lnumt;
+	    (ਖਾਲੀ)hasFoldingWin(wp, mod_ਸਿਖਰ, &mod_ਸਿਖਰ, ਨਿਰਾ, TRUE, ਨਿਰਾ);
+	    ਜੇ (mod_ਸਿਖਰ > lnumt)
+		mod_ਸਿਖਰ = lnumt;
 
 	    // Now do the same for the bottom line (one above mod_bot).
 	    --mod_bot;
-	    (void)hasFoldingWin(wp, mod_bot, NULL, &mod_bot, TRUE, NULL);
+	    (ਖਾਲੀ)hasFoldingWin(wp, mod_bot, ਨਿਰਾ, &mod_bot, TRUE, ਨਿਰਾ);
 	    ++mod_bot;
-	    if (mod_bot < lnumb)
+	    ਜੇ (mod_bot < lnumb)
 		mod_bot = lnumb;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// When a change starts above w_topline and the end is below
 	// w_topline, start redrawing at w_topline.
 	// If the end of the change is above w_topline: do like no change was
 	// made, but redraw the first line to find changes in syntax.
-	if (mod_top != 0 && mod_top < wp->w_topline)
+	ਜੇ (mod_ਸਿਖਰ != 0 && mod_ਸਿਖਰ < wp->w_topline)
 	{
-	    if (mod_bot > wp->w_topline)
-		mod_top = wp->w_topline;
-#ifdef FEAT_SYN_HL
-	    else if (syntax_present(wp))
-		top_end = 1;
-#endif
+	    ਜੇ (mod_bot > wp->w_topline)
+		mod_ਸਿਖਰ = wp->w_topline;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	    ਨਹੀਂਤਾਂ ਜੇ (syntax_present(wp))
+		ਸਿਖਰ_ਸਿਰਾ = 1;
+#ਜੇ_ਅੰਤ
 	}
     }
-    wp->w_redraw_top = 0;	// reset for next time
+    wp->w_redraw_ਸਿਖਰ = 0;	// reset for next time
     wp->w_redraw_bot = 0;
-#ifdef FEAT_SEARCH_EXTRA
-    search_hl_has_cursor_lnum = 0;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+    ਖੋਜ_hl_has_cursor_lnum = 0;
+#ਜੇ_ਅੰਤ
 
 
     // When only displaying the lines at the top, set top_end.  Used when
     // window has scrolled down for msg_scrolled.
-    if (type == UPD_REDRAW_TOP)
+    ਜੇ (type == UPD_REDRAW_ਸਿਖਰ)
     {
 	j = 0;
-	for (i = 0; i < wp->w_lines_valid; ++i)
+	ਲਈ (i = 0; i < wp->w_ਸਤਰਾਂ_valid; ++i)
 	{
-	    j += wp->w_lines[i].wl_size;
-	    if (j >= wp->w_upd_rows)
+	    j += wp->w_ਸਤਰਾਂ[i].wl_ਮਾਪ;
+	    ਜੇ (j >= wp->w_upd_ਪੰਕਤੀਆਂ)
 	    {
-		top_end = j;
-		break;
+		ਸਿਖਰ_ਸਿਰਾ = j;
+		ਰੋਕੋ;
 	    }
 	}
-	if (top_end == 0)
+	ਜੇ (ਸਿਖਰ_ਸਿਰਾ == 0)
 	    // not found (cannot happen?): redraw everything
 	    type = UPD_NOT_VALID;
-	else
+	ਨਹੀਂਤਾਂ
 	    // top area defined, the rest is UPD_VALID
 	    type = UPD_VALID;
     }
@@ -1925,7 +1925,7 @@ win_update(win_T *wp)
     // set "screen_cleared" to TRUE.  The special value MAYBE (which is still
     // non-zero and thus not FALSE) will indicate that screenclear() was not
     // called.
-    if (screen_cleared)
+    ਜੇ (screen_cleared)
 	screen_cleared = MAYBE;
 
     // If there are no changes on the screen that require a complete redraw,
@@ -1934,95 +1934,95 @@ win_update(win_T *wp)
     // 2: wp->w_topline is below wp->w_lines[0].wl_lnum: may scroll up
     // 3: wp->w_topline is wp->w_lines[0].wl_lnum: find first entry in
     //    w_lines[] that needs updating.
-    if ((type == UPD_VALID || type == UPD_SOME_VALID
+    ਜੇ ((type == UPD_VALID || type == UPD_SOME_VALID
 			   || type == UPD_INVERTED || type == UPD_INVERTED_ALL)
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	    && !wp->w_botfill && !wp->w_old_botfill
-#endif
+#ਜੇ_ਅੰਤ
 	    )
     {
-	if (mod_top != 0
-		&& wp->w_topline == mod_top
-		&& (!wp->w_lines[0].wl_valid
-		    || wp->w_topline == wp->w_lines[0].wl_lnum))
+	ਜੇ (mod_ਸਿਖਰ != 0
+		&& wp->w_topline == mod_ਸਿਖਰ
+		&& (!wp->w_ਸਤਰਾਂ[0].wl_valid
+		    || wp->w_topline == wp->w_ਸਤਰਾਂ[0].wl_lnum))
 	{
 	    // w_topline is the first changed line and window is not scrolled,
 	    // the scrolling from changed lines will be done further down.
 	}
-	else if (wp->w_lines[0].wl_valid
-		&& (wp->w_topline < wp->w_lines[0].wl_lnum
-#ifdef FEAT_DIFF
-		    || (wp->w_topline == wp->w_lines[0].wl_lnum
+	ਨਹੀਂਤਾਂ ਜੇ (wp->w_ਸਤਰਾਂ[0].wl_valid
+		&& (wp->w_topline < wp->w_ਸਤਰਾਂ[0].wl_lnum
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+		    || (wp->w_topline == wp->w_ਸਤਰਾਂ[0].wl_lnum
 			&& wp->w_topfill > wp->w_old_topfill)
-#endif
+#ਜੇ_ਅੰਤ
 		   ))
 	{
 	    // New topline is above old topline: May scroll down.
-#ifdef FEAT_FOLDING
-	    if (hasAnyFolding(wp))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	    ਜੇ (hasAnyFolding(wp))
 	    {
 		linenr_T ln;
 
 		// count the number of lines we are off, counting a sequence
 		// of folded lines as one
 		j = 0;
-		for (ln = wp->w_topline; ln < wp->w_lines[0].wl_lnum; ++ln)
+		ਲਈ (ln = wp->w_topline; ln < wp->w_ਸਤਰਾਂ[0].wl_lnum; ++ln)
 		{
 		    ++j;
-		    if (j >= wp->w_height - 2)
-			break;
-		    (void)hasFoldingWin(wp, ln, NULL, &ln, TRUE, NULL);
+		    ਜੇ (j >= wp->w_ਉਚਾਈ - 2)
+			ਰੋਕੋ;
+		    (ਖਾਲੀ)hasFoldingWin(wp, ln, ਨਿਰਾ, &ln, TRUE, ਨਿਰਾ);
 		}
 	    }
-	    else
-#endif
-		j = wp->w_lines[0].wl_lnum - wp->w_topline;
-	    if (j < wp->w_height - 2)		// not too far off
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		j = wp->w_ਸਤਰਾਂ[0].wl_lnum - wp->w_topline;
+	    ਜੇ (j < wp->w_ਉਚਾਈ - 2)		// not too far off
 	    {
-		i = plines_m_win(wp, wp->w_topline, wp->w_lines[0].wl_lnum - 1,
-								wp->w_height);
-#ifdef FEAT_DIFF
+		i = plines_m_win(wp, wp->w_topline, wp->w_ਸਤਰਾਂ[0].wl_lnum - 1,
+								wp->w_ਉਚਾਈ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		// insert extra lines for previously invisible filler lines
-		if (wp->w_lines[0].wl_lnum != wp->w_topline)
-		    i += diff_check_fill(wp, wp->w_lines[0].wl_lnum)
+		ਜੇ (wp->w_ਸਤਰਾਂ[0].wl_lnum != wp->w_topline)
+		    i += diff_check_fill(wp, wp->w_ਸਤਰਾਂ[0].wl_lnum)
 							  - wp->w_old_topfill;
-#endif
-		if (i < wp->w_height - 2)	// less than a screen off
+#ਜੇ_ਅੰਤ
+		ਜੇ (i < wp->w_ਉਚਾਈ - 2)	// less than a screen off
 		{
 		    // Try to insert the correct number of lines.
 		    // If not the last window, delete the lines at the bottom.
 		    // win_ins_lines may fail when the terminal can't do it.
-		    if (i > 0)
+		    ਜੇ (i > 0)
 			check_for_delay(FALSE);
-		    if (win_ins_lines(wp, 0, i, FALSE, wp == firstwin) == OK)
+		    ਜੇ (win_ins_ਸਤਰਾਂ(wp, 0, i, FALSE, wp == firstwin) == OK)
 		    {
-			if (wp->w_lines_valid != 0)
+			ਜੇ (wp->w_ਸਤਰਾਂ_valid != 0)
 			{
 			    // Need to update rows that are new, stop at the
 			    // first one that scrolled down.
-			    top_end = i;
-			    scrolled_down = TRUE;
+			    ਸਿਖਰ_ਸਿਰਾ = i;
+			    scrolled_ਥੱਲੇ = TRUE;
 
 			    // Move the entries that were scrolled, disable
 			    // the entries for the lines to be redrawn.
-			    if ((wp->w_lines_valid += j) > wp->w_height)
-				wp->w_lines_valid = wp->w_height;
-			    for (idx = wp->w_lines_valid; idx - j >= 0; idx--)
-				wp->w_lines[idx] = wp->w_lines[idx - j];
-			    while (idx >= 0)
-				wp->w_lines[idx--].wl_valid = FALSE;
+			    ਜੇ ((wp->w_ਸਤਰਾਂ_valid += j) > wp->w_ਉਚਾਈ)
+				wp->w_ਸਤਰਾਂ_valid = wp->w_ਉਚਾਈ;
+			    ਲਈ (idx = wp->w_ਸਤਰਾਂ_valid; idx - j >= 0; idx--)
+				wp->w_ਸਤਰਾਂ[idx] = wp->w_ਸਤਰਾਂ[idx - j];
+			    ਜਦੋਂ (idx >= 0)
+				wp->w_ਸਤਰਾਂ[idx--].wl_valid = FALSE;
 			}
 		    }
-		    else
-			mid_start = 0;		// redraw all lines
+		    ਨਹੀਂਤਾਂ
+			mid_ਸ਼ੁਰੂ = 0;		// redraw all lines
 		}
-		else
-		    mid_start = 0;		// redraw all lines
+		ਨਹੀਂਤਾਂ
+		    mid_ਸ਼ੁਰੂ = 0;		// redraw all lines
 	    }
-	    else
-		mid_start = 0;		// redraw all lines
+	    ਨਹੀਂਤਾਂ
+		mid_ਸ਼ੁਰੂ = 0;		// redraw all lines
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // New topline is at or below old topline: May scroll up.
 	    // When topline didn't change, find first entry in w_lines[] that
@@ -2031,259 +2031,259 @@ win_update(win_T *wp)
 	    // Try to find wp->w_topline in wp->w_lines[].wl_lnum.  The check
 	    // for "Rows" is in case "wl_size" is incorrect somehow.
 	    j = -1;
-	    row = 0;
-	    for (i = 0; i < wp->w_lines_valid && i < Rows; i++)
+	    ਪੰਕਤੀ = 0;
+	    ਲਈ (i = 0; i < wp->w_ਸਤਰਾਂ_valid && i < ਪੰਕਤੀਆਂ; i++)
 	    {
-		if (wp->w_lines[i].wl_valid
-			&& wp->w_lines[i].wl_lnum == wp->w_topline)
+		ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_valid
+			&& wp->w_ਸਤਰਾਂ[i].wl_lnum == wp->w_topline)
 		{
 		    j = i;
-		    break;
+		    ਰੋਕੋ;
 		}
-		row += wp->w_lines[i].wl_size;
+		ਪੰਕਤੀ += wp->w_ਸਤਰਾਂ[i].wl_ਮਾਪ;
 	    }
-	    if (j == -1)
+	    ਜੇ (j == -1)
 	    {
 		// if wp->w_topline is not in wp->w_lines[].wl_lnum redraw all
-		// lines
-		mid_start = 0;
+		//ਸਤਰਾਂ
+		mid_ਸ਼ੁਰੂ = 0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Try to delete the correct number of lines.
 		// wp->w_topline is at wp->w_lines[i].wl_lnum.
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		// If the topline didn't change, delete old filler lines,
 		// otherwise delete filler lines of the new topline...
-		if (wp->w_lines[0].wl_lnum == wp->w_topline)
-		    row += wp->w_old_topfill;
-		else
-		    row += diff_check_fill(wp, wp->w_topline);
+		ਜੇ (wp->w_ਸਤਰਾਂ[0].wl_lnum == wp->w_topline)
+		    ਪੰਕਤੀ += wp->w_old_topfill;
+		ਨਹੀਂਤਾਂ
+		    ਪੰਕਤੀ += diff_check_fill(wp, wp->w_topline);
 		// ... but don't delete new filler lines.
-		row -= wp->w_topfill;
-#endif
-		if (row > Rows)  // just in case
-		    row = Rows;
-		if (row > 0)
+		ਪੰਕਤੀ -= wp->w_topfill;
+#ਜੇ_ਅੰਤ
+		ਜੇ (ਪੰਕਤੀ > ਪੰਕਤੀਆਂ)  // just in case
+		    ਪੰਕਤੀ = ਪੰਕਤੀਆਂ;
+		ਜੇ (ਪੰਕਤੀ > 0)
 		{
 		    check_for_delay(FALSE);
-		    if (win_del_lines(wp, 0, row, FALSE, wp == firstwin, 0)
+		    ਜੇ (win_del_ਸਤਰਾਂ(wp, 0, ਪੰਕਤੀ, FALSE, wp == firstwin, 0)
 									 == OK)
-			bot_start = wp->w_height - row;
-		    else
-			mid_start = 0;		// redraw all lines
+			bot_ਸ਼ੁਰੂ = wp->w_ਉਚਾਈ - ਪੰਕਤੀ;
+		    ਨਹੀਂਤਾਂ
+			mid_ਸ਼ੁਰੂ = 0;		// redraw all lines
 		}
-		if ((row == 0 || bot_start < 999) && wp->w_lines_valid != 0)
+		ਜੇ ((ਪੰਕਤੀ == 0 || bot_ਸ਼ੁਰੂ < 999) && wp->w_ਸਤਰਾਂ_valid != 0)
 		{
 		    // Skip the lines (below the deleted lines) that are still
 		    // valid and don't need redrawing.	Copy their info
 		    // upwards, to compensate for the deleted lines.  Set
 		    // bot_start to the first row that needs redrawing.
-		    bot_start = 0;
+		    bot_ਸ਼ੁਰੂ = 0;
 		    idx = 0;
-		    for (;;)
+		    ਲਈ (;;)
 		    {
-			wp->w_lines[idx] = wp->w_lines[j];
+			wp->w_ਸਤਰਾਂ[idx] = wp->w_ਸਤਰਾਂ[j];
 			// stop at line that didn't fit, unless it is still
 			// valid (no lines deleted)
-			if (row > 0 && bot_start + row
-				 + (int)wp->w_lines[j].wl_size > wp->w_height)
+			ਜੇ (ਪੰਕਤੀ > 0 && bot_ਸ਼ੁਰੂ + ਪੰਕਤੀ
+				 + (ਪੂਰਨ)wp->w_ਸਤਰਾਂ[j].wl_ਮਾਪ > wp->w_ਉਚਾਈ)
 			{
-			    wp->w_lines_valid = idx + 1;
-			    break;
+			    wp->w_ਸਤਰਾਂ_valid = idx + 1;
+			    ਰੋਕੋ;
 			}
-			bot_start += wp->w_lines[idx++].wl_size;
+			bot_ਸ਼ੁਰੂ += wp->w_ਸਤਰਾਂ[idx++].wl_ਮਾਪ;
 
 			// stop at the last valid entry in w_lines[].wl_size
-			if (++j >= wp->w_lines_valid)
+			ਜੇ (++j >= wp->w_ਸਤਰਾਂ_valid)
 			{
-			    wp->w_lines_valid = idx;
-			    break;
+			    wp->w_ਸਤਰਾਂ_valid = idx;
+			    ਰੋਕੋ;
 			}
 		    }
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    // Correct the first entry for filler lines at the top
 		    // when it won't get updated below.
-		    if (wp->w_p_diff && bot_start > 0)
-			wp->w_lines[0].wl_size = plines_correct_topline(wp,
+		    ਜੇ (wp->w_p_diff && bot_ਸ਼ੁਰੂ > 0)
+			wp->w_ਸਤਰਾਂ[0].wl_ਮਾਪ = plines_correct_topline(wp,
 							  wp->w_topline, TRUE);
-#endif
+#ਜੇ_ਅੰਤ
 		}
 	    }
 	}
 
 	// When starting redraw in the first line, redraw all lines.
-	if (mid_start == 0)
-	    mid_end = wp->w_height;
+	ਜੇ (mid_ਸ਼ੁਰੂ == 0)
+	    mid_ਸਿਰਾ = wp->w_ਉਚਾਈ;
 
 	// When win_del_lines() or win_ins_lines() caused the screen to be
 	// cleared (only happens for the first window) or when screenclear()
 	// was called directly above, "must_redraw" will have been set to
 	// UPD_NOT_VALID, need to reset it here to avoid redrawing twice.
-	if (screen_cleared == TRUE)
+	ਜੇ (screen_cleared == TRUE)
 	    must_redraw = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Not UPD_VALID or UPD_INVERTED: redraw all lines.
-	mid_start = 0;
-	mid_end = wp->w_height;
+	mid_ਸ਼ੁਰੂ = 0;
+	mid_ਸਿਰਾ = wp->w_ਉਚਾਈ;
     }
 
-    if (type == UPD_SOME_VALID)
+    ਜੇ (type == UPD_SOME_VALID)
     {
 	// UPD_SOME_VALID: redraw all lines.
-	mid_start = 0;
-	mid_end = wp->w_height;
+	mid_ਸ਼ੁਰੂ = 0;
+	mid_ਸਿਰਾ = wp->w_ਉਚਾਈ;
 	type = UPD_NOT_VALID;
     }
 
     // check if we are updating or removing the inverted part
-    if ((VIsual_active && buf == curwin->w_buffer)
+    ਜੇ ((VIsual_ਸਰਗਰਮ && buf == curwin->w_ਬਫਰ)
 	    || (wp->w_old_cursor_lnum != 0 && type != UPD_NOT_VALID))
     {
-	linenr_T    from, to;
+	linenr_T    from, ਮੰਜ਼ਿਲ;
 
-	if (VIsual_active)
+	ਜੇ (VIsual_ਸਰਗਰਮ)
 	{
-	    if (VIsual_mode != wp->w_old_visual_mode
+	    ਜੇ (VIsual_ਬਹੁਲਕ != wp->w_old_visual_ਬਹੁਲਕ
 		|| type == UPD_INVERTED_ALL)
 	    {
 		// If the type of Visual selection changed, redraw the whole
 		// selection.  Also when the ownership of the X selection is
 		// gained or lost.
-		if (curwin->w_cursor.lnum < VIsual.lnum)
+		ਜੇ (curwin->w_cursor.lnum < VIsual.lnum)
 		{
 		    from = curwin->w_cursor.lnum;
-		    to = VIsual.lnum;
+		    ਮੰਜ਼ਿਲ = VIsual.lnum;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    from = VIsual.lnum;
-		    to = curwin->w_cursor.lnum;
+		    ਮੰਜ਼ਿਲ = curwin->w_cursor.lnum;
 		}
 		// redraw more when the cursor moved as well
-		if (wp->w_old_cursor_lnum < from)
+		ਜੇ (wp->w_old_cursor_lnum < from)
 		    from = wp->w_old_cursor_lnum;
-		if (wp->w_old_cursor_lnum > to)
-		    to = wp->w_old_cursor_lnum;
-		if (wp->w_old_visual_lnum < from)
+		ਜੇ (wp->w_old_cursor_lnum > ਮੰਜ਼ਿਲ)
+		    ਮੰਜ਼ਿਲ = wp->w_old_cursor_lnum;
+		ਜੇ (wp->w_old_visual_lnum < from)
 		    from = wp->w_old_visual_lnum;
-		if (wp->w_old_visual_lnum > to)
-		    to = wp->w_old_visual_lnum;
+		ਜੇ (wp->w_old_visual_lnum > ਮੰਜ਼ਿਲ)
+		    ਮੰਜ਼ਿਲ = wp->w_old_visual_lnum;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Find the line numbers that need to be updated: The lines
 		// between the old cursor position and the current cursor
 		// position.  Also check if the Visual position changed.
-		if (curwin->w_cursor.lnum < wp->w_old_cursor_lnum)
+		ਜੇ (curwin->w_cursor.lnum < wp->w_old_cursor_lnum)
 		{
 		    from = curwin->w_cursor.lnum;
-		    to = wp->w_old_cursor_lnum;
+		    ਮੰਜ਼ਿਲ = wp->w_old_cursor_lnum;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    from = wp->w_old_cursor_lnum;
-		    to = curwin->w_cursor.lnum;
-		    if (from == 0)	// Visual mode just started
-			from = to;
+		    ਮੰਜ਼ਿਲ = curwin->w_cursor.lnum;
+		    ਜੇ (from == 0)	// Visual mode just started
+			from = ਮੰਜ਼ਿਲ;
 		}
 
-		if (VIsual.lnum != wp->w_old_visual_lnum
-					|| VIsual.col != wp->w_old_visual_col)
+		ਜੇ (VIsual.lnum != wp->w_old_visual_lnum
+					|| VIsual.ਖਾਨਾ != wp->w_old_visual_ਖਾਨਾ)
 		{
-		    if (wp->w_old_visual_lnum < from
+		    ਜੇ (wp->w_old_visual_lnum < from
 						&& wp->w_old_visual_lnum != 0)
 			from = wp->w_old_visual_lnum;
-		    if (wp->w_old_visual_lnum > to)
-			to = wp->w_old_visual_lnum;
-		    if (VIsual.lnum < from)
+		    ਜੇ (wp->w_old_visual_lnum > ਮੰਜ਼ਿਲ)
+			ਮੰਜ਼ਿਲ = wp->w_old_visual_lnum;
+		    ਜੇ (VIsual.lnum < from)
 			from = VIsual.lnum;
-		    if (VIsual.lnum > to)
-			to = VIsual.lnum;
+		    ਜੇ (VIsual.lnum > ਮੰਜ਼ਿਲ)
+			ਮੰਜ਼ਿਲ = VIsual.lnum;
 		}
 	    }
 
 	    // If in block mode and changed column or curwin->w_curswant:
 	    // update all lines.
 	    // First compute the actual start and end column.
-	    if (VIsual_mode == Ctrl_V)
+	    ਜੇ (VIsual_ਬਹੁਲਕ == Ctrl_V)
 	    {
 		colnr_T	    fromc, toc;
 
 		getvcols(wp, &VIsual, &curwin->w_cursor, &fromc, &toc,
-							 GETVCOL_END_EXCL_LBR);
+							 GETVCOL_ਸਿਰਾ_EXCL_LBR);
 		++toc;
 		// Highlight to the end of the line, unless 'virtualedit' has
 		// "block".
-		if (curwin->w_curswant == MAXCOL)
+		ਜੇ (curwin->w_curswant == MAXCOL)
 		{
-		    if (get_ve_flags() & VE_BLOCK)
+		    ਜੇ (get_ve_flags() & VE_ਖੰਡ)
 		    {
 			pos_T	    pos;
-			int	    cursor_above =
+			ਪੂਰਨ	    cursor_above =
 					   curwin->w_cursor.lnum < VIsual.lnum;
 
 			// Need to find the longest line.
 			toc = 0;
 			pos.coladd = 0;
-			for (pos.lnum = curwin->w_cursor.lnum; cursor_above
+			ਲਈ (pos.lnum = curwin->w_cursor.lnum; cursor_above
 					? pos.lnum <= VIsual.lnum
 					: pos.lnum >= VIsual.lnum;
 					     pos.lnum += cursor_above ? 1 : -1)
 			{
 			    colnr_T t;
 
-			    pos.col = (int)ml_get_buf_len(wp->w_buffer, pos.lnum);
-			    getvvcol(wp, &pos, NULL, NULL, &t, 0);
-			    if (toc < t)
+			    pos.ਖਾਨਾ = (ਪੂਰਨ)ml_get_buf_len(wp->w_ਬਫਰ, pos.lnum);
+			    getvvcol(wp, &pos, ਨਿਰਾ, ਨਿਰਾ, &t, 0);
+			    ਜੇ (toc < t)
 				toc = t;
 			}
 			++toc;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			toc = MAXCOL;
 		}
 
-		if (fromc != wp->w_old_cursor_fcol
+		ਜੇ (fromc != wp->w_old_cursor_fcol
 			|| toc != wp->w_old_cursor_lcol)
 		{
-		    if (from > VIsual.lnum)
+		    ਜੇ (from > VIsual.lnum)
 			from = VIsual.lnum;
-		    if (to < VIsual.lnum)
-			to = VIsual.lnum;
+		    ਜੇ (ਮੰਜ਼ਿਲ < VIsual.lnum)
+			ਮੰਜ਼ਿਲ = VIsual.lnum;
 		}
 		wp->w_old_cursor_fcol = fromc;
 		wp->w_old_cursor_lcol = toc;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Use the line numbers of the old Visual area.
-	    if (wp->w_old_cursor_lnum < wp->w_old_visual_lnum)
+	    ਜੇ (wp->w_old_cursor_lnum < wp->w_old_visual_lnum)
 	    {
 		from = wp->w_old_cursor_lnum;
-		to = wp->w_old_visual_lnum;
+		ਮੰਜ਼ਿਲ = wp->w_old_visual_lnum;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		from = wp->w_old_visual_lnum;
-		to = wp->w_old_cursor_lnum;
+		ਮੰਜ਼ਿਲ = wp->w_old_cursor_lnum;
 	    }
 	}
 
 	// There is no need to update lines above the top of the window.
-	if (from < wp->w_topline)
+	ਜੇ (from < wp->w_topline)
 	    from = wp->w_topline;
 
 	// If we know the value of w_botline, use it to restrict the update to
 	// the lines that are visible in the window.
 	// Note: w_botline may be partially visible or completely invisible.
-	if (wp->w_valid & VALID_BOTLINE)
+	ਜੇ (wp->w_valid & VALID_BOTLINE)
 	{
 	    from = MIN(from, wp->w_botline);
-	    to = MIN(to, wp->w_botline);
+	    ਮੰਜ਼ਿਲ = MIN(ਮੰਜ਼ਿਲ, wp->w_botline);
 	}
 
 	// Find the minimal part to be updated.
@@ -2293,119 +2293,119 @@ win_update(win_T *wp)
 	// A middle mouse click with a Visual selection may change the text
 	// above the Visual area and reset wl_valid, do count these for
 	// mid_end (in srow).
-	if (mid_start > 0)
+	ਜੇ (mid_ਸ਼ੁਰੂ > 0)
 	{
 	    lnum = wp->w_topline;
 	    idx = 0;
 	    srow = 0;
-	    if (scrolled_down)
-		mid_start = top_end;
-	    else
-		mid_start = 0;
-	    while (lnum < from && idx < wp->w_lines_valid)	// find start
+	    ਜੇ (scrolled_ਥੱਲੇ)
+		mid_ਸ਼ੁਰੂ = ਸਿਖਰ_ਸਿਰਾ;
+	    ਨਹੀਂਤਾਂ
+		mid_ਸ਼ੁਰੂ = 0;
+	    ਜਦੋਂ (lnum < from && idx < wp->w_ਸਤਰਾਂ_valid)	// find start
 	    {
-		if (wp->w_lines[idx].wl_valid)
-		    mid_start += wp->w_lines[idx].wl_size;
-		else if (!scrolled_down)
-		    srow += wp->w_lines[idx].wl_size;
+		ਜੇ (wp->w_ਸਤਰਾਂ[idx].wl_valid)
+		    mid_ਸ਼ੁਰੂ += wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ;
+		ਨਹੀਂਤਾਂ ਜੇ (!scrolled_ਥੱਲੇ)
+		    srow += wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ;
 		++idx;
-#ifdef FEAT_FOLDING
-		if (idx < wp->w_lines_valid && wp->w_lines[idx].wl_valid)
-		    lnum = wp->w_lines[idx].wl_lnum;
-		else
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+		ਜੇ (idx < wp->w_ਸਤਰਾਂ_valid && wp->w_ਸਤਰਾਂ[idx].wl_valid)
+		    lnum = wp->w_ਸਤਰਾਂ[idx].wl_lnum;
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		    ++lnum;
 	    }
-	    srow += mid_start;
-	    mid_end = wp->w_height;
-	    for ( ; idx < wp->w_lines_valid; ++idx)		// find end
+	    srow += mid_ਸ਼ੁਰੂ;
+	    mid_ਸਿਰਾ = wp->w_ਉਚਾਈ;
+	    ਲਈ ( ; idx < wp->w_ਸਤਰਾਂ_valid; ++idx)		// find end
 	    {
-		if (wp->w_lines[idx].wl_valid
-			&& wp->w_lines[idx].wl_lnum >= to + 1)
+		ਜੇ (wp->w_ਸਤਰਾਂ[idx].wl_valid
+			&& wp->w_ਸਤਰਾਂ[idx].wl_lnum >= ਮੰਜ਼ਿਲ + 1)
 		{
 		    // Only update until first row of this line
-		    mid_end = srow;
-		    break;
+		    mid_ਸਿਰਾ = srow;
+		    ਰੋਕੋ;
 		}
-		srow += wp->w_lines[idx].wl_size;
+		srow += wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ;
 	    }
 	}
     }
 
-    if (VIsual_active && buf == curwin->w_buffer)
+    ਜੇ (VIsual_ਸਰਗਰਮ && buf == curwin->w_ਬਫਰ)
     {
-	wp->w_old_visual_mode = VIsual_mode;
+	wp->w_old_visual_ਬਹੁਲਕ = VIsual_ਬਹੁਲਕ;
 	wp->w_old_cursor_lnum = curwin->w_cursor.lnum;
 	wp->w_old_visual_lnum = VIsual.lnum;
-	wp->w_old_visual_col = VIsual.col;
+	wp->w_old_visual_ਖਾਨਾ = VIsual.ਖਾਨਾ;
 	wp->w_old_curswant = curwin->w_curswant;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	wp->w_old_visual_mode = 0;
+	wp->w_old_visual_ਬਹੁਲਕ = 0;
 	wp->w_old_cursor_lnum = 0;
 	wp->w_old_visual_lnum = 0;
-	wp->w_old_visual_col = 0;
+	wp->w_old_visual_ਖਾਨਾ = 0;
     }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA)
+#ਜੇ defined(FEAT_SYN_HL) || defined(FEAT_ਖੋਜ_EXTRA)
     // reset got_int, otherwise regexp won't work
     save_got_int = got_int;
     got_int = 0;
-#endif
-#ifdef SYN_TIME_LIMIT
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ SYN_ਸਮਾਂ_ਹੱਦਬੰਦੀ
     // Set the time limit to 'redrawtime'.
-    redrawtime_limit_set = TRUE;
+    redrawtime_ਹੱਦਬੰਦੀ_ਸੈੱਟ = TRUE;
     init_regexp_timeout(p_rdt);
-#endif
-#ifdef FEAT_FOLDING
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
     win_foldinfo.fi_level = 0;
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_MENU
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
     // Draw the window toolbar, if there is one.
     // TODO: only when needed.
-    if (winbar_height(wp) > 0)
+    ਜੇ (winbar_ਉਚਾਈ(wp) > 0)
 	redraw_win_toolbar(wp);
-#endif
+#ਜੇ_ਅੰਤ
 
     lnum = wp->w_topline;   // first line shown in window
 
     spellvars_T spv;
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     // Initialize spell related variables for the first drawn line.
-    CLEAR_FIELD(spv);
-    if (spell_check_window(wp))
+    CLEAR_ਖੇਤਰ(spv);
+    ਜੇ (spell_check_ਖਿੜਕੀ(wp))
     {
 	spv.spv_has_spell = TRUE;
-	spv.spv_unchanged = mod_top == 0;
+	spv.spv_unchanged = mod_ਸਿਖਰ == 0;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     // Update all the window rows.
     idx = 0;		// first entry in w_lines[].wl_size
-    row = 0;
+    ਪੰਕਤੀ = 0;
     srow = 0;
-    for (;;)
+    ਲਈ (;;)
     {
 	// stop updating when reached the end of the window (check for _past_
 	// the end of the window is at the end of the loop)
-	if (row == wp->w_height)
+	ਜੇ (ਪੰਕਤੀ == wp->w_ਉਚਾਈ)
 	{
 	    didline = TRUE;
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// stop updating when hit the end of the file
-	if (lnum > buf->b_ml.ml_line_count)
+	ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	{
 	    eof = TRUE;
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// Remember the starting row of the line that is going to be dealt
 	// with.  It is used further down when the line doesn't fit.
-	srow = row;
+	srow = ਪੰਕਤੀ;
 
 	// Update a line when it is in an area that needs updating, when it
 	// has changes or w_lines[idx] is invalid.
@@ -2414,230 +2414,230 @@ win_update(win_T *wp)
 	// When syntax folding is being used, the saved syntax states will
 	// already have been updated, we can't see where the syntax state is
 	// the same again, just update until the end of the window.
-	if (row < top_end
-		|| (row >= mid_start && row < mid_end)
-#ifdef FEAT_SEARCH_EXTRA
-		|| top_to_mod
-#endif
-		|| idx >= wp->w_lines_valid
-		|| (row + wp->w_lines[idx].wl_size > bot_start)
-		|| (mod_top != 0
-		    && (lnum == mod_top
-			|| (lnum >= mod_top
+	ਜੇ (ਪੰਕਤੀ < ਸਿਖਰ_ਸਿਰਾ
+		|| (ਪੰਕਤੀ >= mid_ਸ਼ੁਰੂ && ਪੰਕਤੀ < mid_ਸਿਰਾ)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+		|| ਸਿਖਰ_ਮੰਜ਼ਿਲ_mod
+#ਜੇ_ਅੰਤ
+		|| idx >= wp->w_ਸਤਰਾਂ_valid
+		|| (ਪੰਕਤੀ + wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ > bot_ਸ਼ੁਰੂ)
+		|| (mod_ਸਿਖਰ != 0
+		    && (lnum == mod_ਸਿਖਰ
+			|| (lnum >= mod_ਸਿਖਰ
 			    && (lnum < mod_bot
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 				|| did_update == DID_FOLD
-				|| (did_update == DID_LINE
+				|| (did_update == DID_ਸਤਰ
 				    && syntax_present(wp)
 				    && (
 # ifdef FEAT_FOLDING
 					(foldmethodIsSyntax(wp)
 						      && hasAnyFolding(wp)) ||
 # endif
-					syntax_check_changed(lnum)))
-#endif
-#ifdef FEAT_SEARCH_EXTRA
+					syntax_check_ਬਦਲਿਆ(lnum)))
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
 				// match in fixed position might need redraw
 				// if lines were inserted or deleted
-				|| (wp->w_match_head != NULL
-						    && buf->b_mod_set
+				|| (wp->w_ਮੇਲ_ਸਿਰ != ਨਿਰਾ
+						    && buf->b_mod_ਸੈੱਟ
 						    && buf->b_mod_xlines != 0)
-#endif
+#ਜੇ_ਅੰਤ
 				))))
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 		|| (wp->w_p_cul && lnum == wp->w_cursor.lnum)
-		|| lnum == wp->w_last_cursorline
-#endif
+		|| lnum == wp->w_ਆਖਰੀ_cursorline
+#ਜੇ_ਅੰਤ
 				)
 	{
-#ifdef FEAT_SEARCH_EXTRA
-	    if (lnum == mod_top)
-		top_to_mod = FALSE;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+	    ਜੇ (lnum == mod_ਸਿਖਰ)
+		ਸਿਖਰ_ਮੰਜ਼ਿਲ_mod = FALSE;
+#ਜੇ_ਅੰਤ
 
 	    // When at start of changed lines: May scroll following lines
 	    // up or down to minimize redrawing.
 	    // Don't do this when the change continues until the end.
 	    // Don't scroll for changed lines in the top area if that's already
 	    // done above, but do scroll for changed lines below the top area.
-	    if (!scrolled_for_mod && mod_bot != MAXLNUM
-		    && lnum >= mod_top && lnum < MAX(mod_bot, mod_top + 1)
-		    && (!scrolled_down || row >= top_end))
+	    ਜੇ (!scrolled_for_mod && mod_bot != MAXLNUM
+		    && lnum >= mod_ਸਿਖਰ && lnum < MAX(mod_bot, mod_ਸਿਖਰ + 1)
+		    && (!scrolled_ਥੱਲੇ || ਪੰਕਤੀ >= ਸਿਖਰ_ਸਿਰਾ))
 	    {
 		scrolled_for_mod = TRUE;
 
-		int		old_cline_height = 0;
-		int		old_rows = 0;
-		int		new_rows = 0;
-		int		xtra_rows;
+		ਪੂਰਨ		old_cline_ਉਚਾਈ = 0;
+		ਪੂਰਨ		old_ਪੰਕਤੀਆਂ = 0;
+		ਪੂਰਨ		new_ਪੰਕਤੀਆਂ = 0;
+		ਪੂਰਨ		xtra_ਪੰਕਤੀਆਂ;
 		linenr_T	l;
 
 		// Count the old number of window rows, using w_lines[], which
 		// should still contain the sizes for the lines as they are
 		// currently displayed.
-		for (i = idx; i < wp->w_lines_valid; ++i)
+		ਲਈ (i = idx; i < wp->w_ਸਤਰਾਂ_valid; ++i)
 		{
 		    // Only valid lines have a meaningful wl_lnum.  Invalid
 		    // lines are part of the changed area.
-		    if (wp->w_lines[i].wl_valid
-			    && wp->w_lines[i].wl_lnum == mod_bot)
-			break;
-		    if (wp->w_lines[i].wl_lnum == wp->w_cursor.lnum)
-			old_cline_height = wp->w_lines[i].wl_size;
-		    old_rows += wp->w_lines[i].wl_size;
-#ifdef FEAT_FOLDING
-		    if (wp->w_lines[i].wl_valid
-			    && wp->w_lines[i].wl_lastlnum + 1 == mod_bot)
+		    ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_valid
+			    && wp->w_ਸਤਰਾਂ[i].wl_lnum == mod_bot)
+			ਰੋਕੋ;
+		    ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_lnum == wp->w_cursor.lnum)
+			old_cline_ਉਚਾਈ = wp->w_ਸਤਰਾਂ[i].wl_ਮਾਪ;
+		    old_ਪੰਕਤੀਆਂ += wp->w_ਸਤਰਾਂ[i].wl_ਮਾਪ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+		    ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_valid
+			    && wp->w_ਸਤਰਾਂ[i].wl_lastlnum + 1 == mod_bot)
 		    {
 			// Must have found the last valid entry above mod_bot.
 			// Add following invalid entries.
 			++i;
-			while (i < wp->w_lines_valid
-						  && !wp->w_lines[i].wl_valid)
-			    old_rows += wp->w_lines[i++].wl_size;
-			break;
+			ਜਦੋਂ (i < wp->w_ਸਤਰਾਂ_valid
+						  && !wp->w_ਸਤਰਾਂ[i].wl_valid)
+			    old_ਪੰਕਤੀਆਂ += wp->w_ਸਤਰਾਂ[i++].wl_ਮਾਪ;
+			ਰੋਕੋ;
 		    }
-#endif
+#ਜੇ_ਅੰਤ
 		}
 
-		if (i >= wp->w_lines_valid)
+		ਜੇ (i >= wp->w_ਸਤਰਾਂ_valid)
 		{
 		    // We can't find a valid line below the changed lines,
 		    // need to redraw until the end of the window.
 		    // Inserting/deleting lines has no use.
-		    bot_start = 0;
+		    bot_ਸ਼ੁਰੂ = 0;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Able to count old number of rows: Count new window
 		    // rows, and may insert/delete lines
 		    j = idx;
-		    for (l = lnum; l < mod_bot; ++l)
+		    ਲਈ (l = lnum; l < mod_bot; ++l)
 		    {
-			if (dollar_vcol >= 0 && wp == curwin &&
-				old_cline_height > 0 && l == wp->w_cursor.lnum)
+			ਜੇ (dollar_vcol >= 0 && wp == curwin &&
+				old_cline_ਉਚਾਈ > 0 && l == wp->w_cursor.lnum)
 			    // When dollar_vcol >= 0, cursor line isn't fully
 			    // redrawn, and its height remains unchanged.
-			    new_rows += old_cline_height;
-#ifdef FEAT_FOLDING
-			else if (hasFoldingWin(wp, l, NULL, &l, TRUE, NULL))
-			    ++new_rows;
-#endif
-			else
-			    new_rows += plines_correct_topline(wp, l, TRUE);
+			    new_ਪੰਕਤੀਆਂ += old_cline_ਉਚਾਈ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+			ਨਹੀਂਤਾਂ ਜੇ (hasFoldingWin(wp, l, ਨਿਰਾ, &l, TRUE, ਨਿਰਾ))
+			    ++new_ਪੰਕਤੀਆਂ;
+#ਜੇ_ਅੰਤ
+			ਨਹੀਂਤਾਂ
+			    new_ਪੰਕਤੀਆਂ += plines_correct_topline(wp, l, TRUE);
 			++j;
-			if (new_rows > wp->w_height - row - 2)
+			ਜੇ (new_ਪੰਕਤੀਆਂ > wp->w_ਉਚਾਈ - ਪੰਕਤੀ - 2)
 			{
 			    // it's getting too much, must redraw the rest
-			    new_rows = 9999;
-			    break;
+			    new_ਪੰਕਤੀਆਂ = 9999;
+			    ਰੋਕੋ;
 			}
 		    }
-		    xtra_rows = new_rows - old_rows;
-		    if (xtra_rows < 0)
+		    xtra_ਪੰਕਤੀਆਂ = new_ਪੰਕਤੀਆਂ - old_ਪੰਕਤੀਆਂ;
+		    ਜੇ (xtra_ਪੰਕਤੀਆਂ < 0)
 		    {
 			// May scroll text up.  If there is not enough
 			// remaining text or scrolling fails, must redraw the
 			// rest.  If scrolling works, must redraw the text
 			// below the scrolled text.
-			if (row - xtra_rows >= wp->w_height - 2)
+			ਜੇ (ਪੰਕਤੀ - xtra_ਪੰਕਤੀਆਂ >= wp->w_ਉਚਾਈ - 2)
 			    mod_bot = MAXLNUM;
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    check_for_delay(FALSE);
-			    if (win_del_lines(wp, row,
-					  -xtra_rows, FALSE, FALSE, 0) == FAIL)
+			    ਜੇ (win_del_ਸਤਰਾਂ(wp, ਪੰਕਤੀ,
+					  -xtra_ਪੰਕਤੀਆਂ, FALSE, FALSE, 0) == FAIL)
 				mod_bot = MAXLNUM;
-			    else
-				bot_start = wp->w_height + xtra_rows;
+			    ਨਹੀਂਤਾਂ
+				bot_ਸ਼ੁਰੂ = wp->w_ਉਚਾਈ + xtra_ਪੰਕਤੀਆਂ;
 			}
 		    }
-		    else if (xtra_rows > 0)
+		    ਨਹੀਂਤਾਂ ਜੇ (xtra_ਪੰਕਤੀਆਂ > 0)
 		    {
 			// May scroll text down.  If there is not enough
 			// remaining text of scrolling fails, must redraw the
 			// rest.
-			if (row + xtra_rows >= wp->w_height - 2)
+			ਜੇ (ਪੰਕਤੀ + xtra_ਪੰਕਤੀਆਂ >= wp->w_ਉਚਾਈ - 2)
 			    mod_bot = MAXLNUM;
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    check_for_delay(FALSE);
-			    if (win_ins_lines(wp, row + old_rows,
-					     xtra_rows, FALSE, FALSE) == FAIL)
+			    ਜੇ (win_ins_ਸਤਰਾਂ(wp, ਪੰਕਤੀ + old_ਪੰਕਤੀਆਂ,
+					     xtra_ਪੰਕਤੀਆਂ, FALSE, FALSE) == FAIL)
 				mod_bot = MAXLNUM;
-			    else if (top_end > row + old_rows)
+			    ਨਹੀਂਤਾਂ ਜੇ (ਸਿਖਰ_ਸਿਰਾ > ਪੰਕਤੀ + old_ਪੰਕਤੀਆਂ)
 				// Scrolled the part at the top that requires
 				// updating down.
-				top_end += xtra_rows;
+				ਸਿਖਰ_ਸਿਰਾ += xtra_ਪੰਕਤੀਆਂ;
 			}
 		    }
 
 		    // When not updating the rest, may need to move w_lines[]
 		    // entries.
-		    if (mod_bot != MAXLNUM && i != j)
+		    ਜੇ (mod_bot != MAXLNUM && i != j)
 		    {
-			if (j < i)
+			ਜੇ (j < i)
 			{
-			    int x = row + new_rows;
+			    ਪੂਰਨ x = ਪੰਕਤੀ + new_ਪੰਕਤੀਆਂ;
 
 			    // move entries in w_lines[] upwards
-			    for (;;)
+			    ਲਈ (;;)
 			    {
 				// stop at last valid entry in w_lines[]
-				if (i >= wp->w_lines_valid)
+				ਜੇ (i >= wp->w_ਸਤਰਾਂ_valid)
 				{
-				    wp->w_lines_valid = j;
-				    break;
+				    wp->w_ਸਤਰਾਂ_valid = j;
+				    ਰੋਕੋ;
 				}
-				wp->w_lines[j] = wp->w_lines[i];
+				wp->w_ਸਤਰਾਂ[j] = wp->w_ਸਤਰਾਂ[i];
 				// stop at a line that won't fit
-				if (x + (int)wp->w_lines[j].wl_size
-							   > wp->w_height)
+				ਜੇ (x + (ਪੂਰਨ)wp->w_ਸਤਰਾਂ[j].wl_ਮਾਪ
+							   > wp->w_ਉਚਾਈ)
 				{
-				    wp->w_lines_valid = j + 1;
-				    break;
+				    wp->w_ਸਤਰਾਂ_valid = j + 1;
+				    ਰੋਕੋ;
 				}
-				x += wp->w_lines[j++].wl_size;
+				x += wp->w_ਸਤਰਾਂ[j++].wl_ਮਾਪ;
 				++i;
 			    }
-			    if (bot_start > x)
-				bot_start = x;
+			    ਜੇ (bot_ਸ਼ੁਰੂ > x)
+				bot_ਸ਼ੁਰੂ = x;
 			}
-			else // j > i
+			ਨਹੀਂਤਾਂ // j > i
 			{
 			    // move entries in w_lines[] downwards
 			    j -= i;
-			    wp->w_lines_valid += j;
-			    if (wp->w_lines_valid > wp->w_height)
-				wp->w_lines_valid = wp->w_height;
-			    for (i = wp->w_lines_valid; i - j >= idx; --i)
-				wp->w_lines[i] = wp->w_lines[i - j];
+			    wp->w_ਸਤਰਾਂ_valid += j;
+			    ਜੇ (wp->w_ਸਤਰਾਂ_valid > wp->w_ਉਚਾਈ)
+				wp->w_ਸਤਰਾਂ_valid = wp->w_ਉਚਾਈ;
+			    ਲਈ (i = wp->w_ਸਤਰਾਂ_valid; i - j >= idx; --i)
+				wp->w_ਸਤਰਾਂ[i] = wp->w_ਸਤਰਾਂ[i - j];
 
 			    // The w_lines[] entries for inserted lines are
 			    // now invalid, but wl_size may be used above.
 			    // Reset to zero.
-			    while (i >= idx)
+			    ਜਦੋਂ (i >= idx)
 			    {
-				wp->w_lines[i].wl_size = 0;
-				wp->w_lines[i--].wl_valid = FALSE;
+				wp->w_ਸਤਰਾਂ[i].wl_ਮਾਪ = 0;
+				wp->w_ਸਤਰਾਂ[i--].wl_valid = FALSE;
 			    }
 			}
 		    }
 		}
 	    }
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 	    // When lines are folded, display one line for all of them.
 	    // Otherwise, display normally (can be several display lines when
 	    // 'wrap' is on).
-	    fold_count = foldedCount(wp, lnum, &win_foldinfo);
-	    if (fold_count != 0)
+	    fold_ਗਿਣਤੀ = folded_ਗਿਣਤੀ(wp, lnum, &win_foldinfo);
+	    ਜੇ (fold_ਗਿਣਤੀ != 0)
 	    {
-		fold_line(wp, fold_count, &win_foldinfo, lnum, row);
-		++row;
-		--fold_count;
-		wp->w_lines[idx].wl_folded = TRUE;
-		wp->w_lines[idx].wl_lastlnum = lnum + fold_count;
+		fold_ਸਤਰ(wp, fold_ਗਿਣਤੀ, &win_foldinfo, lnum, ਪੰਕਤੀ);
+		++ਪੰਕਤੀ;
+		--fold_ਗਿਣਤੀ;
+		wp->w_ਸਤਰਾਂ[idx].wl_folded = TRUE;
+		wp->w_ਸਤਰਾਂ[idx].wl_lastlnum = lnum + fold_ਗਿਣਤੀ;
 # ifdef FEAT_SYN_HL
 		did_update = DID_FOLD;
 # endif
@@ -2645,282 +2645,282 @@ win_update(win_T *wp)
 		spv.spv_capcol_lnum = 0;
 # endif
 	    }
-	    else
-#endif
-	    if (idx < wp->w_lines_valid
-		    && wp->w_lines[idx].wl_valid
-		    && wp->w_lines[idx].wl_lnum == lnum
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਜੇ (idx < wp->w_ਸਤਰਾਂ_valid
+		    && wp->w_ਸਤਰਾਂ[idx].wl_valid
+		    && wp->w_ਸਤਰਾਂ[idx].wl_lnum == lnum
 		    && lnum > wp->w_topline
 		    && !(dy_flags & (DY_LASTLINE | DY_TRUNCATE))
 		    && !WIN_IS_POPUP(wp)
-		    && srow + wp->w_lines[idx].wl_size > wp->w_height
-#ifdef FEAT_DIFF
+		    && srow + wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ > wp->w_ਉਚਾਈ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    && diff_check_fill(wp, lnum) == 0
-#endif
+#ਜੇ_ਅੰਤ
 		    )
 	    {
 		// This line is not going to fit.  Don't draw anything here,
 		// will draw "@  " lines below.
-		row = wp->w_height + 1;
+		ਪੰਕਤੀ = wp->w_ਉਚਾਈ + 1;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-#ifdef FEAT_SEARCH_EXTRA
-		prepare_search_hl(wp, &screen_search_hl, lnum);
-#endif
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+		prepare_ਖੋਜ_hl(wp, &screen_ਖੋਜ_hl, lnum);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 		// Let the syntax stuff know we skipped a few lines.
-		if (syntax_last_parsed != 0 && syntax_last_parsed + 1 < lnum
+		ਜੇ (syntax_ਆਖਰੀ_parsed != 0 && syntax_ਆਖਰੀ_parsed + 1 < lnum
 						       && syntax_present(wp))
-		    syntax_end_parsing(wp, syntax_last_parsed + 1);
-#endif
+		    syntax_ਸਿਰਾ_parsing(wp, syntax_ਆਖਰੀ_parsed + 1);
+#ਜੇ_ਅੰਤ
 
 		// Display one line.
-		row = win_line(wp, lnum, srow, wp->w_height, 0, &spv);
+		ਪੰਕਤੀ = win_ਸਤਰ(wp, lnum, srow, wp->w_ਉਚਾਈ, 0, &spv);
 
-#ifdef FEAT_FOLDING
-		wp->w_lines[idx].wl_folded = FALSE;
-		wp->w_lines[idx].wl_lastlnum = lnum;
-#endif
-#ifdef FEAT_SYN_HL
-		did_update = DID_LINE;
-		syntax_last_parsed = lnum;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+		wp->w_ਸਤਰਾਂ[idx].wl_folded = FALSE;
+		wp->w_ਸਤਰਾਂ[idx].wl_lastlnum = lnum;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+		did_update = DID_ਸਤਰ;
+		syntax_ਆਖਰੀ_parsed = lnum;
+#ਜੇ_ਅੰਤ
 	    }
 
-	    wp->w_lines[idx].wl_lnum = lnum;
-	    wp->w_lines[idx].wl_valid = TRUE;
+	    wp->w_ਸਤਰਾਂ[idx].wl_lnum = lnum;
+	    wp->w_ਸਤਰਾਂ[idx].wl_valid = TRUE;
 
-	    int is_curline = wp == curwin && lnum == wp->w_cursor.lnum;
+	    ਪੂਰਨ is_curline = wp == curwin && lnum == wp->w_cursor.lnum;
 
 	    // Past end of the window or end of the screen. Note that after
 	    // resizing wp->w_height may be end up too big. That's a problem
 	    // elsewhere, but prevent a crash here.
-	    if (row > wp->w_height || row + wp->w_winrow >= Rows)
+	    ਜੇ (ਪੰਕਤੀ > wp->w_ਉਚਾਈ || ਪੰਕਤੀ + wp->w_winrow >= ਪੰਕਤੀਆਂ)
 	    {
 		// we may need the size of that too long line later on
-		if (dollar_vcol == -1 || !is_curline)
-		    wp->w_lines[idx].wl_size = plines_win(wp, lnum, TRUE);
+		ਜੇ (dollar_vcol == -1 || !is_curline)
+		    wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ = plines_win(wp, lnum, TRUE);
 		++idx;
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (dollar_vcol == -1 || !is_curline)
-		wp->w_lines[idx].wl_size = row - srow;
+	    ਜੇ (dollar_vcol == -1 || !is_curline)
+		wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ = ਪੰਕਤੀ - srow;
 	    ++idx;
-#ifdef FEAT_FOLDING
-	    lnum += fold_count + 1;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	    lnum += fold_ਗਿਣਤੀ + 1;
+#ਨਹੀਂਤਾਂ
 	    ++lnum;
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // If:
 	    // - 'number' is set and below inserted/deleted lines, or
 	    // - 'relativenumber' is set and cursor moved vertically,
 	    // the text doesn't need to be redrawn, but the number column does.
-	    if ((wp->w_p_nu && mod_top != 0 && lnum >= mod_bot
-			&& buf->b_mod_set && buf->b_mod_xlines != 0)
+	    ਜੇ ((wp->w_p_nu && mod_ਸਿਖਰ != 0 && lnum >= mod_bot
+			&& buf->b_mod_ਸੈੱਟ && buf->b_mod_xlines != 0)
 		    || (wp->w_p_rnu
-			&& wp->w_last_cursor_lnum_rnu != wp->w_cursor.lnum))
+			&& wp->w_ਆਖਰੀ_cursor_lnum_rnu != wp->w_cursor.lnum))
 	    {
-#ifdef FEAT_FOLDING
-		fold_count = foldedCount(wp, lnum, &win_foldinfo);
-		if (fold_count != 0)
-		    fold_line(wp, fold_count, &win_foldinfo, lnum, row);
-		else
-#endif
-		    (void)win_line(wp, lnum, srow, wp->w_height,
-					       wp->w_lines[idx].wl_size, &spv);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+		fold_ਗਿਣਤੀ = folded_ਗਿਣਤੀ(wp, lnum, &win_foldinfo);
+		ਜੇ (fold_ਗਿਣਤੀ != 0)
+		    fold_ਸਤਰ(wp, fold_ਗਿਣਤੀ, &win_foldinfo, lnum, ਪੰਕਤੀ);
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		    (ਖਾਲੀ)win_ਸਤਰ(wp, lnum, srow, wp->w_ਉਚਾਈ,
+					       wp->w_ਸਤਰਾਂ[idx].wl_ਮਾਪ, &spv);
 	    }
 
 	    // This line does not need to be drawn, advance to the next one.
-	    row += wp->w_lines[idx++].wl_size;
-	    if (row > wp->w_height)	// past end of screen
-		break;
-#ifdef FEAT_FOLDING
-	    lnum = wp->w_lines[idx - 1].wl_lastlnum + 1;
-#else
+	    ਪੰਕਤੀ += wp->w_ਸਤਰਾਂ[idx++].wl_ਮਾਪ;
+	    ਜੇ (ਪੰਕਤੀ > wp->w_ਉਚਾਈ)	// past end of screen
+		ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	    lnum = wp->w_ਸਤਰਾਂ[idx - 1].wl_lastlnum + 1;
+#ਨਹੀਂਤਾਂ
 	    ++lnum;
-#endif
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 	    did_update = DID_NONE;
-#endif
-#ifdef FEAT_SPELL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 	    spv.spv_capcol_lnum = 0;
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
-	if (lnum > buf->b_ml.ml_line_count)
+	ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	{
 	    eof = TRUE;
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// Safety check: if any of the wl_size values is wrong we might go over
 	// the end of w_lines[].
-	if (idx >= Rows)
-	    break;
+	ਜੇ (idx >= ਪੰਕਤੀਆਂ)
+	    ਰੋਕੋ;
     }
 
     // End of loop over all window lines.
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // Now that the window has been redrawn with the old and new cursor line,
     // update w_last_cursorline.
-    wp->w_last_cursorline = wp->w_p_cul ? wp->w_cursor.lnum : 0;
-#endif
-    wp->w_last_cursor_lnum_rnu = wp->w_p_rnu ? wp->w_cursor.lnum : 0;
+    wp->w_ਆਖਰੀ_cursorline = wp->w_p_cul ? wp->w_cursor.lnum : 0;
+#ਜੇ_ਅੰਤ
+    wp->w_ਆਖਰੀ_cursor_lnum_rnu = wp->w_p_rnu ? wp->w_cursor.lnum : 0;
 
-#ifdef FEAT_VTP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VTP
     // Rewrite the character at the end of the screen line.
     // See the version that was fixed.
-    if (use_vtp() && get_conpty_fix_type() < 1)
+    ਜੇ (use_vtp() && get_conpty_fix_type() < 1)
     {
-	int k;
+	ਪੂਰਨ k;
 
-	for (k = 0; k < Rows; ++k)
-	    if (enc_utf8)
-		if ((*mb_off2cells)(LineOffset[k] + topframe->fr_width - 2,
-					   LineOffset[k] + screen_Columns) > 1)
-		    screen_draw_rectangle(k, topframe->fr_width - 2, 1, 2,
+	ਲਈ (k = 0; k < ਪੰਕਤੀਆਂ; ++k)
+	    ਜੇ (enc_utf8)
+		ਜੇ ((*mb_off2cells)(ਸਤਰ_ਵਿੱਥ[k] + topframe->fr_ਚੌੜਾਈ - 2,
+					   ਸਤਰ_ਵਿੱਥ[k] + screen_Columns) > 1)
+		    screen_draw_rectangle(k, topframe->fr_ਚੌੜਾਈ - 2, 1, 2,
 			    FALSE, FALSE);
-		else
-		    screen_draw_rectangle(k, topframe->fr_width - 1, 1, 1,
+		ਨਹੀਂਤਾਂ
+		    screen_draw_rectangle(k, topframe->fr_ਚੌੜਾਈ - 1, 1, 1,
 			    FALSE, FALSE);
-	    else
-		screen_char(LineOffset[k] + topframe->fr_width - 1, k,
-			cmdline_width - 1);
+	    ਨਹੀਂਤਾਂ
+		screen_char(ਸਤਰ_ਵਿੱਥ[k] + topframe->fr_ਚੌੜਾਈ - 1, k,
+			cmdline_ਚੌੜਾਈ - 1);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (idx > wp->w_lines_valid)
-	wp->w_lines_valid = idx;
+    ਜੇ (idx > wp->w_ਸਤਰਾਂ_valid)
+	wp->w_ਸਤਰਾਂ_valid = idx;
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // Let the syntax stuff know we stop parsing here.
-    if (syntax_last_parsed != 0 && syntax_present(wp))
-	syntax_end_parsing(wp, syntax_last_parsed + 1);
-#endif
+    ਜੇ (syntax_ਆਖਰੀ_parsed != 0 && syntax_present(wp))
+	syntax_ਸਿਰਾ_parsing(wp, syntax_ਆਖਰੀ_parsed + 1);
+#ਜੇ_ਅੰਤ
 
     // If we didn't hit the end of the file, and we didn't finish the last
     // line we were working on, then the line didn't fit.
-    wp->w_empty_rows = 0;
-#ifdef FEAT_DIFF
-    wp->w_filler_rows = 0;
-#endif
-    if (!eof && !didline)
+    wp->w_ਖਾਲੀ_ਥਾਵਾਂ_ਪੰਕਤੀਆਂ = 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+    wp->w_filler_ਪੰਕਤੀਆਂ = 0;
+#ਜੇ_ਅੰਤ
+    ਜੇ (!eof && !didline)
     {
-	if (lnum == wp->w_topline)
+	ਜੇ (lnum == wp->w_topline)
 	{
 	    // Single line that does not fit!
 	    // Don't overwrite it, it can be edited.
 	    wp->w_botline = lnum + 1;
 	}
-#ifdef FEAT_DIFF
-	else if (diff_check_fill(wp, lnum) >= wp->w_height - srow)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+	ਨਹੀਂਤਾਂ ਜੇ (diff_check_fill(wp, lnum) >= wp->w_ਉਚਾਈ - srow)
 	{
 	    // Window ends in filler lines.
 	    wp->w_botline = lnum;
-	    wp->w_filler_rows = wp->w_height - srow;
+	    wp->w_filler_ਪੰਕਤੀਆਂ = wp->w_ਉਚਾਈ - srow;
 	}
-#endif
-#ifdef FEAT_PROP_POPUP
-	else if (WIN_IS_POPUP(wp))
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	ਨਹੀਂਤਾਂ ਜੇ (WIN_IS_POPUP(wp))
 	{
 	    // popup line that doesn't fit is left as-is
 	    wp->w_botline = lnum;
 	}
-#endif
-	else if (dy_flags & DY_TRUNCATE)	// 'display' has "truncate"
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ ਜੇ (dy_flags & DY_TRUNCATE)	// 'display' has "truncate"
 	{
-	    int		scr_row = W_WINROW(wp) + wp->w_height - 1;
-	    int		symbol  = wp->w_fill_chars.lastline;
-	    int		charlen;
+	    ਪੂਰਨ		scr_ਪੰਕਤੀ = W_WINROW(wp) + wp->w_ਉਚਾਈ - 1;
+	    ਪੂਰਨ		ਚਿੰਨ੍ਹ  = wp->w_fill_chars.lastline;
+	    ਪੂਰਨ		charlen;
 	    char_u	fillbuf[12];  // 2 characters of 6 bytes
 
-	    charlen = mb_char2bytes(symbol, &fillbuf[0]);
-	    mb_char2bytes(symbol, &fillbuf[charlen]);
+	    charlen = mb_char2bytes(ਚਿੰਨ੍ਹ, &fillbuf[0]);
+	    mb_char2bytes(ਚਿੰਨ੍ਹ, &fillbuf[charlen]);
 
 	    // Last line isn't finished: Display "@@@" in the last screen line.
 	    screen_puts_len(fillbuf,
-			    (wp->w_width > 2 ? 2 : wp->w_width) * charlen,
-			    scr_row, wp->w_wincol, HL_ATTR(HLF_AT));
-	    screen_fill(scr_row, scr_row + 1,
-		    (int)wp->w_wincol + 2, (int)W_ENDCOL(wp),
-		    symbol, ' ', HL_ATTR(HLF_AT));
-	    set_empty_rows(wp, srow);
+			    (wp->w_ਚੌੜਾਈ > 2 ? 2 : wp->w_ਚੌੜਾਈ) * charlen,
+			    scr_ਪੰਕਤੀ, wp->w_wincol, HL_ATTR(HLF_AT));
+	    screen_fill(scr_ਪੰਕਤੀ, scr_ਪੰਕਤੀ + 1,
+		    (ਪੂਰਨ)wp->w_wincol + 2, (ਪੂਰਨ)W_ENDCOL(wp),
+		    ਚਿੰਨ੍ਹ, ' ', HL_ATTR(HLF_AT));
+	    ਸੈੱਟ_ਖਾਲੀ_ਥਾਵਾਂ_ਪੰਕਤੀਆਂ(wp, srow);
 	    wp->w_botline = lnum;
 	}
-	else if (dy_flags & DY_LASTLINE)	// 'display' has "lastline"
+	ਨਹੀਂਤਾਂ ਜੇ (dy_flags & DY_LASTLINE)	// 'display' has "lastline"
 	{
-	    int start_col = (int)W_ENDCOL(wp) - 3;
-	    int symbol    = wp->w_fill_chars.lastline;
+	    ਪੂਰਨ ਸ਼ੁਰੂ_ਖਾਨਾ = (ਪੂਰਨ)W_ENDCOL(wp) - 3;
+	    ਪੂਰਨ ਚਿੰਨ੍ਹ    = wp->w_fill_chars.lastline;
 
 	    // Last line isn't finished: Display "@@@" at the end.
-	    screen_fill(W_WINROW(wp) + wp->w_height - 1,
-		    W_WINROW(wp) + wp->w_height,
-		    (start_col < wp->w_wincol ? wp->w_wincol : start_col),
-		    (int)W_ENDCOL(wp),
-		    symbol, symbol, HL_ATTR(HLF_AT));
-	    set_empty_rows(wp, srow);
+	    screen_fill(W_WINROW(wp) + wp->w_ਉਚਾਈ - 1,
+		    W_WINROW(wp) + wp->w_ਉਚਾਈ,
+		    (ਸ਼ੁਰੂ_ਖਾਨਾ < wp->w_wincol ? wp->w_wincol : ਸ਼ੁਰੂ_ਖਾਨਾ),
+		    (ਪੂਰਨ)W_ENDCOL(wp),
+		    ਚਿੰਨ੍ਹ, ਚਿੰਨ੍ਹ, HL_ATTR(HLF_AT));
+	    ਸੈੱਟ_ਖਾਲੀ_ਥਾਵਾਂ_ਪੰਕਤੀਆਂ(wp, srow);
 	    wp->w_botline = lnum;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    win_draw_end(wp, wp->w_fill_chars.lastline, ' ', TRUE,
-						   srow, wp->w_height, HLF_AT);
+	    win_draw_ਸਿਰਾ(wp, wp->w_fill_chars.lastline, ' ', TRUE,
+						   srow, wp->w_ਉਚਾਈ, HLF_AT);
 	    wp->w_botline = lnum;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	draw_vsep_win(wp, row);
-	if (eof)		// we hit the end of the file
+	draw_vsep_win(wp, ਪੰਕਤੀ);
+	ਜੇ (eof)		// we hit the end of the file
 	{
-	    wp->w_botline = buf->b_ml.ml_line_count + 1;
-#ifdef FEAT_DIFF
+	    wp->w_botline = buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	    j = diff_check_fill(wp, wp->w_botline);
-	    if (j > 0 && !wp->w_botfill)
+	    ਜੇ (j > 0 && !wp->w_botfill)
 	    {
 		// Display filler lines at the end of the file.
-		if (char2cells(wp->w_fill_chars.diff) > 1)
+		ਜੇ (char2cells(wp->w_fill_chars.diff) > 1)
 		    i = '-';
-		else
+		ਨਹੀਂਤਾਂ
 		    i = wp->w_fill_chars.diff;
-		if (row + j > wp->w_height)
-		    j = wp->w_height - row;
-		win_draw_end(wp, i, i, TRUE, row, row + (int)j, HLF_DED);
-		row += j;
+		ਜੇ (ਪੰਕਤੀ + j > wp->w_ਉਚਾਈ)
+		    j = wp->w_ਉਚਾਈ - ਪੰਕਤੀ;
+		win_draw_ਸਿਰਾ(wp, i, i, TRUE, ਪੰਕਤੀ, ਪੰਕਤੀ + (ਪੂਰਨ)j, HLF_DED);
+		ਪੰਕਤੀ += j;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else if (dollar_vcol == -1 || wp != curwin)
+	ਨਹੀਂਤਾਂ ਜੇ (dollar_vcol == -1 || wp != curwin)
 	    wp->w_botline = lnum;
 
 	// Make sure the rest of the screen is blank.
 	// write the "eob" character from 'fillchars' to rows that aren't part
 	// of the file.
-	if (WIN_IS_POPUP(wp))
-	    win_draw_end(wp, ' ', ' ', FALSE, row, wp->w_height, HLF_AT);
-	else
-	    win_draw_end(wp, wp->w_fill_chars.eob, ' ', FALSE,
-						   row, wp->w_height, HLF_EOB);
+	ਜੇ (WIN_IS_POPUP(wp))
+	    win_draw_ਸਿਰਾ(wp, ' ', ' ', FALSE, ਪੰਕਤੀ, wp->w_ਉਚਾਈ, HLF_AT);
+	ਨਹੀਂਤਾਂ
+	    win_draw_ਸਿਰਾ(wp, wp->w_fill_chars.eob, ' ', FALSE,
+						   ਪੰਕਤੀ, wp->w_ਉਚਾਈ, HLF_EOB);
     }
 
-#ifdef SYN_TIME_LIMIT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ SYN_ਸਮਾਂ_ਹੱਦਬੰਦੀ
     disable_regexp_timeout();
-    redrawtime_limit_set = FALSE;
-#endif
+    redrawtime_ਹੱਦਬੰਦੀ_ਸੈੱਟ = FALSE;
+#ਜੇ_ਅੰਤ
 
     // Reset the type of redrawing required, the window has been updated.
     wp->w_redr_type = 0;
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     wp->w_old_topfill = wp->w_topfill;
     wp->w_old_botfill = wp->w_botfill;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (dollar_vcol == -1 || wp != curwin)
+    ਜੇ (dollar_vcol == -1 || wp != curwin)
     {
 	// There is a trick with w_botline.  If we invalidate it on each
 	// change that might modify it, this will cause a lot of expensive
@@ -2933,19 +2933,19 @@ win_update(win_T *wp)
 	// doesn't look too bad.  Only do this for the current window (where
 	// changes are relevant).
 	wp->w_valid |= VALID_BOTLINE;
-	if (wp == curwin && wp->w_botline != old_botline && !recursive)
+	ਜੇ (wp == curwin && wp->w_botline != old_botline && !recursive)
 	{
 	    win_T	*wwp;
-#if defined(FEAT_CONCEAL)
+#ਜੇ defined(FEAT_CONCEAL)
 	    linenr_T	old_topline = wp->w_topline;
-	    int		new_wcol = wp->w_wcol;
-#endif
+	    ਪੂਰਨ		new_wcol = wp->w_wcol;
+#ਜੇ_ਅੰਤ
 	    recursive = TRUE;
 	    curwin->w_valid &= ~VALID_TOPLINE;
 	    update_topline();	// may invalidate w_botline again
 
-#if defined(FEAT_CONCEAL)
-	    if (old_wcol != new_wcol && (wp->w_valid & (VALID_WCOL|VALID_WROW))
+#ਜੇ defined(FEAT_CONCEAL)
+	    ਜੇ (old_wcol != new_wcol && (wp->w_valid & (VALID_WCOL|VALID_WROW))
 						    != (VALID_WCOL|VALID_WROW))
 	    {
 		// A win_line() call applied a fix to screen cursor column to
@@ -2957,81 +2957,81 @@ win_update(win_T *wp)
 		// cursor validation now and reapply the fix again (or call
 		// win_line() to do it for us).
 		validate_cursor();
-		if (wp->w_wcol == old_wcol && wp->w_wrow == old_wrow
+		ਜੇ (wp->w_wcol == old_wcol && wp->w_wrow == old_wrow
 					       && old_topline == wp->w_topline)
 		    wp->w_wcol = new_wcol;
-		else
+		ਨਹੀਂਤਾਂ
 		    redrawWinline(wp, wp->w_cursor.lnum);
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	    // New redraw either due to updated topline, wcol fix or reset skipcol.
-	    if (wp->w_redr_type != 0)
+	    ਜੇ (wp->w_redr_type != 0)
 	    {
 		// Don't update for changes in buffer again.
-		bool b = curbuf->b_mod_set;
-		curbuf->b_mod_set = false;
+		bool b = curbuf->b_mod_ਸੈੱਟ;
+		curbuf->b_mod_ਸੈੱਟ = false;
 		j = curbuf->b_mod_xlines;
 		curbuf->b_mod_xlines = 0;
 		curs_columns(TRUE);
 		win_update(curwin);
-		curbuf->b_mod_set = b;
+		curbuf->b_mod_ਸੈੱਟ = b;
 		curbuf->b_mod_xlines = j;
 	    }
 	    // Other windows might have w_redr_type raised in update_topline().
 	    must_redraw = 0;
 	    FOR_ALL_WINDOWS(wwp)
-		if (wwp->w_redr_type > must_redraw)
+		ਜੇ (wwp->w_redr_type > must_redraw)
 		    must_redraw = wwp->w_redr_type;
 	    recursive = FALSE;
 	}
     }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA)
+#ਜੇ defined(FEAT_SYN_HL) || defined(FEAT_ਖੋਜ_EXTRA)
     // restore got_int, unless CTRL-C was hit while redrawing
-    if (!got_int)
+    ਜੇ (!got_int)
 	got_int = save_got_int;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (override_success)
-	pop_highlight_overrides();
+    ਜੇ (override_success)
+	ਕੱਢੋ_highlight_overrides();
 }
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_GUI)
+#ਜੇ defined(FEAT_NETBEANS_INTG) || defined(FEAT_GUI)
 /*
  * Prepare for updating one or more windows.
  * Caller must check for "updating_screen" already set to avoid recursiveness.
  */
-    static void
-update_prepare(void)
+    ਸਥਿਰ ਖਾਲੀ
+update_prepare(ਖਾਲੀ)
 {
     cursor_off();
     updating_screen = TRUE;
 # ifdef FEAT_GUI
     // Remove the cursor before starting to do anything, because scrolling may
     // make it difficult to redraw the text under it.
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 	gui_undraw_cursor();
 # endif
-# ifdef FEAT_SEARCH_EXTRA
-    start_search_hl();
+# ifdef FEAT_ਖੋਜ_EXTRA
+    ਸ਼ੁਰੂ_ਖੋਜ_hl();
 # endif
 # ifdef FEAT_PROP_POPUP
     // Update popup_mask if needed.
-    may_update_popup_mask(must_redraw);
+    may_update_popup_ਨਕਾਬ(must_redraw);
 # endif
 }
 
 /*
  * Finish updating one or more windows.
  */
-    static void
-update_finish(void)
+    ਸਥਿਰ ਖਾਲੀ
+update_ਅੰਤ(ਖਾਲੀ)
 {
-    if (redraw_cmdline || redraw_mode)
+    ਜੇ (redraw_cmdline || redraw_ਬਹੁਲਕ)
 	showmode();
 
-# ifdef FEAT_SEARCH_EXTRA
-    end_search_hl();
+# ifdef FEAT_ਖੋਜ_EXTRA
+    ਸਿਰਾ_ਖੋਜ_hl();
 # endif
 
     after_updating_screen(TRUE);
@@ -3039,222 +3039,222 @@ update_finish(void)
 # ifdef FEAT_GUI
     // Redraw the cursor and update the scrollbars when all screen updating is
     // done.
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
-	out_flush_cursor(FALSE, FALSE);
+	ਬਾਹਰਲਾ_flush_cursor(FALSE, FALSE);
 	gui_update_scrollbars(FALSE);
     }
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_NETBEANS_INTG)
-    void
+#ਜੇ defined(FEAT_NETBEANS_INTG)
+    ਖਾਲੀ
 update_debug_sign(buf_T *buf, linenr_T lnum)
 {
     win_T	*wp;
-    int		doit = FALSE;
+    ਪੂਰਨ		doit = FALSE;
 
 # ifdef FEAT_FOLDING
     win_foldinfo.fi_level = 0;
 # endif
 
     // update/delete a specific sign
-    redraw_buf_line_later(buf, lnum);
+    redraw_buf_ਸਤਰ_later(buf, lnum);
 
     // check if it resulted in the need to redraw a window
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_redr_type != 0)
+	ਜੇ (wp->w_redr_type != 0)
 	    doit = TRUE;
 
     // Return when there is nothing to do, screen updating is already
     // happening (recursive call), messages on the screen or still starting up.
-    if (!doit || updating_screen
-	    || State == MODE_ASKMORE || State == MODE_HITRETURN
-	    || msg_scrolled
+    ਜੇ (!doit || updating_screen
+	    || State == ਬਹੁਲਕ_ASKMORE || State == ਬਹੁਲਕ_HITRETURN
+	    || ਸੁਨੇਹਾ_scrolled
 # ifdef FEAT_GUI
 	    || gui.starting
 # endif
 	    || starting)
-	return;
+	ਵਾਪਸ;
 
     // update all windows that need updating
     update_prepare();
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_redr_type != 0)
+	ਜੇ (wp->w_redr_type != 0)
 	    win_update(wp);
-	if (wp->w_redr_status)
-	    win_redr_status(wp, FALSE);
+	ਜੇ (wp->w_redr_ਸਥਿਤੀ)
+	    win_redr_ਸਥਿਤੀ(wp, FALSE);
     }
 
-# if defined(FEAT_TABPANEL)
-    if (redraw_tabpanel)
+# ਜੇ defined(FEAT_TABPANEL)
+    ਜੇ (redraw_tabpanel)
 	draw_tabpanel();
 # endif
 
-    update_finish();
+    update_ਅੰਤ();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * Update a single window, its status line and maybe the command line msg.
  * Used for the GUI scrollbar.
  */
-    void
-updateWindow(win_T *wp)
+    ਖਾਲੀ
+update_ਖਿੜਕੀ(win_T *wp)
 {
     // return if already busy updating
-    if (updating_screen)
-	return;
+    ਜੇ (updating_screen)
+	ਵਾਪਸ;
 
     update_prepare();
 
 # ifdef FEAT_CLIPBOARD
     // When Visual area changed, may have to update selection.
-    if (clip_star.available && clip_isautosel_star())
-	clip_update_selection(&clip_star);
-    if (clip_plus.available && clip_isautosel_plus())
+    ਜੇ (clip_ਤਾਰਾ.ਉਪਲਬਧ && clip_isautosel_ਤਾਰਾ())
+	clip_update_selection(&clip_ਤਾਰਾ);
+    ਜੇ (clip_plus.ਉਪਲਬਧ && clip_isautosel_plus())
 	clip_update_selection(&clip_plus);
 # endif
 
     win_update(wp);
 
     // When the screen was cleared redraw the tab pages line.
-    if (redraw_tabline)
+    ਜੇ (redraw_tabline)
 	draw_tabline();
 
-# if defined(FEAT_TABPANEL)
-    if (redraw_tabpanel)
+# ਜੇ defined(FEAT_TABPANEL)
+    ਜੇ (redraw_tabpanel)
 	draw_tabpanel();
 # endif
 
-    if (wp->w_redr_status || p_ru
+    ਜੇ (wp->w_redr_ਸਥਿਤੀ || p_ru
 # ifdef FEAT_STL_OPT
 	    || *p_stl != NUL || *wp->w_p_stl != NUL
 # endif
 	    )
-	win_redr_status(wp, FALSE);
+	win_redr_ਸਥਿਤੀ(wp, FALSE);
 
 # ifdef FEAT_PROP_POPUP
     // Display popup windows on top of everything.
     update_popups(win_update);
 # endif
 
-    update_finish();
+    update_ਅੰਤ();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Redraw as soon as possible.  When the command line is not scrolled redraw
  * right away and restore what was on the command line.
  * Return a code indicating what happened.
  */
-    int
-redraw_asap(int type)
+    ਪੂਰਨ
+redraw_asap(ਪੂਰਨ type)
 {
-    int		rows;
-    int		cols = screen_Columns;
-    int		r;
-    int		ret = 0;
+    ਪੂਰਨ		ਪੰਕਤੀਆਂ_2;
+    ਪੂਰਨ		ਖਾਨੇ_ਗਿਣਤੀ = screen_Columns;
+    ਪੂਰਨ		r;
+    ਪੂਰਨ		ret = 0;
     schar_T	*screenline;	// copy from ScreenLines[]
     sattr_T	*screenattr;	// copy from ScreenAttrs[]
-    int		i;
-    u8char_T	*screenlineUC = NULL;	// copy from ScreenLinesUC[]
+    ਪੂਰਨ		i;
+    u8char_T	*screenlineUC = ਨਿਰਾ;	// copy from ScreenLinesUC[]
     u8char_T	*screenlineC[MAX_MCO];	// copy from ScreenLinesC[][]
-    schar_T	*screenline2 = NULL;	// copy from ScreenLines2[]
+    schar_T	*screenline2 = ਨਿਰਾ;	// copy from ScreenLines2[]
 
     redraw_later(type);
-    if (msg_scrolled
-	    || (State != MODE_NORMAL && State != MODE_NORMAL_BUSY)
+    ਜੇ (ਸੁਨੇਹਾ_scrolled
+	    || (State != ਬਹੁਲਕ_ਸਾਧਾਰਨ && State != ਬਹੁਲਕ_ਸਾਧਾਰਨ_BUSY)
 	    || exiting)
-	return ret;
+	ਵਾਪਸ ret;
 
     // Allocate space to save the text displayed in the command line area.
-    rows = screen_Rows - cmdline_row;
-    screenline = LALLOC_MULT(schar_T, rows * cols);
-    screenattr = LALLOC_MULT(sattr_T, rows * cols);
-    if (screenline == NULL || screenattr == NULL)
+    ਪੰਕਤੀਆਂ_2 = screen_ਪੰਕਤੀਆਂ - cmdline_ਪੰਕਤੀ;
+    screenline = LALLOC_MULT(schar_T, ਪੰਕਤੀਆਂ_2 * ਖਾਨੇ_ਗਿਣਤੀ);
+    screenattr = LALLOC_MULT(sattr_T, ਪੰਕਤੀਆਂ_2 * ਖਾਨੇ_ਗਿਣਤੀ);
+    ਜੇ (screenline == ਨਿਰਾ || screenattr == ਨਿਰਾ)
 	ret = 2;
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
     {
-	screenlineUC = LALLOC_MULT(u8char_T, rows * cols);
-	if (screenlineUC == NULL)
+	screenlineUC = LALLOC_MULT(u8char_T, ਪੰਕਤੀਆਂ_2 * ਖਾਨੇ_ਗਿਣਤੀ);
+	ਜੇ (screenlineUC == ਨਿਰਾ)
 	    ret = 2;
-	for (i = 0; i < p_mco; ++i)
+	ਲਈ (i = 0; i < p_mco; ++i)
 	{
-	    screenlineC[i] = LALLOC_MULT(u8char_T, rows * cols);
-	    if (screenlineC[i] == NULL)
+	    screenlineC[i] = LALLOC_MULT(u8char_T, ਪੰਕਤੀਆਂ_2 * ਖਾਨੇ_ਗਿਣਤੀ);
+	    ਜੇ (screenlineC[i] == ਨਿਰਾ)
 		ret = 2;
 	}
     }
-    if (enc_dbcs == DBCS_JPNU)
+    ਜੇ (enc_dbcs == DBCS_JPNU)
     {
-	screenline2 = LALLOC_MULT(schar_T, rows * cols);
-	if (screenline2 == NULL)
+	screenline2 = LALLOC_MULT(schar_T, ਪੰਕਤੀਆਂ_2 * ਖਾਨੇ_ਗਿਣਤੀ);
+	ਜੇ (screenline2 == ਨਿਰਾ)
 	    ret = 2;
     }
 
-    if (ret != 2)
+    ਜੇ (ret != 2)
     {
 	// Save the text displayed in the command line area.
-	for (r = 0; r < rows; ++r)
+	ਲਈ (r = 0; r < ਪੰਕਤੀਆਂ_2; ++r)
 	{
-	    mch_memmove(screenline + r * cols,
-			ScreenLines + LineOffset[cmdline_row + r],
-			(size_t)cols * sizeof(schar_T));
-	    mch_memmove(screenattr + r * cols,
-			ScreenAttrs + LineOffset[cmdline_row + r],
-			(size_t)cols * sizeof(sattr_T));
-	    if (enc_utf8)
+	    mch_memmove(screenline + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			Screen_ਸਤਰਾਂ + ਸਤਰ_ਵਿੱਥ[cmdline_ਪੰਕਤੀ + r],
+			(size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(schar_T));
+	    mch_memmove(screenattr + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			ScreenAttrs + ਸਤਰ_ਵਿੱਥ[cmdline_ਪੰਕਤੀ + r],
+			(size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(sattr_T));
+	    ਜੇ (enc_utf8)
 	    {
-		mch_memmove(screenlineUC + r * cols,
-			    ScreenLinesUC + LineOffset[cmdline_row + r],
-			    (size_t)cols * sizeof(u8char_T));
-		for (i = 0; i < p_mco; ++i)
-		    mch_memmove(screenlineC[i] + r * cols,
-				ScreenLinesC[i] + LineOffset[cmdline_row + r],
-				(size_t)cols * sizeof(u8char_T));
+		mch_memmove(screenlineUC + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			    Screen_ਸਤਰਾਂ_UC + ਸਤਰ_ਵਿੱਥ[cmdline_ਪੰਕਤੀ + r],
+			    (size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(u8char_T));
+		ਲਈ (i = 0; i < p_mco; ++i)
+		    mch_memmove(screenlineC[i] + r * ਖਾਨੇ_ਗਿਣਤੀ,
+				Screen_ਸਤਰਾਂ_C[i] + ਸਤਰ_ਵਿੱਥ[cmdline_ਪੰਕਤੀ + r],
+				(size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(u8char_T));
 	    }
-	    if (enc_dbcs == DBCS_JPNU)
-		mch_memmove(screenline2 + r * cols,
-			    ScreenLines2 + LineOffset[cmdline_row + r],
-			    (size_t)cols * sizeof(schar_T));
+	    ਜੇ (enc_dbcs == DBCS_JPNU)
+		mch_memmove(screenline2 + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			    ScreenLines2 + ਸਤਰ_ਵਿੱਥ[cmdline_ਪੰਕਤੀ + r],
+			    (size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(schar_T));
 	}
 
 	update_screen(0);
 	ret = 3;
 
-	if (must_redraw == 0)
+	ਜੇ (must_redraw == 0)
 	{
-	    int	off = (int)(current_ScreenLine - ScreenLines);
+	    ਪੂਰਨ	off = (ਪੂਰਨ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
 
 	    // Restore the text displayed in the command line area.
-	    for (r = 0; r < rows; ++r)
+	    ਲਈ (r = 0; r < ਪੰਕਤੀਆਂ_2; ++r)
 	    {
-		mch_memmove(current_ScreenLine,
-			    screenline + r * cols,
-			    (size_t)cols * sizeof(schar_T));
+		mch_memmove(current_Screen_ਸਤਰ,
+			    screenline + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			    (size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(schar_T));
 		mch_memmove(ScreenAttrs + off,
-			    screenattr + r * cols,
-			    (size_t)cols * sizeof(sattr_T));
-		if (enc_utf8)
+			    screenattr + r * ਖਾਨੇ_ਗਿਣਤੀ,
+			    (size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(sattr_T));
+		ਜੇ (enc_utf8)
 		{
-		    mch_memmove(ScreenLinesUC + off,
-				screenlineUC + r * cols,
-				(size_t)cols * sizeof(u8char_T));
-		    for (i = 0; i < p_mco; ++i)
-			mch_memmove(ScreenLinesC[i] + off,
-				    screenlineC[i] + r * cols,
-				    (size_t)cols * sizeof(u8char_T));
+		    mch_memmove(Screen_ਸਤਰਾਂ_UC + off,
+				screenlineUC + r * ਖਾਨੇ_ਗਿਣਤੀ,
+				(size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(u8char_T));
+		    ਲਈ (i = 0; i < p_mco; ++i)
+			mch_memmove(Screen_ਸਤਰਾਂ_C[i] + off,
+				    screenlineC[i] + r * ਖਾਨੇ_ਗਿਣਤੀ,
+				    (size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(u8char_T));
 		}
-		if (enc_dbcs == DBCS_JPNU)
+		ਜੇ (enc_dbcs == DBCS_JPNU)
 		    mch_memmove(ScreenLines2 + off,
-				screenline2 + r * cols,
-				(size_t)cols * sizeof(schar_T));
-		screen_line(curwin, cmdline_row + r, 0, cols, cols, -1, 0);
+				screenline2 + r * ਖਾਨੇ_ਗਿਣਤੀ,
+				(size_t)ਖਾਨੇ_ਗਿਣਤੀ * ਆਕਾਰ(schar_T));
+		screen_ਸਤਰ(curwin, cmdline_ਪੰਕਤੀ + r, 0, ਖਾਨੇ_ਗਿਣਤੀ, ਖਾਨੇ_ਗਿਣਤੀ, -1, 0);
 	    }
 	    ret = 4;
 	}
@@ -3262,21 +3262,21 @@ redraw_asap(int type)
 
     vim_free(screenline);
     vim_free(screenattr);
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
     {
 	vim_free(screenlineUC);
-	for (i = 0; i < p_mco; ++i)
+	ਲਈ (i = 0; i < p_mco; ++i)
 	    vim_free(screenlineC[i]);
     }
-    if (enc_dbcs == DBCS_JPNU)
+    ਜੇ (enc_dbcs == DBCS_JPNU)
 	vim_free(screenline2);
 
     // Show the intro message when appropriate.
-    maybe_intro_message();
+    maybe_intro_ਸੁਨੇਹਾ();
 
     setcursor();
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -3287,31 +3287,31 @@ redraw_asap(int type)
  * command line.
  * If "redraw_message" is TRUE.
  */
-    void
-redraw_after_callback(int call_update_screen, int do_message)
+    ਖਾਲੀ
+redraw_after_callback(ਪੂਰਨ call_update_screen, ਪੂਰਨ do_ਸੁਨੇਹਾ_2)
 {
     ++redrawing_for_callback;
 
-    term_set_sync_output(TERM_SYNC_OUTPUT_ENABLE);
+    ਪਦ_ਸੈੱਟ_sync_output(ਪਦ_SYNC_OUTPUT_ENABLE);
 
-    if (State == MODE_HITRETURN || State == MODE_ASKMORE
-	    || State == MODE_SETWSIZE || State == MODE_EXTERNCMD
-	    || State == MODE_CONFIRM || exmode_active)
+    ਜੇ (State == ਬਹੁਲਕ_HITRETURN || State == ਬਹੁਲਕ_ASKMORE
+	    || State == ਬਹੁਲਕ_SETWSIZE || State == ਬਹੁਲਕ_EXTERNCMD
+	    || State == ਬਹੁਲਕ_CONFIRM || exmode_ਸਰਗਰਮ)
     {
-	if (do_message)
-	    repeat_message();
+	ਜੇ (do_ਸੁਨੇਹਾ_2)
+	    repeat_ਸੁਨੇਹਾ();
     }
-    else if (State & MODE_CMDLINE)
+    ਨਹੀਂਤਾਂ ਜੇ (State & ਬਹੁਲਕ_CMDLINE)
     {
-	if (pum_visible())
+	ਜੇ (pum_visible())
 	    cmdline_pum_display();
 
 	// Don't redraw when in prompt_for_number().
-	if (cmdline_row > 0)
+	ਜੇ (cmdline_ਪੰਕਤੀ > 0)
 	{
 	    // Redrawing only works when the screen didn't scroll. Don't clear
 	    // wildmenu entries.
-	    if (msg_scrolled == 0
+	    ਜੇ (ਸੁਨੇਹਾ_scrolled == 0
 		    && wild_menu_showing == 0
 		    && call_update_screen)
 		update_screen(0);
@@ -3321,7 +3321,7 @@ redraw_after_callback(int call_update_screen, int do_message)
 	    redrawcmdline_ex(FALSE);
 	}
     }
-    else if (State & (MODE_NORMAL | MODE_INSERT | MODE_TERMINAL))
+    ਨਹੀਂਤਾਂ ਜੇ (State & (ਬਹੁਲਕ_ਸਾਧਾਰਨ | ਬਹੁਲਕ_ਪਾਓ | ਬਹੁਲਕ_TERMINAL))
     {
 	update_topline();
 	validate_cursor();
@@ -3330,23 +3330,23 @@ redraw_after_callback(int call_update_screen, int do_message)
 	update_screen(UPD_VALID_NO_UPDATE);
 	setcursor();
 
-	if (msg_scrolled == 0)
+	ਜੇ (ਸੁਨੇਹਾ_scrolled == 0)
 	{
 	    // don't want a hit-enter prompt when something else is displayed
-	    msg_didany = FALSE;
+	    ਸੁਨੇਹਾ_didany = FALSE;
 	    need_wait_return = FALSE;
 	}
     }
     cursor_on();
-    term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
-#ifdef FEAT_GUI
-    if (gui.in_use && !gui_mch_is_blink_off())
+    ਪਦ_ਸੈੱਟ_sync_output(ਪਦ_SYNC_OUTPUT_DISABLE);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (gui.ਵਿੱਚ_use && !gui_mch_is_blink_off())
 	// Don't update the cursor when it is blinking and off to avoid
 	// flicker.
-	out_flush_cursor(FALSE, FALSE);
-    else
-#endif
-	out_flush();
+	ਬਾਹਰਲਾ_flush_cursor(FALSE, FALSE);
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	ਬਾਹਰਲਾ_flush();
 
     --redrawing_for_callback;
 }
@@ -3356,30 +3356,30 @@ redraw_after_callback(int call_update_screen, int do_message)
  * Set must_redraw only if not already set to a higher value.
  * E.g. if must_redraw is UPD_CLEAR, type UPD_NOT_VALID will do nothing.
  */
-    void
-redraw_later(int type)
+    ਖਾਲੀ
+redraw_later(ਪੂਰਨ type)
 {
     redraw_win_later(curwin, type);
 }
 
-    void
+    ਖਾਲੀ
 redraw_win_later(
     win_T	*wp,
-    int		type)
+    ਪੂਰਨ		type)
 {
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     // If inside a redraw_listener_add() callback, then only set the redraw type
     // for the window and not request another one right after.
-    if (inside_redraw_on_start_cb && wp->w_redr_type < type)
+    ਜੇ (inside_redraw_on_ਸ਼ੁਰੂ_cb && wp->w_redr_type < type)
 	wp->w_redr_type = type;
-    else
-#endif
-    if (!exiting && !redraw_not_allowed && wp->w_redr_type < type)
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+    ਜੇ (!exiting && !redraw_not_allowed && wp->w_redr_type < type)
     {
 	wp->w_redr_type = type;
-	if (type >= UPD_NOT_VALID)
-	    wp->w_lines_valid = 0;
-	if (must_redraw < type)	// must_redraw is the maximum of all windows
+	ਜੇ (type >= UPD_NOT_VALID)
+	    wp->w_ਸਤਰਾਂ_valid = 0;
+	ਜੇ (must_redraw < type)	// must_redraw is the maximum of all windows
 	    must_redraw = type;
     }
 }
@@ -3388,8 +3388,8 @@ redraw_win_later(
  * Force a complete redraw later.  Also resets the highlighting.  To be used
  * after executing a shell command that messes up the screen.
  */
-    void
-redraw_later_clear(void)
+    ਖਾਲੀ
+redraw_later_clear(ਖਾਲੀ)
 {
     redraw_all_later(UPD_CLEAR);
     reset_screen_attr();
@@ -3398,42 +3398,42 @@ redraw_later_clear(void)
 /*
  * Mark all windows to be redrawn later.  Except popup windows.
  */
-    void
-redraw_all_later(int type)
+    ਖਾਲੀ
+redraw_all_later(ਪੂਰਨ type)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
 	redraw_win_later(wp, type);
     // This may be needed when switching tabs.
-    set_must_redraw(type);
+    ਸੈੱਟ_must_redraw(type);
 }
 
-#if 0  // not actually used yet, it probably should
+#ਜੇ 0  // not actually used yet, it probably should
 /*
  * Mark all windows, including popup windows, to be redrawn.
  */
-    void
-redraw_all_windows_later(int type)
+    ਖਾਲੀ
+redraw_all_windows_later(ਪੂਰਨ type)
 {
     redraw_all_later(type);
 # ifdef FEAT_PROP_POPUP
     popup_redraw_all();		// redraw all popup windows
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set "must_redraw" to "type" unless it already has a higher value
  * or it is currently not allowed.
  */
-    void
-set_must_redraw(int type)
+    ਖਾਲੀ
+ਸੈੱਟ_must_redraw(ਪੂਰਨ type)
 {
-    if (!redraw_not_allowed &&
-#ifdef FEAT_EVAL
-	    !inside_redraw_on_start_cb &&
-#endif
+    ਜੇ (!redraw_not_allowed &&
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	    !inside_redraw_on_ਸ਼ੁਰੂ_cb &&
+#ਜੇ_ਅੰਤ
 	    must_redraw < type)
 	must_redraw = type;
 }
@@ -3441,95 +3441,95 @@ set_must_redraw(int type)
 /*
  * Mark all windows that are editing the current buffer to be updated later.
  */
-    void
-redraw_curbuf_later(int type)
+    ਖਾਲੀ
+redraw_curbuf_later(ਪੂਰਨ type)
 {
     redraw_buf_later(curbuf, type);
 }
 
-    void
-redraw_buf_later(buf_T *buf, int type)
+    ਖਾਲੀ
+redraw_buf_later(buf_T *buf, ਪੂਰਨ type)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_buffer == buf)
+	ਜੇ (wp->w_ਬਫਰ == buf)
 	    redraw_win_later(wp, type);
     }
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
     // popup windows are not in the list of windows
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_buffer == buf)
+	ਜੇ (wp->w_ਬਫਰ == buf)
 	    redraw_win_later(wp, type);
-    FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_buffer == buf)
+    FOR_ALL_POPUPWINS_ਵਿੱਚ_TAB(curtab, wp)
+	ਜੇ (wp->w_ਬਫਰ == buf)
 	    redraw_win_later(wp, type);
-#endif
-#if defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
     // terminal in popup window is not in list of windows
-    if (curwin->w_buffer == buf)
+    ਜੇ (curwin->w_ਬਫਰ == buf)
 	redraw_win_later(curwin, type);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#if defined(FEAT_SIGNS)
-    void
-redraw_buf_line_later(buf_T *buf, linenr_T lnum)
+#ਜੇ defined(FEAT_SIGNS)
+    ਖਾਲੀ
+redraw_buf_ਸਤਰ_later(buf_T *buf, linenr_T lnum)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf && lnum >= wp->w_topline
+	ਜੇ (wp->w_ਬਫਰ == buf && lnum >= wp->w_topline
 						  && lnum < wp->w_botline)
 	    redrawWinline(wp, lnum);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-redraw_buf_and_status_later(buf_T *buf, int type)
+#ਜੇ defined(FEAT_ਕੰਮ_CHANNEL)
+    ਖਾਲੀ
+redraw_buf_and_ਸਥਿਤੀ_later(buf_T *buf, ਪੂਰਨ type)
 {
     win_T	*wp;
 
-    if (wild_menu_showing != 0)
+    ਜੇ (wild_menu_showing != 0)
 	// Don't redraw while the command line completion is displayed, it
 	// would disappear.
-	return;
+	ਵਾਪਸ;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_buffer == buf)
+	ਜੇ (wp->w_ਬਫਰ == buf)
 	{
 	    redraw_win_later(wp, type);
-	    wp->w_redr_status = true;
+	    wp->w_redr_ਸਥਿਤੀ = true;
 	}
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * mark the ruler for redraw when the last window has no status line and the
  * ruler takes its place in the last screen line; showmode() draws it
  */
-    static void
-ruler_redraw_lastwin(void)
+    ਸਥਿਰ ਖਾਲੀ
+ruler_redraw_lastwin(ਖਾਲੀ)
 {
-    if (p_ru && lastwin->w_status_height == 0)
+    ਜੇ (p_ru && lastwin->w_ਸਥਿਤੀ_ਉਚਾਈ == 0)
 	redraw_cmdline = TRUE;
 }
 
 /*
  * mark all status lines for redraw; used after first :cd
  */
-    void
-status_redraw_all(void)
+    ਖਾਲੀ
+ਸਥਿਤੀ_redraw_all(ਖਾਲੀ)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_status_height)
+	ਜੇ (wp->w_ਸਥਿਤੀ_ਉਚਾਈ)
 	{
-	    wp->w_redr_status = true;
+	    wp->w_redr_ਸਥਿਤੀ = true;
 	    redraw_later(UPD_VALID);
 	}
     ruler_redraw_lastwin();
@@ -3538,66 +3538,66 @@ status_redraw_all(void)
 /*
  * mark all status lines of the current buffer for redraw
  */
-    void
-status_redraw_curbuf(void)
+    ਖਾਲੀ
+ਸਥਿਤੀ_redraw_curbuf(ਖਾਲੀ)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_status_height != 0 && wp->w_buffer == curbuf)
+	ਜੇ (wp->w_ਸਥਿਤੀ_ਉਚਾਈ != 0 && wp->w_ਬਫਰ == curbuf)
 	{
-	    wp->w_redr_status = true;
+	    wp->w_redr_ਸਥਿਤੀ = true;
 	    redraw_later(UPD_VALID);
 	}
-    if (lastwin->w_buffer == curbuf)
+    ਜੇ (lastwin->w_ਬਫਰ == curbuf)
 	ruler_redraw_lastwin();
 }
 
 /*
  * Redraw all status lines that need to be redrawn.
  */
-    void
-redraw_statuslines(void)
+    ਖਾਲੀ
+redraw_statuslines(ਖਾਲੀ)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_redr_status)
+	ਜੇ (wp->w_redr_ਸਥਿਤੀ)
 	{
-	    bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
-	    win_redr_status(wp, FALSE);
-	    if (ret)
-		pop_highlight_overrides();
+	    bool ret = ਧੱਕੋ_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	    win_redr_ਸਥਿਤੀ(wp, FALSE);
+	    ਜੇ (ret)
+		ਕੱਢੋ_highlight_overrides();
 	}
     borrow_stl_vsep_hl();
-    if (redraw_tabline)
+    ਜੇ (redraw_tabline)
 	draw_tabline();
 
-#if defined(FEAT_TABPANEL)
-    if (redraw_tabpanel)
+#ਜੇ defined(FEAT_TABPANEL)
+    ਜੇ (redraw_tabpanel)
 	draw_tabpanel();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Redraw all status lines at the bottom of frame "frp".
  */
-    void
-win_redraw_last_status(frame_T *frp)
+    ਖਾਲੀ
+win_redraw_ਆਖਰੀ_ਸਥਿਤੀ(ਚੌਖਟਾ_T *frp)
 {
-    if (frp->fr_layout == FR_LEAF)
-	frp->fr_win->w_redr_status = true;
-    else if (frp->fr_layout == FR_ROW)
+    ਜੇ (frp->fr_layout == FR_ਪੱਤੀ)
+	frp->fr_win->w_redr_ਸਥਿਤੀ = true;
+    ਨਹੀਂਤਾਂ ਜੇ (frp->fr_layout == FR_ਪੰਕਤੀ)
     {
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    win_redraw_last_status(frp);
+	FOR_ALL_ਚੌਖਟੇ(frp, frp->fr_ਬੱਚਾ)
+	    win_redraw_ਆਖਰੀ_ਸਥਿਤੀ(frp);
     }
-    else // frp->fr_layout == FR_COL
+    ਨਹੀਂਤਾਂ // frp->fr_layout == FR_COL
     {
-	frp = frp->fr_child;
-	while (frp->fr_next != NULL)
-	    frp = frp->fr_next;
-	win_redraw_last_status(frp);
+	frp = frp->fr_ਬੱਚਾ;
+	ਜਦੋਂ (frp->fr_ਅਗਲਾ != ਨਿਰਾ)
+	    frp = frp->fr_ਅਗਲਾ;
+	win_redraw_ਆਖਰੀ_ਸਥਿਤੀ(frp);
     }
 }
 
@@ -3609,7 +3609,7 @@ win_redraw_last_status(frame_T *frp)
  * Note that when also inserting/deleting lines w_redraw_top and w_redraw_bot
  * may become invalid and the whole window will have to be redrawn.
  */
-    void
+    ਖਾਲੀ
 redrawWinline(
     win_T	*wp,
     linenr_T	lnum)
@@ -3617,18 +3617,18 @@ redrawWinline(
     redraw_win_range_later(wp, lnum, lnum);
 }
 
-    void
+    ਖਾਲੀ
 redraw_win_range_later(
     win_T	*wp,
-    linenr_T	first,
-    linenr_T	last)
+    linenr_T	ਪਹਿਲਾ,
+    linenr_T	ਆਖਰੀ)
 {
-    if (last >= wp->w_topline && first < wp->w_botline)
+    ਜੇ (ਆਖਰੀ >= wp->w_topline && ਪਹਿਲਾ < wp->w_botline)
     {
-	if (wp->w_redraw_top == 0 || wp->w_redraw_top > first)
-	    wp->w_redraw_top = first;
-	if (wp->w_redraw_bot == 0 || wp->w_redraw_bot < last)
-	    wp->w_redraw_bot = last;
+	ਜੇ (wp->w_redraw_ਸਿਖਰ == 0 || wp->w_redraw_ਸਿਖਰ > ਪਹਿਲਾ)
+	    wp->w_redraw_ਸਿਖਰ = ਪਹਿਲਾ;
+	ਜੇ (wp->w_redraw_bot == 0 || wp->w_redraw_bot < ਆਖਰੀ)
+	    wp->w_redraw_bot = ਆਖਰੀ;
 	redraw_win_later(wp, UPD_VALID);
     }
 }
@@ -3638,51 +3638,51 @@ redraw_win_range_later(
  * Use this from inside an update_screen() pass (where the redraw will be
  * picked up this cycle), to avoid triggering an extra full redraw cycle.
  */
-    void
+    ਖਾਲੀ
 redraw_win_range_now(
     win_T	*wp,
-    linenr_T	first,
-    linenr_T	last)
+    linenr_T	ਪਹਿਲਾ,
+    linenr_T	ਆਖਰੀ)
 {
-    if (last >= wp->w_topline && first < wp->w_botline)
+    ਜੇ (ਆਖਰੀ >= wp->w_topline && ਪਹਿਲਾ < wp->w_botline)
     {
-	if (wp->w_redraw_top == 0 || wp->w_redraw_top > first)
-	    wp->w_redraw_top = first;
-	if (wp->w_redraw_bot == 0 || wp->w_redraw_bot < last)
-	    wp->w_redraw_bot = last;
-	if (wp->w_redr_type < UPD_VALID)
+	ਜੇ (wp->w_redraw_ਸਿਖਰ == 0 || wp->w_redraw_ਸਿਖਰ > ਪਹਿਲਾ)
+	    wp->w_redraw_ਸਿਖਰ = ਪਹਿਲਾ;
+	ਜੇ (wp->w_redraw_bot == 0 || wp->w_redraw_bot < ਆਖਰੀ)
+	    wp->w_redraw_bot = ਆਖਰੀ;
+	ਜੇ (wp->w_redr_type < UPD_VALID)
 	    wp->w_redr_type = UPD_VALID;
     }
 }
 
-#ifdef FEAT_EVAL
-static bool redraw_cb_in_progress = false;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+ਸਥਿਰ bool redraw_cb_ਵਿੱਚ_ਤਰੱਕੀ = false;
 
-    void
-f_redraw_listener_add(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_redraw_listener_ਜੋੜੋ(typval_T *argvars, typval_T *rettv)
 {
     redraw_listener_T	*rln;
     dict_T		*dict;
     typval_T		tv;
     bool		got_one = false;
-    static int		id;
+    ਸਥਿਰ ਪੂਰਨ		id;
 
-    if (check_secure())
-	return;
+    ਜੇ (check_secure())
+	ਵਾਪਸ;
 
-    if (redraw_cb_in_progress)
+    ਜੇ (redraw_cb_ਵਿੱਚ_ਤਰੱਕੀ)
     {
-	emsg(_(e_cannot_add_redraw_listener_in_listener_callback));
-	return;
+	emsg(_(e_cannot_ਜੋੜੋ_redraw_listener_ਵਿੱਚ_listener_callback));
+	ਵਾਪਸ;
     }
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_dict_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     rln = ALLOC_CLEAR_ONE(redraw_listener_T);
 
-    if (rln == NULL)
-	return;
+    ਜੇ (rln == ਨਿਰਾ)
+	ਵਾਪਸ;
     dict = argvars[0].vval.v_dict;
 
     /*
@@ -3690,79 +3690,79 @@ f_redraw_listener_add(typval_T *argvars, typval_T *rettv)
      *
      * on_end: called at the end of a redraw cycle
      */
-    if (dict_get_tv(dict, "on_start", &tv) == OK)
+    ਜੇ (dict_get_tv(dict, "on_start", &tv) == OK)
     {
 	callback_T cb = get_callback(&tv);
 
-	if (cb.cb_name == NULL)
+	ਜੇ (cb.cb_name == ਨਿਰਾ)
 	{
 	    clear_tv(&tv);
 	    vim_free(rln);
-	    return;
+	    ਵਾਪਸ;
 	}
-	copy_callback(&rln->rl_callbacks.on_start, &cb);
+	copy_callback(&rln->rl_callbacks.on_ਸ਼ੁਰੂ, &cb);
 	free_callback(&cb);
 	clear_tv(&tv);
 	got_one = true;
     }
 
-    if (dict_get_tv(dict, "on_end", &tv) == OK)
+    ਜੇ (dict_get_tv(dict, "on_end", &tv) == OK)
     {
 	callback_T cb = get_callback(&tv);
 
-	if (cb.cb_name == NULL)
+	ਜੇ (cb.cb_name == ਨਿਰਾ)
 	{
 	    clear_tv(&tv);
-	    free_callback(&rln->rl_callbacks.on_start);
+	    free_callback(&rln->rl_callbacks.on_ਸ਼ੁਰੂ);
 	    vim_free(rln);
-	    return;
+	    ਵਾਪਸ;
 	}
-	copy_callback(&rln->rl_callbacks.on_end, &cb);
+	copy_callback(&rln->rl_callbacks.on_ਸਿਰਾ, &cb);
 	free_callback(&cb);
 	clear_tv(&tv);
 	got_one = true;
     }
 
-    if (!got_one)
+    ਜੇ (!got_one)
     {
 	emsg(_(e_no_redraw_listener_callbacks_defined));
 	vim_free(rln);
-	return;
+	ਵਾਪਸ;
     }
 
-    rln->rl_next = redraw_listeners;
+    rln->rl_ਅਗਲਾ = redraw_listeners;
     redraw_listeners = rln;
     rln->rl_id = ++id; // Never zero
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = id;
+    rettv->v_type = VAR_ਸੰਖਿਆ;
+    rettv->vval.v_ਸੰਖਿਆ = id;
 
-    return;
+    ਵਾਪਸ;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 redraw_listener_free(redraw_listener_T *rln)
 {
-    free_callback(&rln->rl_callbacks.on_start);
-    free_callback(&rln->rl_callbacks.on_end);
+    free_callback(&rln->rl_callbacks.on_ਸ਼ੁਰੂ);
+    free_callback(&rln->rl_callbacks.on_ਸਿਰਾ);
 
     vim_free(rln);
 }
 
 
-    static void
-redraw_listener_cleanup(void)
+    ਸਥਿਰ ਖਾਲੀ
+redraw_listener_cleanup(ਖਾਲੀ)
 {
-    for (redraw_listener_T *rln = redraw_listeners; rln != NULL;)
+    ਲਈ (redraw_listener_T *rln = redraw_listeners; rln != ਨਿਰਾ;)
     {
-	redraw_listener_T *next = rln->rl_next;
-	if (rln->rl_id == 0)
+	redraw_listener_T *ਅਗਲਾ = rln->rl_ਅਗਲਾ;
+	ਜੇ (rln->rl_id == 0)
 	{
-	    if (redraw_listeners == rln)
-		redraw_listeners = rln->rl_next;
+	    ਜੇ (redraw_listeners == rln)
+		redraw_listeners = rln->rl_ਅਗਲਾ;
 	    redraw_listener_free(rln);
 	}
-	rln = next;
+	rln = ਅਗਲਾ;
     }
 }
 
@@ -3770,74 +3770,74 @@ redraw_listener_cleanup(void)
  * Return the redraw listener struct with the specified id. Returns NULL if not
  * found.
  */
-    static redraw_listener_T *
-get_redraw_listener(int id)
+    ਸਥਿਰ redraw_listener_T *
+get_redraw_listener(ਪੂਰਨ id)
 {
-    for (redraw_listener_T *rln = redraw_listeners; rln != NULL; rln = rln->rl_next)
-	if (rln->rl_id == id)
-	    return rln;
-    return NULL;
+    ਲਈ (redraw_listener_T *rln = redraw_listeners; rln != ਨਿਰਾ; rln = rln->rl_ਅਗਲਾ)
+	ਜੇ (rln->rl_id == id)
+	    ਵਾਪਸ rln;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    void
-f_redraw_listener_remove(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_redraw_listener_remove(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-    int			id;
+    ਪੂਰਨ			id;
     redraw_listener_T	*rln;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    id = argvars[0].vval.v_number;
+    id = argvars[0].vval.v_ਸੰਖਿਆ;
     rln = get_redraw_listener(id);
 
-    rettv->v_type = VAR_NUMBER;
-    if (rln == NULL)
+    rettv->v_type = VAR_ਸੰਖਿਆ;
+    ਜੇ (rln == ਨਿਰਾ)
     {
-	rettv->vval.v_number = 0;
-	return;
+	rettv->vval.v_ਸੰਖਿਆ = 0;
+	ਵਾਪਸ;
     }
 
     // We set the id to zero instead of freeing it here, since we still need
     // rl_next from it.
     rln->rl_id = 0;
-    rettv->vval.v_number = 1;
+    rettv->vval.v_ਸੰਖਿਆ = 1;
 }
 
 /*
  * Invoke the on_start callbacks.
  */
-    static void
-invoke_redraw_listener_start_or_end(bool start)
+    ਸਥਿਰ ਖਾਲੀ
+invoke_redraw_listener_ਸ਼ੁਰੂ_or_ਸਿਰਾ(bool ਸ਼ੁਰੂ)
 {
     typval_T argv[1];
     typval_T rettv;
 
     argv[0].v_type = VAR_UNKNOWN;
 
-    if (start)
-	inside_redraw_on_start_cb = true;
+    ਜੇ (ਸ਼ੁਰੂ)
+	inside_redraw_on_ਸ਼ੁਰੂ_cb = true;
 
-    redraw_cb_in_progress = true;
-    for (redraw_listener_T *rln = redraw_listeners; rln != NULL; rln = rln->rl_next)
+    redraw_cb_ਵਿੱਚ_ਤਰੱਕੀ = true;
+    ਲਈ (redraw_listener_T *rln = redraw_listeners; rln != ਨਿਰਾ; rln = rln->rl_ਅਗਲਾ)
     {
-	if (rln->rl_id == 0)
+	ਜੇ (rln->rl_id == 0)
 	    // Listener has been removed, skip
-	    continue;
-	if (start && rln->rl_callbacks.on_start.cb_name != NULL)
+	    ਜਾਰੀ;
+	ਜੇ (ਸ਼ੁਰੂ && rln->rl_callbacks.on_ਸ਼ੁਰੂ.cb_name != ਨਿਰਾ)
 	{
-	    call_callback(&rln->rl_callbacks.on_start, -1, &rettv, 0, argv);
+	    call_callback(&rln->rl_callbacks.on_ਸ਼ੁਰੂ, -1, &rettv, 0, argv);
 	    clear_tv(&rettv);
 	}
-	else if (rln->rl_callbacks.on_end.cb_name != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (rln->rl_callbacks.on_ਸਿਰਾ.cb_name != ਨਿਰਾ)
 	{
-	    call_callback(&rln->rl_callbacks.on_end, -1, &rettv, 0, argv);
+	    call_callback(&rln->rl_callbacks.on_ਸਿਰਾ, -1, &rettv, 0, argv);
 	    clear_tv(&rettv);
 	}
     }
-    redraw_cb_in_progress = false;
+    redraw_cb_ਵਿੱਚ_ਤਰੱਕੀ = false;
 
-    if (start)
-	inside_redraw_on_start_cb = false;
+    ਜੇ (ਸ਼ੁਰੂ)
+	inside_redraw_on_ਸ਼ੁਰੂ_cb = false;
 }
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL

@@ -9,22 +9,22 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
-#include "version.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "version.h"
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <lua.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <lualib.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <lauxlib.h>
 
-#if __STDC_VERSION__ >= 199901L
-# define LUAV_INLINE inline
-#else
+#ਜੇ __STDC_VERSION__ >= 199901L
+# define LUAV_INLINE ਸਤਰਅੰਦਰ
+#ਨਹੀਂਤਾਂ
 # define LUAV_INLINE
-#endif
+#ਜੇ_ਅੰਤ
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_LUA)
+#ਜੇ defined(FEAT_LUA)
 
 # define LUAVIM_CHUNKNAME "vim chunk"
 # define LUAVIM_NAME "vim"
@@ -32,106 +32,106 @@
 # define LUAVIM_EVALHEADER "local _A=select(1,...) return "
 
 # ifdef LUA_RELEASE
-#  define LUAVIM_VERSION LUA_RELEASE
-# else
-#  define LUAVIM_VERSION LUA_VERSION
+#  define LUAVIM_ਸੰਸਕਰਣ LUA_RELEASE
+# ਨਹੀਂਤਾਂ
+#  define LUAVIM_ਸੰਸਕਰਣ LUA_ਸੰਸਕਰਣ
 # endif
 
-typedef buf_T *luaV_Buffer;
-typedef win_T *luaV_Window;
-typedef dict_T *luaV_Dict;
-typedef list_T *luaV_List;
-typedef blob_T *luaV_Blob;
-typedef struct {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ buf_T *lua_V_ਬਫਰ;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ win_T *lua_V_ਖਿੜਕੀ;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ dict_T *luaV_Dict;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ list_T *luaV_List;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ blob_T *luaV_Blob;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
     char_u	*name;	// funcref
     dict_T	*self;	// selfdict
 } luaV_Funcref;
-typedef int (*msgfunc_T)(char *);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*msgfunc_T)(ਅੱਖਰ *);
 
-typedef struct {
-    int lua_funcref;    // ref to a lua func
-    int lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਪੂਰਨ lua_funcref;    // ref to a lua func
+    ਪੂਰਨ lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
 			// for __call
     lua_State *L;
 } luaV_CFuncState;
 
-static const char LUAVIM_DICT[] = "dict";
-static const char LUAVIM_LIST[] = "list";
-static const char LUAVIM_BLOB[] = "blob";
-static const char LUAVIM_FUNCREF[] = "funcref";
-static const char LUAVIM_BUFFER[] = "buffer";
-static const char LUAVIM_WINDOW[] = "window";
-static const char LUAVIM_FREE[] = "luaV_free";
-static const char LUAVIM_LUAEVAL[] = "luaV_luaeval";
-static const char LUAVIM_SETREF[] = "luaV_setref";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_DICT[] = "dict";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_LIST[] = "list";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_BLOB[] = "blob";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_FUNCREF[] = "funcref";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_ਬਫਰ[] = "buffer";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_ਖਿੜਕੀ[] = "window";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_FREE[] = "luaV_free";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_LUAEVAL[] = "luaV_luaeval";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_SETREF[] = "luaV_setref";
 
-static const char LUA___CALL[] = "__call";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUA___CALL[] = "__call";
 
 // get/setudata manage references to vim userdata in a cache table through
 // object pointers (light userdata). The cache table itself is retrieved
 // from the registry.
 
-static const char LUAVIM_UDATA_CACHE[] = "luaV_udata_cache";
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ LUAVIM_UDATA_CACHE[] = "luaV_udata_cache";
 
 # define luaV_getfield(L, s) \
-    lua_pushlightuserdata((L), (void *)(s)); \
+    lua_pushlightuserdata((L), (ਖਾਲੀ *)(s)); \
     lua_rawget((L), LUA_REGISTRYINDEX)
 # define luaV_checksandbox(L) \
-    if (sandbox) luaL_error((L), "not allowed in sandbox")
-# define luaV_msg(L) luaV_msgfunc((L), (msgfunc_T) msg)
+    ਜੇ (sandbox) luaL_error((L), "not allowed in sandbox")
+# define lua_V_ਸੁਨੇਹਾ(L) luaV_msgfunc((L), (msgfunc_T) ਸੁਨੇਹਾ)
 # define luaV_emsg(L) luaV_msgfunc((L), (msgfunc_T) emsg)
-# define luaV_checktypval(L, a, v, msg) \
-    do { \
-	if (luaV_totypval(L, a, v) == FAIL) \
-	    luaL_error(L, msg ": cannot convert value"); \
-    } while (0)
+# define luaV_checktypval(L, a, v, ਸੁਨੇਹਾ) \
+    ਕਰੋ { \
+	ਜੇ (luaV_totypval(L, a, v) == FAIL) \
+	    luaL_error(L, ਸੁਨੇਹਾ ": cannot convert value"); \
+    } ਜਦੋਂ (0)
 
-static luaV_List *luaV_pushlist(lua_State *L, list_T *lis);
-static luaV_Dict *luaV_pushdict(lua_State *L, dict_T *dic);
-static luaV_Blob *luaV_pushblob(lua_State *L, blob_T *blo);
-static luaV_Funcref *luaV_pushfuncref(lua_State *L, char_u *name);
-static int luaV_call_lua_func(int argcount, typval_T *argvars, typval_T *rettv, void *state);
-static void luaV_call_lua_func_free(void *state);
+ਸਥਿਰ luaV_List *luaV_pushlist(lua_State *L, list_T *lis);
+ਸਥਿਰ luaV_Dict *luaV_pushdict(lua_State *L, dict_T *dic);
+ਸਥਿਰ luaV_Blob *luaV_pushblob(lua_State *L, blob_T *blo);
+ਸਥਿਰ luaV_Funcref *luaV_pushfuncref(lua_State *L, char_u *name);
+ਸਥਿਰ ਪੂਰਨ luaV_call_lua_func(ਪੂਰਨ argcount, typval_T *argvars, typval_T *rettv, ਖਾਲੀ *state);
+ਸਥਿਰ ਖਾਲੀ luaV_call_lua_func_free(ਖਾਲੀ *state);
 
-# if LUA_VERSION_NUM <= 501
-#  define luaV_register(L, l) luaL_register(L, NULL, l)
+# ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
+#  define lua_V_ਰਜਿਸਟਰ(L, l) lua_L_ਰਜਿਸਟਰ(L, ਨਿਰਾ, l)
 #  define luaL_typeerror luaL_typerror
-# else
-#  define luaV_register(L, l) luaL_setfuncs(L, l, 0)
+# ਨਹੀਂਤਾਂ
+#  define lua_V_ਰਜਿਸਟਰ(L, l) luaL_setfuncs(L, l, 0)
 # endif
 
 # ifdef DYNAMIC_LUA
 
 #  ifdef MSWIN
-#   define load_dll vimLoadLib
-#   define symbol_from_dll GetProcAddress
+#   define ਲੱਦੋ_dll vim_ਲੱਦੋ_Lib
+#   define ਚਿੰਨ੍ਹ_from_dll Get_Proc_ਪਤਾ
 #   define close_dll FreeLibrary
-#   define load_dll_error GetWin32Error
-#  else
+#   define ਲੱਦੋ_dll_error GetWin32Error
+#  ਨਹੀਂਤਾਂ
 #   include <dlfcn.h>
-#   define HANDLE void*
-#   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#   define symbol_from_dll dlsym
+#   define HANDLE ਖਾਲੀ*
+#   define ਲੱਦੋ_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#   define ਚਿੰਨ੍ਹ_from_dll dlsym
 #   define close_dll dlclose
-#   define load_dll_error dlerror
+#   define ਲੱਦੋ_dll_error dlerror
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
-#   define luaL_register dll_luaL_register
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
+#   define lua_L_ਰਜਿਸਟਰ dll_lua_L_ਰਜਿਸਟਰ
 #   define luaL_prepbuffer dll_luaL_prepbuffer
 #   define luaL_openlib dll_luaL_openlib
 #   define luaL_typerror dll_luaL_typerror
 #   define luaL_loadfile dll_luaL_loadfile
 #   define luaL_loadbuffer dll_luaL_loadbuffer
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define luaL_prepbuffsize dll_luaL_prepbuffsize
 #   define luaL_setfuncs dll_luaL_setfuncs
 #   define luaL_loadfilex dll_luaL_loadfilex
 #   define luaL_loadbufferx dll_luaL_loadbufferx
 #   define luaL_argerror dll_luaL_argerror
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
 #   define luaL_typeerror dll_luaL_typeerror
 #  endif
 #  define luaL_checkany dll_luaL_checkany
@@ -148,12 +148,12 @@ static void luaV_call_lua_func_free(void *state);
 #  define luaL_ref dll_luaL_ref
 #  define luaL_unref dll_luaL_unref
 // lua
-#  if LUA_VERSION_NUM <= 501
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
 #   define lua_tonumber dll_lua_tonumber
 #   define lua_tointeger dll_lua_tointeger
 #   define lua_call dll_lua_call
 #   define lua_pcall dll_lua_pcall
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define lua_tonumberx dll_lua_tonumberx
 #   define lua_tointegerx dll_lua_tointegerx
 #   define lua_callk dll_lua_callk
@@ -161,11 +161,11 @@ static void luaV_call_lua_func_free(void *state);
 #   define lua_getglobal dll_lua_getglobal
 #   define lua_setglobal dll_lua_setglobal
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
 #   define lua_replace dll_lua_replace
 #   define lua_remove dll_lua_remove
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 503
 #   define lua_rotate dll_lua_rotate
 #   define lua_copy dll_lua_copy
 #  endif
@@ -195,9 +195,9 @@ static void luaV_call_lua_func_free(void *state);
 #  define lua_rawgeti dll_lua_rawgeti
 #  define lua_createtable dll_lua_createtable
 #  define lua_settable dll_lua_settable
-#  if LUA_VERSION_NUM >= 504
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
 #   define lua_newuserdatauv dll_lua_newuserdatauv
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define lua_newuserdata dll_lua_newuserdata
 #  endif
 #  define lua_getmetatable dll_lua_getmetatable
@@ -205,165 +205,165 @@ static void luaV_call_lua_func_free(void *state);
 #  define lua_rawset dll_lua_rawset
 #  define lua_rawseti dll_lua_rawseti
 #  define lua_setmetatable dll_lua_setmetatable
-#  define lua_next dll_lua_next
+#  define lua_ਅਗਲਾ dll_lua_ਅਗਲਾ
 // libs
-#  define luaopen_base dll_luaopen_base
-#  define luaopen_table dll_luaopen_table
+#  define luaopen_ਅਧਾਰ dll_luaopen_ਅਧਾਰ
+#  define luaopen_ਸਾਰਣੀ dll_luaopen_ਸਾਰਣੀ
 #  define luaopen_string dll_luaopen_string
 #  define luaopen_math dll_luaopen_math
 #  define luaopen_io dll_luaopen_io
 #  define luaopen_os dll_luaopen_os
 #  define luaopen_package dll_luaopen_package
 #  define luaopen_debug dll_luaopen_debug
-#  if LUA_VERSION_NUM >= 505
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 505
 #   define luaL_openselectedlibs dll_luaL_openselectedlibs
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define luaL_openlibs dll_luaL_openlibs
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
-void (*dll_luaL_register) (lua_State *L, const char *libname, const luaL_Reg *l);
-char *(*dll_luaL_prepbuffer) (luaL_Buffer *B);
-void (*dll_luaL_openlib) (lua_State *L, const char *libname, const luaL_Reg *l, int nup);
-int (*dll_luaL_typerror) (lua_State *L, int narg, const char *tname);
-int (*dll_luaL_loadfile) (lua_State *L, const char *filename);
-int (*dll_luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz, const char *name);
-#  else
-char *(*dll_luaL_prepbuffsize) (luaL_Buffer *B, size_t sz);
-void (*dll_luaL_setfuncs) (lua_State *L, const luaL_Reg *l, int nup);
-int (*dll_luaL_loadfilex) (lua_State *L, const char *filename, const char *mode);
-int (*dll_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz, const char *name, const char *mode);
-int (*dll_luaL_argerror) (lua_State *L, int numarg, const char *extramsg);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
+ਖਾਲੀ (*dll_lua_L_ਰਜਿਸਟਰ) (lua_State *L, ਅਚਲ ਅੱਖਰ *libname, ਅਚਲ luaL_Reg *l);
+ਅੱਖਰ *(*dll_luaL_prepbuffer) (lua_L_ਬਫਰ *B);
+ਖਾਲੀ (*dll_luaL_openlib) (lua_State *L, ਅਚਲ ਅੱਖਰ *libname, ਅਚਲ luaL_Reg *l, ਪੂਰਨ nup);
+ਪੂਰਨ (*dll_luaL_typerror) (lua_State *L, ਪੂਰਨ narg, ਅਚਲ ਅੱਖਰ *tname);
+ਪੂਰਨ (*dll_luaL_loadfile) (lua_State *L, ਅਚਲ ਅੱਖਰ *filename);
+ਪੂਰਨ (*dll_luaL_loadbuffer) (lua_State *L, ਅਚਲ ਅੱਖਰ *buff, size_t sz, ਅਚਲ ਅੱਖਰ *name);
+#  ਨਹੀਂਤਾਂ
+ਅੱਖਰ *(*dll_luaL_prepbuffsize) (lua_L_ਬਫਰ *B, size_t sz);
+ਖਾਲੀ (*dll_luaL_setfuncs) (lua_State *L, ਅਚਲ luaL_Reg *l, ਪੂਰਨ nup);
+ਪੂਰਨ (*dll_luaL_loadfilex) (lua_State *L, ਅਚਲ ਅੱਖਰ *filename, ਅਚਲ ਅੱਖਰ *ਬਹੁਲਕ);
+ਪੂਰਨ (*dll_luaL_loadbufferx) (lua_State *L, ਅਚਲ ਅੱਖਰ *buff, size_t sz, ਅਚਲ ਅੱਖਰ *name, ਅਚਲ ਅੱਖਰ *ਬਹੁਲਕ);
+ਪੂਰਨ (*dll_luaL_argerror) (lua_State *L, ਪੂਰਨ numarg, ਅਚਲ ਅੱਖਰ *extramsg);
 #  endif
-#  if LUA_VERSION_NUM >= 504
-int (*dll_luaL_typeerror) (lua_State *L, int narg, const char *tname);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
+ਪੂਰਨ (*dll_luaL_typeerror) (lua_State *L, ਪੂਰਨ narg, ਅਚਲ ਅੱਖਰ *tname);
 #  endif
-void (*dll_luaL_checkany) (lua_State *L, int narg);
-const char *(*dll_luaL_checklstring) (lua_State *L, int numArg, size_t *l);
-lua_Integer (*dll_luaL_checkinteger) (lua_State *L, int numArg);
-lua_Integer (*dll_luaL_optinteger) (lua_State *L, int nArg, lua_Integer def);
-void (*dll_luaL_checktype) (lua_State *L, int narg, int t);
-int (*dll_luaL_error) (lua_State *L, const char *fmt, ...);
-lua_State *(*dll_luaL_newstate) (void);
-void (*dll_luaL_buffinit) (lua_State *L, luaL_Buffer *B);
-void (*dll_luaL_addlstring) (luaL_Buffer *B, const char *s, size_t l);
-void (*dll_luaL_pushresult) (luaL_Buffer *B);
-int (*dll_luaL_loadstring) (lua_State *L, const char *s);
-int (*dll_luaL_ref) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_luaL_unref) (lua_State *L, int idx, int n);
-#  else
-void (*dll_luaL_unref) (lua_State *L, int idx, lua_Integer n);
+ਖਾਲੀ (*dll_luaL_checkany) (lua_State *L, ਪੂਰਨ narg);
+ਅਚਲ ਅੱਖਰ *(*dll_luaL_checklstring) (lua_State *L, ਪੂਰਨ ਅੰਕ_Arg, size_t *l);
+lua_Integer (*dll_luaL_checkinteger) (lua_State *L, ਪੂਰਨ ਅੰਕ_Arg);
+lua_Integer (*dll_luaL_optinteger) (lua_State *L, ਪੂਰਨ nArg, lua_Integer def);
+ਖਾਲੀ (*dll_luaL_checktype) (lua_State *L, ਪੂਰਨ narg, ਪੂਰਨ t);
+ਪੂਰਨ (*dll_luaL_error) (lua_State *L, ਅਚਲ ਅੱਖਰ *fmt, ...);
+lua_State *(*dll_luaL_newstate) (ਖਾਲੀ);
+ਖਾਲੀ (*dll_luaL_buffinit) (lua_State *L, lua_L_ਬਫਰ *B);
+ਖਾਲੀ (*dll_luaL_addlstring) (lua_L_ਬਫਰ *B, ਅਚਲ ਅੱਖਰ *s, size_t l);
+ਖਾਲੀ (*dll_luaL_pushresult) (lua_L_ਬਫਰ *B);
+ਪੂਰਨ (*dll_luaL_loadstring) (lua_State *L, ਅਚਲ ਅੱਖਰ *s);
+ਪੂਰਨ (*dll_luaL_ref) (lua_State *L, ਪੂਰਨ idx);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
+ਖਾਲੀ (*dll_luaL_unref) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ n);
+#  ਨਹੀਂਤਾਂ
+ਖਾਲੀ (*dll_luaL_unref) (lua_State *L, ਪੂਰਨ idx, lua_Integer n);
 #  endif
 // lua
-#  if LUA_VERSION_NUM <= 501
-lua_Number (*dll_lua_tonumber) (lua_State *L, int idx);
-lua_Integer (*dll_lua_tointeger) (lua_State *L, int idx);
-void (*dll_lua_call) (lua_State *L, int nargs, int nresults);
-int (*dll_lua_pcall) (lua_State *L, int nargs, int nresults, int errfunc);
-#  else
-lua_Number (*dll_lua_tonumberx) (lua_State *L, int idx, int *isnum);
-lua_Integer (*dll_lua_tointegerx) (lua_State *L, int idx, int *isnum);
-void (*dll_lua_callk) (lua_State *L, int nargs, int nresults, int ctx,
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
+lua_ਸੰਖਿਆ (*dll_lua_tonumber) (lua_State *L, ਪੂਰਨ idx);
+lua_Integer (*dll_lua_tointeger) (lua_State *L, ਪੂਰਨ idx);
+ਖਾਲੀ (*dll_lua_call) (lua_State *L, ਪੂਰਨ nargs, ਪੂਰਨ nresults);
+ਪੂਰਨ (*dll_lua_pcall) (lua_State *L, ਪੂਰਨ nargs, ਪੂਰਨ nresults, ਪੂਰਨ errfunc);
+#  ਨਹੀਂਤਾਂ
+lua_ਸੰਖਿਆ (*dll_lua_tonumberx) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ *isnum);
+lua_Integer (*dll_lua_tointegerx) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ *isnum);
+ਖਾਲੀ (*dll_lua_callk) (lua_State *L, ਪੂਰਨ nargs, ਪੂਰਨ nresults, ਪੂਰਨ ctx,
 	lua_CFunction k);
-int (*dll_lua_pcallk) (lua_State *L, int nargs, int nresults, int errfunc,
-	int ctx, lua_CFunction k);
-void (*dll_lua_getglobal) (lua_State *L, const char *var);
-void (*dll_lua_setglobal) (lua_State *L, const char *var);
+ਪੂਰਨ (*dll_lua_pcallk) (lua_State *L, ਪੂਰਨ nargs, ਪੂਰਨ nresults, ਪੂਰਨ errfunc,
+	ਪੂਰਨ ctx, lua_CFunction k);
+ਖਾਲੀ (*dll_lua_getglobal) (lua_State *L, ਅਚਲ ਅੱਖਰ *var);
+ਖਾਲੀ (*dll_lua_setglobal) (lua_State *L, ਅਚਲ ਅੱਖਰ *var);
 #  endif
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_replace) (lua_State *L, int idx);
-void (*dll_lua_remove) (lua_State *L, int idx);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
+ਖਾਲੀ (*dll_lua_replace) (lua_State *L, ਪੂਰਨ idx);
+ਖਾਲੀ (*dll_lua_remove) (lua_State *L, ਪੂਰਨ idx);
 #  endif
-#  if LUA_VERSION_NUM >= 503
-void  (*dll_lua_rotate) (lua_State *L, int idx, int n);
-void (*dll_lua_copy) (lua_State *L, int fromidx, int toidx);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 503
+ਖਾਲੀ  (*dll_lua_rotate) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ n);
+ਖਾਲੀ (*dll_lua_copy) (lua_State *L, ਪੂਰਨ fromidx, ਪੂਰਨ toidx);
 #  endif
-const char *(*dll_lua_typename) (lua_State *L, int tp);
-void       (*dll_lua_close) (lua_State *L);
-int (*dll_lua_gettop) (lua_State *L);
-void (*dll_lua_settop) (lua_State *L, int idx);
-void (*dll_lua_pushvalue) (lua_State *L, int idx);
-int (*dll_lua_isnumber) (lua_State *L, int idx);
-int (*dll_lua_isstring) (lua_State *L, int idx);
-int (*dll_lua_type) (lua_State *L, int idx);
-int (*dll_lua_rawequal) (lua_State *L, int idx1, int idx2);
-int (*dll_lua_toboolean) (lua_State *L, int idx);
-const char *(*dll_lua_tolstring) (lua_State *L, int idx, size_t *len);
-void *(*dll_lua_touserdata) (lua_State *L, int idx);
-void (*dll_lua_pushnil) (lua_State *L);
-void (*dll_lua_pushnumber) (lua_State *L, lua_Number n);
-void (*dll_lua_pushinteger) (lua_State *L, lua_Integer n);
-void (*dll_lua_pushlstring) (lua_State *L, const char *s, size_t l);
-void (*dll_lua_pushstring) (lua_State *L, const char *s);
-const char *(*dll_lua_pushfstring) (lua_State *L, const char *fmt, ...);
-void (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
-void (*dll_lua_pushboolean) (lua_State *L, int b);
-void (*dll_lua_pushlightuserdata) (lua_State *L, void *p);
-void (*dll_lua_getfield) (lua_State *L, int idx, const char *k);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawget) (lua_State *L, int idx);
-void (*dll_lua_rawgeti) (lua_State *L, int idx, int n);
-#  else
-int (*dll_lua_rawget) (lua_State *L, int idx);
-int (*dll_lua_rawgeti) (lua_State *L, int idx, lua_Integer n);
+ਅਚਲ ਅੱਖਰ *(*dll_lua_typename) (lua_State *L, ਪੂਰਨ tp);
+ਖਾਲੀ       (*dll_lua_close) (lua_State *L);
+ਪੂਰਨ (*dll_lua_gettop) (lua_State *L);
+ਖਾਲੀ (*dll_lua_settop) (lua_State *L, ਪੂਰਨ idx);
+ਖਾਲੀ (*dll_lua_pushvalue) (lua_State *L, ਪੂਰਨ idx);
+ਪੂਰਨ (*dll_lua_isnumber) (lua_State *L, ਪੂਰਨ idx);
+ਪੂਰਨ (*dll_lua_isstring) (lua_State *L, ਪੂਰਨ idx);
+ਪੂਰਨ (*dll_lua_type) (lua_State *L, ਪੂਰਨ idx);
+ਪੂਰਨ (*dll_lua_rawequal) (lua_State *L, ਪੂਰਨ idx1, ਪੂਰਨ idx2);
+ਪੂਰਨ (*dll_lua_toboolean) (lua_State *L, ਪੂਰਨ idx);
+ਅਚਲ ਅੱਖਰ *(*dll_lua_tolstring) (lua_State *L, ਪੂਰਨ idx, size_t *len);
+ਖਾਲੀ *(*dll_lua_touserdata) (lua_State *L, ਪੂਰਨ idx);
+ਖਾਲੀ (*dll_lua_pushnil) (lua_State *L);
+ਖਾਲੀ (*dll_lua_pushnumber) (lua_State *L, lua_ਸੰਖਿਆ n);
+ਖਾਲੀ (*dll_lua_pushinteger) (lua_State *L, lua_Integer n);
+ਖਾਲੀ (*dll_lua_pushlstring) (lua_State *L, ਅਚਲ ਅੱਖਰ *s, size_t l);
+ਖਾਲੀ (*dll_lua_pushstring) (lua_State *L, ਅਚਲ ਅੱਖਰ *s);
+ਅਚਲ ਅੱਖਰ *(*dll_lua_pushfstring) (lua_State *L, ਅਚਲ ਅੱਖਰ *fmt, ...);
+ਖਾਲੀ (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, ਪੂਰਨ n);
+ਖਾਲੀ (*dll_lua_pushboolean) (lua_State *L, ਪੂਰਨ b);
+ਖਾਲੀ (*dll_lua_pushlightuserdata) (lua_State *L, ਖਾਲੀ *p);
+ਖਾਲੀ (*dll_lua_getfield) (lua_State *L, ਪੂਰਨ idx, ਅਚਲ ਅੱਖਰ *k);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
+ਖਾਲੀ (*dll_lua_rawget) (lua_State *L, ਪੂਰਨ idx);
+ਖਾਲੀ (*dll_lua_rawgeti) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ n);
+#  ਨਹੀਂਤਾਂ
+ਪੂਰਨ (*dll_lua_rawget) (lua_State *L, ਪੂਰਨ idx);
+ਪੂਰਨ (*dll_lua_rawgeti) (lua_State *L, ਪੂਰਨ idx, lua_Integer n);
 #  endif
-void (*dll_lua_createtable) (lua_State *L, int narr, int nrec);
-void (*dll_lua_settable) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM >= 504
-void *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, int nuvalue);
-#  else
-void *(*dll_lua_newuserdata) (lua_State *L, size_t sz);
+ਖਾਲੀ (*dll_lua_createtable) (lua_State *L, ਪੂਰਨ narr, ਪੂਰਨ nrec);
+ਖਾਲੀ (*dll_lua_settable) (lua_State *L, ਪੂਰਨ idx);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
+ਖਾਲੀ *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, ਪੂਰਨ nuvalue);
+#  ਨਹੀਂਤਾਂ
+ਖਾਲੀ *(*dll_lua_newuserdata) (lua_State *L, size_t sz);
 #  endif
-int (*dll_lua_getmetatable) (lua_State *L, int objindex);
-void (*dll_lua_setfield) (lua_State *L, int idx, const char *k);
-void (*dll_lua_rawset) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawseti) (lua_State *L, int idx, int n);
-#  else
-void (*dll_lua_rawseti) (lua_State *L, int idx, lua_Integer n);
+ਪੂਰਨ (*dll_lua_getmetatable) (lua_State *L, ਪੂਰਨ objindex);
+ਖਾਲੀ (*dll_lua_setfield) (lua_State *L, ਪੂਰਨ idx, ਅਚਲ ਅੱਖਰ *k);
+ਖਾਲੀ (*dll_lua_rawset) (lua_State *L, ਪੂਰਨ idx);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
+ਖਾਲੀ (*dll_lua_rawseti) (lua_State *L, ਪੂਰਨ idx, ਪੂਰਨ n);
+#  ਨਹੀਂਤਾਂ
+ਖਾਲੀ (*dll_lua_rawseti) (lua_State *L, ਪੂਰਨ idx, lua_Integer n);
 #  endif
-int (*dll_lua_setmetatable) (lua_State *L, int objindex);
-int (*dll_lua_next) (lua_State *L, int idx);
+ਪੂਰਨ (*dll_lua_setmetatable) (lua_State *L, ਪੂਰਨ objindex);
+ਪੂਰਨ (*dll_lua_ਅਗਲਾ) (lua_State *L, ਪੂਰਨ idx);
 // libs
-int (*dll_luaopen_base) (lua_State *L);
-int (*dll_luaopen_table) (lua_State *L);
-int (*dll_luaopen_string) (lua_State *L);
-int (*dll_luaopen_math) (lua_State *L);
-int (*dll_luaopen_io) (lua_State *L);
-int (*dll_luaopen_os) (lua_State *L);
-int (*dll_luaopen_package) (lua_State *L);
-int (*dll_luaopen_debug) (lua_State *L);
-#  if LUA_VERSION_NUM >= 505
-void (*dll_luaL_openselectedlibs) (lua_State *L, int load, int preload);
-#  else
-void (*dll_luaL_openlibs) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_ਅਧਾਰ) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_ਸਾਰਣੀ) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_string) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_math) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_io) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_os) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_package) (lua_State *L);
+ਪੂਰਨ (*dll_luaopen_debug) (lua_State *L);
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 505
+ਖਾਲੀ (*dll_luaL_openselectedlibs) (lua_State *L, ਪੂਰਨ ਲੱਦੋ, ਪੂਰਨ preload);
+#  ਨਹੀਂਤਾਂ
+ਖਾਲੀ (*dll_luaL_openlibs) (lua_State *L);
 #  endif
 
-typedef void **luaV_function;
-typedef struct {
-    const char *name;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ **luaV_function;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਅਚਲ ਅੱਖਰ *name;
     luaV_function func;
 } luaV_Reg;
 
-static const luaV_Reg luaV_dll[] = {
+ਸਥਿਰ ਅਚਲ luaV_Reg luaV_dll[] = {
     // lauxlib
-#  if LUA_VERSION_NUM <= 501
-    {"luaL_register", (luaV_function) &dll_luaL_register},
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
+    {"luaL_register", (luaV_function) &dll_lua_L_ਰਜਿਸਟਰ},
     {"luaL_prepbuffer", (luaV_function) &dll_luaL_prepbuffer},
     {"luaL_openlib", (luaV_function) &dll_luaL_openlib},
     {"luaL_typerror", (luaV_function) &dll_luaL_typerror},
     {"luaL_loadfile", (luaV_function) &dll_luaL_loadfile},
     {"luaL_loadbuffer", (luaV_function) &dll_luaL_loadbuffer},
-#  else
+#  ਨਹੀਂਤਾਂ
     {"luaL_prepbuffsize", (luaV_function) &dll_luaL_prepbuffsize},
     {"luaL_setfuncs", (luaV_function) &dll_luaL_setfuncs},
     {"luaL_loadfilex", (luaV_function) &dll_luaL_loadfilex},
     {"luaL_loadbufferx", (luaV_function) &dll_luaL_loadbufferx},
     {"luaL_argerror", (luaV_function) &dll_luaL_argerror},
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
     {"luaL_typeerror", (luaV_function) &dll_luaL_typeerror},
 #  endif
     {"luaL_checkany", (luaV_function) &dll_luaL_checkany},
@@ -380,12 +380,12 @@ static const luaV_Reg luaV_dll[] = {
     {"luaL_ref", (luaV_function) &dll_luaL_ref},
     {"luaL_unref", (luaV_function) &dll_luaL_unref},
     // lua
-#  if LUA_VERSION_NUM <= 501
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 501
     {"lua_tonumber", (luaV_function) &dll_lua_tonumber},
     {"lua_tointeger", (luaV_function) &dll_lua_tointeger},
     {"lua_call", (luaV_function) &dll_lua_call},
     {"lua_pcall", (luaV_function) &dll_lua_pcall},
-#  else
+#  ਨਹੀਂਤਾਂ
     {"lua_tonumberx", (luaV_function) &dll_lua_tonumberx},
     {"lua_tointegerx", (luaV_function) &dll_lua_tointegerx},
     {"lua_callk", (luaV_function) &dll_lua_callk},
@@ -393,11 +393,11 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_getglobal", (luaV_function) &dll_lua_getglobal},
     {"lua_setglobal", (luaV_function) &dll_lua_setglobal},
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ <= 502
     {"lua_replace", (luaV_function) &dll_lua_replace},
     {"lua_remove", (luaV_function) &dll_lua_remove},
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 503
     {"lua_rotate", (luaV_function) &dll_lua_rotate},
     {"lua_copy", (luaV_function) &dll_lua_copy},
 #  endif
@@ -427,9 +427,9 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_rawgeti", (luaV_function) &dll_lua_rawgeti},
     {"lua_createtable", (luaV_function) &dll_lua_createtable},
     {"lua_settable", (luaV_function) &dll_lua_settable},
-#  if LUA_VERSION_NUM >= 504
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 504
     {"lua_newuserdatauv", (luaV_function) &dll_lua_newuserdatauv},
-#  else
+#  ਨਹੀਂਤਾਂ
     {"lua_newuserdata", (luaV_function) &dll_lua_newuserdata},
 #  endif
     {"lua_getmetatable", (luaV_function) &dll_lua_getmetatable},
@@ -437,192 +437,192 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_rawset", (luaV_function) &dll_lua_rawset},
     {"lua_rawseti", (luaV_function) &dll_lua_rawseti},
     {"lua_setmetatable", (luaV_function) &dll_lua_setmetatable},
-    {"lua_next", (luaV_function) &dll_lua_next},
+    {"lua_next", (luaV_function) &dll_lua_ਅਗਲਾ},
     // libs
-    {"luaopen_base", (luaV_function) &dll_luaopen_base},
-    {"luaopen_table", (luaV_function) &dll_luaopen_table},
+    {"luaopen_base", (luaV_function) &dll_luaopen_ਅਧਾਰ},
+    {"luaopen_table", (luaV_function) &dll_luaopen_ਸਾਰਣੀ},
     {"luaopen_string", (luaV_function) &dll_luaopen_string},
     {"luaopen_math", (luaV_function) &dll_luaopen_math},
     {"luaopen_io", (luaV_function) &dll_luaopen_io},
     {"luaopen_os", (luaV_function) &dll_luaopen_os},
     {"luaopen_package", (luaV_function) &dll_luaopen_package},
     {"luaopen_debug", (luaV_function) &dll_luaopen_debug},
-#  if LUA_VERSION_NUM >= 505
+#  ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 505
     {"luaL_openselectedlibs", (luaV_function) &dll_luaL_openselectedlibs},
-#  else
+#  ਨਹੀਂਤਾਂ
     {"luaL_openlibs", (luaV_function) &dll_luaL_openlibs},
 #  endif
-    {NULL, NULL}
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
-static HANDLE hinstLua = NULL;
+ਸਥਿਰ HANDLE hinstLua = ਨਿਰਾ;
 
-    static int
-lua_link_init(char *libname, int verbose)
+    ਸਥਿਰ ਪੂਰਨ
+lua_link_init(ਅੱਖਰ *libname, ਪੂਰਨ verbose)
 {
-    const luaV_Reg *reg;
-    if (hinstLua) return OK;
-    hinstLua = load_dll(libname);
-    if (!hinstLua)
+    ਅਚਲ luaV_Reg *reg;
+    ਜੇ (hinstLua) ਵਾਪਸ OK;
+    hinstLua = ਲੱਦੋ_dll(libname);
+    ਜੇ (!hinstLua)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ਜੇ (verbose)
+	    semsg(_(e_could_not_ਲੱਦੋ_library_str_str), libname, ਲੱਦੋ_dll_error());
+	ਵਾਪਸ FAIL;
     }
-    for (reg = luaV_dll; reg->func; reg++)
+    ਲਈ (reg = luaV_dll; reg->func; reg++)
     {
-	if ((*reg->func = symbol_from_dll(hinstLua, reg->name)) == NULL)
+	ਜੇ ((*reg->func = ਚਿੰਨ੍ਹ_from_dll(hinstLua, reg->name)) == ਨਿਰਾ)
 	{
 	    close_dll(hinstLua);
 	    hinstLua = 0;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), reg->name);
-	    return FAIL;
+	    ਜੇ (verbose)
+		semsg(_(e_could_not_ਲੱਦੋ_library_function_str), reg->name);
+	    ਵਾਪਸ FAIL;
 	}
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 # endif // DYNAMIC_LUA
 
-# if defined(DYNAMIC_LUA)
-    int
-lua_enabled(int verbose)
+# ਜੇ defined(DYNAMIC_LUA)
+    ਪੂਰਨ
+lua_enabled(ਪੂਰਨ verbose)
 {
-    return lua_link_init((char *)p_luadll, verbose) == OK;
+    ਵਾਪਸ lua_link_init((ਅੱਖਰ *)p_luadll, verbose) == OK;
 }
 # endif
 
-# if LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
-    static int
-luaL_typeerror(lua_State *L, int narg, const char *tname)
+# ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ > 501 && LUA_ਸੰਸਕਰਣ_ਅੰਕ < 504
+    ਸਥਿਰ ਪੂਰਨ
+luaL_typeerror(lua_State *L, ਪੂਰਨ narg, ਅਚਲ ਅੱਖਰ *tname)
 {
-    const char *msg = lua_pushfstring(L, "%s expected, got %s",
+    ਅਚਲ ਅੱਖਰ *ਸੁਨੇਹਾ = lua_pushfstring(L, "%s expected, got %s",
 	    tname, luaL_typename(L, narg));
-    return luaL_argerror(L, narg, msg);
+    ਵਾਪਸ luaL_argerror(L, narg, ਸੁਨੇਹਾ);
 }
 # endif
 
-    static LUAV_INLINE void
-luaV_getudata(lua_State *L, void *v)
+    ਸਥਿਰ LUAV_INLINE ਖਾਲੀ
+luaV_getudata(lua_State *L, ਖਾਲੀ *v)
 {
-    lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_UDATA_CACHE);
     lua_rawget(L, LUA_REGISTRYINDEX);  // now the cache table is at the top of the stack
     lua_pushlightuserdata(L, v);
     lua_rawget(L, -2);
     lua_remove(L, -2);  // remove the cache table from the stack
 }
 
-    static LUAV_INLINE void
-luaV_setudata(lua_State *L, void *v)
+    ਸਥਿਰ LUAV_INLINE ਖਾਲੀ
+luaV_setudata(lua_State *L, ਖਾਲੀ *v)
 {
-    lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_UDATA_CACHE);
     lua_rawget(L, LUA_REGISTRYINDEX);  // cache table is at -1
     lua_pushlightuserdata(L, v);       // ...now at -2
     lua_pushvalue(L, -3);	       // copy the userdata (cache at -3)
     lua_rawset(L, -3);		       // consumes two stack items
-    lua_pop(L, 1);		       // and remove the cache table
+    lua_ਕੱਢੋ(L, 1);		       // and remove the cache table
 }
 
 // =======   Internal   =======
 
-    static void
-luaV_newmetatable(lua_State *L, const char *tname)
+    ਸਥਿਰ ਖਾਲੀ
+luaV_newmetatable(lua_State *L, ਅਚਲ ਅੱਖਰ *tname)
 {
     lua_newtable(L);
-    lua_pushlightuserdata(L, (void *) tname);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) tname);
     lua_pushvalue(L, -2);
     lua_rawset(L, LUA_REGISTRYINDEX);
 }
 
-    static void *
-luaV_toudata(lua_State *L, int ud, const char *tname)
+    ਸਥਿਰ ਖਾਲੀ *
+luaV_toudata(lua_State *L, ਪੂਰਨ ud, ਅਚਲ ਅੱਖਰ *tname)
 {
-    void *p = lua_touserdata(L, ud);
+    ਖਾਲੀ *p = lua_touserdata(L, ud);
 
-    if (p == NULL)
-	return NULL;
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // value is userdata
-    if (lua_getmetatable(L, ud)) // does it have a metatable?
+    ਜੇ (lua_getmetatable(L, ud)) // does it have a metatable?
     {
 	luaV_getfield(L, tname); // get metatable
-	if (lua_rawequal(L, -1, -2)) // MTs match?
+	ਜੇ (lua_rawequal(L, -1, -2)) // MTs match?
 	{
-	    lua_pop(L, 2); // MTs
-	    return p;
+	    lua_ਕੱਢੋ(L, 2); // MTs
+	    ਵਾਪਸ p;
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static void *
-luaV_checkcache(lua_State *L, void *p)
+    ਸਥਿਰ ਖਾਲੀ *
+luaV_checkcache(lua_State *L, ਖਾਲੀ *p)
 {
     luaV_getudata(L, p);
-    if (lua_isnil(L, -1)) luaL_error(L, "invalid object");
-    lua_pop(L, 1);
-    return p;
+    ਜੇ (lua_isnil(L, -1)) luaL_error(L, "invalid object");
+    lua_ਕੱਢੋ(L, 1);
+    ਵਾਪਸ p;
 }
 
 # define luaV_unbox(L,luatyp,ud) (*((luatyp *) lua_touserdata((L),(ud))))
 
 # define luaV_checkvalid(L,luatyp,ud) \
-    luaV_checkcache((L), (void *) luaV_unbox((L),luatyp,(ud)))
+    luaV_checkcache((L), (ਖਾਲੀ *) luaV_unbox((L),luatyp,(ud)))
 
-    static void *
-luaV_checkudata(lua_State *L, int ud, const char *tname)
+    ਸਥਿਰ ਖਾਲੀ *
+luaV_checkudata(lua_State *L, ਪੂਰਨ ud, ਅਚਲ ਅੱਖਰ *tname)
 {
-    void *p = luaV_toudata(L, ud, tname);
-    if (p == NULL) luaL_typeerror(L, ud, tname);
-    return p;
+    ਖਾਲੀ *p = luaV_toudata(L, ud, tname);
+    ਜੇ (p == ਨਿਰਾ) luaL_typeerror(L, ud, tname);
+    ਵਾਪਸ p;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 luaV_pushtypval(lua_State *L, typval_T *tv)
 {
-    if (tv == NULL)
+    ਜੇ (tv == ਨਿਰਾ)
     {
 	lua_pushnil(L);
-	return;
+	ਵਾਪਸ;
     }
-    switch (tv->v_type)
+    ਚੋਣ (tv->v_type)
     {
-	case VAR_STRING:
-	    lua_pushstring(L, tv->vval.v_string == NULL
-					    ? "" : (char *)tv->vval.v_string);
-	    break;
-	case VAR_NUMBER:
-	    lua_pushinteger(L, (int) tv->vval.v_number);
-	    break;
-	case VAR_FLOAT:
-	    lua_pushnumber(L, (lua_Number) tv->vval.v_float);
-	    break;
-	case VAR_LIST:
+	ਹਾਲਤ VAR_STRING:
+	    lua_pushstring(L, tv->vval.v_string == ਨਿਰਾ
+					    ? "" : (ਅੱਖਰ *)tv->vval.v_string);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	    lua_pushinteger(L, (ਪੂਰਨ) tv->vval.v_ਸੰਖਿਆ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_FLOAT:
+	    lua_pushnumber(L, (lua_ਸੰਖਿਆ) tv->vval.v_float);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_LIST:
 	    luaV_pushlist(L, tv->vval.v_list);
-	    break;
-	case VAR_DICT:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_DICT:
 	    luaV_pushdict(L, tv->vval.v_dict);
-	    break;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    if (tv->vval.v_number <= VVAL_TRUE)
-		lua_pushboolean(L, (int) tv->vval.v_number);
-	    else
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	    ਜੇ (tv->vval.v_ਸੰਖਿਆ <= VVAL_TRUE)
+		lua_pushboolean(L, (ਪੂਰਨ) tv->vval.v_ਸੰਖਿਆ);
+	    ਨਹੀਂਤਾਂ
 		lua_pushnil(L);
-	    break;
-	case VAR_FUNC:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_FUNC:
 	    luaV_pushfuncref(L, tv->vval.v_string);
-	    break;
-	case VAR_PARTIAL:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_PARTIAL:
 	    // TODO: handle partial arguments
 	    luaV_pushfuncref(L, partial_name(tv->vval.v_partial));
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_BLOB:
+	ਹਾਲਤ VAR_BLOB:
 	    luaV_pushblob(L, tv->vval.v_blob);
-	    break;
-	default:
+	    ਰੋਕੋ;
+	ਮੂਲ:
 	    lua_pushnil(L);
     }
 }
@@ -631,45 +631,45 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
  * Converts lua value at 'pos' to typval 'tv'.
  * Returns OK or FAIL.
  */
-    static int
-luaV_totypval(lua_State *L, int pos, typval_T *tv)
+    ਸਥਿਰ ਪੂਰਨ
+luaV_totypval(lua_State *L, ਪੂਰਨ pos, typval_T *tv)
 {
-    int status = OK;
+    ਪੂਰਨ ਸਥਿਤੀ = OK;
 
-    tv->v_lock = 0;
+    tv->v_ਤਾਲਾ = 0;
 
-    switch (lua_type(L, pos))
+    ਚੋਣ (lua_type(L, pos))
     {
-	case LUA_TBOOLEAN:
+	ਹਾਲਤ LUA_TBOOLEAN:
 	    tv->v_type = VAR_BOOL;
-	    tv->vval.v_number = (varnumber_T) lua_toboolean(L, pos);
-	    break;
-	case LUA_TNIL:
+	    tv->vval.v_ਸੰਖਿਆ = (varnumber_T) lua_toboolean(L, pos);
+	    ਰੋਕੋ;
+	ਹਾਲਤ LUA_TNIL:
 	    tv->v_type = VAR_SPECIAL;
-	    tv->vval.v_number = VVAL_NULL;
-	    break;
-	case LUA_TSTRING:
+	    tv->vval.v_ਸੰਖਿਆ = VVAL_NULL;
+	    ਰੋਕੋ;
+	ਹਾਲਤ LUA_TSTRING:
 	    tv->v_type = VAR_STRING;
 	    tv->vval.v_string = vim_strsave((char_u *) lua_tostring(L, pos));
-	    break;
-	case LUA_TNUMBER:
+	    ਰੋਕੋ;
+	ਹਾਲਤ LUA_TNUMBER:
 	{
-	    const lua_Number n = lua_tonumber(L, pos);
+	    ਅਚਲ lua_ਸੰਖਿਆ n = lua_tonumber(L, pos);
 
-	    if (n > (lua_Number)INT64_MAX || n < (lua_Number)INT64_MIN
-		    || ((lua_Number)((varnumber_T)n)) != n)
+	    ਜੇ (n > (lua_ਸੰਖਿਆ)INT64_MAX || n < (lua_ਸੰਖਿਆ)INT64_MIN
+		    || ((lua_ਸੰਖਿਆ)((varnumber_T)n)) != n)
 	    {
 		tv->v_type = VAR_FLOAT;
 		tv->vval.v_float = (float_T)n;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		tv->v_type = VAR_NUMBER;
-		tv->vval.v_number = (varnumber_T)n;
+		tv->v_type = VAR_ਸੰਖਿਆ;
+		tv->vval.v_ਸੰਖਿਆ = (varnumber_T)n;
 	    }
 	}
-	    break;
-	case LUA_TFUNCTION:
+	    ਰੋਕੋ;
+	ਹਾਲਤ LUA_TFUNCTION:
 	{
 	    char_u *name;
 	    luaV_CFuncState *state;
@@ -679,324 +679,324 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	    state->lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
 	    state->L = L;
 	    state->lua_tableref = LUA_NOREF;
-	    name = register_cfunc(&luaV_call_lua_func,
+	    name = ਰਜਿਸਟਰ_cfunc(&luaV_call_lua_func,
 					      &luaV_call_lua_func_free, state);
 	    tv->v_type = VAR_FUNC;
 	    tv->vval.v_string = vim_strsave(name);
-	    break;
+	    ਰੋਕੋ;
 	}
-	case LUA_TTABLE:
+	ਹਾਲਤ LUA_TTABLE:
 	{
-	    int lua_tableref;
+	    ਪੂਰਨ lua_tableref;
 
 	    lua_pushvalue(L, pos);
 	    lua_tableref = luaL_ref(L, LUA_REGISTRYINDEX);
-	    if (lua_getmetatable(L, pos))
+	    ਜੇ (lua_getmetatable(L, pos))
 	    {
 		lua_getfield(L, -1, LUA___CALL);
-		if (lua_isfunction(L, -1))
+		ਜੇ (lua_isfunction(L, -1))
 		{
 		    char_u *name;
-		    int lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
+		    ਪੂਰਨ lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
 		    luaV_CFuncState *state = ALLOC_CLEAR_ONE(luaV_CFuncState);
 
 		    state->lua_funcref = lua_funcref;
 		    state->L = L;
 		    state->lua_tableref = lua_tableref;
-		    name = register_cfunc(&luaV_call_lua_func,
+		    name = ਰਜਿਸਟਰ_cfunc(&luaV_call_lua_func,
 					      &luaV_call_lua_func_free, state);
 		    tv->v_type = VAR_FUNC;
 		    tv->vval.v_string = vim_strsave(name);
-		    break;
+		    ਰੋਕੋ;
 		}
 	    }
-	    tv->v_type = VAR_NUMBER;
-	    tv->vval.v_number = 0;
-	    status = FAIL;
-	    break;
+	    tv->v_type = VAR_ਸੰਖਿਆ;
+	    tv->vval.v_ਸੰਖਿਆ = 0;
+	    ਸਥਿਤੀ = FAIL;
+	    ਰੋਕੋ;
 	}
-	case LUA_TUSERDATA:
+	ਹਾਲਤ LUA_TUSERDATA:
 	{
-	    void *p = lua_touserdata(L, pos);
+	    ਖਾਲੀ *p = lua_touserdata(L, pos);
 
-	    if (lua_getmetatable(L, pos)) // has metatable?
+	    ਜੇ (lua_getmetatable(L, pos)) // has metatable?
 	    {
 		// check list
 		luaV_getfield(L, LUAVIM_LIST);
-		if (lua_rawequal(L, -1, -2))
+		ਜੇ (lua_rawequal(L, -1, -2))
 		{
 		    tv->v_type = VAR_LIST;
 		    tv->vval.v_list = *((luaV_List *) p);
 		    ++tv->vval.v_list->lv_refcount;
-		    lua_pop(L, 2); // MTs
-		    break;
+		    lua_ਕੱਢੋ(L, 2); // MTs
+		    ਰੋਕੋ;
 		}
 		// check dict
 		luaV_getfield(L, LUAVIM_DICT);
-		if (lua_rawequal(L, -1, -3))
+		ਜੇ (lua_rawequal(L, -1, -3))
 		{
 		    tv->v_type = VAR_DICT;
 		    tv->vval.v_dict = *((luaV_Dict *) p);
 		    ++tv->vval.v_dict->dv_refcount;
-		    lua_pop(L, 3); // MTs
-		    break;
+		    lua_ਕੱਢੋ(L, 3); // MTs
+		    ਰੋਕੋ;
 		}
 		// check blob
 		luaV_getfield(L, LUAVIM_BLOB);
-		if (lua_rawequal(L, -1, -4))
+		ਜੇ (lua_rawequal(L, -1, -4))
 		{
 		    tv->v_type = VAR_BLOB;
 		    tv->vval.v_blob = *((luaV_Blob *) p);
 		    ++tv->vval.v_blob->bv_refcount;
-		    lua_pop(L, 4); // MTs
-		    break;
+		    lua_ਕੱਢੋ(L, 4); // MTs
+		    ਰੋਕੋ;
 		}
 		// check funcref
 		luaV_getfield(L, LUAVIM_FUNCREF);
-		if (lua_rawequal(L, -1, -5))
+		ਜੇ (lua_rawequal(L, -1, -5))
 		{
 		    luaV_Funcref *f = (luaV_Funcref *) p;
 
 		    func_ref(f->name);
 		    tv->v_type = VAR_FUNC;
 		    tv->vval.v_string = vim_strsave(f->name);
-		    lua_pop(L, 5); // MTs
-		    break;
+		    lua_ਕੱਢੋ(L, 5); // MTs
+		    ਰੋਕੋ;
 		}
-		lua_pop(L, 4); // MTs
+		lua_ਕੱਢੋ(L, 4); // MTs
 	    }
 	}
 	// FALLTHROUGH
-	default:
-	    tv->v_type = VAR_NUMBER;
-	    tv->vval.v_number = 0;
-	    status = FAIL;
+	ਮੂਲ:
+	    tv->v_type = VAR_ਸੰਖਿਆ;
+	    tv->vval.v_ਸੰਖਿਆ = 0;
+	    ਸਥਿਤੀ = FAIL;
     }
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
 /*
  * similar to luaL_addlstring, but replaces \0 with \n if toline and
  * \n with \0 otherwise
  */
-    static void
-luaV_addlstring(luaL_Buffer *b, const char *s, size_t l, int toline)
+    ਸਥਿਰ ਖਾਲੀ
+luaV_addlstring(lua_L_ਬਫਰ *b, ਅਚਲ ਅੱਖਰ *s, size_t l, ਪੂਰਨ toline)
 {
-    while (l--)
+    ਜਦੋਂ (l--)
     {
-	if (*s == '\0' && toline)
+	ਜੇ (*s == '\0' && toline)
 	    luaL_addchar(b, '\n');
-	else if (*s == '\n' && !toline)
+	ਨਹੀਂਤਾਂ ਜੇ (*s == '\n' && !toline)
 	    luaL_addchar(b, '\0');
-	else
+	ਨਹੀਂਤਾਂ
 	    luaL_addchar(b, *s);
 	s++;
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 luaV_pushline(lua_State *L, buf_T *buf, linenr_T n)
 {
-    const char *s = (const char *) ml_get_buf(buf, n, FALSE);
-    luaL_Buffer b;
+    ਅਚਲ ਅੱਖਰ *s = (ਅਚਲ ਅੱਖਰ *) ml_get_buf(buf, n, FALSE);
+    lua_L_ਬਫਰ b;
     luaL_buffinit(L, &b);
-    luaV_addlstring(&b, s, strlen(s), 0);
+    luaV_addlstring(&b, s, ਲੜੀ_ਲੰਬਾਈ(s), 0);
     luaL_pushresult(&b);
 }
 
-    static char_u *
-luaV_toline(lua_State *L, int pos)
+    ਸਥਿਰ char_u *
+luaV_toline(lua_State *L, ਪੂਰਨ pos)
 {
     size_t l;
-    const char *s = lua_tolstring(L, pos, &l);
+    ਅਚਲ ਅੱਖਰ *s = lua_tolstring(L, pos, &l);
 
-    luaL_Buffer b;
+    lua_L_ਬਫਰ b;
     luaL_buffinit(L, &b);
     luaV_addlstring(&b, s, l, 1);
     luaL_pushresult(&b);
-    return (char_u *) lua_tostring(L, -1);
+    ਵਾਪਸ (char_u *) lua_tostring(L, -1);
 }
 
 /*
  * pops a string s from the top of the stack and calls mf(t) for pieces t of
  * s separated by newlines
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 luaV_msgfunc(lua_State *L, msgfunc_T mf)
 {
-    luaL_Buffer b;
+    lua_L_ਬਫਰ b;
     size_t l;
-    const char *p, *s = lua_tolstring(L, -1, &l);
+    ਅਚਲ ਅੱਖਰ *p, *s = lua_tolstring(L, -1, &l);
     luaL_buffinit(L, &b);
     luaV_addlstring(&b, s, l, 0);
     luaL_pushresult(&b);
     // break string
     p = s = lua_tolstring(L, -1, &l);
-    while (l--)
+    ਜਦੋਂ (l--)
     {
-	if (*p++ == '\0') // break?
+	ਜੇ (*p++ == '\0') // break?
 	{
-	    mf((char *)s);
+	    mf((ਅੱਖਰ *)s);
 	    s = p;
 	}
     }
-    mf((char *)s);
-    lua_pop(L, 2); // original and modified strings
+    mf((ਅੱਖਰ *)s);
+    lua_ਕੱਢੋ(L, 2); // original and modified strings
 }
 
 # define luaV_newtype(typ,tname,luatyp,luatname) \
-	static luatyp * \
+	ਸਥਿਰ luatyp * \
     luaV_new##tname(lua_State *L, typ *obj) \
     { \
-	luatyp *o = (luatyp *) lua_newuserdata(L, sizeof(luatyp)); \
+	luatyp *o = (luatyp *) lua_newuserdata(L, ਆਕਾਰ(luatyp)); \
 	*o = obj; \
 	luaV_setudata(L, obj); /* cache[obj] = udata */ \
 	luaV_getfield(L, luatname); \
 	lua_setmetatable(L, -2); \
-	return o; \
+	ਵਾਪਸ o; \
     }
 
 # define luaV_pushtype(typ,tname,luatyp) \
-	static luatyp * \
-    luaV_push##tname(lua_State *L, typ *obj) \
+	ਸਥਿਰ luatyp * \
+    lua_V_ਧੱਕੋ##tname(lua_State *L, typ *obj) \
     { \
-	luatyp *o = NULL; \
-	if (obj == NULL) \
+	luatyp *o = ਨਿਰਾ; \
+	ਜੇ (obj == ਨਿਰਾ) \
 	    lua_pushnil(L); \
-	else \
+	ਨਹੀਂਤਾਂ \
 	{ \
 	    luaV_getudata(L, obj); \
-	    if (lua_isnil(L, -1)) /* not interned? */ \
+	    ਜੇ (lua_isnil(L, -1)) /* not interned? */ \
 	    { \
-		lua_pop(L, 1); \
+		lua_ਕੱਢੋ(L, 1); \
 		o = luaV_new##tname(L, obj); \
 	    } \
-	    else \
+	    ਨਹੀਂਤਾਂ \
 		o = (luatyp *) lua_touserdata(L, -1); \
 	} \
-	return o; \
+	ਵਾਪਸ o; \
     }
 
 # define luaV_type_tostring(tname,luatname) \
-	static int \
+	ਸਥਿਰ ਪੂਰਨ \
     luaV_##tname##_tostring(lua_State *L) \
     { \
 	lua_pushfstring(L, "%s: %p", luatname, lua_touserdata(L, 1)); \
-	return 1; \
+	ਵਾਪਸ 1; \
     }
 
 // =======   List type   =======
 
-    static luaV_List *
+    ਸਥਿਰ luaV_List *
 luaV_newlist(lua_State *L, list_T *lis)
 {
-    luaV_List *l = (luaV_List *) lua_newuserdata(L, sizeof(luaV_List));
+    luaV_List *l = (luaV_List *) lua_newuserdata(L, ਆਕਾਰ(luaV_List));
     *l = lis;
     lis->lv_refcount++; // reference in Lua
     luaV_setudata(L, lis); // cache[lis] = udata
     luaV_getfield(L, LUAVIM_LIST);
     lua_setmetatable(L, -2);
-    return l;
+    ਵਾਪਸ l;
 }
 
 luaV_pushtype(list_T, list, luaV_List)
 luaV_type_tostring(list, LUAVIM_LIST)
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_list_len(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    lua_pushinteger(L, (int) list_len(l));
-    return 1;
+    lua_pushinteger(L, (ਪੂਰਨ) list_len(l));
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_list_iter(lua_State *L)
 {
     listitem_T *li = (listitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    if (li == NULL) return 0;
+    ਜੇ (li == ਨਿਰਾ) ਵਾਪਸ 0;
     luaV_pushtypval(L, &li->li_tv);
-    lua_pushlightuserdata(L, (void *) li->li_next);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) li->li_ਅਗਲਾ);
     lua_replace(L, lua_upvalueindex(1));
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_list_call(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    lua_pushlightuserdata(L, (void *) l->lv_first);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) l->lv_ਪਹਿਲਾ);
     lua_pushcclosure(L, luaV_list_iter, 1);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_list_index(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_list_ਸੂਚਕਾਂਕ(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    if (lua_isnumber(L, 2)) // list item?
+    ਜੇ (lua_isnumber(L, 2)) // list item?
     {
-	long n = (long) luaL_checkinteger(L, 2);
+	ਲੰਮਾ n = (ਲੰਮਾ) luaL_checkinteger(L, 2);
 	listitem_T *li;
 
 	// Lua array index starts with 1 while Vim uses 0, subtract 1 to
 	// normalize.
 	n -= 1;
-	li = list_find(l, n);
-	if (li == NULL)
+	li = list_ਲੱਭੋ(l, n);
+	ਜੇ (li == ਨਿਰਾ)
 	    lua_pushnil(L);
-	else
+	ਨਹੀਂਤਾਂ
 	    luaV_pushtypval(L, &li->li_tv);
     }
-    else if (lua_isstring(L, 2)) // method?
+    ਨਹੀਂਤਾਂ ਜੇ (lua_isstring(L, 2)) // method?
     {
-	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0
-		|| strncmp(s, "insert", 6) == 0)
+	ਅਚਲ ਅੱਖਰ *s = lua_tostring(L, 2);
+	ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "add", 3) == 0
+		|| ਲੜੀ_ਤੁਲਨਾ(s, "insert", 6) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    lua_pushnil(L);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lua_pushnil(L);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_list_newindex(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    long n = (long) luaL_checkinteger(L, 2);
+    ਲੰਮਾ n = (ਲੰਮਾ) luaL_checkinteger(L, 2);
     listitem_T *li;
 
     // Lua array index starts with 1 while Vim uses 0, subtract 1 to normalize.
     n -= 1;
 
-    if (l->lv_lock)
+    ਜੇ (l->lv_ਤਾਲਾ)
 	luaL_error(L, "list is locked");
-    li = list_find(l, n);
-    if (li == NULL)
+    li = list_ਲੱਭੋ(l, n);
+    ਜੇ (li == ਨਿਰਾ)
     {
-	if (!lua_isnil(L, 3))
+	ਜੇ (!lua_isnil(L, 3))
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "inserting list item");
-	    if (list_insert_tv(l, &v, li) == FAIL)
+	    ਜੇ (list_ਪਾਓ_tv(l, &v, li) == FAIL)
 		luaL_error(L, "failed to add item to list");
 	    clear_tv(&v);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (lua_isnil(L, 3)) // remove?
+	ਜੇ (lua_isnil(L, 3)) // remove?
 	{
 	    vimlist_remove(l, li, li);
 	    listitem_free(l, li);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "setting list item");
@@ -1004,364 +1004,364 @@ luaV_list_newindex(lua_State *L)
 	    li->li_tv = v;
 	}
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_list_add(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_list_ਜੋੜੋ(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
-    list_T *l = (list_T *) luaV_checkcache(L, (void *) *lis);
+    list_T *l = (list_T *) luaV_checkcache(L, (ਖਾਲੀ *) *lis);
     typval_T v;
-    if (l->lv_lock)
+    ਜੇ (l->lv_ਤਾਲਾ)
 	luaL_error(L, "list is locked");
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "adding list item");
-    if (list_append_tv(l, &v) == FAIL)
+    ਜੇ (list_append_tv(l, &v) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_list_insert(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_list_ਪਾਓ(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
-    list_T *l = (list_T *) luaV_checkcache(L, (void *) *lis);
-    long pos = (long) luaL_optinteger(L, 3, 0);
-    listitem_T *li = NULL;
+    list_T *l = (list_T *) luaV_checkcache(L, (ਖਾਲੀ *) *lis);
+    ਲੰਮਾ pos = (ਲੰਮਾ) luaL_optinteger(L, 3, 0);
+    listitem_T *li = ਨਿਰਾ;
     typval_T v;
-    if (l->lv_lock)
+    ਜੇ (l->lv_ਤਾਲਾ)
 	luaL_error(L, "list is locked");
-    if (pos < l->lv_len)
+    ਜੇ (pos < l->lv_len)
     {
-	li = list_find(l, pos);
-	if (li == NULL)
+	li = list_ਲੱਭੋ(l, pos);
+	ਜੇ (li == ਨਿਰਾ)
 	    luaL_error(L, "invalid position");
     }
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "inserting list item");
-    if (list_insert_tv(l, &v, li) == FAIL)
+    ਜੇ (list_ਪਾਓ_tv(l, &v, li) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_List_mt[] = {
+ਸਥਿਰ ਅਚਲ luaL_Reg luaV_List_mt[] = {
     {"__tostring", luaV_list_tostring},
     {"__len", luaV_list_len},
     {"__call", luaV_list_call},
-    {"__index", luaV_list_index},
+    {"__index", lua_V_list_ਸੂਚਕਾਂਕ},
     {"__newindex", luaV_list_newindex},
-    {"add", luaV_list_add},
-    {"insert", luaV_list_insert},
-    {NULL, NULL}
+    {"add", lua_V_list_ਜੋੜੋ},
+    {"insert", lua_V_list_ਪਾਓ},
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Dict type   =======
 
-    static luaV_Dict *
+    ਸਥਿਰ luaV_Dict *
 luaV_newdict(lua_State *L, dict_T *dic)
 {
-    luaV_Dict *d = (luaV_Dict *) lua_newuserdata(L, sizeof(luaV_Dict));
+    luaV_Dict *d = (luaV_Dict *) lua_newuserdata(L, ਆਕਾਰ(luaV_Dict));
     *d = dic;
     dic->dv_refcount++; // reference in Lua
     luaV_setudata(L, dic); // cache[dic] = udata
     luaV_getfield(L, LUAVIM_DICT);
     lua_setmetatable(L, -2);
-    return d;
+    ਵਾਪਸ d;
 }
 
 luaV_pushtype(dict_T, dict, luaV_Dict)
 luaV_type_tostring(dict, LUAVIM_DICT)
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_dict_len(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
-    lua_pushinteger(L, (int) dict_len(d));
-    return 1;
+    lua_pushinteger(L, (ਪੂਰਨ) dict_len(d));
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_dict_iter(lua_State *L UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+luaV_dict_iter(lua_State *L ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_EVAL
     hashitem_T *hi = (hashitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    int n = lua_tointeger(L, lua_upvalueindex(2));
+    ਪੂਰਨ n = lua_tointeger(L, lua_upvalueindex(2));
     dictitem_T *di;
-    if (n <= 0) return 0;
-    while (HASHITEM_EMPTY(hi)) hi++;
+    ਜੇ (n <= 0) ਵਾਪਸ 0;
+    ਜਦੋਂ (HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi)) hi++;
     di = dict_lookup(hi);
-    lua_pushstring(L, (char *) hi->hi_key);
+    lua_pushstring(L, (ਅੱਖਰ *) hi->hi_ਕੁੰਜੀ);
     luaV_pushtypval(L, &di->di_tv);
-    lua_pushlightuserdata(L, (void *) (hi + 1));
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) (hi + 1));
     lua_replace(L, lua_upvalueindex(1));
     lua_pushinteger(L, n - 1);
     lua_replace(L, lua_upvalueindex(2));
-    return 2;
-# else
-    return 0;
+    ਵਾਪਸ 2;
+# ਨਹੀਂਤਾਂ
+    ਵਾਪਸ 0;
 # endif
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_dict_call(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
     hashtab_T *ht = &d->dv_hashtab;
-    lua_pushlightuserdata(L, (void *) ht->ht_array);
-    lua_pushinteger(L, ht->ht_used); // # remaining items
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) ht->ht_array);
+    lua_pushinteger(L, ht->ht_ਵਰਤਿਆ); // # remaining items
     lua_pushcclosure(L, luaV_dict_iter, 2);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_dict_index(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_dict_ਸੂਚਕਾਂਕ(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
-    char_u *key = (char_u *) luaL_checkstring(L, 2);
-    dictitem_T *di = dict_find(d, key, -1);
+    char_u *ਕੁੰਜੀ = (char_u *) luaL_checkstring(L, 2);
+    dictitem_T *di = dict_ਲੱਭੋ(d, ਕੁੰਜੀ, -1);
 
-    if (di == NULL)
+    ਜੇ (di == ਨਿਰਾ)
     {
 	lua_pushnil(L);
-	return 1;
+	ਵਾਪਸ 1;
     }
 
     luaV_pushtypval(L, &di->di_tv);
-    if (di->di_tv.v_type == VAR_FUNC) // funcref?
+    ਜੇ (di->di_tv.v_type == VAR_FUNC) // funcref?
     {
 	luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, -1);
 	f->self = d; // keep "self" reference
 	d->dv_refcount++;
     }
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_dict_newindex(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
-    char_u *key = (char_u *) luaL_checkstring(L, 2);
+    char_u *ਕੁੰਜੀ = (char_u *) luaL_checkstring(L, 2);
     dictitem_T *di;
     typval_T tv;
 
-    if (d->dv_lock)
+    ਜੇ (d->dv_ਤਾਲਾ)
 	luaL_error(L, "dict is locked");
-    if (key == NULL)
-	return 0;
-    if (*key == NUL)
+    ਜੇ (ਕੁੰਜੀ == ਨਿਰਾ)
+	ਵਾਪਸ 0;
+    ਜੇ (*ਕੁੰਜੀ == NUL)
 	luaL_error(L, "empty key");
-    if (!lua_isnil(L, 3)) // read value?
+    ਜੇ (!lua_isnil(L, 3)) // read value?
     {
 	luaV_checktypval(L, 3, &tv, "setting dict item");
-	if (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
+	ਜੇ (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
 	{
 	    clear_tv(&tv);
 	    luaL_error(L, "cannot assign funcref to builtin scope");
 	}
     }
-    di = dict_find(d, key, -1);
-    if (di == NULL) // non-existing key?
+    di = dict_ਲੱਭੋ(d, ਕੁੰਜੀ, -1);
+    ਜੇ (di == ਨਿਰਾ) // non-existing key?
     {
-	if (lua_isnil(L, 3))
-	    return 0;
-	di = dictitem_alloc(key);
-	if (di == NULL)
+	ਜੇ (lua_isnil(L, 3))
+	    ਵਾਪਸ 0;
+	di = dictitem_alloc(ਕੁੰਜੀ);
+	ਜੇ (di == ਨਿਰਾ)
 	{
 	    clear_tv(&tv);
-	    return 0;
+	    ਵਾਪਸ 0;
 	}
-	if (dict_add(d, di) == FAIL)
+	ਜੇ (dict_ਜੋੜੋ(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    clear_tv(&tv);
-	    return 0;
+	    ਵਾਪਸ 0;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	clear_tv(&di->di_tv);
-    if (lua_isnil(L, 3)) // remove?
+    ਜੇ (lua_isnil(L, 3)) // remove?
     {
-	hashitem_T *hi = hash_find(&d->dv_hashtab, di->di_key);
+	hashitem_T *hi = hash_ਲੱਭੋ(&d->dv_hashtab, di->di_ਕੁੰਜੀ);
 	hash_remove(&d->dv_hashtab, hi, "Lua new index");
 	dictitem_free(di);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	di->di_tv = tv;
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-static const luaL_Reg luaV_Dict_mt[] = {
+ਸਥਿਰ ਅਚਲ luaL_Reg luaV_Dict_mt[] = {
     {"__tostring", luaV_dict_tostring},
     {"__len", luaV_dict_len},
     {"__call", luaV_dict_call},
-    {"__index", luaV_dict_index},
+    {"__index", lua_V_dict_ਸੂਚਕਾਂਕ},
     {"__newindex", luaV_dict_newindex},
-    {NULL, NULL}
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Blob type   =======
 
-    static luaV_Blob *
+    ਸਥਿਰ luaV_Blob *
 luaV_newblob(lua_State *L, blob_T *blo)
 {
-    luaV_Blob *b = (luaV_Blob *) lua_newuserdata(L, sizeof(luaV_Blob));
+    luaV_Blob *b = (luaV_Blob *) lua_newuserdata(L, ਆਕਾਰ(luaV_Blob));
     *b = blo;
     blo->bv_refcount++; // reference in Lua
     luaV_setudata(L, blo); // cache[blo] = udata
     luaV_getfield(L, LUAVIM_BLOB);
     lua_setmetatable(L, -2);
-    return b;
+    ਵਾਪਸ b;
 }
 
 luaV_pushtype(blob_T, blob, luaV_Blob)
 luaV_type_tostring(blob, LUAVIM_BLOB)
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_blob_gc(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
     blob_unref(b);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_blob_len(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    lua_pushinteger(L, (int) blob_len(b));
-    return 1;
+    lua_pushinteger(L, (ਪੂਰਨ) blob_len(b));
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_blob_index(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_blob_ਸੂਚਕਾਂਕ(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (lua_isnumber(L, 2))
+    ਜੇ (lua_isnumber(L, 2))
     {
-	int idx = luaL_checkinteger(L, 2);
-	if (idx < 0)
+	ਪੂਰਨ idx = luaL_checkinteger(L, 2);
+	ਜੇ (idx < 0)
 	    // Negative index is relative to the end.
-	    idx += (int) blob_len(b);
-	if (idx >= 0 && idx < blob_len(b))
-	    lua_pushnumber(L, (lua_Number) blob_get(b, idx));
-	else
+	    idx += (ਪੂਰਨ) blob_len(b);
+	ਜੇ (idx >= 0 && idx < blob_len(b))
+	    lua_pushnumber(L, (lua_ਸੰਖਿਆ) blob_get(b, idx));
+	ਨਹੀਂਤਾਂ
 	    lua_pushnil(L);
     }
-    else if (lua_isstring(L, 2))
+    ਨਹੀਂਤਾਂ ਜੇ (lua_isstring(L, 2))
     {
-	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0)
+	ਅਚਲ ਅੱਖਰ *s = lua_tostring(L, 2);
+	ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "add", 3) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    lua_pushnil(L);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lua_pushnil(L);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_blob_newindex(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (b->bv_lock)
+    ਜੇ (b->bv_ਤਾਲਾ)
 	luaL_error(L, "blob is locked");
 
-    if (!lua_isnumber(L, 2))
-	return 0;
+    ਜੇ (!lua_isnumber(L, 2))
+	ਵਾਪਸ 0;
 
-    long len = blob_len(b);
-    int idx = luaL_checkinteger(L, 2);
-    int val = luaL_checkinteger(L, 3);
-    if (idx < 0)
+    ਲੰਮਾ len = blob_len(b);
+    ਪੂਰਨ idx = luaL_checkinteger(L, 2);
+    ਪੂਰਨ val = luaL_checkinteger(L, 3);
+    ਜੇ (idx < 0)
 	// Negative index is relative to the end.
-	idx += (int) len;
-    if ((idx >= 0 && idx < len)
+	idx += (ਪੂਰਨ) len;
+    ਜੇ ((idx >= 0 && idx < len)
 	    || (idx == len && ga_grow(&b->bv_ga, 1) == OK))
     {
-	blob_set(b, idx, (char_u) val);
-	if (idx == len)
+	blob_ਸੈੱਟ(b, idx, (char_u) val);
+	ਜੇ (idx == len)
 	    ++b->bv_ga.ga_len;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	luaL_error(L, "index out of range");
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_blob_add(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_blob_ਜੋੜੋ(lua_State *L)
 {
     luaV_Blob *blo = luaV_checkudata(L, 1, LUAVIM_BLOB);
-    blob_T *b = (blob_T *) luaV_checkcache(L, (void *) *blo);
-    if (b->bv_lock)
+    blob_T *b = (blob_T *) luaV_checkcache(L, (ਖਾਲੀ *) *blo);
+    ਜੇ (b->bv_ਤਾਲਾ)
 	luaL_error(L, "blob is locked");
     lua_settop(L, 2);
-    if (!lua_isstring(L, 2))
+    ਜੇ (!lua_isstring(L, 2))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 2));
-    else
+    ਨਹੀਂਤਾਂ
     {
 	size_t i, l = 0;
-	const char *s = lua_tolstring(L, 2, &l);
+	ਅਚਲ ਅੱਖਰ *s = lua_tolstring(L, 2, &l);
 
-	if (ga_grow(&b->bv_ga, (int)l) == OK)
-	    for (i = 0; i < l; ++i)
+	ਜੇ (ga_grow(&b->bv_ga, (ਪੂਰਨ)l) == OK)
+	    ਲਈ (i = 0; i < l; ++i)
 		ga_append(&b->bv_ga, s[i]);
     }
     lua_settop(L, 1);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_Blob_mt[] = {
+ਸਥਿਰ ਅਚਲ luaL_Reg luaV_Blob_mt[] = {
     {"__tostring", luaV_blob_tostring},
     {"__gc", luaV_blob_gc},
     {"__len", luaV_blob_len},
-    {"__index", luaV_blob_index},
+    {"__index", lua_V_blob_ਸੂਚਕਾਂਕ},
     {"__newindex", luaV_blob_newindex},
-    {"add", luaV_blob_add},
-    {NULL, NULL}
+    {"add", lua_V_blob_ਜੋੜੋ},
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Funcref type   =======
 
-    static luaV_Funcref *
+    ਸਥਿਰ luaV_Funcref *
 luaV_newfuncref(lua_State *L, char_u *name)
 {
-    luaV_Funcref *f = (luaV_Funcref *)lua_newuserdata(L, sizeof(luaV_Funcref));
+    luaV_Funcref *f = (luaV_Funcref *)lua_newuserdata(L, ਆਕਾਰ(luaV_Funcref));
 
-    if (name != NULL)
+    ਜੇ (name != ਨਿਰਾ)
     {
 	func_ref(name);
 	f->name = vim_strsave(name);
     }
-    f->self = NULL;
+    f->self = ਨਿਰਾ;
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_setmetatable(L, -2);
-    return f;
+    ਵਾਪਸ f;
 }
 
-    static luaV_Funcref *
+    ਸਥਿਰ luaV_Funcref *
 luaV_pushfuncref(lua_State *L, char_u *name)
 {
-    return luaV_newfuncref(L, name);
+    ਵਾਪਸ luaV_newfuncref(L, name);
 }
 
 
 luaV_type_tostring(funcref, LUAVIM_FUNCREF)
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_funcref_gc(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
@@ -1370,334 +1370,334 @@ luaV_funcref_gc(lua_State *L)
     vim_free(f->name);
     // NOTE: Don't call "dict_unref(f->self)", because the dict of "f->self"
     // will be (or has been already) freed by Vim's garbage collection.
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 // equivalent to string(funcref)
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_funcref_len(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
 
-    lua_pushstring(L, (const char *) f->name);
-    return 1;
+    lua_pushstring(L, (ਅਚਲ ਅੱਖਰ *) f->name);
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_funcref_call(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
-    int i, n = lua_gettop(L) - 1; // #args
-    int status = FAIL;
-    typval_T args;
+    ਪੂਰਨ i, n = lua_gettop(L) - 1; // #args
+    ਪੂਰਨ ਸਥਿਤੀ = FAIL;
+    typval_T ਦਲੀਲਾਂ;
     typval_T rettv;
 
-    args.v_type = VAR_LIST;
-    args.vval.v_list = list_alloc();
+    ਦਲੀਲਾਂ.v_type = VAR_LIST;
+    ਦਲੀਲਾਂ.vval.v_list = list_alloc();
     rettv.v_type = VAR_UNKNOWN; // as in clear_tv
-    if (args.vval.v_list != NULL)
+    ਜੇ (ਦਲੀਲਾਂ.vval.v_list != ਨਿਰਾ)
     {
 	typval_T v;
 
-	for (i = 0; i < n; i++)
+	ਲਈ (i = 0; i < n; i++)
 	{
 	    luaV_checktypval(L, i + 2, &v, "calling funcref");
-	    list_append_tv(args.vval.v_list, &v);
+	    list_append_tv(ਦਲੀਲਾਂ.vval.v_list, &v);
 	    clear_tv(&v);
 	}
-	status = func_call(f->name, &args, NULL, f->self, &rettv);
-	if (status == OK)
+	ਸਥਿਤੀ = func_call(f->name, &ਦਲੀਲਾਂ, ਨਿਰਾ, f->self, &rettv);
+	ਜੇ (ਸਥਿਤੀ == OK)
 	    luaV_pushtypval(L, &rettv);
-	clear_tv(&args);
+	clear_tv(&ਦਲੀਲਾਂ);
 	clear_tv(&rettv);
     }
-    if (status != OK)
+    ਜੇ (ਸਥਿਤੀ != OK)
 	luaL_error(L, "cannot call funcref");
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_Funcref_mt[] = {
+ਸਥਿਰ ਅਚਲ luaL_Reg luaV_Funcref_mt[] = {
     {"__tostring", luaV_funcref_tostring},
     {"__gc", luaV_funcref_gc},
     {"__len", luaV_funcref_len},
     {"__call", luaV_funcref_call},
-    {NULL, NULL}
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Buffer type   =======
 
-luaV_newtype(buf_T, buffer, luaV_Buffer, LUAVIM_BUFFER)
-luaV_pushtype(buf_T, buffer, luaV_Buffer)
-luaV_type_tostring(buffer, LUAVIM_BUFFER)
+luaV_newtype(buf_T, ਬਫਰ, lua_V_ਬਫਰ, LUAVIM_ਬਫਰ)
+luaV_pushtype(buf_T, ਬਫਰ, lua_V_ਬਫਰ)
+luaV_type_tostring(ਬਫਰ, LUAVIM_ਬਫਰ)
 
-    static int
-luaV_buffer_len(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_len(lua_State *L)
 {
-    buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
-    lua_pushinteger(L, b->b_ml.ml_line_count);
-    return 1;
+    buf_T *b = (buf_T *) luaV_checkvalid(L, lua_V_ਬਫਰ, 1);
+    lua_pushinteger(L, b->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ);
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer_call(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_call(lua_State *L)
 {
-    buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
+    buf_T *b = (buf_T *) luaV_checkvalid(L, lua_V_ਬਫਰ, 1);
     lua_settop(L, 1);
-    set_curbuf(b, DOBUF_SPLIT);
-    return 1;
+    ਸੈੱਟ_curbuf(b, DOBUF_ਵੰਡੋ);
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer_index(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_ਸੂਚਕਾਂਕ(lua_State *L)
 {
-    buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
+    buf_T *b = (buf_T *) luaV_checkvalid(L, lua_V_ਬਫਰ, 1);
     linenr_T n = (linenr_T) lua_tointeger(L, 2);
-    if (n > 0 && n <= b->b_ml.ml_line_count)
+    ਜੇ (n > 0 && n <= b->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	luaV_pushline(L, b, n);
-    else if (lua_isstring(L, 2))
+    ਨਹੀਂਤਾਂ ਜੇ (lua_isstring(L, 2))
     {
-	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "name", 4) == 0)
-	    lua_pushstring(L, (b->b_sfname == NULL)
-					? "" : (char *) b->b_sfname);
-	else if (strncmp(s, "fname", 5) == 0)
-	    lua_pushstring(L, (b->b_ffname == NULL)
-					? "" : (char *) b->b_ffname);
-	else if (strncmp(s, "number", 6) == 0)
+	ਅਚਲ ਅੱਖਰ *s = lua_tostring(L, 2);
+	ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "name", 4) == 0)
+	    lua_pushstring(L, (b->b_sfname == ਨਿਰਾ)
+					? "" : (ਅੱਖਰ *) b->b_sfname);
+	ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "fname", 5) == 0)
+	    lua_pushstring(L, (b->b_ffname == ਨਿਰਾ)
+					? "" : (ਅੱਖਰ *) b->b_ffname);
+	ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "number", 6) == 0)
 	    lua_pushinteger(L, b->b_fnum);
 	// methods
-	else if (strncmp(s,   "insert", 6) == 0
-		|| strncmp(s, "next", 4) == 0
-		|| strncmp(s, "previous", 8) == 0
-		|| strncmp(s, "isvalid", 7) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s,   "insert", 6) == 0
+		|| ਲੜੀ_ਤੁਲਨਾ(s, "next", 4) == 0
+		|| ਲੜੀ_ਤੁਲਨਾ(s, "previous", 8) == 0
+		|| ਲੜੀ_ਤੁਲਨਾ(s, "isvalid", 7) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    lua_pushnil(L);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lua_pushnil(L);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer_newindex(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_newindex(lua_State *L)
 {
-    buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
+    buf_T *b = (buf_T *) luaV_checkvalid(L, lua_V_ਬਫਰ, 1);
     linenr_T n = (linenr_T) luaL_checkinteger(L, 2);
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (n < 1 || n > b->b_ml.ml_line_count)
+    ਜੇ (n < 1 || n > b->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	luaL_error(L, "invalid line number");
-    if (lua_isnil(L, 3)) // delete line
+    ਜੇ (lua_isnil(L, 3)) // delete line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savedel(n, 1L) == FAIL)
+	ਜੇ (u_savedel(n, 1L) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_delete(n) == FAIL)
+	ਨਹੀਂਤਾਂ ਜੇ (ml_delete(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot delete line");
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    deleted_lines_mark(n, 1L);
-	    if (b == curwin->w_buffer) // fix cursor in current window?
+	    deleted_ਸਤਰਾਂ_mark(n, 1L);
+	    ਜੇ (b == curwin->w_ਬਫਰ) // fix cursor in current window?
 	    {
-		if (curwin->w_cursor.lnum >= n)
+		ਜੇ (curwin->w_cursor.lnum >= n)
 		{
-		    if (curwin->w_cursor.lnum > n)
+		    ਜੇ (curwin->w_cursor.lnum > n)
 		    {
 			curwin->w_cursor.lnum -= 1;
-			check_cursor_col();
+			check_cursor_ਖਾਨਾ();
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			check_cursor();
-		    changed_cline_bef_curs();
+		    ਬਦਲਿਆ_cline_bef_curs();
 		}
 		invalidate_botline();
 	    }
 	}
 	curbuf = buf;
     }
-    else if (lua_isstring(L, 3)) // update line
+    ਨਹੀਂਤਾਂ ਜੇ (lua_isstring(L, 3)) // update line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savesub(n) == FAIL)
+	ਜੇ (u_savesub(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
+	ਨਹੀਂਤਾਂ ਜੇ (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot replace line");
 	}
-	else
-	    changed_bytes(n, 0);
+	ਨਹੀਂਤਾਂ
+	    ਬਦਲਿਆ_ਬਾਈਟਾਂ(n, 0);
 	curbuf = buf;
-	if (b == curwin->w_buffer)
-	    check_cursor_col();
+	ਜੇ (b == curwin->w_ਬਫਰ)
+	    check_cursor_ਖਾਨਾ();
     }
-    else
+    ਨਹੀਂਤਾਂ
 	luaL_error(L, "wrong argument to change line");
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_buffer_insert(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_ਪਾਓ(lua_State *L)
 {
-    luaV_Buffer *lb = luaV_checkudata(L, 1, LUAVIM_BUFFER);
-    buf_T *b = (buf_T *) luaV_checkcache(L, (void *) *lb);
-    linenr_T last = b->b_ml.ml_line_count;
-    linenr_T n = (linenr_T) luaL_optinteger(L, 3, last);
+    lua_V_ਬਫਰ *lb = luaV_checkudata(L, 1, LUAVIM_ਬਫਰ);
+    buf_T *b = (buf_T *) luaV_checkcache(L, (ਖਾਲੀ *) *lb);
+    linenr_T ਆਖਰੀ = b->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+    linenr_T n = (linenr_T) luaL_optinteger(L, 3, ਆਖਰੀ);
     buf_T *buf;
     luaL_checktype(L, 2, LUA_TSTRING);
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
     // fix insertion line
-    if (n < 0) n = 0;
-    if (n > last) n = last;
+    ਜੇ (n < 0) n = 0;
+    ਜੇ (n > ਆਖਰੀ) n = ਆਖਰੀ;
     // insert
     buf = curbuf;
     curbuf = b;
-    if (u_save(n, n + 1) == FAIL)
+    ਜੇ (u_save(n, n + 1) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot save undo information");
     }
-    else if (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
+    ਨਹੀਂਤਾਂ ਜੇ (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot insert line");
     }
-    else
-	appended_lines_mark(n, 1L);
+    ਨਹੀਂਤਾਂ
+	appended_ਸਤਰਾਂ_mark(n, 1L);
     curbuf = buf;
     update_screen(UPD_VALID);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_buffer_next(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_ਅਗਲਾ(lua_State *L)
 {
-    luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
-    buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
-    luaV_pushbuffer(L, buf->b_next);
-    return 1;
+    lua_V_ਬਫਰ *b = luaV_checkudata(L, 1, LUAVIM_ਬਫਰ);
+    buf_T *buf = (buf_T *) luaV_checkcache(L, (ਖਾਲੀ *) *b);
+    luaV_pushbuffer(L, buf->b_ਅਗਲਾ);
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer_previous(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_ਪਿਛਲਾ(lua_State *L)
 {
-    luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
-    buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
+    lua_V_ਬਫਰ *b = luaV_checkudata(L, 1, LUAVIM_ਬਫਰ);
+    buf_T *buf = (buf_T *) luaV_checkcache(L, (ਖਾਲੀ *) *b);
     luaV_pushbuffer(L, buf->b_prev);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer_isvalid(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_isvalid(lua_State *L)
 {
-    luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
+    lua_V_ਬਫਰ *b = luaV_checkudata(L, 1, LUAVIM_ਬਫਰ);
     luaV_getudata(L, *b);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_Buffer_mt[] = {
-    {"__tostring", luaV_buffer_tostring},
-    {"__len", luaV_buffer_len},
-    {"__call", luaV_buffer_call},
-    {"__index", luaV_buffer_index},
-    {"__newindex", luaV_buffer_newindex},
-    {"insert", luaV_buffer_insert},
-    {"next", luaV_buffer_next},
-    {"previous", luaV_buffer_previous},
-    {"isvalid", luaV_buffer_isvalid},
-    {NULL, NULL}
+ਸਥਿਰ ਅਚਲ luaL_Reg lua_V_ਬਫਰ_mt[] = {
+    {"__tostring", lua_V_ਬਫਰ_tostring},
+    {"__len", lua_V_ਬਫਰ_len},
+    {"__call", lua_V_ਬਫਰ_call},
+    {"__index", lua_V_ਬਫਰ_ਸੂਚਕਾਂਕ},
+    {"__newindex", lua_V_ਬਫਰ_newindex},
+    {"insert", lua_V_ਬਫਰ_ਪਾਓ},
+    {"next", lua_V_ਬਫਰ_ਅਗਲਾ},
+    {"previous", lua_V_ਬਫਰ_ਪਿਛਲਾ},
+    {"isvalid", lua_V_ਬਫਰ_isvalid},
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Window type   =======
 
-luaV_newtype(win_T, window, luaV_Window, LUAVIM_WINDOW)
-luaV_pushtype(win_T, window, luaV_Window)
-luaV_type_tostring(window, LUAVIM_WINDOW)
+luaV_newtype(win_T, ਖਿੜਕੀ_2, lua_V_ਖਿੜਕੀ, LUAVIM_ਖਿੜਕੀ)
+luaV_pushtype(win_T, ਖਿੜਕੀ_2, lua_V_ਖਿੜਕੀ)
+luaV_type_tostring(ਖਿੜਕੀ_2, LUAVIM_ਖਿੜਕੀ)
 
-    static int
-luaV_window_call(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_call(lua_State *L)
 {
-    win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
+    win_T *w = (win_T *) luaV_checkvalid(L, lua_V_ਖਿੜਕੀ, 1);
     lua_settop(L, 1);
     win_goto(w);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_window_index(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_ਸੂਚਕਾਂਕ(lua_State *L)
 {
-    win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
-    const char *s = luaL_checkstring(L, 2);
-    if (strncmp(s, "buffer", 6) == 0)
-	luaV_pushbuffer(L, w->w_buffer);
-    else if (strncmp(s, "line", 4) == 0)
+    win_T *w = (win_T *) luaV_checkvalid(L, lua_V_ਖਿੜਕੀ, 1);
+    ਅਚਲ ਅੱਖਰ *s = luaL_checkstring(L, 2);
+    ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "buffer", 6) == 0)
+	luaV_pushbuffer(L, w->w_ਬਫਰ);
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "line", 4) == 0)
 	lua_pushinteger(L, w->w_cursor.lnum);
-    else if (strncmp(s, "col", 3) == 0)
-	lua_pushinteger(L, w->w_cursor.col + 1);
-    else if (strncmp(s, "width", 5) == 0)
-	lua_pushinteger(L, w->w_width);
-    else if (strncmp(s, "height", 6) == 0)
-	lua_pushinteger(L, w->w_height);
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "col", 3) == 0)
+	lua_pushinteger(L, w->w_cursor.ਖਾਨਾ + 1);
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "width", 5) == 0)
+	lua_pushinteger(L, w->w_ਚੌੜਾਈ);
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "height", 6) == 0)
+	lua_pushinteger(L, w->w_ਉਚਾਈ);
     // methods
-    else if (strncmp(s,   "next", 4) == 0
-	    || strncmp(s, "previous", 8) == 0
-	    || strncmp(s, "isvalid", 7) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s,   "next", 4) == 0
+	    || ਲੜੀ_ਤੁਲਨਾ(s, "previous", 8) == 0
+	    || ਲੜੀ_ਤੁਲਨਾ(s, "isvalid", 7) == 0)
     {
 	lua_getmetatable(L, 1);
 	lua_getfield(L, -1, s);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lua_pushnil(L);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_window_newindex(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_newindex(lua_State *L)
 {
-    win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
-    const char *s = luaL_checkstring(L, 2);
-    int v = luaL_checkinteger(L, 3);
-    if (strncmp(s, "line", 4) == 0)
+    win_T *w = (win_T *) luaV_checkvalid(L, lua_V_ਖਿੜਕੀ, 1);
+    ਅਚਲ ਅੱਖਰ *s = luaL_checkstring(L, 2);
+    ਪੂਰਨ v = luaL_checkinteger(L, 3);
+    ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "line", 4) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
 # endif
-	if (v < 1 || v > w->w_buffer->b_ml.ml_line_count)
+	ਜੇ (v < 1 || v > w->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	    luaL_error(L, "line out of range");
 	w->w_cursor.lnum = v;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "col", 3) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "col", 3) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
 # endif
-	w->w_cursor.col = v - 1;
-	w->w_set_curswant = true;
+	w->w_cursor.ਖਾਨਾ = v - 1;
+	w->w_ਸੈੱਟ_curswant = true;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "width", 5) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "width", 5) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1707,7 +1707,7 @@ luaV_window_newindex(lua_State *L)
 	win_setwidth(v);
 	curwin = win;
     }
-    else if (strncmp(s, "height", 6) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, "height", 6) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1717,217 +1717,217 @@ luaV_window_newindex(lua_State *L)
 	win_setheight(v);
 	curwin = win;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	luaL_error(L, "invalid window property: `%s'", s);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_window_next(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_ਅਗਲਾ(lua_State *L)
 {
-    luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
-    win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
-    luaV_pushwindow(L, win->w_next);
-    return 1;
+    lua_V_ਖਿੜਕੀ *w = luaV_checkudata(L, 1, LUAVIM_ਖਿੜਕੀ);
+    win_T *win = (win_T *) luaV_checkcache(L, (ਖਾਲੀ *) *w);
+    luaV_pushwindow(L, win->w_ਅਗਲਾ);
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_window_previous(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_ਪਿਛਲਾ(lua_State *L)
 {
-    luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
-    win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
+    lua_V_ਖਿੜਕੀ *w = luaV_checkudata(L, 1, LUAVIM_ਖਿੜਕੀ);
+    win_T *win = (win_T *) luaV_checkcache(L, (ਖਾਲੀ *) *w);
     luaV_pushwindow(L, win->w_prev);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_window_isvalid(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_isvalid(lua_State *L)
 {
-    luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
+    lua_V_ਖਿੜਕੀ *w = luaV_checkudata(L, 1, LUAVIM_ਖਿੜਕੀ);
     luaV_getudata(L, *w);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_Window_mt[] = {
-    {"__tostring", luaV_window_tostring},
-    {"__call", luaV_window_call},
-    {"__index", luaV_window_index},
-    {"__newindex", luaV_window_newindex},
-    {"next", luaV_window_next},
-    {"previous", luaV_window_previous},
-    {"isvalid", luaV_window_isvalid},
-    {NULL, NULL}
+ਸਥਿਰ ਅਚਲ luaL_Reg lua_V_ਖਿੜਕੀ_mt[] = {
+    {"__tostring", lua_V_ਖਿੜਕੀ_tostring},
+    {"__call", lua_V_ਖਿੜਕੀ_call},
+    {"__index", lua_V_ਖਿੜਕੀ_ਸੂਚਕਾਂਕ},
+    {"__newindex", lua_V_ਖਿੜਕੀ_newindex},
+    {"next", lua_V_ਖਿੜਕੀ_ਅਗਲਾ},
+    {"previous", lua_V_ਖਿੜਕੀ_ਪਿਛਲਾ},
+    {"isvalid", lua_V_ਖਿੜਕੀ_isvalid},
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 
 // =======   Vim module   =======
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_print(lua_State *L)
 {
-    int		i, n = lua_gettop(L); // nargs
-    const char	*s;
+    ਪੂਰਨ		i, n = lua_gettop(L); // nargs
+    ਅਚਲ ਅੱਖਰ	*s;
     size_t	l;
-    garray_T	msg_ga;
+    garray_T	ਸੁਨੇਹਾ_ga;
 
-    ga_init2(&msg_ga, 1, 128);
+    ga_init2(&ਸੁਨੇਹਾ_ga, 1, 128);
     lua_getglobal(L, "tostring");
-    for (i = 1; i <= n; i++)
+    ਲਈ (i = 1; i <= n; i++)
     {
 	lua_pushvalue(L, -1); // tostring
 	lua_pushvalue(L, i); // arg
 	lua_call(L, 1, 1);
 	s = lua_tolstring(L, -1, &l);
-	if (s == NULL)
-	    return luaL_error(L, "cannot convert to string");
-	if (i > 1)
-	    ga_append(&msg_ga, ' '); // use space instead of tab
-	ga_concat_len(&msg_ga, (char_u *)s, l);
-	lua_pop(L, 1);
+	ਜੇ (s == ਨਿਰਾ)
+	    ਵਾਪਸ luaL_error(L, "cannot convert to string");
+	ਜੇ (i > 1)
+	    ga_append(&ਸੁਨੇਹਾ_ga, ' '); // use space instead of tab
+	ga_concat_len(&ਸੁਨੇਹਾ_ga, (char_u *)s, l);
+	lua_ਕੱਢੋ(L, 1);
     }
     // Replace any "\n" with "\0"
-    for (i = 0; i < msg_ga.ga_len; i++)
-	if (((char *)msg_ga.ga_data)[i] == '\n')
-	    ((char *)msg_ga.ga_data)[i] = '\0';
-    lua_pushlstring(L, msg_ga.ga_data, msg_ga.ga_len);
-    if (!got_int)
-	luaV_msg(L);
+    ਲਈ (i = 0; i < ਸੁਨੇਹਾ_ga.ga_len; i++)
+	ਜੇ (((ਅੱਖਰ *)ਸੁਨੇਹਾ_ga.ga_ਅੰਕੜੇ)[i] == '\n')
+	    ((ਅੱਖਰ *)ਸੁਨੇਹਾ_ga.ga_ਅੰਕੜੇ)[i] = '\0';
+    lua_pushlstring(L, ਸੁਨੇਹਾ_ga.ga_ਅੰਕੜੇ, ਸੁਨੇਹਾ_ga.ga_len);
+    ਜੇ (!got_int)
+	lua_V_ਸੁਨੇਹਾ(L);
 
-    ga_clear(&msg_ga);
-    return 0;
+    ga_clear(&ਸੁਨੇਹਾ_ga);
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_debug(lua_State *L)
 {
     lua_settop(L, 0);
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "eval");
     lua_remove(L, -2); // vim.eval at position 1
-    for (;;)
+    ਲਈ (;;)
     {
-	const char *input;
+	ਅਚਲ ਅੱਖਰ *ਨਿਵੇਸ਼;
 	size_t l;
 	lua_pushvalue(L, 1); // vim.eval
 	lua_pushliteral(L, "input('lua_debug> ')");
 	lua_call(L, 1, 1); // return string
-	input = lua_tolstring(L, -1, &l);
-	if (l == 0 || strcmp(input, "cont") == 0)
-	    return 0;
-	msg_putchar('\n'); // avoid outputting on input line
-	if (luaL_loadbuffer(L, input, l, "=(debug command)")
+	ਨਿਵੇਸ਼ = lua_tolstring(L, -1, &l);
+	ਜੇ (l == 0 || strcmp(ਨਿਵੇਸ਼, "cont") == 0)
+	    ਵਾਪਸ 0;
+	ਸੁਨੇਹਾ_putchar('\n'); // avoid outputting on input line
+	ਜੇ (luaL_loadbuffer(L, ਨਿਵੇਸ਼, l, "=(debug command)")
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
 	lua_settop(L, 1); // remove eventual returns, but keep vim.eval
     }
 }
 
-    static dict_T *
+    ਸਥਿਰ dict_T *
 luaV_get_var_scope(lua_State *L)
 {
-    const char	*scope = luaL_checkstring(L, 1);
-    dict_T	*dict = NULL;
+    ਅਚਲ ਅੱਖਰ	*scope = luaL_checkstring(L, 1);
+    dict_T	*dict = ਨਿਰਾ;
 
-    if (STRICMP((char *)scope, "g") == 0)
+    ਜੇ (STRICMP((ਅੱਖਰ *)scope, "g") == 0)
 	dict = get_globvar_dict();
-    else if (STRICMP((char *)scope, "v") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP((ਅੱਖਰ *)scope, "v") == 0)
 	dict = get_vimvar_dict();
-    else if (STRICMP((char *)scope, "b") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP((ਅੱਖਰ *)scope, "b") == 0)
 	dict = curbuf->b_vars;
-    else if (STRICMP((char *)scope, "w") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP((ਅੱਖਰ *)scope, "w") == 0)
 	dict = curwin->w_vars;
-    else if (STRICMP((char *)scope, "t") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP((ਅੱਖਰ *)scope, "t") == 0)
 	dict = curtab->tp_vars;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	luaL_error(L, "invalid scope %s", scope);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    return dict;
+    ਵਾਪਸ dict;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_setvar(lua_State *L)
 {
     dict_T	*dict;
     dictitem_T	*di;
     size_t	len;
-    char	*name;
-    int		del;
-    char	*error = NULL;
+    ਅੱਖਰ	*name;
+    ਪੂਰਨ		del;
+    ਅੱਖਰ	*error = ਨਿਰਾ;
 
-    name = (char *)luaL_checklstring(L, 3, &len);
+    name = (ਅੱਖਰ *)luaL_checklstring(L, 3, &len);
     del = (lua_gettop(L) < 4) || lua_isnil(L, 4);
 
     dict = luaV_get_var_scope(L);
-    if (dict == NULL)
-	return 0;
+    ਜੇ (dict == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
-    di = dict_find(dict, (char_u *)name, (int)len);
-    if (di != NULL)
+    di = dict_ਲੱਭੋ(dict, (char_u *)name, (ਪੂਰਨ)len);
+    ਜੇ (di != ਨਿਰਾ)
     {
-	if (di->di_flags & DI_FLAGS_RO)
+	ਜੇ (di->di_flags & DI_FLAGS_RO)
 	    error = "variable is read-only";
-	else if (di->di_flags & DI_FLAGS_LOCK)
+	ਨਹੀਂਤਾਂ ਜੇ (di->di_flags & DI_FLAGS_ਤਾਲਾ)
 	    error = "variable is locked";
-	else if (del && di->di_flags & DI_FLAGS_FIX)
+	ਨਹੀਂਤਾਂ ਜੇ (del && di->di_flags & DI_FLAGS_FIX)
 	    error = "variable is fixed";
-	if (error != NULL)
-	    return luaL_error(L, error);
+	ਜੇ (error != ਨਿਰਾ)
+	    ਵਾਪਸ luaL_error(L, error);
     }
-    else if (dict->dv_lock)
-	return luaL_error(L, "Dictionary is locked");
+    ਨਹੀਂਤਾਂ ਜੇ (dict->dv_ਤਾਲਾ)
+	ਵਾਪਸ luaL_error(L, "Dictionary is locked");
 
-    if (del)
+    ਜੇ (del)
     {
 	// Delete the key
-	if (di == NULL)
+	ਜੇ (di == ਨਿਰਾ)
 	    // Doesn't exist, nothing to do
-	    return 0;
+	    ਵਾਪਸ 0;
 	// Delete the entry
 	dictitem_remove(dict, di, "Lua delete variable");
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Update the key
 	typval_T	tv;
 
 	// Convert the lua value to a Vim script type in the temporary variable
 	lua_pushvalue(L, 4);
-	if (luaV_totypval(L, -1, &tv) == FAIL)
-	    return luaL_error(L, "Couldn't convert lua value");
+	ਜੇ (luaV_totypval(L, -1, &tv) == FAIL)
+	    ਵਾਪਸ luaL_error(L, "Couldn't convert lua value");
 
-	if (di == NULL)
+	ਜੇ (di == ਨਿਰਾ)
 	{
 	    // Need to create an entry
 	    di = dictitem_alloc((char_u *)name);
-	    if (di == NULL)
+	    ਜੇ (di == ਨਿਰਾ)
 	    {
 		clear_tv(&tv);
-		return 0;
+		ਵਾਪਸ 0;
 	    }
 	    // Update the value
 	    copy_tv(&tv, &di->di_tv);
-	    if (dict_add(dict, di) == FAIL)
+	    ਜੇ (dict_ਜੋੜੋ(dict, di) == FAIL)
 	    {
 		dictitem_free(di);
 		clear_tv(&tv);
-		return luaL_error(L, "Couldn't add to dictionary");
+		ਵਾਪਸ luaL_error(L, "Couldn't add to dictionary");
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int type_error = FALSE;
-	    if (dict == get_vimvar_dict()
-	       && !before_set_vvar((char_u *)name, di, &tv, TRUE, &type_error))
+	    ਪੂਰਨ type_error = FALSE;
+	    ਜੇ (dict == get_vimvar_dict()
+	       && !before_ਸੈੱਟ_vvar((char_u *)name, di, &tv, TRUE, &type_error))
 	    {
 		clear_tv(&tv);
-		if (type_error)
-		    return luaL_error(L,
+		ਜੇ (type_error)
+		    ਵਾਪਸ luaL_error(L,
 				"Setting v:%s to value with wrong type", name);
-		return 0;
+		ਵਾਪਸ 0;
 	    }
 	    // Clear the old value
 	    clear_tv(&di->di_tv);
@@ -1939,25 +1939,25 @@ luaV_setvar(lua_State *L)
 	clear_tv(&tv);
     }
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_getvar(lua_State *L)
 {
     dict_T	*dict = luaV_get_var_scope(L);
     size_t	len;
-    const char	*name = luaL_checklstring(L, 3, &len);
-    dictitem_T	*di = dict_find(dict, (char_u *)name, (int)len);
+    ਅਚਲ ਅੱਖਰ	*name = luaL_checklstring(L, 3, &len);
+    dictitem_T	*di = dict_ਲੱਭੋ(dict, (char_u *)name, (ਪੂਰਨ)len);
 
-    if (di == NULL)
-	return 0;  // nil
+    ਜੇ (di == ਨਿਰਾ)
+	ਵਾਪਸ 0;  // nil
 
     luaV_pushtypval(L, &di->di_tv);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_command(lua_State *L)
 {
     char_u  *s = vim_strsave((char_u *)luaL_checkstring(L, 1));
@@ -1965,413 +1965,413 @@ luaV_command(lua_State *L)
     execute_cmds_from_string(s);
     vim_free(s);
     update_screen(UPD_VALID);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_eval(lua_State *L)
 {
-    typval_T *tv = eval_expr((char_u *) luaL_checkstring(L, 1), NULL);
+    typval_T *tv = eval_ਵਿਅੰਜਕ((char_u *) luaL_checkstring(L, 1), ਨਿਰਾ);
 
-    if (tv == NULL) luaL_error(L, "invalid expression");
+    ਜੇ (tv == ਨਿਰਾ) luaL_error(L, "invalid expression");
     luaV_pushtypval(L, tv);
     free_tv(tv);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_beep(lua_State *L UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+luaV_beep(lua_State *L ਅਣਵਰਤਿਆ)
 {
     vim_beep(BO_LANG);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-luaV_line(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਸਤਰ(lua_State *L)
 {
     luaV_pushline(L, curbuf, curwin->w_cursor.lnum);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_list(lua_State *L)
 {
     list_T *l;
-    int initarg = !lua_isnoneornil(L, 1);
+    ਪੂਰਨ initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    ਜੇ (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     l = list_alloc();
-    if (l == NULL)
+    ਜੇ (l == ਨਿਰਾ)
     {
 	lua_pushnil(L);
-	return 1;
+	ਵਾਪਸ 1;
     }
 
     luaV_newlist(L, l);
-    if (!initarg)
-	return 1;
+    ਜੇ (!initarg)
+	ਵਾਪਸ 1;
 
     // traverse table to init list
-    int notnil, i = 0;
+    ਪੂਰਨ notnil, i = 0;
     typval_T v;
-    do
+    ਕਰੋ
     {
 	lua_rawgeti(L, 1, ++i);
 	notnil = !lua_isnil(L, -1);
-	if (notnil)
+	ਜੇ (notnil)
 	{
 	    luaV_checktypval(L, -1, &v, "vim.list");
 	    list_append_tv(l, &v);
 	    clear_tv(&v);
 	}
-	lua_pop(L, 1); // value
-    } while (notnil);
+	lua_ਕੱਢੋ(L, 1); //ਮੁੱਲ
+    } ਜਦੋਂ (notnil);
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_dict(lua_State *L)
 {
     dict_T *d;
-    int initarg = !lua_isnoneornil(L, 1);
+    ਪੂਰਨ initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    ਜੇ (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     d = dict_alloc();
-    if (d == NULL)
+    ਜੇ (d == ਨਿਰਾ)
     {
 	lua_pushnil(L);
-	return 1;
+	ਵਾਪਸ 1;
     }
 
     luaV_newdict(L, d);
-    if (!initarg)
-	return 1;
+    ਜੇ (!initarg)
+	ਵਾਪਸ 1;
 
     // traverse table to init dict
     lua_pushnil(L);
-    while (lua_next(L, 1))
+    ਜਦੋਂ (lua_ਅਗਲਾ(L, 1))
     {
-	char_u *key;
+	char_u *ਕੁੰਜੀ;
 	dictitem_T *di;
 	typval_T v;
 
 	lua_pushvalue(L, -2); // dup key in case it's a number
-	key = (char_u *) lua_tostring(L, -1);
-	if (key == NULL)
+	ਕੁੰਜੀ = (char_u *) lua_tostring(L, -1);
+	ਜੇ (ਕੁੰਜੀ == ਨਿਰਾ)
 	{
 	    lua_pushnil(L);
-	    return 1;
+	    ਵਾਪਸ 1;
 	}
-	if (*key == NUL)
+	ਜੇ (*ਕੁੰਜੀ == NUL)
 	    luaL_error(L, "table has empty key");
-	luaV_checktypval(L, -2, &v, "vim.dict"); // value
-	di = dictitem_alloc(key);
-	if (di == NULL || dict_add(d, di) == FAIL)
+	luaV_checktypval(L, -2, &v, "vim.dict"); //ਮੁੱਲ
+	di = dictitem_alloc(ਕੁੰਜੀ);
+	ਜੇ (di == ਨਿਰਾ || dict_ਜੋੜੋ(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    lua_pushnil(L);
-	    return 1;
+	    ਵਾਪਸ 1;
 	}
 	di->di_tv = v;
-	lua_pop(L, 2); // key copy and value
+	lua_ਕੱਢੋ(L, 2); // key copy and value
     }
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_blob(lua_State *L)
 {
     blob_T *b;
-    int initarg = !lua_isnoneornil(L, 1);
+    ਪੂਰਨ initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && !lua_isstring(L, 1))
+    ਜੇ (initarg && !lua_isstring(L, 1))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 1));
 
     b = blob_alloc();
-    if (b == NULL)
+    ਜੇ (b == ਨਿਰਾ)
     {
 	lua_pushnil(L);
-	return 1;
+	ਵਾਪਸ 1;
     }
 
     luaV_newblob(L, b);
-    if (!initarg)
-	return 1;
+    ਜੇ (!initarg)
+	ਵਾਪਸ 1;
 
     // traverse table to init blob
     size_t i, l = 0;
-    const char *s = lua_tolstring(L, 1, &l);
+    ਅਚਲ ਅੱਖਰ *s = lua_tolstring(L, 1, &l);
 
-    if (ga_grow(&b->bv_ga, (int)l) == OK)
-	for (i = 0; i < l; ++i)
+    ਜੇ (ga_grow(&b->bv_ga, (ਪੂਰਨ)l) == OK)
+	ਲਈ (i = 0; i < l; ++i)
 	    ga_append(&b->bv_ga, s[i]);
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_funcref(lua_State *L)
 {
-    const char *name = luaL_checkstring(L, 1);
+    ਅਚਲ ਅੱਖਰ *name = luaL_checkstring(L, 1);
     // note: not checking if function exists (needs function_exists)
-    if (name == NULL || *name == NUL || VIM_ISDIGIT(*name))
+    ਜੇ (name == ਨਿਰਾ || *name == NUL || VIM_ISDIGIT(*name))
 	luaL_error(L, "invalid function name: %s", name);
     luaV_newfuncref(L, (char_u *) name);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_buffer(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਬਫਰ_2(lua_State *L)
 {
     buf_T *buf;
-    if (lua_isstring(L, 1)) // get by number or name?
+    ਜੇ (lua_isstring(L, 1)) // get by number or name?
     {
-	if (lua_isnumber(L, 1)) // by number?
+	ਜੇ (lua_isnumber(L, 1)) // by number?
 	{
-	    int n = lua_tointeger(L, 1);
+	    ਪੂਰਨ n = lua_tointeger(L, 1);
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_fnum == n) break;
+		ਜੇ (buf->b_fnum == n) ਰੋਕੋ;
 	}
-	else // by name
+	ਨਹੀਂਤਾਂ // by name
 	{
 	    size_t l;
-	    const char *s = lua_tolstring(L, 1, &l);
+	    ਅਚਲ ਅੱਖਰ *s = lua_tolstring(L, 1, &l);
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+		ਜੇ (buf->b_ffname == ਨਿਰਾ || buf->b_sfname == ਨਿਰਾ)
 		{
-		    if (l == 0) break;
+		    ਜੇ (l == 0) ਰੋਕੋ;
 		}
-		else if (strncmp(s, (char *)buf->b_ffname, l) == 0
-			|| strncmp(s, (char *)buf->b_sfname, l) == 0)
-		    break;
+		ਨਹੀਂਤਾਂ ਜੇ (ਲੜੀ_ਤੁਲਨਾ(s, (ਅੱਖਰ *)buf->b_ffname, l) == 0
+			|| ਲੜੀ_ਤੁਲਨਾ(s, (ਅੱਖਰ *)buf->b_sfname, l) == 0)
+		    ਰੋਕੋ;
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	buf = (lua_toboolean(L, 1)) ? firstbuf : curbuf; // first buffer?
     luaV_pushbuffer(L, buf);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-luaV_window(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਖਿੜਕੀ_2(lua_State *L)
 {
     win_T *win;
-    if (lua_isnumber(L, 1)) // get by number?
+    ਜੇ (lua_isnumber(L, 1)) // get by number?
     {
-	int n = lua_tointeger(L, 1);
-	for (win = firstwin; win != NULL; win = win->w_next, n--)
-	    if (n == 1) break;
+	ਪੂਰਨ n = lua_tointeger(L, 1);
+	ਲਈ (win = firstwin; win != ਨਿਰਾ; win = win->w_ਅਗਲਾ, n--)
+	    ਜੇ (n == 1) ਰੋਕੋ;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	win = (lua_toboolean(L, 1)) ? firstwin : curwin; // first window?
     luaV_pushwindow(L, win);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_open(lua_State *L)
 {
-    char_u *s = NULL;
+    char_u *s = ਨਿਰਾ;
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
-    luaV_pushbuffer(L, buflist_new(s, NULL, 1L, BLN_LISTED));
-    return 1;
+    ਜੇ (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
+    luaV_pushbuffer(L, buflist_new(s, ਨਿਰਾ, 1L, BLN_LISTED));
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_type(lua_State *L)
 {
     luaL_checkany(L, 1);
-    if (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
+    ਜੇ (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
     {
 	lua_settop(L, 1);
-	if (lua_getmetatable(L, 1))
+	ਜੇ (lua_getmetatable(L, 1))
 	{
 	    luaV_getfield(L, LUAVIM_LIST);
-	    if (lua_rawequal(L, -1, 2))
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "list");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
 	    luaV_getfield(L, LUAVIM_DICT);
-	    if (lua_rawequal(L, -1, 2))
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "dict");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
 	    luaV_getfield(L, LUAVIM_BLOB);
-	    if (lua_rawequal(L, -1, 2))
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "blob");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
 	    luaV_getfield(L, LUAVIM_FUNCREF);
-	    if (lua_rawequal(L, -1, 2))
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "funcref");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
-	    luaV_getfield(L, LUAVIM_BUFFER);
-	    if (lua_rawequal(L, -1, 2))
+	    luaV_getfield(L, LUAVIM_ਬਫਰ);
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "buffer");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
-	    luaV_getfield(L, LUAVIM_WINDOW);
-	    if (lua_rawequal(L, -1, 2))
+	    luaV_getfield(L, LUAVIM_ਖਿੜਕੀ);
+	    ਜੇ (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "window");
-		return 1;
+		ਵਾਪਸ 1;
 	    }
 	}
     }
     lua_pushstring(L, luaL_typename(L, 1)); // fallback
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_call(lua_State *L)
 {
-    int		argc = lua_gettop(L) - 1;
+    ਪੂਰਨ		argc = lua_gettop(L) - 1;
     size_t	funcname_len;
     char_u	*funcname;
-    char	*error = NULL;
+    ਅੱਖਰ	*error = ਨਿਰਾ;
     typval_T	rettv;
-    typval_T	argv[MAX_FUNC_ARGS + 1];
-    int		i = 0;
+    typval_T	argv[MAX_FUNC_ਦਲੀਲਾਂ + 1];
+    ਪੂਰਨ		i = 0;
 
-    if (argc > MAX_FUNC_ARGS)
-	return luaL_error(L, "Function called with too many arguments");
+    ਜੇ (argc > MAX_FUNC_ਦਲੀਲਾਂ)
+	ਵਾਪਸ luaL_error(L, "Function called with too many arguments");
 
     funcname = (char_u *)luaL_checklstring(L, 1, &funcname_len);
 
-    for (; i < argc; i++)
+    ਲਈ (; i < argc; i++)
     {
-	if (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
+	ਜੇ (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
 	{
 	    error = "lua: cannot convert value";
-	    goto free_vim_args;
+	    ਜਾਓ free_vim_ਦਲੀਲਾਂ;
 	}
     }
 
     argv[argc].v_type = VAR_UNKNOWN;
 
-    if (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
+    ਜੇ (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
     {
 	error = "lua: call_vim_function failed";
-	goto free_vim_args;
+	ਜਾਓ free_vim_ਦਲੀਲਾਂ;
     }
 
     luaV_pushtypval(L, &rettv);
     clear_tv(&rettv);
 
-free_vim_args:
-    while (i > 0)
+free_vim_ਦਲੀਲਾਂ:
+    ਜਦੋਂ (i > 0)
 	clear_tv(&argv[--i]);
 
-    if (error == NULL)
-	return 1;
-    else
-	return luaL_error(L, error);
+    ਜੇ (error == ਨਿਰਾ)
+	ਵਾਪਸ 1;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ luaL_error(L, error);
 }
 
 /*
  * Return the Vim version as a Lua table
  */
-    static int
-luaV_version(lua_State *L)
+    ਸਥਿਰ ਪੂਰਨ
+lua_V_ਸੰਸਕਰਣ(lua_State *L)
 {
     lua_newtable(L);
     lua_pushstring(L, "major");
-    lua_pushinteger(L, VIM_VERSION_MAJOR);
+    lua_pushinteger(L, VIM_ਸੰਸਕਰਣ_MAJOR);
     lua_settable(L, -3);
     lua_pushstring(L, "minor");
-    lua_pushinteger(L, VIM_VERSION_MINOR);
+    lua_pushinteger(L, VIM_ਸੰਸਕਰਣ_MINOR);
     lua_settable(L, -3);
     lua_pushstring(L, "patch");
     lua_pushinteger(L, highest_patch());
     lua_settable(L, -3);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-static const luaL_Reg luaV_module[] = {
+ਸਥਿਰ ਅਚਲ luaL_Reg luaV_module[] = {
     {"command", luaV_command},
     {"eval", luaV_eval},
     {"beep", luaV_beep},
-    {"line", luaV_line},
+    {"line", lua_V_ਸਤਰ},
     {"list", luaV_list},
     {"dict", luaV_dict},
     {"blob", luaV_blob},
     {"funcref", luaV_funcref},
-    {"buffer", luaV_buffer},
-    {"window", luaV_window},
+    {"buffer", lua_V_ਬਫਰ_2},
+    {"window", lua_V_ਖਿੜਕੀ_2},
     {"open", luaV_open},
     {"type", luaV_type},
     {"call", luaV_call},
     {"_getvar", luaV_getvar},
     {"_setvar", luaV_setvar},
-    {"version", luaV_version},
-    {"lua_version", NULL},
-    {NULL, NULL}
+    {"version", lua_V_ਸੰਸਕਰਣ},
+    {"lua_version", ਨਿਰਾ},
+    {ਨਿਰਾ, ਨਿਰਾ}
 };
 
 /*
  * for freeing list, dict, buffer and window objects; lightuserdata as arg
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_free(lua_State *L)
 {
     lua_pushnil(L);
     luaV_setudata(L, lua_touserdata(L, 1));
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_luaeval(lua_State *L)
 {
-    luaL_Buffer b;
+    lua_L_ਬਫਰ b;
     size_t l;
-    const char *str = lua_tolstring(L, 1, &l);
+    ਅਚਲ ਅੱਖਰ *str = lua_tolstring(L, 1, &l);
     typval_T *arg = (typval_T *) lua_touserdata(L, 2);
     typval_T *rettv = (typval_T *) lua_touserdata(L, 3);
     luaL_buffinit(L, &b);
-    luaL_addlstring(&b, LUAVIM_EVALHEADER, sizeof(LUAVIM_EVALHEADER) - 1);
+    luaL_addlstring(&b, LUAVIM_EVALHEADER, ਆਕਾਰ(LUAVIM_EVALHEADER) - 1);
     luaL_addlstring(&b, str, l);
     luaL_pushresult(&b);
     str = lua_tolstring(L, -1, &l);
-    if (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
+    ਜੇ (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
     {
 	luaV_emsg(L);
-	return 0;
+	ਵਾਪਸ 0;
     }
     luaV_pushtypval(L, arg);
-    if (lua_pcall(L, 1, 1, 0)) // running error?
+    ਜੇ (lua_pcall(L, 1, 1, 0)) // running error?
     {
 	luaV_emsg(L);
-	return 0;
+	ਵਾਪਸ 0;
     }
-    if (luaV_totypval(L, -1, rettv) == FAIL)
+    ਜੇ (luaV_totypval(L, -1, rettv) == FAIL)
 	emsg("luaeval: cannot convert value");
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_setref(lua_State *L)
 {
-    int copyID = lua_tointeger(L, 1);
-    int abort = FALSE;
+    ਪੂਰਨ copyID = lua_tointeger(L, 1);
+    ਪੂਰਨ abort = FALSE;
 
-    lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_UDATA_CACHE);
     lua_rawget(L, LUA_REGISTRYINDEX);  // the cache table
 
     luaV_getfield(L, LUAVIM_LIST);
@@ -2379,48 +2379,48 @@ luaV_setref(lua_State *L)
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_pushnil(L);
     // traverse cache table
-    while (!abort && lua_next(L, 2) != 0)
+    ਜਦੋਂ (!abort && lua_ਅਗਲਾ(L, 2) != 0)
     {
 	lua_getmetatable(L, -1);
-	if (lua_rawequal(L, -1, 3)) // list?
+	ਜੇ (lua_rawequal(L, -1, 3)) // list?
 	{
-	    list_T *l = (list_T *)lua_touserdata(L, 6); // key
+	    list_T *l = (list_T *)lua_touserdata(L, 6); //ਕੁੰਜੀ
 
-	    abort = set_ref_in_list(l, copyID);
+	    abort = ਸੈੱਟ_ref_ਵਿੱਚ_list(l, copyID);
 	}
-	else if (lua_rawequal(L, -1, 4)) // dict?
+	ਨਹੀਂਤਾਂ ਜੇ (lua_rawequal(L, -1, 4)) // dict?
 	{
-	    dict_T *d = (dict_T *)lua_touserdata(L, 6); // key
+	    dict_T *d = (dict_T *)lua_touserdata(L, 6); //ਕੁੰਜੀ
 
-	    abort = set_ref_in_dict(d, copyID);
+	    abort = ਸੈੱਟ_ref_ਵਿੱਚ_dict(d, copyID);
 	}
-	else if (lua_rawequal(L, -1, 5)) // funcref?
+	ਨਹੀਂਤਾਂ ਜੇ (lua_rawequal(L, -1, 5)) // funcref?
 	{
-	    luaV_Funcref *f = (luaV_Funcref *)lua_touserdata(L, 6); // key
+	    luaV_Funcref *f = (luaV_Funcref *)lua_touserdata(L, 6); //ਕੁੰਜੀ
 
-	    abort = set_ref_in_dict(f->self, copyID);
+	    abort = ਸੈੱਟ_ref_ਵਿੱਚ_dict(f->self, copyID);
 	}
-	lua_pop(L, 2); // metatable and value
+	lua_ਕੱਢੋ(L, 2); // metatable and value
     }
     lua_pushinteger(L, abort);
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_pushversion(lua_State *L)
 {
-    int major = 0;
-    int minor = 0;
-    int patch = 0;
-    char s[16];
+    ਪੂਰਨ major = 0;
+    ਪੂਰਨ minor = 0;
+    ਪੂਰਨ patch = 0;
+    ਅੱਖਰ s[16];
 
-    sscanf(LUAVIM_VERSION, "Lua %d.%d.%d", &major, &minor, &patch);
-    vim_snprintf(s, sizeof(s), "%d.%d.%d", major, minor, patch);
+    ਲੜੀ_ਤੋਂ_ਪੜ੍ਹੋ(LUAVIM_ਸੰਸਕਰਣ, "Lua %d.%d.%d", &major, &minor, &patch);
+    vim_snprintf(s, ਆਕਾਰ(s), "%d.%d.%d", major, minor, patch);
     lua_pushstring(L, s);
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-# define LUA_VIM_FN_CODE \
+# define LUA_VIM_FN_ਕੋਡ \
     "vim.fn = setmetatable({}, {\n"\
     "  __index = function (t, key)\n"\
     "    local function _fn(...)\n"\
@@ -2495,7 +2495,7 @@ luaV_pushversion(lua_State *L)
     "  last_vim_paths = cur_vim_paths\n"\
     "end"
 
-# define LUA_VIM_SETUP_VARIABLE_DICTS \
+# define LUA_VIM_ਤਿਆਰੀ_VARIABLE_DICTS \
     "do\n"\
     "  local function make_dict_accessor(scope)\n"\
     "    local mt = {}\n"\
@@ -2514,7 +2514,7 @@ luaV_pushversion(lua_State *L)
     "  vim.t = make_dict_accessor('t')\n"\
     "end"
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaopen_vim(lua_State *L)
 {
     lua_newtable(L);  // cache table
@@ -2523,10 +2523,10 @@ luaopen_vim(lua_State *L)
     lua_setfield(L, -2, "__mode");
     lua_setmetatable(L, -2); // cache is weak-valued
     // put the cache table in the registry for luaV_get/setudata()
-    lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_UDATA_CACHE);
     lua_pushvalue(L, -2);
     lua_rawset(L, LUA_REGISTRYINDEX);
-    lua_pop(L, 1);  // we don't need the cache table here anymore
+    lua_ਕੱਢੋ(L, 1);  // we don't need the cache table here anymore
     // print
     lua_pushcfunction(L, luaV_print);
     lua_setglobal(L, "print");
@@ -2534,252 +2534,252 @@ luaopen_vim(lua_State *L)
     lua_getglobal(L, "debug");
     lua_pushcfunction(L, luaV_debug);
     lua_setfield(L, -2, "debug");
-    lua_pop(L, 1);
+    lua_ਕੱਢੋ(L, 1);
     // free
-    lua_pushlightuserdata(L, (void *) LUAVIM_FREE);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_FREE);
     lua_pushcfunction(L, luaV_free);
     lua_rawset(L, LUA_REGISTRYINDEX);
     // luaeval
-    lua_pushlightuserdata(L, (void *) LUAVIM_LUAEVAL);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_LUAEVAL);
     lua_pushcfunction(L, luaV_luaeval);
     lua_rawset(L, LUA_REGISTRYINDEX);
     // setref
-    lua_pushlightuserdata(L, (void *) LUAVIM_SETREF);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) LUAVIM_SETREF);
     lua_pushcfunction(L, luaV_setref);
     lua_rawset(L, LUA_REGISTRYINDEX);
-    // register
+    //ਰਜਿਸਟਰ
     luaV_newmetatable(L, LUAVIM_LIST);
-    luaV_register(L, luaV_List_mt);
-    lua_pop(L, 1);
+    lua_V_ਰਜਿਸਟਰ(L, luaV_List_mt);
+    lua_ਕੱਢੋ(L, 1);
     luaV_newmetatable(L, LUAVIM_DICT);
-    luaV_register(L, luaV_Dict_mt);
-    lua_pop(L, 1);
+    lua_V_ਰਜਿਸਟਰ(L, luaV_Dict_mt);
+    lua_ਕੱਢੋ(L, 1);
     luaV_newmetatable(L, LUAVIM_BLOB);
-    luaV_register(L, luaV_Blob_mt);
-    lua_pop(L, 1);
+    lua_V_ਰਜਿਸਟਰ(L, luaV_Blob_mt);
+    lua_ਕੱਢੋ(L, 1);
     luaV_newmetatable(L, LUAVIM_FUNCREF);
-    luaV_register(L, luaV_Funcref_mt);
-    lua_pop(L, 1);
-    luaV_newmetatable(L, LUAVIM_BUFFER);
-    luaV_register(L, luaV_Buffer_mt);
-    lua_pop(L, 1);
-    luaV_newmetatable(L, LUAVIM_WINDOW);
-    luaV_register(L, luaV_Window_mt);
-    lua_pop(L, 1);
+    lua_V_ਰਜਿਸਟਰ(L, luaV_Funcref_mt);
+    lua_ਕੱਢੋ(L, 1);
+    luaV_newmetatable(L, LUAVIM_ਬਫਰ);
+    lua_V_ਰਜਿਸਟਰ(L, lua_V_ਬਫਰ_mt);
+    lua_ਕੱਢੋ(L, 1);
+    luaV_newmetatable(L, LUAVIM_ਖਿੜਕੀ);
+    lua_V_ਰਜਿਸਟਰ(L, lua_V_ਖਿੜਕੀ_mt);
+    lua_ਕੱਢੋ(L, 1);
     lua_newtable(L); // vim table
-    luaV_register(L, luaV_module);
+    lua_V_ਰਜਿਸਟਰ(L, luaV_module);
     luaV_pushversion(L);
     lua_setfield(L, -2, "lua_version");
     lua_setglobal(L, LUAVIM_NAME);
     // custom code
-    (void)luaL_dostring(L, LUA_VIM_FN_CODE);
-    (void)luaL_dostring(L, LUA_VIM_UPDATE_PACKAGE_PATHS);
-    (void)luaL_dostring(L, LUA_VIM_SETUP_VARIABLE_DICTS);
+    (ਖਾਲੀ)luaL_dostring(L, LUA_VIM_FN_ਕੋਡ);
+    (ਖਾਲੀ)luaL_dostring(L, LUA_VIM_UPDATE_PACKAGE_PATHS);
+    (ਖਾਲੀ)luaL_dostring(L, LUA_VIM_ਤਿਆਰੀ_VARIABLE_DICTS);
 
     lua_getglobal(L, LUAVIM_NAME);
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    ਜੇ (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static lua_State *
-luaV_newstate(void)
+    ਸਥਿਰ lua_State *
+luaV_newstate(ਖਾਲੀ)
 {
     lua_State *L = luaL_newstate();
-# if LUA_VERSION_NUM >= 505
+# ਜੇ LUA_ਸੰਸਕਰਣ_ਅੰਕ >= 505
     luaL_openselectedlibs(L, ~0, 0); // core libs
-# else
+# ਨਹੀਂਤਾਂ
     luaL_openlibs(L); // core libs
 # endif
     lua_pushcfunction(L, luaopen_vim); // vim
     lua_call(L, 0, 0);
-    return L;
+    ਵਾਪਸ L;
 }
 
-    static void
-luaV_setrange(lua_State *L, int line1, int line2)
+    ਸਥਿਰ ਖਾਲੀ
+luaV_setrange(lua_State *L, ਪੂਰਨ line1, ਪੂਰਨ line2)
 {
     lua_getglobal(L, LUAVIM_NAME);
     lua_pushinteger(L, line1);
     lua_setfield(L, -2, "firstline");
     lua_pushinteger(L, line2);
     lua_setfield(L, -2, "lastline");
-    lua_pop(L, 1); // vim table
+    lua_ਕੱਢੋ(L, 1); // vim table
 }
 
 
 // =======   Interface   =======
 
-static lua_State *L = NULL;
+ਸਥਿਰ lua_State *L = ਨਿਰਾ;
 
-    static int
-lua_isopen(void)
+    ਸਥਿਰ ਪੂਰਨ
+lua_isopen(ਖਾਲੀ)
 {
-    return L != NULL;
+    ਵਾਪਸ L != ਨਿਰਾ;
 }
 
-    static int
-lua_init(void)
+    ਸਥਿਰ ਪੂਰਨ
+lua_init(ਖਾਲੀ)
 {
-    if (lua_isopen())
-	return OK;
+    ਜੇ (lua_isopen())
+	ਵਾਪਸ OK;
 
 # ifdef DYNAMIC_LUA
-    if (!lua_enabled(TRUE))
+    ਜੇ (!lua_enabled(TRUE))
     {
 	emsg(_("Lua library cannot be loaded."));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 # endif
     L = luaV_newstate();
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    void
-lua_end(void)
+    ਖਾਲੀ
+lua_ਸਿਰਾ(ਖਾਲੀ)
 {
-    if (!lua_isopen())
-	return;
+    ਜੇ (!lua_isopen())
+	ਵਾਪਸ;
 
     lua_close(L);
-    L = NULL;
+    L = ਨਿਰਾ;
 }
 
 /*
  * ex commands
  */
-    void
+    ਖਾਲੀ
 ex_lua(exarg_T *eap)
 {
-    char *script = (char *)script_get(eap, eap->arg);
+    ਅੱਖਰ *script = (ਅੱਖਰ *)script_get(eap, eap->arg);
 
-    if (!eap->skip && lua_init() == OK)
+    ਜੇ (!eap->skip && lua_init() == OK)
     {
-	char *s = script != NULL ? script : (char *)eap->arg;
+	ਅੱਖਰ *s = script != ਨਿਰਾ ? script : (ਅੱਖਰ *)eap->arg;
 
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadbuffer(L, s, strlen(s), LUAVIM_CHUNKNAME)
+	ਜੇ (luaL_loadbuffer(L, s, ਲੜੀ_ਲੰਬਾਈ(s), LUAVIM_CHUNKNAME)
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
-    if (script != NULL)
+    ਜੇ (script != ਨਿਰਾ)
 	vim_free(script);
 }
 
-    void
+    ਖਾਲੀ
 ex_luado(exarg_T *eap)
 {
     linenr_T l;
-    const char *s = (const char *) eap->arg;
-    luaL_Buffer b;
+    ਅਚਲ ਅੱਖਰ *s = (ਅਚਲ ਅੱਖਰ *) eap->arg;
+    lua_L_ਬਫਰ b;
     size_t len;
     buf_T *was_curbuf = curbuf;
 
-    if (lua_init() == FAIL) return;
-    if (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
+    ਜੇ (lua_init() == FAIL) ਵਾਪਸ;
+    ਜੇ (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	ਵਾਪਸ;
     }
     luaV_setrange(L, eap->line1, eap->line2);
     luaL_buffinit(L, &b);
-    luaL_addlstring(&b, "return function(line, linenr) ", 30); // header
-    luaL_addlstring(&b, s, strlen(s));
+    luaL_addlstring(&b, "return function(line, linenr) ", 30); //ਸਿਰਲੇਖ
+    luaL_addlstring(&b, s, ਲੜੀ_ਲੰਬਾਈ(s));
     luaL_addlstring(&b, " end", 4); // footer
     luaL_pushresult(&b);
     s = lua_tolstring(L, -1, &len);
-    if (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
+    ਜੇ (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
     {
 	luaV_emsg(L);
-	lua_pop(L, 1); // function body
-	return;
+	lua_ਕੱਢੋ(L, 1); // function body
+	ਵਾਪਸ;
     }
     lua_call(L, 0, 1);
     lua_replace(L, -2); // function -> body
-    for (l = eap->line1; l <= eap->line2; l++)
+    ਲਈ (l = eap->line1; l <= eap->line2; l++)
     {
 	// Check the line number, the command may have deleted lines.
-	if (l > curbuf->b_ml.ml_line_count)
-	    break;
+	ਜੇ (l > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਰੋਕੋ;
 
 	lua_pushvalue(L, -1); // function
 	luaV_pushline(L, curbuf, l); // current line as arg
 	lua_pushinteger(L, l); // current line number as arg
-	if (lua_pcall(L, 2, 1, 0))
+	ਜੇ (lua_pcall(L, 2, 1, 0))
 	{
 	    luaV_emsg(L);
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// Catch the command switching to another buffer.
 	// Check the line number, the command may have deleted lines.
-	if (curbuf != was_curbuf || l > curbuf->b_ml.ml_line_count)
-	    break;
+	ਜੇ (curbuf != was_curbuf || l > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਰੋਕੋ;
 
-	if (lua_isstring(L, -1)) // update line?
+	ਜੇ (lua_isstring(L, -1)) // update line?
 	{
 # ifdef HAVE_SANDBOX
 	    luaV_checksandbox(L);
 # endif
 	    ml_replace(l, luaV_toline(L, -1), TRUE);
-	    changed_bytes(l, 0);
-	    lua_pop(L, 1); // result from luaV_toline
+	    ਬਦਲਿਆ_ਬਾਈਟਾਂ(l, 0);
+	    lua_ਕੱਢੋ(L, 1); // result from luaV_toline
 	}
-	lua_pop(L, 1); // line
+	lua_ਕੱਢੋ(L, 1); //ਸਤਰ
     }
-    lua_pop(L, 1); // function
+    lua_ਕੱਢੋ(L, 1); // function
     check_cursor();
     update_screen(UPD_NOT_VALID);
 }
 
-    void
+    ਖਾਲੀ
 ex_luafile(exarg_T *eap)
 {
-    if (lua_init() == FAIL)
-	return;
-    if (!eap->skip)
+    ਜੇ (lua_init() == FAIL)
+	ਵਾਪਸ;
+    ਜੇ (!eap->skip)
     {
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadfile(L, (char *) eap->arg) || lua_pcall(L, 0, 0, 0))
+	ਜੇ (luaL_loadfile(L, (ਅੱਖਰ *) eap->arg) || lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
 }
 
 # define luaV_freetype(typ,tname) \
-	void \
+	ਖਾਲੀ \
     lua_##tname##_free(typ *o) \
     { \
-	if (!lua_isopen()) return; \
+	ਜੇ (!lua_isopen()) ਵਾਪਸ; \
 	luaV_getfield(L, LUAVIM_FREE); \
-	lua_pushlightuserdata(L, (void *) o); \
+	lua_pushlightuserdata(L, (ਖਾਲੀ *) o); \
 	lua_call(L, 1, 0); \
     }
 
-luaV_freetype(buf_T, buffer)
-luaV_freetype(win_T, window)
+luaV_freetype(buf_T, ਬਫਰ)
+luaV_freetype(win_T, ਖਿੜਕੀ_2)
 
-    void
+    ਖਾਲੀ
 do_luaeval(char_u *str, typval_T *arg, typval_T *rettv)
 {
     lua_init();
     luaV_getfield(L, LUAVIM_LUAEVAL);
-    lua_pushstring(L, (char *) str);
-    lua_pushlightuserdata(L, (void *) arg);
-    lua_pushlightuserdata(L, (void *) rettv);
+    lua_pushstring(L, (ਅੱਖਰ *) str);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) arg);
+    lua_pushlightuserdata(L, (ਖਾਲੀ *) rettv);
     lua_call(L, 3, 0);
 }
 
-    int
-set_ref_in_lua(int copyID)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_lua(ਪੂਰਨ copyID)
 {
-    int aborted = 0;
+    ਪੂਰਨ aborted = 0;
 
-    if (!lua_isopen())
-	return 0;
+    ਜੇ (!lua_isopen())
+	ਵਾਪਸ 0;
 
     luaV_getfield(L, LUAVIM_SETREF);
     // call the function with 1 arg, getting 1 result back
@@ -2788,71 +2788,71 @@ set_ref_in_lua(int copyID)
     // get the result
     aborted = lua_tointeger(L, -1);
     // pop result off the stack
-    lua_pop(L, 1);
+    lua_ਕੱਢੋ(L, 1);
 
-    return aborted;
+    ਵਾਪਸ aborted;
 }
 
-    void
-update_package_paths_in_lua(void)
+    ਖਾਲੀ
+update_package_paths_ਵਿੱਚ_lua(ਖਾਲੀ)
 {
-    if (!lua_isopen())
-	return;
+    ਜੇ (!lua_isopen())
+	ਵਾਪਸ;
 
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    ਜੇ (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 }
 
 /*
  * Native C function callback
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 luaV_call_lua_func(
-	int	 argcount,
+	ਪੂਰਨ	 argcount,
 	typval_T *argvars,
 	typval_T *rettv,
-	void	 *state)
+	ਖਾਲੀ	 *state)
 {
-    int i;
-    int luaargcount = argcount;
+    ਪੂਰਨ i;
+    ਪੂਰਨ luaargcount = argcount;
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
 
-    if (funcstate->lua_tableref != LUA_NOREF)
+    ਜੇ (funcstate->lua_tableref != LUA_NOREF)
     {
 	// First arg for metatable __call method is a table
 	luaargcount += 1;
 	lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     }
 
-    for (i = 0; i < argcount; ++i)
+    ਲਈ (i = 0; i < argcount; ++i)
 	luaV_pushtypval(funcstate->L, &argvars[i]);
 
-    if (lua_pcall(funcstate->L, luaargcount, 1, 0))
+    ਜੇ (lua_pcall(funcstate->L, luaargcount, 1, 0))
     {
 	luaV_emsg(funcstate->L);
-	return (int)FCERR_OTHER;
+	ਵਾਪਸ (ਪੂਰਨ)FCERR_OTHER;
     }
 
     luaV_checktypval(funcstate->L, -1, rettv, "get return value");
-    return (int)FCERR_NONE;
+    ਵਾਪਸ (ਪੂਰਨ)FCERR_NONE;
 }
 
 /*
  * Free up any lua references held by the func state.
  */
-    static void
-luaV_call_lua_func_free(void *state)
+    ਸਥਿਰ ਖਾਲੀ
+luaV_call_lua_func_free(ਖਾਲੀ *state)
 {
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
-    funcstate->L = NULL;
-    if (funcstate->lua_tableref != LUA_NOREF)
+    funcstate->L = ਨਿਰਾ;
+    ਜੇ (funcstate->lua_tableref != LUA_NOREF)
 	luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     VIM_CLEAR(funcstate);
 }
 
-#endif
+#ਜੇ_ਅੰਤ

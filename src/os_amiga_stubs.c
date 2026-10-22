@@ -14,44 +14,44 @@
  * Split into a separate file to keep os_amiga.c clean.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#ifndef PROTO
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ PROTO
 
-#include <proto/dos.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <proto/dos.h>
 
 /*
  * Input Method (IM) stubs.
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
-im_get_status(void)
+    ਪੂਰਨ
+im_get_ਸਥਿਤੀ(ਖਾਲੀ)
 {
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    void
-im_set_active(int active UNUSED)
+    ਖਾਲੀ
+im_ਸੈੱਟ_ਸਰਗਰਮ(ਪੂਰਨ ਸਰਗਰਮ ਅਣਵਰਤਿਆ)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_im_funcs(ਪੂਰਨ copyID ਅਣਵਰਤਿਆ)
 {
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    char *
-did_set_imactivatefunc(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_imactivatefunc(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    char *
-did_set_imstatusfunc(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_imstatusfunc(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    ਪੂਰਨ
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    ਜੇ (DeleteFile((STRPTR)name))
+	ਵਾਪਸ 0;
+    ਵਾਪਸ -1;
 }
 
 /*
@@ -73,25 +73,25 @@ mch_rmdir(char_u *name)
  * The struct declarations exist in the NDK headers but the functions
  * are not implemented in libnix.
  */
-#include <pwd.h>
-#include <grp.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <pwd.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <grp.h>
 
-    struct passwd *
-getpwuid(uid_t uid UNUSED)
+    ਬਣਤਰ passwd *
+getpwuid(uid_t uid ਅਣਵਰਤਿਆ)
 {
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    struct group *
-getgrgid(gid_t gid UNUSED)
+    ਬਣਤਰ ਸਮੂਹ *
+getgrgid(gid_t gid ਅਣਵਰਤਿਆ)
 {
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
     uid_t
-getuid(void)
+getuid(ਖਾਲੀ)
 {
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-#endif // PROTO
+#ਜੇ_ਅੰਤ // PROTO

@@ -7,64 +7,64 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#define LN_MAX_BUFS 8
-#define LN_DECISION_MAX 255  // pow(2, LN_MAX_BUFS(8)) - 1 = 255
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ LN_MAX_BUFS 8
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ LN_DECISION_MAX 255  // pow(2, LN_MAX_BUFS(8)) - 1 = 255
 
 // struct for running the diff linematch algorithm
-typedef struct diffcmppath_S diffcmppath_T;
-struct diffcmppath_S
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ diffcmppath_S diffcmppath_T;
+ਬਣਤਰ diffcmppath_S
 {
     // to keep track of the total score of this path
-    int			df_lev_score;
-    size_t		df_path_n;	// current index of this path
-    int			df_choice_mem[LN_DECISION_MAX + 1];
-    int			df_choice[LN_DECISION_MAX];
+    ਪੂਰਨ			df_lev_score;
+    size_t		df_ਰਸਤਾ_n;	// current index of this path
+    ਪੂਰਨ			df_choice_mem[LN_DECISION_MAX + 1];
+    ਪੂਰਨ			df_choice[LN_DECISION_MAX];
     // to keep track of this path traveled
     diffcmppath_T	*df_decision[LN_DECISION_MAX];
     size_t		df_optimal_choice;
 };
 
-static int matching_chars(const mmfile_t *m1, const mmfile_t *m2);
-static size_t unwrap_indexes(const int *values, const int *diff_len, const size_t ndiffs);
-static size_t test_charmatch_paths(diffcmppath_T *node, int lastdecision);
+ਸਥਿਰ ਪੂਰਨ matching_chars(ਅਚਲ mmfile_t *m1, ਅਚਲ mmfile_t *m2);
+ਸਥਿਰ size_t unwrap_indexes(ਅਚਲ ਪੂਰਨ *ਮੁੱਲਾਂ, ਅਚਲ ਪੂਰਨ *diff_len, ਅਚਲ size_t ndiffs);
+ਸਥਿਰ size_t test_charmatch_paths(diffcmppath_T *ਗੰਢ, ਪੂਰਨ lastdecision);
 
-    static size_t
-line_len(const mmfile_t *m)
+    ਸਥਿਰ size_t
+ਸਤਰ_len(ਅਚਲ mmfile_t *m)
 {
-    char	*s = m->ptr;
-    char	*end;
+    ਅੱਖਰ	*s = m->ptr;
+    ਅੱਖਰ	*ਸਿਰਾ;
 
-    end = memchr(s, '\n', (size_t)m->size);
-    return end ? (size_t)(end - s) : (size_t)m->size;
+    ਸਿਰਾ = memchr(s, '\n', (size_t)m->ਮਾਪ);
+    ਵਾਪਸ ਸਿਰਾ ? (size_t)(ਸਿਰਾ - s) : (size_t)m->ਮਾਪ;
 }
 
-#define MATCH_CHAR_MAX_LEN 800
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਮੇਲ_CHAR_MAX_LEN 800
 
 /// Same as matching_chars but ignore whitespace
 ///
 /// @param s1
 /// @param s2
-    static int
-matching_chars_iwhite(const mmfile_t *s1, const mmfile_t *s2)
+    ਸਥਿਰ ਪੂਰਨ
+matching_chars_iwhite(ਅਚਲ mmfile_t *s1, ਅਚਲ mmfile_t *s2)
 {
     // the newly processed strings that will be compared
     // delete the white space characters
     mmfile_t	sp[2];
-    char	p[2][MATCH_CHAR_MAX_LEN];
+    ਅੱਖਰ	p[2][ਮੇਲ_CHAR_MAX_LEN];
 
-    for (int k = 0; k < 2; k++)
+    ਲਈ (ਪੂਰਨ k = 0; k < 2; k++)
     {
-	const	mmfile_t *s = k == 0 ? s1 : s2;
+	ਅਚਲ	mmfile_t *s = k == 0 ? s1 : s2;
 	size_t	pi = 0;
-	size_t	slen = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(s));
+	size_t	slen = MIN(ਮੇਲ_CHAR_MAX_LEN - 1, ਸਤਰ_len(s));
 
-	for (size_t i = 0; i <= slen; i++)
+	ਲਈ (size_t i = 0; i <= slen; i++)
 	{
-	    char e = s->ptr[i];
+	    ਅੱਖਰ e = s->ptr[i];
 
-	    if (e != ' ' && e != '\t')
+	    ਜੇ (e != ' ' && e != '\t')
 	    {
 		p[k][pi] = e;
 		pi++;
@@ -72,10 +72,10 @@ matching_chars_iwhite(const mmfile_t *s1, const mmfile_t *s2)
 	}
 
 	sp[k].ptr = p[k];
-	sp[k].size = (int)pi;
+	sp[k].ਮਾਪ = (ਪੂਰਨ)pi;
     }
 
-    return matching_chars(&sp[0], &sp[1]);
+    ਵਾਪਸ matching_chars(&sp[0], &sp[1]);
 }
 
 /// Return matching characters between "s1" and "s2" whilst respecting sequence
@@ -92,37 +92,37 @@ matching_chars_iwhite(const mmfile_t *s1, const mmfile_t *s2)
 ///
 /// @param m1
 /// @param m2
-    static int
-matching_chars(const mmfile_t *m1, const mmfile_t *m2)
+    ਸਥਿਰ ਪੂਰਨ
+matching_chars(ਅਚਲ mmfile_t *m1, ਅਚਲ mmfile_t *m2)
 {
-    size_t	s1len = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(m1));
-    size_t	s2len = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(m2));
-    char	*s1 = m1->ptr;
-    char	*s2 = m2->ptr;
-    int		matrix[2][MATCH_CHAR_MAX_LEN] = { 0 };
-    int		icur = 1;  // save space by storing only two rows for i axis
+    size_t	s1len = MIN(ਮੇਲ_CHAR_MAX_LEN - 1, ਸਤਰ_len(m1));
+    size_t	s2len = MIN(ਮੇਲ_CHAR_MAX_LEN - 1, ਸਤਰ_len(m2));
+    ਅੱਖਰ	*s1 = m1->ptr;
+    ਅੱਖਰ	*s2 = m2->ptr;
+    ਪੂਰਨ		ਮੈਟ੍ਰਿਕਸ[2][ਮੇਲ_CHAR_MAX_LEN] = { 0 };
+    ਪੂਰਨ		icur = 1;  // save space by storing only two rows for i axis
 
-    for (size_t i = 0; i < s1len; i++)
+    ਲਈ (size_t i = 0; i < s1len; i++)
     {
 	icur = (icur == 1 ? 0 : 1);
-	int *e1 = matrix[icur];
-	int *e2 = matrix[!icur];
+	ਪੂਰਨ *e1 = ਮੈਟ੍ਰਿਕਸ[icur];
+	ਪੂਰਨ *e2 = ਮੈਟ੍ਰਿਕਸ[!icur];
 
-	for (size_t j = 0; j < s2len; j++)
+	ਲਈ (size_t j = 0; j < s2len; j++)
 	{
 	    // skip char in s1
-	    if (e2[j + 1] > e1[j + 1])
+	    ਜੇ (e2[j + 1] > e1[j + 1])
 		e1[j + 1] = e2[j + 1];
 	    // skip char in s2
-	    if (e1[j] > e1[j + 1])
+	    ਜੇ (e1[j] > e1[j + 1])
 		e1[j + 1] = e1[j];
 	    // compare char in s1 and s2
-	    if ((s1[i] == s2[j]) && (e2[j] + 1) > e1[j + 1])
+	    ਜੇ ((s1[i] == s2[j]) && (e2[j] + 1) > e1[j + 1])
 		e1[j + 1] = e2[j] + 1;
 	}
     }
 
-    return matrix[icur][s2len];
+    ਵਾਪਸ ਮੈਟ੍ਰਿਕਸ[icur][s2len];
 }
 
 /// count the matching characters between a variable number of strings "sp"
@@ -131,21 +131,21 @@ matching_chars(const mmfile_t *m1, const mmfile_t *m2)
 /// @param sp
 /// @param fomvals
 /// @param n
-    static int
-count_n_matched_chars(mmfile_t **sp, const size_t n, int iwhite)
+    ਸਥਿਰ ਪੂਰਨ
+ਗਿਣਤੀ_n_matched_chars(mmfile_t **sp, ਅਚਲ size_t n, ਪੂਰਨ iwhite)
 {
-    int matched_chars = 0;
-    int matched = 0;
+    ਪੂਰਨ matched_chars = 0;
+    ਪੂਰਨ matched = 0;
 
-    for (size_t i = 0; i < n; i++)
+    ਲਈ (size_t i = 0; i < n; i++)
     {
-	for (size_t j = i + 1; j < n; j++)
+	ਲਈ (size_t j = i + 1; j < n; j++)
 	{
-	    if (sp[i]->ptr != NULL && sp[j]->ptr != NULL)
+	    ਜੇ (sp[i]->ptr != ਨਿਰਾ && sp[j]->ptr != ਨਿਰਾ)
 	    {
 		matched++;
 		// TODO(lewis6991): handle whitespace ignoring higher up in the
-		// stack
+		//ਢੇਰ
 		matched_chars += iwhite ? matching_chars_iwhite(sp[i], sp[j])
 					: matching_chars(sp[i], sp[j]);
 	    }
@@ -153,32 +153,32 @@ count_n_matched_chars(mmfile_t **sp, const size_t n, int iwhite)
     }
 
     // prioritize a match of 3 (or more lines) equally to a match of 2 lines
-    if (matched >= 2)
+    ਜੇ (matched >= 2)
     {
 	matched_chars *= 2;
 	matched_chars /= matched;
     }
 
-    return matched_chars;
+    ਵਾਪਸ matched_chars;
 }
 
-    static mmfile_t
-fastforward_buf_to_lnum(mmfile_t s, linenr_T lnum)
+    ਸਥਿਰ mmfile_t
+fastforward_buf_ਮੰਜ਼ਿਲ_lnum(mmfile_t s, linenr_T lnum)
 {
-    for (int i = 0; i < lnum - 1; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < lnum - 1; i++)
     {
-	char *line_end;
+	ਅੱਖਰ *ਸਤਰ_ਸਿਰਾ;
 
-	line_end = memchr(s.ptr, '\n', (size_t)s.size);
-	s.size = line_end ? (int)(s.size - (line_end - s.ptr)) : 0;
-	s.ptr = line_end;
-	if (!s.ptr)
-	    break;
+	ਸਤਰ_ਸਿਰਾ = memchr(s.ptr, '\n', (size_t)s.ਮਾਪ);
+	s.ਮਾਪ = ਸਤਰ_ਸਿਰਾ ? (ਪੂਰਨ)(s.ਮਾਪ - (ਸਤਰ_ਸਿਰਾ - s.ptr)) : 0;
+	s.ptr = ਸਤਰ_ਸਿਰਾ;
+	ਜੇ (!s.ptr)
+	    ਰੋਕੋ;
 	s.ptr++;
-	s.size--;
+	s.ਮਾਪ--;
     }
 
-    return s;
+    ਵਾਪਸ s;
 }
 
 /// try all the different ways to compare these lines and use the one that
@@ -192,71 +192,71 @@ fastforward_buf_to_lnum(mmfile_t s, linenr_T lnum)
 /// @param diff_len
 /// @param ndiffs
 /// @param diff_blk
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 try_possible_paths(
-    const int		*df_iters,
-    const size_t	*paths,
-    const int		npaths,
-    const int		path_idx,
-    int			*choice,
+    ਅਚਲ ਪੂਰਨ		*df_iters,
+    ਅਚਲ size_t	*paths,
+    ਅਚਲ ਪੂਰਨ		npaths,
+    ਅਚਲ ਪੂਰਨ		ਰਸਤਾ_idx,
+    ਪੂਰਨ			*choice,
     diffcmppath_T	*diffcmppath,
-    const int		*diff_len,
-    const size_t	ndiffs,
-    const mmfile_t	**diff_blk,
-    int			iwhite)
+    ਅਚਲ ਪੂਰਨ		*diff_len,
+    ਅਚਲ size_t	ndiffs,
+    ਅਚਲ mmfile_t	**diff_blk,
+    ਪੂਰਨ			iwhite)
 {
-    if (path_idx == npaths)
+    ਜੇ (ਰਸਤਾ_idx == npaths)
     {
-	if ((*choice) > 0)
+	ਜੇ ((*choice) > 0)
 	{
-	    int from_vals[LN_MAX_BUFS] = { 0 };
-	    const int *to_vals = df_iters;
+	    ਪੂਰਨ from_vals[LN_MAX_BUFS] = { 0 };
+	    ਅਚਲ ਪੂਰਨ *ਮੰਜ਼ਿਲ_vals = df_iters;
 
 	    mmfile_t mm[LN_MAX_BUFS];  // stack memory for current_lines
-	    mmfile_t *current_lines[LN_MAX_BUFS];
-	    for (size_t k = 0; k < ndiffs; k++)
+	    mmfile_t *current_ਸਤਰਾਂ[LN_MAX_BUFS];
+	    ਲਈ (size_t k = 0; k < ndiffs; k++)
 	    {
 		from_vals[k] = df_iters[k];
 		// get the index at all of the places
-		if ((*choice) & (1 << k))
+		ਜੇ ((*choice) & (1 << k))
 		{
 		    from_vals[k]--;
-		    mm[k] = fastforward_buf_to_lnum(*diff_blk[k], df_iters[k]);
+		    mm[k] = fastforward_buf_ਮੰਜ਼ਿਲ_lnum(*diff_blk[k], df_iters[k]);
 		}
-		else
-		    CLEAR_FIELD(mm[k]);
-		current_lines[k] = &mm[k];
+		ਨਹੀਂਤਾਂ
+		    CLEAR_ਖੇਤਰ(mm[k]);
+		current_ਸਤਰਾਂ[k] = &mm[k];
 	    }
 	    size_t unwrapped_idx_from = unwrap_indexes(from_vals, diff_len, ndiffs);
-	    size_t unwrapped_idx_to = unwrap_indexes(to_vals, diff_len, ndiffs);
-	    int matched_chars = count_n_matched_chars(current_lines, ndiffs, iwhite);
-	    int score = diffcmppath[unwrapped_idx_from].df_lev_score + matched_chars;
+	    size_t unwrapped_idx_ਮੰਜ਼ਿਲ = unwrap_indexes(ਮੰਜ਼ਿਲ_vals, diff_len, ndiffs);
+	    ਪੂਰਨ matched_chars = ਗਿਣਤੀ_n_matched_chars(current_ਸਤਰਾਂ, ndiffs, iwhite);
+	    ਪੂਰਨ score = diffcmppath[unwrapped_idx_from].df_lev_score + matched_chars;
 
-	    if (score > diffcmppath[unwrapped_idx_to].df_lev_score)
+	    ਜੇ (score > diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_lev_score)
 	    {
-		diffcmppath[unwrapped_idx_to].df_path_n = 1;
-		diffcmppath[unwrapped_idx_to].df_decision[0] =
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_ਰਸਤਾ_n = 1;
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_decision[0] =
 					&diffcmppath[unwrapped_idx_from];
-		diffcmppath[unwrapped_idx_to].df_choice[0] = *choice;
-		diffcmppath[unwrapped_idx_to].df_lev_score = score;
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_choice[0] = *choice;
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_lev_score = score;
 	    }
-	    else if (score == diffcmppath[unwrapped_idx_to].df_lev_score)
+	    ਨਹੀਂਤਾਂ ਜੇ (score == diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_lev_score)
 	    {
-		size_t k = diffcmppath[unwrapped_idx_to].df_path_n++;
-		diffcmppath[unwrapped_idx_to].df_decision[k] =
+		size_t k = diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_ਰਸਤਾ_n++;
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_decision[k] =
 					&diffcmppath[unwrapped_idx_from];
-		diffcmppath[unwrapped_idx_to].df_choice[k] = *choice;
+		diffcmppath[unwrapped_idx_ਮੰਜ਼ਿਲ].df_choice[k] = *choice;
 	    }
 	}
-	return;
+	ਵਾਪਸ;
     }
 
-    size_t bit_place = paths[path_idx];
-    *(choice) |= (1 << bit_place);  // set it to 1
-    try_possible_paths(df_iters, paths, npaths, path_idx + 1, choice,
+    size_t ਦੋਆਧਾਰੀ_ਅੰਕ_ਰੱਖੋ = paths[ਰਸਤਾ_idx];
+    *(choice) |= (1 << ਦੋਆਧਾਰੀ_ਅੰਕ_ਰੱਖੋ);  // set it to 1
+    try_possible_paths(df_iters, paths, npaths, ਰਸਤਾ_idx + 1, choice,
 	    diffcmppath, diff_len, ndiffs, diff_blk, iwhite);
-    *(choice) &= ~(1 << bit_place);  // set it to 0
-    try_possible_paths(df_iters, paths, npaths, path_idx + 1, choice,
+    *(choice) &= ~(1 << ਦੋਆਧਾਰੀ_ਅੰਕ_ਰੱਖੋ);  // set it to 0
+    try_possible_paths(df_iters, paths, npaths, ਰਸਤਾ_idx + 1, choice,
 	    diffcmppath, diff_len, ndiffs, diff_blk, iwhite);
 }
 
@@ -264,24 +264,24 @@ try_possible_paths(
 /// @param values
 /// @param diff_len
 /// @param ndiffs
-    static size_t
-unwrap_indexes(const int *values, const int *diff_len, const size_t ndiffs)
+    ਸਥਿਰ size_t
+unwrap_indexes(ਅਚਲ ਪੂਰਨ *ਮੁੱਲਾਂ, ਅਚਲ ਪੂਰਨ *diff_len, ਅਚਲ size_t ndiffs)
 {
-    size_t num_unwrap_scalar = 1;
+    size_t ਅੰਕ_unwrap_scalar = 1;
 
-    for (size_t k = 0; k < ndiffs; k++)
-	num_unwrap_scalar *= (size_t)diff_len[k] + 1;
+    ਲਈ (size_t k = 0; k < ndiffs; k++)
+	ਅੰਕ_unwrap_scalar *= (size_t)diff_len[k] + 1;
 
-    size_t path_idx = 0;
-    for (size_t k = 0; k < ndiffs; k++)
+    size_t ਰਸਤਾ_idx = 0;
+    ਲਈ (size_t k = 0; k < ndiffs; k++)
     {
-	num_unwrap_scalar /= (size_t)diff_len[k] + 1;
+	ਅੰਕ_unwrap_scalar /= (size_t)diff_len[k] + 1;
 
-	int n = values[k];
-	path_idx += num_unwrap_scalar * (size_t)n;
+	ਪੂਰਨ n = ਮੁੱਲਾਂ[k];
+	ਰਸਤਾ_idx += ਅੰਕ_unwrap_scalar * (size_t)n;
     }
 
-    return path_idx;
+    ਵਾਪਸ ਰਸਤਾ_idx;
 }
 
 /// populate the values of the linematch algorithm tensor, and find the best
@@ -293,40 +293,40 @@ unwrap_indexes(const int *values, const int *diff_len, const size_t ndiffs)
 /// @param diff_len
 /// @param ndiffs
 /// @param diff_blk
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 populate_tensor(
-    int			*df_iters,
-    const size_t	ch_dim,
+    ਪੂਰਨ			*df_iters,
+    ਅਚਲ size_t	ch_dim,
     diffcmppath_T	*diffcmppath,
-    const int		*diff_len,
-    const size_t	ndiffs,
-    const mmfile_t	**diff_blk,
-    int			iwhite)
+    ਅਚਲ ਪੂਰਨ		*diff_len,
+    ਅਚਲ size_t	ndiffs,
+    ਅਚਲ mmfile_t	**diff_blk,
+    ਪੂਰਨ			iwhite)
 {
-    if (ch_dim == ndiffs)
+    ਜੇ (ch_dim == ndiffs)
     {
-	int npaths = 0;
+	ਪੂਰਨ npaths = 0;
 	size_t paths[LN_MAX_BUFS];
 
-	for (size_t j = 0; j < ndiffs; j++)
+	ਲਈ (size_t j = 0; j < ndiffs; j++)
 	{
-	    if (df_iters[j] > 0)
+	    ਜੇ (df_iters[j] > 0)
 	    {
 		paths[npaths] = j;
 		npaths++;
 	    }
 	}
 
-	int choice = 0;
-	size_t unwrapper_idx_to = unwrap_indexes(df_iters, diff_len, ndiffs);
+	ਪੂਰਨ choice = 0;
+	size_t unwrapper_idx_ਮੰਜ਼ਿਲ = unwrap_indexes(df_iters, diff_len, ndiffs);
 
-	diffcmppath[unwrapper_idx_to].df_lev_score = -1;
+	diffcmppath[unwrapper_idx_ਮੰਜ਼ਿਲ].df_lev_score = -1;
 	try_possible_paths(df_iters, paths, npaths, 0, &choice, diffcmppath,
 					diff_len, ndiffs, diff_blk, iwhite);
-	return;
+	ਵਾਪਸ;
     }
 
-    for (int i = 0; i <= diff_len[ch_dim]; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i <= diff_len[ch_dim]; i++)
     {
 	df_iters[ch_dim] = i;
 	populate_tensor(df_iters, ch_dim + 1, diffcmppath, diff_len,
@@ -391,103 +391,103 @@ populate_tensor(
 /// @return the length of decisions
     size_t
 linematch_nbuffers(
-    const mmfile_t	**diff_blk,
-    const int		*diff_len,
-    const size_t	ndiffs,
-    int			**decisions,
-    int			iwhite)
+    ਅਚਲ mmfile_t	**diff_blk,
+    ਅਚਲ ਪੂਰਨ		*diff_len,
+    ਅਚਲ size_t	ndiffs,
+    ਪੂਰਨ			**decisions,
+    ਪੂਰਨ			iwhite)
 {
-    assert(ndiffs <= LN_MAX_BUFS);
+    ਪ੍ਰਤਿਜ੍ਞਾ(ndiffs <= LN_MAX_BUFS);
 
     size_t memsize = 1;
     size_t memsize_decisions = 0;
-    for (size_t i = 0; i < ndiffs; i++)
+    ਲਈ (size_t i = 0; i < ndiffs; i++)
     {
-	assert(diff_len[i] >= 0);
+	ਪ੍ਰਤਿਜ੍ਞਾ(diff_len[i] >= 0);
 	memsize *= (size_t)(diff_len[i] + 1);
 	memsize_decisions += (size_t)diff_len[i];
     }
 
     // create the flattened path matrix
-    diffcmppath_T *diffcmppath = lalloc(sizeof(diffcmppath_T) * memsize, TRUE);
-    if (diffcmppath == NULL)
-	return 0;
+    diffcmppath_T *diffcmppath = lalloc(ਆਕਾਰ(diffcmppath_T) * memsize, TRUE);
+    ਜੇ (diffcmppath == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
     // allocate memory here
-    size_t n = (size_t)pow(2.0, (double)ndiffs);
-    for (size_t i = 0; i < memsize; i++)
+    size_t n = (size_t)ਘਾਤ(2.0, (ਦੁੱਗਣਾ)ndiffs);
+    ਲਈ (size_t i = 0; i < memsize; i++)
     {
 	diffcmppath[i].df_lev_score = 0;
-	diffcmppath[i].df_path_n = 0;
-	for (size_t j = 0; j < n; j++)
+	diffcmppath[i].df_ਰਸਤਾ_n = 0;
+	ਲਈ (size_t j = 0; j < n; j++)
 	    diffcmppath[i].df_choice_mem[j] = -1;
     }
 
     // memory for avoiding repetitive calculations of score
-    int df_iters[LN_MAX_BUFS];
+    ਪੂਰਨ df_iters[LN_MAX_BUFS];
     populate_tensor(df_iters, 0, diffcmppath, diff_len, ndiffs, diff_blk,
 		    iwhite);
 
-    const size_t u = unwrap_indexes(diff_len, diff_len, ndiffs);
-    diffcmppath_T *startNode = &diffcmppath[u];
+    ਅਚਲ size_t u = unwrap_indexes(diff_len, diff_len, ndiffs);
+    diffcmppath_T *ਸ਼ੁਰੂ_ਗੰਢ = &diffcmppath[u];
 
-    *decisions = lalloc(sizeof(int) * memsize_decisions, TRUE);
-    if (*decisions == NULL)
+    *decisions = lalloc(ਆਕਾਰ(ਪੂਰਨ) * memsize_decisions, TRUE);
+    ਜੇ (*decisions == ਨਿਰਾ)
     {
 	vim_free(diffcmppath);
-	return 0;
+	ਵਾਪਸ 0;
     }
 
     size_t n_optimal = 0;
-    test_charmatch_paths(startNode, 0);
-    while (startNode->df_path_n > 0)
+    test_charmatch_paths(ਸ਼ੁਰੂ_ਗੰਢ, 0);
+    ਜਦੋਂ (ਸ਼ੁਰੂ_ਗੰਢ->df_ਰਸਤਾ_n > 0)
     {
-	size_t j = startNode->df_optimal_choice;
-	(*decisions)[n_optimal++] = startNode->df_choice[j];
-	startNode = startNode->df_decision[j];
+	size_t j = ਸ਼ੁਰੂ_ਗੰਢ->df_optimal_choice;
+	(*decisions)[n_optimal++] = ਸ਼ੁਰੂ_ਗੰਢ->df_choice[j];
+	ਸ਼ੁਰੂ_ਗੰਢ = ਸ਼ੁਰੂ_ਗੰਢ->df_decision[j];
     }
     // reverse array
-    for (size_t i = 0; i < (n_optimal / 2); i++)
+    ਲਈ (size_t i = 0; i < (n_optimal / 2); i++)
     {
-	int tmp = (*decisions)[i];
+	ਪੂਰਨ tmp = (*decisions)[i];
 	(*decisions)[i] = (*decisions)[n_optimal - 1 - i];
 	(*decisions)[n_optimal - 1 - i] = tmp;
     }
 
     vim_free(diffcmppath);
 
-    return n_optimal;
+    ਵਾਪਸ n_optimal;
 }
 
 // returns the minimum amount of path changes from start to end
-    static size_t
-test_charmatch_paths(diffcmppath_T *node, int lastdecision)
+    ਸਥਿਰ size_t
+test_charmatch_paths(diffcmppath_T *ਗੰਢ, ਪੂਰਨ lastdecision)
 {
     // memoization
-    if (node->df_choice_mem[lastdecision] == -1)
+    ਜੇ (ਗੰਢ->df_choice_mem[lastdecision] == -1)
     {
-	if (node->df_path_n == 0)
+	ਜੇ (ਗੰਢ->df_ਰਸਤਾ_n == 0)
 	    // we have reached the end of the tree
-	    node->df_choice_mem[lastdecision] = 0;
-	else
+	    ਗੰਢ->df_choice_mem[lastdecision] = 0;
+	ਨਹੀਂਤਾਂ
 	{
 	    // the minimum amount of turns required to reach the end
-	    size_t minimum_turns = SIZE_MAX;
-	    for (size_t i = 0; i < node->df_path_n; i++)
+	    size_t minimum_turns = ਮਾਪ_MAX;
+	    ਲਈ (size_t i = 0; i < ਗੰਢ->df_ਰਸਤਾ_n; i++)
 	    {
 		// recurse
-		size_t t = test_charmatch_paths(node->df_decision[i],
-							node->df_choice[i]) +
-		    (lastdecision != node->df_choice[i] ? 1 : 0);
-		if (t < minimum_turns)
+		size_t t = test_charmatch_paths(ਗੰਢ->df_decision[i],
+							ਗੰਢ->df_choice[i]) +
+		    (lastdecision != ਗੰਢ->df_choice[i] ? 1 : 0);
+		ਜੇ (t < minimum_turns)
 		{
-		    node->df_optimal_choice = i;
+		    ਗੰਢ->df_optimal_choice = i;
 		    minimum_turns = t;
 		}
 	    }
-	    node->df_choice_mem[lastdecision] = (int)minimum_turns;
+	    ਗੰਢ->df_choice_mem[lastdecision] = (ਪੂਰਨ)minimum_turns;
 	}
     }
 
-    return (size_t)node->df_choice_mem[lastdecision];
+    ਵਾਪਸ (size_t)ਗੰਢ->df_choice_mem[lastdecision];
 }

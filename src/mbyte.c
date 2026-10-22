@@ -77,64 +77,64 @@
  * some commands, like ":menutrans"
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#ifdef WIN32UNIX
-# ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ WIN32UNIX
+# ifndef WIN32_LEAN_AND_ਔਸਤ
+#  define WIN32_LEAN_AND_ਔਸਤ
 # endif
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# ਜੇ defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 #  ifdef __CYGWIN__
     // ControlMask from <X11/X.h> (included in "vim.h") is conflicting with
     // <w32api/windows.h> (included in <X11/Xwindows.h>).
-#   undef ControlMask
+#   undef Control_ਨਕਾਬ
 #  endif
 #  include <X11/Xwindows.h>
 #  define WINBYTE wBYTE
-# else
+# ਨਹੀਂਤਾਂ
 #  include <windows.h>
 #  define WINBYTE BYTE
 # endif
 # ifdef WIN32
 #  undef WIN32	    // Some windows.h define WIN32, we don't want that here.
 # endif
-#else
+#ਨਹੀਂਤਾਂ
 # define WINBYTE BYTE
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(MSWIN) || defined(WIN32UNIX)
+#ਜੇ defined(MSWIN) || defined(WIN32UNIX)
 # include <winnls.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_X11
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_X11
 # include <X11/Intrinsic.h>
-#endif
-#ifdef X_LOCALE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ X_LOCALE
 # include <X11/Xlocale.h>
-# if !defined(HAVE_MBLEN) && !defined(mblen)
+# ਜੇ !defined(HAVE_MBLEN) && !defined(mblen)
 #  define mblen _Xmblen
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_WCHAR_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_WCHAR_H
 # include <wchar.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-static int dbcs_char2len(int c);
-static int dbcs_char2bytes(int c, char_u *buf);
-static int dbcs_ptr2len(char_u *p);
-static int dbcs_ptr2len_len(char_u *p, int size);
-static int utf_ptr2cells_len(char_u *p, int size);
-static int dbcs_char2cells(int c);
-static int dbcs_ptr2cells_len(char_u *p, int size);
-static int dbcs_ptr2char(char_u *p);
-static int dbcs_head_off(char_u *base, char_u *p);
-static inline int utf_ptr2char_and_len(char_u *p, int *lenp);
-static inline int utf_ptr2char_and_len_len(char_u *p, int size, int *lenp);
-static inline int utf_iscomposinglike_char(int c1, int c2);
-#ifdef FEAT_EVAL
-static int cw_value(int c);
-#endif
+ਸਥਿਰ ਪੂਰਨ dbcs_char2len(ਪੂਰਨ c);
+ਸਥਿਰ ਪੂਰਨ dbcs_char2bytes(ਪੂਰਨ c, char_u *buf);
+ਸਥਿਰ ਪੂਰਨ dbcs_ptr2len(char_u *p);
+ਸਥਿਰ ਪੂਰਨ dbcs_ptr2len_len(char_u *p, ਪੂਰਨ ਮਾਪ);
+ਸਥਿਰ ਪੂਰਨ utf_ptr2cells_len(char_u *p, ਪੂਰਨ ਮਾਪ);
+ਸਥਿਰ ਪੂਰਨ dbcs_char2cells(ਪੂਰਨ c);
+ਸਥਿਰ ਪੂਰਨ dbcs_ptr2cells_len(char_u *p, ਪੂਰਨ ਮਾਪ);
+ਸਥਿਰ ਪੂਰਨ dbcs_ptr2char(char_u *p);
+ਸਥਿਰ ਪੂਰਨ dbcs_ਸਿਰ_off(char_u *ਅਧਾਰ, char_u *p);
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ utf_ptr2char_and_len(char_u *p, ਪੂਰਨ *lenp);
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ utf_ptr2char_and_len_len(char_u *p, ਪੂਰਨ ਮਾਪ, ਪੂਰਨ *lenp);
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ utf_iscomposinglike_char(ਪੂਰਨ c1, ਪੂਰਨ c2);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+ਸਥਿਰ ਪੂਰਨ cw_ਮੁੱਲ(ਪੂਰਨ c);
+#ਜੇ_ਅੰਤ
 
 /*
  * Lookup table to quickly get the length in bytes of a UTF-8 character from
@@ -142,7 +142,7 @@ static int cw_value(int c);
  * Bytes which are illegal when used as the first byte have a 1.
  * The NUL byte has length 1.
  */
-static char utf8len_tab[256] =
+ਸਥਿਰ ਅੱਖਰ utf8len_tab[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -157,7 +157,7 @@ static char utf8len_tab[256] =
 /*
  * Like utf8len_tab above, but using a zero for illegal lead bytes.
  */
-static char utf8len_tab_zero[256] =
+ਸਥਿਰ ਅੱਖਰ utf8len_tab_zero[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -174,149 +174,149 @@ static char utf8len_tab_zero[256] =
  * Canonical encoding names and their properties.
  * "iso-8859-n" is handled by enc_canonize() directly.
  */
-static struct
-{   char *name;		int prop;		int codepage;}
-enc_canon_table[] =
+ਸਥਿਰ ਬਣਤਰ
+{   ਅੱਖਰ *name;		ਪੂਰਨ prop;		ਪੂਰਨ codepage;}
+enc_canon_ਸਾਰਣੀ[] =
 {
-#define IDX_LATIN_1	0
-    {"latin1",		ENC_8BIT + ENC_LATIN1,	1252},
-#define IDX_ISO_2	1
-    {"iso-8859-2",	ENC_8BIT,		0},
-#define IDX_ISO_3	2
-    {"iso-8859-3",	ENC_8BIT,		0},
-#define IDX_ISO_4	3
-    {"iso-8859-4",	ENC_8BIT,		0},
-#define IDX_ISO_5	4
-    {"iso-8859-5",	ENC_8BIT,		0},
-#define IDX_ISO_6	5
-    {"iso-8859-6",	ENC_8BIT,		0},
-#define IDX_ISO_7	6
-    {"iso-8859-7",	ENC_8BIT,		0},
-#define IDX_ISO_8	7
-    {"iso-8859-8",	ENC_8BIT,		0},
-#define IDX_ISO_9	8
-    {"iso-8859-9",	ENC_8BIT,		0},
-#define IDX_ISO_10	9
-    {"iso-8859-10",	ENC_8BIT,		0},
-#define IDX_ISO_11	10
-    {"iso-8859-11",	ENC_8BIT,		0},
-#define IDX_ISO_13	11
-    {"iso-8859-13",	ENC_8BIT,		0},
-#define IDX_ISO_14	12
-    {"iso-8859-14",	ENC_8BIT,		0},
-#define IDX_ISO_15	13
-    {"iso-8859-15",	ENC_8BIT + ENC_LATIN9,	0},
-#define IDX_KOI8_R	14
-    {"koi8-r",		ENC_8BIT,		0},
-#define IDX_KOI8_U	15
-    {"koi8-u",		ENC_8BIT,		0},
-#define IDX_UTF8	16
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_LATIN_1	0
+    {"latin1",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ + ENC_LATIN1,	1252},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_2	1
+    {"iso-8859-2",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_3	2
+    {"iso-8859-3",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_4	3
+    {"iso-8859-4",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_5	4
+    {"iso-8859-5",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_6	5
+    {"iso-8859-6",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_7	6
+    {"iso-8859-7",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_8	7
+    {"iso-8859-8",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_9	8
+    {"iso-8859-9",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_10	9
+    {"iso-8859-10",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_11	10
+    {"iso-8859-11",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_13	11
+    {"iso-8859-13",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_14	12
+    {"iso-8859-14",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ISO_15	13
+    {"iso-8859-15",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ + ENC_LATIN9,	0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_KOI8_R	14
+    {"koi8-r",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_KOI8_U	15
+    {"koi8-u",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UTF8	16
     {"utf-8",		ENC_UNICODE,		0},
-#define IDX_UCS2	17
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UCS2	17
     {"ucs-2",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2BYTE, 0},
-#define IDX_UCS2LE	18
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UCS2LE	18
     {"ucs-2le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_2BYTE, 0},
-#define IDX_UTF16	19
-    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16BE	20
-    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16LE	21
-    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2WORD, 0},
-#define IDX_UCS4	22
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UTF16	19
+    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_ਸ਼ਬਦ, 0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UTF16BE	20
+    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_ਸ਼ਬਦ, 0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UTF16LE	21
+    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2_ਸ਼ਬਦ, 0},
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UCS4	22
     {"ucs-4",		ENC_UNICODE + ENC_ENDIAN_B + ENC_4BYTE, 0},
-#define IDX_UCS4LE	23
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_UCS4LE	23
     {"ucs-4le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_4BYTE, 0},
 
     // For debugging DBCS encoding on Unix.
-#define IDX_DEBUG	24
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_DEBUG	24
     {"debug",		ENC_DBCS,		DBCS_DEBUG},
-#define IDX_EUC_JP	25
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_EUC_JP	25
     {"euc-jp",		ENC_DBCS,		DBCS_JPNU},
-#define IDX_SJIS	26
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_SJIS	26
     {"sjis",		ENC_DBCS,		DBCS_JPN},
-#define IDX_EUC_KR	27
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_EUC_KR	27
     {"euc-kr",		ENC_DBCS,		DBCS_KORU},
-#define IDX_EUC_CN	28
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_EUC_CN	28
     {"euc-cn",		ENC_DBCS,		DBCS_CHSU},
-#define IDX_EUC_TW	29
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_EUC_TW	29
     {"euc-tw",		ENC_DBCS,		DBCS_CHTU},
-#define IDX_BIG5	30
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_BIG5	30
     {"big5",		ENC_DBCS,		DBCS_CHT},
 
     // MS-DOS and MS-Windows codepages are included here, so that they can be
     // used on Unix too.  Most of them are similar to ISO-8859 encodings, but
     // not exactly the same.
-#define IDX_CP437	31
-    {"cp437",		ENC_8BIT,		437}, // like iso-8859-1
-#define IDX_CP737	32
-    {"cp737",		ENC_8BIT,		737}, // like iso-8859-7
-#define IDX_CP775	33
-    {"cp775",		ENC_8BIT,		775}, // Baltic
-#define IDX_CP850	34
-    {"cp850",		ENC_8BIT,		850}, // like iso-8859-4
-#define IDX_CP852	35
-    {"cp852",		ENC_8BIT,		852}, // like iso-8859-1
-#define IDX_CP855	36
-    {"cp855",		ENC_8BIT,		855}, // like iso-8859-2
-#define IDX_CP857	37
-    {"cp857",		ENC_8BIT,		857}, // like iso-8859-5
-#define IDX_CP860	38
-    {"cp860",		ENC_8BIT,		860}, // like iso-8859-9
-#define IDX_CP861	39
-    {"cp861",		ENC_8BIT,		861}, // like iso-8859-1
-#define IDX_CP862	40
-    {"cp862",		ENC_8BIT,		862}, // like iso-8859-1
-#define IDX_CP863	41
-    {"cp863",		ENC_8BIT,		863}, // like iso-8859-8
-#define IDX_CP865	42
-    {"cp865",		ENC_8BIT,		865}, // like iso-8859-1
-#define IDX_CP866	43
-    {"cp866",		ENC_8BIT,		866}, // like iso-8859-5
-#define IDX_CP869	44
-    {"cp869",		ENC_8BIT,		869}, // like iso-8859-7
-#define IDX_CP874	45
-    {"cp874",		ENC_8BIT,		874}, // Thai
-#define IDX_CP932	46
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP437	31
+    {"cp437",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		437}, // like iso-8859-1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP737	32
+    {"cp737",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		737}, // like iso-8859-7
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP775	33
+    {"cp775",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		775}, // Baltic
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP850	34
+    {"cp850",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		850}, // like iso-8859-4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP852	35
+    {"cp852",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		852}, // like iso-8859-1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP855	36
+    {"cp855",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		855}, // like iso-8859-2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP857	37
+    {"cp857",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		857}, // like iso-8859-5
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP860	38
+    {"cp860",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		860}, // like iso-8859-9
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP861	39
+    {"cp861",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		861}, // like iso-8859-1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP862	40
+    {"cp862",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		862}, // like iso-8859-1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP863	41
+    {"cp863",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		863}, // like iso-8859-8
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP865	42
+    {"cp865",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		865}, // like iso-8859-1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP866	43
+    {"cp866",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		866}, // like iso-8859-5
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP869	44
+    {"cp869",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		869}, // like iso-8859-7
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP874	45
+    {"cp874",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		874}, // Thai
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP932	46
     {"cp932",		ENC_DBCS,		DBCS_JPN},
-#define IDX_CP936	47
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP936	47
     {"cp936",		ENC_DBCS,		DBCS_CHS},
-#define IDX_CP949	48
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP949	48
     {"cp949",		ENC_DBCS,		DBCS_KOR},
-#define IDX_CP950	49
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP950	49
     {"cp950",		ENC_DBCS,		DBCS_CHT},
-#define IDX_CP1250	50
-    {"cp1250",		ENC_8BIT,		1250}, // Czech, Polish, etc.
-#define IDX_CP1251	51
-    {"cp1251",		ENC_8BIT,		1251}, // Cyrillic
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1250	50
+    {"cp1250",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1250}, // Czech, Polish, etc.
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1251	51
+    {"cp1251",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1251}, // Cyrillic
     // cp1252 is considered to be equal to latin1
-#define IDX_CP1253	52
-    {"cp1253",		ENC_8BIT,		1253}, // Greek
-#define IDX_CP1254	53
-    {"cp1254",		ENC_8BIT,		1254}, // Turkish
-#define IDX_CP1255	54
-    {"cp1255",		ENC_8BIT,		1255}, // Hebrew
-#define IDX_CP1256	55
-    {"cp1256",		ENC_8BIT,		1256}, // Arabic
-#define IDX_CP1257	56
-    {"cp1257",		ENC_8BIT,		1257}, // Baltic
-#define IDX_CP1258	57
-    {"cp1258",		ENC_8BIT,		1258}, // Vietnamese
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1253	52
+    {"cp1253",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1253}, // Greek
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1254	53
+    {"cp1254",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1254}, // Turkish
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1255	54
+    {"cp1255",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1255}, // Hebrew
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1256	55
+    {"cp1256",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1256}, // Arabic
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1257	56
+    {"cp1257",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1257}, // Baltic
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_CP1258	57
+    {"cp1258",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		1258}, // Vietnamese
 
-#define IDX_MACROMAN	58
-    {"macroman",	ENC_8BIT + ENC_MACROMAN, 0},	// Mac OS
-#define IDX_DECMCS	59
-    {"dec-mcs",		ENC_8BIT,		0},	// DEC MCS
-#define IDX_HPROMAN8	60
-    {"hp-roman8",	ENC_8BIT,		0},	// HP Roman8
-#define IDX_COUNT	61
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_MACROMAN	58
+    {"macroman",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ + ENC_MACROMAN, 0},	// Mac OS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_DECMCS	59
+    {"dec-mcs",		ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},	// DEC MCS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_HPROMAN8	60
+    {"hp-roman8",	ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ,		0},	// HP Roman8
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IDX_ਗਿਣਤੀ	61
 };
 
 /*
  * Aliases for encoding names.
  */
-static struct
-{   char *name;		int canon;}
-enc_alias_table[] =
+ਸਥਿਰ ਬਣਤਰ
+{   ਅੱਖਰ *name;		ਪੂਰਨ canon;}
+enc_alias_ਸਾਰਣੀ[] =
 {
     {"ansi",		IDX_LATIN_1},
     {"iso-8859-1",	IDX_LATIN_1},
@@ -327,11 +327,11 @@ enc_alias_table[] =
     {"cyrillic",	IDX_ISO_5},
     {"arabic",		IDX_ISO_6},
     {"greek",		IDX_ISO_7},
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     {"hebrew",		IDX_CP1255},
-#else
+#ਨਹੀਂਤਾਂ
     {"hebrew",		IDX_ISO_8},
-#endif
+#ਜੇ_ਅੰਤ
     {"latin5",		IDX_ISO_9},
     {"turkish",		IDX_ISO_9}, // ?
     {"latin6",		IDX_ISO_10},
@@ -375,14 +375,14 @@ enc_alias_table[] =
     {"euccn",		IDX_EUC_CN},
     {"gb2312",		IDX_EUC_CN},
     {"euctw",		IDX_EUC_TW},
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#ਜੇ defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
     {"japan",		IDX_CP932},
     {"korea",		IDX_CP949},
     {"prc",		IDX_CP936},
     {"chinese",		IDX_CP936},
     {"taiwan",		IDX_CP950},
     {"big5",		IDX_CP950},
-#else
+#ਨਹੀਂਤਾਂ
     {"japan",		IDX_EUC_JP},
     {"korea",		IDX_EUC_KR},
     {"prc",		IDX_EUC_CN},
@@ -390,29 +390,29 @@ enc_alias_table[] =
     {"taiwan",		IDX_EUC_TW},
     {"cp950",		IDX_BIG5},
     {"950",		IDX_BIG5},
-#endif
+#ਜੇ_ਅੰਤ
     {"mac",		IDX_MACROMAN},
     {"mac-roman",	IDX_MACROMAN},
-    {NULL,		0}
+    {ਨਿਰਾ,		0}
 };
 
-#ifndef CP_UTF8
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CP_UTF8
 # define CP_UTF8 65001	// magic number from winnls.h
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Find encoding "name" in the list of canonical encoding names.
  * Returns -1 if not found.
  */
-    static int
-enc_canon_search(char_u *name)
+    ਸਥਿਰ ਪੂਰਨ
+enc_canon_ਖੋਜ(char_u *name)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < IDX_COUNT; ++i)
-	if (STRCMP(name, enc_canon_table[i].name) == 0)
-	    return i;
-    return -1;
+    ਲਈ (i = 0; i < IDX_ਗਿਣਤੀ; ++i)
+	ਜੇ (STRCMP(name, enc_canon_ਸਾਰਣੀ[i].name) == 0)
+	    ਵਾਪਸ i;
+    ਵਾਪਸ -1;
 }
 
 
@@ -420,37 +420,37 @@ enc_canon_search(char_u *name)
  * Find canonical encoding "name" in the list and return its properties.
  * Returns 0 if not found.
  */
-    int
+    ਪੂਰਨ
 enc_canon_props(char_u *name)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    i = enc_canon_search(name);
-    if (i >= 0)
-	return enc_canon_table[i].prop;
-#ifdef MSWIN
-    if (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
+    i = enc_canon_ਖੋਜ(name);
+    ਜੇ (i >= 0)
+	ਵਾਪਸ enc_canon_ਸਾਰਣੀ[i].prop;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)name + 2), &cpinfo) != 0)
+	ਜੇ (GetCPInfo(atoi((ਅੱਖਰ *)name + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1) // some single-byte encoding
-		return ENC_8BIT;
-	    if (cpinfo.MaxCharSize == 2
+	    ਜੇ (cpinfo.Max_Char_ਮਾਪ == 1) // some single-byte encoding
+		ਵਾਪਸ ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ;
+	    ਜੇ (cpinfo.Max_Char_ਮਾਪ == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 		// must be a DBCS encoding
-		return ENC_DBCS;
+		ਵਾਪਸ ENC_DBCS;
 	}
-	return 0;
+	ਵਾਪਸ 0;
     }
-#endif
-    if (STRNCMP(name, "2byte-", 6) == 0)
-	return ENC_DBCS;
-    if (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
-	return ENC_8BIT;
-    return 0;
+#ਜੇ_ਅੰਤ
+    ਜੇ (STRNCMP(name, "2byte-", 6) == 0)
+	ਵਾਪਸ ENC_DBCS;
+    ਜੇ (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
+	ਵਾਪਸ ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ;
+    ਵਾਪਸ 0;
 }
 
 /*
@@ -465,126 +465,126 @@ enc_canon_props(char_u *name)
  * When there is something wrong: Returns an error message and doesn't change
  * anything.
  */
-    char *
-mb_init(void)
+    ਅੱਖਰ *
+mb_init(ਖਾਲੀ)
 {
-    int		i;
-    int		idx;
-    int		n;
-    int		enc_dbcs_new = 0;
-#if defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		idx;
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		enc_dbcs_new = 0;
+#ਜੇ defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
 	&& !defined(MACOS_CONVERT)
 # define LEN_FROM_CONV
     vimconv_T	vimconv;
     char_u	*p;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (p_enc == NULL)
+    ਜੇ (p_enc == ਨਿਰਾ)
     {
 	// Just starting up: set the whole table to one's.
-	for (i = 0; i < 256; ++i)
+	ਲਈ (i = 0; i < 256; ++i)
 	    mb_bytelen_tab[i] = 1;
-	input_conv.vc_type = CONV_NONE;
-	input_conv.vc_factor = 1;
+	ਨਿਵੇਸ਼_conv.vc_type = CONV_NONE;
+	ਨਿਵੇਸ਼_conv.vc_ਗੁਣਕ = 1;
 	output_conv.vc_type = CONV_NONE;
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-#ifdef MSWIN
-    if (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)p_enc + 2), &cpinfo) != 0)
+	ਜੇ (GetCPInfo(atoi((ਅੱਖਰ *)p_enc + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1)
+	    ਜੇ (cpinfo.Max_Char_ਮਾਪ == 1)
 	    {
 		// some single-byte encoding
 		enc_unicode = 0;
 		enc_utf8 = FALSE;
 	    }
-	    else if (cpinfo.MaxCharSize == 2
+	    ਨਹੀਂਤਾਂ ਜੇ (cpinfo.Max_Char_ਮਾਪ == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 	    {
 		// must be a DBCS encoding, check below
-		enc_dbcs_new = atoi((char *)p_enc + 2);
+		enc_dbcs_new = atoi((ਅੱਖਰ *)p_enc + 2);
 	    }
-	    else
-		goto codepage_invalid;
+	    ਨਹੀਂਤਾਂ
+		ਜਾਓ codepage_invalid;
 	}
-	else if (GetLastError() == ERROR_INVALID_PARAMETER)
+	ਨਹੀਂਤਾਂ ਜੇ (Get_ਆਖਰੀ_Error() == ERROR_INVALID_PARAMETER)
 	{
 codepage_invalid:
-	    return N_(e_not_valid_codepage);
+	    ਵਾਪਸ N_(e_not_valid_codepage);
 	}
     }
-#endif
-    else if (STRNCMP(p_enc, "8bit-", 5) == 0
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p_enc, "8bit-", 5) == 0
 	    || STRNCMP(p_enc, "iso-8859-", 9) == 0)
     {
 	// Accept any "8bit-" or "iso-8859-" name.
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p_enc, "2byte-", 6) == 0)
     {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// Windows: accept only valid codepage numbers, check below.
-	if (p_enc[6] != 'c' || p_enc[7] != 'p'
-			      || (enc_dbcs_new = atoi((char *)p_enc + 8)) == 0)
-	    return e_invalid_argument;
-#else
+	ਜੇ (p_enc[6] != 'c' || p_enc[7] != 'p'
+			      || (enc_dbcs_new = atoi((ਅੱਖਰ *)p_enc + 8)) == 0)
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
+#ਨਹੀਂਤਾਂ
 	// Unix: accept any "2byte-" name, assume current locale.
 	enc_dbcs_new = DBCS_2BYTE;
-#endif
+#ਜੇ_ਅੰਤ
     }
-    else if ((idx = enc_canon_search(p_enc)) >= 0)
+    ਨਹੀਂਤਾਂ ਜੇ ((idx = enc_canon_ਖੋਜ(p_enc)) >= 0)
     {
-	i = enc_canon_table[idx].prop;
-	if (i & ENC_UNICODE)
+	i = enc_canon_ਸਾਰਣੀ[idx].prop;
+	ਜੇ (i & ENC_UNICODE)
 	{
 	    // Unicode
 	    enc_utf8 = TRUE;
-	    if (i & (ENC_2BYTE | ENC_2WORD))
+	    ਜੇ (i & (ENC_2BYTE | ENC_2_ਸ਼ਬਦ))
 		enc_unicode = 2;
-	    else if (i & ENC_4BYTE)
+	    ਨਹੀਂਤਾਂ ਜੇ (i & ENC_4BYTE)
 		enc_unicode = 4;
-	    else
+	    ਨਹੀਂਤਾਂ
 		enc_unicode = 0;
 	}
-	else if (i & ENC_DBCS)
+	ਨਹੀਂਤਾਂ ਜੇ (i & ENC_DBCS)
 	{
 	    // 2byte, handle below
-	    enc_dbcs_new = enc_canon_table[idx].codepage;
+	    enc_dbcs_new = enc_canon_ਸਾਰਣੀ[idx].codepage;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Must be 8-bit.
 	    enc_unicode = 0;
 	    enc_utf8 = FALSE;
 	}
     }
-    else    // Don't know what encoding this is, reject it.
-	return e_invalid_argument;
+    ਨਹੀਂਤਾਂ    // Don't know what encoding this is, reject it.
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    if (enc_dbcs_new != 0)
+    ਜੇ (enc_dbcs_new != 0)
     {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// Check if the DBCS code page is OK.
-	if (!IsValidCodePage(enc_dbcs_new))
-	    goto codepage_invalid;
-#endif
+	ਜੇ (!Is_Valid_ਕੋਡ_ਪੰਨਾ(enc_dbcs_new))
+	    ਜਾਓ codepage_invalid;
+#ਜੇ_ਅੰਤ
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
     enc_dbcs = enc_dbcs_new;
     has_mbyte = (enc_dbcs != 0 || enc_utf8);
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#ਜੇ defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     enc_codepage = encname2codepage(p_enc);
     enc_latin9 = (STRCMP(p_enc, "iso-8859-15") == 0);
-#endif
+#ਜੇ_ਅੰਤ
 
     // Detect an encoding that uses latin1 characters.
     enc_latin1like = (enc_utf8 || STRCMP(p_enc, "latin1") == 0
@@ -593,7 +593,7 @@ codepage_invalid:
     /*
      * Set the function pointers.
      */
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
     {
 	mb_ptr2len = utfc_ptr2len;
 	mb_ptr2len_len = utfc_ptr2len_len;
@@ -604,9 +604,9 @@ codepage_invalid:
 	mb_char2cells = utf_char2cells;
 	mb_off2cells = utf_off2cells;
 	mb_ptr2char = utf_ptr2char;
-	mb_head_off = utf_head_off;
+	mb_ਸਿਰ_off = utf_ਸਿਰ_off;
     }
-    else if (enc_dbcs != 0)
+    ਨਹੀਂਤਾਂ ਜੇ (enc_dbcs != 0)
     {
 	mb_ptr2len = dbcs_ptr2len;
 	mb_ptr2len_len = dbcs_ptr2len_len;
@@ -617,9 +617,9 @@ codepage_invalid:
 	mb_char2cells = dbcs_char2cells;
 	mb_off2cells = dbcs_off2cells;
 	mb_ptr2char = dbcs_ptr2char;
-	mb_head_off = dbcs_head_off;
+	mb_ਸਿਰ_off = dbcs_ਸਿਰ_off;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	mb_ptr2len = latin_ptr2len;
 	mb_ptr2len_len = latin_ptr2len_len;
@@ -630,45 +630,45 @@ codepage_invalid:
 	mb_char2cells = latin_char2cells;
 	mb_off2cells = latin_off2cells;
 	mb_ptr2char = latin_ptr2char;
-	mb_head_off = latin_head_off;
+	mb_ਸਿਰ_off = latin_ਸਿਰ_off;
     }
 
     /*
      * Fill the mb_bytelen_tab[] for MB_BYTE2LEN().
      */
-#ifdef LEN_FROM_CONV
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LEN_FROM_CONV
     // When 'encoding' is different from the current locale mblen() won't
     // work.  Use conversion to "utf-8" instead.
     vimconv.vc_type = CONV_NONE;
-    if (enc_dbcs)
+    ਜੇ (enc_dbcs)
     {
 	p = enc_locale();
-	if (p == NULL || STRCMP(p, p_enc) != 0)
+	ਜੇ (p == ਨਿਰਾ || STRCMP(p, p_enc) != 0)
 	{
-	    convert_setup(&vimconv, p_enc, (char_u *)"utf-8");
+	    convert_ਤਿਆਰੀ(&vimconv, p_enc, (char_u *)"utf-8");
 	    vimconv.vc_fail = TRUE;
 	}
 	vim_free(p);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    for (i = 0; i < 256; ++i)
+    ਲਈ (i = 0; i < 256; ++i)
     {
 	// Our own function to reliably check the length of UTF-8 characters,
 	// independent of mblen().
-	if (enc_utf8)
+	ਜੇ (enc_utf8)
 	    n = utf8len_tab[i];
-	else if (enc_dbcs == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (enc_dbcs == 0)
 	    n = 1;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-#if defined(MSWIN) || defined(WIN32UNIX)
+#ਜੇ defined(MSWIN) || defined(WIN32UNIX)
 	    // enc_dbcs is set by setting 'fileencoding'.  It becomes a Windows
 	    // CodePage identifier, which we can pass directly in to Windows
 	    // API
 	    n = IsDBCSLeadByteEx(enc_dbcs, (WINBYTE)i) ? 2 : 1;
-#else
-# if defined(__amigaos4__) || defined(__ANDROID__) || \
+#ਨਹੀਂਤਾਂ
+# ਜੇ defined(__amigaos4__) || defined(__ANDROID__) || \
 				   !(defined(HAVE_MBLEN) || defined(X_LOCALE))
 	    /*
 	     * if mblen() is not available, character which MSB is turned on
@@ -676,32 +676,32 @@ codepage_invalid:
 	     * is not always true.)
 	     */
 	    n = (i & 0x80) ? 2 : 1;
-# else
-	    char buf[MB_MAXBYTES + 1];
+# ਨਹੀਂਤਾਂ
+	    ਅੱਖਰ buf[MB_MAXBYTES + 1];
 
-	    if (i == NUL)	// just in case mblen() can't handle ""
+	    ਜੇ (i == NUL)	// just in case mblen() can't handle ""
 		n = 1;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		buf[0] = i;
 		buf[1] = 0;
 #  ifdef LEN_FROM_CONV
-		if (vimconv.vc_type != CONV_NONE)
+		ਜੇ (vimconv.vc_type != CONV_NONE)
 		{
 		    /*
 		     * string_convert() should fail when converting the first
 		     * byte of a double-byte character.
 		     */
-		    p = string_convert(&vimconv, (char_u *)buf, NULL);
-		    if (p != NULL)
+		    p = string_convert(&vimconv, (char_u *)buf, ਨਿਰਾ);
+		    ਜੇ (p != ਨਿਰਾ)
 		    {
 			vim_free(p);
 			n = 1;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			n = 2;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 #  endif
 		{
 		    /*
@@ -710,58 +710,58 @@ codepage_invalid:
 		     * where mblen() returns 0 for invalid character.
 		     * Therefore, following condition includes 0.
 		     */
-		    vim_ignored = mblen(NULL, 0);  // First reset the state.
-		    if (mblen(buf, (size_t)1) <= 0)
+		    vim_ignored = mblen(ਨਿਰਾ, 0);  // First reset the state.
+		    ਜੇ (mblen(buf, (size_t)1) <= 0)
 			n = 2;
-		    else
+		    ਨਹੀਂਤਾਂ
 			n = 1;
 		}
 	    }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
 	mb_bytelen_tab[i] = n;
     }
 
-#ifdef LEN_FROM_CONV
-    convert_setup(&vimconv, NULL, NULL);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LEN_FROM_CONV
+    convert_ਤਿਆਰੀ(&vimconv, ਨਿਰਾ, ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
 
     // The cell width depends on the type of multi-byte characters.
-    (void)init_chartab();
+    (ਖਾਲੀ)init_chartab();
 
     // When enc_utf8 is set or reset, (de)allocate ScreenLinesUC[]
     screenalloc(FALSE);
 
     // When using Unicode, set default for 'fileencodings'.
-    if (enc_utf8 && !option_was_set((char_u *)"fencs"))
-	set_fencs_unicode();
+    ਜੇ (enc_utf8 && !option_was_ਸੈੱਟ((char_u *)"fencs"))
+	ਸੈੱਟ_fencs_unicode();
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
+#ਜੇ defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
     // GNU gettext 0.10.37 supports this feature: set the codeset used for
     // translated messages independently from the current locale.
-    (void)bind_textdomain_codeset(VIMPACKAGE,
-					  enc_utf8 ? "utf-8" : (char *)p_enc);
-#endif
+    (ਖਾਲੀ)bind_textdomain_codeset(VIMPACKAGE,
+					  enc_utf8 ? "utf-8" : (ਅੱਖਰ *)p_enc);
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     // When changing 'encoding' while starting up, then convert the command
     // line arguments from the active codepage to 'encoding'.
-    if (starting != 0)
+    ਜੇ (starting != 0)
 	fix_arg_enc();
-#endif
+#ਜੇ_ਅੰਤ
 
     // Fire an autocommand to let people do custom font setup. This must be
     // after Vim has been setup for the new encoding.
-    apply_autocmds(EVENT_ENCODINGCHANGED, NULL, (char_u *)"", FALSE, curbuf);
+    apply_autocmds(EVENT_ENCODINGCHANGED, ਨਿਰਾ, (char_u *)"", FALSE, curbuf);
 
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     // Need to reload spell dictionaries
     spell_reload();
-#endif
+#ਜੇ_ਅੰਤ
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -771,55 +771,55 @@ codepage_invalid:
  * 4 - UCS-4 BOM
  * 3 - UTF-8 BOM
  */
-    int
-bomb_size(void)
+    ਪੂਰਨ
+bomb_ਮਾਪ(ਖਾਲੀ)
 {
-    int n = 0;
+    ਪੂਰਨ n = 0;
 
-    if (curbuf->b_p_bomb && !curbuf->b_p_bin)
+    ਜੇ (curbuf->b_p_bomb && !curbuf->b_p_bin)
     {
-	if (*curbuf->b_p_fenc == NUL)
+	ਜੇ (*curbuf->b_p_fenc == NUL)
 	{
-	    if (enc_utf8)
+	    ਜੇ (enc_utf8)
 	    {
-		if (enc_unicode != 0)
+		ਜੇ (enc_unicode != 0)
 		    n = enc_unicode;
-		else
+		ਨਹੀਂਤਾਂ
 		    n = 3;
 	    }
 	}
-	else if (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
 	    n = 3;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
 		|| STRNCMP(curbuf->b_p_fenc, "utf-16", 6) == 0)
 	    n = 2;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
 	    n = 4;
     }
-    return n;
+    ਵਾਪਸ n;
 }
 
-#if defined(FEAT_QUICKFIX)
+#ਜੇ defined(FEAT_QUICKFIX)
 /*
  * Remove all BOM from "s" by moving remaining text.
  */
-    void
+    ਖਾਲੀ
 remove_bom(char_u *s)
 {
-    if (!enc_utf8)
-	return;
+    ਜੇ (!enc_utf8)
+	ਵਾਪਸ;
 
     char_u *p = s;
 
-    while ((p = vim_strbyte(p, 0xef)) != NULL)
+    ਜਦੋਂ ((p = vim_strbyte(p, 0xef)) != ਨਿਰਾ)
     {
-	if (p[1] == 0xbb && p[2] == 0xbf)
+	ਜੇ (p[1] == 0xbb && p[2] == 0xbf)
 	    STRMOVE(p, p + 3);
-	else
+	ਨਹੀਂਤਾਂ
 	    ++p;
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Get class of pointer:
@@ -828,65 +828,65 @@ remove_bom(char_u *s)
  * 2 for an alphanumeric word character
  * >2 for other word characters, including CJK and emoji
  */
-    int
+    ਪੂਰਨ
 mb_get_class(char_u *p)
 {
-    return mb_get_class_buf(p, curbuf);
+    ਵਾਪਸ mb_get_class_buf(p, curbuf);
 }
 
-    int
+    ਪੂਰਨ
 mb_get_class_buf(char_u *p, buf_T *buf)
 {
-    if (MB_BYTE2LEN(p[0]) == 1)
+    ਜੇ (MB_BYTE2LEN(p[0]) == 1)
     {
-	if (p[0] == NUL || VIM_ISWHITE(p[0]))
-	    return 0;
-	if (vim_iswordc_buf(p[0], buf))
-	    return 2;
-	return 1;
+	ਜੇ (p[0] == NUL || VIM_ISWHITE(p[0]))
+	    ਵਾਪਸ 0;
+	ਜੇ (vim_iswordc_buf(p[0], buf))
+	    ਵਾਪਸ 2;
+	ਵਾਪਸ 1;
     }
-    if (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
-	return dbcs_class(p[0], p[1]);
-    if (enc_utf8)
-	return utf_class_buf(utf_ptr2char(p), buf);
-    return 0;
+    ਜੇ (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
+	ਵਾਪਸ dbcs_class(p[0], p[1]);
+    ਜੇ (enc_utf8)
+	ਵਾਪਸ utf_class_buf(utf_ptr2char(p), buf);
+    ਵਾਪਸ 0;
 }
 
 /*
  * Get class of a double-byte character.  This always returns 3 or bigger.
  * TODO: Should return 1 for punctuation.
  */
-    int
-dbcs_class(unsigned lead, unsigned trail)
+    ਪੂਰਨ
+dbcs_class(ਬਿਨਾਨਿਸ਼ਾਨੀ lead, ਬਿਨਾਨਿਸ਼ਾਨੀ trail)
 {
-    switch (enc_dbcs)
+    ਚੋਣ (enc_dbcs)
     {
 	// please add classify routine for your language in here
 
-	case DBCS_JPNU:	// ?
-	case DBCS_JPN:
+	ਹਾਲਤ DBCS_JPNU:	// ?
+	ਹਾਲਤ DBCS_JPN:
 	    {
 		// JIS code classification
-		unsigned char lb = lead;
-		unsigned char tb = trail;
+		ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ lb = lead;
+		ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ tb = trail;
 
 		// convert process code to JIS
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#ਜੇ defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
 		// process code is SJIS
-		if (lb <= 0x9f)
+		ਜੇ (lb <= 0x9f)
 		    lb = (lb - 0x81) * 2 + 0x21;
-		else
+		ਨਹੀਂਤਾਂ
 		    lb = (lb - 0xc1) * 2 + 0x21;
-		if (tb <= 0x7e)
+		ਜੇ (tb <= 0x7e)
 		    tb -= 0x1f;
-		else if (tb <= 0x9e)
+		ਨਹੀਂਤਾਂ ਜੇ (tb <= 0x9e)
 		    tb -= 0x20;
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    tb -= 0x7e;
 		    lb += 1;
 		}
-#else
+#ਨਹੀਂਤਾਂ
 		/*
 		 * XXX: Code page identification can not use with all
 		 *	    system! So, some other encoding information
@@ -899,57 +899,57 @@ dbcs_class(unsigned lead, unsigned trail)
 		// assume process code is JAPANESE-EUC
 		lb &= 0x7f;
 		tb &= 0x7f;
-#endif
+#ਜੇ_ਅੰਤ
 		// exceptions
-		switch (lb << 8 | tb)
+		ਚੋਣ (lb << 8 | tb)
 		{
-		    case 0x2121: // ZENKAKU space
-			return 0;
-		    case 0x2122: // TOU-TEN (Japanese comma)
-		    case 0x2123: // KU-TEN (Japanese period)
-		    case 0x2124: // ZENKAKU comma
-		    case 0x2125: // ZENKAKU period
-			return 1;
-		    case 0x213c: // prolongedsound handled as KATAKANA
-			return 13;
+		    ਹਾਲਤ 0x2121: // ZENKAKU space
+			ਵਾਪਸ 0;
+		    ਹਾਲਤ 0x2122: // TOU-TEN (Japanese comma)
+		    ਹਾਲਤ 0x2123: // KU-TEN (Japanese period)
+		    ਹਾਲਤ 0x2124: // ZENKAKU comma
+		    ਹਾਲਤ 0x2125: // ZENKAKU period
+			ਵਾਪਸ 1;
+		    ਹਾਲਤ 0x213c: // prolongedsound handled as KATAKANA
+			ਵਾਪਸ 13;
 		}
 		// sieved by KU code
-		switch (lb)
+		ਚੋਣ (lb)
 		{
-		    case 0x21:
-		    case 0x22:
+		    ਹਾਲਤ 0x21:
+		    ਹਾਲਤ 0x22:
 			// special symbols
-			return 10;
-		    case 0x23:
+			ਵਾਪਸ 10;
+		    ਹਾਲਤ 0x23:
 			// alphanumeric
-			return 11;
-		    case 0x24:
+			ਵਾਪਸ 11;
+		    ਹਾਲਤ 0x24:
 			// hiragana
-			return 12;
-		    case 0x25:
+			ਵਾਪਸ 12;
+		    ਹਾਲਤ 0x25:
 			// katakana
-			return 13;
-		    case 0x26:
+			ਵਾਪਸ 13;
+		    ਹਾਲਤ 0x26:
 			// greek
-			return 14;
-		    case 0x27:
+			ਵਾਪਸ 14;
+		    ਹਾਲਤ 0x27:
 			// russian
-			return 15;
-		    case 0x28:
-			// lines
-			return 16;
-		    default:
+			ਵਾਪਸ 15;
+		    ਹਾਲਤ 0x28:
+			//ਸਤਰਾਂ
+			ਵਾਪਸ 16;
+		    ਮੂਲ:
 			// kanji
-			return 17;
+			ਵਾਪਸ 17;
 		}
 	    }
 
-	case DBCS_KORU:	// ?
-	case DBCS_KOR:
+	ਹਾਲਤ DBCS_KORU:	// ?
+	ਹਾਲਤ DBCS_KOR:
 	    {
 		// KS code classification
-		unsigned char c1 = lead;
-		unsigned char c2 = trail;
+		ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ c1 = lead;
+		ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ c2 = trail;
 
 		/*
 		 * 20 : Hangul
@@ -965,63 +965,63 @@ dbcs_class(unsigned lead, unsigned trail)
 		 * 30 : Cyrillic Letter
 		 */
 
-		if (c1 >= 0xB0 && c1 <= 0xC8)
+		ਜੇ (c1 >= 0xB0 && c1 <= 0xC8)
 		    // Hangul
-		    return 20;
-#if defined(MSWIN) || defined(WIN32UNIX)
-		else if (c1 <= 0xA0 || c2 <= 0xA0)
+		    ਵਾਪਸ 20;
+#ਜੇ defined(MSWIN) || defined(WIN32UNIX)
+		ਨਹੀਂਤਾਂ ਜੇ (c1 <= 0xA0 || c2 <= 0xA0)
 		    // Extended Hangul Region : MS UHC(Unified Hangul Code)
 		    // c1: 0x81-0xA0 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xFE
 		    // c1: 0xA1-0xC6 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xA0
-		    return 20;
-#endif
+		    ਵਾਪਸ 20;
+#ਜੇ_ਅੰਤ
 
-		else if (c1 >= 0xCA && c1 <= 0xFD)
+		ਨਹੀਂਤਾਂ ਜੇ (c1 >= 0xCA && c1 <= 0xFD)
 		    // Hanja
-		    return 21;
-		else switch (c1)
+		    ਵਾਪਸ 21;
+		ਨਹੀਂਤਾਂ ਚੋਣ (c1)
 		{
-		    case 0xA1:
-		    case 0xA2:
+		    ਹਾਲਤ 0xA1:
+		    ਹਾਲਤ 0xA2:
 			// Symbols
-			return 22;
-		    case 0xA3:
+			ਵਾਪਸ 22;
+		    ਹਾਲਤ 0xA3:
 			// Alphanumeric
-			return 23;
-		    case 0xA4:
+			ਵਾਪਸ 23;
+		    ਹਾਲਤ 0xA4:
 			// Hangul Letter(Alphabet)
-			return 24;
-		    case 0xA5:
+			ਵਾਪਸ 24;
+		    ਹਾਲਤ 0xA5:
 			// Roman Numeral/Greek Letter
-			return 25;
-		    case 0xA6:
+			ਵਾਪਸ 25;
+		    ਹਾਲਤ 0xA6:
 			// Box Drawings
-			return 26;
-		    case 0xA7:
+			ਵਾਪਸ 26;
+		    ਹਾਲਤ 0xA7:
 			// Unit Symbols
-			return 27;
-		    case 0xA8:
-		    case 0xA9:
-			if (c2 <= 0xAF)
-			    return 25;  // Roman Letter
-			else if (c2 >= 0xF6)
-			    return 22;  // Symbols
-			else
+			ਵਾਪਸ 27;
+		    ਹਾਲਤ 0xA8:
+		    ਹਾਲਤ 0xA9:
+			ਜੇ (c2 <= 0xAF)
+			    ਵਾਪਸ 25;  // Roman Letter
+			ਨਹੀਂਤਾਂ ਜੇ (c2 >= 0xF6)
+			    ਵਾਪਸ 22;  // Symbols
+			ਨਹੀਂਤਾਂ
 			    // Circled/Parenthesized Letter
-			    return 28;
-		    case 0xAA:
-		    case 0xAB:
+			    ਵਾਪਸ 28;
+		    ਹਾਲਤ 0xAA:
+		    ਹਾਲਤ 0xAB:
 			// Hiragana/Katakana
-			return 29;
-		    case 0xAC:
+			ਵਾਪਸ 29;
+		    ਹਾਲਤ 0xAC:
 			// Cyrillic Letter
-			return 30;
+			ਵਾਪਸ 30;
 		}
 	    }
-	default:
-	    break;
+	ਮੂਲ:
+	    ਰੋਕੋ;
     }
-    return 3;
+    ਵਾਪਸ 3;
 }
 
 /*
@@ -1029,19 +1029,19 @@ dbcs_class(unsigned lead, unsigned trail)
  * Return length in bytes of character "c".
  * Returns 1 for a single-byte character.
  */
-    int
-latin_char2len(int c UNUSED)
+    ਪੂਰਨ
+latin_char2len(ਪੂਰਨ c ਅਣਵਰਤਿਆ)
 {
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 dbcs_char2len(
-    int		c)
+    ਪੂਰਨ		c)
 {
-    if (c >= 0x100)
-	return 2;
-    return 1;
+    ਜੇ (c >= 0x100)
+	ਵਾਪਸ 2;
+    ਵਾਪਸ 1;
 }
 
 /*
@@ -1049,57 +1049,57 @@ dbcs_char2len(
  * Convert a character to its bytes.
  * Returns the length in bytes.
  */
-    int
-latin_char2bytes(int c, char_u *buf)
+    ਪੂਰਨ
+latin_char2bytes(ਪੂਰਨ c, char_u *buf)
 {
     buf[0] = c;
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-dbcs_char2bytes(int c, char_u *buf)
+    ਸਥਿਰ ਪੂਰਨ
+dbcs_char2bytes(ਪੂਰਨ c, char_u *buf)
 {
-    if (c >= 0x100)
+    ਜੇ (c >= 0x100)
     {
-	buf[0] = (unsigned)c >> 8;
+	buf[0] = (ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 8;
 	buf[1] = c;
 	// Never use a NUL byte, it causes lots of trouble.  It's an invalid
 	// character anyway.
-	if (buf[1] == NUL)
+	ਜੇ (buf[1] == NUL)
 	    buf[1] = '\n';
-	return 2;
+	ਵਾਪਸ 2;
     }
     buf[0] = c;
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' latin.
  */
-    int
+    ਪੂਰਨ
 latin_ptr2len(char_u *p)
 {
-    return *p == NUL ? 0 : 1;
+    ਵਾਪਸ *p == NUL ? 0 : 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' DBCS.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 dbcs_ptr2len(char_u *p)
 {
-    int		len;
+    ਪੂਰਨ		len;
 
-    if (*p == NUL)
-	return 0;
+    ਜੇ (*p == NUL)
+	ਵਾਪਸ 0;
 
     // if the second byte is missing the length is 1
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    ਜੇ (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -1108,67 +1108,67 @@ dbcs_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-latin_ptr2len_len(char_u *p, int size)
+    ਪੂਰਨ
+latin_ptr2len_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
-    if (size < 1 || *p == NUL)
-	return 0;
-    return 1;
+    ਜੇ (ਮਾਪ < 1 || *p == NUL)
+	ਵਾਪਸ 0;
+    ਵਾਪਸ 1;
 }
 
-    static int
-dbcs_ptr2len_len(char_u *p, int size)
+    ਸਥਿਰ ਪੂਰਨ
+dbcs_ptr2len_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
-    int		len;
+    ਪੂਰਨ		len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (size == 1)
-	return 1;
+    ਜੇ (ਮਾਪ < 1 || *p == NUL)
+	ਵਾਪਸ 0;
+    ਜੇ (ਮਾਪ == 1)
+	ਵਾਪਸ 1;
     // Check that second byte is not missing.
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    ਜੇ (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    ਵਾਪਸ len;
 }
 
-struct interval
+ਬਣਤਰ interval
 {
-    long first;
-    long last;
+    ਲੰਮਾ ਪਹਿਲਾ;
+    ਲੰਮਾ ਆਖਰੀ;
 };
 
 /*
  * Return TRUE if "c" is in "table[size / sizeof(struct interval)]".
  */
-    static int
-intable(struct interval *table, size_t size, int c)
+    ਸਥਿਰ ਪੂਰਨ
+intable(ਬਣਤਰ interval *ਸਾਰਣੀ, size_t ਮਾਪ, ਪੂਰਨ c)
 {
-    int mid, bot, top;
+    ਪੂਰਨ mid, bot, ਸਿਖਰ;
 
     // first quick check for Latin1 etc. characters
-    if (c < table[0].first)
-	return FALSE;
+    ਜੇ (c < ਸਾਰਣੀ[0].ਪਹਿਲਾ)
+	ਵਾਪਸ FALSE;
 
     // binary search in table
     bot = 0;
-    top = (int)(size / sizeof(struct interval) - 1);
-    while (top >= bot)
+    ਸਿਖਰ = (ਪੂਰਨ)(ਮਾਪ / ਆਕਾਰ(ਬਣਤਰ interval) - 1);
+    ਜਦੋਂ (ਸਿਖਰ >= bot)
     {
-	mid = (bot + top) / 2;
-	if (table[mid].last < c)
+	mid = (bot + ਸਿਖਰ) / 2;
+	ਜੇ (ਸਾਰਣੀ[mid].ਆਖਰੀ < c)
 	    bot = mid + 1;
-	else if (table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return TRUE;
+	ਨਹੀਂਤਾਂ ਜੇ (ਸਾਰਣੀ[mid].ਪਹਿਲਾ > c)
+	    ਸਿਖਰ = mid - 1;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 // Sorted list of non-overlapping intervals of East Asian Ambiguous
 // characters, generated with ../runtime/tools/unicode.vim.
-static struct interval ambiguous[] =
+ਸਥਿਰ ਬਣਤਰ interval ambiguous[] =
 {
     {0x00a1, 0x00a1},
     {0x00a4, 0x00a4},
@@ -1351,18 +1351,18 @@ static struct interval ambiguous[] =
     {0x100000, 0x10fffd}
 };
 
-#if defined(FEAT_TERMINAL)
+#ਜੇ defined(FEAT_TERMINAL)
 /*
  * utf_char2cells() with different argument type for libvterm.
  */
-    int
+    ਪੂਰਨ
 utf_uint2cells(UINT32_T c)
 {
-    if (c >= 0x100 && utf_iscomposing((int)c))
-	return 0;
-    return utf_char2cells((int)c);
+    ਜੇ (c >= 0x100 && utf_iscomposing((ਪੂਰਨ)c))
+	ਵਾਪਸ 0;
+    ਵਾਪਸ utf_char2cells((ਪੂਰਨ)c);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * For UTF-8 character "c" return 2 for a double-width character, 1 for others.
@@ -1371,12 +1371,12 @@ utf_uint2cells(UINT32_T c)
  * When p_ambw is "double", return 2 for a character with East Asian Width
  * class 'A'(mbiguous).
  */
-    int
-utf_char2cells(int c)
+    ਪੂਰਨ
+utf_char2cells(ਪੂਰਨ c)
 {
     // Sorted list of non-overlapping intervals of East Asian double width
     // characters, generated with ../runtime/tools/unicode.vim.
-    static struct interval doublewidth[] =
+    ਸਥਿਰ ਬਣਤਰ interval doublewidth[] =
     {
 	{0x1100, 0x115f},
 	{0x231a, 0x231b},
@@ -1505,7 +1505,7 @@ utf_char2cells(int c)
     // Sorted list of non-overlapping intervals of Emoji characters that don't
     // have ambiguous or double width,
     // based on http://unicode.org/emoji/charts/emoji-list.html
-    static struct interval emoji_wide[] =
+    ਸਥਿਰ ਬਣਤਰ interval emoji_wide[] =
     {
 	{0x23ed, 0x23ef},
 	{0x23f1, 0x23f2},
@@ -1562,7 +1562,7 @@ utf_char2cells(int c)
 	{0x1f6f0, 0x1f6f0},
 	{0x1f6f3, 0x1f6f3}
 
-#ifdef MACOS_X
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_X
 	// Include SF Symbols 4 characters, which should be rendered as
 	// double-width.  SF Symbols is an Apple-specific set of symbols and
 	// icons for use in Apple operating systems.  They are included as
@@ -1584,38 +1584,38 @@ utf_char2cells(int c)
 	//
 	// Also see https://en.wikipedia.org/wiki/San_Francisco_(sans-serif_typeface)#SF_Symbols
 	, {0x100000, 0x1018c7}
-#endif
+#ਜੇ_ਅੰਤ
     };
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     // Use the value from setcellwidths() at 0x80 and higher, unless the
     // character is not printable.
-    if (c >= 0x80 && vim_isprintc(c))
+    ਜੇ (c >= 0x80 && vim_isprintc(c))
     {
-	int n = cw_value(c);
-	if (n != 0)
-	    return n;
+	ਪੂਰਨ n = cw_ਮੁੱਲ(c);
+	ਜੇ (n != 0)
+	    ਵਾਪਸ n;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (c >= 0x100)
+    ਜੇ (c >= 0x100)
     {
-	if (!utf_printable(c))
-	    return 6;		// unprintable, displays <xxxx>
-	if (intable(doublewidth, sizeof(doublewidth), c))
-	    return 2;
-	if (p_emoji && intable(emoji_wide, sizeof(emoji_wide), c))
-	    return 2;
+	ਜੇ (!utf_printable(c))
+	    ਵਾਪਸ 6;		// unprintable, displays <xxxx>
+	ਜੇ (intable(doublewidth, ਆਕਾਰ(doublewidth), c))
+	    ਵਾਪਸ 2;
+	ਜੇ (p_emoji && intable(emoji_wide, ਆਕਾਰ(emoji_wide), c))
+	    ਵਾਪਸ 2;
     }
 
     // Characters below 0x100 are influenced by 'isprint' option
-    else if (c >= 0x80 && !vim_isprintc(c))
-	return 4;		// unprintable, displays <xx>
+    ਨਹੀਂਤਾਂ ਜੇ (c >= 0x80 && !vim_isprintc(c))
+	ਵਾਪਸ 4;		// unprintable, displays <xx>
 
-    if (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, sizeof(ambiguous), c))
-	return 2;
+    ਜੇ (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, ਆਕਾਰ(ambiguous), c))
+	ਵਾਪਸ 2;
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
@@ -1623,42 +1623,42 @@ utf_char2cells(int c)
  * Return the number of display cells character at "*p" occupies.
  * This doesn't take care of unprintable characters, use ptr2cells() for that.
  */
-    int
-latin_ptr2cells(char_u *p UNUSED)
+    ਪੂਰਨ
+latin_ptr2cells(char_u *p ਅਣਵਰਤਿਆ)
 {
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    int
+    ਪੂਰਨ
 utf_ptr2cells(
     char_u	*p)
 {
-    int		c;
-    int		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		len;
 
     // Need to convert to a character number.
-    if (*p >= 0x80)
+    ਜੇ (*p >= 0x80)
     {
 	c = utf_ptr2char_and_len(p, &len);
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	ਜੇ (len == 1 || c == NUL)
+	    ਵਾਪਸ 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	ਜੇ (c < 0x80)
+	    ਵਾਪਸ vim_isprintc(c) ? char2cells(c) : 4;
+	ਵਾਪਸ utf_char2cells(c);
     }
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    int
+    ਪੂਰਨ
 dbcs_ptr2cells(char_u *p)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && *p == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(*p);
+    ਜੇ (enc_dbcs == DBCS_JPNU && *p == 0x8e)
+	ਵਾਪਸ 1;
+    ਵਾਪਸ MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1666,43 +1666,43 @@ dbcs_ptr2cells(char_u *p)
  * Like mb_ptr2cells(), but limit string length to "size".
  * For an empty string or truncated character returns 1.
  */
-    int
-latin_ptr2cells_len(char_u *p UNUSED, int size UNUSED)
+    ਪੂਰਨ
+latin_ptr2cells_len(char_u *p ਅਣਵਰਤਿਆ, ਪੂਰਨ ਮਾਪ ਅਣਵਰਤਿਆ)
 {
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-utf_ptr2cells_len(char_u *p, int size)
+    ਸਥਿਰ ਪੂਰਨ
+utf_ptr2cells_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
-    int		c;
-    int		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		len;
 
     // Need to convert to a wide character.
-    if (size > 0 && *p >= 0x80)
+    ਜੇ (ਮਾਪ > 0 && *p >= 0x80)
     {
-	c = utf_ptr2char_and_len_len(p, size, &len);
-	if (len > size)
-	    return 4;  // truncated, display as illegal byte
+	c = utf_ptr2char_and_len_len(p, ਮਾਪ, &len);
+	ਜੇ (len > ਮਾਪ)
+	    ਵਾਪਸ 4;  // truncated, display as illegal byte
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	ਜੇ (len == 1 || c == NUL)
+	    ਵਾਪਸ 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	ਜੇ (c < 0x80)
+	    ਵਾਪਸ vim_isprintc(c) ? char2cells(c) : 4;
+	ਵਾਪਸ utf_char2cells(c);
     }
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-dbcs_ptr2cells_len(char_u *p, int size)
+    ਸਥਿਰ ਪੂਰਨ
+dbcs_ptr2cells_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (size <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
-	return 1;
-    return MB_BYTE2LEN(*p);
+    ਜੇ (ਮਾਪ <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
+	ਵਾਪਸ 1;
+    ਵਾਪਸ MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1710,36 +1710,36 @@ dbcs_ptr2cells_len(char_u *p, int size)
  * Return the number of display cells character "c" occupies.
  * Only takes care of multi-byte chars, not "^C" and such.
  */
-    int
-latin_char2cells(int c UNUSED)
+    ਪੂਰਨ
+latin_char2cells(ਪੂਰਨ c ਅਣਵਰਤਿਆ)
 {
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    static int
-dbcs_char2cells(int c)
+    ਸਥਿਰ ਪੂਰਨ
+dbcs_char2cells(ਪੂਰਨ c)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
-	return 1;
+    ਜੇ (enc_dbcs == DBCS_JPNU && ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 8) == 0x8e)
+	ਵਾਪਸ 1;
     // use the first byte
-    return MB_BYTE2LEN((unsigned)c >> 8);
+    ਵਾਪਸ MB_BYTE2LEN((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 8);
 }
 
 /*
  * Return the number of cells occupied by string "p".
  * Stop at a NUL character.  When "len" >= 0 stop at character "p[len]".
  */
-    int
-mb_string2cells(char_u *p, int len)
+    ਪੂਰਨ
+mb_string2cells(char_u *p, ਪੂਰਨ len)
 {
-    int i;
-    int clen = 0;
+    ਪੂਰਨ i;
+    ਪੂਰਨ clen = 0;
 
-    for (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
+    ਲਈ (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
 	clen += (*mb_ptr2cells)(p + i);
-    return clen;
+    ਵਾਪਸ clen;
 }
 
 /*
@@ -1747,48 +1747,48 @@ mb_string2cells(char_u *p, int len)
  * Return number of display cells for char at ScreenLines[off].
  * We make sure that the offset used is less than "max_off".
  */
-    int
-latin_off2cells(unsigned off UNUSED, unsigned max_off UNUSED)
+    ਪੂਰਨ
+latin_off2cells(ਬਿਨਾਨਿਸ਼ਾਨੀ off ਅਣਵਰਤਿਆ, ਬਿਨਾਨਿਸ਼ਾਨੀ max_off ਅਣਵਰਤਿਆ)
 {
-    return 1;
+    ਵਾਪਸ 1;
 }
 
-    int
-dbcs_off2cells(unsigned off, unsigned max_off)
+    ਪੂਰਨ
+dbcs_off2cells(ਬਿਨਾਨਿਸ਼ਾਨੀ off, ਬਿਨਾਨਿਸ਼ਾਨੀ max_off)
 {
     // never check beyond end of the line
-    if (off >= max_off)
-	return 1;
+    ਜੇ (off >= max_off)
+	ਵਾਪਸ 1;
 
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(ScreenLines[off]);
+    ਜੇ (enc_dbcs == DBCS_JPNU && Screen_ਸਤਰਾਂ[off] == 0x8e)
+	ਵਾਪਸ 1;
+    ਵਾਪਸ MB_BYTE2LEN(Screen_ਸਤਰਾਂ[off]);
 }
 
-    int
-utf_off2cells(unsigned off, unsigned max_off)
+    ਪੂਰਨ
+utf_off2cells(ਬਿਨਾਨਿਸ਼ਾਨੀ off, ਬਿਨਾਨਿਸ਼ਾਨੀ max_off)
 {
-    return (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
+    ਵਾਪਸ (off + 1 < max_off && Screen_ਸਤਰਾਂ[off + 1] == 0) ? 2 : 1;
 }
 
 /*
  * mb_ptr2char() function pointer.
  * Convert a byte sequence into a character.
  */
-    int
+    ਪੂਰਨ
 latin_ptr2char(char_u *p)
 {
-    return *p;
+    ਵਾਪਸ *p;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 dbcs_ptr2char(char_u *p)
 {
-    if (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
-	return (p[0] << 8) + p[1];
-    return *p;
+    ਜੇ (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
+	ਵਾਪਸ (p[0] << 8) + p[1];
+    ਵਾਪਸ *p;
 }
 
 /*
@@ -1796,78 +1796,78 @@ dbcs_ptr2char(char_u *p)
  * Returns the character and sets "*lenp" to its byte length.
  * Illegal bytes are returned as-is with a length of one.
  */
-    static inline int
-utf_ptr2char_and_len(char_u *p, int *lenp)
+    ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ
+utf_ptr2char_and_len(char_u *p, ਪੂਰਨ *lenp)
 {
-    int		len;
-    int		c;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
 
-    if (p[0] < 0x80)
+    ਜੇ (p[0] < 0x80)
     {
 	*lenp = p[0] == NUL ? 0 : 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1 || (p[1] & 0xc0) != 0x80)
+    ਜੇ (len <= 1 || (p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    ਜੇ (len == 2)
     {
 	*lenp = 2;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    ਜੇ ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    ਜੇ (len == 3)
     {
 	*lenp = 3;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    ਜੇ ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    ਜੇ (len == 4)
     {
 	*lenp = 4;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    ਜੇ ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    ਜੇ (len == 5)
     {
 	*lenp = 5;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    ਜੇ ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    ਵਾਪਸ ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
@@ -1877,120 +1877,120 @@ utf_ptr2char_and_len(char_u *p, int *lenp)
  * Like utf_ptr2char_and_len(), but never reads beyond "size" bytes.
  * For an incomplete sequence "*lenp" is set to the expected length.
  */
-    static inline int
-utf_ptr2char_and_len_len(char_u *p, int size, int *lenp)
+    ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ
+utf_ptr2char_and_len_len(char_u *p, ਪੂਰਨ ਮਾਪ, ਪੂਰਨ *lenp)
 {
-    int		len;
-    int		c;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
 
-    if (size < 1)
+    ਜੇ (ਮਾਪ < 1)
     {
 	*lenp = 1;
-	return NUL;
+	ਵਾਪਸ NUL;
     }
-    if (p[0] < 0x80)
+    ਜੇ (p[0] < 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1)
+    ਜੇ (len <= 1)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
-    if (len > size)
+    ਜੇ (len > ਮਾਪ)
     {
-	int		i;
+	ਪੂਰਨ		i;
 
 	// Incomplete sequence: validate continuation bytes within range.
-	for (i = 1; i < size; ++i)
-	    if ((p[i] & 0xc0) != 0x80)
+	ਲਈ (i = 1; i < ਮਾਪ; ++i)
+	    ਜੇ ((p[i] & 0xc0) != 0x80)
 	    {
 		*lenp = 1;
-		return p[0];
+		ਵਾਪਸ p[0];
 	    }
 	*lenp = len;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
-    if ((p[1] & 0xc0) != 0x80)
+    ਜੇ ((p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    ਜੇ (len == 2)
     {
 	*lenp = 2;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    ਜੇ ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    ਜੇ (len == 3)
     {
 	*lenp = 3;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    ਜੇ ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    ਜੇ (len == 4)
     {
 	*lenp = 4;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    ਜੇ ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    ਜੇ (len == 5)
     {
 	*lenp = 5;
-	return c;
+	ਵਾਪਸ c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    ਜੇ ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	ਵਾਪਸ p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    ਵਾਪਸ ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
 }
 
-    static inline int
-utf_iscomposinglike_char(int c1, int c2)
+    ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ
+utf_iscomposinglike_char(ਪੂਰਨ c1, ਪੂਰਨ c2)
 {
-    if (utf_iscomposing(c2))
-	return TRUE;
-#ifdef FEAT_ARABIC
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(c1, c2);
-#else
-    (void)c1;
-    return FALSE;
-#endif
+    ਜੇ (utf_iscomposing(c2))
+	ਵਾਪਸ TRUE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
+    ਜੇ (!arabic_maycombine(c2))
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ arabic_combine(c1, c2);
+#ਨਹੀਂਤਾਂ
+    (ਖਾਲੀ)c1;
+    ਵਾਪਸ FALSE;
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -2000,12 +2000,12 @@ utf_iscomposinglike_char(int c1, int c2)
  * For an overlong sequence this may return zero.
  * Does not include composing characters, of course.
  */
-    int
+    ਪੂਰਨ
 utf_ptr2char(char_u *p)
 {
-    int		len;
+    ਪੂਰਨ		len;
 
-    return utf_ptr2char_and_len(p, &len);
+    ਵਾਪਸ utf_ptr2char_and_len(p, &len);
 }
 
 /*
@@ -2024,24 +2024,24 @@ utf_ptr2char(char_u *p)
  * If byte sequence is illegal or incomplete, returns -1 and does not advance
  * "s".
  */
-    static int
-utf_safe_read_char_adv(char_u **s, size_t *n)
+    ਸਥਿਰ ਪੂਰਨ
+utf_ਸੁਰੱਖਿਅਤ_read_char_adv(char_u **s, size_t *n)
 {
-    int		c, k;
+    ਪੂਰਨ		c, k;
 
-    if (*n == 0) // end of buffer
-	return 0;
+    ਜੇ (*n == 0) // end of buffer
+	ਵਾਪਸ 0;
 
     k = utf8len_tab_zero[**s];
 
-    if (k == 1)
+    ਜੇ (k == 1)
     {
 	// ASCII character or NUL
 	(*n)--;
-	return *(*s)++;
+	ਵਾਪਸ *(*s)++;
     }
 
-    if ((size_t)k <= *n)
+    ਜੇ ((size_t)k <= *n)
     {
 	// We have a multibyte sequence and it isn't truncated by buffer
 	// limits so utf_ptr2char() is safe to use. Or the first byte is
@@ -2053,156 +2053,156 @@ utf_safe_read_char_adv(char_u **s, size_t *n)
 	// which equals the first byte of its own UTF-8 representation is
 	// U+00C3 (UTF-8: 0xC3 0x83), so need to check that special case too.
 	// It's safe even if n=1, else we would have k=2 > n.
-	if (c != (int)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
+	ਜੇ (c != (ਪੂਰਨ)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
 	{
 	    // byte sequence was successfully decoded
 	    *s += k;
 	    *n -= k;
-	    return c;
+	    ਵਾਪਸ c;
 	}
     }
 
     // byte sequence is incomplete or illegal
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are skipped!
  */
-    int
+    ਪੂਰਨ
 mb_ptr2char_adv(char_u **pp)
 {
-    int		c;
+    ਪੂਰਨ		c;
 
     c = (*mb_ptr2char)(*pp);
     *pp += (*mb_ptr2len)(*pp);
-    return c;
+    ਵਾਪਸ c;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are returned as separate characters.
  */
-    int
+    ਪੂਰਨ
 mb_cptr2char_adv(char_u **pp)
 {
-    int		c;
+    ਪੂਰਨ		c;
 
     c = (*mb_ptr2char)(*pp);
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
 	*pp += utf_ptr2len(*pp);
-    else
+    ਨਹੀਂਤਾਂ
 	*pp += (*mb_ptr2len)(*pp);
-    return c;
+    ਵਾਪਸ c;
 }
 
-#if defined(FEAT_ARABIC)
+#ਜੇ defined(FEAT_ARABIC)
 /*
  * Check if the character pointed to by "p2" is a composing character when it
  * comes after "p1".  For Arabic sometimes "ab" is replaced with "c", which
  * behaves like a composing character.
  */
-    int
+    ਪੂਰਨ
 utf_composinglike(char_u *p1, char_u *p2)
 {
-    int		c2;
+    ਪੂਰਨ		c2;
 
     c2 = utf_ptr2char(p2);
-    if (utf_iscomposing(c2))
-	return TRUE;
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(utf_ptr2char(p1), c2);
+    ਜੇ (utf_iscomposing(c2))
+	ਵਾਪਸ TRUE;
+    ਜੇ (!arabic_maycombine(c2))
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ arabic_combine(utf_ptr2char(p1), c2);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.
  */
-    int
+    ਪੂਰਨ
 utfc_ptr2char(
     char_u	*p,
-    int		*pcc)	// return: composing chars, last one is 0
+    ਪੂਰਨ		*pcc)	// return: composing chars, last one is 0
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		cc;
+    ਪੂਰਨ		cc_len;
+    ਪੂਰਨ		i = 0;
 
     c = utf_ptr2char_and_len(p, &len);
 
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && p[len] >= 0x80)
+    ਜੇ ((len > 1 || *p < 0x80) && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (utf_iscomposinglike_char(c, cc))
+	ਜੇ (utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    ਲਈ (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		ਜੇ (i == MAX_MCO)
+		    ਰੋਕੋ;
 		len += cc_len;
-		if (p[len] < 0x80)
-		    break;
+		ਜੇ (p[len] < 0x80)
+		    ਰੋਕੋ;
 		cc = utf_ptr2char_and_len(p + len, &cc_len);
-		if (!utf_iscomposing(cc))
-		    break;
+		ਜੇ (!utf_iscomposing(cc))
+		    ਰੋਕੋ;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    ਜੇ (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    ਵਾਪਸ c;
 }
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.  Use no more than p[maxlen].
  */
-    int
+    ਪੂਰਨ
 utfc_ptr2char_len(
     char_u	*p,
-    int		*pcc,	// return: composing chars, last one is 0
-    int		maxlen)
+    ਪੂਰਨ		*pcc,	// return: composing chars, last one is 0
+    ਪੂਰਨ		maxlen)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		cc;
+    ਪੂਰਨ		cc_len;
+    ਪੂਰਨ		i = 0;
 
     c = utf_ptr2char_and_len_len(p, maxlen, &len);
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
+    ਜੇ ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-	if (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
+	ਜੇ (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    ਲਈ (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		ਜੇ (i == MAX_MCO)
+		    ਰੋਕੋ;
 		len += cc_len;
-		if (len >= maxlen || p[len] < 0x80)
-		    break;
+		ਜੇ (len >= maxlen || p[len] < 0x80)
+		    ਰੋਕੋ;
 		cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-		if (cc_len > maxlen - len || !utf_iscomposing(cc))
-		    break;
+		ਜੇ (cc_len > maxlen - len || !utf_iscomposing(cc))
+		    ਰੋਕੋ;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    ਜੇ (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    ਵਾਪਸ c;
 }
 
 /*
@@ -2212,20 +2212,20 @@ utfc_ptr2char_len(
  * Only to be used when ScreenLinesUC[off] != 0.
  * Returns the produced number of bytes.
  */
-    int
-utfc_char2bytes(int off, char_u *buf)
+    ਪੂਰਨ
+utfc_char2bytes(ਪੂਰਨ off, char_u *buf)
 {
-    int		len;
-    int		i;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		i;
 
-    len = utf_char2bytes(ScreenLinesUC[off], buf);
-    for (i = 0; i < Screen_mco; ++i)
+    len = utf_char2bytes(Screen_ਸਤਰਾਂ_UC[off], buf);
+    ਲਈ (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] == 0)
-	    break;
-	len += utf_char2bytes(ScreenLinesC[i][off], buf + len);
+	ਜੇ (Screen_ਸਤਰਾਂ_C[i][off] == 0)
+	    ਰੋਕੋ;
+	len += utf_char2bytes(Screen_ਸਤਰਾਂ_C[i][off], buf + len);
     }
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -2234,13 +2234,13 @@ utfc_char2bytes(int off, char_u *buf)
  * Returns 0 for "".
  * Returns 1 for an illegal byte sequence.
  */
-    int
+    ਪੂਰਨ
 utf_ptr2len(char_u *p)
 {
-    int		len;
+    ਪੂਰਨ		len;
 
     utf_ptr2char_and_len(p, &len);
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -2248,10 +2248,10 @@ utf_ptr2len(char_u *p)
  * "b" must be between 0 and 255!
  * Returns 1 for an invalid first byte value.
  */
-    int
-utf_byte2len(int b)
+    ਪੂਰਨ
+utf_byte2len(ਪੂਰਨ b)
 {
-    return utf8len_tab[b];
+    ਵਾਪਸ utf8len_tab[b];
 }
 
 /*
@@ -2259,10 +2259,10 @@ utf_byte2len(int b)
  * "b" must be between 0 and 255!
  * Returns 0 for an invalid first byte value.
  */
-    int
-utf_byte2len_zero(int b)
+    ਪੂਰਨ
+utf_byte2len_zero(ਪੂਰਨ b)
 {
-    return utf8len_tab_zero[b];
+    ਵਾਪਸ utf8len_tab_zero[b];
 }
 
 /*
@@ -2273,13 +2273,13 @@ utf_byte2len_zero(int b)
  * Returns number > "size" for an incomplete byte sequence.
  * Never returns zero.
  */
-    int
-utf_ptr2len_len(char_u *p, int size)
+    ਪੂਰਨ
+utf_ptr2len_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
-    int		len;
+    ਪੂਰਨ		len;
 
-    utf_ptr2char_and_len_len(p, size, &len);
-    return len;
+    utf_ptr2char_and_len_len(p, ਮਾਪ, &len);
+    ਵਾਪਸ len;
 }
 
 /*
@@ -2287,47 +2287,47 @@ utf_ptr2len_len(char_u *p, int size)
  * This includes following composing characters.
  * Returns zero for NUL.
  */
-    int
+    ਪੂਰਨ
 utfc_ptr2len(char_u *p)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		b0 = *p;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		cc;
+    ਪੂਰਨ		cc_len;
+    ਪੂਰਨ		b0 = *p;
 
-    if (b0 == NUL)
-	return 0;
-    if (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
-	return 1;
+    ਜੇ (b0 == NUL)
+	ਵਾਪਸ 0;
+    ਜੇ (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
+	ਵਾਪਸ 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
     c = utf_ptr2char_and_len(p, &len);
 
     // Check for illegal byte.
-    if (len == 1 && b0 >= 0x80)
-	return 1;
+    ਜੇ (len == 1 && b0 >= 0x80)
+	ਵਾਪਸ 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (p[len] < 0x80)
-	return len;
+    ਜੇ (p[len] < 0x80)
+	ਵਾਪਸ len;
 
     cc = utf_ptr2char_and_len(p + len, &cc_len);
-    if (!utf_iscomposinglike_char(c, cc))
-	return len;
+    ਜੇ (!utf_iscomposinglike_char(c, cc))
+	ਵਾਪਸ len;
 
-    for (;;)
+    ਲਈ (;;)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (p[len] < 0x80)
-	    return len;
+	ਜੇ (p[len] < 0x80)
+	    ਵਾਪਸ len;
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (!utf_iscomposing(cc))
-	    return len;
+	ਜੇ (!utf_iscomposing(cc))
+	    ਵਾਪਸ len;
     }
 }
 
@@ -2337,146 +2337,146 @@ utfc_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-utfc_ptr2len_len(char_u *p, int size)
+    ਪੂਰਨ
+utfc_ptr2len_len(char_u *p, ਪੂਰਨ ਮਾਪ)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		cc;
+    ਪੂਰਨ		cc_len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (p[0] < 0x80 && (size == 1 || p[1] < 0x80)) // be quick for ASCII
-	return 1;
+    ਜੇ (ਮਾਪ < 1 || *p == NUL)
+	ਵਾਪਸ 0;
+    ਜੇ (p[0] < 0x80 && (ਮਾਪ == 1 || p[1] < 0x80)) // be quick for ASCII
+	ਵਾਪਸ 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
-    c = utf_ptr2char_and_len_len(p, size, &len);
+    c = utf_ptr2char_and_len_len(p, ਮਾਪ, &len);
 
     // Check for illegal byte and incomplete byte sequence.
-    if ((len == 1 && p[0] >= 0x80) || len > size)
-	return 1;
+    ਜੇ ((len == 1 && p[0] >= 0x80) || len > ਮਾਪ)
+	ਵਾਪਸ 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (len >= size || p[len] < 0x80)
-	return len;
+    ਜੇ (len >= ਮਾਪ || p[len] < 0x80)
+	ਵਾਪਸ len;
 
-    cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-    if (cc_len > size - len || !utf_iscomposinglike_char(c, cc))
-	return len;
+    cc = utf_ptr2char_and_len_len(p + len, ਮਾਪ - len, &cc_len);
+    ਜੇ (cc_len > ਮਾਪ - len || !utf_iscomposinglike_char(c, cc))
+	ਵਾਪਸ len;
 
-    while (len < size)
+    ਜਦੋਂ (len < ਮਾਪ)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (len >= size || p[len] < 0x80)
-	    break;
-	cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-	if (cc_len > size - len)
-	    break;
-	if (!utf_iscomposing(cc))
-	    break;
+	ਜੇ (len >= ਮਾਪ || p[len] < 0x80)
+	    ਰੋਕੋ;
+	cc = utf_ptr2char_and_len_len(p + len, ਮਾਪ - len, &cc_len);
+	ਜੇ (cc_len > ਮਾਪ - len)
+	    ਰੋਕੋ;
+	ਜੇ (!utf_iscomposing(cc))
+	    ਰੋਕੋ;
     }
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
  * Return the number of bytes the UTF-8 encoding of character "c" takes.
  * This does not include composing characters.
  */
-    int
-utf_char2len(int c)
+    ਪੂਰਨ
+utf_char2len(ਪੂਰਨ c)
 {
-    if (c < 0x80)
-	return 1;
-    if (c < 0x800)
-	return 2;
-    if (c < 0x10000)
-	return 3;
-    if (c < 0x200000)
-	return 4;
-    if (c < 0x4000000)
-	return 5;
-    return 6;
+    ਜੇ (c < 0x80)
+	ਵਾਪਸ 1;
+    ਜੇ (c < 0x800)
+	ਵਾਪਸ 2;
+    ਜੇ (c < 0x10000)
+	ਵਾਪਸ 3;
+    ਜੇ (c < 0x200000)
+	ਵਾਪਸ 4;
+    ਜੇ (c < 0x4000000)
+	ਵਾਪਸ 5;
+    ਵਾਪਸ 6;
 }
 
 /*
  * Convert Unicode character "c" to UTF-8 string in "buf[]".
  * Returns the number of bytes.
  */
-    int
-utf_char2bytes(int c, char_u *buf)
+    ਪੂਰਨ
+utf_char2bytes(ਪੂਰਨ c, char_u *buf)
 {
-    if (c < 0x80)		// 7 bits
+    ਜੇ (c < 0x80)		// 7 bits
     {
 	buf[0] = c;
-	return 1;
+	ਵਾਪਸ 1;
     }
-    if (c < 0x800)		// 11 bits
+    ਜੇ (c < 0x800)		// 11 bits
     {
-	buf[0] = 0xc0 + ((unsigned)c >> 6);
+	buf[0] = 0xc0 + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6);
 	buf[1] = 0x80 + (c & 0x3f);
-	return 2;
+	ਵਾਪਸ 2;
     }
-    if (c < 0x10000)		// 16 bits
+    ਜੇ (c < 0x10000)		// 16 bits
     {
-	buf[0] = 0xe0 + ((unsigned)c >> 12);
-	buf[1] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xe0 + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 12);
+	buf[1] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6) & 0x3f);
 	buf[2] = 0x80 + (c & 0x3f);
-	return 3;
+	ਵਾਪਸ 3;
     }
-    if (c < 0x200000)		// 21 bits
+    ਜੇ (c < 0x200000)		// 21 bits
     {
-	buf[0] = 0xf0 + ((unsigned)c >> 18);
-	buf[1] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf0 + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 18);
+	buf[1] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 12) & 0x3f);
+	buf[2] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6) & 0x3f);
 	buf[3] = 0x80 + (c & 0x3f);
-	return 4;
+	ਵਾਪਸ 4;
     }
-    if (c < 0x4000000)		// 26 bits
+    ਜੇ (c < 0x4000000)		// 26 bits
     {
-	buf[0] = 0xf8 + ((unsigned)c >> 24);
-	buf[1] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[3] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf8 + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 24);
+	buf[1] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 18) & 0x3f);
+	buf[2] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 12) & 0x3f);
+	buf[3] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6) & 0x3f);
 	buf[4] = 0x80 + (c & 0x3f);
-	return 5;
+	ਵਾਪਸ 5;
     }
 				// 31 bits
-    buf[0] = 0xfc + ((unsigned)c >> 30);
-    buf[1] = 0x80 + (((unsigned)c >> 24) & 0x3f);
-    buf[2] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-    buf[3] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-    buf[4] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+    buf[0] = 0xfc + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 30);
+    buf[1] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 24) & 0x3f);
+    buf[2] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 18) & 0x3f);
+    buf[3] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 12) & 0x3f);
+    buf[4] = 0x80 + (((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6) & 0x3f);
     buf[5] = 0x80 + (c & 0x3f);
-    return 6;
+    ਵਾਪਸ 6;
 }
 
-#if defined(FEAT_TERMINAL)
+#ਜੇ defined(FEAT_TERMINAL)
 /*
  * utf_iscomposing() with different argument type for libvterm.
  */
-    int
+    ਪੂਰਨ
 utf_iscomposing_uint(UINT32_T c)
 {
-    return utf_iscomposing((int)c);
+    ਵਾਪਸ utf_iscomposing((ਪੂਰਨ)c);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE if "c" is a composing UTF-8 character.  This means it will be
  * drawn on top of the preceding character.
  * Based on code from Markus Kuhn.
  */
-    int
-utf_iscomposing(int c)
+    ਪੂਰਨ
+utf_iscomposing(ਪੂਰਨ c)
 {
     // Sorted list of non-overlapping intervals.
     // Generated by ../runtime/tools/unicode.vim.
-    static struct interval combining[] =
+    ਸਥਿਰ ਬਣਤਰ interval combining[] =
     {
 	{0x0300, 0x036f},
 	{0x0483, 0x0489},
@@ -2834,33 +2834,33 @@ utf_iscomposing(int c)
 	{0xe0100, 0xe01ef}
     };
 
-    return intable(combining, sizeof(combining), c);
+    ਵਾਪਸ intable(combining, ਆਕਾਰ(combining), c);
 }
 
 /*
  * Return TRUE for characters that can be displayed in a normal way.
  * Only for characters of 0x100 and above!
  */
-    int
-utf_printable(int c)
+    ਪੂਰਨ
+utf_printable(ਪੂਰਨ c)
 {
     // Sorted list of non-overlapping intervals.
     // 0xd800-0xdfff is reserved for UTF-16, actually illegal.
-    static struct interval nonprint[] =
+    ਸਥਿਰ ਬਣਤਰ interval nonprint[] =
     {
 	{0x070f, 0x070f}, {0x180b, 0x180e}, {0x200b, 0x200f}, {0x202a, 0x202e},
 	{0x2060, 0x206f}, {0xd800, 0xdfff}, {0xfeff, 0xfeff}, {0xfff9, 0xfffb},
 	{0xfffe, 0xffff}
     };
 
-    return !intable(nonprint, sizeof(nonprint), c);
+    ਵਾਪਸ !intable(nonprint, ਆਕਾਰ(nonprint), c);
 }
 
 // Sorted list of non-overlapping intervals of all Emoji characters,
 // based on http://unicode.org/emoji/charts/emoji-list.html
 // Generated by ../runtime/tools/unicode.vim.
 // Excludes 0x00a9 and 0x00ae because they are considered latin1.
-static struct interval emoji_all[] =
+ਸਥਿਰ ਬਣਤਰ interval emoji_all[] =
 {
     {0x203c, 0x203c},
     {0x2049, 0x2049},
@@ -3016,21 +3016,21 @@ static struct interval emoji_all[] =
  * 1: punctuation
  * 2 or bigger: some class of word character.
  */
-    int
-utf_class(int c)
+    ਪੂਰਨ
+utf_class(ਪੂਰਨ c)
 {
-    return utf_class_buf(c, curbuf);
+    ਵਾਪਸ utf_class_buf(c, curbuf);
 }
 
-    int
-utf_class_buf(int c, buf_T *buf)
+    ਪੂਰਨ
+utf_class_buf(ਪੂਰਨ c, buf_T *buf)
 {
     // sorted list of non-overlapping intervals
-    static struct clinterval
+    ਸਥਿਰ ਬਣਤਰ clinterval
     {
-	unsigned int first;
-	unsigned int last;
-	unsigned int class;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਪਹਿਲਾ;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਆਖਰੀ;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ class;
     } classes[] =
     {
 	{0x037e, 0x037e, 1},		// Greek question mark
@@ -3106,45 +3106,45 @@ utf_class_buf(int c, buf_T *buf)
 	{0x2f800, 0x2fa1f, 0x4e00},	// CJK Ideographs
     };
 
-    int bot = 0;
-    int top = ARRAY_LENGTH(classes) - 1;
-    int mid;
+    ਪੂਰਨ bot = 0;
+    ਪੂਰਨ ਸਿਖਰ = ARRAY_ਲੰਮਾਈ(classes) - 1;
+    ਪੂਰਨ mid;
 
     // First quick check for Latin1 characters, use 'iskeyword'.
-    if (c < 0x100)
+    ਜੇ (c < 0x100)
     {
-	if (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
-	    return 0;	    // blank
-	if (vim_iswordc_buf(c, buf))
-	    return 2;	    // word character
-	return 1;	    // punctuation
+	ਜੇ (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
+	    ਵਾਪਸ 0;	    // blank
+	ਜੇ (vim_iswordc_buf(c, buf))
+	    ਵਾਪਸ 2;	    // word character
+	ਵਾਪਸ 1;	    // punctuation
     }
 
     // emoji
-    if (intable(emoji_all, sizeof(emoji_all), c))
-	return 3;
+    ਜੇ (intable(emoji_all, ਆਕਾਰ(emoji_all), c))
+	ਵਾਪਸ 3;
 
     // binary search in table
-    while (top >= bot)
+    ਜਦੋਂ (ਸਿਖਰ >= bot)
     {
-	mid = (bot + top) / 2;
-	if (classes[mid].last < (unsigned int)c)
+	mid = (bot + ਸਿਖਰ) / 2;
+	ਜੇ (classes[mid].ਆਖਰੀ < (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)c)
 	    bot = mid + 1;
-	else if (classes[mid].first > (unsigned int)c)
-	    top = mid - 1;
-	else
-	    return (int)classes[mid].class;
+	ਨਹੀਂਤਾਂ ਜੇ (classes[mid].ਪਹਿਲਾ > (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)c)
+	    ਸਿਖਰ = mid - 1;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ (ਪੂਰਨ)classes[mid].class;
     }
 
     // most other characters are "word" characters
-    return 2;
+    ਵਾਪਸ 2;
 }
 
-    int
-utf_ambiguous_width(int c)
+    ਪੂਰਨ
+utf_ambiguous_ਚੌੜਾਈ(ਪੂਰਨ c)
 {
-    return c >= 0x80 && (intable(ambiguous, sizeof(ambiguous), c)
-	    || intable(emoji_all, sizeof(emoji_all), c));
+    ਵਾਪਸ c >= 0x80 && (intable(ambiguous, ਆਕਾਰ(ambiguous), c)
+	    || intable(emoji_all, ਆਕਾਰ(emoji_all), c));
 }
 
 /*
@@ -3161,15 +3161,15 @@ utf_ambiguous_width(int c)
  * range from 0x41 to 0x5a inclusive, stepping by 1, are changed to
  * folded/upper/lower by adding 32.
  */
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    int rangeStart;
-    int rangeEnd;
-    int step;
-    int offset;
+    ਪੂਰਨ range_ਸ਼ੁਰੂ_2;
+    ਪੂਰਨ range_ਸਿਰਾ_2;
+    ਪੂਰਨ ਕਦਮ;
+    ਪੂਰਨ ਵਿੱਥ;
 } convertStruct;
 
-static convertStruct foldCase[] =
+ਸਥਿਰ convertStruct foldCase[] =
 {
 	{0x41,0x5a,1,32},
 	{0xb5,0xb5,-1,775},
@@ -3384,49 +3384,49 @@ static convertStruct foldCase[] =
  * Return the converted equivalent of "a", which is a UCS-4 character.  Use
  * the given conversion "table".  Uses binary search on "table".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 utf_convert(
-    int			a,
-    convertStruct	table[],
-    int			tableSize)
+    ਪੂਰਨ			a,
+    convertStruct	ਸਾਰਣੀ[],
+    ਪੂਰਨ			ਸਾਰਣੀ_ਮਾਪ_3)
 {
-    int start, mid, end; // indices into table
-    int entries = tableSize / sizeof(convertStruct);
+    ਪੂਰਨ ਸ਼ੁਰੂ, mid, ਸਿਰਾ; // indices into table
+    ਪੂਰਨ entries = ਸਾਰਣੀ_ਮਾਪ_3 / ਆਕਾਰ(convertStruct);
 
-    start = 0;
-    end = entries;
-    while (start < end)
+    ਸ਼ੁਰੂ = 0;
+    ਸਿਰਾ = entries;
+    ਜਦੋਂ (ਸ਼ੁਰੂ < ਸਿਰਾ)
     {
 	// need to search further
-	mid = (end + start) / 2;
-	if (table[mid].rangeEnd < a)
-	    start = mid + 1;
-	else
-	    end = mid;
+	mid = (ਸਿਰਾ + ਸ਼ੁਰੂ) / 2;
+	ਜੇ (ਸਾਰਣੀ[mid].range_ਸਿਰਾ_2 < a)
+	    ਸ਼ੁਰੂ = mid + 1;
+	ਨਹੀਂਤਾਂ
+	    ਸਿਰਾ = mid;
     }
-    if (start < entries
-	    && table[start].rangeStart <= a
-	    && a <= table[start].rangeEnd
-	    && (a - table[start].rangeStart) % table[start].step == 0)
-	return (a + table[start].offset);
-    else
-	return a;
+    ਜੇ (ਸ਼ੁਰੂ < entries
+	    && ਸਾਰਣੀ[ਸ਼ੁਰੂ].range_ਸ਼ੁਰੂ_2 <= a
+	    && a <= ਸਾਰਣੀ[ਸ਼ੁਰੂ].range_ਸਿਰਾ_2
+	    && (a - ਸਾਰਣੀ[ਸ਼ੁਰੂ].range_ਸ਼ੁਰੂ_2) % ਸਾਰਣੀ[ਸ਼ੁਰੂ].ਕਦਮ == 0)
+	ਵਾਪਸ (a + ਸਾਰਣੀ[ਸ਼ੁਰੂ].ਵਿੱਥ);
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ a;
 }
 
 /*
  * Return the folded-case equivalent of "a", which is a UCS-4 character.  Uses
  * simple case folding.
  */
-    int
-utf_fold(int a)
+    ਪੂਰਨ
+utf_fold(ਪੂਰਨ a)
 {
-    if (a < 0x80)
+    ਜੇ (a < 0x80)
 	// be fast for ASCII
-	return a >= 0x41 && a <= 0x5a ? a + 32 : a;
-    return utf_convert(a, foldCase, (int)sizeof(foldCase));
+	ਵਾਪਸ a >= 0x41 && a <= 0x5a ? a + 32 : a;
+    ਵਾਪਸ utf_convert(a, foldCase, (ਪੂਰਨ)ਆਕਾਰ(foldCase));
 }
 
-static convertStruct toLower[] =
+ਸਥਿਰ convertStruct ਮੰਜ਼ਿਲ_ਹੇਠਲਾ[] =
 {
 	{0x41,0x5a,1,32},
 	{0xc0,0xd6,1,32},
@@ -3615,7 +3615,7 @@ static convertStruct toLower[] =
 
 // Note: UnicodeData.txt does not define U+1E9E as being the corresponding upper
 // case letter for U+00DF (ß), however it is part of the toLower table
-static convertStruct toUpper[] =
+ਸਥਿਰ convertStruct ਮੰਜ਼ਿਲ_ਉੱਤਲਾ[] =
 {
 	{0x61,0x7a,1,-32},
 	{0xb5,0xb5,-1,743},
@@ -3821,99 +3821,99 @@ static convertStruct toUpper[] =
  * Return the upper-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_toupper(int a)
+    ਪੂਰਨ
+utf_toupper(ਪੂਰਨ a)
 {
     // If 'casemap' contains "keepascii" use ASCII style toupper().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOUPPER_ASC(a);
+    ਜੇ (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	ਵਾਪਸ TOUPPER_ASC(a);
 
-#if defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
+#ਜੇ defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
     // If towupper() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towupper(a);
-#endif
+    ਜੇ (!(cmp_flags & CMP_ਅੰਦਰੂਨੀ))
+	ਵਾਪਸ towupper(a);
+#ਜੇ_ਅੰਤ
 
     // For characters below 128 use locale sensitive toupper().
-    if (a < 128)
-	return TOUPPER_LOC(a);
+    ਜੇ (a < 128)
+	ਵਾਪਸ TOUPPER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toUpper, (int)sizeof(toUpper));
+    ਵਾਪਸ utf_convert(a, ਮੰਜ਼ਿਲ_ਉੱਤਲਾ, (ਪੂਰਨ)ਆਕਾਰ(ਮੰਜ਼ਿਲ_ਉੱਤਲਾ));
 }
 
-    int
-utf_islower(int a)
+    ਪੂਰਨ
+utf_islower(ਪੂਰਨ a)
 {
     // German sharp s is lower case but has no upper case equivalent.
-    return (utf_toupper(a) != a) || a == 0xdf;
+    ਵਾਪਸ (utf_toupper(a) != a) || a == 0xdf;
 }
 
 /*
  * Return the lower-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_tolower(int a)
+    ਪੂਰਨ
+utf_tolower(ਪੂਰਨ a)
 {
     // If 'casemap' contains "keepascii" use ASCII style tolower().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOLOWER_ASC(a);
+    ਜੇ (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	ਵਾਪਸ TOLOWER_ASC(a);
 
-#if defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
+#ਜੇ defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
     // If towlower() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towlower(a);
-#endif
+    ਜੇ (!(cmp_flags & CMP_ਅੰਦਰੂਨੀ))
+	ਵਾਪਸ towlower(a);
+#ਜੇ_ਅੰਤ
 
     // For characters below 128 use locale sensitive tolower().
-    if (a < 128)
-	return TOLOWER_LOC(a);
+    ਜੇ (a < 128)
+	ਵਾਪਸ TOLOWER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toLower, (int)sizeof(toLower));
+    ਵਾਪਸ utf_convert(a, ਮੰਜ਼ਿਲ_ਹੇਠਲਾ, (ਪੂਰਨ)ਆਕਾਰ(ਮੰਜ਼ਿਲ_ਹੇਠਲਾ));
 }
 
-    int
-utf_isupper(int a)
+    ਪੂਰਨ
+utf_isupper(ਪੂਰਨ a)
 {
-    return (utf_tolower(a) != a);
+    ਵਾਪਸ (utf_tolower(a) != a);
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 utf_strnicmp(
     char_u      *s1,
     char_u      *s2,
     size_t      n1,
     size_t      n2)
 {
-    int		c1, c2, cdiff;
-    char_u	buffer[6];
+    ਪੂਰਨ		c1, c2, cdiff;
+    char_u	ਬਫਰ[6];
 
-    for (;;)
+    ਲਈ (;;)
     {
-	c1 = utf_safe_read_char_adv(&s1, &n1);
-	c2 = utf_safe_read_char_adv(&s2, &n2);
+	c1 = utf_ਸੁਰੱਖਿਅਤ_read_char_adv(&s1, &n1);
+	c2 = utf_ਸੁਰੱਖਿਅਤ_read_char_adv(&s2, &n2);
 
-	if (c1 <= 0 || c2 <= 0)
-	    break;
+	ਜੇ (c1 <= 0 || c2 <= 0)
+	    ਰੋਕੋ;
 
-	if (c1 == c2)
-	    continue;
+	ਜੇ (c1 == c2)
+	    ਜਾਰੀ;
 
 	cdiff = utf_fold(c1) - utf_fold(c2);
-	if (cdiff != 0)
-	    return cdiff;
+	ਜੇ (cdiff != 0)
+	    ਵਾਪਸ cdiff;
     }
 
     // some string ended or has an incomplete/illegal character sequence
 
-    if (c1 == 0 || c2 == 0)
+    ਜੇ (c1 == 0 || c2 == 0)
     {
 	// some string ended. shorter string is smaller
-	if (c1 == 0 && c2 == 0)
-	    return 0;
-	return c1 == 0 ? -1 : 1;
+	ਜੇ (c1 == 0 && c2 == 0)
+	    ਵਾਪਸ 0;
+	ਵਾਪਸ c1 == 0 ? -1 : 1;
     }
 
     // Continue with bytewise comparison to produce some result that
@@ -3923,22 +3923,22 @@ utf_strnicmp(
     // folded version of the other string. In this case it is enough
     // to fold just one character to determine the result of comparison.
 
-    if (c1 != -1 && c2 == -1)
+    ਜੇ (c1 != -1 && c2 == -1)
     {
-	n1 = utf_char2bytes(utf_fold(c1), buffer);
-	s1 = buffer;
+	n1 = utf_char2bytes(utf_fold(c1), ਬਫਰ);
+	s1 = ਬਫਰ;
     }
-    else if (c2 != -1 && c1 == -1)
+    ਨਹੀਂਤਾਂ ਜੇ (c2 != -1 && c1 == -1)
     {
-	n2 = utf_char2bytes(utf_fold(c2), buffer);
-	s2 = buffer;
+	n2 = utf_char2bytes(utf_fold(c2), ਬਫਰ);
+	s2 = ਬਫਰ;
     }
 
-    while (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
+    ਜਦੋਂ (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
     {
-	cdiff = (int)(*s1) - (int)(*s2);
-	if (cdiff != 0)
-	    return cdiff;
+	cdiff = (ਪੂਰਨ)(*s1) - (ਪੂਰਨ)(*s2);
+	ਜੇ (cdiff != 0)
+	    ਵਾਪਸ cdiff;
 
 	s1++;
 	s2++;
@@ -3946,14 +3946,14 @@ utf_strnicmp(
 	n2--;
     }
 
-    if (n1 > 0 && *s1 == NUL)
+    ਜੇ (n1 > 0 && *s1 == NUL)
 	n1 = 0;
-    if (n2 > 0 && *s2 == NUL)
+    ਜੇ (n2 > 0 && *s2 == NUL)
 	n2 = 0;
 
-    if (n1 == 0 && n2 == 0)
-	return 0;
-    return n1 == 0 ? -1 : 1;
+    ਜੇ (n1 == 0 && n2 == 0)
+	ਵਾਪਸ 0;
+    ਵਾਪਸ n1 == 0 ? -1 : 1;
 }
 
 /*
@@ -3964,103 +3964,103 @@ utf_strnicmp(
  * Returns zero if s1 and s2 are equal (ignoring case), the difference between
  * two characters otherwise.
  */
-    int
+    ਪੂਰਨ
 mb_strnicmp2(char_u *s1, char_u *s2, size_t n1, size_t n2)
 {
-    if (n1 == n2 || !enc_utf8)
-	return mb_strnicmp(s1, s2, n1);
-    else
-	return utf_strnicmp(s1, s2, n1, n2);
+    ਜੇ (n1 == n2 || !enc_utf8)
+	ਵਾਪਸ mb_strnicmp(s1, s2, n1);
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ utf_strnicmp(s1, s2, n1, n2);
 }
 
-    int
+    ਪੂਰਨ
 mb_strnicmp(char_u *s1, char_u *s2, size_t nn)
 {
-    int		i, l;
-    int		cdiff;
-    int		n = (int)nn;
+    ਪੂਰਨ		i, l;
+    ਪੂਰਨ		cdiff;
+    ਪੂਰਨ		n = (ਪੂਰਨ)nn;
 
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
     {
-	return utf_strnicmp(s1, s2, nn, nn);
+	ਵਾਪਸ utf_strnicmp(s1, s2, nn, nn);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (i = 0; i < n; i += l)
+	ਲਈ (i = 0; i < n; i += l)
 	{
-	    if (s1[i] == NUL && s2[i] == NUL)	// both strings end
-		return 0;
+	    ਜੇ (s1[i] == NUL && s2[i] == NUL)	// both strings end
+		ਵਾਪਸ 0;
 
 	    l = (*mb_ptr2len)(s1 + i);
-	    if (l <= 1)
+	    ਜੇ (l <= 1)
 	    {
 		// Single byte: first check normally, then with ignore case.
-		if (s1[i] != s2[i])
+		ਜੇ (s1[i] != s2[i])
 		{
 		    cdiff = MB_TOLOWER(s1[i]) - MB_TOLOWER(s2[i]);
-		    if (cdiff != 0)
-			return cdiff;
+		    ਜੇ (cdiff != 0)
+			ਵਾਪਸ cdiff;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// For non-Unicode multi-byte don't ignore case.
-		if (l > n - i)
+		ਜੇ (l > n - i)
 		    l = n - i;
 		cdiff = STRNCMP(s1 + i, s2 + i, l);
-		if (cdiff != 0)
-		    return cdiff;
+		ਜੇ (cdiff != 0)
+		    ਵਾਪਸ cdiff;
 	    }
 	}
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 /*
  * "g8": show bytes of the UTF-8 char under the cursor.  Doesn't matter what
  * 'encoding' has been set to.
  */
-    void
-show_utf8(void)
+    ਖਾਲੀ
+show_utf8(ਖਾਲੀ)
 {
-    int		len;
-    int		rlen = 0;
-    char_u	*line;
-    int		clen;
-    int		i;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		rlen = 0;
+    char_u	*ਸਤਰ;
+    ਪੂਰਨ		clen;
+    ਪੂਰਨ		i;
 
     // Get the byte length of the char under the cursor, including composing
     // characters.
-    line = ml_get_cursor();
-    len = utfc_ptr2len(line);
-    if (len == 0)
+    ਸਤਰ = ml_get_cursor();
+    len = utfc_ptr2len(ਸਤਰ);
+    ਜੇ (len == 0)
     {
-	msg("NUL");
-	return;
+	ਸੁਨੇਹਾ("NUL");
+	ਵਾਪਸ;
     }
 
     clen = 0;
-    for (i = 0; i < len; ++i)
+    ਲਈ (i = 0; i < len; ++i)
     {
-	if (clen == 0)
+	ਜੇ (clen == 0)
 	{
 	    // start of (composing) character, get its length
-	    if (i > 0)
+	    ਜੇ (i > 0)
 	    {
 		STRCPY(IObuff + rlen, "+ ");
 		rlen += 2;
 	    }
-	    clen = utf_ptr2len(line + i);
+	    clen = utf_ptr2len(ਸਤਰ + i);
 	}
-	sprintf((char *)IObuff + rlen, "%02x ",
-		(line[i] == NL) ? NUL : line[i]);  // NUL is stored as NL
+	sprintf((ਅੱਖਰ *)IObuff + rlen, "%02x ",
+		(ਸਤਰ[i] == NL) ? NUL : ਸਤਰ[i]);  // NUL is stored as NL
 	--clen;
-	rlen += (int)STRLEN(IObuff + rlen);
-	if (rlen > IOSIZE - 20)
-	    break;
+	rlen += (ਪੂਰਨ)STRLEN(IObuff + rlen);
+	ਜੇ (rlen > IOSIZE - 20)
+	    ਰੋਕੋ;
     }
 
-    msg((char *)IObuff);
+    ਸੁਨੇਹਾ((ਅੱਖਰ *)IObuff);
 }
 
 /*
@@ -4069,36 +4069,36 @@ show_utf8(void)
  * If "p" points to the NUL at the end of the string return 0.
  * Returns 0 when already at the first byte of a character.
  */
-    int
-latin_head_off(char_u *base UNUSED, char_u *p UNUSED)
+    ਪੂਰਨ
+latin_ਸਿਰ_off(char_u *ਅਧਾਰ ਅਣਵਰਤਿਆ, char_u *p ਅਣਵਰਤਿਆ)
 {
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-dbcs_head_off(char_u *base, char_u *p)
+    ਸਥਿਰ ਪੂਰਨ
+dbcs_ਸਿਰ_off(char_u *ਅਧਾਰ, char_u *p)
 {
     char_u	*q;
 
     // It can't be a trailing byte when not using DBCS, at the start of the
     // string or the previous byte can't start a double-byte.
-    if (p <= base || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
-	return 0;
+    ਜੇ (p <= ਅਧਾਰ || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
+	ਵਾਪਸ 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
-    q = base;
-    while (q < p)
+    q = ਅਧਾਰ;
+    ਜਦੋਂ (q < p)
 	q += dbcs_ptr2len(q);
-    return (q == p) ? 0 : 1;
+    ਵਾਪਸ (q == p) ? 0 : 1;
 }
 
 /*
  * Special version of dbcs_head_off() that works for ScreenLines[], where
  * single-width DBCS_JPNU characters are stored separately.
  */
-    int
-dbcs_screen_head_off(char_u *base, char_u *p)
+    ਪੂਰਨ
+dbcs_screen_ਸਿਰ_off(char_u *ਅਧਾਰ, char_u *p)
 {
     char_u	*q;
 
@@ -4106,25 +4106,25 @@ dbcs_screen_head_off(char_u *base, char_u *p)
     // string or the previous byte can't start a double-byte.
     // For euc-jp an 0x8e byte in the previous cell always means we have a
     // lead byte in the current cell.
-    if (p <= base
+    ਜੇ (p <= ਅਧਾਰ
 	    || (enc_dbcs == DBCS_JPNU && p[-1] == 0x8e)
 	    || MB_BYTE2LEN(p[-1]) == 1
 	    || *p == NUL)
-	return 0;
+	ਵਾਪਸ 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
     // For DBCS_JPNU look out for 0x8e, which means the second byte is not
     // stored as the next byte.
-    q = base;
-    while (q < p)
+    q = ਅਧਾਰ;
+    ਜਦੋਂ (q < p)
     {
-	if (enc_dbcs == DBCS_JPNU && *q == 0x8e)
+	ਜੇ (enc_dbcs == DBCS_JPNU && *q == 0x8e)
 	    ++q;
-	else
+	ਨਹੀਂਤਾਂ
 	    q += dbcs_ptr2len(q);
     }
-    return (q == p) ? 0 : 1;
+    ਵਾਪਸ (q == p) ? 0 : 1;
 }
 
 /*
@@ -4132,69 +4132,69 @@ dbcs_screen_head_off(char_u *base, char_u *p)
  * characters.  "base" must be the start of the string, which must be NUL
  * terminated.
  */
-    int
-utf_head_off(char_u *base, char_u *p)
+    ਪੂਰਨ
+utf_ਸਿਰ_off(char_u *ਅਧਾਰ, char_u *p)
 {
     char_u	*q;
     char_u	*s;
-    int		c;
-    int		len;
-#ifdef FEAT_ARABIC
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		len;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
     char_u	*j;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (*p < 0x80)		// be quick for ASCII
-	return 0;
+    ਜੇ (*p < 0x80)		// be quick for ASCII
+	ਵਾਪਸ 0;
 
     // Skip backwards over trailing bytes: 10xx.xxxx
     // Skip backwards again if on a composing char.
-    for (q = p; ; --q)
+    ਲਈ (q = p; ; --q)
     {
 	// Move s to the last byte of this char.
-	for (s = q; (s[1] & 0xc0) == 0x80; ++s)
+	ਲਈ (s = q; (s[1] & 0xc0) == 0x80; ++s)
 	    ;
 	// Move q to the first byte of this char.
-	while (q > base && (*q & 0xc0) == 0x80)
+	ਜਦੋਂ (q > ਅਧਾਰ && (*q & 0xc0) == 0x80)
 	    --q;
 	// Check for illegal sequence. Do allow an illegal byte after where we
 	// started.
 	len = utf8len_tab[*q];
-	if (len != (int)(s - q + 1) && len != (int)(p - q + 1))
-	    return 0;
+	ਜੇ (len != (ਪੂਰਨ)(s - q + 1) && len != (ਪੂਰਨ)(p - q + 1))
+	    ਵਾਪਸ 0;
 
-	if (q <= base)
-	    break;
+	ਜੇ (q <= ਅਧਾਰ)
+	    ਰੋਕੋ;
 
 	c = utf_ptr2char(q);
-	if (utf_iscomposing(c))
-	    continue;
+	ਜੇ (utf_iscomposing(c))
+	    ਜਾਰੀ;
 
-#ifdef FEAT_ARABIC
-	if (arabic_maycombine(c))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
+	ਜੇ (arabic_maycombine(c))
 	{
 	    // Advance to get a sneak-peak at the next char
 	    j = q;
 	    --j;
 	    // Move j to the first byte of this char.
-	    while (j > base && (*j & 0xc0) == 0x80)
+	    ਜਦੋਂ (j > ਅਧਾਰ && (*j & 0xc0) == 0x80)
 		--j;
-	    if (arabic_combine(utf_ptr2char(j), c))
-		continue;
+	    ਜੇ (arabic_combine(utf_ptr2char(j), c))
+		ਜਾਰੀ;
 	}
-#endif
-	break;
+#ਜੇ_ਅੰਤ
+	ਰੋਕੋ;
     }
 
-    return (int)(p - q);
+    ਵਾਪਸ (ਪੂਰਨ)(p - q);
 }
 
 /*
  * Whether space is NOT allowed before/after 'c'.
  */
-    int
-utf_eat_space(int cc)
+    ਪੂਰਨ
+utf_eat_space(ਪੂਰਨ cc)
 {
-    return ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
+    ਵਾਪਸ ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
 	 || (cc >= 0x2e00 && cc <= 0x2e7f)	// Supplemental punctuations
 	 || (cc >= 0x3000 && cc <= 0x303f)	// CJK symbols and punctuations
 	 || (cc >= 0xff01 && cc <= 0xff0f)	// Full width ASCII punctuations
@@ -4206,10 +4206,10 @@ utf_eat_space(int cc)
 /*
  * Whether line break is allowed before "cc".
  */
-    int
-utf_allow_break_before(int cc)
+    ਪੂਰਨ
+utf_allow_break_before(ਪੂਰਨ cc)
 {
-    static const int BOL_prohibition_punct[] =
+    ਸਥਿਰ ਅਚਲ ਪੂਰਨ BOL_prohibition_punct[] =
     {
 	'!',
 	'%',
@@ -4256,32 +4256,32 @@ utf_allow_break_before(int cc)
 	0xff5d, // ｝ fullwidth right curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(BOL_prohibition_punct) - 1;
-    int mid   = 0;
+    ਪੂਰਨ ਪਹਿਲਾ = 0;
+    ਪੂਰਨ ਆਖਰੀ  = ARRAY_ਲੰਮਾਈ(BOL_prohibition_punct) - 1;
+    ਪੂਰਨ mid   = 0;
 
-    while (first < last)
+    ਜਦੋਂ (ਪਹਿਲਾ < ਆਖਰੀ)
     {
-	mid = (first + last)/2;
+	mid = (ਪਹਿਲਾ + ਆਖਰੀ)/2;
 
-	if (cc == BOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > BOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	ਜੇ (cc == BOL_prohibition_punct[mid])
+	    ਵਾਪਸ FALSE;
+	ਨਹੀਂਤਾਂ ਜੇ (cc > BOL_prohibition_punct[mid])
+	    ਪਹਿਲਾ = mid + 1;
+	ਨਹੀਂਤਾਂ
+	    ਆਖਰੀ = mid - 1;
     }
 
-    return cc != BOL_prohibition_punct[first];
+    ਵਾਪਸ cc != BOL_prohibition_punct[ਪਹਿਲਾ];
 }
 
 /*
  * Whether line break is allowed after "cc".
  */
-    static int
-utf_allow_break_after(int cc)
+    ਸਥਿਰ ਪੂਰਨ
+utf_allow_break_after(ਪੂਰਨ cc)
 {
-    static const int EOL_prohibition_punct[] =
+    ਸਥਿਰ ਅਚਲ ਪੂਰਨ EOL_prohibition_punct[] =
     {
 	'(',
 	'<',
@@ -4306,47 +4306,47 @@ utf_allow_break_after(int cc)
 	0xff5b, // ｛ fullwidth left curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(EOL_prohibition_punct) - 1;
-    int mid   = 0;
+    ਪੂਰਨ ਪਹਿਲਾ = 0;
+    ਪੂਰਨ ਆਖਰੀ  = ARRAY_ਲੰਮਾਈ(EOL_prohibition_punct) - 1;
+    ਪੂਰਨ mid   = 0;
 
-    while (first < last)
+    ਜਦੋਂ (ਪਹਿਲਾ < ਆਖਰੀ)
     {
-	mid = (first + last)/2;
+	mid = (ਪਹਿਲਾ + ਆਖਰੀ)/2;
 
-	if (cc == EOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > EOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	ਜੇ (cc == EOL_prohibition_punct[mid])
+	    ਵਾਪਸ FALSE;
+	ਨਹੀਂਤਾਂ ਜੇ (cc > EOL_prohibition_punct[mid])
+	    ਪਹਿਲਾ = mid + 1;
+	ਨਹੀਂਤਾਂ
+	    ਆਖਰੀ = mid - 1;
     }
 
-    return cc != EOL_prohibition_punct[first];
+    ਵਾਪਸ cc != EOL_prohibition_punct[ਪਹਿਲਾ];
 }
 
 /*
  * Whether line break is allowed between "cc" and "ncc".
  */
-    int
-utf_allow_break(int cc, int ncc)
+    ਪੂਰਨ
+utf_allow_break(ਪੂਰਨ cc, ਪੂਰਨ ncc)
 {
     // don't break between two-letter punctuations
-    if (cc == ncc
+    ਜੇ (cc == ncc
 	    && (cc == 0x2014 // em dash
 		|| cc == 0x2026)) // horizontal ellipsis
-	return FALSE;
+	ਵਾਪਸ FALSE;
 
-    return utf_allow_break_after(cc) && utf_allow_break_before(ncc);
+    ਵਾਪਸ utf_allow_break_after(cc) && utf_allow_break_before(ncc);
 }
 
 /*
  * Copy a character from "*fp" to "*tp" and advance the pointers.
  */
-    void
+    ਖਾਲੀ
 mb_copy_char(char_u **fp, char_u **tp)
 {
-    int	    l = (*mb_ptr2len)(*fp);
+    ਪੂਰਨ	    l = (*mb_ptr2len)(*fp);
 
     mch_memmove(*tp, *fp, (size_t)l);
     *tp += l;
@@ -4358,15 +4358,15 @@ mb_copy_char(char_u **fp, char_u **tp)
  * at the start of a character 0 is returned, otherwise the offset to the next
  * character.  Can start anywhere in a stream of bytes.
  */
-    int
-mb_off_next(char_u *base, char_u *p)
+    ਪੂਰਨ
+mb_off_ਅਗਲਾ(char_u *ਅਧਾਰ, char_u *p)
 {
-    int		head_off = (*mb_head_off)(base, p);
+    ਪੂਰਨ		ਸਿਰ_off = (*mb_ਸਿਰ_off)(ਅਧਾਰ, p);
 
-    if (head_off == 0)
-	return 0;
+    ਜੇ (ਸਿਰ_off == 0)
+	ਵਾਪਸ 0;
 
-    return (*mb_ptr2len)(p - head_off) - head_off;
+    ਵਾਪਸ (*mb_ptr2len)(p - ਸਿਰ_off) - ਸਿਰ_off;
 }
 
 /*
@@ -4374,102 +4374,102 @@ mb_off_next(char_u *base, char_u *p)
  * into.  Can start anywhere in a stream of bytes.
  * Composing characters are not included.
  */
-    int
-mb_tail_off(char_u *base, char_u *p)
+    ਪੂਰਨ
+mb_ਪੂਛ_off(char_u *ਅਧਾਰ, char_u *p)
 {
-    int		i;
-    int		j;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		j;
 
-    if (*p == NUL)
-	return 0;
+    ਜੇ (*p == NUL)
+	ਵਾਪਸ 0;
 
-    if (enc_utf8)
+    ਜੇ (enc_utf8)
     {
 	// Find the last character that is 10xx.xxxx
-	for (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
+	ਲਈ (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
 	    ;
 	// Check for illegal sequence.
-	for (j = 0; p - j > base; ++j)
-	    if ((p[-j] & 0xc0) != 0x80)
-		break;
-	if (utf8len_tab[p[-j]] != i + j + 1)
-	    return 0;
-	return i;
+	ਲਈ (j = 0; p - j > ਅਧਾਰ; ++j)
+	    ਜੇ ((p[-j] & 0xc0) != 0x80)
+		ਰੋਕੋ;
+	ਜੇ (utf8len_tab[p[-j]] != i + j + 1)
+	    ਵਾਪਸ 0;
+	ਵਾਪਸ i;
     }
 
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
-    if (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
-	return 0;
+    ਜੇ (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
+	ਵਾਪਸ 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_head_off(base, p);
+    ਵਾਪਸ 1 - dbcs_ਸਿਰ_off(ਅਧਾਰ, p);
 }
 
 /*
  * Find the next illegal byte sequence.
  */
-    void
-utf_find_illegal(void)
+    ਖਾਲੀ
+utf_ਲੱਭੋ_illegal(ਖਾਲੀ)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*p;
-    int		len;
+    ਪੂਰਨ		len;
     vimconv_T	vimconv;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ਨਿਰਾ;
 
     vimconv.vc_type = CONV_NONE;
-    if (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
+    ਜੇ (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ))
     {
 	// 'encoding' is "utf-8" but we are editing a 8-bit encoded file,
 	// possibly a utf-8 file with illegal bytes.  Setup for conversion
 	// from utf-8 to 'fileencoding'.
-	convert_setup(&vimconv, p_enc, curbuf->b_p_fenc);
+	convert_ਤਿਆਰੀ(&vimconv, p_enc, curbuf->b_p_fenc);
     }
 
     curwin->w_cursor.coladd = 0;
-    for (;;)
+    ਲਈ (;;)
     {
 	p = ml_get_cursor();
-	if (vimconv.vc_type != CONV_NONE)
+	ਜੇ (vimconv.vc_type != CONV_NONE)
 	{
 	    vim_free(tofree);
-	    tofree = string_convert(&vimconv, p, NULL);
-	    if (tofree == NULL)
-		break;
+	    tofree = string_convert(&vimconv, p, ਨਿਰਾ);
+	    ਜੇ (tofree == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    p = tofree;
 	}
 
-	while (*p != NUL)
+	ਜਦੋਂ (*p != NUL)
 	{
 	    // Illegal means that there are not enough trail bytes (checked by
 	    // utf_ptr2len()) or too many of them (overlong sequence).
 	    len = utf_ptr2len(p);
-	    if (*p >= 0x80 && (len == 1
+	    ਜੇ (*p >= 0x80 && (len == 1
 				     || utf_char2len(utf_ptr2char(p)) != len))
 	    {
-		if (vimconv.vc_type == CONV_NONE)
-		    curwin->w_cursor.col += (colnr_T)(p - ml_get_cursor());
-		else
+		ਜੇ (vimconv.vc_type == CONV_NONE)
+		    curwin->w_cursor.ਖਾਨਾ += (colnr_T)(p - ml_get_cursor());
+		ਨਹੀਂਤਾਂ
 		{
-		    int	    l;
+		    ਪੂਰਨ	    l;
 
-		    len = (int)(p - tofree);
-		    for (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
+		    len = (ਪੂਰਨ)(p - tofree);
+		    ਲਈ (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
 		    {
 			l = utf_ptr2len(p);
-			curwin->w_cursor.col += l;
+			curwin->w_cursor.ਖਾਨਾ += l;
 		    }
 		}
-		curwin->w_set_curswant = TRUE;
-		goto theend;
+		curwin->w_ਸੈੱਟ_curswant = TRUE;
+		ਜਾਓ theend;
 	    }
 	    p += len;
 	}
-	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
-	    break;
+	ਜੇ (curwin->w_cursor.lnum == curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਰੋਕੋ;
 	++curwin->w_cursor.lnum;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.ਖਾਨਾ = 0;
     }
 
     // didn't find it: don't move and beep
@@ -4478,64 +4478,64 @@ utf_find_illegal(void)
 
 theend:
     vim_free(tofree);
-    convert_setup(&vimconv, NULL, NULL);
+    convert_ਤਿਆਰੀ(&vimconv, ਨਿਰਾ, ਨਿਰਾ);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
 /*
  * Return TRUE if string "s" is a valid utf-8 string.
  * When "end" is NULL stop at the first NUL.  Otherwise stop at "end".
  */
-    int
-utf_valid_string(char_u *s, char_u *end)
+    ਪੂਰਨ
+utf_valid_string(char_u *s, char_u *ਸਿਰਾ)
 {
-    int		l;
+    ਪੂਰਨ		l;
     char_u	*p = s;
 
-    while (end == NULL ? *p != NUL : p < end)
+    ਜਦੋਂ (ਸਿਰਾ == ਨਿਰਾ ? *p != NUL : p < ਸਿਰਾ)
     {
 	l = utf8len_tab_zero[*p];
-	if (l == 0)
-	    return FALSE;	// invalid lead byte
-	if (end != NULL && p + l > end)
-	    return FALSE;	// incomplete byte sequence
+	ਜੇ (l == 0)
+	    ਵਾਪਸ FALSE;	// invalid lead byte
+	ਜੇ (ਸਿਰਾ != ਨਿਰਾ && p + l > ਸਿਰਾ)
+	    ਵਾਪਸ FALSE;	// incomplete byte sequence
 	++p;
-	while (--l > 0)
-	    if ((*p++ & 0xc0) != 0x80)
-		return FALSE;	// invalid trail byte
+	ਜਦੋਂ (--l > 0)
+	    ਜੇ ((*p++ & 0xc0) != 0x80)
+		ਵਾਪਸ FALSE;	// invalid trail byte
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * Special version of mb_tail_off() for use in ScreenLines[].
  */
-    int
-dbcs_screen_tail_off(char_u *base, char_u *p)
+    ਪੂਰਨ
+dbcs_screen_ਪੂਛ_off(char_u *ਅਧਾਰ, char_u *p)
 {
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
     // For euc-jp an 0x8e byte always means we have a lead byte in the current
     // cell.
-    if (*p == NUL || p[1] == NUL
+    ਜੇ (*p == NUL || p[1] == NUL
 	    || (enc_dbcs == DBCS_JPNU && *p == 0x8e)
 	    || MB_BYTE2LEN(*p) == 1)
-	return 0;
+	ਵਾਪਸ 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_screen_head_off(base, p);
+    ਵਾਪਸ 1 - dbcs_screen_ਸਿਰ_off(ਅਧਾਰ, p);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * If the cursor moves on an trail byte, set the cursor on the lead byte.
  * Thus it moves left if necessary.
  * Return TRUE when the cursor was adjusted.
  */
-    void
-mb_adjust_cursor(void)
+    ਖਾਲੀ
+mb_adjust_cursor(ਖਾਲੀ)
 {
     mb_adjustpos(curbuf, &curwin->w_cursor);
 }
@@ -4544,24 +4544,24 @@ mb_adjust_cursor(void)
  * Adjust position "*lp" to point to the first byte of a multi-byte character.
  * If it points to a tail byte it's moved backwards to the head byte.
  */
-    void
+    ਖਾਲੀ
 mb_adjustpos(buf_T *buf, pos_T *lp)
 {
     char_u	*p;
 
-    if (lp->col > 0 || lp->coladd > 1)
+    ਜੇ (lp->ਖਾਨਾ > 0 || lp->coladd > 1)
     {
 	p = ml_get_buf(buf, lp->lnum, FALSE);
-	if (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->col)
-	    lp->col = 0;
-	else
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
+	ਜੇ (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->ਖਾਨਾ)
+	    lp->ਖਾਨਾ = 0;
+	ਨਹੀਂਤਾਂ
+	    lp->ਖਾਨਾ -= (*mb_ਸਿਰ_off)(p, p + lp->ਖਾਨਾ);
 	// Reset "coladd" when the cursor would be on the right half of a
 	// double-wide character.
-	if (lp->coladd == 1
-		&& p[lp->col] != TAB
-		&& vim_isprintc((*mb_ptr2char)(p + lp->col))
-		&& ptr2cells(p + lp->col) > 1)
+	ਜੇ (lp->coladd == 1
+		&& p[lp->ਖਾਨਾ] != TAB
+		&& vim_isprintc((*mb_ptr2char)(p + lp->ਖਾਨਾ))
+		&& ptr2cells(p + lp->ਖਾਨਾ) > 1)
 	    lp->coladd = 0;
     }
 }
@@ -4571,46 +4571,46 @@ mb_adjustpos(buf_T *buf, pos_T *lp)
  */
     char_u *
 mb_prevptr(
-    char_u *line,	// start of the string
+    char_u *ਸਤਰ,	// start of the string
     char_u *p)
 {
-    if (p > line)
-	MB_PTR_BACK(line, p);
-    return p;
+    ਜੇ (p > ਸਤਰ)
+	MB_PTR_ਪਿੱਠ(ਸਤਰ, p);
+    ਵਾਪਸ p;
 }
 
 /*
  * Return the character length of "str".  Each multi-byte character (with
  * following composing characters) counts as one.
  */
-    int
+    ਪੂਰਨ
 mb_charlen(char_u *str)
 {
     char_u	*p = str;
-    int		count;
+    ਪੂਰਨ		ਗਿਣਤੀ_2;
 
-    if (p == NULL)
-	return 0;
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
-    for (count = 0; *p != NUL; count++)
+    ਲਈ (ਗਿਣਤੀ_2 = 0; *p != NUL; ਗਿਣਤੀ_2++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    ਵਾਪਸ ਗਿਣਤੀ_2;
 }
 
 /*
  * Like mb_charlen() but for a string with specified length.
  */
-    int
-mb_charlen_len(char_u *str, int len)
+    ਪੂਰਨ
+mb_charlen_len(char_u *str, ਪੂਰਨ len)
 {
     char_u	*p = str;
-    int		count;
+    ਪੂਰਨ		ਗਿਣਤੀ_2;
 
-    for (count = 0; *p != NUL && p < str + len; count++)
+    ਲਈ (ਗਿਣਤੀ_2 = 0; *p != NUL && p < str + len; ਗਿਣਤੀ_2++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    ਵਾਪਸ ਗਿਣਤੀ_2;
 }
 
 /*
@@ -4623,57 +4623,57 @@ mb_charlen_len(char_u *str, int len)
     char_u *
 mb_unescape(char_u **pp)
 {
-    static char_u	buf[6];
-    int			n;
-    int			m = 0;
+    ਸਥਿਰ char_u	buf[6];
+    ਪੂਰਨ			n;
+    ਪੂਰਨ			m = 0;
     char_u		*str = *pp;
 
     // Must translate K_SPECIAL KS_SPECIAL KE_FILLER to K_SPECIAL and CSI
     // KS_EXTRA KE_CSI to CSI.
     // Maximum length of a utf-8 character is 4 bytes.
-    for (n = 0; str[n] != NUL && m < 4; ++n)
+    ਲਈ (n = 0; str[n] != NUL && m < 4; ++n)
     {
-	if (str[n] == K_SPECIAL
+	ਜੇ (str[n] == K_SPECIAL
 		&& str[n + 1] == KS_SPECIAL
 		&& str[n + 2] == KE_FILLER)
 	{
 	    buf[m++] = K_SPECIAL;
 	    n += 2;
 	}
-	else if ((str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	ਨਹੀਂਤਾਂ ਜੇ ((str[n] == K_SPECIAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		    || str[n] == CSI
-#endif
+#ਜੇ_ਅੰਤ
 		 )
 		&& str[n + 1] == KS_EXTRA
-		&& str[n + 2] == (int)KE_CSI)
+		&& str[n + 2] == (ਪੂਰਨ)KE_CSI)
 	{
 	    buf[m++] = CSI;
 	    n += 2;
 	}
-	else if (str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	ਨਹੀਂਤਾਂ ਜੇ (str[n] == K_SPECIAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		|| str[n] == CSI
-#endif
+#ਜੇ_ਅੰਤ
 		)
-	    break;		// a special key can't be a multibyte char
-	else
+	    ਰੋਕੋ;		// a special key can't be a multibyte char
+	ਨਹੀਂਤਾਂ
 	    buf[m++] = str[n];
 	buf[m] = NUL;
 
 	// Return a multi-byte character if it's found.  An illegal sequence
 	// will result in a 1 here.
-	if ((*mb_ptr2len)(buf) > 1)
+	ਜੇ ((*mb_ptr2len)(buf) > 1)
 	{
 	    *pp = str + n + 1;
-	    return buf;
+	    ਵਾਪਸ buf;
 	}
 
 	// Bail out quickly for ASCII.
-	if (buf[0] < 128)
-	    break;
+	ਜੇ (buf[0] < 128)
+	    ਰੋਕੋ;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -4681,37 +4681,37 @@ mb_unescape(char_u **pp)
  * of a double-width character.
  * Caller must make sure "row" and "col" are not invalid!
  */
-    int
-mb_lefthalve(int row, int col)
+    ਪੂਰਨ
+mb_lefthalve(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ)
 {
-    return (*mb_off2cells)(LineOffset[row] + col,
-					LineOffset[row] + screen_Columns) > 1;
+    ਵਾਪਸ (*mb_off2cells)(ਸਤਰ_ਵਿੱਥ[ਪੰਕਤੀ] + ਖਾਨਾ,
+					ਸਤਰ_ਵਿੱਥ[ਪੰਕਤੀ] + screen_Columns) > 1;
 }
 
 /*
  * Correct a position on the screen, if it's the right half of a double-wide
  * char move it to the left half.  Returns the corrected column.
  */
-    int
-mb_fix_col(int col, int row)
+    ਪੂਰਨ
+mb_fix_ਖਾਨਾ(ਪੂਰਨ ਖਾਨਾ, ਪੂਰਨ ਪੰਕਤੀ)
 {
-    int off;
+    ਪੂਰਨ off;
 
-    col = check_col(col);
-    row = check_row(row);
-    off = LineOffset[row] + col;
-    if (has_mbyte && ScreenLines != NULL && col > 0
+    ਖਾਨਾ = check_ਖਾਨਾ(ਖਾਨਾ);
+    ਪੰਕਤੀ = check_ਪੰਕਤੀ(ਪੰਕਤੀ);
+    off = ਸਤਰ_ਵਿੱਥ[ਪੰਕਤੀ] + ਖਾਨਾ;
+    ਜੇ (has_mbyte && Screen_ਸਤਰਾਂ != ਨਿਰਾ && ਖਾਨਾ > 0
 	    && ((enc_dbcs
-		    && ScreenLines[off] != NUL
-		    && dbcs_screen_head_off(ScreenLines + LineOffset[row],
-					 ScreenLines + off))
-		|| (enc_utf8 && ScreenLines[off] == 0
-						  && ScreenLinesUC[off] == 0)))
-	return col - 1;
-    return col;
+		    && Screen_ਸਤਰਾਂ[off] != NUL
+		    && dbcs_screen_ਸਿਰ_off(Screen_ਸਤਰਾਂ + ਸਤਰ_ਵਿੱਥ[ਪੰਕਤੀ],
+					 Screen_ਸਤਰਾਂ + off))
+		|| (enc_utf8 && Screen_ਸਤਰਾਂ[off] == 0
+						  && Screen_ਸਤਰਾਂ_UC[off] == 0)))
+	ਵਾਪਸ ਖਾਨਾ - 1;
+    ਵਾਪਸ ਖਾਨਾ;
 }
 
-static int enc_alias_search(char_u *name);
+ਸਥਿਰ ਪੂਰਨ enc_alias_ਖੋਜ(char_u *name);
 
 /*
  * Skip the Vim specific head of a 'encoding' name.
@@ -4719,11 +4719,11 @@ static int enc_alias_search(char_u *name);
     char_u *
 enc_skip(char_u *p)
 {
-    if (STRNCMP(p, "2byte-", 6) == 0)
-	return p + 6;
-    if (STRNCMP(p, "8bit-", 5) == 0)
-	return p + 5;
-    return p;
+    ਜੇ (STRNCMP(p, "2byte-", 6) == 0)
+	ਵਾਪਸ p + 6;
+    ਜੇ (STRNCMP(p, "8bit-", 5) == 0)
+	ਵਾਪਸ p + 5;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -4737,34 +4737,34 @@ enc_canonize(char_u *enc)
 {
     char_u	*r;
     char_u	*p, *s;
-    int		i;
+    ਪੂਰਨ		i;
 
-    if (STRCMP(enc, "default") == 0)
+    ਜੇ (STRCMP(enc, "default") == 0)
     {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// Use the system encoding, the default is always utf-8.
 	r = enc_locale();
-#else
+#ਨਹੀਂਤਾਂ
 	// Use the default encoding as it's found by set_init_1().
 	r = get_encoding_default();
-#endif
-	if (r == NULL)
+#ਜੇ_ਅੰਤ
+	ਜੇ (r == ਨਿਰਾ)
 	    r = (char_u *)ENC_DFLT;
-	return vim_strsave(r);
+	ਵਾਪਸ vim_strsave(r);
     }
 
     // copy "enc" to allocated memory, with room for two '-'
     r = alloc(STRLEN(enc) + 3);
-    if (r == NULL)
-	return NULL;
+    ਜੇ (r == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // Make it all lower case and replace '_' with '-'.
     p = r;
-    for (s = enc; *s != NUL; ++s)
+    ਲਈ (s = enc; *s != NUL; ++s)
     {
-	if (*s == '_')
+	ਜੇ (*s == '_')
 	    *p++ = '-';
-	else
+	ਨਹੀਂਤਾਂ
 	    *p++ = TOLOWER_ASC(*s);
     }
     *p = NUL;
@@ -4773,83 +4773,83 @@ enc_canonize(char_u *enc)
     p = enc_skip(r);
 
     // Change "microsoft-cp" to "cp".  Used in some spell files.
-    if (STRNCMP(p, "microsoft-cp", 12) == 0)
+    ਜੇ (STRNCMP(p, "microsoft-cp", 12) == 0)
 	STRMOVE(p, p + 10);
 
     // "iso8859" -> "iso-8859"
-    if (STRNCMP(p, "iso8859", 7) == 0)
+    ਜੇ (STRNCMP(p, "iso8859", 7) == 0)
     {
 	STRMOVE(p + 4, p + 3);
 	p[3] = '-';
     }
 
     // "iso-8859n" -> "iso-8859-n"
-    if (STRNCMP(p, "iso-8859", 8) == 0 && SAFE_isdigit(p[8]))
+    ਜੇ (STRNCMP(p, "iso-8859", 8) == 0 && ਸੁਰੱਖਿਅਤ_isdigit(p[8]))
     {
 	STRMOVE(p + 9, p + 8);
 	p[8] = '-';
     }
 
     // "latin-N" -> "latinN"
-    if (STRNCMP(p, "latin-", 6) == 0)
+    ਜੇ (STRNCMP(p, "latin-", 6) == 0)
 	STRMOVE(p + 5, p + 6);
 
-    if (enc_canon_search(p) >= 0)
+    ਜੇ (enc_canon_ਖੋਜ(p) >= 0)
     {
 	// canonical name can be used unmodified
-	if (p != r)
+	ਜੇ (p != r)
 	    STRMOVE(r, p);
     }
-    else if ((i = enc_alias_search(p)) >= 0)
+    ਨਹੀਂਤਾਂ ਜੇ ((i = enc_alias_ਖੋਜ(p)) >= 0)
     {
 	// alias recognized, get canonical name
 	vim_free(r);
-	r = vim_strsave((char_u *)enc_canon_table[i].name);
+	r = vim_strsave((char_u *)enc_canon_ਸਾਰਣੀ[i].name);
     }
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
  * Search for an encoding alias of "name".
  * Returns -1 when not found.
  */
-    static int
-enc_alias_search(char_u *name)
+    ਸਥਿਰ ਪੂਰਨ
+enc_alias_ਖੋਜ(char_u *name)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; enc_alias_table[i].name != NULL; ++i)
-	if (STRCMP(name, enc_alias_table[i].name) == 0)
-	    return enc_alias_table[i].canon;
-    return -1;
+    ਲਈ (i = 0; enc_alias_ਸਾਰਣੀ[i].name != ਨਿਰਾ; ++i)
+	ਜੇ (STRCMP(name, enc_alias_ਸਾਰਣੀ[i].name) == 0)
+	    ਵਾਪਸ enc_alias_ਸਾਰਣੀ[i].canon;
+    ਵਾਪਸ -1;
 }
 
 
-#ifdef HAVE_LANGINFO_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_LANGINFO_H
 # include <langinfo.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ਜੇ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Get the canonicalized encoding from the specified locale string "locale"
  * or from the environment variables LC_ALL, LC_CTYPE and LANG.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale_env(char *locale)
+enc_locale_env(ਅੱਖਰ *locale)
 {
-    char	*s = locale;
-    char	*p;
-    int		i;
-    char	buf[50];
+    ਅੱਖਰ	*s = locale;
+    ਅੱਖਰ	*p;
+    ਪੂਰਨ		i;
+    ਅੱਖਰ	buf[50];
 
-    if (s == NULL || *s == NUL)
-	if ((s = getenv("LC_ALL")) == NULL || *s == NUL)
-	    if ((s = getenv("LC_CTYPE")) == NULL || *s == NUL)
+    ਜੇ (s == ਨਿਰਾ || *s == NUL)
+	ਜੇ ((s = getenv("LC_ALL")) == ਨਿਰਾ || *s == NUL)
+	    ਜੇ ((s = getenv("LC_CTYPE")) == ਨਿਰਾ || *s == NUL)
 		s = getenv("LANG");
 
-    if (s == NULL || *s == NUL)
-	return NULL;
+    ਜੇ (s == ਨਿਰਾ || *s == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // The most generic locale format is:
     // language[_territory][.codeset][@modifier][+special][,[sponsor][_revision]]
@@ -4858,10 +4858,10 @@ enc_locale_env(char *locale)
     // Make the name lowercase and replace '_' with '-'.
     // Exception: "ja_JP.EUC" == "euc-jp", "zh_CN.EUC" = "euc-cn",
     // "ko_KR.EUC" == "euc-kr"
-    if ((p = (char *)vim_strchr((char_u *)s, '.')) != NULL)
+    ਜੇ ((p = (ਅੱਖਰ *)vim_strchr((char_u *)s, '.')) != ਨਿਰਾ)
     {
-	if (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
-			&& !SAFE_isalnum((int)p[4]) && p[4] != '-' && p[-3] == '_')
+	ਜੇ (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
+			&& !ਸੁਰੱਖਿਅਤ_isalnum((ਪੂਰਨ)p[4]) && p[4] != '-' && p[-3] == '_')
 	{
 	    // copy "XY.EUC" to "euc-XY" to buf[10]
 	    STRCPY(buf + 10, "euc-");
@@ -4870,90 +4870,90 @@ enc_locale_env(char *locale)
 	    buf[16] = 0;
 	    s = buf + 10;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    s = p + 1;
     }
-    for (i = 0; i < (int)sizeof(buf) - 1 && s[i] != NUL; ++i)
+    ਲਈ (i = 0; i < (ਪੂਰਨ)ਆਕਾਰ(buf) - 1 && s[i] != NUL; ++i)
     {
-	if (s[i] == '_' || s[i] == '-')
+	ਜੇ (s[i] == '_' || s[i] == '-')
 	    buf[i] = '-';
-	else if (SAFE_isalnum(s[i]))
+	ਨਹੀਂਤਾਂ ਜੇ (ਸੁਰੱਖਿਅਤ_isalnum(s[i]))
 	    buf[i] = TOLOWER_ASC(s[i]);
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
     buf[i] = NUL;
 
-    return enc_canonize((char_u *)buf);
+    ਵਾਪਸ enc_canonize((char_u *)buf);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Get the canonicalized encoding of the current locale.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale(void)
+enc_locale(ਖਾਲੀ)
 {
-#ifdef MSWIN
-    char	buf[50];
-    long	acp = GetACP();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਅੱਖਰ	buf[50];
+    ਲੰਮਾ	acp = GetACP();
 
-    if (acp == 1200)
+    ਜੇ (acp == 1200)
 	STRCPY(buf, "ucs-2le");
-    else if (acp == 1252)	    // cp1252 is used as latin1
+    ਨਹੀਂਤਾਂ ਜੇ (acp == 1252)	    // cp1252 is used as latin1
 	STRCPY(buf, "latin1");
-    else if (acp == 65001)
+    ਨਹੀਂਤਾਂ ਜੇ (acp == 65001)
 	STRCPY(buf, "utf-8");
-    else
+    ਨਹੀਂਤਾਂ
 	sprintf(buf, "cp%ld", acp);
 
-    return enc_canonize((char_u *)buf);
-#else
-    char	*s;
+    ਵਾਪਸ enc_canonize((char_u *)buf);
+#ਨਹੀਂਤਾਂ
+    ਅੱਖਰ	*s;
 
 # ifdef HAVE_NL_LANGINFO_CODESET
-    if ((s = nl_langinfo(CODESET)) == NULL || *s == NUL)
+    ਜੇ ((s = nl_langinfo(CODESET)) == ਨਿਰਾ || *s == NUL)
 # endif
-# if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	if ((s = setlocale(LC_CTYPE, NULL)) == NULL || *s == NUL)
+# ਜੇ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	ਜੇ ((s = setlocale(LC_CTYPE, ਨਿਰਾ)) == ਨਿਰਾ || *s == NUL)
 # endif
-	    s = NULL;
+	    s = ਨਿਰਾ;
 
-    return enc_locale_env(s);
-#endif
+    ਵਾਪਸ enc_locale_env(s);
+#ਜੇ_ਅੰਤ
 }
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#ਜੇ defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
 /*
  * Convert an encoding name to an MS-Windows codepage.
  * Returns zero if no codepage can be figured out.
  */
-    int
+    ਪੂਰਨ
 encname2codepage(char_u *name)
 {
-    int		cp;
+    ਪੂਰਨ		cp;
     char_u	*p = name;
-    int		idx;
+    ਪੂਰਨ		idx;
 
-    if (STRNCMP(p, "8bit-", 5) == 0)
+    ਜੇ (STRNCMP(p, "8bit-", 5) == 0)
 	p += 5;
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p_enc, "2byte-", 6) == 0)
 	p += 6;
 
-    if (p[0] == 'c' && p[1] == 'p')
-	cp = atoi((char *)p + 2);
-    else if ((idx = enc_canon_search(p)) >= 0)
-	cp = enc_canon_table[idx].codepage;
-    else
-	return 0;
-    if (IsValidCodePage(cp))
-	return cp;
-    return 0;
+    ਜੇ (p[0] == 'c' && p[1] == 'p')
+	cp = atoi((ਅੱਖਰ *)p + 2);
+    ਨਹੀਂਤਾਂ ਜੇ ((idx = enc_canon_ਖੋਜ(p)) >= 0)
+	cp = enc_canon_ਸਾਰਣੀ[idx].codepage;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ 0;
+    ਜੇ (Is_Valid_ਕੋਡ_ਪੰਨਾ(cp))
+	ਵਾਪਸ cp;
+    ਵਾਪਸ 0;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(USE_ICONV)
+#ਜੇ defined(USE_ICONV)
 
 /*
  * Call iconv_open() with a check if iconv() works properly (there are broken
@@ -4961,28 +4961,28 @@ encname2codepage(char_u *name)
  * Returns (void *)-1 if failed.
  * (should return iconv_t, but that causes problems with prototypes).
  */
-    void *
-my_iconv_open(char_u *to, char_u *from)
+    ਖਾਲੀ *
+my_iconv_open(char_u *ਮੰਜ਼ਿਲ, char_u *from)
 {
     iconv_t	fd;
 # define ICONV_TESTLEN 400
     char_u	tobuf[ICONV_TESTLEN];
-    char	*p;
+    ਅੱਖਰ	*p;
     size_t	tolen;
-    static int	iconv_ok = -1;
+    ਸਥਿਰ ਪੂਰਨ	iconv_ok = -1;
 
-    if (iconv_ok == FALSE)
-	return (void *)-1;	// detected a broken iconv() previously
+    ਜੇ (iconv_ok == FALSE)
+	ਵਾਪਸ (ਖਾਲੀ *)-1;	// detected a broken iconv() previously
 
 # ifdef DYNAMIC_ICONV
     // Check if the iconv.dll can be found.
-    if (!iconv_enabled(TRUE))
-	return (void *)-1;
+    ਜੇ (!iconv_enabled(TRUE))
+	ਵਾਪਸ (ਖਾਲੀ *)-1;
 # endif
 
-    fd = iconv_open((char *)enc_skip(to), (char *)enc_skip(from));
+    fd = iconv_open((ਅੱਖਰ *)enc_skip(ਮੰਜ਼ਿਲ), (ਅੱਖਰ *)enc_skip(from));
 
-    if (fd != (iconv_t)-1 && iconv_ok == -1)
+    ਜੇ (fd != (iconv_t)-1 && iconv_ok == -1)
     {
 	/*
 	 * Do a dummy iconv() call to check if it actually works.  There is a
@@ -4991,20 +4991,20 @@ my_iconv_open(char_u *to, char_u *from)
 	 * the initial shift state the "to" pointer is NULL and conversion
 	 * stops for no apparent reason after about 8160 characters.
 	 */
-	p = (char *)tobuf;
+	p = (ਅੱਖਰ *)tobuf;
 	tolen = ICONV_TESTLEN;
-	(void)iconv(fd, NULL, NULL, &p, &tolen);
-	if (p == NULL)
+	(ਖਾਲੀ)iconv(fd, ਨਿਰਾ, ਨਿਰਾ, &p, &tolen);
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    iconv_ok = FALSE;
 	    iconv_close(fd);
 	    fd = (iconv_t)-1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    iconv_ok = TRUE;
     }
 
-    return (void *)fd;
+    ਵਾਪਸ (ਖਾਲੀ *)fd;
 }
 
 /*
@@ -5014,113 +5014,113 @@ my_iconv_open(char_u *to, char_u *from)
  * Returns the converted string in allocated memory.  NULL for an error.
  * If resultlenp is not NULL, sets it to the result length in bytes.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 iconv_string(
     vimconv_T	*vcp,
     char_u	*str,
-    int		slen,
-    int		*unconvlenp,
-    int		*resultlenp)
+    ਪੂਰਨ		slen,
+    ਪੂਰਨ		*unconvlenp,
+    ਪੂਰਨ		*resultlenp)
 {
-    const char	*from;
+    ਅਚਲ ਅੱਖਰ	*from;
     size_t	fromlen;
-    char	*to;
+    ਅੱਖਰ	*ਮੰਜ਼ਿਲ;
     size_t	tolen;
     size_t	len = 0;
-    size_t	done = 0;
-    char_u	*result = NULL;
+    size_t	ਪੂਰਾ = 0;
+    char_u	*ਨਤੀਜਾ = ਨਿਰਾ;
     char_u	*p;
-    int		l;
+    ਪੂਰਨ		l;
 
-    from = (char *)str;
+    from = (ਅੱਖਰ *)str;
     fromlen = slen;
-    for (;;)
+    ਲਈ (;;)
     {
-	if (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
+	ਜੇ (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
 	{
 	    // Allocate enough room for most conversions.  When re-allocating
 	    // increase the buffer size.
 	    len = len + fromlen * 2 + 40;
 	    p = alloc(len);
-	    if (p != NULL && done > 0)
-		mch_memmove(p, result, done);
-	    vim_free(result);
-	    result = p;
-	    if (result == NULL)	// out of memory
-		break;
+	    ਜੇ (p != ਨਿਰਾ && ਪੂਰਾ > 0)
+		mch_memmove(p, ਨਤੀਜਾ, ਪੂਰਾ);
+	    vim_free(ਨਤੀਜਾ);
+	    ਨਤੀਜਾ = p;
+	    ਜੇ (ਨਤੀਜਾ == ਨਿਰਾ)	// out of memory
+		ਰੋਕੋ;
 	}
 
-	to = (char *)result + done;
-	tolen = len - done - 2;
+	ਮੰਜ਼ਿਲ = (ਅੱਖਰ *)ਨਤੀਜਾ + ਪੂਰਾ;
+	tolen = len - ਪੂਰਾ - 2;
 	// Avoid a warning for systems with a wrong iconv() prototype by
 	// casting the second argument to void *.
-	if (iconv(vcp->vc_fd, (void *)&from, &fromlen, &to, &tolen)
+	ਜੇ (iconv(vcp->vc_fd, (ਖਾਲੀ *)&from, &fromlen, &ਮੰਜ਼ਿਲ, &tolen)
 								!= (size_t)-1)
 	{
 	    // Finished, append a NUL.
-	    *to = NUL;
-	    break;
+	    *ਮੰਜ਼ਿਲ = NUL;
+	    ਰੋਕੋ;
 	}
 
 	// Check both ICONV_EINVAL and EINVAL, because the dynamically loaded
 	// iconv library may use one of them.
-	if (!vcp->vc_fail && unconvlenp != NULL
+	ਜੇ (!vcp->vc_fail && unconvlenp != ਨਿਰਾ
 		&& (ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Handle an incomplete sequence at the end.
-	    *to = NUL;
-	    *unconvlenp = (int)fromlen;
-	    break;
+	    *ਮੰਜ਼ਿਲ = NUL;
+	    *unconvlenp = (ਪੂਰਨ)fromlen;
+	    ਰੋਕੋ;
 	}
 
 	// Check both ICONV_EILSEQ and EILSEQ, because the dynamically loaded
 	// iconv library may use one of them.
-	else if (!vcp->vc_fail
+	ਨਹੀਂਤਾਂ ਜੇ (!vcp->vc_fail
 		&& (ICONV_ERRNO == ICONV_EILSEQ || ICONV_ERRNO == EILSEQ
 		    || ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Can't convert: insert a '?' and skip a character.  This assumes
 	    // conversion from 'encoding' to something else.  In other
 	    // situations we don't know what to skip anyway.
-	    *to++ = '?';
-	    if ((*mb_ptr2cells)((char_u *)from) > 1)
-		*to++ = '?';
-	    if (enc_utf8)
-		l = utfc_ptr2len_len((char_u *)from, (int)fromlen);
-	    else
+	    *ਮੰਜ਼ਿਲ++ = '?';
+	    ਜੇ ((*mb_ptr2cells)((char_u *)from) > 1)
+		*ਮੰਜ਼ਿਲ++ = '?';
+	    ਜੇ (enc_utf8)
+		l = utfc_ptr2len_len((char_u *)from, (ਪੂਰਨ)fromlen);
+	    ਨਹੀਂਤਾਂ
 	    {
 		l = (*mb_ptr2len)((char_u *)from);
-		if (l > (int)fromlen)
-		    l = (int)fromlen;
+		ਜੇ (l > (ਪੂਰਨ)fromlen)
+		    l = (ਪੂਰਨ)fromlen;
 	    }
 	    from += l;
 	    fromlen -= l;
 	}
-	else if (ICONV_ERRNO != ICONV_E2BIG)
+	ਨਹੀਂਤਾਂ ਜੇ (ICONV_ERRNO != ICONV_E2BIG)
 	{
 	    // conversion failed
-	    VIM_CLEAR(result);
-	    break;
+	    VIM_CLEAR(ਨਤੀਜਾ);
+	    ਰੋਕੋ;
 	}
 	// Not enough room or skipping illegal sequence.
-	done = to - (char *)result;
+	ਪੂਰਾ = ਮੰਜ਼ਿਲ - (ਅੱਖਰ *)ਨਤੀਜਾ;
     }
 
-    if (resultlenp != NULL && result != NULL)
-	*resultlenp = (int)(to - (char *)result);
-    return result;
+    ਜੇ (resultlenp != ਨਿਰਾ && ਨਤੀਜਾ != ਨਿਰਾ)
+	*resultlenp = (ਪੂਰਨ)(ਮੰਜ਼ਿਲ - (ਅੱਖਰ *)ਨਤੀਜਾ);
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
-# if defined(DYNAMIC_ICONV)
+# ਜੇ defined(DYNAMIC_ICONV)
 /*
  * Dynamically load the "iconv.dll" on Win32.
  */
 
 #  ifndef DYNAMIC_ICONV	    // must be generating prototypes
-#   define HINSTANCE int
+#   define HINSTANCE ਪੂਰਨ
 #  endif
-static HINSTANCE hIconvDLL = 0;
-static HINSTANCE hMsvcrtDLL = 0;
+ਸਥਿਰ HINSTANCE hIconvDLL = 0;
+ਸਥਿਰ HINSTANCE hMsvcrtDLL = 0;
 
 #  ifndef DYNAMIC_ICONV_DLL
 #   define DYNAMIC_ICONV_DLL "iconv.dll"
@@ -5135,142 +5135,142 @@ static HINSTANCE hMsvcrtDLL = 0;
 /*
  * Try opening the iconv.dll and return TRUE if iconv() can be used.
  */
-    int
-iconv_enabled(int verbose)
+    ਪੂਰਨ
+iconv_enabled(ਪੂਰਨ verbose)
 {
-    if (hIconvDLL != 0 && hMsvcrtDLL != 0)
-	return TRUE;
+    ਜੇ (hIconvDLL != 0 && hMsvcrtDLL != 0)
+	ਵਾਪਸ TRUE;
 
     // The iconv DLL file goes under different names, try them all.
     // Do the "2" version first, it's newer.
 #  ifdef DYNAMIC_ICONV_DLL_ALT2
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT2);
+    ਜੇ (hIconvDLL == 0)
+	hIconvDLL = vim_ਲੱਦੋ_Lib(DYNAMIC_ICONV_DLL_ALT2);
 #  endif
 #  ifdef DYNAMIC_ICONV_DLL_ALT3
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT3);
+    ਜੇ (hIconvDLL == 0)
+	hIconvDLL = vim_ਲੱਦੋ_Lib(DYNAMIC_ICONV_DLL_ALT3);
 #  endif
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL);
+    ਜੇ (hIconvDLL == 0)
+	hIconvDLL = vim_ਲੱਦੋ_Lib(DYNAMIC_ICONV_DLL);
 #  ifdef DYNAMIC_ICONV_DLL_ALT1
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT1);
+    ਜੇ (hIconvDLL == 0)
+	hIconvDLL = vim_ਲੱਦੋ_Lib(DYNAMIC_ICONV_DLL_ALT1);
 #  endif
 
-    if (hIconvDLL != 0)
-	hMsvcrtDLL = vimLoadLib(DYNAMIC_MSVCRT_DLL);
-    if (hIconvDLL == 0 || hMsvcrtDLL == 0)
+    ਜੇ (hIconvDLL != 0)
+	hMsvcrtDLL = vim_ਲੱਦੋ_Lib(DYNAMIC_MSVCRT_DLL);
+    ਜੇ (hIconvDLL == 0 || hMsvcrtDLL == 0)
     {
 	// Only give the message when 'verbose' is set, otherwise it might be
 	// done whenever a conversion is attempted.
-	if (verbose && p_verbose > 0)
+	ਜੇ (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str),
+	    semsg(_(e_could_not_ਲੱਦੋ_library_str_str),
 		    hIconvDLL == 0 ? DYNAMIC_ICONV_DLL : DYNAMIC_MSVCRT_DLL,
 		    GetWin32Error());
 	    verbose_leave();
 	}
-	iconv_end();
-	return FALSE;
+	iconv_ਸਿਰਾ();
+	ਵਾਪਸ FALSE;
     }
 
-    iconv	= (size_t (*)(iconv_t, const char **,
-			size_t *, char **, size_t *))
-				GetProcAddress(hIconvDLL, "libiconv");
-    iconv_open	= (iconv_t (*)(const char *, const char *))
-				GetProcAddress(hIconvDLL, "libiconv_open");
-    iconv_close	= (int (*)(iconv_t))
-				GetProcAddress(hIconvDLL, "libiconv_close");
-    iconvctl	= (int (*)(iconv_t, int, void *))
-				GetProcAddress(hIconvDLL, "libiconvctl");
-    iconv_errno	= (int *(*)(void))get_dll_import_func(hIconvDLL, "_errno");
-    if (iconv_errno == NULL)
-	iconv_errno = (int *(*)(void))GetProcAddress(hMsvcrtDLL, "_errno");
-    if (iconv == NULL || iconv_open == NULL || iconv_close == NULL
-	    || iconvctl == NULL || iconv_errno == NULL)
+    iconv	= (size_t (*)(iconv_t, ਅਚਲ ਅੱਖਰ **,
+			size_t *, ਅੱਖਰ **, size_t *))
+				Get_Proc_ਪਤਾ(hIconvDLL, "libiconv");
+    iconv_open	= (iconv_t (*)(ਅਚਲ ਅੱਖਰ *, ਅਚਲ ਅੱਖਰ *))
+				Get_Proc_ਪਤਾ(hIconvDLL, "libiconv_open");
+    iconv_close	= (ਪੂਰਨ (*)(iconv_t))
+				Get_Proc_ਪਤਾ(hIconvDLL, "libiconv_close");
+    iconvctl	= (ਪੂਰਨ (*)(iconv_t, ਪੂਰਨ, ਖਾਲੀ *))
+				Get_Proc_ਪਤਾ(hIconvDLL, "libiconvctl");
+    iconv_errno	= (ਪੂਰਨ *(*)(ਖਾਲੀ))get_dll_import_func(hIconvDLL, "_errno");
+    ਜੇ (iconv_errno == ਨਿਰਾ)
+	iconv_errno = (ਪੂਰਨ *(*)(ਖਾਲੀ))Get_Proc_ਪਤਾ(hMsvcrtDLL, "_errno");
+    ਜੇ (iconv == ਨਿਰਾ || iconv_open == ਨਿਰਾ || iconv_close == ਨਿਰਾ
+	    || iconvctl == ਨਿਰਾ || iconv_errno == ਨਿਰਾ)
     {
-	iconv_end();
-	if (verbose && p_verbose > 0)
+	iconv_ਸਿਰਾ();
+	ਜੇ (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_function_str), "for libiconv");
+	    semsg(_(e_could_not_ਲੱਦੋ_library_function_str), "for libiconv");
 	    verbose_leave();
 	}
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-    void
-iconv_end(void)
+    ਖਾਲੀ
+iconv_ਸਿਰਾ(ਖਾਲੀ)
 {
     // Don't use iconv() when inputting or outputting characters.
-    if (input_conv.vc_type == CONV_ICONV)
-	convert_setup(&input_conv, NULL, NULL);
-    if (output_conv.vc_type == CONV_ICONV)
-	convert_setup(&output_conv, NULL, NULL);
+    ਜੇ (ਨਿਵੇਸ਼_conv.vc_type == CONV_ICONV)
+	convert_ਤਿਆਰੀ(&ਨਿਵੇਸ਼_conv, ਨਿਰਾ, ਨਿਰਾ);
+    ਜੇ (output_conv.vc_type == CONV_ICONV)
+	convert_ਤਿਆਰੀ(&output_conv, ਨਿਰਾ, ਨਿਰਾ);
 
-    if (hIconvDLL != 0)
+    ਜੇ (hIconvDLL != 0)
 	FreeLibrary(hIconvDLL);
-    if (hMsvcrtDLL != 0)
+    ਜੇ (hMsvcrtDLL != 0)
 	FreeLibrary(hMsvcrtDLL);
     hIconvDLL = 0;
     hMsvcrtDLL = 0;
 }
 # endif // DYNAMIC_ICONV
-#endif // USE_ICONV
+#ਜੇ_ਅੰਤ // USE_ICONV
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * "getimstatus()" function
  */
-    void
-f_getimstatus(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getimstatus(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-# if defined(HAVE_INPUT_METHOD)
-    rettv->vval.v_number = im_get_status();
+# ਜੇ defined(HAVE_ਨਿਵੇਸ਼_ਵਿਧੀ)
+    rettv->vval.v_ਸੰਖਿਆ = im_get_ਸਥਿਤੀ();
 # endif
 }
 
 /*
  * iconv() function
  */
-    void
-f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_iconv(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*from, *to, *str;
+    char_u	*from, *ਮੰਜ਼ਿਲ, *str;
     vimconv_T	vimconv;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     str = tv_get_string(&argvars[0]);
     from = enc_canonize(enc_skip(tv_get_string_buf(&argvars[1], buf1)));
-    to = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
+    ਮੰਜ਼ਿਲ = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
     vimconv.vc_type = CONV_NONE;
-    convert_setup(&vimconv, from, to);
+    convert_ਤਿਆਰੀ(&vimconv, from, ਮੰਜ਼ਿਲ);
 
     // If the encodings are equal, no conversion needed.
-    if (vimconv.vc_type == CONV_NONE)
+    ਜੇ (vimconv.vc_type == CONV_NONE)
 	rettv->vval.v_string = vim_strsave(str);
-    else
-	rettv->vval.v_string = string_convert(&vimconv, str, NULL);
+    ਨਹੀਂਤਾਂ
+	rettv->vval.v_string = string_convert(&vimconv, str, ਨਿਰਾ);
 
-    convert_setup(&vimconv, NULL, NULL);
+    convert_ਤਿਆਰੀ(&vimconv, ਨਿਰਾ, ਨਿਰਾ);
     vim_free(from);
-    vim_free(to);
+    vim_free(ਮੰਜ਼ਿਲ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Setup "vcp" for conversion from "from" to "to".
@@ -5281,179 +5281,179 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
  * Afterwards invoke with "from" and "to" equal to NULL to cleanup.
  * Return FAIL when conversion is not supported, OK otherwise.
  */
-    int
-convert_setup(vimconv_T *vcp, char_u *from, char_u *to)
+    ਪੂਰਨ
+convert_ਤਿਆਰੀ(vimconv_T *vcp, char_u *from, char_u *ਮੰਜ਼ਿਲ)
 {
-    return convert_setup_ext(vcp, from, TRUE, to, TRUE);
+    ਵਾਪਸ convert_ਤਿਆਰੀ_ext(vcp, from, TRUE, ਮੰਜ਼ਿਲ, TRUE);
 }
 
 /*
  * As convert_setup(), but only when from_unicode_is_utf8 is TRUE will all
  * "from" unicode charsets be considered utf-8.  Same for "to".
  */
-    int
-convert_setup_ext(
+    ਪੂਰਨ
+convert_ਤਿਆਰੀ_ext(
     vimconv_T	*vcp,
     char_u	*from,
-    int		from_unicode_is_utf8,
-    char_u	*to,
-    int		to_unicode_is_utf8)
+    ਪੂਰਨ		from_unicode_is_utf8,
+    char_u	*ਮੰਜ਼ਿਲ,
+    ਪੂਰਨ		ਮੰਜ਼ਿਲ_unicode_is_utf8)
 {
-    int		from_prop;
-    int		to_prop;
-    int		from_is_utf8;
-    int		to_is_utf8;
+    ਪੂਰਨ		from_prop;
+    ਪੂਰਨ		ਮੰਜ਼ਿਲ_prop;
+    ਪੂਰਨ		from_is_utf8;
+    ਪੂਰਨ		ਮੰਜ਼ਿਲ_is_utf8;
 
     // Reset to no conversion.
-#ifdef USE_ICONV
-    if (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+    ਜੇ (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
 	iconv_close(vcp->vc_fd);
-#endif
+#ਜੇ_ਅੰਤ
     vcp->vc_type = CONV_NONE;
-    vcp->vc_factor = 1;
+    vcp->vc_ਗੁਣਕ = 1;
     vcp->vc_fail = FALSE;
 
     // No conversion when one of the names is empty or they are equal.
-    if (from == NULL || *from == NUL || to == NULL || *to == NUL
-						     || STRCMP(from, to) == 0)
-	return OK;
+    ਜੇ (from == ਨਿਰਾ || *from == NUL || ਮੰਜ਼ਿਲ == ਨਿਰਾ || *ਮੰਜ਼ਿਲ == NUL
+						     || STRCMP(from, ਮੰਜ਼ਿਲ) == 0)
+	ਵਾਪਸ OK;
 
     from_prop = enc_canon_props(from);
-    to_prop = enc_canon_props(to);
-    if (from_unicode_is_utf8)
+    ਮੰਜ਼ਿਲ_prop = enc_canon_props(ਮੰਜ਼ਿਲ);
+    ਜੇ (from_unicode_is_utf8)
 	from_is_utf8 = from_prop & ENC_UNICODE;
-    else
+    ਨਹੀਂਤਾਂ
 	from_is_utf8 = from_prop == ENC_UNICODE;
-    if (to_unicode_is_utf8)
-	to_is_utf8 = to_prop & ENC_UNICODE;
-    else
-	to_is_utf8 = to_prop == ENC_UNICODE;
+    ਜੇ (ਮੰਜ਼ਿਲ_unicode_is_utf8)
+	ਮੰਜ਼ਿਲ_is_utf8 = ਮੰਜ਼ਿਲ_prop & ENC_UNICODE;
+    ਨਹੀਂਤਾਂ
+	ਮੰਜ਼ਿਲ_is_utf8 = ਮੰਜ਼ਿਲ_prop == ENC_UNICODE;
 
-    if ((from_prop & ENC_LATIN1) && to_is_utf8)
+    ਜੇ ((from_prop & ENC_LATIN1) && ਮੰਜ਼ਿਲ_is_utf8)
     {
 	// Internal latin1 -> utf-8 conversion.
-	vcp->vc_type = CONV_TO_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_type = CONV_ਮੰਜ਼ਿਲ_UTF8;
+	vcp->vc_ਗੁਣਕ = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN9) && to_is_utf8)
+    ਨਹੀਂਤਾਂ ਜੇ ((from_prop & ENC_LATIN9) && ਮੰਜ਼ਿਲ_is_utf8)
     {
 	// Internal latin9 -> utf-8 conversion.
-	vcp->vc_type = CONV_9_TO_UTF8;
-	vcp->vc_factor = 3;	// up to three as long (euro sign)
+	vcp->vc_type = CONV_9_ਮੰਜ਼ਿਲ_UTF8;
+	vcp->vc_ਗੁਣਕ = 3;	// up to three as long (euro sign)
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN1))
+    ਨਹੀਂਤਾਂ ਜੇ (from_is_utf8 && (ਮੰਜ਼ਿਲ_prop & ENC_LATIN1))
     {
 	// Internal utf-8 -> latin1 conversion.
-	vcp->vc_type = CONV_TO_LATIN1;
+	vcp->vc_type = CONV_ਮੰਜ਼ਿਲ_LATIN1;
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN9))
+    ਨਹੀਂਤਾਂ ਜੇ (from_is_utf8 && (ਮੰਜ਼ਿਲ_prop & ENC_LATIN9))
     {
 	// Internal utf-8 -> latin9 conversion.
-	vcp->vc_type = CONV_TO_LATIN9;
+	vcp->vc_type = CONV_ਮੰਜ਼ਿਲ_LATIN9;
     }
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     // Win32-specific codepage <-> codepage conversion without iconv.
-    else if ((from_is_utf8 || encname2codepage(from) > 0)
-	    && (to_is_utf8 || encname2codepage(to) > 0))
+    ਨਹੀਂਤਾਂ ਜੇ ((from_is_utf8 || encname2codepage(from) > 0)
+	    && (ਮੰਜ਼ਿਲ_is_utf8 || encname2codepage(ਮੰਜ਼ਿਲ) > 0))
     {
 	vcp->vc_type = CONV_CODEPAGE;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_ਗੁਣਕ = 2;	// up to twice as long
 	vcp->vc_cpfrom = from_is_utf8 ? 0 : encname2codepage(from);
-	vcp->vc_cpto = to_is_utf8 ? 0 : encname2codepage(to);
+	vcp->vc_cpto = ਮੰਜ਼ਿਲ_is_utf8 ? 0 : encname2codepage(ਮੰਜ਼ਿਲ);
     }
-#endif
-#ifdef MACOS_CONVERT
-    else if ((from_prop & ENC_MACROMAN) && (to_prop & ENC_LATIN1))
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_CONVERT
+    ਨਹੀਂਤਾਂ ਜੇ ((from_prop & ENC_MACROMAN) && (ਮੰਜ਼ਿਲ_prop & ENC_LATIN1))
     {
 	vcp->vc_type = CONV_MAC_LATIN1;
     }
-    else if ((from_prop & ENC_MACROMAN) && to_is_utf8)
+    ਨਹੀਂਤਾਂ ਜੇ ((from_prop & ENC_MACROMAN) && ਮੰਜ਼ਿਲ_is_utf8)
     {
 	vcp->vc_type = CONV_MAC_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_ਗੁਣਕ = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN1) && (to_prop & ENC_MACROMAN))
+    ਨਹੀਂਤਾਂ ਜੇ ((from_prop & ENC_LATIN1) && (ਮੰਜ਼ਿਲ_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_LATIN1_MAC;
     }
-    else if (from_is_utf8 && (to_prop & ENC_MACROMAN))
+    ਨਹੀਂਤਾਂ ਜੇ (from_is_utf8 && (ਮੰਜ਼ਿਲ_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_UTF8_MAC;
     }
-#endif
-#ifdef USE_ICONV
-    else
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+    ਨਹੀਂਤਾਂ
     {
 	// Use iconv() for conversion.
 	vcp->vc_fd = (iconv_t)my_iconv_open(
-		to_is_utf8 ? (char_u *)"utf-8" : to,
+		ਮੰਜ਼ਿਲ_is_utf8 ? (char_u *)"utf-8" : ਮੰਜ਼ਿਲ,
 		from_is_utf8 ? (char_u *)"utf-8" : from);
-	if (vcp->vc_fd != (iconv_t)-1)
+	ਜੇ (vcp->vc_fd != (iconv_t)-1)
 	{
 	    vcp->vc_type = CONV_ICONV;
-	    vcp->vc_factor = 4;	// could be longer too...
+	    vcp->vc_ਗੁਣਕ = 4;	// could be longer too...
 	}
     }
-#endif
-    if (vcp->vc_type == CONV_NONE)
-	return FAIL;
+#ਜੇ_ਅੰਤ
+    ਜੇ (vcp->vc_type == CONV_NONE)
+	ਵਾਪਸ FAIL;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-#if defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
+#ਜੇ defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
 /*
  * Do conversion on typed input characters in-place.
  * The input and output are not NUL terminated!
  * Returns the length after conversion.
  */
-    int
-convert_input(char_u *ptr, int len, int maxlen)
+    ਪੂਰਨ
+convert_ਨਿਵੇਸ਼(char_u *ptr, ਪੂਰਨ len, ਪੂਰਨ maxlen)
 {
-    return convert_input_safe(ptr, len, maxlen, NULL, NULL);
+    ਵਾਪਸ convert_ਨਿਵੇਸ਼_ਸੁਰੱਖਿਅਤ(ptr, len, maxlen, ਨਿਰਾ, ਨਿਰਾ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Like convert_input(), but when there is an incomplete byte sequence at the
  * end return that as an allocated string in "restp" and set "*restlenp" to
  * the length.  If "restp" is NULL it is not used.
  */
-    int
-convert_input_safe(
+    ਪੂਰਨ
+convert_ਨਿਵੇਸ਼_ਸੁਰੱਖਿਅਤ(
     char_u	*ptr,
-    int		len,
-    int		maxlen,
+    ਪੂਰਨ		len,
+    ਪੂਰਨ		maxlen,
     char_u	**restp,
-    int		*restlenp)
+    ਪੂਰਨ		*restlenp)
 {
     char_u	*d;
-    int		dlen = len;
-    int		unconvertlen = 0;
+    ਪੂਰਨ		dlen = len;
+    ਪੂਰਨ		unconvertlen = 0;
 
-    d = string_convert_ext(&input_conv, ptr, &dlen,
-					restp == NULL ? NULL : &unconvertlen);
-    if (d == NULL)
-	return dlen;
+    d = string_convert_ext(&ਨਿਵੇਸ਼_conv, ptr, &dlen,
+					restp == ਨਿਰਾ ? ਨਿਰਾ : &unconvertlen);
+    ਜੇ (d == ਨਿਰਾ)
+	ਵਾਪਸ dlen;
 
-    if (dlen <= maxlen)
+    ਜੇ (dlen <= maxlen)
     {
-	if (unconvertlen > 0)
+	ਜੇ (unconvertlen > 0)
 	{
 	    // Move the unconverted characters to allocated memory.
 	    *restp = alloc(unconvertlen);
-	    if (*restp != NULL)
+	    ਜੇ (*restp != ਨਿਰਾ)
 		mch_memmove(*restp, ptr + len - unconvertlen, unconvertlen);
 	    *restlenp = unconvertlen;
 	}
 	mch_memmove(ptr, d, dlen);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	// result is too long, keep the unconverted text (the caller must
 	// have done something wrong!)
 	dlen = len;
     vim_free(d);
-    return dlen;
+    ਵਾਪਸ dlen;
 }
 
 /*
@@ -5467,9 +5467,9 @@ convert_input_safe(
 string_convert(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp)
+    ਪੂਰਨ		*lenp)
 {
-    return string_convert_ext(vcp, ptr, lenp, NULL);
+    ਵਾਪਸ string_convert_ext(vcp, ptr, lenp, ਨਿਰਾ);
 }
 
 /*
@@ -5481,137 +5481,137 @@ string_convert(
 string_convert_ext(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp,
-    int		*unconvlenp)
+    ਪੂਰਨ		*lenp,
+    ਪੂਰਨ		*unconvlenp)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ਨਿਰਾ;
     char_u	*d;
-    int		len;
-    int		i;
-    int		l;
-    int		c;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		l;
+    ਪੂਰਨ		c;
 
-    if (lenp == NULL)
-	len = (int)STRLEN(ptr);
-    else
+    ਜੇ (lenp == ਨਿਰਾ)
+	len = (ਪੂਰਨ)STRLEN(ptr);
+    ਨਹੀਂਤਾਂ
 	len = *lenp;
-    if (len == 0)
-	return vim_strsave((char_u *)"");
+    ਜੇ (len == 0)
+	ਵਾਪਸ vim_strsave((char_u *)"");
 
-    switch (vcp->vc_type)
+    ਚੋਣ (vcp->vc_type)
     {
-	case CONV_TO_UTF8:	// latin1 to utf-8 conversion
+	ਹਾਲਤ CONV_ਮੰਜ਼ਿਲ_UTF8:	// latin1 to utf-8 conversion
 	    retval = alloc(len * 2 + 1);
-	    if (retval == NULL)
-		break;
+	    ਜੇ (retval == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    ਲਈ (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		if (c < 0x80)
+		ਜੇ (c < 0x80)
 		    *d++ = c;
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    *d++ = 0xc0 + ((unsigned)c >> 6);
+		    *d++ = 0xc0 + ((ਬਿਨਾਨਿਸ਼ਾਨੀ)c >> 6);
 		    *d++ = 0x80 + (c & 0x3f);
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ਜੇ (lenp != ਨਿਰਾ)
+		*lenp = (ਪੂਰਨ)(d - retval);
+	    ਰੋਕੋ;
 
-	case CONV_9_TO_UTF8:	// latin9 to utf-8 conversion
+	ਹਾਲਤ CONV_9_ਮੰਜ਼ਿਲ_UTF8:	// latin9 to utf-8 conversion
 	    retval = alloc(len * 3 + 1);
-	    if (retval == NULL)
-		break;
+	    ਜੇ (retval == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    ਲਈ (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		switch (c)
+		ਚੋਣ (c)
 		{
-		    case 0xa4: c = 0x20ac; break;   // euro
-		    case 0xa6: c = 0x0160; break;   // S hat
-		    case 0xa8: c = 0x0161; break;   // S -hat
-		    case 0xb4: c = 0x017d; break;   // Z hat
-		    case 0xb8: c = 0x017e; break;   // Z -hat
-		    case 0xbc: c = 0x0152; break;   // OE
-		    case 0xbd: c = 0x0153; break;   // oe
-		    case 0xbe: c = 0x0178; break;   // Y
+		    ਹਾਲਤ 0xa4: c = 0x20ac; ਰੋਕੋ;   // euro
+		    ਹਾਲਤ 0xa6: c = 0x0160; ਰੋਕੋ;   // S hat
+		    ਹਾਲਤ 0xa8: c = 0x0161; ਰੋਕੋ;   // S -hat
+		    ਹਾਲਤ 0xb4: c = 0x017d; ਰੋਕੋ;   // Z hat
+		    ਹਾਲਤ 0xb8: c = 0x017e; ਰੋਕੋ;   // Z -hat
+		    ਹਾਲਤ 0xbc: c = 0x0152; ਰੋਕੋ;   // OE
+		    ਹਾਲਤ 0xbd: c = 0x0153; ਰੋਕੋ;   // oe
+		    ਹਾਲਤ 0xbe: c = 0x0178; ਰੋਕੋ;   // Y
 		}
 		d += utf_char2bytes(c, d);
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ਜੇ (lenp != ਨਿਰਾ)
+		*lenp = (ਪੂਰਨ)(d - retval);
+	    ਰੋਕੋ;
 
-	case CONV_TO_LATIN1:	// utf-8 to latin1 conversion
-	case CONV_TO_LATIN9:	// utf-8 to latin9 conversion
+	ਹਾਲਤ CONV_ਮੰਜ਼ਿਲ_LATIN1:	// utf-8 to latin1 conversion
+	ਹਾਲਤ CONV_ਮੰਜ਼ਿਲ_LATIN9:	// utf-8 to latin9 conversion
 	    retval = alloc(len + 1);
-	    if (retval == NULL)
-		break;
+	    ਜੇ (retval == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    ਲਈ (i = 0; i < len; ++i)
 	    {
 		l = utf_ptr2len_len(ptr + i, len - i);
-		if (l == 0)
+		ਜੇ (l == 0)
 		    *d++ = NUL;
-		else if (l == 1)
+		ਨਹੀਂਤਾਂ ਜੇ (l == 1)
 		{
-		    int l_w = utf8len_tab_zero[ptr[i]];
+		    ਪੂਰਨ l_w = utf8len_tab_zero[ptr[i]];
 
-		    if (l_w == 0)
+		    ਜੇ (l_w == 0)
 		    {
 			// Illegal utf-8 byte cannot be converted
 			vim_free(retval);
-			return NULL;
+			ਵਾਪਸ ਨਿਰਾ;
 		    }
-		    if (unconvlenp != NULL && l_w > len - i)
+		    ਜੇ (unconvlenp != ਨਿਰਾ && l_w > len - i)
 		    {
 			// Incomplete sequence at the end.
 			*unconvlenp = len - i;
-			break;
+			ਰੋਕੋ;
 		    }
 		    *d++ = ptr[i];
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    c = utf_ptr2char(ptr + i);
-		    if (vcp->vc_type == CONV_TO_LATIN9)
-			switch (c)
+		    ਜੇ (vcp->vc_type == CONV_ਮੰਜ਼ਿਲ_LATIN9)
+			ਚੋਣ (c)
 			{
-			    case 0x20ac: c = 0xa4; break;   // euro
-			    case 0x0160: c = 0xa6; break;   // S hat
-			    case 0x0161: c = 0xa8; break;   // S -hat
-			    case 0x017d: c = 0xb4; break;   // Z hat
-			    case 0x017e: c = 0xb8; break;   // Z -hat
-			    case 0x0152: c = 0xbc; break;   // OE
-			    case 0x0153: c = 0xbd; break;   // oe
-			    case 0x0178: c = 0xbe; break;   // Y
-			    case 0xa4:
-			    case 0xa6:
-			    case 0xa8:
-			    case 0xb4:
-			    case 0xb8:
-			    case 0xbc:
-			    case 0xbd:
-			    case 0xbe: c = 0x100; break; // not in latin9
+			    ਹਾਲਤ 0x20ac: c = 0xa4; ਰੋਕੋ;   // euro
+			    ਹਾਲਤ 0x0160: c = 0xa6; ਰੋਕੋ;   // S hat
+			    ਹਾਲਤ 0x0161: c = 0xa8; ਰੋਕੋ;   // S -hat
+			    ਹਾਲਤ 0x017d: c = 0xb4; ਰੋਕੋ;   // Z hat
+			    ਹਾਲਤ 0x017e: c = 0xb8; ਰੋਕੋ;   // Z -hat
+			    ਹਾਲਤ 0x0152: c = 0xbc; ਰੋਕੋ;   // OE
+			    ਹਾਲਤ 0x0153: c = 0xbd; ਰੋਕੋ;   // oe
+			    ਹਾਲਤ 0x0178: c = 0xbe; ਰੋਕੋ;   // Y
+			    ਹਾਲਤ 0xa4:
+			    ਹਾਲਤ 0xa6:
+			    ਹਾਲਤ 0xa8:
+			    ਹਾਲਤ 0xb4:
+			    ਹਾਲਤ 0xb8:
+			    ਹਾਲਤ 0xbc:
+			    ਹਾਲਤ 0xbd:
+			    ਹਾਲਤ 0xbe: c = 0x100; ਰੋਕੋ; // not in latin9
 			}
-		    if (!utf_iscomposing(c))	// skip composing chars
+		    ਜੇ (!utf_iscomposing(c))	// skip composing chars
 		    {
-			if (c < 0x100)
+			ਜੇ (c < 0x100)
 			    *d++ = c;
-			else if (vcp->vc_fail)
+			ਨਹੀਂਤਾਂ ਜੇ (vcp->vc_fail)
 			{
 			    vim_free(retval);
-			    return NULL;
+			    ਵਾਪਸ ਨਿਰਾ;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    *d++ = 0xbf;
-			    if (utf_char2cells(c) > 1)
+			    ਜੇ (utf_char2cells(c) > 1)
 				*d++ = '?';
 			}
 		    }
@@ -5619,351 +5619,351 @@ string_convert_ext(
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    ਜੇ (lenp != ਨਿਰਾ)
+		*lenp = (ਪੂਰਨ)(d - retval);
+	    ਰੋਕੋ;
 
-#ifdef MACOS_CONVERT
-	case CONV_MAC_LATIN1:
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_CONVERT
+	ਹਾਲਤ CONV_MAC_LATIN1:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'l', unconvlenp);
-	    break;
+	    ਰੋਕੋ;
 
-	case CONV_LATIN1_MAC:
+	ਹਾਲਤ CONV_LATIN1_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'l', 'm', unconvlenp);
-	    break;
+	    ਰੋਕੋ;
 
-	case CONV_MAC_UTF8:
+	ਹਾਲਤ CONV_MAC_UTF8:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'u', unconvlenp);
-	    break;
+	    ਰੋਕੋ;
 
-	case CONV_UTF8_MAC:
+	ਹਾਲਤ CONV_UTF8_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'u', 'm', unconvlenp);
-	    break;
-#endif
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 
-#ifdef USE_ICONV
-	case CONV_ICONV:	// conversion with output_conv.vc_fd
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ICONV
+	ਹਾਲਤ CONV_ICONV:	// conversion with output_conv.vc_fd
 	    retval = iconv_string(vcp, ptr, len, unconvlenp, lenp);
-	    break;
-#endif
-#ifdef MSWIN
-	case CONV_CODEPAGE:		// codepage -> codepage
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਹਾਲਤ CONV_CODEPAGE:		// codepage -> codepage
 	{
-	    int		retlen;
-	    int		tmp_len;
+	    ਪੂਰਨ		retlen;
+	    ਪੂਰਨ		tmp_len;
 	    short_u	*tmp;
 
 	    // 1. codepage/UTF-8  ->  ucs-2.
-	    if (vcp->vc_cpfrom == 0)
-		tmp_len = utf8_to_utf16(ptr, len, NULL, NULL);
-	    else
+	    ਜੇ (vcp->vc_cpfrom == 0)
+		tmp_len = utf8_ਮੰਜ਼ਿਲ_utf16(ptr, len, ਨਿਰਾ, ਨਿਰਾ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		tmp_len = MultiByteToWideChar(vcp->vc_cpfrom,
+		tmp_len = Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char(vcp->vc_cpfrom,
 					unconvlenp ? MB_ERR_INVALID_CHARS : 0,
-					(char *)ptr, len, 0, 0);
-		if (tmp_len == 0
-			&& GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+					(ਅੱਖਰ *)ptr, len, 0, 0);
+		ਜੇ (tmp_len == 0
+			&& Get_ਆਖਰੀ_Error() == ERROR_NO_UNICODE_TRANSLATION)
 		{
-		    if (lenp != NULL)
+		    ਜੇ (lenp != ਨਿਰਾ)
 			*lenp = 0;
-		    if (unconvlenp != NULL)
+		    ਜੇ (unconvlenp != ਨਿਰਾ)
 			*unconvlenp = len;
 		    retval = alloc(1);
-		    if (retval)
+		    ਜੇ (retval)
 			retval[0] = NUL;
-		    return retval;
+		    ਵਾਪਸ retval;
 		}
 	    }
 	    tmp = ALLOC_MULT(short_u, tmp_len);
-	    if (tmp == NULL)
-		break;
-	    if (vcp->vc_cpfrom == 0)
-		utf8_to_utf16(ptr, len, tmp, unconvlenp);
-	    else
-		MultiByteToWideChar(vcp->vc_cpfrom, 0,
-			(char *)ptr, len, tmp, tmp_len);
+	    ਜੇ (tmp == ਨਿਰਾ)
+		ਰੋਕੋ;
+	    ਜੇ (vcp->vc_cpfrom == 0)
+		utf8_ਮੰਜ਼ਿਲ_utf16(ptr, len, tmp, unconvlenp);
+	    ਨਹੀਂਤਾਂ
+		Multi_Byte_ਮੰਜ਼ਿਲ_Wide_Char(vcp->vc_cpfrom, 0,
+			(ਅੱਖਰ *)ptr, len, tmp, tmp_len);
 
 	    // 2. ucs-2  ->  codepage/UTF-8.
-	    if (vcp->vc_cpto == 0)
-		retlen = utf16_to_utf8(tmp, tmp_len, NULL);
-	    else
-		retlen = WideCharToMultiByte(vcp->vc_cpto, 0,
+	    ਜੇ (vcp->vc_cpto == 0)
+		retlen = utf16_ਮੰਜ਼ਿਲ_utf8(tmp, tmp_len, ਨਿਰਾ);
+	    ਨਹੀਂਤਾਂ
+		retlen = Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte(vcp->vc_cpto, 0,
 						    tmp, tmp_len, 0, 0, 0, 0);
 	    retval = alloc(retlen + 1);
-	    if (retval != NULL)
+	    ਜੇ (retval != ਨਿਰਾ)
 	    {
-		if (vcp->vc_cpto == 0)
-		    utf16_to_utf8(tmp, tmp_len, retval);
-		else
-		    WideCharToMultiByte(vcp->vc_cpto, 0,
+		ਜੇ (vcp->vc_cpto == 0)
+		    utf16_ਮੰਜ਼ਿਲ_utf8(tmp, tmp_len, retval);
+		ਨਹੀਂਤਾਂ
+		    Wide_Char_ਮੰਜ਼ਿਲ_Multi_Byte(vcp->vc_cpto, 0,
 					  tmp, tmp_len,
-					  (char *)retval, retlen, 0, 0);
+					  (ਅੱਖਰ *)retval, retlen, 0, 0);
 		retval[retlen] = NUL;
-		if (lenp != NULL)
+		ਜੇ (lenp != ਨਿਰਾ)
 		    *lenp = retlen;
 	    }
 	    vim_free(tmp);
-	    break;
+	    ਰੋਕੋ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    int
-get_cellwidth(int c UNUSED)
+    ਪੂਰਨ
+get_cellwidth(ਪੂਰਨ c ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_EVAL
-    return cw_value(c);
-#else
-    return 0;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਵਾਪਸ cw_ਮੁੱਲ(c);
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ 0;
+#ਜੇ_ਅੰਤ
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 /*
  * Table set by setcellwidths().
  */
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    long    first;
-    long    last;
-    char    width;
+    ਲੰਮਾ    ਪਹਿਲਾ;
+    ਲੰਮਾ    ਆਖਰੀ;
+    ਅੱਖਰ    ਚੌੜਾਈ;
 } cw_interval_T;
 
-static cw_interval_T	*cw_table = NULL;
-static size_t		cw_table_size = 0;
+ਸਥਿਰ cw_interval_T	*cw_ਸਾਰਣੀ = ਨਿਰਾ;
+ਸਥਿਰ size_t		cw_ਸਾਰਣੀ_ਮਾਪ = 0;
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    static int
-cw_value(int c)
+    ਸਥਿਰ ਪੂਰਨ
+cw_ਮੁੱਲ(ਪੂਰਨ c)
 {
-    int mid, bot, top;
+    ਪੂਰਨ mid, bot, ਸਿਖਰ;
 
-    if (cw_table == NULL)
-	return 0;
+    ਜੇ (cw_ਸਾਰਣੀ == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
     // first quick check for Latin1 etc. characters
-    if (c < cw_table[0].first)
-	return 0;
+    ਜੇ (c < cw_ਸਾਰਣੀ[0].ਪਹਿਲਾ)
+	ਵਾਪਸ 0;
 
     // binary search in table
     bot = 0;
-    top = (int)cw_table_size - 1;
-    while (top >= bot)
+    ਸਿਖਰ = (ਪੂਰਨ)cw_ਸਾਰਣੀ_ਮਾਪ - 1;
+    ਜਦੋਂ (ਸਿਖਰ >= bot)
     {
-	mid = (bot + top) / 2;
-	if (cw_table[mid].last < c)
+	mid = (bot + ਸਿਖਰ) / 2;
+	ਜੇ (cw_ਸਾਰਣੀ[mid].ਆਖਰੀ < c)
 	    bot = mid + 1;
-	else if (cw_table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return cw_table[mid].width;
+	ਨਹੀਂਤਾਂ ਜੇ (cw_ਸਾਰਣੀ[mid].ਪਹਿਲਾ > c)
+	    ਸਿਖਰ = mid - 1;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ cw_ਸਾਰਣੀ[mid].ਚੌੜਾਈ;
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    static int
-tv_nr_compare(const void *a1, const void *a2)
+    ਸਥਿਰ ਪੂਰਨ
+tv_nr_compare(ਅਚਲ ਖਾਲੀ *a1, ਅਚਲ ਖਾਲੀ *a2)
 {
     listitem_T *li1 = *(listitem_T **)a1;
     listitem_T *li2 = *(listitem_T **)a2;
 
-    return li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
-	li1->li_tv.vval.v_number > li2->li_tv.vval.v_number ? 1 : -1;
+    ਵਾਪਸ li1->li_tv.vval.v_ਸੰਖਿਆ == li2->li_tv.vval.v_ਸੰਖਿਆ ? 0 :
+	li1->li_tv.vval.v_ਸੰਖਿਆ > li2->li_tv.vval.v_ਸੰਖਿਆ ? 1 : -1;
 }
 
-    void
-f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_setcellwidths(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     list_T	    *l;
     listitem_T	    *li;
-    int		    item;
-    int		    i;
+    ਪੂਰਨ		    ਵਸਤੂ;
+    ਪੂਰਨ		    i;
     listitem_T	    **ptrs;
-    cw_interval_T   *table = NULL;
-    size_t	    table_size;
-    cw_interval_T   *cw_table_save;
-    size_t	    cw_table_size_save;
-    char	    *error = NULL;
+    cw_interval_T   *ਸਾਰਣੀ = ਨਿਰਾ;
+    size_t	    ਸਾਰਣੀ_ਮਾਪ_2;
+    cw_interval_T   *cw_ਸਾਰਣੀ_save;
+    size_t	    cw_ਸਾਰਣੀ_ਮਾਪ_save;
+    ਅੱਖਰ	    *error = ਨਿਰਾ;
 
-    if (check_for_nonnull_list_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_nonnull_list_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     l = argvars[0].vval.v_list;
-    table_size = (size_t)l->lv_len;
-    if (table_size == 0)
+    ਸਾਰਣੀ_ਮਾਪ_2 = (size_t)l->lv_len;
+    ਜੇ (ਸਾਰਣੀ_ਮਾਪ_2 == 0)
 	// Clearing the table.
-	goto update;
+	ਜਾਓ update;
 
-    ptrs = ALLOC_MULT(listitem_T *, table_size);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(listitem_T *, ਸਾਰਣੀ_ਮਾਪ_2);
+    ਜੇ (ptrs == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Check that all entries are a list with three numbers, the range is
     // valid and the cell width is valid.
-    item = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    ਵਸਤੂ = 0;
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(l, li)
     {
 	listitem_T *lili;
 	varnumber_T n1;
 
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	ਜੇ (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == ਨਿਰਾ)
 	{
-	    semsg(_(e_list_item_nr_is_not_list), item);
+	    semsg(_(e_list_ਵਸਤੂ_nr_is_not_list), ਵਸਤੂ);
 	    vim_free(ptrs);
-	    return;
+	    ਵਾਪਸ;
 	}
 
-	lili = li->li_tv.vval.v_list->lv_first;
-	ptrs[item] = lili;
-	for (i = 0; lili != NULL; lili = lili->li_next, ++i)
+	lili = li->li_tv.vval.v_list->lv_ਪਹਿਲਾ;
+	ptrs[ਵਸਤੂ] = lili;
+	ਲਈ (i = 0; lili != ਨਿਰਾ; lili = lili->li_ਅਗਲਾ, ++i)
 	{
-	    if (lili->li_tv.v_type != VAR_NUMBER)
-		break;
-	    if (i == 0)
+	    ਜੇ (lili->li_tv.v_type != VAR_ਸੰਖਿਆ)
+		ਰੋਕੋ;
+	    ਜੇ (i == 0)
 	    {
-		n1 = lili->li_tv.vval.v_number;
-		if (n1 < 0x80)
+		n1 = lili->li_tv.vval.v_ਸੰਖਿਆ;
+		ਜੇ (n1 < 0x80)
 		{
-		    emsg(_(e_only_values_of_0x80_and_higher_supported));
+		    emsg(_(e_only_ਮੁੱਲਾਂ_ਦਾ_0x80_and_higher_supported));
 		    vim_free(ptrs);
-		    return;
+		    ਵਾਪਸ;
 		}
 	    }
-	    else if (i == 1 && lili->li_tv.vval.v_number < n1)
+	    ਨਹੀਂਤਾਂ ਜੇ (i == 1 && lili->li_tv.vval.v_ਸੰਖਿਆ < n1)
 	    {
-		semsg(_(e_list_item_nr_range_invalid), item);
+		semsg(_(e_list_ਵਸਤੂ_nr_range_invalid), ਵਸਤੂ);
 		vim_free(ptrs);
-		return;
+		ਵਾਪਸ;
 	    }
-	    else if (i == 2 && (lili->li_tv.vval.v_number < 1
-					     || lili->li_tv.vval.v_number > 2))
+	    ਨਹੀਂਤਾਂ ਜੇ (i == 2 && (lili->li_tv.vval.v_ਸੰਖਿਆ < 1
+					     || lili->li_tv.vval.v_ਸੰਖਿਆ > 2))
 	    {
-		semsg(_(e_list_item_nr_cell_width_invalid), item);
+		semsg(_(e_list_ਵਸਤੂ_nr_cell_ਚੌੜਾਈ_invalid), ਵਸਤੂ);
 		vim_free(ptrs);
-		return;
+		ਵਾਪਸ;
 	    }
 	}
-	if (i != 3)
+	ਜੇ (i != 3)
 	{
-	    semsg(_(e_list_item_nr_does_not_contain_3_numbers), item);
+	    semsg(_(e_list_ਵਸਤੂ_nr_does_not_contain_3_numbers), ਵਸਤੂ);
 	    vim_free(ptrs);
-	    return;
+	    ਵਾਪਸ;
 	}
-	++item;
+	++ਵਸਤੂ;
     }
 
     // Sort the list on the first number.
-    qsort((void *)ptrs, table_size, sizeof(listitem_T *), tv_nr_compare);
+    qsort((ਖਾਲੀ *)ptrs, ਸਾਰਣੀ_ਮਾਪ_2, ਆਕਾਰ(listitem_T *), tv_nr_compare);
 
-    table = ALLOC_MULT(cw_interval_T, table_size);
-    if (table == NULL)
+    ਸਾਰਣੀ = ALLOC_MULT(cw_interval_T, ਸਾਰਣੀ_ਮਾਪ_2);
+    ਜੇ (ਸਾਰਣੀ == ਨਿਰਾ)
     {
 	vim_free(ptrs);
-	return;
+	ਵਾਪਸ;
     }
 
     // Store the items in the new table.
-    for (item = 0; (size_t)item < table_size; ++item)
+    ਲਈ (ਵਸਤੂ = 0; (size_t)ਵਸਤੂ < ਸਾਰਣੀ_ਮਾਪ_2; ++ਵਸਤੂ)
     {
-	listitem_T	*lili = ptrs[item];
+	listitem_T	*lili = ptrs[ਵਸਤੂ];
 	varnumber_T	n1;
 
-	n1 = lili->li_tv.vval.v_number;
-	if (item > 0 && n1 <= table[item - 1].last)
+	n1 = lili->li_tv.vval.v_ਸੰਖਿਆ;
+	ਜੇ (ਵਸਤੂ > 0 && n1 <= ਸਾਰਣੀ[ਵਸਤੂ - 1].ਆਖਰੀ)
 	{
-	    semsg(_(e_overlapping_ranges_for_nr), (long)n1);
+	    semsg(_(e_overlapping_ranges_for_nr), (ਲੰਮਾ)n1);
 	    vim_free(ptrs);
-	    vim_free(table);
-	    return;
+	    vim_free(ਸਾਰਣੀ);
+	    ਵਾਪਸ;
 	}
-	table[item].first = n1;
-	lili = lili->li_next;
-	table[item].last = lili->li_tv.vval.v_number;
-	lili = lili->li_next;
-	table[item].width = lili->li_tv.vval.v_number;
+	ਸਾਰਣੀ[ਵਸਤੂ].ਪਹਿਲਾ = n1;
+	lili = lili->li_ਅਗਲਾ;
+	ਸਾਰਣੀ[ਵਸਤੂ].ਆਖਰੀ = lili->li_tv.vval.v_ਸੰਖਿਆ;
+	lili = lili->li_ਅਗਲਾ;
+	ਸਾਰਣੀ[ਵਸਤੂ].ਚੌੜਾਈ = lili->li_tv.vval.v_ਸੰਖਿਆ;
     }
 
     vim_free(ptrs);
 
 update:
-    cw_table_save = cw_table;
-    cw_table_size_save = cw_table_size;
-    cw_table = table;
-    cw_table_size = table_size;
+    cw_ਸਾਰਣੀ_save = cw_ਸਾਰਣੀ;
+    cw_ਸਾਰਣੀ_ਮਾਪ_save = cw_ਸਾਰਣੀ_ਮਾਪ;
+    cw_ਸਾਰਣੀ = ਸਾਰਣੀ;
+    cw_ਸਾਰਣੀ_ਮਾਪ = ਸਾਰਣੀ_ਮਾਪ_2;
 
     // Check that the new value does not conflict with 'listchars' or
     // 'fillchars'.
     error = check_chars_options();
-    if (error != NULL)
+    ਜੇ (error != ਨਿਰਾ)
     {
 	emsg(_(error));
-	cw_table = cw_table_save;
-	cw_table_size = cw_table_size_save;
-	vim_free(table);
-	return;
+	cw_ਸਾਰਣੀ = cw_ਸਾਰਣੀ_save;
+	cw_ਸਾਰਣੀ_ਮਾਪ = cw_ਸਾਰਣੀ_ਮਾਪ_save;
+	vim_free(ਸਾਰਣੀ);
+	ਵਾਪਸ;
     }
 
-    vim_free(cw_table_save);
-    changed_window_setting_all();
+    vim_free(cw_ਸਾਰਣੀ_save);
+    ਬਦਲਿਆ_ਖਿੜਕੀ_setting_all();
     redraw_all_later(UPD_CLEAR);
 }
 
-    void
-f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getcellwidths(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    for (size_t i = 0; i < cw_table_size; i++)
+    ਲਈ (size_t i = 0; i < cw_ਸਾਰਣੀ_ਮਾਪ; i++)
     {
-	list_T *entry = list_alloc();
-	if (entry == NULL)
-	    break;
-	if (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].last) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].width) == FAIL
-	   || list_append_list(rettv->vval.v_list, entry) == FAIL)
+	list_T *ਇੰਦਰਾਜ = list_alloc();
+	ਜੇ (ਇੰਦਰਾਜ == ਨਿਰਾ)
+	    ਰੋਕੋ;
+	ਜੇ (list_append_ਸੰਖਿਆ(ਇੰਦਰਾਜ, (varnumber_T)cw_ਸਾਰਣੀ[i].ਪਹਿਲਾ) == FAIL
+	   || list_append_ਸੰਖਿਆ(ਇੰਦਰਾਜ, (varnumber_T)cw_ਸਾਰਣੀ[i].ਆਖਰੀ) == FAIL
+	   || list_append_ਸੰਖਿਆ(ਇੰਦਰਾਜ, (varnumber_T)cw_ਸਾਰਣੀ[i].ਚੌੜਾਈ) == FAIL
+	   || list_append_list(rettv->vval.v_list, ਇੰਦਰਾਜ) == FAIL)
 	{
-	    list_free(entry);
-	    break;
+	    list_free(ਇੰਦਰਾਜ);
+	    ਰੋਕੋ;
 	}
     }
 }
 
-    void
-f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_charclass(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || argvars[0].vval.v_string == NULL)
-	return;
-    rettv->vval.v_number = mb_get_class(argvars[0].vval.v_string);
+    ਜੇ (check_for_string_arg(argvars, 0) == FAIL
+	    || argvars[0].vval.v_string == ਨਿਰਾ)
+	ਵਾਪਸ;
+    rettv->vval.v_ਸੰਖਿਆ = mb_get_class(argvars[0].vval.v_string);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * encoding options.
  */
     char_u *
-get_encoding_name(expand_T *xp UNUSED, int idx)
+get_encoding_name(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx >= (int)(sizeof(enc_canon_table) / sizeof(enc_canon_table[0])))
-	return NULL;
+    ਜੇ (idx >= (ਪੂਰਨ)(ਆਕਾਰ(enc_canon_ਸਾਰਣੀ) / ਆਕਾਰ(enc_canon_ਸਾਰਣੀ[0])))
+	ਵਾਪਸ ਨਿਰਾ;
 
-    return (char_u*)enc_canon_table[idx].name;
+    ਵਾਪਸ (char_u*)enc_canon_ਸਾਰਣੀ[idx].name;
 }

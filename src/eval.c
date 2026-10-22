@@ -10,65 +10,65 @@
 /*
  * eval.c: Expression evaluation.
  */
-#define USING_FLOAT_STUFF
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USING_FLOAT_STUFF
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 # include <float.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#define NAMESPACE_CHAR	(char_u *)"abglstvw"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NAMESPACE_CHAR	(char_u *)"abglstvw"
 
-static int eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
-static int eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9_leader(typval_T *rettv, int numeric_only, char_u *start_leader, char_u **end_leaderp);
+ਸਥਿਰ ਪੂਰਨ eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+ਸਥਿਰ ਪੂਰਨ eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ਪੂਰਨ want_string);
+ਸਥਿਰ ਪੂਰਨ eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ਪੂਰਨ want_string);
+ਸਥਿਰ ਪੂਰਨ eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ਪੂਰਨ want_string);
+ਸਥਿਰ ਪੂਰਨ eval9_leader(typval_T *rettv, ਪੂਰਨ numeric_only, char_u *ਸ਼ੁਰੂ_leader, char_u **ਸਿਰਾ_leaderp);
 
-static char_u *make_expanded_name(char_u *in_start, char_u *expr_start, char_u *expr_end, char_u *in_end);
+ਸਥਿਰ char_u *make_expanded_name(char_u *ਵਿੱਚ_ਸ਼ੁਰੂ, char_u *ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, char_u *ਵਿਅੰਜਕ_ਸਿਰਾ, char_u *ਵਿੱਚ_ਸਿਰਾ);
 
 /*
  * Return "n1" divided by "n2", taking care of dividing by zero.
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_divide(varnumber_T n1, varnumber_T n2, int *failed)
+ਅੰਕ_divide(varnumber_T n1, varnumber_T n2, ਪੂਰਨ *failed)
 {
-    varnumber_T	result;
+    varnumber_T	ਨਤੀਜਾ;
 
-    if (n2 == 0)
+    ਜੇ (n2 == 0)
     {
-	if (in_vim9script())
+	ਜੇ (ਵਿੱਚ_vim9script())
 	{
 	    emsg(_(e_divide_by_zero));
-	    if (failed != NULL)
+	    ਜੇ (failed != ਨਿਰਾ)
 		*failed = TRUE;
 	}
-	if (n1 == 0)
-	    result = VARNUM_MIN; // similar to NaN
-	else if (n1 < 0)
-	    result = -VARNUM_MAX;
-	else
-	    result = VARNUM_MAX;
+	ਜੇ (n1 == 0)
+	    ਨਤੀਜਾ = VARNUM_MIN; // similar to NaN
+	ਨਹੀਂਤਾਂ ਜੇ (n1 < 0)
+	    ਨਤੀਜਾ = -VARNUM_MAX;
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ = VARNUM_MAX;
     }
-    else if (n1 == VARNUM_MIN && n2 == -1)
+    ਨਹੀਂਤਾਂ ਜੇ (n1 == VARNUM_MIN && n2 == -1)
     {
 	// specific case: trying to do VARNUM_MIN / -1 results in a positive
 	// number that doesn't fit in varnumber_T and causes an FPE
-	result = VARNUM_MAX;
+	ਨਤੀਜਾ = VARNUM_MAX;
     }
-    else
-	result = n1 / n2;
+    ਨਹੀਂਤਾਂ
+	ਨਤੀਜਾ = n1 / n2;
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
@@ -76,30 +76,30 @@ num_divide(varnumber_T n1, varnumber_T n2, int *failed)
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_modulus(varnumber_T n1, varnumber_T n2, int *failed)
+ਅੰਕ_modulus(varnumber_T n1, varnumber_T n2, ਪੂਰਨ *failed)
 {
-    if (n2 == 0 && in_vim9script())
+    ਜੇ (n2 == 0 && ਵਿੱਚ_vim9script())
     {
 	emsg(_(e_divide_by_zero));
-	if (failed != NULL)
+	ਜੇ (failed != ਨਿਰਾ)
 	    *failed = TRUE;
     }
-    return (n2 == 0) ? 0 : (n1 % n2);
+    ਵਾਪਸ (n2 == 0) ? 0 : (n1 % n2);
 }
 
 /*
  * Initialize the global and v: variables.
  */
-    void
-eval_init(void)
+    ਖਾਲੀ
+eval_init(ਖਾਲੀ)
 {
     evalvars_init();
     func_init();
 }
 
-#if defined(EXITFREE)
-    void
-eval_clear(void)
+#ਜੇ defined(EXITFREE)
+    ਖਾਲੀ
+eval_clear(ਖਾਲੀ)
 {
     evalvars_clear();
     free_scriptnames();  // must come after evalvars_clear().
@@ -109,24 +109,24 @@ eval_clear(void)
     free_autoload_scriptnames();
 
     // unreferenced lists, tuples and dicts
-    (void)garbage_collect(FALSE);
+    (ਖਾਲੀ)garbage_collect(FALSE);
 
     // functions not garbage collected
     free_all_functions();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
+    ਖਾਲੀ
+fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, ਪੂਰਨ skip)
 {
     init_evalarg(evalarg);
     evalarg->eval_flags = skip ? 0 : EVAL_EVALUATE;
 
-    if (eap == NULL)
-	return;
+    ਜੇ (eap == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     evalarg->eval_cstack = eap->cstack;
-    if (sourcing_a_script(eap) || eap->ea_getline == get_list_line)
+    ਜੇ (sourcing_a_script(eap) || eap->ea_getline == get_list_ਸਤਰ)
     {
 	evalarg->eval_getline = eap->ea_getline;
 	evalarg->eval_cookie = eap->cookie;
@@ -139,87 +139,87 @@ fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
  * Sets "error" to TRUE if there was an error.
  * Return TRUE or FALSE.
  */
-    int
-eval_to_bool(
+    ਪੂਰਨ
+eval_ਮੰਜ਼ਿਲ_bool(
     char_u	*arg,
-    int		*error,
+    ਪੂਰਨ		*error,
     exarg_T	*eap,
-    int		skip,	    // only parse, don't execute
-    int		use_simple_function)
+    ਪੂਰਨ		skip,	    // only parse, don't execute
+    ਪੂਰਨ		use_simple_function)
 {
     typval_T	tv;
     varnumber_T	retval = FALSE;
     evalarg_T	evalarg;
-    int		r;
+    ਪੂਰਨ		r;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
 
-    if (skip)
+    ਜੇ (skip)
 	++emsg_skip;
-    if (use_simple_function)
+    ਜੇ (use_simple_function)
 	r = eval0_simple_funccal(arg, &tv, eap, &evalarg);
-    else
+    ਨਹੀਂਤਾਂ
 	r = eval0(arg, &tv, eap, &evalarg);
-    if (r == FAIL)
+    ਜੇ (r == FAIL)
 	*error = TRUE;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	*error = FALSE;
-	if (!skip)
+	ਜੇ (!skip)
 	{
-	    if (in_vim9script())
+	    ਜੇ (ਵਿੱਚ_vim9script())
 		retval = tv_get_bool_chk(&tv, error);
-	    else
-		retval = (tv_get_number_chk(&tv, error) != 0);
+	    ਨਹੀਂਤਾਂ
+		retval = (tv_get_ਸੰਖਿਆ_chk(&tv, error) != 0);
 	    clear_tv(&tv);
 	}
     }
-    if (skip)
+    ਜੇ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return (int)retval;
+    ਵਾਪਸ (ਪੂਰਨ)retval;
 }
 
 /*
  * Call eval1() and give an error message if not done at a lower level.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval1_emsg(char_u **arg, typval_T *rettv, exarg_T *eap)
 {
-    char_u	*start = *arg;
-    int		ret;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    char_u	*ਸ਼ੁਰੂ = *arg;
+    ਪੂਰਨ		ret;
+    ਪੂਰਨ		did_emsg_before = did_emsg;
+    ਪੂਰਨ		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ਨਿਰਾ && eap->skip);
 
     ret = eval1(arg, rettv, &evalarg);
-    if (ret == FAIL)
+    ਜੇ (ret == FAIL)
     {
 	// Report the invalid expression unless the expression evaluation has
 	// been cancelled due to an aborting error, an interrupt, or an
 	// exception, or we already gave a more specific error.
 	// Also check called_emsg for when using assert_fails().
-	if (!aborting() && did_emsg == did_emsg_before
+	ਜੇ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
-	    semsg(_(e_invalid_expression_str), start);
+	    semsg(_(e_invalid_ਵਿਅੰਜਕ_str), ਸ਼ੁਰੂ);
     }
     clear_evalarg(&evalarg, eap);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Return whether a typval is a valid expression to pass to eval_expr_typval()
  * or eval_expr_to_bool().  An empty string returns FALSE;
  */
-    int
-eval_expr_valid_arg(typval_T *tv)
+    ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_valid_arg(typval_T *tv)
 {
-    return tv->v_type != VAR_UNKNOWN
+    ਵਾਪਸ tv->v_type != VAR_UNKNOWN
 	    && (tv->v_type != VAR_STRING
-		  || (tv->vval.v_string != NULL && *tv->vval.v_string != NUL));
+		  || (tv->vval.v_string != ਨਿਰਾ && *tv->vval.v_string != NUL));
 }
 
 /*
@@ -228,19 +228,19 @@ eval_expr_valid_arg(typval_T *tv)
  * When returning non-NULL remove_funccal() must be called later.
  */
     funccall_T *
-eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
+eval_ਵਿਅੰਜਕ_get_funccal(typval_T *ਵਿਅੰਜਕ, typval_T *rettv)
 {
-    if (expr->v_type != VAR_PARTIAL)
-	return NULL;
+    ਜੇ (ਵਿਅੰਜਕ->v_type != VAR_PARTIAL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    partial_T *partial = expr->vval.v_partial;
-    if (partial == NULL)
-	return NULL;
-    if (partial->pt_func == NULL
-	    || partial->pt_func->uf_def_status == UF_NOT_COMPILED)
-	return NULL;
+    partial_T *partial = ਵਿਅੰਜਕ->vval.v_partial;
+    ਜੇ (partial == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (partial->pt_func == ਨਿਰਾ
+	    || partial->pt_func->uf_def_ਸਥਿਤੀ == UF_NOT_COMPILED)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    return create_funccal(partial->pt_func, rettv);
+    ਵਾਪਸ create_funccal(partial->pt_func, rettv);
 }
 
 /*
@@ -249,55 +249,55 @@ eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_partial(
-    typval_T	*expr,
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_partial(
+    typval_T	*ਵਿਅੰਜਕ,
     typval_T	*argv,
-    int		argc,
+    ਪੂਰਨ		argc,
     funccall_T	*fc_arg,
     typval_T	*rettv)
 {
-    partial_T	*partial = expr->vval.v_partial;
+    partial_T	*partial = ਵਿਅੰਜਕ->vval.v_partial;
 
-    if (partial == NULL)
-	return FAIL;
+    ਜੇ (partial == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    if (partial->pt_func != NULL
-			&& partial->pt_func->uf_def_status != UF_NOT_COMPILED)
+    ਜੇ (partial->pt_func != ਨਿਰਾ
+			&& partial->pt_func->uf_def_ਸਥਿਤੀ != UF_NOT_COMPILED)
     {
-	funccall_T	*fc = fc_arg != NULL ? fc_arg
+	funccall_T	*fc = fc_arg != ਨਿਰਾ ? fc_arg
 				: create_funccal(partial->pt_func, rettv);
-	int		r;
+	ਪੂਰਨ		r;
 
-	if (fc == NULL)
-	    return FAIL;
+	ਜੇ (fc == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
 	// Shortcut to call a compiled function with minimal overhead.
-	if (partial->pt_obj != NULL)
+	ਜੇ (partial->pt_obj != ਨਿਰਾ)
 	    partial->pt_obj->obj_refcount++;
 	r = call_def_function(partial->pt_func, argc, argv, DEF_USE_PT_ARGV,
 					partial, partial->pt_obj, fc, rettv);
-	if (fc_arg == NULL)
+	ਜੇ (fc_arg == ਨਿਰਾ)
 	    remove_funccal();
-	if (r == FAIL)
-	    return FAIL;
+	ਜੇ (r == FAIL)
+	    ਵਾਪਸ FAIL;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	char_u		*s = partial_name(partial);
 	funcexe_T	funcexe;
 
-	if (s == NULL || *s == NUL)
-	    return FAIL;
+	ਜੇ (s == ਨਿਰਾ || *s == NUL)
+	    ਵਾਪਸ FAIL;
 
-	CLEAR_FIELD(funcexe);
+	CLEAR_ਖੇਤਰ(funcexe);
 	funcexe.fe_evaluate = TRUE;
 	funcexe.fe_partial = partial;
-	if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	    return FAIL;
+	ਜੇ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	    ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -305,60 +305,60 @@ eval_expr_partial(
  * Pass arguments "argv[argc]".
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_func(
-    typval_T	*expr,
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_func(
+    typval_T	*ਵਿਅੰਜਕ,
     typval_T	*argv,
-    int		argc,
+    ਪੂਰਨ		argc,
     typval_T	*rettv)
 {
     funcexe_T	funcexe;
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (expr->v_type == VAR_FUNC)
-	s = expr->vval.v_string;
-    else
-	s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL || *s == NUL)
-	return FAIL;
+    ਜੇ (ਵਿਅੰਜਕ->v_type == VAR_FUNC)
+	s = ਵਿਅੰਜਕ->vval.v_string;
+    ਨਹੀਂਤਾਂ
+	s = tv_get_string_buf_chk_strict(ਵਿਅੰਜਕ, buf, ਵਿੱਚ_vim9script());
+    ਜੇ (s == ਨਿਰਾ || *s == NUL)
+	ਵਾਪਸ FAIL;
 
-    CLEAR_FIELD(funcexe);
+    CLEAR_ਖੇਤਰ(funcexe);
     funcexe.fe_evaluate = TRUE;
-    if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	return FAIL;
+    ਜੇ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Evaluate an expression, which is a string.
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_string(
-    typval_T	*expr,
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_string(
+    typval_T	*ਵਿਅੰਜਕ,
     typval_T	*rettv)
 {
     char_u	*s;
     char_u	buf[NUMBUFLEN];
 
-    s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL)
-	return FAIL;
+    s = tv_get_string_buf_chk_strict(ਵਿਅੰਜਕ, buf, ਵਿੱਚ_vim9script());
+    ਜੇ (s == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     s = skipwhite(s);
-    if (eval1_emsg(&s, rettv, NULL) == FAIL)
-	return FAIL;
+    ਜੇ (eval1_emsg(&s, rettv, ਨਿਰਾ) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    if (*skipwhite(s) != NUL)  // check for trailing chars after expr
+    ਜੇ (*skipwhite(s) != NUL)  // check for trailing chars after expr
     {
 	clear_tv(rettv);
-	semsg(_(e_invalid_expression_str), s);
-	return FAIL;
+	semsg(_(e_invalid_ਵਿਅੰਜਕ_str), s);
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -368,43 +368,43 @@ eval_expr_string(
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    int
-eval_expr_typval(
-	typval_T    *expr,
-	int	    want_func,
+    ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_typval(
+	typval_T    *ਵਿਅੰਜਕ,
+	ਪੂਰਨ	    want_func,
 	typval_T    *argv,
-	int	    argc,
+	ਪੂਰਨ	    argc,
 	funccall_T  *fc_arg,
 	typval_T    *rettv)
 {
-    if (expr->v_type == VAR_PARTIAL)
-	return eval_expr_partial(expr, argv, argc, fc_arg, rettv);
-    if (expr->v_type == VAR_INSTR)
-	return exe_typval_instr(expr, rettv);
-    if (expr->v_type == VAR_FUNC || want_func)
-	return eval_expr_func(expr, argv, argc, rettv);
+    ਜੇ (ਵਿਅੰਜਕ->v_type == VAR_PARTIAL)
+	ਵਾਪਸ eval_ਵਿਅੰਜਕ_partial(ਵਿਅੰਜਕ, argv, argc, fc_arg, rettv);
+    ਜੇ (ਵਿਅੰਜਕ->v_type == VAR_INSTR)
+	ਵਾਪਸ exe_typval_instr(ਵਿਅੰਜਕ, rettv);
+    ਜੇ (ਵਿਅੰਜਕ->v_type == VAR_FUNC || want_func)
+	ਵਾਪਸ eval_ਵਿਅੰਜਕ_func(ਵਿਅੰਜਕ, argv, argc, rettv);
 
-    return eval_expr_string(expr, rettv);
+    ਵਾਪਸ eval_ਵਿਅੰਜਕ_string(ਵਿਅੰਜਕ, rettv);
 }
 
 /*
  * Like eval_to_bool() but using a typval_T instead of a string.
  * Works for string, funcref and partial.
  */
-    int
-eval_expr_to_bool(typval_T *expr, int *error)
+    ਪੂਰਨ
+eval_ਵਿਅੰਜਕ_ਮੰਜ਼ਿਲ_bool(typval_T *ਵਿਅੰਜਕ, ਪੂਰਨ *error)
 {
     typval_T	rettv;
-    int		res;
+    ਪੂਰਨ		res;
 
-    if (eval_expr_typval(expr, FALSE, NULL, 0, NULL, &rettv) == FAIL)
+    ਜੇ (eval_ਵਿਅੰਜਕ_typval(ਵਿਅੰਜਕ, FALSE, ਨਿਰਾ, 0, ਨਿਰਾ, &rettv) == FAIL)
     {
 	*error = TRUE;
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
     res = (tv_get_bool_chk(&rettv, error) != 0);
     clear_tv(&rettv);
-    return res;
+    ਵਾਪਸ res;
 }
 
 /*
@@ -413,74 +413,74 @@ eval_expr_to_bool(typval_T *expr, int *error)
  * pointer to allocated memory, or NULL for failure or when "skip" is TRUE.
  */
     char_u *
-eval_to_string_skip(
+eval_ਮੰਜ਼ਿਲ_string_skip(
     char_u	*arg,
     exarg_T	*eap,
-    int		skip)	    // only parse, don't execute
+    ਪੂਰਨ		skip)	    // only parse, don't execute
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
-    if (skip)
+    ਜੇ (skip)
 	++emsg_skip;
-    if (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
-	retval = NULL;
-    else
+    ਜੇ (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
+	retval = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ
     {
 	retval = vim_strsave(tv_get_string(&tv));
 	clear_tv(&tv);
     }
-    if (skip)
+    ਜੇ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Initialize "evalarg" for use.
  */
-    void
+    ਖਾਲੀ
 init_evalarg(evalarg_T *evalarg)
 {
-    CLEAR_POINTER(evalarg);
-    ga_init2(&evalarg->eval_tofree_ga, sizeof(char_u *), 20);
+    CLEAR_ਸੂਚਕ(evalarg);
+    ga_init2(&evalarg->eval_tofree_ga, ਆਕਾਰ(char_u *), 20);
 }
 
 /*
  * If "evalarg->eval_tofree" is not NULL free it later.
  * Caller is expected to overwrite "evalarg->eval_tofree" next.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 free_eval_tofree_later(evalarg_T *evalarg)
 {
-    if (evalarg->eval_tofree == NULL)
-	return;
+    ਜੇ (evalarg->eval_tofree == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
-	((char_u **)evalarg->eval_tofree_ga.ga_data)
+    ਜੇ (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
+	((char_u **)evalarg->eval_tofree_ga.ga_ਅੰਕੜੇ)
 	    [evalarg->eval_tofree_ga.ga_len++]
 	    = evalarg->eval_tofree;
-    else
+    ਨਹੀਂਤਾਂ
 	vim_free(evalarg->eval_tofree);
 }
 
 /*
  * After using "evalarg" filled from "eap": free the memory.
  */
-    void
+    ਖਾਲੀ
 clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 {
-    if (evalarg == NULL)
-	return;
+    ਜੇ (evalarg == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     garray_T *etga = &evalarg->eval_tofree_ga;
 
-    if (evalarg->eval_tofree != NULL || evalarg->eval_using_cmdline)
+    ਜੇ (evalarg->eval_tofree != ਨਿਰਾ || evalarg->eval_using_cmdline)
     {
-	if (eap != NULL)
+	ਜੇ (eap != ਨਿਰਾ)
 	{
 	    // We may need to keep the original command line, e.g. for
 	    // ":let" it has the variable names.  But we may also need
@@ -488,23 +488,23 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 	    vim_free(eap->cmdline_tofree);
 	    eap->cmdline_tofree = *eap->cmdlinep;
 
-	    if (evalarg->eval_using_cmdline && etga->ga_len > 0)
+	    ਜੇ (evalarg->eval_using_cmdline && etga->ga_len > 0)
 	    {
 		// "nextcmd" points into the last line in eval_tofree_ga,
 		// need to keep it around.
 		--etga->ga_len;
-		*eap->cmdlinep = ((char_u **)etga->ga_data)[etga->ga_len];
+		*eap->cmdlinep = ((char_u **)etga->ga_ਅੰਕੜੇ)[etga->ga_len];
 		vim_free(evalarg->eval_tofree);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		*eap->cmdlinep = evalarg->eval_tofree;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    vim_free(evalarg->eval_tofree);
-	evalarg->eval_tofree = NULL;
+	evalarg->eval_tofree = ਨਿਰਾ;
     }
 
-    ga_clear_strings(etga);
+    ga_clear_ਲੜੀਆਂ(etga);
     VIM_CLEAR(evalarg->eval_tofree_lambda);
 }
 
@@ -512,13 +512,13 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
  * Skip over an expression at "*pp".
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr(char_u **pp, evalarg_T *evalarg)
+    ਪੂਰਨ
+skip_ਵਿਅੰਜਕ(char_u **pp, evalarg_T *evalarg)
 {
     typval_T	rettv;
 
     *pp = skipwhite(*pp);
-    return eval1(pp, &rettv, evalarg);
+    ਵਾਪਸ eval1(pp, &rettv, evalarg);
 }
 
 /*
@@ -530,94 +530,94 @@ skip_expr(char_u **pp, evalarg_T *evalarg)
  * Also when the expression is copied to allocated memory.
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr_concatenate(
+    ਪੂਰਨ
+skip_ਵਿਅੰਜਕ_concatenate(
 	char_u	    **arg,
-	char_u	    **start,
-	char_u	    **end,
+	char_u	    **ਸ਼ੁਰੂ,
+	char_u	    **ਸਿਰਾ,
 	evalarg_T   *evalarg)
 {
     typval_T	rettv;
-    int		res;
-    int		vim9script = in_vim9script();
-    garray_T    *gap = evalarg == NULL ? NULL : &evalarg->eval_ga;
-    garray_T    *freegap = evalarg == NULL ? NULL : &evalarg->eval_freega;
-    int		save_flags = evalarg == NULL ? 0 : evalarg->eval_flags;
-    int		evaluate = evalarg == NULL
+    ਪੂਰਨ		res;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
+    garray_T    *gap = evalarg == ਨਿਰਾ ? ਨਿਰਾ : &evalarg->eval_ga;
+    garray_T    *freegap = evalarg == ਨਿਰਾ ? ਨਿਰਾ : &evalarg->eval_freega;
+    ਪੂਰਨ		save_flags = evalarg == ਨਿਰਾ ? 0 : evalarg->eval_flags;
+    ਪੂਰਨ		evaluate = evalarg == ਨਿਰਾ
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    if (vim9script && evaluate
-	       && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    ਜੇ (vim9script && evaluate
+	       && (evalarg->eval_cookie != ਨਿਰਾ || evalarg->eval_cctx != ਨਿਰਾ))
     {
-	ga_init2(gap, sizeof(char_u *), 10);
+	ga_init2(gap, ਆਕਾਰ(char_u *), 10);
 	// leave room for "start"
-	if (ga_grow(gap, 1) == OK)
+	ਜੇ (ga_grow(gap, 1) == OK)
 	    ++gap->ga_len;
-	ga_init2(freegap, sizeof(char_u *), 10);
+	ga_init2(freegap, ਆਕਾਰ(char_u *), 10);
     }
-    *start = *arg;
+    *ਸ਼ੁਰੂ = *arg;
 
     // Don't evaluate the expression.
-    if (evalarg != NULL)
+    ਜੇ (evalarg != ਨਿਰਾ)
 	evalarg->eval_flags &= ~EVAL_EVALUATE;
     *arg = skipwhite(*arg);
     res = eval1(arg, &rettv, evalarg);
-    *end = *arg;
-    if (evalarg != NULL)
+    *ਸਿਰਾ = *arg;
+    ਜੇ (evalarg != ਨਿਰਾ)
 	evalarg->eval_flags = save_flags;
 
-    if (vim9script && evaluate
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    ਜੇ (vim9script && evaluate
+	    && (evalarg->eval_cookie != ਨਿਰਾ || evalarg->eval_cctx != ਨਿਰਾ))
     {
-	if (evalarg->eval_ga.ga_len == 1)
+	ਜੇ (evalarg->eval_ga.ga_len == 1)
 	{
 	    // just the one line, no need to concatenate
 	    ga_clear(gap);
 	    gap->ga_itemsize = 0;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    char_u	    *p;
 	    size_t	    endoff = STRLEN(*arg);
 
 	    // Line breaks encountered, concatenate all the lines.
-	    *((char_u **)gap->ga_data) = *start;
-	    p = ga_concat_strings(gap, " ");
+	    *((char_u **)gap->ga_ਅੰਕੜੇ) = *ਸ਼ੁਰੂ;
+	    p = ga_concat_ਲੜੀਆਂ(gap, " ");
 
 	    // free the lines only when using getsourceline()
-	    if (evalarg->eval_cookie != NULL)
+	    ਜੇ (evalarg->eval_cookie != ਨਿਰਾ)
 	    {
 		// Do not free the first line, the caller can still use it.
-		*((char_u **)gap->ga_data) = NULL;
+		*((char_u **)gap->ga_ਅੰਕੜੇ) = ਨਿਰਾ;
 		// Do not free the last line, "arg" points into it, free it
 		// later.  Also free "eval_tofree" later if needed.
 		free_eval_tofree_later(evalarg);
 		evalarg->eval_tofree =
-				    ((char_u **)gap->ga_data)[gap->ga_len - 1];
-		((char_u **)gap->ga_data)[gap->ga_len - 1] = NULL;
-		ga_clear_strings(gap);
+				    ((char_u **)gap->ga_ਅੰਕੜੇ)[gap->ga_len - 1];
+		((char_u **)gap->ga_ਅੰਕੜੇ)[gap->ga_len - 1] = ਨਿਰਾ;
+		ga_clear_ਲੜੀਆਂ(gap);
 		ga_clear(freegap);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		ga_clear(gap);
 
 		// free lines that were explicitly marked for freeing
-		ga_clear_strings(freegap);
+		ga_clear_ਲੜੀਆਂ(freegap);
 	    }
 
 	    gap->ga_itemsize = 0;
-	    if (p == NULL)
-		return FAIL;
-	    *start = p;
+	    ਜੇ (p == ਨਿਰਾ)
+		ਵਾਪਸ FAIL;
+	    *ਸ਼ੁਰੂ = p;
 	    vim_free(evalarg->eval_tofree_lambda);
 	    evalarg->eval_tofree_lambda = p;
 	    // Compute "end" relative to the end.
-	    *end = *start + STRLEN(*start) - endoff;
+	    *ਸਿਰਾ = *ਸ਼ੁਰੂ + STRLEN(*ਸ਼ੁਰੂ) - endoff;
 	}
     }
 
-    return res;
+    ਵਾਪਸ res;
 }
 
 /*
@@ -626,42 +626,42 @@ skip_expr_concatenate(
  * Returns an allocated string (NULL when out of memory).
  */
     char_u *
-typval2string(typval_T *tv, int join_list)
+typval2string(typval_T *tv, ਪੂਰਨ join_list)
 {
     garray_T	ga;
-    char_u	*retval = NULL;
+    char_u	*retval = ਨਿਰਾ;
 
-    if (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
+    ਜੇ (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
     {
-	if (tv->v_type == VAR_LIST)
+	ਜੇ (tv->v_type == VAR_LIST)
 	{
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_list != NULL)
+	    ga_init2(&ga, ਆਕਾਰ(ਅੱਖਰ), 80);
+	    ਜੇ (tv->vval.v_list != ਨਿਰਾ)
 	    {
 		list_join(&ga, tv->vval.v_list, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (tv->vval.v_list->lv_len > 0)
+		ਜੇ (tv->vval.v_list->lv_len > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
-	    retval = (char_u *)ga.ga_data;
+	    retval = (char_u *)ga.ga_ਅੰਕੜੇ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // tuple
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_tuple != NULL)
+	    ga_init2(&ga, ਆਕਾਰ(ਅੱਖਰ), 80);
+	    ਜੇ (tv->vval.v_tuple != ਨਿਰਾ)
 	    {
 		tuple_join(&ga, tv->vval.v_tuple, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (TUPLE_LEN(tv->vval.v_tuple) > 0)
+		ਜੇ (TUPLE_LEN(tv->vval.v_tuple) > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
-	    retval = (char_u *)ga.ga_data;
+	    retval = (char_u *)ga.ga_ਅੰਕੜੇ;
 	}
     }
-    else if (tv->v_type == VAR_LIST
+    ਨਹੀਂਤਾਂ ਜੇ (tv->v_type == VAR_LIST
 	    || tv->v_type == VAR_TUPLE
 	    || tv->v_type == VAR_DICT)
     {
@@ -670,12 +670,12 @@ typval2string(typval_T *tv, int join_list)
 
 	retval = tv2string(tv, &tofree, numbuf, 0);
 	// Make a copy if we have a value but it's not in allocated memory.
-	if (retval != NULL && tofree == NULL)
+	ਜੇ (retval != ਨਿਰਾ && tofree == ਨਿਰਾ)
 	    retval = vim_strsave(retval);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	retval = vim_strsave(tv_get_string(tv));
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -686,41 +686,41 @@ typval2string(typval_T *tv, int join_list)
  * Return pointer to allocated memory, or NULL for failure.
  */
     char_u *
-eval_to_string_eap(
+eval_ਮੰਜ਼ਿਲ_string_eap(
     char_u	*arg,
-    int		join_list,
+    ਪੂਰਨ		join_list,
     exarg_T	*eap,
-    int		use_simple_function)
+    ਪੂਰਨ		use_simple_function)
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
-    int		r;
+    ਪੂਰਨ		r;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
-    if (use_simple_function)
-	r = eval0_simple_funccal(arg, &tv, NULL, &evalarg);
-    else
-	r = eval0(arg, &tv, NULL, &evalarg);
-    if (r == FAIL)
-	retval = NULL;
-    else
+    fill_evalarg_from_eap(&evalarg, eap, eap != ਨਿਰਾ && eap->skip);
+    ਜੇ (use_simple_function)
+	r = eval0_simple_funccal(arg, &tv, ਨਿਰਾ, &evalarg);
+    ਨਹੀਂਤਾਂ
+	r = eval0(arg, &tv, ਨਿਰਾ, &evalarg);
+    ਜੇ (r == FAIL)
+	retval = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ
     {
 	retval = typval2string(&tv, join_list);
 	clear_tv(&tv);
     }
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ਨਿਰਾ);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
     char_u *
-eval_to_string(
+eval_ਮੰਜ਼ਿਲ_string(
     char_u	*arg,
-    int		join_list,
-    int		use_simple_function)
+    ਪੂਰਨ		join_list,
+    ਪੂਰਨ		use_simple_function)
 {
-    return eval_to_string_eap(arg, join_list, NULL, use_simple_function);
+    ਵਾਪਸ eval_ਮੰਜ਼ਿਲ_string_eap(arg, join_list, ਨਿਰਾ, use_simple_function);
 }
 
 /*
@@ -729,32 +729,32 @@ eval_to_string(
  * Use legacy Vim script syntax.
  */
     char_u *
-eval_to_string_safe(
+eval_ਮੰਜ਼ਿਲ_string_ਸੁਰੱਖਿਅਤ(
     char_u	*arg,
-    int		use_sandbox,
-    int		keep_script_version,
-    int		use_simple_function)
+    ਪੂਰਨ		use_sandbox,
+    ਪੂਰਨ		keep_script_ਸੰਸਕਰਣ,
+    ਪੂਰਨ		use_simple_function)
 {
     char_u	*retval;
-    funccal_entry_T funccal_entry;
-    int		save_sc_version = current_sctx.sc_version;
-    int		save_garbage = may_garbage_collect;
+    funccal_ਇੰਦਰਾਜ_T funccal_ਇੰਦਰਾਜ;
+    ਪੂਰਨ		save_sc_ਸੰਸਕਰਣ = current_sctx.sc_ਸੰਸਕਰਣ;
+    ਪੂਰਨ		save_garbage = may_garbage_collect;
 
-    if (!keep_script_version)
-	current_sctx.sc_version = 1;
-    save_funccal(&funccal_entry);
-    if (use_sandbox)
+    ਜੇ (!keep_script_ਸੰਸਕਰਣ)
+	current_sctx.sc_ਸੰਸਕਰਣ = 1;
+    save_funccal(&funccal_ਇੰਦਰਾਜ);
+    ਜੇ (use_sandbox)
 	++sandbox;
     ++textlock;
     may_garbage_collect = FALSE;
-    retval = eval_to_string(arg, FALSE, use_simple_function);
-    if (use_sandbox)
+    retval = eval_ਮੰਜ਼ਿਲ_string(arg, FALSE, use_simple_function);
+    ਜੇ (use_sandbox)
 	--sandbox;
     --textlock;
     may_garbage_collect = save_garbage;
     restore_funccal();
-    current_sctx.sc_version = save_sc_version;
-    return retval;
+    current_sctx.sc_ਸੰਸਕਰਣ = save_sc_ਸੰਸਕਰਣ;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -763,29 +763,29 @@ eval_to_string_safe(
  * Returns -1 for an error.
  */
     varnumber_T
-eval_to_number(char_u *expr, int use_simple_function)
+eval_ਮੰਜ਼ਿਲ_ਸੰਖਿਆ(char_u *ਵਿਅੰਜਕ, ਪੂਰਨ use_simple_function)
 {
     typval_T	rettv;
     varnumber_T	retval;
-    char_u	*p = skipwhite(expr);
-    int		r = NOTDONE;
+    char_u	*p = skipwhite(ਵਿਅੰਜਕ);
+    ਪੂਰਨ		r = NOTDONE;
 
     ++emsg_off;
 
-    if (use_simple_function)
-	r = may_call_simple_func(expr, &rettv);
-    if (r == NOTDONE)
+    ਜੇ (use_simple_function)
+	r = may_call_simple_func(ਵਿਅੰਜਕ, &rettv);
+    ਜੇ (r == NOTDONE)
 	r = eval1(&p, &rettv, &EVALARG_EVALUATE);
-    if (r == FAIL)
+    ਜੇ (r == FAIL)
 	retval = -1;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	retval = tv_get_number_chk(&rettv, NULL);
+	retval = tv_get_ਸੰਖਿਆ_chk(&rettv, ਨਿਰਾ);
 	clear_tv(&rettv);
     }
     --emsg_off;
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -794,35 +794,35 @@ eval_to_number(char_u *expr, int use_simple_function)
  * Returns NULL when there is an error.
  */
     typval_T *
-eval_expr(char_u *arg, exarg_T *eap)
+eval_ਵਿਅੰਜਕ(char_u *arg, exarg_T *eap)
 {
-    return eval_expr_ext(arg, eap, FALSE);
+    ਵਾਪਸ eval_ਵਿਅੰਜਕ_ext(arg, eap, FALSE);
 }
 
     typval_T *
-eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
+eval_ਵਿਅੰਜਕ_ext(char_u *arg, exarg_T *eap, ਪੂਰਨ use_simple_function)
 {
     typval_T	*tv;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ਨਿਰਾ && eap->skip);
 
     tv = ALLOC_ONE(typval_T);
-    if (tv != NULL)
+    ਜੇ (tv != ਨਿਰਾ)
     {
-	int	r = NOTDONE;
+	ਪੂਰਨ	r = NOTDONE;
 
-	if (use_simple_function)
+	ਜੇ (use_simple_function)
 	    r = eval0_simple_funccal(arg, tv, eap, &evalarg);
-	if (r == NOTDONE)
+	ਜੇ (r == NOTDONE)
 	    r = eval0(arg, tv, eap, &evalarg);
 
-	if (r == FAIL)
+	ਜੇ (r == FAIL)
 	    VIM_CLEAR(tv);
     }
 
     clear_evalarg(&evalarg, eap);
-    return tv;
+    ਵਾਪਸ tv;
 }
 
 /*
@@ -832,78 +832,78 @@ eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
  * If "verbose" is FALSE no errors are given.
  * Return NULL for any failure.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 deref_function_name(
 	    char_u	**arg,
 	    char_u	**tofree,
 	    evalarg_T	*evalarg,
-	    int		verbose)
+	    ਪੂਰਨ		verbose)
 {
     typval_T	ref;
     char_u	*name = *arg;
-    int		save_flags = 0;
-    int		evaluate = evalarg != NULL
+    ਪੂਰਨ		save_flags = 0;
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     ref.v_type = VAR_UNKNOWN;
-    if (evalarg != NULL)
+    ਜੇ (evalarg != ਨਿਰਾ)
     {
 	// need to evaluate this to get an import, like in "a.Func"
 	save_flags = evalarg->eval_flags;
 	evalarg->eval_flags |= EVAL_EVALUATE;
     }
-    if (eval9(arg, &ref, evalarg, FALSE) == FAIL)
+    ਜੇ (eval9(arg, &ref, evalarg, FALSE) == FAIL)
     {
 	dictitem_T	*v;
 
 	// If <SID>VarName was used it would not be found, try another way.
-	v = find_var_also_in_script(name, NULL, FALSE);
-	if (v == NULL)
+	v = ਲੱਭੋ_var_also_ਵਿੱਚ_script(name, ਨਿਰਾ, FALSE);
+	ਜੇ (v == ਨਿਰਾ)
 	{
-	    name = NULL;
-	    goto theend;
+	    name = ਨਿਰਾ;
+	    ਜਾਓ theend;
 	}
 	copy_tv(&v->di_tv, &ref);
     }
-    if (*skipwhite(*arg) != NUL)
+    ਜੇ (*skipwhite(*arg) != NUL)
     {
-	if (verbose)
+	ਜੇ (verbose)
 	    semsg(_(e_trailing_characters_str), *arg);
-	name = NULL;
+	name = ਨਿਰਾ;
     }
-    else if (ref.v_type == VAR_FUNC && ref.vval.v_string != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (ref.v_type == VAR_FUNC && ref.vval.v_string != ਨਿਰਾ)
     {
 	name = ref.vval.v_string;
-	ref.vval.v_string = NULL;
+	ref.vval.v_string = ਨਿਰਾ;
 	*tofree = name;
     }
-    else if (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != ਨਿਰਾ)
     {
-	if (ref.vval.v_partial->pt_argc > 0
-		|| ref.vval.v_partial->pt_dict != NULL)
+	ਜੇ (ref.vval.v_partial->pt_argc > 0
+		|| ref.vval.v_partial->pt_dict != ਨਿਰਾ)
 	{
-	    if (verbose)
-		emsg(_(e_cannot_use_partial_here));
-	    name = NULL;
+	    ਜੇ (verbose)
+		emsg(_(e_cannot_use_partial_ਇੱਥੇ));
+	    name = ਨਿਰਾ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    name = vim_strsave(partial_name(ref.vval.v_partial));
 	    *tofree = name;
 	}
     }
-    else if (evaluate)
+    ਨਹੀਂਤਾਂ ਜੇ (evaluate)
     {
-	if (verbose)
+	ਜੇ (verbose)
 	    semsg(_(e_not_callable_type_str), name);
-	name = NULL;
+	name = ਨਿਰਾ;
     }
 
 theend:
     clear_tv(&ref);
-    if (evalarg != NULL)
+    ਜੇ (evalarg != ਨਿਰਾ)
 	evalarg->eval_flags = save_flags;
-    return name;
+    ਵਾਪਸ name;
 }
 
 /*
@@ -912,22 +912,22 @@ theend:
  * should have type VAR_UNKNOWN.
  * Returns OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 call_vim_function(
     char_u      *func,
-    int		argc,
+    ਪੂਰਨ		argc,
     typval_T	*argv,
     typval_T	*rettv)
 {
-    int		ret;
+    ਪੂਰਨ		ret;
     funcexe_T	funcexe;
     char_u	*arg;
     char_u	*name;
-    char_u	*tofree = NULL;
-    int		ignore_errors;
+    char_u	*tofree = ਨਿਰਾ;
+    ਪੂਰਨ		ignore_errors;
 
     rettv->v_type = VAR_UNKNOWN;		// clear_tv() uses this
-    CLEAR_FIELD(funcexe);
+    CLEAR_ਖੇਤਰ(funcexe);
     funcexe.fe_firstline = curwin->w_cursor.lnum;
     funcexe.fe_lastline = curwin->w_cursor.lnum;
     funcexe.fe_evaluate = TRUE;
@@ -936,23 +936,23 @@ call_vim_function(
     // ignore errors for an undefined name.  But we do want errors when an
     // autoload script has errors.  Guess that when there is a dot in the name
     // showing errors is the right choice.
-    ignore_errors = vim_strchr(func, '.') == NULL;
+    ignore_errors = vim_strchr(func, '.') == ਨਿਰਾ;
     arg = func;
-    if (ignore_errors)
+    ਜੇ (ignore_errors)
 	++emsg_off;
     name = deref_function_name(&arg, &tofree, &EVALARG_EVALUATE, FALSE);
-    if (ignore_errors)
+    ਜੇ (ignore_errors)
 	--emsg_off;
-    if (name == NULL)
+    ਜੇ (name == ਨਿਰਾ)
 	name = func;
 
     ret = call_func(name, -1, rettv, argc, argv, &funcexe);
 
-    if (ret == FAIL)
+    ਜੇ (ret == FAIL)
 	clear_tv(rettv);
     vim_free(tofree);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -961,21 +961,21 @@ call_vim_function(
  * should have type VAR_UNKNOWN.
  * Returns NULL when calling the function fails.
  */
-    void *
+    ਖਾਲੀ *
 call_func_retstr(
     char_u      *func,
-    int		argc,
+    ਪੂਰਨ		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
     char_u	*retval;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    ਜੇ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
     retval = vim_strsave(tv_get_string(&rettv));
     clear_tv(&rettv);
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -984,133 +984,133 @@ call_func_retstr(
  * Returns NULL when there is something wrong.
  * Gives an error when the returned value is not a list.
  */
-    void *
+    ਖਾਲੀ *
 call_func_retlist(
     char_u      *func,
-    int		argc,
+    ਪੂਰਨ		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    ਜੇ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (rettv.v_type != VAR_LIST)
+    ਜੇ (rettv.v_type != VAR_LIST)
     {
 	semsg(_(e_custom_list_completion_function_does_not_return_list_but_str),
 		vartype_name(rettv.v_type));
 	clear_tv(&rettv);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    return rettv.vval.v_list;
+    ਵਾਪਸ rettv.vval.v_list;
 }
 
-#if defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_FOLDING)
 /*
  * Evaluate "arg", which is 'foldexpr'.
  * Note: caller must set "curwin" to match "arg".
  * Returns the foldlevel, and any character preceding it in "*cp".  Doesn't
  * give error messages.
  */
-    int
-eval_foldexpr(win_T *wp, int *cp)
+    ਪੂਰਨ
+eval_foldexpr(win_T *wp, ਪੂਰਨ *cp)
 {
     char_u	*arg;
     typval_T	tv;
     varnumber_T	retval;
     char_u	*s;
     sctx_T	saved_sctx = current_sctx;
-    int		use_sandbox = was_set_insecurely(wp, (char_u *)"foldexpr",
+    ਪੂਰਨ		use_sandbox = was_ਸੈੱਟ_insecurely(wp, (char_u *)"foldexpr",
 								    OPT_LOCAL);
 
     arg = skipwhite(wp->w_p_fde);
     current_sctx = wp->w_p_script_ctx[WV_FDE];
 
     ++emsg_off;
-    if (use_sandbox)
+    ਜੇ (use_sandbox)
 	++sandbox;
     ++textlock;
     *cp = NUL;
 
     // Evaluate the expression.  If the expression is "FuncName()" call the
     // function directly.
-    if (eval0_simple_funccal(arg, &tv, NULL, &EVALARG_EVALUATE) == FAIL)
+    ਜੇ (eval0_simple_funccal(arg, &tv, ਨਿਰਾ, &EVALARG_EVALUATE) == FAIL)
 	retval = 0;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// If the result is a number, just return the number.
-	if (tv.v_type == VAR_NUMBER)
-	    retval = tv.vval.v_number;
-	else if (tv.v_type != VAR_STRING || tv.vval.v_string == NULL)
+	ਜੇ (tv.v_type == VAR_ਸੰਖਿਆ)
+	    retval = tv.vval.v_ਸੰਖਿਆ;
+	ਨਹੀਂਤਾਂ ਜੇ (tv.v_type != VAR_STRING || tv.vval.v_string == ਨਿਰਾ)
 	    retval = 0;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // If the result is a string, check if there is a non-digit before
 	    // the number.
 	    s = tv.vval.v_string;
-	    if (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
+	    ਜੇ (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
 		*cp = *s++;
-	    retval = atol((char *)s);
+	    retval = atol((ਅੱਖਰ *)s);
 	}
 	clear_tv(&tv);
     }
     --emsg_off;
-    if (use_sandbox)
+    ਜੇ (use_sandbox)
 	--sandbox;
     --textlock;
-    clear_evalarg(&EVALARG_EVALUATE, NULL);
+    clear_evalarg(&EVALARG_EVALUATE, ਨਿਰਾ);
     current_sctx = saved_sctx;
 
-    return (int)retval;
+    ਵਾਪਸ (ਪੂਰਨ)retval;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef LOG_LOCKVAR
-typedef struct flag_string_S
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ flag_string_S
 {
-    int	    flag;
-    char    *str;
+    ਪੂਰਨ	    flag;
+    ਅੱਖਰ    *str;
 } flag_string_T;
 
-    static char *
-flags_tostring(int flags, flag_string_T *_fstring, char *buf, size_t n)
+    ਸਥਿਰ ਅੱਖਰ *
+flags_tostring(ਪੂਰਨ flags, flag_string_T *_fstring, ਅੱਖਰ *buf, size_t n)
 {
-    char *p = buf;
+    ਅੱਖਰ *p = buf;
     *p = NUL;
-    for (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
+    ਲਈ (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
     {
-	if ((fstring->flag & flags) != 0)
+	ਜੇ ((fstring->flag & flags) != 0)
 	{
 	    size_t len = STRLEN(fstring->str);
-	    if (n > p - buf + len + 7)
+	    ਜੇ (n > p - buf + len + 7)
 	    {
 		STRCAT(p, fstring->str);
 		p += len;
 		STRCAT(p, " ");
 		++p;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		STRCAT(buf, "...");
-		break;
+		ਰੋਕੋ;
 	    }
 	}
     }
-    return buf;
+    ਵਾਪਸ buf;
 }
 
-flag_string_T glv_flag_strings[] = {
+flag_string_T glv_flag_ਲੜੀਆਂ[] = {
     { GLV_QUIET,		"QUIET" },
     { GLV_NO_AUTOLOAD,		"NO_AUTOLOAD" },
     { GLV_READ_ONLY,		"READ_ONLY" },
     { GLV_NO_DECL,		"NO_DECL" },
     { GLV_COMPILING,		"COMPILING" },
-    { GLV_ASSIGN_WITH_OP,	"ASSIGN_WITH_OP" },
+    { GLV_ਸੌਂਪੋ_WITH_OP,	"ASSIGN_WITH_OP" },
     { GLV_PREFER_FUNC,		"PREFER_FUNC" },
-    { 0,			NULL }
+    { 0,			ਨਿਰਾ }
 };
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Fill in "lp" using "root". This is used in a special case when
@@ -1130,99 +1130,99 @@ flag_string_T glv_flag_strings[] = {
  *	compile_lock_unlock - pushes object on stack (which becomes lval_root)
  *	execute_instructions: ISN_LOCKUNLOCK - sets lval_root from stack.
  */
-    static void
-fill_lval_from_lval_root(lval_T *lp, lval_root_T *lr)
+    ਸਥਿਰ ਖਾਲੀ
+fill_lval_from_lval_ਜੜ੍ਹ(lval_T *lp, lval_ਜੜ੍ਹ_T *lr)
 {
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
-						lp->ll_name, (void*)lr->lr_tv);
-#endif
-    if (lr->lr_tv == NULL)
-	return;
-    if (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+    ch_log(ਨਿਰਾ, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
+						lp->ll_name, (ਖਾਲੀ*)lr->lr_tv);
+#ਜੇ_ਅੰਤ
+    ਜੇ (lr->lr_tv == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
     {
-	if (lr->lr_tv->vval.v_class != NULL)
+	ਜੇ (lr->lr_tv->vval.v_class != ਨਿਰਾ)
 	{
 	    // Special special case. Look for a bare class variable reference.
 	    class_T	*cl = lr->lr_tv->vval.v_class;
-	    int		m_idx;
+	    ਪੂਰਨ		m_idx;
 	    ocmember_T	*m = class_member_lookup(cl, lp->ll_name,
-					lp->ll_name_end - lp->ll_name, &m_idx);
-	    if (m != NULL)
+					lp->ll_name_ਸਿਰਾ - lp->ll_name, &m_idx);
+	    ਜੇ (m != ਨਿਰਾ)
 	    {
 		// Assuming "inside class" since bare reference.
 		lp->ll_class = lr->lr_tv->vval.v_class;
 		lp->ll_oi = m_idx;
 		lp->ll_valtype = m->ocm_type;
 		lp->ll_tv = &lp->ll_class->class_members_tv[m_idx];
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... class member %s.%s",
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+		ch_log(ਨਿਰਾ, "LKVAR:    ... class member %s.%s",
 					lp->ll_class->class_name.string, lp->ll_name);
-#endif
-		return;
+#ਜੇ_ਅੰਤ
+		ਵਾਪਸ;
 	    }
 	}
     }
 
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+    ch_log(ਨਿਰਾ, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
+#ਜੇ_ਅੰਤ
     lp->ll_tv = lr->lr_tv;
-    lp->ll_is_root = TRUE;
+    lp->ll_is_ਜੜ੍ਹ = TRUE;
 }
 
 /*
  * Check if the class has permission to access the member.
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_check_access(
     class_T	*cl_exec,   // executing class, NULL if :def or script level
     class_T	*cl,	    // class which contains the member
     ocmember_T	*om,	    // member being accessed
     char_u	*p,	    // char after member name
-    int		flags)	    // GLV flags to check if writing to lval
+    ਪੂਰਨ		flags)	    // GLV flags to check if writing to lval
 {
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
-						(void*)cl_exec, (void*)cl, *p);
-#endif
-    if (cl_exec != NULL && cl_exec == cl)
-	return OK;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+    ch_log(ਨਿਰਾ, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
+						(ਖਾਲੀ*)cl_exec, (ਖਾਲੀ*)cl, *p);
+#ਜੇ_ਅੰਤ
+    ਜੇ (cl_exec != ਨਿਰਾ && cl_exec == cl)
+	ਵਾਪਸ OK;
 
-    char *msg = NULL;
-    switch (om->ocm_access)
+    ਅੱਖਰ *ਸੁਨੇਹਾ = ਨਿਰਾ;
+    ਚੋਣ (om->ocm_access)
     {
-	case VIM_ACCESS_PRIVATE:
-	    msg = e_cannot_access_protected_variable_str;
-	    break;
-	case VIM_ACCESS_READ:
+	ਹਾਲਤ VIM_ACCESS_ਨਿੱਜੀ:
+	    ਸੁਨੇਹਾ = e_cannot_access_protected_variable_str;
+	    ਰੋਕੋ;
+	ਹਾਲਤ VIM_ACCESS_READ:
 	    // If [idx] or .key following, read only OK.
-	    if (*p == '[' || *p == '.')
-		break;
-	    if ((flags & GLV_READ_ONLY) == 0)
+	    ਜੇ (*p == '[' || *p == '.')
+		ਰੋਕੋ;
+	    ਜੇ ((flags & GLV_READ_ONLY) == 0)
 	    {
-		if (IS_ENUM(cl))
+		ਜੇ (IS_ENUM(cl))
 		{
-		    if (om->ocm_type->tt_type == VAR_OBJECT)
+		    ਜੇ (om->ocm_type->tt_type == VAR_OBJECT)
 			semsg(_(e_enumvalue_str_cannot_be_modified),
 				cl->class_name.string, om->ocm_name.string);
-		    else
-			msg = e_variable_is_not_writable_str;
+		    ਨਹੀਂਤਾਂ
+			ਸੁਨੇਹਾ = e_variable_is_not_writable_str;
 		}
-		else
-		    msg = e_variable_is_not_writable_str;
+		ਨਹੀਂਤਾਂ
+		    ਸੁਨੇਹਾ = e_variable_is_not_writable_str;
 	    }
-	    break;
-	case VIM_ACCESS_ALL:
-	    break;
+	    ਰੋਕੋ;
+	ਹਾਲਤ VIM_ACCESS_ALL:
+	    ਰੋਕੋ;
     }
-    if (msg != NULL)
+    ਜੇ (ਸੁਨੇਹਾ != ਨਿਰਾ)
     {
-	emsg_var_cl_define(msg, om->ocm_name.string, 0, cl);
-	return FAIL;
+	emsg_var_cl_define(ਸੁਨੇਹਾ, om->ocm_name.string, 0, cl);
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1236,57 +1236,57 @@ get_lval_check_access(
  * Returns NULL if the variable is not exported or typval is not found or the
  * rhs type doesn't match the lhs type or the variable is not writable.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 get_lval_imported(
     lval_T	*lp,
     scid_T	imp_sid,
     char_u	*p,
     dictitem_T	**dip,
-    int		fne_flags)
+    ਪੂਰਨ		fne_flags)
 {
     ufunc_T	*ufunc;
-    type_T	*type = NULL;
-    int		cc;
-    int		rc = FAIL;
+    type_T	*type = ਨਿਰਾ;
+    ਪੂਰਨ		cc;
+    ਪੂਰਨ		rc = FAIL;
 
     p = skipwhite(p);
 
     import_check_sourced_sid(&imp_sid);
     lp->ll_sid = imp_sid;
     lp->ll_name = p;
-    p = find_name_end(lp->ll_name, NULL, NULL, fne_flags);
-    lp->ll_name_end = p;
+    p = ਲੱਭੋ_name_ਸਿਰਾ(lp->ll_name, ਨਿਰਾ, ਨਿਰਾ, fne_flags);
+    lp->ll_name_ਸਿਰਾ = p;
 
     // check the item is exported
     cc = *p;
     *p = NUL;
-    if (find_exported(imp_sid, lp->ll_name, &ufunc, &type, NULL, NULL,
+    ਜੇ (ਲੱਭੋ_exported(imp_sid, lp->ll_name, &ufunc, &type, ਨਿਰਾ, ਨਿਰਾ,
 								TRUE) == -1)
-	goto failed;
+	ਜਾਓ failed;
 
     // Get the typval for the exported item
     hashtab_T *ht = &SCRIPT_VARS(imp_sid);
-    if (ht == NULL)
-	goto failed;
+    ਜੇ (ht == ਨਿਰਾ)
+	ਜਾਓ failed;
 
-    dictitem_T *di = find_var_in_ht(ht, 0, lp->ll_name, TRUE);
-    if (di == NULL)
+    dictitem_T *di = ਲੱਭੋ_var_ਵਿੱਚ_ht(ht, 0, lp->ll_name, TRUE);
+    ਜੇ (di == ਨਿਰਾ)
 	// script is autoloaded.  So variable will be found later
-	goto success;
+	ਜਾਓ success;
 
     *dip = di;
 
     // Check whether the variable is writable.
-    svar_T *sv = find_typval_in_script(&di->di_tv, imp_sid, FALSE);
-    if (sv != NULL && sv->sv_const != 0)
+    svar_T *sv = ਲੱਭੋ_typval_ਵਿੱਚ_script(&di->di_tv, imp_sid, FALSE);
+    ਜੇ (sv != ਨਿਰਾ && sv->sv_const != 0)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), lp->ll_name);
-	goto failed;
+	ਜਾਓ failed;
     }
 
     // check whether variable is locked
-    if (value_check_lock(di->di_tv.v_lock, lp->ll_name, FALSE))
-	goto failed;
+    ਜੇ (ਮੁੱਲ_check_ਤਾਲਾ(di->di_tv.v_ਤਾਲਾ, lp->ll_name, FALSE))
+	ਜਾਓ failed;
 
     lp->ll_tv = &di->di_tv;
     lp->ll_valtype = type;
@@ -1296,14 +1296,14 @@ success:
 
 failed:
     *p = cc;
-    return rc == OK ? p : NULL;
+    ਵਾਪਸ rc == OK ? p : ਨਿਰਾ;
 }
 
-typedef enum {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਗਿਣਤੀ {
     GLV_FAIL,
     GLV_OK,
     GLV_STOP
-} glv_status_T;
+} glv_ਸਥਿਤੀ_T;
 
 /*
  * Get an Dict lval variable that can be assigned a value to: "name",
@@ -1322,112 +1322,112 @@ typedef enum {
  * failure.  Returns GLV_STOP to stop processing the characters following
  * 'key_end'.
  */
-    static int
-get_lval_dict_item(
+    ਸਥਿਰ ਪੂਰਨ
+get_lval_dict_ਵਸਤੂ(
     lval_T	*lp,
     char_u	*name,
-    char_u	*key,
-    int		len,
-    char_u	**key_end,
+    char_u	*ਕੁੰਜੀ,
+    ਪੂਰਨ		len,
+    char_u	**ਕੁੰਜੀ_ਸਿਰਾ,
     typval_T	*var1,
-    int		flags,
-    int		unlet,
+    ਪੂਰਨ		flags,
+    ਪੂਰਨ		unlet,
     typval_T	*rettv)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*p = *key_end;
+    ਪੂਰਨ		quiet = flags & GLV_QUIET;
+    char_u	*p = *ਕੁੰਜੀ_ਸਿਰਾ;
 
-    if (len == -1)
+    ਜੇ (len == -1)
     {
 	// "[key]": get key from "var1"
-	key = tv_get_string_chk(var1);	// is number or string
-	if (key == NULL)
-	    return GLV_FAIL;
+	ਕੁੰਜੀ = tv_get_string_chk(var1);	// is number or string
+	ਜੇ (ਕੁੰਜੀ == ਨਿਰਾ)
+	    ਵਾਪਸ GLV_FAIL;
     }
-    lp->ll_list = NULL;
-    lp->ll_list = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ਨਿਰਾ;
+    lp->ll_list = ਨਿਰਾ;
+    lp->ll_blob = ਨਿਰਾ;
+    lp->ll_object = ਨਿਰਾ;
+    lp->ll_class = ਨਿਰਾ;
+    lp->ll_tuple = ਨਿਰਾ;
 
     // a NULL dict is equivalent with an empty dict
-    if (lp->ll_tv->vval.v_dict == NULL)
+    ਜੇ (lp->ll_tv->vval.v_dict == ਨਿਰਾ)
     {
 	lp->ll_tv->vval.v_dict = dict_alloc();
-	if (lp->ll_tv->vval.v_dict == NULL)
-	    return GLV_FAIL;
+	ਜੇ (lp->ll_tv->vval.v_dict == ਨਿਰਾ)
+	    ਵਾਪਸ GLV_FAIL;
 	++lp->ll_tv->vval.v_dict->dv_refcount;
     }
     lp->ll_dict = lp->ll_tv->vval.v_dict;
 
-    lp->ll_di = dict_find(lp->ll_dict, key, len);
+    lp->ll_di = dict_ਲੱਭੋ(lp->ll_dict, ਕੁੰਜੀ, len);
 
     // When assigning to a scope dictionary check that a function and
     // variable name is valid (only variable name unless it is l: or
     // g: dictionary). Disallow overwriting a builtin function.
-    if (rettv != NULL && lp->ll_dict->dv_scope != 0)
+    ਜੇ (rettv != ਨਿਰਾ && lp->ll_dict->dv_scope != 0)
     {
-	int prevval;
+	ਪੂਰਨ prevval;
 
-	if (len != -1)
+	ਜੇ (len != -1)
 	{
-	    prevval = key[len];
-	    key[len] = NUL;
+	    prevval = ਕੁੰਜੀ[len];
+	    ਕੁੰਜੀ[len] = NUL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    prevval = 0; // avoid compiler warning
-	int wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
+	ਪੂਰਨ wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
 		&& (rettv->v_type == VAR_FUNC
 		    || rettv->v_type == VAR_PARTIAL)
-		&& var_wrong_func_name(key, lp->ll_di == NULL))
-	    || !valid_varname(key, -1, TRUE);
-	if (len != -1)
-	    key[len] = prevval;
-	if (wrong)
-	    return GLV_FAIL;
+		&& var_wrong_func_name(ਕੁੰਜੀ, lp->ll_di == ਨਿਰਾ))
+	    || !valid_varname(ਕੁੰਜੀ, -1, TRUE);
+	ਜੇ (len != -1)
+	    ਕੁੰਜੀ[len] = prevval;
+	ਜੇ (wrong)
+	    ਵਾਪਸ GLV_FAIL;
     }
 
-    if (lp->ll_valtype != NULL)
+    ਜੇ (lp->ll_valtype != ਨਿਰਾ)
 	// use the type of the member
 	lp->ll_valtype = lp->ll_valtype->tt_member;
 
-    if (lp->ll_di == NULL)
+    ਜੇ (lp->ll_di == ਨਿਰਾ)
     {
 	// Can't add "v:" or "a:" variable.
-	if (lp->ll_dict == get_vimvar_dict()
-		|| &lp->ll_dict->dv_hashtab == get_funccal_args_ht())
+	ਜੇ (lp->ll_dict == get_vimvar_dict()
+		|| &lp->ll_dict->dv_hashtab == get_funccal_ਦਲੀਲਾਂ_ht())
 	{
 	    semsg(_(e_illegal_variable_name_str), name);
-	    return GLV_FAIL;
+	    ਵਾਪਸ GLV_FAIL;
 	}
 
 	// Key does not exist in dict: may need to add it.
-	if (*p == '[' || *p == '.' || unlet)
+	ਜੇ (*p == '[' || *p == '.' || unlet)
 	{
-	    if (!quiet)
-		semsg(_(e_key_not_present_in_dictionary_str), key);
-	    return GLV_FAIL;
+	    ਜੇ (!quiet)
+		semsg(_(e_ਕੁੰਜੀ_not_present_ਵਿੱਚ_dictionary_str), ਕੁੰਜੀ);
+	    ਵਾਪਸ GLV_FAIL;
 	}
-	if (len == -1)
-	    lp->ll_newkey = vim_strsave(key);
-	else
-	    lp->ll_newkey = vim_strnsave(key, len);
-	if (lp->ll_newkey == NULL)
-	    p = NULL;
+	ਜੇ (len == -1)
+	    lp->ll_newkey = vim_strsave(ਕੁੰਜੀ);
+	ਨਹੀਂਤਾਂ
+	    lp->ll_newkey = vim_strnsave(ਕੁੰਜੀ, len);
+	ਜੇ (lp->ll_newkey == ਨਿਰਾ)
+	    p = ਨਿਰਾ;
 
-	*key_end = p;
-	return GLV_STOP;
+	*ਕੁੰਜੀ_ਸਿਰਾ = p;
+	ਵਾਪਸ GLV_STOP;
     }
     // existing variable, need to check if it can be changed
-    else if ((flags & GLV_READ_ONLY) == 0
+    ਨਹੀਂਤਾਂ ਜੇ ((flags & GLV_READ_ONLY) == 0
 	    && (var_check_ro(lp->ll_di->di_flags, name, FALSE)
-		|| var_check_lock(lp->ll_di->di_flags, name, FALSE)))
-	return GLV_FAIL;
+		|| var_check_ਤਾਲਾ(lp->ll_di->di_flags, name, FALSE)))
+	ਵਾਪਸ GLV_FAIL;
 
     lp->ll_tv = &lp->ll_di->di_tv;
 
-    return GLV_OK;
+    ਵਾਪਸ GLV_OK;
 }
 
 /*
@@ -1441,47 +1441,47 @@ get_lval_dict_item(
  *
  * The blob is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_blob(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		quiet)
+    ਪੂਰਨ		empty1,
+    ਪੂਰਨ		quiet)
 {
-    long	bloblen = blob_len(lp->ll_tv->vval.v_blob);
+    ਲੰਮਾ	bloblen = blob_len(lp->ll_tv->vval.v_blob);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ਨਿਰਾ;
+    lp->ll_dict = ਨਿਰਾ;
+    lp->ll_object = ਨਿਰਾ;
+    lp->ll_class = ਨਿਰਾ;
+    lp->ll_tuple = ਨਿਰਾ;
 
     // Get the number and item for the only or first index of a List or Tuple.
-    if (empty1)
+    ਜੇ (empty1)
 	lp->ll_n1 = 0;
-    else
+    ਨਹੀਂਤਾਂ
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(var1);
 
-    if (check_blob_index(bloblen, lp->ll_n1, quiet) == FAIL)
-	return FAIL;
-    if (lp->ll_range && !lp->ll_empty2)
+    ਜੇ (check_blob_ਸੂਚਕਾਂਕ(bloblen, lp->ll_n1, quiet) == FAIL)
+	ਵਾਪਸ FAIL;
+    ਜੇ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
-	if (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	lp->ll_n2 = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(var2);
+	ਜੇ (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
+	    ਵਾਪਸ FAIL;
     }
 
-    if (!lp->ll_range)
+    ਜੇ (!lp->ll_range)
 	// Indexing a single byte in a blob.  So the rhs type is a
 	// number.
-	lp->ll_valtype = &t_number;
+	lp->ll_valtype = &t_ਸੰਖਿਆ;
 
     lp->ll_blob = lp->ll_tv->vval.v_blob;
-    lp->ll_tv = NULL;
+    lp->ll_tv = ਨਿਰਾ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1495,40 +1495,40 @@ get_lval_blob(
  *
  * The List is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_list(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		flags,
-    int		quiet)
+    ਪੂਰਨ		empty1,
+    ਪੂਰਨ		flags,
+    ਪੂਰਨ		quiet)
 {
     /*
      * Get the number and item for the only or first index of the List.
      */
-    if (empty1)
+    ਜੇ (empty1)
 	lp->ll_n1 = 0;
-    else
+    ਨਹੀਂਤਾਂ
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(var1);
 
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ਨਿਰਾ;
+    lp->ll_object = ਨਿਰਾ;
+    lp->ll_class = ਨਿਰਾ;
+    lp->ll_tuple = ਨਿਰਾ;
     lp->ll_list = lp->ll_tv->vval.v_list;
-    lp->ll_li = check_range_index_one(lp->ll_list, &lp->ll_n1,
-				(flags & GLV_ASSIGN_WITH_OP) == 0, quiet);
-    if (lp->ll_li == NULL)
-	return FAIL;
+    lp->ll_li = check_range_ਸੂਚਕਾਂਕ_one(lp->ll_list, &lp->ll_n1,
+				(flags & GLV_ਸੌਂਪੋ_WITH_OP) == 0, quiet);
+    ਜੇ (lp->ll_li == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    if (lp->ll_valtype != NULL && !lp->ll_range)
+    ਜੇ (lp->ll_valtype != ਨਿਰਾ && !lp->ll_range)
     {
 	// use the type of the member
-	if (lp->ll_valtype->tt_member != NULL)
+	ਜੇ (lp->ll_valtype->tt_member != ਨਿਰਾ)
 	    lp->ll_valtype = lp->ll_valtype->tt_member;
-	else
+	ਨਹੀਂਤਾਂ
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the list item (after indexing)
 	    lp->ll_valtype = typval2type(&lp->ll_li->li_tv, get_copyID(),
@@ -1542,18 +1542,18 @@ get_lval_list(
      * When no index given: "lp->ll_empty2" is TRUE.
      * Otherwise "lp->ll_n2" is set to the second index.
      */
-    if (lp->ll_range && !lp->ll_empty2)
+    ਜੇ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
+	lp->ll_n2 = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(var2);
 	// is number or string
-	if (check_range_index_two(lp->ll_list,
+	ਜੇ (check_range_ਸੂਚਕਾਂਕ_two(lp->ll_list,
 			&lp->ll_n1, lp->ll_li, &lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
     }
 
     lp->ll_tv = &lp->ll_li->li_tv;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1567,51 +1567,51 @@ get_lval_list(
  * The typval is returned in 'lp'.  Returns GLV_OK on success and GLV_FAIL on
  * failure.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_tuple(
     lval_T	*lp,
     typval_T	*idx,
-    int		quiet)
+    ਪੂਰਨ		quiet)
 {
     // is number or string
-    lp->ll_n1 = (long)tv_get_number(idx);
+    lp->ll_n1 = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(idx);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
+    lp->ll_list = ਨਿਰਾ;
+    lp->ll_dict = ਨਿਰਾ;
+    lp->ll_blob = ਨਿਰਾ;
+    lp->ll_object = ਨਿਰਾ;
+    lp->ll_class = ਨਿਰਾ;
 
     lp->ll_tuple = lp->ll_tv->vval.v_tuple;
-    lp->ll_tv = tuple_find(lp->ll_tuple, lp->ll_n1);
-    if (lp->ll_tv == NULL)
+    lp->ll_tv = tuple_ਲੱਭੋ(lp->ll_tuple, lp->ll_n1);
+    ਜੇ (lp->ll_tv == ਨਿਰਾ)
     {
-	if (!quiet)
-	    semsg(_(e_tuple_index_out_of_range_nr), lp->ll_n1);
-	return GLV_FAIL;
+	ਜੇ (!quiet)
+	    semsg(_(e_tuple_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), lp->ll_n1);
+	ਵਾਪਸ GLV_FAIL;
     }
 
     // use the type of the member
-    if (lp->ll_valtype != NULL)
+    ਜੇ (lp->ll_valtype != ਨਿਰਾ)
     {
-	if (lp->ll_valtype != NULL
+	ਜੇ (lp->ll_valtype != ਨਿਰਾ
 		&& lp->ll_valtype->tt_type == VAR_TUPLE
 		&& lp->ll_valtype->tt_argcount == 1)
 	{
 	    // a variadic tuple or a single item tuple
-	    if (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
-		lp->ll_valtype = lp->ll_valtype->tt_args[0]->tt_member;
-	    else
-		lp->ll_valtype = lp->ll_valtype->tt_args[0];
+	    ਜੇ (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
+		lp->ll_valtype = lp->ll_valtype->tt_ਦਲੀਲਾਂ[0]->tt_member;
+	    ਨਹੀਂਤਾਂ
+		lp->ll_valtype = lp->ll_valtype->tt_ਦਲੀਲਾਂ[0];
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the tuple item (after indexing)
 	    lp->ll_valtype = typval2type(lp->ll_tv, get_copyID(),
 					&lp->ll_type_list, TVTT_DO_MEMBER);
     }
 
-    return GLV_OK;
+    ਵਾਪਸ GLV_OK;
 }
 
 /*
@@ -1622,39 +1622,39 @@ get_lval_tuple(
  * The method index, method function pointer and method type are returned in
  * "lp".
  */
-    static int
-get_lval_oc_method(
+    ਸਥਿਰ ਪੂਰਨ
+get_lval_oc_ਵਿਧੀ(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*ਕੁੰਜੀ,
+    char_u	**ਕੁੰਜੀ_ਸਿਰਾ,
     vartype_T	v_type)
 {
     // Look for a method with this name.
     // round 1: class functions (skipped for an object)
     // round 2: object methods
-    for (int round = v_type == VAR_OBJECT ? 2 : 1; round <= 2; ++round)
+    ਲਈ (ਪੂਰਨ ਗੇੜਾ = v_type == VAR_OBJECT ? 2 : 1; ਗੇੜਾ <= 2; ++ਗੇੜਾ)
     {
-	int	m_idx;
+	ਪੂਰਨ	m_idx;
 	ufunc_T	*fp;
 
-	fp = method_lookup(cl, round == 1 ? VAR_CLASS : VAR_OBJECT,
-						key, *key_end - key, &m_idx);
+	fp = ਵਿਧੀ_lookup(cl, ਗੇੜਾ == 1 ? VAR_CLASS : VAR_OBJECT,
+						ਕੁੰਜੀ, *ਕੁੰਜੀ_ਸਿਰਾ - ਕੁੰਜੀ, &m_idx);
 	lp->ll_oi = m_idx;
 
 	// process generic method (if present)
-	if (fp && (fp = eval_generic_func(fp, key, key_end)) == NULL)
-	    return FAIL;
+	ਜੇ (fp && (fp = eval_generic_func(fp, ਕੁੰਜੀ, ਕੁੰਜੀ_ਸਿਰਾ)) == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	if (fp != NULL)
+	ਜੇ (fp != ਨਿਰਾ)
 	{
 	    lp->ll_ufunc = fp;
 	    lp->ll_valtype = fp->uf_func_type;
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1666,42 +1666,42 @@ get_lval_oc_method(
  * The variable index, typval and type are returned in "lp".  Returns FAIL if
  * the variable is not writable.  Otherwise returns OK.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_oc_variable(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	*key_end,
+    char_u	*ਕੁੰਜੀ,
+    char_u	*ਕੁੰਜੀ_ਸਿਰਾ,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags)
+    ਪੂਰਨ		flags)
 {
-    int		m_idx;
+    ਪੂਰਨ		m_idx;
     ocmember_T	*om;
 
-    om = member_lookup(cl, v_type, key, key_end - key, &m_idx);
+    om = member_lookup(cl, v_type, ਕੁੰਜੀ, ਕੁੰਜੀ_ਸਿਰਾ - ਕੁੰਜੀ, &m_idx);
     lp->ll_oi = m_idx;
-    if (om == NULL)
-	return OK;
+    ਜੇ (om == ਨਿਰਾ)
+	ਵਾਪਸ OK;
 
     // Check variable is accessible
-    if (get_lval_check_access(cl_exec, cl, om, key_end, flags) == FAIL)
-	return FAIL;
+    ਜੇ (get_lval_check_access(cl_exec, cl, om, ਕੁੰਜੀ_ਸਿਰਾ, flags) == FAIL)
+	ਵਾਪਸ FAIL;
 
     // When lhs is used to modify the variable, check it is not a read-only
     // variable.
-    if ((flags & GLV_READ_ONLY) == 0 && (*key_end != '.' && *key_end != '[')
+    ਜੇ ((flags & GLV_READ_ONLY) == 0 && (*ਕੁੰਜੀ_ਸਿਰਾ != '.' && *ਕੁੰਜੀ_ਸਿਰਾ != '[')
 	    && oc_var_check_ro(cl, om))
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
     lp->ll_valtype = om->ocm_type;
 
-    if (v_type == VAR_OBJECT)
+    ਜੇ (v_type == VAR_OBJECT)
 	lp->ll_tv = ((typval_T *)(lp->ll_tv->vval.v_object + 1)) + m_idx;
-    else
+    ਨਹੀਂਤਾਂ
 	lp->ll_tv = &cl->class_members_tv[m_idx];
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1716,64 +1716,64 @@ get_lval_oc_variable(
  * The Class or Object is returned in 'lp'.  Returns OK on success and FAIL on
  * failure.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lval_class_or_obj(
     lval_T	*lp,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*ਕੁੰਜੀ,
+    char_u	**ਕੁੰਜੀ_ਸਿਰਾ,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags,
-    int		quiet)
+    ਪੂਰਨ		flags,
+    ਪੂਰਨ		quiet)
 {
-    lp->ll_dict = NULL;
-    lp->ll_list = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ਨਿਰਾ;
+    lp->ll_list = ਨਿਰਾ;
+    lp->ll_tuple = ਨਿਰਾ;
 
     class_T *cl;
-    if (v_type == VAR_OBJECT)
+    ਜੇ (v_type == VAR_OBJECT)
     {
-	if (lp->ll_tv->vval.v_object == NULL)
+	ਜੇ (lp->ll_tv->vval.v_object == ਨਿਰਾ)
 	{
-	    if (!quiet)
+	    ਜੇ (!quiet)
 		emsg(_(e_using_null_object));
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	cl = lp->ll_tv->vval.v_object->obj_class;
 	lp->ll_object = lp->ll_tv->vval.v_object;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	cl = lp->ll_tv->vval.v_class;
-	lp->ll_object = NULL;
+	lp->ll_object = ਨਿਰਾ;
     }
     lp->ll_class = cl;
 
-    if (cl == NULL)
+    ਜੇ (cl == ਨਿਰਾ)
 	// TODO: what if class is NULL?
-	return OK;
+	ਵਾਪਸ OK;
 
-    lp->ll_valtype = NULL;
+    lp->ll_valtype = ਨਿਰਾ;
 
-    if (flags & GLV_PREFER_FUNC)
-	if (get_lval_oc_method(lp, cl, key, key_end, v_type) == FAIL)
-	    return FAIL;
+    ਜੇ (flags & GLV_PREFER_FUNC)
+	ਜੇ (get_lval_oc_ਵਿਧੀ(lp, cl, ਕੁੰਜੀ, ਕੁੰਜੀ_ਸਿਰਾ, v_type) == FAIL)
+	    ਵਾਪਸ FAIL;
 
     // Look for object/class member variable
-    if (lp->ll_valtype == NULL)
+    ਜੇ (lp->ll_valtype == ਨਿਰਾ)
     {
-	if (get_lval_oc_variable(lp, cl, key, *key_end, v_type, cl_exec, flags)
+	ਜੇ (get_lval_oc_variable(lp, cl, ਕੁੰਜੀ, *ਕੁੰਜੀ_ਸਿਰਾ, v_type, cl_exec, flags)
 								== FAIL)
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
     }
 
-    if (lp->ll_valtype == NULL)
+    ਜੇ (lp->ll_valtype == ਨਿਰਾ)
     {
-	member_not_found_msg(cl, v_type, key, *key_end - key);
-	return FAIL;
+	member_not_ਮਿਲਿਆ_ਸੁਨੇਹਾ(cl, v_type, ਕੁੰਜੀ, *ਕੁੰਜੀ_ਸਿਰਾ - ਕੁੰਜੀ);
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1781,18 +1781,18 @@ get_lval_class_or_obj(
  * "v_type".  Only Dict, Class and Object types support a dot after the name.
  * Returns TRUE if dot is allowed after the name.
  */
-    static int
-dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    ਸਥਿਰ ਪੂਰਨ
+dot_allowed_after_type(char_u *name, vartype_T v_type, ਪੂਰਨ quiet)
 {
-    if (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
+    ਜੇ (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
     {
-	if (!quiet)
+	ਜੇ (!quiet)
 	    semsg(_(e_dot_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -1800,18 +1800,18 @@ dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * type "v_type".  Only Dict, List, Tuple and Blob types support a bracket
  * after the variable name.  Returns TRUE if bracket is allowed after the name.
  */
-    static int
-bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    ਸਥਿਰ ਪੂਰਨ
+bracket_allowed_after_type(char_u *name, vartype_T v_type, ਪੂਰਨ quiet)
 {
-    if (v_type == VAR_CLASS || v_type == VAR_OBJECT)
+    ਜੇ (v_type == VAR_CLASS || v_type == VAR_OBJECT)
     {
-	if (!quiet)
-	    semsg(_(e_index_not_allowed_after_str_str),
+	ਜੇ (!quiet)
+	    semsg(_(e_ਸੂਚਕਾਂਕ_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -1819,23 +1819,23 @@ bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * index.  Only Dict, List, Tuple, Blob, Object and Class types support
  * indexing.  Returns TRUE if indexing is allowed after the name.
  */
-    static int
-index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    ਸਥਿਰ ਪੂਰਨ
+ਸੂਚਕਾਂਕ_allowed_after_type(char_u *name, vartype_T v_type, ਪੂਰਨ quiet)
 {
-    if (v_type != VAR_LIST
+    ਜੇ (v_type != VAR_LIST
 	    && v_type != VAR_TUPLE
 	    && v_type != VAR_DICT
 	    && v_type != VAR_BLOB
 	    && v_type != VAR_OBJECT
 	    && v_type != VAR_CLASS)
     {
-	if (!quiet)
-	    semsg(_(e_index_not_allowed_after_str_str),
+	ਜੇ (!quiet)
+	    semsg(_(e_ਸੂਚਕਾਂਕ_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -1848,7 +1848,7 @@ index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * Returns a pointer to the character after the subscript on success or NULL on
  * failure.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 get_lval_subscript(
     lval_T	*lp,
     char_u	*p,
@@ -1856,17 +1856,17 @@ get_lval_subscript(
     typval_T	*rettv,
     hashtab_T	*ht,
     dictitem_T	*v,
-    int		unlet,
-    int		flags,	    // GLV_ values
+    ਪੂਰਨ		unlet,
+    ਪੂਰਨ		flags,	    // GLV_ values
     class_T	*cl_exec)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*key = NULL;
-    int		len;
+    ਪੂਰਨ		quiet = flags & GLV_QUIET;
+    char_u	*ਕੁੰਜੀ = ਨਿਰਾ;
+    ਪੂਰਨ		len;
     typval_T	var1;
     typval_T	var2;
-    int		empty1 = FALSE;
-    int		rc = FAIL;
+    ਪੂਰਨ		empty1 = FALSE;
+    ਪੂਰਨ		rc = FAIL;
 
     /*
      * Loop until no more [idx] or .key is following.
@@ -1874,183 +1874,183 @@ get_lval_subscript(
     var1.v_type = VAR_UNKNOWN;
     var2.v_type = VAR_UNKNOWN;
 
-    while (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
+    ਜਦੋਂ (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
     {
 	vartype_T v_type = lp->ll_tv->v_type;
 
-	if (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ਜੇ (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
+	    ਜਾਓ ਪੂਰਾ;
 
-	if (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ਜੇ (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
+	    ਜਾਓ ਪੂਰਾ;
 
-	if (!index_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	ਜੇ (!ਸੂਚਕਾਂਕ_allowed_after_type(name, v_type, quiet))
+	    ਜਾਓ ਪੂਰਾ;
 
 	// A NULL list/blob works like an empty list/blob, allocate one now.
-	int r = OK;
-	if (v_type == VAR_LIST && lp->ll_tv->vval.v_list == NULL)
+	ਪੂਰਨ r = OK;
+	ਜੇ (v_type == VAR_LIST && lp->ll_tv->vval.v_list == ਨਿਰਾ)
 	    r = rettv_list_alloc(lp->ll_tv);
-	else if (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == ਨਿਰਾ)
 	    r = rettv_blob_alloc(lp->ll_tv);
-	if (r == FAIL)
-	    goto done;
+	ਜੇ (r == FAIL)
+	    ਜਾਓ ਪੂਰਾ;
 
-	if (lp->ll_range)
+	ਜੇ (lp->ll_range)
 	{
-	    if (!quiet)
-		emsg(_(e_slice_must_come_last));
-	    goto done;
+	    ਜੇ (!quiet)
+		emsg(_(e_ਟੁਕੜਾ_must_come_ਆਖਰੀ));
+	    ਜਾਓ ਪੂਰਾ;
 	}
-#ifdef LOG_LOCKVAR
-	ch_log(NULL, "LKVAR: get_lval() loop: p: %s, type: %s", p,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+	ch_log(ਨਿਰਾ, "LKVAR: get_lval() loop: p: %s, type: %s", p,
 		vartype_name(v_type));
-#endif
+#ਜੇ_ਅੰਤ
 
-	if (current_script_is_vim9() && lp->ll_valtype == NULL
-		&& v != NULL
+	ਜੇ (current_script_is_vim9() && lp->ll_valtype == ਨਿਰਾ
+		&& v != ਨਿਰਾ
 		&& lp->ll_tv == &v->di_tv
-		&& ht != NULL && ht == get_script_local_ht())
+		&& ht != ਨਿਰਾ && ht == get_script_local_ht())
 	{
-	    svar_T  *sv = find_typval_in_script(lp->ll_tv, 0, TRUE);
+	    svar_T  *sv = ਲੱਭੋ_typval_ਵਿੱਚ_script(lp->ll_tv, 0, TRUE);
 
 	    // Vim9 script local variable: get the type
-	    if (sv != NULL)
+	    ਜੇ (sv != ਨਿਰਾ)
 	    {
 		lp->ll_valtype = sv->sv_type;
-#ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... loop: vim9 assign type: %s",
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+		ch_log(ਨਿਰਾ, "LKVAR:    ... loop: vim9 assign type: %s",
 			vartype_name(lp->ll_valtype->tt_type));
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 	}
 
 	len = -1;
-	if (*p == '.')
+	ਜੇ (*p == '.')
 	{
-	    key = p + 1;
+	    ਕੁੰਜੀ = p + 1;
 
-	    for (len = 0; ASCII_ISALNUM(key[len]) || key[len] == '_'; ++len)
+	    ਲਈ (len = 0; ASCII_ISALNUM(ਕੁੰਜੀ[len]) || ਕੁੰਜੀ[len] == '_'; ++len)
 		;
-	    if (len == 0)
+	    ਜੇ (len == 0)
 	    {
-		if (!quiet)
-		    emsg(_(e_cannot_use_empty_key_for_dictionary));
-		goto done;
+		ਜੇ (!quiet)
+		    emsg(_(e_cannot_use_ਖਾਲੀ_ਥਾਵਾਂ_ਕੁੰਜੀ_for_dictionary));
+		ਜਾਓ ਪੂਰਾ;
 	    }
-	    p = key + len;
+	    p = ਕੁੰਜੀ + len;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Get the index [expr] or the first index [expr: ].
 	    p = skipwhite(p + 1);
-	    if (*p == ':')
+	    ਜੇ (*p == ':')
 		empty1 = TRUE;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		empty1 = FALSE;
-		if (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
-		    goto done;
-		if (tv_get_string_chk(&var1) == NULL)
+		ਜੇ (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
+		    ਜਾਓ ਪੂਰਾ;
+		ਜੇ (tv_get_string_chk(&var1) == ਨਿਰਾ)
 		    // not a number or string
-		    goto done;
+		    ਜਾਓ ਪੂਰਾ;
 		p = skipwhite(p);
 	    }
 
 	    // Optionally get the second index [ :expr].
-	    if (*p == ':')
+	    ਜੇ (*p == ':')
 	    {
-		if (v_type == VAR_DICT)
+		ਜੇ (v_type == VAR_DICT)
 		{
-		    if (!quiet)
-			emsg(_(e_cannot_slice_dictionary));
-		    goto done;
+		    ਜੇ (!quiet)
+			emsg(_(e_cannot_ਟੁਕੜਾ_dictionary));
+		    ਜਾਓ ਪੂਰਾ;
 		}
-		if (v_type == VAR_TUPLE)
+		ਜੇ (v_type == VAR_TUPLE)
 		{
-		    if (!quiet)
-			emsg(_(e_cannot_slice_tuple));
-		    goto done;
+		    ਜੇ (!quiet)
+			emsg(_(e_cannot_ਟੁਕੜਾ_tuple));
+		    ਜਾਓ ਪੂਰਾ;
 		}
-		if (rettv != NULL
+		ਜੇ (rettv != ਨਿਰਾ
 			&& !(rettv->v_type == VAR_LIST
-			    && rettv->vval.v_list != NULL)
+			    && rettv->vval.v_list != ਨਿਰਾ)
 			&& !(rettv->v_type == VAR_BLOB
-			    && rettv->vval.v_blob != NULL))
+			    && rettv->vval.v_blob != ਨਿਰਾ))
 		{
-		    if (!quiet)
-			emsg(_(e_slice_requires_list_or_blob_value));
-		    goto done;
+		    ਜੇ (!quiet)
+			emsg(_(e_ਟੁਕੜਾ_requires_list_or_blob_ਮੁੱਲ));
+		    ਜਾਓ ਪੂਰਾ;
 		}
 		p = skipwhite(p + 1);
-		if (*p == ']')
+		ਜੇ (*p == ']')
 		    lp->ll_empty2 = TRUE;
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    lp->ll_empty2 = FALSE;
 		    // recursive!
-		    if (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
-			goto done;
-		    if (tv_get_string_chk(&var2) == NULL)
+		    ਜੇ (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
+			ਜਾਓ ਪੂਰਾ;
+		    ਜੇ (tv_get_string_chk(&var2) == ਨਿਰਾ)
 			// not a number or string
-			goto done;
+			ਜਾਓ ਪੂਰਾ;
 		}
 		lp->ll_range = TRUE;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		lp->ll_range = FALSE;
 
-	    if (*p != ']')
+	    ਜੇ (*p != ']')
 	    {
-		if (!quiet)
-		    emsg(_(e_missing_closing_square_brace));
-		goto done;
+		ਜੇ (!quiet)
+		    emsg(_(e_missing_closing_ਵਰਗਫਲ_brace));
+		ਜਾਓ ਪੂਰਾ;
 	    }
 
 	    // Skip to past ']'.
 	    ++p;
 	}
-#ifdef LOG_LOCKVAR
-	if (len == -1)
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
-		    empty1 ? ":" : (char*)tv_get_string(&var1));
-	else
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '.' key: %s", p, key);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+	ਜੇ (len == -1)
+	    ch_log(ਨਿਰਾ, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
+		    empty1 ? ":" : (ਅੱਖਰ*)tv_get_string(&var1));
+	ਨਹੀਂਤਾਂ
+	    ch_log(ਨਿਰਾ, "LKVAR:    ... loop: p: %s, '.' key: %s", p, ਕੁੰਜੀ);
+#ਜੇ_ਅੰਤ
 
-	if (v_type == VAR_DICT)
+	ਜੇ (v_type == VAR_DICT)
 	{
-	    glv_status_T glv_status;
+	    glv_ਸਥਿਤੀ_T glv_ਸਥਿਤੀ;
 
-	    glv_status = get_lval_dict_item(lp, name, key, len, &p, &var1,
+	    glv_ਸਥਿਤੀ = get_lval_dict_ਵਸਤੂ(lp, name, ਕੁੰਜੀ, len, &p, &var1,
 							flags, unlet, rettv);
-	    if (glv_status == GLV_FAIL)
-		goto done;
-	    if (glv_status == GLV_STOP)
-		break;
+	    ਜੇ (glv_ਸਥਿਤੀ == GLV_FAIL)
+		ਜਾਓ ਪੂਰਾ;
+	    ਜੇ (glv_ਸਥਿਤੀ == GLV_STOP)
+		ਰੋਕੋ;
 	}
-	else if (v_type == VAR_BLOB)
+	ਨਹੀਂਤਾਂ ਜੇ (v_type == VAR_BLOB)
 	{
-	    if (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
-		goto done;
+	    ਜੇ (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
+		ਜਾਓ ਪੂਰਾ;
 
-	    break;
+	    ਰੋਕੋ;
 	}
-	else if (v_type == VAR_LIST)
+	ਨਹੀਂਤਾਂ ਜੇ (v_type == VAR_LIST)
 	{
-	    if (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
-		goto done;
+	    ਜੇ (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
+		ਜਾਓ ਪੂਰਾ;
 	}
-	else if (v_type == VAR_TUPLE)
+	ਨਹੀਂਤਾਂ ਜੇ (v_type == VAR_TUPLE)
 	{
-	    if (get_lval_tuple(lp, &var1, quiet) == FAIL)
-		goto done;
+	    ਜੇ (get_lval_tuple(lp, &var1, quiet) == FAIL)
+		ਜਾਓ ਪੂਰਾ;
 	}
-	else  // v_type == VAR_CLASS || v_type == VAR_OBJECT
+	ਨਹੀਂਤਾਂ  // v_type == VAR_CLASS || v_type == VAR_OBJECT
 	{
-	    if (get_lval_class_or_obj(lp, key, &p, v_type, cl_exec, flags,
+	    ਜੇ (get_lval_class_or_obj(lp, ਕੁੰਜੀ, &p, v_type, cl_exec, flags,
 							quiet) == FAIL)
-		goto done;
+		ਜਾਓ ਪੂਰਾ;
 	}
 
 	clear_tv(&var1);
@@ -2059,19 +2059,19 @@ get_lval_subscript(
 	var2.v_type = VAR_UNKNOWN;
     }
 
-    if (lp->ll_tuple != NULL && (flags & GLV_READ_ONLY) == 0)
+    ਜੇ (lp->ll_tuple != ਨਿਰਾ && (flags & GLV_READ_ONLY) == 0)
     {
-	if (!quiet)
+	ਜੇ (!quiet)
 	    emsg(_(e_tuple_is_immutable));
-	goto done;
+	ਜਾਓ ਪੂਰਾ;
     }
 
     rc = OK;
 
-done:
+ਪੂਰਾ:
     clear_tv(&var1);
     clear_tv(&var2);
-    return rc == OK ? p : NULL;
+    ਵਾਪਸ rc == OK ? p : ਨਿਰਾ;
 }
 
 /*
@@ -2098,236 +2098,236 @@ get_lval(
     char_u	*name,
     typval_T	*rettv,
     lval_T	*lp,
-    int		unlet,
-    int		skip,
-    int		flags,	    // GLV_ values
-    int		fne_flags)  // flags for find_name_end()
+    ਪੂਰਨ		unlet,
+    ਪੂਰਨ		skip,
+    ਪੂਰਨ		flags,	    // GLV_ values
+    ਪੂਰਨ		fne_flags)  // flags for find_name_end()
 {
     char_u	*p;
-    char_u	*expr_start, *expr_end;
-    int		cc;
-    dictitem_T	*v = NULL;
-    hashtab_T	*ht = NULL;
-    int		quiet = flags & GLV_QUIET;
-    int		writing = 0;
-    int		vim9script = in_vim9script();
-    class_T	*cl_exec = NULL;    // class that is executing, or NULL.
+    char_u	*ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, *ਵਿਅੰਜਕ_ਸਿਰਾ;
+    ਪੂਰਨ		cc;
+    dictitem_T	*v = ਨਿਰਾ;
+    hashtab_T	*ht = ਨਿਰਾ;
+    ਪੂਰਨ		quiet = flags & GLV_QUIET;
+    ਪੂਰਨ		writing = 0;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
+    class_T	*cl_exec = ਨਿਰਾ;    // class that is executing, or NULL.
 
-#ifdef LOG_LOCKVAR
-    if (lval_root == NULL)
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
-    else
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
-			name, (void*)lval_root->lr_tv, lval_root->lr_is_arg);
-    char buf[80];
-    ch_log(NULL, "LKVAR:    ...: GLV flags: %s",
-		    flags_tostring(flags, glv_flag_strings, buf, sizeof(buf)));
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LOG_LOCKVAR
+    ਜੇ (lval_ਜੜ੍ਹ == ਨਿਰਾ)
+	ch_log(ਨਿਰਾ, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
+    ਨਹੀਂਤਾਂ
+	ch_log(ਨਿਰਾ, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
+			name, (ਖਾਲੀ*)lval_ਜੜ੍ਹ->lr_tv, lval_ਜੜ੍ਹ->lr_is_arg);
+    ਅੱਖਰ buf[80];
+    ch_log(ਨਿਰਾ, "LKVAR:    ...: GLV flags: %s",
+		    flags_tostring(flags, glv_flag_ਲੜੀਆਂ, buf, ਆਕਾਰ(buf)));
+#ਜੇ_ਅੰਤ
 
     // Clear everything in "lp".
-    CLEAR_POINTER(lp);
-    ga_init2(&lp->ll_type_list, sizeof(type_T *), 10);
+    CLEAR_ਸੂਚਕ(lp);
+    ga_init2(&lp->ll_type_list, ਆਕਾਰ(type_T *), 10);
 
-    if (skip || (flags & GLV_COMPILING))
+    ਜੇ (skip || (flags & GLV_COMPILING))
     {
 	// When skipping or compiling just find the end of the name.
 	lp->ll_name = name;
-	lp->ll_name_end = find_name_end(name, NULL, NULL,
+	lp->ll_name_ਸਿਰਾ = ਲੱਭੋ_name_ਸਿਰਾ(name, ਨਿਰਾ, ਨਿਰਾ,
 						      FNE_INCL_BR | fne_flags);
-	return lp->ll_name_end;
+	ਵਾਪਸ lp->ll_name_ਸਿਰਾ;
     }
 
     // Cannot use "s:var" at the Vim9 script level.  "s: type" is OK.
-    if (vim9script && at_script_level()
+    ਜੇ (vim9script && at_script_level()
 		  && name[0] == 's' && name[1] == ':' && !VIM_ISWHITE(name[2]))
     {
-	semsg(_(e_cannot_use_s_colon_in_vim9_script_str), name);
-	return NULL;
+	semsg(_(e_cannot_use_s_colon_ਵਿੱਚ_vim9_script_str), name);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Find the end of the name.
-    p = find_name_end(name, &expr_start, &expr_end, fne_flags);
-    lp->ll_name_end = p;
-    if (expr_start != NULL)
+    p = ਲੱਭੋ_name_ਸਿਰਾ(name, &ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, &ਵਿਅੰਜਕ_ਸਿਰਾ, fne_flags);
+    lp->ll_name_ਸਿਰਾ = p;
+    ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ)
     {
 	// Don't expand the name when we already know there is an error.
-	if (unlet && !VIM_ISWHITE(*p) && !ends_excmd(*p)
+	ਜੇ (unlet && !VIM_ISWHITE(*p) && !ਸਿਰੇ_excmd(*p)
 						    && *p != '[' && *p != '.')
 	{
 	    semsg(_(e_trailing_characters_str), p);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 
-	lp->ll_exp_name = make_expanded_name(name, expr_start, expr_end, p);
-	if (lp->ll_exp_name == NULL)
+	lp->ll_exp_name = make_expanded_name(name, ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, ਵਿਅੰਜਕ_ਸਿਰਾ, p);
+	ਜੇ (lp->ll_exp_name == ਨਿਰਾ)
 	{
 	    // Report an invalid expression in braces, unless the
 	    // expression evaluation has been cancelled due to an
 	    // aborting error, an interrupt, or an exception.
-	    if (!aborting() && !quiet)
+	    ਜੇ (!aborting() && !quiet)
 	    {
 		emsg_severe = TRUE;
-		semsg(_(e_invalid_argument_str), name);
-		return NULL;
+		semsg(_(e_invalid_ਦਲੀਲ_str), name);
+		ਵਾਪਸ ਨਿਰਾ;
 	    }
 	}
 	lp->ll_name = lp->ll_exp_name;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	lp->ll_name = name;
 
-	if (vim9script)
+	ਜੇ (vim9script)
 	{
 	    // "a: type" is declaring variable "a" with a type, not "a:".
 	    // However, "g:[key]" is indexing a dictionary.
-	    if (p == name + 2 && p[-1] == ':' && *p != '[')
+	    ਜੇ (p == name + 2 && p[-1] == ':' && *p != '[')
 	    {
 		--p;
-		lp->ll_name_end = p;
+		lp->ll_name_ਸਿਰਾ = p;
 	    }
-	    if (*skipwhite(p) == ':')
+	    ਜੇ (*skipwhite(p) == ':')
 	    {
 		char_u	    *tp = skipwhite(p + 1);
 
-		if (is_scoped_variable(name))
+		ਜੇ (is_scoped_variable(name))
 		{
 		    semsg(_(e_cannot_use_type_with_this_variable_str), name);
-		    return NULL;
+		    ਵਾਪਸ ਨਿਰਾ;
 		}
-		if (VIM_ISWHITE(*p))
+		ਜੇ (VIM_ISWHITE(*p))
 		{
 		    semsg(_(e_no_white_space_allowed_before_colon_str), p);
-		    return NULL;
+		    ਵਾਪਸ ਨਿਰਾ;
 		}
-		if (tp == p + 1 && !quiet)
+		ਜੇ (tp == p + 1 && !quiet)
 		{
 		    semsg(_(e_white_space_required_after_str_str), ":", p);
-		    return NULL;
+		    ਵਾਪਸ ਨਿਰਾ;
 		}
-		if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+		ਜੇ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
 		{
-		    semsg(_(e_using_type_not_in_script_context_str), p);
-		    return NULL;
+		    semsg(_(e_using_type_not_ਵਿੱਚ_script_context_str), p);
+		    ਵਾਪਸ ਨਿਰਾ;
 		}
-		if (vim9script && (flags & GLV_NO_DECL) &&
+		ਜੇ (vim9script && (flags & GLV_NO_DECL) &&
 			!(flags & GLV_FOR_LOOP))
 		{
 		    // Using a type and not in a "var" declaration.
 		    semsg(_(e_trailing_characters_str), p);
-		    return NULL;
+		    ਵਾਪਸ ਨਿਰਾ;
 		}
 
 
 		// parse the type after the name
 		lp->ll_type = parse_type(&tp,
-			       &SCRIPT_ITEM(current_sctx.sc_sid)->sn_type_list,
-			       NULL, NULL, !quiet);
-		if (!quiet && (lp->ll_type == NULL
+			       &SCRIPT_ਵਸਤੂ(current_sctx.sc_sid)->sn_type_list,
+			       ਨਿਰਾ, ਨਿਰਾ, !quiet);
+		ਜੇ (!quiet && (lp->ll_type == ਨਿਰਾ
 			    || !valid_declaration_type(lp->ll_type)))
-		    return NULL;
-		lp->ll_name_end = tp;
+		    ਵਾਪਸ ਨਿਰਾ;
+		lp->ll_name_ਸਿਰਾ = tp;
 	    }
 	    // TODO: check inside class?
 	}
     }
-    if (lp->ll_name == NULL)
-	return p;
+    ਜੇ (lp->ll_name == ਨਿਰਾ)
+	ਵਾਪਸ p;
 
-    if (*p == '.')
+    ਜੇ (*p == '.')
     {
 	// In legacy script, when a local variable and import exists with this name,
 	// prioritize local variable over imports to avoid conflicts.
-	int var_exists = FALSE;
-	if (!vim9script)
+	ਪੂਰਨ var_exists = FALSE;
+	ਜੇ (!vim9script)
 	{
 	    cc = *p;
 	    *p = NUL;
 	    hashtab_T *local_ht = get_funccal_local_ht();
-	    if (local_ht != NULL)
+	    ਜੇ (local_ht != ਨਿਰਾ)
 	    {
-		hashitem_T *hi = hash_find(local_ht, lp->ll_name);
-		if (!HASHITEM_EMPTY(hi))
+		hashitem_T *hi = hash_ਲੱਭੋ(local_ht, lp->ll_name);
+		ਜੇ (!HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi))
 		    var_exists = TRUE;
 	    }
 	    *p = cc;
 	}
 
-	if (!var_exists)
+	ਜੇ (!var_exists)
 	{
-	    imported_T *import = find_imported(lp->ll_name, p - lp->ll_name, TRUE);
-	    if (import != NULL)
+	    imported_T *import = ਲੱਭੋ_imported(lp->ll_name, p - lp->ll_name, TRUE);
+	    ਜੇ (import != ਨਿਰਾ)
 	    {
 		p++;	// skip '.'
 		p = get_lval_imported(lp, import->imp_sid, p, &v, fne_flags);
-		if (p == NULL)
-		    return NULL;
+		ਜੇ (p == ਨਿਰਾ)
+		    ਵਾਪਸ ਨਿਰਾ;
 	    }
 	}
     }
 
     // Without [idx] or .key we are done.
-    if (*p != '[' && *p != '.')
+    ਜੇ (*p != '[' && *p != '.')
     {
-	if (lval_root != NULL)
-	    fill_lval_from_lval_root(lp, lval_root);
-	return p;
+	ਜੇ (lval_ਜੜ੍ਹ != ਨਿਰਾ)
+	    fill_lval_from_lval_ਜੜ੍ਹ(lp, lval_ਜੜ੍ਹ);
+	ਵਾਪਸ p;
     }
 
-    if (vim9script && lval_root != NULL)
-	cl_exec = lval_root->lr_cl_exec;
-    if (vim9script && lval_root != NULL && lval_root->lr_tv != NULL)
+    ਜੇ (vim9script && lval_ਜੜ੍ਹ != ਨਿਰਾ)
+	cl_exec = lval_ਜੜ੍ਹ->lr_cl_exec;
+    ਜੇ (vim9script && lval_ਜੜ੍ਹ != ਨਿਰਾ && lval_ਜੜ੍ਹ->lr_tv != ਨਿਰਾ)
     {
 	// using local variable
-	lp->ll_tv = lval_root->lr_tv;
-	v = NULL;
+	lp->ll_tv = lval_ਜੜ੍ਹ->lr_tv;
+	v = ਨਿਰਾ;
     }
-    else if (lp->ll_tv == NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (lp->ll_tv == ਨਿਰਾ)
     {
 	cc = *p;
 	*p = NUL;
 	// When we would write to the variable pass &ht and prevent autoload.
 	writing = !(flags & GLV_READ_ONLY);
-	v = find_var(lp->ll_name, writing ? &ht : NULL,
+	v = ਲੱਭੋ_var(lp->ll_name, writing ? &ht : ਨਿਰਾ,
 					 (flags & GLV_NO_AUTOLOAD) || writing);
-	if (v == NULL && !quiet)
+	ਜੇ (v == ਨਿਰਾ && !quiet)
 	    semsg(_(e_undefined_variable_str), lp->ll_name);
 	*p = cc;
-	if (v == NULL)
-	    return NULL;
+	ਜੇ (v == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 	lp->ll_tv = &v->di_tv;
     }
 
-    if (vim9script && (flags & GLV_NO_DECL) == 0)
+    ਜੇ (vim9script && (flags & GLV_NO_DECL) == 0)
     {
-	if (!quiet)
+	ਜੇ (!quiet)
 	    semsg(_(e_variable_already_declared_str), lp->ll_name);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // If the next character is a "." or a "[", then process the subitem.
     p = get_lval_subscript(lp, p, name, rettv, ht, v, unlet, flags, cl_exec);
-    if (p == NULL)
-	return NULL;
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (vim9script && lp->ll_valtype != NULL && rettv != NULL)
+    ਜੇ (vim9script && lp->ll_valtype != ਨਿਰਾ && rettv != ਨਿਰਾ)
     {
 	where_T	    where = WHERE_INIT;
 
 	// In a Vim9 script, do type check and make sure the variable is
 	// writable.
-	if (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
-	    return NULL;
+	ਜੇ (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
+	    ਵਾਪਸ ਨਿਰਾ;
     }
 
-    lp->ll_name_end = p;
-    return p;
+    lp->ll_name_ਸਿਰਾ = p;
+    ਵਾਪਸ p;
 }
 
 /*
  * Clear lval "lp" that was filled by get_lval().
  */
-    void
+    ਖਾਲੀ
 clear_lval(lval_T *lp)
 {
     vim_free(lp->ll_exp_name);
@@ -2341,202 +2341,202 @@ clear_lval(lval_T *lp)
  * "op" is NULL, "+" for "+=", "-" for "-=", "*" for "*=", "/" for "/=",
  * "%" for "%=", "." for ".=" or "=" for "=".
  */
-    void
-set_var_lval(
+    ਖਾਲੀ
+ਸੈੱਟ_var_lval(
     lval_T	*lp,
     char_u	*endp,
     typval_T	*rettv,
-    int		copy,
-    int		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
+    ਪੂਰਨ		copy,
+    ਪੂਰਨ		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
     char_u	*op,
-    int		var_idx)    // index for "let [a, b] = list"
+    ਪੂਰਨ		var_idx)    // index for "let [a, b] = list"
 {
-    int		cc;
+    ਪੂਰਨ		cc;
     dictitem_T	*di;
 
-    if (lp->ll_tv == NULL)
+    ਜੇ (lp->ll_tv == ਨਿਰਾ)
     {
 	cc = *endp;
 	*endp = NUL;
-	if (in_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
-	    return;
+	ਜੇ (ਵਿੱਚ_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
+	    ਵਾਪਸ;
 
-	if (lp->ll_blob != NULL)
+	ਜੇ (lp->ll_blob != ਨਿਰਾ)
 	{
-	    int	    error = FALSE;
+	    ਪੂਰਨ	    error = FALSE;
 
-	    if (op != NULL && *op != '=')
+	    ਜੇ (op != ਨਿਰਾ && *op != '=')
 	    {
 		semsg(_(e_wrong_variable_type_for_str_equal), op);
-		return;
+		ਵਾਪਸ;
 	    }
-	    if (value_check_lock(lp->ll_blob->bv_lock, lp->ll_name, FALSE))
-		return;
+	    ਜੇ (ਮੁੱਲ_check_ਤਾਲਾ(lp->ll_blob->bv_ਤਾਲਾ, lp->ll_name, FALSE))
+		ਵਾਪਸ;
 
-	    if (lp->ll_range && rettv->v_type == VAR_BLOB)
+	    ਜੇ (lp->ll_range && rettv->v_type == VAR_BLOB)
 	    {
-		if (lp->ll_empty2)
+		ਜੇ (lp->ll_empty2)
 		    lp->ll_n2 = blob_len(lp->ll_blob) - 1;
 
-		if (blob_set_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
+		ਜੇ (blob_ਸੈੱਟ_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
 								rettv) == FAIL)
-		    return;
+		    ਵਾਪਸ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		varnumber_T	val = tv_get_number_chk(rettv, &error);
-		if (!error)
+		varnumber_T	val = tv_get_ਸੰਖਿਆ_chk(rettv, &error);
+		ਜੇ (!error)
 		{
-		    if (val < 0 || val > 255)
-			semsg(_(e_invalid_value_for_blob_nr), val);
-		    else
-			blob_set_append(lp->ll_blob, lp->ll_n1, val);
+		    ਜੇ (val < 0 || val > 255)
+			semsg(_(e_invalid_ਮੁੱਲ_for_blob_nr), val);
+		    ਨਹੀਂਤਾਂ
+			blob_ਸੈੱਟ_append(lp->ll_blob, lp->ll_n1, val);
 		}
 	    }
 	}
-	else if (op != NULL && *op != '=')
+	ਨਹੀਂਤਾਂ ਜੇ (op != ਨਿਰਾ && *op != '=')
 	{
 	    typval_T tv;
 
-	    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	    ਜੇ ((flags & (ਸੌਂਪੋ_CONST | ਸੌਂਪੋ_FINAL))
+					     && (flags & ਸੌਂਪੋ_FOR_LOOP) == 0)
 	    {
 		emsg(_(e_cannot_modify_existing_variable));
 		*endp = cc;
-		return;
+		ਵਾਪਸ;
 	    }
 
 	    // handle +=, -=, *=, /=, %= and .=
-	    di = NULL;
-	    if (eval_variable(lp->ll_name, (int)STRLEN(lp->ll_name),
+	    di = ਨਿਰਾ;
+	    ਜੇ (eval_variable(lp->ll_name, (ਪੂਰਨ)STRLEN(lp->ll_name),
 				 lp->ll_sid, &tv, &di, EVAL_VAR_VERBOSE) == OK)
 	    {
-		if (di != NULL && check_typval_is_value(&di->di_tv) == FAIL)
+		ਜੇ (di != ਨਿਰਾ && check_typval_is_ਮੁੱਲ(&di->di_tv) == FAIL)
 		{
 		    clear_tv(&tv);
-		    return;
+		    ਵਾਪਸ;
 		}
 
 		// In Vim9 script a String v: variable only takes a String.
-		if (in_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
+		ਜੇ (ਵਿੱਚ_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
 			&& tv.v_type == VAR_STRING)
 		{
 		    where_T	where = WHERE_INIT;
 
-		    if (check_typval_type(&t_string, rettv, where) == FAIL)
+		    ਜੇ (check_typval_type(&t_string, rettv, where) == FAIL)
 		    {
 			clear_tv(&tv);
 			*endp = cc;
-			return;
+			ਵਾਪਸ;
 		    }
 		}
 
-		if ((di == NULL
+		ਜੇ ((di == ਨਿਰਾ
 			 || (!var_check_ro(di->di_flags, lp->ll_name, FALSE)
-			   && !tv_check_lock(&di->di_tv, lp->ll_name, FALSE)))
+			   && !tv_check_ਤਾਲਾ(&di->di_tv, lp->ll_name, FALSE)))
 			&& tv_op(&tv, rettv, op) == OK)
-		    set_var_const(lp->ll_name, lp->ll_sid, NULL, &tv, FALSE,
-				ASSIGN_NO_DECL | ASSIGN_COMPOUND_OP, 0);
+		    ਸੈੱਟ_var_const(lp->ll_name, lp->ll_sid, ਨਿਰਾ, &tv, FALSE,
+				ਸੌਂਪੋ_NO_DECL | ਸੌਂਪੋ_COMPOUND_OP, 0);
 		clear_tv(&tv);
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (lp->ll_type != NULL && check_typval_arg_type(lp->ll_type, rettv,
-							      NULL, 0) == FAIL)
-		return;
-	    set_var_const(lp->ll_name, lp->ll_sid, lp->ll_type, rettv, copy,
+	    ਜੇ (lp->ll_type != ਨਿਰਾ && check_typval_arg_type(lp->ll_type, rettv,
+							      ਨਿਰਾ, 0) == FAIL)
+		ਵਾਪਸ;
+	    ਸੈੱਟ_var_const(lp->ll_name, lp->ll_sid, lp->ll_type, rettv, copy,
 							       flags, var_idx);
 	}
 	*endp = cc;
     }
-    else if (value_check_lock(lp->ll_newkey == NULL
-		? lp->ll_tv->v_lock
-		: lp->ll_tv->vval.v_dict->dv_lock, lp->ll_name, FALSE))
+    ਨਹੀਂਤਾਂ ਜੇ (ਮੁੱਲ_check_ਤਾਲਾ(lp->ll_newkey == ਨਿਰਾ
+		? lp->ll_tv->v_ਤਾਲਾ
+		: lp->ll_tv->vval.v_dict->dv_ਤਾਲਾ, lp->ll_name, FALSE))
 	;
-    else if (lp->ll_range)
+    ਨਹੀਂਤਾਂ ਜੇ (lp->ll_range)
     {
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	ਜੇ ((flags & (ਸੌਂਪੋ_CONST | ਸੌਂਪੋ_FINAL))
+					     && (flags & ਸੌਂਪੋ_FOR_LOOP) == 0)
 	{
-	    emsg(_(e_cannot_lock_range));
-	    return;
+	    emsg(_(e_cannot_ਤਾਲਾ_range));
+	    ਵਾਪਸ;
 	}
 
-	(void)list_assign_range(lp->ll_list, rettv->vval.v_list,
+	(ਖਾਲੀ)list_ਸੌਂਪੋ_range(lp->ll_list, rettv->vval.v_list,
 			 lp->ll_n1, lp->ll_n2, lp->ll_empty2, op, lp->ll_name);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	/*
 	 * Assign to a List, Dictionary or Object item.
 	 */
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					     && (flags & ASSIGN_FOR_LOOP) == 0)
+	ਜੇ ((flags & (ਸੌਂਪੋ_CONST | ਸੌਂਪੋ_FINAL))
+					     && (flags & ਸੌਂਪੋ_FOR_LOOP) == 0)
 	{
-	    emsg(_(e_cannot_lock_list_or_dict));
-	    return;
+	    emsg(_(e_cannot_ਤਾਲਾ_list_or_dict));
+	    ਵਾਪਸ;
 	}
 
-	if (lp->ll_valtype != NULL
+	ਜੇ (lp->ll_valtype != ਨਿਰਾ
 		    && check_typval_arg_type(lp->ll_valtype, rettv,
-							      NULL, 0) == FAIL)
+							      ਨਿਰਾ, 0) == FAIL)
 	{
-	    lp->ll_name_end = NULL;
-	    return;
+	    lp->ll_name_ਸਿਰਾ = ਨਿਰਾ;
+	    ਵਾਪਸ;
 	}
 
 	// If the lval is a List and the type of the list is not yet set,
 	// then set the item type from the declared type of the variable.
-	if (in_vim9script() && rettv->v_type == VAR_LIST
-				&& rettv->vval.v_list != NULL
-				&& rettv->vval.v_list->lv_type == NULL)
+	ਜੇ (ਵਿੱਚ_vim9script() && rettv->v_type == VAR_LIST
+				&& rettv->vval.v_list != ਨਿਰਾ
+				&& rettv->vval.v_list->lv_type == ਨਿਰਾ)
 	{
-	    if (lp->ll_tv->v_type == VAR_LIST
-		    && lp->ll_tv->vval.v_list != NULL
-		    && lp->ll_tv->vval.v_list->lv_type != NULL)
-		set_tv_type(rettv, lp->ll_tv->vval.v_list->lv_type);
+	    ਜੇ (lp->ll_tv->v_type == VAR_LIST
+		    && lp->ll_tv->vval.v_list != ਨਿਰਾ
+		    && lp->ll_tv->vval.v_list->lv_type != ਨਿਰਾ)
+		ਸੈੱਟ_tv_type(rettv, lp->ll_tv->vval.v_list->lv_type);
 	}
 
-	if (lp->ll_newkey != NULL)
+	ਜੇ (lp->ll_newkey != ਨਿਰਾ)
 	{
-	    if (op != NULL && *op != '=')
+	    ਜੇ (op != ਨਿਰਾ && *op != '=')
 	    {
-		semsg(_(e_key_not_present_in_dictionary_str), lp->ll_newkey);
-		return;
+		semsg(_(e_ਕੁੰਜੀ_not_present_ਵਿੱਚ_dictionary_str), lp->ll_newkey);
+		ਵਾਪਸ;
 	    }
-	    if (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
+	    ਜੇ (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
 								lp->ll_newkey))
-		return;
+		ਵਾਪਸ;
 
 	    // Need to add an item to the Dictionary.
 	    di = dictitem_alloc(lp->ll_newkey);
-	    if (di == NULL)
-		return;
-	    if (dict_add(lp->ll_tv->vval.v_dict, di) == FAIL)
+	    ਜੇ (di == ਨਿਰਾ)
+		ਵਾਪਸ;
+	    ਜੇ (dict_ਜੋੜੋ(lp->ll_tv->vval.v_dict, di) == FAIL)
 	    {
 		vim_free(di);
-		return;
+		ਵਾਪਸ;
 	    }
 	    lp->ll_tv = &di->di_tv;
 	}
-	else if (op != NULL && *op != '=')
+	ਨਹੀਂਤਾਂ ਜੇ (op != ਨਿਰਾ && *op != '=')
 	{
 	    tv_op(lp->ll_tv, rettv, op);
-	    return;
+	    ਵਾਪਸ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    clear_tv(lp->ll_tv);
 
 	/*
 	 * Assign the value to the variable or list item.
 	 */
-	if (copy)
+	ਜੇ (copy)
 	    copy_tv(rettv, lp->ll_tv);
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    *lp->ll_tv = *rettv;
-	    lp->ll_tv->v_lock = 0;
+	    lp->ll_tv->v_ਤਾਲਾ = 0;
 	    init_tv(rettv);
 	}
     }
@@ -2546,63 +2546,63 @@ set_var_lval(
  * Handle "blob1 += blob2".
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 tv_op_blob(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_BLOB)
-	return FAIL;
+    ਜੇ (*op != '+' || tv2->v_type != VAR_BLOB)
+	ਵਾਪਸ FAIL;
 
     // Blob += Blob
-    if (tv2->vval.v_blob == NULL)
-	return OK;
+    ਜੇ (tv2->vval.v_blob == ਨਿਰਾ)
+	ਵਾਪਸ OK;
 
-    if (tv1->vval.v_blob == NULL)
+    ਜੇ (tv1->vval.v_blob == ਨਿਰਾ)
     {
 	tv1->vval.v_blob = tv2->vval.v_blob;
 	++tv1->vval.v_blob->bv_refcount;
-	return OK;
+	ਵਾਪਸ OK;
     }
 
     blob_T	*b1 = tv1->vval.v_blob;
     blob_T	*b2 = tv2->vval.v_blob;
-    int		len = blob_len(b2);
+    ਪੂਰਨ		len = blob_len(b2);
 
-    if (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
+    ਜੇ (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
     {
-	mch_memmove((char_u *)b1->bv_ga.ga_data + b1->bv_ga.ga_len,
-		    (char_u *)b2->bv_ga.ga_data, (size_t)len);
+	mch_memmove((char_u *)b1->bv_ga.ga_ਅੰਕੜੇ + b1->bv_ga.ga_len,
+		    (char_u *)b2->bv_ga.ga_ਅੰਕੜੇ, (size_t)len);
 	b1->bv_ga.ga_len += len;
     }
-    else
-	for (int i = 0; i < len; i++)
-	    (void)ga_append(&b1->bv_ga, blob_get(b2, i));
+    ਨਹੀਂਤਾਂ
+	ਲਈ (ਪੂਰਨ i = 0; i < len; i++)
+	    (ਖਾਲੀ)ga_append(&b1->bv_ga, blob_get(b2, i));
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Handle "list1 += list2".
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_LIST)
-	return FAIL;
+    ਜੇ (*op != '+' || tv2->v_type != VAR_LIST)
+	ਵਾਪਸ FAIL;
 
     // List += List
-    if (tv2->vval.v_list == NULL)
-	return OK;
+    ਜੇ (tv2->vval.v_list == ਨਿਰਾ)
+	ਵਾਪਸ OK;
 
-    if (tv1->vval.v_list == NULL)
+    ਜੇ (tv1->vval.v_list == ਨਿਰਾ)
     {
 	tv1->vval.v_list = tv2->vval.v_list;
 	++tv1->vval.v_list->lv_refcount;
     }
-    else
-	list_extend(tv1->vval.v_list, tv2->vval.v_list, NULL);
+    ਨਹੀਂਤਾਂ
+	list_extend(tv1->vval.v_list, tv2->vval.v_list, ਨਿਰਾ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2611,88 +2611,88 @@ tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
  *
  * Returns OK or FAIL.
  */
-    static int
-tv_op_number(typval_T *tv1, typval_T *tv2, char_u *op)
+    ਸਥਿਰ ਪੂਰਨ
+tv_op_ਸੰਖਿਆ(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     varnumber_T	n;
-    int		failed = FALSE;
+    ਪੂਰਨ		failed = FALSE;
 
-    n = tv_get_number(tv1);
-    if (tv2->v_type == VAR_FLOAT)
+    n = tv_get_ਸੰਖਿਆ(tv1);
+    ਜੇ (tv2->v_type == VAR_FLOAT)
     {
 	float_T f = n;
 
-	if (*op == '%')
-	    return FAIL;
-	switch (*op)
+	ਜੇ (*op == '%')
+	    ਵਾਪਸ FAIL;
+	ਚੋਣ (*op)
 	{
-	    case '+': f += tv2->vval.v_float; break;
-	    case '-': f -= tv2->vval.v_float; break;
-	    case '*': f *= tv2->vval.v_float; break;
-	    case '/': f /= tv2->vval.v_float; break;
+	    ਹਾਲਤ '+': f += tv2->vval.v_float; ਰੋਕੋ;
+	    ਹਾਲਤ '-': f -= tv2->vval.v_float; ਰੋਕੋ;
+	    ਹਾਲਤ '*': f *= tv2->vval.v_float; ਰੋਕੋ;
+	    ਹਾਲਤ '/': f /= tv2->vval.v_float; ਰੋਕੋ;
 	}
 	clear_tv(tv1);
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	switch (*op)
+	ਚੋਣ (*op)
 	{
-	    case '+': n += tv_get_number(tv2); break;
-	    case '-': n -= tv_get_number(tv2); break;
-	    case '*': n *= tv_get_number(tv2); break;
-	    case '/': n = num_divide(n, tv_get_number(tv2), &failed); break;
-	    case '%': n = num_modulus(n, tv_get_number(tv2), &failed); break;
+	    ਹਾਲਤ '+': n += tv_get_ਸੰਖਿਆ(tv2); ਰੋਕੋ;
+	    ਹਾਲਤ '-': n -= tv_get_ਸੰਖਿਆ(tv2); ਰੋਕੋ;
+	    ਹਾਲਤ '*': n *= tv_get_ਸੰਖਿਆ(tv2); ਰੋਕੋ;
+	    ਹਾਲਤ '/': n = ਅੰਕ_divide(n, tv_get_ਸੰਖਿਆ(tv2), &failed); ਰੋਕੋ;
+	    ਹਾਲਤ '%': n = ਅੰਕ_modulus(n, tv_get_ਸੰਖਿਆ(tv2), &failed); ਰੋਕੋ;
 	}
 	clear_tv(tv1);
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n;
+	tv1->v_type = VAR_ਸੰਖਿਆ;
+	tv1->vval.v_ਸੰਖਿਆ = n;
     }
 
-    return failed ? FAIL : OK;
+    ਵਾਪਸ failed ? FAIL : OK;
 }
 
 /*
  * Append string "s2" to the string in "tv1".
  * Returns OK if "tv1" was grown in place, FAIL otherwise.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 grow_string_tv(typval_T *tv1, char_u *s2)
 {
-    if (tv1->v_type != VAR_STRING || tv1->vval.v_string == NULL)
-	return FAIL;
+    ਜੇ (tv1->v_type != VAR_STRING || tv1->vval.v_string == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     size_t len1 = STRLEN(tv1->vval.v_string);
     size_t len2 = STRLEN(s2);
     char_u *p = vim_realloc(tv1->vval.v_string, len1 + len2 + 1);
 
-    if (p == NULL)
-	return FAIL;
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     mch_memmove(p + len1, s2, len2 + 1);
     tv1->vval.v_string = p;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Handle "str1 .= str2"
  * Returns OK or FAIL.
  */
-    static int
-tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op ਅਣਵਰਤਿਆ)
 {
     char_u	numbuf[NUMBUFLEN];
     char_u	*s;
     char_u	*s2;
 
-    if (tv2->v_type == VAR_FLOAT)
-	return FAIL;
+    ਜੇ (tv2->v_type == VAR_FLOAT)
+	ਵਾਪਸ FAIL;
 
     // str .= str
     s2 = tv_get_string_buf(tv2, numbuf);
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    ਜੇ (grow_string_tv(tv1, s2) == OK)
+	ਵਾਪਸ OK;
 
     s = tv_get_string(tv1);
     s = concat_str(s, s2);
@@ -2700,7 +2700,7 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = s;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2708,46 +2708,46 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 tv_op_nr_or_string(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (tv2->v_type == VAR_LIST)
-	return FAIL;
+    ਜੇ (tv2->v_type == VAR_LIST)
+	ਵਾਪਸ FAIL;
 
-    if (vim_strchr((char_u *)"+-*/%", *op) != NULL)
-	return tv_op_number(tv1, tv2, op);
+    ਜੇ (vim_strchr((char_u *)"+-*/%", *op) != ਨਿਰਾ)
+	ਵਾਪਸ tv_op_ਸੰਖਿਆ(tv1, tv2, op);
 
-    return tv_op_string(tv1, tv2, op);
+    ਵਾਪਸ tv_op_string(tv1, tv2, op);
 }
 
 /*
  * Handle "f1 += f2", "f1 -= f2", "f1 *= f2", "f1 /= f2".
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     float_T f;
 
-    if (*op == '%' || *op == '.'
+    ਜੇ (*op == '%' || *op == '.'
 	    || (tv2->v_type != VAR_FLOAT
-		&& tv2->v_type != VAR_NUMBER
+		&& tv2->v_type != VAR_ਸੰਖਿਆ
 		&& tv2->v_type != VAR_STRING))
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
-    if (tv2->v_type == VAR_FLOAT)
+    ਜੇ (tv2->v_type == VAR_FLOAT)
 	f = tv2->vval.v_float;
-    else
-	f = tv_get_number(tv2);
-    switch (*op)
+    ਨਹੀਂਤਾਂ
+	f = tv_get_ਸੰਖਿਆ(tv2);
+    ਚੋਣ (*op)
     {
-	case '+': tv1->vval.v_float += f; break;
-	case '-': tv1->vval.v_float -= f; break;
-	case '*': tv1->vval.v_float *= f; break;
-	case '/': tv1->vval.v_float /= f; break;
+	ਹਾਲਤ '+': tv1->vval.v_float += f; ਰੋਕੋ;
+	ਹਾਲਤ '-': tv1->vval.v_float -= f; ਰੋਕੋ;
+	ਹਾਲਤ '*': tv1->vval.v_float *= f; ਰੋਕੋ;
+	ਹਾਲਤ '/': tv1->vval.v_float /= f; ਰੋਕੋ;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2755,61 +2755,61 @@ tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     // Can't do anything with a Funcref or Dict on the right.
     // v:true and friends only work with "..=".
-    if (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
+    ਜੇ (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
 		|| ((tv2->v_type == VAR_BOOL || tv2->v_type == VAR_SPECIAL)
 							&& *op != '.'))
     {
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    int retval = FAIL;
-    switch (tv1->v_type)
+    ਪੂਰਨ retval = FAIL;
+    ਚੋਣ (tv1->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_DICT:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	case VAR_TUPLE:
-	    break;
+	ਹਾਲਤ VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_VOID:
+	ਹਾਲਤ VAR_DICT:
+	ਹਾਲਤ VAR_FUNC:
+	ਹਾਲਤ VAR_PARTIAL:
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	ਹਾਲਤ VAR_INSTR:
+	ਹਾਲਤ VAR_OBJECT:
+	ਹਾਲਤ VAR_CLASS:
+	ਹਾਲਤ VAR_TYPEALIAS:
+	ਹਾਲਤ VAR_TUPLE:
+	    ਰੋਕੋ;
 
-	case VAR_BLOB:
+	ਹਾਲਤ VAR_BLOB:
 	    retval = tv_op_blob(tv1, tv2, op);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_LIST:
+	ਹਾਲਤ VAR_LIST:
 	    retval = tv_op_list(tv1, tv2, op);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	ਹਾਲਤ VAR_STRING:
 	    retval = tv_op_nr_or_string(tv1, tv2, op);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_FLOAT:
+	ਹਾਲਤ VAR_FLOAT:
 	    retval = tv_op_float(tv1, tv2, op);
-	    break;
+	    ਰੋਕੋ;
     }
 
-    if (retval != OK)
+    ਜੇ (retval != OK)
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -2818,60 +2818,60 @@ tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
  * Set "*errp" to TRUE for an error, FALSE otherwise;
  * Return a pointer that holds the info.  Null when there is an error.
  */
-    void *
-eval_for_line(
+    ਖਾਲੀ *
+eval_for_ਸਤਰ(
     char_u	*arg,
-    int		*errp,
+    ਪੂਰਨ		*errp,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
     forinfo_T	*fi;
-    char_u	*var_list_end;
-    char_u	*expr;
+    char_u	*var_list_ਸਿਰਾ;
+    char_u	*ਵਿਅੰਜਕ;
     typval_T	tv;
     list_T	*l;
     tuple_T	*tuple;
-    int		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
+    ਪੂਰਨ		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
 
     *errp = TRUE;	// default: there is an error
 
     fi = ALLOC_CLEAR_ONE(forinfo_T);
-    if (fi == NULL)
-	return NULL;
+    ਜੇ (fi == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    var_list_end = skip_var_list(arg, TRUE, &fi->fi_varcount,
+    var_list_ਸਿਰਾ = skip_var_list(arg, TRUE, &fi->fi_varcount,
 						     &fi->fi_semicolon, FALSE);
-    if (var_list_end == NULL)
-	return fi;
+    ਜੇ (var_list_ਸਿਰਾ == ਨਿਰਾ)
+	ਵਾਪਸ fi;
 
-    expr = skipwhite_and_linebreak(var_list_end, evalarg);
-    if (expr[0] != 'i' || expr[1] != 'n'
-				  || !(expr[2] == NUL || VIM_ISWHITE(expr[2])))
+    ਵਿਅੰਜਕ = skipwhite_and_linebreak(var_list_ਸਿਰਾ, evalarg);
+    ਜੇ (ਵਿਅੰਜਕ[0] != 'i' || ਵਿਅੰਜਕ[1] != 'n'
+				  || !(ਵਿਅੰਜਕ[2] == NUL || VIM_ISWHITE(ਵਿਅੰਜਕ[2])))
     {
-	if (in_vim9script() && *expr == ':' && expr != var_list_end)
-	    semsg(_(e_no_white_space_allowed_before_colon_str), expr);
-	else
-	    emsg(_(e_missing_in_after_for));
-	return fi;
+	ਜੇ (ਵਿੱਚ_vim9script() && *ਵਿਅੰਜਕ == ':' && ਵਿਅੰਜਕ != var_list_ਸਿਰਾ)
+	    semsg(_(e_no_white_space_allowed_before_colon_str), ਵਿਅੰਜਕ);
+	ਨਹੀਂਤਾਂ
+	    emsg(_(e_missing_ਵਿੱਚ_after_for));
+	ਵਾਪਸ fi;
     }
 
-    if (skip)
+    ਜੇ (skip)
 	++emsg_skip;
-    expr = skipwhite_and_linebreak(expr + 2, evalarg);
-    if (eval0(expr, &tv, eap, evalarg) == OK)
+    ਵਿਅੰਜਕ = skipwhite_and_linebreak(ਵਿਅੰਜਕ + 2, evalarg);
+    ਜੇ (eval0(ਵਿਅੰਜਕ, &tv, eap, evalarg) == OK)
     {
 	*errp = FALSE;
-	if (!skip)
+	ਜੇ (!skip)
 	{
-	    if (tv.v_type == VAR_LIST)
+	    ਜੇ (tv.v_type == VAR_LIST)
 	    {
 		l = tv.vval.v_list;
-		if (l == NULL)
+		ਜੇ (l == ਨਿਰਾ)
 		{
 		    // a null list is like an empty list: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Need a real list here.
 		    CHECK_LIST_MATERIALIZE(l);
@@ -2879,19 +2879,19 @@ eval_for_line(
 		    // No need to increment the refcount, it's already set for
 		    // the list being used in "tv".
 		    fi->fi_list = l;
-		    list_add_watch(l, &fi->fi_lw);
-		    fi->fi_lw.lw_item = l->lv_first;
+		    list_ਜੋੜੋ_watch(l, &fi->fi_lw);
+		    fi->fi_lw.lw_ਵਸਤੂ = l->lv_ਪਹਿਲਾ;
 		}
 	    }
-	    else if (tv.v_type == VAR_TUPLE)
+	    ਨਹੀਂਤਾਂ ਜੇ (tv.v_type == VAR_TUPLE)
 	    {
 		tuple = tv.vval.v_tuple;
-		if (tuple == NULL)
+		ਜੇ (tuple == ਨਿਰਾ)
 		{
 		    // a null tuple is like an empty tuple: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // No need to increment the refcount, it's already set for
 		    // the tuple being used in "tv".
@@ -2899,10 +2899,10 @@ eval_for_line(
 		    fi->fi_tuple_idx = 0;
 		}
 	    }
-	    else if (tv.v_type == VAR_BLOB)
+	    ਨਹੀਂਤਾਂ ਜੇ (tv.v_type == VAR_BLOB)
 	    {
 		fi->fi_bi = 0;
-		if (tv.vval.v_blob != NULL)
+		ਜੇ (tv.vval.v_blob != ਨਿਰਾ)
 		{
 		    // Make a copy, so that the iteration still works when the
 		    // blob is changed.
@@ -2910,39 +2910,39 @@ eval_for_line(
 		}
 		clear_tv(&tv);
 	    }
-	    else if (tv.v_type == VAR_STRING)
+	    ਨਹੀਂਤਾਂ ਜੇ (tv.v_type == VAR_STRING)
 	    {
 		fi->fi_byte_idx = 0;
 		fi->fi_string = tv.vval.v_string;
-		tv.vval.v_string = NULL;
-		if (fi->fi_string == NULL)
+		tv.vval.v_string = ਨਿਰਾ;
+		ਜੇ (fi->fi_string == ਨਿਰਾ)
 		    fi->fi_string = vim_strsave((char_u *)"");
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		emsg(_(e_string_list_tuple_or_blob_required));
 		clear_tv(&tv);
 	    }
 	}
     }
-    if (skip)
+    ਜੇ (skip)
 	--emsg_skip;
-    fi->fi_break_count = evalarg->eval_break_count;
+    fi->fi_break_ਗਿਣਤੀ = evalarg->eval_break_ਗਿਣਤੀ;
 
-    return fi;
+    ਵਾਪਸ fi;
 }
 
 /*
  * Used when looping over a :for line, skip the "in expr" part.
  */
-    void
-skip_for_lines(void *fi_void, evalarg_T *evalarg)
+    ਖਾਲੀ
+skip_for_ਸਤਰਾਂ(ਖਾਲੀ *fi_void, evalarg_T *evalarg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < fi->fi_break_count; ++i)
-	eval_next_line(NULL, evalarg);
+    ਲਈ (i = 0; i < fi->fi_break_ਗਿਣਤੀ; ++i)
+	eval_ਅਗਲਾ_ਸਤਰ(ਨਿਰਾ, evalarg);
 }
 
 /*
@@ -2951,252 +2951,252 @@ skip_for_lines(void *fi_void, evalarg_T *evalarg)
  * Return TRUE when a valid item was found, FALSE when at end of list or
  * something wrong.
  */
-    int
-next_for_item(void *fi_void, char_u *arg)
+    ਪੂਰਨ
+ਅਗਲਾ_for_ਵਸਤੂ(ਖਾਲੀ *fi_void, char_u *arg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		result;
-    int		flag = ASSIGN_FOR_LOOP | (in_vim9script()
-			 ? (ASSIGN_FINAL
+    ਪੂਰਨ		ਨਤੀਜਾ;
+    ਪੂਰਨ		flag = ਸੌਂਪੋ_FOR_LOOP | (ਵਿੱਚ_vim9script()
+			 ? (ਸੌਂਪੋ_FINAL
 			     // first round: error if variable exists
-			     | (fi->fi_bi == 0 ? 0 : ASSIGN_DECL)
-			     | ASSIGN_NO_MEMBER_TYPE
-			     | ASSIGN_UPDATE_BLOCK_ID)
+			     | (fi->fi_bi == 0 ? 0 : ਸੌਂਪੋ_DECL)
+			     | ਸੌਂਪੋ_NO_MEMBER_TYPE
+			     | ਸੌਂਪੋ_UPDATE_ਖੰਡ_ID)
 			 : 0);
-    listitem_T	*item;
-    int		skip_assign = in_vim9script() && arg[0] == '_'
+    listitem_T	*ਵਸਤੂ;
+    ਪੂਰਨ		skip_ਸੌਂਪੋ = ਵਿੱਚ_vim9script() && arg[0] == '_'
 						      && !eval_isnamec(arg[1]);
 
-    if (fi->fi_blob != NULL)
+    ਜੇ (fi->fi_blob != ਨਿਰਾ)
     {
 	typval_T	tv;
 
-	if (fi->fi_bi >= blob_len(fi->fi_blob))
-	    return FALSE;
-	tv.v_type = VAR_NUMBER;
-	tv.v_lock = VAR_FIXED;
-	tv.vval.v_number = blob_get(fi->fi_blob, fi->fi_bi);
+	ਜੇ (fi->fi_bi >= blob_len(fi->fi_blob))
+	    ਵਾਪਸ FALSE;
+	tv.v_type = VAR_ਸੰਖਿਆ;
+	tv.v_ਤਾਲਾ = VAR_FIXED;
+	tv.vval.v_ਸੰਖਿਆ = blob_get(fi->fi_blob, fi->fi_bi);
 	++fi->fi_bi;
-	if (skip_assign)
-	    return TRUE;
-	return ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ਜੇ (skip_ਸੌਂਪੋ)
+	    ਵਾਪਸ TRUE;
+	ਵਾਪਸ ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ਨਿਰਾ) == OK;
     }
 
-    if (fi->fi_string != NULL)
+    ਜੇ (fi->fi_string != ਨਿਰਾ)
     {
 	typval_T	tv;
-	int		len;
+	ਪੂਰਨ		len;
 
 	len = mb_ptr2len(fi->fi_string + fi->fi_byte_idx);
-	if (len == 0)
-	    return FALSE;
+	ਜੇ (len == 0)
+	    ਵਾਪਸ FALSE;
 	tv.v_type = VAR_STRING;
-	tv.v_lock = VAR_FIXED;
+	tv.v_ਤਾਲਾ = VAR_FIXED;
 	tv.vval.v_string = vim_strnsave(fi->fi_string + fi->fi_byte_idx, len);
 	fi->fi_byte_idx += len;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ਜੇ (skip_ਸੌਂਪੋ)
+	    ਨਤੀਜਾ = TRUE;
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ਨਿਰਾ) == OK;
 	vim_free(tv.vval.v_string);
-	return result;
+	ਵਾਪਸ ਨਤੀਜਾ;
     }
 
-    if (fi->fi_tuple != NULL)
+    ਜੇ (fi->fi_tuple != ਨਿਰਾ)
     {
 	typval_T	tv;
 
-	if (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
-	    return FALSE;
+	ਜੇ (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
+	    ਵਾਪਸ FALSE;
 
-	copy_tv(TUPLE_ITEM(fi->fi_tuple, fi->fi_tuple_idx), &tv);
+	copy_tv(TUPLE_ਵਸਤੂ(fi->fi_tuple, fi->fi_tuple_idx), &tv);
 	++fi->fi_tuple_idx;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	ਜੇ (skip_ਸੌਂਪੋ)
+	    ਨਤੀਜਾ = TRUE;
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ਨਿਰਾ) == OK;
 	clear_tv(&tv);
-	return result;
+	ਵਾਪਸ ਨਤੀਜਾ;
     }
 
-    item = fi->fi_lw.lw_item;
-    if (item == NULL)
-	result = FALSE;
-    else
+    ਵਸਤੂ = fi->fi_lw.lw_ਵਸਤੂ;
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਨਤੀਜਾ = FALSE;
+    ਨਹੀਂਤਾਂ
     {
-	fi->fi_lw.lw_item = item->li_next;
+	fi->fi_lw.lw_ਵਸਤੂ = ਵਸਤੂ->li_ਅਗਲਾ;
 	++fi->fi_bi;
-	if (skip_assign)
-	    result = TRUE;
-	else
-	    result = (ex_let_vars(arg, &item->li_tv, TRUE, fi->fi_semicolon,
-					   fi->fi_varcount, flag, NULL) == OK);
+	ਜੇ (skip_ਸੌਂਪੋ)
+	    ਨਤੀਜਾ = TRUE;
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ = (ex_let_vars(arg, &ਵਸਤੂ->li_tv, TRUE, fi->fi_semicolon,
+					   fi->fi_varcount, flag, ਨਿਰਾ) == OK);
     }
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
  * Free the structure used to store info used by ":for".
  */
-    void
-free_for_info(void *fi_void)
+    ਖਾਲੀ
+free_for_info(ਖਾਲੀ *fi_void)
 {
     forinfo_T    *fi = (forinfo_T *)fi_void;
 
-    if (fi == NULL)
-	return;
-    if (fi->fi_list != NULL)
+    ਜੇ (fi == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (fi->fi_list != ਨਿਰਾ)
     {
 	list_rem_watch(fi->fi_list, &fi->fi_lw);
 	list_unref(fi->fi_list);
     }
-    else if (fi->fi_blob != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (fi->fi_blob != ਨਿਰਾ)
 	blob_unref(fi->fi_blob);
-    else if (fi->fi_tuple != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (fi->fi_tuple != ਨਿਰਾ)
 	tuple_unref(fi->fi_tuple);
-    else
+    ਨਹੀਂਤਾਂ
 	vim_free(fi->fi_string);
     vim_free(fi);
 }
 
-    void
-set_context_for_expression(
+    ਖਾਲੀ
+ਸੈੱਟ_context_for_ਵਿਅੰਜਕ(
     expand_T	*xp,
     char_u	*arg,
     cmdidx_T	cmdidx)
 {
-    int		has_expr = cmdidx != CMD_let && cmdidx != CMD_var;
-    int		c;
+    ਪੂਰਨ		has_ਵਿਅੰਜਕ = cmdidx != CMD_let && cmdidx != CMD_var;
+    ਪੂਰਨ		c;
     char_u	*p;
 
-    if (cmdidx == CMD_let || cmdidx == CMD_var
+    ਜੇ (cmdidx == CMD_let || cmdidx == CMD_var
 				 || cmdidx == CMD_const || cmdidx == CMD_final)
     {
 	xp->xp_context = EXPAND_USER_VARS;
-	if (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == NULL)
+	ਜੇ (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == ਨਿਰਾ)
 	{
 	    // ":let var1 var2 ...": find last space.
-	    for (p = arg + STRLEN(arg); p >= arg; )
+	    ਲਈ (p = arg + STRLEN(arg); p >= arg; )
 	    {
-		xp->xp_pattern = p;
-		MB_PTR_BACK(arg, p);
-		if (VIM_ISWHITE(*p))
-		    break;
+		xp->xp_ਨਮੂਨਾ = p;
+		MB_PTR_ਪਿੱਠ(arg, p);
+		ਜੇ (VIM_ISWHITE(*p))
+		    ਰੋਕੋ;
 	    }
-	    return;
+	    ਵਾਪਸ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	xp->xp_context = cmdidx == CMD_call ? EXPAND_FUNCTIONS
-							  : EXPAND_EXPRESSION;
-    while ((xp->xp_pattern = vim_strpbrk(arg,
-				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != NULL)
+							  : EXPAND_ਵਿਅੰਜਕ;
+    ਜਦੋਂ ((xp->xp_ਨਮੂਨਾ = vim_strpbrk(arg,
+				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != ਨਿਰਾ)
     {
-	c = *xp->xp_pattern;
-	if (c == '&')
+	c = *xp->xp_ਨਮੂਨਾ;
+	ਜੇ (c == '&')
 	{
-	    c = xp->xp_pattern[1];
-	    if (c == '&')
+	    c = xp->xp_ਨਮੂਨਾ[1];
+	    ਜੇ (c == '&')
 	    {
-		++xp->xp_pattern;
-		xp->xp_context = has_expr ? EXPAND_EXPRESSION : EXPAND_NOTHING;
+		++xp->xp_ਨਮੂਨਾ;
+		xp->xp_context = has_ਵਿਅੰਜਕ ? EXPAND_ਵਿਅੰਜਕ : EXPAND_NOTHING;
 	    }
-	    else if (c != ' ')
+	    ਨਹੀਂਤਾਂ ਜੇ (c != ' ')
 	    {
 		xp->xp_context = EXPAND_SETTINGS;
-		if ((c == 'l' || c == 'g') && xp->xp_pattern[2] == ':')
-		    xp->xp_pattern += 2;
+		ਜੇ ((c == 'l' || c == 'g') && xp->xp_ਨਮੂਨਾ[2] == ':')
+		    xp->xp_ਨਮੂਨਾ += 2;
 
 	    }
 	}
-	else if (c == '$')
+	ਨਹੀਂਤਾਂ ਜੇ (c == '$')
 	{
 	    // environment variable
 	    xp->xp_context = EXPAND_ENV_VARS;
 	}
-	else if (c == '=')
+	ਨਹੀਂਤਾਂ ਜੇ (c == '=')
 	{
-	    has_expr = TRUE;
-	    xp->xp_context = EXPAND_EXPRESSION;
+	    has_ਵਿਅੰਜਕ = TRUE;
+	    xp->xp_context = EXPAND_ਵਿਅੰਜਕ;
 	}
-	else if (c == '#'
-		&& xp->xp_context == EXPAND_EXPRESSION)
+	ਨਹੀਂਤਾਂ ਜੇ (c == '#'
+		&& xp->xp_context == EXPAND_ਵਿਅੰਜਕ)
 	{
 	    // Autoload function/variable contains '#'.
-	    break;
+	    ਰੋਕੋ;
 	}
-	else if ((c == '<' || c == '#')
+	ਨਹੀਂਤਾਂ ਜੇ ((c == '<' || c == '#')
 		&& xp->xp_context == EXPAND_FUNCTIONS
-		&& vim_strchr(xp->xp_pattern, '(') == NULL)
+		&& vim_strchr(xp->xp_ਨਮੂਨਾ, '(') == ਨਿਰਾ)
 	{
 	    // Function name can start with "<SNR>" and contain '#'.
-	    break;
+	    ਰੋਕੋ;
 	}
-	else if (has_expr)
+	ਨਹੀਂਤਾਂ ਜੇ (has_ਵਿਅੰਜਕ)
 	{
-	    if (c == '"')	    // string
+	    ਜੇ (c == '"')	    // string
 	    {
-		while ((c = *++xp->xp_pattern) != NUL && c != '"')
-		    if (c == '\\' && xp->xp_pattern[1] != NUL)
-			++xp->xp_pattern;
+		ਜਦੋਂ ((c = *++xp->xp_ਨਮੂਨਾ) != NUL && c != '"')
+		    ਜੇ (c == '\\' && xp->xp_ਨਮੂਨਾ[1] != NUL)
+			++xp->xp_ਨਮੂਨਾ;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '\'')	    // literal string
+	    ਨਹੀਂਤਾਂ ਜੇ (c == '\'')	    // literal string
 	    {
 		// Trick: '' is like stopping and starting a literal string.
-		while ((c = *++xp->xp_pattern) != NUL && c != '\'')
+		ਜਦੋਂ ((c = *++xp->xp_ਨਮੂਨਾ) != NUL && c != '\'')
 		    /* skip */ ;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '|')
+	    ਨਹੀਂਤਾਂ ਜੇ (c == '|')
 	    {
-		if (xp->xp_pattern[1] == '|')
+		ਜੇ (xp->xp_ਨਮੂਨਾ[1] == '|')
 		{
-		    ++xp->xp_pattern;
-		    xp->xp_context = EXPAND_EXPRESSION;
+		    ++xp->xp_ਨਮੂਨਾ;
+		    xp->xp_context = EXPAND_ਵਿਅੰਜਕ;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    xp->xp_context = EXPAND_COMMANDS;
 	    }
-	    else
-		xp->xp_context = EXPAND_EXPRESSION;
+	    ਨਹੀਂਤਾਂ
+		xp->xp_context = EXPAND_ਵਿਅੰਜਕ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // Doesn't look like something valid, expand as an expression
 	    // anyway.
-	    xp->xp_context = EXPAND_EXPRESSION;
-	arg = xp->xp_pattern;
-	if (*arg != NUL)
-	    while ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
+	    xp->xp_context = EXPAND_ਵਿਅੰਜਕ;
+	arg = xp->xp_ਨਮੂਨਾ;
+	ਜੇ (*arg != NUL)
+	    ਜਦੋਂ ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
 		/* skip */ ;
     }
 
     // ":exe one two" completes "two"
-    if ((cmdidx == CMD_execute
+    ਜੇ ((cmdidx == CMD_execute
 		|| cmdidx == CMD_echo
 		|| cmdidx == CMD_echon
 		|| cmdidx == CMD_echomsg
 		|| cmdidx == CMD_echoerr
 		|| cmdidx == CMD_echoconsole
 		|| cmdidx == CMD_echowindow)
-	    && xp->xp_context == EXPAND_EXPRESSION)
+	    && xp->xp_context == EXPAND_ਵਿਅੰਜਕ)
     {
-	for (;;)
+	ਲਈ (;;)
 	{
 	    char_u *n = skiptowhite(arg);
 
-	    if (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
-		break;
+	    ਜੇ (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
+		ਰੋਕੋ;
 	    arg = skipwhite(n);
 	}
     }
 
-    xp->xp_pattern = arg;
+    xp->xp_ਨਮੂਨਾ = arg;
 }
 
 /*
@@ -3219,20 +3219,20 @@ set_context_for_expression(
  * eval_prog_pat and eval_prog_enc are non-NULL whenever eval_prog_cache is
  * non-NULL.
  */
-static regprog_T    *eval_prog_cache = NULL;
-static char_u	    *eval_prog_pat = NULL;	// pattern it was compiled for
-static char_u	    *eval_prog_enc = NULL;	// 'encoding' when compiled
-static long	    eval_prog_re;		// 'regexpengine' when compiled
+ਸਥਿਰ regprog_T    *eval_prog_cache = ਨਿਰਾ;
+ਸਥਿਰ char_u	    *eval_prog_pat = ਨਿਰਾ;	// pattern it was compiled for
+ਸਥਿਰ char_u	    *eval_prog_enc = ਨਿਰਾ;	// 'encoding' when compiled
+ਸਥਿਰ ਲੰਮਾ	    eval_prog_re;		// 'regexpengine' when compiled
 // State sampled by eval_regcomp() for the eval_regfree() call that gives the
 // program back: user code run in between, e.g. an object's string() method
 // invoked by match() on a list, can change these options, and then the
 // program must not be cached under the changed values.  eval_compile_enc is
 // only ever compared against p_enc, never dereferenced.
-static long	    eval_compile_re;
-static char_u	    *eval_compile_enc;
-static int	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
+ਸਥਿਰ ਲੰਮਾ	    eval_compile_re;
+ਸਥਿਰ char_u	    *eval_compile_enc;
+ਸਥਿਰ ਪੂਰਨ	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
 					// that were not given back yet
-static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
+ਸਥਿਰ ਪੂਰਨ	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
 						  // a program was handed out
 
 /*
@@ -3245,20 +3245,20 @@ static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
  * intentionally over-approximate, e.g. a literal "~" or "%." also matches;
  * such a pattern is compiled every time, which is never wrong.
  */
-    static bool
+    ਸਥਿਰ bool
 eval_prog_volatile(char_u *pat)
 {
     char_u *p;
 
-    if (STRNCMP(pat, "\\%#=", 4) == 0)
-	return true;
-    for (p = pat; *p != NUL; ++p)
-	if (*p == '~'
+    ਜੇ (STRNCMP(pat, "\\%#=", 4) == 0)
+	ਵਾਪਸ true;
+    ਲਈ (p = pat; *p != NUL; ++p)
+	ਜੇ (*p == '~'
 		|| (p[0] == '[' && (p[1] == ':' || p[1] == '=' || p[1] == '.'))
 		|| (p[0] == '%' && (p[1] == '.'
 			|| ((p[1] == '<' || p[1] == '>') && p[2] == '.'))))
-	    return true;
-    return false;
+	    ਵਾਪਸ true;
+    ਵਾਪਸ false;
 }
 
 /*
@@ -3275,12 +3275,12 @@ eval_regcomp(char_u *pat)
     // did not change while the caller was using the program.
     eval_compile_re = p_re;
     eval_compile_enc = p_enc;
-    if (eval_prog_busy > 0)
+    ਜੇ (eval_prog_busy > 0)
 	// The samples above no longer describe the program already handed
 	// out: its eval_regfree() must drop it instead of caching it.
 	eval_prog_reentered = TRUE;
 
-    if (eval_prog_cache != NULL
+    ਜੇ (eval_prog_cache != ਨਿਰਾ
 	    && *p_cpo == NUL
 	    && eval_prog_cache->re_flags == RE_MAGIC + RE_STRING
 	    && eval_prog_re == p_re
@@ -3290,13 +3290,13 @@ eval_regcomp(char_u *pat)
 	prog = eval_prog_cache;
 	// The caller now owns the program, eval_regfree() adopts the
 	// program the caller ends up with.
-	eval_prog_cache = NULL;
+	eval_prog_cache = ਨਿਰਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (prog != NULL)
+    ਜੇ (prog != ਨਿਰਾ)
 	++eval_prog_busy;	// paired with the eval_regfree() call
-    return prog;
+    ਵਾਪਸ prog;
 }
 
 /*
@@ -3304,25 +3304,25 @@ eval_regcomp(char_u *pat)
  * keeping it in the cache for the next use.  "pat" must be the same string
  * the program was compiled for and must still be valid.
  */
-    void
+    ਖਾਲੀ
 eval_regfree(char_u *pat, regprog_T *prog)
 {
-    int	    reentered = eval_prog_reentered;
+    ਪੂਰਨ	    reentered = eval_prog_reentered;
 
-    if (eval_prog_busy > 0 && --eval_prog_busy == 0)
+    ਜੇ (eval_prog_busy > 0 && --eval_prog_busy == 0)
 	eval_prog_reentered = FALSE;
-    if (prog == NULL)
-	return;
-    if (reentered || *p_cpo != NUL
+    ਜੇ (prog == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (reentered || *p_cpo != NUL
 	    || eval_compile_re != p_re || eval_compile_enc != p_enc)
     {
 	// 'cpoptions' is not empty, an option in the cache key changed, or
 	// another program was handed out while the caller was using this
 	// one: the samples may not describe this program, do not cache it.
 	vim_regfree(prog);
-	return;
+	ਵਾਪਸ;
     }
-    if (eval_prog_pat == NULL || STRCMP(eval_prog_pat, pat) != 0
+    ਜੇ (eval_prog_pat == ਨਿਰਾ || STRCMP(eval_prog_pat, pat) != 0
 	    || STRCMP(eval_prog_enc, p_enc) != 0)
     {
 	char_u	*pat_copy;
@@ -3330,20 +3330,20 @@ eval_regfree(char_u *pat, regprog_T *prog)
 
 	// A cached pattern is known not to be volatile, thus the scan is
 	// only needed when installing a new key.
-	if (eval_prog_volatile(pat))
+	ਜੇ (eval_prog_volatile(pat))
 	{
 	    // compiling depends on state the cache key does not cover
 	    vim_regfree(prog);
-	    return;
+	    ਵਾਪਸ;
 	}
 	pat_copy = vim_strsave(pat);
 	enc_copy = vim_strsave(p_enc);
-	if (pat_copy == NULL || enc_copy == NULL)
+	ਜੇ (pat_copy == ਨਿਰਾ || enc_copy == ਨਿਰਾ)
 	{
 	    vim_free(pat_copy);
 	    vim_free(enc_copy);
 	    vim_regfree(prog);
-	    return;
+	    ਵਾਪਸ;
 	}
 	vim_free(eval_prog_pat);
 	vim_free(eval_prog_enc);
@@ -3358,42 +3358,42 @@ eval_regfree(char_u *pat, regprog_T *prog)
     eval_prog_re = eval_compile_re;
 }
 
-#if defined(EXITFREE)
-    void
-free_eval_regcomp_cache(void)
+#ਜੇ defined(EXITFREE)
+    ਖਾਲੀ
+free_eval_regcomp_cache(ਖਾਲੀ)
 {
     vim_regfree(eval_prog_cache);
-    eval_prog_cache = NULL;
+    eval_prog_cache = ਨਿਰਾ;
     VIM_CLEAR(eval_prog_pat);
     VIM_CLEAR(eval_prog_enc);
     eval_prog_busy = 0;
     eval_prog_reentered = FALSE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE if "pat" matches "text".
  * Does not use 'cpo' and always uses 'magic'.
  */
-    int
-pattern_match(char_u *pat, char_u *text, int ic)
+    ਪੂਰਨ
+ਨਮੂਨਾ_ਮੇਲ(char_u *pat, char_u *ਪਾਠ, ਪੂਰਨ ic)
 {
-    int		matches = FALSE;
+    ਪੂਰਨ		matches = FALSE;
     char_u	*save_cpo;
     regmatch_T	regmatch;
 
     // avoid 'l' flag in 'cpoptions'
     save_cpo = p_cpo;
-    p_cpo = empty_option;
+    p_cpo = ਖਾਲੀ_ਥਾਵਾਂ_option;
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    ਜੇ (regmatch.regprog != ਨਿਰਾ)
     {
 	regmatch.rm_ic = ic;
-	matches = vim_regexec_nl(&regmatch, text, (colnr_T)0);
+	matches = vim_regexec_nl(&regmatch, ਪਾਠ, (colnr_T)0);
 	eval_regfree(pat, regmatch.regprog);
     }
     p_cpo = save_cpo;
-    return matches;
+    ਵਾਪਸ matches;
 }
 
 /*
@@ -3401,57 +3401,57 @@ pattern_match(char_u *pat, char_u *text, int ic)
  * "expr->name(arg)".
  * Returns OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval_func(
 	char_u	    **arg,	// points to "(", will be advanced
 	evalarg_T   *evalarg,
 	char_u	    *name,
-	int	    name_len,
+	ਪੂਰਨ	    name_len,
 	typval_T    *rettv,
-	int	    flags,
+	ਪੂਰਨ	    flags,
 	typval_T    *basetv)	// "expr" for "expr->name(arg)"
 {
-    int		evaluate = flags & EVAL_EVALUATE;
+    ਪੂਰਨ		evaluate = flags & EVAL_EVALUATE;
     char_u	*s = name;
-    int		len = name_len;
+    ਪੂਰਨ		len = name_len;
     partial_T	*partial;
-    int		ret = OK;
-    type_T	*type = NULL;
-    int		found_var = FALSE;
+    ਪੂਰਨ		ret = OK;
+    type_T	*type = ਨਿਰਾ;
+    ਪੂਰਨ		ਮਿਲਿਆ_var = FALSE;
 
-    if (!evaluate)
+    ਜੇ (!evaluate)
 	check_vars(s, len);
 
     // If "s" is the name of a variable of type VAR_FUNC
     // use its contents.
     s = deref_func_name(s, &len, &partial,
-		 in_vim9script() ? &type : NULL, !evaluate, FALSE, &found_var);
+		 ਵਿੱਚ_vim9script() ? &type : ਨਿਰਾ, !evaluate, FALSE, &ਮਿਲਿਆ_var);
 
     // Need to make a copy, in case evaluating the arguments makes
     // the name invalid.
     s = vim_strsave(s);
-    if (s == NULL || (evaluate && *s == NUL))
+    ਜੇ (s == ਨਿਰਾ || (evaluate && *s == NUL))
 	ret = FAIL;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	funcexe_T funcexe;
 
 	// Invoke the function.
-	CLEAR_FIELD(funcexe);
+	CLEAR_ਖੇਤਰ(funcexe);
 	funcexe.fe_firstline = curwin->w_cursor.lnum;
 	funcexe.fe_lastline = curwin->w_cursor.lnum;
 	funcexe.fe_evaluate = evaluate;
 	funcexe.fe_partial = partial;
-	if (partial != NULL)
+	ਜੇ (partial != ਨਿਰਾ)
 	{
 	    funcexe.fe_object = partial->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    ਜੇ (funcexe.fe_object != ਨਿਰਾ)
 		++funcexe.fe_object->obj_refcount;
 	}
 	funcexe.fe_basetv = basetv;
 	funcexe.fe_check_type = type;
-	funcexe.fe_found_var = found_var;
-	if (evalarg != NULL)
+	funcexe.fe_ਮਿਲਿਆ_var = ਮਿਲਿਆ_var;
+	ਜੇ (evalarg != ਨਿਰਾ)
 	    funcexe.fe_cctx = evalarg->eval_cctx;
 	ret = get_func_tv(s, len, rettv, arg, evalarg, &funcexe);
     }
@@ -3460,51 +3460,51 @@ eval_func(
     // If evaluate is FALSE rettv->v_type was not set in
     // get_func_tv, but it's needed in handle_subscript() to parse
     // what follows. So set it here.
-    if (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
+    ਜੇ (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
     {
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ਨਿਰਾ;
 	rettv->v_type = VAR_FUNC;
     }
 
     // Stop the expression evaluation when immediately
     // aborting on error, or when an interrupt occurred or
     // an exception was thrown but not caught.
-    if (evaluate && aborting())
+    ਜੇ (evaluate && aborting())
     {
-	if (ret == OK)
+	ਜੇ (ret == OK)
 	    clear_tv(rettv);
 	ret = FAIL;
     }
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * After a NL, skip over empty lines and comment-only lines.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 newline_skip_comments(char_u *arg)
 {
     char_u *p = arg + 1;
 
-    for (;;)
+    ਲਈ (;;)
     {
 	p = skipwhite(p);
 
-	if (*p == NUL)
-	    break;
-	if (vim9_comment_start(p))
+	ਜੇ (*p == NUL)
+	    ਰੋਕੋ;
+	ਜੇ (vim9_comment_ਸ਼ੁਰੂ(p))
 	{
 	    char_u *nl = vim_strchr(p, NL);
 
-	    if (nl == NULL)
-		break;
+	    ਜੇ (nl == ਨਿਰਾ)
+		ਰੋਕੋ;
 	    p = nl;
 	}
-	if (*p != NL)
-	    break;
+	ਜੇ (*p != NL)
+	    ਰੋਕੋ;
 	++p;  // skip another NL
     }
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -3512,24 +3512,24 @@ newline_skip_comments(char_u *arg)
  * lines.
  * Only called for Vim9 script.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 getline_peek_skip_comments(evalarg_T *evalarg)
 {
-    for (;;)
+    ਲਈ (;;)
     {
-	char_u *next = getline_peek(evalarg->eval_getline,
+	char_u *ਅਗਲਾ = getline_peek(evalarg->eval_getline,
 							 evalarg->eval_cookie);
 	char_u *p;
 
-	if (next == NULL)
-	    break;
-	p = skipwhite(next);
-	if (*p != NUL && !vim9_comment_start(p))
-	    return next;
-	if (eval_next_line(NULL, evalarg) == NULL)
-	    break;
+	ਜੇ (ਅਗਲਾ == ਨਿਰਾ)
+	    ਰੋਕੋ;
+	p = skipwhite(ਅਗਲਾ);
+	ਜੇ (*p != NUL && !vim9_comment_ਸ਼ੁਰੂ(p))
+	    ਵਾਪਸ ਅਗਲਾ;
+	ਜੇ (eval_ਅਗਲਾ_ਸਤਰ(ਨਿਰਾ, evalarg) == ਨਿਰਾ)
+	    ਰੋਕੋ;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -3541,34 +3541,34 @@ getline_peek_skip_comments(evalarg_T *evalarg)
  * "arg" must point somewhere inside a line, not at the start.
  */
     char_u *
-eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
+eval_ਅਗਲਾ_non_blank(char_u *arg, evalarg_T *evalarg, ਪੂਰਨ *getnext)
 {
     char_u *p = skipwhite(arg);
 
     *getnext = FALSE;
-    if (in_vim9script()
-	    && evalarg != NULL
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && evalarg != ਨਿਰਾ
+	    && (evalarg->eval_cookie != ਨਿਰਾ || evalarg->eval_cctx != ਨਿਰਾ
 								   || *p == NL)
 	    && (*p == NUL || *p == NL
-			     || (vim9_comment_start(p) && VIM_ISWHITE(p[-1]))))
+			     || (vim9_comment_ਸ਼ੁਰੂ(p) && VIM_ISWHITE(p[-1]))))
     {
-	char_u *next;
+	char_u *ਅਗਲਾ;
 
-	if (*p == NL)
-	    next = newline_skip_comments(p);
-	else if (evalarg->eval_cookie != NULL)
-	    next = getline_peek_skip_comments(evalarg);
-	else
-	    next = peek_next_line_from_context(evalarg->eval_cctx);
+	ਜੇ (*p == NL)
+	    ਅਗਲਾ = newline_skip_comments(p);
+	ਨਹੀਂਤਾਂ ਜੇ (evalarg->eval_cookie != ਨਿਰਾ)
+	    ਅਗਲਾ = getline_peek_skip_comments(evalarg);
+	ਨਹੀਂਤਾਂ
+	    ਅਗਲਾ = peek_ਅਗਲਾ_ਸਤਰ_from_context(evalarg->eval_cctx);
 
-	if (next != NULL)
+	ਜੇ (ਅਗਲਾ != ਨਿਰਾ)
 	{
 	    *getnext = *p != NL;
-	    return skipwhite(next);
+	    ਵਾਪਸ skipwhite(ਅਗਲਾ);
 	}
     }
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -3579,49 +3579,49 @@ eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
  * "arg".
  */
     char_u *
-eval_next_line(char_u *arg, evalarg_T *evalarg)
+eval_ਅਗਲਾ_ਸਤਰ(char_u *arg, evalarg_T *evalarg)
 {
     garray_T	*gap = &evalarg->eval_ga;
-    char_u	*line;
+    char_u	*ਸਤਰ;
 
-    if (arg != NULL)
+    ਜੇ (arg != ਨਿਰਾ)
     {
-	if (*arg == NL)
-	    return newline_skip_comments(arg);
+	ਜੇ (*arg == NL)
+	    ਵਾਪਸ newline_skip_comments(arg);
 	// Truncate before a trailing comment, so that concatenating the lines
 	// won't turn the rest into a comment.
-	if (*skipwhite(arg) == '#')
+	ਜੇ (*skipwhite(arg) == '#')
 	    *arg = NUL;
     }
 
-    if (evalarg->eval_cookie != NULL)
-	line = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
+    ਜੇ (evalarg->eval_cookie != ਨਿਰਾ)
+	ਸਤਰ = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
 							   GETLINE_CONCAT_ALL);
-    else
-	line = next_line_from_context(evalarg->eval_cctx, TRUE);
-    if (line == NULL)
-	return NULL;
+    ਨਹੀਂਤਾਂ
+	ਸਤਰ = ਅਗਲਾ_ਸਤਰ_from_context(evalarg->eval_cctx, TRUE);
+    ਜੇ (ਸਤਰ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    ++evalarg->eval_break_count;
-    if (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
+    ++evalarg->eval_break_ਗਿਣਤੀ;
+    ਜੇ (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
     {
-	char_u *p = skipwhite(line);
+	char_u *p = skipwhite(ਸਤਰ);
 
 	// Going to concatenate the lines after parsing.  For an empty or
 	// comment line use an empty string.
-	if (*p == NUL || vim9_comment_start(p))
+	ਜੇ (*p == NUL || vim9_comment_ਸ਼ੁਰੂ(p))
 	{
-	    vim_free(line);
-	    line = vim_strsave((char_u *)"");
+	    vim_free(ਸਤਰ);
+	    ਸਤਰ = vim_strsave((char_u *)"");
 	}
 
-	((char_u **)gap->ga_data)[gap->ga_len] = line;
+	((char_u **)gap->ga_ਅੰਕੜੇ)[gap->ga_len] = ਸਤਰ;
 	++gap->ga_len;
     }
-    else if (evalarg->eval_cookie != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (evalarg->eval_cookie != ਨਿਰਾ)
     {
 	free_eval_tofree_later(evalarg);
-	evalarg->eval_tofree = line;
+	evalarg->eval_tofree = ਸਤਰ;
     }
 
     // Advanced to the next line, "arg" no longer points into the previous
@@ -3629,9 +3629,9 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     // If "arg" is NULL, then the return value is discarded.  In that case,
     // "arg" still points to the previous line.  So don't reset
     // "eval_using_cmdline".
-    if (arg != NULL)
+    ਜੇ (arg != ਨਿਰਾ)
 	evalarg->eval_using_cmdline = FALSE;
-    return skipwhite(line);
+    ਵਾਪਸ skipwhite(ਸਤਰ);
 }
 
 /*
@@ -3640,15 +3640,15 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     char_u *
 skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
 {
-    int	    getnext;
+    ਪੂਰਨ	    getnext;
     char_u  *p = skipwhite_and_nl(arg);
 
-    if (evalarg == NULL)
-	return skipwhite(arg);
-    eval_next_non_blank(p, evalarg, &getnext);
-    if (getnext)
-	return eval_next_line(arg, evalarg);
-    return p;
+    ਜੇ (evalarg == ਨਿਰਾ)
+	ਵਾਪਸ skipwhite(arg);
+    eval_ਅਗਲਾ_non_blank(p, evalarg, &getnext);
+    ਜੇ (getnext)
+	ਵਾਪਸ eval_ਅਗਲਾ_ਸਤਰ(arg, evalarg);
+    ਵਾਪਸ p;
 }
 
 /*
@@ -3665,62 +3665,62 @@ skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
  * "evalarg" can be NULL, EVALARG_EVALUATE or a pointer.
  * Return OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 eval0(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    return eval0_retarg(arg, rettv, eap, evalarg, NULL);
+    ਵਾਪਸ eval0_retarg(arg, rettv, eap, evalarg, ਨਿਰਾ);
 }
 
 /*
  * If "arg" is a simple function call without arguments then call it and return
  * the result.  Otherwise return NOTDONE.
  */
-    int
+    ਪੂਰਨ
 may_call_simple_func(
     char_u	*arg,
     typval_T	*rettv)
 {
-    char_u  *parens = (char_u *)strstr((char *)arg, "()");
-    int	    r = NOTDONE;
+    char_u  *parens = (char_u *)ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)arg, "()");
+    ਪੂਰਨ	    r = NOTDONE;
 
     // If the expression is "FuncName()" then we can skip a lot of overhead.
-    if (parens != NULL && *skipwhite(parens + 2) == NUL)
+    ਜੇ (parens != ਨਿਰਾ && *skipwhite(parens + 2) == NUL)
     {
 	char_u *p = STRNCMP(arg, "<SNR>", 5) == 0 ? skipdigits(arg + 5) : arg;
 
-	if (to_name_end(p, TRUE) == parens)
+	ਜੇ (ਮੰਜ਼ਿਲ_name_ਸਿਰਾ(p, TRUE) == parens)
 	    r = call_simple_func(arg, (size_t)(parens - arg), rettv);
     }
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
  * Handle zero level expression with optimization for a simple function call.
  * Same arguments and return value as eval0().
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval0_simple_funccal(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    int	    r = may_call_simple_func(arg, rettv);
+    ਪੂਰਨ	    r = may_call_simple_func(arg, rettv);
 
-    if (r == NOTDONE)
-	r = eval0_retarg(arg, rettv, eap, evalarg, NULL);
-    return r;
+    ਜੇ (r == NOTDONE)
+	r = eval0_retarg(arg, rettv, eap, evalarg, ਨਿਰਾ);
+    ਵਾਪਸ r;
 }
 
 /*
  * Like eval0() but when "retarg" is not NULL store the pointer to after the
  * expression and don't check what comes after the expression.
  */
-    int
+    ਪੂਰਨ
 eval0_retarg(
     char_u	*arg,
     typval_T	*rettv,
@@ -3728,45 +3728,45 @@ eval0_retarg(
     evalarg_T	*evalarg,
     char_u	**retarg)
 {
-    int		ret;
+    ਪੂਰਨ		ret;
     char_u	*p;
-    char_u	*expr_end;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
-    int		check_for_end = retarg == NULL;
-    int		end_error = FALSE;
+    char_u	*ਵਿਅੰਜਕ_ਸਿਰਾ;
+    ਪੂਰਨ		did_emsg_before = did_emsg;
+    ਪੂਰਨ		called_emsg_before = called_emsg;
+    ਪੂਰਨ		check_for_ਸਿਰਾ = retarg == ਨਿਰਾ;
+    ਪੂਰਨ		ਸਿਰਾ_error = FALSE;
 
     p = skipwhite(arg);
     ret = eval1(&p, rettv, evalarg);
 
-    if (ret != FAIL)
+    ਜੇ (ret != FAIL)
     {
-	expr_end = p;
+	ਵਿਅੰਜਕ_ਸਿਰਾ = p;
 	p = skipwhite(p);
 
 	// In Vim9 script a command block is not split at NL characters for
 	// commands using an expression argument.  Skip over a '#' comment to
 	// check for a following NL.  Require white space before the '#'.
-	if (in_vim9script() && p > expr_end && retarg == NULL)
-	    while (*p == '#')
+	ਜੇ (ਵਿੱਚ_vim9script() && p > ਵਿਅੰਜਕ_ਸਿਰਾ && retarg == ਨਿਰਾ)
+	    ਜਦੋਂ (*p == '#')
 	    {
 		char_u *nl = vim_strchr(p, NL);
 
-		if (nl == NULL)
-		    break;
+		ਜੇ (nl == ਨਿਰਾ)
+		    ਰੋਕੋ;
 		p = skipwhite(nl + 1);
-		if (eap != NULL && *p != NUL)
+		ਜੇ (eap != ਨਿਰਾ && *p != NUL)
 		    eap->nextcmd = p;
-		check_for_end = FALSE;
+		check_for_ਸਿਰਾ = FALSE;
 	    }
 
-	if (check_for_end)
-	    end_error = !ends_excmd2(arg, p);
+	ਜੇ (check_for_ਸਿਰਾ)
+	    ਸਿਰਾ_error = !ਸਿਰੇ_excmd2(arg, p);
     }
 
-    if (ret == FAIL || end_error)
+    ਜੇ (ret == FAIL || ਸਿਰਾ_error)
     {
-	if (ret != FAIL)
+	ਜੇ (ret != FAIL)
 	    clear_tv(rettv);
 	/*
 	 * Report the invalid expression unless the expression evaluation has
@@ -3774,35 +3774,35 @@ eval0_retarg(
 	 * exception, or we already gave a more specific error.
 	 * Also check called_emsg for when using assert_fails().
 	 */
-	if (!aborting()
+	ਜੇ (!aborting()
 		&& did_emsg == did_emsg_before
 		&& called_emsg == called_emsg_before
-		&& (!in_vim9script() || !vim9_bad_comment(p)))
+		&& (!ਵਿੱਚ_vim9script() || !vim9_bad_comment(p)))
 	{
-	    if (end_error)
+	    ਜੇ (ਸਿਰਾ_error)
 		semsg(_(e_trailing_characters_str), p);
-	    else
-		semsg(_(e_invalid_expression_str), arg);
+	    ਨਹੀਂਤਾਂ
+		semsg(_(e_invalid_ਵਿਅੰਜਕ_str), arg);
 	}
 
-	if (eap != NULL && p != NULL)
+	ਜੇ (eap != ਨਿਰਾ && p != ਨਿਰਾ)
 	{
 	    // Some of the expression may not have been consumed.
 	    // Only execute a next command if it cannot be a "||" operator.
 	    // The next command may be "catch".
 	    char_u *nextcmd = check_nextcmd(p);
-	    if (nextcmd != NULL && *nextcmd != '|')
+	    ਜੇ (nextcmd != ਨਿਰਾ && *nextcmd != '|')
 		eap->nextcmd = nextcmd;
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (retarg != NULL)
+    ਜੇ (retarg != ਨਿਰਾ)
 	*retarg = p;
-    else if (check_for_end && eap != NULL)
-	set_nextcmd(eap, p);
+    ਨਹੀਂਤਾਂ ਜੇ (check_for_ਸਿਰਾ && eap != ਨਿਰਾ)
+	ਸੈੱਟ_nextcmd(eap, p);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -3815,124 +3815,124 @@ eval0_retarg(
  *
  * Return OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u  *p;
-    int	    getnext;
+    ਪੂਰਨ	    getnext;
 
-    CLEAR_POINTER(rettv);
+    CLEAR_ਸੂਚਕ(rettv);
 
     /*
      * Get the first variable.
      */
-    if (eval2(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ਜੇ (eval2(arg, rettv, evalarg) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (*p == '?')
+    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
+    ਜੇ (*p == '?')
     {
-	int		op_falsy = p[1] == '?';
-	int		result;
+	ਪੂਰਨ		op_falsy = p[1] == '?';
+	ਪੂਰਨ		ਨਤੀਜਾ;
 	typval_T	var2;
-	evalarg_T	*evalarg_used = evalarg;
+	evalarg_T	*evalarg_ਵਰਤਿਆ = evalarg;
 	evalarg_T	local_evalarg;
-	int		orig_flags;
-	int		evaluate;
-	int		vim9script = in_vim9script();
+	ਪੂਰਨ		orig_flags;
+	ਪੂਰਨ		evaluate;
+	ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
-	if (evalarg == NULL)
+	ਜੇ (evalarg == ਨਿਰਾ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_ਵਰਤਿਆ = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
-	evaluate = evalarg_used->eval_flags & EVAL_EVALUATE;
+	orig_flags = evalarg_ਵਰਤਿਆ->eval_flags;
+	evaluate = evalarg_ਵਰਤਿਆ->eval_flags & EVAL_EVALUATE;
 
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg_used);
-	else
+	ਜੇ (getnext)
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg_ਵਰਤਿਆ);
+	ਨਹੀਂਤਾਂ
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+	    ਜੇ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 	    {
 		error_white_both(p, op_falsy ? 2 : 1);
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    *arg = p;
 	}
 
-	result = FALSE;
-	if (evaluate)
+	ਨਤੀਜਾ = FALSE;
+	ਜੇ (evaluate)
 	{
-	    int		error = FALSE;
+	    ਪੂਰਨ		error = FALSE;
 
-	    if (op_falsy)
+	    ਜੇ (op_falsy)
 	    {
 		// Is this typeval supported with the falsy operator?
-		if (check_typval_is_value(rettv) == FAIL)
+		ਜੇ (check_typval_is_ਮੁੱਲ(rettv) == FAIL)
 		{
 		    clear_tv(rettv);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
-		result = tv2bool(rettv);
+		ਨਤੀਜਾ = tv2bool(rettv);
 	    }
-	    else if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
-		result = TRUE;
-	    if (error || !op_falsy || !result)
+	    ਨਹੀਂਤਾਂ ਜੇ (vim9script)
+		ਨਤੀਜਾ = tv_get_bool_chk(rettv, &error);
+	    ਨਹੀਂਤਾਂ ਜੇ (tv_get_ਸੰਖਿਆ_chk(rettv, &error) != 0)
+		ਨਤੀਜਾ = TRUE;
+	    ਜੇ (error || !op_falsy || !ਨਤੀਜਾ)
 		clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ਜੇ (error)
+		ਵਾਪਸ FAIL;
 	}
 
 	/*
 	 * Get the second variable.  Recursive!
 	 */
-	if (op_falsy)
+	ਜੇ (op_falsy)
 	    ++*arg;
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg - (op_falsy ? 1 : 0), op_falsy ? 2 : 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	*arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
-	evalarg_used->eval_flags = (op_falsy ? !result : result)
+	*arg = skipwhite_and_linebreak(*arg + 1, evalarg_ਵਰਤਿਆ);
+	evalarg_ਵਰਤਿਆ->eval_flags = (op_falsy ? !ਨਤੀਜਾ : ਨਤੀਜਾ)
 				  ? orig_flags : (orig_flags & ~EVAL_EVALUATE);
-	if (eval1(arg, &var2, evalarg_used) == FAIL)
+	ਜੇ (eval1(arg, &var2, evalarg_ਵਰਤਿਆ) == FAIL)
 	{
-	    evalarg_used->eval_flags = orig_flags;
-	    return FAIL;
+	    evalarg_ਵਰਤਿਆ->eval_flags = orig_flags;
+	    ਵਾਪਸ FAIL;
 	}
-	if (!op_falsy || !result)
+	ਜੇ (!op_falsy || !ਨਤੀਜਾ)
 	    *rettv = var2;
 
-	if (!op_falsy)
+	ਜੇ (!op_falsy)
 	{
 	    /*
 	     * Check for the ":".
 	     */
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
-	    if (*p != ':')
+	    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg_ਵਰਤਿਆ, &getnext);
+	    ਜੇ (*p != ':')
 	    {
 		emsg(_(e_missing_colon_after_questionmark));
-		if (evaluate && result)
+		ਜੇ (evaluate && ਨਤੀਜਾ)
 		    clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_ਵਰਤਿਆ->eval_flags = orig_flags;
+		ਵਾਪਸ FAIL;
 	    }
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ਜੇ (getnext)
+		*arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg_ਵਰਤਿਆ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ਜੇ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 1);
 		    clear_tv(rettv);
-		    evalarg_used->eval_flags = orig_flags;
-		    return FAIL;
+		    evalarg_ਵਰਤਿਆ->eval_flags = orig_flags;
+		    ਵਾਪਸ FAIL;
 		}
 		*arg = p;
 	    }
@@ -3940,34 +3940,34 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the third variable.  Recursive!
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	    ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_ਵਰਤਿਆ->eval_flags = orig_flags;
+		ਵਾਪਸ FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
-	    evalarg_used->eval_flags = !result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 1, evalarg_ਵਰਤਿਆ);
+	    evalarg_ਵਰਤਿਆ->eval_flags = !ਨਤੀਜਾ ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval1(arg, &var2, evalarg_used) == FAIL)
+	    ਜੇ (eval1(arg, &var2, evalarg_ਵਰਤਿਆ) == FAIL)
 	    {
-		if (evaluate && result)
+		ਜੇ (evaluate && ਨਤੀਜਾ)
 		    clear_tv(rettv);
-		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		evalarg_ਵਰਤਿਆ->eval_flags = orig_flags;
+		ਵਾਪਸ FAIL;
 	    }
-	    if (evaluate && !result)
+	    ਜੇ (evaluate && !ਨਤੀਜਾ)
 		*rettv = var2;
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ਜੇ (evalarg == ਨਿਰਾ)
+	    clear_evalarg(&local_evalarg, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -3979,65 +3979,65 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    ਪੂਰਨ		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval3(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ਜੇ (eval3(arg, rettv, evalarg) == FAIL)
+	ਵਾਪਸ FAIL;
 
     /*
      * Handle the  "||" operator.
      */
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '|' && p[1] == '|')
+    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
+    ਜੇ (p[0] == '|' && p[1] == '|')
     {
-	evalarg_T   *evalarg_used = evalarg;
+	evalarg_T   *evalarg_ਵਰਤਿਆ = evalarg;
 	evalarg_T   local_evalarg;
-	int	    evaluate;
-	int	    orig_flags;
-	long	    result = FALSE;
+	ਪੂਰਨ	    evaluate;
+	ਪੂਰਨ	    orig_flags;
+	ਲੰਮਾ	    ਨਤੀਜਾ = FALSE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	ਪੂਰਨ	    error = FALSE;
+	ਪੂਰਨ	    vim9script = ਵਿੱਚ_vim9script();
 
-	if (evalarg == NULL)
+	ਜੇ (evalarg == ਨਿਰਾ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_ਵਰਤਿਆ = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
+	orig_flags = evalarg_ਵਰਤਿਆ->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
-	    if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
-		result = TRUE;
+	    ਜੇ (vim9script)
+		ਨਤੀਜਾ = tv_get_bool_chk(rettv, &error);
+	    ਨਹੀਂਤਾਂ ਜੇ (tv_get_ਸੰਖਿਆ_chk(rettv, &error) != 0)
+		ਨਤੀਜਾ = TRUE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ਜੇ (error)
+		ਵਾਪਸ FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "||".
 	 */
-	while (p[0] == '|' && p[1] == '|')
+	ਜਦੋਂ (p[0] == '|' && p[1] == '|')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ਜੇ (getnext)
+		*arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg_ਵਰਤਿਆ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ਜੇ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 		*arg = p;
 	    }
@@ -4045,55 +4045,55 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
-	    evalarg_used->eval_flags = !result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_ਵਰਤਿਆ);
+	    evalarg_ਵਰਤਿਆ->eval_flags = !ਨਤੀਜਾ ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval3(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    ਜੇ (eval3(arg, &var2, evalarg_ਵਰਤਿਆ) == FAIL)
+		ਵਾਪਸ FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && !result)
+	    ਜੇ (evaluate && !ਨਤੀਜਾ)
 	    {
-		if (vim9script)
-		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) != 0)
-		    result = TRUE;
+		ਜੇ (vim9script)
+		    ਨਤੀਜਾ = tv_get_bool_chk(&var2, &error);
+		ਨਹੀਂਤਾਂ ਜੇ (tv_get_ਸੰਖਿਆ_chk(&var2, &error) != 0)
+		    ਨਤੀਜਾ = TRUE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		ਜੇ (error)
+		    ਵਾਪਸ FAIL;
 	    }
-	    if (evaluate)
+	    ਜੇ (evaluate)
 	    {
-		if (vim9script)
+		ਜੇ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_ਸੰਖਿਆ = ਨਤੀਜਾ ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_ਸੰਖਿਆ;
+		    rettv->vval.v_ਸੰਖਿਆ = ਨਤੀਜਾ;
 		}
 	    }
 
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
+	    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg_ਵਰਤਿਆ, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ਜੇ (evalarg == ਨਿਰਾ)
+	    clear_evalarg(&local_evalarg, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4105,65 +4105,65 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    ਪੂਰਨ		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval4(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ਜੇ (eval4(arg, rettv, evalarg) == FAIL)
+	ਵਾਪਸ FAIL;
 
     /*
      * Handle the "&&" operator.
      */
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '&' && p[1] == '&')
+    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
+    ਜੇ (p[0] == '&' && p[1] == '&')
     {
-	evalarg_T   *evalarg_used = evalarg;
+	evalarg_T   *evalarg_ਵਰਤਿਆ = evalarg;
 	evalarg_T   local_evalarg;
-	int	    orig_flags;
-	int	    evaluate;
-	long	    result = TRUE;
+	ਪੂਰਨ	    orig_flags;
+	ਪੂਰਨ	    evaluate;
+	ਲੰਮਾ	    ਨਤੀਜਾ = TRUE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	ਪੂਰਨ	    error = FALSE;
+	ਪੂਰਨ	    vim9script = ਵਿੱਚ_vim9script();
 
-	if (evalarg == NULL)
+	ਜੇ (evalarg == ਨਿਰਾ)
 	{
 	    init_evalarg(&local_evalarg);
-	    evalarg_used = &local_evalarg;
+	    evalarg_ਵਰਤਿਆ = &local_evalarg;
 	}
-	orig_flags = evalarg_used->eval_flags;
+	orig_flags = evalarg_ਵਰਤਿਆ->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
-	    if (vim9script)
-		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) == 0)
-		result = FALSE;
+	    ਜੇ (vim9script)
+		ਨਤੀਜਾ = tv_get_bool_chk(rettv, &error);
+	    ਨਹੀਂਤਾਂ ਜੇ (tv_get_ਸੰਖਿਆ_chk(rettv, &error) == 0)
+		ਨਤੀਜਾ = FALSE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    ਜੇ (error)
+		ਵਾਪਸ FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "&&".
 	 */
-	while (p[0] == '&' && p[1] == '&')
+	ਜਦੋਂ (p[0] == '&' && p[1] == '&')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    ਜੇ (getnext)
+		*arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg_ਵਰਤਿਆ);
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		ਜੇ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 		*arg = p;
 	    }
@@ -4171,56 +4171,56 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
-	    evalarg_used->eval_flags = result ? orig_flags
+	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_ਵਰਤਿਆ);
+	    evalarg_ਵਰਤਿਆ->eval_flags = ਨਤੀਜਾ ? orig_flags
 					      : (orig_flags & ~EVAL_EVALUATE);
-	    CLEAR_FIELD(var2);
-	    if (eval4(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    CLEAR_ਖੇਤਰ(var2);
+	    ਜੇ (eval4(arg, &var2, evalarg_ਵਰਤਿਆ) == FAIL)
+		ਵਾਪਸ FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && result)
+	    ਜੇ (evaluate && ਨਤੀਜਾ)
 	    {
-		if (vim9script)
-		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) == 0)
-		    result = FALSE;
+		ਜੇ (vim9script)
+		    ਨਤੀਜਾ = tv_get_bool_chk(&var2, &error);
+		ਨਹੀਂਤਾਂ ਜੇ (tv_get_ਸੰਖਿਆ_chk(&var2, &error) == 0)
+		    ਨਤੀਜਾ = FALSE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		ਜੇ (error)
+		    ਵਾਪਸ FAIL;
 	    }
-	    if (evaluate)
+	    ਜੇ (evaluate)
 	    {
-		if (vim9script)
+		ਜੇ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_ਸੰਖਿਆ = ਨਤੀਜਾ ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_ਸੰਖਿਆ;
+		    rettv->vval.v_ਸੰਖਿਆ = ਨਤੀਜਾ;
 		}
 	    }
 
-	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
+	    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg_ਵਰਤਿਆ, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	ਜੇ (evalarg == ਨਿਰਾ)
+	    clear_evalarg(&local_evalarg, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4241,191 +4241,191 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
-    exprtype_T	type = EXPR_UNKNOWN;
-    int		len = 2;
-    int		type_is = FALSE;
+    ਪੂਰਨ		getnext;
+    exprtype_T	type = ਵਿਅੰਜਕ_UNKNOWN;
+    ਪੂਰਨ		len = 2;
+    ਪੂਰਨ		type_is = FALSE;
 
     /*
      * Get the first expression.
      */
-    if (eval5(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ਜੇ (eval5(arg, rettv, evalarg) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    p = eval_next_non_blank(*arg, evalarg, &getnext);
+    p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
 
     type = get_compare_type(p, &len, &type_is);
 
     /*
      * If there is a comparative operator, use it.
      */
-    if (type != EXPR_UNKNOWN)
+    ਜੇ (type != ਵਿਅੰਜਕ_UNKNOWN)
     {
 	typval_T    var2;
-	int	    ic;
-	int	    vim9script = in_vim9script();
-	int	    evaluate = evalarg == NULL
+	ਪੂਰਨ	    ic;
+	ਪੂਰਨ	    vim9script = ਵਿੱਚ_vim9script();
+	ਪੂਰਨ	    evaluate = evalarg == ਨਿਰਾ
 				   ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	long	    comp_lnum = SOURCING_LNUM;
+	ਲੰਮਾ	    comp_lnum = SOURCING_LNUM;
 
-	if (getnext)
+	ਜੇ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	ਨਹੀਂਤਾਂ ਜੇ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
-	if (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
+	ਜੇ (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
 	{
-	    semsg(_(e_invalid_expression_str), p);
+	    semsg(_(e_invalid_ਵਿਅੰਜਕ_str), p);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
 	// extra question mark appended: ignore case
-	if (p[len] == '?')
+	ਜੇ (p[len] == '?')
 	{
 	    ic = TRUE;
 	    ++len;
 	}
 	// extra '#' appended: match case
-	else if (p[len] == '#')
+	ਨਹੀਂਤਾਂ ਜੇ (p[len] == '#')
 	{
 	    ic = FALSE;
 	    ++len;
 	}
 	// nothing appended: use 'ignorecase' if not in Vim script
-	else
+	ਨਹੀਂਤਾਂ
 	    ic = vim9script ? FALSE : p_ic;
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
+	ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
 	{
 	    error_white_both(p, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + len, evalarg);
-	if (eval5(arg, &var2, evalarg) == FAIL)
+	ਜੇ (eval5(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
-	    int ret;
+	    ਪੂਰਨ ret;
 
 	    // use the line of the comparison for messages
 	    SOURCING_LNUM = comp_lnum;
-	    if (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
+	    ਜੇ (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
 	    {
 		ret = FAIL;
 		clear_tv(rettv);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ret = typval_compare(rettv, &var2, type, ic);
 	    clear_tv(&var2);
-	    return ret;
+	    ਵਾਪਸ ret;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Make a copy of blob "tv1" and append blob "tv2".
  */
-    void
+    ਖਾਲੀ
 eval_addblob(typval_T *tv1, typval_T *tv2)
 {
     blob_T  *b1 = tv1->vval.v_blob;
     blob_T  *b2 = tv2->vval.v_blob;
     blob_T  *b = blob_alloc();
-    long    len1, len2;
-    long    totallen;
+    ਲੰਮਾ    len1, len2;
+    ਲੰਮਾ    totallen;
 
-    if (b == NULL)
-	return;
+    ਜੇ (b == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     len1 = blob_len(b1);
     len2 = blob_len(b2);
     totallen = len1 + len2;
 
-    if (totallen > 0 && totallen <= INT_MAX
-				    && ga_grow(&b->bv_ga, (int)totallen) == OK)
+    ਜੇ (totallen > 0 && totallen <= ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ
+				    && ga_grow(&b->bv_ga, (ਪੂਰਨ)totallen) == OK)
     {
-	if (len1 > 0)
-	    mch_memmove((char_u *)b->bv_ga.ga_data,
-		    (char_u *)b1->bv_ga.ga_data, (size_t)len1);
-	if (len2 > 0)
-	    mch_memmove((char_u *)b->bv_ga.ga_data + len1,
-		    (char_u *)b2->bv_ga.ga_data, (size_t)len2);
-	b->bv_ga.ga_len = (int)totallen;
+	ਜੇ (len1 > 0)
+	    mch_memmove((char_u *)b->bv_ga.ga_ਅੰਕੜੇ,
+		    (char_u *)b1->bv_ga.ga_ਅੰਕੜੇ, (size_t)len1);
+	ਜੇ (len2 > 0)
+	    mch_memmove((char_u *)b->bv_ga.ga_ਅੰਕੜੇ + len1,
+		    (char_u *)b2->bv_ga.ga_ਅੰਕੜੇ, (size_t)len2);
+	b->bv_ga.ga_len = (ਪੂਰਨ)totallen;
     }
 
     clear_tv(tv1);
-    rettv_blob_set(tv1, b);
+    rettv_blob_ਸੈੱਟ(tv1, b);
 }
 
 /*
  * Make a copy of list "tv1" and append list "tv2".
  */
-    int
+    ਪੂਰਨ
 eval_addlist(typval_T *tv1, typval_T *tv2)
 {
     typval_T var3;
 
     // concatenate Lists
-    if (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
+    ਜੇ (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Make a copy of tuple "tv1" and append tuple "tv2".
  */
-    int
+    ਪੂਰਨ
 eval_addtuple(typval_T *tv1, typval_T *tv2)
 {
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
     typval_T	var3;
 
-    if (vim9script && tv1->vval.v_tuple != NULL && tv2->vval.v_tuple != NULL
-	    && tv1->vval.v_tuple->tv_type != NULL
-	    && tv2->vval.v_tuple->tv_type != NULL)
+    ਜੇ (vim9script && tv1->vval.v_tuple != ਨਿਰਾ && tv2->vval.v_tuple != ਨਿਰਾ
+	    && tv1->vval.v_tuple->tv_type != ਨਿਰਾ
+	    && tv2->vval.v_tuple->tv_type != ਨਿਰਾ)
     {
-	if (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
+	ਜੇ (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
 						tv2->vval.v_tuple->tv_type))
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
     }
 
     // concatenate tuples
-    if (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
+    ਜੇ (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4434,32 +4434,32 @@ eval_addtuple(typval_T *tv1, typval_T *tv2)
  *
  * Return OK or FAIL.
  */
-    static int
-eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਖਿਸਕਾਓ_ਸੰਖਿਆ(typval_T *tv1, typval_T *tv2, ਪੂਰਨ ਖਿਸਕਾਓ_type)
 {
-    if (tv2->v_type != VAR_NUMBER || tv2->vval.v_number < 0)
+    ਜੇ (tv2->v_type != VAR_ਸੰਖਿਆ || tv2->vval.v_ਸੰਖਿਆ < 0)
     {
 	// right operand should be a positive number
-	if (tv2->v_type != VAR_NUMBER)
-	    emsg(_(e_bitshift_ops_must_be_number));
-	else
-	    emsg(_(e_bitshift_ops_must_be_positive));
+	ਜੇ (tv2->v_type != VAR_ਸੰਖਿਆ)
+	    emsg(_(e_bitshift_ops_must_be_ਸੰਖਿਆ));
+	ਨਹੀਂਤਾਂ
+	    emsg(_(e_bitshift_ops_must_be_ਸਕਾਰਾਤਮਕ));
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (tv2->vval.v_number > MAX_LSHIFT_BITS)
+    ਜੇ (tv2->vval.v_ਸੰਖਿਆ > MAX_LSHIFT_ਬਿੱਟ)
 	// shifting more bits than we have always results in zero
-	tv1->vval.v_number = 0;
-    else if (shift_type == EXPR_LSHIFT)
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number << tv2->vval.v_number;
-    else
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number >> tv2->vval.v_number;
+	tv1->vval.v_ਸੰਖਿਆ = 0;
+    ਨਹੀਂਤਾਂ ਜੇ (ਖਿਸਕਾਓ_type == ਵਿਅੰਜਕ_LSHIFT)
+	tv1->vval.v_ਸੰਖਿਆ =
+	    (uvarnumber_T)tv1->vval.v_ਸੰਖਿਆ << tv2->vval.v_ਸੰਖਿਆ;
+    ਨਹੀਂਤਾਂ
+	tv1->vval.v_ਸੰਖਿਆ =
+	    (uvarnumber_T)tv1->vval.v_ਸੰਖਿਆ >> tv2->vval.v_ਸੰਖਿਆ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4472,150 +4472,150 @@ eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval6(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    ਜੇ (eval6(arg, rettv, evalarg) == FAIL)
+	ਵਾਪਸ FAIL;
 
     /*
      * Repeat computing, until no '<<' or '>>' is following.
      */
-    for (;;)
+    ਲਈ (;;)
     {
 	char_u		*p;
-	int		getnext;
+	ਪੂਰਨ		getnext;
 	exprtype_T	exprtype;
-	int		evaluate;
+	ਪੂਰਨ		evaluate;
 	typval_T	var2;
-	int		vim9script;
+	ਪੂਰਨ		vim9script;
 
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (p[0] == '<' && p[1] == '<')
-	    exprtype = EXPR_LSHIFT;
-	else if (p[0] == '>' && p[1] == '>')
-	    exprtype = EXPR_RSHIFT;
-	else
-	    return OK;
+	p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
+	ਜੇ (p[0] == '<' && p[1] == '<')
+	    exprtype = ਵਿਅੰਜਕ_LSHIFT;
+	ਨਹੀਂਤਾਂ ਜੇ (p[0] == '>' && p[1] == '>')
+	    exprtype = ਵਿਅੰਜਕ_RSHIFT;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ OK;
 
 	// Handle a bitwise left or right shift operator
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (evaluate && rettv->v_type != VAR_NUMBER)
+	evaluate = evalarg == ਨਿਰਾ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	ਜੇ (evaluate && rettv->v_type != VAR_ਸੰਖਿਆ)
 	{
 	    // left operand should be a number
-	    emsg(_(e_bitshift_ops_must_be_number));
+	    emsg(_(e_bitshift_ops_must_be_ਸੰਖਿਆ));
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
-	vim9script = in_vim9script();
-	if (getnext)
+	vim9script = ਵਿੱਚ_vim9script();
+	ਜੇ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	ਨਹੀਂਤਾਂ ਜੇ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
+	ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
 	{
 	    error_white_both(p, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + 2, evalarg);
-	if (eval6(arg, &var2, evalarg) == FAIL)
+	ਜੇ (eval6(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
-	    if (eval_shift_number(rettv, &var2, exprtype) == FAIL)
-		return FAIL;
+	    ਜੇ (eval_ਖਿਸਕਾਓ_ਸੰਖਿਆ(rettv, &var2, exprtype) == FAIL)
+		ਵਾਪਸ FAIL;
 	}
 
 	clear_tv(&var2);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Concatenate strings "tv1" and "tv2" and store the result in "tv1".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval_concat_str(typval_T *tv1, typval_T *tv2)
 {
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
     char_u	*s1 = tv_get_string_buf(tv1, buf1);
-    char_u	*s2 = NULL;
+    char_u	*s2 = ਨਿਰਾ;
     char_u	*p;
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
-    if (vim9script && (tv2->v_type == VAR_VOID
+    ਜੇ (vim9script && (tv2->v_type == VAR_VOID
 		|| tv2->v_type == VAR_CHANNEL
-		|| tv2->v_type == VAR_JOB))
-	semsg(_(e_using_invalid_value_as_string_str),
+		|| tv2->v_type == VAR_ਕੰਮ))
+	semsg(_(e_using_invalid_ਮੁੱਲ_as_string_str),
 		vartype_name(tv2->v_type));
-    else if (vim9script && tv2->v_type == VAR_FLOAT)
+    ਨਹੀਂਤਾਂ ਜੇ (vim9script && tv2->v_type == VAR_FLOAT)
     {
-	vim_snprintf((char *)buf2, NUMBUFLEN, "%g",
+	vim_snprintf((ਅੱਖਰ *)buf2, NUMBUFLEN, "%g",
 		tv2->vval.v_float);
 	s2 = buf2;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	s2 = tv_get_string_buf_chk(tv2, buf2);
-    if (s2 == NULL)		// type error ?
+    ਜੇ (s2 == ਨਿਰਾ)		// type error ?
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     // When possible, grow the existing string in place to avoid alloc/free.
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    ਜੇ (grow_string_tv(tv1, s2) == OK)
+	ਵਾਪਸ OK;
 
     p = concat_str(s1, s2);
     clear_tv(tv1);
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = p;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Add or subtract numbers "tv1" and "tv2" and store the result in "tv1".
  * The numbers can be whole numbers or floats.
  */
-    static int
-eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
+    ਸਥਿਰ ਪੂਰਨ
+eval_addsub_ਸੰਖਿਆ(typval_T *tv1, typval_T *tv2, ਪੂਰਨ op)
 {
-    int		error = FALSE;
+    ਪੂਰਨ		error = FALSE;
     varnumber_T	n1, n2;
     float_T	f1 = 0, f2 = 0;
 
-    if (tv1->v_type == VAR_FLOAT)
+    ਜੇ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	n1 = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	n1 = tv_get_number_chk(tv1, &error);
-	if (error)
+	n1 = tv_get_ਸੰਖਿਆ_chk(tv1, &error);
+	ਜੇ (error)
 	{
 	    // This can only happen for "list + non-list" or
 	    // "blob + non-blob".  For "non-list + ..." or
@@ -4623,51 +4623,51 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
 	    // 2nd operand.
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (tv2->v_type == VAR_FLOAT)
+	ਜੇ (tv2->v_type == VAR_FLOAT)
 	    f1 = n1;
     }
-    if (tv2->v_type == VAR_FLOAT)
+    ਜੇ (tv2->v_type == VAR_FLOAT)
     {
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	n2 = tv_get_number_chk(tv2, &error);
-	if (error)
+	n2 = tv_get_ਸੰਖਿਆ_chk(tv2, &error);
+	ਜੇ (error)
 	{
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (tv1->v_type == VAR_FLOAT)
+	ਜੇ (tv1->v_type == VAR_FLOAT)
 	    f2 = n2;
     }
     clear_tv(tv1);
 
     // If there is a float on either side the result is a float.
-    if (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+    ਜੇ (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
     {
-	if (op == '+')
+	ਜੇ (op == '+')
 	    f1 = f1 + f2;
-	else
+	ਨਹੀਂਤਾਂ
 	    f1 = f1 - f2;
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (op == '+')
+	ਜੇ (op == '+')
 	    n1 = n1 + n2;
-	else
+	ਨਹੀਂਤਾਂ
 	    n1 = n1 - n2;
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_ਸੰਖਿਆ;
+	tv1->vval.v_ਸੰਖਿਆ = n1;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4682,63 +4682,63 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval7(arg, rettv, evalarg, FALSE) == FAIL)
-	return FAIL;
+    ਜੇ (eval7(arg, rettv, evalarg, FALSE) == FAIL)
+	ਵਾਪਸ FAIL;
 
     /*
      * Repeat computing, until no '+', '-' or '.' is following.
      */
-    for (;;)
+    ਲਈ (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	ਪੂਰਨ	    evaluate;
+	ਪੂਰਨ	    getnext;
 	char_u	    *p;
-	int	    op;
-	int	    oplen;
-	int	    concat;
+	ਪੂਰਨ	    op;
+	ਪੂਰਨ	    oplen;
+	ਪੂਰਨ	    concat;
 	typval_T    var2;
-	int	    vim9script = in_vim9script();
-	long	    op_lnum = SOURCING_LNUM;
+	ਪੂਰਨ	    vim9script = ਵਿੱਚ_vim9script();
+	ਲੰਮਾ	    op_lnum = SOURCING_LNUM;
 
 	// "." is only string concatenation when scriptversion is 1
 	// "+=", "-=" and "..=" are assignments
 	// "++" and "--" on the next line are a separate command.
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
+	p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
 	op = *p;
-	concat = op == '.' && (*(p + 1) == '.' || in_old_script(2));
-	if ((op != '+' && op != '-' && !concat) || p[1] == '='
+	concat = op == '.' && (*(p + 1) == '.' || ਵਿੱਚ_old_script(2));
+	ਜੇ ((op != '+' && op != '-' && !concat) || p[1] == '='
 					       || (p[1] == '.' && p[2] == '='))
-	    break;
-	if (getnext && (op == '+' || op == '-') && p[0] == p[1])
-	    break;
+	    ਰੋਕੋ;
+	ਜੇ (getnext && (op == '+' || op == '-') && p[0] == p[1])
+	    ਰੋਕੋ;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	evaluate = evalarg == ਨਿਰਾ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
 	oplen = (concat && p[1] == '.') ? 2 : 1;
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	ਜੇ (getnext)
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg);
+	ਨਹੀਂਤਾਂ
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	    ਜੇ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, oplen);
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    *arg = p;
 	}
-	if ((op != '+' || (rettv->v_type != VAR_LIST
+	ਜੇ ((op != '+' || (rettv->v_type != VAR_LIST
 						&& rettv->v_type != VAR_TUPLE
 						&& rettv->v_type != VAR_BLOB))
 		&& (op == '.' || rettv->v_type != VAR_FLOAT)
 		&& evaluate)
 	{
-	    int		error = FALSE;
+	    ਪੂਰਨ		error = FALSE;
 
 	    // For "list + ...", an illegal use of the first operand as
 	    // a number cannot be determined before evaluating the 2nd
@@ -4747,102 +4747,102 @@ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    // we know that the first operand needs to be a string or number
 	    // without evaluating the 2nd operand.  So check before to avoid
 	    // side effects after an error.
-	    if (op != '.')
-		tv_get_number_chk(rettv, &error);
-	    if ((op == '.' && tv_get_string_chk(rettv) == NULL) || error)
+	    ਜੇ (op != '.')
+		tv_get_ਸੰਖਿਆ_chk(rettv, &error);
+	    ਜੇ ((op == '.' && tv_get_string_chk(rettv) == ਨਿਰਾ) || error)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
+	ਜੇ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
 	{
 	    error_white_both(*arg, oplen);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + oplen, evalarg);
-	if (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
+	ਜੇ (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
 	    /*
 	     * Compute the result.
 	     */
 	    // use the line of the operation for messages
 	    SOURCING_LNUM = op_lnum;
-	    if (op == '.')
+	    ਜੇ (op == '.')
 	    {
-		if (eval_concat_str(rettv, &var2) == FAIL)
-		    return FAIL;
+		ਜੇ (eval_concat_str(rettv, &var2) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_BLOB
+	    ਨਹੀਂਤਾਂ ਜੇ (op == '+' && rettv->v_type == VAR_BLOB
 						   && var2.v_type == VAR_BLOB)
 		eval_addblob(rettv, &var2);
-	    else if (op == '+' && rettv->v_type == VAR_LIST
+	    ਨਹੀਂਤਾਂ ਜੇ (op == '+' && rettv->v_type == VAR_LIST
 						   && var2.v_type == VAR_LIST)
 	    {
-		if (eval_addlist(rettv, &var2) == FAIL)
-		    return FAIL;
+		ਜੇ (eval_addlist(rettv, &var2) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_TUPLE
+	    ਨਹੀਂਤਾਂ ਜੇ (op == '+' && rettv->v_type == VAR_TUPLE
 					   && var2.v_type == VAR_TUPLE)
 	    {
-		if (eval_addtuple(rettv, &var2) == FAIL)
-		    return FAIL;
+		ਜੇ (eval_addtuple(rettv, &var2) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (eval_addsub_number(rettv, &var2, op) == FAIL)
-		    return FAIL;
+		ਜੇ (eval_addsub_ਸੰਖਿਆ(rettv, &var2, op) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
 	    clear_tv(&var2);
 	}
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Multiply or divide or compute the modulo of numbers "tv1" and "tv2" and
  * store the result in "tv1".  The numbers can be whole numbers or floats.
  */
-    static int
-eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
+    ਸਥਿਰ ਪੂਰਨ
+eval_multdiv_ਸੰਖਿਆ(typval_T *tv1, typval_T *tv2, ਪੂਰਨ op)
 {
     varnumber_T	n1, n2;
     float_T	f1, f2;
-    int		error;
-    int		use_float = FALSE;
+    ਪੂਰਨ		error;
+    ਪੂਰਨ		use_float = FALSE;
 
     f1 = 0;
     f2 = 0;
     error = FALSE;
-    if (tv1->v_type == VAR_FLOAT)
+    ਜੇ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	use_float = TRUE;
 	n1 = 0;
     }
-    else
-	n1 = tv_get_number_chk(tv1, &error);
+    ਨਹੀਂਤਾਂ
+	n1 = tv_get_ਸੰਖਿਆ_chk(tv1, &error);
     clear_tv(tv1);
-    if (error)
+    ਜੇ (error)
     {
 	clear_tv(tv2);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (tv2->v_type == VAR_FLOAT)
+    ਜੇ (tv2->v_type == VAR_FLOAT)
     {
-	if (!use_float)
+	ਜੇ (!use_float)
 	{
 	    f1 = n1;
 	    use_float = TRUE;
@@ -4850,13 +4850,13 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	n2 = tv_get_number_chk(tv2, &error);
+	n2 = tv_get_ਸੰਖਿਆ_chk(tv2, &error);
 	clear_tv(tv2);
-	if (error)
-	    return FAIL;
-	if (use_float)
+	ਜੇ (error)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (use_float)
 	    f2 = n2;
     }
 
@@ -4864,57 +4864,57 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
      * Compute the result.
      * When either side is a float the result is a float.
      */
-    if (use_float)
+    ਜੇ (use_float)
     {
-	if (op == '*')
+	ਜੇ (op == '*')
 	    f1 = f1 * f2;
-	else if (op == '/')
+	ਨਹੀਂਤਾਂ ਜੇ (op == '/')
 	{
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 	    // VMS crashes on divide by zero, work around it
-	    if (f2 == 0.0)
+	    ਜੇ (f2 == 0.0)
 	    {
-		if (f1 == 0)
+		ਜੇ (f1 == 0)
 		    f1 = -1 * __F_FLT_MAX - 1L;   // similar to NaN
-		else if (f1 < 0)
+		ਨਹੀਂਤਾਂ ਜੇ (f1 < 0)
 		    f1 = -1 * __F_FLT_MAX;
-		else
+		ਨਹੀਂਤਾਂ
 		    f1 = __F_FLT_MAX;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		f1 = f1 / f2;
-#else
+#ਨਹੀਂਤਾਂ
 	    // We rely on the floating point library to handle divide
 	    // by zero to result in "inf" and not a crash.
 	    f1 = f1 / f2;
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    emsg(_(e_cannot_use_percent_with_float));
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int	    failed = FALSE;
+	ਪੂਰਨ	    failed = FALSE;
 
-	if (op == '*')
+	ਜੇ (op == '*')
 	    n1 = n1 * n2;
-	else if (op == '/')
-	    n1 = num_divide(n1, n2, &failed);
-	else
-	    n1 = num_modulus(n1, n2, &failed);
-	if (failed)
-	    return FAIL;
+	ਨਹੀਂਤਾਂ ਜੇ (op == '/')
+	    n1 = ਅੰਕ_divide(n1, n2, &failed);
+	ਨਹੀਂਤਾਂ
+	    n1 = ਅੰਕ_modulus(n1, n2, &failed);
+	ਜੇ (failed)
+	    ਵਾਪਸ FAIL;
 
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_ਸੰਖਿਆ;
+	tv1->vval.v_ਸੰਖਿਆ = n1;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -4928,46 +4928,46 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval7(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)  // after "." operator
+    ਪੂਰਨ		want_string)  // after "." operator
 {
     /*
      * Get the first expression.
      */
-    if (eval8(arg, rettv, evalarg, want_string) == FAIL)
-	return FAIL;
+    ਜੇ (eval8(arg, rettv, evalarg, want_string) == FAIL)
+	ਵਾਪਸ FAIL;
 
     /*
      * Repeat computing, until no '*', '/' or '%' is following.
      */
-    for (;;)
+    ਲਈ (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	ਪੂਰਨ	    evaluate;
+	ਪੂਰਨ	    getnext;
 	typval_T    var2;
 	char_u	    *p;
-	int	    op;
+	ਪੂਰਨ	    op;
 
 	// "*=", "/=" and "%=" are assignments
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
+	p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
 	op = *p;
-	if ((op != '*' && op != '/' && op != '%') || p[1] == '=')
-	    break;
+	ਜੇ ((op != '*' && op != '/' && op != '%') || p[1] == '=')
+	    ਰੋਕੋ;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	evaluate = evalarg == ਨਿਰਾ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	ਜੇ (getnext)
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg);
+	ਨਹੀਂਤਾਂ
 	{
-	    if (evaluate && in_vim9script() && !VIM_ISWHITE(**arg))
+	    ਜੇ (evaluate && ਵਿੱਚ_vim9script() && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    *arg = p;
 	}
@@ -4975,23 +4975,23 @@ eval7(
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && in_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
+	ਜੇ (evaluate && ਵਿੱਚ_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg, 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval8(arg, &var2, evalarg, FALSE) == FAIL)
-	    return FAIL;
+	ਜੇ (eval8(arg, &var2, evalarg, FALSE) == FAIL)
+	    ਵਾਪਸ FAIL;
 
-	if (evaluate)
+	ਜੇ (evaluate)
 	    // Compute the result.
-	    if (eval_multdiv_number(rettv, &var2, op) == FAIL)
-		return FAIL;
+	    ਜੇ (eval_multdiv_ਸੰਖਿਆ(rettv, &var2, op) == FAIL)
+		ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -5001,47 +5001,47 @@ eval7(
  * "arg" is advanced to just after the recognized expression.
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval8(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    ਪੂਰਨ		want_string)	// after "." operator
 {
-    type_T	*want_type = NULL;
+    type_T	*want_type = ਨਿਰਾ;
     garray_T	type_list;	    // list of pointers to allocated types
-    int		res;
-    int		evaluate = evalarg == NULL ? 0
+    ਪੂਰਨ		res;
+    ਪੂਰਨ		evaluate = evalarg == ਨਿਰਾ ? 0
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
 
     // Recognize <type> in Vim9 script only.
-    if (in_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
+    ਜੇ (ਵਿੱਚ_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
 					     && STRNCMP(*arg, "<SNR>", 5) != 0)
     {
 	++*arg;
-	ga_init2(&type_list, sizeof(type_T *), 10);
-	if (!evaluate)
+	ga_init2(&type_list, ਆਕਾਰ(type_T *), 10);
+	ਜੇ (!evaluate)
 	    // Only skip over the type, it may use a type variable that is only
 	    // known when the expression is compiled, e.g. in a lambda.
 	    *arg = skip_type(*arg, FALSE);
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    want_type = parse_type(arg, &type_list, NULL, NULL, TRUE);
-	    if (want_type == NULL)
+	    want_type = parse_type(arg, &type_list, ਨਿਰਾ, ਨਿਰਾ, TRUE);
+	    ਜੇ (want_type == ਨਿਰਾ)
 	    {
 		clear_type_list(&type_list);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 
-	if (**arg != '>')
+	ਜੇ (**arg != '>')
 	{
-	    if (*skipwhite(*arg) == '>')
+	    ਜੇ (*skipwhite(*arg) == '>')
 		semsg(_(e_no_white_space_allowed_before_str_str), ">", *arg);
-	    else
+	    ਨਹੀਂਤਾਂ
 		emsg(_(e_missing_gt));
 	    clear_type_list(&type_list);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	++*arg;
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
@@ -5049,27 +5049,27 @@ eval8(
 
     res = eval9(arg, rettv, evalarg, want_string);
 
-    if (want_type != NULL)
+    ਜੇ (want_type != ਨਿਰਾ)
     {
-	if (evaluate && res == OK)
+	ਜੇ (evaluate && res == OK)
 	{
 	    type_T *actual = typval2type(rettv, get_copyID(), &type_list,
 							       TVTT_DO_MEMBER);
 
-	    if (!equal_type(want_type, actual, 0))
+	    ਜੇ (!equal_type(want_type, actual, 0))
 	    {
-		if (want_type->tt_type == VAR_BOOL
+		ਜੇ (want_type->tt_type == VAR_BOOL
 					&& actual->tt_type != VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		{
-		    int n = tv2bool(rettv);
+		    ਪੂਰਨ n = tv2bool(rettv);
 
 		    // can use "0" and "1" for boolean in some places
 		    clear_tv(rettv);
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = n ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_ਸੰਖਿਆ = n ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    where_T where = WHERE_INIT;
 
@@ -5080,239 +5080,239 @@ eval8(
 	clear_type_list(&type_list);
     }
 
-    return res;
+    ਵਾਪਸ res;
 }
 
-    int
-eval_leader(char_u **arg, int vim9)
+    ਪੂਰਨ
+eval_leader(char_u **arg, ਪੂਰਨ vim9)
 {
     char_u	*s = *arg;
     char_u	*p = *arg;
 
-    while (*p == '!' || *p == '-' || *p == '+')
+    ਜਦੋਂ (*p == '!' || *p == '-' || *p == '+')
     {
 	char_u *n = skipwhite(p + 1);
 
 	// ++, --, -+ and +- are not accepted in Vim9 script
-	if (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
+	ਜੇ (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
 	{
-	    semsg(_(e_invalid_expression_str), s);
-	    return FAIL;
+	    semsg(_(e_invalid_ਵਿਅੰਜਕ_str), s);
+	    ਵਾਪਸ FAIL;
 	}
 	p = n;
     }
     *arg = p;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Check for a predefined value "true", "false" and "null.*".
  * Return OK when recognized.
  */
-    int
-handle_predefined(char_u *s, int len, typval_T *rettv)
+    ਪੂਰਨ
+handle_predefined(char_u *s, ਪੂਰਨ len, typval_T *rettv)
 {
-    switch (len)
+    ਚੋਣ (len)
     {
-	case 4: if (STRNCMP(s, "true", 4) == 0)
+	ਹਾਲਤ 4: ਜੇ (STRNCMP(s, "true", 4) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_TRUE;
-		    return OK;
+		    rettv->vval.v_ਸੰਖਿਆ = VVAL_TRUE;
+		    ਵਾਪਸ OK;
 		}
-		if (STRNCMP(s, "null", 4) == 0)
+		ਜੇ (STRNCMP(s, "null", 4) == 0)
 		{
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-		    return OK;
+		    rettv->vval.v_ਸੰਖਿਆ = VVAL_NULL;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 5: if (STRNCMP(s, "false", 5) == 0)
+		ਰੋਕੋ;
+	ਹਾਲਤ 5: ਜੇ (STRNCMP(s, "false", 5) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_FALSE;
-		    return OK;
+		    rettv->vval.v_ਸੰਖਿਆ = VVAL_FALSE;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 8: if (STRNCMP(s, "null_job", 8) == 0)
+		ਰੋਕੋ;
+	ਹਾਲਤ 8: ਜੇ (STRNCMP(s, "null_job", 8) == 0)
 		{
-#ifdef FEAT_JOB_CHANNEL
-		    rettv->v_type = VAR_JOB;
-		    rettv->vval.v_job = NULL;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+		    rettv->v_type = VAR_ਕੰਮ;
+		    rettv->vval.v_ਕੰਮ = ਨਿਰਾ;
+#ਨਹੀਂਤਾਂ
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-#endif
-		    return OK;
+		    rettv->vval.v_ਸੰਖਿਆ = VVAL_NULL;
+#ਜੇ_ਅੰਤ
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 9:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		ਰੋਕੋ;
+	ਹਾਲਤ 9:
+		ਜੇ (STRNCMP(s, "null_", 5) != 0)
+		    ਰੋਕੋ;
 		// null_list
-		if (STRNCMP(s + 5, "list", 4) == 0)
+		ਜੇ (STRNCMP(s + 5, "list", 4) == 0)
 		{
 		    rettv->v_type = VAR_LIST;
-		    rettv->vval.v_list = NULL;
-		    return OK;
+		    rettv->vval.v_list = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
 		// null_dict
-		if (STRNCMP(s + 5, "dict", 4) == 0)
+		ਜੇ (STRNCMP(s + 5, "dict", 4) == 0)
 		{
 		    rettv->v_type = VAR_DICT;
-		    rettv->vval.v_dict = NULL;
-		    return OK;
+		    rettv->vval.v_dict = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
 		// null_blob
-		if (STRNCMP(s + 5, "blob", 4) == 0)
+		ਜੇ (STRNCMP(s + 5, "blob", 4) == 0)
 		{
 		    rettv->v_type = VAR_BLOB;
-		    rettv->vval.v_blob = NULL;
-		    return OK;
+		    rettv->vval.v_blob = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 10:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		ਰੋਕੋ;
+	ਹਾਲਤ 10:
+		ਜੇ (STRNCMP(s, "null_", 5) != 0)
+		    ਰੋਕੋ;
 		// null_class
-		if (STRNCMP(s + 5, "class", 5) == 0)
+		ਜੇ (STRNCMP(s + 5, "class", 5) == 0)
 		{
 		    rettv->v_type = VAR_CLASS;
-		    rettv->vval.v_class = NULL;
-		    return OK;
+		    rettv->vval.v_class = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		if (STRNCMP(s + 5, "tuple", 5) == 0)
+		ਜੇ (STRNCMP(s + 5, "tuple", 5) == 0)
 		{
 		    rettv->v_type = VAR_TUPLE;
-		    rettv->vval.v_tuple = NULL;
-		    return OK;
+		    rettv->vval.v_tuple = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 11: if (STRNCMP(s, "null_string", 11) == 0)
+		ਰੋਕੋ;
+	ਹਾਲਤ 11: ਜੇ (STRNCMP(s, "null_string", 11) == 0)
 		{
 		    rettv->v_type = VAR_STRING;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		if (STRNCMP(s, "null_object", 11) == 0)
+		ਜੇ (STRNCMP(s, "null_object", 11) == 0)
 		{
 		    rettv->v_type = VAR_OBJECT;
-		    rettv->vval.v_object = NULL;
-		    return OK;
+		    rettv->vval.v_object = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 12:
-		if (STRNCMP(s, "null_channel", 12) == 0)
+		ਰੋਕੋ;
+	ਹਾਲਤ 12:
+		ਜੇ (STRNCMP(s, "null_channel", 12) == 0)
 		{
-#ifdef FEAT_JOB_CHANNEL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
 		    rettv->v_type = VAR_CHANNEL;
-		    rettv->vval.v_channel = NULL;
-#else
+		    rettv->vval.v_channel = ਨਿਰਾ;
+#ਨਹੀਂਤਾਂ
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-#endif
-		    return OK;
+		    rettv->vval.v_ਸੰਖਿਆ = VVAL_NULL;
+#ਜੇ_ਅੰਤ
+		    ਵਾਪਸ OK;
 		}
-		if (STRNCMP(s, "null_partial", 12) == 0)
+		ਜੇ (STRNCMP(s, "null_partial", 12) == 0)
 		{
 		    rettv->v_type = VAR_PARTIAL;
-		    rettv->vval.v_partial = NULL;
-		    return OK;
+		    rettv->vval.v_partial = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		break;
-	case 13: if (STRNCMP(s, "null_function", 13) == 0)
+		ਰੋਕੋ;
+	ਹਾਲਤ 13: ਜੇ (STRNCMP(s, "null_function", 13) == 0)
 		{
 		    rettv->v_type = VAR_FUNC;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ਨਿਰਾ;
+		    ਵਾਪਸ OK;
 		}
-		break;
+		ਰੋਕੋ;
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Handle register contents: @r.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 eval9_reg_contents(
     char_u	**arg,
     typval_T	*rettv,
-    int		evaluate)
+    ਪੂਰਨ		evaluate)
 {
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
     ++*arg;	// skip '@'
-    if (evaluate)
+    ਜੇ (evaluate)
     {
-	if (vim9script && IS_WHITE_OR_NUL(**arg))
+	ਜੇ (vim9script && IS_WHITE_OR_NUL(**arg))
 	    semsg(_(e_syntax_error_at_str), *arg);
-	else if (vim9script && !valid_yank_reg(**arg, FALSE))
+	ਨਹੀਂਤਾਂ ਜੇ (vim9script && !valid_yank_reg(**arg, FALSE))
 	    emsg_invreg(**arg);
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = get_reg_contents(**arg,
-		    GREG_EXPR_SRC);
+		    GREG_ਵਿਅੰਜਕ_SRC);
 	}
     }
-    if (**arg != NUL)
+    ਜੇ (**arg != NUL)
 	++*arg;
 }
 
 /*
  * Handle a nested expression: (expression) or lambda: (arg) => expr
  */
-    static int
-eval9_nested_expr(
+    ਸਥਿਰ ਪੂਰਨ
+eval9_nested_ਵਿਅੰਜਕ(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate)
+    ਪੂਰਨ		evaluate)
 {
-    int		ret = NOTDONE;
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		ret = NOTDONE;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
-    if (vim9script)
+    ਜੇ (vim9script)
     {
-	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, NULL);
-	if (ret == OK && evaluate)
+	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, ਨਿਰਾ);
+	ਜੇ (ret == OK && evaluate)
 	{
 	    ufunc_T *ufunc = rettv->vval.v_partial->pt_func;
 
 	    // Compile it here to get the return type.  The return
 	    // type is optional, when it's missing use t_unknown.
 	    // This is recognized in compile_return().
-	    if (ufunc->uf_ret_type->tt_type == VAR_VOID)
+	    ਜੇ (ufunc->uf_ret_type->tt_type == VAR_VOID)
 		ufunc->uf_ret_type = &t_unknown;
-	    if (compile_def_function(ufunc, FALSE,
-				get_compile_type(ufunc), NULL) == FAIL)
+	    ਜੇ (compile_def_function(ufunc, FALSE,
+				get_compile_type(ufunc), ਨਿਰਾ) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
     }
-    if (ret == NOTDONE)
+    ਜੇ (ret == NOTDONE)
     {
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ')')
+	ਜੇ (**arg == ')')
 	    // empty tuple
 	    ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    ret = eval1(arg, rettv, evalarg);	// recursive!
-	    if (ret != OK)
-		return ret;
+	    ਜੇ (ret != OK)
+		ਵਾਪਸ ret;
 
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
 
-	    if (**arg == ',')
+	    ਜੇ (**arg == ',')
 		// tuple
 		ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	    else if (**arg == ')')
+	    ਨਹੀਂਤਾਂ ਜੇ (**arg == ')')
 		++*arg;
-	    else if (ret == OK)
+	    ਨਹੀਂਤਾਂ ਜੇ (ret == OK)
 	    {
 		emsg(_(e_missing_closing_paren));
 		clear_tv(rettv);
@@ -5321,90 +5321,90 @@ eval9_nested_expr(
 	}
     }
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
 * Handle be a variable or function name.
 * Can also be a curly-braces kind of name: {expr}.
 */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval9_var_func_name(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate,
-    char_u	**name_start)
+    ਪੂਰਨ		evaluate,
+    char_u	**name_ਸ਼ੁਰੂ)
 {
     char_u	*s;
-    int		len;
+    ਪੂਰਨ		len;
     char_u	*alias;
-    int		ret = OK;
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		ret = OK;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
     s = *arg;
     len = get_name_len(arg, &alias, evaluate, TRUE);
-    if (alias != NULL)
+    ਜੇ (alias != ਨਿਰਾ)
 	s = alias;
 
-    if (len <= 0)
+    ਜੇ (len <= 0)
 	ret = FAIL;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int	flags = evalarg == NULL ? 0 : evalarg->eval_flags;
+	ਪੂਰਨ	flags = evalarg == ਨਿਰਾ ? 0 : evalarg->eval_flags;
 
-	if (evaluate && vim9script && len == 1 && *s == '_')
+	ਜੇ (evaluate && vim9script && len == 1 && *s == '_')
 	{
-	    emsg(_(e_cannot_use_underscore_here));
+	    emsg(_(e_cannot_use_underscore_ਇੱਥੇ));
 	    ret = FAIL;
 	}
-	else if (evaluate && vim9script && len > 2
+	ਨਹੀਂਤਾਂ ਜੇ (evaluate && vim9script && len > 2
 						&& s[0] == 's' && s[1] == ':')
 	{
-	    semsg(_(e_cannot_use_s_colon_in_vim9_script_str), s);
+	    semsg(_(e_cannot_use_s_colon_ਵਿੱਚ_vim9_script_str), s);
 	    ret = FAIL;
 	}
-	else if ((vim9script ? **arg : *skipwhite(*arg)) == '('
+	ਨਹੀਂਤਾਂ ਜੇ ((vim9script ? **arg : *skipwhite(*arg)) == '('
 				|| (vim9script && generic_func_call(arg)))
 	{
 	    // "name(..."  recursive!
 	    *arg = skipwhite(*arg);
-	    ret = eval_func(arg, evalarg, s, len, rettv, flags, NULL);
+	    ret = eval_func(arg, evalarg, s, len, rettv, flags, ਨਿਰਾ);
 	}
-	else if (evaluate)
+	ਨਹੀਂਤਾਂ ਜੇ (evaluate)
 	{
 	    // get the value of "true", "false", etc. or a variable
 	    ret = FAIL;
-	    if (vim9script)
+	    ਜੇ (vim9script)
 		ret = handle_predefined(s, len, rettv);
-	    if (ret == FAIL)
+	    ਜੇ (ret == FAIL)
 	    {
-		*name_start = s;
-		ret = eval_variable(s, len, 0, rettv, NULL,
+		*name_ਸ਼ੁਰੂ = s;
+		ret = eval_variable(s, len, 0, rettv, ਨਿਰਾ,
 					EVAL_VAR_VERBOSE + EVAL_VAR_IMPORT);
 
 		// skip the generic function arguments (if present)
 		// they are already processed by eval_variable
-		if (ret == OK && vim9script && **arg == '<'
+		ਜੇ (ret == OK && vim9script && **arg == '<'
 						&& rettv->v_type == VAR_FUNC)
-		    ret = skip_generic_func_type_args(arg);
+		    ret = skip_generic_func_type_ਦਲੀਲਾਂ(arg);
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // skip the name
 	    check_vars(s, len);
 
 	    // Skip the type arguments of a generic function, its name starts
 	    // with an uppercase letter.
-	    if (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
-		skip_generic_func_type_args(arg);
+	    ਜੇ (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
+		skip_generic_func_type_ਦਲੀਲਾਂ(arg);
 	    ret = OK;
 	}
     }
     vim_free(alias);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -5438,20 +5438,20 @@ eval9_var_func_name(
  *
  * Return OK or FAIL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval9(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    ਪੂਰਨ		want_string)	// after "." operator
 {
-    int		evaluate = evalarg != NULL
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    char_u	*name_start = NULL;
-    char_u	*start_leader, *end_leader;
-    int		ret = OK;
-    static int	recurse = 0;
-    int		vim9script = in_vim9script();
+    char_u	*name_ਸ਼ੁਰੂ = ਨਿਰਾ;
+    char_u	*ਸ਼ੁਰੂ_leader, *ਸਿਰਾ_leader;
+    ਪੂਰਨ		ret = OK;
+    ਸਥਿਰ ਪੂਰਨ	recurse = 0;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
     /*
      * Initialise variable so that clear_tv() can't mistake this for a
@@ -5462,149 +5462,149 @@ eval9(
     /*
      * Skip '!', '-' and '+' characters.  They are handled later.
      */
-    start_leader = *arg;
-    if (eval_leader(arg, vim9script) == FAIL)
-	return FAIL;
-    end_leader = *arg;
+    ਸ਼ੁਰੂ_leader = *arg;
+    ਜੇ (eval_leader(arg, vim9script) == FAIL)
+	ਵਾਪਸ FAIL;
+    ਸਿਰਾ_leader = *arg;
 
-    if (**arg == '.' && (!SAFE_isdigit(*(*arg + 1)) || in_old_script(2)))
+    ਜੇ (**arg == '.' && (!ਸੁਰੱਖਿਅਤ_isdigit(*(*arg + 1)) || ਵਿੱਚ_old_script(2)))
     {
-	semsg(_(e_invalid_expression_str), *arg);
+	semsg(_(e_invalid_ਵਿਅੰਜਕ_str), *arg);
 	++*arg;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     // Limit recursion to 1000 levels.  At least at 10000 we run out of stack
     // and crash.  With MSVC the stack is smaller.
-    if (recurse ==
-#ifdef _MSC_VER
+    ਜੇ (recurse ==
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _MSC_VER
 		    300
-#else
+#ਨਹੀਂਤਾਂ
 		    1000
-#endif
+#ਜੇ_ਅੰਤ
 		    )
     {
-	semsg(_(e_expression_too_recursive_str), *arg);
-	return FAIL;
+	semsg(_(e_ਵਿਅੰਜਕ_too_recursive_str), *arg);
+	ਵਾਪਸ FAIL;
     }
     ++recurse;
 
-    switch (**arg)
+    ਚੋਣ (**arg)
     {
     /*
      * Number constant.
      */
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-    case '.':	ret = eval_number(arg, rettv, evaluate, want_string);
+    ਹਾਲਤ '0':
+    ਹਾਲਤ '1':
+    ਹਾਲਤ '2':
+    ਹਾਲਤ '3':
+    ਹਾਲਤ '4':
+    ਹਾਲਤ '5':
+    ਹਾਲਤ '6':
+    ਹਾਲਤ '7':
+    ਹਾਲਤ '8':
+    ਹਾਲਤ '9':
+    ਹਾਲਤ '.':	ret = eval_ਸੰਖਿਆ(arg, rettv, evaluate, want_string);
 
 		// Apply prefixed "-" and "+" now.  Matters especially when
 		// "->" follows.
-		if (ret == OK && evaluate && end_leader > start_leader
+		ਜੇ (ret == OK && evaluate && ਸਿਰਾ_leader > ਸ਼ੁਰੂ_leader
 						  && rettv->v_type != VAR_BLOB)
-		    ret = eval9_leader(rettv, TRUE, start_leader, &end_leader);
-		break;
+		    ret = eval9_leader(rettv, TRUE, ਸ਼ੁਰੂ_leader, &ਸਿਰਾ_leader);
+		ਰੋਕੋ;
 
     /*
      * String constant: "string".
      */
-    case '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
-		break;
+    ਹਾਲਤ '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
+		ਰੋਕੋ;
 
     /*
      * Literal string constant: 'str''ing'.
      */
-    case '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
-		break;
+    ਹਾਲਤ '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
+		ਰੋਕੋ;
 
     /*
      * List: [expr, expr]
      */
-    case '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
-		break;
+    ਹਾਲਤ '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
+		ਰੋਕੋ;
 
     /*
      * Literal Dictionary: #{key: val, key: val}
      */
-    case '#':	ret = eval_lit_dict(arg, rettv, evalarg);
-		break;
+    ਹਾਲਤ '#':	ret = eval_lit_dict(arg, rettv, evalarg);
+		ਰੋਕੋ;
 
     /*
      * Lambda: {arg, arg -> expr}
      * Dictionary: {'key': val, 'key': val}
      */
-    case '{':	if (vim9script)
+    ਹਾਲਤ '{':	ਜੇ (vim9script)
 		    ret = NOTDONE;
-		else
-		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, NULL);
-		if (ret == NOTDONE)
+		ਨਹੀਂਤਾਂ
+		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, ਨਿਰਾ);
+		ਜੇ (ret == NOTDONE)
 		    ret = eval_dict(arg, rettv, evalarg, FALSE);
-		break;
+		ਰੋਕੋ;
 
     /*
      * Option value: &name
      */
-    case '&':	ret = eval_option(arg, rettv, evaluate);
-		break;
+    ਹਾਲਤ '&':	ret = eval_option(arg, rettv, evaluate);
+		ਰੋਕੋ;
 
     /*
      * Environment variable: $VAR.
      * Interpolated string: $"string" or $'string'.
      */
-    case '$':	if ((*arg)[1] == '"' || (*arg)[1] == '\'')
+    ਹਾਲਤ '$':	ਜੇ ((*arg)[1] == '"' || (*arg)[1] == '\'')
 		    ret = eval_interp_string(arg, rettv, evaluate);
-		else
+		ਨਹੀਂਤਾਂ
 		    ret = eval_env_var(arg, rettv, evaluate);
-		break;
+		ਰੋਕੋ;
 
     /*
      * Register contents: @r.
      */
-    case '@':	eval9_reg_contents(arg, rettv, evaluate);
-		break;
+    ਹਾਲਤ '@':	eval9_reg_contents(arg, rettv, evaluate);
+		ਰੋਕੋ;
 
     /*
      * nested expression: (expression).
      * or lambda: (arg) => expr
      * or tuple
      */
-    case '(':	ret = eval9_nested_expr(arg, rettv, evalarg, evaluate);
-		break;
+    ਹਾਲਤ '(':	ret = eval9_nested_ਵਿਅੰਜਕ(arg, rettv, evalarg, evaluate);
+		ਰੋਕੋ;
 
-    default:	ret = NOTDONE;
-		break;
+    ਮੂਲ:	ret = NOTDONE;
+		ਰੋਕੋ;
     }
 
-    if (ret == NOTDONE)
+    ਜੇ (ret == NOTDONE)
     {
 	/*
 	 * Must be a variable or function name.
 	 * Can also be a curly-braces kind of name: {expr}.
 	 */
-	ret = eval9_var_func_name(arg, rettv, evalarg, evaluate, &name_start);
+	ret = eval9_var_func_name(arg, rettv, evalarg, evaluate, &name_ਸ਼ੁਰੂ);
     }
 
     // Handle following '[', '(' and '.' for expr[expr], expr.name,
     // expr(expr), expr->name(expr)
-    if (ret == OK)
-	ret = handle_subscript(arg, name_start, rettv, evalarg, evaluate);
+    ਜੇ (ret == OK)
+	ret = handle_subscript(arg, name_ਸ਼ੁਰੂ, rettv, evalarg, evaluate);
 
     /*
      * Apply logical NOT and unary '-', from right to left, ignore '+'.
      */
-    if (ret == OK && evaluate && end_leader > start_leader)
-	ret = eval9_leader(rettv, FALSE, start_leader, &end_leader);
+    ਜੇ (ret == OK && evaluate && ਸਿਰਾ_leader > ਸ਼ੁਰੂ_leader)
+	ret = eval9_leader(rettv, FALSE, ਸ਼ੁਰੂ_leader, &ਸਿਰਾ_leader);
 
     --recurse;
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -5612,167 +5612,167 @@ eval9(
  * When "numeric_only" is TRUE only handle "+" and "-".
  * Adjusts "end_leaderp" until it is at "start_leader".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval9_leader(
 	typval_T    *rettv,
-	int	    numeric_only,
-	char_u	    *start_leader,
-	char_u	    **end_leaderp)
+	ਪੂਰਨ	    numeric_only,
+	char_u	    *ਸ਼ੁਰੂ_leader,
+	char_u	    **ਸਿਰਾ_leaderp)
 {
-    char_u	*end_leader = *end_leaderp;
-    int		ret = OK;
-    int		error = FALSE;
+    char_u	*ਸਿਰਾ_leader = *ਸਿਰਾ_leaderp;
+    ਪੂਰਨ		ret = OK;
+    ਪੂਰਨ		error = FALSE;
     varnumber_T val = 0;
     vartype_T	type = rettv->v_type;
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
     float_T	    f = 0.0;
 
-    if (rettv->v_type == VAR_FLOAT)
+    ਜੇ (rettv->v_type == VAR_FLOAT)
 	f = rettv->vval.v_float;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	while (VIM_ISWHITE(end_leader[-1]))
-	    --end_leader;
-	if (vim9script && end_leader[-1] == '!')
+	ਜਦੋਂ (VIM_ISWHITE(ਸਿਰਾ_leader[-1]))
+	    --ਸਿਰਾ_leader;
+	ਜੇ (vim9script && ਸਿਰਾ_leader[-1] == '!')
 	{
 	    // Is this typeval supported with the ! operator?
-	    if (check_typval_is_value(rettv) == FAIL)
+	    ਜੇ (check_typval_is_ਮੁੱਲ(rettv) == FAIL)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    val = tv2bool(rettv);
 	}
-	else
-	    val = tv_get_number_chk(rettv, &error);
+	ਨਹੀਂਤਾਂ
+	    val = tv_get_ਸੰਖਿਆ_chk(rettv, &error);
     }
-    if (error)
+    ਜੇ (error)
     {
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	while (end_leader > start_leader)
+	ਜਦੋਂ (ਸਿਰਾ_leader > ਸ਼ੁਰੂ_leader)
 	{
-	    --end_leader;
-	    if (*end_leader == '!')
+	    --ਸਿਰਾ_leader;
+	    ਜੇ (*ਸਿਰਾ_leader == '!')
 	    {
-		if (numeric_only)
+		ਜੇ (numeric_only)
 		{
-		    ++end_leader;
-		    break;
+		    ++ਸਿਰਾ_leader;
+		    ਰੋਕੋ;
 		}
-		if (rettv->v_type == VAR_FLOAT)
+		ਜੇ (rettv->v_type == VAR_FLOAT)
 		{
 		    rettv->v_type = VAR_BOOL;
 		    val = f == 0.0 ? VVAL_TRUE : VVAL_FALSE;
 		    type = VAR_BOOL;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    val = !val;
 		    type = VAR_BOOL;
 		}
 	    }
-	    else if (*end_leader == '-')
+	    ਨਹੀਂਤਾਂ ਜੇ (*ਸਿਰਾ_leader == '-')
 	    {
-		if (rettv->v_type == VAR_FLOAT)
+		ਜੇ (rettv->v_type == VAR_FLOAT)
 		    f = -f;
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    val = -val;
-		    type = VAR_NUMBER;
+		    type = VAR_ਸੰਖਿਆ;
 		}
 	    }
 	}
-	if (rettv->v_type == VAR_FLOAT)
+	ਜੇ (rettv->v_type == VAR_FLOAT)
 	{
 	    clear_tv(rettv);
 	    rettv->vval.v_float = f;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    clear_tv(rettv);
-	    if (vim9script)
+	    ਜੇ (vim9script)
 		rettv->v_type = type;
-	    else
-		rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = val;
+	    ਨਹੀਂਤਾਂ
+		rettv->v_type = VAR_ਸੰਖਿਆ;
+	    rettv->vval.v_ਸੰਖਿਆ = val;
 	}
     }
-    *end_leaderp = end_leader;
-    return ret;
+    *ਸਿਰਾ_leaderp = ਸਿਰਾ_leader;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Call the function referred to in "rettv".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 call_func_rettv(
 	char_u	    **arg,
 	evalarg_T   *evalarg,
 	typval_T    *rettv,
-	int	    evaluate,
+	ਪੂਰਨ	    evaluate,
 	dict_T	    *selfdict,
 	typval_T    *basetv)
 {
-    partial_T	*pt = NULL;
+    partial_T	*pt = ਨਿਰਾ;
     funcexe_T	funcexe;
     typval_T	functv;
     char_u	*s;
-    int		ret;
+    ਪੂਰਨ		ret;
 
     // need to copy the funcref so that we can clear rettv
-    if (evaluate)
+    ਜੇ (evaluate)
     {
 	functv = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	// Invoke the function.  Recursive!
-	if (functv.v_type == VAR_PARTIAL)
+	ਜੇ (functv.v_type == VAR_PARTIAL)
 	{
 	    pt = functv.vval.v_partial;
 	    s = partial_name(pt);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    s = functv.vval.v_string;
-	    if (s == NULL || *s == NUL)
+	    ਜੇ (s == ਨਿਰਾ || *s == NUL)
 	    {
-		emsg(_(e_empty_function_name));
+		emsg(_(e_ਖਾਲੀ_ਥਾਵਾਂ_function_name));
 		ret = FAIL;
-		goto theend;
+		ਜਾਓ theend;
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	s = (char_u *)"";
 
-    CLEAR_FIELD(funcexe);
+    CLEAR_ਖੇਤਰ(funcexe);
     funcexe.fe_firstline = curwin->w_cursor.lnum;
     funcexe.fe_lastline = curwin->w_cursor.lnum;
     funcexe.fe_evaluate = evaluate;
     funcexe.fe_partial = pt;
-    if (pt != NULL)
+    ਜੇ (pt != ਨਿਰਾ)
     {
 	funcexe.fe_object = pt->pt_obj;
-	if (funcexe.fe_object != NULL)
+	ਜੇ (funcexe.fe_object != ਨਿਰਾ)
 	    ++funcexe.fe_object->obj_refcount;
     }
     funcexe.fe_selfdict = selfdict;
     funcexe.fe_basetv = basetv;
-    if (evalarg != NULL)
+    ਜੇ (evalarg != ਨਿਰਾ)
 	funcexe.fe_cctx = evalarg->eval_cctx;
     ret = get_func_tv(s, -1, rettv, arg, evalarg, &funcexe);
 
 theend:
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
+    ਜੇ (evaluate)
 	clear_tv(&functv);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -5780,68 +5780,68 @@ theend:
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 eval_lambda(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    ਪੂਰਨ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    typval_T	base = *rettv;
-    int		ret;
+    typval_T	ਅਧਾਰ = *rettv;
+    ਪੂਰਨ		ret;
 
     rettv->v_type = VAR_UNKNOWN;
 
-    if (**arg == '{')
+    ਜੇ (**arg == '{')
     {
 	// ->{lambda}()
-	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, NULL);
+	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, ਨਿਰਾ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// ->(lambda)()
 	++*arg;
 	ret = eval1(arg, rettv, evalarg);
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ')')
+	ਜੇ (**arg != ')')
 	{
 	    emsg(_(e_missing_closing_paren));
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
+	ਜੇ (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
 					       && rettv->v_type != VAR_PARTIAL)
 	{
-	    emsg(_(e_string_or_function_required_for_arrow_parens_expr));
-	    return FAIL;
+	    emsg(_(e_string_or_function_required_for_arrow_parens_ਵਿਅੰਜਕ));
+	    ਵਾਪਸ FAIL;
 	}
 	++*arg;
     }
-    if (ret != OK)
-	return FAIL;
+    ਜੇ (ret != OK)
+	ਵਾਪਸ FAIL;
 
-    if (**arg != '(')
+    ਜੇ (**arg != '(')
     {
-	if (verbose)
+	ਜੇ (verbose)
 	{
-	    if (*skipwhite(*arg) == '(')
+	    ਜੇ (*skipwhite(*arg) == '(')
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
-	    else
+	    ਨਹੀਂਤਾਂ
 		semsg(_(e_missing_parenthesis_str), "lambda");
 	}
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
-	ret = call_func_rettv(arg, evalarg, rettv, evaluate, NULL, &base);
+    ਨਹੀਂਤਾਂ
+	ret = call_func_rettv(arg, evalarg, rettv, evaluate, ਨਿਰਾ, &ਅਧਾਰ);
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
-	clear_tv(&base);
+    ਜੇ (evaluate)
+	clear_tv(&ਅਧਾਰ);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -5849,36 +5849,36 @@ eval_lambda(
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
-eval_method(
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਵਿਧੀ(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    ਪੂਰਨ		verbose)	// give error messages
 {
     char_u	*name;
-    long	len;
+    ਲੰਮਾ	len;
     char_u	*alias;
-    char_u	*tofree = NULL;
-    typval_T	base = *rettv;
-    int		ret = OK;
-    int		evaluate = evalarg != NULL
+    char_u	*tofree = ਨਿਰਾ;
+    typval_T	ਅਧਾਰ = *rettv;
+    ਪੂਰਨ		ret = OK;
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     rettv->v_type = VAR_UNKNOWN;
 
     name = *arg;
     len = get_name_len(arg, &alias, evaluate, evaluate);
-    if (alias != NULL)
+    ਜੇ (alias != ਨਿਰਾ)
 	name = alias;
 
-    if (len <= 0)
+    ਜੇ (len <= 0)
     {
-	if (verbose)
-	    emsg(_(e_missing_name_after_method));
+	ਜੇ (verbose)
+	    emsg(_(e_missing_name_after_ਵਿਧੀ));
 	ret = FAIL;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	char_u *paren;
 
@@ -5887,70 +5887,70 @@ eval_method(
 	// Does not handle anything where "(" is part of the expression.
 	*arg = skipwhite(*arg);
 
-	if (**arg != '(' && alias == NULL
-				    && (paren = vim_strchr(*arg, '(')) != NULL)
+	ਜੇ (**arg != '(' && alias == ਨਿਰਾ
+				    && (paren = vim_strchr(*arg, '(')) != ਨਿਰਾ)
 	{
 	    *arg = name;
 
 	    // Truncate the name at the "(".  Avoid trying to get another line
 	    // by making "getline" NULL.
 	    *paren = NUL;
-	    char_u	*(*getline)(int, void *, int, getline_opt_T) = NULL;
-	    if (evalarg != NULL)
+	    char_u	*(*getline)(ਪੂਰਨ, ਖਾਲੀ *, ਪੂਰਨ, getline_opt_T) = ਨਿਰਾ;
+	    ਜੇ (evalarg != ਨਿਰਾ)
 	    {
 		getline = evalarg->eval_getline;
-		evalarg->eval_getline = NULL;
+		evalarg->eval_getline = ਨਿਰਾ;
 	    }
 
 	    char_u *deref = deref_function_name(arg, &tofree, evalarg, verbose);
-	    if (deref == NULL)
+	    ਜੇ (deref == ਨਿਰਾ)
 	    {
 		*arg = name + len;
 		ret = FAIL;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		name = deref;
-		len = (long)STRLEN(name);
+		len = (ਲੰਮਾ)STRLEN(name);
 	    }
 
 	    *paren = '(';
-	    if (getline != NULL)
+	    ਜੇ (getline != ਨਿਰਾ)
 		evalarg->eval_getline = getline;
 	}
 
-	if (ret == OK)
+	ਜੇ (ret == OK)
 	{
 	    *arg = skipwhite(*arg);
 
-	    if (**arg != '(')
+	    ਜੇ (**arg != '(')
 	    {
-		if (verbose)
+		ਜੇ (verbose)
 		    semsg(_(e_missing_parenthesis_str), name);
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE((*arg)[-1]))
+	    ਨਹੀਂਤਾਂ ਜੇ (VIM_ISWHITE((*arg)[-1]))
 	    {
-		if (verbose)
+		ਜੇ (verbose)
 		    emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ret = eval_func(arg, evalarg, name, len, rettv,
-					  evaluate ? EVAL_EVALUATE : 0, &base);
+					  evaluate ? EVAL_EVALUATE : 0, &ਅਧਾਰ);
 	}
     }
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
-	clear_tv(&base);
+    ਜੇ (evaluate)
+	clear_tv(&ਅਧਾਰ);
     vim_free(tofree);
 
-    if (alias != NULL)
+    ਜੇ (alias != ਨਿਰਾ)
 	vim_free(alias);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -5958,49 +5958,49 @@ eval_method(
  * "*arg" points to the '[' or '.'.
  * Returns FAIL or OK. "*arg" is advanced to after the ']'.
  */
-    static int
-eval_index(
+    ਸਥਿਰ ਪੂਰਨ
+eval_ਸੂਚਕਾਂਕ(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    ਪੂਰਨ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		empty1 = FALSE, empty2 = FALSE;
+    ਪੂਰਨ		empty1 = FALSE, empty2 = FALSE;
     typval_T	var1, var2;
-    int		range = FALSE;
-    char_u	*key = NULL;
-    int		keylen = -1;
-    int		vim9script = in_vim9script();
+    ਪੂਰਨ		range = FALSE;
+    char_u	*ਕੁੰਜੀ = ਨਿਰਾ;
+    ਪੂਰਨ		keylen = -1;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
 
-    if (check_can_index(rettv, evaluate, verbose) == FAIL)
-	return FAIL;
+    ਜੇ (check_can_ਸੂਚਕਾਂਕ(rettv, evaluate, verbose) == FAIL)
+	ਵਾਪਸ FAIL;
 
     init_tv(&var1);
     init_tv(&var2);
-    if (**arg == '.')
+    ਜੇ (**arg == '.')
     {
 	/*
 	 * dict.name
 	 */
-	key = *arg + 1;
-	for (keylen = 0; eval_isdictc(key[keylen]); ++keylen)
+	ਕੁੰਜੀ = *arg + 1;
+	ਲਈ (keylen = 0; eval_isdictc(ਕੁੰਜੀ[keylen]); ++keylen)
 	    ;
-	if (keylen == 0)
-	    return FAIL;
-	if (vim9script && key[keylen] == '<')
+	ਜੇ (keylen == 0)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (vim9script && ਕੁੰਜੀ[keylen] == '<')
 	{
 	    // skip generic type arguments
-	    char_u	*p = &key[keylen];
+	    char_u	*p = &ਕੁੰਜੀ[keylen];
 
-	    if (skip_generic_func_type_args(&p) == FAIL)
-		return FAIL;
-	    keylen = p - key;
+	    ਜੇ (skip_generic_func_type_ਦਲੀਲਾਂ(&p) == FAIL)
+		ਵਾਪਸ FAIL;
+	    keylen = p - ਕੁੰਜੀ;
 	}
-	*arg = key + keylen;
+	*arg = ਕੁੰਜੀ + keylen;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	/*
 	 * something[idx]
@@ -6008,39 +6008,39 @@ eval_index(
 	 * Get the (first) variable from inside the [].
 	 */
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ':')
+	ਜੇ (**arg == ':')
 	    empty1 = TRUE;
-	else if (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
-	    return FAIL;
-	else if (vim9script && **arg == ':')
+	ਨਹੀਂਤਾਂ ਜੇ (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
+	    ਵਾਪਸ FAIL;
+	ਨਹੀਂਤਾਂ ਜੇ (vim9script && **arg == ':')
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 								    ":", *arg);
 	    clear_tv(&var1);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	else if (evaluate)
+	ਨਹੀਂਤਾਂ ਜੇ (evaluate)
 	{
-	    int error = FALSE;
+	    ਪੂਰਨ error = FALSE;
 
 	    // allow for indexing with float
-	    if (vim9script && rettv->v_type == VAR_DICT
+	    ਜੇ (vim9script && rettv->v_type == VAR_DICT
 						   && var1.v_type == VAR_FLOAT)
 	    {
 		var1.vval.v_string = typval_tostring(&var1, TRUE);
 		var1.v_type = VAR_STRING;
 	    }
 
-	    if (vim9script && (rettv->v_type == VAR_LIST
+	    ਜੇ (vim9script && (rettv->v_type == VAR_LIST
 						|| rettv->v_type == VAR_TUPLE))
-		tv_get_number_chk(&var1, &error);
-	    else
-		error = tv_get_string_chk(&var1) == NULL;
-	    if (error)
+		tv_get_ਸੰਖਿਆ_chk(&var1, &error);
+	    ਨਹੀਂਤਾਂ
+		error = tv_get_string_chk(&var1) == ਨਿਰਾ;
+	    ਜੇ (error)
 	    {
 		// not a number or string
 		clear_tv(&var1);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 
@@ -6048,119 +6048,119 @@ eval_index(
 	 * Get the second variable from inside the [:].
 	 */
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ':')
+	ਜੇ (**arg == ':')
 	{
 	    range = TRUE;
 	    ++*arg;
-	    if (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
+	    ਜੇ (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
 	    {
 		semsg(_(e_white_space_required_before_and_after_str_at_str),
 								":", *arg - 1);
-		if (!empty1)
+		ਜੇ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
-	    if (**arg == ']')
+	    ਜੇ (**arg == ']')
 		empty2 = TRUE;
-	    else if (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
+	    ਨਹੀਂਤਾਂ ਜੇ (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
 	    {
-		if (!empty1)
+		ਜੇ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    else if (evaluate && tv_get_string_chk(&var2) == NULL)
+	    ਨਹੀਂਤਾਂ ਜੇ (evaluate && tv_get_string_chk(&var2) == ਨਿਰਾ)
 	    {
 		// not a number or string
-		if (!empty1)
+		ਜੇ (!empty1)
 		    clear_tv(&var1);
 		clear_tv(&var2);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 
 	// Check for the ']'.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ']')
+	ਜੇ (**arg != ']')
 	{
-	    if (verbose)
-		emsg(_(e_missing_closing_square_brace));
+	    ਜੇ (verbose)
+		emsg(_(e_missing_closing_ਵਰਗਫਲ_brace));
 	    clear_tv(&var1);
-	    if (range)
+	    ਜੇ (range)
 		clear_tv(&var2);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	*arg = *arg + 1;	// skip over the ']'
     }
 
-    if (evaluate)
+    ਜੇ (evaluate)
     {
-	int res = eval_index_inner(rettv, range,
-		empty1 ? NULL : &var1, empty2 ? NULL : &var2, FALSE,
-		key, keylen, verbose);
+	ਪੂਰਨ res = eval_ਸੂਚਕਾਂਕ_inner(rettv, range,
+		empty1 ? ਨਿਰਾ : &var1, empty2 ? ਨਿਰਾ : &var2, FALSE,
+		ਕੁੰਜੀ, keylen, verbose);
 
-	if (!empty1)
+	ਜੇ (!empty1)
 	    clear_tv(&var1);
-	if (range)
+	ਜੇ (range)
 	    clear_tv(&var2);
-	return res;
+	ਵਾਪਸ res;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Check if "rettv" can have an [index] or [sli:ce]
  */
-    int
-check_can_index(typval_T *rettv, int evaluate, int verbose)
+    ਪੂਰਨ
+check_can_ਸੂਚਕਾਂਕ(typval_T *rettv, ਪੂਰਨ evaluate, ਪੂਰਨ verbose)
 {
-    switch (rettv->v_type)
+    ਚੋਣ (rettv->v_type)
     {
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    if (verbose)
-		emsg(_(e_cannot_index_a_funcref));
-	    return FAIL;
-	case VAR_FLOAT:
-	    if (verbose)
+	ਹਾਲਤ VAR_FUNC:
+	ਹਾਲਤ VAR_PARTIAL:
+	    ਜੇ (verbose)
+		emsg(_(e_cannot_ਸੂਚਕਾਂਕ_a_funcref));
+	    ਵਾਪਸ FAIL;
+	ਹਾਲਤ VAR_FLOAT:
+	    ਜੇ (verbose)
 		emsg(_(e_using_float_as_string));
-	    return FAIL;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	    if (verbose)
-		emsg(_(e_cannot_index_special_variable));
-	    return FAIL;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    if (verbose)
-		check_typval_is_value(rettv);
-	    return FAIL;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    if (evaluate)
+	    ਵਾਪਸ FAIL;
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	ਹਾਲਤ VAR_INSTR:
+	ਹਾਲਤ VAR_OBJECT:
+	    ਜੇ (verbose)
+		emsg(_(e_cannot_ਸੂਚਕਾਂਕ_special_variable));
+	    ਵਾਪਸ FAIL;
+	ਹਾਲਤ VAR_CLASS:
+	ਹਾਲਤ VAR_TYPEALIAS:
+	    ਜੇ (verbose)
+		check_typval_is_ਮੁੱਲ(rettv);
+	    ਵਾਪਸ FAIL;
+	ਹਾਲਤ VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_VOID:
+	    ਜੇ (evaluate)
 	    {
-		emsg(_(e_cannot_index_special_variable));
-		return FAIL;
+		emsg(_(e_cannot_ਸੂਚਕਾਂਕ_special_variable));
+		ਵਾਪਸ FAIL;
 	    }
 	    // FALLTHROUGH
 
-	case VAR_STRING:
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-	case VAR_BLOB:
-	    break;
-	case VAR_NUMBER:
-	    if (in_vim9script())
-		emsg(_(e_cannot_index_number));
-	    break;
+	ਹਾਲਤ VAR_STRING:
+	ਹਾਲਤ VAR_LIST:
+	ਹਾਲਤ VAR_TUPLE:
+	ਹਾਲਤ VAR_DICT:
+	ਹਾਲਤ VAR_BLOB:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	    ਜੇ (ਵਿੱਚ_vim9script())
+		emsg(_(e_cannot_ਸੂਚਕਾਂਕ_ਸੰਖਿਆ));
+	    ਰੋਕੋ;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -6171,161 +6171,161 @@ check_can_index(typval_T *rettv, int evaluate, int verbose)
  * index for string.
  * Alternatively, "key" is not NULL, then key[keylen] is the dict index.
  */
-    int
-eval_index_inner(
+    ਪੂਰਨ
+eval_ਸੂਚਕਾਂਕ_inner(
 	typval_T    *rettv,
-	int	    is_range,
+	ਪੂਰਨ	    is_range,
 	typval_T    *var1,
 	typval_T    *var2,
-	int	    exclusive,
-	char_u	    *key,
-	int	    keylen,
-	int	    verbose)
+	ਪੂਰਨ	    exclusive,
+	char_u	    *ਕੁੰਜੀ,
+	ਪੂਰਨ	    keylen,
+	ਪੂਰਨ	    verbose)
 {
     varnumber_T	    n1, n2 = 0;
-    long	    len;
+    ਲੰਮਾ	    len;
 
     n1 = 0;
-    if (var1 != NULL && rettv->v_type != VAR_DICT)
-	n1 = tv_get_number(var1);
+    ਜੇ (var1 != ਨਿਰਾ && rettv->v_type != VAR_DICT)
+	n1 = tv_get_ਸੰਖਿਆ(var1);
 
-    if (is_range)
+    ਜੇ (is_range)
     {
-	if (rettv->v_type == VAR_DICT)
+	ਜੇ (rettv->v_type == VAR_DICT)
 	{
-	    if (verbose)
-		emsg(_(e_cannot_slice_dictionary));
-	    return FAIL;
+	    ਜੇ (verbose)
+		emsg(_(e_cannot_ਟੁਕੜਾ_dictionary));
+	    ਵਾਪਸ FAIL;
 	}
-	if (var2 != NULL)
-	    n2 = tv_get_number(var2);
-	else
+	ਜੇ (var2 != ਨਿਰਾ)
+	    n2 = tv_get_ਸੰਖਿਆ(var2);
+	ਨਹੀਂਤਾਂ
 	    n2 = VARNUM_MAX;
     }
 
-    switch (rettv->v_type)
+    ਚੋਣ (rettv->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_FLOAT:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    break; // not evaluating, skipping over subscript
+	ਹਾਲਤ VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_VOID:
+	ਹਾਲਤ VAR_FUNC:
+	ਹਾਲਤ VAR_PARTIAL:
+	ਹਾਲਤ VAR_FLOAT:
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	ਹਾਲਤ VAR_INSTR:
+	ਹਾਲਤ VAR_CLASS:
+	ਹਾਲਤ VAR_OBJECT:
+	ਹਾਲਤ VAR_TYPEALIAS:
+	    ਰੋਕੋ; // not evaluating, skipping over subscript
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	ਹਾਲਤ VAR_STRING:
 	    {
 		char_u	*s = tv_get_string(rettv);
 
-		len = (long)STRLEN(s);
-		if (in_vim9script() || exclusive)
+		len = (ਲੰਮਾ)STRLEN(s);
+		ਜੇ (ਵਿੱਚ_vim9script() || exclusive)
 		{
-		    if (is_range)
-			s = string_slice(s, n1, n2, exclusive);
-		    else
+		    ਜੇ (is_range)
+			s = string_ਟੁਕੜਾ(s, n1, n2, exclusive);
+		    ਨਹੀਂਤਾਂ
 			s = char_from_string(s, n1);
 		}
-		else if (is_range)
+		ਨਹੀਂਤਾਂ ਜੇ (is_range)
 		{
 		    // The resulting variable is a substring.  If the indexes
 		    // are out of range the result is empty.
-		    if (n1 < 0)
+		    ਜੇ (n1 < 0)
 		    {
 			n1 = len + n1;
-			if (n1 < 0)
+			ਜੇ (n1 < 0)
 			    n1 = 0;
 		    }
-		    if (n2 < 0)
+		    ਜੇ (n2 < 0)
 			n2 = len + n2;
-		    else if (n2 >= len)
+		    ਨਹੀਂਤਾਂ ਜੇ (n2 >= len)
 			n2 = len;
-		    if (n1 >= len || n2 < 0 || n1 > n2)
-			s = NULL;
-		    else
+		    ਜੇ (n1 >= len || n2 < 0 || n1 > n2)
+			s = ਨਿਰਾ;
+		    ਨਹੀਂਤਾਂ
 			s = vim_strnsave(s + n1, n2 - n1 + 1);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // The resulting variable is a string of a single
 		    // character.  If the index is too big or negative the
 		    // result is empty.
-		    if (n1 >= len || n1 < 0)
-			s = NULL;
-		    else
+		    ਜੇ (n1 >= len || n1 < 0)
+			s = ਨਿਰਾ;
+		    ਨਹੀਂਤਾਂ
 			s = vim_strnsave(s + n1, 1);
 		}
 		clear_tv(rettv);
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = s;
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_BLOB:
-	    blob_slice_or_index(rettv->vval.v_blob, is_range, n1, n2,
+	ਹਾਲਤ VAR_BLOB:
+	    blob_ਟੁਕੜਾ_or_ਸੂਚਕਾਂਕ(rettv->vval.v_blob, is_range, n1, n2,
 							     exclusive, rettv);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_LIST:
-	    if (var1 == NULL)
+	ਹਾਲਤ VAR_LIST:
+	    ਜੇ (var1 == ਨਿਰਾ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    ਜੇ (var2 == ਨਿਰਾ)
 		n2 = VARNUM_MAX;
-	    if (list_slice_or_index(rettv->vval.v_list,
+	    ਜੇ (list_ਟੁਕੜਾ_or_ਸੂਚਕਾਂਕ(rettv->vval.v_list,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		ਵਾਪਸ FAIL;
+	    ਰੋਕੋ;
 
-	case VAR_TUPLE:
-	    if (var1 == NULL)
+	ਹਾਲਤ VAR_TUPLE:
+	    ਜੇ (var1 == ਨਿਰਾ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    ਜੇ (var2 == ਨਿਰਾ)
 		n2 = VARNUM_MAX;
-	    if (tuple_slice_or_index(rettv->vval.v_tuple,
+	    ਜੇ (tuple_ਟੁਕੜਾ_or_ਸੂਚਕਾਂਕ(rettv->vval.v_tuple,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		ਵਾਪਸ FAIL;
+	    ਰੋਕੋ;
 
-	case VAR_DICT:
+	ਹਾਲਤ VAR_DICT:
 	    {
-		dictitem_T	*item;
+		dictitem_T	*ਵਸਤੂ;
 		typval_T	tmp;
 
-		if (key == NULL)
+		ਜੇ (ਕੁੰਜੀ == ਨਿਰਾ)
 		{
-		    key = tv_get_string_chk(var1);
-		    if (key == NULL)
-			return FAIL;
+		    ਕੁੰਜੀ = tv_get_string_chk(var1);
+		    ਜੇ (ਕੁੰਜੀ == ਨਿਰਾ)
+			ਵਾਪਸ FAIL;
 		}
 
-		item = dict_find(rettv->vval.v_dict, key, keylen);
+		ਵਸਤੂ = dict_ਲੱਭੋ(rettv->vval.v_dict, ਕੁੰਜੀ, keylen);
 
-		if (item == NULL)
+		ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 		{
-		    if (verbose)
+		    ਜੇ (verbose)
 		    {
-			if (keylen > 0)
-			    key[keylen] = NUL;
-			semsg(_(e_key_not_present_in_dictionary_str), key);
+			ਜੇ (keylen > 0)
+			    ਕੁੰਜੀ[keylen] = NUL;
+			semsg(_(e_ਕੁੰਜੀ_not_present_ਵਿੱਚ_dictionary_str), ਕੁੰਜੀ);
 		    }
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 
-		copy_tv(&item->di_tv, &tmp);
+		copy_tv(&ਵਸਤੂ->di_tv, &tmp);
 		clear_tv(rettv);
 		*rettv = tmp;
 	    }
-	    break;
+	    ਰੋਕੋ;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -6334,51 +6334,51 @@ eval_index_inner(
     char_u *
 partial_name(partial_T *pt)
 {
-    if (pt != NULL)
+    ਜੇ (pt != ਨਿਰਾ)
     {
-	if (pt->pt_name != NULL)
-	    return pt->pt_name;
-	if (pt->pt_func != NULL)
-	    return pt->pt_func->uf_name;
+	ਜੇ (pt->pt_name != ਨਿਰਾ)
+	    ਵਾਪਸ pt->pt_name;
+	ਜੇ (pt->pt_func != ਨਿਰਾ)
+	    ਵਾਪਸ pt->pt_func->uf_name;
     }
-    return (char_u *)"";
+    ਵਾਪਸ (char_u *)"";
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 partial_free(partial_T *pt)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    for (i = 0; i < pt->pt_argc; ++i)
+    ਲਈ (i = 0; i < pt->pt_argc; ++i)
 	clear_tv(&pt->pt_argv[i]);
     vim_free(pt->pt_argv);
     dict_unref(pt->pt_dict);
-    if (pt->pt_name != NULL)
+    ਜੇ (pt->pt_name != ਨਿਰਾ)
     {
 	func_unref(pt->pt_name);
 	vim_free(pt->pt_name);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	func_ptr_unref(pt->pt_func);
-    if (pt->pt_obj != NULL)
+    ਜੇ (pt->pt_obj != ਨਿਰਾ)
 	object_unref(pt->pt_obj);
 
     // "out_up" is no longer used, decrement refcount on partial that owns it.
-    partial_unref(pt->pt_outer.out_up_partial);
+    partial_unref(pt->pt_outer.ਬਾਹਰਲਾ_ਉੱਪਰ_partial);
 
     // Using pt_outer from another partial.
     partial_unref(pt->pt_outer_partial);
 
     // Decrease the reference count for the context of a closure.  If down
     // to the minimum it may be time to free it.
-    if (pt->pt_funcstack != NULL)
+    ਜੇ (pt->pt_funcstack != ਨਿਰਾ)
     {
 	--pt->pt_funcstack->fs_refcount;
 	funcstack_check_refcount(pt->pt_funcstack);
     }
     // Similarly for loop variables.
-    for (i = 0; i < MAX_LOOP_DEPTH; ++i)
-	if (pt->pt_loopvars[i] != NULL)
+    ਲਈ (i = 0; i < MAX_LOOP_ਡੂੰਘਾਈ; ++i)
+	ਜੇ (pt->pt_loopvars[i] != ਨਿਰਾ)
 	{
 	    --pt->pt_loopvars[i]->lvs_refcount;
 	    loopvars_check_refcount(pt->pt_loopvars[i]);
@@ -6391,34 +6391,34 @@ partial_free(partial_T *pt)
  * Unreference a closure: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ਖਾਲੀ
 partial_unref(partial_T *pt)
 {
-    if (pt == NULL)
-	return;
+    ਜੇ (pt == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    int	done = FALSE;
+    ਪੂਰਨ	ਪੂਰਾ = FALSE;
 
-    if (--pt->pt_refcount <= 0)
+    ਜੇ (--pt->pt_refcount <= 0)
 	partial_free(pt);
 
     // If the reference count goes down to one, the funcstack may be the
     // only reference and can be freed if no other partials reference it.
-    else if (pt->pt_refcount == 1)
+    ਨਹੀਂਤਾਂ ਜੇ (pt->pt_refcount == 1)
     {
 	// careful: if the funcstack is freed it may contain this partial
 	// and it gets freed as well
-	if (pt->pt_funcstack != NULL)
-	    done = funcstack_check_refcount(pt->pt_funcstack);
+	ਜੇ (pt->pt_funcstack != ਨਿਰਾ)
+	    ਪੂਰਾ = funcstack_check_refcount(pt->pt_funcstack);
 
-	if (!done)
+	ਜੇ (!ਪੂਰਾ)
 	{
-	    int	depth;
+	    ਪੂਰਨ	ਡੂੰਘਾਈ;
 
-	    for (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
-		if (pt->pt_loopvars[depth] != NULL
-			&& loopvars_check_refcount(pt->pt_loopvars[depth]))
-		    break;
+	    ਲਈ (ਡੂੰਘਾਈ = 0; ਡੂੰਘਾਈ < MAX_LOOP_ਡੂੰਘਾਈ; ++ਡੂੰਘਾਈ)
+		ਜੇ (pt->pt_loopvars[ਡੂੰਘਾਈ] != ਨਿਰਾ
+			&& loopvars_check_refcount(pt->pt_loopvars[ਡੂੰਘਾਈ]))
+		    ਰੋਕੋ;
 	}
     }
 }
@@ -6430,29 +6430,29 @@ partial_unref(partial_T *pt)
  * strings as "string()", otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 string_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		echo_style,
-    int		composite_val)
+    ਪੂਰਨ		echo_style,
+    ਪੂਰਨ		ਸੰਯੁਕਤ_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
-    if (echo_style && !composite_val)
+    ਜੇ (echo_style && !ਸੰਯੁਕਤ_val)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = tv->vval.v_string;
-	if (r == NULL)
+	ਜੇ (r == ਨਿਰਾ)
 	    r = (char_u *)"";
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	*tofree = string_quote(tv->vval.v_string, FALSE);
 	r = *tofree;
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6462,38 +6462,38 @@ string_tv2string(
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    ਸਥਿਰ char_u *
+func_tv2string(typval_T *tv, char_u **tofree, ਪੂਰਨ echo_style)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
     char_u	buf[MAX_FUNC_NAME_LEN];
 
-    if (echo_style)
+    ਜੇ (echo_style)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 
-	if (tv->vval.v_string == NULL)
+	ਜੇ (tv->vval.v_string == ਨਿਰਾ)
 	    r = (char_u *)"function()";
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    r = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
-	    if (r == buf)
+	    ਜੇ (r == buf)
 		r = *tofree = vim_strsave(buf);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	char_u *s = NULL;
+	char_u *s = ਨਿਰਾ;
 
-	if (tv->vval.v_string != NULL)
+	ਜੇ (tv->vval.v_string != ਨਿਰਾ)
 	    s = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
 
 	r = *tofree = string_quote(s, TRUE);
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6503,28 +6503,28 @@ func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    ਸਥਿਰ char_u *
+ਵਿਧੀ_tv2string(typval_T *tv, char_u **tofree, ਪੂਰਨ echo_style)
 {
     char_u	buf[MAX_FUNC_NAME_LEN];
     partial_T	*pt = tv->vval.v_partial;
 
-    size_t len = vim_snprintf((char *)buf, sizeof(buf), "<SNR>%d_%s.%s",
+    size_t len = vim_snprintf((ਅੱਖਰ *)buf, ਆਕਾਰ(buf), "<SNR>%d_%s.%s",
 			   pt->pt_func->uf_script_ctx.sc_sid,
 			   pt->pt_func->uf_class->class_name.string,
 			   pt->pt_func->uf_name);
-    if (len >= sizeof(buf))
+    ਜੇ (len >= ਆਕਾਰ(buf))
     {
-	if (echo_style)
+	ਜੇ (echo_style)
 	{
-	    *tofree = NULL;
-	    return (char_u *)"function()";
+	    *tofree = ਨਿਰਾ;
+	    ਵਾਪਸ (char_u *)"function()";
 	}
-	else
-	    return *tofree = string_quote((char_u*)"", TRUE);
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ *tofree = string_quote((char_u*)"", TRUE);
     }
 
-    return *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
+    ਵਾਪਸ *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
 }
 
 /*
@@ -6532,51 +6532,51 @@ method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * "numbuf" is used for a number.  May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 partial_tv2string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    ਪੂਰਨ		copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
     partial_T	*pt;
     char_u	*fname;
     garray_T	ga;
-    int		i;
+    ਪੂਰਨ		i;
     char_u	*tf;
 
     pt = tv->vval.v_partial;
-    fname = string_quote(pt == NULL ? NULL : partial_name(pt), FALSE);
+    fname = string_quote(pt == ਨਿਰਾ ? ਨਿਰਾ : partial_name(pt), FALSE);
 
     ga_init2(&ga, 1, 100);
     GA_CONCAT_LITERAL(&ga, "function(");
-    if (fname != NULL)
+    ਜੇ (fname != ਨਿਰਾ)
     {
 	// When using uf_name prepend "g:" for a global function.
-	if (pt != NULL && pt->pt_name == NULL && fname[0] == '\''
+	ਜੇ (pt != ਨਿਰਾ && pt->pt_name == ਨਿਰਾ && fname[0] == '\''
 						&& vim_isupper(fname[1]))
 	{
 	    GA_CONCAT_LITERAL(&ga, "'g:");
 	    ga_concat(&ga, fname + 1);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    ga_concat(&ga, fname);
 	vim_free(fname);
     }
-    if (pt != NULL && pt->pt_argc > 0)
+    ਜੇ (pt != ਨਿਰਾ && pt->pt_argc > 0)
     {
 	GA_CONCAT_LITERAL(&ga, ", [");
-	for (i = 0; i < pt->pt_argc; ++i)
+	ਲਈ (i = 0; i < pt->pt_argc; ++i)
 	{
-	    if (i > 0)
+	    ਜੇ (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
 	    ga_concat(&ga, tv2string(&pt->pt_argv[i], &tf, numbuf, copyID));
 	    vim_free(tf);
 	}
 	GA_CONCAT_LITERAL(&ga, "]");
     }
-    if (pt != NULL && pt->pt_dict != NULL)
+    ਜੇ (pt != ਨਿਰਾ && pt->pt_dict != ਨਿਰਾ)
     {
 	typval_T dtv;
 
@@ -6590,10 +6590,10 @@ partial_tv2string(
     GA_CONCAT_LITERAL(&ga, ")");
     ga_append(&ga, NUL);
 
-    *tofree = ga.ga_data;
+    *tofree = ga.ga_ਅੰਕੜੇ;
     r = *tofree;
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6603,41 +6603,41 @@ partial_tv2string(
  * "restore_copyID" is FALSE, repeated items in lists are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 list_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    ਪੂਰਨ		copyID,
+    ਪੂਰਨ		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
-    if (tv->vval.v_list == NULL)
+    ਜੇ (tv->vval.v_list == ਨਿਰਾ)
     {
 	// NULL list is equivalent to empty list.
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"[]";
     }
-    else if (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
+    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
 	    && tv->vval.v_list->lv_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"[...]";
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int old_copyID;
-	if (restore_copyID)
+	ਪੂਰਨ old_copyID;
+	ਜੇ (restore_copyID)
 	    old_copyID = tv->vval.v_list->lv_copyID;
 
 	tv->vval.v_list->lv_copyID = copyID;
 	*tofree = list2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ਜੇ (restore_copyID)
 	    tv->vval.v_list->lv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6647,42 +6647,42 @@ list_tv2string(
  * "restore_copyID" is FALSE, repeated items in tuples are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 tuple_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    ਪੂਰਨ		copyID,
+    ਪੂਰਨ		restore_copyID)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
-    if (tuple == NULL)
+    ਜੇ (tuple == ਨਿਰਾ)
     {
 	// NULL tuple is equivalent to an empty tuple.
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"()";
     }
-    else if (copyID != 0 && tuple->tv_copyID == copyID
-					&& tuple->tv_items.ga_len > 0)
+    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && tuple->tv_copyID == copyID
+					&& tuple->tv_ਚੀਜ਼ਾਂ.ga_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"(...)";
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int old_copyID;
-	if (restore_copyID)
+	ਪੂਰਨ old_copyID;
+	ਜੇ (restore_copyID)
 	    old_copyID = tuple->tv_copyID;
 
 	tuple->tv_copyID = copyID;
 	*tofree = tuple2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ਜੇ (restore_copyID)
 	    tuple->tv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6692,41 +6692,41 @@ tuple_tv2string(
  * When "restore_copyID" is FALSE, repeated items in the dictionary are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 dict_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    ਪੂਰਨ		copyID,
+    ਪੂਰਨ		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
-    if (tv->vval.v_dict == NULL)
+    ਜੇ (tv->vval.v_dict == ਨਿਰਾ)
     {
 	// NULL dict is equivalent to empty dict.
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"{}";
     }
-    else if (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
-	    && tv->vval.v_dict->dv_hashtab.ht_used != 0)
+    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
+	    && tv->vval.v_dict->dv_hashtab.ht_ਵਰਤਿਆ != 0)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"{...}";
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int old_copyID;
-	if (restore_copyID)
+	ਪੂਰਨ old_copyID;
+	ਜੇ (restore_copyID)
 	    old_copyID = tv->vval.v_dict->dv_copyID;
 
 	tv->vval.v_dict->dv_copyID = copyID;
 	*tofree = dict2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	ਜੇ (restore_copyID)
 	    tv->vval.v_dict->dv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6737,31 +6737,31 @@ dict_tv2string(
  * otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 jobchan_tv2string(
-    typval_T	*tv UNUSED,
-    char_u	**tofree UNUSED,
-    char_u	*numbuf UNUSED,
-    int		composite_val UNUSED)
+    typval_T	*tv ਅਣਵਰਤਿਆ,
+    char_u	**tofree ਅਣਵਰਤਿਆ,
+    char_u	*numbuf ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		ਸੰਯੁਕਤ_val ਅਣਵਰਤਿਆ)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
-#ifdef FEAT_JOB_CHANNEL
-    *tofree = NULL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+    *tofree = ਨਿਰਾ;
 
-    if (tv->v_type == VAR_JOB)
-	r = job_to_string_buf(tv, numbuf);
-    else
-	r = channel_to_string_buf(tv, numbuf);
+    ਜੇ (tv->v_type == VAR_ਕੰਮ)
+	r = ਕੰਮ_ਮੰਜ਼ਿਲ_string_buf(tv, numbuf);
+    ਨਹੀਂਤਾਂ
+	r = channel_ਮੰਜ਼ਿਲ_string_buf(tv, numbuf);
 
-    if (composite_val)
+    ਜੇ (ਸੰਯੁਕਤ_val)
     {
 	*tofree = string_quote(r, FALSE);
 	r = *tofree;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6769,31 +6769,31 @@ jobchan_tv2string(
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 class_tv2string(typval_T *tv, char_u **tofree)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
     size_t	rsize;
     class_T	*cl = tv->vval.v_class;
     string_T	class_name = {(char_u *)"[unknown]", 9};
     string_T	s = {(char_u *)"class", 5};
 
-    if (cl != NULL)
+    ਜੇ (cl != ਨਿਰਾ)
     {
 	class_name.string = cl->class_name.string;
-	class_name.length = cl->class_name.length;
-	if (IS_INTERFACE(cl))
-	    STR_LITERAL_SET(s, "interface");
-	else if (IS_ENUM(cl))
-	    STR_LITERAL_SET(s, "enum");
+	class_name.ਲੰਮਾਈ = cl->class_name.ਲੰਮਾਈ;
+	ਜੇ (IS_INTERFACE(cl))
+	    STR_LITERAL_ਸੈੱਟ(s, "interface");
+	ਨਹੀਂਤਾਂ ਜੇ (IS_ENUM(cl))
+	    STR_LITERAL_ਸੈੱਟ(s, "enum");
     }
 
-    rsize = s.length + 1 + class_name.length + 1;
+    rsize = s.ਲੰਮਾਈ + 1 + class_name.ਲੰਮਾਈ + 1;
     r = *tofree = alloc(rsize);
-    if (r != NULL)
-	vim_snprintf((char *)r, rsize, "%s %s", s.string, (char *)class_name.string);
+    ਜੇ (r != ਨਿਰਾ)
+	vim_snprintf((ਅੱਖਰ *)r, rsize, "%s %s", s.string, (ਅੱਖਰ *)class_name.string);
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6803,49 +6803,49 @@ class_tv2string(typval_T *tv, char_u **tofree)
  * When "restore_copyID" is FALSE, repeated items in the object are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 object_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID,
+    ਪੂਰਨ		copyID,
+    ਪੂਰਨ		restore_copyID,
     char_u	*numbuf,
-    int		echo_style,
-    int		composite_val)
+    ਪੂਰਨ		echo_style,
+    ਪੂਰਨ		ਸੰਯੁਕਤ_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
     object_T	*obj = tv->vval.v_object;
-    if (obj == NULL || obj->obj_class == NULL)
+    ਜੇ (obj == ਨਿਰਾ || obj->obj_class == ਨਿਰਾ)
     {
-	*tofree = NULL;
+	*tofree = ਨਿਰਾ;
 	r = (char_u *)"object of [unknown]";
     }
-    else if (copyID != 0 && obj->obj_copyID == copyID
-	    && obj->obj_class->class_obj_member_count != 0)
+    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && obj->obj_copyID == copyID
+	    && obj->obj_class->class_obj_member_ਗਿਣਤੀ != 0)
     {
-	size_t n = 25 + obj->obj_class->class_name.length;
+	size_t n = 25 + obj->obj_class->class_name.ਲੰਮਾਈ;
 	r = alloc(n);
-	if (r != NULL)
-	    (void)vim_snprintf((char *)r, n, "object of %s {...}",
+	ਜੇ (r != ਨਿਰਾ)
+	    (ਖਾਲੀ)vim_snprintf((ਅੱਖਰ *)r, n, "object of %s {...}",
 						obj->obj_class->class_name.string);
 	*tofree = r;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int old_copyID;
-	if (restore_copyID)
+	ਪੂਰਨ old_copyID;
+	ਜੇ (restore_copyID)
 	    old_copyID = obj->obj_copyID;
 
 	obj->obj_copyID = copyID;
 	*tofree = object2string(obj, numbuf, copyID, echo_style,
-				restore_copyID, composite_val);
-	if (restore_copyID)
+				restore_copyID, ਸੰਯੁਕਤ_val);
+	ਜੇ (restore_copyID)
 	    obj->obj_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6865,17 +6865,17 @@ echo_string_core(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID,
-    int		echo_style,
-    int		restore_copyID,
-    int		composite_val)
+    ਪੂਰਨ		copyID,
+    ਪੂਰਨ		echo_style,
+    ਪੂਰਨ		restore_copyID,
+    ਪੂਰਨ		ਸੰਯੁਕਤ_val)
 {
-    static int	recurse = 0;
-    char_u	*r = NULL;
+    ਸਥਿਰ ਪੂਰਨ	recurse = 0;
+    char_u	*r = ਨਿਰਾ;
 
-    if (recurse >= DICT_MAXNEST)
+    ਜੇ (recurse >= DICT_MAXNEST)
     {
-	if (!did_echo_string_emsg)
+	ਜੇ (!did_echo_string_emsg)
 	{
 	    // Only give this message once for a recursive call to avoid
 	    // flooding the user with errors.  And stop iterating over lists
@@ -6883,95 +6883,95 @@ echo_string_core(
 	    did_echo_string_emsg = TRUE;
 	    emsg(_(e_variable_nested_too_deep_for_displaying));
 	}
-	*tofree = NULL;
-	return (char_u *)"{E724}";
+	*tofree = ਨਿਰਾ;
+	ਵਾਪਸ (char_u *)"{E724}";
     }
     ++recurse;
 
-    switch (tv->v_type)
+    ਚੋਣ (tv->v_type)
     {
-	case VAR_STRING:
-	    r = string_tv2string(tv, tofree, echo_style, composite_val);
-	    break;
+	ਹਾਲਤ VAR_STRING:
+	    r = string_tv2string(tv, tofree, echo_style, ਸੰਯੁਕਤ_val);
+	    ਰੋਕੋ;
 
-	case VAR_FUNC:
+	ਹਾਲਤ VAR_FUNC:
 	    r = func_tv2string(tv, tofree, echo_style);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial == NULL
-		    || tv->vval.v_partial->pt_obj == NULL)
+	ਹਾਲਤ VAR_PARTIAL:
+	    ਜੇ (tv->vval.v_partial == ਨਿਰਾ
+		    || tv->vval.v_partial->pt_obj == ਨਿਰਾ)
 		r = partial_tv2string(tv, tofree, numbuf, copyID);
-	    else
-		r = method_tv2string(tv, tofree, echo_style);
-	    break;
+	    ਨਹੀਂਤਾਂ
+		r = ਵਿਧੀ_tv2string(tv, tofree, echo_style);
+	    ਰੋਕੋ;
 
-	case VAR_BLOB:
+	ਹਾਲਤ VAR_BLOB:
 	    r = blob2string(tv->vval.v_blob, tofree, numbuf);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_LIST:
+	ਹਾਲਤ VAR_LIST:
 	    r = list_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_TUPLE:
+	ਹਾਲਤ VAR_TUPLE:
 	    r = tuple_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_DICT:
+	ਹਾਲਤ VAR_DICT:
 	    r = dict_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_NUMBER:
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    *tofree = NULL;
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	ਹਾਲਤ VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_VOID:
+	    *tofree = ਨਿਰਾ;
 	    r = tv_get_string_buf(tv, numbuf);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	    r = jobchan_tv2string(tv, tofree, numbuf, composite_val);
-	    break;
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	    r = jobchan_tv2string(tv, tofree, numbuf, ਸੰਯੁਕਤ_val);
+	    ਰੋਕੋ;
 
-	case VAR_INSTR:
-	    *tofree = NULL;
+	ਹਾਲਤ VAR_INSTR:
+	    *tofree = ਨਿਰਾ;
 	    r = (char_u *)"instructions";
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_CLASS:
+	ਹਾਲਤ VAR_CLASS:
 	    r = class_tv2string(tv, tofree);
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_OBJECT:
+	ਹਾਲਤ VAR_OBJECT:
 	    r = object_tv2string(tv, tofree, copyID, restore_copyID,
-					 numbuf, echo_style, composite_val);
-	    break;
+					 numbuf, echo_style, ਸੰਯੁਕਤ_val);
+	    ਰੋਕੋ;
 
-	case VAR_FLOAT:
-	    *tofree = NULL;
-	    vim_snprintf((char *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
+	ਹਾਲਤ VAR_FLOAT:
+	    *tofree = ਨਿਰਾ;
+	    vim_snprintf((ਅੱਖਰ *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
 	    r = numbuf;
-	    break;
+	    ਰੋਕੋ;
 
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    *tofree = NULL;
-	    r = (char_u *)get_var_special_name(tv->vval.v_number);
-	    break;
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	    *tofree = ਨਿਰਾ;
+	    r = (char_u *)get_var_special_name(tv->vval.v_ਸੰਖਿਆ);
+	    ਰੋਕੋ;
 
-	case VAR_TYPEALIAS:
+	ਹਾਲਤ VAR_TYPEALIAS:
 	    *tofree = vim_strsave(tv->vval.v_typealias->ta_name);
 	    r = *tofree;
-	    if (r == NULL)
+	    ਜੇ (r == ਨਿਰਾ)
 		r = (char_u *)"";
-	    break;
+	    ਰੋਕੋ;
     }
 
-    if (--recurse == 0)
+    ਜੇ (--recurse == 0)
 	did_echo_string_emsg = FALSE;
-    return r;
+    ਵਾਪਸ r;
 }
 
 /*
@@ -6987,9 +6987,9 @@ echo_string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    ਪੂਰਨ		copyID)
 {
-    return echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
+    ਵਾਪਸ echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
 }
 
 /*
@@ -6997,38 +6997,38 @@ echo_string(
  * character index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
+    ਪੂਰਨ
+buf_byteidx_ਮੰਜ਼ਿਲ_charidx(buf_T *buf, ਪੂਰਨ lnum, ਪੂਰਨ byteidx)
 {
     char_u	*str;
     char_u	*t;
-    int		count;
+    ਪੂਰਨ		ਗਿਣਤੀ_2;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    ਜੇ (buf == ਨਿਰਾ || buf->b_ml.ml_mfp == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	lnum = buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    ਜੇ (str == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    if (*str == NUL)
-	return 0;
+    ਜੇ (*str == NUL)
+	ਵਾਪਸ 0;
 
     // count the number of characters
     t = str;
-    for (count = 0; *t != NUL && t <= str + byteidx; count++)
+    ਲਈ (ਗਿਣਤੀ_2 = 0; *t != NUL && t <= str + byteidx; ਗਿਣਤੀ_2++)
 	t += mb_ptr2len(t);
 
     // In insert mode, when the cursor is at the end of a non-empty line,
     // byteidx points to the NUL character immediately past the end of the
     // string. In this case, add one to the character count.
-    if (*t == NUL && byteidx != 0 && t == str + byteidx)
-	count++;
+    ਜੇ (*t == NUL && byteidx != 0 && t == str + byteidx)
+	ਗਿਣਤੀ_2++;
 
-    return count - 1;
+    ਵਾਪਸ ਗਿਣਤੀ_2 - 1;
 }
 
 /*
@@ -7036,28 +7036,28 @@ buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
  * byte index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
+    ਪੂਰਨ
+buf_charidx_ਮੰਜ਼ਿਲ_byteidx(buf_T *buf, ਪੂਰਨ lnum, ਪੂਰਨ charidx)
 {
     char_u	*str;
     char_u	*t;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    ਜੇ (buf == ਨਿਰਾ || buf->b_ml.ml_mfp == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	lnum = buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    ਜੇ (str == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
     // Convert the character offset to a byte offset
     t = str;
-    while (*t != NUL && --charidx > 0)
+    ਜਦੋਂ (*t != NUL && --charidx > 0)
 	t += mb_ptr2len(t);
 
-    return t - str;
+    ਵਾਪਸ t - str;
 }
 
 /*
@@ -7067,166 +7067,166 @@ buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
     pos_T *
 var2fpos(
     typval_T	*varp,
-    int		dollar_lnum,	// TRUE when $ is last line
-    int		*fnum,		// set to fnum for '0, 'A, etc.
-    int		charcol)	// return character column
+    ਪੂਰਨ		dollar_lnum,	// TRUE when $ is last line
+    ਪੂਰਨ		*fnum,		// set to fnum for '0, 'A, etc.
+    ਪੂਰਨ		charcol)	// return character column
 {
     char_u		*name;
-    static pos_T	pos;
+    ਸਥਿਰ pos_T	pos;
     pos_T		*pp;
-    int			error = FALSE;
+    ਪੂਰਨ			error = FALSE;
 
     // Argument can be [lnum, col, coladd].
-    if (varp->v_type == VAR_LIST)
+    ਜੇ (varp->v_type == VAR_LIST)
     {
 	list_T		*l;
-	int		len;
+	ਪੂਰਨ		len;
 	listitem_T	*li;
 
 	l = varp->vval.v_list;
-	if (l == NULL)
-	    return NULL;
+	ਜੇ (l == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 
 	// Get the line number
-	pos.lnum = list_find_nr(l, 0L, &error);
-	if (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_line_count)
-	    return NULL;	// invalid line number
-	if (charcol)
-	    len = (long)mb_charlen(ml_get(pos.lnum));
-	else
-	    len = (long)ml_get_len(pos.lnum);
+	pos.lnum = list_ਲੱਭੋ_nr(l, 0L, &error);
+	ਜੇ (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਵਾਪਸ ਨਿਰਾ;	// invalid line number
+	ਜੇ (charcol)
+	    len = (ਲੰਮਾ)mb_charlen(ml_get(pos.lnum));
+	ਨਹੀਂਤਾਂ
+	    len = (ਲੰਮਾ)ml_get_len(pos.lnum);
 
 	// Get the column number
 	// We accept "$" for the column number: last column.
-	li = list_find(l, 1L);
-	if (li != NULL && li->li_tv.v_type == VAR_STRING
-		&& li->li_tv.vval.v_string != NULL
+	li = list_ਲੱਭੋ(l, 1L);
+	ਜੇ (li != ਨਿਰਾ && li->li_tv.v_type == VAR_STRING
+		&& li->li_tv.vval.v_string != ਨਿਰਾ
 		&& STRCMP(li->li_tv.vval.v_string, "$") == 0)
 	{
-	    pos.col = len + 1;
+	    pos.ਖਾਨਾ = len + 1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    pos.col = list_find_nr(l, 1L, &error);
-	    if (error)
-		return NULL;
+	    pos.ਖਾਨਾ = list_ਲੱਭੋ_nr(l, 1L, &error);
+	    ਜੇ (error)
+		ਵਾਪਸ ਨਿਰਾ;
 	}
 
 	// Accept a position up to the NUL after the line.
-	if (pos.col == 0 || (int)pos.col > len + 1)
-	    return NULL;	// invalid column number
-	--pos.col;
+	ਜੇ (pos.ਖਾਨਾ == 0 || (ਪੂਰਨ)pos.ਖਾਨਾ > len + 1)
+	    ਵਾਪਸ ਨਿਰਾ;	// invalid column number
+	--pos.ਖਾਨਾ;
 
 	// Get the virtual offset.  Defaults to zero.
-	pos.coladd = list_find_nr(l, 2L, &error);
-	if (error)
+	pos.coladd = list_ਲੱਭੋ_nr(l, 2L, &error);
+	ਜੇ (error)
 	    pos.coladd = 0;
 
-	return &pos;
+	ਵਾਪਸ &pos;
     }
 
-    if (in_vim9script() && check_for_string_arg(varp, 0) == FAIL)
-	return NULL;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_string_arg(varp, 0) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
     name = tv_get_string_chk(varp);
-    if (name == NULL)
-	return NULL;
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     error = TRUE;
     pos.lnum = 0;
-    if (name[0] == '.')
+    ਜੇ (name[0] == '.')
     {
-	if (!in_vim9script() || name[1] == NUL)
+	ਜੇ (!ਵਿੱਚ_vim9script() || name[1] == NUL)
 	{
 	    error = FALSE;
 	    // cursor
 	    pos = curwin->w_cursor;
 	}
     }
-    else if (name[0] == 'v' && name[1] == NUL)
+    ਨਹੀਂਤਾਂ ਜੇ (name[0] == 'v' && name[1] == NUL)
     {
 	// Visual start
-	if (VIsual_active)
+	ਜੇ (VIsual_ਸਰਗਰਮ)
 	    pos = VIsual;
-	else
+	ਨਹੀਂਤਾਂ
 	    pos = curwin->w_cursor;
     }
-    else if (name[0] == '\'')
+    ਨਹੀਂਤਾਂ ਜੇ (name[0] == '\'')
     {
-	if (!in_vim9script() || (name[1] != NUL && name[2] == NUL))
+	ਜੇ (!ਵਿੱਚ_vim9script() || (name[1] != NUL && name[2] == NUL))
 	{
 	    error = FALSE;
 	    // mark
 	    pp = getmark_buf_fnum(curbuf, name[1], FALSE, fnum);
-	    if (pp == NULL || pp == (pos_T *)-1 || pp->lnum <= 0)
-		return NULL;
+	    ਜੇ (pp == ਨਿਰਾ || pp == (pos_T *)-1 || pp->lnum <= 0)
+		ਵਾਪਸ ਨਿਰਾ;
 	    pos = *pp;
 	}
     }
-    if (pos.lnum != 0)
+    ਜੇ (pos.lnum != 0)
     {
-	if (charcol)
-	    pos.col = buf_byteidx_to_charidx(curbuf, pos.lnum, pos.col);
-	return &pos;
+	ਜੇ (charcol)
+	    pos.ਖਾਨਾ = buf_byteidx_ਮੰਜ਼ਿਲ_charidx(curbuf, pos.lnum, pos.ਖਾਨਾ);
+	ਵਾਪਸ &pos;
     }
 
     pos.coladd = 0;
 
-    if (name[0] == 'w' && dollar_lnum)
+    ਜੇ (name[0] == 'w' && dollar_lnum)
     {
 	// the "w_valid" flags are not reset when moving the cursor, but they
 	// do matter for update_topline() and validate_botline().
 	check_cursor_moved(curwin);
 
-	pos.col = 0;
-	if (name[1] == '0')		// "w0": first visible line
+	pos.ਖਾਨਾ = 0;
+	ਜੇ (name[1] == '0')		// "w0": first visible line
 	{
-#ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
-				    && !term_in_normal_mode(curwin->w_buffer))
-		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	    ਜੇ (bt_terminal(curwin->w_ਬਫਰ)
+				    && curwin->w_ਬਫਰ->b_ਪਦ != ਨਿਰਾ
+				    && !ਪਦ_ਵਿੱਚ_ਸਾਧਾਰਨ_ਬਹੁਲਕ(curwin->w_ਬਫਰ))
+		may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(curwin->w_ਬਫਰ->b_ਪਦ, TRUE);
+#ਜੇ_ਅੰਤ
 	    update_topline();
 	    // In silent Ex mode topline is zero, but that's not a valid line
 	    // number; use one instead.
 	    pos.lnum = curwin->w_topline > 0 ? curwin->w_topline : 1;
-	    return &pos;
+	    ਵਾਪਸ &pos;
 	}
-	else if (name[1] == '$')	// "w$": last visible line
+	ਨਹੀਂਤਾਂ ਜੇ (name[1] == '$')	// "w$": last visible line
 	{
-#ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
-				    && !term_in_normal_mode(curwin->w_buffer))
-		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	    ਜੇ (bt_terminal(curwin->w_ਬਫਰ)
+				    && curwin->w_ਬਫਰ->b_ਪਦ != ਨਿਰਾ
+				    && !ਪਦ_ਵਿੱਚ_ਸਾਧਾਰਨ_ਬਹੁਲਕ(curwin->w_ਬਫਰ))
+		may_move_terminal_ਮੰਜ਼ਿਲ_ਬਫਰ(curwin->w_ਬਫਰ->b_ਪਦ, TRUE);
+#ਜੇ_ਅੰਤ
 	    validate_botline();
 	    // In silent Ex mode botline is zero, return zero then.
 	    pos.lnum = curwin->w_botline > 0 ? curwin->w_botline - 1 : 0;
-	    return &pos;
+	    ਵਾਪਸ &pos;
 	}
     }
-    else if (name[0] == '$')		// last column or line
+    ਨਹੀਂਤਾਂ ਜੇ (name[0] == '$')		// last column or line
     {
-	if (dollar_lnum)
+	ਜੇ (dollar_lnum)
 	{
-	    pos.lnum = curbuf->b_ml.ml_line_count;
-	    pos.col = 0;
+	    pos.lnum = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+	    pos.ਖਾਨਾ = 0;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    pos.lnum = curwin->w_cursor.lnum;
-	    if (charcol)
-		pos.col = (colnr_T)mb_charlen(ml_get_curline());
-	    else
-		pos.col = ml_get_curline_len();
+	    ਜੇ (charcol)
+		pos.ਖਾਨਾ = (colnr_T)mb_charlen(ml_get_curline());
+	    ਨਹੀਂਤਾਂ
+		pos.ਖਾਨਾ = ml_get_curline_len();
 	}
-	return &pos;
+	ਵਾਪਸ &pos;
     }
-    if (in_vim9script() && error)
-	semsg(_(e_invalid_value_for_line_number_str), name);
-    return NULL;
+    ਜੇ (ਵਿੱਚ_vim9script() && error)
+	semsg(_(e_invalid_ਮੁੱਲ_for_ਸਤਰ_ਸੰਖਿਆ_str), name);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -7239,70 +7239,70 @@ var2fpos(
  * Return FAIL when conversion is not possible, doesn't check the position for
  * validity.
  */
-    int
+    ਪੂਰਨ
 list2fpos(
     typval_T	*arg,
     pos_T	*posp,
-    int		*fnump,
+    ਪੂਰਨ		*fnump,
     colnr_T	*curswantp,
-    int		charcol)
+    ਪੂਰਨ		charcol)
 {
     list_T	*l = arg->vval.v_list;
-    long	i = 0;
-    long	n;
+    ਲੰਮਾ	i = 0;
+    ਲੰਮਾ	n;
 
     // List must be: [fnum, lnum, col, coladd, curswant], where "fnum" is only
     // there when "fnump" isn't NULL; "coladd" and "curswant" are optional.
-    if (arg->v_type != VAR_LIST
-	    || l == NULL
-	    || l->lv_len < (fnump == NULL ? 2 : 3)
-	    || l->lv_len > (fnump == NULL ? 4 : 5))
-	return FAIL;
+    ਜੇ (arg->v_type != VAR_LIST
+	    || l == ਨਿਰਾ
+	    || l->lv_len < (fnump == ਨਿਰਾ ? 2 : 3)
+	    || l->lv_len > (fnump == ਨਿਰਾ ? 4 : 5))
+	ਵਾਪਸ FAIL;
 
-    if (fnump != NULL)
+    ਜੇ (fnump != ਨਿਰਾ)
     {
-	n = list_find_nr(l, i++, NULL);	// fnum
-	if (n < 0)
-	    return FAIL;
-	if (n == 0)
+	n = list_ਲੱਭੋ_nr(l, i++, ਨਿਰਾ);	// fnum
+	ਜੇ (n < 0)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (n == 0)
 	    n = curbuf->b_fnum;		// current buffer
 	*fnump = n;
     }
 
-    n = list_find_nr(l, i++, NULL);	// lnum
-    if (n < 0)
-	return FAIL;
+    n = list_ਲੱਭੋ_nr(l, i++, ਨਿਰਾ);	// lnum
+    ਜੇ (n < 0)
+	ਵਾਪਸ FAIL;
     posp->lnum = n;
 
-    n = list_find_nr(l, i++, NULL);	// col
-    if (n < 0)
-	return FAIL;
+    n = list_ਲੱਭੋ_nr(l, i++, ਨਿਰਾ);	//ਖਾਨਾ
+    ਜੇ (n < 0)
+	ਵਾਪਸ FAIL;
     // If character position is specified, then convert to byte position
     // If the line number is zero use the cursor line.
-    if (charcol)
+    ਜੇ (charcol)
     {
 	buf_T	*buf;
 
 	// Get the text for the specified line in a loaded buffer
-	buf = buflist_findnr(fnump == NULL ? curbuf->b_fnum : *fnump);
-	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	    return FAIL;
+	buf = buflist_findnr(fnump == ਨਿਰਾ ? curbuf->b_fnum : *fnump);
+	ਜੇ (buf == ਨਿਰਾ || buf->b_ml.ml_mfp == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	n = buf_charidx_to_byteidx(buf,
+	n = buf_charidx_ਮੰਜ਼ਿਲ_byteidx(buf,
 		  posp->lnum == 0 ? curwin->w_cursor.lnum : posp->lnum, n) + 1;
     }
-    posp->col = n;
+    posp->ਖਾਨਾ = n;
 
-    n = list_find_nr(l, i, NULL);	// off
-    if (n < 0)
+    n = list_ਲੱਭੋ_nr(l, i, ਨਿਰਾ);	// off
+    ਜੇ (n < 0)
 	posp->coladd = 0;
-    else
+    ਨਹੀਂਤਾਂ
 	posp->coladd = n;
 
-    if (curswantp != NULL)
-	*curswantp = list_find_nr(l, i + 1, NULL);  // curswant
+    ਜੇ (curswantp != ਨਿਰਾ)
+	*curswantp = list_ਲੱਭੋ_nr(l, i + 1, ਨਿਰਾ);  // curswant
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -7310,20 +7310,20 @@ list2fpos(
  * Advance "arg" to the first character after the name.
  * Return 0 for error.
  */
-    int
+    ਪੂਰਨ
 get_env_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    ਪੂਰਨ		len;
 
-    for (p = *arg; vim_isIDc(*p); ++p)
+    ਲਈ (p = *arg; vim_isIDc(*p); ++p)
 	;
-    if (p == *arg)	    // no name found
-	return 0;
+    ਜੇ (p == *arg)	    // no name found
+	ਵਾਪਸ 0;
 
-    len = (int)(p - *arg);
+    len = (ਪੂਰਨ)(p - *arg);
     *arg = p;
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -7331,32 +7331,32 @@ get_env_len(char_u **arg)
  * "arg" is advanced to after the name.
  * Return 0 if something is wrong.
  */
-    int
+    ਪੂਰਨ
 get_id_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    ਪੂਰਨ		len;
 
     // Find the end of the name.
-    for (p = *arg; eval_isnamec(*p); ++p)
+    ਲਈ (p = *arg; eval_isnamec(*p); ++p)
     {
-	if (*p == ':')
+	ਜੇ (*p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace.
-	    len = (int)(p - *arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == NULL)
+	    len = (ਪੂਰਨ)(p - *arg);
+	    ਜੇ ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == ਨਿਰਾ)
 		    || len > 1)
-		break;
+		ਰੋਕੋ;
 	}
     }
-    if (p == *arg)	    // no name found
-	return 0;
+    ਜੇ (p == *arg)	    // no name found
+	ਵਾਪਸ 0;
 
-    len = (int)(p - *arg);
+    len = (ਪੂਰਨ)(p - *arg);
     *arg = p;
 
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -7368,29 +7368,29 @@ get_id_len(char_u **arg)
  * If the name contains 'magic' {}'s, expand them and return the
  * expanded name in an allocated string via 'alias' - caller must free.
  */
-    int
+    ਪੂਰਨ
 get_name_len(
     char_u	**arg,
     char_u	**alias,
-    int		evaluate,
-    int		verbose)
+    ਪੂਰਨ		evaluate,
+    ਪੂਰਨ		verbose)
 {
-    int		len;
+    ਪੂਰਨ		len;
     char_u	*p;
-    char_u	*expr_start;
-    char_u	*expr_end;
+    char_u	*ਵਿਅੰਜਕ_ਸ਼ੁਰੂ;
+    char_u	*ਵਿਅੰਜਕ_ਸਿਰਾ;
 
-    *alias = NULL;  // default to no alias
+    *alias = ਨਿਰਾ;  // default to no alias
 
-    if ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
-						  && (*arg)[2] == (int)KE_SNR)
+    ਜੇ ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
+						  && (*arg)[2] == (ਪੂਰਨ)KE_SNR)
     {
 	// hard coded <SNR>, already translated
 	*arg += 3;
-	return get_id_len(arg) + 3;
+	ਵਾਪਸ get_id_len(arg) + 3;
     }
     len = eval_fname_script(*arg);
-    if (len > 0)
+    ਜੇ (len > 0)
     {
 	// literal "<SID>", "s:" or "<SNR>"
 	*arg += len;
@@ -7399,38 +7399,38 @@ get_name_len(
     /*
      * Find the end of the name; check for {} construction.
      */
-    p = find_name_end(*arg, &expr_start, &expr_end,
-					       len > 0 ? 0 : FNE_CHECK_START);
-    if (expr_start != NULL)
+    p = ਲੱਭੋ_name_ਸਿਰਾ(*arg, &ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, &ਵਿਅੰਜਕ_ਸਿਰਾ,
+					       len > 0 ? 0 : FNE_CHECK_ਸ਼ੁਰੂ);
+    ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ)
     {
-	char_u	*temp_string;
+	char_u	*ਆਰਜ਼ੀ_string;
 
-	if (!evaluate)
+	ਜੇ (!evaluate)
 	{
-	    len += (int)(p - *arg);
+	    len += (ਪੂਰਨ)(p - *arg);
 	    *arg = skipwhite(p);
-	    return len;
+	    ਵਾਪਸ len;
 	}
 
 	/*
 	 * Include any <SID> etc in the expanded string:
 	 * Thus the -len here.
 	 */
-	temp_string = make_expanded_name(*arg - len, expr_start, expr_end, p);
-	if (temp_string == NULL)
-	    return -1;
-	*alias = temp_string;
+	ਆਰਜ਼ੀ_string = make_expanded_name(*arg - len, ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, ਵਿਅੰਜਕ_ਸਿਰਾ, p);
+	ਜੇ (ਆਰਜ਼ੀ_string == ਨਿਰਾ)
+	    ਵਾਪਸ -1;
+	*alias = ਆਰਜ਼ੀ_string;
 	*arg = skipwhite(p);
-	return (int)STRLEN(temp_string);
+	ਵਾਪਸ (ਪੂਰਨ)STRLEN(ਆਰਜ਼ੀ_string);
     }
 
     len += get_id_len(arg);
     // Only give an error when there is something, otherwise it will be
     // reported at a higher level.
-    if (len == 0 && verbose && **arg != NUL)
-	semsg(_(e_invalid_expression_str), *arg);
+    ਜੇ (len == 0 && verbose && **arg != NUL)
+	semsg(_(e_invalid_ਵਿਅੰਜਕ_str), *arg);
 
-    return len;
+    ਵਾਪਸ len;
 }
 
 /*
@@ -7442,30 +7442,30 @@ get_name_len(
  * valid name.
  */
     char_u *
-find_name_end(
+ਲੱਭੋ_name_ਸਿਰਾ(
     char_u	*arg,
-    char_u	**expr_start,
-    char_u	**expr_end,
-    int		flags)
+    char_u	**ਵਿਅੰਜਕ_ਸ਼ੁਰੂ,
+    char_u	**ਵਿਅੰਜਕ_ਸਿਰਾ,
+    ਪੂਰਨ		flags)
 {
-    int		mb_nest = 0;
-    int		br_nest = 0;
+    ਪੂਰਨ		mb_nest = 0;
+    ਪੂਰਨ		br_nest = 0;
     char_u	*p;
-    int		len;
-    int		allow_curly = !in_vim9script();
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		allow_curly = !ਵਿੱਚ_vim9script();
 
-    if (expr_start != NULL)
+    ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ)
     {
-	*expr_start = NULL;
-	*expr_end = NULL;
+	*ਵਿਅੰਜਕ_ਸ਼ੁਰੂ = ਨਿਰਾ;
+	*ਵਿਅੰਜਕ_ਸਿਰਾ = ਨਿਰਾ;
     }
 
     // Quick check for valid starting character.
-    if ((flags & FNE_CHECK_START) && !eval_isnamec1(*arg)
+    ਜੇ ((flags & FNE_CHECK_ਸ਼ੁਰੂ) && !eval_isnamec1(*arg)
 					      && (*arg != '{' || !allow_curly))
-	return arg;
+	ਵਾਪਸ arg;
 
-    for (p = arg; *p != NUL
+    ਲਈ (p = arg; *p != NUL
 		    && (eval_isnamec(*p)
 			|| (*p == '{' && allow_curly)
 			|| ((flags & FNE_INCL_BR) && (*p == '['
@@ -7473,59 +7473,59 @@ find_name_end(
 			|| mb_nest != 0
 			|| br_nest != 0); MB_PTR_ADV(p))
     {
-	if (*p == '\'')
+	ਜੇ (*p == '\'')
 	{
 	    // skip over 'string' to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
+	    ਲਈ (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
 		;
-	    if (*p == NUL)
-		break;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	}
-	else if (*p == '"')
+	ਨਹੀਂਤਾਂ ਜੇ (*p == '"')
 	{
 	    // skip over "str\"ing" to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
-		if (*p == '\\' && p[1] != NUL)
+	    ਲਈ (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
+		ਜੇ (*p == '\\' && p[1] != NUL)
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	}
-	else if (br_nest == 0 && mb_nest == 0 && *p == ':')
+	ਨਹੀਂਤਾਂ ਜੇ (br_nest == 0 && mb_nest == 0 && *p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace. But {ns}: is.
-	    len = (int)(p - arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == NULL)
+	    len = (ਪੂਰਨ)(p - arg);
+	    ਜੇ ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == ਨਿਰਾ)
 		    || (len > 1 && p[-1] != '}'))
-		break;
+		ਰੋਕੋ;
 	}
 
-	if (mb_nest == 0)
+	ਜੇ (mb_nest == 0)
 	{
-	    if (*p == '[')
+	    ਜੇ (*p == '[')
 		++br_nest;
-	    else if (*p == ']')
+	    ਨਹੀਂਤਾਂ ਜੇ (*p == ']')
 		--br_nest;
 	}
 
-	if (br_nest == 0 && allow_curly)
+	ਜੇ (br_nest == 0 && allow_curly)
 	{
-	    if (*p == '{')
+	    ਜੇ (*p == '{')
 	    {
 		mb_nest++;
-		if (expr_start != NULL && *expr_start == NULL)
-		    *expr_start = p;
+		ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ && *ਵਿਅੰਜਕ_ਸ਼ੁਰੂ == ਨਿਰਾ)
+		    *ਵਿਅੰਜਕ_ਸ਼ੁਰੂ = p;
 	    }
-	    else if (*p == '}')
+	    ਨਹੀਂਤਾਂ ਜੇ (*p == '}')
 	    {
 		mb_nest--;
-		if (expr_start != NULL && mb_nest == 0 && *expr_end == NULL)
-		    *expr_end = p;
+		ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ && mb_nest == 0 && *ਵਿਅੰਜਕ_ਸਿਰਾ == ਨਿਰਾ)
+		    *ਵਿਅੰਜਕ_ਸਿਰਾ = p;
 	    }
 	}
     }
 
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
@@ -7541,101 +7541,101 @@ find_name_end(
  * Returns a new allocated string, which the caller must free.
  * Returns NULL for failure.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 make_expanded_name(
-    char_u	*in_start,
-    char_u	*expr_start,
-    char_u	*expr_end,
-    char_u	*in_end)
+    char_u	*ਵਿੱਚ_ਸ਼ੁਰੂ,
+    char_u	*ਵਿਅੰਜਕ_ਸ਼ੁਰੂ,
+    char_u	*ਵਿਅੰਜਕ_ਸਿਰਾ,
+    char_u	*ਵਿੱਚ_ਸਿਰਾ)
 {
     char_u	c1;
-    char_u	*retval = NULL;
-    char_u	*temp_result;
+    char_u	*retval = ਨਿਰਾ;
+    char_u	*ਆਰਜ਼ੀ_ਨਤੀਜਾ;
 
-    if (expr_end == NULL || in_end == NULL)
-	return NULL;
-    *expr_start	= NUL;
-    *expr_end = NUL;
-    c1 = *in_end;
-    *in_end = NUL;
+    ਜੇ (ਵਿਅੰਜਕ_ਸਿਰਾ == ਨਿਰਾ || ਵਿੱਚ_ਸਿਰਾ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    *ਵਿਅੰਜਕ_ਸ਼ੁਰੂ	= NUL;
+    *ਵਿਅੰਜਕ_ਸਿਰਾ = NUL;
+    c1 = *ਵਿੱਚ_ਸਿਰਾ;
+    *ਵਿੱਚ_ਸਿਰਾ = NUL;
 
-    temp_result = eval_to_string(expr_start + 1, FALSE, FALSE);
-    if (temp_result != NULL)
+    ਆਰਜ਼ੀ_ਨਤੀਜਾ = eval_ਮੰਜ਼ਿਲ_string(ਵਿਅੰਜਕ_ਸ਼ੁਰੂ + 1, FALSE, FALSE);
+    ਜੇ (ਆਰਜ਼ੀ_ਨਤੀਜਾ != ਨਿਰਾ)
     {
-	size_t	retvalsize = (size_t)(expr_start - in_start)
-				+ STRLEN(temp_result)
-				+ (size_t)(in_end - expr_end) + 1;
+	size_t	retvalsize = (size_t)(ਵਿਅੰਜਕ_ਸ਼ੁਰੂ - ਵਿੱਚ_ਸ਼ੁਰੂ)
+				+ STRLEN(ਆਰਜ਼ੀ_ਨਤੀਜਾ)
+				+ (size_t)(ਵਿੱਚ_ਸਿਰਾ - ਵਿਅੰਜਕ_ਸਿਰਾ) + 1;
 
 	retval = alloc(retvalsize);
-	if (retval != NULL)
-	    vim_snprintf((char *)retval, retvalsize, "%s%s%s",
-				in_start, temp_result, expr_end + 1);
+	ਜੇ (retval != ਨਿਰਾ)
+	    vim_snprintf((ਅੱਖਰ *)retval, retvalsize, "%s%s%s",
+				ਵਿੱਚ_ਸ਼ੁਰੂ, ਆਰਜ਼ੀ_ਨਤੀਜਾ, ਵਿਅੰਜਕ_ਸਿਰਾ + 1);
     }
-    vim_free(temp_result);
+    vim_free(ਆਰਜ਼ੀ_ਨਤੀਜਾ);
 
-    *in_end = c1;		// put char back for error messages
-    *expr_start = '{';
-    *expr_end = '}';
+    *ਵਿੱਚ_ਸਿਰਾ = c1;		// put char back for error messages
+    *ਵਿਅੰਜਕ_ਸ਼ੁਰੂ = '{';
+    *ਵਿਅੰਜਕ_ਸਿਰਾ = '}';
 
-    if (retval != NULL)
+    ਜੇ (retval != ਨਿਰਾ)
     {
-	temp_result = find_name_end(retval, &expr_start, &expr_end, 0);
-	if (expr_start != NULL)
+	ਆਰਜ਼ੀ_ਨਤੀਜਾ = ਲੱਭੋ_name_ਸਿਰਾ(retval, &ਵਿਅੰਜਕ_ਸ਼ੁਰੂ, &ਵਿਅੰਜਕ_ਸਿਰਾ, 0);
+	ਜੇ (ਵਿਅੰਜਕ_ਸ਼ੁਰੂ != ਨਿਰਾ)
 	{
 	    // Further expansion!
-	    temp_result = make_expanded_name(retval, expr_start,
-						       expr_end, temp_result);
+	    ਆਰਜ਼ੀ_ਨਤੀਜਾ = make_expanded_name(retval, ਵਿਅੰਜਕ_ਸ਼ੁਰੂ,
+						       ਵਿਅੰਜਕ_ਸਿਰਾ, ਆਰਜ਼ੀ_ਨਤੀਜਾ);
 	    vim_free(retval);
-	    retval = temp_result;
+	    retval = ਆਰਜ਼ੀ_ਨਤੀਜਾ;
 	}
     }
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Return TRUE if character "c" can be used in a variable or function name.
  * Does not include '{' or '}' for magic braces.
  */
-    int
-eval_isnamec(int c)
+    ਪੂਰਨ
+eval_isnamec(ਪੂਰਨ c)
 {
-    return ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
+    ਵਾਪਸ ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character in a
  * variable or function name (excluding '{' and '}').
  */
-    int
-eval_isnamec1(int c)
+    ਪੂਰਨ
+eval_isnamec1(ਪੂਰਨ c)
 {
-    return ASCII_ISALPHA(c) || c == '_';
+    ਵਾਪਸ ASCII_ISALPHA(c) || c == '_';
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character of a
  * dictionary key.
  */
-    int
-eval_isdictc(int c)
+    ਪੂਰਨ
+eval_isdictc(ਪੂਰਨ c)
 {
-    return ASCII_ISALNUM(c) || c == '_';
+    ਵਾਪਸ ASCII_ISALNUM(c) || c == '_';
 }
 
 /*
  * Return true when "p" points to "->" followed by a method name or a lambda.
  * Only called for Vim9 script.
  */
-    static bool
-method_call_follows(char_u *p)
+    ਸਥਿਰ bool
+ਵਿਧੀ_call_follows(char_u *p)
 {
-    if (p[0] != '-' || p[1] != '>')
-	return false;
+    ਜੇ (p[0] != '-' || p[1] != '>')
+	ਵਾਪਸ false;
 
     char_u	*after = skipwhite(p + 2);
 
-    return ASCII_ISALPHA(*after) || *after == '(';
+    ਵਾਪਸ ASCII_ISALPHA(*after) || *after == '(';
 }
 
 /*
@@ -7648,177 +7648,177 @@ method_call_follows(char_u *p)
  * Can all be combined in any order: dict.func(expr)[idx]['func'](expr)->len()
  * "name_start" points to a variable before the subscript or is NULL.
  */
-    int
+    ਪੂਰਨ
 handle_subscript(
     char_u	**arg,
-    char_u	*name_start,
+    char_u	*name_ਸ਼ੁਰੂ,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    ਪੂਰਨ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    ਪੂਰਨ		evaluate = evalarg != ਨਿਰਾ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		ret = OK;
-    dict_T	*selfdict = NULL;
-    int		check_white = TRUE;
-    int		getnext;
+    ਪੂਰਨ		ret = OK;
+    dict_T	*selfdict = ਨਿਰਾ;
+    ਪੂਰਨ		check_white = TRUE;
+    ਪੂਰਨ		getnext;
     char_u	*p;
 
-    while (ret == OK)
+    ਜਦੋਂ (ret == OK)
     {
 	// When at the end of the line and ".name" or a method call follows in
 	// the next line then consume the line break.
-	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (getnext
+	p = eval_ਅਗਲਾ_non_blank(*arg, evalarg, &getnext);
+	ਜੇ (getnext
 	    && ((*p == '.'
 		    && ((rettv->v_type == VAR_DICT && eval_isdictc(p[1]))
 			|| rettv->v_type == VAR_CLASS
 			|| rettv->v_type == VAR_OBJECT))
-		|| method_call_follows(p)))
+		|| ਵਿਧੀ_call_follows(p)))
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_ਅਗਲਾ_ਸਤਰ(*arg, evalarg);
 	    p = *arg;
 	    check_white = FALSE;
 	}
 
-	if (rettv->v_type == VAR_ANY)
+	ਜੇ (rettv->v_type == VAR_ANY)
 	{
 	    char_u	*exp_name;
-	    int		cc;
-	    int		idx;
+	    ਪੂਰਨ		cc;
+	    ਪੂਰਨ		idx;
 	    ufunc_T	*ufunc;
 	    type_T	*type;
 
 	    // Found script from "import {name} as name", script item name must
 	    // follow.  "rettv->vval.v_number" has the script ID.
-	    if (**arg != '.')
+	    ਜੇ (**arg != '.')
 	    {
-		if (verbose)
+		ਜੇ (verbose)
 		    semsg(_(e_expected_dot_after_name_str),
-					name_start != NULL ? name_start: *arg);
+					name_ਸ਼ੁਰੂ != ਨਿਰਾ ? name_ਸ਼ੁਰੂ: *arg);
 		ret = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
 	    ++*arg;
-	    if (IS_WHITE_OR_NUL(**arg))
+	    ਜੇ (IS_WHITE_OR_NUL(**arg))
 	    {
-		if (verbose)
+		ਜੇ (verbose)
 		    emsg(_(e_no_white_space_allowed_after_dot));
 		ret = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
 
 	    // isolate the name
 	    exp_name = *arg;
-	    while (eval_isnamec(**arg))
+	    ਜਦੋਂ (eval_isnamec(**arg))
 		++*arg;
 	    cc = **arg;
 	    **arg = NUL;
 
-	    idx = find_exported(rettv->vval.v_number, exp_name, &ufunc, &type,
-		       evalarg == NULL ? NULL : evalarg->eval_cctx,
-		       evalarg == NULL ? NULL : evalarg->eval_cstack, verbose);
+	    idx = ਲੱਭੋ_exported(rettv->vval.v_ਸੰਖਿਆ, exp_name, &ufunc, &type,
+		       evalarg == ਨਿਰਾ ? ਨਿਰਾ : evalarg->eval_cctx,
+		       evalarg == ਨਿਰਾ ? ਨਿਰਾ : evalarg->eval_cstack, verbose);
 	    **arg = cc;
 
-	    if (idx < 0 && ufunc == NULL)
+	    ਜੇ (idx < 0 && ufunc == ਨਿਰਾ)
 	    {
 		ret = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (idx >= 0)
+	    ਜੇ (idx >= 0)
 	    {
-		scriptitem_T    *si = SCRIPT_ITEM(rettv->vval.v_number);
-		svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+		scriptitem_T    *si = SCRIPT_ਵਸਤੂ(rettv->vval.v_ਸੰਖਿਆ);
+		svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_ਅੰਕੜੇ) + idx;
 
 		copy_tv(sv->sv_tv, rettv);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		rettv->v_type = VAR_FUNC;
-		if (**arg == '<')
+		ਜੇ (**arg == '<')
 		{
 		    char_u *s = get_generic_func_name(ufunc, arg);
-		    if (s != NULL)
+		    ਜੇ (s != ਨਿਰਾ)
 			rettv->vval.v_string = s;
-		    else
+		    ਨਹੀਂਤਾਂ
 			ret = FAIL;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    rettv->vval.v_string =
 			vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
 		}
 	    }
-	    continue;
+	    ਜਾਰੀ;
 	}
 
-	if ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
+	ਜੇ ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
 			    || rettv->v_type == VAR_PARTIAL))
 		    && (!check_white || !VIM_ISWHITE(*(*arg - 1))))
 	{
 	    ret = call_func_rettv(arg, evalarg, rettv, evaluate,
-							       selfdict, NULL);
+							       selfdict, ਨਿਰਾ);
 
 	    // Stop the expression evaluation when immediately aborting on
 	    // error, or when an interrupt occurred or an exception was thrown
 	    // but not caught.
-	    if (aborting())
+	    ਜੇ (aborting())
 	    {
-		if (ret == OK)
+		ਜੇ (ret == OK)
 		    clear_tv(rettv);
 		ret = FAIL;
 	    }
 	    dict_unref(selfdict);
-	    selfdict = NULL;
+	    selfdict = ਨਿਰਾ;
 	}
-	else if (p[0] == '-' && p[1] == '>')
+	ਨਹੀਂਤਾਂ ਜੇ (p[0] == '-' && p[1] == '>')
 	{
-	    if (in_vim9script())
+	    ਜੇ (ਵਿੱਚ_vim9script())
 		*arg = skipwhite(p + 2);
-	    else
+	    ਨਹੀਂਤਾਂ
 		*arg = p + 2;
-	    if (ret == OK && evaluate && rettv->v_type == VAR_VOID)
+	    ਜੇ (ret == OK && evaluate && rettv->v_type == VAR_VOID)
 	    {
-		if (verbose)
-		    emsg(_(e_cannot_use_void_value));
+		ਜੇ (verbose)
+		    emsg(_(e_cannot_use_void_ਮੁੱਲ));
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE(**arg))
+	    ਨਹੀਂਤਾਂ ਜੇ (VIM_ISWHITE(**arg))
 	    {
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else if ((**arg == '{' && !in_vim9script()) || **arg == '(')
+	    ਨਹੀਂਤਾਂ ਜੇ ((**arg == '{' && !ਵਿੱਚ_vim9script()) || **arg == '(')
 		// expr->{lambda}() or expr->(lambda)()
 		ret = eval_lambda(arg, rettv, evalarg, verbose);
-	    else
+	    ਨਹੀਂਤਾਂ
 		// expr->name()
-		ret = eval_method(arg, rettv, evalarg, verbose);
+		ret = eval_ਵਿਧੀ(arg, rettv, evalarg, verbose);
 	}
 	// "." is ".name" lookup when we found a dict or when evaluating and
 	// scriptversion is at least 2, where string concatenation is "..".
-	else if (**arg == '['
+	ਨਹੀਂਤਾਂ ਜੇ (**arg == '['
 		|| (**arg == '.' && (rettv->v_type == VAR_DICT
 			|| (!evaluate
 			    && (*arg)[1] != '.'
-			    && !in_old_script(2)))))
+			    && !ਵਿੱਚ_old_script(2)))))
 	{
 	    dict_unref(selfdict);
-	    if (rettv->v_type == VAR_DICT)
+	    ਜੇ (rettv->v_type == VAR_DICT)
 	    {
 		selfdict = rettv->vval.v_dict;
-		if (selfdict != NULL)
+		ਜੇ (selfdict != ਨਿਰਾ)
 		    ++selfdict->dv_refcount;
 	    }
-	    else
-		selfdict = NULL;
-	    if (eval_index(arg, rettv, evalarg, verbose) == FAIL)
+	    ਨਹੀਂਤਾਂ
+		selfdict = ਨਿਰਾ;
+	    ਜੇ (eval_ਸੂਚਕਾਂਕ(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else if (**arg == '.' && (rettv->v_type == VAR_CLASS
+	ਨਹੀਂਤਾਂ ਜੇ (**arg == '.' && (rettv->v_type == VAR_CLASS
 					       || rettv->v_type == VAR_OBJECT))
 	{
 	    // class member: SomeClass.varname
@@ -7826,28 +7826,28 @@ handle_subscript(
 	    // class constructor: SomeClass.new()
 	    // object member: someObject.varname
 	    // object method: someObject.SomeMethod()
-	    if (class_object_index(arg, rettv, evalarg, verbose) == FAIL)
+	    ਜੇ (class_object_ਸੂਚਕਾਂਕ(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
 
     // Turn "dict.Func" into a partial for "Func" bound to "dict".
     // Don't do this when "Func" is already a partial that was bound
     // explicitly (pt_auto is FALSE).
-    if (selfdict != NULL
+    ਜੇ (selfdict != ਨਿਰਾ
 	    && (rettv->v_type == VAR_FUNC
 		|| (rettv->v_type == VAR_PARTIAL
 		    && (rettv->vval.v_partial->pt_auto
-			|| rettv->vval.v_partial->pt_dict == NULL))))
+			|| rettv->vval.v_partial->pt_dict == ਨਿਰਾ))))
 	selfdict = make_partial(selfdict, rettv);
 
     dict_unref(selfdict);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -7858,168 +7858,168 @@ handle_subscript(
  * reference to an already copied list/dict can be used.
  * Returns FAIL or OK.
  */
-    int
-item_copy(
+    ਪੂਰਨ
+ਵਸਤੂ_copy(
     typval_T	*from,
-    typval_T	*to,
-    int		deep,
-    int		top,
-    int		copyID)
+    typval_T	*ਮੰਜ਼ਿਲ,
+    ਪੂਰਨ		deep,
+    ਪੂਰਨ		ਸਿਖਰ,
+    ਪੂਰਨ		copyID)
 {
-    static int	recurse = 0;
-    int		ret = OK;
+    ਸਥਿਰ ਪੂਰਨ	recurse = 0;
+    ਪੂਰਨ		ret = OK;
 
-    if (recurse >= DICT_MAXNEST)
+    ਜੇ (recurse >= DICT_MAXNEST)
     {
 	emsg(_(e_variable_nested_too_deep_for_making_copy));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
     ++recurse;
 
-    switch (from->v_type)
+    ਚੋਣ (from->v_type)
     {
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    copy_tv(from, to);
-	    break;
-	case VAR_LIST:
-	    to->v_type = VAR_LIST;
-	    to->v_lock = 0;
-	    if (from->vval.v_list == NULL)
-		to->vval.v_list = NULL;
-	    else if (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	ਹਾਲਤ VAR_FLOAT:
+	ਹਾਲਤ VAR_STRING:
+	ਹਾਲਤ VAR_FUNC:
+	ਹਾਲਤ VAR_PARTIAL:
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_SPECIAL:
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	ਹਾਲਤ VAR_INSTR:
+	ਹਾਲਤ VAR_CLASS:
+	ਹਾਲਤ VAR_OBJECT:
+	ਹਾਲਤ VAR_TYPEALIAS:
+	    copy_tv(from, ਮੰਜ਼ਿਲ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_LIST:
+	    ਮੰਜ਼ਿਲ->v_type = VAR_LIST;
+	    ਮੰਜ਼ਿਲ->v_ਤਾਲਾ = 0;
+	    ਜੇ (from->vval.v_list == ਨਿਰਾ)
+		ਮੰਜ਼ਿਲ->vval.v_list = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_list = from->vval.v_list->lv_copylist;
-		++to->vval.v_list->lv_refcount;
+		ਮੰਜ਼ਿਲ->vval.v_list = from->vval.v_list->lv_copylist;
+		++ਮੰਜ਼ਿਲ->vval.v_list->lv_refcount;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		to->vval.v_list = list_copy(from->vval.v_list,
-							    deep, top, copyID);
-		if (to->vval.v_list == NULL)
+		ਮੰਜ਼ਿਲ->vval.v_list = list_copy(from->vval.v_list,
+							    deep, ਸਿਖਰ, copyID);
+		ਜੇ (ਮੰਜ਼ਿਲ->vval.v_list == ਨਿਰਾ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_TUPLE:
-	    to->v_type = VAR_TUPLE;
-	    to->v_lock = 0;
-	    if (from->vval.v_tuple == NULL)
-		to->vval.v_tuple = NULL;
-	    else if (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_TUPLE:
+	    ਮੰਜ਼ਿਲ->v_type = VAR_TUPLE;
+	    ਮੰਜ਼ਿਲ->v_ਤਾਲਾ = 0;
+	    ਜੇ (from->vval.v_tuple == ਨਿਰਾ)
+		ਮੰਜ਼ਿਲ->vval.v_tuple = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_tuple = from->vval.v_tuple->tv_copytuple;
-		++to->vval.v_tuple->tv_refcount;
+		ਮੰਜ਼ਿਲ->vval.v_tuple = from->vval.v_tuple->tv_copytuple;
+		++ਮੰਜ਼ਿਲ->vval.v_tuple->tv_refcount;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		to->vval.v_tuple = tuple_copy(from->vval.v_tuple,
-							    deep, top, copyID);
-		if (to->vval.v_tuple == NULL)
+		ਮੰਜ਼ਿਲ->vval.v_tuple = tuple_copy(from->vval.v_tuple,
+							    deep, ਸਿਖਰ, copyID);
+		ਜੇ (ਮੰਜ਼ਿਲ->vval.v_tuple == ਨਿਰਾ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_BLOB:
-	    to->v_type = VAR_BLOB;
-	    to->v_lock = 0;
-	    if (from->vval.v_blob == NULL)
-		to->vval.v_blob = NULL;
-	    else
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_BLOB:
+	    ਮੰਜ਼ਿਲ->v_type = VAR_BLOB;
+	    ਮੰਜ਼ਿਲ->v_ਤਾਲਾ = 0;
+	    ਜੇ (from->vval.v_blob == ਨਿਰਾ)
+		ਮੰਜ਼ਿਲ->vval.v_blob = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ
 	    {
-		to->vval.v_blob = blob_copy(from->vval.v_blob);
-		if (to->vval.v_blob == NULL)
+		ਮੰਜ਼ਿਲ->vval.v_blob = blob_copy(from->vval.v_blob);
+		ਜੇ (ਮੰਜ਼ਿਲ->vval.v_blob == ਨਿਰਾ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_DICT:
-	    to->v_type = VAR_DICT;
-	    to->v_lock = 0;
-	    if (from->vval.v_dict == NULL)
-		to->vval.v_dict = NULL;
-	    else if (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_DICT:
+	    ਮੰਜ਼ਿਲ->v_type = VAR_DICT;
+	    ਮੰਜ਼ਿਲ->v_ਤਾਲਾ = 0;
+	    ਜੇ (from->vval.v_dict == ਨਿਰਾ)
+		ਮੰਜ਼ਿਲ->vval.v_dict = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ ਜੇ (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
 	    {
 		// use the copy made earlier
-		to->vval.v_dict = from->vval.v_dict->dv_copydict;
-		++to->vval.v_dict->dv_refcount;
+		ਮੰਜ਼ਿਲ->vval.v_dict = from->vval.v_dict->dv_copydict;
+		++ਮੰਜ਼ਿਲ->vval.v_dict->dv_refcount;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		to->vval.v_dict = dict_copy(from->vval.v_dict,
-							    deep, top, copyID);
-		if (to->vval.v_dict == NULL)
+		ਮੰਜ਼ਿਲ->vval.v_dict = dict_copy(from->vval.v_dict,
+							    deep, ਸਿਖਰ, copyID);
+		ਜੇ (ਮੰਜ਼ਿਲ->vval.v_dict == ਨਿਰਾ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    internal_error_no_abort("item_copy(UNKNOWN)");
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_VOID:
+	    ਅੰਦਰੂਨੀ_error_no_abort("item_copy(UNKNOWN)");
 	    ret = FAIL;
     }
     --recurse;
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-    void
-echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
+    ਖਾਲੀ
+echo_one(typval_T *rettv, ਪੂਰਨ with_space, ਪੂਰਨ *atstart, ਪੂਰਨ *needclr)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     char_u	*p = echo_string(rettv, &tofree, numbuf, get_copyID());
 
-    if (*atstart)
+    ਜੇ (*atstart)
     {
 	*atstart = FALSE;
 	// Call msg_start() after eval1(), evaluating the expression
 	// may cause a message to appear.
-	if (with_space)
+	ਜੇ (with_space)
 	{
 	    // Mark the saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back
 	    // at the more prompt.
-	    msg_sb_eol();
-	    msg_start();
+	    ਸੁਨੇਹਾ_sb_eol();
+	    ਸੁਨੇਹਾ_ਸ਼ੁਰੂ();
 	}
     }
-    else if (with_space)
-	msg_puts_attr(" ", echo_attr);
+    ਨਹੀਂਤਾਂ ਜੇ (with_space)
+	ਸੁਨੇਹਾ_puts_attr(" ", echo_attr);
 
-    if (p != NULL)
-	for ( ; *p != NUL && !got_int; ++p)
+    ਜੇ (p != ਨਿਰਾ)
+	ਲਈ ( ; *p != NUL && !got_int; ++p)
 	{
-	    if (*p == '\n' || *p == '\r' || *p == TAB)
+	    ਜੇ (*p == '\n' || *p == '\r' || *p == TAB)
 	    {
-		if (*p != TAB && *needclr)
+		ਜੇ (*p != TAB && *needclr)
 		{
 		    // remove any text still there from the command
-		    msg_clr_eos();
+		    ਸੁਨੇਹਾ_clr_eos();
 		    *needclr = FALSE;
 		}
-		msg_putchar_attr(*p, echo_attr);
+		ਸੁਨੇਹਾ_putchar_attr(*p, echo_attr);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (has_mbyte)
+		ਜੇ (has_mbyte)
 		{
-		    int i = (*mb_ptr2len)(p);
+		    ਪੂਰਨ i = (*mb_ptr2len)(p);
 
-		    (void)msg_outtrans_len_attr(p, i, echo_attr);
+		    (ਖਾਲੀ)ਸੁਨੇਹਾ_outtrans_len_attr(p, i, echo_attr);
 		    p += i - 1;
 		}
-		else
-		    (void)msg_outtrans_len_attr(p, 1, echo_attr);
+		ਨਹੀਂਤਾਂ
+		    (ਖਾਲੀ)ਸੁਨੇਹਾ_outtrans_len_attr(p, 1, echo_attr);
 	    }
 	}
     vim_free(tofree);
@@ -8030,50 +8030,50 @@ echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
  *			newline at the end.
  * ":echon expr1 ..."	print each argument plain.
  */
-    void
+    ਖਾਲੀ
 ex_echo(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    char_u	*arg_start;
-    int		needclr = TRUE;
-    int		atstart = TRUE;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    char_u	*arg_ਸ਼ੁਰੂ;
+    ਪੂਰਨ		needclr = TRUE;
+    ਪੂਰਨ		atstart = TRUE;
+    ਪੂਰਨ		did_emsg_before = did_emsg;
+    ਪੂਰਨ		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    if (eap->skip)
+    ਜੇ (eap->skip)
 	++emsg_skip;
-    while ((!ends_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
+    ਜਦੋਂ ((!ਸਿਰੇ_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
     {
 	// If eval1() causes an error message the text from the command may
 	// still need to be cleared. E.g., "echo 22,44".
 	need_clr_eos = needclr;
 
-	arg_start = arg;
-	if (eval1(&arg, &rettv, &evalarg) == FAIL)
+	arg_ਸ਼ੁਰੂ = arg;
+	ਜੇ (eval1(&arg, &rettv, &evalarg) == FAIL)
 	{
 	    /*
 	     * Report the invalid expression unless the expression evaluation
 	     * has been cancelled due to an aborting error, an interrupt, or an
 	     * exception.
 	     */
-	    if (!aborting() && did_emsg == did_emsg_before
+	    ਜੇ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
-		semsg(_(e_invalid_expression_str), arg_start);
+		semsg(_(e_invalid_ਵਿਅੰਜਕ_str), arg_ਸ਼ੁਰੂ);
 	    need_clr_eos = FALSE;
-	    break;
+	    ਰੋਕੋ;
 	}
 	need_clr_eos = FALSE;
 
-	if (!eap->skip)
+	ਜੇ (!eap->skip)
 	{
-	    if (rettv.v_type == VAR_VOID)
+	    ਜੇ (rettv.v_type == VAR_VOID)
 	    {
-		semsg(_(e_expression_does_not_result_in_value_str), arg_start);
-		break;
+		semsg(_(e_ਵਿਅੰਜਕ_does_not_ਨਤੀਜਾ_ਵਿੱਚ_ਮੁੱਲ_str), arg_ਸ਼ੁਰੂ);
+		ਰੋਕੋ;
 	    }
 	    echo_one(&rettv, eap->cmdidx == CMD_echo, &atstart, &needclr);
 	}
@@ -8081,25 +8081,25 @@ ex_echo(exarg_T *eap)
 	clear_tv(&rettv);
 	arg = skipwhite(arg);
     }
-    set_nextcmd(eap, arg);
+    ਸੈੱਟ_nextcmd(eap, arg);
     clear_evalarg(&evalarg, eap);
 
-    if (eap->skip)
+    ਜੇ (eap->skip)
 	--emsg_skip;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// remove text that may still be there from the command
-	if (needclr)
-	    msg_clr_eos();
-	if (eap->cmdidx == CMD_echo)
-	    msg_end();
+	ਜੇ (needclr)
+	    ਸੁਨੇਹਾ_clr_eos();
+	ਜੇ (eap->cmdidx == CMD_echo)
+	    ਸੁਨੇਹਾ_ਸਿਰਾ();
     }
 }
 
 /*
  * ":echohl {name}".
  */
-    void
+    ਖਾਲੀ
 ex_echohl(exarg_T *eap)
 {
     echo_attr = syn_name2attr(eap->arg);
@@ -8108,10 +8108,10 @@ ex_echohl(exarg_T *eap)
 /*
  * Returns the :echo attribute
  */
-    int
-get_echo_attr(void)
+    ਪੂਰਨ
+get_echo_attr(ਖਾਲੀ)
 {
-    return echo_attr;
+    ਵਾਪਸ echo_attr;
 }
 
 /*
@@ -8123,60 +8123,60 @@ get_echo_attr(void)
  * Each gets spaces around each argument and a newline at the end for
  * echo commands
  */
-    void
+    ਖਾਲੀ
 ex_execute(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    int		ret = OK;
+    ਪੂਰਨ		ret = OK;
     char_u	*p;
     garray_T	ga;
-    int		len;
-    long	start_lnum = SOURCING_LNUM;
+    ਪੂਰਨ		len;
+    ਲੰਮਾ	ਸ਼ੁਰੂ_lnum = SOURCING_LNUM;
 
     ga_init2(&ga, 1, 80);
 
-    if (eap->skip)
+    ਜੇ (eap->skip)
 	++emsg_skip;
-    while (!ends_excmd2(eap->cmd, arg) || *arg == '"')
+    ਜਦੋਂ (!ਸਿਰੇ_excmd2(eap->cmd, arg) || *arg == '"')
     {
 	ret = eval1_emsg(&arg, &rettv, eap);
-	if (ret == FAIL)
-	    break;
+	ਜੇ (ret == FAIL)
+	    ਰੋਕੋ;
 
-	if (!eap->skip)
+	ਜੇ (!eap->skip)
 	{
 	    char_u   buf[NUMBUFLEN];
 
-	    if (eap->cmdidx == CMD_execute)
+	    ਜੇ (eap->cmdidx == CMD_execute)
 	    {
-		if (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_JOB)
+		ਜੇ (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_ਕੰਮ)
 		{
-		    semsg(_(e_using_invalid_value_as_string_str),
+		    semsg(_(e_using_invalid_ਮੁੱਲ_as_string_str),
 						  vartype_name(rettv.v_type));
-		    p = NULL;
+		    p = ਨਿਰਾ;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    p = tv_get_string_buf(&rettv, buf);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		p = tv_stringify(&rettv, buf);
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
-	    len = (int)STRLEN(p);
-	    if (ga_grow(&ga, len + 2) == FAIL)
+	    len = (ਪੂਰਨ)STRLEN(p);
+	    ਜੇ (ga_grow(&ga, len + 2) == FAIL)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (ga.ga_len)
-		((char_u *)(ga.ga_data))[ga.ga_len++] = ' ';
-	    STRCPY((char_u *)(ga.ga_data) + ga.ga_len, p);
+	    ਜੇ (ga.ga_len)
+		((char_u *)(ga.ga_ਅੰਕੜੇ))[ga.ga_len++] = ' ';
+	    STRCPY((char_u *)(ga.ga_ਅੰਕੜੇ) + ga.ga_len, p);
 	    ga.ga_len += len;
 	}
 
@@ -8184,58 +8184,58 @@ ex_execute(exarg_T *eap)
 	arg = skipwhite(arg);
     }
 
-    if (ret != FAIL && ga.ga_data != NULL)
+    ਜੇ (ret != FAIL && ga.ga_ਅੰਕੜੇ != ਨਿਰਾ)
     {
 	// use the first line of continuation lines for messages
-	SOURCING_LNUM = start_lnum;
+	SOURCING_LNUM = ਸ਼ੁਰੂ_lnum;
 
-	if (eap->cmdidx == CMD_echomsg
+	ਜੇ (eap->cmdidx == CMD_echomsg
 		|| eap->cmdidx == CMD_echowindow
 		|| eap->cmdidx == CMD_echoerr)
 	{
 	    // Mark the already saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back at the
 	    // more prompt.
-	    msg_sb_eol();
+	    ਸੁਨੇਹਾ_sb_eol();
 	}
 
-	if (eap->cmdidx == CMD_echomsg)
+	ਜੇ (eap->cmdidx == CMD_echomsg)
 	{
-	    msg_attr(ga.ga_data, echo_attr);
-	    out_flush();
+	    ਸੁਨੇਹਾ_attr(ga.ga_ਅੰਕੜੇ, echo_attr);
+	    ਬਾਹਰਲਾ_flush();
 	}
-	else if (eap->cmdidx == CMD_echowindow)
+	ਨਹੀਂਤਾਂ ਜੇ (eap->cmdidx == CMD_echowindow)
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    start_echowindow(eap->addr_count > 0 ? eap->line2 : 0);
-#endif
-	    msg_attr(ga.ga_data, echo_attr);
-#ifdef HAS_MESSAGE_WINDOW
-	    end_echowindow();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAS_ਸੁਨੇਹਾ_ਖਿੜਕੀ
+	    ਸ਼ੁਰੂ_echowindow(eap->addr_ਗਿਣਤੀ > 0 ? eap->line2 : 0);
+#ਜੇ_ਅੰਤ
+	    ਸੁਨੇਹਾ_attr(ga.ga_ਅੰਕੜੇ, echo_attr);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAS_ਸੁਨੇਹਾ_ਖਿੜਕੀ
+	    ਸਿਰਾ_echowindow();
+#ਜੇ_ਅੰਤ
 	}
-	else if (eap->cmdidx == CMD_echoconsole)
+	ਨਹੀਂਤਾਂ ਜੇ (eap->cmdidx == CMD_echoconsole)
 	{
-	    ui_write(ga.ga_data, (int)STRLEN(ga.ga_data), TRUE);
+	    ui_write(ga.ga_ਅੰਕੜੇ, (ਪੂਰਨ)STRLEN(ga.ga_ਅੰਕੜੇ), TRUE);
 	    ui_write((char_u *)"\r\n", 2, TRUE);
 	}
-	else if (eap->cmdidx == CMD_echoerr)
+	ਨਹੀਂਤਾਂ ਜੇ (eap->cmdidx == CMD_echoerr)
 	{
-	    int		save_did_emsg = did_emsg;
+	    ਪੂਰਨ		save_did_emsg = did_emsg;
 
 	    // We don't want to abort following commands, restore did_emsg.
-	    emsg(ga.ga_data);
-	    if (!force_abort)
+	    emsg(ga.ga_ਅੰਕੜੇ);
+	    ਜੇ (!force_abort)
 		did_emsg = save_did_emsg;
 	}
-	else if (eap->cmdidx == CMD_execute)
+	ਨਹੀਂਤਾਂ ਜੇ (eap->cmdidx == CMD_execute)
 	{
-	    int save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+	    ਪੂਰਨ save_sticky_cmdmod_flags = sticky_cmdmod_flags;
 
 	    // "legacy exe cmd" and "vim9cmd exe cmd" applies to "cmd".
 	    sticky_cmdmod_flags = cmdmod.cmod_flags
 						& (CMOD_LEGACY | CMOD_VIM9CMD);
-	    do_cmdline((char_u *)ga.ga_data,
+	    do_cmdline((char_u *)ga.ga_ਅੰਕੜੇ,
 		       eap->ea_getline, eap->cookie, DOCMD_NOWAIT|DOCMD_VERBOSE);
 	    sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 	}
@@ -8243,9 +8243,9 @@ ex_execute(exarg_T *eap)
 
     ga_clear(&ga);
 
-    if (eap->skip)
+    ਜੇ (eap->skip)
 	--emsg_skip;
-    set_nextcmd(eap, arg);
+    ਸੈੱਟ_nextcmd(eap, arg);
 }
 
 /*
@@ -8255,65 +8255,65 @@ ex_execute(exarg_T *eap)
  * after the option name.
  */
     char_u *
-find_option_end(char_u **arg, int *scope)
+ਲੱਭੋ_option_ਸਿਰਾ(char_u **arg, ਪੂਰਨ *scope)
 {
     char_u	*p = *arg;
 
     ++p;
-    if (*p == 'g' && p[1] == ':')
+    ਜੇ (*p == 'g' && p[1] == ':')
     {
 	*scope = OPT_GLOBAL;
 	p += 2;
     }
-    else if (*p == 'l' && p[1] == ':')
+    ਨਹੀਂਤਾਂ ਜੇ (*p == 'l' && p[1] == ':')
     {
 	*scope = OPT_LOCAL;
 	p += 2;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	*scope = 0;
 
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
+    ਜੇ (!ASCII_ISALPHA(*p))
+	ਵਾਪਸ ਨਿਰਾ;
     *arg = p;
 
-    if (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
+    ਜੇ (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
 	p += 4;	    // termcap option
-    else
-	while (ASCII_ISALPHA(*p))
+    ਨਹੀਂਤਾਂ
+	ਜਦੋਂ (ASCII_ISALPHA(*p))
 	    ++p;
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
  * Display script name where an item was last set.
  * Should only be invoked when 'verbose' is non-zero.
  */
-    void
-last_set_msg(sctx_T script_ctx)
+    ਖਾਲੀ
+ਆਖਰੀ_ਸੈੱਟ_ਸੁਨੇਹਾ(sctx_T script_ctx)
 {
     char_u *p;
 
-    if (script_ctx.sc_sid == 0)
-	return;
+    ਜੇ (script_ctx.sc_sid == 0)
+	ਵਾਪਸ;
 
-    p = home_replace_save(NULL, get_scriptname(script_ctx.sc_sid));
-    if (p == NULL)
-	return;
+    p = home_replace_save(ਨਿਰਾ, get_scriptname(script_ctx.sc_sid));
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     verbose_enter();
-    msg_puts(_("\n\tLast set from "));
-    msg_puts((char *)p);
-    if (script_ctx.sc_lnum > 0)
+    ਸੁਨੇਹਾ_puts(_("\n\tLast set from "));
+    ਸੁਨੇਹਾ_puts((ਅੱਖਰ *)p);
+    ਜੇ (script_ctx.sc_lnum > 0)
     {
-	msg_puts(_(line_msg));
-	msg_outnum((long)script_ctx.sc_lnum);
+	ਸੁਨੇਹਾ_puts(_(ਸਤਰ_ਸੁਨੇਹਾ));
+	ਸੁਨੇਹਾ_outnum((ਲੰਮਾ)script_ctx.sc_lnum);
     }
     verbose_leave();
     vim_free(p);
 }
 
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL
 
 /*
  * Perform a substitution on "str" with pattern "pat" and substitute "sub".
@@ -8327,7 +8327,7 @@ do_string_sub(
     size_t	len,
     char_u	*pat,
     char_u	*sub,
-    typval_T	*expr,
+    typval_T	*ਵਿਅੰਜਕ,
     char_u	*flags,
     size_t	*ret_len)		// length of returned buffer
 {
@@ -8338,37 +8338,37 @@ do_string_sub(
 
     // Make 'cpoptions' empty, so that the 'l' flag doesn't work here
     save_cpo = p_cpo;
-    p_cpo = empty_option;
+    p_cpo = ਖਾਲੀ_ਥਾਵਾਂ_option;
 
     ga_init2(&ga, 1, 200);
 
     regmatch.rm_ic = p_ic;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog != NULL)
+    ਜੇ (regmatch.regprog != ਨਿਰਾ)
     {
-	char_u	*tail = str;
-	char_u	*end = str + len;
-	int	do_all = (flags[0] == 'g');
-	int	sublen;
-	int	i;
-	char_u	*zero_width = NULL;
+	char_u	*ਪੂਛ = str;
+	char_u	*ਸਿਰਾ = str + len;
+	ਪੂਰਨ	do_all = (flags[0] == 'g');
+	ਪੂਰਨ	sublen;
+	ਪੂਰਨ	i;
+	char_u	*zero_ਚੌੜਾਈ = ਨਿਰਾ;
 
-	while (vim_regexec_nl(&regmatch, str, (colnr_T)(tail - str)))
+	ਜਦੋਂ (vim_regexec_nl(&regmatch, str, (colnr_T)(ਪੂਛ - str)))
 	{
 	    // Skip empty match except for first match.
-	    if (regmatch.startp[0] == regmatch.endp[0])
+	    ਜੇ (regmatch.startp[0] == regmatch.endp[0])
 	    {
-		if (zero_width == regmatch.startp[0])
+		ਜੇ (zero_ਚੌੜਾਈ == regmatch.startp[0])
 		{
 		    // avoid getting stuck on a match with an empty string
-		    i = mb_ptr2len(tail);
-		    mch_memmove((char_u *)ga.ga_data + ga.ga_len, tail,
+		    i = mb_ptr2len(ਪੂਛ);
+		    mch_memmove((char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len, ਪੂਛ,
 								   (size_t)i);
 		    ga.ga_len += i;
-		    tail += i;
-		    continue;
+		    ਪੂਛ += i;
+		    ਜਾਰੀ;
 		}
-		zero_width = regmatch.startp[0];
+		zero_ਚੌੜਾਈ = regmatch.startp[0];
 	    }
 
 	    /*
@@ -8378,64 +8378,64 @@ do_string_sub(
 	     * - The substituted text.
 	     * - The text after the match.
 	     */
-	    sublen = vim_regsub(&regmatch, sub, expr, tail, 0, REGSUB_MAGIC);
-	    if (sublen <= 0)
+	    sublen = vim_regsub(&regmatch, sub, ਵਿਅੰਜਕ, ਪੂਛ, 0, REGSUB_MAGIC);
+	    ਜੇ (sublen <= 0)
 	    {
 		ga_clear(&ga);
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (ga_grow(&ga, (int)((end - tail) + sublen -
+	    ਜੇ (ga_grow(&ga, (ਪੂਰਨ)((ਸਿਰਾ - ਪੂਛ) + sublen -
 			    (regmatch.endp[0] - regmatch.startp[0]))) == FAIL)
 	    {
 		ga_clear(&ga);
-		break;
+		ਰੋਕੋ;
 	    }
 
 	    // copy the text up to where the match is
-	    i = (int)(regmatch.startp[0] - tail);
-	    mch_memmove((char_u *)ga.ga_data + ga.ga_len, tail, (size_t)i);
+	    i = (ਪੂਰਨ)(regmatch.startp[0] - ਪੂਛ);
+	    mch_memmove((char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len, ਪੂਛ, (size_t)i);
 	    // add the substituted text
-	    (void)vim_regsub(&regmatch, sub, expr,
-				  (char_u *)ga.ga_data + ga.ga_len + i, sublen,
+	    (ਖਾਲੀ)vim_regsub(&regmatch, sub, ਵਿਅੰਜਕ,
+				  (char_u *)ga.ga_ਅੰਕੜੇ + ga.ga_len + i, sublen,
 				  REGSUB_COPY | REGSUB_MAGIC);
 	    ga.ga_len += i + sublen - 1;
-	    tail = regmatch.endp[0];
-	    if (*tail == NUL)
-		break;
-	    if (!do_all)
-		break;
+	    ਪੂਛ = regmatch.endp[0];
+	    ਜੇ (*ਪੂਛ == NUL)
+		ਰੋਕੋ;
+	    ਜੇ (!do_all)
+		ਰੋਕੋ;
 	}
 
-	if (ga.ga_data != NULL)
+	ਜੇ (ga.ga_ਅੰਕੜੇ != ਨਿਰਾ)
 	{
-	    STRCPY((char *)ga.ga_data + ga.ga_len, tail);
-	    ga.ga_len += (int)(end - tail);
+	    STRCPY((ਅੱਖਰ *)ga.ga_ਅੰਕੜੇ + ga.ga_len, ਪੂਛ);
+	    ga.ga_len += (ਪੂਰਨ)(ਸਿਰਾ - ਪੂਛ);
 	}
 
 	vim_regfree(regmatch.regprog);
     }
 
-    if (ga.ga_data != NULL)
+    ਜੇ (ga.ga_ਅੰਕੜੇ != ਨਿਰਾ)
     {
-	str = (char_u *)ga.ga_data;
+	str = (char_u *)ga.ga_ਅੰਕੜੇ;
 	len = (size_t)ga.ga_len;
     }
     ret = vim_strnsave(str, len);
     ga_clear(&ga);
-    if (p_cpo == empty_option)
+    ਜੇ (p_cpo == ਖਾਲੀ_ਥਾਵਾਂ_option)
 	p_cpo = save_cpo;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Darn, evaluating {sub} expression or {expr} changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	ਜੇ (*p_cpo == NUL)
+	    ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    if (ret_len != NULL)
+    ਜੇ (ret_len != ਨਿਰਾ)
 	*ret_len = len;
 
-    return ret;
+    ਵਾਪਸ ret;
 }

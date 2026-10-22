@@ -2,55 +2,55 @@
  * Some utility functions on VTermRect structures
  */
 
-#define STRFrect "(%d,%d-%d,%d)"
-#define ARGSrect(r) (r).start_row, (r).start_col, (r).end_row, (r).end_col
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ STRFrect "(%d,%d-%d,%d)"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ARGSrect(r) (r).ਸ਼ੁਰੂ_ਪੰਕਤੀ, (r).ਸ਼ੁਰੂ_ਖਾਨਾ, (r).ਸਿਰਾ_ਪੰਕਤੀ, (r).ਸਿਰਾ_ਖਾਨਾ
 
 /* Expand dst to contain src as well */
-static void rect_expand(VTermRect *dst, VTermRect *src)
+ਸਥਿਰ ਖਾਲੀ rect_expand(VTermRect *dst, VTermRect *src)
 {
-  if(dst->start_row > src->start_row) dst->start_row = src->start_row;
-  if(dst->start_col > src->start_col) dst->start_col = src->start_col;
-  if(dst->end_row   < src->end_row)   dst->end_row   = src->end_row;
-  if(dst->end_col   < src->end_col)   dst->end_col   = src->end_col;
+  ਜੇ(dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ > src->ਸ਼ੁਰੂ_ਪੰਕਤੀ) dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ = src->ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+  ਜੇ(dst->ਸ਼ੁਰੂ_ਖਾਨਾ > src->ਸ਼ੁਰੂ_ਖਾਨਾ) dst->ਸ਼ੁਰੂ_ਖਾਨਾ = src->ਸ਼ੁਰੂ_ਖਾਨਾ;
+  ਜੇ(dst->ਸਿਰਾ_ਪੰਕਤੀ   < src->ਸਿਰਾ_ਪੰਕਤੀ)   dst->ਸਿਰਾ_ਪੰਕਤੀ   = src->ਸਿਰਾ_ਪੰਕਤੀ;
+  ਜੇ(dst->ਸਿਰਾ_ਖਾਨਾ   < src->ਸਿਰਾ_ਖਾਨਾ)   dst->ਸਿਰਾ_ਖਾਨਾ   = src->ਸਿਰਾ_ਖਾਨਾ;
 }
 
 /* Clip the dst to ensure it does not step outside of bounds */
-static void rect_clip(VTermRect *dst, VTermRect *bounds)
+ਸਥਿਰ ਖਾਲੀ rect_clip(VTermRect *dst, VTermRect *bounds)
 {
-  if(dst->start_row < bounds->start_row) dst->start_row = bounds->start_row;
-  if(dst->start_col < bounds->start_col) dst->start_col = bounds->start_col;
-  if(dst->end_row   > bounds->end_row)   dst->end_row   = bounds->end_row;
-  if(dst->end_col   > bounds->end_col)   dst->end_col   = bounds->end_col;
+  ਜੇ(dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ < bounds->ਸ਼ੁਰੂ_ਪੰਕਤੀ) dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ = bounds->ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+  ਜੇ(dst->ਸ਼ੁਰੂ_ਖਾਨਾ < bounds->ਸ਼ੁਰੂ_ਖਾਨਾ) dst->ਸ਼ੁਰੂ_ਖਾਨਾ = bounds->ਸ਼ੁਰੂ_ਖਾਨਾ;
+  ਜੇ(dst->ਸਿਰਾ_ਪੰਕਤੀ   > bounds->ਸਿਰਾ_ਪੰਕਤੀ)   dst->ਸਿਰਾ_ਪੰਕਤੀ   = bounds->ਸਿਰਾ_ਪੰਕਤੀ;
+  ਜੇ(dst->ਸਿਰਾ_ਖਾਨਾ   > bounds->ਸਿਰਾ_ਖਾਨਾ)   dst->ਸਿਰਾ_ਖਾਨਾ   = bounds->ਸਿਰਾ_ਖਾਨਾ;
   /* Ensure it doesn't end up negatively-sized */
-  if(dst->end_row < dst->start_row) dst->end_row = dst->start_row;
-  if(dst->end_col < dst->start_col) dst->end_col = dst->start_col;
+  ਜੇ(dst->ਸਿਰਾ_ਪੰਕਤੀ < dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ) dst->ਸਿਰਾ_ਪੰਕਤੀ = dst->ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+  ਜੇ(dst->ਸਿਰਾ_ਖਾਨਾ < dst->ਸ਼ੁਰੂ_ਖਾਨਾ) dst->ਸਿਰਾ_ਖਾਨਾ = dst->ਸ਼ੁਰੂ_ਖਾਨਾ;
 }
 
 /* True if the two rectangles are equal */
-static int rect_equal(VTermRect *a, VTermRect *b)
+ਸਥਿਰ ਪੂਰਨ rect_equal(VTermRect *a, VTermRect *b)
 {
-  return (a->start_row == b->start_row) &&
-         (a->start_col == b->start_col) &&
-         (a->end_row   == b->end_row)   &&
-         (a->end_col   == b->end_col);
+  ਵਾਪਸ (a->ਸ਼ੁਰੂ_ਪੰਕਤੀ == b->ਸ਼ੁਰੂ_ਪੰਕਤੀ) &&
+         (a->ਸ਼ੁਰੂ_ਖਾਨਾ == b->ਸ਼ੁਰੂ_ਖਾਨਾ) &&
+         (a->ਸਿਰਾ_ਪੰਕਤੀ   == b->ਸਿਰਾ_ਪੰਕਤੀ)   &&
+         (a->ਸਿਰਾ_ਖਾਨਾ   == b->ਸਿਰਾ_ਖਾਨਾ);
 }
 
 /* True if small is contained entirely within big */
-static int rect_contains(VTermRect *big, VTermRect *small)
+ਸਥਿਰ ਪੂਰਨ rect_ਸ਼ਾਮਲ_ਹੈ(VTermRect *big, VTermRect *small)
 {
-  if(small->start_row < big->start_row) return 0;
-  if(small->start_col < big->start_col) return 0;
-  if(small->end_row   > big->end_row)   return 0;
-  if(small->end_col   > big->end_col)   return 0;
-  return 1;
+  ਜੇ(small->ਸ਼ੁਰੂ_ਪੰਕਤੀ < big->ਸ਼ੁਰੂ_ਪੰਕਤੀ) ਵਾਪਸ 0;
+  ਜੇ(small->ਸ਼ੁਰੂ_ਖਾਨਾ < big->ਸ਼ੁਰੂ_ਖਾਨਾ) ਵਾਪਸ 0;
+  ਜੇ(small->ਸਿਰਾ_ਪੰਕਤੀ   > big->ਸਿਰਾ_ਪੰਕਤੀ)   ਵਾਪਸ 0;
+  ਜੇ(small->ਸਿਰਾ_ਖਾਨਾ   > big->ਸਿਰਾ_ਖਾਨਾ)   ਵਾਪਸ 0;
+  ਵਾਪਸ 1;
 }
 
 /* True if the rectangles overlap at all */
-static int rect_intersects(VTermRect *a, VTermRect *b)
+ਸਥਿਰ ਪੂਰਨ rect_intersects(VTermRect *a, VTermRect *b)
 {
-  if(a->start_row > b->end_row || b->start_row > a->end_row)
-    return 0;
-  if(a->start_col > b->end_col || b->start_col > a->end_col)
-    return 0;
-  return 1;
+  ਜੇ(a->ਸ਼ੁਰੂ_ਪੰਕਤੀ > b->ਸਿਰਾ_ਪੰਕਤੀ || b->ਸ਼ੁਰੂ_ਪੰਕਤੀ > a->ਸਿਰਾ_ਪੰਕਤੀ)
+    ਵਾਪਸ 0;
+  ਜੇ(a->ਸ਼ੁਰੂ_ਖਾਨਾ > b->ਸਿਰਾ_ਖਾਨਾ || b->ਸ਼ੁਰੂ_ਖਾਨਾ > a->ਸਿਰਾ_ਖਾਨਾ)
+    ਵਾਪਸ 0;
+  ਵਾਪਸ 1;
 }

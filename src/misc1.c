@@ -11,22 +11,22 @@
  * misc1.c: functions that didn't seem to fit elsewhere
  */
 
-#include "vim.h"
-#include "version.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "version.h"
 
-#if defined(__HAIKU__)
+#ਜੇ defined(__HAIKU__)
 # include <storage/FindDirectory.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 # include <lm.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#define URL_SLASH	1		// path_is_url() has found "://"
-#define URL_BACKSLASH	2		// path_is_url() has found ":\\"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ URL_SLASH	1		// path_is_url() has found "://"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ URL_BACKSLASH	2		// path_is_url() has found ":\\"
 
 // All user names (for ~user completion as done by shell).
-static garray_T	ga_users;
+ਸਥਿਰ garray_T	ga_users;
 
 /*
  * get_leader_len() returns the length in bytes of the prefix of the given
@@ -38,142 +38,142 @@ static garray_T	ga_users;
  * If "include_space" is set, include trailing whitespace while calculating the
  * length.
  */
-    int
+    ਪੂਰਨ
 get_leader_len(
-    char_u	*line,
+    char_u	*ਸਤਰ,
     char_u	**flags,
-    int		backward,
-    int		include_space)
+    ਪੂਰਨ		backward,
+    ਪੂਰਨ		include_space)
 {
-    int		i, j;
-    int		result;
-    int		got_com = FALSE;
-    int		found_one;
+    ਪੂਰਨ		i, j;
+    ਪੂਰਨ		ਨਤੀਜਾ;
+    ਪੂਰਨ		got_com = FALSE;
+    ਪੂਰਨ		ਮਿਲਿਆ_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
     char_u	*string;		// pointer to comment string
     char_u	*list;
-    int		middle_match_len = 0;
+    ਪੂਰਨ		ਵਿਚਕਾਰ_ਮੇਲ_len = 0;
     char_u	*prev_list;
-    char_u	*saved_flags = NULL;
+    char_u	*saved_flags = ਨਿਰਾ;
 
-    result = i = 0;
-    while (VIM_ISWHITE(line[i]))    // leading white space is ignored
+    ਨਤੀਜਾ = i = 0;
+    ਜਦੋਂ (VIM_ISWHITE(ਸਤਰ[i]))    // leading white space is ignored
 	++i;
 
     /*
      * Repeat to match several nested comment strings.
      */
-    while (line[i] != NUL)
+    ਜਦੋਂ (ਸਤਰ[i] != NUL)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	ਮਿਲਿਆ_one = FALSE;
+	ਲਈ (list = curbuf->b_p_com; *list; )
 	{
 	    // Get one option part into part_buf[].  Advance "list" to next
 	    // one.  Put "string" at start of string.
-	    if (!got_com && flags != NULL)
+	    ਜੇ (!got_com && flags != ਨਿਰਾ)
 		*flags = list;	    // remember where flags started
 	    prev_list = list;
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (ਖਾਲੀ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	    // missing ':', ignore this part
-		continue;
+	    ਜੇ (string == ਨਿਰਾ)	    // missing ':', ignore this part
+		ਜਾਰੀ;
 	    *string++ = NUL;	    // isolate flags from string
 
 	    // If we found a middle match previously, use that match when this
 	    // is not a middle or end.
-	    if (middle_match_len != 0
-		    && vim_strchr(part_buf, COM_MIDDLE) == NULL
-		    && vim_strchr(part_buf, COM_END) == NULL)
-		break;
+	    ਜੇ (ਵਿਚਕਾਰ_ਮੇਲ_len != 0
+		    && vim_strchr(part_buf, COM_ਵਿਚਕਾਰ) == ਨਿਰਾ
+		    && vim_strchr(part_buf, COM_ਸਿਰਾ) == ਨਿਰਾ)
+		ਰੋਕੋ;
 
 	    // When we already found a nested comment, only accept further
 	    // nested comments.
-	    if (got_com && vim_strchr(part_buf, COM_NEST) == NULL)
-		continue;
+	    ਜੇ (got_com && vim_strchr(part_buf, COM_NEST) == ਨਿਰਾ)
+		ਜਾਰੀ;
 
 	    // When 'O' flag present and using "O" command skip this one.
-	    if (backward && vim_strchr(part_buf, COM_NOBACK) != NULL)
-		continue;
+	    ਜੇ (backward && vim_strchr(part_buf, COM_NOBACK) != ਨਿਰਾ)
+		ਜਾਰੀ;
 
 	    // Line contents and string must match.
 	    // When string starts with white space, must have some white space
 	    // (but the amount does not need to match, there might be a mix of
 	    // TABs and spaces).
-	    if (VIM_ISWHITE(string[0]))
+	    ਜੇ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;  // missing white space
-		while (VIM_ISWHITE(string[0]))
+		ਜੇ (i == 0 || !VIM_ISWHITE(ਸਤਰ[i - 1]))
+		    ਜਾਰੀ;  // missing white space
+		ਜਦੋਂ (VIM_ISWHITE(string[0]))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    ਲਈ (j = 0; string[j] != NUL && string[j] == ਸਤਰ[i + j]; ++j)
 		;
-	    if (string[j] != NUL)
-		continue;  // string doesn't match
+	    ਜੇ (string[j] != NUL)
+		ਜਾਰੀ;  // string doesn't match
 
 	    // When 'b' flag used, there must be white space or an
 	    // end-of-line after the string in the line.
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-			   && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ਜੇ (vim_strchr(part_buf, COM_BLANK) != ਨਿਰਾ
+			   && !VIM_ISWHITE(ਸਤਰ[i + j]) && ਸਤਰ[i + j] != NUL)
+		ਜਾਰੀ;
 
 	    // We have found a match, stop searching unless this is a middle
 	    // comment. The middle comment can be a substring of the end
 	    // comment in which case it's better to return the length of the
 	    // end comment and its flags.  Thus we keep searching with middle
 	    // and end matches and use an end match if it matches better.
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ਜੇ (vim_strchr(part_buf, COM_ਵਿਚਕਾਰ) != ਨਿਰਾ)
 	    {
-		if (middle_match_len == 0)
+		ਜੇ (ਵਿਚਕਾਰ_ਮੇਲ_len == 0)
 		{
-		    middle_match_len = j;
+		    ਵਿਚਕਾਰ_ਮੇਲ_len = j;
 		    saved_flags = prev_list;
 		}
-		continue;
+		ਜਾਰੀ;
 	    }
-	    if (middle_match_len != 0 && j > middle_match_len)
+	    ਜੇ (ਵਿਚਕਾਰ_ਮੇਲ_len != 0 && j > ਵਿਚਕਾਰ_ਮੇਲ_len)
 		// Use this match instead of the middle match, since it's a
 		// longer thus better match.
-		middle_match_len = 0;
+		ਵਿਚਕਾਰ_ਮੇਲ_len = 0;
 
-	    if (middle_match_len == 0)
+	    ਜੇ (ਵਿਚਕਾਰ_ਮੇਲ_len == 0)
 		i += j;
-	    found_one = TRUE;
-	    break;
+	    ਮਿਲਿਆ_one = TRUE;
+	    ਰੋਕੋ;
 	}
 
-	if (middle_match_len != 0)
+	ਜੇ (ਵਿਚਕਾਰ_ਮੇਲ_len != 0)
 	{
 	    // Use the previously found middle match after failing to find a
 	    // match with an end.
-	    if (!got_com && flags != NULL)
+	    ਜੇ (!got_com && flags != ਨਿਰਾ)
 		*flags = saved_flags;
-	    i += middle_match_len;
-	    found_one = TRUE;
+	    i += ਵਿਚਕਾਰ_ਮੇਲ_len;
+	    ਮਿਲਿਆ_one = TRUE;
 	}
 
 	// No match found, stop scanning.
-	if (!found_one)
-	    break;
+	ਜੇ (!ਮਿਲਿਆ_one)
+	    ਰੋਕੋ;
 
-	result = i;
+	ਨਤੀਜਾ = i;
 
 	// Include any trailing white space.
-	while (VIM_ISWHITE(line[i]))
+	ਜਦੋਂ (VIM_ISWHITE(ਸਤਰ[i]))
 	    ++i;
 
-	if (include_space)
-	    result = i;
+	ਜੇ (include_space)
+	    ਨਤੀਜਾ = i;
 
 	// If this comment doesn't nest, stop here.
 	got_com = TRUE;
-	if (vim_strchr(part_buf, COM_NEST) == NULL)
-	    break;
+	ਜੇ (vim_strchr(part_buf, COM_NEST) == ਨਿਰਾ)
+	    ਰੋਕੋ;
     }
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
@@ -183,30 +183,30 @@ get_leader_len(
  * When "flags" is not null, it is set to point to the flags describing the
  * recognized comment leader.
  */
-    int
-get_last_leader_offset(char_u *line, char_u **flags)
+    ਪੂਰਨ
+get_ਆਖਰੀ_leader_ਵਿੱਥ(char_u *ਸਤਰ, char_u **flags)
 {
-    int		result = -1;
-    int		i, j;
-    int		lower_check_bound = 0;
+    ਪੂਰਨ		ਨਤੀਜਾ = -1;
+    ਪੂਰਨ		i, j;
+    ਪੂਰਨ		ਹੇਠਲਾ_check_bound = 0;
     char_u	*string;
     char_u	*com_leader;
     char_u	*com_flags;
     char_u	*list;
-    int		found_one;
+    ਪੂਰਨ		ਮਿਲਿਆ_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
 
     /*
      * Repeat to match several nested comment strings.
      */
-    i = (int)STRLEN(line);
-    while (--i >= lower_check_bound)
+    i = (ਪੂਰਨ)STRLEN(ਸਤਰ);
+    ਜਦੋਂ (--i >= ਹੇਠਲਾ_check_bound)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
-	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	ਮਿਲਿਆ_one = FALSE;
+	ਲਈ (list = curbuf->b_p_com; *list; )
 	{
 	    char_u *flags_save = list;
 
@@ -214,11 +214,11 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * Get one option part into part_buf[].  Advance list to next one.
 	     * put string at start of string.
 	     */
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (ਖਾਲੀ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	// If everything is fine, this cannot actually
+	    ਜੇ (string == ਨਿਰਾ)	// If everything is fine, this cannot actually
 				// happen.
-		continue;
+		ਜਾਰੀ;
 	    *string++ = NUL;	// Isolate flags from string.
 	    com_leader = string;
 
@@ -228,126 +228,126 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * (but the amount does not need to match, there might be a mix of
 	     * TABs and spaces).
 	     */
-	    if (VIM_ISWHITE(string[0]))
+	    ਜੇ (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;
-		while (VIM_ISWHITE(*string))
+		ਜੇ (i == 0 || !VIM_ISWHITE(ਸਤਰ[i - 1]))
+		    ਜਾਰੀ;
+		ਜਦੋਂ (VIM_ISWHITE(*string))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    ਲਈ (j = 0; string[j] != NUL && string[j] == ਸਤਰ[i + j]; ++j)
 		/* do nothing */;
-	    if (string[j] != NUL)
-		continue;
+	    ਜੇ (string[j] != NUL)
+		ਜਾਰੀ;
 
 	    /*
 	     * When 'b' flag used, there must be white space or an
 	     * end-of-line after the string in the line.
 	     */
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-		    && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    ਜੇ (vim_strchr(part_buf, COM_BLANK) != ਨਿਰਾ
+		    && !VIM_ISWHITE(ਸਤਰ[i + j]) && ਸਤਰ[i + j] != NUL)
+		ਜਾਰੀ;
 
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    ਜੇ (vim_strchr(part_buf, COM_ਵਿਚਕਾਰ) != ਨਿਰਾ)
 	    {
 		// For a middlepart comment, only consider it to match if
 		// everything before the current position in the line is
 		// whitespace.  Otherwise we would think we are inside a
 		// comment if the middle part appears somewhere in the middle
 		// of the line.  E.g. for C the "*" appears often.
-		for (j = 0; VIM_ISWHITE(line[j]) && j <= i; j++)
+		ਲਈ (j = 0; VIM_ISWHITE(ਸਤਰ[j]) && j <= i; j++)
 		    ;
-		if (j < i)
-		    continue;
+		ਜੇ (j < i)
+		    ਜਾਰੀ;
 	    }
 
 	    /*
 	     * We have found a match, stop searching.
 	     */
-	    found_one = TRUE;
+	    ਮਿਲਿਆ_one = TRUE;
 
-	    if (flags)
+	    ਜੇ (flags)
 		*flags = flags_save;
 	    com_flags = flags_save;
 
-	    break;
+	    ਰੋਕੋ;
 	}
 
-	if (found_one)
+	ਜੇ (ਮਿਲਿਆ_one)
 	{
 	    char_u  part_buf2[COM_MAX_LEN];	// buffer for one option part
-	    int     len1, len2, off;
+	    ਪੂਰਨ     len1, len2, off;
 
-	    result = i;
+	    ਨਤੀਜਾ = i;
 	    /*
 	     * If this comment nests, continue searching.
 	     */
-	    if (vim_strchr(part_buf, COM_NEST) != NULL)
-		continue;
+	    ਜੇ (vim_strchr(part_buf, COM_NEST) != ਨਿਰਾ)
+		ਜਾਰੀ;
 
-	    lower_check_bound = i;
+	    ਹੇਠਲਾ_check_bound = i;
 
 	    // Let's verify whether the comment leader found is a substring
 	    // of other comment leaders. If it is, let's adjust the
 	    // lower_check_bound so that we make sure that we have determined
 	    // the comment leader correctly.
 
-	    while (VIM_ISWHITE(*com_leader))
+	    ਜਦੋਂ (VIM_ISWHITE(*com_leader))
 		++com_leader;
-	    len1 = (int)STRLEN(com_leader);
+	    len1 = (ਪੂਰਨ)STRLEN(com_leader);
 
-	    for (list = curbuf->b_p_com; *list; )
+	    ਲਈ (list = curbuf->b_p_com; *list; )
 	    {
 		char_u *flags_save = list;
 
-		(void)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
-		if (flags_save == com_flags)
-		    continue;
+		(ਖਾਲੀ)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
+		ਜੇ (flags_save == com_flags)
+		    ਜਾਰੀ;
 		string = vim_strchr(part_buf2, ':');
 		++string;
-		while (VIM_ISWHITE(*string))
+		ਜਦੋਂ (VIM_ISWHITE(*string))
 		    ++string;
-		len2 = (int)STRLEN(string);
-		if (len2 == 0)
-		    continue;
+		len2 = (ਪੂਰਨ)STRLEN(string);
+		ਜੇ (len2 == 0)
+		    ਜਾਰੀ;
 
 		// Now we have to verify whether string ends with a substring
 		// beginning the com_leader.
-		for (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
+		ਲਈ (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
 		{
 		    --off;
-		    if (STRNCMP(string + off, com_leader, len2 - off) == 0)
+		    ਜੇ (STRNCMP(string + off, com_leader, len2 - off) == 0)
 		    {
-			if (i - off < lower_check_bound)
-			    lower_check_bound = i - off;
+			ਜੇ (i - off < ਹੇਠਲਾ_check_bound)
+			    ਹੇਠਲਾ_check_bound = i - off;
 		    }
 		}
 	    }
 	}
     }
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /*
  * Return the number of window lines occupied by buffer line "lnum".
  * Includes any filler lines.
  */
-    int
+    ਪੂਰਨ
 plines(linenr_T lnum)
 {
-    return plines_win(curwin, lnum, TRUE);
+    ਵਾਪਸ plines_win(curwin, lnum, TRUE);
 }
 
-    int
+    ਪੂਰਨ
 plines_win(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    ਪੂਰਨ		ਹੱਦਬੰਦੀ_winheight)	// when TRUE limit to window height
 {
-#if defined(FEAT_DIFF)
+#ਜੇ defined(FEAT_DIFF)
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    return plines_win_nofill(wp, lnum, limit_winheight)
+    ਵਾਪਸ plines_win_nofill(wp, lnum, ਹੱਦਬੰਦੀ_winheight)
 						   + diff_check_fill(wp, lnum);
 }
 
@@ -355,120 +355,120 @@ plines_win(
  * Return the number of window lines occupied by buffer line "lnum".
  * Does not include filler lines.
  */
-    int
+    ਪੂਰਨ
 plines_nofill(linenr_T lnum)
 {
-    return plines_win_nofill(curwin, lnum, TRUE);
+    ਵਾਪਸ plines_win_nofill(curwin, lnum, TRUE);
 }
 
-    int
+    ਪੂਰਨ
 plines_win_nofill(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    ਪੂਰਨ		ਹੱਦਬੰਦੀ_winheight)	// when TRUE limit to window height
 {
-#endif
-    int		lines;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		ਸਤਰਾਂ;
 
-    if (wp->w_width == 0)
-	return 1;
+    ਜੇ (wp->w_ਚੌੜਾਈ == 0)
+	ਵਾਪਸ 1;
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
     // Folded lines are handled just like an empty line.
     // NOTE: Caller must handle lines that are MAYBE folded.
-    if (lineFolded(wp, lnum) == TRUE)
-	return 1;
-#endif
+    ਜੇ (ਸਤਰ_Folded(wp, lnum) == TRUE)
+	ਵਾਪਸ 1;
+#ਜੇ_ਅੰਤ
 
-    if (!wp->w_p_wrap)
-	lines = 1
-#ifdef FEAT_PROP_POPUP
+    ਜੇ (!wp->w_p_wrap)
+	ਸਤਰਾਂ = 1
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 	    // add a line for each "above" and "below" aligned text property
-	    + prop_count_above_below(wp->w_buffer, lnum)
-#endif
+	    + prop_ਗਿਣਤੀ_above_ਹੇਠਾਂ(wp->w_ਬਫਰ, lnum)
+#ਜੇ_ਅੰਤ
 	;
-    else
-	lines = plines_win_nofold(wp, lnum);
+    ਨਹੀਂਤਾਂ
+	ਸਤਰਾਂ = plines_win_nofold(wp, lnum);
 
-    if (limit_winheight && lines > wp->w_height)
-	return wp->w_height;
-    return lines;
+    ਜੇ (ਹੱਦਬੰਦੀ_winheight && ਸਤਰਾਂ > wp->w_ਉਚਾਈ)
+	ਵਾਪਸ wp->w_ਉਚਾਈ;
+    ਵਾਪਸ ਸਤਰਾਂ;
 }
 
 /*
  * Return number of window lines physical line "lnum" will occupy in window
  * "wp".  Does not care about folding, 'wrap' or 'diff'.
  */
-    int
+    ਪੂਰਨ
 plines_win_nofold(win_T *wp, linenr_T lnum)
 {
     char_u	*s;
-    long	col;
-    int		width;
+    ਲੰਮਾ	ਖਾਨਾ;
+    ਪੂਰਨ		ਚੌੜਾਈ;
     chartabsize_T cts;
 
-    s = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    s = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
     init_chartabsize_arg(&cts, wp, lnum, 0, s, s);
-    if (*s == NUL
-#ifdef FEAT_PROP_POPUP
-	    && !cts.cts_has_prop_with_text
-#endif
+    ਜੇ (*s == NUL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    && !cts.cts_has_prop_with_ਪਾਠ
+#ਜੇ_ਅੰਤ
 	    )
-	return 1; // be quick for an empty line
+	ਵਾਪਸ 1; // be quick for an empty line
     win_linetabsize_cts(&cts, (colnr_T)MAXCOL);
     clear_chartabsize_arg(&cts);
-    col = (int)cts.cts_vcol;
+    ਖਾਨਾ = (ਪੂਰਨ)cts.cts_vcol;
 
     // If list mode is on, then the '$' at the end of the line may take up one
     // extra column.
-    if (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
-	col += 1;
+    ਜੇ (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
+	ਖਾਨਾ += 1;
 
     /*
      * Add column offset for 'number', 'relativenumber' and 'foldcolumn'.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 32000;
-    if (col <= width)
-	return 1;
-    col -= width;
-    width += win_col_off2(wp);
-    return (col + (width - 1)) / width + 1;
+    ਚੌੜਾਈ = wp->w_ਚੌੜਾਈ - win_ਖਾਨਾ_off(wp);
+    ਜੇ (ਚੌੜਾਈ <= 0)
+	ਵਾਪਸ 32000;
+    ਜੇ (ਖਾਨਾ <= ਚੌੜਾਈ)
+	ਵਾਪਸ 1;
+    ਖਾਨਾ -= ਚੌੜਾਈ;
+    ਚੌੜਾਈ += win_ਖਾਨਾ_off2(wp);
+    ਵਾਪਸ (ਖਾਨਾ + (ਚੌੜਾਈ - 1)) / ਚੌੜਾਈ + 1;
 }
 
 /*
  * Like plines_win(), but only reports the number of physical screen lines
  * used from the start of the line to the given byte column.
  */
-    int
-plines_win_col(win_T *wp, linenr_T lnum, long column)
+    ਪੂਰਨ
+plines_win_ਖਾਨਾ(win_T *wp, linenr_T lnum, ਲੰਮਾ ਕਾਲਮ)
 {
-    long	col;
-    int		lines = 0;
-    int		width;
-    char_u	*line;
+    ਲੰਮਾ	ਖਾਨਾ;
+    ਪੂਰਨ		ਸਤਰਾਂ = 0;
+    ਪੂਰਨ		ਚੌੜਾਈ;
+    char_u	*ਸਤਰ;
     chartabsize_T cts;
 
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    lines = diff_check_fill(wp, lnum);
-#endif
+    ਸਤਰਾਂ = diff_check_fill(wp, lnum);
+#ਜੇ_ਅੰਤ
 
-    if (!wp->w_p_wrap)
-	return lines + 1;
+    ਜੇ (!wp->w_p_wrap)
+	ਵਾਪਸ ਸਤਰਾਂ + 1;
 
-    if (wp->w_width == 0)
-	return lines + 1;
+    ਜੇ (wp->w_ਚੌੜਾਈ == 0)
+	ਵਾਪਸ ਸਤਰਾਂ + 1;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, ਸਤਰ, ਸਤਰ);
     // "column" is a byte index, advance the pointer until it is reached.
-    while (*cts.cts_ptr != NUL && cts.cts_ptr < line + column)
+    ਜਦੋਂ (*cts.cts_ptr != NUL && cts.cts_ptr < ਸਤਰ + ਕਾਲਮ)
     {
-	cts.cts_vcol += win_lbr_chartabsize(&cts, NULL, NULL);
+	cts.cts_vcol += win_lbr_chartabsize(&cts, ਨਿਰਾ, ਨਿਰਾ);
 	MB_PTR_ADV(cts.cts_ptr);
     }
 
@@ -479,23 +479,23 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
      * error when the TAB wraps from one screen line to the next (when
      * 'columns' is not a multiple of 'ts') -- webb.
      */
-    col = cts.cts_vcol;
-    if (*cts.cts_ptr == TAB && (State & MODE_NORMAL)
+    ਖਾਨਾ = cts.cts_vcol;
+    ਜੇ (*cts.cts_ptr == TAB && (State & ਬਹੁਲਕ_ਸਾਧਾਰਨ)
 				    && (!wp->w_p_list || wp->w_lcs_chars.tab1))
-	col += win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+	ਖਾਨਾ += win_lbr_chartabsize(&cts, ਨਿਰਾ, ਨਿਰਾ) - 1;
     clear_chartabsize_arg(&cts);
 
     /*
      * Add column offset for 'number', 'relativenumber', 'foldcolumn', etc.
      */
-    width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 9999;
+    ਚੌੜਾਈ = wp->w_ਚੌੜਾਈ - win_ਖਾਨਾ_off(wp);
+    ਜੇ (ਚੌੜਾਈ <= 0)
+	ਵਾਪਸ 9999;
 
-    lines += 1;
-    if (col > width)
-	lines += (col - width) / (width + win_col_off2(wp)) + 1;
-    return lines;
+    ਸਤਰਾਂ += 1;
+    ਜੇ (ਖਾਨਾ > ਚੌੜਾਈ)
+	ਸਤਰਾਂ += (ਖਾਨਾ - ਚੌੜਾਈ) / (ਚੌੜਾਈ + win_ਖਾਨਾ_off2(wp)) + 1;
+    ਵਾਪਸ ਸਤਰਾਂ;
 }
 
 /*
@@ -503,127 +503,127 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
  * "last" will occupy in window "wp". Takes into account folding, 'wrap',
  * topfill and filler lines beyond the end of the buffer. Limit to "max" lines.
  */
-    int
-plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
+    ਪੂਰਨ
+plines_m_win(win_T *wp, linenr_T ਪਹਿਲਾ, linenr_T ਆਖਰੀ, ਪੂਰਨ max)
 {
-    int		count = 0;
+    ਪੂਰਨ		ਗਿਣਤੀ_2 = 0;
 
-    while (first <= last && count < max)
+    ਜਦੋਂ (ਪਹਿਲਾ <= ਆਖਰੀ && ਗਿਣਤੀ_2 < max)
     {
-#ifdef FEAT_FOLDING
-	int	x;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	ਪੂਰਨ	x;
 
 	// Check if there are any really folded lines, but also included lines
 	// that are maybe folded.
-	x = foldedCount(wp, first, NULL);
-	if (x > 0)
+	x = folded_ਗਿਣਤੀ(wp, ਪਹਿਲਾ, ਨਿਰਾ);
+	ਜੇ (x > 0)
 	{
-	    ++count;	    // count 1 for "+-- folded" line
-	    first += x;
+	    ++ਗਿਣਤੀ_2;	    // count 1 for "+-- folded" line
+	    ਪਹਿਲਾ += x;
 	}
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	{
-#ifdef FEAT_DIFF
-	    if (first == wp->w_topline)
-		count += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
-	    else
-#endif
-		count += plines_win(wp, first, FALSE);
-	    ++first;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+	    ਜੇ (ਪਹਿਲਾ == wp->w_topline)
+		ਗਿਣਤੀ_2 += plines_win_nofill(wp, ਪਹਿਲਾ, FALSE) + wp->w_topfill;
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		ਗਿਣਤੀ_2 += plines_win(wp, ਪਹਿਲਾ, FALSE);
+	    ++ਪਹਿਲਾ;
 	}
     }
-#ifdef FEAT_DIFF
-    if (first == wp->w_buffer->b_ml.ml_line_count + 1)
-	count += diff_check_fill(wp, first);
-#endif
-    return MIN(max, count);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+    ਜੇ (ਪਹਿਲਾ == wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1)
+	ਗਿਣਤੀ_2 += diff_check_fill(wp, ਪਹਿਲਾ);
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ MIN(max, ਗਿਣਤੀ_2);
 }
 
-    int
+    ਪੂਰਨ
 gchar_pos(pos_T *pos)
 {
     char_u	*ptr;
-    int		ptrlen;
+    ਪੂਰਨ		ptrlen;
 
     // When searching columns is sometimes put at the end of a line.
-    if (pos->col == MAXCOL)
-	return NUL;
+    ਜੇ (pos->ਖਾਨਾ == MAXCOL)
+	ਵਾਪਸ NUL;
     ptrlen = ml_get_len(pos->lnum);
     ptr = ml_get_pos(pos);
-    if (pos->col > ptrlen)
-	return NUL;
-    if (has_mbyte)
-	return (*mb_ptr2char)(ptr);
-    return (int)*ptr;
+    ਜੇ (pos->ਖਾਨਾ > ptrlen)
+	ਵਾਪਸ NUL;
+    ਜੇ (has_mbyte)
+	ਵਾਪਸ (*mb_ptr2char)(ptr);
+    ਵਾਪਸ (ਪੂਰਨ)*ptr;
 }
 
-    int
-gchar_cursor(void)
+    ਪੂਰਨ
+gchar_cursor(ਖਾਲੀ)
 {
-    if (has_mbyte)
-	return (*mb_ptr2char)(ml_get_cursor());
-    return (int)*ml_get_cursor();
+    ਜੇ (has_mbyte)
+	ਵਾਪਸ (*mb_ptr2char)(ml_get_cursor());
+    ਵਾਪਸ (ਪੂਰਨ)*ml_get_cursor();
 }
 
 /*
  * Return the character immediately before the cursor.
  */
-    int
-char_before_cursor(void)
+    ਪੂਰਨ
+char_before_cursor(ਖਾਲੀ)
 {
-    if (curwin->w_cursor.col == 0)
-	return -1;
+    ਜੇ (curwin->w_cursor.ਖਾਨਾ == 0)
+	ਵਾਪਸ -1;
 
-    char_u *line = ml_get_curline();
+    char_u *ਸਤਰ = ml_get_curline();
 
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
-	char_u *p = line + curwin->w_cursor.col;
-	int prev_len = (*mb_head_off)(line, p - 1) + 1;
-	return mb_ptr2char(p - prev_len);
+	char_u *p = ਸਤਰ + curwin->w_cursor.ਖਾਨਾ;
+	ਪੂਰਨ prev_len = (*mb_ਸਿਰ_off)(ਸਤਰ, p - 1) + 1;
+	ਵਾਪਸ mb_ptr2char(p - prev_len);
     }
-    return line[curwin->w_cursor.col - 1];
+    ਵਾਪਸ ਸਤਰ[curwin->w_cursor.ਖਾਨਾ - 1];
 }
 
 /*
  * Write a character at the current cursor position.
  * It is directly written into the block.
  */
-    void
-pchar_cursor(int c)
+    ਖਾਲੀ
+pchar_cursor(ਪੂਰਨ c)
 {
     *(ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE)
-						  + curwin->w_cursor.col) = c;
+						  + curwin->w_cursor.ਖਾਨਾ) = c;
 }
 
 /*
  * Skip to next part of an option argument: Skip space and comma.
  */
     char_u *
-skip_to_option_part(char_u *p)
+skip_ਮੰਜ਼ਿਲ_option_part(char_u *p)
 {
-    if (*p == ',')
+    ਜੇ (*p == ',')
 	++p;
-    while (*p == ' ')
+    ਜਦੋਂ (*p == ' ')
 	++p;
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
  * check_status: called when the status bars for the buffer 'buf'
  *		 need to be updated
  */
-    void
-check_status(buf_T *buf)
+    ਖਾਲੀ
+check_ਸਥਿਤੀ(buf_T *buf)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf && wp->w_status_height)
+	ਜੇ (wp->w_ਬਫਰ == buf && wp->w_ਸਥਿਤੀ_ਉਚਾਈ)
 	{
-	    wp->w_redr_status = true;
-	    set_must_redraw(UPD_VALID);
+	    wp->w_redr_ਸਥਿਤੀ = true;
+	    ਸੈੱਟ_must_redraw(UPD_VALID);
 	}
 }
 
@@ -637,46 +637,46 @@ check_status(buf_T *buf)
  *
  * return the 'y' or 'n'
  */
-    int
-ask_yesno(char_u *str, int direct)
+    ਪੂਰਨ
+ask_yesno(char_u *str, ਪੂਰਨ ਸਿੱਧਾ)
 {
-    int	    r = ' ';
-    int	    save_State = State;
+    ਪੂਰਨ	    r = ' ';
+    ਪੂਰਨ	    save_State = State;
 
-    if (exiting)		// put terminal in raw mode for this question
+    ਜੇ (exiting)		// put terminal in raw mode for this question
 	settmode(TMODE_RAW);
     ++no_wait_return;
-#ifdef USE_ON_FLY_SCROLL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
-    State = MODE_CONFIRM;	// mouse behaves like with :confirm
+#ਜੇ_ਅੰਤ
+    State = ਬਹੁਲਕ_CONFIRM;	// mouse behaves like with :confirm
     setmouse();			// disables mouse for xterm
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_ਕੁੰਜੀਆਂ;		// no mapping here, but recognize keys
 
-    while (r != 'y' && r != 'n')
+    ਜਦੋਂ (r != 'y' && r != 'n')
     {
 	// same highlighting as for wait_return()
 	smsg_attr(HL_ATTR(HLF_R), "%s (y/n)?", str);
-	if (direct)
+	ਜੇ (ਸਿੱਧਾ)
 	    r = get_keystroke();
-	else
+	ਨਹੀਂਤਾਂ
 	    r = plain_vgetc();
-	if (r == Ctrl_C || r == ESC)
+	ਜੇ (r == Ctrl_C || r == ESC)
 	    r = 'n';
-	msg_putchar(r);	    // show what you typed
-	out_flush();
+	ਸੁਨੇਹਾ_putchar(r);	    // show what you typed
+	ਬਾਹਰਲਾ_flush();
     }
     --no_wait_return;
     State = save_State;
     setmouse();
     --no_mapping;
-    --allow_keys;
+    --allow_ਕੁੰਜੀਆਂ;
 
-    return r;
+    ਵਾਪਸ r;
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 /*
  * Returns the current mode as a string in "buf[MODE_MAX_LENGTH]", NUL
@@ -684,96 +684,96 @@ ask_yesno(char_u *str, int direct)
  * The first character represents the major mode, the following ones the minor
  * ones.
  */
-    void
-get_mode(char_u *buf)
+    ਖਾਲੀ
+get_ਬਹੁਲਕ(char_u *buf)
 {
-    int		i = 0;
+    ਪੂਰਨ		i = 0;
 
-    if (time_for_testing == 93784)
+    ਜੇ (ਸਮਾਂ_for_testing == 93784)
     {
 	// Testing the two-character code.
 	buf[i++] = 'x';
 	buf[i++] = '!';
     }
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_use_loop())
     {
-	if (State & MODE_CMDLINE)
+	ਜੇ (State & ਬਹੁਲਕ_CMDLINE)
 	    buf[i++] = 'c';
 	buf[i++] = 't';
     }
 # endif
-    else if (State == MODE_HITRETURN || State == MODE_ASKMORE
-						      || State == MODE_SETWSIZE
-		|| State == MODE_CONFIRM)
+    ਨਹੀਂਤਾਂ ਜੇ (State == ਬਹੁਲਕ_HITRETURN || State == ਬਹੁਲਕ_ASKMORE
+						      || State == ਬਹੁਲਕ_SETWSIZE
+		|| State == ਬਹੁਲਕ_CONFIRM)
     {
 	buf[i++] = 'r';
-	if (State == MODE_ASKMORE)
+	ਜੇ (State == ਬਹੁਲਕ_ASKMORE)
 	    buf[i++] = 'm';
-	else if (State == MODE_CONFIRM)
+	ਨਹੀਂਤਾਂ ਜੇ (State == ਬਹੁਲਕ_CONFIRM)
 	    buf[i++] = '?';
     }
-    else if (State == MODE_EXTERNCMD)
+    ਨਹੀਂਤਾਂ ਜੇ (State == ਬਹੁਲਕ_EXTERNCMD)
 	buf[i++] = '!';
-    else if (State & MODE_INSERT)
+    ਨਹੀਂਤਾਂ ਜੇ (State & ਬਹੁਲਕ_ਪਾਓ)
     {
-	if (State & VREPLACE_FLAG)
+	ਜੇ (State & VREPLACE_FLAG)
 	{
 	    buf[i++] = 'R';
 	    buf[i++] = 'v';
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (State & REPLACE_FLAG)
+	    ਜੇ (State & REPLACE_FLAG)
 		buf[i++] = 'R';
-	    else
+	    ਨਹੀਂਤਾਂ
 		buf[i++] = 'i';
 	}
 
-	if (ins_compl_active())
+	ਜੇ (ins_compl_ਸਰਗਰਮ())
 	    buf[i++] = 'c';
-	else if (ctrl_x_mode_not_defined_yet())
+	ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_not_defined_yet())
 	    buf[i++] = 'x';
     }
-    else if ((State & MODE_CMDLINE) || exmode_active)
+    ਨਹੀਂਤਾਂ ਜੇ ((State & ਬਹੁਲਕ_CMDLINE) || exmode_ਸਰਗਰਮ)
     {
 	buf[i++] = 'c';
-	if (exmode_active == EXMODE_VIM)
+	ਜੇ (exmode_ਸਰਗਰਮ == EXMODE_VIM)
 	    buf[i++] = 'v';
-	else if (exmode_active == EXMODE_NORMAL)
+	ਨਹੀਂਤਾਂ ਜੇ (exmode_ਸਰਗਰਮ == EXMODE_ਸਾਧਾਰਨ)
 	    buf[i++] = 'e';
-	if ((State & MODE_CMDLINE) && cmdline_overstrike())
+	ਜੇ ((State & ਬਹੁਲਕ_CMDLINE) && cmdline_overstrike())
 	    buf[i++] = 'r';
     }
-    else if (VIsual_active)
+    ਨਹੀਂਤਾਂ ਜੇ (VIsual_ਸਰਗਰਮ)
     {
-	if (VIsual_select)
-	    buf[i++] = VIsual_mode + 's' - 'v';
-	else
+	ਜੇ (VIsual_select)
+	    buf[i++] = VIsual_ਬਹੁਲਕ + 's' - 'v';
+	ਨਹੀਂਤਾਂ
 	{
-	    buf[i++] = VIsual_mode;
-	    if (restart_VIsual_select)
+	    buf[i++] = VIsual_ਬਹੁਲਕ;
+	    ਜੇ (restart_VIsual_select)
 		buf[i++] = 's';
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	buf[i++] = 'n';
-	if (finish_op)
+	ਜੇ (ਅੰਤ_op)
 	{
 	    buf[i++] = 'o';
 	    // to be able to detect force-linewise/blockwise/characterwise
 	    // operations
 	    buf[i++] = motion_force;
 	}
-	else if (restart_edit == 'I' || restart_edit == 'R'
+	ਨਹੀਂਤਾਂ ਜੇ (restart_edit == 'I' || restart_edit == 'R'
 							|| restart_edit == 'V')
 	{
 	    buf[i++] = 'i';
 	    buf[i++] = restart_edit;
 	}
 # ifdef FEAT_TERMINAL
-	else if (term_in_normal_mode(curbuf))
+	ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_ਵਿੱਚ_ਸਾਧਾਰਨ_ਬਹੁਲਕ(curbuf))
 	    buf[i++] = 't';
 # endif
     }
@@ -784,74 +784,74 @@ get_mode(char_u *buf)
 /*
  * "mode()" function
  */
-    void
-f_mode(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ਬਹੁਲਕ(typval_T *argvars, typval_T *rettv)
 {
-    char_u	buf[MODE_MAX_LENGTH];
+    char_u	buf[ਬਹੁਲਕ_MAX_ਲੰਮਾਈ];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    get_mode(buf);
+    get_ਬਹੁਲਕ(buf);
 
     // Clear out the minor mode when the argument is not a non-zero number or
     // non-empty string.
-    if (!non_zero_arg(&argvars[0]))
+    ਜੇ (!non_zero_arg(&argvars[0]))
 	buf[1] = NUL;
 
     rettv->vval.v_string = vim_strsave(buf);
     rettv->v_type = VAR_STRING;
 }
 
-    static void
-may_add_state_char(garray_T *gap, char_u *include, int c)
+    ਸਥਿਰ ਖਾਲੀ
+may_ਜੋੜੋ_state_char(garray_T *gap, char_u *include, ਪੂਰਨ c)
 {
-    if (include == NULL || vim_strchr(include, c) != NULL)
+    ਜੇ (include == ਨਿਰਾ || vim_strchr(include, c) != ਨਿਰਾ)
 	ga_append(gap, c);
 }
 
 /*
  * "state()" function
  */
-    void
+    ਖਾਲੀ
 f_state(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    char_u	*include = NULL;
-    int		i;
+    char_u	*include = ਨਿਰਾ;
+    ਪੂਰਨ		i;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     ga_init2(&ga, 1, 20);
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
 	include = tv_get_string(&argvars[0]);
 
-    if (!(stuff_empty() && typebuf.tb_len == 0 && scriptin[curscript] == NULL))
-	may_add_state_char(&ga, include, 'm');
-    if (op_pending())
-	may_add_state_char(&ga, include, 'o');
-    if (autocmd_busy)
-	may_add_state_char(&ga, include, 'x');
-    if (ins_compl_active())
-	may_add_state_char(&ga, include, 'a');
+    ਜੇ (!(stuff_ਖਾਲੀ_ਥਾਵਾਂ() && typebuf.tb_len == 0 && scriptin[curscript] == ਨਿਰਾ))
+	may_ਜੋੜੋ_state_char(&ga, include, 'm');
+    ਜੇ (op_pending())
+	may_ਜੋੜੋ_state_char(&ga, include, 'o');
+    ਜੇ (autocmd_busy)
+	may_ਜੋੜੋ_state_char(&ga, include, 'x');
+    ਜੇ (ins_compl_ਸਰਗਰਮ())
+	may_ਜੋੜੋ_state_char(&ga, include, 'a');
 
-# ifdef FEAT_JOB_CHANNEL
-    if (channel_in_blocking_wait())
-	may_add_state_char(&ga, include, 'w');
+# ifdef FEAT_ਕੰਮ_CHANNEL
+    ਜੇ (channel_ਵਿੱਚ_blocking_wait())
+	may_ਜੋੜੋ_state_char(&ga, include, 'w');
 # endif
-    if (!get_was_safe_state())
-	may_add_state_char(&ga, include, 'S');
-    for (i = 0; i < get_callback_depth() && i < 3; ++i)
-	may_add_state_char(&ga, include, 'c');
-    if (msg_scrolled > 0)
-	may_add_state_char(&ga, include, 's');
+    ਜੇ (!get_was_ਸੁਰੱਖਿਅਤ_state())
+	may_ਜੋੜੋ_state_char(&ga, include, 'S');
+    ਲਈ (i = 0; i < get_callback_ਡੂੰਘਾਈ() && i < 3; ++i)
+	may_ਜੋੜੋ_state_char(&ga, include, 'c');
+    ਜੇ (ਸੁਨੇਹਾ_scrolled > 0)
+	may_ਜੋੜੋ_state_char(&ga, include, 's');
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_ਅੰਕੜੇ;
 }
 
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL
 
 /*
  * Get a key stroke directly from the user.
@@ -861,31 +861,31 @@ f_state(typval_T *argvars, typval_T *rettv)
  * Disadvantage: typeahead is ignored.
  * Translates the interrupt character for unix to ESC.
  */
-    int
-get_keystroke(void)
+    ਪੂਰਨ
+get_keystroke(ਖਾਲੀ)
 {
-    char_u	*buf = NULL;
-    int		buflen = 150;
-    int		maxlen;
-    int		len = 0;
-    int		n;
-    int		save_mapped_ctrl_c = mapped_ctrl_c;
-    int		waited = 0;
+    char_u	*buf = ਨਿਰਾ;
+    ਪੂਰਨ		buflen = 150;
+    ਪੂਰਨ		maxlen;
+    ਪੂਰਨ		len = 0;
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		save_mapped_ctrl_c = mapped_ctrl_c;
+    ਪੂਰਨ		waited = 0;
 
-    mod_mask = 0;
+    mod_ਨਕਾਬ = 0;
     mapped_ctrl_c = FALSE;	// mappings are not used here
-    for (;;)
+    ਲਈ (;;)
     {
 	cursor_on();
-	out_flush();
+	ਬਾਹਰਲਾ_flush();
 
 	// Leave some room for check_termcode() to insert a key code into (max
 	// 5 chars plus NUL).  And fix_input_buffer() can triple the number of
 	// bytes.
 	maxlen = (buflen - 6 - len) / 3;
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	    buf = alloc(buflen);
-	else if (maxlen < 10)
+	ਨਹੀਂਤਾਂ ਜੇ (maxlen < 10)
 	{
 	    char_u  *t_buf = buf;
 
@@ -893,175 +893,175 @@ get_keystroke(void)
 	    // escape sequence.
 	    buflen += 100;
 	    buf = vim_realloc(buf, buflen);
-	    if (buf == NULL)
+	    ਜੇ (buf == ਨਿਰਾ)
 		vim_free(t_buf);
 	    maxlen = (buflen - 6 - len) / 3;
 	}
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	{
-	    do_outofmem_msg((long_u)buflen);
-	    return ESC;  // panic!
+	    do_outofmem_ਸੁਨੇਹਾ((long_u)buflen);
+	    ਵਾਪਸ ESC;  // panic!
 	}
 
 	// First time: blocking wait.  Second time: wait up to 100ms for a
 	// terminal code to complete.
 	n = ui_inchar(buf + len, maxlen, len == 0 ? -1L : 100L, 0);
-	if (n > 0)
+	ਜੇ (n > 0)
 	{
 	    // Replace zero and CSI by a special key code.
-	    n = fix_input_buffer(buf + len, n);
+	    n = fix_ਨਿਵੇਸ਼_ਬਫਰ(buf + len, n);
 	    len += n;
 	    waited = 0;
 	}
-	else if (len > 0)
+	ਨਹੀਂਤਾਂ ਜੇ (len > 0)
 	    ++waited;	    // keep track of the waiting time
 
 	// Incomplete termcode and not timed out yet: get more characters
-	if ((n = check_termcode(1, buf, buflen, &len)) < 0
+	ਜੇ ((n = check_termcode(1, buf, buflen, &len)) < 0
 	       && (!p_ttimeout || waited * 100L < (p_ttm < 0 ? p_tm : p_ttm)))
-	    continue;
+	    ਜਾਰੀ;
 
-	if (n == KEYLEN_REMOVED)  // key code removed
+	ਜੇ (n == KEYLEN_REMOVED)  // key code removed
 	{
-	    if (must_redraw != 0 && !need_wait_return && (State
-			& (MODE_CMDLINE | MODE_HITRETURN | MODE_ASKMORE)) == 0)
+	    ਜੇ (must_redraw != 0 && !need_wait_return && (State
+			& (ਬਹੁਲਕ_CMDLINE | ਬਹੁਲਕ_HITRETURN | ਬਹੁਲਕ_ASKMORE)) == 0)
 	    {
 		// Redrawing was postponed, do it now.
 		update_screen(0);
 		setcursor(); // put cursor back where it belongs
 	    }
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (n > 0)		// found a termcode: adjust length
+	ਜੇ (n > 0)		// found a termcode: adjust length
 	    len = n;
-	if (len == 0)		// nothing typed yet
-	    continue;
+	ਜੇ (len == 0)		// nothing typed yet
+	    ਜਾਰੀ;
 
 	// Handle modifier and/or special key code.
 	n = buf[0];
-	if (n == K_SPECIAL)
+	ਜੇ (n == K_SPECIAL)
 	{
-	    n = TO_SPECIAL(buf[1], buf[2]);
-	    if (buf[1] == KS_MODIFIER
+	    n = ਮੰਜ਼ਿਲ_SPECIAL(buf[1], buf[2]);
+	    ਜੇ (buf[1] == KS_MODIFIER
 		    || n == K_IGNORE
-		    || (is_mouse_key(n) && n != K_LEFTMOUSE)
-#ifdef FEAT_GUI
+		    || (is_mouse_ਕੁੰਜੀ(n) && n != K_LEFTMOUSE)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		    || n == K_VER_SCROLLBAR
 		    || n == K_HOR_SCROLLBAR
-#endif
+#ਜੇ_ਅੰਤ
 	       )
 	    {
-		if (buf[1] == KS_MODIFIER)
-		    mod_mask = buf[2];
+		ਜੇ (buf[1] == KS_MODIFIER)
+		    mod_ਨਕਾਬ = buf[2];
 		len -= 3;
-		if (len > 0)
+		ਜੇ (len > 0)
 		    mch_memmove(buf, buf + 3, (size_t)len);
-		continue;
+		ਜਾਰੀ;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
-	    if (MB_BYTE2LEN(n) > len)
-		continue;	// more bytes to get
+	    ਜੇ (MB_BYTE2LEN(n) > len)
+		ਜਾਰੀ;	// more bytes to get
 	    buf[len >= buflen ? buflen - 1 : len] = NUL;
 	    n = (*mb_ptr2char)(buf);
 	}
-#ifdef UNIX
-	if (n == intr_char)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+	ਜੇ (n == intr_char)
 	    n = ESC;
-#endif
-	break;
+#ਜੇ_ਅੰਤ
+	ਰੋਕੋ;
     }
     vim_free(buf);
 
     mapped_ctrl_c = save_mapped_ctrl_c;
-    return merge_modifyOtherKeys(n, &mod_mask);
+    ਵਾਪਸ ਮਿਲਾਓ_modify_Other_ਕੁੰਜੀਆਂ(n, &mod_ਨਕਾਬ);
 }
 
 // For overflow detection, add a digit safely to an int value.
-    static int
-vim_append_digit_int(int *value, int digit)
+    ਸਥਿਰ ਪੂਰਨ
+vim_append_digit_int(ਪੂਰਨ *ਮੁੱਲ, ਪੂਰਨ digit)
 {
-    int x = *value;
-    if (x > ((INT_MAX - digit) / 10))
-	return FAIL;
-    *value = x * 10 + digit;
-    return OK;
+    ਪੂਰਨ x = *ਮੁੱਲ;
+    ਜੇ (x > ((ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ - digit) / 10))
+	ਵਾਪਸ FAIL;
+    *ਮੁੱਲ = x * 10 + digit;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Get a number from the user.
  * When "mouse_used" is not NULL allow using the mouse.
  */
-    int
-get_number(
-    int	    colon,			// allow colon to abort
-    int	    *mouse_used)
+    ਪੂਰਨ
+get_ਸੰਖਿਆ(
+    ਪੂਰਨ	    colon,			// allow colon to abort
+    ਪੂਰਨ	    *mouse_ਵਰਤਿਆ)
 {
-    int	n = 0;
-    int	c;
-    int typed = 0;
+    ਪੂਰਨ	n = 0;
+    ਪੂਰਨ	c;
+    ਪੂਰਨ typed = 0;
 
-    if (mouse_used != NULL)
-	*mouse_used = FALSE;
+    ਜੇ (mouse_ਵਰਤਿਆ != ਨਿਰਾ)
+	*mouse_ਵਰਤਿਆ = FALSE;
 
     // When not printing messages, the user won't know what to type, return a
     // zero (as if CR was hit).
-    if (msg_silent != 0)
-	return 0;
+    ਜੇ (ਸੁਨੇਹਾ_silent != 0)
+	ਵਾਪਸ 0;
 
-#ifdef USE_ON_FLY_SCROLL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#ਜੇ_ਅੰਤ
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
-    for (;;)
+    ++allow_ਕੁੰਜੀਆਂ;		// no mapping here, but recognize keys
+    ਲਈ (;;)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col);
-	c = safe_vgetc();
-	if (VIM_ISDIGIT(c))
+	windgoto(ਸੁਨੇਹਾ_ਪੰਕਤੀ, cmdline_ਖਾਨਾ_off + ਸੁਨੇਹਾ_ਖਾਨਾ);
+	c = ਸੁਰੱਖਿਅਤ_vgetc();
+	ਜੇ (VIM_ISDIGIT(c))
 	{
-	    if (vim_append_digit_int(&n, c - '0') == FAIL)
-		return 0;
-	    msg_putchar(c);
+	    ਜੇ (vim_append_digit_int(&n, c - '0') == FAIL)
+		ਵਾਪਸ 0;
+	    ਸੁਨੇਹਾ_putchar(c);
 	    ++typed;
 	}
-	else if (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
+	ਨਹੀਂਤਾਂ ਜੇ (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
 	{
-	    if (typed > 0)
+	    ਜੇ (typed > 0)
 	    {
-		msg_puts("\b \b");
+		ਸੁਨੇਹਾ_puts("\b \b");
 		--typed;
 	    }
 	    n /= 10;
 	}
-	else if (mouse_used != NULL && c == K_LEFTMOUSE)
+	ਨਹੀਂਤਾਂ ਜੇ (mouse_ਵਰਤਿਆ != ਨਿਰਾ && c == K_LEFTMOUSE)
 	{
-	    *mouse_used = TRUE;
-	    n = mouse_row + 1;
-	    break;
+	    *mouse_ਵਰਤਿਆ = TRUE;
+	    n = mouse_ਪੰਕਤੀ + 1;
+	    ਰੋਕੋ;
 	}
-	else if (n == 0 && c == ':' && colon)
+	ਨਹੀਂਤਾਂ ਜੇ (n == 0 && c == ':' && colon)
 	{
 	    stuffcharReadbuff(':');
-	    if (!exmode_active)
-		cmdline_row = msg_row;
+	    ਜੇ (!exmode_ਸਰਗਰਮ)
+		cmdline_ਪੰਕਤੀ = ਸੁਨੇਹਾ_ਪੰਕਤੀ;
 	    skip_redraw = TRUE;	    // skip redraw once
 	    do_redraw = FALSE;
-	    break;
+	    ਰੋਕੋ;
 	}
-	else if (c == Ctrl_C || c == ESC || c == 'q')
+	ਨਹੀਂਤਾਂ ਜੇ (c == Ctrl_C || c == ESC || c == 'q')
 	{
 	    n = 0;
-	    break;
+	    ਰੋਕੋ;
 	}
-	else if (c == CAR || c == NL )
-	    break;
+	ਨਹੀਂਤਾਂ ਜੇ (c == CAR || c == NL )
+	    ਰੋਕੋ;
     }
     --no_mapping;
-    --allow_keys;
-    return n;
+    --allow_ਕੁੰਜੀਆਂ;
+    ਵਾਪਸ n;
 }
 
 /*
@@ -1069,83 +1069,83 @@ get_number(
  * When "mouse_used" is not NULL allow using the mouse and in that case return
  * the line number.
  */
-    int
-prompt_for_number(int *mouse_used)
+    ਪੂਰਨ
+prompt_for_ਸੰਖਿਆ(ਪੂਰਨ *mouse_ਵਰਤਿਆ)
 {
-    int		i;
-    int		save_cmdline_row;
-    int		save_State;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		save_cmdline_ਪੰਕਤੀ;
+    ਪੂਰਨ		save_State;
 
     // When using ":silent" assume that <CR> was entered.
-    if (mouse_used != NULL)
-	msg_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
-    else
-	msg_puts(_("Type number and <Enter> (q or empty cancels): "));
+    ਜੇ (mouse_ਵਰਤਿਆ != ਨਿਰਾ)
+	ਸੁਨੇਹਾ_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
+    ਨਹੀਂਤਾਂ
+	ਸੁਨੇਹਾ_puts(_("Type number and <Enter> (q or empty cancels): "));
 
     // Set the state such that text can be selected/copied/pasted and we still
     // get mouse events. redraw_after_callback() will not redraw if cmdline_row
     // is zero.
-    save_cmdline_row = cmdline_row;
-    cmdline_row = 0;
+    save_cmdline_ਪੰਕਤੀ = cmdline_ਪੰਕਤੀ;
+    cmdline_ਪੰਕਤੀ = 0;
     save_State = State;
-    State = MODE_CMDLINE;
+    State = ਬਹੁਲਕ_CMDLINE;
     // May show different mouse shape.
     setmouse();
 
-    i = get_number(TRUE, mouse_used);
-    if (KeyTyped)
+    i = get_ਸੰਖਿਆ(TRUE, mouse_ਵਰਤਿਆ);
+    ਜੇ (ਕੁੰਜੀ_Typed)
     {
 	// don't call wait_return() now
-	if (msg_row > 0)
-	    cmdline_row = msg_row - 1;
+	ਜੇ (ਸੁਨੇਹਾ_ਪੰਕਤੀ > 0)
+	    cmdline_ਪੰਕਤੀ = ਸੁਨੇਹਾ_ਪੰਕਤੀ - 1;
 	need_wait_return = FALSE;
-	msg_didany = FALSE;
-	msg_didout = FALSE;
+	ਸੁਨੇਹਾ_didany = FALSE;
+	ਸੁਨੇਹਾ_didout = FALSE;
     }
-    else
-	cmdline_row = save_cmdline_row;
+    ਨਹੀਂਤਾਂ
+	cmdline_ਪੰਕਤੀ = save_cmdline_ਪੰਕਤੀ;
     State = save_State;
     // May need to restore mouse shape.
     setmouse();
 
-    return i;
+    ਵਾਪਸ i;
 }
 
-    void
-msgmore(long n)
+    ਖਾਲੀ
+msgmore(ਲੰਮਾ n)
 {
-    long pn;
+    ਲੰਮਾ pn;
 
-    if (global_busy	    // no messages now, wait until global is finished
+    ਜੇ (global_busy	    // no messages now, wait until global is finished
 	    || !messaging())  // 'lazyredraw' set, don't do messages now
-	return;
+	ਵਾਪਸ;
 
     // We don't want to overwrite another important message, but do overwrite
     // a previous "more lines" or "fewer lines" message, so that "5dd" and
     // then "put" reports the last action.
-    if (keep_msg != NULL && !keep_msg_more)
-	return;
+    ਜੇ (keep_ਸੁਨੇਹਾ != ਨਿਰਾ && !keep_ਸੁਨੇਹਾ_ਹੋਰ)
+	ਵਾਪਸ;
 
-    if (n > 0)
+    ਜੇ (n > 0)
 	pn = n;
-    else
+    ਨਹੀਂਤਾਂ
 	pn = -n;
 
-    if (pn > p_report)
+    ਜੇ (pn > p_report)
     {
-	if (n > 0)
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	ਜੇ (n > 0)
+	    vim_snprintf(ਸੁਨੇਹਾ_buf, ਸੁਨੇਹਾ_BUF_LEN,
 		    NGETTEXT("%ld more line", "%ld more lines", pn), pn);
-	else
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	ਨਹੀਂਤਾਂ
+	    vim_snprintf(ਸੁਨੇਹਾ_buf, ਸੁਨੇਹਾ_BUF_LEN,
 		    NGETTEXT("%ld line less", "%ld fewer lines", pn), pn);
-	if (got_int)
-	    vim_strcat((char_u *)msg_buf, (char_u *)_(" (Interrupted)"),
-								  MSG_BUF_LEN);
-	if (msg(msg_buf))
+	ਜੇ (got_int)
+	    vim_strcat((char_u *)ਸੁਨੇਹਾ_buf, (char_u *)_(" (Interrupted)"),
+								  ਸੁਨੇਹਾ_BUF_LEN);
+	ਜੇ (ਸੁਨੇਹਾ(ਸੁਨੇਹਾ_buf))
 	{
-	    set_keep_msg((char_u *)msg_buf, 0);
-	    keep_msg_more = TRUE;
+	    ਸੈੱਟ_keep_ਸੁਨੇਹਾ((char_u *)ਸੁਨੇਹਾ_buf, 0);
+	    keep_ਸੁਨੇਹਾ_ਹੋਰ = TRUE;
 	}
     }
 }
@@ -1153,12 +1153,12 @@ msgmore(long n)
 /*
  * flush map and typeahead buffers and give a warning for an error
  */
-    void
-beep_flush(void)
+    ਖਾਲੀ
+beep_flush(ਖਾਲੀ)
 {
-    if (emsg_silent == 0)
+    ਜੇ (emsg_silent == 0)
     {
-	flush_buffers(FLUSH_MINIMAL);
+	flush_buffers(FLUSH_ਨਿਊਨਤਮ);
 	vim_beep(BO_ERROR);
     }
 }
@@ -1166,41 +1166,41 @@ beep_flush(void)
 /*
  * Give a warning for an error. "val" is one of the BO_ values, e.g., BO_OPER.
  */
-    void
-vim_beep(unsigned val)
+    ਖਾਲੀ
+vim_beep(ਬਿਨਾਨਿਸ਼ਾਨੀ val)
 {
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     called_vim_beep = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (emsg_silent != 0 || in_assert_fails)
-	return;
+    ਜੇ (emsg_silent != 0 || ਵਿੱਚ_assert_fails)
+	ਵਾਪਸ;
 
-    if (!((bo_flags & val) || (bo_flags & BO_ALL)))
+    ਜੇ (!((bo_flags & val) || (bo_flags & BO_ALL)))
     {
-#ifdef ELAPSED_FUNC
-	static int		did_init = FALSE;
-	static elapsed_T	start_tv;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+	ਸਥਿਰ ਪੂਰਨ		did_init = FALSE;
+	ਸਥਿਰ elapsed_T	ਸ਼ੁਰੂ_tv;
 
 	// Only beep once per half a second, otherwise a sequence of beeps
 	// would freeze Vim.
-	if (!did_init || ELAPSED_FUNC(start_tv) > 500)
+	ਜੇ (!did_init || ELAPSED_FUNC(ਸ਼ੁਰੂ_tv) > 500)
 	{
 	    did_init = TRUE;
-	    ELAPSED_INIT(start_tv);
-#endif
-	    if (p_vb
-#ifdef FEAT_GUI
+	    ELAPSED_INIT(ਸ਼ੁਰੂ_tv);
+#ਜੇ_ਅੰਤ
+	    ਜੇ (p_vb
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		    // While the GUI is starting up the termcap is set for
 		    // the GUI but the output still goes to a terminal.
-		    && !(gui.in_use && gui.starting)
-#endif
+		    && !(gui.ਵਿੱਚ_use && gui.starting)
+#ਜੇ_ਅੰਤ
 	       )
 	    {
-		out_str_cf(T_VB);
-#ifdef FEAT_VTP
+		ਬਾਹਰਲਾ_str_cf(T_VB);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VTP
 		// No restore color information, refresh the screen.
-		if (has_vtp_working() != 0
+		ਜੇ (has_vtp_working() != 0
 # ifdef FEAT_TERMGUICOLORS
 			&& (p_tgc || (!p_tgc && t_colors >= 256))
 # endif
@@ -1210,22 +1210,22 @@ vim_beep(unsigned val)
 		    update_screen(0);
 		    redrawcmd();
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-	    else
-		out_char(BELL);
-#ifdef ELAPSED_FUNC
+	    ਨਹੀਂਤਾਂ
+		ਬਾਹਰਲਾ_char(BELL);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // When 'debug' contains "beep" produce a message.  If we are sourcing
     // a script or executing a function give the user a hint where the beep
     // comes from.
-    if (vim_strchr(p_debug, 'e') != NULL)
+    ਜੇ (vim_strchr(p_debug, 'e') != ਨਿਰਾ)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg_attr(_("Beep!"), HL_ATTR(HLF_W));
+	ਸੁਨੇਹਾ_ਸਰੋਤ(HL_ATTR(HLF_W));
+	ਸੁਨੇਹਾ_attr(_("Beep!"), HL_ATTR(HLF_W));
     }
 }
 
@@ -1240,45 +1240,45 @@ vim_beep(unsigned val)
  * For Windows:
  *  This code is duplicated in init_homedir() in dosinst.c.  Keep in sync!
  */
-    void
-init_homedir(void)
+    ਖਾਲੀ
+init_homedir(ਖਾਲੀ)
 {
     char_u  *var;
 
     // In case we are called a second time (when 'encoding' changes).
     VIM_CLEAR(homedir);
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
     var = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#ਨਹੀਂਤਾਂ
     var = mch_getenv((char_u *)"HOME");
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     /*
      * Typically, $HOME is not defined on Windows, unless the user has
      * specifically defined it for Vim's sake.  However, on Windows NT
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    ਜੇ (var == ਨਿਰਾ || *var == NUL)
     {
 	char_u *homedrive, *homepath;
 
 	homedrive = mch_getenv((char_u *)"HOMEDRIVE");
 	homepath = mch_getenv((char_u *)"HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	ਜੇ (homepath == ਨਿਰਾ || *homepath == NUL)
 	    homepath = (char_u *)"\\";
-	if (homedrive != NULL
+	ਜੇ (homedrive != ਨਿਰਾ
 			   && STRLEN(homedrive) + STRLEN(homepath) < MAXPATHL)
 	{
-	    sprintf((char *)NameBuff, "%s%s", homedrive, homepath);
-	    if (NameBuff[0] != NUL)
+	    sprintf((ਅੱਖਰ *)NameBuff, "%s%s", homedrive, homepath);
+	    ਜੇ (NameBuff[0] != NUL)
 		var = NameBuff;
 	}
     }
 
-    if (var == NULL)
+    ਜੇ (var == ਨਿਰਾ)
 	var = mch_getenv((char_u *)"USERPROFILE");
 
     /*
@@ -1286,40 +1286,40 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    ਜੇ (var != ਨਿਰਾ && *var == '%')
     {
 	char_u	*p;
-	char_u	*exp;
+	char_u	*ਘਾਤਾਂਕ;
 
 	p = vim_strchr(var + 1, '%');
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    vim_strncpy(NameBuff, var + 1, p - (var + 1));
-	    exp = mch_getenv(NameBuff);
-	    if (exp != NULL && *exp != NUL
-					&& STRLEN(exp) + STRLEN(p) < MAXPATHL)
+	    ਘਾਤਾਂਕ = mch_getenv(NameBuff);
+	    ਜੇ (ਘਾਤਾਂਕ != ਨਿਰਾ && *ਘਾਤਾਂਕ != NUL
+					&& STRLEN(ਘਾਤਾਂਕ) + STRLEN(p) < MAXPATHL)
 	    {
-		vim_snprintf((char *)NameBuff, MAXPATHL, "%s%s", exp, p + 1);
+		vim_snprintf((ਅੱਖਰ *)NameBuff, MAXPATHL, "%s%s", ਘਾਤਾਂਕ, p + 1);
 		var = NameBuff;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    ਜੇ (var != ਨਿਰਾ && *var == NUL)	// empty is same as not set
+	var = ਨਿਰਾ;
 
-    if (enc_utf8 && var != NULL)
+    ਜੇ (enc_utf8 && var != ਨਿਰਾ)
     {
-	int	len;
-	char_u  *pp = NULL;
+	ਪੂਰਨ	len;
+	char_u  *pp = ਨਿਰਾ;
 
 	// Convert from active codepage to UTF-8.  Other conversions are
 	// not done, because they would fail for non-ASCII characters.
-	acp_to_enc(var, (int)STRLEN(var), &pp, &len);
-	if (pp != NULL)
+	acp_ਮੰਜ਼ਿਲ_enc(var, (ਪੂਰਨ)STRLEN(var), &pp, &len);
+	ਜੇ (pp != ਨਿਰਾ)
 	{
 	    homedir = pp;
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 
@@ -1327,52 +1327,52 @@ init_homedir(void)
      * Default home dir is C:/
      * Best assumption we can make in such a situation.
      */
-    if (var == NULL)
+    ਜੇ (var == ਨਿਰਾ)
 	var = (char_u *)"C:/";
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (var != NULL)
+    ਜੇ (var != ਨਿਰਾ)
     {
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 	/*
 	 * Change to the directory and get the actual path.  This resolves
 	 * links.  Don't do it when we can't return.
 	 */
-	if (mch_dirname(NameBuff, MAXPATHL) == OK
-					  && mch_chdir((char *)NameBuff) == 0)
+	ਜੇ (mch_dirname(NameBuff, MAXPATHL) == OK
+					  && mch_chdir((ਅੱਖਰ *)NameBuff) == 0)
 	{
-	    if (!mch_chdir((char *)var) && mch_dirname(IObuff, IOSIZE) == OK)
+	    ਜੇ (!mch_chdir((ਅੱਖਰ *)var) && mch_dirname(IObuff, IOSIZE) == OK)
 		var = IObuff;
-	    if (mch_chdir((char *)NameBuff) != 0)
-		emsg(_(e_cannot_go_back_to_previous_directory));
+	    ਜੇ (mch_chdir((ਅੱਖਰ *)NameBuff) != 0)
+		emsg(_(e_cannot_go_ਪਿੱਠ_ਮੰਜ਼ਿਲ_ਪਿਛਲਾ_directory));
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	homedir = vim_strsave(var);
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_homedir(void)
+#ਜੇ defined(EXITFREE)
+    ਖਾਲੀ
+free_homedir(ਖਾਲੀ)
 {
     vim_free(homedir);
 }
 
-    void
-free_users(void)
+    ਖਾਲੀ
+free_users(ਖਾਲੀ)
 {
-    ga_clear_strings(&ga_users);
+    ga_clear_ਲੜੀਆਂ(&ga_users);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 /*
  * Initialize $VIM and $VIMRUNTIME when 'enc' is updated.
  */
-    void
-init_vimdir(void)
+    ਖਾਲੀ
+init_vimdir(ਖਾਲੀ)
 {
-    int	    mustfree;
+    ਪੂਰਨ	    mustfree;
     char_u  *p;
 
     mch_get_exe_name();
@@ -1380,16 +1380,16 @@ init_vimdir(void)
     mustfree = FALSE;
     didset_vim = FALSE;
     p = vim_getenv((char_u *)"VIM", &mustfree);
-    if (mustfree)
+    ਜੇ (mustfree)
 	vim_free(p);
 
     mustfree = FALSE;
     didset_vimruntime = FALSE;
     p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-    if (mustfree)
+    ਜੇ (mustfree)
 	vim_free(p);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Call expand_env() and store the result in an allocated string.
@@ -1399,7 +1399,7 @@ init_vimdir(void)
     char_u *
 expand_env_save(char_u *src)
 {
-    return expand_env_save_opt(src, FALSE, NULL);
+    ਵਾਪਸ expand_env_save_opt(src, FALSE, ਨਿਰਾ);
 }
 
 /*
@@ -1407,14 +1407,14 @@ expand_env_save(char_u *src)
  * expand "~" at the start.
  */
     char_u *
-expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
+expand_env_save_opt(char_u *src, ਪੂਰਨ one, char_u *esc_chars)
 {
     char_u	*p;
 
     p = alloc(MAXPATHL);
-    if (p != NULL)
-	expand_env_esc(src, p, MAXPATHL, esc_chars, one, NULL);
-    return p;
+    ਜੇ (p != ਨਿਰਾ)
+	expand_env_esc(src, p, MAXPATHL, esc_chars, one, ਨਿਰਾ);
+    ਵਾਪਸ p;
 }
 
 /*
@@ -1427,67 +1427,67 @@ expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
 expand_env(
     char_u	*src,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen)		// maximum length of the result
+    ਪੂਰਨ		dstlen)		// maximum length of the result
 {
-    return expand_env_esc(src, dst, dstlen, NULL, FALSE, NULL);
+    ਵਾਪਸ expand_env_esc(src, dst, dstlen, ਨਿਰਾ, FALSE, ਨਿਰਾ);
 }
 
     size_t
 expand_env_esc(
     char_u	*srcp,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen,		// maximum length of the result
+    ਪੂਰਨ		dstlen,		// maximum length of the result
     char_u	*esc_chars,	// chars to escape in expanded vars
-    int		one,		// "srcp" is one file name
+    ਪੂਰਨ		one,		// "srcp" is one file name
     char_u	*startstr)	// start again after this (can be NULL)
 {
     char_u	*src;
-    char_u	*tail;
-    int		c;
+    char_u	*ਪੂਛ;
+    ਪੂਰਨ		c;
     char_u	*var;
-    int		copy_char;
-    int		mustfree;	// var was allocated, need to free it later
-    int		at_start = TRUE; // at start of a name
-    int		startstr_len = 0;
-    char_u	*dst_start = dst;
+    ਪੂਰਨ		copy_char;
+    ਪੂਰਨ		mustfree;	// var was allocated, need to free it later
+    ਪੂਰਨ		at_ਸ਼ੁਰੂ = TRUE; // at start of a name
+    ਪੂਰਨ		startstr_len = 0;
+    char_u	*dst_ਸ਼ੁਰੂ = dst;
 
-    if (startstr != NULL)
-	startstr_len = (int)STRLEN(startstr);
+    ਜੇ (startstr != ਨਿਰਾ)
+	startstr_len = (ਪੂਰਨ)STRLEN(startstr);
 
     src = skipwhite(srcp);
     --dstlen;		    // leave one char space for "\,"
-    while (*src && dstlen > 0)
+    ਜਦੋਂ (*src && dstlen > 0)
     {
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	// Skip over `=expr`.
-	if (src[0] == '`' && src[1] == '=')
+	ਜੇ (src[0] == '`' && src[1] == '=')
 	{
 	    size_t len;
 
 	    var = src;
 	    src += 2;
-	    (void)skip_expr(&src, NULL);
-	    if (*src == '`')
+	    (ਖਾਲੀ)skip_ਵਿਅੰਜਕ(&src, ਨਿਰਾ);
+	    ਜੇ (*src == '`')
 		++src;
 	    len = src - var;
-	    if (len > (size_t)dstlen)
+	    ਜੇ (len > (size_t)dstlen)
 		len = dstlen;
 	    vim_strncpy(dst, var, len);
 	    dst += len;
-	    dstlen -= (int)len;
-	    continue;
+	    dstlen -= (ਪੂਰਨ)len;
+	    ਜਾਰੀ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	copy_char = TRUE;
-	if ((*src == '$'
-#ifdef VMS
-		    && at_start
-#endif
+	ਜੇ ((*src == '$'
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
+		    && at_ਸ਼ੁਰੂ
+#ਜੇ_ਅੰਤ
 	   )
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 		|| *src == '%'
-#endif
-		|| (*src == '~' && at_start))
+#ਜੇ_ਅੰਤ
+		|| (*src == '~' && at_ਸ਼ੁਰੂ))
 	{
 	    mustfree = FALSE;
 
@@ -1495,75 +1495,75 @@ expand_env_esc(
 	     * The variable name is copied into dst temporarily, because it may
 	     * be a string in read-only memory and a NUL needs to be appended.
 	     */
-	    if (*src != '~')				// environment var
+	    ਜੇ (*src != '~')				// environment var
 	    {
-		tail = src + 1;
+		ਪੂਛ = src + 1;
 		var = dst;
 		c = dstlen - 1;
 
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 		// Unix has ${var-name} type environment vars
-		if (*tail == '{' && !vim_isIDc('{'))
+		ਜੇ (*ਪੂਛ == '{' && !vim_isIDc('{'))
 		{
-		    tail++;	// ignore '{'
-		    while (c-- > 0 && *tail && *tail != '}')
-			*var++ = *tail++;
+		    ਪੂਛ++;	// ignore '{'
+		    ਜਦੋਂ (c-- > 0 && *ਪੂਛ && *ਪੂਛ != '}')
+			*var++ = *ਪੂਛ++;
 		}
-		else
-#endif
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		{
-		    while (c-- > 0 && *tail != NUL && ((vim_isIDc(*tail))
-#if defined(MSWIN)
-			    || (*src == '%' && *tail != '%')
-#endif
+		    ਜਦੋਂ (c-- > 0 && *ਪੂਛ != NUL && ((vim_isIDc(*ਪੂਛ))
+#ਜੇ defined(MSWIN)
+			    || (*src == '%' && *ਪੂਛ != '%')
+#ਜੇ_ਅੰਤ
 			    ))
-			*var++ = *tail++;
+			*var++ = *ਪੂਛ++;
 		}
 
-#if defined(MSWIN) || defined(UNIX)
+#ਜੇ defined(MSWIN) || defined(UNIX)
 # ifdef UNIX
-		if (src[1] == '{' && *tail != '}')
-# else
-		if (*src == '%' && *tail != '%')
+		ਜੇ (src[1] == '{' && *ਪੂਛ != '}')
+# ਨਹੀਂਤਾਂ
+		ਜੇ (*src == '%' && *ਪੂਛ != '%')
 # endif
-		    var = NULL;
-		else
+		    var = ਨਿਰਾ;
+		ਨਹੀਂਤਾਂ
 		{
 # ifdef UNIX
-		    if (src[1] == '{')
-# else
-		    if (*src == '%')
+		    ਜੇ (src[1] == '{')
+# ਨਹੀਂਤਾਂ
+		    ਜੇ (*src == '%')
 # endif
-			++tail;
-#endif
+			++ਪੂਛ;
+#ਜੇ_ਅੰਤ
 		    *var = NUL;
 		    var = vim_getenv(dst, &mustfree);
-#if defined(MSWIN) || defined(UNIX)
+#ਜੇ defined(MSWIN) || defined(UNIX)
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 							// home directory
-	    else if (  src[1] == NUL
+	    ਨਹੀਂਤਾਂ ਜੇ (  src[1] == NUL
 		    || vim_ispathsep(src[1])
-		    || vim_strchr((char_u *)" ,\t\n", src[1]) != NULL)
+		    || vim_strchr((char_u *)" ,\t\n", src[1]) != ਨਿਰਾ)
 	    {
 		var = homedir;
-		tail = src + 1;
+		ਪੂਛ = src + 1;
 	    }
-	    else					// user directory
+	    ਨਹੀਂਤਾਂ					// user directory
 	    {
-#if defined(UNIX) || (defined(VMS) && defined(USER_HOME))
+#ਜੇ defined(UNIX) || (defined(VMS) && defined(USER_HOME))
 		/*
 		 * Copy ~user to dst[], so we can put a NUL after it.
 		 */
-		tail = src;
+		ਪੂਛ = src;
 		var = dst;
 		c = dstlen - 1;
-		while (	   c-- > 0
-			&& *tail
-			&& vim_isfilec(*tail)
-			&& !vim_ispathsep(*tail))
-		    *var++ = *tail++;
+		ਜਦੋਂ (	   c-- > 0
+			&& *ਪੂਛ
+			&& vim_isfilec(*ਪੂਛ)
+			&& !vim_ispathsep(*ਪੂਛ))
+		    *var++ = *ਪੂਛ++;
 		*var = NUL;
 # ifdef UNIX
 		/*
@@ -1572,28 +1572,28 @@ expand_env_esc(
 		 * expand ~user.  This is slower and may fail if the shell
 		 * does not support ~user (old versions of /bin/sh).
 		 */
-#  if defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
+#  ਜੇ defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
 		{
 		    // Note: memory allocated by getpwnam() is never freed.
 		    // Calling endpwent() apparently doesn't help.
-		    struct passwd *pw = (*dst == NUL)
-					? NULL : getpwnam((char *)dst + 1);
+		    ਬਣਤਰ passwd *pw = (*dst == NUL)
+					? ਨਿਰਾ : getpwnam((ਅੱਖਰ *)dst + 1);
 
-		    var = (pw == NULL) ? NULL : (char_u *)pw->pw_dir;
+		    var = (pw == ਨਿਰਾ) ? ਨਿਰਾ : (char_u *)pw->pw_dir;
 		}
-		if (var == NULL)
+		ਜੇ (var == ਨਿਰਾ)
 #  endif
 		{
 		    expand_T	xpc;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    var = ExpandOne(&xpc, dst, NULL,
-				WILD_ADD_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
+		    var = ExpandOne(&xpc, dst, ਨਿਰਾ,
+				WILD_ਜੋੜੋ_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
 		    mustfree = TRUE;
 		}
 
-# else	// !UNIX, thus VMS
+# ਨਹੀਂਤਾਂ	// !UNIX, thus VMS
 		/*
 		 * USER_HOME is a comma-separated list of
 		 * directories to search for the user account in.
@@ -1601,194 +1601,194 @@ expand_env_esc(
 		{
 		    char_u	test[MAXPATHL], paths[MAXPATHL];
 		    size_t	testlen;
-		    char_u	*path, *next_path, *ptr;
+		    char_u	*ਰਸਤਾ, *ਅਗਲਾ_ਰਸਤਾ, *ptr;
 		    stat_T	st;
 
 		    STRCPY(paths, USER_HOME);
-		    next_path = paths;
-		    while (*next_path)
+		    ਅਗਲਾ_ਰਸਤਾ = paths;
+		    ਜਦੋਂ (*ਅਗਲਾ_ਰਸਤਾ)
 		    {
-			for (path = next_path; *next_path && *next_path != ',';
-				next_path++);
-			if (*next_path)
-			    *next_path++ = NUL;
+			ਲਈ (ਰਸਤਾ = ਅਗਲਾ_ਰਸਤਾ; *ਅਗਲਾ_ਰਸਤਾ && *ਅਗਲਾ_ਰਸਤਾ != ',';
+				ਅਗਲਾ_ਰਸਤਾ++);
+			ਜੇ (*ਅਗਲਾ_ਰਸਤਾ)
+			    *ਅਗਲਾ_ਰਸਤਾ++ = NUL;
 			testlen = vim_snprintf_safelen(
-			    (char *)test,
-			    sizeof(test),
+			    (ਅੱਖਰ *)test,
+			    ਆਕਾਰ(test),
 			    "%s/%s",
-			    path,
+			    ਰਸਤਾ,
 			    dst + 1);
-			if (mch_stat(test, &st) == 0)
+			ਜੇ (mch_stat(test, &st) == 0)
 			{
 			    var = alloc(testlen + 1);
-			    if (var != NULL)
+			    ਜੇ (var != ਨਿਰਾ)
 			    {
 				STRCPY(var, test);
 				mustfree = TRUE;
 			    }
-			    break;
+			    ਰੋਕੋ;
 			}
 		    }
 		}
 # endif // UNIX
-#else
+#ਨਹੀਂਤਾਂ
 		// cannot expand user's home directory, so don't try
-		var = NULL;
-		tail = (char_u *)"";	// for gcc
-#endif // UNIX || VMS
+		var = ਨਿਰਾ;
+		ਪੂਛ = (char_u *)"";	// for gcc
+#ਜੇ_ਅੰਤ // UNIX || VMS
 	    }
 
-#ifdef BACKSLASH_IN_FILENAME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
 	    // If 'shellslash' is set change backslashes to forward slashes.
 	    // Can't use slash_adjust(), p_ssl may be set temporarily.
-	    if (p_ssl && var != NULL && vim_strchr(var, '\\') != NULL)
+	    ਜੇ (p_ssl && var != ਨਿਰਾ && vim_strchr(var, '\\') != ਨਿਰਾ)
 	    {
 		char_u	*p = vim_strsave(var);
 
-		if (p != NULL)
+		ਜੇ (p != ਨਿਰਾ)
 		{
-		    if (mustfree)
+		    ਜੇ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		    forward_slash(var);
 		}
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
 	    // If "var" contains any character from "esc_chars", escape it
 	    // with a backslash.  The historical use is escaping spaces so
 	    // that ":e ~/tt" works when $HOME contains a space.
-	    if (esc_chars != NULL && var != NULL
-		    && vim_strpbrk(var, esc_chars) != NULL)
+	    ਜੇ (esc_chars != ਨਿਰਾ && var != ਨਿਰਾ
+		    && vim_strpbrk(var, esc_chars) != ਨਿਰਾ)
 	    {
 		char_u	*p = vim_strsave_escaped(var, esc_chars);
 
-		if (p != NULL)
+		ਜੇ (p != ਨਿਰਾ)
 		{
-		    if (mustfree)
+		    ਜੇ (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		}
 	    }
 
-	    if (var != NULL && *var != NUL)
+	    ਜੇ (var != ਨਿਰਾ && *var != NUL)
 	    {
-		c = (int)STRLEN(var);
+		c = (ਪੂਰਨ)STRLEN(var);
 
-		if (c + STRLEN(tail) + 1 < (unsigned)dstlen)
+		ਜੇ (c + STRLEN(ਪੂਛ) + 1 < (ਬਿਨਾਨਿਸ਼ਾਨੀ)dstlen)
 		{
 		    STRCPY(dst, var);
 		    dstlen -= c;
 		    // if var[] ends in a path separator and tail[] starts
 		    // with it, skip a character
-		    if (after_pathsep(dst, dst + c)
-#if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA)
+		    ਜੇ (after_pathsep(dst, dst + c)
+#ਜੇ defined(BACKSLASH_ਵਿੱਚ_FILENAME) || defined(AMIGA)
 			    && dst[c - 1] != ':'
-#endif
-			    && vim_ispathsep(*tail))
-			++tail;
+#ਜੇ_ਅੰਤ
+			    && vim_ispathsep(*ਪੂਛ))
+			++ਪੂਛ;
 		    dst += c;
-		    src = tail;
+		    src = ਪੂਛ;
 		    copy_char = FALSE;
 		}
 	    }
-	    if (mustfree)
+	    ਜੇ (mustfree)
 		vim_free(var);
 	}
 
-	if (copy_char)	    // copy at least one char
+	ਜੇ (copy_char)	    // copy at least one char
 	{
 	    /*
 	     * Recognize the start of a new name, for '~'.
 	     * Don't do this when "one" is TRUE, to avoid expanding "~" in
 	     * ":edit foo ~ foo".
 	     */
-	    at_start = FALSE;
-	    if (src[0] == '\\' && src[1] != NUL)
+	    at_ਸ਼ੁਰੂ = FALSE;
+	    ਜੇ (src[0] == '\\' && src[1] != NUL)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 	    }
-	    else if ((src[0] == ' ' || src[0] == ',') && !one)
-		at_start = TRUE;
-	    if (dstlen > 0)
+	    ਨਹੀਂਤਾਂ ਜੇ ((src[0] == ' ' || src[0] == ',') && !one)
+		at_ਸ਼ੁਰੂ = TRUE;
+	    ਜੇ (dstlen > 0)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 
-		if (startstr != NULL && src - startstr_len >= srcp
+		ਜੇ (startstr != ਨਿਰਾ && src - startstr_len >= srcp
 			&& STRNCMP(src - startstr_len, startstr,
 							    startstr_len) == 0)
-		    at_start = TRUE;
+		    at_ਸ਼ੁਰੂ = TRUE;
 	    }
 	}
 
     }
     *dst = NUL;
 
-    return (size_t)(dst - dst_start);
+    ਵਾਪਸ (size_t)(dst - dst_ਸ਼ੁਰੂ);
 }
 
 /*
  * If the string between "p" and "pend" ends in "name/", return "pend" minus
  * the length of "name/".  Otherwise return "pend".
  */
-    static char_u *
-remove_tail(char_u *p, char_u *pend, char_u *name)
+    ਸਥਿਰ char_u *
+remove_ਪੂਛ(char_u *p, char_u *pend, char_u *name)
 {
-    int		len = (int)STRLEN(name) + 1;
+    ਪੂਰਨ		len = (ਪੂਰਨ)STRLEN(name) + 1;
     char_u	*newend = pend - len;
 
-    if (newend >= p
+    ਜੇ (newend >= p
 	    && fnamencmp(newend, name, len - 1) == 0
 	    && (newend == p || after_pathsep(p, newend)))
-	return newend;
-    return pend;
+	ਵਾਪਸ newend;
+    ਵਾਪਸ pend;
 }
 
 /*
  * Check if the directory "vimdir/<version>" or "vimdir/runtime" exists.
  * Return NULL if not, return its name in allocated memory otherwise.
  */
-    static char_u *
-vim_version_dir(char_u *vimdir)
+    ਸਥਿਰ char_u *
+vim_ਸੰਸਕਰਣ_dir(char_u *vimdir)
 {
     string_T	p;
     size_t	vimdir_len;
 
-    if (vimdir == NULL || *vimdir == NUL)
-	return NULL;
+    ਜੇ (vimdir == ਨਿਰਾ || *vimdir == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
     vimdir_len = STRLEN(vimdir);
     concat_fnames(vimdir, vimdir_len,
-	(char_u *)VIM_VERSION_NODOT, STRLEN_LITERAL(VIM_VERSION_NODOT), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
-	return p.string;
+	(char_u *)VIM_ਸੰਸਕਰਣ_NODOT, STRLEN_LITERAL(VIM_ਸੰਸਕਰਣ_NODOT), TRUE, &p);
+    ਜੇ (p.string != ਨਿਰਾ && mch_isdir(p.string))
+	ਵਾਪਸ p.string;
     vim_free(p.string);
     concat_fnames(vimdir, vimdir_len,
 	(char_u *)RUNTIME_DIRNAME, STRLEN_LITERAL(RUNTIME_DIRNAME), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
+    ਜੇ (p.string != ਨਿਰਾ && mch_isdir(p.string))
     {
 	string_T    fname;
 
-	concat_fnames(p.string, p.length,
+	concat_fnames(p.string, p.ਲੰਮਾਈ,
 	    (char_u *)"defaults.vim", STRLEN_LITERAL("defaults.vim"), TRUE, &fname);
 
 	// Check that "defaults.vim" exists in this directory, to avoid picking
 	// up a stray "runtime" directory, it would make many tests fail in
 	// mysterious ways.
-	if (fname.string != NULL)
+	ਜੇ (fname.string != ਨਿਰਾ)
 	{
-	    int exists = file_is_readable(fname.string);
+	    ਪੂਰਨ exists = file_is_readable(fname.string);
 
 	    vim_free(fname.string);
-	    if (exists)
-		return p.string;
+	    ਜੇ (exists)
+		ਵਾਪਸ p.string;
 	}
     }
     vim_free(p.string);
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -1799,105 +1799,105 @@ vim_version_dir(char_u *vimdir)
  * initialized to FALSE by the caller.
  */
     char_u *
-vim_getenv(char_u *name, int *mustfree)
+vim_getenv(char_u *name, ਪੂਰਨ *mustfree)
 {
-    char_u	*p = NULL;
+    char_u	*p = ਨਿਰਾ;
     char_u	*pend;
-    int		vimruntime;
-#ifdef MSWIN
+    ਪੂਰਨ		vimruntime;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     WCHAR	*wn, *wp;
 
     // use "C:/" when $HOME is not set
-    if (STRCMP(name, "HOME") == 0)
-	return homedir;
+    ਜੇ (STRCMP(name, "HOME") == 0)
+	ਵਾਪਸ homedir;
 
     // Use Wide function
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NULL;
+    wn = enc_ਮੰਜ਼ਿਲ_utf16(name, ਨਿਰਾ);
+    ਜੇ (wn == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     wp = _wgetenv(wn);
     vim_free(wn);
 
-    if (wp != NULL && *wp == NUL)   // empty is the same as not set
-	wp = NULL;
+    ਜੇ (wp != ਨਿਰਾ && *wp == NUL)   // empty is the same as not set
+	wp = ਨਿਰਾ;
 
-    if (wp != NULL)
+    ਜੇ (wp != ਨਿਰਾ)
     {
-	p = utf16_to_enc(wp, NULL);
-	if (p == NULL)
-	    return NULL;
+	p = utf16_ਮੰਜ਼ਿਲ_enc(wp, ਨਿਰਾ);
+	ਜੇ (p == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 
 	*mustfree = TRUE;
-	return p;
+	ਵਾਪਸ p;
     }
-#else
+#ਨਹੀਂਤਾਂ
     p = mch_getenv(name);
-    if (p != NULL && *p == NUL)	    // empty is the same as not set
-	p = NULL;
+    ਜੇ (p != ਨਿਰਾ && *p == NUL)	    // empty is the same as not set
+	p = ਨਿਰਾ;
 
-    if (p != NULL)
-	return p;
+    ਜੇ (p != ਨਿਰਾ)
+	ਵਾਪਸ p;
 
 # ifdef __HAIKU__
     // special handling for user settings directory...
-    if (STRCMP(name, "BE_USER_SETTINGS") == 0)
+    ਜੇ (STRCMP(name, "BE_USER_SETTINGS") == 0)
     {
-	static char userSettingsPath[MAXPATHL];
+	ਸਥਿਰ ਅੱਖਰ user_Settings_ਰਸਤਾ[MAXPATHL];
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
-					   userSettingsPath, MAXPATHL) == B_OK)
-	    return (char_u *)userSettingsPath;
-	else
-	    return NULL;
+	ਜੇ (ਲੱਭੋ_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
+					   user_Settings_ਰਸਤਾ, MAXPATHL) == B_OK)
+	    ਵਾਪਸ (char_u *)user_Settings_ਰਸਤਾ;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ ਨਿਰਾ;
     }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
     // handling $VIMRUNTIME and $VIM is below, bail out if it's another name.
     vimruntime = (STRCMP(name, "VIMRUNTIME") == 0);
-    if (!vimruntime && STRCMP(name, "VIM") != 0)
-	return NULL;
+    ਜੇ (!vimruntime && STRCMP(name, "VIM") != 0)
+	ਵਾਪਸ ਨਿਰਾ;
 
     /*
      * When expanding $VIMRUNTIME fails, try using $VIM/vim<version> or $VIM.
      * Don't do this when default_vimruntime_dir is non-empty.
      */
-    if (vimruntime
-#ifdef HAVE_PATHDEF
+    ਜੇ (vimruntime
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_PATHDEF
 	    && *default_vimruntime_dir == NUL
-#endif
+#ਜੇ_ਅੰਤ
        )
     {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// Use Wide function
 	wp = _wgetenv(L"VIM");
-	if (wp != NULL && *wp == NUL)	    // empty is the same as not set
-	    wp = NULL;
-	if (wp != NULL)
+	ਜੇ (wp != ਨਿਰਾ && *wp == NUL)	    // empty is the same as not set
+	    wp = ਨਿਰਾ;
+	ਜੇ (wp != ਨਿਰਾ)
 	{
-	    char_u *q = utf16_to_enc(wp, NULL);
-	    if (q != NULL)
+	    char_u *q = utf16_ਮੰਜ਼ਿਲ_enc(wp, ਨਿਰਾ);
+	    ਜੇ (q != ਨਿਰਾ)
 	    {
-		p = vim_version_dir(q);
+		p = vim_ਸੰਸਕਰਣ_dir(q);
 		*mustfree = TRUE;
-		if (p == NULL)
+		ਜੇ (p == ਨਿਰਾ)
 		    p = q;
 	    }
 	}
-#else
+#ਨਹੀਂਤਾਂ
 	p = mch_getenv((char_u *)"VIM");
-	if (p != NULL && *p == NUL)	    // empty is the same as not set
-	    p = NULL;
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ && *p == NUL)	    // empty is the same as not set
+	    p = ਨਿਰਾ;
+	ਜੇ (p != ਨਿਰਾ)
 	{
-	    p = vim_version_dir(p);
-	    if (p != NULL)
+	    p = vim_ਸੰਸਕਰਣ_dir(p);
+	    ਜੇ (p != ਨਿਰਾ)
 		*mustfree = TRUE;
-	    else
+	    ਨਹੀਂਤਾਂ
 		p = mch_getenv((char_u *)"VIM");
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     /*
@@ -1905,39 +1905,39 @@ vim_getenv(char_u *name, int *mustfree)
      * - the directory name from 'helpfile' (unless it contains '$')
      * - the executable name from argv[0]
      */
-    if (p == NULL)
+    ਜੇ (p == ਨਿਰਾ)
     {
-	if (p_hf != NULL && vim_strchr(p_hf, '$') == NULL)
+	ਜੇ (p_hf != ਨਿਰਾ && vim_strchr(p_hf, '$') == ਨਿਰਾ)
 	    p = p_hf;
-#ifdef USE_EXE_NAME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_EXE_NAME
 	/*
 	 * Use the name of the executable, obtained from argv[0].
 	 */
-	else
+	ਨਹੀਂਤਾਂ
 	    p = exe_name;
-#endif
-	if (p != NULL)
+#ਜੇ_ਅੰਤ
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    // remove the file name
 	    pend = gettail(p);
 
 	    // remove "doc/" from 'helpfile', if present
-	    if (p == p_hf)
-		pend = remove_tail(p, pend, (char_u *)"doc");
+	    ਜੇ (p == p_hf)
+		pend = remove_ਪੂਛ(p, pend, (char_u *)"doc");
 
-#ifdef USE_EXE_NAME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_EXE_NAME
 # ifdef MACOS_X
 	    // remove "MacOS" from exe_name and add "Resources/vim"
-	    if (p == exe_name)
+	    ਜੇ (p == exe_name)
 	    {
 		char_u	*pend1;
 		char_u	*pnew;
 
-		pend1 = remove_tail(p, pend, (char_u *)"MacOS");
-		if (pend1 != pend)
+		pend1 = remove_ਪੂਛ(p, pend, (char_u *)"MacOS");
+		ਜੇ (pend1 != pend)
 		{
 		    pnew = alloc(pend1 - p + 15);
-		    if (pnew != NULL)
+		    ਜੇ (pnew != ਨਿਰਾ)
 		    {
 			STRNCPY(pnew, p, (pend1 - p));
 			STRCPY(pnew + (pend1 - p), "Resources/vim");
@@ -1948,139 +1948,139 @@ vim_getenv(char_u *name, int *mustfree)
 	    }
 # endif
 	    // remove "src/" from exe_name, if present
-	    if (p == exe_name)
-		pend = remove_tail(p, pend, (char_u *)"src");
-#endif
+	    ਜੇ (p == exe_name)
+		pend = remove_ਪੂਛ(p, pend, (char_u *)"src");
+#ਜੇ_ਅੰਤ
 
 	    // for $VIM, remove "runtime/" or "vim54/", if present
-	    if (!vimruntime)
+	    ਜੇ (!vimruntime)
 	    {
-		pend = remove_tail(p, pend, (char_u *)RUNTIME_DIRNAME);
-		pend = remove_tail(p, pend, (char_u *)VIM_VERSION_NODOT);
+		pend = remove_ਪੂਛ(p, pend, (char_u *)RUNTIME_DIRNAME);
+		pend = remove_ਪੂਛ(p, pend, (char_u *)VIM_ਸੰਸਕਰਣ_NODOT);
 	    }
 
 	    // remove trailing path separator
-	    if (pend > p && after_pathsep(p, pend))
+	    ਜੇ (pend > p && after_pathsep(p, pend))
 		--pend;
 
-#ifdef MACOS_X
-	    if (p == exe_name || p == p_hf)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MACOS_X
+	    ਜੇ (p == exe_name || p == p_hf)
+#ਜੇ_ਅੰਤ
 		// check that the result is a directory name
 		p = vim_strnsave(p, pend - p);
 
-	    if (p != NULL && !mch_isdir(p))
+	    ਜੇ (p != ਨਿਰਾ && !mch_isdir(p))
 		VIM_CLEAR(p);
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-#ifdef USE_EXE_NAME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_EXE_NAME
 		// may add "/vim54" or "/runtime" if it exists
-		if (vimruntime && (pend = vim_version_dir(p)) != NULL)
+		ਜੇ (vimruntime && (pend = vim_ਸੰਸਕਰਣ_dir(p)) != ਨਿਰਾ)
 		{
 		    vim_free(p);
 		    p = pend;
 		}
-#endif
+#ਜੇ_ਅੰਤ
 		*mustfree = TRUE;
 	    }
 	}
     }
 
-#ifdef HAVE_PATHDEF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_PATHDEF
     // When there is a pathdef.c file we can use default_vim_dir and
     // default_vimruntime_dir
-    if (p == NULL)
+    ਜੇ (p == ਨਿਰਾ)
     {
 	// Only use default_vimruntime_dir when it is not empty
-	if (vimruntime && *default_vimruntime_dir != NUL)
+	ਜੇ (vimruntime && *default_vimruntime_dir != NUL)
 	{
 	    p = default_vimruntime_dir;
 	    *mustfree = FALSE;
 	}
-	else if (*default_vim_dir != NUL)
+	ਨਹੀਂਤਾਂ ਜੇ (*default_vim_dir != NUL)
 	{
-	    if (vimruntime && (p = vim_version_dir(default_vim_dir)) != NULL)
+	    ਜੇ (vimruntime && (p = vim_ਸੰਸਕਰਣ_dir(default_vim_dir)) != ਨਿਰਾ)
 		*mustfree = TRUE;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		p = default_vim_dir;
 		*mustfree = FALSE;
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * Set the environment variable, so that the new value can be found fast
      * next time, and others can also use it (e.g. Perl).
      */
-    if (p != NULL)
+    ਜੇ (p != ਨਿਰਾ)
     {
-	if (vimruntime)
+	ਜੇ (vimruntime)
 	{
 	    vim_setenv((char_u *)"VIMRUNTIME", p);
 	    didset_vimruntime = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    vim_setenv((char_u *)"VIM", p);
 	    didset_vim = TRUE;
 	}
     }
-    return p;
+    ਵਾਪਸ p;
 }
 
-    void
+    ਖਾਲੀ
 vim_unsetenv(char_u *var)
 {
-#ifdef HAVE_UNSETENV
-    unsetenv((char *)var);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_UNSETENV
+    unsetenv((ਅੱਖਰ *)var);
+#ਨਹੀਂਤਾਂ
     vim_setenv(var, (char_u *)"");
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Removes environment variable "name" and take care of side effects.
  */
-    void
+    ਖਾਲੀ
 vim_unsetenv_ext(char_u *var)
 {
     vim_unsetenv(var);
 
     // "homedir" is not cleared, keep using the old value until $HOME is set.
-    if (STRICMP(var, "VIM") == 0)
+    ਜੇ (STRICMP(var, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (STRICMP(var, "VIMRUNTIME") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP(var, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Set environment variable "name" and take care of side effects.
  */
-    void
+    ਖਾਲੀ
 vim_setenv_ext(char_u *name, char_u *val)
 {
     vim_setenv(name, val);
-    if (STRICMP(name, "HOME") == 0)
+    ਜੇ (STRICMP(name, "HOME") == 0)
 	init_homedir();
-    else if (didset_vim && STRICMP(name, "VIM") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (didset_vim && STRICMP(name, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Our portable version of setenv.
  */
-    void
+    ਖਾਲੀ
 vim_setenv(char_u *name, char_u *val)
 {
-#ifdef HAVE_SETENV
-    mch_setenv((char *)name, (char *)val, 1);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_SETENV
+    mch_setenv((ਅੱਖਰ *)name, (ਅੱਖਰ *)val, 1);
+#ਨਹੀਂਤਾਂ
     char_u	*envbuf;
 
     /*
@@ -2088,28 +2088,28 @@ vim_setenv(char_u *name, char_u *val)
      * valid.  The allocated memory will never be freed.
      */
     envbuf = alloc(STRLEN(name) + STRLEN(val) + 2);
-    if (envbuf != NULL)
+    ਜੇ (envbuf != ਨਿਰਾ)
     {
-	sprintf((char *)envbuf, "%s=%s", name, val);
-	putenv((char *)envbuf);
+	sprintf((ਅੱਖਰ *)envbuf, "%s=%s", name, val);
+	putenv((ਅੱਖਰ *)envbuf);
     }
-#endif
-#ifdef FEAT_GETTEXT
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GETTEXT
     /*
      * When setting $VIMRUNTIME adjust the directory to find message
      * translations to $VIMRUNTIME/lang.
      */
-    if (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
+    ਜੇ (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
     {
 	char_u	*buf = concat_str(val, (char_u *)"/lang");
 
-	if (buf != NULL)
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    bindtextdomain(VIMPACKAGE, (char *)buf);
+	    bindtextdomain(VIMPACKAGE, (ਅੱਖਰ *)buf);
 	    vim_free(buf);
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -2117,94 +2117,94 @@ vim_setenv(char_u *name, char_u *val)
  */
     char_u *
 get_env_name(
-    expand_T	*xp UNUSED,
-    int		idx)
+    expand_T	*xp ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		idx)
 {
-#if defined(AMIGA)
+#ਜੇ defined(AMIGA)
     // No environ[] on the Amiga.
-    return NULL;
-#else
+    ਵਾਪਸ ਨਿਰਾ;
+#ਨਹੀਂਤਾਂ
 # ifndef __WIN32__
     // Borland C++ 5.2 has this in a header file.
-    extern char		**environ;
+    ਬਾਹਰੀ ਅੱਖਰ		**environ;
 # endif
     char_u		*str;
-    int			n;
+    ਪੂਰਨ			n;
 
     str = (char_u *)environ[idx];
-    if (str == NULL)
-	return NULL;
+    ਜੇ (str == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
+    ਲਈ (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
     {
-	if (str[n] == '=' || str[n] == NUL)
-	    break;
+	ਜੇ (str[n] == '=' || str[n] == NUL)
+	    ਰੋਕੋ;
 	xp->xp_buf[n] = str[n];
     }
     xp->xp_buf[n] = NUL;
-    return xp->xp_buf;
-#endif
+    ਵਾਪਸ xp->xp_buf;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Add a user name to the list of users in ga_users.
  * Do nothing if user name is NULL or empty.
  */
-    static void
-add_user(char_u *user, int need_copy)
+    ਸਥਿਰ ਖਾਲੀ
+ਜੋੜੋ_user(char_u *user, ਪੂਰਨ need_copy)
 {
-    char_u	*user_copy = (user != NULL && need_copy)
+    char_u	*user_copy = (user != ਨਿਰਾ && need_copy)
 						    ? vim_strsave(user) : user;
 
-    if (user_copy == NULL || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
+    ਜੇ (user_copy == ਨਿਰਾ || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
     {
-	if (need_copy)
+	ਜੇ (need_copy)
 	    vim_free(user_copy);
-	return;
+	ਵਾਪਸ;
     }
-    ((char_u **)(ga_users.ga_data))[ga_users.ga_len++] = user_copy;
+    ((char_u **)(ga_users.ga_ਅੰਕੜੇ))[ga_users.ga_len++] = user_copy;
 }
 
 /*
  * Find all user names for user completion.
  * Done only once and then cached.
  */
-    static void
-init_users(void)
+    ਸਥਿਰ ਖਾਲੀ
+init_users(ਖਾਲੀ)
 {
-    static int	lazy_init_done = FALSE;
+    ਸਥਿਰ ਪੂਰਨ	lazy_init_ਪੂਰਾ = FALSE;
 
-    if (lazy_init_done)
-	return;
+    ਜੇ (lazy_init_ਪੂਰਾ)
+	ਵਾਪਸ;
 
-    lazy_init_done = TRUE;
-    ga_init2(&ga_users, sizeof(char_u *), 20);
+    lazy_init_ਪੂਰਾ = TRUE;
+    ga_init2(&ga_users, ਆਕਾਰ(char_u *), 20);
 
-#if defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
+#ਜੇ defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
     {
-	struct passwd*	pw;
+	ਬਣਤਰ passwd*	pw;
 
 	setpwent();
-	while ((pw = getpwent()) != NULL)
-	    add_user((char_u *)pw->pw_name, TRUE);
+	ਜਦੋਂ ((pw = getpwent()) != ਨਿਰਾ)
+	    ਜੋੜੋ_user((char_u *)pw->pw_name, TRUE);
 	endpwent();
     }
-#elif defined(MSWIN)
+#ਜਾਂਜੇ defined(MSWIN)
     {
 	DWORD		nusers = 0, ntotal = 0, i;
 	PUSER_INFO_0	uinfo;
 
-	if (NetUserEnum(NULL, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_LENGTH,
-				       &nusers, &ntotal, NULL) == NERR_Success)
+	ਜੇ (NetUserEnum(ਨਿਰਾ, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_ਲੰਮਾਈ,
+				       &nusers, &ntotal, ਨਿਰਾ) == NERR_Success)
 	{
-	    for (i = 0; i < nusers; i++)
-		add_user(utf16_to_enc(uinfo[i].usri0_name, NULL), FALSE);
+	    ਲਈ (i = 0; i < nusers; i++)
+		ਜੋੜੋ_user(utf16_ਮੰਜ਼ਿਲ_enc(uinfo[i].usri0_name, ਨਿਰਾ), FALSE);
 
-	    NetApiBufferFree(uinfo);
+	    Net_Api_ਬਫਰ_Free(uinfo);
 	}
     }
-#endif
-#if defined(HAVE_GETPWNAM)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(HAVE_GETPWNAM)
     {
 	char_u	*user_env = mch_getenv((char_u *)"USER");
 
@@ -2214,40 +2214,40 @@ init_users(void)
 	// is a valid remote user name using getpwnam() and if it is, add it to
 	// the list of user names.
 
-	if (user_env != NULL && *user_env != NUL)
+	ਜੇ (user_env != ਨਿਰਾ && *user_env != NUL)
 	{
-	    int	i;
+	    ਪੂਰਨ	i;
 
-	    for (i = 0; i < ga_users.ga_len; i++)
+	    ਲਈ (i = 0; i < ga_users.ga_len; i++)
 	    {
-		char_u	*local_user = ((char_u **)ga_users.ga_data)[i];
+		char_u	*local_user = ((char_u **)ga_users.ga_ਅੰਕੜੇ)[i];
 
-		if (STRCMP(local_user, user_env) == 0)
-		    break;
+		ਜੇ (STRCMP(local_user, user_env) == 0)
+		    ਰੋਕੋ;
 	    }
 
-	    if (i == ga_users.ga_len)
+	    ਜੇ (i == ga_users.ga_len)
 	    {
-		struct passwd	*pw = getpwnam((char *)user_env);
+		ਬਣਤਰ passwd	*pw = getpwnam((ਅੱਖਰ *)user_env);
 
-		if (pw != NULL)
-		    add_user((char_u *)pw->pw_name, TRUE);
+		ਜੇ (pw != ਨਿਰਾ)
+		    ਜੋੜੋ_user((char_u *)pw->pw_name, TRUE);
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Function given to ExpandGeneric() to obtain user names.
  */
     char_u*
-get_users(expand_T *xp UNUSED, int idx)
+get_users(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
     init_users();
-    if (idx < ga_users.ga_len)
-	return ((char_u **)ga_users.ga_data)[idx];
-    return NULL;
+    ਜੇ (idx < ga_users.ga_len)
+	ਵਾਪਸ ((char_u **)ga_users.ga_ਅੰਕੜੇ)[idx];
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -2256,48 +2256,48 @@ get_users(expand_T *xp UNUSED, int idx)
  * 1 if name partially matches the beginning of a user name.
  * 2 is name fully matches a user name.
  */
-    int
-match_user(char_u *name)
+    ਪੂਰਨ
+ਮੇਲ_user(char_u *name)
 {
-    int i;
-    int n = (int)STRLEN(name);
-    int result = 0;
+    ਪੂਰਨ i;
+    ਪੂਰਨ n = (ਪੂਰਨ)STRLEN(name);
+    ਪੂਰਨ ਨਤੀਜਾ = 0;
 
     init_users();
-    for (i = 0; i < ga_users.ga_len; i++)
+    ਲਈ (i = 0; i < ga_users.ga_len; i++)
     {
-	if (STRCMP(((char_u **)ga_users.ga_data)[i], name) == 0)
-	    return 2; // full match
-	if (STRNCMP(((char_u **)ga_users.ga_data)[i], name, n) == 0)
-	    result = 1; // partial match
+	ਜੇ (STRCMP(((char_u **)ga_users.ga_ਅੰਕੜੇ)[i], name) == 0)
+	    ਵਾਪਸ 2; // full match
+	ਜੇ (STRNCMP(((char_u **)ga_users.ga_ਅੰਕੜੇ)[i], name, n) == 0)
+	    ਨਤੀਜਾ = 1; // partial match
     }
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
-    static void
-prepare_to_exit(void)
+    ਸਥਿਰ ਖਾਲੀ
+prepare_ਮੰਜ਼ਿਲ_exit(ਖਾਲੀ)
 {
-#if defined(SIGHUP) && defined(SIG_IGN)
+#ਜੇ defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
     mch_signal(SIGHUP, SIG_IGN);
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
 	gui.dying = true;
-	out_trash();	// trash any pending output
+	ਬਾਹਰਲਾ_trash();	// trash any pending output
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     {
-	windgoto((int)Rows - 1, cmdline_col_off);
+	windgoto((ਪੂਰਨ)ਪੰਕਤੀਆਂ - 1, cmdline_ਖਾਨਾ_off);
 
 	// When "full_screen" was reset, e.g. by deathtrap(), settmode() below
 	// returns without switching the mouse off, so do it here.
-	if (!full_screen)
+	ਜੇ (!ਭਰਿਆ_screen)
 	    mch_setmouse(FALSE);
 
 	/*
@@ -2306,7 +2306,7 @@ prepare_to_exit(void)
 	 */
 	settmode(TMODE_COOK);
 	stoptermcap();
-	out_flush();
+	ਬਾਹਰਲਾ_flush();
     }
 }
 
@@ -2316,38 +2316,38 @@ prepare_to_exit(void)
  * NOTE: This may be called from deathtrap() in a signal handler, avoid unsafe
  * functions, such as allocating memory.
  */
-    void
-preserve_exit(void)
+    ਖਾਲੀ
+preserve_exit(ਖਾਲੀ)
 {
     buf_T	*buf;
 
-    prepare_to_exit();
+    prepare_ਮੰਜ਼ਿਲ_exit();
 
     // Setting this will prevent free() calls.  That avoids calling free()
     // recursively when free() was invoked with a bad pointer.
     really_exiting = TRUE;
 
-    out_str(IObuff);
-    screen_start();		    // don't know where cursor is now
-    out_flush();
+    ਬਾਹਰਲਾ_str(IObuff);
+    screen_ਸ਼ੁਰੂ();		    // don't know where cursor is now
+    ਬਾਹਰਲਾ_flush();
 
     ml_close_notmod();		    // close all not-modified buffers
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp != NULL && buf->b_ml.ml_mfp->mf_fname != NULL)
+	ਜੇ (buf->b_ml.ml_mfp != ਨਿਰਾ && buf->b_ml.ml_mfp->mf_fname != ਨਿਰਾ)
 	{
-	    OUT_STR("Vim: preserving files...\r\n");
-	    screen_start();	    // don't know where cursor is now
-	    out_flush();
+	    ਬਾਹਰਲਾ_STR("Vim: preserving files...\r\n");
+	    screen_ਸ਼ੁਰੂ();	    // don't know where cursor is now
+	    ਬਾਹਰਲਾ_flush();
 	    ml_sync_all(FALSE, FALSE);	// preserve all swap files
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
     ml_close_all(FALSE);	    // close all memfiles, without deleting
 
-    OUT_STR("Vim: Finished.\r\n");
+    ਬਾਹਰਲਾ_STR("Vim: Finished.\r\n");
 
     getout(1);
 }
@@ -2359,18 +2359,18 @@ preserve_exit(void)
  * time, because it can be a system call.
  */
 
-#ifndef BREAKCHECK_SKIP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ BREAKCHECK_SKIP
 # define BREAKCHECK_SKIP 1000
-#endif
+#ਜੇ_ਅੰਤ
 
-static int	breakcheck_count = 0;
+ਸਥਿਰ ਪੂਰਨ	breakcheck_ਗਿਣਤੀ = 0;
 
-    void
-line_breakcheck(void)
+    ਖਾਲੀ
+ਸਤਰ_breakcheck(ਖਾਲੀ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP)
+    ਜੇ (++breakcheck_ਗਿਣਤੀ >= BREAKCHECK_SKIP)
     {
-	breakcheck_count = 0;
+	breakcheck_ਗਿਣਤੀ = 0;
 	ui_breakcheck();
     }
 }
@@ -2378,32 +2378,32 @@ line_breakcheck(void)
 /*
  * Like line_breakcheck() but check 10 times less often.
  */
-    void
-fast_breakcheck(void)
+    ਖਾਲੀ
+fast_breakcheck(ਖਾਲੀ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 10)
+    ਜੇ (++breakcheck_ਗਿਣਤੀ >= BREAKCHECK_SKIP * 10)
     {
-	breakcheck_count = 0;
+	breakcheck_ਗਿਣਤੀ = 0;
 	ui_breakcheck();
     }
 }
 
-#if defined(FEAT_SPELL)
+#ਜੇ defined(FEAT_SPELL)
 /*
  * Like line_breakcheck() but check 100 times less often.
  */
-    void
-veryfast_breakcheck(void)
+    ਖਾਲੀ
+veryfast_breakcheck(ਖਾਲੀ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 100)
+    ਜੇ (++breakcheck_ਗਿਣਤੀ >= BREAKCHECK_SKIP * 100)
     {
-	breakcheck_count = 0;
+	breakcheck_ਗਿਣਤੀ = 0;
 	ui_breakcheck();
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#ਜੇ defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 
 # ifndef SEEK_SET
 #  define SEEK_SET 0
@@ -2422,31 +2422,31 @@ veryfast_breakcheck(void)
 get_cmd_output(
     char_u	*cmd,
     char_u	*infile,	// optional input file name
-    int		flags,		// can be SHELL_SILENT
-    int		*ret_len)
+    ਪੂਰਨ		flags,		// can be SHELL_SILENT
+    ਪੂਰਨ		*ret_len)
 {
     char_u	*tempname;
     char_u	*command;
-    char_u	*buffer = NULL;
-    int		len;
-    int		i = 0;
+    char_u	*ਬਫਰ = ਨਿਰਾ;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		i = 0;
     FILE	*fd;
 
-    if (check_restricted() || check_secure())
-	return NULL;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ ਨਿਰਾ;
 
     // Keep the file reserved until the shell opens it.  On MS-Windows,
     // deleting it here would let another Vim process reuse the same name.
-    if ((tempname = vim_tempname('o', TRUE)) == NULL)
+    ਜੇ ((tempname = vim_tempname('o', TRUE)) == ਨਿਰਾ)
     {
-	emsg(_(e_cant_get_temp_file_name));
-	return NULL;
+	emsg(_(e_cant_get_ਆਰਜ਼ੀ_file_name));
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Add the redirection stuff
     command = make_filter_cmd(cmd, infile, tempname);
-    if (command == NULL)
-	goto done;
+    ਜੇ (command == ਨਿਰਾ)
+	ਜਾਓ ਪੂਰਾ;
 
     /*
      * Call the shell to execute the command (errors are ignored).
@@ -2463,195 +2463,195 @@ get_cmd_output(
      */
 # ifdef VMS
     // created temporary file is not always readable as binary
-    fd = mch_fopen((char *)tempname, "r");
-# else
-    fd = mch_fopen((char *)tempname, READBIN);
+    fd = mch_fopen((ਅੱਖਰ *)tempname, "r");
+# ਨਹੀਂਤਾਂ
+    fd = mch_fopen((ਅੱਖਰ *)tempname, READBIN);
 # endif
 
     // Not being able to seek means we can't read the file.
-    if (fd == NULL
+    ਜੇ (fd == ਨਿਰਾ
 	    || fseek(fd, 0L, SEEK_END) == -1
 	    || (len = ftell(fd)) == -1		// get size of temp file
 	    || fseek(fd, 0L, SEEK_SET) == -1)	// back to the start
     {
 	semsg(_(e_cannot_read_from_str_2), tempname);
-	if (fd != NULL)
+	ਜੇ (fd != ਨਿਰਾ)
 	    fclose(fd);
-	goto done;
+	ਜਾਓ ਪੂਰਾ;
     }
 
-    buffer = alloc(len + 1);
-    if (buffer != NULL)
-	i = (int)fread((char *)buffer, (size_t)1, (size_t)len, fd);
+    ਬਫਰ = alloc(len + 1);
+    ਜੇ (ਬਫਰ != ਨਿਰਾ)
+	i = (ਪੂਰਨ)fread((ਅੱਖਰ *)ਬਫਰ, (size_t)1, (size_t)len, fd);
     fclose(fd);
-    if (buffer == NULL)
-	goto done;
+    ਜੇ (ਬਫਰ == ਨਿਰਾ)
+	ਜਾਓ ਪੂਰਾ;
 # ifdef VMS
     len = i;	// VMS doesn't give us what we asked for...
 # endif
-    if (i != len)
+    ਜੇ (i != len)
     {
 	semsg(_(e_cant_read_file_str), tempname);
-	VIM_CLEAR(buffer);
+	VIM_CLEAR(ਬਫਰ);
     }
-    else if (ret_len == NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (ret_len == ਨਿਰਾ)
     {
 	// Change NUL into SOH, otherwise the string is truncated.
-	for (i = 0; i < len; ++i)
-	    if (buffer[i] == NUL)
-		buffer[i] = 1;
+	ਲਈ (i = 0; i < len; ++i)
+	    ਜੇ (ਬਫਰ[i] == NUL)
+		ਬਫਰ[i] = 1;
 
-	buffer[len] = NUL;	// make sure the buffer is terminated
+	ਬਫਰ[len] = NUL;	// make sure the buffer is terminated
     }
-    else
+    ਨਹੀਂਤਾਂ
 	*ret_len = len;
 
-done:
+ਪੂਰਾ:
     mch_remove(tempname);
     vim_free(tempname);
-    return buffer;
+    ਵਾਪਸ ਬਫਰ;
 }
 
-# if defined(FEAT_EVAL)
+# ਜੇ defined(FEAT_EVAL)
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 get_cmd_output_as_rettv(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		retlist)
+    ਪੂਰਨ		retlist)
 {
-    char_u	*res = NULL;
+    char_u	*res = ਨਿਰਾ;
     char_u	*p;
-    char_u	*infile = NULL;
-    int		err = FALSE;
+    char_u	*infile = ਨਿਰਾ;
+    ਪੂਰਨ		err = FALSE;
     FILE	*fd;
-    list_T	*list = NULL;
-    int		flags = SHELL_SILENT;
-    int		use_argv = FALSE;
-    char	**argv = NULL;
-    int		argc = 0;
+    list_T	*list = ਨਿਰਾ;
+    ਪੂਰਨ		flags = SHELL_SILENT;
+    ਪੂਰਨ		use_argv = FALSE;
+    ਅੱਖਰ	**argv = ਨਿਰਾ;
+    ਪੂਰਨ		argc = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (check_restricted() || check_secure())
-	goto errret;
+    rettv->vval.v_string = ਨਿਰਾ;
+    ਜੇ (check_restricted() || check_secure())
+	ਜਾਓ errret;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_or_list_arg(argvars, 1)
+		|| check_for_opt_string_or_ਸੰਖਿਆ_or_list_arg(argvars, 1)
 								      == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	/*
 	 * Write the text to a temp file, to be used for input of the shell
 	 * command.
 	 */
-	if ((infile = vim_tempname('i', TRUE)) == NULL)
+	ਜੇ ((infile = vim_tempname('i', TRUE)) == ਨਿਰਾ)
 	{
-	    emsg(_(e_cant_get_temp_file_name));
-	    goto errret;
+	    emsg(_(e_cant_get_ਆਰਜ਼ੀ_file_name));
+	    ਜਾਓ errret;
 	}
 
-	fd = mch_fopen((char *)infile, WRITEBIN);
-	if (fd == NULL)
+	fd = mch_fopen((ਅੱਖਰ *)infile, WRITEBIN);
+	ਜੇ (fd == ਨਿਰਾ)
 	{
 	    semsg(_(e_cant_open_file_str), infile);
-	    goto errret;
+	    ਜਾਓ errret;
 	}
-	if (argvars[1].v_type == VAR_NUMBER)
+	ਜੇ (argvars[1].v_type == VAR_ਸੰਖਿਆ)
 	{
 	    linenr_T	lnum;
 	    buf_T	*buf;
 
-	    buf = buflist_findnr(argvars[1].vval.v_number);
-	    if (buf == NULL)
+	    buf = buflist_findnr(argvars[1].vval.v_ਸੰਖਿਆ);
+	    ਜੇ (buf == ਨਿਰਾ)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_number);
+		semsg(_(e_ਬਫਰ_nr_does_not_exist), argvars[1].vval.v_ਸੰਖਿਆ);
 		fclose(fd);
-		goto errret;
+		ਜਾਓ errret;
 	    }
 
-	    for (lnum = 1; lnum <= buf->b_ml.ml_line_count; lnum++)
+	    ਲਈ (lnum = 1; lnum <= buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; lnum++)
 	    {
-		for (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
-		    if (putc(*p == '\n' ? NUL : *p, fd) == EOF)
+		ਲਈ (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
+		    ਜੇ (putc(*p == '\n' ? NUL : *p, fd) == EOF)
 		    {
 			err = TRUE;
-			break;
+			ਰੋਕੋ;
 		    }
-		if (putc(NL, fd) == EOF)
+		ਜੇ (putc(NL, fd) == EOF)
 		{
 		    err = TRUE;
-		    break;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	ਨਹੀਂਤਾਂ ਜੇ (argvars[1].v_type == VAR_LIST)
 	{
-	    if (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
+	    ਜੇ (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
 		err = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    size_t	len;
 	    char_u	buf[NUMBUFLEN];
 
 	    p = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 	    {
 		fclose(fd);
-		goto errret;		// type error; errmsg already given
+		ਜਾਓ errret;		// type error; errmsg already given
 	    }
 	    len = STRLEN(p);
-	    if (len > 0 && fwrite(p, len, 1, fd) != 1)
+	    ਜੇ (len > 0 && fwrite(p, len, 1, fd) != 1)
 		err = TRUE;
 	}
-	if (fclose(fd) != 0)
+	ਜੇ (fclose(fd) != 0)
 	    err = TRUE;
-	if (err)
+	ਜੇ (err)
 	{
-	    emsg(_(e_error_writing_temp_file));
-	    goto errret;
+	    emsg(_(e_error_writing_ਆਰਜ਼ੀ_file));
+	    ਜਾਓ errret;
 	}
     }
 
     // When the command is a List, execute directly without the shell.
-    if (argvars[0].v_type == VAR_LIST)
+    ਜੇ (argvars[0].v_type == VAR_LIST)
     {
 	list_T	*l = argvars[0].vval.v_list;
 
-	if (l == NULL || l->lv_len < 1)
+	ਜੇ (l == ਨਿਰਾ || l->lv_len < 1)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_ਦਲੀਲ));
+	    ਜਾਓ errret;
 	}
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
-	    goto errret;
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	ਜੇ (build_argv_from_list(l, &argv, &argc) == FAIL)
+	    ਜਾਓ errret;
+	ਜੇ (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
-	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    emsg(_(e_invalid_ਦਲੀਲ));
+	    ਜਾਓ errret;
 	}
 	use_argv = TRUE;
 
-	if (p_verbose > 3)
+	ਜੇ (p_verbose > 3)
 	{
-	    int		i;
+	    ਪੂਰਨ		i;
 	    garray_T	ga;
 
 	    verbose_enter();
 	    ga_init2(&ga, 1, 200);
-	    for (i = 0; i < argc; ++i)
+	    ਲਈ (i = 0; i < argc; ++i)
 	    {
-		if (i > 0)
+		ਜੇ (i > 0)
 		    ga_append(&ga, ' ');
 		ga_concat(&ga, (char_u *)argv[i]);
 	    }
 	    ga_append(&ga, NUL);
-	    smsg(_("Executing directly: \"%s\""), (char *)ga.ga_data);
-	    msg_putchar_attr('\n', 0);
+	    smsg(_("Executing directly: \"%s\""), (ਅੱਖਰ *)ga.ga_ਅੰਕੜੇ);
+	    ਸੁਨੇਹਾ_putchar_attr('\n', 0);
 	    cursor_on();
 	    verbose_leave();
 	    ga_clear(&ga);
@@ -2660,75 +2660,75 @@ get_cmd_output_as_rettv(
 
     // Omit SHELL_COOKED when invoked with ":silent".  Avoids that the shell
     // echoes typeahead, that messes up the display.
-    if (!msg_silent)
+    ਜੇ (!ਸੁਨੇਹਾ_silent)
 	flags += SHELL_COOKED;
 
-    if (retlist)
+    ਜੇ (retlist)
     {
-	int		len;
+	ਪੂਰਨ		len;
 	listitem_T	*li;
-	char_u		*s = NULL;
-	char_u		*start;
-	char_u		*end;
-	int		i;
+	char_u		*s = ਨਿਰਾ;
+	char_u		*ਸ਼ੁਰੂ;
+	char_u		*ਸਿਰਾ;
+	ਪੂਰਨ		i;
 
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, &len);
-	else
+	ਜੇ (use_argv)
+	    res = mch_get_cmd_output_ਸਿੱਧਾ(argv, infile, flags, &len);
+	ਨਹੀਂਤਾਂ
 	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, &len);
-	if (res == NULL)
-	    goto errret;
+	ਜੇ (res == ਨਿਰਾ)
+	    ਜਾਓ errret;
 
 	list = list_alloc();
-	if (list == NULL)
-	    goto errret;
+	ਜੇ (list == ਨਿਰਾ)
+	    ਜਾਓ errret;
 
-	for (i = 0; i < len; ++i)
+	ਲਈ (i = 0; i < len; ++i)
 	{
-	    start = res + i;
-	    while (i < len && res[i] != NL)
+	    ਸ਼ੁਰੂ = res + i;
+	    ਜਦੋਂ (i < len && res[i] != NL)
 		++i;
-	    end = res + i;
+	    ਸਿਰਾ = res + i;
 
-	    s = alloc(end - start + 1);
-	    if (s == NULL)
-		goto errret;
+	    s = alloc(ਸਿਰਾ - ਸ਼ੁਰੂ + 1);
+	    ਜੇ (s == ਨਿਰਾ)
+		ਜਾਓ errret;
 
-	    for (p = s; start < end; ++p, ++start)
-		*p = *start == NUL ? NL : *start;
+	    ਲਈ (p = s; ਸ਼ੁਰੂ < ਸਿਰਾ; ++p, ++ਸ਼ੁਰੂ)
+		*p = *ਸ਼ੁਰੂ == NUL ? NL : *ਸ਼ੁਰੂ;
 	    *p = NUL;
 
 	    li = listitem_alloc();
-	    if (li == NULL)
+	    ਜੇ (li == ਨਿਰਾ)
 	    {
 		vim_free(s);
-		goto errret;
+		ਜਾਓ errret;
 	    }
 	    li->li_tv.v_type = VAR_STRING;
-	    li->li_tv.v_lock = 0;
+	    li->li_tv.v_ਤਾਲਾ = 0;
 	    li->li_tv.vval.v_string = s;
 	    list_append(list, li);
 	}
 
-	rettv_list_set(rettv, list);
-	list = NULL;
+	rettv_list_ਸੈੱਟ(rettv, list);
+	list = ਨਿਰਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, NULL);
-	else
-	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, NULL);
+	ਜੇ (use_argv)
+	    res = mch_get_cmd_output_ਸਿੱਧਾ(argv, infile, flags, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
+	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, ਨਿਰਾ);
 #  ifdef USE_CRNL
 	// translate <CR><NL> into <NL>
-	if (res != NULL)
+	ਜੇ (res != ਨਿਰਾ)
 	{
 	    char_u	*s, *d;
 
 	    d = res;
-	    for (s = res; *s; ++s)
+	    ਲਈ (s = res; *s; ++s)
 	    {
-		if (s[0] == CAR && s[1] == NL)
+		ਜੇ (s[0] == CAR && s[1] == NL)
 		    ++s;
 		*d++ = *s;
 	    }
@@ -2736,32 +2736,32 @@ get_cmd_output_as_rettv(
 	}
 #  endif
 	rettv->vval.v_string = res;
-	res = NULL;
+	res = ਨਿਰਾ;
     }
 
 errret:
-    if (argv != NULL)
+    ਜੇ (argv != ਨਿਰਾ)
     {
-	int i;
-	for (i = 0; argv[i] != NULL; i++)
+	ਪੂਰਨ i;
+	ਲਈ (i = 0; argv[i] != ਨਿਰਾ; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
-    if (infile != NULL)
+    ਜੇ (infile != ਨਿਰਾ)
     {
 	mch_remove(infile);
 	vim_free(infile);
     }
-    if (res != NULL)
+    ਜੇ (res != ਨਿਰਾ)
 	vim_free(res);
-    if (list != NULL)
+    ਜੇ (list != ਨਿਰਾ)
 	list_free(list);
 }
 
 /*
  * "system()" function
  */
-    void
+    ਖਾਲੀ
 f_system(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, FALSE);
@@ -2770,24 +2770,24 @@ f_system(typval_T *argvars, typval_T *rettv)
 /*
  * "systemlist()" function
  */
-    void
+    ਖਾਲੀ
 f_systemlist(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, TRUE);
 }
 # endif // FEAT_EVAL
 
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE when need to go to Insert mode because of 'insertmode'.
  * Don't do this when still processing a command or a mapping.
  * Don't do this when inside a ":normal" command.
  */
-    int
-goto_im(void)
+    ਪੂਰਨ
+goto_im(ਖਾਲੀ)
 {
-    return (p_im && stuff_empty() && typebuf_typed());
+    ਵਾਪਸ (p_im && stuff_ਖਾਲੀ_ਥਾਵਾਂ() && typebuf_typed());
 }
 
 /*
@@ -2800,33 +2800,33 @@ goto_im(void)
  * Returns NULL when out of memory.
  */
     char_u *
-get_isolated_shell_name(void)
+get_isolated_shell_name(ਖਾਲੀ)
 {
     char_u *p;
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     p = gettail(p_sh);
     p = vim_strnsave(p, skiptowhite(p) - p);
-#else
+#ਨਹੀਂਤਾਂ
     p = skiptowhite(p_sh);
-    if (*p == NUL)
+    ਜੇ (*p == NUL)
     {
 	// No white space, use the tail.
 	p = vim_strsave(gettail(p_sh));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	char_u  *p1, *p2;
 
 	// Find the last path separator before the space.
 	p1 = p_sh;
-	for (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
-	    if (vim_ispathsep(*p2))
+	ਲਈ (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
+	    ਜੇ (vim_ispathsep(*p2))
 		p1 = p2 + 1;
 	p = vim_strnsave(p1, p - p1);
     }
-#endif
-    return p;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ p;
 }
 
 /*
@@ -2834,14 +2834,14 @@ get_isolated_shell_name(void)
  * Also check for ":\\", which MS Internet Explorer accepts, return
  * URL_BACKSLASH.
  */
-    int
-path_is_url(char_u *p)
+    ਪੂਰਨ
+ਰਸਤਾ_is_url(char_u *p)
 {
-    if (STRNCMP(p, "://", (size_t)3) == 0)
-	return URL_SLASH;
-    else if (STRNCMP(p, ":\\\\", (size_t)3) == 0)
-	return URL_BACKSLASH;
-    return 0;
+    ਜੇ (STRNCMP(p, "://", (size_t)3) == 0)
+	ਵਾਪਸ URL_SLASH;
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, ":\\\\", (size_t)3) == 0)
+	ਵਾਪਸ URL_BACKSLASH;
+    ਵਾਪਸ 0;
 }
 
 /*
@@ -2849,8 +2849,8 @@ path_is_url(char_u *p)
  * Return URL_SLASH for "name://", URL_BACKSLASH for "name:\\".
  * Return zero otherwise.
  */
-    int
-path_with_url(char_u *fname)
+    ਪੂਰਨ
+ਰਸਤਾ_with_url(char_u *fname)
 {
     char_u *p;
 
@@ -2859,22 +2859,22 @@ path_with_url(char_u *fname)
     // non-URL text.
 
     // first character must be alpha
-    if (!ASCII_ISALPHA(*fname))
-	return 0;
+    ਜੇ (!ASCII_ISALPHA(*fname))
+	ਵਾਪਸ 0;
 
     // check body: alpha or dash
-    for (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
+    ਲਈ (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
 	;
 
     // check last char is not a dash
-    if (p[-1] == '-')
-	return 0;
+    ਜੇ (p[-1] == '-')
+	ਵਾਪਸ 0;
 
     // "://" or ":\\" must follow
-    return path_is_url(p);
+    ਵਾਪਸ ਰਸਤਾ_is_url(p);
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Return the dictionary of v:event.
  * Save and clear the value in case it already has items.
@@ -2884,80 +2884,80 @@ get_v_event(save_v_event_T *sve)
 {
     dict_T	*v_event = get_vim_var_dict(VV_EVENT);
 
-    if (v_event->dv_hashtab.ht_used > 0)
+    ਜੇ (v_event->dv_hashtab.ht_ਵਰਤਿਆ > 0)
     {
 	// recursive use of v:event, save, make empty and restore later
 	sve->sve_did_save = TRUE;
 	sve->sve_hashtab = v_event->dv_hashtab;
 	hash_init(&v_event->dv_hashtab);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	sve->sve_did_save = FALSE;
-    return v_event;
+    ਵਾਪਸ v_event;
 }
 
-    void
+    ਖਾਲੀ
 restore_v_event(dict_T *v_event, save_v_event_T *sve)
 {
     dict_free_contents(v_event);
-    if (sve->sve_did_save)
+    ਜੇ (sve->sve_did_save)
 	v_event->dv_hashtab = sve->sve_hashtab;
-    else
+    ਨਹੀਂਤਾਂ
 	hash_init(&v_event->dv_hashtab);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Fires a ModeChanged autocmd event if appropriate.
  */
-    void
-may_trigger_modechanged(void)
+    ਖਾਲੀ
+may_trigger_modechanged(ਖਾਲੀ)
 {
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     dict_T	    *v_event;
     save_v_event_T  save_v_event;
-    char_u	    curr_mode[MODE_MAX_LENGTH];
-    char_u	    pattern_buf[2 * MODE_MAX_LENGTH];
+    char_u	    curr_ਬਹੁਲਕ[ਬਹੁਲਕ_MAX_ਲੰਮਾਈ];
+    char_u	    ਨਮੂਨਾ_buf[2 * ਬਹੁਲਕ_MAX_ਲੰਮਾਈ];
 
     // Skip this when got_int is set, the autocommand will not be executed.
     // Better trigger it next time.
-    if (!has_modechanged() || got_int)
-	return;
+    ਜੇ (!has_modechanged() || got_int)
+	ਵਾਪਸ;
 
-    get_mode(curr_mode);
-    if (STRCMP(curr_mode, last_mode) == 0)
-	return;
+    get_ਬਹੁਲਕ(curr_ਬਹੁਲਕ);
+    ਜੇ (STRCMP(curr_ਬਹੁਲਕ, ਆਖਰੀ_ਬਹੁਲਕ) == 0)
+	ਵਾਪਸ;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "new_mode", curr_mode);
-    (void)dict_add_string(v_event, "old_mode", last_mode);
-    dict_set_items_ro(v_event);
+    (ਖਾਲੀ)dict_ਜੋੜੋ_string(v_event, "new_mode", curr_ਬਹੁਲਕ);
+    (ਖਾਲੀ)dict_ਜੋੜੋ_string(v_event, "old_mode", ਆਖਰੀ_ਬਹੁਲਕ);
+    dict_ਸੈੱਟ_ਚੀਜ਼ਾਂ_ro(v_event);
 
     // concatenate modes in format "old_mode:new_mode"
-    vim_snprintf((char *)pattern_buf, sizeof(pattern_buf), "%s:%s", last_mode,
-	    curr_mode);
+    vim_snprintf((ਅੱਖਰ *)ਨਮੂਨਾ_buf, ਆਕਾਰ(ਨਮੂਨਾ_buf), "%s:%s", ਆਖਰੀ_ਬਹੁਲਕ,
+	    curr_ਬਹੁਲਕ);
 
-    apply_autocmds(EVENT_MODECHANGED, pattern_buf, NULL, FALSE, curbuf);
-    STRCPY(last_mode, curr_mode);
+    apply_autocmds(EVENT_MODECHANGED, ਨਮੂਨਾ_buf, ਨਿਰਾ, FALSE, curbuf);
+    STRCPY(ਆਖਰੀ_ਬਹੁਲਕ, curr_ਬਹੁਲਕ);
 
     restore_v_event(v_event, &save_v_event);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 // For overflow detection, add a digit safely to a long value.
-    int
-vim_append_digit_long(long *value, int digit)
+    ਪੂਰਨ
+vim_append_digit_long(ਲੰਮਾ *ਮੁੱਲ, ਪੂਰਨ digit)
 {
-    long x = *value;
-    if (x > ((LONG_MAX - (long)digit) / 10))
-	return FAIL;
-    *value = x * 10 + (long)digit;
-    return OK;
+    ਲੰਮਾ x = *ਮੁੱਲ;
+    ਜੇ (x > ((LONG_MAX - (ਲੰਮਾ)digit) / 10))
+	ਵਾਪਸ FAIL;
+    *ਮੁੱਲ = x * 10 + (ਲੰਮਾ)digit;
+    ਵਾਪਸ OK;
 }
 
 // Return something that fits into an int.
-    int
-trim_to_int(vimlong_T x)
+    ਪੂਰਨ
+trim_ਮੰਜ਼ਿਲ_int(vimlong_T x)
 {
-    return x > INT_MAX ? INT_MAX : x < INT_MIN ? INT_MIN : x;
+    ਵਾਪਸ x > ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ ? ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ : x < INT_MIN ? INT_MIN : x;
 }

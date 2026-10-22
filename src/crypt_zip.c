@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ਜੇ defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,131 +24,131 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    u32_T ਕੁੰਜੀਆਂ[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+ਸਥਿਰ u32_T ਚੱਕਰੀ_ਜਾਂਚ_32_ਸਾਰਣੀ[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    ਸਥਿਰ ਖਾਲੀ
+make_ਚੱਕਰੀ_ਜਾਂਚ_tab(ਖਾਲੀ)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    ਸਥਿਰ ਪੂਰਨ	ਪੂਰਾ = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    ਜੇ (ਪੂਰਾ)
+	ਵਾਪਸ;
+    ਲਈ (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	ਲਈ (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
-	crc_32_table[t] = v;
+	ਚੱਕਰੀ_ਜਾਂਚ_32_ਸਾਰਣੀ[t] = v;
     }
-    done = TRUE;
+    ਪੂਰਾ = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਚੱਕਰੀ_ਜਾਂਚ_32(c, b) (ਚੱਕਰੀ_ਜਾਂਚ_32_ਸਾਰਣੀ[((ਪੂਰਨ)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DECRYPT_BYTE_ZIP(ਕੁੰਜੀਆਂ, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u ਆਰਜ਼ੀ = (short_u)ਕੁੰਜੀਆਂ[2] | 2; \
+    t = (ਪੂਰਨ)(((ਬਿਨਾਨਿਸ਼ਾਨੀ)(ਆਰਜ਼ੀ * (ਆਰਜ਼ੀ ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ UPDATE_ਕੁੰਜੀਆਂ_ZIP(ਕੁੰਜੀਆਂ, c) ਕਰੋ { \
+    ਕੁੰਜੀਆਂ[0] = ਚੱਕਰੀ_ਜਾਂਚ_32(ਕੁੰਜੀਆਂ[0], (c)); \
+    ਕੁੰਜੀਆਂ[1] += ਕੁੰਜੀਆਂ[0] & 0xff; \
+    ਕੁੰਜੀਆਂ[1] = ਕੁੰਜੀਆਂ[1] * 134775813L + 1; \
+    ਕੁੰਜੀਆਂ[2] = ਚੱਕਰੀ_ਜਾਂਚ_32(ਕੁੰਜੀਆਂ[2], (ਪੂਰਨ)(ਕੁੰਜੀਆਂ[1] >> 24)); \
+} ਜਦੋਂ (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    ਪੂਰਨ
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
-    crypt_arg_T     *arg UNUSED)
+    char_u	    *ਕੁੰਜੀ,
+    crypt_arg_T     *arg ਅਣਵਰਤਿਆ)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
-    state->method_state = zs;
+    ਜੇ (zs == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    state->ਵਿਧੀ_state = zs;
 
-    make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    make_ਚੱਕਰੀ_ਜਾਂਚ_tab();
+    zs->ਕੁੰਜੀਆਂ[0] = 305419896L;
+    zs->ਕੁੰਜੀਆਂ[1] = 591751049L;
+    zs->ਕੁੰਜੀਆਂ[2] = 878082192L;
+    ਲਈ (p = ਕੁੰਜੀ; *p != NUL; ++p)
+	UPDATE_ਕੁੰਜੀਆਂ_ZIP(zs->ਕੁੰਜੀਆਂ, (ਪੂਰਨ)*p);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    ਖਾਲੀ
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*ਮੰਜ਼ਿਲ,
+    ਪੂਰਨ		ਆਖਰੀ ਅਣਵਰਤਿਆ)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->ਵਿਧੀ_state;
     size_t	i;
-    int		ztemp, t;
+    ਪੂਰਨ		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    ਲਈ (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
-	to[i] = t ^ ztemp;
+	DECRYPT_BYTE_ZIP(zs->ਕੁੰਜੀਆਂ, t);
+	UPDATE_ਕੁੰਜੀਆਂ_ZIP(zs->ਕੁੰਜੀਆਂ, ztemp);
+	ਮੰਜ਼ਿਲ[i] = t ^ ztemp;
     }
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    ਖਾਲੀ
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*ਮੰਜ਼ਿਲ,
+    ਪੂਰਨ		ਆਖਰੀ ਅਣਵਰਤਿਆ)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->ਵਿਧੀ_state;
     size_t	i;
-    short_u	temp;
+    short_u	ਆਰਜ਼ੀ;
 
-    for (i = 0; i < len; ++i)
+    ਲਈ (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	ਆਰਜ਼ੀ = (short_u)zs->ਕੁੰਜੀਆਂ[2] | 2;
+	ਆਰਜ਼ੀ = (ਪੂਰਨ)(((ਬਿਨਾਨਿਸ਼ਾਨੀ)(ਆਰਜ਼ੀ * (ਆਰਜ਼ੀ ^ 1U)) >> 8) & 0xff);
+	UPDATE_ਕੁੰਜੀਆਂ_ZIP(zs->ਕੁੰਜੀਆਂ, ਮੰਜ਼ਿਲ[i] = from[i] ^ ਆਰਜ਼ੀ);
     }
 }
 
-#endif // FEAT_CRYPT
+#ਜੇ_ਅੰਤ // FEAT_CRYPT

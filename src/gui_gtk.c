@@ -31,22 +31,22 @@
  * "Let's give this some time to mature."
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#ifdef FEAT_GUI_GTK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_GTK
 # include "gui_gtk_f.h"
-#endif
+#ਜੇ_ਅੰਤ
 
 // GTK defines MAX and MIN, but some system header files as well.  Undefine
 // them and don't use them.
-#ifdef MIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MIN
 # undef MIN
-#endif
-#ifdef MAX
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MAX
 # undef MAX
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_GNOME
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_GNOME
 // Gnome redefines _() and N_().  Grrr...
 # ifdef _
 #  undef _
@@ -63,60 +63,60 @@
 # ifdef bind_textdomain_codeset
 #  undef bind_textdomain_codeset
 # endif
-# if defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
+# ਜੇ defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
 #  define ENABLE_NLS	// so the texts in the dialog boxes are translated
 # endif
 # include <gnome.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI_GTK
-# if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_GTK
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 #  include <gdk/gdkkeysyms-compat.h>
-# else
+# ਨਹੀਂਤਾਂ
 #  include <gdk/gdkkeysyms.h>
 # endif
 # include <gdk/gdk.h>
 # ifdef MSWIN
 #  include <gdk/gdkwin32.h>
-# else
+# ਨਹੀਂਤਾਂ
 #  include <gdk/gdkx.h>
 # endif
 
 # include <gtk/gtk.h>
-#else
+#ਨਹੀਂਤਾਂ
 // define these items to be able to generate prototypes without GTK
-typedef int GtkWidget;
-# define gpointer int
-# define guint8 int
-# define GdkPixmap int
-# define GdkBitmap int
-# define GtkIconFactory int
-# define GtkToolbar int
-# define GtkAdjustment int
-# define gboolean int
-# define GdkEventKey int
-# define CancelData int
-#endif
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ GtkWidget;
+# define gpointer ਪੂਰਨ
+# define guint8 ਪੂਰਨ
+# define GdkPixmap ਪੂਰਨ
+# define GdkBitmap ਪੂਰਨ
+# define GtkIconFactory ਪੂਰਨ
+# define GtkToolbar ਪੂਰਨ
+# define GtkAdjustment ਪੂਰਨ
+# define gboolean ਪੂਰਨ
+# define Gdk_Event_ਕੁੰਜੀ ਪੂਰਨ
+# define Cancel_ਅੰਕੜੇ ਪੂਰਨ
+#ਜੇ_ਅੰਤ
 
-static void entry_activate_cb(GtkWidget *widget, gpointer data);
-static void entry_changed_cb(GtkWidget *entry, GtkWidget *dialog);
-static void find_replace_cb(GtkWidget *widget, gpointer data);
-#if defined(FEAT_BROWSE)
-static void recent_func_log_func(
-	const gchar *log_domain,
+ਸਥਿਰ ਖਾਲੀ ਇੰਦਰਾਜ_activate_cb(GtkWidget *widget, gpointer ਅੰਕੜੇ);
+ਸਥਿਰ ਖਾਲੀ ਇੰਦਰਾਜ_ਬਦਲਿਆ_cb(GtkWidget *ਇੰਦਰਾਜ, GtkWidget *dialog);
+ਸਥਿਰ ਖਾਲੀ ਲੱਭੋ_replace_cb(GtkWidget *widget, gpointer ਅੰਕੜੇ);
+#ਜੇ defined(FEAT_BROWSE)
+ਸਥਿਰ ਖਾਲੀ recent_func_log_func(
+	ਅਚਲ gchar *log_domain,
 	GLogLevelFlags log_level,
-	const gchar *message,
-	gpointer user_data);
-#endif
+	ਅਚਲ gchar *ਸੁਨੇਹਾ_2,
+	gpointer user_ਅੰਕੜੇ);
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_TOOLBAR)
+#ਜੇ defined(FEAT_TOOLBAR)
 /*
  * Table from BuiltIn## icon indices to GTK+ stock IDs.  Order must exactly
  * match toolbar_names[] in menu.c!  All stock icons including the "vim-*"
  * ones can be overridden in your gtkrc file.
  */
-# if GTK_CHECK_VERSION(3,10,0)
-static const char * const menu_themed_names[] =
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ * ਅਚਲ menu_themed_ਨਾਂ[] =
 {
     /* 00 */ "document-new",		// sub. GTK_STOCK_NEW
     /* 01 */ "document-open",		// sub. GTK_STOCK_OPEN
@@ -129,14 +129,14 @@ static const char * const menu_themed_names[] =
     /* 08 */ "document-print",		// sub. GTK_STOCK_PRINT
     /* 09 */ "help-browser",		// sub. GTK_STOCK_HELP
     /* 10 */ "edit-find",		// sub. GTK_STOCK_FIND
-#  if GTK_CHECK_VERSION(3,14,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
     // Use the file names in gui_gtk_res.xml, cutting off the extension.
     // Similar changes follow.
     /* 11 */ "stock_vim_save_all",
     /* 12 */ "stock_vim_session_save",
     /* 13 */ "stock_vim_session_new",
     /* 14 */ "stock_vim_session_load",
-#  else
+#  ਨਹੀਂਤਾਂ
     /* 11 */ "vim-save-all",
     /* 12 */ "vim-session-save",
     /* 13 */ "vim-session-new",
@@ -145,12 +145,12 @@ static const char * const menu_themed_names[] =
     /* 15 */ "system-run",		// sub. GTK_STOCK_EXECUTE
     /* 16 */ "edit-find-replace",	// sub. GTK_STOCK_FIND_AND_REPLACE
     /* 17 */ "window-close",		// sub. GTK_STOCK_CLOSE, FIXME: fuzzy
-#  if GTK_CHECK_VERSION(3,14,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
     /* 18 */ "stock_vim_window_maximize",
     /* 19 */ "stock_vim_window_minimize",
     /* 20 */ "stock_vim_window_split",
     /* 21 */ "stock_vim_shell",
-#  else
+#  ਨਹੀਂਤਾਂ
     /* 18 */ "vim-window-maximize",
     /* 19 */ "vim-window-minimize",
     /* 20 */ "vim-window-split",
@@ -158,19 +158,19 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 22 */ "go-previous",		// sub. GTK_STOCK_GO_BACK
     /* 23 */ "go-next",			// sub. GTK_STOCK_GO_FORWARD
-#  if GTK_CHECK_VERSION(3,14,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
     /* 24 */ "stock_vim_find_help",
-#  else
+#  ਨਹੀਂਤਾਂ
     /* 24 */ "vim-find-help",
 #  endif
     /* 25 */ "gtk-convert",		// sub. GTK_STOCK_CONVERT
     /* 26 */ "go-jump",			// sub. GTK_STOCK_JUMP_TO
-#  if GTK_CHECK_VERSION(3,14,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
     /* 27 */ "stock_vim_build_tags",
     /* 28 */ "stock_vim_window_split_vertical",
     /* 29 */ "stock_vim_window_maximize_width",
     /* 30 */ "stock_vim_window_minimize_width",
-#  else
+#  ਨਹੀਂਤਾਂ
     /* 27 */ "vim-build-tags",
     /* 28 */ "vim-window-split-vertical",
     /* 29 */ "vim-window-maximize-width",
@@ -178,8 +178,8 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 31 */ "application-exit",	// GTK_STOCK_QUIT
 };
-# else // !GTK_CHECK_VERSION(3,10,0)
-static const char * const menu_stock_ids[] =
+# ਨਹੀਂਤਾਂ // !GTK_CHECK_VERSION(3,10,0)
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ * ਅਚਲ menu_stock_ids[] =
 {
     /* 00 */ GTK_STOCK_NEW,
     /* 01 */ GTK_STOCK_OPEN,
@@ -191,23 +191,23 @@ static const char * const menu_stock_ids[] =
     /* 07 */ GTK_STOCK_PASTE,
     /* 08 */ GTK_STOCK_PRINT,
     /* 09 */ GTK_STOCK_HELP,
-    /* 10 */ GTK_STOCK_FIND,
+    /* 10 */ GTK_STOCK_ਲੱਭੋ,
     /* 11 */ "vim-save-all",
     /* 12 */ "vim-session-save",
     /* 13 */ "vim-session-new",
     /* 14 */ "vim-session-load",
     /* 15 */ GTK_STOCK_EXECUTE,
-    /* 16 */ GTK_STOCK_FIND_AND_REPLACE,
+    /* 16 */ GTK_STOCK_ਲੱਭੋ_AND_REPLACE,
     /* 17 */ GTK_STOCK_CLOSE,		// FIXME: fuzzy
     /* 18 */ "vim-window-maximize",
     /* 19 */ "vim-window-minimize",
     /* 20 */ "vim-window-split",
     /* 21 */ "vim-shell",
-    /* 22 */ GTK_STOCK_GO_BACK,
+    /* 22 */ GTK_STOCK_GO_ਪਿੱਠ,
     /* 23 */ GTK_STOCK_GO_FORWARD,
     /* 24 */ "vim-find-help",
     /* 25 */ GTK_STOCK_CONVERT,
-    /* 26 */ GTK_STOCK_JUMP_TO,
+    /* 26 */ GTK_STOCK_JUMP_ਮੰਜ਼ਿਲ,
     /* 27 */ "vim-build-tags",
     /* 28 */ "vim-window-split-vertical",
     /* 29 */ "vim-window-maximize-width",
@@ -217,13 +217,13 @@ static const char * const menu_stock_ids[] =
 # endif // !GTK_CHECK_VERSION(3,10,0)
 
 # ifdef USE_GRESOURCE
-#  if !GTK_CHECK_VERSION(3,10,0)
-typedef struct IconNames {
-    const char *icon_name;
-    const char *file_name;
-} IconNames;
+#  ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ Icon_ਨਾਂ {
+    ਅਚਲ ਅੱਖਰ *icon_name;
+    ਅਚਲ ਅੱਖਰ *file_name;
+} Icon_ਨਾਂ;
 
-static IconNames stock_vim_icons[] = {
+ਸਥਿਰ Icon_ਨਾਂ stock_vim_icons[] = {
     { "vim-build-tags", "stock_vim_build_tags.png" },
     { "vim-find-help", "stock_vim_find_help.png" },
     { "vim-save-all", "stock_vim_save_all.png" },
@@ -237,246 +237,246 @@ static IconNames stock_vim_icons[] = {
     { "vim-window-minimize-width", "stock_vim_window_minimize_width.png" },
     { "vim-window-split", "stock_vim_window_split.png" },
     { "vim-window-split-vertical", "stock_vim_window_split_vertical.png" },
-    { NULL, NULL }
+    { ਨਿਰਾ, ਨਿਰਾ }
 };
 #  endif
 # endif // USE_G_RESOURCE
 
 # ifndef USE_GRESOURCE
-    static void
-add_stock_icon(GtkIconFactory	*factory,
-	       const char	*stock_id,
-	       const guint8	*inline_data,
-	       int		data_length)
+    ਸਥਿਰ ਖਾਲੀ
+ਜੋੜੋ_stock_icon(GtkIconFactory	*factory,
+	       ਅਚਲ ਅੱਖਰ	*stock_id,
+	       ਅਚਲ guint8	*inline_ਅੰਕੜੇ,
+	       ਪੂਰਨ		ਅੰਕੜੇ_ਲੰਮਾਈ)
 {
     GdkPixbuf	*pixbuf;
-    GtkIconSet	*icon_set;
+    Gtk_Icon_ਸੈੱਟ	*icon_ਸੈੱਟ;
 
-    pixbuf = gdk_pixbuf_new_from_inline(data_length, inline_data, FALSE, NULL);
-    icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
+    pixbuf = gdk_pixbuf_new_from_inline(ਅੰਕੜੇ_ਲੰਮਾਈ, inline_ਅੰਕੜੇ, FALSE, ਨਿਰਾ);
+    icon_ਸੈੱਟ = gtk_icon_ਸੈੱਟ_new_from_pixbuf(pixbuf);
 
-    gtk_icon_factory_add(factory, stock_id, icon_set);
+    gtk_icon_factory_ਜੋੜੋ(factory, stock_id, icon_ਸੈੱਟ);
 
-    gtk_icon_set_unref(icon_set);
+    gtk_icon_ਸੈੱਟ_unref(icon_ਸੈੱਟ);
     g_object_unref(pixbuf);
 }
 # endif
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 lookup_menu_iconfile(char_u *iconfile, char_u *dest)
 {
     expand_env(iconfile, dest, MAXPATHL);
 
-    if (mch_isFullName(dest))
+    ਜੇ (mch_is_ਭਰਿਆ_Name(dest))
     {
-	return vim_fexists(dest);
+	ਵਾਪਸ vim_fexists(dest);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	static const char   suffixes[][4] = {"png", "xpm", "bmp"};
+	ਸਥਿਰ ਅਚਲ ਅੱਖਰ   suffixes[][4] = {"png", "xpm", "bmp"};
 	char_u		    buf[MAXPATHL];
-	unsigned int	    i;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ	    i;
 
-	for (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
-	    if (gui_find_bitmap(dest, buf, (char *)suffixes[i]) == OK)
+	ਲਈ (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
+	    ਜੇ (gui_ਲੱਭੋ_bitmap(dest, buf, (ਅੱਖਰ *)suffixes[i]) == OK)
 	    {
 		STRCPY(dest, buf);
-		return TRUE;
+		ਵਾਪਸ TRUE;
 	    }
 
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 }
 
-    static GtkWidget *
-load_menu_iconfile(char_u *name, GtkIconSize icon_size)
+    ਸਥਿਰ GtkWidget *
+ਲੱਦੋ_menu_iconfile(char_u *name, Gtk_Icon_ਮਾਪ icon_ਮਾਪ)
 {
-    GtkWidget	    *image = NULL;
-# if GTK_CHECK_VERSION(3,10,0)
-    int		     pixel_size = -1;
+    GtkWidget	    *image = ਨਿਰਾ;
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਪੂਰਨ		     pixel_ਮਾਪ = -1;
 
-    switch (icon_size)
+    ਚੋਣ (icon_ਮਾਪ)
     {
-	case GTK_ICON_SIZE_MENU:
-	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_SMALL_TOOLBAR:
-	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_LARGE_TOOLBAR:
-	    pixel_size = 24;
-	    break;
-	case GTK_ICON_SIZE_BUTTON:
-	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_DND:
-	    pixel_size = 32;
-	    break;
-	case GTK_ICON_SIZE_DIALOG:
-	    pixel_size = 48;
-	    break;
-	case GTK_ICON_SIZE_INVALID:
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_MENU:
+	    pixel_ਮਾਪ = 16;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_SMALL_TOOLBAR:
+	    pixel_ਮਾਪ = 16;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_LARGE_TOOLBAR:
+	    pixel_ਮਾਪ = 24;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_BUTTON:
+	    pixel_ਮਾਪ = 16;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_DND:
+	    pixel_ਮਾਪ = 32;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_DIALOG:
+	    pixel_ਮਾਪ = 48;
+	    ਰੋਕੋ;
+	ਹਾਲਤ GTK_ICON_ਮਾਪ_INVALID:
 	    // FALLTHROUGH
-	default:
-	    pixel_size = 0;
-	    break;
+	ਮੂਲ:
+	    pixel_ਮਾਪ = 0;
+	    ਰੋਕੋ;
     }
 
-    if (pixel_size > 0 || pixel_size == -1)
+    ਜੇ (pixel_ਮਾਪ > 0 || pixel_ਮਾਪ == -1)
     {
-	GdkPixbuf * const pixbuf
-	    = gdk_pixbuf_new_from_file_at_scale((const char *)name,
-		pixel_size, pixel_size, TRUE, NULL);
-	if (pixbuf != NULL)
+	GdkPixbuf * ਅਚਲ pixbuf
+	    = gdk_pixbuf_new_from_file_at_scale((ਅਚਲ ਅੱਖਰ *)name,
+		pixel_ਮਾਪ, pixel_ਮਾਪ, TRUE, ਨਿਰਾ);
+	ਜੇ (pixbuf != ਨਿਰਾ)
 	{
 	    image = gtk_image_new_from_pixbuf(pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-    if (image == NULL)
-	image = gtk_image_new_from_icon_name("image-missing", icon_size);
+    ਜੇ (image == ਨਿਰਾ)
+	image = gtk_image_new_from_icon_name("image-missing", icon_ਮਾਪ);
 
-    return image;
-# else // !GTK_CHECK_VERSION(3,10,0)
-    GtkIconSet	    *icon_set;
-    GtkIconSource   *icon_source;
+    ਵਾਪਸ image;
+# ਨਹੀਂਤਾਂ // !GTK_CHECK_VERSION(3,10,0)
+    Gtk_Icon_ਸੈੱਟ	    *icon_ਸੈੱਟ;
+    Gtk_Icon_ਸਰੋਤ   *icon_ਸਰੋਤ;
 
     /*
      * Rather than loading the icon directly into a GtkImage, create
      * a new GtkIconSet and put it in there.  This way we can easily
      * scale the toolbar icons on the fly when needed.
      */
-    icon_set = gtk_icon_set_new();
-    icon_source = gtk_icon_source_new();
+    icon_ਸੈੱਟ = gtk_icon_ਸੈੱਟ_new();
+    icon_ਸਰੋਤ = gtk_icon_ਸਰੋਤ_new();
 
-    gtk_icon_source_set_filename(icon_source, (const char *)name);
-    gtk_icon_set_add_source(icon_set, icon_source);
+    gtk_icon_ਸਰੋਤ_ਸੈੱਟ_filename(icon_ਸਰੋਤ, (ਅਚਲ ਅੱਖਰ *)name);
+    gtk_icon_ਸੈੱਟ_ਜੋੜੋ_ਸਰੋਤ(icon_ਸੈੱਟ, icon_ਸਰੋਤ);
 
-    image = gtk_image_new_from_icon_set(icon_set, icon_size);
+    image = gtk_image_new_from_icon_ਸੈੱਟ(icon_ਸੈੱਟ, icon_ਮਾਪ);
 
-    gtk_icon_source_free(icon_source);
-    gtk_icon_set_unref(icon_set);
+    gtk_icon_ਸਰੋਤ_free(icon_ਸਰੋਤ);
+    gtk_icon_ਸੈੱਟ_unref(icon_ਸੈੱਟ);
 
-    return image;
+    ਵਾਪਸ image;
 # endif // !GTK_CHECK_VERSION(3,10,0)
 }
 
-    static GtkWidget *
-create_menu_icon(vimmenu_T *menu, GtkIconSize icon_size)
+    ਸਥਿਰ GtkWidget *
+create_menu_icon(vimmenu_T *menu, Gtk_Icon_ਮਾਪ icon_ਮਾਪ)
 {
-    GtkWidget	*image = NULL;
+    GtkWidget	*image = ਨਿਰਾ;
     char_u	buf[MAXPATHL];
 
     // First use a specified "icon=" argument.
-    if (menu->iconfile != NULL && lookup_menu_iconfile(menu->iconfile, buf))
-	image = load_menu_iconfile(buf, icon_size);
+    ਜੇ (menu->iconfile != ਨਿਰਾ && lookup_menu_iconfile(menu->iconfile, buf))
+	image = ਲੱਦੋ_menu_iconfile(buf, icon_ਮਾਪ);
 
     // If not found and not builtin specified try using the menu name.
-    if (image == NULL && !menu->icon_builtin
+    ਜੇ (image == ਨਿਰਾ && !menu->icon_builtin
 				     && lookup_menu_iconfile(menu->name, buf))
-	image = load_menu_iconfile(buf, icon_size);
+	image = ਲੱਦੋ_menu_iconfile(buf, icon_ਮਾਪ);
 
     // Still not found?  Then use a builtin icon, a blank one as fallback.
-    if (image == NULL)
+    ਜੇ (image == ਨਿਰਾ)
     {
-# if GTK_CHECK_VERSION(3,10,0)
-	const char *icon_name = NULL;
-	const int   n_names = G_N_ELEMENTS(menu_themed_names);
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+	ਅਚਲ ਅੱਖਰ *icon_name = ਨਿਰਾ;
+	ਅਚਲ ਪੂਰਨ   n_ਨਾਂ = G_N_ELEMENTS(menu_themed_ਨਾਂ);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_names)
-	    icon_name = menu_themed_names[menu->iconidx];
-	if (icon_name == NULL)
+	ਜੇ (menu->iconidx >= 0 && menu->iconidx < n_ਨਾਂ)
+	    icon_name = menu_themed_ਨਾਂ[menu->iconidx];
+	ਜੇ (icon_name == ਨਿਰਾ)
 	    icon_name = "image-missing";
 
-	image = gtk_image_new_from_icon_name(icon_name, icon_size);
-# else
-	const char  *stock_id;
-	const int   n_ids = G_N_ELEMENTS(menu_stock_ids);
+	image = gtk_image_new_from_icon_name(icon_name, icon_ਮਾਪ);
+# ਨਹੀਂਤਾਂ
+	ਅਚਲ ਅੱਖਰ  *stock_id;
+	ਅਚਲ ਪੂਰਨ   n_ids = G_N_ELEMENTS(menu_stock_ids);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_ids)
+	ਜੇ (menu->iconidx >= 0 && menu->iconidx < n_ids)
 	    stock_id = menu_stock_ids[menu->iconidx];
-	else
+	ਨਹੀਂਤਾਂ
 	    stock_id = GTK_STOCK_MISSING_IMAGE;
 
-	image = gtk_image_new_from_stock(stock_id, icon_size);
+	image = gtk_image_new_from_stock(stock_id, icon_ਮਾਪ);
 # endif
     }
 
-    return image;
+    ਵਾਪਸ image;
 }
 
-    static gint
-toolbar_button_focus_in_event(GtkWidget *widget UNUSED,
-			      GdkEventFocus *event UNUSED,
-			      gpointer data UNUSED)
+    ਸਥਿਰ gint
+toolbar_button_focus_ਵਿੱਚ_event(GtkWidget *widget ਅਣਵਰਤਿਆ,
+			      GdkEventFocus *event ਅਣਵਰਤਿਆ,
+			      gpointer ਅੰਕੜੇ ਅਣਵਰਤਿਆ)
 {
     // When we're in a GtkPlug, we don't have window focus events, only widget
     // focus.  To emulate stand-alone gvim, if a button gets focus (e.g.,
     // <Tab> into GtkPlug) immediately pass it to mainwin.
-    if (gtk_socket_id != 0)
+    ਜੇ (gtk_socket_id != 0)
 	gtk_widget_grab_focus(gui.drawarea);
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
-#endif // FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ // FEAT_TOOLBAR
 
-#if defined(FEAT_TOOLBAR)
+#ਜੇ defined(FEAT_TOOLBAR)
 
-    void
-gui_gtk_register_stock_icons(void)
+    ਖਾਲੀ
+gui_gtk_ਰਜਿਸਟਰ_stock_icons(ਖਾਲੀ)
 {
 # ifndef USE_GRESOURCE
 #  include "../pixmaps/stock_icons.h"
     GtkIconFactory *factory;
 
     factory = gtk_icon_factory_new();
-#  define ADD_ICON(Name, Data) add_stock_icon(factory, Name, Data, (int)sizeof(Data))
+#  define ਜੋੜੋ_ICON(Name, ਅੰਕੜੇ_2) ਜੋੜੋ_stock_icon(factory, Name, ਅੰਕੜੇ_2, (ਪੂਰਨ)ਆਕਾਰ(ਅੰਕੜੇ_2))
 
-    ADD_ICON("vim-build-tags",		  stock_vim_build_tags);
-    ADD_ICON("vim-find-help",		  stock_vim_find_help);
-    ADD_ICON("vim-save-all",		  stock_vim_save_all);
-    ADD_ICON("vim-session-load",	  stock_vim_session_load);
-    ADD_ICON("vim-session-new",		  stock_vim_session_new);
-    ADD_ICON("vim-session-save",	  stock_vim_session_save);
-    ADD_ICON("vim-shell",		  stock_vim_shell);
-    ADD_ICON("vim-window-maximize",	  stock_vim_window_maximize);
-    ADD_ICON("vim-window-maximize-width", stock_vim_window_maximize_width);
-    ADD_ICON("vim-window-minimize",	  stock_vim_window_minimize);
-    ADD_ICON("vim-window-minimize-width", stock_vim_window_minimize_width);
-    ADD_ICON("vim-window-split",	  stock_vim_window_split);
-    ADD_ICON("vim-window-split-vertical", stock_vim_window_split_vertical);
+    ਜੋੜੋ_ICON("vim-build-tags",		  stock_vim_build_ਟੈਗ_ਸੂਚੀ);
+    ਜੋੜੋ_ICON("vim-find-help",		  stock_vim_ਲੱਭੋ_help);
+    ਜੋੜੋ_ICON("vim-save-all",		  stock_vim_save_all);
+    ਜੋੜੋ_ICON("vim-session-load",	  stock_vim_session_ਲੱਦੋ);
+    ਜੋੜੋ_ICON("vim-session-new",		  stock_vim_session_new);
+    ਜੋੜੋ_ICON("vim-session-save",	  stock_vim_session_save);
+    ਜੋੜੋ_ICON("vim-shell",		  stock_vim_shell);
+    ਜੋੜੋ_ICON("vim-window-maximize",	  stock_vim_ਖਿੜਕੀ_maximize);
+    ਜੋੜੋ_ICON("vim-window-maximize-width", stock_vim_ਖਿੜਕੀ_maximize_ਚੌੜਾਈ);
+    ਜੋੜੋ_ICON("vim-window-minimize",	  stock_vim_ਖਿੜਕੀ_minimize);
+    ਜੋੜੋ_ICON("vim-window-minimize-width", stock_vim_ਖਿੜਕੀ_minimize_ਚੌੜਾਈ);
+    ਜੋੜੋ_ICON("vim-window-split",	  stock_vim_ਖਿੜਕੀ_ਵੰਡੋ);
+    ਜੋੜੋ_ICON("vim-window-split-vertical", stock_vim_ਖਿੜਕੀ_ਵੰਡੋ_vertical);
 
-#  undef ADD_ICON
+#  undef ਜੋੜੋ_ICON
 
-    gtk_icon_factory_add_default(factory);
+    gtk_icon_factory_ਜੋੜੋ_default(factory);
     g_object_unref(factory);
-# else // defined(USE_GRESOURCE)
-    const char * const path_prefix = "/org/vim/gui/icon";
-#  if GTK_CHECK_VERSION(3,14,0)
-    GdkScreen    *screen = NULL;
-    GtkIconTheme *icon_theme = NULL;
+# ਨਹੀਂਤਾਂ // defined(USE_GRESOURCE)
+    ਅਚਲ ਅੱਖਰ * ਅਚਲ ਰਸਤਾ_ਅਗੇਤਰ = "/org/vim/gui/icon";
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
+    GdkScreen    *screen = ਨਿਰਾ;
+    GtkIconTheme *icon_theme = ਨਿਰਾ;
 
-    if (GTK_IS_WIDGET(gui.mainwin))
+    ਜੇ (GTK_IS_WIDGET(gui.mainwin))
 	screen = gtk_widget_get_screen(gui.mainwin);
-    else
+    ਨਹੀਂਤਾਂ
 	screen = gdk_screen_get_default();
     icon_theme = gtk_icon_theme_get_for_screen(screen);
-    gtk_icon_theme_add_resource_path(icon_theme, path_prefix);
-#  elif GTK_CHECK_VERSION(3,0,0)
-    IconNames *names;
+    gtk_icon_theme_ਜੋੜੋ_resource_ਰਸਤਾ(icon_theme, ਰਸਤਾ_ਅਗੇਤਰ);
+#  elif GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    Icon_ਨਾਂ *ਨਾਂ;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    ਲਈ (ਨਾਂ = stock_vim_icons; ਨਾਂ->icon_name != ਨਿਰਾ; ਨਾਂ++)
     {
-	char path[MAXPATHL];
+	ਅੱਖਰ ਰਸਤਾ[MAXPATHL];
 
-	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
-	GdkPixbuf *pixbuf = NULL;
-	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	vim_snprintf(ਰਸਤਾ, MAXPATHL, "%s/%s", ਰਸਤਾ_ਅਗੇਤਰ, ਨਾਂ->file_name);
+	GdkPixbuf *pixbuf = ਨਿਰਾ;
+	pixbuf = gdk_pixbuf_new_from_resource(ਰਸਤਾ, ਨਿਰਾ);
+	ਜੇ (pixbuf != ਨਿਰਾ)
 	{
-	    const gint size = MAX(gdk_pixbuf_get_width(pixbuf),
-				  gdk_pixbuf_get_height(pixbuf));
-	    if (size > 16)
+	    ਅਚਲ gint ਮਾਪ = MAX(gdk_pixbuf_get_ਚੌੜਾਈ(pixbuf),
+				  gdk_pixbuf_get_ਉਚਾਈ(pixbuf));
+	    ਜੇ (ਮਾਪ > 16)
 	    {
 		// An icon theme is supposed to provide fixed-size
 		// image files for each size, e.g., 16, 22, 24, ...
@@ -494,44 +494,44 @@ gui_gtk_register_stock_icons(void)
 		pixbuf = gdk_pixbuf_scale_simple(src,
 						 16, 16,
 						 GDK_INTERP_BILINEAR);
-		if (pixbuf == NULL)
+		ਜੇ (pixbuf == ਨਿਰਾ)
 		    pixbuf = src;
-		else
+		ਨਹੀਂਤਾਂ
 		    g_object_unref(src);
 	    }
-	    gtk_icon_theme_add_builtin_icon(names->icon_name, size, pixbuf);
+	    gtk_icon_theme_ਜੋੜੋ_builtin_icon(ਨਾਂ->icon_name, ਮਾਪ, pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-#  else // !GTK_CHECK_VERSION(3,0.0)
-    GtkIconFactory * const factory = gtk_icon_factory_new();
-    IconNames *names;
+#  ਨਹੀਂਤਾਂ // !GTK_CHECK_VERSION(3,0.0)
+    GtkIconFactory * ਅਚਲ factory = gtk_icon_factory_new();
+    Icon_ਨਾਂ *ਨਾਂ;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    ਲਈ (ਨਾਂ = stock_vim_icons; ਨਾਂ->icon_name != ਨਿਰਾ; ਨਾਂ++)
     {
-	char path[MAXPATHL];
+	ਅੱਖਰ ਰਸਤਾ[MAXPATHL];
 	GdkPixbuf *pixbuf;
 
-	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
-	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	vim_snprintf(ਰਸਤਾ, MAXPATHL, "%s/%s", ਰਸਤਾ_ਅਗੇਤਰ, ਨਾਂ->file_name);
+	pixbuf = gdk_pixbuf_new_from_resource(ਰਸਤਾ, ਨਿਰਾ);
+	ਜੇ (pixbuf != ਨਿਰਾ)
 	{
-	    GtkIconSet *icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
-	    gtk_icon_factory_add(factory, names->icon_name, icon_set);
-	    gtk_icon_set_unref(icon_set);
+	    Gtk_Icon_ਸੈੱਟ *icon_ਸੈੱਟ = gtk_icon_ਸੈੱਟ_new_from_pixbuf(pixbuf);
+	    gtk_icon_factory_ਜੋੜੋ(factory, ਨਾਂ->icon_name, icon_ਸੈੱਟ);
+	    gtk_icon_ਸੈੱਟ_unref(icon_ਸੈੱਟ);
 	    g_object_unref(pixbuf);
 	}
     }
 
-    gtk_icon_factory_add_default(factory);
+    gtk_icon_factory_ਜੋੜੋ_default(factory);
     g_object_unref(factory);
 #  endif // !GTK_CHECK_VERSION(3,0,0)
 # endif // defined(USE_GRESOURCE)
 }
 
-#endif // FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ // FEAT_TOOLBAR
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
@@ -543,42 +543,42 @@ gui_gtk_register_stock_icons(void)
  *	&	_	stripped if use_mnemonic == FALSE
  *	<Tab>		end of menu label text
  */
-    static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+    ਸਥਿਰ char_u *
+translate_mnemonic_ਟੈਗ(char_u *name, ਪੂਰਨ use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    ਪੂਰਨ	    n_underscores = 0;
 
-    name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    name = CONVERT_ਮੰਜ਼ਿਲ_UTF8(name);
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    ਲਈ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ਜੇ (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    ਜੇ (buf != ਨਿਰਾ)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ਲਈ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    ਜੇ (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    ਨਹੀਂਤਾਂ ਜੇ (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    ਨਹੀਂਤਾਂ ਜੇ (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    ਨਹੀਂਤਾਂ ਜੇ (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -586,300 +586,300 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
 	*pdest = NUL;
     }
 
-    CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(name);
+    ਵਾਪਸ buf;
 }
 
-    static void
-menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
+    ਸਥਿਰ ਖਾਲੀ
+menu_ਵਸਤੂ_new(vimmenu_T *menu, GtkWidget *ਮਾਪਾ_widget)
 {
     GtkWidget	*box;
-    char_u	*text;
-    int		use_mnemonic;
+    char_u	*ਪਾਠ;
+    ਪੂਰਨ		use_mnemonic;
 
     // It would be neat to have image menu items, but that would require major
     // changes to Vim's menu system.  Not to mention that all the translations
     // had to be updated.
-    menu->id = gtk_menu_item_new();
-# if GTK_CHECK_VERSION(3,2,0)
+    menu->id = gtk_menu_ਵਸਤੂ_new();
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 20);
-    gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-# else
+    gtk_box_ਸੈੱਟ_homogeneous(GTK_BOX(box), FALSE);
+# ਨਹੀਂਤਾਂ
     box = gtk_hbox_new(FALSE, 20);
 # endif
 
-    use_mnemonic = (p_wak[0] != 'n' || !GTK_IS_MENU_BAR(parent_widget));
-    text = translate_mnemonic_tag(menu->name, use_mnemonic);
+    use_mnemonic = (p_wak[0] != 'n' || !GTK_IS_MENU_BAR(ਮਾਪਾ_widget));
+    ਪਾਠ = translate_mnemonic_ਟੈਗ(menu->name, use_mnemonic);
 
-    menu->label = gtk_label_new_with_mnemonic((const char *)text);
-    vim_free(text);
+    menu->label = gtk_label_new_with_mnemonic((ਅਚਲ ਅੱਖਰ *)ਪਾਠ);
+    vim_free(ਪਾਠ);
 
-    gtk_box_pack_start(GTK_BOX(box), menu->label, FALSE, FALSE, 0);
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(box), menu->label, FALSE, FALSE, 0);
 
-    if (menu->actext != NULL && menu->actext[0] != NUL)
+    ਜੇ (menu->actext != ਨਿਰਾ && menu->actext[0] != NUL)
     {
-	text = CONVERT_TO_UTF8(menu->actext);
+	ਪਾਠ = CONVERT_ਮੰਜ਼ਿਲ_UTF8(menu->actext);
 
-	gtk_box_pack_end(GTK_BOX(box),
-			 gtk_label_new((const char *)text),
+	gtk_box_pack_ਸਿਰਾ(GTK_BOX(box),
+			 gtk_label_new((ਅਚਲ ਅੱਖਰ *)ਪਾਠ),
 			 FALSE, FALSE, 0);
 
-	CONVERT_TO_UTF8_FREE(text);
+	CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(ਪਾਠ);
     }
 
-    gtk_container_add(GTK_CONTAINER(menu->id), box);
+    gtk_container_ਜੋੜੋ(GTK_CONTAINER(menu->id), box);
     gtk_widget_show_all(menu->id);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu(vimmenu_T *menu, ਪੂਰਨ idx)
 {
-    vimmenu_T	*parent;
-    GtkWidget	*parent_widget;
+    vimmenu_T	*ਮਾਪਾ;
+    GtkWidget	*ਮਾਪਾ_widget;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    ਜੇ (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	menu->submenu_id = gtk_menu_new();
-	return;
+	ਵਾਪਸ;
     }
 
-    parent = menu->parent;
+    ਮਾਪਾ = menu->ਮਾਪਾ;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    ਜੇ ((ਮਾਪਾ != ਨਿਰਾ && ਮਾਪਾ->submenu_id == ਨਿਰਾ)
 	    || !menu_is_menubar(menu->name))
-	return;
+	ਵਾਪਸ;
 
-    parent_widget = (parent != NULL) ? parent->submenu_id : gui.menubar;
-    menu_item_new(menu, parent_widget);
+    ਮਾਪਾ_widget = (ਮਾਪਾ != ਨਿਰਾ) ? ਮਾਪਾ->submenu_id : gui.menubar;
+    menu_ਵਸਤੂ_new(menu, ਮਾਪਾ_widget);
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
     // since the tearoff should always appear first, increment idx
-    if (parent != NULL && !menu_is_popup(parent->name))
+    ਜੇ (ਮਾਪਾ != ਨਿਰਾ && !menu_is_popup(ਮਾਪਾ->name))
 	++idx;
 # endif
 
-    gtk_menu_shell_insert(GTK_MENU_SHELL(parent_widget), menu->id, idx);
+    gtk_menu_shell_ਪਾਓ(GTK_MENU_SHELL(ਮਾਪਾ_widget), menu->id, idx);
 
     menu->submenu_id = gtk_menu_new();
 
-    gtk_menu_set_accel_group(GTK_MENU(menu->submenu_id), gui.accel_group);
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu->id), menu->submenu_id);
+    gtk_menu_ਸੈੱਟ_accel_ਸਮੂਹ(GTK_MENU(menu->submenu_id), gui.accel_ਸਮੂਹ);
+    gtk_menu_ਵਸਤੂ_ਸੈੱਟ_submenu(GTK_MENU_ਵਸਤੂ(menu->id), menu->submenu_id);
 
-# if !GTK_CHECK_VERSION(3,4,0)
-    menu->tearoff_handle = gtk_tearoff_menu_item_new();
-    if (vim_strchr(p_go, GO_TEAROFF) != NULL)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+    menu->tearoff_handle = gtk_tearoff_menu_ਵਸਤੂ_new();
+    ਜੇ (vim_strchr(p_go, GO_TEAROFF) != ਨਿਰਾ)
 	gtk_widget_show(menu->tearoff_handle);
-#  if GTK_CHECK_VERSION(3,0,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     gtk_menu_shell_prepend(GTK_MENU_SHELL(menu->submenu_id),
 	    menu->tearoff_handle);
-#  else
+#  ਨਹੀਂਤਾਂ
     gtk_menu_prepend(GTK_MENU(menu->submenu_id), menu->tearoff_handle);
 #  endif
 # endif
 }
 
-    static void
-menu_item_activate(GtkWidget *widget UNUSED, gpointer data)
+    ਸਥਿਰ ਖਾਲੀ
+menu_ਵਸਤੂ_activate(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer ਅੰਕੜੇ)
 {
-    gui_menu_cb((vimmenu_T *)data);
+    gui_menu_cb((vimmenu_T *)ਅੰਕੜੇ);
 }
 
-    static void
-menu_item_select(GtkWidget *widget UNUSED, gpointer data)
+    ਸਥਿਰ ਖਾਲੀ
+menu_ਵਸਤੂ_select(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer ਅੰਕੜੇ)
 {
     vimmenu_T	*menu;
     char_u	*tooltip;
-    static int	did_msg = FALSE;
+    ਸਥਿਰ ਪੂਰਨ	did_ਸੁਨੇਹਾ = FALSE;
 
-    if (State & MODE_CMDLINE)
-	return;
-    menu = (vimmenu_T *)data;
-    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+    ਜੇ (State & ਬਹੁਲਕ_CMDLINE)
+	ਵਾਪਸ;
+    menu = (vimmenu_T *)ਅੰਕੜੇ;
+    tooltip = CONVERT_ਮੰਜ਼ਿਲ_UTF8(menu->ਲੜੀਆਂ[MENU_ਸੂਚਕਾਂਕ_TIP]);
+    ਜੇ (tooltip != ਨਿਰਾ && utf_valid_string(tooltip, ਨਿਰਾ))
     {
-	msg((char *)tooltip);
-	did_msg = TRUE;
+	ਸੁਨੇਹਾ((ਅੱਖਰ *)tooltip);
+	did_ਸੁਨੇਹਾ = TRUE;
 	setcursor();
-	out_flush_cursor(TRUE, FALSE);
+	ਬਾਹਰਲਾ_flush_cursor(TRUE, FALSE);
     }
-    else if (did_msg)
+    ਨਹੀਂਤਾਂ ਜੇ (did_ਸੁਨੇਹਾ)
     {
-	msg("");
-	did_msg = FALSE;
+	ਸੁਨੇਹਾ("");
+	did_ਸੁਨੇਹਾ = FALSE;
 	setcursor();
-	out_flush_cursor(TRUE, FALSE);
+	ਬਾਹਰਲਾ_flush_cursor(TRUE, FALSE);
     }
-    CONVERT_TO_UTF8_FREE(tooltip);
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(tooltip);
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu_ਵਸਤੂ(vimmenu_T *menu, ਪੂਰਨ idx)
 {
-    vimmenu_T *parent;
+    vimmenu_T *ਮਾਪਾ;
 
-    parent = menu->parent;
+    ਮਾਪਾ = menu->ਮਾਪਾ;
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ਜੇ (menu_is_toolbar(ਮਾਪਾ->name))
     {
 	GtkToolbar *toolbar;
 
 	toolbar = GTK_TOOLBAR(gui.toolbar);
-	menu->submenu_id = NULL;
+	menu->submenu_id = ਨਿਰਾ;
 
-	if (menu_is_separator(menu->name))
+	ਜੇ (menu_is_separator(menu->name))
 	{
-#  if GTK_CHECK_VERSION(3,0,0)
-	    GtkToolItem *item = gtk_separator_tool_item_new();
-	    gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM(item),
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	    Gtk_Tool_ਵਸਤੂ *ਵਸਤੂ = gtk_separator_tool_ਵਸਤੂ_new();
+	    gtk_separator_tool_ਵਸਤੂ_ਸੈੱਟ_draw(GTK_SEPARATOR_TOOL_ਵਸਤੂ(ਵਸਤੂ),
 		    TRUE);
-	    gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), FALSE);
-	    gtk_widget_show(GTK_WIDGET(item));
+	    gtk_tool_ਵਸਤੂ_ਸੈੱਟ_expand(GTK_TOOL_ਵਸਤੂ(ਵਸਤੂ), FALSE);
+	    gtk_widget_show(GTK_WIDGET(ਵਸਤੂ));
 
-	    gtk_toolbar_insert(toolbar, item, idx);
-#  else
-	    gtk_toolbar_insert_space(toolbar, idx);
+	    gtk_toolbar_ਪਾਓ(toolbar, ਵਸਤੂ, idx);
+#  ਨਹੀਂਤਾਂ
+	    gtk_toolbar_ਪਾਓ_space(toolbar, idx);
 #  endif
-	    menu->id = NULL;
+	    menu->id = ਨਿਰਾ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    char_u *text;
+	    char_u *ਪਾਠ;
 	    char_u *tooltip;
 
-	    text    = CONVERT_TO_UTF8(menu->dname);
-	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    ਪਾਠ    = CONVERT_ਮੰਜ਼ਿਲ_UTF8(menu->dname);
+	    tooltip = CONVERT_ਮੰਜ਼ਿਲ_UTF8(menu->ਲੜੀਆਂ[MENU_ਸੂਚਕਾਂਕ_TIP]);
+	    ਜੇ (tooltip != ਨਿਰਾ && !utf_valid_string(tooltip, ਨਿਰਾ))
 		// Invalid text, can happen when 'encoding' is changed.  Avoid
 		// a nasty GTK error message, skip the tooltip.
-		CONVERT_TO_UTF8_FREE(tooltip);
+		CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(tooltip);
 
-#  if GTK_CHECK_VERSION(3,0,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	    {
 		GtkWidget *icon;
-		GtkToolItem *item;
+		Gtk_Tool_ਵਸਤੂ *ਵਸਤੂ;
 
 		icon = create_menu_icon(menu,
-			gtk_toolbar_get_icon_size(toolbar));
-		item = gtk_tool_button_new(icon, (const gchar *)text);
-		gtk_tool_item_set_tooltip_text(item, (const gchar *)tooltip);
-		g_signal_connect(G_OBJECT(item), "clicked",
-			G_CALLBACK(&menu_item_activate), menu);
-		gtk_widget_show_all(GTK_WIDGET(item));
+			gtk_toolbar_get_icon_ਮਾਪ(toolbar));
+		ਵਸਤੂ = gtk_tool_button_new(icon, (ਅਚਲ gchar *)ਪਾਠ);
+		gtk_tool_ਵਸਤੂ_ਸੈੱਟ_tooltip_ਪਾਠ(ਵਸਤੂ, (ਅਚਲ gchar *)tooltip);
+		g_signal_connect(G_OBJECT(ਵਸਤੂ), "clicked",
+			G_CALLBACK(&menu_ਵਸਤੂ_activate), menu);
+		gtk_widget_show_all(GTK_WIDGET(ਵਸਤੂ));
 
-		gtk_toolbar_insert(toolbar, item, idx);
+		gtk_toolbar_ਪਾਓ(toolbar, ਵਸਤੂ, idx);
 
-		menu->id = GTK_WIDGET(item);
+		menu->id = GTK_WIDGET(ਵਸਤੂ);
 	    }
-#  else
-	    menu->id = gtk_toolbar_insert_item(
+#  ਨਹੀਂਤਾਂ
+	    menu->id = gtk_toolbar_ਪਾਓ_ਵਸਤੂ(
 		    toolbar,
-		    (const char *)text,
-		    (const char *)tooltip,
-		    NULL,
-		    create_menu_icon(menu, gtk_toolbar_get_icon_size(toolbar)),
-		    G_CALLBACK(&menu_item_activate),
+		    (ਅਚਲ ਅੱਖਰ *)ਪਾਠ,
+		    (ਅਚਲ ਅੱਖਰ *)tooltip,
+		    ਨਿਰਾ,
+		    create_menu_icon(menu, gtk_toolbar_get_icon_ਮਾਪ(toolbar)),
+		    G_CALLBACK(&menu_ਵਸਤੂ_activate),
 		    menu,
 		    idx);
 #  endif
 
-	    if (gtk_socket_id != 0)
+	    ਜੇ (gtk_socket_id != 0)
 		g_signal_connect(G_OBJECT(menu->id), "focus-in-event",
-			G_CALLBACK(toolbar_button_focus_in_event), NULL);
+			G_CALLBACK(toolbar_button_focus_ਵਿੱਚ_event), ਨਿਰਾ);
 
-	    CONVERT_TO_UTF8_FREE(text);
-	    CONVERT_TO_UTF8_FREE(tooltip);
+	    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(ਪਾਠ);
+	    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(tooltip);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 # endif // FEAT_TOOLBAR
     {
 	// No parent, must be a non-menubar menu
-	if (parent == NULL || parent->submenu_id == NULL)
-	    return;
+	ਜੇ (ਮਾਪਾ == ਨਿਰਾ || ਮਾਪਾ->submenu_id == ਨਿਰਾ)
+	    ਵਾਪਸ;
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
 	// Make place for the possible tearoff handle item.  Not in the popup
 	// menu, it doesn't have a tearoff item.
-	if (!menu_is_popup(parent->name))
+	ਜੇ (!menu_is_popup(ਮਾਪਾ->name))
 	    ++idx;
 # endif
 
-	if (menu_is_separator(menu->name))
+	ਜੇ (menu_is_separator(menu->name))
 	{
 	    // Separator: Just add it
-# if GTK_CHECK_VERSION(3,0,0)
-	    menu->id = gtk_separator_menu_item_new();
-# else
-	    menu->id = gtk_menu_item_new();
-	    gtk_widget_set_sensitive(menu->id, FALSE);
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	    menu->id = gtk_separator_menu_ਵਸਤੂ_new();
+# ਨਹੀਂਤਾਂ
+	    menu->id = gtk_menu_ਵਸਤੂ_new();
+	    gtk_widget_ਸੈੱਟ_sensitive(menu->id, FALSE);
 # endif
 	    gtk_widget_show(menu->id);
-	    gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	    gtk_menu_shell_ਪਾਓ(GTK_MENU_SHELL(ਮਾਪਾ->submenu_id),
 		    menu->id, idx);
 
-	    return;
+	    ਵਾਪਸ;
 	}
 
 	// Add textual menu item.
-	menu_item_new(menu, parent->submenu_id);
+	menu_ਵਸਤੂ_new(menu, ਮਾਪਾ->submenu_id);
 	gtk_widget_show(menu->id);
-	gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	gtk_menu_shell_ਪਾਓ(GTK_MENU_SHELL(ਮਾਪਾ->submenu_id),
 		menu->id, idx);
 
-	if (menu->id != NULL)
+	ਜੇ (menu->id != ਨਿਰਾ)
 	{
 	    g_signal_connect(G_OBJECT(menu->id), "activate",
-			     G_CALLBACK(menu_item_activate), menu);
+			     G_CALLBACK(menu_ਵਸਤੂ_activate), menu);
 	    g_signal_connect(G_OBJECT(menu->id), "select",
-			     G_CALLBACK(menu_item_select), menu);
+			     G_CALLBACK(menu_ਵਸਤੂ_select), menu);
 	}
     }
 }
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU
 
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_ਪਾਠ_area_pos(ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
     gui_gtk_form_move_resize(GTK_FORM(gui.formwin), gui.drawarea, x, y, w, h);
 }
 
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
-    void
-gui_gtk_set_mnemonics(int enable)
+    ਖਾਲੀ
+gui_gtk_ਸੈੱਟ_mnemonics(ਪੂਰਨ enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
-	    continue;
+	ਜੇ (menu->id == ਨਿਰਾ)
+	    ਜਾਰੀ;
 
-	name = translate_mnemonic_tag(menu->name, enable);
-	gtk_label_set_text_with_mnemonic(GTK_LABEL(menu->label),
-					 (const char *)name);
+	name = translate_mnemonic_ਟੈਗ(menu->name, enable);
+	gtk_label_ਸੈੱਟ_ਪਾਠ_with_mnemonic(GTK_LABEL(menu->label),
+					 (ਅਚਲ ਅੱਖਰ *)name);
 	vim_free(name);
     }
 }
 
-# if !GTK_CHECK_VERSION(3,4,0)
-    static void
-recurse_tearoffs(vimmenu_T *menu, int val)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+    ਸਥਿਰ ਖਾਲੀ
+recurse_tearoffs(vimmenu_T *menu, ਪੂਰਨ val)
 {
-    for (; menu != NULL; menu = menu->next)
+    ਲਈ (; menu != ਨਿਰਾ; menu = menu->ਅਗਲਾ)
     {
-	if (menu->submenu_id != NULL && menu->tearoff_handle != NULL
+	ਜੇ (menu->submenu_id != ਨਿਰਾ && menu->tearoff_handle != ਨਿਰਾ
 		&& menu->name[0] != ']' && !menu_is_popup(menu->name))
 	{
-	    if (val)
+	    ਜੇ (val)
 		gtk_widget_show(menu->tearoff_handle);
-	    else
+	    ਨਹੀਂਤਾਂ
 		gtk_widget_hide(menu->tearoff_handle);
 	}
 	recurse_tearoffs(menu->children, val);
@@ -887,128 +887,128 @@ recurse_tearoffs(vimmenu_T *menu, int val)
 }
 # endif
 
-# if GTK_CHECK_VERSION(3,4,0)
-    void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+    ਖਾਲੀ
+gui_mch_toggle_tearoffs(ਪੂਰਨ enable ਅਣਵਰਤਿਆ)
 {
     // Do nothing
 }
-# else
-    void
-gui_mch_toggle_tearoffs(int enable)
+# ਨਹੀਂਤਾਂ
+    ਖਾਲੀ
+gui_mch_toggle_tearoffs(ਪੂਰਨ enable)
 {
-    recurse_tearoffs(root_menu, enable);
+    recurse_tearoffs(ਜੜ੍ਹ_menu, enable);
 }
 # endif
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU
 
-#if defined(FEAT_TOOLBAR)
-    static int
+#ਜੇ defined(FEAT_TOOLBAR)
+    ਸਥਿਰ ਪੂਰਨ
 get_menu_position(vimmenu_T *menu)
 {
-    vimmenu_T	*node;
-    int		idx = 0;
+    vimmenu_T	*ਗੰਢ;
+    ਪੂਰਨ		idx = 0;
 
-    for (node = menu->parent->children; node != menu; node = node->next)
+    ਲਈ (ਗੰਢ = menu->ਮਾਪਾ->children; ਗੰਢ != menu; ਗੰਢ = ਗੰਢ->ਅਗਲਾ)
     {
-	g_return_val_if_fail(node != NULL, -1);
+	g_return_val_if_fail(ਗੰਢ != ਨਿਰਾ, -1);
 	++idx;
     }
 
-    return idx;
+    ਵਾਪਸ idx;
 }
-#endif // FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ // FEAT_TOOLBAR
 
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_menu_set_tip(vimmenu_T *menu)
+#ਜੇ defined(FEAT_TOOLBAR)
+    ਖਾਲੀ
+gui_mch_menu_ਸੈੱਟ_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL || gui.toolbar == NULL)
-	return;
+    ਜੇ (menu->id == ਨਿਰਾ || menu->ਮਾਪਾ == ਨਿਰਾ || gui.toolbar == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     char_u *tooltip;
 
-    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-# if GTK_CHECK_VERSION(3,0,0)
+    tooltip = CONVERT_ਮੰਜ਼ਿਲ_UTF8(menu->ਲੜੀਆਂ[MENU_ਸੂਚਕਾਂਕ_TIP]);
+    ਜੇ (tooltip != ਨਿਰਾ && utf_valid_string(tooltip, ਨਿਰਾ))
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	// Only set the tooltip when it's valid utf-8.
-	gtk_widget_set_tooltip_text(menu->id, (const gchar *)tooltip);
-# else
+	gtk_widget_ਸੈੱਟ_tooltip_ਪਾਠ(menu->id, (ਅਚਲ gchar *)tooltip);
+# ਨਹੀਂਤਾਂ
     // Only set the tooltip when it's valid utf-8.
-    gtk_tooltips_set_tip(GTK_TOOLBAR(gui.toolbar)->tooltips,
-	    menu->id, (const char *)tooltip, NULL);
+    gtk_tooltips_ਸੈੱਟ_tip(GTK_TOOLBAR(gui.toolbar)->tooltips,
+	    menu->id, (ਅਚਲ ਅੱਖਰ *)tooltip, ਨਿਰਾ);
 # endif
-    CONVERT_TO_UTF8_FREE(tooltip);
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(tooltip);
 }
-#endif // FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ // FEAT_TOOLBAR
 
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    ਖਾਲੀ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Don't let gtk_container_remove automatically destroy menu->id.
-    if (menu->id != NULL)
+    ਜੇ (menu->id != ਨਿਰਾ)
 	g_object_ref(menu->id);
 
     // Workaround for a spurious gtk warning in Ubuntu: "Trying to remove
     // a child that doesn't believe we're its parent."
     // Remove widget from gui.menubar before destroying it.
-    if (menu->id != NULL && gui.menubar != NULL
-			    && gtk_widget_get_parent(menu->id) == gui.menubar)
+    ਜੇ (menu->id != ਨਿਰਾ && gui.menubar != ਨਿਰਾ
+			    && gtk_widget_get_ਮਾਪਾ(menu->id) == gui.menubar)
 	gtk_container_remove(GTK_CONTAINER(gui.menubar), menu->id);
 
 # ifdef FEAT_TOOLBAR
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    ਜੇ (menu->ਮਾਪਾ != ਨਿਰਾ && menu_is_toolbar(menu->ਮਾਪਾ->name))
     {
-	if (menu_is_separator(menu->name))
-#  if GTK_CHECK_VERSION(3,0,0)
+	ਜੇ (menu_is_separator(menu->name))
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	{
-	    GtkToolItem *item = NULL;
+	    Gtk_Tool_ਵਸਤੂ *ਵਸਤੂ = ਨਿਰਾ;
 
-	    item = gtk_toolbar_get_nth_item(GTK_TOOLBAR(gui.toolbar),
+	    ਵਸਤੂ = gtk_toolbar_get_nth_ਵਸਤੂ(GTK_TOOLBAR(gui.toolbar),
 					    get_menu_position(menu));
-	    if (item != NULL)
+	    ਜੇ (ਵਸਤੂ != ਨਿਰਾ)
 		gtk_container_remove(GTK_CONTAINER(gui.toolbar),
-				     GTK_WIDGET(item));
+				     GTK_WIDGET(ਵਸਤੂ));
 	}
-#  else
+#  ਨਹੀਂਤਾਂ
 	    gtk_toolbar_remove_space(GTK_TOOLBAR(gui.toolbar),
 				     get_menu_position(menu));
 #  endif
-	else if (menu->id != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (menu->id != ਨਿਰਾ)
 	    gtk_widget_destroy(menu->id);
     }
-    else
+    ਨਹੀਂਤਾਂ
 # endif // FEAT_TOOLBAR
     {
-	if (menu->submenu_id != NULL)
+	ਜੇ (menu->submenu_id != ਨਿਰਾ)
 	    gtk_widget_destroy(menu->submenu_id);
 
-	if (menu->id != NULL)
+	ਜੇ (menu->id != ਨਿਰਾ)
 	    gtk_widget_destroy(menu->id);
     }
 
-    if (menu->id != NULL)
+    ਜੇ (menu->id != ਨਿਰਾ)
 	g_object_unref(menu->id);
-    menu->submenu_id = NULL;
-    menu->id = NULL;
+    menu->submenu_id = ਨਿਰਾ;
+    menu->id = ਨਿਰਾ;
 }
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU
 
 
 /*
  * Scrollbar stuff.
  */
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_thumb(scrollbar_T *sb, ਲੰਮਾ val, ਲੰਮਾ ਮਾਪ, ਲੰਮਾ max)
 {
-    if (sb->id == NULL)
-	return;
+    ਜੇ (sb->id == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     GtkAdjustment *adjustment;
 
@@ -1017,83 +1017,83 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 
     adjustment = gtk_range_get_adjustment(GTK_RANGE(sb->id));
 
-    gtk_adjustment_set_lower(adjustment, 0.0);
-    gtk_adjustment_set_value(adjustment, val);
-    gtk_adjustment_set_upper(adjustment, max + 1);
-    gtk_adjustment_set_page_size(adjustment, size);
-    gtk_adjustment_set_page_increment(adjustment,
-	    size < 3L ? 1L : size - 2L);
-    gtk_adjustment_set_step_increment(adjustment, 1.0);
+    gtk_adjustment_ਸੈੱਟ_ਹੇਠਲਾ(adjustment, 0.0);
+    gtk_adjustment_ਸੈੱਟ_ਮੁੱਲ(adjustment, val);
+    gtk_adjustment_ਸੈੱਟ_ਉੱਤਲਾ(adjustment, max + 1);
+    gtk_adjustment_ਸੈੱਟ_ਪੰਨਾ_ਮਾਪ(adjustment, ਮਾਪ);
+    gtk_adjustment_ਸੈੱਟ_ਪੰਨਾ_increment(adjustment,
+	    ਮਾਪ < 3L ? 1L : ਮਾਪ - 2L);
+    gtk_adjustment_ਸੈੱਟ_ਕਦਮ_increment(adjustment, 1.0);
 
-    g_signal_handler_block(G_OBJECT(adjustment), (gulong)sb->handler_id);
+    g_signal_handler_ਖੰਡ(G_OBJECT(adjustment), (gulong)sb->handler_id);
 
     --hold_gui_events;
 
-#if !GTK_CHECK_VERSION(3,18,0)
-    gtk_adjustment_changed(adjustment);
-#endif
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,18,0)
+    gtk_adjustment_ਬਦਲਿਆ(adjustment);
+#ਜੇ_ਅੰਤ
 
     g_signal_handler_unblock(G_OBJECT(adjustment),
 	    (gulong)sb->handler_id);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_pos(scrollbar_T *sb, ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
-    if (sb->id != NULL)
+    ਜੇ (sb->id != ਨਿਰਾ)
 	gui_gtk_form_move_resize(GTK_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_xpadding(ਖਾਲੀ)
 {
-    int xpad;
-#if GTK_CHECK_VERSION(3,0,0)
-    xpad = gtk_widget_get_allocated_width(gui.formwin)
-	  - gtk_widget_get_allocated_width(gui.drawarea) - gui.scrollbar_width;
-#else
-    xpad = gui.formwin->allocation.width - gui.drawarea->allocation.width
-							 - gui.scrollbar_width;
-#endif
-    if (gui.which_scrollbars[SBAR_LEFT] && gui.which_scrollbars[SBAR_RIGHT])
-	xpad -= gui.scrollbar_width;
+    ਪੂਰਨ xpad;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    xpad = gtk_widget_get_allocated_ਚੌੜਾਈ(gui.formwin)
+	  - gtk_widget_get_allocated_ਚੌੜਾਈ(gui.drawarea) - gui.scrollbar_ਚੌੜਾਈ;
+#ਨਹੀਂਤਾਂ
+    xpad = gui.formwin->ਵੰਡ.ਚੌੜਾਈ - gui.drawarea->ਵੰਡ.ਚੌੜਾਈ
+							 - gui.scrollbar_ਚੌੜਾਈ;
+#ਜੇ_ਅੰਤ
+    ਜੇ (gui.which_scrollbars[SBAR_ਖੱਬਾ] && gui.which_scrollbars[SBAR_ਸੱਜਾ])
+	xpad -= gui.scrollbar_ਚੌੜਾਈ;
 
-    return (xpad < 0) ? 0 : xpad;
+    ਵਾਪਸ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_ypadding(ਖਾਲੀ)
 {
-    int ypad;
-#if GTK_CHECK_VERSION(3,0,0)
-    ypad = gtk_widget_get_allocated_height(gui.formwin)
-	- gtk_widget_get_allocated_height(gui.drawarea) - gui.scrollbar_height;
-#else
-    ypad = gui.formwin->allocation.height - gui.drawarea->allocation.height
-							- gui.scrollbar_height;
-#endif
-    return (ypad < 0) ? 0 : ypad;
+    ਪੂਰਨ ypad;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ypad = gtk_widget_get_allocated_ਉਚਾਈ(gui.formwin)
+	- gtk_widget_get_allocated_ਉਚਾਈ(gui.drawarea) - gui.scrollbar_ਉਚਾਈ;
+#ਨਹੀਂਤਾਂ
+    ypad = gui.formwin->ਵੰਡ.ਉਚਾਈ - gui.drawarea->ਵੰਡ.ਉਚਾਈ
+							- gui.scrollbar_ਉਚਾਈ;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ (ypad < 0) ? 0 : ypad;
 }
 
 /*
  * Take action upon scrollbar dragging.
  */
-    static void
-adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
+    ਸਥਿਰ ਖਾਲੀ
+adjustment_ਮੁੱਲ_ਬਦਲਿਆ(GtkAdjustment *adjustment, gpointer ਅੰਕੜੇ)
 {
     scrollbar_T	*sb;
-    long	value;
-    int		dragging = FALSE;
+    ਲੰਮਾ	ਮੁੱਲ;
+    ਪੂਰਨ		dragging = FALSE;
 
-#ifdef FEAT_XIM
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_XIM
     // cancel any preediting
-    if (im_is_preediting())
+    ਜੇ (im_is_preediting())
 	xim_reset();
-#endif
+#ਜੇ_ਅੰਤ
 
-    sb = gui_find_scrollbar((long)data);
-    value = gtk_adjustment_get_value(adjustment);
-#if !GTK_CHECK_VERSION(3,0,0)
+    sb = gui_ਲੱਭੋ_scrollbar((ਲੰਮਾ)ਅੰਕੜੇ);
+    ਮੁੱਲ = gtk_adjustment_get_ਮੁੱਲ(adjustment);
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     /*
      * The dragging argument must be right for the scrollbar to work with
      * closed folds.  This isn't documented, hopefully this will keep on
@@ -1103,89 +1103,89 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
      * HACK: Get the mouse pointer position, if it appears to be on an arrow
      * button set "dragging" to FALSE.  This assumes square buttons!
      */
-    if (sb != NULL)
+    ਜੇ (sb != ਨਿਰਾ)
     {
 	dragging = TRUE;
 
-	if (sb->wp != NULL && GDK_IS_DRAWABLE(sb->id->window))
+	ਜੇ (sb->wp != ਨਿਰਾ && GDK_IS_DRAWABLE(sb->id->ਖਿੜਕੀ_2))
 	{
-	    int			x;
-	    int			y;
+	    ਪੂਰਨ			x;
+	    ਪੂਰਨ			y;
 	    GdkModifierType	state;
-	    int			width;
-	    int			height;
+	    ਪੂਰਨ			ਚੌੜਾਈ;
+	    ਪੂਰਨ			ਉਚਾਈ;
 
 	    // vertical scrollbar: need to set "dragging" properly in case
 	    // there are closed folds.
-	    gdk_window_get_pointer(sb->id->window, &x, &y, &state);
-	    gdk_window_get_size(sb->id->window, &width, &height);
-	    if (x >= 0 && x < width && y >= 0 && y < height)
+	    gdk_ਖਿੜਕੀ_get_ਸੂਚਕ(sb->id->ਖਿੜਕੀ_2, &x, &y, &state);
+	    gdk_ਖਿੜਕੀ_get_ਮਾਪ(sb->id->ਖਿੜਕੀ_2, &ਚੌੜਾਈ, &ਉਚਾਈ);
+	    ਜੇ (x >= 0 && x < ਚੌੜਾਈ && y >= 0 && y < ਉਚਾਈ)
 	    {
-		if (y < width)
+		ਜੇ (y < ਚੌੜਾਈ)
 		{
 		    // up arrow: move one (closed fold) line up
 		    dragging = FALSE;
-		    value = sb->wp->w_topline - 2;
+		    ਮੁੱਲ = sb->wp->w_topline - 2;
 		}
-		else if (y > height - width)
+		ਨਹੀਂਤਾਂ ਜੇ (y > ਉਚਾਈ - ਚੌੜਾਈ)
 		{
 		    // down arrow: move one (closed fold) line down
 		    dragging = FALSE;
-		    value = sb->wp->w_topline;
+		    ਮੁੱਲ = sb->wp->w_topline;
 		}
 	    }
 	}
     }
-#endif // !GTK_CHECK_VERSION(3,0,0)
-    gui_drag_scrollbar(sb, value, dragging);
+#ਜੇ_ਅੰਤ // !GTK_CHECK_VERSION(3,0,0)
+    gui_drag_scrollbar(sb, ਮੁੱਲ, dragging);
 }
 
 // SBAR_VERT or SBAR_HORIZ
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    ਖਾਲੀ
+gui_mch_create_scrollbar(scrollbar_T *sb, ਪੂਰਨ orient)
 {
-    if (orient == SBAR_HORIZ)
-#if GTK_CHECK_VERSION(3,2,0)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-#else
-	sb->id = gtk_hscrollbar_new(NULL);
-#endif
-    else if (orient == SBAR_VERT)
-#if GTK_CHECK_VERSION(3,2,0)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
-#else
-	sb->id = gtk_vscrollbar_new(NULL);
-#endif
+    ਜੇ (orient == SBAR_HORIZ)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
+	sb->id = gtk_hscrollbar_new(ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ ਜੇ (orient == SBAR_VERT)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
+	sb->id = gtk_vscrollbar_new(ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
 
-    if (sb->id == NULL)
-	return;
+    ਜੇ (sb->id == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     GtkAdjustment *adjustment;
 
-    gtk_widget_set_can_focus(sb->id, FALSE);
+    gtk_widget_ਸੈੱਟ_can_focus(sb->id, FALSE);
     gui_gtk_form_put(GTK_FORM(gui.formwin), sb->id, 0, 0);
 
     adjustment = gtk_range_get_adjustment(GTK_RANGE(sb->id));
 
     sb->handler_id = g_signal_connect(
 	    G_OBJECT(adjustment), "value-changed",
-	    G_CALLBACK(adjustment_value_changed),
-	    GINT_TO_POINTER(sb->ident));
+	    G_CALLBACK(adjustment_ਮੁੱਲ_ਬਦਲਿਆ),
+	    GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(sb->ident));
     gui_mch_update();
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    ਜੇ (sb->id != ਨਿਰਾ)
     {
 	gtk_widget_destroy(sb->id);
-	sb->id = NULL;
+	sb->id = ਨਿਰਾ;
     }
     gui_mch_update();
 }
 
-#if defined(FEAT_BROWSE)
+#ਜੇ defined(FEAT_BROWSE)
 /*
  * Implementation of the file selector related stuff
  */
@@ -1201,100 +1201,100 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * filter			file name filter
  */
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(ਪੂਰਨ saving,
 	       char_u *title,
 	       char_u *dflt,
-	       char_u *ext UNUSED,
+	       char_u *ext ਅਣਵਰਤਿਆ,
 	       char_u *initdir,
 	       char_u *filter)
 {
-# if GTK_CHECK_VERSION(3,20,0)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,20,0)
     GtkFileChooserNative	*fc;
-# else
+# ਨਹੀਂਤਾਂ
     GtkWidget			*fc;
 # endif
     char_u		dirbuf[MAXPATHL];
     guint		log_handler;
-    const gchar		*domain = "Gtk";
+    ਅਚਲ gchar		*domain = "Gtk";
 
-    title = CONVERT_TO_UTF8(title);
+    title = CONVERT_ਮੰਜ਼ਿਲ_UTF8(title);
 
     // GTK has a bug, it only works with an absolute path.
-    if (initdir == NULL || *initdir == NUL)
+    ਜੇ (initdir == ਨਿਰਾ || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    ਨਹੀਂਤਾਂ ਜੇ (vim_ਭਰਿਆ_Name(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     // Always need a trailing slash for a directory.
-    add_pathsep(dirbuf);
+    ਜੋੜੋ_pathsep(dirbuf);
 
     // If our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
     // Hack: The GTK file dialog warns when it can't access a new file, this
     // makes it shut up. http://bugzilla.gnome.org/show_bug.cgi?id=664587
-    log_handler = g_log_set_handler(domain, G_LOG_LEVEL_WARNING,
-						  recent_func_log_func, NULL);
+    log_handler = g_log_ਸੈੱਟ_handler(domain, G_LOG_LEVEL_WARNING,
+						  recent_func_log_func, ਨਿਰਾ);
 
     // We create the dialog each time, so that the button text can be "Open"
     // or "Save" according to the action.
-# if GTK_CHECK_VERSION(3,20,0)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,20,0)
     fc = gtk_file_chooser_native_new(
-# else
+# ਨਹੀਂਤਾਂ
     fc = gtk_file_chooser_dialog_new(
 # endif
-	    (const gchar *)title,
-	    GTK_WINDOW(gui.mainwin),
+	    (ਅਚਲ gchar *)title,
+	    GTK_ਖਿੜਕੀ(gui.mainwin),
 	    saving ? GTK_FILE_CHOOSER_ACTION_SAVE
 					   : GTK_FILE_CHOOSER_ACTION_OPEN,
-# if GTK_CHECK_VERSION(3,20,0)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,20,0)
 	    saving ? _("_Save") : _("_Open"), _("_Cancel"));
-# else
-#  if GTK_CHECK_VERSION(3,10,0)
+# ਨਹੀਂਤਾਂ
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    saving ? _("_Save") : _("_Open"), GTK_RESPONSE_ACCEPT,
-#  else
+#  ਨਹੀਂਤਾਂ
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    saving ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 #  endif
-	    NULL);
+	    ਨਿਰਾ);
 # endif
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fc),
-						       (const gchar *)dirbuf);
+    gtk_file_chooser_ਸੈੱਟ_current_folder(GTK_FILE_CHOOSER(fc),
+						       (ਅਚਲ gchar *)dirbuf);
 
-    if (filter != NULL && *filter != NUL)
+    ਜੇ (filter != ਨਿਰਾ && *filter != NUL)
     {
-	int     i = 0;
+	ਪੂਰਨ     i = 0;
 	char_u  *patt;
 	char_u  *p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	ਜੇ (patt != ਨਿਰਾ)
 	{
-	    while (p != NULL && *p != NUL)
+	    ਜਦੋਂ (p != ਨਿਰਾ && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		ਜੇ (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
-			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    ਜੇ (*p == '\t')
+			gtk_file_filter_ਸੈੱਟ_name(gfilter, (gchar *)patt);
+		    ਨਹੀਂਤਾਂ
 		    {
-			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			gtk_file_filter_ਜੋੜੋ_ਨਮੂਨਾ(gfilter, (gchar *)patt);
+			ਜੇ (*p == '\n')
 			{
-			    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fc),
+			    gtk_file_chooser_ਜੋੜੋ_filter(GTK_FILE_CHOOSER(fc),
 				    gfilter);
-			    if (*(p + 1) != NUL)
+			    ਜੇ (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    p++;
 		    i++;
@@ -1303,36 +1303,36 @@ gui_mch_browse(int saving,
 	}
 	vim_free(patt);
     }
-    if (saving && dflt != NULL && *dflt != NUL)
-	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fc), (char *)dflt);
+    ਜੇ (saving && dflt != ਨਿਰਾ && *dflt != NUL)
+	gtk_file_chooser_ਸੈੱਟ_current_name(GTK_FILE_CHOOSER(fc), (ਅੱਖਰ *)dflt);
 
-    gui.browse_fname = NULL;
-# if GTK_CHECK_VERSION(3,20,0)
-    if (gtk_native_dialog_run(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
-# else
-    if (gtk_dialog_run(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+    gui.browse_fname = ਨਿਰਾ;
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,20,0)
+    ਜੇ (gtk_native_dialog_ਲੜੀਵਾਰ(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+# ਨਹੀਂਤਾਂ
+    ਜੇ (gtk_dialog_ਲੜੀਵਾਰ(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
 # endif
     {
-	char *filename;
+	ਅੱਖਰ *filename;
 
 	filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fc));
 	gui.browse_fname = (char_u *)g_strdup(filename);
 	g_free(filename);
     }
-# if GTK_CHECK_VERSION(3,20,0)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,20,0)
     g_object_unref(fc);
-# else
+# ਨਹੀਂਤਾਂ
     gtk_widget_destroy(GTK_WIDGET(fc));
 # endif
 
     g_log_remove_handler(domain, log_handler);
 
-    CONVERT_TO_UTF8_FREE(title);
-    if (gui.browse_fname == NULL)
-	return NULL;
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(title);
+    ਜੇ (gui.browse_fname == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // shorten the file name if possible
-    return vim_strsave(shorten_fname1(gui.browse_fname));
+    ਵਾਪਸ vim_strsave(shorten_fname1(gui.browse_fname));
 }
 
 /*
@@ -1347,102 +1347,102 @@ gui_mch_browsedir(
 	       char_u *title,
 	       char_u *initdir)
 {
-# if defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
+# ਜੇ defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
     char_u		dirbuf[MAXPATHL];
     char_u		*p;
     GtkWidget		*dirdlg;	    // file selection dialog
-    char_u		*dirname = NULL;
+    char_u		*dirname = ਨਿਰਾ;
 
-    title = CONVERT_TO_UTF8(title);
+    title = CONVERT_ਮੰਜ਼ਿਲ_UTF8(title);
 
     dirdlg = gtk_file_chooser_dialog_new(
-	    (const gchar *)title,
-	    GTK_WINDOW(gui.mainwin),
+	    (ਅਚਲ gchar *)title,
+	    GTK_ਖਿੜਕੀ(gui.mainwin),
 	    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-#  if GTK_CHECK_VERSION(3,10,0)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    _("_OK"), GTK_RESPONSE_ACCEPT,
-#  else
+#  ਨਹੀਂਤਾਂ
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 #  endif
-	    NULL);
+	    ਨਿਰਾ);
 
-    CONVERT_TO_UTF8_FREE(title);
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(title);
 
     // if our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
     // GTK appears to insist on an absolute path.
-    if (initdir == NULL || *initdir == NUL
-	       || vim_FullName(initdir, dirbuf, MAXPATHL - 10, FALSE) == FAIL)
+    ਜੇ (initdir == ਨਿਰਾ || *initdir == NUL
+	       || vim_ਭਰਿਆ_Name(initdir, dirbuf, MAXPATHL - 10, FALSE) == FAIL)
 	mch_dirname(dirbuf, MAXPATHL - 10);
 
     // Always need a trailing slash for a directory.
     // Also add a dummy file name, so that we get to the directory.
-    add_pathsep(dirbuf);
+    ਜੋੜੋ_pathsep(dirbuf);
     STRCAT(dirbuf, "@zd(*&1|");
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dirdlg),
-						      (const gchar *)dirbuf);
+    gtk_file_chooser_ਸੈੱਟ_filename(GTK_FILE_CHOOSER(dirdlg),
+						      (ਅਚਲ gchar *)dirbuf);
 
     // Run the dialog.
-    if (gtk_dialog_run(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
+    ਜੇ (gtk_dialog_ਲੜੀਵਾਰ(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
 	dirname = (char_u *)gtk_file_chooser_get_filename(
 						    GTK_FILE_CHOOSER(dirdlg));
     gtk_widget_destroy(dirdlg);
-    if (dirname == NULL)
-	return NULL;
+    ਜੇ (dirname == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // shorten the file name if possible
     p = vim_strsave(shorten_fname1(dirname));
     g_free(dirname);
-    return p;
+    ਵਾਪਸ p;
 
-# else // !defined(GTK_FILE_CHOOSER)
+# ਨਹੀਂਤਾਂ // !defined(GTK_FILE_CHOOSER)
     // For GTK 2.2 and earlier: fall back to ordinary file selector.
-    return gui_mch_browse(0, title, NULL, NULL, initdir, NULL);
+    ਵਾਪਸ gui_mch_browse(0, title, ਨਿਰਾ, ਨਿਰਾ, initdir, ਨਿਰਾ);
 # endif // !defined(GTK_FILE_CHOOSER)
 }
 
 
-#endif	// FEAT_BROWSE
+#ਜੇ_ਅੰਤ	// FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#ਜੇ defined(FEAT_GUI_DIALOG)
 
-    static GtkWidget *
-create_message_dialog(int type, char_u *title, char_u *message)
+    ਸਥਿਰ GtkWidget *
+create_ਸੁਨੇਹਾ_dialog(ਪੂਰਨ type, char_u *title, char_u *ਸੁਨੇਹਾ_2)
 {
     GtkWidget	    *dialog;
-    GtkMessageType  message_type;
+    Gtk_ਸੁਨੇਹਾ_Type  ਸੁਨੇਹਾ_type;
 
-    switch (type)
+    ਚੋਣ (type)
     {
-	case VIM_ERROR:	    message_type = GTK_MESSAGE_ERROR;	 break;
-	case VIM_WARNING:   message_type = GTK_MESSAGE_WARNING;	 break;
-	case VIM_QUESTION:  message_type = GTK_MESSAGE_QUESTION; break;
-	default:	    message_type = GTK_MESSAGE_INFO;	 break;
+	ਹਾਲਤ VIM_ERROR:	    ਸੁਨੇਹਾ_type = GTK_ਸੁਨੇਹਾ_ERROR;	 ਰੋਕੋ;
+	ਹਾਲਤ VIM_WARNING:   ਸੁਨੇਹਾ_type = GTK_ਸੁਨੇਹਾ_WARNING;	 ਰੋਕੋ;
+	ਹਾਲਤ VIM_QUESTION:  ਸੁਨੇਹਾ_type = GTK_ਸੁਨੇਹਾ_QUESTION; ਰੋਕੋ;
+	ਮੂਲ:	    ਸੁਨੇਹਾ_type = GTK_ਸੁਨੇਹਾ_INFO;	 ਰੋਕੋ;
     }
 
-    message = CONVERT_TO_UTF8(message);
-    dialog  = gtk_message_dialog_new(GTK_WINDOW(gui.mainwin),
-				     GTK_DIALOG_DESTROY_WITH_PARENT,
-				     message_type,
+    ਸੁਨੇਹਾ_2 = CONVERT_ਮੰਜ਼ਿਲ_UTF8(ਸੁਨੇਹਾ_2);
+    dialog  = gtk_ਸੁਨੇਹਾ_dialog_new(GTK_ਖਿੜਕੀ(gui.mainwin),
+				     GTK_DIALOG_DESTROY_WITH_ਮਾਪਾ,
+				     ਸੁਨੇਹਾ_type,
 				     GTK_BUTTONS_NONE,
-				     "%s", (const char *)message);
-    CONVERT_TO_UTF8_FREE(message);
+				     "%s", (ਅਚਲ ਅੱਖਰ *)ਸੁਨੇਹਾ_2);
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(ਸੁਨੇਹਾ_2);
 
-    if (title != NULL)
+    ਜੇ (title != ਨਿਰਾ)
     {
-	title = CONVERT_TO_UTF8(title);
-	gtk_window_set_title(GTK_WINDOW(dialog), (const char *)title);
-	CONVERT_TO_UTF8_FREE(title);
+	title = CONVERT_ਮੰਜ਼ਿਲ_UTF8(title);
+	gtk_ਖਿੜਕੀ_ਸੈੱਟ_title(GTK_ਖਿੜਕੀ(dialog), (ਅਚਲ ਅੱਖਰ *)title);
+	CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(title);
     }
-    else if (type == VIM_GENERIC)
+    ਨਹੀਂਤਾਂ ਜੇ (type == VIM_GENERIC)
     {
-	gtk_window_set_title(GTK_WINDOW(dialog), "VIM");
+	gtk_ਖਿੜਕੀ_ਸੈੱਟ_title(GTK_ਖਿੜਕੀ(dialog), "VIM");
     }
 
-    return dialog;
+    ਵਾਪਸ dialog;
 }
 
 /*
@@ -1451,133 +1451,133 @@ create_message_dialog(int type, char_u *title, char_u *message)
  * '&' with '_'.  button_string must point to allocated memory!
  * Return an allocated array of pointers into button_string.
  */
-    static char **
-split_button_string(char_u *button_string, int *n_buttons)
+    ਸਥਿਰ ਅੱਖਰ **
+ਵੰਡੋ_button_string(char_u *button_string, ਪੂਰਨ *n_buttons)
 {
-    char	    **array;
+    ਅੱਖਰ	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    ਗਿਣਤੀ_2 = 1;
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+    ਲਈ (p = button_string; *p != NUL; ++p)
+	ਜੇ (*p == DLG_BUTTON_SEP)
+	    ++ਗਿਣਤੀ_2;
 
-    array = ALLOC_MULT(char *, count + 1);
-    count = 0;
+    array = ALLOC_MULT(ਅੱਖਰ *, ਗਿਣਤੀ_2 + 1);
+    ਗਿਣਤੀ_2 = 0;
 
-    if (array != NULL)
+    ਜੇ (array != ਨਿਰਾ)
     {
-	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	array[ਗਿਣਤੀ_2++] = (ਅੱਖਰ *)button_string;
+	ਲਈ (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    ਜੇ (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[ਗਿਣਤੀ_2++] = (ਅੱਖਰ *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    ਨਹੀਂਤਾਂ ਜੇ (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    ਨਹੀਂਤਾਂ
 		MB_PTR_ADV(p);
 	}
-	array[count] = NULL; // currently not relied upon, but doesn't hurt
+	array[ਗਿਣਤੀ_2] = ਨਿਰਾ; // currently not relied upon, but doesn't hurt
     }
 
-    *n_buttons = count;
-    return array;
+    *n_buttons = ਗਿਣਤੀ_2;
+    ਵਾਪਸ array;
 }
 
-# if !GTK_CHECK_VERSION(3,10,0)
-    static char **
-split_button_translation(const char *message)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਸਥਿਰ ਅੱਖਰ **
+ਵੰਡੋ_button_translation(ਅਚਲ ਅੱਖਰ *ਸੁਨੇਹਾ_2)
 {
-    char    **buttons = NULL;
+    ਅੱਖਰ    **buttons = ਨਿਰਾ;
     char_u  *str;
-    int	    n_buttons = 0;
-    int	    n_expected = 1;
+    ਪੂਰਨ	    n_buttons = 0;
+    ਪੂਰਨ	    n_expected = 1;
 
-    for (str = (char_u *)message; *str != NUL; ++str)
-	if (*str == DLG_BUTTON_SEP)
+    ਲਈ (str = (char_u *)ਸੁਨੇਹਾ_2; *str != NUL; ++str)
+	ਜੇ (*str == DLG_BUTTON_SEP)
 	    ++n_expected;
 
-    str = (char_u *)_(message);
-    if (str != NULL)
+    str = (char_u *)_(ਸੁਨੇਹਾ_2);
+    ਜੇ (str != ਨਿਰਾ)
     {
-	if (output_conv.vc_type != CONV_NONE)
-	    str = string_convert(&output_conv, str, NULL);
-	else
+	ਜੇ (output_conv.vc_type != CONV_NONE)
+	    str = string_convert(&output_conv, str, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
 	    str = vim_strsave(str);
 
-	if (str != NULL)
-	    buttons = split_button_string(str, &n_buttons);
+	ਜੇ (str != ਨਿਰਾ)
+	    buttons = ਵੰਡੋ_button_string(str, &n_buttons);
     }
     /*
      * Uh-oh... this should never ever happen.	But we don't wanna crash
      * if the translation is broken, thus fall back to the untranslated
      * buttons string in case of emergency.
      */
-    if (buttons == NULL || n_buttons != n_expected)
+    ਜੇ (buttons == ਨਿਰਾ || n_buttons != n_expected)
     {
 	vim_free(buttons);
 	vim_free(str);
-	buttons = NULL;
-	str = vim_strsave((char_u *)message);
+	buttons = ਨਿਰਾ;
+	str = vim_strsave((char_u *)ਸੁਨੇਹਾ_2);
 
-	if (str != NULL)
-	    buttons = split_button_string(str, &n_buttons);
-	if (buttons == NULL)
+	ਜੇ (str != ਨਿਰਾ)
+	    buttons = ਵੰਡੋ_button_string(str, &n_buttons);
+	ਜੇ (buttons == ਨਿਰਾ)
 	    vim_free(str);
     }
 
-    return buttons;
+    ਵਾਪਸ buttons;
 }
 
-    static int
-button_equal(const char *a, const char *b)
+    ਸਥਿਰ ਪੂਰਨ
+button_equal(ਅਚਲ ਅੱਖਰ *a, ਅਚਲ ਅੱਖਰ *b)
 {
-    while (*a != '\0' && *b != '\0')
+    ਜਦੋਂ (*a != '\0' && *b != '\0')
     {
-	if (*a == '_' && *++a == '\0')
-	    break;
-	if (*b == '_' && *++b == '\0')
-	    break;
+	ਜੇ (*a == '_' && *++a == '\0')
+	    ਰੋਕੋ;
+	ਜੇ (*b == '_' && *++b == '\0')
+	    ਰੋਕੋ;
 
-	if (g_unichar_tolower(g_utf8_get_char(a))
+	ਜੇ (g_unichar_tolower(g_utf8_get_char(a))
 		!= g_unichar_tolower(g_utf8_get_char(b)))
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 
-	a = g_utf8_next_char(a);
-	b = g_utf8_next_char(b);
+	a = g_utf8_ਅਗਲਾ_char(a);
+	b = g_utf8_ਅਗਲਾ_char(b);
     }
 
-    return (*a == '\0' && *b == '\0');
+    ਵਾਪਸ (*a == '\0' && *b == '\0');
 }
 # endif
 
-    static void
-dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
+    ਸਥਿਰ ਖਾਲੀ
+dialog_ਜੋੜੋ_buttons(GtkDialog *dialog, char_u *button_string)
 {
-# if !GTK_CHECK_VERSION(3,10,0)
-    char    **ok;
-    char    **ync;  // "yes no cancel"
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਅੱਖਰ    **ok;
+    ਅੱਖਰ    **ync;  // "yes no cancel"
 # endif
-    char    **buttons;
-    int	    n_buttons = 0;
-    int	    idx;
+    ਅੱਖਰ    **buttons;
+    ਪੂਰਨ	    n_buttons = 0;
+    ਪੂਰਨ	    idx;
 
     button_string = vim_strsave(button_string); // must be writable
-    if (button_string == NULL)
-	return;
+    ਜੇ (button_string == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+    ਜੇ (vim_strchr(p_go, GO_VERTICAL) != ਨਿਰਾ)
     {
-# if !GTK_CHECK_VERSION(3,0,0)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	GtkWidget	*vbutton_box;
 
 	vbutton_box = gtk_vbutton_box_new();
 	gtk_widget_show(vbutton_box);
-	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+	gtk_box_pack_ਸਿਰਾ(GTK_BOX(GTK_DIALOG(dialog)->vbox),
 						 vbutton_box, TRUE, FALSE, 0);
 	// Overrule the "action_area" value, hopefully this works...
 	GTK_DIALOG(dialog)->action_area = vbutton_box;
@@ -1589,11 +1589,11 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * this way has the compelling advantage that translations need not to
      * be touched at all.  See below what 'ok' and 'ync' are used for.
      */
-# if !GTK_CHECK_VERSION(3,10,0)
-    ok	    = split_button_translation(N_("&Ok"));
-    ync     = split_button_translation(N_("&Yes\n&No\n&Cancel"));
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ok	    = ਵੰਡੋ_button_translation(N_("&Ok"));
+    ync     = ਵੰਡੋ_button_translation(N_("&Yes\n&No\n&Cancel"));
 # endif
-    buttons = split_button_string(button_string, &n_buttons);
+    buttons = ਵੰਡੋ_button_string(button_string, &n_buttons);
 
     /*
      * Yes, the buttons are in reversed order to match the GNOME 2 desktop
@@ -1601,9 +1601,9 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * Well, apparently somebody changed his mind: with GTK 2.2.4 it works the
      * other way around...
      */
-    for (idx = 1; idx <= n_buttons; ++idx)
+    ਲਈ (idx = 1; idx <= n_buttons; ++idx)
     {
-	char	*label;
+	ਅੱਖਰ	*label;
 	char_u	*label8;
 
 	label = buttons[idx - 1];
@@ -1616,28 +1616,28 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 	 * since anyone can create their own dialogs using Vim functions.
 	 * Thus we have to check for those too.
 	 */
-# if !GTK_CHECK_VERSION(3,10,0)
-	if (ok != NULL && ync != NULL) // almost impossible to fail
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+	ਜੇ (ok != ਨਿਰਾ && ync != ਨਿਰਾ) // almost impossible to fail
 	{
-	    if	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
-	    else if (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
-	    else if (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
-	    else if (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
-	    else if (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
-	    else if (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
-	    else if (button_equal(label, "No"))     label = GTK_STOCK_NO;
-	    else if (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
+	    ਜੇ	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, "No"))     label = GTK_STOCK_NO;
+	    ਨਹੀਂਤਾਂ ਜੇ (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
 	}
 # endif
-	label8 = CONVERT_TO_UTF8((char_u *)label);
-	gtk_dialog_add_button(dialog, (const gchar *)label8, idx);
-	CONVERT_TO_UTF8_FREE(label8);
+	label8 = CONVERT_ਮੰਜ਼ਿਲ_UTF8((char_u *)label);
+	gtk_dialog_ਜੋੜੋ_button(dialog, (ਅਚਲ gchar *)label8, idx);
+	CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(label8);
     }
 
-# if !GTK_CHECK_VERSION(3,10,0)
-    if (ok != NULL)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਜੇ (ok != ਨਿਰਾ)
 	vim_free(*ok);
-    if (ync != NULL)
+    ਜੇ (ync != ਨਿਰਾ)
 	vim_free(*ync);
     vim_free(ok);
     vim_free(ync);
@@ -1652,194 +1652,194 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
  * GUI used to work this way, and I consider the impact on UI consistency
  * low enough to justify implementing this as a special Vim feature.
  */
-typedef struct _DialogInfo
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ _DialogInfo
 {
-    int		ignore_enter;	    // no default button, ignore "Enter"
-    int		noalt;		    // accept accelerators without Alt
+    ਪੂਰਨ		ignore_enter;	    // no default button, ignore "Enter"
+    ਪੂਰਨ		noalt;		    // accept accelerators without Alt
     GtkDialog	*dialog;	    // Widget of the dialog
 } DialogInfo;
 
-    static gboolean
-dialog_key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
+    ਸਥਿਰ gboolean
+dialog_ਕੁੰਜੀ_press_event_cb(GtkWidget *widget, Gdk_Event_ਕੁੰਜੀ *event, gpointer ਅੰਕੜੇ)
 {
-    DialogInfo *di = (DialogInfo *)data;
+    DialogInfo *di = (DialogInfo *)ਅੰਕੜੇ;
 
     // Ignore hitting Enter (or Space) when there is no default button.
-    if (di->ignore_enter && (event->keyval == GDK_Return
+    ਜੇ (di->ignore_enter && (event->keyval == GDK_Return
 						     || event->keyval == ' '))
-	return TRUE;
-    else    // A different key was pressed, return to normal behavior
+	ਵਾਪਸ TRUE;
+    ਨਹੀਂਤਾਂ    // A different key was pressed, return to normal behavior
 	di->ignore_enter = FALSE;
 
     // Close the dialog when hitting "Esc".
-    if (event->keyval == GDK_Escape)
+    ਜੇ (event->keyval == GDK_Escape)
     {
 	gtk_dialog_response(di->dialog, GTK_RESPONSE_REJECT);
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
 
-    if (di->noalt
-	      && (event->state & gtk_accelerator_get_default_mod_mask()) == 0)
+    ਜੇ (di->noalt
+	      && (event->state & gtk_accelerator_get_default_mod_ਨਕਾਬ()) == 0)
     {
-	return gtk_window_mnemonic_activate(
-		   GTK_WINDOW(widget), event->keyval,
-		   gtk_window_get_mnemonic_modifier(GTK_WINDOW(widget)));
+	ਵਾਪਸ gtk_ਖਿੜਕੀ_mnemonic_activate(
+		   GTK_ਖਿੜਕੀ(widget), event->keyval,
+		   gtk_ਖਿੜਕੀ_get_mnemonic_modifier(GTK_ਖਿੜਕੀ(widget)));
     }
 
-    return FALSE; // continue emission
+    ਵਾਪਸ FALSE; // continue emission
 }
 
-    int
-gui_mch_dialog(int	type,	    // type of dialog
+    ਪੂਰਨ
+gui_mch_dialog(ਪੂਰਨ	type,	    // type of dialog
 	       char_u	*title,	    // title of dialog
-	       char_u	*message,   // message text
+	       char_u	*ਸੁਨੇਹਾ_2,   // message text
 	       char_u	*buttons,   // names of buttons
-	       int	def_but,    // default button
+	       ਪੂਰਨ	def_but,    // default button
 	       char_u	*textfield, // text for textfield or NULL
-	       int	ex_cmd UNUSED)
+	       ਪੂਰਨ	ex_cmd ਅਣਵਰਤਿਆ)
 {
     GtkWidget	*dialog;
-    GtkWidget	*entry = NULL;
-    char_u	*text;
-    int		response;
+    GtkWidget	*ਇੰਦਰਾਜ = ਨਿਰਾ;
+    char_u	*ਪਾਠ;
+    ਪੂਰਨ		response;
     DialogInfo  dialoginfo;
 
-    ++gui.dialogs_active;
+    ++gui.dialogs_ਸਰਗਰਮ;
 
-    dialog = create_message_dialog(type, title, message);
+    dialog = create_ਸੁਨੇਹਾ_dialog(type, title, ਸੁਨੇਹਾ_2);
     dialoginfo.dialog = GTK_DIALOG(dialog);
-    dialog_add_buttons(GTK_DIALOG(dialog), buttons);
+    dialog_ਜੋੜੋ_buttons(GTK_DIALOG(dialog), buttons);
 
-    if (textfield != NULL)
+    ਜੇ (textfield != ਨਿਰਾ)
     {
 	GtkWidget *alignment;
 
-	entry = gtk_entry_new();
-	gtk_widget_show(entry);
+	ਇੰਦਰਾਜ = gtk_ਇੰਦਰਾਜ_new();
+	gtk_widget_show(ਇੰਦਰਾਜ);
 
 	// Make Enter work like pressing OK.
-	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+	gtk_ਇੰਦਰਾਜ_ਸੈੱਟ_activates_default(GTK_ਇੰਦਰਾਜ(ਇੰਦਰਾਜ), TRUE);
 
-	text = CONVERT_TO_UTF8(textfield);
-	gtk_entry_set_text(GTK_ENTRY(entry), (const char *)text);
-	CONVERT_TO_UTF8_FREE(text);
+	ਪਾਠ = CONVERT_ਮੰਜ਼ਿਲ_UTF8(textfield);
+	gtk_ਇੰਦਰਾਜ_ਸੈੱਟ_ਪਾਠ(GTK_ਇੰਦਰਾਜ(ਇੰਦਰਾਜ), (ਅਚਲ ਅੱਖਰ *)ਪਾਠ);
+	CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(ਪਾਠ);
 
-# if GTK_CHECK_VERSION(3,14,0)
-	gtk_widget_set_halign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
-	gtk_widget_set_valign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
-	gtk_widget_set_hexpand(GTK_WIDGET(entry), TRUE);
-	gtk_widget_set_vexpand(GTK_WIDGET(entry), TRUE);
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
+	gtk_widget_ਸੈੱਟ_halign(GTK_WIDGET(ਇੰਦਰਾਜ), GTK_ALIGN_CENTER);
+	gtk_widget_ਸੈੱਟ_valign(GTK_WIDGET(ਇੰਦਰਾਜ), GTK_ALIGN_CENTER);
+	gtk_widget_ਸੈੱਟ_hexpand(GTK_WIDGET(ਇੰਦਰਾਜ), TRUE);
+	gtk_widget_ਸੈੱਟ_vexpand(GTK_WIDGET(ਇੰਦਰਾਜ), TRUE);
 
 	alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-# else
-	alignment = gtk_alignment_new((float)0.5, (float)0.5,
-						      (float)1.0, (float)1.0);
+# ਨਹੀਂਤਾਂ
+	alignment = gtk_alignment_new((ਦਸ਼ਮਲਵ)0.5, (ਦਸ਼ਮਲਵ)0.5,
+						      (ਦਸ਼ਮਲਵ)1.0, (ਦਸ਼ਮਲਵ)1.0);
 # endif
-	gtk_container_add(GTK_CONTAINER(alignment), entry);
-	gtk_container_set_border_width(GTK_CONTAINER(alignment), 5);
+	gtk_container_ਜੋੜੋ(GTK_CONTAINER(alignment), ਇੰਦਰਾਜ);
+	gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(alignment), 5);
 	gtk_widget_show(alignment);
 
-# if GTK_CHECK_VERSION(3,0,0)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	{
-	    GtkWidget * const vbox
+	    GtkWidget * ਅਚਲ vbox
 		= gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-	    gtk_box_pack_start(GTK_BOX(vbox),
+	    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(vbox),
 		    alignment, TRUE, FALSE, 0);
 	}
-# else
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+# ਨਹੀਂਤਾਂ
+	gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(GTK_DIALOG(dialog)->vbox),
 			   alignment, TRUE, FALSE, 0);
 # endif
 	dialoginfo.noalt = FALSE;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	dialoginfo.noalt = TRUE;
 
     // Allow activation of mnemonic accelerators without pressing <Alt> when
     // there is no textfield.  Handle pressing Esc.
     g_signal_connect(G_OBJECT(dialog), "key-press-event",
-			 G_CALLBACK(&dialog_key_press_event_cb), &dialoginfo);
+			 G_CALLBACK(&dialog_ਕੁੰਜੀ_press_event_cb), &dialoginfo);
 
-    if (def_but > 0)
+    ਜੇ (def_but > 0)
     {
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), def_but);
+	gtk_dialog_ਸੈੱਟ_default_response(GTK_DIALOG(dialog), def_but);
 	dialoginfo.ignore_enter = FALSE;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	// No default button, ignore pressing Enter.
 	dialoginfo.ignore_enter = TRUE;
 
     // Show the mouse pointer if it's currently hidden.
     gui_mch_mousehide(FALSE);
 
-    response = gtk_dialog_run(GTK_DIALOG(dialog));
+    response = gtk_dialog_ਲੜੀਵਾਰ(GTK_DIALOG(dialog));
 
     // GTK_RESPONSE_NONE means the dialog was programmatically destroyed.
-    if (response != GTK_RESPONSE_NONE)
+    ਜੇ (response != GTK_RESPONSE_NONE)
     {
-	if (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
+	ਜੇ (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
 	    response = def_but;
-	if (textfield != NULL)
+	ਜੇ (textfield != ਨਿਰਾ)
 	{
-	    text = (char_u *)gtk_entry_get_text(GTK_ENTRY(entry));
-	    text = CONVERT_FROM_UTF8(text);
+	    ਪਾਠ = (char_u *)gtk_ਇੰਦਰਾਜ_get_ਪਾਠ(GTK_ਇੰਦਰਾਜ(ਇੰਦਰਾਜ));
+	    ਪਾਠ = CONVERT_FROM_UTF8(ਪਾਠ);
 
-	    vim_strncpy(textfield, text, IOSIZE - 1);
+	    vim_strncpy(textfield, ਪਾਠ, IOSIZE - 1);
 
-	    CONVERT_FROM_UTF8_FREE(text);
+	    CONVERT_FROM_UTF8_FREE(ਪਾਠ);
 	}
 	gtk_widget_destroy(dialog);
     }
 
-    if (gui.dialogs_active > 0)
-	--gui.dialogs_active;
-    return response > 0 ? response : 0;
+    ਜੇ (gui.dialogs_ਸਰਗਰਮ > 0)
+	--gui.dialogs_ਸਰਗਰਮ;
+    ਵਾਪਸ response > 0 ? response : 0;
 }
 
-#endif // FEAT_GUI_DIALOG
+#ਜੇ_ਅੰਤ // FEAT_GUI_DIALOG
 
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 
-    void
+    ਖਾਲੀ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-# if defined(FEAT_XIM)
+# ਜੇ defined(FEAT_XIM)
     /*
      * Append a submenu for selecting an input method.	This is
      * currently the only way to switch input methods at runtime.
      */
-#  if !GTK_CHECK_VERSION(3,10,0)
-    if (xic != NULL && g_object_get_data(G_OBJECT(menu->submenu_id),
-					 "vim-has-im-menu") == NULL)
+#  ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਜੇ (xic != ਨਿਰਾ && g_object_get_ਅੰਕੜੇ(G_OBJECT(menu->submenu_id),
+					 "vim-has-im-menu") == ਨਿਰਾ)
     {
 	GtkWidget   *menuitem;
 	GtkWidget   *submenu;
 	char_u	    *name;
 
-	menuitem = gtk_separator_menu_item_new();
+	menuitem = gtk_separator_menu_ਵਸਤੂ_new();
 	gtk_widget_show(menuitem);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu->submenu_id), menuitem);
 
 	name = (char_u *)_("Input _Methods");
-	name = CONVERT_TO_UTF8(name);
-	menuitem = gtk_menu_item_new_with_mnemonic((const char *)name);
-	CONVERT_TO_UTF8_FREE(name);
+	name = CONVERT_ਮੰਜ਼ਿਲ_UTF8(name);
+	menuitem = gtk_menu_ਵਸਤੂ_new_with_mnemonic((ਅਚਲ ਅੱਖਰ *)name);
+	CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(name);
 	gtk_widget_show(menuitem);
 
 	submenu = gtk_menu_new();
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
+	gtk_menu_ਵਸਤੂ_ਸੈੱਟ_submenu(GTK_MENU_ਵਸਤੂ(menuitem), submenu);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu->submenu_id), menuitem);
 
 	gtk_im_multicontext_append_menuitems(GTK_IM_MULTICONTEXT(xic),
 					     GTK_MENU_SHELL(submenu));
-	g_object_set_data(G_OBJECT(menu->submenu_id),
-			  "vim-has-im-menu", GINT_TO_POINTER(TRUE));
+	g_object_ਸੈੱਟ_ਅੰਕੜੇ(G_OBJECT(menu->submenu_id),
+			  "vim-has-im-menu", GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(TRUE));
     }
 #  endif
 # endif // FEAT_XIM
 
-# if GTK_CHECK_VERSION(3,22,2)
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,22,2)
     {
 	GdkEventButton trigger;
 
@@ -1848,32 +1848,32 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 	// actual pointer position when it is invoked, the fields x, y, x_root
 	// and y_root are set to zero for convenience.
 	trigger.type       = GDK_BUTTON_PRESS;
-	trigger.window     = gtk_widget_get_window(gui.drawarea);
+	trigger.ਖਿੜਕੀ_2     = gtk_widget_get_ਖਿੜਕੀ(gui.drawarea);
 	trigger.send_event = FALSE;
-	trigger.time       = gui.event_time;
+	trigger.ਸਮਾਂ       = gui.event_ਸਮਾਂ;
 	trigger.x	   = 0.0;
 	trigger.y	   = 0.0;
-	trigger.axes       = NULL;
+	trigger.axes       = ਨਿਰਾ;
 	trigger.state      = 0;
 	trigger.button     = 3;
-	trigger.device     = NULL;
-	trigger.x_root     = 0.0;
-	trigger.y_root     = 0.0;
+	trigger.device     = ਨਿਰਾ;
+	trigger.x_ਜੜ੍ਹ     = 0.0;
+	trigger.y_ਜੜ੍ਹ     = 0.0;
 
-	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
+	gtk_menu_popup_at_ਸੂਚਕ(GTK_MENU(menu->submenu_id),
 				  (GdkEvent *)&trigger);
     }
-# else
+# ਨਹੀਂਤਾਂ
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
-		   NULL, NULL,
-		   (GtkMenuPositionFunc)NULL, NULL,
-		   3U, gui.event_time);
+		   ਨਿਰਾ, ਨਿਰਾ,
+		   (GtkMenuPositionFunc)ਨਿਰਾ, ਨਿਰਾ,
+		   3U, gui.event_ਸਮਾਂ);
 # endif
 }
 
 // Ugly global variable to pass "mouse_pos" flag from gui_make_popup() to
 // popup_menu_position_func().
-static int popup_mouse_pos;
+ਸਥਿਰ ਪੂਰਨ popup_mouse_pos;
 
 /*
  * Menu position callback; used by gui_make_popup() to place the menu
@@ -1882,24 +1882,24 @@ static int popup_mouse_pos;
  * Note: The push_in output argument seems to affect scrolling of huge
  * menus that don't fit on the screen.	Leave it at the default for now.
  */
-    static void
-popup_menu_position_func(GtkMenu *menu UNUSED,
+    ਸਥਿਰ ਖਾਲੀ
+popup_menu_position_func(GtkMenu *menu ਅਣਵਰਤਿਆ,
 			 gint *x, gint *y,
-			 gboolean *push_in UNUSED,
-			 gpointer user_data UNUSED)
+			 gboolean *ਧੱਕੋ_ਵਿੱਚ ਅਣਵਰਤਿਆ,
+			 gpointer user_ਅੰਕੜੇ ਅਣਵਰਤਿਆ)
 {
-    gdk_window_get_origin(gtk_widget_get_window(gui.drawarea), x, y);
+    gdk_ਖਿੜਕੀ_get_origin(gtk_widget_get_ਖਿੜਕੀ(gui.drawarea), x, y);
 
-    if (popup_mouse_pos)
+    ਜੇ (popup_mouse_pos)
     {
-	int	mx, my;
+	ਪੂਰਨ	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	*x += mx;
 	*y += my;
     }
-    else if (curwin != NULL && gui.drawarea != NULL &&
-	     gtk_widget_get_window(gui.drawarea) != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (curwin != ਨਿਰਾ && gui.drawarea != ਨਿਰਾ &&
+	     gtk_widget_get_ਖਿੜਕੀ(gui.drawarea) != ਨਿਰਾ)
     {
 	// Find the cursor position in the current window
 	*x += FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
@@ -1907,19 +1907,19 @@ popup_menu_position_func(GtkMenu *menu UNUSED,
     }
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    ਖਾਲੀ
+gui_make_popup(char_u *ਰਸਤਾ_name, ਪੂਰਨ mouse_pos)
 {
     vimmenu_T *menu;
 
     popup_mouse_pos = mouse_pos;
 
-    menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    menu = gui_ਲੱਭੋ_menu(ਰਸਤਾ_name);
+    ਜੇ (menu == ਨਿਰਾ || menu->submenu_id == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-# if GTK_CHECK_VERSION(3,22,2)
-    GdkWindow * const win = gtk_widget_get_window(gui.drawarea);
+# ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,22,2)
+    Gdk_ਖਿੜਕੀ * ਅਚਲ win = gtk_widget_get_ਖਿੜਕੀ(gui.drawarea);
     GdkEventButton trigger;
 
     // A pseudo event to have gtk_menu_popup_at_*() functions work. Since
@@ -1928,28 +1928,28 @@ gui_make_popup(char_u *path_name, int mouse_pos)
     // set to a specific value here; therefore, they are set to zero for
     // convenience.
     trigger.type       = GDK_BUTTON_PRESS;
-    trigger.window     = win;
+    trigger.ਖਿੜਕੀ_2     = win;
     trigger.send_event = FALSE;
-    trigger.time       = GDK_CURRENT_TIME;
+    trigger.ਸਮਾਂ       = GDK_CURRENT_ਸਮਾਂ;
     trigger.x	   = 0.0;
     trigger.y	   = 0.0;
-    trigger.axes       = NULL;
+    trigger.axes       = ਨਿਰਾ;
     trigger.state      = 0;
     trigger.button     = 0;
-    trigger.device     = NULL;
-    trigger.x_root     = 0.0;
-    trigger.y_root     = 0.0;
+    trigger.device     = ਨਿਰਾ;
+    trigger.x_ਜੜ੍ਹ     = 0.0;
+    trigger.y_ਜੜ੍ਹ     = 0.0;
 
-    if (mouse_pos)
-	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
+    ਜੇ (mouse_pos)
+	gtk_menu_popup_at_ਸੂਚਕ(GTK_MENU(menu->submenu_id),
 		(GdkEvent *)&trigger);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	gint origin_x, origin_y;
 	GdkRectangle rect = { 0, 0, 0, 0 };
 
-	gdk_window_get_origin(win, &origin_x, &origin_y);
-	popup_menu_position_func(NULL, &rect.x, &rect.y, NULL, NULL);
+	gdk_ਖਿੜਕੀ_get_origin(win, &origin_x, &origin_y);
+	popup_menu_position_func(ਨਿਰਾ, &rect.x, &rect.y, ਨਿਰਾ, ਨਿਰਾ);
 
 	rect.x -= origin_x;
 	rect.y -= origin_y;
@@ -1961,115 +1961,115 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 		GDK_GRAVITY_NORTH_WEST,
 		(GdkEvent *)&trigger);
     }
-# else
+# ਨਹੀਂਤਾਂ
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
-	    NULL, NULL,
-	    &popup_menu_position_func, NULL,
-	    0U, (guint32)GDK_CURRENT_TIME);
+	    ਨਿਰਾ, ਨਿਰਾ,
+	    &popup_menu_position_func, ਨਿਰਾ,
+	    0U, (guint32)GDK_CURRENT_ਸਮਾਂ);
 # endif
 }
 
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU
 
 
 /*
  * We don't create it twice.
  */
 
-typedef struct _SharedFindReplace
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ Shared_ਲੱਭੋ_Replace
 {
     GtkWidget *dialog;	// the main dialog widget
     GtkWidget *wword;	// 'Whole word only' check button
     GtkWidget *mcase;	// 'Match case' check button
-    GtkWidget *up;	// search direction 'Up' radio button
-    GtkWidget *down;	// search direction 'Down' radio button
+    GtkWidget *ਉੱਪਰ;	// search direction 'Up' radio button
+    GtkWidget *ਥੱਲੇ;	// search direction 'Down' radio button
     GtkWidget *what;	// 'Find what' entry text widget
     GtkWidget *with;	// 'Replace with' entry text widget
-    GtkWidget *find;	// 'Find Next' action button
+    GtkWidget *ਲੱਭੋ;	// 'Find Next' action button
     GtkWidget *replace;	// 'Replace With' action button
     GtkWidget *all;	// 'Replace All' action button
-} SharedFindReplace;
+} Shared_ਲੱਭੋ_Replace_2;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+ਸਥਿਰ Shared_ਲੱਭੋ_Replace_2 ਲੱਭੋ_widgets = {ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ};
+ਸਥਿਰ Shared_ਲੱਭੋ_Replace_2 repl_widgets = {ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ};
 
-    static int
-find_key_press_event(
-		GtkWidget	*widget UNUSED,
-		GdkEventKey	*event,
-		SharedFindReplace *frdp)
+    ਸਥਿਰ ਪੂਰਨ
+ਲੱਭੋ_ਕੁੰਜੀ_press_event(
+		GtkWidget	*widget ਅਣਵਰਤਿਆ,
+		Gdk_Event_ਕੁੰਜੀ	*event,
+		Shared_ਲੱਭੋ_Replace_2 *frdp)
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    ਜੇ (event->state & (GDK_CONTROL_ਨਕਾਬ | GDK_ਖਿਸਕਾਓ_ਨਕਾਬ))
+	ਵਾਪਸ FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (event->keyval == GDK_Escape)
+    ਜੇ (event->keyval == GDK_Escape)
     {
 	gtk_widget_hide(frdp->dialog);
 
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
 
     // It would be delightful if it where possible to do search history
     // operations on the K_UP and K_DOWN keys here.
 
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    static GtkWidget *
-#if GTK_CHECK_VERSION(3,10,0)
-create_image_button(const char *stock_id UNUSED,
-		    const char *label)
-#else
-create_image_button(const char *stock_id,
-		    const char *label)
-#endif
+    ਸਥਿਰ GtkWidget *
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+create_image_button(ਅਚਲ ਅੱਖਰ *stock_id ਅਣਵਰਤਿਆ,
+		    ਅਚਲ ਅੱਖਰ *label)
+#ਨਹੀਂਤਾਂ
+create_image_button(ਅਚਲ ਅੱਖਰ *stock_id,
+		    ਅਚਲ ਅੱਖਰ *label)
+#ਜੇ_ਅੰਤ
 {
-    char_u	*text;
+    char_u	*ਪਾਠ;
     GtkWidget	*box;
     GtkWidget	*alignment;
     GtkWidget	*button;
 
-    text = CONVERT_TO_UTF8((char_u *)label);
+    ਪਾਠ = CONVERT_ਮੰਜ਼ਿਲ_UTF8((char_u *)label);
 
-#if GTK_CHECK_VERSION(3,2,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
-    gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-#else
+    gtk_box_ਸੈੱਟ_homogeneous(GTK_BOX(box), FALSE);
+#ਨਹੀਂਤਾਂ
     box = gtk_hbox_new(FALSE, 3);
-#endif
-#if !GTK_CHECK_VERSION(3,10,0)
-    if (stock_id != NULL)
-	gtk_box_pack_start(GTK_BOX(box),
-			   gtk_image_new_from_stock(stock_id, GTK_ICON_SIZE_BUTTON),
+#ਜੇ_ਅੰਤ
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    ਜੇ (stock_id != ਨਿਰਾ)
+	gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(box),
+			   gtk_image_new_from_stock(stock_id, GTK_ICON_ਮਾਪ_BUTTON),
 			   FALSE, FALSE, 0);
-#endif
-    gtk_box_pack_start(GTK_BOX(box),
-		       gtk_label_new((const char *)text),
+#ਜੇ_ਅੰਤ
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(box),
+		       gtk_label_new((ਅਚਲ ਅੱਖਰ *)ਪਾਠ),
 		       FALSE, FALSE, 0);
 
-    CONVERT_TO_UTF8_FREE(text);
+    CONVERT_ਮੰਜ਼ਿਲ_UTF8_FREE(ਪਾਠ);
 
-#if GTK_CHECK_VERSION(3,14,0)
-    gtk_widget_set_halign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
-    gtk_widget_set_hexpand(GTK_WIDGET(box), TRUE);
-    gtk_widget_set_vexpand(GTK_WIDGET(box), TRUE);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
+    gtk_widget_ਸੈੱਟ_halign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
+    gtk_widget_ਸੈੱਟ_valign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
+    gtk_widget_ਸੈੱਟ_hexpand(GTK_WIDGET(box), TRUE);
+    gtk_widget_ਸੈੱਟ_vexpand(GTK_WIDGET(box), TRUE);
 
     alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-    alignment = gtk_alignment_new((float)0.5, (float)0.5,
-						      (float)0.0, (float)0.0);
-#endif
-    gtk_container_add(GTK_CONTAINER(alignment), box);
+#ਨਹੀਂਤਾਂ
+    alignment = gtk_alignment_new((ਦਸ਼ਮਲਵ)0.5, (ਦਸ਼ਮਲਵ)0.5,
+						      (ਦਸ਼ਮਲਵ)0.0, (ਦਸ਼ਮਲਵ)0.0);
+#ਜੇ_ਅੰਤ
+    gtk_container_ਜੋੜੋ(GTK_CONTAINER(alignment), box);
     gtk_widget_show_all(alignment);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), alignment);
+    gtk_container_ਜੋੜੋ(GTK_CONTAINER(button), alignment);
 
-    return button;
+    ਵਾਪਸ button;
 }
 
 /*
@@ -2077,391 +2077,391 @@ create_image_button(const char *stock_id,
  * I'd really like to keep it at that.	In other words: don't spread
  * this nasty hack all over the code.  Think twice.
  */
-    static const char *
-convert_localized_message(char_u **buffer, const char *message)
+    ਸਥਿਰ ਅਚਲ ਅੱਖਰ *
+convert_localized_ਸੁਨੇਹਾ(char_u **ਬਫਰ, ਅਚਲ ਅੱਖਰ *ਸੁਨੇਹਾ_2)
 {
-    if (output_conv.vc_type == CONV_NONE)
-	return message;
+    ਜੇ (output_conv.vc_type == CONV_NONE)
+	ਵਾਪਸ ਸੁਨੇਹਾ_2;
 
-    vim_free(*buffer);
-    *buffer = string_convert(&output_conv, (char_u *)message, NULL);
+    vim_free(*ਬਫਰ);
+    *ਬਫਰ = string_convert(&output_conv, (char_u *)ਸੁਨੇਹਾ_2, ਨਿਰਾ);
 
-    return (const char *)*buffer;
+    ਵਾਪਸ (ਅਚਲ ਅੱਖਰ *)*ਬਫਰ;
 }
 
 /*
  * Returns the number of characters in GtkEntry.
  */
-    static unsigned long
-entry_get_text_length(GtkEntry *entry)
+    ਸਥਿਰ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ
+ਇੰਦਰਾਜ_get_ਪਾਠ_ਲੰਮਾਈ(Gtk_ਇੰਦਰਾਜ *ਇੰਦਰਾਜ)
 {
-    g_return_val_if_fail(entry != NULL, 0);
-    g_return_val_if_fail(GTK_IS_ENTRY(entry) == TRUE, 0);
+    g_return_val_if_fail(ਇੰਦਰਾਜ != ਨਿਰਾ, 0);
+    g_return_val_if_fail(GTK_IS_ਇੰਦਰਾਜ(ਇੰਦਰਾਜ) == TRUE, 0);
 
-#if GTK_CHECK_VERSION(2,18,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(2,18,0)
     // 2.18 introduced a new object GtkEntryBuffer to handle text data for
     // GtkEntry instead of letting each instance of the latter have its own
     // storage for that.  The code below is almost identical to the
     // implementation of gtk_entry_get_text_length() for the versions >= 2.18.
-    return gtk_entry_buffer_get_length(gtk_entry_get_buffer(entry));
-#elif GTK_CHECK_VERSION(2,14,0)
+    ਵਾਪਸ gtk_ਇੰਦਰਾਜ_ਬਫਰ_get_ਲੰਮਾਈ(gtk_ਇੰਦਰਾਜ_get_ਬਫਰ(ਇੰਦਰਾਜ));
+#ਜਾਂਜੇ GTK_CHECK_ਸੰਸਕਰਣ(2,14,0)
     // 2.14 introduced a new function to avoid memory management bugs which can
     // happen when gtk_entry_get_text() is used without due care and attention.
-    return gtk_entry_get_text_length(entry);
-#else
+    ਵਾਪਸ gtk_ਇੰਦਰਾਜ_get_ਪਾਠ_ਲੰਮਾਈ(ਇੰਦਰਾਜ);
+#ਨਹੀਂਤਾਂ
     // gtk_entry_get_text() returns the pointer to the storage allocated
     // internally by the widget.  Accordingly, use the one with great care:
     // Don't free it nor modify the contents it points to; call the function
     // every time you need the pointer since its value may have been changed
     // by the widget.
-    return g_utf8_strlen(gtk_entry_get_text(entry), -1);
-#endif
+    ਵਾਪਸ g_utf8_strlen(gtk_ਇੰਦਰਾਜ_get_ਪਾਠ(ਇੰਦਰਾਜ), -1);
+#ਜੇ_ਅੰਤ
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    ਸਥਿਰ ਖਾਲੀ
+ਲੱਭੋ_replace_dialog_create(char_u *arg, ਪੂਰਨ do_replace)
 {
     GtkWidget	*hbox;		// main top down box
     GtkWidget	*actionarea;
-    GtkWidget	*table;
+    GtkWidget	*ਸਾਰਣੀ;
     GtkWidget	*tmp;
     GtkWidget	*vbox;
     gboolean	sensitive;
-    SharedFindReplace *frdp;
-    char_u	*entry_text;
-    int		wword = FALSE;
-    int		mcase = !p_ic;
-    char_u	*conv_buffer = NULL;
-#define CONV(message) convert_localized_message(&conv_buffer, (message))
+    Shared_ਲੱਭੋ_Replace_2 *frdp;
+    char_u	*ਇੰਦਰਾਜ_ਪਾਠ;
+    ਪੂਰਨ		wword = FALSE;
+    ਪੂਰਨ		mcase = !p_ic;
+    char_u	*conv_ਬਫਰ = ਨਿਰਾ;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONV(ਸੁਨੇਹਾ_2) convert_localized_ਸੁਨੇਹਾ(&conv_ਬਫਰ, (ਸੁਨੇਹਾ_2))
 
-    frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
+    frdp = (do_replace) ? (&repl_widgets) : (&ਲੱਭੋ_widgets);
 
     // Get the search string to use.
-    entry_text = get_find_dialog_text(arg, &wword, &mcase);
+    ਇੰਦਰਾਜ_ਪਾਠ = get_ਲੱਭੋ_dialog_ਪਾਠ(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    ਜੇ (ਇੰਦਰਾਜ_ਪਾਠ != ਨਿਰਾ && output_conv.vc_type != CONV_NONE)
     {
-	char_u *old_text = entry_text;
-	entry_text = string_convert(&output_conv, entry_text, NULL);
-	vim_free(old_text);
+	char_u *old_ਪਾਠ = ਇੰਦਰਾਜ_ਪਾਠ;
+	ਇੰਦਰਾਜ_ਪਾਠ = string_convert(&output_conv, ਇੰਦਰਾਜ_ਪਾਠ, ਨਿਰਾ);
+	vim_free(old_ਪਾਠ);
     }
 
     /*
      * If the dialog already exists, just raise it.
      */
-    if (frdp->dialog)
+    ਜੇ (frdp->dialog)
     {
-	if (entry_text != NULL)
+	ਜੇ (ਇੰਦਰਾਜ_ਪਾਠ != ਨਿਰਾ)
 	{
-	    gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
+	    gtk_ਇੰਦਰਾਜ_ਸੈੱਟ_ਪਾਠ(GTK_ਇੰਦਰਾਜ(frdp->what), (ਅੱਖਰ *)ਇੰਦਰਾਜ_ਪਾਠ);
+	    gtk_toggle_button_ਸੈੱਟ_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(frdp->wword),
 							     (gboolean)wword);
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->mcase),
+	    gtk_toggle_button_ਸੈੱਟ_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(frdp->mcase),
 							     (gboolean)mcase);
 	}
-	gtk_window_present(GTK_WINDOW(frdp->dialog));
+	gtk_ਖਿੜਕੀ_present(GTK_ਖਿੜਕੀ(frdp->dialog));
 
 	// For :promptfind dialog, always give keyboard focus to 'what' entry.
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && entry_get_text_length(GTK_ENTRY(frdp->what)) > 0)
+	ਜੇ (do_replace && ਇੰਦਰਾਜ_get_ਪਾਠ_ਲੰਮਾਈ(GTK_ਇੰਦਰਾਜ(frdp->what)) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
-	vim_free(entry_text);
-	return;
+	vim_free(ਇੰਦਰਾਜ_ਪਾਠ);
+	ਵਾਪਸ;
     }
 
     frdp->dialog = gtk_dialog_new();
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     // Nothing equivalent to gtk_dialog_set_has_separator() in GTK+ 3.
-#else
-    gtk_dialog_set_has_separator(GTK_DIALOG(frdp->dialog), FALSE);
-#endif
-    gtk_window_set_transient_for(GTK_WINDOW(frdp->dialog), GTK_WINDOW(gui.mainwin));
-    gtk_window_set_destroy_with_parent(GTK_WINDOW(frdp->dialog), TRUE);
+#ਨਹੀਂਤਾਂ
+    gtk_dialog_ਸੈੱਟ_has_separator(GTK_DIALOG(frdp->dialog), FALSE);
+#ਜੇ_ਅੰਤ
+    gtk_ਖਿੜਕੀ_ਸੈੱਟ_transient_for(GTK_ਖਿੜਕੀ(frdp->dialog), GTK_ਖਿੜਕੀ(gui.mainwin));
+    gtk_ਖਿੜਕੀ_ਸੈੱਟ_destroy_with_ਮਾਪਾ(GTK_ਖਿੜਕੀ(frdp->dialog), TRUE);
 
-    if (do_replace)
+    ਜੇ (do_replace)
     {
-	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
+	gtk_ਖਿੜਕੀ_ਸੈੱਟ_title(GTK_ਖਿੜਕੀ(frdp->dialog),
 			     CONV(_("VIM - Search and Replace...")));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
+	gtk_ਖਿੜਕੀ_ਸੈੱਟ_title(GTK_ਖਿੜਕੀ(frdp->dialog),
 			     CONV(_("VIM - Search...")));
     }
 
-#if GTK_CHECK_VERSION(3,2,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
-#else
+    gtk_box_ਸੈੱਟ_homogeneous(GTK_BOX(hbox), FALSE);
+#ਨਹੀਂਤਾਂ
     hbox = gtk_hbox_new(FALSE, 0);
-#endif
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ_ਅੰਤ
+    gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(hbox), 10);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     {
-	GtkWidget * const dialog_vbox
+	GtkWidget * ਅਚਲ dialog_vbox
 	    = gtk_dialog_get_content_area(GTK_DIALOG(frdp->dialog));
-	gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
+	gtk_container_ਜੋੜੋ(GTK_CONTAINER(dialog_vbox), hbox);
     }
-#else
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(frdp->dialog)->vbox), hbox);
-#endif
+#ਨਹੀਂਤਾਂ
+    gtk_container_ਜੋੜੋ(GTK_CONTAINER(GTK_DIALOG(frdp->dialog)->vbox), hbox);
+#ਜੇ_ਅੰਤ
 
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
-	table = gtk_grid_new();
-#else
-	table = gtk_table_new(1024, 4, FALSE);
-#endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
-	table = gtk_grid_new();
-#else
-	table = gtk_table_new(1024, 3, FALSE);
-#endif
-    gtk_box_pack_start(GTK_BOX(hbox), table, TRUE, TRUE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 4);
+    ਜੇ (do_replace)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	ਸਾਰਣੀ = gtk_grid_new();
+#ਨਹੀਂਤਾਂ
+	ਸਾਰਣੀ = gtk_ਸਾਰਣੀ_new(1024, 4, FALSE);
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	ਸਾਰਣੀ = gtk_grid_new();
+#ਨਹੀਂਤਾਂ
+	ਸਾਰਣੀ = gtk_ਸਾਰਣੀ_new(1024, 3, FALSE);
+#ਜੇ_ਅੰਤ
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(hbox), ਸਾਰਣੀ, TRUE, TRUE, 0);
+    gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(ਸਾਰਣੀ), 4);
 
     tmp = gtk_label_new(CONV(_("Find what:")));
-#if GTK_CHECK_VERSION(3,16,0)
-    gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
-    gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
-#elif GTK_CHECK_VERSION(3,14,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,16,0)
+    gtk_label_ਸੈੱਟ_xalign(GTK_LABEL(tmp), 0.0);
+    gtk_label_ਸੈੱਟ_yalign(GTK_LABEL(tmp), 0.5);
+#ਜਾਂਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
     {
-	GValue align_val = G_VALUE_INIT;
+	GValue align_val = G_ਮੁੱਲ_INIT;
 
-	g_value_init(&align_val, G_TYPE_FLOAT);
+	g_ਮੁੱਲ_init(&align_val, G_TYPE_FLOAT);
 
-	g_value_set_float(&align_val, 0.0);
-	g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
+	g_ਮੁੱਲ_ਸੈੱਟ_float(&align_val, 0.0);
+	g_object_ਸੈੱਟ_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	g_value_set_float(&align_val, 0.5);
-	g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
+	g_ਮੁੱਲ_ਸੈੱਟ_float(&align_val, 0.5);
+	g_object_ਸੈੱਟ_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	g_value_unset(&align_val);
+	g_ਮੁੱਲ_unset(&align_val);
     }
-#else
-    gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
-#endif
-#if GTK_CHECK_VERSION(3,4,0)
-    gtk_grid_attach(GTK_GRID(table), tmp, 0, 0, 2, 1);
-#else
-    gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 0, 1,
+#ਨਹੀਂਤਾਂ
+    gtk_misc_ਸੈੱਟ_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
+#ਜੇ_ਅੰਤ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+    gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), tmp, 0, 0, 2, 1);
+#ਨਹੀਂਤਾਂ
+    gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), tmp, 0, 1, 0, 1,
 		     GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
-    frdp->what = gtk_entry_new();
-    sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
-	gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
+#ਜੇ_ਅੰਤ
+    frdp->what = gtk_ਇੰਦਰਾਜ_new();
+    sensitive = (ਇੰਦਰਾਜ_ਪਾਠ != ਨਿਰਾ && ਇੰਦਰਾਜ_ਪਾਠ[0] != NUL);
+    ਜੇ (ਇੰਦਰਾਜ_ਪਾਠ != ਨਿਰਾ)
+	gtk_ਇੰਦਰਾਜ_ਸੈੱਟ_ਪਾਠ(GTK_ਇੰਦਰਾਜ(frdp->what), (ਅੱਖਰ *)ਇੰਦਰਾਜ_ਪਾਠ);
     g_signal_connect(G_OBJECT(frdp->what), "changed",
-		     G_CALLBACK(entry_changed_cb), frdp->dialog);
+		     G_CALLBACK(ਇੰਦਰਾਜ_ਬਦਲਿਆ_cb), frdp->dialog);
     g_signal_connect_after(G_OBJECT(frdp->what), "key-press-event",
-			   G_CALLBACK(find_key_press_event),
+			   G_CALLBACK(ਲੱਭੋ_ਕੁੰਜੀ_press_event),
 			   (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
-    gtk_grid_attach(GTK_GRID(table), frdp->what, 2, 0, 5, 1);
-#else
-    gtk_table_attach(GTK_TABLE(table), frdp->what, 1, 1024, 0, 1,
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+    gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->what, 2, 0, 5, 1);
+#ਨਹੀਂਤਾਂ
+    gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->what, 1, 1024, 0, 1,
 		     GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (do_replace)
+    ਜੇ (do_replace)
     {
 	tmp = gtk_label_new(CONV(_("Replace with:")));
-#if GTK_CHECK_VERSION(3,16,0)
-	gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
-	gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
-#elif GTK_CHECK_VERSION(3,14,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,16,0)
+	gtk_label_ਸੈੱਟ_xalign(GTK_LABEL(tmp), 0.0);
+	gtk_label_ਸੈੱਟ_yalign(GTK_LABEL(tmp), 0.5);
+#ਜਾਂਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,14,0)
 	{
-	    GValue align_val = G_VALUE_INIT;
+	    GValue align_val = G_ਮੁੱਲ_INIT;
 
-	    g_value_init(&align_val, G_TYPE_FLOAT);
+	    g_ਮੁੱਲ_init(&align_val, G_TYPE_FLOAT);
 
-	    g_value_set_float(&align_val, 0.0);
-	    g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
+	    g_ਮੁੱਲ_ਸੈੱਟ_float(&align_val, 0.0);
+	    g_object_ਸੈੱਟ_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	    g_value_set_float(&align_val, 0.5);
-	    g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
+	    g_ਮੁੱਲ_ਸੈੱਟ_float(&align_val, 0.5);
+	    g_object_ਸੈੱਟ_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	    g_value_unset(&align_val);
+	    g_ਮੁੱਲ_unset(&align_val);
 	}
-#else
-	gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
-#endif
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), tmp, 0, 1, 2, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 1, 2,
+#ਨਹੀਂਤਾਂ
+	gtk_misc_ਸੈੱਟ_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
+#ਜੇ_ਅੰਤ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), tmp, 0, 1, 2, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), tmp, 0, 1, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
-	frdp->with = gtk_entry_new();
+#ਜੇ_ਅੰਤ
+	frdp->with = gtk_ਇੰਦਰਾਜ_new();
 	g_signal_connect(G_OBJECT(frdp->with), "activate",
-			 G_CALLBACK(find_replace_cb),
-			 GINT_TO_POINTER(FRD_R_FINDNEXT));
+			 G_CALLBACK(ਲੱਭੋ_replace_cb),
+			 GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_R_FINDNEXT));
 	g_signal_connect_after(G_OBJECT(frdp->with), "key-press-event",
-			       G_CALLBACK(find_key_press_event),
+			       G_CALLBACK(ਲੱਭੋ_ਕੁੰਜੀ_press_event),
 			       (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), frdp->with, 2, 1, 5, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), frdp->with, 1, 1024, 1, 2,
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->with, 2, 1, 5, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->with, 1, 1024, 1, 2,
 			 GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
+#ਜੇ_ਅੰਤ
 
 	/*
 	 * Make the entry activation only change the input focus onto the
 	 * with item.
 	 */
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
-			 G_CALLBACK(entry_activate_cb), frdp->with);
+			 G_CALLBACK(ਇੰਦਰਾਜ_activate_cb), frdp->with);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	/*
 	 * Make the entry activation do the search.
 	 */
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
-			 G_CALLBACK(find_replace_cb),
-			 GINT_TO_POINTER(FRD_FINDNEXT));
+			 G_CALLBACK(ਲੱਭੋ_replace_cb),
+			 GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_FINDNEXT));
     }
 
     // whole word only button
     frdp->wword = gtk_check_button_new_with_label(CONV(_("Match whole word only")));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
+    gtk_toggle_button_ਸੈੱਟ_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(frdp->wword),
 							(gboolean)wword);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 2, 5, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 2, 3,
+    ਜੇ (do_replace)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->wword, 0, 2, 5, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->wword, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 3, 5, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 1, 2,
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->wword, 0, 3, 5, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->wword, 0, 1023, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
+#ਜੇ_ਅੰਤ
 
     // match case button
     frdp->mcase = gtk_check_button_new_with_label(CONV(_("Match case")));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->mcase),
+    gtk_toggle_button_ਸੈੱਟ_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(frdp->mcase),
 							     (gboolean)mcase);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 3, 5, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 3, 4,
+    ਜੇ (do_replace)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->mcase, 0, 3, 5, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->mcase, 0, 1023, 3, 4,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 4, 5, 1);
-#else
-	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 2, 3,
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), frdp->mcase, 0, 4, 5, 1);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), frdp->mcase, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
-#endif
+#ਜੇ_ਅੰਤ
 
-    tmp = gtk_frame_new(CONV(_("Direction")));
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 2, 4);
-#else
-	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 2, 4,
+    tmp = gtk_ਚੌਖਟਾ_new(CONV(_("Direction")));
+    ਜੇ (do_replace)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), tmp, 5, 2, 2, 4);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), tmp, 1023, 1024, 2, 4,
 			 GTK_FILL, GTK_FILL, 2, 2);
-#endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
-	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 1, 3);
-#else
-	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 1, 3,
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,4,0)
+	gtk_grid_attach(GTK_GRID(ਸਾਰਣੀ), tmp, 5, 2, 1, 3);
+#ਨਹੀਂਤਾਂ
+	gtk_ਸਾਰਣੀ_attach(GTK_ਸਾਰਣੀ(ਸਾਰਣੀ), tmp, 1023, 1024, 1, 3,
 			 GTK_FILL, GTK_FILL, 2, 2);
-#endif
-#if GTK_CHECK_VERSION(3,2,0)
+#ਜੇ_ਅੰਤ
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-#else
+    gtk_box_ਸੈੱਟ_homogeneous(GTK_BOX(vbox), FALSE);
+#ਨਹੀਂਤਾਂ
     vbox = gtk_vbox_new(FALSE, 0);
-#endif
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 0);
-    gtk_container_add(GTK_CONTAINER(tmp), vbox);
+#ਜੇ_ਅੰਤ
+    gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(vbox), 0);
+    gtk_container_ਜੋੜੋ(GTK_CONTAINER(tmp), vbox);
 
     // 'Up' and 'Down' buttons
-    frdp->up = gtk_radio_button_new_with_label(NULL, CONV(_("Up")));
-    gtk_box_pack_start(GTK_BOX(vbox), frdp->up, TRUE, TRUE, 0);
-    frdp->down = gtk_radio_button_new_with_label(
-			gtk_radio_button_get_group(GTK_RADIO_BUTTON(frdp->up)),
+    frdp->ਉੱਪਰ = gtk_radio_button_new_with_label(ਨਿਰਾ, CONV(_("Up")));
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(vbox), frdp->ਉੱਪਰ, TRUE, TRUE, 0);
+    frdp->ਥੱਲੇ = gtk_radio_button_new_with_label(
+			gtk_radio_button_get_ਸਮੂਹ(GTK_RADIO_BUTTON(frdp->ਉੱਪਰ)),
 			CONV(_("Down")));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->down), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 2);
-    gtk_box_pack_start(GTK_BOX(vbox), frdp->down, TRUE, TRUE, 0);
+    gtk_toggle_button_ਸੈੱਟ_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(frdp->ਥੱਲੇ), TRUE);
+    gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(vbox), 2);
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(vbox), frdp->ਥੱਲੇ, TRUE, TRUE, 0);
 
     // vbox to hold the action buttons
-#if GTK_CHECK_VERSION(3,2,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     actionarea = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-#else
+#ਨਹੀਂਤਾਂ
     actionarea = gtk_vbutton_box_new();
-#endif
-    gtk_container_set_border_width(GTK_CONTAINER(actionarea), 2);
-    gtk_box_pack_end(GTK_BOX(hbox), actionarea, FALSE, FALSE, 0);
+#ਜੇ_ਅੰਤ
+    gtk_container_ਸੈੱਟ_border_ਚੌੜਾਈ(GTK_CONTAINER(actionarea), 2);
+    gtk_box_pack_ਸਿਰਾ(GTK_BOX(hbox), actionarea, FALSE, FALSE, 0);
 
     // 'Find Next' button
-#if GTK_CHECK_VERSION(3,10,0)
-    frdp->find = create_image_button(NULL, _("Find Next"));
-#else
-    frdp->find = create_image_button(GTK_STOCK_FIND, _("Find Next"));
-#endif
-    gtk_widget_set_sensitive(frdp->find, sensitive);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+    frdp->ਲੱਭੋ = create_image_button(ਨਿਰਾ, _("Find Next"));
+#ਨਹੀਂਤਾਂ
+    frdp->ਲੱਭੋ = create_image_button(GTK_STOCK_ਲੱਭੋ, _("Find Next"));
+#ਜੇ_ਅੰਤ
+    gtk_widget_ਸੈੱਟ_sensitive(frdp->ਲੱਭੋ, sensitive);
 
-    g_signal_connect(G_OBJECT(frdp->find), "clicked",
-		     G_CALLBACK(find_replace_cb),
-		     (do_replace) ? GINT_TO_POINTER(FRD_R_FINDNEXT)
-				  : GINT_TO_POINTER(FRD_FINDNEXT));
+    g_signal_connect(G_OBJECT(frdp->ਲੱਭੋ), "clicked",
+		     G_CALLBACK(ਲੱਭੋ_replace_cb),
+		     (do_replace) ? GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_R_FINDNEXT)
+				  : GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_FINDNEXT));
 
-    gtk_widget_set_can_default(frdp->find, TRUE);
-    gtk_box_pack_start(GTK_BOX(actionarea), frdp->find, FALSE, FALSE, 0);
-    gtk_widget_grab_default(frdp->find);
+    gtk_widget_ਸੈੱਟ_can_default(frdp->ਲੱਭੋ, TRUE);
+    gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(actionarea), frdp->ਲੱਭੋ, FALSE, FALSE, 0);
+    gtk_widget_grab_default(frdp->ਲੱਭੋ);
 
-    if (do_replace)
+    ਜੇ (do_replace)
     {
 	// 'Replace' button
-#if GTK_CHECK_VERSION(3,10,0)
-	frdp->replace = create_image_button(NULL, _("Replace"));
-#else
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+	frdp->replace = create_image_button(ਨਿਰਾ, _("Replace"));
+#ਨਹੀਂਤਾਂ
 	frdp->replace = create_image_button(GTK_STOCK_CONVERT, _("Replace"));
-#endif
-	gtk_widget_set_sensitive(frdp->replace, sensitive);
-	gtk_widget_set_can_default(frdp->find, TRUE);
-	gtk_box_pack_start(GTK_BOX(actionarea), frdp->replace, FALSE, FALSE, 0);
+#ਜੇ_ਅੰਤ
+	gtk_widget_ਸੈੱਟ_sensitive(frdp->replace, sensitive);
+	gtk_widget_ਸੈੱਟ_can_default(frdp->ਲੱਭੋ, TRUE);
+	gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(actionarea), frdp->replace, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(frdp->replace), "clicked",
-			 G_CALLBACK(find_replace_cb),
-			 GINT_TO_POINTER(FRD_REPLACE));
+			 G_CALLBACK(ਲੱਭੋ_replace_cb),
+			 GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_REPLACE));
 
 	// 'Replace All' button
-#if GTK_CHECK_VERSION(3,10,0)
-	frdp->all = create_image_button(NULL, _("Replace All"));
-#else
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
+	frdp->all = create_image_button(ਨਿਰਾ, _("Replace All"));
+#ਨਹੀਂਤਾਂ
 	frdp->all = create_image_button(GTK_STOCK_CONVERT, _("Replace All"));
-#endif
-	gtk_widget_set_sensitive(frdp->all, sensitive);
-	gtk_widget_set_can_default(frdp->all, TRUE);
-	gtk_box_pack_start(GTK_BOX(actionarea), frdp->all, FALSE, FALSE, 0);
+#ਜੇ_ਅੰਤ
+	gtk_widget_ਸੈੱਟ_sensitive(frdp->all, sensitive);
+	gtk_widget_ਸੈੱਟ_can_default(frdp->all, TRUE);
+	gtk_box_pack_ਸ਼ੁਰੂ(GTK_BOX(actionarea), frdp->all, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(frdp->all), "clicked",
-			 G_CALLBACK(find_replace_cb),
-			 GINT_TO_POINTER(FRD_REPLACEALL));
+			 G_CALLBACK(ਲੱਭੋ_replace_cb),
+			 GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(FRD_REPLACEALL));
     }
 
     // 'Cancel' button
-#if GTK_CHECK_VERSION(3,10,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,10,0)
     tmp = gtk_button_new_with_mnemonic(_("_Close"));
-#else
+#ਨਹੀਂਤਾਂ
     tmp = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-#endif
-    gtk_widget_set_can_default(tmp, TRUE);
-    gtk_box_pack_end(GTK_BOX(actionarea), tmp, FALSE, FALSE, 0);
+#ਜੇ_ਅੰਤ
+    gtk_widget_ਸੈੱਟ_can_default(tmp, TRUE);
+    gtk_box_pack_ਸਿਰਾ(GTK_BOX(actionarea), tmp, FALSE, FALSE, 0);
     g_signal_connect_swapped(G_OBJECT(tmp),
 			     "clicked", G_CALLBACK(gtk_widget_hide),
 			     G_OBJECT(frdp->dialog));
@@ -2469,91 +2469,91 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			     "delete-event", G_CALLBACK(gtk_widget_hide_on_delete),
 			     G_OBJECT(frdp->dialog));
 
-#if GTK_CHECK_VERSION(3,2,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,2,0)
     tmp = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-#else
+#ਨਹੀਂਤਾਂ
     tmp = gtk_vseparator_new();
-#endif
-    gtk_box_pack_end(GTK_BOX(hbox), tmp, FALSE, FALSE, 10);
+#ਜੇ_ਅੰਤ
+    gtk_box_pack_ਸਿਰਾ(GTK_BOX(hbox), tmp, FALSE, FALSE, 10);
 
     // Suppress automatic show of the unused action area
-#if GTK_CHECK_VERSION(3,0,0)
-# if !GTK_CHECK_VERSION(3,12,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,12,0)
     gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(frdp->dialog)));
 # endif
-#else
+#ਨਹੀਂਤਾਂ
     gtk_widget_hide(GTK_DIALOG(frdp->dialog)->action_area);
-#endif
+#ਜੇ_ਅੰਤ
     gtk_widget_show_all(hbox);
     gtk_widget_show(frdp->dialog);
 
-    vim_free(entry_text);
-    vim_free(conv_buffer);
-#undef CONV
+    vim_free(ਇੰਦਰਾਜ_ਪਾਠ);
+    vim_free(conv_ਬਫਰ);
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CONV
 }
 
-    void
-gui_mch_find_dialog(exarg_T *eap)
+    ਖਾਲੀ
+gui_mch_ਲੱਭੋ_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
-	find_replace_dialog_create(eap->arg, FALSE);
+    ਜੇ (gui.ਵਿੱਚ_use)
+	ਲੱਭੋ_replace_dialog_create(eap->arg, FALSE);
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
-	find_replace_dialog_create(eap->arg, TRUE);
+    ਜੇ (gui.ਵਿੱਚ_use)
+	ਲੱਭੋ_replace_dialog_create(eap->arg, TRUE);
 }
 
 /*
  * Callback for actions of the find and replace dialogs
  */
-    static void
-find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
+    ਸਥਿਰ ਖਾਲੀ
+ਲੱਭੋ_replace_cb(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer ਅੰਕੜੇ)
 {
-    int			flags;
-    char_u		*find_text;
-    char_u		*repl_text;
-    gboolean		direction_down;
-    SharedFindReplace	*sfr;
+    ਪੂਰਨ			flags;
+    char_u		*ਲੱਭੋ_ਪਾਠ;
+    char_u		*repl_ਪਾਠ;
+    gboolean		direction_ਥੱਲੇ;
+    Shared_ਲੱਭੋ_Replace_2	*sfr;
 
-    flags = (int)(long)data;	    // avoid a lint warning here
+    flags = (ਪੂਰਨ)(ਲੰਮਾ)ਅੰਕੜੇ;	    // avoid a lint warning here
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    ਜੇ (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
-	sfr = &find_widgets;
+	repl_ਪਾਠ = ਨਿਰਾ;
+	sfr = &ਲੱਭੋ_widgets;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	repl_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(repl_widgets.with));
+	repl_ਪਾਠ = (char_u *)gtk_ਇੰਦਰਾਜ_get_ਪਾਠ(GTK_ਇੰਦਰਾਜ(repl_widgets.with));
 	sfr = &repl_widgets;
     }
 
-    find_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(sfr->what));
-    direction_down = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->down));
+    ਲੱਭੋ_ਪਾਠ = (char_u *)gtk_ਇੰਦਰਾਜ_get_ਪਾਠ(GTK_ਇੰਦਰਾਜ(sfr->what));
+    direction_ਥੱਲੇ = gtk_toggle_button_get_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(sfr->ਥੱਲੇ));
 
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->wword)))
-	flags |= FRD_WHOLE_WORD;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->mcase)))
-	flags |= FRD_MATCH_CASE;
+    ਜੇ (gtk_toggle_button_get_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(sfr->wword)))
+	flags |= FRD_ਸਾਰਾ_ਸ਼ਬਦ;
+    ਜੇ (gtk_toggle_button_get_ਸਰਗਰਮ(GTK_TOGGLE_BUTTON(sfr->mcase)))
+	flags |= FRD_ਮੇਲ_CASE;
 
-    repl_text = CONVERT_FROM_UTF8(repl_text);
-    find_text = CONVERT_FROM_UTF8(find_text);
-    gui_do_findrepl(flags, find_text, repl_text, direction_down);
-    CONVERT_FROM_UTF8_FREE(repl_text);
-    CONVERT_FROM_UTF8_FREE(find_text);
+    repl_ਪਾਠ = CONVERT_FROM_UTF8(repl_ਪਾਠ);
+    ਲੱਭੋ_ਪਾਠ = CONVERT_FROM_UTF8(ਲੱਭੋ_ਪਾਠ);
+    gui_do_findrepl(flags, ਲੱਭੋ_ਪਾਠ, repl_ਪਾਠ, direction_ਥੱਲੇ);
+    CONVERT_FROM_UTF8_FREE(repl_ਪਾਠ);
+    CONVERT_FROM_UTF8_FREE(ਲੱਭੋ_ਪਾਠ);
 }
 
 /*
  * our usual callback function
  */
-    static void
-entry_activate_cb(GtkWidget *widget UNUSED, gpointer data)
+    ਸਥਿਰ ਖਾਲੀ
+ਇੰਦਰਾਜ_activate_cb(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer ਅੰਕੜੇ)
 {
-    gtk_widget_grab_focus(GTK_WIDGET(data));
+    gtk_widget_grab_focus(GTK_WIDGET(ਅੰਕੜੇ));
 }
 
 /*
@@ -2565,58 +2565,58 @@ entry_activate_cb(GtkWidget *widget UNUSED, gpointer data)
  * particularly evil incarnation of braindeadness, whatever; I'd much rather
  * see it extinguished from this planet.  Thanks for listening.  Sorry.
  */
-    static void
-entry_changed_cb(GtkWidget * entry, GtkWidget * dialog)
+    ਸਥਿਰ ਖਾਲੀ
+ਇੰਦਰਾਜ_ਬਦਲਿਆ_cb(GtkWidget * ਇੰਦਰਾਜ, GtkWidget * dialog)
 {
-    const gchar	*entry_text;
+    ਅਚਲ gchar	*ਇੰਦਰਾਜ_ਪਾਠ;
     gboolean	nonempty;
 
-    entry_text = gtk_entry_get_text(GTK_ENTRY(entry));
+    ਇੰਦਰਾਜ_ਪਾਠ = gtk_ਇੰਦਰਾਜ_get_ਪਾਠ(GTK_ਇੰਦਰਾਜ(ਇੰਦਰਾਜ));
 
-    if (!entry_text)
-	return;			// shouldn't happen
+    ਜੇ (!ਇੰਦਰਾਜ_ਪਾਠ)
+	ਵਾਪਸ;			// shouldn't happen
 
-    nonempty = (entry_text[0] != '\0');
+    nonempty = (ਇੰਦਰਾਜ_ਪਾਠ[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
-	gtk_widget_set_sensitive(find_widgets.find, nonempty);
+    ਜੇ (dialog == ਲੱਭੋ_widgets.dialog)
+	gtk_widget_ਸੈੱਟ_sensitive(ਲੱਭੋ_widgets.ਲੱਭੋ, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    ਜੇ (dialog == repl_widgets.dialog)
     {
-	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
-	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
-	gtk_widget_set_sensitive(repl_widgets.all, nonempty);
+	gtk_widget_ਸੈੱਟ_sensitive(repl_widgets.ਲੱਭੋ, nonempty);
+	gtk_widget_ਸੈੱਟ_sensitive(repl_widgets.replace, nonempty);
+	gtk_widget_ਸੈੱਟ_sensitive(repl_widgets.all, nonempty);
     }
 }
 
 /*
  * ":helpfind"
  */
-    void
-ex_helpfind(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_helpfind(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
     // This will fail when menus are not loaded.  Well, it's only for
     // backwards compatibility anyway.
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
 }
 
-#if defined(FEAT_BROWSE)
-    static void
-recent_func_log_func(const gchar *log_domain UNUSED,
-		     GLogLevelFlags log_level UNUSED,
-		     const gchar *message UNUSED,
-		     gpointer user_data UNUSED)
+#ਜੇ defined(FEAT_BROWSE)
+    ਸਥਿਰ ਖਾਲੀ
+recent_func_log_func(ਅਚਲ gchar *log_domain ਅਣਵਰਤਿਆ,
+		     GLogLevelFlags log_level ਅਣਵਰਤਿਆ,
+		     ਅਚਲ gchar *ਸੁਨੇਹਾ_2 ਅਣਵਰਤਿਆ,
+		     gpointer user_ਅੰਕੜੇ ਅਣਵਰਤਿਆ)
 {
     // We just want to suppress the warnings.
     // http://bugzilla.gnome.org/show_bug.cgi?id=664587
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-gui_mch_set_fullscreen(int flag)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_fullscreen(ਪੂਰਨ flag)
 {
-    if (flag)
-	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
-	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
+    ਜੇ (flag)
+	gtk_ਖਿੜਕੀ_fullscreen(GTK_ਖਿੜਕੀ(gui.mainwin));
+    ਨਹੀਂਤਾਂ
+	gtk_ਖਿੜਕੀ_unfullscreen(GTK_ਖਿੜਕੀ(gui.mainwin));
 }

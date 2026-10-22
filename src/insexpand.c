@@ -11,49 +11,49 @@
  * insexpand.c: functions for Insert mode completion
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 /*
  * Definitions used for CTRL-X submode.
  * Note: If you change CTRL-X submode, you must also maintain ctrl_x_msgs[] and
  * ctrl_x_mode_names[] below.
  */
-#define CTRL_X_WANT_IDENT	0x100
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_WANT_IDENT	0x100
 
-#define CTRL_X_NORMAL		0  // CTRL-N CTRL-P completion, default
-#define CTRL_X_NOT_DEFINED_YET	1
-#define CTRL_X_SCROLL		2
-#define CTRL_X_WHOLE_LINE	3
-#define CTRL_X_FILES		4
-#define CTRL_X_TAGS		(5 + CTRL_X_WANT_IDENT)
-#define CTRL_X_PATH_PATTERNS	(6 + CTRL_X_WANT_IDENT)
-#define CTRL_X_PATH_DEFINES	(7 + CTRL_X_WANT_IDENT)
-#define CTRL_X_FINISHED		8
-#define CTRL_X_DICTIONARY	(9 + CTRL_X_WANT_IDENT)
-#define CTRL_X_THESAURUS	(10 + CTRL_X_WANT_IDENT)
-#define CTRL_X_CMDLINE		11
-#define CTRL_X_FUNCTION	12
-#define CTRL_X_OMNI		13
-#define CTRL_X_SPELL		14
-#define CTRL_X_LOCAL_MSG	15	// only used in "ctrl_x_msgs"
-#define CTRL_X_EVAL		16	// for builtin function complete()
-#define CTRL_X_CMDLINE_CTRL_X	17	// CTRL-X typed in CTRL_X_CMDLINE
-#define CTRL_X_REGISTER	18	// complete words from registers
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਸਾਧਾਰਨ		0  // CTRL-N CTRL-P completion, default
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_NOT_DEFINED_YET	1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_SCROLL		2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਸਾਰਾ_ਸਤਰ	3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_FILES		4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਟੈਗ_ਸੂਚੀ		(5 + CTRL_X_WANT_IDENT)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਰਸਤਾ_PATTERNS	(6 + CTRL_X_WANT_IDENT)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ	(7 + CTRL_X_WANT_IDENT)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਮੁਕੰਮਲ		8
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_DICTIONARY	(9 + CTRL_X_WANT_IDENT)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_THESAURUS	(10 + CTRL_X_WANT_IDENT)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_CMDLINE		11
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_FUNCTION	12
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_OMNI		13
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_SPELL		14
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_LOCAL_ਸੁਨੇਹਾ	15	// only used in "ctrl_x_msgs"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_EVAL		16	// for builtin function complete()
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_CMDLINE_CTRL_X	17	// CTRL-X typed in CTRL_X_CMDLINE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਰਜਿਸਟਰ	18	// complete words from registers
 
-#define CTRL_X_MSG(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CTRL_X_ਸੁਨੇਹਾ(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
 
 // Message for CTRL-X mode, index is ctrl_x_mode.
-static char *ctrl_x_msgs[] =
+ਸਥਿਰ ਅੱਖਰ *ctrl_x_msgs[] =
 {
     N_(" Keyword completion (^N^P)"), // CTRL_X_NORMAL, ^P/^N compl.
     N_(" ^X mode (^]^D^E^F^I^K^L^N^O^P^Rs^U^V^Y)"),
-    NULL, // CTRL_X_SCROLL: depends on state
+    ਨਿਰਾ, // CTRL_X_SCROLL: depends on state
     N_(" Whole line completion (^L^N^P)"),
     N_(" File name completion (^F^N^P)"),
     N_(" Tag completion (^]^N^P)"),
     N_(" Path pattern completion (^N^P)"),
     N_(" Definition completion (^D^N^P)"),
-    NULL, // CTRL_X_FINISHED
+    ਨਿਰਾ, // CTRL_X_FINISHED
     N_(" Dictionary completion (^K^N^P)"),
     N_(" Thesaurus completion (^T^N^P)"),
     N_(" Command-line completion (^V^N^P)"),
@@ -61,13 +61,13 @@ static char *ctrl_x_msgs[] =
     N_(" Omni completion (^O^N^P)"),
     N_(" Spelling suggestion (^S^N^P)"),
     N_(" Keyword Local completion (^N^P)"),
-    NULL,   // CTRL_X_EVAL doesn't use msg.
+    ਨਿਰਾ,   // CTRL_X_EVAL doesn't use msg.
     N_(" Command-line completion (^V^N^P)"),
     N_(" Register completion (^N^P)"),
 };
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static string_T ctrl_x_mode_names[] = {
+#ਜੇ defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+ਸਥਿਰ string_T ctrl_x_ਬਹੁਲਕ_ਨਾਂ[] = {
     STR_LITERAL_INIT("keyword"),
     STR_LITERAL_INIT("ctrl_x"),
     STR_LITERAL_INIT("scroll"),
@@ -83,46 +83,46 @@ static string_T ctrl_x_mode_names[] = {
     STR_LITERAL_INIT("function"),
     STR_LITERAL_INIT("omni"),
     STR_LITERAL_INIT("spell"),
-    {NULL, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
+    {ਨਿਰਾ, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
     STR_LITERAL_INIT("eval"),
     STR_LITERAL_INIT("cmdline"),
     STR_LITERAL_INIT("register"),
 };
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Structure used to store one match for insert completion.
  */
-typedef struct compl_S compl_T;
-struct compl_S
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ compl_S compl_T;
+ਬਣਤਰ compl_S
 {
-    compl_T	*cp_next;
+    compl_T	*cp_ਅਗਲਾ;
     compl_T	*cp_prev;
-    compl_T	*cp_match_next;		// matched next compl_T
+    compl_T	*cp_ਮੇਲ_ਅਗਲਾ;		// matched next compl_T
     string_T	cp_str;			// matched text
-    char_u	*(cp_text[CPT_COUNT]);	// text for the menu
-#ifdef FEAT_EVAL
-    typval_T	cp_user_data;
-#endif
+    char_u	*(cp_ਪਾਠ[CPT_ਗਿਣਤੀ]);	// text for the menu
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    typval_T	cp_user_ਅੰਕੜੇ;
+#ਜੇ_ਅੰਤ
     char_u	*cp_fname;		// file containing the match, allocated when
 					// cp_flags has CP_FREE_FNAME
-    int		cp_flags;		// CP_ values
-    int		cp_number;		// sequence number
-    int		cp_order;		// list position when first scored
-    int		cp_score;		// fuzzy match score or proximity score
-    int		cp_in_match_array;	// collected by compl_match_array
-    int		cp_user_abbr_hl_id;	// highlight group ID for abbr
-    int		cp_user_kind_hl_id;	// highlight group ID for kind
-    int		cp_cpt_source_idx;	// index of this match's source in 'cpt' option
+    ਪੂਰਨ		cp_flags;		// CP_ values
+    ਪੂਰਨ		cp_ਸੰਖਿਆ;		// sequence number
+    ਪੂਰਨ		cp_ਕ੍ਰਮ;		// list position when first scored
+    ਪੂਰਨ		cp_score;		// fuzzy match score or proximity score
+    ਪੂਰਨ		cp_ਵਿੱਚ_ਮੇਲ_array;	// collected by compl_match_array
+    ਪੂਰਨ		cp_user_abbr_hl_id;	// highlight group ID for abbr
+    ਪੂਰਨ		cp_user_ਕਿਸਮ_hl_id;	// highlight group ID for kind
+    ਪੂਰਨ		cp_cpt_ਸਰੋਤ_idx;	// index of this match's source in 'cpt' option
 };
 
 // values for cp_flags
-#define CP_ORIGINAL_TEXT   1	// the original text when the expansion begun
-#define CP_FREE_FNAME	    2	// cp_fname is allocated
-#define CP_CONT_S_IPOS	    4	// use CONT_S_IPOS for compl_cont_status
-#define CP_EQUAL	    8	// ins_compl_equal() always returns TRUE
-#define CP_ICASE	    16	// ins_compl_equal() ignores case
-#define CP_FAST	    32	// use fast_breakcheck instead of ui_breakcheck
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_ORIGINAL_ਪਾਠ   1	// the original text when the expansion begun
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_FREE_FNAME	    2	// cp_fname is allocated
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_CONT_S_IPOS	    4	// use CONT_S_IPOS for compl_cont_status
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_EQUAL	    8	// ins_compl_equal() always returns TRUE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_ICASE	    16	// ins_compl_equal() ignores case
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CP_FAST	    32	// use fast_breakcheck instead of ui_breakcheck
 
 /*
  * All the current matches are stored in a list.
@@ -132,119 +132,119 @@ struct compl_S
  * ins_compl_get_exp(), when new matches are added to the list.
  * "compl_old_match" points to previous "compl_curr_match".
  */
-static compl_T    *compl_first_match = NULL;
-static compl_T    *compl_curr_match = NULL;
-static compl_T    *compl_shown_match = NULL;
-static compl_T    *compl_old_match = NULL;
+ਸਥਿਰ compl_T    *compl_ਪਹਿਲਾ_ਮੇਲ = ਨਿਰਾ;
+ਸਥਿਰ compl_T    *compl_curr_ਮੇਲ = ਨਿਰਾ;
+ਸਥਿਰ compl_T    *compl_shown_ਮੇਲ = ਨਿਰਾ;
+ਸਥਿਰ compl_T    *compl_old_ਮੇਲ = ਨਿਰਾ;
 
 // Hashtab with the strings of the matches in the list above, except the
 // original-text entries.  Each entry owns a copy of the string and counts
 // the matches with that string, so that when matches were added with "adup"
 // the entry remains until the last match with the string is removed.
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    int	    cse_count;	// number of matches with this string
+    ਪੂਰਨ	    cse_ਗਿਣਤੀ;	// number of matches with this string
     char_u  cse_str[1];	// the string, actually longer
 } complstr_T;
 
-#define CSE_OFF		((int)offsetof(complstr_T, cse_str))
-#define HI2CSE(hi)	((complstr_T *)((hi)->hi_key - CSE_OFF))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CSE_OFF		((ਪੂਰਨ)offsetof(complstr_T, cse_str))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HI2CSE(hi)	((complstr_T *)((hi)->hi_ਕੁੰਜੀ - CSE_OFF))
 
-static hashtab_T  compl_strings_ht;
+ਸਥਿਰ hashtab_T  compl_ਲੜੀਆਂ_ht;
 
 /*
  * Count the string of a new match in the duplicate-check hashtab.
  * "hash" is the hash of "str" when it is not zero.
  */
-    static void
-compl_strings_add(char_u *str, size_t len, hash_T hash)
+    ਸਥਿਰ ਖਾਲੀ
+compl_ਲੜੀਆਂ_ਜੋੜੋ(char_u *str, size_t len, hash_T hash)
 {
     hashitem_T	*hi;
-    complstr_T	*entry;
+    complstr_T	*ਇੰਦਰਾਜ;
 
-    if (compl_strings_ht.ht_array == NULL)
-	hash_init(&compl_strings_ht);
-    if (hash == 0)
+    ਜੇ (compl_ਲੜੀਆਂ_ht.ht_array == ਨਿਰਾ)
+	hash_init(&compl_ਲੜੀਆਂ_ht);
+    ਜੇ (hash == 0)
 	hash = hash_hash(str);
-    hi = hash_lookup(&compl_strings_ht, str, hash);
-    if (HASHITEM_EMPTY(hi))
+    hi = hash_lookup(&compl_ਲੜੀਆਂ_ht, str, hash);
+    ਜੇ (HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi))
     {
-	entry = alloc(CSE_OFF + len + 1);
-	if (entry == NULL)
+	ਇੰਦਰਾਜ = alloc(CSE_OFF + len + 1);
+	ਜੇ (ਇੰਦਰਾਜ == ਨਿਰਾ)
 	    // Out of memory: the duplicate check degrades, an equal string
 	    // added later is not recognized as a duplicate.
-	    return;
-	entry->cse_count = 1;
-	vim_strncpy(entry->cse_str, str, len);
-	if (hash_add_item(&compl_strings_ht, hi, entry->cse_str, hash)
+	    ਵਾਪਸ;
+	ਇੰਦਰਾਜ->cse_ਗਿਣਤੀ = 1;
+	vim_strncpy(ਇੰਦਰਾਜ->cse_str, str, len);
+	ਜੇ (hash_ਜੋੜੋ_ਵਸਤੂ(&compl_ਲੜੀਆਂ_ht, hi, ਇੰਦਰਾਜ->cse_str, hash)
 								      == FAIL)
-	    vim_free(entry);
+	    vim_free(ਇੰਦਰਾਜ);
     }
-    else
-	++HI2CSE(hi)->cse_count;
+    ਨਹੀਂਤਾਂ
+	++HI2CSE(hi)->cse_ਗਿਣਤੀ;
 }
 
 // list used to store the compl_T which have the max score
-static compl_T	  **compl_best_matches = NULL;
-static int	  compl_num_bests = 0;
+ਸਥਿਰ compl_T	  **compl_ਉੱਤਮ_matches = ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ	  compl_ਅੰਕ_bests = 0;
 
 // After using a cursor key <Enter> selects a match in the popup menu,
 // otherwise it inserts a line break.
-static int	  compl_enter_selects = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_enter_selects = FALSE;
 
 // When "compl_leader" is not NULL only matches that start with this string
 // are used.
-static string_T	  compl_leader = {NULL, 0};
+ਸਥਿਰ string_T	  compl_leader = {ਨਿਰਾ, 0};
 
-static int	  compl_get_longest = FALSE;	// put longest common string
+ਸਥਿਰ ਪੂਰਨ	  compl_get_longest = FALSE;	// put longest common string
 						// in compl_leader
 
 // This flag is FALSE when no match is selected (by ^N/^P) or the match was
 // edited or using the longest common string.
-static int	  compl_used_match;
+ਸਥਿਰ ਪੂਰਨ	  compl_ਵਰਤਿਆ_ਮੇਲ;
 
 // didn't finish finding completions.
-static int	  compl_was_interrupted = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_was_interrupted = FALSE;
 
 // Set when character typed while looking for matches and it means we should
 // stop looking for matches.
-static int	  compl_interrupted = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_interrupted = FALSE;
 
-static int	  compl_restarting = FALSE;	// don't insert match
+ਸਥਿਰ ਪੂਰਨ	  compl_restarting = FALSE;	// don't insert match
 
 // When the first completion is done "compl_started" is set.  When it's
 // FALSE the word to be completed must be located.
-static int	  compl_started = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_started = FALSE;
 
 // Which Ctrl-X mode are we in?
-static int	  ctrl_x_mode = CTRL_X_NORMAL;
+ਸਥਿਰ ਪੂਰਨ	  ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
 
-static int	  compl_matches = 0;	    // number of completion matches
-static string_T	  compl_pattern = {NULL, 0};	 // search pattern for matching items
-#ifdef FEAT_COMPL_FUNC
-static string_T	  cpt_compl_pattern = {NULL, 0}; // pattern returned by func in 'cpt'
-#endif
-static int	  compl_direction = FORWARD;
-static int	  compl_shows_dir = FORWARD;
-static int	  compl_pending = 0;	    // > 1 for postponed CTRL-N
-static pos_T	  compl_startpos;
+ਸਥਿਰ ਪੂਰਨ	  compl_matches = 0;	    // number of completion matches
+ਸਥਿਰ string_T	  compl_ਨਮੂਨਾ = {ਨਿਰਾ, 0};	 // search pattern for matching items
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+ਸਥਿਰ string_T	  cpt_compl_ਨਮੂਨਾ = {ਨਿਰਾ, 0}; // pattern returned by func in 'cpt'
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਪੂਰਨ	  compl_direction = FORWARD;
+ਸਥਿਰ ਪੂਰਨ	  compl_shows_dir = FORWARD;
+ਸਥਿਰ ਪੂਰਨ	  compl_pending = 0;	    // > 1 for postponed CTRL-N
+ਸਥਿਰ pos_T	  compl_startpos;
 // Length in bytes of the text being completed (this is deleted to be replaced
 // by the match.)
-static int	  compl_length = 0;
-static linenr_T	  compl_lnum = 0;           // lnum where the completion start
-static colnr_T	  compl_col = 0;	    // column where the text starts
+ਸਥਿਰ ਪੂਰਨ	  compl_ਲੰਮਾਈ = 0;
+ਸਥਿਰ linenr_T	  compl_lnum = 0;           // lnum where the completion start
+ਸਥਿਰ colnr_T	  compl_ਖਾਨਾ = 0;	    // column where the text starts
 					    // that is being completed
-static colnr_T	  compl_ins_end_col = 0;
-static colnr_T	  compl_longest_end_col = 0;  // end of 'longest' inserted text
-static string_T	  compl_orig_text = {NULL, 0};  // text as it was before
+ਸਥਿਰ colnr_T	  compl_ins_ਸਿਰਾ_ਖਾਨਾ = 0;
+ਸਥਿਰ colnr_T	  compl_longest_ਸਿਰਾ_ਖਾਨਾ = 0;  // end of 'longest' inserted text
+ਸਥਿਰ string_T	  compl_orig_ਪਾਠ = {ਨਿਰਾ, 0};  // text as it was before
 					    // completion started
-static int	  compl_cont_mode = 0;
-static expand_T	  compl_xp;
+ਸਥਿਰ ਪੂਰਨ	  compl_cont_ਬਹੁਲਕ = 0;
+ਸਥਿਰ expand_T	  compl_xp;
 
-static win_T	  *compl_curr_win = NULL;  // win where completion is active
-static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
+ਸਥਿਰ win_T	  *compl_curr_win = ਨਿਰਾ;  // win where completion is active
+ਸਥਿਰ buf_T	  *compl_curr_buf = ਨਿਰਾ;  // buf where completion is active
 
-#define COMPL_INITIAL_TIMEOUT_MS    80
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ COMPL_INITIAL_TIMEOUT_MS    80
 // Autocomplete uses a decaying timeout: starting from COMPL_INITIAL_TIMEOUT_MS,
 // if the current source exceeds its timeout, it is interrupted and the next
 // begins with half the time. A small minimum timeout ensures every source
@@ -252,133 +252,133 @@ static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
 // Special case: when 'complete' contains "F" or "o" (function sources), a
 // longer fixed timeout is used (COMPL_FUNC_TIMEOUT_MS or
 // COMPL_FUNC_TIMEOUT_NON_KW_MS). - girish
-static int	  compl_autocomplete = FALSE;	    // whether autocompletion is active
-static bool	  compl_autostarted = false;	    // Vim started this completion
-static bool	  compl_autostart_pending = false;  // the trigger armed one
-static bool	  compl_autocomplete_pending = false;
-#ifdef ELAPSED_FUNC
-static elapsed_T  compl_autocomplete_start_tv;	    // when the delay was armed
-#endif
-static int	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
-static int	  compl_time_slice_expired = FALSE; // time budget exceeded for current source
-static int	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
-static int	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
+ਸਥਿਰ ਪੂਰਨ	  compl_autocomplete = FALSE;	    // whether autocompletion is active
+ਸਥਿਰ bool	  compl_autostarted = false;	    // Vim started this completion
+ਸਥਿਰ bool	  compl_autostart_pending = false;  // the trigger armed one
+ਸਥਿਰ bool	  compl_autocomplete_pending = false;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+ਸਥਿਰ elapsed_T  compl_autocomplete_ਸ਼ੁਰੂ_tv;	    // when the delay was armed
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਪੂਰਨ	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
+ਸਥਿਰ ਪੂਰਨ	  compl_ਸਮਾਂ_ਟੁਕੜਾ_expired = FALSE; // time budget exceeded for current source
+ਸਥਿਰ ਪੂਰਨ	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
+ਸਥਿਰ ਪੂਰਨ	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
 
 // Halve the current completion timeout, simulating exponential decay.
-#define COMPL_MIN_TIMEOUT_MS	5
-#define DECAY_COMPL_TIMEOUT() \
-    do { \
-	if (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ COMPL_MIN_TIMEOUT_MS	5
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DECAY_COMPL_TIMEOUT() \
+    ਕਰੋ { \
+	ਜੇ (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
 	    compl_timeout_ms /= 2; \
-    } while (0)
+    } ਜਦੋਂ (0)
 
 // Timeout values for F{func}, F and o values in 'complete'
-#define COMPL_FUNC_TIMEOUT_MS		300
-#define COMPL_FUNC_TIMEOUT_NON_KW_MS	1000
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ COMPL_FUNC_TIMEOUT_MS		300
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ COMPL_FUNC_TIMEOUT_NON_KW_MS	1000
 
 // List of flags for method of completion.
-static int	  compl_cont_status = 0;
-#define CONT_ADDING	1	// "normal" or "adding" expansion
-#define CONT_INTRPT	(2 + 4)	// a ^X interrupted the current expansion
+ਸਥਿਰ ਪੂਰਨ	  compl_cont_ਸਥਿਤੀ = 0;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_ADDING	1	// "normal" or "adding" expansion
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_INTRPT	(2 + 4)	// a ^X interrupted the current expansion
 				// it's set only iff N_ADDS is set
-#define CONT_N_ADDS	4	// next ^X<> will add-new or expand-current
-#define CONT_S_IPOS	8	// next ^X<> will set initial_pos?
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_N_ADDS	4	// next ^X<> will add-new or expand-current
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_S_IPOS	8	// next ^X<> will set initial_pos?
 				// if so, word-wise-expansion will set SOL
-#define CONT_SOL	16	// pattern includes start of line, just for
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_SOL	16	// pattern includes start of line, just for
 				// word-wise expansion, not set for ^X^L
-#define CONT_LOCAL	32	// for ctrl_x_mode 0, ^X^P/^X^N do a local
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CONT_LOCAL	32	// for ctrl_x_mode 0, ^X^P/^X^N do a local
 				// expansion, (eg use complete=.)
 
-static int	  compl_opt_refresh_always = FALSE;
-static int	  compl_opt_suppress_empty = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_opt_refresh_always = FALSE;
+ਸਥਿਰ ਪੂਰਨ	  compl_opt_suppress_ਖਾਲੀ_ਥਾਵਾਂ = FALSE;
 
-static int	  compl_selected_item = -1;
+ਸਥਿਰ ਪੂਰਨ	  compl_selected_ਵਸਤੂ = -1;
 
-static int	  *compl_fuzzy_scores;
+ਸਥਿਰ ਪੂਰਨ	  *compl_fuzzy_scores;
 
 // Define the structure for completion source (in 'cpt' option) information
-typedef struct cpt_source_T
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ cpt_ਸਰੋਤ_T
 {
-    int	cs_refresh_always;  // Whether 'refresh:always' is set for func
-    int	cs_startcol;	    // Start column returned by func
-    int	cs_max_matches;	    // Max items to display from this source
-#ifdef ELAPSED_FUNC
-    elapsed_T	compl_start_tv;	    // Timestamp when match collection starts
-#endif
+    ਪੂਰਨ	cs_refresh_always;  // Whether 'refresh:always' is set for func
+    ਪੂਰਨ	cs_startcol;	    // Start column returned by func
+    ਪੂਰਨ	cs_max_matches;	    // Max items to display from this source
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    elapsed_T	compl_ਸ਼ੁਰੂ_tv;	    // Timestamp when match collection starts
+#ਜੇ_ਅੰਤ
     char_u  cs_flag;	    // flag indicating the type of source
-} cpt_source_T;
+} cpt_ਸਰੋਤ_T;
 
-static cpt_source_T *cpt_sources_array; // Pointer to the array of completion sources
-static int	    cpt_sources_count;  // Total number of completion sources specified in the 'cpt' option
-static int	    cpt_sources_index = -1;  // Index of the current completion source being expanded
+ਸਥਿਰ cpt_ਸਰੋਤ_T *cpt_sources_array; // Pointer to the array of completion sources
+ਸਥਿਰ ਪੂਰਨ	    cpt_sources_ਗਿਣਤੀ;  // Total number of completion sources specified in the 'cpt' option
+ਸਥਿਰ ਪੂਰਨ	    cpt_sources_ਸੂਚਕਾਂਕ = -1;  // Index of the current completion source being expanded
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
-static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+ਸਥਿਰ pumitem_T *compl_ਮੇਲ_array = ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ compl_ਮੇਲ_arraysize;
 
-static int ins_compl_add(char_u *str, int len, char_u *fname, char_u **cptext, typval_T *user_data, int cdir, int flags, int adup, int *user_hl, int score);
-static void ins_compl_longest_match(compl_T *match);
-static void ins_compl_del_pum(void);
-static void ins_compl_files(int count, char_u **files, int thesaurus, int flags, regmatch_T *regmatch, char_u *buf, int *dir);
-static void ins_compl_free(void);
-static int  ins_compl_need_restart(void);
-static void ins_compl_new_leader(void);
-static int  get_compl_len(void);
-static void ins_compl_restart(void);
-static void ins_compl_set_original_text(char_u *str, size_t len);
-static void ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static void ins_compl_add_list(list_T *list);
-static void ins_compl_add_dict(dict_T *dict);
-static int get_userdefined_compl_info(colnr_T curs_col, callback_T *cb, int *startcol);
-static void get_cpt_func_completion_matches(callback_T *cb);
-static callback_T *get_callback_if_cpt_func(char_u *p, int idx);
-static void fill_complete_info_dict(dict_T *di, compl_T *match, int add_match);
-#endif
-static int setup_cpt_sources(void);
-static int is_cpt_func_refresh_always(void);
-static void cpt_sources_clear(void);
-static void cpt_compl_refresh(void);
-static int  ins_compl_key2dir(int c);
-static int  ins_compl_pum_key(int c);
-static int  ins_compl_key2count(int c);
-static void show_pum(int prev_w_wrow, int prev_w_leftcol);
-static unsigned  quote_meta(char_u *dest, char_u *str, int len);
-static int ins_compl_has_multiple(void);
-static void ins_compl_expand_multiple(char_u *str);
-static void ins_compl_longest_insert(char_u *prefix);
-static void ins_compl_make_linear(void);
-static int ins_compl_make_cyclic(void);
+ਸਥਿਰ ਪੂਰਨ ins_compl_ਜੋੜੋ(char_u *str, ਪੂਰਨ len, char_u *fname, char_u **cptext, typval_T *user_ਅੰਕੜੇ, ਪੂਰਨ cdir, ਪੂਰਨ flags, ਪੂਰਨ adup, ਪੂਰਨ *user_hl, ਪੂਰਨ score);
+ਸਥਿਰ ਖਾਲੀ ins_compl_longest_ਮੇਲ(compl_T *ਮੇਲ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_del_pum(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_files(ਪੂਰਨ ਗਿਣਤੀ_2, char_u **files, ਪੂਰਨ thesaurus, ਪੂਰਨ flags, regmatch_T *regmatch, char_u *buf, ਪੂਰਨ *dir);
+ਸਥਿਰ ਖਾਲੀ ins_compl_free(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ  ins_compl_need_restart(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_new_leader(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ  get_compl_len(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_restart(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_ਸੈੱਟ_original_ਪਾਠ(char_u *str, size_t len);
+ਸਥਿਰ ਖਾਲੀ ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
+#ਜੇ defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+ਸਥਿਰ ਖਾਲੀ ins_compl_ਜੋੜੋ_list(list_T *list);
+ਸਥਿਰ ਖਾਲੀ ins_compl_ਜੋੜੋ_dict(dict_T *dict);
+ਸਥਿਰ ਪੂਰਨ get_userdefined_compl_info(colnr_T curs_ਖਾਨਾ, callback_T *cb, ਪੂਰਨ *startcol);
+ਸਥਿਰ ਖਾਲੀ get_cpt_func_completion_matches(callback_T *cb);
+ਸਥਿਰ callback_T *get_callback_if_cpt_func(char_u *p, ਪੂਰਨ idx);
+ਸਥਿਰ ਖਾਲੀ fill_complete_info_dict(dict_T *di, compl_T *ਮੇਲ, ਪੂਰਨ ਜੋੜੋ_ਮੇਲ);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਪੂਰਨ ਤਿਆਰੀ_cpt_sources(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ is_cpt_func_refresh_always(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ cpt_sources_clear(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ cpt_compl_refresh(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ  ins_compl_key2dir(ਪੂਰਨ c);
+ਸਥਿਰ ਪੂਰਨ  ins_compl_pum_ਕੁੰਜੀ(ਪੂਰਨ c);
+ਸਥਿਰ ਪੂਰਨ  ins_compl_key2count(ਪੂਰਨ c);
+ਸਥਿਰ ਖਾਲੀ show_pum(ਪੂਰਨ prev_w_wrow, ਪੂਰਨ prev_w_leftcol);
+ਸਥਿਰ ਬਿਨਾਨਿਸ਼ਾਨੀ  quote_meta(char_u *dest, char_u *str, ਪੂਰਨ len);
+ਸਥਿਰ ਪੂਰਨ ins_compl_has_ਗੁਣਜ(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_expand_ਗੁਣਜ(char_u *str);
+ਸਥਿਰ ਖਾਲੀ ins_compl_longest_ਪਾਓ(char_u *ਅਗੇਤਰ);
+ਸਥਿਰ ਖਾਲੀ ins_compl_make_ਰੇਖਿਕ(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ ins_compl_make_cyclic(ਖਾਲੀ);
 
-#ifdef FEAT_SPELL
-static void spell_back_to_badword(void);
-static int  spell_bad_len = 0;	// length of located bad word
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+ਸਥਿਰ ਖਾਲੀ spell_ਪਿੱਠ_ਮੰਜ਼ਿਲ_badword(ਖਾਲੀ);
+ਸਥਿਰ ਪੂਰਨ  spell_bad_len = 0;	// length of located bad word
+#ਜੇ_ਅੰਤ
 
 /*
  * CTRL-X pressed in Insert mode.
  */
-    void
-ins_ctrl_x(void)
+    ਖਾਲੀ
+ins_ctrl_x(ਖਾਲੀ)
 {
-    if (!ctrl_x_mode_cmdline())
+    ਜੇ (!ctrl_x_ਬਹੁਲਕ_cmdline())
     {
 	// if the next ^X<> won't ADD nothing, then reset compl_cont_status
-	if (compl_cont_status & CONT_N_ADDS)
-	    compl_cont_status |= CONT_INTRPT;
-	else
-	    compl_cont_status = 0;
+	ਜੇ (compl_cont_ਸਥਿਤੀ & CONT_N_ADDS)
+	    compl_cont_ਸਥਿਤੀ |= CONT_INTRPT;
+	ਨਹੀਂਤਾਂ
+	    compl_cont_ਸਥਿਤੀ = 0;
 	// We're not sure which CTRL-X mode it will be yet
-	ctrl_x_mode = CTRL_X_NOT_DEFINED_YET;
-	edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
-	edit_submode_pre = NULL;
+	ctrl_x_ਬਹੁਲਕ = CTRL_X_NOT_DEFINED_YET;
+	edit_submode = (char_u *)_(CTRL_X_ਸੁਨੇਹਾ(ctrl_x_ਬਹੁਲਕ));
+	edit_submode_pre = ਨਿਰਾ;
 	showmode();
     }
-    else
+    ਨਹੀਂਤਾਂ
 	// CTRL-X in CTRL-X CTRL-V mode behaves differently to make CTRL-X
 	// CTRL-V look like CTRL-N
-	ctrl_x_mode = CTRL_X_CMDLINE_CTRL_X;
+	ctrl_x_ਬਹੁਲਕ = CTRL_X_CMDLINE_CTRL_X;
 
     may_trigger_modechanged();
 }
@@ -386,258 +386,258 @@ ins_ctrl_x(void)
 /*
  * Functions to check the current CTRL-X mode.
  */
-int ctrl_x_mode_none(void)
-    { return ctrl_x_mode == 0; }
-int ctrl_x_mode_normal(void)
-    { return ctrl_x_mode == CTRL_X_NORMAL; }
-int ctrl_x_mode_scroll(void)
-    { return ctrl_x_mode == CTRL_X_SCROLL; }
-int ctrl_x_mode_whole_line(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE; }
-int ctrl_x_mode_files(void)
-    { return ctrl_x_mode == CTRL_X_FILES; }
-int ctrl_x_mode_tags(void)
-    { return ctrl_x_mode == CTRL_X_TAGS; }
-int ctrl_x_mode_path_patterns(void)
-    { return ctrl_x_mode == CTRL_X_PATH_PATTERNS; }
-int ctrl_x_mode_path_defines(void)
-    { return ctrl_x_mode == CTRL_X_PATH_DEFINES; }
-int ctrl_x_mode_dictionary(void)
-    { return ctrl_x_mode == CTRL_X_DICTIONARY; }
-int ctrl_x_mode_thesaurus(void)
-    { return ctrl_x_mode == CTRL_X_THESAURUS; }
-int ctrl_x_mode_cmdline(void)
-    { return ctrl_x_mode == CTRL_X_CMDLINE
-		|| ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X; }
-int ctrl_x_mode_function(void)
-    { return ctrl_x_mode == CTRL_X_FUNCTION; }
-int ctrl_x_mode_omni(void)
-    { return ctrl_x_mode == CTRL_X_OMNI; }
-int ctrl_x_mode_spell(void)
-    { return ctrl_x_mode == CTRL_X_SPELL; }
-int ctrl_x_mode_eval(void)
-    { return ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_line_or_eval(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE || ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_register(void)
-    { return ctrl_x_mode == CTRL_X_REGISTER; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_none(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == 0; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਸਾਧਾਰਨ; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_scroll(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_SCROLL; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਸਾਰਾ_ਸਤਰ(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਸਾਰਾ_ਸਤਰ; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_files(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_FILES; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਟੈਗ_ਸੂਚੀ(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਟੈਗ_ਸੂਚੀ; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_patterns(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਰਸਤਾ_PATTERNS; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_dictionary(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_DICTIONARY; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_thesaurus(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_THESAURUS; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_cmdline(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_CMDLINE
+		|| ctrl_x_ਬਹੁਲਕ == CTRL_X_CMDLINE_CTRL_X; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_function(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_FUNCTION; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_omni(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_OMNI; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_spell(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_SPELL; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_eval(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_EVAL; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਸਾਰਾ_ਸਤਰ || ctrl_x_ਬਹੁਲਕ == CTRL_X_EVAL; }
+ਪੂਰਨ ctrl_x_ਬਹੁਲਕ_ਰਜਿਸਟਰ(ਖਾਲੀ)
+    { ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_ਰਜਿਸਟਰ; }
 
 /*
  * Whether other than default completion has been selected.
  */
-    int
-ctrl_x_mode_not_default(void)
+    ਪੂਰਨ
+ctrl_x_ਬਹੁਲਕ_not_default(ਖਾਲੀ)
 {
-    return ctrl_x_mode != CTRL_X_NORMAL;
+    ਵਾਪਸ ctrl_x_ਬਹੁਲਕ != CTRL_X_ਸਾਧਾਰਨ;
 }
 
 /*
  * Whether CTRL-X was typed without a following character,
  * not including when in CTRL-X CTRL-V mode.
  */
-    int
-ctrl_x_mode_not_defined_yet(void)
+    ਪੂਰਨ
+ctrl_x_ਬਹੁਲਕ_not_defined_yet(ਖਾਲੀ)
 {
-    return ctrl_x_mode == CTRL_X_NOT_DEFINED_YET;
+    ਵਾਪਸ ctrl_x_ਬਹੁਲਕ == CTRL_X_NOT_DEFINED_YET;
 }
 
 /*
  * Return TRUE if currently in "normal" or "adding" insert completion matches
  * state
  */
-    int
-compl_status_adding(void)
+    ਪੂਰਨ
+compl_ਸਥਿਤੀ_adding(ਖਾਲੀ)
 {
-    return compl_cont_status & CONT_ADDING;
+    ਵਾਪਸ compl_cont_ਸਥਿਤੀ & CONT_ADDING;
 }
 
 /*
  * Return TRUE if the completion pattern includes start of line, just for
  * word-wise expansion.
  */
-    int
-compl_status_sol(void)
+    ਪੂਰਨ
+compl_ਸਥਿਤੀ_sol(ਖਾਲੀ)
 {
-    return compl_cont_status & CONT_SOL;
+    ਵਾਪਸ compl_cont_ਸਥਿਤੀ & CONT_SOL;
 }
 
 /*
  * Return TRUE if ^X^P/^X^N will do a local completion (i.e. use complete=.)
  */
-    int
-compl_status_local(void)
+    ਪੂਰਨ
+compl_ਸਥਿਤੀ_local(ਖਾਲੀ)
 {
-    return compl_cont_status & CONT_LOCAL;
+    ਵਾਪਸ compl_cont_ਸਥਿਤੀ & CONT_LOCAL;
 }
 
 /*
  * Clear the completion status flags
  */
-    void
-compl_status_clear(void)
+    ਖਾਲੀ
+compl_ਸਥਿਤੀ_clear(ਖਾਲੀ)
 {
-    compl_cont_status = 0;
+    compl_cont_ਸਥਿਤੀ = 0;
 }
 
 /*
  * Return TRUE if completion is using the forward direction matches
  */
-    static int
-compl_dir_forward(void)
+    ਸਥਿਰ ਪੂਰਨ
+compl_dir_forward(ਖਾਲੀ)
 {
-    return compl_direction == FORWARD;
+    ਵਾਪਸ compl_direction == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing forward completion matches
  */
-    static int
-compl_shows_dir_forward(void)
+    ਸਥਿਰ ਪੂਰਨ
+compl_shows_dir_forward(ਖਾਲੀ)
 {
-    return compl_shows_dir == FORWARD;
+    ਵਾਪਸ compl_shows_dir == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing backward completion matches
  */
-    static int
-compl_shows_dir_backward(void)
+    ਸਥਿਰ ਪੂਰਨ
+compl_shows_dir_backward(ਖਾਲੀ)
 {
-    return compl_shows_dir == BACKWARD;
+    ਵਾਪਸ compl_shows_dir == BACKWARD;
 }
 
 /*
  * Return TRUE if the 'dictionary' or 'thesaurus' option can be used.
  */
-    int
-has_compl_option(int dict_opt)
+    ਪੂਰਨ
+has_compl_option(ਪੂਰਨ dict_opt)
 {
-    if (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
-#ifdef FEAT_SPELL
+    ਜੇ (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 							&& !curwin->w_p_spell
-#endif
+#ਜੇ_ਅੰਤ
 							)
 		 : (*curbuf->b_p_tsr == NUL && *p_tsr == NUL
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
 		     && *curbuf->b_p_tsrfu == NUL && *p_tsrfu == NUL
-#endif
+#ਜੇ_ਅੰਤ
 		   ))
     {
-	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	msg_attr(dict_opt ? _("'dictionary' option is empty")
+	ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
+	edit_submode = ਨਿਰਾ;
+	ਸੁਨੇਹਾ_attr(dict_opt ? _("'dictionary' option is empty")
 			  : _("'thesaurus' option is empty"),
 							      HL_ATTR(HLF_E));
-	if (emsg_silent == 0 && !in_assert_fails)
+	ਜੇ (emsg_silent == 0 && !ਵਿੱਚ_assert_fails)
 	{
 	    vim_beep(BO_COMPL);
 	    setcursor();
-	    out_flush();
-#ifdef FEAT_EVAL
-	    if (!get_vim_var_nr(VV_TESTING))
-#endif
+	    ਬਾਹਰਲਾ_flush();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	    ਜੇ (!get_vim_var_nr(VV_TESTING))
+#ਜੇ_ਅੰਤ
 		ui_delay(2004L, FALSE);
 	}
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
  * Is the character "c" a valid key to go to or keep us in CTRL-X mode?
  * This depends on the current mode.
  */
-    int
-vim_is_ctrl_x_key(int c)
+    ਪੂਰਨ
+vim_is_ctrl_x_ਕੁੰਜੀ(ਪੂਰਨ c)
 {
     // Accept <PageUp> and <PageDown> if the popup menu is visible.
-    if (ins_compl_pum_key(c))
-	return TRUE;
+    ਜੇ (ins_compl_pum_ਕੁੰਜੀ(c))
+	ਵਾਪਸ TRUE;
 
-    switch (ctrl_x_mode)
+    ਚੋਣ (ctrl_x_ਬਹੁਲਕ)
     {
-	case 0:		    // Not in any CTRL-X mode
-	    return (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
-	case CTRL_X_NOT_DEFINED_YET:
-	case CTRL_X_CMDLINE_CTRL_X:
-	    return (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
+	ਹਾਲਤ 0:		    // Not in any CTRL-X mode
+	    ਵਾਪਸ (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
+	ਹਾਲਤ CTRL_X_NOT_DEFINED_YET:
+	ਹਾਲਤ CTRL_X_CMDLINE_CTRL_X:
+	    ਵਾਪਸ (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
 		    || c == Ctrl_L || c == Ctrl_F || c == Ctrl_RSB
 		    || c == Ctrl_I || c == Ctrl_D || c == Ctrl_P
 		    || c == Ctrl_N || c == Ctrl_T || c == Ctrl_V
 		    || c == Ctrl_Q || c == Ctrl_U || c == Ctrl_O
 		    || c == Ctrl_S || c == Ctrl_K || c == 's'
 		    || c == Ctrl_Z || c == Ctrl_R);
-	case CTRL_X_SCROLL:
-	    return (c == Ctrl_Y || c == Ctrl_E);
-	case CTRL_X_WHOLE_LINE:
-	    return (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_FILES:
-	    return (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_DICTIONARY:
-	    return (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_THESAURUS:
-	    return (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_TAGS:
-	    return (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
-#ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_PATH_DEFINES:
-	    return (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
-#endif
-	case CTRL_X_CMDLINE:
-	    return (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
+	ਹਾਲਤ CTRL_X_SCROLL:
+	    ਵਾਪਸ (c == Ctrl_Y || c == Ctrl_E);
+	ਹਾਲਤ CTRL_X_ਸਾਰਾ_ਸਤਰ:
+	    ਵਾਪਸ (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_FILES:
+	    ਵਾਪਸ (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_DICTIONARY:
+	    ਵਾਪਸ (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_THESAURUS:
+	    ਵਾਪਸ (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_ਟੈਗ_ਸੂਚੀ:
+	    ਵਾਪਸ (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
+	ਹਾਲਤ CTRL_X_ਰਸਤਾ_PATTERNS:
+	    ਵਾਪਸ (c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ:
+	    ਵਾਪਸ (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ CTRL_X_CMDLINE:
+	    ਵਾਪਸ (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
 		    || c == Ctrl_X);
-#ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    return (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_OMNI:
-	    return (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
-#endif
-	case CTRL_X_SPELL:
-	    return (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_EVAL:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_REGISTER:
-	    return (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+	ਹਾਲਤ CTRL_X_FUNCTION:
+	    ਵਾਪਸ (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_OMNI:
+	    ਵਾਪਸ (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ CTRL_X_SPELL:
+	    ਵਾਪਸ (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_EVAL:
+	    ਵਾਪਸ (c == Ctrl_P || c == Ctrl_N);
+	ਹਾਲਤ CTRL_X_ਰਜਿਸਟਰ:
+	    ਵਾਪਸ (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
     }
-    internal_error("vim_is_ctrl_x_key()");
-    return FALSE;
+    ਅੰਦਰੂਨੀ_error("vim_is_ctrl_x_key()");
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Return TRUE if "match" is the original text when the completion began.
  */
-    static int
-match_at_original_text(compl_T *match)
+    ਸਥਿਰ ਪੂਰਨ
+ਮੇਲ_at_original_ਪਾਠ(compl_T *ਮੇਲ)
 {
-    return match->cp_flags & CP_ORIGINAL_TEXT;
+    ਵਾਪਸ ਮੇਲ->cp_flags & CP_ORIGINAL_ਪਾਠ;
 }
 
 /*
  * Returns TRUE if "match" is the first match in the completion list.
  */
-    static int
-is_first_match(compl_T *match)
+    ਸਥਿਰ ਪੂਰਨ
+is_ਪਹਿਲਾ_ਮੇਲ(compl_T *ਮੇਲ)
 {
-    return match == compl_first_match;
+    ਵਾਪਸ ਮੇਲ == compl_ਪਹਿਲਾ_ਮੇਲ;
 }
 
 /*
  * Return the entry holding the original text, NULL if not found.
  * It is the first item, or the last one for backward completion.
  */
-    static compl_T *
-find_original_text_match(void)
+    ਸਥਿਰ compl_T *
+ਲੱਭੋ_original_ਪਾਠ_ਮੇਲ(ਖਾਲੀ)
 {
-    if (compl_first_match == NULL)
-	return NULL;
-    if (match_at_original_text(compl_first_match))
-	return compl_first_match;
-    if (compl_first_match->cp_prev != NULL
-	    && match_at_original_text(compl_first_match->cp_prev))
-	return compl_first_match->cp_prev;
-    return NULL;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (ਮੇਲ_at_original_ਪਾਠ(compl_ਪਹਿਲਾ_ਮੇਲ))
+	ਵਾਪਸ compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev != ਨਿਰਾ
+	    && ਮੇਲ_at_original_ਪਾਠ(compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev))
+	ਵਾਪਸ compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -645,118 +645,118 @@ find_original_text_match(void)
  * completed.  Used to decide whether to abandon complete mode when the menu
  * is visible.
  */
-    int
-ins_compl_accept_char(int c)
+    ਪੂਰਨ
+ins_compl_accept_char(ਪੂਰਨ c)
 {
-    if (compl_autocomplete && compl_from_nonkeyword)
-	return FALSE;
+    ਜੇ (compl_autocomplete && compl_from_nonkeyword)
+	ਵਾਪਸ FALSE;
 
-    if (ctrl_x_mode & CTRL_X_WANT_IDENT)
+    ਜੇ (ctrl_x_ਬਹੁਲਕ & CTRL_X_WANT_IDENT)
 	// When expanding an identifier only accept identifier chars.
-	return vim_isIDc(c);
+	ਵਾਪਸ vim_isIDc(c);
 
-    switch (ctrl_x_mode)
+    ਚੋਣ (ctrl_x_ਬਹੁਲਕ)
     {
-	case CTRL_X_FILES:
+	ਹਾਲਤ CTRL_X_FILES:
 	    // When expanding file name only accept file name chars. But not
 	    // path separators, so that "proto/<Tab>" expands files in
 	    // "proto", not "proto/" as a whole
-	    return vim_isfilec(c) && !vim_ispathsep(c);
+	    ਵਾਪਸ vim_isfilec(c) && !vim_ispathsep(c);
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
-	case CTRL_X_OMNI:
+	ਹਾਲਤ CTRL_X_CMDLINE:
+	ਹਾਲਤ CTRL_X_CMDLINE_CTRL_X:
+	ਹਾਲਤ CTRL_X_OMNI:
 	    // Command line and Omni completion can work with just about any
 	    // printable character, but do stop at white space.
-	    return vim_isprintc(c) && !VIM_ISWHITE(c);
+	    ਵਾਪਸ vim_isprintc(c) && !VIM_ISWHITE(c);
 
-	case CTRL_X_WHOLE_LINE:
+	ਹਾਲਤ CTRL_X_ਸਾਰਾ_ਸਤਰ:
 	    // For while line completion a space can be part of the line.
-	    return vim_isprintc(c);
+	    ਵਾਪਸ vim_isprintc(c);
     }
-    return vim_iswordc(c);
+    ਵਾਪਸ vim_iswordc(c);
 }
 
 /*
  * Get the completed text by inferring the case of the originally typed text.
  * If the result is in allocated memory "tofree" is set to it.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 ins_compl_infercase_gettext(
     char_u  *str,
-    int	    char_len,
-    int	    compl_char_len,
-    int	    min_len,
+    ਪੂਰਨ	    char_len,
+    ਪੂਰਨ	    compl_char_len,
+    ਪੂਰਨ	    min_len,
     char_u  **tofree)
 {
-    int		*wca;			// Wide character array.
+    ਪੂਰਨ		*wca;			// Wide character array.
     char_u	*p;
-    int		i, c;
-    int		has_lower = FALSE;
-    int		was_letter = FALSE;
+    ਪੂਰਨ		i, c;
+    ਪੂਰਨ		has_ਹੇਠਲਾ = FALSE;
+    ਪੂਰਨ		was_letter = FALSE;
     garray_T	gap;
 
     IObuff[0] = NUL;
 
     // Allocate wide character array for the completion and fill it.
-    wca = ALLOC_MULT(int, char_len);
-    if (wca == NULL)
-	return IObuff;
+    wca = ALLOC_MULT(ਪੂਰਨ, char_len);
+    ਜੇ (wca == ਨਿਰਾ)
+	ਵਾਪਸ IObuff;
 
     p = str;
-    for (i = 0; i < char_len; ++i)
+    ਲਈ (i = 0; i < char_len; ++i)
     {
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	    wca[i] = mb_ptr2char_adv(&p);
-	else
+	ਨਹੀਂਤਾਂ
 	    wca[i] = *(p++);
     }
 
     // Rule 1: Were any chars converted to lower?
-    p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    p = compl_orig_ਪਾਠ.string;
+    ਲਈ (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	ਜੇ (MB_ISLOWER(c))
 	{
-	    has_lower = TRUE;
-	    if (MB_ISUPPER(wca[i]))
+	    has_ਹੇਠਲਾ = TRUE;
+	    ਜੇ (MB_ISUPPER(wca[i]))
 	    {
 		// Rule 1 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		ਲਈ (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOLOWER(wca[i]);
-		break;
+		ਰੋਕੋ;
 	    }
 	}
     }
 
     // Rule 2: No lower case, 2nd consecutive letter converted to
     // upper case.
-    if (!has_lower)
+    ਜੇ (!has_ਹੇਠਲਾ)
     {
-	p = compl_orig_text.string;
-	for (i = 0; i < min_len; ++i)
+	p = compl_orig_ਪਾਠ.string;
+	ਲਈ (i = 0; i < min_len; ++i)
 	{
 	    c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	    if (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
+	    ਜੇ (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
 	    {
 		// Rule 2 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		ਲਈ (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOUPPER(wca[i]);
-		break;
+		ਰੋਕੋ;
 	    }
 	    was_letter = MB_ISLOWER(c) || MB_ISUPPER(c);
 	}
     }
 
     // Copy the original case of the part we typed.
-    p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    p = compl_orig_ਪਾਠ.string;
+    ਲਈ (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	ਜੇ (MB_ISLOWER(c))
 	    wca[i] = MB_TOLOWER(wca[i]);
-	else if (MB_ISUPPER(c))
+	ਨਹੀਂਤਾਂ ਜੇ (MB_ISUPPER(c))
 	    wca[i] = MB_TOUPPER(wca[i]);
     }
 
@@ -764,55 +764,55 @@ ins_compl_infercase_gettext(
     p = IObuff;
     i = 0;
     ga_init2(&gap, 1, 500);
-    while (i < char_len)
+    ਜਦੋਂ (i < char_len)
     {
-	if (gap.ga_data != NULL)
+	ਜੇ (gap.ga_ਅੰਕੜੇ != ਨਿਰਾ)
 	{
-	    if (ga_grow(&gap, 10) == FAIL)
+	    ਜੇ (ga_grow(&gap, 10) == FAIL)
 	    {
 		ga_clear(&gap);
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		ਵਾਪਸ (char_u *)"[failed]";
 	    }
-	    p = (char_u *)gap.ga_data + gap.ga_len;
-	    if (has_mbyte)
+	    p = (char_u *)gap.ga_ਅੰਕੜੇ + gap.ga_len;
+	    ਜੇ (has_mbyte)
 		gap.ga_len += (*mb_char2bytes)(wca[i++], p);
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		*p = wca[i++];
 		++gap.ga_len;
 	    }
 	}
-	else if ((p - IObuff) + 6 >= IOSIZE)
+	ਨਹੀਂਤਾਂ ਜੇ ((p - IObuff) + 6 >= IOSIZE)
 	{
 	    // Multi-byte characters can occupy up to five bytes more than
 	    // ASCII characters, and we also need one byte for NUL, so when
 	    // getting to six bytes from the edge of IObuff switch to using a
 	    // growarray.  Add the character in the next round.
-	    if (ga_grow(&gap, IOSIZE) == FAIL)
+	    ਜੇ (ga_grow(&gap, IOSIZE) == FAIL)
 	    {
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		ਵਾਪਸ (char_u *)"[failed]";
 	    }
 	    *p = NUL;
-	    STRCPY(gap.ga_data, IObuff);
-	    gap.ga_len = (int)(p - IObuff);
+	    STRCPY(gap.ga_ਅੰਕੜੇ, IObuff);
+	    gap.ga_len = (ਪੂਰਨ)(p - IObuff);
 	}
-	else if (has_mbyte)
+	ਨਹੀਂਤਾਂ ਜੇ (has_mbyte)
 	    p += (*mb_char2bytes)(wca[i++], p);
-	else
+	ਨਹੀਂਤਾਂ
 	    *(p++) = wca[i++];
     }
     vim_free(wca);
 
-    if (gap.ga_data != NULL)
+    ਜੇ (gap.ga_ਅੰਕੜੇ != ਨਿਰਾ)
     {
-	*tofree = gap.ga_data;
-	return gap.ga_data;
+	*tofree = gap.ga_ਅੰਕੜੇ;
+	ਵਾਪਸ gap.ga_ਅੰਕੜੇ;
     }
 
     *p = NUL;
-    return IObuff;
+    ਵਾਪਸ IObuff;
 }
 
 /*
@@ -821,59 +821,59 @@ ins_compl_infercase_gettext(
  * text is inferred, ie this tries to work out what case you probably wanted
  * the rest of the word to be in -- webb
  */
-    int
-ins_compl_add_infercase(
+    ਪੂਰਨ
+ins_compl_ਜੋੜੋ_infercase(
     char_u	*str_arg,
-    int		len,
-    int		icase,
+    ਪੂਰਨ		len,
+    ਪੂਰਨ		icase,
     char_u	*fname,
-    int		dir,
-    int		cont_s_ipos,  // next ^X<> will set initial_pos
-    int		score)
+    ਪੂਰਨ		dir,
+    ਪੂਰਨ		cont_s_ipos,  // next ^X<> will set initial_pos
+    ਪੂਰਨ		score)
 {
     char_u	*str = str_arg;
     char_u	*p;
-    int		char_len;		// count multi-byte characters
-    int		compl_char_len;
-    int		min_len;
-    int		flags = 0;
-    int		res;
-    char_u	*tofree = NULL;
+    ਪੂਰਨ		char_len;		// count multi-byte characters
+    ਪੂਰਨ		compl_char_len;
+    ਪੂਰਨ		min_len;
+    ਪੂਰਨ		flags = 0;
+    ਪੂਰਨ		res;
+    char_u	*tofree = ਨਿਰਾ;
 
-    if (p_ic && curbuf->b_p_inf && len > 0)
+    ਜੇ (p_ic && curbuf->b_p_inf && len > 0)
     {
 	// Infer case of completed part.
 
 	// Find actual length of completion.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
 	    p = str;
 	    char_len = 0;
-	    while (*p != NUL)
+	    ਜਦੋਂ (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++char_len;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    char_len = len;
 	}
 
 	// Find actual length of original text.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
-	    p = compl_orig_text.string;
+	    p = compl_orig_ਪਾਠ.string;
 	    compl_char_len = 0;
-	    while (*p != NUL)
+	    ਜਦੋਂ (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++compl_char_len;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    compl_char_len = compl_length;
+	    compl_char_len = compl_ਲੰਮਾਈ;
 	}
 
 	// "char_len" may be smaller than "compl_char_len" when using
@@ -883,52 +883,52 @@ ins_compl_add_infercase(
 	str = ins_compl_infercase_gettext(str, char_len,
 					  compl_char_len, min_len, &tofree);
     }
-    if (cont_s_ipos)
+    ਜੇ (cont_s_ipos)
 	flags |= CP_CONT_S_IPOS;
-    if (icase)
+    ਜੇ (icase)
 	flags |= CP_ICASE;
 
-    res = ins_compl_add(str, len, fname, NULL, NULL, dir, flags, FALSE, NULL, score);
+    res = ins_compl_ਜੋੜੋ(str, len, fname, ਨਿਰਾ, ਨਿਰਾ, dir, flags, FALSE, ਨਿਰਾ, score);
     vim_free(tofree);
-    return res;
+    ਵਾਪਸ res;
 }
 
 /*
  * Check if fuzzy matching is enabled
  */
-    static int
-cot_fuzzy(void)
+    ਸਥਿਰ ਪੂਰਨ
+cot_fuzzy(ਖਾਲੀ)
 {
-    return (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_mode_thesaurus();
+    ਵਾਪਸ (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_ਬਹੁਲਕ_thesaurus();
 }
 
 /*
  * Returns TRUE if matches should be sorted based on proximity to the cursor.
  */
-    static int
-is_nearest_active(void)
+    ਸਥਿਰ ਪੂਰਨ
+is_ਸਭ_ਤੋਂ_ਨੇੜੇ_ਸਰਗਰਮ(ਖਾਲੀ)
 {
-    return (compl_autocomplete || (get_cot_flags() & COT_NEAREST))
+    ਵਾਪਸ (compl_autocomplete || (get_cot_flags() & COT_ਸਭ_ਤੋਂ_ਨੇੜੇ))
 	&& !cot_fuzzy();
 }
 
 /*
  * TRUE if a match is selected (even if it is not inserted).
  */
-    int
-ins_compl_is_match_selected(void)
+    ਪੂਰਨ
+ins_compl_is_ਮੇਲ_selected(ਖਾਲੀ)
 {
-    return compl_shown_match != NULL && !is_first_match(compl_shown_match);
+    ਵਾਪਸ compl_shown_ਮੇਲ != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ);
 }
 
 /*
  * Returns TRUE if autocomplete is active and the pre-insert effect targets the
  * longest prefix.
  */
-    int
-ins_compl_preinsert_longest(void)
+    ਪੂਰਨ
+ins_compl_preinsert_longest(ਖਾਲੀ)
 {
-    return compl_autocomplete
+    ਵਾਪਸ compl_autocomplete
 	&& (get_cot_flags() & (COT_LONGEST | COT_PREINSERT | COT_FUZZY))
 		== COT_LONGEST;
 }
@@ -953,81 +953,81 @@ ins_compl_preinsert_longest(void)
  * NOTDONE, otherwise add it to the list and return OK.  If there is an error,
  * maybe because alloc() returns NULL, then FAIL is returned.
  */
-    static int
-ins_compl_add(
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_ਜੋੜੋ(
     char_u	*str,
-    int		len,
+    ਪੂਰਨ		len,
     char_u	*fname,
     char_u	**cptext,	    // extra text for popup menu or NULL
-    typval_T	*user_data UNUSED,  // "user_data" entry or NULL
-    int		cdir,
-    int		flags_arg,
-    int		adup,		    // accept duplicate match
-    int		*user_hl,           // user abbr/kind hlattr
-    int		score)
+    typval_T	*user_ਅੰਕੜੇ ਅਣਵਰਤਿਆ,  // "user_data" entry or NULL
+    ਪੂਰਨ		cdir,
+    ਪੂਰਨ		flags_arg,
+    ਪੂਰਨ		adup,		    // accept duplicate match
+    ਪੂਰਨ		*user_hl,           // user abbr/kind hlattr
+    ਪੂਰਨ		score)
 {
-    compl_T	*match, *current, *prev;
-    int		dir = (cdir == 0 ? compl_direction : cdir);
-    int		flags = flags_arg;
-    int		inserted = FALSE;
-    char_u	*new_str = NULL;
+    compl_T	*ਮੇਲ, *current, *prev;
+    ਪੂਰਨ		dir = (cdir == 0 ? compl_direction : cdir);
+    ਪੂਰਨ		flags = flags_arg;
+    ਪੂਰਨ		inserted = FALSE;
+    char_u	*new_str = ਨਿਰਾ;
     hash_T	str_hash = 0;	    // hash of the match string, when not 0
 
-    if (flags & CP_FAST)
+    ਜੇ (flags & CP_FAST)
 	fast_breakcheck();
-    else
+    ਨਹੀਂਤਾਂ
 	ui_breakcheck();
-    if (got_int)
-	return FAIL;
-    if (len < 0)
-	len = (int)STRLEN(str);
+    ਜੇ (got_int)
+	ਵਾਪਸ FAIL;
+    ਜੇ (len < 0)
+	len = (ਪੂਰਨ)STRLEN(str);
 
     // If the same match is already present, don't add it.
-    if (compl_first_match != NULL && !adup && compl_strings_ht.ht_used > 0)
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ != ਨਿਰਾ && !adup && compl_ਲੜੀਆਂ_ht.ht_ਵਰਤਿਆ > 0)
     {
 	// The key must be NUL terminated.
 	char_u	    keybuf[128];
-	char_u	    *key;
+	char_u	    *ਕੁੰਜੀ;
 	hashitem_T  *hi;
 
-	if (len < (int)sizeof(keybuf))
+	ਜੇ (len < (ਪੂਰਨ)ਆਕਾਰ(keybuf))
 	{
 	    mch_memmove(keybuf, str, (size_t)len);
 	    keybuf[len] = NUL;
-	    key = keybuf;
+	    ਕੁੰਜੀ = keybuf;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    new_str = vim_strnsave(str, len);
-	    if (new_str == NULL)
-		return FAIL;
-	    key = new_str;
+	    ਜੇ (new_str == ਨਿਰਾ)
+		ਵਾਪਸ FAIL;
+	    ਕੁੰਜੀ = new_str;
 	}
-	str_hash = hash_hash(key);
-	hi = hash_lookup(&compl_strings_ht, key, str_hash);
-	if (!HASHITEM_EMPTY(hi))
+	str_hash = hash_hash(ਕੁੰਜੀ);
+	hi = hash_lookup(&compl_ਲੜੀਆਂ_ht, ਕੁੰਜੀ, str_hash);
+	ਜੇ (!HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi))
 	{
-	    if (is_nearest_active() && score > 0)
+	    ਜੇ (is_ਸਭ_ਤੋਂ_ਨੇੜੇ_ਸਰਗਰਮ() && score > 0)
 	    {
 		// The duplicate may need its score updated, scan the
 		// matches to find it.
-		match = compl_first_match;
-		do
+		ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+		ਕਰੋ
 		{
-		    if (!match_at_original_text(match)
-			    && STRNCMP(match->cp_str.string, str, len) == 0
-			    && ((int)match->cp_str.length <= len
-					  || match->cp_str.string[len] == NUL))
+		    ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(ਮੇਲ)
+			    && STRNCMP(ਮੇਲ->cp_str.string, str, len) == 0
+			    && ((ਪੂਰਨ)ਮੇਲ->cp_str.ਲੰਮਾਈ <= len
+					  || ਮੇਲ->cp_str.string[len] == NUL))
 		    {
-			if (score < match->cp_score)
-			    match->cp_score = score;
-			break;
+			ਜੇ (score < ਮੇਲ->cp_score)
+			    ਮੇਲ->cp_score = score;
+			ਰੋਕੋ;
 		    }
-		    match = match->cp_next;
-		} while (match != NULL && !is_first_match(match));
+		    ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ;
+		} ਜਦੋਂ (ਮੇਲ != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(ਮੇਲ));
 	    }
 	    vim_free(new_str);
-	    return NOTDONE;
+	    ਵਾਪਸ NOTDONE;
 	}
     }
 
@@ -1036,190 +1036,190 @@ ins_compl_add(
 
     // Allocate a new match structure.
     // Copy the values to the new match structure.
-    match = ALLOC_CLEAR_ONE(compl_T);
-    if (match == NULL)
+    ਮੇਲ = ALLOC_CLEAR_ONE(compl_T);
+    ਜੇ (ਮੇਲ == ਨਿਰਾ)
     {
 	vim_free(new_str);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    match->cp_number = flags & CP_ORIGINAL_TEXT ? 0 : -1;
-    match->cp_order = -1;
-    if (new_str == NULL && (new_str = vim_strnsave(str, len)) == NULL)
+    ਮੇਲ->cp_ਸੰਖਿਆ = flags & CP_ORIGINAL_ਪਾਠ ? 0 : -1;
+    ਮੇਲ->cp_ਕ੍ਰਮ = -1;
+    ਜੇ (new_str == ਨਿਰਾ && (new_str = vim_strnsave(str, len)) == ਨਿਰਾ)
     {
-	vim_free(match);
-	return FAIL;
+	vim_free(ਮੇਲ);
+	ਵਾਪਸ FAIL;
     }
-    match->cp_str.string = new_str;
-    match->cp_str.length = len;
+    ਮੇਲ->cp_str.string = new_str;
+    ਮੇਲ->cp_str.ਲੰਮਾਈ = len;
 
     // match-fname is:
     // - compl_curr_match->cp_fname if it is a string equal to fname.
     // - a copy of fname, CP_FREE_FNAME is set to free later THE allocated mem.
     // - NULL otherwise.	--Acevedo
-    if (fname != NULL
-	    && compl_curr_match != NULL
-	    && compl_curr_match->cp_fname != NULL
-	    && STRCMP(fname, compl_curr_match->cp_fname) == 0)
-	match->cp_fname = compl_curr_match->cp_fname;
-    else if (fname != NULL)
+    ਜੇ (fname != ਨਿਰਾ
+	    && compl_curr_ਮੇਲ != ਨਿਰਾ
+	    && compl_curr_ਮੇਲ->cp_fname != ਨਿਰਾ
+	    && STRCMP(fname, compl_curr_ਮੇਲ->cp_fname) == 0)
+	ਮੇਲ->cp_fname = compl_curr_ਮੇਲ->cp_fname;
+    ਨਹੀਂਤਾਂ ਜੇ (fname != ਨਿਰਾ)
     {
-	match->cp_fname = vim_strsave(fname);
+	ਮੇਲ->cp_fname = vim_strsave(fname);
 	flags |= CP_FREE_FNAME;
     }
-    else
-	match->cp_fname = NULL;
-    match->cp_flags = flags;
-    match->cp_user_abbr_hl_id = user_hl ? user_hl[0] : 0;
-    match->cp_user_kind_hl_id = user_hl ? user_hl[1] : 0;
-    match->cp_score = score;
-    match->cp_cpt_source_idx = cpt_sources_index;
+    ਨਹੀਂਤਾਂ
+	ਮੇਲ->cp_fname = ਨਿਰਾ;
+    ਮੇਲ->cp_flags = flags;
+    ਮੇਲ->cp_user_abbr_hl_id = user_hl ? user_hl[0] : 0;
+    ਮੇਲ->cp_user_ਕਿਸਮ_hl_id = user_hl ? user_hl[1] : 0;
+    ਮੇਲ->cp_score = score;
+    ਮੇਲ->cp_cpt_ਸਰੋਤ_idx = cpt_sources_ਸੂਚਕਾਂਕ;
 
-    if (cptext != NULL)
+    ਜੇ (cptext != ਨਿਰਾ)
     {
-	for (int i = 0; i < CPT_COUNT; ++i)
+	ਲਈ (ਪੂਰਨ i = 0; i < CPT_ਗਿਣਤੀ; ++i)
 	{
-	    if (cptext[i] != NULL && *cptext[i] != NUL)
-		match->cp_text[i] = vim_strsave(cptext[i]);
+	    ਜੇ (cptext[i] != ਨਿਰਾ && *cptext[i] != NUL)
+		ਮੇਲ->cp_ਪਾਠ[i] = vim_strsave(cptext[i]);
 	}
     }
-#ifdef FEAT_EVAL
-    if (user_data != NULL)
-	match->cp_user_data = *user_data;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (user_ਅੰਕੜੇ != ਨਿਰਾ)
+	ਮੇਲ->cp_user_ਅੰਕੜੇ = *user_ਅੰਕੜੇ;
+#ਜੇ_ਅੰਤ
 
     // Link the new match structure after (FORWARD) or before (BACKWARD) the
     // current match in the list of matches .
-    if (compl_first_match == NULL)
-	match->cp_next = match->cp_prev = NULL;
-    else if (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ)
+	ਮੇਲ->cp_ਅਗਲਾ = ਮੇਲ->cp_prev = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
     {
-	current = compl_first_match->cp_next;
-	prev = compl_first_match;
+	current = compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ;
+	prev = compl_ਪਹਿਲਾ_ਮੇਲ;
 	inserted = FALSE;
 	// The direction is ignored when using longest and fuzzy match, because
 	// matches are inserted and sorted by score.
-	while (current != NULL && current != compl_first_match)
+	ਜਦੋਂ (current != ਨਿਰਾ && current != compl_ਪਹਿਲਾ_ਮੇਲ)
 	{
-	    if (current->cp_score < score)
+	    ਜੇ (current->cp_score < score)
 	    {
-		match->cp_next = current;
-		match->cp_prev = current->cp_prev;
-		if (current->cp_prev)
-		    current->cp_prev->cp_next = match;
-		current->cp_prev = match;
+		ਮੇਲ->cp_ਅਗਲਾ = current;
+		ਮੇਲ->cp_prev = current->cp_prev;
+		ਜੇ (current->cp_prev)
+		    current->cp_prev->cp_ਅਗਲਾ = ਮੇਲ;
+		current->cp_prev = ਮੇਲ;
 		inserted = TRUE;
-		break;
+		ਰੋਕੋ;
 	    }
 	    prev = current;
-	    current = current->cp_next;
+	    current = current->cp_ਅਗਲਾ;
 	}
-	if (!inserted)
+	ਜੇ (!inserted)
 	{
-	    prev->cp_next = match;
-	    match->cp_prev = prev;
-	    match->cp_next = compl_first_match;
-	    compl_first_match->cp_prev = match;
+	    prev->cp_ਅਗਲਾ = ਮੇਲ;
+	    ਮੇਲ->cp_prev = prev;
+	    ਮੇਲ->cp_ਅਗਲਾ = compl_ਪਹਿਲਾ_ਮੇਲ;
+	    compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev = ਮੇਲ;
 	}
     }
-    else if (dir == FORWARD)
+    ਨਹੀਂਤਾਂ ਜੇ (dir == FORWARD)
     {
-	match->cp_next = compl_curr_match->cp_next;
-	match->cp_prev = compl_curr_match;
+	ਮੇਲ->cp_ਅਗਲਾ = compl_curr_ਮੇਲ->cp_ਅਗਲਾ;
+	ਮੇਲ->cp_prev = compl_curr_ਮੇਲ;
     }
-    else	// BACKWARD
+    ਨਹੀਂਤਾਂ	// BACKWARD
     {
-	match->cp_next = compl_curr_match;
-	match->cp_prev = compl_curr_match->cp_prev;
+	ਮੇਲ->cp_ਅਗਲਾ = compl_curr_ਮੇਲ;
+	ਮੇਲ->cp_prev = compl_curr_ਮੇਲ->cp_prev;
     }
-    if (match->cp_next)
-	match->cp_next->cp_prev = match;
-    if (match->cp_prev)
-	match->cp_prev->cp_next = match;
-    else	// if there's nothing before, it is the first match
-	compl_first_match = match;
-    compl_curr_match = match;
+    ਜੇ (ਮੇਲ->cp_ਅਗਲਾ)
+	ਮੇਲ->cp_ਅਗਲਾ->cp_prev = ਮੇਲ;
+    ਜੇ (ਮੇਲ->cp_prev)
+	ਮੇਲ->cp_prev->cp_ਅਗਲਾ = ਮੇਲ;
+    ਨਹੀਂਤਾਂ	// if there's nothing before, it is the first match
+	compl_ਪਹਿਲਾ_ਮੇਲ = ਮੇਲ;
+    compl_curr_ਮੇਲ = ਮੇਲ;
 
-    if (!match_at_original_text(match))
-	compl_strings_add(match->cp_str.string, match->cp_str.length,
+    ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(ਮੇਲ))
+	compl_ਲੜੀਆਂ_ਜੋੜੋ(ਮੇਲ->cp_str.string, ਮੇਲ->cp_str.ਲੰਮਾਈ,
 								    str_hash);
 
     // Find the longest common string if still doing that.
-    if (compl_get_longest && (flags & CP_ORIGINAL_TEXT) == 0 && !cot_fuzzy()
-	    && !ins_compl_preinsert_longest() && !ctrl_x_mode_thesaurus())
-	ins_compl_longest_match(match);
+    ਜੇ (compl_get_longest && (flags & CP_ORIGINAL_ਪਾਠ) == 0 && !cot_fuzzy()
+	    && !ins_compl_preinsert_longest() && !ctrl_x_ਬਹੁਲਕ_thesaurus())
+	ins_compl_longest_ਮੇਲ(ਮੇਲ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Return TRUE if "str[len]" matches with match->cp_str, considering
  * match->cp_flags.
  */
-    static int
-ins_compl_equal(compl_T *match, char_u *str, int len)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_equal(compl_T *ਮੇਲ, char_u *str, ਪੂਰਨ len)
 {
-    if (match->cp_flags & CP_EQUAL)
-	return TRUE;
-    if (match->cp_flags & CP_ICASE)
-	return STRNICMP(match->cp_str.string, str, (size_t)len) == 0;
-    return STRNCMP(match->cp_str.string, str, (size_t)len) == 0;
+    ਜੇ (ਮੇਲ->cp_flags & CP_EQUAL)
+	ਵਾਪਸ TRUE;
+    ਜੇ (ਮੇਲ->cp_flags & CP_ICASE)
+	ਵਾਪਸ STRNICMP(ਮੇਲ->cp_str.string, str, (size_t)len) == 0;
+    ਵਾਪਸ STRNCMP(ਮੇਲ->cp_str.string, str, (size_t)len) == 0;
 }
 
 /*
  * Like ins_compl_equal(), but ignore case in the 'longest'-inserted part of
  * the leader, so CTRL-N and CTRL-P filter the same way.
  */
-    static int
-ins_compl_equal_sc(compl_T *match, char_u *str, int len)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_equal_sc(compl_T *ਮੇਲ, char_u *str, ਪੂਰਨ len)
 {
-    int	typed = compl_length;
-    int	longest_end = (compl_get_longest && compl_longest_end_col > compl_col)
-			    ? (int)(compl_longest_end_col - compl_col) : typed;
+    ਪੂਰਨ	typed = compl_ਲੰਮਾਈ;
+    ਪੂਰਨ	longest_ਸਿਰਾ = (compl_get_longest && compl_longest_ਸਿਰਾ_ਖਾਨਾ > compl_ਖਾਨਾ)
+			    ? (ਪੂਰਨ)(compl_longest_ਸਿਰਾ_ਖਾਨਾ - compl_ਖਾਨਾ) : typed;
 
-    if ((match->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_end <= typed)
-	return ins_compl_equal(match, str, len);
+    ਜੇ ((ਮੇਲ->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_ਸਿਰਾ <= typed)
+	ਵਾਪਸ ins_compl_equal(ਮੇਲ, str, len);
 
-    if ((int)match->cp_str.length < len)
-	return FALSE;
+    ਜੇ ((ਪੂਰਨ)ਮੇਲ->cp_str.ਲੰਮਾਈ < len)
+	ਵਾਪਸ FALSE;
 
-    for (int i = 0; i < len; ++i)
+    ਲਈ (ਪੂਰਨ i = 0; i < len; ++i)
     {
-	if (i >= typed && i < longest_end
-		? TOLOWER_LOC(match->cp_str.string[i]) != TOLOWER_LOC(str[i])
-		: match->cp_str.string[i] != str[i])
-	    return FALSE;
+	ਜੇ (i >= typed && i < longest_ਸਿਰਾ
+		? TOLOWER_LOC(ਮੇਲ->cp_str.string[i]) != TOLOWER_LOC(str[i])
+		: ਮੇਲ->cp_str.string[i] != str[i])
+	    ਵਾਪਸ FALSE;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
  * when len is -1 mean use whole length of p otherwise part of p
  */
-    static void
-ins_compl_insert_bytes(char_u *p, int len)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(char_u *p, ਪੂਰਨ len)
 {
-    if (len == -1)
-	len = (int)STRLEN(p);
-    ins_bytes_len(p, len);
-    compl_ins_end_col = curwin->w_cursor.col;
+    ਜੇ (len == -1)
+	len = (ਪੂਰਨ)STRLEN(p);
+    ins_ਬਾਈਟਾਂ_len(p, len);
+    compl_ins_ਸਿਰਾ_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
 }
 
 /*
  * Get current completion leader
  */
     char_u *
-ins_compl_leader(void)
+ins_compl_leader(ਖਾਲੀ)
 {
-    return compl_leader.string != NULL ? compl_leader.string : compl_orig_text.string;
+    ਵਾਪਸ compl_leader.string != ਨਿਰਾ ? compl_leader.string : compl_orig_ਪਾਠ.string;
 }
 
 /*
  * Get current completion leader length
  */
-    static size_t
-ins_compl_leader_len(void)
+    ਸਥਿਰ size_t
+ins_compl_leader_len(ਖਾਲੀ)
 {
-    return compl_leader.string != NULL ? compl_leader.length : compl_orig_text.length;
+    ਵਾਪਸ compl_leader.string != ਨਿਰਾ ? compl_leader.ਲੰਮਾਈ : compl_orig_ਪਾਠ.ਲੰਮਾਈ;
 }
 
 /*
@@ -1227,41 +1227,41 @@ ins_compl_leader_len(void)
  * column range. If it is, it returns a special highlight attribute.
  * -1 means normal item.
  */
-    int
-ins_compl_col_range_attr(linenr_T lnum, int col)
+    ਪੂਰਨ
+ins_compl_ਖਾਨਾ_range_attr(linenr_T lnum, ਪੂਰਨ ਖਾਨਾ)
 {
-    int	    start_col;
-    int	    has_preinsert = ins_compl_has_preinsert()
+    ਪੂਰਨ	    ਸ਼ੁਰੂ_ਖਾਨਾ;
+    ਪੂਰਨ	    has_preinsert = ins_compl_has_preinsert()
 			|| ins_compl_preinsert_longest();
-    int	    attr;
+    ਪੂਰਨ	    attr;
 
-    if (cot_fuzzy()
+    ਜੇ (cot_fuzzy()
 	    || (!compl_hi_on_autocompl_longest && ins_compl_preinsert_longest())
 	    || (attr = syn_name2attr(has_preinsert
 		    ? (char_u *)"PreInsert" : (char_u *)"ComplMatchIns")) == 0)
-	return -1;
+	ਵਾਪਸ -1;
 
-    start_col = compl_col + (int)ins_compl_leader_len();
-    if (!ins_compl_has_multiple())
-	return (col >= start_col && col < compl_ins_end_col) ? attr : -1;
+    ਸ਼ੁਰੂ_ਖਾਨਾ = compl_ਖਾਨਾ + (ਪੂਰਨ)ins_compl_leader_len();
+    ਜੇ (!ins_compl_has_ਗੁਣਜ())
+	ਵਾਪਸ (ਖਾਨਾ >= ਸ਼ੁਰੂ_ਖਾਨਾ && ਖਾਨਾ < compl_ins_ਸਿਰਾ_ਖਾਨਾ) ? attr : -1;
 
     // Multiple lines
-    if ((lnum == compl_lnum && col >= start_col && col < MAXCOL) ||
+    ਜੇ ((lnum == compl_lnum && ਖਾਨਾ >= ਸ਼ੁਰੂ_ਖਾਨਾ && ਖਾਨਾ < MAXCOL) ||
 	(lnum > compl_lnum && lnum < curwin->w_cursor.lnum) ||
-	(lnum == curwin->w_cursor.lnum && col <= compl_ins_end_col))
-	return attr;
+	(lnum == curwin->w_cursor.lnum && ਖਾਨਾ <= compl_ins_ਸਿਰਾ_ਖਾਨਾ))
+	ਵਾਪਸ attr;
 
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 /*
  * Returns TRUE if the current completion string contains newline characters,
  * indicating it's a multi-line completion.
  */
-    static int
-ins_compl_has_multiple(void)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_has_ਗੁਣਜ(ਖਾਲੀ)
 {
-    return vim_strchr(compl_shown_match->cp_str.string, '\n') != NULL;
+    ਵਾਪਸ vim_strchr(compl_shown_ਮੇਲ->cp_str.string, '\n') != ਨਿਰਾ;
 }
 
 /*
@@ -1269,333 +1269,333 @@ ins_compl_has_multiple(void)
  * completion, i.e. between the starting line (compl_lnum) and current cursor
  * line. Always returns FALSE for single-line completions.
  */
-    int
-ins_compl_lnum_in_range(linenr_T lnum)
+    ਪੂਰਨ
+ins_compl_lnum_ਵਿੱਚ_range(linenr_T lnum)
 {
-    if (!ins_compl_has_multiple())
-	return FALSE;
-    return lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
+    ਜੇ (!ins_compl_has_ਗੁਣਜ())
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
 }
 
 /*
  * Reduce the longest common string for match "match".
  */
-    static void
-ins_compl_longest_match(compl_T *match)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_longest_ਮੇਲ(compl_T *ਮੇਲ)
 {
     char_u	*p, *s;
-    int		c1, c2;
-    int		had_match;
+    ਪੂਰਨ		c1, c2;
+    ਪੂਰਨ		had_ਮੇਲ;
 
-    if (compl_leader.string == NULL)
+    ਜੇ (compl_leader.string == ਨਿਰਾ)
     {
 	// First match, use it as a whole.
-	compl_leader.string = vim_strnsave(match->cp_str.string, match->cp_str.length);
-	if (compl_leader.string == NULL)
-	    return;
+	compl_leader.string = vim_strnsave(ਮੇਲ->cp_str.string, ਮੇਲ->cp_str.ਲੰਮਾਈ);
+	ਜੇ (compl_leader.string == ਨਿਰਾ)
+	    ਵਾਪਸ;
 
-	compl_leader.length = match->cp_str.length;
-	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	compl_leader.ਲੰਮਾਈ = ਮੇਲ->cp_str.ਲੰਮਾਈ;
+	had_ਮੇਲ = (curwin->w_cursor.ਖਾਨਾ > compl_ਖਾਨਾ);
+	ins_compl_longest_ਪਾਓ(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	ਜੇ (!had_ਮੇਲ)
 	    ins_compl_delete();
-	compl_used_match = FALSE;
+	compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
 
-	return;
+	ਵਾਪਸ;
     }
 
     // Reduce the text if this match differs from compl_leader.
     p = compl_leader.string;
-    s = match->cp_str.string;
-    while (*p != NUL)
+    s = ਮੇਲ->cp_str.string;
+    ਜਦੋਂ (*p != NUL)
     {
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
 	    c1 = mb_ptr2char(p);
 	    c2 = mb_ptr2char(s);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    c1 = *p;
 	    c2 = *s;
 	}
-	if ((match->cp_flags & CP_ICASE)
+	ਜੇ ((ਮੇਲ->cp_flags & CP_ICASE)
 		? (MB_TOLOWER(c1) != MB_TOLOWER(c2)) : (c1 != c2))
-	    break;
-	if (has_mbyte)
+	    ਰੋਕੋ;
+	ਜੇ (has_mbyte)
 	{
 	    MB_PTR_ADV(p);
 	    MB_PTR_ADV(s);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    ++p;
 	    ++s;
 	}
     }
 
-    if (*p != NUL)
+    ਜੇ (*p != NUL)
     {
 	// Leader was shortened, need to change the inserted text.
 	*p = NUL;
-	compl_leader.length = (size_t)(p - compl_leader.string);
+	compl_leader.ਲੰਮਾਈ = (size_t)(p - compl_leader.string);
 
-	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	had_ਮੇਲ = (curwin->w_cursor.ਖਾਨਾ > compl_ਖਾਨਾ);
+	ins_compl_longest_ਪਾਓ(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	ਜੇ (!had_ਮੇਲ)
 	    ins_compl_delete();
     }
 
-    compl_used_match = FALSE;
+    compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
 }
 
 /*
  * Add an array of matches to the list of matches.
  * Frees matches[].
  */
-    static void
-ins_compl_add_matches(
-    int		num_matches,
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਜੋੜੋ_matches(
+    ਪੂਰਨ		ਅੰਕ_matches,
     char_u	**matches,
-    int		icase)
+    ਪੂਰਨ		icase)
 {
-    int		add_r = OK;
-    int		dir = compl_direction;
+    ਪੂਰਨ		ਜੋੜੋ_r = OK;
+    ਪੂਰਨ		dir = compl_direction;
 
-    for (int i = 0; i < num_matches && add_r != FAIL; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < ਅੰਕ_matches && ਜੋੜੋ_r != FAIL; i++)
     {
-	add_r = ins_compl_add(matches[i], -1, NULL, NULL, NULL, dir,
-		CP_FAST | (icase ? CP_ICASE : 0), FALSE, NULL,
+	ਜੋੜੋ_r = ins_compl_ਜੋੜੋ(matches[i], -1, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, dir,
+		CP_FAST | (icase ? CP_ICASE : 0), FALSE, ਨਿਰਾ,
 		FUZZY_SCORE_NONE);
-	if (add_r == OK)
+	ਜੇ (ਜੋੜੋ_r == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
     }
-    FreeWild(num_matches, matches);
+    FreeWild(ਅੰਕ_matches, matches);
 }
 
 /*
  * Make the completion list cyclic.
  * Return the number of matches (excluding the original).
  */
-    static int
-ins_compl_make_cyclic(void)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_make_cyclic(ਖਾਲੀ)
 {
-    compl_T *match;
-    int	    count = 0;
+    compl_T *ਮੇਲ;
+    ਪੂਰਨ	    ਗਿਣਤੀ_2 = 0;
 
-    if (compl_first_match == NULL)
-	return 0;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
     // Find the end of the list.
-    match = compl_first_match;
+    ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
     // there's always an entry for the compl_orig_text, it doesn't count.
-    while (match->cp_next != NULL && !is_first_match(match->cp_next))
+    ਜਦੋਂ (ਮੇਲ->cp_ਅਗਲਾ != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(ਮੇਲ->cp_ਅਗਲਾ))
     {
-	match = match->cp_next;
-	++count;
+	ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ;
+	++ਗਿਣਤੀ_2;
     }
-    match->cp_next = compl_first_match;
-    compl_first_match->cp_prev = match;
+    ਮੇਲ->cp_ਅਗਲਾ = compl_ਪਹਿਲਾ_ਮੇਲ;
+    compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev = ਮੇਲ;
 
-    return count;
+    ਵਾਪਸ ਗਿਣਤੀ_2;
 }
 
 /*
  * Return whether there currently is a shown match.
  */
-    int
-ins_compl_has_shown_match(void)
+    ਪੂਰਨ
+ins_compl_has_shown_ਮੇਲ(ਖਾਲੀ)
 {
-    return compl_shown_match == NULL
-	|| compl_shown_match != compl_shown_match->cp_next;
+    ਵਾਪਸ compl_shown_ਮੇਲ == ਨਿਰਾ
+	|| compl_shown_ਮੇਲ != compl_shown_ਮੇਲ->cp_ਅਗਲਾ;
 }
 
 /*
  * Return whether the shown match is long enough.
  */
-    int
-ins_compl_long_shown_match(void)
+    ਪੂਰਨ
+ins_compl_long_shown_ਮੇਲ(ਖਾਲੀ)
 {
-    return (int)compl_shown_match->cp_str.length
-					    > curwin->w_cursor.col - compl_col;
+    ਵਾਪਸ (ਪੂਰਨ)compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ
+					    > curwin->w_cursor.ਖਾਨਾ - compl_ਖਾਨਾ;
 }
 
 /*
  * Get the local or global value of 'completeopt' flags.
  */
-    unsigned int
-get_cot_flags(void)
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ
+get_cot_flags(ਖਾਲੀ)
 {
-    return curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
+    ਵਾਪਸ curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
 }
 
 /*
  * Update the screen and when there is any scrolling remove the popup menu.
  */
-    static void
-ins_compl_upd_pum(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_upd_pum(ਖਾਲੀ)
 {
-    if (compl_match_array == NULL)
-	return;
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    int h = curwin->w_cline_height;
+    ਪੂਰਨ h = curwin->w_cline_ਉਚਾਈ;
     // Update the screen later, before drawing the popup menu over it.
     pum_call_update_screen();
-    if (h != curwin->w_cline_height)
+    ਜੇ (h != curwin->w_cline_ਉਚਾਈ)
 	ins_compl_del_pum();
 }
 
 /*
  * Remove any popup menu.
  */
-    static void
-ins_compl_del_pum(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_del_pum(ਖਾਲੀ)
 {
-    if (compl_match_array == NULL)
-	return;
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     pum_undisplay();
-    VIM_CLEAR(compl_match_array);
+    VIM_CLEAR(compl_ਮੇਲ_array);
 }
 
 /*
  * Return TRUE if the popup menu should be displayed.
  */
-    int
-pum_wanted(void)
+    ਪੂਰਨ
+pum_wanted(ਖਾਲੀ)
 {
     // 'completeopt' must contain "menu" or "menuone"
-    return (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
+    ਵਾਪਸ (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
 }
 
 /*
  * Return TRUE if there are two or more matches to be shown in the popup menu.
  * One if 'completopt' contains "menuone".
  */
-    static int
-pum_enough_matches(void)
+    ਸਥਿਰ ਪੂਰਨ
+pum_enough_matches(ਖਾਲੀ)
 {
     compl_T     *compl;
-    int		i = 0;
+    ਪੂਰਨ		i = 0;
 
     // Don't display the popup menu if there are no matches or there is only
     // one (ignoring the original text).
-    compl = compl_first_match;
-    do
+    compl = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਕਰੋ
     {
-	if (compl == NULL || (!match_at_original_text(compl) && ++i == 2))
-	    break;
-	compl = compl->cp_next;
-    } while (!is_first_match(compl));
+	ਜੇ (compl == ਨਿਰਾ || (!ਮੇਲ_at_original_ਪਾਠ(compl) && ++i == 2))
+	    ਰੋਕੋ;
+	compl = compl->cp_ਅਗਲਾ;
+    } ਜਦੋਂ (!is_ਪਹਿਲਾ_ਮੇਲ(compl));
 
-    if ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
-	return (i >= 1);
-    return (i >= 2);
+    ਜੇ ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
+	ਵਾਪਸ (i >= 1);
+    ਵਾਪਸ (i >= 2);
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Allocate Dict for the completed item.
  * { word, abbr, menu, kind, info }
  */
-    static dict_T *
-ins_compl_dict_alloc(compl_T *match)
+    ਸਥਿਰ dict_T *
+ins_compl_dict_alloc(compl_T *ਮੇਲ)
 {
-    dict_T *dict = dict_alloc_lock(VAR_FIXED);
+    dict_T *dict = dict_alloc_ਤਾਲਾ(VAR_FIXED);
 
-    if (dict == NULL)
-	return NULL;
-    fill_complete_info_dict(dict, match, FALSE);
-    return dict;
+    ਜੇ (dict == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    fill_complete_info_dict(dict, ਮੇਲ, FALSE);
+    ਵਾਪਸ dict;
 }
 
 /*
  * Trigger the CompleteChanged autocmd event. Invoked each time the Insert mode
  * completion menu is changed.
  */
-    static void
-trigger_complete_changed_event(int cur)
+    ਸਥਿਰ ਖਾਲੀ
+trigger_complete_ਬਦਲਿਆ_event(ਪੂਰਨ cur)
 {
     dict_T	    *v_event;
-    dict_T	    *item;
-    static int	    recursive = FALSE;
+    dict_T	    *ਵਸਤੂ;
+    ਸਥਿਰ ਪੂਰਨ	    recursive = FALSE;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    ਜੇ (recursive)
+	ਵਾਪਸ;
 
-    item = cur < 0 ? dict_alloc() : ins_compl_dict_alloc(compl_curr_match);
-    if (item == NULL)
-	return;
+    ਵਸਤੂ = cur < 0 ? dict_alloc() : ins_compl_dict_alloc(compl_curr_ਮੇਲ);
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਵਾਪਸ;
     v_event = get_v_event(&save_v_event);
-    dict_add_dict(v_event, "completed_item", item);
-    pum_set_event_info(v_event);
-    dict_set_items_ro(v_event);
+    dict_ਜੋੜੋ_dict(v_event, "completed_item", ਵਸਤੂ);
+    pum_ਸੈੱਟ_event_info(v_event);
+    dict_ਸੈੱਟ_ਚੀਜ਼ਾਂ_ro(v_event);
 
     recursive = TRUE;
     textlock++;
-    apply_autocmds(EVENT_COMPLETECHANGED, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_COMPLETECHANGED, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
     textlock--;
     recursive = FALSE;
 
     restore_v_event(v_event, &save_v_event);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Helper functions for mergesort_list().
  */
-    static void*
-cp_get_next(void *node)
+    ਸਥਿਰ ਖਾਲੀ*
+cp_get_ਅਗਲਾ(ਖਾਲੀ *ਗੰਢ)
 {
-    return ((compl_T*)node)->cp_next;
+    ਵਾਪਸ ((compl_T*)ਗੰਢ)->cp_ਅਗਲਾ;
 }
 
-    static void
-cp_set_next(void *node, void *next)
+    ਸਥਿਰ ਖਾਲੀ
+cp_ਸੈੱਟ_ਅਗਲਾ(ਖਾਲੀ *ਗੰਢ, ਖਾਲੀ *ਅਗਲਾ)
 {
-    ((compl_T*)node)->cp_next = (compl_T*)next;
+    ((compl_T*)ਗੰਢ)->cp_ਅਗਲਾ = (compl_T*)ਅਗਲਾ;
 }
 
-    static void*
-cp_get_prev(void* node)
+    ਸਥਿਰ ਖਾਲੀ*
+cp_get_prev(ਖਾਲੀ* ਗੰਢ)
 {
-    return ((compl_T*)node)->cp_prev;
+    ਵਾਪਸ ((compl_T*)ਗੰਢ)->cp_prev;
 }
 
-    static void
-cp_set_prev(void* node, void* prev)
+    ਸਥਿਰ ਖਾਲੀ
+cp_ਸੈੱਟ_prev(ਖਾਲੀ* ਗੰਢ, ਖਾਲੀ* prev)
 {
-    ((compl_T*)node)->cp_prev = (compl_T*)prev;
+    ((compl_T*)ਗੰਢ)->cp_prev = (compl_T*)prev;
 }
 
-    static int
-cp_compare_fuzzy(const void* a, const void* b)
+    ਸਥਿਰ ਪੂਰਨ
+cp_compare_fuzzy(ਅਚਲ ਖਾਲੀ* a, ਅਚਲ ਖਾਲੀ* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
+    ਪੂਰਨ score_a = ((compl_T*)a)->cp_score;
+    ਪੂਰਨ score_b = ((compl_T*)b)->cp_score;
 
-    if (score_a != score_b)
-	return (score_b > score_a) ? 1 : -1;
+    ਜੇ (score_a != score_b)
+	ਵਾਪਸ (score_b > score_a) ? 1 : -1;
 
-    return ((compl_T *)a)->cp_order - ((compl_T *)b)->cp_order;
+    ਵਾਪਸ ((compl_T *)a)->cp_ਕ੍ਰਮ - ((compl_T *)b)->cp_ਕ੍ਰਮ;
 }
 
-    static int
-cp_compare_nearest(const void* a, const void* b)
+    ਸਥਿਰ ਪੂਰਨ
+cp_compare_ਸਭ_ਤੋਂ_ਨੇੜੇ(ਅਚਲ ਖਾਲੀ* a, ਅਚਲ ਖਾਲੀ* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
-    if (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
-	return 0;
-    return (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
+    ਪੂਰਨ score_a = ((compl_T*)a)->cp_score;
+    ਪੂਰਨ score_b = ((compl_T*)b)->cp_score;
+    ਜੇ (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
+	ਵਾਪਸ 0;
+    ਵਾਪਸ (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
 }
 
 /*
@@ -1603,26 +1603,26 @@ cp_compare_nearest(const void* a, const void* b)
  * startcol to compl_col) to the given source string. Stores the result in
  * dest. Returns OK or FAIL.
  */
-    static int
-prepend_startcol_text(string_T *dest, string_T *src, int startcol)
+    ਸਥਿਰ ਪੂਰਨ
+prepend_startcol_ਪਾਠ(string_T *dest, string_T *src, ਪੂਰਨ startcol)
 {
-    int prepend_len = compl_col - startcol;
-    int new_length = prepend_len + (int)src->length;
+    ਪੂਰਨ prepend_len = compl_ਖਾਨਾ - startcol;
+    ਪੂਰਨ new_ਲੰਮਾਈ = prepend_len + (ਪੂਰਨ)src->ਲੰਮਾਈ;
 
-    dest->length = (size_t)new_length;
-    dest->string = alloc(new_length + 1);  // +1 for NUL
-    if (dest->string == NULL)
+    dest->ਲੰਮਾਈ = (size_t)new_ਲੰਮਾਈ;
+    dest->string = alloc(new_ਲੰਮਾਈ + 1);  // +1 for NUL
+    ਜੇ (dest->string == ਨਿਰਾ)
     {
-	dest->length = 0;
-	return FAIL;
+	dest->ਲੰਮਾਈ = 0;
+	ਵਾਪਸ FAIL;
     }
 
-    char_u	*line = ml_get(curwin->w_cursor.lnum);
+    char_u	*ਸਤਰ = ml_get(curwin->w_cursor.lnum);
 
-    mch_memmove(dest->string, line + startcol, prepend_len);
-    mch_memmove(dest->string + prepend_len, src->string, src->length);
-    dest->string[new_length] = NUL;
-    return OK;
+    mch_memmove(dest->string, ਸਤਰ + startcol, prepend_len);
+    mch_memmove(dest->string + prepend_len, src->string, src->ਲੰਮਾਈ);
+    dest->string[new_ਲੰਮਾਈ] = NUL;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1630,26 +1630,26 @@ prepend_startcol_text(string_T *dest, string_T *src, int startcol)
  * startcol. If the source's startcol is before compl_col, prepends text from
  * the buffer line to the original compl_leader.
  */
-    static string_T *
-get_leader_for_startcol(compl_T *match, int cached)
+    ਸਥਿਰ string_T *
+get_leader_for_startcol(compl_T *ਮੇਲ, ਪੂਰਨ cached)
 {
-    static string_T adjusted_leader = {NULL, 0};
+    ਸਥਿਰ string_T adjusted_leader = {ਨਿਰਾ, 0};
 
-    if (match == NULL)
+    ਜੇ (ਮੇਲ == ਨਿਰਾ)
     {
 	VIM_CLEAR_STRING(adjusted_leader);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (cpt_sources_array == NULL)
-	goto theend;
+    ਜੇ (cpt_sources_array == ਨਿਰਾ)
+	ਜਾਓ theend;
 
-    int	cpt_idx = match->cp_cpt_source_idx;
-    if (cpt_idx < 0)
-	goto theend;
-    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+    ਪੂਰਨ	cpt_idx = ਮੇਲ->cp_cpt_ਸਰੋਤ_idx;
+    ਜੇ (cpt_idx < 0)
+	ਜਾਓ theend;
+    ਪੂਰਨ	startcol = cpt_sources_array[cpt_idx].cs_startcol;
 
-    if (compl_leader.string == NULL)
+    ਜੇ (compl_leader.string == ਨਿਰਾ)
     {
 	// When leader is not set (e.g. 'autocomplete' first fires before
 	// compl_leader is initialised), fall back to compl_orig_text for
@@ -1657,129 +1657,129 @@ get_leader_for_startcol(compl_T *match, int cached)
 	// compl_col carry pre-compl_col text and must not be compared with
 	// compl_orig_text, so return &compl_leader (NULL string) to signal
 	// "pass through" (no prefix filter).
-	if (startcol < 0 || startcol >= compl_col)
-	    return &compl_orig_text;
-	return &compl_leader;  // pass through (startcol < compl_col)
+	ਜੇ (startcol < 0 || startcol >= compl_ਖਾਨਾ)
+	    ਵਾਪਸ &compl_orig_ਪਾਠ;
+	ਵਾਪਸ &compl_leader;  // pass through (startcol < compl_col)
     }
 
-    if (compl_col <= 0)
-	goto theend;
+    ਜੇ (compl_ਖਾਨਾ <= 0)
+	ਜਾਓ theend;
 
-    if (startcol >= 0 && startcol < compl_col)
+    ਜੇ (startcol >= 0 && startcol < compl_ਖਾਨਾ)
     {
-	int prepend_len = compl_col - startcol;
-	int new_length = prepend_len + (int)compl_leader.length;
-	if (cached && (size_t)new_length == adjusted_leader.length
-		&& adjusted_leader.string != NULL)
-	    return &adjusted_leader;
+	ਪੂਰਨ prepend_len = compl_ਖਾਨਾ - startcol;
+	ਪੂਰਨ new_ਲੰਮਾਈ = prepend_len + (ਪੂਰਨ)compl_leader.ਲੰਮਾਈ;
+	ਜੇ (cached && (size_t)new_ਲੰਮਾਈ == adjusted_leader.ਲੰਮਾਈ
+		&& adjusted_leader.string != ਨਿਰਾ)
+	    ਵਾਪਸ &adjusted_leader;
 
 	VIM_CLEAR_STRING(adjusted_leader);
-	if (prepend_startcol_text(&adjusted_leader, &compl_leader,
+	ਜੇ (prepend_startcol_ਪਾਠ(&adjusted_leader, &compl_leader,
 		    startcol) != OK)
-	    goto theend;
+	    ਜਾਓ theend;
 
-	return &adjusted_leader;
+	ਵਾਪਸ &adjusted_leader;
     }
 theend:
-    return &compl_leader;
+    ਵਾਪਸ &compl_leader;
 }
 
 /*
  * Set fuzzy score for completion matches.
  */
-    static void
-set_fuzzy_score(void)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_fuzzy_score(ਖਾਲੀ)
 {
     compl_T *compl;
-    char_u  *pattern;
-    int	    use_leader;
+    char_u  *ਨਮੂਨਾ;
+    ਪੂਰਨ	    use_leader;
 
-    if (compl_first_match == NULL)
-	return;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     /* Determine the pattern to match against */
-    use_leader = (compl_leader.string != NULL && compl_leader.length > 0);
-    if (!use_leader)
+    use_leader = (compl_leader.string != ਨਿਰਾ && compl_leader.ਲੰਮਾਈ > 0);
+    ਜੇ (!use_leader)
     {
-	if (compl_orig_text.string == NULL || compl_orig_text.length == 0)
-	    return;
-	pattern = compl_orig_text.string;
+	ਜੇ (compl_orig_ਪਾਠ.string == ਨਿਰਾ || compl_orig_ਪਾਠ.ਲੰਮਾਈ == 0)
+	    ਵਾਪਸ;
+	ਨਮੂਨਾ = compl_orig_ਪਾਠ.string;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	/* Clear the leader cache once before the loop */
-	(void)get_leader_for_startcol(NULL, TRUE);
-	pattern = NULL;  /* Will be computed per-completion */
+	(ਖਾਲੀ)get_leader_for_startcol(ਨਿਰਾ, TRUE);
+	ਨਮੂਨਾ = ਨਿਰਾ;  /* Will be computed per-completion */
     }
 
     /* Score all completion matches */
-    int next = 0;
-    compl = compl_first_match;
-    do
+    ਪੂਰਨ ਅਗਲਾ = 0;
+    compl = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਕਰੋ
     {
-	if (compl->cp_order < 0)
-	    compl->cp_order = next;
-	next = MAX(next, compl->cp_order + 1);
+	ਜੇ (compl->cp_ਕ੍ਰਮ < 0)
+	    compl->cp_ਕ੍ਰਮ = ਅਗਲਾ;
+	ਅਗਲਾ = MAX(ਅਗਲਾ, compl->cp_ਕ੍ਰਮ + 1);
 
-	if (use_leader)
-	    pattern = get_leader_for_startcol(compl, TRUE)->string;
+	ਜੇ (use_leader)
+	    ਨਮੂਨਾ = get_leader_for_startcol(compl, TRUE)->string;
 
-	compl->cp_score = fuzzy_match_str(compl->cp_str.string, pattern);
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl->cp_score = fuzzy_ਮੇਲ_str(compl->cp_str.string, ਨਮੂਨਾ);
+	compl = compl->cp_ਅਗਲਾ;
+    } ਜਦੋਂ (compl != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(compl));
 }
 
 /*
  * Sort completion matches, leaving the entry with the original text in place.
  */
-    static void
-sort_compl_match_list(int (*compare)(const void *, const void *))
+    ਸਥਿਰ ਖਾਲੀ
+ਛਾਂਟੋ_compl_ਮੇਲ_list(ਪੂਰਨ (*compare)(ਅਚਲ ਖਾਲੀ *, ਅਚਲ ਖਾਲੀ *))
 {
-    compl_T	*orig_text;
+    compl_T	*orig_ਪਾਠ;
 
-    if (!compl_first_match || is_first_match(compl_first_match->cp_next))
-	return;
+    ਜੇ (!compl_ਪਹਿਲਾ_ਮੇਲ || is_ਪਹਿਲਾ_ਮੇਲ(compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ))
+	ਵਾਪਸ;
 
-    orig_text = find_original_text_match();
-    if (orig_text == NULL)
-	return;
+    orig_ਪਾਠ = ਲੱਭੋ_original_ਪਾਠ_ਮੇਲ();
+    ਜੇ (orig_ਪਾਠ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    ins_compl_make_linear();
-    if (orig_text == compl_first_match)
+    ins_compl_make_ਰੇਖਿਕ();
+    ਜੇ (orig_ਪਾਠ == compl_ਪਹਿਲਾ_ਮੇਲ)
     {
-	compl_first_match->cp_next->cp_prev = NULL;
-	compl_first_match->cp_next = mergesort_list(compl_first_match->cp_next,
-		cp_get_next, cp_set_next, cp_get_prev, cp_set_prev, compare);
-	compl_first_match->cp_next->cp_prev = compl_first_match;
+	compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ->cp_prev = ਨਿਰਾ;
+	compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ = mergesort_list(compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ,
+		cp_get_ਅਗਲਾ, cp_ਸੈੱਟ_ਅਗਲਾ, cp_get_prev, cp_ਸੈੱਟ_prev, compare);
+	compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ->cp_prev = compl_ਪਹਿਲਾ_ਮੇਲ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	compl_T	*tail;
+	compl_T	*ਪੂਛ;
 
-	orig_text->cp_prev->cp_next = NULL;
-	compl_first_match = mergesort_list(compl_first_match, cp_get_next,
-		cp_set_next, cp_get_prev, cp_set_prev, compare);
-	tail = compl_first_match;
-	while (tail->cp_next != NULL)
-	    tail = tail->cp_next;
-	tail->cp_next = orig_text;
-	orig_text->cp_prev = tail;
+	orig_ਪਾਠ->cp_prev->cp_ਅਗਲਾ = ਨਿਰਾ;
+	compl_ਪਹਿਲਾ_ਮੇਲ = mergesort_list(compl_ਪਹਿਲਾ_ਮੇਲ, cp_get_ਅਗਲਾ,
+		cp_ਸੈੱਟ_ਅਗਲਾ, cp_get_prev, cp_ਸੈੱਟ_prev, compare);
+	ਪੂਛ = compl_ਪਹਿਲਾ_ਮੇਲ;
+	ਜਦੋਂ (ਪੂਛ->cp_ਅਗਲਾ != ਨਿਰਾ)
+	    ਪੂਛ = ਪੂਛ->cp_ਅਗਲਾ;
+	ਪੂਛ->cp_ਅਗਲਾ = orig_ਪਾਠ;
+	orig_ਪਾਠ->cp_prev = ਪੂਛ;
     }
-    (void)ins_compl_make_cyclic();
+    (ਖਾਲੀ)ins_compl_make_cyclic();
 }
 
 /*
  * Return the attribute for highlight group "hl_id", -1 when it has none.
  */
-    static int
-get_user_highlight_attr(int hl_id)
+    ਸਥਿਰ ਪੂਰਨ
+get_user_highlight_attr(ਪੂਰਨ hl_id)
 {
-    int	    attr;
+    ਪੂਰਨ	    attr;
 
-    if (hl_id <= 0)
-	return -1;
+    ਜੇ (hl_id <= 0)
+	ਵਾਪਸ -1;
     attr = syn_id2attr(hl_id);
-    return attr > 0 ? attr : -1;
+    ਵਾਪਸ attr > 0 ? attr : -1;
 }
 
 /*
@@ -1787,224 +1787,224 @@ get_user_highlight_attr(int hl_id)
  * Returns the popup menu entry that should be selected. Returns -1 if nothing
  * should be selected.
  */
-    static int
-ins_compl_build_pum(void)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_build_pum(ਖਾਲੀ)
 {
     compl_T     *compl;
-    compl_T     *shown_compl = NULL;
-    int		did_find_shown_match = FALSE;
-    int		shown_match_ok = FALSE;
-    int		i = 0;
-    int		cur = -1;
-    int		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
+    compl_T     *shown_compl = ਨਿਰਾ;
+    ਪੂਰਨ		did_ਲੱਭੋ_shown_ਮੇਲ = FALSE;
+    ਪੂਰਨ		shown_ਮੇਲ_ok = FALSE;
+    ਪੂਰਨ		i = 0;
+    ਪੂਰਨ		cur = -1;
+    ਪੂਰਨ		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    compl_T	*match_head = NULL;
-    compl_T	*match_tail = NULL;
-    compl_T	*match_next = NULL;
-    int		*match_count = NULL;
-    int		is_forward = compl_shows_dir_forward();
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    compl_T	*ਮੇਲ_ਸਿਰ = ਨਿਰਾ;
+    compl_T	*ਮੇਲ_ਪੂਛ = ਨਿਰਾ;
+    compl_T	*ਮੇਲ_ਅਗਲਾ = ਨਿਰਾ;
+    ਪੂਰਨ		*ਮੇਲ_ਗਿਣਤੀ = ਨਿਰਾ;
+    ਪੂਰਨ		is_forward = compl_shows_dir_forward();
+    ਪੂਰਨ		is_cpt_completion = (cpt_sources_array != ਨਿਰਾ);
     string_T	*leader;
 
     // Need to build the popup menu list.
-    compl_match_arraysize = 0;
+    compl_ਮੇਲ_arraysize = 0;
 
     // If the current match is the original text don't find the first
     // match after it, don't highlight anything.
-    if (match_at_original_text(compl_shown_match))
-	shown_match_ok = TRUE;
+    ਜੇ (ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ))
+	shown_ਮੇਲ_ok = TRUE;
 
-    if (compl_leader.string != NULL
-	    && STRCMP(compl_leader.string, compl_orig_text.string) == 0
-	    && shown_match_ok == FALSE)
-	compl_shown_match = compl_no_select ? compl_first_match
-					    : compl_first_match->cp_next;
+    ਜੇ (compl_leader.string != ਨਿਰਾ
+	    && STRCMP(compl_leader.string, compl_orig_ਪਾਠ.string) == 0
+	    && shown_ਮੇਲ_ok == FALSE)
+	compl_shown_ਮੇਲ = compl_no_select ? compl_ਪਹਿਲਾ_ਮੇਲ
+					    : compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ;
 
-    if (is_cpt_completion)
+    ਜੇ (is_cpt_completion)
     {
-	match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-	if (match_count == NULL)
-	    return -1;
+	ਮੇਲ_ਗਿਣਤੀ = ALLOC_CLEAR_MULT(ਪੂਰਨ, cpt_sources_ਗਿਣਤੀ);
+	ਜੇ (ਮੇਲ_ਗਿਣਤੀ == ਨਿਰਾ)
+	    ਵਾਪਸ -1;
     }
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (ਖਾਲੀ)get_leader_for_startcol(ਨਿਰਾ, TRUE); // Clear the cache
 
-    compl = compl_first_match;
-    do
+    compl = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਕਰੋ
     {
-	compl->cp_in_match_array = FALSE;
+	compl->cp_ਵਿੱਚ_ਮੇਲ_array = FALSE;
 
 	leader = get_leader_for_startcol(compl, TRUE);
 
 	// Apply 'smartcase': judge case from compl_orig_text, not the leader
 	// which 'longest' may fill with uppercase the user never typed.
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
-		&& !ignorecase(compl_orig_text.string) && !cot_fuzzy())
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && !p_inf && compl_orig_ਪਾਠ.string
+		&& !ignorecase(compl_orig_ਪਾਠ.string) && !cot_fuzzy())
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(compl)
+		&& (leader->string == ਨਿਰਾ
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)
+			(ਪੂਰਨ)leader->ਲੰਮਾਈ)
 		    || (cot_fuzzy() && compl->cp_score != FUZZY_SCORE_NONE)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
-	    if (is_forward && cur_source != -1 && is_cpt_completion)
+	    ਪੂਰਨ ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded = FALSE;
+	    ਪੂਰਨ cur_ਸਰੋਤ = compl->cp_cpt_ਸਰੋਤ_idx;
+	    ਜੇ (is_forward && cur_ਸਰੋਤ != -1 && is_cpt_completion)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
-		    match_limit_exceeded = TRUE;
+		ਮੇਲ_ਗਿਣਤੀ[cur_ਸਰੋਤ]++;
+		ਪੂਰਨ max_matches = cpt_sources_array[cur_ਸਰੋਤ].cs_max_matches;
+		ਜੇ (max_matches > 0 && ਮੇਲ_ਗਿਣਤੀ[cur_ਸਰੋਤ] > max_matches)
+		    ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded)
+	    ਜੇ (!ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded)
 	    {
-		++compl_match_arraysize;
-		compl->cp_in_match_array = TRUE;
-		if (match_head == NULL)
-		    match_head = compl;
-		else
-		    match_tail->cp_match_next = compl;
-		match_tail = compl;
+		++compl_ਮੇਲ_arraysize;
+		compl->cp_ਵਿੱਚ_ਮੇਲ_array = TRUE;
+		ਜੇ (ਮੇਲ_ਸਿਰ == ਨਿਰਾ)
+		    ਮੇਲ_ਸਿਰ = compl;
+		ਨਹੀਂਤਾਂ
+		    ਮੇਲ_ਪੂਛ->cp_ਮੇਲ_ਅਗਲਾ = compl;
+		ਮੇਲ_ਪੂਛ = compl;
 
-		if (!shown_match_ok && !cot_fuzzy())
+		ਜੇ (!shown_ਮੇਲ_ok && !cot_fuzzy())
 		{
-		    if (compl == compl_shown_match || did_find_shown_match)
+		    ਜੇ (compl == compl_shown_ਮੇਲ || did_ਲੱਭੋ_shown_ਮੇਲ)
 		    {
 			// This item is the shown match or this is the
 			// first displayed item after the shown match.
-			compl_shown_match = compl;
-			did_find_shown_match = TRUE;
-			shown_match_ok = TRUE;
+			compl_shown_ਮੇਲ = compl;
+			did_ਲੱਭੋ_shown_ਮੇਲ = TRUE;
+			shown_ਮੇਲ_ok = TRUE;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			// Remember this displayed match for when the
 			// shown match is just below it.
 			shown_compl = compl;
 		    cur = i;
 		}
-		else if (cot_fuzzy())
+		ਨਹੀਂਤਾਂ ਜੇ (cot_fuzzy())
 		{
-		    if (i == 0)
+		    ਜੇ (i == 0)
 			shown_compl = compl;
 
-		    if (!shown_match_ok && compl == compl_shown_match)
+		    ਜੇ (!shown_ਮੇਲ_ok && compl == compl_shown_ਮੇਲ)
 		    {
 			cur = i;
-			shown_match_ok = TRUE;
+			shown_ਮੇਲ_ok = TRUE;
 		    }
 		}
 		i++;
 	    }
 	}
 
-	if (compl == compl_shown_match && !cot_fuzzy())
+	ਜੇ (compl == compl_shown_ਮੇਲ && !cot_fuzzy())
 	{
-	    did_find_shown_match = TRUE;
+	    did_ਲੱਭੋ_shown_ਮੇਲ = TRUE;
 
 	    // When the original text is the shown match don't set
 	    // compl_shown_match.
-	    if (match_at_original_text(compl))
-		shown_match_ok = TRUE;
+	    ਜੇ (ਮੇਲ_at_original_ਪਾਠ(compl))
+		shown_ਮੇਲ_ok = TRUE;
 
-	    if (!shown_match_ok && shown_compl != NULL)
+	    ਜੇ (!shown_ਮੇਲ_ok && shown_compl != ਨਿਰਾ)
 	    {
 		// The shown match isn't displayed, set it to the
 		// previously displayed match.
-		compl_shown_match = shown_compl;
-		shown_match_ok = TRUE;
+		compl_shown_ਮੇਲ = shown_compl;
+		shown_ਮੇਲ_ok = TRUE;
 	    }
 	}
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl = compl->cp_ਅਗਲਾ;
+    } ਜਦੋਂ (compl != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(compl));
 
-    vim_free(match_count);
+    vim_free(ਮੇਲ_ਗਿਣਤੀ);
 
-    if (compl_match_arraysize == 0)
-	return -1;
+    ਜੇ (compl_ਮੇਲ_arraysize == 0)
+	ਵਾਪਸ -1;
 
-    if (cot_fuzzy() && !compl_no_select && !shown_match_ok)
+    ਜੇ (cot_fuzzy() && !compl_no_select && !shown_ਮੇਲ_ok)
     {
-	compl_shown_match = shown_compl;
-	shown_match_ok = TRUE;
+	compl_shown_ਮੇਲ = shown_compl;
+	shown_ਮੇਲ_ok = TRUE;
 	cur = 0;
     }
 
-    compl_match_array = ALLOC_CLEAR_MULT(pumitem_T, compl_match_arraysize);
-    if (compl_match_array == NULL)
-	return -1;
+    compl_ਮੇਲ_array = ALLOC_CLEAR_MULT(pumitem_T, compl_ਮੇਲ_arraysize);
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    compl = match_head;
+    compl = ਮੇਲ_ਸਿਰ;
     i = 0;
-    while (compl != NULL)
+    ਜਦੋਂ (compl != ਨਿਰਾ)
     {
-	compl_match_array[i].pum_text = compl->cp_text[CPT_ABBR] != NULL
-			    ? compl->cp_text[CPT_ABBR] : compl->cp_str.string;
-	compl_match_array[i].pum_kind = compl->cp_text[CPT_KIND];
-	compl_match_array[i].pum_info = compl->cp_text[CPT_INFO];
-	compl_match_array[i].pum_cpt_source_idx = compl->cp_cpt_source_idx;
-	compl_match_array[i].pum_user_abbr_hlattr =
+	compl_ਮੇਲ_array[i].pum_ਪਾਠ = compl->cp_ਪਾਠ[CPT_ABBR] != ਨਿਰਾ
+			    ? compl->cp_ਪਾਠ[CPT_ABBR] : compl->cp_str.string;
+	compl_ਮੇਲ_array[i].pum_ਕਿਸਮ = compl->cp_ਪਾਠ[CPT_ਕਿਸਮ];
+	compl_ਮੇਲ_array[i].pum_info = compl->cp_ਪਾਠ[CPT_INFO];
+	compl_ਮੇਲ_array[i].pum_cpt_ਸਰੋਤ_idx = compl->cp_cpt_ਸਰੋਤ_idx;
+	compl_ਮੇਲ_array[i].pum_user_abbr_hlattr =
 			get_user_highlight_attr(compl->cp_user_abbr_hl_id);
-	compl_match_array[i].pum_user_kind_hlattr =
-			get_user_highlight_attr(compl->cp_user_kind_hl_id);
-	compl_match_array[i++].pum_extra = compl->cp_text[CPT_MENU] != NULL
-			    ? compl->cp_text[CPT_MENU] : compl->cp_fname;
-	match_next = compl->cp_match_next;
-	compl->cp_match_next = NULL;
-	compl = match_next;
+	compl_ਮੇਲ_array[i].pum_user_ਕਿਸਮ_hlattr =
+			get_user_highlight_attr(compl->cp_user_ਕਿਸਮ_hl_id);
+	compl_ਮੇਲ_array[i++].pum_extra = compl->cp_ਪਾਠ[CPT_MENU] != ਨਿਰਾ
+			    ? compl->cp_ਪਾਠ[CPT_MENU] : compl->cp_fname;
+	ਮੇਲ_ਅਗਲਾ = compl->cp_ਮੇਲ_ਅਗਲਾ;
+	compl->cp_ਮੇਲ_ਅਗਲਾ = ਨਿਰਾ;
+	compl = ਮੇਲ_ਅਗਲਾ;
     }
 
-    if (!shown_match_ok)    // no displayed match at all
+    ਜੇ (!shown_ਮੇਲ_ok)    // no displayed match at all
 	cur = -1;
 
-    return cur;
+    ਵਾਪਸ cur;
 }
 
 /*
  * Show the popup menu for the list of matches.
  * Also adjusts "compl_shown_match" to an entry that is actually displayed.
  */
-    void
-ins_compl_show_pum(void)
+    ਖਾਲੀ
+ins_compl_show_pum(ਖਾਲੀ)
 {
-    int		i;
-    int		cur = -1;
-    colnr_T	col;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		cur = -1;
+    colnr_T	ਖਾਨਾ;
 
-    if (!pum_wanted() || !pum_enough_matches())
-	return;
+    ਜੇ (!pum_wanted() || !pum_enough_matches())
+	ਵਾਪਸ;
 
     // Avoid redrawing the screen under a pum that stays in place.
-    if (!pum_redraw_in_same_position())
+    ਜੇ (!pum_redraw_ਵਿੱਚ_same_position())
 	pum_call_update_screen();
 
-    if (compl_match_array == NULL)
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
 	// Need to build the popup menu list.
 	cur = ins_compl_build_pum();
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// popup menu already exists, only need to find the current item.
-	for (i = 0; i < compl_match_arraysize; ++i)
+	ਲਈ (i = 0; i < compl_ਮੇਲ_arraysize; ++i)
 	{
-	    if (compl_match_array[i].pum_text == compl_shown_match->cp_str.string
-		    || compl_match_array[i].pum_text
-				      == compl_shown_match->cp_text[CPT_ABBR])
+	    ਜੇ (compl_ਮੇਲ_array[i].pum_ਪਾਠ == compl_shown_ਮੇਲ->cp_str.string
+		    || compl_ਮੇਲ_array[i].pum_ਪਾਠ
+				      == compl_shown_ਮੇਲ->cp_ਪਾਠ[CPT_ABBR])
 	    {
 		cur = i;
-		break;
+		ਰੋਕੋ;
 	    }
 	}
     }
 
-    if (compl_match_array == NULL)
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
     {
-#ifdef FEAT_EVAL
-	if (compl_started && has_completechanged())
-	    trigger_complete_changed_event(cur);
-#endif
-	return;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	ਜੇ (compl_started && has_completechanged())
+	    trigger_complete_ਬਦਲਿਆ_event(cur);
+#ਜੇ_ਅੰਤ
+	ਵਾਪਸ;
     }
 
     // In Replace mode when a $ is displayed at the end of the line only
@@ -2013,150 +2013,150 @@ ins_compl_show_pum(void)
 
     // Position the menu at the completion start without moving the cursor
     // there, so the ruler keeps showing the real cursor column.
-    col = curwin->w_cursor.col;
-    curwin->w_cursor.col = compl_col;
-    validate_cursor_col();
-    int pum_wcol = curwin->w_wcol;
-    curwin->w_cursor.col = col;
-    validate_cursor_col();
-    compl_selected_item = cur;
+    ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
+    curwin->w_cursor.ਖਾਨਾ = compl_ਖਾਨਾ;
+    validate_cursor_ਖਾਨਾ();
+    ਪੂਰਨ pum_wcol = curwin->w_wcol;
+    curwin->w_cursor.ਖਾਨਾ = ਖਾਨਾ;
+    validate_cursor_ਖਾਨਾ();
+    compl_selected_ਵਸਤੂ = cur;
     // Flag the status line so the ruler is redrawn for the real cursor column
     // when the menu update redraws the screen.
-    curwin->w_redr_status = true;
-    pum_display(compl_match_array, compl_match_arraysize, cur, pum_wcol);
+    curwin->w_redr_ਸਥਿਤੀ = true;
+    pum_display(compl_ਮੇਲ_array, compl_ਮੇਲ_arraysize, cur, pum_wcol);
 
     // After adding leader, set the current match to shown match.
-    if (compl_started && compl_curr_match != compl_shown_match)
-	compl_curr_match = compl_shown_match;
+    ਜੇ (compl_started && compl_curr_ਮੇਲ != compl_shown_ਮੇਲ)
+	compl_curr_ਮੇਲ = compl_shown_ਮੇਲ;
 
-#ifdef FEAT_EVAL
-    if (has_completechanged())
-	trigger_complete_changed_event(cur);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (has_completechanged())
+	trigger_complete_ਬਦਲਿਆ_event(cur);
+#ਜੇ_ਅੰਤ
 }
 
-#define DICT_FIRST	(1)	// use just first element in "dict"
-#define DICT_EXACT	(2)	// "dict" is the exact name of a file
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DICT_ਪਹਿਲਾ	(1)	// use just first element in "dict"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DICT_EXACT	(2)	// "dict" is the exact name of a file
 
 /*
  * Add any identifiers that match the given pattern "pat" in the list of
  * dictionary files "dict_start" to the list of completions.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 ins_compl_dictionaries(
-    char_u	*dict_start,
+    char_u	*dict_ਸ਼ੁਰੂ,
     char_u	*pat,
-    int		flags,		// DICT_FIRST and/or DICT_EXACT
-    int		thesaurus)	// Thesaurus completion
+    ਪੂਰਨ		flags,		// DICT_FIRST and/or DICT_EXACT
+    ਪੂਰਨ		thesaurus)	// Thesaurus completion
 {
-    char_u	*dict = dict_start;
+    char_u	*dict = dict_ਸ਼ੁਰੂ;
     char_u	*ptr;
     char_u	*buf;
     regmatch_T	regmatch;
     char_u	**files;
-    int		count;
-    int		save_p_scs;
-    int		dir = compl_direction;
+    ਪੂਰਨ		ਗਿਣਤੀ_2;
+    ਪੂਰਨ		save_p_scs;
+    ਪੂਰਨ		dir = compl_direction;
 
-    if (*dict == NUL)
+    ਜੇ (*dict == NUL)
     {
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 	// When 'dictionary' is empty and spell checking is enabled use
 	// "spell".
-	if (!thesaurus && curwin->w_p_spell)
+	ਜੇ (!thesaurus && curwin->w_p_spell)
 	    dict = (char_u *)"spell";
-	else
-#endif
-	    return;
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਵਾਪਸ;
     }
 
     buf = alloc(LSIZE);
-    if (buf == NULL)
-	return;
-    regmatch.regprog = NULL;	// so that we can goto theend
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    regmatch.regprog = ਨਿਰਾ;	// so that we can goto theend
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (curbuf->b_p_inf)
+    ਜੇ (curbuf->b_p_inf)
 	p_scs = FALSE;
 
     // When invoked to match whole lines for CTRL-X CTRL-L adjust the pattern
     // to only match at the start of a line.  Otherwise just match the
     // pattern. Also need to double backslashes.
-    if (ctrl_x_mode_line_or_eval())
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
     {
 	char_u *pat_esc = vim_strsave_escaped(pat, (char_u *)"\\");
 
-	if (pat_esc == NULL)
-	    goto theend;
+	ਜੇ (pat_esc == ਨਿਰਾ)
+	    ਜਾਓ theend;
 	size_t len = STRLEN(pat_esc) + 10;
 	ptr = alloc(len);
-	if (ptr == NULL)
+	ਜੇ (ptr == ਨਿਰਾ)
 	{
 	    vim_free(pat_esc);
-	    goto theend;
+	    ਜਾਓ theend;
 	}
-	vim_snprintf((char *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
+	vim_snprintf((ਅੱਖਰ *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
 	regmatch.regprog = vim_regcomp(ptr, RE_MAGIC);
 	vim_free(pat_esc);
 	vim_free(ptr);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
-	    goto theend;
+	ਜੇ (regmatch.regprog == ਨਿਰਾ)
+	    ਜਾਓ theend;
     }
 
     // ignore case depends on 'ignorecase', 'smartcase' and "pat"
     regmatch.rm_ic = ignorecase(pat);
-    while (*dict != NUL && !got_int && !compl_interrupted)
+    ਜਦੋਂ (*dict != NUL && !got_int && !compl_interrupted)
     {
 	// copy one dictionary file name into buf
-	if (flags == DICT_EXACT)
+	ਜੇ (flags == DICT_EXACT)
 	{
-	    count = 1;
+	    ਗਿਣਤੀ_2 = 1;
 	    files = &dict;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Expand wildcards in the dictionary name, but do not allow
 	    // backticks (for security, the 'dict' option may have been set in
 	    // a modeline).
 	    copy_option_part(&dict, buf, LSIZE, ",");
-#ifdef FEAT_SPELL
-	    if (!thesaurus && STRCMP(buf, "spell") == 0)
-		count = -1;
-	    else
-#endif
-		if (vim_strchr(buf, '`') != NULL
-		    || expand_wildcards(1, &buf, &count, &files,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+	    ਜੇ (!thesaurus && STRCMP(buf, "spell") == 0)
+		ਗਿਣਤੀ_2 = -1;
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		ਜੇ (vim_strchr(buf, '`') != ਨਿਰਾ
+		    || expand_wildcards(1, &buf, &ਗਿਣਤੀ_2, &files,
 						     EW_FILE|EW_SILENT) != OK)
-		count = 0;
+		ਗਿਣਤੀ_2 = 0;
 	}
 
-#ifdef FEAT_SPELL
-	if (count == -1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+	ਜੇ (ਗਿਣਤੀ_2 == -1)
 	{
 	    // Complete from active spelling.  Skip "\<" in the pattern, we
 	    // don't use it as a RE.
-	    if (pat[0] == '\\' && pat[1] == '<')
+	    ਜੇ (pat[0] == '\\' && pat[1] == '<')
 		ptr = pat + 2;
-	    else
+	    ਨਹੀਂਤਾਂ
 		ptr = pat;
 	    spell_dump_compl(ptr, regmatch.rm_ic, &dir, 0);
 	}
-	else
-#endif
-	    if (count > 0)	// avoid warning for using "files" uninit
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਜੇ (ਗਿਣਤੀ_2 > 0)	// avoid warning for using "files" uninit
 	{
-	    ins_compl_files(count, files, thesaurus, flags, &regmatch, buf,
+	    ins_compl_files(ਗਿਣਤੀ_2, files, thesaurus, flags, &regmatch, buf,
 		    &dir);
-	    if (flags != DICT_EXACT)
-		FreeWild(count, files);
+	    ਜੇ (flags != DICT_EXACT)
+		FreeWild(ਗਿਣਤੀ_2, files);
 	}
-	if (flags != 0)
-	    break;
+	ਜੇ (flags != 0)
+	    ਰੋਕੋ;
     }
 
 theend:
@@ -2169,160 +2169,160 @@ theend:
  * Add all the words in the line "*buf_arg" from the thesaurus file "fname"
  * skipping the word at 'skip_word'.  Returns OK on success.
  */
-    static int
-thesaurus_add_words_in_line(
+    ਸਥਿਰ ਪੂਰਨ
+thesaurus_ਜੋੜੋ_ਸ਼ਬਦ_ਵਿੱਚ_ਸਤਰ(
     char_u	*fname,
     char_u	**buf_arg,
-    int		dir,
-    char_u	*skip_word)
+    ਪੂਰਨ		dir,
+    char_u	*skip_ਸ਼ਬਦ)
 {
-    int		status = OK;
+    ਪੂਰਨ		ਸਥਿਤੀ = OK;
     char_u	*ptr;
     char_u	*wstart;
 
     // Add the other matches on the line
     ptr = *buf_arg;
-    while (!got_int)
+    ਜਦੋਂ (!got_int)
     {
 	// Find start of the next word.  Skip white
 	// space and punctuation.
-	ptr = find_word_start(ptr);
-	if (*ptr == NUL || *ptr == NL)
-	    break;
+	ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸ਼ੁਰੂ(ptr);
+	ਜੇ (*ptr == NUL || *ptr == NL)
+	    ਰੋਕੋ;
 	wstart = ptr;
 
 	// Find end of the word.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	    // Japanese words may have characters in
 	    // different classes, only separate words
 	    // with single-byte non-word characters.
-	    while (*ptr != NUL)
+	    ਜਦੋਂ (*ptr != NUL)
 	    {
-		int l = (*mb_ptr2len)(ptr);
+		ਪੂਰਨ l = (*mb_ptr2len)(ptr);
 
-		if (l < 2 && !vim_iswordc(*ptr))
-		    break;
+		ਜੇ (l < 2 && !vim_iswordc(*ptr))
+		    ਰੋਕੋ;
 		ptr += l;
 	    }
-	else
-	    ptr = find_word_end(ptr);
+	ਨਹੀਂਤਾਂ
+	    ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(ptr);
 
 	// Add the word. Skip the regexp match.
-	if (wstart != skip_word)
+	ਜੇ (wstart != skip_ਸ਼ਬਦ)
 	{
-	    status = ins_compl_add_infercase(wstart, (int)(ptr - wstart), p_ic,
+	    ਸਥਿਤੀ = ins_compl_ਜੋੜੋ_infercase(wstart, (ਪੂਰਨ)(ptr - wstart), p_ic,
 		    fname, dir, FALSE, FUZZY_SCORE_NONE);
-	    if (status == FAIL)
-		break;
+	    ਜੇ (ਸਥਿਤੀ == FAIL)
+		ਰੋਕੋ;
 	}
     }
 
     *buf_arg = ptr;
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
 /*
  * Process "count" dictionary/thesaurus "files" and add the text matching
  * "regmatch".
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 ins_compl_files(
-    int		count,
+    ਪੂਰਨ		ਗਿਣਤੀ_2,
     char_u	**files,
-    int		thesaurus,
-    int		flags,
+    ਪੂਰਨ		thesaurus,
+    ਪੂਰਨ		flags,
     regmatch_T	*regmatch,
     char_u	*buf,
-    int		*dir)
+    ਪੂਰਨ		*dir)
 {
     char_u	*ptr;
-    int		i;
+    ਪੂਰਨ		i;
     FILE	*fp;
-    int		add_r;
-    char_u	*leader = NULL;
-    int		leader_len = 0;
-    int		score = 0;
-    int		len = 0;
-    char_u	*line_end = NULL;
+    ਪੂਰਨ		ਜੋੜੋ_r;
+    char_u	*leader = ਨਿਰਾ;
+    ਪੂਰਨ		leader_len = 0;
+    ਪੂਰਨ		score = 0;
+    ਪੂਰਨ		len = 0;
+    char_u	*ਸਤਰ_ਸਿਰਾ = ਨਿਰਾ;
 
-    if (cot_fuzzy())
+    ਜੇ (cot_fuzzy())
     {
 	leader = ins_compl_leader();
-	leader_len = (int)ins_compl_leader_len();
+	leader_len = (ਪੂਰਨ)ins_compl_leader_len();
     }
 
-    for (i = 0; i < count && !got_int && !ins_compl_interrupted(); i++)
+    ਲਈ (i = 0; i < ਗਿਣਤੀ_2 && !got_int && !ins_compl_interrupted(); i++)
     {
-	fp = mch_fopen((char *)files[i], "r");  // open dictionary file
-	if (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
+	fp = mch_fopen((ਅੱਖਰ *)files[i], "r");  // open dictionary file
+	ਜੇ (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
 		&& !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE,
-			      _("Scanning dictionary: %s"), (char *)files[i]);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    ਸੁਨੇਹਾ_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((ਅੱਖਰ *)IObuff, IOSIZE,
+			      _("Scanning dictionary: %s"), (ਅੱਖਰ *)files[i]);
+	    (ਖਾਲੀ)ਸੁਨੇਹਾ_trunc_attr((ਅੱਖਰ *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
 
-	if (fp == NULL)
-	    continue;
+	ਜੇ (fp == ਨਿਰਾ)
+	    ਜਾਰੀ;
 
 	// Read dictionary file line by line.
 	// Check each line for a match.
-	while (!got_int && !ins_compl_interrupted()
+	ਜਦੋਂ (!got_int && !ins_compl_interrupted()
 	       && !vim_fgets(buf, LSIZE, fp))
 	{
 	    ptr = buf;
-	    if (cot_fuzzy() && leader_len > 0)
+	    ਜੇ (cot_fuzzy() && leader_len > 0)
 	    {
-		line_end = find_line_end(ptr);
-		while (ptr < line_end)
+		ਸਤਰ_ਸਿਰਾ = ਲੱਭੋ_ਸਤਰ_ਸਿਰਾ(ptr);
+		ਜਦੋਂ (ptr < ਸਤਰ_ਸਿਰਾ)
 		{
-		    if (fuzzy_match_str_in_line(&ptr, leader, &len, NULL, &score))
+		    ਜੇ (fuzzy_ਮੇਲ_str_ਵਿੱਚ_ਸਤਰ(&ptr, leader, &len, ਨਿਰਾ, &score))
 		    {
-			char_u *end_ptr = ctrl_x_mode_line_or_eval()
-					? find_line_end(ptr) : find_word_end(ptr);
-			add_r = ins_compl_add_infercase(ptr, (int)(end_ptr - ptr),
+			char_u *end_ptr = ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval()
+					? ਲੱਭੋ_ਸਤਰ_ਸਿਰਾ(ptr) : ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(ptr);
+			ਜੋੜੋ_r = ins_compl_ਜੋੜੋ_infercase(ptr, (ਪੂਰਨ)(end_ptr - ptr),
 					    p_ic, files[i], *dir, FALSE, score);
-			if (add_r == FAIL)
-			    break;
+			ਜੇ (ਜੋੜੋ_r == FAIL)
+			    ਰੋਕੋ;
 			ptr = end_ptr;  // start from next word
-			if (compl_get_longest && ctrl_x_mode_normal()
-				&& compl_first_match->cp_next
-				&& score == compl_first_match->cp_next->cp_score)
-			    compl_num_bests++;
+			ਜੇ (compl_get_longest && ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ()
+				&& compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ
+				&& score == compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ->cp_score)
+			    compl_ਅੰਕ_bests++;
 		    }
 		}
 	    }
-	    else if (regmatch != NULL)
+	    ਨਹੀਂਤਾਂ ਜੇ (regmatch != ਨਿਰਾ)
 	    {
-		while (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
+		ਜਦੋਂ (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
 		{
 		    ptr = regmatch->startp[0];
-		    ptr = ctrl_x_mode_line_or_eval() ? find_line_end(ptr)
-						    : find_word_end(ptr);
-		    add_r = ins_compl_add_infercase(regmatch->startp[0],
-			    (int)(ptr - regmatch->startp[0]),
+		    ptr = ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval() ? ਲੱਭੋ_ਸਤਰ_ਸਿਰਾ(ptr)
+						    : ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(ptr);
+		    ਜੋੜੋ_r = ins_compl_ਜੋੜੋ_infercase(regmatch->startp[0],
+			    (ਪੂਰਨ)(ptr - regmatch->startp[0]),
 			    p_ic, files[i], *dir, FALSE, FUZZY_SCORE_NONE);
-		    if (thesaurus)
+		    ਜੇ (thesaurus)
 		    {
 			// For a thesaurus, add all the words in the line
 			ptr = buf;
-			add_r = thesaurus_add_words_in_line(files[i], &ptr, *dir,
+			ਜੋੜੋ_r = thesaurus_ਜੋੜੋ_ਸ਼ਬਦ_ਵਿੱਚ_ਸਤਰ(files[i], &ptr, *dir,
 							    regmatch->startp[0]);
 		    }
-		    if (add_r == OK)
+		    ਜੇ (ਜੋੜੋ_r == OK)
 			// if dir was BACKWARD then honor it just once
 			*dir = FORWARD;
-		    else if (add_r == FAIL)
-			break;
+		    ਨਹੀਂਤਾਂ ਜੇ (ਜੋੜੋ_r == FAIL)
+			ਰੋਕੋ;
 		    // avoid expensive call to vim_regexec() when at end
 		    // of line
-		    if (*ptr == '\n' || got_int)
-			break;
+		    ਜੇ (*ptr == '\n' || got_int)
+			ਰੋਕੋ;
 		}
 	    }
-	    line_breakcheck();
-	    ins_compl_check_keys(50, FALSE);
+	    ਸਤਰ_breakcheck();
+	    ins_compl_check_ਕੁੰਜੀਆਂ(50, FALSE);
 	}
 	fclose(fp);
     }
@@ -2333,19 +2333,19 @@ ins_compl_files(
  * Returns a pointer to the first char of the word.  Also stops at a NUL.
  */
     char_u *
-find_word_start(char_u *ptr)
+ਲੱਭੋ_ਸ਼ਬਦ_ਸ਼ੁਰੂ(char_u *ptr)
 {
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
-	while (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
+	ਜਦੋਂ (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
 	    ptr += (*mb_ptr2len)(ptr);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	while (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
+	ਜਦੋਂ (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
 	    ++ptr;
     }
-    return ptr;
+    ਵਾਪਸ ptr;
 }
 
 /*
@@ -2353,23 +2353,23 @@ find_word_start(char_u *ptr)
  * Returns a pointer to just after the word.
  */
     char_u *
-find_word_end(char_u *ptr)
+ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(char_u *ptr)
 {
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
-	int start_class = mb_get_class(ptr);
-	if (start_class > 1)
-	    while (*ptr != NUL)
+	ਪੂਰਨ ਸ਼ੁਰੂ_class = mb_get_class(ptr);
+	ਜੇ (ਸ਼ੁਰੂ_class > 1)
+	    ਜਦੋਂ (*ptr != NUL)
 	    {
 		ptr += (*mb_ptr2len)(ptr);
-		if (mb_get_class(ptr) != start_class)
-		    break;
+		ਜੇ (mb_get_class(ptr) != ਸ਼ੁਰੂ_class)
+		    ਰੋਕੋ;
 	    }
     }
-    else
-	while (vim_iswordc(*ptr))
+    ਨਹੀਂਤਾਂ
+	ਜਦੋਂ (vim_iswordc(*ptr))
 	    ++ptr;
-    return ptr;
+    ਵਾਪਸ ptr;
 }
 
 /*
@@ -2377,149 +2377,149 @@ find_word_end(char_u *ptr)
  * Returns a pointer to just after the line.
  */
     char_u *
-find_line_end(char_u *ptr)
+ਲੱਭੋ_ਸਤਰ_ਸਿਰਾ(char_u *ptr)
 {
     char_u *s = ptr + STRLEN(ptr);
-    while (s > ptr && (s[-1] == CAR || s[-1] == NL))
+    ਜਦੋਂ (s > ptr && (s[-1] == CAR || s[-1] == NL))
 	--s;
-    return s;
+    ਵਾਪਸ s;
 }
 
 /*
  * Free a completion item in the list
  */
-    static void
-ins_compl_item_free(compl_T *match)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਵਸਤੂ_free(compl_T *ਮੇਲ)
 {
     // Uncount the match string in the duplicate-check hashtab; the entry is
     // only removed with its last match.  The hashtab is empty when it was
     // already cleared as a whole by ins_compl_free().
-    if (compl_strings_ht.ht_used > 0 && match->cp_str.string != NULL
-					   && !match_at_original_text(match))
+    ਜੇ (compl_ਲੜੀਆਂ_ht.ht_ਵਰਤਿਆ > 0 && ਮੇਲ->cp_str.string != ਨਿਰਾ
+					   && !ਮੇਲ_at_original_ਪਾਠ(ਮੇਲ))
     {
-	hashitem_T *hi = hash_find(&compl_strings_ht, match->cp_str.string);
+	hashitem_T *hi = hash_ਲੱਭੋ(&compl_ਲੜੀਆਂ_ht, ਮੇਲ->cp_str.string);
 
-	if (!HASHITEM_EMPTY(hi))
+	ਜੇ (!HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi))
 	{
-	    complstr_T *entry = HI2CSE(hi);
+	    complstr_T *ਇੰਦਰਾਜ = HI2CSE(hi);
 
-	    if (--entry->cse_count <= 0)
+	    ਜੇ (--ਇੰਦਰਾਜ->cse_ਗਿਣਤੀ <= 0)
 	    {
-		hash_remove(&compl_strings_ht, hi, "completion match");
-		vim_free(entry);
+		hash_remove(&compl_ਲੜੀਆਂ_ht, hi, "completion match");
+		vim_free(ਇੰਦਰਾਜ);
 	    }
 	}
     }
-    VIM_CLEAR_STRING(match->cp_str);
+    VIM_CLEAR_STRING(ਮੇਲ->cp_str);
     // several entries may use the same fname, free it just once.
-    if (match->cp_flags & CP_FREE_FNAME)
-	vim_free(match->cp_fname);
-    for (int i = 0; i < CPT_COUNT; ++i)
-	vim_free(match->cp_text[i]);
-#ifdef FEAT_EVAL
-    clear_tv(&match->cp_user_data);
-#endif
-    vim_free(match);
+    ਜੇ (ਮੇਲ->cp_flags & CP_FREE_FNAME)
+	vim_free(ਮੇਲ->cp_fname);
+    ਲਈ (ਪੂਰਨ i = 0; i < CPT_ਗਿਣਤੀ; ++i)
+	vim_free(ਮੇਲ->cp_ਪਾਠ[i]);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    clear_tv(&ਮੇਲ->cp_user_ਅੰਕੜੇ);
+#ਜੇ_ਅੰਤ
+    vim_free(ਮੇਲ);
 }
 
 /*
  * Free the list of completions
  */
-    static void
-ins_compl_free(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_free(ਖਾਲੀ)
 {
-    compl_T *match;
+    compl_T *ਮੇਲ;
 
-    VIM_CLEAR_STRING(compl_pattern);
+    VIM_CLEAR_STRING(compl_ਨਮੂਨਾ);
     VIM_CLEAR_STRING(compl_leader);
 
-    if (compl_first_match == NULL)
-	return;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     ins_compl_del_pum();
     pum_clear();
 
     // Free the duplicate-check hashtab entries all at once, then freeing
     // the matches below does not need to uncount them one by one.
-    hash_clear_all(&compl_strings_ht, CSE_OFF);
-    hash_init(&compl_strings_ht);
+    hash_clear_all(&compl_ਲੜੀਆਂ_ht, CSE_OFF);
+    hash_init(&compl_ਲੜੀਆਂ_ht);
 
-    compl_curr_match = compl_first_match;
-    do
+    compl_curr_ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਕਰੋ
     {
-	match = compl_curr_match;
-	compl_curr_match = compl_curr_match->cp_next;
-	ins_compl_item_free(match);
-    } while (compl_curr_match != NULL && !is_first_match(compl_curr_match));
-    compl_first_match = compl_curr_match = NULL;
-    compl_shown_match = NULL;
-    compl_old_match = NULL;
+	ਮੇਲ = compl_curr_ਮੇਲ;
+	compl_curr_ਮੇਲ = compl_curr_ਮੇਲ->cp_ਅਗਲਾ;
+	ins_compl_ਵਸਤੂ_free(ਮੇਲ);
+    } ਜਦੋਂ (compl_curr_ਮੇਲ != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(compl_curr_ਮੇਲ));
+    compl_ਪਹਿਲਾ_ਮੇਲ = compl_curr_ਮੇਲ = ਨਿਰਾ;
+    compl_shown_ਮੇਲ = ਨਿਰਾ;
+    compl_old_ਮੇਲ = ਨਿਰਾ;
 }
 
 /*
  * Reset/clear the completion state.
  */
-    void
-ins_compl_clear(void)
+    ਖਾਲੀ
+ins_compl_clear(ਖਾਲੀ)
 {
-    compl_cont_status = 0;
+    compl_cont_ਸਥਿਤੀ = 0;
     compl_started = FALSE;
     compl_matches = 0;
-    compl_selected_item = -1;
-    compl_ins_end_col = 0;
-    compl_longest_end_col = 0;
-    compl_curr_win = NULL;
-    compl_curr_buf = NULL;
-    VIM_CLEAR_STRING(compl_pattern);
+    compl_selected_ਵਸਤੂ = -1;
+    compl_ins_ਸਿਰਾ_ਖਾਨਾ = 0;
+    compl_longest_ਸਿਰਾ_ਖਾਨਾ = 0;
+    compl_curr_win = ਨਿਰਾ;
+    compl_curr_buf = ਨਿਰਾ;
+    VIM_CLEAR_STRING(compl_ਨਮੂਨਾ);
     VIM_CLEAR_STRING(compl_leader);
-    edit_submode_extra = NULL;
-    VIM_CLEAR_STRING(compl_orig_text);
+    edit_submode_extra = ਨਿਰਾ;
+    VIM_CLEAR_STRING(compl_orig_ਪਾਠ);
     compl_enter_selects = FALSE;
     cpt_sources_clear();
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
-#ifdef FEAT_EVAL
+    compl_ਅੰਕ_bests = 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     // clear v:completed_item
-    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
-#endif
+    ਸੈੱਟ_vim_var_dict(VV_COMPLETED_ਵਸਤੂ, dict_alloc_ਤਾਲਾ(VAR_FIXED));
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Return TRUE when Insert completion is active.
  */
-    int
-ins_compl_active(void)
+    ਪੂਰਨ
+ins_compl_ਸਰਗਰਮ(ਖਾਲੀ)
 {
-    return compl_started;
+    ਵਾਪਸ compl_started;
 }
 
 /*
  * Return True when wp is the actual completion window
  */
-    int
-ins_compl_win_active(win_T *wp)
+    ਪੂਰਨ
+ins_compl_win_ਸਰਗਰਮ(win_T *wp)
 {
-    return ins_compl_active() && wp == compl_curr_win
-	&& wp->w_buffer == compl_curr_buf;
+    ਵਾਪਸ ins_compl_ਸਰਗਰਮ() && wp == compl_curr_win
+	&& wp->w_ਬਫਰ == compl_curr_buf;
 }
 
 /*
  * Selected one of the matches.  When FALSE, the match was either edited or
  * using the longest common string.
  */
-    int
-ins_compl_used_match(void)
+    ਪੂਰਨ
+ins_compl_ਵਰਤਿਆ_ਮੇਲ(ਖਾਲੀ)
 {
-    return compl_used_match;
+    ਵਾਪਸ compl_ਵਰਤਿਆ_ਮੇਲ;
 }
 
 /*
  * Initialize get longest common string.
  */
-    void
-ins_compl_init_get_longest(void)
+    ਖਾਲੀ
+ins_compl_init_get_longest(ਖਾਲੀ)
 {
     compl_get_longest = FALSE;
 }
@@ -2527,51 +2527,51 @@ ins_compl_init_get_longest(void)
 /*
  * Returns TRUE when insert completion is interrupted.
  */
-    int
-ins_compl_interrupted(void)
+    ਪੂਰਨ
+ins_compl_interrupted(ਖਾਲੀ)
 {
-    return compl_interrupted || compl_time_slice_expired;
+    ਵਾਪਸ compl_interrupted || compl_ਸਮਾਂ_ਟੁਕੜਾ_expired;
 }
 
 /*
  * Returns TRUE if the <Enter> key selects a match in the completion popup
  * menu.
  */
-    int
-ins_compl_enter_selects(void)
+    ਪੂਰਨ
+ins_compl_enter_selects(ਖਾਲੀ)
 {
-    return compl_enter_selects;
+    ਵਾਪਸ compl_enter_selects;
 }
 
 /*
  * Return the column where the text starts that is being completed
  */
     colnr_T
-ins_compl_col(void)
+ins_compl_ਖਾਨਾ(ਖਾਲੀ)
 {
-    return compl_col;
+    ਵਾਪਸ compl_ਖਾਨਾ;
 }
 
 /*
  * Return the length in bytes of the text being completed
  */
-    int
-ins_compl_len(void)
+    ਪੂਰਨ
+ins_compl_len(ਖਾਲੀ)
 {
-    return compl_length;
+    ਵਾਪਸ compl_ਲੰਮਾਈ;
 }
 
 /*
  * Return TRUE when the 'completeopt' "preinsert" flag is in effect,
  * otherwise return FALSE.
  */
-    int
-ins_compl_has_preinsert(void)
+    ਪੂਰਨ
+ins_compl_has_preinsert(ਖਾਲੀ)
 {
-    int cur_cot_flags = get_cot_flags();
-    if (compl_autocomplete && p_ic && !p_inf)
-	return FALSE;
-    return !compl_autocomplete
+    ਪੂਰਨ cur_cot_flags = get_cot_flags();
+    ਜੇ (compl_autocomplete && p_ic && !p_inf)
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ !compl_autocomplete
 	? (cur_cot_flags & (COT_PREINSERT | COT_FUZZY | COT_MENUONE))
 		== (COT_PREINSERT | COT_MENUONE)
 	: (cur_cot_flags & (COT_PREINSERT | COT_FUZZY)) == COT_PREINSERT;
@@ -2581,13 +2581,13 @@ ins_compl_has_preinsert(void)
  * Returns TRUE if the pre-insert effect is valid and the cursor is within
  * the `compl_ins_end_col` range.
  */
-    int
-ins_compl_preinsert_effect(void)
+    ਪੂਰਨ
+ins_compl_preinsert_effect(ਖਾਲੀ)
 {
-    if (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
-	return FALSE;
+    ਜੇ (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
+	ਵਾਪਸ FALSE;
 
-    return curwin->w_cursor.col < compl_ins_end_col;
+    ਵਾਪਸ curwin->w_cursor.ਖਾਨਾ < compl_ins_ਸਿਰਾ_ਖਾਨਾ;
 }
 
 /*
@@ -2596,101 +2596,101 @@ ins_compl_preinsert_effect(void)
  * Returns the character to be used, NUL if the work is done and another char
  * to be got from the user.
  */
-    int
-ins_compl_bs(void)
+    ਪੂਰਨ
+ins_compl_bs(ਖਾਲੀ)
 {
-    char_u	*line;
+    char_u	*ਸਤਰ;
     char_u	*p;
 
-    if (ins_compl_preinsert_effect())
+    ਜੇ (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    line = ml_get_curline();
-    p = line + curwin->w_cursor.col;
-    MB_PTR_BACK(line, p);
+    ਸਤਰ = ml_get_curline();
+    p = ਸਤਰ + curwin->w_cursor.ਖਾਨਾ;
+    MB_PTR_ਪਿੱਠ(ਸਤਰ, p);
 
     // Stop completion when the whole word was deleted.  For Omni completion
     // allow the word to be deleted, we won't match everything.
     // Respect the 'backspace' option.
-    if ((int)(p - line) - (int)compl_col < 0
-	    || ((int)(p - line) - (int)compl_col == 0 && !ctrl_x_mode_omni())
-	    || ctrl_x_mode_eval()
-	    || (!can_bs(BS_START) && (int)(p - line) - (int)compl_col
-							- compl_length < 0))
-	return K_BS;
+    ਜੇ ((ਪੂਰਨ)(p - ਸਤਰ) - (ਪੂਰਨ)compl_ਖਾਨਾ < 0
+	    || ((ਪੂਰਨ)(p - ਸਤਰ) - (ਪੂਰਨ)compl_ਖਾਨਾ == 0 && !ctrl_x_ਬਹੁਲਕ_omni())
+	    || ctrl_x_ਬਹੁਲਕ_eval()
+	    || (!can_bs(BS_ਸ਼ੁਰੂ) && (ਪੂਰਨ)(p - ਸਤਰ) - (ਪੂਰਨ)compl_ਖਾਨਾ
+							- compl_ਲੰਮਾਈ < 0))
+	ਵਾਪਸ K_BS;
 
     // Deleted more than what was used to find matches or didn't finish
     // finding all matches: need to look for matches all over again.
-    if (curwin->w_cursor.col <= compl_col + compl_length
+    ਜੇ (curwin->w_cursor.ਖਾਨਾ <= compl_ਖਾਨਾ + compl_ਲੰਮਾਈ
 						  || ins_compl_need_restart())
 	ins_compl_restart();
 
     VIM_CLEAR_STRING(compl_leader);
-    compl_leader.length = (size_t)((p - line) - compl_col);
-    compl_leader.string = vim_strnsave(line + compl_col, compl_leader.length);
-    if (compl_leader.string == NULL)
+    compl_leader.ਲੰਮਾਈ = (size_t)((p - ਸਤਰ) - compl_ਖਾਨਾ);
+    compl_leader.string = vim_strnsave(ਸਤਰ + compl_ਖਾਨਾ, compl_leader.ਲੰਮਾਈ);
+    ਜੇ (compl_leader.string == ਨਿਰਾ)
     {
-	compl_leader.length = 0;
-	return K_BS;
+	compl_leader.ਲੰਮਾਈ = 0;
+	ਵਾਪਸ K_BS;
     }
 
     // Clear selection if a menu item is currently selected in autocompletion
-    if (compl_autocomplete && compl_first_match && !ins_compl_has_preinsert())
-	compl_shown_match = compl_first_match;
+    ਜੇ (compl_autocomplete && compl_ਪਹਿਲਾ_ਮੇਲ && !ins_compl_has_preinsert())
+	compl_shown_ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
 
     ins_compl_new_leader();
-    if (compl_shown_match != NULL)
+    ਜੇ (compl_shown_ਮੇਲ != ਨਿਰਾ)
 	// Make sure current match is not a hidden item.
-	compl_curr_match = compl_shown_match;
-    return NUL;
+	compl_curr_ਮੇਲ = compl_shown_ਮੇਲ;
+    ਵਾਪਸ NUL;
 }
 
 /*
  * Return TRUE when we need to find matches again, ins_compl_restart() is to
  * be called.
  */
-    static int
-ins_compl_need_restart(void)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_need_restart(ਖਾਲੀ)
 {
     // Return TRUE if we didn't complete finding matches or when the
     // 'completefunc' returned "always" in the "refresh" dictionary item.
-    return compl_was_interrupted
-	|| ((ctrl_x_mode_function() || ctrl_x_mode_omni())
+    ਵਾਪਸ compl_was_interrupted
+	|| ((ctrl_x_ਬਹੁਲਕ_function() || ctrl_x_ਬਹੁਲਕ_omni())
 						  && compl_opt_refresh_always);
 }
 
 /*
  * Return TRUE if 'autocomplete' option is set
  */
-    int
-ins_compl_has_autocomplete(void)
+    ਪੂਰਨ
+ins_compl_has_autocomplete(ਖਾਲੀ)
 {
     // Use buffer-local setting if defined (>= 0), otherwise use global
-    return curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
+    ਵਾਪਸ curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
 }
 
 /*
  * Calculate fuzzy score and sort completion matches unless sorting is disabled.
  */
-    static void
-ins_compl_fuzzy_sort(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_fuzzy_ਛਾਂਟੋ(ਖਾਲੀ)
 {
-    int	    cur_cot_flags = get_cot_flags();
+    ਪੂਰਨ	    cur_cot_flags = get_cot_flags();
 
     // Set the fuzzy score in cp_score and sort
-    set_fuzzy_score();
-    if (!(cur_cot_flags & COT_NOSORT))
+    ਸੈੱਟ_fuzzy_score();
+    ਜੇ (!(cur_cot_flags & COT_NOSORT))
     {
-	sort_compl_match_list(cp_compare_fuzzy);
+	ਛਾਂਟੋ_compl_ਮੇਲ_list(cp_compare_fuzzy);
 	// Reset the shown item since sorting reorders items
-	if ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
+	ਜੇ ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
 	{
-	    int none_selected = compl_shown_match == (compl_shows_dir_forward()
-		    ? compl_first_match : compl_first_match->cp_prev);
-	    if (!none_selected)
-		compl_shown_match
+	    ਪੂਰਨ none_selected = compl_shown_ਮੇਲ == (compl_shows_dir_forward()
+		    ? compl_ਪਹਿਲਾ_ਮੇਲ : compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev);
+	    ਜੇ (!none_selected)
+		compl_shown_ਮੇਲ
 		    = (!compl_autocomplete && compl_shows_dir_forward())
-		    ? compl_first_match->cp_next : compl_first_match;
+		    ? compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ : compl_ਪਹਿਲਾ_ਮੇਲ;
 	}
     }
 }
@@ -2700,131 +2700,131 @@ ins_compl_fuzzy_sort(void)
  * Show the popup menu with a different set of matches.
  * May also search for matches again if the previous search was interrupted.
  */
-    static void
-ins_compl_new_leader(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_new_leader(ਖਾਲੀ)
 {
-    int	    save_w_wrow = curwin->w_wrow;
-    int	    save_w_leftcol = curwin->w_leftcol;
+    ਪੂਰਨ	    save_w_wrow = curwin->w_wrow;
+    ਪੂਰਨ	    save_w_leftcol = curwin->w_leftcol;
 
     ins_compl_del_pum();
     ins_compl_delete();
-    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
-    compl_used_match = FALSE;
+    ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(compl_leader.string + get_compl_len(), -1);
+    compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
 
-    if (compl_started)
+    ਜੇ (compl_started)
     {
-	ins_compl_set_original_text(compl_leader.string, compl_leader.length);
-	if (is_cpt_func_refresh_always())
+	ins_compl_ਸੈੱਟ_original_ਪਾਠ(compl_leader.string, compl_leader.ਲੰਮਾਈ);
+	ਜੇ (is_cpt_func_refresh_always())
 	    cpt_compl_refresh();
-	if (cot_fuzzy())
-	    ins_compl_fuzzy_sort();
+	ਜੇ (cot_fuzzy())
+	    ins_compl_fuzzy_ਛਾਂਟੋ();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 	spell_bad_len = 0;	// need to redetect bad word
-#endif
+#ਜੇ_ਅੰਤ
 	// Matches were cleared, need to search for them now.  Before drawing
 	// the popup menu display the changed text before the cursor.  Set
 	// "compl_restarting" to avoid that the first match is inserted.
 	pum_call_update_screen();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (gui.ਵਿੱਚ_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
-	    out_flush_cursor(FALSE, FALSE);
+	    ਬਾਹਰਲਾ_flush_cursor(FALSE, FALSE);
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	save_w_wrow = curwin->w_wrow;
 	save_w_leftcol = curwin->w_leftcol;
 	compl_restarting = TRUE;
-	if (ins_compl_has_autocomplete())
+	ਜੇ (ins_compl_has_autocomplete())
 	    ins_compl_enable_autocomplete();
-	else
+	ਨਹੀਂਤਾਂ
 	    compl_autocomplete = FALSE;
-	if (ins_complete(Ctrl_N, FALSE) == FAIL)
-	    compl_cont_status = 0;
+	ਜੇ (ins_complete(Ctrl_N, FALSE) == FAIL)
+	    compl_cont_ਸਥਿਤੀ = 0;
 	compl_restarting = FALSE;
     }
 
-    compl_enter_selects = !compl_used_match && compl_selected_item != -1;
+    compl_enter_selects = !compl_ਵਰਤਿਆ_ਮੇਲ && compl_selected_ਵਸਤੂ != -1;
 
     // Show the popup menu with a different set of matches.  With
     // 'autocompletedelay' the menu is already visible here, so update it
     // immediately rather than re-arming the delay, like a zero delay does.
-    if (!compl_interrupted)
+    ਜੇ (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     // Don't let Enter select the original text when there is no popup menu.
-    if (compl_match_array == NULL)
+    ਜੇ (compl_ਮੇਲ_array == ਨਿਰਾ)
 	compl_enter_selects = FALSE;
-    else if (ins_compl_has_preinsert() && compl_leader.length > 0)
-	ins_compl_insert(TRUE, FALSE);
-    else if (compl_started && ins_compl_preinsert_longest()
-	    && compl_leader.length > 0 && !ins_compl_preinsert_effect())
-	ins_compl_insert(TRUE, TRUE);
+    ਨਹੀਂਤਾਂ ਜੇ (ins_compl_has_preinsert() && compl_leader.ਲੰਮਾਈ > 0)
+	ins_compl_ਪਾਓ(TRUE, FALSE);
+    ਨਹੀਂਤਾਂ ਜੇ (compl_started && ins_compl_preinsert_longest()
+	    && compl_leader.ਲੰਮਾਈ > 0 && !ins_compl_preinsert_effect())
+	ins_compl_ਪਾਓ(TRUE, TRUE);
 }
 
 /*
  * Return the length of the completion, from the completion start column to
  * the cursor column.  Making sure it never goes below zero.
  */
-    static int
-get_compl_len(void)
+    ਸਥਿਰ ਪੂਰਨ
+get_compl_len(ਖਾਲੀ)
 {
-    int off = (int)curwin->w_cursor.col - (int)compl_col;
-    return MAX(0, off);
+    ਪੂਰਨ off = (ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ - (ਪੂਰਨ)compl_ਖਾਨਾ;
+    ਵਾਪਸ MAX(0, off);
 }
 
 /*
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addleader(int c)
+    ਖਾਲੀ
+ins_compl_addleader(ਪੂਰਨ c)
 {
-    int	    cc;
+    ਪੂਰਨ	    cc;
 
-    if (ins_compl_preinsert_effect())
+    ਜੇ (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    if (stop_arrow() == FAIL)
-	return;
-    if (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
+    ਜੇ (stop_arrow() == FAIL)
+	ਵਾਪਸ;
+    ਜੇ (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
     {
 	char_u	buf[MB_MAXBYTES + 1];
 
 	(*mb_char2bytes)(c, buf);
 	buf[cc] = NUL;
-	ins_char_bytes(buf, cc);
-	if (compl_opt_refresh_always)
-	    AppendToRedobuff(buf);
+	ins_char_ਬਾਈਟਾਂ(buf, cc);
+	ਜੇ (compl_opt_refresh_always)
+	    Append_ਮੰਜ਼ਿਲ_Redobuff(buf);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	ins_char(c);
-	if (compl_opt_refresh_always)
-	    AppendCharToRedobuff(c);
+	ਜੇ (compl_opt_refresh_always)
+	    Append_Char_ਮੰਜ਼ਿਲ_Redobuff(c);
     }
 
     // If we didn't complete finding matches we must search again.
-    if (ins_compl_need_restart())
+    ਜੇ (ins_compl_need_restart())
 	ins_compl_restart();
 
     // When 'always' is set, don't reset compl_leader. While completing,
     // cursor doesn't point to the original position, changing compl_leader
     // would break redo.
-    if (!compl_opt_refresh_always)
+    ਜੇ (!compl_opt_refresh_always)
     {
 	VIM_CLEAR_STRING(compl_leader);
-	compl_leader.length = (size_t)(curwin->w_cursor.col - compl_col);
-	compl_leader.string = vim_strnsave(ml_get_curline() + compl_col,
-		compl_leader.length);
-	if (compl_leader.string == NULL)
+	compl_leader.ਲੰਮਾਈ = (size_t)(curwin->w_cursor.ਖਾਨਾ - compl_ਖਾਨਾ);
+	compl_leader.string = vim_strnsave(ml_get_curline() + compl_ਖਾਨਾ,
+		compl_leader.ਲੰਮਾਈ);
+	ਜੇ (compl_leader.string == ਨਿਰਾ)
 	{
-	    compl_leader.length = 0;
-	    return;
+	    compl_leader.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ;
 	}
 
 	ins_compl_new_leader();
@@ -2835,81 +2835,81 @@ ins_compl_addleader(int c)
  * Setup for finding completions again without leaving CTRL-X mode.  Used when
  * BS or a key was typed while still searching for matches.
  */
-    static void
-ins_compl_restart(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_restart(ਖਾਲੀ)
 {
     ins_compl_free();
     compl_started = FALSE;
     compl_matches = 0;
-    compl_cont_status = 0;
-    compl_cont_mode = 0;
+    compl_cont_ਸਥਿਤੀ = 0;
+    compl_cont_ਬਹੁਲਕ = 0;
     cpt_sources_clear();
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
+    compl_ਅੰਕ_bests = 0;
 }
 
 /*
  * Set the first match, the original text.
  */
-    static void
-ins_compl_set_original_text(char_u *str, size_t len)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਸੈੱਟ_original_ਪਾਠ(char_u *str, size_t len)
 {
-    compl_T	*match = find_original_text_match();
+    compl_T	*ਮੇਲ = ਲੱਭੋ_original_ਪਾਠ_ਮੇਲ();
     char_u	*p;
 
     // Replace the original text entry.
-    if (match == NULL)
-	return;
+    ਜੇ (ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     p = vim_strnsave(str, len);
-    if (p == NULL)
-	return;
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    VIM_CLEAR_STRING(match->cp_str);
-    match->cp_str.string = p;
-    match->cp_str.length = len;
+    VIM_CLEAR_STRING(ਮੇਲ->cp_str);
+    ਮੇਲ->cp_str.string = p;
+    ਮੇਲ->cp_str.ਲੰਮਾਈ = len;
 }
 
 /*
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addfrommatch(void)
+    ਖਾਲੀ
+ins_compl_addfrommatch(ਖਾਲੀ)
 {
     char_u	*p;
-    int		len = (int)curwin->w_cursor.col - (int)compl_col;
-    int		c;
+    ਪੂਰਨ		len = (ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ - (ਪੂਰਨ)compl_ਖਾਨਾ;
+    ਪੂਰਨ		c;
 
-    p = compl_shown_match->cp_str.string;
-    if ((int)compl_shown_match->cp_str.length <= len)   // the match is too short
+    p = compl_shown_ਮੇਲ->cp_str.string;
+    ਜੇ ((ਪੂਰਨ)compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ <= len)   // the match is too short
     {
 	size_t	plen;
 	compl_T	*cp;
 
 	// When still at the original match use the first entry that matches
 	// the leader.
-	if (!match_at_original_text(compl_shown_match))
-	    return;
+	ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ))
+	    ਵਾਪਸ;
 
-	p = NULL;
+	p = ਨਿਰਾ;
 	plen = 0;
-	for (cp = compl_shown_match->cp_next; cp != NULL
-		&& !is_first_match(cp); cp = cp->cp_next)
+	ਲਈ (cp = compl_shown_ਮੇਲ->cp_ਅਗਲਾ; cp != ਨਿਰਾ
+		&& !is_ਪਹਿਲਾ_ਮੇਲ(cp); cp = cp->cp_ਅਗਲਾ)
 	{
-	    if (compl_leader.string == NULL
+	    ਜੇ (compl_leader.string == ਨਿਰਾ
 		    || ins_compl_equal(cp, compl_leader.string,
-			(int)compl_leader.length))
+			(ਪੂਰਨ)compl_leader.ਲੰਮਾਈ))
 	    {
 		p = cp->cp_str.string;
-		plen = cp->cp_str.length;
-		break;
+		plen = cp->cp_str.ਲੰਮਾਈ;
+		ਰੋਕੋ;
 	    }
 	}
-	if (p == NULL || (int)plen <= len)
-	    return;
+	ਜੇ (p == ਨਿਰਾ || (ਪੂਰਨ)plen <= len)
+	    ਵਾਪਸ;
     }
     p += len;
     c = PTR2CHAR(p);
@@ -2922,96 +2922,96 @@ ins_compl_addfrommatch(void)
  * compl_cont_mode and compl_cont_status.
  * Returns TRUE when the character is not to be inserted.
  */
-    static int
-set_ctrl_x_mode(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ਸੈੱਟ_ctrl_x_ਬਹੁਲਕ(ਪੂਰਨ c)
 {
-    int	    retval = FALSE;
+    ਪੂਰਨ	    retval = FALSE;
 
-    switch (c)
+    ਚੋਣ (c)
     {
-	case Ctrl_E:
-	case Ctrl_Y:
+	ਹਾਲਤ Ctrl_E:
+	ਹਾਲਤ Ctrl_Y:
 	    // scroll the window one line up or down
-	    ctrl_x_mode = CTRL_X_SCROLL;
-	    if (!(State & REPLACE_FLAG))
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_SCROLL;
+	    ਜੇ (!(State & REPLACE_FLAG))
 		edit_submode = (char_u *)_(" (insert) Scroll (^E/^Y)");
-	    else
+	    ਨਹੀਂਤਾਂ
 		edit_submode = (char_u *)_(" (replace) Scroll (^E/^Y)");
-	    edit_submode_pre = NULL;
+	    edit_submode_pre = ਨਿਰਾ;
 	    showmode();
-	    break;
-	case Ctrl_L:
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_L:
 	    // complete whole line
-	    ctrl_x_mode = CTRL_X_WHOLE_LINE;
-	    break;
-	case Ctrl_F:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਰਾ_ਸਤਰ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_F:
 	    // complete filenames
-	    ctrl_x_mode = CTRL_X_FILES;
-	    break;
-	case Ctrl_K:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_FILES;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_K:
 	    // complete words from a dictionary
-	    ctrl_x_mode = CTRL_X_DICTIONARY;
-	    break;
-	case Ctrl_R:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_DICTIONARY;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_R:
 	    // When CTRL-R is followed by '=', don't trigger register completion
 	    // This allows expressions like <C-R>=func()<CR> to work normally
-	    if (vpeekc() == '=')
-		break;
-	    ctrl_x_mode = CTRL_X_REGISTER;
-	    break;
-	case Ctrl_T:
+	    ਜੇ (vpeekc() == '=')
+		ਰੋਕੋ;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਰਜਿਸਟਰ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_T:
 	    // complete words from a thesaurus
-	    ctrl_x_mode = CTRL_X_THESAURUS;
-	    break;
-#ifdef FEAT_COMPL_FUNC
-	case Ctrl_U:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_THESAURUS;
+	    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+	ਹਾਲਤ Ctrl_U:
 	    // user defined completion
-	    ctrl_x_mode = CTRL_X_FUNCTION;
-	    break;
-	case Ctrl_O:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_FUNCTION;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_O:
 	    // omni completion
-	    ctrl_x_mode = CTRL_X_OMNI;
-	    break;
-#endif
-	case 's':
-	case Ctrl_S:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_OMNI;
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ 's':
+	ਹਾਲਤ Ctrl_S:
 	    // complete spelling suggestions
-	    ctrl_x_mode = CTRL_X_SPELL;
-#ifdef FEAT_SPELL
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_SPELL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 	    ++emsg_off;	// Avoid getting the E756 error twice.
-	    spell_back_to_badword();
+	    spell_ਪਿੱਠ_ਮੰਜ਼ਿਲ_badword();
 	    --emsg_off;
-#endif
-	    break;
-	case Ctrl_RSB:
+#ਜੇ_ਅੰਤ
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_RSB:
 	    // complete tag names
-	    ctrl_x_mode = CTRL_X_TAGS;
-	    break;
-#ifdef FEAT_FIND_ID
-	case Ctrl_I:
-	case K_S_TAB:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਟੈਗ_ਸੂਚੀ;
+	    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
+	ਹਾਲਤ Ctrl_I:
+	ਹਾਲਤ K_S_TAB:
 	    // complete keywords from included files
-	    ctrl_x_mode = CTRL_X_PATH_PATTERNS;
-	    break;
-	case Ctrl_D:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਰਸਤਾ_PATTERNS;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_D:
 	    // complete definitions from included files
-	    ctrl_x_mode = CTRL_X_PATH_DEFINES;
-	    break;
-#endif
-	case Ctrl_V:
-	case Ctrl_Q:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ;
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ Ctrl_V:
+	ਹਾਲਤ Ctrl_Q:
 	    // complete vim commands
-	    ctrl_x_mode = CTRL_X_CMDLINE;
-	    break;
-	case Ctrl_Z:
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_CMDLINE;
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_Z:
 	    // stop completion
-	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
+	    edit_submode = ਨਿਰਾ;
 	    showmode();
 	    retval = TRUE;
-	    break;
-	case Ctrl_P:
-	case Ctrl_N:
+	    ਰੋਕੋ;
+	ਹਾਲਤ Ctrl_P:
+	ਹਾਲਤ Ctrl_N:
 	    // ^X^P means LOCAL expansion if nothing interrupted (eg we
 	    // just started ^X mode, or there were enough ^X's to cancel
 	    // the previous mode, say ^X^F^X^X^P or ^P^X^X^X^P, see below)
@@ -3019,12 +3019,12 @@ set_ctrl_x_mode(int c)
 	    // ^X^F^X^P or ^P^X^X^P, see below)
 	    // nothing changes if interrupting mode 0, (eg, the flag
 	    // doesn't change when going to ADDING mode  -- Acevedo
-	    if (!(compl_cont_status & CONT_INTRPT))
-		compl_cont_status |= CONT_LOCAL;
-	    else if (compl_cont_mode != 0)
-		compl_cont_status &= ~CONT_LOCAL;
+	    ਜੇ (!(compl_cont_ਸਥਿਤੀ & CONT_INTRPT))
+		compl_cont_ਸਥਿਤੀ |= CONT_LOCAL;
+	    ਨਹੀਂਤਾਂ ਜੇ (compl_cont_ਬਹੁਲਕ != 0)
+		compl_cont_ਸਥਿਤੀ &= ~CONT_LOCAL;
 	    // FALLTHROUGH
-	default:
+	ਮੂਲ:
 	    // If we have typed at least 2 ^X's... for modes != 0, we set
 	    // compl_cont_status = 0 (eg, as if we had just started ^X
 	    // mode).
@@ -3035,70 +3035,70 @@ set_ctrl_x_mode(int c)
 	    // 'complete' and local ^P expansions respectively.
 	    // In mode 0 an extra ^X is needed since ^X^P goes to ADDING
 	    // mode  -- Acevedo
-	    if (c == Ctrl_X)
+	    ਜੇ (c == Ctrl_X)
 	    {
-		if (compl_cont_mode != 0)
-		    compl_cont_status = 0;
-		else
-		    compl_cont_mode = CTRL_X_NOT_DEFINED_YET;
+		ਜੇ (compl_cont_ਬਹੁਲਕ != 0)
+		    compl_cont_ਸਥਿਤੀ = 0;
+		ਨਹੀਂਤਾਂ
+		    compl_cont_ਬਹੁਲਕ = CTRL_X_NOT_DEFINED_YET;
 	    }
-	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
+	    edit_submode = ਨਿਰਾ;
 	    showmode();
-	    break;
+	    ਰੋਕੋ;
     }
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Trigger CompleteDone event and adds relevant information to v:event
  */
-    static void
-trigger_complete_done_event(int mode UNUSED, string_T *word UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+trigger_complete_ਪੂਰਾ_event(ਪੂਰਨ ਬਹੁਲਕ ਅਣਵਰਤਿਆ, string_T *ਸ਼ਬਦ ਅਣਵਰਤਿਆ)
 {
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     save_v_event_T	save_v_event;
     dict_T		*v_event = get_v_event(&save_v_event);
-    string_T		*mode_str;
+    string_T		*ਬਹੁਲਕ_str;
 
-    if (word == NULL || word->string == NULL)
-	(void)dict_add_string_len(v_event, "complete_word", (char_u *)"", 0);
-    else
-	(void)dict_add_string_len(v_event, "complete_word", word->string, (int)word->length);
+    ਜੇ (ਸ਼ਬਦ == ਨਿਰਾ || ਸ਼ਬਦ->string == ਨਿਰਾ)
+	(ਖਾਲੀ)dict_ਜੋੜੋ_string_len(v_event, "complete_word", (char_u *)"", 0);
+    ਨਹੀਂਤਾਂ
+	(ਖਾਲੀ)dict_ਜੋੜੋ_string_len(v_event, "complete_word", ਸ਼ਬਦ->string, (ਪੂਰਨ)ਸ਼ਬਦ->ਲੰਮਾਈ);
 
-    mode_str = &ctrl_x_mode_names[mode & ~CTRL_X_WANT_IDENT];
-    (void)dict_add_string_len(v_event, "complete_type",
-	(mode_str->string == NULL) ? (char_u *)"" : mode_str->string, (int)mode_str->length);
+    ਬਹੁਲਕ_str = &ctrl_x_ਬਹੁਲਕ_ਨਾਂ[ਬਹੁਲਕ & ~CTRL_X_WANT_IDENT];
+    (ਖਾਲੀ)dict_ਜੋੜੋ_string_len(v_event, "complete_type",
+	(ਬਹੁਲਕ_str->string == ਨਿਰਾ) ? (char_u *)"" : ਬਹੁਲਕ_str->string, (ਪੂਰਨ)ਬਹੁਲਕ_str->ਲੰਮਾਈ);
 
-    dict_set_items_ro(v_event);
-#endif
+    dict_ਸੈੱਟ_ਚੀਜ਼ਾਂ_ro(v_event);
+#ਜੇ_ਅੰਤ
     ins_apply_autocmds(EVENT_COMPLETEDONE);
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     restore_v_event(v_event, &save_v_event);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Stop insert completion mode
  */
-    static int
-ins_compl_stop(int c, int prev_mode, int retval)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_stop(ਪੂਰਨ c, ਪੂਰਨ prev_ਬਹੁਲਕ, ਪੂਰਨ retval)
 {
-    int		want_cindent;
-    string_T	word = {NULL, 0};
+    ਪੂਰਨ		want_cindent;
+    string_T	ਸ਼ਬਦ = {ਨਿਰਾ, 0};
 
     // Remove pre-inserted text when present.
-    if (ins_compl_preinsert_effect() && ins_compl_win_active(curwin))
+    ਜੇ (ins_compl_preinsert_effect() && ins_compl_win_ਸਰਗਰਮ(curwin))
 	ins_compl_delete();
 
     // Get here when we have finished typing a sequence of ^N and
     // ^P or other completion characters in CTRL-X mode.  Free up
     // memory that was used, and make sure we can redo the insert.
-    if (compl_curr_match != NULL || compl_leader.string != NULL || c == Ctrl_E)
+    ਜੇ (compl_curr_ਮੇਲ != ਨਿਰਾ || compl_leader.string != ਨਿਰਾ || c == Ctrl_E)
     {
-	char_u	*ptr = NULL;
+	char_u	*ptr = ਨਿਰਾ;
 
 	// If any of the original typed text has been changed, eg when
 	// ignorecase is set, we must add back-spaces to the redo
@@ -3106,8 +3106,8 @@ ins_compl_stop(int c, int prev_mode, int retval)
 	// of the original text that has changed.
 	// When using the longest match, edited the match or used
 	// CTRL-E then don't use the current match.
-	if (compl_curr_match != NULL && compl_used_match && c != Ctrl_E)
-	    ptr = compl_curr_match->cp_str.string;
+	ਜੇ (compl_curr_ਮੇਲ != ਨਿਰਾ && compl_ਵਰਤਿਆ_ਮੇਲ && c != Ctrl_E)
+	    ptr = compl_curr_ਮੇਲ->cp_str.string;
 	ins_compl_fixRedoBufForLeader(ptr);
     }
 
@@ -3115,70 +3115,70 @@ ins_compl_stop(int c, int prev_mode, int retval)
 
     // When completing whole lines: fix indent for 'cindent'.
     // Otherwise, break line if it's too long.
-    if (compl_cont_mode == CTRL_X_WHOLE_LINE)
+    ਜੇ (compl_cont_ਬਹੁਲਕ == CTRL_X_ਸਾਰਾ_ਸਤਰ)
     {
 	// re-indent the current line
-	if (want_cindent)
+	ਜੇ (want_cindent)
 	{
-	    do_c_expr_indent();
+	    do_c_ਵਿਅੰਜਕ_indent();
 	    want_cindent = FALSE;	// don't do it again
 	}
     }
-    else if (!compl_autocomplete || compl_used_match)
+    ਨਹੀਂਤਾਂ ਜੇ (!compl_autocomplete || compl_ਵਰਤਿਆ_ਮੇਲ)
     {
-	int prev_col = curwin->w_cursor.col;
+	ਪੂਰਨ prev_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
 
 	// put the cursor on the last char, for 'tw' formatting
-	if (prev_col > 0)
+	ਜੇ (prev_ਖਾਨਾ > 0)
 	    dec_cursor();
 	// only format when something was inserted
-	if (!arrow_used && !ins_need_undo_get() && c != Ctrl_E)
+	ਜੇ (!arrow_ਵਰਤਿਆ && !ins_need_undo_get() && c != Ctrl_E)
 	    insertchar(NUL, 0, -1);
-	if (prev_col > 0
-		&& ml_get_curline()[curwin->w_cursor.col] != NUL)
+	ਜੇ (prev_ਖਾਨਾ > 0
+		&& ml_get_curline()[curwin->w_cursor.ਖਾਨਾ] != NUL)
 	    inc_cursor();
     }
 
     // If the popup menu is displayed pressing CTRL-Y means accepting
     // the selection without inserting anything.  When
     // compl_enter_selects is set the Enter key does the same.
-    if ((c == Ctrl_Y || (compl_enter_selects
+    ਜੇ ((c == Ctrl_Y || (compl_enter_selects
 		    && (c == CAR || c == K_KENTER || c == NL)))
 	    && pum_visible())
     {
-	word.string = vim_strnsave(compl_shown_match->cp_str.string,
-	    compl_shown_match->cp_str.length);
-	if (word.string == NULL)
-	    word.length = 0;
-	else
-	    word.length = compl_shown_match->cp_str.length;
+	ਸ਼ਬਦ.string = vim_strnsave(compl_shown_ਮੇਲ->cp_str.string,
+	    compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ);
+	ਜੇ (ਸ਼ਬਦ.string == ਨਿਰਾ)
+	    ਸ਼ਬਦ.ਲੰਮਾਈ = 0;
+	ਨਹੀਂਤਾਂ
+	    ਸ਼ਬਦ.ਲੰਮਾਈ = compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ;
 	retval = TRUE;
     }
 
     // CTRL-E means completion is Ended, go back to the typed text.
     // but only do this, if the Popup is still visible
-    if (c == Ctrl_E)
+    ਜੇ (c == Ctrl_E)
     {
-	char_u *p = NULL;
+	char_u *p = ਨਿਰਾ;
 	size_t	plen = 0;
 
 	ins_compl_delete();
-	if (compl_leader.string != NULL)
+	ਜੇ (compl_leader.string != ਨਿਰਾ)
 	{
 	    p = compl_leader.string;
-	    plen = compl_leader.length;
+	    plen = compl_leader.ਲੰਮਾਈ;
 	}
-	else if (compl_first_match != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ != ਨਿਰਾ)
 	{
-	    p = compl_orig_text.string;
-	    plen = compl_orig_text.length;
+	    p = compl_orig_ਪਾਠ.string;
+	    plen = compl_orig_ਪਾਠ.ਲੰਮਾਈ;
 	}
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
-	    int	    compl_len = get_compl_len();
+	    ਪੂਰਨ	    compl_len = get_compl_len();
 
-	    if ((int)plen > compl_len)
-		ins_compl_insert_bytes(p + compl_len, (int)plen - compl_len);
+	    ਜੇ ((ਪੂਰਨ)plen > compl_len)
+		ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(p + compl_len, (ਪੂਰਨ)plen - compl_len);
 	}
 	retval = TRUE;
     }
@@ -3188,49 +3188,49 @@ ins_compl_stop(int c, int prev_mode, int retval)
     // Trigger the CompleteDonePre event to give scripts a chance to
     // act upon the completion before clearing the info, and restore
     // ctrl_x_mode, so that complete_info() can be used.
-    ctrl_x_mode = prev_mode;
+    ctrl_x_ਬਹੁਲਕ = prev_ਬਹੁਲਕ;
     ins_apply_autocmds(EVENT_COMPLETEDONEPRE);
 
     ins_compl_free();
     compl_started = FALSE;
     compl_matches = 0;
-    if (!shortmess(SHM_COMPLETIONMENU))
-	msg_clr_cmdline();	// necessary for "noshowmode"
-    ctrl_x_mode = CTRL_X_NORMAL;
+    ਜੇ (!shortmess(SHM_COMPLETIONMENU))
+	ਸੁਨੇਹਾ_clr_cmdline();	// necessary for "noshowmode"
+    ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
     compl_enter_selects = FALSE;
-    if (edit_submode != NULL)
+    ਜੇ (edit_submode != ਨਿਰਾ)
     {
-	edit_submode = NULL;
+	edit_submode = ਨਿਰਾ;
 	showmode();
     }
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
-    compl_ins_end_col = 0;
+    compl_ਅੰਕ_bests = 0;
+    compl_ins_ਸਿਰਾ_ਖਾਨਾ = 0;
 
-    if (c == Ctrl_C && cmdwin_type != 0)
+    ਜੇ (c == Ctrl_C && cmdwin_type != 0)
 	// Avoid the popup menu remains displayed when leaving the
 	// command line window.
 	update_screen(0);
     // Indent now if a key was typed that is in 'cinkeys'.
-    if (want_cindent && in_cinkeys(KEY_COMPLETE, ' ', inindent(0)))
-	do_c_expr_indent();
+    ਜੇ (want_cindent && ਵਿੱਚ_cinkeys(ਕੁੰਜੀ_COMPLETE, ' ', inindent(0)))
+	do_c_ਵਿਅੰਜਕ_indent();
     // Trigger the CompleteDone event to give scripts a chance to act
     // upon the end of completion.
-    trigger_complete_done_event(prev_mode, &word);
-    vim_free(word.string);
+    trigger_complete_ਪੂਰਾ_event(prev_ਬਹੁਲਕ, &ਸ਼ਬਦ);
+    vim_free(ਸ਼ਬਦ.string);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Cancel completion.
  */
-    int
-ins_compl_cancel(void)
+    ਪੂਰਨ
+ins_compl_cancel(ਖਾਲੀ)
 {
-    return ins_compl_stop(' ', ctrl_x_mode, TRUE);
+    ਵਾਪਸ ins_compl_stop(' ', ctrl_x_ਬਹੁਲਕ, TRUE);
 }
 
 /*
@@ -3238,30 +3238,30 @@ ins_compl_cancel(void)
  * Called just after typing a character in Insert mode.
  * Returns TRUE when the character is not to be inserted;
  */
-    int
-ins_compl_prep(int c)
+    ਪੂਰਨ
+ins_compl_prep(ਪੂਰਨ c)
 {
-    int	    retval = FALSE;
-    int	    prev_mode = ctrl_x_mode;
+    ਪੂਰਨ	    retval = FALSE;
+    ਪੂਰਨ	    prev_ਬਹੁਲਕ = ctrl_x_ਬਹੁਲਕ;
 
     // Forget any previous 'special' messages if this is actually
     // a ^X mode key - bar ^R, in which case we wait to see what it gives us.
-    if (c != Ctrl_R && vim_is_ctrl_x_key(c))
-	edit_submode_extra = NULL;
+    ਜੇ (c != Ctrl_R && vim_is_ctrl_x_ਕੁੰਜੀ(c))
+	edit_submode_extra = ਨਿਰਾ;
 
     // Ignore end of Select mode mapping and mouse scroll/movement.
-    if (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
+    ਜੇ (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
 	    || c == K_MOUSELEFT || c == K_MOUSERIGHT || c == K_MOUSEMOVE
 	    || c == K_COMMAND || c == K_SCRIPT_COMMAND)
-	return retval;
+	ਵਾਪਸ retval;
 
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
     // Ignore mouse events in a popup window
-    if (is_mouse_key(c))
+    ਜੇ (is_mouse_ਕੁੰਜੀ(c))
     {
 	// Ignore drag and release events, the position does not need to be in
 	// the popup and it may have just closed.
-	if (c == K_LEFTRELEASE
+	ਜੇ (c == K_LEFTRELEASE
 		|| c == K_LEFTRELEASE_NM
 		|| c == K_MIDDLERELEASE
 		|| c == K_RIGHTRELEASE
@@ -3272,92 +3272,92 @@ ins_compl_prep(int c)
 		|| c == K_RIGHTDRAG
 		|| c == K_X1DRAG
 		|| c == K_X2DRAG)
-	    return retval;
-	if (popup_visible)
+	    ਵਾਪਸ retval;
+	ਜੇ (popup_visible)
 	{
-	    int	    row = mouse_row;
-	    int	    col = mouse_col;
-	    win_T   *wp = mouse_find_win(&row, &col, FIND_POPUP);
+	    ਪੂਰਨ	    ਪੰਕਤੀ = mouse_ਪੰਕਤੀ;
+	    ਪੂਰਨ	    ਖਾਨਾ = mouse_ਖਾਨਾ;
+	    win_T   *wp = mouse_ਲੱਭੋ_win(&ਪੰਕਤੀ, &ਖਾਨਾ, ਲੱਭੋ_POPUP);
 
-	    if (wp != NULL && WIN_IS_POPUP(wp))
-		return retval;
+	    ਜੇ (wp != ਨਿਰਾ && WIN_IS_POPUP(wp))
+		ਵਾਪਸ retval;
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
+    ਜੇ (ctrl_x_ਬਹੁਲਕ == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
     {
-	if (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_key(c)
-		|| !vim_is_ctrl_x_key(c))
+	ਜੇ (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_ਕੁੰਜੀ(c)
+		|| !vim_is_ctrl_x_ਕੁੰਜੀ(c))
 	{
 	    // Not starting another completion mode.
-	    ctrl_x_mode = CTRL_X_CMDLINE;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_CMDLINE;
 
 	    // CTRL-X CTRL-Z should stop completion without inserting anything
-	    if (c == Ctrl_Z)
+	    ਜੇ (c == Ctrl_Z)
 		retval = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    ctrl_x_mode = CTRL_X_CMDLINE;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_CMDLINE;
 
 	    // Other CTRL-X keys first stop completion, then start another
 	    // completion mode.
 	    ins_compl_prep(' ');
-	    ctrl_x_mode = CTRL_X_NOT_DEFINED_YET;
+	    ctrl_x_ਬਹੁਲਕ = CTRL_X_NOT_DEFINED_YET;
 	}
     }
 
     // Set "compl_get_longest" when finding the first matches.
-    if (ctrl_x_mode_not_defined_yet()
-			   || (ctrl_x_mode_normal() && !compl_started))
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_not_defined_yet()
+			   || (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && !compl_started))
     {
 	compl_get_longest = (get_cot_flags() & COT_LONGEST);
-	compl_used_match = TRUE;
+	compl_ਵਰਤਿਆ_ਮੇਲ = TRUE;
     }
 
-    if (ctrl_x_mode_not_defined_yet())
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_not_defined_yet())
 	// We have just typed CTRL-X and aren't quite sure which CTRL-X mode
 	// it will be yet.  Now we decide.
-	retval = set_ctrl_x_mode(c);
-    else if (ctrl_x_mode_not_default())
+	retval = ਸੈੱਟ_ctrl_x_ਬਹੁਲਕ(c);
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_not_default())
     {
 	// We're already in CTRL-X mode, do we stay in it?
-	if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+	ਜੇ (c != Ctrl_R && !vim_is_ctrl_x_ਕੁੰਜੀ(c))
 	{
-	    ctrl_x_mode = ctrl_x_mode_scroll() ? CTRL_X_NORMAL : CTRL_X_FINISHED;
-	    edit_submode = NULL;
+	    ctrl_x_ਬਹੁਲਕ = ctrl_x_ਬਹੁਲਕ_scroll() ? CTRL_X_ਸਾਧਾਰਨ : CTRL_X_ਮੁਕੰਮਲ;
+	    edit_submode = ਨਿਰਾ;
 	}
 	showmode();
     }
 
-    if (compl_started || ctrl_x_mode == CTRL_X_FINISHED)
+    ਜੇ (compl_started || ctrl_x_ਬਹੁਲਕ == CTRL_X_ਮੁਕੰਮਲ)
     {
 	// Show error message from attempted keyword completion (probably
 	// 'Pattern not found') until another key is hit, then go back to
 	// showing what mode we are in.
 	showmode();
-	if ((ctrl_x_mode_normal() && c != Ctrl_N && c != Ctrl_P
-				       && c != Ctrl_R && !ins_compl_pum_key(c))
-		|| ctrl_x_mode == CTRL_X_FINISHED)
-	    retval = ins_compl_stop(c, prev_mode, retval);
+	ਜੇ ((ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && c != Ctrl_N && c != Ctrl_P
+				       && c != Ctrl_R && !ins_compl_pum_ਕੁੰਜੀ(c))
+		|| ctrl_x_ਬਹੁਲਕ == CTRL_X_ਮੁਕੰਮਲ)
+	    retval = ins_compl_stop(c, prev_ਬਹੁਲਕ, retval);
     }
-    else if (ctrl_x_mode == CTRL_X_LOCAL_MSG)
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ == CTRL_X_LOCAL_ਸੁਨੇਹਾ)
 	// Trigger the CompleteDone event to give scripts a chance to act
 	// upon the (possibly failed) completion.
-	trigger_complete_done_event(ctrl_x_mode, NULL);
+	trigger_complete_ਪੂਰਾ_event(ctrl_x_ਬਹੁਲਕ, ਨਿਰਾ);
 
     may_trigger_modechanged();
 
     // reset continue_* if we left expansion-mode, if we stay they'll be
     // (re)set properly in ins_complete()
-    if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+    ਜੇ (c != Ctrl_R && !vim_is_ctrl_x_ਕੁੰਜੀ(c))
     {
-	compl_cont_status = 0;
-	compl_cont_mode = 0;
+	compl_cont_ਸਥਿਤੀ = 0;
+	compl_cont_ਬਹੁਲਕ = 0;
     }
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -3365,36 +3365,36 @@ ins_compl_prep(int c)
  * text.  This inserts backspaces and appends the changed text.
  * "ptr" is the known leader text or NUL.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
 {
-    int	    len = 0;
+    ਪੂਰਨ	    len = 0;
     char_u  *p;
     char_u  *ptr = ptr_arg;
 
-    if (ptr == NULL)
+    ਜੇ (ptr == ਨਿਰਾ)
     {
-	if (compl_leader.string != NULL)
+	ਜੇ (compl_leader.string != ਨਿਰਾ)
 	    ptr = compl_leader.string;
-	else
-	    return;  // nothing to do
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ;  // nothing to do
     }
-    if (compl_orig_text.string != NULL)
+    ਜੇ (compl_orig_ਪਾਠ.string != ਨਿਰਾ)
     {
-	p = compl_orig_text.string;
+	p = compl_orig_ਪਾਠ.string;
 	// Find length of common prefix between original text and new completion
-	while (p[len] != NUL && p[len] == ptr[len])
+	ਜਦੋਂ (p[len] != NUL && p[len] == ptr[len])
 	    len++;
 	// Adjust length to not break inside a multi-byte character
-	if (len > 0)
-	    len -= (*mb_head_off)(p, p + len);
+	ਜੇ (len > 0)
+	    len -= (*mb_ਸਿਰ_off)(p, p + len);
 	// Add backspace characters for each remaining character in
 	// original text
-	for (p += len; *p != NUL; MB_PTR_ADV(p))
-	    AppendCharToRedobuff(K_BS);
+	ਲਈ (p += len; *p != NUL; MB_PTR_ADV(p))
+	    Append_Char_ਮੰਜ਼ਿਲ_Redobuff(K_BS);
     }
-    if (ptr != NULL)
-	AppendToRedobuffLit(ptr + len, -1);
+    ਜੇ (ptr != ਨਿਰਾ)
+	Append_ਮੰਜ਼ਿਲ_Redobuff_Lit(ptr + len, -1);
 }
 
 /*
@@ -3405,100 +3405,100 @@ ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
  *
  * Returns the buffer to scan, if any, otherwise returns curbuf -- Acevedo
  */
-    static buf_T *
-ins_compl_next_buf(buf_T *buf, int flag)
+    ਸਥਿਰ buf_T *
+ins_compl_ਅਗਲਾ_buf(buf_T *buf, ਪੂਰਨ flag)
 {
-    static win_T    *wp = NULL;
-    int		    skip_buffer;
+    ਸਥਿਰ win_T    *wp = ਨਿਰਾ;
+    ਪੂਰਨ		    skip_ਬਫਰ;
 
-    if (flag == 'w')		// just windows
+    ਜੇ (flag == 'w')		// just windows
     {
-	if (buf == curbuf || !win_valid(wp))
+	ਜੇ (buf == curbuf || !win_valid(wp))
 	    // first call for this flag/expansion or window was closed
 	    wp = curwin;
 
-	while (TRUE)
+	ਜਦੋਂ (TRUE)
 	{
 	    // Move to next window (wrap to first window if at the end)
-	    wp = (wp->w_next != NULL) ? wp->w_next : firstwin;
+	    wp = (wp->w_ਅਗਲਾ != ਨਿਰਾ) ? wp->w_ਅਗਲਾ : firstwin;
 	    // Break if we're back at start or found an unscanned buffer
-	    if (wp == curwin || !wp->w_buffer->b_scanned)
-		break;
+	    ਜੇ (wp == curwin || !wp->w_ਬਫਰ->b_scanned)
+		ਰੋਕੋ;
 	}
-	buf = wp->w_buffer;
+	buf = wp->w_ਬਫਰ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// 'b' (just loaded buffers), 'u' (just non-loaded buffers) or 'U'
 	// (unlisted buffers)
 	// When completing whole lines skip unloaded buffers.
-	while (TRUE)
+	ਜਦੋਂ (TRUE)
 	{
 	    // Move to next buffer (wrap to first buffer if at the end)
-	    buf = (buf->b_next != NULL) ? buf->b_next : firstbuf;
+	    buf = (buf->b_ਅਗਲਾ != ਨਿਰਾ) ? buf->b_ਅਗਲਾ : firstbuf;
 	    // Break if we're back at start buffer
-	    if (buf == curbuf)
-		break;
+	    ਜੇ (buf == curbuf)
+		ਰੋਕੋ;
 
 	    // Check buffer conditions based on flag
-	    if (flag == 'U')
-		skip_buffer = buf->b_p_bl;
-	    else
-		skip_buffer = !buf->b_p_bl ||
-		    (buf->b_ml.ml_mfp == NULL) != (flag == 'u');
+	    ਜੇ (flag == 'U')
+		skip_ਬਫਰ = buf->b_p_bl;
+	    ਨਹੀਂਤਾਂ
+		skip_ਬਫਰ = !buf->b_p_bl ||
+		    (buf->b_ml.ml_mfp == ਨਿਰਾ) != (flag == 'u');
 
 	    // Break if we found a buffer that matches our criteria
-	    if (!skip_buffer && !buf->b_scanned)
-		break;
+	    ਜੇ (!skip_ਬਫਰ && !buf->b_scanned)
+		ਰੋਕੋ;
 	}
     }
-    return buf;
+    ਵਾਪਸ buf;
 }
 
 /*
  * Count the number of entries in the 'complete' option value "cpt".
  * Each non-empty, comma-separated segment is counted as one entry.
  */
-    static int
-get_cpt_sources_count(char_u *cpt)
+    ਸਥਿਰ ਪੂਰਨ
+get_cpt_sources_ਗਿਣਤੀ(char_u *cpt)
 {
     char_u  dummy[LSIZE];
-    int	    count = 0;
+    ਪੂਰਨ	    ਗਿਣਤੀ_2 = 0;
     char_u  *p;
 
-    for (p = cpt; *p != NUL; )
+    ਲਈ (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	ਜਦੋਂ (*p == ',' || *p == ' ')
 	    p++;  // Skip delimiters
 
-	if (*p != NUL)
+	ਜੇ (*p != NUL)
 	{
-	    (void)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
-	    count++;
+	    (ਖਾਲੀ)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
+	    ਗਿਣਤੀ_2++;
 	}
     }
 
-    return count;
+    ਵਾਪਸ ਗਿਣਤੀ_2;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
 
 # ifdef FEAT_EVAL
-static callback_T cfu_cb;	    // 'completefunc' callback function
-static callback_T ofu_cb;	    // 'omnifunc' callback function
-static callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
-static callback_T *cpt_cb;	    // Callback functions associated with F{func}
-static int	  cpt_cb_count;	    // Number of cpt callbacks
+ਸਥਿਰ callback_T cfu_cb;	    // 'completefunc' callback function
+ਸਥਿਰ callback_T ofu_cb;	    // 'omnifunc' callback function
+ਸਥਿਰ callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
+ਸਥਿਰ callback_T *cpt_cb;	    // Callback functions associated with F{func}
+ਸਥਿਰ ਪੂਰਨ	  cpt_cb_ਗਿਣਤੀ;	    // Number of cpt callbacks
 # endif
 
 /*
  * Copy a global callback function to a buffer local callback.
  */
-    static void
-copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
+    ਸਥਿਰ ਖਾਲੀ
+copy_global_ਮੰਜ਼ਿਲ_buflocal_cb(callback_T *globcb, callback_T *bufcb)
 {
     free_callback(bufcb);
-    if (globcb->cb_name != NULL && *globcb->cb_name != NUL)
+    ਜੇ (globcb->cb_name != ਨਿਰਾ && *globcb->cb_name != NUL)
 	copy_callback(bufcb, globcb);
 }
 
@@ -3508,33 +3508,33 @@ copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_completefunc(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completefunc(optset_T *ਦਲੀਲਾਂ)
 {
-    int	retval;
+    ਪੂਰਨ	retval;
 
-    if (args->os_flags & OPT_LOCAL)
-	retval = option_set_callback_func(args->os_newval.string,
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
+	retval = option_ਸੈੱਟ_callback_func(ਦਲੀਲਾਂ->os_newval.string,
 							    &curbuf->b_cfu_cb);
-    else
+    ਨਹੀਂਤਾਂ
     {
-	retval = option_set_callback_func(args->os_newval.string, &cfu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
-	    set_buflocal_cfu_callback(curbuf);
+	retval = option_ਸੈੱਟ_callback_func(ਦਲੀਲਾਂ->os_newval.string, &cfu_cb);
+	ਜੇ (retval == OK && !(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
+	    ਸੈੱਟ_buflocal_cfu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    ਵਾਪਸ retval == FAIL ? e_invalid_ਦਲੀਲ : ਨਿਰਾ;
 }
 
 /*
  * Copy the global 'completefunc' callback function to the buffer-local
  * 'completefunc' callback for "buf".
  */
-    void
-set_buflocal_cfu_callback(buf_T *buf UNUSED)
+    ਖਾਲੀ
+ਸੈੱਟ_buflocal_cfu_callback(buf_T *buf ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_EVAL
-    copy_global_to_buflocal_cb(&cfu_cb, &buf->b_cfu_cb);
+    copy_global_ਮੰਜ਼ਿਲ_buflocal_cb(&cfu_cb, &buf->b_cfu_cb);
 # endif
 }
 
@@ -3544,46 +3544,46 @@ set_buflocal_cfu_callback(buf_T *buf UNUSED)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_omnifunc(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_omnifunc(optset_T *ਦਲੀਲਾਂ)
 {
-    int	retval;
+    ਪੂਰਨ	retval;
 
-    if (args->os_flags & OPT_LOCAL)
-	retval = option_set_callback_func(args->os_newval.string,
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
+	retval = option_ਸੈੱਟ_callback_func(ਦਲੀਲਾਂ->os_newval.string,
 							    &curbuf->b_ofu_cb);
-    else
+    ਨਹੀਂਤਾਂ
     {
-	retval = option_set_callback_func(args->os_newval.string, &ofu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
-	    set_buflocal_ofu_callback(curbuf);
+	retval = option_ਸੈੱਟ_callback_func(ਦਲੀਲਾਂ->os_newval.string, &ofu_cb);
+	ਜੇ (retval == OK && !(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
+	    ਸੈੱਟ_buflocal_ofu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    ਵਾਪਸ retval == FAIL ? e_invalid_ਦਲੀਲ : ਨਿਰਾ;
 }
 
 /*
  * Copy the global 'omnifunc' callback function to the buffer-local 'omnifunc'
  * callback for "buf".
  */
-    void
-set_buflocal_ofu_callback(buf_T *buf UNUSED)
+    ਖਾਲੀ
+ਸੈੱਟ_buflocal_ofu_callback(buf_T *buf ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_EVAL
-    copy_global_to_buflocal_cb(&ofu_cb, &buf->b_ofu_cb);
+    copy_global_ਮੰਜ਼ਿਲ_buflocal_cb(&ofu_cb, &buf->b_ofu_cb);
 # endif
 }
 
 /*
  * Free an array of 'complete' F{func} callbacks and set the pointer to NULL.
  */
-    void
-clear_cpt_callbacks(callback_T **callbacks, int count)
+    ਖਾਲੀ
+clear_cpt_callbacks(callback_T **callbacks, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
-    if (callbacks == NULL || *callbacks == NULL)
-	return;
+    ਜੇ (callbacks == ਨਿਰਾ || *callbacks == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    for (int i = 0; i < count; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < ਗਿਣਤੀ_2; i++)
 	free_callback(&(*callbacks)[i]);
 
     VIM_CLEAR(*callbacks);
@@ -3593,40 +3593,40 @@ clear_cpt_callbacks(callback_T **callbacks, int count)
  * Copies a list of callback_T structs from src to *dest, clearing any existing
  * entries and allocating memory for the destination.
  */
-    static int
-copy_cpt_callbacks(callback_T **dest, int *dest_cnt, callback_T *src, int cnt)
+    ਸਥਿਰ ਪੂਰਨ
+copy_cpt_callbacks(callback_T **dest, ਪੂਰਨ *dest_cnt, callback_T *src, ਪੂਰਨ cnt)
 {
     clear_cpt_callbacks(dest, *dest_cnt);
     *dest_cnt = 0;
 
-    if (cnt == 0)
-	return OK;
+    ਜੇ (cnt == 0)
+	ਵਾਪਸ OK;
 
     *dest = ALLOC_CLEAR_MULT(callback_T, cnt);
-    if (*dest == NULL)
-	return FAIL;
+    ਜੇ (*dest == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     *dest_cnt = cnt;
 
-    for (int i = 0; i < cnt; i++)
-	if (src[i].cb_name != NULL && *(src[i].cb_name) != NUL)
+    ਲਈ (ਪੂਰਨ i = 0; i < cnt; i++)
+	ਜੇ (src[i].cb_name != ਨਿਰਾ && *(src[i].cb_name) != NUL)
 	    copy_callback(&(*dest)[i], &src[i]);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Copy global 'complete' F{func} callbacks into the given buffer's local
  * callback array. Clears any existing buffer-local callbacks first.
  */
-    void
-set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
+    ਖਾਲੀ
+ਸੈੱਟ_buflocal_cpt_callbacks(buf_T *buf ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_EVAL
-    if (buf == NULL)
-	return;
-    (void)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_count, cpt_cb,
-	    cpt_cb_count);
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
+    (ਖਾਲੀ)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_ਗਿਣਤੀ, cpt_cb,
+	    cpt_cb_ਗਿਣਤੀ);
 # endif
 }
 
@@ -3638,81 +3638,81 @@ set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
  * index.  Any previous array in "*cbp" is cleared.
  * Returns FAIL when out of memory.
  */
-    static int
-parse_cpt_callbacks(char_u *cpt, callback_T **cbp, int *cnt)
+    ਸਥਿਰ ਪੂਰਨ
+parse_cpt_callbacks(char_u *cpt, callback_T **cbp, ਪੂਰਨ *cnt)
 {
     char_u  buf[LSIZE];
     char_u  *p;
-    int	    idx = 0;
-    int	    slen;
-    int	    count;
+    ਪੂਰਨ	    idx = 0;
+    ਪੂਰਨ	    slen;
+    ਪੂਰਨ	    ਗਿਣਤੀ_2;
 
     clear_cpt_callbacks(cbp, *cnt);
     *cnt = 0;
 
-    count = get_cpt_sources_count(cpt);
-    if (count == 0)
-	return OK;
+    ਗਿਣਤੀ_2 = get_cpt_sources_ਗਿਣਤੀ(cpt);
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
+	ਵਾਪਸ OK;
 
-    *cbp = ALLOC_CLEAR_MULT(callback_T, count);
-    if (*cbp == NULL)
-	return FAIL;
-    *cnt = count;
+    *cbp = ALLOC_CLEAR_MULT(callback_T, ਗਿਣਤੀ_2);
+    ਜੇ (*cbp == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    *cnt = ਗਿਣਤੀ_2;
 
-    for (p = cpt; *p != NUL; )
+    ਲਈ (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	ਜਦੋਂ (*p == ',' || *p == ' ')
 	    p++; // Skip delimiters
 
-	if (*p != NUL)
+	ਜੇ (*p != NUL)
 	{
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
+	    ਜੇ (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
 
-		if (caret != NULL)
+		ਜੇ (caret != ਨਿਰਾ)
 		    *caret = NUL;
 
-		if (option_set_callback_func(buf + 1, &(*cbp)[idx]) != OK)
-		    (*cbp)[idx].cb_name = NULL;
+		ਜੇ (option_ਸੈੱਟ_callback_func(buf + 1, &(*cbp)[idx]) != OK)
+		    (*cbp)[idx].cb_name = ਨਿਰਾ;
 	    }
 	    idx++;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Parse 'complete' option and initialize F{func} callbacks.
  * Frees any existing callbacks and allocates new ones.
  */
-    int
-set_cpt_callbacks(optset_T *args)
+    ਪੂਰਨ
+ਸੈੱਟ_cpt_callbacks(optset_T *ਦਲੀਲਾਂ)
 {
-    int	    opt_flags = args->os_flags;
+    ਪੂਰਨ	    opt_flags = ਦਲੀਲਾਂ->os_flags;
 
-    if (curbuf == NULL)
-	return FAIL;
+    ਜੇ (curbuf == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // ":setglobal" does not change the buffer-local option value
-    if (!(opt_flags & OPT_GLOBAL)
+    ਜੇ (!(opt_flags & OPT_GLOBAL)
 	    && parse_cpt_callbacks(curbuf->b_p_cpt, &curbuf->b_p_cpt_cb,
-				   &curbuf->b_p_cpt_count) != OK)
-	return FAIL;
+				   &curbuf->b_p_cpt_ਗਿਣਤੀ) != OK)
+	ਵਾਪਸ FAIL;
 
     // ":setlocal" does not change the global option value
-    if (opt_flags & OPT_LOCAL)
-	return OK;
+    ਜੇ (opt_flags & OPT_LOCAL)
+	ਵਾਪਸ OK;
 
     // Cache the callbacks for the global value
-    if (opt_flags & OPT_GLOBAL)
-	return parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_count);
+    ਜੇ (opt_flags & OPT_GLOBAL)
+	ਵਾਪਸ parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_ਗਿਣਤੀ);
 
     // set case
-    return copy_cpt_callbacks(&cpt_cb, &cpt_cb_count, curbuf->b_p_cpt_cb,
-			      curbuf->b_p_cpt_count);
+    ਵਾਪਸ copy_cpt_callbacks(&cpt_cb, &cpt_cb_ਗਿਣਤੀ, curbuf->b_p_cpt_cb,
+			      curbuf->b_p_cpt_ਗਿਣਤੀ);
 }
 
 /*
@@ -3721,90 +3721,90 @@ set_cpt_callbacks(optset_T *args)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_thesaurusfunc(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_thesaurusfunc(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    int	retval;
+    ਪੂਰਨ	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
 	// buffer-local option set
-	retval = option_set_callback_func(curbuf->b_p_tsrfu,
+	retval = option_ਸੈੱਟ_callback_func(curbuf->b_p_tsrfu,
 							&curbuf->b_tsrfu_cb);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// global option set
-	retval = option_set_callback_func(p_tsrfu, &tsrfu_cb);
+	retval = option_ਸੈੱਟ_callback_func(p_tsrfu, &tsrfu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	ਜੇ (!(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_tsrfu_cb);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    ਵਾਪਸ retval == FAIL ? e_invalid_ਦਲੀਲ : ਨਿਰਾ;
 }
 
 /*
  * Mark "copyID" references in an array of F{func} callbacks so that they are
  * not garbage collected.
  */
-    int
-set_ref_in_cpt_callbacks(callback_T *callbacks, int count, int copyID)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_cpt_callbacks(callback_T *callbacks, ਪੂਰਨ ਗਿਣਤੀ_2, ਪੂਰਨ copyID)
 {
-    int	abort = FALSE;
+    ਪੂਰਨ	abort = FALSE;
 
-    if (callbacks == NULL)
-	return FALSE;
+    ਜੇ (callbacks == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-    for (int i = 0; i < count; i++)
-	abort = abort || set_ref_in_callback(&callbacks[i], copyID);
-    return abort;
+    ਲਈ (ਪੂਰਨ i = 0; i < ਗਿਣਤੀ_2; i++)
+	abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_callback(&callbacks[i], copyID);
+    ਵਾਪਸ abort;
 }
 
 /*
  * Mark the global 'completefunc' 'omnifunc' and 'thesaurusfunc' callbacks with
  * "copyID" so that they are not garbage collected.
  */
-    int
-set_ref_in_insexpand_funcs(int copyID)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_insexpand_funcs(ਪੂਰਨ copyID)
 {
-    int abort = set_ref_in_callback(&cfu_cb, copyID);
-    abort = abort || set_ref_in_callback(&ofu_cb, copyID);
-    abort = abort || set_ref_in_callback(&tsrfu_cb, copyID);
-    abort = abort || set_ref_in_cpt_callbacks(cpt_cb, cpt_cb_count, copyID);
+    ਪੂਰਨ abort = ਸੈੱਟ_ref_ਵਿੱਚ_callback(&cfu_cb, copyID);
+    abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_callback(&ofu_cb, copyID);
+    abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_callback(&tsrfu_cb, copyID);
+    abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_cpt_callbacks(cpt_cb, cpt_cb_ਗਿਣਤੀ, copyID);
 
-    return abort;
+    ਵਾਪਸ abort;
 }
 
 /*
  * Get the user-defined completion function name for completion "type"
  */
-    static char_u *
-get_complete_funcname(int type)
+    ਸਥਿਰ char_u *
+get_complete_funcname(ਪੂਰਨ type)
 {
-    switch (type)
+    ਚੋਣ (type)
     {
-	case CTRL_X_FUNCTION:
-	    return curbuf->b_p_cfu;
-	case CTRL_X_OMNI:
-	    return curbuf->b_p_ofu;
-	case CTRL_X_THESAURUS:
-	    return *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
-	default:
-	    return (char_u *)"";
+	ਹਾਲਤ CTRL_X_FUNCTION:
+	    ਵਾਪਸ curbuf->b_p_cfu;
+	ਹਾਲਤ CTRL_X_OMNI:
+	    ਵਾਪਸ curbuf->b_p_ofu;
+	ਹਾਲਤ CTRL_X_THESAURUS:
+	    ਵਾਪਸ *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
+	ਮੂਲ:
+	    ਵਾਪਸ (char_u *)"";
     }
 }
 
 /*
  * Get the callback to use for insert mode completion.
  */
-    static callback_T *
-get_insert_callback(int type)
+    ਸਥਿਰ callback_T *
+get_ਪਾਓ_callback(ਪੂਰਨ type)
 {
-    if (type == CTRL_X_FUNCTION)
-	return &curbuf->b_cfu_cb;
-    if (type == CTRL_X_OMNI)
-	return &curbuf->b_ofu_cb;
+    ਜੇ (type == CTRL_X_FUNCTION)
+	ਵਾਪਸ &curbuf->b_cfu_cb;
+    ਜੇ (type == CTRL_X_OMNI)
+	ਵਾਪਸ &curbuf->b_ofu_cb;
     // CTRL_X_THESAURUS
-    return (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
+    ਵਾਪਸ (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
 }
 
 /*
@@ -3814,68 +3814,68 @@ get_insert_callback(int type)
  * Callback function "cb" is set if triggered by a function in the 'cpt'
  * option; otherwise, it is NULL.
  */
-    static void
-expand_by_function(int type, char_u *base, callback_T *cb)
+    ਸਥਿਰ ਖਾਲੀ
+expand_by_function(ਪੂਰਨ type, char_u *ਅਧਾਰ, callback_T *cb)
 {
-    list_T      *matchlist = NULL;
-    dict_T	*matchdict = NULL;
-    typval_T	args[3];
+    list_T      *matchlist = ਨਿਰਾ;
+    dict_T	*matchdict = ਨਿਰਾ;
+    typval_T	ਦਲੀਲਾਂ[3];
     char_u	*funcname;
     pos_T	pos;
     typval_T	rettv;
-    int		save_State = State;
-    int		retval;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
-			    && was_set_insecurely(curwin,
+    ਪੂਰਨ		save_State = State;
+    ਪੂਰਨ		retval;
+    ਪੂਰਨ		is_cpt_function = (cb != ਨਿਰਾ);
+    ਪੂਰਨ		use_sandbox = is_cpt_function
+			    && was_ਸੈੱਟ_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    ਜੇ (!is_cpt_function)
     {
 	funcname = get_complete_funcname(type);
-	if (*funcname == NUL)
-	    return;
-	cb = get_insert_callback(type);
+	ਜੇ (*funcname == NUL)
+	    ਵਾਪਸ;
+	cb = get_ਪਾਓ_callback(type);
     }
 
     // Call 'completefunc' to obtain the list of matches.
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 0;
-    args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = base != NULL ? base : (char_u *)"";
-    args[2].v_type = VAR_UNKNOWN;
+    ਦਲੀਲਾਂ[0].v_type = VAR_ਸੰਖਿਆ;
+    ਦਲੀਲਾਂ[0].vval.v_ਸੰਖਿਆ = 0;
+    ਦਲੀਲਾਂ[1].v_type = VAR_STRING;
+    ਦਲੀਲਾਂ[1].vval.v_string = ਅਧਾਰ != ਨਿਰਾ ? ਅਧਾਰ : (char_u *)"";
+    ਦਲੀਲਾਂ[2].v_type = VAR_UNKNOWN;
 
     pos = curwin->w_cursor;
     // Lock the text to avoid weird things from happening.  Also disallow
     // switching to another window, it should not be needed and may end up in
     // Insert mode in another buffer.
     ++textlock;
-    if (use_sandbox)
+    ਜੇ (use_sandbox)
 	++sandbox;
 
-    retval = call_callback(cb, 0, &rettv, 2, args);
-    if (use_sandbox)
+    retval = call_callback(cb, 0, &rettv, 2, ਦਲੀਲਾਂ);
+    ਜੇ (use_sandbox)
 	--sandbox;
 
     // Call a function, which returns a list or dict.
-    if (retval == OK)
+    ਜੇ (retval == OK)
     {
-	switch (rettv.v_type)
+	ਚੋਣ (rettv.v_type)
 	{
-	    case VAR_LIST:
+	    ਹਾਲਤ VAR_LIST:
 		matchlist = rettv.vval.v_list;
-		break;
-	    case VAR_DICT:
+		ਰੋਕੋ;
+	    ਹਾਲਤ VAR_DICT:
 		matchdict = rettv.vval.v_dict;
-		break;
-	    case VAR_SPECIAL:
-		if (rettv.vval.v_number == VVAL_NONE)
-		    compl_opt_suppress_empty = TRUE;
+		ਰੋਕੋ;
+	    ਹਾਲਤ VAR_SPECIAL:
+		ਜੇ (rettv.vval.v_ਸੰਖਿਆ == VVAL_NONE)
+		    compl_opt_suppress_ਖਾਲੀ_ਥਾਵਾਂ = TRUE;
 		// FALLTHROUGH
-	    default:
+	    ਮੂਲ:
 		// TODO: Give error message?
 		clear_tv(&rettv);
-		break;
+		ਰੋਕੋ;
 	}
     }
     --textlock;
@@ -3883,36 +3883,36 @@ expand_by_function(int type, char_u *base, callback_T *cb)
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    ਜੇ (!EQUAL_POS(curwin->w_cursor, pos))
     {
-	emsg(_(e_complete_function_deleted_text));
-	goto theend;
+	emsg(_(e_complete_function_deleted_ਪਾਠ));
+	ਜਾਓ theend;
     }
 
-    if (matchlist != NULL)
-	ins_compl_add_list(matchlist);
-    else if (matchdict != NULL)
-	ins_compl_add_dict(matchdict);
+    ਜੇ (matchlist != ਨਿਰਾ)
+	ins_compl_ਜੋੜੋ_list(matchlist);
+    ਨਹੀਂਤਾਂ ਜੇ (matchdict != ਨਿਰਾ)
+	ins_compl_ਜੋੜੋ_dict(matchdict);
 
 theend:
     // Restore State, it might have been changed.
     State = save_State;
 
-    if (matchdict != NULL)
+    ਜੇ (matchdict != ਨਿਰਾ)
 	dict_unref(matchdict);
-    if (matchlist != NULL)
+    ਜੇ (matchlist != ਨਿਰਾ)
 	list_unref(matchlist);
 }
-#endif // FEAT_COMPL_FUNC
+#ਜੇ_ਅੰਤ // FEAT_COMPL_FUNC
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 
-    static inline int
+    ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ
 get_user_highlight_id(char_u *hlname)
 {
-    if (hlname != NULL && *hlname != NUL)
-	return syn_check_group(hlname, (int)STRLEN(hlname));
-    return 0;
+    ਜੇ (hlname != ਨਿਰਾ && *hlname != NUL)
+	ਵਾਪਸ syn_check_ਸਮੂਹ(hlname, (ਪੂਰਨ)STRLEN(hlname));
+    ਵਾਪਸ 0;
 }
 /*
  * Add a match to the list of matches from a typeval_T.
@@ -3921,109 +3921,109 @@ get_user_highlight_id(char_u *hlname)
  * maybe because alloc() returns NULL, then FAIL is returned.
  * When "fast" is TRUE use fast_breakcheck() instead of ui_breakcheck().
  */
-    static int
-ins_compl_add_tv(typval_T *tv, int dir, int fast)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_ਜੋੜੋ_tv(typval_T *tv, ਪੂਰਨ dir, ਪੂਰਨ fast)
 {
-    char_u	*word;
-    int		dup = FALSE;
-    int		empty = FALSE;
-    int		flags = fast ? CP_FAST : 0;
-    char_u	*(cptext[CPT_COUNT]);
-    typval_T	user_data;
-    int		status;
+    char_u	*ਸ਼ਬਦ;
+    ਪੂਰਨ		dup = FALSE;
+    ਪੂਰਨ		ਖਾਲੀ_ਥਾਵਾਂ_2 = FALSE;
+    ਪੂਰਨ		flags = fast ? CP_FAST : 0;
+    char_u	*(cptext[CPT_ਗਿਣਤੀ]);
+    typval_T	user_ਅੰਕੜੇ;
+    ਪੂਰਨ		ਸਥਿਤੀ;
     char_u	*user_abbr_hlname;
-    char_u	*user_kind_hlname;
-    int		user_hl[2] = { 0, 0 };
+    char_u	*user_ਕਿਸਮ_hlname;
+    ਪੂਰਨ		user_hl[2] = { 0, 0 };
 
-    user_data.v_type = VAR_UNKNOWN;
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    user_ਅੰਕੜੇ.v_type = VAR_UNKNOWN;
+    ਜੇ (tv->v_type == VAR_DICT && tv->vval.v_dict != ਨਿਰਾ)
     {
-	word = dict_get_string(tv->vval.v_dict, "word", FALSE);
+	ਸ਼ਬਦ = dict_get_string(tv->vval.v_dict, "word", FALSE);
 	cptext[CPT_ABBR] = dict_get_string(tv->vval.v_dict, "abbr", FALSE);
 	cptext[CPT_MENU] = dict_get_string(tv->vval.v_dict, "menu", FALSE);
-	cptext[CPT_KIND] = dict_get_string(tv->vval.v_dict, "kind", FALSE);
+	cptext[CPT_ਕਿਸਮ] = dict_get_string(tv->vval.v_dict, "kind", FALSE);
 	cptext[CPT_INFO] = dict_get_string(tv->vval.v_dict, "info", FALSE);
 
 	user_abbr_hlname = dict_get_string(tv->vval.v_dict, "abbr_hlgroup", FALSE);
 	user_hl[0] = get_user_highlight_id(user_abbr_hlname);
 
-	user_kind_hlname = dict_get_string(tv->vval.v_dict, "kind_hlgroup", FALSE);
-	user_hl[1] = get_user_highlight_id(user_kind_hlname);
+	user_ਕਿਸਮ_hlname = dict_get_string(tv->vval.v_dict, "kind_hlgroup", FALSE);
+	user_hl[1] = get_user_highlight_id(user_ਕਿਸਮ_hlname);
 
-	dict_get_tv(tv->vval.v_dict, "user_data", &user_data);
-	if (dict_get_string(tv->vval.v_dict, "icase", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "icase"))
+	dict_get_tv(tv->vval.v_dict, "user_data", &user_ਅੰਕੜੇ);
+	ਜੇ (dict_get_string(tv->vval.v_dict, "icase", FALSE) != ਨਿਰਾ
+				  && dict_get_ਸੰਖਿਆ(tv->vval.v_dict, "icase"))
 	    flags |= CP_ICASE;
-	if (dict_get_string(tv->vval.v_dict, "dup", FALSE) != NULL)
-	    dup = dict_get_number(tv->vval.v_dict, "dup");
-	if (dict_get_string(tv->vval.v_dict, "empty", FALSE) != NULL)
-	    empty = dict_get_number(tv->vval.v_dict, "empty");
-	if (dict_get_string(tv->vval.v_dict, "equal", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "equal"))
+	ਜੇ (dict_get_string(tv->vval.v_dict, "dup", FALSE) != ਨਿਰਾ)
+	    dup = dict_get_ਸੰਖਿਆ(tv->vval.v_dict, "dup");
+	ਜੇ (dict_get_string(tv->vval.v_dict, "empty", FALSE) != ਨਿਰਾ)
+	    ਖਾਲੀ_ਥਾਵਾਂ_2 = dict_get_ਸੰਖਿਆ(tv->vval.v_dict, "empty");
+	ਜੇ (dict_get_string(tv->vval.v_dict, "equal", FALSE) != ਨਿਰਾ
+				  && dict_get_ਸੰਖਿਆ(tv->vval.v_dict, "equal"))
 	    flags |= CP_EQUAL;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	word = tv_get_string_chk(tv);
-	CLEAR_FIELD(cptext);
+	ਸ਼ਬਦ = tv_get_string_chk(tv);
+	CLEAR_ਖੇਤਰ(cptext);
     }
-    if (word == NULL || (!empty && *word == NUL))
+    ਜੇ (ਸ਼ਬਦ == ਨਿਰਾ || (!ਖਾਲੀ_ਥਾਵਾਂ_2 && *ਸ਼ਬਦ == NUL))
     {
-	clear_tv(&user_data);
-	return FAIL;
+	clear_tv(&user_ਅੰਕੜੇ);
+	ਵਾਪਸ FAIL;
     }
-    status = ins_compl_add(word, -1, NULL, cptext,
-	    &user_data, dir, flags, dup, user_hl, FUZZY_SCORE_NONE);
-    if (status != OK)
-	clear_tv(&user_data);
-    return status;
+    ਸਥਿਤੀ = ins_compl_ਜੋੜੋ(ਸ਼ਬਦ, -1, ਨਿਰਾ, cptext,
+	    &user_ਅੰਕੜੇ, dir, flags, dup, user_hl, FUZZY_SCORE_NONE);
+    ਜੇ (ਸਥਿਤੀ != OK)
+	clear_tv(&user_ਅੰਕੜੇ);
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
 /*
  * Add completions from a list.
  */
-    static void
-ins_compl_add_list(list_T *list)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਜੋੜੋ_list(list_T *list)
 {
     listitem_T	*li;
-    int		dir = compl_direction;
+    ਪੂਰਨ		dir = compl_direction;
 
     // Go through the List with matches and add each of them.
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(list, li)
     {
-	if (ins_compl_add_tv(&li->li_tv, dir, TRUE) == OK)
+	ਜੇ (ins_compl_ਜੋੜੋ_tv(&li->li_tv, dir, TRUE) == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
-	else if (did_emsg)
-	    break;
+	ਨਹੀਂਤਾਂ ਜੇ (did_emsg)
+	    ਰੋਕੋ;
     }
 }
 
 /*
  * Add completions from a dict.
  */
-    static void
-ins_compl_add_dict(dict_T *dict)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਜੋੜੋ_dict(dict_T *dict)
 {
     dictitem_T	*di_refresh;
-    dictitem_T	*di_words;
+    dictitem_T	*di_ਸ਼ਬਦ;
 
     // Check for optional "refresh" item.
     compl_opt_refresh_always = FALSE;
-    di_refresh = dict_find(dict, (char_u *)"refresh", 7);
-    if (di_refresh != NULL && di_refresh->di_tv.v_type == VAR_STRING)
+    di_refresh = dict_ਲੱਭੋ(dict, (char_u *)"refresh", 7);
+    ਜੇ (di_refresh != ਨਿਰਾ && di_refresh->di_tv.v_type == VAR_STRING)
     {
 	char_u	*v = di_refresh->di_tv.vval.v_string;
 
-	if (v != NULL && STRCMP(v, (char_u *)"always") == 0)
+	ਜੇ (v != ਨਿਰਾ && STRCMP(v, (char_u *)"always") == 0)
 	    compl_opt_refresh_always = TRUE;
     }
 
     // Add completions from a "words" list.
-    di_words = dict_find(dict, (char_u *)"words", 5);
-    if (di_words != NULL && di_words->di_tv.v_type == VAR_LIST)
-	ins_compl_add_list(di_words->di_tv.vval.v_list);
+    di_ਸ਼ਬਦ = dict_ਲੱਭੋ(dict, (char_u *)"words", 5);
+    ਜੇ (di_ਸ਼ਬਦ != ਨਿਰਾ && di_ਸ਼ਬਦ->di_tv.v_type == VAR_LIST)
+	ins_compl_ਜੋੜੋ_list(di_ਸ਼ਬਦ->di_tv.vval.v_list);
 }
 
 /*
@@ -4031,127 +4031,127 @@ ins_compl_add_dict(dict_T *dict)
  * "startcol" is where the matched text starts (1 is first column).
  * "list" is the list of matches.
  */
-    static void
-set_completion(colnr_T startcol, list_T *list)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_completion(colnr_T startcol, list_T *list)
 {
-    int save_w_wrow = curwin->w_wrow;
-    int save_w_leftcol = curwin->w_leftcol;
-    int flags = CP_ORIGINAL_TEXT;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
-    int compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0;
-    int compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
+    ਪੂਰਨ save_w_wrow = curwin->w_wrow;
+    ਪੂਰਨ save_w_leftcol = curwin->w_leftcol;
+    ਪੂਰਨ flags = CP_ORIGINAL_ਪਾਠ;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cur_cot_flags = get_cot_flags();
+    ਪੂਰਨ compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
+    ਪੂਰਨ compl_no_ਪਾਓ = (cur_cot_flags & COT_NOINSERT) != 0;
+    ਪੂਰਨ compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
 
     // If already doing completions stop it.
-    if (compl_started || ctrl_x_mode_not_default())
+    ਜੇ (compl_started || ctrl_x_ਬਹੁਲਕ_not_default())
 	ins_compl_prep(' ');
     ins_compl_clear();
     ins_compl_free();
     compl_get_longest = compl_longest;
 
     compl_direction = FORWARD;
-    if (startcol > curwin->w_cursor.col)
-	startcol = curwin->w_cursor.col;
-    compl_col = startcol;
+    ਜੇ (startcol > curwin->w_cursor.ਖਾਨਾ)
+	startcol = curwin->w_cursor.ਖਾਨਾ;
+    compl_ਖਾਨਾ = startcol;
     compl_lnum = curwin->w_cursor.lnum;
-    compl_length = (int)curwin->w_cursor.col - (int)startcol;
+    compl_ਲੰਮਾਈ = (ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ - (ਪੂਰਨ)startcol;
     // compl_pattern doesn't need to be set
-    compl_orig_text.string = vim_strnsave(ml_get_curline() + compl_col,
-							(size_t)compl_length);
-    if (p_ic)
+    compl_orig_ਪਾਠ.string = vim_strnsave(ml_get_curline() + compl_ਖਾਨਾ,
+							(size_t)compl_ਲੰਮਾਈ);
+    ਜੇ (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL)
+    ਜੇ (compl_orig_ਪਾਠ.string == ਨਿਰਾ)
     {
-	compl_orig_text.length = 0;
-	return;
+	compl_orig_ਪਾਠ.ਲੰਮਾਈ = 0;
+	ਵਾਪਸ;
     }
-    compl_orig_text.length = (size_t)compl_length;
-    if (ins_compl_add(compl_orig_text.string,
-			(int)compl_orig_text.length, NULL, NULL, NULL, 0,
-			flags | CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
-	return;
+    compl_orig_ਪਾਠ.ਲੰਮਾਈ = (size_t)compl_ਲੰਮਾਈ;
+    ਜੇ (ins_compl_ਜੋੜੋ(compl_orig_ਪਾਠ.string,
+			(ਪੂਰਨ)compl_orig_ਪਾਠ.ਲੰਮਾਈ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, 0,
+			flags | CP_FAST, FALSE, ਨਿਰਾ, FUZZY_SCORE_NONE) != OK)
+	ਵਾਪਸ;
 
-    ctrl_x_mode = CTRL_X_EVAL;
+    ctrl_x_ਬਹੁਲਕ = CTRL_X_EVAL;
 
-    ins_compl_add_list(list);
+    ins_compl_ਜੋੜੋ_list(list);
     compl_matches = ins_compl_make_cyclic();
     compl_started = TRUE;
-    compl_used_match = TRUE;
-    compl_cont_status = 0;
+    compl_ਵਰਤਿਆ_ਮੇਲ = TRUE;
+    compl_cont_ਸਥਿਤੀ = 0;
 
-    compl_curr_match = compl_first_match;
-    int no_select = compl_no_select || compl_longest;
-    if (compl_no_insert || no_select)
+    compl_curr_ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਪੂਰਨ no_select = compl_no_select || compl_longest;
+    ਜੇ (compl_no_ਪਾਓ || no_select)
     {
-	ins_complete(K_DOWN, FALSE);
-	if (no_select)
+	ins_complete(K_ਥੱਲੇ, FALSE);
+	ਜੇ (no_select)
 	    // Down/Up has no real effect.
-	    ins_complete(K_UP, FALSE);
+	    ins_complete(K_ਉੱਪਰ, FALSE);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ins_complete(Ctrl_N, FALSE);
-    compl_enter_selects = compl_no_insert;
+    compl_enter_selects = compl_no_ਪਾਓ;
 
     // Lazily show the popup menu, unless we got interrupted.
-    if (!compl_interrupted)
+    ਜੇ (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
     may_trigger_modechanged();
-    out_flush();
+    ਬਾਹਰਲਾ_flush();
 }
 
 /*
  * "complete()" function
  */
-    void
-f_complete(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_complete(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    if ((State & MODE_INSERT) == 0)
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) == 0)
     {
-	emsg(_(e_complete_can_only_be_used_in_insert_mode));
-	return;
+	emsg(_(e_complete_can_only_be_ਵਰਤਿਆ_ਵਿੱਚ_ਪਾਓ_ਬਹੁਲਕ));
+	ਵਾਪਸ;
     }
 
     // Check for undo allowed here, because if something was already inserted
     // the line was already saved for undo and this check isn't done.
-    if (!undo_allowed())
-	return;
+    ਜੇ (!undo_allowed())
+	ਵਾਪਸ;
 
-    if (check_for_nonnull_list_arg(argvars, 1) != FAIL)
+    ਜੇ (check_for_nonnull_list_arg(argvars, 1) != FAIL)
     {
-	int startcol = (int)tv_get_number_chk(&argvars[0], NULL);
-	if (startcol > 0)
-	    set_completion(startcol - 1, argvars[1].vval.v_list);
+	ਪੂਰਨ startcol = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ_chk(&argvars[0], ਨਿਰਾ);
+	ਜੇ (startcol > 0)
+	    ਸੈੱਟ_completion(startcol - 1, argvars[1].vval.v_list);
     }
 }
 
 /*
  * "complete_add()" function
  */
-    void
-f_complete_add(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_complete_ਜੋੜੋ(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    rettv->vval.v_number = ins_compl_add_tv(&argvars[0], 0, FALSE);
+    rettv->vval.v_ਸੰਖਿਆ = ins_compl_ਜੋੜੋ_tv(&argvars[0], 0, FALSE);
 }
 
 /*
  * "complete_check()" function
  */
-    void
-f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_complete_check(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ਪੂਰਨ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    ins_compl_check_keys(0, TRUE);
-    rettv->vval.v_number = ins_compl_interrupted();
+    ins_compl_check_ਕੁੰਜੀਆਂ(0, TRUE);
+    rettv->vval.v_ਸੰਖਿਆ = ins_compl_interrupted();
 
     RedrawingDisabled = save_RedrawingDisabled;
 }
@@ -4159,21 +4159,21 @@ f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * Return Insert completion mode name string
  */
-    static void
-ins_compl_mode(string_T *ret)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_ਬਹੁਲਕ(string_T *ret)
 {
-    if (ctrl_x_mode_not_defined_yet() || ctrl_x_mode_scroll() || compl_started)
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_not_defined_yet() || ctrl_x_ਬਹੁਲਕ_scroll() || compl_started)
     {
-	string_T    *mode;
+	string_T    *ਬਹੁਲਕ;
 
-	mode = &ctrl_x_mode_names[ctrl_x_mode & ~CTRL_X_WANT_IDENT];
-	ret->string = (mode->string == NULL) ? (char_u *)"" : mode->string;
-	ret->length = mode->length;
+	ਬਹੁਲਕ = &ctrl_x_ਬਹੁਲਕ_ਨਾਂ[ctrl_x_ਬਹੁਲਕ & ~CTRL_X_WANT_IDENT];
+	ret->string = (ਬਹੁਲਕ->string == ਨਿਰਾ) ? (char_u *)"" : ਬਹੁਲਕ->string;
+	ret->ਲੰਮਾਈ = ਬਹੁਲਕ->ਲੰਮਾਈ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	ret->string = (char_u *)"";
-	ret->length = 0;
+	ret->ਲੰਮਾਈ = 0;
     }
 }
 
@@ -4181,52 +4181,52 @@ ins_compl_mode(string_T *ret)
  * Assign the sequence number to all the completion matches which don't have
  * one assigned yet.
  */
-    static void
-ins_compl_update_sequence_numbers(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_update_sequence_numbers(ਖਾਲੀ)
 {
-    int		number = 0;
-    compl_T	*match;
+    ਪੂਰਨ		ਸੰਖਿਆ = 0;
+    compl_T	*ਮੇਲ;
 
-    if (compl_dir_forward())
+    ਜੇ (compl_dir_forward())
     {
 	// Search backwards for the first valid (!= -1) number.
 	// This should normally succeed already at the first loop
 	// cycle, so it's fast!
-	for (match = compl_curr_match->cp_prev; match != NULL
-		&& !is_first_match(match); match = match->cp_prev)
-	    if (match->cp_number != -1)
+	ਲਈ (ਮੇਲ = compl_curr_ਮੇਲ->cp_prev; ਮੇਲ != ਨਿਰਾ
+		&& !is_ਪਹਿਲਾ_ਮੇਲ(ਮੇਲ); ਮੇਲ = ਮੇਲ->cp_prev)
+	    ਜੇ (ਮੇਲ->cp_ਸੰਖਿਆ != -1)
 	    {
-		number = match->cp_number;
-		break;
+		ਸੰਖਿਆ = ਮੇਲ->cp_ਸੰਖਿਆ;
+		ਰੋਕੋ;
 	    }
-	if (match != NULL)
+	ਜੇ (ਮੇਲ != ਨਿਰਾ)
 	    // go up and assign all numbers which are not assigned yet
-	    for (match = match->cp_next;
-		    match != NULL && match->cp_number == -1;
-					   match = match->cp_next)
-		match->cp_number = ++number;
+	    ਲਈ (ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ;
+		    ਮੇਲ != ਨਿਰਾ && ਮੇਲ->cp_ਸੰਖਿਆ == -1;
+					   ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ)
+		ਮੇਲ->cp_ਸੰਖਿਆ = ++ਸੰਖਿਆ;
     }
-    else // BACKWARD
+    ਨਹੀਂਤਾਂ // BACKWARD
     {
 	// Search forwards (upwards) for the first valid (!= -1)
 	// number.  This should normally succeed already at the
 	// first loop cycle, so it's fast!
-	for (match = compl_curr_match->cp_next; match != NULL
-		&& !is_first_match(match); match = match->cp_next)
+	ਲਈ (ਮੇਲ = compl_curr_ਮੇਲ->cp_ਅਗਲਾ; ਮੇਲ != ਨਿਰਾ
+		&& !is_ਪਹਿਲਾ_ਮੇਲ(ਮੇਲ); ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ)
 	{
-	    if (match->cp_number != -1)
+	    ਜੇ (ਮੇਲ->cp_ਸੰਖਿਆ != -1)
 	    {
-		number = match->cp_number;
-		break;
+		ਸੰਖਿਆ = ਮੇਲ->cp_ਸੰਖਿਆ;
+		ਰੋਕੋ;
 	    }
 	}
-	if (match != NULL)
+	ਜੇ (ਮੇਲ != ਨਿਰਾ)
 	{
 	    // go down and assign all numbers which are not assigned yet
-	    for (match = match->cp_prev; match
-		    && match->cp_number == -1;
-					   match = match->cp_prev)
-		match->cp_number = ++number;
+	    ਲਈ (ਮੇਲ = ਮੇਲ->cp_prev; ਮੇਲ
+		    && ਮੇਲ->cp_ਸੰਖਿਆ == -1;
+					   ਮੇਲ = ਮੇਲ->cp_prev)
+		ਮੇਲ->cp_ਸੰਖਿਆ = ++ਸੰਖਿਆ;
 	}
     }
 }
@@ -4234,164 +4234,164 @@ ins_compl_update_sequence_numbers(void)
 /*
  * Fill the dict of complete_info
  */
-    static void
-fill_complete_info_dict(dict_T *di, compl_T *match, int add_match)
+    ਸਥਿਰ ਖਾਲੀ
+fill_complete_info_dict(dict_T *di, compl_T *ਮੇਲ, ਪੂਰਨ ਜੋੜੋ_ਮੇਲ)
 {
-    dict_add_string_len(di, "word", match->cp_str.string, (int)match->cp_str.length);
-    dict_add_string(di, "abbr", match->cp_text[CPT_ABBR]);
-    dict_add_string(di, "menu", match->cp_text[CPT_MENU]);
-    dict_add_string(di, "kind", match->cp_text[CPT_KIND]);
-    dict_add_string(di, "info", match->cp_text[CPT_INFO]);
-    dict_add_string(di, "abbr_hlgroup", syn_id2name(match->cp_user_abbr_hl_id));
-    dict_add_string(di, "kind_hlgroup", syn_id2name(match->cp_user_kind_hl_id));
-    if (add_match)
-	dict_add_bool(di, "match", match->cp_in_match_array);
-    if (match->cp_user_data.v_type == VAR_UNKNOWN)
+    dict_ਜੋੜੋ_string_len(di, "word", ਮੇਲ->cp_str.string, (ਪੂਰਨ)ਮੇਲ->cp_str.ਲੰਮਾਈ);
+    dict_ਜੋੜੋ_string(di, "abbr", ਮੇਲ->cp_ਪਾਠ[CPT_ABBR]);
+    dict_ਜੋੜੋ_string(di, "menu", ਮੇਲ->cp_ਪਾਠ[CPT_MENU]);
+    dict_ਜੋੜੋ_string(di, "kind", ਮੇਲ->cp_ਪਾਠ[CPT_ਕਿਸਮ]);
+    dict_ਜੋੜੋ_string(di, "info", ਮੇਲ->cp_ਪਾਠ[CPT_INFO]);
+    dict_ਜੋੜੋ_string(di, "abbr_hlgroup", syn_id2name(ਮੇਲ->cp_user_abbr_hl_id));
+    dict_ਜੋੜੋ_string(di, "kind_hlgroup", syn_id2name(ਮੇਲ->cp_user_ਕਿਸਮ_hl_id));
+    ਜੇ (ਜੋੜੋ_ਮੇਲ)
+	dict_ਜੋੜੋ_bool(di, "match", ਮੇਲ->cp_ਵਿੱਚ_ਮੇਲ_array);
+    ਜੇ (ਮੇਲ->cp_user_ਅੰਕੜੇ.v_type == VAR_UNKNOWN)
 	// Add an empty string for backwards compatibility
-	dict_add_string_len(di, "user_data", (char_u *)"", 0);
-    else
-	dict_add_tv(di, "user_data", &match->cp_user_data);
+	dict_ਜੋੜੋ_string_len(di, "user_data", (char_u *)"", 0);
+    ਨਹੀਂਤਾਂ
+	dict_ਜੋੜੋ_tv(di, "user_data", &ਮੇਲ->cp_user_ਅੰਕੜੇ);
 }
 
 /*
  * Get complete information
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 get_complete_info(list_T *what_list, dict_T *retdict)
 {
-    int		ret = OK;
-    listitem_T	*item;
-# define CI_WHAT_MODE		    0x01
+    ਪੂਰਨ		ret = OK;
+    listitem_T	*ਵਸਤੂ;
+# define CI_WHAT_ਬਹੁਲਕ		    0x01
 # define CI_WHAT_PUM_VISIBLE	    0x02
-# define CI_WHAT_ITEMS		    0x04
+# define CI_WHAT_ਚੀਜ਼ਾਂ		    0x04
 # define CI_WHAT_SELECTED	    0x08
 # define CI_WHAT_COMPLETED	    0x10
 # define CI_WHAT_MATCHES	    0x20
-# define CI_WHAT_PREINSERTED_TEXT   0x40
+# define CI_WHAT_PREINSERTED_ਪਾਠ   0x40
 # define CI_WHAT_AUTO		    0x80
 # define CI_WHAT_ALL		    0xff
-    int		what_flag;
+    ਪੂਰਨ		what_flag;
 
-    if (what_list == NULL)
+    ਜੇ (what_list == ਨਿਰਾ)
 	what_flag = CI_WHAT_ALL
 	    & ~(CI_WHAT_MATCHES | CI_WHAT_COMPLETED | CI_WHAT_AUTO);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	what_flag = 0;
 	CHECK_LIST_MATERIALIZE(what_list);
-	FOR_ALL_LIST_ITEMS(what_list, item)
+	FOR_ALL_LIST_ਚੀਜ਼ਾਂ(what_list, ਵਸਤੂ)
 	{
-	    char_u *what = tv_get_string(&item->li_tv);
+	    char_u *what = tv_get_string(&ਵਸਤੂ->li_tv);
 
-	    if (STRCMP(what, "mode") == 0)
-		what_flag |= CI_WHAT_MODE;
-	    else if (STRCMP(what, "pum_visible") == 0)
+	    ਜੇ (STRCMP(what, "mode") == 0)
+		what_flag |= CI_WHAT_ਬਹੁਲਕ;
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "pum_visible") == 0)
 		what_flag |= CI_WHAT_PUM_VISIBLE;
-	    else if (STRCMP(what, "items") == 0)
-		what_flag |= CI_WHAT_ITEMS;
-	    else if (STRCMP(what, "selected") == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "items") == 0)
+		what_flag |= CI_WHAT_ਚੀਜ਼ਾਂ;
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "selected") == 0)
 		what_flag |= CI_WHAT_SELECTED;
-	    else if (STRCMP(what, "completed") == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "completed") == 0)
 		what_flag |= CI_WHAT_COMPLETED;
-	    else if (STRCMP(what, "preinserted_text") == 0)
-		what_flag |= CI_WHAT_PREINSERTED_TEXT;
-	    else if (STRCMP(what, "matches") == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "preinserted_text") == 0)
+		what_flag |= CI_WHAT_PREINSERTED_ਪਾਠ;
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "matches") == 0)
 		what_flag |= CI_WHAT_MATCHES;
-	    else if (STRCMP(what, "auto") == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "auto") == 0)
 		what_flag |= CI_WHAT_AUTO;
 	}
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_MODE))
+    ਜੇ (ret == OK && (what_flag & CI_WHAT_ਬਹੁਲਕ))
     {
-	string_T    mode;
+	string_T    ਬਹੁਲਕ;
 
-	ins_compl_mode(&mode);
-	ret = dict_add_string_len(retdict, "mode", mode.string, (int)mode.length);
+	ins_compl_ਬਹੁਲਕ(&ਬਹੁਲਕ);
+	ret = dict_ਜੋੜੋ_string_len(retdict, "mode", ਬਹੁਲਕ.string, (ਪੂਰਨ)ਬਹੁਲਕ.ਲੰਮਾਈ);
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
-	ret = dict_add_number(retdict, "pum_visible", pum_visible());
+    ਜੇ (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
+	ret = dict_ਜੋੜੋ_ਸੰਖਿਆ(retdict, "pum_visible", pum_visible());
 
-    if (ret == OK && (what_flag & CI_WHAT_AUTO))
-	ret = dict_add_number(retdict, "auto", compl_autostarted);
+    ਜੇ (ret == OK && (what_flag & CI_WHAT_AUTO))
+	ret = dict_ਜੋੜੋ_ਸੰਖਿਆ(retdict, "auto", compl_autostarted);
 
-    if (ret == OK && (what_flag & CI_WHAT_PREINSERTED_TEXT))
+    ਜੇ (ret == OK && (what_flag & CI_WHAT_PREINSERTED_ਪਾਠ))
     {
-	char_u	*line = ml_get_curline();
-	int	len = compl_ins_end_col - curwin->w_cursor.col;
+	char_u	*ਸਤਰ = ml_get_curline();
+	ਪੂਰਨ	len = compl_ins_ਸਿਰਾ_ਖਾਨਾ - curwin->w_cursor.ਖਾਨਾ;
 
-	ret = dict_add_string_len(retdict, "preinserted_text",
-		(len > 0) ? line + curwin->w_cursor.col : (char_u *)"", (len > 0) ? len : 0);
+	ret = dict_ਜੋੜੋ_string_len(retdict, "preinserted_text",
+		(len > 0) ? ਸਤਰ + curwin->w_cursor.ਖਾਨਾ : (char_u *)"", (len > 0) ? len : 0);
     }
 
-    if (ret == OK && (what_flag & (CI_WHAT_ITEMS | CI_WHAT_SELECTED
+    ਜੇ (ret == OK && (what_flag & (CI_WHAT_ਚੀਜ਼ਾਂ | CI_WHAT_SELECTED
 				    | CI_WHAT_MATCHES | CI_WHAT_COMPLETED)))
     {
-	list_T	    *li = NULL;
+	list_T	    *li = ਨਿਰਾ;
 	dict_T	    *di;
-	compl_T     *match;
-	int         selected_idx = -1;
-	int	    has_items = what_flag & CI_WHAT_ITEMS;
-	int	    has_matches = what_flag & CI_WHAT_MATCHES;
-	int	    has_completed = what_flag & CI_WHAT_COMPLETED;
+	compl_T     *ਮੇਲ;
+	ਪੂਰਨ         selected_idx = -1;
+	ਪੂਰਨ	    has_ਚੀਜ਼ਾਂ = what_flag & CI_WHAT_ਚੀਜ਼ਾਂ;
+	ਪੂਰਨ	    has_matches = what_flag & CI_WHAT_MATCHES;
+	ਪੂਰਨ	    has_completed = what_flag & CI_WHAT_COMPLETED;
 
-	if (has_items || has_matches)
+	ਜੇ (has_ਚੀਜ਼ਾਂ || has_matches)
 	{
 	    li = list_alloc();
-	    if (li == NULL)
-		return;
-	    ret = dict_add_list(retdict, (has_matches && !has_items)
+	    ਜੇ (li == ਨਿਰਾ)
+		ਵਾਪਸ;
+	    ret = dict_ਜੋੜੋ_list(retdict, (has_matches && !has_ਚੀਜ਼ਾਂ)
 						? "matches" : "items", li);
-	    if (ret == FAIL)
+	    ਜੇ (ret == FAIL)
 		list_unref(li);
 	}
-	if (ret == OK && what_flag & CI_WHAT_SELECTED)
-	    if (compl_curr_match != NULL && compl_curr_match->cp_number == -1)
+	ਜੇ (ret == OK && what_flag & CI_WHAT_SELECTED)
+	    ਜੇ (compl_curr_ਮੇਲ != ਨਿਰਾ && compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ == -1)
 		ins_compl_update_sequence_numbers();
-	if (ret == OK && compl_first_match != NULL)
+	ਜੇ (ret == OK && compl_ਪਹਿਲਾ_ਮੇਲ != ਨਿਰਾ)
 	{
-	    int list_idx = 0;
-	    match = compl_first_match;
-	    do
+	    ਪੂਰਨ list_idx = 0;
+	    ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+	    ਕਰੋ
 	    {
-		if (!match_at_original_text(match))
+		ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(ਮੇਲ))
 		{
-		    if (has_items
-			    || (has_matches && match->cp_in_match_array))
+		    ਜੇ (has_ਚੀਜ਼ਾਂ
+			    || (has_matches && ਮੇਲ->cp_ਵਿੱਚ_ਮੇਲ_array))
 		    {
 			di = dict_alloc();
-			if (di == NULL)
-			    return;
+			ਜੇ (di == ਨਿਰਾ)
+			    ਵਾਪਸ;
 			ret = list_append_dict(li, di);
-			if (ret != OK)
+			ਜੇ (ret != OK)
 			{
 			    dict_unref(di);
-			    return;
+			    ਵਾਪਸ;
 			}
-			fill_complete_info_dict(di, match, has_matches && has_items);
+			fill_complete_info_dict(di, ਮੇਲ, has_matches && has_ਚੀਜ਼ਾਂ);
 		    }
-		    if (compl_curr_match != NULL
-			    && compl_curr_match->cp_number == match->cp_number)
+		    ਜੇ (compl_curr_ਮੇਲ != ਨਿਰਾ
+			    && compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ == ਮੇਲ->cp_ਸੰਖਿਆ)
 			selected_idx = list_idx;
-		    if (!has_matches || match->cp_in_match_array)
+		    ਜੇ (!has_matches || ਮੇਲ->cp_ਵਿੱਚ_ਮੇਲ_array)
 			list_idx++;
 		}
-		match = match->cp_next;
+		ਮੇਲ = ਮੇਲ->cp_ਅਗਲਾ;
 	    }
-	    while (match != NULL && !is_first_match(match));
+	    ਜਦੋਂ (ਮੇਲ != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(ਮੇਲ));
 	}
-	if (ret == OK && (what_flag & CI_WHAT_SELECTED))
-	    ret = dict_add_number(retdict, "selected", selected_idx);
+	ਜੇ (ret == OK && (what_flag & CI_WHAT_SELECTED))
+	    ret = dict_ਜੋੜੋ_ਸੰਖਿਆ(retdict, "selected", selected_idx);
 
-	if (ret == OK && selected_idx != -1 && has_completed)
+	ਜੇ (ret == OK && selected_idx != -1 && has_completed)
 	{
 	    di = dict_alloc();
-	    if (di == NULL)
-		return;
-	    fill_complete_info_dict(di, compl_curr_match, FALSE);
-	    ret = dict_add_dict(retdict, "completed", di);
-	    if (ret == FAIL)
+	    ਜੇ (di == ਨਿਰਾ)
+		ਵਾਪਸ;
+	    fill_complete_info_dict(di, compl_curr_ਮੇਲ, FALSE);
+	    ret = dict_ਜੋੜੋ_dict(retdict, "completed", di);
+	    ਜੇ (ret == FAIL)
 		dict_unref(di);
 	}
     }
@@ -4400,85 +4400,85 @@ get_complete_info(list_T *what_list, dict_T *retdict)
 /*
  * "complete_info()" function
  */
-    void
+    ਖਾਲੀ
 f_complete_info(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*what_list = NULL;
+    list_T	*what_list = ਨਿਰਾ;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_dict_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (check_for_list_arg(argvars, 0) == FAIL)
-	    return;
+	ਜੇ (check_for_list_arg(argvars, 0) == FAIL)
+	    ਵਾਪਸ;
 	what_list = argvars[0].vval.v_list;
     }
     get_complete_info(what_list, rettv->vval.v_dict);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Returns TRUE when using a user-defined function for thesaurus completion.
  */
-    static int
-thesaurus_func_complete(int type UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+thesaurus_func_complete(ਪੂਰਨ type ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_COMPL_FUNC
-    return type == CTRL_X_THESAURUS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਵਾਪਸ type == CTRL_X_THESAURUS
 		&& (*curbuf->b_p_tsrfu != NUL || *p_tsrfu != NUL);
-#else
-    return FALSE;
-#endif
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ FALSE;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Check if 'cpt' list index can be advanced to the next completion source.
  */
-    static int
-may_advance_cpt_index(char_u *cpt)
+    ਸਥਿਰ ਪੂਰਨ
+may_advance_cpt_ਸੂਚਕਾਂਕ(char_u *cpt)
 {
     char_u  *p = cpt;
 
-    if (cpt_sources_index == -1)
-	return FALSE;
-    while (*p == ',' || *p == ' ') // Skip delimiters
+    ਜੇ (cpt_sources_ਸੂਚਕਾਂਕ == -1)
+	ਵਾਪਸ FALSE;
+    ਜਦੋਂ (*p == ',' || *p == ' ') // Skip delimiters
 	p++;
-    return (*p != NUL);
+    ਵਾਪਸ (*p != NUL);
 }
 
 /*
  * Return value of process_next_cpt_value()
  */
-enum
+ਗਿਣਤੀ
 {
     INS_COMPL_CPT_OK = 1,
     INS_COMPL_CPT_CONT,
-    INS_COMPL_CPT_END
+    INS_COMPL_CPT_ਸਿਰਾ
 };
 
 /*
  * state information used for getting the next set of insert completion
  * matches.
  */
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
     char_u	*e_cpt_copy;		// copy of 'complete'
     char_u	*e_cpt;			// current entry in "e_cpt_copy"
     buf_T	*ins_buf;		// buffer being scanned
-    pos_T	*cur_match_pos;		// current match position
-    pos_T	prev_match_pos;		// previous match position
-    int		set_match_pos;		// save first_match_pos/last_match_pos
-    pos_T	first_match_pos;	// first match position
-    pos_T	last_match_pos;		// last match position
-    int		found_all;		// found all matches of a certain type.
+    pos_T	*cur_ਮੇਲ_pos;		// current match position
+    pos_T	prev_ਮੇਲ_pos;		// previous match position
+    ਪੂਰਨ		ਸੈੱਟ_ਮੇਲ_pos;		// save first_match_pos/last_match_pos
+    pos_T	ਪਹਿਲਾ_ਮੇਲ_pos;	// first match position
+    pos_T	ਆਖਰੀ_ਮੇਲ_pos;		// last match position
+    ਪੂਰਨ		ਮਿਲਿਆ_all;		// found all matches of a certain type.
     char_u	*dict;			// dictionary file to search
-    int		dict_f;			// "dict" is an exact file name or not
+    ਪੂਰਨ		dict_f;			// "dict" is an exact file name or not
     callback_T	*func_cb;		// callback of function in 'cpt' option
-} ins_compl_next_state_T;
+} ins_compl_ਅਗਲਾ_state_T;
 
 /*
  * Process the next 'complete' option value in st->e_cpt.
@@ -4500,235 +4500,235 @@ typedef struct
  * the "st->e_cpt" option value and process the next matching source.
  * Returns INS_COMPL_CPT_END if all the values in "st->e_cpt" are processed.
  */
-    static int
-process_next_cpt_value(
-	ins_compl_next_state_T *st,
-	int		*compl_type_arg,
-	pos_T		*start_match_pos,
-	int		fuzzy_collect,
-	int		*advance_cpt_idx)
+    ਸਥਿਰ ਪੂਰਨ
+process_ਅਗਲਾ_cpt_ਮੁੱਲ(
+	ins_compl_ਅਗਲਾ_state_T *st,
+	ਪੂਰਨ		*compl_type_arg,
+	pos_T		*ਸ਼ੁਰੂ_ਮੇਲ_pos,
+	ਪੂਰਨ		fuzzy_collect,
+	ਪੂਰਨ		*advance_cpt_idx)
 {
-    int	    compl_type = -1;
-    int	    status = INS_COMPL_CPT_OK;
-    int	    skip_source = compl_autocomplete && compl_from_nonkeyword;
+    ਪੂਰਨ	    compl_type = -1;
+    ਪੂਰਨ	    ਸਥਿਤੀ = INS_COMPL_CPT_OK;
+    ਪੂਰਨ	    skip_ਸਰੋਤ = compl_autocomplete && compl_from_nonkeyword;
 
-    st->found_all = FALSE;
+    st->ਮਿਲਿਆ_all = FALSE;
     *advance_cpt_idx = FALSE;
 
-    while (*st->e_cpt == ',' || *st->e_cpt == ' ')
+    ਜਦੋਂ (*st->e_cpt == ',' || *st->e_cpt == ' ')
 	st->e_cpt++;
 
-    if (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_source
-	    && !compl_time_slice_expired)
+    ਜੇ (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_ਸਰੋਤ
+	    && !compl_ਸਮਾਂ_ਟੁਕੜਾ_expired)
     {
 	st->ins_buf = curbuf;
-	st->first_match_pos = *start_match_pos;
+	st->ਪਹਿਲਾ_ਮੇਲ_pos = *ਸ਼ੁਰੂ_ਮੇਲ_pos;
 	// Move the cursor back one character so that ^N can match the
 	// word immediately after the cursor.
-	if (ctrl_x_mode_normal() && (!fuzzy_collect && dec(&st->first_match_pos) < 0))
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && (!fuzzy_collect && dec(&st->ਪਹਿਲਾ_ਮੇਲ_pos) < 0))
 	{
 	    // Move the cursor to after the last character in the
 	    // buffer, so that word at start of buffer is found
 	    // correctly.
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count;
-	    st->first_match_pos.col = ml_get_len(st->first_match_pos.lnum);
+	    st->ਪਹਿਲਾ_ਮੇਲ_pos.lnum = st->ins_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+	    st->ਪਹਿਲਾ_ਮੇਲ_pos.ਖਾਨਾ = ml_get_len(st->ਪਹਿਲਾ_ਮੇਲ_pos.lnum);
 	}
-	st->last_match_pos = st->first_match_pos;
+	st->ਆਖਰੀ_ਮੇਲ_pos = st->ਪਹਿਲਾ_ਮੇਲ_pos;
 	compl_type = 0;
 
 	// Remember the first match so that the loop stops when we
 	// wrap and come back there a second time.
-	st->set_match_pos = TRUE;
+	st->ਸੈੱਟ_ਮੇਲ_pos = TRUE;
     }
-    else if (!skip_source && !compl_time_slice_expired
-	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != NULL
-	    && (st->ins_buf = ins_compl_next_buf(
+    ਨਹੀਂਤਾਂ ਜੇ (!skip_ਸਰੋਤ && !compl_ਸਮਾਂ_ਟੁਕੜਾ_expired
+	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != ਨਿਰਾ
+	    && (st->ins_buf = ins_compl_ਅਗਲਾ_buf(
 					   st->ins_buf, *st->e_cpt)) != curbuf)
     {
 	// Scan a buffer, but not the current one.
-	if (st->ins_buf->b_ml.ml_mfp != NULL)   // loaded buffer
+	ਜੇ (st->ins_buf->b_ml.ml_mfp != ਨਿਰਾ)   // loaded buffer
 	{
 	    compl_started = TRUE;
-	    st->first_match_pos.col = st->last_match_pos.col = 0;
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count + 1;
-	    st->last_match_pos.lnum = 0;
+	    st->ਪਹਿਲਾ_ਮੇਲ_pos.ਖਾਨਾ = st->ਆਖਰੀ_ਮੇਲ_pos.ਖਾਨਾ = 0;
+	    st->ਪਹਿਲਾ_ਮੇਲ_pos.lnum = st->ins_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1;
+	    st->ਆਖਰੀ_ਮੇਲ_pos.lnum = 0;
 	    compl_type = 0;
 	}
-	else	// unloaded buffer, scan like dictionary
+	ਨਹੀਂਤਾਂ	// unloaded buffer, scan like dictionary
 	{
-	    st->found_all = TRUE;
-	    if (st->ins_buf->b_fname == NULL)
+	    st->ਮਿਲਿਆ_all = TRUE;
+	    ਜੇ (st->ins_buf->b_fname == ਨਿਰਾ)
 	    {
-		status = INS_COMPL_CPT_CONT;
-		goto done;
+		ਸਥਿਤੀ = INS_COMPL_CPT_CONT;
+		ਜਾਓ ਪੂਰਾ;
 	    }
 	    compl_type = CTRL_X_DICTIONARY;
 	    st->dict = st->ins_buf->b_fname;
 	    st->dict_f = DICT_EXACT;
 	}
-	if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+	ਜੇ (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning: %s"),
-		    st->ins_buf->b_fname == NULL
+	    ਸੁਨੇਹਾ_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((ਅੱਖਰ *)IObuff, IOSIZE, _("Scanning: %s"),
+		    st->ins_buf->b_fname == ਨਿਰਾ
 			? buf_spname(st->ins_buf)
-			: st->ins_buf->b_sfname == NULL
+			: st->ins_buf->b_sfname == ਨਿਰਾ
 			    ? st->ins_buf->b_fname
 			    : st->ins_buf->b_sfname);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    (ਖਾਲੀ)ਸੁਨੇਹਾ_trunc_attr((ਅੱਖਰ *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
     }
-    else if (*st->e_cpt == NUL)
-	status = INS_COMPL_CPT_END;
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == NUL)
+	ਸਥਿਤੀ = INS_COMPL_CPT_ਸਿਰਾ;
+    ਨਹੀਂਤਾਂ
     {
-	if (ctrl_x_mode_line_or_eval())
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
 	    compl_type = -1;
-#ifdef FEAT_COMPL_FUNC
-	else if (*st->e_cpt == 'F' || *st->e_cpt == 'o')
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+	ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == 'F' || *st->e_cpt == 'o')
 	{
 	    compl_type = CTRL_X_FUNCTION;
-	    st->func_cb = get_callback_if_cpt_func(st->e_cpt, cpt_sources_index);
-	    if (!st->func_cb)
+	    st->func_cb = get_callback_if_cpt_func(st->e_cpt, cpt_sources_ਸੂਚਕਾਂਕ);
+	    ਜੇ (!st->func_cb)
 		compl_type = -1;
 	}
-#endif
-	else if (!skip_source)
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ ਜੇ (!skip_ਸਰੋਤ)
 	{
-	    if (*st->e_cpt == 'k' || *st->e_cpt == 's')
+	    ਜੇ (*st->e_cpt == 'k' || *st->e_cpt == 's')
 	    {
-		if (*st->e_cpt == 'k')
+		ਜੇ (*st->e_cpt == 'k')
 		    compl_type = CTRL_X_DICTIONARY;
-		else
+		ਨਹੀਂਤਾਂ
 		    compl_type = CTRL_X_THESAURUS;
-		if (*++st->e_cpt != ',' && *st->e_cpt != NUL)
+		ਜੇ (*++st->e_cpt != ',' && *st->e_cpt != NUL)
 		{
 		    st->dict = st->e_cpt;
-		    st->dict_f = DICT_FIRST;
+		    st->dict_f = DICT_ਪਹਿਲਾ;
 		}
 	    }
-#ifdef FEAT_FIND_ID
-	    else if (*st->e_cpt == 'i')
-		compl_type = CTRL_X_PATH_PATTERNS;
-	    else if (*st->e_cpt == 'd')
-		compl_type = CTRL_X_PATH_DEFINES;
-#endif
-	    else if (*st->e_cpt == ']' || *st->e_cpt == 't')
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
+	    ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == 'i')
+		compl_type = CTRL_X_ਰਸਤਾ_PATTERNS;
+	    ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == 'd')
+		compl_type = CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ;
+#ਜੇ_ਅੰਤ
+	    ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == ']' || *st->e_cpt == 't')
 	    {
-		compl_type = CTRL_X_TAGS;
-		if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+		compl_type = CTRL_X_ਟੈਗ_ਸੂਚੀ;
+		ਜੇ (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 		{
-		    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-		    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning tags."));
-		    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+		    ਸੁਨੇਹਾ_hist_off = TRUE;	// reset in msg_trunc_attr()
+		    vim_snprintf((ਅੱਖਰ *)IObuff, IOSIZE, _("Scanning tags."));
+		    (ਖਾਲੀ)ਸੁਨੇਹਾ_trunc_attr((ਅੱਖਰ *)IObuff, TRUE, HL_ATTR(HLF_R));
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		compl_type = -1;
 	}
 
 	// in any case e_cpt is advanced to the next entry
-	(void)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
-	*advance_cpt_idx = may_advance_cpt_index(st->e_cpt);
+	(ਖਾਲੀ)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
+	*advance_cpt_idx = may_advance_cpt_ਸੂਚਕਾਂਕ(st->e_cpt);
 
-	st->found_all = TRUE;
-	if (compl_type == -1)
-	    status = INS_COMPL_CPT_CONT;
+	st->ਮਿਲਿਆ_all = TRUE;
+	ਜੇ (compl_type == -1)
+	    ਸਥਿਤੀ = INS_COMPL_CPT_CONT;
     }
 
-done:
+ਪੂਰਾ:
     *compl_type_arg = compl_type;
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
-#ifdef FEAT_FIND_ID
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
 /*
  * Get the next set of identifiers or defines matching "compl_pattern" in
  * included files.
  */
-    static void
-get_next_include_file_completion(int compl_type)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_include_file_completion(ਪੂਰਨ compl_type)
 {
-    find_pattern_in_path(compl_pattern.string, compl_direction,
-	    (int)compl_pattern.length, FALSE, FALSE,
-	    (compl_type == CTRL_X_PATH_DEFINES
-	     && !(compl_cont_status & CONT_SOL))
-	    ? FIND_DEFINE : FIND_ANY, 1L, ACTION_EXPAND,
+    ਲੱਭੋ_ਨਮੂਨਾ_ਵਿੱਚ_ਰਸਤਾ(compl_ਨਮੂਨਾ.string, compl_direction,
+	    (ਪੂਰਨ)compl_ਨਮੂਨਾ.ਲੰਮਾਈ, FALSE, FALSE,
+	    (compl_type == CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ
+	     && !(compl_cont_ਸਥਿਤੀ & CONT_SOL))
+	    ? ਲੱਭੋ_DEFINE : ਲੱਭੋ_ANY, 1L, ACTION_EXPAND,
 	    (linenr_T)1, (linenr_T)MAXLNUM, FALSE, compl_autocomplete);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Get the next set of words matching "compl_pattern" in dictionary or
  * thesaurus files.
  */
-    static void
-get_next_dict_tsr_completion(int compl_type, char_u *dict, int dict_f)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_dict_tsr_completion(ਪੂਰਨ compl_type, char_u *dict, ਪੂਰਨ dict_f)
 {
-#ifdef FEAT_COMPL_FUNC
-    if (thesaurus_func_complete(compl_type))
-	expand_by_function(compl_type, compl_pattern.string, NULL);
-    else
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਜੇ (thesaurus_func_complete(compl_type))
+	expand_by_function(compl_type, compl_ਨਮੂਨਾ.string, ਨਿਰਾ);
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	ins_compl_dictionaries(
-		dict != NULL ? dict
+		dict != ਨਿਰਾ ? dict
 		: (compl_type == CTRL_X_THESAURUS
 		    ? (*curbuf->b_p_tsr == NUL ? p_tsr : curbuf->b_p_tsr)
 		    : (*curbuf->b_p_dict == NUL ? p_dict : curbuf->b_p_dict)),
-		compl_pattern.string,
-		dict != NULL ? dict_f : 0,
+		compl_ਨਮੂਨਾ.string,
+		dict != ਨਿਰਾ ? dict_f : 0,
 		compl_type == CTRL_X_THESAURUS);
 }
 
 /*
  * Get the next set of tag names matching "compl_pattern".
  */
-    static void
-get_next_tag_completion(void)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_ਟੈਗ_completion(ਖਾਲੀ)
 {
-    int		save_p_ic;
+    ਪੂਰਨ		save_p_ic;
     char_u	**matches;
-    int		num_matches;
+    ਪੂਰਨ		ਅੰਕ_matches;
 
     // set p_ic according to p_ic, p_scs and pat for find_tags().
     save_p_ic = p_ic;
-    p_ic = ignorecase(compl_pattern.string);
+    p_ic = ignorecase(compl_ਨਮੂਨਾ.string);
 
     // Find up to TAG_MANY matches.  Avoids that an enormous number
     // of matches is found when compl_pattern is empty
-    g_tag_at_cursor = TRUE;
-    if (find_tags(compl_pattern.string, &num_matches, &matches,
-		TAG_REGEXP | TAG_NAMES | TAG_NOIC | TAG_INS_COMP
-		| (ctrl_x_mode_not_default() ? TAG_VERBOSE : 0),
-		TAG_MANY, curbuf->b_ffname) == OK && num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
-    g_tag_at_cursor = FALSE;
+    g_ਟੈਗ_at_cursor = TRUE;
+    ਜੇ (ਲੱਭੋ_ਟੈਗ_ਸੂਚੀ(compl_ਨਮੂਨਾ.string, &ਅੰਕ_matches, &matches,
+		ਟੈਗ_REGEXP | ਟੈਗ_ਨਾਂ | ਟੈਗ_NOIC | ਟੈਗ_INS_COMP
+		| (ctrl_x_ਬਹੁਲਕ_not_default() ? ਟੈਗ_VERBOSE : 0),
+		ਟੈਗ_MANY, curbuf->b_ffname) == OK && ਅੰਕ_matches > 0)
+	ins_compl_ਜੋੜੋ_matches(ਅੰਕ_matches, matches, p_ic);
+    g_ਟੈਗ_at_cursor = FALSE;
     p_ic = save_p_ic;
 }
 
 /*
  * Compare function for qsort
  */
-    static int
-compare_scores(const void *a, const void *b)
+    ਸਥਿਰ ਪੂਰਨ
+compare_scores(ਅਚਲ ਖਾਲੀ *a, ਅਚਲ ਖਾਲੀ *b)
 {
-    int idx_a = *(const int *)a;
-    int idx_b = *(const int *)b;
-    int score_a = compl_fuzzy_scores[idx_a];
-    int score_b = compl_fuzzy_scores[idx_b];
-    return score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
+    ਪੂਰਨ idx_a = *(ਅਚਲ ਪੂਰਨ *)a;
+    ਪੂਰਨ idx_b = *(ਅਚਲ ਪੂਰਨ *)b;
+    ਪੂਰਨ score_a = compl_fuzzy_scores[idx_a];
+    ਪੂਰਨ score_b = compl_fuzzy_scores[idx_b];
+    ਵਾਪਸ score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
 			: (score_a > score_b ? -1 : 1);
 }
 
 /*
  * insert prefix with redraw
  */
-    static void
-ins_compl_longest_insert(char_u *prefix)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_longest_ਪਾਓ(char_u *ਅਗੇਤਰ)
 {
     ins_compl_delete();
-    ins_compl_insert_bytes(prefix + get_compl_len(), -1);
-    compl_longest_end_col = curwin->w_cursor.col;
+    ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(ਅਗੇਤਰ + get_compl_len(), -1);
+    compl_longest_ਸਿਰਾ_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
     ins_redraw(FALSE);
 }
 
@@ -4736,220 +4736,220 @@ ins_compl_longest_insert(char_u *prefix)
  * Calculate the longest common prefix among the best fuzzy matches
  * stored in compl_best_matches, and insert it as the longest.
  */
-    static void
-fuzzy_longest_match(void)
+    ਸਥਿਰ ਖਾਲੀ
+fuzzy_longest_ਮੇਲ(ਖਾਲੀ)
 {
-    char_u	*prefix = NULL;
-    int		prefix_len = 0;
-    int		i = 0;
-    int		j = 0;
-    char_u	*match_str = NULL;
-    char_u	*prefix_ptr = NULL;
-    char_u	*match_ptr = NULL;
-    char_u	*leader = NULL;
+    char_u	*ਅਗੇਤਰ = ਨਿਰਾ;
+    ਪੂਰਨ		ਅਗੇਤਰ_len = 0;
+    ਪੂਰਨ		i = 0;
+    ਪੂਰਨ		j = 0;
+    char_u	*ਮੇਲ_str = ਨਿਰਾ;
+    char_u	*ਅਗੇਤਰ_ptr = ਨਿਰਾ;
+    char_u	*ਮੇਲ_ptr = ਨਿਰਾ;
+    char_u	*leader = ਨਿਰਾ;
     size_t	leader_len = 0;
-    compl_T	*compl = NULL;
-    int		more_candidates = FALSE;
-    compl_T	*nn_compl = NULL;
+    compl_T	*compl = ਨਿਰਾ;
+    ਪੂਰਨ		ਹੋਰ_candidates = FALSE;
+    compl_T	*nn_compl = ਨਿਰਾ;
 
-    if (compl_num_bests == 0)
-	return;
+    ਜੇ (compl_ਅੰਕ_bests == 0)
+	ਵਾਪਸ;
 
-    nn_compl = compl_first_match->cp_next->cp_next;
-    if (nn_compl && nn_compl != compl_first_match)
-	more_candidates = TRUE;
+    nn_compl = compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ->cp_ਅਗਲਾ;
+    ਜੇ (nn_compl && nn_compl != compl_ਪਹਿਲਾ_ਮੇਲ)
+	ਹੋਰ_candidates = TRUE;
 
-    compl = ctrl_x_mode_whole_line() ? compl_first_match
-				    : compl_first_match->cp_next;
-    if (compl_num_bests == 1)
+    compl = ctrl_x_ਬਹੁਲਕ_ਸਾਰਾ_ਸਤਰ() ? compl_ਪਹਿਲਾ_ਮੇਲ
+				    : compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ;
+    ਜੇ (compl_ਅੰਕ_bests == 1)
     {
 	// no more candidates insert the match str
-	if (!more_candidates)
+	ਜੇ (!ਹੋਰ_candidates)
 	{
-	    ins_compl_longest_insert(compl->cp_str.string);
-	    compl_num_bests = 0;
+	    ins_compl_longest_ਪਾਓ(compl->cp_str.string);
+	    compl_ਅੰਕ_bests = 0;
 	}
-	compl_num_bests = 0;
-	return;
+	compl_ਅੰਕ_bests = 0;
+	ਵਾਪਸ;
     }
 
-    if ((size_t)compl_num_bests > SIZE_MAX / sizeof(compl_T *))
-	return;
-    compl_best_matches = (compl_T **)alloc(compl_num_bests * sizeof(compl_T *));
-    if (compl_best_matches == NULL)
-	return;
-    while (compl != NULL && i < compl_num_bests)
+    ਜੇ ((size_t)compl_ਅੰਕ_bests > ਮਾਪ_MAX / ਆਕਾਰ(compl_T *))
+	ਵਾਪਸ;
+    compl_ਉੱਤਮ_matches = (compl_T **)alloc(compl_ਅੰਕ_bests * ਆਕਾਰ(compl_T *));
+    ਜੇ (compl_ਉੱਤਮ_matches == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜਦੋਂ (compl != ਨਿਰਾ && i < compl_ਅੰਕ_bests)
     {
-	compl_best_matches[i] = compl;
-	compl = compl->cp_next;
+	compl_ਉੱਤਮ_matches[i] = compl;
+	compl = compl->cp_ਅਗਲਾ;
 	i++;
     }
 
-    prefix = compl_best_matches[0]->cp_str.string;
-    prefix_len = (int)compl_best_matches[0]->cp_str.length;
+    ਅਗੇਤਰ = compl_ਉੱਤਮ_matches[0]->cp_str.string;
+    ਅਗੇਤਰ_len = (ਪੂਰਨ)compl_ਉੱਤਮ_matches[0]->cp_str.ਲੰਮਾਈ;
 
-    for (i = 1; i < compl_num_bests; i++)
+    ਲਈ (i = 1; i < compl_ਅੰਕ_bests; i++)
     {
-	match_str = compl_best_matches[i]->cp_str.string;
-	prefix_ptr = prefix;
-	match_ptr = match_str;
+	ਮੇਲ_str = compl_ਉੱਤਮ_matches[i]->cp_str.string;
+	ਅਗੇਤਰ_ptr = ਅਗੇਤਰ;
+	ਮੇਲ_ptr = ਮੇਲ_str;
 	j = 0;
 
-	while (j < prefix_len && *match_ptr != NUL && *prefix_ptr != NUL)
+	ਜਦੋਂ (j < ਅਗੇਤਰ_len && *ਮੇਲ_ptr != NUL && *ਅਗੇਤਰ_ptr != NUL)
 	{
-	    if (STRNCMP(prefix_ptr, match_ptr, mb_ptr2len(prefix_ptr)) != 0)
-		break;
+	    ਜੇ (STRNCMP(ਅਗੇਤਰ_ptr, ਮੇਲ_ptr, mb_ptr2len(ਅਗੇਤਰ_ptr)) != 0)
+		ਰੋਕੋ;
 
-	    MB_PTR_ADV(prefix_ptr);
-	    MB_PTR_ADV(match_ptr);
+	    MB_PTR_ADV(ਅਗੇਤਰ_ptr);
+	    MB_PTR_ADV(ਮੇਲ_ptr);
 	    j++;
 	}
 
-	if (j > 0)
-	    prefix_len = j;
+	ਜੇ (j > 0)
+	    ਅਗੇਤਰ_len = j;
     }
 
     leader = ins_compl_leader();
     leader_len = ins_compl_leader_len();
 
     // skip non-consecutive prefixes
-    if (leader_len > 0 && STRNCMP(prefix, leader, leader_len) != 0)
-	goto end;
+    ਜੇ (leader_len > 0 && STRNCMP(ਅਗੇਤਰ, leader, leader_len) != 0)
+	ਜਾਓ ਸਿਰਾ;
 
-    prefix = vim_strnsave(prefix, prefix_len);
-    if (prefix != NULL)
+    ਅਗੇਤਰ = vim_strnsave(ਅਗੇਤਰ, ਅਗੇਤਰ_len);
+    ਜੇ (ਅਗੇਤਰ != ਨਿਰਾ)
     {
-	ins_compl_longest_insert(prefix);
-	vim_free(prefix);
+	ins_compl_longest_ਪਾਓ(ਅਗੇਤਰ);
+	vim_free(ਅਗੇਤਰ);
     }
 
-end:
-    vim_free(compl_best_matches);
-    compl_best_matches = NULL;
-    compl_num_bests = 0;
+ਸਿਰਾ:
+    vim_free(compl_ਉੱਤਮ_matches);
+    compl_ਉੱਤਮ_matches = ਨਿਰਾ;
+    compl_ਅੰਕ_bests = 0;
 }
 
 /*
  * Get the next set of filename matching "compl_pattern".
  */
-    static void
-get_next_filename_completion(void)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_filename_completion(ਖਾਲੀ)
 {
     char_u	**matches;
-    int		num_matches;
+    ਪੂਰਨ		ਅੰਕ_matches;
     char_u	*ptr;
     garray_T	fuzzy_indices;
-    int		i;
-    int		score;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		score;
     char_u	*leader = ins_compl_leader();
     size_t	leader_len = ins_compl_leader_len();
-    int		in_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
-    int		*fuzzy_indices_data;
-    char_u	*last_sep = NULL;
-    int		need_collect_bests = in_fuzzy_collect && compl_get_longest;
-    int		max_score = 0;
-    int		current_score = 0;
-    int		dir = compl_direction;
+    ਪੂਰਨ		ਵਿੱਚ_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
+    ਪੂਰਨ		*fuzzy_indices_ਅੰਕੜੇ;
+    char_u	*ਆਖਰੀ_sep = ਨਿਰਾ;
+    ਪੂਰਨ		need_collect_bests = ਵਿੱਚ_fuzzy_collect && compl_get_longest;
+    ਪੂਰਨ		max_score = 0;
+    ਪੂਰਨ		current_score = 0;
+    ਪੂਰਨ		dir = compl_direction;
 
-#ifdef BACKSLASH_IN_FILENAME
-    char pathsep = (curbuf->b_p_csl[0] == 's') ?
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+    ਅੱਖਰ pathsep = (curbuf->b_p_csl[0] == 's') ?
 	'/' : (curbuf->b_p_csl[0] == 'b') ? '\\' : PATHSEP;
-#else
-    char pathsep = PATHSEP;
-#endif
+#ਨਹੀਂਤਾਂ
+    ਅੱਖਰ pathsep = PATHSEP;
+#ਜੇ_ਅੰਤ
 
-    if (in_fuzzy_collect)
+    ਜੇ (ਵਿੱਚ_fuzzy_collect)
     {
-#ifdef BACKSLASH_IN_FILENAME
-	if (curbuf->b_p_csl[0] == 's')
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+	ਜੇ (curbuf->b_p_csl[0] == 's')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    ਲਈ (i = 0; i < (ਪੂਰਨ)leader_len; i++)
 	    {
-		if (leader[i] == '\\')
+		ਜੇ (leader[i] == '\\')
 		    leader[i] = '/';
 	    }
 	}
-	else if (curbuf->b_p_csl[0] == 'b')
+	ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_p_csl[0] == 'b')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    ਲਈ (i = 0; i < (ਪੂਰਨ)leader_len; i++)
 	    {
-		if (leader[i] == '/')
+		ਜੇ (leader[i] == '/')
 		    leader[i] = '\\';
 	    }
 	}
-#endif
-	last_sep = vim_strrchr(leader, pathsep);
-	if (last_sep == NULL)
+#ਜੇ_ਅੰਤ
+	ਆਖਰੀ_sep = vim_strrchr(leader, pathsep);
+	ਜੇ (ਆਖਰੀ_sep == ਨਿਰਾ)
 	{
 	    // No path separator or separator is the last character,
 	    // fuzzy match the whole leader
-	    VIM_CLEAR_STRING(compl_pattern);
-	    compl_pattern.string = vim_strnsave((char_u *)"*", 1);
-	    if (compl_pattern.string == NULL)
-		return;
-	    compl_pattern.length = 1;
+	    VIM_CLEAR_STRING(compl_ਨਮੂਨਾ);
+	    compl_ਨਮੂਨਾ.string = vim_strnsave((char_u *)"*", 1);
+	    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
+		ਵਾਪਸ;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 1;
 	}
-	else if (*(last_sep + 1) == '\0')
-	    in_fuzzy_collect = FALSE;
-	else
+	ਨਹੀਂਤਾਂ ਜੇ (*(ਆਖਰੀ_sep + 1) == '\0')
+	    ਵਿੱਚ_fuzzy_collect = FALSE;
+	ਨਹੀਂਤਾਂ
 	{
 	    // Split leader into path and file parts
-	    int path_len = last_sep - leader + 1;
-	    char_u  *path_with_wildcard;
+	    ਪੂਰਨ ਰਸਤਾ_len = ਆਖਰੀ_sep - leader + 1;
+	    char_u  *ਰਸਤਾ_with_wildcard;
 
-	    path_with_wildcard = alloc(path_len + 2);
-	    if (path_with_wildcard != NULL)
+	    ਰਸਤਾ_with_wildcard = alloc(ਰਸਤਾ_len + 2);
+	    ਜੇ (ਰਸਤਾ_with_wildcard != ਨਿਰਾ)
 	    {
-		vim_snprintf((char *)path_with_wildcard, path_len + 2, "%*.*s*", path_len, path_len, leader);
-		VIM_CLEAR_STRING(compl_pattern);
-		compl_pattern.string = path_with_wildcard;
-		compl_pattern.length = path_len + 1;
+		vim_snprintf((ਅੱਖਰ *)ਰਸਤਾ_with_wildcard, ਰਸਤਾ_len + 2, "%*.*s*", ਰਸਤਾ_len, ਰਸਤਾ_len, leader);
+		VIM_CLEAR_STRING(compl_ਨਮੂਨਾ);
+		compl_ਨਮੂਨਾ.string = ਰਸਤਾ_with_wildcard;
+		compl_ਨਮੂਨਾ.ਲੰਮਾਈ = ਰਸਤਾ_len + 1;
 
 		// Move leader to the file part
-		leader = last_sep + 1;
-		leader_len -= path_len;
+		leader = ਆਖਰੀ_sep + 1;
+		leader_len -= ਰਸਤਾ_len;
 	    }
 	}
     }
 
-    if (expand_wildcards(1, &compl_pattern.string, &num_matches, &matches,
+    ਜੇ (expand_wildcards(1, &compl_ਨਮੂਨਾ.string, &ਅੰਕ_matches, &matches,
 		EW_FILE|EW_DIR|EW_ADDSLASH|EW_SILENT) != OK)
-	return;
+	ਵਾਪਸ;
 
     // May change home directory back to "~".
-    tilde_replace(compl_pattern.string, num_matches, matches);
-#ifdef BACKSLASH_IN_FILENAME
-    if (curbuf->b_p_csl[0] != NUL)
+    tilde_replace(compl_ਨਮੂਨਾ.string, ਅੰਕ_matches, matches);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+    ਜੇ (curbuf->b_p_csl[0] != NUL)
     {
-	for (i = 0; i < num_matches; ++i)
+	ਲਈ (i = 0; i < ਅੰਕ_matches; ++i)
 	{
 	    ptr = matches[i];
-	    while (*ptr != NUL)
+	    ਜਦੋਂ (*ptr != NUL)
 	    {
-		if (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
+		ਜੇ (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
+		ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (in_fuzzy_collect)
+    ਜੇ (ਵਿੱਚ_fuzzy_collect)
     {
-	ga_init2(&fuzzy_indices, sizeof(int), 10);
-	compl_fuzzy_scores = (int *)alloc(sizeof(int) * num_matches);
+	ga_init2(&fuzzy_indices, ਆਕਾਰ(ਪੂਰਨ), 10);
+	compl_fuzzy_scores = (ਪੂਰਨ *)alloc(ਆਕਾਰ(ਪੂਰਨ) * ਅੰਕ_matches);
 
-	for (i = 0; i < num_matches; i++)
+	ਲਈ (i = 0; i < ਅੰਕ_matches; i++)
 	{
 	    ptr = matches[i];
-	    score = fuzzy_match_str(ptr, leader);
-	    if (score != FUZZY_SCORE_NONE)
+	    score = fuzzy_ਮੇਲ_str(ptr, leader);
+	    ਜੇ (score != FUZZY_SCORE_NONE)
 	    {
-		if (ga_grow(&fuzzy_indices, 1) == OK)
+		ਜੇ (ga_grow(&fuzzy_indices, 1) == OK)
 		{
-		    ((int *)fuzzy_indices.ga_data)[fuzzy_indices.ga_len] = i;
+		    ((ਪੂਰਨ *)fuzzy_indices.ga_ਅੰਕੜੇ)[fuzzy_indices.ga_len] = i;
 		    compl_fuzzy_scores[i] = score;
 		    fuzzy_indices.ga_len++;
 		}
@@ -4957,163 +4957,163 @@ get_next_filename_completion(void)
 	}
 
 	// prevent qsort from deref NULL pointer
-	if (fuzzy_indices.ga_len > 0)
+	ਜੇ (fuzzy_indices.ga_len > 0)
 	{
-	    char_u	*match = NULL;
-	    fuzzy_indices_data = (int *)fuzzy_indices.ga_data;
-	    qsort(fuzzy_indices_data, fuzzy_indices.ga_len, sizeof(int), compare_scores);
+	    char_u	*ਮੇਲ = ਨਿਰਾ;
+	    fuzzy_indices_ਅੰਕੜੇ = (ਪੂਰਨ *)fuzzy_indices.ga_ਅੰਕੜੇ;
+	    qsort(fuzzy_indices_ਅੰਕੜੇ, fuzzy_indices.ga_len, ਆਕਾਰ(ਪੂਰਨ), compare_scores);
 
-	    for (i = 0; i < fuzzy_indices.ga_len; ++i)
+	    ਲਈ (i = 0; i < fuzzy_indices.ga_len; ++i)
 	    {
-		match = matches[fuzzy_indices_data[i]];
-		current_score = compl_fuzzy_scores[fuzzy_indices_data[i]];
-		if (ins_compl_add(match, -1, NULL, NULL, NULL, dir,
+		ਮੇਲ = matches[fuzzy_indices_ਅੰਕੜੇ[i]];
+		current_score = compl_fuzzy_scores[fuzzy_indices_ਅੰਕੜੇ[i]];
+		ਜੇ (ins_compl_ਜੋੜੋ(ਮੇਲ, -1, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, dir,
 			CP_FAST | ((p_fic || p_wic) ? CP_ICASE : 0),
-			FALSE, NULL, current_score) == OK)
+			FALSE, ਨਿਰਾ, current_score) == OK)
 		    dir = FORWARD;
 
-		if (need_collect_bests)
+		ਜੇ (need_collect_bests)
 		{
-		    if (i == 0 || current_score == max_score)
+		    ਜੇ (i == 0 || current_score == max_score)
 		    {
-			compl_num_bests++;
+			compl_ਅੰਕ_bests++;
 			max_score = current_score;
 		    }
 		}
 	    }
 
-	    FreeWild(num_matches, matches);
+	    FreeWild(ਅੰਕ_matches, matches);
 	}
-	else if (leader_len > 0)
+	ਨਹੀਂਤਾਂ ਜੇ (leader_len > 0)
 	{
-	    FreeWild(num_matches, matches);
-	    num_matches = 0;
+	    FreeWild(ਅੰਕ_matches, matches);
+	    ਅੰਕ_matches = 0;
 	}
 
 	vim_free(compl_fuzzy_scores);
 	ga_clear(&fuzzy_indices);
 
-	if (compl_num_bests > 0 && compl_get_longest)
-	    fuzzy_longest_match();
-	return;
+	ਜੇ (compl_ਅੰਕ_bests > 0 && compl_get_longest)
+	    fuzzy_longest_ਮੇਲ();
+	ਵਾਪਸ;
     }
 
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_fic || p_wic);
+    ਜੇ (ਅੰਕ_matches > 0)
+	ins_compl_ਜੋੜੋ_matches(ਅੰਕ_matches, matches, p_fic || p_wic);
 }
 
 /*
  * Get the next set of command-line completions matching "compl_pattern".
  */
-    static void
-get_next_cmdline_completion(void)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_cmdline_completion(ਖਾਲੀ)
 {
     char_u	**matches;
-    int		num_matches;
+    ਪੂਰਨ		ਅੰਕ_matches;
 
-    if (expand_cmdline(&compl_xp, compl_pattern.string,
-		(int)compl_pattern.length, &num_matches, &matches) == EXPAND_OK)
+    ਜੇ (expand_cmdline(&compl_xp, compl_ਨਮੂਨਾ.string,
+		(ਪੂਰਨ)compl_ਨਮੂਨਾ.ਲੰਮਾਈ, &ਅੰਕ_matches, &matches) == EXPAND_OK)
     {
-	int		add_r = OK;
-	int		dir = compl_direction;
+	ਪੂਰਨ		ਜੋੜੋ_r = OK;
+	ਪੂਰਨ		dir = compl_direction;
 
-	for (int i = 0; i < num_matches && add_r != FAIL; i++)
+	ਲਈ (ਪੂਰਨ i = 0; i < ਅੰਕ_matches && ਜੋੜੋ_r != FAIL; i++)
 	{
-	    char_u	*(cptext[CPT_COUNT]) = {NULL, NULL, NULL, NULL};
+	    char_u	*(cptext[CPT_ਗਿਣਤੀ]) = {ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ};
 
-	    if (compl_xp.xp_files_abbr != NULL)
+	    ਜੇ (compl_xp.xp_files_abbr != ਨਿਰਾ)
 		cptext[CPT_ABBR] = compl_xp.xp_files_abbr[i];
-	    if (compl_xp.xp_files_kind != NULL)
-		cptext[CPT_KIND] = compl_xp.xp_files_kind[i];
-	    if (compl_xp.xp_files_menu != NULL)
+	    ਜੇ (compl_xp.xp_files_ਕਿਸਮ != ਨਿਰਾ)
+		cptext[CPT_ਕਿਸਮ] = compl_xp.xp_files_ਕਿਸਮ[i];
+	    ਜੇ (compl_xp.xp_files_menu != ਨਿਰਾ)
 		cptext[CPT_MENU] = compl_xp.xp_files_menu[i];
-	    if (compl_xp.xp_files_info != NULL)
+	    ਜੇ (compl_xp.xp_files_info != ਨਿਰਾ)
 		cptext[CPT_INFO] = compl_xp.xp_files_info[i];
 
-	    add_r = ins_compl_add(matches[i], -1, NULL, cptext, NULL, dir,
-		    CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE);
-	    if (add_r == OK)
+	    ਜੋੜੋ_r = ins_compl_ਜੋੜੋ(matches[i], -1, ਨਿਰਾ, cptext, ਨਿਰਾ, dir,
+		    CP_FAST, FALSE, ਨਿਰਾ, FUZZY_SCORE_NONE);
+	    ਜੇ (ਜੋੜੋ_r == OK)
 		// if dir was BACKWARD then honor it just once
 		dir = FORWARD;
 	}
-	FreeWild(num_matches, matches);
-	free_xp_files_extra(&compl_xp, num_matches);
+	FreeWild(ਅੰਕ_matches, matches);
+	free_xp_files_extra(&compl_xp, ਅੰਕ_matches);
     }
 }
 
 /*
  * Get the next set of spell suggestions matching "compl_pattern".
  */
-    static void
-get_next_spell_completion(linenr_T lnum UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਅਗਲਾ_spell_completion(linenr_T lnum ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     char_u	**matches;
-    int		num_matches;
+    ਪੂਰਨ		ਅੰਕ_matches;
 
-    num_matches = expand_spelling(lnum, compl_pattern.string, &matches);
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
-    else
+    ਅੰਕ_matches = expand_spelling(lnum, compl_ਨਮੂਨਾ.string, &matches);
+    ਜੇ (ਅੰਕ_matches > 0)
+	ins_compl_ਜੋੜੋ_matches(ਅੰਕ_matches, matches, p_ic);
+    ਨਹੀਂਤਾਂ
 	vim_free(matches);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Return the next word or line from buffer "ins_buf" at position
  * "cur_match_pos" for completion.  The length of the match is set in "len".
  */
-    static char_u *
-ins_compl_get_next_word_or_line(
+    ਸਥਿਰ char_u *
+ins_compl_get_ਅਗਲਾ_ਸ਼ਬਦ_or_ਸਤਰ(
 	buf_T	*ins_buf,		// buffer being scanned
-	pos_T	*cur_match_pos,		// current match position
-	int	*match_len,
-	int	*cont_s_ipos)		// next ^X<> will set initial_pos
+	pos_T	*cur_ਮੇਲ_pos,		// current match position
+	ਪੂਰਨ	*ਮੇਲ_len,
+	ਪੂਰਨ	*cont_s_ipos)		// next ^X<> will set initial_pos
 {
     char_u	*ptr;
-    int		len;
+    ਪੂਰਨ		len;
 
-    *match_len = 0;
-    ptr = ml_get_buf(ins_buf, cur_match_pos->lnum, FALSE) +
-	cur_match_pos->col;
-    len = (int)ml_get_buf_len(ins_buf, cur_match_pos->lnum) - cur_match_pos->col;
-    if (ctrl_x_mode_line_or_eval())
+    *ਮੇਲ_len = 0;
+    ptr = ml_get_buf(ins_buf, cur_ਮੇਲ_pos->lnum, FALSE) +
+	cur_ਮੇਲ_pos->ਖਾਨਾ;
+    len = (ਪੂਰਨ)ml_get_buf_len(ins_buf, cur_ਮੇਲ_pos->lnum) - cur_ਮੇਲ_pos->ਖਾਨਾ;
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
     {
-	if (compl_status_adding())
+	ਜੇ (compl_ਸਥਿਤੀ_adding())
 	{
-	    if (cur_match_pos->lnum >= ins_buf->b_ml.ml_line_count)
-		return NULL;
-	    ptr = ml_get_buf(ins_buf, cur_match_pos->lnum + 1, FALSE);
-	    len = ml_get_buf_len(ins_buf, cur_match_pos->lnum + 1);
-	    if (!p_paste)
+	    ਜੇ (cur_ਮੇਲ_pos->lnum >= ins_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+		ਵਾਪਸ ਨਿਰਾ;
+	    ptr = ml_get_buf(ins_buf, cur_ਮੇਲ_pos->lnum + 1, FALSE);
+	    len = ml_get_buf_len(ins_buf, cur_ਮੇਲ_pos->lnum + 1);
+	    ਜੇ (!p_paste)
 	    {
 		char_u	*tmp_ptr = ptr;
 
 		ptr = skipwhite(tmp_ptr);
-		len -= (int)(ptr - tmp_ptr);
+		len -= (ਪੂਰਨ)(ptr - tmp_ptr);
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	char_u	*tmp_ptr = ptr;
 
-	if (compl_status_adding() && compl_length <= len)
+	ਜੇ (compl_ਸਥਿਤੀ_adding() && compl_ਲੰਮਾਈ <= len)
 	{
-	    tmp_ptr += compl_length;
+	    tmp_ptr += compl_ਲੰਮਾਈ;
 	    // Skip if already inside a word.
-	    if (vim_iswordp(tmp_ptr))
-		return NULL;
+	    ਜੇ (vim_iswordp(tmp_ptr))
+		ਵਾਪਸ ਨਿਰਾ;
 	    // Find start of next word.
-	    tmp_ptr = find_word_start(tmp_ptr);
+	    tmp_ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸ਼ੁਰੂ(tmp_ptr);
 	}
 	// Find end of this word.
-	tmp_ptr = find_word_end(tmp_ptr);
-	len = (int)(tmp_ptr - ptr);
+	tmp_ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(tmp_ptr);
+	len = (ਪੂਰਨ)(tmp_ptr - ptr);
 
-	if (compl_status_adding() && len == compl_length)
+	ਜੇ (compl_ਸਥਿਤੀ_adding() && len == compl_ਲੰਮਾਈ)
 	{
-	    if (cur_match_pos->lnum < ins_buf->b_ml.ml_line_count)
+	    ਜੇ (cur_ਮੇਲ_pos->lnum < ins_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	    {
 		// Try next line, if any. the new word will be
 		// "join" as if the normal command "J" was used.
@@ -5121,44 +5121,44 @@ ins_compl_get_next_word_or_line(
 		// compl_length, so the next STRNCPY always
 		// works -- Acevedo
 		STRNCPY(IObuff, ptr, len);
-		ptr = ml_get_buf(ins_buf, cur_match_pos->lnum + 1, FALSE);
+		ptr = ml_get_buf(ins_buf, cur_ਮੇਲ_pos->lnum + 1, FALSE);
 		tmp_ptr = ptr = skipwhite(ptr);
 		// Find start of next word.
-		tmp_ptr = find_word_start(tmp_ptr);
+		tmp_ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸ਼ੁਰੂ(tmp_ptr);
 		// Find end of next word.
-		tmp_ptr = find_word_end(tmp_ptr);
-		if (tmp_ptr > ptr)
+		tmp_ptr = ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(tmp_ptr);
+		ਜੇ (tmp_ptr > ptr)
 		{
-		    if (*ptr != ')' && IObuff[len - 1] != TAB)
+		    ਜੇ (*ptr != ')' && IObuff[len - 1] != TAB)
 		    {
-			if (IObuff[len - 1] != ' ')
+			ਜੇ (IObuff[len - 1] != ' ')
 			    IObuff[len++] = ' ';
 			// IObuf =~ "\k.* ", thus len >= 2
-			if (p_js
+			ਜੇ (p_js
 				&& (IObuff[len - 2] == '.'
 				    || (vim_strchr(p_cpo, CPO_JOINSP)
-					== NULL
+					== ਨਿਰਾ
 					&& (IObuff[len - 2] == '?'
 					    || IObuff[len - 2] == '!'))))
 			    IObuff[len++] = ' ';
 		    }
 		    // copy as much as possible of the new word
-		    if (tmp_ptr - ptr >= IOSIZE - len)
+		    ਜੇ (tmp_ptr - ptr >= IOSIZE - len)
 			tmp_ptr = ptr + IOSIZE - len - 1;
 		    STRNCPY(IObuff + len, ptr, tmp_ptr - ptr);
-		    len += (int)(tmp_ptr - ptr);
+		    len += (ਪੂਰਨ)(tmp_ptr - ptr);
 		    *cont_s_ipos = TRUE;
 		}
 		IObuff[len] = NUL;
 		ptr = IObuff;
 	    }
-	    if (len == compl_length)
-		return NULL;
+	    ਜੇ (len == compl_ਲੰਮਾਈ)
+		ਵਾਪਸ ਨਿਰਾ;
 	}
     }
 
-    *match_len = len;
-    return ptr;
+    *ਮੇਲ_len = len;
+    ਵਾਪਸ ptr;
 }
 
 /*
@@ -5170,24 +5170,24 @@ ins_compl_get_next_word_or_line(
  * "st->last_match_pos".
  * Returns OK if a new next match is found, otherwise returns FAIL.
  */
-    static int
-get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
+    ਸਥਿਰ ਪੂਰਨ
+get_ਅਗਲਾ_default_completion(ins_compl_ਅਗਲਾ_state_T *st, pos_T *ਸ਼ੁਰੂ_pos)
 {
-    int		found_new_match = FAIL;
-    int		save_p_scs;
-    int		save_p_ws;
-    int		looped_around = FALSE;
-    char_u	*ptr = NULL;
-    int		len = 0;
-    int		in_fuzzy_collect = !compl_status_adding()
-			&& cot_fuzzy() && compl_length > 0;
+    ਪੂਰਨ		ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
+    ਪੂਰਨ		save_p_scs;
+    ਪੂਰਨ		save_p_ws;
+    ਪੂਰਨ		looped_around = FALSE;
+    char_u	*ptr = ਨਿਰਾ;
+    ਪੂਰਨ		len = 0;
+    ਪੂਰਨ		ਵਿੱਚ_fuzzy_collect = !compl_ਸਥਿਤੀ_adding()
+			&& cot_fuzzy() && compl_ਲੰਮਾਈ > 0;
     char_u	*leader = ins_compl_leader();
-    int		score = FUZZY_SCORE_NONE;
-    int		in_curbuf = st->ins_buf == curbuf;
+    ਪੂਰਨ		score = FUZZY_SCORE_NONE;
+    ਪੂਰਨ		ਵਿੱਚ_curbuf = st->ins_buf == curbuf;
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (st->ins_buf->b_p_inf)
+    ਜੇ (st->ins_buf->b_p_inf)
 	p_scs = FALSE;
 
     //	Buffers other than curbuf are scanned from the beginning or the
@@ -5195,245 +5195,245 @@ get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
     //	buffer is a good idea, on the other hand, we always set
     //	wrapscan for curbuf to avoid missing matches -- Acevedo,Webb
     save_p_ws = p_ws;
-    if (!in_curbuf)
+    ਜੇ (!ਵਿੱਚ_curbuf)
 	p_ws = FALSE;
-    else if (*st->e_cpt == '.')
+    ਨਹੀਂਤਾਂ ਜੇ (*st->e_cpt == '.')
 	p_ws = TRUE;
     looped_around = FALSE;
-    for (;;)
+    ਲਈ (;;)
     {
-	int	cont_s_ipos = FALSE;
+	ਪੂਰਨ	cont_s_ipos = FALSE;
 
-	++msg_silent;  // Don't want messages for wrapscan.
+	++ਸੁਨੇਹਾ_silent;  // Don't want messages for wrapscan.
 
-	if (in_fuzzy_collect)
+	ਜੇ (ਵਿੱਚ_fuzzy_collect)
 	{
-	    found_new_match = search_for_fuzzy_match(st->ins_buf,
-			    st->cur_match_pos, leader, compl_direction,
-			    start_pos, &len, &ptr, &score);
+	    ਮਿਲਿਆ_new_ਮੇਲ = ਖੋਜ_for_fuzzy_ਮੇਲ(st->ins_buf,
+			    st->cur_ਮੇਲ_pos, leader, compl_direction,
+			    ਸ਼ੁਰੂ_pos, &len, &ptr, &score);
 	}
 	// ctrl_x_mode_line_or_eval() || word-wise search that
 	// has added a word that was at the beginning of the line
-	else if (ctrl_x_mode_whole_line() || ctrl_x_mode_eval() || (compl_cont_status & CONT_SOL))
-	    found_new_match = search_for_exact_line(st->ins_buf,
-			    st->cur_match_pos, compl_direction, compl_pattern.string);
-	else
-	    found_new_match = searchit(NULL, st->ins_buf, st->cur_match_pos,
-				NULL, compl_direction, compl_pattern.string, (int)compl_pattern.length,
-				1L, SEARCH_KEEP + SEARCH_NFMSG, RE_LAST, NULL);
-	--msg_silent;
-	if (!compl_started || st->set_match_pos)
+	ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਰਾ_ਸਤਰ() || ctrl_x_ਬਹੁਲਕ_eval() || (compl_cont_ਸਥਿਤੀ & CONT_SOL))
+	    ਮਿਲਿਆ_new_ਮੇਲ = ਖੋਜ_for_exact_ਸਤਰ(st->ins_buf,
+			    st->cur_ਮੇਲ_pos, compl_direction, compl_ਨਮੂਨਾ.string);
+	ਨਹੀਂਤਾਂ
+	    ਮਿਲਿਆ_new_ਮੇਲ = searchit(ਨਿਰਾ, st->ins_buf, st->cur_ਮੇਲ_pos,
+				ਨਿਰਾ, compl_direction, compl_ਨਮੂਨਾ.string, (ਪੂਰਨ)compl_ਨਮੂਨਾ.ਲੰਮਾਈ,
+				1L, ਖੋਜ_KEEP + ਖੋਜ_NFMSG, RE_ਆਖਰੀ, ਨਿਰਾ);
+	--ਸੁਨੇਹਾ_silent;
+	ਜੇ (!compl_started || st->ਸੈੱਟ_ਮੇਲ_pos)
 	{
 	    // set "compl_started" even on fail
 	    compl_started = TRUE;
-	    st->first_match_pos = *st->cur_match_pos;
-	    st->last_match_pos = *st->cur_match_pos;
-	    st->set_match_pos = FALSE;
+	    st->ਪਹਿਲਾ_ਮੇਲ_pos = *st->cur_ਮੇਲ_pos;
+	    st->ਆਖਰੀ_ਮੇਲ_pos = *st->cur_ਮੇਲ_pos;
+	    st->ਸੈੱਟ_ਮੇਲ_pos = FALSE;
 	}
-	else if (st->first_match_pos.lnum == st->last_match_pos.lnum
-		&& st->first_match_pos.col == st->last_match_pos.col)
+	ਨਹੀਂਤਾਂ ਜੇ (st->ਪਹਿਲਾ_ਮੇਲ_pos.lnum == st->ਆਖਰੀ_ਮੇਲ_pos.lnum
+		&& st->ਪਹਿਲਾ_ਮੇਲ_pos.ਖਾਨਾ == st->ਆਖਰੀ_ਮੇਲ_pos.ਖਾਨਾ)
 	{
-	    found_new_match = FAIL;
+	    ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
 	}
-	else if (compl_dir_forward()
-		&& (st->prev_match_pos.lnum > st->cur_match_pos->lnum
-		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
-			&& st->prev_match_pos.col >= st->cur_match_pos->col)))
+	ਨਹੀਂਤਾਂ ਜੇ (compl_dir_forward()
+		&& (st->prev_ਮੇਲ_pos.lnum > st->cur_ਮੇਲ_pos->lnum
+		    || (st->prev_ਮੇਲ_pos.lnum == st->cur_ਮੇਲ_pos->lnum
+			&& st->prev_ਮੇਲ_pos.ਖਾਨਾ >= st->cur_ਮੇਲ_pos->ਖਾਨਾ)))
 	{
-	    if (looped_around)
-		found_new_match = FAIL;
-	    else
+	    ਜੇ (looped_around)
+		ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
+	    ਨਹੀਂਤਾਂ
 		looped_around = TRUE;
 	}
-	else if (!compl_dir_forward()
-		&& (st->prev_match_pos.lnum < st->cur_match_pos->lnum
-		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
-			&& st->prev_match_pos.col <= st->cur_match_pos->col)))
+	ਨਹੀਂਤਾਂ ਜੇ (!compl_dir_forward()
+		&& (st->prev_ਮੇਲ_pos.lnum < st->cur_ਮੇਲ_pos->lnum
+		    || (st->prev_ਮੇਲ_pos.lnum == st->cur_ਮੇਲ_pos->lnum
+			&& st->prev_ਮੇਲ_pos.ਖਾਨਾ <= st->cur_ਮੇਲ_pos->ਖਾਨਾ)))
 	{
-	    if (looped_around)
-		found_new_match = FAIL;
-	    else
+	    ਜੇ (looped_around)
+		ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
+	    ਨਹੀਂਤਾਂ
 		looped_around = TRUE;
 	}
-	st->prev_match_pos = *st->cur_match_pos;
-	if (found_new_match == FAIL)
-	    break;
+	st->prev_ਮੇਲ_pos = *st->cur_ਮੇਲ_pos;
+	ਜੇ (ਮਿਲਿਆ_new_ਮੇਲ == FAIL)
+	    ਰੋਕੋ;
 
 	// when ADDING, the text before the cursor matches, skip it
-	if (compl_status_adding() && in_curbuf
-		&& start_pos->lnum == st->cur_match_pos->lnum
-		&& start_pos->col  == st->cur_match_pos->col)
-	    continue;
+	ਜੇ (compl_ਸਥਿਤੀ_adding() && ਵਿੱਚ_curbuf
+		&& ਸ਼ੁਰੂ_pos->lnum == st->cur_ਮੇਲ_pos->lnum
+		&& ਸ਼ੁਰੂ_pos->ਖਾਨਾ  == st->cur_ਮੇਲ_pos->ਖਾਨਾ)
+	    ਜਾਰੀ;
 
-	if (!in_fuzzy_collect)
-	    ptr = ins_compl_get_next_word_or_line(st->ins_buf,
-		    st->cur_match_pos, &len, &cont_s_ipos);
-	if (ptr == NULL || (ins_compl_has_preinsert()
+	ਜੇ (!ਵਿੱਚ_fuzzy_collect)
+	    ptr = ins_compl_get_ਅਗਲਾ_ਸ਼ਬਦ_or_ਸਤਰ(st->ins_buf,
+		    st->cur_ਮੇਲ_pos, &len, &cont_s_ipos);
+	ਜੇ (ptr == ਨਿਰਾ || (ins_compl_has_preinsert()
 		    && STRCMP(ptr, ins_compl_leader()) == 0))
-	    continue;
+	    ਜਾਰੀ;
 
-	if (is_nearest_active() && in_curbuf)
+	ਜੇ (is_ਸਭ_ਤੋਂ_ਨੇੜੇ_ਸਰਗਰਮ() && ਵਿੱਚ_curbuf)
 	{
-	    score = st->cur_match_pos->lnum - curwin->w_cursor.lnum;
-	    if (score < 0)
+	    score = st->cur_ਮੇਲ_pos->lnum - curwin->w_cursor.lnum;
+	    ਜੇ (score < 0)
 		score = -score;
 	}
 
-	if (ins_compl_add_infercase(ptr, len, p_ic,
-			in_curbuf ? NULL : st->ins_buf->b_sfname,
+	ਜੇ (ins_compl_ਜੋੜੋ_infercase(ptr, len, p_ic,
+			ਵਿੱਚ_curbuf ? ਨਿਰਾ : st->ins_buf->b_sfname,
 			0, cont_s_ipos, score) != NOTDONE)
 	{
-	    if (in_fuzzy_collect && score == compl_first_match->cp_next->cp_score)
-		compl_num_bests++;
-	    found_new_match = OK;
-	    break;
+	    ਜੇ (ਵਿੱਚ_fuzzy_collect && score == compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ->cp_score)
+		compl_ਅੰਕ_bests++;
+	    ਮਿਲਿਆ_new_ਮੇਲ = OK;
+	    ਰੋਕੋ;
 	}
     }
     p_scs = save_p_scs;
     p_ws = save_p_ws;
 
-    return found_new_match;
+    ਵਾਪਸ ਮਿਲਿਆ_new_ਮੇਲ;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
 /*
  * Return the callback function associated with "p" if it refers to a
  * user-defined function in the 'complete' option.
  * The "idx" parameter is used for indexing callback entries.
  */
-    static callback_T *
-get_callback_if_cpt_func(char_u *p, int idx)
+    ਸਥਿਰ callback_T *
+get_callback_if_cpt_func(char_u *p, ਪੂਰਨ idx)
 {
-    if (*p == 'o')
-	return &curbuf->b_ofu_cb;
+    ਜੇ (*p == 'o')
+	ਵਾਪਸ &curbuf->b_ofu_cb;
 
-    if (*p == 'F')
+    ਜੇ (*p == 'F')
     {
-	if (*++p != ',' && *p != NUL)
+	ਜੇ (*++p != ',' && *p != NUL)
 	{
 	    // 'F{func}' case
-	    if (curbuf->b_p_cpt_cb == NULL
-		    || idx < 0 || idx >= curbuf->b_p_cpt_count)
-		return NULL;
-	    return curbuf->b_p_cpt_cb[idx].cb_name != NULL
-		? &curbuf->b_p_cpt_cb[idx] : NULL;
+	    ਜੇ (curbuf->b_p_cpt_cb == ਨਿਰਾ
+		    || idx < 0 || idx >= curbuf->b_p_cpt_ਗਿਣਤੀ)
+		ਵਾਪਸ ਨਿਰਾ;
+	    ਵਾਪਸ curbuf->b_p_cpt_cb[idx].cb_name != ਨਿਰਾ
+		? &curbuf->b_p_cpt_cb[idx] : ਨਿਰਾ;
 	}
-	else
-	    return &curbuf->b_cfu_cb; // 'cfu'
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ &curbuf->b_cfu_cb; // 'cfu'
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Get completion matches from register contents.
  * Extracts words from all available registers and adds them to the completion list.
  */
-    static void
-get_register_completion(void)
+    ਸਥਿਰ ਖਾਲੀ
+get_ਰਜਿਸਟਰ_completion(ਖਾਲੀ)
 {
-    int		dir = compl_direction;
-    yankreg_T	*reg = NULL;
-    void	*reg_ptr = NULL;
-    int		adding_mode = compl_status_adding();
+    ਪੂਰਨ		dir = compl_direction;
+    yankreg_T	*reg = ਨਿਰਾ;
+    ਖਾਲੀ	*reg_ptr = ਨਿਰਾ;
+    ਪੂਰਨ		adding_ਬਹੁਲਕ = compl_ਸਥਿਤੀ_adding();
 
-    for (int i = 0; i < NUM_REGISTERS; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < ਅੰਕ_REGISTERS; i++)
     {
-	int regname = 0;
-	if (i == 0)
+	ਪੂਰਨ regname = 0;
+	ਜੇ (i == 0)
 	    regname = '"';    // unnamed register
-	else if (i < 10)
+	ਨਹੀਂਤਾਂ ਜੇ (i < 10)
 	    regname = '0' + i;
-	else if (i == DELETION_REGISTER)
+	ਨਹੀਂਤਾਂ ਜੇ (i == DELETION_ਰਜਿਸਟਰ)
 	    regname = '-';
-#ifdef FEAT_CLIPBOARD
-	else if (i == STAR_REGISTER)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CLIPBOARD
+	ਨਹੀਂਤਾਂ ਜੇ (i == ਤਾਰਾ_ਰਜਿਸਟਰ)
 	    regname = '*';
-	else if (i == PLUS_REGISTER)
+	ਨਹੀਂਤਾਂ ਜੇ (i == PLUS_ਰਜਿਸਟਰ)
 	    regname = '+';
-#endif
-	else
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ
 	    regname = 'a' + i - 10;
 
 	// Skip invalid or black hole register
-	if (!valid_yank_reg(regname, FALSE) || regname == '_')
-	    continue;
+	ਜੇ (!valid_yank_reg(regname, FALSE) || regname == '_')
+	    ਜਾਰੀ;
 
-	reg_ptr = get_register(regname, FALSE);
-	if (reg_ptr == NULL)
-	    continue;
+	reg_ptr = get_ਰਜਿਸਟਰ(regname, FALSE);
+	ਜੇ (reg_ptr == ਨਿਰਾ)
+	    ਜਾਰੀ;
 
 	reg = (yankreg_T *)reg_ptr;
 
-	for (int j = 0; j < reg->y_size; j++)
+	ਲਈ (ਪੂਰਨ j = 0; j < reg->y_ਮਾਪ; j++)
 	{
 	    char_u *str = reg->y_array[j].string;
-	    if (str == NULL)
-		continue;
+	    ਜੇ (str == ਨਿਰਾ)
+		ਜਾਰੀ;
 
-	    if (adding_mode)
+	    ਜੇ (adding_ਬਹੁਲਕ)
 	    {
-		int str_len = (int)STRLEN(str);
-		if (str_len == 0)
-		    continue;
+		ਪੂਰਨ str_len = (ਪੂਰਨ)STRLEN(str);
+		ਜੇ (str_len == 0)
+		    ਜਾਰੀ;
 
-		if (!compl_orig_text.string
-			|| (p_ic ? STRNICMP(str, compl_orig_text.string,
-					    compl_orig_text.length) == 0
-				: STRNCMP(str, compl_orig_text.string,
-					    compl_orig_text.length) == 0))
+		ਜੇ (!compl_orig_ਪਾਠ.string
+			|| (p_ic ? STRNICMP(str, compl_orig_ਪਾਠ.string,
+					    compl_orig_ਪਾਠ.ਲੰਮਾਈ) == 0
+				: STRNCMP(str, compl_orig_ਪਾਠ.string,
+					    compl_orig_ਪਾਠ.ਲੰਮਾਈ) == 0))
 		{
-		    if (ins_compl_add_infercase(str, str_len, p_ic, NULL,
+		    ਜੇ (ins_compl_ਜੋੜੋ_infercase(str, str_len, p_ic, ਨਿਰਾ,
 				dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			dir = FORWARD;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Calculate the safe end of string to avoid null byte issues
-		char_u *str_end = str + STRLEN(str);
+		char_u *str_ਸਿਰਾ = str + STRLEN(str);
 		char_u *p = str;
 
 		// Safely iterate through the string
-		while (p < str_end && *p != NUL)
+		ਜਦੋਂ (p < str_ਸਿਰਾ && *p != NUL)
 		{
 		    char_u *old_p = p;
-		    p = find_word_start(p);
-		    if (p >= str_end || *p == NUL)
-			break;
+		    p = ਲੱਭੋ_ਸ਼ਬਦ_ਸ਼ੁਰੂ(p);
+		    ਜੇ (p >= str_ਸਿਰਾ || *p == NUL)
+			ਰੋਕੋ;
 
-		    char_u *word_end = find_word_end(p);
+		    char_u *ਸ਼ਬਦ_ਸਿਰਾ = ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(p);
 
-		    if (word_end <= p)
+		    ਜੇ (ਸ਼ਬਦ_ਸਿਰਾ <= p)
 		    {
-			if (has_mbyte)
-			    word_end = p + (*mb_ptr2len)(p);
-			else
-			    word_end = p + 1;
+			ਜੇ (has_mbyte)
+			    ਸ਼ਬਦ_ਸਿਰਾ = p + (*mb_ptr2len)(p);
+			ਨਹੀਂਤਾਂ
+			    ਸ਼ਬਦ_ਸਿਰਾ = p + 1;
 		    }
 
-		    if (word_end > str_end)
-			word_end = str_end;
+		    ਜੇ (ਸ਼ਬਦ_ਸਿਰਾ > str_ਸਿਰਾ)
+			ਸ਼ਬਦ_ਸਿਰਾ = str_ਸਿਰਾ;
 
-		    int len = (int)(word_end - p);
-		    if (len > 0 && (!compl_orig_text.string
-				|| (p_ic ? STRNICMP(p, compl_orig_text.string,
-						    compl_orig_text.length) == 0
-					: STRNCMP(p, compl_orig_text.string,
-						    compl_orig_text.length) == 0)))
+		    ਪੂਰਨ len = (ਪੂਰਨ)(ਸ਼ਬਦ_ਸਿਰਾ - p);
+		    ਜੇ (len > 0 && (!compl_orig_ਪਾਠ.string
+				|| (p_ic ? STRNICMP(p, compl_orig_ਪਾਠ.string,
+						    compl_orig_ਪਾਠ.ਲੰਮਾਈ) == 0
+					: STRNCMP(p, compl_orig_ਪਾਠ.string,
+						    compl_orig_ਪਾਠ.ਲੰਮਾਈ) == 0)))
 		    {
-			if (ins_compl_add_infercase(p, len, p_ic, NULL,
+			ਜੇ (ins_compl_ਜੋੜੋ_infercase(p, len, p_ic, ਨਿਰਾ,
 				    dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			    dir = FORWARD;
 		    }
 
-		    p = word_end;
+		    p = ਸ਼ਬਦ_ਸਿਰਾ;
 
-		    if (p <= old_p)
+		    ਜੇ (p <= old_p)
 		    {
 			p = old_p + 1;
-			if (has_mbyte && p < str_end)
+			ਜੇ (has_mbyte && p < str_ਸਿਰਾ)
 			    p = old_p + (*mb_ptr2len)(old_p);
 		    }
 		}
@@ -5441,7 +5441,7 @@ get_register_completion(void)
 	}
 
 	// Free the register copy
-	put_register(regname, reg_ptr);
+	put_ਰਜਿਸਟਰ(regname, reg_ptr);
     }
 }
 
@@ -5449,193 +5449,193 @@ get_register_completion(void)
  * get the next set of completion matches for "type".
  * Returns TRUE if a new match is found. Otherwise returns FALSE.
  */
-    static int
-get_next_completion_match(int type, ins_compl_next_state_T *st, pos_T *ini)
+    ਸਥਿਰ ਪੂਰਨ
+get_ਅਗਲਾ_completion_ਮੇਲ(ਪੂਰਨ type, ins_compl_ਅਗਲਾ_state_T *st, pos_T *ini)
 {
-    int	found_new_match = FALSE;
+    ਪੂਰਨ	ਮਿਲਿਆ_new_ਮੇਲ = FALSE;
 
-    switch (type)
+    ਚੋਣ (type)
     {
-	case -1:
-	    break;
-#ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	case CTRL_X_PATH_DEFINES:
-	    get_next_include_file_completion(type);
-	    break;
-#endif
+	ਹਾਲਤ -1:
+	    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
+	ਹਾਲਤ CTRL_X_ਰਸਤਾ_PATTERNS:
+	ਹਾਲਤ CTRL_X_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ:
+	    get_ਅਗਲਾ_include_file_completion(type);
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 
-	case CTRL_X_DICTIONARY:
-	case CTRL_X_THESAURUS:
-	    get_next_dict_tsr_completion(type, st->dict, st->dict_f);
-	    st->dict = NULL;
-	    break;
+	ਹਾਲਤ CTRL_X_DICTIONARY:
+	ਹਾਲਤ CTRL_X_THESAURUS:
+	    get_ਅਗਲਾ_dict_tsr_completion(type, st->dict, st->dict_f);
+	    st->dict = ਨਿਰਾ;
+	    ਰੋਕੋ;
 
-	case CTRL_X_TAGS:
-	    get_next_tag_completion();
-	    break;
+	ਹਾਲਤ CTRL_X_ਟੈਗ_ਸੂਚੀ:
+	    get_ਅਗਲਾ_ਟੈਗ_completion();
+	    ਰੋਕੋ;
 
-	case CTRL_X_FILES:
-	    get_next_filename_completion();
-	    break;
+	ਹਾਲਤ CTRL_X_FILES:
+	    get_ਅਗਲਾ_filename_completion();
+	    ਰੋਕੋ;
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
-	    get_next_cmdline_completion();
-	    break;
+	ਹਾਲਤ CTRL_X_CMDLINE:
+	ਹਾਲਤ CTRL_X_CMDLINE_CTRL_X:
+	    get_ਅਗਲਾ_cmdline_completion();
+	    ਰੋਕੋ;
 
-#ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    if (ctrl_x_mode_normal())  // Invoked by a func in 'cpt' option
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+	ਹਾਲਤ CTRL_X_FUNCTION:
+	    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ())  // Invoked by a func in 'cpt' option
 		get_cpt_func_completion_matches(st->func_cb);
-	    else
-		expand_by_function(type, compl_pattern.string, NULL);
-	    break;
-	case CTRL_X_OMNI:
-	    expand_by_function(type, compl_pattern.string, NULL);
-	    break;
-#endif
+	    ਨਹੀਂਤਾਂ
+		expand_by_function(type, compl_ਨਮੂਨਾ.string, ਨਿਰਾ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ CTRL_X_OMNI:
+	    expand_by_function(type, compl_ਨਮੂਨਾ.string, ਨਿਰਾ);
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 
-	case CTRL_X_SPELL:
-	    get_next_spell_completion(st->first_match_pos.lnum);
-	    break;
+	ਹਾਲਤ CTRL_X_SPELL:
+	    get_ਅਗਲਾ_spell_completion(st->ਪਹਿਲਾ_ਮੇਲ_pos.lnum);
+	    ਰੋਕੋ;
 
-	case CTRL_X_REGISTER:
-	    get_register_completion();
-	    break;
+	ਹਾਲਤ CTRL_X_ਰਜਿਸਟਰ:
+	    get_ਰਜਿਸਟਰ_completion();
+	    ਰੋਕੋ;
 
-	default:	// normal ^P/^N and ^X^L
-	    found_new_match = get_next_default_completion(st, ini);
-	    if (found_new_match == FAIL && st->ins_buf == curbuf)
-		st->found_all = TRUE;
+	ਮੂਲ:	// normal ^P/^N and ^X^L
+	    ਮਿਲਿਆ_new_ਮੇਲ = get_ਅਗਲਾ_default_completion(st, ini);
+	    ਜੇ (ਮਿਲਿਆ_new_ਮੇਲ == FAIL && st->ins_buf == curbuf)
+		st->ਮਿਲਿਆ_all = TRUE;
     }
 
     // check if compl_curr_match has changed, (e.g. other type of
     // expansion added something)
-    if (type != 0 && compl_curr_match != compl_old_match)
-	found_new_match = OK;
+    ਜੇ (type != 0 && compl_curr_ਮੇਲ != compl_old_ਮੇਲ)
+	ਮਿਲਿਆ_new_ਮੇਲ = OK;
 
-    return found_new_match;
+    ਵਾਪਸ ਮਿਲਿਆ_new_ਮੇਲ;
 }
 
 /*
  * Strips carets followed by numbers. This suffix typically represents the
  * max_matches setting.
  */
-    static void
-strip_caret_numbers_in_place(char_u *str)
+    ਸਥਿਰ ਖਾਲੀ
+strip_caret_numbers_ਵਿੱਚ_ਰੱਖੋ(char_u *str)
 {
-    char_u  *read = str, *write = str, *p;
+    char_u  *ਪਠ = str, *ਲਿਖ = str, *p;
 
-    if (str == NULL)
-	return;
+    ਜੇ (str == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    while (*read)
+    ਜਦੋਂ (*ਪਠ)
     {
-	if (*read == '^')
+	ਜੇ (*ਪਠ == '^')
 	{
-	    p = read + 1;
-	    while (vim_isdigit(*p))
+	    p = ਪਠ + 1;
+	    ਜਦੋਂ (vim_isdigit(*p))
 		p++;
-	    if ((*p == ',' || *p == '\0') && p != read + 1)
+	    ਜੇ ((*p == ',' || *p == '\0') && p != ਪਠ + 1)
 	    {
-		read = p;
-		continue;
+		ਪਠ = p;
+		ਜਾਰੀ;
 	    }
-	    else
-		*write++ = *read++;
+	    ਨਹੀਂਤਾਂ
+		*ਲਿਖ++ = *ਪਠ++;
 	}
-	else
-	    *write++ = *read++;
+	ਨਹੀਂਤਾਂ
+	    *ਲਿਖ++ = *ਪਠ++;
     }
-    *write = '\0';
+    *ਲਿਖ = '\0';
 }
 
 /*
  * Call functions specified in the 'cpt' option with findstart=1,
  * and retrieve the startcol.
  */
-    static int
-prepare_cpt_compl_funcs(void)
+    ਸਥਿਰ ਪੂਰਨ
+prepare_cpt_compl_funcs(ਖਾਲੀ)
 {
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		idx = 0;
-    int		startcol;
+    callback_T	*cb = ਨਿਰਾ;
+    ਪੂਰਨ		idx = 0;
+    ਪੂਰਨ		startcol;
 
     // Make a copy of 'cpt' in case the buffer gets wiped out
     cpt = vim_strsave(curbuf->b_p_cpt);
-    if (cpt == NULL)
-	return FAIL;
-    strip_caret_numbers_in_place(cpt);
+    ਜੇ (cpt == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    strip_caret_numbers_ਵਿੱਚ_ਰੱਖੋ(cpt);
 
-    for (p = cpt; *p;)
+    ਲਈ (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	ਜਦੋਂ (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	ਜੇ (*p == NUL)
+	    ਰੋਕੋ;
 
 	cb = get_callback_if_cpt_func(p, idx);
-	if (cb)
+	ਜੇ (cb)
 	{
-	    if (get_userdefined_compl_info(curwin->w_cursor.col, cb, &startcol)
+	    ਜੇ (get_userdefined_compl_info(curwin->w_cursor.ਖਾਨਾ, cb, &startcol)
 		    == FAIL)
 	    {
-		if (startcol == -3)
+		ਜੇ (startcol == -3)
 		    cpt_sources_array[idx].cs_refresh_always = FALSE;
-		else
+		ਨਹੀਂਤਾਂ
 		    startcol = -2;
 	    }
-	    else if (startcol < 0 || startcol > curwin->w_cursor.col)
-		startcol = curwin->w_cursor.col;
+	    ਨਹੀਂਤਾਂ ਜੇ (startcol < 0 || startcol > curwin->w_cursor.ਖਾਨਾ)
+		startcol = curwin->w_cursor.ਖਾਨਾ;
 	    cpt_sources_array[idx].cs_startcol = startcol;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    cpt_sources_array[idx].cs_startcol = -3;
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	(ਖਾਲੀ)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
 	idx++;
     }
 
     vim_free(cpt);
-    return OK;
-#endif
-    return FAIL;
+    ਵਾਪਸ OK;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Start the timer for the current completion source.
  */
-    static void
-compl_source_start_timer(int source_idx UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+compl_ਸਰੋਤ_ਸ਼ੁਰੂ_timer(ਪੂਰਨ ਸਰੋਤ_idx ਅਣਵਰਤਿਆ)
 {
-#ifdef ELAPSED_FUNC
-    if (compl_autocomplete || p_cto > 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    ਜੇ (compl_autocomplete || p_cto > 0)
     {
-	ELAPSED_INIT(cpt_sources_array[source_idx].compl_start_tv);
-	compl_time_slice_expired = FALSE;
+	ELAPSED_INIT(cpt_sources_array[ਸਰੋਤ_idx].compl_ਸ਼ੁਰੂ_tv);
+	compl_ਸਮਾਂ_ਟੁਕੜਾ_expired = FALSE;
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Safely advance the cpt_sources_index by one.
  */
-    static int
-advance_cpt_sources_index_safe(void)
+    ਸਥਿਰ ਪੂਰਨ
+advance_cpt_sources_ਸੂਚਕਾਂਕ_ਸੁਰੱਖਿਅਤ(ਖਾਲੀ)
 {
-    if (cpt_sources_index >= 0 && cpt_sources_index < cpt_sources_count - 1)
+    ਜੇ (cpt_sources_ਸੂਚਕਾਂਕ >= 0 && cpt_sources_ਸੂਚਕਾਂਕ < cpt_sources_ਗਿਣਤੀ - 1)
     {
-	cpt_sources_index++;
-	return OK;
+	cpt_sources_ਸੂਚਕਾਂਕ++;
+	ਵਾਪਸ OK;
     }
-#ifdef FEAT_EVAL
-    semsg(_(e_list_index_out_of_range_nr), cpt_sources_index);
-#endif
-    return FAIL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    semsg(_(e_list_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), cpt_sources_ਸੂਚਕਾਂਕ);
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ FAIL;
 }
 
 /*
@@ -5647,64 +5647,64 @@ advance_cpt_sources_index_safe(void)
  * This may return before finding all the matches.
  * Return the total number of matches or -1 if still unknown -- Acevedo
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 ins_compl_get_exp(pos_T *ini)
 {
-    static ins_compl_next_state_T   st;
-    static int			    st_cleared = FALSE;
-    int		match_count;
-    int		found_new_match;
-    int		type = ctrl_x_mode;
-    int		may_advance_cpt_idx = FALSE;
-    pos_T	start_pos = *ini;
-    int		normal_mode_strict = FALSE;
-    long	compl_timeout_save = 0;
+    ਸਥਿਰ ins_compl_ਅਗਲਾ_state_T   st;
+    ਸਥਿਰ ਪੂਰਨ			    st_cleared = FALSE;
+    ਪੂਰਨ		ਮੇਲ_ਗਿਣਤੀ;
+    ਪੂਰਨ		ਮਿਲਿਆ_new_ਮੇਲ;
+    ਪੂਰਨ		type = ctrl_x_ਬਹੁਲਕ;
+    ਪੂਰਨ		may_advance_cpt_idx = FALSE;
+    pos_T	ਸ਼ੁਰੂ_pos = *ini;
+    ਪੂਰਨ		ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict = FALSE;
+    ਲੰਮਾ	compl_timeout_save = 0;
 
-    if (!compl_started)
+    ਜੇ (!compl_started)
     {
 	buf_T *buf;
 
 	FOR_ALL_BUFFERS(buf)
 	    buf->b_scanned = false;
-	if (!st_cleared)
+	ਜੇ (!st_cleared)
 	{
-	    CLEAR_FIELD(st);
+	    CLEAR_ਖੇਤਰ(st);
 	    st_cleared = TRUE;
 	}
-	st.found_all = FALSE;
+	st.ਮਿਲਿਆ_all = FALSE;
 	st.ins_buf = curbuf;
 	vim_free(st.e_cpt_copy);
 	// Make a copy of 'complete', in case the buffer is wiped out.
-	st.e_cpt_copy = vim_strsave((compl_cont_status & CONT_LOCAL)
+	st.e_cpt_copy = vim_strsave((compl_cont_ਸਥਿਤੀ & CONT_LOCAL)
 					    ? (char_u *)"." : curbuf->b_p_cpt);
-	strip_caret_numbers_in_place(st.e_cpt_copy);
-	st.e_cpt = st.e_cpt_copy == NULL ? (char_u *)"" : st.e_cpt_copy;
+	strip_caret_numbers_ਵਿੱਚ_ਰੱਖੋ(st.e_cpt_copy);
+	st.e_cpt = st.e_cpt_copy == ਨਿਰਾ ? (char_u *)"" : st.e_cpt_copy;
 
 	// In large buffers, timeout may miss nearby matches — search above cursor
-#define LOOKBACK_LINE_COUNT	1000
-	if (compl_autocomplete && is_nearest_active())
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ LOOKBACK_ਸਤਰ_ਗਿਣਤੀ	1000
+	ਜੇ (compl_autocomplete && is_ਸਭ_ਤੋਂ_ਨੇੜੇ_ਸਰਗਰਮ())
 	{
-	    start_pos.lnum = MAX(1, start_pos.lnum - LOOKBACK_LINE_COUNT);
-	    start_pos.col = 0;
+	    ਸ਼ੁਰੂ_pos.lnum = MAX(1, ਸ਼ੁਰੂ_pos.lnum - LOOKBACK_ਸਤਰ_ਗਿਣਤੀ);
+	    ਸ਼ੁਰੂ_pos.ਖਾਨਾ = 0;
 	}
-	st.last_match_pos = st.first_match_pos = start_pos;
+	st.ਆਖਰੀ_ਮੇਲ_pos = st.ਪਹਿਲਾ_ਮੇਲ_pos = ਸ਼ੁਰੂ_pos;
     }
-    else if (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
+    ਨਹੀਂਤਾਂ ਜੇ (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
 	st.ins_buf = curbuf;  // In case the buffer was wiped out.
 
-    compl_old_match = compl_curr_match;	// remember the last current match
-    st.cur_match_pos = (compl_dir_forward())
-				    ? &st.last_match_pos : &st.first_match_pos;
+    compl_old_ਮੇਲ = compl_curr_ਮੇਲ;	// remember the last current match
+    st.cur_ਮੇਲ_pos = (compl_dir_forward())
+				    ? &st.ਆਖਰੀ_ਮੇਲ_pos : &st.ਪਹਿਲਾ_ਮੇਲ_pos;
 
-    normal_mode_strict = ctrl_x_mode_normal() && !ctrl_x_mode_line_or_eval()
-	&& !(compl_cont_status & CONT_LOCAL) && cpt_sources_array != NULL;
-    if (normal_mode_strict)
+    ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict = ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && !ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval()
+	&& !(compl_cont_ਸਥਿਤੀ & CONT_LOCAL) && cpt_sources_array != ਨਿਰਾ;
+    ਜੇ (ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict)
     {
-	cpt_sources_index = 0;
-	if (compl_autocomplete || p_cto > 0)
+	cpt_sources_ਸੂਚਕਾਂਕ = 0;
+	ਜੇ (compl_autocomplete || p_cto > 0)
 	{
-	    compl_source_start_timer(0);
-	    compl_time_slice_expired = FALSE;
+	    compl_ਸਰੋਤ_ਸ਼ੁਰੂ_timer(0);
+	    compl_ਸਮਾਂ_ਟੁਕੜਾ_expired = FALSE;
 	    compl_timeout_ms = compl_autocomplete
 		? MAX(COMPL_INITIAL_TIMEOUT_MS, p_act)
 		: p_cto;
@@ -5712,35 +5712,35 @@ ins_compl_get_exp(pos_T *ini)
     }
 
     // For ^N/^P loop over all the flags/windows/buffers in 'complete'.
-    for (;;)
+    ਲਈ (;;)
     {
-	found_new_match = FAIL;
-	st.set_match_pos = FALSE;
+	ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
+	st.ਸੈੱਟ_ਮੇਲ_pos = FALSE;
 
 	// For ^N/^P pick a new entry from e_cpt if compl_started is off,
 	// or if found_all says this entry is done.  For ^X^L only use the
 	// entries from 'complete' that look in loaded buffers.
-	if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
-					&& (!compl_started || st.found_all))
+	ਜੇ ((ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() || ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
+					&& (!compl_started || st.ਮਿਲਿਆ_all))
 	{
-	    int status = process_next_cpt_value(&st, &type, &start_pos,
+	    ਪੂਰਨ ਸਥਿਤੀ = process_ਅਗਲਾ_cpt_ਮੁੱਲ(&st, &type, &ਸ਼ੁਰੂ_pos,
 		    cot_fuzzy(), &may_advance_cpt_idx);
 
-	    if (status == INS_COMPL_CPT_END)
-		break;
-	    if (status == INS_COMPL_CPT_CONT)
+	    ਜੇ (ਸਥਿਤੀ == INS_COMPL_CPT_ਸਿਰਾ)
+		ਰੋਕੋ;
+	    ਜੇ (ਸਥਿਤੀ == INS_COMPL_CPT_CONT)
 	    {
-		if (may_advance_cpt_idx)
+		ਜੇ (may_advance_cpt_idx)
 		{
-		    if (!advance_cpt_sources_index_safe())
-			break;
-		    compl_source_start_timer(cpt_sources_index);
+		    ਜੇ (!advance_cpt_sources_ਸੂਚਕਾਂਕ_ਸੁਰੱਖਿਅਤ())
+			ਰੋਕੋ;
+		    compl_ਸਰੋਤ_ਸ਼ੁਰੂ_timer(cpt_sources_ਸੂਚਕਾਂਕ);
 		}
-		continue;
+		ਜਾਰੀ;
 	    }
 	}
 
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	ਜੇ (ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	{
 	    // LSP servers may sporadically take >1s to respond (e.g., while
@@ -5754,133 +5754,133 @@ ins_compl_get_exp(pos_T *ini)
 	}
 
 	// get the next set of completion matches
-	found_new_match = get_next_completion_match(type, &st, &start_pos);
+	ਮਿਲਿਆ_new_ਮੇਲ = get_ਅਗਲਾ_completion_ਮੇਲ(type, &st, &ਸ਼ੁਰੂ_pos);
 
 	// If complete() was called then compl_pattern has been reset.  The
 	// following won't work then, bail out.
-	if (compl_pattern.string == NULL)
-	    break;
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
+	    ਰੋਕੋ;
 
-	if (may_advance_cpt_idx)
+	ਜੇ (may_advance_cpt_idx)
 	{
-	    if (!advance_cpt_sources_index_safe())
-		break;
-	    compl_source_start_timer(cpt_sources_index);
+	    ਜੇ (!advance_cpt_sources_ਸੂਚਕਾਂਕ_ਸੁਰੱਖਿਅਤ())
+		ਰੋਕੋ;
+	    compl_ਸਰੋਤ_ਸ਼ੁਰੂ_timer(cpt_sources_ਸੂਚਕਾਂਕ);
 	}
 
 	// break the loop for specialized modes (use 'complete' just for the
 	// generic ctrl_x_mode == CTRL_X_NORMAL) or when we've found a new
-	// match
-	if ((ctrl_x_mode_not_default() && !ctrl_x_mode_line_or_eval())
-						|| found_new_match != FAIL)
+	//ਮੇਲ
+	ਜੇ ((ctrl_x_ਬਹੁਲਕ_not_default() && !ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
+						|| ਮਿਲਿਆ_new_ਮੇਲ != FAIL)
 	{
-	    if (got_int)
-		break;
+	    ਜੇ (got_int)
+		ਰੋਕੋ;
 	    // Fill the popup menu as soon as possible.
-	    if (type != -1)
-		ins_compl_check_keys(0, FALSE);
+	    ਜੇ (type != -1)
+		ins_compl_check_ਕੁੰਜੀਆਂ(0, FALSE);
 
-	    if ((ctrl_x_mode_not_default()
-			&& !ctrl_x_mode_line_or_eval()) || compl_interrupted)
-		break;
-	    compl_started = compl_time_slice_expired ? FALSE : TRUE;
+	    ਜੇ ((ctrl_x_ਬਹੁਲਕ_not_default()
+			&& !ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval()) || compl_interrupted)
+		ਰੋਕੋ;
+	    compl_started = compl_ਸਮਾਂ_ਟੁਕੜਾ_expired ? FALSE : TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Mark a buffer scanned when it has been scanned completely
-	    if (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_PATH_PATTERNS))
+	    ਜੇ (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_ਰਸਤਾ_PATTERNS))
 		st.ins_buf->b_scanned = true;
 
 	    compl_started = FALSE;
 	}
 
 	// Restore the timeout after collecting matches from function source
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	ਜੇ (ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	    compl_timeout_ms = compl_timeout_save;
 
 	// For `^P` completion, reset `compl_curr_match` to the head to avoid
 	// mixing matches from different sources.
-	if (!compl_dir_forward())
-	    while (compl_curr_match->cp_prev
-		    && !match_at_original_text(compl_curr_match->cp_prev))
-		compl_curr_match = compl_curr_match->cp_prev;
+	ਜੇ (!compl_dir_forward())
+	    ਜਦੋਂ (compl_curr_ਮੇਲ->cp_prev
+		    && !ਮੇਲ_at_original_ਪਾਠ(compl_curr_ਮੇਲ->cp_prev))
+		compl_curr_ਮੇਲ = compl_curr_ਮੇਲ->cp_prev;
     }
-    cpt_sources_index = -1;
+    cpt_sources_ਸੂਚਕਾਂਕ = -1;
     compl_started = TRUE;
 
-    if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
+    ਜੇ ((ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() || ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
 	    && *st.e_cpt == NUL)		// Got to end of 'complete'
-	found_new_match = FAIL;
+	ਮਿਲਿਆ_new_ਮੇਲ = FAIL;
 
-    match_count = -1;		// total of matches, unknown
-    if (found_new_match == FAIL || (ctrl_x_mode_not_default()
-		&& !ctrl_x_mode_line_or_eval()))
-	match_count = ins_compl_make_cyclic();
+    ਮੇਲ_ਗਿਣਤੀ = -1;		// total of matches, unknown
+    ਜੇ (ਮਿਲਿਆ_new_ਮੇਲ == FAIL || (ctrl_x_ਬਹੁਲਕ_not_default()
+		&& !ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval()))
+	ਮੇਲ_ਗਿਣਤੀ = ins_compl_make_cyclic();
 
-    if (cot_fuzzy() && compl_get_longest && compl_num_bests > 0)
-	fuzzy_longest_match();
+    ਜੇ (cot_fuzzy() && compl_get_longest && compl_ਅੰਕ_bests > 0)
+	fuzzy_longest_ਮੇਲ();
 
-    if (compl_old_match != NULL)
+    ਜੇ (compl_old_ਮੇਲ != ਨਿਰਾ)
     {
 	// If several matches were added (FORWARD) or the search failed and has
 	// just been made cyclic then we have to move compl_curr_match to the
 	// next or previous entry (if any) -- Acevedo
-	compl_curr_match = compl_dir_forward() ? compl_old_match->cp_next
-						    : compl_old_match->cp_prev;
-	if (compl_curr_match == NULL)
-	    compl_curr_match = compl_old_match;
+	compl_curr_ਮੇਲ = compl_dir_forward() ? compl_old_ਮੇਲ->cp_ਅਗਲਾ
+						    : compl_old_ਮੇਲ->cp_prev;
+	ਜੇ (compl_curr_ਮੇਲ == ਨਿਰਾ)
+	    compl_curr_ਮੇਲ = compl_old_ਮੇਲ;
     }
     may_trigger_modechanged();
 
-    if (match_count > 0 && !ctrl_x_mode_spell())
+    ਜੇ (ਮੇਲ_ਗਿਣਤੀ > 0 && !ctrl_x_ਬਹੁਲਕ_spell())
     {
-	if (is_nearest_active() && !ins_compl_has_preinsert())
-	    sort_compl_match_list(cp_compare_nearest);
+	ਜੇ (is_ਸਭ_ਤੋਂ_ਨੇੜੇ_ਸਰਗਰਮ() && !ins_compl_has_preinsert())
+	    ਛਾਂਟੋ_compl_ਮੇਲ_list(cp_compare_ਸਭ_ਤੋਂ_ਨੇੜੇ);
 
-	if (cot_fuzzy() && ins_compl_leader_len() > 0)
-	    ins_compl_fuzzy_sort();
+	ਜੇ (cot_fuzzy() && ins_compl_leader_len() > 0)
+	    ins_compl_fuzzy_ਛਾਂਟੋ();
     }
 
-    return match_count;
+    ਵਾਪਸ ਮੇਲ_ਗਿਣਤੀ;
 }
 
 /*
  * Update "compl_shown_match" to the actually shown match, it may differ when
  * "compl_leader" is used to omit some of the matches.
  */
-    static void
-ins_compl_update_shown_match(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_update_shown_ਮੇਲ(ਖਾਲੀ)
 {
     string_T	*leader;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
-    leader = get_leader_for_startcol(compl_shown_match, TRUE);
+    (ਖਾਲੀ)get_leader_for_startcol(ਨਿਰਾ, TRUE); // Clear the cache
+    leader = get_leader_for_startcol(compl_shown_ਮੇਲ, TRUE);
 
-    while (!ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && compl_shown_match->cp_next != NULL
-	    && !is_first_match(compl_shown_match->cp_next))
+    ਜਦੋਂ (!ins_compl_equal(compl_shown_ਮੇਲ,
+		leader->string, (ਪੂਰਨ)leader->ਲੰਮਾਈ)
+	    && compl_shown_ਮੇਲ->cp_ਅਗਲਾ != ਨਿਰਾ
+	    && !is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ->cp_ਅਗਲਾ))
     {
-	compl_shown_match = compl_shown_match->cp_next;
-	leader = get_leader_for_startcol(compl_shown_match, TRUE);
+	compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_ਅਗਲਾ;
+	leader = get_leader_for_startcol(compl_shown_ਮੇਲ, TRUE);
     }
 
     // If we didn't find it searching forward, and compl_shows_dir is
     // backward, find the last match.
-    if (compl_shows_dir_backward()
-	    && !ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && (compl_shown_match->cp_next == NULL
-		|| is_first_match(compl_shown_match->cp_next)))
+    ਜੇ (compl_shows_dir_backward()
+	    && !ins_compl_equal(compl_shown_ਮੇਲ,
+		leader->string, (ਪੂਰਨ)leader->ਲੰਮਾਈ)
+	    && (compl_shown_ਮੇਲ->cp_ਅਗਲਾ == ਨਿਰਾ
+		|| is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ->cp_ਅਗਲਾ)))
     {
-	while (!ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
-		&& compl_shown_match->cp_prev != NULL
-		&& !is_first_match(compl_shown_match->cp_prev))
+	ਜਦੋਂ (!ins_compl_equal(compl_shown_ਮੇਲ,
+		    leader->string, (ਪੂਰਨ)leader->ਲੰਮਾਈ)
+		&& compl_shown_ਮੇਲ->cp_prev != ਨਿਰਾ
+		&& !is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ->cp_prev))
 	{
-	    compl_shown_match = compl_shown_match->cp_prev;
-	    leader = get_leader_for_startcol(compl_shown_match, TRUE);
+	    compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_prev;
+	    leader = get_leader_for_startcol(compl_shown_ਮੇਲ, TRUE);
 	}
     }
 }
@@ -5888,105 +5888,105 @@ ins_compl_update_shown_match(void)
 /*
  * Delete the old text being completed.
  */
-    void
-ins_compl_delete(void)
+    ਖਾਲੀ
+ins_compl_delete(ਖਾਲੀ)
 {
     // In insert mode: Delete the typed part.
     // In replace mode: Put the old characters back, if any.
-    int col = compl_col + (compl_status_adding() ? compl_length : 0);
-    string_T	remaining = {NULL, 0};
-    int	    orig_col;
+    ਪੂਰਨ ਖਾਨਾ = compl_ਖਾਨਾ + (compl_ਸਥਿਤੀ_adding() ? compl_ਲੰਮਾਈ : 0);
+    string_T	ਬਚਿਆ = {ਨਿਰਾ, 0};
+    ਪੂਰਨ	    orig_ਖਾਨਾ;
 
-    if (ins_compl_preinsert_effect())
+    ਜੇ (ins_compl_preinsert_effect())
     {
-	col += (int)ins_compl_leader_len();
-	curwin->w_cursor.col = compl_ins_end_col;
+	ਖਾਨਾ += (ਪੂਰਨ)ins_compl_leader_len();
+	curwin->w_cursor.ਖਾਨਾ = compl_ins_ਸਿਰਾ_ਖਾਨਾ;
     }
 
-    if (curwin->w_cursor.lnum > compl_lnum)
+    ਜੇ (curwin->w_cursor.lnum > compl_lnum)
     {
-	if (curwin->w_cursor.col < ml_get_curline_len())
+	ਜੇ (curwin->w_cursor.ਖਾਨਾ < ml_get_curline_len())
 	{
-	    char_u *line = ml_get_cursor();
-	    remaining.length = ml_get_cursor_len();
-	    remaining.string = vim_strnsave(line, remaining.length);
-	    if (remaining.string == NULL)
-		return;
+	    char_u *ਸਤਰ = ml_get_cursor();
+	    ਬਚਿਆ.ਲੰਮਾਈ = ml_get_cursor_len();
+	    ਬਚਿਆ.string = vim_strnsave(ਸਤਰ, ਬਚਿਆ.ਲੰਮਾਈ);
+	    ਜੇ (ਬਚਿਆ.string == ਨਿਰਾ)
+		ਵਾਪਸ;
 	}
-	while (curwin->w_cursor.lnum > compl_lnum)
+	ਜਦੋਂ (curwin->w_cursor.lnum > compl_lnum)
 	{
-	    if (ml_delete(curwin->w_cursor.lnum) == FAIL)
+	    ਜੇ (ml_delete(curwin->w_cursor.lnum) == FAIL)
 	    {
-		if (remaining.string)
-		    vim_free(remaining.string);
-		return;
+		ਜੇ (ਬਚਿਆ.string)
+		    vim_free(ਬਚਿਆ.string);
+		ਵਾਪਸ;
 	    }
-	    deleted_lines_mark(curwin->w_cursor.lnum, 1L);
+	    deleted_ਸਤਰਾਂ_mark(curwin->w_cursor.lnum, 1L);
 	    curwin->w_cursor.lnum--;
 	}
 	// move cursor to end of line
-	curwin->w_cursor.col = ml_get_curline_len();
+	curwin->w_cursor.ਖਾਨਾ = ml_get_curline_len();
     }
 
-    if ((int)curwin->w_cursor.col > col)
+    ਜੇ ((ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ > ਖਾਨਾ)
     {
-	if (stop_arrow() == FAIL)
+	ਜੇ (stop_arrow() == FAIL)
 	{
-	    if (remaining.string)
-		vim_free(remaining.string);
-	    return;
+	    ਜੇ (ਬਚਿਆ.string)
+		vim_free(ਬਚਿਆ.string);
+	    ਵਾਪਸ;
 	}
-	backspace_until_column(col);
-	compl_ins_end_col = curwin->w_cursor.col;
+	backspace_until_ਕਾਲਮ(ਖਾਨਾ);
+	compl_ins_ਸਿਰਾ_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
     }
 
-    if (remaining.string != NULL)
+    ਜੇ (ਬਚਿਆ.string != ਨਿਰਾ)
     {
-	orig_col = curwin->w_cursor.col;
-	ins_str(remaining.string, remaining.length);
-	curwin->w_cursor.col = orig_col;
-	vim_free(remaining.string);
+	orig_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
+	ins_str(ਬਚਿਆ.string, ਬਚਿਆ.ਲੰਮਾਈ);
+	curwin->w_cursor.ਖਾਨਾ = orig_ਖਾਨਾ;
+	vim_free(ਬਚਿਆ.string);
     }
     // TODO: is this sufficient for redrawing?  Redrawing everything causes
     // flicker, thus we can't do that.
-    changed_cline_bef_curs();
-#ifdef FEAT_EVAL
+    ਬਦਲਿਆ_cline_bef_curs();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     // clear v:completed_item
-    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
-#endif
+    ਸੈੱਟ_vim_var_dict(VV_COMPLETED_ਵਸਤੂ, dict_alloc_ਤਾਲਾ(VAR_FIXED));
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Insert a completion string that contains newlines.
  * The string is split and inserted line by line.
  */
-    static void
-ins_compl_expand_multiple(char_u *str)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_expand_ਗੁਣਜ(char_u *str)
 {
-    char_u	*start = str;
+    char_u	*ਸ਼ੁਰੂ = str;
     char_u	*curr = str;
-    int		base_indent = get_indent();
+    ਪੂਰਨ		ਅਧਾਰ_indent = get_indent();
 
-    while (*curr != NUL)
+    ਜਦੋਂ (*curr != NUL)
     {
-	if (*curr == '\n')
+	ਜੇ (*curr == '\n')
 	{
 	    // Insert the text chunk before newline
-	    if (curr > start)
-		ins_char_bytes(start, (int)(curr - start));
+	    ਜੇ (curr > ਸ਼ੁਰੂ)
+		ins_char_ਬਾਈਟਾਂ(ਸ਼ੁਰੂ, (ਪੂਰਨ)(curr - ਸ਼ੁਰੂ));
 
 	    // Handle newline
-	    open_line(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, base_indent, NULL);
-	    start = curr + 1;
+	    open_ਸਤਰ(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, ਅਧਾਰ_indent, ਨਿਰਾ);
+	    ਸ਼ੁਰੂ = curr + 1;
 	}
 	curr++;
     }
 
     // Handle remaining text after last newline (if any)
-    if (curr > start)
-	ins_char_bytes(start, (int)(curr - start));
+    ਜੇ (curr > ਸ਼ੁਰੂ)
+	ins_char_ਬਾਈਟਾਂ(ਸ਼ੁਰੂ, (ਪੂਰਨ)(curr - ਸ਼ੁਰੂ));
 
-    compl_ins_end_col = curwin->w_cursor.col;
+    compl_ins_ਸਿਰਾ_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
 }
 
 /*
@@ -5996,72 +5996,72 @@ ins_compl_expand_multiple(char_u *str)
  * If "curbuf_only" is TRUE, restrict matches to the current buffer
  * ('.' source in 'complete').
  */
-    static char_u *
-find_common_prefix(size_t *prefix_len, int curbuf_only)
+    ਸਥਿਰ char_u *
+ਲੱਭੋ_common_ਅਗੇਤਰ(size_t *ਅਗੇਤਰ_len, ਪੂਰਨ curbuf_only)
 {
     compl_T     *compl;
-    int		*match_count;
-    char_u	*first = NULL;
-    int		len = -1;
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    ਪੂਰਨ		*ਮੇਲ_ਗਿਣਤੀ;
+    char_u	*ਪਹਿਲਾ = ਨਿਰਾ;
+    ਪੂਰਨ		len = -1;
+    ਪੂਰਨ		is_cpt_completion = (cpt_sources_array != ਨਿਰਾ);
 
-    if (!is_cpt_completion)
-	return NULL;
+    ਜੇ (!is_cpt_completion)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-    if (match_count == NULL)
-	return NULL;
+    ਮੇਲ_ਗਿਣਤੀ = ALLOC_CLEAR_MULT(ਪੂਰਨ, cpt_sources_ਗਿਣਤੀ);
+    ਜੇ (ਮੇਲ_ਗਿਣਤੀ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (ਖਾਲੀ)get_leader_for_startcol(ਨਿਰਾ, TRUE); // Clear the cache
 
-    compl = compl_first_match;
-    do
+    compl = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਕਰੋ
     {
 	string_T *leader = get_leader_for_startcol(compl, TRUE);
 
 	// Apply 'smartcase' behavior during normal mode
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
-		&& !ignorecase(compl_orig_text.string))
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && !p_inf && compl_orig_ਪਾਠ.string
+		&& !ignorecase(compl_orig_ਪਾਠ.string))
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(compl)
+		&& (leader->string == ਨਿਰਾ
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)))
+			(ਪੂਰਨ)leader->ਲੰਮਾਈ)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
+	    ਪੂਰਨ ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded = FALSE;
+	    ਪੂਰਨ cur_ਸਰੋਤ = compl->cp_cpt_ਸਰੋਤ_idx;
 
-	    if (cur_source != -1)
+	    ਜੇ (cur_ਸਰੋਤ != -1)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
-		    match_limit_exceeded = TRUE;
+		ਮੇਲ_ਗਿਣਤੀ[cur_ਸਰੋਤ]++;
+		ਪੂਰਨ max_matches = cpt_sources_array[cur_ਸਰੋਤ].cs_max_matches;
+		ਜੇ (max_matches > 0 && ਮੇਲ_ਗਿਣਤੀ[cur_ਸਰੋਤ] > max_matches)
+		    ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded && (!curbuf_only
-			|| (cur_source != -1
-			    && cpt_sources_array[cur_source].cs_flag == '.')))
+	    ਜੇ (!ਮੇਲ_ਹੱਦਬੰਦੀ_exceeded && (!curbuf_only
+			|| (cur_ਸਰੋਤ != -1
+			    && cpt_sources_array[cur_ਸਰੋਤ].cs_flag == '.')))
 	    {
-		if (first == NULL && STRNCMP(ins_compl_leader(),
+		ਜੇ (ਪਹਿਲਾ == ਨਿਰਾ && STRNCMP(ins_compl_leader(),
 			    compl->cp_str.string, ins_compl_leader_len()) == 0)
 		{
-		    first = compl->cp_str.string;
-		    len = (int)STRLEN(first);
+		    ਪਹਿਲਾ = compl->cp_str.string;
+		    len = (ਪੂਰਨ)STRLEN(ਪਹਿਲਾ);
 		}
-		else if (first != NULL)
+		ਨਹੀਂਤਾਂ ਜੇ (ਪਹਿਲਾ != ਨਿਰਾ)
 		{
-		    int j = 0;  // count in bytes
-		    char_u *s1 = first;
+		    ਪੂਰਨ j = 0;  // count in bytes
+		    char_u *s1 = ਪਹਿਲਾ;
 		    char_u *s2 = compl->cp_str.string;
 
-		    while (j < len && *s1 != NUL && *s2 != NUL)
+		    ਜਦੋਂ (j < len && *s1 != NUL && *s2 != NUL)
 		    {
-			if (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
+			ਜੇ (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
 				|| memcmp(s1, s2, MB_BYTE2LEN(*s1)) != 0)
-			    break;
+			    ਰੋਕੋ;
 
 			j += MB_BYTE2LEN(*s1);
 			MB_PTR_ADV(s1);
@@ -6069,38 +6069,38 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
 		    }
 		    len = j;
 
-		    if (len == 0)
-			break;
+		    ਜੇ (len == 0)
+			ਰੋਕੋ;
 		}
 	    }
 	}
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl = compl->cp_ਅਗਲਾ;
+    } ਜਦੋਂ (compl != ਨਿਰਾ && !is_ਪਹਿਲਾ_ਮੇਲ(compl));
 
-    vim_free(match_count);
+    vim_free(ਮੇਲ_ਗਿਣਤੀ);
 
-    if (len > (int)ins_compl_leader_len())
+    ਜੇ (len > (ਪੂਰਨ)ins_compl_leader_len())
     {
 	// Avoid inserting text that duplicates the text already present
 	// after the cursor.
-	if (len == (int)STRLEN(first))
+	ਜੇ (len == (ਪੂਰਨ)STRLEN(ਪਹਿਲਾ))
 	{
-	    char_u *line = ml_get_curline();
-	    char_u *p = line + curwin->w_cursor.col;
-	    if (p && !IS_WHITE_OR_NUL(*p))
+	    char_u *ਸਤਰ = ml_get_curline();
+	    char_u *p = ਸਤਰ + curwin->w_cursor.ਖਾਨਾ;
+	    ਜੇ (p && !IS_WHITE_OR_NUL(*p))
 	    {
-		char_u *end = find_word_end(p);
-		int text_len = end - p;
-		if (text_len > 0
-			&& text_len < (len - (int)ins_compl_leader_len())
-			&& STRNCMP(first + len - text_len, p, text_len) == 0)
-		    len -= text_len;
+		char_u *ਸਿਰਾ = ਲੱਭੋ_ਸ਼ਬਦ_ਸਿਰਾ(p);
+		ਪੂਰਨ ਪਾਠ_len = ਸਿਰਾ - p;
+		ਜੇ (ਪਾਠ_len > 0
+			&& ਪਾਠ_len < (len - (ਪੂਰਨ)ins_compl_leader_len())
+			&& STRNCMP(ਪਹਿਲਾ + len - ਪਾਠ_len, p, ਪਾਠ_len) == 0)
+		    len -= ਪਾਠ_len;
 	    }
 	}
-	*prefix_len = (size_t)len;
-	return first;
+	*ਅਗੇਤਰ_len = (size_t)len;
+	ਵਾਪਸ ਪਹਿਲਾ;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -6110,42 +6110,42 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
  * When "insert_prefix" is TRUE the longest common prefix is inserted instead
  * of shown match.
  */
-    void
-ins_compl_insert(int move_cursor, int insert_prefix)
+    ਖਾਲੀ
+ins_compl_ਪਾਓ(ਪੂਰਨ move_cursor, ਪੂਰਨ ਪਾਓ_ਅਗੇਤਰ)
 {
-    int		compl_len = get_compl_len();
-    int		preinsert = ins_compl_has_preinsert();
-    char_u	*cp_str = compl_shown_match->cp_str.string;
-    size_t	cp_str_len = compl_shown_match->cp_str.length;
+    ਪੂਰਨ		compl_len = get_compl_len();
+    ਪੂਰਨ		preinsert = ins_compl_has_preinsert();
+    char_u	*cp_str = compl_shown_ਮੇਲ->cp_str.string;
+    size_t	cp_str_len = compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ;
     size_t	leader_len = ins_compl_leader_len();
-    char_u	*has_multiple = vim_strchr(cp_str, '\n');
+    char_u	*has_ਗੁਣਜ = vim_strchr(cp_str, '\n');
 
-    if (insert_prefix)
+    ਜੇ (ਪਾਓ_ਅਗੇਤਰ)
     {
-	cp_str = find_common_prefix(&cp_str_len, FALSE);
-	if (cp_str == NULL)
+	cp_str = ਲੱਭੋ_common_ਅਗੇਤਰ(&cp_str_len, FALSE);
+	ਜੇ (cp_str == ਨਿਰਾ)
 	{
-	    cp_str = find_common_prefix(&cp_str_len, TRUE);
-	    if (cp_str == NULL)
+	    cp_str = ਲੱਭੋ_common_ਅਗੇਤਰ(&cp_str_len, TRUE);
+	    ਜੇ (cp_str == ਨਿਰਾ)
 	    {
-		cp_str = compl_shown_match->cp_str.string;
-		cp_str_len = compl_shown_match->cp_str.length;
+		cp_str = compl_shown_ਮੇਲ->cp_str.string;
+		cp_str_len = compl_shown_ਮੇਲ->cp_str.ਲੰਮਾਈ;
 	    }
 	}
     }
     // Since completion sources may provide matches with varying start
     // positions, insert only the portion of the match that corresponds to the
     // intended replacement range.
-    else if (cpt_sources_array != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (cpt_sources_array != ਨਿਰਾ)
     {
-	int	cpt_idx = compl_shown_match->cp_cpt_source_idx;
-	if (cpt_idx >= 0 && compl_col >= 0)
+	ਪੂਰਨ	cpt_idx = compl_shown_ਮੇਲ->cp_cpt_ਸਰੋਤ_idx;
+	ਜੇ (cpt_idx >= 0 && compl_ਖਾਨਾ >= 0)
 	{
-	    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
-	    if (startcol >= 0 && startcol < (int)compl_col)
+	    ਪੂਰਨ	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+	    ਜੇ (startcol >= 0 && startcol < (ਪੂਰਨ)compl_ਖਾਨਾ)
 	    {
-		int skip = (int)compl_col - startcol;
-		if ((size_t)skip <= cp_str_len)
+		ਪੂਰਨ skip = (ਪੂਰਨ)compl_ਖਾਨਾ - startcol;
+		ਜੇ ((size_t)skip <= cp_str_len)
 		{
 		    cp_str_len -= skip;
 		    cp_str += skip;
@@ -6156,67 +6156,67 @@ ins_compl_insert(int move_cursor, int insert_prefix)
 
     // Make sure we don't go over the end of the string, this can happen with
     // illegal bytes.
-    if (compl_len < (int)cp_str_len)
+    ਜੇ (compl_len < (ਪੂਰਨ)cp_str_len)
     {
-	if (has_multiple)
-	    ins_compl_expand_multiple(cp_str + compl_len);
-	else
+	ਜੇ (has_ਗੁਣਜ)
+	    ins_compl_expand_ਗੁਣਜ(cp_str + compl_len);
+	ਨਹੀਂਤਾਂ
 	{
-	    ins_compl_insert_bytes(cp_str + compl_len,
-		    insert_prefix ? (int)cp_str_len - compl_len : -1);
-	    if ((preinsert || insert_prefix) && move_cursor)
-		curwin->w_cursor.col -= (colnr_T)(cp_str_len - leader_len);
+	    ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(cp_str + compl_len,
+		    ਪਾਓ_ਅਗੇਤਰ ? (ਪੂਰਨ)cp_str_len - compl_len : -1);
+	    ਜੇ ((preinsert || ਪਾਓ_ਅਗੇਤਰ) && move_cursor)
+		curwin->w_cursor.ਖਾਨਾ -= (colnr_T)(cp_str_len - leader_len);
 	}
     }
-    if (match_at_original_text(compl_shown_match)
-	    || (preinsert && !insert_prefix))
-	compl_used_match = FALSE;
-    else
-	compl_used_match = TRUE;
-#ifdef FEAT_EVAL
+    ਜੇ (ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ)
+	    || (preinsert && !ਪਾਓ_ਅਗੇਤਰ))
+	compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
+    ਨਹੀਂਤਾਂ
+	compl_ਵਰਤਿਆ_ਮੇਲ = TRUE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     {
-	dict_T *dict = ins_compl_dict_alloc(compl_shown_match);
+	dict_T *dict = ins_compl_dict_alloc(compl_shown_ਮੇਲ);
 
-	set_vim_var_dict(VV_COMPLETED_ITEM, dict);
+	ਸੈੱਟ_vim_var_dict(VV_COMPLETED_ਵਸਤੂ, dict);
     }
-#endif
-    compl_hi_on_autocompl_longest = insert_prefix && move_cursor;
+#ਜੇ_ਅੰਤ
+    compl_hi_on_autocompl_longest = ਪਾਓ_ਅਗੇਤਰ && move_cursor;
 }
 
 /*
  * show the file name for the completion match (if any).  Truncate the file
  * name to avoid a wait for return.
  */
-    static void
-ins_compl_show_filename(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_show_filename(ਖਾਲੀ)
 {
-    char	*lead = _("match in file");
-    int		space = sc_col - vim_strsize((char_u *)lead) - 2;
+    ਅੱਖਰ	*lead = _("match in file");
+    ਪੂਰਨ		space = sc_ਖਾਨਾ - vim_strsize((char_u *)lead) - 2;
     char_u	*s;
     char_u	*e;
 
-    if (space <= 0)
-	return;
+    ਜੇ (space <= 0)
+	ਵਾਪਸ;
 
     // We need the tail that fits.  With double-byte encoding going
     // back from the end is very slow, thus go from the start and keep
     // the text that fits in "space" between "s" and "e".
-    for (s = e = compl_shown_match->cp_fname; *e != NUL; MB_PTR_ADV(e))
+    ਲਈ (s = e = compl_shown_ਮੇਲ->cp_fname; *e != NUL; MB_PTR_ADV(e))
     {
 	space -= ptr2cells(e);
-	while (space < 0)
+	ਜਦੋਂ (space < 0)
 	{
 	    space += ptr2cells(s);
 	    MB_PTR_ADV(s);
 	}
     }
-    if (!compl_autocomplete)
+    ਜੇ (!compl_autocomplete)
     {
-	msg_hist_off = TRUE;
-	vim_snprintf((char *)IObuff, IOSIZE, "%s %s%s", lead,
-		s > compl_shown_match->cp_fname ? "<" : "", s);
-	msg((char *)IObuff);
-	msg_hist_off = FALSE;
+	ਸੁਨੇਹਾ_hist_off = TRUE;
+	vim_snprintf((ਅੱਖਰ *)IObuff, IOSIZE, "%s %s%s", lead,
+		s > compl_shown_ਮੇਲ->cp_fname ? "<" : "", s);
+	ਸੁਨੇਹਾ((ਅੱਖਰ *)IObuff);
+	ਸੁਨੇਹਾ_hist_off = FALSE;
 	redraw_cmdline = FALSE;	    // don't overwrite!
     }
 }
@@ -6227,17 +6227,17 @@ ins_compl_show_filename(void)
  * 'cp_in_match_array' is set, indicating that the match is also present
  * in 'compl_match_array'.
  */
-    static compl_T *
-find_next_match_in_menu(void)
+    ਸਥਿਰ compl_T *
+ਲੱਭੋ_ਅਗਲਾ_ਮੇਲ_ਵਿੱਚ_menu(ਖਾਲੀ)
 {
-    int	    is_forward = compl_shows_dir_forward();
-    compl_T *match = compl_shown_match;
+    ਪੂਰਨ	    is_forward = compl_shows_dir_forward();
+    compl_T *ਮੇਲ = compl_shown_ਮੇਲ;
 
-    do
-	match = is_forward ? match->cp_next : match->cp_prev;
-    while (match->cp_next && !match->cp_in_match_array
-	    && !match_at_original_text(match));
-    return match;
+    ਕਰੋ
+	ਮੇਲ = is_forward ? ਮੇਲ->cp_ਅਗਲਾ : ਮੇਲ->cp_prev;
+    ਜਦੋਂ (ਮੇਲ->cp_ਅਗਲਾ && !ਮੇਲ->cp_ਵਿੱਚ_ਮੇਲ_array
+	    && !ਮੇਲ_at_original_ਪਾਠ(ਮੇਲ));
+    ਵਾਪਸ ਮੇਲ;
 }
 
 /*
@@ -6253,114 +6253,114 @@ find_next_match_in_menu(void)
  *
  * Returns OK on success and -1 if the number of matches are unknown.
  */
-    static int
-find_next_completion_match(
-	int	allow_get_expansion,
-	int	todo,		// repeat completion this many times
-	int	advance,
-	int	*num_matches)
+    ਸਥਿਰ ਪੂਰਨ
+ਲੱਭੋ_ਅਗਲਾ_completion_ਮੇਲ(
+	ਪੂਰਨ	allow_get_expansion,
+	ਪੂਰਨ	todo,		// repeat completion this many times
+	ਪੂਰਨ	advance,
+	ਪੂਰਨ	*ਅੰਕ_matches)
 {
-    int		found_end = FALSE;
-    compl_T	*found_compl = NULL;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
+    ਪੂਰਨ		ਮਿਲਿਆ_ਸਿਰਾ = FALSE;
+    compl_T	*ਮਿਲਿਆ_compl = ਨਿਰਾ;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cur_cot_flags = get_cot_flags();
+    ਪੂਰਨ		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
     string_T	*leader;
 
 
-    while (--todo >= 0)
+    ਜਦੋਂ (--todo >= 0)
     {
-	if (compl_shows_dir_forward() && compl_shown_match->cp_next != NULL)
+	ਜੇ (compl_shows_dir_forward() && compl_shown_ਮੇਲ->cp_ਅਗਲਾ != ਨਿਰਾ)
 	{
-	    if (compl_match_array != NULL)
-		compl_shown_match = find_next_match_in_menu();
-	    else
-		compl_shown_match = compl_shown_match->cp_next;
-	    found_end = (compl_first_match != NULL
-		    && (is_first_match(compl_shown_match->cp_next)
-			|| is_first_match(compl_shown_match)));
+	    ਜੇ (compl_ਮੇਲ_array != ਨਿਰਾ)
+		compl_shown_ਮੇਲ = ਲੱਭੋ_ਅਗਲਾ_ਮੇਲ_ਵਿੱਚ_menu();
+	    ਨਹੀਂਤਾਂ
+		compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_ਅਗਲਾ;
+	    ਮਿਲਿਆ_ਸਿਰਾ = (compl_ਪਹਿਲਾ_ਮੇਲ != ਨਿਰਾ
+		    && (is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ->cp_ਅਗਲਾ)
+			|| is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ)));
 	}
-	else if (compl_shows_dir_backward()
-		&& compl_shown_match->cp_prev != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (compl_shows_dir_backward()
+		&& compl_shown_ਮੇਲ->cp_prev != ਨਿਰਾ)
 	{
-	    found_end = is_first_match(compl_shown_match);
-	    if (compl_match_array != NULL)
-		compl_shown_match = find_next_match_in_menu();
-	    else
-		compl_shown_match = compl_shown_match->cp_prev;
-	    found_end |= is_first_match(compl_shown_match);
+	    ਮਿਲਿਆ_ਸਿਰਾ = is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ);
+	    ਜੇ (compl_ਮੇਲ_array != ਨਿਰਾ)
+		compl_shown_ਮੇਲ = ਲੱਭੋ_ਅਗਲਾ_ਮੇਲ_ਵਿੱਚ_menu();
+	    ਨਹੀਂਤਾਂ
+		compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_prev;
+	    ਮਿਲਿਆ_ਸਿਰਾ |= is_ਪਹਿਲਾ_ਮੇਲ(compl_shown_ਮੇਲ);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (!allow_get_expansion)
+	    ਜੇ (!allow_get_expansion)
 	    {
-		if (advance)
+		ਜੇ (advance)
 		{
-		    if (compl_shows_dir_backward())
+		    ਜੇ (compl_shows_dir_backward())
 			compl_pending -= todo + 1;
-		    else
+		    ਨਹੀਂਤਾਂ
 			compl_pending += todo + 1;
 		}
-		return -1;
+		ਵਾਪਸ -1;
 	    }
 
-	    if (!compl_no_select && advance)
+	    ਜੇ (!compl_no_select && advance)
 	    {
-		if (compl_shows_dir_backward())
+		ਜੇ (compl_shows_dir_backward())
 		    --compl_pending;
-		else
+		ਨਹੀਂਤਾਂ
 		    ++compl_pending;
 	    }
 
 	    // Find matches.
-	    *num_matches = ins_compl_get_exp(&compl_startpos);
+	    *ਅੰਕ_matches = ins_compl_get_exp(&compl_startpos);
 
 	    // handle any pending completions
-	    while (compl_pending != 0 && compl_direction == compl_shows_dir
+	    ਜਦੋਂ (compl_pending != 0 && compl_direction == compl_shows_dir
 		    && advance)
 	    {
-		if (compl_pending > 0 && compl_shown_match->cp_next != NULL)
+		ਜੇ (compl_pending > 0 && compl_shown_ਮੇਲ->cp_ਅਗਲਾ != ਨਿਰਾ)
 		{
-		    compl_shown_match = compl_shown_match->cp_next;
+		    compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_ਅਗਲਾ;
 		    --compl_pending;
 		}
-		else if (compl_pending < 0 && compl_shown_match->cp_prev != NULL)
+		ਨਹੀਂਤਾਂ ਜੇ (compl_pending < 0 && compl_shown_ਮੇਲ->cp_prev != ਨਿਰਾ)
 		{
-		    compl_shown_match = compl_shown_match->cp_prev;
+		    compl_shown_ਮੇਲ = compl_shown_ਮੇਲ->cp_prev;
 		    ++compl_pending;
 		}
-		else
-		    break;
+		ਨਹੀਂਤਾਂ
+		    ਰੋਕੋ;
 	    }
-	    found_end = FALSE;
+	    ਮਿਲਿਆ_ਸਿਰਾ = FALSE;
 	}
 
-	leader = get_leader_for_startcol(compl_shown_match, FALSE);
+	leader = get_leader_for_startcol(compl_shown_ਮੇਲ, FALSE);
 
-	if (!match_at_original_text(compl_shown_match)
-		&& leader->string != NULL
-		&& !ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
+	ਜੇ (!ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ)
+		&& leader->string != ਨਿਰਾ
+		&& !ins_compl_equal(compl_shown_ਮੇਲ,
+		    leader->string, (ਪੂਰਨ)leader->ਲੰਮਾਈ)
 		&& !(cot_fuzzy()
-		    && compl_shown_match->cp_score != FUZZY_SCORE_NONE))
+		    && compl_shown_ਮੇਲ->cp_score != FUZZY_SCORE_NONE))
 	    ++todo;
-	else
+	ਨਹੀਂਤਾਂ
 	    // Remember a matching item.
-	    found_compl = compl_shown_match;
+	    ਮਿਲਿਆ_compl = compl_shown_ਮੇਲ;
 
 	// Stop at the end of the list when we found a usable match.
-	if (found_end)
+	ਜੇ (ਮਿਲਿਆ_ਸਿਰਾ)
 	{
-	    if (found_compl != NULL)
+	    ਜੇ (ਮਿਲਿਆ_compl != ਨਿਰਾ)
 	    {
-		compl_shown_match = found_compl;
-		break;
+		compl_shown_ਮੇਲ = ਮਿਲਿਆ_compl;
+		ਰੋਕੋ;
 	    }
 	    todo = 1;	    // use first usable match after wrapping around
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -6379,45 +6379,45 @@ find_next_completion_match(
  * "allow_get_expansion" TRUE, which calls ins_compl_get_exp(), which in turn
  * calls this function with "allow_get_expansion" FALSE.
  */
-    static int
-ins_compl_next(
-    int	    allow_get_expansion,
-    int	    count,		// repeat completion this many times; should
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_ਅਗਲਾ(
+    ਪੂਰਨ	    allow_get_expansion,
+    ਪੂਰਨ	    ਗਿਣਤੀ_2,		// repeat completion this many times; should
 				// be at least 1
-    int	    insert_match)	// Insert the newly selected match
+    ਪੂਰਨ	    ਪਾਓ_ਮੇਲ)	// Insert the newly selected match
 {
-    int	    num_matches = -1;
-    int	    todo = count;
-    int	    advance;
-    int	    started = compl_started;
+    ਪੂਰਨ	    ਅੰਕ_matches = -1;
+    ਪੂਰਨ	    todo = ਗਿਣਤੀ_2;
+    ਪੂਰਨ	    advance;
+    ਪੂਰਨ	    started = compl_started;
     buf_T   *orig_curbuf = curbuf;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int	    compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cur_cot_flags = get_cot_flags();
+    ਪੂਰਨ	    compl_no_ਪਾਓ = (cur_cot_flags & COT_NOINSERT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    int	    compl_preinsert = ins_compl_has_preinsert();
+    ਪੂਰਨ	    compl_preinsert = ins_compl_has_preinsert();
 
     // When user complete function return -1 for findstart which is next
     // time of 'always', compl_shown_match become NULL.
-    if (compl_shown_match == NULL)
-	return -1;
+    ਜੇ (compl_shown_ਮੇਲ == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    if (compl_leader.string != NULL
-	    && !match_at_original_text(compl_shown_match)
+    ਜੇ (compl_leader.string != ਨਿਰਾ
+	    && !ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ)
 	    && !cot_fuzzy())
 	// Update "compl_shown_match" to the actually shown match
-	ins_compl_update_shown_match();
+	ins_compl_update_shown_ਮੇਲ();
 
-    if (allow_get_expansion && insert_match
-	    && (!compl_get_longest || compl_used_match))
+    ਜੇ (allow_get_expansion && ਪਾਓ_ਮੇਲ
+	    && (!compl_get_longest || compl_ਵਰਤਿਆ_ਮੇਲ))
 	// Delete old text to be replaced
 	ins_compl_delete();
 
     // When finding the longest common text we stick at the original text,
     // don't let CTRL-N or CTRL-P move to the first match.
-    advance = count != 1 || !allow_get_expansion || !compl_get_longest;
+    advance = ਗਿਣਤੀ_2 != 1 || !allow_get_expansion || !compl_get_longest;
 
     // When restarting the search don't insert the first match either.
-    if (compl_restarting)
+    ਜੇ (compl_restarting)
     {
 	advance = FALSE;
 	compl_restarting = FALSE;
@@ -6425,63 +6425,63 @@ ins_compl_next(
 
     // Repeat this for when <PageUp> or <PageDown> is typed.  But don't wrap
     // around.
-    if (find_next_completion_match(allow_get_expansion, todo, advance,
-							&num_matches) == -1)
-	return -1;
+    ਜੇ (ਲੱਭੋ_ਅਗਲਾ_completion_ਮੇਲ(allow_get_expansion, todo, advance,
+							&ਅੰਕ_matches) == -1)
+	ਵਾਪਸ -1;
 
-    if (curbuf != orig_curbuf)
+    ਜੇ (curbuf != orig_curbuf)
     {
 	// In case some completion function switched buffer, don't want to
 	// insert the completion elsewhere.
-	return -1;
+	ਵਾਪਸ -1;
     }
 
     // Insert the text of the new completion, or the compl_leader.
-    if (!started && ins_compl_preinsert_longest())
-	ins_compl_insert(TRUE, TRUE);
-    else if (compl_no_insert && !started && !compl_preinsert)
+    ਜੇ (!started && ins_compl_preinsert_longest())
+	ins_compl_ਪਾਓ(TRUE, TRUE);
+    ਨਹੀਂਤਾਂ ਜੇ (compl_no_ਪਾਓ && !started && !compl_preinsert)
     {
-	ins_compl_insert_bytes(compl_orig_text.string + get_compl_len(), -1);
-	compl_used_match = FALSE;
+	ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(compl_orig_ਪਾਠ.string + get_compl_len(), -1);
+	compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
     }
-    else if (insert_match)
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਾਓ_ਮੇਲ)
     {
-	if (!compl_get_longest || compl_used_match)
+	ਜੇ (!compl_get_longest || compl_ਵਰਤਿਆ_ਮੇਲ)
 	{
-	    int preinsert_longest = ins_compl_preinsert_longest()
-		&& match_at_original_text(compl_shown_match); // none selected
-	    ins_compl_insert(compl_preinsert || preinsert_longest,
+	    ਪੂਰਨ preinsert_longest = ins_compl_preinsert_longest()
+		&& ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ); // none selected
+	    ins_compl_ਪਾਓ(compl_preinsert || preinsert_longest,
 		    preinsert_longest);
 	}
-	else
-	    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
+	ਨਹੀਂਤਾਂ
+	    ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(compl_leader.string + get_compl_len(), -1);
     }
-    else
-	compl_used_match = FALSE;
+    ਨਹੀਂਤਾਂ
+	compl_ਵਰਤਿਆ_ਮੇਲ = FALSE;
 
-    if (!allow_get_expansion)
+    ਜੇ (!allow_get_expansion)
     {
 	// may undisplay the popup menu first
 	ins_compl_upd_pum();
 
-	if (pum_enough_matches())
+	ਜੇ (pum_enough_matches())
 	    // Will display the popup menu, don't redraw yet to avoid flicker.
 	    pum_call_update_screen();
-	else
+	ਨਹੀਂਤਾਂ
 	    // Not showing the popup menu yet, redraw to show the user what was
 	    // inserted.
 	    update_screen(0);
 
 	// display the updated popup menu
 	ins_compl_show_pum();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	ਜੇ (gui.ਵਿੱਚ_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
-	    out_flush_cursor(FALSE, FALSE);
+	    ਬਾਹਰਲਾ_flush_cursor(FALSE, FALSE);
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// Delete old text to be replaced, since we're still searching and
 	// don't want to match ourselves!
@@ -6490,37 +6490,37 @@ ins_compl_next(
 
     // Enter will select a match when the match wasn't inserted and the popup
     // menu is visible.
-    if (compl_no_insert && !started
-				 && !match_at_original_text(compl_shown_match))
+    ਜੇ (compl_no_ਪਾਓ && !started
+				 && !ਮੇਲ_at_original_ਪਾਠ(compl_shown_ਮੇਲ))
 	compl_enter_selects = TRUE;
-    else
-	compl_enter_selects = !insert_match && compl_match_array != NULL;
+    ਨਹੀਂਤਾਂ
+	compl_enter_selects = !ਪਾਓ_ਮੇਲ && compl_ਮੇਲ_array != ਨਿਰਾ;
 
     // Show the file name for the match (if any)
-    if (compl_shown_match->cp_fname != NULL)
+    ਜੇ (compl_shown_ਮੇਲ->cp_fname != ਨਿਰਾ)
 	ins_compl_show_filename();
 
-    return num_matches;
+    ਵਾਪਸ ਅੰਕ_matches;
 }
 
 /*
  * Check if the current completion source exceeded its timeout. If so, stop
  * collecting, and halve the timeout.
  */
-    static void
-check_elapsed_time(void)
+    ਸਥਿਰ ਖਾਲੀ
+check_elapsed_ਸਮਾਂ(ਖਾਲੀ)
 {
-#ifdef ELAPSED_FUNC
-    elapsed_T	*start_tv
-	= &cpt_sources_array[cpt_sources_index].compl_start_tv;
-    long	elapsed_ms = ELAPSED_FUNC(*start_tv);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    elapsed_T	*ਸ਼ੁਰੂ_tv
+	= &cpt_sources_array[cpt_sources_ਸੂਚਕਾਂਕ].compl_ਸ਼ੁਰੂ_tv;
+    ਲੰਮਾ	elapsed_ms = ELAPSED_FUNC(*ਸ਼ੁਰੂ_tv);
 
-    if (elapsed_ms > compl_timeout_ms)
+    ਜੇ (elapsed_ms > compl_timeout_ms)
     {
-	compl_time_slice_expired = TRUE;
+	compl_ਸਮਾਂ_ਟੁਕੜਾ_expired = TRUE;
 	DECAY_COMPL_TIMEOUT();
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -6532,78 +6532,78 @@ check_elapsed_time(void)
  * "in_compl_func" is TRUE when called from complete_check(), don't set
  * compl_curr_match.
  */
-    void
-ins_compl_check_keys(int frequency, int in_compl_func)
+    ਖਾਲੀ
+ins_compl_check_ਕੁੰਜੀਆਂ(ਪੂਰਨ frequency, ਪੂਰਨ ਵਿੱਚ_compl_func)
 {
-    static int	count = 0;
-    int		c;
+    ਸਥਿਰ ਪੂਰਨ	ਗਿਣਤੀ_2 = 0;
+    ਪੂਰਨ		c;
 
     // Don't check when reading keys from a script, :normal or feedkeys().
     // That would break the test scripts.  But do check for keys when called
     // from complete_check().
-    if (!in_compl_func && (using_script() || ex_normal_busy))
-	return;
+    ਜੇ (!ਵਿੱਚ_compl_func && (using_script() || ex_ਸਾਧਾਰਨ_busy))
+	ਵਾਪਸ;
 
     // Only do this at regular intervals
-    if (++count < frequency)
-	return;
-    count = 0;
+    ਜੇ (++ਗਿਣਤੀ_2 < frequency)
+	ਵਾਪਸ;
+    ਗਿਣਤੀ_2 = 0;
 
     // Check for a typed key.  Do use mappings, otherwise vim_is_ctrl_x_key()
     // can't do its work correctly.
     c = vpeekc_any();
-    if (c != NUL
-#ifdef FEAT_EVAL
+    ਜੇ (c != NUL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	    // If test_override("char_avail", 1) was called, ignore characters
 	    // waiting in the typeahead buffer.
 	    && !disable_char_avail_for_testing
-#endif
+#ਜੇ_ਅੰਤ
        )
     {
-	if (vim_is_ctrl_x_key(c) && c != Ctrl_X && c != Ctrl_R)
+	ਜੇ (vim_is_ctrl_x_ਕੁੰਜੀ(c) && c != Ctrl_X && c != Ctrl_R)
 	{
-	    c = safe_vgetc();	// Eat the character
+	    c = ਸੁਰੱਖਿਅਤ_vgetc();	// Eat the character
 	    compl_shows_dir = ins_compl_key2dir(c);
-	    (void)ins_compl_next(FALSE, ins_compl_key2count(c),
-				      c != K_UP && c != K_DOWN);
+	    (ਖਾਲੀ)ins_compl_ਅਗਲਾ(FALSE, ins_compl_key2count(c),
+				      c != K_ਉੱਪਰ && c != K_ਥੱਲੇ);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Need to get the character to have KeyTyped set.  We'll put it
 	    // back with vungetc() below.  But skip K_IGNORE.
-	    c = safe_vgetc();
-	    if (c != K_IGNORE)
+	    c = ਸੁਰੱਖਿਅਤ_vgetc();
+	    ਜੇ (c != K_IGNORE)
 	    {
 		// Typed keys that get mapped lose KeyTyped. Still let
 		// complete_check() interrupt, except during @r replay.
-		if (c != Ctrl_R && (KeyTyped
-			    || (in_compl_func && reg_executing == 0)))
+		ਜੇ (c != Ctrl_R && (ਕੁੰਜੀ_Typed
+			    || (ਵਿੱਚ_compl_func && reg_executing == 0)))
 		    compl_interrupted = TRUE;
 
 		vungetc(c);
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	int normal_mode_strict = ctrl_x_mode_normal()
-	    && !ctrl_x_mode_line_or_eval() && !(compl_cont_status & CONT_LOCAL)
-	    && cpt_sources_array != NULL && cpt_sources_index >= 0;
-	if (normal_mode_strict && (compl_autocomplete || p_cto > 0))
-	    check_elapsed_time();
+	ਪੂਰਨ ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict = ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ()
+	    && !ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval() && !(compl_cont_ਸਥਿਤੀ & CONT_LOCAL)
+	    && cpt_sources_array != ਨਿਰਾ && cpt_sources_ਸੂਚਕਾਂਕ >= 0;
+	ਜੇ (ਸਾਧਾਰਨ_ਬਹੁਲਕ_strict && (compl_autocomplete || p_cto > 0))
+	    check_elapsed_ਸਮਾਂ();
     }
 
-    if (compl_pending
+    ਜੇ (compl_pending
 	    && !got_int
 	    && !(cot_flags & (COT_NOINSERT | COT_FUZZY))
 	    && (!compl_autocomplete || ins_compl_has_preinsert()))
     {
 	// Insert the first match immediately and advance compl_shown_match,
 	// before finding other matches.
-	int todo = compl_pending > 0 ? compl_pending : -compl_pending;
+	ਪੂਰਨ todo = compl_pending > 0 ? compl_pending : -compl_pending;
 
 	compl_pending = 0;
-	(void)ins_compl_next(FALSE, todo, TRUE);
+	(ਖਾਲੀ)ins_compl_ਅਗਲਾ(FALSE, todo, TRUE);
     }
 }
 
@@ -6611,64 +6611,64 @@ ins_compl_check_keys(int frequency, int in_compl_func)
  * Decide the direction of Insert mode complete from the key typed.
  * Returns BACKWARD or FORWARD.
  */
-    static int
-ins_compl_key2dir(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_key2dir(ਪੂਰਨ c)
 {
-    if (c == Ctrl_P || c == Ctrl_L
-	    || c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP || c == K_UP)
-	return BACKWARD;
-    return FORWARD;
+    ਜੇ (c == Ctrl_P || c == Ctrl_L
+	    || c == K_PAGEUP || c == K_KPAGEUP || c == K_S_ਉੱਪਰ || c == K_ਉੱਪਰ)
+	ਵਾਪਸ BACKWARD;
+    ਵਾਪਸ FORWARD;
 }
 
 /*
  * Return TRUE for keys that are used for completion only when the popup menu
  * is visible.
  */
-    static int
-ins_compl_pum_key(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_pum_ਕੁੰਜੀ(ਪੂਰਨ c)
 {
-    return pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP
-		     || c == K_PAGEDOWN || c == K_KPAGEDOWN || c == K_S_DOWN
-		     || c == K_UP || c == K_DOWN);
+    ਵਾਪਸ pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_ਉੱਪਰ
+		     || c == K_PAGEDOWN || c == K_KPAGEDOWN || c == K_S_ਥੱਲੇ
+		     || c == K_ਉੱਪਰ || c == K_ਥੱਲੇ);
 }
 
 /*
  * Decide the number of completions to move forward.
  * Returns 1 for most keys, height of the popup menu for page-up/down keys.
  */
-    static int
-ins_compl_key2count(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_key2count(ਪੂਰਨ c)
 {
-    if (ins_compl_pum_key(c) && c != K_UP && c != K_DOWN)
+    ਜੇ (ins_compl_pum_ਕੁੰਜੀ(c) && c != K_ਉੱਪਰ && c != K_ਥੱਲੇ)
     {
-	int h = pum_get_height();
-	if (h > 3)
+	ਪੂਰਨ h = pum_get_ਉਚਾਈ();
+	ਜੇ (h > 3)
 	    h -= 2; // keep some context
-	return h;
+	ਵਾਪਸ h;
     }
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
  * Return TRUE if completion with "c" should insert the match, FALSE if only
  * to change the currently selected completion.
  */
-    static int
-ins_compl_use_match(int c)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_use_ਮੇਲ(ਪੂਰਨ c)
 {
-    switch (c)
+    ਚੋਣ (c)
     {
-	case K_UP:
-	case K_DOWN:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-	case K_S_DOWN:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_S_UP:
-	    return FALSE;
+	ਹਾਲਤ K_ਉੱਪਰ:
+	ਹਾਲਤ K_ਥੱਲੇ:
+	ਹਾਲਤ K_PAGEDOWN:
+	ਹਾਲਤ K_KPAGEDOWN:
+	ਹਾਲਤ K_S_ਥੱਲੇ:
+	ਹਾਲਤ K_PAGEUP:
+	ਹਾਲਤ K_KPAGEUP:
+	ਹਾਲਤ K_S_ਉੱਪਰ:
+	    ਵਾਪਸ FALSE;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -6677,154 +6677,154 @@ ins_compl_use_match(int c)
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variables: compl_cont_status and ctrl_x_mode
  */
-    static int
-get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    ਸਥਿਰ ਪੂਰਨ
+get_ਸਾਧਾਰਨ_compl_info(char_u *ਸਤਰ, ਪੂਰਨ startcol, colnr_T curs_ਖਾਨਾ)
 {
-    if ((compl_cont_status & CONT_SOL) || ctrl_x_mode_path_defines())
+    ਜੇ ((compl_cont_ਸਥਿਤੀ & CONT_SOL) || ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ())
     {
-	if (!compl_status_adding())
+	ਜੇ (!compl_ਸਥਿਤੀ_adding())
 	{
-	    while (--startcol >= 0 && vim_isIDc(line[startcol]))
+	    ਜਦੋਂ (--startcol >= 0 && vim_isIDc(ਸਤਰ[startcol]))
 		;
-	    compl_col += ++startcol;
-	    compl_length = curs_col - startcol;
+	    compl_ਖਾਨਾ += ++startcol;
+	    compl_ਲੰਮਾਈ = curs_ਖਾਨਾ - startcol;
 	}
-	if (p_ic)
+	ਜੇ (p_ic)
 	{
-	    compl_pattern.string = str_foldcase(line + compl_col,
-		    compl_length, NULL, 0);
-	    if (compl_pattern.string == NULL)
+	    compl_ਨਮੂਨਾ.string = str_foldcase(ਸਤਰ + compl_ਖਾਨਾ,
+		    compl_ਲੰਮਾਈ, ਨਿਰਾ, 0);
+	    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+		ਵਾਪਸ FAIL;
 	    }
-	    compl_pattern.length = STRLEN(compl_pattern.string);
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = STRLEN(compl_ਨਮੂਨਾ.string);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	    if (compl_pattern.string == NULL)
+	    compl_ਨਮੂਨਾ.string = vim_strnsave(ਸਤਰ + compl_ਖਾਨਾ, (size_t)compl_ਲੰਮਾਈ);
+	    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+		ਵਾਪਸ FAIL;
 	    }
-	    compl_pattern.length = (size_t)compl_length;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = (size_t)compl_ਲੰਮਾਈ;
 	}
     }
-    else if (compl_status_adding())
+    ਨਹੀਂਤਾਂ ਜੇ (compl_ਸਥਿਤੀ_adding())
     {
-	char_u	    *prefix = (char_u *)"\\<";
+	char_u	    *ਅਗੇਤਰ = (char_u *)"\\<";
 	size_t	    prefixlen = STRLEN_LITERAL("\\<");
 	size_t	    n;
 
-	if (!vim_iswordp(line + compl_col)
-		|| (compl_col > 0
-		    && (vim_iswordp(mb_prevptr(line, line + compl_col)))))
+	ਜੇ (!vim_iswordp(ਸਤਰ + compl_ਖਾਨਾ)
+		|| (compl_ਖਾਨਾ > 0
+		    && (vim_iswordp(mb_prevptr(ਸਤਰ, ਸਤਰ + compl_ਖਾਨਾ)))))
 	{
-	    prefix = (char_u *)"";
+	    ਅਗੇਤਰ = (char_u *)"";
 	    prefixlen = 0;
 	}
 
 	// we need up to 2 extra chars for the prefix
-	n = quote_meta(NULL, line + compl_col, compl_length) + prefixlen;
-	compl_pattern.string = alloc(n);
-	if (compl_pattern.string == NULL)
+	n = quote_meta(ਨਿਰਾ, ਸਤਰ + compl_ਖਾਨਾ, compl_ਲੰਮਾਈ) + prefixlen;
+	compl_ਨਮੂਨਾ.string = alloc(n);
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ FAIL;
 	}
-	STRCPY((char *)compl_pattern.string, prefix);
-	(void)quote_meta(compl_pattern.string + prefixlen,
-		line + compl_col, compl_length);
-	compl_pattern.length = n - 1;
+	STRCPY((ਅੱਖਰ *)compl_ਨਮੂਨਾ.string, ਅਗੇਤਰ);
+	(ਖਾਲੀ)quote_meta(compl_ਨਮੂਨਾ.string + prefixlen,
+		ਸਤਰ + compl_ਖਾਨਾ, compl_ਲੰਮਾਈ);
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = n - 1;
     }
-    else if (--startcol < 0
-	    || !vim_iswordp(mb_prevptr(line, line + startcol + 1)))
+    ਨਹੀਂਤਾਂ ਜੇ (--startcol < 0
+	    || !vim_iswordp(mb_prevptr(ਸਤਰ, ਸਤਰ + startcol + 1)))
     {
 	size_t	len = STRLEN_LITERAL("\\<\\k\\k");
 
 	// Match any word of at least two chars
-	compl_pattern.string = vim_strnsave((char_u *)"\\<\\k\\k", len);
-	if (compl_pattern.string == NULL)
+	compl_ਨਮੂਨਾ.string = vim_strnsave((char_u *)"\\<\\k\\k", len);
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ FAIL;
 	}
-	compl_pattern.length = len;
-	compl_col += curs_col;
-	compl_length = 0;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = len;
+	compl_ਖਾਨਾ += curs_ਖਾਨਾ;
+	compl_ਲੰਮਾਈ = 0;
 	compl_from_nonkeyword = TRUE;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Search the point of change class of multibyte character
 	// or not a word single byte character backward.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
-	    int base_class;
-	    int head_off;
+	    ਪੂਰਨ ਅਧਾਰ_class;
+	    ਪੂਰਨ ਸਿਰ_off;
 
-	    startcol -= (*mb_head_off)(line, line + startcol);
-	    base_class = mb_get_class(line + startcol);
-	    while (--startcol >= 0)
+	    startcol -= (*mb_ਸਿਰ_off)(ਸਤਰ, ਸਤਰ + startcol);
+	    ਅਧਾਰ_class = mb_get_class(ਸਤਰ + startcol);
+	    ਜਦੋਂ (--startcol >= 0)
 	    {
-		head_off = (*mb_head_off)(line, line + startcol);
-		if (base_class != mb_get_class(line + startcol
-			    - head_off))
-		    break;
-		startcol -= head_off;
+		ਸਿਰ_off = (*mb_ਸਿਰ_off)(ਸਤਰ, ਸਤਰ + startcol);
+		ਜੇ (ਅਧਾਰ_class != mb_get_class(ਸਤਰ + startcol
+			    - ਸਿਰ_off))
+		    ਰੋਕੋ;
+		startcol -= ਸਿਰ_off;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    while (--startcol >= 0 && vim_iswordc(line[startcol]))
+	    ਜਦੋਂ (--startcol >= 0 && vim_iswordc(ਸਤਰ[startcol]))
 		;
 	}
 
-	compl_col += ++startcol;
-	compl_length = (int)curs_col - startcol;
-	if (compl_length == 1)
+	compl_ਖਾਨਾ += ++startcol;
+	compl_ਲੰਮਾਈ = (ਪੂਰਨ)curs_ਖਾਨਾ - startcol;
+	ਜੇ (compl_ਲੰਮਾਈ == 1)
 	{
 	    // Only match word with at least two chars -- webb
 	    // there's no need to call quote_meta,
 	    // alloc(7) is enough  -- Acevedo
-	    compl_pattern.string = alloc(7);
-	    if (compl_pattern.string == NULL)
+	    compl_ਨਮੂਨਾ.string = alloc(7);
+	    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+		ਵਾਪਸ FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col, 1);
-	    STRCAT((char *)compl_pattern.string, "\\k");
-	    compl_pattern.length = STRLEN(compl_pattern.string);
+	    STRCPY((ਅੱਖਰ *)compl_ਨਮੂਨਾ.string, "\\<");
+	    (ਖਾਲੀ)quote_meta(compl_ਨਮੂਨਾ.string + 2, ਸਤਰ + compl_ਖਾਨਾ, 1);
+	    STRCAT((ਅੱਖਰ *)compl_ਨਮੂਨਾ.string, "\\k");
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = STRLEN(compl_ਨਮੂਨਾ.string);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    size_t  n = quote_meta(NULL, line + compl_col, compl_length) + 2;
+	    size_t  n = quote_meta(ਨਿਰਾ, ਸਤਰ + compl_ਖਾਨਾ, compl_ਲੰਮਾਈ) + 2;
 
-	    compl_pattern.string = alloc(n);
-	    if (compl_pattern.string == NULL)
+	    compl_ਨਮੂਨਾ.string = alloc(n);
+	    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+		ਵਾਪਸ FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col,
-		    compl_length);
-	    compl_pattern.length = n - 1;
+	    STRCPY((ਅੱਖਰ *)compl_ਨਮੂਨਾ.string, "\\<");
+	    (ਖਾਲੀ)quote_meta(compl_ਨਮੂਨਾ.string + 2, ਸਤਰ + compl_ਖਾਨਾ,
+		    compl_ਲੰਮਾਈ);
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = n - 1;
 	}
     }
 
     // Call functions in 'complete' with 'findstart=1'
-    if (ctrl_x_mode_normal() && !(compl_cont_status & CONT_LOCAL))
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() && !(compl_cont_ਸਥਿਤੀ & CONT_LOCAL))
     {
 	// ^N completion, not complete() or ^X^N
-	if (setup_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
-	    return FAIL;
+	ਜੇ (ਤਿਆਰੀ_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
+	    ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -6832,148 +6832,148 @@ get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
  * complete() function.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_wholeline_compl_info(char_u *line, colnr_T curs_col)
+    ਸਥਿਰ ਪੂਰਨ
+get_wholeline_compl_info(char_u *ਸਤਰ, colnr_T curs_ਖਾਨਾ)
 {
-    compl_col = (colnr_T)getwhitecols(line);
-    compl_length = (int)curs_col - (int)compl_col;
-    if (compl_length < 0)	// cursor in indent: empty pattern
-	compl_length = 0;
-    if (p_ic)
+    compl_ਖਾਨਾ = (colnr_T)getwhitecols(ਸਤਰ);
+    compl_ਲੰਮਾਈ = (ਪੂਰਨ)curs_ਖਾਨਾ - (ਪੂਰਨ)compl_ਖਾਨਾ;
+    ਜੇ (compl_ਲੰਮਾਈ < 0)	// cursor in indent: empty pattern
+	compl_ਲੰਮਾਈ = 0;
+    ਜੇ (p_ic)
     {
-	compl_pattern.string = str_foldcase(line + compl_col, compl_length,
-		NULL, 0);
-	if (compl_pattern.string == NULL)
+	compl_ਨਮੂਨਾ.string = str_foldcase(ਸਤਰ + compl_ਖਾਨਾ, compl_ਲੰਮਾਈ,
+		ਨਿਰਾ, 0);
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ FAIL;
 	}
-	compl_pattern.length = STRLEN(compl_pattern.string);
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = STRLEN(compl_ਨਮੂਨਾ.string);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	if (compl_pattern.string == NULL)
+	compl_ਨਮੂਨਾ.string = vim_strnsave(ਸਤਰ + compl_ਖਾਨਾ, (size_t)compl_ਲੰਮਾਈ);
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ FAIL;
 	}
-	compl_pattern.length = (size_t)compl_length;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = (size_t)compl_ਲੰਮਾਈ;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Get the pattern, column and length for filename completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_filename_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    ਸਥਿਰ ਪੂਰਨ
+get_filename_compl_info(char_u *ਸਤਰ, ਪੂਰਨ startcol, colnr_T curs_ਖਾਨਾ)
 {
     // Go back to just before the first filename character.
-    if (startcol > 0)
+    ਜੇ (startcol > 0)
     {
-	char_u	*p = line + startcol;
+	char_u	*p = ਸਤਰ + startcol;
 
-	MB_PTR_BACK(line, p);
-	while (p > line && vim_isfilec(PTR2CHAR(p)))
-	    MB_PTR_BACK(line, p);
-	if (p == line && vim_isfilec(PTR2CHAR(p)))
+	MB_PTR_ਪਿੱਠ(ਸਤਰ, p);
+	ਜਦੋਂ (p > ਸਤਰ && vim_isfilec(PTR2CHAR(p)))
+	    MB_PTR_ਪਿੱਠ(ਸਤਰ, p);
+	ਜੇ (p == ਸਤਰ && vim_isfilec(PTR2CHAR(p)))
 	    startcol = 0;
-	else
-	    startcol = (int)(p - line) + 1;
+	ਨਹੀਂਤਾਂ
+	    startcol = (ਪੂਰਨ)(p - ਸਤਰ) + 1;
     }
 
-    compl_col += startcol;
-    compl_length = (int)curs_col - startcol;
-    compl_pattern.string = addstar(line + compl_col, compl_length, EXPAND_FILES);
-    if (compl_pattern.string == NULL)
+    compl_ਖਾਨਾ += startcol;
+    compl_ਲੰਮਾਈ = (ਪੂਰਨ)curs_ਖਾਨਾ - startcol;
+    compl_ਨਮੂਨਾ.string = addstar(ਸਤਰ + compl_ਖਾਨਾ, compl_ਲੰਮਾਈ, EXPAND_FILES);
+    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	ਵਾਪਸ FAIL;
     }
 
-    compl_pattern.length = STRLEN(compl_pattern.string);
+    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = STRLEN(compl_ਨਮੂਨਾ.string);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Get the pattern, column and length for command-line completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_cmdline_compl_info(char_u *line, colnr_T curs_col)
+    ਸਥਿਰ ਪੂਰਨ
+get_cmdline_compl_info(char_u *ਸਤਰ, colnr_T curs_ਖਾਨਾ)
 {
-    compl_pattern.string = vim_strnsave(line, curs_col);
-    if (compl_pattern.string == NULL)
+    compl_ਨਮੂਨਾ.string = vim_strnsave(ਸਤਰ, curs_ਖਾਨਾ);
+    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	ਵਾਪਸ FAIL;
     }
-    compl_pattern.length = curs_col;
-    set_cmd_context(&compl_xp, compl_pattern.string,
-	    (int)compl_pattern.length, curs_col, FALSE);
-    if (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
+    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = curs_ਖਾਨਾ;
+    ਸੈੱਟ_cmd_context(&compl_xp, compl_ਨਮੂਨਾ.string,
+	    (ਪੂਰਨ)compl_ਨਮੂਨਾ.ਲੰਮਾਈ, curs_ਖਾਨਾ, FALSE);
+    ਜੇ (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
 	    || compl_xp.xp_context == EXPAND_NOTHING)
 	// No completion possible, use an empty pattern to get a
 	// "pattern not found" message.
-	compl_col = curs_col;
-    else
-	compl_col = (int)(compl_xp.xp_pattern - compl_pattern.string);
-    compl_length = curs_col - compl_col;
+	compl_ਖਾਨਾ = curs_ਖਾਨਾ;
+    ਨਹੀਂਤਾਂ
+	compl_ਖਾਨਾ = (ਪੂਰਨ)(compl_xp.xp_ਨਮੂਨਾ - compl_ਨਮੂਨਾ.string);
+    compl_ਲੰਮਾਈ = curs_ਖਾਨਾ - compl_ਖਾਨਾ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
 /*
  * Set global variables related to completion:
  * compl_col, compl_length, compl_pattern, and cpt_compl_pattern.
  */
-    static int
-set_compl_globals(
-    int		startcol UNUSED,
-    colnr_T	curs_col UNUSED,
-    int		is_cpt_compl UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+ਸੈੱਟ_compl_globals(
+    ਪੂਰਨ		startcol ਅਣਵਰਤਿਆ,
+    colnr_T	curs_ਖਾਨਾ ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		is_cpt_compl ਅਣਵਰਤਿਆ)
 {
-    if (is_cpt_compl)
+    ਜੇ (is_cpt_compl)
     {
-	VIM_CLEAR_STRING(cpt_compl_pattern);
-	if (startcol < compl_col)
-	    return prepend_startcol_text(&cpt_compl_pattern, &compl_orig_text,
+	VIM_CLEAR_STRING(cpt_compl_ਨਮੂਨਾ);
+	ਜੇ (startcol < compl_ਖਾਨਾ)
+	    ਵਾਪਸ prepend_startcol_ਪਾਠ(&cpt_compl_ਨਮੂਨਾ, &compl_orig_ਪਾਠ,
 		    startcol);
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    cpt_compl_pattern.string = vim_strnsave(compl_orig_text.string,
-		    compl_orig_text.length);
-	    cpt_compl_pattern.length = compl_orig_text.length;
+	    cpt_compl_ਨਮੂਨਾ.string = vim_strnsave(compl_orig_ਪਾਠ.string,
+		    compl_orig_ਪਾਠ.ਲੰਮਾਈ);
+	    cpt_compl_ਨਮੂਨਾ.ਲੰਮਾਈ = compl_orig_ਪਾਠ.ਲੰਮਾਈ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (startcol < 0 || startcol > curs_col)
-	    startcol = curs_col;
+	ਜੇ (startcol < 0 || startcol > curs_ਖਾਨਾ)
+	    startcol = curs_ਖਾਨਾ;
 
 	// Re-obtain line in case it has changed
-	char_u	*line = ml_get(curwin->w_cursor.lnum);
-	int	len = curs_col - startcol;
+	char_u	*ਸਤਰ = ml_get(curwin->w_cursor.lnum);
+	ਪੂਰਨ	len = curs_ਖਾਨਾ - startcol;
 
-	compl_pattern.string = vim_strnsave(line + startcol, (size_t)len);
-	if (compl_pattern.string == NULL)
+	compl_ਨਮੂਨਾ.string = vim_strnsave(ਸਤਰ + startcol, (size_t)len);
+	ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	    ਵਾਪਸ FAIL;
 	}
-	compl_pattern.length = (size_t)len;
-	compl_col = startcol;
-	compl_length = len;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = (size_t)len;
+	compl_ਖਾਨਾ = startcol;
+	compl_ਲੰਮਾਈ = len;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Get the pattern, column and length for user defined completion ('omnifunc',
@@ -6983,52 +6983,52 @@ set_compl_globals(
  * option; otherwise, it is NULL.
  * "startcol", when not NULL, contains the column returned by function.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_userdefined_compl_info(
-    colnr_T	curs_col UNUSED,
-    callback_T	*cb UNUSED,
-    int		*startcol UNUSED)
+    colnr_T	curs_ਖਾਨਾ ਅਣਵਰਤਿਆ,
+    callback_T	*cb ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		*startcol ਅਣਵਰਤਿਆ)
 {
-    int		ret = FAIL;
+    ਪੂਰਨ		ret = FAIL;
 
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
     // Call user defined function 'completefunc' with "a:findstart"
     // set to 1 to obtain the length of text to use for completion.
-    typval_T	args[3];
-    int		col;
-    char_u	*funcname = NULL;
+    typval_T	ਦਲੀਲਾਂ[3];
+    ਪੂਰਨ		ਖਾਨਾ;
+    char_u	*funcname = ਨਿਰਾ;
     pos_T	pos;
-    int		save_State = State;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
-			    && was_set_insecurely(curwin,
+    ਪੂਰਨ		save_State = State;
+    ਪੂਰਨ		is_cpt_function = (cb != ਨਿਰਾ);
+    ਪੂਰਨ		use_sandbox = is_cpt_function
+			    && was_ਸੈੱਟ_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    ਜੇ (!is_cpt_function)
     {
 	// Call 'completefunc' or 'omnifunc' or 'thesaurusfunc' and get pattern
 	// length as a string
-	funcname = get_complete_funcname(ctrl_x_mode);
-	if (*funcname == NUL)
+	funcname = get_complete_funcname(ctrl_x_ਬਹੁਲਕ);
+	ਜੇ (*funcname == NUL)
 	{
-	    semsg(_(e_option_str_is_not_set), ctrl_x_mode_function()
+	    semsg(_(e_option_str_is_not_ਸੈੱਟ), ctrl_x_ਬਹੁਲਕ_function()
 		    ? "completefunc" : "omnifunc");
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	cb = get_insert_callback(ctrl_x_mode);
+	cb = get_ਪਾਓ_callback(ctrl_x_ਬਹੁਲਕ);
     }
 
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 1;
-    args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = (char_u *)"";
-    args[2].v_type = VAR_UNKNOWN;
+    ਦਲੀਲਾਂ[0].v_type = VAR_ਸੰਖਿਆ;
+    ਦਲੀਲਾਂ[0].vval.v_ਸੰਖਿਆ = 1;
+    ਦਲੀਲਾਂ[1].v_type = VAR_STRING;
+    ਦਲੀਲਾਂ[1].vval.v_string = (char_u *)"";
+    ਦਲੀਲਾਂ[2].v_type = VAR_UNKNOWN;
     pos = curwin->w_cursor;
     ++textlock;
-    if (use_sandbox)
+    ਜੇ (use_sandbox)
 	++sandbox;
-    col = call_callback_retnr(cb, 2, args);
-    if (use_sandbox)
+    ਖਾਨਾ = call_callback_retnr(cb, 2, ਦਲੀਲਾਂ);
+    ਜੇ (use_sandbox)
 	--sandbox;
     --textlock;
 
@@ -7036,42 +7036,42 @@ get_userdefined_compl_info(
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    ਜੇ (!EQUAL_POS(curwin->w_cursor, pos))
     {
-	emsg(_(e_complete_function_deleted_text));
-	return FAIL;
+	emsg(_(e_complete_function_deleted_ਪਾਠ));
+	ਵਾਪਸ FAIL;
     }
 
-    if (startcol != NULL)
-	*startcol = col;
+    ਜੇ (startcol != ਨਿਰਾ)
+	*startcol = ਖਾਨਾ;
 
     // Return value -2 means the user complete function wants to cancel the
     // complete without an error, do the same if the function did not execute
     // successfully.
-    if (col == -2 || aborting())
-	return FAIL;
+    ਜੇ (ਖਾਨਾ == -2 || aborting())
+	ਵਾਪਸ FAIL;
 
     // Return value -3 does the same as -2 and leaves CTRL-X mode.
-    if (col == -3)
+    ਜੇ (ਖਾਨਾ == -3)
     {
-	if (is_cpt_function)
-	    return FAIL;
-	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	if (!shortmess(SHM_COMPLETIONMENU))
-	    msg_clr_cmdline();
-	return FAIL;
+	ਜੇ (is_cpt_function)
+	    ਵਾਪਸ FAIL;
+	ctrl_x_ਬਹੁਲਕ = CTRL_X_ਸਾਧਾਰਨ;
+	edit_submode = ਨਿਰਾ;
+	ਜੇ (!shortmess(SHM_COMPLETIONMENU))
+	    ਸੁਨੇਹਾ_clr_cmdline();
+	ਵਾਪਸ FAIL;
     }
 
     // Reset extended parameters of completion, when starting new
     // completion.
     compl_opt_refresh_always = FALSE;
-    compl_opt_suppress_empty = FALSE;
+    compl_opt_suppress_ਖਾਲੀ_ਥਾਵਾਂ = FALSE;
 
-    ret = !is_cpt_function ? set_compl_globals(col, curs_col, FALSE) : OK;
-#endif
+    ret = !is_cpt_function ? ਸੈੱਟ_compl_globals(ਖਾਨਾ, curs_ਖਾਨਾ, FALSE) : OK;
+#ਜੇ_ਅੰਤ
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -7079,42 +7079,42 @@ get_userdefined_compl_info(
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variable: spell_bad_len
  */
-    static int
-get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+get_spell_compl_info(ਪੂਰਨ startcol ਅਣਵਰਤਿਆ, colnr_T curs_ਖਾਨਾ ਅਣਵਰਤਿਆ)
 {
-    int		ret = FAIL;
-#ifdef FEAT_SPELL
-    char_u	*line = NULL;
+    ਪੂਰਨ		ret = FAIL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+    char_u	*ਸਤਰ = ਨਿਰਾ;
 
-    if (spell_bad_len > 0)
-	compl_col = curs_col - spell_bad_len;
-    else
-	compl_col = spell_word_start(startcol);
+    ਜੇ (spell_bad_len > 0)
+	compl_ਖਾਨਾ = curs_ਖਾਨਾ - spell_bad_len;
+    ਨਹੀਂਤਾਂ
+	compl_ਖਾਨਾ = spell_ਸ਼ਬਦ_ਸ਼ੁਰੂ(startcol);
 
-    if (compl_col >= (colnr_T)startcol)
+    ਜੇ (compl_ਖਾਨਾ >= (colnr_T)startcol)
     {
-	compl_length = 0;
-	compl_col = curs_col;
+	compl_ਲੰਮਾਈ = 0;
+	compl_ਖਾਨਾ = curs_ਖਾਨਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	spell_expand_check_cap(compl_col);
-	compl_length = (int)curs_col - compl_col;
+	spell_expand_check_cap(compl_ਖਾਨਾ);
+	compl_ਲੰਮਾਈ = (ਪੂਰਨ)curs_ਖਾਨਾ - compl_ਖਾਨਾ;
     }
     // Need to obtain "line" again, it may have become invalid.
-    line = ml_get(curwin->w_cursor.lnum);
-    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (compl_pattern.string == NULL)
+    ਸਤਰ = ml_get(curwin->w_cursor.lnum);
+    compl_ਨਮੂਨਾ.string = vim_strnsave(ਸਤਰ + compl_ਖਾਨਾ, (size_t)compl_ਲੰਮਾਈ);
+    ਜੇ (compl_ਨਮੂਨਾ.string == ਨਿਰਾ)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_ਨਮੂਨਾ.ਲੰਮਾਈ = 0;
+	ਵਾਪਸ FAIL;
     }
 
-    compl_pattern.length = (size_t)compl_length;
+    compl_ਨਮੂਨਾ.ਲੰਮਾਈ = (size_t)compl_ਲੰਮਾਈ;
     ret = OK;
-#endif
+#ਜੇ_ਅੰਤ
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
@@ -7125,49 +7125,49 @@ get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
  * become invalid and needs to be fetched again.
  * Returns OK on success.
  */
-    static int
-compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
+    ਸਥਿਰ ਪੂਰਨ
+compl_get_info(char_u *ਸਤਰ, ਪੂਰਨ startcol, colnr_T curs_ਖਾਨਾ, ਪੂਰਨ *ਸਤਰ_invalid)
 {
-    if (ctrl_x_mode_normal() || ctrl_x_mode_register()
-	    || (ctrl_x_mode & CTRL_X_WANT_IDENT
-		&& !thesaurus_func_complete(ctrl_x_mode)))
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() || ctrl_x_ਬਹੁਲਕ_ਰਜਿਸਟਰ()
+	    || (ctrl_x_ਬਹੁਲਕ & CTRL_X_WANT_IDENT
+		&& !thesaurus_func_complete(ctrl_x_ਬਹੁਲਕ)))
     {
-	if (get_normal_compl_info(line, startcol, curs_col) != OK)
-	    return FAIL;
-	*line_invalid = TRUE; // 'cpt' func may have invalidated "line"
+	ਜੇ (get_ਸਾਧਾਰਨ_compl_info(ਸਤਰ, startcol, curs_ਖਾਨਾ) != OK)
+	    ਵਾਪਸ FAIL;
+	*ਸਤਰ_invalid = TRUE; // 'cpt' func may have invalidated "line"
     }
-    else if (ctrl_x_mode_line_or_eval())
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
     {
-	return get_wholeline_compl_info(line, curs_col);
+	ਵਾਪਸ get_wholeline_compl_info(ਸਤਰ, curs_ਖਾਨਾ);
     }
-    else if (ctrl_x_mode_files())
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_files())
     {
-	return get_filename_compl_info(line, startcol, curs_col);
+	ਵਾਪਸ get_filename_compl_info(ਸਤਰ, startcol, curs_ਖਾਨਾ);
     }
-    else if (ctrl_x_mode == CTRL_X_CMDLINE)
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ == CTRL_X_CMDLINE)
     {
-	return get_cmdline_compl_info(line, curs_col);
+	ਵਾਪਸ get_cmdline_compl_info(ਸਤਰ, curs_ਖਾਨਾ);
     }
-    else if (ctrl_x_mode_function() || ctrl_x_mode_omni()
-	    || thesaurus_func_complete(ctrl_x_mode))
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_function() || ctrl_x_ਬਹੁਲਕ_omni()
+	    || thesaurus_func_complete(ctrl_x_ਬਹੁਲਕ))
     {
-	if (get_userdefined_compl_info(curs_col, NULL, NULL) != OK)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	ਜੇ (get_userdefined_compl_info(curs_ਖਾਨਾ, ਨਿਰਾ, ਨਿਰਾ) != OK)
+	    ਵਾਪਸ FAIL;
+	*ਸਤਰ_invalid = TRUE;	// "line" may have become invalid
     }
-    else if (ctrl_x_mode_spell())
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_spell())
     {
-	if (get_spell_compl_info(startcol, curs_col) == FAIL)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	ਜੇ (get_spell_compl_info(startcol, curs_ਖਾਨਾ) == FAIL)
+	    ਵਾਪਸ FAIL;
+	*ਸਤਰ_invalid = TRUE;	// "line" may have become invalid
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	internal_error("ins_complete()");
-	return FAIL;
+	ਅੰਦਰੂਨੀ_error("ins_complete()");
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -7180,274 +7180,274 @@ compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
  * was longer than 'tw').  if SOL is set then skip the previous pattern, a word
  * at the beginning of the line has been inserted, we'll look for that.
  */
-    static void
-ins_compl_continue_search(char_u *line)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_continue_ਖੋਜ(char_u *ਸਤਰ)
 {
     // it is a continued search
-    compl_cont_status &= ~CONT_INTRPT;	// remove INTRPT
-    if (ctrl_x_mode_normal() || ctrl_x_mode_path_patterns()
-						|| ctrl_x_mode_path_defines())
+    compl_cont_ਸਥਿਤੀ &= ~CONT_INTRPT;	// remove INTRPT
+    ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਾਧਾਰਨ() || ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_patterns()
+						|| ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ())
     {
-	if (compl_startpos.lnum != curwin->w_cursor.lnum)
+	ਜੇ (compl_startpos.lnum != curwin->w_cursor.lnum)
 	{
 	    // line (probably) wrapped, set compl_startpos to the
 	    // first non_blank in the line, if it is not a wordchar
 	    // include it to get a better pattern, but then we don't
 	    // want the "\\<" prefix, check it below
-	    compl_col = (colnr_T)getwhitecols(line);
-	    compl_startpos.col = compl_col;
+	    compl_ਖਾਨਾ = (colnr_T)getwhitecols(ਸਤਰ);
+	    compl_startpos.ਖਾਨਾ = compl_ਖਾਨਾ;
 	    compl_startpos.lnum = curwin->w_cursor.lnum;
-	    compl_cont_status &= ~CONT_SOL;   // clear SOL if present
+	    compl_cont_ਸਥਿਤੀ &= ~CONT_SOL;   // clear SOL if present
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // S_IPOS was set when we inserted a word that was at the
 	    // beginning of the line, which means that we'll go to SOL
 	    // mode but first we need to redefine compl_startpos
-	    if (compl_cont_status & CONT_S_IPOS)
+	    ਜੇ (compl_cont_ਸਥਿਤੀ & CONT_S_IPOS)
 	    {
-		compl_cont_status |= CONT_SOL;
-		compl_startpos.col = (colnr_T)(skipwhite(
-			    line + compl_length
-			    + compl_startpos.col) - line);
+		compl_cont_ਸਥਿਤੀ |= CONT_SOL;
+		compl_startpos.ਖਾਨਾ = (colnr_T)(skipwhite(
+			    ਸਤਰ + compl_ਲੰਮਾਈ
+			    + compl_startpos.ਖਾਨਾ) - ਸਤਰ);
 	    }
-	    compl_col = compl_startpos.col;
+	    compl_ਖਾਨਾ = compl_startpos.ਖਾਨਾ;
 	}
-	compl_length = curwin->w_cursor.col - (int)compl_col;
+	compl_ਲੰਮਾਈ = curwin->w_cursor.ਖਾਨਾ - (ਪੂਰਨ)compl_ਖਾਨਾ;
 	// IObuff is used to add a "word from the next line" would we
 	// have enough space?  just being paranoid
-#define	MIN_SPACE 75
-	if (compl_length > (IOSIZE - MIN_SPACE))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	MIN_SPACE 75
+	ਜੇ (compl_ਲੰਮਾਈ > (IOSIZE - MIN_SPACE))
 	{
-	    compl_cont_status &= ~CONT_SOL;
-	    compl_length = (IOSIZE - MIN_SPACE);
-	    compl_col = curwin->w_cursor.col - compl_length;
+	    compl_cont_ਸਥਿਤੀ &= ~CONT_SOL;
+	    compl_ਲੰਮਾਈ = (IOSIZE - MIN_SPACE);
+	    compl_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ - compl_ਲੰਮਾਈ;
 	}
-	compl_cont_status |= CONT_ADDING | CONT_N_ADDS;
-	if (compl_length < 1)
-	    compl_cont_status &= CONT_LOCAL;
+	compl_cont_ਸਥਿਤੀ |= CONT_ADDING | CONT_N_ADDS;
+	ਜੇ (compl_ਲੰਮਾਈ < 1)
+	    compl_cont_ਸਥਿਤੀ &= CONT_LOCAL;
     }
-    else if (ctrl_x_mode_line_or_eval() || ctrl_x_mode_register())
-	compl_cont_status = CONT_ADDING | CONT_N_ADDS;
-    else
-	compl_cont_status = 0;
+    ਨਹੀਂਤਾਂ ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval() || ctrl_x_ਬਹੁਲਕ_ਰਜਿਸਟਰ())
+	compl_cont_ਸਥਿਤੀ = CONT_ADDING | CONT_N_ADDS;
+    ਨਹੀਂਤਾਂ
+	compl_cont_ਸਥਿਤੀ = 0;
 }
 
 /*
  * start insert mode completion
  */
-    static int
-ins_compl_start(void)
+    ਸਥਿਰ ਪੂਰਨ
+ins_compl_ਸ਼ੁਰੂ(ਖਾਲੀ)
 {
-    char_u	*line = NULL;
-    int		startcol = 0;	    // column where searched text starts
-    colnr_T	curs_col;	    // cursor column
-    int		line_invalid = FALSE;
-    int		save_did_ai = did_ai;
-    int		flags = CP_ORIGINAL_TEXT;
+    char_u	*ਸਤਰ = ਨਿਰਾ;
+    ਪੂਰਨ		startcol = 0;	    // column where searched text starts
+    colnr_T	curs_ਖਾਨਾ;	    // cursor column
+    ਪੂਰਨ		ਸਤਰ_invalid = FALSE;
+    ਪੂਰਨ		save_did_ai = did_ai;
+    ਪੂਰਨ		flags = CP_ORIGINAL_ਪਾਠ;
 
     // First time we hit ^N or ^P (in a row, I mean)
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
-    if (stop_arrow() == FAIL)
+    can_si_ਪਿੱਠ = FALSE;
+    ਜੇ (stop_arrow() == FAIL)
     {
 	did_ai = save_did_ai;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    line = ml_get(curwin->w_cursor.lnum);
-    curs_col = curwin->w_cursor.col;
+    ਸਤਰ = ml_get(curwin->w_cursor.lnum);
+    curs_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
     compl_pending = 0;
     compl_lnum = curwin->w_cursor.lnum;
 
-    if ((compl_cont_status & CONT_INTRPT) == CONT_INTRPT
-	    && compl_cont_mode == ctrl_x_mode)
+    ਜੇ ((compl_cont_ਸਥਿਤੀ & CONT_INTRPT) == CONT_INTRPT
+	    && compl_cont_ਬਹੁਲਕ == ctrl_x_ਬਹੁਲਕ)
 	// this same ctrl-x_mode was interrupted previously. Continue the
 	// completion.
-	ins_compl_continue_search(line);
-    else
-	compl_cont_status &= CONT_LOCAL;
+	ins_compl_continue_ਖੋਜ(ਸਤਰ);
+    ਨਹੀਂਤਾਂ
+	compl_cont_ਸਥਿਤੀ &= CONT_LOCAL;
 
-    if (!compl_status_adding())	// normal expansion
+    ਜੇ (!compl_ਸਥਿਤੀ_adding())	// normal expansion
     {
-	compl_cont_mode = ctrl_x_mode;
-	if (ctrl_x_mode_not_default())
+	compl_cont_ਬਹੁਲਕ = ctrl_x_ਬਹੁਲਕ;
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_not_default())
 	    // Remove LOCAL if ctrl_x_mode != CTRL_X_NORMAL
-	    compl_cont_status = 0;
-	compl_cont_status |= CONT_N_ADDS;
+	    compl_cont_ਸਥਿਤੀ = 0;
+	compl_cont_ਸਥਿਤੀ |= CONT_N_ADDS;
 	compl_startpos = curwin->w_cursor;
-	startcol = (int)curs_col;
-	compl_col = 0;
+	startcol = (ਪੂਰਨ)curs_ਖਾਨਾ;
+	compl_ਖਾਨਾ = 0;
     }
 
     // Work out completion pattern and original text -- webb
-    if (compl_get_info(line, startcol, curs_col, &line_invalid) == FAIL)
+    ਜੇ (compl_get_info(ਸਤਰ, startcol, curs_ਖਾਨਾ, &ਸਤਰ_invalid) == FAIL)
     {
-	if (ctrl_x_mode_function() || ctrl_x_mode_omni()
-				|| thesaurus_func_complete(ctrl_x_mode))
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_function() || ctrl_x_ਬਹੁਲਕ_omni()
+				|| thesaurus_func_complete(ctrl_x_ਬਹੁਲਕ))
 	    // restore did_ai, so that adding comment leader works
 	    did_ai = save_did_ai;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
     // If "line" was changed while getting completion info get it again.
-    if (line_invalid)
-	line = ml_get(curwin->w_cursor.lnum);
+    ਜੇ (ਸਤਰ_invalid)
+	ਸਤਰ = ml_get(curwin->w_cursor.lnum);
 
-    if (compl_status_adding())
+    ਜੇ (compl_ਸਥਿਤੀ_adding())
     {
-	if (!shortmess(SHM_COMPLETIONMENU))
+	ਜੇ (!shortmess(SHM_COMPLETIONMENU))
 	    edit_submode_pre = (char_u *)_(" Adding");
-	if (ctrl_x_mode_line_or_eval())
+	ਜੇ (ctrl_x_ਬਹੁਲਕ_ਸਤਰ_or_eval())
 	{
 	    // Insert a new line, keep indentation but ignore 'comments'.
 	    char_u *old = curbuf->b_p_com;
 
 	    curbuf->b_p_com = (char_u *)"";
 	    compl_startpos.lnum = curwin->w_cursor.lnum;
-	    compl_startpos.col = compl_col;
+	    compl_startpos.ਖਾਨਾ = compl_ਖਾਨਾ;
 	    ins_eol('\r');
 	    curbuf->b_p_com = old;
-	    compl_length = 0;
-	    compl_col = curwin->w_cursor.col;
+	    compl_ਲੰਮਾਈ = 0;
+	    compl_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
 	    compl_lnum = curwin->w_cursor.lnum;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	edit_submode_pre = NULL;
-	compl_startpos.col = compl_col;
+	edit_submode_pre = ਨਿਰਾ;
+	compl_startpos.ਖਾਨਾ = compl_ਖਾਨਾ;
     }
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    ਜੇ (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
-	if (compl_cont_status & CONT_LOCAL)
-	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_MSG]);
-	else
-	    edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
+	ਜੇ (compl_cont_ਸਥਿਤੀ & CONT_LOCAL)
+	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_ਸੁਨੇਹਾ]);
+	ਨਹੀਂਤਾਂ
+	    edit_submode = (char_u *)_(CTRL_X_ਸੁਨੇਹਾ(ctrl_x_ਬਹੁਲਕ));
     }
 
     // If any of the original typed text has been changed we need to fix
     // the redo buffer.
-    ins_compl_fixRedoBufForLeader(NULL);
+    ins_compl_fixRedoBufForLeader(ਨਿਰਾ);
 
     // Always add completion for the original text.
-    VIM_CLEAR_STRING(compl_orig_text);
-    compl_orig_text.length = (size_t)compl_length;
-    compl_orig_text.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (p_ic)
+    VIM_CLEAR_STRING(compl_orig_ਪਾਠ);
+    compl_orig_ਪਾਠ.ਲੰਮਾਈ = (size_t)compl_ਲੰਮਾਈ;
+    compl_orig_ਪਾਠ.string = vim_strnsave(ਸਤਰ + compl_ਖਾਨਾ, (size_t)compl_ਲੰਮਾਈ);
+    ਜੇ (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL
-	    || ins_compl_add(compl_orig_text.string,
-		(int)compl_orig_text.length,
-		NULL, NULL, NULL, 0, flags, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
+    ਜੇ (compl_orig_ਪਾਠ.string == ਨਿਰਾ
+	    || ins_compl_ਜੋੜੋ(compl_orig_ਪਾਠ.string,
+		(ਪੂਰਨ)compl_orig_ਪਾਠ.ਲੰਮਾਈ,
+		ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, 0, flags, FALSE, ਨਿਰਾ, FUZZY_SCORE_NONE) != OK)
     {
-	VIM_CLEAR_STRING(compl_pattern);
-	VIM_CLEAR_STRING(compl_orig_text);
+	VIM_CLEAR_STRING(compl_ਨਮੂਨਾ);
+	VIM_CLEAR_STRING(compl_orig_ਪਾਠ);
 	did_ai = save_did_ai;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     // showmode might reset the internal line pointers, so it must
     // be called before line = ml_get(), or when this address is no
     // longer needed.  -- Acevedo.
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    ਜੇ (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
 	edit_submode_extra = (char_u *)_("-- Searching...");
-	edit_submode_highl = HLF_COUNT;
+	edit_submode_highl = HLF_ਗਿਣਤੀ;
 	showmode();
-	edit_submode_extra = NULL;
-	out_flush();
+	edit_submode_extra = ਨਿਰਾ;
+	ਬਾਹਰਲਾ_flush();
     }
 
     did_ai = save_did_ai;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * display the completion status message
  */
-    static void
-ins_compl_show_statusmsg(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_show_statusmsg(ਖਾਲੀ)
 {
     // we found no match if the list has only the "compl_orig_text"-entry
-    if (is_first_match(compl_first_match->cp_next))
+    ਜੇ (is_ਪਹਿਲਾ_ਮੇਲ(compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ))
     {
-	edit_submode_extra = compl_status_adding() && compl_length > 1
+	edit_submode_extra = compl_ਸਥਿਤੀ_adding() && compl_ਲੰਮਾਈ > 1
 				? (char_u *)_("Hit end of paragraph")
 				: (char_u *)_("Pattern not found");
 	edit_submode_highl = HLF_E;
     }
 
-    if (edit_submode_extra == NULL)
+    ਜੇ (edit_submode_extra == ਨਿਰਾ)
     {
-	if (match_at_original_text(compl_curr_match))
+	ਜੇ (ਮੇਲ_at_original_ਪਾਠ(compl_curr_ਮੇਲ))
 	{
 	    edit_submode_extra = (char_u *)_("Back at original");
 	    edit_submode_highl = HLF_W;
 	}
-	else if (compl_cont_status & CONT_S_IPOS)
+	ਨਹੀਂਤਾਂ ਜੇ (compl_cont_ਸਥਿਤੀ & CONT_S_IPOS)
 	{
 	    edit_submode_extra = (char_u *)_("Word from other line");
-	    edit_submode_highl = HLF_COUNT;
+	    edit_submode_highl = HLF_ਗਿਣਤੀ;
 	}
-	else if (compl_curr_match->cp_next == compl_curr_match->cp_prev)
+	ਨਹੀਂਤਾਂ ਜੇ (compl_curr_ਮੇਲ->cp_ਅਗਲਾ == compl_curr_ਮੇਲ->cp_prev)
 	{
 	    edit_submode_extra = (char_u *)_("The only match");
-	    edit_submode_highl = HLF_COUNT;
-	    compl_curr_match->cp_number = 1;
+	    edit_submode_highl = HLF_ਗਿਣਤੀ;
+	    compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ = 1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 	    // Update completion sequence number when needed.
-	    if (compl_curr_match->cp_number == -1)
+	    ਜੇ (compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ == -1)
 		ins_compl_update_sequence_numbers();
-#endif
+#ਜੇ_ਅੰਤ
 	    // The match should always have a sequence number now, this is
 	    // just a safety check.
-	    if (compl_curr_match->cp_number != -1)
+	    ਜੇ (compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ != -1)
 	    {
 		// Space for 10 text chars. + 2x10-digit no.s = 31.
 		// Translations may need more than twice that.
-		static char_u match_ref[81];
+		ਸਥਿਰ char_u ਮੇਲ_ref[81];
 
-		if (compl_matches > 0)
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+		ਜੇ (compl_matches > 0)
+		    vim_snprintf((ਅੱਖਰ *)ਮੇਲ_ref, ਆਕਾਰ(ਮੇਲ_ref),
 			    _("match %d of %d"),
-			    compl_curr_match->cp_number, compl_matches);
-		else
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+			    compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ, compl_matches);
+		ਨਹੀਂਤਾਂ
+		    vim_snprintf((ਅੱਖਰ *)ਮੇਲ_ref, ਆਕਾਰ(ਮੇਲ_ref),
 			    _("match %d"),
-			    compl_curr_match->cp_number);
-		edit_submode_extra = match_ref;
+			    compl_curr_ਮੇਲ->cp_ਸੰਖਿਆ);
+		edit_submode_extra = ਮੇਲ_ref;
 		edit_submode_highl = HLF_R;
-		if (dollar_vcol >= 0)
+		ਜੇ (dollar_vcol >= 0)
 		    curs_columns(FALSE);
 	    }
 	}
     }
 
     // Show a message about what (completion) mode we're in.
-    if (!compl_opt_suppress_empty)
+    ਜੇ (!compl_opt_suppress_ਖਾਲੀ_ਥਾਵਾਂ)
     {
 	showmode();
-	if (!shortmess(SHM_COMPLETIONMENU))
+	ਜੇ (!shortmess(SHM_COMPLETIONMENU))
 	{
-	    if (edit_submode_extra != NULL)
+	    ਜੇ (edit_submode_extra != ਨਿਰਾ)
 	    {
-		if (!p_smd)
+		ਜੇ (!p_smd)
 		{
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)edit_submode_extra,
-			    edit_submode_highl < HLF_COUNT
+		    ਸੁਨੇਹਾ_hist_off = TRUE;
+		    ਸੁਨੇਹਾ_attr((ਅੱਖਰ *)edit_submode_extra,
+			    edit_submode_highl < HLF_ਗਿਣਤੀ
 			    ? HL_ATTR(edit_submode_highl) : 0);
-		    msg_hist_off = FALSE;
+		    ਸੁਨੇਹਾ_hist_off = FALSE;
 		}
 	    }
-	    else
-		msg_clr_cmdline();	// necessary for "noshowmode"
+	    ਨਹੀਂਤਾਂ
+		ਸੁਨੇਹਾ_clr_cmdline();	// necessary for "noshowmode"
 	}
     }
 }
@@ -7457,111 +7457,111 @@ ins_compl_show_statusmsg(void)
  * Called when character "c" was typed, which has a meaning for completion.
  * Returns OK if completion was done, FAIL if something failed (out of mem).
  */
-    int
-ins_complete(int c, int enable_pum)
+    ਪੂਰਨ
+ins_complete(ਪੂਰਨ c, ਪੂਰਨ enable_pum)
 {
-    int		n;
-    int		save_w_wrow;
-    int		save_w_leftcol;
-    int		insert_match;
-    int		no_matches_found;
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		save_w_wrow;
+    ਪੂਰਨ		save_w_leftcol;
+    ਪੂਰਨ		ਪਾਓ_ਮੇਲ;
+    ਪੂਰਨ		no_matches_ਮਿਲਿਆ;
 
     compl_direction = ins_compl_key2dir(c);
-    insert_match = ins_compl_use_match(c);
+    ਪਾਓ_ਮੇਲ = ins_compl_use_ਮੇਲ(c);
 
-    if (!compl_started)
+    ਜੇ (!compl_started)
     {
 	// Only what the automatic trigger armed counts as started by Vim.
 	compl_autostarted = compl_autostart_pending;
 	compl_autostart_pending = false;
-	if (ins_compl_start() == FAIL)
-	    return FAIL;
+	ਜੇ (ins_compl_ਸ਼ੁਰੂ() == FAIL)
+	    ਵਾਪਸ FAIL;
     }
-    else if (insert_match && stop_arrow() == FAIL)
-	return FAIL;
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਾਓ_ਮੇਲ && stop_arrow() == FAIL)
+	ਵਾਪਸ FAIL;
 
     compl_curr_win = curwin;
-    compl_curr_buf = curwin->w_buffer;
-    compl_shown_match = compl_curr_match;
+    compl_curr_buf = curwin->w_ਬਫਰ;
+    compl_shown_ਮੇਲ = compl_curr_ਮੇਲ;
     compl_shows_dir = compl_direction;
-    compl_num_bests = 0;
+    compl_ਅੰਕ_bests = 0;
 
     // Find next match (and following matches).
     save_w_wrow = curwin->w_wrow;
     save_w_leftcol = curwin->w_leftcol;
-    n = ins_compl_next(TRUE, ins_compl_key2count(c), insert_match);
+    n = ins_compl_ਅਗਲਾ(TRUE, ins_compl_key2count(c), ਪਾਓ_ਮੇਲ);
 
     // Reset autocompletion timer expiry flag
-    if (compl_autocomplete)
-	compl_time_slice_expired = FALSE;
+    ਜੇ (compl_autocomplete)
+	compl_ਸਮਾਂ_ਟੁਕੜਾ_expired = FALSE;
 
     // may undisplay the popup menu
     ins_compl_upd_pum();
 
-    if (n > 1)		// all matches have been found
+    ਜੇ (n > 1)		// all matches have been found
 	compl_matches = n;
-    compl_curr_match = compl_shown_match;
+    compl_curr_ਮੇਲ = compl_shown_ਮੇਲ;
     compl_direction = compl_shows_dir;
 
     // Eat the ESC that vgetc() returns after a CTRL-C to avoid leaving Insert
     // mode.
-    if (got_int && !global_busy)
+    ਜੇ (got_int && !global_busy)
     {
-	(void)vgetc();
+	(ਖਾਲੀ)vgetc();
 	got_int = FALSE;
     }
 
     // we found no match if the list has only the "compl_orig_text"-entry
-    no_matches_found = is_first_match(compl_first_match->cp_next);
-    if (no_matches_found)
+    no_matches_ਮਿਲਿਆ = is_ਪਹਿਲਾ_ਮੇਲ(compl_ਪਹਿਲਾ_ਮੇਲ->cp_ਅਗਲਾ);
+    ਜੇ (no_matches_ਮਿਲਿਆ)
     {
 	// remove N_ADDS flag, so next ^X<> won't try to go to ADDING mode,
 	// because we couldn't expand anything at first place, but if we used
 	// ^P, ^N, ^X^I or ^X^D we might want to add-expand a single-char-word
 	// (such as M in M'exico) if not tried already.  -- Acevedo
-	if (compl_length > 1
-		|| compl_status_adding()
-		|| (ctrl_x_mode_not_default()
-		    && !ctrl_x_mode_path_patterns()
-		    && !ctrl_x_mode_path_defines()))
-	    compl_cont_status &= ~CONT_N_ADDS;
+	ਜੇ (compl_ਲੰਮਾਈ > 1
+		|| compl_ਸਥਿਤੀ_adding()
+		|| (ctrl_x_ਬਹੁਲਕ_not_default()
+		    && !ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_patterns()
+		    && !ctrl_x_ਬਹੁਲਕ_ਰਸਤਾ_ਨਿਰਧਾਰਤ_ਕਰਦਾ()))
+	    compl_cont_ਸਥਿਤੀ &= ~CONT_N_ADDS;
     }
 
-    if (compl_curr_match->cp_flags & CP_CONT_S_IPOS)
-	compl_cont_status |= CONT_S_IPOS;
-    else
-	compl_cont_status &= ~CONT_S_IPOS;
+    ਜੇ (compl_curr_ਮੇਲ->cp_flags & CP_CONT_S_IPOS)
+	compl_cont_ਸਥਿਤੀ |= CONT_S_IPOS;
+    ਨਹੀਂਤਾਂ
+	compl_cont_ਸਥਿਤੀ &= ~CONT_S_IPOS;
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    ਜੇ (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
 	ins_compl_show_statusmsg();
 
     // Show the popup menu, unless we got interrupted.
-    if (enable_pum && !compl_interrupted)
+    ਜੇ (enable_pum && !compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     compl_was_interrupted = compl_interrupted;
     compl_interrupted = FALSE;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Enable autocompletion
  */
-    void
-ins_compl_enable_autocomplete(void)
+    ਖਾਲੀ
+ins_compl_enable_autocomplete(ਖਾਲੀ)
 {
-#ifdef ELAPSED_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
     compl_autocomplete = TRUE;
     compl_get_longest = FALSE;
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Disable autocompletion
  */
-    void
-ins_compl_disable_autocomplete(void)
+    ਖਾਲੀ
+ins_compl_disable_autocomplete(ਖਾਲੀ)
 {
     compl_autocomplete = FALSE;
 }
@@ -7570,8 +7570,8 @@ ins_compl_disable_autocomplete(void)
  * Remember that Vim is about to start a completion by itself, rather than
  * because a key was typed to ask for one.
  */
-    void
-ins_compl_arm_autostart(void)
+    ਖਾਲੀ
+ins_compl_arm_autostart(ਖਾਲੀ)
 {
     compl_autostart_pending = true;
 }
@@ -7579,8 +7579,8 @@ ins_compl_arm_autostart(void)
 /*
  * Forget what the automatic trigger armed, another key was typed since.
  */
-    void
-ins_compl_disarm_autostart(void)
+    ਖਾਲੀ
+ins_compl_disarm_autostart(ਖਾਲੀ)
 {
     compl_autostart_pending = false;
 }
@@ -7590,24 +7590,24 @@ ins_compl_disarm_autostart(void)
  * Return true when the popup should be deferred, false to trigger it now.
  */
     bool
-ins_compl_arm_autocomplete_delay(void)
+ins_compl_arm_autocomplete_delay(ਖਾਲੀ)
 {
-#ifdef ELAPSED_FUNC
-    if (p_acl > 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    ਜੇ (p_acl > 0)
     {
-	ELAPSED_INIT(compl_autocomplete_start_tv);
+	ELAPSED_INIT(compl_autocomplete_ਸ਼ੁਰੂ_tv);
 	compl_autocomplete_pending = true;
-	return true;
+	ਵਾਪਸ true;
     }
-#endif
-    return false;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ false;
 }
 
 /*
  * Clear the pending 'autocompletedelay' state.
  */
-    void
-ins_compl_clear_autocomplete_delay(void)
+    ਖਾਲੀ
+ins_compl_clear_autocomplete_delay(ਖਾਲੀ)
 {
     compl_autocomplete_pending = false;
 }
@@ -7616,38 +7616,38 @@ ins_compl_clear_autocomplete_delay(void)
  * Return true while waiting for 'autocompletedelay' to expire.
  */
     bool
-ins_compl_autocomplete_pending(void)
+ins_compl_autocomplete_pending(ਖਾਲੀ)
 {
-    return compl_autocomplete_pending;
+    ਵਾਪਸ compl_autocomplete_pending;
 }
 
 /*
  * Return the time in msec since the 'autocompletedelay' was armed.
  */
-    long
-ins_compl_autocomplete_elapsed(void)
+    ਲੰਮਾ
+ins_compl_autocomplete_elapsed(ਖਾਲੀ)
 {
-#ifdef ELAPSED_FUNC
-    return ELAPSED_FUNC(compl_autocomplete_start_tv);
-#else
-    return 0;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    ਵਾਪਸ ELAPSED_FUNC(compl_autocomplete_ਸ਼ੁਰੂ_tv);
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ 0;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Remove (if needed) and show the popup menu
  */
-    static void
-show_pum(int prev_w_wrow, int prev_w_leftcol)
+    ਸਥਿਰ ਖਾਲੀ
+show_pum(ਪੂਰਨ prev_w_wrow, ਪੂਰਨ prev_w_leftcol)
 {
     // RedrawingDisabled may be set when invoked through complete().
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ਪੂਰਨ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
     // If the cursor moved or the display scrolled we need to remove the pum
     // first.
     setcursor();
-    if (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
+    ਜੇ (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
 	ins_compl_del_pum();
 
     ins_compl_show_pum();
@@ -7662,357 +7662,357 @@ show_pum(int prev_w_wrow, int prev_w_leftcol)
  * a backslash) the metachars, and dest would be NUL terminated.
  * Returns the length (needed) of dest
  */
-    static unsigned
-quote_meta(char_u *dest, char_u *src, int len)
+    ਸਥਿਰ ਬਿਨਾਨਿਸ਼ਾਨੀ
+quote_meta(char_u *dest, char_u *src, ਪੂਰਨ len)
 {
-    unsigned	m = (unsigned)len + 1;  // one extra for the NUL
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	m = (ਬਿਨਾਨਿਸ਼ਾਨੀ)len + 1;  // one extra for the NUL
 
-    for ( ; --len >= 0; src++)
+    ਲਈ ( ; --len >= 0; src++)
     {
-	switch (*src)
+	ਚੋਣ (*src)
 	{
-	    case '.':
-	    case '*':
-	    case '[':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    ਹਾਲਤ '.':
+	    ਹਾਲਤ '*':
+	    ਹਾਲਤ '[':
+		ਜੇ (ctrl_x_ਬਹੁਲਕ_dictionary() || ctrl_x_ਬਹੁਲਕ_thesaurus())
+		    ਰੋਕੋ;
 		// FALLTHROUGH
-	    case '~':
-		if (!magic_isset())	// quote these only if magic is set
-		    break;
+	    ਹਾਲਤ '~':
+		ਜੇ (!magic_isset())	// quote these only if magic is set
+		    ਰੋਕੋ;
 		// FALLTHROUGH
-	    case '\\':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    ਹਾਲਤ '\\':
+		ਜੇ (ctrl_x_ਬਹੁਲਕ_dictionary() || ctrl_x_ਬਹੁਲਕ_thesaurus())
+		    ਰੋਕੋ;
 		// FALLTHROUGH
-	    case '^':		// currently it's not needed.
-	    case '$':
+	    ਹਾਲਤ '^':		// currently it's not needed.
+	    ਹਾਲਤ '$':
 		m++;
-		if (dest != NULL)
+		ਜੇ (dest != ਨਿਰਾ)
 		    *dest++ = '\\';
-		break;
+		ਰੋਕੋ;
 	}
-	if (dest != NULL)
+	ਜੇ (dest != ਨਿਰਾ)
 	    *dest++ = *src;
 	// Copy remaining bytes of a multibyte character.
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(src) - 1;
-	    if (mb_len > 0 && len >= mb_len)
-		for (int i = 0; i < mb_len; ++i)
+	    ਪੂਰਨ mb_len = (*mb_ptr2len)(src) - 1;
+	    ਜੇ (mb_len > 0 && len >= mb_len)
+		ਲਈ (ਪੂਰਨ i = 0; i < mb_len; ++i)
 		{
 		    --len;
 		    ++src;
-		    if (dest != NULL)
+		    ਜੇ (dest != ਨਿਰਾ)
 			*dest++ = *src;
 		}
 	}
     }
-    if (dest != NULL)
+    ਜੇ (dest != ਨਿਰਾ)
 	*dest = NUL;
 
-    return m;
+    ਵਾਪਸ m;
 }
 
-#if defined(EXITFREE)
-    void
-free_insexpand_stuff(void)
+#ਜੇ defined(EXITFREE)
+    ਖਾਲੀ
+free_insexpand_stuff(ਖਾਲੀ)
 {
-    VIM_CLEAR_STRING(compl_orig_text);
+    VIM_CLEAR_STRING(compl_orig_ਪਾਠ);
 # ifdef FEAT_EVAL
     free_callback(&cfu_cb);
     free_callback(&ofu_cb);
     free_callback(&tsrfu_cb);
-    clear_cpt_callbacks(&cpt_cb, cpt_cb_count);
+    clear_cpt_callbacks(&cpt_cb, cpt_cb_ਗਿਣਤੀ);
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 /*
  * Called when starting CTRL_X_SPELL mode: Move backwards to a previous badly
  * spelled word, if there is one.
  */
-    static void
-spell_back_to_badword(void)
+    ਸਥਿਰ ਖਾਲੀ
+spell_ਪਿੱਠ_ਮੰਜ਼ਿਲ_badword(ਖਾਲੀ)
 {
     pos_T	tpos = curwin->w_cursor;
 
-    spell_bad_len = spell_move_to(curwin, BACKWARD, SMT_ALL, TRUE, NULL);
-    if (curwin->w_cursor.col != tpos.col)
-	start_arrow(&tpos);
+    spell_bad_len = spell_move_ਮੰਜ਼ਿਲ(curwin, BACKWARD, SMT_ALL, TRUE, ਨਿਰਾ);
+    ਜੇ (curwin->w_cursor.ਖਾਨਾ != tpos.ਖਾਨਾ)
+	ਸ਼ੁਰੂ_arrow(&tpos);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Reset the info associated with completion sources.
  */
-    static void
-cpt_sources_clear(void)
+    ਸਥਿਰ ਖਾਲੀ
+cpt_sources_clear(ਖਾਲੀ)
 {
     VIM_CLEAR(cpt_sources_array);
-    cpt_sources_index = -1;
-    cpt_sources_count = 0;
+    cpt_sources_ਸੂਚਕਾਂਕ = -1;
+    cpt_sources_ਗਿਣਤੀ = 0;
 }
 
 /*
  * Setup completion sources.
  */
-    static int
-setup_cpt_sources(void)
+    ਸਥਿਰ ਪੂਰਨ
+ਤਿਆਰੀ_cpt_sources(ਖਾਲੀ)
 {
     char_u  buf[LSIZE];
-    int	    slen;
-    int	    idx = 0;
-    int	    count;
+    ਪੂਰਨ	    slen;
+    ਪੂਰਨ	    idx = 0;
+    ਪੂਰਨ	    ਗਿਣਤੀ_2;
     char_u  *p;
 
     cpt_sources_clear();
 
-    count = get_cpt_sources_count(curbuf->b_p_cpt);
-    if (count == 0)
-	return OK;
+    ਗਿਣਤੀ_2 = get_cpt_sources_ਗਿਣਤੀ(curbuf->b_p_cpt);
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
+	ਵਾਪਸ OK;
 
-    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_source_T, count);
-    if (cpt_sources_array == NULL)
-	return FAIL;
+    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_ਸਰੋਤ_T, ਗਿਣਤੀ_2);
+    ਜੇ (cpt_sources_array == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    for (p = curbuf->b_p_cpt; *p;)
+    ਲਈ (p = curbuf->b_p_cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	ਜਦੋਂ (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p) // If not end of string, count this segment
+	ਜੇ (*p) // If not end of string, count this segment
 	{
 	    cpt_sources_array[idx].cs_flag = *p;
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0)
+	    ਜੇ (slen > 0)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
-		if (caret != NULL)
+		ਜੇ (caret != ਨਿਰਾ)
 		    cpt_sources_array[idx].cs_max_matches
-			= atoi((char *)caret + 1);
+			= atoi((ਅੱਖਰ *)caret + 1);
 	    }
 	    idx++;
 	}
     }
 
-    cpt_sources_count = count;
-    return OK;
+    cpt_sources_ਗਿਣਤੀ = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Return TRUE if any of the completion sources have 'refresh' set to 'always'.
  */
-    static int
-is_cpt_func_refresh_always(void)
+    ਸਥਿਰ ਪੂਰਨ
+is_cpt_func_refresh_always(ਖਾਲੀ)
 {
-#ifdef FEAT_COMPL_FUNC
-    for (int i = 0; i < cpt_sources_count; i++)
-	if (cpt_sources_array[i].cs_refresh_always)
-	    return TRUE;
-#endif
-    return FALSE;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਲਈ (ਪੂਰਨ i = 0; i < cpt_sources_ਗਿਣਤੀ; i++)
+	ਜੇ (cpt_sources_array[i].cs_refresh_always)
+	    ਵਾਪਸ TRUE;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Make the completion list non-cyclic.
  */
-    static void
-ins_compl_make_linear(void)
+    ਸਥਿਰ ਖਾਲੀ
+ins_compl_make_ਰੇਖਿਕ(ਖਾਲੀ)
 {
     compl_T *m;
 
-    if (compl_first_match == NULL || compl_first_match->cp_prev == NULL)
-	return;
-    m = compl_first_match->cp_prev;
-    m->cp_next = NULL;
-    compl_first_match->cp_prev = NULL;
+    ਜੇ (compl_ਪਹਿਲਾ_ਮੇਲ == ਨਿਰਾ || compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev == ਨਿਰਾ)
+	ਵਾਪਸ;
+    m = compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev;
+    m->cp_ਅਗਲਾ = ਨਿਰਾ;
+    compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev = ਨਿਰਾ;
 }
 
 /*
  * Remove the matches linked to the current completion source (as indicated by
  * cpt_sources_index) from the completion list.
  */
-#ifdef FEAT_COMPL_FUNC
-    static void
-remove_old_matches(void)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਸਥਿਰ ਖਾਲੀ
+remove_old_matches(ਖਾਲੀ)
 {
     compl_T *current;
-    int	    shown_match_removed = FALSE;
-    int	    forward = (compl_first_match->cp_cpt_source_idx < 0);
+    ਪੂਰਨ	    shown_ਮੇਲ_removed = FALSE;
+    ਪੂਰਨ	    forward = (compl_ਪਹਿਲਾ_ਮੇਲ->cp_cpt_ਸਰੋਤ_idx < 0);
 
-    if (cpt_sources_index < 0)
-	return;
+    ਜੇ (cpt_sources_ਸੂਚਕਾਂਕ < 0)
+	ਵਾਪਸ;
 
     compl_direction = forward ? FORWARD : BACKWARD;
     compl_shows_dir = compl_direction;
 
     // When 'fuzzy' is enabled, items are not ordered by their original source
     // order (cpt_sources_index). So, remove items one by one.
-    for (current = compl_first_match; current != NULL; )
+    ਲਈ (current = compl_ਪਹਿਲਾ_ਮੇਲ; current != ਨਿਰਾ; )
     {
-	if (current->cp_cpt_source_idx == cpt_sources_index)
+	ਜੇ (current->cp_cpt_ਸਰੋਤ_idx == cpt_sources_ਸੂਚਕਾਂਕ)
 	{
-	    compl_T *to_delete = current;
+	    compl_T *ਮੰਜ਼ਿਲ_delete = current;
 
-	    if (!shown_match_removed && compl_shown_match == current)
-		shown_match_removed = TRUE;
+	    ਜੇ (!shown_ਮੇਲ_removed && compl_shown_ਮੇਲ == current)
+		shown_ਮੇਲ_removed = TRUE;
 
-	    current = current->cp_next;
+	    current = current->cp_ਅਗਲਾ;
 
-	    if (to_delete == compl_first_match)  // node to remove is at head
+	    ਜੇ (ਮੰਜ਼ਿਲ_delete == compl_ਪਹਿਲਾ_ਮੇਲ)  // node to remove is at head
 	    {
-		compl_first_match = to_delete->cp_next;
-		compl_first_match->cp_prev = NULL;
+		compl_ਪਹਿਲਾ_ਮੇਲ = ਮੰਜ਼ਿਲ_delete->cp_ਅਗਲਾ;
+		compl_ਪਹਿਲਾ_ਮੇਲ->cp_prev = ਨਿਰਾ;
 	    }
-	    else if (to_delete->cp_next == NULL) // node to remove is at tail
-		to_delete->cp_prev->cp_next = NULL;
-	    else // node is in the moddle
+	    ਨਹੀਂਤਾਂ ਜੇ (ਮੰਜ਼ਿਲ_delete->cp_ਅਗਲਾ == ਨਿਰਾ) // node to remove is at tail
+		ਮੰਜ਼ਿਲ_delete->cp_prev->cp_ਅਗਲਾ = ਨਿਰਾ;
+	    ਨਹੀਂਤਾਂ // node is in the moddle
 	    {
-		to_delete->cp_prev->cp_next = to_delete->cp_next;
-		to_delete->cp_next->cp_prev = to_delete->cp_prev;
+		ਮੰਜ਼ਿਲ_delete->cp_prev->cp_ਅਗਲਾ = ਮੰਜ਼ਿਲ_delete->cp_ਅਗਲਾ;
+		ਮੰਜ਼ਿਲ_delete->cp_ਅਗਲਾ->cp_prev = ਮੰਜ਼ਿਲ_delete->cp_prev;
 	    }
-	    ins_compl_item_free(to_delete);
+	    ins_compl_ਵਸਤੂ_free(ਮੰਜ਼ਿਲ_delete);
 	}
-	else
-	    current = current->cp_next;
+	ਨਹੀਂਤਾਂ
+	    current = current->cp_ਅਗਲਾ;
     }
 
     // Re-assign compl_shown_match if necessary
-    if (shown_match_removed)
+    ਜੇ (shown_ਮੇਲ_removed)
     {
-	if (forward)
-	    compl_shown_match = compl_first_match;
-	else
+	ਜੇ (forward)
+	    compl_shown_ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+	ਨਹੀਂਤਾਂ
 	{  // Last node will have the prefix that is being completed
-	    for (current = compl_first_match; current->cp_next != NULL;
-		    current = current->cp_next)
+	    ਲਈ (current = compl_ਪਹਿਲਾ_ਮੇਲ; current->cp_ਅਗਲਾ != ਨਿਰਾ;
+		    current = current->cp_ਅਗਲਾ)
 		;
-	    compl_shown_match = current;
+	    compl_shown_ਮੇਲ = current;
 	}
     }
 
     // Re-assign compl_curr_match
-    compl_curr_match = compl_first_match;
-    for (current = compl_first_match; current != NULL; )
+    compl_curr_ਮੇਲ = compl_ਪਹਿਲਾ_ਮੇਲ;
+    ਲਈ (current = compl_ਪਹਿਲਾ_ਮੇਲ; current != ਨਿਰਾ; )
     {
-	if ((forward ? current->cp_cpt_source_idx < cpt_sources_index
-		    : current->cp_cpt_source_idx > cpt_sources_index))
+	ਜੇ ((forward ? current->cp_cpt_ਸਰੋਤ_idx < cpt_sources_ਸੂਚਕਾਂਕ
+		    : current->cp_cpt_ਸਰੋਤ_idx > cpt_sources_ਸੂਚਕਾਂਕ))
 	{
-	    compl_curr_match = forward ? current : current->cp_next;
-	    current = current->cp_next;
+	    compl_curr_ਮੇਲ = forward ? current : current->cp_ਅਗਲਾ;
+	    current = current->cp_ਅਗਲਾ;
 	}
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Retrieve completion matches using the callback function "cb" and store the
  * 'refresh:always' flag.
  */
-#ifdef FEAT_COMPL_FUNC
-    static void
-get_cpt_func_completion_matches(callback_T *cb UNUSED)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਸਥਿਰ ਖਾਲੀ
+get_cpt_func_completion_matches(callback_T *cb ਅਣਵਰਤਿਆ)
 {
-    cpt_source_T    *cpt_src = &cpt_sources_array[cpt_sources_index];
-    int		    startcol = cpt_src->cs_startcol;
+    cpt_ਸਰੋਤ_T    *cpt_src = &cpt_sources_array[cpt_sources_ਸੂਚਕਾਂਕ];
+    ਪੂਰਨ		    startcol = cpt_src->cs_startcol;
 
-    if (startcol == -2 || startcol == -3)
-	return;
+    ਜੇ (startcol == -2 || startcol == -3)
+	ਵਾਪਸ;
 
-    if (set_compl_globals(startcol, curwin->w_cursor.col, TRUE) == OK)
+    ਜੇ (ਸੈੱਟ_compl_globals(startcol, curwin->w_cursor.ਖਾਨਾ, TRUE) == OK)
     {
 	// Insert the leader string (previously removed) before expansion.
 	// This prevents flicker when `func` (e.g. an LSP client) is slow and
 	// calls 'sleep', which triggers out_flush().
-	if (!cpt_src->cs_refresh_always)
-	    ins_compl_insert_bytes(ins_compl_leader(), -1);
+	ਜੇ (!cpt_src->cs_refresh_always)
+	    ins_compl_ਪਾਓ_ਬਾਈਟਾਂ(ins_compl_leader(), -1);
 
-	expand_by_function(0, cpt_compl_pattern.string, cb);
+	expand_by_function(0, cpt_compl_ਨਮੂਨਾ.string, cb);
 
-	if (!cpt_src->cs_refresh_always)
+	ਜੇ (!cpt_src->cs_refresh_always)
 	    ins_compl_delete();
 
 	cpt_src->cs_refresh_always = compl_opt_refresh_always;
 	compl_opt_refresh_always = FALSE;
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Retrieve completion matches from functions in the 'cpt' option where the
  * 'refresh:always' flag is set.
  */
-    static void
-cpt_compl_refresh(void)
+    ਸਥਿਰ ਖਾਲੀ
+cpt_compl_refresh(ਖਾਲੀ)
 {
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		startcol, ret;
+    callback_T	*cb = ਨਿਰਾ;
+    ਪੂਰਨ		startcol, ret;
 
     // Make the completion list linear (non-cyclic)
-    ins_compl_make_linear();
+    ins_compl_make_ਰੇਖਿਕ();
     // Make a copy of 'cpt' in case the buffer gets wiped out
     cpt = vim_strsave(curbuf->b_p_cpt);
-    strip_caret_numbers_in_place(cpt);
+    strip_caret_numbers_ਵਿੱਚ_ਰੱਖੋ(cpt);
 
-    cpt_sources_index = 0;
-    for (p = cpt; *p;)
+    cpt_sources_ਸੂਚਕਾਂਕ = 0;
+    ਲਈ (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	ਜਦੋਂ (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	ਜੇ (*p == NUL)
+	    ਰੋਕੋ;
 
-	if (cpt_sources_array[cpt_sources_index].cs_refresh_always)
+	ਜੇ (cpt_sources_array[cpt_sources_ਸੂਚਕਾਂਕ].cs_refresh_always)
 	{
-	    cb = get_callback_if_cpt_func(p, cpt_sources_index);
-	    if (cb)
+	    cb = get_callback_if_cpt_func(p, cpt_sources_ਸੂਚਕਾਂਕ);
+	    ਜੇ (cb)
 	    {
 		remove_old_matches();
-		ret = get_userdefined_compl_info(curwin->w_cursor.col, cb,
+		ret = get_userdefined_compl_info(curwin->w_cursor.ਖਾਨਾ, cb,
 			&startcol);
-		if (ret == FAIL)
+		ਜੇ (ret == FAIL)
 		{
-		    if (startcol == -3)
-			cpt_sources_array[cpt_sources_index].cs_refresh_always
+		    ਜੇ (startcol == -3)
+			cpt_sources_array[cpt_sources_ਸੂਚਕਾਂਕ].cs_refresh_always
 			    = FALSE;
-		    else
+		    ਨਹੀਂਤਾਂ
 			startcol = -2;
 		}
-		else if (startcol < 0 || startcol > curwin->w_cursor.col)
-		    startcol = curwin->w_cursor.col;
-		cpt_sources_array[cpt_sources_index].cs_startcol = startcol;
-		if (ret == OK)
+		ਨਹੀਂਤਾਂ ਜੇ (startcol < 0 || startcol > curwin->w_cursor.ਖਾਨਾ)
+		    startcol = curwin->w_cursor.ਖਾਨਾ;
+		cpt_sources_array[cpt_sources_ਸੂਚਕਾਂਕ].cs_startcol = startcol;
+		ਜੇ (ret == OK)
 		{
-		    compl_source_start_timer(cpt_sources_index);
+		    compl_ਸਰੋਤ_ਸ਼ੁਰੂ_timer(cpt_sources_ਸੂਚਕਾਂਕ);
 		    get_cpt_func_completion_matches(cb);
 		}
 	    }
 	}
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
-	if (may_advance_cpt_index(p))
-	    (void)advance_cpt_sources_index_safe();
+	(ਖਾਲੀ)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	ਜੇ (may_advance_cpt_ਸੂਚਕਾਂਕ(p))
+	    (ਖਾਲੀ)advance_cpt_sources_ਸੂਚਕਾਂਕ_ਸੁਰੱਖਿਅਤ();
     }
-    cpt_sources_index = -1;
+    cpt_sources_ਸੂਚਕਾਂਕ = -1;
 
     vim_free(cpt);
     // Make the list cyclic
     compl_matches = ins_compl_make_cyclic();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * "preinserted()" function
  */
-    void
-f_preinserted(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_preinserted(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
-    if (ins_compl_preinsert_effect())
-	rettv->vval.v_number = 1;
+    ਜੇ (ins_compl_preinsert_effect())
+	rettv->vval.v_ਸੰਖਿਆ = 1;
 }

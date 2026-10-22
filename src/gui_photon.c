@@ -11,65 +11,65 @@
  * PhAttach() is called in os_qnx.c:qnx_init()
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 # include <photon/PxImage.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if !defined(__QNX__)
+#ਜੇ !defined(__QNX__)
 // Used when generating prototypes.
-# define PgColor_t	int
-# define PhEvent_t	int
-# define PhPoint_t	int
-# define PtWidget_t	int
+# define PgColor_t	ਪੂਰਨ
+# define PhEvent_t	ਪੂਰਨ
+# define Ph_ਬਿੰਦੂ_t	ਪੂਰਨ
+# define PtWidget_t	ਪੂਰਨ
 # define Pg_BLACK	0
-# define PtCallbackF_t	int
-# define PtCallbackInfo_t int
-# define PhTile_t	int
-# define PtWidget_t	int
-# define PhImage_t	int
-#endif
+# define PtCallbackF_t	ਪੂਰਨ
+# define PtCallbackInfo_t ਪੂਰਨ
+# define PhTile_t	ਪੂਰਨ
+# define PtWidget_t	ਪੂਰਨ
+# define PhImage_t	ਪੂਰਨ
+#ਜੇ_ਅੰਤ
 
-#define RGB(r, g, b) PgRGB(r, g, b)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RGB(r, g, b) PgRGB(r, g, b)
 
-#define EVENT_BUFFER_SIZE sizeof(PhEvent_t) + 1000
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ EVENT_ਬਫਰ_ਮਾਪ ਆਕਾਰ(PhEvent_t) + 1000
 
 // Some defines for gui_mch_mousehide()
-#define MOUSE_HIDE		TRUE
-#define MOUSE_SHOW		FALSE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MOUSE_HIDE		TRUE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MOUSE_SHOW		FALSE
 
 // Optional support for using a PtPanelGroup widget, needs work
-#undef USE_PANEL_GROUP
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ USE_PANEL_ਸਮੂਹ
 
-#ifdef USE_PANEL_GROUP
-static char	*empty_title = "    ";
-static char	**panel_titles = NULL;
-static ushort_t	num_panels = 0;
-static short pg_margin_left, pg_margin_right, pg_margin_top, pg_margin_bottom;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+ਸਥਿਰ ਅੱਖਰ	*ਖਾਲੀ_ਥਾਵਾਂ_title = "    ";
+ਸਥਿਰ ਅੱਖਰ	**panel_titles = ਨਿਰਾ;
+ਸਥਿਰ ushort_t	ਅੰਕ_panels = 0;
+ਸਥਿਰ ਛੋਟਾ pg_margin_ਖੱਬਾ, pg_margin_ਸੱਜਾ, pg_margin_ਸਿਖਰ, pg_margin_bottom;
+#ਜੇ_ਅੰਤ
 
-#define GUI_PH_MARGIN		4	// Size of the bevel
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GUI_PH_MARGIN		4	// Size of the bevel
 
-#define GUI_PH_MOUSE_TYPE		Ph_CURSOR_INSERT
-static PgColor_t gui_ph_mouse_color =	Pg_BLACK;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GUI_PH_MOUSE_TYPE		Ph_CURSOR_ਪਾਓ
+ਸਥਿਰ PgColor_t gui_ph_mouse_color =	Pg_BLACK;
 
-static PhPoint_t    gui_ph_raw_offset;
-static PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
-static PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
-static short	    is_timeout;		    // Has the timeout occurred?
+ਸਥਿਰ Ph_ਬਿੰਦੂ_t    gui_ph_raw_ਵਿੱਥ;
+ਸਥਿਰ PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
+ਸਥਿਰ PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
+ਸਥਿਰ ਛੋਟਾ	    is_timeout;		    // Has the timeout occurred?
 
 /*
  * This is set inside the mouse callback for a right mouse
  * button click, and used for the popup menus
  */
-static PhPoint_t    abs_mouse;
+ਸਥਿਰ Ph_ਬਿੰਦੂ_t    abs_mouse;
 
 // Try and avoid redraws while a resize is in progress
-static int is_ignore_draw = FALSE;
+ਸਥਿਰ ਪੂਰਨ is_ignore_draw = FALSE;
 
 // Used for converting to/from utf-8 and other charsets
-static struct PxTransCtrl *charset_translate;
+ਸਥਿਰ ਬਣਤਰ PxTransCtrl *charset_translate;
 
 /*
  * Cursor blink functions.
@@ -79,27 +79,27 @@ static struct PxTransCtrl *charset_translate;
  * BLINK_OFF	blinking, cursor is not shown
  * BLINK_ON	blinking, cursor is shown
  */
-static enum {
+ਸਥਿਰ ਗਿਣਤੀ {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
-static long_u	blink_waittime	= 700;
-static long_u	blink_ontime	= 400;
-static long_u	blink_offtime	= 250;
+ਸਥਿਰ long_u	blink_waittime	= 700;
+ਸਥਿਰ long_u	blink_ontime	= 400;
+ਸਥਿਰ long_u	blink_offtime	= 250;
 
-static struct
+ਸਥਿਰ ਬਣਤਰ
 {
-    int	    key_sym;
+    ਪੂਰਨ	    ਕੁੰਜੀ_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ਕੁੰਜੀਆਂ[] =
 {
-    {Pk_Up,	    'k', 'u'},
-    {Pk_Down,	    'k', 'd'},
-    {Pk_Left,	    'k', 'l'},
-    {Pk_Right,	    'k', 'r'},
+    {Pk_ਉੱਪਰ,	    'k', 'u'},
+    {Pk_ਥੱਲੇ,	    'k', 'd'},
+    {Pk_ਖੱਬਾ,	    'k', 'l'},
+    {Pk_ਸੱਜਾ,	    'k', 'r'},
 
     {Pk_F1,	    'k', '1'},
     {Pk_F2,	    'k', '2'},
@@ -141,22 +141,22 @@ static struct
     {Pk_F35,	    'F', 'P'},
 
     {Pk_Help,	    '%', '1'},
-    {Pk_BackSpace,  'k', 'b'},
-    {Pk_Insert,	    'k', 'I'},
+    {Pk_ਪਿੱਠ_Space,  'k', 'b'},
+    {Pk_ਪਾਓ,	    'k', 'I'},
     {Pk_Delete,	    'k', 'D'},
     {Pk_Home,	    'k', 'h'},
-    {Pk_End,	    '@', '7'},
-    {Pk_Prior,	    'k', 'P'},
-    {Pk_Next,	    'k', 'N'},
+    {Pk_ਸਿਰਾ,	    '@', '7'},
+    {Pk_ਪੂਰਵ,	    'k', 'P'},
+    {Pk_ਅਗਲਾ,	    'k', 'N'},
     {Pk_Print,	    '%', '9'},
 
-    {Pk_KP_Add,	    'K', '6'},
-    {Pk_KP_Subtract,'K', '7'},
+    {Pk_KP_ਜੋੜੋ,	    'K', '6'},
+    {Pk_KP_ਘਟਾਓ,'K', '7'},
     {Pk_KP_Divide,  'K', '8'},
     {Pk_KP_Multiply,'K', '9'},
     {Pk_KP_Enter,   'K', 'A'},
 
-    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, // Insert
+    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, //ਪਾਓ
     {Pk_KP_Decimal, KS_EXTRA, KE_KDEL}, // Delete
 
     {Pk_KP_4,	    'k', 'l'}, // Left
@@ -165,7 +165,7 @@ static struct
     {Pk_KP_2,	    'k', 'd'}, // Down
 
     {Pk_KP_7,	    'K', '1'}, // Home
-    {Pk_KP_1,	    'K', '4'}, // End
+    {Pk_KP_1,	    'K', '4'}, //ਸਿਰਾ
 
     {Pk_KP_9,	    'K', '3'}, // Page Up
     {Pk_KP_3,	    'K', '5'}, // Page Down
@@ -187,454 +187,454 @@ static struct
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtCallbackF_t gui_ph_handle_timer_cursor;
-static PtCallbackF_t gui_ph_handle_timer_timeout;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_timer_cursor;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_timer_timeout;
 
-static PtCallbackF_t gui_ph_handle_window_cb;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_ਖਿੜਕੀ_cb;
 
-static PtCallbackF_t gui_ph_handle_scrollbar;
-static PtCallbackF_t gui_ph_handle_keyboard;
-static PtCallbackF_t gui_ph_handle_mouse;
-static PtCallbackF_t gui_ph_handle_pulldown_menu;
-static PtCallbackF_t gui_ph_handle_menu;
-static PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_scrollbar;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_keyboard;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_mouse;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_pulldown_menu;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_menu;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
 
-static PtCallbackF_t gui_ph_handle_menu_resize;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_menu_resize;
 
 // When a menu is unrealized, give focus back to vimTextArea
-static PtCallbackF_t gui_ph_handle_menu_unrealized;
+ਸਥਿਰ PtCallbackF_t gui_ph_handle_menu_unrealized;
 
-#ifdef USE_PANEL_GROUP
-static void gui_ph_get_panelgroup_margins(short*, short*, short*, short*);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+ਸਥਿਰ ਖਾਲੀ gui_ph_get_panelgroup_margins(ਛੋਟਾ*, ਛੋਟਾ*, ਛੋਟਾ*, ਛੋਟਾ*);
+#ਜੇ_ਅੰਤ
 
-static void gui_ph_draw_start(void);
-static void gui_ph_draw_end(void);
+ਸਥਿਰ ਖਾਲੀ gui_ph_draw_ਸ਼ੁਰੂ(ਖਾਲੀ);
+ਸਥਿਰ ਖਾਲੀ gui_ph_draw_ਸਿਰਾ(ਖਾਲੀ);
 
 // Set the text for the balloon
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+ਸਥਿਰ PtWidget_t * gui_ph_show_tooltip(PtWidget_t *ਖਿੜਕੀ_2,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     ਪੂਰਨ position,
+			     ਅੱਖਰ *ਪਾਠ,
+			     ਅੱਖਰ *font,
 			     PgColor_t fill_color,
-			     PgColor_t text_color);
+			     PgColor_t ਪਾਠ_color);
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+ਸਥਿਰ PtWidget_t * gui_ph_show_tooltip(PtWidget_t *ਖਿੜਕੀ_2,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     ਪੂਰਨ position,
+			     ਅੱਖਰ *ਪਾਠ,
+			     ਅੱਖਰ *font,
 			     PgColor_t fill_color,
-			     PgColor_t text_color)
+			     PgColor_t ਪਾਠ_color)
 {
     PtArg_t arg;
     vimmenu_T *menu;
     char_u  *tooltip;
 
-    PtSetArg(&arg, Pt_ARG_POINTER, &menu, 0);
+    Pt_ਸੈੱਟ_Arg(&arg, Pt_ARG_ਸੂਚਕ, &menu, 0);
     PtGetResources(widget, 1, &arg);
 
     // Override the text and position
 
-    tooltip = text;
-    if (menu != NULL)
+    tooltip = ਪਾਠ;
+    ਜੇ (menu != ਨਿਰਾ)
     {
-	int index = MENU_INDEX_TIP;
-	if (menu->strings[ index ] != NULL)
-	    tooltip = menu->strings[ index ];
+	ਪੂਰਨ ਸੂਚਕਾਂਕ = MENU_ਸੂਚਕਾਂਕ_TIP;
+	ਜੇ (menu->ਲੜੀਆਂ[ ਸੂਚਕਾਂਕ ] != ਨਿਰਾ)
+	    tooltip = menu->ਲੜੀਆਂ[ ਸੂਚਕਾਂਕ ];
     }
 
-    return PtInflateBalloon(
-	    window,
+    ਵਾਪਸ PtInflateBalloon(
+	    ਖਿੜਕੀ_2,
 	    widget,
 	    // Don't put the balloon at the bottom,
 	    // it gets drawn over by gfx done in the PtRaw
-	    Pt_BALLOON_TOP,
+	    Pt_BALLOON_ਸਿਖਰ,
 	    tooltip,
 	    font,
 	    fill_color,
-	    text_color);
+	    ਪਾਠ_color);
 }
 
-    static void
-gui_ph_resize_container(void)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_resize_container(ਖਾਲੀ)
 {
     PhArea_t area;
 
-    PtWidgetArea(gui.vimWindow, &area);
+    PtWidgetArea(gui.vim_ਖਿੜਕੀ, &area);
     PtWidgetPos (gui.vimContainer, &area.pos);
 
-    PtSetResource(gui.vimContainer, Pt_ARG_AREA, &area, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vimContainer, Pt_ARG_AREA, &area, 0);
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_menu_resize(
 	PtWidget_t *widget,
-	void *other,
+	ਖਾਲੀ *other,
 	PtCallbackInfo_t *info)
 {
     PtContainerCallback_t *sizes = info->cbdata;
     PtWidget_t		*container;
-    PhPoint_t		below_menu;
-    int_u		height;
+    Ph_ਬਿੰਦੂ_t		ਹੇਠਾਂ_menu;
+    int_u		ਉਚਾਈ;
 
-    height = sizes->new_dim.h;
+    ਉਚਾਈ = sizes->new_dim.h;
 
     // Because vim treats the toolbar and menubar separately,
     // and here they're lumped together into a PtToolbarGroup,
     // we only need either menu_height or toolbar_height set at once
-    if (gui.menu_is_active)
+    ਜੇ (gui.menu_is_ਸਰਗਰਮ)
     {
-	gui.menu_height = height;
-	gui.toolbar_height = 0;
+	gui.menu_ਉਚਾਈ = ਉਚਾਈ;
+	gui.toolbar_ਉਚਾਈ = 0;
     }
-#ifdef FEAT_TOOLBAR
-    else
-	gui.toolbar_height = height;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਨਹੀਂਤਾਂ
+	gui.toolbar_ਉਚਾਈ = ਉਚਾਈ;
+#ਜੇ_ਅੰਤ
 
-    below_menu.x = 0;
-    below_menu.y = height;
+    ਹੇਠਾਂ_menu.x = 0;
+    ਹੇਠਾਂ_menu.y = ਉਚਾਈ;
 
-#ifdef USE_PANEL_GROUP
-    container = gui.vimPanelGroup;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+    container = gui.vim_Panel_ਸਮੂਹ;
+#ਨਹੀਂਤਾਂ
     container = gui.vimContainer;
-#endif
+#ਜੇ_ਅੰਤ
 
-    PtSetResource(container, Pt_ARG_POS, &below_menu, 0);
+    Pt_ਸੈੱਟ_Resource(container, Pt_ARG_POS, &ਹੇਠਾਂ_menu, 0);
 
     gui_ph_resize_container();
 
-#ifdef USE_PANEL_GROUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
     gui_ph_get_panelgroup_margins(
-	    &pg_margin_top, &pg_margin_bottom,
-	    &pg_margin_left, &pg_margin_right);
-#endif
-    return Pt_CONTINUE;
+	    &pg_margin_ਸਿਖਰ, &pg_margin_bottom,
+	    &pg_margin_ਖੱਬਾ, &pg_margin_ਸੱਜਾ);
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 /*
  * Pt_ARG_TIMER_REPEAT isn't used because the on & off times
  * are different
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_timer_cursor(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
-    if (blink_state == BLINK_ON)
+    ਜੇ (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_ਸੈੱਟ_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_offtime, 0);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_ਸੈੱਟ_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_ontime, 0);
     }
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_timer_timeout(
     PtWidget_t		*widget,
-    void		*data,
+    ਖਾਲੀ		*ਅੰਕੜੇ,
     PtCallbackInfo_t	*info)
 {
     is_timeout = TRUE;
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_window_cb(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_ਖਿੜਕੀ_cb(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    PhWindowEvent_t *we = info->cbdata;
-    ushort_t *width, *height;
+    Ph_ਖਿੜਕੀ_Event_t *we = info->cbdata;
+    ushort_t *ਚੌੜਾਈ, *ਉਚਾਈ;
 
-    switch (we->event_f)
+    ਚੋਣ (we->event_f)
     {
-	case Ph_WM_CLOSE:
+	ਹਾਲਤ Ph_WM_CLOSE:
 	    gui_shell_closed();
-	    break;
+	    ਰੋਕੋ;
 
-	case Ph_WM_FOCUS:
+	ਹਾਲਤ Ph_WM_FOCUS:
 	    // Just in case it's hidden and needs to be shown
 	    gui_mch_mousehide(MOUSE_SHOW);
 
-	    if (we->event_state == Ph_WM_EVSTATE_FOCUS)
+	    ਜੇ (we->event_state == Ph_WM_EVSTATE_FOCUS)
 	    {
 		gui_focus_change(TRUE);
-		gui_mch_start_blink();
+		gui_mch_ਸ਼ੁਰੂ_blink();
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		gui_focus_change(FALSE);
 		gui_mch_stop_blink(TRUE);
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case Ph_WM_RESIZE:
-	    PtGetResource(gui.vimWindow, Pt_ARG_WIDTH, &width, 0);
-	    PtGetResource(gui.vimWindow, Pt_ARG_HEIGHT, &height, 0);
-#ifdef USE_PANEL_GROUP
-	    width  -= (pg_margin_left + pg_margin_right);
-	    height -= (pg_margin_top + pg_margin_bottom);
-#endif
-	    gui_resize_shell(*width, *height);
-	    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
+	ਹਾਲਤ Ph_WM_RESIZE:
+	    PtGetResource(gui.vim_ਖਿੜਕੀ, Pt_ARG_ਚੌੜਾਈ, &ਚੌੜਾਈ, 0);
+	    PtGetResource(gui.vim_ਖਿੜਕੀ, Pt_ARG_ਉਚਾਈ, &ਉਚਾਈ, 0);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+	    ਚੌੜਾਈ  -= (pg_margin_ਖੱਬਾ + pg_margin_ਸੱਜਾ);
+	    ਉਚਾਈ -= (pg_margin_ਸਿਖਰ + pg_margin_bottom);
+#ਜੇ_ਅੰਤ
+	    gui_resize_shell(*ਚੌੜਾਈ, *ਉਚਾਈ);
+	    gui_ਸੈੱਟ_shellsize(FALSE, FALSE, RESIZE_BOTH);
 	    is_ignore_draw = FALSE;
-	    PtEndFlux(gui.vimContainer);
+	    Pt_ਸਿਰਾ_Flux(gui.vimContainer);
 	    PtContainerRelease(gui.vimContainer);
-	    break;
+	    ਰੋਕੋ;
 
-	default:
-	    break;
+	ਮੂਲ:
+	    ਰੋਕੋ;
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_scrollbar(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_scrollbar(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
     PtScrollbarCallback_t *scroll;
     scrollbar_T *sb;
-    int	    value, dragging = FALSE;
+    ਪੂਰਨ	    ਮੁੱਲ, dragging = FALSE;
 
     scroll = info->cbdata;
 
-    sb = (scrollbar_T *) data;
-    if (sb != NULL)
+    sb = (scrollbar_T *) ਅੰਕੜੇ;
+    ਜੇ (sb != ਨਿਰਾ)
     {
-	value = scroll->position;
-	switch (scroll->action)
+	ਮੁੱਲ = scroll->position;
+	ਚੋਣ (scroll->action)
 	{
-	    case Pt_SCROLL_DRAGGED:
+	    ਹਾਲਤ Pt_SCROLL_DRAGGED:
 		dragging = TRUE;
-		break;
+		ਰੋਕੋ;
 
-	    case Pt_SCROLL_SET:
+	    ਹਾਲਤ Pt_SCROLL_ਸੈੱਟ:
 		// FIXME: return straight away here?
-		return Pt_CONTINUE;
-		break;
+		ਵਾਪਸ Pt_CONTINUE;
+		ਰੋਕੋ;
 	}
 
-	gui_drag_scrollbar(sb, value, dragging);
+	gui_drag_scrollbar(sb, ਮੁੱਲ, dragging);
     }
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_keyboard(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_keyboard(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t    *key;
-    unsigned char   string[6];
-    int		    len, i;
-    int		    ch, modifiers;
+    Ph_ਕੁੰਜੀ_Event_t    *ਕੁੰਜੀ;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ   string[6];
+    ਪੂਰਨ		    len, i;
+    ਪੂਰਨ		    ch, modifiers;
 
-    key = PhGetData(info->event);
+    ਕੁੰਜੀ = Ph_Get_ਅੰਕੜੇ(info->event);
 
     ch = modifiers = len = 0;
 
-    if (p_mh)
+    ਜੇ (p_mh)
 	gui_mch_mousehide(MOUSE_HIDE);
 
     // We're a good lil photon program, aren't we? yes we are, yeess wee arrr
-    if (key->key_flags & Pk_KF_Compose)
-	return Pt_CONTINUE;
+    ਜੇ (ਕੁੰਜੀ->ਕੁੰਜੀ_flags & Pk_KF_Compose)
+	ਵਾਪਸ Pt_CONTINUE;
 
-    if ((key->key_flags & Pk_KF_Cap_Valid) &&
-	    PkIsKeyDown(key->key_flags))
+    ਜੇ ((ਕੁੰਜੀ->ਕੁੰਜੀ_flags & Pk_KF_Cap_Valid) &&
+	    Pk_Is_ਕੁੰਜੀ_ਥੱਲੇ(ਕੁੰਜੀ->ਕੁੰਜੀ_flags))
     {
-#ifdef FEAT_MENU
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
 	/*
 	 * Only show the menu if the Alt key is down, and the Shift & Ctrl
 	 * keys aren't down, as well as the other conditions
 	 */
-	if (((key->key_mods & Pk_KM_Alt) &&
-		    !(key->key_mods & Pk_KM_Shift) &&
-		    !(key->key_mods & Pk_KM_Ctrl)) &&
-	    gui.menu_is_active &&
+	ਜੇ (((ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_Alt) &&
+		    !(ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_ਖਿਸਕਾਓ) &&
+		    !(ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_Ctrl)) &&
+	    gui.menu_is_ਸਰਗਰਮ &&
 	    (*p_wak == 'y' ||
 	      (*p_wak == 'm' &&
-		gui_is_menu_shortcut(key->key_cap))))
+		gui_is_menu_shortcut(ਕੁੰਜੀ->ਕੁੰਜੀ_cap))))
 	{
 	    // Fallthrough and let photon look for the hotkey
-	    return Pt_CONTINUE;
+	    ਵਾਪਸ Pt_CONTINUE;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	ਲਈ (i = 0; special_ਕੁੰਜੀਆਂ[i].ਕੁੰਜੀ_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key->key_cap)
+	    ਜੇ (special_ਕੁੰਜੀਆਂ[i].ਕੁੰਜੀ_sym == ਕੁੰਜੀ->ਕੁੰਜੀ_cap)
 	    {
 		len = 0;
-		if (special_keys[i].vim_code1 == NUL)
-		    ch = special_keys[i].vim_code0;
-		else
+		ਜੇ (special_ਕੁੰਜੀਆਂ[i].vim_code1 == NUL)
+		    ch = special_ਕੁੰਜੀਆਂ[i].vim_code0;
+		ਨਹੀਂਤਾਂ
 		{
 		    // Detect if a keypad number key has been pressed
 		    // and change the key if Num Lock is on
-		    if (key->key_cap >= Pk_KP_Enter && key->key_cap <= Pk_KP_9
-			    && (key->key_mods & Pk_KM_Num_Lock))
+		    ਜੇ (ਕੁੰਜੀ->ਕੁੰਜੀ_cap >= Pk_KP_Enter && ਕੁੰਜੀ->ਕੁੰਜੀ_cap <= Pk_KP_9
+			    && (ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_ਅੰਕ_ਤਾਲਾ))
 		    {
 			// FIXME: For now, just map the key to an ascii value
 			// (see <photon/PkKeyDef.h>)
-			ch = key->key_cap - 0xf080;
+			ch = ਕੁੰਜੀ->ਕੁੰਜੀ_cap - 0xf080;
 		    }
-		    else
-			ch = TO_SPECIAL(special_keys[i].vim_code0,
-				special_keys[i].vim_code1);
+		    ਨਹੀਂਤਾਂ
+			ch = ਮੰਜ਼ਿਲ_SPECIAL(special_ਕੁੰਜੀਆਂ[i].vim_code0,
+				special_ਕੁੰਜੀਆਂ[i].vim_code1);
 		}
-		break;
+		ਰੋਕੋ;
 	    }
 	}
 
-	if (key->key_mods & Pk_KM_Ctrl)
-	    modifiers |= MOD_MASK_CTRL;
-	if (key->key_mods & Pk_KM_Alt)
-	    modifiers |= MOD_MASK_ALT;
-	if (key->key_mods & Pk_KM_Shift)
-	    modifiers |= MOD_MASK_SHIFT;
+	ਜੇ (ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_Ctrl)
+	    modifiers |= MOD_ਨਕਾਬ_CTRL;
+	ਜੇ (ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_Alt)
+	    modifiers |= MOD_ਨਕਾਬ_ALT;
+	ਜੇ (ਕੁੰਜੀ->ਕੁੰਜੀ_mods & Pk_KM_ਖਿਸਕਾਓ)
+	    modifiers |= MOD_ਨਕਾਬ_ਖਿਸਕਾਓ;
 
 	// Is this not a special key?
-	if (special_keys[i].key_sym == 0)
+	ਜੇ (special_ਕੁੰਜੀਆਂ[i].ਕੁੰਜੀ_sym == 0)
 	{
-	    ch = PhTo8859_1(key);
-	    if (ch == -1 || (enc_utf8 && ch > 127))
+	    ch = PhTo8859_1(ਕੁੰਜੀ);
+	    ਜੇ (ch == -1 || (enc_utf8 && ch > 127))
 	    {
-		len = PhKeyToMb(string, key);
-		if (len > 0)
+		len = Ph_ਕੁੰਜੀ_ਮੰਜ਼ਿਲ_Mb(string, ਕੁੰਜੀ);
+		ਜੇ (len > 0)
 		{
-		    static char buf[6];
-		    int src_taken, dst_made;
-		    if (enc_utf8 != TRUE)
+		    ਸਥਿਰ ਅੱਖਰ buf[6];
+		    ਪੂਰਨ src_ਲਿਆ, dst_made;
+		    ਜੇ (enc_utf8 != TRUE)
 		    {
 			PxTranslateFromUTF(
 				charset_translate,
 				string,
 				len,
-				&src_taken,
+				&src_ਲਿਆ,
 				buf,
 				6,
 				&dst_made);
 
-			add_to_input_buf(buf, dst_made);
+			ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(buf, dst_made);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			add_to_input_buf(string, len);
+			ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(string, len);
 		    }
 
-		    return Pt_CONSUME;
+		    ਵਾਪਸ Pt_CONSUME;
 		}
 		len = 0;
-		ch = key->key_cap;
-		if (ch < 0xff)
+		ch = ਕੁੰਜੀ->ਕੁੰਜੀ_cap;
+		ਜੇ (ch < 0xff)
 		{
 		    // FIXME: is this the right thing to do?
-		    if (modifiers & MOD_MASK_CTRL)
+		    ਜੇ (modifiers & MOD_ਨਕਾਬ_CTRL)
 		    {
-			modifiers &= ~MOD_MASK_CTRL;
+			modifiers &= ~MOD_ਨਕਾਬ_CTRL;
 
-			if ((ch >= 'a' && ch <= 'z') ||
+			ਜੇ ((ch >= 'a' && ch <= 'z') ||
 				ch == '[' ||
 				ch == ']' ||
 				ch == '\\')
 			    ch = Ctrl_chr(ch);
-			else if (ch == '2')
+			ਨਹੀਂਤਾਂ ਜੇ (ch == '2')
 			    ch = NUL;
-			else if (ch == '6')
+			ਨਹੀਂਤਾਂ ਜੇ (ch == '6')
 			    ch = 0x1e;
-			else if (ch == '-')
+			ਨਹੀਂਤਾਂ ਜੇ (ch == '-')
 			    ch = 0x1f;
-			else
-			    modifiers |= MOD_MASK_CTRL;
+			ਨਹੀਂਤਾਂ
+			    modifiers |= MOD_ਨਕਾਬ_CTRL;
 		    }
 
-		    if (modifiers & MOD_MASK_ALT)
+		    ਜੇ (modifiers & MOD_ਨਕਾਬ_ALT)
 		    {
 			ch = Meta(ch);
-			modifiers &= ~MOD_MASK_ALT;
+			modifiers &= ~MOD_ਨਕਾਬ_ALT;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    return Pt_CONTINUE;
+		    ਵਾਪਸ Pt_CONTINUE;
 		}
 	    }
-	    else
-		modifiers &= ~MOD_MASK_SHIFT;
+	    ਨਹੀਂਤਾਂ
+		modifiers &= ~MOD_ਨਕਾਬ_ਖਿਸਕਾਓ;
 	}
 
-	ch = simplify_key(ch, &modifiers);
-	if (modifiers)
+	ch = simplify_ਕੁੰਜੀ(ch, &modifiers);
+	ਜੇ (modifiers)
 	{
 	    string[ len++ ] = CSI;
 	    string[ len++ ] = KS_MODIFIER;
 	    string[ len++ ] = modifiers;
 	}
 
-	if (IS_SPECIAL(ch))
+	ਜੇ (IS_SPECIAL(ch))
 	{
 	    string[ len++ ] = CSI;
-	    string[ len++ ] = K_SECOND(ch);
-	    string[ len++ ] = K_THIRD(ch);
+	    string[ len++ ] = K_ਦੂਜਾ(ch);
+	    string[ len++ ] = K_ਤੀਜਾ(ch);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    string[ len++ ] = ch;
 	}
 
 	// Check if the key interrupts.
 	{
-	    int int_ch = check_for_interrupt(ch, modifiers);
+	    ਪੂਰਨ int_ch = check_for_ਰੁਕਾਵਟ(ch, modifiers);
 
-	    if (int_ch != NUL)
+	    ਜੇ (int_ch != NUL)
 	    {
 		ch = int_ch;
 		string[0] = ch;
 		len = 1;
-		trash_input_buf();
+		trash_ਨਿਵੇਸ਼_buf();
 	    }
 	}
 
-	if (len == 1 && string[0] == CSI)
+	ਜੇ (len == 1 && string[0] == CSI)
 	{
 	    // Turn CSI into K_CSI.
 	    string[ len++ ] = KS_EXTRA;
 	    string[ len++ ] = KE_CSI;
 	}
 
-	if (len > 0)
+	ਜੇ (len > 0)
 	{
-	    add_to_input_buf(string, len);
-	    return Pt_CONSUME;
+	    ਜੋੜੋ_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(string, len);
+	    ਵਾਪਸ Pt_CONSUME;
 	}
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_mouse(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    PhPointerEvent_t *pointer;
+    Ph_ਸੂਚਕ_Event_t *ਸੂਚਕ;
     PhRect_t	     *pos;
-    int		     button = 0, repeated_click, modifiers = 0x0;
-    short	     mouse_x, mouse_y;
+    ਪੂਰਨ		     button = 0, repeated_click, modifiers = 0x0;
+    ਛੋਟਾ	     mouse_x, mouse_y;
 
-    pointer = PhGetData(info->event);
+    ਸੂਚਕ = Ph_Get_ਅੰਕੜੇ(info->event);
     pos = PhGetRects(info->event);
 
     gui_mch_mousehide(MOUSE_SHOW);
@@ -643,101 +643,101 @@ gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
      * Coordinates need to be relative to the base window,
      * not relative to the vimTextArea widget
      */
-    mouse_x = pos->ul.x + gui.border_width;
-    mouse_y = pos->ul.y + gui.border_width;
+    mouse_x = pos->ul.x + gui.border_ਚੌੜਾਈ;
+    mouse_y = pos->ul.y + gui.border_ਚੌੜਾਈ;
 
-    if (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
+    ਜੇ (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
     {
 	gui_mouse_moved(mouse_x, mouse_y);
-	return Pt_CONTINUE;
+	ਵਾਪਸ Pt_CONTINUE;
     }
 
-    if (pointer->key_mods & Pk_KM_Shift)
-	modifiers |= MOUSE_SHIFT;
-    if (pointer->key_mods & Pk_KM_Ctrl)
+    ਜੇ (ਸੂਚਕ->ਕੁੰਜੀ_mods & Pk_KM_ਖਿਸਕਾਓ)
+	modifiers |= MOUSE_ਖਿਸਕਾਓ;
+    ਜੇ (ਸੂਚਕ->ਕੁੰਜੀ_mods & Pk_KM_Ctrl)
 	modifiers |= MOUSE_CTRL;
-    if (pointer->key_mods & Pk_KM_Alt)
+    ਜੇ (ਸੂਚਕ->ਕੁੰਜੀ_mods & Pk_KM_Alt)
 	modifiers |= MOUSE_ALT;
 
     /*
      * FIXME More than one button may be involved, but for
      * now just deal with one
      */
-    if (pointer->buttons & Ph_BUTTON_SELECT)
-	button = MOUSE_LEFT;
+    ਜੇ (ਸੂਚਕ->buttons & Ph_BUTTON_SELECT)
+	button = MOUSE_ਖੱਬਾ;
 
-    if (pointer->buttons & Ph_BUTTON_MENU)
+    ਜੇ (ਸੂਚਕ->buttons & Ph_BUTTON_MENU)
     {
-	button = MOUSE_RIGHT;
+	button = MOUSE_ਸੱਜਾ;
 	// Need the absolute coordinates for the popup menu
-	abs_mouse.x = pointer->pos.x;
-	abs_mouse.y = pointer->pos.y;
+	abs_mouse.x = ਸੂਚਕ->pos.x;
+	abs_mouse.y = ਸੂਚਕ->pos.y;
     }
 
-    if (pointer->buttons & Ph_BUTTON_ADJUST)
-	button = MOUSE_MIDDLE;
+    ਜੇ (ਸੂਚਕ->buttons & Ph_BUTTON_ADJUST)
+	button = MOUSE_ਵਿਚਕਾਰ;
 
     // Catch a real release (not phantom or other releases
-    if (info->event->type == Ph_EV_BUT_RELEASE)
+    ਜੇ (info->event->type == Ph_EV_BUT_RELEASE)
 	button = MOUSE_RELEASE;
 
-    if (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
+    ਜੇ (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
 	button = MOUSE_DRAG;
 
-#if 0
+#ਜੇ 0
     // Vim doesn't use button repeats
-    if (info->event->type & Ph_EV_BUT_REPEAT)
+    ਜੇ (info->event->type & Ph_EV_BUT_REPEAT)
 	button = MOUSE_DRAG;
-#endif
+#ਜੇ_ਅੰਤ
 
     // Don't do anything if it is one of the phantom mouse release events
-    if ((button != MOUSE_RELEASE) ||
+    ਜੇ ((button != MOUSE_RELEASE) ||
 	    (info->event->subtype == Ph_EV_RELEASE_REAL))
     {
-	repeated_click = (pointer->click_count >= 2) ? TRUE : FALSE;
+	repeated_click = (ਸੂਚਕ->click_ਗਿਣਤੀ >= 2) ? TRUE : FALSE;
 
 	gui_send_mouse_event(button , mouse_x, mouse_y, repeated_click, modifiers);
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 /*
  * Handle a focus change of the PtRaw widget
  */
-    static int
-gui_ph_handle_focus(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_focus(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    if (info->reason == Pt_CB_LOST_FOCUS)
+    ਜੇ (info->reason == Pt_CB_ਗੁਆਚਾ_FOCUS)
     {
-	PtRemoveEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+	PtRemoveEventHandler(gui.vim_ਪਾਠ_Area, Ph_EV_PTR_MOTION_NOBUTTON,
+		gui_ph_handle_mouse, ਨਿਰਾ);
 
 	gui_mch_mousehide(MOUSE_SHOW);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	PtAddEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+	Pt_ਜੋੜੋ_Event_Handler(gui.vim_ਪਾਠ_Area, Ph_EV_PTR_MOTION_NOBUTTON,
+		gui_ph_handle_mouse, ਨਿਰਾ);
     }
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
 {
     PhRect_t	*r;
-    PhPoint_t	offset;
-    PhPoint_t	translation;
+    Ph_ਬਿੰਦੂ_t	ਵਿੱਥ;
+    Ph_ਬਿੰਦੂ_t	translation;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    ਜੇ (is_ignore_draw == TRUE)
+	ਵਾਪਸ;
 
     PtSuperClassDraw(PtBasic, widget, damage);
     PgGetTranslation(&translation);
     PgClearTranslation();
 
-#if 0
+#ਜੇ 0
     /*
      * This causes some weird problems, with drawing being done from
      * within this raw drawing function (rather than just simple clearing
@@ -746,300 +746,300 @@ gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
      * The main problem is when PhBlit is used, and the cursor appearing
      * in places where it shouldn't
      */
-    out_flush();
-#endif
+    ਬਾਹਰਲਾ_flush();
+#ਜੇ_ਅੰਤ
 
-    PtWidgetOffset(widget, &offset);
-    PhTranslatePoint(&offset, PtWidgetPos(gui.vimTextArea, NULL));
+    Pt_Widget_ਵਿੱਥ(widget, &ਵਿੱਥ);
+    Ph_Translate_ਬਿੰਦੂ(&ਵਿੱਥ, PtWidgetPos(gui.vim_ਪਾਠ_Area, ਨਿਰਾ));
 
-#if 1
+#ਜੇ 1
     // Redraw individual damage regions
-    if (damage->next != NULL)
-	damage = damage->next;
+    ਜੇ (damage->ਅਗਲਾ != ਨਿਰਾ)
+	damage = damage->ਅਗਲਾ;
 
-    while (damage != NULL)
+    ਜਦੋਂ (damage != ਨਿਰਾ)
     {
 	r = &damage->rect;
 	gui_redraw(
-		r->ul.x - offset.x, r->ul.y - offset.y,
+		r->ul.x - ਵਿੱਥ.x, r->ul.y - ਵਿੱਥ.y,
 		r->lr.x - r->ul.x + 1,
 		r->lr.y - r->ul.y + 1);
-	damage = damage->next;
+	damage = damage->ਅਗਲਾ;
     }
-#else
+#ਨਹੀਂਤਾਂ
     // Redraw the rectangle that covers all the damaged regions
     r = &damage->rect;
     gui_redraw(
-	    r->ul.x - offset.x, r->ul.y - offset.y,
+	    r->ul.x - ਵਿੱਥ.x, r->ul.y - ਵਿੱਥ.y,
 	    r->lr.x - r->ul.x + 1,
 	    r->lr.y - r->ul.y + 1);
-#endif
+#ਜੇ_ਅੰਤ
 
-    PgSetTranslation(&translation, 0);
+    Pg_ਸੈੱਟ_Translation(&translation, 0);
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_pulldown_menu(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    ਜੇ (ਅੰਕੜੇ != ਨਿਰਾ)
     {
-	vimmenu_T *menu = (vimmenu_T *) data;
+	vimmenu_T *menu = (vimmenu_T *) ਅੰਕੜੇ;
 
-	PtPositionMenu(menu->submenu_id, NULL);
+	PtPositionMenu(menu->submenu_id, ਨਿਰਾ);
 	PtRealizeWidget(menu->submenu_id);
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 /*
  * This is used for pulldown/popup menus and also toolbar buttons
  */
-    static int
-gui_ph_handle_menu(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_menu(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    ਜੇ (ਅੰਕੜੇ != ਨਿਰਾ)
     {
-	vimmenu_T *menu = (vimmenu_T *) data;
+	vimmenu_T *menu = (vimmenu_T *) ਅੰਕੜੇ;
 	gui_menu_cb(menu);
     }
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 /*
  * Stop focus from disappearing into the menubar...
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_menu_unrealized(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
-    PtGiveFocus(gui.vimTextArea, NULL);
-    return Pt_CONTINUE;
+    PtGiveFocus(gui.vim_ਪਾਠ_Area, ਨਿਰਾ);
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_window_open(
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_ਖਿੜਕੀ_open(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
-    gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-    return Pt_CONTINUE;
+    gui_ਸੈੱਟ_shellsize(FALSE, TRUE, RESIZE_BOTH);
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define DRAW_START  gui_ph_draw_start()
-#define DRAW_END    gui_ph_draw_end()
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DRAW_ਸ਼ੁਰੂ  gui_ph_draw_ਸ਼ੁਰੂ()
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DRAW_ਸਿਰਾ    gui_ph_draw_ਸਿਰਾ()
 
 /*
  * TODO: Set a clipping rect?
  */
-    static void
-gui_ph_draw_start(void)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_draw_ਸ਼ੁਰੂ(ਖਾਲੀ)
 {
     PhGC_t *gc;
 
     gc = PgGetGC();
-    PgSetRegion(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)));
+    Pg_ਸੈੱਟ_Region(PtWidgetRid(Pt_ਲੱਭੋ_Disjoint(gui.vim_ਪਾਠ_Area)));
     PgClearClippingsCx(gc);
     PgClearTranslationCx(gc);
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
+    Pt_Widget_ਵਿੱਥ(gui.vim_ਪਾਠ_Area, &gui_ph_raw_ਵਿੱਥ);
+    Ph_Translate_ਬਿੰਦੂ(&gui_ph_raw_ਵਿੱਥ, PtWidgetPos(gui.vim_ਪਾਠ_Area, ਨਿਰਾ));
 
-    PgSetTranslation(&gui_ph_raw_offset, Pg_RELATIVE);
+    Pg_ਸੈੱਟ_Translation(&gui_ph_raw_ਵਿੱਥ, Pg_RELATIVE);
 }
 
-    static void
-gui_ph_draw_end(void)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_draw_ਸਿਰਾ(ਖਾਲੀ)
 {
-    gui_ph_raw_offset.x = -gui_ph_raw_offset.x;
-    gui_ph_raw_offset.y = -gui_ph_raw_offset.y;
-    PgSetTranslation(&gui_ph_raw_offset, Pg_RELATIVE);
+    gui_ph_raw_ਵਿੱਥ.x = -gui_ph_raw_ਵਿੱਥ.x;
+    gui_ph_raw_ਵਿੱਥ.y = -gui_ph_raw_ਵਿੱਥ.y;
+    Pg_ਸੈੱਟ_Translation(&gui_ph_raw_ਵਿੱਥ, Pg_RELATIVE);
 }
 
-#ifdef USE_PANEL_GROUP
-    static vimmenu_T *
-gui_ph_find_buffer_item(char_u *name)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+    ਸਥਿਰ vimmenu_T *
+gui_ph_ਲੱਭੋ_ਬਫਰ_ਵਸਤੂ(char_u *name)
 {
-    vimmenu_T *top_level = root_menu;
-    vimmenu_T *items = NULL;
+    vimmenu_T *ਸਿਖਰ_level = ਜੜ੍ਹ_menu;
+    vimmenu_T *ਚੀਜ਼ਾਂ = ਨਿਰਾ;
 
-    while (top_level != NULL &&
-	    (STRCMP(top_level->dname, "Buffers") != 0))
-	top_level = top_level->next;
+    ਜਦੋਂ (ਸਿਖਰ_level != ਨਿਰਾ &&
+	    (STRCMP(ਸਿਖਰ_level->dname, "Buffers") != 0))
+	ਸਿਖਰ_level = ਸਿਖਰ_level->ਅਗਲਾ;
 
-    if (top_level != NULL)
+    ਜੇ (ਸਿਖਰ_level != ਨਿਰਾ)
     {
-	items = top_level->children;
+	ਚੀਜ਼ਾਂ = ਸਿਖਰ_level->children;
 
-	while (items != NULL &&
-		(STRCMP(items->dname, name) != 0))
-	    items = items->next;
+	ਜਦੋਂ (ਚੀਜ਼ਾਂ != ਨਿਰਾ &&
+		(STRCMP(ਚੀਜ਼ਾਂ->dname, name) != 0))
+	    ਚੀਜ਼ਾਂ = ਚੀਜ਼ਾਂ->ਅਗਲਾ;
     }
-    return items;
+    ਵਾਪਸ ਚੀਜ਼ਾਂ;
 }
 
-    static void
-gui_ph_pg_set_buffer_num(int_u buf_num)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_pg_ਸੈੱਟ_ਬਫਰ_ਅੰਕ(int_u buf_ਅੰਕ)
 {
-    int i;
-    char search[16];
-    char *mark;
+    ਪੂਰਨ i;
+    ਅੱਖਰ ਖੋਜ[16];
+    ਅੱਖਰ *mark;
 
-    if (gui.vimTextArea == NULL || buf_num == 0)
-	return;
+    ਜੇ (gui.vim_ਪਾਠ_Area == ਨਿਰਾ || buf_ਅੰਕ == 0)
+	ਵਾਪਸ;
 
-    search[0] = '(';
-    ultoa(buf_num, &search[1], 10);
-    STRCAT(search, ")");
+    ਖੋਜ[0] = '(';
+    ultoa(buf_ਅੰਕ, &ਖੋਜ[1], 10);
+    STRCAT(ਖੋਜ, ")");
 
-    for (i = 0; i < num_panels; i++)
+    ਲਈ (i = 0; i < ਅੰਕ_panels; i++)
     {
 	// find the last "(" in the panel title and see if the buffer
 	// number in the title matches the one we're looking for
 	mark = STRRCHR(panel_titles[ i ], '(');
-	if (mark != NULL && STRCMP(mark, search) == 0)
+	ਜੇ (mark != ਨਿਰਾ && STRCMP(mark, ਖੋਜ) == 0)
 	{
-	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_CURRENT_INDEX,
+	    Pt_ਸੈੱਟ_Resource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_PG_CURRENT_ਸੂਚਕਾਂਕ,
 		    i, 0);
 	}
     }
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_handle_pg_change(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
-    PtPanelGroupCallback_t *panel;
+    Pt_Panel_ਸਮੂਹ_Callback_t *panel;
 
-    if (info->event != NULL)
+    ਜੇ (info->event != ਨਿਰਾ)
     {
 	panel = info->cbdata;
-	if (panel->new_panel != NULL)
+	ਜੇ (panel->new_panel != ਨਿਰਾ)
 	{
-	    menu = gui_ph_find_buffer_item(panel->new_panel);
-	    if (menu)
+	    menu = gui_ph_ਲੱਭੋ_ਬਫਰ_ਵਸਤੂ(panel->new_panel);
+	    ਜੇ (menu)
 		gui_menu_cb(menu);
 	}
     }
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_ph_get_panelgroup_margins(
-	short *top,
-	short *bottom,
-	short *left,
-	short *right)
+	ਛੋਟਾ *ਸਿਖਰ,
+	ਛੋਟਾ *bottom,
+	ਛੋਟਾ *ਖੱਬਾ,
+	ਛੋਟਾ *ਸੱਜਾ)
 {
-    unsigned short abs_raw_x, abs_raw_y, abs_panel_x, abs_panel_y;
-    const unsigned short *margin_top, *margin_bottom;
-    const unsigned short *margin_left, *margin_right;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ abs_raw_x, abs_raw_y, abs_panel_x, abs_panel_y;
+    ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ *margin_ਸਿਖਰ, *margin_bottom;
+    ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ *margin_ਖੱਬਾ, *margin_ਸੱਜਾ;
 
-    PtGetAbsPosition(gui.vimTextArea, &abs_raw_x, &abs_raw_y);
-    PtGetAbsPosition(gui.vimPanelGroup, &abs_panel_x, &abs_panel_y);
+    PtGetAbsPosition(gui.vim_ਪਾਠ_Area, &abs_raw_x, &abs_raw_y);
+    PtGetAbsPosition(gui.vim_Panel_ਸਮੂਹ, &abs_panel_x, &abs_panel_y);
 
-    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_RIGHT, &margin_right, 0);
-    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_BOTTOM, &margin_bottom, 0);
+    PtGetResource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_MARGIN_ਸੱਜਾ, &margin_ਸੱਜਾ, 0);
+    PtGetResource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_MARGIN_BOTTOM, &margin_bottom, 0);
 
     abs_raw_x -= abs_panel_x;
     abs_raw_y -= abs_panel_y;
 
-    *top    = abs_raw_y;
+    *ਸਿਖਰ    = abs_raw_y;
     *bottom = *margin_bottom;
 
-    *left  = abs_raw_x;
-    *right = *margin_right;
+    *ਖੱਬਾ  = abs_raw_x;
+    *ਸੱਜਾ = *margin_ਸੱਜਾ;
 }
 
 /*
  * Used for the tabs for PtPanelGroup
  */
-    static int
-gui_ph_is_buffer_item(vimmenu_T *menu, vimmenu_T *parent)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_is_ਬਫਰ_ਵਸਤੂ(vimmenu_T *menu, vimmenu_T *ਮਾਪਾ)
 {
-    char *mark;
+    ਅੱਖਰ *mark;
 
-    if (STRCMP(parent->dname, "Buffers") == 0)
+    ਜੇ (STRCMP(ਮਾਪਾ->dname, "Buffers") == 0)
     {
 	// Look for '(' digits ')'
 	mark = vim_strchr(menu->dname, '(');
-	if (mark != NULL)
+	ਜੇ (mark != ਨਿਰਾ)
 	{
 	    mark++;
-	    while (SAFE_isdigit(*mark))
+	    ਜਦੋਂ (ਸੁਰੱਖਿਅਤ_isdigit(*mark))
 		mark++;
 
-	    if (*mark == ')')
-		return TRUE;
+	    ਜੇ (*mark == ')')
+		ਵਾਪਸ TRUE;
 	}
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    static void
-gui_ph_pg_add_buffer(char *name)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_pg_ਜੋੜੋ_ਬਫਰ(ਅੱਖਰ *name)
 {
-    char **new_titles = NULL;
+    ਅੱਖਰ **new_titles = ਨਿਰਾ;
 
-    new_titles = ALLOC_MULT(char *, (num_panels + 1));
-    if (new_titles == NULL)
-	return;
+    new_titles = ALLOC_MULT(ਅੱਖਰ *, (ਅੰਕ_panels + 1));
+    ਜੇ (new_titles == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (num_panels > 0)
-	memcpy(new_titles, panel_titles, num_panels * sizeof(char **));
+    ਜੇ (ਅੰਕ_panels > 0)
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ(new_titles, panel_titles, ਅੰਕ_panels * ਆਕਾਰ(ਅੱਖਰ **));
 
-    new_titles[ num_panels++ ] = name;
+    new_titles[ ਅੰਕ_panels++ ] = name;
 
-    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-	    num_panels);
+    Pt_ਸੈੱਟ_Resource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_PG_PANEL_TITLES, new_titles,
+	    ਅੰਕ_panels);
 
     vim_free(panel_titles);
     panel_titles = new_titles;
 }
 
-    static void
-gui_ph_pg_remove_buffer(char *name)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_pg_remove_ਬਫਰ(ਅੱਖਰ *name)
 {
-    int i;
-    char **new_titles = NULL;
+    ਪੂਰਨ i;
+    ਅੱਖਰ **new_titles = ਨਿਰਾ;
 
     // If there is only 1 panel, we just use the temporary place holder
-    if (num_panels > 1)
+    ਜੇ (ਅੰਕ_panels > 1)
     {
-	new_titles = ALLOC_MULT(char *, num_panels - 1);
-	if (new_titles != NULL)
+	new_titles = ALLOC_MULT(ਅੱਖਰ *, ਅੰਕ_panels - 1);
+	ਜੇ (new_titles != ਨਿਰਾ)
 	{
-	    char **s = new_titles;
+	    ਅੱਖਰ **s = new_titles;
 	    // Copy all the titles except the one we're removing
-	    for (i = 0; i < num_panels; i++)
+	    ਲਈ (i = 0; i < ਅੰਕ_panels; i++)
 	    {
-		if (STRCMP(panel_titles[ i ], name) != 0)
+		ਜੇ (STRCMP(panel_titles[ i ], name) != 0)
 		    *s++ = panel_titles[ i ];
 	    }
-	    num_panels--;
+	    ਅੰਕ_panels--;
 
-	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-		    num_panels);
+	    Pt_ਸੈੱਟ_Resource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_PG_PANEL_TITLES, new_titles,
+		    ਅੰਕ_panels);
 
 	    vim_free(panel_titles);
 	    panel_titles = new_titles;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	num_panels--;
-	PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, &empty_title,
+	ਅੰਕ_panels--;
+	Pt_ਸੈੱਟ_Resource(gui.vim_Panel_ਸਮੂਹ, Pt_ARG_PG_PANEL_TITLES, &ਖਾਲੀ_ਥਾਵਾਂ_title,
 		1);
 
 	VIM_CLEAR(panel_titles);
@@ -1049,49 +1049,49 @@ gui_ph_pg_remove_buffer(char *name)
 /*
  * When a buffer item is deleted from the buffer menu
  */
-    static int
-gui_ph_handle_buffer_remove(
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_handle_ਬਫਰ_remove(
 	PtWidget_t *widget,
-	void *data,
+	ਖਾਲੀ *ਅੰਕੜੇ,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
 
-    if (data != NULL)
+    ਜੇ (ਅੰਕੜੇ != ਨਿਰਾ)
     {
-	menu = (vimmenu_T *) data;
-	gui_ph_pg_remove_buffer(menu->dname);
+	menu = (vimmenu_T *) ਅੰਕੜੇ;
+	gui_ph_pg_remove_ਬਫਰ(menu->dname);
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    static int
-gui_ph_pane_resize(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_pane_resize(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    if (PtWidgetIsRealized(widget))
+    ਜੇ (PtWidgetIsRealized(widget))
     {
 	is_ignore_draw = TRUE;
-	PtStartFlux(gui.vimContainer);
+	Pt_ਸ਼ੁਰੂ_Flux(gui.vimContainer);
 	PtContainerHold(gui.vimContainer);
     }
 
-    return Pt_CONTINUE;
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_ph_encoding_changed(int new_encoding)
+    ਖਾਲੀ
+gui_ph_encoding_ਬਦਲਿਆ(ਪੂਰਨ new_encoding)
 {
     // Default encoding is latin1
-    char *charset = "latin1";
-    int i;
+    ਅੱਖਰ *charset = "latin1";
+    ਪੂਰਨ i;
 
-    struct {
-	int encoding;
-	char *name;
+    ਬਣਤਰ {
+	ਪੂਰਨ encoding;
+	ਅੱਖਰ *name;
     } charsets[] = {
 	{ DBCS_JPN, "SHIFT_JIS" },
 	{ DBCS_KOR, "csEUCKR" },
@@ -1099,116 +1099,116 @@ gui_ph_encoding_changed(int new_encoding)
 	{ DBCS_CHS, "gb" }
     };
 
-    for (i = 0; i < ARRAY_LENGTH(charsets); i++)
+    ਲਈ (i = 0; i < ARRAY_ਲੰਮਾਈ(charsets); i++)
     {
-	if (new_encoding == charsets[ i ].encoding)
+	ਜੇ (new_encoding == charsets[ i ].encoding)
 	    charset = charsets[ i ].name;
     }
 
-    charset_translate = PxTranslateSet(charset_translate, charset);
+    charset_translate = Px_Translate_ਸੈੱਟ(charset_translate, charset);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ਖਾਲੀ
+gui_mch_prepare(ਪੂਰਨ *argc, ਅੱਖਰ **argv)
 {
-    PtInit(NULL);
+    PtInit(ਨਿਰਾ);
 }
 
-    int
-gui_mch_init(void)
+    ਪੂਰਨ
+gui_mch_init(ਖਾਲੀ)
 {
-    PtArg_t args[10];
-    int	    flags = 0, n = 0;
+    PtArg_t ਦਲੀਲਾਂ[10];
+    ਪੂਰਨ	    flags = 0, n = 0;
 
-    PhDim_t	window_size = {100, 100}; // Arbitrary values
-    PhPoint_t	pos = {0, 0};
+    PhDim_t	ਖਿੜਕੀ_ਮਾਪ = {100, 100}; // Arbitrary values
+    Ph_ਬਿੰਦੂ_t	pos = {0, 0};
 
-    gui.event_buffer = alloc(EVENT_BUFFER_SIZE);
-    if (gui.event_buffer == NULL)
-	return FAIL;
+    gui.event_ਬਫਰ = alloc(EVENT_ਬਫਰ_ਮਾਪ);
+    ਜੇ (gui.event_ਬਫਰ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // Get a translation so we can convert from ISO Latin-1 to UTF
-    charset_translate = PxTranslateSet(NULL, "latin1");
+    charset_translate = Px_Translate_ਸੈੱਟ(ਨਿਰਾ, "latin1");
 
     // The +2 is for the 1 pixel dark line on each side
-    gui.border_offset = gui.border_width = GUI_PH_MARGIN + 2;
+    gui.border_ਵਿੱਥ = gui.border_ਚੌੜਾਈ = GUI_PH_MARGIN + 2;
 
     // Handle close events ourselves
-    PtSetArg(&args[ n++ ], Pt_ARG_WINDOW_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE);
-    PtSetArg(&args[ n++ ], Pt_ARG_WINDOW_NOTIFY_FLAGS, Pt_TRUE,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਖਿੜਕੀ_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਖਿੜਕੀ_NOTIFY_FLAGS, Pt_TRUE,
 	    Ph_WM_CLOSE | Ph_WM_RESIZE | Ph_WM_FOCUS);
-    PtSetArg(&args[ n++ ], Pt_ARG_DIM, &window_size, 0);
-    gui.vimWindow = PtCreateWidget(PtWindow, NULL, n, args);
-    if (gui.vimWindow == NULL)
-	return FAIL;
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_DIM, &ਖਿੜਕੀ_ਮਾਪ, 0);
+    gui.vim_ਖਿੜਕੀ = PtCreateWidget(Pt_ਖਿੜਕੀ, ਨਿਰਾ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vim_ਖਿੜਕੀ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW, gui_ph_handle_window_cb, NULL);
-    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW_OPENING,
-	    gui_ph_handle_window_open, NULL);
+    Pt_ਜੋੜੋ_Callback(gui.vim_ਖਿੜਕੀ, Pt_CB_ਖਿੜਕੀ, gui_ph_handle_ਖਿੜਕੀ_cb, ਨਿਰਾ);
+    Pt_ਜੋੜੋ_Callback(gui.vim_ਖਿੜਕੀ, Pt_CB_ਖਿੜਕੀ_OPENING,
+	    gui_ph_handle_ਖਿੜਕੀ_open, ਨਿਰਾ);
 
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ALL, Pt_IS_ANCHORED);
-    PtSetArg(&args[ n++ ], Pt_ARG_DIM, &window_size, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_POS, &pos, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ALL, Pt_IS_ANCHORED);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_DIM, &ਖਿੜਕੀ_ਮਾਪ, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_POS, &pos, 0);
 
-#ifdef USE_PANEL_GROUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
     // Put in a temporary place holder title
-    PtSetArg(&args[ n++ ], Pt_ARG_PG_PANEL_TITLES, &empty_title, 1);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_PG_PANEL_TITLES, &ਖਾਲੀ_ਥਾਵਾਂ_title, 1);
 
-    gui.vimPanelGroup = PtCreateWidget(PtPanelGroup, gui.vimWindow, n, args);
-    if (gui.vimPanelGroup == NULL)
-	return FAIL;
+    gui.vim_Panel_ਸਮੂਹ = PtCreateWidget(Pt_Panel_ਸਮੂਹ, gui.vim_ਖਿੜਕੀ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vim_Panel_ਸਮੂਹ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    PtAddCallback(gui.vimPanelGroup, Pt_CB_PG_PANEL_SWITCHING,
-	    gui_ph_handle_pg_change, NULL);
-#else
+    Pt_ਜੋੜੋ_Callback(gui.vim_Panel_ਸਮੂਹ, Pt_CB_PG_PANEL_SWITCHING,
+	    gui_ph_handle_pg_change, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
     // Turn off all edge decorations
-    PtSetArg(&args[ n++ ], Pt_ARG_BASIC_FLAGS, Pt_FALSE, Pt_ALL);
-    PtSetArg(&args[ n++ ], Pt_ARG_BEVEL_WIDTH, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_WIDTH, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_HEIGHT, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_CONTAINER_FLAGS, Pt_TRUE, Pt_AUTO_EXTENT);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_BASIC_FLAGS, Pt_FALSE, Pt_ALL);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_BEVEL_ਚੌੜਾਈ, 0, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_MARGIN_ਚੌੜਾਈ, 0, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_MARGIN_ਉਚਾਈ, 0, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_CONTAINER_FLAGS, Pt_TRUE, Pt_AUTO_EXTENT);
 
-    gui.vimContainer = PtCreateWidget(PtPane, gui.vimWindow, n, args);
-    if (gui.vimContainer == NULL)
-	return FAIL;
+    gui.vimContainer = PtCreateWidget(PtPane, gui.vim_ਖਿੜਕੀ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vimContainer == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    PtAddCallback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, NULL);
-#endif
+    Pt_ਜੋੜੋ_Callback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
 
     // Size for the text area is set in gui_mch_set_text_area_pos
     n = 0;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_RAW_DRAW_F, gui_ph_handle_raw_draw, 1);
-    PtSetArg(&args[ n++ ], Pt_ARG_BEVEL_WIDTH, GUI_PH_MARGIN, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_RAW_DRAW_F, gui_ph_handle_raw_draw, 1);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_BEVEL_ਚੌੜਾਈ, GUI_PH_MARGIN, 0);
     /*
      * Using focus render also causes the whole widget to be redrawn
      * whenever it changes focus, which is very annoying :p
      */
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_TRUE,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FLAGS, Pt_TRUE,
 	    Pt_GETS_FOCUS | Pt_HIGHLIGHTED);
-#ifndef FEAT_MOUSESHAPE
-    PtSetArg(&args[ n++ ], Pt_ARG_CURSOR_TYPE, GUI_PH_MOUSE_TYPE, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_CURSOR_COLOR, gui_ph_mouse_color, 0);
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FEAT_MOUSESHAPE
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_CURSOR_TYPE, GUI_PH_MOUSE_TYPE, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_CURSOR_COLOR, gui_ph_mouse_color, 0);
+#ਜੇ_ਅੰਤ
 
-    gui.vimTextArea = PtCreateWidget(PtRaw, Pt_DFLT_PARENT, n, args);
-    if (gui.vimTextArea == NULL)
-	return FAIL;
+    gui.vim_ਪਾਠ_Area = PtCreateWidget(PtRaw, Pt_DFLT_ਮਾਪਾ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vim_ਪਾਠ_Area == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // TODO: use PtAddEventHandlers instead?
     // Not using Ph_EV_BUT_REPEAT because vim wouldn't use it anyway
-    PtAddEventHandler(gui.vimTextArea,
+    Pt_ਜੋੜੋ_Event_Handler(gui.vim_ਪਾਠ_Area,
 	    Ph_EV_BUT_PRESS | Ph_EV_BUT_RELEASE | Ph_EV_PTR_MOTION_BUTTON,
-	    gui_ph_handle_mouse, NULL);
-    PtAddEventHandler(gui.vimTextArea, Ph_EV_KEY,
-	    gui_ph_handle_keyboard, NULL);
-    PtAddCallback(gui.vimTextArea, Pt_CB_GOT_FOCUS,
-	    gui_ph_handle_focus, NULL);
-    PtAddCallback(gui.vimTextArea, Pt_CB_LOST_FOCUS,
-	    gui_ph_handle_focus, NULL);
+	    gui_ph_handle_mouse, ਨਿਰਾ);
+    Pt_ਜੋੜੋ_Event_Handler(gui.vim_ਪਾਠ_Area, Ph_EV_ਕੁੰਜੀ,
+	    gui_ph_handle_keyboard, ਨਿਰਾ);
+    Pt_ਜੋੜੋ_Callback(gui.vim_ਪਾਠ_Area, Pt_CB_GOT_FOCUS,
+	    gui_ph_handle_focus, ਨਿਰਾ);
+    Pt_ਜੋੜੋ_Callback(gui.vim_ਪਾਠ_Area, Pt_CB_ਗੁਆਚਾ_FOCUS,
+	    gui_ph_handle_focus, ਨਿਰਾ);
 
     /*
      * Now that the text area widget has been created, set up the colours,
@@ -1219,62 +1219,62 @@ gui_mch_init(void)
      * Create the two timers, not as accurate as using the kernel timer
      * functions, but good enough
      */
-    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_cursor == NULL)
-	return FAIL;
+    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vim_ਖਿੜਕੀ, 0, ਨਿਰਾ);
+    ਜੇ (gui_ph_timer_cursor == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_timeout == NULL)
-	return FAIL;
+    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vim_ਖਿੜਕੀ, 0, ਨਿਰਾ);
+    ਜੇ (gui_ph_timer_timeout == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    PtAddCallback(gui_ph_timer_cursor,  Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_cursor, NULL);
-    PtAddCallback(gui_ph_timer_timeout, Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_timeout, NULL);
+    Pt_ਜੋੜੋ_Callback(gui_ph_timer_cursor,  Pt_CB_TIMER_ACTIVATE,
+	    gui_ph_handle_timer_cursor, ਨਿਰਾ);
+    Pt_ਜੋੜੋ_Callback(gui_ph_timer_timeout, Pt_CB_TIMER_ACTIVATE,
+	    gui_ph_handle_timer_timeout, ਨਿਰਾ);
 
-#ifdef FEAT_MENU
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MENU
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_LEFT_RIGHT,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਚੌੜਾਈ, ਖਿੜਕੀ_ਮਾਪ.w, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ਖੱਬਾ_ਸੱਜਾ,
 	    Pt_IS_ANCHORED);
-    gui.vimToolBarGroup = PtCreateWidget(PtToolbarGroup, gui.vimWindow,
-	    n, args);
-    if (gui.vimToolBarGroup == NULL)
-	return FAIL;
+    gui.vim_Tool_Bar_ਸਮੂਹ = PtCreateWidget(Pt_Toolbar_ਸਮੂਹ, gui.vim_ਖਿੜਕੀ,
+	    n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vim_Tool_Bar_ਸਮੂਹ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    PtAddCallback(gui.vimToolBarGroup, Pt_CB_RESIZE,
-	    gui_ph_handle_menu_resize, NULL);
+    Pt_ਜੋੜੋ_Callback(gui.vim_Tool_Bar_ਸਮੂਹ, Pt_CB_RESIZE,
+	    gui_ph_handle_menu_resize, ਨਿਰਾ);
 
     n = 0;
     flags = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    if (! vim_strchr(p_go, GO_MENUS))
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਚੌੜਾਈ, ਖਿੜਕੀ_ਮਾਪ.w, 0);
+    ਜੇ (! vim_strchr(p_go, GO_MENUS))
     {
 	flags |= Pt_DELAY_REALIZE;
-	PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_TRUE, flags);
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FLAGS, Pt_TRUE, flags);
     }
-    gui.vimMenuBar = PtCreateWidget(PtMenuBar, gui.vimToolBarGroup, n, args);
-    if (gui.vimMenuBar == NULL)
-	return FAIL;
+    gui.vimMenuBar = PtCreateWidget(PtMenuBar, gui.vim_Tool_Bar_ਸਮੂਹ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vimMenuBar == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
 # ifdef FEAT_TOOLBAR
     n = 0;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-	    Pt_ANCHOR_LEFT_RIGHT |Pt_TOP_ANCHORED_TOP, Pt_IS_ANCHORED);
-    PtSetArg(&args[ n++ ], Pt_ARG_RESIZE_FLAGS, Pt_TRUE,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ANCHOR_FLAGS,
+	    Pt_ANCHOR_ਖੱਬਾ_ਸੱਜਾ |Pt_ਸਿਖਰ_ANCHORED_ਸਿਖਰ, Pt_IS_ANCHORED);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_RESIZE_FLAGS, Pt_TRUE,
 	    Pt_RESIZE_Y_AS_REQUIRED);
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਚੌੜਾਈ, ਖਿੜਕੀ_ਮਾਪ.w, 0);
 
     flags = Pt_GETS_FOCUS;
-    if (! vim_strchr(p_go, GO_TOOLBAR))
+    ਜੇ (! vim_strchr(p_go, GO_TOOLBAR))
 	flags |= Pt_DELAY_REALIZE;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE, flags);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE, flags);
 
-    gui.vimToolBar = PtCreateWidget(PtToolbar, gui.vimToolBarGroup, n, args);
-    if (gui.vimToolBar == NULL)
-	return FAIL;
+    gui.vimToolBar = PtCreateWidget(PtToolbar, gui.vim_Tool_Bar_ਸਮੂਹ, n, ਦਲੀਲਾਂ);
+    ਜੇ (gui.vimToolBar == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     /*
      * Size for the toolbar is fetched in gui_mch_show_toolbar, after
@@ -1283,49 +1283,49 @@ gui_mch_init(void)
      */
 # endif
 
-#endif
+#ਜੇ_ਅੰਤ
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
-gui_mch_init_check(void)
+    ਪੂਰਨ
+gui_mch_init_check(ਖਾਲੀ)
 {
-    return (is_photon_available == TRUE) ? OK : FAIL;
+    ਵਾਪਸ (is_photon_ਉਪਲਬਧ == TRUE) ? OK : FAIL;
 }
 
-    int
-gui_mch_open(void)
+    ਪੂਰਨ
+gui_mch_open(ਖਾਲੀ)
 {
     gui.norm_pixel =  Pg_BLACK;
-    gui.back_pixel =  Pg_WHITE;
+    gui.ਪਿੱਠ_pixel =  Pg_WHITE;
 
-    set_normal_colors();
+    ਸੈੱਟ_ਸਾਧਾਰਨ_colors();
 
     gui_check_colors();
     gui.def_norm_pixel = gui.norm_pixel;
-    gui.def_back_pixel = gui.back_pixel;
+    gui.def_ਪਿੱਠ_pixel = gui.ਪਿੱਠ_pixel;
 
     highlight_gui_started();
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    ਜੇ (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_ਸੈੱਟ_winpos(gui_win_x, gui_win_y);
 
-    return (PtRealizeWidget(gui.vimWindow) == 0) ? OK : FAIL;
+    ਵਾਪਸ (PtRealizeWidget(gui.vim_ਖਿੜਕੀ) == 0) ? OK : FAIL;
 }
 
-    void
-gui_mch_exit(int rc)
+    ਖਾਲੀ
+gui_mch_exit(ਪੂਰਨ rc)
 {
-    PtDestroyWidget(gui.vimWindow);
+    PtDestroyWidget(gui.vim_ਖਿੜਕੀ);
 
-    PxTranslateSet(charset_translate, NULL);
+    Px_Translate_ਸੈੱਟ(charset_translate, ਨਿਰਾ);
 
-    vim_free(gui.event_buffer);
+    vim_free(gui.event_ਬਫਰ);
 
-#ifdef USE_PANEL_GROUPS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_GROUPS
     vim_free(panel_titles);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1335,46 +1335,46 @@ gui_mch_exit(int rc)
  * When no events are available, photon will call this function, working is
  * set to FALSE, and the gui_mch_update loop will exit.
  */
-    static int
-exit_gui_mch_update(void *data)
+    ਸਥਿਰ ਪੂਰਨ
+exit_gui_mch_update(ਖਾਲੀ *ਅੰਕੜੇ)
 {
-    *(int *)data = FALSE;
-    return Pt_END;
+    *(ਪੂਰਨ *)ਅੰਕੜੇ = FALSE;
+    ਵਾਪਸ Pt_ਸਿਰਾ;
 }
 
-    void
-gui_mch_update(void)
+    ਖਾਲੀ
+gui_mch_update(ਖਾਲੀ)
 {
-    int working = TRUE;
+    ਪੂਰਨ working = TRUE;
 
-    PtAppAddWorkProc(NULL, exit_gui_mch_update, &working);
-    while ((working == TRUE) && !vim_is_input_buf_full())
+    Pt_App_ਜੋੜੋ_Work_Proc(ਨਿਰਾ, exit_gui_mch_update, &working);
+    ਜਦੋਂ ((working == TRUE) && !vim_is_ਨਿਵੇਸ਼_buf_ਭਰਿਆ())
 	PtProcessEvent();
 }
 
-    int
-gui_mch_wait_for_chars(long wtime)
+    ਪੂਰਨ
+gui_mch_wait_for_chars(ਲੰਮਾ wtime)
 {
     is_timeout = FALSE;
 
-    if (wtime >= 0)
-	PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL,
+    ਜੇ (wtime >= 0)
+	Pt_ਸੈੱਟ_Resource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL,
 						    wtime == 0 ? 1 : wtime, 0);
 
-    while (1)
+    ਜਦੋਂ (1)
     {
 	PtProcessEvent();
-	if (input_available())
+	ਜੇ (ਨਿਵੇਸ਼_ਉਪਲਬਧ())
 	{
-	    PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL, 0, 0);
-	    return OK;
+	    Pt_ਸੈੱਟ_Resource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL, 0, 0);
+	    ਵਾਪਸ OK;
 	}
-	else if (is_timeout == TRUE)
-	    return FAIL;
+	ਨਹੀਂਤਾਂ ਜੇ (is_timeout == TRUE)
+	    ਵਾਪਸ FAIL;
     }
 }
 
-#if defined(FEAT_BROWSE)
+#ਜੇ defined(FEAT_BROWSE)
 /*
  * Put up a file requester.
  * Returns the selected name in allocated memory, or NULL for Cancel.
@@ -1387,7 +1387,7 @@ gui_mch_wait_for_chars(long wtime)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	ਪੂਰਨ saving,
 	char_u *title,
 	char_u *default_name,
 	char_u *ext,
@@ -1395,154 +1395,154 @@ gui_mch_browse(
 	char_u *filter)
 {
     PtFileSelectionInfo_t file;
-    int	    flags;
-    char_u  *default_path;
-    char_u  *open_text = NULL;
+    ਪੂਰਨ	    flags;
+    char_u  *default_ਰਸਤਾ;
+    char_u  *open_ਪਾਠ = ਨਿਰਾ;
 
     flags = 0;
-    CLEAR_FIELD(file);
+    CLEAR_ਖੇਤਰ(file);
 
-    default_path = alloc(MAXPATHL + 1 + NAME_MAX + 1);
-    if (default_path != NULL)
+    default_ਰਸਤਾ = alloc(MAXPATHL + 1 + NAME_MAX + 1);
+    ਜੇ (default_ਰਸਤਾ != ਨਿਰਾ)
     {
-	if (saving == TRUE)
+	ਜੇ (saving == TRUE)
 	{
 	    // Don't need Pt_FSR_CONFIRM_EXISTING, vim will ask anyway
 	    flags |= Pt_FSR_NO_FCHECK;
-	    open_text = "&Save";
+	    open_ਪਾਠ = "&Save";
 	}
 
 	// combine the directory and filename into a single path
-	if (initdir == NULL || *initdir == NUL)
+	ਜੇ (initdir == ਨਿਰਾ || *initdir == NUL)
 	{
-	    mch_dirname(default_path, MAXPATHL);
-	    initdir = default_path;
+	    mch_dirname(default_ਰਸਤਾ, MAXPATHL);
+	    initdir = default_ਰਸਤਾ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    STRCPY(default_path, initdir);
-	    initdir = default_path;
+	    STRCPY(default_ਰਸਤਾ, initdir);
+	    initdir = default_ਰਸਤਾ;
 	}
 
-	if (default_name != NULL)
+	ਜੇ (default_name != ਨਿਰਾ)
 	{
-	    if (default_path[ STRLEN(default_path) - 1 ] != '/')
-		STRCAT(default_path, "/");
+	    ਜੇ (default_ਰਸਤਾ[ STRLEN(default_ਰਸਤਾ) - 1 ] != '/')
+		STRCAT(default_ਰਸਤਾ, "/");
 
-	    STRCAT(default_path, default_name);
+	    STRCAT(default_ਰਸਤਾ, default_name);
 	}
 
 	// TODO: add a filter?
 	PtFileSelection(
-		gui.vimWindow,
-		NULL,
+		gui.vim_ਖਿੜਕੀ,
+		ਨਿਰਾ,
 		title,
-		default_path,
-		NULL,
-		open_text,
-		NULL,
-		NULL,
+		default_ਰਸਤਾ,
+		ਨਿਰਾ,
+		open_ਪਾਠ,
+		ਨਿਰਾ,
+		ਨਿਰਾ,
 		&file,
 		flags);
 
-	vim_free(default_path);
+	vim_free(default_ਰਸਤਾ);
 
-	if (file.ret == Pt_FSDIALOG_BTN1)
-	    return vim_strsave(file.path);
+	ਜੇ (file.ret == Pt_FSDIALOG_BTN1)
+	    ਵਾਪਸ vim_strsave(file.ਰਸਤਾ);
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI_DIALOG)
-static PtWidget_t *gui_ph_dialog_text = NULL;
+#ਜੇ defined(FEAT_GUI_DIALOG)
+ਸਥਿਰ PtWidget_t *gui_ph_dialog_ਪਾਠ = ਨਿਰਾ;
 
-    static int
-gui_ph_dialog_close(int button, void *data)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_dialog_close(ਪੂਰਨ button, ਖਾਲੀ *ਅੰਕੜੇ)
 {
-    PtModalCtrl_t *modal_ctrl = data;
-    char_u *dialog_text, *vim_text;
+    PtModalCtrl_t *modal_ctrl = ਅੰਕੜੇ;
+    char_u *dialog_ਪਾਠ, *vim_ਪਾਠ;
 
-    if (gui_ph_dialog_text != NULL)
+    ਜੇ (gui_ph_dialog_ਪਾਠ != ਨਿਰਾ)
     {
-	PtGetResource(gui_ph_dialog_text, Pt_ARG_TEXT_STRING, &dialog_text, 0);
-	PtGetResource(gui_ph_dialog_text, Pt_ARG_POINTER, &vim_text, 0);
-	STRNCPY(vim_text, dialog_text, IOSIZE - 1);
+	PtGetResource(gui_ph_dialog_ਪਾਠ, Pt_ARG_ਪਾਠ_STRING, &dialog_ਪਾਠ, 0);
+	PtGetResource(gui_ph_dialog_ਪਾਠ, Pt_ARG_ਸੂਚਕ, &vim_ਪਾਠ, 0);
+	STRNCPY(vim_ਪਾਠ, dialog_ਪਾਠ, IOSIZE - 1);
     }
 
-    PtModalUnblock(modal_ctrl, (void *) button);
+    PtModalUnblock(modal_ctrl, (ਖਾਲੀ *) button);
 
-    return Pt_TRUE;
+    ਵਾਪਸ Pt_TRUE;
 }
 
-    static int
-gui_ph_dialog_text_enter(
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_dialog_ਪਾਠ_enter(
     PtWidget_t		*widget,
-    void		*data,
+    ਖਾਲੀ		*ਅੰਕੜੇ,
     PtCallbackInfo_t	*info)
 {
-    if (info->reason_subtype == Pt_EDIT_ACTIVATE)
-	gui_ph_dialog_close(1, data);
-    return Pt_CONTINUE;
+    ਜੇ (info->reason_subtype == Pt_EDIT_ACTIVATE)
+	gui_ph_dialog_close(1, ਅੰਕੜੇ);
+    ਵਾਪਸ Pt_CONTINUE;
 }
 
-    static int
-gui_ph_dialog_esc(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ਸਥਿਰ ਪੂਰਨ
+gui_ph_dialog_esc(PtWidget_t *widget, ਖਾਲੀ *ਅੰਕੜੇ, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t *key;
+    Ph_ਕੁੰਜੀ_Event_t *ਕੁੰਜੀ;
 
-    key = PhGetData(info->event);
-    if ((key->key_flags & Pk_KF_Cap_Valid) && (key->key_cap == Pk_Escape))
+    ਕੁੰਜੀ = Ph_Get_ਅੰਕੜੇ(info->event);
+    ਜੇ ((ਕੁੰਜੀ->ਕੁੰਜੀ_flags & Pk_KF_Cap_Valid) && (ਕੁੰਜੀ->ਕੁੰਜੀ_cap == Pk_Escape))
     {
-	gui_ph_dialog_close(0, data);
-	return Pt_CONSUME;
+	gui_ph_dialog_close(0, ਅੰਕੜੇ);
+	ਵਾਪਸ Pt_CONSUME;
     }
-    return Pt_PROCESS;
+    ਵਾਪਸ Pt_PROCESS;
 }
 
-    int
+    ਪੂਰਨ
 gui_mch_dialog(
-	int	type,
+	ਪੂਰਨ	type,
 	char_u	*title,
-	char_u	*message,
+	char_u	*ਸੁਨੇਹਾ_2,
 	char_u	*buttons,
-	int	default_button,
+	ਪੂਰਨ	default_button,
 	char_u	*textfield,
-	int	ex_cmd)
+	ਪੂਰਨ	ex_cmd)
 {
     char_u	*str;
     char_u	**button_array;
     char_u	*buttons_copy;
 
-    int		button_count;
-    int		i, len;
-    int		dialog_result = -1;
+    ਪੂਰਨ		button_ਗਿਣਤੀ;
+    ਪੂਰਨ		i, len;
+    ਪੂਰਨ		dialog_ਨਤੀਜਾ = -1;
 
     // FIXME: the vertical option in guioptions is blatantly ignored
     // FIXME: so is the type
 
-    button_count = len = i = 0;
+    button_ਗਿਣਤੀ = len = i = 0;
 
-    if (buttons == NULL || *buttons == NUL)
-	return -1;
+    ਜੇ (buttons == ਨਿਰਾ || *buttons == NUL)
+	ਵਾਪਸ -1;
 
     // There is one less separator than buttons, so bump up the button count
-    button_count = 1;
+    button_ਗਿਣਤੀ = 1;
 
     // Count string length and number of separators
-    for (str = buttons; *str; str++)
+    ਲਈ (str = buttons; *str; str++)
     {
 	len++;
-	if (*str == DLG_BUTTON_SEP)
-	    button_count++;
+	ਜੇ (*str == DLG_BUTTON_SEP)
+	    button_ਗਿਣਤੀ++;
     }
 
-    if (title == NULL)
+    ਜੇ (title == ਨਿਰਾ)
 	title = "Vim";
 
     buttons_copy = alloc(len + 1);
-    button_array = ALLOC_MULT(char_u *, button_count);
-    if (buttons_copy != NULL && button_array != NULL)
+    button_array = ALLOC_MULT(char_u *, button_ਗਿਣਤੀ);
+    ਜੇ (buttons_copy != ਨਿਰਾ && button_array != ਨਿਰਾ)
     {
 	STRCPY(buttons_copy, buttons);
 
@@ -1551,90 +1551,90 @@ gui_mch_dialog(
 	 * button_array with the pointer to each NUL terminated string
 	 */
 	str = buttons_copy;
-	for (i = 0; i < button_count; i++)
+	ਲਈ (i = 0; i < button_ਗਿਣਤੀ; i++)
 	{
 	    button_array[ i ] = str;
-	    for (; *str; str++)
+	    ਲਈ (; *str; str++)
 	    {
-		if (*str == DLG_BUTTON_SEP)
+		ਜੇ (*str == DLG_BUTTON_SEP)
 		{
 		    *str++ = NUL;
-		    break;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
 # ifndef FEAT_GUI_TEXTDIALOG
-	dialog_result = PtAlert(
-		gui.vimWindow, NULL,
+	dialog_ਨਤੀਜਾ = PtAlert(
+		gui.vim_ਖਿੜਕੀ, ਨਿਰਾ,
 		title,
-		NULL,
-		message, NULL,
-		button_count, (const char **) button_array, NULL,
+		ਨਿਰਾ,
+		ਸੁਨੇਹਾ_2, ਨਿਰਾ,
+		button_ਗਿਣਤੀ, (ਅਚਲ ਅੱਖਰ **) button_array, ਨਿਰਾ,
 		default_button, 0, Pt_MODAL);
-# else
+# ਨਹੀਂਤਾਂ
 	// Writing the dialog ourselves lets us add extra features, like
 	// trapping the escape key and returning 0 to vim
 	{
-	    int n;
-	    PtArg_t args[5];
+	    ਪੂਰਨ n;
+	    PtArg_t ਦਲੀਲਾਂ[5];
 	    PtWidget_t *dialog, *pane;
 	    PtModalCtrl_t modal_ctrl;
 	    PtDialogInfo_t di;
 
-	    CLEAR_FIELD(di);
-	    CLEAR_FIELD(modal_ctrl);
+	    CLEAR_ਖੇਤਰ(di);
+	    CLEAR_ਖੇਤਰ(modal_ctrl);
 
 	    n = 0;
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_ROWS_COLS, 0, 0);
-	    PtSetArg(&args[n++], Pt_ARG_WIDTH, 350, 0);
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_ORIENTATION,
-		    Pt_GROUP_VERTICAL, 0);
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_FLAGS,
-		    Pt_TRUE, Pt_GROUP_NO_KEYS | Pt_GROUP_STRETCH_HORIZONTAL);
-	    PtSetArg(&args[n++], Pt_ARG_CONTAINER_FLAGS, Pt_FALSE, Pt_TRUE);
-	    pane = PtCreateWidget(PtGroup, NULL, n, args);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਸਮੂਹ_ਪੰਕਤੀਆਂ_ਖਾਨੇ_ਗਿਣਤੀ, 0, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਚੌੜਾਈ, 350, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਸਮੂਹ_ORIENTATION,
+		    Pt_ਸਮੂਹ_VERTICAL, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਸਮੂਹ_FLAGS,
+		    Pt_TRUE, Pt_ਸਮੂਹ_NO_ਕੁੰਜੀਆਂ | Pt_ਸਮੂਹ_STRETCH_HORIZONTAL);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_CONTAINER_FLAGS, Pt_FALSE, Pt_TRUE);
+	    pane = PtCreateWidget(Pt_ਸਮੂਹ, ਨਿਰਾ, n, ਦਲੀਲਾਂ);
 
 	    n = 0;
-	    PtSetArg(&args[n++], Pt_ARG_TEXT_STRING, message, 0);
-	    PtCreateWidget(PtLabel, pane, n, args);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਪਾਠ_STRING, ਸੁਨੇਹਾ_2, 0);
+	    PtCreateWidget(PtLabel, pane, n, ਦਲੀਲਾਂ);
 
-	    if (textfield != NULL)
+	    ਜੇ (textfield != ਨਿਰਾ)
 	    {
 		n = 0;
-		PtSetArg(&args[n++], Pt_ARG_MAX_LENGTH, IOSIZE - 1, 0);
-		PtSetArg(&args[n++], Pt_ARG_TEXT_STRING, textfield, 0);
-		PtSetArg(&args[n++], Pt_ARG_POINTER, textfield, 0);
-		gui_ph_dialog_text = PtCreateWidget(PtText, pane, n, args);
-		PtAddCallback(gui_ph_dialog_text, Pt_CB_ACTIVATE,
-			gui_ph_dialog_text_enter, &modal_ctrl);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_MAX_ਲੰਮਾਈ, IOSIZE - 1, 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਪਾਠ_STRING, textfield, 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[n++], Pt_ARG_ਸੂਚਕ, textfield, 0);
+		gui_ph_dialog_ਪਾਠ = PtCreateWidget(Pt_ਪਾਠ, pane, n, ਦਲੀਲਾਂ);
+		Pt_ਜੋੜੋ_Callback(gui_ph_dialog_ਪਾਠ, Pt_CB_ACTIVATE,
+			gui_ph_dialog_ਪਾਠ_enter, &modal_ctrl);
 	    }
 
-	    di.parent = gui.vimWindow;
+	    di.ਮਾਪਾ = gui.vim_ਖਿੜਕੀ;
 	    di.pane = pane;
 	    di.title = title;
-	    di.buttons = (const char **) button_array;
-	    di.nbtns = button_count;
+	    di.buttons = (ਅਚਲ ਅੱਖਰ **) button_array;
+	    di.nbtns = button_ਗਿਣਤੀ;
 	    di.def_btn = default_button;
 	    // This is just to give the dialog the close button.
 	    // We check for the Escape key ourselves and return 0
-	    di.esc_btn = button_count;
+	    di.esc_btn = button_ਗਿਣਤੀ;
 	    di.callback = gui_ph_dialog_close;
-	    di.data = &modal_ctrl;
+	    di.ਅੰਕੜੇ = &modal_ctrl;
 
 	    dialog = PtCreateDialog(&di);
-	    PtAddFilterCallback(dialog, Ph_EV_KEY,
+	    Pt_ਜੋੜੋ_Filter_Callback(dialog, Ph_EV_ਕੁੰਜੀ,
 		    gui_ph_dialog_esc, &modal_ctrl);
 
-	    if (gui_ph_dialog_text != NULL)
-		PtGiveFocus(gui_ph_dialog_text, NULL);
+	    ਜੇ (gui_ph_dialog_ਪਾਠ != ਨਿਰਾ)
+		PtGiveFocus(gui_ph_dialog_ਪਾਠ, ਨਿਰਾ);
 
 	    // Open dialog, block the vim window and wait for the dialog to close
 	    PtRealizeWidget(dialog);
 	    PtMakeModal(dialog, Ph_CURSOR_NOINPUT, Ph_CURSOR_DEFAULT_COLOR);
-	    dialog_result = (int) PtModalBlock(&modal_ctrl, 0);
+	    dialog_ਨਤੀਜਾ = (ਪੂਰਨ) Pt_Modal_ਖੰਡ(&modal_ctrl, 0);
 
 	    PtDestroyWidget(dialog);
-	    gui_ph_dialog_text = NULL;
+	    gui_ph_dialog_ਪਾਠ = ਨਿਰਾ;
 	}
 # endif
     }
@@ -1642,50 +1642,50 @@ gui_mch_dialog(
     vim_free(button_array);
     vim_free(buttons_copy);
 
-    return dialog_result;
+    ਵਾਪਸ dialog_ਨਤੀਜਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 ////////////////////////////////////////////////////////////////////////////
 // window size/position/state
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ਪੂਰਨ
+gui_mch_get_winpos(ਪੂਰਨ *x, ਪੂਰਨ *y)
 {
-    PhPoint_t *pos;
+    Ph_ਬਿੰਦੂ_t *pos;
 
-    pos = PtWidgetPos(gui.vimWindow, NULL);
+    pos = PtWidgetPos(gui.vim_ਖਿੜਕੀ, ਨਿਰਾ);
 
     *x = pos->x;
     *y = pos->y;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    void
-gui_mch_set_winpos(int x, int y)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_winpos(ਪੂਰਨ x, ਪੂਰਨ y)
 {
-    PhPoint_t pos = { x, y };
+    Ph_ਬਿੰਦੂ_t pos = { x, y };
 
-    PtSetResource(gui.vimWindow, Pt_ARG_POS, &pos, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਖਿੜਕੀ, Pt_ARG_POS, &pos, 0);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width, int min_height, int base_width, int base_height,
-	int direction)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_shellsize(ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ,
+	ਪੂਰਨ min_ਚੌੜਾਈ, ਪੂਰਨ min_ਉਚਾਈ, ਪੂਰਨ ਅਧਾਰ_ਚੌੜਾਈ, ਪੂਰਨ ਅਧਾਰ_ਉਚਾਈ,
+	ਪੂਰਨ direction)
 {
-    PhDim_t window_size = { width, height };
-    PhDim_t min_size = { min_width, min_height };
+    PhDim_t ਖਿੜਕੀ_ਮਾਪ = { ਚੌੜਾਈ, ਉਚਾਈ };
+    PhDim_t min_ਮਾਪ = { min_ਚੌੜਾਈ, min_ਉਚਾਈ };
 
-#ifdef USE_PANEL_GROUP
-    window_size.w += pg_margin_left + pg_margin_right;
-    window_size.h += pg_margin_top + pg_margin_bottom;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+    ਖਿੜਕੀ_ਮਾਪ.w += pg_margin_ਖੱਬਾ + pg_margin_ਸੱਜਾ;
+    ਖਿੜਕੀ_ਮਾਪ.h += pg_margin_ਸਿਖਰ + pg_margin_bottom;
+#ਜੇ_ਅੰਤ
 
-    PtSetResource(gui.vimWindow, Pt_ARG_MINIMUM_DIM, &min_size, 0);
-    PtSetResource(gui.vimWindow, Pt_ARG_DIM, &window_size, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਖਿੜਕੀ, Pt_ARG_MINIMUM_DIM, &min_ਮਾਪ, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਖਿੜਕੀ, Pt_ARG_DIM, &ਖਿੜਕੀ_ਮਾਪ, 0);
 
-    if (! PtWidgetIsRealized(gui.vimWindow))
+    ਜੇ (! PtWidgetIsRealized(gui.vim_ਖਿੜਕੀ))
 	gui_ph_resize_container();
 }
 
@@ -1693,102 +1693,102 @@ gui_mch_set_shellsize(int width, int height,
  * Return the amount of screen space that hasn't been allocated (such as
  * by the shelf).
  */
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    ਖਾਲੀ
+gui_mch_get_screen_dimensions(ਪੂਰਨ *screen_w, ਪੂਰਨ *screen_h)
 {
     PhRect_t console;
 
-    PhWindowQueryVisible(Ph_QUERY_WORKSPACE, 0,
-	    PhInputGroup(NULL), &console);
+    Ph_ਖਿੜਕੀ_Query_Visible(Ph_QUERY_WORKSPACE, 0,
+	    Ph_ਨਿਵੇਸ਼_ਸਮੂਹ(ਨਿਰਾ), &console);
 
     *screen_w = console.lr.x - console.ul.x + 1;
     *screen_h = console.lr.y - console.ul.y + 1;
 }
 
-    void
-gui_mch_iconify(void)
+    ਖਾਲੀ
+gui_mch_iconify(ਖਾਲੀ)
 {
-    PhWindowEvent_t event;
+    Ph_ਖਿੜਕੀ_Event_t event;
 
-    CLEAR_FIELD(event);
+    CLEAR_ਖੇਤਰ(event);
     event.event_f = Ph_WM_HIDE;
     event.event_state = Ph_WM_EVSTATE_HIDE;
-    event.rid = PtWidgetRid(gui.vimWindow);
-    PtForwardWindowEvent(&event);
+    event.rid = PtWidgetRid(gui.vim_ਖਿੜਕੀ);
+    Pt_Forward_ਖਿੜਕੀ_Event(&event);
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_foreground(ਖਾਲੀ)
 {
-    PhWindowEvent_t event;
+    Ph_ਖਿੜਕੀ_Event_t event;
 
-    CLEAR_FIELD(event);
+    CLEAR_ਖੇਤਰ(event);
     event.event_f = Ph_WM_TOFRONT;
     event.event_state = Ph_WM_EVSTATE_FFRONT;
-    event.rid = PtWidgetRid(gui.vimWindow);
-    PtForwardWindowEvent(&event);
+    event.rid = PtWidgetRid(gui.vim_ਖਿੜਕੀ);
+    Pt_Forward_ਖਿੜਕੀ_Event(&event);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
+    ਖਾਲੀ
 gui_mch_settitle(char_u *title,	char_u *icon)
 {
-#ifdef USE_PANEL_GROUP
-    gui_ph_pg_set_buffer_num(curwin->w_buffer->b_fnum);
-#endif
-    PtSetResource(gui.vimWindow, Pt_ARG_WINDOW_TITLE, title, 0);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+    gui_ph_pg_ਸੈੱਟ_ਬਫਰ_ਅੰਕ(curwin->w_ਬਫਰ->b_fnum);
+#ਜੇ_ਅੰਤ
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਖਿੜਕੀ, Pt_ARG_ਖਿੜਕੀ_TITLE, title, 0);
     // Not sure what to do with the icon text, set balloon text somehow?
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Scrollbar
 
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, int val, int size, int max)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_thumb(scrollbar_T *sb, ਪੂਰਨ val, ਪੂਰਨ ਮਾਪ, ਪੂਰਨ max)
 {
-    int	    n = 0;
-    PtArg_t args[3];
+    ਪੂਰਨ	    n = 0;
+    PtArg_t ਦਲੀਲਾਂ[3];
 
-    PtSetArg(&args[ n++ ], Pt_ARG_MAXIMUM, max, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_SLIDER_SIZE, size, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_GAUGE_VALUE, val, 0);
-    PtSetResources(sb->id, n, args);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਵੱਧ_ਤੋਂ_ਵੱਧ, max, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_SLIDER_ਮਾਪ, ਮਾਪ, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_GAUGE_ਮੁੱਲ, val, 0);
+    Pt_ਸੈੱਟ_Resources(sb->id, n, ਦਲੀਲਾਂ);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_scrollbar_pos(scrollbar_T *sb, ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
     PhArea_t area = {{ x, y }, { w, h }};
 
-    PtSetResource(sb->id, Pt_ARG_AREA, &area, 0);
+    Pt_ਸੈੱਟ_Resource(sb->id, Pt_ARG_AREA, &area, 0);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_xpadding(ਖਾਲੀ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ਪੂਰਨ
+gui_mch_get_scrollbar_ypadding(ਖਾਲੀ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    ਖਾਲੀ
+gui_mch_create_scrollbar(scrollbar_T *sb, ਪੂਰਨ orient)
 {
-    int	    n = 0;
+    ਪੂਰਨ	    n = 0;
 //    int	    anchor_flags = 0;
-    PtArg_t args[4];
+    PtArg_t ਦਲੀਲਾਂ[4];
 
     /*
      * Stop the scrollbar from being realized when the parent
@@ -1796,71 +1796,71 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
      *
      * Also, don't let the scrollbar get focus
      */
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE,
 	    Pt_DELAY_REALIZE | Pt_GETS_FOCUS);
-    PtSetArg(&args[ n++ ], Pt_ARG_SCROLLBAR_FLAGS, Pt_SCROLLBAR_SHOW_ARROWS, 0);
-#if 0
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_SCROLLBAR_FLAGS, Pt_SCROLLBAR_SHOW_ARROWS, 0);
+#ਜੇ 0
     // Don't need this anchoring for the scrollbars
-    if (orient == SBAR_HORIZ)
+    ਜੇ (orient == SBAR_HORIZ)
     {
 	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM |
-	    Pt_LEFT_ANCHORED_LEFT | Pt_RIGHT_ANCHORED_RIGHT;
+	    Pt_ਖੱਬਾ_ANCHORED_ਖੱਬਾ | Pt_ਸੱਜਾ_ANCHORED_ਸੱਜਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_TOP_ANCHORED_TOP;
-	if (sb->wp != NULL)
+	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_ਸਿਖਰ_ANCHORED_ਸਿਖਰ;
+	ਜੇ (sb->wp != ਨਿਰਾ)
 	{
-	    if (sb == &sb->wp->w_scrollbars[ SBAR_LEFT ])
-		anchor_flags |= Pt_LEFT_ANCHORED_LEFT;
-	    else
-		anchor_flags |= Pt_RIGHT_ANCHORED_RIGHT;
+	    ਜੇ (sb == &sb->wp->w_scrollbars[ SBAR_ਖੱਬਾ ])
+		anchor_flags |= Pt_ਖੱਬਾ_ANCHORED_ਖੱਬਾ;
+	    ਨਹੀਂਤਾਂ
+		anchor_flags |= Pt_ਸੱਜਾ_ANCHORED_ਸੱਜਾ;
 	}
     }
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, anchor_flags, Pt_IS_ANCHORED);
-#endif
-    PtSetArg(&args[ n++ ], Pt_ARG_ORIENTATION,
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ANCHOR_FLAGS, anchor_flags, Pt_IS_ANCHORED);
+#ਜੇ_ਅੰਤ
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ORIENTATION,
 	    (orient == SBAR_HORIZ) ? Pt_HORIZONTAL : Pt_VERTICAL, 0);
-#ifdef USE_PANEL_GROUP
-    sb->id = PtCreateWidget(PtScrollbar, gui.vimPanelGroup, n, args);
-#else
-    sb->id = PtCreateWidget(PtScrollbar, gui.vimContainer, n, args);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_PANEL_ਸਮੂਹ
+    sb->id = PtCreateWidget(PtScrollbar, gui.vim_Panel_ਸਮੂਹ, n, ਦਲੀਲਾਂ);
+#ਨਹੀਂਤਾਂ
+    sb->id = PtCreateWidget(PtScrollbar, gui.vimContainer, n, ਦਲੀਲਾਂ);
+#ਜੇ_ਅੰਤ
 
-    PtAddCallback(sb->id, Pt_CB_SCROLLBAR_MOVE, gui_ph_handle_scrollbar, sb);
+    Pt_ਜੋੜੋ_Callback(sb->id, Pt_CB_SCROLLBAR_MOVE, gui_ph_handle_scrollbar, sb);
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    ਖਾਲੀ
+gui_mch_enable_scrollbar(scrollbar_T *sb, ਪੂਰਨ flag)
 {
-    if (flag != 0)
+    ਜੇ (flag != 0)
 	PtRealizeWidget(sb->id);
-    else
+    ਨਹੀਂਤਾਂ
 	PtUnrealizeWidget(sb->id);
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
     PtDestroyWidget(sb->id);
-    sb->id = NULL;
+    sb->id = ਨਿਰਾ;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Mouse functions
 
-#if defined(FEAT_MOUSESHAPE)
+#ਜੇ defined(FEAT_MOUSESHAPE)
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
+ਸਥਿਰ ਪੂਰਨ ਆਖਰੀ_shape = 0;
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+ਸਥਿਰ ਪੂਰਨ mshape_ids[] =
 {
-    Ph_CURSOR_POINTER,		// arrow
+    Ph_CURSOR_ਸੂਚਕ,		// arrow
     Ph_CURSOR_NONE,		// blank
-    Ph_CURSOR_INSERT,		// beam
+    Ph_CURSOR_ਪਾਓ,		// beam
     Ph_CURSOR_DRAG_VERTICAL,	// updown
     Ph_CURSOR_DRAG_VERTICAL,	// udsizing
     Ph_CURSOR_DRAG_HORIZONTAL,	// leftright
@@ -1871,80 +1871,80 @@ static int mshape_ids[] =
     Ph_CURSOR_FINGER,		// hand1
     Ph_CURSOR_FINGER,		// hand2
     Ph_CURSOR_FINGER,		// pencil
-    Ph_CURSOR_QUESTION_POINT,	// question
-    Ph_CURSOR_POINTER,		// right-arrow
-    Ph_CURSOR_POINTER,		// up-arrow
-    Ph_CURSOR_POINTER		// last one
+    Ph_CURSOR_QUESTION_ਬਿੰਦੂ,	// question
+    Ph_CURSOR_ਸੂਚਕ,		// right-arrow
+    Ph_CURSOR_ਸੂਚਕ,		// up-arrow
+    Ph_CURSOR_ਸੂਚਕ		// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    ਖਾਲੀ
+mch_ਸੈੱਟ_mouse_shape(ਪੂਰਨ shape)
 {
-    int	    id;
+    ਪੂਰਨ	    id;
 
-    if (!gui.in_use)
-	return;
+    ਜੇ (!gui.ਵਿੱਚ_use)
+	ਵਾਪਸ;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, Ph_CURSOR_NONE,
+    ਜੇ (shape == MSHAPE_HIDE || gui.ਸੂਚਕ_hidden)
+	Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_CURSOR_TYPE, Ph_CURSOR_NONE,
 		0);
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (shape >= MSHAPE_NUMBERED)
-	    id = Ph_CURSOR_POINTER;
-	else
+	ਜੇ (shape >= MSHAPE_NUMBERED)
+	    id = Ph_CURSOR_ਸੂਚਕ;
+	ਨਹੀਂਤਾਂ
 	    id = mshape_ids[shape];
 
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, id,	0);
+	Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_CURSOR_TYPE, id,	0);
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    ਜੇ (shape != MSHAPE_HIDE)
+	ਆਖਰੀ_shape = shape;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-gui_mch_mousehide(int hide)
+    ਖਾਲੀ
+gui_mch_mousehide(ਪੂਰਨ hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ਜੇ (gui.ਸੂਚਕ_hidden == hide)
+	ਵਾਪਸ;
 
-    gui.pointer_hidden = hide;
-#ifdef FEAT_MOUSESHAPE
-    if (hide)
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
+    gui.ਸੂਚਕ_hidden = hide;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MOUSESHAPE
+    ਜੇ (hide)
+	Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_CURSOR_TYPE,
 		Ph_CURSOR_NONE, 0);
-    else
-	mch_set_mouse_shape(last_shape);
-#else
-    PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
+    ਨਹੀਂਤਾਂ
+	mch_ਸੈੱਟ_mouse_shape(ਆਖਰੀ_shape);
+#ਨਹੀਂਤਾਂ
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_CURSOR_TYPE,
 	    (hide == MOUSE_SHOW) ? GUI_PH_MOUSE_TYPE : Ph_CURSOR_NONE,
 	    0);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    ਖਾਲੀ
+gui_mch_getmouse(ਪੂਰਨ *x, ਪੂਰਨ *y)
 {
     PhCursorInfo_t info;
-    short ix, iy;
+    ਛੋਟਾ ix, iy;
 
     // FIXME: does this return the correct position,
     // with respect to the border?
-    PhQueryCursor(PhInputGroup(NULL), &info);
-    PtGetAbsPosition(gui.vimTextArea , &ix, &iy);
+    PhQueryCursor(Ph_ਨਿਵੇਸ਼_ਸਮੂਹ(ਨਿਰਾ), &info);
+    PtGetAbsPosition(gui.vim_ਪਾਠ_Area , &ix, &iy);
 
     *x = info.pos.x - ix;
     *y = info.pos.y - iy;
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    ਖਾਲੀ
+gui_mch_setmouse(ਪੂਰਨ x, ਪੂਰਨ y)
 {
-    short abs_x, abs_y;
+    ਛੋਟਾ abs_x, abs_y;
 
-    PtGetAbsPosition(gui.vimTextArea, &abs_x, &abs_y);
+    PtGetAbsPosition(gui.vim_ਪਾਠ_Area, &abs_x, &abs_y);
     // Add the border offset?
-    PhMoveCursorAbs(PhInputGroup(NULL), abs_x + x, abs_y + y);
+    PhMoveCursorAbs(Ph_ਨਿਵੇਸ਼_ਸਮੂਹ(ਨਿਰਾ), abs_x + x, abs_y + y);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1956,40 +1956,40 @@ gui_mch_setmouse(int x, int y)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)(PgRGB(PgRedValue(pixel),
-				     PgGreenValue(pixel), PgBlueValue(pixel)));
+    ਵਾਪਸ (guicolor_T)(PgRGB(Pg_Red_ਮੁੱਲ(pixel),
+				     Pg_Green_ਮੁੱਲ(pixel), Pg_Blue_ਮੁੱਲ(pixel)));
 }
 
-    void
-gui_mch_new_colors(void)
+    ਖਾਲੀ
+gui_mch_new_colors(ਖਾਲੀ)
 {
-#if 0 // Don't bother changing the cursor colour
-    short color_diff;
+#ਜੇ 0 // Don't bother changing the cursor colour
+    ਛੋਟਾ color_diff;
 
     /*
      * If there isn't enough difference between the background colour and
      * the mouse pointer colour then change the mouse pointer colour
      */
     color_diff = gui_get_lightness(gui_ph_mouse_color)
-					  - gui_get_lightness(gui.back_pixel);
+					  - gui_get_lightness(gui.ਪਿੱਠ_pixel);
 
-    if (abs(color_diff) < 64)
+    ਜੇ (ਨਿਰਪੇਖ(color_diff) < 64)
     {
-	short r, g, b;
+	ਛੋਟਾ r, g, b;
 	// not a great algorithm...
-	r = PgRedValue(gui_ph_mouse_color) ^ 255;
-	g = PgGreenValue(gui_ph_mouse_color) ^ 255;
-	b = PgBlueValue(gui_ph_mouse_color) ^ 255;
+	r = Pg_Red_ਮੁੱਲ(gui_ph_mouse_color) ^ 255;
+	g = Pg_Green_ਮੁੱਲ(gui_ph_mouse_color) ^ 255;
+	b = Pg_Blue_ਮੁੱਲ(gui_ph_mouse_color) ^ 255;
 
 # ifndef FEAT_MOUSESHAPE
 	gui_ph_mouse_color = PgRGB(r, g, b);
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_COLOR,
+	Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_CURSOR_COLOR,
 		gui_ph_mouse_color, 0);
 # endif
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    PtSetResource(gui.vimTextArea, Pt_ARG_FILL_COLOR, gui.back_pixel, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_FILL_COLOR, gui.ਪਿੱਠ_pixel, 0);
 }
 
 /*
@@ -2003,301 +2003,301 @@ gui_mch_new_colors(void)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    ਵਾਪਸ gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ਪੂਰਨ r, ਪੂਰਨ g, ਪੂਰਨ b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ਵਾਪਸ gui_get_rgb_color_cmn(r, g, b);
 }
 
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_fg_color(guicolor_T color)
 {
-    PgSetTextColor(color);
+    Pg_ਸੈੱਟ_ਪਾਠ_Color(color);
 }
 
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_bg_color(guicolor_T color)
 {
-    PgSetFillColor(color);
+    Pg_ਸੈੱਟ_Fill_Color(color);
 }
 
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_sp_color(guicolor_T color)
 {
 }
 
-    void
-gui_mch_invert_rectangle(int row, int col, int nr, int nc)
+    ਖਾਲੀ
+gui_mch_invert_rectangle(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ, ਪੂਰਨ nr, ਪੂਰਨ nc)
 {
     PhRect_t rect;
 
-    rect.ul.x = FILL_X(col);
-    rect.ul.y = FILL_Y(row);
+    rect.ul.x = FILL_X(ਖਾਨਾ);
+    rect.ul.y = FILL_Y(ਪੰਕਤੀ);
 
     // FIXME: This has an off by one pixel problem
-    rect.lr.x = rect.ul.x + nc * gui.char_width;
-    rect.lr.y = rect.ul.y + nr * gui.char_height;
-    if (nc > 0)
+    rect.lr.x = rect.ul.x + nc * gui.char_ਚੌੜਾਈ;
+    rect.lr.y = rect.ul.y + nr * gui.char_ਉਚਾਈ;
+    ਜੇ (nc > 0)
 	rect.lr.x -= 1;
-    if (nr > 0)
+    ਜੇ (nr > 0)
 	rect.lr.y -= 1;
 
-    DRAW_START;
-    PgSetDrawMode(Pg_DrawModeDSTINVERT);
+    DRAW_ਸ਼ੁਰੂ;
+    Pg_ਸੈੱਟ_Draw_ਬਹੁਲਕ(Pg_Draw_ਬਹੁਲਕ_DSTINVERT);
     PgDrawRect(&rect, Pg_DRAW_FILL);
-    PgSetDrawMode(Pg_DrawModeSRCCOPY);
-    DRAW_END;
+    Pg_ਸੈੱਟ_Draw_ਬਹੁਲਕ(Pg_Draw_ਬਹੁਲਕ_SRCCOPY);
+    DRAW_ਸਿਰਾ;
 }
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    ਖਾਲੀ
+gui_mch_clear_ਖੰਡ(ਪੂਰਨ row1, ਪੂਰਨ col1, ਪੂਰਨ row2, ਪੂਰਨ col2)
 {
-    PhRect_t block = {
+    PhRect_t ਖੰਡ = {
 	{ FILL_X(col1), FILL_Y(row1) },
 	{ FILL_X(col2 + 1) - 1, FILL_Y(row2 + 1) - 1}
     };
 
-    DRAW_START;
-    gui_mch_set_bg_color(gui.back_pixel);
-    PgDrawRect(&block, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_ਸ਼ੁਰੂ;
+    gui_mch_ਸੈੱਟ_bg_color(gui.ਪਿੱਠ_pixel);
+    PgDrawRect(&ਖੰਡ, Pg_DRAW_FILL);
+    DRAW_ਸਿਰਾ;
 }
 
-    void
-gui_mch_clear_all(void)
+    ਖਾਲੀ
+gui_mch_clear_all(ਖਾਲੀ)
 {
-    PhRect_t text_rect = {
-	{ gui.border_width, gui.border_width },
-	{ Columns * gui.char_width + gui.border_width - 1 ,
-	    Rows * gui.char_height + gui.border_width - 1 }
+    PhRect_t ਪਾਠ_rect = {
+	{ gui.border_ਚੌੜਾਈ, gui.border_ਚੌੜਾਈ },
+	{ Columns * gui.char_ਚੌੜਾਈ + gui.border_ਚੌੜਾਈ - 1 ,
+	    ਪੰਕਤੀਆਂ * gui.char_ਉਚਾਈ + gui.border_ਚੌੜਾਈ - 1 }
     };
 
-    if (is_ignore_draw == TRUE)
-	return;
+    ਜੇ (is_ignore_draw == TRUE)
+	ਵਾਪਸ;
 
-    DRAW_START;
-    gui_mch_set_bg_color(gui.back_pixel);
-    PgDrawRect(&text_rect, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_ਸ਼ੁਰੂ;
+    gui_mch_ਸੈੱਟ_bg_color(gui.ਪਿੱਠ_pixel);
+    PgDrawRect(&ਪਾਠ_rect, Pg_DRAW_FILL);
+    DRAW_ਸਿਰਾ;
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    ਖਾਲੀ
+gui_mch_delete_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ)
 {
     PhRect_t    rect;
-    PhPoint_t   delta;
+    Ph_ਬਿੰਦੂ_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
-    rect.ul.y = FILL_Y(row + num_lines);
+    rect.ul.x = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    rect.ul.y = FILL_Y(ਪੰਕਤੀ + ਅੰਕ_ਸਤਰਾਂ);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - 1;
     rect.lr.y = FILL_Y(gui.scroll_region_bot + 1) - 1;
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
-    PhTranslateRect(&rect, &gui_ph_raw_offset);
+    Pt_Widget_ਵਿੱਥ(gui.vim_ਪਾਠ_Area, &gui_ph_raw_ਵਿੱਥ);
+    Ph_Translate_ਬਿੰਦੂ(&gui_ph_raw_ਵਿੱਥ, PtWidgetPos(gui.vim_ਪਾਠ_Area, ਨਿਰਾ));
+    PhTranslateRect(&rect, &gui_ph_raw_ਵਿੱਥ);
 
     delta.x = 0;
-    delta.y = -num_lines * gui.char_height;
+    delta.y = -ਅੰਕ_ਸਤਰਾਂ * gui.char_ਉਚਾਈ;
 
     PgFlush();
 
-    PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)), &rect, &delta);
+    PhBlit(PtWidgetRid(Pt_ਲੱਭੋ_Disjoint(gui.vim_ਪਾਠ_Area)), &rect, &delta);
 
-    gui_clear_block(
-	gui.scroll_region_bot - num_lines + 1,
-	gui.scroll_region_left,
+    gui_clear_ਖੰਡ(
+	gui.scroll_region_bot - ਅੰਕ_ਸਤਰਾਂ + 1,
+	gui.scroll_region_ਖੱਬਾ,
 	gui.scroll_region_bot,
-	gui.scroll_region_right);
+	gui.scroll_region_ਸੱਜਾ);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    ਖਾਲੀ
+gui_mch_ਪਾਓ_ਸਤਰਾਂ(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਅੰਕ_ਸਤਰਾਂ)
 {
     PhRect_t    rect;
-    PhPoint_t   delta;
+    Ph_ਬਿੰਦੂ_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
-    rect.ul.y = FILL_Y(row);
+    rect.ul.x = FILL_X(gui.scroll_region_ਖੱਬਾ);
+    rect.ul.y = FILL_Y(ਪੰਕਤੀ);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
-    rect.lr.y = FILL_Y(gui.scroll_region_bot - num_lines + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_ਸੱਜਾ + 1) - 1;
+    rect.lr.y = FILL_Y(gui.scroll_region_bot - ਅੰਕ_ਸਤਰਾਂ + 1) - 1;
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
-    PhTranslateRect(&rect, &gui_ph_raw_offset);
+    Pt_Widget_ਵਿੱਥ(gui.vim_ਪਾਠ_Area, &gui_ph_raw_ਵਿੱਥ);
+    Ph_Translate_ਬਿੰਦੂ(&gui_ph_raw_ਵਿੱਥ, PtWidgetPos(gui.vim_ਪਾਠ_Area, ਨਿਰਾ));
+    PhTranslateRect(&rect, &gui_ph_raw_ਵਿੱਥ);
 
     delta.x = 0;
-    delta.y = num_lines * gui.char_height;
+    delta.y = ਅੰਕ_ਸਤਰਾਂ * gui.char_ਉਚਾਈ;
 
     PgFlush();
 
-    PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)) , &rect, &delta);
+    PhBlit(PtWidgetRid(Pt_ਲੱਭੋ_Disjoint(gui.vim_ਪਾਠ_Area)) , &rect, &delta);
 
-    gui_clear_block(row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_ਖੰਡ(ਪੰਕਤੀ, gui.scroll_region_ਖੱਬਾ,
+	    ਪੰਕਤੀ + ਅੰਕ_ਸਤਰਾਂ - 1, gui.scroll_region_ਸੱਜਾ);
 }
 
-    void
-gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
+    ਖਾਲੀ
+gui_mch_draw_string(ਪੂਰਨ ਪੰਕਤੀ, ਪੂਰਨ ਖਾਨਾ, char_u *s, ਪੂਰਨ len, ਪੂਰਨ flags)
 {
-    static char *utf8_buffer = NULL;
-    static int	utf8_len = 0;
+    ਸਥਿਰ ਅੱਖਰ *utf8_ਬਫਰ = ਨਿਰਾ;
+    ਸਥਿਰ ਪੂਰਨ	utf8_len = 0;
 
-    PhPoint_t	pos = { TEXT_X(col), TEXT_Y(row) };
+    Ph_ਬਿੰਦੂ_t	pos = { ਪਾਠ_X(ਖਾਨਾ), ਪਾਠ_Y(ਪੰਕਤੀ) };
     PhRect_t	rect;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    ਜੇ (is_ignore_draw == TRUE)
+	ਵਾਪਸ;
 
-    DRAW_START;
+    DRAW_ਸ਼ੁਰੂ;
 
-    if (!(flags & DRAW_TRANSP))
+    ਜੇ (!(flags & DRAW_TRANSP))
     {
 	PgDrawIRect(
-		FILL_X(col), FILL_Y(row),
-		FILL_X(col + len) - 1, FILL_Y(row + 1) - 1,
+		FILL_X(ਖਾਨਾ), FILL_Y(ਪੰਕਤੀ),
+		FILL_X(ਖਾਨਾ + len) - 1, FILL_Y(ਪੰਕਤੀ + 1) - 1,
 		Pg_DRAW_FILL);
     }
 
-    if (flags & DRAW_UNDERL)
-	PgSetUnderline(gui.norm_pixel, Pg_TRANSPARENT, 0);
+    ਜੇ (flags & DRAW_UNDERL)
+	Pg_ਸੈੱਟ_Underline(gui.norm_pixel, Pg_TRANSPARENT, 0);
 
-    if (charset_translate != NULL && enc_utf8 == 0)
+    ਜੇ (charset_translate != ਨਿਰਾ && enc_utf8 == 0)
     {
-	int src_taken, dst_made;
+	ਪੂਰਨ src_ਲਿਆ, dst_made;
 
 	// Use a static buffer to avoid large amounts of de/allocations
-	if (utf8_len < len)
+	ਜੇ (utf8_len < len)
 	{
-	    char *new_buffer = realloc(utf8_buffer, len * MB_LEN_MAX);
+	    ਅੱਖਰ *new_ਬਫਰ = realloc(utf8_ਬਫਰ, len * MB_LEN_MAX);
 
-	    if (new_buffer == NULL)
-		return;
-	    utf8_buffer = new_buffer;
+	    ਜੇ (new_ਬਫਰ == ਨਿਰਾ)
+		ਵਾਪਸ;
+	    utf8_ਬਫਰ = new_ਬਫਰ;
 	    utf8_len = len;
 	}
 
-	PxTranslateToUTF(
+	Px_Translate_ਮੰਜ਼ਿਲ_UTF(
 		charset_translate,
 		s,
 		len,
-		&src_taken,
-		utf8_buffer,
+		&src_ਲਿਆ,
+		utf8_ਬਫਰ,
 		utf8_len,
 		&dst_made);
-	s = utf8_buffer;
+	s = utf8_ਬਫਰ;
 	len = dst_made;
     }
 
-    PgDrawText(s, len, &pos, 0);
+    Pg_Draw_ਪਾਠ(s, len, &pos, 0);
 
-    if (flags & DRAW_BOLD)
+    ਜੇ (flags & DRAW_BOLD)
     {
 	// FIXME: try and only calculate these values once...
-	rect.ul.x = FILL_X(col) + 1;
-	rect.ul.y = FILL_Y(row);
-	rect.lr.x = FILL_X(col + len) - 1;
-	rect.lr.y = FILL_Y(row + 1) - 1;
+	rect.ul.x = FILL_X(ਖਾਨਾ) + 1;
+	rect.ul.y = FILL_Y(ਪੰਕਤੀ);
+	rect.lr.x = FILL_X(ਖਾਨਾ + len) - 1;
+	rect.lr.y = FILL_Y(ਪੰਕਤੀ + 1) - 1;
 	// PgSetUserClip(NULL) causes the scrollbar to not redraw...
-#if 0
+#ਜੇ 0
 	pos.x++;
 
-	PgSetUserClip(&rect);
-	PgDrawText(s, len, &pos, 0);
-	PgSetUserClip(NULL);
-#else
+	Pg_ਸੈੱਟ_User_Clip(&rect);
+	Pg_Draw_ਪਾਠ(s, len, &pos, 0);
+	Pg_ਸੈੱਟ_User_Clip(ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
 	rect.lr.y -= (p_linespace + 1) / 2;
 	// XXX: DrawTextArea doesn't work with phditto
-	PgDrawTextArea(s, len, &rect, Pg_TEXT_BOTTOM);
-#endif
+	Pg_Draw_ਪਾਠ_Area(s, len, &rect, Pg_ਪਾਠ_BOTTOM);
+#ਜੇ_ਅੰਤ
     }
 
-    if (flags & DRAW_UNDERL)
-	PgSetUnderline(Pg_TRANSPARENT, Pg_TRANSPARENT, 0);
+    ਜੇ (flags & DRAW_UNDERL)
+	Pg_ਸੈੱਟ_Underline(Pg_TRANSPARENT, Pg_TRANSPARENT, 0);
 
-    DRAW_END;
+    DRAW_ਸਿਰਾ;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Cursor
 
-    void
+    ਖਾਲੀ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     PhRect_t r;
 
     // FIXME: Double width characters
 
-    r.ul.x = FILL_X(gui.col);
-    r.ul.y = FILL_Y(gui.row);
-    r.lr.x = r.ul.x + gui.char_width - 1;
-    r.lr.y = r.ul.y + gui.char_height - 1;
+    r.ul.x = FILL_X(gui.ਖਾਨਾ);
+    r.ul.y = FILL_Y(gui.ਪੰਕਤੀ);
+    r.lr.x = r.ul.x + gui.char_ਚੌੜਾਈ - 1;
+    r.lr.y = r.ul.y + gui.char_ਉਚਾਈ - 1;
 
-    DRAW_START;
-    PgSetStrokeColor(color);
+    DRAW_ਸ਼ੁਰੂ;
+    Pg_ਸੈੱਟ_Stroke_Color(color);
     PgDrawRect(&r, Pg_DRAW_STROKE);
-    DRAW_END;
+    DRAW_ਸਿਰਾ;
 }
 
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    ਖਾਲੀ
+gui_mch_draw_part_cursor(ਪੂਰਨ w, ਪੂਰਨ h, guicolor_T color)
 {
     PhRect_t r;
 
-    r.ul.x = FILL_X(gui.col);
-    r.ul.y = FILL_Y(gui.row) + gui.char_height - h;
+    r.ul.x = FILL_X(gui.ਖਾਨਾ);
+    r.ul.y = FILL_Y(gui.ਪੰਕਤੀ) + gui.char_ਉਚਾਈ - h;
     r.lr.x = r.ul.x + w - 1;
     r.lr.y = r.ul.y + h - 1;
 
-    DRAW_START;
-    gui_mch_set_bg_color(color);
+    DRAW_ਸ਼ੁਰੂ;
+    gui_mch_ਸੈੱਟ_bg_color(color);
     PgDrawRect(&r, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_ਸਿਰਾ;
 }
 
-    int
-gui_mch_is_blinking(void)
+    ਪੂਰਨ
+gui_mch_is_blinking(ਖਾਲੀ)
 {
-    return blink_state != BLINK_NONE;
+    ਵਾਪਸ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ਪੂਰਨ
+gui_mch_is_blink_off(ਖਾਲੀ)
 {
-    return blink_state == BLINK_OFF;
+    ਵਾਪਸ blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long wait, long on, long off)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_blinking(ਲੰਮਾ wait, ਲੰਮਾ on, ਲੰਮਾ off)
 {
     blink_waittime = wait;
     blink_ontime = on;
     blink_offtime = off;
 }
 
-    void
-gui_mch_start_blink(void)
+    ਖਾਲੀ
+gui_mch_ਸ਼ੁਰੂ_blink(ਖਾਲੀ)
 {
     // Only turn on the timer on if none of the times are zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ਜੇ (blink_waittime && blink_ontime && blink_offtime && gui.ਵਿੱਚ_focus)
     {
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_ਸੈੱਟ_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_waittime, 0);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ਖਾਲੀ
+gui_mch_stop_blink(ਪੂਰਨ may_call_gui_update_cursor)
 {
-    PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL, 0, 0);
+    Pt_ਸੈੱਟ_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL, 0, 0);
 
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ਜੇ (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
 
     blink_state = BLINK_NONE;
@@ -2306,60 +2306,60 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
 ////////////////////////////////////////////////////////////////////////////
 // miscellaneous functions
 
-    void
-gui_mch_beep(void)
+    ਖਾਲੀ
+gui_mch_beep(ਖਾਲੀ)
 {
     PtBeep();
 }
 
-    void
-gui_mch_flash(int msec)
+    ਖਾਲੀ
+gui_mch_flash(ਪੂਰਨ msec)
 {
-    PgSetFillXORColor(Pg_BLACK, Pg_WHITE);
-    PgSetDrawMode(Pg_DRAWMODE_XOR);
+    Pg_ਸੈੱਟ_Fill_XORColor(Pg_BLACK, Pg_WHITE);
+    Pg_ਸੈੱਟ_Draw_ਬਹੁਲਕ(Pg_DRAWMODE_XOR);
     gui_mch_clear_all();
     gui_mch_flush();
 
-    ui_delay((long) msec, TRUE);
+    ui_delay((ਲੰਮਾ) msec, TRUE);
 
     gui_mch_clear_all();
-    PgSetDrawMode(Pg_DRAWMODE_OPAQUE);
+    Pg_ਸੈੱਟ_Draw_ਬਹੁਲਕ(Pg_DRAWMODE_OPAQUE);
     gui_mch_flush();
 }
 
-    void
-gui_mch_flush(void)
+    ਖਾਲੀ
+gui_mch_flush(ਖਾਲੀ)
 {
     PgFlush();
 }
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_ਪਾਠ_area_pos(ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
     PhArea_t area = {{x, y}, {w, h}};
 
-    PtSetResource(gui.vimTextArea, Pt_ARG_AREA, &area, 0);
+    Pt_ਸੈੱਟ_Resource(gui.vim_ਪਾਠ_Area, Pt_ARG_AREA, &area, 0);
 }
 
-    int
+    ਪੂਰਨ
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ਪੂਰਨ i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    ਲਈ (i = 0; special_ਕੁੰਜੀਆਂ[i].ਕੁੰਜੀ_sym != 0; i++)
+	ਜੇ (name[0] == special_ਕੁੰਜੀਆਂ[i].vim_code0 &&
+		 name[1] == special_ਕੁੰਜੀਆਂ[i].vim_code1)
+	    ਵਾਪਸ OK;
+    ਵਾਪਸ FAIL;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Menu
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 # include "toolbar.phi"
 
-static PhImage_t *gui_ph_toolbar_images[] = {
+ਸਥਿਰ PhImage_t *gui_ph_toolbar_images[] = {
     &tb_new_phi,
     &tb_open_phi,
     &tb_save_phi,
@@ -2370,21 +2370,21 @@ static PhImage_t *gui_ph_toolbar_images[] = {
     &tb_paste_phi,
     &tb_print_phi,
     &tb_help_phi,
-    &tb_find_phi,
+    &tb_ਲੱਭੋ_phi,
     &tb_save_all_phi,
     &tb_save_session_phi,
     &tb_new_session_phi,
-    &tb_load_session_phi,
+    &tb_ਲੱਦੋ_session_phi,
     &tb_macro_phi,
     &tb_replace_phi,
     &tb_close_phi,
     &tb_maximize_phi,
     &tb_minimize_phi,
-    &tb_split_phi,
+    &tb_ਵੰਡੋ_phi,
     &tb_shell_phi,
-    &tb_find_prev_phi,
-    &tb_find_next_phi,
-    &tb_find_help_phi,
+    &tb_ਲੱਭੋ_prev_phi,
+    &tb_ਲੱਭੋ_ਅਗਲਾ_phi,
+    &tb_ਲੱਭੋ_help_phi,
     &tb_make_phi,
     &tb_jump_phi,
     &tb_ctags_phi,
@@ -2393,24 +2393,24 @@ static PhImage_t *gui_ph_toolbar_images[] = {
     &tb_minwidth_phi
 };
 
-static PhImage_t *
-gui_ph_toolbar_load_icon(char_u *iconfile)
+ਸਥਿਰ PhImage_t *
+gui_ph_toolbar_ਲੱਦੋ_icon(char_u *iconfile)
 {
-    static PhImage_t external_icon;
-    PhImage_t *temp_phi = NULL;
+    ਸਥਿਰ PhImage_t external_icon;
+    PhImage_t *ਆਰਜ਼ੀ_phi = ਨਿਰਾ;
 
-    temp_phi = PxLoadImage(iconfile, NULL);
-    if (temp_phi != NULL)
+    ਆਰਜ਼ੀ_phi = Px_ਲੱਦੋ_Image(iconfile, ਨਿਰਾ);
+    ਜੇ (ਆਰਜ਼ੀ_phi != ਨਿਰਾ)
     {
 	// The label widget will free the image/palette/etc. for us when
 	// it's destroyed
-	temp_phi->flags |= Ph_RELEASE_IMAGE_ALL;
-	memcpy(&external_icon, temp_phi, sizeof(external_icon));
-	free(temp_phi);
+	ਆਰਜ਼ੀ_phi->flags |= Ph_RELEASE_IMAGE_ALL;
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ(&external_icon, ਆਰਜ਼ੀ_phi, ਆਕਾਰ(external_icon));
+	ਮੁਕਤ(ਆਰਜ਼ੀ_phi);
 
-	temp_phi = &external_icon;
+	ਆਰਜ਼ੀ_phi = &external_icon;
     }
-    return temp_phi;
+    ਵਾਪਸ ਆਰਜ਼ੀ_phi;
 }
 
 /*
@@ -2420,48 +2420,48 @@ gui_ph_toolbar_load_icon(char_u *iconfile)
  * (When setting the Pt_ARG_LABEL_IMAGE resource, the contents of the
  * PhImage_t are copied, and the original PhImage_t aren't needed anymore).
  */
-static PhImage_t *
-gui_ph_toolbar_find_icon(vimmenu_T *menu)
+ਸਥਿਰ PhImage_t *
+gui_ph_toolbar_ਲੱਭੋ_icon(vimmenu_T *menu)
 {
-    char_u full_pathname[ MAXPATHL + 1 ];
-    PhImage_t *icon = NULL;
+    char_u ਭਰਿਆ_pathname[ MAXPATHL + 1 ];
+    PhImage_t *icon = ਨਿਰਾ;
 
-    if (menu->icon_builtin == FALSE)
+    ਜੇ (menu->icon_builtin == FALSE)
     {
-	if (menu->iconfile != NULL)
+	ਜੇ (menu->iconfile != ਨਿਰਾ)
 	    // TODO: use gui_find_iconfile()
-	    icon = gui_ph_toolbar_load_icon(menu->iconfile);
+	    icon = gui_ph_toolbar_ਲੱਦੋ_icon(menu->iconfile);
 
 	// TODO: Restrict loading to just .png? Search for any format?
-	if ((icon == NULL) &&
-	    ((gui_find_bitmap(menu->name, full_pathname, "gif") == OK) ||
-	      (gui_find_bitmap(menu->name, full_pathname, "png") == OK)))
-	    icon = gui_ph_toolbar_load_icon(full_pathname);
+	ਜੇ ((icon == ਨਿਰਾ) &&
+	    ((gui_ਲੱਭੋ_bitmap(menu->name, ਭਰਿਆ_pathname, "gif") == OK) ||
+	      (gui_ਲੱਭੋ_bitmap(menu->name, ਭਰਿਆ_pathname, "png") == OK)))
+	    icon = gui_ph_toolbar_ਲੱਦੋ_icon(ਭਰਿਆ_pathname);
 
-	if (icon != NULL)
-	    return icon;
+	ਜੇ (icon != ਨਿਰਾ)
+	    ਵਾਪਸ icon;
     }
 
-    if (menu->iconidx >= 0 &&
-	    (menu->iconidx < ARRAY_LENGTH(gui_ph_toolbar_images)))
-	return gui_ph_toolbar_images[menu->iconidx];
+    ਜੇ (menu->iconidx >= 0 &&
+	    (menu->iconidx < ARRAY_ਲੰਮਾਈ(gui_ph_toolbar_images)))
+	ਵਾਪਸ gui_ph_toolbar_images[menu->iconidx];
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_MENU)
-    void
-gui_mch_enable_menu(int flag)
+#ਜੇ defined(FEAT_MENU)
+    ਖਾਲੀ
+gui_mch_enable_menu(ਪੂਰਨ flag)
 {
-    if (flag != 0)
+    ਜੇ (flag != 0)
 	PtRealizeWidget(gui.vimMenuBar);
-    else
+    ਨਹੀਂਤਾਂ
 	PtUnrealizeWidget(gui.vimMenuBar);
 }
 
-    void
-gui_mch_set_menu_pos(int x, int y, int w, int h)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_menu_pos(ਪੂਰਨ x, ਪੂਰਨ y, ਪੂਰਨ w, ਪੂਰਨ h)
 {
     // Nothing
 }
@@ -2469,336 +2469,336 @@ gui_mch_set_menu_pos(int x, int y, int w, int h)
 /*
  * Change the position of a menu button in the parent
  */
-    static void
-gui_ph_position_menu(PtWidget_t *widget, int priority)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ph_position_menu(PtWidget_t *widget, ਪੂਰਨ ਤਰਜੀਹ)
 {
     PtWidget_t	*traverse;
     vimmenu_T	*menu;
 
-    traverse = PtWidgetChildBack(PtWidgetParent(widget));
+    traverse = Pt_Widget_ਬੱਚਾ_ਪਿੱਠ(Pt_Widget_ਮਾਪਾ(widget));
 
     // Iterate through the list of widgets in traverse, until
     // we find the position we want to insert our widget into
     // TODO: traverse from front to back, possible speedup?
-    while (traverse != NULL)
+    ਜਦੋਂ (traverse != ਨਿਰਾ)
     {
-	PtGetResource(traverse, Pt_ARG_POINTER, &menu, 0);
+	PtGetResource(traverse, Pt_ARG_ਸੂਚਕ, &menu, 0);
 
-	if (menu != NULL &&
-		priority < menu->priority &&
+	ਜੇ (menu != ਨਿਰਾ &&
+		ਤਰਜੀਹ < menu->ਤਰਜੀਹ &&
 		widget != traverse)
 	{
 	    // Insert the widget before the current traverse widget
-	    PtWidgetInsert(widget, traverse, 1);
-	    return;
+	    Pt_Widget_ਪਾਓ(widget, traverse, 1);
+	    ਵਾਪਸ;
 	}
 
-	traverse = PtWidgetBrotherInFront(traverse);
+	traverse = Pt_Widget_Brother_ਵਿੱਚ_Front(traverse);
     }
 }
 
 /*
  * the index is ignored because it's not useful for our purposes
  */
-    void
-gui_mch_add_menu(vimmenu_T *menu, int index)
+    ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu(vimmenu_T *menu, ਪੂਰਨ ਸੂਚਕਾਂਕ)
 {
-    vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    vimmenu_T	*ਮਾਪਾ = menu->ਮਾਪਾ;
+    char_u	*accel_ਕੁੰਜੀ;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
-    PtArg_t args[5];
+    ਪੂਰਨ	    n;
+    PtArg_t ਦਲੀਲਾਂ[5];
 
-    menu->submenu_id = menu->id = NULL;
+    menu->submenu_id = menu->id = ਨਿਰਾ;
 
-    if (menu_is_menubar(menu->name))
+    ਜੇ (menu_is_menubar(menu->name))
     {
 
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_ਕੁੰਜੀ = vim_strchr(menu->name, '&');
+	ਜੇ (accel_ਕੁੰਜੀ != ਨਿਰਾ)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_ਕੁੰਜੀ[1];
 	    mnemonic_str[1] = NUL;
 	}
 
 	// Create the menu button
 	n = 0;
-	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str, 0);
-	PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਪਾਠ_STRING, menu->dname, 0);
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ACCEL_ਪਾਠ, menu->actext, 0);
+	ਜੇ (accel_ਕੁੰਜੀ != ਨਿਰਾ)
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ACCEL_ਕੁੰਜੀ, mnemonic_str, 0);
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਸੂਚਕ, menu, 0);
 
-	if (parent != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_RIGHT, 0);
+	ਜੇ (ਮਾਪਾ != ਨਿਰਾ)
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_ਸੱਜਾ, 0);
 
 	menu->id = PtCreateWidget(PtMenuButton,
-		(parent == NULL) ? gui.vimMenuBar : parent->submenu_id,
-		n, args);
+		(ਮਾਪਾ == ਨਿਰਾ) ? gui.vimMenuBar : ਮਾਪਾ->submenu_id,
+		n, ਦਲੀਲਾਂ);
 
-	PtAddCallback(menu->id, Pt_CB_ARM, gui_ph_handle_pulldown_menu, menu);
+	Pt_ਜੋੜੋ_Callback(menu->id, Pt_CB_ARM, gui_ph_handle_pulldown_menu, menu);
 
 	// Create the actual menu
 	n = 0;
-	if (parent != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_MENU_FLAGS, Pt_TRUE, Pt_MENU_CHILD);
+	ਜੇ (ਮਾਪਾ != ਨਿਰਾ)
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_MENU_FLAGS, Pt_TRUE, Pt_MENU_ਬੱਚਾ);
 
-	menu->submenu_id = PtCreateWidget(PtMenu, menu->id, n, args);
+	menu->submenu_id = PtCreateWidget(PtMenu, menu->id, n, ਦਲੀਲਾਂ);
 
-	if (parent == NULL)
+	ਜੇ (ਮਾਪਾ == ਨਿਰਾ)
 	{
-	    PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
+	    Pt_ਜੋੜੋ_Callback(menu->submenu_id, Pt_CB_UNREALIZED,
 		    gui_ph_handle_menu_unrealized, menu);
 
-	    if (menu->mnemonic != 0)
+	    ਜੇ (menu->mnemonic != 0)
 	    {
-		PtAddHotkeyHandler(gui.vimWindow, SAFE_tolower(menu->mnemonic),
+		Pt_ਜੋੜੋ_Hotkey_Handler(gui.vim_ਖਿੜਕੀ, ਸੁਰੱਖਿਅਤ_tolower(menu->mnemonic),
 			Pk_KM_Alt, 0, menu, gui_ph_handle_pulldown_menu);
 	    }
 	}
 
-	gui_ph_position_menu(menu->id, menu->priority);
+	gui_ph_position_menu(menu->id, menu->ਤਰਜੀਹ);
 
 	// Redraw menubar here instead of gui_mch_draw_menubar
-	if (gui.menu_is_active)
+	ਜੇ (gui.menu_is_ਸਰਗਰਮ)
 	    PtRealizeWidget(menu->id);
     }
-    else if (menu_is_popup(menu->name))
+    ਨਹੀਂਤਾਂ ਜੇ (menu_is_popup(menu->name))
     {
-	menu->submenu_id = PtCreateWidget(PtMenu, gui.vimWindow, 0, NULL);
-	PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
+	menu->submenu_id = PtCreateWidget(PtMenu, gui.vim_ਖਿੜਕੀ, 0, ਨਿਰਾ);
+	Pt_ਜੋੜੋ_Callback(menu->submenu_id, Pt_CB_UNREALIZED,
 		gui_ph_handle_menu_unrealized, menu);
     }
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int index)
+    ਖਾਲੀ
+gui_mch_ਜੋੜੋ_menu_ਵਸਤੂ(vimmenu_T *menu, ਪੂਰਨ ਸੂਚਕਾਂਕ)
 {
-    vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    vimmenu_T	*ਮਾਪਾ = menu->ਮਾਪਾ;
+    char_u	*accel_ਕੁੰਜੀ;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
-    PtArg_t args[13];
+    ਪੂਰਨ	    n;
+    PtArg_t ਦਲੀਲਾਂ[13];
 
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
+    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਸੂਚਕ, menu, 0);
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ਜੇ (menu_is_toolbar(ਮਾਪਾ->name))
     {
-	if (menu_is_separator(menu->name))
+	ਜੇ (menu_is_separator(menu->name))
 	{
-	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_FLAGS,
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_SEP_FLAGS,
 		    Pt_SEP_VERTICAL, Pt_SEP_ORIENTATION);
-	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_TYPE, Pt_ETCHED_IN, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-		    Pt_TRUE, Pt_ANCHOR_TOP_BOTTOM);
-	    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, 2, 0);
-	    menu->id = PtCreateWidget(PtSeparator, gui.vimToolBar, n, args);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_SEP_TYPE, Pt_ETCHED_ਵਿੱਚ, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ANCHOR_FLAGS,
+		    Pt_TRUE, Pt_ANCHOR_ਸਿਖਰ_BOTTOM);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਚੌੜਾਈ, 2, 0);
+	    menu->id = PtCreateWidget(PtSeparator, gui.vimToolBar, n, ਦਲੀਲਾਂ);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (strstr((const char *) p_toolbar, "text") != NULL)
+	    ਜੇ (ਲੜੀ_ਖੋਜ((ਅਚਲ ਅੱਖਰ *) p_toolbar, "text") != ਨਿਰਾ)
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_BALLOON_POSITION,
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_BALLOON_POSITION,
 			Pt_BALLOON_BOTTOM, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_FONT, "TextFont08", 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਪਾਠ_STRING, menu->dname, 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਪਾਠ_FONT, "TextFont08", 0);
 	    }
-	    if ((strstr((const char *) p_toolbar, "icons") != NULL) &&
-		    (gui_ph_toolbar_images != NULL))
+	    ਜੇ ((ਲੜੀ_ਖੋਜ((ਅਚਲ ਅੱਖਰ *) p_toolbar, "icons") != ਨਿਰਾ) &&
+		    (gui_ph_toolbar_images != ਨਿਰਾ))
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_IMAGE,
-			gui_ph_toolbar_find_icon(menu), 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_TYPE, Pt_TEXT_IMAGE, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_IMAGE_SPACING, 0, 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_LABEL_IMAGE,
+			gui_ph_toolbar_ਲੱਭੋ_icon(menu), 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_LABEL_TYPE, Pt_ਪਾਠ_IMAGE, 0);
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਪਾਠ_IMAGE_SPACING, 0, 0);
 	    }
-	    if (strstr((const char *) p_toolbar, "tooltips") != NULL)
+	    ਜੇ (ਲੜੀ_ਖੋਜ((ਅਚਲ ਅੱਖਰ *) p_toolbar, "tooltips") != ਨਿਰਾ)
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_BALLOON,
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_LABEL_BALLOON,
 			gui_ph_show_tooltip, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_FLAGS,
+		Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_LABEL_FLAGS,
 			Pt_TRUE, Pt_SHOW_BALLOON);
 	    }
-	    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_HEIGHT, 1, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_WIDTH, 1, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_FALSE,
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_MARGIN_ਉਚਾਈ, 1, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_MARGIN_ਚੌੜਾਈ, 1, 0);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FLAGS, Pt_FALSE,
 		    Pt_HIGHLIGHTED | Pt_GETS_FOCUS);
-	    PtSetArg(&args[ n++ ], Pt_ARG_FILL_COLOR, Pg_TRANSPARENT, 0);
-	    menu->id = PtCreateWidget(PtButton, gui.vimToolBar, n, args);
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_FILL_COLOR, Pg_TRANSPARENT, 0);
+	    menu->id = PtCreateWidget(PtButton, gui.vimToolBar, n, ਦਲੀਲਾਂ);
 
-	    PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
+	    Pt_ਜੋੜੋ_Callback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 	}
 	// Update toolbar if it's open
-	if (PtWidgetIsRealized(gui.vimToolBar))
+	ਜੇ (PtWidgetIsRealized(gui.vimToolBar))
 	    PtRealizeWidget(menu->id);
     }
-    else
+    ਨਹੀਂਤਾਂ
 # endif
-	if (menu_is_separator(menu->name))
+	ਜੇ (menu_is_separator(menu->name))
     {
-	menu->id = PtCreateWidget(PtSeparator, parent->submenu_id, n, args);
+	menu->id = PtCreateWidget(PtSeparator, ਮਾਪਾ->submenu_id, n, ਦਲੀਲਾਂ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_ਕੁੰਜੀ = vim_strchr(menu->name, '&');
+	ਜੇ (accel_ਕੁੰਜੀ != ਨਿਰਾ)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_ਕੁੰਜੀ[1];
 	    mnemonic_str[1] = NUL;
 	}
 
-	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str,
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ਪਾਠ_STRING, menu->dname, 0);
+	ਜੇ (accel_ਕੁੰਜੀ != ਨਿਰਾ)
+	    Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ACCEL_ਕੁੰਜੀ, mnemonic_str,
 		    0);
 
-	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
+	Pt_ਸੈੱਟ_Arg(&ਦਲੀਲਾਂ[ n++ ], Pt_ARG_ACCEL_ਪਾਠ, menu->actext, 0);
 
-	menu->id = PtCreateWidget(PtMenuButton, parent->submenu_id, n, args);
+	menu->id = PtCreateWidget(PtMenuButton, ਮਾਪਾ->submenu_id, n, ਦਲੀਲਾਂ);
 
-	PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
+	Pt_ਜੋੜੋ_Callback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 
-# ifdef USE_PANEL_GROUP
-	if (gui_ph_is_buffer_item(menu, parent) == TRUE)
+# ifdef USE_PANEL_ਸਮੂਹ
+	ਜੇ (gui_ph_is_ਬਫਰ_ਵਸਤੂ(menu, ਮਾਪਾ) == TRUE)
 	{
-	    PtAddCallback(menu->id, Pt_CB_DESTROYED,
-		    gui_ph_handle_buffer_remove, menu);
-	    gui_ph_pg_add_buffer(menu->dname);
+	    Pt_ਜੋੜੋ_Callback(menu->id, Pt_CB_DESTROYED,
+		    gui_ph_handle_ਬਫਰ_remove, menu);
+	    gui_ph_pg_ਜੋੜੋ_ਬਫਰ(menu->dname);
 	}
 # endif
     }
 
-    gui_ph_position_menu(menu->id, menu->priority);
+    gui_ph_position_menu(menu->id, menu->ਤਰਜੀਹ);
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
-    if (menu->submenu_id != NULL)
+    ਜੇ (menu->submenu_id != ਨਿਰਾ)
 	PtDestroyWidget(menu->submenu_id);
-    if (menu->id != NULL)
+    ਜੇ (menu->id != ਨਿਰਾ)
 	PtDestroyWidget(menu->id);
 
-    menu->submenu_id = NULL;
-    menu->id = NULL;
+    menu->submenu_id = ਨਿਰਾ;
+    menu->id = ਨਿਰਾ;
 }
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    ਖਾਲੀ
+gui_mch_menu_grey(vimmenu_T *menu, ਪੂਰਨ grey)
 {
-    long    flags, mask, fields;
+    ਲੰਮਾ    flags, ਨਕਾਬ, fields;
 
-    if (menu->id == NULL)
-	return;
+    ਜੇ (menu->id == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     flags = PtWidgetFlags(menu->id);
-    if (PtWidgetIsClass(menu->id, PtMenuButton) &&
-	    PtWidgetIsClass(PtWidgetParent(menu->id), PtMenu))
+    ਜੇ (PtWidgetIsClass(menu->id, PtMenuButton) &&
+	    PtWidgetIsClass(Pt_Widget_ਮਾਪਾ(menu->id), PtMenu))
     {
 	fields = Pt_FALSE;
-	mask = Pt_SELECTABLE | Pt_HIGHLIGHTED;
+	ਨਕਾਬ = Pt_SELECTABLE | Pt_HIGHLIGHTED;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	fields = Pt_TRUE;
-	mask = Pt_BLOCKED | Pt_GHOST;
+	ਨਕਾਬ = Pt_BLOCKED | Pt_GHOST;
     }
 
-    if (! grey)
+    ਜੇ (! grey)
 	fields = ~fields;
 
-    PtSetResource(menu->id, Pt_ARG_FLAGS, fields,
-	    mask);
+    Pt_ਸੈੱਟ_Resource(menu->id, Pt_ARG_FLAGS, fields,
+	    ਨਕਾਬ);
 }
 
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    ਖਾਲੀ
+gui_mch_menu_hidden(vimmenu_T *menu, ਪੂਰਨ hidden)
 {
     // TODO: [un]realize the widget?
 }
 
-    void
-gui_mch_draw_menubar(void)
+    ਖਾਲੀ
+gui_mch_draw_menubar(ਖਾਲੀ)
 {
     // The only time a redraw is needed is when a menu button
     // is added to the menubar, and that is detected and the bar
     // redrawn in gui_mch_add_menu_item
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    PtSetResource(menu->submenu_id, Pt_ARG_POS, &abs_mouse, 0);
+    Pt_ਸੈੱਟ_Resource(menu->submenu_id, Pt_ARG_POS, &abs_mouse, 0);
     PtRealizeWidget(menu->submenu_id);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    ਖਾਲੀ
+gui_mch_toggle_tearoffs(ਪੂਰਨ enable)
 {
     // No tearoffs yet
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ਜੇ defined(FEAT_TOOLBAR)
+    ਖਾਲੀ
+gui_mch_show_toolbar(ਪੂਰਨ showit)
 {
-    if (showit)
+    ਜੇ (showit)
 	PtRealizeWidget(gui.vimToolBar);
-    else
+    ਨਹੀਂਤਾਂ
 	PtUnrealizeWidget(gui.vimToolBar);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 ////////////////////////////////////////////////////////////////////////////
 // Fonts
 
-    static GuiFont
+    ਸਥਿਰ GuiFont
 gui_ph_get_font(
 	char_u	*font_name,
 	int_u	font_flags,
-	int_u	font_size,
+	int_u	font_ਮਾਪ_2,
 	// Check whether the resulting font has the font flags and size that
 	// was asked for
 	int_u	enforce
 	)
 {
-    char_u	    *font_tag;
+    char_u	    *font_ਟੈਗ;
     FontQueryInfo   info;
     int_u	    style;
 
-    font_tag = alloc(MAX_FONT_TAG);
-    if (font_tag != NULL)
+    font_ਟੈਗ = alloc(MAX_FONT_ਟੈਗ);
+    ਜੇ (font_ਟੈਗ != ਨਿਰਾ)
     {
-	if (PfGenerateFontName(font_name, font_flags, font_size,
-		    font_tag) != NULL)
+	ਜੇ (PfGenerateFontName(font_name, font_flags, font_ਮਾਪ_2,
+		    font_ਟੈਗ) != ਨਿਰਾ)
 	{
 	    // Enforce some limits on the font used
 	    style = PHFONT_INFO_FIXED;
 
-	    if (enforce & PF_STYLE_BOLD)
+	    ਜੇ (enforce & PF_STYLE_BOLD)
 		style |= PHFONT_INFO_BOLD;
-	    if (enforce & PF_STYLE_ANTIALIAS)
+	    ਜੇ (enforce & PF_STYLE_ANTIALIAS)
 		style |= PHFONT_INFO_ALIAS;
-	    if (enforce & PF_STYLE_ITALIC)
+	    ਜੇ (enforce & PF_STYLE_ITALIC)
 		style |= PHFONT_INFO_ITALIC;
 
-	    PfQueryFontInfo(font_tag, &info);
+	    PfQueryFontInfo(font_ਟੈਗ, &info);
 
-	    if (info.size == 0)
-		font_size = 0;
+	    ਜੇ (info.ਮਾਪ == 0)
+		font_ਮਾਪ_2 = 0;
 
 	    // Make sure font size matches, and that the font style
 	    // at least has the bits we're checking for
-	    if (font_size == info.size &&
+	    ਜੇ (font_ਮਾਪ_2 == info.ਮਾਪ &&
 		    style == (info.style & style))
-		return (GuiFont)font_tag;
+		ਵਾਪਸ (GuiFont)font_ਟੈਗ;
 	}
-	vim_free(font_tag);
+	vim_free(font_ਟੈਗ);
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -2813,162 +2813,162 @@ gui_ph_get_font(
  *
  */
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 gui_ph_parse_font_name(
 	char_u *vim_font,
 	char_u **font_name,
 	int_u *font_flags,
-	int_u *font_size)
+	int_u *font_ਮਾਪ_2)
 {
     char_u  *mark;
-    int_u   name_len, size;
+    int_u   name_len, ਮਾਪ;
 
     mark = vim_strchr(vim_font, ':');
-    if (mark == NULL)
+    ਜੇ (mark == ਨਿਰਾ)
 	name_len = STRLEN(vim_font);
-    else
+    ਨਹੀਂਤਾਂ
 	name_len = (int_u) (mark - vim_font);
 
     *font_name = vim_strnsave(vim_font, name_len);
-    if (*font_name != NULL)
+    ਜੇ (*font_name != ਨਿਰਾ)
     {
-	if (mark != NULL)
+	ਜੇ (mark != ਨਿਰਾ)
 	{
-	    while (*mark != NUL && *mark++ == ':')
+	    ਜਦੋਂ (*mark != NUL && *mark++ == ':')
 	    {
-		switch (SAFE_tolower(*mark++))
+		ਚੋਣ (ਸੁਰੱਖਿਅਤ_tolower(*mark++))
 		{
-		    case 'a': *font_flags |= PF_STYLE_ANTIALIAS; break;
-		    case 'b': *font_flags |= PF_STYLE_BOLD; break;
-		    case 'i': *font_flags |= PF_STYLE_ITALIC; break;
+		    ਹਾਲਤ 'a': *font_flags |= PF_STYLE_ANTIALIAS; ਰੋਕੋ;
+		    ਹਾਲਤ 'b': *font_flags |= PF_STYLE_BOLD; ਰੋਕੋ;
+		    ਹਾਲਤ 'i': *font_flags |= PF_STYLE_ITALIC; ਰੋਕੋ;
 
-		    case 's':
-			size = getdigits(&mark);
+		    ਹਾਲਤ 's':
+			ਮਾਪ = getdigits(&mark);
 			// Restrict the size to some vague limits
-			if (size < 1 || size > 100)
-			    size = 8;
+			ਜੇ (ਮਾਪ < 1 || ਮਾਪ > 100)
+			    ਮਾਪ = 8;
 
-			*font_size = size;
-			break;
+			*font_ਮਾਪ_2 = ਮਾਪ;
+			ਰੋਕੋ;
 
-		    default:
-			break;
+		    ਮੂਲ:
+			ਰੋਕੋ;
 		}
 	    }
 	}
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    int
-gui_mch_init_font(char_u *vim_font_name, int fontset)
+    ਪੂਰਨ
+gui_mch_init_font(char_u *vim_font_name, ਪੂਰਨ fontset)
 {
-    char_u  *font_tag;
-    char_u  *font_name = NULL;
+    char_u  *font_ਟੈਗ;
+    char_u  *font_name = ਨਿਰਾ;
     int_u   font_flags = 0;
-    int_u   font_size  = 12;
+    int_u   font_ਮਾਪ_2  = 12;
 
     FontQueryInfo info;
     PhRect_t extent;
 
-    if (vim_font_name == NULL)
+    ਜੇ (vim_font_name == ਨਿਰਾ)
     {
 	// Default font
 	vim_font_name = "PC Terminal";
     }
 
-    if (STRCMP(vim_font_name, "*") == 0)
+    ਜੇ (STRCMP(vim_font_name, "*") == 0)
     {
-	font_tag = PtFontSelection(gui.vimWindow, NULL, NULL,
-		"pcterm12", -1, PHFONT_FIXED, NULL);
+	font_ਟੈਗ = PtFontSelection(gui.vim_ਖਿੜਕੀ, ਨਿਰਾ, ਨਿਰਾ,
+		"pcterm12", -1, PHFONT_FIXED, ਨਿਰਾ);
 
-	if (font_tag == NULL)
-	    return FAIL;
+	ਜੇ (font_ਟੈਗ == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
 	gui_mch_free_font(gui.norm_font);
-	gui.norm_font = font_tag;
+	gui.norm_font = font_ਟੈਗ;
 
-	PfQueryFontInfo(font_tag, &info);
+	PfQueryFontInfo(font_ਟੈਗ, &info);
 	font_name = vim_strsave(info.font);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
-		    &font_size) == FALSE)
-	    return FAIL;
+	ਜੇ (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+		    &font_ਮਾਪ_2) == FALSE)
+	    ਵਾਪਸ FAIL;
 
-	font_tag = gui_ph_get_font(font_name, font_flags, font_size, 0);
-	if (font_tag == NULL)
+	font_ਟੈਗ = gui_ph_get_font(font_name, font_flags, font_ਮਾਪ_2, 0);
+	ਜੇ (font_ਟੈਗ == ਨਿਰਾ)
 	{
 	    vim_free(font_name);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
 	gui_mch_free_font(gui.norm_font);
-	gui.norm_font = font_tag;
+	gui.norm_font = font_ਟੈਗ;
     }
 
     gui_mch_free_font(gui.bold_font);
     gui.bold_font = gui_ph_get_font(font_name, font_flags | PF_STYLE_BOLD,
-	    font_size, PF_STYLE_BOLD);
+	    font_ਮਾਪ_2, PF_STYLE_BOLD);
 
     gui_mch_free_font(gui.ital_font);
     gui.ital_font = gui_ph_get_font(font_name, font_flags | PF_STYLE_ITALIC,
-	    font_size, PF_STYLE_ITALIC);
+	    font_ਮਾਪ_2, PF_STYLE_ITALIC);
 
     // This extent was brought to you by the letter 'g'
-    PfExtentText(&extent, NULL, font_tag, "g", 1);
+    Pf_Extent_ਪਾਠ(&extent, ਨਿਰਾ, font_ਟੈਗ, "g", 1);
 
-    gui.char_width = extent.lr.x - extent.ul.x + 1;
-    gui.char_height = (- extent.ul.y) + extent.lr.y + 1;
+    gui.char_ਚੌੜਾਈ = extent.lr.x - extent.ul.x + 1;
+    gui.char_ਉਚਾਈ = (- extent.ul.y) + extent.lr.y + 1;
     gui.char_ascent = - extent.ul.y;
 
     vim_free(font_name);
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    ਪੂਰਨ
+gui_mch_adjust_charheight(ਖਾਲੀ)
 {
     FontQueryInfo info;
 
     PfQueryFontInfo(gui.norm_font, &info);
 
-    gui.char_height = - info.ascender + info.descender + p_linespace;
+    gui.char_ਉਚਾਈ = - info.ascender + info.descender + p_linespace;
     gui.char_ascent = - info.ascender + p_linespace / 2;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *vim_font_name, int report_error)
+gui_mch_get_font(char_u *vim_font_name, ਪੂਰਨ report_error)
 {
     char_u  *font_name;
-    char_u  *font_tag;
-    int_u   font_size = 12;
+    char_u  *font_ਟੈਗ;
+    int_u   font_ਮਾਪ_2 = 12;
     int_u   font_flags = 0;
 
-    if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
-		&font_size) != FALSE)
+    ਜੇ (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+		&font_ਮਾਪ_2) != FALSE)
     {
-	font_tag = gui_ph_get_font(font_name, font_flags, font_size, -1);
+	font_ਟੈਗ = gui_ph_get_font(font_name, font_flags, font_ਮਾਪ_2, -1);
 	vim_free(font_name);
 
-	if (font_tag != NULL)
-	    return (GuiFont)font_tag;
+	ਜੇ (font_ਟੈਗ != ਨਿਰਾ)
+	    ਵਾਪਸ (GuiFont)font_ਟੈਗ;
     }
 
-    if (report_error)
+    ਜੇ (report_error)
 	semsg(_(e_unknown_font_str), vim_font_name);
 
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
@@ -2976,19 +2976,19 @@ gui_mch_get_font(char_u *vim_font_name, int report_error)
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ vim_strsave(name);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-gui_mch_set_font(GuiFont font)
+    ਖਾਲੀ
+gui_mch_ਸੈੱਟ_font(GuiFont font)
 {
-    PgSetFont(font);
+    Pg_ਸੈੱਟ_Font(font);
 }
 
-    void
+    ਖਾਲੀ
 gui_mch_free_font(GuiFont font)
 {
     vim_free(font);

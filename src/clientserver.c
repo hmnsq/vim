@@ -11,20 +11,20 @@
  * clientserver.c: functions for Client Server functionality
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_CLIENTSERVER)
+#ਜੇ defined(FEAT_CLIENTSERVER)
 
-static void cmdsrv_main(int *argc, char **argv, char_u *serverName_arg, char_u **serverStr);
-static char_u *serverMakeName(char_u *arg, char *cmd);
+ਸਥਿਰ ਖਾਲੀ cmdsrv_main(ਪੂਰਨ *argc, ਅੱਖਰ **argv, char_u *serverName_arg, char_u **serverStr);
+ਸਥਿਰ char_u *serverMakeName(char_u *arg, ਅੱਖਰ *cmd);
 
 /*
  * Replace termcodes such as <CR> and insert as key presses if there is room.
  */
-    void
-server_to_input_buf(char_u *str)
+    ਖਾਲੀ
+server_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(char_u *str)
 {
-    char_u      *ptr = NULL;
+    char_u      *ptr = ਨਿਰਾ;
     char_u      *cpo_save = p_cpo;
 
     // Set 'cpoptions' the way we want it.
@@ -34,10 +34,10 @@ server_to_input_buf(char_u *str)
     //  The last but one parameter of replace_termcodes() is TRUE so that the
     //  <lt> sequence is recognised - needed for a real backslash.
     p_cpo = (char_u *)"Bk";
-    str = replace_termcodes(str, &ptr, 0, REPTERM_DO_LT, NULL);
+    str = replace_termcodes(str, &ptr, 0, REPTERM_DO_LT, ਨਿਰਾ);
     p_cpo = cpo_save;
 
-    if (ptr != NULL && *ptr != NUL)	// trailing CTRL-V results in nothing
+    ਜੇ (ptr != ਨਿਰਾ && *ptr != NUL)	// trailing CTRL-V results in nothing
     {
 	/*
 	 * Add the string to the input stream.
@@ -47,9 +47,9 @@ server_to_input_buf(char_u *str)
 	 * be half a mapping there.  Then append to the existing string, so
 	 * that multiple commands from a client are concatenated.
 	 */
-	if (typebuf.tb_maplen < typebuf.tb_len)
+	ਜੇ (typebuf.tb_maplen < typebuf.tb_len)
 	    del_typebuf(typebuf.tb_len - typebuf.tb_maplen, typebuf.tb_maplen);
-	(void)ins_typebuf(str, REMAP_NONE, typebuf.tb_len, TRUE, FALSE);
+	(ਖਾਲੀ)ins_typebuf(str, REMAP_NONE, typebuf.tb_len, TRUE, FALSE);
 
 	// Let input_available() know we inserted text in the typeahead
 	// buffer.
@@ -62,23 +62,23 @@ server_to_input_buf(char_u *str)
  * Evaluate an expression that the client sent to a string.
  */
     char_u *
-eval_client_expr_to_string(char_u *expr)
+eval_client_ਵਿਅੰਜਕ_ਮੰਜ਼ਿਲ_string(char_u *ਵਿਅੰਜਕ)
 {
     char_u	*res;
-    int		save_dbl = debug_break_level;
-    int		save_ro = redir_off;
-    funccal_entry_T funccal_entry;
-    int		did_save_funccal = FALSE;
+    ਪੂਰਨ		save_dbl = debug_break_level;
+    ਪੂਰਨ		save_ro = redir_off;
+    funccal_ਇੰਦਰਾਜ_T funccal_ਇੰਦਰਾਜ;
+    ਪੂਰਨ		did_save_funccal = FALSE;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "eval_client_expr_to_string(\"%s\")", expr);
+# ਜੇ defined(FEAT_EVAL)
+    ch_log(ਨਿਰਾ, "eval_client_expr_to_string(\"%s\")", ਵਿਅੰਜਕ);
 # endif
 
     // Evaluate the expression at the toplevel, don't use variables local to
     // the calling function. Except when in debug mode.
-    if (!debug_mode)
+    ਜੇ (!debug_ਬਹੁਲਕ)
     {
-	save_funccal(&funccal_entry);
+	save_funccal(&funccal_ਇੰਦਰਾਜ);
 	did_save_funccal = TRUE;
     }
 
@@ -90,57 +90,57 @@ eval_client_expr_to_string(char_u *expr)
     // to be typed.  Do generate errors so that try/catch works.
     ++emsg_silent;
 
-    res = eval_to_string(expr, TRUE, FALSE);
+    res = eval_ਮੰਜ਼ਿਲ_string(ਵਿਅੰਜਕ, TRUE, FALSE);
 
     debug_break_level = save_dbl;
     redir_off = save_ro;
     --emsg_silent;
-    if (emsg_silent < 0)
+    ਜੇ (emsg_silent < 0)
 	emsg_silent = 0;
-    if (did_save_funccal)
+    ਜੇ (did_save_funccal)
 	restore_funccal();
 
     // A client can tell us to redraw, but not to display the cursor, so do
     // that here.
     setcursor();
-    out_flush_cursor(FALSE, FALSE);
+    ਬਾਹਰਲਾ_flush_cursor(FALSE, FALSE);
 
-    return res;
+    ਵਾਪਸ res;
 }
 
 /*
  * Evaluate a command or expression sent to ourselves.
  */
-    int
-sendToLocalVim(char_u *cmd, int asExpr, char_u **result)
+    ਪੂਰਨ
+send_ਮੰਜ਼ਿਲ_Local_Vim(char_u *cmd, ਪੂਰਨ as_ਵਿਅੰਜਕ, char_u **ਨਤੀਜਾ)
 {
-    if (asExpr)
+    ਜੇ (as_ਵਿਅੰਜਕ)
     {
 	char_u *ret;
 
-	ret = eval_client_expr_to_string(cmd);
-	if (result != NULL)
+	ret = eval_client_ਵਿਅੰਜਕ_ਮੰਜ਼ਿਲ_string(cmd);
+	ਜੇ (ਨਤੀਜਾ != ਨਿਰਾ)
 	{
-	    if (ret == NULL)
+	    ਜੇ (ret == ਨਿਰਾ)
 	    {
-		char	*err = _(e_invalid_expression_received);
+		ਅੱਖਰ	*err = _(e_invalid_ਵਿਅੰਜਕ_received);
 		size_t	len = STRLEN(cmd) + STRLEN(err) + 5;
-		char_u	*msg;
+		char_u	*ਸੁਨੇਹਾ;
 
-		msg = alloc(len);
-		if (msg != NULL)
-		    vim_snprintf((char *)msg, len, "%s: \"%s\"", err, cmd);
-		*result = msg;
+		ਸੁਨੇਹਾ = alloc(len);
+		ਜੇ (ਸੁਨੇਹਾ != ਨਿਰਾ)
+		    vim_snprintf((ਅੱਖਰ *)ਸੁਨੇਹਾ, len, "%s: \"%s\"", err, cmd);
+		*ਨਤੀਜਾ = ਸੁਨੇਹਾ;
 	    }
-	    else
-		*result = ret;
+	    ਨਹੀਂਤਾਂ
+		*ਨਤੀਜਾ = ret;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    vim_free(ret);
-	return ret == NULL ? -1 : 0;
+	ਵਾਪਸ ret == ਨਿਰਾ ? -1 : 0;
     }
-    server_to_input_buf(cmd);
-    return 0;
+    server_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(cmd);
+    ਵਾਪਸ 0;
 }
 
 /*
@@ -150,51 +150,51 @@ sendToLocalVim(char_u *cmd, int asExpr, char_u **result)
  */
     char_u *
 serverConvert(
-    char_u *client_enc UNUSED,
-    char_u *data,
+    char_u *client_enc ਅਣਵਰਤਿਆ,
+    char_u *ਅੰਕੜੇ,
     char_u **tofree)
 {
-    char_u	*res = data;
+    char_u	*res = ਅੰਕੜੇ;
 
-    *tofree = NULL;
-    if (client_enc == NULL || p_enc == NULL)
-	return res;
+    *tofree = ਨਿਰਾ;
+    ਜੇ (client_enc == ਨਿਰਾ || p_enc == ਨਿਰਾ)
+	ਵਾਪਸ res;
 
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, client_enc, p_enc) != FAIL
+    ਜੇ (convert_ਤਿਆਰੀ(&vimconv, client_enc, p_enc) != FAIL
 	    && vimconv.vc_type != CONV_NONE)
     {
-	res = string_convert(&vimconv, data, NULL);
-	if (res == NULL)
-	    res = data;
-	else
+	res = string_convert(&vimconv, ਅੰਕੜੇ, ਨਿਰਾ);
+	ਜੇ (res == ਨਿਰਾ)
+	    res = ਅੰਕੜੇ;
+	ਨਹੀਂਤਾਂ
 	    *tofree = res;
     }
-    convert_setup(&vimconv, NULL, NULL);
-    return res;
+    convert_ਤਿਆਰੀ(&vimconv, ਨਿਰਾ, ਨਿਰਾ);
+    ਵਾਪਸ res;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CLIENTSERVER) && !defined(NO_VIM_MAIN)
+#ਜੇ defined(FEAT_CLIENTSERVER) && !defined(NO_VIM_MAIN)
 
 /*
  * Common code for the X command server and the Win32 command server.
  */
 
-static char_u *build_drop_cmd(int filec, char **filev, int tabs, int sendReply);
+ਸਥਿਰ char_u *build_drop_cmd(ਪੂਰਨ filec, ਅੱਖਰ **filev, ਪੂਰਨ tabs, ਪੂਰਨ send_ਜਵਾਬ);
 
 /*
  * Do the client-server stuff, unless "--servername ''" was used.
  */
-    void
+    ਖਾਲੀ
 exec_on_server(mparm_T *parmp)
 {
-    int made_name = FALSE;
+    ਪੂਰਨ made_name = FALSE;
 
-    if (parmp->serverName_arg != NULL && *parmp->serverName_arg == NUL)
-	return;
+    ਜੇ (parmp->serverName_arg != ਨਿਰਾ && *parmp->serverName_arg == NUL)
+	ਵਾਪਸ;
 
 # ifdef MSWIN
     // Initialise the client/server messaging infrastructure.
@@ -206,7 +206,7 @@ exec_on_server(mparm_T *parmp)
      * exit Vim when it was successful.  Otherwise it's executed further
      * on.  Remember the encoding used here in "serverStrEnc".
      */
-    if (parmp->serverArg)
+    ਜੇ (parmp->serverArg)
     {
 	cmdsrv_main(&parmp->argc, parmp->argv,
 		parmp->serverName_arg, &parmp->serverStr);
@@ -216,13 +216,13 @@ exec_on_server(mparm_T *parmp)
     // If we're still running, get the name to register ourselves.
     // On Win32 can register right now, for X11 need to setup the
     // clipboard first, it's further down.
-    if (!made_name && parmp->servername == NULL)
+    ਜੇ (!made_name && parmp->servername == ਨਿਰਾ)
 	parmp->servername = serverMakeName(parmp->serverName_arg,
 		parmp->argv[0]);
 # ifdef MSWIN
-    if (parmp->servername != NULL && clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+    ਜੇ (parmp->servername != ਨਿਰਾ && clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
     {
-	serverSetName(parmp->servername);
+	server_ਸੈੱਟ_Name(parmp->servername);
 #  ifndef FEAT_SOCKETSERVER
 	vim_free(parmp->servername);
 #  endif
@@ -232,10 +232,10 @@ exec_on_server(mparm_T *parmp)
 /*
  * Prepare for running as a Vim server.
  */
-    void
+    ਖਾਲੀ
 prepare_server(mparm_T *parmp)
 {
-# if defined(FEAT_X11) || defined(FEAT_SOCKETSERVER)
+# ਜੇ defined(FEAT_X11) || defined(FEAT_SOCKETSERVER)
     /*
      * Register for remote command execution with :serversend and --remote
      * unless there was a -X or a --servername '' on the command line.
@@ -247,58 +247,58 @@ prepare_server(mparm_T *parmp)
      * autoservername, since traditional naming isn't supported.
      */
 
-    if (
-#  if defined(FEAT_X11) || (defined(FEAT_SOCKETSERVER) && !defined(MSWIN))
+    ਜੇ (
+#  ਜੇ defined(FEAT_X11) || (defined(FEAT_SOCKETSERVER) && !defined(MSWIN))
 	    (
 #   ifdef FEAT_X11
-	    X_DISPLAY != NULL
+	    X_DISPLAY != ਨਿਰਾ
 #   endif
-#   if defined(FEAT_X11) && defined(FEAT_SOCKETSERVER) && !defined(MSWIN)
+#   ਜੇ defined(FEAT_X11) && defined(FEAT_SOCKETSERVER) && !defined(MSWIN)
 	    ||
 #   endif
-#   if defined(FEAT_SOCKETSERVER) && !defined(MSWIN)
-	    clientserver_method == CLIENTSERVER_METHOD_SOCKET
+#   ਜੇ defined(FEAT_SOCKETSERVER) && !defined(MSWIN)
+	    clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET
 #   endif
 	    ) &&
 #  endif
-	    parmp->servername != NULL && (
-#  if defined(FEAT_AUTOSERVERNAME) || defined(FEAT_GUI)
+	    parmp->servername != ਨਿਰਾ && (
+#  ਜੇ defined(FEAT_AUTOSERVERNAME) || defined(FEAT_GUI)
 		(
-#   if defined(FEAT_SOCKETSERVER) && defined(MSWIN)
-		 clientserver_method != CLIENTSERVER_METHOD_SOCKET &&
+#   ਜੇ defined(FEAT_SOCKETSERVER) && defined(MSWIN)
+		 clientserver_ਵਿਧੀ != CLIENTSERVER_ਵਿਧੀ_SOCKET &&
 #   endif
-#   if defined(FEAT_AUTOSERVERNAME)
+#   ਜੇ defined(FEAT_AUTOSERVERNAME)
 		    1
-#   else
-		    gui.in_use
+#   ਨਹੀਂਤਾਂ
+		    gui.ਵਿੱਚ_use
 #   endif
 #   ifdef UNIX
-		 && getuid() != ROOT_UID
+		 && getuid() != ਜੜ੍ਹ_UID
 #   endif
 		) ||
 #  endif
-		parmp->serverName_arg != NULL))
+		parmp->serverName_arg != ਨਿਰਾ))
     {
 
 #  ifdef FEAT_SOCKETSERVER
-	if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
-	    socketserver_start(parmp->servername, false);
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
+	    socketserver_ਸ਼ੁਰੂ(parmp->servername, false);
 #  endif
 #  ifdef FEAT_X11
-	if (clientserver_method == CLIENTSERVER_METHOD_X11)
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
 	{
-	    (void)serverRegisterName(X_DISPLAY, parmp->servername);
-	    TIME_MSG("register x11 server name");
+	    (ਖਾਲੀ)server_ਰਜਿਸਟਰ_Name(X_DISPLAY, parmp->servername);
+	    ਸਮਾਂ_ਸੁਨੇਹਾ("register x11 server name");
 	}
 #  endif
 	vim_free(parmp->servername);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 #  ifdef FEAT_X11
-	if (clientserver_method == CLIENTSERVER_METHOD_X11)
-	    serverDelayedStartName = parmp->servername;
-	else
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
+	    server_Delayed_ਸ਼ੁਰੂ_Name = parmp->servername;
+	ਨਹੀਂਤਾਂ
 #  endif
 	    vim_free(parmp->servername);
     }
@@ -308,242 +308,242 @@ prepare_server(mparm_T *parmp)
      * Execute command ourselves if we're here because the send failed (or
      * else we would have exited above).
      */
-    if (parmp->serverStr != NULL)
+    ਜੇ (parmp->serverStr != ਨਿਰਾ)
     {
 	char_u *p;
 
-	server_to_input_buf(serverConvert(parmp->serverStrEnc,
+	server_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(serverConvert(parmp->serverStrEnc,
 						       parmp->serverStr, &p));
 	vim_free(p);
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 cmdsrv_main(
-    int		*argc,
-    char	**argv,
+    ਪੂਰਨ		*argc,
+    ਅੱਖਰ	**argv,
     char_u	*serverName_arg,
     char_u	**serverStr)
 {
     char_u	*res;
-    int		i;
+    ਪੂਰਨ		i;
     char_u	*sname;
-    int		ret = -1;
-    int		didone = FALSE;
-    int		exiterr = 0;
-    char	**newArgV = argv + 1;
-    int		newArgC = 1,
+    ਪੂਰਨ		ret = -1;
+    ਪੂਰਨ		didone = FALSE;
+    ਪੂਰਨ		exiterr = 0;
+    ਅੱਖਰ	**newArgV = argv + 1;
+    ਪੂਰਨ		newArgC = 1,
 		Argc = *argc;
-    int		argtype;
+    ਪੂਰਨ		argtype;
 # define ARGTYPE_OTHER		0
 # define ARGTYPE_EDIT		1
 # define ARGTYPE_EDIT_WAIT	2
 # define ARGTYPE_SEND		3
-    int		silent = FALSE;
-    int		tabs = FALSE;
+    ਪੂਰਨ		silent = FALSE;
+    ਪੂਰਨ		tabs = FALSE;
 # ifdef MSWIN
     HWND	srv;
 # elif defined(FEAT_X11)
-    Window	srv;
+    ਖਿੜਕੀ	srv;
 
-    setup_term_clip();
+    ਤਿਆਰੀ_ਪਦ_clip();
 # endif
 # ifdef FEAT_SOCKETSERVER
-    channel_T	*ch = NULL;
+    channel_T	*ch = ਨਿਰਾ;
 # endif
 
     sname = serverMakeName(serverName_arg, argv[0]);
-    if (sname == NULL)
-	return;
+    ਜੇ (sname == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     /*
      * Execute the command server related arguments and remove them
      * from the argc/argv array; We may have to return into main()
      */
-    for (i = 1; i < Argc; i++)
+    ਲਈ (i = 1; i < Argc; i++)
     {
-	res = NULL;
-	if (STRCMP(argv[i], "--") == 0)	// end of option arguments
+	res = ਨਿਰਾ;
+	ਜੇ (STRCMP(argv[i], "--") == 0)	// end of option arguments
 	{
-	    for (; i < *argc; i++)
+	    ਲਈ (; i < *argc; i++)
 	    {
 		*newArgV++ = argv[i];
 		newArgC++;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
 
-	if (STRICMP(argv[i], "--remote-send") == 0)
+	ਜੇ (STRICMP(argv[i], "--remote-send") == 0)
 	    argtype = ARGTYPE_SEND;
-	else if (STRNICMP(argv[i], "--remote", 8) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(argv[i], "--remote", 8) == 0)
 	{
-	    char	*p = argv[i] + 8;
+	    ਅੱਖਰ	*p = argv[i] + 8;
 
 	    argtype = ARGTYPE_EDIT;
-	    while (*p != NUL)
+	    ਜਦੋਂ (*p != NUL)
 	    {
-		if (STRNICMP(p, "-wait", 5) == 0)
+		ਜੇ (STRNICMP(p, "-wait", 5) == 0)
 		{
 		    argtype = ARGTYPE_EDIT_WAIT;
 		    p += 5;
 		}
-		else if (STRNICMP(p, "-silent", 7) == 0)
+		ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "-silent", 7) == 0)
 		{
 		    silent = TRUE;
 		    p += 7;
 		}
-		else if (STRNICMP(p, "-tab", 4) == 0)
+		ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(p, "-tab", 4) == 0)
 		{
 		    tabs = TRUE;
 		    p += 4;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    argtype = ARGTYPE_OTHER;
-		    break;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    argtype = ARGTYPE_OTHER;
 
-	if (argtype != ARGTYPE_OTHER)
+	ਜੇ (argtype != ARGTYPE_OTHER)
 	{
-	    if (i == *argc - 1)
+	    ਜੇ (i == *argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
-	    if (argtype == ARGTYPE_SEND)
+	    ਜੇ (argtype == ARGTYPE_SEND)
 	    {
 		*serverStr = (char_u *)argv[i + 1];
 		i++;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		*serverStr = build_drop_cmd(*argc - i - 1, argv + i + 1,
 					  tabs, argtype == ARGTYPE_EDIT_WAIT);
-		if (*serverStr == NULL)
+		ਜੇ (*serverStr == ਨਿਰਾ)
 		{
 		    // Probably out of memory, exit.
 		    didone = TRUE;
 		    exiterr = 1;
-		    break;
+		    ਰੋਕੋ;
 		}
 		Argc = i;
 	    }
 
 # ifdef FEAT_SOCKETSERVER
-	    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
-		ret = socketserver_send(sname, *serverStr, NULL, false, -1,
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
+		ret = socketserver_send(sname, *serverStr, ਨਿਰਾ, false, -1,
 			silent, &ch);
 # endif
 # ifdef FEAT_X11
-	    if (clientserver_method == CLIENTSERVER_METHOD_X11)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
 	    {
-		if (xterm_dpy == NULL)
+		ਜੇ (xterm_dpy == ਨਿਰਾ)
 		{
 		    mch_errmsg(_("No display"));
 		    ret = -1;
 		}
-		else
-		    ret = serverSendToVim(xterm_dpy, sname, *serverStr,
-			    NULL, &srv, 0, 0, 0, silent);
+		ਨਹੀਂਤਾਂ
+		    ret = server_Send_ਮੰਜ਼ਿਲ_Vim(xterm_dpy, sname, *serverStr,
+			    ਨਿਰਾ, &srv, 0, 0, 0, silent);
 	    }
 # endif
 # ifdef MSWIN
-	    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
 		// Win32 always works?
-		ret = serverSendToVim(sname, *serverStr, NULL, &srv, 0, 0,
+		ret = server_Send_ਮੰਜ਼ਿਲ_Vim(sname, *serverStr, ਨਿਰਾ, &srv, 0, 0,
 			silent);
 # endif
-	    if (ret < 0)
+	    ਜੇ (ret < 0)
 	    {
-		if (argtype == ARGTYPE_SEND)
+		ਜੇ (argtype == ARGTYPE_SEND)
 		{
 		    // Failed to send, abort.
 		    mch_errmsg(_(": Send failed.\n"));
 		    didone = TRUE;
 		    exiterr = 1;
 		}
-		else if (!silent)
+		ਨਹੀਂਤਾਂ ਜੇ (!silent)
 		    // Let vim start normally.
 		    mch_errmsg(_(": Send failed. Trying to execute locally\n"));
-		break;
+		ਰੋਕੋ;
 	    }
 
 # ifdef FEAT_GUI_MSWIN
 	    // Guess that when the server name starts with "g" it's a GUI
 	    // server, which we can bring to the foreground here.
 	    // Foreground() in the server doesn't work very well.
-	    if (argtype != ARGTYPE_SEND && TOUPPER_ASC(*sname) == 'G')
-		SetForegroundWindow(srv);
+	    ਜੇ (argtype != ARGTYPE_SEND && TOUPPER_ASC(*sname) == 'G')
+		ਸੈੱਟ_Foreground_ਖਿੜਕੀ(srv);
 # endif
 
 	    /*
 	     * For --remote-wait: Wait until the server did edit each
 	     * file.  Also detect that the server no longer runs.
 	     */
-	    if (argtype == ARGTYPE_EDIT_WAIT)
+	    ਜੇ (argtype == ARGTYPE_EDIT_WAIT)
 	    {
-		int	numFiles = *argc - i - 1;
-		char_u  *done = alloc(numFiles);
+		ਪੂਰਨ	ਅੰਕ_Files = *argc - i - 1;
+		char_u  *ਪੂਰਾ = alloc(ਅੰਕ_Files);
 # ifdef FEAT_GUI_MSWIN
 		NOTIFYICONDATA ni;
-		int	count = 0;
-		extern HWND message_window;
+		ਪੂਰਨ	ਗਿਣਤੀ_2 = 0;
+		ਬਾਹਰੀ HWND ਸੁਨੇਹਾ_ਖਿੜਕੀ;
 # endif
 
-		if (numFiles > 0 && argv[i + 1][0] == '+')
+		ਜੇ (ਅੰਕ_Files > 0 && argv[i + 1][0] == '+')
 		    // Skip "+cmd" argument, don't wait for it to be edited.
-		    --numFiles;
+		    --ਅੰਕ_Files;
 
 # ifdef FEAT_GUI_MSWIN
-		ni.cbSize = sizeof(ni);
-		ni.hWnd = message_window;
+		ni.cb_ਮਾਪ = ਆਕਾਰ(ni);
+		ni.hWnd = ਸੁਨੇਹਾ_ਖਿੜਕੀ;
 		ni.uID = 0;
 		ni.uFlags = NIF_ICON|NIF_TIP;
-		ni.hIcon = LoadIcon((HINSTANCE)GetModuleHandle(0), "IDR_VIM");
-		sprintf(ni.szTip, _("%d of %d edited"), count, numFiles);
-		Shell_NotifyIcon(NIM_ADD, &ni);
+		ni.hIcon = ਲੱਦੋ_Icon((HINSTANCE)GetModuleHandle(0), "IDR_VIM");
+		sprintf(ni.szTip, _("%d of %d edited"), ਗਿਣਤੀ_2, ਅੰਕ_Files);
+		Shell_NotifyIcon(NIM_ਜੋੜੋ, &ni);
 # endif
 
 		// Wait for all files to unload in remote
-		vim_memset(done, 0, numFiles);
-		while (memchr(done, 0, numFiles) != NULL)
+		vim_memset(ਪੂਰਾ, 0, ਅੰਕ_Files);
+		ਜਦੋਂ (memchr(ਪੂਰਾ, 0, ਅੰਕ_Files) != ਨਿਰਾ)
 		{
-		    char_u  *p = NULL;
-		    int	    j;
+		    char_u  *p = ਨਿਰਾ;
+		    ਪੂਰਨ	    j;
 # ifdef MSWIN
-		    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
-			p = serverGetReply(srv, NULL, TRUE, TRUE, 0);
+		    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
+			p = server_Get_ਜਵਾਬ(srv, ਨਿਰਾ, TRUE, TRUE, 0);
 # endif
 # ifdef FEAT_SOCKETSERVER
-		    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET
-			    && (ch == NULL
-				|| socketserver_read_reply(sname, &p, -1, true)
+		    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET
+			    && (ch == ਨਿਰਾ
+				|| socketserver_read_ਜਵਾਬ(sname, &p, -1, true)
 				== FAIL))
-			    break;
+			    ਰੋਕੋ;
 # endif
 # ifdef FEAT_X11
-		    if (clientserver_method == CLIENTSERVER_METHOD_X11
-			    && serverReadReply(xterm_dpy, srv, &p, TRUE, -1) < 0)
-			    break;
+		    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11
+			    && server_Read_ਜਵਾਬ(xterm_dpy, srv, &p, TRUE, -1) < 0)
+			    ਰੋਕੋ;
 # endif
-		    if (p == NULL)
-			break;
-		    j = atoi((char *)p);
+		    ਜੇ (p == ਨਿਰਾ)
+			ਰੋਕੋ;
+		    j = atoi((ਅੱਖਰ *)p);
 		    vim_free(p);
-		    if (j >= 0 && j < numFiles)
+		    ਜੇ (j >= 0 && j < ਅੰਕ_Files)
 		    {
 # ifdef FEAT_GUI_MSWIN
-			++count;
+			++ਗਿਣਤੀ_2;
 			sprintf(ni.szTip, _("%d of %d edited"),
-							     count, numFiles);
+							     ਗਿਣਤੀ_2, ਅੰਕ_Files);
 			Shell_NotifyIcon(NIM_MODIFY, &ni);
 # endif
-			done[j] = 1;
+			ਪੂਰਾ[j] = 1;
 		    }
 		}
 # ifdef FEAT_SOCKETSERVER
-		if (ch != NULL)
+		ਜੇ (ch != ਨਿਰਾ)
 		{
 		    channel_close(ch, false);
 		    channel_clear(ch);
@@ -552,108 +552,108 @@ cmdsrv_main(
 # ifdef FEAT_GUI_MSWIN
 		Shell_NotifyIcon(NIM_DELETE, &ni);
 # endif
-		vim_free(done);
+		vim_free(ਪੂਰਾ);
 	    }
 	}
-	else if (STRICMP(argv[i], "--remote-expr") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRICMP(argv[i], "--remote-expr") == 0)
 	{
-	    int status = OK;
+	    ਪੂਰਨ ਸਥਿਤੀ = OK;
 
-	    if (i == *argc - 1)
+	    ਜੇ (i == *argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 # ifdef MSWIN
 	    // Win32 always works?
-	    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN
-		    && serverSendToVim(sname, (char_u *)argv[i + 1],
-						  &res, NULL, 1, 0, FALSE) < 0)
-		status = FAIL;
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN
+		    && server_Send_ਮੰਜ਼ਿਲ_Vim(sname, (char_u *)argv[i + 1],
+						  &res, ਨਿਰਾ, 1, 0, FALSE) < 0)
+		ਸਥਿਤੀ = FAIL;
 # endif
 # ifdef FEAT_SOCKETSERVER
-	    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET
 		&& socketserver_send(sname, (char_u *)argv[i + 1],
-			    &res, 1, 0, false, NULL) < 0)
-		status = FAIL;
+			    &res, 1, 0, false, ਨਿਰਾ) < 0)
+		ਸਥਿਤੀ = FAIL;
 # endif
 # ifdef FEAT_X11
-	    if (clientserver_method == CLIENTSERVER_METHOD_X11)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
 	    {
-		if (xterm_dpy == NULL)
+		ਜੇ (xterm_dpy == ਨਿਰਾ)
 		    mch_errmsg(_("No display: Send expression failed.\n"));
-		else if (serverSendToVim(xterm_dpy, sname,
+		ਨਹੀਂਤਾਂ ਜੇ (server_Send_ਮੰਜ਼ਿਲ_Vim(xterm_dpy, sname,
 			    (char_u *)argv[i + 1], &res,
-			    NULL, 1, 0, 1, FALSE) < 0)
-		    status = FAIL;
+			    ਨਿਰਾ, 1, 0, 1, FALSE) < 0)
+		    ਸਥਿਤੀ = FAIL;
 	    }
 # endif
-	    if (status == FAIL)
+	    ਜੇ (ਸਥਿਤੀ == FAIL)
 	    {
-		if (res != NULL && *res != NUL)
+		ਜੇ (res != ਨਿਰਾ && *res != NUL)
 		{
 		    // Output error from remote
-		    mch_errmsg((char *)res);
+		    mch_errmsg((ਅੱਖਰ *)res);
 		    VIM_CLEAR(res);
 		}
 		mch_errmsg(_(": Send expression failed.\n"));
 	    }
 	}
-	else if (STRICMP(argv[i], "--serverlist") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRICMP(argv[i], "--serverlist") == 0)
 	{
-	    list_T	*list = NULL;
+	    list_T	*list = ਨਿਰਾ;
 	    garray_T	ga;
 
 # ifdef MSWIN
-	    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
 		// Win32 always works?
-		list = serverGetVimNames();
+		list = server_Get_Vim_ਨਾਂ();
 # endif
 # ifdef FEAT_SOCKETSERVER
-	    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
 		list = socketserver_list();
 # endif
 # ifdef FEAT_X11
-	    if (clientserver_method == CLIENTSERVER_METHOD_X11 &&
-		    xterm_dpy != NULL)
-		list = serverGetVimNames(xterm_dpy);
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11 &&
+		    xterm_dpy != ਨਿਰਾ)
+		list = server_Get_Vim_ਨਾਂ(xterm_dpy);
 # endif
 
 	    ga_init2(&ga, 1, 80);
-	    if (list != NULL)
+	    ਜੇ (list != ਨਿਰਾ)
 	    {
 		list_join(&ga, list, (char_u *)"\n", TRUE, FALSE, 0);
 		ga_append(&ga, NUL);
 		list_free(list);
 	    }
-	    res = ga.ga_data;
+	    res = ga.ga_ਅੰਕੜੇ;
 
-	    if (did_emsg)
+	    ਜੇ (did_emsg)
 		mch_errmsg("\n");
 	}
-	else if (STRICMP(argv[i], "--servername") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRICMP(argv[i], "--servername") == 0)
 	{
 	    // Already processed. Take it out of the command line
 	    i++;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    *newArgV++ = argv[i];
 	    newArgC++;
-	    continue;
+	    ਜਾਰੀ;
 	}
 	didone = TRUE;
-	if (res != NULL && *res != NUL)
+	ਜੇ (res != ਨਿਰਾ && *res != NUL)
 	{
-	    mch_msg((char *)res);
-	    if (res[STRLEN(res) - 1] != '\n')
-		mch_msg("\n");
+	    mch_ਸੁਨੇਹਾ((ਅੱਖਰ *)res);
+	    ਜੇ (res[STRLEN(res) - 1] != '\n')
+		mch_ਸੁਨੇਹਾ("\n");
 	}
 	vim_free(res);
     }
 
-    if (didone)
+    ਜੇ (didone)
     {
 	display_errors();	// display any collected messages
-	exit(exiterr);	// Mission accomplished - get out
+	ਬਾਹਰ_ਨਿਕਲੋ(exiterr);	// Mission accomplished - get out
     }
 
     // Return back into main()
@@ -664,83 +664,83 @@ cmdsrv_main(
 /*
  * Build a ":drop" command to send to a Vim server.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 build_drop_cmd(
-    int		filec,
-    char	**filev,
-    int		tabs,		// Use ":tab drop" instead of ":drop".
-    int		sendReply)
+    ਪੂਰਨ		filec,
+    ਅੱਖਰ	**filev,
+    ਪੂਰਨ		tabs,		// Use ":tab drop" instead of ":drop".
+    ਪੂਰਨ		send_ਜਵਾਬ)
 {
     garray_T	ga;
-    int		i;
-    char_u	*inicmd = NULL;
+    ਪੂਰਨ		i;
+    char_u	*inicmd = ਨਿਰਾ;
     char_u	*p;
     string_T	cdp;
     char_u	*cwd;
     // reset wildignore temporarily
-    const string_T wig[] = {
+    ਅਚਲ string_T wig[] = {
 	STR_LITERAL_INIT("<CR><C-\\><C-N>:let g:_wig=&wig|set wig="),
 	STR_LITERAL_INIT("<C-\\><C-N>:let &wig=g:_wig|unlet g:_wig<CR>")
     };
 
-    if (filec > 0 && filev[0][0] == '+')
+    ਜੇ (filec > 0 && filev[0][0] == '+')
     {
 	inicmd = (char_u *)filev[0] + 1;
 	filev++;
 	filec--;
     }
     // Check if we have at least one argument.
-    if (filec <= 0)
+    ਜੇ (filec <= 0)
 	mainerr_arg_missing((char_u *)filev[-1]);
 
     // Temporarily cd to the current directory to handle relative file names.
     cwd = alloc(MAXPATHL);
-    if (cwd == NULL)
-	return NULL;
-    if (mch_dirname(cwd, MAXPATHL) != OK)
+    ਜੇ (cwd == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (mch_dirname(cwd, MAXPATHL) != OK)
     {
 	vim_free(cwd);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
     cdp.string = vim_strsave_escaped_ext(cwd,
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_ਵਿੱਚ_FILENAME
 	    (char_u *)"",  // rem_backslash() will tell what chars to escape
-# else
-	    PATH_ESC_CHARS,
+# ਨਹੀਂਤਾਂ
+	    ਰਸਤਾ_ESC_CHARS,
 # endif
 	    '\\', TRUE);
     vim_free(cwd);
-    if (cdp.string == NULL)
-	return NULL;
-    cdp.length = STRLEN(cdp.string);
+    ਜੇ (cdp.string == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    cdp.ਲੰਮਾਈ = STRLEN(cdp.string);
     ga_init2(&ga, 1, 100);
     GA_CONCAT_LITERAL(&ga, "<C-\\><C-N>:cd ");
-    ga_concat_len(&ga, cdp.string, cdp.length);
+    ga_concat_len(&ga, cdp.string, cdp.ਲੰਮਾਈ);
     // reset wildignorecase temporarily
-    ga_concat_len(&ga, wig[0].string, wig[0].length);
+    ga_concat_len(&ga, wig[0].string, wig[0].ਲੰਮਾਈ);
 
     // Call inputsave() so that a prompt for an encryption key works.
     GA_CONCAT_LITERAL(&ga, "<CR><C-\\><C-N>:if exists('*inputsave')|call inputsave()|endif|");
-    if (tabs)
+    ਜੇ (tabs)
 	GA_CONCAT_LITERAL(&ga, "tab ");
     GA_CONCAT_LITERAL(&ga, "drop");
-    for (i = 0; i < filec; i++)
+    ਲਈ (i = 0; i < filec; i++)
     {
 	// On Unix the shell has already expanded the wildcards, don't want to
 	// do it again in the Vim server.  On MS-Windows only escape
 	// non-wildcard characters.
 	p = vim_strsave_escaped((char_u *)filev[i],
 # ifdef UNIX
-		PATH_ESC_CHARS
-# else
+		ਰਸਤਾ_ESC_CHARS
+# ਨਹੀਂਤਾਂ
 		(char_u *)" \t%#"
 # endif
 		);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    vim_free(cdp.string);
-	    vim_free(ga.ga_data);
-	    return NULL;
+	    vim_free(ga.ga_ਅੰਕੜੇ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	GA_CONCAT_LITERAL(&ga, " ");
 	ga_concat(&ga, p);
@@ -768,19 +768,19 @@ build_drop_cmd(
     // in case :set shellslash is set, need to normalize the directory separators
     // '/' is not valid in a filename so replacing '/' by '\\' should be safe
     GA_CONCAT_LITERAL(&ga, "cd -|lcd -|elseif getcwd()->tr('/','\\') ==# '");
-# else
+# ਨਹੀਂਤਾਂ
     GA_CONCAT_LITERAL(&ga, "cd -|lcd -|elseif getcwd() ==# '");
 # endif
-    ga_concat_len(&ga, cdp.string, cdp.length);
+    ga_concat_len(&ga, cdp.string, cdp.ਲੰਮਾਈ);
     GA_CONCAT_LITERAL(&ga, "'|cd -|endif|endif<CR>");
     vim_free(cdp.string);
     // reset wildignorecase
-    ga_concat_len(&ga, wig[1].string, wig[1].length);
+    ga_concat_len(&ga, wig[1].string, wig[1].ਲੰਮਾਈ);
 
-    if (sendReply)
+    ਜੇ (send_ਜਵਾਬ)
 	GA_CONCAT_LITERAL(&ga, ":call SetupRemoteReplies()<CR>");
     GA_CONCAT_LITERAL(&ga, ":");
-    if (inicmd != NULL)
+    ਜੇ (inicmd != ਨਿਰਾ)
     {
 	// Can't use <CR> after "inicmd", because a "startinsert" would cause
 	// the following commands to be inserted as text.  Use a "|",
@@ -792,7 +792,7 @@ build_drop_cmd(
     // clear command line.
     GA_CONCAT_LITERAL(&ga, "cal foreground()|if &im|star|en|redr|f<CR>");
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    ਵਾਪਸ ga.ga_ਅੰਕੜੇ;
 }
 
 /*
@@ -800,197 +800,197 @@ build_drop_cmd(
  * the tail of the command "cmd" we were started with.
  * Return the name in allocated memory.  This doesn't include a serial number.
  */
-    static char_u *
-serverMakeName(char_u *arg, char *cmd)
+    ਸਥਿਰ char_u *
+serverMakeName(char_u *arg, ਅੱਖਰ *cmd)
 {
     char_u *p;
 
-    if (arg != NULL && *arg != NUL)
+    ਜੇ (arg != ਨਿਰਾ && *arg != NUL)
     {
 # ifdef FEAT_SOCKETSERVER
 	// When using socketserver backend, do not change the name if path or
 	// channel address.
-	if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
 	{
-	    if (STRNICMP(arg, "channel:", 8) == 0 || arg[0] == '/' ||
+	    ਜੇ (STRNICMP(arg, "channel:", 8) == 0 || arg[0] == '/' ||
 		    STRNCMP(arg, "./", 2) == 0 || STRNCMP(arg, "../", 3) == 0)
 		p = vim_strsave(arg);
-	    else
-		p = vim_strsave_up(arg);
+	    ਨਹੀਂਤਾਂ
+		p = vim_strsave_ਉੱਪਰ(arg);
 	}
-	else
-	    p = vim_strsave_up(arg);
-# else
-	p = vim_strsave_up(arg);
+	ਨਹੀਂਤਾਂ
+	    p = vim_strsave_ਉੱਪਰ(arg);
+# ਨਹੀਂਤਾਂ
+	p = vim_strsave_ਉੱਪਰ(arg);
 # endif
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	p = vim_strsave_up(gettail((char_u *)cmd));
+	p = vim_strsave_ਉੱਪਰ(gettail((char_u *)cmd));
 	// Remove .exe or .bat from the name.
-	if (p != NULL && vim_strchr(p, '.') != NULL)
+	ਜੇ (p != ਨਿਰਾ && vim_strchr(p, '.') != ਨਿਰਾ)
 	    *vim_strchr(p, '.') = NUL;
     }
-    return p;
+    ਵਾਪਸ p;
 }
-#endif // FEAT_CLIENTSERVER
+#ਜੇ_ਅੰਤ // FEAT_CLIENTSERVER
 
-#if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
-    static void
-make_connection(void)
+#ਜੇ defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+    ਸਥਿਰ ਖਾਲੀ
+make_connection(ਖਾਲੀ)
 {
-    if (X_DISPLAY == NULL
+    ਜੇ (X_DISPLAY == ਨਿਰਾ
 # ifdef FEAT_GUI
-	    && !gui.in_use
+	    && !gui.ਵਿੱਚ_use
 # endif
 	    )
     {
 	x_force_connect = TRUE;
-	setup_term_clip();
+	ਤਿਆਰੀ_ਪਦ_clip();
 	x_force_connect = FALSE;
     }
 }
 
-    static int
-check_connection(void)
+    ਸਥਿਰ ਪੂਰਨ
+check_connection(ਖਾਲੀ)
 {
-    if (clientserver_method != CLIENTSERVER_METHOD_X11)
-	return OK;
+    ਜੇ (clientserver_ਵਿਧੀ != CLIENTSERVER_ਵਿਧੀ_X11)
+	ਵਾਪਸ OK;
     make_connection();
-    if (X_DISPLAY == NULL)
+    ਜੇ (X_DISPLAY == ਨਿਰਾ)
     {
-	emsg(_(e_no_connection_to_x_server));
-	return FAIL;
+	emsg(_(e_no_connection_ਮੰਜ਼ਿਲ_x_server));
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_CLIENTSERVER
-    static void
-remote_common(typval_T *argvars, typval_T *rettv, int expr)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CLIENTSERVER
+    ਸਥਿਰ ਖਾਲੀ
+remote_common(typval_T *argvars, typval_T *rettv, ਪੂਰਨ ਵਿਅੰਜਕ)
 {
     char_u	*server_name;
-    char_u	*keys;
-    char_u	*r = NULL;
+    char_u	*ਕੁੰਜੀਆਂ;
+    char_u	*r = ਨਿਰਾ;
     char_u	buf[NUMBUFLEN];
-    int		timeout = 0;
+    ਪੂਰਨ		timeout = 0;
 # ifdef MSWIN
     HWND	w;
-# else
+# ਨਹੀਂਤਾਂ
 #  ifdef FEAT_X11
-    Window	w;
+    ਖਿੜਕੀ	w;
 #  endif
 # endif
-    int		ret = OK;
+    ਪੂਰਨ		ret = OK;
 
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
 # ifdef FEAT_X11
-    if (check_connection() == FAIL)
-	return;
+    ਜੇ (check_connection() == FAIL)
+	ਵਾਪਸ;
 # endif
-    if (argvars[2].v_type != VAR_UNKNOWN
+    ਜੇ (argvars[2].v_type != VAR_UNKNOWN
 	    && argvars[3].v_type != VAR_UNKNOWN)
-	timeout = tv_get_number(&argvars[3]);
+	timeout = tv_get_ਸੰਖਿਆ(&argvars[3]);
 
     server_name = tv_get_string_chk(&argvars[0]);
-    if (server_name == NULL)
-	return;		// type error; errmsg already given
-    keys = tv_get_string_buf(&argvars[1], buf);
+    ਜੇ (server_name == ਨਿਰਾ)
+	ਵਾਪਸ;		// type error; errmsg already given
+    ਕੁੰਜੀਆਂ = tv_get_string_buf(&argvars[1], buf);
 # ifdef MSWIN
-    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN
-	    && serverSendToVim(server_name, keys, &r, &w, expr,
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN
+	    && server_Send_ਮੰਜ਼ਿਲ_Vim(server_name, ਕੁੰਜੀਆਂ, &r, &w, ਵਿਅੰਜਕ,
 		timeout, TRUE) < 0)
 	ret = FAIL;
 # endif
 # ifdef FEAT_SOCKETSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET
-	&& socketserver_send(server_name, keys, &r, expr,
-	    timeout * 1000, true, NULL) < 0)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET
+	&& socketserver_send(server_name, ਕੁੰਜੀਆਂ, &r, ਵਿਅੰਜਕ,
+	    timeout * 1000, true, ਨਿਰਾ) < 0)
 	ret = FAIL;
 # endif
 # ifdef FEAT_X11
-    if (clientserver_method == CLIENTSERVER_METHOD_X11)
-	if (serverSendToVim(X_DISPLAY, server_name, keys, &r, &w, expr, timeout,
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
+	ਜੇ (server_Send_ਮੰਜ਼ਿਲ_Vim(X_DISPLAY, server_name, ਕੁੰਜੀਆਂ, &r, &w, ਵਿਅੰਜਕ, timeout,
 		    0, TRUE) < 0)
 	ret = FAIL;
 # endif
-    if (ret == FAIL)
+    ਜੇ (ret == FAIL)
     {
-	if (r != NULL)
+	ਜੇ (r != ਨਿਰਾ)
 	{
-	    emsg((char *)r);	// sending worked but evaluation failed
+	    emsg((ਅੱਖਰ *)r);	// sending worked but evaluation failed
 	    vim_free(r);
 	}
-	else
-	    semsg(_(e_unable_to_send_to_str), server_name);
-	return;
+	ਨਹੀਂਤਾਂ
+	    semsg(_(e_unable_ਮੰਜ਼ਿਲ_send_ਮੰਜ਼ਿਲ_str), server_name);
+	ਵਾਪਸ;
     }
 
     rettv->vval.v_string = r;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dictitem_T	v;
-# if defined(MSWIN) || defined(FEAT_X11)
+# ਜੇ defined(MSWIN) || defined(FEAT_X11)
 	char_u		sbuf[30];
 # endif
-	char_u		*str = NULL;
+	char_u		*str = ਨਿਰਾ;
 	char_u		*idvar;
 
 	idvar = tv_get_string_chk(&argvars[2]);
-	if (idvar != NULL && *idvar != NUL)
+	ਜੇ (idvar != ਨਿਰਾ && *idvar != NUL)
 	{
 # ifdef MSWIN
-	    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
 	    {
-		sprintf((char *)sbuf, PRINTF_HEX_LONG_U, (long_u)w);
+		sprintf((ਅੱਖਰ *)sbuf, PRINTF_HEX_LONG_U, (long_u)w);
 		str = sbuf;
 	    }
 # endif
 # ifdef FEAT_X11
-	    if (clientserver_method == CLIENTSERVER_METHOD_X11)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
 	    {
-		sprintf((char *)sbuf, PRINTF_HEX_LONG_U, (long_u)w);
+		sprintf((ਅੱਖਰ *)sbuf, PRINTF_HEX_LONG_U, (long_u)w);
 		str = sbuf;
 	    }
 # endif
 # ifdef FEAT_SOCKETSERVER
-	    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+	    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
 		str = server_name;
 # endif
-	    if (str == NULL)
+	    ਜੇ (str == ਨਿਰਾ)
 		str = (char_u *)"";
 
 	    v.di_tv.v_type = VAR_STRING;
 	    v.di_tv.vval.v_string = vim_strsave(str);
-	    set_var(idvar, &v.di_tv, FALSE);
+	    ਸੈੱਟ_var(idvar, &v.di_tv, FALSE);
 	    vim_free(v.di_tv.vval.v_string);
 	}
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * "remote_expr()" function
  */
-    void
-f_remote_expr(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_remote_ਵਿਅੰਜਕ(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
 # ifdef FEAT_CLIENTSERVER
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+		    && check_for_opt_ਸੰਖਿਆ_arg(argvars, 3) == FAIL)))
+	ਵਾਪਸ;
 
     remote_common(argvars, rettv, TRUE);
 # endif
@@ -999,148 +999,148 @@ f_remote_expr(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "remote_foreground()" function
  */
-    void
-f_remote_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_remote_foreground(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_CLIENTSERVER
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
 #  ifdef MSWIN
     // On Win32 it's done in this application.
     {
 	char_u	*server_name = tv_get_string_chk(&argvars[0]);
 
-	if (server_name != NULL)
+	ਜੇ (server_name != ਨਿਰਾ)
 	    serverForeground(server_name);
     }
-#  else
+#  ਨਹੀਂਤਾਂ
     // Send a foreground() expression to the server.
     argvars[1].v_type = VAR_STRING;
     argvars[1].vval.v_string = vim_strsave((char_u *)"foreground()");
     argvars[2].v_type = VAR_UNKNOWN;
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
     remote_common(argvars, rettv, TRUE);
     vim_free(argvars[1].vval.v_string);
 #  endif
 # endif
 }
 
-    void
-f_remote_peek(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_remote_peek(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
 # ifdef FEAT_CLIENTSERVER
     dictitem_T	v;
-    char_u	*s = NULL;
+    char_u	*s = ਨਿਰਾ;
 #  ifdef MSWIN
     long_u	n = 0;
 #  endif
     char_u	*serverid;
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_ਸੰਖਿਆ = -1;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     serverid = tv_get_string_chk(&argvars[0]);
-    if (serverid == NULL)
-	return;		// type error; errmsg already given
+    ਜੇ (serverid == ਨਿਰਾ)
+	ਵਾਪਸ;		// type error; errmsg already given
 #  ifdef MSWIN
-    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
     {
-	sscanf((const char *)serverid, SCANF_HEX_LONG_U, &n);
-	if (n == 0)
-	    rettv->vval.v_number = -1;
-	else
+	ਲੜੀ_ਤੋਂ_ਪੜ੍ਹੋ((ਅਚਲ ਅੱਖਰ *)serverid, SCANF_HEX_LONG_U, &n);
+	ਜੇ (n == 0)
+	    rettv->vval.v_ਸੰਖਿਆ = -1;
+	ਨਹੀਂਤਾਂ
 	{
-	    s = serverGetReply((HWND)n, FALSE, FALSE, FALSE, 0);
-	    rettv->vval.v_number = (s != NULL);
+	    s = server_Get_ਜਵਾਬ((HWND)n, FALSE, FALSE, FALSE, 0);
+	    rettv->vval.v_ਸੰਖਿਆ = (s != ਨਿਰਾ);
 	}
     }
 #  endif
 #  ifdef FEAT_SOCKETSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
-	rettv->vval.v_number = socketserver_peek_reply(serverid, &s);
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
+	rettv->vval.v_ਸੰਖਿਆ = socketserver_peek_ਜਵਾਬ(serverid, &s);
 #  endif
 #  ifdef FEAT_X11
-    if (clientserver_method == CLIENTSERVER_METHOD_X11)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
     {
-	if (check_connection() == FAIL)
-	    return;
+	ਜੇ (check_connection() == FAIL)
+	    ਵਾਪਸ;
 
-	rettv->vval.v_number = serverPeekReply(X_DISPLAY,
-		serverStrToWin(serverid), &s);
+	rettv->vval.v_ਸੰਖਿਆ = server_Peek_ਜਵਾਬ(X_DISPLAY,
+		server_Str_ਮੰਜ਼ਿਲ_Win(serverid), &s);
     }
 #  endif
 
-    if (argvars[1].v_type != VAR_UNKNOWN && rettv->vval.v_number > 0)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN && rettv->vval.v_ਸੰਖਿਆ > 0)
     {
 	char_u		*retvar;
 
 	v.di_tv.v_type = VAR_STRING;
 	v.di_tv.vval.v_string = vim_strsave(s);
 	retvar = tv_get_string_chk(&argvars[1]);
-	if (retvar != NULL)
-	    set_var(retvar, &v.di_tv, FALSE);
+	ਜੇ (retvar != ਨਿਰਾ)
+	    ਸੈੱਟ_var(retvar, &v.di_tv, FALSE);
 	vim_free(v.di_tv.vval.v_string);
     }
-# else
-    rettv->vval.v_number = -1;
+# ਨਹੀਂਤਾਂ
+    rettv->vval.v_ਸੰਖਿਆ = -1;
 # endif
 }
 
-    void
-f_remote_read(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_remote_read(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    char_u	*r = NULL;
+    char_u	*r = ਨਿਰਾ;
 
 # ifdef FEAT_CLIENTSERVER
     char_u	*serverid;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
     serverid = tv_get_string_chk(&argvars[0]);
-    if (serverid != NULL && !check_restricted() && !check_secure())
+    ਜੇ (serverid != ਨਿਰਾ && !check_restricted() && !check_secure())
     {
-	int timeout = 0;
+	ਪੂਰਨ timeout = 0;
 #  ifdef MSWIN
 	// The server's HWND is encoded in the 'id' parameter
 	long_u		n = 0;
 #  endif
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    timeout = tv_get_number(&argvars[1]);
+	ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
+	    timeout = tv_get_ਸੰਖਿਆ(&argvars[1]);
 
 #  ifdef MSWIN
-	if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
 	{
-	    sscanf((char *)serverid, SCANF_HEX_LONG_U, &n);
-	    if (n != 0)
-		r = serverGetReply((HWND)n, FALSE, TRUE, TRUE, timeout);
-	    if (r == NULL)
-		emsg(_(e_unable_to_read_server_reply));
+	    ਲੜੀ_ਤੋਂ_ਪੜ੍ਹੋ((ਅੱਖਰ *)serverid, SCANF_HEX_LONG_U, &n);
+	    ਜੇ (n != 0)
+		r = server_Get_ਜਵਾਬ((HWND)n, FALSE, TRUE, TRUE, timeout);
+	    ਜੇ (r == ਨਿਰਾ)
+		emsg(_(e_unable_ਮੰਜ਼ਿਲ_read_server_ਜਵਾਬ));
 	}
 #  endif
 #  ifdef FEAT_SOCKETSERVER
-	if (clientserver_method == CLIENTSERVER_METHOD_SOCKET &&
-		socketserver_read_reply(serverid, &r, timeout * 1000, false)
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET &&
+		socketserver_read_ਜਵਾਬ(serverid, &r, timeout * 1000, false)
 		== FAIL)
-	    emsg(_(e_unable_to_read_server_reply));
+	    emsg(_(e_unable_ਮੰਜ਼ਿਲ_read_server_ਜਵਾਬ));
 #  endif
 #  ifdef FEAT_X11
-	if (clientserver_method == CLIENTSERVER_METHOD_X11 &&
+	ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11 &&
 		(check_connection() == FAIL
-		|| serverReadReply(X_DISPLAY, serverStrToWin(serverid),
+		|| server_Read_ਜਵਾਬ(X_DISPLAY, server_Str_ਮੰਜ਼ਿਲ_Win(serverid),
 						       &r, FALSE, timeout) < 0))
-	    emsg(_(e_unable_to_read_server_reply));
+	    emsg(_(e_unable_ਮੰਜ਼ਿਲ_read_server_ਜਵਾਬ));
 #  endif
     }
 # endif
@@ -1151,18 +1151,18 @@ f_remote_read(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "remote_send()" function
  */
-    void
-f_remote_send(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_remote_send(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
 # ifdef FEAT_CLIENTSERVER
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     remote_common(argvars, rettv, FALSE);
 # endif
@@ -1171,101 +1171,101 @@ f_remote_send(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "remote_startserver()" function
  */
-    void
-f_remote_startserver(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_remote_startserver(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_CLIENTSERVER
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (serverName != NULL)
+    ਜੇ (serverName != ਨਿਰਾ)
     {
 	emsg(_(e_already_started_server));
-	return;
+	ਵਾਪਸ;
     }
 
     char_u *server = tv_get_string_chk(&argvars[0]);
-    if (server == NULL)
-	return;
+    ਜੇ (server == ਨਿਰਾ)
+	ਵਾਪਸ;
 #  ifdef MSWIN
-    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
-	serverSetName(server);
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
+	server_ਸੈੱਟ_Name(server);
 #  endif
 #  ifdef FEAT_SOCKETSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
-	socketserver_start(server, true);
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
+	socketserver_ਸ਼ੁਰੂ(server, true);
 #  endif
 #  ifdef FEAT_X11
-    if (clientserver_method == CLIENTSERVER_METHOD_X11 &&
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11 &&
 	    check_connection() == OK)
-	serverRegisterName(X_DISPLAY, server);
+	server_ਰਜਿਸਟਰ_Name(X_DISPLAY, server);
 #  endif
 
-# else
-    emsg(_(e_clientserver_feature_not_available));
+# ਨਹੀਂਤਾਂ
+    emsg(_(e_clientserver_feature_not_ਉਪਲਬਧ));
 # endif
 }
 
-    void
-f_server2client(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_server2client(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
 # ifdef FEAT_CLIENTSERVER
     char_u	buf[NUMBUFLEN];
     char_u	*server;
-    char_u	*reply;
-    int		ret = OK;
+    char_u	*ਜਵਾਬ;
+    ਪੂਰਨ		ret = OK;
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_ਸੰਖਿਆ = -1;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     server = tv_get_string_chk(&argvars[0]);
-    reply = tv_get_string_buf_chk(&argvars[1], buf);
-    if (server == NULL || reply == NULL)
-	return;
+    ਜਵਾਬ = tv_get_string_buf_chk(&argvars[1], buf);
+    ਜੇ (server == ਨਿਰਾ || ਜਵਾਬ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
 #  ifdef FEAT_SOCKETSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET &&
-	    socketserver_send_reply(server, reply) == FAIL)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET &&
+	    socketserver_send_ਜਵਾਬ(server, ਜਵਾਬ) == FAIL)
 	ret = FAIL;
 #  endif
 #  ifdef FEAT_X11
-    if (clientserver_method == CLIENTSERVER_METHOD_X11 &&
-	    serverSendReply(server, reply) < 0)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11 &&
+	    server_Send_ਜਵਾਬ(server, ਜਵਾਬ) < 0)
 	ret = FAIL;
 #  endif
 #  ifdef MSWIN
-    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN
-	    && serverSendReply(server, reply) < 0)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN
+	    && server_Send_ਜਵਾਬ(server, ਜਵਾਬ) < 0)
 	ret = FAIL;
 #  endif
 
-    if (ret == FAIL)
+    ਜੇ (ret == FAIL)
     {
-	emsg(_(e_unable_to_send_to_client));
-	return;
+	emsg(_(e_unable_ਮੰਜ਼ਿਲ_send_ਮੰਜ਼ਿਲ_client));
+	ਵਾਪਸ;
     }
-    rettv->vval.v_number = 0;
-# else
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ਸੰਖਿਆ = 0;
+# ਨਹੀਂਤਾਂ
+    rettv->vval.v_ਸੰਖਿਆ = -1;
 # endif
 }
 
-    void
-f_serverlist(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_serverlist(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    list_T  *list = NULL;
+    list_T  *list = ਨਿਰਾ;
     bool    use_list = false;
 
-    if (check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_opt_dict_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[0].vval.v_dict;
 
@@ -1274,40 +1274,40 @@ f_serverlist(typval_T *argvars UNUSED, typval_T *rettv)
 
 # ifdef FEAT_CLIENTSERVER
 #  ifdef MSWIN
-    if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
-	list = serverGetVimNames();
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_MSWIN)
+	list = server_Get_Vim_ਨਾਂ();
 #  endif
 #  ifdef FEAT_SOCKETSERVER
-    if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_SOCKET)
 	list = socketserver_list();
 #  endif
 #  ifdef FEAT_X11
-    if (clientserver_method == CLIENTSERVER_METHOD_X11)
+    ਜੇ (clientserver_ਵਿਧੀ == CLIENTSERVER_ਵਿਧੀ_X11)
     {
 	make_connection();
-	if (X_DISPLAY != NULL)
-	    list = serverGetVimNames(X_DISPLAY);
+	ਜੇ (X_DISPLAY != ਨਿਰਾ)
+	    list = server_Get_Vim_ਨਾਂ(X_DISPLAY);
     }
 #  endif
 # endif
-    if (use_list)
+    ਜੇ (use_list)
     {
-	if (list == NULL)
+	ਜੇ (list == ਨਿਰਾ)
 	{
-	    (void)rettv_list_alloc(rettv);
-	    return;
+	    (ਖਾਲੀ)rettv_list_alloc(rettv);
+	    ਵਾਪਸ;
 	}
 	list->lv_refcount++;
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = list;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	garray_T ga;
 
 	ga_init2(&ga, 1, 80);
 
-	if (list != NULL)
+	ਜੇ (list != ਨਿਰਾ)
 	{
 	    list_join(&ga, list, (char_u *)"\n", TRUE, FALSE, 0);
 	    ga_append(&ga, NUL);
@@ -1315,32 +1315,32 @@ f_serverlist(typval_T *argvars UNUSED, typval_T *rettv)
 	}
 
 	rettv->v_type = VAR_STRING;
-	rettv->vval.v_string = (char_u *)ga.ga_data;
+	rettv->vval.v_string = (char_u *)ga.ga_ਅੰਕੜੇ;
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_CLIENTSERVER_BACKENDS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CLIENTSERVER_BACKENDS
 /*
  * Check the $VIM_CLIENTSERVER environment variable and set the method
  */
-    void
-check_clientserver_method_env(void)
+    ਖਾਲੀ
+check_clientserver_ਵਿਧੀ_env(ਖਾਲੀ)
 {
     char_u *env = mch_getenv("VIM_CLIENTSERVER");
 
-    if (env == NULL)
-	return;
+    ਜੇ (env == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (STRICMP(env, "socket") == 0)
-	clientserver_method = CLIENTSERVER_METHOD_SOCKET;
+    ਜੇ (STRICMP(env, "socket") == 0)
+	clientserver_ਵਿਧੀ = CLIENTSERVER_ਵਿਧੀ_SOCKET;
 # ifdef FEAT_X11
-    else if (STRICMP(env, "x11") == 0)
-	clientserver_method = CLIENTSERVER_METHOD_X11;
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP(env, "x11") == 0)
+	clientserver_ਵਿਧੀ = CLIENTSERVER_ਵਿਧੀ_X11;
 # endif
 # ifdef MSWIN
-    else if (STRICMP(env, "mswin") == 0)
-	clientserver_method = CLIENTSERVER_METHOD_MSWIN;
+    ਨਹੀਂਤਾਂ ਜੇ (STRICMP(env, "mswin") == 0)
+	clientserver_ਵਿਧੀ = CLIENTSERVER_ਵਿਧੀ_MSWIN;
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ

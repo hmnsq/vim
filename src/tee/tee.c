@@ -27,32 +27,32 @@
  * precompiled for OS/2. That one probably works better.
  */
 
-#ifndef _MSC_VER
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ _MSC_VER
 # include <unistd.h>
-#endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#ਜੇ_ਅੰਤ
+#ਅਨ੍ਤਰ੍ਭਾਵ <malloc.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdlib.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <string.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <fcntl.h>
 
-#ifdef _WIN32
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _WIN32
 # define sysconf(x) -1
-#endif
+#ਜੇ_ਅੰਤ
 
-void usage(void)
+ਖਾਲੀ usage(ਖਾਲੀ)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
-\t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
-as well as to the standard output.\n\
+\t-a\tappend ਮੰਜ਼ਿਲ files instead ਦਾ truncating\n\
+\nTee reads its ਨਿਵੇਸ਼, and writes ਮੰਜ਼ਿਲ each ਦਾ the specified files,\n\
+as well as ਮੰਜ਼ਿਲ the standard output.\n\
 \n\
-This version supplied with Vim 4.2 to make ':make' possible.\n\
-For a more complete and stable version, consider getting\n\
-[a port of] the GNU shellutils package.\n\
+This ਸੰਸਕਰਣ_2 supplied with Vim 4.2 ਮੰਜ਼ਿਲ make ':make' possible.\n\
+For a ਹੋਰ complete and stable ਸੰਸਕਰਣ_2, consider getting\n\
+[a ਪੋਰਟ ਦਾ] the GNU shellutils package.\n\
 ");
 }
 
@@ -61,105 +61,105 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+ਪੂਰਨ
+myfread(ਅੱਖਰ *buf, ਪੂਰਨ elsize /*ignored*/, ਪੂਰਨ max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	ਪੂਰਨ	c;
+	ਪੂਰਨ	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	ਜਦੋਂ ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		ਜੇ (c == '\n' || c == '\r')
+			ਰੋਕੋ;
 	}
-	return n;
+	ਵਾਪਸ n;
 }
 
 
-int
-main(int argc, char *argv[])
+ਪੂਰਨ
+ਮੁੱਖ(ਪੂਰਨ argc, ਅੱਖਰ *argv[])
 {
-	int	append = 0;
+	ਪੂਰਨ	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	ਪੂਰਨ	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	ਪੂਰਨ	i;
+	ਅੱਖਰ	buf[BUFSIZ];
+	ਪੂਰਨ	n;
+	ਪੂਰਨ	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	ਲਈ (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		ਜੇ (argv[i][0] != '-')
+			ਰੋਕੋ;
+		ਜੇ (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		ਨਹੀਂਤਾਂ
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	ਜੇ (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
-		exit(2);
+		ਬਾਹਰ_ਨਿਕਲੋ(2);
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	ਜੇ (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	ਜੇ (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
-		exit(1);
+		ਬਾਹਰ_ਨਿਕਲੋ(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = ਸਿਫਰ_ਸਮ੍ਰਿਤੀ_ਦਿਓ(numfiles, ਆਕਾਰ(FILE *));
+	ਜੇ (filepointers == ਨਿਰਾ)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
-															   (long)numfiles);
-		exit(1);
+															   (ਲੰਮਾ)numfiles);
+		ਬਾਹਰ_ਨਿਕਲੋ(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	ਲਈ (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		ਜੇ (filepointers[i] == ਨਿਰਾ)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
-			exit(1);
+			ਬਾਹਰ_ਨਿਕਲੋ(1);
 		}
 	}
-#ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _WIN32
+	setmode(fileno(stdin),  O_ਦੁਆਧਾਰੀ);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
-#endif
+	setmode(fileno(stdout),  O_ਦੁਆਧਾਰੀ);
+#ਜੇ_ਅੰਤ
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	ਜਦੋਂ ((n = myfread(buf, ਆਕਾਰ(ਅੱਖਰ), ਆਕਾਰ(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, ਆਕਾਰ(ਅੱਖਰ), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		ਲਈ (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			ਜੇ (filepointers[i] &&
+			     fwrite(buf, ਆਕਾਰ(ਅੱਖਰ), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = ਨਿਰਾ;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	ਲਈ (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		ਜੇ (filepointers[i])
 			fclose(filepointers[i]);
 	}
 
-	exit(0);
+	ਬਾਹਰ_ਨਿਕਲੋ(0);
 }

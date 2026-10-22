@@ -3,23 +3,23 @@
  *
  */
 
-#if defined(__VMS) || defined(__vms)
-# if !defined(VMS)
+#ਜੇ defined(__VMS) || defined(__vms)
+# ਜੇ !defined(VMS)
 #  define VMS
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#include <decc$types.h>             // Required early for large-file support
+#ਅਨ੍ਤਰ੍ਭਾਵ <decc$types.h>             // Required early for large-file support
 
-#define CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
-#define FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
-#define BINARY_FILE_IO              // Use binary fileio
-#define USE_GETCWD
-#define USE_SYSTEM
-#define XPMATTRIBUTES_TYPE XpmAttributes
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਦੁਆਧਾਰੀ_FILE_IO              // Use binary fileio
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USE_GETCWD
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USE_SYSTEM
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPMATTRIBUTES_TYPE Xpm_ਗੁਣ
 
 // Define when terminfo support found
-#undef TERMINFO
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ TERMINFO
 
 // Define when termcap.h contains ospeed
 // #define HAVE_OSPEED
@@ -31,10 +31,10 @@
 //#define HAVE_OUTFUNTYPE
 
 // Define when __DATE__ " " __TIME__ can be used
-#define HAVE_DATE_TIME
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_DATE_ਸਮਾਂ
 
 // #undef USEBCOPY
-#define USEMEMMOVE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USEMEMMOVE
 // #undef USEMEMCPY
 
 // Define when "man -s 2" is to be used
@@ -71,7 +71,7 @@
 // #undef SYS_SELECT_WITH_SYS_TIME
 
 // Define if struct sigcontext is present
-#define HAVE_SIGCONTEXT
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_SIGCONTEXT
 
 // Define if toupper/tolower only work on lower/uppercase characters
 // #define BROKEN_TOUPPER
@@ -91,72 +91,72 @@
 // Define if you have the sigset() function.
 // #undef HAVE_SIGSET
 
-#define TGETENT_ZERO_ERR
-#define HAVE_GETCWD
-#define HAVE_STRTOL
-#define HAVE_TGETENT
-#define HAVE_MEMSET
-#define HAVE_STRERROR
-#define HAVE_FCHOWN
-#define HAVE_RENAME
-#define HAVE_QSORT
-#define HAVE_FSYNC
-#define HAVE_GETPWUID
-#define HAVE_GETPWNAM
-#define	HAVE_STDLIB_H
-#define	HAVE_STRING_H
-#define	HAVE_ERRNO_H
-#define HAVE_OPENDIR
-#define HAVE_PUTENV
-#define HAVE_SETENV
-#define HAVE_SETJMP_H
-#define HAVE_MATH_H
-#define HAVE_GETTIMEOFDAY
-#define HAVE_PWD_H
-#define HAVE_NETDB_H
-#define	HAVE_DIRENT_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TGETENT_ZERO_ERR
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_GETCWD
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_STRTOL
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_TGETENT
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_MEMSET
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_STRERROR
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_FCHOWN
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_RENAME
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_QSORT
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_FSYNC
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_GETPWUID
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_GETPWNAM
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	HAVE_STDLIB_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	HAVE_STRING_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	HAVE_ERRNO_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_OPENDIR
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_PUTENV
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_SETENV
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_SETJMP_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_MATH_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_GETTIMEOFDAY
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_PWD_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_NETDB_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	HAVE_DIRENT_H
 
-#undef	HAVE_SYS_NDIR_H
-#undef	HAVE_SYS_DIR_H
-#undef	HAVE_NDIR_H
-#undef	HAVE_SYS_WAIT_H
-#undef  HAVE_SYS_SELECT_H
-#undef  HAVE_SYS_UTSNAME_H
-#undef  HAVE_SYS_SYSTEMINFO_H
-#undef  HAVE_TERMCAP_H
-#undef	HAVE_SGTTY_H
-#undef	HAVE_SYS_IOCTL_H
-#undef	HAVE_TERMIO_H
-#undef	HAVE_STROPTS_H
-#undef	HAVE_SYS_STREAM_H
-#undef	HAVE_SYS_PTEM_H
-#undef	HAVE_TERMIOS_H
-#undef	HAVE_LIBC_H
-#undef	HAVE_SYS_STATFS_H
-#undef	HAVE_SYS_POLL_H
-#undef  HAVE_FCHDIR
-#undef  HAVE_LSTAT
-#undef  HAVE_STDINT_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_NDIR_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_DIR_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_NDIR_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_WAIT_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_SYS_SELECT_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_SYS_UTSNAME_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_SYS_SYSTEMINFO_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_TERMCAP_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SGTTY_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_IOCTL_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_TERMIO_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_STROPTS_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_ਧਾਰਾ_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_PTEM_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_TERMIOS_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_LIBC_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_STATFS_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	HAVE_SYS_POLL_H
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_FCHDIR
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_LSTAT
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ  HAVE_STDINT_H
 
 // Default features
-#define FEAT_IPV6
-#define FEAT_XTERM_SAVE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FEAT_IPV6
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FEAT_XTERM_SAVE
 
-#define VIM_SIZEOF_INT  4
-#define VIM_SIZEOF_LONG 4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ VIM_SIZEOF_INT  4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ VIM_SIZEOF_LONG 4
 
-#if __USE_OFF64_T
+#ਜੇ __USE_OFF64_T
 # define SIZEOF_OFF_T 8
-#else
+#ਨਹੀਂਤਾਂ
 # define SIZEOF_OFF_T 4
-#endif
+#ਜੇ_ਅੰਤ
 
 // Hardware specific
-#if defined(__VAX) || defined(VAX)
+#ਜੇ defined(__VAX) || defined(VAX)
 # undef  HAVE_GETTIMEOFDAY
 # undef  HAVE_USLEEP
 # undef  HAVE_STRCASECMP
-# undef  HAVE_STRINGS_H
+# undef  HAVE_ਲੜੀਆਂ_H
 # undef  HAVE_SIGSETJMP
 # undef  HAVE_ISNAN
 # undef  HAVE_XOS_R_H
@@ -165,11 +165,11 @@
 # define LONG_LONG_MAX  (2147483647)
 # define ULONG_LONG_MAX (4294967295U)
 
-#else // ALPHA, IA64, X86_64
+#ਨਹੀਂਤਾਂ // ALPHA, IA64, X86_64
 # define HAVE_GETTIMEOFDAY
 # define HAVE_USLEEP
 # define HAVE_STRCASECMP
-# define HAVE_STRINGS_H
+# define HAVE_ਲੜੀਆਂ_H
 # define HAVE_SIGSETJMP
 # undef  HAVE_XOS_R_H
 # undef  HAVE_NO_LONG_LONG
@@ -177,50 +177,50 @@
 # define LONG_LONG_MAX  (9223372036854775807)
 # define ULONG_LONG_MAX (18446744073709551615U)
 
-# if defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
+# ਜੇ defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
 #  define HAVE_ISINF
 #  define HAVE_ISNAN
 # endif
 
-# if defined(X86_64)
+# ਜੇ defined(X86_64)
 #  define HAVE_FSEEKO
 #  define HAVE_STDINT_H
 #  define HAVE_XOS_R_H
 # endif
 
-#endif /* VAX [else] */
+#ਜੇ_ਅੰਤ /* VAX [else] */
 
 // Compiler specific
-#if defined(VAXC) || defined(__VAXC)
+#ਜੇ defined(VAXC) || defined(__VAXC)
 # undef  HAVE_SELECT
 # undef  HAVE_FCNTL_H
 # undef  HAVE_UNISTD_H
-# undef  HAVE_SYS_TIME_H
+# undef  HAVE_SYS_ਸਮਾਂ_H
 # undef  HAVE_LOCALE_H
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # undef	HAVE_STRFTIME
-#else   // DECC
+#ਨਹੀਂਤਾਂ   // DECC
 # define HAVE_SELECT
 # define HAVE_FCNTL_H
 # define HAVE_UNISTD_H 1
-# define HAVE_SYS_TIME_H
+# define HAVE_SYS_ਸਮਾਂ_H
 # define HAVE_LOCALE_H
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # define HAVE_STRFTIME
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(USE_ICONV)
+#ਜੇ defined(USE_ICONV)
 # define HAVE_ICONV_H
 # define HAVE_ICONV
-#else
+#ਨਹੀਂਤਾਂ
 # undef HAVE_ICONV_H
 # undef HAVE_ICONV
-#endif
+#ਜੇ_ਅੰਤ
 
 // GUI support defines
-#if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
+#ਜੇ defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
 # define X_INCLUDE_GRP_H  // To use getgrgid
 # define XUSE_MTSAFE_API
 # define HAVE_X11
@@ -230,11 +230,11 @@
 # endif
 # define USE_FONTSET
 # undef  X_LOCALE
-#endif
+#ਜੇ_ਅੰਤ
 
 // Define needed types from stdint - older VMS do not have stdint.h
-#ifndef HAVE_STDINT_H
-   typedef unsigned char  uint8_t;
-   typedef unsigned short uint16_t;
-   typedef unsigned int   uint32_t;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_STDINT_H
+   ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ  uint8_t;
+   ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ uint16_t;
+   ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ   uint32_t;
+#ਜੇ_ਅੰਤ

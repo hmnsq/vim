@@ -36,37 +36,37 @@
  * http://www.adobe.com
  */
 
-#include "vim.h"
-#include "version.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "version.h"
 
-#ifdef FEAT_POSTSCRIPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_POSTSCRIPT
 
 # include "hardcopy.h"
 # include "hardcopy_postscript.h"
 
-option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS] =
+option_ਸਾਰਣੀ_T mbfont_opts[OPT_MBFONT_ਅੰਕ_OPTIONS] =
 {
-    {"c",	FALSE, 0, NULL, 0, FALSE},
-    {"a",	FALSE, 0, NULL, 0, FALSE},
-    {"r",	FALSE, 0, NULL, 0, FALSE},
-    {"b",	FALSE, 0, NULL, 0, FALSE},
-    {"i",	FALSE, 0, NULL, 0, FALSE},
-    {"o",	FALSE, 0, NULL, 0, FALSE},
+    {"c",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
+    {"a",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
+    {"r",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
+    {"b",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
+    {"i",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
+    {"o",	FALSE, 0, ਨਿਰਾ, 0, FALSE},
 };
 
 # define PRT_PS_DEFAULT_DPI	    (72)    // Default user space resolution
 # define PRT_PS_DEFAULT_FONTSIZE     (10)
-# define PRT_PS_DEFAULT_BUFFER_SIZE  (80)
+# define PRT_PS_DEFAULT_ਬਫਰ_ਮਾਪ  (80)
 
 // PS font names, must be in Roman, Bold, Italic, Bold-Italic order
-struct prt_ps_font_S
+ਬਣਤਰ prt_ps_font_S
 {
-    int		wx;
-    int		uline_offset;
-    int		uline_width;
-    int		bbox_min_y;
-    int		bbox_max_y;
-    char	*(ps_fontname[4]);
+    ਪੂਰਨ		wx;
+    ਪੂਰਨ		uline_ਵਿੱਥ;
+    ਪੂਰਨ		uline_ਚੌੜਾਈ;
+    ਪੂਰਨ		bbox_min_y;
+    ਪੂਰਨ		bbox_max_y;
+    ਅੱਖਰ	*(ps_fontname[4]);
 };
 
 # define PRT_PS_FONT_ROMAN	(0)
@@ -75,7 +75,7 @@ struct prt_ps_font_S
 # define PRT_PS_FONT_BOLDOBLIQUE (3)
 
 // Standard font metrics for Courier family
-static struct prt_ps_font_S prt_ps_courier_font =
+ਸਥਿਰ ਬਣਤਰ prt_ps_font_S prt_ps_courier_font =
 {
     600,
     -100, 50,
@@ -84,31 +84,31 @@ static struct prt_ps_font_S prt_ps_courier_font =
 };
 
 // Generic font metrics for multi-byte fonts
-static struct prt_ps_font_S prt_ps_mb_font =
+ਸਥਿਰ ਬਣਤਰ prt_ps_font_S prt_ps_mb_font =
 {
     1000,
     -100, 50,
     -250, 805,
-    {NULL, NULL, NULL, NULL}
+    {ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ}
 };
 
 // Pointer to current font set being used
-static struct prt_ps_font_S* prt_ps_font;
+ਸਥਿਰ ਬਣਤਰ prt_ps_font_S* prt_ps_font;
 
 // Structures to map user named encoding and mapping to PS equivalents for
 // building CID font name
-struct prt_ps_encoding_S
+ਬਣਤਰ prt_ps_encoding_S
 {
-    char	*encoding;
-    char	*cmap_encoding;
-    int		needs_charset;
+    ਅੱਖਰ	*encoding;
+    ਅੱਖਰ	*cmap_encoding;
+    ਪੂਰਨ		needs_charset;
 };
 
-struct prt_ps_charset_S
+ਬਣਤਰ prt_ps_charset_S
 {
-    char	*charset;
-    char	*cmap_charset;
-    int		has_charset;
+    ਅੱਖਰ	*charset;
+    ਅੱਖਰ	*cmap_charset;
+    ਪੂਰਨ		has_charset;
 };
 
 # define CS_JIS_C_1978   (0x01)
@@ -121,9 +121,9 @@ struct prt_ps_charset_S
 # define CS_KANJITALK7   (0x80)
 
 // Japanese encodings and charsets
-static struct prt_ps_encoding_S j_encodings[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_encoding_S j_encodings[] =
 {
-    {"iso-2022-jp", NULL,       (CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990|
+    {"iso-2022-jp", ਨਿਰਾ,       (CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990|
 								    CS_NEC)},
     {"euc-jp",	    "EUC",	(CS_JIS_C_1978|CS_JIS_X_1983|CS_JIS_X_1990)},
     {"sjis",	    "RKSJ",	(CS_JIS_C_1978|CS_JIS_X_1983|CS_MSWINDOWS|
@@ -132,10 +132,10 @@ static struct prt_ps_encoding_S j_encodings[] =
     {"ucs-2",       "UCS2",     CS_JIS_X_1990},
     {"utf-8",       "UTF8" ,    CS_JIS_X_1990}
 };
-static struct prt_ps_charset_S j_charsets[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_charset_S j_charsets[] =
 {
     {"JIS_C_1978",  "78",       CS_JIS_C_1978},
-    {"JIS_X_1983",  NULL,       CS_JIS_X_1983},
+    {"JIS_X_1983",  ਨਿਰਾ,       CS_JIS_X_1983},
     {"JIS_X_1990",  "Hojo",     CS_JIS_X_1990},
     {"NEC",	    "Ext",	CS_NEC},
     {"MSWINDOWS",   "90ms",     CS_MSWINDOWS},
@@ -153,17 +153,17 @@ static struct prt_ps_charset_S j_charsets[] =
 # define CS_SC_ISO10646      (0x40)
 
 // Simplified Chinese encodings and charsets
-static struct prt_ps_encoding_S sc_encodings[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_encoding_S sc_encodings[] =
 {
-    {"iso-2022",    NULL,       (CS_GB_2312_80|CS_GBT_12345_90)},
-    {"gb18030",     NULL,       CS_GBK2K},
+    {"iso-2022",    ਨਿਰਾ,       (CS_GB_2312_80|CS_GBT_12345_90)},
+    {"gb18030",     ਨਿਰਾ,       CS_GBK2K},
     {"euc-cn",      "EUC",      (CS_GB_2312_80|CS_GBT_12345_90|CS_SC_MAC|
 								CS_GBT_90_MAC)},
     {"gbk",	    "EUC",	CS_GBK},
     {"ucs-2",       "UCS2",     CS_SC_ISO10646},
     {"utf-8",       "UTF8",     CS_SC_ISO10646}
 };
-static struct prt_ps_charset_S sc_charsets[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_charset_S sc_charsets[] =
 {
     {"GB_2312-80",  "GB",       CS_GB_2312_80},
     {"GBT_12345-90","GBT",      CS_GBT_12345_90},
@@ -189,9 +189,9 @@ static struct prt_ps_charset_S sc_charsets[] =
 # define CS_TC_ISO10646	    (0x1000)
 
 // Traditional Chinese encodings and charsets
-static struct prt_ps_encoding_S tc_encodings[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_encoding_S tc_encodings[] =
 {
-    {"iso-2022",    NULL,       (CS_CNS_PLANE_1|CS_CNS_PLANE_2)},
+    {"iso-2022",    ਨਿਰਾ,       (CS_CNS_PLANE_1|CS_CNS_PLANE_2)},
     {"euc-tw",      "EUC",      CS_CNS_PLANE_1_2},
     {"big5",	    "B5",	(CS_B5|CS_ETEN|CS_HK_GCCS|CS_HK_SCS|
 				    CS_HK_SCS_ETEN|CS_MTHKL|CS_MTHKS|CS_DLHKL|
@@ -202,13 +202,13 @@ static struct prt_ps_encoding_S tc_encodings[] =
     {"utf-16",      "UTF16",    CS_TC_ISO10646},
     {"utf-32",      "UTF32",    CS_TC_ISO10646}
 };
-static struct prt_ps_charset_S tc_charsets[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_charset_S tc_charsets[] =
 {
     {"CNS_1992_1",  "CNS1",     CS_CNS_PLANE_1},
     {"CNS_1992_2",  "CNS2",     CS_CNS_PLANE_2},
     {"CNS_1993",    "CNS",      CS_CNS_PLANE_1_2},
-    {"BIG5",	    NULL,	CS_B5},
-    {"CP950",	    NULL,	CS_B5},
+    {"BIG5",	    ਨਿਰਾ,	CS_B5},
+    {"CP950",	    ਨਿਰਾ,	CS_B5},
     {"ETEN",	    "ETen",	CS_ETEN},
     {"HK_GCCS",     "HKgccs",	CS_HK_GCCS},
     {"SCS",	    "HKscs",	CS_HK_SCS},
@@ -226,9 +226,9 @@ static struct prt_ps_charset_S tc_charsets[] =
 # define CS_KR_ISO10646      (0x08)
 
 // Korean encodings and charsets
-static struct prt_ps_encoding_S k_encodings[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_encoding_S k_encodings[] =
 {
-    {"iso-2022-kr", NULL,       CS_KR_X_1992},
+    {"iso-2022-kr", ਨਿਰਾ,       CS_KR_X_1992},
     {"euc-kr",      "EUC",      (CS_KR_X_1992|CS_KR_MAC)},
     {"johab",       "Johab",    CS_KR_X_1992},
     {"cp1361",      "Johab",    CS_KR_X_1992},
@@ -237,7 +237,7 @@ static struct prt_ps_encoding_S k_encodings[] =
     {"ucs-2",       "UCS2",     CS_KR_ISO10646},
     {"utf-8",       "UTF8",     CS_KR_ISO10646}
 };
-static struct prt_ps_charset_S k_charsets[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_charset_S k_charsets[] =
 {
     {"KS_X_1992",   "KSC",      CS_KR_X_1992},
     {"CP1361",      "KSC",      CS_KR_X_1992},
@@ -249,59 +249,59 @@ static struct prt_ps_charset_S k_charsets[] =
 };
 
 // Collections of encodings and charsets for multi-byte printing
-struct prt_ps_mbfont_S
+ਬਣਤਰ prt_ps_mbfont_S
 {
-    int				num_encodings;
-    struct prt_ps_encoding_S	*encodings;
-    int				num_charsets;
-    struct prt_ps_charset_S	*charsets;
-    char			*ascii_enc;
-    char			*defcs;
+    ਪੂਰਨ				ਅੰਕ_encodings;
+    ਬਣਤਰ prt_ps_encoding_S	*encodings;
+    ਪੂਰਨ				ਅੰਕ_charsets;
+    ਬਣਤਰ prt_ps_charset_S	*charsets;
+    ਅੱਖਰ			*ascii_enc;
+    ਅੱਖਰ			*defcs;
 };
 
-static struct prt_ps_mbfont_S prt_ps_mbfonts[] =
+ਸਥਿਰ ਬਣਤਰ prt_ps_mbfont_S prt_ps_mbfonts[] =
 {
     {
-	ARRAY_LENGTH(j_encodings),
+	ARRAY_ਲੰਮਾਈ(j_encodings),
 	j_encodings,
-	ARRAY_LENGTH(j_charsets),
+	ARRAY_ਲੰਮਾਈ(j_charsets),
 	j_charsets,
 	"jis_roman",
 	"JIS_X_1983"
     },
     {
-	ARRAY_LENGTH(sc_encodings),
+	ARRAY_ਲੰਮਾਈ(sc_encodings),
 	sc_encodings,
-	ARRAY_LENGTH(sc_charsets),
+	ARRAY_ਲੰਮਾਈ(sc_charsets),
 	sc_charsets,
 	"gb_roman",
 	"GB_2312-80"
     },
     {
-	ARRAY_LENGTH(tc_encodings),
+	ARRAY_ਲੰਮਾਈ(tc_encodings),
 	tc_encodings,
-	ARRAY_LENGTH(tc_charsets),
+	ARRAY_ਲੰਮਾਈ(tc_charsets),
 	tc_charsets,
 	"cns_roman",
 	"BIG5"
     },
     {
-	ARRAY_LENGTH(k_encodings),
+	ARRAY_ਲੰਮਾਈ(k_encodings),
 	k_encodings,
-	ARRAY_LENGTH(k_charsets),
+	ARRAY_ਲੰਮਾਈ(k_charsets),
 	k_charsets,
 	"ks_roman",
 	"KS_X_1992"
     }
 };
 
-struct prt_ps_resource_S
+ਬਣਤਰ prt_ps_resource_S
 {
     char_u  name[64];
     char_u  filename[MAXPATHL + 1];
-    int     type;
+    ਪੂਰਨ     type;
     char_u  title[256];
-    char_u  version[256];
+    char_u  ਸੰਸਕਰਣ_2[256];
 };
 
 // Types of PS resource file currently used
@@ -318,12 +318,12 @@ struct prt_ps_resource_S
 // VIM      Prolog  CIDProlog
 // 6.2      1.3
 // 7.0      1.4	    1.0
-# define PRT_PROLOG_VERSION  ((char_u *)"1.4")
-# define PRT_CID_PROLOG_VERSION  ((char_u *)"1.0")
+# define PRT_PROLOG_ਸੰਸਕਰਣ  ((char_u *)"1.4")
+# define PRT_CID_PROLOG_ਸੰਸਕਰਣ  ((char_u *)"1.0")
 
 // String versions of PS resource types - indexed by constants above so don't
 // re-order!
-static char *prt_resource_types[] =
+ਸਥਿਰ ਅੱਖਰ *prt_resource_types[] =
 {
     "procset",
     "encoding",
@@ -331,7 +331,7 @@ static char *prt_resource_types[] =
 };
 
 // Strings to look for in a PS resource file
-# define PRT_RESOURCE_HEADER	    "%!PS-Adobe-"
+# define PRT_RESOURCE_ਸਿਰਲੇਖ	    "%!PS-Adobe-"
 # define PRT_RESOURCE_RESOURCE	    "Resource-"
 # define PRT_RESOURCE_PROCSET	    "ProcSet"
 # define PRT_RESOURCE_ENCODING	    "Encoding"
@@ -342,215 +342,215 @@ static char *prt_resource_types[] =
 // read more comments.
 # define PRT_DSC_MISC_TYPE	    (-1)
 # define PRT_DSC_TITLE_TYPE	    (1)
-# define PRT_DSC_VERSION_TYPE	    (2)
+# define PRT_DSC_ਸੰਸਕਰਣ_TYPE	    (2)
 # define PRT_DSC_ENDCOMMENTS_TYPE    (3)
 
 # define PRT_DSC_TITLE		    "%%Title:"
-# define PRT_DSC_VERSION		    "%%Version:"
+# define PRT_DSC_ਸੰਸਕਰਣ		    "%%Version:"
 # define PRT_DSC_ENDCOMMENTS	    "%%EndComments:"
 
-struct prt_dsc_comment_S
+ਬਣਤਰ prt_dsc_comment_S
 {
-    char	*string;
-    int		len;
-    int		type;
+    ਅੱਖਰ	*string;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		type;
 };
 
-struct prt_dsc_line_S
+ਬਣਤਰ prt_dsc_ਸਤਰ_S
 {
-    int		type;
+    ਪੂਰਨ		type;
     char_u	*string;
-    int		len;
+    ਪੂਰਨ		len;
 };
 
 
-# define SIZEOF_CSTR(s)      (sizeof(s) - 1)
-static struct prt_dsc_comment_S prt_dsc_table[] =
+# define SIZEOF_CSTR(s)      (ਆਕਾਰ(s) - 1)
+ਸਥਿਰ ਬਣਤਰ prt_dsc_comment_S prt_dsc_ਸਾਰਣੀ[] =
 {
     {PRT_DSC_TITLE,       SIZEOF_CSTR(PRT_DSC_TITLE),     PRT_DSC_TITLE_TYPE},
-    {PRT_DSC_VERSION,     SIZEOF_CSTR(PRT_DSC_VERSION),
-							PRT_DSC_VERSION_TYPE},
+    {PRT_DSC_ਸੰਸਕਰਣ,     SIZEOF_CSTR(PRT_DSC_ਸੰਸਕਰਣ),
+							PRT_DSC_ਸੰਸਕਰਣ_TYPE},
     {PRT_DSC_ENDCOMMENTS, SIZEOF_CSTR(PRT_DSC_ENDCOMMENTS),
 						     PRT_DSC_ENDCOMMENTS_TYPE}
 };
 
-static void prt_write_file_len(char_u *buffer, int bytes);
-static int prt_next_dsc(struct prt_dsc_line_S *p_dsc_line);
+ਸਥਿਰ ਖਾਲੀ prt_write_file_len(char_u *ਬਫਰ, ਪੂਰਨ ਬਾਈਟਾਂ);
+ਸਥਿਰ ਪੂਰਨ prt_ਅਗਲਾ_dsc(ਬਣਤਰ prt_dsc_ਸਤਰ_S *p_dsc_ਸਤਰ);
 
 /*
  * Variables for the output PostScript file.
  */
-static FILE *prt_ps_fd;
-static int prt_file_error;
-static char_u *prt_ps_file_name = NULL;
+ਸਥਿਰ FILE *prt_ps_fd;
+ਸਥਿਰ ਪੂਰਨ prt_file_error;
+ਸਥਿਰ char_u *prt_ps_file_name = ਨਿਰਾ;
 
 /*
  * Various offsets and dimensions in default PostScript user space (points).
  * Used for text positioning calculations
  */
-static float prt_page_width;
-static float prt_page_height;
-static float prt_left_margin;
-static float prt_right_margin;
-static float prt_top_margin;
-static float prt_bottom_margin;
-static float prt_line_height;
-static float prt_first_line_height;
-static float prt_char_width;
-static float prt_number_width;
-static float prt_bgcol_offset;
-static float prt_pos_x_moveto = 0.0;
-static float prt_pos_y_moveto = 0.0;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਪੰਨਾ_ਚੌੜਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਪੰਨਾ_ਉਚਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਖੱਬਾ_margin;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਸੱਜਾ_margin;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਸਿਖਰ_margin;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_bottom_margin;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਸਤਰ_ਉਚਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਪਹਿਲਾ_ਸਤਰ_ਉਚਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_char_ਚੌੜਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_bgcol_ਵਿੱਥ;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_pos_x_moveto = 0.0;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_pos_y_moveto = 0.0;
 
 /*
  * Various control variables used to decide when and how to change the
  * PostScript graphics state.
  */
-static int prt_need_moveto;
-static int prt_do_moveto;
-static int prt_need_font;
-static int prt_font;
-static int prt_need_underline;
-static int prt_underline;
-static int prt_do_underline;
-static int prt_need_fgcol;
-static int prt_fgcol;
-static int prt_need_bgcol;
-static int prt_do_bgcol;
-static int prt_bgcol;
-static int prt_new_bgcol;
-static int prt_attribute_change;
-static float prt_text_run;
-static int prt_page_num;
-static int prt_bufsiz;
+ਸਥਿਰ ਪੂਰਨ prt_need_moveto;
+ਸਥਿਰ ਪੂਰਨ prt_do_moveto;
+ਸਥਿਰ ਪੂਰਨ prt_need_font;
+ਸਥਿਰ ਪੂਰਨ prt_font;
+ਸਥਿਰ ਪੂਰਨ prt_need_underline;
+ਸਥਿਰ ਪੂਰਨ prt_underline;
+ਸਥਿਰ ਪੂਰਨ prt_do_underline;
+ਸਥਿਰ ਪੂਰਨ prt_need_fgcol;
+ਸਥਿਰ ਪੂਰਨ prt_fgcol;
+ਸਥਿਰ ਪੂਰਨ prt_need_bgcol;
+ਸਥਿਰ ਪੂਰਨ prt_do_bgcol;
+ਸਥਿਰ ਪੂਰਨ prt_bgcol;
+ਸਥਿਰ ਪੂਰਨ prt_new_bgcol;
+ਸਥਿਰ ਪੂਰਨ prt_attribute_change;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_ਪਾਠ_ਲੜੀਵਾਰ;
+ਸਥਿਰ ਪੂਰਨ prt_ਪੰਨਾ_ਅੰਕ;
+ਸਥਿਰ ਪੂਰਨ prt_bufsiz;
 
 /*
  * Variables controlling physical printing.
  */
-static int prt_media;
-static int prt_portrait;
-static int prt_num_copies;
-static int prt_duplex;
-static int prt_tumble;
-static int prt_collate;
+ਸਥਿਰ ਪੂਰਨ prt_media;
+ਸਥਿਰ ਪੂਰਨ prt_portrait;
+ਸਥਿਰ ਪੂਰਨ prt_ਅੰਕ_copies;
+ਸਥਿਰ ਪੂਰਨ prt_duplex;
+ਸਥਿਰ ਪੂਰਨ prt_tumble;
+ਸਥਿਰ ਪੂਰਨ prt_collate;
 
 /*
  * Buffers used when generating PostScript output
  */
-static char_u prt_line_buffer[257];
-static garray_T prt_ps_buffer;
+ਸਥਿਰ char_u prt_ਸਤਰ_ਬਫਰ[257];
+ਸਥਿਰ garray_T prt_ps_ਬਫਰ;
 
-static int prt_do_conv;
-static vimconv_T prt_conv;
+ਸਥਿਰ ਪੂਰਨ prt_do_conv;
+ਸਥਿਰ vimconv_T prt_conv;
 
-static int prt_out_mbyte;
-static int prt_custom_cmap;
-static char prt_cmap[80];
-static int prt_use_courier;
-static int prt_in_ascii;
-static int prt_half_width;
-static char *prt_ascii_encoding;
-static const char_u prt_hexchar[] = "0123456789abcdef";
+ਸਥਿਰ ਪੂਰਨ prt_ਬਾਹਰਲਾ_mbyte;
+ਸਥਿਰ ਪੂਰਨ prt_custom_cmap;
+ਸਥਿਰ ਅੱਖਰ prt_cmap[80];
+ਸਥਿਰ ਪੂਰਨ prt_use_courier;
+ਸਥਿਰ ਪੂਰਨ prt_ਵਿੱਚ_ascii;
+ਸਥਿਰ ਪੂਰਨ prt_half_ਚੌੜਾਈ;
+ਸਥਿਰ ਅੱਖਰ *prt_ascii_encoding;
+ਸਥਿਰ ਅਚਲ char_u prt_hexchar[] = "0123456789abcdef";
 
-    static void
-prt_write_file_raw_len(char_u *buffer, int bytes)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_file_raw_len(char_u *ਬਫਰ, ਪੂਰਨ ਬਾਈਟਾਂ)
 {
-    if (!prt_file_error
-	    && fwrite(buffer, sizeof(char_u), bytes, prt_ps_fd)
-							     != (size_t)bytes)
+    ਜੇ (!prt_file_error
+	    && fwrite(ਬਫਰ, ਆਕਾਰ(char_u), ਬਾਈਟਾਂ, prt_ps_fd)
+							     != (size_t)ਬਾਈਟਾਂ)
     {
-	emsg(_(e_error_writing_to_postscript_output_file));
+	emsg(_(e_error_writing_ਮੰਜ਼ਿਲ_postscript_output_file));
 	prt_file_error = TRUE;
     }
 }
 
-    static void
-prt_write_file(char_u *buffer)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_file(char_u *ਬਫਰ)
 {
-    prt_write_file_len(buffer, (int)STRLEN(buffer));
+    prt_write_file_len(ਬਫਰ, (ਪੂਰਨ)STRLEN(ਬਫਰ));
 }
 
-    static void
-prt_write_file_len(char_u *buffer, int bytes)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_file_len(char_u *ਬਫਰ, ਪੂਰਨ ਬਾਈਟਾਂ)
 {
-    prt_write_file_raw_len(buffer, bytes);
+    prt_write_file_raw_len(ਬਫਰ, ਬਾਈਟਾਂ);
 }
 
 /*
  * Write a string.
  */
-    static void
-prt_write_string(char *s)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_string(ਅੱਖਰ *s)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer), "%s", s);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ), "%s", s);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write an int and a space.
  */
-    static void
-prt_write_int(int i)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_int(ਪੂਰਨ i)
 {
-    sprintf((char *)prt_line_buffer, "%d ", i);
-    prt_write_file(prt_line_buffer);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "%d ", i);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write a boolean and a space.
  */
-    static void
-prt_write_boolean(int b)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_boolean(ਪੂਰਨ b)
 {
-    sprintf((char *)prt_line_buffer, "%s ", (b ? "T" : "F"));
-    prt_write_file(prt_line_buffer);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "%s ", (b ? "T" : "F"));
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write PostScript to re-encode and define the font.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 prt_def_font(
-    char	*new_name,
-    char	*encoding,
-    int		height,
-    char	*font)
+    ਅੱਖਰ	*new_name,
+    ਅੱਖਰ	*encoding,
+    ਪੂਰਨ		ਉਚਾਈ,
+    ਅੱਖਰ	*font)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 			  "/_%s /VIM-%s /%s ref\n", new_name, encoding, font);
-    prt_write_file(prt_line_buffer);
-    if (prt_out_mbyte)
-	sprintf((char *)prt_line_buffer, "/%s %d %f /_%s sffs\n",
-		       new_name, height, 500./prt_ps_courier_font.wx, new_name);
-    else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
+	sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "/%s %d %f /_%s sffs\n",
+		       new_name, ਉਚਾਈ, 500./prt_ps_courier_font.wx, new_name);
+    ਨਹੀਂਤਾਂ
+	vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
+			     "/%s %d /_%s ffs\n", new_name, ਉਚਾਈ, new_name);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write a line to define the CID font.
  */
-    static void
-prt_def_cidfont(char *new_name, int height, char *cidfont)
+    ਸਥਿਰ ਖਾਲੀ
+prt_def_cidfont(ਅੱਖਰ *new_name, ਪੂਰਨ ਉਚਾਈ, ਅੱਖਰ *cidfont)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 	      "/_%s /%s[/%s] vim_composefont\n", new_name, prt_cmap, cidfont);
-    prt_write_file(prt_line_buffer);
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
+			     "/%s %d /_%s ffs\n", new_name, ਉਚਾਈ, new_name);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write a line to define a duplicate of a CID font
  */
-    static void
-prt_dup_cidfont(char *original_name, char *new_name)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dup_cidfont(ਅੱਖਰ *original_name, ਅੱਖਰ *new_name)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 				       "/%s %s d\n", new_name, original_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
@@ -558,26 +558,26 @@ prt_dup_cidfont(char *original_name, char *new_name)
  * the fractional part being in the range [0,10^precision).  The fractional part
  * is also rounded based on the precision + 1'th fractional digit.
  */
-    static void
-prt_real_bits(
-    double      real,
-    int		precision,
-    int		*pinteger,
-    int		*pfraction)
+    ਸਥਿਰ ਖਾਲੀ
+prt_real_ਬਿੱਟ(
+    ਦੁੱਗਣਾ      real,
+    ਪੂਰਨ		precision,
+    ਪੂਰਨ		*pinteger,
+    ਪੂਰਨ		*pfraction)
 {
-    int     i;
-    int     integer;
-    float   fraction;
+    ਪੂਰਨ     i;
+    ਪੂਰਨ     integer;
+    ਦਸ਼ਮਲਵ   fraction;
 
-    integer = (int)real;
-    fraction = (float)(real - integer);
-    if (real < (double)integer)
+    integer = (ਪੂਰਨ)real;
+    fraction = (ਦਸ਼ਮਲਵ)(real - integer);
+    ਜੇ (real < (ਦੁੱਗਣਾ)integer)
 	fraction = -fraction;
-    for (i = 0; i < precision; i++)
+    ਲਈ (i = 0; i < precision; i++)
 	fraction *= 10.0;
 
     *pinteger = integer;
-    *pfraction = (int)(fraction + 0.5);
+    *pfraction = (ਪੂਰਨ)(fraction + 0.5);
 }
 
 /*
@@ -585,62 +585,62 @@ prt_real_bits(
  * We use prt_real_bits() as %f in sprintf uses the locale setting to decide
  * what decimal point character to use, but PS always requires a '.'.
  */
-    static void
-prt_write_real(double val, int prec)
+    ਸਥਿਰ ਖਾਲੀ
+prt_write_real(ਦੁੱਗਣਾ val, ਪੂਰਨ prec)
 {
-    int     integer;
-    int     fraction;
+    ਪੂਰਨ     integer;
+    ਪੂਰਨ     fraction;
 
-    prt_real_bits(val, prec, &integer, &fraction);
+    prt_real_ਬਿੱਟ(val, prec, &integer, &fraction);
     // Emit integer part
-    sprintf((char *)prt_line_buffer, "%d", integer);
-    prt_write_file(prt_line_buffer);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "%d", integer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
     // Only emit fraction if necessary
-    if (fraction != 0)
+    ਜੇ (fraction != 0)
     {
 	// Remove any trailing zeros
-	while ((fraction % 10) == 0)
+	ਜਦੋਂ ((fraction % 10) == 0)
 	{
 	    prec--;
 	    fraction /= 10;
 	}
 	// Emit fraction left padded with zeros
-	sprintf((char *)prt_line_buffer, ".%0*d", prec, fraction);
-	prt_write_file(prt_line_buffer);
+	sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ".%0*d", prec, fraction);
+	prt_write_file(prt_ਸਤਰ_ਬਫਰ);
     }
-    sprintf((char *)prt_line_buffer, " ");
-    prt_write_file(prt_line_buffer);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, " ");
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 /*
  * Write a line to define a numeric variable.
  */
-    static void
-prt_def_var(char *name, double value, int prec)
+    ਸਥਿਰ ਖਾਲੀ
+prt_def_var(ਅੱਖਰ *name, ਦੁੱਗਣਾ ਮੁੱਲ, ਪੂਰਨ prec)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 								"/%s ", name);
-    prt_write_file(prt_line_buffer);
-    prt_write_real(value, prec);
-    sprintf((char *)prt_line_buffer, "d\n");
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
+    prt_write_real(ਮੁੱਲ, prec);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "d\n");
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
 // Convert size from font space to user space at current font scale
-# define PRT_PS_FONT_TO_USER(scale, size)    ((size) * ((scale)/1000.0))
+# define PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(scale, ਮਾਪ)    ((ਮਾਪ) * ((scale)/1000.0))
 
-    static void
-prt_flush_buffer(void)
+    ਸਥਿਰ ਖਾਲੀ
+prt_flush_ਬਫਰ(ਖਾਲੀ)
 {
-    if (prt_ps_buffer.ga_len <= 0)
-	return;
+    ਜੇ (prt_ps_ਬਫਰ.ga_len <= 0)
+	ਵਾਪਸ;
 
     // Any background color must be drawn first
-    if (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
+    ਜੇ (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
     {
-	int     r, g, b;
+	ਪੂਰਨ     r, g, b;
 
-	if (prt_do_moveto)
+	ਜੇ (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -649,12 +649,12 @@ prt_flush_buffer(void)
 	}
 
 	// Size of rect of background color on which text is printed
-	prt_write_real(prt_text_run, 2);
-	prt_write_real(prt_line_height, 2);
+	prt_write_real(prt_ਪਾਠ_ਲੜੀਵਾਰ, 2);
+	prt_write_real(prt_ਸਤਰ_ਉਚਾਈ, 2);
 
 	// Lastly add the color of the background
-	r = ((unsigned)prt_new_bgcol & 0xff0000) >> 16;
-	g = ((unsigned)prt_new_bgcol & 0xff00) >> 8;
+	r = ((ਬਿਨਾਨਿਸ਼ਾਨੀ)prt_new_bgcol & 0xff0000) >> 16;
+	g = ((ਬਿਨਾਨਿਸ਼ਾਨੀ)prt_new_bgcol & 0xff00) >> 8;
 	b = prt_new_bgcol & 0xff;
 	prt_write_real(r / 255.0, 3);
 	prt_write_real(g / 255.0, 3);
@@ -663,9 +663,9 @@ prt_flush_buffer(void)
     }
     // Draw underlines before the text as it makes it slightly easier to
     // find the starting point.
-    if (prt_do_underline)
+    ਜੇ (prt_do_underline)
     {
-	if (prt_do_moveto)
+	ਜੇ (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -674,21 +674,21 @@ prt_flush_buffer(void)
 	}
 
 	// Underline length of text run
-	prt_write_real(prt_text_run, 2);
+	prt_write_real(prt_ਪਾਠ_ਲੜੀਵਾਰ, 2);
 	prt_write_string("ul\n");
     }
     // Draw the text
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
 	prt_write_string("<");
-    else
+    ਨਹੀਂਤਾਂ
 	prt_write_string("(");
-    prt_write_file_raw_len(prt_ps_buffer.ga_data, prt_ps_buffer.ga_len);
-    if (prt_out_mbyte)
+    prt_write_file_raw_len(prt_ps_ਬਫਰ.ga_ਅੰਕੜੇ, prt_ps_ਬਫਰ.ga_len);
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
 	prt_write_string(">");
-    else
+    ਨਹੀਂਤਾਂ
 	prt_write_string(")");
     // Add a moveto if need be and use the appropriate show procedure
-    if (prt_do_moveto)
+    ਜੇ (prt_do_moveto)
     {
 	prt_write_real(prt_pos_x_moveto, 2);
 	prt_write_real(prt_pos_y_moveto, 2);
@@ -696,47 +696,47 @@ prt_flush_buffer(void)
 	prt_write_string("ms\n");
 	prt_do_moveto = FALSE;
     }
-    else // Simple show
+    ਨਹੀਂਤਾਂ // Simple show
 	prt_write_string("s\n");
 
-    ga_clear(&prt_ps_buffer);
-    ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
+    ga_clear(&prt_ps_ਬਫਰ);
+    ga_init2(&prt_ps_ਬਫਰ, ਆਕਾਰ(ਅੱਖਰ), prt_bufsiz);
 }
 
 
-    static void
-prt_resource_name(char_u *filename, void *cookie)
+    ਸਥਿਰ ਖਾਲੀ
+prt_resource_name(char_u *filename, ਖਾਲੀ *cookie)
 {
     char_u *resource_filename = cookie;
 
-    if (STRLEN(filename) >= MAXPATHL)
+    ਜੇ (STRLEN(filename) >= MAXPATHL)
 	*resource_filename = NUL;
-    else
+    ਨਹੀਂਤਾਂ
 	STRCPY(resource_filename, filename);
 }
 
-    static int
-prt_find_resource(char *name, struct prt_ps_resource_S *resource)
+    ਸਥਿਰ ਪੂਰਨ
+prt_ਲੱਭੋ_resource(ਅੱਖਰ *name, ਬਣਤਰ prt_ps_resource_S *resource)
 {
-    char_u	*buffer;
-    int		retval;
+    char_u	*ਬਫਰ;
+    ਪੂਰਨ		retval;
 
-    buffer = alloc(MAXPATHL + 1);
-    if (buffer == NULL)
-	return FALSE;
+    ਬਫਰ = alloc(MAXPATHL + 1);
+    ਜੇ (ਬਫਰ == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
     vim_strncpy(resource->name, (char_u *)name, 63);
     // Look for named resource file in runtimepath
-    STRCPY(buffer, "print");
-    add_pathsep(buffer);
-    vim_strcat(buffer, (char_u *)name, MAXPATHL);
-    vim_strcat(buffer, (char_u *)".ps", MAXPATHL);
+    STRCPY(ਬਫਰ, "print");
+    ਜੋੜੋ_pathsep(ਬਫਰ);
+    vim_strcat(ਬਫਰ, (char_u *)name, MAXPATHL);
+    vim_strcat(ਬਫਰ, (char_u *)".ps", MAXPATHL);
     resource->filename[0] = NUL;
-    retval = (do_in_runtimepath(buffer, 0, prt_resource_name,
+    retval = (do_ਵਿੱਚ_runtimepath(ਬਫਰ, 0, prt_resource_name,
 							   resource->filename)
 	    && resource->filename[0] != NUL);
-    vim_free(buffer);
-    return retval;
+    vim_free(ਬਫਰ);
+    ਵਾਪਸ retval;
 }
 
 // PS CR and LF characters have platform independent values
@@ -745,658 +745,658 @@ prt_find_resource(char *name, struct prt_ps_resource_S *resource)
 
 // Static buffer to read initial comments in a resource file, some can have a
 // couple of KB of comments!
-# define PRT_FILE_BUFFER_LEN (2048)
-struct prt_resfile_buffer_S
+# define PRT_FILE_ਬਫਰ_LEN (2048)
+ਬਣਤਰ prt_resfile_ਬਫਰ_S
 {
-    char_u  buffer[PRT_FILE_BUFFER_LEN];
-    int     len;
-    int     line_start;
-    int     line_end;
+    char_u  ਬਫਰ[PRT_FILE_ਬਫਰ_LEN];
+    ਪੂਰਨ     len;
+    ਪੂਰਨ     ਸਤਰ_ਸ਼ੁਰੂ;
+    ਪੂਰਨ     ਸਤਰ_ਸਿਰਾ;
 };
 
-static struct prt_resfile_buffer_S prt_resfile;
+ਸਥਿਰ ਬਣਤਰ prt_resfile_ਬਫਰ_S prt_resfile;
 
-    static int
-prt_resfile_next_line(void)
+    ਸਥਿਰ ਪੂਰਨ
+prt_resfile_ਅਗਲਾ_ਸਤਰ(ਖਾਲੀ)
 {
-    int     idx;
+    ਪੂਰਨ     idx;
 
     // Move to start of next line and then find end of line
-    idx = prt_resfile.line_end + 1;
-    while (idx < prt_resfile.len)
+    idx = prt_resfile.ਸਤਰ_ਸਿਰਾ + 1;
+    ਜਦੋਂ (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] != PSLF && prt_resfile.buffer[idx] != PSCR)
-	    break;
+	ਜੇ (prt_resfile.ਬਫਰ[idx] != PSLF && prt_resfile.ਬਫਰ[idx] != PSCR)
+	    ਰੋਕੋ;
 	idx++;
     }
-    prt_resfile.line_start = idx;
+    prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ = idx;
 
-    while (idx < prt_resfile.len)
+    ਜਦੋਂ (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] == PSLF || prt_resfile.buffer[idx] == PSCR)
-	    break;
+	ਜੇ (prt_resfile.ਬਫਰ[idx] == PSLF || prt_resfile.ਬਫਰ[idx] == PSCR)
+	    ਰੋਕੋ;
 	idx++;
     }
-    prt_resfile.line_end = idx;
+    prt_resfile.ਸਤਰ_ਸਿਰਾ = idx;
 
-    return (idx < prt_resfile.len);
+    ਵਾਪਸ (idx < prt_resfile.len);
 }
 
-    static int
-prt_resfile_strncmp(int offset, char *string, int len)
+    ਸਥਿਰ ਪੂਰਨ
+prt_resfile_strncmp(ਪੂਰਨ ਵਿੱਥ, ਅੱਖਰ *string, ਪੂਰਨ len)
 {
     // Force not equal if string is longer than remainder of line
-    if (len > (prt_resfile.line_end - (prt_resfile.line_start + offset)))
-	return 1;
+    ਜੇ (len > (prt_resfile.ਸਤਰ_ਸਿਰਾ - (prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ)))
+	ਵਾਪਸ 1;
 
-    return STRNCMP(&prt_resfile.buffer[prt_resfile.line_start + offset],
+    ਵਾਪਸ STRNCMP(&prt_resfile.ਬਫਰ[prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ],
 								string, len);
 }
 
-    static int
-prt_resfile_skip_nonws(int offset)
+    ਸਥਿਰ ਪੂਰਨ
+prt_resfile_skip_nonws(ਪੂਰਨ ਵਿੱਥ)
 {
-    int     idx;
+    ਪੂਰਨ     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ;
+    ਜਦੋਂ (idx < prt_resfile.ਸਤਰ_ਸਿਰਾ)
     {
-	if (SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	ਜੇ (ਸੁਰੱਖਿਅਤ_isspace(prt_resfile.ਬਫਰ[idx]))
+	    ਵਾਪਸ idx - prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ;
 	idx++;
     }
-    return -1;
+    ਵਾਪਸ -1;
 }
 
-    static int
-prt_resfile_skip_ws(int offset)
+    ਸਥਿਰ ਪੂਰਨ
+prt_resfile_skip_ws(ਪੂਰਨ ਵਿੱਥ)
 {
-    int     idx;
+    ਪੂਰਨ     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ;
+    ਜਦੋਂ (idx < prt_resfile.ਸਤਰ_ਸਿਰਾ)
     {
-	if (!SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	ਜੇ (!ਸੁਰੱਖਿਅਤ_isspace(prt_resfile.ਬਫਰ[idx]))
+	    ਵਾਪਸ idx - prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ;
 	idx++;
     }
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 // prt_next_dsc() - returns detail on next DSC comment line found.  Returns true
 // if a DSC comment is found, else false
-    static int
-prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
+    ਸਥਿਰ ਪੂਰਨ
+prt_ਅਗਲਾ_dsc(ਬਣਤਰ prt_dsc_ਸਤਰ_S *p_dsc_ਸਤਰ)
 {
-    int     comment;
-    int     offset;
+    ਪੂਰਨ     comment;
+    ਪੂਰਨ     ਵਿੱਥ;
 
     // Move to start of next line
-    if (!prt_resfile_next_line())
-	return FALSE;
+    ਜੇ (!prt_resfile_ਅਗਲਾ_ਸਤਰ())
+	ਵਾਪਸ FALSE;
 
     // DSC comments always start %%
-    if (prt_resfile_strncmp(0, "%%", 2) != 0)
-	return FALSE;
+    ਜੇ (prt_resfile_strncmp(0, "%%", 2) != 0)
+	ਵਾਪਸ FALSE;
 
     // Find type of DSC comment
-    for (comment = 0; comment < (int)ARRAY_LENGTH(prt_dsc_table); comment++)
-	if (prt_resfile_strncmp(0, prt_dsc_table[comment].string,
-					    prt_dsc_table[comment].len) == 0)
-	    break;
+    ਲਈ (comment = 0; comment < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(prt_dsc_ਸਾਰਣੀ); comment++)
+	ਜੇ (prt_resfile_strncmp(0, prt_dsc_ਸਾਰਣੀ[comment].string,
+					    prt_dsc_ਸਾਰਣੀ[comment].len) == 0)
+	    ਰੋਕੋ;
 
-    if (comment != ARRAY_LENGTH(prt_dsc_table))
+    ਜੇ (comment != ARRAY_ਲੰਮਾਈ(prt_dsc_ਸਾਰਣੀ))
     {
 	// Return type of comment
-	p_dsc_line->type = prt_dsc_table[comment].type;
-	offset = prt_dsc_table[comment].len;
+	p_dsc_ਸਤਰ->type = prt_dsc_ਸਾਰਣੀ[comment].type;
+	ਵਿੱਥ = prt_dsc_ਸਾਰਣੀ[comment].len;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Unrecognised DSC comment, skip to ws after comment leader
-	p_dsc_line->type = PRT_DSC_MISC_TYPE;
-	offset = prt_resfile_skip_nonws(0);
-	if (offset == -1)
-	    return FALSE;
+	p_dsc_ਸਤਰ->type = PRT_DSC_MISC_TYPE;
+	ਵਿੱਥ = prt_resfile_skip_nonws(0);
+	ਜੇ (ਵਿੱਥ == -1)
+	    ਵਾਪਸ FALSE;
     }
 
     // Skip ws to comment value
-    offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    ਵਿੱਥ = prt_resfile_skip_ws(ਵਿੱਥ);
+    ਜੇ (ਵਿੱਥ == -1)
+	ਵਾਪਸ FALSE;
 
-    p_dsc_line->string = &prt_resfile.buffer[prt_resfile.line_start + offset];
-    p_dsc_line->len = prt_resfile.line_end - (prt_resfile.line_start + offset);
+    p_dsc_ਸਤਰ->string = &prt_resfile.ਬਫਰ[prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ];
+    p_dsc_ਸਤਰ->len = prt_resfile.ਸਤਰ_ਸਿਰਾ - (prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ + ਵਿੱਥ);
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
  * Improved hand crafted parser to get the type, title, and version number of a
  * PS resource file so the file details can be added to the DSC header comments.
  */
-    static int
-prt_open_resource(struct prt_ps_resource_S *resource)
+    ਸਥਿਰ ਪੂਰਨ
+prt_open_resource(ਬਣਤਰ prt_ps_resource_S *resource)
 {
-    int		offset;
-    int		seen_all;
-    int		seen_title;
-    int		seen_version;
+    ਪੂਰਨ		ਵਿੱਥ;
+    ਪੂਰਨ		ਵੇਖਿਆ_all;
+    ਪੂਰਨ		ਵੇਖਿਆ_title;
+    ਪੂਰਨ		ਵੇਖਿਆ_ਸੰਸਕਰਣ;
     FILE	*fd_resource;
-    struct prt_dsc_line_S dsc_line;
+    ਬਣਤਰ prt_dsc_ਸਤਰ_S dsc_ਸਤਰ;
 
-    fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    fd_resource = mch_fopen((ਅੱਖਰ *)resource->filename, READBIN);
+    ਜੇ (fd_resource == ਨਿਰਾ)
     {
 	semsg(_(e_cant_open_file_str_3), resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
-    CLEAR_FIELD(prt_resfile.buffer);
+    CLEAR_ਖੇਤਰ(prt_resfile.ਬਫਰ);
 
     // Parse first line to ensure valid resource file
-    prt_resfile.len = (int)fread((char *)prt_resfile.buffer, sizeof(char_u),
-					    PRT_FILE_BUFFER_LEN, fd_resource);
-    if (ferror(fd_resource))
+    prt_resfile.len = (ਪੂਰਨ)fread((ਅੱਖਰ *)prt_resfile.ਬਫਰ, ਆਕਾਰ(char_u),
+					    PRT_FILE_ਬਫਰ_LEN, fd_resource);
+    ਜੇ (ferror(fd_resource))
     {
 	semsg(_(e_cant_read_postscript_resource_file_str),
 		resource->filename);
 	fclose(fd_resource);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
     fclose(fd_resource);
 
-    prt_resfile.line_end = -1;
-    prt_resfile.line_start = 0;
-    if (!prt_resfile_next_line())
-	return FALSE;
+    prt_resfile.ਸਤਰ_ਸਿਰਾ = -1;
+    prt_resfile.ਸਤਰ_ਸ਼ੁਰੂ = 0;
+    ਜੇ (!prt_resfile_ਅਗਲਾ_ਸਤਰ())
+	ਵਾਪਸ FALSE;
 
-    offset = 0;
+    ਵਿੱਥ = 0;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_HEADER,
-			       (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER)) != 0)
+    ਜੇ (prt_resfile_strncmp(ਵਿੱਥ, PRT_RESOURCE_ਸਿਰਲੇਖ,
+			       (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_ਸਿਰਲੇਖ)) != 0)
     {
 	semsg(_(e_file_str_is_not_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
     // Skip over any version numbers and following ws
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER);
-    offset = prt_resfile_skip_nonws(offset);
-    if (offset == -1)
-	return FALSE;
-    offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    ਵਿੱਥ += (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_ਸਿਰਲੇਖ);
+    ਵਿੱਥ = prt_resfile_skip_nonws(ਵਿੱਥ);
+    ਜੇ (ਵਿੱਥ == -1)
+	ਵਾਪਸ FALSE;
+    ਵਿੱਥ = prt_resfile_skip_ws(ਵਿੱਥ);
+    ਜੇ (ਵਿੱਥ == -1)
+	ਵਾਪਸ FALSE;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_RESOURCE,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
+    ਜੇ (prt_resfile_strncmp(ਵਿੱਥ, PRT_RESOURCE_RESOURCE,
+			     (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
+    ਵਿੱਥ += (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
 
     // Decide type of resource in the file
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_PROCSET,
-			      (int)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
+    ਜੇ (prt_resfile_strncmp(ਵਿੱਥ, PRT_RESOURCE_PROCSET,
+			      (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_PROCSET;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_ENCODING,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (prt_resfile_strncmp(ਵਿੱਥ, PRT_RESOURCE_ENCODING,
+			     (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_ENCODING;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_CMAP,
-				 (int)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (prt_resfile_strncmp(ਵਿੱਥ, PRT_RESOURCE_CMAP,
+				 (ਪੂਰਨ)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_CMAP;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
     // Look for title and version of resource
     resource->title[0] = '\0';
-    resource->version[0] = '\0';
-    seen_title = FALSE;
-    seen_version = FALSE;
-    seen_all = FALSE;
-    while (!seen_all && prt_next_dsc(&dsc_line))
+    resource->ਸੰਸਕਰਣ_2[0] = '\0';
+    ਵੇਖਿਆ_title = FALSE;
+    ਵੇਖਿਆ_ਸੰਸਕਰਣ = FALSE;
+    ਵੇਖਿਆ_all = FALSE;
+    ਜਦੋਂ (!ਵੇਖਿਆ_all && prt_ਅਗਲਾ_dsc(&dsc_ਸਤਰ))
     {
-	switch (dsc_line.type)
+	ਚੋਣ (dsc_ਸਤਰ.type)
 	{
-	case PRT_DSC_TITLE_TYPE:
-	    vim_strncpy(resource->title, dsc_line.string, dsc_line.len);
-	    seen_title = TRUE;
-	    if (seen_version)
-		seen_all = TRUE;
-	    break;
+	ਹਾਲਤ PRT_DSC_TITLE_TYPE:
+	    vim_strncpy(resource->title, dsc_ਸਤਰ.string, dsc_ਸਤਰ.len);
+	    ਵੇਖਿਆ_title = TRUE;
+	    ਜੇ (ਵੇਖਿਆ_ਸੰਸਕਰਣ)
+		ਵੇਖਿਆ_all = TRUE;
+	    ਰੋਕੋ;
 
-	case PRT_DSC_VERSION_TYPE:
-	    vim_strncpy(resource->version, dsc_line.string, dsc_line.len);
-	    seen_version = TRUE;
-	    if (seen_title)
-		seen_all = TRUE;
-	    break;
+	ਹਾਲਤ PRT_DSC_ਸੰਸਕਰਣ_TYPE:
+	    vim_strncpy(resource->ਸੰਸਕਰਣ_2, dsc_ਸਤਰ.string, dsc_ਸਤਰ.len);
+	    ਵੇਖਿਆ_ਸੰਸਕਰਣ = TRUE;
+	    ਜੇ (ਵੇਖਿਆ_title)
+		ਵੇਖਿਆ_all = TRUE;
+	    ਰੋਕੋ;
 
-	case PRT_DSC_ENDCOMMENTS_TYPE:
+	ਹਾਲਤ PRT_DSC_ENDCOMMENTS_TYPE:
 	    // Won't find title or resource after this comment, stop searching
-	    seen_all = TRUE;
-	    break;
+	    ਵੇਖਿਆ_all = TRUE;
+	    ਰੋਕੋ;
 
-	case PRT_DSC_MISC_TYPE:
+	ਹਾਲਤ PRT_DSC_MISC_TYPE:
 	    // Not interested in whatever comment this line had
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
-    if (!seen_title || !seen_version)
+    ਜੇ (!ਵੇਖਿਆ_title || !ਵੇਖਿਆ_ਸੰਸਕਰਣ)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-    static int
-prt_check_resource(struct prt_ps_resource_S *resource, char_u *version)
+    ਸਥਿਰ ਪੂਰਨ
+prt_check_resource(ਬਣਤਰ prt_ps_resource_S *resource, char_u *ਸੰਸਕਰਣ_2)
 {
     // Version number m.n should match, the revision number does not matter
-    if (STRNCMP(resource->version, version, STRLEN(version)) != 0)
+    ਜੇ (STRNCMP(resource->ਸੰਸਕਰਣ_2, ਸੰਸਕਰਣ_2, STRLEN(ਸੰਸਕਰਣ_2)) != 0)
     {
-	semsg(_(e_str_resource_file_has_wrong_version),
+	semsg(_(e_str_resource_file_has_wrong_ਸੰਸਕਰਣ),
 		resource->name);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
     // Other checks to be added as needed
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-    static void
-prt_dsc_start(void)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_ਸ਼ੁਰੂ(ਖਾਲੀ)
 {
     prt_write_string("%!PS-Adobe-3.0\n");
 }
 
-    static void
-prt_dsc_noarg(char *comment)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_noarg(ਅੱਖਰ *comment)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 							 "%%%%%s\n", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
-    static void
-prt_dsc_textline(char *comment, char *text)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_textline(ਅੱਖਰ *comment, ਅੱਖਰ *ਪਾਠ)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-					       "%%%%%s: %s\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
+					       "%%%%%s: %s\n", comment, ਪਾਠ);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
-    static void
-prt_dsc_text(char *comment, char *text)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_ਪਾਠ(ਅੱਖਰ *comment, ਅੱਖਰ *ਪਾਠ)
 {
     // TODO - should scan 'text' for any chars needing escaping!
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
-					     "%%%%%s: (%s)\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
+					     "%%%%%s: (%s)\n", comment, ਪਾਠ);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
-# define prt_dsc_atend(c)	prt_dsc_text((c), "atend")
+# define prt_dsc_atend(c)	prt_dsc_ਪਾਠ((c), "atend")
 
-    static void
-prt_dsc_ints(char *comment, int count, int *ints)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_ints(ਅੱਖਰ *comment, ਪੂਰਨ ਗਿਣਤੀ_2, ਪੂਰਨ *ints)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 							  "%%%%%s:", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 
-    for (i = 0; i < count; i++)
+    ਲਈ (i = 0; i < ਗਿਣਤੀ_2; i++)
     {
-	sprintf((char *)prt_line_buffer, " %d", ints[i]);
-	prt_write_file(prt_line_buffer);
+	sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, " %d", ints[i]);
+	prt_write_file(prt_ਸਤਰ_ਬਫਰ);
     }
 
     prt_write_string("\n");
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 prt_dsc_resources(
-    char	*comment,	// if NULL add to previous
-    char	*type,
-    char	*string)
+    ਅੱਖਰ	*comment,	// if NULL add to previous
+    ਅੱਖਰ	*type,
+    ਅੱਖਰ	*string)
 {
-    if (comment != NULL)
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    ਜੇ (comment != ਨਿਰਾ)
+	vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 						 "%%%%%s: %s", comment, type);
-    else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    ਨਹੀਂਤਾਂ
+	vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 							    "%%%%+ %s", type);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 							     " %s\n", string);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 }
 
-    static void
-prt_dsc_font_resource(char *resource, struct prt_ps_font_S *ps_font)
+    ਸਥਿਰ ਖਾਲੀ
+prt_dsc_font_resource(ਅੱਖਰ *resource, ਬਣਤਰ prt_ps_font_S *ps_font)
 {
-    int     i;
+    ਪੂਰਨ     i;
 
     prt_dsc_resources(resource, "font",
 				    ps_font->ps_fontname[PRT_PS_FONT_ROMAN]);
-    for (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
-	if (ps_font->ps_fontname[i] != NULL)
-	    prt_dsc_resources(NULL, "font", ps_font->ps_fontname[i]);
+    ਲਈ (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
+	ਜੇ (ps_font->ps_fontname[i] != ਨਿਰਾ)
+	    prt_dsc_resources(ਨਿਰਾ, "font", ps_font->ps_fontname[i]);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 prt_dsc_requirements(
-    int		duplex,
-    int		tumble,
-    int		collate,
-    int		color,
-    int		num_copies)
+    ਪੂਰਨ		duplex,
+    ਪੂਰਨ		tumble,
+    ਪੂਰਨ		collate,
+    ਪੂਰਨ		color,
+    ਪੂਰਨ		ਅੰਕ_copies)
 {
     // Only output the comment if we need to.
     // Note: tumble is ignored if we are not duplexing
-    if (!(duplex || collate || color || (num_copies > 1)))
-	return;
+    ਜੇ (!(duplex || collate || color || (ਅੰਕ_copies > 1)))
+	ਵਾਪਸ;
 
-    sprintf((char *)prt_line_buffer, "%%%%Requirements:");
-    prt_write_file(prt_line_buffer);
+    sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "%%%%Requirements:");
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 
-    if (duplex)
+    ਜੇ (duplex)
     {
 	prt_write_string(" duplex");
-	if (tumble)
+	ਜੇ (tumble)
 	    prt_write_string("(tumble)");
     }
-    if (collate)
+    ਜੇ (collate)
 	prt_write_string(" collate");
-    if (color)
+    ਜੇ (color)
 	prt_write_string(" color");
-    if (num_copies > 1)
+    ਜੇ (ਅੰਕ_copies > 1)
     {
 	prt_write_string(" numcopies(");
 	// Note: no space wanted so don't use prt_write_int()
-	sprintf((char *)prt_line_buffer, "%d", num_copies);
-	prt_write_file(prt_line_buffer);
+	sprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, "%d", ਅੰਕ_copies);
+	prt_write_file(prt_ਸਤਰ_ਬਫਰ);
 	prt_write_string(")");
     }
     prt_write_string("\n");
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 prt_dsc_docmedia(
-    char	*paper_name,
-    double	width,
-    double	height,
-    double	weight,
-    char	*colour,
-    char	*type)
+    ਅੱਖਰ	*paper_name,
+    ਦੁੱਗਣਾ	ਚੌੜਾਈ,
+    ਦੁੱਗਣਾ	ਉਚਾਈ,
+    ਦੁੱਗਣਾ	ਭਾਰ,
+    ਅੱਖਰ	*ਰੰਗ,
+    ਅੱਖਰ	*type)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((ਅੱਖਰ *)prt_ਸਤਰ_ਬਫਰ, ਆਕਾਰ(prt_ਸਤਰ_ਬਫਰ),
 					"%%%%DocumentMedia: %s ", paper_name);
-    prt_write_file(prt_line_buffer);
-    prt_write_real(width, 2);
-    prt_write_real(height, 2);
-    prt_write_real(weight, 2);
-    if (colour == NULL)
+    prt_write_file(prt_ਸਤਰ_ਬਫਰ);
+    prt_write_real(ਚੌੜਾਈ, 2);
+    prt_write_real(ਉਚਾਈ, 2);
+    prt_write_real(ਭਾਰ, 2);
+    ਜੇ (ਰੰਗ == ਨਿਰਾ)
 	prt_write_string("()");
-    else
-	prt_write_string(colour);
+    ਨਹੀਂਤਾਂ
+	prt_write_string(ਰੰਗ);
     prt_write_string(" ");
-    if (type == NULL)
+    ਜੇ (type == ਨਿਰਾ)
 	prt_write_string("()");
-    else
+    ਨਹੀਂਤਾਂ
 	prt_write_string(type);
     prt_write_string("\n");
 }
 
-    void
-mch_print_cleanup(void)
+    ਖਾਲੀ
+mch_print_cleanup(ਖਾਲੀ)
 {
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
-	int     i;
+	ਪੂਰਨ     i;
 
 	// Free off all CID font names created, but first clear duplicate
 	// pointers to the same string (when the same font is used for more than
 	// one style).
-	for (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
+	ਲਈ (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
 	{
-	    if (prt_ps_mb_font.ps_fontname[i] != NULL)
+	    ਜੇ (prt_ps_mb_font.ps_fontname[i] != ਨਿਰਾ)
 		VIM_CLEAR(prt_ps_mb_font.ps_fontname[i]);
 	}
     }
 
-    if (prt_do_conv)
+    ਜੇ (prt_do_conv)
     {
-	convert_setup(&prt_conv, NULL, NULL);
+	convert_ਤਿਆਰੀ(&prt_conv, ਨਿਰਾ, ਨਿਰਾ);
 	prt_do_conv = FALSE;
     }
-    if (prt_ps_fd != NULL)
+    ਜੇ (prt_ps_fd != ਨਿਰਾ)
     {
 	fclose(prt_ps_fd);
-	prt_ps_fd = NULL;
+	prt_ps_fd = ਨਿਰਾ;
 	prt_file_error = FALSE;
     }
-    if (prt_ps_file_name != NULL)
+    ਜੇ (prt_ps_file_name != ਨਿਰਾ)
 	VIM_CLEAR(prt_ps_file_name);
 }
 
-    static float
-to_device_units(int idx, double physsize, int def_number)
+    ਸਥਿਰ ਦਸ਼ਮਲਵ
+ਮੰਜ਼ਿਲ_device_units(ਪੂਰਨ idx, ਦੁੱਗਣਾ physsize, ਪੂਰਨ def_ਸੰਖਿਆ)
 {
-    float	ret;
-    int		u;
-    int		nr;
+    ਦਸ਼ਮਲਵ	ret;
+    ਪੂਰਨ		u;
+    ਪੂਰਨ		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    ਜੇ (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_ਸੰਖਿਆ;
     }
-    else
-	nr = printer_opts[idx].number;
+    ਨਹੀਂਤਾਂ
+	nr = printer_opts[idx].ਸੰਖਿਆ;
 
-    switch (u)
+    ਚੋਣ (u)
     {
-	case PRT_UNIT_INCH:
-	    ret = (float)(nr * PRT_PS_DEFAULT_DPI);
-	    break;
-	case PRT_UNIT_MM:
-	    ret = (float)(nr * PRT_PS_DEFAULT_DPI) / (float)25.4;
-	    break;
-	case PRT_UNIT_POINT:
-	    ret = (float)nr;
-	    break;
-	case PRT_UNIT_PERC:
-	default:
-	    ret = (float)(physsize * nr) / 100;
-	    break;
+	ਹਾਲਤ PRT_UNIT_INCH:
+	    ret = (ਦਸ਼ਮਲਵ)(nr * PRT_PS_DEFAULT_DPI);
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_MM:
+	    ret = (ਦਸ਼ਮਲਵ)(nr * PRT_PS_DEFAULT_DPI) / (ਦਸ਼ਮਲਵ)25.4;
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_ਬਿੰਦੂ:
+	    ret = (ਦਸ਼ਮਲਵ)nr;
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_PERC:
+	ਮੂਲ:
+	    ret = (ਦਸ਼ਮਲਵ)(physsize * nr) / 100;
+	    ਰੋਕੋ;
     }
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Calculate margins for given width and height from printoptions settings.
  */
-    static void
-prt_page_margins(
-    double	width,
-    double	height,
-    double	*left,
-    double	*right,
-    double	*top,
-    double	*bottom)
+    ਸਥਿਰ ਖਾਲੀ
+prt_ਪੰਨਾ_margins(
+    ਦੁੱਗਣਾ	ਚੌੜਾਈ,
+    ਦੁੱਗਣਾ	ਉਚਾਈ,
+    ਦੁੱਗਣਾ	*ਖੱਬਾ,
+    ਦੁੱਗਣਾ	*ਸੱਜਾ,
+    ਦੁੱਗਣਾ	*ਸਿਖਰ,
+    ਦੁੱਗਣਾ	*bottom)
 {
-    *left   = to_device_units(OPT_PRINT_LEFT, width, 10);
-    *right  = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
-    *top    = height - to_device_units(OPT_PRINT_TOP, height, 5);
-    *bottom = to_device_units(OPT_PRINT_BOT, height, 5);
+    *ਖੱਬਾ   = ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਖੱਬਾ, ਚੌੜਾਈ, 10);
+    *ਸੱਜਾ  = ਚੌੜਾਈ - ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਸੱਜਾ, ਚੌੜਾਈ, 5);
+    *ਸਿਖਰ    = ਉਚਾਈ - ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਸਿਖਰ, ਉਚਾਈ, 5);
+    *bottom = ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_BOT, ਉਚਾਈ, 5);
 }
 
-    static void
-prt_font_metrics(int font_scale)
+    ਸਥਿਰ ਖਾਲੀ
+prt_font_metrics(ਪੂਰਨ font_scale)
 {
-    prt_line_height = (float)font_scale;
-    prt_char_width = (float)PRT_PS_FONT_TO_USER(font_scale, prt_ps_font->wx);
+    prt_ਸਤਰ_ਉਚਾਈ = (ਦਸ਼ਮਲਵ)font_scale;
+    prt_char_ਚੌੜਾਈ = (ਦਸ਼ਮਲਵ)PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(font_scale, prt_ps_font->wx);
 }
 
 
-    static int
-prt_get_cpl(void)
+    ਸਥਿਰ ਪੂਰਨ
+prt_get_cpl(ਖਾਲੀ)
 {
-    if (prt_use_number())
+    ਜੇ (prt_use_ਸੰਖਿਆ())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_char_width;
+	prt_ਸੰਖਿਆ_ਚੌੜਾਈ = PRINT_ਸੰਖਿਆ_ਚੌੜਾਈ * prt_char_ਚੌੜਾਈ;
 	// If we are outputting multi-byte characters then line numbers will be
 	// printed with half width characters
-	if (prt_out_mbyte)
-	    prt_number_width /= 2;
-	prt_left_margin += prt_number_width;
+	ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
+	    prt_ਸੰਖਿਆ_ਚੌੜਾਈ /= 2;
+	prt_ਖੱਬਾ_margin += prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
     }
-    else
-	prt_number_width = 0.0;
+    ਨਹੀਂਤਾਂ
+	prt_ਸੰਖਿਆ_ਚੌੜਾਈ = 0.0;
 
-    return (int)((prt_right_margin - prt_left_margin) / prt_char_width);
+    ਵਾਪਸ (ਪੂਰਨ)((prt_ਸੱਜਾ_margin - prt_ਖੱਬਾ_margin) / prt_char_ਚੌੜਾਈ);
 }
 
-    static int
-prt_build_cid_fontname(int font, char_u *name, int name_len)
+    ਸਥਿਰ ਪੂਰਨ
+prt_build_cid_fontname(ਪੂਰਨ font, char_u *name, ਪੂਰਨ name_len)
 {
-    char    *fontname;
+    ਅੱਖਰ    *fontname;
 
     fontname = alloc(name_len + 1);
-    if (fontname == NULL)
-	return FALSE;
+    ਜੇ (fontname == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
     vim_strncpy((char_u *)fontname, name, name_len);
     prt_ps_mb_font.ps_fontname[font] = fontname;
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
-prt_get_lpp(void)
+    ਸਥਿਰ ਪੂਰਨ
+prt_get_lpp(ਖਾਲੀ)
 {
-    int lpp;
+    ਪੂਰਨ lpp;
 
     /*
      * Calculate offset to lower left corner of background rect based on actual
      * font height (based on its bounding box) and the line height, handling the
      * case where the font height can exceed the line height.
      */
-    prt_bgcol_offset = (float)PRT_PS_FONT_TO_USER(prt_line_height,
+    prt_bgcol_ਵਿੱਥ = (ਦਸ਼ਮਲਵ)PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(prt_ਸਤਰ_ਉਚਾਈ,
 					   prt_ps_font->bbox_min_y);
-    if ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
+    ਜੇ ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
     {
-	prt_bgcol_offset -= (float)PRT_PS_FONT_TO_USER(prt_line_height,
+	prt_bgcol_ਵਿੱਥ -= (ਦਸ਼ਮਲਵ)PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(prt_ਸਤਰ_ਉਚਾਈ,
 				(1000.0 - (prt_ps_font->bbox_max_y -
 					    prt_ps_font->bbox_min_y)) / 2);
     }
 
     // Get height for topmost line based on background rect offset.
-    prt_first_line_height = prt_line_height + prt_bgcol_offset;
+    prt_ਪਹਿਲਾ_ਸਤਰ_ਉਚਾਈ = prt_ਸਤਰ_ਉਚਾਈ + prt_bgcol_ਵਿੱਥ;
 
     // Calculate lpp
-    lpp = (int)((prt_top_margin - prt_bottom_margin) / prt_line_height);
+    lpp = (ਪੂਰਨ)((prt_ਸਿਖਰ_margin - prt_bottom_margin) / prt_ਸਤਰ_ਉਚਾਈ);
 
     // Adjust top margin if there is a header
-    prt_top_margin -= prt_line_height * prt_header_height();
+    prt_ਸਿਖਰ_margin -= prt_ਸਤਰ_ਉਚਾਈ * prt_ਸਿਰਲੇਖ_ਉਚਾਈ();
 
-    return lpp - prt_header_height();
+    ਵਾਪਸ lpp - prt_ਸਿਰਲੇਖ_ਉਚਾਈ();
 }
 
-    static int
-prt_match_encoding(
-    char			*p_encoding,
-    struct prt_ps_mbfont_S	*p_cmap,
-    struct prt_ps_encoding_S	**pp_mbenc)
+    ਸਥਿਰ ਪੂਰਨ
+prt_ਮੇਲ_encoding(
+    ਅੱਖਰ			*p_encoding,
+    ਬਣਤਰ prt_ps_mbfont_S	*p_cmap,
+    ਬਣਤਰ prt_ps_encoding_S	**pp_mbenc)
 {
-    int				mbenc;
-    int				enc_len;
-    struct prt_ps_encoding_S	*p_mbenc;
+    ਪੂਰਨ				mbenc;
+    ਪੂਰਨ				enc_len;
+    ਬਣਤਰ prt_ps_encoding_S	*p_mbenc;
 
-    *pp_mbenc = NULL;
+    *pp_mbenc = ਨਿਰਾ;
     // Look for recognised encoding
-    enc_len = (int)STRLEN(p_encoding);
+    enc_len = (ਪੂਰਨ)STRLEN(p_encoding);
     p_mbenc = p_cmap->encodings;
-    for (mbenc = 0; mbenc < p_cmap->num_encodings; mbenc++)
+    ਲਈ (mbenc = 0; mbenc < p_cmap->ਅੰਕ_encodings; mbenc++)
     {
-	if (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
+	ਜੇ (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
 	{
 	    *pp_mbenc = p_mbenc;
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
 	}
 	p_mbenc++;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    static int
-prt_match_charset(
-    char		    *p_charset,
-    struct prt_ps_mbfont_S  *p_cmap,
-    struct prt_ps_charset_S **pp_mbchar)
+    ਸਥਿਰ ਪੂਰਨ
+prt_ਮੇਲ_charset(
+    ਅੱਖਰ		    *p_charset,
+    ਬਣਤਰ prt_ps_mbfont_S  *p_cmap,
+    ਬਣਤਰ prt_ps_charset_S **pp_mbchar)
 {
-    int			    mbchar;
-    int			    char_len;
-    struct prt_ps_charset_S *p_mbchar;
+    ਪੂਰਨ			    mbchar;
+    ਪੂਰਨ			    char_len;
+    ਬਣਤਰ prt_ps_charset_S *p_mbchar;
 
     // Look for recognised character set, using default if one is not given
-    if (*p_charset == NUL)
+    ਜੇ (*p_charset == NUL)
 	p_charset = p_cmap->defcs;
-    char_len = (int)STRLEN(p_charset);
+    char_len = (ਪੂਰਨ)STRLEN(p_charset);
     p_mbchar = p_cmap->charsets;
-    for (mbchar = 0; mbchar < p_cmap->num_charsets; mbchar++)
+    ਲਈ (mbchar = 0; mbchar < p_cmap->ਅੰਕ_charsets; mbchar++)
     {
-	if (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
+	ਜੇ (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
 	{
 	    *pp_mbchar = p_mbchar;
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
 	}
 	p_mbchar++;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    int
+    ਪੂਰਨ
 mch_print_init(
     prt_settings_T *psettings,
     char_u	*jobname,
-    int		forceit UNUSED)
+    ਪੂਰਨ		forceit ਅਣਵਰਤਿਆ)
 {
-    int		i;
-    char	*paper_name;
-    int		paper_strlen;
-    int		fontsize;
+    ਪੂਰਨ		i;
+    ਅੱਖਰ	*paper_name;
+    ਪੂਰਨ		paper_strlen;
+    ਪੂਰਨ		fontsize;
     char_u	*p;
-    double      left;
-    double      right;
-    double      top;
-    double      bottom;
-    int		props;
-    int		cmap = 0;
+    ਦੁੱਗਣਾ      ਖੱਬਾ;
+    ਦੁੱਗਣਾ      ਸੱਜਾ;
+    ਦੁੱਗਣਾ      ਸਿਖਰ;
+    ਦੁੱਗਣਾ      bottom;
+    ਪੂਰਨ		props;
+    ਪੂਰਨ		cmap = 0;
     char_u	*p_encoding;
-    struct prt_ps_encoding_S *p_mbenc;
-    struct prt_ps_encoding_S *p_mbenc_first;
-    struct prt_ps_charset_S  *p_mbchar = NULL;
+    ਬਣਤਰ prt_ps_encoding_S *p_mbenc;
+    ਬਣਤਰ prt_ps_encoding_S *p_mbenc_ਪਹਿਲਾ;
+    ਬਣਤਰ prt_ps_charset_S  *p_mbchar = ਨਿਰਾ;
 
-# if 0
+# ਜੇ 0
     /*
      * TODO:
      * If "forceit" is false: pop up a dialog to select:
@@ -1410,7 +1410,7 @@ mch_print_init(
      *
      * If "forceit" is true: use the default printer and settings
      */
-    if (forceit)
+    ਜੇ (forceit)
 	s_pd.Flags |= PD_RETURNDEFAULT;
 # endif
 
@@ -1418,131 +1418,131 @@ mch_print_init(
      * Set up font and encoding.
      */
     p_encoding = enc_skip(p_penc);
-    if (*p_encoding == NUL)
+    ਜੇ (*p_encoding == NUL)
 	p_encoding = enc_skip(p_enc);
 
     // Look for a multi-byte font that matches the encoding and character set.
     // Only look if multi-byte character set is defined, or using multi-byte
     // encoding other than Unicode.  This is because a Unicode encoding does not
     // uniquely identify a CJK character set to use.
-    p_mbenc = NULL;
+    p_mbenc = ਨਿਰਾ;
     props = enc_canon_props(p_encoding);
-    if (!(props & ENC_8BIT) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
+    ਜੇ (!(props & ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
     {
-	int cmap_first = 0;
+	ਪੂਰਨ cmap_ਪਹਿਲਾ = 0;
 
-	p_mbenc_first = NULL;
-	for (cmap = 0; cmap < (int)ARRAY_LENGTH(prt_ps_mbfonts); cmap++)
-	    if (prt_match_encoding((char *)p_encoding, &prt_ps_mbfonts[cmap],
+	p_mbenc_ਪਹਿਲਾ = ਨਿਰਾ;
+	ਲਈ (cmap = 0; cmap < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(prt_ps_mbfonts); cmap++)
+	    ਜੇ (prt_ਮੇਲ_encoding((ਅੱਖਰ *)p_encoding, &prt_ps_mbfonts[cmap],
 								    &p_mbenc))
 	    {
-		if (p_mbenc_first == NULL)
+		ਜੇ (p_mbenc_ਪਹਿਲਾ == ਨਿਰਾ)
 		{
-		    p_mbenc_first = p_mbenc;
-		    cmap_first = cmap;
+		    p_mbenc_ਪਹਿਲਾ = p_mbenc;
+		    cmap_ਪਹਿਲਾ = cmap;
 		}
-		if (prt_match_charset((char *)p_pmcs, &prt_ps_mbfonts[cmap],
+		ਜੇ (prt_ਮੇਲ_charset((ਅੱਖਰ *)p_pmcs, &prt_ps_mbfonts[cmap],
 								   &p_mbchar))
-		    break;
+		    ਰੋਕੋ;
 	    }
 
 	// Use first encoding matched if no charset matched
-	if (p_mbchar == NULL && p_mbenc_first != NULL)
+	ਜੇ (p_mbchar == ਨਿਰਾ && p_mbenc_ਪਹਿਲਾ != ਨਿਰਾ)
 	{
-	    p_mbenc = p_mbenc_first;
-	    cmap = cmap_first;
+	    p_mbenc = p_mbenc_ਪਹਿਲਾ;
+	    cmap = cmap_ਪਹਿਲਾ;
 	}
     }
 
-    prt_out_mbyte = (p_mbenc != NULL);
-    if (prt_out_mbyte)
+    prt_ਬਾਹਰਲਾ_mbyte = (p_mbenc != ਨਿਰਾ);
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
 	// Build CMap name - will be same for all multi-byte fonts used
 	prt_cmap[0] = NUL;
 
-	prt_custom_cmap = (p_mbchar == NULL);
-	if (!prt_custom_cmap)
+	prt_custom_cmap = (p_mbchar == ਨਿਰਾ);
+	ਜੇ (!prt_custom_cmap)
 	{
 	    // Check encoding and character set are compatible
-	    if ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
+	    ਜੇ ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
 	    {
-		emsg(_(e_incompatible_multi_byte_encoding_and_character_set));
-		return FALSE;
+		emsg(_(e_incompatible_multi_byte_encoding_and_character_ਸੈੱਟ));
+		ਵਾਪਸ FALSE;
 	    }
 
 	    // Add charset name if not empty
-	    if (p_mbchar->cmap_charset != NULL)
+	    ਜੇ (p_mbchar->cmap_charset != ਨਿਰਾ)
 	    {
 		vim_strncpy((char_u *)prt_cmap,
-		      (char_u *)p_mbchar->cmap_charset, sizeof(prt_cmap) - 3);
+		      (char_u *)p_mbchar->cmap_charset, ਆਕਾਰ(prt_cmap) - 3);
 		STRCAT(prt_cmap, "-");
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Add custom CMap character set name
-	    if (*p_pmcs == NUL)
+	    ਜੇ (*p_pmcs == NUL)
 	    {
-		emsg(_(e_printmbcharset_cannot_be_empty_with_multi_byte_encoding));
-		return FALSE;
+		emsg(_(e_printmbcharset_cannot_be_ਖਾਲੀ_ਥਾਵਾਂ_with_multi_byte_encoding));
+		ਵਾਪਸ FALSE;
 	    }
-	    vim_strncpy((char_u *)prt_cmap, p_pmcs, sizeof(prt_cmap) - 3);
+	    vim_strncpy((char_u *)prt_cmap, p_pmcs, ਆਕਾਰ(prt_cmap) - 3);
 	    STRCAT(prt_cmap, "-");
 	}
 
 	// CMap name ends with (optional) encoding name and -H for horizontal
-	if (p_mbenc->cmap_encoding != NULL && STRLEN(prt_cmap)
-		      + STRLEN(p_mbenc->cmap_encoding) + 3 < sizeof(prt_cmap))
+	ਜੇ (p_mbenc->cmap_encoding != ਨਿਰਾ && STRLEN(prt_cmap)
+		      + STRLEN(p_mbenc->cmap_encoding) + 3 < ਆਕਾਰ(prt_cmap))
 	{
 	    STRCAT(prt_cmap, p_mbenc->cmap_encoding);
 	    STRCAT(prt_cmap, "-");
 	}
 	STRCAT(prt_cmap, "H");
 
-	if (!mbfont_opts[OPT_MBFONT_REGULAR].present)
+	ਜੇ (!mbfont_opts[OPT_MBFONT_REGULAR].present)
 	{
 	    emsg(_(e_no_default_font_specified_for_multi_byte_printing));
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
 
 	// Derive CID font names with fallbacks if not defined
-	if (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
+	ਜੇ (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
 				    mbfont_opts[OPT_MBFONT_REGULAR].string,
-				    mbfont_opts[OPT_MBFONT_REGULAR].strlen))
-	    return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLD].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
+				    mbfont_opts[OPT_MBFONT_REGULAR].ਲੜੀ_ਲੰਬਾਈ))
+	    ਵਾਪਸ FALSE;
+	ਜੇ (mbfont_opts[OPT_MBFONT_BOLD].present)
+	    ਜੇ (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
 					mbfont_opts[OPT_MBFONT_BOLD].string,
-					mbfont_opts[OPT_MBFONT_BOLD].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
+					mbfont_opts[OPT_MBFONT_BOLD].ਲੜੀ_ਲੰਬਾਈ))
+		ਵਾਪਸ FALSE;
+	ਜੇ (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
+	    ਜੇ (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
 					mbfont_opts[OPT_MBFONT_OBLIQUE].string,
-					mbfont_opts[OPT_MBFONT_OBLIQUE].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
+					mbfont_opts[OPT_MBFONT_OBLIQUE].ਲੜੀ_ਲੰਬਾਈ))
+		ਵਾਪਸ FALSE;
+	ਜੇ (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
+	    ਜੇ (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
 				   mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].string,
-				  mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].strlen))
-		return FALSE;
+				  mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].ਲੜੀ_ਲੰਬਾਈ))
+		ਵਾਪਸ FALSE;
 
 	// Check if need to use Courier for ASCII code range, and if so pick up
 	// the encoding to use
 	prt_use_courier = mbfont_opts[OPT_MBFONT_USECOURIER].present &&
 	    (TOLOWER_ASC(mbfont_opts[OPT_MBFONT_USECOURIER].string[0]) == 'y');
-	if (prt_use_courier)
+	ਜੇ (prt_use_courier)
 	{
 	    // Use national ASCII variant unless ASCII wanted
-	    if (mbfont_opts[OPT_MBFONT_ASCII].present &&
+	    ਜੇ (mbfont_opts[OPT_MBFONT_ASCII].present &&
 		(TOLOWER_ASC(mbfont_opts[OPT_MBFONT_ASCII].string[0]) == 'y'))
 		prt_ascii_encoding = "ascii";
-	    else
+	    ਨਹੀਂਤਾਂ
 		prt_ascii_encoding = prt_ps_mbfonts[cmap].ascii_enc;
 	}
 
 	prt_ps_font = &prt_ps_mb_font;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	prt_use_courier = FALSE;
 	prt_ps_font = &prt_ps_courier_font;
@@ -1553,22 +1553,22 @@ mch_print_init(
      */
     prt_portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present
 	   || TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
-    if (printer_opts[OPT_PRINT_PAPER].present)
+    ਜੇ (printer_opts[OPT_PRINT_PAPER].present)
     {
-	paper_name = (char *)printer_opts[OPT_PRINT_PAPER].string;
-	paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
+	paper_name = (ਅੱਖਰ *)printer_opts[OPT_PRINT_PAPER].string;
+	paper_strlen = printer_opts[OPT_PRINT_PAPER].ਲੜੀ_ਲੰਬਾਈ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	paper_name = "A4";
 	paper_strlen = 2;
     }
-    for (i = 0; i < (int)PRT_MEDIASIZE_LEN; ++i)
-	if (STRLEN(prt_mediasize[i].name) == (unsigned)paper_strlen
+    ਲਈ (i = 0; i < (ਪੂਰਨ)PRT_MEDIASIZE_LEN; ++i)
+	ਜੇ (STRLEN(prt_mediasize[i].name) == (ਬਿਨਾਨਿਸ਼ਾਨੀ)paper_strlen
 		&& STRNICMP(prt_mediasize[i].name, paper_name,
 							   paper_strlen) == 0)
-	    break;
-    if (i == PRT_MEDIASIZE_LEN)
+	    ਰੋਕੋ;
+    ਜੇ (i == PRT_MEDIASIZE_LEN)
 	i = 0;
     prt_media = i;
 
@@ -1579,47 +1579,47 @@ mch_print_init(
      * printed on, whereas the page size is the area that the PostScript
      * interpreter renders into.
      */
-    if (prt_portrait)
+    ਜੇ (prt_portrait)
     {
-	prt_page_width = prt_mediasize[i].width;
-	prt_page_height = prt_mediasize[i].height;
+	prt_ਪੰਨਾ_ਚੌੜਾਈ = prt_mediasize[i].ਚੌੜਾਈ;
+	prt_ਪੰਨਾ_ਉਚਾਈ = prt_mediasize[i].ਉਚਾਈ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	prt_page_width = prt_mediasize[i].height;
-	prt_page_height = prt_mediasize[i].width;
+	prt_ਪੰਨਾ_ਚੌੜਾਈ = prt_mediasize[i].ਉਚਾਈ;
+	prt_ਪੰਨਾ_ਉਚਾਈ = prt_mediasize[i].ਚੌੜਾਈ;
     }
 
     /*
      * Set PS page margins based on the PS pagesize, not the mediasize - this
      * needs to be done before the cpl and lpp are calculated.
      */
-    prt_page_margins(prt_page_width, prt_page_height, &left, &right, &top,
+    prt_ਪੰਨਾ_margins(prt_ਪੰਨਾ_ਚੌੜਾਈ, prt_ਪੰਨਾ_ਉਚਾਈ, &ਖੱਬਾ, &ਸੱਜਾ, &ਸਿਖਰ,
 								    &bottom);
-    prt_left_margin = (float)left;
-    prt_right_margin = (float)right;
-    prt_top_margin = (float)top;
-    prt_bottom_margin = (float)bottom;
+    prt_ਖੱਬਾ_margin = (ਦਸ਼ਮਲਵ)ਖੱਬਾ;
+    prt_ਸੱਜਾ_margin = (ਦਸ਼ਮਲਵ)ਸੱਜਾ;
+    prt_ਸਿਖਰ_margin = (ਦਸ਼ਮਲਵ)ਸਿਖਰ;
+    prt_bottom_margin = (ਦਸ਼ਮਲਵ)bottom;
 
     /*
      * Set up the font size.
      */
     fontsize = PRT_PS_DEFAULT_FONTSIZE;
-    for (p = p_pfn; (p = vim_strchr(p, ':')) != NULL; ++p)
-	if (p[1] == 'h' && VIM_ISDIGIT(p[2]))
-	    fontsize = atoi((char *)p + 2);
+    ਲਈ (p = p_pfn; (p = vim_strchr(p, ':')) != ਨਿਰਾ; ++p)
+	ਜੇ (p[1] == 'h' && VIM_ISDIGIT(p[2]))
+	    fontsize = atoi((ਅੱਖਰ *)p + 2);
     prt_font_metrics(fontsize);
 
     /*
      * Return the number of characters per line, and lines per page for the
      * generic print code.
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
+    psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ = prt_get_cpl();
+    psettings->ਸਤਰਾਂ_ਪ੍ਰਤੀ_ਪੰਨਾ = prt_get_lpp();
 
     // Catch margin settings that leave no space for output!
-    if (psettings->chars_per_line <= 0 || psettings->lines_per_page <= 0)
-	return FAIL;
+    ਜੇ (psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ <= 0 || psettings->ਸਤਰਾਂ_ਪ੍ਰਤੀ_ਪੰਨਾ <= 0)
+	ਵਾਪਸ FAIL;
 
     /*
      * Sort out the number of copies to be printed.  PS by default will do
@@ -1629,19 +1629,19 @@ mch_print_init(
      */
     psettings->n_collated_copies = 1;
     psettings->n_uncollated_copies = 1;
-    prt_num_copies = 1;
+    prt_ਅੰਕ_copies = 1;
     prt_collate = (!printer_opts[OPT_PRINT_COLLATE].present
 	    || TOLOWER_ASC(printer_opts[OPT_PRINT_COLLATE].string[0]) == 'y');
-    if (prt_collate)
+    ਜੇ (prt_collate)
     {
 	// TODO: Get number of collated copies wanted.
 	psettings->n_collated_copies = 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// TODO: Get number of uncollated copies wanted and update the cached
 	// count.
-	prt_num_copies = 1;
+	prt_ਅੰਕ_copies = 1;
     }
 
     psettings->jobname = jobname;
@@ -1653,14 +1653,14 @@ mch_print_init(
     prt_duplex = TRUE;
     prt_tumble = FALSE;
     psettings->duplex = 1;
-    if (printer_opts[OPT_PRINT_DUPLEX].present)
+    ਜੇ (printer_opts[OPT_PRINT_DUPLEX].present)
     {
-	if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	ਜੇ (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	{
 	    prt_duplex = FALSE;
 	    psettings->duplex = 0;
 	}
-	else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
 									 == 0)
 	    prt_tumble = TRUE;
     }
@@ -1669,38 +1669,38 @@ mch_print_init(
     psettings->user_abort = 0;
 
     // If the user didn't specify a file name, use a temp file.
-    if (psettings->outfile == NULL)
+    ਜੇ (psettings->outfile == ਨਿਰਾ)
     {
 	prt_ps_file_name = vim_tempname('p', TRUE);
-	if (prt_ps_file_name == NULL)
+	ਜੇ (prt_ps_file_name == ਨਿਰਾ)
 	{
-	    emsg(_(e_cant_get_temp_file_name));
-	    return FAIL;
+	    emsg(_(e_cant_get_ਆਰਜ਼ੀ_file_name));
+	    ਵਾਪਸ FAIL;
 	}
-	prt_ps_fd = mch_fopen((char *)prt_ps_file_name, WRITEBIN);
+	prt_ps_fd = mch_fopen((ਅੱਖਰ *)prt_ps_file_name, WRITEBIN);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	p = expand_env_save(psettings->outfile);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
-	    prt_ps_fd = mch_fopen((char *)p, WRITEBIN);
+	    prt_ps_fd = mch_fopen((ਅੱਖਰ *)p, WRITEBIN);
 	    vim_free(p);
 	}
     }
-    if (prt_ps_fd == NULL)
+    ਜੇ (prt_ps_fd == ਨਿਰਾ)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    prt_bufsiz = psettings->chars_per_line;
-    if (prt_out_mbyte)
+    prt_bufsiz = psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ;
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
 	prt_bufsiz *= 2;
-    ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
+    ga_init2(&prt_ps_ਬਫਰ, ਆਕਾਰ(ਅੱਖਰ), prt_bufsiz);
 
-    prt_page_num = 0;
+    prt_ਪੰਨਾ_ਅੰਕ = 0;
 
     prt_attribute_change = FALSE;
     prt_need_moveto = FALSE;
@@ -1711,45 +1711,45 @@ mch_print_init(
 
     prt_file_error = FALSE;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    static int
-prt_add_resource(struct prt_ps_resource_S *resource)
+    ਸਥਿਰ ਪੂਰਨ
+prt_ਜੋੜੋ_resource(ਬਣਤਰ prt_ps_resource_S *resource)
 {
     FILE*	fd_resource;
-    char_u	resource_buffer[512];
-    size_t	bytes_read;
+    char_u	resource_ਬਫਰ[512];
+    size_t	ਬਾਈਟਾਂ_read;
 
-    fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    fd_resource = mch_fopen((ਅੱਖਰ *)resource->filename, READBIN);
+    ਜੇ (fd_resource == ਨਿਰਾ)
     {
 	semsg(_(e_cant_open_file_str_2), resource->filename);
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
     prt_dsc_resources("BeginResource", prt_resource_types[resource->type],
-						     (char *)resource->title);
+						     (ਅੱਖਰ *)resource->title);
 
-    prt_dsc_textline("BeginDocument", (char *)resource->filename);
+    prt_dsc_textline("BeginDocument", (ਅੱਖਰ *)resource->filename);
 
-    for (;;)
+    ਲਈ (;;)
     {
-	bytes_read = fread((char *)resource_buffer, sizeof(char_u),
-			   sizeof(resource_buffer), fd_resource);
-	if (ferror(fd_resource))
+	ਬਾਈਟਾਂ_read = fread((ਅੱਖਰ *)resource_ਬਫਰ, ਆਕਾਰ(char_u),
+			   ਆਕਾਰ(resource_ਬਫਰ), fd_resource);
+	ਜੇ (ferror(fd_resource))
 	{
 	    semsg(_(e_cant_read_postscript_resource_file_str),
 							    resource->filename);
 	    fclose(fd_resource);
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
-	if (bytes_read == 0)
-	    break;
-	prt_write_file_raw_len(resource_buffer, (int)bytes_read);
-	if (prt_file_error)
+	ਜੇ (ਬਾਈਟਾਂ_read == 0)
+	    ਰੋਕੋ;
+	prt_write_file_raw_len(resource_ਬਫਰ, (ਪੂਰਨ)ਬਾਈਟਾਂ_read);
+	ਜੇ (prt_file_error)
 	{
 	    fclose(fd_resource);
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
     }
     fclose(fd_resource);
@@ -1758,45 +1758,45 @@ prt_add_resource(struct prt_ps_resource_S *resource)
 
     prt_dsc_noarg("EndResource");
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-    int
+    ਪੂਰਨ
 mch_print_begin(prt_settings_T *psettings)
 {
-    int		bbox[4];
-    double      left;
-    double      right;
-    double      top;
-    double      bottom;
-    struct prt_ps_resource_S *res_prolog;
-    struct prt_ps_resource_S *res_encoding;
-    char	buffer[256];
+    ਪੂਰਨ		bbox[4];
+    ਦੁੱਗਣਾ      ਖੱਬਾ;
+    ਦੁੱਗਣਾ      ਸੱਜਾ;
+    ਦੁੱਗਣਾ      ਸਿਖਰ;
+    ਦੁੱਗਣਾ      bottom;
+    ਬਣਤਰ prt_ps_resource_S *res_prolog;
+    ਬਣਤਰ prt_ps_resource_S *res_encoding;
+    ਅੱਖਰ	ਬਫਰ[256];
     char_u      *p_encoding;
-    struct prt_ps_resource_S *res_cidfont;
-    struct prt_ps_resource_S *res_cmap;
-    int		retval = FALSE;
+    ਬਣਤਰ prt_ps_resource_S *res_cidfont;
+    ਬਣਤਰ prt_ps_resource_S *res_cmap;
+    ਪੂਰਨ		retval = FALSE;
 
-    res_prolog = ALLOC_ONE(struct prt_ps_resource_S);
-    res_encoding = ALLOC_ONE(struct prt_ps_resource_S);
-    res_cidfont = ALLOC_ONE(struct prt_ps_resource_S);
-    res_cmap = ALLOC_ONE(struct prt_ps_resource_S);
-    if (res_prolog == NULL || res_encoding == NULL
-	    || res_cidfont == NULL || res_cmap == NULL)
-	goto theend;
+    res_prolog = ALLOC_ONE(ਬਣਤਰ prt_ps_resource_S);
+    res_encoding = ALLOC_ONE(ਬਣਤਰ prt_ps_resource_S);
+    res_cidfont = ALLOC_ONE(ਬਣਤਰ prt_ps_resource_S);
+    res_cmap = ALLOC_ONE(ਬਣਤਰ prt_ps_resource_S);
+    ਜੇ (res_prolog == ਨਿਰਾ || res_encoding == ਨਿਰਾ
+	    || res_cidfont == ਨਿਰਾ || res_cmap == ਨਿਰਾ)
+	ਜਾਓ theend;
 
     /*
      * PS DSC Header comments - no PS code!
      */
-    prt_dsc_start();
-    prt_dsc_textline("Title", (char *)psettings->jobname);
-    if (!get_user_name((char_u *)buffer, 256))
-	STRCPY(buffer, "Unknown");
-    prt_dsc_textline("For", buffer);
-    prt_dsc_textline("Creator", VIM_VERSION_LONG);
+    prt_dsc_ਸ਼ੁਰੂ();
+    prt_dsc_textline("Title", (ਅੱਖਰ *)psettings->jobname);
+    ਜੇ (!get_user_name((char_u *)ਬਫਰ, 256))
+	STRCPY(ਬਫਰ, "Unknown");
+    prt_dsc_textline("For", ਬਫਰ);
+    prt_dsc_textline("Creator", VIM_ਸੰਸਕਰਣ_LONG);
     // Note: to ensure Clean8bit I don't think we can use LC_TIME
 
-    prt_dsc_textline("CreationDate", get_ctime(time(NULL), FALSE));
+    prt_dsc_textline("CreationDate", get_ctime(ਸਮਾਂ(ਨਿਰਾ), FALSE));
     prt_dsc_textline("DocumentData", "Clean8Bit");
     prt_dsc_textline("Orientation", prt_portrait ? "Portrait" : "Landscape");
     prt_dsc_atend("Pages");
@@ -1804,187 +1804,187 @@ mch_print_begin(prt_settings_T *psettings)
     // The bbox does not change with orientation - it is always in the default
     // user coordinate system!  We have to recalculate right and bottom
     // coordinates based on the font metrics for the bbox to be accurate.
-    prt_page_margins(prt_mediasize[prt_media].width,
-					    prt_mediasize[prt_media].height,
-					    &left, &right, &top, &bottom);
-    bbox[0] = (int)left;
-    if (prt_portrait)
+    prt_ਪੰਨਾ_margins(prt_mediasize[prt_media].ਚੌੜਾਈ,
+					    prt_mediasize[prt_media].ਉਚਾਈ,
+					    &ਖੱਬਾ, &ਸੱਜਾ, &ਸਿਖਰ, &bottom);
+    bbox[0] = (ਪੂਰਨ)ਖੱਬਾ;
+    ਜੇ (prt_portrait)
     {
 	// In portrait printing the fixed point is the top left corner so we
 	// derive the bbox from that point.  We have the expected cpl chars
 	// across the media and lpp lines down the media.
-	bbox[1] = (int)(top - (psettings->lines_per_page + prt_header_height())
-						    * (double)prt_line_height);
-	bbox[2] = (int)(left + psettings->chars_per_line
-					       * (double)prt_char_width + 0.5);
-	bbox[3] = (int)(top + 0.5);
+	bbox[1] = (ਪੂਰਨ)(ਸਿਖਰ - (psettings->ਸਤਰਾਂ_ਪ੍ਰਤੀ_ਪੰਨਾ + prt_ਸਿਰਲੇਖ_ਉਚਾਈ())
+						    * (ਦੁੱਗਣਾ)prt_ਸਤਰ_ਉਚਾਈ);
+	bbox[2] = (ਪੂਰਨ)(ਖੱਬਾ + psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ
+					       * (ਦੁੱਗਣਾ)prt_char_ਚੌੜਾਈ + 0.5);
+	bbox[3] = (ਪੂਰਨ)(ਸਿਖਰ + 0.5);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// In landscape printing the fixed point is the bottom left corner so we
 	// derive the bbox from that point.  We have lpp chars across the media
 	// and cpl lines up the media.
-	bbox[1] = (int)bottom;
-	bbox[2] = (int)(left + ((psettings->lines_per_page
-			      + prt_header_height()) * prt_line_height) + 0.5);
-	bbox[3] = (int)(bottom + psettings->chars_per_line
-					       * (double)prt_char_width + 0.5);
+	bbox[1] = (ਪੂਰਨ)bottom;
+	bbox[2] = (ਪੂਰਨ)(ਖੱਬਾ + ((psettings->ਸਤਰਾਂ_ਪ੍ਰਤੀ_ਪੰਨਾ
+			      + prt_ਸਿਰਲੇਖ_ਉਚਾਈ()) * prt_ਸਤਰ_ਉਚਾਈ) + 0.5);
+	bbox[3] = (ਪੂਰਨ)(bottom + psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ
+					       * (ਦੁੱਗਣਾ)prt_char_ਚੌੜਾਈ + 0.5);
     }
     prt_dsc_ints("BoundingBox", 4, bbox);
     // The media width and height does not change with landscape printing!
     prt_dsc_docmedia(prt_mediasize[prt_media].name,
-				prt_mediasize[prt_media].width,
-				prt_mediasize[prt_media].height,
-				(double)0, NULL, NULL);
+				prt_mediasize[prt_media].ਚੌੜਾਈ,
+				prt_mediasize[prt_media].ਉਚਾਈ,
+				(ਦੁੱਗਣਾ)0, ਨਿਰਾ, ਨਿਰਾ);
     // Define fonts needed
-    if (!prt_out_mbyte || prt_use_courier)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte || prt_use_courier)
 	prt_dsc_font_resource("DocumentNeededResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
-	prt_dsc_font_resource((prt_use_courier ? NULL
+	prt_dsc_font_resource((prt_use_courier ? ਨਿਰਾ
 				: "DocumentNeededResources"), &prt_ps_mb_font);
-	if (!prt_custom_cmap)
-	    prt_dsc_resources(NULL, "cmap", prt_cmap);
+	ਜੇ (!prt_custom_cmap)
+	    prt_dsc_resources(ਨਿਰਾ, "cmap", prt_cmap);
     }
 
     // Search for external resources VIM supplies
-    if (!prt_find_resource("prolog", res_prolog))
+    ਜੇ (!prt_ਲੱਭੋ_resource("prolog", res_prolog))
     {
-	semsg(_(e_cant_find_postscript_resource_file_str_ps), "prolog");
-	goto theend;
+	semsg(_(e_cant_ਲੱਭੋ_postscript_resource_file_str_ps), "prolog");
+	ਜਾਓ theend;
     }
-    if (!prt_open_resource(res_prolog))
-	goto theend;
-    if (!prt_check_resource(res_prolog, PRT_PROLOG_VERSION))
-	goto theend;
-    if (prt_out_mbyte)
+    ਜੇ (!prt_open_resource(res_prolog))
+	ਜਾਓ theend;
+    ਜੇ (!prt_check_resource(res_prolog, PRT_PROLOG_ਸੰਸਕਰਣ))
+	ਜਾਓ theend;
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
 	// Look for required version of multi-byte printing procset
-	if (!prt_find_resource("cidfont", res_cidfont))
+	ਜੇ (!prt_ਲੱਭੋ_resource("cidfont", res_cidfont))
 	{
-	    semsg(_(e_cant_find_postscript_resource_file_str_ps), "cidfont");
-	    goto theend;
+	    semsg(_(e_cant_ਲੱਭੋ_postscript_resource_file_str_ps), "cidfont");
+	    ਜਾਓ theend;
 	}
-	if (!prt_open_resource(res_cidfont))
-	    goto theend;
-	if (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_VERSION))
-	    goto theend;
+	ਜੇ (!prt_open_resource(res_cidfont))
+	    ਜਾਓ theend;
+	ਜੇ (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_ਸੰਸਕਰਣ))
+	    ਜਾਓ theend;
     }
 
     // Find an encoding to use for printing.
     // Check 'printencoding'. If not set or not found, then use 'encoding'. If
     // that cannot be found then default to "latin1".
     // Note: VIM specific encoding header is always skipped.
-    if (!prt_out_mbyte)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte)
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL
-		|| !prt_find_resource((char *)p_encoding, res_encoding))
+	ਜੇ (*p_encoding == NUL
+		|| !prt_ਲੱਭੋ_resource((ਅੱਖਰ *)p_encoding, res_encoding))
 	{
 	    // 'printencoding' not set or not supported - find alternate
-	    int		props;
+	    ਪੂਰਨ		props;
 
 	    p_encoding = enc_skip(p_enc);
 	    props = enc_canon_props(p_encoding);
-	    if (!(props & ENC_8BIT)
-		    || !prt_find_resource((char *)p_encoding, res_encoding))
+	    ਜੇ (!(props & ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ)
+		    || !prt_ਲੱਭੋ_resource((ਅੱਖਰ *)p_encoding, res_encoding))
 		// 8-bit 'encoding' is not supported
 	    {
 		// Use latin1 as default printing encoding
 		p_encoding = (char_u *)"latin1";
-		if (!prt_find_resource((char *)p_encoding, res_encoding))
+		ਜੇ (!prt_ਲੱਭੋ_resource((ਅੱਖਰ *)p_encoding, res_encoding))
 		{
-		    semsg(_(e_cant_find_postscript_resource_file_str_ps),
+		    semsg(_(e_cant_ਲੱਭੋ_postscript_resource_file_str_ps),
 			    p_encoding);
-		    goto theend;
+		    ਜਾਓ theend;
 		}
 	    }
 	}
-	if (!prt_open_resource(res_encoding))
-	    goto theend;
+	ਜੇ (!prt_open_resource(res_encoding))
+	    ਜਾਓ theend;
 	// For the moment there are no checks on encoding resource files to
 	// perform
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL)
+	ਜੇ (*p_encoding == NUL)
 	    p_encoding = enc_skip(p_enc);
-	if (prt_use_courier)
+	ਜੇ (prt_use_courier)
 	{
 	    // Include ASCII range encoding vector
-	    if (!prt_find_resource(prt_ascii_encoding, res_encoding))
+	    ਜੇ (!prt_ਲੱਭੋ_resource(prt_ascii_encoding, res_encoding))
 	    {
-		semsg(_(e_cant_find_postscript_resource_file_str_ps),
+		semsg(_(e_cant_ਲੱਭੋ_postscript_resource_file_str_ps),
 							  prt_ascii_encoding);
-		goto theend;
+		ਜਾਓ theend;
 	    }
-	    if (!prt_open_resource(res_encoding))
-		goto theend;
+	    ਜੇ (!prt_open_resource(res_encoding))
+		ਜਾਓ theend;
 	    // For the moment there are no checks on encoding resource files to
 	    // perform
 	}
     }
 
     prt_conv.vc_type = CONV_NONE;
-    if (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8BIT))
+    ਜੇ (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8_ਦੋਆਧਾਰੀ_ਅੰਕ))
     {
 	// Set up encoding conversion if required
-	if (FAIL == convert_setup(&prt_conv, p_enc, p_encoding))
+	ਜੇ (FAIL == convert_ਤਿਆਰੀ(&prt_conv, p_enc, p_encoding))
 	{
-	    semsg(_(e_unable_to_convert_to_print_encoding_str), p_encoding);
-	    goto theend;
+	    semsg(_(e_unable_ਮੰਜ਼ਿਲ_convert_ਮੰਜ਼ਿਲ_print_encoding_str), p_encoding);
+	    ਜਾਓ theend;
 	}
 	prt_do_conv = TRUE;
     }
     prt_do_conv = prt_conv.vc_type != CONV_NONE;
 
-    if (prt_out_mbyte && prt_custom_cmap)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte && prt_custom_cmap)
     {
 	// Find user supplied CMap
-	if (!prt_find_resource(prt_cmap, res_cmap))
+	ਜੇ (!prt_ਲੱਭੋ_resource(prt_cmap, res_cmap))
 	{
-	    semsg(_(e_cant_find_postscript_resource_file_str_ps), prt_cmap);
-	    goto theend;
+	    semsg(_(e_cant_ਲੱਭੋ_postscript_resource_file_str_ps), prt_cmap);
+	    ਜਾਓ theend;
 	}
-	if (!prt_open_resource(res_cmap))
-	    goto theend;
+	ਜੇ (!prt_open_resource(res_cmap))
+	    ਜਾਓ theend;
     }
 
     // List resources supplied
-    STRCPY(buffer, res_prolog->title);
-    STRCAT(buffer, " ");
-    STRCAT(buffer, res_prolog->version);
-    prt_dsc_resources("DocumentSuppliedResources", "procset", buffer);
-    if (prt_out_mbyte)
+    STRCPY(ਬਫਰ, res_prolog->title);
+    STRCAT(ਬਫਰ, " ");
+    STRCAT(ਬਫਰ, res_prolog->ਸੰਸਕਰਣ_2);
+    prt_dsc_resources("DocumentSuppliedResources", "procset", ਬਫਰ);
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
-	STRCPY(buffer, res_cidfont->title);
-	STRCAT(buffer, " ");
-	STRCAT(buffer, res_cidfont->version);
-	prt_dsc_resources(NULL, "procset", buffer);
+	STRCPY(ਬਫਰ, res_cidfont->title);
+	STRCAT(ਬਫਰ, " ");
+	STRCAT(ਬਫਰ, res_cidfont->ਸੰਸਕਰਣ_2);
+	prt_dsc_resources(ਨਿਰਾ, "procset", ਬਫਰ);
 
-	if (prt_custom_cmap)
+	ਜੇ (prt_custom_cmap)
 	{
-	    STRCPY(buffer, res_cmap->title);
-	    STRCAT(buffer, " ");
-	    STRCAT(buffer, res_cmap->version);
-	    prt_dsc_resources(NULL, "cmap", buffer);
+	    STRCPY(ਬਫਰ, res_cmap->title);
+	    STRCAT(ਬਫਰ, " ");
+	    STRCAT(ਬਫਰ, res_cmap->ਸੰਸਕਰਣ_2);
+	    prt_dsc_resources(ਨਿਰਾ, "cmap", ਬਫਰ);
 	}
     }
-    if (!prt_out_mbyte || prt_use_courier)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte || prt_use_courier)
     {
-	STRCPY(buffer, res_encoding->title);
-	STRCAT(buffer, " ");
-	STRCAT(buffer, res_encoding->version);
-	prt_dsc_resources(NULL, "encoding", buffer);
+	STRCPY(ਬਫਰ, res_encoding->title);
+	STRCAT(ਬਫਰ, " ");
+	STRCAT(ਬਫਰ, res_encoding->ਸੰਸਕਰਣ_2);
+	prt_dsc_resources(ਨਿਰਾ, "encoding", ਬਫਰ);
     }
     prt_dsc_requirements(prt_duplex, prt_tumble, prt_collate,
 # ifdef FEAT_SYN_HL
 					psettings->do_syntax
-# else
+# ਨਹੀਂਤਾਂ
 					0
 # endif
-					, prt_num_copies);
+					, prt_ਅੰਕ_copies);
     prt_dsc_noarg("EndComments");
 
     /*
@@ -1993,14 +1993,14 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginDefaults");
 
     // List font resources most likely common to all pages
-    if (!prt_out_mbyte || prt_use_courier)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte || prt_use_courier)
 	prt_dsc_font_resource("PageResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
-	prt_dsc_font_resource((prt_use_courier ? NULL : "PageResources"),
+	prt_dsc_font_resource((prt_use_courier ? ਨਿਰਾ : "PageResources"),
 							    &prt_ps_mb_font);
-	if (!prt_custom_cmap)
-	    prt_dsc_resources(NULL, "cmap", prt_cmap);
+	ਜੇ (!prt_custom_cmap)
+	    prt_dsc_resources(ਨਿਰਾ, "cmap", prt_cmap);
     }
 
     // Paper will be used for all pages
@@ -2014,22 +2014,22 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginProlog");
 
     // Add required procsets - NOTE: order is important!
-    if (!prt_add_resource(res_prolog))
-	goto theend;
-    if (prt_out_mbyte)
+    ਜੇ (!prt_ਜੋੜੋ_resource(res_prolog))
+	ਜਾਓ theend;
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
 	// Add CID font procset, and any user supplied CMap
-	if (!prt_add_resource(res_cidfont))
-	    goto theend;
-	if (prt_custom_cmap && !prt_add_resource(res_cmap))
-	    goto theend;
+	ਜੇ (!prt_ਜੋੜੋ_resource(res_cidfont))
+	    ਜਾਓ theend;
+	ਜੇ (prt_custom_cmap && !prt_ਜੋੜੋ_resource(res_cmap))
+	    ਜਾਓ theend;
     }
 
-    if (!prt_out_mbyte || prt_use_courier)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte || prt_use_courier)
 	// There will be only one Roman font encoding to be included in the PS
 	// file.
-	if (!prt_add_resource(res_encoding))
-	    goto theend;
+	ਜੇ (!prt_ਜੋੜੋ_resource(res_encoding))
+	    ਜਾਓ theend;
 
     prt_dsc_noarg("EndProlog");
 
@@ -2039,11 +2039,11 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginSetup");
 
     // Device setup - page size and number of uncollated copies
-    prt_write_int((int)prt_mediasize[prt_media].width);
-    prt_write_int((int)prt_mediasize[prt_media].height);
+    prt_write_int((ਪੂਰਨ)prt_mediasize[prt_media].ਚੌੜਾਈ);
+    prt_write_int((ਪੂਰਨ)prt_mediasize[prt_media].ਉਚਾਈ);
     prt_write_int(0);
     prt_write_string("sps\n");
-    prt_write_int(prt_num_copies);
+    prt_write_int(prt_ਅੰਕ_copies);
     prt_write_string("nc\n");
     prt_write_boolean(prt_duplex);
     prt_write_boolean(prt_tumble);
@@ -2052,30 +2052,30 @@ mch_print_begin(prt_settings_T *psettings)
     prt_write_string("c\n");
 
     // Font resource inclusion and definition
-    if (!prt_out_mbyte || prt_use_courier)
+    ਜੇ (!prt_ਬਾਹਰਲਾ_mbyte || prt_use_courier)
     {
 	// When using Courier for ASCII range when printing multi-byte, need to
 	// pick up ASCII encoding to use with it.
-	if (prt_use_courier)
+	ਜੇ (prt_use_courier)
 	    p_encoding = (char_u *)prt_ascii_encoding;
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	prt_def_font("F0", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F0", (ਅੱਖਰ *)p_encoding, (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	prt_def_font("F1", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F1", (ਅੱਖਰ *)p_encoding, (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	prt_def_font("F2", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F2", (ਅੱਖਰ *)p_encoding, (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	prt_def_font("F3", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F3", (ਅੱਖਰ *)p_encoding, (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
     }
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
 	// Define the CID fonts to be used in the job.	Typically CJKV fonts do
 	// not have an italic form being a western style, so where no font is
@@ -2084,57 +2084,57 @@ mch_print_begin(prt_settings_T *psettings)
 	// have bold/italic/bolditalic regardless of the setting of printmbfont.
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	if (!prt_custom_cmap)
+	ਜੇ (!prt_custom_cmap)
 	    prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	prt_def_cidfont("CF0", (int)prt_line_height,
+	prt_def_cidfont("CF0", (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 			prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != NULL)
+	ਜੇ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != ਨਿਰਾ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	    if (!prt_custom_cmap)
+	    ਜੇ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF1", (int)prt_line_height,
+	    prt_def_cidfont("CF1", (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // Use ROMAN for BOLD
 	    prt_dup_cidfont("CF0", "CF1");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != NULL)
+	ਜੇ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != ਨਿਰਾ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	    if (!prt_custom_cmap)
+	    ਜੇ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF2", (int)prt_line_height,
+	    prt_def_cidfont("CF2", (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // Use ROMAN for OBLIQUE
 	    prt_dup_cidfont("CF0", "CF2");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != NULL)
+	ਜੇ (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != ਨਿਰਾ)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	    if (!prt_custom_cmap)
+	    ਜੇ (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF3", (int)prt_line_height,
+	    prt_def_cidfont("CF3", (ਪੂਰਨ)prt_ਸਤਰ_ਉਚਾਈ,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // Use BOLD for BOLDOBLIQUE
 	    prt_dup_cidfont("CF1", "CF3");
     }
 
     // Misc constant vars used for underlining and background rects
-    prt_def_var("UO", PRT_PS_FONT_TO_USER(prt_line_height,
-						prt_ps_font->uline_offset), 2);
-    prt_def_var("UW", PRT_PS_FONT_TO_USER(prt_line_height,
-						 prt_ps_font->uline_width), 2);
-    prt_def_var("BO", prt_bgcol_offset, 2);
+    prt_def_var("UO", PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(prt_ਸਤਰ_ਉਚਾਈ,
+						prt_ps_font->uline_ਵਿੱਥ), 2);
+    prt_def_var("UW", PRT_PS_FONT_ਮੰਜ਼ਿਲ_USER(prt_ਸਤਰ_ਉਚਾਈ,
+						 prt_ps_font->uline_ਚੌੜਾਈ), 2);
+    prt_def_var("BO", prt_bgcol_ਵਿੱਥ, 2);
 
     prt_dsc_noarg("EndSetup");
 
@@ -2147,18 +2147,18 @@ theend:
     vim_free(res_cidfont);
     vim_free(res_cmap);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
-    void
-mch_print_end(prt_settings_T *psettings)
+    ਖਾਲੀ
+mch_print_ਸਿਰਾ(prt_settings_T *psettings)
 {
     prt_dsc_noarg("Trailer");
 
     /*
      * Output any info we don't know in toto until we finish
      */
-    prt_dsc_ints("Pages", 1, &prt_page_num);
+    prt_dsc_ints("Pages", 1, &prt_ਪੰਨਾ_ਅੰਕ);
 
     prt_dsc_noarg("EOF");
 
@@ -2166,65 +2166,65 @@ mch_print_end(prt_settings_T *psettings)
     // NOTHING MUST BE WRITTEN AFTER THIS!
     prt_write_file((char_u *)"\004");
 
-    if (!prt_file_error && psettings->outfile == NULL
+    ਜੇ (!prt_file_error && psettings->outfile == ਨਿਰਾ
 					&& !got_int && !psettings->user_abort)
     {
 	// Close the file first.
-	if (prt_ps_fd != NULL)
+	ਜੇ (prt_ps_fd != ਨਿਰਾ)
 	{
 	    fclose(prt_ps_fd);
-	    prt_ps_fd = NULL;
+	    prt_ps_fd = ਨਿਰਾ;
 	}
-	prt_message((char_u *)_("Sending to printer..."));
+	prt_ਸੁਨੇਹਾ((char_u *)_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
-	    emsg(_(e_failed_to_print_postscript_file));
-	else
-	    prt_message((char_u *)_("Print job sent."));
+	ਜੇ (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
+	    emsg(_(e_failed_ਮੰਜ਼ਿਲ_print_postscript_file));
+	ਨਹੀਂਤਾਂ
+	    prt_ਸੁਨੇਹਾ((char_u *)_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
-mch_print_end_page(void)
+    ਪੂਰਨ
+mch_print_ਸਿਰਾ_ਪੰਨਾ(ਖਾਲੀ)
 {
-    prt_flush_buffer();
+    prt_flush_ਬਫਰ();
 
     prt_write_string("re sp\n");
 
     prt_dsc_noarg("PageTrailer");
 
-    return !prt_file_error;
+    ਵਾਪਸ !prt_file_error;
 }
 
-    int
-mch_print_begin_page(char_u *str UNUSED)
+    ਪੂਰਨ
+mch_print_begin_ਪੰਨਾ(char_u *str ਅਣਵਰਤਿਆ)
 {
-    int		page_num[2];
+    ਪੂਰਨ		ਪੰਨਾ_ਅੰਕ[2];
 
-    prt_page_num++;
+    prt_ਪੰਨਾ_ਅੰਕ++;
 
-    page_num[0] = page_num[1] = prt_page_num;
-    prt_dsc_ints("Page", 2, page_num);
+    ਪੰਨਾ_ਅੰਕ[0] = ਪੰਨਾ_ਅੰਕ[1] = prt_ਪੰਨਾ_ਅੰਕ;
+    prt_dsc_ints("Page", 2, ਪੰਨਾ_ਅੰਕ);
 
     prt_dsc_noarg("BeginPageSetup");
 
     prt_write_string("sv\n0 g\n");
-    prt_in_ascii = !prt_out_mbyte;
-    if (prt_out_mbyte)
+    prt_ਵਿੱਚ_ascii = !prt_ਬਾਹਰਲਾ_mbyte;
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
 	prt_write_string("CF0 sf\n");
-    else
+    ਨਹੀਂਤਾਂ
 	prt_write_string("F0 sf\n");
     prt_fgcol = PRCOLOR_BLACK;
     prt_bgcol = PRCOLOR_WHITE;
     prt_font = PRT_PS_FONT_ROMAN;
 
     // Set up page transformation for landscape printing.
-    if (!prt_portrait)
+    ਜੇ (!prt_portrait)
     {
-	prt_write_int(-((int)prt_mediasize[prt_media].width));
+	prt_write_int(-((ਪੂਰਨ)prt_mediasize[prt_media].ਚੌੜਾਈ));
 	prt_write_string("sl\n");
     }
 
@@ -2235,47 +2235,47 @@ mch_print_begin_page(char_u *str UNUSED)
     prt_curr_fg = (long_u)0xffffffff;
     prt_curr_bold = MAYBE;
 
-    return !prt_file_error;
+    ਵਾਪਸ !prt_file_error;
 }
 
-    int
-mch_print_blank_page(void)
+    ਪੂਰਨ
+mch_print_blank_ਪੰਨਾ(ਖਾਲੀ)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    ਵਾਪਸ (mch_print_begin_ਪੰਨਾ(ਨਿਰਾ) ? (mch_print_ਸਿਰਾ_ਪੰਨਾ()) : FALSE);
 }
 
-static float prt_pos_x = 0;
-static float prt_pos_y = 0;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_pos_x = 0;
+ਸਥਿਰ ਦਸ਼ਮਲਵ prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    ਖਾਲੀ
+mch_print_ਸ਼ੁਰੂ_ਸਤਰ(ਪੂਰਨ margin, ਪੂਰਨ ਪੰਨਾ_ਸਤਰ)
 {
-    prt_pos_x = prt_left_margin;
-    if (margin)
-	prt_pos_x -= prt_number_width;
+    prt_pos_x = prt_ਖੱਬਾ_margin;
+    ਜੇ (margin)
+	prt_pos_x -= prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
 
-    prt_pos_y = prt_top_margin - prt_first_line_height -
-					page_line * prt_line_height;
+    prt_pos_y = prt_ਸਿਖਰ_margin - prt_ਪਹਿਲਾ_ਸਤਰ_ਉਚਾਈ -
+					ਪੰਨਾ_ਸਤਰ * prt_ਸਤਰ_ਉਚਾਈ;
 
     prt_attribute_change = TRUE;
     prt_need_moveto = TRUE;
-    prt_half_width = FALSE;
+    prt_half_ਚੌੜਾਈ = FALSE;
 }
 
-    int
-mch_print_text_out(char_u *textp, int len UNUSED)
+    ਪੂਰਨ
+mch_print_ਪਾਠ_ਬਾਹਰਲਾ(char_u *textp, ਪੂਰਨ len ਅਣਵਰਤਿਆ)
 {
     char_u	*p = textp;
-    int		need_break;
+    ਪੂਰਨ		need_break;
     char_u	ch;
     char_u      ch_buff[8];
-    float       char_width;
-    float       next_pos;
-    int		in_ascii;
-    int		half_width;
-    char_u	*tofree = NULL;
+    ਦਸ਼ਮਲਵ       char_ਚੌੜਾਈ;
+    ਦਸ਼ਮਲਵ       ਅਗਲਾ_pos;
+    ਪੂਰਨ		ਵਿੱਚ_ascii;
+    ਪੂਰਨ		half_ਚੌੜਾਈ;
+    char_u	*tofree = ਨਿਰਾ;
 
-    char_width = prt_char_width;
+    char_ਚੌੜਾਈ = prt_char_ਚੌੜਾਈ;
 
     // Ideally VIM would create a rearranged CID font to combine a Roman and
     // CJKV font to do what VIM is doing here - use a Roman font for characters
@@ -2283,46 +2283,46 @@ mch_print_text_out(char_u *textp, int len UNUSED)
     // The problem is that GhostScript still (as of 8.13) does not support
     // rearranged fonts even though they have been documented by Adobe for 7
     // years!  If they ever do, a lot of this code will disappear.
-    if (prt_use_courier)
+    ਜੇ (prt_use_courier)
     {
-	in_ascii = (len == 1 && *p < 0x80);
-	if (prt_in_ascii)
+	ਵਿੱਚ_ascii = (len == 1 && *p < 0x80);
+	ਜੇ (prt_ਵਿੱਚ_ascii)
 	{
-	    if (!in_ascii)
+	    ਜੇ (!ਵਿੱਚ_ascii)
 	    {
 		// No longer in ASCII range - need to switch font
-		prt_in_ascii = FALSE;
+		prt_ਵਿੱਚ_ascii = FALSE;
 		prt_need_font = TRUE;
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (in_ascii)
+	ਨਹੀਂਤਾਂ ਜੇ (ਵਿੱਚ_ascii)
 	{
 	    // Now in ASCII range - need to switch font
-	    prt_in_ascii = TRUE;
+	    prt_ਵਿੱਚ_ascii = TRUE;
 	    prt_need_font = TRUE;
 	    prt_attribute_change = TRUE;
 	}
     }
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
-	half_width = ((*mb_ptr2cells)(p) == 1);
-	if (half_width)
-	    char_width /= 2;
-	if (prt_half_width)
+	half_ਚੌੜਾਈ = ((*mb_ptr2cells)(p) == 1);
+	ਜੇ (half_ਚੌੜਾਈ)
+	    char_ਚੌੜਾਈ /= 2;
+	ਜੇ (prt_half_ਚੌੜਾਈ)
 	{
-	    if (!half_width)
+	    ਜੇ (!half_ਚੌੜਾਈ)
 	    {
-		prt_half_width = FALSE;
-		prt_pos_x += prt_char_width/4;
+		prt_half_ਚੌੜਾਈ = FALSE;
+		prt_pos_x += prt_char_ਚੌੜਾਈ/4;
 		prt_need_moveto = TRUE;
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (half_width)
+	ਨਹੀਂਤਾਂ ਜੇ (half_ਚੌੜਾਈ)
 	{
-	    prt_half_width = TRUE;
-	    prt_pos_x += prt_char_width/4;
+	    prt_half_ਚੌੜਾਈ = TRUE;
+	    prt_pos_x += prt_char_ਚੌੜਾਈ/4;
 	    prt_need_moveto = TRUE;
 	    prt_attribute_change = TRUE;
 	}
@@ -2330,13 +2330,13 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
     // Output any required changes to the graphics state, after flushing any
     // text buffered so far.
-    if (prt_attribute_change)
+    ਜੇ (prt_attribute_change)
     {
-	prt_flush_buffer();
+	prt_flush_ਬਫਰ();
 	// Reset count of number of chars that will be printed
-	prt_text_run = 0;
+	prt_ਪਾਠ_ਲੜੀਵਾਰ = 0;
 
-	if (prt_need_moveto)
+	ਜੇ (prt_need_moveto)
 	{
 	    prt_pos_x_moveto = prt_pos_x;
 	    prt_pos_y_moveto = prt_pos_y;
@@ -2344,27 +2344,27 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
 	    prt_need_moveto = FALSE;
 	}
-	if (prt_need_font)
+	ਜੇ (prt_need_font)
 	{
-	    if (!prt_in_ascii)
+	    ਜੇ (!prt_ਵਿੱਚ_ascii)
 		prt_write_string("CF");
-	    else
+	    ਨਹੀਂਤਾਂ
 		prt_write_string("F");
 	    prt_write_int(prt_font);
 	    prt_write_string("sf\n");
 	    prt_need_font = FALSE;
 	}
-	if (prt_need_fgcol)
+	ਜੇ (prt_need_fgcol)
 	{
-	    int     r, g, b;
-	    r = ((unsigned)prt_fgcol & 0xff0000) >> 16;
-	    g = ((unsigned)prt_fgcol & 0xff00) >> 8;
+	    ਪੂਰਨ     r, g, b;
+	    r = ((ਬਿਨਾਨਿਸ਼ਾਨੀ)prt_fgcol & 0xff0000) >> 16;
+	    g = ((ਬਿਨਾਨਿਸ਼ਾਨੀ)prt_fgcol & 0xff00) >> 8;
 	    b = prt_fgcol & 0xff;
 
 	    prt_write_real(r / 255.0, 3);
-	    if (r == g && g == b)
+	    ਜੇ (r == g && g == b)
 		prt_write_string("g\n");
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		prt_write_real(g / 255.0, 3);
 		prt_write_real(b / 255.0, 3);
@@ -2373,116 +2373,116 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 	    prt_need_fgcol = FALSE;
 	}
 
-	if (prt_bgcol != PRCOLOR_WHITE)
+	ਜੇ (prt_bgcol != PRCOLOR_WHITE)
 	{
 	    prt_new_bgcol = prt_bgcol;
-	    if (prt_need_bgcol)
+	    ਜੇ (prt_need_bgcol)
 		prt_do_bgcol = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    prt_do_bgcol = FALSE;
 	prt_need_bgcol = FALSE;
 
-	if (prt_need_underline)
+	ਜੇ (prt_need_underline)
 	    prt_do_underline = prt_underline;
 	prt_need_underline = FALSE;
 
 	prt_attribute_change = FALSE;
     }
 
-    if (prt_do_conv)
+    ਜੇ (prt_do_conv)
     {
 	// Convert from multi-byte to 8-bit encoding
 	tofree = p = string_convert(&prt_conv, p, &len);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    p = (char_u *)"";
 	    len = 0;
 	}
     }
 
-    if (prt_out_mbyte)
+    ਜੇ (prt_ਬਾਹਰਲਾ_mbyte)
     {
 	// Multi-byte character strings are represented more efficiently as hex
 	// strings when outputting clean 8 bit PS.
-	while (len-- > 0)
+	ਜਦੋਂ (len-- > 0)
 	{
-	    ch = prt_hexchar[(unsigned)(*p) >> 4];
-	    ga_append(&prt_ps_buffer, ch);
+	    ch = prt_hexchar[(ਬਿਨਾਨਿਸ਼ਾਨੀ)(*p) >> 4];
+	    ga_append(&prt_ps_ਬਫਰ, ch);
 	    ch = prt_hexchar[(*p) & 0xf];
-	    ga_append(&prt_ps_buffer, ch);
+	    ga_append(&prt_ps_ਬਫਰ, ch);
 	    p++;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Add next character to buffer of characters to output.
 	// Note: One printed character may require several PS characters to
 	// represent it, but we only count them as one printed character.
 	ch = *p;
-	if (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
+	ਜੇ (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
 	{
 	    // Convert non-printing characters to either their escape or octal
 	    // sequence, ensures PS sent over a serial line does not interfere
 	    // with the comms protocol.
-	    ga_append(&prt_ps_buffer, '\\');
-	    switch (ch)
+	    ga_append(&prt_ps_ਬਫਰ, '\\');
+	    ਚੋਣ (ch)
 	    {
-		case BS:   ga_append(&prt_ps_buffer, 'b'); break;
-		case TAB:  ga_append(&prt_ps_buffer, 't'); break;
-		case NL:   ga_append(&prt_ps_buffer, 'n'); break;
-		case FF:   ga_append(&prt_ps_buffer, 'f'); break;
-		case CAR:  ga_append(&prt_ps_buffer, 'r'); break;
-		case '(':  ga_append(&prt_ps_buffer, '('); break;
-		case ')':  ga_append(&prt_ps_buffer, ')'); break;
-		case '\\': ga_append(&prt_ps_buffer, '\\'); break;
+		ਹਾਲਤ BS:   ga_append(&prt_ps_ਬਫਰ, 'b'); ਰੋਕੋ;
+		ਹਾਲਤ TAB:  ga_append(&prt_ps_ਬਫਰ, 't'); ਰੋਕੋ;
+		ਹਾਲਤ NL:   ga_append(&prt_ps_ਬਫਰ, 'n'); ਰੋਕੋ;
+		ਹਾਲਤ FF:   ga_append(&prt_ps_ਬਫਰ, 'f'); ਰੋਕੋ;
+		ਹਾਲਤ CAR:  ga_append(&prt_ps_ਬਫਰ, 'r'); ਰੋਕੋ;
+		ਹਾਲਤ '(':  ga_append(&prt_ps_ਬਫਰ, '('); ਰੋਕੋ;
+		ਹਾਲਤ ')':  ga_append(&prt_ps_ਬਫਰ, ')'); ਰੋਕੋ;
+		ਹਾਲਤ '\\': ga_append(&prt_ps_ਬਫਰ, '\\'); ਰੋਕੋ;
 
-		default:
-			   sprintf((char *)ch_buff, "%03o", (unsigned int)ch);
-			   ga_append(&prt_ps_buffer, ch_buff[0]);
-			   ga_append(&prt_ps_buffer, ch_buff[1]);
-			   ga_append(&prt_ps_buffer, ch_buff[2]);
-			   break;
+		ਮੂਲ:
+			   sprintf((ਅੱਖਰ *)ch_buff, "%03o", (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)ch);
+			   ga_append(&prt_ps_ਬਫਰ, ch_buff[0]);
+			   ga_append(&prt_ps_ਬਫਰ, ch_buff[1]);
+			   ga_append(&prt_ps_ਬਫਰ, ch_buff[2]);
+			   ਰੋਕੋ;
 	    }
 	}
-	else
-	    ga_append(&prt_ps_buffer, ch);
+	ਨਹੀਂਤਾਂ
+	    ga_append(&prt_ps_ਬਫਰ, ch);
     }
 
     // Need to free any translated characters
     vim_free(tofree);
 
-    prt_text_run += char_width;
-    prt_pos_x += char_width;
+    prt_ਪਾਠ_ਲੜੀਵਾਰ += char_ਚੌੜਾਈ;
+    prt_pos_x += char_ਚੌੜਾਈ;
 
     // The downside of fp - use relative error on right margin check
-    next_pos = prt_pos_x + prt_char_width;
-    need_break = (next_pos > prt_right_margin) &&
-		    ((next_pos - prt_right_margin) > (prt_right_margin*1e-5));
+    ਅਗਲਾ_pos = prt_pos_x + prt_char_ਚੌੜਾਈ;
+    need_break = (ਅਗਲਾ_pos > prt_ਸੱਜਾ_margin) &&
+		    ((ਅਗਲਾ_pos - prt_ਸੱਜਾ_margin) > (prt_ਸੱਜਾ_margin*1e-5));
 
-    if (need_break)
-	prt_flush_buffer();
+    ਜੇ (need_break)
+	prt_flush_ਬਫਰ();
 
-    return need_break;
+    ਵਾਪਸ need_break;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_font(ਪੂਰਨ iBold, ਪੂਰਨ iItalic, ਪੂਰਨ iUnderline)
 {
-    int		font = 0;
+    ਪੂਰਨ		font = 0;
 
-    if (iBold)
+    ਜੇ (iBold)
 	font |= 0x01;
-    if (iItalic)
+    ਜੇ (iItalic)
 	font |= 0x02;
 
-    if (font != prt_font)
+    ਜੇ (font != prt_font)
     {
 	prt_font = font;
 	prt_attribute_change = TRUE;
 	prt_need_font = TRUE;
     }
-    if (prt_underline != iUnderline)
+    ਜੇ (prt_underline != iUnderline)
     {
 	prt_underline = iUnderline;
 	prt_attribute_change = TRUE;
@@ -2490,23 +2490,23 @@ mch_print_set_font(int iBold, int iItalic, int iUnderline)
     }
 }
 
-    void
-mch_print_set_bg(long_u bgcol)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_bg(long_u bgcol)
 {
-    prt_bgcol = (int)bgcol;
+    prt_bgcol = (ਪੂਰਨ)bgcol;
     prt_attribute_change = TRUE;
     prt_need_bgcol = TRUE;
 }
 
-    void
-mch_print_set_fg(long_u fgcol)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_fg(long_u fgcol)
 {
-    if (fgcol == (long_u)prt_fgcol)
-	return;
+    ਜੇ (fgcol == (long_u)prt_fgcol)
+	ਵਾਪਸ;
 
-    prt_fgcol = (int)fgcol;
+    prt_fgcol = (ਪੂਰਨ)fgcol;
     prt_attribute_change = TRUE;
     prt_need_fgcol = TRUE;
 }
 
-#endif // FEAT_POSTSCRIPT
+#ਜੇ_ਅੰਤ // FEAT_POSTSCRIPT

@@ -6,14 +6,14 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifdef __QNXNTO__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __QNXNTO__
 # include <sys/procmgr.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#define	USE_TMPNAM
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	USE_TMPNAM
 
-#define POSIX	    // Used by pty.c
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ POSIX	    // Used by pty.c
 
-#if defined(FEAT_GUI_PHOTON)
-extern int is_photon_available;
-#endif
+#ਜੇ defined(FEAT_GUI_PHOTON)
+ਬਾਹਰੀ ਪੂਰਨ is_photon_ਉਪਲਬਧ;
+#ਜੇ_ਅੰਤ

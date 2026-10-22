@@ -12,122 +12,122 @@
  * Mostly by Ivan Krasilnikov.
  */
 
-#undef NDEBUG
-#include <assert.h>
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ NDEBUG
+#ਅਨ੍ਤਰ੍ਭਾਵ <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NO_VIM_MAIN
+#ਅਨ੍ਤਰ੍ਭਾਵ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#ਅਨ੍ਤਰ੍ਭਾਵ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(i) ((i) ^ 15167)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TEST_ਗਿਣਤੀ 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    ਸਥਿਰ ਖਾਲੀ
+test_mf_hash(ਖਾਲੀ)
 {
     mf_hashtab_T   ht;
-    mf_hashitem_T  *item;
-    blocknr_T      key;
+    mf_hashitem_T  *ਵਸਤੂ;
+    blocknr_T      ਕੁੰਜੀ;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   ਅੰਕ_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    ਲਈ (i = 0; i < TEST_ਗਿਣਤੀ; i++)
     {
-	assert(ht.mht_count == i);
+	ਪ੍ਰਤਿਜ੍ਞਾ(ht.mht_ਗਿਣਤੀ == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	ਅੰਕ_buckets = ht.mht_ਨਕਾਬ + 1;
+	ਪ੍ਰਤਿਜ੍ਞਾ(ਅੰਕ_buckets > 0 && (ਅੰਕ_buckets & (ਅੰਕ_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	ਪ੍ਰਤਿਜ੍ਞਾ(ht.mht_ਗਿਣਤੀ <= (ਅੰਕ_buckets << MHT_LOG_ਲੱਦੋ_ਗੁਣਕ));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	ਜੇ (i < (MHT_INIT_ਮਾਪ << MHT_LOG_ਲੱਦੋ_ਗੁਣਕ))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਅੰਕ_buckets == MHT_INIT_ਮਾਪ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਅੰਕ_buckets > MHT_INIT_ਮਾਪ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	ਕੁੰਜੀ = ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(i);
+	ਪ੍ਰਤਿਜ੍ਞਾ(mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ) == ਨਿਰਾ);
 
 	// allocate and add new item
-	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
-	mf_hash_add_item(&ht, item);
+	ਵਸਤੂ = LALLOC_CLEAR_ONE(mf_hashitem_T);
+	ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ != ਨਿਰਾ);
+	ਵਸਤੂ->mhi_ਕੁੰਜੀ = ਕੁੰਜੀ;
+	mf_hash_ਜੋੜੋ_ਵਸਤੂ(&ht, ਵਸਤੂ);
 
-	assert(mf_hash_find(&ht, key) == item);
+	ਪ੍ਰਤਿਜ੍ਞਾ(mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ) == ਵਸਤੂ);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	ਜੇ (ht.mht_ਨਕਾਬ + 1 != ਅੰਕ_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ht.mht_ਨਕਾਬ + 1 == ਅੰਕ_buckets * MHT_GROWTH_ਗੁਣਕ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(i + 1 == (ਅੰਕ_buckets << MHT_LOG_ਲੱਦੋ_ਗੁਣਕ));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    ਲਈ (i = 0; i < TEST_ਗਿਣਤੀ; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	ਕੁੰਜੀ = ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(i);
+	ਵਸਤੂ = mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ);
+	ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ != ਨਿਰਾ);
+	ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ->mhi_ਕੁੰਜੀ == ਕੁੰਜੀ);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    ਲਈ (i = 0; i < TEST_ਗਿਣਤੀ; i++)
     {
-	if (i % 100 < 70)
+	ਜੇ (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ਕੁੰਜੀ = ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(i);
+	    ਵਸਤੂ = mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ != ਨਿਰਾ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ->mhi_ਕੁੰਜੀ == ਕੁੰਜੀ);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_ਵਸਤੂ(&ht, ਵਸਤੂ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ) == ਨਿਰਾ);
 
-	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    mf_hash_ਜੋੜੋ_ਵਸਤੂ(&ht, ਵਸਤੂ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ) == ਵਸਤੂ);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_ਵਸਤੂ(&ht, ਵਸਤੂ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ) == ਨਿਰਾ);
 
-	    vim_free(item);
+	    vim_free(ਵਸਤੂ);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    ਲਈ (i = 0; i < TEST_ਗਿਣਤੀ; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	ਕੁੰਜੀ = ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(i);
+	ਵਸਤੂ = mf_hash_ਲੱਭੋ(&ht, ਕੁੰਜੀ);
 
-	if (i % 100 < 70)
+	ਜੇ (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ == ਨਿਰਾ);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ != ਨਿਰਾ);
+	    ਪ੍ਰਤਿਜ੍ਞਾ(ਵਸਤੂ->mhi_ਕੁੰਜੀ == ਕੁੰਜੀ);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    ਪੂਰਨ
+ਮੁੱਖ(ਖਾਲੀ)
 {
     test_mf_hash();
-    return 0;
+    ਵਾਪਸ 0;
 }

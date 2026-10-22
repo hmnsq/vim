@@ -42,8 +42,8 @@
  * Lorens Younes (d93-hyo@nada.kth.se) 4/96
  */
 
-#ifndef XPM_h
-#define XPM_h
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ XPM_h
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_h
 
 /*
  * first some identification numbers:
@@ -57,41 +57,41 @@
  *
  * Then the XpmIncludeVersion number is built from these numbers.
  */
-#define XpmFormat 3
-#define XpmVersion 4
-#define XpmRevision 11
-#define XpmIncludeVersion ((XpmFormat * 100 + XpmVersion) * 100 + XpmRevision)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmFormat 3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_ਸੰਸਕਰਣ 4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmRevision 11
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Include_ਸੰਸਕਰਣ ((XpmFormat * 100 + Xpm_ਸੰਸਕਰਣ) * 100 + XpmRevision)
 
-#ifndef XPM_NUMBERS
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ XPM_NUMBERS
 
-#ifdef FOR_MSW
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FOR_MSW
 # define SYSV			/* uses memcpy string.h etc. */
 # include <malloc.h>
 # include "simx.h"		/* defines some X stuff using MSW types */
-#define NEED_STRCASECMP		/* at least for MSVC++ */
-#else /* FOR_MSW */
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NEED_STRCASECMP		/* at least for MSVC++ */
+#ਨਹੀਂਤਾਂ /* FOR_MSW */
 # ifdef AMIGA
 #  include "amigax.h"
-# else /* not AMIGA */
+# ਨਹੀਂਤਾਂ /* not AMIGA */
 #  include <X11/Xlib.h>
 #  include <X11/Xutil.h>
 # endif /* not AMIGA */
-#endif /* FOR_MSW */
+#ਜੇ_ਅੰਤ /* FOR_MSW */
 
 /* let's define Pixel if it is not done yet */
-#if ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
-typedef unsigned long Pixel;	/* Index into colormap */
+#ਜੇ ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ Pixel;	/* Index into colormap */
 # define PIXEL_ALREADY_TYPEDEFED
-#endif
+#ਜੇ_ਅੰਤ
 
 /* make sure we know whether function prototypes are needed or not */
-#ifndef NeedFunctionPrototypes
-# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ NeedFunctionPrototypes
+# ਜੇ defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #  define NeedFunctionPrototypes 1
-# else
+# ਨਹੀਂਤਾਂ
 #  define NeedFunctionPrototypes 0
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 
 /* Return ErrorStatus codes:
@@ -100,402 +100,402 @@ typedef unsigned long Pixel;	/* Index into colormap */
  * negative if failure
  */
 
-#define XpmColorError    1
-#define XpmSuccess       0
-#define XpmOpenFailed   -1
-#define XpmFileInvalid  -2
-#define XpmNoMemory     -3
-#define XpmColorFailed  -4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmColorError    1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmSuccess       0
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmOpenFailed   -1
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmFileInvalid  -2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_No_ਸਮ੍ਰਿਤੀ     -3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmColorFailed  -4
 
-typedef struct {
-    char *name;			/* Symbolic color name */
-    char *value;		/* Color value */
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਅੱਖਰ *name;			/* Symbolic color name */
+    ਅੱਖਰ *ਮੁੱਲ;		/* Color value */
     Pixel pixel;		/* Color pixel */
-}      XpmColorSymbol;
+}      Xpm_Color_ਚਿੰਨ੍ਹ;
 
-typedef struct {
-    char *name;			/* name of the extension */
-    unsigned int nlines;	/* number of lines in this extension */
-    char **lines;		/* pointer to the extension array of strings */
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਅੱਖਰ *name;			/* name of the extension */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ nlines;	/* number of lines in this extension */
+    ਅੱਖਰ **ਸਤਰਾਂ;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
-typedef struct {
-    char *string;		/* characters string */
-    char *symbolic;		/* symbolic name */
-    char *m_color;		/* monochrom default */
-    char *g4_color;		/* 4 level grayscale default */
-    char *g_color;		/* other level grayscale default */
-    char *c_color;		/* color default */
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਅੱਖਰ *string;		/* characters string */
+    ਅੱਖਰ *symbolic;		/* symbolic name */
+    ਅੱਖਰ *m_color;		/* monochrom default */
+    ਅੱਖਰ *g4_color;		/* 4 level grayscale default */
+    ਅੱਖਰ *g_color;		/* other level grayscale default */
+    ਅੱਖਰ *c_color;		/* color default */
 }      XpmColor;
 
-typedef struct {
-    unsigned int width;		/* image width */
-    unsigned int height;	/* image height */
-    unsigned int cpp;		/* number of characters per pixel */
-    unsigned int ncolors;	/* number of colors */
-    XpmColor *colorTable;	/* list of related colors */
-    unsigned int *data;		/* image data */
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਚੌੜਾਈ;		/* image width */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਉਚਾਈ;	/* image height */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cpp;		/* number of characters per pixel */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ncolors;	/* number of colors */
+    XpmColor *color_ਸਾਰਣੀ;	/* list of related colors */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ *ਅੰਕੜੇ;		/* image data */
 }      XpmImage;
 
-typedef struct {
-    unsigned long valuemask;	/* Specifies which attributes are defined */
-    char *hints_cmt;		/* Comment of the hints section */
-    char *colors_cmt;		/* Comment of the colors section */
-    char *pixels_cmt;		/* Comment of the pixels section */
-    unsigned int x_hotspot;	/* Returns the x hotspot's coordinate */
-    unsigned int y_hotspot;	/* Returns the y hotspot's coordinate */
-    unsigned int nextensions;	/* number of extensions */
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ valuemask;	/* Specifies which attributes are defined */
+    ਅੱਖਰ *hints_cmt;		/* Comment of the hints section */
+    ਅੱਖਰ *colors_cmt;		/* Comment of the colors section */
+    ਅੱਖਰ *pixels_cmt;		/* Comment of the pixels section */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ x_hotspot;	/* Returns the x hotspot's coordinate */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ y_hotspot;	/* Returns the y hotspot's coordinate */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ nextensions;	/* number of extensions */
     XpmExtension *extensions;	/* pointer to array of extensions */
 }      XpmInfo;
 
-typedef int (*XpmAllocColorFunc)(
-#if NeedFunctionPrototypes
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*XpmAllocColorFunc)(
+#ਜੇ NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
-    char*			/* colorname */,
+    ਅੱਖਰ*			/* colorname */,
     XColor*			/* xcolor */,
-    void*			/* closure */
-#endif
+    ਖਾਲੀ*			/*ਘੇਰਾ*/
+#ਜੇ_ਅੰਤ
 );
 
-typedef int (*XpmFreeColorsFunc)(
-#if NeedFunctionPrototypes
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*XpmFreeColorsFunc)(
+#ਜੇ NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     Pixel*			/* pixels */,
-    int				/* npixels */,
-    void*			/* closure */
-#endif
+    ਪੂਰਨ				/* npixels */,
+    ਖਾਲੀ*			/*ਘੇਰਾ*/
+#ਜੇ_ਅੰਤ
 );
 
-typedef struct {
-    unsigned long valuemask;		/* Specifies which attributes are
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ valuemask;		/* Specifies which attributes are
 					   defined */
 
     Visual *visual;			/* Specifies the visual to use */
     Colormap colormap;			/* Specifies the colormap to use */
-    unsigned int depth;			/* Specifies the depth */
-    unsigned int width;			/* Returns the width of the created
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਡੂੰਘਾਈ;			/* Specifies the depth */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਚੌੜਾਈ;			/* Returns the width of the created
 					   pixmap */
-    unsigned int height;		/* Returns the height of the created
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਉਚਾਈ;		/* Returns the height of the created
 					   pixmap */
-    unsigned int x_hotspot;		/* Returns the x hotspot's
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ x_hotspot;		/* Returns the x hotspot's
 					   coordinate */
-    unsigned int y_hotspot;		/* Returns the y hotspot's
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ y_hotspot;		/* Returns the y hotspot's
 					   coordinate */
-    unsigned int cpp;			/* Specifies the number of char per
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cpp;			/* Specifies the number of char per
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
-    unsigned int npixels;		/* Number of used pixels */
-    XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
-    unsigned int numsymbols;		/* Number of symbols */
-    char *rgb_fname;			/* RGB text file name */
-    unsigned int nextensions;		/* Number of extensions */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ npixels;		/* Number of used pixels */
+    Xpm_Color_ਚਿੰਨ੍ਹ *colorsymbols;	/* List of color symbols to override */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ numsymbols;		/* Number of symbols */
+    ਅੱਖਰ *rgb_fname;			/* RGB text file name */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ nextensions;		/* Number of extensions */
     XpmExtension *extensions;		/* List of extensions */
 
-    unsigned int ncolors;               /* Number of colors */
-    XpmColor *colorTable;               /* List of colors */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ncolors;               /* Number of colors */
+    XpmColor *color_ਸਾਰਣੀ;               /* List of colors */
 /* 3.2 backward compatibility code */
-    char *hints_cmt;                    /* Comment of the hints section */
-    char *colors_cmt;                   /* Comment of the colors section */
-    char *pixels_cmt;                   /* Comment of the pixels section */
+    ਅੱਖਰ *hints_cmt;                    /* Comment of the hints section */
+    ਅੱਖਰ *colors_cmt;                   /* Comment of the colors section */
+    ਅੱਖਰ *pixels_cmt;                   /* Comment of the pixels section */
 /* end 3.2 bc */
-    unsigned int mask_pixel;            /* Color table index of transparent
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਨਕਾਬ_pixel;            /* Color table index of transparent
                                            color */
 
     /* Color Allocation Directives */
     Bool exactColors;			/* Only use exact colors for visual */
-    unsigned int closeness;		/* Allowable RGB deviation */
-    unsigned int red_closeness;		/* Allowable red deviation */
-    unsigned int green_closeness;	/* Allowable green deviation */
-    unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ closeness;		/* Allowable RGB deviation */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ red_closeness;		/* Allowable red deviation */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ green_closeness;	/* Allowable green deviation */
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ blue_closeness;	/* Allowable blue deviation */
+    ਪੂਰਨ color_ਕੁੰਜੀ;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
-    int nalloc_pixels;			/* Returns the number of alloc'ed
+    ਪੂਰਨ nalloc_pixels;			/* Returns the number of alloc'ed
 					   color pixels */
 
     Bool alloc_close_colors;    	/* Specify whether close colors should
 					   be allocated using XAllocColor
 					   or not */
-    int bitmap_format;			/* Specify the format of 1bit depth
+    ਪੂਰਨ bitmap_format;			/* Specify the format of 1bit depth
 					   images: ZPixmap or XYBitmap */
 
     /* Color functions */
     XpmAllocColorFunc alloc_color;	/* Application color allocator */
     XpmFreeColorsFunc free_colors;	/* Application color de-allocator */
-    void *color_closure;		/* Application private data to pass to
+    ਖਾਲੀ *color_ਘੇਰਾ;		/* Application private data to pass to
 					   alloc_color and free_colors */
 
-}      XpmAttributes;
+}      Xpm_ਗੁਣ;
 
 /* XpmAttributes value masks bits */
-#define XpmVisual	   (1L<<0)
-#define XpmColormap	   (1L<<1)
-#define XpmDepth	   (1L<<2)
-#define XpmSize		   (1L<<3)	/* width & height */
-#define XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
-#define XpmCharsPerPixel   (1L<<5)
-#define XpmColorSymbols	   (1L<<6)
-#define XpmRgbFilename	   (1L<<7)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmVisual	   (1L<<0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmColormap	   (1L<<1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_ਡੂੰਘਾਈ	   (1L<<2)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_ਮਾਪ		   (1L<<3)	/* width & height */
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Chars_ਪ੍ਰਤੀ_Pixel   (1L<<5)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmColorSymbols	   (1L<<6)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmRgbFilename	   (1L<<7)
 /* 3.2 backward compatibility code */
-#define XpmInfos	   (1L<<8)
-#define XpmReturnInfos	   XpmInfos
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmInfos	   (1L<<8)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReturnInfos	   XpmInfos
 /* end 3.2 bc */
-#define XpmReturnPixels	   (1L<<9)
-#define XpmExtensions      (1L<<10)
-#define XpmReturnExtensions XpmExtensions
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReturnPixels	   (1L<<9)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmExtensions      (1L<<10)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReturnExtensions XpmExtensions
 
-#define XpmExactColors     (1L<<11)
-#define XpmCloseness	   (1L<<12)
-#define XpmRGBCloseness	   (1L<<13)
-#define XpmColorKey	   (1L<<14)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmExactColors     (1L<<11)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmCloseness	   (1L<<12)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmRGBCloseness	   (1L<<13)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Color_ਕੁੰਜੀ	   (1L<<14)
 
-#define XpmColorTable      (1L<<15)
-#define XpmReturnColorTable XpmColorTable
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Color_ਸਾਰਣੀ      (1L<<15)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Return_Color_ਸਾਰਣੀ Xpm_Color_ਸਾਰਣੀ
 
-#define XpmReturnAllocPixels (1L<<16)
-#define XpmAllocCloseColors (1L<<17)
-#define XpmBitmapFormat    (1L<<18)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReturnAllocPixels (1L<<16)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmAllocCloseColors (1L<<17)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmBitmapFormat    (1L<<18)
 
-#define XpmAllocColor      (1L<<19)
-#define XpmFreeColors      (1L<<20)
-#define XpmColorClosure    (1L<<21)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmAllocColor      (1L<<19)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmFreeColors      (1L<<20)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Color_ਘੇਰਾ    (1L<<21)
 
 
 /* XpmInfo value masks bits */
-#define XpmComments        XpmInfos
-#define XpmReturnComments  XpmComments
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmComments        XpmInfos
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReturnComments  XpmComments
 
 /* XpmAttributes mask_pixel value when there is no mask */
-#ifndef FOR_MSW
-#define XpmUndefPixel 0x80000000
-#else
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FOR_MSW
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmUndefPixel 0x80000000
+#ਨਹੀਂਤਾਂ
 /* int is only 16 bit for MSW */
-#define XpmUndefPixel 0x8000
-#endif
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmUndefPixel 0x8000
+#ਜੇ_ਅੰਤ
 
 /*
  * color keys for visual type, they must fit along with the number key of
  * each related element in xpmColorKeys[] defined in XpmI.h
  */
-#define XPM_MONO	2
-#define XPM_GREY4	3
-#define XPM_GRAY4	3
-#define XPM_GREY 	4
-#define XPM_GRAY 	4
-#define XPM_COLOR	5
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_MONO	2
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_GREY4	3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_GRAY4	3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_GREY 	4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_ਸਲੇਟੀ 	4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPM_COLOR	5
 
 
 /* macros for forward declarations of functions with prototypes */
-#if NeedFunctionPrototypes
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
-#endif
+#ਜੇ NeedFunctionPrototypes
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FUNC(f, t, p) ਬਾਹਰੀ t f p
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ LFUNC(f, t, p) ਸਥਿਰ t f p
+#ਨਹੀਂਤਾਂ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FUNC(f, t, p) ਬਾਹਰੀ t f()
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ LFUNC(f, t, p) ਸਥਿਰ t f()
+#ਜੇ_ਅੰਤ
 
 
 /*
  * functions declarations
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
+ਬਾਹਰੀ "C" {
+#ਜੇ_ਅੰਤ
 
 /* FOR_MSW, all ..Pixmap.. are excluded, only the ..XImage.. are used */
 /* Same for Amiga! */
 
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromData, int, (Display *display,
+#ਜੇ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_ਅੰਕੜੇ, ਪੂਰਨ, (Display *display,
 					Drawable d,
-					char **data,
+					ਅੱਖਰ **ਅੰਕੜੇ,
 					Pixmap *pixmap_return,
 					Pixmap *shapemask_return,
-					XpmAttributes *attributes));
+					Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateDataFromPixmap, int, (Display *display,
-					char ***data_return,
+    FUNC(Xpm_Create_ਅੰਕੜੇ_From_Pixmap, ਪੂਰਨ, (Display *display,
+					ਅੱਖਰ ***ਅੰਕੜੇ_return,
 					Pixmap pixmap,
 					Pixmap shapemask,
-					XpmAttributes *attributes));
+					Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmReadFileToPixmap, int, (Display *display,
+    FUNC(Xpm_Read_File_ਮੰਜ਼ਿਲ_Pixmap, ਪੂਰਨ, (Display *display,
 				    Drawable d,
-				    char *filename,
+				    ਅੱਖਰ *filename,
 				    Pixmap *pixmap_return,
 				    Pixmap *shapemask_return,
-				    XpmAttributes *attributes));
+				    Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmWriteFileFromPixmap, int, (Display *display,
-				       char *filename,
+    FUNC(XpmWriteFileFromPixmap, ਪੂਰਨ, (Display *display,
+				       ਅੱਖਰ *filename,
 				       Pixmap pixmap,
 				       Pixmap shapemask,
-				       XpmAttributes *attributes));
-#endif
+				       Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ_ਅੰਤ
 
-    FUNC(XpmCreateImageFromData, int, (Display *display,
-				       char **data,
+    FUNC(Xpm_Create_Image_From_ਅੰਕੜੇ, ਪੂਰਨ, (Display *display,
+				       ਅੱਖਰ **ਅੰਕੜੇ,
 				       XImage **image_return,
 				       XImage **shapemask_return,
-				       XpmAttributes *attributes));
+				       Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateDataFromImage, int, (Display *display,
-				       char ***data_return,
+    FUNC(Xpm_Create_ਅੰਕੜੇ_From_Image, ਪੂਰਨ, (Display *display,
+				       ਅੱਖਰ ***ਅੰਕੜੇ_return,
 				       XImage *image,
 				       XImage *shapeimage,
-				       XpmAttributes *attributes));
+				       Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmReadFileToImage, int, (Display *display,
-				   char *filename,
+    FUNC(Xpm_Read_File_ਮੰਜ਼ਿਲ_Image, ਪੂਰਨ, (Display *display,
+				   ਅੱਖਰ *filename,
 				   XImage **image_return,
 				   XImage **shapeimage_return,
-				   XpmAttributes *attributes));
+				   Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmWriteFileFromImage, int, (Display *display,
-				      char *filename,
+    FUNC(XpmWriteFileFromImage, ਪੂਰਨ, (Display *display,
+				      ਅੱਖਰ *filename,
 				      XImage *image,
 				      XImage *shapeimage,
-				      XpmAttributes *attributes));
+				      Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateImageFromBuffer, int, (Display *display,
-					 char *buffer,
+    FUNC(Xpm_Create_Image_From_ਬਫਰ, ਪੂਰਨ, (Display *display,
+					 ਅੱਖਰ *ਬਫਰ,
 					 XImage **image_return,
 					 XImage **shapemask_return,
-					 XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromBuffer, int, (Display *display,
+					 Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_ਬਫਰ, ਪੂਰਨ, (Display *display,
 					  Drawable d,
-					  char *buffer,
+					  ਅੱਖਰ *ਬਫਰ,
 					  Pixmap *pixmap_return,
 					  Pixmap *shapemask_return,
-					  XpmAttributes *attributes));
+					  Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateBufferFromImage, int, (Display *display,
-					 char **buffer_return,
+    FUNC(Xpm_Create_ਬਫਰ_From_Image, ਪੂਰਨ, (Display *display,
+					 ਅੱਖਰ **ਬਫਰ_return,
 					 XImage *image,
 					 XImage *shapeimage,
-					 XpmAttributes *attributes));
+					 Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateBufferFromPixmap, int, (Display *display,
-					  char **buffer_return,
+    FUNC(Xpm_Create_ਬਫਰ_From_Pixmap, ਪੂਰਨ, (Display *display,
+					  ਅੱਖਰ **ਬਫਰ_return,
 					  Pixmap pixmap,
 					  Pixmap shapemask,
-					  XpmAttributes *attributes));
-#endif
-    FUNC(XpmReadFileToBuffer, int, (char *filename, char **buffer_return));
-    FUNC(XpmWriteFileFromBuffer, int, (char *filename, char *buffer));
+					  Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ_ਅੰਤ
+    FUNC(Xpm_Read_File_ਮੰਜ਼ਿਲ_ਬਫਰ, ਪੂਰਨ, (ਅੱਖਰ *filename, ਅੱਖਰ **ਬਫਰ_return));
+    FUNC(Xpm_Write_File_From_ਬਫਰ, ਪੂਰਨ, (ਅੱਖਰ *filename, ਅੱਖਰ *ਬਫਰ));
 
-    FUNC(XpmReadFileToData, int, (char *filename, char ***data_return));
-    FUNC(XpmWriteFileFromData, int, (char *filename, char **data));
+    FUNC(Xpm_Read_File_ਮੰਜ਼ਿਲ_ਅੰਕੜੇ, ਪੂਰਨ, (ਅੱਖਰ *filename, ਅੱਖਰ ***ਅੰਕੜੇ_return));
+    FUNC(Xpm_Write_File_From_ਅੰਕੜੇ, ਪੂਰਨ, (ਅੱਖਰ *filename, ਅੱਖਰ **ਅੰਕੜੇ));
 
-    FUNC(XpmAttributesSize, int, ());
-    FUNC(XpmFreeAttributes, void, (XpmAttributes *attributes));
-    FUNC(XpmFreeExtensions, void, (XpmExtension *extensions,
-				   int nextensions));
+    FUNC(Xpm_ਗੁਣ_ਮਾਪ, ਪੂਰਨ, ());
+    FUNC(Xpm_Free_ਗੁਣ, ਖਾਲੀ, (Xpm_ਗੁਣ *ਗੁਣ));
+    FUNC(XpmFreeExtensions, ਖਾਲੀ, (XpmExtension *extensions,
+				   ਪੂਰਨ nextensions));
 
-    FUNC(XpmFreeXpmImage, void, (XpmImage *image));
-    FUNC(XpmFreeXpmInfo, void, (XpmInfo *info));
-    FUNC(XpmGetErrorString, char *, (int errcode));
-    FUNC(XpmLibraryVersion, int, ());
+    FUNC(XpmFreeXpmImage, ਖਾਲੀ, (XpmImage *image));
+    FUNC(XpmFreeXpmInfo, ਖਾਲੀ, (XpmInfo *info));
+    FUNC(XpmGetErrorString, ਅੱਖਰ *, (ਪੂਰਨ errcode));
+    FUNC(Xpm_Library_ਸੰਸਕਰਣ, ਪੂਰਨ, ());
 
     /* XpmImage functions */
-    FUNC(XpmReadFileToXpmImage, int, (char *filename,
+    FUNC(Xpm_Read_File_ਮੰਜ਼ਿਲ_Xpm_Image, ਪੂਰਨ, (ਅੱਖਰ *filename,
 				      XpmImage *image,
 				      XpmInfo *info));
 
-    FUNC(XpmWriteFileFromXpmImage, int, (char *filename,
+    FUNC(XpmWriteFileFromXpmImage, ਪੂਰਨ, (ਅੱਖਰ *filename,
 					 XpmImage *image,
 					 XpmInfo *info));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromXpmImage, int, (Display *display,
+#ਜੇ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromXpmImage, ਪੂਰਨ, (Display *display,
 					    Drawable d,
 					    XpmImage *image,
 					    Pixmap *pixmap_return,
 					    Pixmap *shapemask_return,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateImageFromXpmImage, int, (Display *display,
+					    Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ_ਅੰਤ
+    FUNC(XpmCreateImageFromXpmImage, ਪੂਰਨ, (Display *display,
 					   XpmImage *image,
 					   XImage **image_return,
 					   XImage **shapeimage_return,
-					   XpmAttributes *attributes));
+					   Xpm_ਗੁਣ *ਗੁਣ));
 
-    FUNC(XpmCreateXpmImageFromImage, int, (Display *display,
+    FUNC(XpmCreateXpmImageFromImage, ਪੂਰਨ, (Display *display,
 					   XImage *image,
 					   XImage *shapeimage,
 					   XpmImage *xpmimage,
-					   XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreateXpmImageFromPixmap, int, (Display *display,
+					   Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreateXpmImageFromPixmap, ਪੂਰਨ, (Display *display,
 					    Pixmap pixmap,
 					    Pixmap shapemask,
 					    XpmImage *xpmimage,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateDataFromXpmImage, int, (char ***data_return,
+					    Xpm_ਗੁਣ *ਗੁਣ));
+#ਜੇ_ਅੰਤ
+    FUNC(Xpm_Create_ਅੰਕੜੇ_From_Xpm_Image, ਪੂਰਨ, (ਅੱਖਰ ***ਅੰਕੜੇ_return,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromData, int, (char **data,
+    FUNC(Xpm_Create_Xpm_Image_From_ਅੰਕੜੇ, ਪੂਰਨ, (ਅੱਖਰ **ਅੰਕੜੇ,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromBuffer, int, (char *buffer,
+    FUNC(Xpm_Create_Xpm_Image_From_ਬਫਰ, ਪੂਰਨ, (ਅੱਖਰ *ਬਫਰ,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmCreateBufferFromXpmImage, int, (char **buffer_return,
+    FUNC(Xpm_Create_ਬਫਰ_From_Xpm_Image, ਪੂਰਨ, (ਅੱਖਰ **ਬਫਰ_return,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmGetParseError, int, (char *filename,
-				 int *linenum_return,
-				 int *charnum_return));
+    FUNC(XpmGetParseError, ਪੂਰਨ, (ਅੱਖਰ *filename,
+				 ਪੂਰਨ *linenum_return,
+				 ਪੂਰਨ *charnum_return));
 
-    FUNC(XpmFree, void, (void *ptr));
+    FUNC(XpmFree, ਖਾਲੀ, (ਖਾਲੀ *ptr));
 
-#ifdef __cplusplus
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
 } /* for C++ V2.0 */
-#endif
+#ਜੇ_ਅੰਤ
 
 
 /* backward compatibility */
 
 /* for version 3.0c */
-#define XpmPixmapColorError  XpmColorError
-#define XpmPixmapSuccess     XpmSuccess
-#define XpmPixmapOpenFailed  XpmOpenFailed
-#define XpmPixmapFileInvalid XpmFileInvalid
-#define XpmPixmapNoMemory    XpmNoMemory
-#define XpmPixmapColorFailed XpmColorFailed
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmPixmapColorError  XpmColorError
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmPixmapSuccess     XpmSuccess
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmPixmapOpenFailed  XpmOpenFailed
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmPixmapFileInvalid XpmFileInvalid
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Xpm_Pixmap_No_ਸਮ੍ਰਿਤੀ    Xpm_No_ਸਮ੍ਰਿਤੀ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmPixmapColorFailed XpmColorFailed
 
-#define XpmReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XpmWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmReadPixmapFile(dpy, d, file, pix, ਨਕਾਬ, att) \
+    Xpm_Read_File_ਮੰਜ਼ਿਲ_Pixmap(dpy, d, file, pix, ਨਕਾਬ, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XpmWritePixmapFile(dpy, file, pix, ਨਕਾਬ, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ਨਕਾਬ, att)
 
 /* for version 3.0b */
-#define PixmapColorError  XpmColorError
-#define PixmapSuccess     XpmSuccess
-#define PixmapOpenFailed  XpmOpenFailed
-#define PixmapFileInvalid XpmFileInvalid
-#define PixmapNoMemory    XpmNoMemory
-#define PixmapColorFailed XpmColorFailed
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PixmapColorError  XpmColorError
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PixmapSuccess     XpmSuccess
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PixmapOpenFailed  XpmOpenFailed
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PixmapFileInvalid XpmFileInvalid
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Pixmap_No_ਸਮ੍ਰਿਤੀ    Xpm_No_ਸਮ੍ਰਿਤੀ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PixmapColorFailed XpmColorFailed
 
-#define ColorSymbol XpmColorSymbol
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Color_ਚਿੰਨ੍ਹ Xpm_Color_ਚਿੰਨ੍ਹ
 
-#define XReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
-#define XCreatePixmapFromData(dpy, d, data, pix, mask, att) \
-    XpmCreatePixmapFromData(dpy, d, data, pix, mask, att)
-#define XCreateDataFromPixmap(dpy, data, pix, mask, att) \
-    XpmCreateDataFromPixmap(dpy, data, pix, mask, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XReadPixmapFile(dpy, d, file, pix, ਨਕਾਬ, att) \
+    Xpm_Read_File_ਮੰਜ਼ਿਲ_Pixmap(dpy, d, file, pix, ਨਕਾਬ, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XWritePixmapFile(dpy, file, pix, ਨਕਾਬ, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ਨਕਾਬ, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XCreate_Pixmap_From_ਅੰਕੜੇ(dpy, d, ਅੰਕੜੇ, pix, ਨਕਾਬ, att) \
+    Xpm_Create_Pixmap_From_ਅੰਕੜੇ(dpy, d, ਅੰਕੜੇ, pix, ਨਕਾਬ, att)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XCreate_ਅੰਕੜੇ_From_Pixmap(dpy, ਅੰਕੜੇ, pix, ਨਕਾਬ, att) \
+    Xpm_Create_ਅੰਕੜੇ_From_Pixmap(dpy, ਅੰਕੜੇ, pix, ਨਕਾਬ, att)
 
-#endif /* XPM_NUMBERS */
-#endif
+#ਜੇ_ਅੰਤ /* XPM_NUMBERS */
+#ਜੇ_ਅੰਤ

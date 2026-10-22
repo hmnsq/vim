@@ -11,24 +11,24 @@
  * tuple.c: Tuple support functions.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 // Tuple heads for garbage collection.
-static tuple_T		*first_tuple = NULL;	// list of all tuples
+ਸਥਿਰ tuple_T		*ਪਹਿਲਾ_tuple = ਨਿਰਾ;	// list of all tuples
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 tuple_init(tuple_T *tuple)
 {
     // Prepend the tuple to the list of tuples for garbage collection.
-    if (first_tuple != NULL)
-	first_tuple->tv_used_prev = tuple;
-    tuple->tv_used_prev = NULL;
-    tuple->tv_used_next = first_tuple;
-    first_tuple = tuple;
+    ਜੇ (ਪਹਿਲਾ_tuple != ਨਿਰਾ)
+	ਪਹਿਲਾ_tuple->tv_ਵਰਤਿਆ_prev = tuple;
+    tuple->tv_ਵਰਤਿਆ_prev = ਨਿਰਾ;
+    tuple->tv_ਵਰਤਿਆ_ਅਗਲਾ = ਪਹਿਲਾ_tuple;
+    ਪਹਿਲਾ_tuple = tuple;
 
-    ga_init2(&tuple->tv_items, sizeof(typval_T), 20);
+    ga_init2(&tuple->tv_ਚੀਜ਼ਾਂ, ਆਕਾਰ(typval_T), 20);
 }
 
 /*
@@ -36,14 +36,14 @@ tuple_init(tuple_T *tuple)
  * Caller should take care of the reference count.
  */
     tuple_T *
-tuple_alloc(void)
+tuple_alloc(ਖਾਲੀ)
 {
     tuple_T  *tuple;
 
     tuple = ALLOC_CLEAR_ONE(tuple_T);
-    if (tuple != NULL)
+    ਜੇ (tuple != ਨਿਰਾ)
 	tuple_init(tuple);
-    return tuple;
+    ਵਾਪਸ tuple;
 }
 
 /*
@@ -53,24 +53,24 @@ tuple_alloc(void)
  * Next tuple_set_item() must be called for each item.
  */
     tuple_T *
-tuple_alloc_with_items(int count)
+tuple_alloc_with_ਚੀਜ਼ਾਂ(ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     tuple_T	*tuple;
 
     tuple = tuple_alloc();
-    if (tuple == NULL)
-	return NULL;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (count <= 0)
-	return tuple;
+    ਜੇ (ਗਿਣਤੀ_2 <= 0)
+	ਵਾਪਸ tuple;
 
-    if (ga_grow(&tuple->tv_items, count) == FAIL)
+    ਜੇ (ga_grow(&tuple->tv_ਚੀਜ਼ਾਂ, ਗਿਣਤੀ_2) == FAIL)
     {
 	tuple_free(tuple);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    return tuple;
+    ਵਾਪਸ tuple;
 }
 
 /*
@@ -79,39 +79,39 @@ tuple_alloc_with_items(int count)
  * The contents of "tv" is copied into the tuple item.
  * Each item must be set exactly once.
  */
-    void
-tuple_set_item(tuple_T *tuple, int idx, typval_T *tv)
+    ਖਾਲੀ
+tuple_ਸੈੱਟ_ਵਸਤੂ(tuple_T *tuple, ਪੂਰਨ idx, typval_T *tv)
 {
-    *TUPLE_ITEM(tuple, idx) = *tv;
-    tuple->tv_items.ga_len++;
+    *TUPLE_ਵਸਤੂ(tuple, idx) = *tv;
+    tuple->tv_ਚੀਜ਼ਾਂ.ga_len++;
 }
 
 /*
  * Allocate an empty tuple for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 rettv_tuple_alloc(typval_T *rettv)
 {
     tuple_T	*tuple = tuple_alloc();
 
-    if (tuple == NULL)
-	return FAIL;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    rettv->v_lock = 0;
-    rettv_tuple_set(rettv, tuple);
-    return OK;
+    rettv->v_ਤਾਲਾ = 0;
+    rettv_tuple_ਸੈੱਟ(rettv, tuple);
+    ਵਾਪਸ OK;
 }
 
 /*
  * Set a tuple as the return value.  Increments the reference count.
  */
-    void
-rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
+    ਖਾਲੀ
+rettv_tuple_ਸੈੱਟ(typval_T *rettv, tuple_T *tuple)
 {
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = tuple;
-    if (tuple != NULL)
+    ਜੇ (tuple != ਨਿਰਾ)
 	++tuple->tv_refcount;
 }
 
@@ -119,28 +119,28 @@ rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
  * Set a new tuple with "count" items as the return value.
  * Returns OK on success and FAIL on allocation failure.
  */
-    int
-rettv_tuple_set_with_items(typval_T *rettv, int count)
+    ਪੂਰਨ
+rettv_tuple_ਸੈੱਟ_with_ਚੀਜ਼ਾਂ(typval_T *rettv, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     tuple_T *new_tuple;
 
-    new_tuple = tuple_alloc_with_items(count);
-    if (new_tuple == NULL)
-	return FAIL;
+    new_tuple = tuple_alloc_with_ਚੀਜ਼ਾਂ(ਗਿਣਤੀ_2);
+    ਜੇ (new_tuple == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    rettv_tuple_set(rettv, new_tuple);
+    rettv_tuple_ਸੈੱਟ(rettv, new_tuple);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Unreference a tuple: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ਖਾਲੀ
 tuple_unref(tuple_T *tuple)
 {
-    if (tuple != NULL && --tuple->tv_refcount <= 0)
+    ਜੇ (tuple != ਨਿਰਾ && --tuple->tv_refcount <= 0)
 	tuple_free(tuple);
 }
 
@@ -148,13 +148,13 @@ tuple_unref(tuple_T *tuple)
  * Free a tuple, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 tuple_free_contents(tuple_T *tuple)
 {
-    for (int i = 0; i < TUPLE_LEN(tuple); i++)
-	clear_tv(TUPLE_ITEM(tuple, i));
+    ਲਈ (ਪੂਰਨ i = 0; i < TUPLE_LEN(tuple); i++)
+	clear_tv(TUPLE_ਵਸਤੂ(tuple, i));
 
-    ga_clear(&tuple->tv_items);
+    ga_clear(&tuple->tv_ਚੀਜ਼ਾਂ);
 }
 
 /*
@@ -162,14 +162,14 @@ tuple_free_contents(tuple_T *tuple)
  * But don't free a tuple that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-tuple_free_nonref(int copyID)
+    ਪੂਰਨ
+tuple_free_nonref(ਪੂਰਨ copyID)
 {
     tuple_T	*tt;
-    int		did_free = FALSE;
+    ਪੂਰਨ		did_free = FALSE;
 
-    for (tt = first_tuple; tt != NULL; tt = tt->tv_used_next)
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    ਲਈ (tt = ਪਹਿਲਾ_tuple; tt != ਨਿਰਾ; tt = tt->tv_ਵਰਤਿਆ_ਅਗਲਾ)
+	ਜੇ ((tt->tv_copyID & COPYID_ਨਕਾਬ) != (copyID & COPYID_ਨਕਾਬ))
 	{
 	    // Free the Tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -177,33 +177,33 @@ tuple_free_nonref(int copyID)
 	    tuple_free_contents(tt);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ਵਾਪਸ did_free;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 tuple_free_list(tuple_T  *tuple)
 {
     // Remove the tuple from the list of tuples for garbage collection.
-    if (tuple->tv_used_prev == NULL)
-	first_tuple = tuple->tv_used_next;
-    else
-	tuple->tv_used_prev->tv_used_next = tuple->tv_used_next;
-    if (tuple->tv_used_next != NULL)
-	tuple->tv_used_next->tv_used_prev = tuple->tv_used_prev;
+    ਜੇ (tuple->tv_ਵਰਤਿਆ_prev == ਨਿਰਾ)
+	ਪਹਿਲਾ_tuple = tuple->tv_ਵਰਤਿਆ_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	tuple->tv_ਵਰਤਿਆ_prev->tv_ਵਰਤਿਆ_ਅਗਲਾ = tuple->tv_ਵਰਤਿਆ_ਅਗਲਾ;
+    ਜੇ (tuple->tv_ਵਰਤਿਆ_ਅਗਲਾ != ਨਿਰਾ)
+	tuple->tv_ਵਰਤਿਆ_ਅਗਲਾ->tv_ਵਰਤਿਆ_prev = tuple->tv_ਵਰਤਿਆ_prev;
 
     free_type(tuple->tv_type);
     vim_free(tuple);
 }
 
-    void
-tuple_free_items(int copyID)
+    ਖਾਲੀ
+tuple_free_ਚੀਜ਼ਾਂ(ਪੂਰਨ copyID)
 {
-    tuple_T	*tt, *tt_next;
+    tuple_T	*tt, *tt_ਅਗਲਾ;
 
-    for (tt = first_tuple; tt != NULL; tt = tt_next)
+    ਲਈ (tt = ਪਹਿਲਾ_tuple; tt != ਨਿਰਾ; tt = tt_ਅਗਲਾ)
     {
-	tt_next = tt->tv_used_next;
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	tt_ਅਗਲਾ = tt->tv_ਵਰਤਿਆ_ਅਗਲਾ;
+	ਜੇ ((tt->tv_copyID & COPYID_ਨਕਾਬ) != (copyID & COPYID_ਨਕਾਬ))
 	{
 	    // Free the tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -213,11 +213,11 @@ tuple_free_items(int copyID)
     }
 }
 
-    void
+    ਖਾਲੀ
 tuple_free(tuple_T *tuple)
 {
-    if (in_free_unref_items)
-	return;
+    ਜੇ (ਵਿੱਚ_free_unref_ਚੀਜ਼ਾਂ)
+	ਵਾਪਸ;
 
     tuple_free_contents(tuple);
     tuple_free_list(tuple);
@@ -226,44 +226,44 @@ tuple_free(tuple_T *tuple)
 /*
  * Get the number of items in a tuple.
  */
-    long
+    ਲੰਮਾ
 tuple_len(tuple_T *tuple)
 {
-    if (tuple == NULL)
-	return 0L;
-    return tuple->tv_items.ga_len;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ 0L;
+    ਵਾਪਸ tuple->tv_ਚੀਜ਼ਾਂ.ga_len;
 }
 
 /*
  * Return TRUE when two tuples have exactly the same values.
  */
-    int
+    ਪੂਰਨ
 tuple_equal(
     tuple_T	*t1,
     tuple_T	*t2,
-    int		ic)	// ignore case for strings
+    ਪੂਰਨ		ic)	// ignore case for strings
 {
-    if (t1 == t2)
-	return TRUE;
+    ਜੇ (t1 == t2)
+	ਵਾਪਸ TRUE;
 
-    int t1_len = tuple_len(t1);
-    int t2_len = tuple_len(t2);
+    ਪੂਰਨ t1_len = tuple_len(t1);
+    ਪੂਰਨ t2_len = tuple_len(t2);
 
-    if (t1_len != t2_len)
-	return FALSE;
+    ਜੇ (t1_len != t2_len)
+	ਵਾਪਸ FALSE;
 
-    if (t1_len == 0)
+    ਜੇ (t1_len == 0)
 	// empty and NULL tuples are considered equal
-	return TRUE;
+	ਵਾਪਸ TRUE;
 
     // If the tuples "t1" or "t2" is NULL, then it is handled by the length
     // checks above.
 
-    for (int i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
-	if (!tv_equal(TUPLE_ITEM(t1, i), TUPLE_ITEM(t2, j), ic))
-	    return FALSE;
+    ਲਈ (ਪੂਰਨ i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
+	ਜੇ (!tv_equal(TUPLE_ਵਸਤੂ(t1, i), TUPLE_ਵਸਤੂ(t2, j), ic))
+	    ਵਾਪਸ FALSE;
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -272,71 +272,71 @@ tuple_equal(
  * Returns NULL when "n" is out of range.
  */
     typval_T *
-tuple_find(tuple_T *tuple, long n)
+tuple_ਲੱਭੋ(tuple_T *tuple, ਲੰਮਾ n)
 {
-    if (tuple == NULL)
-	return NULL;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    ਜੇ (n < 0)
 	n = TUPLE_LEN(tuple) + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= TUPLE_LEN(tuple))
-	return NULL;
+    ਜੇ (n < 0 || n >= TUPLE_LEN(tuple))
+	ਵਾਪਸ ਨਿਰਾ;
 
-    return TUPLE_ITEM(tuple, n);
+    ਵਾਪਸ TUPLE_ਵਸਤੂ(tuple, n);
 }
 
-    int
+    ਪੂਰਨ
 tuple_append_tv(tuple_T *tuple, typval_T *tv)
 {
-    if (ga_grow_id(&tuple->tv_items, 1, aid_tuple_append) == FAIL)
-	return FAIL;
+    ਜੇ (ga_grow_id(&tuple->tv_ਚੀਜ਼ਾਂ, 1, aid_tuple_append) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    tuple_set_item(tuple, TUPLE_LEN(tuple), tv);
+    tuple_ਸੈੱਟ_ਵਸਤੂ(tuple, TUPLE_LEN(tuple), tv);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Concatenate tuples "t1" and "t2" into a new tuple, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    ਪੂਰਨ
 tuple_concat(tuple_T *t1, tuple_T *t2, typval_T *tv)
 {
     tuple_T	*tuple;
 
     // make a copy of the first tuple.
-    if (t1 == NULL)
+    ਜੇ (t1 == ਨਿਰਾ)
 	tuple = tuple_alloc();
-    else
+    ਨਹੀਂਤਾਂ
 	tuple = tuple_copy(t1, FALSE, TRUE, 0);
-    if (tuple == NULL)
-	return FAIL;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     tv->v_type = VAR_TUPLE;
-    tv->v_lock = 0;
+    tv->v_ਤਾਲਾ = 0;
     tv->vval.v_tuple = tuple;
-    if (t1 == NULL)
+    ਜੇ (t1 == ਨਿਰਾ)
 	++tuple->tv_refcount;
 
     // append all the items from the second tuple
-    for (int i = 0; i < tuple_len(t2); i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < tuple_len(t2); i++)
     {
 	typval_T    new_tv;
 
-	copy_tv(TUPLE_ITEM(t2, i), &new_tv);
+	copy_tv(TUPLE_ਵਸਤੂ(t2, i), &new_tv);
 
-	if (tuple_append_tv(tuple, &new_tv) == FAIL)
+	ਜੇ (tuple_append_tv(tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(tuple);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -344,90 +344,90 @@ tuple_concat(tuple_T *t1, tuple_T *t2, typval_T *tv)
  * inclusive (tuple[n1 : n2])
  */
     tuple_T *
-tuple_slice(tuple_T *tuple, long n1, long n2)
+tuple_ਟੁਕੜਾ(tuple_T *tuple, ਲੰਮਾ n1, ਲੰਮਾ n2)
 {
     tuple_T	*new_tuple;
 
-    new_tuple = tuple_alloc_with_items(n2 - n1 + 1);
-    if (new_tuple == NULL)
-	return NULL;
+    new_tuple = tuple_alloc_with_ਚੀਜ਼ਾਂ(n2 - n1 + 1);
+    ਜੇ (new_tuple == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (int i = n1; i <= n2; i++)
+    ਲਈ (ਪੂਰਨ i = n1; i <= n2; i++)
     {
 	typval_T    new_tv;
 
-	copy_tv(TUPLE_ITEM(tuple, i), &new_tv);
+	copy_tv(TUPLE_ਵਸਤੂ(tuple, i), &new_tv);
 
-	if (tuple_append_tv(new_tuple, &new_tv) == FAIL)
+	ਜੇ (tuple_append_tv(new_tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(new_tuple);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
 
-    return new_tuple;
+    ਵਾਪਸ new_tuple;
 }
 
-    int
-tuple_slice_or_index(
+    ਪੂਰਨ
+tuple_ਟੁਕੜਾ_or_ਸੂਚਕਾਂਕ(
     tuple_T	*tuple,
-    int		range,
+    ਪੂਰਨ		range,
     varnumber_T	n1_arg,
     varnumber_T	n2_arg,
-    int		exclusive,
+    ਪੂਰਨ		exclusive,
     typval_T	*rettv,
-    int		verbose)
+    ਪੂਰਨ		verbose)
 {
-    long	len = tuple_len(tuple);
+    ਲੰਮਾ	len = tuple_len(tuple);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    ਜੇ (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    ਜੇ (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty tuple, for Vim9 script start at the first item.
 	// A tuple index out of range is an error.
-	if (!range)
+	ਜੇ (!range)
 	{
-	    if (verbose)
-		semsg(_(e_tuple_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    ਜੇ (verbose)
+		semsg(_(e_tuple_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), (ਲੰਮਾ)n1_arg);
+	    ਵਾਪਸ FAIL;
 	}
-	if (in_vim9script())
+	ਜੇ (ਵਿੱਚ_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	ਨਹੀਂਤਾਂ
 	    n1 = len;
     }
-    if (range)
+    ਜੇ (range)
     {
 	tuple_T	*new_tuple;
 
-	if (n2 < 0)
+	ਜੇ (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	ਨਹੀਂਤਾਂ ਜੇ (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	ਜੇ (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	ਜੇ (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
-	new_tuple = tuple_slice(tuple, n1, n2);
-	if (new_tuple == NULL)
-	    return FAIL;
+	new_tuple = tuple_ਟੁਕੜਾ(tuple, n1, n2);
+	ਜੇ (new_tuple == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 	clear_tv(rettv);
-	rettv_tuple_set(rettv, new_tuple);
+	rettv_tuple_ਸੈੱਟ(rettv, new_tuple);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// copy the item to "var1" to avoid that freeing the tuple makes it
 	// invalid.
-	copy_tv(tuple_find(tuple, n1), &var1);
+	copy_tv(tuple_ਲੱਭੋ(tuple, n1), &var1);
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -437,23 +437,23 @@ tuple_slice_or_index(
  * Returns NULL when out of memory.
  */
     tuple_T *
-tuple_copy(tuple_T *orig, int deep, int top, int copyID)
+tuple_copy(tuple_T *orig, ਪੂਰਨ deep, ਪੂਰਨ ਸਿਖਰ, ਪੂਰਨ copyID)
 {
     tuple_T	*copy;
-    int		idx;
+    ਪੂਰਨ		idx;
 
-    if (orig == NULL)
-	return NULL;
+    ਜੇ (orig == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    copy = tuple_alloc_with_items(TUPLE_LEN(orig));
-    if (copy == NULL)
-	return NULL;
+    copy = tuple_alloc_with_ਚੀਜ਼ਾਂ(TUPLE_LEN(orig));
+    ਜੇ (copy == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (orig->tv_type == NULL || top || deep)
-	copy->tv_type = NULL;
-    else
+    ਜੇ (orig->tv_type == ਨਿਰਾ || ਸਿਖਰ || deep)
+	copy->tv_type = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ
 	copy->tv_type = alloc_type(orig->tv_type);
-    if (copyID != 0)
+    ਜੇ (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this tuple.
@@ -461,27 +461,27 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
 	orig->tv_copytuple = copy;
     }
 
-    for (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
+    ਲਈ (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
     {
-	copy->tv_items.ga_len++;
-	if (deep)
+	copy->tv_ਚੀਜ਼ਾਂ.ga_len++;
+	ਜੇ (deep)
 	{
-	    if (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
+	    ਜੇ (ਵਸਤੂ_copy(TUPLE_ਵਸਤੂ(orig, idx), TUPLE_ਵਸਤੂ(copy, idx),
 						deep, FALSE, copyID) == FAIL)
-		break;
+		ਰੋਕੋ;
 	}
-	else
-	    copy_tv(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx));
+	ਨਹੀਂਤਾਂ
+	    copy_tv(TUPLE_ਵਸਤੂ(orig, idx), TUPLE_ਵਸਤੂ(copy, idx));
     }
 
     ++copy->tv_refcount;
-    if (idx != TUPLE_LEN(orig))
+    ਜੇ (idx != TUPLE_LEN(orig))
     {
 	tuple_unref(copy);
-	copy = NULL;
+	copy = ਨਿਰਾ;
     }
 
-    return copy;
+    ਵਾਪਸ copy;
 }
 
 /*
@@ -490,82 +490,82 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
  * "rettv" contains the first element.
  * Returns OK or FAIL.
  */
-    int
-eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    ਪੂਰਨ
+eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ਪੂਰਨ do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    ਪੂਰਨ		evaluate = evalarg == ਨਿਰਾ ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    tuple_T	*tuple = NULL;
+    tuple_T	*tuple = ਨਿਰਾ;
     typval_T	tv;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    ਪੂਰਨ		vim9script = ਵਿੱਚ_vim9script();
+    ਪੂਰਨ		had_comma;
 
-    if (check_typval_is_value(rettv) == FAIL)
+    ਜੇ (check_typval_is_ਮੁੱਲ(rettv) == FAIL)
     {
 	// the first item is not a valid value type
 	clear_tv(rettv);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (evaluate)
+    ਜੇ (evaluate)
     {
 	tuple = tuple_alloc();
-	if (tuple == NULL)
-	    return FAIL;
+	ਜੇ (tuple == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	if (rettv->v_type != VAR_UNKNOWN)
+	ਜੇ (rettv->v_type != VAR_UNKNOWN)
 	{
 	    // Add the first item to the tuple from "rettv"
-	    if (tuple_append_tv(tuple, rettv) == FAIL)
-		goto failret;
+	    ਜੇ (tuple_append_tv(tuple, rettv) == FAIL)
+		ਜਾਓ failret;
 	    // The first item in "rettv" is added to the tuple.  Set the rettv
 	    // type to unknown, so that the caller doesn't free it.
 	    rettv->v_type = VAR_UNKNOWN;
 	}
     }
 
-    if (**arg == ')')
+    ਜੇ (**arg == ')')
 	// empty tuple
-	goto done;
+	ਜਾਓ ਪੂਰਾ;
 
-    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+    ਜੇ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
     {
 	semsg(_(e_white_space_required_after_str_str), ",", *arg);
-	goto failret;
+	ਜਾਓ failret;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ')' && **arg != NUL)
+    ਜਦੋਂ (**arg != ')' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	ਜੇ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    ਜਾਓ failret;
+	ਜੇ (check_typval_is_ਮੁੱਲ(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    ਜੇ (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    ਜਾਓ failret;
 	}
 
-	if (evaluate)
+	ਜੇ (evaluate)
 	{
-	    if (tuple_append_tv(tuple, &tv) == FAIL)
+	    ਜੇ (tuple_append_tv(tuple, &tv) == FAIL)
 	    {
 		clear_tv(&tv);
-		goto failret;
+		ਜਾਓ failret;
 	    }
 	}
 
-	if (!vim9script)
+	ਜੇ (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	ਜੇ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+	    ਜੇ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		ਜਾਓ failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -573,39 +573,39 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The ")" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ')')
-	    break;
+	ਜੇ (**arg == ')')
+	    ਰੋਕੋ;
 
-	if (!had_comma)
+	ਜੇ (!had_comma)
 	{
-	    if (do_error)
+	    ਜੇ (do_error)
 	    {
-		if (**arg == ',')
+		ਜੇ (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
-		    semsg(_(e_missing_comma_in_tuple_str), *arg);
+		ਨਹੀਂਤਾਂ
+		    semsg(_(e_missing_comma_ਵਿੱਚ_tuple_str), *arg);
 	    }
-	    goto failret;
+	    ਜਾਓ failret;
 	}
     }
 
-    if (**arg != ')')
+    ਜੇ (**arg != ')')
     {
-	if (do_error)
-	    semsg(_(e_missing_end_of_tuple_rsp_str), *arg);
+	ਜੇ (do_error)
+	    semsg(_(e_missing_ਸਿਰਾ_ਦਾ_tuple_rsp_str), *arg);
 failret:
-	if (evaluate)
+	ਜੇ (evaluate)
 	    tuple_free(tuple);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-done:
+ਪੂਰਾ:
     *arg += 1;
-    if (evaluate)
-	rettv_tuple_set(rettv, tuple);
+    ਜੇ (evaluate)
+	rettv_tuple_ਸੈੱਟ(rettv, tuple);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -613,44 +613,44 @@ done:
  * When "check_refcount" is TRUE do not lock a tuple with a reference
  * count larger than 1.
  */
-    void
-tuple_lock(tuple_T *tuple, int deep, int lock, int check_refcount)
+    ਖਾਲੀ
+tuple_ਤਾਲਾ(tuple_T *tuple, ਪੂਰਨ deep, ਪੂਰਨ ਤਾਲਾ, ਪੂਰਨ check_refcount)
 {
-    if (tuple == NULL || (check_refcount && tuple->tv_refcount > 1))
-	return;
+    ਜੇ (tuple == ਨਿਰਾ || (check_refcount && tuple->tv_refcount > 1))
+	ਵਾਪਸ;
 
-    if (lock)
-	tuple->tv_lock |= VAR_LOCKED;
-    else
-	tuple->tv_lock &= ~VAR_LOCKED;
+    ਜੇ (ਤਾਲਾ)
+	tuple->tv_ਤਾਲਾ |= VAR_LOCKED;
+    ਨਹੀਂਤਾਂ
+	tuple->tv_ਤਾਲਾ &= ~VAR_LOCKED;
 
-    if (deep < 0 || deep > 1)
+    ਜੇ (deep < 0 || deep > 1)
     {
 	// recursive: lock/unlock the items the Tuple contains
-	for (int i = 0; i < TUPLE_LEN(tuple); i++)
-	    item_lock(TUPLE_ITEM(tuple, i), deep - 1, lock, check_refcount);
+	ਲਈ (ਪੂਰਨ i = 0; i < TUPLE_LEN(tuple); i++)
+	    ਵਸਤੂ_ਤਾਲਾ(TUPLE_ਵਸਤੂ(tuple, i), deep - 1, ਤਾਲਾ, check_refcount);
     }
 }
 
-typedef struct join_S {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 tuple_join_inner(
     garray_T	*gap,		// to store the result in
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    ਪੂਰਨ		echo_style,
+    ਪੂਰਨ		restore_copyID,
+    ਪੂਰਨ		copyID,
     garray_T	*join_gap)	// to keep each tuple item string
 {
-    int		i;
+    ਪੂਰਨ		i;
     join_T	*p;
-    int		sumlen = 0;
-    int		first = TRUE;
+    ਪੂਰਨ		sumlen = 0;
+    ਪੂਰਨ		ਪਹਿਲਾ = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     string_T	s;
@@ -658,67 +658,67 @@ tuple_join_inner(
     size_t	seplen = 0;
 
     // Stringify each item in the tuple.
-    for (i = 0; i < TUPLE_LEN(tuple) && !got_int; i++)
+    ਲਈ (i = 0; i < TUPLE_LEN(tuple) && !got_int; i++)
     {
-	tv = TUPLE_ITEM(tuple, i);
+	tv = TUPLE_ਵਸਤੂ(tuple, i);
 	s.string = echo_string_core(tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
-	    return FAIL;
+	ਜੇ (s.string == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	s.length = STRLEN(s.string);
-	sumlen += (int)s.length;
+	s.ਲੰਮਾਈ = STRLEN(s.string);
+	sumlen += (ਪੂਰਨ)s.ਲੰਮਾਈ;
 
-	(void)ga_grow(join_gap, 1);
-	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	(ਖਾਲੀ)ga_grow(join_gap, 1);
+	p = ((join_T *)join_gap->ga_ਅੰਕੜੇ) + (join_gap->ga_len++);
+	ਜੇ (tofree != ਨਿਰਾ || s.string != numbuf)
 	{
 	    p->s.string = s.string;
-	    p->s.length = s.length;
+	    p->s.ਲੰਮਾਈ = s.ਲੰਮਾਈ;
 	    p->tofree = tofree;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    p->s.string = vim_strnsave(s.string, s.length);
-	    p->s.length = s.length;
+	    p->s.string = vim_strnsave(s.string, s.ਲੰਮਾਈ);
+	    p->s.ਲੰਮਾਈ = s.ਲੰਮਾਈ;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	ਸਤਰ_breakcheck();
+	ਜੇ (did_echo_string_emsg)  // recursion error, bail out
+	    ਰੋਕੋ;
     }
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ')' and NUL.
-    if (join_gap->ga_len > 0)
+    ਜੇ (join_gap->ga_len > 0)
     {
 	seplen = STRLEN(sep);
-	if (join_gap->ga_len >= 2)
-	    sumlen += (int)seplen * (join_gap->ga_len - 1);
+	ਜੇ (join_gap->ga_len >= 2)
+	    sumlen += (ਪੂਰਨ)seplen * (join_gap->ga_len - 1);
     }
-    if (ga_grow(gap, sumlen + 2) == FAIL)
-	return FAIL;
+    ਜੇ (ga_grow(gap, sumlen + 2) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    ਲਈ (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
-	    first = FALSE;
-	else
+	ਜੇ (ਪਹਿਲਾ)
+	    ਪਹਿਲਾ = FALSE;
+	ਨਹੀਂਤਾਂ
 	    ga_concat_len(gap, sep, seplen);
-	p = ((join_T *)join_gap->ga_data) + i;
+	p = ((join_T *)join_gap->ga_ਅੰਕੜੇ) + i;
 
-	if (p->s.string != NULL)
-	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	ਜੇ (p->s.string != ਨਿਰਾ)
+	    ga_concat_len(gap, p->s.string, p->s.ਲੰਮਾਈ);
+	ਸਤਰ_breakcheck();
     }
 
     // If there is only one item in the tuple, then add the separator after
     // that.
-    if (join_gap->ga_len == 1)
+    ਜੇ (join_gap->ga_len == 1)
 	ga_concat_len(gap, sep, seplen);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -726,39 +726,39 @@ tuple_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a Tuple.
  * Return FAIL or OK.
  */
-    int
+    ਪੂਰਨ
 tuple_join(
     garray_T	*gap,
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    ਪੂਰਨ		echo_style,
+    ਪੂਰਨ		restore_copyID,
+    ਪੂਰਨ		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    ਪੂਰਨ		retval;
     join_T	*p;
-    int		i;
+    ਪੂਰਨ		i;
 
-    if (TUPLE_LEN(tuple) < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), TUPLE_LEN(tuple));
+    ਜੇ (TUPLE_LEN(tuple) < 1)
+	ਵਾਪਸ OK; // nothing to do
+    ga_init2(&join_ga, ਆਕਾਰ(join_T), TUPLE_LEN(tuple));
     retval = tuple_join_inner(gap, tuple, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    ਜੇ (join_ga.ga_ਅੰਕੜੇ == ਨਿਰਾ)
+	ਵਾਪਸ retval;
 
     // Dispose each item in join_ga.
-    p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    p = (join_T *)join_ga.ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -766,55 +766,55 @@ tuple_join(
  * May return NULL.
  */
     char_u *
-tuple2string(typval_T *tv, int copyID, int restore_copyID)
+tuple2string(typval_T *tv, ਪੂਰਨ copyID, ਪੂਰਨ restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_tuple == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ਜੇ (tv->vval.v_tuple == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ga_init2(&ga, ਆਕਾਰ(ਅੱਖਰ), 80);
     ga_append(&ga, '(');
-    if (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
+    ਜੇ (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_ਅੰਕੜੇ);
+	ਵਾਪਸ ਨਿਰਾ;
     }
     ga_append(&ga, ')');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ਵਾਪਸ (char_u *)ga.ga_ਅੰਕੜੇ;
 }
 
 /*
  * Implementation of foreach() for a Tuple.  Apply "expr" to
  * every item in Tuple "tuple" and return the result in "rettv".
  */
-    void
+    ਖਾਲੀ
 tuple_foreach(
     tuple_T	*tuple,
     filtermap_T	filtermap,
-    typval_T	*expr)
+    typval_T	*ਵਿਅੰਜਕ)
 {
-    int		len = tuple_len(tuple);
-    int		rem;
+    ਪੂਰਨ		len = tuple_len(tuple);
+    ਪੂਰਨ		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    ਸੈੱਟ_vim_var_type(VV_ਕੁੰਜੀ, VAR_ਸੰਖਿਆ);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ਵਿਅੰਜਕ_get_funccal(ਵਿਅੰਜਕ, &newtv);
 
-    for (int idx = 0; idx < len; idx++)
+    ਲਈ (ਪੂਰਨ idx = 0; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(TUPLE_ITEM(tuple, idx), expr, filtermap, fc,
+	ਸੈੱਟ_vim_var_nr(VV_ਕੁੰਜੀ, idx);
+	ਜੇ (filter_map_one(TUPLE_ਵਸਤੂ(tuple, idx), ਵਿਅੰਜਕ, filtermap, fc,
 						     &newtv, &rem) == FAIL)
-	    break;
+	    ਰੋਕੋ;
     }
 
-    if (fc != NULL)
+    ਜੇ (fc != ਨਿਰਾ)
 	remove_funccal();
 }
 
@@ -822,64 +822,64 @@ tuple_foreach(
  * Count the number of times item "needle" occurs in Tuple "l" starting at index
  * "idx". Case is ignored if "ic" is TRUE.
  */
-    long
-tuple_count(tuple_T *tuple, typval_T *needle, long idx, int ic)
+    ਲੰਮਾ
+tuple_ਗਿਣਤੀ(tuple_T *tuple, typval_T *needle, ਲੰਮਾ idx, ਪੂਰਨ ic)
 {
-    long	n = 0;
+    ਲੰਮਾ	n = 0;
 
-    if (tuple == NULL)
-	return 0;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
-    int	len = TUPLE_LEN(tuple);
-    if (len == 0)
-	return 0;
+    ਪੂਰਨ	len = TUPLE_LEN(tuple);
+    ਜੇ (len == 0)
+	ਵਾਪਸ 0;
 
-    if (idx < 0 || idx >= len)
+    ਜੇ (idx < 0 || idx >= len)
     {
-	semsg(_(e_tuple_index_out_of_range_nr), idx);
-	return 0;
+	semsg(_(e_tuple_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), idx);
+	ਵਾਪਸ 0;
     }
 
-    for (int i = idx; i < len; i++)
+    ਲਈ (ਪੂਰਨ i = idx; i < len; i++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, i), needle, ic))
+	ਜੇ (tv_equal(TUPLE_ਵਸਤੂ(tuple, i), needle, ic))
 	    ++n;
     }
 
-    return n;
+    ਵਾਪਸ n;
 }
 
 /*
  * "items(tuple)" function
  * Caller must have already checked that argvars[0] is a tuple.
  */
-    void
+    ਖਾਲੀ
 tuple2items(typval_T *argvars, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (tuple == NULL)
-	return;  // null tuple behaves like an empty list
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ;  // null tuple behaves like an empty list
 
-    for (idx = 0; idx < TUPLE_LEN(tuple); idx++)
+    ਲਈ (idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
 	list_T	*l = list_alloc();
 
-	if (l == NULL)
-	    break;
+	ਜੇ (l == ਨਿਰਾ)
+	    ਰੋਕੋ;
 
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	ਜੇ (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    break;
+	    ਰੋਕੋ;
 	}
-	if (list_append_number(l, idx) == FAIL
-		|| list_append_tv(l, TUPLE_ITEM(tuple, idx)) == FAIL)
-	    break;
+	ਜੇ (list_append_ਸੰਖਿਆ(l, idx) == FAIL
+		|| list_append_tv(l, TUPLE_ਵਸਤੂ(tuple, idx)) == FAIL)
+	    ਰੋਕੋ;
     }
 }
 
@@ -889,23 +889,23 @@ tuple2items(typval_T *argvars, typval_T *rettv)
  *
  * Returns the index where "tv" is present or -1 if it is not found.
  */
-    int
-index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
+    ਪੂਰਨ
+ਸੂਚਕਾਂਕ_tuple(tuple_T *tuple, typval_T *tv, ਪੂਰਨ ਸ਼ੁਰੂ_idx, ਪੂਰਨ ic)
 {
-    if (start_idx < 0)
+    ਜੇ (ਸ਼ੁਰੂ_idx < 0)
     {
-	start_idx = TUPLE_LEN(tuple) + start_idx;
-	if (start_idx < 0)
-	    start_idx = 0;
+	ਸ਼ੁਰੂ_idx = TUPLE_LEN(tuple) + ਸ਼ੁਰੂ_idx;
+	ਜੇ (ਸ਼ੁਰੂ_idx < 0)
+	    ਸ਼ੁਰੂ_idx = 0;
     }
 
-    for (int idx = start_idx; idx < TUPLE_LEN(tuple); idx++)
+    ਲਈ (ਪੂਰਨ idx = ਸ਼ੁਰੂ_idx; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, idx), tv, ic))
-	    return idx;
+	ਜੇ (tv_equal(TUPLE_ਵਸਤੂ(tuple, idx), tv, ic))
+	    ਵਾਪਸ idx;
     }
 
-    return -1;		// "tv" not found
+    ਵਾਪਸ -1;		// "tv" not found
 }
 
 /*
@@ -913,46 +913,46 @@ index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    int
-indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
+    ਪੂਰਨ
+indexof_tuple(tuple_T *tuple, ਲੰਮਾ startidx, typval_T *ਵਿਅੰਜਕ)
 {
-    long	idx = 0;
-    int		len;
-    int		found;
+    ਲੰਮਾ	idx = 0;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		ਮਿਲਿਆ;
 
-    if (tuple == NULL)
-	return -1;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
     len = TUPLE_LEN(tuple);
 
-    if (startidx < 0)
+    ਜੇ (startidx < 0)
     {
 	// negative index: index from the end
 	startidx = len + startidx;
-	if (startidx < 0)
+	ਜੇ (startidx < 0)
 	    startidx = 0;
     }
 
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    ਸੈੱਟ_vim_var_type(VV_ਕੁੰਜੀ, VAR_ਸੰਖਿਆ);
 
-    int		called_emsg_start = called_emsg;
+    ਪੂਰਨ		called_emsg_ਸ਼ੁਰੂ = called_emsg;
 
-    for (idx = startidx; idx < len; idx++)
+    ਲਈ (idx = startidx; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
-	copy_tv(TUPLE_ITEM(tuple, idx), get_vim_var_tv(VV_VAL));
+	ਸੈੱਟ_vim_var_nr(VV_ਕੁੰਜੀ, idx);
+	copy_tv(TUPLE_ਵਸਤੂ(tuple, idx), get_vim_var_tv(VV_VAL));
 
-	found = indexof_eval_expr(expr);
+	ਮਿਲਿਆ = indexof_eval_ਵਿਅੰਜਕ(ਵਿਅੰਜਕ);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	ਜੇ (ਮਿਲਿਆ)
+	    ਵਾਪਸ idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	ਜੇ (called_emsg != called_emsg_ਸ਼ੁਰੂ)
+	    ਵਾਪਸ -1;
     }
 
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 /*
@@ -960,57 +960,57 @@ indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
  * If an error occurs NULL is returned instead.
  */
     typval_T *
-tuple_max_min(tuple_T *tuple, int domax)
+tuple_max_min(tuple_T *tuple, ਪੂਰਨ domax)
 {
-    typval_T	*tv = NULL;
-    int		res;
+    typval_T	*tv = ਨਿਰਾ;
+    ਪੂਰਨ		res;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0)
-	return NULL;
+    ਜੇ (tuple == ਨਿਰਾ || TUPLE_LEN(tuple) == 0)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+    ਲਈ (ਪੂਰਨ idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv == NULL)
-	    tv = TUPLE_ITEM(tuple, idx);
-	else
+	ਜੇ (tv == ਨਿਰਾ)
+	    tv = TUPLE_ਵਸਤੂ(tuple, idx);
+	ਨਹੀਂਤਾਂ
 	{
-	    if (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
-		    domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-		return NULL;
-	    if (res == OK)
-		tv = TUPLE_ITEM(tuple, idx);
+	    ਜੇ (typval_compare2(TUPLE_ਵਸਤੂ(tuple, idx), tv,
+		    domax ? ਵਿਅੰਜਕ_GREATER : ਵਿਅੰਜਕ_SMALLER, FALSE, &res) == FAIL)
+		ਵਾਪਸ ਨਿਰਾ;
+	    ਜੇ (res == OK)
+		tv = TUPLE_ਵਸਤੂ(tuple, idx);
 	}
     }
 
-    return tv;
+    ਵਾਪਸ tv;
 }
 
 /*
  * Repeat the tuple "tuple" "n" times and set "rettv" to the new tuple.
  */
-    void
+    ਖਾਲੀ
 tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
 {
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = ਨਿਰਾ;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0 || n <= 0)
-	return;
+    ਜੇ (tuple == ਨਿਰਾ || TUPLE_LEN(tuple) == 0 || n <= 0)
+	ਵਾਪਸ;
 
-    if (check_repeat_count(TUPLE_LEN(tuple), n) == FAIL)
-	return;
+    ਜੇ (check_repeat_ਗਿਣਤੀ(TUPLE_LEN(tuple), n) == FAIL)
+	ਵਾਪਸ;
 
-    if (rettv_tuple_set_with_items(rettv, TUPLE_LEN(tuple) * (int)n) == FAIL)
-	return;
+    ਜੇ (rettv_tuple_ਸੈੱਟ_with_ਚੀਜ਼ਾਂ(rettv, TUPLE_LEN(tuple) * (ਪੂਰਨ)n) == FAIL)
+	ਵਾਪਸ;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int count = 0; count < (int)n; count++)
+    ਲਈ (ਪੂਰਨ ਗਿਣਤੀ_2 = 0; ਗਿਣਤੀ_2 < (ਪੂਰਨ)n; ਗਿਣਤੀ_2++)
     {
-	for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+	ਲਈ (ਪੂਰਨ idx = 0; idx < TUPLE_LEN(tuple); idx++)
 	{
-	    copy_tv(TUPLE_ITEM(tuple, idx),
-		    TUPLE_ITEM(new_tuple, TUPLE_LEN(new_tuple)));
-	    new_tuple->tv_items.ga_len++;
+	    copy_tv(TUPLE_ਵਸਤੂ(tuple, idx),
+		    TUPLE_ਵਸਤੂ(new_tuple, TUPLE_LEN(new_tuple)));
+	    new_tuple->tv_ਚੀਜ਼ਾਂ.ga_len++;
 	}
     }
 }
@@ -1018,51 +1018,51 @@ tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
 /*
  * Reverse "tuple" and return the new tuple in "rettv"
  */
-    void
-tuple_reverse(tuple_T *tuple, typval_T *rettv)
+    ਖਾਲੀ
+tuple_ਉਲਟ(tuple_T *tuple, typval_T *rettv)
 {
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = ਨਿਰਾ;
 
-    int	len = tuple_len(tuple);
+    ਪੂਰਨ	len = tuple_len(tuple);
 
-    if (len == 0)
-	return;
+    ਜੇ (len == 0)
+	ਵਾਪਸ;
 
-    if (rettv_tuple_set_with_items(rettv, len) == FAIL)
-	return;
+    ਜੇ (rettv_tuple_ਸੈੱਟ_with_ਚੀਜ਼ਾਂ(rettv, len) == FAIL)
+	ਵਾਪਸ;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int i = 0; i < len; i++)
-	copy_tv(TUPLE_ITEM(tuple, i), TUPLE_ITEM(new_tuple, len - i - 1));
-    new_tuple->tv_items.ga_len = tuple->tv_items.ga_len;
+    ਲਈ (ਪੂਰਨ i = 0; i < len; i++)
+	copy_tv(TUPLE_ਵਸਤੂ(tuple, i), TUPLE_ਵਸਤੂ(new_tuple, len - i - 1));
+    new_tuple->tv_ਚੀਜ਼ਾਂ.ga_len = tuple->tv_ਚੀਜ਼ਾਂ.ga_len;
 }
 
 /*
  * Tuple reduce() function
  */
-    void
-tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
+    ਖਾਲੀ
+tuple_reduce(typval_T *argvars, typval_T *ਵਿਅੰਜਕ, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		called_emsg_start = called_emsg;
+    ਪੂਰਨ		called_emsg_ਸ਼ੁਰੂ = called_emsg;
     typval_T	initial;
-    int		idx = 0;
+    ਪੂਰਨ		idx = 0;
     funccall_T	*fc;
     typval_T	argv[3];
-    int		r;
+    ਪੂਰਨ		r;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (tuple == NULL || TUPLE_LEN(tuple) == 0)
+	ਜੇ (tuple == ਨਿਰਾ || TUPLE_LEN(tuple) == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Tuple");
-	    return;
+	    semsg(_(e_reduce_ਦਾ_an_ਖਾਲੀ_ਥਾਵਾਂ_str_with_no_initial_ਮੁੱਲ), "Tuple");
+	    ਵਾਪਸ;
 	}
-	initial = *TUPLE_ITEM(tuple, 0);
+	initial = *TUPLE_ਵਸਤੂ(tuple, 0);
 	idx = 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	initial = argvars[2];
 	idx = 0;
@@ -1070,27 +1070,27 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 
     copy_tv(&initial, rettv);
 
-    if (tuple == NULL)
-	return;
+    ਜੇ (tuple == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_ਵਿਅੰਜਕ_get_funccal(ਵਿਅੰਜਕ, rettv);
 
-    for ( ; idx < TUPLE_LEN(tuple); idx++)
+    ਲਈ ( ; idx < TUPLE_LEN(tuple); idx++)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
-	argv[1] = *TUPLE_ITEM(tuple, idx);
+	argv[1] = *TUPLE_ਵਸਤੂ(tuple, idx);
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_ਵਿਅੰਜਕ_typval(ਵਿਅੰਜਕ, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ਜੇ (r == FAIL || called_emsg != called_emsg_ਸ਼ੁਰੂ)
+	    ਰੋਕੋ;
     }
 
-    if (fc != NULL)
+    ਜੇ (fc != ਨਿਰਾ)
 	remove_funccal();
 }
 
@@ -1098,38 +1098,38 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
  * Returns TRUE if two tuples with types "type1" and "type2" are addable.
  * Otherwise returns FALSE.
  */
-    int
+    ਪੂਰਨ
 check_tuples_addable(type_T *type1, type_T *type2)
 {
-    int	addable = TRUE;
+    ਪੂਰਨ	addable = TRUE;
 
     // If the first operand is a variadic tuple and the second argument is
     // non-variadic, then concatenation is not possible.
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    ਜੇ ((type1->tt_flags & TTFLAG_VARARGS)
 	    && !(type2->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_argcount > 0))
 	addable = FALSE;
 
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    ਜੇ ((type1->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_flags & TTFLAG_VARARGS))
     {
 	// two variadic tuples
-	if (type1->tt_argcount > 1 || type2->tt_argcount > 1)
+	ਜੇ (type1->tt_argcount > 1 || type2->tt_argcount > 1)
 	    // one of the variadic tuple has fixed number of items
 	    addable = FALSE;
-	else if ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
-		&& !equal_type(type1->tt_args[0], type2->tt_args[0], 0))
+	ਨਹੀਂਤਾਂ ਜੇ ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
+		&& !equal_type(type1->tt_ਦਲੀਲਾਂ[0], type2->tt_ਦਲੀਲਾਂ[0], 0))
 	    // the tuples have different item types
 	    addable = FALSE;
     }
 
-    if (!addable)
+    ਜੇ (!addable)
     {
-	emsg(_(e_cannot_use_variadic_tuple_in_concatenation));
-	return FAIL;
+	emsg(_(e_cannot_use_variadic_tuple_ਵਿੱਚ_concatenation));
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-#endif // defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ // defined(FEAT_EVAL)

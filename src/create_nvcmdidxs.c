@@ -14,25 +14,25 @@
  * decimal form, one per line.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 // Declare nv_cmds[].
-#include "nv_cmds.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "nv_cmds.h"
 
-#include <stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdio.h>
 
-int main(void)
+ਪੂਰਨ ਮੁੱਖ(ਖਾਲੀ)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    ਲਈ (i = 0; i < NV_CMDS_ਮਾਪ; i++)
     {
-	int cmdchar = nv_cmds[i];
+	ਪੂਰਨ cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	ਜੇ (cmdchar < 0)
 	    cmdchar = -cmdchar;
-	printf("%d\n", cmdchar);
+	ਲਿਖੋ("%d\n", cmdchar);
     }
-    return 0;
+    ਵਾਪਸ 0;
 }

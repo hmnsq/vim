@@ -27,16 +27,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef _WIN32
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <ctype.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <io.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <wchar.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <windows.h>
 
-#ifdef USE_FILEEXTD
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# ਜੇ !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,146 +45,146 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#ਨਹੀਂਤਾਂ // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# ਜੇ defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  ਨਹੀਂਤਾਂ
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
-#endif // USE_FILEEXTD
+#ਜੇ_ਅੰਤ // USE_FILEEXTD
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __MINGW32__
+# define ਅਣਵਰਤਿਆ __attribute__((ਅਣਵਰਤਿਆ_2))
+#ਨਹੀਂਤਾਂ
+# define ਅਣਵਰਤਿਆ
+#ਜੇ_ਅੰਤ
 
-#include "iscygpty.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "iscygpty.h"
 
 //#define USE_DYNFILEID
-#ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_DYNFILEID
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
-		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+		DWORD						dw_ਬਫਰ_ਮਾਪ);
+ਸਥਿਰ pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = ਨਿਰਾ;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
-		HANDLE						hFile UNUSED,
-		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
-		LPVOID						lpFileInformation UNUSED,
-		DWORD						dwBufferSize UNUSED)
+ਸਥਿਰ BOOL WINAPI stub_GetFileInformationByHandleEx(
+		HANDLE						hFile ਅਣਵਰਤਿਆ,
+		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass ਅਣਵਰਤਿਆ,
+		LPVOID						lpFileInformation ਅਣਵਰਤਿਆ,
+		DWORD						dw_ਬਫਰ_ਮਾਪ ਅਣਵਰਤਿਆ)
 {
-	return FALSE;
+	ਵਾਪਸ FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+ਸਥਿਰ ਖਾਲੀ ਤਿਆਰੀ_fileid_api(ਖਾਲੀ)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	ਜੇ (pGetFileInformationByHandleEx != ਨਿਰਾ) {
+		ਵਾਪਸ;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
-		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		Get_Proc_ਪਤਾ(GetModuleHandle(ਪਾਠ_3("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	ਜੇ (pGetFileInformationByHandleEx == ਨਿਰਾ) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# ਨਹੀਂਤਾਂ
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#ਨਹੀਂਤਾਂ
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
-# define setup_fileid_api()
-#endif
+# define ਤਿਆਰੀ_fileid_api()
+#ਜੇ_ਅੰਤ
 
 
-#define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ is_wprefix(s, ਅਗੇਤਰ) \
+	(wcsncmp((s), (ਅਗੇਤਰ), ਆਕਾਰ(ਅਗੇਤਰ) / ਆਕਾਰ(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+ਪੂਰਨ is_cygpty(ਪੂਰਨ fd)
 {
-#ifdef STUB_IMPL
-	return 0;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ STUB_IMPL
+	ਵਾਪਸ 0;
+#ਨਹੀਂਤਾਂ
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ਅਚਲ ਪੂਰਨ ਮਾਪ = ਆਕਾਰ(FILE_NAME_INFO) + ਆਕਾਰ(WCHAR) * (MAX_ਰਸਤਾ - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = ਨਿਰਾ;
 
-	setup_fileid_api();
+	ਤਿਆਰੀ_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	ਜੇ (h == INVALID_HANDLE_ਮੁੱਲ) {
+		ਵਾਪਸ 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	ਜੇ (GetFileType(h) != FILE_TYPE_PIPE) {
+		ਵਾਪਸ 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = ਸਮ੍ਰਿਤੀ_ਦਿਓ(ਮਾਪ + ਆਕਾਰ(WCHAR));
+	ਜੇ (nameinfo == ਨਿਰਾ) {
+		ਵਾਪਸ 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	ਜੇ (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, ਮਾਪ)) {
+		nameinfo->FileName[nameinfo->File_Name_ਲੰਮਾਈ / ਆਕਾਰ(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		ਜੇ (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} ਨਹੀਂਤਾਂ ਜੇ (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} ਨਹੀਂਤਾਂ {
+			p = ਨਿਰਾ;
 		}
-		if (p != NULL) {
+		ਜੇ (p != ਨਿਰਾ) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			ਜਦੋਂ (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			ਜੇ (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} ਨਹੀਂਤਾਂ {
+				p = ਨਿਰਾ;
 			}
 		}
-		if (p != NULL) {
+		ਜੇ (p != ਨਿਰਾ) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			ਜਦੋਂ (*p && iswascii(*p) && ਅੰਕ_ਹੈ(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			ਜੇ (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} ਨਹੀਂਤਾਂ ਜੇ (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} ਨਹੀਂਤਾਂ {
+				p = ਨਿਰਾ;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
-#endif // STUB_IMPL
+	ਮੁਕਤ(nameinfo);
+	ਵਾਪਸ (p != ਨਿਰਾ);
+#ਜੇ_ਅੰਤ // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+ਪੂਰਨ is_cygpty_ਵਰਤਿਆ(ਖਾਲੀ)
 {
-	int fd, ret = 0;
+	ਪੂਰਨ fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	ਲਈ (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	ਵਾਪਸ ret;
 }
 
-#endif // _WIN32
+#ਜੇ_ਅੰਤ // _WIN32
 
 // vim: set ts=4 sw=4:

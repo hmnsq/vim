@@ -11,49 +11,49 @@
  * blob.c: Blob support by Yasuhiro Matsumoto
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 /*
  * Allocate an empty blob.
  * Caller should take care of the reference count.
  */
     blob_T *
-blob_alloc(void)
+blob_alloc(ਖਾਲੀ)
 {
     blob_T *blob = ALLOC_CLEAR_ONE_ID(blob_T, aid_blob_alloc);
 
-    if (blob != NULL)
+    ਜੇ (blob != ਨਿਰਾ)
 	ga_init2(&blob->bv_ga, 1, 100);
-    return blob;
+    ਵਾਪਸ blob;
 }
 
 /*
  * Allocate an empty blob for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 rettv_blob_alloc(typval_T *rettv)
 {
     blob_T	*b = blob_alloc();
 
-    if (b == NULL)
-	return FAIL;
+    ਜੇ (b == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    rettv_blob_set(rettv, b);
-    return OK;
+    rettv_blob_ਸੈੱਟ(rettv, b);
+    ਵਾਪਸ OK;
 }
 
 /*
  * Set a blob as the return value.
  */
-    void
-rettv_blob_set(typval_T *rettv, blob_T *b)
+    ਖਾਲੀ
+rettv_blob_ਸੈੱਟ(typval_T *rettv, blob_T *b)
 {
     rettv->v_type = VAR_BLOB;
     rettv->vval.v_blob = b;
-    if (b != NULL)
+    ਜੇ (b != ਨਿਰਾ)
 	++b->bv_refcount;
 }
 
@@ -65,32 +65,32 @@ rettv_blob_set(typval_T *rettv, blob_T *b)
     blob_T *
 blob_copy(blob_T *orig)
 {
-    int		len;
+    ਪੂਰਨ		len;
     blob_T	*copy;
 
-    if (orig == NULL)
-	return NULL;
+    ਜੇ (orig == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     copy = blob_alloc();
-    if (copy == NULL)
-	return NULL;
+    ਜੇ (copy == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
     ++copy->bv_refcount;
 
     len = orig->bv_ga.ga_len;
-    if (len > 0)
+    ਜੇ (len > 0)
     {
-	copy->bv_ga.ga_data =
-	    vim_memsave(orig->bv_ga.ga_data, len);
-	if (copy->bv_ga.ga_data == NULL)
+	copy->bv_ga.ga_ਅੰਕੜੇ =
+	    vim_memsave(orig->bv_ga.ga_ਅੰਕੜੇ, len);
+	ਜੇ (copy->bv_ga.ga_ਅੰਕੜੇ == ਨਿਰਾ)
 	    len = 0;
     }
     copy->bv_ga.ga_len = len;
     copy->bv_ga.ga_maxlen = len;
 
-    return copy;
+    ਵਾਪਸ copy;
 }
 
-    void
+    ਖਾਲੀ
 blob_free(blob_T *b)
 {
     ga_clear(&b->bv_ga);
@@ -101,60 +101,60 @@ blob_free(blob_T *b)
  * Unreference a blob: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ਖਾਲੀ
 blob_unref(blob_T *b)
 {
-    if (b != NULL && --b->bv_refcount <= 0)
+    ਜੇ (b != ਨਿਰਾ && --b->bv_refcount <= 0)
 	blob_free(b);
 }
 
 /*
  * Get the length of data.
  */
-    long
+    ਲੰਮਾ
 blob_len(blob_T *b)
 {
-    if (b == NULL)
-	return 0L;
-    return b->bv_ga.ga_len;
+    ਜੇ (b == ਨਿਰਾ)
+	ਵਾਪਸ 0L;
+    ਵਾਪਸ b->bv_ga.ga_len;
 }
 
 /*
  * Get byte "idx" in blob "b".
  * Caller must check that "idx" is valid.
  */
-    int
-blob_get(blob_T *b, int idx)
+    ਪੂਰਨ
+blob_get(blob_T *b, ਪੂਰਨ idx)
 {
-    return ((char_u*)b->bv_ga.ga_data)[idx];
+    ਵਾਪਸ ((char_u*)b->bv_ga.ga_ਅੰਕੜੇ)[idx];
 }
 
 /*
  * Store one byte "byte" in blob "blob" at "idx".
  * Caller must make sure that "idx" is valid.
  */
-    void
-blob_set(blob_T *blob, int idx, int byte)
+    ਖਾਲੀ
+blob_ਸੈੱਟ(blob_T *blob, ਪੂਰਨ idx, ਪੂਰਨ byte)
 {
-    ((char_u*)blob->bv_ga.ga_data)[idx] = byte;
+    ((char_u*)blob->bv_ga.ga_ਅੰਕੜੇ)[idx] = byte;
 }
 
 /*
  * Store one byte "byte" in blob "blob" at "idx".
  * Append one byte if needed.
  */
-    void
-blob_set_append(blob_T *blob, int idx, int byte)
+    ਖਾਲੀ
+blob_ਸੈੱਟ_append(blob_T *blob, ਪੂਰਨ idx, ਪੂਰਨ byte)
 {
     garray_T *gap = &blob->bv_ga;
 
     // Allow for appending a byte.  Setting a byte beyond
     // the end is an error otherwise.
-    if (idx < gap->ga_len
+    ਜੇ (idx < gap->ga_len
 	    || (idx == gap->ga_len && ga_grow(gap, 1) == OK))
     {
-	blob_set(blob, idx, byte);
-	if (idx == gap->ga_len)
+	blob_ਸੈੱਟ(blob, idx, byte);
+	ਜੇ (idx == gap->ga_len)
 	    ++gap->ga_len;
     }
 }
@@ -162,26 +162,26 @@ blob_set_append(blob_T *blob, int idx, int byte)
 /*
  * Return TRUE when two blobs have exactly the same values.
  */
-    int
+    ਪੂਰਨ
 blob_equal(
     blob_T	*b1,
     blob_T	*b2)
 {
-    int	    i;
-    long    len1 = blob_len(b1);
-    long    len2 = blob_len(b2);
+    ਪੂਰਨ	    i;
+    ਲੰਮਾ    len1 = blob_len(b1);
+    ਲੰਮਾ    len2 = blob_len(b2);
 
     // empty and NULL are considered the same
-    if (len1 == 0 && len2 == 0)
-	return TRUE;
-    if (b1 == b2)
-	return TRUE;
-    if (len1 != len2)
-	return FALSE;
+    ਜੇ (len1 == 0 && len2 == 0)
+	ਵਾਪਸ TRUE;
+    ਜੇ (b1 == b2)
+	ਵਾਪਸ TRUE;
+    ਜੇ (len1 != len2)
+	ਵਾਪਸ FALSE;
 
-    for (i = 0; i < b1->bv_ga.ga_len; i++)
-	if (blob_get(b1, i) != blob_get(b2, i)) return FALSE;
-    return TRUE;
+    ਲਈ (i = 0; i < b1->bv_ga.ga_len; i++)
+	ਜੇ (blob_get(b1, i) != blob_get(b2, i)) ਵਾਪਸ FALSE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -189,116 +189,116 @@ blob_equal(
  * Caller has allocated a blob in "rettv".
  * Return OK or FAIL.
  */
-    int
-read_blob(FILE *fd, typval_T *rettv, off_T offset, off_T size_arg)
+    ਪੂਰਨ
+read_blob(FILE *fd, typval_T *rettv, off_T ਵਿੱਥ, off_T ਮਾਪ_arg)
 {
     blob_T	*blob = rettv->vval.v_blob;
-    struct stat	st;
-    int		whence;
-    off_T	size = size_arg;
+    ਬਣਤਰ stat	st;
+    ਪੂਰਨ		whence;
+    off_T	ਮਾਪ = ਮਾਪ_arg;
 
-    if (fstat(fileno(fd), &st) < 0)
-	return FAIL;  // can't read the file, error
+    ਜੇ (fstat(fileno(fd), &st) < 0)
+	ਵਾਪਸ FAIL;  // can't read the file, error
 
-    if (offset >= 0)
+    ਜੇ (ਵਿੱਥ >= 0)
     {
 	// The size defaults to the whole file.  If a size is given it is
 	// limited to not go past the end of the file.
-	if (size == -1 || (size > st.st_size - offset
-#ifdef S_ISCHR
-		    && !S_ISCHR(st.st_mode)
-#endif
+	ਜੇ (ਮਾਪ == -1 || (ਮਾਪ > st.st_size - ਵਿੱਥ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ S_ISCHR
+		    && !S_ISCHR(st.st_ਬਹੁਲਕ)
+#ਜੇ_ਅੰਤ
 		    ))
 	    // size may become negative, checked below
-	    size = st.st_size - offset;
+	    ਮਾਪ = st.st_size - ਵਿੱਥ;
 	whence = SEEK_SET;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// limit the offset to not go before the start of the file
-	if (-offset > st.st_size
-#ifdef S_ISCHR
-		    && !S_ISCHR(st.st_mode)
-#endif
+	ਜੇ (-ਵਿੱਥ > st.st_size
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ S_ISCHR
+		    && !S_ISCHR(st.st_ਬਹੁਲਕ)
+#ਜੇ_ਅੰਤ
 		    )
-	    offset = -st.st_size;
+	    ਵਿੱਥ = -st.st_size;
 	// Size defaults to reading until the end of the file.
-	if (size == -1 || size > -offset)
-	    size = -offset;
+	ਜੇ (ਮਾਪ == -1 || ਮਾਪ > -ਵਿੱਥ)
+	    ਮਾਪ = -ਵਿੱਥ;
 	whence = SEEK_END;
     }
-    if (size <= 0)
-	return OK;
-    if (offset != 0 && vim_fseek(fd, offset, whence) != 0)
-	return OK;
+    ਜੇ (ਮਾਪ <= 0)
+	ਵਾਪਸ OK;
+    ਜੇ (ਵਿੱਥ != 0 && vim_fseek(fd, ਵਿੱਥ, whence) != 0)
+	ਵਾਪਸ OK;
 
-    if (ga_grow(&blob->bv_ga, (int)size) == FAIL)
-	return FAIL;
-    blob->bv_ga.ga_len = (int)size;
-    if (fread(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
+    ਜੇ (ga_grow(&blob->bv_ga, (ਪੂਰਨ)ਮਾਪ) == FAIL)
+	ਵਾਪਸ FAIL;
+    blob->bv_ga.ga_len = (ਪੂਰਨ)ਮਾਪ;
+    ਜੇ (fread(blob->bv_ga.ga_ਅੰਕੜੇ, 1, blob->bv_ga.ga_len, fd)
 						  < (size_t)blob->bv_ga.ga_len)
     {
 	// An empty blob is returned on error.
 	blob_free(rettv->vval.v_blob);
-	rettv->vval.v_blob = NULL;
-	return FAIL;
+	rettv->vval.v_blob = ਨਿਰਾ;
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Write "blob" to file "fd".
  * Return OK or FAIL.
  */
-    int
+    ਪੂਰਨ
 write_blob(FILE *fd, blob_T *blob)
 {
-    if (fwrite(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
+    ਜੇ (fwrite(blob->bv_ga.ga_ਅੰਕੜੇ, 1, blob->bv_ga.ga_len, fd)
 						  < (size_t)blob->bv_ga.ga_len)
     {
 	emsg(_(e_error_while_writing));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Convert a blob to a readable form: "0z00112233.44556677.8899"
  */
     char_u *
-blob2string(blob_T *blob, char_u **tofree, char_u *numbuf UNUSED)
+blob2string(blob_T *blob, char_u **tofree, char_u *numbuf ਅਣਵਰਤਿਆ)
 {
-    static const char hex_chars[] = "0123456789ABCDEF";
-    int		blen;
-    size_t	total;
+    ਸਥਿਰ ਅਚਲ ਅੱਖਰ hex_chars[] = "0123456789ABCDEF";
+    ਪੂਰਨ		blen;
+    size_t	ਕੁੱਲ;
     char_u	*buf;
     char_u	*p;
     char_u	*src;
 
-    if (blob == NULL || (blen = blob_len(blob)) == 0)
+    ਜੇ (blob == ਨਿਰਾ || (blen = blob_len(blob)) == 0)
     {
-	*tofree = NULL;
-	return (char_u *)"0z";
+	*tofree = ਨਿਰਾ;
+	ਵਾਪਸ (char_u *)"0z";
     }
 
     // 2 ("0z") + 2 hex per byte + one '.' every 4 bytes + NUL terminator.
-    total = 2 + (size_t)blen * 2 + (size_t)((blen - 1) / 4) + 1;
-    buf = alloc(total);
-    if (buf == NULL)
+    ਕੁੱਲ = 2 + (size_t)blen * 2 + (size_t)((blen - 1) / 4) + 1;
+    buf = alloc(ਕੁੱਲ);
+    ਜੇ (buf == ਨਿਰਾ)
     {
-	*tofree = NULL;
-	return (char_u *)"0z";
+	*tofree = ਨਿਰਾ;
+	ਵਾਪਸ (char_u *)"0z";
     }
 
     p = buf;
     *p++ = '0';
     *p++ = 'z';
-    src = (char_u *)blob->bv_ga.ga_data;
-    for (int i = 0; i < blen; i++)
+    src = (char_u *)blob->bv_ga.ga_ਅੰਕੜੇ;
+    ਲਈ (ਪੂਰਨ i = 0; i < blen; i++)
     {
-	unsigned b;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ b;
 
-	if (i > 0 && (i & 3) == 0)
+	ਜੇ (i > 0 && (i & 3) == 0)
 	    *p++ = '.';
 	b = src[i];
 	*p++ = hex_chars[b >> 4];
@@ -306,7 +306,7 @@ blob2string(blob_T *blob, char_u **tofree, char_u *numbuf UNUSED)
     }
     *p = NUL;
     *tofree = buf;
-    return buf;
+    ਵਾਪਸ buf;
 }
 
 /*
@@ -315,29 +315,29 @@ blob2string(blob_T *blob, char_u **tofree, char_u *numbuf UNUSED)
  * Caller must have already checked that argvars[0] is a Blob.
  * A null blob behaves like an empty blob.
  */
-    void
+    ਖਾਲੀ
 blob2items(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob = argvars[0].vval.v_blob;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    for (int i = 0; i < blob_len(blob); i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < blob_len(blob); i++)
     {
 	list_T	*l2 = list_alloc();
-	if (l2 == NULL)
-	    return;
+	ਜੇ (l2 == ਨਿਰਾ)
+	    ਵਾਪਸ;
 
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	ਜੇ (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    return;
+	    ਵਾਪਸ;
 	}
 
-	if (list_append_number(l2, i) == FAIL
-		|| list_append_number(l2, blob_get(blob, i)) == FAIL)
-	    return;
+	ਜੇ (list_append_ਸੰਖਿਆ(l2, i) == FAIL
+		|| list_append_ਸੰਖਿਆ(l2, blob_get(blob, i)) == FAIL)
+	    ਵਾਪਸ;
     }
 }
 
@@ -351,164 +351,164 @@ string2blob(char_u *str)
     blob_T  *blob = blob_alloc();
     char_u  *s = str;
 
-    if (blob == NULL)
-	return NULL;
-    if (s[0] != '0' || (s[1] != 'z' && s[1] != 'Z'))
-	goto failed;
+    ਜੇ (blob == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (s[0] != '0' || (s[1] != 'z' && s[1] != 'Z'))
+	ਜਾਓ failed;
     s += 2;
-    while (vim_isxdigit(*s))
+    ਜਦੋਂ (vim_isxdigit(*s))
     {
-	if (!vim_isxdigit(s[1]))
-	    goto failed;
+	ਜੇ (!vim_isxdigit(s[1]))
+	    ਜਾਓ failed;
 	ga_append(&blob->bv_ga, (hex2nr(s[0]) << 4) + hex2nr(s[1]));
 	s += 2;
-	if (*s == '.' && vim_isxdigit(s[1]))
+	ਜੇ (*s == '.' && vim_isxdigit(s[1]))
 	    ++s;
     }
-    if (*skipwhite(s) != NUL)
-	goto failed;  // text after final digit
+    ਜੇ (*skipwhite(s) != NUL)
+	ਜਾਓ failed;  // text after final digit
 
     ++blob->bv_refcount;
-    return blob;
+    ਵਾਪਸ blob;
 
 failed:
     blob_free(blob);
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Returns a slice of 'blob' from index 'n1' to 'n2' in 'rettv'.  The length of
  * the blob is 'len'.  Returns an empty blob if the indexes are out of range.
  */
-    static int
-blob_slice(
+    ਸਥਿਰ ਪੂਰਨ
+blob_ਟੁਕੜਾ(
 	blob_T		*blob,
-	long		len,
+	ਲੰਮਾ		len,
 	varnumber_T	n1,
 	varnumber_T	n2,
-	int		exclusive,
+	ਪੂਰਨ		exclusive,
 	typval_T	*rettv)
 {
-    if (n1 < 0)
+    ਜੇ (n1 < 0)
     {
 	n1 = len + n1;
-	if (n1 < 0)
+	ਜੇ (n1 < 0)
 	    n1 = 0;
     }
-    if (n2 < 0)
+    ਜੇ (n2 < 0)
 	n2 = len + n2;
-    else if (n2 >= len)
+    ਨਹੀਂਤਾਂ ਜੇ (n2 >= len)
 	n2 = len - (exclusive ? 0 : 1);
-    if (exclusive)
+    ਜੇ (exclusive)
 	--n2;
-    if (n1 >= len || n2 < 0 || n1 > n2)
+    ਜੇ (n1 >= len || n2 < 0 || n1 > n2)
     {
 	clear_tv(rettv);
 	rettv->v_type = VAR_BLOB;
-	rettv->vval.v_blob = NULL;
+	rettv->vval.v_blob = ਨਿਰਾ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	blob_T  *new_blob = blob_alloc();
-	long    i;
+	ਲੰਮਾ    i;
 
-	if (new_blob != NULL)
+	ਜੇ (new_blob != ਨਿਰਾ)
 	{
-	    if (ga_grow(&new_blob->bv_ga, n2 - n1 + 1) == FAIL)
+	    ਜੇ (ga_grow(&new_blob->bv_ga, n2 - n1 + 1) == FAIL)
 	    {
 		blob_free(new_blob);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    new_blob->bv_ga.ga_len = n2 - n1 + 1;
-	    for (i = n1; i <= n2; i++)
-		blob_set(new_blob, i - n1, blob_get(blob, i));
+	    ਲਈ (i = n1; i <= n2; i++)
+		blob_ਸੈੱਟ(new_blob, i - n1, blob_get(blob, i));
 
 	    clear_tv(rettv);
-	    rettv_blob_set(rettv, new_blob);
+	    rettv_blob_ਸੈੱਟ(rettv, new_blob);
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Return the byte value in 'blob' at index 'idx' in 'rettv'.  If the index is
  * too big or negative that is an error.  The length of the blob is 'len'.
  */
-    static int
-blob_index(
+    ਸਥਿਰ ਪੂਰਨ
+blob_ਸੂਚਕਾਂਕ(
 	blob_T		*blob,
-	int		len,
+	ਪੂਰਨ		len,
 	varnumber_T	idx,
 	typval_T	*rettv)
 {
     // The resulting variable is a byte value.
     // If the index is too big or negative that is an error.
-    if (idx < 0)
+    ਜੇ (idx < 0)
 	idx = len + idx;
-    if (idx < len && idx >= 0)
+    ਜੇ (idx < len && idx >= 0)
     {
-	int v = blob_get(blob, idx);
+	ਪੂਰਨ v = blob_get(blob, idx);
 
 	clear_tv(rettv);
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = v;
+	rettv->v_type = VAR_ਸੰਖਿਆ;
+	rettv->vval.v_ਸੰਖਿਆ = v;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	semsg(_(e_blob_index_out_of_range_nr), idx);
-	return FAIL;
+	semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), idx);
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
-blob_slice_or_index(
+    ਪੂਰਨ
+blob_ਟੁਕੜਾ_or_ਸੂਚਕਾਂਕ(
 	blob_T		*blob,
-	int		is_range,
+	ਪੂਰਨ		is_range,
 	varnumber_T	n1,
 	varnumber_T	n2,
-	int		exclusive,
+	ਪੂਰਨ		exclusive,
 	typval_T	*rettv)
 {
-    long	len = blob_len(blob);
+    ਲੰਮਾ	len = blob_len(blob);
 
-    if (is_range)
-	return blob_slice(blob, len, n1, n2, exclusive, rettv);
-    else
-	return blob_index(blob, len, n1, rettv);
-    return OK;
+    ਜੇ (is_range)
+	ਵਾਪਸ blob_ਟੁਕੜਾ(blob, len, n1, n2, exclusive, rettv);
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ blob_ਸੂਚਕਾਂਕ(blob, len, n1, rettv);
+    ਵਾਪਸ OK;
 }
 
 /*
  * Check if "n1"- is a valid index for a blobl with length "bloblen".
  */
-    int
-check_blob_index(long bloblen, varnumber_T n1, int quiet)
+    ਪੂਰਨ
+check_blob_ਸੂਚਕਾਂਕ(ਲੰਮਾ bloblen, varnumber_T n1, ਪੂਰਨ quiet)
 {
-    if (n1 < 0 || n1 > bloblen)
+    ਜੇ (n1 < 0 || n1 > bloblen)
     {
-	if (!quiet)
-	    semsg(_(e_blob_index_out_of_range_nr), n1);
-	return FAIL;
+	ਜੇ (!quiet)
+	    semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), n1);
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Check if "n1"-"n2" is a valid range for a blob with length "bloblen".
  */
-    int
-check_blob_range(long bloblen, varnumber_T n1, varnumber_T n2, int quiet)
+    ਪੂਰਨ
+check_blob_range(ਲੰਮਾ bloblen, varnumber_T n1, varnumber_T n2, ਪੂਰਨ quiet)
 {
-    if (n2 < 0 || n2 >= bloblen || n2 < n1)
+    ਜੇ (n2 < 0 || n2 >= bloblen || n2 < n1)
     {
-	if (!quiet)
-	    semsg(_(e_blob_index_out_of_range_nr), n2);
-	return FAIL;
+	ਜੇ (!quiet)
+	    semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), n2);
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -516,201 +516,201 @@ check_blob_range(long bloblen, varnumber_T n1, varnumber_T n2, int quiet)
  * Caller must make sure "src" is a blob.
  * Returns FAIL if the number of bytes does not match.
  */
-    int
-blob_set_range(blob_T *dest, long n1, long n2, typval_T *src)
+    ਪੂਰਨ
+blob_ਸੈੱਟ_range(blob_T *dest, ਲੰਮਾ n1, ਲੰਮਾ n2, typval_T *src)
 {
-    int	il, ir;
+    ਪੂਰਨ	il, ir;
 
-    if (n2 - n1 + 1 != blob_len(src->vval.v_blob))
+    ਜੇ (n2 - n1 + 1 != blob_len(src->vval.v_blob))
     {
-	emsg(_(e_blob_value_does_not_have_right_number_of_bytes));
-	return FAIL;
+	emsg(_(e_blob_ਮੁੱਲ_does_not_have_ਸੱਜਾ_ਸੰਖਿਆ_ਦਾ_ਬਾਈਟਾਂ));
+	ਵਾਪਸ FAIL;
     }
 
     ir = 0;
-    for (il = n1; il <= n2; il++)
-	blob_set(dest, il, blob_get(src->vval.v_blob, ir++));
-    return OK;
+    ਲਈ (il = n1; il <= n2; il++)
+	blob_ਸੈੱਟ(dest, il, blob_get(src->vval.v_blob, ir++));
+    ਵਾਪਸ OK;
 }
 
 /*
  * "add(blob, item)" function
  */
-    void
-blob_add(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+blob_ਜੋੜੋ(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
-    int		error = FALSE;
+    ਪੂਰਨ		error = FALSE;
     varnumber_T n;
 
-    if (b == NULL)
+    ਜੇ (b == ਨਿਰਾ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_blob));
-	return;
+	ਜੇ (ਵਿੱਚ_vim9script())
+	    emsg(_(e_cannot_ਜੋੜੋ_ਮੰਜ਼ਿਲ_null_blob));
+	ਵਾਪਸ;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("add() argument"), TRUE))
-	return;
+    ਜੇ (ਮੁੱਲ_check_ਤਾਲਾ(b->bv_ਤਾਲਾ, (char_u *)N_("add() argument"), TRUE))
+	ਵਾਪਸ;
 
-    n = tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    n = tv_get_ਸੰਖਿਆ_chk(&argvars[1], &error);
+    ਜੇ (error)
+	ਵਾਪਸ;
 
-    ga_append(&b->bv_ga, (int)n);
+    ga_append(&b->bv_ga, (ਪੂਰਨ)n);
     copy_tv(&argvars[0], rettv);
 }
 
 /*
  * "remove({blob}, {idx} [, {end}])" function
  */
-    void
+    ਖਾਲੀ
 blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     blob_T	*b = argvars[0].vval.v_blob;
     blob_T	*newblob;
-    int		error = FALSE;
-    long	idx;
-    long	end;
-    int		len;
+    ਪੂਰਨ		error = FALSE;
+    ਲੰਮਾ	idx;
+    ਲੰਮਾ	ਸਿਰਾ;
+    ਪੂਰਨ		len;
     char_u	*p;
 
-    if (b != NULL && value_check_lock(b->bv_lock, arg_errmsg, TRUE))
-	return;
+    ਜੇ (b != ਨਿਰਾ && ਮੁੱਲ_check_ਤਾਲਾ(b->bv_ਤਾਲਾ, arg_errmsg, TRUE))
+	ਵਾਪਸ;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    idx = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ_chk(&argvars[1], &error);
+    ਜੇ (error)
+	ਵਾਪਸ;
 
     len = blob_len(b);
 
-    if (idx < 0)
+    ਜੇ (idx < 0)
 	// count from the end
 	idx = len + idx;
-    if (idx < 0 || idx >= len)
+    ਜੇ (idx < 0 || idx >= len)
     {
-	semsg(_(e_blob_index_out_of_range_nr), idx);
-	return;
+	semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), idx);
+	ਵਾਪਸ;
     }
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
-	p = (char_u *)b->bv_ga.ga_data;
-	rettv->vval.v_number = (varnumber_T) *(p + idx);
+	p = (char_u *)b->bv_ga.ga_ਅੰਕੜੇ;
+	rettv->vval.v_ਸੰਖਿਆ = (varnumber_T) *(p + idx);
 	mch_memmove(p + idx, p + idx + 1, (size_t)len - idx - 1);
 	--b->bv_ga.ga_len;
-	return;
+	ਵਾਪਸ;
     }
 
     // Remove range of items, return blob with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;
-    if (end < 0)
+    ਸਿਰਾ = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ_chk(&argvars[2], &error);
+    ਜੇ (error)
+	ਵਾਪਸ;
+    ਜੇ (ਸਿਰਾ < 0)
 	// count from the end
-	end = len + end;
-    if (end >= len || idx > end)
+	ਸਿਰਾ = len + ਸਿਰਾ;
+    ਜੇ (ਸਿਰਾ >= len || idx > ਸਿਰਾ)
     {
-	semsg(_(e_blob_index_out_of_range_nr), end);
-	return;
+	semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), ਸਿਰਾ);
+	ਵਾਪਸ;
     }
     newblob = blob_alloc();
-    if (newblob == NULL)
-	return;
-    newblob->bv_ga.ga_len = end - idx + 1;
-    if (ga_grow(&newblob->bv_ga, end - idx + 1) == FAIL)
+    ਜੇ (newblob == ਨਿਰਾ)
+	ਵਾਪਸ;
+    newblob->bv_ga.ga_len = ਸਿਰਾ - idx + 1;
+    ਜੇ (ga_grow(&newblob->bv_ga, ਸਿਰਾ - idx + 1) == FAIL)
     {
 	vim_free(newblob);
-	return;
+	ਵਾਪਸ;
     }
-    p = (char_u *)b->bv_ga.ga_data;
-    mch_memmove((char_u *)newblob->bv_ga.ga_data, p + idx,
-	    (size_t)(end - idx + 1));
+    p = (char_u *)b->bv_ga.ga_ਅੰਕੜੇ;
+    mch_memmove((char_u *)newblob->bv_ga.ga_ਅੰਕੜੇ, p + idx,
+	    (size_t)(ਸਿਰਾ - idx + 1));
     ++newblob->bv_refcount;
     rettv->v_type = VAR_BLOB;
     rettv->vval.v_blob = newblob;
 
-    if (len - end - 1 > 0)
-	mch_memmove(p + idx, p + end + 1, (size_t)(len - end - 1));
-    b->bv_ga.ga_len -= end - idx + 1;
+    ਜੇ (len - ਸਿਰਾ - 1 > 0)
+	mch_memmove(p + idx, p + ਸਿਰਾ + 1, (size_t)(len - ਸਿਰਾ - 1));
+    b->bv_ga.ga_len -= ਸਿਰਾ - idx + 1;
 }
 
 /*
  * Implementation of map() and filter() for a Blob.  Apply "expr" to every
  * number in Blob "blob_arg" and return the result in "rettv".
  */
-    void
+    ਖਾਲੀ
 blob_filter_map(
 	blob_T		*blob_arg,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*ਵਿਅੰਜਕ,
 	char_u		*arg_errmsg,
 	typval_T	*rettv)
 {
     blob_T	*b = blob_arg;
-    int		i;
+    ਪੂਰਨ		i;
     typval_T	tv;
     varnumber_T	val;
     blob_T	*b_ret;
-    int		idx = 0;
-    int		rem;
+    ਪੂਰਨ		idx = 0;
+    ਪੂਰਨ		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ਜੇ (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_BLOB;
-	rettv->vval.v_blob = NULL;
+	rettv->vval.v_blob = ਨਿਰਾ;
     }
-    if (b == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(b->bv_lock, arg_errmsg, TRUE)))
-	return;
+    ਜੇ (b == ਨਿਰਾ || (filtermap == FILTERMAP_FILTER
+			    && ਮੁੱਲ_check_ਤਾਲਾ(b->bv_ਤਾਲਾ, arg_errmsg, TRUE)))
+	ਵਾਪਸ;
 
     b_ret = b;
-    if (filtermap == FILTERMAP_MAPNEW)
+    ਜੇ (filtermap == FILTERMAP_MAPNEW)
     {
-	rettv->v_lock = 0;
+	rettv->v_ਤਾਲਾ = 0;
 	rettv->vval.v_blob = blob_copy(b);
-	if (rettv->vval.v_blob == NULL)
-	    return;
+	ਜੇ (rettv->vval.v_blob == ਨਿਰਾ)
+	    ਵਾਪਸ;
 	b_ret = rettv->vval.v_blob;
     }
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    ਸੈੱਟ_vim_var_type(VV_ਕੁੰਜੀ, VAR_ਸੰਖਿਆ);
 
-    int prev_lock = b->bv_lock;
-    if (b->bv_lock == 0)
-	b->bv_lock = VAR_LOCKED;
+    ਪੂਰਨ prev_ਤਾਲਾ = b->bv_ਤਾਲਾ;
+    ਜੇ (b->bv_ਤਾਲਾ == 0)
+	b->bv_ਤਾਲਾ = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ਵਿਅੰਜਕ_get_funccal(ਵਿਅੰਜਕ, &newtv);
 
-    for (i = 0; i < b->bv_ga.ga_len; i++)
+    ਲਈ (i = 0; i < b->bv_ga.ga_len; i++)
     {
-	tv.v_type = VAR_NUMBER;
+	tv.v_type = VAR_ਸੰਖਿਆ;
 	val = blob_get(b, i);
-	tv.vval.v_number = val;
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	tv.vval.v_ਸੰਖਿਆ = val;
+	ਸੈੱਟ_vim_var_nr(VV_ਕੁੰਜੀ, idx);
+	ਜੇ (filter_map_one(&tv, ਵਿਅੰਜਕ, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
-	    break;
-	if (filtermap != FILTERMAP_FOREACH)
+	    ਰੋਕੋ;
+	ਜੇ (filtermap != FILTERMAP_FOREACH)
 	{
-	    if (newtv.v_type != VAR_NUMBER && newtv.v_type != VAR_BOOL)
+	    ਜੇ (newtv.v_type != VAR_ਸੰਖਿਆ && newtv.v_type != VAR_BOOL)
 	    {
 		clear_tv(&newtv);
 		emsg(_(e_invalid_operation_for_blob));
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (filtermap != FILTERMAP_FILTER)
+	    ਜੇ (filtermap != FILTERMAP_FILTER)
 	    {
-		if (newtv.vval.v_number != val)
-		    blob_set(b_ret, i, newtv.vval.v_number);
+		ਜੇ (newtv.vval.v_ਸੰਖਿਆ != val)
+		    blob_ਸੈੱਟ(b_ret, i, newtv.vval.v_ਸੰਖਿਆ);
 	    }
-	    else if (rem)
+	    ਨਹੀਂਤਾਂ ਜੇ (rem)
 	    {
-		char_u *p = (char_u *)blob_arg->bv_ga.ga_data;
+		char_u *p = (char_u *)blob_arg->bv_ga.ga_ਅੰਕੜੇ;
 
 		mch_memmove(p + i, p + i + 1,
 			    (size_t)b->bv_ga.ga_len - i - 1);
@@ -721,57 +721,57 @@ blob_filter_map(
 	++idx;
     }
 
-    b->bv_lock = prev_lock;
-    if (fc != NULL)
+    b->bv_ਤਾਲਾ = prev_ਤਾਲਾ;
+    ਜੇ (fc != ਨਿਰਾ)
 	remove_funccal();
 }
 
 /*
  * "insert(blob, {item} [, {idx}])" function
  */
-    void
-blob_insert_func(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+blob_ਪਾਓ_func(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
-    long	before = 0;
-    int		error = FALSE;
-    int		val, len;
+    ਲੰਮਾ	before = 0;
+    ਪੂਰਨ		error = FALSE;
+    ਪੂਰਨ		val, len;
     char_u	*p;
 
-    if (b == NULL)
+    ਜੇ (b == ਨਿਰਾ)
     {
-	if (in_vim9script())
-	    emsg(_(e_cannot_add_to_null_blob));
-	return;
+	ਜੇ (ਵਿੱਚ_vim9script())
+	    emsg(_(e_cannot_ਜੋੜੋ_ਮੰਜ਼ਿਲ_null_blob));
+	ਵਾਪਸ;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    ਜੇ (ਮੁੱਲ_check_ਤਾਲਾ(b->bv_ਤਾਲਾ, (char_u *)N_("insert() argument"), TRUE))
+	ਵਾਪਸ;
 
     len = blob_len(b);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
     {
-	before = (long)tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    return;		// type error; errmsg already given
-	if (before < 0 || before > len)
+	before = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ_chk(&argvars[2], &error);
+	ਜੇ (error)
+	    ਵਾਪਸ;		// type error; errmsg already given
+	ਜੇ (before < 0 || before > len)
 	{
-	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-	    return;
+	    semsg(_(e_invalid_ਦਲੀਲ_str), tv_get_string(&argvars[2]));
+	    ਵਾਪਸ;
 	}
     }
-    val = tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
-    if (val < 0 || val > 255)
+    val = tv_get_ਸੰਖਿਆ_chk(&argvars[1], &error);
+    ਜੇ (error)
+	ਵਾਪਸ;
+    ਜੇ (val < 0 || val > 255)
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	return;
+	semsg(_(e_invalid_ਦਲੀਲ_str), tv_get_string(&argvars[1]));
+	ਵਾਪਸ;
     }
 
-    if (ga_grow(&b->bv_ga, 1) == FAIL)
-	return;
-    p = (char_u *)b->bv_ga.ga_data;
+    ਜੇ (ga_grow(&b->bv_ga, 1) == FAIL)
+	ਵਾਪਸ;
+    p = (char_u *)b->bv_ga.ga_ਅੰਕੜੇ;
     mch_memmove(p + before + 1, p + before, (size_t)len - before);
     *(p + before) = val;
     ++b->bv_ga.ga_len;
@@ -786,42 +786,42 @@ blob_insert_func(typval_T *argvars, typval_T *rettv)
  * Caller must check that "bef" is valid.
  * Returns FAIL when out of memory.
  */
-    static int
-blob_extend(blob_T *b1, blob_T *b2, long bef)
+    ਸਥਿਰ ਪੂਰਨ
+blob_extend(blob_T *b1, blob_T *b2, ਲੰਮਾ bef)
 {
-    int		len1, len2;
+    ਪੂਰਨ		len1, len2;
     char_u	*p1;
 
     // NULL blob is equivalent to an empty blob: nothing to do.
-    if (b2 == NULL || b2->bv_ga.ga_len == 0)
-	return OK;
+    ਜੇ (b2 == ਨਿਰਾ || b2->bv_ga.ga_len == 0)
+	ਵਾਪਸ OK;
 
     len1 = b1->bv_ga.ga_len;
     len2 = b2->bv_ga.ga_len;
 
-    if (ga_grow(&b1->bv_ga, len2) == FAIL)
-	return FAIL;
+    ਜੇ (ga_grow(&b1->bv_ga, len2) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    p1 = (char_u *)b1->bv_ga.ga_data;
+    p1 = (char_u *)b1->bv_ga.ga_ਅੰਕੜੇ;
 
-    if (b1 == b2)
+    ਜੇ (b1 == b2)
     {
 	// Inserting a blob into itself
 	mch_memmove(p1 + bef, p1, (size_t)len1);
-	if (bef < len1)
-	    memcpy(p1 + bef + len1, p1 + bef * 2, (size_t)(len1 - bef));
+	ਜੇ (bef < len1)
+	    ਸਮ੍ਰਿਤੀ_ਨਕਲ(p1 + bef + len1, p1 + bef * 2, (size_t)(len1 - bef));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (bef < len1)
+	ਜੇ (bef < len1)
 	    mch_memmove(p1 + bef + len2, p1 + bef, (size_t)(len1 - bef));
 
-	memcpy(p1 + bef, b2->bv_ga.ga_data, (size_t)len2);
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ(p1 + bef, b2->bv_ga.ga_ਅੰਕੜੇ, (size_t)len2);
     }
 
     b1->bv_ga.ga_len += len2;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -829,67 +829,67 @@ blob_extend(blob_T *b1, blob_T *b2, long bef)
  * argvars[3] and return the resulting blob in "rettv".  "is_new" is TRUE for
  * extendnew().
  */
-    void
+    ਖਾਲੀ
 blob_extend_func(
 	typval_T	*argvars,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ਪੂਰਨ		is_new,
 	typval_T	*rettv)
 {
     blob_T	*b1, *b2;
-    long	before;
-    int		error = FALSE;
+    ਲੰਮਾ	before;
+    ਪੂਰਨ		error = FALSE;
 
     b1 = argvars[0].vval.v_blob;
-    if (b1 == NULL)
+    ਜੇ (b1 == ਨਿਰਾ)
     {
 	emsg(_(e_cannot_extend_null_blob));
-	return;
+	ਵਾਪਸ;
     }
-    if (is_new || !value_check_lock(b1->bv_lock, arg_errmsg, TRUE))
+    ਜੇ (is_new || !ਮੁੱਲ_check_ਤਾਲਾ(b1->bv_ਤਾਲਾ, arg_errmsg, TRUE))
     {
-	if (is_new)
+	ਜੇ (is_new)
 	{
 	    b1 = blob_copy(b1);
-	    if (b1 == NULL)
-		return;
+	    ਜੇ (b1 == ਨਿਰਾ)
+		ਵਾਪਸ;
 	}
 
 	b2 = argvars[1].vval.v_blob;
-	if (b2 == NULL)
-	    goto theend;
+	ਜੇ (b2 == ਨਿਰਾ)
+	    ਜਾਓ theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		goto cleanup;		// type error; errmsg already given
-	    if (before < 0)
+	    before = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ_chk(&argvars[2], &error);
+	    ਜੇ (error)
+		ਜਾਓ cleanup;		// type error; errmsg already given
+	    ਜੇ (before < 0)
 		before = b1->bv_ga.ga_len + before;
-	    if (before < 0 || before > b1->bv_ga.ga_len)
+	    ਜੇ (before < 0 || before > b1->bv_ga.ga_len)
 	    {
-		semsg(_(e_blob_index_out_of_range_nr), before);
-		goto cleanup;
+		semsg(_(e_blob_ਸੂਚਕਾਂਕ_ਬਾਹਰਲਾ_ਦਾ_range_nr), before);
+		ਜਾਓ cleanup;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    before = b1->bv_ga.ga_len;
-	if (blob_extend(b1, b2, before) == FAIL)
-	    goto cleanup;
+	ਜੇ (blob_extend(b1, b2, before) == FAIL)
+	    ਜਾਓ cleanup;
 
 theend:
-	if (is_new)
+	ਜੇ (is_new)
 	{
 	    rettv->v_type = VAR_BLOB;
-	    rettv->v_lock = 0;
+	    rettv->v_ਤਾਲਾ = 0;
 	    rettv->vval.v_blob = b1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    copy_tv(&argvars[0], rettv);
-	return;
+	ਵਾਪਸ;
 
 cleanup:
-	if (is_new)
+	ਜੇ (is_new)
 	    blob_unref(b1);
     }
 }
@@ -899,149 +899,149 @@ cleanup:
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    ਖਾਲੀ
 blob_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*ਵਿਅੰਜਕ,
 	typval_T	*rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
-    int		called_emsg_start = called_emsg;
-    int		r;
+    ਪੂਰਨ		called_emsg_ਸ਼ੁਰੂ = called_emsg;
+    ਪੂਰਨ		r;
     typval_T	initial;
     typval_T	argv[3];
-    int	i;
+    ਪੂਰਨ	i;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (b == NULL || b->bv_ga.ga_len == 0)
+	ਜੇ (b == ਨਿਰਾ || b->bv_ga.ga_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Blob");
-	    return;
+	    semsg(_(e_reduce_ਦਾ_an_ਖਾਲੀ_ਥਾਵਾਂ_str_with_no_initial_ਮੁੱਲ), "Blob");
+	    ਵਾਪਸ;
 	}
-	initial.v_type = VAR_NUMBER;
-	initial.vval.v_number = blob_get(b, 0);
+	initial.v_type = VAR_ਸੰਖਿਆ;
+	initial.vval.v_ਸੰਖਿਆ = blob_get(b, 0);
 	i = 1;
     }
-    else if (check_for_number_arg(argvars, 2) == FAIL)
-	return;
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (check_for_ਸੰਖਿਆ_arg(argvars, 2) == FAIL)
+	ਵਾਪਸ;
+    ਨਹੀਂਤਾਂ
     {
 	initial = argvars[2];
 	i = 0;
     }
 
     copy_tv(&initial, rettv);
-    if (b == NULL)
-	return;
+    ਜੇ (b == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    for ( ; i < b->bv_ga.ga_len; i++)
+    ਲਈ ( ; i < b->bv_ga.ga_len; i++)
     {
 	argv[0] = *rettv;
-	argv[1].v_type = VAR_NUMBER;
-	argv[1].vval.v_number = blob_get(b, i);
+	argv[1].v_type = VAR_ਸੰਖਿਆ;
+	argv[1].vval.v_ਸੰਖਿਆ = blob_get(b, i);
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, NULL, rettv);
+	r = eval_ਵਿਅੰਜਕ_typval(ਵਿਅੰਜਕ, TRUE, argv, 2, ਨਿਰਾ, rettv);
 
 	clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    return;
+	ਜੇ (r == FAIL || called_emsg != called_emsg_ਸ਼ੁਰੂ)
+	    ਵਾਪਸ;
     }
 }
 
 /*
  * "reverse({blob})" function
  */
-    void
-blob_reverse(blob_T *b, typval_T *rettv)
+    ਖਾਲੀ
+blob_ਉਲਟ(blob_T *b, typval_T *rettv)
 {
-    long    i, len = blob_len(b);
+    ਲੰਮਾ    i, len = blob_len(b);
 
-    for (i = 0; i < len / 2; i++)
+    ਲਈ (i = 0; i < len / 2; i++)
     {
-	int tmp = blob_get(b, (int)i);
+	ਪੂਰਨ tmp = blob_get(b, (ਪੂਰਨ)i);
 
-	blob_set(b, (int)i, blob_get(b, (int)(len - i - 1)));
-	blob_set(b, (int)(len - i - 1), tmp);
+	blob_ਸੈੱਟ(b, (ਪੂਰਨ)i, blob_get(b, (ਪੂਰਨ)(len - i - 1)));
+	blob_ਸੈੱਟ(b, (ਪੂਰਨ)(len - i - 1), tmp);
     }
-    rettv_blob_set(rettv, b);
+    rettv_blob_ਸੈੱਟ(rettv, b);
 }
 
 /*
  * blob2list() function
  */
-    void
+    ਖਾਲੀ
 f_blob2list(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*l;
-    int		i, len;
+    ਪੂਰਨ		i, len;
     typval_T	tv;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL)
+    ਜੇ (check_for_blob_arg(argvars, 0) == FAIL)
     {
-	(void)rettv_list_alloc(rettv);
-	return;
+	(ਖਾਲੀ)rettv_list_alloc(rettv);
+	ਵਾਪਸ;
     }
 
     blob = argvars->vval.v_blob;
     len = blob_len(blob);
-    l = list_alloc_with_items(len);
-    if (l == NULL)
-	return;
-    rettv_list_set(rettv, l);
+    l = list_alloc_with_ਚੀਜ਼ਾਂ(len);
+    ਜੇ (l == ਨਿਰਾ)
+	ਵਾਪਸ;
+    rettv_list_ਸੈੱਟ(rettv, l);
 
-    tv.v_type = VAR_NUMBER;
-    tv.v_lock = 0;
-    for (i = 0; i < len; i++)
+    tv.v_type = VAR_ਸੰਖਿਆ;
+    tv.v_ਤਾਲਾ = 0;
+    ਲਈ (i = 0; i < len; i++)
     {
-	tv.vval.v_number = blob_get(blob, i);
-	list_set_item(l, i, &tv);
+	tv.vval.v_ਸੰਖਿਆ = blob_get(blob, i);
+	list_ਸੈੱਟ_ਵਸਤੂ(l, i, &tv);
     }
 }
 
 /*
  * list2blob() function
  */
-    void
+    ਖਾਲੀ
 f_list2blob(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
     blob_T	*blob;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_blob_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
     blob = rettv->vval.v_blob;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_list_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     l = argvars->vval.v_list;
-    if (l == NULL)
-	return;
+    ਜੇ (l == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // The result has one byte per list item; reserve all space at once.
-    if (ga_grow(&blob->bv_ga, list_len(l)) == FAIL)
-	return;
+    ਜੇ (ga_grow(&blob->bv_ga, list_len(l)) == FAIL)
+	ਵਾਪਸ;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(l, li)
     {
-	int		error;
+	ਪੂਰਨ		error;
 	varnumber_T	n;
 
 	error = FALSE;
-	n = tv_get_number_chk(&li->li_tv, &error);
-	if (error == TRUE || n < 0 || n > 255)
+	n = tv_get_ਸੰਖਿਆ_chk(&li->li_tv, &error);
+	ਜੇ (error == TRUE || n < 0 || n > 255)
 	{
-	    if (!error)
-		semsg(_(e_invalid_value_for_blob_nr), n);
+	    ਜੇ (!error)
+		semsg(_(e_invalid_ਮੁੱਲ_for_blob_nr), n);
 	    ga_clear(&blob->bv_ga);
-	    return;
+	    ਵਾਪਸ;
 	}
-	((char_u *)blob->bv_ga.ga_data)[blob->bv_ga.ga_len++] = (char_u)n;
+	((char_u *)blob->bv_ga.ga_ਅੰਕੜੇ)[blob->bv_ga.ga_len++] = (char_u)n;
     }
 }
 
-#endif // defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ // defined(FEAT_EVAL)

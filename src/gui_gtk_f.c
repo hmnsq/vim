@@ -23,209 +23,209 @@
  * 2016  Kazunobu Kuriyama  <kazunobu.kuriyama@gmail.com>
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>	// without this it compiles, but gives errors at
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ <gtk/gtk.h>	// without this it compiles, but gives errors at
 			// runtime!
-#include "gui_gtk_f.h"
-#if !GTK_CHECK_VERSION(3,0,0)
+#ਅਨ੍ਤਰ੍ਭਾਵ "gui_gtk_f.h"
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 # include <gtk/gtksignal.h>
-#endif
-#ifdef MSWIN
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 # include <gdk/gdkwin32.h>
-#else
+#ਨਹੀਂਤਾਂ
 # include <gdk/gdkx.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-typedef struct _GtkFormChild GtkFormChild;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ Gtk_Form_ਬੱਚਾ Gtk_Form_ਬੱਚਾ_2;
 
-struct _GtkFormChild
+ਬਣਤਰ Gtk_Form_ਬੱਚਾ
 {
     GtkWidget *widget;
-    GdkWindow *window;
+    Gdk_ਖਿੜਕੀ *ਖਿੜਕੀ_2;
     gint x;		// relative subwidget x position
     gint y;		// relative subwidget y position
     gint mapped;
 };
 
 
-static void gui_gtk_form_class_init(GtkFormClass *klass);
-#if GTK_CHECK_VERSION(3,0,0)
-static void gui_gtk_form_init(GtkForm *form);
-#else
-static void gui_gtk_form_init(GtkForm *form, void *g_class);
-#endif
+ਸਥਿਰ ਖਾਲੀ gui_gtk_form_class_init(GtkFormClass *klass);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+ਸਥਿਰ ਖਾਲੀ gui_gtk_form_init(GtkForm *form);
+#ਨਹੀਂਤਾਂ
+ਸਥਿਰ ਖਾਲੀ gui_gtk_form_init(GtkForm *form, ਖਾਲੀ *g_class);
+#ਜੇ_ਅੰਤ
 
-static void form_realize(GtkWidget *widget);
-static void form_unrealize(GtkWidget *widget);
-static void form_map(GtkWidget *widget);
-static void form_size_request(GtkWidget *widget, GtkRequisition *requisition);
-#if GTK_CHECK_VERSION(3,0,0)
-static void form_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width);
-static void form_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height);
-#endif
-static void form_size_allocate(GtkWidget *widget, GtkAllocation *allocation);
-#if GTK_CHECK_VERSION(3,0,0)
-static gboolean form_draw(GtkWidget *widget, cairo_t *cr);
-#else
-static gint form_expose(GtkWidget *widget, GdkEventExpose *event);
-#endif
+ਸਥਿਰ ਖਾਲੀ form_realize(GtkWidget *widget);
+ਸਥਿਰ ਖਾਲੀ form_unrealize(GtkWidget *widget);
+ਸਥਿਰ ਖਾਲੀ form_map(GtkWidget *widget);
+ਸਥਿਰ ਖਾਲੀ form_ਮਾਪ_request(GtkWidget *widget, GtkRequisition *requisition);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+ਸਥਿਰ ਖਾਲੀ form_get_preferred_ਚੌੜਾਈ(GtkWidget *widget, gint *ਨਿਊਨਤਮ_ਚੌੜਾਈ, gint *natural_ਚੌੜਾਈ);
+ਸਥਿਰ ਖਾਲੀ form_get_preferred_ਉਚਾਈ(GtkWidget *widget, gint *ਨਿਊਨਤਮ_ਉਚਾਈ, gint *natural_ਉਚਾਈ);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਖਾਲੀ form_ਮਾਪ_allocate(GtkWidget *widget, Gtk_ਵੰਡ *ਵੰਡ);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+ਸਥਿਰ gboolean form_draw(GtkWidget *widget, cairo_t *cr);
+#ਨਹੀਂਤਾਂ
+ਸਥਿਰ gint form_expose(GtkWidget *widget, GdkEventExpose *event);
+#ਜੇ_ਅੰਤ
 
-static void form_remove(GtkContainer *container, GtkWidget *widget);
-static void form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_data);
+ਸਥਿਰ ਖਾਲੀ form_remove(GtkContainer *container, GtkWidget *widget);
+ਸਥਿਰ ਖਾਲੀ form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_ਅੰਕੜੇ);
 
-static void form_attach_child_window(GtkForm *form, GtkFormChild *child);
-static void form_realize_child(GtkForm *form, GtkFormChild *child);
-static void form_position_child(GtkForm *form, GtkFormChild *child, gboolean force_allocate);
-static void form_position_children(GtkForm *form);
+ਸਥਿਰ ਖਾਲੀ form_attach_ਬੱਚਾ_ਖਿੜਕੀ(GtkForm *form, Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ);
+ਸਥਿਰ ਖਾਲੀ form_realize_ਬੱਚਾ(GtkForm *form, Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ);
+ਸਥਿਰ ਖਾਲੀ form_position_ਬੱਚਾ(GtkForm *form, Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ, gboolean force_allocate);
+ਸਥਿਰ ਖਾਲੀ form_position_children(GtkForm *form);
 
-static void form_send_configure(GtkForm *form);
+ਸਥਿਰ ਖਾਲੀ form_send_configure(GtkForm *form);
 
-static void form_child_map(GtkWidget *widget, gpointer user_data);
-static void form_child_unmap(GtkWidget *widget, gpointer user_data);
+ਸਥਿਰ ਖਾਲੀ form_ਬੱਚਾ_map(GtkWidget *widget, gpointer user_ਅੰਕੜੇ);
+ਸਥਿਰ ਖਾਲੀ form_ਬੱਚਾ_unmap(GtkWidget *widget, gpointer user_ਅੰਕੜੇ);
 
-#if !GTK_CHECK_VERSION(3,0,0)
-static GtkWidgetClass *parent_class = NULL;
-#endif
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+ਸਥਿਰ GtkWidgetClass *ਮਾਪਾ_class = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
 // Public interface
 
     GtkWidget *
-gui_gtk_form_new(void)
+gui_gtk_form_new(ਖਾਲੀ)
 {
     GtkForm *form;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    form = g_object_new(GTK_TYPE_FORM, NULL);
-#else
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    form = g_object_new(GTK_TYPE_FORM, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
     form = gtk_type_new(gui_gtk_form_get_type());
-#endif
+#ਜੇ_ਅੰਤ
 
-    return GTK_WIDGET(form);
+    ਵਾਪਸ GTK_WIDGET(form);
 }
 
-    void
+    ਖਾਲੀ
 gui_gtk_form_put(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*ਬੱਚਾ_widget,
 	gint	x,
 	gint	y)
 {
-    GtkFormChild *child;
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
     // LINTED: avoid warning: conversion to 'unsigned long'
-    child = g_new(GtkFormChild, 1);
-    if (child == NULL)
-	return;
+    ਬੱਚਾ = g_new(Gtk_Form_ਬੱਚਾ_2, 1);
+    ਜੇ (ਬੱਚਾ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    child->widget = child_widget;
-    child->window = NULL;
-    child->x = x;
-    child->y = y;
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(child->widget, -1, -1);
-#else
-    child->widget->requisition.width = 0;
-    child->widget->requisition.height = 0;
-#endif
-    child->mapped = FALSE;
+    ਬੱਚਾ->widget = ਬੱਚਾ_widget;
+    ਬੱਚਾ->ਖਿੜਕੀ_2 = ਨਿਰਾ;
+    ਬੱਚਾ->x = x;
+    ਬੱਚਾ->y = y;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    gtk_widget_ਸੈੱਟ_ਮਾਪ_request(ਬੱਚਾ->widget, -1, -1);
+#ਨਹੀਂਤਾਂ
+    ਬੱਚਾ->widget->requisition.ਚੌੜਾਈ = 0;
+    ਬੱਚਾ->widget->requisition.ਉਚਾਈ = 0;
+#ਜੇ_ਅੰਤ
+    ਬੱਚਾ->mapped = FALSE;
 
-    form->children = g_list_append(form->children, child);
+    form->children = g_list_append(form->children, ਬੱਚਾ);
 
     // child->window must be created and attached to the widget _before_
     // it has been realized, or else things will break with GTK2.  Note
     // that gtk_widget_set_parent() realizes the widget if it's visible
     // and its parent is mapped.
-    if (gtk_widget_get_realized(GTK_WIDGET(form)))
-	form_attach_child_window(form, child);
+    ਜੇ (gtk_widget_get_realized(GTK_WIDGET(form)))
+	form_attach_ਬੱਚਾ_ਖਿੜਕੀ(form, ਬੱਚਾ);
 
-    gtk_widget_set_parent(child_widget, GTK_WIDGET(form));
+    gtk_widget_ਸੈੱਟ_ਮਾਪਾ(ਬੱਚਾ_widget, GTK_WIDGET(form));
 
-    if (gtk_widget_get_realized(GTK_WIDGET(form))
-	    && !gtk_widget_get_realized(child_widget))
-	form_realize_child(form, child);
+    ਜੇ (gtk_widget_get_realized(GTK_WIDGET(form))
+	    && !gtk_widget_get_realized(ਬੱਚਾ_widget))
+	form_realize_ਬੱਚਾ(form, ਬੱਚਾ);
 
-    form_position_child(form, child, TRUE);
+    form_position_ਬੱਚਾ(form, ਬੱਚਾ, TRUE);
 }
 
-    void
+    ਖਾਲੀ
 gui_gtk_form_move(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*ਬੱਚਾ_widget,
 	gint	x,
 	gint	y)
 {
     GList *tmp_list;
-    GtkFormChild *child;
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
     {
-	child = tmp_list->data;
-	if (child->widget == child_widget)
+	ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
+	ਜੇ (ਬੱਚਾ->widget == ਬੱਚਾ_widget)
 	{
-	    child->x = x;
-	    child->y = y;
+	    ਬੱਚਾ->x = x;
+	    ਬੱਚਾ->y = y;
 
-	    form_position_child(form, child, TRUE);
-	    return;
+	    form_position_ਬੱਚਾ(form, ਬੱਚਾ, TRUE);
+	    ਵਾਪਸ;
 	}
     }
 }
 
-    void
+    ਖਾਲੀ
 gui_gtk_form_freeze(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    ++form->freeze_count;
+    ++form->freeze_ਗਿਣਤੀ;
 }
 
-    void
+    ਖਾਲੀ
 gui_gtk_form_thaw(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    if (!form->freeze_count)
-	return;
+    ਜੇ (!form->freeze_ਗਿਣਤੀ)
+	ਵਾਪਸ;
 
-    if (!(--form->freeze_count))
+    ਜੇ (!(--form->freeze_ਗਿਣਤੀ))
     {
 	form_position_children(form);
-	gtk_widget_queue_draw(GTK_WIDGET(form));
+	gtk_widget_ਕਤਾਰ_draw(GTK_WIDGET(form));
     }
 }
 
 // Basic Object handling procedures
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 G_DEFINE_TYPE(GtkForm, gui_gtk_form, GTK_TYPE_CONTAINER)
-#else
+#ਨਹੀਂਤਾਂ
     GtkType
-gui_gtk_form_get_type(void)
+gui_gtk_form_get_type(ਖਾਲੀ)
 {
-    static GtkType form_type = 0;
+    ਸਥਿਰ GtkType form_type = 0;
 
-    if (!form_type)
+    ਜੇ (!form_type)
     {
 	GtkTypeInfo form_info;
 
-	CLEAR_FIELD(form_info);
+	CLEAR_ਖੇਤਰ(form_info);
 	form_info.type_name = "GtkForm";
-	form_info.object_size = sizeof(GtkForm);
-	form_info.class_size = sizeof(GtkFormClass);
+	form_info.object_ਮਾਪ = ਆਕਾਰ(GtkForm);
+	form_info.class_ਮਾਪ = ਆਕਾਰ(GtkFormClass);
 	form_info.class_init_func = (GtkClassInitFunc)gui_gtk_form_class_init;
 	form_info.object_init_func = (GtkObjectInitFunc)gui_gtk_form_init;
 
 	form_type = gtk_type_unique(GTK_TYPE_CONTAINER, &form_info);
     }
-    return form_type;
+    ਵਾਪਸ form_type;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ਜੇ_ਅੰਤ // !GTK_CHECK_VERSION(3,0,0)
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_gtk_form_class_init(GtkFormClass *klass)
 {
     GtkWidgetClass *widget_class;
@@ -234,122 +234,122 @@ gui_gtk_form_class_init(GtkFormClass *klass)
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
-#if !GTK_CHECK_VERSION(3,0,0)
-    parent_class = gtk_type_class(gtk_container_get_type());
-#endif
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਮਾਪਾ_class = gtk_type_class(gtk_container_get_type());
+#ਜੇ_ਅੰਤ
 
     widget_class->realize = form_realize;
     widget_class->unrealize = form_unrealize;
     widget_class->map = form_map;
-#if GTK_CHECK_VERSION(3,0,0)
-    widget_class->get_preferred_width = form_get_preferred_width;
-    widget_class->get_preferred_height = form_get_preferred_height;
-#else
-    widget_class->size_request = form_size_request;
-#endif
-    widget_class->size_allocate = form_size_allocate;
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    widget_class->get_preferred_ਚੌੜਾਈ = form_get_preferred_ਚੌੜਾਈ;
+    widget_class->get_preferred_ਉਚਾਈ = form_get_preferred_ਉਚਾਈ;
+#ਨਹੀਂਤਾਂ
+    widget_class->ਮਾਪ_request = form_ਮਾਪ_request;
+#ਜੇ_ਅੰਤ
+    widget_class->ਮਾਪ_allocate = form_ਮਾਪ_allocate;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     widget_class->draw = form_draw;
-#else
+#ਨਹੀਂਤਾਂ
     widget_class->expose_event = form_expose;
-#endif
+#ਜੇ_ਅੰਤ
 
     container_class->remove = form_remove;
     container_class->forall = form_forall;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_gtk_form_init(GtkForm *form
-#if !GTK_CHECK_VERSION(3,0,0)
-	, void *g_class UNUSED
-#endif
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	, ਖਾਲੀ *g_class ਅਣਵਰਤਿਆ
+#ਜੇ_ਅੰਤ
 	)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_has_window(GTK_WIDGET(form), TRUE);
-#endif
-    form->children = NULL;
-    form->bin_window = NULL;
-    form->freeze_count = 0;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    gtk_widget_ਸੈੱਟ_has_ਖਿੜਕੀ(GTK_WIDGET(form), TRUE);
+#ਜੇ_ਅੰਤ
+    form->children = ਨਿਰਾ;
+    form->bin_ਖਿੜਕੀ = ਨਿਰਾ;
+    form->freeze_ਗਿਣਤੀ = 0;
 }
 
 /*
  * Widget methods
  */
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_realize(GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GdkWindowAttr attributes;
-    gint attributes_mask;
-    GtkAllocation allocation;
+    Gdk_ਖਿੜਕੀ_Attr ਗੁਣ;
+    gint ਗੁਣ_ਨਕਾਬ;
+    Gtk_ਵੰਡ ਵੰਡ;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
     form = GTK_FORM(widget);
-    gtk_widget_set_realized(widget, TRUE);
+    gtk_widget_ਸੈੱਟ_realized(widget, TRUE);
 
-    gtk_widget_get_allocation(widget, &allocation);
-    attributes.window_type = GDK_WINDOW_CHILD;
-    attributes.x = allocation.x;
-    attributes.y = allocation.y;
-    attributes.width = allocation.width;
-    attributes.height = allocation.height;
-    attributes.wclass = GDK_INPUT_OUTPUT;
-    attributes.visual = gtk_widget_get_visual(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes.event_mask = GDK_EXPOSURE_MASK;
-#else
-    attributes.colormap = gtk_widget_get_colormap(widget);
-    attributes.event_mask = GDK_VISIBILITY_NOTIFY_MASK;
-#endif
+    gtk_widget_get_ਵੰਡ(widget, &ਵੰਡ);
+    ਗੁਣ.ਖਿੜਕੀ_type = GDK_ਖਿੜਕੀ_ਬੱਚਾ;
+    ਗੁਣ.x = ਵੰਡ.x;
+    ਗੁਣ.y = ਵੰਡ.y;
+    ਗੁਣ.ਚੌੜਾਈ = ਵੰਡ.ਚੌੜਾਈ;
+    ਗੁਣ.ਉਚਾਈ = ਵੰਡ.ਉਚਾਈ;
+    ਗੁਣ.wclass = GDK_ਨਿਵੇਸ਼_OUTPUT;
+    ਗੁਣ.visual = gtk_widget_get_visual(widget);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਗੁਣ.event_ਨਕਾਬ = GDK_EXPOSURE_ਨਕਾਬ;
+#ਨਹੀਂਤਾਂ
+    ਗੁਣ.colormap = gtk_widget_get_colormap(widget);
+    ਗੁਣ.event_ਨਕਾਬ = GDK_VISIBILITY_NOTIFY_ਨਕਾਬ;
+#ਜੇ_ਅੰਤ
 
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਗੁਣ_ਨਕਾਬ = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#ਨਹੀਂਤਾਂ
+    ਗੁਣ_ਨਕਾਬ = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#ਜੇ_ਅੰਤ
 
-    gtk_widget_set_window(widget,
-			  gdk_window_new(gtk_widget_get_parent_window(widget),
-					 &attributes, attributes_mask));
-    gdk_window_set_user_data(gtk_widget_get_window(widget), widget);
+    gtk_widget_ਸੈੱਟ_ਖਿੜਕੀ(widget,
+			  gdk_ਖਿੜਕੀ_new(gtk_widget_get_ਮਾਪਾ_ਖਿੜਕੀ(widget),
+					 &ਗੁਣ, ਗੁਣ_ਨਕਾਬ));
+    gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(gtk_widget_get_ਖਿੜਕੀ(widget), widget);
 
-    attributes.x = 0;
-    attributes.y = 0;
-    attributes.event_mask = gtk_widget_get_events(widget);
+    ਗੁਣ.x = 0;
+    ਗੁਣ.y = 0;
+    ਗੁਣ.event_ਨਕਾਬ = gtk_widget_get_events(widget);
 
-    form->bin_window = gdk_window_new(gtk_widget_get_window(widget),
-				      &attributes, attributes_mask);
-    gdk_window_set_user_data(form->bin_window, widget);
+    form->bin_ਖਿੜਕੀ = gdk_ਖਿੜਕੀ_new(gtk_widget_get_ਖਿੜਕੀ(widget),
+				      &ਗੁਣ, ਗੁਣ_ਨਕਾਬ);
+    gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(form->bin_ਖਿੜਕੀ, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
     {
-	GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	GtkStyleContext * ਅਚਲ sctx = gtk_widget_get_style_context(widget);
 
-	gtk_style_context_add_class(sctx, "gtk-form");
-	gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	gtk_style_context_set_background(sctx, gtk_widget_get_window(widget));
-	gtk_style_context_set_background(sctx, form->bin_window);
+	gtk_style_context_ਜੋੜੋ_class(sctx, "gtk-form");
+	gtk_style_context_ਸੈੱਟ_state(sctx, GTK_STATE_FLAG_ਸਾਧਾਰਨ);
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,18,0)
+	gtk_style_context_ਸੈੱਟ_background(sctx, gtk_widget_get_ਖਿੜਕੀ(widget));
+	gtk_style_context_ਸੈੱਟ_background(sctx, form->bin_ਖਿੜਕੀ);
 # endif
     }
-#else
-    widget->style = gtk_style_attach(widget->style, widget->window);
-    gtk_style_set_background(widget->style, widget->window, GTK_STATE_NORMAL);
-    gtk_style_set_background(widget->style, form->bin_window, GTK_STATE_NORMAL);
-#endif
+#ਨਹੀਂਤਾਂ
+    widget->style = gtk_style_attach(widget->style, widget->ਖਿੜਕੀ_2);
+    gtk_style_ਸੈੱਟ_background(widget->style, widget->ਖਿੜਕੀ_2, GTK_STATE_ਸਾਧਾਰਨ);
+    gtk_style_ਸੈੱਟ_background(widget->style, form->bin_ਖਿੜਕੀ, GTK_STATE_ਸਾਧਾਰਨ);
+#ਜੇ_ਅੰਤ
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
 
-	form_attach_child_window(form, child);
+	form_attach_ਬੱਚਾ_ਖਿੜਕੀ(form, ਬੱਚਾ);
 
-	if (gtk_widget_get_visible(child->widget))
-	    form_realize_child(form, child);
+	ਜੇ (gtk_widget_get_visible(ਬੱਚਾ->widget))
+	    form_realize_ਬੱਚਾ(form, ਬੱਚਾ);
     }
 }
 
@@ -361,7 +361,7 @@ form_realize(GtkWidget *widget)
 //
 // Well, I reckon at least the gdk_window_show(form->bin_window)
 // is necessary.  GtkForm is anything but a usual container widget.
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_map(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -371,22 +371,22 @@ form_map(GtkWidget *widget)
 
     form = GTK_FORM(widget);
 
-    gtk_widget_set_mapped(widget, TRUE);
+    gtk_widget_ਸੈੱਟ_mapped(widget, TRUE);
 
-    gdk_window_show(gtk_widget_get_window(widget));
-    gdk_window_show(form->bin_window);
+    gdk_ਖਿੜਕੀ_show(gtk_widget_get_ਖਿੜਕੀ(widget));
+    gdk_ਖਿੜਕੀ_show(form->bin_ਖਿੜਕੀ);
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
 
-	if (gtk_widget_get_visible(child->widget)
-		&& !gtk_widget_get_mapped(child->widget))
-	    gtk_widget_map(child->widget);
+	ਜੇ (gtk_widget_get_visible(ਬੱਚਾ->widget)
+		&& !gtk_widget_get_mapped(ਬੱਚਾ->widget))
+	    gtk_widget_map(ਬੱਚਾ->widget);
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_unrealize(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -398,155 +398,155 @@ form_unrealize(GtkWidget *widget)
 
     tmp_list = form->children;
 
-    gdk_window_set_user_data(form->bin_window, NULL);
-    gdk_window_destroy(form->bin_window);
-    form->bin_window = NULL;
+    gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(form->bin_ਖਿੜਕੀ, ਨਿਰਾ);
+    gdk_ਖਿੜਕੀ_destroy(form->bin_ਖਿੜਕੀ);
+    form->bin_ਖਿੜਕੀ = ਨਿਰਾ;
 
-    while (tmp_list)
+    ਜਦੋਂ (tmp_list)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
 
-	if (child->window != NULL)
+	ਜੇ (ਬੱਚਾ->ਖਿੜਕੀ_2 != ਨਿਰਾ)
 	{
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_map),
-		    child);
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_unmap),
-		    child);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(ਬੱਚਾ->widget),
+		    FUNC2GENERIC(form_ਬੱਚਾ_map),
+		    ਬੱਚਾ);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(ਬੱਚਾ->widget),
+		    FUNC2GENERIC(form_ਬੱਚਾ_unmap),
+		    ਬੱਚਾ);
 
-	    gdk_window_set_user_data(child->window, NULL);
-	    gdk_window_destroy(child->window);
+	    gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(ਬੱਚਾ->ਖਿੜਕੀ_2, ਨਿਰਾ);
+	    gdk_ਖਿੜਕੀ_destroy(ਬੱਚਾ->ਖਿੜਕੀ_2);
 
-	    child->window = NULL;
+	    ਬੱਚਾ->ਖਿੜਕੀ_2 = ਨਿਰਾ;
 	}
 
-	tmp_list = tmp_list->next;
+	tmp_list = tmp_list->ਅਗਲਾ;
     }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize) (widget);
-#else
-    if (GTK_WIDGET_CLASS (parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
-#endif
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਜੇ (GTK_WIDGET_CLASS (gui_gtk_form_ਮਾਪਾ_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (gui_gtk_form_ਮਾਪਾ_class)->unrealize) (widget);
+#ਨਹੀਂਤਾਂ
+    ਜੇ (GTK_WIDGET_CLASS (ਮਾਪਾ_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (ਮਾਪਾ_class)->unrealize) (widget);
+#ਜੇ_ਅੰਤ
 }
 
-    static void
-form_size_request(GtkWidget *widget, GtkRequisition *requisition)
+    ਸਥਿਰ ਖਾਲੀ
+form_ਮਾਪ_request(GtkWidget *widget, GtkRequisition *requisition)
 {
     g_return_if_fail(GTK_IS_FORM(widget));
-    g_return_if_fail(requisition != NULL);
+    g_return_if_fail(requisition != ਨਿਰਾ);
 
-    requisition->width = 1;
-    requisition->height = 1;
+    requisition->ਚੌੜਾਈ = 1;
+    requisition->ਉਚਾਈ = 1;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-form_get_preferred_width(GtkWidget *widget,
-			     gint      *minimal_width,
-			     gint      *natural_width)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਸਥਿਰ ਖਾਲੀ
+form_get_preferred_ਚੌੜਾਈ(GtkWidget *widget,
+			     gint      *ਨਿਊਨਤਮ_ਚੌੜਾਈ,
+			     gint      *natural_ਚੌੜਾਈ)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_ਮਾਪ_request(widget, &requisition);
 
-    *minimal_width = requisition.width;
-    *natural_width = requisition.width;
+    *ਨਿਊਨਤਮ_ਚੌੜਾਈ = requisition.ਚੌੜਾਈ;
+    *natural_ਚੌੜਾਈ = requisition.ਚੌੜਾਈ;
 }
 
-    static void
-form_get_preferred_height(GtkWidget *widget,
-			      gint	*minimal_height,
-			      gint	*natural_height)
+    ਸਥਿਰ ਖਾਲੀ
+form_get_preferred_ਉਚਾਈ(GtkWidget *widget,
+			      gint	*ਨਿਊਨਤਮ_ਉਚਾਈ,
+			      gint	*natural_ਉਚਾਈ)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_ਮਾਪ_request(widget, &requisition);
 
-    *minimal_height = requisition.height;
-    *natural_height = requisition.height;
+    *ਨਿਊਨਤਮ_ਉਚਾਈ = requisition.ਉਚਾਈ;
+    *natural_ਉਚਾਈ = requisition.ਉਚਾਈ;
 }
-#endif // GTK_CHECK_VERSION(3,0,0)
+#ਜੇ_ਅੰਤ // GTK_CHECK_VERSION(3,0,0)
 
-    static void
-form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+    ਸਥਿਰ ਖਾਲੀ
+form_ਮਾਪ_allocate(GtkWidget *widget, Gtk_ਵੰਡ *ਵੰਡ)
 {
     GList *tmp_list;
     GtkForm *form;
     gboolean need_reposition;
-    GtkAllocation cur_alloc;
+    Gtk_ਵੰਡ cur_alloc;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
-    gtk_widget_get_allocation(widget, &cur_alloc);
+    gtk_widget_get_ਵੰਡ(widget, &cur_alloc);
 
-    if (cur_alloc.x == allocation->x
-	    && cur_alloc.y == allocation->y
-	    && cur_alloc.width == allocation->width
-	    && cur_alloc.height == allocation->height)
-	return;
+    ਜੇ (cur_alloc.x == ਵੰਡ->x
+	    && cur_alloc.y == ਵੰਡ->y
+	    && cur_alloc.ਚੌੜਾਈ == ਵੰਡ->ਚੌੜਾਈ
+	    && cur_alloc.ਉਚਾਈ == ਵੰਡ->ਉਚਾਈ)
+	ਵਾਪਸ;
 
-    need_reposition = cur_alloc.width != allocation->width
-		   || cur_alloc.height != allocation->height;
+    need_reposition = cur_alloc.ਚੌੜਾਈ != ਵੰਡ->ਚੌੜਾਈ
+		   || cur_alloc.ਉਚਾਈ != ਵੰਡ->ਉਚਾਈ;
     form = GTK_FORM(widget);
 
-    if (need_reposition)
+    ਜੇ (need_reposition)
     {
 	tmp_list = form->children;
 
-	while (tmp_list)
+	ਜਦੋਂ (tmp_list)
 	{
-	    GtkFormChild *child = tmp_list->data;
-	    form_position_child(form, child, TRUE);
+	    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
+	    form_position_ਬੱਚਾ(form, ਬੱਚਾ, TRUE);
 
-	    tmp_list = tmp_list->next;
+	    tmp_list = tmp_list->ਅਗਲਾ;
 	}
     }
 
-    if (gtk_widget_get_realized(widget))
+    ਜੇ (gtk_widget_get_realized(widget))
     {
-	gdk_window_move_resize(gtk_widget_get_window(widget),
-			       allocation->x, allocation->y,
-			       allocation->width, allocation->height);
-	gdk_window_move_resize(GTK_FORM(widget)->bin_window,
+	gdk_ਖਿੜਕੀ_move_resize(gtk_widget_get_ਖਿੜਕੀ(widget),
+			       ਵੰਡ->x, ਵੰਡ->y,
+			       ਵੰਡ->ਚੌੜਾਈ, ਵੰਡ->ਉਚਾਈ);
+	gdk_ਖਿੜਕੀ_move_resize(GTK_FORM(widget)->bin_ਖਿੜਕੀ,
 			       0, 0,
-			       allocation->width, allocation->height);
+			       ਵੰਡ->ਚੌੜਾਈ, ਵੰਡ->ਉਚਾਈ);
     }
-    gtk_widget_set_allocation(widget, allocation);
-    if (need_reposition)
+    gtk_widget_ਸੈੱਟ_ਵੰਡ(widget, ਵੰਡ);
+    ਜੇ (need_reposition)
 	form_send_configure(form);
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਸਥਿਰ ਖਾਲੀ
 gtk_form_render_background(GtkWidget *widget, cairo_t *cr)
 {
     gtk_render_background(gtk_widget_get_style_context(widget), cr,
 			  0, 0,
-			  gtk_widget_get_allocated_width(widget),
-			  gtk_widget_get_allocated_height(widget));
+			  gtk_widget_get_allocated_ਚੌੜਾਈ(widget),
+			  gtk_widget_get_allocated_ਉਚਾਈ(widget));
 }
 
-    static gboolean
+    ਸਥਿਰ gboolean
 form_draw(GtkWidget *widget, cairo_t *cr)
 {
-    GList   *tmp_list = NULL;
-    GtkForm *form     = NULL;
+    GList   *tmp_list = ਨਿਰਾ;
+    GtkForm *form     = ਨਿਰਾ;
 
     g_return_val_if_fail(GTK_IS_FORM(widget), FALSE);
 
     gtk_form_render_background(widget, cr);
 
     form = GTK_FORM(widget);
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
     {
-	GtkFormChild * const formchild = tmp_list->data;
+	Gtk_Form_ਬੱਚਾ_2 * ਅਚਲ formchild = tmp_list->ਅੰਕੜੇ;
 
-	if (!gtk_widget_get_has_window(formchild->widget) &&
-		gtk_cairo_should_draw_window(cr, formchild->window))
+	ਜੇ (!gtk_widget_get_has_ਖਿੜਕੀ(formchild->widget) &&
+		gtk_cairo_should_draw_ਖਿੜਕੀ(cr, formchild->ਖਿੜਕੀ_2))
 	{
 	    // To get gtk_widget_draw() to work, it is required to call
 	    // gtk_widget_size_allocate() in advance with a well-posed
@@ -558,16 +558,16 @@ form_draw(GtkWidget *widget, cairo_t *cr)
 	    //
 	    // Calling form_position_child() like this is one of ways
 	    // to make sure of that.
-	    form_position_child(form, formchild, TRUE);
+	    form_position_ਬੱਚਾ(form, formchild, TRUE);
 
 	    gtk_form_render_background(formchild->widget, cr);
 	}
     }
 
-    return GTK_WIDGET_CLASS(gui_gtk_form_parent_class)->draw(widget, cr);
+    ਵਾਪਸ GTK_WIDGET_CLASS(gui_gtk_form_ਮਾਪਾ_class)->draw(widget, cr);
 }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    static gint
+#ਨਹੀਂਤਾਂ // !GTK_CHECK_VERSION(3,0,0)
+    ਸਥਿਰ gint
 form_expose(GtkWidget *widget, GdkEventExpose *event)
 {
     GList   *tmp_list;
@@ -577,310 +577,310 @@ form_expose(GtkWidget *widget, GdkEventExpose *event)
 
     form = GTK_FORM(widget);
 
-    if (event->window == form->bin_window)
-	return FALSE;
+    ਜੇ (event->ਖਿੜਕੀ_2 == form->bin_ਖਿੜਕੀ)
+	ਵਾਪਸ FALSE;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
 	gtk_container_propagate_expose(GTK_CONTAINER(widget),
-		GTK_WIDGET(((GtkFormChild *)tmp_list->data)->widget),
+		GTK_WIDGET(((Gtk_Form_ਬੱਚਾ_2 *)tmp_list->ਅੰਕੜੇ)->widget),
 		event);
 
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#ਜੇ_ਅੰਤ // !GTK_CHECK_VERSION(3,0,0)
 
 // Container method
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_remove(GtkContainer *container, GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GtkFormChild *child = NULL;	    // init for gcc
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ = ਨਿਰਾ;	    // init for gcc
 
     g_return_if_fail(GTK_IS_FORM(container));
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    ਜਦੋਂ (tmp_list)
     {
-	child = tmp_list->data;
-	if (child->widget == widget)
-	    break;
-	tmp_list = tmp_list->next;
+	ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
+	ਜੇ (ਬੱਚਾ->widget == widget)
+	    ਰੋਕੋ;
+	tmp_list = tmp_list->ਅਗਲਾ;
     }
 
-    if (tmp_list == NULL)
-	return;
+    ਜੇ (tmp_list == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    const gboolean was_visible = gtk_widget_get_visible(widget);
-#endif
-    if (child->window)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਅਚਲ gboolean was_visible = gtk_widget_get_visible(widget);
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਬੱਚਾ->ਖਿੜਕੀ_2)
     {
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_map), child);
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_unmap), child);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(ਬੱਚਾ->widget),
+		FUNC2GENERIC(&form_ਬੱਚਾ_map), ਬੱਚਾ);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(ਬੱਚਾ->widget),
+		FUNC2GENERIC(&form_ਬੱਚਾ_unmap), ਬੱਚਾ);
 
 	// FIXME: This will cause problems for reparenting NO_WINDOW
 	// widgets out of a GtkForm
-	gdk_window_set_user_data(child->window, NULL);
-	gdk_window_destroy(child->window);
+	gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(ਬੱਚਾ->ਖਿੜਕੀ_2, ਨਿਰਾ);
+	gdk_ਖਿੜਕੀ_destroy(ਬੱਚਾ->ਖਿੜਕੀ_2);
     }
     gtk_widget_unparent(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    if (was_visible)
-	gtk_widget_queue_resize(GTK_WIDGET(container));
-#endif
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਜੇ (was_visible)
+	gtk_widget_ਕਤਾਰ_resize(GTK_WIDGET(container));
+#ਜੇ_ਅੰਤ
     form->children = g_list_remove_link(form->children, tmp_list);
     g_list_free_1(tmp_list);
-    g_free(child);
+    g_free(ਬੱਚਾ);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_forall(GtkContainer	*container,
-		gboolean	include_internals UNUSED,
+		gboolean	include_internals ਅਣਵਰਤਿਆ,
 		GtkCallback	callback,
-		gpointer	callback_data)
+		gpointer	callback_ਅੰਕੜੇ)
 {
     GtkForm *form;
-    GtkFormChild *child;
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ;
     GList *tmp_list;
 
     g_return_if_fail(GTK_IS_FORM(container));
-    g_return_if_fail(callback != NULL);
+    g_return_if_fail(callback != ਨਿਰਾ);
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    ਜਦੋਂ (tmp_list)
     {
-	child = tmp_list->data;
-	tmp_list = tmp_list->next;
+	ਬੱਚਾ = tmp_list->ਅੰਕੜੇ;
+	tmp_list = tmp_list->ਅਗਲਾ;
 
-	(*callback) (child->widget, callback_data);
+	(*callback) (ਬੱਚਾ->widget, callback_ਅੰਕੜੇ);
     }
 }
 
 // Operations on children
 
-    static void
-form_attach_child_window(GtkForm *form, GtkFormChild *child)
+    ਸਥਿਰ ਖਾਲੀ
+form_attach_ਬੱਚਾ_ਖਿੜਕੀ(GtkForm *form, Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ)
 {
-    if (child->window != NULL)
-	return; // been there, done that
+    ਜੇ (ਬੱਚਾ->ਖਿੜਕੀ_2 != ਨਿਰਾ)
+	ਵਾਪਸ; // been there, done that
 
-    if (!gtk_widget_get_has_window(child->widget))
+    ਜੇ (!gtk_widget_get_has_ਖਿੜਕੀ(ਬੱਚਾ->widget))
     {
 	GtkWidget	*widget;
-	GdkWindowAttr	attributes;
-	gint		attributes_mask;
+	Gdk_ਖਿੜਕੀ_Attr	ਗੁਣ;
+	gint		ਗੁਣ_ਨਕਾਬ;
 	GtkRequisition	requisition;
 
 	widget = GTK_WIDGET(form);
 
-#if GTK_CHECK_VERSION(3,0,0)
-	gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	requisition = child->widget->requisition;
-#endif
-	attributes.window_type = GDK_WINDOW_CHILD;
-	attributes.x = child->x;
-	attributes.y = child->y;
-	attributes.width = requisition.width;
-	attributes.height = requisition.height;
-	attributes.wclass = GDK_INPUT_OUTPUT;
-	attributes.visual = gtk_widget_get_visual(widget);
-#if !GTK_CHECK_VERSION(3,0,0)
-	attributes.colormap = gtk_widget_get_colormap(widget);
-#endif
-	attributes.event_mask = GDK_EXPOSURE_MASK;
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	gtk_widget_get_preferred_ਮਾਪ(ਬੱਚਾ->widget, &requisition, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
+	requisition = ਬੱਚਾ->widget->requisition;
+#ਜੇ_ਅੰਤ
+	ਗੁਣ.ਖਿੜਕੀ_type = GDK_ਖਿੜਕੀ_ਬੱਚਾ;
+	ਗੁਣ.x = ਬੱਚਾ->x;
+	ਗੁਣ.y = ਬੱਚਾ->y;
+	ਗੁਣ.ਚੌੜਾਈ = requisition.ਚੌੜਾਈ;
+	ਗੁਣ.ਉਚਾਈ = requisition.ਉਚਾਈ;
+	ਗੁਣ.wclass = GDK_ਨਿਵੇਸ਼_OUTPUT;
+	ਗੁਣ.visual = gtk_widget_get_visual(widget);
+#ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	ਗੁਣ.colormap = gtk_widget_get_colormap(widget);
+#ਜੇ_ਅੰਤ
+	ਗੁਣ.event_ਨਕਾਬ = GDK_EXPOSURE_ਨਕਾਬ;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
-	child->window = gdk_window_new(form->bin_window,
-				       &attributes, attributes_mask);
-	gdk_window_set_user_data(child->window, widget);
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	ਗੁਣ_ਨਕਾਬ = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#ਨਹੀਂਤਾਂ
+	ਗੁਣ_ਨਕਾਬ = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#ਜੇ_ਅੰਤ
+	ਬੱਚਾ->ਖਿੜਕੀ_2 = gdk_ਖਿੜਕੀ_new(form->bin_ਖਿੜਕੀ,
+				       &ਗੁਣ, ਗੁਣ_ਨਕਾਬ);
+	gdk_ਖਿੜਕੀ_ਸੈੱਟ_user_ਅੰਕੜੇ(ਬੱਚਾ->ਖਿੜਕੀ_2, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	{
-	    GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	    GtkStyleContext * ਅਚਲ sctx = gtk_widget_get_style_context(widget);
 
-	    gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	    gtk_style_context_set_background(sctx, child->window);
+	    gtk_style_context_ਸੈੱਟ_state(sctx, GTK_STATE_FLAG_ਸਾਧਾਰਨ);
+# ਜੇ !GTK_CHECK_ਸੰਸਕਰਣ(3,18,0)
+	    gtk_style_context_ਸੈੱਟ_background(sctx, ਬੱਚਾ->ਖਿੜਕੀ_2);
 # endif
 	}
-#else
-	gtk_style_set_background(widget->style,
-				 child->window,
-				 GTK_STATE_NORMAL);
-#endif
+#ਨਹੀਂਤਾਂ
+	gtk_style_ਸੈੱਟ_background(widget->style,
+				 ਬੱਚਾ->ਖਿੜਕੀ_2,
+				 GTK_STATE_ਸਾਧਾਰਨ);
+#ਜੇ_ਅੰਤ
 
-	gtk_widget_set_parent_window(child->widget, child->window);
+	gtk_widget_ਸੈੱਟ_ਮਾਪਾ_ਖਿੜਕੀ(ਬੱਚਾ->widget, ਬੱਚਾ->ਖਿੜਕੀ_2);
 	/*
 	 * Install signal handlers to map/unmap child->window
 	 * alongside with the actual widget.
 	 */
-	g_signal_connect(G_OBJECT(child->widget), "map",
-			 G_CALLBACK(&form_child_map), child);
-	g_signal_connect(G_OBJECT(child->widget), "unmap",
-			 G_CALLBACK(&form_child_unmap), child);
+	g_signal_connect(G_OBJECT(ਬੱਚਾ->widget), "map",
+			 G_CALLBACK(&form_ਬੱਚਾ_map), ਬੱਚਾ);
+	g_signal_connect(G_OBJECT(ਬੱਚਾ->widget), "unmap",
+			 G_CALLBACK(&form_ਬੱਚਾ_unmap), ਬੱਚਾ);
     }
-    else if (!gtk_widget_get_realized(child->widget))
+    ਨਹੀਂਤਾਂ ਜੇ (!gtk_widget_get_realized(ਬੱਚਾ->widget))
     {
-	gtk_widget_set_parent_window(child->widget, form->bin_window);
+	gtk_widget_ਸੈੱਟ_ਮਾਪਾ_ਖਿੜਕੀ(ਬੱਚਾ->widget, form->bin_ਖਿੜਕੀ);
     }
 }
 
-    static void
-form_realize_child(GtkForm *form, GtkFormChild *child)
+    ਸਥਿਰ ਖਾਲੀ
+form_realize_ਬੱਚਾ(GtkForm *form, Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ)
 {
-    form_attach_child_window(form, child);
-    gtk_widget_realize(child->widget);
+    form_attach_ਬੱਚਾ_ਖਿੜਕੀ(form, ਬੱਚਾ);
+    gtk_widget_realize(ਬੱਚਾ->widget);
 }
 
-    static void
-form_position_child(
+    ਸਥਿਰ ਖਾਲੀ
+form_position_ਬੱਚਾ(
     GtkForm		*form,
-    GtkFormChild	*child,
+    Gtk_Form_ਬੱਚਾ_2	*ਬੱਚਾ,
     gboolean		force_allocate)
 {
     gint x;
     gint y;
 
-    x = child->x;
-    y = child->y;
+    x = ਬੱਚਾ->x;
+    y = ਬੱਚਾ->y;
 
-    if ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
+    ਜੇ ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
 	(y >= G_MINSHORT) && (y <= G_MAXSHORT))
     {
-	if (!child->mapped)
+	ਜੇ (!ਬੱਚਾ->mapped)
 	{
-	    if (gtk_widget_get_mapped(GTK_WIDGET(form))
-		    && gtk_widget_get_visible(child->widget))
+	    ਜੇ (gtk_widget_get_mapped(GTK_WIDGET(form))
+		    && gtk_widget_get_visible(ਬੱਚਾ->widget))
 	    {
-		if (!gtk_widget_get_mapped(child->widget))
-		    gtk_widget_map(child->widget);
+		ਜੇ (!gtk_widget_get_mapped(ਬੱਚਾ->widget))
+		    gtk_widget_map(ਬੱਚਾ->widget);
 
-		child->mapped = TRUE;
+		ਬੱਚਾ->mapped = TRUE;
 		force_allocate = TRUE;
 	    }
 	}
 
-	if (force_allocate)
+	ਜੇ (force_allocate)
 	{
-	    GtkAllocation allocation;
+	    Gtk_ਵੰਡ ਵੰਡ;
 	    GtkRequisition requisition;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	    requisition = child->widget->requisition;
-#endif
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	    gtk_widget_get_preferred_ਮਾਪ(ਬੱਚਾ->widget, &requisition, ਨਿਰਾ);
+#ਨਹੀਂਤਾਂ
+	    requisition = ਬੱਚਾ->widget->requisition;
+#ਜੇ_ਅੰਤ
 
-	    if (!gtk_widget_get_has_window(child->widget))
+	    ਜੇ (!gtk_widget_get_has_ਖਿੜਕੀ(ਬੱਚਾ->widget))
 	    {
-		if (child->window)
+		ਜੇ (ਬੱਚਾ->ਖਿੜਕੀ_2)
 		{
-		    gdk_window_move_resize(child->window,
+		    gdk_ਖਿੜਕੀ_move_resize(ਬੱਚਾ->ਖਿੜਕੀ_2,
 			    x, y,
-			    requisition.width,
-			    requisition.height);
+			    requisition.ਚੌੜਾਈ,
+			    requisition.ਉਚਾਈ);
 		}
 
-		allocation.x = 0;
-		allocation.y = 0;
+		ਵੰਡ.x = 0;
+		ਵੰਡ.y = 0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		allocation.x = x;
-		allocation.y = y;
+		ਵੰਡ.x = x;
+		ਵੰਡ.y = y;
 	    }
 
-	    allocation.width = requisition.width;
-	    allocation.height = requisition.height;
+	    ਵੰਡ.ਚੌੜਾਈ = requisition.ਚੌੜਾਈ;
+	    ਵੰਡ.ਉਚਾਈ = requisition.ਉਚਾਈ;
 
-	    gtk_widget_size_allocate(child->widget, &allocation);
+	    gtk_widget_ਮਾਪ_allocate(ਬੱਚਾ->widget, &ਵੰਡ);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (child->mapped)
+	ਜੇ (ਬੱਚਾ->mapped)
 	{
-	    child->mapped = FALSE;
+	    ਬੱਚਾ->mapped = FALSE;
 
-	    if (gtk_widget_get_mapped(child->widget))
-		gtk_widget_unmap(child->widget);
+	    ਜੇ (gtk_widget_get_mapped(ਬੱਚਾ->widget))
+		gtk_widget_unmap(ਬੱਚਾ->widget);
 	}
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_position_children(GtkForm *form)
 {
     GList *tmp_list;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
-	form_position_child(form, tmp_list->data, FALSE);
+    ਲਈ (tmp_list = form->children; tmp_list; tmp_list = tmp_list->ਅਗਲਾ)
+	form_position_ਬੱਚਾ(form, tmp_list->ਅੰਕੜੇ, FALSE);
 }
 
-    void
+    ਖਾਲੀ
 gui_gtk_form_move_resize(GtkForm *form, GtkWidget *widget,
 		     gint x, gint y, gint w, gint h)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(widget, w, h);
-#else
-    widget->requisition.width  = w;
-    widget->requisition.height = h;
-#endif
+#ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    gtk_widget_ਸੈੱਟ_ਮਾਪ_request(widget, w, h);
+#ਨਹੀਂਤਾਂ
+    widget->requisition.ਚੌੜਾਈ  = w;
+    widget->requisition.ਉਚਾਈ = h;
+#ਜੇ_ਅੰਤ
 
     gui_gtk_form_move(form, widget, x, y);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 form_send_configure(GtkForm *form)
 {
     GtkWidget *widget;
     GdkEventConfigure event;
-    GtkAllocation allocation;
+    Gtk_ਵੰਡ ਵੰਡ;
 
     widget = GTK_WIDGET(form);
 
-    gtk_widget_get_allocation(widget, &allocation);
+    gtk_widget_get_ਵੰਡ(widget, &ਵੰਡ);
     event.type = GDK_CONFIGURE;
-    event.window = gtk_widget_get_window(widget);
-    event.x = allocation.x;
-    event.y = allocation.y;
-    event.width = allocation.width;
-    event.height = allocation.height;
+    event.ਖਿੜਕੀ_2 = gtk_widget_get_ਖਿੜਕੀ(widget);
+    event.x = ਵੰਡ.x;
+    event.y = ਵੰਡ.y;
+    event.ਚੌੜਾਈ = ਵੰਡ.ਚੌੜਾਈ;
+    event.ਉਚਾਈ = ਵੰਡ.ਉਚਾਈ;
 
     gtk_main_do_event((GdkEvent*)&event);
 }
 
-    static void
-form_child_map(GtkWidget *widget UNUSED, gpointer user_data)
+    ਸਥਿਰ ਖਾਲੀ
+form_ਬੱਚਾ_map(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer user_ਅੰਕੜੇ)
 {
-    GtkFormChild *child;
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ;
 
-    child = (GtkFormChild *)user_data;
+    ਬੱਚਾ = (Gtk_Form_ਬੱਚਾ_2 *)user_ਅੰਕੜੇ;
 
-    child->mapped = TRUE;
-    gdk_window_show(child->window);
+    ਬੱਚਾ->mapped = TRUE;
+    gdk_ਖਿੜਕੀ_show(ਬੱਚਾ->ਖਿੜਕੀ_2);
 }
 
-    static void
-form_child_unmap(GtkWidget *widget UNUSED, gpointer user_data)
+    ਸਥਿਰ ਖਾਲੀ
+form_ਬੱਚਾ_unmap(GtkWidget *widget ਅਣਵਰਤਿਆ, gpointer user_ਅੰਕੜੇ)
 {
-    GtkFormChild *child;
+    Gtk_Form_ਬੱਚਾ_2 *ਬੱਚਾ;
 
-    child = (GtkFormChild *)user_data;
+    ਬੱਚਾ = (Gtk_Form_ਬੱਚਾ_2 *)user_ਅੰਕੜੇ;
 
-    child->mapped = FALSE;
-    gdk_window_hide(child->window);
+    ਬੱਚਾ->mapped = FALSE;
+    gdk_ਖਿੜਕੀ_hide(ਬੱਚਾ->ਖਿੜਕੀ_2);
 }

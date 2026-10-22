@@ -20,15 +20,15 @@
  *
  */
 
-#if !defined(XPREPARE_H)
-#define XPREPARE_H
+#ਜੇ !defined(XPREPARE_H)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XPREPARE_H
 
 
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ਪੂਰਨ xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ਅਚਲ *xpp,
 		    xdfenv_t *xe);
-void xdl_free_env(xdfenv_t *xe);
+ਖਾਲੀ xdl_free_env(xdfenv_t *xe);
 
 
 
-#endif /* #if !defined(XPREPARE_H) */
+#ਜੇ_ਅੰਤ /* #if !defined(XPREPARE_H) */

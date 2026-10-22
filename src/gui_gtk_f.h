@@ -6,75 +6,75 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifndef __GTK_FORM_H__
-#define __GTK_FORM_H__
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ __GTK_FORM_H__
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __GTK_FORM_H__
 
-#ifdef USE_GTK3
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_GTK3
 # include <gtk/gtk.h>
-#else
+#ਨਹੀਂਤਾਂ
 # include <gdk/gdk.h>
 # include <gtk/gtkcontainer.h>
-#endif
+#ਜੇ_ਅੰਤ
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
+ਬਾਹਰੀ "C" {
+#ਜੇ_ਅੰਤ
 
-#define GTK_TYPE_FORM		       (gui_gtk_form_get_type ())
-#ifdef USE_GTK3
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GTK_TYPE_FORM		       (gui_gtk_form_get_type ())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_GTK3
 # define GTK_FORM(obj)		       (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_FORM, GtkForm))
 # define GTK_FORM_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_FORM))
 # define GTK_IS_FORM_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE((klass), GTK_TYPE_FORM))
-#else
+#ਨਹੀਂਤਾਂ
 # define GTK_FORM(obj)		       (GTK_CHECK_CAST ((obj), GTK_TYPE_FORM, GtkForm))
 # define GTK_FORM_CLASS(klass)	       (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (GTK_CHECK_TYPE ((obj), GTK_TYPE_FORM))
 # define GTK_IS_FORM_CLASS(klass)       (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_FORM))
-#endif
+#ਜੇ_ਅੰਤ
 
 
-typedef struct _GtkForm GtkForm;
-typedef struct _GtkFormClass GtkFormClass;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ _GtkForm GtkForm;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ _GtkFormClass GtkFormClass;
 
-struct _GtkForm
+ਬਣਤਰ _GtkForm
 {
     GtkContainer container;
 
     GList *children;
-    GdkWindow *bin_window;
-    gint freeze_count;
+    Gdk_ਖਿੜਕੀ *bin_ਖਿੜਕੀ;
+    gint freeze_ਗਿਣਤੀ;
 };
 
-struct _GtkFormClass
+ਬਣਤਰ _GtkFormClass
 {
-    GtkContainerClass parent_class;
+    GtkContainerClass ਮਾਪਾ_class;
 };
 
-#ifdef USE_GTK3
-GType gui_gtk_form_get_type(void);
-#else
-GtkType gui_gtk_form_get_type(void);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_GTK3
+GType gui_gtk_form_get_type(ਖਾਲੀ);
+#ਨਹੀਂਤਾਂ
+GtkType gui_gtk_form_get_type(ਖਾਲੀ);
+#ਜੇ_ਅੰਤ
 
-GtkWidget *gui_gtk_form_new(void);
+GtkWidget *gui_gtk_form_new(ਖਾਲੀ);
 
-void gui_gtk_form_put(GtkForm * form, GtkWidget * widget, gint x, gint y);
+ਖਾਲੀ gui_gtk_form_put(GtkForm * form, GtkWidget * widget, gint x, gint y);
 
-void gui_gtk_form_move(GtkForm *form, GtkWidget * widget, gint x, gint y);
+ਖਾਲੀ gui_gtk_form_move(GtkForm *form, GtkWidget * widget, gint x, gint y);
 
-void gui_gtk_form_move_resize(GtkForm * form, GtkWidget * widget, gint x, gint y, gint w, gint h);
+ਖਾਲੀ gui_gtk_form_move_resize(GtkForm * form, GtkWidget * widget, gint x, gint y, gint w, gint h);
 
 // These disable and enable moving and repainting respectively.  If you
 // want to update the layout's offsets but do not want it to repaint
 // itself, you should use these functions.
 
-void gui_gtk_form_freeze(GtkForm *form);
-void gui_gtk_form_thaw(GtkForm *form);
+ਖਾਲੀ gui_gtk_form_freeze(GtkForm *form);
+ਖਾਲੀ gui_gtk_form_thaw(GtkForm *form);
 
 
-#ifdef __cplusplus
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __cplusplus
 }
-#endif
-#endif	// __GTK_FORM_H__
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ	// __GTK_FORM_H__

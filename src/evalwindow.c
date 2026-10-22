@@ -11,80 +11,80 @@
  * evalwindow.c: Window related builtin functions
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 win_getid(typval_T *argvars)
 {
-    int	    winnr;
+    ਪੂਰਨ	    winnr;
     win_T   *wp;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
-	return curwin->w_id;
-    winnr = tv_get_number(&argvars[0]);
-    if (winnr <= 0)
-	return 0;
+    ਜੇ (argvars[0].v_type == VAR_UNKNOWN)
+	ਵਾਪਸ curwin->w_id;
+    winnr = tv_get_ਸੰਖਿਆ(&argvars[0]);
+    ਜੇ (winnr <= 0)
+	ਵਾਪਸ 0;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	tabpage_T	*tp;
-	int		tabnr = tv_get_number(&argvars[1]);
+	ਪੂਰਨ		tabnr = tv_get_ਸੰਖਿਆ(&argvars[1]);
 
 	FOR_ALL_TABPAGES(tp)
-	    if (--tabnr == 0)
-		break;
-	if (tp == NULL)
-	    return -1;
-	if (tp == curtab)
+	    ਜੇ (--tabnr == 0)
+		ਰੋਕੋ;
+	ਜੇ (tp == ਨਿਰਾ)
+	    ਵਾਪਸ -1;
+	ਜੇ (tp == curtab)
 	    wp = firstwin;
-	else
+	ਨਹੀਂਤਾਂ
 	    wp = tp->tp_firstwin;
     }
-    for ( ; wp != NULL; wp = wp->w_next)
-	if (--winnr == 0)
-	    return wp->w_id;
-    return 0;
+    ਲਈ ( ; wp != ਨਿਰਾ; wp = wp->w_ਅਗਲਾ)
+	ਜੇ (--winnr == 0)
+	    ਵਾਪਸ wp->w_id;
+    ਵਾਪਸ 0;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 win_id2tabwin(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		winnr = 1;
-    int		tabnr = 1;
-    int		id = tv_get_number(&argvars[0]);
+    ਪੂਰਨ		winnr = 1;
+    ਪੂਰਨ		tabnr = 1;
+    ਪੂਰਨ		id = tv_get_ਸੰਖਿਆ(&argvars[0]);
 
     FOR_ALL_TABPAGES(tp)
     {
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	FOR_ALL_WINDOWS_ਵਿੱਚ_TAB(tp, wp)
 	{
-	    if (wp->w_id == id)
+	    ਜੇ (wp->w_id == id)
 	    {
-		list_append_number(list, tabnr);
-		list_append_number(list, winnr);
-		return;
+		list_append_ਸੰਖਿਆ(list, tabnr);
+		list_append_ਸੰਖਿਆ(list, winnr);
+		ਵਾਪਸ;
 	    }
 	    ++winnr;
 	}
 	++tabnr;
 	winnr = 1;
     }
-    list_append_number(list, 0);
-    list_append_number(list, 0);
+    list_append_ਸੰਖਿਆ(list, 0);
+    list_append_ਸੰਖਿਆ(list, 0);
 }
 
 /*
  * Return the window pointer of window "id".
  */
     win_T *
-win_id2wp(int id)
+win_id2wp(ਪੂਰਨ id)
 {
-    return win_id2wp_tp(id, NULL);
+    ਵਾਪਸ win_id2wp_tp(id, ਨਿਰਾ);
 }
 
 /*
@@ -92,66 +92,66 @@ win_id2wp(int id)
  * Returns NULL when not found.
  */
     win_T *
-win_id2wp_tp(int id, tabpage_T **tpp)
+win_id2wp_tp(ਪੂਰਨ id, tabpage_T **tpp)
 {
     win_T	*wp;
     tabpage_T   *tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	ਜੇ (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    ਜੇ (tpp != ਨਿਰਾ)
 		*tpp = tp;
-	    return wp;
+	    ਵਾਪਸ wp;
 	}
 # ifdef FEAT_PROP_POPUP
     // popup windows are in separate lists
     FOR_ALL_TABPAGES(tp)
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	     if (wp->w_id == id)
+	FOR_ALL_POPUPWINS_ਵਿੱਚ_TAB(tp, wp)
+	     ਜੇ (wp->w_id == id)
 	     {
-		 if (tpp != NULL)
+		 ਜੇ (tpp != ਨਿਰਾ)
 		     *tpp = tp;
-		 return wp;
+		 ਵਾਪਸ wp;
 	     }
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
+	ਜੇ (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    ਜੇ (tpp != ਨਿਰਾ)
 		*tpp = curtab;  // any tabpage would do
-	    return wp;
+	    ਵਾਪਸ wp;
 	}
 # endif
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 win_id2win(typval_T *argvars)
 {
     win_T   *wp;
-    int	    nr = 1;
-    int	    id = tv_get_number(&argvars[0]);
+    ਪੂਰਨ	    nr = 1;
+    ਪੂਰਨ	    id = tv_get_ਸੰਖਿਆ(&argvars[0]);
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_id == id)
-	    return nr;
+	ਜੇ (wp->w_id == id)
+	    ਵਾਪਸ nr;
 	++nr;
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-    void
+    ਖਾਲੀ
 win_findbuf(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		bufnr = tv_get_number(&argvars[0]);
+    ਪੂਰਨ		bufnr = tv_get_ਸੰਖਿਆ(&argvars[0]);
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer->b_fnum == bufnr)
-		list_append_number(list, wp->w_id);
+	    ਜੇ (wp->w_ਬਫਰ->b_fnum == bufnr)
+		list_append_ਸੰਖਿਆ(list, wp->w_id);
 }
 
 /*
@@ -160,44 +160,44 @@ win_findbuf(typval_T *argvars, list_T *list)
  * Returns NULL if not found.
  */
     win_T *
-find_win_by_nr(
+ਲੱਭੋ_win_by_nr(
     typval_T	*vp,
     tabpage_T	*tp)	// NULL for current tab page
 {
     win_T	*wp;
-    int		nr = (int)tv_get_number_chk(vp, NULL);
+    ਪੂਰਨ		nr = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ_chk(vp, ਨਿਰਾ);
 
-    if (nr < 0)
-	return NULL;
-    if (nr == 0)
-	return curwin;
+    ਜੇ (nr < 0)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (nr == 0)
+	ਵਾਪਸ curwin;
 
-    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+    FOR_ALL_WINDOWS_ਵਿੱਚ_TAB(tp, wp)
     {
-	if (nr >= LOWEST_WIN_ID)
+	ਜੇ (nr >= ਸਭ_ਤੋਂ_ਨੀਵਾਂ_WIN_ID)
 	{
-	    if (wp->w_id == nr)
-		return wp;
+	    ਜੇ (wp->w_id == nr)
+		ਵਾਪਸ wp;
 	}
-	else if (--nr <= 0)
-	    break;
+	ਨਹੀਂਤਾਂ ਜੇ (--nr <= 0)
+	    ਰੋਕੋ;
     }
-    if (nr >= LOWEST_WIN_ID)
+    ਜੇ (nr >= ਸਭ_ਤੋਂ_ਨੀਵਾਂ_WIN_ID)
     {
 # ifdef FEAT_PROP_POPUP
 	// check tab-local popup windows
-	for (wp = (tp == NULL ? curtab : tp)->tp_first_popupwin;
-						   wp != NULL; wp = wp->w_next)
-	    if (wp->w_id == nr)
-		return wp;
+	ਲਈ (wp = (tp == ਨਿਰਾ ? curtab : tp)->tp_ਪਹਿਲਾ_popupwin;
+						   wp != ਨਿਰਾ; wp = wp->w_ਅਗਲਾ)
+	    ਜੇ (wp->w_id == nr)
+		ਵਾਪਸ wp;
 	// check global popup windows
 	FOR_ALL_POPUPWINS(wp)
-	    if (wp->w_id == nr)
-		return wp;
+	    ਜੇ (wp->w_id == nr)
+		ਵਾਪਸ wp;
 # endif
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    return wp;
+    ਵਾਪਸ wp;
 }
 
 /*
@@ -206,13 +206,13 @@ find_win_by_nr(
  * Returns NULL when not found.
  */
     win_T *
-find_win_by_nr_or_id(typval_T *vp)
+ਲੱਭੋ_win_by_nr_or_id(typval_T *vp)
 {
-    int	nr = (int)tv_get_number_chk(vp, NULL);
+    ਪੂਰਨ	nr = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ_chk(vp, ਨਿਰਾ);
 
-    if (nr >= LOWEST_WIN_ID)
-	return win_id2wp(tv_get_number(vp));
-    return find_win_by_nr(vp, NULL);
+    ਜੇ (nr >= ਸਭ_ਤੋਂ_ਨੀਵਾਂ_WIN_ID)
+	ਵਾਪਸ win_id2wp(tv_get_ਸੰਖਿਆ(vp));
+    ਵਾਪਸ ਲੱਭੋ_win_by_nr(vp, ਨਿਰਾ);
 }
 
 /*
@@ -220,104 +220,104 @@ find_win_by_nr_or_id(typval_T *vp)
  * Returns the tab page in 'ptp'
  */
     win_T *
-find_tabwin(
+ਲੱਭੋ_tabwin(
     typval_T	*wvp,	// VAR_UNKNOWN for current window
     typval_T	*tvp,	// VAR_UNKNOWN for current tab page
     tabpage_T	**ptp)
 {
-    win_T	*wp = NULL;
-    tabpage_T	*tp = NULL;
-    long	n;
+    win_T	*wp = ਨਿਰਾ;
+    tabpage_T	*tp = ਨਿਰਾ;
+    ਲੰਮਾ	n;
 
-    if (wvp->v_type != VAR_UNKNOWN)
+    ਜੇ (wvp->v_type != VAR_UNKNOWN)
     {
-	if (tvp->v_type != VAR_UNKNOWN)
+	ਜੇ (tvp->v_type != VAR_UNKNOWN)
 	{
-	    n = (long)tv_get_number(tvp);
-	    if (n >= 0)
-		tp = find_tabpage(n);
+	    n = (ਲੰਮਾ)tv_get_ਸੰਖਿਆ(tvp);
+	    ਜੇ (n >= 0)
+		tp = ਲੱਭੋ_tabpage(n);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    tp = curtab;
 
-	if (tp != NULL)
+	ਜੇ (tp != ਨਿਰਾ)
 	{
-	    wp = find_win_by_nr(wvp, tp);
-	    if (wp == NULL && wvp->v_type == VAR_NUMBER
-						&& wvp->vval.v_number != -1)
+	    wp = ਲੱਭੋ_win_by_nr(wvp, tp);
+	    ਜੇ (wp == ਨਿਰਾ && wvp->v_type == VAR_ਸੰਖਿਆ
+						&& wvp->vval.v_ਸੰਖਿਆ != -1)
 		// A window with the specified number is not found
-		tp = NULL;
+		tp = ਨਿਰਾ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	wp = curwin;
 	tp = curtab;
     }
 
-    if (ptp != NULL)
+    ਜੇ (ptp != ਨਿਰਾ)
 	*ptp = tp;
 
-    return wp;
+    ਵਾਪਸ wp;
 }
 
 /*
  * Get the layout of the given tab page for winlayout() and add it to "l".
  */
-    static void
-get_framelayout(frame_T *fr, list_T *l, int outer)
+    ਸਥਿਰ ਖਾਲੀ
+get_framelayout(ਚੌਖਟਾ_T *fr, list_T *l, ਪੂਰਨ outer)
 {
-    frame_T	*child;
+    ਚੌਖਟਾ_T	*ਬੱਚਾ;
     list_T	*fr_list;
     list_T	*win_list;
 
-    if (fr == NULL)
-	return;
+    ਜੇ (fr == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (outer)
+    ਜੇ (outer)
 	// outermost call from f_winlayout()
 	fr_list = l;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	fr_list = list_alloc();
-	if (fr_list == NULL)
-	    return;
-	if (list_append_list(l, fr_list) == FAIL)
+	ਜੇ (fr_list == ਨਿਰਾ)
+	    ਵਾਪਸ;
+	ਜੇ (list_append_list(l, fr_list) == FAIL)
 	{
 	    list_free(fr_list);
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 
-    if (fr->fr_layout == FR_LEAF)
+    ਜੇ (fr->fr_layout == FR_ਪੱਤੀ)
     {
-	if (fr->fr_win != NULL)
+	ਜੇ (fr->fr_win != ਨਿਰਾ)
 	{
 	    list_append_string(fr_list, (char_u *)"leaf", STRLEN_LITERAL("leaf"));
-	    list_append_number(fr_list, fr->fr_win->w_id);
+	    list_append_ਸੰਖਿਆ(fr_list, fr->fr_win->w_id);
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (fr->fr_layout == FR_ROW)
+	ਜੇ (fr->fr_layout == FR_ਪੰਕਤੀ)
 	    list_append_string(fr_list, (char_u *)"row", STRLEN_LITERAL("row"));
-	else
+	ਨਹੀਂਤਾਂ
 	    list_append_string(fr_list, (char_u *)"col", STRLEN_LITERAL("col"));
 
 	win_list = list_alloc();
-	if (win_list == NULL)
-	    return;
-	if (list_append_list(fr_list, win_list) == FAIL)
+	ਜੇ (win_list == ਨਿਰਾ)
+	    ਵਾਪਸ;
+	ਜੇ (list_append_list(fr_list, win_list) == FAIL)
 	{
 	    list_free(win_list);
-	    return;
+	    ਵਾਪਸ;
 	}
 
-	child = fr->fr_child;
-	while (child != NULL)
+	ਬੱਚਾ = fr->fr_ਬੱਚਾ;
+	ਜਦੋਂ (ਬੱਚਾ != ਨਿਰਾ)
 	{
-	    get_framelayout(child, win_list, FALSE);
-	    child = child->fr_next;
+	    get_framelayout(ਬੱਚਾ, win_list, FALSE);
+	    ਬੱਚਾ = ਬੱਚਾ->fr_ਅਗਲਾ;
 	}
     }
 }
@@ -325,218 +325,218 @@ get_framelayout(frame_T *fr, list_T *l, int outer)
 /*
  * Common code for tabpagewinnr() and winnr().
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_winnr(tabpage_T *tp, typval_T *argvar)
 {
     win_T	*twin;
-    int		nr = 1;
+    ਪੂਰਨ		nr = 1;
     win_T	*wp;
     char_u	*arg;
 
     twin = (tp == curtab) ? curwin : tp->tp_curwin;
-    if (argvar->v_type != VAR_UNKNOWN)
+    ਜੇ (argvar->v_type != VAR_UNKNOWN)
     {
-	int	invalid_arg = FALSE;
+	ਪੂਰਨ	invalid_arg = FALSE;
 
 	arg = tv_get_string_chk(argvar);
-	if (arg == NULL)
+	ਜੇ (arg == ਨਿਰਾ)
 	    nr = 0;		// type error; errmsg already given
-	else if (STRCMP(arg, "$") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(arg, "$") == 0)
 	    twin = (tp == curtab) ? lastwin : tp->tp_lastwin;
-	else if (STRCMP(arg, "#") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(arg, "#") == 0)
 	{
 	    twin = (tp == curtab) ? prevwin : tp->tp_prevwin;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    long	count;
+	    ਲੰਮਾ	ਗਿਣਤੀ_2;
 	    char_u	*endp;
 
 	    // Extract the window count (if specified). e.g. winnr('3j')
-	    count = strtol((char *)arg, (char **)&endp, 10);
-	    if (count <= 0)
-		count = 1;	// if count is not specified, default to 1
-	    if (endp != NULL && *endp != '\0')
+	    ਗਿਣਤੀ_2 = strtol((ਅੱਖਰ *)arg, (ਅੱਖਰ **)&endp, 10);
+	    ਜੇ (ਗਿਣਤੀ_2 <= 0)
+		ਗਿਣਤੀ_2 = 1;	// if count is not specified, default to 1
+	    ਜੇ (endp != ਨਿਰਾ && *endp != '\0')
 	    {
-		if (STRCMP(endp, "j") == 0)
-		    twin = win_vert_neighbor(tp, twin, FALSE, count);
-		else if (STRCMP(endp, "k") == 0)
-		    twin = win_vert_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "h") == 0)
-		    twin = win_horz_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "l") == 0)
-		    twin = win_horz_neighbor(tp, twin, FALSE, count);
-		else
+		ਜੇ (STRCMP(endp, "j") == 0)
+		    twin = win_vert_neighbor(tp, twin, FALSE, ਗਿਣਤੀ_2);
+		ਨਹੀਂਤਾਂ ਜੇ (STRCMP(endp, "k") == 0)
+		    twin = win_vert_neighbor(tp, twin, TRUE, ਗਿਣਤੀ_2);
+		ਨਹੀਂਤਾਂ ਜੇ (STRCMP(endp, "h") == 0)
+		    twin = win_horz_neighbor(tp, twin, TRUE, ਗਿਣਤੀ_2);
+		ਨਹੀਂਤਾਂ ਜੇ (STRCMP(endp, "l") == 0)
+		    twin = win_horz_neighbor(tp, twin, FALSE, ਗਿਣਤੀ_2);
+		ਨਹੀਂਤਾਂ
 		    invalid_arg = TRUE;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		invalid_arg = TRUE;
 	}
-	if (twin == NULL)
+	ਜੇ (twin == ਨਿਰਾ)
 	    nr = 0;
 
-	if (invalid_arg)
+	ਜੇ (invalid_arg)
 	{
-	    semsg(_(e_invalid_expression_str), arg);
+	    semsg(_(e_invalid_ਵਿਅੰਜਕ_str), arg);
 	    nr = 0;
 	}
     }
 
-    if (nr <= 0)
-	return 0;
+    ਜੇ (nr <= 0)
+	ਵਾਪਸ 0;
 
-    for (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
-	    wp != twin; wp = wp->w_next)
+    ਲਈ (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
+	    wp != twin; wp = wp->w_ਅਗਲਾ)
     {
-	if (wp == NULL)
+	ਜੇ (wp == ਨਿਰਾ)
 	{
 	    // didn't find it in this tabpage
 	    nr = 0;
-	    break;
+	    ਰੋਕੋ;
 	}
 	++nr;
     }
-    return nr;
+    ਵਾਪਸ nr;
 }
 
 /*
  * Returns information about a window as a dictionary.
  */
-    static dict_T *
-get_win_info(win_T *wp, short tpnr, short winnr)
+    ਸਥਿਰ dict_T *
+get_win_info(win_T *wp, ਛੋਟਾ tpnr, ਛੋਟਾ winnr)
 {
     dict_T	*dict;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ਜੇ (dict == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // make sure w_botline is valid
     validate_botline_win(wp);
 
-    dict_add_number(dict, "tabnr", tpnr);
-    dict_add_number(dict, "winnr", winnr);
-    dict_add_number(dict, "winid", wp->w_id);
-    dict_add_number(dict, "height", wp->w_height);
-    dict_add_number(dict, "status_height", wp->w_status_height);
-    dict_add_number(dict, "winrow", wp->w_winrow + 1);
-    dict_add_number(dict, "topline", wp->w_topline);
-    dict_add_number(dict, "botline", wp->w_botline - 1);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "tabnr", tpnr);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "winnr", winnr);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "winid", wp->w_id);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "height", wp->w_ਉਚਾਈ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "status_height", wp->w_ਸਥਿਤੀ_ਉਚਾਈ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "winrow", wp->w_winrow + 1);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "topline", wp->w_topline);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "botline", wp->w_botline - 1);
 # ifdef FEAT_MENU
-    dict_add_number(dict, "winbar", wp->w_winbar_height);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "winbar", wp->w_winbar_ਉਚਾਈ);
 # endif
-    dict_add_number(dict, "width", wp->w_width);
-    dict_add_number(dict, "wincol", wp->w_wincol + 1);
-    dict_add_number(dict, "textoff", win_col_off(wp));
-    dict_add_number(dict, "bufnr", wp->w_buffer->b_fnum);
-    dict_add_number(dict, "leftcol", wp->w_leftcol);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "width", wp->w_ਚੌੜਾਈ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "wincol", wp->w_wincol + 1);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "textoff", win_ਖਾਨਾ_off(wp));
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "bufnr", wp->w_ਬਫਰ->b_fnum);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "leftcol", wp->w_leftcol);
 
 # ifdef FEAT_TERMINAL
-    dict_add_number(dict, "terminal", bt_terminal(wp->w_buffer));
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "terminal", bt_terminal(wp->w_ਬਫਰ));
 # endif
 # ifdef FEAT_QUICKFIX
-    dict_add_number(dict, "quickfix", bt_quickfix(wp->w_buffer));
-    dict_add_number(dict, "loclist",
-		      (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL));
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "quickfix", bt_quickfix(wp->w_ਬਫਰ));
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "loclist",
+		      (bt_quickfix(wp->w_ਬਫਰ) && wp->w_llist_ref != ਨਿਰਾ));
 # endif
 
     // Add a reference to window variables
-    dict_add_dict(dict, "variables", wp->w_vars);
+    dict_ਜੋੜੋ_dict(dict, "variables", wp->w_vars);
 
-    return dict;
+    ਵਾਪਸ dict;
 }
 
 /*
  * Returns information (variables, options, etc.) about a tab page
  * as a dictionary.
  */
-    static dict_T *
-get_tabpage_info(tabpage_T *tp, int tp_idx)
+    ਸਥਿਰ dict_T *
+get_tabpage_info(tabpage_T *tp, ਪੂਰਨ tp_idx)
 {
     win_T	*wp;
     dict_T	*dict;
     list_T	*l;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ਜੇ (dict == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    dict_add_number(dict, "tabnr", tp_idx);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "tabnr", tp_idx);
 
     l = list_alloc();
-    if (l != NULL)
+    ਜੇ (l != ਨਿਰਾ)
     {
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-	    list_append_number(l, (varnumber_T)wp->w_id);
-	dict_add_list(dict, "windows", l);
+	FOR_ALL_WINDOWS_ਵਿੱਚ_TAB(tp, wp)
+	    list_append_ਸੰਖਿਆ(l, (varnumber_T)wp->w_id);
+	dict_ਜੋੜੋ_list(dict, "windows", l);
     }
 
     // Make a reference to tabpage variables
-    dict_add_dict(dict, "variables", tp->tp_vars);
+    dict_ਜੋੜੋ_dict(dict, "variables", tp->tp_vars);
 
-    return dict;
+    ਵਾਪਸ dict;
 }
 
 /*
  * "gettabinfo()" function
  */
-    void
+    ਖਾਲੀ
 f_gettabinfo(typval_T *argvars, typval_T *rettv)
 {
-    tabpage_T	*tp, *tparg = NULL;
+    tabpage_T	*tp, *tparg = ਨਿਰਾ;
     dict_T	*d;
-    int		tpnr = 0;
+    ਪੂਰਨ		tpnr = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// Information about one tab page
-	tparg = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-	if (tparg == NULL)
-	    return;
+	tparg = ਲੱਭੋ_tabpage((ਪੂਰਨ)tv_get_ਸੰਖਿਆ_chk(&argvars[0], ਨਿਰਾ));
+	ਜੇ (tparg == ਨਿਰਾ)
+	    ਵਾਪਸ;
     }
 
     // Get information about a specific tab page or all tab pages
     FOR_ALL_TABPAGES(tp)
     {
 	tpnr++;
-	if (tparg != NULL && tp != tparg)
-	    continue;
+	ਜੇ (tparg != ਨਿਰਾ && tp != tparg)
+	    ਜਾਰੀ;
 	d = get_tabpage_info(tp, tpnr);
-	if (d != NULL)
+	ਜੇ (d != ਨਿਰਾ)
 	    list_append_dict(rettv->vval.v_list, d);
-	if (tparg != NULL)
-	    return;
+	ਜੇ (tparg != ਨਿਰਾ)
+	    ਵਾਪਸ;
     }
 }
 
 /*
  * "getwininfo()" function
  */
-    void
+    ਖਾਲੀ
 f_getwininfo(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp;
-    win_T	*wp = NULL, *wparg = NULL;
+    win_T	*wp = ਨਿਰਾ, *wparg = ਨਿਰਾ;
     dict_T	*d;
-    short	tabnr = 0, winnr;
+    ਛੋਟਾ	tabnr = 0, winnr;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	wparg = win_id2wp(tv_get_number(&argvars[0]));
-	if (wparg == NULL)
-	    return;
+	wparg = win_id2wp(tv_get_ਸੰਖਿਆ(&argvars[0]));
+	ਜੇ (wparg == ਨਿਰਾ)
+	    ਵਾਪਸ;
     }
 
     // Collect information about either all the windows across all the tab
@@ -545,33 +545,33 @@ f_getwininfo(typval_T *argvars, typval_T *rettv)
     {
 	tabnr++;
 	winnr = 0;
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	FOR_ALL_WINDOWS_ਵਿੱਚ_TAB(tp, wp)
 	{
 	    winnr++;
-	    if (wparg != NULL && wp != wparg)
-		continue;
+	    ਜੇ (wparg != ਨਿਰਾ && wp != wparg)
+		ਜਾਰੀ;
 	    d = get_win_info(wp, tabnr, winnr);
-	    if (d != NULL)
+	    ਜੇ (d != ਨਿਰਾ)
 		list_append_dict(rettv->vval.v_list, d);
-	    if (wparg != NULL)
+	    ਜੇ (wparg != ਨਿਰਾ)
 		// found information about a specific window
-		return;
+		ਵਾਪਸ;
 	}
     }
 # ifdef FEAT_PROP_POPUP
-    if (wparg != NULL)
+    ਜੇ (wparg != ਨਿਰਾ)
     {
 	tabnr = 0;
 	FOR_ALL_TABPAGES(tp)
 	{
 	    tabnr++;
-	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		if (wp == wparg)
-		    goto found;
+	    FOR_ALL_POPUPWINS_ਵਿੱਚ_TAB(tp, wp)
+		ਜੇ (wp == wparg)
+		    ਜਾਓ ਮਿਲਿਆ;
 	}
-found:
-	d = get_win_info(wparg, tp == NULL ? 0 : tabnr, 0);
-	if (d != NULL)
+ਮਿਲਿਆ:
+	d = get_win_info(wparg, tp == ਨਿਰਾ ? 0 : tabnr, 0);
+	ਜੇ (d != ਨਿਰਾ)
 	    list_append_dict(rettv->vval.v_list, d);
     }
 # endif
@@ -580,51 +580,51 @@ found:
 /*
  * "getwinpos({timeout})" function
  */
-    void
-f_getwinpos(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getwinpos(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    int x = -1;
-    int y = -1;
+    ਪੂਰਨ x = -1;
+    ਪੂਰਨ y = -1;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-# if defined(FEAT_GUI) \
+# ਜੇ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
 	varnumber_T timeout = 100;
 
-	if (argvars[0].v_type != VAR_UNKNOWN)
-	    timeout = tv_get_number(&argvars[0]);
+	ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
+	    timeout = tv_get_ਸੰਖਿਆ(&argvars[0]);
 
-	(void)ui_get_winpos(&x, &y, timeout);
+	(ਖਾਲੀ)ui_get_winpos(&x, &y, timeout);
     }
 # endif
-    list_append_number(rettv->vval.v_list, (varnumber_T)x);
-    list_append_number(rettv->vval.v_list, (varnumber_T)y);
+    list_append_ਸੰਖਿਆ(rettv->vval.v_list, (varnumber_T)x);
+    list_append_ਸੰਖਿਆ(rettv->vval.v_list, (varnumber_T)y);
 }
 
 
 /*
  * "getwinposx()" function
  */
-    void
-f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getwinposx(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+    rettv->vval.v_ਸੰਖਿਆ = -1;
+# ਜੇ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
 
     {
-	int	    x, y;
+	ਪੂਰਨ	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
-	    rettv->vval.v_number = x;
+	ਜੇ (ui_get_winpos(&x, &y, 100) == OK)
+	    rettv->vval.v_ਸੰਖਿਆ = x;
     }
 # endif
 }
@@ -632,18 +632,18 @@ f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getwinposy()" function
  */
-    void
-f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getwinposy(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+    rettv->vval.v_ਸੰਖਿਆ = -1;
+# ਜੇ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
-	int	    x, y;
+	ਪੂਰਨ	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
-	    rettv->vval.v_number = y;
+	ਜੇ (ui_get_winpos(&x, &y, 100) == OK)
+	    rettv->vval.v_ਸੰਖਿਆ = y;
     }
 # endif
 }
@@ -651,113 +651,113 @@ f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "tabpagenr()" function
  */
-    void
-f_tabpagenr(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_tabpagenr(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    int		nr = 1;
+    ਪੂਰਨ		nr = 1;
     char_u	*arg;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	arg = tv_get_string_chk(&argvars[0]);
 	nr = 0;
-	if (arg != NULL)
+	ਜੇ (arg != ਨਿਰਾ)
 	{
-	    if (STRCMP(arg, "$") == 0)
-		nr = tabpage_index(NULL) - 1;
-	    else if (STRCMP(arg, "#") == 0)
+	    ਜੇ (STRCMP(arg, "$") == 0)
+		nr = tabpage_ਸੂਚਕਾਂਕ(ਨਿਰਾ) - 1;
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(arg, "#") == 0)
 		nr = valid_tabpage(lastused_tabpage) ?
-					tabpage_index(lastused_tabpage) : 0;
-	    else
-		semsg(_(e_invalid_expression_str), arg);
+					tabpage_ਸੂਚਕਾਂਕ(lastused_tabpage) : 0;
+	    ਨਹੀਂਤਾਂ
+		semsg(_(e_invalid_ਵਿਅੰਜਕ_str), arg);
 	}
     }
-    else
-	nr = tabpage_index(curtab);
-    rettv->vval.v_number = nr;
+    ਨਹੀਂਤਾਂ
+	nr = tabpage_ਸੂਚਕਾਂਕ(curtab);
+    rettv->vval.v_ਸੰਖਿਆ = nr;
 }
 
 /*
  * "tabpagewinnr()" function
  */
-    void
-f_tabpagewinnr(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_tabpagewinnr(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    int		nr = 1;
+    ਪੂਰਨ		nr = 1;
     tabpage_T	*tp;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    tp = find_tabpage((int)tv_get_number(&argvars[0]));
-    if (tp == NULL)
+    tp = ਲੱਭੋ_tabpage((ਪੂਰਨ)tv_get_ਸੰਖਿਆ(&argvars[0]));
+    ਜੇ (tp == ਨਿਰਾ)
 	nr = 0;
-    else
+    ਨਹੀਂਤਾਂ
 	nr = get_winnr(tp, &argvars[1]);
-    rettv->vval.v_number = nr;
+    rettv->vval.v_ਸੰਖਿਆ = nr;
 }
 
 /*
  * "win_execute()" function
  */
-    void
+    ਖਾਲੀ
 f_win_execute(typval_T *argvars, typval_T *rettv)
 {
-    int		id;
+    ਪੂਰਨ		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
 
     // Return an empty string if something fails.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
 		|| check_for_string_or_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    id = (int)tv_get_number(argvars);
+    id = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ(argvars);
     wp = win_id2wp_tp(id, &tp);
-    if (wp == NULL || tp == NULL)
-	return;
+    ਜੇ (wp == ਨਿਰਾ || tp == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     pos_T	curpos = wp->w_cursor;
     char_u	cwd[MAXPATHL];
-    int	cwd_status = FAIL;
+    ਪੂਰਨ	cwd_ਸਥਿਤੀ = FAIL;
 # ifdef FEAT_AUTOCHDIR
     char_u	autocwd[MAXPATHL];
-    int	apply_acd = FALSE;
-    char_u	*save_sfname = NULL;
+    ਪੂਰਨ	apply_acd = FALSE;
+    char_u	*save_sfname = ਨਿਰਾ;
 # endif
 
     // Getting and setting directory can be slow on some systems, only do
     // this when the current or target window/tab have a local directory or
     // 'acd' is set.
-    if (curwin != wp
-	    && (curwin->w_localdir != NULL
-		|| wp->w_localdir != NULL
+    ਜੇ (curwin != wp
+	    && (curwin->w_localdir != ਨਿਰਾ
+		|| wp->w_localdir != ਨਿਰਾ
 		|| (curtab != tp
-		    && (curtab->tp_localdir != NULL
-			|| tp->tp_localdir != NULL))
+		    && (curtab->tp_localdir != ਨਿਰਾ
+			|| tp->tp_localdir != ਨਿਰਾ))
 # ifdef FEAT_AUTOCHDIR
 		|| p_acd
 # endif
 	       ))
-	cwd_status = mch_dirname(cwd, MAXPATHL);
+	cwd_ਸਥਿਤੀ = mch_dirname(cwd, MAXPATHL);
 
 # ifdef FEAT_AUTOCHDIR
     // If 'acd' is set, check we are using that directory.  If yes, then
     // apply 'acd' afterwards, otherwise restore the current directory.
-    if (cwd_status == OK && p_acd)
+    ਜੇ (cwd_ਸਥਿਤੀ == OK && p_acd)
     {
-	if (curbuf->b_sfname != NULL && curbuf->b_fname == curbuf->b_sfname)
+	ਜੇ (curbuf->b_sfname != ਨਿਰਾ && curbuf->b_fname == curbuf->b_sfname)
 	    save_sfname = vim_strsave(curbuf->b_sfname);
 	do_autochdir();
 	apply_acd = mch_dirname(autocwd, MAXPATHL) == OK
@@ -765,25 +765,25 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
     }
 # endif
 
-    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+    ਜੇ (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
     {
 	check_cursor();
 	execute_common(argvars, rettv, 1);
     }
     restore_win_noblock(&switchwin, TRUE);
 # ifdef FEAT_AUTOCHDIR
-    if (apply_acd)
+    ਜੇ (apply_acd)
     {
 	vim_free(save_sfname);
 	do_autochdir();
     }
-    else
+    ਨਹੀਂਤਾਂ
 # endif
-	if (cwd_status == OK)
+	ਜੇ (cwd_ਸਥਿਤੀ == OK)
 	{
-	    mch_chdir((char *)cwd);
+	    mch_chdir((ਅੱਖਰ *)cwd);
 # ifdef FEAT_AUTOCHDIR
-	    if (save_sfname != NULL)
+	    ਜੇ (save_sfname != ਨਿਰਾ)
 	    {
 		vim_free(curbuf->b_sfname);
 		curbuf->b_sfname = save_sfname;
@@ -793,294 +793,294 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
 	}
 
     // Update the status line if the cursor moved.
-    if (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
-	wp->w_redr_status = true;
+    ਜੇ (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
+	wp->w_redr_ਸਥਿਤੀ = true;
 
     // In case the command moved the cursor or changed the Visual area,
     // check it is valid.
     check_cursor();
-    if (VIsual_active)
+    ਜੇ (VIsual_ਸਰਗਰਮ)
 	check_pos(curbuf, &VIsual);
 }
 
 /*
  * "win_findbuf()" function
  */
-    void
+    ਖਾਲੀ
 f_win_findbuf(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (rettv_list_alloc(rettv) == OK)
+    ਜੇ (rettv_list_alloc(rettv) == OK)
 	win_findbuf(argvars, rettv->vval.v_list);
 }
 
 /*
  * "win_getid()" function
  */
-    void
+    ਖਾਲੀ
 f_win_getid(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL)))
+	ਵਾਪਸ;
 
-    rettv->vval.v_number = win_getid(argvars);
+    rettv->vval.v_ਸੰਖਿਆ = win_getid(argvars);
 }
 
 /*
  * "win_gotoid()" function
  */
-    void
+    ਖਾਲੀ
 f_win_gotoid(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		id;
+    ਪੂਰਨ		id;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    id = tv_get_number(&argvars[0]);
-    if (curwin->w_id == id)
+    id = tv_get_ਸੰਖਿਆ(&argvars[0]);
+    ਜੇ (curwin->w_id == id)
     {
 	// Nothing to do.
-	rettv->vval.v_number = 1;
-	return;
+	rettv->vval.v_ਸੰਖਿਆ = 1;
+	ਵਾਪਸ;
     }
 
-    if (text_or_buf_locked())
-	return;
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
-    if (popup_is_popup(curwin) && curbuf->b_term != NULL)
+    ਜੇ (ਪਾਠ_or_buf_locked())
+	ਵਾਪਸ;
+# ਜੇ defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+    ਜੇ (popup_is_popup(curwin) && curbuf->b_ਪਦ != ਨਿਰਾ)
     {
-	emsg(_(e_not_allowed_for_terminal_in_popup_window));
-	return;
+	emsg(_(e_not_allowed_for_terminal_ਵਿੱਚ_popup_ਖਿੜਕੀ));
+	ਵਾਪਸ;
     }
 # endif
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	ਜੇ (wp->w_id == id)
 	{
 	    // When jumping to another buffer stop Visual mode.
-	    if (VIsual_active && wp->w_buffer != curbuf)
-		end_visual_mode();
+	    ਜੇ (VIsual_ਸਰਗਰਮ && wp->w_ਬਫਰ != curbuf)
+		ਸਿਰਾ_visual_ਬਹੁਲਕ();
 	    goto_tabpage_win(tp, wp);
-	    rettv->vval.v_number = 1;
-	    return;
+	    rettv->vval.v_ਸੰਖਿਆ = 1;
+	    ਵਾਪਸ;
 	}
 }
 
 /*
  * "win_id2tabwin()" function
  */
-    void
+    ਖਾਲੀ
 f_win_id2tabwin(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (rettv_list_alloc(rettv) == OK)
+    ਜੇ (rettv_list_alloc(rettv) == OK)
 	win_id2tabwin(argvars, rettv->vval.v_list);
 }
 
 /*
  * "win_id2win()" function
  */
-    void
+    ਖਾਲੀ
 f_win_id2win(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    rettv->vval.v_number = win_id2win(argvars);
+    rettv->vval.v_ਸੰਖਿਆ = win_id2win(argvars);
 }
 
 /*
  * "win_move_separator()" function
  */
-    void
+    ਖਾਲੀ
 f_win_move_separator(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    ਪੂਰਨ		ਵਿੱਥ;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_ਸੰਖਿਆ = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
+		|| check_for_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    ਜੇ (wp == ਨਿਰਾ || win_valid_popup(wp))
+	ਵਾਪਸ;
+    ਜੇ (!win_valid(wp))
     {
-	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	emsg(_(e_cannot_resize_ਖਿੜਕੀ_ਵਿੱਚ_another_tab_ਪੰਨਾ));
+	ਵਾਪਸ;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
-    win_drag_vsep_line(wp, offset);
-    rettv->vval.v_number = TRUE;
+    ਵਿੱਥ = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ(&argvars[1]);
+    win_drag_vsep_ਸਤਰ(wp, ਵਿੱਥ);
+    rettv->vval.v_ਸੰਖਿਆ = TRUE;
 }
 
 /*
  * "win_move_statusline()" function
  */
-    void
+    ਖਾਲੀ
 f_win_move_statusline(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    ਪੂਰਨ		ਵਿੱਥ;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_ਸੰਖਿਆ = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
+		|| check_for_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    ਜੇ (wp == ਨਿਰਾ || win_valid_popup(wp))
+	ਵਾਪਸ;
+    ਜੇ (!win_valid(wp))
     {
-	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	emsg(_(e_cannot_resize_ਖਿੜਕੀ_ਵਿੱਚ_another_tab_ਪੰਨਾ));
+	ਵਾਪਸ;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
-    win_drag_status_line(wp, offset);
-    rettv->vval.v_number = TRUE;
+    ਵਿੱਥ = (ਪੂਰਨ)tv_get_ਸੰਖਿਆ(&argvars[1]);
+    win_drag_ਸਥਿਤੀ_ਸਤਰ(wp, ਵਿੱਥ);
+    rettv->vval.v_ਸੰਖਿਆ = TRUE;
 }
 
 /*
  * "win_screenpos()" function
  */
-    void
+    ਖਾਲੀ
 f_win_screenpos(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    list_append_number(rettv->vval.v_list, wp == NULL ? 0 : wp->w_winrow + 1);
-    list_append_number(rettv->vval.v_list, wp == NULL ? 0 : wp->w_wincol + 1);
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    list_append_ਸੰਖਿਆ(rettv->vval.v_list, wp == ਨਿਰਾ ? 0 : wp->w_winrow + 1);
+    list_append_ਸੰਖਿਆ(rettv->vval.v_list, wp == ਨਿਰਾ ? 0 : wp->w_wincol + 1);
 }
 
 /*
  * "win_splitmove()" function
  */
-    void
+    ਖਾਲੀ
 f_win_splitmove(typval_T *argvars, typval_T *rettv)
 {
     win_T   *wp, *targetwin;
     win_T   *oldwin = curwin;
-    int     flags = 0, size = 0;
+    ਪੂਰਨ     flags = 0, ਮਾਪ = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ਸੰਖਿਆ = -1;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL
+		|| check_for_ਸੰਖਿਆ_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    targetwin = find_win_by_nr_or_id(&argvars[1]);
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    targetwin = ਲੱਭੋ_win_by_nr_or_id(&argvars[1]);
 
-    if (wp == NULL || targetwin == NULL || wp == targetwin
+    ਜੇ (wp == ਨਿਰਾ || targetwin == ਨਿਰਾ || wp == targetwin
 	    || !win_valid(wp) || !win_valid(targetwin)
 	    || win_valid_popup(wp) || win_valid_popup(targetwin))
     {
-	emsg(_(e_invalid_window_number));
-	return;
+	emsg(_(e_invalid_ਖਿੜਕੀ_ਸੰਖਿਆ));
+	ਵਾਪਸ;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T      *d;
 	dictitem_T  *di;
 
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	ਜੇ (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    ਵਾਪਸ;
 
 	d = argvars[2].vval.v_dict;
-	if (dict_get_bool(d, "vertical", FALSE))
+	ਜੇ (dict_get_bool(d, "vertical", FALSE))
 	    flags |= WSP_VERT;
-	if ((di = dict_find(d, (char_u *)"rightbelow", -1)) != NULL)
-	    flags |= tv_get_bool(&di->di_tv) ? WSP_BELOW : WSP_ABOVE;
-	size = (int)dict_get_number(d, "size");
+	ਜੇ ((di = dict_ਲੱਭੋ(d, (char_u *)"rightbelow", -1)) != ਨਿਰਾ)
+	    flags |= tv_get_bool(&di->di_tv) ? WSP_ਹੇਠਾਂ : WSP_ABOVE;
+	ਮਾਪ = (ਪੂਰਨ)dict_get_ਸੰਖਿਆ(d, "size");
     }
 
     // Check if we're allowed to continue before we bother switching windows.
-    if (text_or_buf_locked() || check_split_disallowed(wp) == FAIL)
-	return;
+    ਜੇ (ਪਾਠ_or_buf_locked() || check_ਵੰਡੋ_disallowed(wp) == FAIL)
+	ਵਾਪਸ;
 
-    if (curwin != targetwin)
+    ਜੇ (curwin != targetwin)
 	win_goto(targetwin);
 
     // Autocommands may have sent us elsewhere or closed "wp" or "oldwin".
-    if (curwin == targetwin && win_valid(wp))
+    ਜੇ (curwin == targetwin && win_valid(wp))
     {
-	if (win_splitmove(wp, size, flags) == OK)
-	    rettv->vval.v_number = 0;
+	ਜੇ (win_splitmove(wp, ਮਾਪ, flags) == OK)
+	    rettv->vval.v_ਸੰਖਿਆ = 0;
     }
-    else
-	emsg(_(e_autocommands_caused_command_to_abort));
+    ਨਹੀਂਤਾਂ
+	emsg(_(e_autocommands_caused_command_ਮੰਜ਼ਿਲ_abort));
 
-    if (oldwin != curwin && win_valid(oldwin))
+    ਜੇ (oldwin != curwin && win_valid(oldwin))
 	win_goto(oldwin);
 }
 
 /*
  * "win_gettype(nr)" function
  */
-    void
+    ਖਾਲੀ
 f_win_gettype(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp = curwin;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
+	wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+	ਜੇ (wp == ਨਿਰਾ)
 	{
 	    rettv->vval.v_string = vim_strsave((char_u *)"unknown");
-	    return;
+	    ਵਾਪਸ;
 	}
     }
-    if (is_aucmd_win(wp))
+    ਜੇ (is_aucmd_win(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"autocmd");
-# if defined(FEAT_QUICKFIX)
-    else if (wp->w_p_pvw)
+# ਜੇ defined(FEAT_QUICKFIX)
+    ਨਹੀਂਤਾਂ ਜੇ (wp->w_p_pvw)
 	rettv->vval.v_string = vim_strsave((char_u *)"preview");
 # endif
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(wp))
+    ਨਹੀਂਤਾਂ ਜੇ (WIN_IS_POPUP(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"popup");
 # endif
-    else if (wp == cmdwin_win)
+    ਨਹੀਂਤਾਂ ਜੇ (wp == cmdwin_win)
 	rettv->vval.v_string = vim_strsave((char_u *)"command");
 # ifdef FEAT_QUICKFIX
-    else if (bt_quickfix(wp->w_buffer))
+    ਨਹੀਂਤਾਂ ਜੇ (bt_quickfix(wp->w_ਬਫਰ))
 	rettv->vval.v_string = vim_strsave((char_u *)
-		(wp->w_llist_ref != NULL ? "loclist" : "quickfix"));
+		(wp->w_llist_ref != ਨਿਰਾ ? "loclist" : "quickfix"));
 # endif
 
 }
@@ -1088,14 +1088,14 @@ f_win_gettype(typval_T *argvars, typval_T *rettv)
 /*
  * "getcmdwintype()" function
  */
-    void
-f_getcmdwintype(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_getcmdwintype(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
     rettv->vval.v_string = alloc(2);
-    if (rettv->vval.v_string == NULL)
-	return;
+    ਜੇ (rettv->vval.v_string == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     rettv->vval.v_string[0] = cmdwin_type;
     rettv->vval.v_string[1] = NUL;
@@ -1104,75 +1104,75 @@ f_getcmdwintype(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "winbufnr(nr)" function
  */
-    void
+    ਖਾਲੀ
 f_winbufnr(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_buffer->b_fnum;
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    ਜੇ (wp == ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ = -1;
+    ਨਹੀਂਤਾਂ
+	rettv->vval.v_ਸੰਖਿਆ = wp->w_ਬਫਰ->b_fnum;
 }
 
 /*
  * "wincol()" function
  */
-    void
-f_wincol(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_wincol(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     validate_cursor();
-    int col = curwin->w_wcol + 1;
+    ਪੂਰਨ ਖਾਨਾ = curwin->w_wcol + 1;
 # ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
-	col = curwin->w_width - curwin->w_wcol - cursor_screen_cells() + 1;
+    ਜੇ (curwin->w_p_rl)
+	ਖਾਨਾ = curwin->w_ਚੌੜਾਈ - curwin->w_wcol - cursor_screen_cells() + 1;
 # endif
-    rettv->vval.v_number = col;
+    rettv->vval.v_ਸੰਖਿਆ = ਖਾਨਾ;
 }
 
 /*
  * "winheight(nr)" function
  */
-    void
+    ਖਾਲੀ
 f_winheight(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_height;
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    ਜੇ (wp == ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ = -1;
+    ਨਹੀਂਤਾਂ
+	rettv->vval.v_ਸੰਖਿਆ = wp->w_ਉਚਾਈ;
 }
 
 /*
  * "winlayout()" function
  */
-    void
+    ਖਾਲੀ
 f_winlayout(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_list_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type == VAR_UNKNOWN)
 	tp = curtab;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp == NULL)
-	    return;
+	tp = ਲੱਭੋ_tabpage((ਪੂਰਨ)tv_get_ਸੰਖਿਆ(&argvars[0]));
+	ਜੇ (tp == ਨਿਰਾ)
+	    ਵਾਪਸ;
     }
 
     get_framelayout(tp->tp_topframe, rettv->vval.v_list, TRUE);
@@ -1181,109 +1181,109 @@ f_winlayout(typval_T *argvars, typval_T *rettv)
 /*
  * "winline()" function
  */
-    void
-f_winline(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_winline(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     validate_cursor();
-    rettv->vval.v_number = curwin->w_wrow + 1;
+    rettv->vval.v_ਸੰਖਿਆ = curwin->w_wrow + 1;
 }
 
 /*
  * "winnr()" function
  */
-    void
-f_winnr(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_winnr(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
-    int		nr = 1;
+    ਪੂਰਨ		nr = 1;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     nr = get_winnr(curtab, &argvars[0]);
-    rettv->vval.v_number = nr;
+    rettv->vval.v_ਸੰਖਿਆ = nr;
 }
 
 /*
  * "winrestcmd()" function
  */
-    void
-f_winrestcmd(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_winrestcmd(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
-    int		winnr;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		winnr;
     garray_T	ga;
     char_u	buf[50];
 
-    ga_init2(&ga, sizeof(char), 70);
+    ga_init2(&ga, ਆਕਾਰ(ਅੱਖਰ), 70);
 
     // Do this twice to handle some window layouts properly.
-    for (i = 0; i < 2; ++i)
+    ਲਈ (i = 0; i < 2; ++i)
     {
 	winnr = 1;
 	FOR_ALL_WINDOWS(wp)
 	{
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
-		":%dresize %d|", winnr, wp->w_height);
+	    buflen = vim_snprintf_safelen((ਅੱਖਰ *)buf, ਆਕਾਰ(buf),
+		":%dresize %d|", winnr, wp->w_ਉਚਾਈ);
 	    ga_concat_len(&ga, buf, buflen);
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
-		"vert :%dresize %d|", winnr, wp->w_width);
+	    buflen = vim_snprintf_safelen((ਅੱਖਰ *)buf, ਆਕਾਰ(buf),
+		"vert :%dresize %d|", winnr, wp->w_ਚੌੜਾਈ);
 	    ga_concat_len(&ga, buf, buflen);
 	    ++winnr;
 	}
     }
     ga_append(&ga, NUL);
 
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_ਅੰਕੜੇ;
     rettv->v_type = VAR_STRING;
 }
 
 /*
  * "winrestview()" function
  */
-    void
-f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_winrestview(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     dict_T	*dict;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     dict = argvars[0].vval.v_dict;
-    if (dict_has_key(dict, "lnum"))
-	curwin->w_cursor.lnum = (linenr_T)dict_get_number(dict, "lnum");
-    if (dict_has_key(dict, "col"))
-	curwin->w_cursor.col = (colnr_T)dict_get_number(dict, "col");
-    if (dict_has_key(dict, "coladd"))
-	curwin->w_cursor.coladd = (colnr_T)dict_get_number(dict, "coladd");
-    if (dict_has_key(dict, "curswant"))
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "lnum"))
+	curwin->w_cursor.lnum = (linenr_T)dict_get_ਸੰਖਿਆ(dict, "lnum");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "col"))
+	curwin->w_cursor.ਖਾਨਾ = (colnr_T)dict_get_ਸੰਖਿਆ(dict, "col");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "coladd"))
+	curwin->w_cursor.coladd = (colnr_T)dict_get_ਸੰਖਿਆ(dict, "coladd");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "curswant"))
     {
-	curwin->w_curswant = (colnr_T)dict_get_number(dict, "curswant");
-	curwin->w_set_curswant = false;
+	curwin->w_curswant = (colnr_T)dict_get_ਸੰਖਿਆ(dict, "curswant");
+	curwin->w_ਸੈੱਟ_curswant = false;
     }
 
-    if (dict_has_key(dict, "topline"))
-	set_topline(curwin, (linenr_T)dict_get_number(dict, "topline"));
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "topline"))
+	ਸੈੱਟ_topline(curwin, (linenr_T)dict_get_ਸੰਖਿਆ(dict, "topline"));
 # ifdef FEAT_DIFF
-    if (dict_has_key(dict, "topfill"))
-	curwin->w_topfill = (int)dict_get_number(dict, "topfill");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "topfill"))
+	curwin->w_topfill = (ਪੂਰਨ)dict_get_ਸੰਖਿਆ(dict, "topfill");
 # endif
-    if (dict_has_key(dict, "leftcol"))
-	curwin->w_leftcol = (colnr_T)dict_get_number(dict, "leftcol");
-    if (dict_has_key(dict, "skipcol"))
-	curwin->w_skipcol = (colnr_T)dict_get_number(dict, "skipcol");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "leftcol"))
+	curwin->w_leftcol = (colnr_T)dict_get_ਸੰਖਿਆ(dict, "leftcol");
+    ਜੇ (dict_has_ਕੁੰਜੀ(dict, "skipcol"))
+	curwin->w_skipcol = (colnr_T)dict_get_ਸੰਖਿਆ(dict, "skipcol");
 
     check_cursor();
-    win_new_height(curwin, curwin->w_height);
-    win_new_width(curwin, curwin->w_width);
-    changed_window_setting();
+    win_new_ਉਚਾਈ(curwin, curwin->w_ਉਚਾਈ);
+    win_new_ਚੌੜਾਈ(curwin, curwin->w_ਚੌੜਾਈ);
+    ਬਦਲਿਆ_ਖਿੜਕੀ_setting();
 
-    if (curwin->w_topline <= 0)
+    ਜੇ (curwin->w_topline <= 0)
 	curwin->w_topline = 1;
-    if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-	curwin->w_topline = curbuf->b_ml.ml_line_count;
+    ਜੇ (curwin->w_topline > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	curwin->w_topline = curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 # ifdef FEAT_DIFF
     check_topfill(curwin, TRUE);
 # endif
@@ -1292,49 +1292,49 @@ f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "winsaveview()" function
  */
-    void
-f_winsaveview(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_winsaveview(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     dict_T	*dict;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_dict_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
     dict = rettv->vval.v_dict;
 
-    dict_add_number(dict, "lnum", (long)curwin->w_cursor.lnum);
-    dict_add_number(dict, "col", (long)curwin->w_cursor.col);
-    dict_add_number(dict, "coladd", (long)curwin->w_cursor.coladd);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "lnum", (ਲੰਮਾ)curwin->w_cursor.lnum);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "col", (ਲੰਮਾ)curwin->w_cursor.ਖਾਨਾ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "coladd", (ਲੰਮਾ)curwin->w_cursor.coladd);
     update_curswant();
-    dict_add_number(dict, "curswant", (long)curwin->w_curswant);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "curswant", (ਲੰਮਾ)curwin->w_curswant);
 
-    dict_add_number(dict, "topline", (long)curwin->w_topline);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "topline", (ਲੰਮਾ)curwin->w_topline);
 # ifdef FEAT_DIFF
-    dict_add_number(dict, "topfill", (long)curwin->w_topfill);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "topfill", (ਲੰਮਾ)curwin->w_topfill);
 # endif
-    dict_add_number(dict, "leftcol", (long)curwin->w_leftcol);
-    dict_add_number(dict, "skipcol", (long)curwin->w_skipcol);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "leftcol", (ਲੰਮਾ)curwin->w_leftcol);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "skipcol", (ਲੰਮਾ)curwin->w_skipcol);
 }
 
 /*
  * "winwidth(nr)" function
  */
-    void
+    ਖਾਲੀ
 f_winwidth(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_width;
+    wp = ਲੱਭੋ_win_by_nr_or_id(&argvars[0]);
+    ਜੇ (wp == ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ = -1;
+    ਨਹੀਂਤਾਂ
+	rettv->vval.v_ਸੰਖਿਆ = wp->w_ਚੌੜਾਈ;
 }
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL
 
-#if defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ਜੇ defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Set "win" to be the curwin and "tp" to be the current tab page.
  * restore_win() MUST be called to undo, also when FAIL is returned.
@@ -1343,54 +1343,54 @@ f_winwidth(typval_T *argvars, typval_T *rettv)
  * triggered, another tabpage access is limited.
  * Returns FAIL if switching to "win" failed.
  */
-    int
+    ਪੂਰਨ
 switch_win(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	ਪੂਰਨ	    no_display)
 {
-    block_autocmds();
-    return switch_win_noblock(switchwin, win, tp, no_display);
+    ਖੰਡ_autocmds();
+    ਵਾਪਸ switch_win_noblock(switchwin, win, tp, no_display);
 }
 
 /*
  * As switch_win() but without blocking autocommands.
  */
-    int
+    ਪੂਰਨ
 switch_win_noblock(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	ਪੂਰਨ	    no_display)
 {
-    CLEAR_POINTER(switchwin);
+    CLEAR_ਸੂਚਕ(switchwin);
     switchwin->sw_curwin = curwin;
-    if (win == curwin)
+    ਜੇ (win == curwin)
 	switchwin->sw_same_win = TRUE;
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Disable Visual selection, because redrawing may fail.
-	switchwin->sw_visual_active = VIsual_active;
-	VIsual_active = FALSE;
+	switchwin->sw_visual_ਸਰਗਰਮ = VIsual_ਸਰਗਰਮ;
+	VIsual_ਸਰਗਰਮ = FALSE;
     }
 
-    if (tp != NULL)
+    ਜੇ (tp != ਨਿਰਾ)
     {
 	switchwin->sw_curtab = curtab;
-	if (no_display)
+	ਜੇ (no_display)
 	{
 	    unuse_tabpage(curtab);
 	    use_tabpage(tp);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    goto_tabpage_tp(tp, FALSE, FALSE);
     }
-    if (!win_valid(win))
-	return FAIL;
+    ਜੇ (!win_valid(win))
+	ਵਾਪਸ FAIL;
     curwin = win;
-    curbuf = curwin->w_buffer;
-    return OK;
+    curbuf = curwin->w_ਬਫਰ;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1398,10 +1398,10 @@ switch_win_noblock(
  * When "no_display" is TRUE the display won't be affected, no redraw is
  * triggered.
  */
-    void
+    ਖਾਲੀ
 restore_win(
 	switchwin_T *switchwin,
-	int	    no_display)
+	ਪੂਰਨ	    no_display)
 {
     restore_win_noblock(switchwin, no_display);
     unblock_autocmds();
@@ -1410,14 +1410,14 @@ restore_win(
 /*
  * As restore_win() but without unblocking autocommands.
  */
-    void
+    ਖਾਲੀ
 restore_win_noblock(
 	switchwin_T *switchwin,
-	int	    no_display)
+	ਪੂਰਨ	    no_display)
 {
-    if (switchwin->sw_curtab != NULL && valid_tabpage(switchwin->sw_curtab))
+    ਜੇ (switchwin->sw_curtab != ਨਿਰਾ && valid_tabpage(switchwin->sw_curtab))
     {
-	if (no_display)
+	ਜੇ (no_display)
 	{
 	    win_T	*old_tp_curwin = curtab->tp_curwin;
 
@@ -1426,23 +1426,23 @@ restore_win_noblock(
 	    curtab->tp_curwin = old_tp_curwin;
 	    use_tabpage(switchwin->sw_curtab);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    goto_tabpage_tp(switchwin->sw_curtab, FALSE, FALSE);
     }
 
-    if (!switchwin->sw_same_win)
-	VIsual_active = switchwin->sw_visual_active;
+    ਜੇ (!switchwin->sw_same_win)
+	VIsual_ਸਰਗਰਮ = switchwin->sw_visual_ਸਰਗਰਮ;
 
-    if (win_valid(switchwin->sw_curwin))
+    ਜੇ (win_valid(switchwin->sw_curwin))
     {
 	curwin = switchwin->sw_curwin;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_ਬਫਰ;
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    ਨਹੀਂਤਾਂ ਜੇ (WIN_IS_POPUP(curwin))
 	// original window was closed and now we're in a popup window: Go
 	// to the first valid window.
 	win_goto(firstwin);
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ

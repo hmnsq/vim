@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ utf8_seqlen(ਲੰਮਾ codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#ਜੇ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ utf8_seqlen(ਲੰਮਾ codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  ਜੇ(codepoint < 0x0000080) ਵਾਪਸ 1;
+  ਜੇ(codepoint < 0x0000800) ਵਾਪਸ 2;
+  ਜੇ(codepoint < 0x0010000) ਵਾਪਸ 3;
+  ਜੇ(codepoint < 0x0200000) ਵਾਪਸ 4;
+  ਜੇ(codepoint < 0x4000000) ਵਾਪਸ 5;
+  ਵਾਪਸ 6;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+ਪੂਰਨ fill_utf8(ਲੰਮਾ codepoint, ਅੱਖਰ *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#ਜੇ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ਪੂਰਨ fill_utf8(ਲੰਮਾ codepoint, ਅੱਖਰ *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  ਪੂਰਨ nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  ਪੂਰਨ b = nbytes;
+  ਜਦੋਂ(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  ਚੋਣ(nbytes) {
+    ਹਾਲਤ 1: str[0] =        (codepoint & 0x7f); ਰੋਕੋ;
+    ਹਾਲਤ 2: str[0] = 0xc0 | (codepoint & 0x1f); ਰੋਕੋ;
+    ਹਾਲਤ 3: str[0] = 0xe0 | (codepoint & 0x0f); ਰੋਕੋ;
+    ਹਾਲਤ 4: str[0] = 0xf0 | (codepoint & 0x07); ਰੋਕੋ;
+    ਹਾਲਤ 5: str[0] = 0xf8 | (codepoint & 0x03); ਰੋਕੋ;
+    ਹਾਲਤ 6: str[0] = 0xfc | (codepoint & 0x01); ਰੋਕੋ;
   }
 
-  return nbytes;
+  ਵਾਪਸ nbytes;
 }
-#endif
+#ਜੇ_ਅੰਤ
 /* end copy */

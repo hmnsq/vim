@@ -25,19 +25,19 @@
  * This code must have NBDEBUG defined for it to be compiled into vim/gvim.
  */
 
-#ifdef NBDEBUG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ NBDEBUG
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-FILE		*nb_debug = NULL;
+FILE		*nb_debug = ਨਿਰਾ;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ਖਾਲੀ		 nbdb(ਅੱਖਰ *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
-#ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
-#endif
+ਸਥਿਰ ਪੂਰਨ	 lookup(ਅੱਖਰ *);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_NB_ERRORHANDLER
+ਸਥਿਰ ਪੂਰਨ	 errorHandler(Display *, XErrorEvent *);
+#ਜੇ_ਅੰਤ
 
 /*
  * nbdebug_wait	-   This function can be used to delay or stop execution of vim.
@@ -46,73 +46,73 @@ static int	 errorHandler(Display *, XErrorEvent *);
  *		    from a background process this is the only way to debug
  *		    startup problems.
  */
-	void
+	ਖਾਲੀ
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	ਅੱਖਰ		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
 	init_homedir();			// not inited yet
-#ifdef USE_WDDUMP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_WDDUMP
 	WDDump(0, 0, 0);
-#endif
+#ਜੇ_ਅੰਤ
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	ਜੇ (wait_flags & WT_ENV && wait_var && getenv(wait_var) != ਨਿਰਾ)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	ਨਹੀਂਤਾਂ ਜੇ (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	ਨਹੀਂਤਾਂ ਜੇ (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		ਪੂਰਨ w = 1;
+		ਜਦੋਂ (w)
 		{
 			;
 		}
 	}
 }
 
-	void
+	ਖਾਲੀ
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	ਅੱਖਰ		*log_var,	// env var with log file
+	ਅੱਖਰ		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	ਅੱਖਰ		*file;		// possible nb_debug output file
+	ਅੱਖਰ		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	ਜੇ (log_var && (file = getenv(log_var)) != ਨਿਰਾ)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
-		time(&now);
+		ਸਮਾਂ(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		ਜੇ (level_var && (cp = getenv(level_var)) != ਨਿਰਾ)
 		{
-			nb_dlevel = strtoul(cp, NULL, 0);
+			nb_dlevel = strtoul(cp, ਨਿਰਾ, 0);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
-#ifdef USE_NB_ERRORHANDLER
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_NB_ERRORHANDLER
 		XSetErrorHandler(errorHandler);
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
 }
 
-	void
-nbdbg(char *fmt, ...)
+	ਖਾਲੀ
+nbdbg(ਅੱਖਰ *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	ਜੇ (nb_debug != ਨਿਰਾ && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,47 +122,47 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
-lookup(char *file)
+	ਸਥਿਰ ਪੂਰਨ
+lookup(ਅੱਖਰ *file)
 {
-	char		 buf[BUFSIZ];
+	ਅੱਖਰ		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
-#ifndef FEAT_GUI_MSWIN
+	ਵਾਪਸ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#ਨਹੀਂਤਾਂ
 		(access(buf, 0) == 0);
-#endif
+#ਜੇ_ਅੰਤ
 
 }
 
-#ifdef USE_NB_ERRORHANDLER
-	static int
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_NB_ERRORHANDLER
+	ਸਥਿਰ ਪੂਰਨ
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	ਅੱਖਰ		 ਸੁਨੇਹਾ[256];
+	ਅੱਖਰ		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGet_Error_ਪਾਠ(dpy, err->error_ਕੋਡ, ਸੁਨੇਹਾ, ਆਕਾਰ(ਸੁਨੇਹਾ));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", ਸੁਨੇਹਾ);
 
-	sprintf(buf, "%d", err->request_code);
-	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	sprintf(buf, "%d", err->request_ਕੋਡ);
+	XGet_Error_Database_ਪਾਠ(dpy,
+	    "XRequest", buf, "Unknown", ਸੁਨੇਹਾ, ਆਕਾਰ(ਸੁਨੇਹਾ));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
-	if (err->request_code > 128)
+	    err->request_ਕੋਡ, ਸੁਨੇਹਾ);
+	ਜੇ (err->request_ਕੋਡ > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
-		    err->minor_code);
+		    err->minor_ਕੋਡ);
 	}
 
-	return 0;
+	ਵਾਪਸ 0;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
-#endif // NBDEBUG
+#ਜੇ_ਅੰਤ // NBDEBUG

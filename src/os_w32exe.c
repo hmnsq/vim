@@ -13,41 +13,41 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
-#ifdef VIMDLL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VIMDLL
 __declspec(dllimport)
-#endif
-int VimMain(int argc, char **argv);
+#ਜੇ_ਅੰਤ
+ਪੂਰਨ VimMain(ਪੂਰਨ argc, ਅੱਖਰ **argv);
 
-#ifdef VIMDLL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
-#endif
+#ਨਹੀਂਤਾਂ
+ਖਾਲੀ SaveInst(HINSTANCE hInst);
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
-    int WINAPI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਪੂਰਨ WINAPI
 wWinMain(
     HINSTANCE	hInstance,
-    HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    HINSTANCE	hPrevInst ਅਣਵਰਤਿਆ,
+    LPWSTR	lpsz_Cmd_ਸਤਰ ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		nCmdShow ਅਣਵਰਤਿਆ)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ਵਾਪਸ VimMain(0, ਨਿਰਾ);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#ਨਹੀਂਤਾਂ
+    ਪੂਰਨ
+wmain(ਪੂਰਨ argc ਅਣਵਰਤਿਆ, wchar_t **argv ਅਣਵਰਤਿਆ)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(ਨਿਰਾ));
+    ਵਾਪਸ VimMain(0, ਨਿਰਾ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef USE_OWNSTARTUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_OWNSTARTUP
 // Use our own entry point and don't use the default CRT startup code to
 // reduce the size of (g)vim.exe.  This works only when VIMDLL is defined.
 //
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    ਖਾਲੀ WINAPI
+wWinMainCRTStartup(ਖਾਲੀ)
 {
-    VimMain(0, NULL);
+    VimMain(0, ਨਿਰਾ);
 }
-# else
-    void
-wmainCRTStartup(void)
+# ਨਹੀਂਤਾਂ
+    ਖਾਲੀ
+wmainCRTStartup(ਖਾਲੀ)
 {
-    VimMain(0, NULL);
+    VimMain(0, ਨਿਰਾ);
 }
 # endif
-#endif	// USE_OWNSTARTUP
+#ਜੇ_ਅੰਤ	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#ਜੇ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# ਜੇ defined(_MSC_VER)
+ਸਥਿਰ __declspec(thread) ਖਾਲੀ *tls_space;
+ਬਾਹਰੀ intptr_t tls_ਸੂਚਕਾਂਕ;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+ਸਥਿਰ __thread ਖਾਲੀ *tls_space;
+ਬਾਹਰੀ intptr_t tls_ਸੂਚਕਾਂਕ;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) ਖਾਲੀ
+get_tls_info(ਖਾਲੀ ***ptls_space, intptr_t *ptls_ਸੂਚਕਾਂਕ)
 {
     *ptls_space = &tls_space;
-    *ptls_index = _tls_index;
-    return;
+    *ptls_ਸੂਚਕਾਂਕ = tls_ਸੂਚਕਾਂਕ;
+    ਵਾਪਸ;
 }
-#endif
+#ਜੇ_ਅੰਤ

@@ -12,59 +12,59 @@
  * Code for menus.  Used for the GUI and 'wildmenu'.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_MENU)
+#ਜੇ defined(FEAT_MENU)
 
-#define MENUDEPTH   10		// maximum depth of menus
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MENUDEPTH   10		// maximum depth of menus
 
-#ifdef FEAT_GUI_MSWIN
-static int add_menu_path(char_u *, vimmenu_T *, int *, char_u *, int);
-#else
-static int add_menu_path(char_u *, vimmenu_T *, int *, char_u *);
-#endif
-static int menu_nable_recurse(vimmenu_T *menu, char_u *name, int modes, int enable);
-static int remove_menu(vimmenu_T **, char_u *, int, int silent);
-static void free_menu(vimmenu_T **menup);
-static void free_menu_string(vimmenu_T *, int);
-static int show_menus(char_u *, int);
-static void show_menus_recursive(vimmenu_T *, int, int);
-static char_u *menu_name_skip(char_u *name);
-static int menu_name_equal(char_u *name, vimmenu_T *menu);
-static int menu_namecmp(char_u *name, char_u *mname);
-static int get_menu_cmd_modes(char_u *, int, int *, int *);
-static char_u *popup_mode_name(char_u *name, int idx);
-static char_u *menu_text(char_u *text, int *mnemonic, char_u **actext);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
+ਸਥਿਰ ਪੂਰਨ ਜੋੜੋ_menu_ਰਸਤਾ(char_u *, vimmenu_T *, ਪੂਰਨ *, char_u *, ਪੂਰਨ);
+#ਨਹੀਂਤਾਂ
+ਸਥਿਰ ਪੂਰਨ ਜੋੜੋ_menu_ਰਸਤਾ(char_u *, vimmenu_T *, ਪੂਰਨ *, char_u *);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਪੂਰਨ menu_nable_recurse(vimmenu_T *menu, char_u *name, ਪੂਰਨ modes, ਪੂਰਨ enable);
+ਸਥਿਰ ਪੂਰਨ remove_menu(vimmenu_T **, char_u *, ਪੂਰਨ, ਪੂਰਨ silent);
+ਸਥਿਰ ਖਾਲੀ free_menu(vimmenu_T **menup);
+ਸਥਿਰ ਖਾਲੀ free_menu_string(vimmenu_T *, ਪੂਰਨ);
+ਸਥਿਰ ਪੂਰਨ show_menus(char_u *, ਪੂਰਨ);
+ਸਥਿਰ ਖਾਲੀ show_menus_recursive(vimmenu_T *, ਪੂਰਨ, ਪੂਰਨ);
+ਸਥਿਰ char_u *menu_name_skip(char_u *name);
+ਸਥਿਰ ਪੂਰਨ menu_name_equal(char_u *name, vimmenu_T *menu);
+ਸਥਿਰ ਪੂਰਨ menu_namecmp(char_u *name, char_u *mname);
+ਸਥਿਰ ਪੂਰਨ get_menu_cmd_modes(char_u *, ਪੂਰਨ, ਪੂਰਨ *, ਪੂਰਨ *);
+ਸਥਿਰ char_u *popup_ਬਹੁਲਕ_name(char_u *name, ਪੂਰਨ idx);
+ਸਥਿਰ char_u *menu_ਪਾਠ(char_u *ਪਾਠ, ਪੂਰਨ *mnemonic, char_u **actext);
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
-static void gui_create_tearoffs_recurse(vimmenu_T *menu, const char_u *pname, int *pri_tab, int pri_idx);
-static void gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx);
-static void gui_destroy_tearoffs_recurse(vimmenu_T *menu);
-static int s_tearoffs = FALSE;
-#endif
+#ਜੇ defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+ਸਥਿਰ ਖਾਲੀ gui_create_tearoffs_recurse(vimmenu_T *menu, ਅਚਲ char_u *pname, ਪੂਰਨ *pri_tab, ਪੂਰਨ pri_idx);
+ਸਥਿਰ ਖਾਲੀ gui_ਜੋੜੋ_tearoff(char_u *tearpath, ਪੂਰਨ *pri_tab, ਪੂਰਨ pri_idx);
+ਸਥਿਰ ਖਾਲੀ gui_destroy_tearoffs_recurse(vimmenu_T *menu);
+ਸਥਿਰ ਪੂਰਨ s_tearoffs = FALSE;
+#ਜੇ_ਅੰਤ
 
-static int menu_is_hidden(char_u *name);
-static int menu_is_tearoff(char_u *name);
+ਸਥਿਰ ਪੂਰਨ menu_is_hidden(char_u *name);
+ਸਥਿਰ ਪੂਰਨ menu_is_tearoff(char_u *name);
 
 // When non-zero no menu must be added or cleared.  Prevents the list of menus
 // changing while listing them.
-static int menus_locked = 0;
+ਸਥਿਰ ਪੂਰਨ menus_locked = 0;
 
-#if defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
-static char_u *menu_skip_part(char_u *p);
-#endif
-#ifdef FEAT_MULTI_LANG
-static char_u *menutrans_lookup(char_u *name, int len);
-static void menu_unescape_name(char_u	*p);
-#endif
+#ਜੇ defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
+ਸਥਿਰ char_u *menu_skip_part(char_u *p);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+ਸਥਿਰ char_u *menutrans_lookup(char_u *name, ਪੂਰਨ len);
+ਸਥਿਰ ਖਾਲੀ menu_unescape_name(char_u	*p);
+#ਜੇ_ਅੰਤ
 
-static char_u *menu_translate_tab_and_shift(char_u *arg_start);
+ਸਥਿਰ char_u *menu_translate_tab_and_ਖਿਸਕਾਓ(char_u *arg_ਸ਼ੁਰੂ);
 
 // The character for each menu mode
-static char *menu_mode_chars[] = {"n", "v", "s", "o", "i", "c", "tl", "t"};
+ਸਥਿਰ ਅੱਖਰ *menu_ਬਹੁਲਕ_chars[] = {"n", "v", "s", "o", "i", "c", "tl", "t"};
 
-#ifdef FEAT_TOOLBAR
-static const char *toolbar_names[] =
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ *toolbar_ਨਾਂ[] =
 {
     /*  0 */ "New", "Open", "Save", "Undo", "Redo",
     /*  5 */ "Cut", "Copy", "Paste", "Print", "Help",
@@ -74,123 +74,123 @@ static const char *toolbar_names[] =
     /* 25 */ "Make", "TagJump", "RunCtags", "WinVSplit", "WinMaxWidth",
     /* 30 */ "WinMinWidth", "Exit"
 };
-# define TOOLBAR_NAME_COUNT ARRAY_LENGTH(toolbar_names)
-#endif
+# define TOOLBAR_NAME_ਗਿਣਤੀ ARRAY_ਲੰਮਾਈ(toolbar_ਨਾਂ)
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE if "name" is a window toolbar menu name.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 menu_is_winbar(char_u *name)
 {
-    return (STRNCMP(name, "WinBar", 6) == 0);
+    ਵਾਪਸ (STRNCMP(name, "WinBar", 6) == 0);
 }
 
-    int
-winbar_height(win_T *wp)
+    ਪੂਰਨ
+winbar_ਉਚਾਈ(win_T *wp)
 {
-    if (wp->w_winbar != NULL && wp->w_winbar->children != NULL)
-	return 1;
-    return 0;
+    ਜੇ (wp->w_winbar != ਨਿਰਾ && wp->w_winbar->children != ਨਿਰਾ)
+	ਵਾਪਸ 1;
+    ਵਾਪਸ 0;
 }
 
-    static vimmenu_T **
-get_root_menu(char_u *name)
+    ਸਥਿਰ vimmenu_T **
+get_ਜੜ੍ਹ_menu(char_u *name)
 {
-    if (menu_is_winbar(name))
-	return &curwin->w_winbar;
-    return &root_menu;
+    ਜੇ (menu_is_winbar(name))
+	ਵਾਪਸ &curwin->w_winbar;
+    ਵਾਪਸ &ਜੜ੍ਹ_menu;
 }
 
 /*
  * If "menus_locked" is set then give an error and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-is_menus_locked(void)
+    ਸਥਿਰ ਪੂਰਨ
+is_menus_locked(ਖਾਲੀ)
 {
-    if (menus_locked > 0)
+    ਜੇ (menus_locked > 0)
     {
 	emsg(_(e_cannot_change_menus_while_listing));
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Do the :menu command and relatives.
  */
-    void
+    ਖਾਲੀ
 ex_menu(
     exarg_T	*eap)		    // Ex command arguments
 {
-    char_u	*menu_path;
-    int		modes;
-    char_u	*map_to;
-    int		noremap;
-    int		silent = FALSE;
-    int		special = FALSE;
-    int		unmenu;
+    char_u	*menu_ਰਸਤਾ;
+    ਪੂਰਨ		modes;
+    char_u	*map_ਮੰਜ਼ਿਲ;
+    ਪੂਰਨ		noremap;
+    ਪੂਰਨ		silent = FALSE;
+    ਪੂਰਨ		special = FALSE;
+    ਪੂਰਨ		unmenu;
     char_u	*map_buf;
     char_u	*arg;
     char_u	*p;
-    int		i;
-#if defined(FEAT_GUI) && !defined(FEAT_GUI_GTK)
-    int		old_menu_height;
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    int		old_toolbar_height;
+    ਪੂਰਨ		i;
+#ਜੇ defined(FEAT_GUI) && !defined(FEAT_GUI_GTK)
+    ਪੂਰਨ		old_menu_ਉਚਾਈ;
+# ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+    ਪੂਰਨ		old_toolbar_ਉਚਾਈ;
 # endif
-#endif
-    int		pri_tab[MENUDEPTH + 1];
-    int		enable = MAYBE;	    // TRUE for "menu enable", FALSE for "menu
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		pri_tab[MENUDEPTH + 1];
+    ਪੂਰਨ		enable = MAYBE;	    // TRUE for "menu enable", FALSE for "menu
 				    // disable
-#ifdef FEAT_TOOLBAR
-    char_u	*icon = NULL;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    char_u	*icon = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
     vimmenu_T	menuarg;
-    vimmenu_T	**root_menu_ptr;
+    vimmenu_T	**ਜੜ੍ਹ_menu_ptr;
 
     modes = get_menu_cmd_modes(eap->cmd, eap->forceit, &noremap, &unmenu);
     arg = eap->arg;
 
-    for (;;)
+    ਲਈ (;;)
     {
-	if (STRNCMP(arg, "<script>", 8) == 0)
+	ਜੇ (STRNCMP(arg, "<script>", 8) == 0)
 	{
 	    noremap = REMAP_SCRIPT;
 	    arg = skipwhite(arg + 8);
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (STRNCMP(arg, "<silent>", 8) == 0)
+	ਜੇ (STRNCMP(arg, "<silent>", 8) == 0)
 	{
 	    silent = TRUE;
 	    arg = skipwhite(arg + 8);
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (STRNCMP(arg, "<special>", 9) == 0)
+	ਜੇ (STRNCMP(arg, "<special>", 9) == 0)
 	{
 	    special = TRUE;
 	    arg = skipwhite(arg + 9);
-	    continue;
+	    ਜਾਰੀ;
 	}
-	break;
+	ਰੋਕੋ;
     }
 
 
     // Locate an optional "icon=filename" argument.
-    if (STRNCMP(arg, "icon=", 5) == 0)
+    ਜੇ (STRNCMP(arg, "icon=", 5) == 0)
     {
 	arg += 5;
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 	icon = arg;
-#endif
-	while (*arg != NUL && *arg != ' ')
+#ਜੇ_ਅੰਤ
+	ਜਦੋਂ (*arg != NUL && *arg != ' ')
 	{
-	    if (*arg == '\\')
+	    ਜੇ (*arg == '\\')
 		STRMOVE(arg, arg + 1);
 	    MB_PTR_ADV(arg);
 	}
-	if (*arg != NUL)
+	ਜੇ (*arg != NUL)
 	{
 	    *arg++ = NUL;
 	    arg = skipwhite(arg);
@@ -200,41 +200,41 @@ ex_menu(
     /*
      * Fill in the priority table.
      */
-    for (p = arg; *p; ++p)
-	if (!VIM_ISDIGIT(*p) && *p != '.')
-	    break;
-    if (VIM_ISWHITE(*p))
+    ਲਈ (p = arg; *p; ++p)
+	ਜੇ (!VIM_ISDIGIT(*p) && *p != '.')
+	    ਰੋਕੋ;
+    ਜੇ (VIM_ISWHITE(*p))
     {
-	for (i = 0; i < MENUDEPTH && !VIM_ISWHITE(*arg); ++i)
+	ਲਈ (i = 0; i < MENUDEPTH && !VIM_ISWHITE(*arg); ++i)
 	{
 	    pri_tab[i] = getdigits(&arg);
-	    if (pri_tab[i] == 0)
+	    ਜੇ (pri_tab[i] == 0)
 		pri_tab[i] = 500;
-	    if (*arg == '.')
+	    ਜੇ (*arg == '.')
 		++arg;
 	}
 	arg = skipwhite(arg);
     }
-    else if (eap->addr_count && eap->line2 != 0)
+    ਨਹੀਂਤਾਂ ਜੇ (eap->addr_ਗਿਣਤੀ && eap->line2 != 0)
     {
 	pri_tab[0] = eap->line2;
 	i = 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	i = 0;
-    while (i < MENUDEPTH)
+    ਜਦੋਂ (i < MENUDEPTH)
 	pri_tab[i++] = 500;
     pri_tab[MENUDEPTH] = -1;		// mark end of the table
 
     /*
      * Check for "disable" or "enable" argument.
      */
-    if (STRNCMP(arg, "enable", 6) == 0 && VIM_ISWHITE(arg[6]))
+    ਜੇ (STRNCMP(arg, "enable", 6) == 0 && VIM_ISWHITE(arg[6]))
     {
 	enable = TRUE;
 	arg = skipwhite(arg + 6);
     }
-    else if (STRNCMP(arg, "disable", 7) == 0 && VIM_ISWHITE(arg[7]))
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(arg, "disable", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
 	enable = FALSE;
 	arg = skipwhite(arg + 7);
@@ -243,193 +243,193 @@ ex_menu(
     /*
      * If there is no argument, display all menus.
      */
-    if (*arg == NUL)
+    ਜੇ (*arg == NUL)
     {
 	show_menus(arg, modes);
-	return;
+	ਵਾਪਸ;
     }
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
     /*
      * Need to get the toolbar icon index before doing the translation.
      */
     menuarg.iconidx = -1;
     menuarg.icon_builtin = FALSE;
-    if (menu_is_toolbar(arg))
+    ਜੇ (menu_is_toolbar(arg))
     {
-	menu_path = menu_skip_part(arg);
-	if (*menu_path == '.')
+	menu_ਰਸਤਾ = menu_skip_part(arg);
+	ਜੇ (*menu_ਰਸਤਾ == '.')
 	{
-	    p = menu_skip_part(++menu_path);
-	    if (STRNCMP(menu_path, "BuiltIn", 7) == 0)
+	    p = menu_skip_part(++menu_ਰਸਤਾ);
+	    ਜੇ (STRNCMP(menu_ਰਸਤਾ, "BuiltIn", 7) == 0)
 	    {
-		if (skipdigits(menu_path + 7) == p)
+		ਜੇ (skipdigits(menu_ਰਸਤਾ + 7) == p)
 		{
-		    menuarg.iconidx = atoi((char *)menu_path + 7);
-		    if (menuarg.iconidx >= (int)TOOLBAR_NAME_COUNT)
+		    menuarg.iconidx = atoi((ਅੱਖਰ *)menu_ਰਸਤਾ + 7);
+		    ਜੇ (menuarg.iconidx >= (ਪੂਰਨ)TOOLBAR_NAME_ਗਿਣਤੀ)
 			menuarg.iconidx = -1;
-		    else
+		    ਨਹੀਂਤਾਂ
 			menuarg.icon_builtin = TRUE;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		for (i = 0; i < (int)TOOLBAR_NAME_COUNT; ++i)
-		    if (STRNCMP(toolbar_names[i], menu_path, p - menu_path)
+		ਲਈ (i = 0; i < (ਪੂਰਨ)TOOLBAR_NAME_ਗਿਣਤੀ; ++i)
+		    ਜੇ (STRNCMP(toolbar_ਨਾਂ[i], menu_ਰਸਤਾ, p - menu_ਰਸਤਾ)
 									 == 0)
 		    {
 			menuarg.iconidx = i;
-			break;
+			ਰੋਕੋ;
 		    }
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    menu_path = arg;
-    if (*menu_path == '.')
+    menu_ਰਸਤਾ = arg;
+    ਜੇ (*menu_ਰਸਤਾ == '.')
     {
-	semsg(_(e_invalid_argument_str), menu_path);
-	goto theend;
+	semsg(_(e_invalid_ਦਲੀਲ_str), menu_ਰਸਤਾ);
+	ਜਾਓ theend;
     }
 
-    map_to = menu_translate_tab_and_shift(arg);
+    map_ਮੰਜ਼ਿਲ = menu_translate_tab_and_ਖਿਸਕਾਓ(arg);
 
     /*
      * If there is only a menu name, display menus with that name.
      */
-    if (*map_to == NUL && !unmenu && enable == MAYBE)
+    ਜੇ (*map_ਮੰਜ਼ਿਲ == NUL && !unmenu && enable == MAYBE)
     {
-	show_menus(menu_path, modes);
-	goto theend;
+	show_menus(menu_ਰਸਤਾ, modes);
+	ਜਾਓ theend;
     }
-    else if (*map_to != NUL && (unmenu || enable != MAYBE))
+    ਨਹੀਂਤਾਂ ਜੇ (*map_ਮੰਜ਼ਿਲ != NUL && (unmenu || enable != MAYBE))
     {
-	semsg(_(e_trailing_characters_str), map_to);
-	goto theend;
+	semsg(_(e_trailing_characters_str), map_ਮੰਜ਼ਿਲ);
+	ਜਾਓ theend;
     }
-#if defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
-    old_menu_height = gui.menu_height;
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    old_toolbar_height = gui.toolbar_height;
+#ਜੇ defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
+    old_menu_ਉਚਾਈ = gui.menu_ਉਚਾਈ;
+# ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+    old_toolbar_ਉਚਾਈ = gui.toolbar_ਉਚਾਈ;
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-    root_menu_ptr = get_root_menu(menu_path);
-    if (root_menu_ptr == &curwin->w_winbar)
+    ਜੜ੍ਹ_menu_ptr = get_ਜੜ੍ਹ_menu(menu_ਰਸਤਾ);
+    ਜੇ (ਜੜ੍ਹ_menu_ptr == &curwin->w_winbar)
 	// Assume the window toolbar menu will change.
 	redraw_later(UPD_NOT_VALID);
 
-    if (enable != MAYBE)
+    ਜੇ (enable != MAYBE)
     {
 	/*
 	 * Change sensitivity of the menu.
 	 * For the PopUp menu, remove a menu for each mode separately.
 	 * Careful: menu_nable_recurse() changes menu_path.
 	 */
-	if (STRCMP(menu_path, "*") == 0)	// meaning: do all menus
-	    menu_path = (char_u *)"";
+	ਜੇ (STRCMP(menu_ਰਸਤਾ, "*") == 0)	// meaning: do all menus
+	    menu_ਰਸਤਾ = (char_u *)"";
 
-	if (menu_is_popup(menu_path))
+	ਜੇ (menu_is_popup(menu_ਰਸਤਾ))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    ਲਈ (i = 0; i < MENU_ਸੂਚਕਾਂਕ_TIP; ++i)
+		ਜੇ (modes & (1 << i))
 		{
-		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    p = popup_ਬਹੁਲਕ_name(menu_ਰਸਤਾ, i);
+		    ਜੇ (p != ਨਿਰਾ)
 		    {
-			menu_nable_recurse(*root_menu_ptr, p, MENU_ALL_MODES,
+			menu_nable_recurse(*ਜੜ੍ਹ_menu_ptr, p, MENU_ALL_MODES,
 								      enable);
 			vim_free(p);
 		    }
 		}
 	}
-	menu_nable_recurse(*root_menu_ptr, menu_path, modes, enable);
+	menu_nable_recurse(*ਜੜ੍ਹ_menu_ptr, menu_ਰਸਤਾ, modes, enable);
     }
-    else if (unmenu)
+    ਨਹੀਂਤਾਂ ਜੇ (unmenu)
     {
-	if (is_menus_locked())
-	    goto theend;
+	ਜੇ (is_menus_locked())
+	    ਜਾਓ theend;
 
 	/*
 	 * Delete menu(s).
 	 */
-	if (STRCMP(menu_path, "*") == 0)	// meaning: remove all menus
-	    menu_path = (char_u *)"";
+	ਜੇ (STRCMP(menu_ਰਸਤਾ, "*") == 0)	// meaning: remove all menus
+	    menu_ਰਸਤਾ = (char_u *)"";
 
 	/*
 	 * For the PopUp menu, remove a menu for each mode separately.
 	 */
-	if (menu_is_popup(menu_path))
+	ਜੇ (menu_is_popup(menu_ਰਸਤਾ))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    ਲਈ (i = 0; i < MENU_ਸੂਚਕਾਂਕ_TIP; ++i)
+		ਜੇ (modes & (1 << i))
 		{
-		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    p = popup_ਬਹੁਲਕ_name(menu_ਰਸਤਾ, i);
+		    ਜੇ (p != ਨਿਰਾ)
 		    {
-			remove_menu(root_menu_ptr, p, MENU_ALL_MODES, TRUE);
+			remove_menu(ਜੜ੍ਹ_menu_ptr, p, MENU_ALL_MODES, TRUE);
 			vim_free(p);
 		    }
 		}
 	}
 
 	// Careful: remove_menu() changes menu_path
-	remove_menu(root_menu_ptr, menu_path, modes, FALSE);
+	remove_menu(ਜੜ੍ਹ_menu_ptr, menu_ਰਸਤਾ, modes, FALSE);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (is_menus_locked())
-	    goto theend;
+	ਜੇ (is_menus_locked())
+	    ਜਾਓ theend;
 
 	/*
 	 * Add menu(s).
 	 * Replace special key codes.
 	 */
-	if (STRICMP(map_to, "<nop>") == 0)	// "<Nop>" means nothing
+	ਜੇ (STRICMP(map_ਮੰਜ਼ਿਲ, "<nop>") == 0)	// "<Nop>" means nothing
 	{
-	    map_to = (char_u *)"";
-	    map_buf = NULL;
+	    map_ਮੰਜ਼ਿਲ = (char_u *)"";
+	    map_buf = ਨਿਰਾ;
 	}
-	else if (modes & MENU_TIP_MODE)
-	    map_buf = NULL;	// Menu tips are plain text.
-	else
-	    map_to = replace_termcodes(map_to, &map_buf, 0,
-			REPTERM_DO_LT | (special ? REPTERM_SPECIAL : 0), NULL);
+	ਨਹੀਂਤਾਂ ਜੇ (modes & MENU_TIP_ਬਹੁਲਕ)
+	    map_buf = ਨਿਰਾ;	// Menu tips are plain text.
+	ਨਹੀਂਤਾਂ
+	    map_ਮੰਜ਼ਿਲ = replace_termcodes(map_ਮੰਜ਼ਿਲ, &map_buf, 0,
+			REPTERM_DO_LT | (special ? REPTERM_SPECIAL : 0), ਨਿਰਾ);
 	menuarg.modes = modes;
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 	menuarg.iconfile = icon;
-#endif
+#ਜੇ_ਅੰਤ
 	menuarg.noremap[0] = noremap;
 	menuarg.silent[0] = silent;
-	add_menu_path(menu_path, &menuarg, pri_tab, map_to
-#ifdef FEAT_GUI_MSWIN
+	ਜੋੜੋ_menu_ਰਸਤਾ(menu_ਰਸਤਾ, &menuarg, pri_tab, map_ਮੰਜ਼ਿਲ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 		, TRUE
-#endif
+#ਜੇ_ਅੰਤ
 		);
 
 	/*
 	 * For the PopUp menu, add a menu for each mode separately.
 	 */
-	if (menu_is_popup(menu_path))
+	ਜੇ (menu_is_popup(menu_ਰਸਤਾ))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    ਲਈ (i = 0; i < MENU_ਸੂਚਕਾਂਕ_TIP; ++i)
+		ਜੇ (modes & (1 << i))
 		{
-		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    p = popup_ਬਹੁਲਕ_name(menu_ਰਸਤਾ, i);
+		    ਜੇ (p != ਨਿਰਾ)
 		    {
 			// Include all modes, to make ":amenu" work
 			menuarg.modes = modes;
-#ifdef FEAT_TOOLBAR
-			menuarg.iconfile = NULL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+			menuarg.iconfile = ਨਿਰਾ;
 			menuarg.iconidx = -1;
 			menuarg.icon_builtin = FALSE;
-#endif
-			add_menu_path(p, &menuarg, pri_tab, map_to
-#ifdef FEAT_GUI_MSWIN
+#ਜੇ_ਅੰਤ
+			ਜੋੜੋ_menu_ਰਸਤਾ(p, &menuarg, pri_tab, map_ਮੰਜ਼ਿਲ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 				, TRUE
-#endif
+#ਜੇ_ਅੰਤ
 					 );
 			vim_free(p);
 		    }
@@ -439,29 +439,29 @@ ex_menu(
 	vim_free(map_buf);
     }
 
-#if defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK))
+#ਜੇ defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK))
     // If the menubar height changed, resize the window
-    if (gui.in_use
-	    && (gui.menu_height != old_menu_height
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-		|| gui.toolbar_height != old_toolbar_height
+    ਜੇ (gui.ਵਿੱਚ_use
+	    && (gui.menu_ਉਚਾਈ != old_menu_ਉਚਾਈ
+# ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+		|| gui.toolbar_ਉਚਾਈ != old_toolbar_ਉਚਾਈ
 # endif
 	    ))
-	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-#endif
-    if (root_menu_ptr == &curwin->w_winbar)
+	gui_ਸੈੱਟ_shellsize(FALSE, FALSE, RESIZE_VERT);
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਜੜ੍ਹ_menu_ptr == &curwin->w_winbar)
     {
-	int h = winbar_height(curwin);
+	ਪੂਰਨ h = winbar_ਉਚਾਈ(curwin);
 
-	if (h != curwin->w_winbar_height)
+	ਜੇ (h != curwin->w_winbar_ਉਚਾਈ)
 	{
-	    if (h == 0)
-		++curwin->w_height;
-	    else if (curwin->w_height > 0)
-		--curwin->w_height;
-	    curwin->w_winbar_height = h;
+	    ਜੇ (h == 0)
+		++curwin->w_ਉਚਾਈ;
+	    ਨਹੀਂਤਾਂ ਜੇ (curwin->w_ਉਚਾਈ > 0)
+		--curwin->w_ਉਚਾਈ;
+	    curwin->w_winbar_ਉਚਾਈ = h;
 	}
-	curwin->w_prev_height = curwin->w_height;
+	curwin->w_prev_ਉਚਾਈ = curwin->w_ਉਚਾਈ;
     }
 
 theend:
@@ -471,191 +471,191 @@ theend:
 /*
  * Add the menu with the given name to the menu hierarchy
  */
-    static int
-add_menu_path(
-    char_u	*menu_path,
+    ਸਥਿਰ ਪੂਰਨ
+ਜੋੜੋ_menu_ਰਸਤਾ(
+    char_u	*menu_ਰਸਤਾ,
     vimmenu_T	*menuarg,	// passes modes, iconfile, iconidx,
 				// icon_builtin, silent[0], noremap[0]
-    int		*pri_tab,
-    char_u	*call_data
-#ifdef FEAT_GUI_MSWIN
-    , int	addtearoff	// may add tearoff item
-#endif
+    ਪੂਰਨ		*pri_tab,
+    char_u	*call_ਅੰਕੜੇ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
+    , ਪੂਰਨ	addtearoff	// may add tearoff item
+#ਜੇ_ਅੰਤ
     )
 {
-    char_u	*path_name;
-    int		modes = menuarg->modes;
+    char_u	*ਰਸਤਾ_name;
+    ਪੂਰਨ		modes = menuarg->modes;
     vimmenu_T	**menup;
-    vimmenu_T	*menu = NULL;
-    vimmenu_T	*parent;
-    vimmenu_T	**lower_pri;
+    vimmenu_T	*menu = ਨਿਰਾ;
+    vimmenu_T	*ਮਾਪਾ;
+    vimmenu_T	**ਹੇਠਲਾ_pri;
     char_u	*p;
     char_u	*name;
     char_u	*dname;
-    char_u	*next_name;
-    int		i;
-    int		c;
-    int		d;
-#ifdef FEAT_GUI
-    int		idx;
-    int		new_idx;
-#endif
-    int		pri_idx = 0;
-    int		old_modes = 0;
-    int		amenu;
-#ifdef FEAT_MULTI_LANG
+    char_u	*ਅਗਲਾ_name;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		c;
+    ਪੂਰਨ		d;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਪੂਰਨ		idx;
+    ਪੂਰਨ		new_idx;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		pri_idx = 0;
+    ਪੂਰਨ		old_modes = 0;
+    ਪੂਰਨ		amenu;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     char_u	*en_name;
-    char_u	*map_to = NULL;
-#endif
-    vimmenu_T	**root_menu_ptr;
+    char_u	*map_ਮੰਜ਼ਿਲ = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+    vimmenu_T	**ਜੜ੍ਹ_menu_ptr;
 
     // Make a copy so we can stuff around with it, since it could be const
-    path_name = vim_strsave(menu_path);
-    if (path_name == NULL)
-	return FAIL;
-    root_menu_ptr = get_root_menu(menu_path);
-    menup = root_menu_ptr;
-    parent = NULL;
-    name = path_name;
-    while (*name)
+    ਰਸਤਾ_name = vim_strsave(menu_ਰਸਤਾ);
+    ਜੇ (ਰਸਤਾ_name == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੜ੍ਹ_menu_ptr = get_ਜੜ੍ਹ_menu(menu_ਰਸਤਾ);
+    menup = ਜੜ੍ਹ_menu_ptr;
+    ਮਾਪਾ = ਨਿਰਾ;
+    name = ਰਸਤਾ_name;
+    ਜਦੋਂ (*name)
     {
 	// Get name of this element in the menu hierarchy, and the simplified
 	// name (without mnemonic and accelerator text).
-	next_name = menu_name_skip(name);
-#ifdef	FEAT_MULTI_LANG
-	map_to = menutrans_lookup(name, (int)STRLEN(name));
-	if (map_to != NULL)
+	ਅਗਲਾ_name = menu_name_skip(name);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ	FEAT_MULTI_LANG
+	map_ਮੰਜ਼ਿਲ = menutrans_lookup(name, (ਪੂਰਨ)STRLEN(name));
+	ਜੇ (map_ਮੰਜ਼ਿਲ != ਨਿਰਾ)
 	{
 	    en_name = name;
-	    name = map_to;
+	    name = map_ਮੰਜ਼ਿਲ;
 	}
-	else
-	    en_name = NULL;
-#endif
-	dname = menu_text(name, NULL, NULL);
-	if (dname == NULL)
-	    goto erret;
-	if (*dname == NUL)
+	ਨਹੀਂਤਾਂ
+	    en_name = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+	dname = menu_ਪਾਠ(name, ਨਿਰਾ, ਨਿਰਾ);
+	ਜੇ (dname == ਨਿਰਾ)
+	    ਜਾਓ erret;
+	ਜੇ (*dname == NUL)
 	{
 	    // Only a mnemonic or accelerator is not valid.
-	    emsg(_(e_empty_menu_name));
-	    goto erret;
+	    emsg(_(e_ਖਾਲੀ_ਥਾਵਾਂ_menu_name));
+	    ਜਾਓ erret;
 	}
 
 	// See if it's already there
-	lower_pri = menup;
-#ifdef FEAT_GUI
+	ਹੇਠਲਾ_pri = menup;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 	idx = 0;
 	new_idx = 0;
-#endif
+#ਜੇ_ਅੰਤ
 	menu = *menup;
-	while (menu != NULL)
+	ਜਦੋਂ (menu != ਨਿਰਾ)
 	{
-	    if (menu_name_equal(name, menu) || menu_name_equal(dname, menu))
+	    ਜੇ (menu_name_equal(name, menu) || menu_name_equal(dname, menu))
 	    {
-		if (*next_name == NUL && menu->children != NULL)
+		ਜੇ (*ਅਗਲਾ_name == NUL && menu->children != ਨਿਰਾ)
 		{
-		    if (!sys_menu)
-			emsg(_(e_menu_path_must_not_lead_to_sub_menu));
-		    goto erret;
+		    ਜੇ (!sys_menu)
+			emsg(_(e_menu_ਰਸਤਾ_must_not_lead_ਮੰਜ਼ਿਲ_sub_menu));
+		    ਜਾਓ erret;
 		}
-		if (*next_name != NUL && menu->children == NULL
-#ifdef FEAT_GUI_MSWIN
+		ਜੇ (*ਅਗਲਾ_name != NUL && menu->children == ਨਿਰਾ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 			&& addtearoff
-#endif
+#ਜੇ_ਅੰਤ
 			)
 		{
-		    if (!sys_menu)
-			emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    goto erret;
+		    ਜੇ (!sys_menu)
+			emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		    ਜਾਓ erret;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
-	    menup = &menu->next;
+	    menup = &menu->ਅਗਲਾ;
 
 	    // Count menus, to find where this one needs to be inserted.
 	    // Ignore menus that are not in the menubar (PopUp and Toolbar)
-	    if (parent != NULL || menu_is_menubar(menu->name))
+	    ਜੇ (ਮਾਪਾ != ਨਿਰਾ || menu_is_menubar(menu->name))
 	    {
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		++idx;
-#endif
-		if (menu->priority <= pri_tab[pri_idx])
+#ਜੇ_ਅੰਤ
+		ਜੇ (menu->ਤਰਜੀਹ <= pri_tab[pri_idx])
 		{
-		    lower_pri = menup;
-#ifdef FEAT_GUI
+		    ਹੇਠਲਾ_pri = menup;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 		    new_idx = idx;
-#endif
+#ਜੇ_ਅੰਤ
 		}
 	    }
-	    menu = menu->next;
+	    menu = menu->ਅਗਲਾ;
 	}
 
-	if (menu == NULL)
+	ਜੇ (menu == ਨਿਰਾ)
 	{
-	    if (*next_name == NUL && parent == NULL)
+	    ਜੇ (*ਅਗਲਾ_name == NUL && ਮਾਪਾ == ਨਿਰਾ)
 	    {
-		emsg(_(e_must_not_add_menu_items_directly_to_menu_bar));
-		goto erret;
+		emsg(_(e_must_not_ਜੋੜੋ_menu_ਚੀਜ਼ਾਂ_directly_ਮੰਜ਼ਿਲ_menu_bar));
+		ਜਾਓ erret;
 	    }
 
-	    if (menu_is_separator(dname) && *next_name != NUL)
+	    ਜੇ (menu_is_separator(dname) && *ਅਗਲਾ_name != NUL)
 	    {
-		emsg(_(e_separator_cannot_be_part_of_menu_path));
-		goto erret;
+		emsg(_(e_separator_cannot_be_part_ਦਾ_menu_ਰਸਤਾ));
+		ਜਾਓ erret;
 	    }
 
 	    // Not already there, so let's add it
 	    menu = ALLOC_CLEAR_ONE(vimmenu_T);
-	    if (menu == NULL)
-		goto erret;
+	    ਜੇ (menu == ਨਿਰਾ)
+		ਜਾਓ erret;
 
 	    menu->modes = modes;
 	    menu->enabled = MENU_ALL_MODES;
 	    menu->name = vim_strsave(name);
 	    // separate mnemonic and accelerator text from actual menu name
-	    menu->dname = menu_text(name, &menu->mnemonic, &menu->actext);
-#ifdef	FEAT_MULTI_LANG
-	    if (en_name != NULL)
+	    menu->dname = menu_ਪਾਠ(name, &menu->mnemonic, &menu->actext);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ	FEAT_MULTI_LANG
+	    ਜੇ (en_name != ਨਿਰਾ)
 	    {
 		menu->en_name = vim_strsave(en_name);
-		menu->en_dname = menu_text(en_name, NULL, NULL);
+		menu->en_dname = menu_ਪਾਠ(en_name, ਨਿਰਾ, ਨਿਰਾ);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		menu->en_name = NULL;
-		menu->en_dname = NULL;
+		menu->en_name = ਨਿਰਾ;
+		menu->en_dname = ਨਿਰਾ;
 	    }
-#endif
-	    menu->priority = pri_tab[pri_idx];
-	    menu->parent = parent;
-#ifdef FEAT_GUI_MOTIF
+#ਜੇ_ਅੰਤ
+	    menu->ਤਰਜੀਹ = pri_tab[pri_idx];
+	    menu->ਮਾਪਾ = ਮਾਪਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MOTIF
 	    menu->sensitive = TRUE;	    // the default
-#endif
-#ifdef FEAT_BEVAL_TIP
-	    menu->tip = NULL;
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_BEVAL_TIP
+	    menu->tip = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 	    /*
 	     * Add after menu that has lower priority.
 	     */
-	    menu->next = *lower_pri;
-	    *lower_pri = menu;
+	    menu->ਅਗਲਾ = *ਹੇਠਲਾ_pri;
+	    *ਹੇਠਲਾ_pri = menu;
 
 	    old_modes = 0;
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 	    menu->iconidx = menuarg->iconidx;
 	    menu->icon_builtin = menuarg->icon_builtin;
-	    if (*next_name == NUL && menuarg->iconfile != NULL)
+	    ਜੇ (*ਅਗਲਾ_name == NUL && menuarg->iconfile != ਨਿਰਾ)
 		menu->iconfile = vim_strsave(menuarg->iconfile);
-#endif
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 	    // the tearoff item must be present in the modes of each item.
-	    if (parent != NULL && menu_is_tearoff(parent->children->dname))
-		parent->children->modes |= modes;
-#endif
+	    ਜੇ (ਮਾਪਾ != ਨਿਰਾ && menu_is_tearoff(ਮਾਪਾ->children->dname))
+		ਮਾਪਾ->children->modes |= modes;
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    old_modes = menu->modes;
 
@@ -664,49 +664,49 @@ add_menu_path(
 	     * modes, then make sure it's available for this one now
 	     * Also enable a menu when it's created or changed.
 	     */
-#ifdef FEAT_GUI_MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 	    // If adding a tearbar (addtearoff == FALSE) don't update modes
-	    if (addtearoff)
-#endif
+	    ਜੇ (addtearoff)
+#ਜੇ_ਅੰਤ
 	    {
 		menu->modes |= modes;
 		menu->enabled |= modes;
 	    }
 	}
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 	/*
 	 * Add the menu item when it's used in one of the modes, but not when
 	 * only a tooltip is defined.
 	 */
-	if ((old_modes & MENU_ALL_MODES) == 0
+	ਜੇ ((old_modes & MENU_ALL_MODES) == 0
 		&& (menu->modes & MENU_ALL_MODES) != 0)
 	{
-	    if (gui.in_use)  // Otherwise it will be added when GUI starts
+	    ਜੇ (gui.ਵਿੱਚ_use)  // Otherwise it will be added when GUI starts
 	    {
-		if (*next_name == NUL)
+		ਜੇ (*ਅਗਲਾ_name == NUL)
 		{
 		    // Real menu item, not sub-menu
-		    gui_mch_add_menu_item(menu, new_idx);
+		    gui_mch_ਜੋੜੋ_menu_ਵਸਤੂ(menu, new_idx);
 
 		    // Want to update menus now even if mode not changed
 		    force_menu_update = TRUE;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Sub-menu (not at end of path yet)
-		    gui_mch_add_menu(menu, new_idx);
+		    gui_mch_ਜੋੜੋ_menu(menu, new_idx);
 		}
 	    }
 
-# if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+# ਜੇ defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 	    // When adding a new submenu, may add a tearoff item
-	    if (	addtearoff
-		    && *next_name
-		    && vim_strchr(p_go, GO_TEAROFF) != NULL
+	    ਜੇ (	addtearoff
+		    && *ਅਗਲਾ_name
+		    && vim_strchr(p_go, GO_TEAROFF) != ਨਿਰਾ
 		    && menu_is_menubar(name)
 #  ifdef VIMDLL
-		    && (gui.in_use || gui.starting)
+		    && (gui.ਵਿੱਚ_use || gui.starting)
 #  endif
 		    )
 	    {
@@ -717,60 +717,60 @@ add_menu_path(
 		 * \'s and ^V's stripped out. But menu_path is a "raw"
 		 * string, so we must correct for special characters.
 		 */
-		tearpath = alloc(STRLEN(menu_path) + TEAR_LEN + 2);
-		if (tearpath != NULL)
+		tearpath = alloc(STRLEN(menu_ਰਸਤਾ) + TEAR_LEN + 2);
+		ਜੇ (tearpath != ਨਿਰਾ)
 		{
 		    char_u  *s;
-		    int	    len;
+		    ਪੂਰਨ	    len;
 
-		    STRCPY(tearpath, menu_path);
-		    len = (int)(next_name - path_name - 1);
-		    for (s = tearpath; *s && s < tearpath + len; MB_PTR_ADV(s))
+		    STRCPY(tearpath, menu_ਰਸਤਾ);
+		    len = (ਪੂਰਨ)(ਅਗਲਾ_name - ਰਸਤਾ_name - 1);
+		    ਲਈ (s = tearpath; *s && s < tearpath + len; MB_PTR_ADV(s))
 		    {
-			if ((*s == '\\' || *s == Ctrl_V) && s[1])
+			ਜੇ ((*s == '\\' || *s == Ctrl_V) && s[1])
 			{
 			    ++len;
 			    ++s;
 			}
 		    }
 		    tearpath[len] = NUL;
-		    gui_add_tearoff(tearpath, pri_tab, pri_idx);
+		    gui_ਜੋੜੋ_tearoff(tearpath, pri_tab, pri_idx);
 		    vim_free(tearpath);
 		}
 	    }
 # endif
 	}
-#endif // FEAT_GUI
+#ਜੇ_ਅੰਤ // FEAT_GUI
 
 	menup = &menu->children;
-	parent = menu;
-	name = next_name;
+	ਮਾਪਾ = menu;
+	name = ਅਗਲਾ_name;
 	VIM_CLEAR(dname);
-	if (pri_tab[pri_idx + 1] != -1)
+	ਜੇ (pri_tab[pri_idx + 1] != -1)
 	    ++pri_idx;
     }
-    vim_free(path_name);
+    vim_free(ਰਸਤਾ_name);
 
     /*
      * Only add system menu items which have not been defined yet.
      * First check if this was an ":amenu".
      */
-    amenu = ((modes & (MENU_NORMAL_MODE | MENU_INSERT_MODE)) ==
-				       (MENU_NORMAL_MODE | MENU_INSERT_MODE));
-    if (sys_menu)
+    amenu = ((modes & (MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ | MENU_ਪਾਓ_ਬਹੁਲਕ)) ==
+				       (MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ | MENU_ਪਾਓ_ਬਹੁਲਕ));
+    ਜੇ (sys_menu)
 	modes &= ~old_modes;
 
-    if (menu != NULL && modes)
+    ਜੇ (menu != ਨਿਰਾ && modes)
     {
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 	menu->cb = gui_menu_cb;
-#endif
-	p = (call_data == NULL) ? NULL : vim_strsave(call_data);
+#ਜੇ_ਅੰਤ
+	p = (call_ਅੰਕੜੇ == ਨਿਰਾ) ? ਨਿਰਾ : vim_strsave(call_ਅੰਕੜੇ);
 
 	// loop over all modes, may add more than one
-	for (i = 0; i < MENU_MODES; ++i)
+	ਲਈ (i = 0; i < MENU_MODES; ++i)
 	{
-	    if (modes & (1 << i))
+	    ਜੇ (modes & (1 << i))
 	    {
 		// free any old menu
 		free_menu_string(menu, i);
@@ -780,127 +780,127 @@ add_menu_path(
 		// Don't do this for "<Nop>".
 		c = 0;
 		d = 0;
-		if (amenu && call_data != NULL && *call_data != NUL
-#ifdef FEAT_GUI_MSWIN
+		ਜੇ (amenu && call_ਅੰਕੜੇ != ਨਿਰਾ && *call_ਅੰਕੜੇ != NUL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 		       && addtearoff
-#endif
+#ਜੇ_ਅੰਤ
 				       )
 		{
-		    switch (1 << i)
+		    ਚੋਣ (1 << i)
 		    {
-			case MENU_VISUAL_MODE:
-			case MENU_SELECT_MODE:
-			case MENU_OP_PENDING_MODE:
-			case MENU_CMDLINE_MODE:
+			ਹਾਲਤ MENU_VISUAL_ਬਹੁਲਕ:
+			ਹਾਲਤ MENU_SELECT_ਬਹੁਲਕ:
+			ਹਾਲਤ MENU_OP_PENDING_ਬਹੁਲਕ:
+			ਹਾਲਤ MENU_CMDLINE_ਬਹੁਲਕ:
 			    c = Ctrl_C;
-			    break;
-			case MENU_INSERT_MODE:
+			    ਰੋਕੋ;
+			ਹਾਲਤ MENU_ਪਾਓ_ਬਹੁਲਕ:
 			    c = Ctrl_BSL;
 			    d = Ctrl_O;
-			    break;
+			    ਰੋਕੋ;
 		    }
 		}
 
-		if (c != 0)
+		ਜੇ (c != 0)
 		{
-		    menu->strings[i] = alloc(STRLEN(call_data) + 5);
-		    if (menu->strings[i] != NULL)
+		    menu->ਲੜੀਆਂ[i] = alloc(STRLEN(call_ਅੰਕੜੇ) + 5);
+		    ਜੇ (menu->ਲੜੀਆਂ[i] != ਨਿਰਾ)
 		    {
-			menu->strings[i][0] = c;
-			if (d == 0)
-			    STRCPY(menu->strings[i] + 1, call_data);
-			else
+			menu->ਲੜੀਆਂ[i][0] = c;
+			ਜੇ (d == 0)
+			    STRCPY(menu->ਲੜੀਆਂ[i] + 1, call_ਅੰਕੜੇ);
+			ਨਹੀਂਤਾਂ
 			{
-			    menu->strings[i][1] = d;
-			    STRCPY(menu->strings[i] + 2, call_data);
+			    menu->ਲੜੀਆਂ[i][1] = d;
+			    STRCPY(menu->ਲੜੀਆਂ[i] + 2, call_ਅੰਕੜੇ);
 			}
-			if (c == Ctrl_C)
+			ਜੇ (c == Ctrl_C)
 			{
-			    int	    len = (int)STRLEN(menu->strings[i]);
+			    ਪੂਰਨ	    len = (ਪੂਰਨ)STRLEN(menu->ਲੜੀਆਂ[i]);
 
 			    // Append CTRL-\ CTRL-G to obey 'insertmode'.
-			    menu->strings[i][len] = Ctrl_BSL;
-			    menu->strings[i][len + 1] = Ctrl_G;
-			    menu->strings[i][len + 2] = NUL;
+			    menu->ਲੜੀਆਂ[i][len] = Ctrl_BSL;
+			    menu->ਲੜੀਆਂ[i][len + 1] = Ctrl_G;
+			    menu->ਲੜੀਆਂ[i][len + 2] = NUL;
 			}
 		    }
 		}
-		else
-		    menu->strings[i] = p;
+		ਨਹੀਂਤਾਂ
+		    menu->ਲੜੀਆਂ[i] = p;
 		menu->noremap[i] = menuarg->noremap[0];
 		menu->silent[i] = menuarg->silent[0];
 	    }
 	}
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
+#ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
 	&& (defined(FEAT_BEVAL_GUI) || defined(FEAT_GUI_GTK))
 	// Need to update the menu tip.
-	if (modes & MENU_TIP_MODE)
-	    gui_mch_menu_set_tip(menu);
-#endif
+	ਜੇ (modes & MENU_TIP_ਬਹੁਲਕ)
+	    gui_mch_menu_ਸੈੱਟ_tip(menu);
+#ਜੇ_ਅੰਤ
     }
-    return OK;
+    ਵਾਪਸ OK;
 
 erret:
-    vim_free(path_name);
+    vim_free(ਰਸਤਾ_name);
     vim_free(dname);
 
     // Delete any empty submenu we added before discovering the error.  Repeat
     // for higher levels.
-    while (parent != NULL && parent->children == NULL)
+    ਜਦੋਂ (ਮਾਪਾ != ਨਿਰਾ && ਮਾਪਾ->children == ਨਿਰਾ)
     {
-	if (parent->parent == NULL)
-	    menup = root_menu_ptr;
-	else
-	    menup = &parent->parent->children;
-	for ( ; *menup != NULL && *menup != parent; menup = &((*menup)->next))
+	ਜੇ (ਮਾਪਾ->ਮਾਪਾ == ਨਿਰਾ)
+	    menup = ਜੜ੍ਹ_menu_ptr;
+	ਨਹੀਂਤਾਂ
+	    menup = &ਮਾਪਾ->ਮਾਪਾ->children;
+	ਲਈ ( ; *menup != ਨਿਰਾ && *menup != ਮਾਪਾ; menup = &((*menup)->ਅਗਲਾ))
 	    ;
-	if (*menup == NULL) // safety check
-	    break;
-	parent = parent->parent;
+	ਜੇ (*menup == ਨਿਰਾ) // safety check
+	    ਰੋਕੋ;
+	ਮਾਪਾ = ਮਾਪਾ->ਮਾਪਾ;
 	free_menu(menup);
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Set the (sub)menu with the given name to enabled or disabled.
  * Called recursively.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 menu_nable_recurse(
     vimmenu_T	*menu,
     char_u	*name,
-    int		modes,
-    int		enable)
+    ਪੂਰਨ		modes,
+    ਪੂਰਨ		enable)
 {
     char_u	*p;
 
-    if (menu == NULL)
-	return OK;		// Got to bottom of hierarchy
+    ਜੇ (menu == ਨਿਰਾ)
+	ਵਾਪਸ OK;		// Got to bottom of hierarchy
 
     // Get name of this element in the menu hierarchy
     p = menu_name_skip(name);
 
     // Find the menu
-    while (menu != NULL)
+    ਜਦੋਂ (menu != ਨਿਰਾ)
     {
-	if (*name == NUL || *name == '*' || menu_name_equal(name, menu))
+	ਜੇ (*name == NUL || *name == '*' || menu_name_equal(name, menu))
 	{
-	    if (*p != NUL)
+	    ਜੇ (*p != NUL)
 	    {
-		if (menu->children == NULL)
+		ਜੇ (menu->children == ਨਿਰਾ)
 		{
-		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    return FAIL;
+		    emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		    ਵਾਪਸ FAIL;
 		}
-		if (menu_nable_recurse(menu->children, p, modes, enable)
+		ਜੇ (menu_nable_recurse(menu->children, p, modes, enable)
 								      == FAIL)
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 	    }
-	    else
-		if (enable)
+	    ਨਹੀਂਤਾਂ
+		ਜੇ (enable)
 		    menu->enabled |= modes;
-		else
+		ਨਹੀਂਤਾਂ
 		    menu->enabled &= ~modes;
 
 	    /*
@@ -908,78 +908,78 @@ menu_nable_recurse(
 	     * modes, so keep looping, otherwise we are just doing the named
 	     * menu item (which has been found) so break here.
 	     */
-	    if (*name != NUL && *name != '*')
-		break;
+	    ਜੇ (*name != NUL && *name != '*')
+		ਰੋਕੋ;
 	}
-	menu = menu->next;
+	menu = menu->ਅਗਲਾ;
     }
-    if (*name != NUL && *name != '*' && menu == NULL)
+    ਜੇ (*name != NUL && *name != '*' && menu == ਨਿਰਾ)
     {
 	semsg(_(e_no_menu_str), name);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // Want to update menus now even if mode not changed
     force_menu_update = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Remove the (sub)menu with the given name from the menu hierarchy
  * Called recursively.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 remove_menu(
     vimmenu_T	**menup,
     char_u	*name,
-    int		modes,
-    int		silent)		// don't give error messages
+    ਪੂਰਨ		modes,
+    ਪੂਰਨ		silent)		// don't give error messages
 {
     vimmenu_T	*menu;
-    vimmenu_T	*child;
+    vimmenu_T	*ਬੱਚਾ;
     char_u	*p;
 
-    if (*menup == NULL)
-	return OK;		// Got to bottom of hierarchy
+    ਜੇ (*menup == ਨਿਰਾ)
+	ਵਾਪਸ OK;		// Got to bottom of hierarchy
 
     // Get name of this element in the menu hierarchy
     p = menu_name_skip(name);
 
     // Find the menu
-    while ((menu = *menup) != NULL)
+    ਜਦੋਂ ((menu = *menup) != ਨਿਰਾ)
     {
-	if (*name == NUL || menu_name_equal(name, menu))
+	ਜੇ (*name == NUL || menu_name_equal(name, menu))
 	{
-	    if (*p != NUL && menu->children == NULL)
+	    ਜੇ (*p != NUL && menu->children == ਨਿਰਾ)
 	    {
-		if (!silent)
-		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		return FAIL;
+		ਜੇ (!silent)
+		    emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		ਵਾਪਸ FAIL;
 	    }
-	    if ((menu->modes & modes) != 0x0)
+	    ਜੇ ((menu->modes & modes) != 0x0)
 	    {
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+#ਜੇ defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
 		/*
 		 * If we are removing all entries for this menu,MENU_ALL_MODES,
 		 * Then kill any tearoff before we start
 		 */
-		if (*p == NUL && modes == MENU_ALL_MODES)
+		ਜੇ (*p == NUL && modes == MENU_ALL_MODES)
 		{
-		    if (IsWindow(menu->tearoff_handle))
-			DestroyWindow(menu->tearoff_handle);
+		    ਜੇ (Is_ਖਿੜਕੀ(menu->tearoff_handle))
+			Destroy_ਖਿੜਕੀ(menu->tearoff_handle);
 		}
-#endif
-		if (remove_menu(&menu->children, p, modes, silent) == FAIL)
-		    return FAIL;
+#ਜੇ_ਅੰਤ
+		ਜੇ (remove_menu(&menu->children, p, modes, silent) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
-	    else if (*name != NUL)
+	    ਨਹੀਂਤਾਂ ਜੇ (*name != NUL)
 	    {
-		if (!silent)
-		    emsg(_(e_menu_only_exists_in_another_mode));
-		return FAIL;
+		ਜੇ (!silent)
+		    emsg(_(e_menu_only_exists_ਵਿੱਚ_another_ਬਹੁਲਕ));
+		ਵਾਪਸ FAIL;
 	    }
 
 	    /*
@@ -987,415 +987,415 @@ remove_menu(
 	     * modes, so keep looping, otherwise we are just removing the named
 	     * menu item (which has been found) so break here.
 	     */
-	    if (*name != NUL)
-		break;
+	    ਜੇ (*name != NUL)
+		ਰੋਕੋ;
 
 	    // Remove the menu item for the given mode[s].  If the menu item
 	    // is no longer valid in ANY mode, delete it
 	    menu->modes &= ~modes;
-	    if (modes & MENU_TIP_MODE)
-		free_menu_string(menu, MENU_INDEX_TIP);
-	    if ((menu->modes & MENU_ALL_MODES) == 0)
+	    ਜੇ (modes & MENU_TIP_ਬਹੁਲਕ)
+		free_menu_string(menu, MENU_ਸੂਚਕਾਂਕ_TIP);
+	    ਜੇ ((menu->modes & MENU_ALL_MODES) == 0)
 		free_menu(menup);
-	    else
-		menup = &menu->next;
+	    ਨਹੀਂਤਾਂ
+		menup = &menu->ਅਗਲਾ;
 	}
-	else
-	    menup = &menu->next;
+	ਨਹੀਂਤਾਂ
+	    menup = &menu->ਅਗਲਾ;
     }
-    if (*name != NUL)
+    ਜੇ (*name != NUL)
     {
-	if (menu == NULL)
+	ਜੇ (menu == ਨਿਰਾ)
 	{
-	    if (!silent)
+	    ਜੇ (!silent)
 		semsg(_(e_no_menu_str), name);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
 
 	// Recalculate modes for menu based on the new updated children
 	menu->modes &= ~modes;
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
-	if ((s_tearoffs) && (menu->children != NULL)) // there's a tear bar.
-	    child = menu->children->next; // don't count tearoff bar
-	else
-#endif
-	    child = menu->children;
-	for ( ; child != NULL; child = child->next)
-	    menu->modes |= child->modes;
-	if (modes & MENU_TIP_MODE)
+#ਜੇ defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+	ਜੇ ((s_tearoffs) && (menu->children != ਨਿਰਾ)) // there's a tear bar.
+	    ਬੱਚਾ = menu->children->ਅਗਲਾ; // don't count tearoff bar
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	    ਬੱਚਾ = menu->children;
+	ਲਈ ( ; ਬੱਚਾ != ਨਿਰਾ; ਬੱਚਾ = ਬੱਚਾ->ਅਗਲਾ)
+	    menu->modes |= ਬੱਚਾ->modes;
+	ਜੇ (modes & MENU_TIP_ਬਹੁਲਕ)
 	{
-	    free_menu_string(menu, MENU_INDEX_TIP);
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
+	    free_menu_string(menu, MENU_ਸੂਚਕਾਂਕ_TIP);
+#ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
 	    && (defined(FEAT_BEVAL_GUI) || defined(FEAT_GUI_GTK))
 	    // Need to update the menu tip.
-	    if (gui.in_use)
-		gui_mch_menu_set_tip(menu);
-#endif
+	    ਜੇ (gui.ਵਿੱਚ_use)
+		gui_mch_menu_ਸੈੱਟ_tip(menu);
+#ਜੇ_ਅੰਤ
 	}
-	if ((menu->modes & MENU_ALL_MODES) == 0)
+	ਜੇ ((menu->modes & MENU_ALL_MODES) == 0)
 	{
 	    // The menu item is no longer valid in ANY mode, so delete it
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
-	    if (s_tearoffs && menu->children != NULL) // there's a tear bar.
+#ਜੇ defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+	    ਜੇ (s_tearoffs && menu->children != ਨਿਰਾ) // there's a tear bar.
 		free_menu(&menu->children);
-#endif
+#ਜੇ_ਅੰਤ
 	    *menup = menu;
 	    free_menu(menup);
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Remove the WinBar menu from window "wp".
  */
-    void
+    ਖਾਲੀ
 remove_winbar(win_T *wp)
 {
     remove_menu(&wp->w_winbar, (char_u *)"", MENU_ALL_MODES, TRUE);
-    vim_free(wp->w_winbar_items);
+    vim_free(wp->w_winbar_ਚੀਜ਼ਾਂ);
 }
 
 /*
  * Free the given menu structure and remove it from the linked list.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 free_menu(vimmenu_T **menup)
 {
-    int		i;
+    ਪੂਰਨ		i;
     vimmenu_T	*menu;
 
     menu = *menup;
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // Free machine specific menu structures (only when already created)
     // Also may rebuild a tearoff'ed menu
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 	gui_mch_destroy_menu(menu);
-#endif
+#ਜੇ_ਅੰਤ
 
     // Don't change *menup until after calling gui_mch_destroy_menu(). The
     // MacOS code needs the original structure to properly delete the menu.
-    *menup = menu->next;
+    *menup = menu->ਅਗਲਾ;
     vim_free(menu->name);
     vim_free(menu->dname);
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     vim_free(menu->en_name);
     vim_free(menu->en_dname);
-#endif
+#ਜੇ_ਅੰਤ
     vim_free(menu->actext);
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
     vim_free(menu->iconfile);
 # ifdef FEAT_GUI_MOTIF
     vim_free(menu->xpm_fname);
 # endif
-#endif
-    for (i = 0; i < MENU_MODES; i++)
+#ਜੇ_ਅੰਤ
+    ਲਈ (i = 0; i < MENU_MODES; i++)
 	free_menu_string(menu, i);
     vim_free(menu);
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // Want to update menus now even if mode not changed
     force_menu_update = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Free the menu->string with the given index.
  */
-    static void
-free_menu_string(vimmenu_T *menu, int idx)
+    ਸਥਿਰ ਖਾਲੀ
+free_menu_string(vimmenu_T *menu, ਪੂਰਨ idx)
 {
-    int		count = 0;
-    int		i;
+    ਪੂਰਨ		ਗਿਣਤੀ_2 = 0;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < MENU_MODES; i++)
-	if (menu->strings[i] == menu->strings[idx])
-	    count++;
-    if (count == 1)
-	vim_free(menu->strings[idx]);
-    menu->strings[idx] = NULL;
+    ਲਈ (i = 0; i < MENU_MODES; i++)
+	ਜੇ (menu->ਲੜੀਆਂ[i] == menu->ਲੜੀਆਂ[idx])
+	    ਗਿਣਤੀ_2++;
+    ਜੇ (ਗਿਣਤੀ_2 == 1)
+	vim_free(menu->ਲੜੀਆਂ[idx]);
+    menu->ਲੜੀਆਂ[idx] = ਨਿਰਾ;
 }
 
 /*
  * Show the mapping associated with a menu item or hierarchy in a sub-menu.
  */
-    static int
-show_menus(char_u *path_name, int modes)
+    ਸਥਿਰ ਪੂਰਨ
+show_menus(char_u *ਰਸਤਾ_name, ਪੂਰਨ modes)
 {
     char_u	*p;
     char_u	*name;
     vimmenu_T	*menu;
-    vimmenu_T	*parent = NULL;
+    vimmenu_T	*ਮਾਪਾ = ਨਿਰਾ;
 
-    name = path_name = vim_strsave(path_name);
-    if (path_name == NULL)
-	return FAIL;
-    menu = *get_root_menu(path_name);
+    name = ਰਸਤਾ_name = vim_strsave(ਰਸਤਾ_name);
+    ਜੇ (ਰਸਤਾ_name == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    menu = *get_ਜੜ੍ਹ_menu(ਰਸਤਾ_name);
 
     // First, find the (sub)menu with the given name
-    while (*name)
+    ਜਦੋਂ (*name)
     {
 	p = menu_name_skip(name);
-	while (menu != NULL)
+	ਜਦੋਂ (menu != ਨਿਰਾ)
 	{
-	    if (menu_name_equal(name, menu))
+	    ਜੇ (menu_name_equal(name, menu))
 	    {
 		// Found menu
-		if (*p != NUL && menu->children == NULL)
+		ਜੇ (*p != NUL && menu->children == ਨਿਰਾ)
 		{
-		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    vim_free(path_name);
-		    return FAIL;
+		    emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		    vim_free(ਰਸਤਾ_name);
+		    ਵਾਪਸ FAIL;
 		}
-		else if ((menu->modes & modes) == 0x0)
+		ਨਹੀਂਤਾਂ ਜੇ ((menu->modes & modes) == 0x0)
 		{
-		    emsg(_(e_menu_only_exists_in_another_mode));
-		    vim_free(path_name);
-		    return FAIL;
+		    emsg(_(e_menu_only_exists_ਵਿੱਚ_another_ਬਹੁਲਕ));
+		    vim_free(ਰਸਤਾ_name);
+		    ਵਾਪਸ FAIL;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
-	    menu = menu->next;
+	    menu = menu->ਅਗਲਾ;
 	}
-	if (menu == NULL)
+	ਜੇ (menu == ਨਿਰਾ)
 	{
 	    semsg(_(e_no_menu_str), name);
-	    vim_free(path_name);
-	    return FAIL;
+	    vim_free(ਰਸਤਾ_name);
+	    ਵਾਪਸ FAIL;
 	}
 	name = p;
-	parent = menu;
+	ਮਾਪਾ = menu;
 	menu = menu->children;
     }
-    vim_free(path_name);
+    vim_free(ਰਸਤਾ_name);
 
     // make sure the list of menus doesn't change while listing them
     ++menus_locked;
 
     // list the matching menu mappings
-    msg_puts_title(_("\n--- Menus ---"));
-    show_menus_recursive(parent, modes, 0);
+    ਸੁਨੇਹਾ_puts_title(_("\n--- Menus ---"));
+    show_menus_recursive(ਮਾਪਾ, modes, 0);
 
     --menus_locked;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Recursively show the mappings associated with the menus under the given one
  */
-    static void
-show_menus_recursive(vimmenu_T *menu, int modes, int depth)
+    ਸਥਿਰ ਖਾਲੀ
+show_menus_recursive(vimmenu_T *menu, ਪੂਰਨ modes, ਪੂਰਨ ਡੂੰਘਾਈ)
 {
-    int		i;
-    int		bit;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		ਦੋਆਧਾਰੀ_ਅੰਕ;
 
-    if (menu != NULL && (menu->modes & modes) == 0x0)
-	return;
+    ਜੇ (menu != ਨਿਰਾ && (menu->modes & modes) == 0x0)
+	ਵਾਪਸ;
 
-    if (menu != NULL)
+    ਜੇ (menu != ਨਿਰਾ)
     {
-	msg_putchar('\n');
-	if (got_int)		// "q" hit for "--more--"
-	    return;
-	for (i = 0; i < depth; i++)
-	    msg_puts("  ");
-	if (menu->priority)
+	ਸੁਨੇਹਾ_putchar('\n');
+	ਜੇ (got_int)		// "q" hit for "--more--"
+	    ਵਾਪਸ;
+	ਲਈ (i = 0; i < ਡੂੰਘਾਈ; i++)
+	    ਸੁਨੇਹਾ_puts("  ");
+	ਜੇ (menu->ਤਰਜੀਹ)
 	{
-	    msg_outnum((long)menu->priority);
-	    msg_puts(" ");
+	    ਸੁਨੇਹਾ_outnum((ਲੰਮਾ)menu->ਤਰਜੀਹ);
+	    ਸੁਨੇਹਾ_puts(" ");
 	}
 				// Same highlighting as for directories!?
-	msg_outtrans_attr(menu->name, HL_ATTR(HLF_D));
+	ਸੁਨੇਹਾ_outtrans_attr(menu->name, HL_ATTR(HLF_D));
     }
 
-    if (menu != NULL && menu->children == NULL)
+    ਜੇ (menu != ਨਿਰਾ && menu->children == ਨਿਰਾ)
     {
-	for (bit = 0; bit < MENU_MODES; bit++)
-	    if ((menu->modes & modes & (1 << bit)) != 0)
+	ਲਈ (ਦੋਆਧਾਰੀ_ਅੰਕ = 0; ਦੋਆਧਾਰੀ_ਅੰਕ < MENU_MODES; ਦੋਆਧਾਰੀ_ਅੰਕ++)
+	    ਜੇ ((menu->modes & modes & (1 << ਦੋਆਧਾਰੀ_ਅੰਕ)) != 0)
 	    {
-		msg_putchar('\n');
-		if (got_int)		// "q" hit for "--more--"
-		    return;
-		for (i = 0; i < depth + 2; i++)
-		    msg_puts("  ");
-		msg_puts(menu_mode_chars[bit]);
-		if (menu->noremap[bit] == REMAP_NONE)
-		    msg_putchar('*');
-		else if (menu->noremap[bit] == REMAP_SCRIPT)
-		    msg_putchar('&');
-		else
-		    msg_putchar(' ');
-		if (menu->silent[bit])
-		    msg_putchar('s');
-		else
-		    msg_putchar(' ');
-		if ((menu->modes & menu->enabled & (1 << bit)) == 0)
-		    msg_putchar('-');
-		else
-		    msg_putchar(' ');
-		msg_puts(" ");
-		if (*menu->strings[bit] == NUL)
-		    msg_puts_attr("<Nop>", HL_ATTR(HLF_8));
-		else
-		    msg_outtrans_special(menu->strings[bit], FALSE, 0);
+		ਸੁਨੇਹਾ_putchar('\n');
+		ਜੇ (got_int)		// "q" hit for "--more--"
+		    ਵਾਪਸ;
+		ਲਈ (i = 0; i < ਡੂੰਘਾਈ + 2; i++)
+		    ਸੁਨੇਹਾ_puts("  ");
+		ਸੁਨੇਹਾ_puts(menu_ਬਹੁਲਕ_chars[ਦੋਆਧਾਰੀ_ਅੰਕ]);
+		ਜੇ (menu->noremap[ਦੋਆਧਾਰੀ_ਅੰਕ] == REMAP_NONE)
+		    ਸੁਨੇਹਾ_putchar('*');
+		ਨਹੀਂਤਾਂ ਜੇ (menu->noremap[ਦੋਆਧਾਰੀ_ਅੰਕ] == REMAP_SCRIPT)
+		    ਸੁਨੇਹਾ_putchar('&');
+		ਨਹੀਂਤਾਂ
+		    ਸੁਨੇਹਾ_putchar(' ');
+		ਜੇ (menu->silent[ਦੋਆਧਾਰੀ_ਅੰਕ])
+		    ਸੁਨੇਹਾ_putchar('s');
+		ਨਹੀਂਤਾਂ
+		    ਸੁਨੇਹਾ_putchar(' ');
+		ਜੇ ((menu->modes & menu->enabled & (1 << ਦੋਆਧਾਰੀ_ਅੰਕ)) == 0)
+		    ਸੁਨੇਹਾ_putchar('-');
+		ਨਹੀਂਤਾਂ
+		    ਸੁਨੇਹਾ_putchar(' ');
+		ਸੁਨੇਹਾ_puts(" ");
+		ਜੇ (*menu->ਲੜੀਆਂ[ਦੋਆਧਾਰੀ_ਅੰਕ] == NUL)
+		    ਸੁਨੇਹਾ_puts_attr("<Nop>", HL_ATTR(HLF_8));
+		ਨਹੀਂਤਾਂ
+		    ਸੁਨੇਹਾ_outtrans_special(menu->ਲੜੀਆਂ[ਦੋਆਧਾਰੀ_ਅੰਕ], FALSE, 0);
 	    }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (menu == NULL)
+	ਜੇ (menu == ਨਿਰਾ)
 	{
-	    menu = root_menu;
-	    depth--;
+	    menu = ਜੜ੍ਹ_menu;
+	    ਡੂੰਘਾਈ--;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    menu = menu->children;
 
 	// recursively show all children.  Skip PopUp[nvoci].
-	for (; menu != NULL && !got_int; menu = menu->next)
-	    if (!menu_is_hidden(menu->dname))
-		show_menus_recursive(menu, modes, depth + 1);
+	ਲਈ (; menu != ਨਿਰਾ && !got_int; menu = menu->ਅਗਲਾ)
+	    ਜੇ (!menu_is_hidden(menu->dname))
+		show_menus_recursive(menu, modes, ਡੂੰਘਾਈ + 1);
     }
 }
 
 /*
  * Used when expanding menu names.
  */
-static vimmenu_T	*expand_menu = NULL;
-static vimmenu_T	*expand_menu_alt = NULL;
-static int		expand_modes = 0x0;
-static int		expand_emenu;	// TRUE for ":emenu" command
+ਸਥਿਰ vimmenu_T	*expand_menu = ਨਿਰਾ;
+ਸਥਿਰ vimmenu_T	*expand_menu_alt = ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ		expand_modes = 0x0;
+ਸਥਿਰ ਪੂਰਨ		expand_emenu;	// TRUE for ":emenu" command
 
 /*
  * Work out what to complete when doing command line completion of menu names.
  */
     char_u *
-set_context_in_menu_cmd(
+ਸੈੱਟ_context_ਵਿੱਚ_menu_cmd(
     expand_T	*xp,
     char_u	*cmd,
     char_u	*arg,
-    int		forceit)
+    ਪੂਰਨ		forceit)
 {
     char_u	*after_dot;
     char_u	*p;
-    char_u	*path_name = NULL;
+    char_u	*ਰਸਤਾ_name = ਨਿਰਾ;
     char_u	*name;
-    int		unmenu;
+    ਪੂਰਨ		unmenu;
     vimmenu_T	*menu;
-    int		expand_menus;
+    ਪੂਰਨ		expand_menus;
 
     xp->xp_context = EXPAND_UNSUCCESSFUL;
 
 
     // Check for priority numbers, enable and disable
-    for (p = arg; *p; ++p)
-	if (!VIM_ISDIGIT(*p) && *p != '.')
-	    break;
+    ਲਈ (p = arg; *p; ++p)
+	ਜੇ (!VIM_ISDIGIT(*p) && *p != '.')
+	    ਰੋਕੋ;
 
-    if (!VIM_ISWHITE(*p))
+    ਜੇ (!VIM_ISWHITE(*p))
     {
-	if (STRNCMP(arg, "enable", 6) == 0
+	ਜੇ (STRNCMP(arg, "enable", 6) == 0
 		&& (arg[6] == NUL ||  VIM_ISWHITE(arg[6])))
 	    p = arg + 6;
-	else if (STRNCMP(arg, "disable", 7) == 0
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(arg, "disable", 7) == 0
 		&& (arg[7] == NUL || VIM_ISWHITE(arg[7])))
 	    p = arg + 7;
-	else
+	ਨਹੀਂਤਾਂ
 	    p = arg;
     }
 
-    while (*p != NUL && VIM_ISWHITE(*p))
+    ਜਦੋਂ (*p != NUL && VIM_ISWHITE(*p))
 	++p;
 
     arg = after_dot = p;
 
-    for (; *p && !VIM_ISWHITE(*p); ++p)
+    ਲਈ (; *p && !VIM_ISWHITE(*p); ++p)
     {
-	if ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
+	ਜੇ ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
 	    p++;
-	else if (*p == '.')
+	ਨਹੀਂਤਾਂ ਜੇ (*p == '.')
 	    after_dot = p + 1;
     }
 
     // ":tearoff" and ":popup" only use menus, not entries
     expand_menus = !((*cmd == 't' && cmd[1] == 'e') || *cmd == 'p');
     expand_emenu = (*cmd == 'e');
-    if (expand_menus && VIM_ISWHITE(*p))
-	return NULL;	// TODO: check for next command?
-    if (*p == NUL)		// Complete the menu name
+    ਜੇ (expand_menus && VIM_ISWHITE(*p))
+	ਵਾਪਸ ਨਿਰਾ;	// TODO: check for next command?
+    ਜੇ (*p == NUL)		// Complete the menu name
     {
-	int try_alt_menu = TRUE;
+	ਪੂਰਨ try_alt_menu = TRUE;
 
 	/*
 	 * With :unmenu, you only want to match menus for the appropriate mode.
 	 * With :menu though you might want to add a menu with the same name as
 	 * one in another mode, so match menus from other modes too.
 	 */
-	expand_modes = get_menu_cmd_modes(cmd, forceit, NULL, &unmenu);
-	if (!unmenu)
+	expand_modes = get_menu_cmd_modes(cmd, forceit, ਨਿਰਾ, &unmenu);
+	ਜੇ (!unmenu)
 	    expand_modes = MENU_ALL_MODES;
 
-	menu = root_menu;
-	if (after_dot != arg)
+	menu = ਜੜ੍ਹ_menu;
+	ਜੇ (after_dot != arg)
 	{
-	    path_name = alloc(after_dot - arg);
-	    if (path_name == NULL)
-		return NULL;
-	    vim_strncpy(path_name, arg, after_dot - arg - 1);
+	    ਰਸਤਾ_name = alloc(after_dot - arg);
+	    ਜੇ (ਰਸਤਾ_name == ਨਿਰਾ)
+		ਵਾਪਸ ਨਿਰਾ;
+	    vim_strncpy(ਰਸਤਾ_name, arg, after_dot - arg - 1);
 	}
-	name = path_name;
-	while (name != NULL && *name)
+	name = ਰਸਤਾ_name;
+	ਜਦੋਂ (name != ਨਿਰਾ && *name)
 	{
 	    p = menu_name_skip(name);
-	    while (menu != NULL)
+	    ਜਦੋਂ (menu != ਨਿਰਾ)
 	    {
-		if (menu_name_equal(name, menu))
+		ਜੇ (menu_name_equal(name, menu))
 		{
 		    // Found menu
-		    if ((*p != NUL && menu->children == NULL)
+		    ਜੇ ((*p != NUL && menu->children == ਨਿਰਾ)
 			|| ((menu->modes & expand_modes) == 0x0))
 		    {
 			/*
 			 * Menu path continues, but we have reached a leaf.
 			 * Or menu exists only in another mode.
 			 */
-			vim_free(path_name);
-			return NULL;
+			vim_free(ਰਸਤਾ_name);
+			ਵਾਪਸ ਨਿਰਾ;
 		    }
-		    break;
+		    ਰੋਕੋ;
 		}
-		menu = menu->next;
-		if (menu == NULL && try_alt_menu)
+		menu = menu->ਅਗਲਾ;
+		ਜੇ (menu == ਨਿਰਾ && try_alt_menu)
 		{
 		    menu = curwin->w_winbar;
 		    try_alt_menu = FALSE;
 		}
 	    }
-	    if (menu == NULL)
+	    ਜੇ (menu == ਨਿਰਾ)
 	    {
 		// No menu found with the name we were looking for
-		vim_free(path_name);
-		return NULL;
+		vim_free(ਰਸਤਾ_name);
+		ਵਾਪਸ ਨਿਰਾ;
 	    }
 	    name = p;
 	    menu = menu->children;
 	    try_alt_menu = FALSE;
 	}
-	vim_free(path_name);
+	vim_free(ਰਸਤਾ_name);
 
 	xp->xp_context = expand_menus ? EXPAND_MENUNAMES : EXPAND_MENUS;
-	xp->xp_pattern = after_dot;
+	xp->xp_ਨਮੂਨਾ = after_dot;
 	expand_menu = menu;
-	if (expand_menu == root_menu)
+	ਜੇ (expand_menu == ਜੜ੍ਹ_menu)
 	    expand_menu_alt = curwin->w_winbar;
-	else
-	    expand_menu_alt = NULL;
+	ਨਹੀਂਤਾਂ
+	    expand_menu_alt = ਨਿਰਾ;
     }
-    else			// We're in the mapping part
+    ਨਹੀਂਤਾਂ			// We're in the mapping part
 	xp->xp_context = EXPAND_NOTHING;
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -1403,75 +1403,75 @@ set_context_in_menu_cmd(
  * entries).
  */
     char_u *
-get_menu_name(expand_T *xp UNUSED, int idx)
+get_menu_name(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    static vimmenu_T	*menu = NULL;
-    static int		did_alt_menu = FALSE;
+    ਸਥਿਰ vimmenu_T	*menu = ਨਿਰਾ;
+    ਸਥਿਰ ਪੂਰਨ		did_alt_menu = FALSE;
     char_u		*str;
-#ifdef FEAT_MULTI_LANG
-    static  int		should_advance = FALSE;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਸਥਿਰ  ਪੂਰਨ		should_advance = FALSE;
+#ਜੇ_ਅੰਤ
 
-    if (idx == 0)	    // first call: start at first item
+    ਜੇ (idx == 0)	    // first call: start at first item
     {
 	menu = expand_menu;
 	did_alt_menu = FALSE;
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 	should_advance = FALSE;
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // Skip PopUp[nvoci].
-    while (menu != NULL && (menu_is_hidden(menu->dname)
+    ਜਦੋਂ (menu != ਨਿਰਾ && (menu_is_hidden(menu->dname)
 	    || menu_is_separator(menu->dname)
 	    || menu_is_tearoff(menu->dname)
-	    || menu->children == NULL))
+	    || menu->children == ਨਿਰਾ))
     {
-	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	menu = menu->ਅਗਲਾ;
+	ਜੇ (menu == ਨਿਰਾ && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-    if (menu == NULL)	    // at end of linked list
-	return NULL;
+    ਜੇ (menu == ਨਿਰਾ)	    // at end of linked list
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (menu->modes & expand_modes)
-#ifdef FEAT_MULTI_LANG
-	if (should_advance)
+    ਜੇ (menu->modes & expand_modes)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+	ਜੇ (should_advance)
 	    str = menu->en_dname;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-#endif
+#ਜੇ_ਅੰਤ
 	    str = menu->dname;
-#ifdef FEAT_MULTI_LANG
-	    if (menu->en_dname == NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+	    ਜੇ (menu->en_dname == ਨਿਰਾ)
 		should_advance = TRUE;
 	}
-#endif
-    else
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
 	str = (char_u *)"";
 
-#ifdef FEAT_MULTI_LANG
-    if (should_advance)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਜੇ (should_advance)
+#ਜੇ_ਅੰਤ
     {
 	// Advance to next menu entry.
-	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	menu = menu->ਅਗਲਾ;
+	ਜੇ (menu == ਨਿਰਾ && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     should_advance = !should_advance;
-#endif
+#ਜੇ_ਅੰਤ
 
-    return str;
+    ਵਾਪਸ str;
 }
 
 /*
@@ -1479,105 +1479,105 @@ get_menu_name(expand_T *xp UNUSED, int idx)
  * entries.
  */
     char_u *
-get_menu_names(expand_T *xp UNUSED, int idx)
+get_menu_ਨਾਂ(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    static vimmenu_T	*menu = NULL;
-    static int		did_alt_menu = FALSE;
-#define TBUFFER_LEN 256
-    static char_u	tbuffer[TBUFFER_LEN]; //hack
+    ਸਥਿਰ vimmenu_T	*menu = ਨਿਰਾ;
+    ਸਥਿਰ ਪੂਰਨ		did_alt_menu = FALSE;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TBUFFER_LEN 256
+    ਸਥਿਰ char_u	tbuffer[TBUFFER_LEN]; //hack
     char_u		*str;
-#ifdef FEAT_MULTI_LANG
-    static  int		should_advance = FALSE;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਸਥਿਰ  ਪੂਰਨ		should_advance = FALSE;
+#ਜੇ_ਅੰਤ
 
-    if (idx == 0)	    // first call: start at first item
+    ਜੇ (idx == 0)	    // first call: start at first item
     {
 	menu = expand_menu;
 	did_alt_menu = FALSE;
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 	should_advance = FALSE;
-#endif
+#ਜੇ_ਅੰਤ
     }
 
     // Skip Browse-style entries, popup menus and separators.
-    while (menu != NULL
+    ਜਦੋਂ (menu != ਨਿਰਾ
 	    && (   menu_is_hidden(menu->dname)
 		|| (expand_emenu && menu_is_separator(menu->dname))
 		|| menu_is_tearoff(menu->dname)
-#ifndef FEAT_BROWSE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FEAT_BROWSE
 		|| menu->dname[STRLEN(menu->dname) - 1] == '.'
-#endif
+#ਜੇ_ਅੰਤ
 	       ))
     {
-	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	menu = menu->ਅਗਲਾ;
+	ਜੇ (menu == ਨਿਰਾ && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-    if (menu == NULL)	    // at end of linked list
-	return NULL;
+    ਜੇ (menu == ਨਿਰਾ)	    // at end of linked list
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (menu->modes & expand_modes)
+    ਜੇ (menu->modes & expand_modes)
     {
-	if (menu->children != NULL)
+	ਜੇ (menu->children != ਨਿਰਾ)
 	{
-#ifdef FEAT_MULTI_LANG
-	    if (should_advance)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+	    ਜੇ (should_advance)
 		vim_strncpy(tbuffer, menu->en_dname, TBUFFER_LEN - 2);
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-#endif
+#ਜੇ_ਅੰਤ
 		vim_strncpy(tbuffer, menu->dname,  TBUFFER_LEN - 2);
-#ifdef FEAT_MULTI_LANG
-		if (menu->en_dname == NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+		ਜੇ (menu->en_dname == ਨਿਰਾ)
 		    should_advance = TRUE;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	    // hack on menu separators:  use a 'magic' char for the separator
 	    // so that '.' in names gets escaped properly
 	    STRCAT(tbuffer, "\001");
 	    str = tbuffer;
 	}
-	else
-#ifdef FEAT_MULTI_LANG
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 	{
-	    if (should_advance)
+	    ਜੇ (should_advance)
 		str = menu->en_dname;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-#endif
+#ਜੇ_ਅੰਤ
 		str = menu->dname;
-#ifdef FEAT_MULTI_LANG
-		if (menu->en_dname == NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+		ਜੇ (menu->en_dname == ਨਿਰਾ)
 		    should_advance = TRUE;
 	    }
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
-    else
+    ਨਹੀਂਤਾਂ
 	str = (char_u *)"";
 
-#ifdef FEAT_MULTI_LANG
-    if (should_advance)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਜੇ (should_advance)
+#ਜੇ_ਅੰਤ
     {
 	// Advance to next menu entry.
-	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	menu = menu->ਅਗਲਾ;
+	ਜੇ (menu == ਨਿਰਾ && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     should_advance = !should_advance;
-#endif
+#ਜੇ_ਅੰਤ
 
-    return str;
+    ਵਾਪਸ str;
 }
 
 /*
@@ -1585,50 +1585,50 @@ get_menu_names(expand_T *xp UNUSED, int idx)
  * element.  Any \ and ^Vs are removed from the current element.
  * "name" may be modified.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 menu_name_skip(char_u *name)
 {
     char_u  *p;
 
-    for (p = name; *p && *p != '.'; MB_PTR_ADV(p))
+    ਲਈ (p = name; *p && *p != '.'; MB_PTR_ADV(p))
     {
-	if (*p == '\\' || *p == Ctrl_V)
+	ਜੇ (*p == '\\' || *p == Ctrl_V)
 	{
 	    STRMOVE(p, p + 1);
-	    if (*p == NUL)
-		break;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	}
     }
-    if (*p)
+    ਜੇ (*p)
 	*p++ = NUL;
-    return p;
+    ਵਾਪਸ p;
 }
 
 /*
  * Return TRUE when "name" matches with menu "menu".  The name is compared in
  * two ways: raw menu name and menu name without '&'.  ignore part after a TAB.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 menu_name_equal(char_u *name, vimmenu_T *menu)
 {
-#ifdef FEAT_MULTI_LANG
-    if (menu->en_name != NULL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
+    ਜੇ (menu->en_name != ਨਿਰਾ
 	    && (menu_namecmp(name, menu->en_name)
 		|| menu_namecmp(name, menu->en_dname)))
-	return TRUE;
-#endif
-    return menu_namecmp(name, menu->name) || menu_namecmp(name, menu->dname);
+	ਵਾਪਸ TRUE;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ menu_namecmp(name, menu->name) || menu_namecmp(name, menu->dname);
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 menu_namecmp(char_u *name, char_u *mname)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; name[i] != NUL && name[i] != TAB; ++i)
-	if (name[i] != mname[i])
-	    break;
-    return ((name[i] == NUL || name[i] == TAB)
+    ਲਈ (i = 0; name[i] != NUL && name[i] != TAB; ++i)
+	ਜੇ (name[i] != mname[i])
+	    ਰੋਕੋ;
+    ਵਾਪਸ ((name[i] == NUL || name[i] == TAB)
 	    && (mname[i] == NUL || mname[i] == TAB));
 }
 
@@ -1640,178 +1640,178 @@ menu_namecmp(char_u *name, char_u *mname)
  * If "unmenu" is not NULL, then the flag it points to is set according to
  * whether the command is an "unmenu" command.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_menu_cmd_modes(
     char_u  *cmd,
-    int	    forceit,	    // Was there a "!" after the command?
-    int	    *noremap,
-    int	    *unmenu)
+    ਪੂਰਨ	    forceit,	    // Was there a "!" after the command?
+    ਪੂਰਨ	    *noremap,
+    ਪੂਰਨ	    *unmenu)
 {
-    int	    modes;
+    ਪੂਰਨ	    modes;
 
-    switch (*cmd++)
+    ਚੋਣ (*cmd++)
     {
-	case 'v':			// vmenu, vunmenu, vnoremenu
-	    modes = MENU_VISUAL_MODE | MENU_SELECT_MODE;
-	    break;
-	case 'x':			// xmenu, xunmenu, xnoremenu
-	    modes = MENU_VISUAL_MODE;
-	    break;
-	case 's':			// smenu, sunmenu, snoremenu
-	    modes = MENU_SELECT_MODE;
-	    break;
-	case 'o':			// omenu
-	    modes = MENU_OP_PENDING_MODE;
-	    break;
-	case 'i':			// imenu
-	    modes = MENU_INSERT_MODE;
-	    break;
-	case 't':
-	    if (*cmd == 'l')		// tlmenu, tlunmenu, tlnoremenu
+	ਹਾਲਤ 'v':			// vmenu, vunmenu, vnoremenu
+	    modes = MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'x':			// xmenu, xunmenu, xnoremenu
+	    modes = MENU_VISUAL_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 's':			// smenu, sunmenu, snoremenu
+	    modes = MENU_SELECT_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'o':			// omenu
+	    modes = MENU_OP_PENDING_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'i':			// imenu
+	    modes = MENU_ਪਾਓ_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 't':
+	    ਜੇ (*cmd == 'l')		// tlmenu, tlunmenu, tlnoremenu
 	    {
-		modes = MENU_TERMINAL_MODE;
+		modes = MENU_TERMINAL_ਬਹੁਲਕ;
 		++cmd;
-		break;
+		ਰੋਕੋ;
 	    }
-	    modes = MENU_TIP_MODE;	// tmenu
-	    break;
-	case 'c':			// cmenu
-	    modes = MENU_CMDLINE_MODE;
-	    break;
-	case 'a':			// amenu
-	    modes = MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE
-				    | MENU_VISUAL_MODE | MENU_SELECT_MODE
-				    | MENU_OP_PENDING_MODE;
-	    break;
-	case 'n':
-	    if (*cmd != 'o')		// nmenu, not noremenu
+	    modes = MENU_TIP_ਬਹੁਲਕ;	// tmenu
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'c':			// cmenu
+	    modes = MENU_CMDLINE_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'a':			// amenu
+	    modes = MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ | MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ
+				    | MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ
+				    | MENU_OP_PENDING_ਬਹੁਲਕ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ 'n':
+	    ਜੇ (*cmd != 'o')		// nmenu, not noremenu
 	    {
-		modes = MENU_NORMAL_MODE;
-		break;
+		modes = MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ;
+		ਰੋਕੋ;
 	    }
 	    // FALLTHROUGH
-	default:
+	ਮੂਲ:
 	    --cmd;
-	    if (forceit)		// menu!!
-		modes = MENU_INSERT_MODE | MENU_CMDLINE_MODE;
-	    else			// menu
-		modes = MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE
-						       | MENU_OP_PENDING_MODE;
+	    ਜੇ (forceit)		// menu!!
+		modes = MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ;
+	    ਨਹੀਂਤਾਂ			// menu
+		modes = MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ | MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ
+						       | MENU_OP_PENDING_ਬਹੁਲਕ;
     }
 
-    if (noremap != NULL)
+    ਜੇ (noremap != ਨਿਰਾ)
 	*noremap = (*cmd == 'n' ? REMAP_NONE : REMAP_YES);
-    if (unmenu != NULL)
+    ਜੇ (unmenu != ਨਿਰਾ)
 	*unmenu = (*cmd == 'u');
-    return modes;
+    ਵਾਪਸ modes;
 }
 
 /*
  * Return the string representation of the menu modes. Does the opposite
  * of get_menu_cmd_modes().
  */
-    static char_u *
-get_menu_mode_str(int modes)
+    ਸਥਿਰ char_u *
+get_menu_ਬਹੁਲਕ_str(ਪੂਰਨ modes)
 {
-    if ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE |
-		  MENU_VISUAL_MODE | MENU_SELECT_MODE | MENU_OP_PENDING_MODE))
-	    == (MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE |
-		MENU_VISUAL_MODE | MENU_SELECT_MODE | MENU_OP_PENDING_MODE))
-	return (char_u *)"a";
-    if ((modes & (MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE |
-		  MENU_OP_PENDING_MODE))
-	    == (MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE |
-		MENU_OP_PENDING_MODE))
-	return (char_u *)" ";
-    if ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE))
-	    == (MENU_INSERT_MODE | MENU_CMDLINE_MODE))
-	return (char_u *)"!";
-    if ((modes & (MENU_VISUAL_MODE | MENU_SELECT_MODE))
-	    == (MENU_VISUAL_MODE | MENU_SELECT_MODE))
-	return (char_u *)"v";
-    if (modes & MENU_VISUAL_MODE)
-	return (char_u *)"x";
-    if (modes & MENU_SELECT_MODE)
-	return (char_u *)"s";
-    if (modes & MENU_OP_PENDING_MODE)
-	return (char_u *)"o";
-    if (modes & MENU_INSERT_MODE)
-	return (char_u *)"i";
-    if (modes & MENU_TERMINAL_MODE)
-	return (char_u *)"tl";
-    if (modes & MENU_CMDLINE_MODE)
-	return (char_u *)"c";
-    if (modes & MENU_NORMAL_MODE)
-	return (char_u *)"n";
-    if (modes & MENU_TIP_MODE)
-	return (char_u *)"t";
+    ਜੇ ((modes & (MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ | MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ |
+		  MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ | MENU_OP_PENDING_ਬਹੁਲਕ))
+	    == (MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ | MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ |
+		MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ | MENU_OP_PENDING_ਬਹੁਲਕ))
+	ਵਾਪਸ (char_u *)"a";
+    ਜੇ ((modes & (MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ | MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ |
+		  MENU_OP_PENDING_ਬਹੁਲਕ))
+	    == (MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ | MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ |
+		MENU_OP_PENDING_ਬਹੁਲਕ))
+	ਵਾਪਸ (char_u *)" ";
+    ਜੇ ((modes & (MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ))
+	    == (MENU_ਪਾਓ_ਬਹੁਲਕ | MENU_CMDLINE_ਬਹੁਲਕ))
+	ਵਾਪਸ (char_u *)"!";
+    ਜੇ ((modes & (MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ))
+	    == (MENU_VISUAL_ਬਹੁਲਕ | MENU_SELECT_ਬਹੁਲਕ))
+	ਵਾਪਸ (char_u *)"v";
+    ਜੇ (modes & MENU_VISUAL_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"x";
+    ਜੇ (modes & MENU_SELECT_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"s";
+    ਜੇ (modes & MENU_OP_PENDING_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"o";
+    ਜੇ (modes & MENU_ਪਾਓ_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"i";
+    ਜੇ (modes & MENU_TERMINAL_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"tl";
+    ਜੇ (modes & MENU_CMDLINE_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"c";
+    ਜੇ (modes & MENU_ਸਾਧਾਰਨ_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"n";
+    ਜੇ (modes & MENU_TIP_ਬਹੁਲਕ)
+	ਵਾਪਸ (char_u *)"t";
 
-    return (char_u *)"";
+    ਵਾਪਸ (char_u *)"";
 }
 
 /*
  * Modify a menu name starting with "PopUp" to include the mode character.
  * Returns the name in allocated memory (NULL for failure).
  */
-    static char_u *
-popup_mode_name(char_u *name, int idx)
+    ਸਥਿਰ char_u *
+popup_ਬਹੁਲਕ_name(char_u *name, ਪੂਰਨ idx)
 {
     char_u	*p;
-    int		len = (int)STRLEN(name);
-    char	*mode_chars = menu_mode_chars[idx];
-    int		mode_chars_len = (int)strlen(mode_chars);
-    int		i;
+    ਪੂਰਨ		len = (ਪੂਰਨ)STRLEN(name);
+    ਅੱਖਰ	*ਬਹੁਲਕ_chars = menu_ਬਹੁਲਕ_chars[idx];
+    ਪੂਰਨ		ਬਹੁਲਕ_chars_len = (ਪੂਰਨ)ਲੜੀ_ਲੰਬਾਈ(ਬਹੁਲਕ_chars);
+    ਪੂਰਨ		i;
 
-    p = vim_strnsave(name, len + mode_chars_len);
-    if (p == NULL)
-	return NULL;
+    p = vim_strnsave(name, len + ਬਹੁਲਕ_chars_len);
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    mch_memmove(p + 5 + mode_chars_len, p + 5, (size_t)(len - 4));
-    for (i = 0; i < mode_chars_len; ++i)
-	p[5 + i] = menu_mode_chars[idx][i];
-    return p;
+    mch_memmove(p + 5 + ਬਹੁਲਕ_chars_len, p + 5, (size_t)(len - 4));
+    ਲਈ (i = 0; i < ਬਹੁਲਕ_chars_len; ++i)
+	p[5 + i] = menu_ਬਹੁਲਕ_chars[idx][i];
+    ਵਾਪਸ p;
 }
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * Return the index into the menu->strings or menu->noremap arrays for the
  * current state.  Returns MENU_INDEX_INVALID if there is no mapping for the
  * given menu in the current mode.
  */
-    int
-get_menu_index(vimmenu_T *menu, int state)
+    ਪੂਰਨ
+get_menu_ਸੂਚਕਾਂਕ(vimmenu_T *menu, ਪੂਰਨ state)
 {
-    int		idx;
+    ਪੂਰਨ		idx;
 
-    if ((state & MODE_INSERT))
-	idx = MENU_INDEX_INSERT;
-    else if (state & MODE_CMDLINE)
-	idx = MENU_INDEX_CMDLINE;
+    ਜੇ ((state & ਬਹੁਲਕ_ਪਾਓ))
+	idx = MENU_ਸੂਚਕਾਂਕ_ਪਾਓ;
+    ਨਹੀਂਤਾਂ ਜੇ (state & ਬਹੁਲਕ_CMDLINE)
+	idx = MENU_ਸੂਚਕਾਂਕ_CMDLINE;
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
-	idx = MENU_INDEX_TERMINAL;
+    ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_use_loop())
+	idx = MENU_ਸੂਚਕਾਂਕ_TERMINAL;
 # endif
-    else if (VIsual_active)
+    ਨਹੀਂਤਾਂ ਜੇ (VIsual_ਸਰਗਰਮ)
     {
-	if (VIsual_select)
-	    idx = MENU_INDEX_SELECT;
-	else
-	    idx = MENU_INDEX_VISUAL;
+	ਜੇ (VIsual_select)
+	    idx = MENU_ਸੂਚਕਾਂਕ_SELECT;
+	ਨਹੀਂਤਾਂ
+	    idx = MENU_ਸੂਚਕਾਂਕ_VISUAL;
     }
-    else if (state == MODE_HITRETURN || state == MODE_ASKMORE)
-	idx = MENU_INDEX_CMDLINE;
-    else if (finish_op)
-	idx = MENU_INDEX_OP_PENDING;
-    else if ((state & MODE_NORMAL))
-	idx = MENU_INDEX_NORMAL;
-    else
-	idx = MENU_INDEX_INVALID;
+    ਨਹੀਂਤਾਂ ਜੇ (state == ਬਹੁਲਕ_HITRETURN || state == ਬਹੁਲਕ_ASKMORE)
+	idx = MENU_ਸੂਚਕਾਂਕ_CMDLINE;
+    ਨਹੀਂਤਾਂ ਜੇ (ਅੰਤ_op)
+	idx = MENU_ਸੂਚਕਾਂਕ_OP_PENDING;
+    ਨਹੀਂਤਾਂ ਜੇ ((state & ਬਹੁਲਕ_ਸਾਧਾਰਨ))
+	idx = MENU_ਸੂਚਕਾਂਕ_ਸਾਧਾਰਨ;
+    ਨਹੀਂਤਾਂ
+	idx = MENU_ਸੂਚਕਾਂਕ_INVALID;
 
-    if (idx != MENU_INDEX_INVALID && menu->strings[idx] == NULL)
-	idx = MENU_INDEX_INVALID;
-    return idx;
+    ਜੇ (idx != MENU_ਸੂਚਕਾਂਕ_INVALID && menu->ਲੜੀਆਂ[idx] == ਨਿਰਾ)
+	idx = MENU_ਸੂਚਕਾਂਕ_INVALID;
+    ਵਾਪਸ idx;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Duplicate the menu item text and then process to see if a mnemonic key
@@ -1820,35 +1820,35 @@ get_menu_index(vimmenu_T *menu, int state)
  * If mnemonic != NULL, *mnemonic is set to the character after the first '&'.
  * If actext != NULL, *actext is set to the text after the first TAB.
  */
-    static char_u *
-menu_text(char_u *str, int *mnemonic, char_u **actext)
+    ਸਥਿਰ char_u *
+menu_ਪਾਠ(char_u *str, ਪੂਰਨ *mnemonic, char_u **actext)
 {
     char_u	*p;
-    char_u	*text;
+    char_u	*ਪਾਠ;
 
     // Locate accelerator text, after the first TAB
     p = vim_strchr(str, TAB);
-    if (p != NULL)
+    ਜੇ (p != ਨਿਰਾ)
     {
-	if (actext != NULL)
+	ਜੇ (actext != ਨਿਰਾ)
 	    *actext = vim_strsave(p + 1);
-	text = vim_strnsave(str, p - str);
+	ਪਾਠ = vim_strnsave(str, p - str);
     }
-    else
-	text = vim_strsave(str);
+    ਨਹੀਂਤਾਂ
+	ਪਾਠ = vim_strsave(str);
 
     // Find mnemonic characters "&a" and reduce "&&" to "&".
-    for (p = text; p != NULL; )
+    ਲਈ (p = ਪਾਠ; p != ਨਿਰਾ; )
     {
 	p = vim_strchr(p, '&');
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
-	    if (p[1] == NUL)	    // trailing "&"
-		break;
-	    if (mnemonic != NULL && p[1] != '&')
-#if !defined(__MVS__) || defined(MOTIF390_MNEMONIC_FIXED)
+	    ਜੇ (p[1] == NUL)	    // trailing "&"
+		ਰੋਕੋ;
+	    ਜੇ (mnemonic != ਨਿਰਾ && p[1] != '&')
+#ਜੇ !defined(__MVS__) || defined(MOTIF390_MNEMONIC_FIXED)
 		*mnemonic = p[1];
-#else
+#ਨਹੀਂਤਾਂ
 	    {
 		/*
 		 * Well there is a bug in the Motif libraries on OS390 Unix.
@@ -1856,25 +1856,25 @@ menu_text(char_u *str, int *mnemonic, char_u **actext)
 		 * first.
 		 * This behavior has been seen in 2.8 and 2.9.
 		 */
-		char c = p[1];
+		ਅੱਖਰ c = p[1];
 		__etoa_l(&c, 1);
 		*mnemonic = c;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	    STRMOVE(p, p + 1);
 	    p = p + 1;
 	}
     }
-    return text;
+    ਵਾਪਸ ਪਾਠ;
 }
 
 /*
  * Return TRUE if "name" can be a menu in the MenuBar.
  */
-    int
+    ਪੂਰਨ
 menu_is_menubar(char_u *name)
 {
-    return (!menu_is_popup(name)
+    ਵਾਪਸ (!menu_is_popup(name)
 	    && !menu_is_toolbar(name)
 	    && !menu_is_winbar(name)
 	    && *name != MNU_HIDDEN_CHAR);
@@ -1883,103 +1883,103 @@ menu_is_menubar(char_u *name)
 /*
  * Return TRUE if "name" is a popup menu name.
  */
-    int
+    ਪੂਰਨ
 menu_is_popup(char_u *name)
 {
-    return (STRNCMP(name, "PopUp", 5) == 0);
+    ਵਾਪਸ (STRNCMP(name, "PopUp", 5) == 0);
 }
 
-#if defined(FEAT_GUI_MOTIF) && (XmVersion <= 1002)
+#ਜੇ defined(FEAT_GUI_MOTIF) && (Xm_ਸੰਸਕਰਣ <= 1002)
 /*
  * Return TRUE if "name" is part of a popup menu.
  */
-    int
-menu_is_child_of_popup(vimmenu_T *menu)
+    ਪੂਰਨ
+menu_is_ਬੱਚਾ_ਦਾ_popup(vimmenu_T *menu)
 {
-    while (menu->parent != NULL)
-	menu = menu->parent;
-    return menu_is_popup(menu->name);
+    ਜਦੋਂ (menu->ਮਾਪਾ != ਨਿਰਾ)
+	menu = menu->ਮਾਪਾ;
+    ਵਾਪਸ menu_is_popup(menu->name);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE if "name" is a toolbar menu name.
  */
-    int
+    ਪੂਰਨ
 menu_is_toolbar(char_u *name)
 {
-    return (STRNCMP(name, "ToolBar", 7) == 0);
+    ਵਾਪਸ (STRNCMP(name, "ToolBar", 7) == 0);
 }
 
 /*
  * Return TRUE if the name is a menu separator identifier: Starts and ends
  * with '-'
  */
-    int
+    ਪੂਰਨ
 menu_is_separator(char_u *name)
 {
-    return (name[0] == '-' && name[STRLEN(name) - 1] == '-');
+    ਵਾਪਸ (name[0] == '-' && name[STRLEN(name) - 1] == '-');
 }
 
 /*
  * Return TRUE if the menu is hidden:  Starts with ']'
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 menu_is_hidden(char_u *name)
 {
-    return (name[0] == ']') || (menu_is_popup(name) && name[5] != NUL);
+    ਵਾਪਸ (name[0] == ']') || (menu_is_popup(name) && name[5] != NUL);
 }
 
 /*
  * Return TRUE if the menu is the tearoff menu.
  */
-    static int
-menu_is_tearoff(char_u *name UNUSED)
+    ਸਥਿਰ ਪੂਰਨ
+menu_is_tearoff(char_u *name ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_GUI
-    return (STRCMP(name, TEAR_STRING) == 0);
-#else
-    return FALSE;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਵਾਪਸ (STRCMP(name, TEAR_STRING) == 0);
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ FALSE;
+#ਜੇ_ਅੰਤ
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERM_POPUP_MENU)
+#ਜੇ defined(FEAT_GUI) || defined(FEAT_ਪਦ_POPUP_MENU)
 
-    static int
-get_menu_mode(void)
+    ਸਥਿਰ ਪੂਰਨ
+get_menu_ਬਹੁਲਕ(ਖਾਲੀ)
 {
 # ifdef FEAT_TERMINAL
-    if (term_use_loop())
-	return MENU_INDEX_TERMINAL;
+    ਜੇ (ਪਦ_use_loop())
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_TERMINAL;
 # endif
-    if (VIsual_active)
+    ਜੇ (VIsual_ਸਰਗਰਮ)
     {
-	if (VIsual_select)
-	    return MENU_INDEX_SELECT;
-	return MENU_INDEX_VISUAL;
+	ਜੇ (VIsual_select)
+	    ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_SELECT;
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_VISUAL;
     }
-    if (State & MODE_INSERT)
-	return MENU_INDEX_INSERT;
-    if ((State & MODE_CMDLINE) || State == MODE_ASKMORE
-						    || State == MODE_HITRETURN)
-	return MENU_INDEX_CMDLINE;
-    if (finish_op)
-	return MENU_INDEX_OP_PENDING;
-    if (State & MODE_NORMAL)
-	return MENU_INDEX_NORMAL;
-    if (State & MODE_LANGMAP)	// must be a "r" command, like Insert mode
-	return MENU_INDEX_INSERT;
-    return MENU_INDEX_INVALID;
+    ਜੇ (State & ਬਹੁਲਕ_ਪਾਓ)
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_ਪਾਓ;
+    ਜੇ ((State & ਬਹੁਲਕ_CMDLINE) || State == ਬਹੁਲਕ_ASKMORE
+						    || State == ਬਹੁਲਕ_HITRETURN)
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_CMDLINE;
+    ਜੇ (ਅੰਤ_op)
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_OP_PENDING;
+    ਜੇ (State & ਬਹੁਲਕ_ਸਾਧਾਰਨ)
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_ਸਾਧਾਰਨ;
+    ਜੇ (State & ਬਹੁਲਕ_LANGMAP)	// must be a "r" command, like Insert mode
+	ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_ਪਾਓ;
+    ਵਾਪਸ MENU_ਸੂਚਕਾਂਕ_INVALID;
 }
 
-    int
-get_menu_mode_flag(void)
+    ਪੂਰਨ
+get_menu_ਬਹੁਲਕ_flag(ਖਾਲੀ)
 {
-    int mode = get_menu_mode();
+    ਪੂਰਨ ਬਹੁਲਕ = get_menu_ਬਹੁਲਕ();
 
-    if (mode == MENU_INDEX_INVALID)
-	return 0;
-    return 1 << mode;
+    ਜੇ (ਬਹੁਲਕ == MENU_ਸੂਚਕਾਂਕ_INVALID)
+	ਵਾਪਸ 0;
+    ਵਾਪਸ 1 << ਬਹੁਲਕ;
 }
 
 /*
@@ -1987,32 +1987,32 @@ get_menu_mode_flag(void)
  * position.  The "PopUpn" menu is for Normal mode, "PopUpi" for Insert mode,
  * etc.
  */
-    void
-show_popupmenu(void)
+    ਖਾਲੀ
+show_popupmenu(ਖਾਲੀ)
 {
     vimmenu_T	*menu;
-    int		menu_mode;
-    char*	mode;
-    int		mode_len;
+    ਪੂਰਨ		menu_ਬਹੁਲਕ;
+    ਅੱਖਰ*	ਬਹੁਲਕ;
+    ਪੂਰਨ		ਬਹੁਲਕ_len;
 
-    menu_mode = get_menu_mode();
-    if (menu_mode == MENU_INDEX_INVALID)
-	return;
-    mode = menu_mode_chars[menu_mode];
-    mode_len = (int)strlen(mode);
+    menu_ਬਹੁਲਕ = get_menu_ਬਹੁਲਕ();
+    ਜੇ (menu_ਬਹੁਲਕ == MENU_ਸੂਚਕਾਂਕ_INVALID)
+	ਵਾਪਸ;
+    ਬਹੁਲਕ = menu_ਬਹੁਲਕ_chars[menu_ਬਹੁਲਕ];
+    ਬਹੁਲਕ_len = (ਪੂਰਨ)ਲੜੀ_ਲੰਬਾਈ(ਬਹੁਲਕ);
 
-    apply_autocmds(EVENT_MENUPOPUP, (char_u*)mode, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_MENUPOPUP, (char_u*)ਬਹੁਲਕ, ਨਿਰਾ, FALSE, curbuf);
 
     FOR_ALL_MENUS(menu)
-	if (STRNCMP("PopUp", menu->name, 5) == 0 && STRNCMP(menu->name + 5, mode, mode_len) == 0)
-	    break;
+	ਜੇ (STRNCMP("PopUp", menu->name, 5) == 0 && STRNCMP(menu->name + 5, ਬਹੁਲਕ, ਬਹੁਲਕ_len) == 0)
+	    ਰੋਕੋ;
 
     // Only show a popup when it is defined and has entries
-    if (menu == NULL || menu->children == NULL)
-	return;
+    ਜੇ (menu == ਨਿਰਾ || menu->children == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-# if defined(FEAT_GUI)
-    if (gui.in_use)
+# ਜੇ defined(FEAT_GUI)
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
 	// Update the menus now, in case the MenuPopup autocommand did
 	// anything.
@@ -2020,16 +2020,16 @@ show_popupmenu(void)
 	gui_mch_show_popupmenu(menu);
     }
 # endif
-# if defined(FEAT_GUI) && defined(FEAT_TERM_POPUP_MENU)
-    else
+# ਜੇ defined(FEAT_GUI) && defined(FEAT_ਪਦ_POPUP_MENU)
+    ਨਹੀਂਤਾਂ
 # endif
-# if defined(FEAT_TERM_POPUP_MENU)
+# ਜੇ defined(FEAT_ਪਦ_POPUP_MENU)
 	pum_show_popupmenu(menu);
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 
 /*
  * Check that a pointer appears in the menu tree.  Used to protect from using
@@ -2037,17 +2037,17 @@ show_popupmenu(void)
  * handled.
  * Return OK or FAIL.  Used recursively.
  */
-    int
-check_menu_pointer(vimmenu_T *root, vimmenu_T *menu_to_check)
+    ਪੂਰਨ
+check_menu_ਸੂਚਕ(vimmenu_T *ਜੜ੍ਹ, vimmenu_T *menu_ਮੰਜ਼ਿਲ_check)
 {
     vimmenu_T	*p;
 
-    for (p = root; p != NULL; p = p->next)
-	if (p == menu_to_check
-		|| (p->children != NULL
-		    && check_menu_pointer(p->children, menu_to_check) == OK))
-	    return OK;
-    return FAIL;
+    ਲਈ (p = ਜੜ੍ਹ; p != ਨਿਰਾ; p = p->ਅਗਲਾ)
+	ਜੇ (p == menu_ਮੰਜ਼ਿਲ_check
+		|| (p->children != ਨਿਰਾ
+		    && check_menu_ਸੂਚਕ(p->children, menu_ਮੰਜ਼ਿਲ_check) == OK))
+	    ਵਾਪਸ OK;
+    ਵਾਪਸ FAIL;
 }
 
 /*
@@ -2057,25 +2057,25 @@ check_menu_pointer(vimmenu_T *root, vimmenu_T *menu_to_check)
  * itself recursively.	Should be called at the top level with:
  * gui_create_initial_menus(root_menu);
  */
-    void
+    ਖਾਲੀ
 gui_create_initial_menus(vimmenu_T *menu)
 {
-    int		idx = 0;
+    ਪੂਰਨ		idx = 0;
 
-    while (menu != NULL)
+    ਜਦੋਂ (menu != ਨਿਰਾ)
     {
 	// Don't add a menu when only a tip was defined.
-	if (menu->modes & MENU_ALL_MODES)
+	ਜੇ (menu->modes & MENU_ALL_MODES)
 	{
-	    if (menu->children != NULL)
+	    ਜੇ (menu->children != ਨਿਰਾ)
 	    {
-		gui_mch_add_menu(menu, idx);
+		gui_mch_ਜੋੜੋ_menu(menu, idx);
 		gui_create_initial_menus(menu->children);
 	    }
-	    else
-		gui_mch_add_menu_item(menu, idx);
+	    ਨਹੀਂਤਾਂ
+		gui_mch_ਜੋੜੋ_menu_ਵਸਤੂ(menu, idx);
 	}
-	menu = menu->next;
+	menu = menu->ਅਗਲਾ;
 	++idx;
     }
 }
@@ -2083,34 +2083,34 @@ gui_create_initial_menus(vimmenu_T *menu)
 /*
  * Used recursively by gui_update_menus (see below)
  */
-    static void
-gui_update_menus_recurse(vimmenu_T *menu, int mode)
+    ਸਥਿਰ ਖਾਲੀ
+gui_update_menus_recurse(vimmenu_T *menu, ਪੂਰਨ ਬਹੁਲਕ)
 {
-    int		grey;
+    ਪੂਰਨ		grey;
 
-    while (menu)
+    ਜਦੋਂ (menu)
     {
-	if ((menu->modes & menu->enabled & mode)
-# if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+	ਜੇ ((menu->modes & menu->enabled & ਬਹੁਲਕ)
+# ਜੇ defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 		|| menu_is_tearoff(menu->dname)
 # endif
 	   )
 	    grey = FALSE;
-	else
+	ਨਹੀਂਤਾਂ
 	    grey = TRUE;
 
 	// Never hide a toplevel menu, it may make the menubar resize or
 	// disappear. Same problem for ToolBar items.
-	if (vim_strchr(p_go, GO_GREY) != NULL || menu->parent == NULL
+	ਜੇ (vim_strchr(p_go, GO_GREY) != ਨਿਰਾ || menu->ਮਾਪਾ == ਨਿਰਾ
 # ifdef FEAT_TOOLBAR
-		|| menu_is_toolbar(menu->parent->name)
+		|| menu_is_toolbar(menu->ਮਾਪਾ->name)
 # endif
 		   )
 	    gui_mch_menu_grey(menu, grey);
-	else
+	ਨਹੀਂਤਾਂ
 	    gui_mch_menu_hidden(menu, grey);
-	gui_update_menus_recurse(menu->children, mode);
-	menu = menu->next;
+	gui_update_menus_recurse(menu->children, ਬਹੁਲਕ);
+	menu = menu->ਅਗਲਾ;
     }
 }
 
@@ -2119,117 +2119,117 @@ gui_update_menus_recurse(vimmenu_T *menu, int mode)
  * force_menu_update is not TRUE, then we only do this if the mode has changed
  * since last time.  If "modes" is not 0, then we use these modes instead.
  */
-    void
-gui_update_menus(int modes)
+    ਖਾਲੀ
+gui_update_menus(ਪੂਰਨ modes)
 {
-    static int	    prev_mode = -1;
-    int		    mode = 0;
+    ਸਥਿਰ ਪੂਰਨ	    prev_ਬਹੁਲਕ = -1;
+    ਪੂਰਨ		    ਬਹੁਲਕ = 0;
 
-    if (modes != 0x0)
-	mode = modes;
-    else
-	mode = get_menu_mode_flag();
+    ਜੇ (modes != 0x0)
+	ਬਹੁਲਕ = modes;
+    ਨਹੀਂਤਾਂ
+	ਬਹੁਲਕ = get_menu_ਬਹੁਲਕ_flag();
 
-    if (force_menu_update || mode != prev_mode)
+    ਜੇ (force_menu_update || ਬਹੁਲਕ != prev_ਬਹੁਲਕ)
     {
-	gui_update_menus_recurse(root_menu, mode);
+	gui_update_menus_recurse(ਜੜ੍ਹ_menu, ਬਹੁਲਕ);
 	gui_mch_draw_menubar();
-	prev_mode = mode;
+	prev_ਬਹੁਲਕ = ਬਹੁਲਕ;
 	force_menu_update = FALSE;
     }
 }
 
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# ਜੇ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
     || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON)
 /*
  * Check if a key is used as a mnemonic for a toplevel menu.
  * Case of the key is ignored.
  */
-    int
-gui_is_menu_shortcut(int key)
+    ਪੂਰਨ
+gui_is_menu_shortcut(ਪੂਰਨ ਕੁੰਜੀ)
 {
     vimmenu_T	*menu;
 
-    if (key < 256)
-	key = TOLOWER_LOC(key);
+    ਜੇ (ਕੁੰਜੀ < 256)
+	ਕੁੰਜੀ = TOLOWER_LOC(ਕੁੰਜੀ);
     FOR_ALL_MENUS(menu)
-	if (menu->mnemonic == key
-		|| (menu->mnemonic < 256 && TOLOWER_LOC(menu->mnemonic) == key))
-	    return TRUE;
-    return FALSE;
+	ਜੇ (menu->mnemonic == ਕੁੰਜੀ
+		|| (menu->mnemonic < 256 && TOLOWER_LOC(menu->mnemonic) == ਕੁੰਜੀ))
+	    ਵਾਪਸ TRUE;
+    ਵਾਪਸ FALSE;
 }
 # endif
-#endif // FEAT_GUI
+#ਜੇ_ਅੰਤ // FEAT_GUI
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+#ਜੇ defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 
 /*
  * Deal with tearoff items that are added like a menu item.
  * Currently only for Win32 GUI.  Others may follow later.
  */
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    ਖਾਲੀ
+gui_mch_toggle_tearoffs(ਪੂਰਨ enable)
 {
-    int		pri_tab[MENUDEPTH + 1];
-    int		i;
+    ਪੂਰਨ		pri_tab[MENUDEPTH + 1];
+    ਪੂਰਨ		i;
 
-    if (enable)
+    ਜੇ (enable)
     {
-	for (i = 0; i < MENUDEPTH; ++i)
+	ਲਈ (i = 0; i < MENUDEPTH; ++i)
 	    pri_tab[i] = 500;
 	pri_tab[MENUDEPTH] = -1;
-	gui_create_tearoffs_recurse(root_menu, (char_u *)"", pri_tab, 0);
+	gui_create_tearoffs_recurse(ਜੜ੍ਹ_menu, (char_u *)"", pri_tab, 0);
     }
-    else
-	gui_destroy_tearoffs_recurse(root_menu);
+    ਨਹੀਂਤਾਂ
+	gui_destroy_tearoffs_recurse(ਜੜ੍ਹ_menu);
     s_tearoffs = enable;
 }
 
 /*
  * Recursively add tearoff items
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_create_tearoffs_recurse(
     vimmenu_T		*menu,
-    const char_u	*pname,
-    int			*pri_tab,
-    int			pri_idx)
+    ਅਚਲ char_u	*pname,
+    ਪੂਰਨ			*pri_tab,
+    ਪੂਰਨ			pri_idx)
 {
-    char_u	*newpname = NULL;
-    int		len;
+    char_u	*newpname = ਨਿਰਾ;
+    ਪੂਰਨ		len;
     char_u	*s;
     char_u	*d;
 
-    if (pri_tab[pri_idx + 1] != -1)
+    ਜੇ (pri_tab[pri_idx + 1] != -1)
 	++pri_idx;
-    while (menu != NULL)
+    ਜਦੋਂ (menu != ਨਿਰਾ)
     {
-	if (menu->children != NULL && menu_is_menubar(menu->name))
+	ਜੇ (menu->children != ਨਿਰਾ && menu_is_menubar(menu->name))
 	{
 	    // Add the menu name to the menu path.  Insert a backslash before
 	    // dots (it's used to separate menu names).
-	    len = (int)STRLEN(pname) + (int)STRLEN(menu->name);
-	    for (s = menu->name; *s; ++s)
-		if (*s == '.' || *s == '\\')
+	    len = (ਪੂਰਨ)STRLEN(pname) + (ਪੂਰਨ)STRLEN(menu->name);
+	    ਲਈ (s = menu->name; *s; ++s)
+		ਜੇ (*s == '.' || *s == '\\')
 		    ++len;
 	    newpname = alloc(len + TEAR_LEN + 2);
-	    if (newpname != NULL)
+	    ਜੇ (newpname != ਨਿਰਾ)
 	    {
 		STRCPY(newpname, pname);
 		d = newpname + STRLEN(newpname);
-		for (s = menu->name; *s; ++s)
+		ਲਈ (s = menu->name; *s; ++s)
 		{
-		    if (*s == '.' || *s == '\\')
+		    ਜੇ (*s == '.' || *s == '\\')
 			*d++ = '\\';
 		    *d++ = *s;
 		}
 		*d = NUL;
 
 		// check if tearoff already exists
-		if (STRCMP(menu->children->name, TEAR_STRING) != 0)
+		ਜੇ (STRCMP(menu->children->name, TEAR_STRING) != 0)
 		{
-		    gui_add_tearoff(newpname, pri_tab, pri_idx - 1);
+		    gui_ਜੋੜੋ_tearoff(newpname, pri_tab, pri_idx - 1);
 		    *d = NUL;			// remove TEAR_STRING
 		}
 
@@ -2239,7 +2239,7 @@ gui_create_tearoffs_recurse(
 		vim_free(newpname);
 	    }
 	}
-	menu = menu->next;
+	menu = menu->ਅਗਲਾ;
     }
 }
 
@@ -2247,20 +2247,20 @@ gui_create_tearoffs_recurse(
  * Add tear-off menu item for a submenu.
  * "tearpath" is the menu path, and must have room to add TEAR_STRING.
  */
-    static void
-gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
+    ਸਥਿਰ ਖਾਲੀ
+gui_ਜੋੜੋ_tearoff(char_u *tearpath, ਪੂਰਨ *pri_tab, ਪੂਰਨ pri_idx)
 {
     char_u	*tbuf;
-    int		t;
+    ਪੂਰਨ		t;
     vimmenu_T	menuarg;
 
-    tbuf = alloc(5 + (unsigned int)STRLEN(tearpath));
-    if (tbuf == NULL)
-	return;
+    tbuf = alloc(5 + (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)STRLEN(tearpath));
+    ਜੇ (tbuf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     tbuf[0] = K_SPECIAL;
-    tbuf[1] = K_SECOND(K_TEAROFF);
-    tbuf[2] = K_THIRD(K_TEAROFF);
+    tbuf[1] = K_ਦੂਜਾ(K_TEAROFF);
+    tbuf[2] = K_ਤੀਜਾ(K_TEAROFF);
     STRCPY(tbuf + 3, tearpath);
     STRCAT(tbuf + 3, "\r");
 
@@ -2272,7 +2272,7 @@ gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
     pri_tab[pri_idx + 1] = 1;
 
 # ifdef FEAT_TOOLBAR
-    menuarg.iconfile = NULL;
+    menuarg.iconfile = ਨਿਰਾ;
     menuarg.iconidx = -1;
     menuarg.icon_builtin = FALSE;
 # endif
@@ -2280,10 +2280,10 @@ gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
     menuarg.silent[0] = TRUE;
 
     menuarg.modes = MENU_ALL_MODES;
-    add_menu_path(tearpath, &menuarg, pri_tab, tbuf, FALSE);
+    ਜੋੜੋ_menu_ਰਸਤਾ(tearpath, &menuarg, pri_tab, tbuf, FALSE);
 
-    menuarg.modes = MENU_TIP_MODE;
-    add_menu_path(tearpath, &menuarg, pri_tab,
+    menuarg.modes = MENU_TIP_ਬਹੁਲਕ;
+    ਜੋੜੋ_menu_ਰਸਤਾ(tearpath, &menuarg, pri_tab,
 	    (char_u *)_("Tear off this menu"), FALSE);
 
     pri_tab[pri_idx + 1] = t;
@@ -2293,27 +2293,27 @@ gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
 /*
  * Recursively destroy tearoff items
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 gui_destroy_tearoffs_recurse(vimmenu_T *menu)
 {
-    while (menu)
+    ਜਦੋਂ (menu)
     {
-	if (menu->children)
+	ਜੇ (menu->children)
 	{
 	    // check if tearoff exists
-	    if (STRCMP(menu->children->name, TEAR_STRING) == 0)
+	    ਜੇ (STRCMP(menu->children->name, TEAR_STRING) == 0)
 	    {
 		// Disconnect the item and free the memory
 		free_menu(&menu->children);
 	    }
-	    if (menu->children != NULL) // if not the last one
+	    ਜੇ (menu->children != ਨਿਰਾ) // if not the last one
 		gui_destroy_tearoffs_recurse(menu->children);
 	}
-	menu = menu->next;
+	menu = menu->ਅਗਲਾ;
     }
 }
 
-#endif // FEAT_GUI_MSWIN && FEAT_TEAROFF
+#ਜੇ_ਅੰਤ // FEAT_GUI_MSWIN && FEAT_TEAROFF
 
 /*
  * Execute "menu".  Use by ":emenu" and the window toolbar.
@@ -2321,60 +2321,60 @@ gui_destroy_tearoffs_recurse(vimmenu_T *menu)
  * "mode_idx" specifies a MENU_INDEX_ value, use MENU_INDEX_INVALID to depend
  * on the current state.
  */
-    void
-execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
+    ਖਾਲੀ
+execute_menu(exarg_T *eap, vimmenu_T *menu, ਪੂਰਨ ਬਹੁਲਕ_idx)
 {
-    int		idx = mode_idx;
+    ਪੂਰਨ		idx = ਬਹੁਲਕ_idx;
 
-    if (idx < 0)
+    ਜੇ (idx < 0)
     {
 	// Use the Insert mode entry when returning to Insert mode.
-	if (restart_edit && current_sctx.sc_sid == 0)
+	ਜੇ (restart_edit && current_sctx.sc_sid == 0)
 	{
-	    idx = MENU_INDEX_INSERT;
+	    idx = MENU_ਸੂਚਕਾਂਕ_ਪਾਓ;
 	}
-#ifdef FEAT_TERMINAL
-	else if (term_use_loop())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	ਨਹੀਂਤਾਂ ਜੇ (ਪਦ_use_loop())
 	{
-	    idx = MENU_INDEX_TERMINAL;
+	    idx = MENU_ਸੂਚਕਾਂਕ_TERMINAL;
 	}
-#endif
-	else if (VIsual_active)
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ ਜੇ (VIsual_ਸਰਗਰਮ)
 	{
-	    idx = MENU_INDEX_VISUAL;
+	    idx = MENU_ਸੂਚਕਾਂਕ_VISUAL;
 	}
-	else if (eap != NULL && eap->addr_count)
+	ਨਹੀਂਤਾਂ ਜੇ (eap != ਨਿਰਾ && eap->addr_ਗਿਣਤੀ)
 	{
 	    pos_T	tpos;
 
-	    idx = MENU_INDEX_VISUAL;
+	    idx = MENU_ਸੂਚਕਾਂਕ_VISUAL;
 
 	    // GEDDES: This is not perfect - but it is a
 	    // quick way of detecting whether we are doing this from a
 	    // selection - see if the range matches up with the visual
 	    // select start and end.
-	    if ((curbuf->b_visual.vi_start.lnum == eap->line1)
-		    && (curbuf->b_visual.vi_end.lnum) == eap->line2)
+	    ਜੇ ((curbuf->b_visual.vi_ਸ਼ੁਰੂ.lnum == eap->line1)
+		    && (curbuf->b_visual.vi_ਸਿਰਾ.lnum) == eap->line2)
 	    {
 		// Set it up for visual mode - equivalent to gv.
-		VIsual_mode = curbuf->b_visual.vi_mode;
-		tpos = curbuf->b_visual.vi_end;
-		curwin->w_cursor = curbuf->b_visual.vi_start;
+		VIsual_ਬਹੁਲਕ = curbuf->b_visual.vi_ਬਹੁਲਕ;
+		tpos = curbuf->b_visual.vi_ਸਿਰਾ;
+		curwin->w_cursor = curbuf->b_visual.vi_ਸ਼ੁਰੂ;
 		curwin->w_curswant = curbuf->b_visual.vi_curswant;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Set it up for line-wise visual mode
-		VIsual_mode = 'V';
+		VIsual_ਬਹੁਲਕ = 'V';
 		curwin->w_cursor.lnum = eap->line1;
-		curwin->w_cursor.col = 1;
+		curwin->w_cursor.ਖਾਨਾ = 1;
 		tpos.lnum = eap->line2;
-		tpos.col = MAXCOL;
+		tpos.ਖਾਨਾ = MAXCOL;
 		tpos.coladd = 0;
 	    }
 
 	    // Activate visual mode
-	    VIsual_active = TRUE;
+	    VIsual_ਸਰਗਰਮ = TRUE;
 	    VIsual_reselect = TRUE;
 	    check_cursor();
 	    VIsual = curwin->w_cursor;
@@ -2384,64 +2384,64 @@ execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
 
 	    // Adjust the cursor to make sure it is in the correct pos
 	    // for exclusive mode
-	    if (*p_sel == 'e' && gchar_cursor() != NUL)
-		++curwin->w_cursor.col;
+	    ਜੇ (*p_sel == 'e' && gchar_cursor() != NUL)
+		++curwin->w_cursor.ਖਾਨਾ;
 	}
     }
 
     // For the WinBar menu always use the Normal mode menu.
-    if (idx == MENU_INDEX_INVALID || eap == NULL)
-	idx = MENU_INDEX_NORMAL;
+    ਜੇ (idx == MENU_ਸੂਚਕਾਂਕ_INVALID || eap == ਨਿਰਾ)
+	idx = MENU_ਸੂਚਕਾਂਕ_ਸਾਧਾਰਨ;
 
-    if (menu->strings[idx] != NULL && (menu->modes & (1 << idx)))
+    ਜੇ (menu->ਲੜੀਆਂ[idx] != ਨਿਰਾ && (menu->modes & (1 << idx)))
     {
 	// When executing a script or function execute the commands right now.
 	// Also for the window toolbar.
 	// Otherwise put them in the typeahead buffer.
-	if (eap == NULL || current_sctx.sc_sid != 0)
+	ਜੇ (eap == ਨਿਰਾ || current_sctx.sc_sid != 0)
 	{
 	    save_state_T save_state;
 
-	    ++ex_normal_busy;
-	    if (save_current_state(&save_state))
-		exec_normal_cmd(menu->strings[idx], menu->noremap[idx],
+	    ++ex_ਸਾਧਾਰਨ_busy;
+	    ਜੇ (save_current_state(&save_state))
+		exec_ਸਾਧਾਰਨ_cmd(menu->ਲੜੀਆਂ[idx], menu->noremap[idx],
 							   menu->silent[idx]);
 	    restore_current_state(&save_state);
-	    --ex_normal_busy;
+	    --ex_ਸਾਧਾਰਨ_busy;
 	}
-	else
-	    ins_typebuf(menu->strings[idx], menu->noremap[idx], 0,
+	ਨਹੀਂਤਾਂ
+	    ins_typebuf(menu->ਲੜੀਆਂ[idx], menu->noremap[idx], 0,
 						     TRUE, menu->silent[idx]);
     }
-    else if (eap != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (eap != ਨਿਰਾ)
     {
-	char_u	*mode;
+	char_u	*ਬਹੁਲਕ;
 
-	switch (idx)
+	ਚੋਣ (idx)
 	{
-	    case MENU_INDEX_VISUAL:
-		mode = (char_u *)"Visual";
-		break;
-	    case MENU_INDEX_SELECT:
-		mode = (char_u *)"Select";
-		break;
-	    case MENU_INDEX_OP_PENDING:
-		mode = (char_u *)"Op-pending";
-		break;
-	    case MENU_INDEX_TERMINAL:
-		mode = (char_u *)"Terminal";
-		break;
-	    case MENU_INDEX_INSERT:
-		mode = (char_u *)"Insert";
-		break;
-	    case MENU_INDEX_CMDLINE:
-		mode = (char_u *)"Cmdline";
-		break;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_VISUAL:
+		ਬਹੁਲਕ = (char_u *)"Visual";
+		ਰੋਕੋ;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_SELECT:
+		ਬਹੁਲਕ = (char_u *)"Select";
+		ਰੋਕੋ;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_OP_PENDING:
+		ਬਹੁਲਕ = (char_u *)"Op-pending";
+		ਰੋਕੋ;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_TERMINAL:
+		ਬਹੁਲਕ = (char_u *)"Terminal";
+		ਰੋਕੋ;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_ਪਾਓ:
+		ਬਹੁਲਕ = (char_u *)"Insert";
+		ਰੋਕੋ;
+	    ਹਾਲਤ MENU_ਸੂਚਕਾਂਕ_CMDLINE:
+		ਬਹੁਲਕ = (char_u *)"Cmdline";
+		ਰੋਕੋ;
 	    // case MENU_INDEX_TIP: cannot happen
-	    default:
-		mode = (char_u *)"Normal";
+	    ਮੂਲ:
+		ਬਹੁਲਕ = (char_u *)"Normal";
 	}
-	semsg(_(e_menu_not_defined_for_str_mode), mode);
+	semsg(_(e_menu_not_defined_for_str_ਬਹੁਲਕ), ਬਹੁਲਕ);
     }
 }
 
@@ -2449,255 +2449,255 @@ execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
  * Lookup a menu by the descriptor name e.g. "File.New"
  * Returns NULL if the menu is not found
  */
-    static vimmenu_T *
+    ਸਥਿਰ vimmenu_T *
 menu_getbyname(char_u *name_arg)
 {
     char_u	*name;
     char_u	*saved_name;
     vimmenu_T	*menu;
     char_u	*p;
-    int		gave_emsg = FALSE;
+    ਪੂਰਨ		gave_emsg = FALSE;
 
     saved_name = vim_strsave(name_arg);
-    if (saved_name == NULL)
-	return NULL;
+    ਜੇ (saved_name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    menu = *get_root_menu(saved_name);
+    menu = *get_ਜੜ੍ਹ_menu(saved_name);
     name = saved_name;
-    while (*name)
+    ਜਦੋਂ (*name)
     {
 	// Find in the menu hierarchy
 	p = menu_name_skip(name);
 
-	while (menu != NULL)
+	ਜਦੋਂ (menu != ਨਿਰਾ)
 	{
-	    if (menu_name_equal(name, menu))
+	    ਜੇ (menu_name_equal(name, menu))
 	    {
-		if (*p == NUL && menu->children != NULL)
+		ਜੇ (*p == NUL && menu->children != ਨਿਰਾ)
 		{
-		    emsg(_(e_menu_path_must_lead_to_menu_item));
+		    emsg(_(e_menu_ਰਸਤਾ_must_lead_ਮੰਜ਼ਿਲ_menu_ਵਸਤੂ));
 		    gave_emsg = TRUE;
-		    menu = NULL;
+		    menu = ਨਿਰਾ;
 		}
-		else if (*p != NUL && menu->children == NULL)
+		ਨਹੀਂਤਾਂ ਜੇ (*p != NUL && menu->children == ਨਿਰਾ)
 		{
-		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    menu = NULL;
+		    emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		    menu = ਨਿਰਾ;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
-	    menu = menu->next;
+	    menu = menu->ਅਗਲਾ;
 	}
-	if (menu == NULL || *p == NUL)
-	    break;
+	ਜੇ (menu == ਨਿਰਾ || *p == NUL)
+	    ਰੋਕੋ;
 	menu = menu->children;
 	name = p;
     }
     vim_free(saved_name);
-    if (menu == NULL)
+    ਜੇ (menu == ਨਿਰਾ)
     {
-	if (!gave_emsg)
-	    semsg(_(e_menu_not_found_str), name_arg);
-	return NULL;
+	ਜੇ (!gave_emsg)
+	    semsg(_(e_menu_not_ਮਿਲਿਆ_str), name_arg);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    return menu;
+    ਵਾਪਸ menu;
 }
 
 /*
  * Given a menu descriptor, e.g. "File.New", find it in the menu hierarchy and
  * execute it.
  */
-    void
+    ਖਾਲੀ
 ex_emenu(exarg_T *eap)
 {
     vimmenu_T	*menu;
     char_u	*arg = eap->arg;
-    int		mode_idx = MENU_INDEX_INVALID;
+    ਪੂਰਨ		ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_INVALID;
 
-    if (arg[0] && VIM_ISWHITE(arg[1]))
+    ਜੇ (arg[0] && VIM_ISWHITE(arg[1]))
     {
-	switch (arg[0])
+	ਚੋਣ (arg[0])
 	{
-	    case 'n': mode_idx = MENU_INDEX_NORMAL; break;
-	    case 'v': mode_idx = MENU_INDEX_VISUAL; break;
-	    case 's': mode_idx = MENU_INDEX_SELECT; break;
-	    case 'o': mode_idx = MENU_INDEX_OP_PENDING; break;
-	    case 't': mode_idx = MENU_INDEX_TERMINAL; break;
-	    case 'i': mode_idx = MENU_INDEX_INSERT; break;
-	    case 'c': mode_idx = MENU_INDEX_CMDLINE; break;
-	    default: semsg(_(e_invalid_argument_str), arg);
-		     return;
+	    ਹਾਲਤ 'n': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_ਸਾਧਾਰਨ; ਰੋਕੋ;
+	    ਹਾਲਤ 'v': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_VISUAL; ਰੋਕੋ;
+	    ਹਾਲਤ 's': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_SELECT; ਰੋਕੋ;
+	    ਹਾਲਤ 'o': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_OP_PENDING; ਰੋਕੋ;
+	    ਹਾਲਤ 't': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_TERMINAL; ਰੋਕੋ;
+	    ਹਾਲਤ 'i': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_ਪਾਓ; ਰੋਕੋ;
+	    ਹਾਲਤ 'c': ਬਹੁਲਕ_idx = MENU_ਸੂਚਕਾਂਕ_CMDLINE; ਰੋਕੋ;
+	    ਮੂਲ: semsg(_(e_invalid_ਦਲੀਲ_str), arg);
+		     ਵਾਪਸ;
 	}
 	arg = skipwhite(arg + 2);
     }
 
     menu = menu_getbyname(arg);
-    if (menu == NULL)
-	return;
+    ਜੇ (menu == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Found the menu, so execute.
-    execute_menu(eap, menu, mode_idx);
+    execute_menu(eap, menu, ਬਹੁਲਕ_idx);
 }
 
 /*
  * Handle a click in the window toolbar of "wp" at column "col".
  */
-    void
-winbar_click(win_T *wp, int col)
+    ਖਾਲੀ
+winbar_click(win_T *wp, ਪੂਰਨ ਖਾਨਾ)
 {
-    int		idx;
+    ਪੂਰਨ		idx;
 
-    if (wp->w_winbar_items == NULL)
-	return;
-    for (idx = 0; wp->w_winbar_items[idx].wb_menu != NULL; ++idx)
+    ਜੇ (wp->w_winbar_ਚੀਜ਼ਾਂ == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਲਈ (idx = 0; wp->w_winbar_ਚੀਜ਼ਾਂ[idx].wb_menu != ਨਿਰਾ; ++idx)
     {
-	winbar_item_T *item = &wp->w_winbar_items[idx];
+	winbar_ਵਸਤੂ_T *ਵਸਤੂ = &wp->w_winbar_ਚੀਜ਼ਾਂ[idx];
 
-	if (col >= item->wb_startcol && col <= item->wb_endcol)
+	ਜੇ (ਖਾਨਾ >= ਵਸਤੂ->wb_startcol && ਖਾਨਾ <= ਵਸਤੂ->wb_endcol)
 	{
-	    win_T   *save_curwin = NULL;
+	    win_T   *save_curwin = ਨਿਰਾ;
 	    pos_T   save_visual = VIsual;
-	    int	    save_visual_active = VIsual_active;
-	    int	    save_visual_select = VIsual_select;
-	    int	    save_visual_reselect = VIsual_reselect;
-	    int	    save_visual_mode = VIsual_mode;
+	    ਪੂਰਨ	    save_visual_ਸਰਗਰਮ = VIsual_ਸਰਗਰਮ;
+	    ਪੂਰਨ	    save_visual_select = VIsual_select;
+	    ਪੂਰਨ	    save_visual_reselect = VIsual_reselect;
+	    ਪੂਰਨ	    save_visual_ਬਹੁਲਕ = VIsual_ਬਹੁਲਕ;
 
-	    if (wp != curwin)
+	    ਜੇ (wp != curwin)
 	    {
 		// Clicking in the window toolbar of a not-current window.
 		// Make that window the current one and save Visual mode.
 		save_curwin = curwin;
-		VIsual_active = FALSE;
+		VIsual_ਸਰਗਰਮ = FALSE;
 		curwin = wp;
-		curbuf = curwin->w_buffer;
+		curbuf = curwin->w_ਬਫਰ;
 		check_cursor();
 	    }
 
 	    // Note: the command might close the current window.
-	    execute_menu(NULL, item->wb_menu, -1);
+	    execute_menu(ਨਿਰਾ, ਵਸਤੂ->wb_menu, -1);
 
-	    if (save_curwin != NULL && win_valid(save_curwin))
+	    ਜੇ (save_curwin != ਨਿਰਾ && win_valid(save_curwin))
 	    {
 		curwin = save_curwin;
-		curbuf = curwin->w_buffer;
+		curbuf = curwin->w_ਬਫਰ;
 		VIsual = save_visual;
-		VIsual_active = save_visual_active;
+		VIsual_ਸਰਗਰਮ = save_visual_ਸਰਗਰਮ;
 		VIsual_select = save_visual_select;
 		VIsual_reselect = save_visual_reselect;
-		VIsual_mode = save_visual_mode;
+		VIsual_ਬਹੁਲਕ = save_visual_ਬਹੁਲਕ;
 	    }
-	    if (!win_valid(wp))
-		break;
+	    ਜੇ (!win_valid(wp))
+		ਰੋਕੋ;
 	}
     }
 }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
-	|| defined(FEAT_TERM_POPUP_MENU) || defined(FEAT_GUI_HAIKU) \
+#ਜੇ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+	|| defined(FEAT_ਪਦ_POPUP_MENU) || defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_BEVAL_TIP)
 /*
  * Given a menu descriptor, e.g. "File.New", find it in the menu hierarchy.
  */
     vimmenu_T *
-gui_find_menu(char_u *path_name)
+gui_ਲੱਭੋ_menu(char_u *ਰਸਤਾ_name)
 {
-    vimmenu_T	*menu = NULL;
+    vimmenu_T	*menu = ਨਿਰਾ;
     char_u	*name;
     char_u	*saved_name;
     char_u	*p;
 
-    menu = *get_root_menu(path_name);
+    menu = *get_ਜੜ੍ਹ_menu(ਰਸਤਾ_name);
 
-    saved_name = vim_strsave(path_name);
-    if (saved_name == NULL)
-	return NULL;
+    saved_name = vim_strsave(ਰਸਤਾ_name);
+    ਜੇ (saved_name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     name = saved_name;
-    while (*name)
+    ਜਦੋਂ (*name)
     {
 	// find the end of one dot-separated name and put a NUL at the dot
 	p = menu_name_skip(name);
 
-	while (menu != NULL)
+	ਜਦੋਂ (menu != ਨਿਰਾ)
 	{
-	    if (menu_name_equal(name, menu))
+	    ਜੇ (menu_name_equal(name, menu))
 	    {
-		if (menu->children == NULL)
+		ਜੇ (menu->children == ਨਿਰਾ)
 		{
 		    // found a menu item instead of a sub-menu
-		    if (*p == NUL)
-			emsg(_(e_menu_path_must_lead_to_sub_menu));
-		    else
-			emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    menu = NULL;
-		    goto theend;
+		    ਜੇ (*p == NUL)
+			emsg(_(e_menu_ਰਸਤਾ_must_lead_ਮੰਜ਼ਿਲ_sub_menu));
+		    ਨਹੀਂਤਾਂ
+			emsg(_(e_part_ਦਾ_menu_ਵਸਤੂ_ਰਸਤਾ_is_not_sub_menu));
+		    menu = ਨਿਰਾ;
+		    ਜਾਓ theend;
 		}
-		if (*p == NUL)	    // found a full match
-		    goto theend;
-		break;
+		ਜੇ (*p == NUL)	    // found a full match
+		    ਜਾਓ theend;
+		ਰੋਕੋ;
 	    }
-	    menu = menu->next;
+	    menu = menu->ਅਗਲਾ;
 	}
-	if (menu == NULL)	// didn't find it
-	    break;
+	ਜੇ (menu == ਨਿਰਾ)	// didn't find it
+	    ਰੋਕੋ;
 
 	// Found a match, search the sub-menu.
 	menu = menu->children;
 	name = p;
     }
 
-    if (menu == NULL)
-	emsg(_(e_menu_not_found_check_menu_names));
+    ਜੇ (menu == ਨਿਰਾ)
+	emsg(_(e_menu_not_ਮਿਲਿਆ_check_menu_ਨਾਂ));
 theend:
     vim_free(saved_name);
-    return menu;
+    ਵਾਪਸ menu;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 /*
  * Translation of menu names.  Just a simple lookup table.
  */
 
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
     char_u	*from;		// English name
     char_u	*from_noamp;	// same, without '&'
-    char_u	*to;		// translated name
+    char_u	*ਮੰਜ਼ਿਲ;		// translated name
 } menutrans_T;
 
-static garray_T menutrans_ga = {0, 0, 0, 0, NULL};
-#endif
+ਸਥਿਰ garray_T menutrans_ga = {0, 0, 0, 0, ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
 
 /*
  * ":menutrans".
  * This function is also defined without the +multi_lang feature, in which
  * case the commands are ignored.
  */
-    void
-ex_menutranslate(exarg_T *eap UNUSED)
+    ਖਾਲੀ
+ex_menutranslate(exarg_T *eap ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
     char_u		*arg = eap->arg;
     menutrans_T		*tp;
-    int			i;
-    char_u		*from, *from_noamp, *to;
+    ਪੂਰਨ			i;
+    char_u		*from, *from_noamp, *ਮੰਜ਼ਿਲ;
 
-    if (menutrans_ga.ga_itemsize == 0)
-	ga_init2(&menutrans_ga, sizeof(menutrans_T), 5);
+    ਜੇ (menutrans_ga.ga_itemsize == 0)
+	ga_init2(&menutrans_ga, ਆਕਾਰ(menutrans_T), 5);
 
     /*
      * ":menutrans clear": clear all translations.
      */
-    if (STRNCMP(arg, "clear", 5) == 0 && ends_excmd2(arg, skipwhite(arg + 5)))
+    ਜੇ (STRNCMP(arg, "clear", 5) == 0 && ਸਿਰੇ_excmd2(arg, skipwhite(arg + 5)))
     {
-	tp = (menutrans_T *)menutrans_ga.ga_data;
-	for (i = 0; i < menutrans_ga.ga_len; ++i)
+	tp = (menutrans_T *)menutrans_ga.ga_ਅੰਕੜੇ;
+	ਲਈ (i = 0; i < menutrans_ga.ga_len; ++i)
 	{
 	    vim_free(tp[i].from);
 	    vim_free(tp[i].from_noamp);
-	    vim_free(tp[i].to);
+	    vim_free(tp[i].ਮੰਜ਼ਿਲ);
 	}
 	ga_clear(&menutrans_ga);
 # ifdef FEAT_EVAL
@@ -2705,343 +2705,343 @@ ex_menutranslate(exarg_T *eap UNUSED)
 	del_menutrans_vars();
 # endif
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// ":menutrans from to": add translation
 	from = arg;
 	arg = menu_skip_part(arg);
-	to = skipwhite(arg);
+	ਮੰਜ਼ਿਲ = skipwhite(arg);
 	*arg = NUL;
-	arg = menu_skip_part(to);
-	if (arg == to || ends_excmd2(eap->arg, from)
-		      || ends_excmd2(eap->arg, to)
-		      || !ends_excmd2(eap->arg, skipwhite(arg)))
-	    emsg(_(e_invalid_argument));
-	else
+	arg = menu_skip_part(ਮੰਜ਼ਿਲ);
+	ਜੇ (arg == ਮੰਜ਼ਿਲ || ਸਿਰੇ_excmd2(eap->arg, from)
+		      || ਸਿਰੇ_excmd2(eap->arg, ਮੰਜ਼ਿਲ)
+		      || !ਸਿਰੇ_excmd2(eap->arg, skipwhite(arg)))
+	    emsg(_(e_invalid_ਦਲੀਲ));
+	ਨਹੀਂਤਾਂ
 	{
-	    if (ga_grow(&menutrans_ga, 1) == OK)
+	    ਜੇ (ga_grow(&menutrans_ga, 1) == OK)
 	    {
-		tp = (menutrans_T *)menutrans_ga.ga_data;
+		tp = (menutrans_T *)menutrans_ga.ga_ਅੰਕੜੇ;
 		from = vim_strsave(from);
-		if (from != NULL)
+		ਜੇ (from != ਨਿਰਾ)
 		{
-		    from_noamp = menu_text(from, NULL, NULL);
-		    to = vim_strnsave(to, arg - to);
-		    if (from_noamp != NULL && to != NULL)
+		    from_noamp = menu_ਪਾਠ(from, ਨਿਰਾ, ਨਿਰਾ);
+		    ਮੰਜ਼ਿਲ = vim_strnsave(ਮੰਜ਼ਿਲ, arg - ਮੰਜ਼ਿਲ);
+		    ਜੇ (from_noamp != ਨਿਰਾ && ਮੰਜ਼ਿਲ != ਨਿਰਾ)
 		    {
-			menu_translate_tab_and_shift(from);
-			menu_translate_tab_and_shift(to);
+			menu_translate_tab_and_ਖਿਸਕਾਓ(from);
+			menu_translate_tab_and_ਖਿਸਕਾਓ(ਮੰਜ਼ਿਲ);
 			menu_unescape_name(from);
-			menu_unescape_name(to);
+			menu_unescape_name(ਮੰਜ਼ਿਲ);
 			tp[menutrans_ga.ga_len].from = from;
 			tp[menutrans_ga.ga_len].from_noamp = from_noamp;
-			tp[menutrans_ga.ga_len].to = to;
+			tp[menutrans_ga.ga_len].ਮੰਜ਼ਿਲ = ਮੰਜ਼ਿਲ;
 			++menutrans_ga.ga_len;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			vim_free(from);
 			vim_free(from_noamp);
-			vim_free(to);
+			vim_free(ਮੰਜ਼ਿਲ);
 		    }
 		}
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#if defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
+#ਜੇ defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
 /*
  * Find the character just after one part of a menu name.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 menu_skip_part(char_u *p)
 {
-    while (*p != NUL && *p != '.' && !VIM_ISWHITE(*p))
+    ਜਦੋਂ (*p != NUL && *p != '.' && !VIM_ISWHITE(*p))
     {
-	if ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
+	ਜੇ ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
 	    ++p;
 	++p;
     }
-    return p;
+    ਵਾਪਸ p;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_MULTI_LANG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_MULTI_LANG
 /*
  * Lookup part of a menu name in the translations.
  * Return a pointer to the translation or NULL if not found.
  */
-    static char_u *
-menutrans_lookup(char_u *name, int len)
+    ਸਥਿਰ char_u *
+menutrans_lookup(char_u *name, ਪੂਰਨ len)
 {
-    menutrans_T		*tp = (menutrans_T *)menutrans_ga.ga_data;
-    int			i;
+    menutrans_T		*tp = (menutrans_T *)menutrans_ga.ga_ਅੰਕੜੇ;
+    ਪੂਰਨ			i;
     char_u		*dname;
 
-    for (i = 0; i < menutrans_ga.ga_len; ++i)
-	if (STRNICMP(name, tp[i].from, len) == 0 && tp[i].from[len] == NUL)
-	    return tp[i].to;
+    ਲਈ (i = 0; i < menutrans_ga.ga_len; ++i)
+	ਜੇ (STRNICMP(name, tp[i].from, len) == 0 && tp[i].from[len] == NUL)
+	    ਵਾਪਸ tp[i].ਮੰਜ਼ਿਲ;
 
     // Now try again while ignoring '&' characters.
     i = name[len];
     name[len] = NUL;
-    dname = menu_text(name, NULL, NULL);
+    dname = menu_ਪਾਠ(name, ਨਿਰਾ, ਨਿਰਾ);
     name[len] = i;
-    if (dname == NULL)
-	return NULL;
+    ਜੇ (dname == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (i = 0; i < menutrans_ga.ga_len; ++i)
-	if (STRICMP(dname, tp[i].from_noamp) == 0)
+    ਲਈ (i = 0; i < menutrans_ga.ga_len; ++i)
+	ਜੇ (STRICMP(dname, tp[i].from_noamp) == 0)
 	{
 	    vim_free(dname);
-	    return tp[i].to;
+	    ਵਾਪਸ tp[i].ਮੰਜ਼ਿਲ;
 	}
     vim_free(dname);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Unescape the name in the translate dictionary table.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 menu_unescape_name(char_u *name)
 {
     char_u  *p;
 
-    for (p = name; *p && *p != '.'; MB_PTR_ADV(p))
-	if (*p == '\\')
+    ਲਈ (p = name; *p && *p != '.'; MB_PTR_ADV(p))
+	ਜੇ (*p == '\\')
 	    STRMOVE(p, p + 1);
 }
-#endif // FEAT_MULTI_LANG
+#ਜੇ_ਅੰਤ // FEAT_MULTI_LANG
 
 /*
  * Isolate the menu name.
  * Skip the menu name, and translate <Tab> into a real TAB.
  */
-    static char_u *
-menu_translate_tab_and_shift(char_u *arg_start)
+    ਸਥਿਰ char_u *
+menu_translate_tab_and_ਖਿਸਕਾਓ(char_u *arg_ਸ਼ੁਰੂ)
 {
-    char_u	*arg = arg_start;
+    char_u	*arg = arg_ਸ਼ੁਰੂ;
 
-    while (*arg && !VIM_ISWHITE(*arg))
+    ਜਦੋਂ (*arg && !VIM_ISWHITE(*arg))
     {
-	if ((*arg == '\\' || *arg == Ctrl_V) && arg[1] != NUL)
+	ਜੇ ((*arg == '\\' || *arg == Ctrl_V) && arg[1] != NUL)
 	    arg++;
-	else if (STRNICMP(arg, "<TAB>", 5) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNICMP(arg, "<TAB>", 5) == 0)
 	{
 	    *arg = TAB;
 	    STRMOVE(arg + 1, arg + 5);
 	}
 	arg++;
     }
-    if (*arg != NUL)
+    ਜੇ (*arg != NUL)
 	*arg++ = NUL;
     arg = skipwhite(arg);
 
-    return arg;
+    ਵਾਪਸ arg;
 }
 
 /*
  * Get the information about a menu item in mode 'which'
  */
-    static int
-menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, int modes, dict_T *dict)
+    ਸਥਿਰ ਪੂਰਨ
+menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, ਪੂਰਨ modes, dict_T *dict)
 {
-    int		status;
+    ਪੂਰਨ		ਸਥਿਤੀ;
     list_T	*l;
 
-    if (*menu_name == NUL)
+    ਜੇ (*menu_name == NUL)
     {
 	// Return all the top-level menus
 	vimmenu_T	*topmenu;
 
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ਜੇ (l == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	if (dict_add_list(dict, "submenus", l) == FAIL)
+	ਜੇ (dict_ਜੋੜੋ_list(dict, "submenus", l) == FAIL)
 	{
 	    list_unref(l);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 	// get all the children.  Skip PopUp[nvoci].
-	for (topmenu = menu; topmenu != NULL; topmenu = topmenu->next)
-	    if (!menu_is_hidden(topmenu->dname))
+	ਲਈ (topmenu = menu; topmenu != ਨਿਰਾ; topmenu = topmenu->ਅਗਲਾ)
+	    ਜੇ (!menu_is_hidden(topmenu->dname))
 		list_append_string(l, topmenu->dname, -1);
-	return OK;
+	ਵਾਪਸ OK;
     }
 
-    if (menu_is_tearoff(menu->dname))		// skip tearoff menu item
-	return OK;
+    ਜੇ (menu_is_tearoff(menu->dname))		// skip tearoff menu item
+	ਵਾਪਸ OK;
 
-    status = dict_add_string(dict, "name", menu->name);
-    if (status == OK)
-	status = dict_add_string(dict, "display", menu->dname);
-    if (status == OK && menu->actext != NULL)
-	status = dict_add_string(dict, "accel", menu->actext);
-    if (status == OK)
-	status = dict_add_number(dict, "priority", menu->priority);
-    if (status == OK)
-	status = dict_add_string(dict, "modes",
-					get_menu_mode_str(menu->modes));
-#ifdef FEAT_TOOLBAR
-    if (status == OK && menu->iconfile != NULL)
-	status = dict_add_string(dict, "icon", menu->iconfile);
-    if (status == OK && menu->iconidx >= 0)
-	status = dict_add_number(dict, "iconidx", menu->iconidx);
-#endif
-    if (status == OK)
+    ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "name", menu->name);
+    ਜੇ (ਸਥਿਤੀ == OK)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "display", menu->dname);
+    ਜੇ (ਸਥਿਤੀ == OK && menu->actext != ਨਿਰਾ)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "accel", menu->actext);
+    ਜੇ (ਸਥਿਤੀ == OK)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "priority", menu->ਤਰਜੀਹ);
+    ਜੇ (ਸਥਿਤੀ == OK)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "modes",
+					get_menu_ਬਹੁਲਕ_str(menu->modes));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
+    ਜੇ (ਸਥਿਤੀ == OK && menu->iconfile != ਨਿਰਾ)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "icon", menu->iconfile);
+    ਜੇ (ਸਥਿਤੀ == OK && menu->iconidx >= 0)
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "iconidx", menu->iconidx);
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਸਥਿਤੀ == OK)
     {
 	char_u	buf[NUMBUFLEN];
-	int	buflen;
+	ਪੂਰਨ	buflen;
 
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	    buflen = utf_char2bytes(menu->mnemonic, buf);
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    buf[0] = (char_u)menu->mnemonic;
 	    buflen = (buf[0] == NUL) ? 0 : 1;
 	}
 	buf[buflen] = NUL;
-	status = dict_add_string_len(dict, "shortcut", buf, buflen);
+	ਸਥਿਤੀ = dict_ਜੋੜੋ_string_len(dict, "shortcut", buf, buflen);
     }
-    if (status == OK && menu->children == NULL)
+    ਜੇ (ਸਥਿਤੀ == OK && menu->children == ਨਿਰਾ)
     {
-	int		bit;
+	ਪੂਰਨ		ਦੋਆਧਾਰੀ_ਅੰਕ;
 
 	// Get the first mode in which the menu is available
-	for (bit = 0; bit < MENU_MODES && !((1 << bit) & modes); bit++)
+	ਲਈ (ਦੋਆਧਾਰੀ_ਅੰਕ = 0; ਦੋਆਧਾਰੀ_ਅੰਕ < MENU_MODES && !((1 << ਦੋਆਧਾਰੀ_ਅੰਕ) & modes); ਦੋਆਧਾਰੀ_ਅੰਕ++)
 	    ;
-	if (bit < MENU_MODES) // just in case, avoid Coverity warning
+	ਜੇ (ਦੋਆਧਾਰੀ_ਅੰਕ < MENU_MODES) // just in case, avoid Coverity warning
 	{
-	    if (menu->strings[bit] != NULL)
+	    ਜੇ (menu->ਲੜੀਆਂ[ਦੋਆਧਾਰੀ_ਅੰਕ] != ਨਿਰਾ)
 	    {
-		if (*menu->strings[bit] == NUL)
-		    status = dict_add_string_len(dict, "rhs",
+		ਜੇ (*menu->ਲੜੀਆਂ[ਦੋਆਧਾਰੀ_ਅੰਕ] == NUL)
+		    ਸਥਿਤੀ = dict_ਜੋੜੋ_string_len(dict, "rhs",
 			(char_u *)"<Nop>", STRLEN_LITERAL("<Nop>"));
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    char_u *tofree = NULL;
+		    char_u *tofree = ਨਿਰਾ;
 
-		    status = dict_add_string(dict, "rhs",
-			tofree = str2special_save(menu->strings[bit], FALSE, FALSE));
+		    ਸਥਿਤੀ = dict_ਜੋੜੋ_string(dict, "rhs",
+			tofree = str2special_save(menu->ਲੜੀਆਂ[ਦੋਆਧਾਰੀ_ਅੰਕ], FALSE, FALSE));
 		    vim_free(tofree);
 		}
 	    }
-	    if (status == OK)
-		status = dict_add_bool(dict, "noremenu",
-					     menu->noremap[bit] == REMAP_NONE);
-	    if (status == OK)
-		status = dict_add_bool(dict, "script",
-					   menu->noremap[bit] == REMAP_SCRIPT);
-	    if (status == OK)
-		status = dict_add_bool(dict, "silent", menu->silent[bit]);
-	    if (status == OK)
-		status = dict_add_bool(dict, "enabled",
-					  ((menu->enabled & (1 << bit)) != 0));
+	    ਜੇ (ਸਥਿਤੀ == OK)
+		ਸਥਿਤੀ = dict_ਜੋੜੋ_bool(dict, "noremenu",
+					     menu->noremap[ਦੋਆਧਾਰੀ_ਅੰਕ] == REMAP_NONE);
+	    ਜੇ (ਸਥਿਤੀ == OK)
+		ਸਥਿਤੀ = dict_ਜੋੜੋ_bool(dict, "script",
+					   menu->noremap[ਦੋਆਧਾਰੀ_ਅੰਕ] == REMAP_SCRIPT);
+	    ਜੇ (ਸਥਿਤੀ == OK)
+		ਸਥਿਤੀ = dict_ਜੋੜੋ_bool(dict, "silent", menu->silent[ਦੋਆਧਾਰੀ_ਅੰਕ]);
+	    ਜੇ (ਸਥਿਤੀ == OK)
+		ਸਥਿਤੀ = dict_ਜੋੜੋ_bool(dict, "enabled",
+					  ((menu->enabled & (1 << ਦੋਆਧਾਰੀ_ਅੰਕ)) != 0));
 	}
     }
 
     // If there are submenus, add all the submenu display names
-    if (status == OK && menu->children != NULL)
+    ਜੇ (ਸਥਿਤੀ == OK && menu->children != ਨਿਰਾ)
     {
-	vimmenu_T	*child;
+	vimmenu_T	*ਬੱਚਾ;
 
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	ਜੇ (l == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 
-	if (dict_add_list(dict, "submenus", l) == FAIL)
+	ਜੇ (dict_ਜੋੜੋ_list(dict, "submenus", l) == FAIL)
 	{
 	    list_unref(l);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	child = menu->children;
-	while (child)
+	ਬੱਚਾ = menu->children;
+	ਜਦੋਂ (ਬੱਚਾ)
 	{
-	    if (!menu_is_tearoff(child->dname))		// skip tearoff menu
-		list_append_string(l, child->dname, -1);
-	    child = child->next;
+	    ਜੇ (!menu_is_tearoff(ਬੱਚਾ->dname))		// skip tearoff menu
+		list_append_string(l, ਬੱਚਾ->dname, -1);
+	    ਬੱਚਾ = ਬੱਚਾ->ਅਗਲਾ;
 	}
     }
 
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }
 
 /*
  * "menu_info()" function
  * Return information about a menu (including all the child menus)
  */
-    void
+    ਖਾਲੀ
 f_menu_info(typval_T *argvars, typval_T *rettv)
 {
     char_u	*menu_name;
     char_u	*which;
-    int		modes;
+    ਪੂਰਨ		modes;
     char_u	*saved_name;
     char_u	*name;
     vimmenu_T	*menu;
     dict_T	*retdict;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ਜੇ (rettv_dict_alloc(rettv) == FAIL)
+	ਵਾਪਸ;
     retdict = rettv->vval.v_dict;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     menu_name = tv_get_string_chk(&argvars[0]);
-    if (menu_name == NULL)
-	return;
+    ਜੇ (menu_name == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // menu mode
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
 	which = tv_get_string_chk(&argvars[1]);
-    else
+    ਨਹੀਂਤਾਂ
 	which = (char_u *)"";	    // Default is modes for "menu"
-    if (which == NULL)
-	return;
+    ਜੇ (which == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    modes = get_menu_cmd_modes(which, *which == '!', NULL, NULL);
+    modes = get_menu_cmd_modes(which, *which == '!', ਨਿਰਾ, ਨਿਰਾ);
 
     // Locate the specified menu or menu item
-    menu = *get_root_menu(menu_name);
+    menu = *get_ਜੜ੍ਹ_menu(menu_name);
     saved_name = vim_strsave(menu_name);
-    if (saved_name == NULL)
-	return;
-    if (*saved_name != NUL)
+    ਜੇ (saved_name == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (*saved_name != NUL)
     {
 	char_u	*p;
 
 	name = saved_name;
-	while (*name)
+	ਜਦੋਂ (*name)
 	{
 	    // Find in the menu hierarchy
 	    p = menu_name_skip(name);
-	    while (menu != NULL)
+	    ਜਦੋਂ (menu != ਨਿਰਾ)
 	    {
-		if (menu_name_equal(name, menu))
-		    break;
-		menu = menu->next;
+		ਜੇ (menu_name_equal(name, menu))
+		    ਰੋਕੋ;
+		menu = menu->ਅਗਲਾ;
 	    }
-	    if (menu == NULL || *p == NUL)
-		break;
+	    ਜੇ (menu == ਨਿਰਾ || *p == NUL)
+		ਰੋਕੋ;
 	    menu = menu->children;
 	    name = p;
 	}
     }
     vim_free(saved_name);
 
-    if (menu == NULL)		// specified menu not found
-	return;
+    ਜੇ (menu == ਨਿਰਾ)		// specified menu not found
+	ਵਾਪਸ;
 
-    if (menu->modes & modes)
+    ਜੇ (menu->modes & modes)
 	menuitem_getinfo(menu_name, menu, modes, retdict);
 }
 
-#endif // FEAT_MENU
+#ਜੇ_ਅੰਤ // FEAT_MENU

@@ -11,16 +11,16 @@
  * vim9instr.c: Dealing with instructions of a compiled function
  */
 
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ USING_FLOAT_STUFF
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 /////////////////////////////////////////////////////////////////////
 // Following generate_ functions expect the caller to call ga_grow().
 
-#define RETURN_NULL_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return NULL
-#define RETURN_OK_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return OK
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RETURN_NULL_IF_SKIP(cctx) ਜੇ (cctx->ctx_skip == SKIP_YES) ਵਾਪਸ ਨਿਰਾ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RETURN_OK_IF_SKIP(cctx) ਜੇ (cctx->ctx_skip == SKIP_YES) ਵਾਪਸ OK
 
 /*
  * Generate an instruction without arguments.
@@ -33,14 +33,14 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
     isn_T	*isn;
 
     RETURN_NULL_IF_SKIP(cctx);
-    if (GA_GROW_FAILS(instr, 1))
-	return NULL;
-    isn = ((isn_T *)instr->ga_data) + instr->ga_len;
+    ਜੇ (GA_GROW_FAILS(instr, 1))
+	ਵਾਪਸ ਨਿਰਾ;
+    isn = ((isn_T *)instr->ga_ਅੰਕੜੇ) + instr->ga_len;
     isn->isn_type = isn_type;
     isn->isn_lnum = cctx->ctx_lnum + 1;
     ++instr->ga_len;
 
-    return isn;
+    ਵਾਪਸ isn;
 }
 
 /*
@@ -49,18 +49,18 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
  * Returns a pointer to the new instruction, NULL if failed.
  */
     isn_T *
-generate_instr_drop(cctx_T *cctx, isntype_T isn_type, int drop)
+generate_instr_drop(cctx_T *cctx, isntype_T isn_type, ਪੂਰਨ drop)
 {
     RETURN_NULL_IF_SKIP(cctx);
-    cctx->ctx_type_stack.ga_len -= drop;
-    return generate_instr(cctx, isn_type);
+    cctx->ctx_type_ਢੇਰ.ga_len -= drop;
+    ਵਾਪਸ generate_instr(cctx, isn_type);
 }
 
 /*
  * Generate instruction "isn_type" and put "type" on the type stack,
  * use "decl_type" for the declared type.
  */
-    static isn_T *
+    ਸਥਿਰ isn_T *
 generate_instr_type2(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
@@ -69,14 +69,14 @@ generate_instr_type2(
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return NULL;
+    ਜੇ ((isn = generate_instr(cctx, isn_type)) == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (push_type_stack2(cctx, type == NULL ? &t_any : type,
-			       decl_type == NULL ? &t_any : decl_type) == FAIL)
-	return NULL;
+    ਜੇ (ਧੱਕੋ_type_stack2(cctx, type == ਨਿਰਾ ? &t_any : type,
+			       decl_type == ਨਿਰਾ ? &t_any : decl_type) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    return isn;
+    ਵਾਪਸ isn;
 }
 
 /*
@@ -87,7 +87,7 @@ generate_instr_type2(
     isn_T *
 generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 {
-    return generate_instr_type2(cctx, isn_type, type, &t_any);
+    ਵਾਪਸ generate_instr_type2(cctx, isn_type, type, &t_any);
 }
 
 /*
@@ -97,89 +97,89 @@ generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 generate_instr_debug(cctx_T *cctx)
 {
     isn_T	*isn;
-    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
+    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_ਅੰਕੜੇ)
 					       + cctx->ctx_ufunc->uf_dfunc_idx;
 
-    if ((isn = generate_instr(cctx, ISN_DEBUG)) == NULL)
-	return NULL;
-    isn->isn_arg.debug.dbg_var_names_len = dfunc->df_var_names.ga_len;
+    ਜੇ ((isn = generate_instr(cctx, ISN_DEBUG)) == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    isn->isn_arg.debug.dbg_var_ਨਾਂ_len = dfunc->df_var_ਨਾਂ.ga_len;
     isn->isn_arg.debug.dbg_break_lnum = cctx->ctx_prev_lnum;
-    return isn;
+    ਵਾਪਸ isn;
 }
 
 /*
  * Generate an ISN_CONSTRUCT instruction.
  * The object will have "size" members.
  */
-    int
+    ਪੂਰਨ
 generate_CONSTRUCT(cctx_T *cctx, class_T *cl)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
-	return FAIL;
-    isn->isn_arg.construct.construct_size = sizeof(object_T)
-			       + cl->class_obj_member_count * sizeof(typval_T);
+    ਜੇ ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.construct.construct_ਮਾਪ = ਆਕਾਰ(object_T)
+			       + cl->class_obj_member_ਗਿਣਤੀ * ਆਕਾਰ(typval_T);
     isn->isn_arg.construct.construct_class = cl;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate ISN_GET_OBJ_MEMBER - access member of object at bottom of stack by
  * index.
  */
-    int
-generate_GET_OBJ_MEMBER(cctx_T *cctx, int idx, type_T *type)
+    ਪੂਰਨ
+generate_GET_OBJ_MEMBER(cctx_T *cctx, ਪੂਰਨ idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_OBJ_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    isn->isn_arg.classmember.cm_class = NULL;
+    isn->isn_arg.classmember.cm_class = ਨਿਰਾ;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    ਵਾਪਸ ਧੱਕੋ_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_GET_ITF_MEMBER - access member of interface at bottom of stack
  * by index.
  */
-    int
-generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, int idx, type_T *type)
+    ਪੂਰਨ
+generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, ਪੂਰਨ idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_ITF_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     isn->isn_arg.classmember.cm_class = itf;
     ++itf->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    ਵਾਪਸ ਧੱਕੋ_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_STORE_THIS - store value in member of "this" object with member
  * index "idx".
  */
-    int
-generate_STORE_THIS(cctx_T *cctx, int idx)
+    ਪੂਰਨ
+generate_STORE_THIS(cctx_T *cctx, ਪੂਰਨ idx)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the value type
     isn_T *isn = generate_instr_drop(cctx, ISN_STORE_THIS, 1);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    isn->isn_arg.number = idx;
-    return OK;
+    isn->isn_arg.ਸੰਖਿਆ = idx;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -189,109 +189,109 @@ generate_STORE_THIS(cctx_T *cctx, int idx)
  * strings.  When tostring_flags has TOSTRING_INTERPOLATE, convert a List or a
  * Dict to the corresponding textual representation.
  */
-    int
-may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
+    ਪੂਰਨ
+may_generate_2STRING(ਪੂਰਨ ਵਿੱਥ, ਪੂਰਨ tostring_flags, cctx_T *cctx)
 {
     isn_T	*isn;
     isntype_T	isntype = ISN_2STRING;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    type = get_type_on_stack(cctx, -1 - offset);
+    type = get_type_on_ਢੇਰ(cctx, -1 - ਵਿੱਥ);
 
-    switch (type->tt_type)
+    ਚੋਣ (type->tt_type)
     {
 	// nothing to be done
-	case VAR_STRING: return OK;
+	ਹਾਲਤ VAR_STRING: ਵਾਪਸ OK;
 
 	// conversion possible
-	case VAR_SPECIAL:
-	case VAR_BOOL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-			 break;
+	ਹਾਲਤ VAR_SPECIAL:
+	ਹਾਲਤ VAR_BOOL:
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	ਹਾਲਤ VAR_FLOAT:
+			 ਰੋਕੋ;
 
 	// conversion possible (with runtime check)
-	case VAR_ANY:
-	case VAR_UNKNOWN:
+	ਹਾਲਤ VAR_ANY:
+	ਹਾਲਤ VAR_UNKNOWN:
 			 isntype = ISN_2STRING_ANY;
-			 break;
+			 ਰੋਕੋ;
 
 	// conversion possible when tolerant
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-			 if (tostring_flags & TOSTRING_TOLERANT)
+	ਹਾਲਤ VAR_LIST:
+	ਹਾਲਤ VAR_TUPLE:
+	ਹਾਲਤ VAR_DICT:
+			 ਜੇ (tostring_flags & TOSTRING_TOLERANT)
 			 {
 			     isntype = ISN_2STRING_ANY;
-			     break;
+			     ਰੋਕੋ;
 			 }
-			 if (tostring_flags & TOSTRING_INTERPOLATE)
-			     break;
+			 ਜੇ (tostring_flags & TOSTRING_INTERPOLATE)
+			     ਰੋਕੋ;
 			 // FALLTHROUGH
 
 	// conversion not possible
-	case VAR_VOID:
-	case VAR_BLOB:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-			 to_string_error(type->tt_type);
-			 return FAIL;
+	ਹਾਲਤ VAR_VOID:
+	ਹਾਲਤ VAR_BLOB:
+	ਹਾਲਤ VAR_FUNC:
+	ਹਾਲਤ VAR_PARTIAL:
+	ਹਾਲਤ VAR_ਕੰਮ:
+	ਹਾਲਤ VAR_CHANNEL:
+	ਹਾਲਤ VAR_INSTR:
+	ਹਾਲਤ VAR_CLASS:
+	ਹਾਲਤ VAR_OBJECT:
+	ਹਾਲਤ VAR_TYPEALIAS:
+			 ਮੰਜ਼ਿਲ_string_error(type->tt_type);
+			 ਵਾਪਸ FAIL;
     }
 
-    set_type_on_stack(cctx, &t_string, -1 - offset);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
-    isn->isn_arg.tostring.offset = offset;
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_string, -1 - ਵਿੱਥ);
+    ਜੇ ((isn = generate_instr(cctx, isntype)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.tostring.ਵਿੱਥ = ਵਿੱਥ;
     isn->isn_arg.tostring.flags = tostring_flags;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    static int
-check_number_or_float(type_T *typ1, type_T *typ2, char_u *op)
+    ਸਥਿਰ ਪੂਰਨ
+check_ਸੰਖਿਆ_or_float(type_T *typ1, type_T *typ2, char_u *op)
 {
     vartype_T	    type1 = typ1->tt_type;
     vartype_T	    type2 = typ2->tt_type;
-    if (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
+    ਜੇ (!((type1 == VAR_ਸੰਖਿਆ || type1 == VAR_FLOAT
 				   || type1 == VAR_ANY || type1 == VAR_UNKNOWN)
-	    && (type2 == VAR_NUMBER || type2 == VAR_FLOAT
+	    && (type2 == VAR_ਸੰਖਿਆ || type2 == VAR_FLOAT
 				 || type2 == VAR_ANY || type2 == VAR_UNKNOWN)))
     {
-	if (check_type_is_value(typ1) == FAIL
-		|| check_type_is_value(typ2) == FAIL)
-	    return FAIL;
-	if (*op == '+')
-	    emsg(_(e_wrong_argument_type_for_plus));
-	else
-	    semsg(_(e_char_requires_number_or_float_arguments), *op);
-	return FAIL;
+	ਜੇ (check_type_is_ਮੁੱਲ(typ1) == FAIL
+		|| check_type_is_ਮੁੱਲ(typ2) == FAIL)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (*op == '+')
+	    emsg(_(e_wrong_ਦਲੀਲ_type_for_plus));
+	ਨਹੀਂਤਾਂ
+	    semsg(_(e_char_requires_ਸੰਖਿਆ_or_float_arguments), *op);
+	ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Append the tuple item types from "tuple_type" to the grow array "gap".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
 {
-    for (int i = 0; i < tuple_type->tt_argcount; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < tuple_type->tt_argcount; i++)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    return FAIL;
+	ਜੇ (ga_grow(gap, 1) == FAIL)
+	    ਵਾਪਸ FAIL;
 
-	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_args[i];
+	((type_T **)gap->ga_ਅੰਕੜੇ)[gap->ga_len] = tuple_type->tt_ਦਲੀਲਾਂ[i];
 	gap->ga_len++;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -301,85 +301,85 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
  *
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
-set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
+    ਸਥਿਰ ਪੂਰਨ
+ਸੈੱਟ_tuple_union_type_on_ਢੇਰ(type_T *type1, type_T *type2, cctx_T *cctx)
 {
     // The concatenated tuple has the union of types from both the tuples
     garray_T	tuple_types_ga;
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ਆਕਾਰ(type_T *), 10);
 
-    if (type1->tt_argcount > 0)
+    ਜੇ (type1->tt_argcount > 0)
 	ga_append_tuple_types(type1, &tuple_types_ga);
-    if (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
+    ਜੇ (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
 	ga_append_tuple_types(type2, &tuple_types_ga);
 
     type_T *new_tuple_type = get_tuple_type(&tuple_types_ga,
 							cctx->ctx_type_list);
     // result inherits the variadic flag from the operands
-    if ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
+    ਜੇ ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
 	new_tuple_type->tt_flags |= (type1->tt_flags & TTFLAG_VARARGS)
 					| (type2->tt_flags & TTFLAG_VARARGS);
 
     // set the type on the stack for the resulting tuple
-    set_type_on_stack(cctx, new_tuple_type, 0);
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, new_tuple_type, 0);
 
     ga_clear(&tuple_types_ga);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate instruction for "+".  For a list this creates a new list.
  */
-    int
-generate_add_instr(
+    ਪੂਰਨ
+generate_ਜੋੜੋ_instr(
 	cctx_T	    *cctx,
 	vartype_T   vartype,
 	type_T	    *type1,
 	type_T	    *type2,
-	exprtype_T  expr_type)
+	exprtype_T  ਵਿਅੰਜਕ_type)
 {
     isn_T	*isn = generate_instr_drop(cctx,
-		      vartype == VAR_NUMBER ? ISN_OPNR
+		      vartype == VAR_ਸੰਖਿਆ ? ISN_OPNR
 		    : vartype == VAR_LIST ? ISN_ADDLIST
 		    : vartype == VAR_TUPLE ? ISN_ADDTUPLE
 		    : vartype == VAR_BLOB ? ISN_ADDBLOB
 		    : vartype == VAR_FLOAT ? ISN_OPFLOAT
 		    : ISN_OPANY, 1);
 
-    if (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
+    ਜੇ (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
 	    && type1->tt_type != VAR_ANY
 	    && type1->tt_type != VAR_UNKNOWN
 	    && type2->tt_type != VAR_ANY
 	    && type2->tt_type != VAR_UNKNOWN
-	    && check_number_or_float(type1, type2, (char_u *)"+") == FAIL)
-	return FAIL;
+	    && check_ਸੰਖਿਆ_or_float(type1, type2, (char_u *)"+") == FAIL)
+	ਵਾਪਸ FAIL;
 
-    if (isn != NULL)
+    ਜੇ (isn != ਨਿਰਾ)
     {
-	if (isn->isn_type == ISN_ADDLIST)
-	    isn->isn_arg.op.op_type = expr_type;
-	else
-	    isn->isn_arg.op.op_type = EXPR_ADD;
+	ਜੇ (isn->isn_type == ISN_ADDLIST)
+	    isn->isn_arg.op.op_type = ਵਿਅੰਜਕ_type;
+	ਨਹੀਂਤਾਂ
+	    isn->isn_arg.op.op_type = ਵਿਅੰਜਕ_ਜੋੜੋ;
     }
 
     // When concatenating two lists with different member types the member type
     // becomes "any".
-    if (vartype == VAR_LIST
+    ਜੇ (vartype == VAR_LIST
 	    && type1->tt_type == VAR_LIST && type2->tt_type == VAR_LIST
 	    && type1->tt_member != type2->tt_member)
-	set_type_on_stack(cctx, &t_list_any, 0);
-    else if (vartype == VAR_TUPLE)
+	ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_list_any, 0);
+    ਨਹੀਂਤਾਂ ਜੇ (vartype == VAR_TUPLE)
     {
-	if (!check_tuples_addable(type1, type2))
-	    return FAIL;
+	ਜੇ (!check_tuples_addable(type1, type2))
+	    ਵਾਪਸ FAIL;
 
-	if (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
-	    return FAIL;
+	ਜੇ (ਸੈੱਟ_tuple_union_type_on_ਢੇਰ(type1, type2, cctx) == FAIL)
+	    ਵਾਪਸ FAIL;
     }
 
-    return isn == NULL ? FAIL : OK;
+    ਵਾਪਸ isn == ਨਿਰਾ ? FAIL : OK;
 }
 
 /*
@@ -390,21 +390,21 @@ generate_add_instr(
     vartype_T
 operator_type(type_T *type1, type_T *type2)
 {
-    if (type1->tt_type == type2->tt_type
-	    && (type1->tt_type == VAR_NUMBER
+    ਜੇ (type1->tt_type == type2->tt_type
+	    && (type1->tt_type == VAR_ਸੰਖਿਆ
 		|| type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_TUPLE
 		|| type1->tt_type == VAR_FLOAT
 		|| type1->tt_type == VAR_BLOB))
-	return type1->tt_type;
-    return VAR_ANY;
+	ਵਾਪਸ type1->tt_type;
+    ਵਾਪਸ VAR_ANY;
 }
 
 /*
  * Generate an instruction with two arguments.  The instruction depends on the
  * type of the arguments.
  */
-    int
+    ਪੂਰਨ
 generate_two_op(cctx_T *cctx, char_u *op)
 {
     type_T	*type1;
@@ -415,76 +415,76 @@ generate_two_op(cctx_T *cctx, char_u *op)
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.
-    type1 = get_type_on_stack(cctx, 1);
-    type2 = get_type_on_stack(cctx, 0);
+    type1 = get_type_on_ਢੇਰ(cctx, 1);
+    type2 = get_type_on_ਢੇਰ(cctx, 0);
     vartype = operator_type(type1, type2);
 
-    switch (*op)
+    ਚੋਣ (*op)
     {
-	case '+':
-		  if (generate_add_instr(cctx, vartype, type1, type2,
-							    EXPR_COPY) == FAIL)
-		      return FAIL;
-		  break;
+	ਹਾਲਤ '+':
+		  ਜੇ (generate_ਜੋੜੋ_instr(cctx, vartype, type1, type2,
+							    ਵਿਅੰਜਕ_COPY) == FAIL)
+		      ਵਾਪਸ FAIL;
+		  ਰੋਕੋ;
 
-	case '-':
-	case '*':
-	case '/': if (check_number_or_float(type1, type2, op) == FAIL)
-		      return FAIL;
-		  if (vartype == VAR_NUMBER)
+	ਹਾਲਤ '-':
+	ਹਾਲਤ '*':
+	ਹਾਲਤ '/': ਜੇ (check_ਸੰਖਿਆ_or_float(type1, type2, op) == FAIL)
+		      ਵਾਪਸ FAIL;
+		  ਜੇ (vartype == VAR_ਸੰਖਿਆ)
 		      isn = generate_instr_drop(cctx, ISN_OPNR, 1);
-		  else if (vartype == VAR_FLOAT)
+		  ਨਹੀਂਤਾਂ ਜੇ (vartype == VAR_FLOAT)
 		      isn = generate_instr_drop(cctx, ISN_OPFLOAT, 1);
-		  else
+		  ਨਹੀਂਤਾਂ
 		      isn = generate_instr_drop(cctx, ISN_OPANY, 1);
-		  if (isn != NULL)
+		  ਜੇ (isn != ਨਿਰਾ)
 		      isn->isn_arg.op.op_type = *op == '*'
-				 ? EXPR_MULT : *op == '/'? EXPR_DIV : EXPR_SUB;
-		  break;
+				 ? ਵਿਅੰਜਕ_MULT : *op == '/'? ਵਿਅੰਜਕ_DIV : ਵਿਅੰਜਕ_SUB;
+		  ਰੋਕੋ;
 
-	case '%': if ((type1->tt_type != VAR_ANY
+	ਹਾਲਤ '%': ਜੇ ((type1->tt_type != VAR_ANY
 			      && type1->tt_type != VAR_UNKNOWN
-					       && type1->tt_type != VAR_NUMBER)
+					       && type1->tt_type != VAR_ਸੰਖਿਆ)
 			  || (type2->tt_type != VAR_ANY
 			      && type2->tt_type != VAR_UNKNOWN
-					      && type2->tt_type != VAR_NUMBER))
+					      && type2->tt_type != VAR_ਸੰਖਿਆ))
 		  {
-		      emsg(_(e_percent_requires_number_arguments));
-		      return FAIL;
+		      emsg(_(e_percent_requires_ਸੰਖਿਆ_arguments));
+		      ਵਾਪਸ FAIL;
 		  }
 		  isn = generate_instr_drop(cctx,
-			      vartype == VAR_NUMBER ? ISN_OPNR : ISN_OPANY, 1);
-		  if (isn != NULL)
-		      isn->isn_arg.op.op_type = EXPR_REM;
-		  break;
+			      vartype == VAR_ਸੰਖਿਆ ? ISN_OPNR : ISN_OPANY, 1);
+		  ਜੇ (isn != ਨਿਰਾ)
+		      isn->isn_arg.op.op_type = ਵਿਅੰਜਕ_REM;
+		  ਰੋਕੋ;
     }
 
     // correct type of result
-    if (vartype == VAR_ANY)
+    ਜੇ (vartype == VAR_ANY)
     {
 	type_T *type = &t_any;
 
 	// float+number and number+float results in float
-	if ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
-	      && (type2->tt_type == VAR_NUMBER || type2->tt_type == VAR_FLOAT))
+	ਜੇ ((type1->tt_type == VAR_ਸੰਖਿਆ || type1->tt_type == VAR_FLOAT)
+	      && (type2->tt_type == VAR_ਸੰਖਿਆ || type2->tt_type == VAR_FLOAT))
 	    type = &t_float;
-	set_type_on_stack(cctx, type, 0);
+	ਸੈੱਟ_type_on_ਢੇਰ(cctx, type, 0);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Choose correct error message for the specified type information.
  */
-    static isntype_T
-compare_isn_not_values(typval_T *tv, type_T *type)
+    ਸਥਿਰ isntype_T
+compare_isn_not_ਮੁੱਲਾਂ(typval_T *tv, type_T *type)
 {
-    if (tv != NULL)
-	(void)check_typval_is_value(tv);
-    else
-	(void)check_type_is_value(type);
-    return ISN_DROP;
+    ਜੇ (tv != ਨਿਰਾ)
+	(ਖਾਲੀ)check_typval_is_ਮੁੱਲ(tv);
+    ਨਹੀਂਤਾਂ
+	(ਖਾਲੀ)check_type_is_ਮੁੱਲ(type);
+    ਵਾਪਸ ISN_DROP;
 }
 
 /*
@@ -492,7 +492,7 @@ compare_isn_not_values(typval_T *tv, type_T *type)
  * Either "tv1" and "tv2" are passed or "type1" and "type2".
  * Return ISN_DROP when failed.
  */
-    static isntype_T
+    ਸਥਿਰ isntype_T
 get_compare_isn(
 	exprtype_T  exprtype,
 	typval_T    *tv1,
@@ -501,133 +501,133 @@ get_compare_isn(
 	type_T	    *type2)
 {
     isntype_T	isntype = ISN_DROP;
-    vartype_T	vartype1 = tv1 != NULL ? tv1->v_type : type1->tt_type;
-    vartype_T	vartype2 = tv2 != NULL ? tv2->v_type : type2->tt_type;
+    vartype_T	vartype1 = tv1 != ਨਿਰਾ ? tv1->v_type : type1->tt_type;
+    vartype_T	vartype2 = tv2 != ਨਿਰਾ ? tv2->v_type : type2->tt_type;
 
-    if (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv1, type1);
-    if (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv2, type2);
+    ਜੇ (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
+	ਵਾਪਸ compare_isn_not_ਮੁੱਲਾਂ(tv1, type1);
+    ਜੇ (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
+	ਵਾਪਸ compare_isn_not_ਮੁੱਲਾਂ(tv2, type2);
 
-    if (vartype1 == vartype2)
+    ਜੇ (vartype1 == vartype2)
     {
-	switch (vartype1)
+	ਚੋਣ (vartype1)
 	{
-	    case VAR_BOOL: isntype = ISN_COMPAREBOOL; break;
-	    case VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; break;
-	    case VAR_NUMBER: isntype = ISN_COMPARENR; break;
-	    case VAR_FLOAT: isntype = ISN_COMPAREFLOAT; break;
-	    case VAR_STRING: isntype = ISN_COMPARESTRING; break;
-	    case VAR_BLOB: isntype = ISN_COMPAREBLOB; break;
-	    case VAR_LIST: isntype = ISN_COMPARELIST; break;
-	    case VAR_TUPLE: isntype = ISN_COMPARETUPLE; break;
-	    case VAR_DICT: isntype = ISN_COMPAREDICT; break;
-	    case VAR_FUNC: isntype = ISN_COMPAREFUNC; break;
-	    case VAR_OBJECT: isntype = ISN_COMPAREOBJECT; break;
-	    default: isntype = ISN_COMPAREANY; break;
+	    ਹਾਲਤ VAR_BOOL: isntype = ISN_COMPAREBOOL; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_ਸੰਖਿਆ: isntype = ISN_COMPARENR; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_FLOAT: isntype = ISN_COMPAREFLOAT; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_STRING: isntype = ISN_COMPARESTRING; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_BLOB: isntype = ISN_COMPAREBLOB; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_LIST: isntype = ISN_COMPARELIST; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_TUPLE: isntype = ISN_COMPARETUPLE; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_DICT: isntype = ISN_COMPAREDICT; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_FUNC: isntype = ISN_COMPAREFUNC; ਰੋਕੋ;
+	    ਹਾਲਤ VAR_OBJECT: isntype = ISN_COMPAREOBJECT; ਰੋਕੋ;
+	    ਮੂਲ: isntype = ISN_COMPAREANY; ਰੋਕੋ;
 	}
     }
-    else if (vartype1 == VAR_ANY || vartype2 == VAR_ANY
-	    || ((vartype1 == VAR_NUMBER || vartype1 == VAR_FLOAT)
-			  && (vartype2 == VAR_NUMBER || vartype2 == VAR_FLOAT))
+    ਨਹੀਂਤਾਂ ਜੇ (vartype1 == VAR_ANY || vartype2 == VAR_ANY
+	    || ((vartype1 == VAR_ਸੰਖਿਆ || vartype1 == VAR_FLOAT)
+			  && (vartype2 == VAR_ਸੰਖਿਆ || vartype2 == VAR_FLOAT))
 	    || (vartype1 == VAR_FUNC && vartype2 == VAR_PARTIAL)
 	    || (vartype1 == VAR_PARTIAL && vartype2 == VAR_FUNC))
 	isntype = ISN_COMPAREANY;
-    else if (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
+    ਨਹੀਂਤਾਂ ਜੇ (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
     {
-	if ((vartype1 == VAR_SPECIAL
-		&& (tv1 != NULL ? tv1->vval.v_number == VVAL_NONE
+	ਜੇ ((vartype1 == VAR_SPECIAL
+		&& (tv1 != ਨਿਰਾ ? tv1->vval.v_ਸੰਖਿਆ == VVAL_NONE
 							    : type1 == &t_none)
 		&& vartype2 != VAR_STRING)
 	    || (vartype2 == VAR_SPECIAL
-		&& (tv2 != NULL ? tv2->vval.v_number == VVAL_NONE
+		&& (tv2 != ਨਿਰਾ ? tv2->vval.v_ਸੰਖਿਆ == VVAL_NONE
 							    : type2 == &t_none)
 		&& vartype1 != VAR_STRING))
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 			       vartype_name(vartype1), vartype_name(vartype2));
-	    return ISN_DROP;
+	    ਵਾਪਸ ISN_DROP;
 	}
 	// although comparing null with number, float or bool is not useful, we
 	// allow it
 	isntype = ISN_COMPARENULL;
     }
 
-    if ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
+    ਜੇ ((exprtype == ਵਿਅੰਜਕ_IS || exprtype == ਵਿਅੰਜਕ_ISNOT)
 	    && (isntype == ISN_COMPAREBOOL
 	    || isntype == ISN_COMPARESPECIAL
 	    || isntype == ISN_COMPARENR
 	    || isntype == ISN_COMPAREFLOAT))
     {
 	semsg(_(e_cannot_use_str_with_str),
-		exprtype == EXPR_IS ? "is" : "isnot" , vartype_name(vartype1));
-	return ISN_DROP;
+		exprtype == ਵਿਅੰਜਕ_IS ? "is" : "isnot" , vartype_name(vartype1));
+	ਵਾਪਸ ISN_DROP;
     }
-    if (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
-		|| exprtype == EXPR_EQUAL || exprtype == EXPR_NEQUAL)
+    ਜੇ (!(exprtype == ਵਿਅੰਜਕ_IS || exprtype == ਵਿਅੰਜਕ_ISNOT
+		|| exprtype == ਵਿਅੰਜਕ_EQUAL || exprtype == ਵਿਅੰਜਕ_NEQUAL)
 	    && (isntype == ISN_COMPAREOBJECT))
     {
 	semsg(_(e_invalid_operation_for_str), vartype_name(vartype1));
-	return ISN_DROP;
+	ਵਾਪਸ ISN_DROP;
     }
-    if (isntype == ISN_DROP
+    ਜੇ (isntype == ISN_DROP
 	    || (isntype != ISN_COMPARENULL
-		&& (((exprtype != EXPR_EQUAL
-			&& exprtype != EXPR_NEQUAL
+		&& (((exprtype != ਵਿਅੰਜਕ_EQUAL
+			&& exprtype != ਵਿਅੰਜਕ_NEQUAL
 			&& (vartype1 == VAR_BOOL || vartype1 == VAR_SPECIAL
 			  || vartype2 == VAR_BOOL || vartype2 == VAR_SPECIAL)))
-		    || ((exprtype != EXPR_EQUAL
-			 && exprtype != EXPR_NEQUAL
-			 && exprtype != EXPR_IS
-			 && exprtype != EXPR_ISNOT
+		    || ((exprtype != ਵਿਅੰਜਕ_EQUAL
+			 && exprtype != ਵਿਅੰਜਕ_NEQUAL
+			 && exprtype != ਵਿਅੰਜਕ_IS
+			 && exprtype != ਵਿਅੰਜਕ_ISNOT
 			 && (vartype1 == VAR_BLOB || vartype2 == VAR_BLOB
 			  || vartype1 == VAR_LIST || vartype2 == VAR_LIST))))))
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		vartype_name(vartype1), vartype_name(vartype2));
-	return ISN_DROP;
+	ਵਾਪਸ ISN_DROP;
     }
-    return isntype;
+    ਵਾਪਸ isntype;
 }
 
-    int
+    ਪੂਰਨ
 check_compare_types(exprtype_T type, typval_T *tv1, typval_T *tv2)
 {
-    if (get_compare_isn(type, tv1, tv2, NULL, NULL) == ISN_DROP)
-	return FAIL;
-    return OK;
+    ਜੇ (get_compare_isn(type, tv1, tv2, ਨਿਰਾ, ਨਿਰਾ) == ISN_DROP)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_COMPARE* instruction with a boolean result.
  */
-    int
-generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
+    ਪੂਰਨ
+generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, ਪੂਰਨ ic)
 {
     isntype_T	isntype;
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
 
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.  If they are matching
     // use a type-specific instruction. Otherwise fall back to runtime type
     // checking.
-    isntype = get_compare_isn(exprtype, NULL, NULL,
-		       get_type_on_stack(cctx, 1), get_type_on_stack(cctx, 0));
-    if (isntype == ISN_DROP)
-	return FAIL;
+    isntype = get_compare_isn(exprtype, ਨਿਰਾ, ਨਿਰਾ,
+		       get_type_on_ਢੇਰ(cctx, 1), get_type_on_ਢੇਰ(cctx, 0));
+    ਜੇ (isntype == ISN_DROP)
+	ਵਾਪਸ FAIL;
 
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, isntype)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.op.op_type = exprtype;
     isn->isn_arg.op.op_ic = ic;
 
     // takes two arguments, puts one bool back
-    --stack->ga_len;
-    set_type_on_stack(cctx, &t_bool, 0);
+    --ਢੇਰ->ga_len;
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_bool, 0);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -636,108 +636,108 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
  * greater or equal to one.
  * The caller ensures all the "count" elements on the stack have the right type.
  */
-    int
-generate_CONCAT(cctx_T *cctx, int count)
+    ਪੂਰਨ
+generate_CONCAT(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_CONCAT)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਗਿਣਤੀ_2;
 
     // drop the argument types
-    stack->ga_len -= count - 1;
+    ਢੇਰ->ga_len -= ਗਿਣਤੀ_2 - 1;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_2BOOL instruction.
  * "offset" is the offset in the type stack.
  */
-    int
-generate_2BOOL(cctx_T *cctx, int invert, int offset)
+    ਪੂਰਨ
+generate_2BOOL(cctx_T *cctx, ਪੂਰਨ invert, ਪੂਰਨ ਵਿੱਥ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_2BOOL)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_2BOOL)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.tobool.invert = invert;
-    isn->isn_arg.tobool.offset = offset;
+    isn->isn_arg.tobool.ਵਿੱਥ = ਵਿੱਥ;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, -1 - offset);
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_bool, -1 - ਵਿੱਥ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_COND2BOOL instruction.
  */
-    int
+    ਪੂਰਨ
 generate_COND2BOOL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_COND2BOOL) == NULL)
-	return FAIL;
+    ਜੇ (generate_instr(cctx, ISN_COND2BOOL) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, 0);
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_bool, 0);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
+    ਪੂਰਨ
 generate_TYPECHECK(
 	cctx_T	    *cctx,
 	type_T	    *expected,
-	int	    typechk_flags,	// type check flags
-	int	    offset,
-	int	    is_var,
-	int	    argidx)
+	ਪੂਰਨ	    typechk_flags,	// type check flags
+	ਪੂਰਨ	    ਵਿੱਥ,
+	ਪੂਰਨ	    is_var,
+	ਪੂਰਨ	    argidx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     type_T *tt;
-    if ((expected->tt_type == VAR_FLOAT
-		&& (typechk_flags & TYPECHK_NUMBER_OK))
+    ਜੇ ((expected->tt_type == VAR_FLOAT
+		&& (typechk_flags & TYPECHK_ਸੰਖਿਆ_OK))
 	    || (expected->tt_type == VAR_LIST
 		&& (typechk_flags & TYPECHK_TUPLE_OK)))
     {
 	// always allocate, also for static types
 	tt = ALLOC_ONE(type_T);
-	if (tt != NULL)
+	ਜੇ (tt != ਨਿਰਾ)
 	{
 	    *tt = *expected;
 	    tt->tt_flags &= ~TTFLAG_STATIC;
-	    if (typechk_flags & TYPECHK_NUMBER_OK)
-		tt->tt_flags |= TTFLAG_NUMBER_OK;
-	    else
+	    ਜੇ (typechk_flags & TYPECHK_ਸੰਖਿਆ_OK)
+		tt->tt_flags |= TTFLAG_ਸੰਖਿਆ_OK;
+	    ਨਹੀਂਤਾਂ
 		tt->tt_flags |= TTFLAG_TUPLE_OK;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	tt = alloc_type(expected);
 
     isn->isn_arg.type.ct_type = tt;
-    isn->isn_arg.type.ct_off = (int8_T)offset;
+    isn->isn_arg.type.ct_off = (int8_T)ਵਿੱਥ;
     isn->isn_arg.type.ct_is_var = is_var;
     isn->isn_arg.type.ct_arg_idx = (int8_T)argidx;
 
     // type becomes expected
-    set_type_on_stack(cctx, expected, -1 - offset);
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx, expected, -1 - ਵਿੱਥ);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
+    ਪੂਰਨ
 generate_SETTYPE(
 	cctx_T	    *cctx,
 	type_T	    *expected)
@@ -745,195 +745,195 @@ generate_SETTYPE(
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SETTYPE)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_SETTYPE)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.type.ct_type = alloc_type(expected);
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHOBJ instruction.  Object is always NULL.
  */
-    int
+    ਪੂਰਨ
 generate_PUSHOBJ(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == NULL)
-	return FAIL;
-    return OK;
+    ਜੇ (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHCLASS instruction.  "class" can be NULL.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 generate_PUSHCLASS(cctx_T *cctx, class_T *class)
 {
     RETURN_OK_IF_SKIP(cctx);
     isn_T *isn = generate_instr_type(cctx, ISN_PUSHCLASS,
-				  class == NULL ? &t_any : &class->class_type);
-    if (isn == NULL)
-	return FAIL;
+				  class == ਨਿਰਾ ? &t_any : &class->class_type);
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.classarg = class;
-    if (class != NULL)
+    ਜੇ (class != ਨਿਰਾ)
 	++class->class_refcount;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate a PUSH instruction for "tv".
  * "tv" will be consumed or cleared.
  */
-    int
-generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
+    ਪੂਰਨ
+generate_tv_ਧੱਕੋ(cctx_T *cctx, typval_T *tv)
 {
-    switch (tv->v_type)
+    ਚੋਣ (tv->v_type)
     {
-	case VAR_BOOL:
-	    generate_PUSHBOOL(cctx, tv->vval.v_number);
-	    break;
-	case VAR_SPECIAL:
-	    generate_PUSHSPEC(cctx, tv->vval.v_number);
-	    break;
-	case VAR_NUMBER:
-	    generate_PUSHNR(cctx, tv->vval.v_number);
-	    break;
-	case VAR_FLOAT:
+	ਹਾਲਤ VAR_BOOL:
+	    generate_PUSHBOOL(cctx, tv->vval.v_ਸੰਖਿਆ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_SPECIAL:
+	    generate_PUSHSPEC(cctx, tv->vval.v_ਸੰਖਿਆ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_ਸੰਖਿਆ:
+	    generate_PUSHNR(cctx, tv->vval.v_ਸੰਖਿਆ);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_FLOAT:
 	    generate_PUSHF(cctx, tv->vval.v_float);
-	    break;
-	case VAR_BLOB:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_BLOB:
 	    generate_PUSHBLOB(cctx, tv->vval.v_blob);
-	    tv->vval.v_blob = NULL;
-	    break;
-	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    tv->vval.v_blob = ਨਿਰਾ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_LIST:
+	    ਜੇ (tv->vval.v_list != ਨਿਰਾ)
 		iemsg("non-empty list constant not supported");
 	    generate_NEWLIST(cctx, 0, TRUE);
-	    break;
-	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_TUPLE:
+	    ਜੇ (tv->vval.v_tuple != ਨਿਰਾ)
 		iemsg("non-empty tuple constant not supported");
 	    generate_NEWTUPLE(cctx, 0, TRUE);
-	    break;
-	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_DICT:
+	    ਜੇ (tv->vval.v_dict != ਨਿਰਾ)
 		iemsg("non-empty dict constant not supported");
 	    generate_NEWDICT(cctx, 0, TRUE);
-	    break;
-#ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB:
-	    if (tv->vval.v_job != NULL)
+	    ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+	ਹਾਲਤ VAR_ਕੰਮ:
+	    ਜੇ (tv->vval.v_ਕੰਮ != ਨਿਰਾ)
 		iemsg("non-null job constant not supported");
 	    generate_PUSHJOB(cctx);
-	    break;
-	case VAR_CHANNEL:
-	    if (tv->vval.v_channel != NULL)
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_CHANNEL:
+	    ਜੇ (tv->vval.v_channel != ਨਿਰਾ)
 		iemsg("non-null channel constant not supported");
 	    generate_PUSHCHANNEL(cctx);
-	    break;
-#endif
-	case VAR_FUNC:
-	    if (tv->vval.v_string != NULL)
+	    ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+	ਹਾਲਤ VAR_FUNC:
+	    ਜੇ (tv->vval.v_string != ਨਿਰਾ)
 		iemsg("non-null function constant not supported");
-	    generate_PUSHFUNC(cctx, NULL, &t_func_unknown, TRUE);
-	    break;
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial != NULL)
+	    generate_PUSHFUNC(cctx, ਨਿਰਾ, &t_func_unknown, TRUE);
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_PARTIAL:
+	    ਜੇ (tv->vval.v_partial != ਨਿਰਾ)
 		iemsg("non-null partial constant not supported");
-	    if (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
-								   == NULL)
-		return FAIL;
-	    break;
-	case VAR_STRING:
+	    ਜੇ (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
+								   == ਨਿਰਾ)
+		ਵਾਪਸ FAIL;
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_STRING:
 	    generate_PUSHS(cctx, &tv->vval.v_string);
-	    tv->vval.v_string = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (tv->vval.v_object != NULL)
+	    tv->vval.v_string = ਨਿਰਾ;
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_OBJECT:
+	    ਜੇ (tv->vval.v_object != ਨਿਰਾ)
 	    {
 		emsg(_(e_cannot_use_non_null_object));
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	    generate_PUSHOBJ(cctx);
-	    break;
-	case VAR_CLASS:
+	    ਰੋਕੋ;
+	ਹਾਲਤ VAR_CLASS:
 	    generate_PUSHCLASS(cctx, tv->vval.v_class);
-	    break;
-	default:
+	    ਰੋਕੋ;
+	ਮੂਲ:
 	    siemsg("constant type %d not supported", tv->v_type);
 	    clear_tv(tv);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
     }
     tv->v_type = VAR_UNKNOWN;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHNR instruction.
  */
-    int
-generate_PUSHNR(cctx_T *cctx, varnumber_T number)
+    ਪੂਰਨ
+generate_PUSHNR(cctx_T *cctx, varnumber_T ਸੰਖਿਆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_ਸੰਖਿਆ)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਸੰਖਿਆ;
 
-    if (number == 0 || number == 1)
+    ਜੇ (ਸੰਖਿਆ == 0 || ਸੰਖਿਆ == 1)
 	// A 0 or 1 number can also be used as a bool.
-	set_type_on_stack(cctx, &t_number_bool, 0);
-    return OK;
+	ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_ਸੰਖਿਆ_bool, 0);
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHBOOL instruction.
  */
-    int
-generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
+    ਪੂਰਨ
+generate_PUSHBOOL(cctx_T *cctx, varnumber_T ਸੰਖਿਆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਸੰਖਿਆ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHSPEC instruction.
  */
-    int
-generate_PUSHSPEC(cctx_T *cctx, varnumber_T number)
+    ਪੂਰਨ
+generate_PUSHSPEC(cctx_T *cctx, varnumber_T ਸੰਖਿਆ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
-			     number == VVAL_NULL ? &t_null : &t_none)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
+			     ਸੰਖਿਆ == VVAL_NULL ? &t_null : &t_none)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਸੰਖਿਆ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUSHF instruction.
  */
-    int
+    ਪੂਰਨ
 generate_PUSHF(cctx_T *cctx, float_T fnumber)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.fnumber = fnumber;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -942,77 +942,77 @@ generate_PUSHF(cctx_T *cctx, float_T fnumber)
  * Note that if "str" is used in the instruction OK is returned and "*str" is
  * not set to NULL.
  */
-    int
+    ਪੂਰਨ
 generate_PUSHS(cctx_T *cctx, char_u **str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ਪੂਰਨ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ਜੇ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == NULL)
+	ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == ਨਿਰਾ)
 	    ret = FAIL;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    isn->isn_arg.string = str == NULL ? NULL : *str;
-	    return OK;
+	    isn->isn_arg.string = str == ਨਿਰਾ ? ਨਿਰਾ : *str;
+	    ਵਾਪਸ OK;
 	}
     }
-    if (str != NULL)
+    ਜੇ (str != ਨਿਰਾ)
 	VIM_CLEAR(*str);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Generate an ISN_PUSHCHANNEL instruction.  Channel is always NULL.
  */
-    int
+    ਪੂਰਨ
 generate_PUSHCHANNEL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-#ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == NULL)
-	return FAIL;
-    return OK;
-#else
-    emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+    ਜੇ (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
+#ਨਹੀਂਤਾਂ
+    emsg(_(e_channel_ਕੰਮ_feature_not_ਉਪਲਬਧ));
+    ਵਾਪਸ FAIL;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Generate an ISN_PUSHJOB instruction.  Job is always NULL.
  */
-    int
+    ਪੂਰਨ
 generate_PUSHJOB(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-#ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == NULL)
-	return FAIL;
-    return OK;
-#else
-    emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+    ਜੇ (generate_instr_type(cctx, ISN_PUSHJOB, &t_ਕੰਮ) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
+#ਨਹੀਂਤਾਂ
+    emsg(_(e_channel_ਕੰਮ_feature_not_ਉਪਲਬਧ));
+    ਵਾਪਸ FAIL;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Generate an ISN_PUSHBLOB instruction.
  * Consumes "blob".
  */
-    int
+    ਪੂਰਨ
 generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
-					&t_blob, &t_blob)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
+					&t_blob, &t_blob)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.blob = blob;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1020,25 +1020,25 @@ generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
  * When "may_prefix" is TRUE prefix "g:" unless "name" is script-local or
  * autoload.
  */
-    int
-generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
+    ਪੂਰਨ
+generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, ਪੂਰਨ may_ਅਗੇਤਰ)
 {
     isn_T	*isn;
     char_u	*funcname;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == NULL)
-	return FAIL;
-    if (name == NULL)
-	funcname = NULL;
-    else if (!may_prefix
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (name == ਨਿਰਾ)
+	funcname = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (!may_ਅਗੇਤਰ
 	    || *name == K_SPECIAL			    // script-local
-	    || vim_strchr(name, AUTOLOAD_CHAR) != NULL)	    // autoload
+	    || vim_strchr(name, AUTOLOAD_CHAR) != ਨਿਰਾ)	    // autoload
 	funcname = vim_strsave(name);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	funcname = alloc(STRLEN(name) + 3);
-	if (funcname != NULL)
+	ਜੇ (funcname != ਨਿਰਾ)
 	{
 	    STRCPY(funcname, "g:");
 	    STRCPY(funcname + 2, name);
@@ -1046,24 +1046,24 @@ generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
     }
 
     isn->isn_arg.string = funcname;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_AUTOLOAD instruction.
  */
-    int
+    ਪੂਰਨ
 generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.string = vim_strsave(name);
-    if (isn->isn_arg.string == NULL)
-	return FAIL;
-    return OK;
+    ਜੇ (isn->isn_arg.string == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1072,57 +1072,57 @@ generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
  * value below the list with values.
  * Caller must check the type is a list.
  */
-    int
-generate_GETITEM(cctx_T *cctx, int index, int with_op)
+    ਪੂਰਨ
+generate_GETITEM(cctx_T *cctx, ਪੂਰਨ ਸੂਚਕਾਂਕ, ਪੂਰਨ with_op)
 {
     isn_T	*isn;
-    type_T	*type = get_type_on_stack(cctx, with_op ? 1 : 0);
-    type_T	*item_type = &t_any;
+    type_T	*type = get_type_on_ਢੇਰ(cctx, with_op ? 1 : 0);
+    type_T	*ਵਸਤੂ_type = &t_any;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    item_type = get_item_type(type);
-    if ((isn = generate_instr(cctx, ISN_GETITEM)) == NULL)
-	return FAIL;
-    isn->isn_arg.getitem.gi_index = index;
+    ਵਸਤੂ_type = get_ਵਸਤੂ_type(type);
+    ਜੇ ((isn = generate_instr(cctx, ISN_GETITEM)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.getitem.gi_ਸੂਚਕਾਂਕ = ਸੂਚਕਾਂਕ;
     isn->isn_arg.getitem.gi_with_op = with_op;
 
     // add the item type to the type stack
-    return push_type_stack(cctx, item_type);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, ਵਸਤੂ_type);
 }
 
 /*
  * Set the type of the tuple that is left after dropping the first "count"
  * items of the tuple with type "type".
  */
-    static void
-set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_tuple_ਟੁਕੜਾ_type_on_ਢੇਰ(type_T *type, ਪੂਰਨ ਗਿਣਤੀ_2, cctx_T *cctx)
 {
     garray_T	tuple_types_ga;
 
     // The item types are only known for a tuple with a fixed number of items.
-    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
+    ਜੇ ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= ਗਿਣਤੀ_2)
     {
-	set_type_on_stack(cctx, &t_tuple_any, 0);
-	return;
+	ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_tuple_any, 0);
+	ਵਾਪਸ;
     }
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ਆਕਾਰ(type_T *), 10);
 
-    for (int i = count; i < type->tt_argcount; i++)
+    ਲਈ (ਪੂਰਨ i = ਗਿਣਤੀ_2; i < type->tt_argcount; i++)
     {
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ਜੇ (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
-	    set_type_on_stack(cctx, &t_tuple_any, 0);
-	    return;
+	    ਸੈੱਟ_type_on_ਢੇਰ(cctx, &t_tuple_any, 0);
+	    ਵਾਪਸ;
 	}
-	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] =
-							     type->tt_args[i];
+	((type_T **)tuple_types_ga.ga_ਅੰਕੜੇ)[tuple_types_ga.ga_len] =
+							     type->tt_ਦਲੀਲਾਂ[i];
 	tuple_types_ga.ga_len++;
     }
 
-    set_type_on_stack(cctx,
+    ਸੈੱਟ_type_on_ਢੇਰ(cctx,
 		get_tuple_type(&tuple_types_ga, cctx->ctx_type_list), 0);
 
     ga_clear(&tuple_types_ga);
@@ -1131,341 +1131,341 @@ set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
 /*
  * Generate an ISN_SLICE instruction with "count".
  */
-    int
-generate_SLICE(cctx_T *cctx, int count)
+    ਪੂਰਨ
+generate_ਟੁਕੜਾ(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_ਟੁਕੜਾ)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਗਿਣਤੀ_2;
 
     // Slicing a tuple leaves a tuple with the remaining item types, not the
     // type of the whole tuple.
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type == VAR_TUPLE)
-	set_tuple_slice_type_on_stack(type, count, cctx);
+    type = get_type_on_ਢੇਰ(cctx, 0);
+    ਜੇ (type->tt_type == VAR_TUPLE)
+	ਸੈੱਟ_tuple_ਟੁਕੜਾ_type_on_ਢੇਰ(type, ਗਿਣਤੀ_2, cctx);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_CHECKLEN instruction with "min_len".
  */
-    int
-generate_CHECKLEN(cctx_T *cctx, int min_len, int more_OK)
+    ਪੂਰਨ
+generate_CHECKLEN(cctx_T *cctx, ਪੂਰਨ min_len, ਪੂਰਨ ਹੋਰ_OK)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CHECKLEN)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_CHECKLEN)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.checklen.cl_min_len = min_len;
-    isn->isn_arg.checklen.cl_more_OK = more_OK;
+    isn->isn_arg.checklen.cl_ਹੋਰ_OK = ਹੋਰ_OK;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_STORE instruction.
  */
-    int
-generate_STORE(cctx_T *cctx, isntype_T isn_type, int idx, char_u *name)
+    ਪੂਰਨ
+generate_STORE(cctx_T *cctx, isntype_T isn_type, ਪੂਰਨ idx, char_u *name)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    ਜੇ ((isn = generate_instr_drop(cctx, isn_type, 1)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (name != ਨਿਰਾ)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    ਨਹੀਂਤਾਂ
+	isn->isn_arg.ਸੰਖਿਆ = idx;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOAD_CLASSMEMBER ("load" == TRUE) or ISN_STORE_CLASSMEMBER
  * ("load" == FALSE) instruction.
  */
-    int
+    ਪੂਰਨ
 generate_CLASSMEMBER(
 	cctx_T	    *cctx,
-	int	    load,
+	ਪੂਰਨ	    ਲੱਦੋ,
 	class_T	    *cl,
-	int	    idx)
+	ਪੂਰਨ	    idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (load)
+    ਜੇ (ਲੱਦੋ)
     {
 	ocmember_T *m = &cl->class_class_members[idx];
-	isn = generate_instr_type(cctx, ISN_LOAD_CLASSMEMBER, m->ocm_type);
+	isn = generate_instr_type(cctx, ISN_ਲੱਦੋ_CLASSMEMBER, m->ocm_type);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	isn = generate_instr_drop(cctx, ISN_STORE_CLASSMEMBER, 1);
     }
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.classmember.cm_class = cl;
     ++cl->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_STOREOUTER instruction.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 generate_STOREOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    level,
-	int	    loop_depth,
-	int	    loop_idx)
+	ਪੂਰਨ	    idx,
+	ਪੂਰਨ	    level,
+	ਪੂਰਨ	    loop_ਡੂੰਘਾਈ,
+	ਪੂਰਨ	    loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == NULL)
-	return FAIL;
-    if (level == 1 && loop_idx >= 0 && idx >= loop_idx)
+    ਜੇ ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (level == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Store a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
-	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
+	isn->isn_arg.outer.outer_ਡੂੰਘਾਈ = -loop_ਡੂੰਘਾਈ - 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	isn->isn_arg.outer.outer_idx = idx;
-	isn->isn_arg.outer.outer_depth = level;
+	isn->isn_arg.outer.outer_ਡੂੰਘਾਈ = level;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_STORENR instruction (short for ISN_PUSHNR + ISN_STORE)
  */
-    int
-generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
+    ਪੂਰਨ
+generate_STORENR(cctx_T *cctx, ਪੂਰਨ idx, varnumber_T ਮੁੱਲ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_STORENR)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.storenr.stnr_idx = idx;
-    isn->isn_arg.storenr.stnr_val = value;
+    isn->isn_arg.storenr.stnr_val = ਮੁੱਲ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_STOREOPT or ISN_STOREFUNCOPT instruction
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 generate_STOREOPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    opt_flags)
+	ਪੂਰਨ	    opt_flags)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_drop(cctx, isn_type, 1)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.storeopt.so_name = vim_strsave(name);
     isn->isn_arg.storeopt.so_flags = opt_flags;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOAD or similar instruction.
  */
-    int
-generate_LOAD(
+    ਪੂਰਨ
+generate_ਲੱਦੋ(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    idx,
+	ਪੂਰਨ	    idx,
 	char_u	    *name,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, isn_type, type, type)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    ਜੇ ((isn = generate_instr_type2(cctx, isn_type, type, type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (name != ਨਿਰਾ)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    ਨਹੀਂਤਾਂ
+	isn->isn_arg.ਸੰਖਿਆ = idx;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOADOUTER instruction
  */
-    int
+    ਪੂਰਨ
 generate_LOADOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    nesting,
-	int	    loop_depth,
-	int	    loop_idx,
+	ਪੂਰਨ	    idx,
+	ਪੂਰਨ	    nesting,
+	ਪੂਰਨ	    loop_ਡੂੰਘਾਈ,
+	ਪੂਰਨ	    loop_idx,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == NULL)
-	return FAIL;
-    if (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
+    ਜੇ ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Load a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
-	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
+	isn->isn_arg.outer.outer_ਡੂੰਘਾਈ = -loop_ਡੂੰਘਾਈ - 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	isn->isn_arg.outer.outer_idx = idx;
-	isn->isn_arg.outer.outer_depth = nesting;
+	isn->isn_arg.outer.outer_ਡੂੰਘਾਈ = nesting;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOADV instruction for v:var.
  */
-    int
+    ਪੂਰਨ
 generate_LOADV(
 	cctx_T	    *cctx,
 	char_u	    *name)
 {
-    int	    di_flags;
-    int	    vidx = find_vim_var(name, &di_flags);
+    ਪੂਰਨ	    di_flags;
+    ਪੂਰਨ	    vidx = ਲੱਭੋ_vim_var(name, &di_flags);
     type_T  *type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (vidx < 0)
+    ਜੇ (vidx < 0)
     {
-	semsg(_(e_variable_not_found_str), name);
-	return FAIL;
+	semsg(_(e_variable_not_ਮਿਲਿਆ_str), name);
+	ਵਾਪਸ FAIL;
     }
     type = get_vim_var_type(vidx, cctx->ctx_type_list);
-    return generate_LOAD(cctx, ISN_LOADV, vidx, NULL, type);
+    ਵਾਪਸ generate_ਲੱਦੋ(cctx, ISN_LOADV, vidx, ਨਿਰਾ, type);
 }
 
 /*
  * Generate an ISN_UNLET instruction.
  */
-    int
-generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, int forceit)
+    ਪੂਰਨ
+generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, ਪੂਰਨ forceit)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, isn_type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.unlet.ul_name = vim_strsave(name);
     isn->isn_arg.unlet.ul_forceit = forceit;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOCKCONST instruction.
  */
-    int
+    ਪੂਰਨ
 generate_LOCKCONST(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_LOCKCONST) == NULL)
-	return FAIL;
-    return OK;
+    ਜੇ (generate_instr(cctx, ISN_LOCKCONST) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOADS instruction.
  */
-    int
+    ਪੂਰਨ
 generate_OLDSCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    sid,
+	ਪੂਰਨ	    sid,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
+    ਜੇ (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
 	isn = generate_instr_type(cctx, isn_type, type);
-    else
+    ਨਹੀਂਤਾਂ
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.loadstore.ls_name = vim_strsave(name);
     isn->isn_arg.loadstore.ls_sid = sid;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LOADSCRIPT or ISN_STORESCRIPT instruction.
  */
-    int
+    ਪੂਰਨ
 generate_VIM9SCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    sid,
-	int	    idx,
+	ਪੂਰਨ	    sid,
+	ਪੂਰਨ	    idx,
 	type_T	    *type)
 {
     isn_T	*isn;
     scriptref_T	*sref;
-    scriptitem_T *si = SCRIPT_ITEM(sid);
+    scriptitem_T *si = SCRIPT_ਵਸਤੂ(sid);
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADSCRIPT)
+    ਜੇ (isn_type == ISN_LOADSCRIPT)
 	isn = generate_instr_type2(cctx, isn_type, type, type);
-    else
+    ਨਹੀਂਤਾਂ
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // This requires three arguments, which doesn't fit in an instruction, thus
     // we need to allocate a struct for this.
     sref = ALLOC_ONE(scriptref_T);
-    if (sref == NULL)
-	return FAIL;
+    ਜੇ (sref == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.script.scriptref = sref;
     sref->sref_sid = sid;
     sref->sref_idx = idx;
     sref->sref_seq = si->sn_script_seq;
     sref->sref_type = type;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_NEWLIST instruction for "count" items.
  * "use_null" is TRUE for null_list.
  */
-    int
-generate_NEWLIST(cctx_T *cctx, int count, int use_null)
+    ਪੂਰਨ
+generate_NEWLIST(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2, ਪੂਰਨ use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1473,49 +1473,49 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_NEWLIST)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = use_null ? -1 : ਗਿਣਤੀ_2;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
-    if ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
-	return FAIL;
+    ਜੇ ((member_type = get_member_type_from_ਢੇਰ(ਗਿਣਤੀ_2, 1, cctx)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     type = get_list_type(member_type, cctx->ctx_type_list);
     decl_type = get_list_type(&t_any, cctx->ctx_type_list);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_ਢੇਰ.ga_len -= ਗਿਣਤੀ_2;
 
     // add the list type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ਵਾਪਸ ਧੱਕੋ_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWTUPLE instruction for "count" items.
  * "use_null" is TRUE for null_tuple.
  */
-    int
-generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
+    ਪੂਰਨ
+generate_NEWTUPLE(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2, ਪੂਰਨ use_null)
 {
     isn_T	*isn;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = use_null ? -1 : ਗਿਣਤੀ_2;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
     garray_T	tuple_types_ga;
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, ਆਕਾਰ(type_T *), 10);
 
-    if (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
+    ਜੇ (get_tuple_type_from_ਢੇਰ(ਗਿਣਤੀ_2, &tuple_types_ga, cctx) < 0)
     {
 	ga_clear(&tuple_types_ga);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     type = get_tuple_type(&tuple_types_ga, cctx->ctx_type_list);
@@ -1524,18 +1524,18 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     ga_clear(&tuple_types_ga);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_ਢੇਰ.ga_len -= ਗਿਣਤੀ_2;
 
     // add the tuple type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ਵਾਪਸ ਧੱਕੋ_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWDICT instruction.
  * "use_null" is TRUE for null_dict.
  */
-    int
-generate_NEWDICT(cctx_T *cctx, int count, int use_null)
+    ਪੂਰਨ
+generate_NEWDICT(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2, ਪੂਰਨ use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1543,20 +1543,20 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_NEWDICT)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = use_null ? -1 : ਗਿਣਤੀ_2;
 
-    if ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
-	return FAIL;
+    ਜੇ ((member_type = get_member_type_from_ਢੇਰ(ਗਿਣਤੀ_2, 2, cctx)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     type = get_dict_type(member_type, cctx->ctx_type_list);
     decl_type = get_dict_type(&t_any, cctx->ctx_type_list);
 
     // drop the key and value types
-    cctx->ctx_type_stack.ga_len -= 2 * count;
+    cctx->ctx_type_ਢੇਰ.ga_len -= 2 * ਗਿਣਤੀ_2;
 
     // add the dict type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    ਵਾਪਸ ਧੱਕੋ_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1567,67 +1567,67 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
  * be set later.  The index is used instead of a pointer to the instruction
  * because the instruction memory can be reallocated.
  */
-    int
+    ਪੂਰਨ
 generate_FUNCREF(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    object_method,
-	int	    fi,
-	int	    *isn_idx)
+	ਪੂਰਨ	    object_ਵਿਧੀ,
+	ਪੂਰਨ	    fi,
+	ਪੂਰਨ	    *isn_idx)
 {
     isn_T	    *isn;
     type_T	    *type;
     funcref_extra_T *extra;
     loopvarinfo_T   loopinfo;
-    int		    has_vars;
+    ਪੂਰਨ		    has_vars;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FUNCREF)) == NULL)
-	return FAIL;
-    if (isn_idx != NULL)
+    ਜੇ ((isn = generate_instr(cctx, ISN_FUNCREF)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (isn_idx != ਨਿਰਾ)
 	// save the index of the new instruction
 	*isn_idx = cctx->ctx_instr.ga_len - 1;
 
     has_vars = get_loop_var_info(cctx, &loopinfo);
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != NULL)
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ == UF_NOT_COMPILED || has_vars || cl != ਨਿਰਾ)
     {
 	extra = ALLOC_CLEAR_ONE(funcref_extra_T);
-	if (extra == NULL)
-	    return FAIL;
+	ਜੇ (extra == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 	isn->isn_arg.funcref.fr_extra = extra;
 	extra->fre_loopvar_info = loopinfo;
-	if (cl != NULL)
+	ਜੇ (cl != ਨਿਰਾ)
 	{
 	    extra->fre_class = cl;
 	    ++cl->class_refcount;
-	    extra->fre_object_method = object_method;
-	    extra->fre_method_idx = fi;
+	    extra->fre_object_ਵਿਧੀ = object_ਵਿਧੀ;
+	    extra->fre_ਵਿਧੀ_idx = fi;
 	}
     }
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || cl != NULL)
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ == UF_NOT_COMPILED || cl != ਨਿਰਾ)
 	extra->fre_func_name = vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
-    if (ufunc->uf_def_status != UF_NOT_COMPILED && cl == NULL)
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ != UF_NOT_COMPILED && cl == ਨਿਰਾ)
     {
-	if (isn_idx == NULL && ufunc->uf_def_status == UF_TO_BE_COMPILED)
+	ਜੇ (isn_idx == ਨਿਰਾ && ufunc->uf_def_ਸਥਿਤੀ == UF_ਮੰਜ਼ਿਲ_BE_COMPILED)
 	    // compile the function now, we need the uf_dfunc_idx value
-	    (void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
+	    (ਖਾਲੀ)compile_def_function(ufunc, FALSE, CT_NONE, ਨਿਰਾ);
 	isn->isn_arg.funcref.fr_dfunc_idx = ufunc->uf_dfunc_idx;
     }
 
     // Reserve an extra variable to keep track of the number of closures
     // created.
-    cctx->ctx_has_closure = 1;
+    cctx->ctx_has_ਘੇਰਾ = 1;
 
     // If the referenced function is a closure, it may use items further up in
     // the nested context, including this one.  But not a function defined at
     // the script level.
-    if ((ufunc->uf_flags & FC_CLOSURE)
+    ਜੇ ((ufunc->uf_flags & FC_ਘੇਰਾ)
 			       && func_name_refcount(cctx->ctx_ufunc->uf_name))
-	cctx->ctx_ufunc->uf_flags |= FC_CLOSURE;
+	cctx->ctx_ufunc->uf_flags |= FC_ਘੇਰਾ;
 
-    type = ufunc->uf_func_type == NULL ? &t_func_any : ufunc->uf_func_type;
-    return push_type_stack(cctx, type);
+    type = ufunc->uf_func_type == ਨਿਰਾ ? &t_func_any : ufunc->uf_func_type;
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, type);
 }
 
 /*
@@ -1635,167 +1635,167 @@ generate_FUNCREF(
  * "lambda_name" and "func_name" must be in allocated memory and will be
  * consumed.
  */
-    int
+    ਪੂਰਨ
 generate_NEWFUNC(
 	cctx_T	*cctx,
 	char_u	*lambda_name,
 	char_u	*func_name)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ਪੂਰਨ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ਜੇ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, ISN_NEWFUNC)) == NULL)
+	ਜੇ ((isn = generate_instr(cctx, ISN_NEWFUNC)) == ਨਿਰਾ)
 	    ret = FAIL;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    newfuncarg_T *arg = ALLOC_CLEAR_ONE(newfuncarg_T);
 
-	    if (arg == NULL)
+	    ਜੇ (arg == ਨਿਰਾ)
 		ret = FAIL;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Reserve an extra variable to keep track of the number of
 		// closures created.
-		cctx->ctx_has_closure = 1;
+		cctx->ctx_has_ਘੇਰਾ = 1;
 
 		isn->isn_arg.newfunc.nf_arg = arg;
 		arg->nfa_lambda = lambda_name;
 		arg->nfa_global = func_name;
-		(void)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
-		return OK;
+		(ਖਾਲੀ)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
+		ਵਾਪਸ OK;
 	    }
 	}
     }
     vim_free(lambda_name);
     vim_free(func_name);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Generate an ISN_DEF instruction: list functions
  */
-    int
+    ਪੂਰਨ
 generate_DEF(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_DEF)) == NULL)
-	return FAIL;
-    if (len > 0)
+    ਜੇ ((isn = generate_instr(cctx, ISN_DEF)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (len > 0)
     {
 	isn->isn_arg.string = vim_strnsave(name, len);
-	if (isn->isn_arg.string == NULL)
-	    return FAIL;
+	ਜੇ (isn->isn_arg.string == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_JUMP instruction.
  */
-    int
-generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
+    ਪੂਰਨ
+generate_JUMP(cctx_T *cctx, jumpwhen_T when, ਪੂਰਨ where)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_JUMP)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.jump.jump_when = when;
     isn->isn_arg.jump.jump_where = where;
 
-    if (when != JUMP_ALWAYS && stack->ga_len > 0)
-	--stack->ga_len;
+    ਜੇ (when != JUMP_ALWAYS && ਢੇਰ->ga_len > 0)
+	--ਢੇਰ->ga_len;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_WHILE instruction.  Similar to ISN_JUMP for :while
  */
-    int
-generate_WHILE(cctx_T *cctx, int funcref_idx)
+    ਪੂਰਨ
+generate_WHILE(cctx_T *cctx, ਪੂਰਨ funcref_idx)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_WHILE)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.whileloop.while_funcref_idx = funcref_idx;
-    isn->isn_arg.whileloop.while_end = 0;  // filled in later
+    isn->isn_arg.whileloop.while_ਸਿਰਾ = 0;  // filled in later
 
-    if (stack->ga_len > 0)
-	--stack->ga_len;
+    ਜੇ (ਢੇਰ->ga_len > 0)
+	--ਢੇਰ->ga_len;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_JUMP_IF_ARG_SET or ISN_JUMP_IF_ARG_NOT_SET instruction.
  */
-    int
-generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, int arg_off)
+    ਪੂਰਨ
+generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, ਪੂਰਨ arg_off)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, isn_type)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.jumparg.jump_arg_off = arg_off;
     // jump_where is set later
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
-generate_FOR(cctx_T *cctx, int loop_idx)
+    ਪੂਰਨ
+generate_FOR(cctx_T *cctx, ਪੂਰਨ loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FOR)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_FOR)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.forloop.for_loop_idx = loop_idx;
 
     // type doesn't matter, will be stored next
-    return push_type_stack(cctx, &t_any);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, &t_any);
 }
 
-    int
+    ਪੂਰਨ
 generate_ENDLOOP(cctx_T *cctx, loop_info_T *loop_info)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_ENDLOOP)) == NULL)
-	return FAIL;
-    isn->isn_arg.endloop.end_depth = loop_info->li_depth;
-    isn->isn_arg.endloop.end_funcref_idx = loop_info->li_funcref_idx;
-    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_count;
-    isn->isn_arg.endloop.end_var_count =
-			   cctx->ctx_locals.ga_len - loop_info->li_local_count;
-    return OK;
+    ਜੇ ((isn = generate_instr(cctx, ISN_ENDLOOP)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.endloop.ਸਿਰਾ_ਡੂੰਘਾਈ = loop_info->li_ਡੂੰਘਾਈ;
+    isn->isn_arg.endloop.ਸਿਰਾ_funcref_idx = loop_info->li_funcref_idx;
+    isn->isn_arg.endloop.ਸਿਰਾ_var_idx = loop_info->li_local_ਗਿਣਤੀ;
+    isn->isn_arg.endloop.ਸਿਰਾ_var_ਗਿਣਤੀ =
+			   cctx->ctx_locals.ga_len - loop_info->li_local_ਗਿਣਤੀ;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_TRYCONT instruction.
  */
-    int
-generate_TRYCONT(cctx_T *cctx, int levels, int where)
+    ਪੂਰਨ
+generate_TRYCONT(cctx_T *cctx, ਪੂਰਨ ਪੱਧਰ, ਪੂਰਨ where)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_TRYCONT)) == NULL)
-	return FAIL;
-    isn->isn_arg.trycont.tct_levels = levels;
+    ਜੇ ((isn = generate_instr(cctx, ISN_TRYCONT)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.trycont.tct_ਪੱਧਰ = ਪੱਧਰ;
     isn->isn_arg.trycont.tct_where = where;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1803,65 +1803,65 @@ generate_TRYCONT(cctx_T *cctx, int levels, int where)
  * Give an error and return FAIL if something is wrong.
  * When "method_call" is NULL no code is generated.
  */
-    int
-check_internal_func_args(
+    ਪੂਰਨ
+check_ਅੰਦਰੂਨੀ_func_ਦਲੀਲਾਂ(
 	cctx_T	*cctx,
-	int	func_idx,
-	int	argcount,
-	int	method_call,
+	ਪੂਰਨ	func_idx,
+	ਪੂਰਨ	argcount,
+	ਪੂਰਨ	ਵਿਧੀ_call,
 	type2_T **argtypes,
 	type2_T *shuffled_argtypes)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
-    int		argoff = check_internal_func(func_idx, argcount);
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
+    ਪੂਰਨ		argoff = check_ਅੰਦਰੂਨੀ_func(func_idx, argcount);
 
-    if (argoff < 0)
-	return FAIL;
+    ਜੇ (argoff < 0)
+	ਵਾਪਸ FAIL;
 
-    if (method_call && argoff > 1)
+    ਜੇ (ਵਿਧੀ_call && argoff > 1)
     {
-	if (argcount < argoff)
+	ਜੇ (argcount < argoff)
 	{
 	    semsg(_(e_not_enough_arguments_for_function_str),
-						 internal_func_name(func_idx));
-	    return FAIL;
+						 ਅੰਦਰੂਨੀ_func_name(func_idx));
+	    ਵਾਪਸ FAIL;
 	}
 
 	isn_T	*isn = generate_instr(cctx, ISN_SHUFFLE);
-	if (isn  == NULL)
-	    return FAIL;
-	isn->isn_arg.shuffle.shfl_item = argcount;
-	isn->isn_arg.shuffle.shfl_up = argoff - 1;
+	ਜੇ (isn  == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
+	isn->isn_arg.shuffle.shfl_ਵਸਤੂ = argcount;
+	isn->isn_arg.shuffle.shfl_ਉੱਪਰ = argoff - 1;
     }
 
-    if (argcount > 0)
+    ਜੇ (argcount > 0)
     {
-	type2_T	*typep = ((type2_T *)stack->ga_data) + stack->ga_len - argcount;
+	type2_T	*typep = ((type2_T *)ਢੇਰ->ga_ਅੰਕੜੇ) + ਢੇਰ->ga_len - argcount;
 
 	// Check the types of the arguments.
-	if (method_call && argoff > 1)
+	ਜੇ (ਵਿਧੀ_call && argoff > 1)
 	{
-	    int i;
+	    ਪੂਰਨ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ਲਈ (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = (i < argoff - 1)
 				    ? typep[i + 1]
 				    : (i == argoff - 1) ? typep[0] : typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int i;
+	    ਪੂਰਨ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ਲਈ (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	if (internal_func_check_arg_types(*argtypes, func_idx, argcount,
+	ਜੇ (ਅੰਦਰੂਨੀ_func_check_arg_types(*argtypes, func_idx, argcount,
 								 cctx) == FAIL)
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1869,96 +1869,96 @@ check_internal_func_args(
  * "method_call" is TRUE for "value->method()"
  * Return FAIL if the number of arguments is wrong.
  */
-    int
-generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
+    ਪੂਰਨ
+generate_BCALL(cctx_T *cctx, ਪੂਰਨ func_idx, ਪੂਰਨ argcount, ਪੂਰਨ ਵਿਧੀ_call)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
-    type2_T	*argtypes = NULL;
-    type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
-    type2_T	*maptype = NULL;
+    garray_T	*ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
+    type2_T	*argtypes = ਨਿਰਾ;
+    type2_T	shuffled_argtypes[MAX_FUNC_ਦਲੀਲਾਂ];
+    type2_T	*maptype = ਨਿਰਾ;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (check_internal_func_args(cctx, func_idx, argcount, method_call,
+    ਜੇ (check_ਅੰਦਰੂਨੀ_func_ਦਲੀਲਾਂ(cctx, func_idx, argcount, ਵਿਧੀ_call,
 					 &argtypes, shuffled_argtypes) == FAIL)
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
-    if (internal_func_is_map(func_idx))
+    ਜੇ (ਅੰਦਰੂਨੀ_func_is_map(func_idx))
 	maptype = argtypes;
 
-    if ((isn = generate_instr(cctx, ISN_BCALL)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_BCALL)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.bfunc.cbf_idx = func_idx;
     isn->isn_arg.bfunc.cbf_argcount = argcount;
 
     // Drop the argument types and push the return type.
-    stack->ga_len -= argcount;
-    type = internal_func_ret_type(func_idx, argcount, argtypes, &decl_type,
+    ਢੇਰ->ga_len -= argcount;
+    type = ਅੰਦਰੂਨੀ_func_ret_type(func_idx, argcount, argtypes, &decl_type,
 							  cctx->ctx_type_list);
-    if (push_type_stack2(cctx, type, decl_type) == FAIL)
-	return FAIL;
+    ਜੇ (ਧੱਕੋ_type_stack2(cctx, type, decl_type) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    if (maptype != NULL && maptype[0].type_decl->tt_member != NULL
+    ਜੇ (maptype != ਨਿਰਾ && maptype[0].type_decl->tt_member != ਨਿਰਾ
 				  && maptype[0].type_decl->tt_member != &t_any)
 	// Check that map() didn't change the item types.
 	generate_TYPECHECK(cctx, maptype[0].type_decl, 0, -1, FALSE, 1);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_LISTAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    ਪੂਰਨ
 generate_LISTAPPEND(cctx_T *cctx)
 {
     type_T	*list_type;
-    type_T	*item_type;
+    type_T	*ਵਸਤੂ_type;
     type_T	*expected;
 
     // Caller already checked that list_type is a list.
     // For checking the item type we use the declared type of the list and the
     // current type of the added item, adding a string to [1, 2] is OK.
-    list_type = get_decl_type_on_stack(cctx, 1);
-    if (arg_type_modifiable(list_type, 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
+    list_type = get_decl_type_on_ਢੇਰ(cctx, 1);
+    ਜੇ (arg_type_modifiable(list_type, 1) == FAIL)
+	ਵਾਪਸ FAIL;
+    ਵਸਤੂ_type = get_type_on_ਢੇਰ(cctx, 0);
     expected = list_type->tt_member;
-    if (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    ਜੇ (need_type(ਵਸਤੂ_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    if (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
-	return FAIL;
+    ਜੇ (generate_instr(cctx, ISN_LISTAPPEND) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_ਢੇਰ.ga_len;	    // drop the argument
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_BLOBAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    ਪੂਰਨ
 generate_BLOBAPPEND(cctx_T *cctx)
 {
-    type_T	*item_type;
+    type_T	*ਵਸਤੂ_type;
 
     // Caller already checked that blob_type is a blob, check it is modifiable.
-    if (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
-    if (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    ਜੇ (arg_type_modifiable(get_decl_type_on_ਢੇਰ(cctx, 1), 1) == FAIL)
+	ਵਾਪਸ FAIL;
+    ਵਸਤੂ_type = get_type_on_ਢੇਰ(cctx, 0);
+    ਜੇ (need_type(ਵਸਤੂ_type, &t_ਸੰਖਿਆ, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    if (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
-	return FAIL;
+    ਜੇ (generate_instr(cctx, ISN_BLOBAPPEND) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_ਢੇਰ.ga_len;	    // drop the argument
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1968,29 +1968,29 @@ generate_BLOBAPPEND(cctx_T *cctx)
  *   ISN_UCALL      - uncompiled function, or
  *                    compiled script-local function called from a lambda
  */
-    static isntype_T
+    ਸਥਿਰ isntype_T
 isn_get_calltype(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl)
 {
-    if (cl != NULL)
-	return ISN_METHODCALL;
+    ਜੇ (cl != ਨਿਰਾ)
+	ਵਾਪਸ ISN_METHODCALL;
 
-    if (ufunc->uf_def_status == UF_NOT_COMPILED)
-	return ISN_UCALL;
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ == UF_NOT_COMPILED)
+	ਵਾਪਸ ISN_UCALL;
 
     // function invoked from a lambda
-    if (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
+    ਜੇ (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
     {
 	// Script-local funcs in a lambda may be redefined by re-sourcing;
 	// resolve by name at runtime.  Patched to ISN_DCALL on next call once
 	// recompiled.
-	if (ufunc->uf_name[0] == K_SPECIAL)
-	    return ISN_UCALL;
+	ਜੇ (ufunc->uf_name[0] == K_SPECIAL)
+	    ਵਾਪਸ ISN_UCALL;
     }
 
-    return ISN_DCALL;
+    ਵਾਪਸ ISN_DCALL;
 }
 
 /*
@@ -2001,92 +2001,92 @@ isn_get_calltype(
  * directly to determine ufunc.
  * Return FAIL if the number of arguments is wrong.
  */
-    int
+    ਪੂਰਨ
 generate_CALL(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    mi,
-	int	    pushed_argcount,
-	int	    is_super)
+	ਪੂਰਨ	    mi,
+	ਪੂਰਨ	    pushed_argcount,
+	ਪੂਰਨ	    is_super)
 {
     isn_T	*isn;
-    int		regular_args = ufunc->uf_args.ga_len;
-    int		argcount = pushed_argcount;
+    ਪੂਰਨ		regular_ਦਲੀਲਾਂ = ufunc->uf_ਦਲੀਲਾਂ.ga_len;
+    ਪੂਰਨ		argcount = pushed_argcount;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (argcount > regular_args && !has_varargs(ufunc))
+    ਜੇ (argcount > regular_ਦਲੀਲਾਂ && !has_varargs(ufunc))
     {
 	semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    if (argcount < regular_args - ufunc->uf_def_args.ga_len)
+    ਜੇ (argcount < regular_ਦਲੀਲਾਂ - ufunc->uf_def_ਦਲੀਲਾਂ.ga_len)
     {
 	semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (ufunc->uf_def_status != UF_NOT_COMPILED
-	    && ufunc->uf_def_status != UF_COMPILE_ERROR)
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ != UF_NOT_COMPILED
+	    && ufunc->uf_def_ਸਥਿਤੀ != UF_COMPILE_ERROR)
     {
-	int		i;
+	ਪੂਰਨ		i;
 	compiletype_T	compile_type;
 
-	for (i = 0; i < argcount; ++i)
+	ਲਈ (i = 0; i < argcount; ++i)
 	{
 	    type_T *expected;
 	    type_T *actual;
 
-	    actual = get_type_on_stack(cctx, argcount - i - 1);
-	    if (check_type_is_value(actual) == FAIL)
-		return FAIL;
-	    if (actual->tt_type == VAR_SPECIAL
-			      && i >= regular_args - ufunc->uf_def_args.ga_len)
+	    actual = get_type_on_ਢੇਰ(cctx, argcount - i - 1);
+	    ਜੇ (check_type_is_ਮੁੱਲ(actual) == FAIL)
+		ਵਾਪਸ FAIL;
+	    ਜੇ (actual->tt_type == VAR_SPECIAL
+			      && i >= regular_ਦਲੀਲਾਂ - ufunc->uf_def_ਦਲੀਲਾਂ.ga_len)
 	    {
 		// assume v:none used for default argument value
-		continue;
+		ਜਾਰੀ;
 	    }
-	    if (i < regular_args)
+	    ਜੇ (i < regular_ਦਲੀਲਾਂ)
 	    {
-		if (ufunc->uf_arg_types == NULL)
-		    continue;
+		ਜੇ (ufunc->uf_arg_types == ਨਿਰਾ)
+		    ਜਾਰੀ;
 		expected = ufunc->uf_arg_types[i];
 	    }
-	    else if (ufunc->uf_va_type == NULL
+	    ਨਹੀਂਤਾਂ ਜੇ (ufunc->uf_va_type == ਨਿਰਾ
 					   || ufunc->uf_va_type == &t_list_any)
 		// possibly a lambda or "...: any"
 		expected = &t_any;
-	    else
+	    ਨਹੀਂਤਾਂ
 		expected = ufunc->uf_va_type->tt_member;
-	    if (need_type(actual, expected, 0,
+	    ਜੇ (need_type(actual, expected, 0,
 			      -argcount + i, i + 1, cctx, TRUE, FALSE) == FAIL)
 	    {
 		arg_type_mismatch(expected, actual, i + 1);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
 	}
 	compile_type = get_compile_type(ufunc);
-	if (func_needs_compiling(ufunc, compile_type)
-		&& compile_def_function(ufunc, ufunc->uf_ret_type == NULL,
-						   compile_type, NULL) == FAIL)
-	    return FAIL;
+	ਜੇ (func_needs_compiling(ufunc, compile_type)
+		&& compile_def_function(ufunc, ufunc->uf_ret_type == ਨਿਰਾ,
+						   compile_type, ਨਿਰਾ) == FAIL)
+	    ਵਾਪਸ FAIL;
     }
-    if (ufunc->uf_def_status == UF_COMPILE_ERROR)
+    ਜੇ (ufunc->uf_def_ਸਥਿਤੀ == UF_COMPILE_ERROR)
     {
-	emsg_funcname(e_call_to_function_that_failed_to_compile_str,
+	emsg_funcname(e_call_ਮੰਜ਼ਿਲ_function_that_failed_ਮੰਜ਼ਿਲ_compile_str,
 							       ufunc->uf_name);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == NULL)
-	return FAIL;
-    if (cl != NULL /* isn->isn_type == ISN_METHODCALL */)
+    ਜੇ ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    ਜੇ (cl != ਨਿਰਾ /* isn->isn_type == ISN_METHODCALL */)
     {
 	isn->isn_arg.mfunc = ALLOC_ONE(cmfunc_T);
-	if (isn->isn_arg.mfunc == NULL)
-	    return FAIL;
+	ਜੇ (isn->isn_arg.mfunc == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 	isn->isn_arg.mfunc->cmf_itf = cl;
 	++cl->class_refcount;
 	isn->isn_arg.mfunc->cmf_idx = mi;
@@ -2095,19 +2095,19 @@ generate_CALL(
 	// For a generic method "ufunc" has the type arguments, the method of
 	// the object class is created with the same type arguments when
 	// called.
-	isn->isn_arg.mfunc->cmf_ufunc = NULL;
-	if (ufunc != cl->class_obj_methods[mi])
+	isn->isn_arg.mfunc->cmf_ufunc = ਨਿਰਾ;
+	ਜੇ (ufunc != cl->class_obj_methods[mi])
 	    isn->isn_arg.mfunc->cmf_ufunc = ufunc;
-	isn->isn_arg.mfunc->cmf_cache_cl = NULL;
-	isn->isn_arg.mfunc->cmf_cache_generic = NULL;
-	isn->isn_arg.mfunc->cmf_cache_ufunc = NULL;
+	isn->isn_arg.mfunc->cmf_cache_cl = ਨਿਰਾ;
+	isn->isn_arg.mfunc->cmf_cache_generic = ਨਿਰਾ;
+	isn->isn_arg.mfunc->cmf_cache_ufunc = ਨਿਰਾ;
     }
-    else if (isn->isn_type == ISN_DCALL)
+    ਨਹੀਂਤਾਂ ਜੇ (isn->isn_type == ISN_DCALL)
     {
 	isn->isn_arg.dfunc.cdf_idx = ufunc->uf_dfunc_idx;
 	isn->isn_arg.dfunc.cdf_argcount = argcount;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// A user function may be deleted and redefined later, can't use the
 	// ufunc pointer, need to look it up again at runtime.
@@ -2116,296 +2116,296 @@ generate_CALL(
     }
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_ਢੇਰ.ga_len -= argcount;
 
     // For an object or class method call, drop the object/class type.
-    if (ufunc->uf_class != NULL)
+    ਜੇ (ufunc->uf_class != ਨਿਰਾ)
     {
 	// When a class method is called without the class name prefix, then
 	// the type will not be in the stack.
-	type_T *stype = get_type_on_stack(cctx, 0);
-	if (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
-	    cctx->ctx_type_stack.ga_len--;
+	type_T *stype = get_type_on_ਢੇਰ(cctx, 0);
+	ਜੇ (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
+	    cctx->ctx_type_ਢੇਰ.ga_len--;
     }
 
     // add return type
-    return push_type_stack(cctx, ufunc->uf_ret_type);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, ufunc->uf_ret_type);
 }
 
 /*
  * Generate an ISN_UCALL instruction when the function isn't defined yet.
  */
-    int
-generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
+    ਪੂਰਨ
+generate_UCALL(cctx_T *cctx, char_u *name, ਪੂਰਨ argcount)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UCALL)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_UCALL)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.ufunc.cuf_name = vim_strsave(name);
     isn->isn_arg.ufunc.cuf_argcount = argcount;
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_ਢੇਰ.ga_len -= argcount;
 
     // add return value
-    return push_type_stack(cctx, &t_any);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, &t_any);
 }
 
 /*
  * Check the arguments of function "type" against the types on the stack.
  * Returns OK or FAIL;
  */
-    int
-check_func_args_from_type(
+    ਪੂਰਨ
+check_func_ਦਲੀਲਾਂ_from_type(
 	cctx_T	*cctx,
 	type_T	*type,
-	int	argcount,
-	int	at_top,
+	ਪੂਰਨ	argcount,
+	ਪੂਰਨ	at_ਸਿਖਰ,
 	char_u	*name)
 {
-    if (type->tt_argcount != -1)
+    ਜੇ (type->tt_argcount != -1)
     {
-	int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+	ਪੂਰਨ	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
 
-	if (argcount < type->tt_min_argcount - varargs)
+	ਜੇ (argcount < type->tt_min_argcount - varargs)
 	{
 	    emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (!varargs && argcount > type->tt_argcount)
+	ਜੇ (!varargs && argcount > type->tt_argcount)
 	{
 	    emsg_funcname(e_too_many_arguments_for_function_str, name);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	if (type->tt_args != NULL)
+	ਜੇ (type->tt_ਦਲੀਲਾਂ != ਨਿਰਾ)
 	{
-	    int i;
+	    ਪੂਰਨ i;
 
-	    for (i = 0; i < argcount; ++i)
+	    ਲਈ (i = 0; i < argcount; ++i)
 	    {
-		int	offset = -argcount + i - (at_top ? 0 : 1);
-		type_T	*actual = get_type_on_stack(cctx, -1 - offset);
+		ਪੂਰਨ	ਵਿੱਥ = -argcount + i - (at_ਸਿਖਰ ? 0 : 1);
+		type_T	*actual = get_type_on_ਢੇਰ(cctx, -1 - ਵਿੱਥ);
 		type_T	*expected;
 
-		if (check_type_is_value(actual) == FAIL)
-		    return FAIL;
-		if (varargs && i >= type->tt_argcount - 1)
+		ਜੇ (check_type_is_ਮੁੱਲ(actual) == FAIL)
+		    ਵਾਪਸ FAIL;
+		ਜੇ (varargs && i >= type->tt_argcount - 1)
 		{
-		    expected = type->tt_args[type->tt_argcount - 1];
-		    if (expected != NULL && expected->tt_type == VAR_LIST)
+		    expected = type->tt_ਦਲੀਲਾਂ[type->tt_argcount - 1];
+		    ਜੇ (expected != ਨਿਰਾ && expected->tt_type == VAR_LIST)
 			expected = expected->tt_member;
-		    if (expected == NULL)
+		    ਜੇ (expected == ਨਿਰਾ)
 			expected = &t_any;
 		}
-		else if (i >= type->tt_min_argcount
+		ਨਹੀਂਤਾਂ ਜੇ (i >= type->tt_min_argcount
 					     && actual->tt_type == VAR_SPECIAL)
 		    expected = &t_any;
-		else
-		    expected = type->tt_args[i];
-		if (need_type(actual, expected, 0,
-				     offset, i + 1, cctx, TRUE, FALSE) == FAIL)
+		ਨਹੀਂਤਾਂ
+		    expected = type->tt_ਦਲੀਲਾਂ[i];
+		ਜੇ (need_type(actual, expected, 0,
+				     ਵਿੱਥ, i + 1, cctx, TRUE, FALSE) == FAIL)
 		{
 		    arg_type_mismatch(expected, actual, i + 1);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 	    }
 	}
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PCALL instruction.
  * "type" is the type of the FuncRef.
  */
-    int
+    ਪੂਰਨ
 generate_PCALL(
 	cctx_T	*cctx,
-	int	argcount,
+	ਪੂਰਨ	argcount,
 	char_u	*name,
 	type_T	*type,
-	int	at_top)
+	ਪੂਰਨ	at_ਸਿਖਰ)
 {
     isn_T	*isn;
     type_T	*ret_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
+    ਜੇ (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
 						|| type == &t_object_any)
 	ret_type = &t_any;
-    else if (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
+    ਨਹੀਂਤਾਂ ਜੇ (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
     {
-	if (check_func_args_from_type(cctx, type, argcount, at_top, name)
+	ਜੇ (check_func_ਦਲੀਲਾਂ_from_type(cctx, type, argcount, at_ਸਿਖਰ, name)
 								       == FAIL)
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 
 	ret_type = type->tt_member;
-	if (ret_type == &t_unknown)
+	ਜੇ (ret_type == &t_unknown)
 	    // return type not known yet, use a runtime check
 	    ret_type = &t_any;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	semsg(_(e_not_callable_type_str), name);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
-	return FAIL;
-    isn->isn_arg.pfunc.cpf_top = at_top;
+    ਜੇ ((isn = generate_instr(cctx, ISN_PCALL)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.pfunc.cpf_ਸਿਖਰ = at_ਸਿਖਰ;
     isn->isn_arg.pfunc.cpf_argcount = argcount;
 
     // drop the arguments and the funcref/partial
-    cctx->ctx_type_stack.ga_len -= argcount + 1;
+    cctx->ctx_type_ਢੇਰ.ga_len -= argcount + 1;
 
     // push the return value
-    push_type_stack(cctx, ret_type);
+    ਧੱਕੋ_type_ਢੇਰ(cctx, ret_type);
 
     // If partial is above the arguments it must be cleared and replaced with
     // the return value.
-    if (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
-	return FAIL;
+    ਜੇ (at_ਸਿਖਰ && generate_instr(cctx, ISN_PCALL_ਸਿਰਾ) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_DEFER instruction.
  */
-    int
-generate_DEFER(cctx_T *cctx, int var_idx, int argcount)
+    ਪੂਰਨ
+generate_DEFER(cctx_T *cctx, ਪੂਰਨ var_idx, ਪੂਰਨ argcount)
 {
     isn_T *isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.defer.defer_var_idx = var_idx;
     isn->isn_arg.defer.defer_argcount = argcount;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_STRINGMEMBER instruction.
  */
-    int
+    ਪੂਰਨ
 generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.string = vim_strnsave(name, len);
 
     // check for dict type
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type != VAR_DICT
+    type = get_type_on_ਢੇਰ(cctx, 0);
+    ਜੇ (type->tt_type != VAR_DICT
 	    && type->tt_type != VAR_OBJECT
 	    && type->tt_type != VAR_ANY
 	    && type->tt_type != VAR_UNKNOWN)
     {
-	char *tofree;
+	ਅੱਖਰ *tofree;
 
-	semsg(_(e_expected_dictionary_for_using_key_str_but_got_str),
+	semsg(_(e_expected_dictionary_for_using_ਕੁੰਜੀ_str_but_got_str),
 					       name, type_name(type, &tofree));
 	vim_free(tofree);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
     // change dict type to dict member type
-    if (type->tt_type == VAR_DICT)
+    ਜੇ (type->tt_type == VAR_DICT)
     {
 	type_T *ntype = type->tt_member->tt_type == VAR_UNKNOWN
 						    ? &t_any : type->tt_member;
-	set_type_on_stack(cctx, ntype, 0);
+	ਸੈੱਟ_type_on_ਢੇਰ(cctx, ntype, 0);
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_ECHO instruction.
  */
-    int
-generate_ECHO(cctx_T *cctx, int with_white, int count)
+    ਪੂਰਨ
+generate_ECHO(cctx_T *cctx, ਪੂਰਨ with_white, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr_drop(cctx, ISN_ECHO, ਗਿਣਤੀ_2)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.echo.echo_with_white = with_white;
-    isn->isn_arg.echo.echo_count = count;
+    isn->isn_arg.echo.echo_ਗਿਣਤੀ = ਗਿਣਤੀ_2;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_EXECUTE/ISN_ECHOMSG/ISN_ECHOERR instruction.
  */
-    int
-generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
+    ਪੂਰਨ
+generate_MULT_ਵਿਅੰਜਕ(cctx_T *cctx, isntype_T isn_type, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    ਜੇ ((isn = generate_instr_drop(cctx, isn_type, ਗਿਣਤੀ_2)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_ECHOWINDOW instruction
  */
-    int
-generate_ECHOWINDOW(cctx_T *cctx, int count, long time)
+    ਪੂਰਨ
+generate_ECHOWINDOW(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2, ਲੰਮਾ ਸਮਾਂ)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.echowin.ewin_count = count;
-    isn->isn_arg.echowin.ewin_time = time;
-    return OK;
+    ਜੇ ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, ਗਿਣਤੀ_2)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.echowin.ewin_ਗਿਣਤੀ = ਗਿਣਤੀ_2;
+    isn->isn_arg.echowin.ewin_ਸਮਾਂ = ਸਮਾਂ;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_SOURCE instruction.
  */
-    int
-generate_SOURCE(cctx_T *cctx, int sid)
+    ਪੂਰਨ
+generate_ਸਰੋਤ(cctx_T *cctx, ਪੂਰਨ sid)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = sid;
+    ਜੇ ((isn = generate_instr(cctx, ISN_ਸਰੋਤ)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = sid;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an ISN_PUT or ISN_IPUT instruction depending on fixindent.
  */
-    int
-generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
+    ਪੂਰਨ
+generate_PUT(cctx_T *cctx, ਪੂਰਨ regname, linenr_T lnum, ਪੂਰਨ fixindent)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     isn = (fixindent) ? generate_instr(cctx, ISN_IPUT) :
 			generate_instr(cctx, ISN_PUT);
-    if (isn == NULL)
-	return FAIL;
+    ਜੇ (isn == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.put.put_regname = regname;
     isn->isn_arg.put.put_lnum = lnum;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2416,147 +2416,147 @@ generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
  * - if the root item is a function argument
  * A copy is made of "line".
  */
-    int
-generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
+    ਪੂਰਨ
+generate_LOCKUNLOCK(cctx_T *cctx, char_u *ਸਤਰ, ਪੂਰਨ is_arg)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
-	return FAIL;
-    class_T *cl = cctx->ctx_ufunc != NULL ? cctx->ctx_ufunc->uf_class : NULL;
-    isn->isn_arg.lockunlock.lu_string = vim_strsave(line);
+    ਜੇ ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    class_T *cl = cctx->ctx_ufunc != ਨਿਰਾ ? cctx->ctx_ufunc->uf_class : ਨਿਰਾ;
+    isn->isn_arg.lockunlock.lu_string = vim_strsave(ਸਤਰ);
     isn->isn_arg.lockunlock.lu_cl_exec = cl;
-    if (cl != NULL)
+    ਜੇ (cl != ਨਿਰਾ)
 	++cl->class_refcount;
     isn->isn_arg.lockunlock.lu_is_arg = is_arg;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * A copy is made of "line".
  */
-    int
-generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *line)
+    ਪੂਰਨ
+generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *ਸਤਰ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
-    return OK;
+    ਜੇ ((isn = generate_instr(cctx, isntype)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.string = vim_strsave(ਸਤਰ);
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * "str" must be allocated, it is consumed.
  */
-    int
+    ਪੂਰਨ
 generate_EXEC(cctx_T *cctx, isntype_T isntype, char_u *str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    ਪੂਰਨ		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    ਜੇ (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, isntype)) == NULL)
+	ਜੇ ((isn = generate_instr(cctx, isntype)) == ਨਿਰਾ)
 	    ret = FAIL;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    isn->isn_arg.string = str;
-	    return OK;
+	    ਵਾਪਸ OK;
 	}
     }
     vim_free(str);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-    int
-generate_LEGACY_EVAL(cctx_T *cctx, char_u *line)
+    ਪੂਰਨ
+generate_LEGACY_EVAL(cctx_T *cctx, char_u *ਸਤਰ)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
+    ਜੇ ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.string = vim_strsave(ਸਤਰ);
 
-    return push_type_stack(cctx, &t_any);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, &t_any);
 }
 
-    int
-generate_EXECCONCAT(cctx_T *cctx, int count)
+    ਪੂਰਨ
+generate_EXECCONCAT(cctx_T *cctx, ਪੂਰਨ ਗਿਣਤੀ_2)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    ਜੇ ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, ਗਿਣਤੀ_2)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.ਸੰਖਿਆ = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate ISN_RANGE.  Consumes "range".  Return OK/FAIL.
  */
-    int
+    ਪੂਰਨ
 generate_RANGE(cctx_T *cctx, char_u *range)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_RANGE)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_RANGE)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.string = range;
 
-    return push_type_stack(cctx, &t_number);
+    ਵਾਪਸ ਧੱਕੋ_type_ਢੇਰ(cctx, &t_ਸੰਖਿਆ);
 }
 
-    int
-generate_UNPACK(cctx_T *cctx, int var_count, int semicolon)
+    ਪੂਰਨ
+generate_UNPACK(cctx_T *cctx, ਪੂਰਨ var_ਗਿਣਤੀ, ਪੂਰਨ semicolon)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
-	return FAIL;
-    isn->isn_arg.unpack.unp_count = var_count;
+    ਜੇ ((isn = generate_instr(cctx, ISN_UNPACK)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
+    isn->isn_arg.unpack.unp_ਗਿਣਤੀ = var_ਗਿਣਤੀ;
     isn->isn_arg.unpack.unp_semicolon = semicolon;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Generate an instruction for any command modifiers.
  */
-    int
+    ਪੂਰਨ
 generate_cmdmods(cctx_T *cctx, cmdmod_T *cmod)
 {
     isn_T	*isn;
 
-    if (has_cmdmod(cmod, FALSE))
+    ਜੇ (has_cmdmod(cmod, FALSE))
     {
 	cctx->ctx_has_cmdmod = TRUE;
 
-	if ((isn = generate_instr(cctx, ISN_CMDMOD)) == NULL)
-	    return FAIL;
+	ਜੇ ((isn = generate_instr(cctx, ISN_CMDMOD)) == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
 	isn->isn_arg.cmdmod.cf_cmdmod = ALLOC_ONE(cmdmod_T);
-	if (isn->isn_arg.cmdmod.cf_cmdmod == NULL)
-	    return FAIL;
-	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, sizeof(cmdmod_T));
+	ਜੇ (isn->isn_arg.cmdmod.cf_cmdmod == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
+	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, ਆਕਾਰ(cmdmod_T));
 	// filter program now belongs to the instruction
-	cmod->cmod_filter_regmatch.regprog = NULL;
+	cmod->cmod_filter_regmatch.regprog = ਨਿਰਾ;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
+    ਪੂਰਨ
 generate_undo_cmdmods(cctx_T *cctx)
 {
-    if (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == NULL)
-	return FAIL;
+    ਜੇ (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     cctx->ctx_has_cmdmod = FALSE;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2564,152 +2564,152 @@ generate_undo_cmdmods(cctx_T *cctx)
  * "lhs" might be NULL.
  * Return FAIL when out of memory.
  */
-    int
+    ਪੂਰਨ
 generate_store_var(
 	cctx_T		*cctx,
-	assign_dest_T	dest,
-	int		opt_flags,
-	int		vimvaridx,
+	ਸੌਂਪੋ_dest_T	dest,
+	ਪੂਰਨ		opt_flags,
+	ਪੂਰਨ		vimvaridx,
 	type_T		*type,
 	char_u		*name,
 	lhs_T		*lhs)
 {
-    switch (dest)
+    ਚੋਣ (dest)
     {
-	case dest_option:
-	    return generate_STOREOPT(cctx, ISN_STOREOPT,
+	ਹਾਲਤ dest_option:
+	    ਵਾਪਸ generate_STOREOPT(cctx, ISN_STOREOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_func_option:
-	    return generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
+	ਹਾਲਤ dest_func_option:
+	    ਵਾਪਸ generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_global:
+	ਹਾਲਤ dest_global:
 	    // include g: with the name, easier to execute that way
-	    return generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == NULL
+	    ਵਾਪਸ generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == ਨਿਰਾ
 					? ISN_STOREG : ISN_STOREAUTO, 0, name);
-	case dest_buffer:
+	ਹਾਲਤ dest_ਬਫਰ:
 	    // include b: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREB, 0, name);
-	case dest_window:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STOREB, 0, name);
+	ਹਾਲਤ dest_ਖਿੜਕੀ:
 	    // include w: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREW, 0, name);
-	case dest_tab:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STOREW, 0, name);
+	ਹਾਲਤ dest_tab:
 	    // include t: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STORET, 0, name);
-	case dest_env:
-	    return generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
-	case dest_reg:
-	    return generate_STORE(cctx, ISN_STOREREG,
-					 name[1] == '@' ? '"' : name[1], NULL);
-	case dest_vimvar:
-	    return generate_STORE(cctx, ISN_STOREV, vimvaridx, NULL);
-	case dest_script:
-	case dest_script_v9:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STORET, 0, name);
+	ਹਾਲਤ dest_env:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
+	ਹਾਲਤ dest_reg:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STOREREG,
+					 name[1] == '@' ? '"' : name[1], ਨਿਰਾ);
+	ਹਾਲਤ dest_vimvar:
+	    ਵਾਪਸ generate_STORE(cctx, ISN_STOREV, vimvaridx, ਨਿਰਾ);
+	ਹਾਲਤ dest_script:
+	ਹਾਲਤ dest_script_v9:
 	    {
-		int	    scriptvar_idx = lhs->lhs_scriptvar_idx;
-		int	    scriptvar_sid = lhs->lhs_scriptvar_sid;
-		if (scriptvar_idx < 0)
+		ਪੂਰਨ	    scriptvar_idx = lhs->lhs_scriptvar_idx;
+		ਪੂਰਨ	    scriptvar_sid = lhs->lhs_scriptvar_sid;
+		ਜੇ (scriptvar_idx < 0)
 		{
 		    isntype_T   isn_type = ISN_STORES;
 
 		    // If "sn_import_autoload", generate ISN_STOREEXPORT (not
 		    // ISN_STORES) if destination is in a vim9script or if
 		    // there is no "sn_autoload_prefix".
-		    if (SCRIPT_ID_VALID(scriptvar_sid)
-			     && SCRIPT_ITEM(scriptvar_sid)->sn_import_autoload
-			     && ((SCRIPT_ITEM(scriptvar_sid)
-						  ->sn_autoload_prefix == NULL)
+		    ਜੇ (SCRIPT_ID_VALID(scriptvar_sid)
+			     && SCRIPT_ਵਸਤੂ(scriptvar_sid)->sn_import_autoload
+			     && ((SCRIPT_ਵਸਤੂ(scriptvar_sid)
+						  ->sn_autoload_ਅਗੇਤਰ == ਨਿਰਾ)
 				|| lhs->lhs_dest == dest_script_v9))
 		    {
 			// "import autoload './dir/script.vim'" - load script
-			// first
-			if (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
-			    return FAIL;
+			//ਪਹਿਲਾ
+			ਜੇ (generate_ਸਰੋਤ(cctx, scriptvar_sid) == FAIL)
+			    ਵਾਪਸ FAIL;
 			isn_type = ISN_STOREEXPORT;
 		    }
 
 		    // "s:" may be included in the name.
-		    return generate_OLDSCRIPT(cctx, isn_type, name,
+		    ਵਾਪਸ generate_OLDSCRIPT(cctx, isn_type, name,
 							  scriptvar_sid, type);
 		}
-		return generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
+		ਵਾਪਸ generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
 					   scriptvar_sid, scriptvar_idx, type);
 	    }
-	case dest_class_member:
-	    return generate_CLASSMEMBER(cctx, FALSE,
+	ਹਾਲਤ dest_class_member:
+	    ਵਾਪਸ generate_CLASSMEMBER(cctx, FALSE,
 				     lhs->lhs_class, lhs->lhs_classmember_idx);
 
-	case dest_local:
-	case dest_expr:
+	ਹਾਲਤ dest_local:
+	ਹਾਲਤ dest_ਵਿਅੰਜਕ:
 	    // cannot happen
-	    break;
+	    ਰੋਕੋ;
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Return TRUE when inside a "for" or "while" loop.
  */
-    int
+    ਪੂਰਨ
 inside_loop_scope(cctx_T *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
-    for (;;)
+    ਲਈ (;;)
     {
-	if (scope == NULL)
-	    break;
-	if (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
-	    return TRUE;
+	ਜੇ (scope == ਨਿਰਾ)
+	    ਰੋਕੋ;
+	ਜੇ (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
+	    ਵਾਪਸ TRUE;
 	scope = scope->se_outer;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    int
-generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
+    ਪੂਰਨ
+generate_store_lhs(cctx_T *cctx, lhs_T *lhs, ਪੂਰਨ instr_ਗਿਣਤੀ, ਪੂਰਨ is_decl)
 {
-    if (lhs->lhs_dest != dest_local)
-	return generate_store_var(cctx, lhs->lhs_dest,
+    ਜੇ (lhs->lhs_dest != dest_local)
+	ਵਾਪਸ generate_store_var(cctx, lhs->lhs_dest,
 			    lhs->lhs_opt_flags, lhs->lhs_vimvaridx,
 			    lhs->lhs_type, lhs->lhs_name, lhs);
 
-    if (lhs->lhs_lvar == NULL)
-	return OK;
+    ਜੇ (lhs->lhs_lvar == ਨਿਰਾ)
+	ਵਾਪਸ OK;
 
     garray_T	*instr = &cctx->ctx_instr;
-    isn_T		*isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
+    isn_T		*isn = ((isn_T *)instr->ga_ਅੰਕੜੇ) + instr->ga_len - 1;
 
     // Optimization: turn "var = 123" from ISN_PUSHNR + ISN_STORE into
     // ISN_STORENR.
     // And "var = 0" does not need any instruction.
-    if (lhs->lhs_lvar->lv_from_outer == 0
-	    && instr->ga_len == instr_count + 1
+    ਜੇ (lhs->lhs_lvar->lv_from_outer == 0
+	    && instr->ga_len == instr_ਗਿਣਤੀ + 1
 	    && isn->isn_type == ISN_PUSHNR)
     {
-	varnumber_T val = isn->isn_arg.number;
-	garray_T    *stack = &cctx->ctx_type_stack;
+	varnumber_T val = isn->isn_arg.ਸੰਖਿਆ;
+	garray_T    *ਢੇਰ = &cctx->ctx_type_ਢੇਰ;
 
-	if (val == 0 && is_decl && !inside_loop_scope(cctx))
+	ਜੇ (val == 0 && is_decl && !inside_loop_scope(cctx))
 	{
 	    // zero is the default value, no need to do anything
 	    --instr->ga_len;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    isn->isn_type = ISN_STORENR;
 	    isn->isn_arg.storenr.stnr_idx = lhs->lhs_lvar->lv_idx;
 	    isn->isn_arg.storenr.stnr_val = val;
 	}
-	if (stack->ga_len > 0)
-	    --stack->ga_len;
+	ਜੇ (ਢੇਰ->ga_len > 0)
+	    --ਢੇਰ->ga_len;
     }
-    else if (lhs->lhs_lvar->lv_from_outer > 0)
+    ਨਹੀਂਤਾਂ ਜੇ (lhs->lhs_lvar->lv_from_outer > 0)
 	generate_STOREOUTER(cctx, lhs->lhs_lvar->lv_idx,
-		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_depth,
+		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_ਡੂੰਘਾਈ,
 		lhs->lhs_lvar->lv_loop_idx);
-    else
-	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, NULL);
-    return OK;
+    ਨਹੀਂਤਾਂ
+	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, ਨਿਰਾ);
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2717,180 +2717,180 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
  * object member variable initialization expression in the context of the
  * script where the class is defined.
  */
-    int
-generate_SCRIPTCTX_SET(cctx_T *cctx, sctx_T new_sctx)
+    ਪੂਰਨ
+generate_SCRIPTCTX_ਸੈੱਟ(cctx_T *cctx, sctx_T new_sctx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == NULL)
-	return FAIL;
+    ਜੇ ((isn = generate_instr(cctx, ISN_SCRIPTCTX_ਸੈੱਟ)) == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
     isn->isn_arg.setsctx = new_sctx;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-#if defined(FEAT_PROFILE)
-    void
-may_generate_prof_end(cctx_T *cctx, int prof_lnum)
+#ਜੇ defined(FEAT_PROFILE)
+    ਖਾਲੀ
+may_generate_prof_ਸਿਰਾ(cctx_T *cctx, ਪੂਰਨ prof_lnum)
 {
-    if (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
-	generate_instr(cctx, ISN_PROF_END);
+    ਜੇ (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
+	generate_instr(cctx, ISN_PROF_ਸਿਰਾ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
 /*
  * Delete an instruction, free what it contains.
  */
-    void
+    ਖਾਲੀ
 delete_instr(isn_T *isn)
 {
-    switch (isn->isn_type)
+    ਚੋਣ (isn->isn_type)
     {
-	case ISN_AUTOLOAD:
-	case ISN_DEF:
-	case ISN_EXEC:
-	case ISN_EXECRANGE:
-	case ISN_EXEC_SPLIT:
-	case ISN_LEGACY_EVAL:
-	case ISN_LOADAUTO:
-	case ISN_LOADB:
-	case ISN_LOADENV:
-	case ISN_LOADG:
-	case ISN_LOADOPT:
-	case ISN_LOADT:
-	case ISN_LOADW:
-	case ISN_PUSHEXC:
-	case ISN_PUSHFUNC:
-	case ISN_PUSHS:
-	case ISN_RANGE:
-	case ISN_STOREAUTO:
-	case ISN_STOREB:
-	case ISN_STOREENV:
-	case ISN_STOREG:
-	case ISN_STORET:
-	case ISN_STOREW:
-	case ISN_STRINGMEMBER:
+	ਹਾਲਤ ISN_AUTOLOAD:
+	ਹਾਲਤ ISN_DEF:
+	ਹਾਲਤ ISN_EXEC:
+	ਹਾਲਤ ISN_EXECRANGE:
+	ਹਾਲਤ ISN_EXEC_ਵੰਡੋ:
+	ਹਾਲਤ ISN_LEGACY_EVAL:
+	ਹਾਲਤ ISN_LOADAUTO:
+	ਹਾਲਤ ISN_LOADB:
+	ਹਾਲਤ ISN_LOADENV:
+	ਹਾਲਤ ISN_LOADG:
+	ਹਾਲਤ ISN_LOADOPT:
+	ਹਾਲਤ ISN_LOADT:
+	ਹਾਲਤ ISN_LOADW:
+	ਹਾਲਤ ISN_PUSHEXC:
+	ਹਾਲਤ ISN_PUSHFUNC:
+	ਹਾਲਤ ISN_PUSHS:
+	ਹਾਲਤ ISN_RANGE:
+	ਹਾਲਤ ISN_STOREAUTO:
+	ਹਾਲਤ ISN_STOREB:
+	ਹਾਲਤ ISN_STOREENV:
+	ਹਾਲਤ ISN_STOREG:
+	ਹਾਲਤ ISN_STORET:
+	ਹਾਲਤ ISN_STOREW:
+	ਹਾਲਤ ISN_STRINGMEMBER:
 	    vim_free(isn->isn_arg.string);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_LOCKUNLOCK:
+	ਹਾਲਤ ISN_LOCKUNLOCK:
 	    class_unref(isn->isn_arg.lockunlock.lu_cl_exec);
 	    vim_free(isn->isn_arg.lockunlock.lu_string);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_SUBSTITUTE:
+	ਹਾਲਤ ISN_SUBSTITUTE:
 	    {
-		int	idx;
+		ਪੂਰਨ	idx;
 		isn_T	*list = isn->isn_arg.subs.subs_instr;
 
 		vim_free(isn->isn_arg.subs.subs_cmd);
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		ਲਈ (idx = 0; list[idx].isn_type != ISN_ਅੰਤ; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_INSTR:
+	ਹਾਲਤ ISN_INSTR:
 	    {
-		int	idx;
+		ਪੂਰਨ	idx;
 		isn_T	*list = isn->isn_arg.instr;
 
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		ਲਈ (idx = 0; list[idx].isn_type != ISN_ਅੰਤ; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_LOADS:
-	case ISN_LOADEXPORT:
-	case ISN_STORES:
-	case ISN_STOREEXPORT:
+	ਹਾਲਤ ISN_LOADS:
+	ਹਾਲਤ ISN_LOADEXPORT:
+	ਹਾਲਤ ISN_STORES:
+	ਹਾਲਤ ISN_STOREEXPORT:
 	    vim_free(isn->isn_arg.loadstore.ls_name);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_UNLET:
-	case ISN_UNLETENV:
+	ਹਾਲਤ ISN_UNLET:
+	ਹਾਲਤ ISN_UNLETENV:
 	    vim_free(isn->isn_arg.unlet.ul_name);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_STOREOPT:
-	case ISN_STOREFUNCOPT:
+	ਹਾਲਤ ISN_STOREOPT:
+	ਹਾਲਤ ISN_STOREFUNCOPT:
 	    vim_free(isn->isn_arg.storeopt.so_name);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_PUSHBLOB:   // push blob isn_arg.blob
+	ਹਾਲਤ ISN_PUSHBLOB:   // push blob isn_arg.blob
 	    blob_unref(isn->isn_arg.blob);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_PUSHCLASS:
+	ਹਾਲਤ ISN_PUSHCLASS:
 	    class_unref(isn->isn_arg.classarg);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_UCALL:
+	ਹਾਲਤ ISN_UCALL:
 	    vim_free(isn->isn_arg.ufunc.cuf_name);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_FUNCREF:
+	ਹਾਲਤ ISN_FUNCREF:
 	    {
 		funcref_T	*funcref = &isn->isn_arg.funcref;
 		funcref_extra_T *extra = funcref->fr_extra;
 
-		if (extra == NULL || extra->fre_func_name == NULL)
+		ਜੇ (extra == ਨਿਰਾ || extra->fre_func_name == ਨਿਰਾ)
 		{
-		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
+		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_ਅੰਕੜੇ)
 						       + funcref->fr_dfunc_idx;
 		    ufunc_T *ufunc = dfunc->df_ufunc;
 
-		    if (ufunc != NULL && func_name_refcount(ufunc->uf_name))
+		    ਜੇ (ufunc != ਨਿਰਾ && func_name_refcount(ufunc->uf_name))
 			func_ptr_unref(ufunc);
 		}
-		if (extra != NULL)
+		ਜੇ (extra != ਨਿਰਾ)
 		{
 		    char_u *name = extra->fre_func_name;
 
-		    if (name != NULL)
+		    ਜੇ (name != ਨਿਰਾ)
 		    {
 			func_unref(name);
 			vim_free(name);
 		    }
-		    if (extra->fre_class != NULL)
+		    ਜੇ (extra->fre_class != ਨਿਰਾ)
 			class_unref(extra->fre_class);
 		    vim_free(extra);
 		}
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_DCALL:
+	ਹਾਲਤ ISN_DCALL:
 	    {
-		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
+		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_ਅੰਕੜੇ)
 		    + isn->isn_arg.dfunc.cdf_idx;
 
-		if (dfunc->df_ufunc != NULL
+		ਜੇ (dfunc->df_ufunc != ਨਿਰਾ
 			&& func_name_refcount(dfunc->df_ufunc->uf_name))
 		    func_ptr_unref(dfunc->df_ufunc);
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_METHODCALL:
+	ਹਾਲਤ ISN_METHODCALL:
 	    {
 		cmfunc_T  *mfunc = isn->isn_arg.mfunc;
 		class_unref(mfunc->cmf_itf);
 		class_unref(mfunc->cmf_cache_cl);
 		vim_free(mfunc);
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_NEWFUNC:
+	ਹਾਲਤ ISN_NEWFUNC:
 	    {
 		newfuncarg_T *arg = isn->isn_arg.newfunc.nf_arg;
 
-		if (arg != NULL)
+		ਜੇ (arg != ਨਿਰਾ)
 		{
-		    ufunc_T *ufunc = find_func_even_dead(
+		    ufunc_T *ufunc = ਲੱਭੋ_func_even_dead(
 					      arg->nfa_lambda, FFED_IS_GLOBAL);
 
-		    if (ufunc != NULL)
+		    ਜੇ (ufunc != ਨਿਰਾ)
 		    {
 			unlink_def_function(ufunc);
 			func_ptr_unref(ufunc);
@@ -2901,171 +2901,171 @@ delete_instr(isn_T *isn)
 		    vim_free(arg);
 		}
 	    }
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_CHECKTYPE:
-	case ISN_SETTYPE:
+	ਹਾਲਤ ISN_CHECKTYPE:
+	ਹਾਲਤ ISN_SETTYPE:
 	    free_type(isn->isn_arg.type.ct_type);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_CMDMOD:
+	ਹਾਲਤ ISN_CMDMOD:
 	    vim_regfree(isn->isn_arg.cmdmod.cf_cmdmod
 		    ->cmod_filter_regmatch.regprog);
 	    vim_free(isn->isn_arg.cmdmod.cf_cmdmod);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_LOADSCRIPT:
-	case ISN_STORESCRIPT:
+	ਹਾਲਤ ISN_LOADSCRIPT:
+	ਹਾਲਤ ISN_STORESCRIPT:
 	    vim_free(isn->isn_arg.script.scriptref);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_LOAD_CLASSMEMBER:
-	case ISN_STORE_CLASSMEMBER:
-	case ISN_GET_ITF_MEMBER:
+	ਹਾਲਤ ISN_ਲੱਦੋ_CLASSMEMBER:
+	ਹਾਲਤ ISN_STORE_CLASSMEMBER:
+	ਹਾਲਤ ISN_GET_ITF_MEMBER:
 	    class_unref(isn->isn_arg.classmember.cm_class);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_STOREINDEX:
+	ਹਾਲਤ ISN_STOREINDEX:
 	    class_unref(isn->isn_arg.storeindex.si_class);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_TRY:
+	ਹਾਲਤ ISN_TRY:
 	    vim_free(isn->isn_arg.tryref.try_ref);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_CEXPR_CORE:
+	ਹਾਲਤ ISN_CEXPR_CORE:
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref->cer_cmdline);
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref);
-	    break;
+	    ਰੋਕੋ;
 
-	case ISN_2BOOL:
-	case ISN_2STRING:
-	case ISN_2STRING_ANY:
-	case ISN_ADDBLOB:
-	case ISN_ADDLIST:
-	case ISN_ADDTUPLE:
-	case ISN_ANYINDEX:
-	case ISN_ANYSLICE:
-	case ISN_BCALL:
-	case ISN_BLOBAPPEND:
-	case ISN_BLOBINDEX:
-	case ISN_BLOBSLICE:
-	case ISN_CATCH:
-	case ISN_CEXPR_AUCMD:
-	case ISN_CHECKLEN:
-	case ISN_CLEARDICT:
-	case ISN_CMDMOD_REV:
-	case ISN_COMPAREANY:
-	case ISN_COMPAREBLOB:
-	case ISN_COMPAREBOOL:
-	case ISN_COMPAREDICT:
-	case ISN_COMPAREFLOAT:
-	case ISN_COMPAREFUNC:
-	case ISN_COMPARELIST:
-	case ISN_COMPARETUPLE:
-	case ISN_COMPARENR:
-	case ISN_COMPARENULL:
-	case ISN_COMPAREOBJECT:
-	case ISN_COMPARESPECIAL:
-	case ISN_COMPARESTRING:
-	case ISN_CONCAT:
-	case ISN_CONSTRUCT:
-	case ISN_COND2BOOL:
-	case ISN_DEBUG:
-	case ISN_DEFER:
-	case ISN_DROP:
-	case ISN_ECHO:
-	case ISN_ECHOCONSOLE:
-	case ISN_ECHOERR:
-	case ISN_ECHOMSG:
-	case ISN_ECHOWINDOW:
-	case ISN_ENDLOOP:
-	case ISN_ENDTRY:
-	case ISN_EXECCONCAT:
-	case ISN_EXECUTE:
-	case ISN_FINALLY:
-	case ISN_FINISH:
-	case ISN_FOR:
-	case ISN_GETITEM:
-	case ISN_GET_OBJ_MEMBER:
-	case ISN_JUMP:
-	case ISN_JUMP_IF_ARG_NOT_SET:
-	case ISN_JUMP_IF_ARG_SET:
-	case ISN_LISTAPPEND:
-	case ISN_LISTINDEX:
-	case ISN_LISTSLICE:
-	case ISN_TUPLEINDEX:
-	case ISN_TUPLESLICE:
-	case ISN_LOAD:
-	case ISN_LOADBDICT:
-	case ISN_LOADGDICT:
-	case ISN_LOADOUTER:
-	case ISN_LOADREG:
-	case ISN_LOADTDICT:
-	case ISN_LOADV:
-	case ISN_LOADWDICT:
-	case ISN_LOCKCONST:
-	case ISN_MEMBER:
-	case ISN_NEGATENR:
-	case ISN_NEWDICT:
-	case ISN_NEWLIST:
-	case ISN_NEWTUPLE:
-	case ISN_NEWPARTIAL:
-	case ISN_OPANY:
-	case ISN_OPFLOAT:
-	case ISN_OPNR:
-	case ISN_PCALL:
-	case ISN_PCALL_END:
-	case ISN_PROF_END:
-	case ISN_PROF_START:
-	case ISN_PUSHBOOL:
-	case ISN_PUSHCHANNEL:
-	case ISN_PUSHF:
-	case ISN_PUSHJOB:
-	case ISN_PUSHNR:
-	case ISN_PUSHOBJ:
-	case ISN_PUSHSPEC:
-	case ISN_PUT:
-	case ISN_IPUT:
-	case ISN_REDIREND:
-	case ISN_REDIRSTART:
-	case ISN_RETURN:
-	case ISN_RETURN_OBJECT:
-	case ISN_RETURN_VOID:
-	case ISN_SHUFFLE:
-	case ISN_SLICE:
-	case ISN_SOURCE:
-	case ISN_STORE:
-	case ISN_STORENR:
-	case ISN_STOREOUTER:
-	case ISN_STORE_THIS:
-	case ISN_STORERANGE:
-	case ISN_STOREREG:
-	case ISN_STOREV:
-	case ISN_STRINDEX:
-	case ISN_STRSLICE:
-	case ISN_THROW:
-	case ISN_TRYCONT:
-	case ISN_UNLETINDEX:
-	case ISN_UNLETRANGE:
-	case ISN_UNPACK:
-	case ISN_USEDICT:
-	case ISN_WHILE:
-	case ISN_SCRIPTCTX_SET:
+	ਹਾਲਤ ISN_2BOOL:
+	ਹਾਲਤ ISN_2STRING:
+	ਹਾਲਤ ISN_2STRING_ANY:
+	ਹਾਲਤ ISN_ADDBLOB:
+	ਹਾਲਤ ISN_ADDLIST:
+	ਹਾਲਤ ISN_ADDTUPLE:
+	ਹਾਲਤ ISN_ANYINDEX:
+	ਹਾਲਤ ISN_ANYSLICE:
+	ਹਾਲਤ ISN_BCALL:
+	ਹਾਲਤ ISN_BLOBAPPEND:
+	ਹਾਲਤ ISN_BLOBINDEX:
+	ਹਾਲਤ ISN_BLOBSLICE:
+	ਹਾਲਤ ISN_CATCH:
+	ਹਾਲਤ ISN_CEXPR_AUCMD:
+	ਹਾਲਤ ISN_CHECKLEN:
+	ਹਾਲਤ ISN_CLEARDICT:
+	ਹਾਲਤ ISN_CMDMOD_REV:
+	ਹਾਲਤ ISN_COMPAREANY:
+	ਹਾਲਤ ISN_COMPAREBLOB:
+	ਹਾਲਤ ISN_COMPAREBOOL:
+	ਹਾਲਤ ISN_COMPAREDICT:
+	ਹਾਲਤ ISN_COMPAREFLOAT:
+	ਹਾਲਤ ISN_COMPAREFUNC:
+	ਹਾਲਤ ISN_COMPARELIST:
+	ਹਾਲਤ ISN_COMPARETUPLE:
+	ਹਾਲਤ ISN_COMPARENR:
+	ਹਾਲਤ ISN_COMPARENULL:
+	ਹਾਲਤ ISN_COMPAREOBJECT:
+	ਹਾਲਤ ISN_COMPARESPECIAL:
+	ਹਾਲਤ ISN_COMPARESTRING:
+	ਹਾਲਤ ISN_CONCAT:
+	ਹਾਲਤ ISN_CONSTRUCT:
+	ਹਾਲਤ ISN_COND2BOOL:
+	ਹਾਲਤ ISN_DEBUG:
+	ਹਾਲਤ ISN_DEFER:
+	ਹਾਲਤ ISN_DROP:
+	ਹਾਲਤ ISN_ECHO:
+	ਹਾਲਤ ISN_ECHOCONSOLE:
+	ਹਾਲਤ ISN_ECHOERR:
+	ਹਾਲਤ ISN_ECHOMSG:
+	ਹਾਲਤ ISN_ECHOWINDOW:
+	ਹਾਲਤ ISN_ENDLOOP:
+	ਹਾਲਤ ISN_ENDTRY:
+	ਹਾਲਤ ISN_EXECCONCAT:
+	ਹਾਲਤ ISN_EXECUTE:
+	ਹਾਲਤ ISN_FINALLY:
+	ਹਾਲਤ ISN_ਅੰਤ:
+	ਹਾਲਤ ISN_FOR:
+	ਹਾਲਤ ISN_GETITEM:
+	ਹਾਲਤ ISN_GET_OBJ_MEMBER:
+	ਹਾਲਤ ISN_JUMP:
+	ਹਾਲਤ ISN_JUMP_IF_ARG_NOT_ਸੈੱਟ:
+	ਹਾਲਤ ISN_JUMP_IF_ARG_ਸੈੱਟ:
+	ਹਾਲਤ ISN_LISTAPPEND:
+	ਹਾਲਤ ISN_LISTINDEX:
+	ਹਾਲਤ ISN_LISTSLICE:
+	ਹਾਲਤ ISN_TUPLEINDEX:
+	ਹਾਲਤ ISN_TUPLESLICE:
+	ਹਾਲਤ ISN_ਲੱਦੋ:
+	ਹਾਲਤ ISN_LOADBDICT:
+	ਹਾਲਤ ISN_LOADGDICT:
+	ਹਾਲਤ ISN_LOADOUTER:
+	ਹਾਲਤ ISN_LOADREG:
+	ਹਾਲਤ ISN_LOADTDICT:
+	ਹਾਲਤ ISN_LOADV:
+	ਹਾਲਤ ISN_LOADWDICT:
+	ਹਾਲਤ ISN_LOCKCONST:
+	ਹਾਲਤ ISN_MEMBER:
+	ਹਾਲਤ ISN_NEGATENR:
+	ਹਾਲਤ ISN_NEWDICT:
+	ਹਾਲਤ ISN_NEWLIST:
+	ਹਾਲਤ ISN_NEWTUPLE:
+	ਹਾਲਤ ISN_NEWPARTIAL:
+	ਹਾਲਤ ISN_OPANY:
+	ਹਾਲਤ ISN_OPFLOAT:
+	ਹਾਲਤ ISN_OPNR:
+	ਹਾਲਤ ISN_PCALL:
+	ਹਾਲਤ ISN_PCALL_ਸਿਰਾ:
+	ਹਾਲਤ ISN_PROF_ਸਿਰਾ:
+	ਹਾਲਤ ISN_PROF_ਸ਼ੁਰੂ:
+	ਹਾਲਤ ISN_PUSHBOOL:
+	ਹਾਲਤ ISN_PUSHCHANNEL:
+	ਹਾਲਤ ISN_PUSHF:
+	ਹਾਲਤ ISN_PUSHJOB:
+	ਹਾਲਤ ISN_PUSHNR:
+	ਹਾਲਤ ISN_PUSHOBJ:
+	ਹਾਲਤ ISN_PUSHSPEC:
+	ਹਾਲਤ ISN_PUT:
+	ਹਾਲਤ ISN_IPUT:
+	ਹਾਲਤ ISN_REDIREND:
+	ਹਾਲਤ ISN_REDIRSTART:
+	ਹਾਲਤ ISN_RETURN:
+	ਹਾਲਤ ISN_RETURN_OBJECT:
+	ਹਾਲਤ ISN_RETURN_VOID:
+	ਹਾਲਤ ISN_SHUFFLE:
+	ਹਾਲਤ ISN_ਟੁਕੜਾ:
+	ਹਾਲਤ ISN_ਸਰੋਤ:
+	ਹਾਲਤ ISN_STORE:
+	ਹਾਲਤ ISN_STORENR:
+	ਹਾਲਤ ISN_STOREOUTER:
+	ਹਾਲਤ ISN_STORE_THIS:
+	ਹਾਲਤ ISN_STORERANGE:
+	ਹਾਲਤ ISN_STOREREG:
+	ਹਾਲਤ ISN_STOREV:
+	ਹਾਲਤ ISN_STRINDEX:
+	ਹਾਲਤ ISN_STRSLICE:
+	ਹਾਲਤ ISN_THROW:
+	ਹਾਲਤ ISN_TRYCONT:
+	ਹਾਲਤ ISN_UNLETINDEX:
+	ਹਾਲਤ ISN_UNLETRANGE:
+	ਹਾਲਤ ISN_UNPACK:
+	ਹਾਲਤ ISN_USEDICT:
+	ਹਾਲਤ ISN_WHILE:
+	ਹਾਲਤ ISN_SCRIPTCTX_ਸੈੱਟ:
 	// nothing allocated
-	break;
+	ਰੋਕੋ;
     }
 }
 
-    void
+    ਖਾਲੀ
 clear_instr_ga(garray_T *gap)
 {
-    int idx;
+    ਪੂਰਨ idx;
 
-    for (idx = 0; idx < gap->ga_len; ++idx)
-	delete_instr(((isn_T *)gap->ga_data) + idx);
+    ਲਈ (idx = 0; idx < gap->ga_len; ++idx)
+	delete_instr(((isn_T *)gap->ga_ਅੰਕੜੇ) + idx);
     ga_clear(gap);
 }
 
 
-#endif  // defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ  // defined(FEAT_EVAL)

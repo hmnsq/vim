@@ -11,197 +11,197 @@
  * optionstr.c: Functions related to string options
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-static char_u shm_buf[SHM_LEN];
-static int set_shm_recursive = 0;
+ਸਥਿਰ char_u shm_buf[SHM_LEN];
+ਸਥਿਰ ਪੂਰਨ ਸੈੱਟ_shm_recursive = 0;
 
-static char *(p_ambw_values[]) = {"single", "double", NULL};
-static char *(p_bg_values[]) = {"light", "dark", NULL};
-static char *(p_bkc_values[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", NULL};
-static char *(p_bo_values[]) = {"all", "backspace", "cursor", "complete",
+ਸਥਿਰ ਅੱਖਰ *(p_ambw_ਮੁੱਲਾਂ[]) = {"single", "double", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_bg_ਮੁੱਲਾਂ[]) = {"light", "dark", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_bkc_ਮੁੱਲਾਂ[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_bo_ਮੁੱਲਾਂ[]) = {"all", "backspace", "cursor", "complete",
 				 "copy", "ctrlg", "error", "esc", "ex",
 				 "hangul", "insertmode", "lang", "mess",
 				 "showmatch", "operator", "register", "shell",
-				 "spell", "term", "wildmode", NULL};
-#if defined(FEAT_LINEBREAK)
+				 "spell", "term", "wildmode", ਨਿਰਾ};
+#ਜੇ defined(FEAT_LINEBREAK)
 // Note: Keep this in sync with briopt_check()
-static char *(p_briopt_values[]) = {"shift:", "min:", "sbr", "list:", "column:", NULL};
-#endif
-#if defined(FEAT_TABPANEL)
+ਸਥਿਰ ਅੱਖਰ *(p_briopt_ਮੁੱਲਾਂ[]) = {"shift:", "min:", "sbr", "list:", "column:", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_TABPANEL)
 // Note: Keep this in sync with tabpanelopt_changed()
-static char *(p_tplo_values[]) = {"align:", "columns:", "scrollbar", "vert", NULL};
-static char *(p_tplo_align_values[]) = {"left", "right", NULL};
-#endif
-#if defined(FEAT_DIFF)
+ਸਥਿਰ ਅੱਖਰ *(p_tplo_ਮੁੱਲਾਂ[]) = {"align:", "columns:", "scrollbar", "vert", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_tplo_align_ਮੁੱਲਾਂ[]) = {"left", "right", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_DIFF)
 // Note: Keep this in sync with diffopt_changed()
-static char *(p_dip_values[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", NULL};
-static char *(p_dip_algorithm_values[]) = {"myers", "minimal", "patience", "histogram", NULL};
-static char *(p_dip_inline_values[]) = {"none", "simple", "char", "word", NULL};
-#endif
-static char *(p_nf_values[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", NULL};
-static char *(p_ff_values[]) = {FF_UNIX, FF_DOS, FF_MAC, NULL};
-#ifdef HAVE_CLIPMETHOD
+ਸਥਿਰ ਅੱਖਰ *(p_dip_ਮੁੱਲਾਂ[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_dip_algorithm_ਮੁੱਲਾਂ[]) = {"myers", "minimal", "patience", "histogram", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_dip_inline_ਮੁੱਲਾਂ[]) = {"none", "simple", "char", "word", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_nf_ਮੁੱਲਾਂ[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_ff_ਮੁੱਲਾਂ[]) = {FF_UNIX, FF_DOS, FF_MAC, ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CLIPMETHOD
 // Note: Keep this in sync with did_set_clipboard()
-static char *(p_cb_values[]) = {"unnamed", "unnamedplus",
+ਸਥਿਰ ਅੱਖਰ *(p_cb_ਮੁੱਲਾਂ[]) = {"unnamed", "unnamedplus",
 # ifdef FEAT_CLIPBOARD
     "autoselect", "autoselectplus", "autoselectml", "html", "exclude:",
 # endif
-    NULL};
-#endif
-#ifdef FEAT_CRYPT
-static char *(p_cm_values[]) = {"zip", "blowfish", "blowfish2",
+    ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+ਸਥਿਰ ਅੱਖਰ *(p_cm_ਮੁੱਲਾਂ[]) = {"zip", "blowfish", "blowfish2",
 # ifdef FEAT_SODIUM
     "xchacha20", "xchacha20v2",
 # endif
-    NULL};
-#endif
-static char *(p_cmp_values[]) = {"internal", "keepascii", NULL};
-#ifdef FEAT_SYN_HL
+    ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_cmp_ਮੁੱਲਾਂ[]) = {"internal", "keepascii", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 // Note: Keep this in sync with fill_culopt_flags()
-static char *(p_culopt_values[]) = {"line", "screenline", "number", "both", NULL};
-#endif
-static char *(p_dy_values[]) = {"lastline", "truncate", "uhex", NULL};
-static char *(p_jop_values[]) = {"stack", NULL};
-#ifdef FEAT_FOLDING
-static char *(p_fdo_values[]) = {"all", "block", "hor", "mark", "percent",
+ਸਥਿਰ ਅੱਖਰ *(p_culopt_ਮੁੱਲਾਂ[]) = {"line", "screenline", "number", "both", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_dy_ਮੁੱਲਾਂ[]) = {"lastline", "truncate", "uhex", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_jop_ਮੁੱਲਾਂ[]) = {"stack", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+ਸਥਿਰ ਅੱਖਰ *(p_fdo_ਮੁੱਲਾਂ[]) = {"all", "block", "hor", "mark", "percent",
 				 "quickfix", "search", "tag", "insert",
-				 "undo", "jump", NULL};
-#endif
+				 "undo", "jump", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
 // Note: Keep this in sync with match_keyprotocol()
-static char *(p_kpc_protocol_values[]) = {"none", "mok2", "kitty", NULL};
-#ifdef FEAT_IMAGE
+ਸਥਿਰ ਅੱਖਰ *(p_kpc_protocol_ਮੁੱਲਾਂ[]) = {"none", "mok2", "kitty", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_IMAGE
 // Note: Keep this in sync with match_imageprotocol()
-static char *(p_ipc_protocol_values[]) = {"none", "kitty", "sixel", NULL};
-#endif
-#ifdef FEAT_PROP_POPUP
+ਸਥਿਰ ਅੱਖਰ *(p_ipc_protocol_ਮੁੱਲਾਂ[]) = {"none", "kitty", "sixel", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 // Note: Keep this in sync with parse_popup_option()
-static char *(p_popup_cpp_option_values[]) = {"align:", "border:",
+ਸਥਿਰ ਅੱਖਰ *(p_popup_cpp_option_ਮੁੱਲਾਂ[]) = {"align:", "border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
-    "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_pvp_option_values[]) = {"border:",
+    "resize:", "shadow:", "width:", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_popup_pvp_option_ਮੁੱਲਾਂ[]) = {"border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
-    "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_option_on_off_values[]) = {"on", "off", NULL};
-static char *(p_popup_cpp_border_values[]) = {"single", "double", "round",
-    "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_pvp_border_values[]) = {"single", "double", "round",
-    "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_option_align_values[]) = {"item", "menu", NULL};
-#endif
-#if defined(FEAT_SPELL)
+    "resize:", "shadow:", "width:", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_popup_option_on_off_ਮੁੱਲਾਂ[]) = {"on", "off", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_popup_cpp_border_ਮੁੱਲਾਂ[]) = {"single", "double", "round",
+    "ascii", "on", "off", "custom:", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_popup_pvp_border_ਮੁੱਲਾਂ[]) = {"single", "double", "round",
+    "ascii", "on", "off", "custom:", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_popup_option_align_ਮੁੱਲਾਂ[]) = {"item", "menu", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_SPELL)
 // Note: Keep this in sync with spell_check_sps()
-static char *(p_sps_values[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", NULL};
-#endif
-#ifdef FEAT_SESSION
+ਸਥਿਰ ਅੱਖਰ *(p_sps_ਮੁੱਲਾਂ[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SESSION
 // Also used for 'viewoptions'!  Keep in sync with SSOP_ flags.
-static char *(p_ssop_values[]) = {"buffers", "winpos", "resize", "winsize",
+ਸਥਿਰ ਅੱਖਰ *(p_ssop_ਮੁੱਲਾਂ[]) = {"buffers", "winpos", "resize", "winsize",
     "localoptions", "options", "help", "blank", "globals", "slash", "unix",
     "sesdir", "curdir", "folds", "cursor", "tabpages", "terminal", "skiprtp",
-    NULL};
-#endif
-#if defined(FEAT_STL_OPT)
-static char *(p_stlo_values[]) = {"fixedheight", "maxheight:", NULL};
-#endif
+    ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_STL_OPT)
+ਸਥਿਰ ਅੱਖਰ *(p_stlo_ਮੁੱਲਾਂ[]) = {"fixedheight", "maxheight:", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
 // Keep in sync with SWB_ flags in option.h
-static char *(p_swb_values[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", NULL};
-static char *(p_spk_values[]) = {"cursor", "screen", "topline", NULL};
-static char *(p_tc_values[]) = {"followic", "ignore", "match", "followscs", "smart", NULL};
+ਸਥਿਰ ਅੱਖਰ *(p_swb_ਮੁੱਲਾਂ[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_spk_ਮੁੱਲਾਂ[]) = {"cursor", "screen", "topline", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_tc_ਮੁੱਲਾਂ[]) = {"followic", "ignore", "match", "followscs", "smart", ਨਿਰਾ};
 // Keep in sync with TCL_ flags in option.h
-static char *(p_tcl_values[]) = {"left", "uselast", NULL};
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-static char *(p_toolbar_values[]) = {"text", "icons", "tooltips", "horiz", NULL};
-#endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-static char *(p_tbis_values[]) = {"tiny", "small", "medium", "large", "huge", "giant", NULL};
-#endif
-#if defined(UNIX) || defined(VMS)
-static char *(p_ttym_values[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", NULL};
-#endif
-static char *(p_ve_values[]) = {"block", "insert", "all", "onemore", "none", "NONE", NULL};
+ਸਥਿਰ ਅੱਖਰ *(p_tcl_ਮੁੱਲਾਂ[]) = {"left", "uselast", ਨਿਰਾ};
+#ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+ਸਥਿਰ ਅੱਖਰ *(p_toolbar_ਮੁੱਲਾਂ[]) = {"text", "icons", "tooltips", "horiz", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+ਸਥਿਰ ਅੱਖਰ *(p_tbis_ਮੁੱਲਾਂ[]) = {"tiny", "small", "medium", "large", "huge", "giant", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(UNIX) || defined(VMS)
+ਸਥਿਰ ਅੱਖਰ *(p_ttym_ਮੁੱਲਾਂ[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_ve_ਮੁੱਲਾਂ[]) = {"block", "insert", "all", "onemore", "none", "NONE", ਨਿਰਾ};
 // Note: Keep this in sync with check_opt_wim()
-static char *(p_wim_values[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", NULL};
-static char *(p_wop_values[]) = {"fuzzy", "tagfile", "pum", "exacttext", NULL};
-#ifdef FEAT_WAK
-static char *(p_wak_values[]) = {"yes", "menu", "no", NULL};
-#endif
-static char *(p_mousem_values[]) = {"extend", "popup", "popup_setpos", "mac", NULL};
-static char *(p_sel_values[]) = {"inclusive", "exclusive", "old", NULL};
-static char *(p_slm_values[]) = {"mouse", "key", "cmd", NULL};
-static char *(p_km_values[]) = {"startsel", "stopsel", NULL};
-#ifdef FEAT_BROWSE
-static char *(p_bsdir_values[]) = {"current", "last", "buffer", NULL};
-#endif
-static char *(p_scbopt_values[]) = {"ver", "hor", "jump", NULL};
-static char *(p_debug_values[]) = {"msg", "throw", "beep", NULL};
-static char *(p_ead_values[]) = {"both", "ver", "hor", NULL};
-static char *(p_buftype_values[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", NULL};
-static char *(p_bufhidden_values[]) = {"hide", "unload", "delete", "wipe", NULL};
-static char *(p_bs_values[]) = {"indent", "eol", "start", "nostop", NULL};
-#ifdef FEAT_FOLDING
-static char *(p_fdm_values[]) = {"manual", "expr", "marker", "indent", "syntax",
+ਸਥਿਰ ਅੱਖਰ *(p_wim_ਮੁੱਲਾਂ[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_wop_ਮੁੱਲਾਂ[]) = {"fuzzy", "tagfile", "pum", "exacttext", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_WAK
+ਸਥਿਰ ਅੱਖਰ *(p_wak_ਮੁੱਲਾਂ[]) = {"yes", "menu", "no", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_mousem_ਮੁੱਲਾਂ[]) = {"extend", "popup", "popup_setpos", "mac", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_sel_ਮੁੱਲਾਂ[]) = {"inclusive", "exclusive", "old", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_slm_ਮੁੱਲਾਂ[]) = {"mouse", "key", "cmd", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_km_ਮੁੱਲਾਂ[]) = {"startsel", "stopsel", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_BROWSE
+ਸਥਿਰ ਅੱਖਰ *(p_bsdir_ਮੁੱਲਾਂ[]) = {"current", "last", "buffer", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_scbopt_ਮੁੱਲਾਂ[]) = {"ver", "hor", "jump", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_debug_ਮੁੱਲਾਂ[]) = {"msg", "throw", "beep", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_ead_ਮੁੱਲਾਂ[]) = {"both", "ver", "hor", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_buftype_ਮੁੱਲਾਂ[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_bufhidden_ਮੁੱਲਾਂ[]) = {"hide", "unload", "delete", "wipe", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_bs_ਮੁੱਲਾਂ[]) = {"indent", "eol", "start", "nostop", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+ਸਥਿਰ ਅੱਖਰ *(p_fdm_ਮੁੱਲਾਂ[]) = {"manual", "expr", "marker", "indent", "syntax",
 # ifdef FEAT_DIFF
 				"diff",
 # endif
-				NULL};
-static char *(p_fcl_values[]) = {"all", NULL};
-#endif
-static char *(p_cfc_values[]) = {"keyword", "files", "whole_line", NULL};
-static char *(p_cot_values[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", NULL};
-#ifdef BACKSLASH_IN_FILENAME
-static char *(p_csl_values[]) = {"slash", "backslash", NULL};
-#endif
-#ifdef FEAT_SIGNS
-static char *(p_scl_values[]) = {"yes", "no", "auto", "number", NULL};
-#endif
-#ifdef UNIX
-static char *(p_trz_values[]) = {"inband", "sigwinch", "", NULL};
-#endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
-static char *(p_twt_values[]) = {"winpty", "conpty", "", NULL};
-#endif
-static char *(p_sloc_values[]) = {"last", "statusline", "tabline", NULL};
-static char *(p_sws_values[]) = {"fsync", "sync", NULL};
+				ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_fcl_ਮੁੱਲਾਂ[]) = {"all", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_cfc_ਮੁੱਲਾਂ[]) = {"keyword", "files", "whole_line", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_cot_ਮੁੱਲਾਂ[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", ਨਿਰਾ};
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ BACKSLASH_ਵਿੱਚ_FILENAME
+ਸਥਿਰ ਅੱਖਰ *(p_csl_ਮੁੱਲਾਂ[]) = {"slash", "backslash", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
+ਸਥਿਰ ਅੱਖਰ *(p_scl_ਮੁੱਲਾਂ[]) = {"yes", "no", "auto", "number", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
+ਸਥਿਰ ਅੱਖਰ *(p_trz_ਮੁੱਲਾਂ[]) = {"inband", "sigwinch", "", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(MSWIN) && defined(FEAT_TERMINAL)
+ਸਥਿਰ ਅੱਖਰ *(p_twt_ਮੁੱਲਾਂ[]) = {"winpty", "conpty", "", ਨਿਰਾ};
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਅੱਖਰ *(p_sloc_ਮੁੱਲਾਂ[]) = {"last", "statusline", "tabline", ਨਿਰਾ};
+ਸਥਿਰ ਅੱਖਰ *(p_sws_ਮੁੱਲਾਂ[]) = {"fsync", "sync", ਨਿਰਾ};
 
-static int check_opt_strings(char_u *val, char **values, int list);
-static int opt_strings_flags(char_u *val, char **values, unsigned *flagp, int list);
+ਸਥਿਰ ਪੂਰਨ check_opt_ਲੜੀਆਂ(char_u *val, ਅੱਖਰ **ਮੁੱਲਾਂ, ਪੂਰਨ list);
+ਸਥਿਰ ਪੂਰਨ opt_ਲੜੀਆਂ_flags(char_u *val, ਅੱਖਰ **ਮੁੱਲਾਂ, ਬਿਨਾਨਿਸ਼ਾਨੀ *flagp, ਪੂਰਨ list);
 
 /*
  * After setting various option values: recompute variables that depend on
  * option values.
  */
-    void
-didset_string_options(void)
+    ਖਾਲੀ
+didset_string_options(ਖਾਲੀ)
 {
-    (void)opt_strings_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
-    (void)opt_strings_flags(p_bkc, p_bkc_values, &bkc_flags, TRUE);
-    (void)opt_strings_flags(p_bo, p_bo_values, &bo_flags, TRUE);
-    (void)opt_strings_flags(p_cot, p_cot_values, &cot_flags, TRUE);
-#ifdef FEAT_SESSION
-    (void)opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE);
-    (void)opt_strings_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
-#endif
-#ifdef FEAT_FOLDING
-    (void)opt_strings_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
-#endif
-    (void)opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE);
-    (void)opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE);
-    (void)opt_strings_flags(p_tc, p_tc_values, &tc_flags, FALSE);
-    (void)opt_strings_flags(p_ve, p_ve_values, &ve_flags, TRUE);
-#if defined(UNIX) || defined(VMS)
-    (void)opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE);
-#endif
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    (void)opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags, TRUE);
-#endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-    (void)opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE);
-#endif
-    (void)opt_strings_flags(p_swb, p_swb_values, &swb_flags, TRUE);
-    (void)opt_strings_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_cmp, p_cmp_ਮੁੱਲਾਂ, &cmp_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_bkc, p_bkc_ਮੁੱਲਾਂ, &bkc_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_bo, p_bo_ਮੁੱਲਾਂ, &bo_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_cot, p_cot_ਮੁੱਲਾਂ, &cot_flags, TRUE);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SESSION
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_ssop, p_ssop_ਮੁੱਲਾਂ, &ssop_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_vop, p_ssop_ਮੁੱਲਾਂ, &vop_flags, TRUE);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_fdo, p_fdo_ਮੁੱਲਾਂ, &fdo_flags, TRUE);
+#ਜੇ_ਅੰਤ
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_dy, p_dy_ਮੁੱਲਾਂ, &dy_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_jop, p_jop_ਮੁੱਲਾਂ, &jop_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_tc, p_tc_ਮੁੱਲਾਂ, &tc_flags, FALSE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_ve, p_ve_ਮੁੱਲਾਂ, &ve_flags, TRUE);
+#ਜੇ defined(UNIX) || defined(VMS)
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_ttym, p_ttym_ਮੁੱਲਾਂ, &ttym_flags, FALSE);
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_toolbar, p_toolbar_ਮੁੱਲਾਂ, &toolbar_flags, TRUE);
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_tbis, p_tbis_ਮੁੱਲਾਂ, &tbis_flags, FALSE);
+#ਜੇ_ਅੰਤ
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_swb, p_swb_ਮੁੱਲਾਂ, &swb_flags, TRUE);
+    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(p_tcl, p_tcl_ਮੁੱਲਾਂ, &tcl_flags, TRUE);
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * Trigger the OptionSet autocommand.
  * "opt_idx"	is the index of the option being set.
@@ -213,111 +213,111 @@ didset_string_options(void)
  *		are set)
  * "newval"	the new value
  */
-    void
+    ਖਾਲੀ
 trigger_optionset_string(
-	int	opt_idx,
-	int	opt_flags,
+	ਪੂਰਨ	opt_idx,
+	ਪੂਰਨ	opt_flags,
 	char_u  *oldval,
 	char_u  *oldval_l,
 	char_u  *oldval_g,
 	char_u  *newval)
 {
     // Don't do this recursively.
-    if (oldval == NULL || newval == NULL
+    ਜੇ (oldval == ਨਿਰਾ || newval == ਨਿਰਾ
 				    || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+	ਵਾਪਸ;
 
     char_u buf_type[7];
     size_t buf_typelen;
     size_t oldvallen;
 
     oldvallen = STRLEN(oldval);
-    set_vim_var_string(VV_OPTION_OLD, oldval, (int)oldvallen);
-    set_vim_var_string(VV_OPTION_NEW, newval, -1);
-    buf_typelen = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type),
+    ਸੈੱਟ_vim_var_string(VV_OPTION_OLD, oldval, (ਪੂਰਨ)oldvallen);
+    ਸੈੱਟ_vim_var_string(VV_OPTION_NEW, newval, -1);
+    buf_typelen = vim_snprintf_safelen((ਅੱਖਰ *)buf_type, ਆਕਾਰ(buf_type),
 	"%s", (opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)buf_typelen);
-    if (opt_flags & OPT_LOCAL)
+    ਸੈੱਟ_vim_var_string(VV_OPTION_TYPE, buf_type, (ਪੂਰਨ)buf_typelen);
+    ਜੇ (opt_flags & OPT_LOCAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	ਸੈੱਟ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
+	ਸੈੱਟ_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (ਪੂਰਨ)oldvallen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    ਜੇ (opt_flags & OPT_GLOBAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (int)oldvallen);
+	ਸੈੱਟ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
+	ਸੈੱਟ_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (ਪੂਰਨ)oldvallen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ਜੇ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval_l, -1);
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval_g, -1);
+	ਸੈੱਟ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
+	ਸੈੱਟ_vim_var_string(VV_OPTION_OLDLOCAL, oldval_l, -1);
+	ਸੈੱਟ_vim_var_string(VV_OPTION_OLDGLOBAL, oldval_g, -1);
     }
-    if (opt_flags & OPT_MODELINE)
+    ਜੇ (opt_flags & OPT_MODELINE)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	ਸੈੱਟ_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
+	ਸੈੱਟ_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (ਪੂਰਨ)oldvallen);
     }
     apply_autocmds(EVENT_OPTIONSET,
-	    get_option_fullname(opt_idx), NULL, FALSE,
-	    NULL);
+	    get_option_fullname(opt_idx), ਨਿਰਾ, FALSE,
+	    ਨਿਰਾ);
     reset_v_option_vars();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-    static char *
-illegal_char(char *errbuf, size_t errbuflen, int c)
+    ਸਥਿਰ ਅੱਖਰ *
+illegal_char(ਅੱਖਰ *errbuf, size_t errbuflen, ਪੂਰਨ c)
 {
-    if (errbuf == NULL)
-	return "";
+    ਜੇ (errbuf == ਨਿਰਾ)
+	ਵਾਪਸ "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_str),
-		    (char *)transchar(c));
-    return errbuf;
+		    (ਅੱਖਰ *)transchar(c));
+    ਵਾਪਸ errbuf;
 }
 
-    static char *
-illegal_char_after_chr(char *errbuf, size_t errbuflen, int c)
+    ਸਥਿਰ ਅੱਖਰ *
+illegal_char_after_chr(ਅੱਖਰ *errbuf, size_t errbuflen, ਪੂਰਨ c)
 {
-    if (errbuf == NULL)
-	return "";
+    ਜੇ (errbuf == ਨਿਰਾ)
+	ਵਾਪਸ "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_after_chr), c);
-    return errbuf;
+    ਵਾਪਸ errbuf;
 }
 
 /*
  * Check string options in a buffer for NULL value.
  */
-    void
+    ਖਾਲੀ
 check_buf_options(buf_T *buf)
 {
     check_string_option(&buf->b_p_bh);
     check_string_option(&buf->b_p_bt);
     check_string_option(&buf->b_p_fenc);
     check_string_option(&buf->b_p_ff);
-#ifdef FEAT_FIND_ID
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਲੱਭੋ_ID
     check_string_option(&buf->b_p_def);
     check_string_option(&buf->b_p_inc);
 # ifdef FEAT_EVAL
     check_string_option(&buf->b_p_inex);
 # endif
-#endif
-#if defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_EVAL)
     check_string_option(&buf->b_p_inde);
     check_string_option(&buf->b_p_indk);
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     check_string_option(&buf->b_p_bexpr);
-#endif
-#if defined(FEAT_CRYPT)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_CRYPT)
     check_string_option(&buf->b_p_cm);
-#endif
+#ਜੇ_ਅੰਤ
     check_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     check_string_option(&buf->b_p_fex);
-#endif
-#ifdef FEAT_CRYPT
-    check_string_option(&buf->b_p_key);
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CRYPT
+    check_string_option(&buf->b_p_ਕੁੰਜੀ);
+#ਜੇ_ਅੰਤ
     check_string_option(&buf->b_p_kp);
     check_string_option(&buf->b_p_mps);
     check_string_option(&buf->b_p_fo);
@@ -327,16 +327,16 @@ check_buf_options(buf_T *buf)
     check_string_option(&buf->b_p_cms);
     check_string_option(&buf->b_p_nf);
     check_string_option(&buf->b_p_qe);
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     check_string_option(&buf->b_p_syn);
     check_string_option(&buf->b_s.b_syn_isk);
-#endif
-#ifdef FEAT_SPELL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     check_string_option(&buf->b_s.b_p_spc);
     check_string_option(&buf->b_s.b_p_spf);
     check_string_option(&buf->b_s.b_p_spl);
     check_string_option(&buf->b_s.b_p_spo);
-#endif
+#ਜੇ_ਅੰਤ
     check_string_option(&buf->b_p_sua);
     check_string_option(&buf->b_p_cink);
     check_string_option(&buf->b_p_cino);
@@ -347,40 +347,40 @@ check_buf_options(buf_T *buf)
     check_string_option(&buf->b_p_cinw);
     check_string_option(&buf->b_p_cot);
     check_string_option(&buf->b_p_cpt);
-#ifdef FEAT_COMPL_FUNC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
     check_string_option(&buf->b_p_cfu);
     check_string_option(&buf->b_p_ofu);
     check_string_option(&buf->b_p_tsrfu);
-#endif
-#ifdef FEAT_EVAL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     check_string_option(&buf->b_p_ffu);
     check_string_option(&buf->b_p_tfu);
-#endif
-#ifdef FEAT_KEYMAP
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_KEYMAP
     check_string_option(&buf->b_p_keymap);
-#endif
-#ifdef FEAT_QUICKFIX
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_QUICKFIX
     check_string_option(&buf->b_p_gefm);
     check_string_option(&buf->b_p_gp);
     check_string_option(&buf->b_p_mp);
     check_string_option(&buf->b_p_efm);
-#endif
+#ਜੇ_ਅੰਤ
     check_string_option(&buf->b_p_ep);
-    check_string_option(&buf->b_p_path);
-    check_string_option(&buf->b_p_tags);
+    check_string_option(&buf->b_p_ਰਸਤਾ);
+    check_string_option(&buf->b_p_ਟੈਗ_ਸੂਚੀ);
     check_string_option(&buf->b_p_tc);
     check_string_option(&buf->b_p_dict);
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     check_string_option(&buf->b_p_dia);
-#endif
+#ਜੇ_ਅੰਤ
     check_string_option(&buf->b_p_tsr);
     check_string_option(&buf->b_p_lw);
     check_string_option(&buf->b_p_bkc);
     check_string_option(&buf->b_p_menc);
-#ifdef FEAT_VARTABS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VARTABS
     check_string_option(&buf->b_p_vsts);
     check_string_option(&buf->b_p_vts);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -390,46 +390,46 @@ check_buf_options(buf_T *buf)
  * check_options().
  * Does NOT check for P_ALLOCED flag!
  */
-    void
+    ਖਾਲੀ
 free_string_option(char_u *p)
 {
-    if (p != empty_option)
+    ਜੇ (p != ਖਾਲੀ_ਥਾਵਾਂ_option)
 	vim_free(p);
 }
 
-    void
+    ਖਾਲੀ
 clear_string_option(char_u **pp)
 {
-    if (*pp != empty_option)
+    ਜੇ (*pp != ਖਾਲੀ_ਥਾਵਾਂ_option)
 	vim_free(*pp);
-    *pp = empty_option;
+    *pp = ਖਾਲੀ_ਥਾਵਾਂ_option;
 }
 
-    void
+    ਖਾਲੀ
 check_string_option(char_u **pp)
 {
-    if (*pp == NULL)
-	*pp = empty_option;
+    ਜੇ (*pp == ਨਿਰਾ)
+	*pp = ਖਾਲੀ_ਥਾਵਾਂ_option;
 }
 
 /*
  * Set global value for string option when it's a local option.
  */
-    static void
-set_string_option_global(
-    int		opt_idx,	// option index
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_string_option_global(
+    ਪੂਰਨ		opt_idx,	// option index
     char_u	**varp)		// pointer to option variable
 {
     char_u	**p, *s;
 
     // the global value is always allocated
-    if (is_window_local_option(opt_idx))
+    ਜੇ (is_ਖਿੜਕੀ_local_option(opt_idx))
 	p = (char_u **)GLOBAL_WO(varp);
-    else
+    ਨਹੀਂਤਾਂ
 	p = (char_u **)get_option_var(opt_idx);
-    if (!is_global_option(opt_idx)
+    ਜੇ (!is_global_option(opt_idx)
 	    && p != varp
-	    && (s = vim_strsave(*varp)) != NULL)
+	    && (s = vim_strsave(*varp)) != ਨਿਰਾ)
     {
 	free_string_option(*p);
 	*p = s;
@@ -444,158 +444,158 @@ set_string_option_global(
  * "set_sid" is SID_NONE don't set the scriptID.  Otherwise set the scriptID to
  * "set_sid".
  */
-    void
-set_string_option_direct(
+    ਖਾਲੀ
+ਸੈੱਟ_string_option_ਸਿੱਧਾ(
     char_u	*name,
-    int		opt_idx,
+    ਪੂਰਨ		opt_idx,
     char_u	*val,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		set_sid UNUSED)
+    ਪੂਰਨ		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    ਪੂਰਨ		ਸੈੱਟ_sid ਅਣਵਰਤਿਆ)
 {
     char_u	*s;
     char_u	**varp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		idx = opt_idx;
+    ਪੂਰਨ		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    ਪੂਰਨ		idx = opt_idx;
 
-    if (idx == -1)		// use name
+    ਜੇ (idx == -1)		// use name
     {
 	idx = findoption(name);
-	if (idx < 0)	// not found (should not happen)
+	ਜੇ (idx < 0)	// not found (should not happen)
 	{
-	    semsg(_(e_internal_error_str), "set_string_option_direct()");
+	    semsg(_(e_ਅੰਦਰੂਨੀ_error_str), "set_string_option_direct()");
 	    siemsg("For option %s", name);
-	    return;
+	    ਵਾਪਸ;
 	}
     }
 
-    if (is_hidden_option(idx))		// can't set hidden option
-	return;
+    ਜੇ (is_hidden_option(idx))		// can't set hidden option
+	ਵਾਪਸ;
 
     s = vim_strsave(val);
-    if (s == NULL)
-	return;
+    ਜੇ (s == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     varp = (char_u **)get_option_varp_scope(idx,
 	    both ? OPT_LOCAL : opt_flags);
-    if ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
+    ਜੇ ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
 	free_string_option(*varp);
     *varp = s;
 
     // For buffer/window local option may also set the global value.
-    if (both)
-	set_string_option_global(idx, varp);
+    ਜੇ (both)
+	ਸੈੱਟ_string_option_global(idx, varp);
 
-    set_option_flag(idx, P_ALLOCED);
+    ਸੈੱਟ_option_flag(idx, P_ALLOCED);
 
     // When setting both values of a global option with a local value,
     // make the local value empty, so that the global value is used.
-    if (is_global_local_option(idx) && both)
+    ਜੇ (is_global_local_option(idx) && both)
     {
 	free_string_option(*varp);
-	*varp = empty_option;
+	*varp = ਖਾਲੀ_ਥਾਵਾਂ_option;
     }
-#ifdef FEAT_EVAL
-    if (set_sid != SID_NONE)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (ਸੈੱਟ_sid != SID_NONE)
     {
 	sctx_T script_ctx;
 
-	if (set_sid == 0)
+	ਜੇ (ਸੈੱਟ_sid == 0)
 	    script_ctx = current_sctx;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    script_ctx.sc_sid = set_sid;
+	    script_ctx.sc_sid = ਸੈੱਟ_sid;
 	    script_ctx.sc_seq = 0;
 	    script_ctx.sc_lnum = 0;
-	    script_ctx.sc_version = 1;
+	    script_ctx.sc_ਸੰਸਕਰਣ = 1;
 	}
-	set_option_sctx_idx(idx, opt_flags, script_ctx);
+	ਸੈੱਟ_option_sctx_idx(idx, opt_flags, script_ctx);
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Like set_string_option_direct(), but for a window-local option in "wp".
  * Blocks autocommands to avoid the old curwin becoming invalid.
  */
-    void
-set_string_option_direct_in_win(
+    ਖਾਲੀ
+ਸੈੱਟ_string_option_ਸਿੱਧਾ_ਵਿੱਚ_win(
 	win_T		*wp,
 	char_u		*name,
-	int		opt_idx,
+	ਪੂਰਨ		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	ਪੂਰਨ		opt_flags,
+	ਪੂਰਨ		ਸੈੱਟ_sid)
 {
     win_T	*save_curwin = curwin;
 
-    block_autocmds();
+    ਖੰਡ_autocmds();
     curwin = wp;
-    curbuf = curwin->w_buffer;
-    set_string_option_direct(name, opt_idx, val, opt_flags, set_sid);
+    curbuf = curwin->w_ਬਫਰ;
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ(name, opt_idx, val, opt_flags, ਸੈੱਟ_sid);
     curwin = save_curwin;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_ਬਫਰ;
     unblock_autocmds();
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ਜੇ defined(FEAT_PROP_POPUP)
 /*
  * Like set_string_option_direct(), but for a buffer-local option in "buf".
  * Blocks autocommands to avoid the old curbuf becoming invalid.
  */
-    void
-set_string_option_direct_in_buf(
+    ਖਾਲੀ
+ਸੈੱਟ_string_option_ਸਿੱਧਾ_ਵਿੱਚ_buf(
 	buf_T		*buf,
 	char_u		*name,
-	int		opt_idx,
+	ਪੂਰਨ		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	ਪੂਰਨ		opt_flags,
+	ਪੂਰਨ		ਸੈੱਟ_sid)
 {
     buf_T	*save_curbuf = curbuf;
 
-    block_autocmds();
+    ਖੰਡ_autocmds();
     curbuf = buf;
-    curwin->w_buffer = curbuf;
-    set_string_option_direct(name, opt_idx, val, opt_flags, set_sid);
+    curwin->w_ਬਫਰ = curbuf;
+    ਸੈੱਟ_string_option_ਸਿੱਧਾ(name, opt_idx, val, opt_flags, ਸੈੱਟ_sid);
     curbuf = save_curbuf;
-    curwin->w_buffer = curbuf;
+    curwin->w_ਬਫਰ = curbuf;
     unblock_autocmds();
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set a string option to a new value, and handle the effects.
  *
  * Returns NULL on success or an untranslated error message on error.
  */
-    char *
-set_string_option(
-    int		opt_idx,
-    char_u	*value,
-    int		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
-    char	*errbuf,
+    ਅੱਖਰ *
+ਸੈੱਟ_string_option(
+    ਪੂਰਨ		opt_idx,
+    char_u	*ਮੁੱਲ,
+    ਪੂਰਨ		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
+    ਅੱਖਰ	*errbuf,
     size_t	errbuflen)
 {
     char_u	*s;
     char_u	**varp;
     char_u	*oldval;
-#if defined(FEAT_EVAL)
-    char_u	*oldval_l = NULL;
-    char_u	*oldval_g = NULL;
-    char_u	*saved_oldval = NULL;
-    char_u	*saved_oldval_l = NULL;
-    char_u	*saved_oldval_g = NULL;
-    char_u	*saved_newval = NULL;
-#endif
-    char	*errmsg = NULL;
-    int		value_checked = FALSE;
+#ਜੇ defined(FEAT_EVAL)
+    char_u	*oldval_l = ਨਿਰਾ;
+    char_u	*oldval_g = ਨਿਰਾ;
+    char_u	*saved_oldval = ਨਿਰਾ;
+    char_u	*saved_oldval_l = ਨਿਰਾ;
+    char_u	*saved_oldval_g = ਨਿਰਾ;
+    char_u	*saved_newval = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
+    ਪੂਰਨ		ਮੁੱਲ_checked = FALSE;
 
-    if (is_hidden_option(opt_idx))	// don't set hidden option
-	return NULL;
+    ਜੇ (is_hidden_option(opt_idx))	// don't set hidden option
+	ਵਾਪਸ ਨਿਰਾ;
 
-    s = vim_strsave(value == NULL ? (char_u *)"" : value);
-    if (s == NULL)
-	return NULL;
+    s = vim_strsave(ਮੁੱਲ == ਨਿਰਾ ? (char_u *)"" : ਮੁੱਲ);
+    ਜੇ (s == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     varp = (char_u **)get_option_varp_scope(opt_idx,
 	    (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
@@ -603,37 +603,37 @@ set_string_option(
 		? OPT_GLOBAL : OPT_LOCAL)
 	    : opt_flags);
     oldval = *varp;
-#if defined(FEAT_EVAL)
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+#ਜੇ defined(FEAT_EVAL)
+    ਜੇ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	oldval_l = *(char_u **)get_option_varp_scope(opt_idx, OPT_LOCAL);
 	oldval_g = *(char_u **)get_option_varp_scope(opt_idx, OPT_GLOBAL);
     }
-#endif
+#ਜੇ_ਅੰਤ
     *varp = s;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#ਜੇ defined(FEAT_EVAL)
+    ਜੇ (!starting
 # ifdef FEAT_CRYPT
-	    && !is_crypt_key_option(opt_idx)
+	    && !is_crypt_ਕੁੰਜੀ_option(opt_idx)
 # endif
        )
     {
-	if (oldval_l != NULL)
+	ਜੇ (oldval_l != ਨਿਰਾ)
 	    saved_oldval_l = vim_strsave(oldval_l);
-	if (oldval_g != NULL)
+	ਜੇ (oldval_g != ਨਿਰਾ)
 	    saved_oldval_g = vim_strsave(oldval_g);
 	saved_oldval = vim_strsave(oldval);
 	saved_newval = vim_strsave(s);
     }
-#endif
-    if ((errmsg = did_set_string_option(opt_idx, varp, oldval, value, errbuf,
-		    errbuflen, opt_flags, OP_NONE, &value_checked)) == NULL)
-	did_set_option(opt_idx, opt_flags, TRUE, value_checked);
+#ਜੇ_ਅੰਤ
+    ਜੇ ((errmsg = did_ਸੈੱਟ_string_option(opt_idx, varp, oldval, ਮੁੱਲ, errbuf,
+		    errbuflen, opt_flags, OP_NONE, &ਮੁੱਲ_checked)) == ਨਿਰਾ)
+	did_ਸੈੱਟ_option(opt_idx, opt_flags, TRUE, ਮੁੱਲ_checked);
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
     // call autocommand after handling side effects
-    if (errmsg == NULL)
+    ਜੇ (errmsg == ਨਿਰਾ)
 	trigger_optionset_string(opt_idx, opt_flags,
 		saved_oldval, saved_oldval_l,
 		saved_oldval_g, saved_newval);
@@ -641,324 +641,324 @@ set_string_option(
     vim_free(saved_oldval_l);
     vim_free(saved_oldval_g);
     vim_free(saved_newval);
-#endif
-    return errmsg;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ errmsg;
 }
 
 /*
  * Return TRUE if "val" is a valid 'filetype' name.
  * Also used for 'syntax' and 'keymap'.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 valid_filetype(char_u *val)
 {
-    return valid_name(val, ".-_");
+    ਵਾਪਸ valid_name(val, ".-_");
 }
 
-#ifdef FEAT_STL_OPT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
 /*
  * Check validity of options with the 'statusline' format.
  * Return an untranslated error message or NULL.
  */
-    static char *
+    ਸਥਿਰ ਅੱਖਰ *
 check_stl_option(char_u *s)
 {
-    int		groupdepth = 0;
-    static char errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    ਪੂਰਨ		groupdepth = 0;
+    ਸਥਿਰ ਅੱਖਰ errbuf[ERR_BUFLEN];
+    ਪੂਰਨ		errbuflen = ERR_BUFLEN;
 
-    while (*s)
+    ਜਦੋਂ (*s)
     {
 	// Check for valid keys after % sequences
-	while (*s && *s != '%')
+	ਜਦੋਂ (*s && *s != '%')
 	    s++;
-	if (!*s)
-	    break;
+	ਜੇ (!*s)
+	    ਰੋਕੋ;
 	s++;
-	if (*s == STL_CLICKFUNC)
+	ਜੇ (*s == STL_CLICKFUNC)
 	{
-	    if (s[1] == ']')
+	    ਜੇ (s[1] == ']')
 	    {
 		// %[] - end click region
 		s += 2;
-		continue;
+		ਜਾਰੀ;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    ਜੇ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		// %[FuncName] - start click region
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		ਜੇ (rb != ਨਿਰਾ)
 		{
 		    s = rb + 1;
-		    continue;
+		    ਜਾਰੀ;
 		}
 	    }
 	    // Bare %[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    ਵਾਪਸ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	ਜੇ (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
 	    s++;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
+	ਜੇ (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
 	{
 	    s++;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (*s == ')')
+	ਜੇ (*s == ')')
 	{
 	    s++;
-	    if (--groupdepth < 0)
-		break;
-	    continue;
+	    ਜੇ (--groupdepth < 0)
+		ਰੋਕੋ;
+	    ਜਾਰੀ;
 	}
-	if (*s == '-')
+	ਜੇ (*s == '-')
 	    s++;
-	while (VIM_ISDIGIT(*s))
+	ਜਦੋਂ (VIM_ISDIGIT(*s))
 	    s++;
-	if (*s == STL_USER_HL)
-	    continue;
-	if (*s == STL_CLICKFUNC)
+	ਜੇ (*s == STL_USER_HL)
+	    ਜਾਰੀ;
+	ਜੇ (*s == STL_CLICKFUNC)
 	{
 	    // %N[FuncName] or %N[]
-	    if (s[1] == ']')
+	    ਜੇ (s[1] == ']')
 	    {
 		s += 2;
-		continue;
+		ਜਾਰੀ;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    ਜੇ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		ਜੇ (rb != ਨਿਰਾ)
 		{
 		    s = rb + 1;
-		    continue;
+		    ਜਾਰੀ;
 		}
 	    }
 	    // Bare %N[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    ਵਾਪਸ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	ਜੇ (*s == STL_LINEBREAK)
 	{
 	    // %N@ - line break
 	    s++;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (*s == '.')
+	ਜੇ (*s == '.')
 	{
 	    s++;
-	    while (*s && VIM_ISDIGIT(*s))
+	    ਜਦੋਂ (*s && VIM_ISDIGIT(*s))
 		s++;
 	}
-	if (*s == '(')
+	ਜੇ (*s == '(')
 	{
 	    groupdepth++;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	ਜੇ (vim_strchr(STL_ALL, *s) == ਨਿਰਾ)
 	{
-	    return illegal_char(errbuf, errbuflen, *s);
+	    ਵਾਪਸ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == '{')
+	ਜੇ (*s == '{')
 	{
-	    int reevaluate = (*++s == '%');
+	    ਪੂਰਨ reevaluate = (*++s == '%');
 
-	    if (reevaluate && *++s == '}')
+	    ਜੇ (reevaluate && *++s == '}')
 		// "}" is not allowed immediately after "%{%"
-		return illegal_char(errbuf, errbuflen, '}');
-	    while ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
+		ਵਾਪਸ illegal_char(errbuf, errbuflen, '}');
+	    ਜਦੋਂ ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
 		s++;
-	    if (*s != '}')
-		return e_unclosed_expression_sequence;
+	    ਜੇ (*s != '}')
+		ਵਾਪਸ e_unclosed_ਵਿਅੰਜਕ_sequence;
 	}
     }
-    if (groupdepth != 0)
-	return e_unbalanced_groups;
-    return NULL;
+    ਜੇ (groupdepth != 0)
+	ਵਾਪਸ e_unbalanced_groups;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Check for a "normal" directory or file name in some options.  Disallow a
  * path separator (slash and/or backslash), wildcards and characters that are
  * often illegal in a file name. Be more permissive if "secure" is off.
  */
-    static int
-check_illegal_path_names(int opt_idx, char_u **varp)
+    ਸਥਿਰ ਪੂਰਨ
+check_illegal_ਰਸਤਾ_ਨਾਂ(ਪੂਰਨ opt_idx, char_u **varp)
 {
-    return (((get_option_flags(opt_idx) & P_NFNAME)
+    ਵਾਪਸ (((get_option_flags(opt_idx) & P_NFNAME)
 		&& vim_strpbrk(*varp, (char_u *)(secure
-			? "/\\*?[|;&<>\r\n" : "/\\*?[<>\r\n")) != NULL)
+			? "/\\*?[|;&<>\r\n" : "/\\*?[<>\r\n")) != ਨਿਰਾ)
 	    || ((get_option_flags(opt_idx) & P_NDNAME)
-		&& vim_strpbrk(*varp, (char_u *)"*?[|;&<>\r\n") != NULL));
+		&& vim_strpbrk(*varp, (char_u *)"*?[|;&<>\r\n") != ਨਿਰਾ));
 }
 
 /*
  * An option that accepts a list of flags is changed.
  * e.g. 'viewoptions', 'switchbuf', 'casemap', etc.
  */
-    static char *
-did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
+    ਸਥਿਰ ਅੱਖਰ *
+did_ਸੈੱਟ_opt_flags(char_u *val, ਅੱਖਰ **ਮੁੱਲਾਂ, ਬਿਨਾਨਿਸ਼ਾਨੀ *flagp, ਪੂਰਨ list)
 {
-    if (opt_strings_flags(val, values, flagp, list) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(val, ਮੁੱਲਾਂ, flagp, list) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * An option that accepts a list of string values is changed.
  * e.g. 'nrformats', 'scrollopt', 'wildoptions', etc.
  */
-    static char *
-did_set_opt_strings(char_u *val, char **values, int list)
+    ਸਥਿਰ ਅੱਖਰ *
+did_ਸੈੱਟ_opt_ਲੜੀਆਂ(char_u *val, ਅੱਖਰ **ਮੁੱਲਾਂ, ਪੂਰਨ list)
 {
-    return did_set_opt_flags(val, values, NULL, list);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(val, ਮੁੱਲਾਂ, ਨਿਰਾ, list);
 }
 
 /*
  * An option which is a list of flags is set.  Valid values are in 'flags'.
  */
-    static char *
-did_set_option_listflag(
+    ਸਥਿਰ ਅੱਖਰ *
+did_ਸੈੱਟ_option_listflag(
 	char_u *val,
 	char_u *flags,
-	char *errbuf,
+	ਅੱਖਰ *errbuf,
 	size_t errbuflen)
 {
     char_u	*s;
 
-    for (s = val; *s; ++s)
-	if (vim_strchr(flags, *s) == NULL)
-	    return illegal_char(errbuf, errbuflen, *s);
+    ਲਈ (s = val; *s; ++s)
+	ਜੇ (vim_strchr(flags, *s) == ਨਿਰਾ)
+	    ਵਾਪਸ illegal_char(errbuf, errbuflen, *s);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Expand an option that accepts a list of fixed string values with known
  * number of items.
  */
-    static int
-expand_set_opt_string(
-	optexpand_T *args,
-	char **values,
-	size_t numValues,
-	int *numMatches,
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_opt_string(
+	optexpand_T *ਦਲੀਲਾਂ,
+	ਅੱਖਰ **ਮੁੱਲਾਂ,
+	size_t ਅੰਕ_ਮੁੱਲਾਂ,
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches)
 {
     char_u	*p;
-    regmatch_T	*regmatch = args->oe_regmatch;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    regmatch_T	*regmatch = ਦਲੀਲਾਂ->oe_regmatch;
+    ਪੂਰਨ		include_orig_val = ਦਲੀਲਾਂ->oe_include_orig_val;
+    char_u	*option_val = ਦਲੀਲਾਂ->oe_opt_ਮੁੱਲ;
 
     // Assume numValues is small since they are fixed enums, so just allocate
     // upfront instead of needing two passes to calculate output size.
-    *matches = ALLOC_MULT(char_u *, numValues + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, ਅੰਕ_ਮੁੱਲਾਂ + 1);
+    ਜੇ (*matches == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    int count = 0;
+    ਪੂਰਨ ਗਿਣਤੀ_2 = 0;
 
-    if (include_orig_val && *option_val != NUL)
+    ਜੇ (include_orig_val && *option_val != NUL)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[ਗਿਣਤੀ_2++] = p;
     }
 
-    for (char **val = values; *val != NULL; val++)
+    ਲਈ (ਅੱਖਰ **val = ਮੁੱਲਾਂ; *val != ਨਿਰਾ; val++)
     {
-	if (include_orig_val && *option_val != NUL)
+	ਜੇ (include_orig_val && *option_val != NUL)
 	{
-	    if (STRCMP((char_u*)*val, option_val) == 0)
-		continue;
+	    ਜੇ (STRCMP((char_u*)*val, option_val) == 0)
+		ਜਾਰੀ;
 	}
-	if (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
+	ਜੇ (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
 	{
 	    p = vim_strsave((char_u*)*val);
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 	    {
-		if (count == 0)
+		ਜੇ (ਗਿਣਤੀ_2 == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
-		else
-		    break;
+		ਨਹੀਂਤਾਂ
+		    ਰੋਕੋ;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[ਗਿਣਤੀ_2++] = p;
 	}
     }
-    if (count == 0)
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *ਅੰਕ_Matches = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
-static char_u *set_opt_callback_orig_option = NULL;
-static char_u *((*set_opt_callback_func)(expand_T *, int));
+ਸਥਿਰ char_u *ਸੈੱਟ_opt_callback_orig_option = ਨਿਰਾ;
+ਸਥਿਰ char_u *((*ਸੈੱਟ_opt_callback_func)(expand_T *, ਪੂਰਨ));
 
 /*
  * Callback used by expand_set_opt_generic to also include the original value
  * as the first item.
  */
-    static char_u *
-expand_set_opt_generic_cb(expand_T *xp, int idx)
+    ਸਥਿਰ char_u *
+expand_ਸੈੱਟ_opt_generic_cb(expand_T *xp, ਪੂਰਨ idx)
 {
-    if (idx == 0)
+    ਜੇ (idx == 0)
     {
-	if (set_opt_callback_orig_option != NULL)
-	    return set_opt_callback_orig_option;
-	else
-	    return (char_u *)""; // empty strings are ignored
+	ਜੇ (ਸੈੱਟ_opt_callback_orig_option != ਨਿਰਾ)
+	    ਵਾਪਸ ਸੈੱਟ_opt_callback_orig_option;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ (char_u *)""; // empty strings are ignored
     }
-    return set_opt_callback_func(xp, idx - 1);
+    ਵਾਪਸ ਸੈੱਟ_opt_callback_func(xp, idx - 1);
 }
 
 /*
  * Expand an option with a callback that iterates through a list of possible
  * names using an index.
  */
-    static int
-expand_set_opt_generic(
-	optexpand_T *args,
-	char_u *((*func)(expand_T *, int)),
-	int *numMatches,
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_opt_generic(
+	optexpand_T *ਦਲੀਲਾਂ,
+	char_u *((*func)(expand_T *, ਪੂਰਨ)),
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches)
 {
-    int ret;
+    ਪੂਰਨ ret;
 
-    set_opt_callback_orig_option = args->oe_include_orig_val ?
-	args->oe_opt_value : NULL;
-    set_opt_callback_func = func;
+    ਸੈੱਟ_opt_callback_orig_option = ਦਲੀਲਾਂ->oe_include_orig_val ?
+	ਦਲੀਲਾਂ->oe_opt_ਮੁੱਲ : ਨਿਰਾ;
+    ਸੈੱਟ_opt_callback_func = func;
 
     ret = ExpandGeneric(
 	    (char_u*)"", // not using fuzzy as currently EXPAND_STRING_SETTING doesn't use it
-	    args->oe_xp,
-	    args->oe_regmatch,
+	    ਦਲੀਲਾਂ->oe_xp,
+	    ਦਲੀਲਾਂ->oe_regmatch,
 	    matches,
-	    numMatches,
-	    expand_set_opt_generic_cb,
+	    ਅੰਕ_Matches,
+	    expand_ਸੈੱਟ_opt_generic_cb,
 	    FALSE);
 
-    set_opt_callback_orig_option = NULL;
-    set_opt_callback_func = NULL;
-    return ret;
+    ਸੈੱਟ_opt_callback_orig_option = ਨਿਰਾ;
+    ਸੈੱਟ_opt_callback_func = ਨਿਰਾ;
+    ਵਾਪਸ ret;
 }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-static garray_T *expand_cb_ga;
-static optexpand_T *expand_cb_args;
+#ਜੇ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+ਸਥਿਰ garray_T *expand_cb_ga;
+ਸਥਿਰ optexpand_T *expand_cb_ਦਲੀਲਾਂ;
 
 /*
  * Callback provided to a function in expand_set_opt_callback. Will perform
@@ -967,35 +967,35 @@ static optexpand_T *expand_cb_args;
  * Returns OK usually. Returns FAIL if it failed to allocate memory, and the
  * caller should terminate the enumeration.
  */
-    static int
-expand_set_opt_callback_cb(char_u *val)
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_opt_callback_cb(char_u *val)
 {
-    regmatch_T	*regmatch = expand_cb_args->oe_regmatch;
-    expand_T	*xp = expand_cb_args->oe_xp;
+    regmatch_T	*regmatch = expand_cb_ਦਲੀਲਾਂ->oe_regmatch;
+    expand_T	*xp = expand_cb_ਦਲੀਲਾਂ->oe_xp;
     garray_T	*ga = expand_cb_ga;
     char_u	*str;
 
-    if (val == NULL || *val == NUL)
-	return OK;
+    ਜੇ (val == ਨਿਰਾ || *val == NUL)
+	ਵਾਪਸ OK;
 
-    if (xp->xp_pattern[0] != NUL &&
+    ਜੇ (xp->xp_ਨਮੂਨਾ[0] != NUL &&
 	    !vim_regexec(regmatch, val, (colnr_T)0))
-	return OK;
+	ਵਾਪਸ OK;
 
     str = vim_strsave_escaped(val, (char_u *)" \t\\");
 
-    if (str == NULL)
-	return FAIL;
+    ਜੇ (str == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    if (ga_grow(ga, 1) == FAIL)
+    ਜੇ (ga_grow(ga, 1) == FAIL)
     {
 	vim_free(str);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    ((char_u **)ga->ga_data)[ga->ga_len] = str;
+    ((char_u **)ga->ga_ਅੰਕੜੇ)[ga->ga_len] = str;
     ++ga->ga_len;
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1006,191 +1006,191 @@ expand_set_opt_callback_cb(char_u *val)
  * "func" is the enumerator function that will generate the list of options.
  * "func_params" is a single parameter that will be passed to func.
  */
-    static int
-expand_set_opt_callback(
-	optexpand_T *args,
-	void (*func)(optexpand_T *, void* params, int (*cb)(char_u *val)),
-	void *func_params,
-	int *numMatches,
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_opt_callback(
+	optexpand_T *ਦਲੀਲਾਂ,
+	ਖਾਲੀ (*func)(optexpand_T *, ਖਾਲੀ* params, ਪੂਰਨ (*cb)(char_u *val)),
+	ਖਾਲੀ *func_params,
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches)
 {
     garray_T	ga;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    ਪੂਰਨ		include_orig_val = ਦਲੀਲਾਂ->oe_include_orig_val;
+    char_u	*option_val = ਦਲੀਲਾਂ->oe_opt_ਮੁੱਲ;
 
-    ga_init2(&ga, sizeof(char *), 30);
+    ga_init2(&ga, ਆਕਾਰ(ਅੱਖਰ *), 30);
 
-    if (include_orig_val && *option_val != NUL)
+    ਜੇ (include_orig_val && *option_val != NUL)
     {
 	char_u *p = vim_strsave(option_val);
-	if (p == NULL)
-	    return FAIL;
-	if (ga_grow(&ga, 1) == FAIL)
+	ਜੇ (p == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	((char_u **)ga.ga_data)[ga.ga_len] = p;
+	((char_u **)ga.ga_ਅੰਕੜੇ)[ga.ga_len] = p;
 	++ga.ga_len;
     }
 
     expand_cb_ga = &ga;
-    expand_cb_args = args;
+    expand_cb_ਦਲੀਲਾਂ = ਦਲੀਲਾਂ;
 
-    func(args, func_params, expand_set_opt_callback_cb);
+    func(ਦਲੀਲਾਂ, func_params, expand_ਸੈੱਟ_opt_callback_cb);
 
-    expand_cb_ga = NULL;
-    expand_cb_args = NULL;
+    expand_cb_ga = ਨਿਰਾ;
+    expand_cb_ਦਲੀਲਾਂ = ਨਿਰਾ;
 
-    *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
-    return OK;
+    *matches = ga.ga_ਅੰਕੜੇ;
+    *ਅੰਕ_Matches = ga.ga_len;
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Expand an option which is a list of flags.
  */
-    static int
-expand_set_opt_listflag(
-	optexpand_T *args,
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_opt_listflag(
+	optexpand_T *ਦਲੀਲਾਂ,
 	char_u *flags,
-	int *numMatches,
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches)
 {
     char_u  *p;
-    char_u  *option_val = args->oe_opt_value;
-    char_u  *cmdline_val = args->oe_set_arg;
-    int	    append = args->oe_append;
-    int	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
+    char_u  *option_val = ਦਲੀਲਾਂ->oe_opt_ਮੁੱਲ;
+    char_u  *cmdline_val = ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg;
+    ਪੂਰਨ	    append = ਦਲੀਲਾਂ->oe_append;
+    ਪੂਰਨ	    include_orig_val = ਦਲੀਲਾਂ->oe_include_orig_val && (*option_val != NUL);
 
-    size_t num_flags = STRLEN(flags);
+    size_t ਅੰਕ_flags = STRLEN(flags);
 
     // Assume we only have small number of flags, so just allocate max size.
-    *matches = ALLOC_MULT(char_u *, num_flags + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, ਅੰਕ_flags + 1);
+    ਜੇ (*matches == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    int count = 0;
+    ਪੂਰਨ ਗਿਣਤੀ_2 = 0;
 
-    if (include_orig_val)
+    ਜੇ (include_orig_val)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[ਗਿਣਤੀ_2++] = p;
     }
 
-    for (char_u *flag = flags; *flag != NUL; flag++)
+    ਲਈ (char_u *flag = flags; *flag != NUL; flag++)
     {
-	if (append && vim_strchr(option_val, *flag) != NULL)
-	    continue;
+	ਜੇ (append && vim_strchr(option_val, *flag) != ਨਿਰਾ)
+	    ਜਾਰੀ;
 
-	if (vim_strchr(cmdline_val, *flag) == NULL)
+	ਜੇ (vim_strchr(cmdline_val, *flag) == ਨਿਰਾ)
 	{
-	    if (include_orig_val
+	    ਜੇ (include_orig_val
 		    && option_val[1] == NUL
 		    && *flag == option_val[0])
 	    {
 		// This value is already used as the first choice as it's the
 		// existing flag. Just skip it to avoid duplicate.
-		continue;
+		ਜਾਰੀ;
 	    }
 	    p = vim_strnsave(flag, 1);
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 	    {
-		if (count == 0)
+		ਜੇ (ਗਿਣਤੀ_2 == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
-		else
-		    break;
+		ਨਹੀਂਤਾਂ
+		    ਰੋਕੋ;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[ਗਿਣਤੀ_2++] = p;
 	}
     }
 
-    if (count == 0)
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *ਅੰਕ_Matches = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
 /*
  * The 'ambiwidth' option is changed.
  */
-    char *
-did_set_ambiwidth(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_ambiwidth(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_ambw, p_ambw_values, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_ambw, p_ambw_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return check_chars_options();
+    ਵਾਪਸ check_chars_options();
 }
 
 // "name" must be a string literal, the length is computed at compile time.
-#define completing_value_for_subopt(args, name) \
-	  completing_value_for_subopt_len(args, name, (int)STRLEN_LITERAL(name))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, name) \
+	  completing_ਮੁੱਲ_for_subopt_len(ਦਲੀਲਾਂ, name, (ਪੂਰਨ)STRLEN_LITERAL(name))
 
 /*
  * Return true when completing the value of the sub-option "name" with length
  * "len", e.g. the value after "close:" in 'completepopup'.
  */
-    static bool
-completing_value_for_subopt_len(optexpand_T *args, char *name, int len)
+    ਸਥਿਰ bool
+completing_ਮੁੱਲ_for_subopt_len(optexpand_T *ਦਲੀਲਾਂ, ਅੱਖਰ *name, ਪੂਰਨ len)
 {
-    char_u  *colon = args->oe_xp->xp_pattern - 1;
-    int	    off = (int)(colon - args->oe_set_arg);
+    char_u  *colon = ਦਲੀਲਾਂ->oe_xp->xp_ਨਮੂਨਾ - 1;
+    ਪੂਰਨ	    off = (ਪੂਰਨ)(colon - ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg);
 
-    if (off < len)
-	return false;
+    ਜੇ (off < len)
+	ਵਾਪਸ false;
     // The name must follow a comma when it does not start the option value.
-    if (off > len && *(colon - len - 1) != ',')
-	return false;
+    ਜੇ (off > len && *(colon - len - 1) != ',')
+	ਵਾਪਸ false;
 
-    return STRNCMP(colon - len, name, len) == 0;
+    ਵਾਪਸ STRNCMP(colon - len, name, len) == 0;
 }
 
-    int
-expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_ambiwidth(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ambw_values,
-	    ARRAY_LENGTH(p_ambw_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ambw_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ambw_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'background' option is changed.
  */
-    char *
-did_set_background(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_background(optset_T *ਦਲੀਲਾਂ)
 {
-    if (check_opt_strings(p_bg, p_bg_values, FALSE) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_bg, p_bg_ਮੁੱਲਾਂ, FALSE) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    if (args->os_oldval.string != NULL && args->os_oldval.string[0] == *p_bg)
+    ਜੇ (ਦਲੀਲਾਂ->os_oldval.string != ਨਿਰਾ && ਦਲੀਲਾਂ->os_oldval.string[0] == *p_bg)
 	// Value was not changed
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
 
-#ifdef FEAT_EVAL
-    int dark = (*p_bg == 'd');
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਪੂਰਨ dark = (*p_bg == 'd');
+#ਜੇ_ਅੰਤ
 
     init_highlight(FALSE, FALSE);
 
-#ifdef FEAT_EVAL
-    if (dark != (*p_bg == 'd')
-	    && get_var_value((char_u *)"g:colors_name") != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਜੇ (dark != (*p_bg == 'd')
+	    && get_var_ਮੁੱਲ((char_u *)"g:colors_name") != ਨਿਰਾ)
     {
 	// The color scheme must have set 'background' back to another
 	// value, that's not what we want here.  Disable the color
@@ -1201,398 +1201,398 @@ did_set_background(optset_T *args)
 	check_string_option(&p_bg);
 	init_highlight(FALSE, FALSE);
     }
-#endif
-#ifdef FEAT_TERMINAL
-    term_update_colors_all();
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+    ਪਦ_update_colors_all();
+#ਜੇ_ਅੰਤ
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_background(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bg_values,
-	    ARRAY_LENGTH(p_bg_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bg_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bg_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'backspace' option is changed.
  */
-    char *
-did_set_backspace(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_backspace(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (VIM_ISDIGIT(*p_bs))
+    ਜੇ (VIM_ISDIGIT(*p_bs))
     {
-	if (*p_bs > '3' || p_bs[1] != NUL)
-	    return e_invalid_argument;
+	ਜੇ (*p_bs > '3' || p_bs[1] != NUL)
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
-    else if (check_opt_strings(p_bs, p_bs_values, TRUE) != OK)
-	return e_invalid_argument;
+    ਨਹੀਂਤਾਂ ਜੇ (check_opt_ਲੜੀਆਂ(p_bs, p_bs_ਮੁੱਲਾਂ, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_backspace(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bs_values,
-	    ARRAY_LENGTH(p_bs_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bs_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bs_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'backupcopy' option is changed.
  */
-    char *
-did_set_backupcopy(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_backupcopy(optset_T *ਦਲੀਲਾਂ)
 {
     char_u		*bkc = p_bkc;
-    unsigned int	*flags = &bkc_flags;
-    char		*errmsg = NULL;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ	*flags = &bkc_flags;
+    ਅੱਖਰ		*errmsg = ਨਿਰਾ;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
     {
 	bkc = curbuf->b_p_bkc;
 	flags = &curbuf->b_bkc_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    ਨਹੀਂਤਾਂ ਜੇ (!(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_bkc_flags = 0;
 
-    if ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) && *bkc == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (opt_strings_flags(bkc, p_bkc_values, flags, TRUE) != OK)
-	    errmsg = e_invalid_argument;
-	if ((((int)*flags & BKC_AUTO) != 0)
-		+ (((int)*flags & BKC_YES) != 0)
-		+ (((int)*flags & BKC_NO) != 0) != 1)
+	ਜੇ (opt_ਲੜੀਆਂ_flags(bkc, p_bkc_ਮੁੱਲਾਂ, flags, TRUE) != OK)
+	    errmsg = e_invalid_ਦਲੀਲ;
+	ਜੇ ((((ਪੂਰਨ)*flags & BKC_AUTO) != 0)
+		+ (((ਪੂਰਨ)*flags & BKC_YES) != 0)
+		+ (((ਪੂਰਨ)*flags & BKC_NO) != 0) != 1)
 	{
 	    // Must have exactly one of "auto", "yes"  and "no".
-	    (void)opt_strings_flags(args->os_oldval.string, p_bkc_values,
+	    (ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(ਦਲੀਲਾਂ->os_oldval.string, p_bkc_ਮੁੱਲਾਂ,
 								  flags, TRUE);
-	    errmsg = e_invalid_argument;
+	    errmsg = e_invalid_ਦਲੀਲ;
 	}
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
-    int
-expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_backupcopy(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bkc_values,
-	    ARRAY_LENGTH(p_bkc_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bkc_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bkc_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'backupext' or the 'patchmode' option is changed.
  */
-    char *
-did_set_backupext_or_patchmode(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_backupext_or_patchmode(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
+    ਜੇ (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
 		*p_pm == '.' ? p_pm + 1 : p_pm) == 0)
-	return e_backupext_and_patchmode_are_equal;
+	ਵਾਪਸ e_backupext_and_patchmode_are_equal;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'belloff' option is changed.
  */
-    char *
-did_set_belloff(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_belloff(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_bo, p_bo_values, &bo_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_bo, p_bo_ਮੁੱਲਾਂ, &bo_flags, TRUE);
 }
 
-    int
-expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_belloff(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bo_values,
-	    ARRAY_LENGTH(p_bo_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bo_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bo_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#ਜੇ defined(FEAT_LINEBREAK)
 /*
  * The 'breakat' option is changed.
  */
-    char *
-did_set_breakat(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_breakat(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*p;
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < 256; i++)
+    ਲਈ (i = 0; i < 256; i++)
 	breakat_flags[i] = FALSE;
 
-    if (p_breakat != NULL)
-	for (p = p_breakat; *p; p++)
+    ਜੇ (p_breakat != ਨਿਰਾ)
+	ਲਈ (p = p_breakat; *p; p++)
 	    breakat_flags[*p] = TRUE;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'breakindentopt' option is changed.
  */
-    char *
-did_set_breakindentopt(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_breakindentopt(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : NULL)
+    ਜੇ (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : ਨਿਰਾ)
 								      == FAIL)
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // list setting requires a redraw
-    if (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
+    ਜੇ (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_breakindentopt(
-    optexpand_T		*args,
-    int			*numMatches,
+    ਪੂਰਨ
+expand_ਸੈੱਟ_breakindentopt(
+    optexpand_T		*ਦਲੀਲਾਂ,
+    ਪੂਰਨ			*ਅੰਕ_Matches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_briopt_values,
-	    ARRAY_LENGTH(p_briopt_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_briopt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_briopt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_BROWSE)
+#ਜੇ defined(FEAT_BROWSE)
 /*
  * The 'browsedir' option is changed.
  */
-    char *
-did_set_browsedir(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_browsedir(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_bsdir, p_bsdir_values, FALSE) != OK
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_bsdir, p_bsdir_ਮੁੱਲਾਂ, FALSE) != OK
 	    && !mch_isdir(p_bsdir))
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_browsedir(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bsdir_values,
-	    ARRAY_LENGTH(p_bsdir_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bsdir_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bsdir_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'bufhidden' option is changed.
  */
-    char *
-did_set_bufhidden(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_bufhidden(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_values, FALSE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(curbuf->b_p_bh, p_bufhidden_ਮੁੱਲਾਂ, FALSE);
 }
 
-    int
-expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_bufhidden(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_bufhidden_values,
-	    ARRAY_LENGTH(p_bufhidden_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_bufhidden_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_bufhidden_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'buftype' option is changed.
  */
-    char *
-did_set_buftype(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_buftype(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(curbuf->b_p_bt, p_buftype_values, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(curbuf->b_p_bt, p_buftype_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    if (curwin->w_status_height)
+    ਜੇ (curwin->w_ਸਥਿਤੀ_ਉਚਾਈ)
     {
-	curwin->w_redr_status = true;
+	curwin->w_redr_ਸਥਿਤੀ = true;
 	redraw_later(UPD_VALID);
     }
     curbuf->b_help = (curbuf->b_p_bt[0] == 'h');
     redraw_titles();
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_buftype(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_buftype_values,
-	    ARRAY_LENGTH(p_buftype_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_buftype_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_buftype_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'casemap' option is changed.
  */
-    char *
-did_set_casemap(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_casemap(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_cmp, p_cmp_ਮੁੱਲਾਂ, &cmp_flags, TRUE);
 }
 
-    int
-expand_set_casemap(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_casemap(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_cmp_values,
-	    ARRAY_LENGTH(p_cmp_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cmp_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cmp_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(HAVE_CLIPMETHOD)
-    int
-expand_set_clipboard(optexpand_T *args, int *numMatches, char_u ***matches)
+#ਜੇ defined(HAVE_CLIPMETHOD)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_clipboard(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_cb_values,
-	    ARRAY_LENGTH(p_cb_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cb_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cb_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_CLIPMETHOD
-    char *
-did_set_clipmethod(optset_T *args UNUSED)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CLIPMETHOD
+    ਅੱਖਰ *
+did_ਸੈੱਟ_clipmethod(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return choose_clipmethod();
+    ਵਾਪਸ ਚੁਣੋ_clipmethod();
 }
 
-    int
-expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_clipmethod(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
     // We want to expand using the predefined clipmethod values + clipboard
     // provider names.
-    int		result;
-    char	**values;
-    int		count, pos = 0, start = 0;
+    ਪੂਰਨ		ਨਤੀਜਾ;
+    ਅੱਖਰ	**ਮੁੱਲਾਂ;
+    ਪੂਰਨ		ਗਿਣਤੀ_2, pos = 0, ਸ਼ੁਰੂ = 0;
 # ifdef FEAT_EVAL
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
-# else
-    dict_T	*providers = NULL;
+# ਨਹੀਂਤਾਂ
+    dict_T	*providers = ਨਿਰਾ;
 # endif
-    hashtab_T	*ht = providers == NULL ? NULL : &providers->dv_hashtab;
+    hashtab_T	*ht = providers == ਨਿਰਾ ? ਨਿਰਾ : &providers->dv_hashtab;
 
-    count = (ht == NULL ? 0 : ht->ht_used);
+    ਗਿਣਤੀ_2 = (ht == ਨਿਰਾ ? 0 : ht->ht_ਵਰਤਿਆ);
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    count++;
-    start++;
+    ਗਿਣਤੀ_2++;
+    ਸ਼ੁਰੂ++;
 # endif
 # ifdef FEAT_XCLIPBOARD
-    count++;
-    start++;
+    ਗਿਣਤੀ_2++;
+    ਸ਼ੁਰੂ++;
 # endif
-    values = ALLOC_MULT(char *, count + 1); // Add NULL terminator too
+    ਮੁੱਲਾਂ = ALLOC_MULT(ਅੱਖਰ *, ਗਿਣਤੀ_2 + 1); // Add NULL terminator too
 
-    if (values == NULL)
-	return FAIL;
+    ਜੇ (ਮੁੱਲਾਂ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    values[pos++] = "wayland";
+    ਮੁੱਲਾਂ[pos++] = "wayland";
 # endif
 # ifdef FEAT_XCLIPBOARD
-    values[pos++] = "x11";
+    ਮੁੱਲਾਂ[pos++] = "x11";
 # endif
 
-    if (ht != NULL)
-	for (long_u i = 0; i < ht->ht_mask + 1; i++)
+    ਜੇ (ht != ਨਿਰਾ)
+	ਲਈ (long_u i = 0; i < ht->ht_ਨਕਾਬ + 1; i++)
 	{
 	    hashitem_T	*hi = ht->ht_array + i;
 
-	    if (!HASHITEM_EMPTY(hi))
-		values[pos++] = (char *)vim_strsave(hi->hi_key);
+	    ਜੇ (!HASHITEM_ਖਾਲੀ_ਥਾਵਾਂ(hi))
+		ਮੁੱਲਾਂ[pos++] = (ਅੱਖਰ *)vim_strsave(hi->hi_ਕੁੰਜੀ);
 	}
-    values[pos++] = NULL;
+    ਮੁੱਲਾਂ[pos++] = ਨਿਰਾ;
 
-    result = expand_set_opt_string(
-	    args,
-	    values,
-	    count,
-	    numMatches,
+    ਨਤੀਜਾ = expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    ਮੁੱਲਾਂ,
+	    ਗਿਣਤੀ_2,
+	    ਅੰਕ_Matches,
 	    matches);
 
-    for (int i = start; i < count; i++)
-	vim_free(values[i]);
-    vim_free(values);
+    ਲਈ (ਪੂਰਨ i = ਸ਼ੁਰੂ; i < ਗਿਣਤੀ_2; i++)
+	vim_free(ਮੁੱਲਾਂ[i]);
+    vim_free(ਮੁੱਲਾਂ);
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The global 'listchars' or 'fillchars' option is changed.
  */
-    static char *
-did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
-						char *errbuf, size_t errbuflen)
+    ਸਥਿਰ ਅੱਖਰ *
+did_ਸੈੱਟ_global_listfillchars(char_u *val, ਪੂਰਨ opt_lcs, ਪੂਰਨ opt_flags,
+						ਅੱਖਰ *errbuf, size_t errbuflen)
 {
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
     char_u	**local_ptr = opt_lcs ? &curwin->w_p_lcs : &curwin->w_p_fcs;
 
     // only apply the global value to "curwin" when it does not have a
     // local value
-    if (opt_lcs)
-	errmsg = set_listchars_option(curwin, val,
+    ਜੇ (opt_lcs)
+	errmsg = ਸੈੱਟ_listchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    else
-	errmsg = set_fillchars_option(curwin, val,
+    ਨਹੀਂਤਾਂ
+	errmsg = ਸੈੱਟ_fillchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    ਜੇ (errmsg != ਨਿਰਾ)
+	ਵਾਪਸ errmsg;
 
     tabpage_T	*tp;
     win_T	*wp;
 
     // If the current window is set to use the global
     // 'listchars'/'fillchars' value, clear the window-local value.
-    if (!(opt_flags & OPT_GLOBAL))
+    ਜੇ (!(opt_flags & OPT_GLOBAL))
 	clear_string_option(local_ptr);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
@@ -1600,168 +1600,168 @@ did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
 	// again, it was changed when setting the global value.
 	// If no error was returned above, we don't expect an error
 	// here, so ignore the return value.
-	if (opt_lcs)
+	ਜੇ (opt_lcs)
 	{
-	    if (*wp->w_p_lcs == NUL)
-		(void)set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
+	    ਜੇ (*wp->w_p_lcs == NUL)
+		(ਖਾਲੀ)ਸੈੱਟ_listchars_option(wp, wp->w_p_lcs, TRUE, ਨਿਰਾ, 0);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (*wp->w_p_fcs == NUL)
-		(void)set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
+	    ਜੇ (*wp->w_p_fcs == NUL)
+		(ਖਾਲੀ)ਸੈੱਟ_fillchars_option(wp, wp->w_p_fcs, TRUE, ਨਿਰਾ, 0);
 	}
     }
 
     redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'fillchars' option or the 'listchars' option is changed.
  */
-    char *
-did_set_chars_option(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_chars_option(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u **varp = (char_u **)args->os_varp;
-    char *errmsg = NULL;
+    char_u **varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
-    if (   varp == &p_lcs		// global 'listchars'
+    ਜੇ (   varp == &p_lcs		// global 'listchars'
 	|| varp == &p_fcs)		// global 'fillchars'
-	errmsg = did_set_global_listfillchars(*varp, varp == &p_lcs,
-			  args->os_flags, args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_lcs)	// local 'listchars'
-	errmsg = set_listchars_option(curwin, *varp, TRUE,
-					  args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_fcs)	// local 'fillchars'
-	errmsg = set_fillchars_option(curwin, *varp, TRUE,
-					  args->os_errbuf, args->os_errbuflen);
+	errmsg = did_ਸੈੱਟ_global_listfillchars(*varp, varp == &p_lcs,
+			  ਦਲੀਲਾਂ->os_flags, ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen);
+    ਨਹੀਂਤਾਂ ਜੇ (varp == &curwin->w_p_lcs)	// local 'listchars'
+	errmsg = ਸੈੱਟ_listchars_option(curwin, *varp, TRUE,
+					  ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen);
+    ਨਹੀਂਤਾਂ ਜੇ (varp == &curwin->w_p_fcs)	// local 'fillchars'
+	errmsg = ਸੈੱਟ_fillchars_option(curwin, *varp, TRUE,
+					  ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen);
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
 /*
  * Expand 'fillchars' or 'listchars' option value.
  */
-    int
-expand_set_chars_option(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_chars_option(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    char_u **varp = (char_u **)args->oe_varp;
-    int is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
-    return expand_set_opt_generic(
-	    args,
+    char_u **varp = (char_u **)ਦਲੀਲਾਂ->oe_varp;
+    ਪੂਰਨ is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ,
 	    is_lcs ? get_listchars_name : get_fillchars_name,
-	    numMatches,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'cinoptions' option is changed.
  */
-    char *
-did_set_cinoptions(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cinoptions(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     // TODO: recognize errors
     parse_cino(curbuf);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_SYN_HL)
+#ਜੇ defined(FEAT_SYN_HL)
 /*
  * The 'colorcolumn' option is changed.
  */
-    char *
-did_set_colorcolumn(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_colorcolumn(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : NULL);
+    ਵਾਪਸ check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : ਨਿਰਾ);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'comments' option is changed.
  */
-    char *
-did_set_comments(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_comments(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*s;
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
 
-    for (s = *varp; *s; )
+    ਲਈ (s = *varp; *s; )
     {
-	while (*s && *s != ':')
+	ਜਦੋਂ (*s && *s != ':')
 	{
-	    if (vim_strchr((char_u *)COM_ALL, *s) == NULL
+	    ਜੇ (vim_strchr((char_u *)COM_ALL, *s) == ਨਿਰਾ
 		    && !VIM_ISDIGIT(*s) && *s != '-')
 	    {
-		errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
-		break;
+		errmsg = illegal_char(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen, *s);
+		ਰੋਕੋ;
 	    }
 	    ++s;
 	}
-	if (*s++ == NUL)
+	ਜੇ (*s++ == NUL)
 	    errmsg = e_missing_colon;
-	else if (*s == ',' || *s == NUL)
-	    errmsg = e_zero_length_string;
-	if (errmsg != NULL)
-	    break;
-	while (*s && *s != ',')
+	ਨਹੀਂਤਾਂ ਜੇ (*s == ',' || *s == NUL)
+	    errmsg = e_zero_ਲੰਮਾਈ_string;
+	ਜੇ (errmsg != ਨਿਰਾ)
+	    ਰੋਕੋ;
+	ਜਦੋਂ (*s && *s != ',')
 	{
-	    if (*s == '\\' && s[1] != NUL)
+	    ਜੇ (*s == '\\' && s[1] != NUL)
 		++s;
 	    ++s;
 	}
-	s = skip_to_option_part(s);
+	s = skip_ਮੰਜ਼ਿਲ_option_part(s);
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
 /*
  * The 'commentstring' option is changed.
  */
-    char *
-did_set_commentstring(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_commentstring(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (**varp != NUL && strstr((char *)*varp, "%s") == NULL)
-	return e_commentstring_must_be_empty_or_contain_str;
+    ਜੇ (**varp != NUL && ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)*varp, "%s") == ਨਿਰਾ)
+	ਵਾਪਸ e_commentstring_must_be_ਖਾਲੀ_ਥਾਵਾਂ_or_contain_str;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Check if value for 'complete' is valid when 'complete' option is changed.
  */
-    char *
-did_set_complete(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_complete(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*p, *t;
-    char_u	buffer[LSIZE];
+    char_u	ਬਫਰ[LSIZE];
     char_u	*buf_ptr;
     char_u	char_before = NUL;
-    int		escape;
+    ਪੂਰਨ		escape;
 
-    for (p = *varp; *p; )
+    ਲਈ (p = *varp; *p; )
     {
-	vim_memset(buffer, 0, LSIZE);
-	buf_ptr = buffer;
+	vim_memset(ਬਫਰ, 0, LSIZE);
+	buf_ptr = ਬਫਰ;
 	escape = 0;
 
 	// Extract substring while handling escaped commas
-	while (*p && (*p != ',' || escape) && buf_ptr < (buffer + LSIZE - 1))
+	ਜਦੋਂ (*p && (*p != ',' || escape) && buf_ptr < (ਬਫਰ + LSIZE - 1))
 	{
-	    if (*p == '\\' && *(p + 1) == ',')
+	    ਜੇ (*p == '\\' && *(p + 1) == ',')
 	    {
 		escape = 1;  // Mark escape mode
 		p++;         // Skip '\'
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		escape = 0;
 		*buf_ptr++ = *p;
@@ -1770,304 +1770,304 @@ did_set_complete(optset_T *args)
 	}
 	*buf_ptr = NUL;
 
-	if (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == NULL)
-	    return illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
+	ਜੇ (vim_strchr((char_u *)".wbuksid]tUFo", *ਬਫਰ) == ਨਿਰਾ)
+	    ਵਾਪਸ illegal_char(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen, *ਬਫਰ);
 
-	if (vim_strchr((char_u *)"ksF", *buffer) == NULL && *(buffer + 1) != NUL
-		&& *(buffer + 1) != '^')
-	    char_before = *buffer;
-	else
+	ਜੇ (vim_strchr((char_u *)"ksF", *ਬਫਰ) == ਨਿਰਾ && *(ਬਫਰ + 1) != NUL
+		&& *(ਬਫਰ + 1) != '^')
+	    char_before = *ਬਫਰ;
+	ਨਹੀਂਤਾਂ
 	{
 	    // Test for a number after '^'
-	    if ((t = vim_strchr(buffer, '^')) != NULL)
+	    ਜੇ ((t = vim_strchr(ਬਫਰ, '^')) != ਨਿਰਾ)
 	    {
 		*t++ = NUL;
-		if (!*t)
+		ਜੇ (!*t)
 		    char_before = '^';
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    for (; *t; t++)
+		    ਲਈ (; *t; t++)
 		    {
-			if (!vim_isdigit(*t))
+			ਜੇ (!vim_isdigit(*t))
 			{
 			    char_before = '^';
-			    break;
+			    ਰੋਕੋ;
 			}
 		    }
 		}
 	    }
 	}
-	if (char_before != NUL)
-	    return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+	ਜੇ (char_before != NUL)
+	    ਵਾਪਸ illegal_char_after_chr(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen,
 		    char_before);
 	// Skip comma and spaces
-	while (*p == ',' || *p == ' ')
+	ਜਦੋਂ (*p == ',' || *p == ' ')
 	    p++;
     }
 
-#ifdef FEAT_COMPL_FUNC
-    if (set_cpt_callbacks(args) != OK)
-	return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_COMPL_FUNC
+    ਜੇ (ਸੈੱਟ_cpt_callbacks(ਦਲੀਲਾਂ) != OK)
+	ਵਾਪਸ illegal_char_after_chr(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen,
 		'F');
-#endif
-    return NULL;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_complete(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_complete(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    static char *(p_cpt_values[]) = {
+    ਸਥਿਰ ਅੱਖਰ *(p_cpt_ਮੁੱਲਾਂ[]) = {
 	".", "w", "b", "u", "k", "kspell", "s", "i", "d", "]", "t", "U", "F", "o",
-	NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_cpt_values,
-	    ARRAY_LENGTH(p_cpt_values) - 1,
-	    numMatches,
+	ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cpt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cpt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'completeopt' option is changed.
  */
-    char *
-did_set_completeopt(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completeopt(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*cot = p_cot;
-    unsigned	*flags = &cot_flags;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	*flags = &cot_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
     {
 	cot = curbuf->b_p_cot;
 	flags = &curbuf->b_cot_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    ਨਹੀਂਤਾਂ ਜੇ (!(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_cot_flags = 0;
 
-    if (opt_strings_flags(cot, p_cot_values, flags, TRUE) != OK)
-	return e_invalid_argument;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(cot, p_cot_ਮੁੱਲਾਂ, flags, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_completeopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_cot_values,
-	    ARRAY_LENGTH(p_cot_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cot_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cot_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'completefuzzycollect' option is changed.
  */
-    char *
-did_set_completefuzzycollect(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completefuzzycollect(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (opt_strings_flags(p_cfc, p_cfc_values, &cfc_flags, TRUE) != OK)
-	return e_invalid_argument;
-    return NULL;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_cfc, p_cfc_ਮੁੱਲਾਂ, &cfc_flags, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_completefuzzycollect(
-	optexpand_T *args,
-	int *numMatches,
+    ਪੂਰਨ
+expand_ਸੈੱਟ_completefuzzycollect(
+	optexpand_T *ਦਲੀਲਾਂ,
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_cfc_values,
-	    ARRAY_LENGTH(p_cfc_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cfc_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cfc_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'completeitemalign' option is changed.
  */
-    char *
-did_set_completeitemalign(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completeitemalign(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*p = p_cia;
-    unsigned	new_cia_flags = 0;
-    int		seen[3] = { FALSE, FALSE, FALSE };
-    int		count = 0;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	new_cia_flags = 0;
+    ਪੂਰਨ		ਵੇਖਿਆ[3] = { FALSE, FALSE, FALSE };
+    ਪੂਰਨ		ਗਿਣਤੀ_2 = 0;
     char_u	buf[10];
 
-    while (*p)
+    ਜਦੋਂ (*p)
     {
-	copy_option_part(&p, buf, sizeof(buf), ",");
-	if (count >= 3)
-	    return e_invalid_argument;
+	copy_option_part(&p, buf, ਆਕਾਰ(buf), ",");
+	ਜੇ (ਗਿਣਤੀ_2 >= 3)
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-	if (STRCMP(buf, "abbr") == 0)
+	ਜੇ (STRCMP(buf, "abbr") == 0)
 	{
-	    if (seen[CPT_ABBR])
-		return e_invalid_argument;
+	    ਜੇ (ਵੇਖਿਆ[CPT_ABBR])
+		ਵਾਪਸ e_invalid_ਦਲੀਲ;
 	    new_cia_flags = new_cia_flags * 10 + CPT_ABBR;
-	    seen[CPT_ABBR] = TRUE;
-	    count++;
+	    ਵੇਖਿਆ[CPT_ABBR] = TRUE;
+	    ਗਿਣਤੀ_2++;
 	}
-	else if (STRCMP(buf, "kind") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(buf, "kind") == 0)
 	{
-	    if (seen[CPT_KIND])
-		return e_invalid_argument;
-	    new_cia_flags = new_cia_flags * 10 + CPT_KIND;
-	    seen[CPT_KIND] = TRUE;
-	    count++;
+	    ਜੇ (ਵੇਖਿਆ[CPT_ਕਿਸਮ])
+		ਵਾਪਸ e_invalid_ਦਲੀਲ;
+	    new_cia_flags = new_cia_flags * 10 + CPT_ਕਿਸਮ;
+	    ਵੇਖਿਆ[CPT_ਕਿਸਮ] = TRUE;
+	    ਗਿਣਤੀ_2++;
 	}
-	else if (STRCMP(buf, "menu") == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(buf, "menu") == 0)
 	{
-	    if (seen[CPT_MENU])
-		return e_invalid_argument;
+	    ਜੇ (ਵੇਖਿਆ[CPT_MENU])
+		ਵਾਪਸ e_invalid_ਦਲੀਲ;
 	    new_cia_flags = new_cia_flags * 10 + CPT_MENU;
-	    seen[CPT_MENU] = TRUE;
-	    count++;
+	    ਵੇਖਿਆ[CPT_MENU] = TRUE;
+	    ਗਿਣਤੀ_2++;
 	}
-	else
-	    return e_invalid_argument;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
-    if (new_cia_flags == 0 || count != 3)
-	return e_invalid_argument;
+    ਜੇ (new_cia_flags == 0 || ਗਿਣਤੀ_2 != 3)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     cia_flags = new_cia_flags;
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ਜੇ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * The 'completepopup' option is changed.
  */
-    char *
-did_set_completepopup(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completepopup(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (parse_completepopup(NULL) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (parse_completepopup(ਨਿਰਾ) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     popup_close_info();
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(BACKSLASH_IN_FILENAME)
+#ਜੇ defined(BACKSLASH_ਵਿੱਚ_FILENAME)
 /*
  * The 'completeslash' option is changed.
  */
-    char *
-did_set_completeslash(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_completeslash(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_csl, p_csl_values, FALSE) != OK
-	    || check_opt_strings(curbuf->b_p_csl, p_csl_values, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_csl, p_csl_ਮੁੱਲਾਂ, FALSE) != OK
+	    || check_opt_ਲੜੀਆਂ(curbuf->b_p_csl, p_csl_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_completeslash(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_csl_values,
-	    ARRAY_LENGTH(p_csl_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_csl_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_csl_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CONCEAL)
+#ਜੇ defined(FEAT_CONCEAL)
 /*
  * The 'concealcursor' option is changed.
  */
-    char *
-did_set_concealcursor(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_concealcursor(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    ਵਾਪਸ did_ਸੈੱਟ_option_listflag(*varp, (char_u *)COCU_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
 }
 
-    int
-expand_set_concealcursor(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_concealcursor(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)COCU_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)COCU_ALL, ਅੰਕ_Matches, matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'cpoptions' option is changed.
  */
-    char *
-did_set_cpoptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cpoptions(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    ਵਾਪਸ did_ਸੈੱਟ_option_listflag(*varp, (char_u *)CPO_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
 }
 
-    int
-expand_set_cpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_cpoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)CPO_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)CPO_ALL, ਅੰਕ_Matches, matches);
 }
 
-#if defined(FEAT_CRYPT)
+#ਜੇ defined(FEAT_CRYPT)
 /*
  * The 'cryptkey' option is changed.
  */
-    char *
-did_set_cryptkey(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cryptkey(optset_T *ਦਲੀਲਾਂ)
 {
     // Make sure the ":set" command doesn't show the new value in the
     // history.
-    remove_key_from_history();
+    remove_ਕੁੰਜੀ_from_history();
 
-    if (args->os_op != OP_NONE)
+    ਜੇ (ਦਲੀਲਾਂ->os_op != OP_NONE)
 	// Don't allow set+=/-=/^= as they can allow for substring guessing
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    if (STRCMP(curbuf->b_p_key, args->os_oldval.string) != 0)
+    ਜੇ (STRCMP(curbuf->b_p_ਕੁੰਜੀ, ਦਲੀਲਾਂ->os_oldval.string) != 0)
     {
 	// Need to update the swapfile.
-	ml_set_crypt_key(curbuf, args->os_oldval.string,
+	ml_ਸੈੱਟ_crypt_ਕੁੰਜੀ(curbuf, ਦਲੀਲਾਂ->os_oldval.string,
 		*curbuf->b_p_cm == NUL ? p_cm : curbuf->b_p_cm);
-	changed_internal();
+	ਬਦਲਿਆ_ਅੰਦਰੂਨੀ();
     }
 # ifdef FEAT_SODIUM
-    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-	crypt_sodium_lock_key(args->os_newval.string);
+    ਜੇ (crypt_ਵਿਧੀ_is_sodium(crypt_get_ਵਿਧੀ_nr(curbuf)))
+	crypt_sodium_ਤਾਲਾ_ਕੁੰਜੀ(ਦਲੀਲਾਂ->os_newval.string);
 # endif
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'cryptmethod' option is changed.
  */
-    char *
-did_set_cryptmethod(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cryptmethod(optset_T *ਦਲੀਲਾਂ)
 {
     char_u  *p;
     char_u  *s;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
 	p = curbuf->b_p_cm;
-    else
+    ਨਹੀਂਤਾਂ
 	p = p_cm;
-    if (check_opt_strings(p, p_cm_values, TRUE) != OK)
-	return e_invalid_argument;
-    else if (crypt_self_test() == FAIL)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p, p_cm_ਮੁੱਲਾਂ, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਨਹੀਂਤਾਂ ਜੇ (crypt_self_test() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // When setting the global value to empty, make it "zip".
-    if (*p_cm == NUL)
+    ਜੇ (*p_cm == NUL)
     {
 	free_string_option(p_cm);
 	p_cm = vim_strsave((char_u *)"zip");
@@ -2075,233 +2075,233 @@ did_set_cryptmethod(optset_T *args)
     // When using ":set cm=name" the local value is going to be empty.
     // Do that here, otherwise the crypt functions will still use the
     // local value.
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	free_string_option(curbuf->b_p_cm);
-	curbuf->b_p_cm = empty_option;
+	curbuf->b_p_cm = ਖਾਲੀ_ਥਾਵਾਂ_option;
     }
 
     // Need to update the swapfile when the effective method changed.
     // Set "s" to the effective old value, "p" to the effective new
     // method and compare.
-    if ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) && *ਦਲੀਲਾਂ->os_oldval.string == NUL)
 	s = p_cm;  // was previously using the global value
-    else
-	s = args->os_oldval.string;
-    if (*curbuf->b_p_cm == NUL)
+    ਨਹੀਂਤਾਂ
+	s = ਦਲੀਲਾਂ->os_oldval.string;
+    ਜੇ (*curbuf->b_p_cm == NUL)
 	p = p_cm;  // is now using the global value
-    else
+    ਨਹੀਂਤਾਂ
 	p = curbuf->b_p_cm;
-    if (STRCMP(s, p) != 0)
-	ml_set_crypt_key(curbuf, curbuf->b_p_key, s);
+    ਜੇ (STRCMP(s, p) != 0)
+	ml_ਸੈੱਟ_crypt_ਕੁੰਜੀ(curbuf, curbuf->b_p_ਕੁੰਜੀ, s);
 
     // If the global value changes need to update the swapfile for all
     // buffers using that value.
-    if ((args->os_flags & OPT_GLOBAL)
-	    && STRCMP(p_cm, args->os_oldval.string) != 0)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL)
+	    && STRCMP(p_cm, ਦਲੀਲਾਂ->os_oldval.string) != 0)
     {
 	buf_T	*buf;
 
 	FOR_ALL_BUFFERS(buf)
-	    if (buf != curbuf && *buf->b_p_cm == NUL)
-		ml_set_crypt_key(buf, buf->b_p_key, args->os_oldval.string);
+	    ਜੇ (buf != curbuf && *buf->b_p_cm == NUL)
+		ml_ਸੈੱਟ_crypt_ਕੁੰਜੀ(buf, buf->b_p_ਕੁੰਜੀ, ਦਲੀਲਾਂ->os_oldval.string);
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_cryptmethod(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_cm_values,
-	    ARRAY_LENGTH(p_cm_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_cm_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_cm_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
+#ਜੇ defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
 /*
  * The 'cscopequickfix' option is changed.
  */
-    char *
-did_set_cscopequickfix(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cscopequickfix(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*p;
 
-    if (p_csqf == NULL)
-	return NULL;
+    ਜੇ (p_csqf == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
     p = p_csqf;
-    while (*p != NUL)
+    ਜਦੋਂ (*p != NUL)
     {
-	if (vim_strchr((char_u *)CSQF_CMDS, *p) == NULL
+	ਜੇ (vim_strchr((char_u *)CSQF_CMDS, *p) == ਨਿਰਾ
 		|| p[1] == NUL
-		|| vim_strchr((char_u *)CSQF_FLAGS, p[1]) == NULL
+		|| vim_strchr((char_u *)CSQF_FLAGS, p[1]) == ਨਿਰਾ
 		|| (p[2] != NUL && p[2] != ','))
-	    return e_invalid_argument;
-	else if (p[2] == NUL)
-	    break;
-	else
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
+	ਨਹੀਂਤਾਂ ਜੇ (p[2] == NUL)
+	    ਰੋਕੋ;
+	ਨਹੀਂਤਾਂ
 	    p += 3;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_SYN_HL)
+#ਜੇ defined(FEAT_SYN_HL)
 /*
  * The 'cursorlineopt' option is changed.
  */
-    char *
-did_set_cursorlineopt(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_cursorlineopt(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
     // This could be changed to use opt_strings_flags() instead.
-    if (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
-	return e_invalid_argument;
+    ਜੇ (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_cursorlineopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_culopt_values,
-	    ARRAY_LENGTH(p_culopt_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_culopt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_culopt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'debug' option is changed.
  */
-    char *
-did_set_debug(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_debug(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_debug, p_debug_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_debug, p_debug_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_debug(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_debug_values,
-	    ARRAY_LENGTH(p_debug_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_debug_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_debug_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_DIFF)
+#ਜੇ defined(FEAT_DIFF)
 /*
  * The 'diffanchors' option is changed.
  */
-    char *
-did_set_diffanchors(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_diffanchors(optset_T *ਦਲੀਲਾਂ)
 {
-    if (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (diffanchors_ਬਦਲਿਆ(ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'diffopt' option is changed.
  */
-    char *
-did_set_diffopt(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_diffopt(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (diffopt_changed() == FAIL)
-	return e_invalid_argument;
+    ਜੇ (diffopt_ਬਦਲਿਆ() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_diffopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
-	if (completing_value_for_subopt(args, "algorithm"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "algorithm"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    p_dip_algorithm_values,
-		    ARRAY_LENGTH(p_dip_algorithm_values) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    p_dip_algorithm_ਮੁੱਲਾਂ,
+		    ARRAY_ਲੰਮਾਈ(p_dip_algorithm_ਮੁੱਲਾਂ) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "inline"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "inline"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    p_dip_inline_values,
-		    ARRAY_LENGTH(p_dip_inline_values) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    p_dip_inline_ਮੁੱਲਾਂ,
+		    ARRAY_ਲੰਮਾਈ(p_dip_inline_ਮੁੱਲਾਂ) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    return expand_set_opt_string(
-	    args,
-	    p_dip_values,
-	    ARRAY_LENGTH(p_dip_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_dip_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_dip_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'display' option is changed.
  */
-    char *
-did_set_display(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_display(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE) != OK)
-	return e_invalid_argument;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_dy, p_dy_ਮੁੱਲਾਂ, &dy_flags, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    (void)init_chartab();
-    return NULL;
+    (ਖਾਲੀ)init_chartab();
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_display(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_dy_values,
-	    ARRAY_LENGTH(p_dy_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_dy_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_dy_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'eadirection' option is changed.
  */
-    char *
-did_set_eadirection(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_eadirection(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_ead, p_ead_values, FALSE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_ead, p_ead_ਮੁੱਲਾਂ, FALSE);
 }
 
-    int
-expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_eadirection(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ead_values,
-	    ARRAY_LENGTH(p_ead_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ead_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ead_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
@@ -2309,27 +2309,27 @@ expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
  * One of the 'encoding', 'fileencoding', 'termencoding' or 'makeencoding'
  * options is changed.
  */
-    char *
-did_set_encoding(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_encoding(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	**gvarp;
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
     char_u	*p;
 
     // Get the global option to compare with, otherwise we would have to check
     // two values for all local options.
-    gvarp = (char_u **)get_option_varp_scope(args->os_idx, OPT_GLOBAL);
+    gvarp = (char_u **)get_option_varp_scope(ਦਲੀਲਾਂ->os_idx, OPT_GLOBAL);
 
-    if (gvarp == &p_fenc)
+    ਜੇ (gvarp == &p_fenc)
     {
-	if (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
+	ਜੇ (!curbuf->b_p_ma && ਦਲੀਲਾਂ->os_flags != OPT_GLOBAL)
 	    errmsg = e_cannot_make_changes_modifiable_is_off;
-	else if (vim_strchr(*varp, ',') != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (vim_strchr(*varp, ',') != ਨਿਰਾ)
 	    // No comma allowed in 'fileencoding'; catches confusing it
 	    // with 'fileencodings'.
-	    errmsg = e_invalid_argument;
-	else
+	    errmsg = e_invalid_ਦਲੀਲ;
+	ਨਹੀਂਤਾਂ
 	{
 	    // May show a "+" in the title now.
 	    redraw_titles();
@@ -2337,91 +2337,91 @@ did_set_encoding(optset_T *args)
 	    ml_setflags(curbuf);
 	}
     }
-    if (errmsg == NULL)
+    ਜੇ (errmsg == ਨਿਰਾ)
     {
 	// canonize the value, so that STRCMP() can be used on it
 	p = enc_canonize(*varp);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    vim_free(*varp);
 	    *varp = p;
 	}
-	if (varp == &p_enc)
+	ਜੇ (varp == &p_enc)
 	{
 	    errmsg = mb_init();
 	    redraw_titles();
 	}
     }
 
-#if defined(FEAT_GUI_GTK)
-    if (errmsg == NULL && varp == &p_tenc && gui.in_use)
+#ਜੇ defined(FEAT_GUI_GTK)
+    ਜੇ (errmsg == ਨਿਰਾ && varp == &p_tenc && gui.ਵਿੱਚ_use)
     {
 	// GTK uses only a single encoding, and that is UTF-8.
-	if (STRCMP(p_tenc, "utf-8") != 0)
-	    errmsg = e_cannot_be_changed_in_gtk_GUI;
+	ਜੇ (STRCMP(p_tenc, "utf-8") != 0)
+	    errmsg = e_cannot_be_ਬਦਲਿਆ_ਵਿੱਚ_gtk_GUI;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (errmsg == NULL)
+    ਜੇ (errmsg == ਨਿਰਾ)
     {
-#ifdef FEAT_KEYMAP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_KEYMAP
 	// When 'keymap' is used and 'encoding' changes, reload the keymap
 	// (with another encoding).
-	if (varp == &p_enc && *curbuf->b_p_keymap != NUL)
-	    (void)keymap_init();
-#endif
+	ਜੇ (varp == &p_enc && *curbuf->b_p_keymap != NUL)
+	    (ਖਾਲੀ)keymap_init();
+#ਜੇ_ਅੰਤ
 
 	// When 'termencoding' is not empty and 'encoding' changes or when
 	// 'termencoding' changes, need to setup for keyboard input and
 	// display output conversion.
-	if (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
+	ਜੇ (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
 	{
-	    if (convert_setup(&input_conv, p_tenc, p_enc) == FAIL
-		    || convert_setup(&output_conv, p_enc, p_tenc) == FAIL)
+	    ਜੇ (convert_ਤਿਆਰੀ(&ਨਿਵੇਸ਼_conv, p_tenc, p_enc) == FAIL
+		    || convert_ਤਿਆਰੀ(&output_conv, p_enc, p_tenc) == FAIL)
 	    {
 		semsg(_(e_cannot_convert_between_str_and_str),
 			p_tenc, p_enc);
-		errmsg = e_invalid_argument;
+		errmsg = e_invalid_ਦਲੀਲ;
 	    }
 	}
 
-#if defined(MSWIN)
+#ਜੇ defined(MSWIN)
 	// $HOME, $VIM and $VIMRUNTIME may have characters in active code page.
-	if (varp == &p_enc)
+	ਜੇ (varp == &p_enc)
 	{
 	    init_homedir();
 	    init_vimdir();
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
-    int
-expand_set_encoding(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_encoding(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
-	    args,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ,
 	    get_encoding_name,
-	    numMatches,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'eventignore(win)' option is changed.
  */
-    char *
-did_set_eventignore(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_eventignore(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    char_u	*oldval = args->os_oldval.string;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    char_u	*oldval = ਦਲੀਲਾਂ->os_oldval.string;
 
-    if (check_ei(*varp) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (check_ei(*varp) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    if (oldval == NULL || STRCMP(oldval, *varp) == 0)
-	return NULL;
+    ਜੇ (oldval == ਨਿਰਾ || STRCMP(oldval, *varp) == 0)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // Deal with the events that are triggered by comparing against a stored
     // state, with the old value in effect: what happened while an event was
@@ -2429,93 +2429,93 @@ did_set_eventignore(optset_T *args)
     // happened before must still be reported.
     // Use a copy, the caller owns "oldval" and autocommands may free it.
     char_u	*save_ei = vim_strsave(oldval);
-    if (save_ei != NULL)
+    ਜੇ (save_ei != ਨਿਰਾ)
     {
 	char_u	*newval = *varp;
-	win_T	*wp = is_window_local_option(args->os_idx) ? curwin : NULL;
+	win_T	*wp = is_ਖਿੜਕੀ_local_option(ਦਲੀਲਾਂ->os_idx) ? curwin : ਨਿਰਾ;
 
 	*varp = save_ei;
 	// "varp" points into "wp" for 'eventignorewin'.
-	if (wp != NULL)
+	ਜੇ (wp != ਨਿਰਾ)
 	    ++wp->w_locked;
 	may_trigger_deferred_events();
-	if (wp != NULL)
+	ਜੇ (wp != ਨਿਰਾ)
 	    --wp->w_locked;
 
 	free_string_option(*varp);
 	*varp = newval;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-static int expand_eiw = FALSE;
+ਸਥਿਰ ਪੂਰਨ expand_eiw = FALSE;
 
-    static char_u *
-get_eventignore_name(expand_T *xp, int idx)
+    ਸਥਿਰ char_u *
+get_eventignore_name(expand_T *xp, ਪੂਰਨ idx)
 {
-    int subtract = *xp->xp_pattern == '-';
+    ਪੂਰਨ ਘਟਾਓ = *xp->xp_ਨਮੂਨਾ == '-';
     // 'eventignore(win)' allows special keyword "all" in addition to
     // all event names.
-    if (!subtract && idx == 0)
-	return (char_u *)"all";
+    ਜੇ (!ਘਟਾਓ && idx == 0)
+	ਵਾਪਸ (char_u *)"all";
 
-    char_u *name = get_event_name_no_group(xp, idx - 1 + subtract, expand_eiw);
-    if (name == NULL)
-	return NULL;
+    char_u *name = get_event_name_no_ਸਮੂਹ(xp, idx - 1 + ਘਟਾਓ, expand_eiw);
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    sprintf((char *)IObuff, "%s%s", subtract ? "-" : "", name);
-    return IObuff;
+    sprintf((ਅੱਖਰ *)IObuff, "%s%s", ਘਟਾਓ ? "-" : "", name);
+    ਵਾਪਸ IObuff;
 }
 
-    int
-expand_set_eventignore(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_eventignore(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_eiw = args->oe_varp != (char_u *)&p_ei;
-    return expand_set_opt_generic(
-	    args,
+    expand_eiw = ਦਲੀਲਾਂ->oe_varp != (char_u *)&p_ei;
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ,
 	    get_eventignore_name,
-	    numMatches,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'fileformat' option is changed.
  */
-    char *
-did_set_fileformat(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_fileformat(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
-	return e_cannot_make_changes_modifiable_is_off;
-    else if (check_opt_strings(*varp, p_ff_values, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (!curbuf->b_p_ma && !(ਦਲੀਲਾਂ->os_flags & OPT_GLOBAL))
+	ਵਾਪਸ e_cannot_make_changes_modifiable_is_off;
+    ਨਹੀਂਤਾਂ ਜੇ (check_opt_ਲੜੀਆਂ(*varp, p_ff_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // may also change 'textmode'
-    if (get_fileformat(curbuf) == EOL_DOS)
+    ਜੇ (get_fileformat(curbuf) == EOL_DOS)
 	curbuf->b_p_tx = TRUE;
-    else
+    ਨਹੀਂਤਾਂ
 	curbuf->b_p_tx = FALSE;
     redraw_titles();
     // update flag in swap file
     ml_setflags(curbuf);
     // Redraw needed when switching to/from "mac": a CR in the text
     // will be displayed differently.
-    if (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
+    ਜੇ (get_fileformat(curbuf) == EOL_MAC || *ਦਲੀਲਾਂ->os_oldval.string == 'm')
 	redraw_curbuf_later(UPD_NOT_VALID);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_fileformat(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ff_values,
-	    ARRAY_LENGTH(p_ff_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ff_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ff_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
@@ -2524,480 +2524,480 @@ expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
  * fileformat options.
  */
     char_u *
-get_fileformat_name(expand_T *xp UNUSED, int idx)
+get_fileformat_name(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(p_ff_values))
-	return NULL;
+    ਜੇ (idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(p_ff_ਮੁੱਲਾਂ))
+	ਵਾਪਸ ਨਿਰਾ;
 
-    return (char_u*)p_ff_values[idx];
+    ਵਾਪਸ (char_u*)p_ff_ਮੁੱਲਾਂ[idx];
 }
 
 /*
  * The 'fileformats' option is changed.
  */
-    char *
-did_set_fileformats(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_fileformats(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_ffs, p_ff_values, TRUE) != OK)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_ffs, p_ff_ਮੁੱਲਾਂ, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // also change 'textauto'
-    if (*p_ffs == NUL)
+    ਜੇ (*p_ffs == NUL)
 	p_ta = FALSE;
-    else
+    ਨਹੀਂਤਾਂ
 	p_ta = TRUE;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'filetype' or the 'syntax' option is changed.
  */
-    char *
-did_set_filetype_or_syntax(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_filetype_or_syntax(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (!valid_filetype(*varp))
-	return e_invalid_argument;
+    ਜੇ (!valid_filetype(*varp))
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    args->os_value_changed = STRCMP(args->os_oldval.string, *varp) != 0;
+    ਦਲੀਲਾਂ->os_ਮੁੱਲ_ਬਦਲਿਆ = STRCMP(ਦਲੀਲਾਂ->os_oldval.string, *varp) != 0;
 
     // Since we check the value, there is no need to set P_INSECURE,
     // even when the value comes from a modeline.
-    args->os_value_checked = TRUE;
+    ਦਲੀਲਾਂ->os_ਮੁੱਲ_checked = TRUE;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_FOLDING)
 /*
  * The 'foldclose' option is changed.
  */
-    char *
-did_set_foldclose(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldclose(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_fcl, p_fcl_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_fcl, p_fcl_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_foldclose(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_fcl_values,
-	    ARRAY_LENGTH(p_fcl_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_fcl_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_fcl_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_EVAL) && defined(FEAT_FOLDING)
 /*
  * The 'foldexpr' option is changed.
  */
-    char *
-did_set_foldexpr(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldexpr(optset_T *ਦਲੀਲਾਂ)
 {
-    (void)did_set_optexpr(args);
-    if (foldmethodIsExpr(curwin))
+    (ਖਾਲੀ)did_ਸੈੱਟ_optexpr(ਦਲੀਲਾਂ);
+    ਜੇ (foldmethod_Is_ਵਿਅੰਜਕ(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_FOLDING)
 /*
  * The 'foldignore' option is changed.
  */
-    char *
-did_set_foldignore(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldignore(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (foldmethodIsIndent(curwin))
+    ਜੇ (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'foldmarker' option is changed.
  */
-    char *
-did_set_foldmarker(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldmarker(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*p;
 
     p = vim_strchr(*varp, ',');
-    if (p == NULL)
-	return e_comma_required;
-    else if (p == *varp || p[1] == NUL)
-	return e_invalid_argument;
-    else if (foldmethodIsMarker(curwin))
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ e_comma_required;
+    ਨਹੀਂਤਾਂ ਜੇ (p == *varp || p[1] == NUL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਨਹੀਂਤਾਂ ਜੇ (foldmethodIsMarker(curwin))
 	foldUpdateAll(curwin);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'foldmethod' option is changed.
  */
-    char *
-did_set_foldmethod(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldmethod(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (check_opt_strings(*varp, p_fdm_values, FALSE) != OK || **varp == NUL)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(*varp, p_fdm_ਮੁੱਲਾਂ, FALSE) != OK || **varp == NUL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     foldUpdateAll(curwin);
-    if (foldmethodIsDiff(curwin))
+    ਜੇ (foldmethodIsDiff(curwin))
 	newFoldLevel();
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_foldmethod(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_fdm_values,
-	    ARRAY_LENGTH(p_fdm_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_fdm_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_fdm_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'foldopen' option is changed.
  */
-    char *
-did_set_foldopen(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_foldopen(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_fdo, p_fdo_ਮੁੱਲਾਂ, &fdo_flags, TRUE);
 }
 
-    int
-expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_foldopen(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_fdo_values,
-	    ARRAY_LENGTH(p_fdo_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_fdo_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_fdo_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'formatoptions' option is changed.
  */
-    char *
-did_set_formatoptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_formatoptions(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    ਵਾਪਸ did_ਸੈੱਟ_option_listflag(*varp, (char_u *)FO_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
 }
 
-    int
-expand_set_formatoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_formatoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)FO_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)FO_ALL, ਅੰਕ_Matches, matches);
 }
 
-#if defined(CURSOR_SHAPE)
+#ਜੇ defined(CURSOR_SHAPE)
 /*
  * The 'guicursor' option is changed.
  */
-    char *
-did_set_guicursor(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guicursor(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return parse_shape_opt(SHAPE_CURSOR);
+    ਵਾਪਸ parse_shape_opt(SHAPE_CURSOR);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * The 'guifont' option is changed.
  */
-    char *
-did_set_guifont(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guifont(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*p;
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
 
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
     {
 	p = p_guifont;
-# if defined(FEAT_GUI_GTK)
+# ਜੇ defined(FEAT_GUI_GTK)
 	// Put up a font dialog and let the user select a new value.
 	// If this is cancelled go back to the old value but don't
 	// give an error message.
-	if (STRCMP(p, "*") == 0)
+	ਜੇ (STRCMP(p, "*") == 0)
 	{
-	    p = gui_mch_font_dialog(args->os_oldval.string);
+	    p = gui_mch_font_dialog(ਦਲੀਲਾਂ->os_oldval.string);
 	    free_string_option(p_guifont);
-	    p_guifont = (p != NULL) ? p : vim_strsave(args->os_oldval.string);
+	    p_guifont = (p != ਨਿਰਾ) ? p : vim_strsave(ਦਲੀਲਾਂ->os_oldval.string);
 	}
 # endif
-	if (p != NULL && gui_init_font(p_guifont, FALSE) != OK)
+	ਜੇ (p != ਨਿਰਾ && gui_init_font(p_guifont, FALSE) != OK)
 	{
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
-	    if (STRCMP(p_guifont, "*") == 0)
+# ਜੇ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
+	    ਜੇ (STRCMP(p_guifont, "*") == 0)
 	    {
 		// Dialog was cancelled: Keep the old value without giving
 		// an error message.
 		free_string_option(p_guifont);
-		p_guifont = vim_strsave(args->os_oldval.string);
+		p_guifont = vim_strsave(ਦਲੀਲਾਂ->os_oldval.string);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 # endif
 		errmsg = e_invalid_fonts;
 	}
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
 /*
  * Expand the 'guifont' option. Only when GUI is being used. Each platform has
  * specific behaviors.
  */
-    int
-expand_set_guifont(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_guifont(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    if (!gui.in_use)
-	return FAIL;
+    ਜੇ (!gui.ਵਿੱਚ_use)
+	ਵਾਪਸ FAIL;
 
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    char_u **varp = (char_u **)args->oe_varp;
-    int wide = (varp == &p_guifontwide);
+# ਜੇ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    char_u **varp = (char_u **)ਦਲੀਲਾਂ->oe_varp;
+    ਪੂਰਨ wide = (varp == &p_guifontwide);
 
-    return expand_set_opt_callback(
-	    args, gui_mch_expand_font, &wide, numMatches, matches);
-# else
-    return FAIL;
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_callback(
+	    ਦਲੀਲਾਂ, gui_mch_expand_font, &wide, ਅੰਕ_Matches, matches);
+# ਨਹੀਂਤਾਂ
+    ਵਾਪਸ FAIL;
 # endif
 }
 
-# if defined(FEAT_XFONTSET)
+# ਜੇ defined(FEAT_XFONTSET)
 /*
  * The 'guifontset' option is changed.
  */
-    char *
-did_set_guifontset(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guifontset(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
-    if (STRCMP(p_guifontset, "*") == 0)
+    ਜੇ (STRCMP(p_guifontset, "*") == 0)
 	errmsg = e_cant_select_fontset;
-    else if (gui.in_use && gui_init_font(p_guifontset, TRUE) != OK)
+    ਨਹੀਂਤਾਂ ਜੇ (gui.ਵਿੱਚ_use && gui_init_font(p_guifontset, TRUE) != OK)
 	errmsg = e_invalid_fontset;
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 # endif
 
 /*
  * The 'guifontwide' option is changed.
  */
-    char *
-did_set_guifontwide(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guifontwide(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
-    if (STRCMP(p_guifontwide, "*") == 0)
+    ਜੇ (STRCMP(p_guifontwide, "*") == 0)
 	errmsg = e_cant_select_wide_font;
-    else if (gui_get_wide_font() == FAIL)
+    ਨਹੀਂਤਾਂ ਜੇ (gui_get_wide_font() == FAIL)
 	errmsg = e_invalid_wide_font;
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ਜੇ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 /*
  * The 'guiligatures' option is changed.
  */
-    char *
-did_set_guiligatures(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guiligatures(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    gui_set_ligatures();
-    return NULL;
+    gui_ਸੈੱਟ_ligatures();
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * The 'guioptions' option is changed.
  */
-    char *
-did_set_guioptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guioptions(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    char *errmsg;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    ਅੱਖਰ *errmsg;
 
-    errmsg = did_set_option_listflag(*varp, (char_u *)GO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    errmsg = did_ਸੈੱਟ_option_listflag(*varp, (char_u *)GO_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
+    ਜੇ (errmsg != ਨਿਰਾ)
+	ਵਾਪਸ errmsg;
 
-    gui_init_which_components(args->os_oldval.string);
-    return NULL;
+    gui_init_which_components(ਦਲੀਲਾਂ->os_oldval.string);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_guioptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)GO_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)GO_ALL, ਅੰਕ_Matches, matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI_TABLINE)
+#ਜੇ defined(FEAT_GUI_TABLINE)
 /*
  * The 'guitablabel' option is changed.
  */
-    char *
-did_set_guitablabel(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_guitablabel(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     redraw_tabline = TRUE;
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'helpfile' option is changed.
  */
-    char *
-did_set_helpfile(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_helpfile(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     // May compute new values for $VIM and $VIMRUNTIME
-    if (didset_vim)
+    ਜੇ (didset_vim)
 	vim_unsetenv_ext((char_u *)"VIM");
-    if (didset_vimruntime)
+    ਜੇ (didset_vimruntime)
 	vim_unsetenv_ext((char_u *)"VIMRUNTIME");
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_MULTI_LANG)
+#ਜੇ defined(FEAT_MULTI_LANG)
 /*
  * The 'helplang' option is changed.
  */
-    char *
-did_set_helplang(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_helplang(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
     // Check for "", "ab", "ab,cd", etc.
-    for (char_u *s = p_hlg; *s != NUL; s += 3)
+    ਲਈ (char_u *s = p_hlg; *s != NUL; s += 3)
     {
-	if (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
+	ਜੇ (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
 	{
-	    errmsg = e_invalid_argument;
-	    break;
+	    errmsg = e_invalid_ਦਲੀਲ;
+	    ਰੋਕੋ;
 	}
-	if (s[2] == NUL)
-	    break;
+	ਜੇ (s[2] == NUL)
+	    ਰੋਕੋ;
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'highlight' option is changed.
  */
-    char *
-did_set_highlight(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_highlight(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (highlight_changed() == FAIL)
-	return e_invalid_argument;	// invalid flags
+    ਜੇ (highlight_ਬਦਲਿਆ() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;	// invalid flags
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 expand_hl_occasions(
-	optexpand_T *args,
-	int *numMatches,
+	optexpand_T *ਦਲੀਲਾਂ,
+	ਪੂਰਨ *ਅੰਕ_Matches,
 	char_u ***matches,
-	char_u prefix)
+	char_u ਅਗੇਤਰ)
 {
     char_u	    *p;
-    static char_u   hl_flags[HLF_COUNT] = HL_FLAGS;
+    ਸਥਿਰ char_u   hl_flags[HLF_ਗਿਣਤੀ] = HL_FLAGS;
     size_t	    i;
-    int		    count = 0;
+    ਪੂਰਨ		    ਗਿਣਤੀ_2 = 0;
 
-    *matches = ALLOC_MULT(char_u *, HLF_COUNT + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, HLF_ਗਿਣਤੀ + 1);
+    ਜੇ (*matches == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     // We still want to return the full option if it's requested.
-    if (args->oe_include_orig_val)
+    ਜੇ (ਦਲੀਲਾਂ->oe_include_orig_val)
     {
-	p = vim_strsave(args->oe_opt_value);
-	if (p == NULL)
+	p = vim_strsave(ਦਲੀਲਾਂ->oe_opt_ਮੁੱਲ);
+	ਜੇ (p == ਨਿਰਾ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[ਗਿਣਤੀ_2++] = p;
     }
 
-    for (i = 0; i < HLF_COUNT; i++)
+    ਲਈ (i = 0; i < HLF_ਗਿਣਤੀ; i++)
     {
-	p = alloc((prefix == NUL ? 1 : 2) + 1);
-	if (p == NULL)
+	p = alloc((ਅਗੇਤਰ == NUL ? 1 : 2) + 1);
+	ਜੇ (p == ਨਿਰਾ)
 	{
-	    if (count == 0)
+	    ਜੇ (ਗਿਣਤੀ_2 == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    else
-		break;
+	    ਨਹੀਂਤਾਂ
+		ਰੋਕੋ;
 	}
-	if (prefix == NUL)
-	    sprintf((char *)p, "%c", hl_flags[i]);
-	else
-	    sprintf((char *)p, "%c%c", prefix, hl_flags[i]);
-	(*matches)[count++] = p;
+	ਜੇ (ਅਗੇਤਰ == NUL)
+	    sprintf((ਅੱਖਰ *)p, "%c", hl_flags[i]);
+	ਨਹੀਂਤਾਂ
+	    sprintf((ਅੱਖਰ *)p, "%c%c", ਅਗੇਤਰ, hl_flags[i]);
+	(*matches)[ਗਿਣਤੀ_2++] = p;
     }
 
-    if (count == 0)
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *ਅੰਕ_Matches = ਗਿਣਤੀ_2;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Expand 'highlight' option.
  */
-    int
-expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_highlight(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
     char_u	    *p;
-    expand_T	    *xp = args->oe_xp;
+    expand_T	    *xp = ਦਲੀਲਾਂ->oe_xp;
     size_t	    i;
-    int		    count = 0;
+    ਪੂਰਨ		    ਗਿਣਤੀ_2 = 0;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
 	// Right after a ':', meaning we just return all highlight names.
-	return expand_set_opt_generic(
-		args,
+	ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+		ਦਲੀਲਾਂ,
 		get_highlight_name,
-		numMatches,
+		ਅੰਕ_Matches,
 		matches);
     }
 
-    if (*xp->xp_pattern == NUL)
+    ਜੇ (*xp->xp_ਨਮੂਨਾ == NUL)
 	// At beginning of a comma-separated list. Return the specific list of
 	// supported occasions.
-	return expand_hl_occasions(args, numMatches, matches, NUL);
+	ਵਾਪਸ expand_hl_occasions(ਦਲੀਲਾਂ, ਅੰਕ_Matches, matches, NUL);
 
     // We are after the initial character (which indicates the occasion). We
     // already made sure we are not matching after a ':' above, so now we want
@@ -3006,211 +3006,211 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
     // the returned match.
 
     // Note: Keep this in sync with highlight_changed()
-    static char_u p_hl_mode_values[] =
+    ਸਥਿਰ char_u p_hl_ਬਹੁਲਕ_ਮੁੱਲਾਂ[] =
 	{':', 'b', 'i', '-', 'n', 'r', 's', 'u', 'c', '2', 'd', '=', 't'};
-    size_t num_hl_modes = ARRAY_LENGTH(p_hl_mode_values);
+    size_t ਅੰਕ_hl_modes = ARRAY_ਲੰਮਾਈ(p_hl_ਬਹੁਲਕ_ਮੁੱਲਾਂ);
 
-    *matches = ALLOC_MULT(char_u *, num_hl_modes);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, ਅੰਕ_hl_modes);
+    ਜੇ (*matches == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    int pattern_len = xp->xp_pattern_len;
+    ਪੂਰਨ ਨਮੂਨਾ_len = xp->xp_ਨਮੂਨਾ_len;
 
-    for (i = 0; i < num_hl_modes; i++)
+    ਲਈ (i = 0; i < ਅੰਕ_hl_modes; i++)
     {
 	// Don't allow duplicates as these are unique flags
-	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_values[i]);
-	if (dup != NULL && (int)(dup - xp->xp_pattern) < pattern_len)
-	    continue;
+	char_u *dup = vim_strchr(xp->xp_ਨਮੂਨਾ + 1, p_hl_ਬਹੁਲਕ_ਮੁੱਲਾਂ[i]);
+	ਜੇ (dup != ਨਿਰਾ && (ਪੂਰਨ)(dup - xp->xp_ਨਮੂਨਾ) < ਨਮੂਨਾ_len)
+	    ਜਾਰੀ;
 
 	// ':' only works by itself, not with other flags.
-	if (pattern_len > 1 && p_hl_mode_values[i] == ':')
-	    continue;
+	ਜੇ (ਨਮੂਨਾ_len > 1 && p_hl_ਬਹੁਲਕ_ਮੁੱਲਾਂ[i] == ':')
+	    ਜਾਰੀ;
 
-	p = vim_strnsave(xp->xp_pattern, pattern_len + 1);
-	if (p == NULL)
+	p = vim_strnsave(xp->xp_ਨਮੂਨਾ, ਨਮੂਨਾ_len + 1);
+	ਜੇ (p == ਨਿਰਾ)
 	{
-	    if (i == 0)
+	    ਜੇ (i == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    else
-		break;
+	    ਨਹੀਂਤਾਂ
+		ਰੋਕੋ;
 	}
-	p[pattern_len] = p_hl_mode_values[i];
-	p[pattern_len + 1] = NUL;
-	(*matches)[count++] = p;
+	p[ਨਮੂਨਾ_len] = p_hl_ਬਹੁਲਕ_ਮੁੱਲਾਂ[i];
+	p[ਨਮੂਨਾ_len + 1] = NUL;
+	(*matches)[ਗਿਣਤੀ_2++] = p;
     }
-    if (count == 0)
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    *numMatches = count;
+    *ਅੰਕ_Matches = ਗਿਣਤੀ_2;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * The 'titlestring' or the 'iconstring' option is changed.
  */
-    static char *
-parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
+    ਸਥਿਰ ਅੱਖਰ *
+parse_titleiconstring(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ, ਪੂਰਨ flagval ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_STL_OPT
-    char_u	**varp = (char_u **)args->os_varp;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
     // NULL => statusline syntax
-    if (vim_strchr(*varp, '%') && check_stl_option(*varp) == NULL)
+    ਜੇ (vim_strchr(*varp, '%') && check_stl_option(*varp) == ਨਿਰਾ)
 	stl_syntax |= flagval;
-    else
+    ਨਹੀਂਤਾਂ
 	stl_syntax &= ~flagval;
-#endif
-    did_set_title();
+#ਜੇ_ਅੰਤ
+    did_ਸੈੱਟ_title();
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'iconstring' option is changed.
  */
-    char *
-did_set_iconstring(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_iconstring(optset_T *ਦਲੀਲਾਂ)
 {
-    int flagval = 0;
+    ਪੂਰਨ flagval = 0;
 
-#ifdef FEAT_STL_OPT
-    flagval = STL_IN_ICON;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+    flagval = STL_ਵਿੱਚ_ICON;
+#ਜੇ_ਅੰਤ
 
-    return parse_titleiconstring(args, flagval);
+    ਵਾਪਸ parse_titleiconstring(ਦਲੀਲਾਂ, flagval);
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ਜੇ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * The 'imactivatekey' option is changed.
  */
-    char *
-did_set_imactivatekey(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_imactivatekey(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (!im_xim_isvalid_imactivate())
-	return e_invalid_argument;
-    return NULL;
+    ਜੇ (!im_xim_isvalid_imactivate())
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_IMAGE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_IMAGE
 /*
  * The 'imageprotocol' option is changed.
  */
-    char *
-did_set_imageprotocol(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_imageprotocol(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (update_image_backend() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    ਜੇ (update_image_backend() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_imageprotocol(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
 	// 'imageprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
-		args,
-		p_ipc_protocol_values,
-		ARRAY_LENGTH(p_ipc_protocol_values) - 1,
-		numMatches,
+	ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		ਦਲੀਲਾਂ,
+		p_ipc_protocol_ਮੁੱਲਾਂ,
+		ARRAY_ਲੰਮਾਈ(p_ipc_protocol_ਮੁੱਲਾਂ) - 1,
+		ਅੰਕ_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
-    static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    ਸਥਿਰ ਅੱਖਰ *(ਖਾਲੀ_ਥਾਵਾਂ_2[]) = {ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(ਦਲੀਲਾਂ, ਖਾਲੀ_ਥਾਵਾਂ_2, 0, ਅੰਕ_Matches, matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'iskeyword' option is changed.
  */
-    char *
-did_set_iskeyword(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_iskeyword(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (varp == &p_isk)		// only check for global-value
+    ਜੇ (varp == &p_isk)		// only check for global-value
     {
-	if (check_isopt(*varp) == FAIL)
-	    return e_invalid_argument;
+	ਜੇ (check_isopt(*varp) == FAIL)
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
-    else			// fallthrough for local-value
-	return did_set_isopt(args);
+    ਨਹੀਂਤਾਂ			// fallthrough for local-value
+	ਵਾਪਸ did_ਸੈੱਟ_isopt(ਦਲੀਲਾਂ);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'isident' or the 'iskeyword' or the 'isprint' or the 'isfname' option is
  * changed.
  */
-    char *
-did_set_isopt(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_isopt(optset_T *ਦਲੀਲਾਂ)
 {
     // 'isident', 'iskeyword', 'isprint' or 'isfname' option: refill g_chartab[]
     // If the new option is invalid, use old value.
     // 'lisp' option: refill g_chartab[] for '-' char.
-    if (init_chartab() == FAIL)
+    ਜੇ (init_chartab() == FAIL)
     {
-	args->os_restore_chartab = TRUE;// need to restore the chartab.
-	return e_invalid_argument;	// error in value
+	ਦਲੀਲਾਂ->os_restore_chartab = TRUE;// need to restore the chartab.
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;	// error in value
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'jumpoptions' option is changed.
  */
-    char *
-did_set_jumpoptions(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_jumpoptions(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE) != OK)
-	return e_invalid_argument;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_jop, p_jop_ਮੁੱਲਾਂ, &jop_flags, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_jumpoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_jop_values,
-	    ARRAY_LENGTH(p_jop_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_jop_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_jop_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_KEYMAP)
+#ਜੇ defined(FEAT_KEYMAP)
 /*
  * The 'keymap' option is changed.
  */
-    char *
-did_set_keymap(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_keymap(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    char *errmsg = NULL;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
-    if (!valid_filetype(*varp))
-	errmsg = e_invalid_argument;
-    else
+    ਜੇ (!valid_filetype(*varp))
+	errmsg = e_invalid_ਦਲੀਲ;
+    ਨਹੀਂਤਾਂ
     {
-	int	    secure_save = secure;
+	ਪੂਰਨ	    secure_save = secure;
 
 	// Reset the secure flag, since the value of 'keymap' has
 	// been checked to be safe.
@@ -3223,658 +3223,658 @@ did_set_keymap(optset_T *args)
 
 	// Since we check the value, there is no need to set P_INSECURE,
 	// even when the value comes from a modeline.
-	args->os_value_checked = TRUE;
+	ਦਲੀਲਾਂ->os_ਮੁੱਲ_checked = TRUE;
     }
 
-    if (errmsg == NULL)
+    ਜੇ (errmsg == ਨਿਰਾ)
     {
-	if (*curbuf->b_p_keymap != NUL)
+	ਜੇ (*curbuf->b_p_keymap != NUL)
 	{
 	    // Installed a new keymap, switch on using it.
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
-	    if (curbuf->b_p_imsearch != B_IMODE_USE_INSERT)
+	    ਜੇ (curbuf->b_p_imsearch != B_IMODE_USE_ਪਾਓ)
 		curbuf->b_p_imsearch = B_IMODE_LMAP;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Cleared the keymap, may reset 'iminsert' and 'imsearch'.
-	    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+	    ਜੇ (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		curbuf->b_p_iminsert = B_IMODE_NONE;
-	    if (curbuf->b_p_imsearch == B_IMODE_LMAP)
-		curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
+	    ਜੇ (curbuf->b_p_imsearch == B_IMODE_LMAP)
+		curbuf->b_p_imsearch = B_IMODE_USE_ਪਾਓ;
 	}
-	if ((args->os_flags & OPT_LOCAL) == 0)
+	ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) == 0)
 	{
-	    set_iminsert_global();
-	    set_imsearch_global();
+	    ਸੈੱਟ_iminsert_global();
+	    ਸੈੱਟ_imsearch_global();
 	}
-	status_redraw_curbuf();
+	ਸਥਿਤੀ_redraw_curbuf();
     }
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'keymodel' option is changed.
  */
-    char *
-did_set_keymodel(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_keymodel(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_km, p_km_values, TRUE) != OK)
-	return e_invalid_argument;
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_km, p_km_ਮੁੱਲਾਂ, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    km_stopsel = (vim_strchr(p_km, 'o') != NULL);
-    km_startsel = (vim_strchr(p_km, 'a') != NULL);
-    return NULL;
+    km_stopsel = (vim_strchr(p_km, 'o') != ਨਿਰਾ);
+    km_startsel = (vim_strchr(p_km, 'a') != ਨਿਰਾ);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_keymodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_keymodel(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_km_values,
-	    ARRAY_LENGTH(p_km_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_km_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_km_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'keyprotocol' option is changed.
  */
-    char *
-did_set_keyprotocol(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_keyprotocol(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char_u *term = T_NAME;
-    keyprot_T kpc = match_keyprotocol(term);
-    if (kpc == KEYPROTOCOL_FAIL)
-	return e_invalid_argument;
+    char_u *ਪਦ = T_NAME;
+    keyprot_T kpc = ਮੇਲ_keyprotocol(ਪਦ);
+    ਜੇ (kpc == KEYPROTOCOL_FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    apply_keyprotocol(term, kpc);
+    apply_keyprotocol(ਪਦ, kpc);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_keyprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_keyprotocol(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
 	// 'keyprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
-		args,
-		p_kpc_protocol_values,
-		ARRAY_LENGTH(p_kpc_protocol_values) - 1,
-		numMatches,
+	ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		ਦਲੀਲਾਂ,
+		p_kpc_protocol_ਮੁੱਲਾਂ,
+		ARRAY_ਲੰਮਾਈ(p_kpc_protocol_ਮੁੱਲਾਂ) - 1,
+		ਅੰਕ_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
-    static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    ਸਥਿਰ ਅੱਖਰ *(ਖਾਲੀ_ਥਾਵਾਂ_2[]) = {ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(ਦਲੀਲਾਂ, ਖਾਲੀ_ਥਾਵਾਂ_2, 0, ਅੰਕ_Matches, matches);
 }
 
 /*
  * The 'lispoptions' option is changed.
  */
-    char *
-did_set_lispoptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_lispoptions(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (**varp != NUL
+    ਜੇ (**varp != NUL
 	    && STRCMP(*varp, "expr:0") != 0
 	    && STRCMP(*varp, "expr:1") != 0)
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_lispoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_lispoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    static char *(p_lop_values[]) = {"expr:0", "expr:1", NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_lop_values,
-	    ARRAY_LENGTH(p_lop_values) - 1,
-	    numMatches,
+    ਸਥਿਰ ਅੱਖਰ *(p_lop_ਮੁੱਲਾਂ[]) = {"expr:0", "expr:1", ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_lop_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_lop_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'matchpairs' option is changed.
  */
-    char *
-did_set_matchpairs(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_matchpairs(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*p;
 
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
-	for (p = *varp; *p != NUL; ++p)
+	ਲਈ (p = *varp; *p != NUL; ++p)
 	{
-	    int x2 = -1;
-	    int x3 = -1;
+	    ਪੂਰਨ x2 = -1;
+	    ਪੂਰਨ x3 = -1;
 
 	    p += mb_ptr2len(p);
-	    if (*p != NUL)
+	    ਜੇ (*p != NUL)
 		x2 = *p++;
-	    if (*p != NUL)
+	    ਜੇ (*p != NUL)
 	    {
 		x3 = mb_ptr2char(p);
 		p += mb_ptr2len(p);
 	    }
-	    if (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
-		return e_invalid_argument;
-	    if (*p == NUL)
-		break;
+	    ਜੇ (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
+		ਵਾਪਸ e_invalid_ਦਲੀਲ;
+	    ਜੇ (*p == NUL)
+		ਰੋਕੋ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Check for "x:y,x:y"
-	for (p = *varp; *p != NUL; p += 4)
+	ਲਈ (p = *varp; *p != NUL; p += 4)
 	{
-	    if (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
-		return e_invalid_argument;
-	    if (p[3] == NUL)
-		break;
+	    ਜੇ (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
+		ਵਾਪਸ e_invalid_ਦਲੀਲ;
+	    ਜੇ (p[3] == NUL)
+		ਰੋਕੋ;
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Process the updated 'messagesopt' option value.
  */
-    char *
-did_set_messagesopt(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_messagesopt(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (messagesopt_changed() == FAIL)
-	return e_invalid_argument;
+    ਜੇ (messagesopt_ਬਦਲਿਆ() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_messagesopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    static char *(p_mopt_values[]) = {"hit-enter", "wait:", "history:", NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_mopt_values,
-	    ARRAY_LENGTH(p_mopt_values) - 1,
-	    numMatches,
+    ਸਥਿਰ ਅੱਖਰ *(p_mopt_ਮੁੱਲਾਂ[]) = {"hit-enter", "wait:", "history:", ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_mopt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_mopt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SPELL)
+#ਜੇ defined(FEAT_SPELL)
 /*
  * The 'mkspellmem' option is changed.
  */
-    char *
-did_set_mkspellmem(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_mkspellmem(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (spell_check_msm() != OK)
-	return e_invalid_argument;
+    ਜੇ (spell_check_msm() != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'mouse' option is changed.
  */
-    char *
-did_set_mouse(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_mouse(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    char	*retval;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    ਅੱਖਰ	*retval;
 
-    retval = did_set_option_listflag(*varp, (char_u *)MOUSE_ALL, args->os_errbuf,
-		    args->os_errbuflen);
-    if (retval == NULL)
+    retval = did_ਸੈੱਟ_option_listflag(*varp, (char_u *)MOUSE_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
+    ਜੇ (retval == ਨਿਰਾ)
     {
 	redraw_tabline = TRUE;
-	if (tabline_height() > 0)
+	ਜੇ (tabline_ਉਚਾਈ() > 0)
 	    update_screen(UPD_VALID);
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ਜੇ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 	popup_close_info(); // Close info popup to apply new properties
-#endif
+#ਜੇ_ਅੰਤ
     }
-    return retval;
+    ਵਾਪਸ retval;
 }
 
-    int
-expand_set_mouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_mouse(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)MOUSE_ALL, ਅੰਕ_Matches, matches);
 }
 
 /*
  * The 'mousemodel' option is changed.
  */
-    char *
-did_set_mousemodel(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_mousemodel(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_strings(p_mousem, p_mousem_values, FALSE) != OK)
-	return e_invalid_argument;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
-    else if (*p_mousem != *args->os_oldval.string)
+    ਜੇ (check_opt_ਲੜੀਆਂ(p_mousem, p_mousem_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+#ਜੇ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (Xm_ਸੰਸਕਰਣ <= 1002)
+    ਨਹੀਂਤਾਂ ਜੇ (*p_mousem != *ਦਲੀਲਾਂ->os_oldval.string)
 	// Changed from "extend" to "popup" or "popup_setpos" or vv: need
 	// to create or delete the popup menus.
-	gui_motif_update_mousemodel(root_menu);
-#endif
+	gui_motif_update_mousemodel(ਜੜ੍ਹ_menu);
+#ਜੇ_ਅੰਤ
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_mousemodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_mousemodel(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_mousem_values,
-	    ARRAY_LENGTH(p_mousem_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_mousem_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_mousem_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_MOUSESHAPE)
-    char *
-did_set_mouseshape(optset_T *args UNUSED)
+#ਜੇ defined(FEAT_MOUSESHAPE)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_mouseshape(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
     errmsg = parse_shape_opt(SHAPE_MOUSE);
     update_mouseshape(-1);
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'nrformats' option is changed.
  */
-    char *
-did_set_nrformats(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_nrformats(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return did_set_opt_strings(*varp, p_nf_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(*varp, p_nf_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_nrformats(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_nf_values,
-	    ARRAY_LENGTH(p_nf_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_nf_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_nf_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 /*
  * One of the '*expr' options is changed: 'balloonexpr', 'diffexpr',
  * 'foldexpr', 'foldtext', 'formatexpr', 'includeexpr', 'indentexpr',
  * 'patchexpr', 'printexpr' and 'charconvert'.
  */
-    char *
-did_set_optexpr(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_optexpr(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
     char_u *name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    ਜੇ (name != ਨਿਰਾ)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'pastetoggle' option is changed.
  */
-    char *
-did_set_pastetoggle(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_pastetoggle(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*p;
 
     // translate key codes like in a mapping
-    if (*p_pt)
+    ਜੇ (*p_pt)
     {
-	(void)replace_termcodes(p_pt, &p, 0,
-		REPTERM_FROM_PART | REPTERM_DO_LT, NULL);
-	if (p != NULL)
+	(ਖਾਲੀ)replace_termcodes(p_pt, &p, 0,
+		REPTERM_FROM_PART | REPTERM_DO_LT, ਨਿਰਾ);
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    free_string_option(p_pt);
 	    p_pt = p;
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ਜੇ defined(FEAT_PROP_POPUP)
 /*
  * The 'previewpopup' option is changed.
  */
-    char *
-did_set_previewpopup(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_previewpopup(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (parse_previewpopup(NULL) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (parse_previewpopup(ਨਿਰਾ) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-# if defined(FEAT_QUICKFIX)
+# ਜੇ defined(FEAT_QUICKFIX)
     popup_close_info();
 # endif
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static int
-expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
-	int previewpopup)
+    ਸਥਿਰ ਪੂਰਨ
+expand_ਸੈੱਟ_popupoption(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches,
+	ਪੂਰਨ previewpopup)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
-	if (completing_value_for_subopt(args, "close")
-		|| completing_value_for_subopt(args, "resize")
-		|| completing_value_for_subopt(args, "shadow"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "close")
+		|| completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "resize")
+		|| completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "shadow"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    p_popup_option_on_off_values,
-		    ARRAY_LENGTH(p_popup_option_on_off_values) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    p_popup_option_on_off_ਮੁੱਲਾਂ,
+		    ARRAY_ਲੰਮਾਈ(p_popup_option_on_off_ਮੁੱਲਾਂ) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "border"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "border"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    previewpopup ? p_popup_pvp_border_values
-			: p_popup_cpp_border_values,
-		    (previewpopup ? ARRAY_LENGTH(p_popup_pvp_border_values) - 1
-			: ARRAY_LENGTH(p_popup_cpp_border_values)) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    previewpopup ? p_popup_pvp_border_ਮੁੱਲਾਂ
+			: p_popup_cpp_border_ਮੁੱਲਾਂ,
+		    (previewpopup ? ARRAY_ਲੰਮਾਈ(p_popup_pvp_border_ਮੁੱਲਾਂ) - 1
+			: ARRAY_ਲੰਮਾਈ(p_popup_cpp_border_ਮੁੱਲਾਂ)) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "align"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "align"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    p_popup_option_align_values,
-		    ARRAY_LENGTH(p_popup_option_align_values) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    p_popup_option_align_ਮੁੱਲਾਂ,
+		    ARRAY_ਲੰਮਾਈ(p_popup_option_align_ਮੁੱਲਾਂ) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "highlight")
-		|| completing_value_for_subopt(args, "borderhighlight"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "highlight")
+		|| completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "borderhighlight"))
 	{
 	    // Return the list of all highlight names
-	    return expand_set_opt_generic(
-		    args,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+		    ਦਲੀਲਾਂ,
 		    get_highlight_name,
-		    numMatches,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    return expand_set_opt_string(
-	    args,
-	    previewpopup ? p_popup_pvp_option_values
-		: p_popup_cpp_option_values,
-	    previewpopup ? ARRAY_LENGTH(p_popup_pvp_option_values) - 1
-		: ARRAY_LENGTH(p_popup_cpp_option_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    previewpopup ? p_popup_pvp_option_ਮੁੱਲਾਂ
+		: p_popup_cpp_option_ਮੁੱਲਾਂ,
+	    previewpopup ? ARRAY_ਲੰਮਾਈ(p_popup_pvp_option_ਮੁੱਲਾਂ) - 1
+		: ARRAY_ਲੰਮਾਈ(p_popup_cpp_option_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-    int
-expand_set_previewpopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_previewpopup(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, TRUE);
+    ਵਾਪਸ expand_ਸੈੱਟ_popupoption(ਦਲੀਲਾਂ, ਅੰਕ_Matches, matches, TRUE);
 }
 
-    int
-expand_set_completepopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_completepopup(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, FALSE);
+    ਵਾਪਸ expand_ਸੈੱਟ_popupoption(ਦਲੀਲਾਂ, ਅੰਕ_Matches, matches, FALSE);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_POSTSCRIPT)
+#ਜੇ defined(FEAT_POSTSCRIPT)
 /*
  * The 'printencoding' option is changed.
  */
-    char *
-did_set_printencoding(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_printencoding(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     char_u	*s, *p;
 
     // Canonize 'printencoding' if VIM standard one
     p = enc_canonize(p_penc);
-    if (p != NULL)
+    ਜੇ (p != ਨਿਰਾ)
     {
 	vim_free(p_penc);
 	p_penc = p;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Ensure lower case and '-' for '_'
-	for (s = p_penc; *s != NUL; s++)
+	ਲਈ (s = p_penc; *s != NUL; s++)
 	{
-	    if (*s == '_')
+	    ਜੇ (*s == '_')
 		*s = '-';
-	    else
+	    ਨਹੀਂਤਾਂ
 		*s = TOLOWER_ASC(*s);
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_PRINTER)
+#ਜੇ defined(FEAT_PRINTER)
 
-    static char_u *
-get_printoptions_names(expand_T *xp UNUSED, int idx)
+    ਸਥਿਰ char_u *
+get_printoptions_ਨਾਂ(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(printer_opts))
-	return NULL;
-    return (char_u*)printer_opts[idx].name;
+    ਜੇ (idx >= (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(printer_opts))
+	ਵਾਪਸ ਨਿਰਾ;
+    ਵਾਪਸ (char_u*)printer_opts[idx].name;
 }
 
 /*
  * Expand 'printoptions' option
  */
-    int
-expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_printoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
-	    args,
-	    get_printoptions_names,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ,
+	    get_printoptions_ਨਾਂ,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_STL_OPT)
+#ਜੇ defined(FEAT_STL_OPT)
 /*
  * The 'statusline' or the 'tabline' or the 'rulerformat' option is changed.
  * "rulerformat" is TRUE if the 'rulerformat' option is changed.
  */
-    static char *
-parse_statustabline_rulerformat(optset_T *args, int rulerformat)
+    ਸਥਿਰ ਅੱਖਰ *
+parse_statustabline_rulerformat(optset_T *ਦਲੀਲਾਂ, ਪੂਰਨ rulerformat)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*s;
-    char	*errmsg = NULL;
-    int		wid;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
+    ਪੂਰਨ		wid;
 
-    if (rulerformat)	// reset ru_wid first
+    ਜੇ (rulerformat)	// reset ru_wid first
 	ru_wid = 0;
     s = *varp;
-    if (rulerformat && *s == '%')
+    ਜੇ (rulerformat && *s == '%')
     {
 	// set ru_wid if 'ruf' starts with "%99("
-	if (*++s == '-')	// ignore a '-'
+	ਜੇ (*++s == '-')	// ignore a '-'
 	    s++;
 	wid = getdigits(&s);
-	if (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == NULL)
+	ਜੇ (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == ਨਿਰਾ)
 	    ru_wid = wid;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Validate the flags in 'rulerformat' only if it doesn't point to
 	    // a custom function ("%!" flag).
-	    if ((*varp)[1] != '!')
+	    ਜੇ ((*varp)[1] != '!')
 		errmsg = check_stl_option(p_ruf);
 	}
     }
     // check 'statusline' or 'tabline' only if it doesn't start with "%!"
-    else if (rulerformat || s[0] != '%' || s[1] != '!')
+    ਨਹੀਂਤਾਂ ਜੇ (rulerformat || s[0] != '%' || s[1] != '!')
 	errmsg = check_stl_option(s);
-    if (rulerformat && errmsg == NULL)
-	comp_col();
+    ਜੇ (rulerformat && errmsg == ਨਿਰਾ)
+	comp_ਖਾਨਾ();
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_RENDER_OPTIONS)
+#ਜੇ defined(FEAT_RENDER_OPTIONS)
 /*
  * The 'renderoptions' option is changed.
  */
-    char *
-did_set_renderoptions(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_renderoptions(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (!gui_mch_set_rendering_options(p_rop))
-	return e_invalid_argument;
+    ਜੇ (!gui_mch_ਸੈੱਟ_rendering_options(p_rop))
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_RIGHTLEFT)
+#ਜੇ defined(FEAT_RIGHTLEFT)
 /*
  * The 'rightleftcmd' option is changed.
  */
-    char *
-did_set_rightleftcmd(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_rightleftcmd(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
     // Currently only "search" is a supported value.
-    if (**varp != NUL && STRCMP(*varp, "search") != 0)
-	return e_invalid_argument;
+    ਜੇ (**varp != NUL && STRCMP(*varp, "search") != 0)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_rightleftcmd(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_rightleftcmd(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    static char *(p_rlc_values[]) = {"search", NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_rlc_values,
-	    ARRAY_LENGTH(p_rlc_values) - 1,
-	    numMatches,
+    ਸਥਿਰ ਅੱਖਰ *(p_rlc_ਮੁੱਲਾਂ[]) = {"search", ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_rlc_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_rlc_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#define PUM_BORDER_CLEAR()   \
-    do {                     \
-	pum_set_border(FALSE); \
-	pum_set_shadow(FALSE); \
-	pum_set_margin(FALSE); \
-    } while (0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ PUM_BORDER_CLEAR()   \
+    ਕਰੋ {                     \
+	pum_ਸੈੱਟ_border(FALSE); \
+	pum_ਸੈੱਟ_shadow(FALSE); \
+	pum_ਸੈੱਟ_margin(FALSE); \
+    } ਜਦੋਂ (0)
 
 /*
  * Parse a border value from a pumopt "border:" token.
  * Returns OK on success, FAIL on error.
  */
-    static int
-parse_pumopt_border(char_u *val, int len)
+    ਸਥਿਰ ਪੂਰਨ
+parse_pumopt_border(char_u *val, ਪੂਰਨ len)
 {
     // Use box-drawing characters only when 'encoding' is "utf-8" and
     // 'ambiwidth' is "single".
-    int	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
+    ਪੂਰਨ	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
     char_u  *token;
 
     token = vim_strnsave(val, len);
-    if (token == NULL)
-	return FAIL;
+    ਜੇ (token == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    if (can_use_box_chars && STRCMP(token, "single") == 0)
-	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
+    ਜੇ (can_use_box_chars && STRCMP(token, "single") == 0)
+	pum_ਸੈੱਟ_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x250c, 0x2510, 0x2518, 0x2514); // ┌ ┐ ┘ └
-    else if (can_use_box_chars && STRCMP(token, "double") == 0)
-	pum_set_border_chars(0x2550, 0x2551, 0x2550, 0x2551, // ═ ║ ═ ║
+    ਨਹੀਂਤਾਂ ਜੇ (can_use_box_chars && STRCMP(token, "double") == 0)
+	pum_ਸੈੱਟ_border_chars(0x2550, 0x2551, 0x2550, 0x2551, // ═ ║ ═ ║
 		0x2554, 0x2557, 0x255D, 0x255A); // ╔ ╗ ╝  ╚
-    else if (can_use_box_chars && STRCMP(token, "round") == 0)
-	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
+    ਨਹੀਂਤਾਂ ਜੇ (can_use_box_chars && STRCMP(token, "round") == 0)
+	pum_ਸੈੱਟ_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x256d, 0x256e, 0x256f, 0x2570); // ╭ ╮ ╯ ╰
-    else if (STRCMP(token, "ascii") == 0)
-	pum_set_border_chars('-', '|', '-', '|', '+', '+', '+', '+');
-    else if (STRNCMP(token, "custom:", 7) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(token, "ascii") == 0)
+	pum_ਸੈੱਟ_border_chars('-', '|', '-', '|', '+', '+', '+', '+');
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(token, "custom:", 7) == 0)
     {
 	char_u	*q = token + 7;
-	int	out[8];
+	ਪੂਰਨ	ਬਾਹਰਲਾ[8];
 
-	for (int i = 0; i < 8; i++)
+	ਲਈ (ਪੂਰਨ i = 0; i < 8; i++)
 	{
-	    if (*q == NUL || *q == ',')
+	    ਜੇ (*q == NUL || *q == ',')
 	    {
 		vim_free(token);
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	    }
-	    out[i] = mb_ptr2char(q);
+	    ਬਾਹਰਲਾ[i] = mb_ptr2char(q);
 	    mb_ptr2char_adv(&q);
-	    if (i < 7)
+	    ਜੇ (i < 7)
 	    {
-		if (*q != ';')
+		ਜੇ (*q != ';')
 		{
 		    vim_free(token);
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		}
 		q++;
 	    }
 	}
-	if (*q != NUL && *q != ',')
+	ਜੇ (*q != NUL && *q != ',')
 	{
 	    vim_free(token);
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
-	pum_set_border_chars(out[0], out[1], out[2], out[3], out[4], out[5],
-		out[6], out[7]);
+	pum_ਸੈੱਟ_border_chars(ਬਾਹਰਲਾ[0], ਬਾਹਰਲਾ[1], ਬਾਹਰਲਾ[2], ਬਾਹਰਲਾ[3], ਬਾਹਰਲਾ[4], ਬਾਹਰਲਾ[5],
+		ਬਾਹਰਲਾ[6], ਬਾਹਰਲਾ[7]);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	vim_free(token);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
     vim_free(token);
-    pum_set_border(TRUE);
-    return OK;
+    pum_ਸੈੱਟ_border(TRUE);
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -3888,13 +3888,13 @@ parse_pumopt_border(char_u *val, int len)
  *   shadow
  *   margin (requires border)
  */
-    char *
-did_set_pumopt(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_pumopt(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u  **varp = (char_u **)args->os_varp;
+    char_u  **varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u  *p;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    ਪੂਰਨ	    have_border = FALSE;
+    ਪੂਰਨ	    have_margin = FALSE;
 
     // Reset to defaults.
     PUM_BORDER_CLEAR();
@@ -3903,78 +3903,78 @@ did_set_pumopt(optset_T *args)
     p_pmw = 0;
     p_po = 100;
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    ਜੇ (*varp == ਨਿਰਾ || **varp == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    ਲਈ (p = *varp; p != ਨਿਰਾ && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	int len;
+	ਪੂਰਨ len;
 
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	ਜੇ (comma != ਨਿਰਾ)
+	    len = (ਪੂਰਨ)(comma - p);
+	ਨਹੀਂਤਾਂ
+	    len = (ਪੂਰਨ)STRLEN(p);
 
-	if (STRNCMP(p, "border:", 7) == 0)
+	ਜੇ (STRNCMP(p, "border:", 7) == 0)
 	{
-	    if (have_border)
-		goto error;
+	    ਜੇ (have_border)
+		ਜਾਓ error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p + 7, len - 7) == FAIL)
-		goto error;
+	    ਜੇ (parse_pumopt_border(p + 7, len - 7) == FAIL)
+		ਜਾਓ error;
 	}
-	else if (STRNCMP(p, "height:", 7) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, "height:", 7) == 0)
 	{
-	    long n = atol((char *)p + 7);
-	    if (n < 0)
-		goto error;
+	    ਲੰਮਾ n = atol((ਅੱਖਰ *)p + 7);
+	    ਜੇ (n < 0)
+		ਜਾਓ error;
 	    p_ph = n;
 	}
-	else if (STRNCMP(p, "width:", 6) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, "width:", 6) == 0)
 	{
-	    long n = atol((char *)p + 6);
-	    if (n < 0)
-		goto error;
+	    ਲੰਮਾ n = atol((ਅੱਖਰ *)p + 6);
+	    ਜੇ (n < 0)
+		ਜਾਓ error;
 	    p_pw = n;
 	}
-	else if (STRNCMP(p, "maxwidth:", 9) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, "maxwidth:", 9) == 0)
 	{
-	    long n = atol((char *)p + 9);
-	    if (n < 0)
-		goto error;
+	    ਲੰਮਾ n = atol((ਅੱਖਰ *)p + 9);
+	    ਜੇ (n < 0)
+		ਜਾਓ error;
 	    p_pmw = n;
 	}
-	else if (STRNCMP(p, "opacity:", 8) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, "opacity:", 8) == 0)
 	{
-	    long n = atol((char *)p + 8);
-	    if (n < 0 || n > 100)
-		goto error;
+	    ਲੰਮਾ n = atol((ਅੱਖਰ *)p + 8);
+	    ਜੇ (n < 0 || n > 100)
+		ਜਾਓ error;
 	    p_po = n;
 	}
-	else if (len == 6 && STRNCMP(p, "shadow", 6) == 0)
-	    pum_set_shadow(TRUE);
-	else if (len == 6 && STRNCMP(p, "margin", 6) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (len == 6 && STRNCMP(p, "shadow", 6) == 0)
+	    pum_ਸੈੱਟ_shadow(TRUE);
+	ਨਹੀਂਤਾਂ ਜੇ (len == 6 && STRNCMP(p, "margin", 6) == 0)
 	{
 	    have_margin = TRUE;
-	    pum_set_margin(TRUE);
+	    pum_ਸੈੱਟ_margin(TRUE);
 	}
-	else
-	    goto error;
+	ਨਹੀਂਤਾਂ
+	    ਜਾਓ error;
 
-	if (comma != NULL)
+	ਜੇ (comma != ਨਿਰਾ)
 	    p = comma + 1;
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
 
-    if (have_margin && !have_border)
-	goto error;
+    ਜੇ (have_margin && !have_border)
+	ਜਾਓ error;
 
     // Invalidate cached background for opacity changes.
-    pum_opacity_changed();
+    pum_opacity_ਬਦਲਿਆ();
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 
 error:
     PUM_BORDER_CLEAR();
@@ -3982,39 +3982,39 @@ error:
     p_pw = 15;
     p_pmw = 0;
     p_po = 100;
-    return e_invalid_argument;
+    ਵਾਪਸ e_invalid_ਦਲੀਲ;
 }
 
-    static char_u *
-get_pum_border_style(expand_T *xp UNUSED, int idx)
+    ਸਥਿਰ char_u *
+get_pum_border_style(expand_T *xp ਅਣਵਰਤਿਆ, ਪੂਰਨ idx)
 {
-    static char *styles[] = {"ascii", "custom:", "single", "double", "round"};
-    return idx < ((enc_utf8 && *p_ambw == 's') ? (int)ARRAY_LENGTH(styles) : 2)
-	    ? (char_u *)styles[idx] : NULL;
+    ਸਥਿਰ ਅੱਖਰ *styles[] = {"ascii", "custom:", "single", "double", "round"};
+    ਵਾਪਸ idx < ((enc_utf8 && *p_ambw == 's') ? (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(styles) : 2)
+	    ? (char_u *)styles[idx] : ਨਿਰਾ;
 }
 
-    int
-expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_pumopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
-	if (completing_value_for_subopt(args, "border"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "border"))
 	{
-	    return expand_set_opt_generic(
-		    args, get_pum_border_style, numMatches, matches);
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+		    ਦਲੀਲਾਂ, get_pum_border_style, ਅੰਕ_Matches, matches);
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    static char *(p_pumopt_values[]) = {"border:", "height:", "width:",
-	"maxwidth:", "opacity:", "shadow", "margin", NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_pumopt_values,
-	    ARRAY_LENGTH(p_pumopt_values) - 1,
-	    numMatches,
+    ਸਥਿਰ ਅੱਖਰ *(p_pumopt_ਮੁੱਲਾਂ[]) = {"border:", "height:", "width:",
+	"maxwidth:", "opacity:", "shadow", "margin", ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_pumopt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_pumopt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
@@ -4025,584 +4025,584 @@ expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
  *   - "margin" may appear, but only together with exactly one border style.
  *   - "shadow" is independent and can be combined freely.
  */
-    char *
-did_set_pumborder(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_pumborder(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u  **varp = (char_u **)args->os_varp;
+    char_u  **varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u  *p;
-    int	    len;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    ਪੂਰਨ	    len;
+    ਪੂਰਨ	    have_border = FALSE;
+    ਪੂਰਨ	    have_margin = FALSE;
 
     PUM_BORDER_CLEAR();
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    ਜੇ (*varp == ਨਿਰਾ || **varp == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    ਲਈ (p = *varp; p != ਨਿਰਾ && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	ਜੇ (comma != ਨਿਰਾ)
+	    len = (ਪੂਰਨ)(comma - p);
+	ਨਹੀਂਤਾਂ
+	    len = (ਪੂਰਨ)STRLEN(p);
 
-	if (STRNCMP(p, "shadow", len) == 0 && len == 6)
-	    pum_set_shadow(TRUE);
-	else if (STRNCMP(p, "margin", len) == 0 && len == 6)
+	ਜੇ (STRNCMP(p, "shadow", len) == 0 && len == 6)
+	    pum_ਸੈੱਟ_shadow(TRUE);
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(p, "margin", len) == 0 && len == 6)
 	{
 	    have_margin = TRUE;
-	    pum_set_margin(TRUE);
+	    pum_ਸੈੱਟ_margin(TRUE);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (have_border)
-		goto error;
+	    ਜੇ (have_border)
+		ਜਾਓ error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p, len) == FAIL)
-		goto error;
+	    ਜੇ (parse_pumopt_border(p, len) == FAIL)
+		ਜਾਓ error;
 	}
 
-	if (comma != NULL)
+	ਜੇ (comma != ਨਿਰਾ)
 	    p = comma + 1;
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
 
-    if (have_margin && !have_border)
-	goto error;
+    ਜੇ (have_margin && !have_border)
+	ਜਾਓ error;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 
 error:
     PUM_BORDER_CLEAR();
-    pum_set_border_chars(0, 0, 0, 0, 0, 0, 0, 0);
-    return e_invalid_argument;
+    pum_ਸੈੱਟ_border_chars(0, 0, 0, 0, 0, 0, 0, 0);
+    ਵਾਪਸ e_invalid_ਦਲੀਲ;
 }
 
-    static char_u *
-get_pumborder_token(expand_T *xp, int idx)
+    ਸਥਿਰ char_u *
+get_pumborder_token(expand_T *xp, ਪੂਰਨ idx)
 {
-    return idx == 0 ? (char_u *)"margin"
+    ਵਾਪਸ idx == 0 ? (char_u *)"margin"
 	 : idx == 1 ? (char_u *)"shadow"
 	 : get_pum_border_style(xp, idx - 2);
 }
 
-    int
-expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_pumborder(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
-	    args, get_pumborder_token, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ, get_pumborder_token, ਅੰਕ_Matches, matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#ਜੇ defined(FEAT_STL_OPT)
 
 /*
  * The 'rulerformat' option is changed.
  */
-    char *
-did_set_rulerformat(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_rulerformat(optset_T *ਦਲੀਲਾਂ)
 {
-    return parse_statustabline_rulerformat(args, TRUE);
+    ਵਾਪਸ parse_statustabline_rulerformat(ਦਲੀਲਾਂ, TRUE);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_TABPANEL)
+#ਜੇ defined(FEAT_TABPANEL)
 /*
  * Process the new 'tabpanelopt' option value.
  */
-    char *
-did_set_tabpanelopt(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_tabpanelopt(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (tabpanelopt_changed() == FAIL)
-	return e_invalid_argument;
+    ਜੇ (tabpanelopt_ਬਦਲਿਆ() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_tabpanelopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
-	if (completing_value_for_subopt(args, "align"))
+	ਜੇ (completing_ਮੁੱਲ_for_subopt(ਦਲੀਲਾਂ, "align"))
 	{
-	    return expand_set_opt_string(
-		    args,
-		    p_tplo_align_values,
-		    ARRAY_LENGTH(p_tplo_align_values) - 1,
-		    numMatches,
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+		    ਦਲੀਲਾਂ,
+		    p_tplo_align_ਮੁੱਲਾਂ,
+		    ARRAY_ਲੰਮਾਈ(p_tplo_align_ਮੁੱਲਾਂ) - 1,
+		    ਅੰਕ_Matches,
 		    matches);
 	}
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    return expand_set_opt_string(
-	    args,
-	    p_tplo_values,
-	    ARRAY_LENGTH(p_tplo_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_tplo_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_tplo_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'scrollopt' option is changed.
  */
-    char *
-did_set_scrollopt(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_scrollopt(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_sbo, p_scbopt_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_sbo, p_scbopt_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_scrollopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_scrollopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_scbopt_values,
-	    ARRAY_LENGTH(p_scbopt_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_scbopt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_scbopt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'wlseat' option is changed
  */
-    char *
-did_set_wlseat(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_wlseat(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_WAYLAND_CLIPBOARD
     // If there isn't any seat named 'wlseat', then let the Wayland clipboard be
     // unavailable. Ignore errors returned.
     clip_reset_wayland();
-#endif
+#ਜੇ_ਅੰਤ
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'selection' option is changed.
  */
-    char *
-did_set_selection(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_selection(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (*p_sel == NUL || check_opt_strings(p_sel, p_sel_values, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (*p_sel == NUL || check_opt_ਲੜੀਆਂ(p_sel, p_sel_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_selection(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_sel_values,
-	    ARRAY_LENGTH(p_sel_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_sel_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_sel_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'selectmode' option is changed.
  */
-    char *
-did_set_selectmode(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_selectmode(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_slm, p_slm_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_slm, p_slm_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_selectmode(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_slm_values,
-	    ARRAY_LENGTH(p_slm_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_slm_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_slm_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SESSION)
+#ਜੇ defined(FEAT_SESSION)
 /*
  * The 'sessionoptions' option is changed.
  */
-    char *
-did_set_sessionoptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_sessionoptions(optset_T *ਦਲੀਲਾਂ)
 {
-    if (opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE) != OK)
-	return e_invalid_argument;
-    if ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_ssop, p_ssop_ਮੁੱਲਾਂ, &ssop_flags, TRUE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਜੇ ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
     {
 	// Don't allow both "sesdir" and "curdir".
-	(void)opt_strings_flags(args->os_oldval.string, p_ssop_values,
+	(ਖਾਲੀ)opt_ਲੜੀਆਂ_flags(ਦਲੀਲਾਂ->os_oldval.string, p_ssop_ਮੁੱਲਾਂ,
 							&ssop_flags, TRUE);
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_sessionoptions(
-    optexpand_T		*args,
-    int			*numMatches,
+    ਪੂਰਨ
+expand_ਸੈੱਟ_sessionoptions(
+    optexpand_T		*ਦਲੀਲਾਂ,
+    ਪੂਰਨ			*ਅੰਕ_Matches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ssop_values,
-	    ARRAY_LENGTH(p_ssop_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ssop_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ssop_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Validate 'shellpipe'/'shellredir' option.
  */
-    char *
-did_set_shellpipe_redir(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_shellpipe_redir(optset_T *ਦਲੀਲਾਂ)
 {
     char_u	*p;
-    bool	seen = false;
+    bool	ਵੇਖਿਆ = false;
 
-    for (p = args->os_newval.string; *p != NUL; ++p)
+    ਲਈ (p = ਦਲੀਲਾਂ->os_newval.string; *p != NUL; ++p)
     {
-	if (*p != '%')
-	    continue;
+	ਜੇ (*p != '%')
+	    ਜਾਰੀ;
 
-	if (p[1] == NUL)
-	    return e_invalid_format_string_single_percent_s;
+	ਜੇ (p[1] == NUL)
+	    ਵਾਪਸ e_invalid_format_string_single_percent_s;
 
-	if (p[1] == '%')
+	ਜੇ (p[1] == '%')
 	{
 	    ++p;    // skip second %
-	    continue;
+	    ਜਾਰੀ;
 	}
 
-	if (p[1] == 's')
+	ਜੇ (p[1] == 's')
 	{
-	    if (seen)
-		return e_invalid_format_string_single_percent_s;
+	    ਜੇ (ਵੇਖਿਆ)
+		ਵਾਪਸ e_invalid_format_string_single_percent_s;
 
-	    seen = true;
+	    ਵੇਖਿਆ = true;
 	    ++p;    // consume 's'
-	    continue;
+	    ਜਾਰੀ;
 	}
-	return e_invalid_format_string_single_percent_s;
+	ਵਾਪਸ e_invalid_format_string_single_percent_s;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'shortmess' option is changed.
  */
-    char *
-did_set_shortmess(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_shortmess(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    ਵਾਪਸ did_ਸੈੱਟ_option_listflag(*varp, (char_u *)SHM_ALL, ਦਲੀਲਾਂ->os_errbuf,
+		    ਦਲੀਲਾਂ->os_errbuflen);
 }
 
-    int
-expand_set_shortmess(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_shortmess(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)SHM_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)SHM_ALL, ਅੰਕ_Matches, matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#ਜੇ defined(FEAT_LINEBREAK)
 /*
  * The 'showbreak' option is changed.
  */
-    char *
-did_set_showbreak(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_showbreak(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*s;
 
-    for (s = *varp; *s; )
+    ਲਈ (s = *varp; *s; )
     {
-	if (ptr2cells(s) != 1)
-	    return e_showbreak_contains_unprintable_or_wide_character;
+	ਜੇ (ptr2cells(s) != 1)
+	    ਵਾਪਸ e_showbreak_ਸ਼ਾਮਲ_ਹੈ_unprintable_or_wide_character;
 	MB_PTR_ADV(s);
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'showcmdloc' option is changed.
  */
-    char *
-did_set_showcmdloc(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_showcmdloc(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char	*errmsg = did_set_opt_strings(p_sloc, p_sloc_values, FALSE);
+    ਅੱਖਰ	*errmsg = did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_sloc, p_sloc_ਮੁੱਲਾਂ, FALSE);
 
-    if (errmsg == NULL)
-	comp_col();
+    ਜੇ (errmsg == ਨਿਰਾ)
+	comp_ਖਾਨਾ();
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
-    int
-expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_showcmdloc(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_sloc_values,
-	    ARRAY_LENGTH(p_sloc_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_sloc_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_sloc_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SIGNS)
+#ਜੇ defined(FEAT_SIGNS)
 /*
  * The 'signcolumn' option is changed.
  */
-    char *
-did_set_signcolumn(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_signcolumn(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-# if defined(FEAT_LINEBREAK)
-    if (check_opt_strings(*varp, p_scl_values, FALSE) != OK)
-	return e_invalid_argument;
+# ਜੇ defined(FEAT_LINEBREAK)
+    ਜੇ (check_opt_ਲੜੀਆਂ(*varp, p_scl_ਮੁੱਲਾਂ, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
     // When changing the 'signcolumn' to or from 'number', recompute the
     // width of the number column if 'number' or 'relativenumber' is set.
-    if (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
+    ਜੇ (((*ਦਲੀਲਾਂ->os_oldval.string == 'n' && ਦਲੀਲਾਂ->os_oldval.string[1] == 'u')
 		|| (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) =='u'))
 	    && (curwin->w_p_nu || curwin->w_p_rnu))
-	curwin->w_nrwidth_line_count = 0;
+	curwin->w_nrwidth_ਸਤਰ_ਗਿਣਤੀ = 0;
 # endif
 
-# if defined(FEAT_GUI)
+# ਜੇ defined(FEAT_GUI)
     // In the GUI, when sign icons are used, a full screen clear is needed
     // to properly redraw the sign icons.
-    if (gui.in_use && curbuf->b_signlist != NULL)
+    ਜੇ (gui.ਵਿੱਚ_use && curbuf->b_signlist != ਨਿਰਾ)
 	redraw_all_later(UPD_CLEAR);
 # endif
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_signcolumn(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_scl_values,
-	    ARRAY_LENGTH(p_scl_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_scl_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_scl_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_SPELL)
+#ਜੇ defined(FEAT_SPELL)
 /*
  * The 'spellcapcheck' option is changed.
  */
-    char *
-did_set_spellcapcheck(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_spellcapcheck(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     // compile the regexp program.
-    return compile_cap_prog(curwin->w_s);
+    ਵਾਪਸ compile_cap_prog(curwin->w_s);
 }
 
 /*
  * The 'spellfile' option is changed.
  */
-    char *
-did_set_spellfile(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_spellfile(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (!valid_spellfile(*varp))
-	return e_invalid_argument;
+    ਜੇ (!valid_spellfile(*varp))
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    ਵਾਪਸ did_ਸੈੱਟ_spell_option();
 }
 
 /*
  * The 'spell' option is changed.
  */
-    char *
-did_set_spelllang(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_spelllang(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (!valid_spelllang(*varp))
-	return e_invalid_argument;
+    ਜੇ (!valid_spelllang(*varp))
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    ਵਾਪਸ did_ਸੈੱਟ_spell_option();
 }
 
 /*
  * The 'spelloptions' option is changed.
  */
-    char *
-did_set_spelloptions(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_spelloptions(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (**varp != NUL && STRCMP(*varp, "camel") != 0)
-	return e_invalid_argument;
+    ਜੇ (**varp != NUL && STRCMP(*varp, "camel") != 0)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_spelloptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    static char *(p_spo_values[]) = {"camel", NULL};
-    return expand_set_opt_string(
-	    args,
-	    p_spo_values,
-	    ARRAY_LENGTH(p_spo_values) - 1,
-	    numMatches,
+    ਸਥਿਰ ਅੱਖਰ *(p_spo_ਮੁੱਲਾਂ[]) = {"camel", ਨਿਰਾ};
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_spo_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_spo_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'spellsuggest' option is changed.
  */
-    char *
-did_set_spellsuggest(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_spellsuggest(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (spell_check_sps() != OK)
-	return e_invalid_argument;
+    ਜੇ (spell_check_sps() != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_spellsuggest(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_sps_values,
-	    ARRAY_LENGTH(p_sps_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_sps_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_sps_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'splitkeep' option is changed.
  */
-    char *
-did_set_splitkeep(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_splitkeep(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     win_T	*wp;
     tabpage_T	*tp;
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	wp->w_prev_height = wp->w_height;
+	wp->w_prev_ਉਚਾਈ = wp->w_ਉਚਾਈ;
 	wp->w_prev_winrow = wp->w_winrow;
     }
-    return did_set_opt_strings(p_spk, p_spk_values, FALSE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_spk, p_spk_ਮੁੱਲਾਂ, FALSE);
 }
 
-    int
-expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_splitkeep(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_spk_values,
-	    ARRAY_LENGTH(p_spk_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_spk_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_spk_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#ਜੇ defined(FEAT_STL_OPT)
 /*
  * The 'statusline' option is changed.
  */
-    char *
-did_set_statusline(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_statusline(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u  **varp = (char_u **)args->os_varp;
-    char    *ret = parse_statustabline_rulerformat(args, FALSE);
+    char_u  **varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    ਅੱਖਰ    *ret = parse_statustabline_rulerformat(ਦਲੀਲਾਂ, FALSE);
 
-    if (ret != NULL)
-	return ret;
-    update_stl_rendered_height(varp == &curwin->w_p_stl ? curwin : NULL);
-    frame_change_statusline_height();
+    ਜੇ (ret != ਨਿਰਾ)
+	ਵਾਪਸ ret;
+    update_stl_rendered_ਉਚਾਈ(varp == &curwin->w_p_stl ? curwin : ਨਿਰਾ);
+    ਚੌਖਟਾ_change_statusline_ਉਚਾਈ();
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Rewrite the 'statuslineopt' string: replace the last "maxheight:N" with
  * actual_stlh and remove earlier duplicates.  Keyword order is preserved.
  */
-    static void
-update_stlo_maxheight(char_u **varp, int actual_stlh)
+    ਸਥਿਰ ਖਾਲੀ
+update_stlo_maxheight(char_u **varp, ਪੂਰਨ actual_stlh)
 {
-    const char_u    *src = *varp;
-    const char_u    *last_mh = NULL;
-    const char_u    *p;
+    ਅਚਲ char_u    *src = *varp;
+    ਅਚਲ char_u    *ਆਖਰੀ_mh = ਨਿਰਾ;
+    ਅਚਲ char_u    *p;
 
     // Find the last "maxheight:" token.
     p = src;
-    while (*p != NUL)
+    ਜਦੋਂ (*p != NUL)
     {
-	if (STRNCMP(p, "maxheight:", 10) == 0)
-	    last_mh = p;
-	while (*p != ',' && *p != NUL)
+	ਜੇ (STRNCMP(p, "maxheight:", 10) == 0)
+	    ਆਖਰੀ_mh = p;
+	ਜਦੋਂ (*p != ',' && *p != NUL)
 	    ++p;
-	if (*p == ',')
+	ਜੇ (*p == ',')
 	    ++p;
     }
 
-    if (last_mh == NULL)
-	return;
+    ਜੇ (ਆਖਰੀ_mh == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     size_t	bufsize = STRLEN(src) + NUMBUFLEN + 1;
     char_u	*buf = alloc(bufsize);
-    if (buf == NULL)
-	return;
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    int		len = 0;
+    ਪੂਰਨ		len = 0;
     bool	need_comma = false;
 
     p = src;
-    while (*p != NUL)
+    ਜਦੋਂ (*p != NUL)
     {
-	const	char_u	*tok = p;
-	int	tok_len;
+	ਅਚਲ	char_u	*tok = p;
+	ਪੂਰਨ	tok_len;
 
-	while (*p != ',' && *p != NUL)
+	ਜਦੋਂ (*p != ',' && *p != NUL)
 	    ++p;
-	tok_len = (int)(p - tok);
-	if (*p == ',')
+	tok_len = (ਪੂਰਨ)(p - tok);
+	ਜੇ (*p == ',')
 	    ++p;
 
-	if (STRNCMP(tok, "maxheight:", 10) == 0)
+	ਜੇ (STRNCMP(tok, "maxheight:", 10) == 0)
 	{
-	    if (tok == last_mh)
+	    ਜੇ (tok == ਆਖਰੀ_mh)
 	    {
 		// Replace the last occurrence with the actual value.
-		if (need_comma)
+		ਜੇ (need_comma)
 		    buf[len++] = ',';
-		len += vim_snprintf((char *)buf + len,
+		len += vim_snprintf((ਅੱਖਰ *)buf + len,
 			bufsize - len, "maxheight:%d", actual_stlh);
 		need_comma = true;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (need_comma)
+	    ਜੇ (need_comma)
 		buf[len++] = ',';
 	    mch_memmove(buf + len, tok, tok_len);
 	    len += tok_len;
@@ -4617,48 +4617,48 @@ update_stlo_maxheight(char_u **varp, int actual_stlh)
 /*
  * The 'statuslineopt' option is changed.
  */
-    char *
-did_set_statuslineopt(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_statuslineopt(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    win_T       *wp = varp == &curwin->w_p_stlo ? curwin : NULL;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
+    win_T       *wp = varp == &curwin->w_p_stlo ? curwin : ਨਿਰਾ;
 
-    if (statuslineopt_changed(*varp, wp) == FAIL)
-	return e_invalid_argument;
+    ਜੇ (statuslineopt_ਬਦਲਿਆ(*varp, wp) == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
     // Sync stl_rendered_height with the current statusline.
-    update_stl_rendered_height(wp);
+    update_stl_rendered_ਉਚਾਈ(wp);
 
     // Update the maxheight value to the actual value set.
     // Note: Must be changed if p_stlo_values are changed.
-    if (*varp != empty_option)
+    ਜੇ (*varp != ਖਾਲੀ_ਥਾਵਾਂ_option)
     {
-	int actual_stlh;
+	ਪੂਰਨ actual_stlh;
 
-	if (wp != NULL)
+	ਜੇ (wp != ਨਿਰਾ)
 	{
-	    frame_change_statusline_height();
+	    ਚੌਖਟਾ_change_statusline_ਉਚਾਈ();
 	    actual_stlh = MIN(wp->w_p_stlo_mh,
-		    wp->w_height + wp->w_status_height - p_wmh);
+		    wp->w_ਉਚਾਈ + wp->w_ਸਥਿਤੀ_ਉਚਾਈ - p_wmh);
 	}
-	else
-	    actual_stlh = frame_change_statusline_height();
+	ਨਹੀਂਤਾਂ
+	    actual_stlh = ਚੌਖਟਾ_change_statusline_ਉਚਾਈ();
 
 	// Only re-serialize when the window actually has a status line shown.
-	if (actual_stlh > 0)
+	ਜੇ (actual_stlh > 0)
 	{
 	    update_stlo_maxheight(varp, actual_stlh);
 	    // Update the parsed maxheight member directly.
-	    if (wp != NULL)
+	    ਜੇ (wp != ਨਿਰਾ)
 		wp->w_p_stlo_mh = actual_stlh;
-	    else
-		set_stlo_mh(actual_stlh);
+	    ਨਹੀਂਤਾਂ
+		ਸੈੱਟ_stlo_mh(actual_stlh);
 	}
     }
-    else
-	frame_change_statusline_height();
+    ਨਹੀਂਤਾਂ
+	ਚੌਖਟਾ_change_statusline_ਉਚਾਈ();
 
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	// :set clears the local values.
 	clear_string_option(&curwin->w_p_stlo);
@@ -4666,616 +4666,616 @@ did_set_statuslineopt(optset_T *args)
 	curwin->w_p_stlo_mh = -1;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_statuslineopt(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_stlo_values,
-	    ARRAY_LENGTH(p_stlo_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_stlo_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_stlo_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'swapsync' option is changed.
  */
-    char *
-did_set_swapsync(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_swapsync(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_sws, p_sws_values, FALSE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_sws, p_sws_ਮੁੱਲਾਂ, FALSE);
 }
 
-    int
-expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_swapsync(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_sws_values,
-	    ARRAY_LENGTH(p_sws_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_sws_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_sws_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'switchbuf' option is changed.
  */
-    char *
-did_set_switchbuf(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_switchbuf(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_swb, p_swb_values, &swb_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_swb, p_swb_ਮੁੱਲਾਂ, &swb_flags, TRUE);
 }
 
-    int
-expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_switchbuf(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_swb_values,
-	    ARRAY_LENGTH(p_swb_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_swb_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_swb_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'tabclose' option is changed.
  */
-    char *
-did_set_tabclose(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_tabclose(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_tcl, p_tcl_ਮੁੱਲਾਂ, &tcl_flags, TRUE);
 }
 
-    int
-expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_tabclose(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_tcl_values,
-	    ARRAY_LENGTH(p_tcl_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_tcl_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_tcl_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#ਜੇ defined(FEAT_STL_OPT)
 /*
  * The 'tabline' option is changed.
  */
-    char *
-did_set_tabline(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_tabline(optset_T *ਦਲੀਲਾਂ)
 {
-    return parse_statustabline_rulerformat(args, FALSE);
+    ਵਾਪਸ parse_statustabline_rulerformat(ਦਲੀਲਾਂ, FALSE);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'tagcase' option is changed.
  */
-    char *
-did_set_tagcase(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_tagcase(optset_T *ਦਲੀਲਾਂ)
 {
-    unsigned int	*flags;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ	*flags;
     char_u		*p;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
     {
 	p = curbuf->b_p_tc;
 	flags = &curbuf->b_tc_flags;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	p = p_tc;
 	flags = &tc_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *p == NUL)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) && *p == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else if (*p == NUL
-	    || opt_strings_flags(p, p_tc_values, flags, FALSE) != OK)
-	return e_invalid_argument;
+    ਨਹੀਂਤਾਂ ਜੇ (*p == NUL
+	    || opt_ਲੜੀਆਂ_flags(p, p_tc_ਮੁੱਲਾਂ, flags, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_tagcase(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_tc_values,
-	    ARRAY_LENGTH(p_tc_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_tc_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_tc_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'term' option is changed.
  */
-    char *
-did_set_term(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_ਪਦ(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (T_NAME[0] == NUL)
-	return e_cannot_set_term_to_empty_string;
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	return e_cannot_change_term_in_GUI;
-    if (term_is_gui(T_NAME))
-	return e_use_gui_to_start_GUI;
-#endif
-    if (set_termname(T_NAME) == FAIL)
-	return e_not_found_in_termcap;
+    ਜੇ (T_NAME[0] == NUL)
+	ਵਾਪਸ e_cannot_ਸੈੱਟ_ਪਦ_ਮੰਜ਼ਿਲ_ਖਾਲੀ_ਥਾਵਾਂ_string;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    ਜੇ (gui.ਵਿੱਚ_use)
+	ਵਾਪਸ e_cannot_change_ਪਦ_ਵਿੱਚ_GUI;
+    ਜੇ (ਪਦ_is_gui(T_NAME))
+	ਵਾਪਸ e_use_gui_ਮੰਜ਼ਿਲ_ਸ਼ੁਰੂ_GUI;
+#ਜੇ_ਅੰਤ
+    ਜੇ (ਸੈੱਟ_termname(T_NAME) == FAIL)
+	ਵਾਪਸ e_not_ਮਿਲਿਆ_ਵਿੱਚ_termcap;
 
     // Screen colors may have changed.
     redraw_later_clear();
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Some terminal option (t_xxx) is changed
  */
-    char *
-did_set_term_option(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_ਪਦ_option(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if (!full_screen)
-	return NULL;
+    ਜੇ (!ਭਰਿਆ_screen)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // ":set t_Co=0" and ":set t_Co=1" do ":set t_Co="
-    if (varp == &T_CCO)
+    ਜੇ (varp == &T_CCO)
     {
-	int colors = atoi((char *)T_CCO);
+	ਪੂਰਨ colors = atoi((ਅੱਖਰ *)T_CCO);
 
 	// Only reinitialize colors if t_Co value has really changed to
 	// avoid expensive reload of colorscheme if t_Co is set to the
 	// same value multiple times.
-	if (colors != t_colors)
+	ਜੇ (colors != t_colors)
 	{
 	    t_colors = colors;
-	    if (t_colors <= 1)
+	    ਜੇ (t_colors <= 1)
 	    {
 		vim_free(T_CCO);
-		T_CCO = empty_option;
+		T_CCO = ਖਾਲੀ_ਥਾਵਾਂ_option;
 	    }
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-	    if (is_term_win32())
+#ਜੇ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+	    ਜੇ (is_ਪਦ_win32())
 	    {
-		swap_tcap();
-		args->os_did_swaptcap = TRUE;
+		ਅਦਲਾ_ਬਦਲੀ_tcap();
+		ਦਲੀਲਾਂ->os_did_swaptcap = TRUE;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	    // We now have a different color setup, initialize it again.
 	    init_highlight(TRUE, FALSE);
 	}
     }
     ttest(FALSE);
-    if (varp == &T_ME)
+    ਜੇ (varp == &T_ME)
     {
-	out_str(T_ME);
+	ਬਾਹਰਲਾ_str(T_ME);
 	redraw_later(UPD_CLEAR);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#ਜੇ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 	// Since t_me has been set, this probably means that the user
 	// wants to use this as default colors.  Need to reset default
 	// background/foreground colors.
 # ifdef VIMDLL
-	if (!gui.in_use && !gui.starting)
+	ਜੇ (!gui.ਵਿੱਚ_use && !gui.starting)
 # endif
-	    mch_set_normal_colors();
-#endif
+	    mch_ਸੈੱਟ_ਸਾਧਾਰਨ_colors();
+#ਜੇ_ਅੰਤ
     }
-    if (varp == &T_BE && termcap_active)
+    ਜੇ (varp == &T_BE && termcap_ਸਰਗਰਮ)
     {
-	MAY_WANT_TO_LOG_THIS;
+	MAY_WANT_ਮੰਜ਼ਿਲ_LOG_THIS;
 
-	if (*T_BE == NUL)
+	ਜੇ (*T_BE == NUL)
 	    // When clearing t_BE we assume the user no longer wants
 	    // bracketed paste, thus disable it by writing t_BD.
-	    out_str(T_BD);
-	else
-	    out_str(T_BE);
+	    ਬਾਹਰਲਾ_str(T_BD);
+	ਨਹੀਂਤਾਂ
+	    ਬਾਹਰਲਾ_str(T_BE);
     }
 
-    if (varp == &T_BSU || varp == &T_ESU)
-	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
+    ਜੇ (varp == &T_BSU || varp == &T_ESU)
+	ਪਦ_ਸੈੱਟ_sync_output(ਪਦ_SYNC_OUTPUT_OFF);
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 
-#ifdef UNIX
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNIX
 /*
  * The 'termresize' option is changed.
  */
-    char *
-did_set_termresize(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_termresize(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     // If empty or "inband", then attempt to enable in-band resize events.
-    if (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
-	term_set_win_resize(true);
-    else if (STRCMP(p_trz, "sigwinch") == 0)
-	term_set_win_resize(false);
-    else
-	return e_invalid_argument;
+    ਜੇ (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+	ਪਦ_ਸੈੱਟ_win_resize(true);
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(p_trz, "sigwinch") == 0)
+	ਪਦ_ਸੈੱਟ_win_resize(false);
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_termresize(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_trz_values,
-	    ARRAY_LENGTH(p_trz_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_trz_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_trz_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_TERMINAL)
+#ਜੇ defined(FEAT_TERMINAL)
 /*
  * The 'termwinkey' option is changed.
  */
-    char *
-did_set_termwinkey(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_termwinkey(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
-    if ((*varp)[0] != NUL && string_to_key(*varp, TRUE) == 0)
-	return e_invalid_argument;
+    ਜੇ ((*varp)[0] != NUL && string_ਮੰਜ਼ਿਲ_ਕੁੰਜੀ(*varp, TRUE) == 0)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'termwinsize' option is changed.
  */
-    char *
-did_set_termwinsize(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_termwinsize(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u	*p;
 
-    if ((*varp)[0] == NUL)
-	return NULL;
+    ਜੇ ((*varp)[0] == NUL)
+	ਵਾਪਸ ਨਿਰਾ;
 
     p = skipdigits(*varp);
-    if (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
-	return e_invalid_argument;
+    ਜੇ (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-# if defined(MSWIN)
+# ਜੇ defined(MSWIN)
 /*
  * The 'termwintype' option is changed.
  */
-    char *
-did_set_termwintype(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_termwintype(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_twt, p_twt_values, FALSE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_twt, p_twt_ਮੁੱਲਾਂ, FALSE);
 }
 
-    int
-expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_termwintype(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_twt_values,
-	    ARRAY_LENGTH(p_twt_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_twt_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_twt_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'titlestring' option is changed.
  */
-    char *
-did_set_titlestring(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_titlestring(optset_T *ਦਲੀਲਾਂ)
 {
-    int flagval = 0;
+    ਪੂਰਨ flagval = 0;
 
-#ifdef FEAT_STL_OPT
-    flagval = STL_IN_TITLE;
-#endif
-    return parse_titleiconstring(args, flagval);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_STL_OPT
+    flagval = STL_ਵਿੱਚ_TITLE;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ parse_titleiconstring(ਦਲੀਲਾਂ, flagval);
 }
 
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+#ਜੇ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 /*
  * The 'toolbar' option is changed.
  */
-    char *
-did_set_toolbar(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_toolbar(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags,
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_toolbar, p_toolbar_ਮੁੱਲਾਂ, &toolbar_flags,
 								TRUE) != OK)
-	return e_invalid_argument;
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    out_flush();
+    ਬਾਹਰਲਾ_flush();
     gui_mch_show_toolbar((toolbar_flags &
-		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+		(TOOLBAR_ਪਾਠ | TOOLBAR_ICONS)) != 0);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_toolbar(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_toolbar_values,
-	    ARRAY_LENGTH(p_toolbar_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_toolbar_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_toolbar_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#ਜੇ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 /*
  * The 'toolbariconsize' option is changed.  GTK+ 2 only.
  */
-    char *
-did_set_toolbariconsize(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_toolbariconsize(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE) != OK)
-	return e_invalid_argument;
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_tbis, p_tbis_ਮੁੱਲਾਂ, &tbis_flags, FALSE) != OK)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    out_flush();
+    ਬਾਹਰਲਾ_flush();
     gui_mch_show_toolbar((toolbar_flags &
-		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+		(TOOLBAR_ਪਾਠ | TOOLBAR_ICONS)) != 0);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_toolbariconsize(
-    optexpand_T	*args,
-    int		*numMatches,
+    ਪੂਰਨ
+expand_ਸੈੱਟ_toolbariconsize(
+    optexpand_T	*ਦਲੀਲਾਂ,
+    ਪੂਰਨ		*ਅੰਕ_Matches,
     char_u	***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_tbis_values,
-	    ARRAY_LENGTH(p_tbis_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_tbis_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_tbis_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(UNIX) || defined(VMS)
+#ਜੇ defined(UNIX) || defined(VMS)
 /*
  * The 'ttymouse' option is changed.
  */
-    char *
-did_set_ttymouse(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_ttymouse(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
     // Switch the mouse off before changing the escape sequences used for
     // that.
     mch_setmouse(FALSE);
-    if (opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE) != OK)
-	errmsg = e_invalid_argument;
-    else
+    ਜੇ (opt_ਲੜੀਆਂ_flags(p_ttym, p_ttym_ਮੁੱਲਾਂ, &ttym_flags, FALSE) != OK)
+	errmsg = e_invalid_ਦਲੀਲ;
+    ਨਹੀਂਤਾਂ
 	check_mouse_termcode();
-    if (termcap_active)
+    ਜੇ (termcap_ਸਰਗਰਮ)
 	setmouse();		// may switch it on again
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
-    int
-expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_ttymouse(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ttym_values,
-	    ARRAY_LENGTH(p_ttym_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ttym_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ttym_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_VARTABS)
+#ਜੇ defined(FEAT_VARTABS)
 /*
  * The 'varsofttabstop' option is changed.
  */
-    char *
-did_set_varsofttabstop(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_varsofttabstop(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    ਜੇ (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vsts_array);
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (cp = *varp; *cp; ++cp)
+	ਲਈ (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
-		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
-		continue;
-	    return e_invalid_argument;
+	    ਜੇ (vim_isdigit(*cp))
+		ਜਾਰੀ;
+	    ਜੇ (*cp == ',' && cp > *varp && *(cp-1) != ',')
+		ਜਾਰੀ;
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
 	}
 
-	int *oldarray = curbuf->b_p_vsts_array;
-	if (tabstop_set(*varp, &(curbuf->b_p_vsts_array)) == OK)
+	ਪੂਰਨ *oldarray = curbuf->b_p_vsts_array;
+	ਜੇ (tabstop_ਸੈੱਟ(*varp, &(curbuf->b_p_vsts_array)) == OK)
 	{
-	    if (oldarray)
+	    ਜੇ (oldarray)
 		vim_free(oldarray);
 	}
-	else
-	    return e_invalid_argument;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'vartabstop' option is changed.
  */
-    char *
-did_set_vartabstop(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_vartabstop(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    ਜੇ (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vts_array);
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (cp = *varp; *cp; ++cp)
+	ਲਈ (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
-		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
-		continue;
-	    return e_invalid_argument;
+	    ਜੇ (vim_isdigit(*cp))
+		ਜਾਰੀ;
+	    ਜੇ (*cp == ',' && cp > *varp && *(cp-1) != ',')
+		ਜਾਰੀ;
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
 	}
 
-	int *oldarray = curbuf->b_p_vts_array;
+	ਪੂਰਨ *oldarray = curbuf->b_p_vts_array;
 
-	if (tabstop_set(*varp, &(curbuf->b_p_vts_array)) == OK)
+	ਜੇ (tabstop_ਸੈੱਟ(*varp, &(curbuf->b_p_vts_array)) == OK)
 	{
 	    vim_free(oldarray);
 # ifdef FEAT_FOLDING
-	    if (foldmethodIsIndent(curwin))
+	    ਜੇ (foldmethodIsIndent(curwin))
 		foldUpdateAll(curwin);
 # endif
 	}
-	else
-	    return e_invalid_argument;
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'verbosefile' option is changed.
  */
-    char *
-did_set_verbosefile(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_verbosefile(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
     verbose_stop();
-    if (*p_vfile != NUL && verbose_open() == FAIL)
-	return e_invalid_argument;
+    ਜੇ (*p_vfile != NUL && verbose_open() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#if defined(FEAT_SESSION)
+#ਜੇ defined(FEAT_SESSION)
 /*
  * The 'viewoptions' option is changed.
  */
-    char *
-did_set_viewoptions(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_viewoptions(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_flags(p_vop, p_ssop_ਮੁੱਲਾਂ, &vop_flags, TRUE);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_VIMINFO)
+#ਜੇ defined(FEAT_VIMINFO)
 /*
  * The 'viminfo' option is changed.
  */
-    char *
-did_set_viminfo(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_viminfo(optset_T *ਦਲੀਲਾਂ)
 {
     char_u	*s;
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
 
-    for (s = p_viminfo; *s;)
+    ਲਈ (s = p_viminfo; *s;)
     {
 	// Check it's a valid character
-	if (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == NULL)
+	ਜੇ (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == ਨਿਰਾ)
 	{
-	    errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
-	    break;
+	    errmsg = illegal_char(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen, *s);
+	    ਰੋਕੋ;
 	}
-	if (*s == 'n')	// name is always last one
-	    break;
-	else if (*s == 'r') // skip until next ','
+	ਜੇ (*s == 'n')	// name is always last one
+	    ਰੋਕੋ;
+	ਨਹੀਂਤਾਂ ਜੇ (*s == 'r') // skip until next ','
 	{
-	    while (*++s && *s != ',')
+	    ਜਦੋਂ (*++s && *s != ',')
 		;
 	}
-	else if (*s == '%')
+	ਨਹੀਂਤਾਂ ਜੇ (*s == '%')
 	{
 	    // optional number
-	    while (vim_isdigit(*++s))
+	    ਜਦੋਂ (vim_isdigit(*++s))
 		;
 	}
-	else if (*s == '!' || *s == 'h' || *s == 'c')
+	ਨਹੀਂਤਾਂ ਜੇ (*s == '!' || *s == 'h' || *s == 'c')
 	    ++s;		// no extra chars
-	else		// must have a number
+	ਨਹੀਂਤਾਂ		// must have a number
 	{
-	    while (vim_isdigit(*++s))
+	    ਜਦੋਂ (vim_isdigit(*++s))
 		;
 
-	    if (!VIM_ISDIGIT(*(s - 1)))
+	    ਜੇ (!VIM_ISDIGIT(*(s - 1)))
 	    {
-		if (args->os_errbuf != NULL)
+		ਜੇ (ਦਲੀਲਾਂ->os_errbuf != ਨਿਰਾ)
 		{
-		    vim_snprintf(args->os_errbuf, args->os_errbuflen,
-			    _(e_missing_number_after_angle_str_angle),
+		    vim_snprintf(ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen,
+			    _(e_missing_ਸੰਖਿਆ_after_angle_str_angle),
 			    transchar_byte(*(s - 1)));
-		    errmsg = args->os_errbuf;
+		    errmsg = ਦਲੀਲਾਂ->os_errbuf;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    errmsg = "";
-		break;
+		ਰੋਕੋ;
 	    }
 	}
-	if (*s == ',')
+	ਜੇ (*s == ',')
 	    ++s;
-	else if (*s)
+	ਨਹੀਂਤਾਂ ਜੇ (*s)
 	{
-	    if (args->os_errbuf != NULL)
+	    ਜੇ (ਦਲੀਲਾਂ->os_errbuf != ਨਿਰਾ)
 		errmsg = e_missing_comma;
-	    else
+	    ਨਹੀਂਤਾਂ
 		errmsg = "";
-	    break;
+	    ਰੋਕੋ;
 	}
     }
-    if (*p_viminfo && errmsg == NULL && get_viminfo_parameter('\'') < 0)
-	errmsg = e_must_specify_a_value;
+    ਜੇ (*p_viminfo && errmsg == ਨਿਰਾ && get_viminfo_parameter('\'') < 0)
+	errmsg = e_must_specify_a_ਮੁੱਲ;
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'virtualedit' option is changed.
  */
-    char *
-did_set_virtualedit(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_virtualedit(optset_T *ਦਲੀਲਾਂ)
 {
     char_u		*ve = p_ve;
-    unsigned int	*flags = &ve_flags;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ	*flags = &ve_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    ਜੇ (ਦਲੀਲਾਂ->os_flags & OPT_LOCAL)
     {
 	ve = curwin->w_p_ve;
 	flags = &curwin->w_ve_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *ve == NUL)
+    ਜੇ ((ਦਲੀਲਾਂ->os_flags & OPT_LOCAL) && *ve == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (opt_strings_flags(ve, p_ve_values, flags, TRUE) != OK)
-	    return e_invalid_argument;
-	else if (STRCMP(ve, args->os_oldval.string) != 0)
+	ਜੇ (opt_ਲੜੀਆਂ_flags(ve, p_ve_ਮੁੱਲਾਂ, flags, TRUE) != OK)
+	    ਵਾਪਸ e_invalid_ਦਲੀਲ;
+	ਨਹੀਂਤਾਂ ਜੇ (STRCMP(ve, ਦਲੀਲਾਂ->os_oldval.string) != 0)
 	{
 	    // Recompute cursor position in case the new 've' setting
 	    // changes something.
@@ -5284,207 +5284,207 @@ did_set_virtualedit(optset_T *args)
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_virtualedit(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_virtualedit(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_ve_values,
-	    ARRAY_LENGTH(p_ve_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_ve_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_ve_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'whichwrap' option is changed.
  */
-    char *
-did_set_whichwrap(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_whichwrap(optset_T *ਦਲੀਲਾਂ)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)ਦਲੀਲਾਂ->os_varp;
 
     // Add ',' to the list flags because 'whichwrap' is a flag
     // list that is comma-separated.
-    return did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
-		    args->os_errbuf, args->os_errbuflen);
+    ਵਾਪਸ did_ਸੈੱਟ_option_listflag(*varp, (char_u *)(WW_ALL ","),
+		    ਦਲੀਲਾਂ->os_errbuf, ਦਲੀਲਾਂ->os_errbuflen);
 }
 
-    int
-expand_set_whichwrap(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_whichwrap(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)WW_ALL, numMatches, matches);
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_listflag(ਦਲੀਲਾਂ, (char_u*)WW_ALL, ਅੰਕ_Matches, matches);
 }
 
 /*
  * The 'wildmode' option is changed.
  */
-    char *
-did_set_wildmode(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_wildmode(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    if (check_opt_wim() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    ਜੇ (check_opt_wim() == FAIL)
+	ਵਾਪਸ e_invalid_ਦਲੀਲ;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    int
-expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_wildmode(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_wim_values,
-	    ARRAY_LENGTH(p_wim_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_wim_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_wim_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
 /*
  * The 'wildoptions' option is changed.
  */
-    char *
-did_set_wildoptions(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_wildoptions(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    return did_set_opt_strings(p_wop, p_wop_values, TRUE);
+    ਵਾਪਸ did_ਸੈੱਟ_opt_ਲੜੀਆਂ(p_wop, p_wop_ਮੁੱਲਾਂ, TRUE);
 }
 
-    int
-expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_wildoptions(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_wop_values,
-	    ARRAY_LENGTH(p_wop_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_wop_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_wop_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#if defined(FEAT_WAK)
+#ਜੇ defined(FEAT_WAK)
 /*
  * The 'winaltkeys' option is changed.
  */
-    char *
-did_set_winaltkeys(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_winaltkeys(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    char *errmsg = NULL;
+    ਅੱਖਰ *errmsg = ਨਿਰਾ;
 
-    if (*p_wak == NUL || check_opt_strings(p_wak, p_wak_values, FALSE) != OK)
-	errmsg = e_invalid_argument;
+    ਜੇ (*p_wak == NUL || check_opt_ਲੜੀਆਂ(p_wak, p_wak_ਮੁੱਲਾਂ, FALSE) != OK)
+	errmsg = e_invalid_ਦਲੀਲ;
 # ifdef FEAT_MENU
-#  if defined(FEAT_GUI_MOTIF)
-    else if (gui.in_use)
-	gui_motif_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
+#  ਜੇ defined(FEAT_GUI_MOTIF)
+    ਨਹੀਂਤਾਂ ਜੇ (gui.ਵਿੱਚ_use)
+	gui_motif_ਸੈੱਟ_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  elif defined(FEAT_GUI_GTK)
-    else if (gui.in_use)
-	gui_gtk_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
+    ਨਹੀਂਤਾਂ ਜੇ (gui.ਵਿੱਚ_use)
+	gui_gtk_ਸੈੱਟ_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  endif
 # endif
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
-    int
-expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_winaltkeys(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
-	    args,
-	    p_wak_values,
-	    ARRAY_LENGTH(p_wak_values) - 1,
-	    numMatches,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_string(
+	    ਦਲੀਲਾਂ,
+	    p_wak_ਮੁੱਲਾਂ,
+	    ARRAY_ਲੰਮਾਈ(p_wak_ਮੁੱਲਾਂ) - 1,
+	    ਅੰਕ_Matches,
 	    matches);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The 'wincolor' option is changed.
  */
-    char *
-did_set_wincolor(optset_T *args UNUSED)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_wincolor(optset_T *ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ)
 {
-    update_wincolor(curwin, args->os_newval.string);
-    return NULL;
+    update_wincolor(curwin, ਦਲੀਲਾਂ->os_newval.string);
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * The 'winhighlight' option is changed
  */
-    char *
-did_set_winhighlight(optset_T *args)
+    ਅੱਖਰ *
+did_ਸੈੱਟ_winhighlight(optset_T *ਦਲੀਲਾਂ)
 {
-    return update_winhighlight(curwin, args->os_newval.string);
+    ਵਾਪਸ update_winhighlight(curwin, ਦਲੀਲਾਂ->os_newval.string);
 }
 
 /*
  * Expand 'winhighlight' option.
  */
-    int
-expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_winhighlight(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    expand_T	    *xp = args->oe_xp;
+    expand_T	    *xp = ਦਲੀਲਾਂ->oe_xp;
 
-    if ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
-	    || xp->xp_pattern == args->oe_set_arg || *(xp->xp_pattern-1) == ',')
+    ਜੇ ((xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
+	    || xp->xp_ਨਮੂਨਾ == ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg || *(xp->xp_ਨਮੂਨਾ-1) == ',')
     {
 	// After a ':' or after a ',', or at the start, so expand highlight
 	// group name.
 
 	// If starts with !, then expand 'highlight' occasions.
-	if (*xp->xp_pattern == '!')
-	    return expand_hl_occasions(args, numMatches, matches, '!');
-	else
-	    return expand_set_opt_generic(
-		    args,
+	ਜੇ (*xp->xp_ਨਮੂਨਾ == '!')
+	    ਵਾਪਸ expand_hl_occasions(ਦਲੀਲਾਂ, ਅੰਕ_Matches, matches, '!');
+	ਨਹੀਂਤਾਂ
+	    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+		    ਦਲੀਲਾਂ,
 		    get_highlight_name,
-		    numMatches,
+		    ਅੰਕ_Matches,
 		    matches);
     }
 
     VIM_CLEAR(*matches);
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
-    int
-expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
+    ਪੂਰਨ
+expand_ਸੈੱਟ_wincolor(optexpand_T *ਦਲੀਲਾਂ, ਪੂਰਨ *ਅੰਕ_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
-	    args,
+    ਵਾਪਸ expand_ਸੈੱਟ_opt_generic(
+	    ਦਲੀਲਾਂ,
 	    get_highlight_name,
-	    numMatches,
+	    ਅੰਕ_Matches,
 	    matches);
 }
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 /*
  * When the 'syntax' option is set, load the syntax of that name.
  */
-    static void
-do_syntax_autocmd(int value_changed)
+    ਸਥਿਰ ਖਾਲੀ
+do_syntax_autocmd(ਪੂਰਨ ਮੁੱਲ_ਬਦਲਿਆ)
 {
-    static int syn_recursive = 0;
+    ਸਥਿਰ ਪੂਰਨ syn_recursive = 0;
 
     ++syn_recursive;
     // Only pass TRUE for "force" when the value changed or not used
     // recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn, curbuf->b_fname,
-	    value_changed || syn_recursive == 1, curbuf);
-    curbuf->b_flags |= BF_SYN_SET;
+	    ਮੁੱਲ_ਬਦਲਿਆ || syn_recursive == 1, curbuf);
+    curbuf->b_flags |= BF_SYN_ਸੈੱਟ;
     --syn_recursive;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * When the 'filetype' option is set, trigger the FileType autocommand.
  */
-    static void
-do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
+    ਸਥਿਰ ਖਾਲੀ
+do_filetype_autocmd(char_u **varp, ਪੂਰਨ opt_flags, ਪੂਰਨ ਮੁੱਲ_ਬਦਲਿਆ)
 {
     // Skip this when called from a modeline and the filetype was already set
     // to this value.
-    if ((opt_flags & OPT_MODELINE) && !value_changed)
-	return;
+    ਜੇ ((opt_flags & OPT_MODELINE) && !ਮੁੱਲ_ਬਦਲਿਆ)
+	ਵਾਪਸ;
 
-    static int  ft_recursive = 0;
-    int	    secure_save = secure;
+    ਸਥਿਰ ਪੂਰਨ  ft_recursive = 0;
+    ਪੂਰਨ	    secure_save = secure;
 
     // Reset the secure flag, since the value of 'filetype' has
     // been checked to be safe.
@@ -5495,199 +5495,199 @@ do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
     // Only pass TRUE for "force" when the value changed or not
     // used recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
-	    value_changed || ft_recursive == 1, curbuf);
+	    ਮੁੱਲ_ਬਦਲਿਆ || ft_recursive == 1, curbuf);
     --ft_recursive;
     // Just in case the old "curbuf" is now invalid.
-    if (varp != &(curbuf->b_p_ft))
-	varp = NULL;
+    ਜੇ (varp != &(curbuf->b_p_ft))
+	varp = ਨਿਰਾ;
 
     secure = secure_save;
 }
 
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 /*
  * When the 'spelllang' option is set, source the spell/LANG.vim file in
  * 'runtimepath'.
  */
-    static void
-do_spelllang_source(void)
+    ਸਥਿਰ ਖਾਲੀ
+do_spelllang_ਸਰੋਤ(ਖਾਲੀ)
 {
     char_u	fname[200];
     char_u	*p;
     char_u	*q = curwin->w_s->b_p_spl;
 
     // Skip the first name if it is "cjk".
-    if (STRNCMP(q, "cjk,", 4) == 0)
+    ਜੇ (STRNCMP(q, "cjk,", 4) == 0)
 	q += 4;
 
     // They could set 'spellcapcheck' depending on the language.  Use the first
     // name in 'spelllang' up to '_region' or '.encoding'.
-    for (p = q; *p != NUL; ++p)
-	if (!ASCII_ISALNUM(*p) && *p != '-')
-	    break;
-    if (p > q)
+    ਲਈ (p = q; *p != NUL; ++p)
+	ਜੇ (!ASCII_ISALNUM(*p) && *p != '-')
+	    ਰੋਕੋ;
+    ਜੇ (p > q)
     {
-	vim_snprintf((char *)fname, 200, "spell/%.*s.vim",
-		(int)(p - q), q);
-	source_runtime(fname, DIP_ALL);
+	vim_snprintf((ਅੱਖਰ *)fname, 200, "spell/%.*s.vim",
+		(ਪੂਰਨ)(p - q), q);
+	ਸਰੋਤ_runtime(fname, DIP_ALL);
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Handle string options that need some action to perform when changed.
  * The new value must be allocated.
  * Returns NULL for success, or an untranslated error message for an error.
  */
-    char *
-did_set_string_option(
-    int		opt_idx,		// index in options[] table
+    ਅੱਖਰ *
+did_ਸੈੱਟ_string_option(
+    ਪੂਰਨ		opt_idx,		// index in options[] table
     char_u	**varp,			// pointer to the option variable
     char_u	*oldval,		// previous value of the option
-    char_u	*value,			// new value of the option
-    char	*errbuf,		// buffer for errors, or NULL
+    char_u	*ਮੁੱਲ,			// new value of the option
+    ਅੱਖਰ	*errbuf,		// buffer for errors, or NULL
     size_t	errbuflen,		// length of error buffer
-    int		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
-    set_op_T    op,			// OP_ADDING/OP_PREPENDING/OP_REMOVING
-    int		*value_checked)		// value was checked to be safe, no
+    ਪੂਰਨ		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
+    ਸੈੱਟ_op_T    op,			// OP_ADDING/OP_PREPENDING/OP_REMOVING
+    ਪੂਰਨ		*ਮੁੱਲ_checked)		// value was checked to be safe, no
 					// need to set P_INSECURE
 {
-    char	*errmsg = NULL;
+    ਅੱਖਰ	*errmsg = ਨਿਰਾ;
     long_u	free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
-    opt_did_set_cb_T did_set_cb = get_option_did_set_cb(opt_idx);
-    optset_T	args;
+    opt_did_ਸੈੱਟ_cb_T did_ਸੈੱਟ_cb = get_option_did_ਸੈੱਟ_cb(opt_idx);
+    optset_T	ਦਲੀਲਾਂ;
 
     // 'ttytype' is an alias for 'term'.  Both 'term' and 'ttytype' point to
     // T_NAME.  If 'term' or 'ttytype' is modified, then use the index for the
     // 'term' option.  Only set the P_ALLOCED flag on 'term'.
-    if (varp == &T_NAME)
+    ਜੇ (varp == &T_NAME)
     {
 	opt_idx = findoption((char_u *)"term");
-	if (opt_idx >= 0)
+	ਜੇ (opt_idx >= 0)
 	{
 	    free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
-	    did_set_cb = get_option_did_set_cb(opt_idx);
+	    did_ਸੈੱਟ_cb = get_option_did_ਸੈੱਟ_cb(opt_idx);
 	}
     }
 
-    CLEAR_FIELD(args);
+    CLEAR_ਖੇਤਰ(ਦਲੀਲਾਂ);
 
     // Disallow changing some options from secure mode
-    if ((secure
-#ifdef HAVE_SANDBOX
+    ਜੇ ((secure
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_SANDBOX
 		|| sandbox != 0
-#endif
+#ਜੇ_ਅੰਤ
 		) && (get_option_flags(opt_idx) & P_SECURE))
-	errmsg = e_not_allowed_here;
+	errmsg = e_not_allowed_ਇੱਥੇ;
     // Check for a "normal" directory or file name in some options.
-    else if (check_illegal_path_names(opt_idx, varp))
-	errmsg = e_invalid_argument;
-    else if (did_set_cb != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (check_illegal_ਰਸਤਾ_ਨਾਂ(opt_idx, varp))
+	errmsg = e_invalid_ਦਲੀਲ;
+    ਨਹੀਂਤਾਂ ਜੇ (did_ਸੈੱਟ_cb != ਨਿਰਾ)
     {
-	args.os_varp = (char_u *)varp;
-	args.os_idx = opt_idx;
-	args.os_flags = opt_flags;
-	args.os_op = op;
-	args.os_oldval.string = oldval;
-	args.os_newval.string = value;
-	args.os_errbuf = errbuf;
-	args.os_errbuflen = errbuflen;
+	ਦਲੀਲਾਂ.os_varp = (char_u *)varp;
+	ਦਲੀਲਾਂ.os_idx = opt_idx;
+	ਦਲੀਲਾਂ.os_flags = opt_flags;
+	ਦਲੀਲਾਂ.os_op = op;
+	ਦਲੀਲਾਂ.os_oldval.string = oldval;
+	ਦਲੀਲਾਂ.os_newval.string = ਮੁੱਲ;
+	ਦਲੀਲਾਂ.os_errbuf = errbuf;
+	ਦਲੀਲਾਂ.os_errbuflen = errbuflen;
 	// Invoke the option specific callback function to validate and apply
 	// the new option value.
-	errmsg = did_set_cb(&args);
+	errmsg = did_ਸੈੱਟ_cb(&ਦਲੀਲਾਂ);
 
 	// The 'keymap', 'filetype' and 'syntax' option callback functions
 	// may change the os_value_checked field.
-	*value_checked = args.os_value_checked;
+	*ਮੁੱਲ_checked = ਦਲੀਲਾਂ.os_ਮੁੱਲ_checked;
     }
 
     // If an error is detected, restore the previous value.
-    if (errmsg != NULL)
+    ਜੇ (errmsg != ਨਿਰਾ)
     {
 	free_string_option(*varp);
 	*varp = oldval;
 	// When resetting some values, need to act on it.
-	if (args.os_restore_chartab)
-	    (void)init_chartab();
-	if (varp == &p_hl)
-	    (void)highlight_changed();
+	ਜੇ (ਦਲੀਲਾਂ.os_restore_chartab)
+	    (ਖਾਲੀ)init_chartab();
+	ਜੇ (varp == &p_hl)
+	    (ਖਾਲੀ)highlight_ਬਦਲਿਆ();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 	// Remember where the option was set.
-	set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
+	ਸੈੱਟ_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#ਜੇ_ਅੰਤ
 	// Free string options that are in allocated memory.
 	// Use "free_oldval", because recursiveness may change the flags under
 	// our fingers (esp. init_highlight()).
-	if (free_oldval)
+	ਜੇ (free_oldval)
 	    free_string_option(oldval);
-	set_option_flag(opt_idx, P_ALLOCED);
+	ਸੈੱਟ_option_flag(opt_idx, P_ALLOCED);
 
-	if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	ਜੇ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
 		&& is_global_local_option(opt_idx))
 	{
 	    // global option with local value set to use global value; free
 	    // the local value and make it empty
 	    char_u *p = get_option_varp_scope(opt_idx, OPT_LOCAL);
 	    free_string_option(*(char_u **)p);
-	    *(char_u **)p = empty_option;
+	    *(char_u **)p = ਖਾਲੀ_ਥਾਵਾਂ_option;
 	}
 
 	// May set global value for local option.
-	else if (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
-	    set_string_option_global(opt_idx, varp);
+	ਨਹੀਂਤਾਂ ਜੇ (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
+	    ਸੈੱਟ_string_option_global(opt_idx, varp);
 
 	// Trigger the autocommand only after setting the flags.
-#ifdef FEAT_SYN_HL
-	if (varp == &(curbuf->b_p_syn))
-	    do_syntax_autocmd(args.os_value_changed);
-#endif
-	else if (varp == &(curbuf->b_p_ft))
-	    do_filetype_autocmd(varp, opt_flags, args.os_value_changed);
-#ifdef FEAT_SPELL
-	if (varp == &(curwin->w_s->b_p_spl))
-	    do_spelllang_source();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	ਜੇ (varp == &(curbuf->b_p_syn))
+	    do_syntax_autocmd(ਦਲੀਲਾਂ.os_ਮੁੱਲ_ਬਦਲਿਆ);
+#ਜੇ_ਅੰਤ
+	ਨਹੀਂਤਾਂ ਜੇ (varp == &(curbuf->b_p_ft))
+	    do_filetype_autocmd(varp, opt_flags, ਦਲੀਲਾਂ.os_ਮੁੱਲ_ਬਦਲਿਆ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+	ਜੇ (varp == &(curwin->w_s->b_p_spl))
+	    do_spelllang_ਸਰੋਤ();
+#ਜੇ_ਅੰਤ
     }
 
-    if (varp == &p_mouse)
+    ਜੇ (varp == &p_mouse)
     {
-	if (*p_mouse == NUL)
+	ਜੇ (*p_mouse == NUL)
 	    mch_setmouse(FALSE);    // switch mouse off
-	else
+	ਨਹੀਂਤਾਂ
 	    setmouse();		    // in case 'mouse' changed
     }
 
-    if (varp == &p_rtp)
+    ਜੇ (varp == &p_rtp)
     {
 	export_myvimdir();
-#if defined(FEAT_LUA)
-	update_package_paths_in_lua();
-#endif
+#ਜੇ defined(FEAT_LUA)
+	update_package_paths_ਵਿੱਚ_lua();
+#ਜੇ_ਅੰਤ
     }
 
-#if defined(FEAT_LINEBREAK)
+#ਜੇ defined(FEAT_LINEBREAK)
     // Changing Formatlistpattern when briopt includes the list setting:
     // redraw
-    if ((varp == &p_flp || varp == &(curbuf->b_p_flp))
+    ਜੇ ((varp == &p_flp || varp == &(curbuf->b_p_flp))
 	    && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (curwin->w_curswant != MAXCOL
+    ਜੇ (curwin->w_curswant != MAXCOL
 		   && (get_option_flags(opt_idx) & (P_CURSWANT | P_RALL)) != 0
 				&& (get_option_flags(opt_idx) & P_HLONLY) == 0)
-	curwin->w_set_curswant = true;
+	curwin->w_ਸੈੱਟ_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    ਜੇ ((opt_flags & OPT_NO_REDRAW) == 0)
     {
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 	// set when changing an option that only requires a redraw in the GUI
-	int	redraw_gui_only = FALSE;
+	ਪੂਰਨ	redraw_gui_only = FALSE;
 
-	if (varp == &p_go			// 'guioptions'
+	ਜੇ (varp == &p_go			// 'guioptions'
 		|| varp == &p_guifont		// 'guifont'
 # ifdef FEAT_GUI_TABLINE
 		|| varp == &p_gtl		// 'guitablabel'
@@ -5697,27 +5697,27 @@ did_set_string_option(
 		|| varp == &p_guifontset	// 'guifontset'
 # endif
 		|| varp == &p_guifontwide	// 'guifontwide'
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# ਜੇ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 		|| varp == &p_guiligatures	// 'guiligatures'
 # endif
 	    )
 	    redraw_gui_only = TRUE;
 
 	// check redraw when it's not a GUI option or the GUI is active.
-	if (!redraw_gui_only || gui.in_use)
-#endif
+	ਜੇ (!redraw_gui_only || gui.ਵਿੱਚ_use)
+#ਜੇ_ਅੰਤ
 	    check_redraw(get_option_flags(opt_idx));
     }
 
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (args.os_did_swaptcap)
+#ਜੇ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    ਜੇ (ਦਲੀਲਾਂ.os_did_swaptcap)
     {
-	set_termname((char_u *)"win32");
+	ਸੈੱਟ_termname((char_u *)"win32");
 	init_highlight(TRUE, FALSE);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    return errmsg;
+    ਵਾਪਸ errmsg;
 }
 
 /*
@@ -5726,13 +5726,13 @@ did_set_string_option(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
-check_opt_strings(
+    ਸਥਿਰ ਪੂਰਨ
+check_opt_ਲੜੀਆਂ(
     char_u	*val,
-    char	**values,
-    int		list)	    // when TRUE: accept a list of values
+    ਅੱਖਰ	**ਮੁੱਲਾਂ,
+    ਪੂਰਨ		list)	    // when TRUE: accept a list of values
 {
-    return opt_strings_flags(val, values, NULL, list);
+    ਵਾਪਸ opt_ਲੜੀਆਂ_flags(val, ਮੁੱਲਾਂ, ਨਿਰਾ, list);
 }
 
 /*
@@ -5742,47 +5742,47 @@ check_opt_strings(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
-opt_strings_flags(
+    ਸਥਿਰ ਪੂਰਨ
+opt_ਲੜੀਆਂ_flags(
     char_u	*val,		// new value
-    char	**values,	// array of valid string values
-    unsigned	*flagp,
-    int		list)		// when TRUE: accept a list of values
+    ਅੱਖਰ	**ਮੁੱਲਾਂ,	// array of valid string values
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	*flagp,
+    ਪੂਰਨ		list)		// when TRUE: accept a list of values
 {
-    int		i;
-    int		len;
-    unsigned	new_flags = 0;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		len;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	new_flags = 0;
 
-    while (*val)
+    ਜਦੋਂ (*val)
     {
-	for (i = 0; ; ++i)
+	ਲਈ (i = 0; ; ++i)
 	{
-	    if (values[i] == NULL)	// val not found in values[]
-		return FAIL;
+	    ਜੇ (ਮੁੱਲਾਂ[i] == ਨਿਰਾ)	// val not found in values[]
+		ਵਾਪਸ FAIL;
 
-	    len = (int)STRLEN(values[i]);
-	    if (STRNCMP(values[i], val, len) == 0
+	    len = (ਪੂਰਨ)STRLEN(ਮੁੱਲਾਂ[i]);
+	    ਜੇ (STRNCMP(ਮੁੱਲਾਂ[i], val, len) == 0
 		    && ((list && val[len] == ',') || val[len] == NUL))
 	    {
 		val += len + (val[len] == ',');
 		new_flags |= (1 << i);
-		break;		// check next item in val list
+		ਰੋਕੋ;		// check next item in val list
 	    }
 	}
     }
-    if (flagp != NULL)
+    ਜੇ (flagp != ਨਿਰਾ)
 	*flagp = new_flags;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * return OK if "p" is a valid fileformat name, FAIL otherwise.
  */
-    int
-check_ff_value(char_u *p)
+    ਪੂਰਨ
+check_ff_ਮੁੱਲ(char_u *p)
 {
-    return check_opt_strings(p, p_ff_values, FALSE);
+    ਵਾਪਸ check_opt_ਲੜੀਆਂ(p, p_ff_ਮੁੱਲਾਂ, FALSE);
 }
 
 /*
@@ -5792,31 +5792,31 @@ check_ff_value(char_u *p)
  * Caller must make sure to first call save_clear_shm_value() and then
  * restore_shm_value() exactly the same number of times.
  */
-    void
-save_clear_shm_value(void)
+    ਖਾਲੀ
+save_clear_shm_ਮੁੱਲ(ਖਾਲੀ)
 {
-    if (STRLEN(p_shm) >= SHM_LEN)
+    ਜੇ (STRLEN(p_shm) >= SHM_LEN)
     {
-	iemsg(e_internal_error_shortmess_too_long);
-	return;
+	iemsg(e_ਅੰਦਰੂਨੀ_error_shortmess_too_long);
+	ਵਾਪਸ;
     }
 
-    if (++set_shm_recursive == 1)
+    ਜੇ (++ਸੈੱਟ_shm_recursive == 1)
     {
 	STRCPY(shm_buf, p_shm);
-	set_option_value_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
+	ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
     }
 }
 
 /*
  * Restore the shortmess Flags set from the save_clear_shm_value() function.
  */
-    void
-restore_shm_value(void)
+    ਖਾਲੀ
+restore_shm_ਮੁੱਲ(ਖਾਲੀ)
 {
-    if (--set_shm_recursive == 0)
+    ਜੇ (--ਸੈੱਟ_shm_recursive == 0)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, shm_buf, 0);
+	ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"shm", 0L, shm_buf, 0);
 	vim_memset(shm_buf, 0, SHM_LEN);
     }
 }
@@ -5824,35 +5824,35 @@ restore_shm_value(void)
 /*
  * Export the environment variable $MYVIMDIR to the first item in runtimepath
  */
-    void
-export_myvimdir(void)
+    ਖਾਲੀ
+export_myvimdir(ਖਾਲੀ)
 {
-    int		dofree = FALSE;
+    ਪੂਰਨ		dofree = FALSE;
     char_u	*p;
     char_u	*q = p_rtp;
     string_T	buf;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    ਜੇ (buf.string == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    buf.length = (size_t)copy_option_part(&q, buf.string, MAXPATHL, ",");
+    buf.ਲੰਮਾਈ = (size_t)copy_option_part(&q, buf.string, MAXPATHL, ",");
 
     p = vim_getenv((char_u *)"MYVIMDIR", &dofree);
 
-    if (p == NULL || STRCMP(p, buf.string) != 0)
+    ਜੇ (p == ਨਿਰਾ || STRCMP(p, buf.string) != 0)
     {
-	if (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.length))
-	    STRCPY(buf.string + buf.length, PATHSEPSTR);
-#ifdef MSWIN
+	ਜੇ (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.ਲੰਮਾਈ))
+	    STRCPY(buf.string + buf.ਲੰਮਾਈ, PATHSEPSTR);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// normalize path separators
-	for (q = buf.string; *q != NUL; q++)
-	    if (*q == '/')
+	ਲਈ (q = buf.string; *q != NUL; q++)
+	    ਜੇ (*q == '/')
 		*q = '\\';
-#endif
+#ਜੇ_ਅੰਤ
 	vim_setenv((char_u *)"MYVIMDIR", buf.string);
     }
-    if (dofree)
+    ਜੇ (dofree)
 	vim_free(p);
     vim_free(buf.string);
 }

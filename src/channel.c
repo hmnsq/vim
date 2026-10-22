@@ -10,20 +10,20 @@
  * Implements communication through a socket or any file handle.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#ਜੇ defined(FEAT_ਕੰਮ_CHANNEL)
 
 // TRUE when netbeans is running with a GUI.
-#ifdef FEAT_GUI
-# define CH_HAS_GUI (gui.in_use || gui.starting)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+# define CH_HAS_GUI (gui.ਵਿੱਚ_use || gui.starting)
+#ਜੇ_ਅੰਤ
 
 // Note: when making changes here also adjust configure.ac.
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 // WinSock API is separated from C API, thus we can't use read(), write(),
 // errno...
-# define SOCK_ERRNO errno = WSAGetLastError()
+# define SOCK_ERRNO errno = WSAGet_ਆਖਰੀ_Error()
 # undef ECONNREFUSED
 # define ECONNREFUSED WSAECONNREFUSED
 # undef EWOULDBLOCK
@@ -38,12 +38,12 @@
 # define sock_read(sd, buf, len) recv((SOCKET)sd, buf, len, 0)
 # define sock_close(sd) closesocket((SOCKET)sd)
 // Support for Unix-domain sockets was added in Windows SDK 17061.
-# define UNIX_PATH_MAX 108
-typedef struct sockaddr_un {
-    ADDRESS_FAMILY sun_family;
-    char sun_path[UNIX_PATH_MAX];
+# define UNIX_ਰਸਤਾ_MAX 108
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ sockaddr_un {
+    ਪਤਾ_FAMILY sun_family;
+    ਅੱਖਰ sun_ਰਸਤਾ[UNIX_ਰਸਤਾ_MAX];
 } SOCKADDR_UN, *PSOCKADDR_UN;
-#else
+#ਨਹੀਂਤਾਂ
 # include <netdb.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -53,138 +53,138 @@ typedef struct sockaddr_un {
 #  include <libgen.h>
 # endif
 # define SOCK_ERRNO
-# define sock_write(sd, buf, len) write(sd, buf, len)
-# define sock_read(sd, buf, len) read(sd, buf, len)
+# define sock_write(sd, buf, len) ਲਿਖ(sd, buf, len)
+# define sock_read(sd, buf, len) ਪਠ(sd, buf, len)
 # define sock_close(sd) close(sd)
-# define fd_read(fd, buf, len) read(fd, buf, len)
-# define fd_write(sd, buf, len) write(sd, buf, len)
+# define fd_read(fd, buf, len) ਪਠ(fd, buf, len)
+# define fd_write(sd, buf, len) ਲਿਖ(sd, buf, len)
 # define fd_close(sd) close(sd)
-#endif
+#ਜੇ_ਅੰਤ
 
-static void channel_read(channel_T *channel, ch_part_T part, char *func);
-static void channel_wait_any(long msec);
-static ch_mode_T channel_get_mode(channel_T *channel, ch_part_T part);
-static int channel_get_timeout(channel_T *channel, ch_part_T part);
-static channel_T *channel_open_stdio(void);
-static ch_part_T channel_part_send(channel_T *channel);
-static ch_part_T channel_part_read(channel_T *channel);
+ਸਥਿਰ ਖਾਲੀ channel_read(channel_T *channel, ch_part_T part, ਅੱਖਰ *func);
+ਸਥਿਰ ਖਾਲੀ channel_wait_any(ਲੰਮਾ msec);
+ਸਥਿਰ ch_ਬਹੁਲਕ_T channel_get_ਬਹੁਲਕ(channel_T *channel, ch_part_T part);
+ਸਥਿਰ ਪੂਰਨ channel_get_timeout(channel_T *channel, ch_part_T part);
+ਸਥਿਰ channel_T *channel_open_stdio(ਖਾਲੀ);
+ਸਥਿਰ ch_part_T channel_part_send(channel_T *channel);
+ਸਥਿਰ ch_part_T channel_part_read(channel_T *channel);
 
-#define FOR_ALL_CHANNELS(ch) \
-    for ((ch) = first_channel; (ch) != NULL; (ch) = (ch)->ch_next)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FOR_ALL_CHANNELS(ch) \
+    ਲਈ ((ch) = ਪਹਿਲਾ_channel; (ch) != ਨਿਰਾ; (ch) = (ch)->ch_ਅਗਲਾ)
 
 // Whether we are inside channel_parse_messages() or another situation where it
 // is safe to invoke callbacks.
-static int safe_to_invoke_callback = 0;
+ਸਥਿਰ ਪੂਰਨ ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback = 0;
 
-#ifdef MSWIN
-    static int
-fd_read(sock_T fd, char *buf, size_t len)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਸਥਿਰ ਪੂਰਨ
+fd_read(sock_T fd, ਅੱਖਰ *buf, size_t len)
 {
     HANDLE h = (HANDLE)fd;
     DWORD nread;
 
-    if (!ReadFile(h, buf, (DWORD)len, &nread, NULL))
-	return -1;
-    return (int)nread;
+    ਜੇ (!ReadFile(h, buf, (DWORD)len, &nread, ਨਿਰਾ))
+	ਵਾਪਸ -1;
+    ਵਾਪਸ (ਪੂਰਨ)nread;
 }
 
-    static int
-fd_write(sock_T fd, char *buf, size_t len)
+    ਸਥਿਰ ਪੂਰਨ
+fd_write(sock_T fd, ਅੱਖਰ *buf, size_t len)
 {
     size_t	todo = len;
     HANDLE	h = (HANDLE)fd;
-    DWORD	nwrite, size, done = 0;
+    DWORD	nwrite, ਮਾਪ, ਪੂਰਾ = 0;
     OVERLAPPED	ov;
 
-    while (todo > 0)
+    ਜਦੋਂ (todo > 0)
     {
-	if (todo > MAX_NAMED_PIPE_SIZE)
-	    size = MAX_NAMED_PIPE_SIZE;
-	else
-	    size = (DWORD)todo;
+	ਜੇ (todo > MAX_NAMED_PIPE_ਮਾਪ)
+	    ਮਾਪ = MAX_NAMED_PIPE_ਮਾਪ;
+	ਨਹੀਂਤਾਂ
+	    ਮਾਪ = (DWORD)todo;
 	// If the pipe overflows while the job does not read the data,
 	// WriteFile() will block forever. This abandons the write.
-	CLEAR_FIELD(ov);
+	CLEAR_ਖੇਤਰ(ov);
 	nwrite = 0;
-	if (!WriteFile(h, buf + done, size, &nwrite, &ov))
+	ਜੇ (!WriteFile(h, buf + ਪੂਰਾ, ਮਾਪ, &nwrite, &ov))
 	{
-	    DWORD err = GetLastError();
+	    DWORD err = Get_ਆਖਰੀ_Error();
 
-	    if (err != ERROR_IO_PENDING)
-		return -1;
-	    if (!GetOverlappedResult(h, &ov, &nwrite, FALSE))
-		return -1;
+	    ਜੇ (err != ERROR_IO_PENDING)
+		ਵਾਪਸ -1;
+	    ਜੇ (!Get_Overlapped_ਨਤੀਜਾ(h, &ov, &nwrite, FALSE))
+		ਵਾਪਸ -1;
 	    FlushFileBuffers(h);
 	}
-	else if (nwrite == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (nwrite == 0)
 	    // WriteFile() returns TRUE but did not write anything. This causes
 	    // a hang, so bail out.
-	    break;
+	    ਰੋਕੋ;
 	todo -= nwrite;
-	done += nwrite;
+	ਪੂਰਾ += nwrite;
     }
-    return (int)done;
+    ਵਾਪਸ (ਪੂਰਨ)ਪੂਰਾ;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 fd_close(sock_T fd)
 {
     HANDLE h = (HANDLE)fd;
 
     CloseHandle(h);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 # undef PERROR
-# define PERROR(msg) (void)semsg("%s: %s", msg, strerror_win32(errno))
+# define PERROR(ਸੁਨੇਹਾ) (ਖਾਲੀ)semsg("%s: %s", ਸੁਨੇਹਾ, strerror_win32(errno))
 
-    static char *
-strerror_win32(int eno)
+    ਸਥਿਰ ਅੱਖਰ *
+strerror_win32(ਪੂਰਨ eno)
 {
-    static LPVOID msgbuf = NULL;
+    ਸਥਿਰ LPVOID msgbuf = ਨਿਰਾ;
     char_u *ptr;
 
-    if (msgbuf)
+    ਜੇ (msgbuf)
     {
 	LocalFree(msgbuf);
-	msgbuf = NULL;
+	msgbuf = ਨਿਰਾ;
     }
-    FormatMessage(
-	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-	FORMAT_MESSAGE_FROM_SYSTEM |
-	FORMAT_MESSAGE_IGNORE_INSERTS,
-	NULL,
+    Format_ਸੁਨੇਹਾ(
+	FORMAT_ਸੁਨੇਹਾ_ALLOCATE_ਬਫਰ |
+	FORMAT_ਸੁਨੇਹਾ_FROM_SYSTEM |
+	FORMAT_ਸੁਨੇਹਾ_IGNORE_INSERTS,
+	ਨਿਰਾ,
 	eno,
 	MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
 	(LPTSTR) &msgbuf,
 	0,
-	NULL);
-    if (msgbuf != NULL)
+	ਨਿਰਾ);
+    ਜੇ (msgbuf != ਨਿਰਾ)
 	// chomp \r or \n
-	for (ptr = (char_u *)msgbuf; *ptr; ptr++)
-	    switch (*ptr)
+	ਲਈ (ptr = (char_u *)msgbuf; *ptr; ptr++)
+	    ਚੋਣ (*ptr)
 	    {
-		case '\r':
+		ਹਾਲਤ '\r':
 		    STRMOVE(ptr, ptr + 1);
 		    ptr--;
-		    break;
-		case '\n':
-		    if (*(ptr + 1) == '\0')
+		    ਰੋਕੋ;
+		ਹਾਲਤ '\n':
+		    ਜੇ (*(ptr + 1) == '\0')
 			*ptr = '\0';
-		    else
+		    ਨਹੀਂਤਾਂ
 			*ptr = ' ';
-		    break;
+		    ਰੋਕੋ;
 	    }
-    return msgbuf;
+    ਵਾਪਸ msgbuf;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * The list of all allocated channels.
  */
-static channel_T *first_channel = NULL;
-static int next_ch_id = 0;
+ਸਥਿਰ channel_T *ਪਹਿਲਾ_channel = ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ ਅਗਲਾ_ch_id = 0;
 
 /*
  * Allocate a new channel.  The refcount is set to 1.
@@ -192,44 +192,44 @@ static int next_ch_id = 0;
  * Returns NULL if out of memory.
  */
     channel_T *
-add_channel(void)
+ਜੋੜੋ_channel(ਖਾਲੀ)
 {
     ch_part_T	part;
     channel_T	*channel = ALLOC_CLEAR_ONE(channel_T);
 
-    if (channel == NULL)
-	return NULL;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    channel->ch_id = next_ch_id++;
+    channel->ch_id = ਅਗਲਾ_ch_id++;
     ch_log(channel, "Created channel");
 
-    for (part = PART_SOCK; part < PART_COUNT; ++part)
+    ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
     {
 	channel->ch_part[part].ch_fd = INVALID_FD;
-#ifdef FEAT_GUI_X11
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
-#endif
-#ifdef FEAT_GUI_GTK
-	channel->ch_part[part].ch_inputHandler = 0;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_X11
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = (Xt_ਨਿਵੇਸ਼_Id)ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_GTK
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = 0;
+#ਜੇ_ਅੰਤ
 	channel->ch_part[part].ch_timeout = 2000;
     }
 
-    if (first_channel != NULL)
+    ਜੇ (ਪਹਿਲਾ_channel != ਨਿਰਾ)
     {
-	first_channel->ch_prev = channel;
-	channel->ch_next = first_channel;
+	ਪਹਿਲਾ_channel->ch_prev = channel;
+	channel->ch_ਅਗਲਾ = ਪਹਿਲਾ_channel;
     }
-    first_channel = channel;
+    ਪਹਿਲਾ_channel = channel;
 
     channel->ch_refcount = 1;
-    return channel;
+    ਵਾਪਸ channel;
 }
 
-    int
-has_any_channel(void)
+    ਪੂਰਨ
+has_any_channel(ਖਾਲੀ)
 {
-    return first_channel != NULL;
+    ਵਾਪਸ ਪਹਿਲਾ_channel != ਨਿਰਾ;
 }
 
 /*
@@ -237,60 +237,60 @@ has_any_channel(void)
  * Return TRUE if "channel" has a callback and the associated job wasn't
  * killed.
  */
-    int
+    ਪੂਰਨ
 channel_still_useful(channel_T *channel)
 {
-    int has_sock_msg;
-    int	has_out_msg;
-    int	has_err_msg;
+    ਪੂਰਨ has_sock_ਸੁਨੇਹਾ;
+    ਪੂਰਨ	has_ਬਾਹਰਲਾ_ਸੁਨੇਹਾ;
+    ਪੂਰਨ	has_err_ਸੁਨੇਹਾ;
 
     // If the job was killed the channel is not expected to work anymore.
-    if (channel->ch_job_killed && channel->ch_job == NULL)
-	return FALSE;
+    ਜੇ (channel->ch_ਕੰਮ_killed && channel->ch_ਕੰਮ == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
     // If there is a close callback it may still need to be invoked.
-    if (channel->ch_close_cb.cb_name != NULL)
-	return TRUE;
+    ਜੇ (channel->ch_close_cb.cb_name != ਨਿਰਾ)
+	ਵਾਪਸ TRUE;
 
     // If reading from or a buffer it's still useful.
-    if (channel->ch_part[PART_IN].ch_bufref.br_buf != NULL)
-	return TRUE;
+    ਜੇ (channel->ch_part[PART_ਵਿੱਚ].ch_bufref.br_buf != ਨਿਰਾ)
+	ਵਾਪਸ TRUE;
 
     // If there is no callback then nobody can get readahead.  If the fd is
     // closed and there is no readahead then the callback won't be called.
-    has_sock_msg = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
-		|| channel->ch_part[PART_SOCK].ch_head.rq_next != NULL
-		|| channel->ch_part[PART_SOCK].ch_json_head.jq_next != NULL;
-    has_out_msg = channel->ch_part[PART_OUT].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_OUT].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_OUT].ch_json_head.jq_next != NULL;
-    has_err_msg = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_ERR].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_ERR].ch_json_head.jq_next != NULL;
-    return (channel->ch_callback.cb_name != NULL && (has_sock_msg
-		|| has_out_msg || has_err_msg))
-	    || ((channel->ch_part[PART_OUT].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_OUT].ch_bufref.br_buf != NULL)
-		    && has_out_msg)
-	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != NULL)
-		    && has_err_msg);
+    has_sock_ਸੁਨੇਹਾ = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
+		|| channel->ch_part[PART_SOCK].ch_ਸਿਰ.rq_ਅਗਲਾ != ਨਿਰਾ
+		|| channel->ch_part[PART_SOCK].ch_json_ਸਿਰ.jq_ਅਗਲਾ != ਨਿਰਾ;
+    has_ਬਾਹਰਲਾ_ਸੁਨੇਹਾ = channel->ch_part[PART_ਬਾਹਰਲਾ].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_ਬਾਹਰਲਾ].ch_ਸਿਰ.rq_ਅਗਲਾ != ਨਿਰਾ
+		  || channel->ch_part[PART_ਬਾਹਰਲਾ].ch_json_ਸਿਰ.jq_ਅਗਲਾ != ਨਿਰਾ;
+    has_err_ਸੁਨੇਹਾ = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_ERR].ch_ਸਿਰ.rq_ਅਗਲਾ != ਨਿਰਾ
+		  || channel->ch_part[PART_ERR].ch_json_ਸਿਰ.jq_ਅਗਲਾ != ਨਿਰਾ;
+    ਵਾਪਸ (channel->ch_callback.cb_name != ਨਿਰਾ && (has_sock_ਸੁਨੇਹਾ
+		|| has_ਬਾਹਰਲਾ_ਸੁਨੇਹਾ || has_err_ਸੁਨੇਹਾ))
+	    || ((channel->ch_part[PART_ਬਾਹਰਲਾ].ch_callback.cb_name != ਨਿਰਾ
+		       || channel->ch_part[PART_ਬਾਹਰਲਾ].ch_bufref.br_buf != ਨਿਰਾ)
+		    && has_ਬਾਹਰਲਾ_ਸੁਨੇਹਾ)
+	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != ਨਿਰਾ
+		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != ਨਿਰਾ)
+		    && has_err_ਸੁਨੇਹਾ);
 }
 
 /*
  * Return TRUE if "channel" is closeable (i.e. all readable fds are closed).
  */
-    int
+    ਪੂਰਨ
 channel_can_close(channel_T *channel)
 {
-    return channel->ch_to_be_closed == 0;
+    ਵਾਪਸ channel->ch_ਮੰਜ਼ਿਲ_be_closed == 0;
 }
 
 /*
  * Close a channel and free all its resources.
  * The "channel" pointer remains valid.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_free_contents(channel_T *channel)
 {
     channel_close(channel, TRUE);
@@ -301,27 +301,27 @@ channel_free_contents(channel_T *channel)
 /*
  * Unlink "channel" from the list of channels and free it.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_free_channel(channel_T *channel)
 {
-    if (channel->ch_next != NULL)
-	channel->ch_next->ch_prev = channel->ch_prev;
-    if (channel->ch_prev == NULL)
-	first_channel = channel->ch_next;
-    else
-	channel->ch_prev->ch_next = channel->ch_next;
+    ਜੇ (channel->ch_ਅਗਲਾ != ਨਿਰਾ)
+	channel->ch_ਅਗਲਾ->ch_prev = channel->ch_prev;
+    ਜੇ (channel->ch_prev == ਨਿਰਾ)
+	ਪਹਿਲਾ_channel = channel->ch_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	channel->ch_prev->ch_ਅਗਲਾ = channel->ch_ਅਗਲਾ;
     vim_free(channel);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_free(channel_T *channel)
 {
-    if (in_free_unref_items)
-	return;
+    ਜੇ (ਵਿੱਚ_free_unref_ਚੀਜ਼ਾਂ)
+	ਵਾਪਸ;
 
-    if (safe_to_invoke_callback == 0)
-	channel->ch_to_be_freed = TRUE;
-    else
+    ਜੇ (ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback == 0)
+	channel->ch_ਮੰਜ਼ਿਲ_be_freed = TRUE;
+    ਨਹੀਂਤਾਂ
     {
 	channel_free_contents(channel);
 	channel_free_channel(channel);
@@ -334,15 +334,15 @@ channel_free(channel_T *channel)
  * killed.
  * Return TRUE if the channel was freed.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_may_free(channel_T *channel)
 {
-    if (!channel_still_useful(channel))
+    ਜੇ (!channel_still_useful(channel))
     {
 	channel_free(channel);
-	return TRUE;
+	ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -350,27 +350,27 @@ channel_may_free(channel_T *channel)
  * down to zero.  Don't free it if there is a pending action.
  * Returns TRUE when the channel is no longer referenced.
  */
-    int
+    ਪੂਰਨ
 channel_unref(channel_T *channel)
 {
-    if (channel != NULL && --channel->ch_refcount <= 0)
-	return channel_may_free(channel);
-    return FALSE;
+    ਜੇ (channel != ਨਿਰਾ && --channel->ch_refcount <= 0)
+	ਵਾਪਸ channel_may_free(channel);
+    ਵਾਪਸ FALSE;
 }
 
-    int
-free_unused_channels_contents(int copyID, int mask)
+    ਪੂਰਨ
+free_ਅਣਵਰਤਿਆ_channels_contents(ਪੂਰਨ copyID, ਪੂਰਨ ਨਕਾਬ)
 {
-    int		did_free = FALSE;
+    ਪੂਰਨ		did_free = FALSE;
     channel_T	*ch;
 
     // This is invoked from the garbage collector, which only runs at a safe
     // point.
-    ++safe_to_invoke_callback;
+    ++ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
 
     FOR_ALL_CHANNELS(ch)
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	ਜੇ (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ਨਕਾਬ) != (copyID & ਨਕਾਬ))
 	{
 	    // Free the channel and ordinary items it contains, but don't
 	    // recurse into Lists, Dictionaries etc.
@@ -378,64 +378,64 @@ free_unused_channels_contents(int copyID, int mask)
 	    did_free = TRUE;
 	}
 
-    --safe_to_invoke_callback;
-    return did_free;
+    --ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
+    ਵਾਪਸ did_free;
 }
 
-    void
-free_unused_channels(int copyID, int mask)
+    ਖਾਲੀ
+free_ਅਣਵਰਤਿਆ_channels(ਪੂਰਨ copyID, ਪੂਰਨ ਨਕਾਬ)
 {
     channel_T	*ch;
-    channel_T	*ch_next;
+    channel_T	*ch_ਅਗਲਾ;
 
-    for (ch = first_channel; ch != NULL; ch = ch_next)
+    ਲਈ (ch = ਪਹਿਲਾ_channel; ch != ਨਿਰਾ; ch = ch_ਅਗਲਾ)
     {
-	ch_next = ch->ch_next;
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	ch_ਅਗਲਾ = ch->ch_ਅਗਲਾ;
+	ਜੇ (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ਨਕਾਬ) != (copyID & ਨਕਾਬ))
 	    // Free the channel struct itself.
 	    channel_free_channel(ch);
     }
 }
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+# ਜੇ defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
 /*
  * Lookup the channel from the socket.  Set "partp" to the fd index.
  * Returns NULL when the socket isn't found.
  */
-    static channel_T *
+    ਸਥਿਰ channel_T *
 channel_fd2channel(sock_T fd, ch_part_T *partp)
 {
     channel_T	*channel;
     ch_part_T	part;
 
-    if (fd == INVALID_FD)
-	return NULL;
+    ਜੇ (fd == INVALID_FD)
+	ਵਾਪਸ ਨਿਰਾ;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel->ch_part[part].ch_fd == fd)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
+	    ਜੇ (channel->ch_part[part].ch_fd == fd)
 	    {
 		*partp = part;
-		return channel;
+		ਵਾਪਸ channel;
 	    }
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-    static void
-channel_read_fd(int fd)
+    ਸਥਿਰ ਖਾਲੀ
+channel_read_fd(ਪੂਰਨ fd)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     channel = channel_fd2channel(fd, &part);
-    if (channel == NULL)
-	ch_error(NULL, "Channel for fd %d not found", fd);
-    else
+    ਜੇ (channel == ਨਿਰਾ)
+	ch_error(ਨਿਰਾ, "Channel for fd %d not found", fd);
+    ਨਹੀਂਤਾਂ
 	channel_read(channel, part, "channel_read_fd");
 }
 # endif
@@ -444,206 +444,206 @@ channel_read_fd(int fd)
  * Read a command from netbeans.
  */
 # ifdef FEAT_GUI_X11
-    static void
-messageFromServerX11(XtPointer clientData,
-		  int *unused1 UNUSED,
-		  XtInputId *unused2 UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੁਨੇਹਾ_From_Server_X11(Xt_ਸੂਚਕ client_ਅੰਕੜੇ,
+		  ਪੂਰਨ *unused1 ਅਣਵਰਤਿਆ,
+		  Xt_ਨਿਵੇਸ਼_Id *unused2 ਅਣਵਰਤਿਆ)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((ਪੂਰਨ)(ਲੰਮਾ)client_ਅੰਕੜੇ);
 }
 # endif
 
 # ifdef FEAT_GUI_GTK
-#  if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
-messageFromServerGtk3(GIOChannel *unused1 UNUSED,
-		  GIOCondition unused2 UNUSED,
-		  gpointer clientData)
+#  ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+    ਸਥਿਰ gboolean
+ਸੁਨੇਹਾ_From_Server_Gtk3(GIOChannel *unused1 ਅਣਵਰਤਿਆ,
+		  GIOCondition unused2 ਅਣਵਰਤਿਆ,
+		  gpointer client_ਅੰਕੜੇ)
 {
-    channel_read_fd(GPOINTER_TO_INT(clientData));
-    return TRUE; // Return FALSE instead in case the event source is to
+    channel_read_fd(GPOINTER_ਮੰਜ਼ਿਲ_INT(client_ਅੰਕੜੇ));
+    ਵਾਪਸ TRUE; // Return FALSE instead in case the event source is to
 		 // be removed after this function returns.
 }
-#  else
-    static void
-messageFromServerGtk2(gpointer clientData,
-		  gint unused1 UNUSED,
-		  GdkInputCondition unused2 UNUSED)
+#  ਨਹੀਂਤਾਂ
+    ਸਥਿਰ ਖਾਲੀ
+ਸੁਨੇਹਾ_From_Server_Gtk2(gpointer client_ਅੰਕੜੇ,
+		  gint unused1 ਅਣਵਰਤਿਆ,
+		  Gdk_ਨਿਵੇਸ਼_Condition unused2 ਅਣਵਰਤਿਆ)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((ਪੂਰਨ)(ਲੰਮਾ)client_ਅੰਕੜੇ);
 }
 #  endif
 # endif
 
-    static void
-channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+channel_gui_ਰਜਿਸਟਰ_one(channel_T *channel, ch_part_T part ਅਣਵਰਤਿਆ)
 {
-    if (!CH_HAS_GUI)
-	return;
+    ਜੇ (!CH_HAS_GUI)
+	ਵਾਪਸ;
 
     // gets stuck in handling events for a not connected channel
-    if (channel->ch_keep_open)
-	return;
+    ਜੇ (channel->ch_keep_open)
+	ਵਾਪਸ;
 
 # ifdef FEAT_GUI_X11
     // Tell notifier we are interested in being called when there is input on
     // the editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
+    ਜੇ (channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler == (Xt_ਨਿਵੇਸ਼_Id)ਨਿਰਾ)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
+		ch_part_ਨਾਂ[part], channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = XtAppAddInput(
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = Xt_App_ਜੋੜੋ_ਨਿਵੇਸ਼(
 		(XtAppContext)app_context,
 		channel->ch_part[part].ch_fd,
-		(XtPointer)(XtInputReadMask + XtInputExceptMask),
-		messageFromServerX11,
-		(XtPointer)(long)channel->ch_part[part].ch_fd);
+		(Xt_ਸੂਚਕ)(Xt_ਨਿਵੇਸ਼_Read_ਨਕਾਬ + Xt_ਨਿਵੇਸ਼_Except_ਨਕਾਬ),
+		ਸੁਨੇਹਾ_From_Server_X11,
+		(Xt_ਸੂਚਕ)(ਲੰਮਾ)channel->ch_part[part].ch_fd);
     }
-# else
+# ਨਹੀਂਤਾਂ
 #  ifdef FEAT_GUI_GTK
     // Tell gdk we are interested in being called when there is input on the
     // editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == 0)
+    ਜੇ (channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler == 0)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
-#   if GTK_CHECK_VERSION(3,0,0)
+		ch_part_ਨਾਂ[part], channel->ch_part[part].ch_fd);
+#   ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
 	GIOChannel *chnnl = g_io_channel_unix_new(
 		(gint)channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = g_io_add_watch(
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = g_io_ਜੋੜੋ_watch(
 		chnnl,
-		G_IO_IN|G_IO_HUP|G_IO_ERR|G_IO_PRI,
-		messageFromServerGtk3,
-		GINT_TO_POINTER(channel->ch_part[part].ch_fd));
+		G_IO_ਵਿੱਚ|G_IO_HUP|G_IO_ERR|G_IO_PRI,
+		ਸੁਨੇਹਾ_From_Server_Gtk3,
+		GINT_ਮੰਜ਼ਿਲ_ਸੂਚਕ(channel->ch_part[part].ch_fd));
 
 	g_io_channel_unref(chnnl);
-#   else
-	channel->ch_part[part].ch_inputHandler = gdk_input_add(
+#   ਨਹੀਂਤਾਂ
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = gdk_ਨਿਵੇਸ਼_ਜੋੜੋ(
 		(gint)channel->ch_part[part].ch_fd,
-		(GdkInputCondition)
-			     ((int)GDK_INPUT_READ + (int)GDK_INPUT_EXCEPTION),
-		messageFromServerGtk2,
-		(gpointer)(long)channel->ch_part[part].ch_fd);
+		(Gdk_ਨਿਵੇਸ਼_Condition)
+			     ((ਪੂਰਨ)GDK_ਨਿਵੇਸ਼_READ + (ਪੂਰਨ)GDK_ਨਿਵੇਸ਼_EXCEPTION),
+		ਸੁਨੇਹਾ_From_Server_Gtk2,
+		(gpointer)(ਲੰਮਾ)channel->ch_part[part].ch_fd);
 #   endif
     }
 #  endif
 # endif
 }
 
-    static void
-channel_gui_register(channel_T *channel)
+    ਸਥਿਰ ਖਾਲੀ
+channel_gui_ਰਜਿਸਟਰ(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD != INVALID_FD)
-	channel_gui_register_one(channel, PART_SOCK);
-    if (channel->CH_OUT_FD != INVALID_FD
-	    && channel->CH_OUT_FD != channel->CH_SOCK_FD)
-	channel_gui_register_one(channel, PART_OUT);
-    if (channel->CH_ERR_FD != INVALID_FD
+    ਜੇ (channel->CH_SOCK_FD != INVALID_FD)
+	channel_gui_ਰਜਿਸਟਰ_one(channel, PART_SOCK);
+    ਜੇ (channel->CH_ਬਾਹਰਲਾ_FD != INVALID_FD
+	    && channel->CH_ਬਾਹਰਲਾ_FD != channel->CH_SOCK_FD)
+	channel_gui_ਰਜਿਸਟਰ_one(channel, PART_ਬਾਹਰਲਾ);
+    ਜੇ (channel->CH_ERR_FD != INVALID_FD
 	    && channel->CH_ERR_FD != channel->CH_SOCK_FD
-	    && channel->CH_ERR_FD != channel->CH_OUT_FD)
-	channel_gui_register_one(channel, PART_ERR);
+	    && channel->CH_ERR_FD != channel->CH_ਬਾਹਰਲਾ_FD)
+	channel_gui_ਰਜਿਸਟਰ_one(channel, PART_ERR);
 }
 
 /*
  * Register any of our file descriptors with the GUI event handling system.
  * Called when the GUI has started.
  */
-    void
-channel_gui_register_all(void)
+    ਖਾਲੀ
+channel_gui_ਰਜਿਸਟਰ_all(ਖਾਲੀ)
 {
     channel_T *channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_gui_register(channel);
+	channel_gui_ਰਜਿਸਟਰ(channel);
 }
 
-    static void
-channel_gui_unregister_one(channel_T *channel UNUSED, ch_part_T part UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+channel_gui_unregister_one(channel_T *channel ਅਣਵਰਤਿਆ, ch_part_T part ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_GUI_X11
-    if (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
+    ਜੇ (channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler != (Xt_ਨਿਵੇਸ਼_Id)ਨਿਰਾ)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-	XtRemoveInput(channel->ch_part[part].ch_inputHandler);
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
+	ch_log(channel, "Unregistering part %s", ch_part_ਨਾਂ[part]);
+	Xt_Remove_ਨਿਵੇਸ਼(channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler);
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = (Xt_ਨਿਵੇਸ਼_Id)ਨਿਰਾ;
     }
-# else
+# ਨਹੀਂਤਾਂ
 #  ifdef FEAT_GUI_GTK
-    if (channel->ch_part[part].ch_inputHandler != 0)
+    ਜੇ (channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler != 0)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-#   if GTK_CHECK_VERSION(3,0,0)
-	g_source_remove(channel->ch_part[part].ch_inputHandler);
-#   else
-	gdk_input_remove(channel->ch_part[part].ch_inputHandler);
+	ch_log(channel, "Unregistering part %s", ch_part_ਨਾਂ[part]);
+#   ਜੇ GTK_CHECK_ਸੰਸਕਰਣ(3,0,0)
+	g_ਸਰੋਤ_remove(channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler);
+#   ਨਹੀਂਤਾਂ
+	gdk_ਨਿਵੇਸ਼_remove(channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler);
 #   endif
-	channel->ch_part[part].ch_inputHandler = 0;
+	channel->ch_part[part].ch_ਨਿਵੇਸ਼_Handler = 0;
     }
 #  endif
 # endif
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_gui_unregister(channel_T *channel)
 {
     ch_part_T	part;
 
-    for (part = PART_SOCK; part < PART_IN; ++part)
+    ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	channel_gui_unregister_one(channel, part);
 }
 
-#endif  // FEAT_GUI
+#ਜੇ_ਅੰਤ  // FEAT_GUI
 
 /*
  * For Unix we need to call connect() again after connect() failed.
  * On Win32 one time is sufficient.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_connect(
 	channel_T *channel,
-	const struct sockaddr *server_addr,
-	int server_addrlen,
-	int *waittime)
+	ਅਚਲ ਬਣਤਰ sockaddr *server_addr,
+	ਪੂਰਨ server_addrlen,
+	ਪੂਰਨ *waittime)
 {
-    int		sd = -1;
-#ifdef MSWIN
+    ਪੂਰਨ		sd = -1;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     u_long	val = 1;
-#endif
+#ਜੇ_ਅੰਤ
 
-    while (TRUE)
+    ਜਦੋਂ (TRUE)
     {
-	long	elapsed_msec = 0;
-	int	waitnow;
-	int	ret;
+	ਲੰਮਾ	elapsed_msec = 0;
+	ਪੂਰਨ	waitnow;
+	ਪੂਰਨ	ret;
 
-	if (sd >= 0)
+	ਜੇ (sd >= 0)
 	    sock_close(sd);
 	sd = socket(server_addr->sa_family, SOCK_STREAM, 0);
-	if (sd == -1)
+	ਜੇ (sd == -1)
 	{
 	    ch_error(channel, "in socket() in channel_connect().");
-	    PERROR(_(e_socket_in_channel_connect));
-	    return -1;
+	    PERROR(_(e_socket_ਵਿੱਚ_channel_connect));
+	    ਵਾਪਸ -1;
 	}
 
-	if (*waittime >= 0)
+	ਜੇ (*waittime >= 0)
 	{
 	    // Make connect() non-blocking.
-	    if (
-#ifdef MSWIN
+	    ਜੇ (
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 		ioctlsocket(sd, FIONBIO, &val) < 0
-#else
+#ਨਹੀਂਤਾਂ
 		fcntl(sd, F_SETFL, O_NONBLOCK) < 0
-#endif
+#ਜੇ_ਅੰਤ
 	       )
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
 		sock_close(sd);
-		return -1;
+		ਵਾਪਸ -1;
 	    }
 	}
 
@@ -651,29 +651,29 @@ channel_connect(
 	ch_log(channel, "Connecting...");
 
 	ret = connect(sd, server_addr, server_addrlen);
-	if (ret == 0)
+	ਜੇ (ret == 0)
 	    // The connection could be established.
-	    break;
+	    ਰੋਕੋ;
 
 	SOCK_ERRNO;
-	if (*waittime < 0 || (errno != EWOULDBLOCK
+	ਜੇ (*waittime < 0 || (errno != EWOULDBLOCK
 		&& errno != ECONNREFUSED
-#ifdef EINPROGRESS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ EINPROGRESS
 		&& errno != EINPROGRESS
-#endif
+#ਜੇ_ਅੰਤ
 		))
 	{
 	    ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-	    PERROR(_(e_cannot_connect_to_port));
+	    PERROR(_(e_cannot_connect_ਮੰਜ਼ਿਲ_ਪੋਰਟ));
 	    sock_close(sd);
-	    return -1;
+	    ਵਾਪਸ -1;
 	}
-	else if (errno == ECONNREFUSED)
+	ਨਹੀਂਤਾਂ ਜੇ (errno == ECONNREFUSED)
 	{
 	    ch_error(channel, "channel_connect: Connection refused");
 	    sock_close(sd);
-	    return -1;
+	    ਵਾਪਸ -1;
 	}
 
 	// Limit the waittime to 50 msec.  If it doesn't work within this
@@ -683,15 +683,15 @@ channel_connect(
 	// If connect() didn't finish then try using select() to wait for the
 	// connection to be made. For Win32 always use select() to wait.
 	{
-	    struct timeval	tv;
+	    ਬਣਤਰ timeval	tv;
 	    fd_set		rfds;
 	    fd_set		wfds;
-#ifndef MSWIN
-	    int			so_error = 0;
-	    socklen_t		so_error_len = sizeof(so_error);
-	    struct timeval	start_tv;
-	    struct timeval	end_tv;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਪੂਰਨ			so_error = 0;
+	    socklen_t		so_error_len = ਆਕਾਰ(so_error);
+	    ਬਣਤਰ timeval	ਸ਼ੁਰੂ_tv;
+	    ਬਣਤਰ timeval	ਸਿਰਾ_tv;
+#ਜੇ_ਅੰਤ
 	    FD_ZERO(&rfds);
 	    FD_SET(sd, &rfds);
 	    FD_ZERO(&wfds);
@@ -699,35 +699,35 @@ channel_connect(
 
 	    tv.tv_sec = waitnow / 1000;
 	    tv.tv_usec = (waitnow % 1000) * 1000;
-#ifndef MSWIN
-	    gettimeofday(&start_tv, NULL);
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    gettimeofday(&ਸ਼ੁਰੂ_tv, ਨਿਰਾ);
+#ਜੇ_ਅੰਤ
 	    ch_log(channel,
 		      "Waiting for connection (waiting %d msec)...", waitnow);
 
-	    ret = select(sd + 1, &rfds, &wfds, NULL, &tv);
-	    if (ret < 0)
+	    ret = select(sd + 1, &rfds, &wfds, ਨਿਰਾ, &tv);
+	    ਜੇ (ret < 0)
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-		PERROR(_(e_cannot_connect_to_port));
+		PERROR(_(e_cannot_connect_ਮੰਜ਼ਿਲ_ਪੋਰਟ));
 		sock_close(sd);
-		return -1;
+		ਵਾਪਸ -1;
 	    }
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	    // On Win32: select() is expected to work and wait for up to
 	    // "waitnow" msec for the socket to be open.
-	    if (FD_ISSET(sd, &wfds))
-		break;
+	    ਜੇ (FD_ISSET(sd, &wfds))
+		ਰੋਕੋ;
 	    elapsed_msec = waitnow;
-	    if (*waittime > 1 && elapsed_msec < *waittime)
+	    ਜੇ (*waittime > 1 && elapsed_msec < *waittime)
 	    {
 		*waittime -= elapsed_msec;
-		continue;
+		ਜਾਰੀ;
 	    }
-#else
+#ਨਹੀਂਤਾਂ
 	    // On Linux-like systems: See socket(7) for the behavior
 	    // After putting the socket in non-blocking mode, connect() will
 	    // return EINPROGRESS, select() will not wait (as if writing is
@@ -735,11 +735,11 @@ channel_connect(
 	    // actually able to connect.
 	    // We detect a failure to connect when either read and write fds
 	    // are set.  Use getsockopt() to find out what kind of failure.
-	    if (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
+	    ਜੇ (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
 	    {
 		ret = getsockopt(sd,
 			      SOL_SOCKET, SO_ERROR, &so_error, &so_error_len);
-		if (ret < 0 || (so_error != 0
+		ਜੇ (ret < 0 || (so_error != 0
 			&& so_error != EWOULDBLOCK
 			&& so_error != ECONNREFUSED
 # ifdef EINPROGRESS
@@ -750,30 +750,30 @@ channel_connect(
 		    ch_error(channel,
 			    "channel_connect: Connect failed with errno %d",
 			    so_error);
-		    PERROR(_(e_cannot_connect_to_port));
+		    PERROR(_(e_cannot_connect_ਮੰਜ਼ਿਲ_ਪੋਰਟ));
 		    sock_close(sd);
-		    return -1;
+		    ਵਾਪਸ -1;
 		}
-		else if (errno == ECONNREFUSED)
+		ਨਹੀਂਤਾਂ ਜੇ (errno == ECONNREFUSED)
 		{
 		    ch_error(channel, "channel_connect: Connection refused");
 		    sock_close(sd);
-		    return -1;
+		    ਵਾਪਸ -1;
 		}
 	    }
 
-	    if (FD_ISSET(sd, &wfds) && so_error == 0)
+	    ਜੇ (FD_ISSET(sd, &wfds) && so_error == 0)
 		// Did not detect an error, connection is established.
-		break;
+		ਰੋਕੋ;
 
-	    gettimeofday(&end_tv, NULL);
-	    elapsed_msec = (end_tv.tv_sec - start_tv.tv_sec) * 1000
-				 + (end_tv.tv_usec - start_tv.tv_usec) / 1000;
-#endif
+	    gettimeofday(&ਸਿਰਾ_tv, ਨਿਰਾ);
+	    elapsed_msec = (ਸਿਰਾ_tv.tv_sec - ਸ਼ੁਰੂ_tv.tv_sec) * 1000
+				 + (ਸਿਰਾ_tv.tv_usec - ਸ਼ੁਰੂ_tv.tv_usec) / 1000;
+#ਜੇ_ਅੰਤ
 	}
 
-#ifndef MSWIN
-	if (*waittime > 1 && elapsed_msec < *waittime)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਜੇ (*waittime > 1 && elapsed_msec < *waittime)
 	{
 	    // The port isn't ready but we also didn't get an error.
 	    // This happens when the server didn't open the socket
@@ -781,40 +781,40 @@ channel_connect(
 	    // "waitnow"  and try again.
 	    waitnow -= elapsed_msec;
 	    *waittime -= elapsed_msec;
-	    if (waitnow > 0)
+	    ਜੇ (waitnow > 0)
 	    {
-		mch_delay((long)waitnow, MCH_DELAY_IGNOREINPUT);
+		mch_delay((ਲੰਮਾ)waitnow, MCH_DELAY_IGNOREINPUT);
 		ui_breakcheck();
 		*waittime -= waitnow;
 	    }
-	    if (!got_int)
+	    ਜੇ (!got_int)
 	    {
-		if (*waittime <= 0)
+		ਜੇ (*waittime <= 0)
 		    // give it one more try
 		    *waittime = 1;
-		continue;
+		ਜਾਰੀ;
 	    }
 	    // we were interrupted, behave as if timed out
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// We timed out.
 	ch_error(channel, "Connection timed out");
 	sock_close(sd);
-	return -1;
+	ਵਾਪਸ -1;
     }
 
-    if (*waittime >= 0)
+    ਜੇ (*waittime >= 0)
     {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	val = 0;
 	ioctlsocket(sd, FIONBIO, &val);
-#else
-	(void)fcntl(sd, F_SETFL, 0);
-#endif
+#ਨਹੀਂਤਾਂ
+	(ਖਾਲੀ)fcntl(sd, F_SETFL, 0);
+#ਜੇ_ਅੰਤ
     }
 
-    return sd;
+    ਵਾਪਸ sd;
 }
 
 /*
@@ -824,62 +824,62 @@ channel_connect(
  */
     channel_T *
 channel_open_unix(
-	const char *path,
-	void (*nb_close_cb)(void))
+	ਅਚਲ ਅੱਖਰ *ਰਸਤਾ,
+	ਖਾਲੀ (*nb_close_cb)(ਖਾਲੀ))
 {
-    channel_T		*channel = NULL;
-    int			sd = -1;
-    size_t		path_len = STRLEN(path);
-    struct sockaddr_un	server;
+    channel_T		*channel = ਨਿਰਾ;
+    ਪੂਰਨ			sd = -1;
+    size_t		ਰਸਤਾ_len = STRLEN(ਰਸਤਾ);
+    ਬਣਤਰ sockaddr_un	server;
     size_t		server_len;
-    int			waittime = -1;
+    ਪੂਰਨ			waittime = -1;
 
-    if (*path == NUL || path_len >= sizeof(server.sun_path))
+    ਜੇ (*ਰਸਤਾ == NUL || ਰਸਤਾ_len >= ਆਕਾਰ(server.sun_ਰਸਤਾ))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), ਰਸਤਾ);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     channel_init_winsock();
-#endif
+#ਜੇ_ਅੰਤ
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_ਖੇਤਰ(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_ਰਸਤਾ, ਰਸਤਾ, ਆਕਾਰ(server.sun_ਰਸਤਾ) - 1);
 
-    ch_log(channel, "Trying to connect to %s", path);
+    ch_log(channel, "Trying to connect to %s", ਰਸਤਾ);
 
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    sd = channel_connect(channel, (struct sockaddr *)&server, (int)server_len,
+    server_len = offsetof(ਬਣਤਰ sockaddr_un, sun_ਰਸਤਾ) + ਰਸਤਾ_len + 1;
+    sd = channel_connect(channel, (ਬਣਤਰ sockaddr *)&server, (ਪੂਰਨ)server_len,
 								   &waittime);
 
-    if (sd < 0)
+    ਜੇ (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (ਅੱਖਰ *)vim_strsave((char_u *)ਰਸਤਾ);
+    channel->ch_ਪੋਰਟ = 0;
+    channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    channel_gui_ਰਜਿਸਟਰ_one(channel, PART_SOCK);
+#ਜੇ_ਅੰਤ
 
-    return channel;
+    ਵਾਪਸ channel;
 }
 
 /*
@@ -891,41 +891,41 @@ channel_open_unix(
  */
     channel_T *
 channel_open(
-	const char *hostname,
-	int port,
-	int waittime,
-	void (*nb_close_cb)(void))
+	ਅਚਲ ਅੱਖਰ *hostname,
+	ਪੂਰਨ ਪੋਰਟ,
+	ਪੂਰਨ waittime,
+	ਖਾਲੀ (*nb_close_cb)(ਖਾਲੀ))
 {
-    int			sd = -1;
-    channel_T		*channel = NULL;
-#ifdef FEAT_IPV6
-    int			err;
-    struct addrinfo	hints;
-    struct addrinfo	*res = NULL;
-    struct addrinfo	*addr = NULL;
-#else
-    struct sockaddr_in	server;
-    struct hostent	*host = NULL;
-#endif
+    ਪੂਰਨ			sd = -1;
+    channel_T		*channel = ਨਿਰਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_IPV6
+    ਪੂਰਨ			err;
+    ਬਣਤਰ addrinfo	hints;
+    ਬਣਤਰ addrinfo	*res = ਨਿਰਾ;
+    ਬਣਤਰ addrinfo	*addr = ਨਿਰਾ;
+#ਨਹੀਂਤਾਂ
+    ਬਣਤਰ sockaddr_ਵਿੱਚ	server;
+    ਬਣਤਰ hostent	*host = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     channel_init_winsock();
-#endif
+#ਜੇ_ਅੰਤ
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Get the server internet address and put into addr structure fill in the
     // socket address structure and connect to server.
-#ifdef FEAT_IPV6
-    CLEAR_FIELD(hints);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_IPV6
+    CLEAR_ਖੇਤਰ(hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-# if defined(__ANDROID__)
+# ਜੇ defined(__ANDROID__)
     hints.ai_flags = AI_ADDRCONFIG;
 # elif defined(AI_ADDRCONFIG) && defined(AI_V4MAPPED)
     hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
@@ -933,192 +933,192 @@ channel_open(
     // Set port number manually in order to prevent name resolution services
     // from being invoked in the environment where AI_NUMERICSERV is not
     // defined.
-    if ((err = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+    ਜੇ ((err = getaddrinfo(hostname, ਨਿਰਾ, &hints, &res)) != 0)
     {
 	ch_error(channel, "in getaddrinfo() in channel_open()");
-	semsg(_(e_getaddrinfo_in_channel_open_str), gai_strerror(err));
+	semsg(_(e_getaddrinfo_ਵਿੱਚ_channel_open_str), gai_strerror(err));
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Count the number of addresses for timeout distribution
-    int addr_count = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next)
-	addr_count++;
+    ਪੂਰਨ addr_ਗਿਣਤੀ = 0;
+    ਲਈ (addr = res; addr != ਨਿਰਾ; addr = addr->ai_ਅਗਲਾ)
+	addr_ਗਿਣਤੀ++;
 
     // On Mac and Solaris a zero timeout almost never works.  Waiting for
     // one millisecond already helps a lot.  Later Mac systems (using IPv6)
     // need more time, 15 milliseconds appears to work well.
     // Let's do it for all systems, because we don't know why this is
     // needed.
-    if (waittime == 0)
+    ਜੇ (waittime == 0)
 	waittime = 15;
 
-    int addr_index = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next, addr_index++)
+    ਪੂਰਨ addr_ਸੂਚਕਾਂਕ = 0;
+    ਲਈ (addr = res; addr != ਨਿਰਾ; addr = addr->ai_ਅਗਲਾ, addr_ਸੂਚਕਾਂਕ++)
     {
-	const char  *dst = hostname;
+	ਅਚਲ ਅੱਖਰ  *dst = hostname;
 # ifdef HAVE_INET_NTOP
-	const void  *src = NULL;
-	char	    buf[NUMBUFLEN];
+	ਅਚਲ ਖਾਲੀ  *src = ਨਿਰਾ;
+	ਅੱਖਰ	    buf[NUMBUFLEN];
 # endif
-	int	    try_waittime;
-	int	    before_waittime;
-	int	    consumed;
-	int	    remaining_addrs;
+	ਪੂਰਨ	    try_waittime;
+	ਪੂਰਨ	    before_waittime;
+	ਪੂਰਨ	    consumed;
+	ਪੂਰਨ	    ਬਚਿਆ_addrs;
 
-	if (addr->ai_family == AF_INET6)
+	ਜੇ (addr->ai_family == AF_INET6)
 	{
-	    struct sockaddr_in6 *sai = (struct sockaddr_in6 *)addr->ai_addr;
+	    ਬਣਤਰ sockaddr_in6 *sai = (ਬਣਤਰ sockaddr_in6 *)addr->ai_addr;
 
-	    sai->sin6_port = htons(port);
+	    sai->sin6_ਪੋਰਟ = htons(ਪੋਰਟ);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin6_addr;
 # endif
 	}
-	else if (addr->ai_family == AF_INET)
+	ਨਹੀਂਤਾਂ ਜੇ (addr->ai_family == AF_INET)
 	{
-	    struct sockaddr_in *sai = (struct sockaddr_in *)addr->ai_addr;
+	    ਬਣਤਰ sockaddr_ਵਿੱਚ *sai = (ਬਣਤਰ sockaddr_ਵਿੱਚ *)addr->ai_addr;
 
-	    sai->sin_port = htons(port);
+	    sai->sin_ਪੋਰਟ = htons(ਪੋਰਟ);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin_addr;
 # endif
 	}
 # ifdef HAVE_INET_NTOP
-	if (src != NULL)
+	ਜੇ (src != ਨਿਰਾ)
 	{
-	    dst = inet_ntop(addr->ai_family, src, buf, sizeof(buf));
-	    if (dst == NULL)
+	    dst = inet_ntop(addr->ai_family, src, buf, ਆਕਾਰ(buf));
+	    ਜੇ (dst == ਨਿਰਾ)
 		dst = hostname;
-	    else if (STRCMP(hostname, dst) != 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(hostname, dst) != 0)
 		ch_log(channel, "Resolved %s to %s", hostname, dst);
 	}
 # endif
 
-	ch_log(channel, "Trying to connect to %s port %d", dst, port);
+	ch_log(channel, "Trying to connect to %s port %d", dst, ਪੋਰਟ);
 
 	// Distribute the timeout across addresses for better fallback behavior.
 	// This implements a simplified version of Happy Eyeballs (RFC 8305).
-	if (addr->ai_next == NULL)
+	ਜੇ (addr->ai_ਅਗਲਾ == ਨਿਰਾ)
 	    try_waittime = waittime;
-	else if (addr_index == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (addr_ਸੂਚਕਾਂਕ == 0)
 	{
-	    if (waittime > 500)
+	    ਜੇ (waittime > 500)
 		try_waittime = 250;
-	    else if (waittime > 30)
+	    ਨਹੀਂਤਾਂ ਜੇ (waittime > 30)
 		try_waittime = waittime / 2;
-	    else
+	    ਨਹੀਂਤਾਂ
 		try_waittime = waittime;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    remaining_addrs = addr_count - addr_index;
-	    try_waittime = waittime / remaining_addrs;
+	    ਬਚਿਆ_addrs = addr_ਗਿਣਤੀ - addr_ਸੂਚਕਾਂਕ;
+	    try_waittime = waittime / ਬਚਿਆ_addrs;
 	}
 
 	before_waittime = try_waittime;
-	sd = channel_connect(channel, addr->ai_addr, (int)addr->ai_addrlen,
+	sd = channel_connect(channel, addr->ai_addr, (ਪੂਰਨ)addr->ai_addrlen,
 							   &try_waittime);
 
 	// Update the overall waittime based on consumed time
 	consumed = before_waittime - try_waittime;
 	waittime -= consumed;
-	if (waittime < 0)
+	ਜੇ (waittime < 0)
 	    waittime = 0;
 
-	if (sd >= 0)
-	    break;
+	ਜੇ (sd >= 0)
+	    ਰੋਕੋ;
 
 	// If we have no time left, stop trying
-	if (waittime <= 0 && addr->ai_next != NULL)
+	ਜੇ (waittime <= 0 && addr->ai_ਅਗਲਾ != ਨਿਰਾ)
 	{
 	    ch_log(channel, "Out of time, stopping connection attempts");
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 
     freeaddrinfo(res);
-#else
-    CLEAR_FIELD(server);
+#ਨਹੀਂਤਾਂ
+    CLEAR_ਖੇਤਰ(server);
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    if ((host = gethostbyname(hostname)) == NULL)
+    server.sin_ਪੋਰਟ = htons(ਪੋਰਟ);
+    ਜੇ ((host = gethostbyname(hostname)) == ਨਿਰਾ)
     {
 	ch_error(channel, "in gethostbyname() in channel_open()");
-	PERROR(_(e_gethostbyname_in_channel_open));
+	PERROR(_(e_gethostbyname_ਵਿੱਚ_channel_open));
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
     {
-	char *p;
+	ਅੱਖਰ *p;
 
 	// When using host->h_addr_list[0] directly ubsan warns for it to not
 	// be aligned.  First copy the pointer to avoid that.
-	memcpy(&p, &host->h_addr_list[0], sizeof(p));
-	memcpy((char *)&server.sin_addr, p, host->h_length);
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ(&p, &host->h_addr_list[0], ਆਕਾਰ(p));
+	ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)&server.sin_addr, p, host->h_ਲੰਮਾਈ);
     }
 
-    ch_log(channel, "Trying to connect to %s port %d", hostname, port);
+    ch_log(channel, "Trying to connect to %s port %d", hostname, ਪੋਰਟ);
 
     // On Mac and Solaris a zero timeout almost never works.  At least wait one
     // millisecond.  Let's do it for all systems, because we don't know why
     // this is needed.
-    if (waittime == 0)
+    ਜੇ (waittime == 0)
 	waittime = 1;
 
-    sd = channel_connect(channel, (struct sockaddr *)&server, sizeof(server),
+    sd = channel_connect(channel, (ਬਣਤਰ sockaddr *)&server, ਆਕਾਰ(server),
 								   &waittime);
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (sd < 0)
+    ਜੇ (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)hostname);
-    channel->ch_port = port;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (ਅੱਖਰ *)vim_strsave((char_u *)hostname);
+    channel->ch_ਪੋਰਟ = ਪੋਰਟ;
+    channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    channel_gui_ਰਜਿਸਟਰ_one(channel, PART_SOCK);
+#ਜੇ_ਅੰਤ
 
-    return channel;
+    ਵਾਪਸ channel;
 }
 
-    static void
-free_set_callback(callback_T *cbp, callback_T *callback)
+    ਸਥਿਰ ਖਾਲੀ
+free_ਸੈੱਟ_callback(callback_T *cbp, callback_T *callback)
 {
     free_callback(cbp);
 
-    if (callback->cb_name != NULL && *callback->cb_name != NUL)
+    ਜੇ (callback->cb_name != ਨਿਰਾ && *callback->cb_name != NUL)
 	copy_callback(cbp, callback);
-    else
-	cbp->cb_name = NULL;
+    ਨਹੀਂਤਾਂ
+	cbp->cb_name = ਨਿਰਾ;
 }
 
 /*
  * Prepare buffer "buf" for writing channel output to.
  */
-	static void
-prepare_buffer(buf_T *buf)
+	ਸਥਿਰ ਖਾਲੀ
+prepare_ਬਫਰ(buf_T *buf)
 {
     buf_T *save_curbuf = curbuf;
 
     buf_copy_options(buf, BCO_ENTER);
     curbuf = buf;
-#ifdef FEAT_QUICKFIX
-    set_option_value_give_err((char_u *)"bt",
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_QUICKFIX
+    ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
-#endif
-    if (curbuf->b_ml.ml_mfp == NULL)
+    ਸੈੱਟ_option_ਮੁੱਲ_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+#ਜੇ_ਅੰਤ
+    ਜੇ (curbuf->b_ml.ml_mfp == ਨਿਰਾ)
 	ml_open(curbuf);
     curbuf = save_curbuf;
 }
@@ -1127,173 +1127,173 @@ prepare_buffer(buf_T *buf)
  * Find a buffer matching "name" or create a new one.
  * Returns NULL if there is something very wrong (error already reported).
  */
-    static buf_T *
-channel_find_buffer(char_u *name, int err, int msg)
+    ਸਥਿਰ buf_T *
+channel_ਲੱਭੋ_ਬਫਰ(char_u *name, ਪੂਰਨ err, ਪੂਰਨ ਸੁਨੇਹਾ)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = ਨਿਰਾ;
     buf_T *save_curbuf = curbuf;
 
-    if (name != NULL && *name != NUL)
+    ਜੇ (name != ਨਿਰਾ && *name != NUL)
     {
 	buf = buflist_findname(name);
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	    buf = buflist_findname_exp(name);
     }
 
-    if (buf != NULL)
-	return buf;
+    ਜੇ (buf != ਨਿਰਾ)
+	ਵਾਪਸ buf;
 
-    buf = buflist_new(name == NULL || *name == NUL ? NULL : name,
-	    NULL, (linenr_T)0, BLN_LISTED | BLN_NEW);
-    if (buf == NULL)
-	return NULL;
-    prepare_buffer(buf);
+    buf = buflist_new(name == ਨਿਰਾ || *name == NUL ? ਨਿਰਾ : name,
+	    ਨਿਰਾ, (linenr_T)0, BLN_LISTED | BLN_NEW);
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    prepare_ਬਫਰ(buf);
 
     curbuf = buf;
-    if (msg)
+    ਜੇ (ਸੁਨੇਹਾ)
 	ml_replace(1, (char_u *)(err ? "Reading from channel error..."
 		    : "Reading from channel output..."), TRUE);
-    changed_bytes(1, 0);
+    ਬਦਲਿਆ_ਬਾਈਟਾਂ(1, 0);
     curbuf = save_curbuf;
 
-    return buf;
+    ਵਾਪਸ buf;
 }
 
 /*
  * Set various properties from an "opt" argument.
  */
-    static void
-channel_set_options(channel_T *channel, jobopt_T *opt)
+    ਸਥਿਰ ਖਾਲੀ
+channel_ਸੈੱਟ_options(channel_T *channel, jobopt_T *opt)
 {
     ch_part_T	part;
 
-    if (opt->jo_set & JO_MODE)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
-	    channel->ch_part[part].ch_mode = opt->jo_mode;
-    if (opt->jo_set & JO_IN_MODE)
-	channel->ch_part[PART_IN].ch_mode = opt->jo_in_mode;
-    if (opt->jo_set & JO_OUT_MODE)
-	channel->ch_part[PART_OUT].ch_mode = opt->jo_out_mode;
-    if (opt->jo_set & JO_ERR_MODE)
-	channel->ch_part[PART_ERR].ch_mode = opt->jo_err_mode;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਹੁਲਕ)
+	ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
+	    channel->ch_part[part].ch_ਬਹੁਲਕ = opt->jo_ਬਹੁਲਕ;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਵਿੱਚ_ਬਹੁਲਕ)
+	channel->ch_part[PART_ਵਿੱਚ].ch_ਬਹੁਲਕ = opt->jo_ਵਿੱਚ_ਬਹੁਲਕ;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_ਬਹੁਲਕ)
+	channel->ch_part[PART_ਬਾਹਰਲਾ].ch_ਬਹੁਲਕ = opt->jo_ਬਾਹਰਲਾ_ਬਹੁਲਕ;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ERR_ਬਹੁਲਕ)
+	channel->ch_part[PART_ERR].ch_ਬਹੁਲਕ = opt->jo_err_ਬਹੁਲਕ;
     channel->ch_nonblock = opt->jo_noblock;
 
-    if (opt->jo_set & JO_TIMEOUT)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_TIMEOUT)
+	ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
 	    channel->ch_part[part].ch_timeout = opt->jo_timeout;
-    if (opt->jo_set & JO_OUT_TIMEOUT)
-	channel->ch_part[PART_OUT].ch_timeout = opt->jo_out_timeout;
-    if (opt->jo_set & JO_ERR_TIMEOUT)
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_TIMEOUT)
+	channel->ch_part[PART_ਬਾਹਰਲਾ].ch_timeout = opt->jo_ਬਾਹਰਲਾ_timeout;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ERR_TIMEOUT)
 	channel->ch_part[PART_ERR].ch_timeout = opt->jo_err_timeout;
-    if (opt->jo_set & JO_BLOCK_WRITE)
-	channel->ch_part[PART_IN].ch_block_write = 1;
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਖੰਡ_WRITE)
+	channel->ch_part[PART_ਵਿੱਚ].ch_ਖੰਡ_write = 1;
 
-    if (opt->jo_set & JO_CALLBACK)
-	free_set_callback(&channel->ch_callback, &opt->jo_callback);
-    if (opt->jo_set & JO_OUT_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_OUT].ch_callback,
-							      &opt->jo_out_cb);
-    if (opt->jo_set & JO_ERR_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_ERR].ch_callback,
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_CALLBACK)
+	free_ਸੈੱਟ_callback(&channel->ch_callback, &opt->jo_callback);
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_CALLBACK)
+	free_ਸੈੱਟ_callback(&channel->ch_part[PART_ਬਾਹਰਲਾ].ch_callback,
+							      &opt->jo_ਬਾਹਰਲਾ_cb);
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_ERR_CALLBACK)
+	free_ਸੈੱਟ_callback(&channel->ch_part[PART_ERR].ch_callback,
 							      &opt->jo_err_cb);
-    if (opt->jo_set & JO_CLOSE_CALLBACK)
-	free_set_callback(&channel->ch_close_cb, &opt->jo_close_cb);
+    ਜੇ (opt->jo_ਸੈੱਟ & JO_CLOSE_CALLBACK)
+	free_ਸੈੱਟ_callback(&channel->ch_close_cb, &opt->jo_close_cb);
     channel->ch_drop_never = opt->jo_drop_never;
 
-    if ((opt->jo_set & JO_OUT_IO) && opt->jo_io[PART_OUT] == JIO_BUFFER)
+    ਜੇ ((opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_IO) && opt->jo_io[PART_ਬਾਹਰਲਾ] == JIO_ਬਫਰ)
     {
 	buf_T *buf;
 
 	// writing output to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_OUT_MODE))
-	    channel->ch_part[PART_OUT].ch_mode = CH_MODE_NL;
-	if (opt->jo_set & JO_OUT_BUF)
+	ਜੇ (!(opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_ਬਹੁਲਕ))
+	    channel->ch_part[PART_ਬਾਹਰਲਾ].ch_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_NL;
+	ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_BUF)
 	{
-	    buf = buflist_findnr(opt->jo_io_buf[PART_OUT]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_OUT]);
+	    buf = buflist_findnr(opt->jo_io_buf[PART_ਬਾਹਰਲਾ]);
+	    ਜੇ (buf == ਨਿਰਾ)
+		semsg(_(e_ਬਫਰ_nr_does_not_exist),
+					       (ਲੰਮਾ)opt->jo_io_buf[PART_ਬਾਹਰਲਾ]);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int msg = TRUE;
+	    ਪੂਰਨ ਸੁਨੇਹਾ = TRUE;
 
-	    if (opt->jo_set2 & JO2_OUT_MSG)
-		msg = opt->jo_message[PART_OUT];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, msg);
+	    ਜੇ (opt->jo_set2 & JO2_ਬਾਹਰਲਾ_ਸੁਨੇਹਾ)
+		ਸੁਨੇਹਾ = opt->jo_ਸੁਨੇਹਾ[PART_ਬਾਹਰਲਾ];
+	    buf = channel_ਲੱਭੋ_ਬਫਰ(opt->jo_io_name[PART_ਬਾਹਰਲਾ], FALSE, ਸੁਨੇਹਾ);
 	}
-	if (buf != NULL)
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    if (opt->jo_set & JO_OUT_MODIFIABLE)
-		channel->ch_part[PART_OUT].ch_nomodifiable =
-						!opt->jo_modifiable[PART_OUT];
+	    ਜੇ (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_MODIFIABLE)
+		channel->ch_part[PART_ਬਾਹਰਲਾ].ch_nomodifiable =
+						!opt->jo_modifiable[PART_ਬਾਹਰਲਾ];
 
-	    if (!buf->b_p_ma && !channel->ch_part[PART_OUT].ch_nomodifiable)
+	    ਜੇ (!buf->b_p_ma && !channel->ch_part[PART_ਬਾਹਰਲਾ].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		ch_log(channel, "writing out to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_OUT].ch_bufref, buf);
+						       (ਅੱਖਰ *)buf->b_ffname);
+		ਸੈੱਟ_bufref(&channel->ch_part[PART_ਬਾਹਰਲਾ].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		ਜੇ (buf->b_ml.ml_mfp == ਨਿਰਾ)
+		    prepare_ਬਫਰ(buf);
 	    }
 	}
     }
 
-    if ((opt->jo_set & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_BUFFER
-	 || (opt->jo_io[PART_ERR] == JIO_OUT && (opt->jo_set & JO_OUT_IO)
-				       && opt->jo_io[PART_OUT] == JIO_BUFFER)))
+    ਜੇ ((opt->jo_ਸੈੱਟ & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_ਬਫਰ
+	 || (opt->jo_io[PART_ERR] == JIO_ਬਾਹਰਲਾ && (opt->jo_ਸੈੱਟ & JO_ਬਾਹਰਲਾ_IO)
+				       && opt->jo_io[PART_ਬਾਹਰਲਾ] == JIO_ਬਫਰ)))
     {
 	buf_T *buf;
 
 	// writing err to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_ERR_MODE))
-	    channel->ch_part[PART_ERR].ch_mode = CH_MODE_NL;
-	if (opt->jo_io[PART_ERR] == JIO_OUT)
-	    buf = channel->ch_part[PART_OUT].ch_bufref.br_buf;
-	else if (opt->jo_set & JO_ERR_BUF)
+	ਜੇ (!(opt->jo_ਸੈੱਟ & JO_ERR_ਬਹੁਲਕ))
+	    channel->ch_part[PART_ERR].ch_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_NL;
+	ਜੇ (opt->jo_io[PART_ERR] == JIO_ਬਾਹਰਲਾ)
+	    buf = channel->ch_part[PART_ਬਾਹਰਲਾ].ch_bufref.br_buf;
+	ਨਹੀਂਤਾਂ ਜੇ (opt->jo_ਸੈੱਟ & JO_ERR_BUF)
 	{
 	    buf = buflist_findnr(opt->jo_io_buf[PART_ERR]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_ERR]);
+	    ਜੇ (buf == ਨਿਰਾ)
+		semsg(_(e_ਬਫਰ_nr_does_not_exist),
+					       (ਲੰਮਾ)opt->jo_io_buf[PART_ERR]);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int msg = TRUE;
+	    ਪੂਰਨ ਸੁਨੇਹਾ = TRUE;
 
-	    if (opt->jo_set2 & JO2_ERR_MSG)
-		msg = opt->jo_message[PART_ERR];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, msg);
+	    ਜੇ (opt->jo_set2 & JO2_ERR_ਸੁਨੇਹਾ)
+		ਸੁਨੇਹਾ = opt->jo_ਸੁਨੇਹਾ[PART_ERR];
+	    buf = channel_ਲੱਭੋ_ਬਫਰ(opt->jo_io_name[PART_ERR], TRUE, ਸੁਨੇਹਾ);
 	}
-	if (buf != NULL)
+	ਜੇ (buf != ਨਿਰਾ)
 	{
-	    if (opt->jo_set & JO_ERR_MODIFIABLE)
+	    ਜੇ (opt->jo_ਸੈੱਟ & JO_ERR_MODIFIABLE)
 		channel->ch_part[PART_ERR].ch_nomodifiable =
 						!opt->jo_modifiable[PART_ERR];
-	    if (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
+	    ਜੇ (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		ch_log(channel, "writing err to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
+						       (ਅੱਖਰ *)buf->b_ffname);
+		ਸੈੱਟ_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		ਜੇ (buf->b_ml.ml_mfp == ਨਿਰਾ)
+		    prepare_ਬਫਰ(buf);
 	    }
 	}
     }
 
-    channel->ch_part[PART_OUT].ch_io = opt->jo_io[PART_OUT];
+    channel->ch_part[PART_ਬਾਹਰਲਾ].ch_io = opt->jo_io[PART_ਬਾਹਰਲਾ];
     channel->ch_part[PART_ERR].ch_io = opt->jo_io[PART_ERR];
-    channel->ch_part[PART_IN].ch_io = opt->jo_io[PART_IN];
+    channel->ch_part[PART_ਵਿੱਚ].ch_io = opt->jo_io[PART_ਵਿੱਚ];
 }
 
 /*
@@ -1301,159 +1301,159 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
  * "unix_path" if it is a unix domain socket. Returns OK on success and FAIL on
  * failure.
  */
-    int
-channel_parse_socketserver_address(
-	char_u	*address,
-	int	*port,
-	char_u	**unix_path,
+    ਪੂਰਨ
+channel_parse_socketserver_ਪਤਾ(
+	char_u	*ਪਤਾ,
+	ਪੂਰਨ	*ਪੋਰਟ,
+	char_u	**unix_ਰਸਤਾ,
 	bool	quiet)
 {
-    char    *rest;
-    long    val;
+    ਅੱਖਰ    *rest;
+    ਲੰਮਾ    val;
 
-    if (*address == NUL)
-	goto fail;
+    ਜੇ (*ਪਤਾ == NUL)
+	ਜਾਓ fail;
 
-    if (STRNCMP(address, "unix:", 5) == 0)
+    ਜੇ (STRNCMP(ਪਤਾ, "unix:", 5) == 0)
     {
-	*unix_path = vim_strsave(address + 5);
-	return OK;
+	*unix_ਰਸਤਾ = vim_strsave(ਪਤਾ + 5);
+	ਵਾਪਸ OK;
     }
 
-    val = strtol((char *)(address), &rest, 10);
-    if (val < 0 || val >= 65536 || *rest != NUL)
+    val = strtol((ਅੱਖਰ *)(ਪਤਾ), &rest, 10);
+    ਜੇ (val < 0 || val >= 65536 || *rest != NUL)
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), address);
-	return FAIL;
+	ਜੇ (!quiet)
+	    semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+	ਵਾਪਸ FAIL;
     }
-    *port = (int)val;
+    *ਪੋਰਟ = (ਪੂਰਨ)val;
 
-    return OK;
+    ਵਾਪਸ OK;
 fail:
-    if (!quiet)
-	semsg(_(e_invalid_argument_str), address);
-    return FAIL;
+    ਜੇ (!quiet)
+	semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Implements ch_open().
  */
-    static channel_T *
+    ਸਥਿਰ channel_T *
 channel_open_func(typval_T *argvars)
 {
-    char_u	*address;
+    char_u	*ਪਤਾ;
     char_u	*p;
-    char	*rest;
-    int		port = 0;
-    int		is_ipv6 = FALSE;
-    int		is_unix = FALSE;
-    int		is_stdio = FALSE;
+    ਅੱਖਰ	*rest;
+    ਪੂਰਨ		ਪੋਰਟ = 0;
+    ਪੂਰਨ		is_ipv6 = FALSE;
+    ਪੂਰਨ		is_unix = FALSE;
+    ਪੂਰਨ		is_stdio = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = ਨਿਰਾ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
 
-    address = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN
+    ਪਤਾ = tv_get_string(&argvars[0]);
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN
 	    && check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
 
-    if (*address == NUL)
+    ਜੇ (*ਪਤਾ == NUL)
     {
-	semsg(_(e_invalid_argument_str), address);
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (STRCMP(address, "stdio") == 0)
+    ਜੇ (STRCMP(ਪਤਾ, "stdio") == 0)
 	is_stdio = TRUE;
-    else if (STRNCMP(address, "unix:", 5) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(ਪਤਾ, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
-	address += 5;
+	ਪਤਾ += 5;
     }
-    else if (*address == '[')
+    ਨਹੀਂਤਾਂ ਜੇ (*ਪਤਾ == '[')
     {
 	// ipv6 address
 	is_ipv6 = TRUE;
-	p = vim_strchr(address + 1, ']');
-	if (p == NULL || *++p != ':')
+	p = vim_strchr(ਪਤਾ + 1, ']');
+	ਜੇ (p == ਨਿਰਾ || *++p != ':')
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// ipv4 address
-	p = vim_strchr(address, ':');
-	if (p == NULL)
+	p = vim_strchr(ਪਤਾ, ':');
+	ਜੇ (p == ਨਿਰਾ)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
     }
 
-    if (!is_unix && !is_stdio)
+    ਜੇ (!is_unix && !is_stdio)
     {
-	port = strtol((char *)(p + 1), &rest, 10);
-	if (port <= 0 || port >= 65536 || *rest != NUL)
+	ਪੋਰਟ = strtol((ਅੱਖਰ *)(p + 1), &rest, 10);
+	ਜੇ (ਪੋਰਟ <= 0 || ਪੋਰਟ >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_ਦਲੀਲ_str), ਪਤਾ);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	if (is_ipv6)
+	ਜੇ (is_ipv6)
 	{
 	    // strip '[' and ']'
-	    ++address;
+	    ++ਪਤਾ;
 	    *(p - 1) = NUL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    *p = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_ਕੰਮ_options(&opt);
+    opt.jo_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
+    ਜੇ (get_ਕੰਮ_options(&argvars[1], &opt,
+	    JO_ਬਹੁਲਕ_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
 		+ (is_unix || is_stdio ? 0 : JO_WAITTIME), 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+	ਜਾਓ theend;
+    ਜੇ (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਜਾਓ theend;
     }
 
-    if (is_stdio)
+    ਜੇ (is_stdio)
 	channel = channel_open_stdio();
-    else if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel = channel_open((char *)address, port, opt.jo_waittime, NULL);
-    if (channel != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (is_unix)
+	channel = channel_open_unix((ਅੱਖਰ *)ਪਤਾ, ਨਿਰਾ);
+    ਨਹੀਂਤਾਂ
+	channel = channel_open((ਅੱਖਰ *)ਪਤਾ, ਪੋਰਟ, opt.jo_waittime, ਨਿਰਾ);
+    ਜੇ (channel != ਨਿਰਾ)
     {
-	int	user_set = opt.jo_set;
+	ਪੂਰਨ	user_ਸੈੱਟ = opt.jo_ਸੈੱਟ;
 
-	opt.jo_set = JO_ALL;
-	if (is_stdio)
+	opt.jo_ਸੈੱਟ = JO_ALL;
+	ਜੇ (is_stdio)
 	    // "mode" and "timeout" apply to both reading and writing, unless
 	    // given for a part specifically.
-	    opt.jo_set &= ~((JO_IN_MODE | JO_OUT_MODE | JO_ERR_MODE
-				| JO_OUT_TIMEOUT | JO_ERR_TIMEOUT) & ~user_set);
-	channel_set_options(channel, &opt);
+	    opt.jo_ਸੈੱਟ &= ~((JO_ਵਿੱਚ_ਬਹੁਲਕ | JO_ਬਾਹਰਲਾ_ਬਹੁਲਕ | JO_ERR_ਬਹੁਲਕ
+				| JO_ਬਾਹਰਲਾ_TIMEOUT | JO_ERR_TIMEOUT) & ~user_ਸੈੱਟ);
+	channel_ਸੈੱਟ_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_ਕੰਮ_options(&opt);
+    ਵਾਪਸ channel;
 }
 
 // The channel on the stdin and stdout of Vim, see --stdio-channel.
-static channel_T *stdio_channel = NULL;
+ਸਥਿਰ channel_T *stdio_channel = ਨਿਰਾ;
 
 /*
  * Open a channel that reads from the stdin of Vim and writes to its stdout.
@@ -1461,107 +1461,107 @@ static channel_T *stdio_channel = NULL;
  * Returns the channel for success.
  * Returns NULL for failure.
  */
-    static channel_T *
-channel_open_stdio(void)
+    ਸਥਿਰ channel_T *
+channel_open_stdio(ਖਾਲੀ)
 {
     channel_T	*channel;
-    sock_T	in_fd;		// our stdin, the channel reads from it
-    sock_T	out_fd;		// our stdout, the channel writes to it
+    sock_T	ਵਿੱਚ_fd;		// our stdin, the channel reads from it
+    sock_T	ਬਾਹਰਲਾ_fd;		// our stdout, the channel writes to it
 
-    if (!use_stdio_channel)
+    ਜੇ (!use_stdio_channel)
     {
 	emsg(_(e_not_started_with_stdio_channel));
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    if (stdio_channel != NULL)
+    ਜੇ (stdio_channel != ਨਿਰਾ)
     {
 	emsg(_(e_cannot_open_stdio_channel));
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Point the original stdin and stdout at the null device, so that neither
     // Vim nor the commands it starts can use the channel.
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     {
 	HANDLE	proc = GetCurrentProcess();
 	HANDLE	hin;
 	HANDLE	hout;
 	HANDLE	hnul;
-	int	nul_fd;
+	ਪੂਰਨ	nul_fd;
 
-	if (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
+	ਜੇ (!DuplicateHandle(proc, GetStdHandle(STD_ਨਿਵੇਸ਼_HANDLE), proc, &hin,
 					      0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	if (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
+	ਜੇ (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
 				       &hout, 0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    CloseHandle(hin);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	hnul = CreateFile("NUL", GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,
-		NULL);
-	if (hnul != INVALID_HANDLE_VALUE)
+		FILE_SHARE_READ | FILE_SHARE_WRITE, ਨਿਰਾ, OPEN_EXISTING, 0,
+		ਨਿਰਾ);
+	ਜੇ (hnul != INVALID_HANDLE_ਮੁੱਲ)
 	{
-	    SetStdHandle(STD_INPUT_HANDLE, hnul);
-	    SetStdHandle(STD_OUTPUT_HANDLE, hnul);
+	    ਸੈੱਟ_Std_Handle(STD_ਨਿਵੇਸ਼_HANDLE, hnul);
+	    ਸੈੱਟ_Std_Handle(STD_OUTPUT_HANDLE, hnul);
 	}
 	// The C runtime keeps its own stdout, used for messages.
 	nul_fd = _open("NUL", _O_RDWR);
-	if (nul_fd >= 0)
+	ਜੇ (nul_fd >= 0)
 	{
 	    _dup2(nul_fd, 1);
 	    _close(nul_fd);
 	}
-	in_fd = (sock_T)hin;
-	out_fd = (sock_T)hout;
+	ਵਿੱਚ_fd = (sock_T)hin;
+	ਬਾਹਰਲਾ_fd = (sock_T)hout;
     }
-#else
+#ਨਹੀਂਤਾਂ
     {
-	int	nul_fd;
+	ਪੂਰਨ	nul_fd;
 
-	in_fd = dup(0);
-	out_fd = dup(1);
-	if (in_fd < 0 || out_fd < 0)
+	ਵਿੱਚ_fd = dup(0);
+	ਬਾਹਰਲਾ_fd = dup(1);
+	ਜੇ (ਵਿੱਚ_fd < 0 || ਬਾਹਰਲਾ_fd < 0)
 	{
-	    if (in_fd >= 0)
-		close(in_fd);
-	    if (out_fd >= 0)
-		close(out_fd);
+	    ਜੇ (ਵਿੱਚ_fd >= 0)
+		close(ਵਿੱਚ_fd);
+	    ਜੇ (ਬਾਹਰਲਾ_fd >= 0)
+		close(ਬਾਹਰਲਾ_fd);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	(void)fcntl(in_fd, F_SETFD, FD_CLOEXEC);
-	(void)fcntl(out_fd, F_SETFD, FD_CLOEXEC);
+	(ਖਾਲੀ)fcntl(ਵਿੱਚ_fd, F_SETFD, FD_CLOEXEC);
+	(ਖਾਲੀ)fcntl(ਬਾਹਰਲਾ_fd, F_SETFD, FD_CLOEXEC);
 	nul_fd = open("/dev/null", O_RDWR);
-	if (nul_fd >= 0)
+	ਜੇ (nul_fd >= 0)
 	{
 	    dup2(nul_fd, 0);
 	    dup2(nul_fd, 1);
 	    close(nul_fd);
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	fd_close(in_fd);
-	fd_close(out_fd);
-	return NULL;
+	ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+	fd_close(ਵਿੱਚ_fd);
+	fd_close(ਬਾਹਰਲਾ_fd);
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    channel_set_pipes(channel, out_fd, in_fd, INVALID_FD);
+    channel_ਸੈੱਟ_pipes(channel, ਬਾਹਰਲਾ_fd, ਵਿੱਚ_fd, INVALID_FD);
     ch_log(channel, "Using stdin and stdout as a channel");
 
     // Keep a reference for channel_stdio_loop().
     ++channel->ch_refcount;
     stdio_channel = channel;
-    return channel;
+    ਵਾਪਸ channel;
 }
 
 /*
@@ -1571,65 +1571,65 @@ channel_open_stdio(void)
 channel_listen_func(typval_T *argvars)
 {
     char_u	*arg;
-    char	*rest;
-    int		port;
-    int		is_unix = FALSE;
+    ਅੱਖਰ	*rest;
+    ਪੂਰਨ		ਪੋਰਟ;
+    ਪੂਰਨ		is_unix = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = ਨਿਰਾ;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && check_for_string_arg(argvars, 0) == FAIL)
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
 
     arg = tv_get_string(&argvars[0]);
-    if (*arg == NUL)
+    ਜੇ (*arg == NUL)
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), arg);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (STRNCMP(arg, "unix:", 5) == 0)
+    ਜੇ (STRNCMP(arg, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
 	arg += 5;
-	port = 0;
+	ਪੋਰਟ = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	port = strtol((char *)(arg), &rest, 10);
-	if (port < 0 || port >= 65536 || *rest != NUL)
+	ਪੋਰਟ = strtol((ਅੱਖਰ *)(arg), &rest, 10);
+	ਜੇ (ਪੋਰਟ < 0 || ਪੋਰਟ >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), arg);
-	    return NULL;
+	    semsg(_(e_invalid_ਦਲੀਲ_str), arg);
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	*arg = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_ਕੰਮ_options(&opt);
+    opt.jo_ਬਹੁਲਕ = CH_ਬਹੁਲਕ_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+    ਜੇ (get_ਕੰਮ_options(&argvars[1], &opt,
+	    JO_ਬਹੁਲਕ_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
+	ਜਾਓ theend;
+    ਜੇ (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_ਦਲੀਲ));
+	ਜਾਓ theend;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)arg, NULL, true);
-    else
-	channel = channel_listen(port, NULL);
-    if (channel != NULL)
+    ਜੇ (is_unix)
+	channel = channel_listen_unix((ਅੱਖਰ *)arg, ਨਿਰਾ, true);
+    ਨਹੀਂਤਾਂ
+	channel = channel_listen(ਪੋਰਟ, ਨਿਰਾ);
+    ਜੇ (channel != ਨਿਰਾ)
     {
-	opt.jo_set = JO_ALL;
-	channel_set_options(channel, &opt);
+	opt.jo_ਸੈੱਟ = JO_ALL;
+	channel_ਸੈੱਟ_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_ਕੰਮ_options(&opt);
+    ਵਾਪਸ channel;
 }
 
 /*
@@ -1639,104 +1639,104 @@ theend:
  */
     channel_T *
 channel_listen(
-	int port_in,
-	void (*nb_close_cb)(void))
+	ਪੂਰਨ ਪੋਰਟ_ਵਿੱਚ,
+	ਖਾਲੀ (*nb_close_cb)(ਖਾਲੀ))
 {
-    int			sd = -1;
-    struct sockaddr_in	server;
-#ifndef FEAT_IPV6
-    struct hostent	*host;
-#endif
-    int			val = 1;
+    ਪੂਰਨ			sd = -1;
+    ਬਣਤਰ sockaddr_ਵਿੱਚ	server;
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ FEAT_IPV6
+    ਬਣਤਰ hostent	*host;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ			val = 1;
     channel_T		*channel;
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     channel_init_winsock();
-#endif
+#ਜੇ_ਅੰਤ
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Get the server internet address and put into addr structure
     // fill in the socket address structure and bind to port
-    vim_memset((char *)&server, 0, sizeof(server));
+    vim_memset((ਅੱਖਰ *)&server, 0, ਆਕਾਰ(server));
     server.sin_family = AF_INET;
-    server.sin_port = htons(port_in);
+    server.sin_ਪੋਰਟ = htons(ਪੋਰਟ_ਵਿੱਚ);
     server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     sd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sd == -1)
+    ਜੇ (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-#ifdef MSWIN
-    if (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-				    (const char *)&val, sizeof(val)) < 0)
-#else
-    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
-				    &val, sizeof(val)) < 0)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+				    (ਅਚਲ ਅੱਖਰ *)&val, ਆਕਾਰ(val)) < 0)
+#ਨਹੀਂਤਾਂ
+    ਜੇ (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
+				    &val, ਆਕਾਰ(val)) < 0)
+#ਜੇ_ਅੰਤ
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in setsockopt() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // Bind the socket to the port
-    if (bind(sd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    ਜੇ (bind(sd, (ਬਣਤਰ sockaddr *)&server, ਆਕਾਰ(server)) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (listen(sd, 5) < 0)
+    ਜੇ (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // When port 0 was specified, retrieve the actual port assigned by the OS.
-    if (port_in == 0)
+    ਜੇ (ਪੋਰਟ_ਵਿੱਚ == 0)
     {
-	struct sockaddr_in	addr;
-	socklen_t		addr_len = sizeof(addr);
+	ਬਣਤਰ sockaddr_ਵਿੱਚ	addr;
+	socklen_t		addr_len = ਆਕਾਰ(addr);
 
-	if (getsockname(sd, (struct sockaddr *)&addr, &addr_len) == 0)
-	    port_in = ntohs(addr.sin_port);
+	ਜੇ (getsockname(sd, (ਬਣਤਰ sockaddr *)&addr, &addr_len) == 0)
+	    ਪੋਰਟ_ਵਿੱਚ = ntohs(addr.sin_ਪੋਰਟ);
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)"");
-    channel->ch_port = port_in;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (ਅੱਖਰ *)vim_strsave((char_u *)"");
+    channel->ch_ਪੋਰਟ = ਪੋਰਟ_ਵਿੱਚ;
+    channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    channel_gui_ਰਜਿਸਟਰ_one(channel, PART_SOCK);
+#ਜੇ_ਅੰਤ
 
-    return channel;
+    ਵਾਪਸ channel;
 }
 
 /*
@@ -1747,162 +1747,162 @@ channel_listen(
  */
     channel_T *
 channel_listen_unix(
-	char *path,
-	void (*nb_close_cb)(void),
+	ਅੱਖਰ *ਰਸਤਾ,
+	ਖਾਲੀ (*nb_close_cb)(ਖਾਲੀ),
 	bool replace)
 {
-    int			sd = -1;
-    struct sockaddr_un	server;
+    ਪੂਰਨ			sd = -1;
+    ਬਣਤਰ sockaddr_un	server;
     channel_T		*channel;
-    size_t		path_len;
+    size_t		ਰਸਤਾ_len;
     size_t		server_len;
 
-    if (path == NULL || *path == NUL)
+    ਜੇ (ਰਸਤਾ == ਨਿਰਾ || *ਰਸਤਾ == NUL)
     {
-	semsg(_(e_invalid_argument_str), path == NULL ? (char *)"" : path);
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), ਰਸਤਾ == ਨਿਰਾ ? (ਅੱਖਰ *)"" : ਰਸਤਾ);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    path_len = STRLEN(path);
-    if (path_len >= sizeof(server.sun_path))
+    ਰਸਤਾ_len = STRLEN(ਰਸਤਾ);
+    ਜੇ (ਰਸਤਾ_len >= ਆਕਾਰ(server.sun_ਰਸਤਾ))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), ਰਸਤਾ);
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     channel_init_winsock();
-#endif
+#ਜੇ_ਅੰਤ
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = ਜੋੜੋ_channel();
+    ਜੇ (channel == ਨਿਰਾ)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_ਖੇਤਰ(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_ਰਸਤਾ, ਰਸਤਾ, ਆਕਾਰ(server.sun_ਰਸਤਾ) - 1);
 
     sd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sd == -1)
+    ਜੇ (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (replace)
+    ਜੇ (replace)
 	// Unlink the socket in case it already exists
-	unlink(server.sun_path);
+	unlink(server.sun_ਰਸਤਾ);
 
     // Bind the socket to the path
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    if (bind(sd, (struct sockaddr *)&server, (int)server_len) < 0)
+    server_len = offsetof(ਬਣਤਰ sockaddr_un, sun_ਰਸਤਾ) + ਰਸਤਾ_len + 1;
+    ਜੇ (bind(sd, (ਬਣਤਰ sockaddr *)&server, (ਪੂਰਨ)server_len) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
-    if (listen(sd, 5) < 0)
+    ਜੇ (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_ਪੋਰਟ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (ਅੱਖਰ *)vim_strsave((char_u *)ਰਸਤਾ);
+    channel->ch_ਪੋਰਟ = 0;
+    channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+    channel_gui_ਰਜਿਸਟਰ_one(channel, PART_SOCK);
+#ਜੇ_ਅੰਤ
 
-    return channel;
+    ਵਾਪਸ channel;
 }
 
-     void
+     ਖਾਲੀ
 ch_close_part(channel_T *channel, ch_part_T part)
 {
     sock_T *fd = &channel->ch_part[part].ch_fd;
 
-    if (*fd == INVALID_FD)
-	return;
+    ਜੇ (*fd == INVALID_FD)
+	ਵਾਪਸ;
 
-    if (part == PART_SOCK)
+    ਜੇ (part == PART_SOCK)
 	sock_close(*fd);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// When using a pty the same FD is set on multiple parts, only
 	// close it when the last reference is closed.
-	if ((part == PART_IN || channel->CH_IN_FD != *fd)
-		&& (part == PART_OUT || channel->CH_OUT_FD != *fd)
+	ਜੇ ((part == PART_ਵਿੱਚ || channel->CH_ਵਿੱਚ_FD != *fd)
+		&& (part == PART_ਬਾਹਰਲਾ || channel->CH_ਬਾਹਰਲਾ_FD != *fd)
 		&& (part == PART_ERR || channel->CH_ERR_FD != *fd))
 	{
-#ifdef MSWIN
-	    if (channel->ch_named_pipe)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਜੇ (channel->ch_named_pipe)
 		DisconnectNamedPipe((HANDLE)fd);
-#endif
+#ਜੇ_ਅੰਤ
 	    fd_close(*fd);
 	}
     }
     *fd = INVALID_FD;
 
     // channel is closed, may want to end the job if it was the last
-    channel->ch_to_be_closed &= ~(1U << part);
+    channel->ch_ਮੰਜ਼ਿਲ_be_closed &= ~(1U << part);
 }
 
-    void
-channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
+    ਖਾਲੀ
+channel_ਸੈੱਟ_pipes(channel_T *channel, sock_T ਵਿੱਚ, sock_T ਬਾਹਰਲਾ, sock_T err)
 {
-    if (in != INVALID_FD)
+    ਜੇ (ਵਿੱਚ != INVALID_FD)
     {
-	ch_close_part(channel, PART_IN);
-	channel->CH_IN_FD = in;
-#if defined(UNIX)
+	ch_close_part(channel, PART_ਵਿੱਚ);
+	channel->CH_ਵਿੱਚ_FD = ਵਿੱਚ;
+#ਜੇ defined(UNIX)
 	// Do not end the job when all output channels are closed, wait until
 	// the job ended.
-	if (mch_isatty(in))
-	    channel->ch_to_be_closed |= (1U << PART_IN);
-#endif
+	ਜੇ (mch_isatty(ਵਿੱਚ))
+	    channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_ਵਿੱਚ);
+#ਜੇ_ਅੰਤ
     }
-    if (out != INVALID_FD)
+    ਜੇ (ਬਾਹਰਲਾ != INVALID_FD)
     {
-#if defined(FEAT_GUI)
-	channel_gui_unregister_one(channel, PART_OUT);
-#endif
-	ch_close_part(channel, PART_OUT);
-	channel->CH_OUT_FD = out;
-	channel->ch_to_be_closed |= (1U << PART_OUT);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_OUT);
-#endif
+#ਜੇ defined(FEAT_GUI)
+	channel_gui_unregister_one(channel, PART_ਬਾਹਰਲਾ);
+#ਜੇ_ਅੰਤ
+	ch_close_part(channel, PART_ਬਾਹਰਲਾ);
+	channel->CH_ਬਾਹਰਲਾ_FD = ਬਾਹਰਲਾ;
+	channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_ਬਾਹਰਲਾ);
+#ਜੇ defined(FEAT_GUI)
+	channel_gui_ਰਜਿਸਟਰ_one(channel, PART_ਬਾਹਰਲਾ);
+#ਜੇ_ਅੰਤ
     }
-    if (err != INVALID_FD)
+    ਜੇ (err != INVALID_FD)
     {
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 	channel_gui_unregister_one(channel, PART_ERR);
-#endif
+#ਜੇ_ਅੰਤ
 	ch_close_part(channel, PART_ERR);
 	channel->CH_ERR_FD = err;
-	channel->ch_to_be_closed |= (1U << PART_ERR);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_ERR);
-#endif
+	channel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_ERR);
+#ਜੇ defined(FEAT_GUI)
+	channel_gui_ਰਜਿਸਟਰ_one(channel, PART_ERR);
+#ਜੇ_ਅੰਤ
     }
 }
 
@@ -1910,95 +1910,95 @@ channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
  * Sets the job the channel is associated with and associated options.
  * This does not keep a refcount, when the job is freed ch_job is cleared.
  */
-    void
-channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
+    ਖਾਲੀ
+channel_ਸੈੱਟ_ਕੰਮ(channel_T *channel, ਕੰਮ_T *ਕੰਮ, jobopt_T *options)
 {
-    channel->ch_job = job;
+    channel->ch_ਕੰਮ = ਕੰਮ;
 
-    channel_set_options(channel, options);
+    channel_ਸੈੱਟ_options(channel, options);
 
-    if (job->jv_in_buf == NULL)
-	return;
+    ਜੇ (ਕੰਮ->jv_ਵਿੱਚ_buf == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
 
-    set_bufref(&in_part->ch_bufref, job->jv_in_buf);
+    ਸੈੱਟ_bufref(&ਵਿੱਚ_part->ch_bufref, ਕੰਮ->jv_ਵਿੱਚ_buf);
     ch_log(channel, "reading from buffer '%s'",
-	    (char *)in_part->ch_bufref.br_buf->b_ffname);
-    if (options->jo_set & JO_IN_TOP)
+	    (ਅੱਖਰ *)ਵਿੱਚ_part->ch_bufref.br_buf->b_ffname);
+    ਜੇ (options->jo_ਸੈੱਟ & JO_ਵਿੱਚ_ਸਿਖਰ)
     {
-	if (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
+	ਜੇ (options->jo_ਵਿੱਚ_ਸਿਖਰ == 0 && !(options->jo_ਸੈੱਟ & JO_ਵਿੱਚ_BOT))
 	{
 	    // Special mode: send last-but-one line when appending a line
 	    // to the buffer.
-	    in_part->ch_bufref.br_buf->b_write_to_channel = true;
-	    in_part->ch_buf_append = TRUE;
-	    in_part->ch_buf_top =
-		in_part->ch_bufref.br_buf->b_ml.ml_line_count + 1;
+	    ਵਿੱਚ_part->ch_bufref.br_buf->b_write_ਮੰਜ਼ਿਲ_channel = true;
+	    ਵਿੱਚ_part->ch_buf_append = TRUE;
+	    ਵਿੱਚ_part->ch_buf_ਸਿਖਰ =
+		ਵਿੱਚ_part->ch_bufref.br_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1;
 	}
-	else
-	    in_part->ch_buf_top = options->jo_in_top;
+	ਨਹੀਂਤਾਂ
+	    ਵਿੱਚ_part->ch_buf_ਸਿਖਰ = options->jo_ਵਿੱਚ_ਸਿਖਰ;
     }
-    else
-	in_part->ch_buf_top = 1;
-    if (options->jo_set & JO_IN_BOT)
-	in_part->ch_buf_bot = options->jo_in_bot;
-    else
-	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_line_count;
+    ਨਹੀਂਤਾਂ
+	ਵਿੱਚ_part->ch_buf_ਸਿਖਰ = 1;
+    ਜੇ (options->jo_ਸੈੱਟ & JO_ਵਿੱਚ_BOT)
+	ਵਿੱਚ_part->ch_buf_bot = options->jo_ਵਿੱਚ_bot;
+    ਨਹੀਂਤਾਂ
+	ਵਿੱਚ_part->ch_buf_bot = ਵਿੱਚ_part->ch_bufref.br_buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 }
 
 /*
  * Set the callback for "channel"/"part" for the response with "id".
  */
-    static void
-channel_set_req_callback(
+    ਸਥਿਰ ਖਾਲੀ
+channel_ਸੈੱਟ_req_callback(
 	channel_T   *channel,
 	ch_part_T   part,
 	callback_T  *callback,
-	int	    id)
+	ਪੂਰਨ	    id)
 {
-    cbq_T *head = &channel->ch_part[part].ch_cb_head;
-    cbq_T *item = ALLOC_ONE(cbq_T);
+    cbq_T *ਸਿਰ = &channel->ch_part[part].ch_cb_ਸਿਰ;
+    cbq_T *ਵਸਤੂ = ALLOC_ONE(cbq_T);
 
-    if (item == NULL)
-	return;
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    copy_callback(&item->cq_callback, callback);
-    item->cq_seq_nr = id;
-    item->cq_prev = head->cq_prev;
-    head->cq_prev = item;
-    item->cq_next = NULL;
-    if (item->cq_prev == NULL)
-	head->cq_next = item;
-    else
-	item->cq_prev->cq_next = item;
+    copy_callback(&ਵਸਤੂ->cq_callback, callback);
+    ਵਸਤੂ->cq_seq_nr = id;
+    ਵਸਤੂ->cq_prev = ਸਿਰ->cq_prev;
+    ਸਿਰ->cq_prev = ਵਸਤੂ;
+    ਵਸਤੂ->cq_ਅਗਲਾ = ਨਿਰਾ;
+    ਜੇ (ਵਸਤੂ->cq_prev == ਨਿਰਾ)
+	ਸਿਰ->cq_ਅਗਲਾ = ਵਸਤੂ;
+    ਨਹੀਂਤਾਂ
+	ਵਸਤੂ->cq_prev->cq_ਅਗਲਾ = ਵਸਤੂ;
 }
 
-    static void
-write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
+    ਸਥਿਰ ਖਾਲੀ
+write_buf_ਸਤਰ(buf_T *buf, linenr_T lnum, channel_T *channel)
 {
-    char_u  *line = ml_get_buf(buf, lnum, FALSE);
-    int	    len = ml_get_buf_len(buf, lnum);
+    char_u  *ਸਤਰ = ml_get_buf(buf, lnum, FALSE);
+    ਪੂਰਨ	    len = ml_get_buf_len(buf, lnum);
     char_u  *p;
-    int	    i;
+    ਪੂਰਨ	    i;
 
     // Need to make a copy to be able to append a NL.
-    if ((p = alloc(len + 2)) == NULL)
-	return;
-    memcpy((char *)p, (char *)line, len);
+    ਜੇ ((p = alloc(len + 2)) == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)p, (ਅੱਖਰ *)ਸਤਰ, len);
 
-    if (channel->ch_write_text_mode)
+    ਜੇ (channel->ch_write_ਪਾਠ_ਬਹੁਲਕ)
 	p[len] = CAR;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (i = 0; i < len; ++i)
-	    if (p[i] == NL)
+	ਲਈ (i = 0; i < len; ++i)
+	    ਜੇ (p[i] == NL)
 		p[i] = NUL;
 
 	p[len] = NL;
     }
     p[len + 1] = NUL;
-    channel_send(channel, PART_IN, p, len + 1, "write_buf_line");
+    channel_send(channel, PART_ਵਿੱਚ, p, len + 1, "write_buf_line");
     vim_free(p);
 }
 
@@ -2006,153 +2006,153 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
  * Return TRUE if "channel" can be written to.
  * Returns FALSE if the input is closed or the write would block.
  */
-    static int
-can_write_buf_line(channel_T *channel)
+    ਸਥਿਰ ਪੂਰਨ
+can_write_buf_ਸਤਰ(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
 
-    if (in_part->ch_fd == INVALID_FD)
-	return FALSE;  // pipe was closed
+    ਜੇ (ਵਿੱਚ_part->ch_fd == INVALID_FD)
+	ਵਾਪਸ FALSE;  // pipe was closed
 
     // for testing: block every other attempt to write
-    if (in_part->ch_block_write == 1)
-	in_part->ch_block_write = -1;
-    else if (in_part->ch_block_write == -1)
-	in_part->ch_block_write = 1;
+    ਜੇ (ਵਿੱਚ_part->ch_ਖੰਡ_write == 1)
+	ਵਿੱਚ_part->ch_ਖੰਡ_write = -1;
+    ਨਹੀਂਤਾਂ ਜੇ (ਵਿੱਚ_part->ch_ਖੰਡ_write == -1)
+	ਵਿੱਚ_part->ch_ਖੰਡ_write = 1;
 
     // TODO: Win32 implementation, probably using WaitForMultipleObjects()
-#ifndef MSWIN
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ MSWIN
     {
-# if defined(HAVE_SELECT)
-	struct timeval	tval;
+# ਜੇ defined(HAVE_SELECT)
+	ਬਣਤਰ timeval	tval;
 	fd_set		wfds;
-	int		ret;
+	ਪੂਰਨ		ret;
 
 	FD_ZERO(&wfds);
-	FD_SET((int)in_part->ch_fd, &wfds);
+	FD_SET((ਪੂਰਨ)ਵਿੱਚ_part->ch_fd, &wfds);
 	tval.tv_sec = 0;
 	tval.tv_usec = 0;
-	for (;;)
+	ਲਈ (;;)
 	{
-	    ret = select((int)in_part->ch_fd + 1, NULL, &wfds, NULL, &tval);
+	    ret = select((ਪੂਰਨ)ਵਿੱਚ_part->ch_fd + 1, ਨਿਰਾ, &wfds, ਨਿਰਾ, &tval);
 #  ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    ਜੇ (ret == -1 && errno == EINTR)
+		ਜਾਰੀ;
 #  endif
-	    if (ret <= 0 || in_part->ch_block_write == 1)
+	    ਜੇ (ret <= 0 || ਵਿੱਚ_part->ch_ਖੰਡ_write == 1)
 	    {
-		if (ret > 0)
+		ਜੇ (ret > 0)
 		    ch_log(channel, "FAKED Input not ready for writing");
-		else
+		ਨਹੀਂਤਾਂ
 		    ch_log(channel, "Input not ready for writing");
-		return FALSE;
+		ਵਾਪਸ FALSE;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
-# else
-	struct pollfd	fds;
+# ਨਹੀਂਤਾਂ
+	ਬਣਤਰ pollfd	fds;
 
-	fds.fd = in_part->ch_fd;
+	fds.fd = ਵਿੱਚ_part->ch_fd;
 	fds.events = POLLOUT;
-	if (poll(&fds, 1, 0) <= 0)
+	ਜੇ (poll(&fds, 1, 0) <= 0)
 	{
 	    ch_log(channel, "Input not ready for writing");
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
-	if (in_part->ch_block_write == 1)
+	ਜੇ (ਵਿੱਚ_part->ch_ਖੰਡ_write == 1)
 	{
 	    ch_log(channel, "FAKED Input not ready for writing");
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
 # endif
     }
-#endif
-    return TRUE;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ TRUE;
 }
 
 /*
  * Write any buffer lines to the input channel.
  */
-    void
-channel_write_in(channel_T *channel)
+    ਖਾਲੀ
+channel_write_ਵਿੱਚ(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
     linenr_T    lnum;
-    buf_T	*buf = in_part->ch_bufref.br_buf;
-    int		written = 0;
+    buf_T	*buf = ਵਿੱਚ_part->ch_bufref.br_buf;
+    ਪੂਰਨ		written = 0;
 
-    if (buf == NULL || in_part->ch_buf_append)
-	return;  // no buffer or using appending
-    if (!bufref_valid(&in_part->ch_bufref) || buf->b_ml.ml_mfp == NULL)
+    ਜੇ (buf == ਨਿਰਾ || ਵਿੱਚ_part->ch_buf_append)
+	ਵਾਪਸ;  // no buffer or using appending
+    ਜੇ (!bufref_valid(&ਵਿੱਚ_part->ch_bufref) || buf->b_ml.ml_mfp == ਨਿਰਾ)
     {
 	// buffer was wiped out or unloaded
 	ch_log(channel, "input buffer has been wiped out");
-	in_part->ch_bufref.br_buf = NULL;
-	return;
+	ਵਿੱਚ_part->ch_bufref.br_buf = ਨਿਰਾ;
+	ਵਾਪਸ;
     }
 
-    for (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
-				   && lnum <= buf->b_ml.ml_line_count; ++lnum)
+    ਲਈ (lnum = ਵਿੱਚ_part->ch_buf_ਸਿਖਰ; lnum <= ਵਿੱਚ_part->ch_buf_bot
+				   && lnum <= buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ; ++lnum)
     {
-	if (!can_write_buf_line(channel))
-	    break;
-	write_buf_line(buf, lnum, channel);
+	ਜੇ (!can_write_buf_ਸਤਰ(channel))
+	    ਰੋਕੋ;
+	write_buf_ਸਤਰ(buf, lnum, channel);
 	++written;
     }
 
-    if (written == 1)
-	ch_log(channel, "written line %d to channel", (int)lnum - 1);
-    else if (written > 1)
+    ਜੇ (written == 1)
+	ch_log(channel, "written line %d to channel", (ਪੂਰਨ)lnum - 1);
+    ਨਹੀਂਤਾਂ ਜੇ (written > 1)
 	ch_log(channel, "written %d lines to channel", written);
 
-    in_part->ch_buf_top = lnum;
-    if (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
+    ਵਿੱਚ_part->ch_buf_ਸਿਖਰ = lnum;
+    ਜੇ (lnum > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ || lnum > ਵਿੱਚ_part->ch_buf_bot)
     {
-#if defined(FEAT_TERMINAL)
+#ਜੇ defined(FEAT_TERMINAL)
 	// Send CTRL-D or "eof_chars" to close stdin on MS-Windows.
-	if (channel->ch_job != NULL)
-	    term_send_eof(channel);
-#endif
+	ਜੇ (channel->ch_ਕੰਮ != ਨਿਰਾ)
+	    ਪਦ_send_eof(channel);
+#ਜੇ_ਅੰਤ
 
 	// Writing is done, no longer need the buffer.
-	in_part->ch_bufref.br_buf = NULL;
+	ਵਿੱਚ_part->ch_bufref.br_buf = ਨਿਰਾ;
 	ch_log(channel, "Finished writing all lines to channel");
 
 	// Close the pipe/socket, so that the other side gets EOF.
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
 	// At this point, the input part of the conpty channel must not be
 	// closed.  If it is closed, the pipe will be destroyed, the console
 	// that was using it will be destroyed, and the process running within
 	// it will be forcibly terminated, so this needs to be prevented.
-	if (!channel->ch_anonymous_pipe)
-#endif
-	    ch_close_part(channel, PART_IN);
+	ਜੇ (!channel->ch_anonymous_pipe)
+#ਜੇ_ਅੰਤ
+	    ch_close_part(channel, PART_ਵਿੱਚ);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ch_log(channel, "Still %ld more lines to write",
-				   (long)(buf->b_ml.ml_line_count - lnum + 1));
+				   (ਲੰਮਾ)(buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - lnum + 1));
 }
 
 /*
  * Handle buffer "buf" being freed, remove it from any channels.
  */
-    void
-channel_buffer_free(buf_T *buf)
+    ਖਾਲੀ
+channel_ਬਫਰ_free(buf_T *buf)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
 	{
 	    chanpart_T  *ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_bufref.br_buf == buf)
+	    ਜੇ (ch_part->ch_bufref.br_buf == buf)
 	    {
 		ch_log(channel, "%s buffer has been wiped out",
-							  ch_part_names[part]);
-		ch_part->ch_bufref.br_buf = NULL;
+							  ch_part_ਨਾਂ[part]);
+		ch_part->ch_bufref.br_buf = ਨਿਰਾ;
 	    }
 	}
 }
@@ -2160,90 +2160,90 @@ channel_buffer_free(buf_T *buf)
 /*
  * Write any lines waiting to be written to "channel".
  */
-    void
-channel_write_input(channel_T *channel)
+    ਖਾਲੀ
+channel_write_ਨਿਵੇਸ਼(channel_T *channel)
 {
-    chanpart_T	*in_part = &channel->ch_part[PART_IN];
+    chanpart_T	*ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	channel_send(channel, PART_IN, (char_u *)"", 0, "channel_write_input");
-    else if (in_part->ch_bufref.br_buf != NULL)
+    ਜੇ (ਵਿੱਚ_part->ch_writeque.wq_ਅਗਲਾ != ਨਿਰਾ)
+	channel_send(channel, PART_ਵਿੱਚ, (char_u *)"", 0, "channel_write_input");
+    ਨਹੀਂਤਾਂ ਜੇ (ਵਿੱਚ_part->ch_bufref.br_buf != ਨਿਰਾ)
     {
-	if (in_part->ch_buf_append)
-	    channel_write_new_lines(in_part->ch_bufref.br_buf);
-	else
-	    channel_write_in(channel);
+	ਜੇ (ਵਿੱਚ_part->ch_buf_append)
+	    channel_write_new_ਸਤਰਾਂ(ਵਿੱਚ_part->ch_bufref.br_buf);
+	ਨਹੀਂਤਾਂ
+	    channel_write_ਵਿੱਚ(channel);
     }
 }
 
 /*
  * Write any lines waiting to be written to a channel.
  */
-    void
-channel_write_any_lines(void)
+    ਖਾਲੀ
+channel_write_any_ਸਤਰਾਂ(ਖਾਲੀ)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_write_input(channel);
+	channel_write_ਨਿਵੇਸ਼(channel);
 }
 
 /*
  * Write appended lines above the last one in "buf" to the channel.
  */
-    void
-channel_write_new_lines(buf_T *buf)
+    ਖਾਲੀ
+channel_write_new_ਸਤਰਾਂ(buf_T *buf)
 {
     channel_T	*channel;
-    int		found_one = FALSE;
+    ਪੂਰਨ		ਮਿਲਿਆ_one = FALSE;
 
     // There could be more than one channel for the buffer, loop over all of
     // them.
     FOR_ALL_CHANNELS(channel)
     {
-	chanpart_T  *in_part = &channel->ch_part[PART_IN];
+	chanpart_T  *ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
 	linenr_T    lnum;
-	int	    written = 0;
+	ਪੂਰਨ	    written = 0;
 
-	if (in_part->ch_bufref.br_buf == buf && in_part->ch_buf_append)
+	ਜੇ (ਵਿੱਚ_part->ch_bufref.br_buf == buf && ਵਿੱਚ_part->ch_buf_append)
 	{
-	    if (in_part->ch_fd == INVALID_FD)
-		continue;  // pipe was closed
-	    found_one = TRUE;
-	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
+	    ਜੇ (ਵਿੱਚ_part->ch_fd == INVALID_FD)
+		ਜਾਰੀ;  // pipe was closed
+	    ਮਿਲਿਆ_one = TRUE;
+	    ਲਈ (lnum = ਵਿੱਚ_part->ch_buf_bot; lnum < buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 								       ++lnum)
 	    {
-		if (!can_write_buf_line(channel))
-		    break;
-		write_buf_line(buf, lnum, channel);
+		ਜੇ (!can_write_buf_ਸਤਰ(channel))
+		    ਰੋਕੋ;
+		write_buf_ਸਤਰ(buf, lnum, channel);
 		++written;
 	    }
 
-	    if (written == 1)
-		ch_log(channel, "written line %d to channel", (int)lnum - 1);
-	    else if (written > 1)
+	    ਜੇ (written == 1)
+		ch_log(channel, "written line %d to channel", (ਪੂਰਨ)lnum - 1);
+	    ਨਹੀਂਤਾਂ ਜੇ (written > 1)
 		ch_log(channel, "written %d lines to channel", written);
-	    if (lnum < buf->b_ml.ml_line_count)
+	    ਜੇ (lnum < buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 		ch_log(channel, "Still %ld more lines to write",
-				       (long)(buf->b_ml.ml_line_count - lnum));
+				       (ਲੰਮਾ)(buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - lnum));
 
-	    in_part->ch_buf_bot = lnum;
+	    ਵਿੱਚ_part->ch_buf_bot = lnum;
 	}
     }
-    if (!found_one)
-	buf->b_write_to_channel = false;
+    ਜੇ (!ਮਿਲਿਆ_one)
+	buf->b_write_ਮੰਜ਼ਿਲ_channel = false;
 }
 
 /*
  * Invoke the "callback" on channel "channel".
  * This does not redraw but sets channel_need_redraw;
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
 {
     typval_T	rettv;
 
-    if (safe_to_invoke_callback == 0)
+    ਜੇ (ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback == 0)
 	iemsg("Invoking callback when it is not safe");
 
     argv[0].v_type = VAR_CHANNEL;
@@ -2261,9 +2261,9 @@ invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
     readq_T *
 channel_peek(channel_T *channel, ch_part_T part)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
 
-    return head->rq_next;
+    ਵਾਪਸ ਸਿਰ->rq_ਅਗਲਾ;
 }
 
 /*
@@ -2272,15 +2272,15 @@ channel_peek(channel_T *channel, ch_part_T part)
  * Returns NULL if there is no NL.
  */
     char_u *
-channel_first_nl(readq_T *node)
+channel_ਪਹਿਲਾ_nl(readq_T *ਗੰਢ)
 {
-    char_u  *buffer = node->rq_buffer;
+    char_u  *ਬਫਰ = ਗੰਢ->rq_ਬਫਰ;
     long_u  i;
 
-    for (i = 0; i < node->rq_buflen; ++i)
-	if (buffer[i] == NL)
-	    return buffer + i;
-    return NULL;
+    ਲਈ (i = 0; i < ਗੰਢ->rq_buflen; ++i)
+	ਜੇ (ਬਫਰ[i] == NL)
+	    ਵਾਪਸ ਬਫਰ + i;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -2289,115 +2289,115 @@ channel_first_nl(readq_T *node)
  * Returns NULL if there is nothing.
  */
     char_u *
-channel_get(channel_T *channel, ch_part_T part, int *outlen)
+channel_get(channel_T *channel, ch_part_T part, ਪੂਰਨ *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
+    readq_T *ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
+    readq_T *ਗੰਢ = ਸਿਰ->rq_ਅਗਲਾ;
     char_u *p;
 
-    if (node == NULL)
-	return NULL;
-    if (outlen != NULL)
-	*outlen += node->rq_buflen;
+    ਜੇ (ਗੰਢ == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
+    ਜੇ (outlen != ਨਿਰਾ)
+	*outlen += ਗੰਢ->rq_buflen;
     // dispose of the node but keep the buffer
-    p = node->rq_buffer;
-    head->rq_next = node->rq_next;
-    if (node->rq_next == NULL)
-	head->rq_prev = NULL;
-    else
-	node->rq_next->rq_prev = NULL;
-    vim_free(node);
-    return p;
+    p = ਗੰਢ->rq_ਬਫਰ;
+    ਸਿਰ->rq_ਅਗਲਾ = ਗੰਢ->rq_ਅਗਲਾ;
+    ਜੇ (ਗੰਢ->rq_ਅਗਲਾ == ਨਿਰਾ)
+	ਸਿਰ->rq_prev = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ
+	ਗੰਢ->rq_ਅਗਲਾ->rq_prev = ਨਿਰਾ;
+    vim_free(ਗੰਢ);
+    ਵਾਪਸ p;
 }
 
 /*
  * Returns the whole buffer contents concatenated for "channel"/"part".
  * Replaces NUL bytes with NL.
  */
-    static char_u *
-channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
+    ਸਥਿਰ char_u *
+channel_get_all(channel_T *channel, ch_part_T part, ਪੂਰਨ *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node;
+    readq_T *ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
+    readq_T *ਗੰਢ;
     long_u  len = 0;
     char_u  *res;
     char_u  *p;
 
     // Concatenate everything into one buffer.
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
-	len += node->rq_buflen;
+    ਲਈ (ਗੰਢ = ਸਿਰ->rq_ਅਗਲਾ; ਗੰਢ != ਨਿਰਾ; ਗੰਢ = ਗੰਢ->rq_ਅਗਲਾ)
+	len += ਗੰਢ->rq_buflen;
     res = alloc(len + 1);
-    if (res == NULL)
-	return NULL;
+    ਜੇ (res == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
     p = res;
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    ਲਈ (ਗੰਢ = ਸਿਰ->rq_ਅਗਲਾ; ਗੰਢ != ਨਿਰਾ; ਗੰਢ = ਗੰਢ->rq_ਅਗਲਾ)
     {
-	mch_memmove(p, node->rq_buffer, node->rq_buflen);
-	p += node->rq_buflen;
+	mch_memmove(p, ਗੰਢ->rq_ਬਫਰ, ਗੰਢ->rq_buflen);
+	p += ਗੰਢ->rq_buflen;
     }
     *p = NUL;
 
     // Free all buffers
-    do
+    ਕਰੋ
     {
-	p = channel_get(channel, part, NULL);
+	p = channel_get(channel, part, ਨਿਰਾ);
 	vim_free(p);
-    } while (p != NULL);
+    } ਜਦੋਂ (p != ਨਿਰਾ);
 
-    if (outlen != NULL)
+    ਜੇ (outlen != ਨਿਰਾ)
     {
 	// Returning the length, keep NUL characters.
 	*outlen += len;
-	return res;
+	ਵਾਪਸ res;
     }
 
     // Turn all NUL into NL, so that the result can be used as a string.
     p = res;
-    while (p < res + len)
+    ਜਦੋਂ (p < res + len)
     {
-	if (*p == NUL)
+	ਜੇ (*p == NUL)
 	    *p = NL;
-#ifdef MSWIN
-	else if (*p == 0x1b)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	ਨਹੀਂਤਾਂ ਜੇ (*p == 0x1b)
 	{
 	    // crush the escape sequence OSC 0/1/2: ESC ]0;
-	    if (p + 3 < res + len
+	    ਜੇ (p + 3 < res + len
 		    && p[1] == ']'
 		    && (p[2] == '0' || p[2] == '1' || p[2] == '2')
 		    && p[3] == ';')
 	    {
 		// '\a' becomes a NL
-		while (p < res + (len - 1) && *p != '\a')
+		ਜਦੋਂ (p < res + (len - 1) && *p != '\a')
 		    ++p;
 		// BEL is zero width characters, suppress display mistake
 		// ConPTY (after 10.0.18317) requires advance checking
-		if (p[-1] == NUL)
+		ਜੇ (p[-1] == NUL)
 		    p[-1] = 0x07;
 	    }
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	++p;
     }
 
-    return res;
+    ਵਾਪਸ res;
 }
 
 /*
  * Consume "len" bytes from the head of "node".
  * Caller must check these bytes are available.
  */
-    void
-channel_consume(channel_T *channel, ch_part_T part, int len)
+    ਖਾਲੀ
+channel_consume(channel_T *channel, ch_part_T part, ਪੂਰਨ len)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
-    char_u *buf = node->rq_buffer;
+    readq_T *ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
+    readq_T *ਗੰਢ = ਸਿਰ->rq_ਅਗਲਾ;
+    char_u *buf = ਗੰਢ->rq_ਬਫਰ;
 
-    if (len < 0 || (long_u)len > node->rq_buflen)
-	return;
-    mch_memmove(buf, buf + len, node->rq_buflen - len);
-    node->rq_buflen -= len;
-    node->rq_buffer[node->rq_buflen] = NUL;
+    ਜੇ (len < 0 || (long_u)len > ਗੰਢ->rq_buflen)
+	ਵਾਪਸ;
+    mch_memmove(buf, buf + len, ਗੰਢ->rq_buflen - len);
+    ਗੰਢ->rq_buflen -= len;
+    ਗੰਢ->rq_ਬਫਰ[ਗੰਢ->rq_buflen] = NUL;
 }
 
 /*
@@ -2407,62 +2407,62 @@ channel_consume(channel_T *channel, ch_part_T part, int len)
  * When the channel part mode is "lsp", collapse all the buffers as the http
  * header and the JSON content can be present in multiple buffers.
  */
-    int
-channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
+    ਪੂਰਨ
+channel_collapse(channel_T *channel, ch_part_T part, ਪੂਰਨ want_nl)
 {
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    readq_T	*head = &channel->ch_part[part].ch_head;
-    readq_T	*node = head->rq_next;
-    readq_T	*last_node;
+    ch_ਬਹੁਲਕ_T	ਬਹੁਲਕ = channel->ch_part[part].ch_ਬਹੁਲਕ;
+    readq_T	*ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
+    readq_T	*ਗੰਢ = ਸਿਰ->rq_ਅਗਲਾ;
+    readq_T	*ਆਖਰੀ_ਗੰਢ;
     readq_T	*n;
     char_u	*newbuf;
     char_u	*p;
     long_u	len;
 
-    if (node == NULL || node->rq_next == NULL)
-	return FAIL;
+    ਜੇ (ਗੰਢ == ਨਿਰਾ || ਗੰਢ->rq_ਅਗਲਾ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    last_node = node->rq_next;
-    len = node->rq_buflen + last_node->rq_buflen;
-    if (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
-	while (last_node->rq_next != NULL
-		&& (mode == CH_MODE_LSP || mode == CH_MODE_DAP
-		    || channel_first_nl(last_node) == NULL))
+    ਆਖਰੀ_ਗੰਢ = ਗੰਢ->rq_ਅਗਲਾ;
+    len = ਗੰਢ->rq_buflen + ਆਖਰੀ_ਗੰਢ->rq_buflen;
+    ਜੇ (want_nl || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
+	ਜਦੋਂ (ਆਖਰੀ_ਗੰਢ->rq_ਅਗਲਾ != ਨਿਰਾ
+		&& (ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP
+		    || channel_ਪਹਿਲਾ_nl(ਆਖਰੀ_ਗੰਢ) == ਨਿਰਾ))
 	{
-	    last_node = last_node->rq_next;
-	    len += last_node->rq_buflen;
+	    ਆਖਰੀ_ਗੰਢ = ਆਖਰੀ_ਗੰਢ->rq_ਅਗਲਾ;
+	    len += ਆਖਰੀ_ਗੰਢ->rq_buflen;
 	}
 
     p = newbuf = alloc(len + 1);
-    if (newbuf == NULL)
-	return FAIL;	    // out of memory
-    mch_memmove(p, node->rq_buffer, node->rq_buflen);
-    p += node->rq_buflen;
-    vim_free(node->rq_buffer);
-    node->rq_buffer = newbuf;
-    for (n = node; n != last_node; )
+    ਜੇ (newbuf == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;	    // out of memory
+    mch_memmove(p, ਗੰਢ->rq_ਬਫਰ, ਗੰਢ->rq_buflen);
+    p += ਗੰਢ->rq_buflen;
+    vim_free(ਗੰਢ->rq_ਬਫਰ);
+    ਗੰਢ->rq_ਬਫਰ = newbuf;
+    ਲਈ (n = ਗੰਢ; n != ਆਖਰੀ_ਗੰਢ; )
     {
-	n = n->rq_next;
-	mch_memmove(p, n->rq_buffer, n->rq_buflen);
+	n = n->rq_ਅਗਲਾ;
+	mch_memmove(p, n->rq_ਬਫਰ, n->rq_buflen);
 	p += n->rq_buflen;
-	vim_free(n->rq_buffer);
+	vim_free(n->rq_ਬਫਰ);
     }
     *p = NUL;
-    node->rq_buflen = (long_u)(p - newbuf);
+    ਗੰਢ->rq_buflen = (long_u)(p - newbuf);
 
     // dispose of the collapsed nodes and their buffers
-    for (n = node->rq_next; n != last_node; )
+    ਲਈ (n = ਗੰਢ->rq_ਅਗਲਾ; n != ਆਖਰੀ_ਗੰਢ; )
     {
-	n = n->rq_next;
+	n = n->rq_ਅਗਲਾ;
 	vim_free(n->rq_prev);
     }
-    node->rq_next = last_node->rq_next;
-    if (last_node->rq_next == NULL)
-	head->rq_prev = node;
-    else
-	last_node->rq_next->rq_prev = node;
-    vim_free(last_node);
-    return OK;
+    ਗੰਢ->rq_ਅਗਲਾ = ਆਖਰੀ_ਗੰਢ->rq_ਅਗਲਾ;
+    ਜੇ (ਆਖਰੀ_ਗੰਢ->rq_ਅਗਲਾ == ਨਿਰਾ)
+	ਸਿਰ->rq_prev = ਗੰਢ;
+    ਨਹੀਂਤਾਂ
+	ਆਖਰੀ_ਗੰਢ->rq_ਅਗਲਾ->rq_prev = ਗੰਢ;
+    vim_free(ਆਖਰੀ_ਗੰਢ);
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2470,110 +2470,110 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
  * When "prepend" is TRUE put in front, otherwise append at the end.
  * Returns OK or FAIL.
  */
-    static int
-channel_save(channel_T *channel, ch_part_T part, char_u *buf, int len,
-						      int prepend, char *lead)
+    ਸਥਿਰ ਪੂਰਨ
+channel_save(channel_T *channel, ch_part_T part, char_u *buf, ਪੂਰਨ len,
+						      ਪੂਰਨ prepend, ਅੱਖਰ *lead)
 {
-    readq_T *node;
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *ਗੰਢ;
+    readq_T *ਸਿਰ = &channel->ch_part[part].ch_ਸਿਰ;
     char_u  *p;
-    int	    i;
+    ਪੂਰਨ	    i;
 
-    node = ALLOC_ONE(readq_T);
-    if (node == NULL)
-	return FAIL;	    // out of memory
+    ਗੰਢ = ALLOC_ONE(readq_T);
+    ਜੇ (ਗੰਢ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;	    // out of memory
     // A NUL is added at the end, because netbeans code expects that.
     // Otherwise a NUL may appear inside the text.
-    node->rq_buffer = alloc(len + 1);
-    if (node->rq_buffer == NULL)
+    ਗੰਢ->rq_ਬਫਰ = alloc(len + 1);
+    ਜੇ (ਗੰਢ->rq_ਬਫਰ == ਨਿਰਾ)
     {
-	vim_free(node);
-	return FAIL;	    // out of memory
+	vim_free(ਗੰਢ);
+	ਵਾਪਸ FAIL;	    // out of memory
     }
 
-    if (channel->ch_part[part].ch_mode == CH_MODE_NL)
+    ਜੇ (channel->ch_part[part].ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL)
     {
 	// Drop any CR before a NL.
-	p = node->rq_buffer;
-	for (i = 0; i < len; ++i)
-	    if (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
+	p = ਗੰਢ->rq_ਬਫਰ;
+	ਲਈ (i = 0; i < len; ++i)
+	    ਜੇ (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
 		*p++ = buf[i];
 	*p = NUL;
-	node->rq_buflen = (long_u)(p - node->rq_buffer);
+	ਗੰਢ->rq_buflen = (long_u)(p - ਗੰਢ->rq_ਬਫਰ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	mch_memmove(node->rq_buffer, buf, len);
-	node->rq_buffer[len] = NUL;
-	node->rq_buflen = (long_u)len;
+	mch_memmove(ਗੰਢ->rq_ਬਫਰ, buf, len);
+	ਗੰਢ->rq_ਬਫਰ[len] = NUL;
+	ਗੰਢ->rq_buflen = (long_u)len;
     }
 
-    if (prepend)
+    ਜੇ (prepend)
     {
 	// prepend node to the head of the queue
-	node->rq_next = head->rq_next;
-	node->rq_prev = NULL;
-	if (head->rq_next == NULL)
-	    head->rq_prev = node;
-	else
-	    head->rq_next->rq_prev = node;
-	head->rq_next = node;
+	ਗੰਢ->rq_ਅਗਲਾ = ਸਿਰ->rq_ਅਗਲਾ;
+	ਗੰਢ->rq_prev = ਨਿਰਾ;
+	ਜੇ (ਸਿਰ->rq_ਅਗਲਾ == ਨਿਰਾ)
+	    ਸਿਰ->rq_prev = ਗੰਢ;
+	ਨਹੀਂਤਾਂ
+	    ਸਿਰ->rq_ਅਗਲਾ->rq_prev = ਗੰਢ;
+	ਸਿਰ->rq_ਅਗਲਾ = ਗੰਢ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// append node to the tail of the queue
-	node->rq_next = NULL;
-	node->rq_prev = head->rq_prev;
-	if (head->rq_prev == NULL)
-	    head->rq_next = node;
-	else
-	    head->rq_prev->rq_next = node;
-	head->rq_prev = node;
+	ਗੰਢ->rq_ਅਗਲਾ = ਨਿਰਾ;
+	ਗੰਢ->rq_prev = ਸਿਰ->rq_prev;
+	ਜੇ (ਸਿਰ->rq_prev == ਨਿਰਾ)
+	    ਸਿਰ->rq_ਅਗਲਾ = ਗੰਢ;
+	ਨਹੀਂਤਾਂ
+	    ਸਿਰ->rq_prev->rq_ਅਗਲਾ = ਗੰਢ;
+	ਸਿਰ->rq_prev = ਗੰਢ;
     }
 
-    if (ch_log_active() && lead != NULL)
+    ਜੇ (ch_log_ਸਰਗਰਮ() && lead != ਨਿਰਾ)
 	ch_log_literal(lead, channel, part, buf, len);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Try to fill the buffer of "reader".
  * Returns FALSE when nothing was added.
  */
-    int
+    ਪੂਰਨ
 channel_fill(js_read_T *reader)
 {
     channel_T	*channel = (channel_T *)reader->js_cookie;
     ch_part_T	part = reader->js_cookie_arg;
-    char_u	*next = channel_get(channel, part, NULL);
-    int		keeplen;
-    int		addlen;
+    char_u	*ਅਗਲਾ = channel_get(channel, part, ਨਿਰਾ);
+    ਪੂਰਨ		keeplen;
+    ਪੂਰਨ		addlen;
     char_u	*p;
 
-    if (next == NULL)
-	return FALSE;
+    ਜੇ (ਅਗਲਾ == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-    keeplen = reader->js_end - reader->js_buf;
-    if (keeplen > 0)
+    keeplen = reader->js_ਸਿਰਾ - reader->js_buf;
+    ਜੇ (keeplen > 0)
     {
 	// Prepend unused text.
-	addlen = (int)STRLEN(next);
+	addlen = (ਪੂਰਨ)STRLEN(ਅਗਲਾ);
 	p = alloc(keeplen + addlen + 1);
-	if (p == NULL)
+	ਜੇ (p == ਨਿਰਾ)
 	{
-	    vim_free(next);
-	    return FALSE;
+	    vim_free(ਅਗਲਾ);
+	    ਵਾਪਸ FALSE;
 	}
 	mch_memmove(p, reader->js_buf, keeplen);
-	mch_memmove(p + keeplen, next, addlen + 1);
-	vim_free(next);
-	next = p;
+	mch_memmove(p + keeplen, ਅਗਲਾ, addlen + 1);
+	vim_free(ਅਗਲਾ);
+	ਅਗਲਾ = p;
     }
 
     vim_free(reader->js_buf);
-    reader->js_buf = next;
-    return TRUE;
+    reader->js_buf = ਅਗਲਾ;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -2599,64 +2599,64 @@ channel_fill(js_read_T *reader)
  * header are not correct. Returns MAYBE if a partial header is received and
  * need to wait for more data to arrive.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_process_lspdap_http_hdr(js_read_T *reader)
 {
-    char_u	*line_start;
+    char_u	*ਸਤਰ_ਸ਼ੁਰੂ;
     char_u	*p;
     int_u	hdr_len;
-    int		payload_len = -1;
+    ਪੂਰਨ		payload_len = -1;
     int_u	jsbuf_len;
 
     // We find the end once, to avoid calling strlen() many times.
     jsbuf_len = (int_u)STRLEN(reader->js_buf);
-    reader->js_end = reader->js_buf + jsbuf_len;
+    reader->js_ਸਿਰਾ = reader->js_buf + jsbuf_len;
 
     p = reader->js_buf;
 
     // Process each line in the header till an empty line is read (header
     // separator).
-    while (TRUE)
+    ਜਦੋਂ (TRUE)
     {
-	line_start = p;
-	while (*p != NUL && *p != '\n')
+	ਸਤਰ_ਸ਼ੁਰੂ = p;
+	ਜਦੋਂ (*p != NUL && *p != '\n')
 	    p++;
-	if (*p == NUL)			// partial header
-	    return MAYBE;
+	ਜੇ (*p == NUL)			// partial header
+	    ਵਾਪਸ MAYBE;
 	p++;
 
 	// process the content length field (if present)
-	if ((p - line_start > 16)
-		&& STRNICMP(line_start, "Content-Length: ", 16) == 0)
+	ਜੇ ((p - ਸਤਰ_ਸ਼ੁਰੂ > 16)
+		&& STRNICMP(ਸਤਰ_ਸ਼ੁਰੂ, "Content-Length: ", 16) == 0)
 	{
 	    errno = 0;
-	    payload_len = strtol((char *)line_start + 16, NULL, 10);
-	    if (errno == ERANGE || payload_len < 0)
+	    payload_len = strtol((ਅੱਖਰ *)ਸਤਰ_ਸ਼ੁਰੂ + 16, ਨਿਰਾ, 10);
+	    ਜੇ (errno == ERANGE || payload_len < 0)
 		// invalid length, discard the payload
-		return FAIL;
+		ਵਾਪਸ FAIL;
 	}
 
-	if ((p - line_start) == 2 && line_start[0] == '\r' &&
-		line_start[1] == '\n')
+	ਜੇ ((p - ਸਤਰ_ਸ਼ੁਰੂ) == 2 && ਸਤਰ_ਸ਼ੁਰੂ[0] == '\r' &&
+		ਸਤਰ_ਸ਼ੁਰੂ[1] == '\n')
 	    // reached the empty line
-	    break;
+	    ਰੋਕੋ;
     }
 
-    if (payload_len == -1)
+    ਜੇ (payload_len == -1)
 	// Content-Length field is not present in the header
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
     hdr_len = p - reader->js_buf;
 
     // if the entire payload is not received, wait for more data to arrive
-    if (jsbuf_len < hdr_len + payload_len)
-	return MAYBE;
+    ਜੇ (jsbuf_len < hdr_len + payload_len)
+	ਵਾਪਸ MAYBE;
 
-    reader->js_used += hdr_len;
+    reader->js_ਵਰਤਿਆ += hdr_len;
     // recalculate the end based on the length read from the header.
-    reader->js_end = reader->js_buf + hdr_len + payload_len;
+    reader->js_ਸਿਰਾ = reader->js_buf + hdr_len + payload_len;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2665,216 +2665,216 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
  * then ignore the channel mode.
  * Return TRUE if there is more to read.
  */
-    int
+    ਪੂਰਨ
 channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 {
     js_read_T	reader;
     typval_T	listtv;
-    jsonq_T	*item;
+    jsonq_T	*ਵਸਤੂ;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    jsonq_T	*head = &chanpart->ch_json_head;
-    int		status = OK;
-    int		ret;
+    jsonq_T	*ਸਿਰ = &chanpart->ch_json_ਸਿਰ;
+    ਪੂਰਨ		ਸਥਿਤੀ = OK;
+    ਪੂਰਨ		ret;
 
-    if (channel_peek(channel, part) == NULL)
-	return FALSE;
+    ਜੇ (channel_peek(channel, part) == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-    reader.js_buf = channel_get(channel, part, NULL);
-    reader.js_used = 0;
+    reader.js_buf = channel_get(channel, part, ਨਿਰਾ);
+    reader.js_ਵਰਤਿਆ = 0;
     reader.js_fill = channel_fill;
     reader.js_cookie = channel;
     reader.js_cookie_arg = part;
 
-    if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-	    || chanpart->ch_mode == CH_MODE_DAP))
-	status = channel_process_lspdap_http_hdr(&reader);
+    ਜੇ (!socketserver && (chanpart->ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP
+	    || chanpart->ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP))
+	ਸਥਿਤੀ = channel_process_lspdap_http_hdr(&reader);
 
     // When a message is incomplete we wait for a short while for more to
     // arrive.  After the delay drop the input, otherwise a truncated string
     // or list will make us hang.
     // Do not generate error messages, they will be written in a channel log.
-    if (status == OK)
+    ਜੇ (ਸਥਿਤੀ == OK)
     {
 	++emsg_silent;
-	status = json_decode(&reader, &listtv,
-				chanpart->ch_mode == CH_MODE_JS ? JSON_JS : 0);
+	ਸਥਿਤੀ = json_decode(&reader, &listtv,
+				chanpart->ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_JS ? JSON_JS : 0);
 	--emsg_silent;
     }
-    if (status == OK)
+    ਜੇ (ਸਥਿਤੀ == OK)
     {
 	// Only accept the response when it is a list with at least two
 	// items.
-	if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-		    || chanpart->ch_mode == CH_MODE_DAP)
+	ਜੇ (!socketserver && (chanpart->ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP
+		    || chanpart->ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 		&& listtv.v_type != VAR_DICT)
 	{
 	    ch_error(channel, "Did not receive a LSP dict, discarding");
 	    clear_tv(&listtv);
 	}
-	else if (!socketserver && chanpart->ch_mode != CH_MODE_LSP
-		&& chanpart->ch_mode != CH_MODE_DAP
+	ਨਹੀਂਤਾਂ ਜੇ (!socketserver && chanpart->ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_LSP
+		&& chanpart->ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_DAP
 		&& (listtv.v_type != VAR_LIST || listtv.vval.v_list->lv_len < 2))
 	{
-	    if (listtv.v_type != VAR_LIST)
+	    ਜੇ (listtv.v_type != VAR_LIST)
 		ch_error(channel, "Did not receive a list, discarding");
-	    else
+	    ਨਹੀਂਤਾਂ
 		ch_error(channel, "Expected list with two items, got %d",
 						  listtv.vval.v_list->lv_len);
 	    clear_tv(&listtv);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    item = ALLOC_ONE(jsonq_T);
-	    if (item == NULL)
+	    ਵਸਤੂ = ALLOC_ONE(jsonq_T);
+	    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
 		clear_tv(&listtv);
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		item->jq_no_callback = FALSE;
-		item->jq_value = alloc_tv();
-		if (item->jq_value == NULL)
+		ਵਸਤੂ->jq_no_callback = FALSE;
+		ਵਸਤੂ->jq_ਮੁੱਲ = alloc_tv();
+		ਜੇ (ਵਸਤੂ->jq_ਮੁੱਲ == ਨਿਰਾ)
 		{
-		    vim_free(item);
+		    vim_free(ਵਸਤੂ);
 		    clear_tv(&listtv);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    *item->jq_value = listtv;
-		    item->jq_prev = head->jq_prev;
-		    head->jq_prev = item;
-		    item->jq_next = NULL;
-		    if (item->jq_prev == NULL)
-			head->jq_next = item;
-		    else
-			item->jq_prev->jq_next = item;
+		    *ਵਸਤੂ->jq_ਮੁੱਲ = listtv;
+		    ਵਸਤੂ->jq_prev = ਸਿਰ->jq_prev;
+		    ਸਿਰ->jq_prev = ਵਸਤੂ;
+		    ਵਸਤੂ->jq_ਅਗਲਾ = ਨਿਰਾ;
+		    ਜੇ (ਵਸਤੂ->jq_prev == ਨਿਰਾ)
+			ਸਿਰ->jq_ਅਗਲਾ = ਵਸਤੂ;
+		    ਨਹੀਂਤਾਂ
+			ਵਸਤੂ->jq_prev->jq_ਅਗਲਾ = ਵਸਤੂ;
 		}
 	    }
 	}
     }
 
-    if (status == OK)
+    ਜੇ (ਸਥਿਤੀ == OK)
 	chanpart->ch_wait_len = 0;
-    else if (status == MAYBE)
+    ਨਹੀਂਤਾਂ ਜੇ (ਸਥਿਤੀ == MAYBE)
     {
 	size_t buflen = STRLEN(reader.js_buf);
 
-	if (chanpart->ch_wait_len < buflen)
+	ਜੇ (chanpart->ch_wait_len < buflen)
 	{
 	    // First time encountering incomplete message or after receiving
 	    // more (but still incomplete): set a deadline of 100 msec.
 	    ch_log(channel,
 		    "Incomplete message (%d bytes) - wait 100 msec for more",
-		    (int)buflen);
-	    reader.js_used = 0;
+		    (ਪੂਰਨ)buflen);
+	    reader.js_ਵਰਤਿਆ = 0;
 	    chanpart->ch_wait_len = buflen;
-#ifdef MSWIN
-	    chanpart->ch_deadline = GetTickCount() + 100L;
-#else
-	    gettimeofday(&chanpart->ch_deadline, NULL);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    chanpart->ch_deadline = Get_Tick_ਗਿਣਤੀ() + 100L;
+#ਨਹੀਂਤਾਂ
+	    gettimeofday(&chanpart->ch_deadline, ਨਿਰਾ);
 	    chanpart->ch_deadline.tv_usec += 100 * 1000;
-	    if (chanpart->ch_deadline.tv_usec > 1000 * 1000)
+	    ਜੇ (chanpart->ch_deadline.tv_usec > 1000 * 1000)
 	    {
 		chanpart->ch_deadline.tv_usec -= 1000 * 1000;
 		++chanpart->ch_deadline.tv_sec;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int timeout;
-#ifdef MSWIN
-	    timeout = (int)(GetTickCount() - chanpart->ch_deadline) > 0;
-#else
+	    ਪੂਰਨ timeout;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    timeout = (ਪੂਰਨ)(Get_Tick_ਗਿਣਤੀ() - chanpart->ch_deadline) > 0;
+#ਨਹੀਂਤਾਂ
 	    {
-		struct timeval now_tv;
+		ਬਣਤਰ timeval now_tv;
 
-		gettimeofday(&now_tv, NULL);
+		gettimeofday(&now_tv, ਨਿਰਾ);
 		timeout = now_tv.tv_sec > chanpart->ch_deadline.tv_sec
 		      || (now_tv.tv_sec == chanpart->ch_deadline.tv_sec
 			   && now_tv.tv_usec > chanpart->ch_deadline.tv_usec);
 	    }
-#endif
-	    if (timeout)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (timeout)
 	    {
-		status = FAIL;
+		ਸਥਿਤੀ = FAIL;
 		chanpart->ch_wait_len = 0;
 		ch_log(channel, "timed out");
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		reader.js_used = 0;
+		reader.js_ਵਰਤਿਆ = 0;
 		ch_log(channel, "still waiting on incomplete message");
 	    }
 	}
     }
 
-    if (status == FAIL)
+    ਜੇ (ਸਥਿਤੀ == FAIL)
     {
 	ch_error(channel, "Decoding failed - discarding input");
 	ret = FALSE;
 	chanpart->ch_wait_len = 0;
     }
-    else if (reader.js_buf[reader.js_used] != NUL)
+    ਨਹੀਂਤਾਂ ਜੇ (reader.js_buf[reader.js_ਵਰਤਿਆ] != NUL)
     {
 	// Put the unread part back into the channel.
-	channel_save(channel, part, reader.js_buf + reader.js_used,
-			(int)(reader.js_end - reader.js_buf) - reader.js_used,
-								  TRUE, NULL);
-	ret = status == MAYBE ? FALSE: TRUE;
+	channel_save(channel, part, reader.js_buf + reader.js_ਵਰਤਿਆ,
+			(ਪੂਰਨ)(reader.js_ਸਿਰਾ - reader.js_buf) - reader.js_ਵਰਤਿਆ,
+								  TRUE, ਨਿਰਾ);
+	ret = ਸਥਿਤੀ == MAYBE ? FALSE: TRUE;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ret = FALSE;
 
     vim_free(reader.js_buf);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Remove "node" from the queue that it is in.  Does not free it.
  */
-    static void
-remove_cb_node(cbq_T *head, cbq_T *node)
+    ਸਥਿਰ ਖਾਲੀ
+remove_cb_ਗੰਢ(cbq_T *ਸਿਰ, cbq_T *ਗੰਢ)
 {
-    if (node->cq_prev == NULL)
-	head->cq_next = node->cq_next;
-    else
-	node->cq_prev->cq_next = node->cq_next;
-    if (node->cq_next == NULL)
-	head->cq_prev = node->cq_prev;
-    else
-	node->cq_next->cq_prev = node->cq_prev;
+    ਜੇ (ਗੰਢ->cq_prev == ਨਿਰਾ)
+	ਸਿਰ->cq_ਅਗਲਾ = ਗੰਢ->cq_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	ਗੰਢ->cq_prev->cq_ਅਗਲਾ = ਗੰਢ->cq_ਅਗਲਾ;
+    ਜੇ (ਗੰਢ->cq_ਅਗਲਾ == ਨਿਰਾ)
+	ਸਿਰ->cq_prev = ਗੰਢ->cq_prev;
+    ਨਹੀਂਤਾਂ
+	ਗੰਢ->cq_ਅਗਲਾ->cq_prev = ਗੰਢ->cq_prev;
 }
 
 /*
  * Remove "node" from the queue that it is in and free it.
  * Caller should have freed or used node->jq_value.
  */
-    void
-remove_json_node(jsonq_T *head, jsonq_T *node)
+    ਖਾਲੀ
+remove_json_ਗੰਢ(jsonq_T *ਸਿਰ, jsonq_T *ਗੰਢ)
 {
-    if (node->jq_prev == NULL)
-	head->jq_next = node->jq_next;
-    else
-	node->jq_prev->jq_next = node->jq_next;
-    if (node->jq_next == NULL)
-	head->jq_prev = node->jq_prev;
-    else
-	node->jq_next->jq_prev = node->jq_prev;
-    vim_free(node);
+    ਜੇ (ਗੰਢ->jq_prev == ਨਿਰਾ)
+	ਸਿਰ->jq_ਅਗਲਾ = ਗੰਢ->jq_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	ਗੰਢ->jq_prev->jq_ਅਗਲਾ = ਗੰਢ->jq_ਅਗਲਾ;
+    ਜੇ (ਗੰਢ->jq_ਅਗਲਾ == ਨਿਰਾ)
+	ਸਿਰ->jq_prev = ਗੰਢ->jq_prev;
+    ਨਹੀਂਤਾਂ
+	ਗੰਢ->jq_ਅਗਲਾ->jq_prev = ਗੰਢ->jq_prev;
+    vim_free(ਗੰਢ);
 }
 
 /*
  * Add "id" to the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_add_block_id(chanpart_T *chanpart, int id)
+    ਸਥਿਰ ਖਾਲੀ
+channel_ਜੋੜੋ_ਖੰਡ_id(chanpart_T *chanpart, ਪੂਰਨ id)
 {
-    garray_T *gap = &chanpart->ch_block_ids;
+    garray_T *gap = &chanpart->ch_ਖੰਡ_ids;
 
-    if (gap->ga_growsize == 0)
-	ga_init2(gap, sizeof(int), 10);
-    if (ga_grow(gap, 1) == OK)
+    ਜੇ (gap->ga_growsize == 0)
+	ga_init2(gap, ਆਕਾਰ(ਪੂਰਨ), 10);
+    ਜੇ (ga_grow(gap, 1) == OK)
     {
-	((int *)gap->ga_data)[gap->ga_len] = id;
+	((ਪੂਰਨ *)gap->ga_ਅੰਕੜੇ)[gap->ga_len] = id;
 	++gap->ga_len;
     }
 }
@@ -2882,23 +2882,23 @@ channel_add_block_id(chanpart_T *chanpart, int id)
 /*
  * Remove "id" from the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_remove_block_id(chanpart_T *chanpart, int id)
+    ਸਥਿਰ ਖਾਲੀ
+channel_remove_ਖੰਡ_id(chanpart_T *chanpart, ਪੂਰਨ id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_ਖੰਡ_ids;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
+	ਜੇ (((ਪੂਰਨ *)gap->ga_ਅੰਕੜੇ)[i] == id)
 	{
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    ਜੇ (i < gap->ga_len)
 	    {
-		int *p = ((int *)gap->ga_data) + i;
+		ਪੂਰਨ *p = ((ਪੂਰਨ *)gap->ga_ਅੰਕੜੇ) + i;
 
-		mch_memmove(p, p + 1, (gap->ga_len - i) * sizeof(int));
+		mch_memmove(p, p + 1, (gap->ga_len - i) * ਆਕਾਰ(ਪੂਰਨ));
 	    }
-	    return;
+	    ਵਾਪਸ;
 	}
     siemsg("channel_remove_block_id(): cannot find id %d", id);
 }
@@ -2906,16 +2906,16 @@ channel_remove_block_id(chanpart_T *chanpart, int id)
 /*
  * Return TRUE if "id" is in the list of JSON message IDs we are waiting on.
  */
-    static int
-channel_has_block_id(chanpart_T *chanpart, int id)
+    ਸਥਿਰ ਪੂਰਨ
+channel_has_ਖੰਡ_id(chanpart_T *chanpart, ਪੂਰਨ id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_ਖੰਡ_ids;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
-	    return TRUE;
-    return FALSE;
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
+	ਜੇ (((ਪੂਰਨ *)gap->ga_ਅੰਕੜੇ)[i] == id)
+	    ਵਾਪਸ TRUE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -2927,294 +2927,294 @@ channel_has_block_id(chanpart_T *chanpart, int id)
  * Return OK when found and return the value in "rettv".
  * Return FAIL otherwise.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_get_json(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    id,
-	int	    without_callback,
+	ਪੂਰਨ	    id,
+	ਪੂਰਨ	    without_callback,
 	typval_T    **rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *ਸਿਰ = &channel->ch_part[part].ch_json_ਸਿਰ;
+    jsonq_T   *ਵਸਤੂ = ਸਿਰ->jq_ਅਗਲਾ;
 
-    while (item != NULL)
+    ਜਦੋਂ (ਵਸਤੂ != ਨਿਰਾ)
     {
 	list_T	    *l;
 	typval_T    *tv;
 
-	if (channel->ch_part[part].ch_mode != CH_MODE_LSP
-		&& channel->ch_part[part].ch_mode != CH_MODE_DAP)
+	ਜੇ (channel->ch_part[part].ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_LSP
+		&& channel->ch_part[part].ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_DAP)
 	{
-	    l = item->jq_value->vval.v_list;
+	    l = ਵਸਤੂ->jq_ਮੁੱਲ->vval.v_list;
 	    CHECK_LIST_MATERIALIZE(l);
-	    tv = &l->lv_first->li_tv;
+	    tv = &l->lv_ਪਹਿਲਾ->li_tv;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    dict_T	*d;
 	    dictitem_T	*di;
 
-	    if (channel->ch_part[part].ch_mode == CH_MODE_LSP)
+	    ਜੇ (channel->ch_part[part].ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP)
 	    {
 		// LSP message payload is a JSON-RPC dict. For RPC requests and
 		// responses, the 'id' item will be present. For notifications,
 		// it will not be present.
-		if (id > 0)
+		ਜੇ (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
+		    ਜੇ (ਵਸਤੂ->jq_ਮੁੱਲ->v_type != VAR_DICT)
+			ਜਾਓ nextitem;
+		    d = ਵਸਤੂ->jq_ਮੁੱਲ->vval.v_dict;
+		    ਜੇ (d == ਨਿਰਾ)
+			ਜਾਓ nextitem;
 		    // When looking for a response message from the LSP server,
 		    // ignore new LSP request and notification messages.  LSP
 		    // request and notification messages have the "method" field
 		    // in the header and the response messages do not have this
 		    // field.
-		    if (dict_has_key(d, "method"))
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"id", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    ਜੇ (dict_has_ਕੁੰਜੀ(d, "method"))
+			ਜਾਓ nextitem;
+		    di = dict_ਲੱਭੋ(d, (char_u *)"id", -1);
+		    ਜੇ (di == ਨਿਰਾ)
+			ਜਾਓ nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		ਨਹੀਂਤਾਂ
+		    tv = ਵਸਤੂ->jq_ਮੁੱਲ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (id > 0)
+		ਜੇ (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    ਜੇ (ਵਸਤੂ->jq_ਮੁੱਲ->v_type != VAR_DICT)
+			ਜਾਓ nextitem;
+		    d = ਵਸਤੂ->jq_ਮੁੱਲ->vval.v_dict;
+		    ਜੇ (d == ਨਿਰਾ)
+			ਜਾਓ nextitem;
+		    di = dict_ਲੱਭੋ(d, (char_u *)"request_seq", -1);
+		    ਜੇ (di == ਨਿਰਾ)
+			ਜਾਓ nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		ਨਹੀਂਤਾਂ
+		    tv = ਵਸਤੂ->jq_ਮੁੱਲ;
 	    }
 	}
 
-	if ((without_callback || !item->jq_no_callback)
-	    && ((id > 0 && tv->v_type == VAR_NUMBER && tv->vval.v_number == id)
-	      || (id <= 0 && (tv->v_type != VAR_NUMBER
-		 || tv->vval.v_number == 0
-		 || !channel_has_block_id(
-				&channel->ch_part[part], tv->vval.v_number)))))
+	ਜੇ ((without_callback || !ਵਸਤੂ->jq_no_callback)
+	    && ((id > 0 && tv->v_type == VAR_ਸੰਖਿਆ && tv->vval.v_ਸੰਖਿਆ == id)
+	      || (id <= 0 && (tv->v_type != VAR_ਸੰਖਿਆ
+		 || tv->vval.v_ਸੰਖਿਆ == 0
+		 || !channel_has_ਖੰਡ_id(
+				&channel->ch_part[part], tv->vval.v_ਸੰਖਿਆ)))))
 	{
-	    *rettv = item->jq_value;
-	    if (tv->v_type == VAR_NUMBER)
+	    *rettv = ਵਸਤੂ->jq_ਮੁੱਲ;
+	    ਜੇ (tv->v_type == VAR_ਸੰਖਿਆ)
 		ch_log(channel, "Getting JSON message %ld",
-						      (long)tv->vval.v_number);
-	    remove_json_node(head, item);
-	    return OK;
+						      (ਲੰਮਾ)tv->vval.v_ਸੰਖਿਆ);
+	    remove_json_ਗੰਢ(ਸਿਰ, ਵਸਤੂ);
+	    ਵਾਪਸ OK;
 	}
 nextitem:
-	item = item->jq_next;
+	ਵਸਤੂ = ਵਸਤੂ->jq_ਅਗਲਾ;
     }
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Put back "rettv" into the JSON queue, there was no callback for it.
  * Takes over the values in "rettv".
  */
-    static void
-channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
+    ਸਥਿਰ ਖਾਲੀ
+channel_ਧੱਕੋ_json(channel_T *channel, ch_part_T part, typval_T *rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *ਸਿਰ = &channel->ch_part[part].ch_json_ਸਿਰ;
+    jsonq_T   *ਵਸਤੂ = ਸਿਰ->jq_ਅਗਲਾ;
     jsonq_T   *newitem;
 
-    if (head->jq_prev != NULL && head->jq_prev->jq_no_callback)
+    ਜੇ (ਸਿਰ->jq_prev != ਨਿਰਾ && ਸਿਰ->jq_prev->jq_no_callback)
 	// last item was pushed back, append to the end
-	item = NULL;
-    else while (item != NULL && item->jq_no_callback)
+	ਵਸਤੂ = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ ਜਦੋਂ (ਵਸਤੂ != ਨਿਰਾ && ਵਸਤੂ->jq_no_callback)
 	// append after the last item that was pushed back
-	item = item->jq_next;
+	ਵਸਤੂ = ਵਸਤੂ->jq_ਅਗਲਾ;
 
     newitem = ALLOC_ONE(jsonq_T);
-    if (newitem == NULL)
+    ਜੇ (newitem == ਨਿਰਾ)
     {
 	clear_tv(rettv);
-	return;
+	ਵਾਪਸ;
     }
 
-    newitem->jq_value = alloc_tv();
-    if (newitem->jq_value == NULL)
+    newitem->jq_ਮੁੱਲ = alloc_tv();
+    ਜੇ (newitem->jq_ਮੁੱਲ == ਨਿਰਾ)
     {
 	vim_free(newitem);
 	clear_tv(rettv);
-	return;
+	ਵਾਪਸ;
     }
 
     newitem->jq_no_callback = FALSE;
-    *newitem->jq_value = *rettv;
-    if (item == NULL)
+    *newitem->jq_ਮੁੱਲ = *rettv;
+    ਜੇ (ਵਸਤੂ == ਨਿਰਾ)
     {
 	// append to the end
-	newitem->jq_prev = head->jq_prev;
-	head->jq_prev = newitem;
-	newitem->jq_next = NULL;
-	if (newitem->jq_prev == NULL)
-	    head->jq_next = newitem;
-	else
-	    newitem->jq_prev->jq_next = newitem;
+	newitem->jq_prev = ਸਿਰ->jq_prev;
+	ਸਿਰ->jq_prev = newitem;
+	newitem->jq_ਅਗਲਾ = ਨਿਰਾ;
+	ਜੇ (newitem->jq_prev == ਨਿਰਾ)
+	    ਸਿਰ->jq_ਅਗਲਾ = newitem;
+	ਨਹੀਂਤਾਂ
+	    newitem->jq_prev->jq_ਅਗਲਾ = newitem;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// append after "item"
-	newitem->jq_prev = item;
-	newitem->jq_next = item->jq_next;
-	item->jq_next = newitem;
-	if (newitem->jq_next == NULL)
-	    head->jq_prev = newitem;
-	else
-	    newitem->jq_next->jq_prev = newitem;
+	newitem->jq_prev = ਵਸਤੂ;
+	newitem->jq_ਅਗਲਾ = ਵਸਤੂ->jq_ਅਗਲਾ;
+	ਵਸਤੂ->jq_ਅਗਲਾ = newitem;
+	ਜੇ (newitem->jq_ਅਗਲਾ == ਨਿਰਾ)
+	    ਸਿਰ->jq_prev = newitem;
+	ਨਹੀਂਤਾਂ
+	    newitem->jq_ਅਗਲਾ->jq_prev = newitem;
     }
 }
 
-#define CH_JSON_MAX_ARGS 4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CH_JSON_MAX_ਦਲੀਲਾਂ 4
 
 /*
  * Execute a command received over "channel"/"part"
  * "argv[0]" is the command string.
  * "argv[1]" etc. have further arguments, type is VAR_UNKNOWN if missing.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 {
     char_u  *cmd = argv[0].vval.v_string;
     char_u  *arg;
-    int	    options = channel->ch_part[part].ch_mode == CH_MODE_JS
+    ਪੂਰਨ	    options = channel->ch_part[part].ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_JS
 								 ? JSON_JS : 0;
 
-    if (argv[1].v_type != VAR_STRING)
+    ਜੇ (argv[1].v_type != VAR_STRING)
     {
 	ch_error(channel, "received command with non-string argument");
-	if (p_verbose > 2)
-	    emsg(_(e_received_command_with_non_string_argument));
-	return;
+	ਜੇ (p_verbose > 2)
+	    emsg(_(e_received_command_with_non_string_ਦਲੀਲ));
+	ਵਾਪਸ;
     }
     arg = argv[1].vval.v_string;
-    if (arg == NULL)
+    ਜੇ (arg == ਨਿਰਾ)
 	arg = (char_u *)"";
 
-    if (STRCMP(cmd, "ex") == 0)
+    ਜੇ (STRCMP(cmd, "ex") == 0)
     {
-	int	called_emsg_before = called_emsg;
+	ਪੂਰਨ	called_emsg_before = called_emsg;
 	char_u	*p = arg;
-	int	do_emsg_silent;
+	ਪੂਰਨ	do_emsg_silent;
 
-	ch_log(channel, "Executing ex command '%s'", (char *)arg);
+	ch_log(channel, "Executing ex command '%s'", (ਅੱਖਰ *)arg);
 	do_emsg_silent = !checkforcmd(&p, "echoerr", 5);
-	if (do_emsg_silent)
+	ਜੇ (do_emsg_silent)
 	    ++emsg_silent;
 	do_cmdline_cmd(arg);
-	if (do_emsg_silent)
+	ਜੇ (do_emsg_silent)
 	    --emsg_silent;
-	if (called_emsg > called_emsg_before)
+	ਜੇ (called_emsg > called_emsg_before)
 	    ch_log(channel, "Ex command error: '%s'",
-					  (char *)get_vim_var_str(VV_ERRMSG));
+					  (ਅੱਖਰ *)get_vim_var_str(VV_ERRMSG));
     }
-    else if (STRCMP(cmd, "normal") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "normal") == 0)
     {
 	exarg_T ea;
 
-	ch_log(channel, "Executing normal command '%s'", (char *)arg);
-	CLEAR_FIELD(ea);
+	ch_log(channel, "Executing normal command '%s'", (ਅੱਖਰ *)arg);
+	CLEAR_ਖੇਤਰ(ea);
 	ea.arg = arg;
-	ea.addr_count = 0;
+	ea.addr_ਗਿਣਤੀ = 0;
 	ea.forceit = TRUE; // no mapping
-	ex_normal(&ea);
+	ex_ਸਾਧਾਰਨ(&ea);
     }
-    else if (STRCMP(cmd, "redraw") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "redraw") == 0)
     {
 	ch_log(channel, "redraw");
 	redraw_cmd(*arg != NUL);
 	showruler(FALSE);
 	setcursor();
-	out_flush_cursor(TRUE, FALSE);
+	ਬਾਹਰਲਾ_flush_cursor(TRUE, FALSE);
     }
-    else if (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
     {
-	int is_call = cmd[0] == 'c';
-	int id_idx = is_call ? 3 : 2;
+	ਪੂਰਨ is_call = cmd[0] == 'c';
+	ਪੂਰਨ id_idx = is_call ? 3 : 2;
 
-	if (argv[id_idx].v_type != VAR_UNKNOWN
-					 && argv[id_idx].v_type != VAR_NUMBER)
+	ਜੇ (argv[id_idx].v_type != VAR_UNKNOWN
+					 && argv[id_idx].v_type != VAR_ਸੰਖਿਆ)
 	{
 	    ch_error(channel, "last argument for expr/call must be a number");
-	    if (p_verbose > 2)
-		emsg(_(e_last_argument_for_expr_call_must_be_number));
+	    ਜੇ (p_verbose > 2)
+		emsg(_(e_ਆਖਰੀ_ਦਲੀਲ_for_ਵਿਅੰਜਕ_call_must_be_ਸੰਖਿਆ));
 	}
-	else if (is_call && argv[2].v_type != VAR_LIST)
+	ਨਹੀਂਤਾਂ ਜੇ (is_call && argv[2].v_type != VAR_LIST)
 	{
 	    ch_error(channel, "third argument for call must be a list");
-	    if (p_verbose > 2)
-		emsg(_(e_third_argument_for_call_must_be_list));
+	    ਜੇ (p_verbose > 2)
+		emsg(_(e_ਤੀਜਾ_ਦਲੀਲ_for_call_must_be_list));
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    typval_T	*tv = NULL;
+	    typval_T	*tv = ਨਿਰਾ;
 	    typval_T	res_tv;
 	    typval_T	err_tv;
-	    char_u	*json = NULL;
+	    char_u	*json = ਨਿਰਾ;
 
 	    // Don't pollute the display with errors.
 	    // Do generate the errors so that try/catch works.
 	    ++emsg_silent;
-	    if (!is_call)
+	    ਜੇ (!is_call)
 	    {
-		ch_log(channel, "Evaluating expression '%s'", (char *)arg);
-		tv = eval_expr(arg, NULL);
+		ch_log(channel, "Evaluating expression '%s'", (ਅੱਖਰ *)arg);
+		tv = eval_ਵਿਅੰਜਕ(arg, ਨਿਰਾ);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		ch_log(channel, "Calling '%s'", (char *)arg);
-		if (func_call(arg, &argv[2], NULL, NULL, &res_tv) == OK)
+		ch_log(channel, "Calling '%s'", (ਅੱਖਰ *)arg);
+		ਜੇ (func_call(arg, &argv[2], ਨਿਰਾ, ਨਿਰਾ, &res_tv) == OK)
 		    tv = &res_tv;
 	    }
 
-	    if (argv[id_idx].v_type == VAR_NUMBER)
+	    ਜੇ (argv[id_idx].v_type == VAR_ਸੰਖਿਆ)
 	    {
-		int id = argv[id_idx].vval.v_number;
+		ਪੂਰਨ id = argv[id_idx].vval.v_ਸੰਖਿਆ;
 
-		if (tv != NULL)
-		    json = json_encode_nr_expr(id, tv, options | JSON_NL);
-		if (tv == NULL || (json != NULL && *json == NUL))
+		ਜੇ (tv != ਨਿਰਾ)
+		    json = json_encode_nr_ਵਿਅੰਜਕ(id, tv, options | JSON_NL);
+		ਜੇ (tv == ਨਿਰਾ || (json != ਨਿਰਾ && *json == NUL))
 		{
 		    // If evaluation failed or the result can't be encoded
 		    // then return the string "ERROR".
 		    vim_free(json);
 		    err_tv.v_type = VAR_STRING;
 		    err_tv.vval.v_string = (char_u *)"ERROR";
-		    json = json_encode_nr_expr(id, &err_tv, options | JSON_NL);
+		    json = json_encode_nr_ਵਿਅੰਜਕ(id, &err_tv, options | JSON_NL);
 		}
-		if (json != NULL)
+		ਜੇ (json != ਨਿਰਾ)
 		{
 		    channel_send(channel,
-				 part == PART_SOCK ? PART_SOCK : PART_IN,
-				 json, (int)STRLEN(json), (char *)cmd);
+				 part == PART_SOCK ? PART_SOCK : PART_ਵਿੱਚ,
+				 json, (ਪੂਰਨ)STRLEN(json), (ਅੱਖਰ *)cmd);
 		    vim_free(json);
 		}
 	    }
 	    --emsg_silent;
-	    if (tv == &res_tv)
+	    ਜੇ (tv == &res_tv)
 		clear_tv(tv);
-	    else
+	    ਨਹੀਂਤਾਂ
 		free_tv(tv);
 	}
     }
-    else if (p_verbose > 2)
+    ਨਹੀਂਤਾਂ ਜੇ (p_verbose > 2)
     {
-	ch_error(channel, "Received unknown command: %s", (char *)cmd);
+	ch_error(channel, "Received unknown command: %s", (ਅੱਖਰ *)cmd);
 	semsg(_(e_received_unknown_command_str), cmd);
     }
 }
@@ -3223,165 +3223,165 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
  * Invoke the callback at "cbhead".
  * Does not redraw but sets channel_need_redraw.
  */
-    static void
-invoke_one_time_callback(
+    ਸਥਿਰ ਖਾਲੀ
+invoke_one_ਸਮਾਂ_callback(
 	channel_T   *channel,
 	cbq_T	    *cbhead,
-	cbq_T	    *item,
+	cbq_T	    *ਵਸਤੂ,
 	typval_T    *argv)
 {
     ch_log(channel, "Invoking one-time callback %s",
-					    (char *)item->cq_callback.cb_name);
+					    (ਅੱਖਰ *)ਵਸਤੂ->cq_callback.cb_name);
     // Remove the item from the list first, if the callback
     // invokes ch_close() the list will be cleared.
-    remove_cb_node(cbhead, item);
-    invoke_callback(channel, &item->cq_callback, argv);
-    free_callback(&item->cq_callback);
-    vim_free(item);
+    remove_cb_ਗੰਢ(cbhead, ਵਸਤੂ);
+    invoke_callback(channel, &ਵਸਤੂ->cq_callback, argv);
+    free_callback(&ਵਸਤੂ->cq_callback);
+    vim_free(ਵਸਤੂ);
 }
 
-    static void
-append_to_buffer(
-    buf_T	*buffer,
-    char_u	*msg,
+    ਸਥਿਰ ਖਾਲੀ
+append_ਮੰਜ਼ਿਲ_ਬਫਰ(
+    buf_T	*ਬਫਰ,
+    char_u	*ਸੁਨੇਹਾ,
     channel_T	*channel,
     ch_part_T	part)
 {
     aco_save_T	aco;
-    linenr_T    lnum = buffer->b_ml.ml_line_count;
-    bool	save_write_to = buffer->b_write_to_channel;
+    linenr_T    lnum = ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+    bool	save_write_ਮੰਜ਼ਿਲ = ਬਫਰ->b_write_ਮੰਜ਼ਿਲ_channel;
     chanpart_T  *ch_part = &channel->ch_part[part];
-    int		save_p_ma = buffer->b_p_ma;
-    int		empty = (buffer->b_ml.ml_flags & ML_EMPTY) ? 1 : 0;
+    ਪੂਰਨ		save_p_ma = ਬਫਰ->b_p_ma;
+    ਪੂਰਨ		ਖਾਲੀ_ਥਾਵਾਂ_2 = (ਬਫਰ->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ) ? 1 : 0;
 
-    if (!buffer->b_p_ma && !ch_part->ch_nomodifiable)
+    ਜੇ (!ਬਫਰ->b_p_ma && !ch_part->ch_nomodifiable)
     {
-	if (!ch_part->ch_nomod_error)
+	ਜੇ (!ch_part->ch_nomod_error)
 	{
 	    ch_error(channel, "Buffer is not modifiable, cannot append");
 	    ch_part->ch_nomod_error = TRUE;
 	}
-	return;
+	ਵਾਪਸ;
     }
 
     // If the buffer is also used as input insert above the last
     // line. Don't write these lines.
-    if (save_write_to)
+    ਜੇ (save_write_ਮੰਜ਼ਿਲ)
     {
 	--lnum;
-	buffer->b_write_to_channel = false;
+	ਬਫਰ->b_write_ਮੰਜ਼ਿਲ_channel = false;
     }
 
     // Append to the buffer
     ch_log(channel, "appending line %d to buffer %s",
-				       (int)lnum + 1 - empty, buffer->b_fname);
+				       (ਪੂਰਨ)lnum + 1 - ਖਾਲੀ_ਥਾਵਾਂ_2, ਬਫਰ->b_fname);
 
-    buffer->b_p_ma = TRUE;
+    ਬਫਰ->b_p_ma = TRUE;
 
     // Set curbuf to "buffer", temporarily.
-    aucmd_prepbuf(&aco, buffer);
-    if (curbuf != buffer)
+    aucmd_prepbuf(&aco, ਬਫਰ);
+    ਜੇ (curbuf != ਬਫਰ)
     {
 	// Could not find a window for this buffer, the following might cause
 	// trouble, better bail out.
-	return;
+	ਵਾਪਸ;
     }
 
     u_sync(TRUE);
     // ignore undo failure, undo is not very useful here
-    vim_ignored = u_save(lnum - empty, lnum + 1);
+    vim_ignored = u_save(lnum - ਖਾਲੀ_ਥਾਵਾਂ_2, lnum + 1);
 
-    if (empty)
+    ਜੇ (ਖਾਲੀ_ਥਾਵਾਂ_2)
     {
 	// The buffer is empty, replace the first (dummy) line.
-	ml_replace(lnum, msg, TRUE);
+	ml_replace(lnum, ਸੁਨੇਹਾ, TRUE);
 	lnum = 0;
     }
-    else
-	ml_append(lnum, msg, 0, FALSE);
-    appended_lines_mark(lnum, 1L);
+    ਨਹੀਂਤਾਂ
+	ml_append(lnum, ਸੁਨੇਹਾ, 0, FALSE);
+    appended_ਸਤਰਾਂ_mark(lnum, 1L);
 
     // reset notion of buffer
     aucmd_restbuf(&aco);
 
-    if (ch_part->ch_nomodifiable)
-	buffer->b_p_ma = FALSE;
-    else
-	buffer->b_p_ma = save_p_ma;
+    ਜੇ (ch_part->ch_nomodifiable)
+	ਬਫਰ->b_p_ma = FALSE;
+    ਨਹੀਂਤਾਂ
+	ਬਫਰ->b_p_ma = save_p_ma;
 
-    if (buffer->b_nwindows > 0)
+    ਜੇ (ਬਫਰ->b_nwindows > 0)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == buffer)
+	    ਜੇ (wp->w_ਬਫਰ == ਬਫਰ)
 	    {
-		int move_cursor = save_write_to
+		ਪੂਰਨ move_cursor = save_write_ਮੰਜ਼ਿਲ
 			    ? wp->w_cursor.lnum == lnum + 1
 			    : (wp->w_cursor.lnum == lnum
-				&& wp->w_cursor.col == 0);
+				&& wp->w_cursor.ਖਾਨਾ == 0);
 
 		// If the cursor is at or above the new line, move it one line
 		// down.  If the topline is outdated update it now.
-		if (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
+		ਜੇ (move_cursor || wp->w_topline > ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 		{
 		    win_T *save_curwin = curwin;
 
-		    if (move_cursor)
+		    ਜੇ (move_cursor)
 			++wp->w_cursor.lnum;
 		    curwin = wp;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_ਬਫਰ;
 		    scroll_cursor_bot(0, FALSE);
 		    curwin = save_curwin;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_ਬਫਰ;
 		}
 	    }
 	}
-	redraw_buf_and_status_later(buffer, UPD_VALID);
+	redraw_buf_and_ਸਥਿਤੀ_later(ਬਫਰ, UPD_VALID);
 	channel_need_redraw = TRUE;
     }
 
-    if (save_write_to)
+    ਜੇ (save_write_ਮੰਜ਼ਿਲ)
     {
 	channel_T *ch;
 
 	// Find channels reading from this buffer and adjust their
 	// next-to-read line number.
-	buffer->b_write_to_channel = true;
+	ਬਫਰ->b_write_ਮੰਜ਼ਿਲ_channel = true;
 	FOR_ALL_CHANNELS(ch)
 	{
-	    chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	    chanpart_T  *ਵਿੱਚ_part = &ch->ch_part[PART_ਵਿੱਚ];
 
-	    if (in_part->ch_bufref.br_buf == buffer)
-		in_part->ch_buf_bot = buffer->b_ml.ml_line_count;
+	    ਜੇ (ਵਿੱਚ_part->ch_bufref.br_buf == ਬਫਰ)
+		ਵਿੱਚ_part->ch_buf_bot = ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 	}
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 drop_messages(channel_T *channel, ch_part_T part)
 {
-    char_u *msg;
+    char_u *ਸੁਨੇਹਾ;
 
-    while ((msg = channel_get(channel, part, NULL)) != NULL)
+    ਜਦੋਂ ((ਸੁਨੇਹਾ = channel_get(channel, part, ਨਿਰਾ)) != ਨਿਰਾ)
     {
-	ch_log(channel, "Dropping message '%s'", (char *)msg);
-	vim_free(msg);
+	ch_log(channel, "Dropping message '%s'", (ਅੱਖਰ *)ਸੁਨੇਹਾ);
+	vim_free(ਸੁਨੇਹਾ);
     }
 }
 
 /*
  * Return TRUE if for "channel" / "part" ch_json_head should be used.
  */
-    static int
-channel_use_json_head(channel_T *channel, ch_part_T part)
+    ਸਥਿਰ ਪੂਰਨ
+channel_use_json_ਸਿਰ(channel_T *channel, ch_part_T part)
 {
-    ch_mode_T	ch_mode = channel->ch_part[part].ch_mode;
+    ch_ਬਹੁਲਕ_T	ch_ਬਹੁਲਕ = channel->ch_part[part].ch_ਬਹੁਲਕ;
 
-    return ch_mode == CH_MODE_JSON || ch_mode == CH_MODE_JS
-						     || ch_mode == CH_MODE_LSP
-						     || ch_mode == CH_MODE_DAP;
+    ਵਾਪਸ ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_JSON || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_JS
+						     || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP
+						     || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP;
 }
 
 /*
@@ -3389,379 +3389,379 @@ channel_use_json_head(channel_T *channel, ch_part_T part)
  * This does not redraw but sets channel_need_redraw when redraw is needed.
  * Return TRUE when a message was handled, there might be another one.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 may_invoke_callback(channel_T *channel, ch_part_T part)
 {
-    char_u	*msg = NULL;
-    blob_T	*blob = NULL;
-    typval_T	*listtv = NULL;
-    typval_T	argv[CH_JSON_MAX_ARGS];
-    int		seq_nr = -1;
+    char_u	*ਸੁਨੇਹਾ = ਨਿਰਾ;
+    blob_T	*blob = ਨਿਰਾ;
+    typval_T	*listtv = ਨਿਰਾ;
+    typval_T	argv[CH_JSON_MAX_ਦਲੀਲਾਂ];
+    ਪੂਰਨ		seq_nr = -1;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    ch_mode_T	ch_mode = ch_part->ch_mode;
-    cbq_T	*cbhead = &ch_part->ch_cb_head;
+    ch_ਬਹੁਲਕ_T	ch_ਬਹੁਲਕ = ch_part->ch_ਬਹੁਲਕ;
+    cbq_T	*cbhead = &ch_part->ch_cb_ਸਿਰ;
     cbq_T	*cbitem;
-    callback_T	*callback = NULL;
-    buf_T	*buffer = NULL;
+    callback_T	*callback = ਨਿਰਾ;
+    buf_T	*ਬਫਰ = ਨਿਰਾ;
     char_u	*p;
-    int		called_otc;		// one time callbackup
-    int		raw_len = 0;
+    ਪੂਰਨ		called_otc;		// one time callbackup
+    ਪੂਰਨ		raw_len = 0;
 
-    if (channel->ch_nb_close_cb != NULL
-#ifdef FEAT_SOCKETSERVER
+    ਜੇ (channel->ch_nb_close_cb != ਨਿਰਾ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SOCKETSERVER
 	    || channel->ch_socketserver
-#endif
+#ਜੇ_ਅੰਤ
 	    )
 	// this channel is handled elsewhere (netbeans or socketserver)
-	return FALSE;
+	ਵਾਪਸ FALSE;
 
     // Use a message-specific callback, part callback or channel callback
-    for (cbitem = cbhead->cq_next; cbitem != NULL; cbitem = cbitem->cq_next)
-	if (cbitem->cq_seq_nr == 0)
-	    break;
-    if (cbitem != NULL)
+    ਲਈ (cbitem = cbhead->cq_ਅਗਲਾ; cbitem != ਨਿਰਾ; cbitem = cbitem->cq_ਅਗਲਾ)
+	ਜੇ (cbitem->cq_seq_nr == 0)
+	    ਰੋਕੋ;
+    ਜੇ (cbitem != ਨਿਰਾ)
 	callback = &cbitem->cq_callback;
-    else if (ch_part->ch_callback.cb_name != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (ch_part->ch_callback.cb_name != ਨਿਰਾ)
 	callback = &ch_part->ch_callback;
-    else if (channel->ch_callback.cb_name != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (channel->ch_callback.cb_name != ਨਿਰਾ)
 	callback = &channel->ch_callback;
 
-    buffer = ch_part->ch_bufref.br_buf;
-    if (buffer != NULL && (!bufref_valid(&ch_part->ch_bufref)
-					       || buffer->b_ml.ml_mfp == NULL))
+    ਬਫਰ = ch_part->ch_bufref.br_buf;
+    ਜੇ (ਬਫਰ != ਨਿਰਾ && (!bufref_valid(&ch_part->ch_bufref)
+					       || ਬਫਰ->b_ml.ml_mfp == ਨਿਰਾ))
     {
 	// buffer was wiped out or unloaded
-	ch_log(channel, "%s buffer has been wiped out", ch_part_names[part]);
-	ch_part->ch_bufref.br_buf = NULL;
-	buffer = NULL;
+	ch_log(channel, "%s buffer has been wiped out", ch_part_ਨਾਂ[part]);
+	ch_part->ch_bufref.br_buf = ਨਿਰਾ;
+	ਬਫਰ = ਨਿਰਾ;
     }
 
-    if (channel_use_json_head(channel, part))
+    ਜੇ (channel_use_json_ਸਿਰ(channel, part))
     {
-	listitem_T	*item;
-	int		argc = 0;
+	listitem_T	*ਵਸਤੂ;
+	ਪੂਰਨ		argc = 0;
 
 	// Get any json message in the queue.
-	if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+	ਜੇ (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 		// In the "lsp" or "dap" mode, the http header and the json
 		// payload may be received in multiple messages. So concatenate
 		// all the received messages.
-		(void)channel_collapse(channel, part, FALSE);
+		(ਖਾਲੀ)channel_collapse(channel, part, FALSE);
 
 	    // Parse readahead, return when there is still no message.
 	    channel_parse_json(channel, part, false);
-	    if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
-		return FALSE;
+	    ਜੇ (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+		ਵਾਪਸ FALSE;
 	}
 
-	if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 	{
 	    dict_T	*d = listtv->vval.v_dict;
 	    dictitem_T	*di;
 
 	    seq_nr = 0;
-	    if (d != NULL)
+	    ਜੇ (d != ਨਿਰਾ)
 	    {
-		if (ch_mode == CH_MODE_LSP)
-		    di = dict_find(d, (char_u *)"id", -1);
-		else
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		    seq_nr = di->di_tv.vval.v_number;
+		ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP)
+		    di = dict_ਲੱਭੋ(d, (char_u *)"id", -1);
+		ਨਹੀਂਤਾਂ
+		    di = dict_ਲੱਭੋ(d, (char_u *)"request_seq", -1);
+		ਜੇ (di != ਨਿਰਾ && di->di_tv.v_type == VAR_ਸੰਖਿਆ)
+		    seq_nr = di->di_tv.vval.v_ਸੰਖਿਆ;
 	    }
 
 	    argv[1] = *listtv;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    for (item = listtv->vval.v_list->lv_first;
-		    item != NULL && argc < CH_JSON_MAX_ARGS;
-		    item = item->li_next)
-		argv[argc++] = item->li_tv;
-	    while (argc < CH_JSON_MAX_ARGS)
+	    ਲਈ (ਵਸਤੂ = listtv->vval.v_list->lv_ਪਹਿਲਾ;
+		    ਵਸਤੂ != ਨਿਰਾ && argc < CH_JSON_MAX_ਦਲੀਲਾਂ;
+		    ਵਸਤੂ = ਵਸਤੂ->li_ਅਗਲਾ)
+		argv[argc++] = ਵਸਤੂ->li_tv;
+	    ਜਦੋਂ (argc < CH_JSON_MAX_ਦਲੀਲਾਂ)
 		argv[argc++].v_type = VAR_UNKNOWN;
 
-	    if (argv[0].v_type == VAR_STRING)
+	    ਜੇ (argv[0].v_type == VAR_STRING)
 	    {
 		// ["cmd", arg] or ["cmd", arg, arg] or ["cmd", arg, arg, arg]
 		channel_exe_cmd(channel, part, argv);
 		free_tv(listtv);
-		return TRUE;
+		ਵਾਪਸ TRUE;
 	    }
 
-	    if (argv[0].v_type != VAR_NUMBER)
+	    ਜੇ (argv[0].v_type != VAR_ਸੰਖਿਆ)
 	    {
 		ch_error(channel,
 			"Dropping message with invalid sequence number type");
 		free_tv(listtv);
-		return FALSE;
+		ਵਾਪਸ FALSE;
 	    }
-	    seq_nr = argv[0].vval.v_number;
+	    seq_nr = argv[0].vval.v_ਸੰਖਿਆ;
 	}
     }
-    else if (channel_peek(channel, part) == NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (channel_peek(channel, part) == ਨਿਰਾ)
     {
 	// nothing to read on RAW or NL channel
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// If there is no callback or buffer drop the message.
-	if (callback == NULL && buffer == NULL)
+	ਜੇ (callback == ਨਿਰਾ && ਬਫਰ == ਨਿਰਾ)
 	{
 	    // If there is a close callback it may use ch_read() to get the
 	    // messages.
-	    if (channel->ch_close_cb.cb_name == NULL && !channel->ch_drop_never)
+	    ਜੇ (channel->ch_close_cb.cb_name == ਨਿਰਾ && !channel->ch_drop_never)
 		drop_messages(channel, part);
-	    return FALSE;
+	    ਵਾਪਸ FALSE;
 	}
 
-	if (ch_mode == CH_MODE_NL)
+	ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL)
 	{
-	    char_u  *nl = NULL;
+	    char_u  *nl = ਨਿਰਾ;
 	    char_u  *buf;
-	    readq_T *node;
+	    readq_T *ਗੰਢ;
 
 	    // See if we have a message ending in NL in the first buffer.  If
 	    // not try to concatenate the first and the second buffer.
-	    while (TRUE)
+	    ਜਦੋਂ (TRUE)
 	    {
-		node = channel_peek(channel, part);
-		nl = channel_first_nl(node);
-		if (nl != NULL)
-		    break;
-		if (channel_collapse(channel, part, TRUE) == FAIL)
+		ਗੰਢ = channel_peek(channel, part);
+		nl = channel_ਪਹਿਲਾ_nl(ਗੰਢ);
+		ਜੇ (nl != ਨਿਰਾ)
+		    ਰੋਕੋ;
+		ਜੇ (channel_collapse(channel, part, TRUE) == FAIL)
 		{
-		    if (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
-			break;
-		    return FALSE; // incomplete message
+		    ਜੇ (ch_part->ch_fd == INVALID_FD && ਗੰਢ->rq_buflen > 0)
+			ਰੋਕੋ;
+		    ਵਾਪਸ FALSE; // incomplete message
 		}
 	    }
-	    buf = node->rq_buffer;
+	    buf = ਗੰਢ->rq_ਬਫਰ;
 
 	    // Convert NUL to NL, the internal representation.
-	    for (p = buf; (nl == NULL || p < nl)
-					    && p < buf + node->rq_buflen; ++p)
-		if (*p == NUL)
+	    ਲਈ (p = buf; (nl == ਨਿਰਾ || p < nl)
+					    && p < buf + ਗੰਢ->rq_buflen; ++p)
+		ਜੇ (*p == NUL)
 		    *p = NL;
 
-	    if (nl == NULL)
+	    ਜੇ (nl == ਨਿਰਾ)
 	    {
 		// get the whole buffer, drop the NL
-		msg = channel_get(channel, part, NULL);
+		ਸੁਨੇਹਾ = channel_get(channel, part, ਨਿਰਾ);
 	    }
-	    else if (nl + 1 == buf + node->rq_buflen)
+	    ਨਹੀਂਤਾਂ ਜੇ (nl + 1 == buf + ਗੰਢ->rq_buflen)
 	    {
 		// get the whole buffer
-		msg = channel_get(channel, part, NULL);
+		ਸੁਨੇਹਾ = channel_get(channel, part, ਨਿਰਾ);
 		*nl = NUL;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Copy the message into allocated memory (excluding the NL)
 		// and remove it from the buffer (including the NL).
-		msg = vim_strnsave(buf, nl - buf);
-		channel_consume(channel, part, (int)(nl - buf) + 1);
+		ਸੁਨੇਹਾ = vim_strnsave(buf, nl - buf);
+		channel_consume(channel, part, (ਪੂਰਨ)(nl - buf) + 1);
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // For a raw channel we don't know where the message ends, just
 	    // get everything we have.
 	    raw_len = 0;
-	    msg = channel_get_all(channel, part,
-			ch_mode == CH_MODE_BLOB ? &raw_len : NULL);
+	    ਸੁਨੇਹਾ = channel_get_all(channel, part,
+			ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB ? &raw_len : ਨਿਰਾ);
 	}
 
-	if (msg == NULL)
-	    return FALSE; // out of memory (and avoids Coverity warning)
+	ਜੇ (ਸੁਨੇਹਾ == ਨਿਰਾ)
+	    ਵਾਪਸ FALSE; // out of memory (and avoids Coverity warning)
 
-	if (ch_mode == CH_MODE_BLOB)
+	ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB)
 	{
 	    blob = blob_alloc();
-	    if (blob == NULL)
+	    ਜੇ (blob == ਨਿਰਾ)
 	    {
-		vim_free(msg);
-		return FALSE;
+		vim_free(ਸੁਨੇਹਾ);
+		ਵਾਪਸ FALSE;
 	    }
-	    if (ga_grow(&blob->bv_ga, raw_len) == FAIL)
+	    ਜੇ (ga_grow(&blob->bv_ga, raw_len) == FAIL)
 	    {
 		blob_free(blob);
-		vim_free(msg);
-		return FALSE;
+		vim_free(ਸੁਨੇਹਾ);
+		ਵਾਪਸ FALSE;
 	    }
-	    if (raw_len > 0)
+	    ਜੇ (raw_len > 0)
 	    {
-		mch_memmove(blob->bv_ga.ga_data, msg, (size_t)raw_len);
+		mch_memmove(blob->bv_ga.ga_ਅੰਕੜੇ, ਸੁਨੇਹਾ, (size_t)raw_len);
 		blob->bv_ga.ga_len = raw_len;
 	    }
 	    argv[1].v_type = VAR_BLOB;
 	    argv[1].vval.v_blob = blob;
 	    ++blob->bv_refcount;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    argv[1].v_type = VAR_STRING;
-	    argv[1].vval.v_string = msg;
+	    argv[1].vval.v_string = ਸੁਨੇਹਾ;
 	}
     }
 
     called_otc = FALSE;
-    if (seq_nr > 0)
+    ਜੇ (seq_nr > 0)
     {
 	// JSON or JS or LSP or DAP mode: invoke the one-time callback with the
 	// matching nr
-	int lsp_req_msg = FALSE;
+	ਪੂਰਨ lsp_req_ਸੁਨੇਹਾ = FALSE;
 
 	// Don't use a LSP/DAP server request message with the same sequence
 	// number as the client request message as the response message.
-	if ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ਜੇ ((ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 		&& argv[1].v_type == VAR_DICT
-		&& dict_has_key(argv[1].vval.v_dict, "method"))
-	    lsp_req_msg = TRUE;
+		&& dict_has_ਕੁੰਜੀ(argv[1].vval.v_dict, "method"))
+	    lsp_req_ਸੁਨੇਹਾ = TRUE;
 
-	if (!lsp_req_msg)
+	ਜੇ (!lsp_req_ਸੁਨੇਹਾ)
 	{
-	    for (cbitem = cbhead->cq_next; cbitem != NULL;
-		    cbitem = cbitem->cq_next)
+	    ਲਈ (cbitem = cbhead->cq_ਅਗਲਾ; cbitem != ਨਿਰਾ;
+		    cbitem = cbitem->cq_ਅਗਲਾ)
 	    {
-		if (cbitem->cq_seq_nr == seq_nr)
+		ਜੇ (cbitem->cq_seq_nr == seq_nr)
 		{
-		    invoke_one_time_callback(channel, cbhead, cbitem, argv);
+		    invoke_one_ਸਮਾਂ_callback(channel, cbhead, cbitem, argv);
 		    called_otc = TRUE;
-		    break;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
     }
 
-    if (seq_nr > 0 && ((ch_mode != CH_MODE_LSP && ch_mode != CH_MODE_DAP)
+    ਜੇ (seq_nr > 0 && ((ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_LSP && ch_ਬਹੁਲਕ != CH_ਬਹੁਲਕ_DAP)
 		|| called_otc))
     {
-	if (!called_otc)
+	ਜੇ (!called_otc)
 	{
 	    // If the 'drop' channel attribute is set to 'never' or if
 	    // ch_evalexpr() is waiting for this response message, then don't
 	    // drop this message.
-	    if (channel->ch_drop_never)
+	    ਜੇ (channel->ch_drop_never)
 	    {
 		// message must be read with ch_read()
-		channel_push_json(channel, part, listtv);
+		channel_ਧੱਕੋ_json(channel, part, listtv);
 
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_ਸੰਖਿਆ;
 		free_tv(listtv);
-		listtv = NULL;
+		listtv = ਨਿਰਾ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ch_log(channel, "Dropping message %d without callback",
 								       seq_nr);
 	}
     }
-    else if (callback != NULL || buffer != NULL)
+    ਨਹੀਂਤਾਂ ਜੇ (callback != ਨਿਰਾ || ਬਫਰ != ਨਿਰਾ)
     {
-	if (buffer != NULL)
+	ਜੇ (ਬਫਰ != ਨਿਰਾ)
 	{
-	    if (msg == NULL)
+	    ਜੇ (ਸੁਨੇਹਾ == ਨਿਰਾ)
 		// JSON or JS mode: re-encode the message.
-		msg = json_encode(listtv, ch_mode);
-	    if (msg != NULL)
+		ਸੁਨੇਹਾ = json_encode(listtv, ch_ਬਹੁਲਕ);
+	    ਜੇ (ਸੁਨੇਹਾ != ਨਿਰਾ)
 	    {
-#ifdef FEAT_TERMINAL
-		if (buffer->b_term != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+		ਜੇ (ਬਫਰ->b_ਪਦ != ਨਿਰਾ)
 		{
 		    // PART_ERR data arrives from a pipe without PTY ONLCR
 		    // conversion, so lone NL must be converted to CR+NL to
 		    // prevent unexpected indentation in the terminal display.
-		    if (part == PART_ERR)
+		    ਜੇ (part == PART_ERR)
 		    {
 			char_u *cp;
-			int    extra = 0;
+			ਪੂਰਨ    extra = 0;
 
-			for (cp = msg; *cp != NUL; ++cp)
-			    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+			ਲਈ (cp = ਸੁਨੇਹਾ; *cp != NUL; ++cp)
+			    ਜੇ (*cp == NL && (cp == ਸੁਨੇਹਾ || cp[-1] != CAR))
 				++extra;
-			if (extra > 0)
+			ਜੇ (extra > 0)
 			{
-			    char_u *crlf_msg = alloc(STRLEN(msg) + extra + 1);
+			    char_u *crlf_ਸੁਨੇਹਾ = alloc(STRLEN(ਸੁਨੇਹਾ) + extra + 1);
 
-			    if (crlf_msg != NULL)
+			    ਜੇ (crlf_ਸੁਨੇਹਾ != ਨਿਰਾ)
 			    {
-				char_u *q = crlf_msg;
+				char_u *q = crlf_ਸੁਨੇਹਾ;
 
-				for (cp = msg; *cp != NUL; ++cp)
+				ਲਈ (cp = ਸੁਨੇਹਾ; *cp != NUL; ++cp)
 				{
-				    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+				    ਜੇ (*cp == NL && (cp == ਸੁਨੇਹਾ || cp[-1] != CAR))
 					*q++ = CAR;
 				    *q++ = *cp;
 				}
 				*q = NUL;
-				write_to_term(buffer, crlf_msg, channel);
-				vim_free(crlf_msg);
+				write_ਮੰਜ਼ਿਲ_ਪਦ(ਬਫਰ, crlf_ਸੁਨੇਹਾ, channel);
+				vim_free(crlf_ਸੁਨੇਹਾ);
 			    }
 			}
-			else
-			    write_to_term(buffer, msg, channel);
+			ਨਹੀਂਤਾਂ
+			    write_ਮੰਜ਼ਿਲ_ਪਦ(ਬਫਰ, ਸੁਨੇਹਾ, channel);
 		    }
-		    else
-			write_to_term(buffer, msg, channel);
+		    ਨਹੀਂਤਾਂ
+			write_ਮੰਜ਼ਿਲ_ਪਦ(ਬਫਰ, ਸੁਨੇਹਾ, channel);
 		}
-		else
-#endif
-		    append_to_buffer(buffer, msg, channel, part);
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		    append_ਮੰਜ਼ਿਲ_ਬਫਰ(ਬਫਰ, ਸੁਨੇਹਾ, channel, part);
 	    }
 	}
 
-	if (callback != NULL)
+	ਜੇ (callback != ਨਿਰਾ)
 	{
-	    if (cbitem != NULL)
-		invoke_one_time_callback(channel, cbhead, cbitem, argv);
-	    else
+	    ਜੇ (cbitem != ਨਿਰਾ)
+		invoke_one_ਸਮਾਂ_callback(channel, cbhead, cbitem, argv);
+	    ਨਹੀਂਤਾਂ
 	    {
 		// invoke the channel callback
 		ch_log(channel, "Invoking channel callback %s",
-						    (char *)callback->cb_name);
+						    (ਅੱਖਰ *)callback->cb_name);
 		invoke_callback(channel, callback, argv);
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	ch_log(channel, "Dropping message %d", seq_nr);
 
-    if (listtv != NULL)
+    ਜੇ (listtv != ਨਿਰਾ)
 	free_tv(listtv);
-    if (blob != NULL)
+    ਜੇ (blob != ਨਿਰਾ)
 	blob_unref(blob);
-    vim_free(msg);
+    vim_free(ਸੁਨੇਹਾ);
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-#if defined(FEAT_NETBEANS_INTG)
+#ਜੇ defined(FEAT_NETBEANS_INTG)
 /*
  * Return TRUE when channel "channel" is open for writing to.
  * Also returns FALSE or invalid "channel".
  */
-    int
-channel_can_write_to(channel_T *channel)
+    ਪੂਰਨ
+channel_can_write_ਮੰਜ਼ਿਲ(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD);
+    ਵਾਪਸ channel != ਨਿਰਾ && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_ਵਿੱਚ_FD != INVALID_FD);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Return TRUE when channel "channel" is open for reading or writing.
  * Also returns FALSE for invalid "channel".
  */
-    int
+    ਪੂਰਨ
 channel_is_open(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD
-			  || channel->CH_OUT_FD != INVALID_FD
+    ਵਾਪਸ channel != ਨਿਰਾ && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_ਵਿੱਚ_FD != INVALID_FD
+			  || channel->CH_ਬਾਹਰਲਾ_FD != INVALID_FD
 			  || channel->CH_ERR_FD != INVALID_FD);
 }
 
@@ -3769,177 +3769,177 @@ channel_is_open(channel_T *channel)
  * Return a pointer indicating the readahead.  Can only be compared between
  * calls.  Returns NULL if there is no readahead.
  */
-    static void *
-channel_readahead_pointer(channel_T *channel, ch_part_T part)
+    ਸਥਿਰ ਖਾਲੀ *
+channel_readahead_ਸੂਚਕ(channel_T *channel, ch_part_T part)
 {
-    if (channel_use_json_head(channel, part))
+    ਜੇ (channel_use_json_ਸਿਰ(channel, part))
     {
-	jsonq_T   *head = &channel->ch_part[part].ch_json_head;
+	jsonq_T   *ਸਿਰ = &channel->ch_part[part].ch_json_ਸਿਰ;
 
-	if (head->jq_next == NULL)
+	ਜੇ (ਸਿਰ->jq_ਅਗਲਾ == ਨਿਰਾ)
 	    // Parse json from readahead, there might be a complete message to
 	    // process.
 	    channel_parse_json(channel, part, false);
 
-	return head->jq_next;
+	ਵਾਪਸ ਸਿਰ->jq_ਅਗਲਾ;
     }
-    return channel_peek(channel, part);
+    ਵਾਪਸ channel_peek(channel, part);
 }
 
 /*
  * Return TRUE if "channel" has JSON or other typeahead.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_has_readahead(channel_T *channel, ch_part_T part)
 {
-    return channel_readahead_pointer(channel, part) != NULL;
+    ਵਾਪਸ channel_readahead_ਸੂਚਕ(channel, part) != ਨਿਰਾ;
 }
 
 /*
  * Return a string indicating the status of the channel.
  * If "req_part" is not negative check that part.
  */
-    static char *
-channel_status(channel_T *channel, int req_part)
+    ਸਥਿਰ ਅੱਖਰ *
+channel_ਸਥਿਤੀ(channel_T *channel, ਪੂਰਨ req_part)
 {
     ch_part_T part;
-    int has_readahead = FALSE;
+    ਪੂਰਨ has_readahead = FALSE;
 
-    if (channel == NULL)
-	 return "fail";
-    if (req_part == PART_OUT)
+    ਜੇ (channel == ਨਿਰਾ)
+	 ਵਾਪਸ "fail";
+    ਜੇ (req_part == PART_ਬਾਹਰਲਾ)
     {
-	if (channel->CH_OUT_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_OUT))
+	ਜੇ (channel->CH_ਬਾਹਰਲਾ_FD != INVALID_FD)
+	    ਵਾਪਸ "open";
+	ਜੇ (channel_has_readahead(channel, PART_ਬਾਹਰਲਾ))
 	    has_readahead = TRUE;
     }
-    else if (req_part == PART_ERR)
+    ਨਹੀਂਤਾਂ ਜੇ (req_part == PART_ERR)
     {
-	if (channel->CH_ERR_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_ERR))
+	ਜੇ (channel->CH_ERR_FD != INVALID_FD)
+	    ਵਾਪਸ "open";
+	ਜੇ (channel_has_readahead(channel, PART_ERR))
 	    has_readahead = TRUE;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (channel_is_open(channel))
-	    return "open";
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel_has_readahead(channel, part))
+	ਜੇ (channel_is_open(channel))
+	    ਵਾਪਸ "open";
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
+	    ਜੇ (channel_has_readahead(channel, part))
 	    {
 		has_readahead = TRUE;
-		break;
+		ਰੋਕੋ;
 	    }
     }
 
-    if (has_readahead)
-	return "buffered";
-    return "closed";
+    ਜੇ (has_readahead)
+	ਵਾਪਸ "buffered";
+    ਵਾਪਸ "closed";
 }
 
-    static void
-channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
+    ਸਥਿਰ ਖਾਲੀ
+channel_part_info(channel_T *channel, dict_T *dict, ਅੱਖਰ *name, ch_part_T part)
 {
     chanpart_T *chanpart = &channel->ch_part[part];
-    char	namebuf[20];  // longest is "sock_timeout"
-    size_t	tail;
+    ਅੱਖਰ	namebuf[20];  // longest is "sock_timeout"
+    size_t	ਪੂਛ;
     string_T	s;
 
     vim_strncpy((char_u *)namebuf, (char_u *)name, 4);
-    tail = STRLEN(namebuf);
-    STRCPY(namebuf + tail, "_");
-    tail += STRLEN_LITERAL("_");
+    ਪੂਛ = STRLEN(namebuf);
+    STRCPY(namebuf + ਪੂਛ, "_");
+    ਪੂਛ += STRLEN_LITERAL("_");
 
-    STRCPY(namebuf + tail, "status");
-    if (chanpart->ch_fd != INVALID_FD)
-	STR_LITERAL_SET(s, "open");
-    else if (channel_has_readahead(channel, part))
-	STR_LITERAL_SET(s, "buffered");
-    else
-	STR_LITERAL_SET(s, "closed");
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    STRCPY(namebuf + ਪੂਛ, "status");
+    ਜੇ (chanpart->ch_fd != INVALID_FD)
+	STR_LITERAL_ਸੈੱਟ(s, "open");
+    ਨਹੀਂਤਾਂ ਜੇ (channel_has_readahead(channel, part))
+	STR_LITERAL_ਸੈੱਟ(s, "buffered");
+    ਨਹੀਂਤਾਂ
+	STR_LITERAL_ਸੈੱਟ(s, "closed");
+    dict_ਜੋੜੋ_string_len(dict, namebuf, s.string, (ਪੂਰਨ)s.ਲੰਮਾਈ);
 
-    STRCPY(namebuf + tail, "mode");
-    switch (chanpart->ch_mode)
+    STRCPY(namebuf + ਪੂਛ, "mode");
+    ਚੋਣ (chanpart->ch_ਬਹੁਲਕ)
     {
-	case CH_MODE_NL:
-	    STR_LITERAL_SET(s, "NL");
-	    break;
-	case CH_MODE_RAW:
-	    STR_LITERAL_SET(s, "RAW");
-	    break;
-	case CH_MODE_BLOB:
-	    STR_LITERAL_SET(s, "BLOB");
-	    break;
-	case CH_MODE_JSON:
-	    STR_LITERAL_SET(s, "JSON");
-	    break;
-	case CH_MODE_JS:
-	    STR_LITERAL_SET(s, "JS");
-	    break;
-	case CH_MODE_LSP:
-	    STR_LITERAL_SET(s, "LSP");
-	    break;
-	case CH_MODE_DAP:
-	    STR_LITERAL_SET(s, "DAP");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_NL:
+	    STR_LITERAL_ਸੈੱਟ(s, "NL");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_RAW:
+	    STR_LITERAL_ਸੈੱਟ(s, "RAW");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_BLOB:
+	    STR_LITERAL_ਸੈੱਟ(s, "BLOB");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_JSON:
+	    STR_LITERAL_ਸੈੱਟ(s, "JSON");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_JS:
+	    STR_LITERAL_ਸੈੱਟ(s, "JS");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_LSP:
+	    STR_LITERAL_ਸੈੱਟ(s, "LSP");
+	    ਰੋਕੋ;
+	ਹਾਲਤ CH_ਬਹੁਲਕ_DAP:
+	    STR_LITERAL_ਸੈੱਟ(s, "DAP");
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    STR_LITERAL_ਸੈੱਟ(s, "");
+	    ਰੋਕੋ;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_ਜੋੜੋ_string_len(dict, namebuf, s.string, (ਪੂਰਨ)s.ਲੰਮਾਈ);
 
-    STRCPY(namebuf + tail, "io");
-    if (part == PART_SOCK)
-	STR_LITERAL_SET(s, "socket");
-    else switch (chanpart->ch_io)
+    STRCPY(namebuf + ਪੂਛ, "io");
+    ਜੇ (part == PART_SOCK)
+	STR_LITERAL_ਸੈੱਟ(s, "socket");
+    ਨਹੀਂਤਾਂ ਚੋਣ (chanpart->ch_io)
     {
-	case JIO_NULL:
-	    STR_LITERAL_SET(s, "null");
-	    break;
-	case JIO_PIPE:
-	    STR_LITERAL_SET(s, "pipe");
-	    break;
-	case JIO_FILE:
-	    STR_LITERAL_SET(s, "file");
-	    break;
-	case JIO_BUFFER:
-	    STR_LITERAL_SET(s, "buffer");
-	    break;
-	case JIO_OUT:
-	    STR_LITERAL_SET(s, "out");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	ਹਾਲਤ JIO_NULL:
+	    STR_LITERAL_ਸੈੱਟ(s, "null");
+	    ਰੋਕੋ;
+	ਹਾਲਤ JIO_PIPE:
+	    STR_LITERAL_ਸੈੱਟ(s, "pipe");
+	    ਰੋਕੋ;
+	ਹਾਲਤ JIO_FILE:
+	    STR_LITERAL_ਸੈੱਟ(s, "file");
+	    ਰੋਕੋ;
+	ਹਾਲਤ JIO_ਬਫਰ:
+	    STR_LITERAL_ਸੈੱਟ(s, "buffer");
+	    ਰੋਕੋ;
+	ਹਾਲਤ JIO_ਬਾਹਰਲਾ:
+	    STR_LITERAL_ਸੈੱਟ(s, "out");
+	    ਰੋਕੋ;
+	ਮੂਲ:
+	    STR_LITERAL_ਸੈੱਟ(s, "");
+	    ਰੋਕੋ;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_ਜੋੜੋ_string_len(dict, namebuf, s.string, (ਪੂਰਨ)s.ਲੰਮਾਈ);
 
-    STRCPY(namebuf + tail, "timeout");
-    dict_add_number(dict, namebuf, chanpart->ch_timeout);
+    STRCPY(namebuf + ਪੂਛ, "timeout");
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, namebuf, chanpart->ch_timeout);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_info(channel_T *channel, dict_T *dict)
 {
-    dict_add_number(dict, "id", channel->ch_id);
-    dict_add_string(dict, "status", (char_u *)channel_status(channel, -1));
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "id", channel->ch_id);
+    dict_ਜੋੜੋ_string(dict, "status", (char_u *)channel_ਸਥਿਤੀ(channel, -1));
 
-    if (channel->ch_hostname != NULL)
+    ਜੇ (channel->ch_hostname != ਨਿਰਾ)
     {
-	if (channel->ch_port)
-	    dict_add_number(dict, "port", channel->ch_port);
-	else
+	ਜੇ (channel->ch_ਪੋਰਟ)
+	    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "port", channel->ch_ਪੋਰਟ);
+	ਨਹੀਂਤਾਂ
 	    // Unix-domain socket.
-	    dict_add_string(dict, "path", (char_u *)channel->ch_hostname);
+	    dict_ਜੋੜੋ_string(dict, "path", (char_u *)channel->ch_hostname);
 	channel_part_info(channel, dict, "sock", PART_SOCK);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	channel_part_info(channel, dict, "out", PART_OUT);
+	channel_part_info(channel, dict, "out", PART_ਬਾਹਰਲਾ);
 	channel_part_info(channel, dict, "err", PART_ERR);
-	channel_part_info(channel, dict, "in", PART_IN);
+	channel_part_info(channel, dict, "in", PART_ਵਿੱਚ);
     }
 }
 
@@ -3948,50 +3948,50 @@ channel_info(channel_T *channel, dict_T *dict)
  * Trigger the close callback if "invoke_close_cb" is TRUE.
  * Does not clear the buffers.
  */
-    void
-channel_close(channel_T *channel, int invoke_close_cb)
+    ਖਾਲੀ
+channel_close(channel_T *channel, ਪੂਰਨ invoke_close_cb)
 {
     ch_log(channel, "Closing channel");
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     channel_gui_unregister(channel);
-#endif
+#ਜੇ_ਅੰਤ
 
     ch_close_part(channel, PART_SOCK);
-    ch_close_part(channel, PART_IN);
-    ch_close_part(channel, PART_OUT);
+    ch_close_part(channel, PART_ਵਿੱਚ);
+    ch_close_part(channel, PART_ਬਾਹਰਲਾ);
     ch_close_part(channel, PART_ERR);
 
-    if (invoke_close_cb)
+    ਜੇ (invoke_close_cb)
     {
 	ch_part_T	part;
 
-#ifdef FEAT_TERMINAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
 	// let the terminal know it is closing to avoid getting stuck
-	term_channel_closing(channel);
-#endif
+	ਪਦ_channel_closing(channel);
+#ਜੇ_ਅੰਤ
 	// Invoke callbacks and flush buffers before the close callback.
-	if (channel->ch_close_cb.cb_name != NULL)
+	ਜੇ (channel->ch_close_cb.cb_name != ਨਿਰਾ)
 	    ch_log(channel,
 		     "Invoking callbacks and flushing buffers before closing");
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
-	    if (channel->ch_close_cb.cb_name != NULL
-			    || channel->ch_part[part].ch_bufref.br_buf != NULL)
+	    ਜੇ (channel->ch_close_cb.cb_name != ਨਿਰਾ
+			    || channel->ch_part[part].ch_bufref.br_buf != ਨਿਰਾ)
 	    {
 		// Increment the refcount to avoid the channel being freed
 		// halfway.
 		++channel->ch_refcount;
-		if (channel->ch_close_cb.cb_name == NULL)
+		ਜੇ (channel->ch_close_cb.cb_name == ਨਿਰਾ)
 		    ch_log(channel, "flushing %s buffers before closing",
-							  ch_part_names[part]);
-		while (may_invoke_callback(channel, part))
+							  ch_part_ਨਾਂ[part]);
+		ਜਦੋਂ (may_invoke_callback(channel, part))
 		    ;
 		--channel->ch_refcount;
 	    }
 	}
 
-	if (channel->ch_close_cb.cb_name != NULL)
+	ਜੇ (channel->ch_close_cb.cb_name != ਨਿਰਾ)
 	{
 	      typval_T	argv[1];
 	      typval_T	rettv;
@@ -4000,7 +4000,7 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // halfway.
 	      ++channel->ch_refcount;
 	      ch_log(channel, "Invoking close callback %s",
-					 (char *)channel->ch_close_cb.cb_name);
+					 (ਅੱਖਰ *)channel->ch_close_cb.cb_name);
 	      argv[0].v_type = VAR_CHANNEL;
 	      argv[0].vval.v_channel = channel;
 	      call_callback(&channel->ch_close_cb, -1, &rettv, 1, argv);
@@ -4010,204 +4010,204 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // the callback is only called once
 	      free_callback(&channel->ch_close_cb);
 
-	      if (channel_need_redraw)
+	      ਜੇ (channel_need_redraw)
 	      {
 		  channel_need_redraw = FALSE;
 		  redraw_after_callback(TRUE, FALSE);
 	      }
 
-	      if (!channel->ch_drop_never)
+	      ਜੇ (!channel->ch_drop_never)
 		  // any remaining messages are useless now
-		  for (part = PART_SOCK; part < PART_IN; ++part)
+		  ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 		      drop_messages(channel, part);
 
 	      --channel->ch_refcount;
 	}
     }
 
-    channel->ch_nb_close_cb = NULL;
-#ifdef FEAT_SOCKETSERVER
+    channel->ch_nb_close_cb = ਨਿਰਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SOCKETSERVER
     channel->ch_socketserver = false;
-    channel->ch_ss_accept_cb = NULL;
-    channel->ch_ss_close_cb = NULL;
-#endif
+    channel->ch_ss_accept_cb = ਨਿਰਾ;
+    channel->ch_ss_close_cb = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_TERMINAL
-    term_channel_closed(channel);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+    ਪਦ_channel_closed(channel);
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Close the "in" part channel "channel".
  */
-    static void
-channel_close_in(channel_T *channel)
+    ਸਥਿਰ ਖਾਲੀ
+channel_close_ਵਿੱਚ(channel_T *channel)
 {
-    ch_close_part(channel, PART_IN);
+    ch_close_part(channel, PART_ਵਿੱਚ);
 }
 
-    static void
-remove_from_writeque(writeq_T *wq, writeq_T *entry)
+    ਸਥਿਰ ਖਾਲੀ
+remove_from_writeque(writeq_T *wq, writeq_T *ਇੰਦਰਾਜ)
 {
-    ga_clear(&entry->wq_ga);
-    wq->wq_next = entry->wq_next;
-    if (wq->wq_next == NULL)
-	wq->wq_prev = NULL;
-    else
-	wq->wq_next->wq_prev = NULL;
-    vim_free(entry);
+    ga_clear(&ਇੰਦਰਾਜ->wq_ga);
+    wq->wq_ਅਗਲਾ = ਇੰਦਰਾਜ->wq_ਅਗਲਾ;
+    ਜੇ (wq->wq_ਅਗਲਾ == ਨਿਰਾ)
+	wq->wq_prev = ਨਿਰਾ;
+    ਨਹੀਂਤਾਂ
+	wq->wq_ਅਗਲਾ->wq_prev = ਨਿਰਾ;
+    vim_free(ਇੰਦਰਾਜ);
 }
 
 /*
  * Clear the read buffer on "channel"/"part".
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_clear_one(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    jsonq_T *json_head = &ch_part->ch_json_head;
-    cbq_T   *cb_head = &ch_part->ch_cb_head;
+    jsonq_T *json_ਸਿਰ = &ch_part->ch_json_ਸਿਰ;
+    cbq_T   *cb_ਸਿਰ = &ch_part->ch_cb_ਸਿਰ;
 
-    while (channel_peek(channel, part) != NULL)
-	vim_free(channel_get(channel, part, NULL));
+    ਜਦੋਂ (channel_peek(channel, part) != ਨਿਰਾ)
+	vim_free(channel_get(channel, part, ਨਿਰਾ));
 
-    while (cb_head->cq_next != NULL)
+    ਜਦੋਂ (cb_ਸਿਰ->cq_ਅਗਲਾ != ਨਿਰਾ)
     {
-	cbq_T *node = cb_head->cq_next;
+	cbq_T *ਗੰਢ = cb_ਸਿਰ->cq_ਅਗਲਾ;
 
-	remove_cb_node(cb_head, node);
-	free_callback(&node->cq_callback);
-	vim_free(node);
+	remove_cb_ਗੰਢ(cb_ਸਿਰ, ਗੰਢ);
+	free_callback(&ਗੰਢ->cq_callback);
+	vim_free(ਗੰਢ);
     }
 
-    while (json_head->jq_next != NULL)
+    ਜਦੋਂ (json_ਸਿਰ->jq_ਅਗਲਾ != ਨਿਰਾ)
     {
-	free_tv(json_head->jq_next->jq_value);
-	remove_json_node(json_head, json_head->jq_next);
+	free_tv(json_ਸਿਰ->jq_ਅਗਲਾ->jq_ਮੁੱਲ);
+	remove_json_ਗੰਢ(json_ਸਿਰ, json_ਸਿਰ->jq_ਅਗਲਾ);
     }
 
     free_callback(&ch_part->ch_callback);
-    ga_clear(&ch_part->ch_block_ids);
+    ga_clear(&ch_part->ch_ਖੰਡ_ids);
 
-    while (ch_part->ch_writeque.wq_next != NULL)
+    ਜਦੋਂ (ch_part->ch_writeque.wq_ਅਗਲਾ != ਨਿਰਾ)
 	remove_from_writeque(&ch_part->ch_writeque,
-						 ch_part->ch_writeque.wq_next);
+						 ch_part->ch_writeque.wq_ਅਗਲਾ);
 }
 
 /*
  * Clear all the read buffers on "channel".
  */
-    void
+    ਖਾਲੀ
 channel_clear(channel_T *channel)
 {
     ch_log(channel, "Clearing channel");
     VIM_CLEAR(channel->ch_hostname);
     channel_clear_one(channel, PART_SOCK);
-    channel_clear_one(channel, PART_OUT);
+    channel_clear_one(channel, PART_ਬਾਹਰਲਾ);
     channel_clear_one(channel, PART_ERR);
-    channel_clear_one(channel, PART_IN);
+    channel_clear_one(channel, PART_ਵਿੱਚ);
     free_callback(&channel->ch_callback);
     free_callback(&channel->ch_close_cb);
 }
 
-#if defined(EXITFREE)
-    void
-channel_free_all(void)
+#ਜੇ defined(EXITFREE)
+    ਖਾਲੀ
+channel_free_all(ਖਾਲੀ)
 {
     channel_T *channel;
 
-    ch_log(NULL, "channel_free_all()");
+    ch_log(ਨਿਰਾ, "channel_free_all()");
     FOR_ALL_CHANNELS(channel)
 	channel_clear(channel);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
 // Sent when the netbeans channel is found closed when reading.
-#define DETACH_MSG_RAW "DETACH\n"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DETACH_ਸੁਨੇਹਾ_RAW "DETACH\n"
 
 // Buffer size for reading incoming messages.
-#define MAXMSGSIZE 4096
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MAXMSGSIZE 4096
 
 /*
  * Check if there are remaining data that should be written for "in_part".
  */
-    static int
-is_channel_write_remaining(chanpart_T *in_part)
+    ਸਥਿਰ ਪੂਰਨ
+is_channel_write_ਬਚਿਆ(chanpart_T *ਵਿੱਚ_part)
 {
-    buf_T *buf = in_part->ch_bufref.br_buf;
+    buf_T *buf = ਵਿੱਚ_part->ch_bufref.br_buf;
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	return TRUE;
-    if (buf == NULL)
-	return FALSE;
-    return in_part->ch_buf_append
-	    ? (in_part->ch_buf_bot < buf->b_ml.ml_line_count)
-	    : (in_part->ch_buf_top <= in_part->ch_buf_bot
-			    && in_part->ch_buf_top <= buf->b_ml.ml_line_count);
+    ਜੇ (ਵਿੱਚ_part->ch_writeque.wq_ਅਗਲਾ != ਨਿਰਾ)
+	ਵਾਪਸ TRUE;
+    ਜੇ (buf == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ ਵਿੱਚ_part->ch_buf_append
+	    ? (ਵਿੱਚ_part->ch_buf_bot < buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    : (ਵਿੱਚ_part->ch_buf_ਸਿਖਰ <= ਵਿੱਚ_part->ch_buf_bot
+			    && ਵਿੱਚ_part->ch_buf_ਸਿਖਰ <= buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ);
 }
 
-#if defined(HAVE_SELECT)
+#ਜੇ defined(HAVE_SELECT)
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_wfds(int maxfd_arg, fd_set *wfds)
+    ਸਥਿਰ ਪੂਰਨ
+channel_fill_wfds(ਪੂਰਨ maxfd_arg, fd_set *wfds)
 {
-    int		maxfd = maxfd_arg;
+    ਪੂਰਨ		maxfd = maxfd_arg;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *ਵਿੱਚ_part = &ch->ch_part[PART_ਵਿੱਚ];
 
-	if (in_part->ch_fd != INVALID_FD
+	ਜੇ (ਵਿੱਚ_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		&& (int)in_part->ch_fd < FD_SETSIZE
+		&& (ਪੂਰਨ)ਵਿੱਚ_part->ch_fd < FD_SETSIZE
 # endif
-		&& is_channel_write_remaining(in_part))
+		&& is_channel_write_ਬਚਿਆ(ਵਿੱਚ_part))
 	{
-	    FD_SET((int)in_part->ch_fd, wfds);
-	    if ((int)in_part->ch_fd >= maxfd)
-		maxfd = (int)in_part->ch_fd + 1;
+	    FD_SET((ਪੂਰਨ)ਵਿੱਚ_part->ch_fd, wfds);
+	    ਜੇ ((ਪੂਰਨ)ਵਿੱਚ_part->ch_fd >= maxfd)
+		maxfd = (ਪੂਰਨ)ਵਿੱਚ_part->ch_fd + 1;
 	}
     }
-    return maxfd;
+    ਵਾਪਸ maxfd;
 }
-#else
+#ਨਹੀਂਤਾਂ
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_poll_write(int nfd_in, struct pollfd *fds)
+    ਸਥਿਰ ਪੂਰਨ
+channel_fill_poll_write(ਪੂਰਨ nfd_ਵਿੱਚ, ਬਣਤਰ pollfd *fds)
 {
-    int		nfd = nfd_in;
+    ਪੂਰਨ		nfd = nfd_ਵਿੱਚ;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *ਵਿੱਚ_part = &ch->ch_part[PART_ਵਿੱਚ];
 
-	if (in_part->ch_fd != INVALID_FD
-		&& is_channel_write_remaining(in_part))
+	ਜੇ (ਵਿੱਚ_part->ch_fd != INVALID_FD
+		&& is_channel_write_ਬਚਿਆ(ਵਿੱਚ_part))
 	{
-	    in_part->ch_poll_idx = nfd;
-	    fds[nfd].fd = in_part->ch_fd;
+	    ਵਿੱਚ_part->ch_poll_idx = nfd;
+	    fds[nfd].fd = ਵਿੱਚ_part->ch_fd;
 	    fds[nfd].events = POLLOUT;
 	    ++nfd;
 	}
-	else
-	    in_part->ch_poll_idx = -1;
+	ਨਹੀਂਤਾਂ
+	    ਵਿੱਚ_part->ch_poll_idx = -1;
     }
-    return nfd;
+    ਵਾਪਸ nfd;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-typedef enum {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਗਿਣਤੀ {
     CW_READY,
     CW_NOT_READY,
     CW_ERROR
-} channel_wait_result;
+} channel_wait_ਨਤੀਜਾ;
 
 /*
  * Check for reading from "fd" with "timeout" msec.
@@ -4215,124 +4215,124 @@ typedef enum {
  * Return CW_NOT_READY when there is nothing to read.
  * Return CW_ERROR when there is an error.
  */
-    static channel_wait_result
-channel_wait(channel_T *channel, sock_T fd, int timeout)
+    ਸਥਿਰ channel_wait_ਨਤੀਜਾ
+channel_wait(channel_T *channel, sock_T fd, ਪੂਰਨ timeout)
 {
-    if (timeout > 0)
+    ਜੇ (timeout > 0)
 	ch_log(channel, "Waiting for up to %d msec", timeout);
 
-#ifdef MSWIN
-    if (fd != channel->CH_SOCK_FD)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+    ਜੇ (fd != channel->CH_SOCK_FD)
     {
 	DWORD	nread;
-	int	sleep_time;
-	DWORD	deadline = GetTickCount() + timeout;
-	int	delay = 1;
+	ਪੂਰਨ	sleep_ਸਮਾਂ;
+	DWORD	deadline = Get_Tick_ਗਿਣਤੀ() + timeout;
+	ਪੂਰਨ	delay = 1;
 
 	// reading from a pipe, not a socket
-	while (TRUE)
+	ਜਦੋਂ (TRUE)
 	{
-	    int r = PeekNamedPipe((HANDLE)fd, NULL, 0, NULL, &nread, NULL);
+	    ਪੂਰਨ r = PeekNamedPipe((HANDLE)fd, ਨਿਰਾ, 0, ਨਿਰਾ, &nread, ਨਿਰਾ);
 
-	    if (r && nread > 0)
-		return CW_READY;
+	    ਜੇ (r && nread > 0)
+		ਵਾਪਸ CW_READY;
 
-	    if (channel->ch_named_pipe)
+	    ਜੇ (channel->ch_named_pipe)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, ਨਿਰਾ);
 	    }
-	    else if (r == 0)
-		return CW_ERROR;
+	    ਨਹੀਂਤਾਂ ਜੇ (r == 0)
+		ਵਾਪਸ CW_ERROR;
 
 	    // perhaps write some buffer lines
-	    channel_write_any_lines();
+	    channel_write_any_ਸਤਰਾਂ();
 
-	    sleep_time = deadline - GetTickCount();
-	    if (sleep_time <= 0)
-		break;
+	    sleep_ਸਮਾਂ = deadline - Get_Tick_ਗਿਣਤੀ();
+	    ਜੇ (sleep_ਸਮਾਂ <= 0)
+		ਰੋਕੋ;
 	    // Wait for a little while.  Very short at first, up to 10 msec
 	    // after looping a few times.
-	    if (sleep_time > delay)
-		sleep_time = delay;
-	    Sleep(sleep_time);
+	    ਜੇ (sleep_ਸਮਾਂ > delay)
+		sleep_ਸਮਾਂ = delay;
+	    Sleep(sleep_ਸਮਾਂ);
 	    delay = delay * 2;
-	    if (delay > 10)
+	    ਜੇ (delay > 10)
 		delay = 10;
 	}
     }
-    else
-#endif
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     {
-#if defined(HAVE_SELECT)
-	struct timeval	tval;
+#ਜੇ defined(HAVE_SELECT)
+	ਬਣਤਰ timeval	tval;
 	fd_set		rfds;
 	fd_set		wfds;
-	int		ret;
-	int		maxfd;
+	ਪੂਰਨ		ret;
+	ਪੂਰਨ		maxfd;
 
 	tval.tv_sec = timeout / 1000;
 	tval.tv_usec = (timeout % 1000) * 1000;
-	for (;;)
+	ਲਈ (;;)
 	{
 	    FD_ZERO(&rfds);
-	    FD_SET((int)fd, &rfds);
+	    FD_SET((ਪੂਰਨ)fd, &rfds);
 
 	    // Write lines to a pipe when a pipe can be written to.  Need to
 	    // set this every time, some buffers may be done.
-	    maxfd = (int)fd + 1;
+	    maxfd = (ਪੂਰਨ)fd + 1;
 	    FD_ZERO(&wfds);
 	    maxfd = channel_fill_wfds(maxfd, &wfds);
 
-	    ret = select(maxfd, &rfds, &wfds, NULL, &tval);
+	    ret = select(maxfd, &rfds, &wfds, ਨਿਰਾ, &tval);
 # ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    ਜੇ (ret == -1 && errno == EINTR)
+		ਜਾਰੀ;
 # endif
-	    if (ret > 0)
+	    ਜੇ (ret > 0)
 	    {
-		if (FD_ISSET(fd, &rfds))
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		ਜੇ (FD_ISSET(fd, &rfds))
+		    ਵਾਪਸ CW_READY;
+		channel_write_any_ਸਤਰਾਂ();
+		ਜਾਰੀ;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
-#else
-	for (;;)
+#ਨਹੀਂਤਾਂ
+	ਲਈ (;;)
 	{
-	    struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	    int		    nfd = 1;
+	    ਬਣਤਰ pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	    ਪੂਰਨ		    nfd = 1;
 
 	    fds[0].fd = fd;
 	    fds[0].events = POLLIN;
 	    nfd = channel_fill_poll_write(nfd, fds);
-	    if (poll(fds, nfd, timeout) > 0)
+	    ਜੇ (poll(fds, nfd, timeout) > 0)
 	    {
-		if (fds[0].revents & POLLIN)
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		ਜੇ (fds[0].revents & POLLIN)
+		    ਵਾਪਸ CW_READY;
+		channel_write_any_ਸਤਰਾਂ();
+		ਜਾਰੀ;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
-    return CW_NOT_READY;
+    ਵਾਪਸ CW_NOT_READY;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 ch_close_part_on_error(
-	channel_T *channel, ch_part_T part, int is_err, char *func)
+	channel_T *channel, ch_part_T part, ਪੂਰਨ is_err, ਅੱਖਰ *func)
 {
-    char	msg[] = "%s(): Read %s from ch_part[%d], closing";
+    ਅੱਖਰ	ਸੁਨੇਹਾ[] = "%s(): Read %s from ch_part[%d], closing";
 
-    if (is_err)
+    ਜੇ (is_err)
 	// Do not call emsg(), most likely the other end just exited.
-	ch_error(channel, msg, func, "error", part);
-    else
-	ch_log(channel, msg, func, "EOF", part);
+	ch_error(channel, ਸੁਨੇਹਾ, func, "error", part);
+    ਨਹੀਂਤਾਂ
+	ch_log(channel, ਸੁਨੇਹਾ, func, "EOF", part);
 
     // Queue a "DETACH" netbeans message in the command queue in order to
     // terminate the netbeans session later. Do not end the session here
@@ -4344,39 +4344,39 @@ ch_close_part_on_error(
     //		    -> gui event loop or select loop
     //			-> channel_read()
     // Only send "DETACH" for a netbeans channel.
-    if (channel->ch_nb_close_cb != NULL)
-	channel_save(channel, PART_SOCK, (char_u *)DETACH_MSG_RAW,
-			      (int)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
+    ਜੇ (channel->ch_nb_close_cb != ਨਿਰਾ)
+	channel_save(channel, PART_SOCK, (char_u *)DETACH_ਸੁਨੇਹਾ_RAW,
+			      (ਪੂਰਨ)STRLEN_LITERAL(DETACH_ਸੁਨੇਹਾ_RAW), FALSE, "PUT ");
 
     // When reading is not possible close this part of the channel.  Don't
     // close the channel yet, there may be something to read on another part.
     // When stdout and stderr use the same FD we get the error only on one of
     // them, also close the other.
-    if (part == PART_OUT || part == PART_ERR)
+    ਜੇ (part == PART_ਬਾਹਰਲਾ || part == PART_ERR)
     {
-	ch_part_T other = part == PART_OUT ? PART_ERR : PART_OUT;
+	ch_part_T other = part == PART_ਬਾਹਰਲਾ ? PART_ERR : PART_ਬਾਹਰਲਾ;
 
-	if (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
+	ਜੇ (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
 	    ch_close_part(channel, other);
     }
     ch_close_part(channel, part);
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
     // Stop listening to GUI events right away.
     channel_gui_unregister_one(channel, part);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 channel_close_now(channel_T *channel)
 {
     ch_log(channel, "Closing channel because all readable fds are closed");
-    if (channel->ch_nb_close_cb != NULL)
+    ਜੇ (channel->ch_nb_close_cb != ਨਿਰਾ)
 	(*channel->ch_nb_close_cb)();
-#ifdef FEAT_SOCKETSERVER
-    if (channel->ch_ss_close_cb != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SOCKETSERVER
+    ਜੇ (channel->ch_ss_close_cb != ਨਿਰਾ)
 	channel->ch_ss_close_cb(channel);
-#endif
+#ਜੇ_ਅੰਤ
     channel_close(channel, TRUE);
 }
 
@@ -4385,129 +4385,129 @@ channel_close_now(channel_T *channel)
  * "part" is PART_SOCK, PART_OUT or PART_ERR.
  * The data is put in the read queue.  No callbacks are invoked here.
  */
-    static void
-channel_read(channel_T *channel, ch_part_T part, char *func)
+    ਸਥਿਰ ਖਾਲੀ
+channel_read(channel_T *channel, ch_part_T part, ਅੱਖਰ *func)
 {
-    static char_u	*buf = NULL;
-    int			len = 0;
-    int			readlen = 0;
+    ਸਥਿਰ char_u	*buf = ਨਿਰਾ;
+    ਪੂਰਨ			len = 0;
+    ਪੂਰਨ			readlen = 0;
     sock_T		fd;
-    int			use_socket = FALSE;
+    ਪੂਰਨ			use_socket = FALSE;
 
     fd = channel->ch_part[part].ch_fd;
-    if (fd == INVALID_FD)
+    ਜੇ (fd == INVALID_FD)
     {
 	ch_error(channel, "channel_read() called while %s part is closed",
-							  ch_part_names[part]);
-	return;
+							  ch_part_ਨਾਂ[part]);
+	ਵਾਪਸ;
     }
     use_socket = fd == channel->CH_SOCK_FD;
 
     // Allocate a buffer to read into.
-    if (buf == NULL)
+    ਜੇ (buf == ਨਿਰਾ)
     {
 	buf = alloc(MAXMSGSIZE);
-	if (buf == NULL)
-	    return;	// out of memory!
+	ਜੇ (buf == ਨਿਰਾ)
+	    ਵਾਪਸ;	// out of memory!
     }
 
     // Keep on reading for as long as there is something to read.
     // Use select() or poll() to avoid blocking on a message that is exactly
     // MAXMSGSIZE long.
-    for (;;)
+    ਲਈ (;;)
     {
-	if (channel_wait(channel, fd, 0) != CW_READY)
-	    break;
-	if (channel->ch_listen)
+	ਜੇ (channel_wait(channel, fd, 0) != CW_READY)
+	    ਰੋਕੋ;
+	ਜੇ (channel->ch_listen)
 	{
 	    sock_T		newfd;
 	    socklen_t		socklen;
 	    channel_T		*newchannel;
 	    typval_T		argv[2];
 	    char_u		namebuf[256];
-	    struct sockaddr_storage	client;
+	    ਬਣਤਰ sockaddr_storage	client;
 
-	    newchannel = add_channel();
-	    if (newchannel == NULL)
+	    newchannel = ਜੋੜੋ_channel();
+	    ਜੇ (newchannel == ਨਿਰਾ)
 	    {
-		ch_error(NULL, "Cannot allocate channel.");
-		return;
+		ch_error(ਨਿਰਾ, "Cannot allocate channel.");
+		ਵਾਪਸ;
 	    }
-	    socklen = sizeof(client);
-	    newfd = accept(fd, (struct sockaddr*)&client, &socklen);
-	    if (newfd < 0)
+	    socklen = ਆਕਾਰ(client);
+	    newfd = accept(fd, (ਬਣਤਰ sockaddr*)&client, &socklen);
+	    ਜੇ (newfd < 0)
 	    {
-		ch_error(NULL, "Cannot accept channel.");
+		ch_error(ਨਿਰਾ, "Cannot accept channel.");
 		channel_free(newchannel);
-		return;
+		ਵਾਪਸ;
 	    }
 	    newchannel->CH_SOCK_FD = (sock_T)newfd;
-	    newchannel->ch_to_be_closed |= (1U << PART_SOCK);
+	    newchannel->ch_ਮੰਜ਼ਿਲ_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-	    channel_gui_register_one(newchannel, PART_SOCK);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+	    channel_gui_ਰਜਿਸਟਰ_one(newchannel, PART_SOCK);
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SOCKETSERVER
-	    if (channel->ch_ss_accept_cb != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SOCKETSERVER
+	    ਜੇ (channel->ch_ss_accept_cb != ਨਿਰਾ)
 	    {
 		channel->ch_ss_accept_cb(newchannel);
-		return;
+		ਵਾਪਸ;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
-	    if (client.ss_family == AF_INET)
+	    ਜੇ (client.ss_family == AF_INET)
 	    {
-#ifdef HAVE_INET_NTOP
-		char addr[INET_ADDRSTRLEN];
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_INET_NTOP
+		ਅੱਖਰ addr[INET_ADDRSTRLEN];
 
 		inet_ntop(AF_INET,
-			&((struct sockaddr_in*)&client)->sin_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
+			&((ਬਣਤਰ sockaddr_ਵਿੱਚ*)&client)->sin_addr,
+			addr, ਆਕਾਰ(addr));
+		vim_snprintf((ਅੱਖਰ *)namebuf, ਆਕਾਰ(namebuf), "%s:%d",
 			addr,
-			ntohs(((struct sockaddr_in*)&client)->sin_port));
-#else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
-		    inet_ntoa(((struct sockaddr_in*)&client)->sin_addr),
-		    ntohs(((struct sockaddr_in*)&client)->sin_port));
-#endif
+			ntohs(((ਬਣਤਰ sockaddr_ਵਿੱਚ*)&client)->sin_ਪੋਰਟ));
+#ਨਹੀਂਤਾਂ
+		vim_snprintf((ਅੱਖਰ *)namebuf, ਆਕਾਰ(namebuf), "%s:%d",
+		    inet_ntoa(((ਬਣਤਰ sockaddr_ਵਿੱਚ*)&client)->sin_addr),
+		    ntohs(((ਬਣਤਰ sockaddr_ਵਿੱਚ*)&client)->sin_ਪੋਰਟ));
+#ਜੇ_ਅੰਤ
 	    }
-#ifdef HAVE_INET_NTOP
-	    else if (client.ss_family == AF_INET6)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_INET_NTOP
+	    ਨਹੀਂਤਾਂ ਜੇ (client.ss_family == AF_INET6)
 	    {
-		char addr[INET6_ADDRSTRLEN];
+		ਅੱਖਰ addr[INET6_ADDRSTRLEN];
 
 		inet_ntop(AF_INET6,
-			&((struct sockaddr_in6*)&client)->sin6_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "[%s]:%d",
+			&((ਬਣਤਰ sockaddr_in6*)&client)->sin6_addr,
+			addr, ਆਕਾਰ(addr));
+		vim_snprintf((ਅੱਖਰ *)namebuf, ਆਕਾਰ(namebuf), "[%s]:%d",
 			addr,
-			ntohs(((struct sockaddr_in6*)&client)->sin6_port));
+			ntohs(((ਬਣਤਰ sockaddr_in6*)&client)->sin6_ਪੋਰਟ));
 	    }
-#endif
-	    else if (client.ss_family == AF_UNIX)
-		vim_snprintf((char *)namebuf, sizeof(namebuf),
+#ਜੇ_ਅੰਤ
+	    ਨਹੀਂਤਾਂ ਜੇ (client.ss_family == AF_UNIX)
+		vim_snprintf((ਅੱਖਰ *)namebuf, ਆਕਾਰ(namebuf),
 							    "unix:anonymous");
-	    else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "unknown");
-	    ++safe_to_invoke_callback;
+	    ਨਹੀਂਤਾਂ
+		vim_snprintf((ਅੱਖਰ *)namebuf, ਆਕਾਰ(namebuf), "unknown");
+	    ++ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
 	    ++newchannel->ch_refcount;
 	    argv[0].v_type = VAR_CHANNEL;
 	    argv[0].vval.v_channel = newchannel;
 	    argv[1].v_type = VAR_STRING;
 	    argv[1].vval.v_string = vim_strsave(namebuf);
 	    invoke_callback(newchannel, &channel->ch_callback, argv);
-	    --safe_to_invoke_callback;
+	    --ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
 	    clear_tv(&argv[1]);
-	    return;
+	    ਵਾਪਸ;
 	}
-	if (use_socket)
-	    len = sock_read(fd, (char *)buf, MAXMSGSIZE);
-	else
-	    len = fd_read(fd, (char *)buf, MAXMSGSIZE);
-	if (len <= 0)
-	    break;	// error or nothing more to read
+	ਜੇ (use_socket)
+	    len = sock_read(fd, (ਅੱਖਰ *)buf, MAXMSGSIZE);
+	ਨਹੀਂਤਾਂ
+	    len = fd_read(fd, (ਅੱਖਰ *)buf, MAXMSGSIZE);
+	ਜੇ (len <= 0)
+	    ਰੋਕੋ;	// error or nothing more to read
 
 	// Store the read message in the queue.
 	channel_save(channel, part, buf, len, FALSE, "RECV ");
@@ -4515,27 +4515,27 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
     }
 
     // Reading a disconnection (readlen == 0), or an error.
-    if (readlen <= 0)
+    ਜੇ (readlen <= 0)
     {
-	if (!channel->ch_keep_open)
+	ਜੇ (!channel->ch_keep_open)
 	    ch_close_part_on_error(channel, part, (len < 0), func);
     }
-#if defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
-    else if (CH_HAS_GUI && gtk_main_level() > 0)
+#ਜੇ defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
+    ਨਹੀਂਤਾਂ ਜੇ (CH_HAS_GUI && gtk_main_level() > 0)
 	// signal the main loop that there is something to read
 	gtk_main_quit();
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#ifdef FEAT_SOCKETSERVER
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SOCKETSERVER
 
-    void
+    ਖਾਲੀ
 channel_check(channel_T *channel, ch_part_T part)
 {
     channel_read(channel, part, "channel_check");
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Read from RAW or NL "channel"/"part".  Blocks until there is something to
@@ -4545,118 +4545,118 @@ channel_check(channel_T *channel, ch_part_T part)
  * Returns what was read in allocated memory.
  * Returns NULL in case of error or timeout.
  */
-    static char_u *
-channel_read_block(
-	channel_T *channel, ch_part_T part, int timeout, int raw, int *outlen)
+    ਸਥਿਰ char_u *
+channel_read_ਖੰਡ(
+	channel_T *channel, ch_part_T part, ਪੂਰਨ timeout, ਪੂਰਨ raw, ਪੂਰਨ *outlen)
 {
     char_u	*buf;
-    char_u	*msg;
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
+    char_u	*ਸੁਨੇਹਾ;
+    ch_ਬਹੁਲਕ_T	ਬਹੁਲਕ = channel->ch_part[part].ch_ਬਹੁਲਕ;
     sock_T	fd = channel->ch_part[part].ch_fd;
     char_u	*nl;
-    readq_T	*node;
+    readq_T	*ਗੰਢ;
 
     ch_log(channel, "Blocking %s read, timeout: %d msec",
-				  mode == CH_MODE_RAW ? "RAW"
-				: mode == CH_MODE_BLOB ? "BLOB" : "NL", timeout);
+				  ਬਹੁਲਕ == CH_ਬਹੁਲਕ_RAW ? "RAW"
+				: ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB ? "BLOB" : "NL", timeout);
 
-    while (TRUE)
+    ਜਦੋਂ (TRUE)
     {
-	node = channel_peek(channel, part);
-	if (node != NULL)
+	ਗੰਢ = channel_peek(channel, part);
+	ਜੇ (ਗੰਢ != ਨਿਰਾ)
 	{
-	    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
-		    || (mode == CH_MODE_NL
-					   && channel_first_nl(node) != NULL))
+	    ਜੇ (ਬਹੁਲਕ == CH_ਬਹੁਲਕ_RAW || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB
+		    || (ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL
+					   && channel_ਪਹਿਲਾ_nl(ਗੰਢ) != ਨਿਰਾ))
 		// got a complete message
-		break;
-	    if (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
-		continue;
+		ਰੋਕੋ;
+	    ਜੇ (channel_collapse(channel, part, ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL) == OK)
+		ਜਾਰੀ;
 	    // If not blocking or nothing more is coming then return what we
 	    // have.
-	    if (raw || fd == INVALID_FD)
-		break;
+	    ਜੇ (raw || fd == INVALID_FD)
+		ਰੋਕੋ;
 	}
 
 	// Wait for up to the channel timeout.
-	if (fd == INVALID_FD)
-	    return NULL;
-	if (channel_wait(channel, fd, timeout) != CW_READY)
+	ਜੇ (fd == INVALID_FD)
+	    ਵਾਪਸ ਨਿਰਾ;
+	ਜੇ (channel_wait(channel, fd, timeout) != CW_READY)
 	{
 	    ch_log(channel, "Timed out");
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
 	channel_read(channel, part, "channel_read_block");
     }
 
     // We have a complete message now.
-    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
+    ਜੇ (ਬਹੁਲਕ == CH_ਬਹੁਲਕ_RAW || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB || outlen != ਨਿਰਾ)
     {
-	msg = channel_get_all(channel, part, outlen);
+	ਸੁਨੇਹਾ = channel_get_all(channel, part, outlen);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	char_u *p;
 
-	buf = node->rq_buffer;
-	nl = channel_first_nl(node);
+	buf = ਗੰਢ->rq_ਬਫਰ;
+	nl = channel_ਪਹਿਲਾ_nl(ਗੰਢ);
 
 	// Convert NUL to NL, the internal representation.
-	for (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
-	    if (*p == NUL)
+	ਲਈ (p = buf; (nl == ਨਿਰਾ || p < nl) && p < buf + ਗੰਢ->rq_buflen; ++p)
+	    ਜੇ (*p == NUL)
 		*p = NL;
 
-	if (nl == NULL)
+	ਜੇ (nl == ਨਿਰਾ)
 	{
 	    // must be a closed channel with missing NL
-	    msg = channel_get(channel, part, NULL);
+	    ਸੁਨੇਹਾ = channel_get(channel, part, ਨਿਰਾ);
 	}
-	else if (nl + 1 == buf + node->rq_buflen)
+	ਨਹੀਂਤਾਂ ਜੇ (nl + 1 == buf + ਗੰਢ->rq_buflen)
 	{
 	    // get the whole buffer
-	    msg = channel_get(channel, part, NULL);
+	    ਸੁਨੇਹਾ = channel_get(channel, part, ਨਿਰਾ);
 	    *nl = NUL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Copy the message into allocated memory and remove it from the
 	    // buffer.
-	    msg = vim_strnsave(buf, nl - buf);
-	    channel_consume(channel, part, (int)(nl - buf) + 1);
+	    ਸੁਨੇਹਾ = vim_strnsave(buf, nl - buf);
+	    channel_consume(channel, part, (ਪੂਰਨ)(nl - buf) + 1);
 	}
     }
-    if (ch_log_active())
+    ਜੇ (ch_log_ਸਰਗਰਮ())
 	ch_log(channel, "Returning %d bytes",
-		outlen != NULL ? *outlen : (int)STRLEN(msg));
-    return msg;
+		outlen != ਨਿਰਾ ? *outlen : (ਪੂਰਨ)STRLEN(ਸੁਨੇਹਾ));
+    ਵਾਪਸ ਸੁਨੇਹਾ;
 }
 
-static int channel_blocking_wait = 0;
+ਸਥਿਰ ਪੂਰਨ channel_blocking_wait = 0;
 
 /*
  * Return TRUE if in a blocking wait that might trigger callbacks.
  */
-    int
-channel_in_blocking_wait(void)
+    ਪੂਰਨ
+channel_ਵਿੱਚ_blocking_wait(ਖਾਲੀ)
 {
-    return channel_blocking_wait > 0;
+    ਵਾਪਸ channel_blocking_wait > 0;
 }
 
 /*
  * Wait up to "timeout" msec for something to read on "fd" of "channel", and
  * read what arrives on any channel meanwhile.
  */
-    static void
-channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
+    ਸਥਿਰ ਖਾਲੀ
+channel_wait_reading(channel_T *channel ਅਣਵਰਤਿਆ, sock_T fd ਅਣਵਰਤਿਆ, ਪੂਰਨ timeout)
 {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     // A pipe cannot be waited for, channel_wait() polls it; the other
     // channels are looked at every 10 msec.
-    (void)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
+    (ਖਾਲੀ)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
     channel_handle_events(FALSE);
-#else
+#ਨਹੀਂਤਾਂ
     channel_wait_any(timeout);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
@@ -4667,114 +4667,114 @@ channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
  * In corner cases this can be called recursively, that is why ch_block_ids is
  * a list.
  */
-    static int
-channel_read_json_block(
+    ਸਥਿਰ ਪੂਰਨ
+channel_read_json_ਖੰਡ(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    timeout_arg,
-	int	    id,
+	ਪੂਰਨ	    timeout_arg,
+	ਪੂਰਨ	    id,
 	typval_T    **rettv)
 {
-    int		more;
+    ਪੂਰਨ		ਹੋਰ;
     sock_T	fd;
-    int		timeout;
+    ਪੂਰਨ		timeout;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    int		retval = FAIL;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    ch_ਬਹੁਲਕ_T	ਬਹੁਲਕ = channel->ch_part[part].ch_ਬਹੁਲਕ;
+    ਪੂਰਨ		retval = FAIL;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    elapsed_T	ਸ਼ੁਰੂ_tv;
 
-    ELAPSED_INIT(start_tv);
-#endif
+    ELAPSED_INIT(ਸ਼ੁਰੂ_tv);
+#ਜੇ_ਅੰਤ
 
     ch_log(channel, "Blocking read JSON for id %d", id);
     ++channel_blocking_wait;
 
-    if (id >= 0)
-	channel_add_block_id(chanpart, id);
+    ਜੇ (id >= 0)
+	channel_ਜੋੜੋ_ਖੰਡ_id(chanpart, id);
 
-    for (;;)
+    ਲਈ (;;)
     {
-	if (mode == CH_MODE_LSP || mode == CH_MODE_DAP)
+	ਜੇ (ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 	    // In the "lsp" or "dap" mode, the http header and the json payload
 	    // may be received in multiple messages. So concatenate all the
 	    // received messages.
-	    (void)channel_collapse(channel, part, FALSE);
+	    (ਖਾਲੀ)channel_collapse(channel, part, FALSE);
 
-	more = channel_parse_json(channel, part, false);
+	ਹੋਰ = channel_parse_json(channel, part, false);
 
 	// search for message "id"
-	if (channel_get_json(channel, part, id, TRUE, rettv) == OK)
+	ਜੇ (channel_get_json(channel, part, id, TRUE, rettv) == OK)
 	{
 	    ch_log(channel, "Received JSON for id %d", id);
 	    retval = OK;
-	    break;
+	    ਰੋਕੋ;
 	}
 
-	if (!more)
+	ਜੇ (!ਹੋਰ)
 	{
-	    void *prev_readahead_ptr = channel_readahead_pointer(channel, part);
-	    void *readahead_ptr;
+	    ਖਾਲੀ *prev_readahead_ptr = channel_readahead_ਸੂਚਕ(channel, part);
+	    ਖਾਲੀ *readahead_ptr;
 
 	    // Handle any other messages in the queue.  If done some more
 	    // messages may have arrived.
-	    if (channel_parse_messages())
-		continue;
+	    ਜੇ (channel_parse_messages())
+		ਜਾਰੀ;
 
 	    // channel_parse_messages() may fill the queue with new data to
 	    // process.  Only loop when the readahead changed, otherwise we
 	    // would busy-loop.
-	    readahead_ptr = channel_readahead_pointer(channel, part);
-	    if (readahead_ptr != NULL && readahead_ptr != prev_readahead_ptr)
-		continue;
+	    readahead_ptr = channel_readahead_ਸੂਚਕ(channel, part);
+	    ਜੇ (readahead_ptr != ਨਿਰਾ && readahead_ptr != prev_readahead_ptr)
+		ਜਾਰੀ;
 
 	    // Wait for up to what is left of the timeout.
 	    timeout = timeout_arg;
-#ifdef ELAPSED_FUNC
-	    timeout -= (int)ELAPSED_FUNC(start_tv);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+	    timeout -= (ਪੂਰਨ)ELAPSED_FUNC(ਸ਼ੁਰੂ_tv);
+#ਜੇ_ਅੰਤ
 	    fd = chanpart->ch_fd;
-	    if (timeout <= 0 || fd == INVALID_FD)
+	    ਜੇ (timeout <= 0 || fd == INVALID_FD)
 	    {
-		if (fd != INVALID_FD)
+		ਜੇ (fd != INVALID_FD)
 		    ch_log(channel, "Timed out on id %d", id);
-		break;
+		ਰੋਕੋ;
 	    }
 	    // If there was an incomplete message use the deadline for that.
-	    if (chanpart->ch_wait_len > 0)
+	    ਜੇ (chanpart->ch_wait_len > 0)
 	    {
-		int	left;
-#ifdef MSWIN
-		left = chanpart->ch_deadline - GetTickCount() + 1;
-#else
+		ਪੂਰਨ	ਖੱਬਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+		ਖੱਬਾ = chanpart->ch_deadline - Get_Tick_ਗਿਣਤੀ() + 1;
+#ਨਹੀਂਤਾਂ
 		{
-		    struct timeval now_tv;
+		    ਬਣਤਰ timeval now_tv;
 
-		    gettimeofday(&now_tv, NULL);
-		    left = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
+		    gettimeofday(&now_tv, ਨਿਰਾ);
+		    ਖੱਬਾ = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
 			+ (chanpart->ch_deadline.tv_usec - now_tv.tv_usec)
 								    / 1000 + 1;
 		}
-#endif
-		if (left < 0)
+#ਜੇ_ਅੰਤ
+		ਜੇ (ਖੱਬਾ < 0)
 		    // Something went wrong, channel_parse_json() didn't
 		    // discard message.  Cancel waiting.
 		    chanpart->ch_wait_len = 0;
-		else if (left < timeout)
-		    timeout = left;
+		ਨਹੀਂਤਾਂ ਜੇ (ਖੱਬਾ < timeout)
+		    timeout = ਖੱਬਾ;
 	    }
 	    channel_wait_reading(channel, fd, timeout);
-#ifndef ELAPSED_FUNC
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
 	    // Without a clock the wait counts as the whole timeout.
 	    timeout_arg = 0;
-#endif
+#ਜੇ_ਅੰਤ
 	}
     }
-    if (id >= 0)
-	channel_remove_block_id(chanpart, id);
+    ਜੇ (id >= 0)
+	channel_remove_ਖੰਡ_id(chanpart, id);
     --channel_blocking_wait;
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -4785,134 +4785,134 @@ channel_read_json_block(
  * "part" is used to check typeahead, when PART_COUNT use the default part.
  */
     channel_T *
-get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
+get_channel_arg(typval_T *tv, ਪੂਰਨ check_open, ਪੂਰਨ reading, ch_part_T part)
 {
-    channel_T	*channel = NULL;
-    int		has_readahead = FALSE;
+    channel_T	*channel = ਨਿਰਾ;
+    ਪੂਰਨ		has_readahead = FALSE;
 
-    if (tv->v_type == VAR_JOB)
+    ਜੇ (tv->v_type == VAR_ਕੰਮ)
     {
-	if (tv->vval.v_job != NULL)
-	    channel = tv->vval.v_job->jv_channel;
+	ਜੇ (tv->vval.v_ਕੰਮ != ਨਿਰਾ)
+	    channel = tv->vval.v_ਕੰਮ->jv_channel;
     }
-    else if (tv->v_type == VAR_CHANNEL)
+    ਨਹੀਂਤਾਂ ਜੇ (tv->v_type == VAR_CHANNEL)
     {
 	channel = tv->vval.v_channel;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	semsg(_(e_invalid_ਦਲੀਲ_str), tv_get_string(tv));
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    if (channel != NULL && reading)
+    ਜੇ (channel != ਨਿਰਾ && reading)
 	has_readahead = channel_has_readahead(channel,
-		       part != PART_COUNT ? part : channel_part_read(channel));
+		       part != PART_ਗਿਣਤੀ ? part : channel_part_read(channel));
 
-    if (check_open && (channel == NULL || (!channel_is_open(channel)
+    ਜੇ (check_open && (channel == ਨਿਰਾ || (!channel_is_open(channel)
 					     && !(reading && has_readahead))))
     {
 	emsg(_(e_not_an_open_channel));
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
-    return channel;
+    ਵਾਪਸ channel;
 }
 
 /*
  * Common for ch_read() and ch_readraw().
  */
-    static void
-common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
+    ਸਥਿਰ ਖਾਲੀ
+common_channel_read(typval_T *argvars, typval_T *rettv, ਪੂਰਨ raw, ਪੂਰਨ blob)
 {
     channel_T	*channel;
-    ch_part_T	part = PART_COUNT;
+    ch_part_T	part = PART_ਗਿਣਤੀ;
     jobopt_T	opt;
-    int		mode;
-    int		timeout;
-    int		id = -1;
-    typval_T	*listtv = NULL;
+    ਪੂਰਨ		ਬਹੁਲਕ;
+    ਪੂਰਨ		timeout;
+    ਪੂਰਨ		id = -1;
+    typval_T	*listtv = ਨਿਰਾ;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
+    clear_ਕੰਮ_options(&opt);
+    ਜੇ (get_ਕੰਮ_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
 								      == FAIL)
-	goto theend;
+	ਜਾਓ theend;
 
-    if (opt.jo_set & JO_PART)
+    ਜੇ (opt.jo_ਸੈੱਟ & JO_PART)
 	part = opt.jo_part;
     channel = get_channel_arg(&argvars[0], TRUE, TRUE, part);
-    if (channel == NULL)
-	goto theend;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਜਾਓ theend;
 
-    if (part == PART_COUNT)
+    ਜੇ (part == PART_ਗਿਣਤੀ)
 	part = channel_part_read(channel);
-    mode = channel_get_mode(channel, part);
+    ਬਹੁਲਕ = channel_get_ਬਹੁਲਕ(channel, part);
     timeout = channel_get_timeout(channel, part);
-    if (opt.jo_set & JO_TIMEOUT)
+    ਜੇ (opt.jo_ਸੈੱਟ & JO_TIMEOUT)
 	timeout = opt.jo_timeout;
 
-    if (blob || mode == CH_MODE_BLOB)
+    ਜੇ (blob || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB)
     {
-	int	    outlen = 0;
-	char_u  *p = channel_read_block(channel, part,
+	ਪੂਰਨ	    outlen = 0;
+	char_u  *p = channel_read_ਖੰਡ(channel, part,
 		timeout, TRUE, &outlen);
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    blob_T	*b = blob_alloc();
 
-	    if (b != NULL)
+	    ਜੇ (b != ਨਿਰਾ)
 	    {
 		b->bv_ga.ga_len = outlen;
-		if (ga_grow(&b->bv_ga, outlen) == FAIL)
+		ਜੇ (ga_grow(&b->bv_ga, outlen) == FAIL)
 		    blob_free(b);
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    memcpy(b->bv_ga.ga_data, p, outlen);
-		    rettv_blob_set(rettv, b);
+		    ਸਮ੍ਰਿਤੀ_ਨਕਲ(b->bv_ga.ga_ਅੰਕੜੇ, p, outlen);
+		    rettv_blob_ਸੈੱਟ(rettv, b);
 		}
 	    }
 	    vim_free(p);
 	}
     }
-    else if (raw || mode == CH_MODE_RAW || mode == CH_MODE_NL)
-	rettv->vval.v_string = channel_read_block(channel, part,
-		timeout, raw, NULL);
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (raw || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_RAW || ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL)
+	rettv->vval.v_string = channel_read_ਖੰਡ(channel, part,
+		timeout, raw, ਨਿਰਾ);
+    ਨਹੀਂਤਾਂ
     {
-	if (opt.jo_set & JO_ID)
+	ਜੇ (opt.jo_ਸੈੱਟ & JO_ID)
 	    id = opt.jo_id;
-	channel_read_json_block(channel, part, timeout, id, &listtv);
-	if (listtv != NULL)
+	channel_read_json_ਖੰਡ(channel, part, timeout, id, &listtv);
+	ਜੇ (listtv != ਨਿਰਾ)
 	{
 	    *rettv = *listtv;
 	    vim_free(listtv);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NONE;
+	    rettv->vval.v_ਸੰਖਿਆ = VVAL_NONE;
 	}
     }
 
 theend:
-    free_job_options(&opt);
+    free_ਕੰਮ_options(&opt);
 }
 
-#if defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
+#ਜੇ defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
 /*
  * Check the channels for anything that is ready to be read.
  * The data is put in the read queue.
  * if "only_keep_open" is TRUE only check channels where ch_keep_open is set.
  */
-    void
-channel_handle_events(int only_keep_open)
+    ਖਾਲੀ
+channel_handle_events(ਪੂਰਨ only_keep_open)
 {
     channel_T	*channel;
     ch_part_T	part;
@@ -4920,15 +4920,15 @@ channel_handle_events(int only_keep_open)
 
     FOR_ALL_CHANNELS(channel)
     {
-	if (only_keep_open && !channel->ch_keep_open)
-	    continue;
+	ਜੇ (only_keep_open && !channel->ch_keep_open)
+	    ਜਾਰੀ;
 
 	// check the socket and pipes
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
 	    fd = channel->ch_part[part].ch_fd;
-	    if (fd == INVALID_FD)
-		continue;
+	    ਜੇ (fd == INVALID_FD)
+		ਜਾਰੀ;
 
 	    // In normal cases, a timeout of 0 is sufficient.
 	    //
@@ -4939,12 +4939,12 @@ channel_handle_events(int only_keep_open)
 	    // received by calling Sleep() once within channel_wait().  Note
 	    // that ch_killing can only be TRUE in conpty terminals, so it has
 	    // no side effects in environments other than conpty.
-	    int r = channel_wait(channel, fd, (channel->ch_killing &&
-			(part == PART_OUT || part == PART_ERR)) ? 1 : 0);
+	    ਪੂਰਨ r = channel_wait(channel, fd, (channel->ch_killing &&
+			(part == PART_ਬਾਹਰਲਾ || part == PART_ERR)) ? 1 : 0);
 
-	    if (r == CW_READY)
+	    ਜੇ (r == CW_READY)
 		channel_read(channel, part, "channel_handle_events");
-	    else if (r == CW_ERROR)
+	    ਨਹੀਂਤਾਂ ਜੇ (r == CW_ERROR)
 		ch_close_part_on_error(channel, part, TRUE,
 			"channel_handle_events");
 	}
@@ -4953,55 +4953,55 @@ channel_handle_events(int only_keep_open)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ਜੇ (channel->ch_ਕੰਮ != ਨਿਰਾ)
 	{
-	    job_T *job = channel->ch_job;
+	    ਕੰਮ_T *ਕੰਮ = channel->ch_ਕੰਮ;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ਜੇ (ਕੰਮ->jv_tty_ਬਾਹਰਲਾ != ਨਿਰਾ && ਕੰਮ->jv_ਸਥਿਤੀ == ਕੰਮ_ਮੁਕੰਮਲ)
+		ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_GUI)
+#ਜੇ defined(FEAT_GUI)
 /*
  * Return TRUE when there is any channel with a keep_open flag.
  */
-    int
-channel_any_keep_open(void)
+    ਪੂਰਨ
+channel_any_keep_open(ਖਾਲੀ)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	if (channel->ch_keep_open)
-	    return TRUE;
-    return FALSE;
+	ਜੇ (channel->ch_keep_open)
+	    ਵਾਪਸ TRUE;
+    ਵਾਪਸ FALSE;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set "channel"/"part" to non-blocking.
  * Only works for sockets and pipes.
  */
-    void
-channel_set_nonblock(channel_T *channel, ch_part_T part)
+    ਖਾਲੀ
+channel_ਸੈੱਟ_nonblock(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    int		fd = ch_part->ch_fd;
+    ਪੂਰਨ		fd = ch_part->ch_fd;
 
-    if (fd == INVALID_FD)
-	return;
+    ਜੇ (fd == INVALID_FD)
+	ਵਾਪਸ;
 
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     u_long	val = 1;
 
     ioctlsocket(fd, FIONBIO, &val);
-#else
-    (void)fcntl(fd, F_SETFL, O_NONBLOCK);
-#endif
+#ਨਹੀਂਤਾਂ
+    (ਖਾਲੀ)fcntl(fd, F_SETFL, O_NONBLOCK);
+#ਜੇ_ਅੰਤ
     ch_part->ch_nonblocking = TRUE;
 }
 
@@ -5010,117 +5010,117 @@ channel_set_nonblock(channel_T *channel, ch_part_T part)
  * When "fun" is not NULL an error message might be given.
  * Return FAIL or OK.
  */
-    int
+    ਪੂਰਨ
 channel_send(
 	channel_T *channel,
 	ch_part_T part,
 	char_u	  *buf_arg,
-	int	  len_arg,
-	char	  *fun)
+	ਪੂਰਨ	  len_arg,
+	ਅੱਖਰ	  *fun)
 {
-    int		res;
+    ਪੂਰਨ		res;
     sock_T	fd;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    int		did_use_queue = FALSE;
+    ਪੂਰਨ		did_use_ਕਤਾਰ = FALSE;
 
     fd = ch_part->ch_fd;
-    if (fd == INVALID_FD)
+    ਜੇ (fd == INVALID_FD)
     {
-	if (!channel->ch_error && fun != NULL)
+	ਜੇ (!channel->ch_error && fun != ਨਿਰਾ)
 	{
 	    ch_error(channel, "%s(): write while not connected", fun);
 	    semsg(_(e_str_write_while_not_connected), fun);
 	}
 	channel->ch_error = TRUE;
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    if (channel->ch_nonblock && !ch_part->ch_nonblocking)
-	channel_set_nonblock(channel, part);
+    ਜੇ (channel->ch_nonblock && !ch_part->ch_nonblocking)
+	channel_ਸੈੱਟ_nonblock(channel, part);
 
-    if (ch_log_active())
+    ਜੇ (ch_log_ਸਰਗਰਮ())
     {
 	ch_log_literal("SEND ", channel, part, buf_arg, len_arg);
-	did_repeated_msg = 0;
+	did_repeated_ਸੁਨੇਹਾ = 0;
     }
 
-    for (;;)
+    ਲਈ (;;)
     {
 	writeq_T    *wq = &ch_part->ch_writeque;
 	char_u	    *buf;
-	int	    len;
+	ਪੂਰਨ	    len;
 
-	if (wq->wq_next != NULL)
+	ਜੇ (wq->wq_ਅਗਲਾ != ਨਿਰਾ)
 	{
 	    // first write what was queued
-	    buf = wq->wq_next->wq_ga.ga_data;
-	    len = wq->wq_next->wq_ga.ga_len;
-	    did_use_queue = TRUE;
+	    buf = wq->wq_ਅਗਲਾ->wq_ga.ga_ਅੰਕੜੇ;
+	    len = wq->wq_ਅਗਲਾ->wq_ga.ga_len;
+	    did_use_ਕਤਾਰ = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (len_arg == 0)
+	    ਜੇ (len_arg == 0)
 		// nothing to write, called from channel_select_check()
-		return OK;
+		ਵਾਪਸ OK;
 	    buf = buf_arg;
 	    len = len_arg;
 	}
 
-	if (part == PART_SOCK)
-	    res = sock_write(fd, (char *)buf, len);
-	else
+	ਜੇ (part == PART_SOCK)
+	    res = sock_write(fd, (ਅੱਖਰ *)buf, len);
+	ਨਹੀਂਤਾਂ
 	{
-	    res = fd_write(fd, (char *)buf, len);
-#ifdef MSWIN
-	    if (channel->ch_named_pipe && res < 0)
+	    res = fd_write(fd, (ਅੱਖਰ *)buf, len);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
+	    ਜੇ (channel->ch_named_pipe && res < 0)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, ਨਿਰਾ);
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	if (res < 0 && (errno == EWOULDBLOCK
-#ifdef EAGAIN
+	ਜੇ (res < 0 && (errno == EWOULDBLOCK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ EAGAIN
 			|| errno == EAGAIN
-#endif
+#ਜੇ_ਅੰਤ
 		    ))
 	    res = 0; // nothing got written
 
-	if (res >= 0 && ch_part->ch_nonblocking)
+	ਜੇ (res >= 0 && ch_part->ch_nonblocking)
 	{
-	    writeq_T *entry = wq->wq_next;
+	    writeq_T *ਇੰਦਰਾਜ = wq->wq_ਅਗਲਾ;
 
-	    if (did_use_queue)
+	    ਜੇ (did_use_ਕਤਾਰ)
 		ch_log(channel, "Sent %d bytes now", res);
-	    if (res == len)
+	    ਜੇ (res == len)
 	    {
 		// Wrote all the buf[len] bytes.
-		if (entry != NULL)
+		ਜੇ (ਇੰਦਰਾਜ != ਨਿਰਾ)
 		{
 		    // Remove the entry from the write queue.
-		    remove_from_writeque(wq, entry);
-		    continue;
+		    remove_from_writeque(wq, ਇੰਦਰਾਜ);
+		    ਜਾਰੀ;
 		}
-		if (did_use_queue)
+		ਜੇ (did_use_ਕਤਾਰ)
 		    ch_log(channel, "Write queue empty");
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Wrote only buf[res] bytes, can't write more now.
-		if (entry != NULL)
+		ਜੇ (ਇੰਦਰਾਜ != ਨਿਰਾ)
 		{
-		    if (res > 0)
+		    ਜੇ (res > 0)
 		    {
 			// Remove the bytes that were written.
-			mch_memmove(entry->wq_ga.ga_data,
-				    (char *)entry->wq_ga.ga_data + res,
+			mch_memmove(ਇੰਦਰਾਜ->wq_ga.ga_ਅੰਕੜੇ,
+				    (ਅੱਖਰ *)ਇੰਦਰਾਜ->wq_ga.ga_ਅੰਕੜੇ + res,
 				    len - res);
-			entry->wq_ga.ga_len -= res;
+			ਇੰਦਰਾਜ->wq_ga.ga_len -= res;
 		    }
 		    buf = buf_arg;
 		    len = len_arg;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    buf += res;
 		    len -= res;
@@ -5129,56 +5129,56 @@ channel_send(
 
 		// Append the not written bytes of the argument to the write
 		// buffer.  Limit entries to 4000 bytes.
-		if (wq->wq_prev != NULL
+		ਜੇ (wq->wq_prev != ਨਿਰਾ
 			&& wq->wq_prev->wq_ga.ga_len + len < 4000)
 		{
-		    writeq_T *last = wq->wq_prev;
+		    writeq_T *ਆਖਰੀ = wq->wq_prev;
 
 		    // append to the last entry
-		    if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+		    ਜੇ (len > 0 && ga_grow(&ਆਖਰੀ->wq_ga, len) == OK)
 		    {
-			mch_memmove((char *)last->wq_ga.ga_data
-							  + last->wq_ga.ga_len,
+			mch_memmove((ਅੱਖਰ *)ਆਖਰੀ->wq_ga.ga_ਅੰਕੜੇ
+							  + ਆਖਰੀ->wq_ga.ga_len,
 				    buf, len);
-			last->wq_ga.ga_len += len;
+			ਆਖਰੀ->wq_ga.ga_len += len;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    writeq_T *last = ALLOC_ONE(writeq_T);
+		    writeq_T *ਆਖਰੀ = ALLOC_ONE(writeq_T);
 
-		    if (last != NULL)
+		    ਜੇ (ਆਖਰੀ != ਨਿਰਾ)
 		    {
-			last->wq_prev = wq->wq_prev;
-			last->wq_next = NULL;
-			if (wq->wq_prev == NULL)
-			    wq->wq_next = last;
-			else
-			    wq->wq_prev->wq_next = last;
-			wq->wq_prev = last;
-			ga_init2(&last->wq_ga, 1, 1000);
-			if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+			ਆਖਰੀ->wq_prev = wq->wq_prev;
+			ਆਖਰੀ->wq_ਅਗਲਾ = ਨਿਰਾ;
+			ਜੇ (wq->wq_prev == ਨਿਰਾ)
+			    wq->wq_ਅਗਲਾ = ਆਖਰੀ;
+			ਨਹੀਂਤਾਂ
+			    wq->wq_prev->wq_ਅਗਲਾ = ਆਖਰੀ;
+			wq->wq_prev = ਆਖਰੀ;
+			ga_init2(&ਆਖਰੀ->wq_ga, 1, 1000);
+			ਜੇ (len > 0 && ga_grow(&ਆਖਰੀ->wq_ga, len) == OK)
 			{
-			    mch_memmove(last->wq_ga.ga_data, buf, len);
-			    last->wq_ga.ga_len = len;
+			    mch_memmove(ਆਖਰੀ->wq_ga.ga_ਅੰਕੜੇ, buf, len);
+			    ਆਖਰੀ->wq_ga.ga_len = len;
 			}
 		    }
 		}
 	    }
 	}
-	else if (res != len)
+	ਨਹੀਂਤਾਂ ਜੇ (res != len)
 	{
-	    if (!channel->ch_error && fun != NULL)
+	    ਜੇ (!channel->ch_error && fun != ਨਿਰਾ)
 	    {
 		ch_error(channel, "%s(): write failed", fun);
 		semsg(_(e_str_write_failed), fun);
 	    }
 	    channel->ch_error = TRUE;
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	}
 
 	channel->ch_error = FALSE;
-	return OK;
+	ਵਾਪਸ OK;
     }
 }
 
@@ -5188,285 +5188,285 @@ channel_send(
  * Sets "part_read" to the read fd.
  * Otherwise returns NULL.
  */
-    static channel_T *
+    ਸਥਿਰ channel_T *
 send_common(
 	typval_T    *argvars,
-	char_u	    *text,
-	int	    len,
-	int	    id,
-	int	    eval,
+	char_u	    *ਪਾਠ,
+	ਪੂਰਨ	    len,
+	ਪੂਰਨ	    id,
+	ਪੂਰਨ	    eval,
 	jobopt_T    *opt,
-	char	    *fun,
+	ਅੱਖਰ	    *fun,
 	ch_part_T   *part_read)
 {
     channel_T	*channel;
     ch_part_T	part_send;
 
-    clear_job_options(opt);
+    clear_ਕੰਮ_options(opt);
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return NULL;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
     part_send = channel_part_send(channel);
     *part_read = channel_part_read(channel);
 
-    if (get_job_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
-	return NULL;
+    ਜੇ (get_ਕੰਮ_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // Set the callback. An empty callback means no callback and not reading
     // the response. With "ch_evalexpr()" and "ch_evalraw()" a callback is not
     // allowed.
-    if (opt->jo_callback.cb_name != NULL && *opt->jo_callback.cb_name != NUL)
+    ਜੇ (opt->jo_callback.cb_name != ਨਿਰਾ && *opt->jo_callback.cb_name != NUL)
     {
-	if (eval)
+	ਜੇ (eval)
 	{
 	    semsg(_(e_cannot_use_callback_with_str), fun);
-	    return NULL;
+	    ਵਾਪਸ ਨਿਰਾ;
 	}
-	channel_set_req_callback(channel, *part_read, &opt->jo_callback, id);
+	channel_ਸੈੱਟ_req_callback(channel, *part_read, &opt->jo_callback, id);
     }
 
-    if (channel_send(channel, part_send, text, len, fun) == OK
-					   && opt->jo_callback.cb_name == NULL)
-	return channel;
-    return NULL;
+    ਜੇ (channel_send(channel, part_send, ਪਾਠ, len, fun) == OK
+					   && opt->jo_callback.cb_name == ਨਿਰਾ)
+	ਵਾਪਸ channel;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * common for "ch_evalexpr()" and "ch_sendexpr()"
  */
-    static void
-ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
+    ਸਥਿਰ ਖਾਲੀ
+ch_ਵਿਅੰਜਕ_common(typval_T *argvars, typval_T *rettv, ਪੂਰਨ eval)
 {
-    char_u	*text;
+    char_u	*ਪਾਠ;
     typval_T	*listtv;
     channel_T	*channel;
-    int		id;
-    ch_mode_T	ch_mode;
+    ਪੂਰਨ		id;
+    ch_ਬਹੁਲਕ_T	ch_ਬਹੁਲਕ;
     ch_part_T	part_send;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
-    int		callback_present = FALSE;
+    ਪੂਰਨ		timeout;
+    ਪੂਰਨ		callback_present = FALSE;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ;
     part_send = channel_part_send(channel);
 
-    ch_mode = channel_get_mode(channel, part_send);
-    if (ch_mode == CH_MODE_RAW || ch_mode == CH_MODE_BLOB
-	    || ch_mode == CH_MODE_NL)
+    ch_ਬਹੁਲਕ = channel_get_ਬਹੁਲਕ(channel, part_send);
+    ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_RAW || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_BLOB
+	    || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_NL)
     {
 	emsg(_(e_cannot_use_evalexpr_sendexpr_with_raw_nl_or_blob_channel));
-	return;
+	ਵਾਪਸ;
     }
 
-    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+    ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
     {
 	dict_T		*d;
 	dictitem_T	*di;
-	char		*key = ch_mode == CH_MODE_LSP ? "id" : "seq";
+	ਅੱਖਰ		*ਕੁੰਜੀ = ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP ? "id" : "seq";
 
 	// return an empty dict by default
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	ਜੇ (rettv_dict_alloc(rettv) == FAIL)
+	    ਵਾਪਸ;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	ਜੇ (check_for_dict_arg(argvars, 1) == FAIL)
+	    ਵਾਪਸ;
 
 	d = argvars[1].vval.v_dict;
-	di = dict_find(d, (char_u *)key, -1);
-	if (argvars[2].v_type == VAR_DICT
-		&& dict_has_key(argvars[2].vval.v_dict, "callback"))
+	di = dict_ਲੱਭੋ(d, (char_u *)ਕੁੰਜੀ, -1);
+	ਜੇ (argvars[2].v_type == VAR_DICT
+		&& dict_has_ਕੁੰਜੀ(argvars[2].vval.v_dict, "callback"))
 	    callback_present = TRUE;
 
 	// The id is what a reply is matched by, so it must be a number when
 	// one is waited for.
-	if (di != NULL && di->di_tv.v_type != VAR_NUMBER
-		&& (ch_mode == CH_MODE_DAP || eval || callback_present))
+	ਜੇ (di != ਨਿਰਾ && di->di_tv.v_type != VAR_ਸੰਖਿਆ
+		&& (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP || eval || callback_present))
 	{
-	    semsg(_(e_invalid_value_for_argument_str), key);
-	    return;
+	    semsg(_(e_invalid_ਮੁੱਲ_for_ਦਲੀਲ_str), ਕੁੰਜੀ);
+	    ਵਾਪਸ;
 	}
 
-	if (ch_mode == CH_MODE_DAP)
+	ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 	{
 	    // DAP message always has a sequence number (id)
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "seq", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_ਆਖਰੀ_ਸੁਨੇਹਾ_id;
+	    ਜੇ (di == ਨਿਰਾ)
+		dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "seq", id);
+	    ਨਹੀਂਤਾਂ
+		di->di_tv.vval.v_ਸੰਖਿਆ = id;
 	}
-	else if (eval || callback_present)
+	ਨਹੀਂਤਾਂ ਜੇ (eval || callback_present)
 	{
 	    // When evaluating an expression or sending an expression with a
 	    // callback, always assign a generated ID
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "id", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_ਆਖਰੀ_ਸੁਨੇਹਾ_id;
+	    ਜੇ (di == ਨਿਰਾ)
+		dict_ਜੋੜੋ_ਸੰਖਿਆ(d, "id", id);
+	    ਨਹੀਂਤਾਂ
+		di->di_tv.vval.v_ਸੰਖਿਆ = id;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // When sending an expression, if the message has an 'id' item,
 	    // then use it.
 	    id = 0;
-	    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		id = di->di_tv.vval.v_number;
+	    ਜੇ (di != ਨਿਰਾ && di->di_tv.v_type == VAR_ਸੰਖਿਆ)
+		id = di->di_tv.vval.v_ਸੰਖਿਆ;
 	}
-	if (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
-	    dict_add_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
-	text = json_encode_lsp_msg(&argvars[1]);
+	ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP && !dict_has_ਕੁੰਜੀ(d, "jsonrpc"))
+	    dict_ਜੋੜੋ_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
+	ਪਾਠ = json_encode_lsp_ਸੁਨੇਹਾ(&argvars[1]);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	id = ++channel->ch_last_msg_id;
-	text = json_encode_nr_expr(id, &argvars[1],
-			      (ch_mode == CH_MODE_JS ? JSON_JS : 0) | JSON_NL);
+	id = ++channel->ch_ਆਖਰੀ_ਸੁਨੇਹਾ_id;
+	ਪਾਠ = json_encode_nr_ਵਿਅੰਜਕ(id, &argvars[1],
+			      (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_JS ? JSON_JS : 0) | JSON_NL);
     }
-    if (text == NULL)
-	return;
+    ਜੇ (ਪਾਠ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    channel = send_common(argvars, text, (int)STRLEN(text), id, eval, &opt,
+    channel = send_common(argvars, ਪਾਠ, (ਪੂਰਨ)STRLEN(ਪਾਠ), id, eval, &opt,
 			    eval ? "ch_evalexpr" : "ch_sendexpr", &part_read);
-    vim_free(text);
-    if (channel != NULL && eval)
+    vim_free(ਪਾਠ);
+    ਜੇ (channel != ਨਿਰਾ && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ਜੇ (opt.jo_ਸੈੱਟ & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	ਨਹੀਂਤਾਂ
 	    timeout = channel_get_timeout(channel, part_read);
-	if (channel_read_json_block(channel, part_read, timeout, id, &listtv)
+	ਜੇ (channel_read_json_ਖੰਡ(channel, part_read, timeout, id, &listtv)
 									== OK)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP || ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP)
 	    {
 		*rettv = *listtv;
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_ਸੰਖਿਆ;
 		free_tv(listtv);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		list_T *list = listtv->vval.v_list;
 
 		// Move the item from the list and then change the type to
 		// avoid the value being freed.
-		*rettv = list->lv_u.mat.lv_last->li_tv;
-		list->lv_u.mat.lv_last->li_tv.v_type = VAR_NUMBER;
+		*rettv = list->lv_u.mat.lv_ਆਖਰੀ->li_tv;
+		list->lv_u.mat.lv_ਆਖਰੀ->li_tv.v_type = VAR_ਸੰਖਿਆ;
 		free_tv(listtv);
 	    }
 	}
     }
-    free_job_options(&opt);
-    if (ch_mode == CH_MODE_DAP && !eval)
+    free_ਕੰਮ_options(&opt);
+    ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_DAP && !eval)
     {
 	// A DAP message always has a sequence number.
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "seq", id);
+	ਜੇ (rettv->vval.v_dict != ਨਿਰਾ)
+	    dict_ਜੋੜੋ_ਸੰਖਿਆ(rettv->vval.v_dict, "seq", id);
     }
-    else if (ch_mode == CH_MODE_LSP && !eval && callback_present)
+    ਨਹੀਂਤਾਂ ਜੇ (ch_ਬਹੁਲਕ == CH_ਬਹੁਲਕ_LSP && !eval && callback_present)
     {
 	// if ch_sendexpr() is used to send a LSP message and a callback
 	// function is specified, then return the generated identifier for the
 	// message.  The user can use this to cancel the request (if needed).
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "id", id);
+	ਜੇ (rettv->vval.v_dict != ਨਿਰਾ)
+	    dict_ਜੋੜੋ_ਸੰਖਿਆ(rettv->vval.v_dict, "id", id);
     }
 }
 
 /*
  * common for "ch_evalraw()" and "ch_sendraw()"
  */
-    static void
-ch_raw_common(typval_T *argvars, typval_T *rettv, int eval)
+    ਸਥਿਰ ਖਾਲੀ
+ch_raw_common(typval_T *argvars, typval_T *rettv, ਪੂਰਨ eval)
 {
     char_u	buf[NUMBUFLEN];
-    char_u	*text;
-    int		len;
+    char_u	*ਪਾਠ;
+    ਪੂਰਨ		len;
     channel_T	*channel;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
+    ਪੂਰਨ		timeout;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_string_or_blob_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ਵਾਪਸ;
 
-    if (argvars[1].v_type == VAR_BLOB)
+    ਜੇ (argvars[1].v_type == VAR_BLOB)
     {
-	text = argvars[1].vval.v_blob->bv_ga.ga_data;
+	ਪਾਠ = argvars[1].vval.v_blob->bv_ga.ga_ਅੰਕੜੇ;
 	len = argvars[1].vval.v_blob->bv_ga.ga_len;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	text = tv_get_string_buf(&argvars[1], buf);
-	len = (int)STRLEN(text);
+	ਪਾਠ = tv_get_string_buf(&argvars[1], buf);
+	len = (ਪੂਰਨ)STRLEN(ਪਾਠ);
     }
-    channel = send_common(argvars, text, len, 0, eval, &opt,
+    channel = send_common(argvars, ਪਾਠ, len, 0, eval, &opt,
 			      eval ? "ch_evalraw" : "ch_sendraw", &part_read);
-    if (channel != NULL && eval)
+    ਜੇ (channel != ਨਿਰਾ && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ਜੇ (opt.jo_ਸੈੱਟ & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	ਨਹੀਂਤਾਂ
 	    timeout = channel_get_timeout(channel, part_read);
-	rettv->vval.v_string = channel_read_block(channel, part_read,
-							timeout, TRUE, NULL);
+	rettv->vval.v_string = channel_read_ਖੰਡ(channel, part_read,
+							timeout, TRUE, ਨਿਰਾ);
     }
-    free_job_options(&opt);
+    free_ਕੰਮ_options(&opt);
 }
 
-#define KEEP_OPEN_TIME 20  // msec
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ KEEP_OPEN_ਸਮਾਂ 20  // msec
 
-#if defined(UNIX) && !defined(HAVE_SELECT)
+#ਜੇ defined(UNIX) && !defined(HAVE_SELECT)
 /*
  * Add open channels to the poll struct.
  * Return the adjusted struct index.
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_setup(int nfd_in, void *fds_in, int *towait)
+    ਪੂਰਨ
+channel_poll_ਤਿਆਰੀ(ਪੂਰਨ nfd_ਵਿੱਚ, ਖਾਲੀ *fds_ਵਿੱਚ, ਪੂਰਨ *towait)
 {
-    int		nfd = nfd_in;
+    ਪੂਰਨ		nfd = nfd_ਵਿੱਚ;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    ਬਣਤਰ	pollfd *fds = fds_ਵਿੱਚ;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
 	    chanpart_T	*ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_fd != INVALID_FD)
+	    ਜੇ (ch_part->ch_fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ਜੇ (channel->ch_keep_open)
 		{
 		    // For unknown reason poll() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the fds add
 		    // a short timeout and check, like polling.
-		    if (*towait < 0 || *towait > KEEP_OPEN_TIME)
-			*towait = KEEP_OPEN_TIME;
+		    ਜੇ (*towait < 0 || *towait > KEEP_OPEN_ਸਮਾਂ)
+			*towait = KEEP_OPEN_ਸਮਾਂ;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    ch_part->ch_poll_idx = nfd;
 		    fds[nfd].fd = ch_part->ch_fd;
@@ -5474,41 +5474,41 @@ channel_poll_setup(int nfd_in, void *fds_in, int *towait)
 		    nfd++;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		channel->ch_part[part].ch_poll_idx = -1;
 	}
     }
 
     nfd = channel_fill_poll_write(nfd, fds);
 
-    return nfd;
+    ਵਾਪਸ nfd;
 }
 
 /*
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_check(int ret_in, void *fds_in)
+    ਪੂਰਨ
+channel_poll_check(ਪੂਰਨ ret_ਵਿੱਚ, ਖਾਲੀ *fds_ਵਿੱਚ)
 {
-    int		ret = ret_in;
+    ਪੂਰਨ		ret = ret_ਵਿੱਚ;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    ਬਣਤਰ	pollfd *fds = fds_ਵਿੱਚ;
     ch_part_T	part;
-    int		idx;
-    chanpart_T	*in_part;
+    ਪੂਰਨ		idx;
+    chanpart_T	*ਵਿੱਚ_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
 	    idx = channel->ch_part[part].ch_poll_idx;
 
-	    if (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
+	    ਜੇ (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
 	    {
 		channel_read(channel, part, "channel_poll_check");
 		--ret;
 	    }
-	    else if (channel->ch_part[part].ch_fd != INVALID_FD
+	    ਨਹੀਂਤਾਂ ਜੇ (channel->ch_part[part].ch_fd != INVALID_FD
 						      && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
@@ -5516,70 +5516,70 @@ channel_poll_check(int ret_in, void *fds_in)
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	idx = in_part->ch_poll_idx;
-	if (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
+	ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
+	idx = ਵਿੱਚ_part->ch_poll_idx;
+	ਜੇ (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
 	{
-	    channel_write_input(channel);
+	    channel_write_ਨਿਵੇਸ਼(channel);
 	    --ret;
 	}
     }
 
-    return ret;
+    ਵਾਪਸ ret;
 }
-#endif // UNIX && !HAVE_SELECT
+#ਜੇ_ਅੰਤ // UNIX && !HAVE_SELECT
 
-#if !defined(MSWIN) && defined(HAVE_SELECT)
+#ਜੇ !defined(MSWIN) && defined(HAVE_SELECT)
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_setup(
-	int maxfd_in,
-	void *rfds_in,
-	void *wfds_in,
-	struct timeval *tv,
-	struct timeval **tvp)
+    ਪੂਰਨ
+channel_select_ਤਿਆਰੀ(
+	ਪੂਰਨ maxfd_ਵਿੱਚ,
+	ਖਾਲੀ *rfds_ਵਿੱਚ,
+	ਖਾਲੀ *wfds_ਵਿੱਚ,
+	ਬਣਤਰ timeval *tv,
+	ਬਣਤਰ timeval **tvp)
 {
-    int		maxfd = maxfd_in;
+    ਪੂਰਨ		maxfd = maxfd_ਵਿੱਚ;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_ਵਿੱਚ;
+    fd_set	*wfds = wfds_ਵਿੱਚ;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (fd != INVALID_FD)
+	    ਜੇ (fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ਜੇ (channel->ch_keep_open)
 		{
 		    // For unknown reason select() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the rfds add
 		    // a short timeout and check, like polling.
-		    if (*tvp == NULL || tv->tv_sec > 0
-					|| tv->tv_usec > KEEP_OPEN_TIME * 1000)
+		    ਜੇ (*tvp == ਨਿਰਾ || tv->tv_sec > 0
+					|| tv->tv_usec > KEEP_OPEN_ਸਮਾਂ * 1000)
 		    {
 			*tvp = tv;
 			tv->tv_sec = 0;
-			tv->tv_usec = KEEP_OPEN_TIME * 1000;
+			tv->tv_usec = KEEP_OPEN_ਸਮਾਂ * 1000;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 # ifdef FD_SETSIZE
 		    // An fd that does not fit in the fd_set cannot be watched
 		    // with select(); skip it rather than overflow the set.
-		    if ((int)fd >= FD_SETSIZE)
-			continue;
+		    ਜੇ ((ਪੂਰਨ)fd >= FD_SETSIZE)
+			ਜਾਰੀ;
 # endif
-		    FD_SET((int)fd, rfds);
-		    if (maxfd < (int)fd)
-			maxfd = (int)fd;
+		    FD_SET((ਪੂਰਨ)fd, rfds);
+		    ਜੇ (maxfd < (ਪੂਰਨ)fd)
+			maxfd = (ਪੂਰਨ)fd;
 		}
 	    }
 	}
@@ -5587,31 +5587,31 @@ channel_select_setup(
 
     maxfd = channel_fill_wfds(maxfd, wfds);
 
-    return maxfd;
+    ਵਾਪਸ maxfd;
 }
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
+    ਪੂਰਨ
+channel_select_check(ਪੂਰਨ ret_ਵਿੱਚ, ਖਾਲੀ *rfds_ਵਿੱਚ, ਖਾਲੀ *wfds_ਵਿੱਚ)
 {
-    int		ret = ret_in;
+    ਪੂਰਨ		ret = ret_ਵਿੱਚ;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_ਵਿੱਚ;
+    fd_set	*wfds = wfds_ਵਿੱਚ;
     ch_part_T	part;
-    chanpart_T	*in_part;
+    chanpart_T	*ਵਿੱਚ_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	ਲਈ (part = PART_SOCK; part < PART_ਵਿੱਚ; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (ret > 0 && fd != INVALID_FD
+	    ਜੇ (ret > 0 && fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)fd < FD_SETSIZE
+		    && (ਪੂਰਨ)fd < FD_SETSIZE
 # endif
 		    && FD_ISSET(fd, rfds))
 	    {
@@ -5619,23 +5619,23 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 		FD_CLR(fd, rfds);
 		--ret;
 	    }
-	    else if (fd != INVALID_FD && channel->ch_keep_open)
+	    ਨਹੀਂਤਾਂ ਜੇ (fd != INVALID_FD && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
 		channel_read(channel, part, "channel_select_check_keep_open");
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	if (ret > 0 && in_part->ch_fd != INVALID_FD
+	ਵਿੱਚ_part = &channel->ch_part[PART_ਵਿੱਚ];
+	ਜੇ (ret > 0 && ਵਿੱਚ_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)in_part->ch_fd < FD_SETSIZE
+		    && (ਪੂਰਨ)ਵਿੱਚ_part->ch_fd < FD_SETSIZE
 # endif
-					    && FD_ISSET(in_part->ch_fd, wfds))
+					    && FD_ISSET(ਵਿੱਚ_part->ch_fd, wfds))
 	{
 	    // Clear the flag first, ch_fd may change in channel_write_input().
-	    FD_CLR(in_part->ch_fd, wfds);
-	    channel_write_input(channel);
+	    FD_CLR(ਵਿੱਚ_part->ch_fd, wfds);
+	    channel_write_ਨਿਵੇਸ਼(channel);
 	    --ret;
 	}
 
@@ -5643,79 +5643,79 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ਜੇ (channel->ch_ਕੰਮ != ਨਿਰਾ)
 	{
-	    job_T *job = channel->ch_job;
+	    ਕੰਮ_T *ਕੰਮ = channel->ch_ਕੰਮ;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ਜੇ (ਕੰਮ->jv_tty_ਬਾਹਰਲਾ != ਨਿਰਾ && ਕੰਮ->jv_ਸਥਿਤੀ == ਕੰਮ_ਮੁਕੰਮਲ)
+		ਲਈ (part = PART_SOCK; part < PART_ਗਿਣਤੀ; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 
-    return ret;
+    ਵਾਪਸ ret;
 }
-#endif // !MSWIN && HAVE_SELECT
+#ਜੇ_ਅੰਤ // !MSWIN && HAVE_SELECT
 
 /*
  * Wait up to "msec" for something to read on any channel and read it.
  * For channel_stdio_loop(), which has no terminal to wait for.
  */
-    static void
-channel_wait_any(long msec)
+    ਸਥਿਰ ਖਾਲੀ
+channel_wait_any(ਲੰਮਾ msec)
 {
-#ifdef MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MSWIN
     // A pipe cannot be waited for, channel_wait() polls it.
-    if (stdio_channel->CH_OUT_FD != INVALID_FD)
-	(void)channel_wait(stdio_channel, stdio_channel->CH_OUT_FD,
-						(int)(msec > 20 ? 20 : msec));
+    ਜੇ (stdio_channel->CH_ਬਾਹਰਲਾ_FD != INVALID_FD)
+	(ਖਾਲੀ)channel_wait(stdio_channel, stdio_channel->CH_ਬਾਹਰਲਾ_FD,
+						(ਪੂਰਨ)(msec > 20 ? 20 : msec));
     channel_handle_events(FALSE);
-#elif defined(HAVE_SELECT)
+#ਜਾਂਜੇ defined(HAVE_SELECT)
     fd_set		rfds;
     fd_set		wfds;
-    struct timeval	tv;
-    struct timeval	*tvp = &tv;
-    int			maxfd;
-    int			ret;
+    ਬਣਤਰ timeval	tv;
+    ਬਣਤਰ timeval	*tvp = &tv;
+    ਪੂਰਨ			maxfd;
+    ਪੂਰਨ			ret;
 
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
     tv.tv_sec = msec / 1000;
     tv.tv_usec = (msec % 1000) * 1000;
-    maxfd = channel_select_setup(-1, &rfds, &wfds, &tv, &tvp);
-    ret = select(maxfd + 1, &rfds, &wfds, NULL, tvp);
-    if (ret >= 0)
-	(void)channel_select_check(ret, &rfds, &wfds);
-#else
-    struct pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
-    int			nfd;
-    int			towait = (int)msec;
-    int			ret;
+    maxfd = channel_select_ਤਿਆਰੀ(-1, &rfds, &wfds, &tv, &tvp);
+    ret = select(maxfd + 1, &rfds, &wfds, ਨਿਰਾ, tvp);
+    ਜੇ (ret >= 0)
+	(ਖਾਲੀ)channel_select_check(ret, &rfds, &wfds);
+#ਨਹੀਂਤਾਂ
+    ਬਣਤਰ pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
+    ਪੂਰਨ			nfd;
+    ਪੂਰਨ			towait = (ਪੂਰਨ)msec;
+    ਪੂਰਨ			ret;
 
-    nfd = channel_poll_setup(0, fds, &towait);
+    nfd = channel_poll_ਤਿਆਰੀ(0, fds, &towait);
     ret = poll(fds, nfd, towait);
-    if (ret >= 0)
-	(void)channel_poll_check(ret, fds);
-#endif
+    ਜੇ (ret >= 0)
+	(ਖਾਲੀ)channel_poll_check(ret, fds);
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Wait for messages on the stdio channel and handle them, until the channel
  * is closed.  Takes the place of the main loop with --stdio-channel.
  */
-    void
-channel_stdio_loop(void)
+    ਖਾਲੀ
+channel_stdio_loop(ਖਾਲੀ)
 {
-    while (stdio_channel != NULL && channel_is_open(stdio_channel))
+    ਜਦੋਂ (stdio_channel != ਨਿਰਾ && channel_is_open(stdio_channel))
     {
-	long	msec = 1000;
-#ifdef FEAT_TIMERS
-	long	due_time = check_due_timer();
+	ਲੰਮਾ	msec = 1000;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TIMERS
+	ਲੰਮਾ	due_ਸਮਾਂ = check_due_timer();
 
-	if (due_time > 0 && due_time < msec)
-	    msec = due_time;
-#endif
+	ਜੇ (due_ਸਮਾਂ > 0 && due_ਸਮਾਂ < msec)
+	    msec = due_ਸਮਾਂ;
+#ਜੇ_ਅੰਤ
 	channel_wait_any(msec);
 	parse_queued_messages();
     }
@@ -5727,249 +5727,249 @@ channel_stdio_loop(void)
  * and during a blocking wait for ch_evalexpr().
  * Return TRUE when something was done.
  */
-    int
-channel_parse_messages(void)
+    ਪੂਰਨ
+channel_parse_messages(ਖਾਲੀ)
 {
-    channel_T	*channel = first_channel;
-    int		ret = FALSE;
-    int		r;
+    channel_T	*channel = ਪਹਿਲਾ_channel;
+    ਪੂਰਨ		ret = FALSE;
+    ਪੂਰਨ		r;
     ch_part_T	part = PART_SOCK;
-    static int	recursive = 0;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
-#endif
+    ਸਥਿਰ ਪੂਰਨ	recursive = 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    elapsed_T	ਸ਼ੁਰੂ_tv;
+#ਜੇ_ਅੰਤ
 
     // The code below may invoke callbacks, which might call us back.
     // In a recursive call channels will not be closed.
     ++recursive;
-    ++safe_to_invoke_callback;
+    ++ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
 
-#ifdef ELAPSED_FUNC
-    ELAPSED_INIT(start_tv);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
+    ELAPSED_INIT(ਸ਼ੁਰੂ_tv);
+#ਜੇ_ਅੰਤ
 
     // Only do this message when another message was given, otherwise we get
     // lots of them.
-    if ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
+    ਜੇ ((did_repeated_ਸੁਨੇਹਾ & REPEATED_ਸੁਨੇਹਾ_LOOKING) == 0)
     {
-	ch_log(NULL, "looking for messages on channels");
+	ch_log(ਨਿਰਾ, "looking for messages on channels");
 	// now we should also give the message for SafeState
-	did_repeated_msg = REPEATED_MSG_LOOKING;
+	did_repeated_ਸੁਨੇਹਾ = REPEATED_ਸੁਨੇਹਾ_LOOKING;
     }
-    while (channel != NULL)
+    ਜਦੋਂ (channel != ਨਿਰਾ)
     {
-	if (recursive == 1)
+	ਜੇ (recursive == 1)
 	{
-	    if (channel_can_close(channel))
+	    ਜੇ (channel_can_close(channel))
 	    {
-		channel->ch_to_be_closed = (1U << PART_COUNT);
+		channel->ch_ਮੰਜ਼ਿਲ_be_closed = (1U << PART_ਗਿਣਤੀ);
 		channel_close_now(channel);
 		// channel may have been freed, start over
-		channel = first_channel;
-		continue;
+		channel = ਪਹਿਲਾ_channel;
+		ਜਾਰੀ;
 	    }
-	    if (channel->ch_to_be_freed || channel->ch_killing)
+	    ਜੇ (channel->ch_ਮੰਜ਼ਿਲ_be_freed || channel->ch_killing)
 	    {
 		channel_free_contents(channel);
-		if (channel->ch_job != NULL)
-		    channel->ch_job->jv_channel = NULL;
+		ਜੇ (channel->ch_ਕੰਮ != ਨਿਰਾ)
+		    channel->ch_ਕੰਮ->jv_channel = ਨਿਰਾ;
 
 		// free the channel and then start over
 		channel_free_channel(channel);
-		channel = first_channel;
-		continue;
+		channel = ਪਹਿਲਾ_channel;
+		ਜਾਰੀ;
 	    }
-	    if (channel->ch_refcount == 0 && !channel_still_useful(channel))
+	    ਜੇ (channel->ch_refcount == 0 && !channel_still_useful(channel))
 	    {
 		// channel is no longer useful, free it
 		channel_free(channel);
-		channel = first_channel;
+		channel = ਪਹਿਲਾ_channel;
 		part = PART_SOCK;
-		continue;
+		ਜਾਰੀ;
 	    }
 	}
 
-#ifdef FEAT_TERMINAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
 	// For a terminal job with a separate stderr pipe, defer processing
 	// PART_OUT until PART_ERR is drained.  Both are filled by
 	// channel_select_check() in the same select() pass, so when both
 	// have readahead the child's write order (stderr before stdout) is
 	// preserved by handling PART_ERR first.
-	if (part == PART_OUT
-		&& channel->ch_job != NULL
-		&& channel->ch_job->jv_tty_out != NULL
+	ਜੇ (part == PART_ਬਾਹਰਲਾ
+		&& channel->ch_ਕੰਮ != ਨਿਰਾ
+		&& channel->ch_ਕੰਮ->jv_tty_ਬਾਹਰਲਾ != ਨਿਰਾ
 		&& channel_has_readahead(channel, PART_ERR))
 	{
 	    part = PART_ERR;
-	    continue;
+	    ਜਾਰੀ;
 	}
-#endif
-	if (channel->ch_part[part].ch_fd != INVALID_FD
+#ਜੇ_ਅੰਤ
+	ਜੇ (channel->ch_part[part].ch_fd != INVALID_FD
 				      || channel_has_readahead(channel, part))
 	{
 	    // Increase the refcount, in case the handler causes the channel
 	    // to be unreferenced or closed.
 	    ++channel->ch_refcount;
 	    r = may_invoke_callback(channel, part);
-	    if (r == OK)
+	    ਜੇ (r == OK)
 		ret = TRUE;
-	    if (channel_unref(channel) || (r == OK
-#ifdef ELAPSED_FUNC
+	    ਜੇ (channel_unref(channel) || (r == OK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ELAPSED_FUNC
 			// Limit the time we loop here to 100 msec, otherwise
 			// Vim becomes unresponsive when the callback takes
 			// more than a bit of time.
-			&& ELAPSED_FUNC(start_tv) < 100L
-#endif
+			&& ELAPSED_FUNC(ਸ਼ੁਰੂ_tv) < 100L
+#ਜੇ_ਅੰਤ
 			))
 	    {
 		// channel was freed or something was done, start over
-		channel = first_channel;
+		channel = ਪਹਿਲਾ_channel;
 		part = PART_SOCK;
-		continue;
+		ਜਾਰੀ;
 	    }
 	}
-	if (part < PART_ERR)
+	ਜੇ (part < PART_ERR)
 	    ++part;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_ਅਗਲਾ;
 	    part = PART_SOCK;
 	}
     }
 
-    if (channel_need_redraw)
+    ਜੇ (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
     }
 
-    --safe_to_invoke_callback;
+    --ਸੁਰੱਖਿਅਤ_ਮੰਜ਼ਿਲ_invoke_callback;
     --recursive;
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Return TRUE if any channel has readahead.  That means we should not block on
  * waiting for input.
  */
-    int
-channel_any_readahead(void)
+    ਪੂਰਨ
+channel_any_readahead(ਖਾਲੀ)
 {
-    channel_T	*channel = first_channel;
+    channel_T	*channel = ਪਹਿਲਾ_channel;
     ch_part_T	part = PART_SOCK;
 
-    while (channel != NULL)
+    ਜਦੋਂ (channel != ਨਿਰਾ)
     {
-	if (channel_has_readahead(channel, part))
-	    return TRUE;
-	if (part < PART_ERR)
+	ਜੇ (channel_has_readahead(channel, part))
+	    ਵਾਪਸ TRUE;
+	ਜੇ (part < PART_ERR)
 	    ++part;
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_ਅਗਲਾ;
 	    part = PART_SOCK;
 	}
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Mark references to lists used in channels.
  */
-    int
-set_ref_in_channel(int copyID)
+    ਪੂਰਨ
+ਸੈੱਟ_ref_ਵਿੱਚ_channel(ਪੂਰਨ copyID)
 {
-    int		abort = FALSE;
+    ਪੂਰਨ		abort = FALSE;
     channel_T	*channel;
     typval_T	tv;
 
-    for (channel = first_channel; !abort && channel != NULL;
-						   channel = channel->ch_next)
-	if (channel_still_useful(channel))
+    ਲਈ (channel = ਪਹਿਲਾ_channel; !abort && channel != ਨਿਰਾ;
+						   channel = channel->ch_ਅਗਲਾ)
+	ਜੇ (channel_still_useful(channel))
 	{
 	    tv.v_type = VAR_CHANNEL;
 	    tv.vval.v_channel = channel;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    abort = abort || ਸੈੱਟ_ref_ਵਿੱਚ_ਵਸਤੂ(&tv, copyID, ਨਿਰਾ, ਨਿਰਾ, ਨਿਰਾ);
 	}
-    return abort;
+    ਵਾਪਸ abort;
 }
 
 /*
  * Return the "part" to write to for "channel".
  */
-    static ch_part_T
+    ਸਥਿਰ ch_part_T
 channel_part_send(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_IN;
-    return PART_SOCK;
+    ਜੇ (channel->CH_SOCK_FD == INVALID_FD)
+	ਵਾਪਸ PART_ਵਿੱਚ;
+    ਵਾਪਸ PART_SOCK;
 }
 
 /*
  * Return the default "part" to read from for "channel".
  */
-    static ch_part_T
+    ਸਥਿਰ ch_part_T
 channel_part_read(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_OUT;
-    return PART_SOCK;
+    ਜੇ (channel->CH_SOCK_FD == INVALID_FD)
+	ਵਾਪਸ PART_ਬਾਹਰਲਾ;
+    ਵਾਪਸ PART_SOCK;
 }
 
 /*
  * Return the mode of "channel"/"part"
  * If "channel" is invalid returns CH_MODE_JSON.
  */
-    static ch_mode_T
-channel_get_mode(channel_T *channel, ch_part_T part)
+    ਸਥਿਰ ch_ਬਹੁਲਕ_T
+channel_get_ਬਹੁਲਕ(channel_T *channel, ch_part_T part)
 {
-    if (channel == NULL)
-	return CH_MODE_JSON;
-    return channel->ch_part[part].ch_mode;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ CH_ਬਹੁਲਕ_JSON;
+    ਵਾਪਸ channel->ch_part[part].ch_ਬਹੁਲਕ;
 }
 
 /*
  * Return the timeout of "channel"/"part"
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 channel_get_timeout(channel_T *channel, ch_part_T part)
 {
-    return channel->ch_part[part].ch_timeout;
+    ਵਾਪਸ channel->ch_part[part].ch_timeout;
 }
 
 /*
  * "ch_canread()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_canread(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    rettv->vval.v_number = 0;
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    rettv->vval.v_ਸੰਖਿਆ = 0;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL)
-	rettv->vval.v_number = channel_has_readahead(channel, PART_SOCK)
-			    || channel_has_readahead(channel, PART_OUT)
+    ਜੇ (channel != ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ = channel_has_readahead(channel, PART_SOCK)
+			    || channel_has_readahead(channel, PART_ਬਾਹਰਲਾ)
 			    || channel_has_readahead(channel, PART_ERR);
 }
 
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_close(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
+    ਜੇ (channel != ਨਿਰਾ)
     {
 	channel_close(channel, FALSE);
 	channel_clear(channel);
@@ -5979,118 +5979,118 @@ f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close_in(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_close_ਵਿੱਚ(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
-	channel_close_in(channel);
+    ਜੇ (channel != ਨਿਰਾ)
+	channel_close_ਵਿੱਚ(channel);
 }
 
 /*
  * "ch_getbufnr()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ਸੰਖਿਆ = -1;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     char_u	*what = tv_get_string(&argvars[1]);
-    int		part;
-    if (STRCMP(what, "err") == 0)
+    ਪੂਰਨ		part;
+    ਜੇ (STRCMP(what, "err") == 0)
 	part = PART_ERR;
-    else if (STRCMP(what, "out") == 0)
-	part = PART_OUT;
-    else if (STRCMP(what, "in") == 0)
-	part = PART_IN;
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "out") == 0)
+	part = PART_ਬਾਹਰਲਾ;
+    ਨਹੀਂਤਾਂ ਜੇ (STRCMP(what, "in") == 0)
+	part = PART_ਵਿੱਚ;
+    ਨਹੀਂਤਾਂ
 	part = PART_SOCK;
-    if (channel->ch_part[part].ch_bufref.br_buf != NULL)
-	rettv->vval.v_number =
+    ਜੇ (channel->ch_part[part].ch_bufref.br_buf != ਨਿਰਾ)
+	rettv->vval.v_ਸੰਖਿਆ =
 	    channel->ch_part[part].ch_bufref.br_buf->b_fnum;
 }
 
 /*
  * "ch_getjob()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_getjob(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = channel->ch_job;
-    if (channel->ch_job != NULL)
-	++channel->ch_job->jv_refcount;
+    rettv->v_type = VAR_ਕੰਮ;
+    rettv->vval.v_ਕੰਮ = channel->ch_ਕੰਮ;
+    ਜੇ (channel->ch_ਕੰਮ != ਨਿਰਾ)
+	++channel->ch_ਕੰਮ->jv_refcount;
 }
 
 /*
  * "ch_info()" function
  */
-    void
-f_ch_info(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_info(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL && rettv_dict_alloc(rettv) == OK)
+    ਜੇ (channel != ਨਿਰਾ && rettv_dict_alloc(rettv) == OK)
 	channel_info(channel, rettv->vval.v_dict);
 }
 
 /*
  * "ch_listen()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_listen(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
     rettv->vval.v_channel = channel_listen_func(argvars);
 }
 
 /*
  * "ch_open()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_open(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
     rettv->vval.v_channel = channel_open_func(argvars);
 }
 
 /*
  * "ch_read()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_read(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, FALSE, FALSE);
@@ -6099,7 +6099,7 @@ f_ch_read(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readblob()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_readblob(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, TRUE);
@@ -6108,7 +6108,7 @@ f_ch_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readraw()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_readraw(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, FALSE);
@@ -6117,25 +6117,25 @@ f_ch_readraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_evalexpr()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_evalexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, TRUE);
+    ch_ਵਿਅੰਜਕ_common(argvars, rettv, TRUE);
 }
 
 /*
  * "ch_sendexpr()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_sendexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, FALSE);
+    ch_ਵਿਅੰਜਕ_common(argvars, rettv, FALSE);
 }
 
 /*
  * "ch_evalraw()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, TRUE);
@@ -6144,7 +6144,7 @@ f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_sendraw()" function
  */
-    void
+    ਖਾਲੀ
 f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, FALSE);
@@ -6153,60 +6153,60 @@ f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_setoptions()" function
  */
-    void
-f_ch_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_ch_setoptions(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     channel_T	*channel;
     jobopt_T	opt;
 
-    if (check_restricted() || check_secure())
-	return;
+    ਜੇ (check_restricted() || check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt,
-			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_MODE_ALL, 0) == OK)
-	channel_set_options(channel, &opt);
-    free_job_options(&opt);
+    ਜੇ (channel == ਨਿਰਾ)
+	ਵਾਪਸ;
+    clear_ਕੰਮ_options(&opt);
+    ਜੇ (get_ਕੰਮ_options(&argvars[1], &opt,
+			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_ਬਹੁਲਕ_ALL, 0) == OK)
+	channel_ਸੈੱਟ_options(channel, &opt);
+    free_ਕੰਮ_options(&opt);
 }
 
 /*
  * "ch_status()" function
  */
-    void
-f_ch_status(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_ch_ਸਥਿਤੀ(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
     jobopt_T	opt;
-    int		part = -1;
+    ਪੂਰਨ		part = -1;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script()
+	    && (check_for_chan_or_ਕੰਮ_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ਵਾਪਸ;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	clear_job_options(&opt);
-	if (get_job_options(&argvars[1], &opt, JO_PART, 0) == OK
-						     && (opt.jo_set & JO_PART))
+	clear_ਕੰਮ_options(&opt);
+	ਜੇ (get_ਕੰਮ_options(&argvars[1], &opt, JO_PART, 0) == OK
+						     && (opt.jo_ਸੈੱਟ & JO_PART))
 	    part = opt.jo_part;
     }
 
-    rettv->vval.v_string = vim_strsave((char_u *)channel_status(channel, part));
+    rettv->vval.v_string = vim_strsave((char_u *)channel_ਸਥਿਤੀ(channel, part));
 }
 
 /*
@@ -6214,30 +6214,30 @@ f_ch_status(typval_T *argvars, typval_T *rettv)
  * "buf" must be at least NUMBUFLEN long.
  */
     char_u *
-channel_to_string_buf(typval_T *varp, char_u *buf)
+channel_ਮੰਜ਼ਿਲ_string_buf(typval_T *varp, char_u *buf)
 {
     channel_T *channel = varp->vval.v_channel;
-    char      *status = channel_status(channel, -1);
+    ਅੱਖਰ      *ਸਥਿਤੀ = channel_ਸਥਿਤੀ(channel, -1);
 
-    if (channel == NULL)
-	vim_snprintf((char *)buf, NUMBUFLEN, "channel %s", status);
-    else
-	vim_snprintf((char *)buf, NUMBUFLEN,
-				      "channel %d %s", channel->ch_id, status);
-    return buf;
+    ਜੇ (channel == ਨਿਰਾ)
+	vim_snprintf((ਅੱਖਰ *)buf, NUMBUFLEN, "channel %s", ਸਥਿਤੀ);
+    ਨਹੀਂਤਾਂ
+	vim_snprintf((ਅੱਖਰ *)buf, NUMBUFLEN,
+				      "channel %d %s", channel->ch_id, ਸਥਿਤੀ);
+    ਵਾਪਸ buf;
 }
 
 /*
  * Return the channel with the given ID. Returns NULL if not found.
  */
     channel_T *
-channel_find(int ch_id)
+channel_ਲੱਭੋ(ਪੂਰਨ ch_id)
 {
     channel_T *ch;
     FOR_ALL_CHANNELS(ch)
-	if (ch->ch_id == ch_id)
-	    return ch;
-    return NULL;
+	ਜੇ (ch->ch_id == ch_id)
+	    ਵਾਪਸ ch;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#ਜੇ_ਅੰਤ // FEAT_JOB_CHANNEL

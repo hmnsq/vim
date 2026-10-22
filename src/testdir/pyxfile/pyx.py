@@ -1,2 +1,2 @@
-import sys
-print(sys.version)
+ਆਯਾਤ sys
+ਛਾਪੋ(sys.ਸੰਸਕਰਣ_2)

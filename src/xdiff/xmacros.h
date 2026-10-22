@@ -20,46 +20,46 @@
  *
  */
 
-#if !defined(XMACROS_H)
-#define XMACROS_H
+#ਜੇ !defined(XMACROS_H)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XMACROS_H
 
 
 // SIZE_MAX may not be defined on older platforms without <stdint.h>.
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t)(-1))
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ ਮਾਪ_MAX
+# define ਮਾਪ_MAX ((size_t)(-1))
+#ਜੇ_ਅੰਤ
 
-#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
-#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
-#define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
-#define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
-#define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
-#define XDL_MASKBITS(b)		((1UL << (b)) - 1)
-#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
-#define XDL_LE32_PUT(p, v) \
-do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
-#define XDL_LE32_GET(p, v) \
-do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
-	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
-		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ABS(v) ((v) >= 0 ? (v): -(v))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ISSPACE(c) (ਖਾਲੀ_ਥਾਂ_ਹੈ((ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ)(c)))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_MASKBITS(b)		((1UL << (b)) - 1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_HASHLONG(v,b)	(XDL_ADDBITS((ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ)(v), b) & XDL_MASKBITS(b))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_LE32_PUT(p, v) \
+ਕਰੋ { \
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ *__p = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ *) (p); \
+	*__p++ = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ) (v); \
+	*__p++ = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ) ((v) >> 8); \
+	*__p++ = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ) ((v) >> 16); \
+	*__p = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ) ((v) >> 24); \
+} ਜਦੋਂ (0)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_LE32_GET(p, v) \
+ਕਰੋ { \
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ ਅਚਲ *__p = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ ਅਚਲ *) (p); \
+	(v) = (ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ) __p[0] | ((ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ) __p[1]) << 8 | \
+		((ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ) __p[2]) << 16 | ((ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ) __p[3]) << 24; \
+} ਜਦੋਂ (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
-#define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
-		: NULL)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ALLOC_ARRAY(p, nr)				\
+	((p) = ਮਾਪ_MAX / ਆਕਾਰ(*(p)) >= (size_t)(nr)	\
+		? xdl_malloc((nr) * ਆਕਾਰ(*(p)))	\
+		: ਨਿਰਾ)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, ਆਕਾਰ(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -67,8 +67,8 @@ do { \
  * elements) as necessary. Frees p and returns -1 on failure, returns
  * 0 on success
  */
-#define XDL_ALLOC_GROW(p, nr, alloc)	\
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), ਆਕਾਰ(*(p))))))
 
-#endif /* #if !defined(XMACROS_H) */
+#ਜੇ_ਅੰਤ /* #if !defined(XMACROS_H) */

@@ -2,134 +2,134 @@
 
 # Used by Test_channel_dap_mode in test_channel.vim to test DAP functionality.
 
-import json
-import socket
-import threading
-import time
+ਆਯਾਤ json
+ਆਯਾਤ socket
+ਆਯਾਤ threading
+ਆਯਾਤ ਸਮਾਂ
 
-try:
-    import socketserver
-except ImportError:
-    import SocketServer as socketserver
+ਕੋਸ਼ਿਸ਼:
+    ਆਯਾਤ socketserver
+ਅਪਵਾਦ ImportError:
+    ਆਯਾਤ SocketServer ਇਵ socketserver
 
-def make_dap_message(obj):
+ਪਰਿਭਾਸ਼ਾ make_dap_ਸੁਨੇਹਾ(obj):
     payload = json.dumps(obj).encode("utf-8")
-    header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    ਸਿਰਲੇਖ = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
+    ਵਾਪਸ ਸਿਰਲੇਖ + payload
 
 
-def parse_messages(buffer):
+ਪਰਿਭਾਸ਼ਾ parse_messages(ਬਫਰ):
     messages = []
 
-    while True:
-        hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+    ਜਦੋਂ ਸੱਚ:
+        hdr_ਸਿਰਾ = ਬਫਰ.ਲੱਭੋ(b"\r\n\r\n")
+        ਜੇ hdr_ਸਿਰਾ == -1:
+            ਰੋਕੋ
 
-        header = buffer[:hdr_end].decode("ascii", errors="ignore")
-        content_length = None
+        ਸਿਰਲੇਖ = ਬਫਰ[:hdr_ਸਿਰਾ].decode("ascii", errors="ignore")
+        content_ਲੰਮਾਈ = ਕੁਝ_ਨਹੀਂ
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        ਲਈ ਸਤਰ ਵਿੱਚ ਸਿਰਲੇਖ.ਵੰਡੋ("\r\n"):
+            ਜੇ ਸਤਰ.ਹੇਠਲਾ().startswith("content-length:"):
+                content_ਲੰਮਾਈ = ਪੂਰਨ(ਸਤਰ.ਵੰਡੋ(":")[1].strip())
 
-        if content_length is None:
-            break
+        ਜੇ content_ਲੰਮਾਈ ਹੈ ਕੁਝ_ਨਹੀਂ:
+            ਰੋਕੋ
 
-        total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        ਕੁੱਲ_len = hdr_ਸਿਰਾ + 4 + content_ਲੰਮਾਈ
+        ਜੇ ਲੰਬਾਈ(ਬਫਰ) < ਕੁੱਲ_len:
+            ਰੋਕੋ  # partial
 
-        body = buffer[hdr_end + 4:total_len]
+        body = ਬਫਰ[hdr_ਸਿਰਾ + 4:ਕੁੱਲ_len]
         messages.append(json.loads(body.decode("utf-8")))
-        buffer = buffer[total_len:]
+        ਬਫਰ = ਬਫਰ[ਕੁੱਲ_len:]
 
-    return messages, buffer
+    ਵਾਪਸ messages, ਬਫਰ
 
 
-class DAPHandler(socketserver.BaseRequestHandler):
+ਵਰਗ DAPHandler(socketserver.ਅਧਾਰ_Request_Handler):
 
-    def setup(self):
+    ਪਰਿਭਾਸ਼ਾ ਤਿਆਰੀ(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.seq = 1  # server sequence counter
 
-    def send(self, obj):
+    ਪਰਿਭਾਸ਼ਾ send(self, obj):
         obj["seq"] = self.seq
         self.seq += 1
-        self.request.sendall(make_dap_message(obj))
+        self.request.sendall(make_dap_ਸੁਨੇਹਾ(obj))
 
-    def send_response(self, request, body=None, success=True):
+    ਪਰਿਭਾਸ਼ਾ send_response(self, request, body=ਕੁਝ_ਨਹੀਂ, success=ਸੱਚ):
         self.send({
             "type": "response",
             "request_seq": request["seq"],
             "success": success,
             "command": request["command"],
-            "body": body or {}
+            "body": body ਜਾਂ {}
         })
 
-    def send_event(self, event, body=None):
+    ਪਰਿਭਾਸ਼ਾ send_event(self, event, body=ਕੁਝ_ਨਹੀਂ):
         self.send({
             "type": "event",
             "event": event,
-            "body": body or {}
+            "body": body ਜਾਂ {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    ਪਰਿਭਾਸ਼ਾ handle_request(self, ਸੁਨੇਹਾ):
+        cmd = ਸੁਨੇਹਾ.get("command")
 
-        if cmd == "initialize":
-            self.send_response(msg, {
-                "supportsConfigurationDoneRequest": True
+        ਜੇ cmd == "initialize":
+            self.send_response(ਸੁਨੇਹਾ, {
+                "supportsConfigurationDoneRequest": ਸੱਚ
             })
             self.send_event("initialized")
-        else:
-            self.send_response(msg)
+        ਨਹੀਂਤਾਂ:
+            self.send_response(ਸੁਨੇਹਾ)
 
-        return True
+        ਵਾਪਸ ਸੱਚ
 
-    def handle(self):
-        buffer = b""
+    ਪਰਿਭਾਸ਼ਾ handle(self):
+        ਬਫਰ = b""
 
-        while True:
-            data = self.request.recv(4096)
-            if not data:
-                break
+        ਜਦੋਂ ਸੱਚ:
+            ਅੰਕੜੇ = self.request.recv(4096)
+            ਜੇ ਨਹੀਂ ਅੰਕੜੇ:
+                ਰੋਕੋ
 
-            buffer += data
-            messages, buffer = parse_messages(buffer)
+            ਬਫਰ += ਅੰਕੜੇ
+            messages, ਬਫਰ = parse_messages(ਬਫਰ)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            ਲਈ ਸੁਨੇਹਾ ਵਿੱਚ messages:
+                ਜੇ ਸੁਨੇਹਾ.get("type") == "request":
+                    ਜੇ ਨਹੀਂ self.handle_request(ਸੁਨੇਹਾ):
+                        ਵਾਪਸ
 
 
-class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
+ਵਰਗ ThreadedDAPServer(socketserver.Threading_Mix_ਵਿੱਚ, socketserver.TCPServer):
+    allow_reuse_ਪਤਾ = ਸੱਚ
 
-def write_port_to_file(port, filename="Xportnr"):
-    with open(filename, "w") as f:
-        f.write(str(port))
+ਪਰਿਭਾਸ਼ਾ write_ਪੋਰਟ_ਮੰਜ਼ਿਲ_file(ਪੋਰਟ, filename="Xportnr"):
+    ਨਾਲ open(filename, "w") ਇਵ f:
+        f.ਲਿਖ(str(ਪੋਰਟ))
 
-def main():
+ਪਰਿਭਾਸ਼ਾ ਮੁੱਖ():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
 
     # Get the actual assigned port
-    ip, assigned_port = server.server_address
+    ip, assigned_ਪੋਰਟ = server.server_ਪਤਾ
 
     # Write port so client/test can read it
-    write_port_to_file(assigned_port)
+    write_ਪੋਰਟ_ਮੰਜ਼ਿਲ_file(assigned_ਪੋਰਟ)
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    thread = threading.ਧਾਗਾ(ਨਿਸ਼ਾਨਾ=server.serve_forever)
+    thread.daemon = ਸੱਚ
+    thread.ਸ਼ੁਰੂ()
 
-    try:
-        while thread.is_alive():
+    ਕੋਸ਼ਿਸ਼:
+        ਜਦੋਂ thread.is_alive():
             thread.join(1)
-    except KeyboardInterrupt:
+    ਅਪਵਾਦ Keyboard_ਰੁਕਾਵਟ:
         server.shutdown()
 
-if __name__ == "__main__":
-    main()
+ਜੇ __name__ == "__main__":
+    ਮੁੱਖ()
 

@@ -13,511 +13,511 @@
  * lower level.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 /*
  * Get the 'listchars' "extends" characters to use for "wp", or NUL if it
  * shouldn't be used.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 get_lcs_ext(win_T *wp)
 {
-    if (wp->w_p_wrap)
+    ਜੇ (wp->w_p_wrap)
 	// Line never continues beyond the right of the screen with 'wrap'.
-	return NUL;
-    if (wp->w_p_wrap_flags & P_INSECURE)
+	ਵਾਪਸ NUL;
+    ਜੇ (wp->w_p_wrap_flags & P_INSECURE)
 	// If 'nowrap' was set from a modeline, forcibly use '>'.
-	return '>';
-    return wp->w_p_list ? wp->w_lcs_chars.ext : NUL;
+	ਵਾਪਸ '>';
+    ਵਾਪਸ wp->w_p_list ? wp->w_lcs_chars.ext : NUL;
 }
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 /*
  * Advance **color_cols and return TRUE when there are columns to draw.
  */
-    static int
-advance_color_col(int vcol, int **color_cols)
+    ਸਥਿਰ ਪੂਰਨ
+advance_color_ਖਾਨਾ(ਪੂਰਨ vcol, ਪੂਰਨ **color_ਖਾਨੇ_ਗਿਣਤੀ)
 {
-    while (**color_cols >= 0 && vcol > **color_cols)
-	++*color_cols;
-    return (**color_cols >= 0);
+    ਜਦੋਂ (**color_ਖਾਨੇ_ਗਿਣਤੀ >= 0 && vcol > **color_ਖਾਨੇ_ਗਿਣਤੀ)
+	++*color_ਖਾਨੇ_ਗਿਣਤੀ;
+    ਵਾਪਸ (**color_ਖਾਨੇ_ਗਿਣਤੀ >= 0);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 /*
  * Used when 'cursorlineopt' contains "screenline": compute the margins between
  * which the highlighting is used.
  */
-    static void
-margin_columns_win(win_T *wp, int *left_col, int *right_col)
+    ਸਥਿਰ ਖਾਲੀ
+margin_columns_win(win_T *wp, ਪੂਰਨ *ਖੱਬਾ_ਖਾਨਾ, ਪੂਰਨ *ਸੱਜਾ_ਖਾਨਾ)
 {
     // cache previous calculations depending on w_virtcol
-    static int saved_w_virtcol;
-    static win_T *prev_wp;
-    static int prev_width1;
-    static int prev_width2;
-    static int prev_left_col;
-    static int prev_right_col;
+    ਸਥਿਰ ਪੂਰਨ saved_w_virtcol;
+    ਸਥਿਰ win_T *prev_wp;
+    ਸਥਿਰ ਪੂਰਨ prev_width1;
+    ਸਥਿਰ ਪੂਰਨ prev_width2;
+    ਸਥਿਰ ਪੂਰਨ prev_ਖੱਬਾ_ਖਾਨਾ;
+    ਸਥਿਰ ਪੂਰਨ prev_ਸੱਜਾ_ਖਾਨਾ;
 
-    int cur_col_off = win_col_off(wp);
-    int	width1;
-    int	width2;
+    ਪੂਰਨ cur_ਖਾਨਾ_off = win_ਖਾਨਾ_off(wp);
+    ਪੂਰਨ	width1;
+    ਪੂਰਨ	width2;
 
-    width1 = wp->w_width - cur_col_off;
-    width2 = width1 + win_col_off2(wp);
+    width1 = wp->w_ਚੌੜਾਈ - cur_ਖਾਨਾ_off;
+    width2 = width1 + win_ਖਾਨਾ_off2(wp);
 
-    if (saved_w_virtcol == wp->w_virtcol && prev_wp == wp
+    ਜੇ (saved_w_virtcol == wp->w_virtcol && prev_wp == wp
 	    && prev_width1 == width1 && prev_width2 == width2)
     {
-	*right_col = prev_right_col;
-	*left_col = prev_left_col;
-	return;
+	*ਸੱਜਾ_ਖਾਨਾ = prev_ਸੱਜਾ_ਖਾਨਾ;
+	*ਖੱਬਾ_ਖਾਨਾ = prev_ਖੱਬਾ_ਖਾਨਾ;
+	ਵਾਪਸ;
     }
 
-    *left_col = 0;
-    *right_col = width1;
+    *ਖੱਬਾ_ਖਾਨਾ = 0;
+    *ਸੱਜਾ_ਖਾਨਾ = width1;
 
-    if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*right_col = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
-    if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*left_col = (wp->w_virtcol - width1) / width2 * width2 + width1;
+    ਜੇ (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
+	*ਸੱਜਾ_ਖਾਨਾ = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
+    ਜੇ (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
+	*ਖੱਬਾ_ਖਾਨਾ = (wp->w_virtcol - width1) / width2 * width2 + width1;
 
     // cache values
-    prev_left_col = *left_col;
-    prev_right_col = *right_col;
+    prev_ਖੱਬਾ_ਖਾਨਾ = *ਖੱਬਾ_ਖਾਨਾ;
+    prev_ਸੱਜਾ_ਖਾਨਾ = *ਸੱਜਾ_ਖਾਨਾ;
     prev_wp = wp;
     prev_width1 = width1;
     prev_width2 = width2;
     saved_w_virtcol = wp->w_virtcol;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_SIGNS) || defined(FEAT_QUICKFIX) \
+#ਜੇ defined(FEAT_SIGNS) || defined(FEAT_QUICKFIX) \
 	|| defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
 // using an attribute for the whole line
-# define LINE_ATTR
-#endif
+# define ਸਤਰ_ATTR
+#ਜੇ_ਅੰਤ
 
 // structure with variables passed between win_line() and other functions
-typedef struct {
-    int		draw_state;	// what to draw next
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ {
+    ਪੂਰਨ		draw_state;	// what to draw next
 
     linenr_T	lnum;		// line number to be drawn
 
-    int		startrow;	// first row in the window to be drawn
-    int		row;		// row in the window, excl w_winrow
-    int		screen_row;	// row on the screen, incl w_winrow
+    ਪੂਰਨ		startrow;	// first row in the window to be drawn
+    ਪੂਰਨ		ਪੰਕਤੀ;		// row in the window, excl w_winrow
+    ਪੂਰਨ		screen_ਪੰਕਤੀ;	// row on the screen, incl w_winrow
 
-    long	vcol;		// virtual column, before wrapping
-    int		col;		// visual column on screen, after wrapping
-#ifdef FEAT_CONCEAL
-    int		boguscols;	// nonexistent columns added to "col" to force
+    ਲੰਮਾ	vcol;		// virtual column, before wrapping
+    ਪੂਰਨ		ਖਾਨਾ;		// visual column on screen, after wrapping
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+    ਪੂਰਨ		boguscols;	// nonexistent columns added to "col" to force
 				// wrapping
-    int		vcol_off_co;	// offset for concealed characters
-#endif
-    int		vcol_off_tp;	// offset for virtual text
-#ifdef FEAT_SYN_HL
-    int		draw_color_col;	// highlight colorcolumn
-    int		*color_cols;	// pointer to according columns array
-#endif
-    int		eol_hl_off;	// 1 if highlighted char after EOL
+    ਪੂਰਨ		vcol_off_co;	// offset for concealed characters
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		vcol_off_tp;	// offset for virtual text
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਪੂਰਨ		draw_color_ਖਾਨਾ;	// highlight colorcolumn
+    ਪੂਰਨ		*color_ਖਾਨੇ_ਗਿਣਤੀ;	// pointer to according columns array
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		eol_hl_off;	// 1 if highlighted char after EOL
 
-    unsigned	off;		// offset in ScreenLines/ScreenAttrs
+    ਬਿਨਾਨਿਸ਼ਾਨੀ	off;		// offset in ScreenLines/ScreenAttrs
 
-    int		win_attr;	// background for the whole window, except
+    ਪੂਰਨ		win_attr;	// background for the whole window, except
 				// margins and "~" lines.
-#ifdef FEAT_SYN_HL
-    int		cul_attr;	// set when 'cursorline' active
-#endif
-#ifdef LINE_ATTR
-    int		line_attr;	// for the whole line, includes 'cursorline'
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਪੂਰਨ		cul_attr;	// set when 'cursorline' active
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸਤਰ_ATTR
+    ਪੂਰਨ		ਸਤਰ_attr;	// for the whole line, includes 'cursorline'
+#ਜੇ_ਅੰਤ
 
-    int		screen_line_flags;  // flags for screen_line()
+    ਪੂਰਨ		screen_ਸਤਰ_flags;  // flags for screen_line()
 
-    int		fromcol;	// start of inverting
-    int		tocol;		// end of inverting
+    ਪੂਰਨ		fromcol;	// start of inverting
+    ਪੂਰਨ		tocol;		// end of inverting
 
-#ifdef FEAT_LINEBREAK
-    long	vcol_sbr;	    // virtual column after showbreak
-    int		need_showbreak;	    // overlong line, skipping first x chars
-    int		dont_use_showbreak; // do not use 'showbreak'
-#endif
-#ifdef FEAT_PROP_POPUP
-    int		text_prop_above_count;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+    ਲੰਮਾ	vcol_sbr;	    // virtual column after showbreak
+    ਪੂਰਨ		need_showbreak;	    // overlong line, skipping first x chars
+    ਪੂਰਨ		dont_use_showbreak; // do not use 'showbreak'
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਪੂਰਨ		ਪਾਠ_prop_above_ਗਿਣਤੀ;
+#ਜੇ_ਅੰਤ
 
     // TRUE when 'cursorlineopt' has "screenline" and cursor is in this line
-    int		cul_screenline;
+    ਪੂਰਨ		cul_screenline;
 
-    int		char_attr;	// attributes for the next character
+    ਪੂਰਨ		char_attr;	// attributes for the next character
 
-    int		n_extra;	// number of extra bytes
+    ਪੂਰਨ		n_extra;	// number of extra bytes
     char_u	*p_extra;	// string of extra chars, plus NUL, only used
 				// when c_extra and c_final are NUL
     char_u	*p_extra_free;  // p_extra buffer that needs to be freed
-    int		extra_attr;	// attributes for p_extra, should be combined
+    ਪੂਰਨ		extra_attr;	// attributes for p_extra, should be combined
 				// with win_attr if needed
-    int		n_attr_skip;    // chars to skip before using extra_attr
-    int		c_extra;	// extra chars, all the same
-    int		c_final;	// final char, mandatory if set
-    int		extra_for_textprop; // n_extra set for textprop
-    int		start_extra_for_textprop; // extra_for_textprop was just set
+    ਪੂਰਨ		n_attr_skip;    // chars to skip before using extra_attr
+    ਪੂਰਨ		c_extra;	// extra chars, all the same
+    ਪੂਰਨ		c_final;	// final char, mandatory if set
+    ਪੂਰਨ		extra_for_textprop; // n_extra set for textprop
+    ਪੂਰਨ		ਸ਼ੁਰੂ_extra_for_textprop; // extra_for_textprop was just set
 
     // saved "extra" items for when draw_state becomes WL_LINE (again)
-    int		saved_n_extra;
+    ਪੂਰਨ		saved_n_extra;
     char_u	*saved_p_extra;
     char_u	*saved_p_extra_free;
-    int		saved_extra_attr;
-    int		saved_n_attr_skip;
-    int		saved_extra_for_textprop;
-    int		saved_c_extra;
-    int		saved_c_final;
-    int		saved_char_attr;
+    ਪੂਰਨ		saved_extra_attr;
+    ਪੂਰਨ		saved_n_attr_skip;
+    ਪੂਰਨ		saved_extra_for_textprop;
+    ਪੂਰਨ		saved_c_extra;
+    ਪੂਰਨ		saved_c_final;
+    ਪੂਰਨ		saved_char_attr;
 
     char_u	extra[NUMBUFLEN + MB_MAXBYTES];
 				// "%ld " and 'fdc' must fit in here, as well
 				// any text sign
 
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     hlf_T	diff_hlf;	// type of diff highlighting
-#endif
-    int		filler_lines;	// nr of filler lines to be drawn
-    int		filler_todo;	// nr of filler lines still to do + 1
-#ifdef FEAT_SIGNS
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		filler_ਸਤਰਾਂ;	// nr of filler lines to be drawn
+    ਪੂਰਨ		filler_todo;	// nr of filler lines still to do + 1
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
     sign_attrs_T sattr;
-#endif
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
      // do consider wrapping in linebreak mode only after encountering
      // a non whitespace char
-    int		need_lbr;
-#endif
+    ਪੂਰਨ		need_lbr;
+#ਜੇ_ਅੰਤ
 } winlinevars_T;
 
 // draw_state values for items that are drawn in sequence:
-#define WL_START	0		// nothing done yet, must be zero
-#define WL_CMDLINE	(WL_START + 1)	// cmdline window column
-#ifdef FEAT_FOLDING
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WL_ਸ਼ੁਰੂ	0		// nothing done yet, must be zero
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WL_CMDLINE	(WL_ਸ਼ੁਰੂ + 1)	// cmdline window column
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 # define WL_FOLD	(WL_CMDLINE + 1)	// 'foldcolumn'
-#else
+#ਨਹੀਂਤਾਂ
 # define WL_FOLD	WL_CMDLINE
-#endif
-#ifdef FEAT_SIGNS
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
 # define WL_SIGN	(WL_FOLD + 1)	// column for signs
-#else
+#ਨਹੀਂਤਾਂ
 # define WL_SIGN	WL_FOLD		// column for signs
-#endif
-#define WL_NR		(WL_SIGN + 1)	// line number
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਅੰਤ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WL_NR		(WL_SIGN + 1)	// line number
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 # define WL_BRI		(WL_NR + 1)	// 'breakindent'
-#else
+#ਨਹੀਂਤਾਂ
 # define WL_BRI		WL_NR
-#endif
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
 # define WL_SBR		(WL_BRI + 1)	// 'showbreak' or 'diff'
-#else
+#ਨਹੀਂਤਾਂ
 # define WL_SBR		WL_BRI
-#endif
-#define WL_LINE		(WL_SBR + 1)	// text in the line
+#ਜੇ_ਅੰਤ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WL_ਸਤਰ		(WL_SBR + 1)	// text in the line
 
-#if defined(FEAT_SIGNS) || defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_SIGNS) || defined(FEAT_FOLDING)
 /*
  * Return TRUE if CursorLineSign / CursorLineFold highlight is to be used.
  * This depends only on 'cursorline', not on 'cursorlineopt'.
  */
-    static int
-use_cursor_line_highlight(win_T *wp, linenr_T lnum)
+    ਸਥਿਰ ਪੂਰਨ
+use_cursor_ਸਤਰ_highlight(win_T *wp, linenr_T lnum)
 {
-    return wp->w_p_cul
+    ਵਾਪਸ wp->w_p_cul
 	    && lnum == wp->w_cursor.lnum;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 /*
  * Setup for drawing the 'foldcolumn', if there is one.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 handle_foldcolumn(win_T *wp, winlinevars_T *wlv)
 {
-    int fdc = compute_foldcolumn(wp, 0);
+    ਪੂਰਨ fdc = compute_foldcolumn(wp, 0);
 
-    if (fdc <= 0)
-	return;
+    ਜੇ (fdc <= 0)
+	ਵਾਪਸ;
 
     // Allocate a buffer, "wlv->extra[]" may already be in use.
     vim_free(wlv->p_extra_free);
     wlv->p_extra_free = alloc(MAX_MCO * fdc + 1);
-    if (wlv->p_extra_free == NULL)
-	return;
+    ਜੇ (wlv->p_extra_free == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    wlv->n_extra = (int)fill_foldcolumn(wlv->p_extra_free,
+    wlv->n_extra = (ਪੂਰਨ)fill_foldcolumn(wlv->p_extra_free,
 							 wp, FALSE, wlv->lnum);
     wlv->p_extra_free[wlv->n_extra] = NUL;
     wlv->p_extra = wlv->p_extra_free;
     wlv->c_extra = NUL;
     wlv->c_final = NUL;
-    if (use_cursor_line_highlight(wp, wlv->lnum))
+    ਜੇ (use_cursor_ਸਤਰ_highlight(wp, wlv->lnum))
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLF));
-    else
+    ਨਹੀਂਤਾਂ
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_FC));
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SIGNS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
 /*
  * Get information needed to display the sign in line "wlv->lnum" in window
  * "wp".
  * If "nrcol" is TRUE, the sign is going to be displayed in the number column.
  * Otherwise the sign is going to be displayed in the sign column.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 get_sign_display_info(
-	int		nrcol,
+	ਪੂਰਨ		nrcol,
 	win_T		*wp,
 	winlinevars_T	*wlv)
 {
-    int	text_sign;
+    ਪੂਰਨ	ਪਾਠ_sign;
 # ifdef FEAT_SIGN_ICONS
-    int	icon_sign;
+    ਪੂਰਨ	icon_sign;
 # endif
 
     // Draw two cells with the sign value or blank.
     wlv->c_extra = ' ';
     wlv->c_final = NUL;
-    if (nrcol)
-	wlv->n_extra = number_width(wp) + 1;
-    else
+    ਜੇ (nrcol)
+	wlv->n_extra = ਸੰਖਿਆ_ਚੌੜਾਈ(wp) + 1;
+    ਨਹੀਂਤਾਂ
     {
-	if (use_cursor_line_highlight(wp, wlv->lnum))
+	ਜੇ (use_cursor_ਸਤਰ_highlight(wp, wlv->lnum))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLS));
-	else
+	ਨਹੀਂਤਾਂ
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_SC));
 	wlv->n_extra = 2;
     }
 
-    if (wlv->row == wlv->startrow
+    ਜੇ (wlv->ਪੰਕਤੀ == wlv->startrow
 # ifdef FEAT_DIFF
-	    + wlv->filler_lines && wlv->filler_todo <= 0
+	    + wlv->filler_ਸਤਰਾਂ && wlv->filler_todo <= 0
 # endif
        )
     {
-	text_sign = (wlv->sattr.sat_text != NULL) ? wlv->sattr.sat_typenr : 0;
+	ਪਾਠ_sign = (wlv->sattr.sat_ਪਾਠ != ਨਿਰਾ) ? wlv->sattr.sat_typenr : 0;
 # ifdef FEAT_SIGN_ICONS
-	icon_sign = (wlv->sattr.sat_icon != NULL) ? wlv->sattr.sat_typenr : 0;
-	if (gui.in_use && icon_sign != 0)
+	icon_sign = (wlv->sattr.sat_icon != ਨਿਰਾ) ? wlv->sattr.sat_typenr : 0;
+	ਜੇ (gui.ਵਿੱਚ_use && icon_sign != 0)
 	{
 	    // Use the image in this position.
-	    if (nrcol)
+	    ਜੇ (nrcol)
 	    {
 		wlv->c_extra = NUL;
-		wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), SIGN_BYTE);
+		wlv->n_extra = vim_snprintf((ਅੱਖਰ *)wlv->extra, ਆਕਾਰ(wlv->extra),
+						"%-*c ", ਸੰਖਿਆ_ਚੌੜਾਈ(wp), SIGN_BYTE);
 		wlv->p_extra = wlv->extra;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		wlv->c_extra = SIGN_BYTE;
 #  ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && (buf_signcount(wp->w_buffer, wlv->lnum)
+	    ਜੇ (netbeans_ਸਰਗਰਮ() && (buf_signcount(wp->w_ਬਫਰ, wlv->lnum)
 									  > 1))
 	    {
-		if (nrcol)
+		ਜੇ (nrcol)
 		{
 		    wlv->c_extra = NUL;
-		    wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), MULTISIGN_BYTE);
+		    wlv->n_extra = vim_snprintf((ਅੱਖਰ *)wlv->extra, ਆਕਾਰ(wlv->extra),
+						"%-*c ", ਸੰਖਿਆ_ਚੌੜਾਈ(wp), MULTISIGN_BYTE);
 		    wlv->p_extra = wlv->extra;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    wlv->c_extra = MULTISIGN_BYTE;
 	    }
 #  endif
 	    wlv->c_final = NUL;
 	    wlv->char_attr = icon_sign;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 # endif
-	    if (text_sign != 0)
+	    ਜੇ (ਪਾਠ_sign != 0)
 	    {
-		wlv->p_extra = wlv->sattr.sat_text;
-		if (wlv->p_extra != NULL)
+		wlv->p_extra = wlv->sattr.sat_ਪਾਠ;
+		ਜੇ (wlv->p_extra != ਨਿਰਾ)
 		{
-		    if (nrcol)
+		    ਜੇ (nrcol)
 		    {
-			int width = number_width(wp) - 2;
+			ਪੂਰਨ ਚੌੜਾਈ = ਸੰਖਿਆ_ਚੌੜਾਈ(wp) - 2;
 
-			vim_memset(wlv->extra, ' ', width);
-			wlv->n_extra = width;
-			wlv->n_extra += vim_snprintf((char *)wlv->extra + width,
-				  sizeof(wlv->extra) - width, "%s ", wlv->p_extra);
+			vim_memset(wlv->extra, ' ', ਚੌੜਾਈ);
+			wlv->n_extra = ਚੌੜਾਈ;
+			wlv->n_extra += vim_snprintf((ਅੱਖਰ *)wlv->extra + ਚੌੜਾਈ,
+				  ਆਕਾਰ(wlv->extra) - ਚੌੜਾਈ, "%s ", wlv->p_extra);
 			wlv->p_extra = wlv->extra;
 		    }
-		    else
-			wlv->n_extra = (int)STRLEN(wlv->p_extra);
+		    ਨਹੀਂਤਾਂ
+			wlv->n_extra = (ਪੂਰਨ)STRLEN(wlv->p_extra);
 
 		    wlv->c_extra = NUL;
 		    wlv->c_final = NUL;
 		}
 
-		if (use_cursor_line_highlight(wp, wlv->lnum)
+		ਜੇ (use_cursor_ਸਤਰ_highlight(wp, wlv->lnum)
 						  && wlv->sattr.sat_culhl > 0)
 		    wlv->char_attr = wlv->sattr.sat_culhl;
-		else
+		ਨਹੀਂਤਾਂ
 		    wlv->char_attr = wlv->sattr.sat_texthl;
 	    }
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Display the absolute or relative line number.  After the first row fill with
  * blanks when the 'n' flag isn't in 'cpo'.
  */
-    static void
-handle_lnum_col(
+    ਸਥਿਰ ਖਾਲੀ
+handle_lnum_ਖਾਨਾ(
 	win_T		*wp,
 	winlinevars_T	*wlv,
-	int		sign_present UNUSED,
-	int		num_attr UNUSED)
+	ਪੂਰਨ		sign_present ਅਣਵਰਤਿਆ,
+	ਪੂਰਨ		ਅੰਕ_attr ਅਣਵਰਤਿਆ)
 {
-    int has_cpo_n = vim_strchr(p_cpo, CPO_NUMCOL) != NULL;
-    int lnum_row = wlv->startrow + wlv->filler_lines
-#ifdef FEAT_PROP_POPUP
-		      + wlv->text_prop_above_count
-#endif
+    ਪੂਰਨ has_cpo_n = vim_strchr(p_cpo, CPO_NUMCOL) != ਨਿਰਾ;
+    ਪੂਰਨ lnum_ਪੰਕਤੀ = wlv->startrow + wlv->filler_ਸਤਰਾਂ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		      + wlv->ਪਾਠ_prop_above_ਗਿਣਤੀ
+#ਜੇ_ਅੰਤ
 		      ;
 
-    if ((wp->w_p_nu || wp->w_p_rnu)
-	     && (wlv->row <= lnum_row || !has_cpo_n)
+    ਜੇ ((wp->w_p_nu || wp->w_p_rnu)
+	     && (wlv->ਪੰਕਤੀ <= lnum_ਪੰਕਤੀ || !has_cpo_n)
 	     // there is no line number in a wrapped line when "n" is in
 	     // 'cpoptions', but 'breakindent' assumes it anyway.
 	     && !((has_cpo_n
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 		     && !wp->w_p_bri
-#endif
+#ਜੇ_ਅੰਤ
 		  ) && wp->w_skipcol > 0 && wlv->lnum == wp->w_topline))
     {
-#ifdef FEAT_SIGNS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
 	// If 'signcolumn' is set to 'number' and a sign is present
 	// in 'lnum', then display the sign instead of the line
 	// number.
-	if ((*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u') && sign_present
-		&& wlv->sattr.sat_text != NULL)
+	ਜੇ ((*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u') && sign_present
+		&& wlv->sattr.sat_ਪਾਠ != ਨਿਰਾ)
 	    get_sign_display_info(TRUE, wp, wlv);
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	{
 	  // Draw the line number (empty space after wrapping).
 	  // When there are text properties above the line put the line number
 	  // below them.
-	  if (wlv->row == lnum_row
-		    && (wp->w_skipcol == 0 || wlv->row > 0
+	  ਜੇ (wlv->ਪੰਕਤੀ == lnum_ਪੰਕਤੀ
+		    && (wp->w_skipcol == 0 || wlv->ਪੰਕਤੀ > 0
 					       || (wp->w_p_nu && wp->w_p_rnu)))
 	  {
-	      long num;
-	      char *fmt = "%*ld ";
+	      ਲੰਮਾ ਅੰਕ;
+	      ਅੱਖਰ *fmt = "%*ld ";
 
-	      if (wp->w_p_nu && !wp->w_p_rnu)
+	      ਜੇ (wp->w_p_nu && !wp->w_p_rnu)
 		  // 'number' + 'norelativenumber'
-		  num = (long)wlv->lnum;
-	      else
+		  ਅੰਕ = (ਲੰਮਾ)wlv->lnum;
+	      ਨਹੀਂਤਾਂ
 	      {
 		  // 'relativenumber', don't use negative numbers
-		  num = labs((long)get_cursor_rel_lnum(wp, wlv->lnum));
-		  if (num == 0 && wp->w_p_nu && wp->w_p_rnu)
+		  ਅੰਕ = labs((ਲੰਮਾ)get_cursor_rel_lnum(wp, wlv->lnum));
+		  ਜੇ (ਅੰਕ == 0 && wp->w_p_nu && wp->w_p_rnu)
 		  {
 		      // 'number' + 'relativenumber'
-		      num = wlv->lnum;
+		      ਅੰਕ = wlv->lnum;
 		      fmt = "%-*ld ";
 		  }
 	      }
 
-	      vim_snprintf((char *)wlv->extra, sizeof(wlv->extra), fmt, number_width(wp), num);
-	      if (wp->w_skipcol > 0 && wlv->startrow == 0)
-		  for (wlv->p_extra = wlv->extra; *wlv->p_extra == ' ';
+	      vim_snprintf((ਅੱਖਰ *)wlv->extra, ਆਕਾਰ(wlv->extra), fmt, ਸੰਖਿਆ_ਚੌੜਾਈ(wp), ਅੰਕ);
+	      ਜੇ (wp->w_skipcol > 0 && wlv->startrow == 0)
+		  ਲਈ (wlv->p_extra = wlv->extra; *wlv->p_extra == ' ';
 			  ++wlv->p_extra)
 		      *wlv->p_extra = '-';
-#ifdef FEAT_RIGHTLEFT
-	      if (wp->w_p_rl)		    // reverse line numbers
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+	      ਜੇ (wp->w_p_rl)		    // reverse line numbers
 	      {
 		  char_u    *p1, *p2;
-		  int	    t;
+		  ਪੂਰਨ	    t;
 
 		  // like rl_mirror(), but keep the space at the end
 		  p2 = skipwhite(wlv->extra);
 		  p2 = skiptowhite(p2) - 1;
-		  for (p1 = skipwhite(wlv->extra); p1 < p2; ++p1, --p2)
+		  ਲਈ (p1 = skipwhite(wlv->extra); p1 < p2; ++p1, --p2)
 		  {
 		      t = *p1;
 		      *p1 = *p2;
 		      *p2 = t;
 		  }
 	      }
-#endif
+#ਜੇ_ਅੰਤ
 	      wlv->p_extra = wlv->extra;
 	      wlv->c_extra = NUL;
 	      wlv->c_final = NUL;
 	  }
-	  else
+	  ਨਹੀਂਤਾਂ
 	  {
 	      wlv->c_extra = ' ';
 	      wlv->c_final = NUL;
 	  }
-	  wlv->n_extra = number_width(wp) + 1;
+	  wlv->n_extra = ਸੰਖਿਆ_ਚੌੜਾਈ(wp) + 1;
 	  wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_N));
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 	  // When 'cursorline' is set highlight the line number of
 	  // the current line differently.
 	  // When 'cursorlineopt' does not have "line" only
 	  // highlight the line number itself.
 	  // TODO: Can we use CursorLine instead of CursorLineNr
 	  // when CursorLineNr isn't set?
-	  if (wp->w_p_cul
+	  ਜੇ (wp->w_p_cul
 		  && wlv->lnum == wp->w_cursor.lnum
 		  && (wp->w_p_culopt_flags & CULOPT_NBR)
-		  && (wlv->row == lnum_row
-		      || (wlv->row > lnum_row
-			 && (wp->w_p_culopt_flags & CULOPT_LINE))))
+		  && (wlv->ਪੰਕਤੀ == lnum_ਪੰਕਤੀ
+		      || (wlv->ਪੰਕਤੀ > lnum_ਪੰਕਤੀ
+			 && (wp->w_p_culopt_flags & CULOPT_ਸਤਰ))))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLN));
-#endif
-	  if (wp->w_p_rnu && wlv->lnum < wp->w_cursor.lnum
+#ਜੇ_ਅੰਤ
+	  ਜੇ (wp->w_p_rnu && wlv->lnum < wp->w_cursor.lnum
 						      && HL_ATTR(HLF_LNA) != 0)
 	      // Use LineNrAbove
 	      wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_LNA));
-	  if (wp->w_p_rnu && wlv->lnum > wp->w_cursor.lnum
+	  ਜੇ (wp->w_p_rnu && wlv->lnum > wp->w_cursor.lnum
 						      && HL_ATTR(HLF_LNB) != 0)
 	      // Use LineNrBelow
 	      wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_LNB));
 	}
-#ifdef FEAT_SIGNS
-	if (num_attr)
-	    wlv->char_attr = num_attr;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
+	ਜੇ (ਅੰਕ_attr)
+	    wlv->char_attr = ਅੰਕ_attr;
+#ਜੇ_ਅੰਤ
     }
 }
 
-#ifdef FEAT_LINEBREAK
-    static void
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+    ਸਥਿਰ ਖਾਲੀ
 handle_breakindent(win_T *wp, winlinevars_T *wlv)
 {
-    if (wp->w_briopt_sbr && wlv->draw_state == WL_BRI - 1
-					    && *get_showbreak_value(wp) != NUL)
+    ਜੇ (wp->w_briopt_sbr && wlv->draw_state == WL_BRI - 1
+					    && *get_showbreak_ਮੁੱਲ(wp) != NUL)
 	// draw indent after showbreak value
 	wlv->draw_state = WL_BRI;
-    else if (wp->w_briopt_sbr && wlv->draw_state == WL_SBR)
+    ਨਹੀਂਤਾਂ ਜੇ (wp->w_briopt_sbr && wlv->draw_state == WL_SBR)
 	// After the showbreak, draw the breakindent
 	wlv->draw_state = WL_BRI - 1;
 
     // draw 'breakindent': indent wrapped text accordingly
-    if (wlv->draw_state == WL_BRI - 1)
+    ਜੇ (wlv->draw_state == WL_BRI - 1)
     {
 	wlv->draw_state = WL_BRI;
 	// if wlv->need_showbreak is set, breakindent also applies
-	if (wp->w_p_bri && (wlv->row > wlv->startrow
+	ਜੇ (wp->w_p_bri && (wlv->ਪੰਕਤੀ > wlv->startrow
 # ifdef FEAT_DIFF
-		    + wlv->filler_lines
+		    + wlv->filler_ਸਤਰਾਂ
 # endif
 		    || wlv->need_showbreak)
 # ifdef FEAT_PROP_POPUP
@@ -527,138 +527,138 @@ handle_breakindent(win_T *wp, winlinevars_T *wlv)
 	{
 	    wlv->char_attr = 0;
 # ifdef FEAT_DIFF
-	    if (wlv->diff_hlf != (hlf_T)0)
+	    ਜੇ (wlv->diff_hlf != (hlf_T)0)
 		wlv->char_attr = HL_ATTR(wlv->diff_hlf);
 # endif
-	    wlv->p_extra = NULL;
+	    wlv->p_extra = ਨਿਰਾ;
 	    wlv->c_extra = ' ';
 	    wlv->c_final = NUL;
 	    wlv->n_extra = get_breakindent_win(wp,
-				   ml_get_buf(wp->w_buffer, wlv->lnum, FALSE));
-	    if (wlv->row == wlv->startrow)
+				   ml_get_buf(wp->w_ਬਫਰ, wlv->lnum, FALSE));
+	    ਜੇ (wlv->ਪੰਕਤੀ == wlv->startrow)
 	    {
-		wlv->n_extra -= win_col_off2(wp);
-		if (wlv->n_extra < 0)
+		wlv->n_extra -= win_ਖਾਨਾ_off2(wp);
+		ਜੇ (wlv->n_extra < 0)
 		    wlv->n_extra = 0;
 	    }
 
 	    // Correct start of highlighted area for 'breakindent',
-	    if (wlv->fromcol >= wlv->vcol
+	    ਜੇ (wlv->fromcol >= wlv->vcol
 				    && wlv->fromcol < wlv->vcol + wlv->n_extra)
 		wlv->fromcol = wlv->vcol + wlv->n_extra;
 
 	    // Correct end of highlighted area for 'breakindent',
 	    // required when 'linebreak' is also set.
-	    if (wlv->tocol == wlv->vcol)
+	    ਜੇ (wlv->tocol == wlv->vcol)
 		wlv->tocol += wlv->n_extra;
 	}
 
-	if (wp->w_skipcol > 0 && wlv->startrow == 0 && wp->w_p_wrap
+	ਜੇ (wp->w_skipcol > 0 && wlv->startrow == 0 && wp->w_p_wrap
 							   && wp->w_briopt_sbr)
 	    wlv->need_showbreak = FALSE;
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
-    static void
+#ਜੇ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+    ਸਥਿਰ ਖਾਲੀ
 handle_showbreak_and_filler(win_T *wp, winlinevars_T *wlv)
 {
 # ifdef FEAT_DIFF
-    if (wlv->filler_todo > 0)
+    ਜੇ (wlv->filler_todo > 0)
     {
 	// Draw "deleted" diff line(s).
-	if (char2cells(wp->w_fill_chars.diff) > 1)
+	ਜੇ (char2cells(wp->w_fill_chars.diff) > 1)
 	{
 	    wlv->c_extra = '-';
 	    wlv->c_final = NUL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    wlv->c_extra = wp->w_fill_chars.diff;
 	    wlv->c_final = NUL;
 	}
 #  ifdef FEAT_RIGHTLEFT
-	if (wp->w_p_rl)
-	    wlv->n_extra = wlv->col + 1;
-	else
+	ਜੇ (wp->w_p_rl)
+	    wlv->n_extra = wlv->ਖਾਨਾ + 1;
+	ਨਹੀਂਤਾਂ
 #  endif
-	    wlv->n_extra = wp->w_width - wlv->col;
+	    wlv->n_extra = wp->w_ਚੌੜਾਈ - wlv->ਖਾਨਾ;
 	wlv->char_attr = HL_ATTR(HLF_DED);
     }
 # endif
 
 # ifdef FEAT_LINEBREAK
-    char_u *sbr = get_showbreak_value(wp);
-    if (*sbr != NUL && wlv->need_showbreak)
+    char_u *sbr = get_showbreak_ਮੁੱਲ(wp);
+    ਜੇ (*sbr != NUL && wlv->need_showbreak)
     {
 	// Draw 'showbreak' at the start of each broken line.
 	wlv->p_extra = sbr;
 	wlv->c_extra = NUL;
 	wlv->c_final = NUL;
-	wlv->n_extra = (int)STRLEN(sbr);
+	wlv->n_extra = (ਪੂਰਨ)STRLEN(sbr);
 	wlv->vcol_sbr = wlv->vcol + MB_CHARLEN(sbr);
 
 	// Correct start of highlighted area for 'showbreak'.
-	if (wlv->fromcol >= wlv->vcol && wlv->fromcol < wlv->vcol_sbr)
+	ਜੇ (wlv->fromcol >= wlv->vcol && wlv->fromcol < wlv->vcol_sbr)
 	    wlv->fromcol = wlv->vcol_sbr;
 
 	// Correct end of highlighted area for 'showbreak',
 	// required when 'linebreak' is also set.
-	if (wlv->tocol == wlv->vcol)
+	ਜੇ (wlv->tocol == wlv->vcol)
 	    wlv->tocol = wlv->vcol_sbr;
 	// combine 'showbreak' with HLF_WIN
 	wlv->char_attr = hl_combine_attr(wlv->win_attr, HL_ATTR(HLF_AT));
 #  ifdef FEAT_SYN_HL
 	// combine 'showbreak' with 'cursorline'
-	if (wlv->cul_attr != 0)
+	ਜੇ (wlv->cul_attr != 0)
 	    wlv->char_attr = hl_combine_attr(wlv->char_attr, wlv->cul_attr);
 #  endif
     }
 
-    if (wp->w_skipcol == 0 || wlv->startrow > 0 || !wp->w_p_wrap
+    ਜੇ (wp->w_skipcol == 0 || wlv->startrow > 0 || !wp->w_p_wrap
 							  || !wp->w_briopt_sbr)
 	wlv->need_showbreak = FALSE;
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_PROP_POPUP)
+#ਜੇ defined(FEAT_PROP_POPUP)
 /*
  * Return the cell size of virtual text after truncation.
  */
-    static int
-textprop_size_after_trunc(
+    ਸਥਿਰ ਪੂਰਨ
+textprop_ਮਾਪ_after_trunc(
 	win_T	*wp,
-	int	flags,	    // TP_FLAG_ALIGN_*
-	int	added,
-	int	padding,
-	char_u	*text,
-	int	*n_used_ptr)
+	ਪੂਰਨ	flags,	    // TP_FLAG_ALIGN_*
+	ਪੂਰਨ	added,
+	ਪੂਰਨ	padding,
+	char_u	*ਪਾਠ,
+	ਪੂਰਨ	*n_ਵਰਤਿਆ_ptr)
 {
-    int	space = (flags & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_ABOVE))
-				       ? wp->w_width - win_col_off(wp) : added;
-    int strsize = 0;
+    ਪੂਰਨ	space = (flags & (TP_FLAG_ALIGN_ਹੇਠਾਂ | TP_FLAG_ALIGN_ABOVE))
+				       ? wp->w_ਚੌੜਾਈ - win_ਖਾਨਾ_off(wp) : added;
+    ਪੂਰਨ strsize = 0;
     char_u *p;
 
     // if the remaining size is too small and 'wrap' is set we wrap anyway and
     // use the next line
-    if (space < PROP_TEXT_MIN_CELLS && wp->w_p_wrap)
-	space += wp->w_width;
-    if (flags & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_ABOVE))
+    ਜੇ (space < PROP_ਪਾਠ_MIN_CELLS && wp->w_p_wrap)
+	space += wp->w_ਚੌੜਾਈ;
+    ਜੇ (flags & (TP_FLAG_ALIGN_ਹੇਠਾਂ | TP_FLAG_ALIGN_ABOVE))
 	space -= padding;
 
-    for (p = text; *p != NUL; p += (*mb_ptr2len)(p))
+    ਲਈ (p = ਪਾਠ; *p != NUL; p += (*mb_ptr2len)(p))
     {
-	int clen = ptr2cells(p);
+	ਪੂਰਨ clen = ptr2cells(p);
 
-	if (strsize + clen > space)
-	    break;
+	ਜੇ (strsize + clen > space)
+	    ਰੋਕੋ;
 	strsize += clen;
     }
-    *n_used_ptr = (int)(p - text);
+    *n_ਵਰਤਿਆ_ptr = (ਪੂਰਨ)(p - ਪਾਠ);
 
-    return strsize;
+    ਵਾਪਸ strsize;
 }
 
 /*
@@ -669,117 +669,117 @@ textprop_size_after_trunc(
  * When "n_attr" is NULL returns the number of screen cells used.
  * Otherwise returns TRUE when drawing continues on the next line.
  */
-    int
-text_prop_position(
+    ਪੂਰਨ
+ਪਾਠ_prop_position(
 	win_T	    *wp,
 	textprop_T  *tp,
-	int	    vcol,	    // current text column
-	int	    scr_col,	    // current screen column
-	int	    *n_extra,	    // nr of bytes for virtual text
+	ਪੂਰਨ	    vcol,	    // current text column
+	ਪੂਰਨ	    scr_ਖਾਨਾ,	    // current screen column
+	ਪੂਰਨ	    *n_extra,	    // nr of bytes for virtual text
 	char_u	    **p_extra,	    // virtual text
-	int	    *n_attr,	    // attribute cells, NULL if not used
-	int	    *n_attr_skip,   // cells to skip attr, NULL if not used
-	int	    do_skip)	    // skip_cells is not zero
+	ਪੂਰਨ	    *n_attr,	    // attribute cells, NULL if not used
+	ਪੂਰਨ	    *n_attr_skip,   // cells to skip attr, NULL if not used
+	ਪੂਰਨ	    do_skip)	    // skip_cells is not zero
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
-    int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
-    int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
-    int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
-    int	    padding = tp->tp_col == MAXCOL ? tp->tp_padleft : 0;
-    int	    col_with_padding = scr_col + (below ? 0 : padding);
-    int	    room = wp->w_width - col_with_padding;
-    int	    before = room;	// spaces before the text
-    int	    after = 0;		// spaces after the text
-    int	    n_used = *n_extra;
-    char_u  *l = NULL;
-    int	    strsize = vim_strsize(*p_extra);
-    int	    cells = wrap ? strsize : textprop_size_after_trunc(wp,
-			     tp->tp_flags, before, padding, *p_extra, &n_used);
+    ਪੂਰਨ	    ਸੱਜਾ = (tp->tp_flags & TP_FLAG_ALIGN_ਸੱਜਾ);
+    ਪੂਰਨ	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
+    ਪੂਰਨ	    ਹੇਠਾਂ = (tp->tp_flags & TP_FLAG_ALIGN_ਹੇਠਾਂ);
+    ਪੂਰਨ	    wrap = tp->tp_ਖਾਨਾ < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
+    ਪੂਰਨ	    padding = tp->tp_ਖਾਨਾ == MAXCOL ? tp->tp_padleft : 0;
+    ਪੂਰਨ	    ਖਾਨਾ_with_padding = scr_ਖਾਨਾ + (ਹੇਠਾਂ ? 0 : padding);
+    ਪੂਰਨ	    ਗੁੰਜਾਇਸ਼ = wp->w_ਚੌੜਾਈ - ਖਾਨਾ_with_padding;
+    ਪੂਰਨ	    before = ਗੁੰਜਾਇਸ਼;	// spaces before the text
+    ਪੂਰਨ	    after = 0;		// spaces after the text
+    ਪੂਰਨ	    n_ਵਰਤਿਆ = *n_extra;
+    char_u  *l = ਨਿਰਾ;
+    ਪੂਰਨ	    strsize = vim_strsize(*p_extra);
+    ਪੂਰਨ	    cells = wrap ? strsize : textprop_ਮਾਪ_after_trunc(wp,
+			     tp->tp_flags, before, padding, *p_extra, &n_ਵਰਤਿਆ);
 
-    if (wrap || right || above || below || padding > 0 || n_used < *n_extra)
+    ਜੇ (wrap || ਸੱਜਾ || above || ਹੇਠਾਂ || padding > 0 || n_ਵਰਤਿਆ < *n_extra)
     {
-	int	    col_off = win_col_off(wp) - win_col_off2(wp);
+	ਪੂਰਨ	    ਖਾਨਾ_off = win_ਖਾਨਾ_off(wp) - win_ਖਾਨਾ_off2(wp);
 
-	if (above)
+	ਜੇ (above)
 	{
 	    before = 0;
-	    after = wp->w_width - cells - win_col_off(wp) - padding;
-	    if (after < 0)
+	    after = wp->w_ਚੌੜਾਈ - cells - win_ਖਾਨਾ_off(wp) - padding;
+	    ਜੇ (after < 0)
 	    {
 		// text "above" has too much padding to fit
 		padding += after;
 		after = 0;
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Right-align: fill with before
-	    if (right)
+	    ਜੇ (ਸੱਜਾ)
 		before -= cells;
 
 	    // Below-align: empty line add one character
-	    if (below && vcol == 0 && col_with_padding == col_off
-					    && wp->w_width - col_off == before)
-		col_with_padding += 1;
+	    ਜੇ (ਹੇਠਾਂ && vcol == 0 && ਖਾਨਾ_with_padding == ਖਾਨਾ_off
+					    && wp->w_ਚੌੜਾਈ - ਖਾਨਾ_off == before)
+		ਖਾਨਾ_with_padding += 1;
 
-	    if (before < 0
-		    || !(right || below)
-		    || (below ? (col_with_padding <= col_off || !wp->w_p_wrap)
-			      : (n_used < *n_extra)))
+	    ਜੇ (before < 0
+		    || !(ਸੱਜਾ || ਹੇਠਾਂ)
+		    || (ਹੇਠਾਂ ? (ਖਾਨਾ_with_padding <= ਖਾਨਾ_off || !wp->w_p_wrap)
+			      : (n_ਵਰਤਿਆ < *n_extra)))
 	    {
-		if (right && (wrap
-			      || (room < PROP_TEXT_MIN_CELLS && wp->w_p_wrap)))
+		ਜੇ (ਸੱਜਾ && (wrap
+			      || (ਗੁੰਜਾਇਸ਼ < PROP_ਪਾਠ_MIN_CELLS && wp->w_p_wrap)))
 		{
 		    // right-align on next line instead of wrapping if possible
-		    before = wp->w_width - col_off - strsize + room;
-		    if (before < 0)
+		    before = wp->w_ਚੌੜਾਈ - ਖਾਨਾ_off - strsize + ਗੁੰਜਾਇਸ਼;
+		    ਜੇ (before < 0)
 			before = 0;
-		    else
-			n_used = *n_extra;
+		    ਨਹੀਂਤਾਂ
+			n_ਵਰਤਿਆ = *n_extra;
 		}
-		else if (below && before > vcol && do_skip)
+		ਨਹੀਂਤਾਂ ਜੇ (ਹੇਠਾਂ && before > vcol && do_skip)
 		    before -= vcol;
-		else
+		ਨਹੀਂਤਾਂ
 		    before = 0;
 	    }
 	}
 
 	// With 'nowrap' add one to show the "extends" character if needed (it
 	// doesn't show if the text just fits).
-	if (n_used < *n_extra && get_lcs_ext(wp) != NUL)
-	    ++n_used;
+	ਜੇ (n_ਵਰਤਿਆ < *n_extra && get_lcs_ext(wp) != NUL)
+	    ++n_ਵਰਤਿਆ;
 
 	// add 1 for NUL, 2 for when '…' is used
-	if (n_attr != NULL)
-	    l = alloc(n_used + before + after + (padding > 0 ? padding : 0) + 3);
-	if (n_attr == NULL || l != NULL)
+	ਜੇ (n_attr != ਨਿਰਾ)
+	    l = alloc(n_ਵਰਤਿਆ + before + after + (padding > 0 ? padding : 0) + 3);
+	ਜੇ (n_attr == ਨਿਰਾ || l != ਨਿਰਾ)
 	{
-	    int off = 0;
+	    ਪੂਰਨ off = 0;
 
-	    if (n_attr != NULL)
+	    ਜੇ (n_attr != ਨਿਰਾ)
 	    {
 		vim_memset(l, ' ', before);
 		off += before;
-		if (padding > 0)
+		ਜੇ (padding > 0)
 		{
 		    vim_memset(l + off, ' ', padding);
 		    off += padding;
 		}
-		vim_strncpy(l + off, *p_extra, n_used);
-		off += n_used;
+		vim_strncpy(l + off, *p_extra, n_ਵਰਤਿਆ);
+		off += n_ਵਰਤਿਆ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		off = before + after + padding + n_used;
+		off = before + after + padding + n_ਵਰਤਿਆ;
 		cells += before + after + padding;
 	    }
-	    if (n_attr != NULL)
+	    ਜੇ (n_attr != ਨਿਰਾ)
 	    {
-		if (n_used < *n_extra && wp->w_p_wrap)
+		ਜੇ (n_ਵਰਤਿਆ < *n_extra && wp->w_p_wrap)
 		{
 		    char_u *lp = l + off - 1;
 
-		    if (has_mbyte)
+		    ਜੇ (has_mbyte)
 		    {
 			char_u	buf[MB_MAXBYTES + 1];
 			char_u	*cp = buf;
@@ -787,77 +787,77 @@ text_prop_position(
 			// change the last character to '…', converted to the
 			// current 'encoding'
 			STRCPY(buf, "…");
-			if (!enc_utf8)
+			ਜੇ (!enc_utf8)
 			{
 			    vimconv_T	vc;
 
 			    vc.vc_type = CONV_NONE;
-			    convert_setup(&vc, (char_u *)"utf-8", p_enc);
-			    if (vc.vc_type != CONV_NONE)
+			    convert_ਤਿਆਰੀ(&vc, (char_u *)"utf-8", p_enc);
+			    ਜੇ (vc.vc_type != CONV_NONE)
 			    {
-				cp = string_convert(&vc, buf, NULL);
-				if (cp == NULL)
+				cp = string_convert(&vc, buf, ਨਿਰਾ);
+				ਜੇ (cp == ਨਿਰਾ)
 				{
 				    // when conversion fails use '>'
 				    cp = buf;
 				    STRCPY(buf, ">");
 				}
-				convert_setup(&vc, NULL, NULL);
+				convert_ਤਿਆਰੀ(&vc, ਨਿਰਾ, ਨਿਰਾ);
 			    }
 			}
 
 			lp -= (*mb_ptr2cells)(cp) - 1;
-			lp -= (*mb_head_off)(l, lp);
+			lp -= (*mb_ਸਿਰ_off)(l, lp);
 			STRCPY(lp, cp);
-			n_used = lp - l + 3 - before - padding;
-			if (cp != buf)
+			n_ਵਰਤਿਆ = lp - l + 3 - before - padding;
+			ਜੇ (cp != buf)
 			    vim_free(cp);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			// change last character to '>'
 			*lp = '>';
 		}
-		else if (after > 0)
+		ਨਹੀਂਤਾਂ ਜੇ (after > 0)
 		{
 		    vim_memset(l + off, ' ', after);
 		    l[off + after] = NUL;
 		}
 
 		*p_extra = l;
-		*n_extra = n_used + before + after + padding;
+		*n_extra = n_ਵਰਤਿਆ + before + after + padding;
 		*n_attr = mb_charlen(*p_extra);
 		// n_attr_skip will not be decremented before draw_state is
 		// WL_LINE
 		*n_attr_skip = before + (padding > 0 ? padding : 0);
 		*n_attr -= *n_attr_skip;
-		if (above)
+		ਜੇ (above)
 		    *n_attr -= after;
 	    }
 	}
     }
 
-    if (n_attr == NULL)
-	return cells;
-    return (below && col_with_padding > win_col_off(wp) && !wp->w_p_wrap);
+    ਜੇ (n_attr == ਨਿਰਾ)
+	ਵਾਪਸ cells;
+    ਵਾਪਸ (ਹੇਠਾਂ && ਖਾਨਾ_with_padding > win_ਖਾਨਾ_off(wp) && !wp->w_p_wrap);
 }
 
-# if defined(FEAT_LINEBREAK)
+# ਜੇ defined(FEAT_LINEBREAK)
 /*
  * no 'showbreak' before "below" text property
  * or after "above" or "right" text property
  */
-    int
-text_prop_no_showbreak(textprop_T *tp)
+    ਪੂਰਨ
+ਪਾਠ_prop_no_showbreak(textprop_T *tp)
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
-    int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
-    int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
-    int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
+    ਪੂਰਨ	    ਸੱਜਾ = (tp->tp_flags & TP_FLAG_ALIGN_ਸੱਜਾ);
+    ਪੂਰਨ	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
+    ਪੂਰਨ	    ਹੇਠਾਂ = (tp->tp_flags & TP_FLAG_ALIGN_ਹੇਠਾਂ);
+    ਪੂਰਨ	    wrap = tp->tp_ਖਾਨਾ < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
 
-    return (right || above || below || !wrap);
+    ਵਾਪਸ (ਸੱਜਾ || above || ਹੇਠਾਂ || !wrap);
 }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Call screen_line() using values from "wlv".
@@ -865,219 +865,219 @@ text_prop_no_showbreak(textprop_T *tp)
  * when 'showbreak' is not set.
  * When "clear_end" is TRUE clear until the end of the screen line.
  */
-    static void
-wlv_screen_line(win_T *wp, winlinevars_T *wlv, int clear_end)
+    ਸਥਿਰ ਖਾਲੀ
+wlv_screen_ਸਤਰ(win_T *wp, winlinevars_T *wlv, ਪੂਰਨ clear_ਸਿਰਾ)
 {
-    if (wlv->row == 0 && wp->w_skipcol > 0
-#if defined(FEAT_LINEBREAK)
+    ਜੇ (wlv->ਪੰਕਤੀ == 0 && wp->w_skipcol > 0
+#ਜੇ defined(FEAT_LINEBREAK)
 	    // do not overwrite the 'showbreak' text with "<<<"
-	    && *get_showbreak_value(wp) == NUL
-#endif
+	    && *get_showbreak_ਮੁੱਲ(wp) == NUL
+#ਜੇ_ਅੰਤ
 	    // do not overwrite the 'listchars' "precedes" text with "<<<"
 	    && !(wp->w_p_list && wp->w_lcs_chars.prec != 0))
     {
-	int off = (int)(current_ScreenLine - ScreenLines);
-	int max_off = off + screen_Columns;
-	int skip = 0;
+	ਪੂਰਨ off = (ਪੂਰਨ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
+	ਪੂਰਨ max_off = off + screen_Columns;
+	ਪੂਰਨ skip = 0;
 
-	if (wp->w_p_nu && wp->w_p_rnu)
+	ਜੇ (wp->w_p_nu && wp->w_p_rnu)
 	    // Do not overwrite the line number, change "123 text" to
 	    // "123<<<xt".
-	    while (skip < wp->w_width && VIM_ISDIGIT(ScreenLines[off]))
+	    ਜਦੋਂ (skip < wp->w_ਚੌੜਾਈ && VIM_ISDIGIT(Screen_ਸਤਰਾਂ[off]))
 	    {
 		++off;
 		++skip;
 	    }
 
-	for (int i = 0; i < 3 && i + skip < wp->w_width; ++i)
+	ਲਈ (ਪੂਰਨ i = 0; i < 3 && i + skip < wp->w_ਚੌੜਾਈ; ++i)
 	{
-	    if ((*mb_off2cells)(off, max_off) > 1)
+	    ਜੇ ((*mb_off2cells)(off, max_off) > 1)
 		// When the first half of a double-width character is
 		// overwritten, change the second half to a space.
-		ScreenLines[off + 1] = ' ';
-	    ScreenLines[off] = '<';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = 0;
+		Screen_ਸਤਰਾਂ[off + 1] = ' ';
+	    Screen_ਸਤਰਾਂ[off] = '<';
+	    ਜੇ (enc_utf8)
+		Screen_ਸਤਰਾਂ_UC[off] = 0;
 	    ScreenAttrs[off] = HL_ATTR(HLF_AT);
 	    ++off;
 	}
     }
 
-    screen_line(wp, wlv->screen_row, wp->w_wincol, wlv->col,
-		    clear_end ? wp->w_width : -wp->w_width,
-		    wlv->vcol - 1, wlv->screen_line_flags);
+    screen_ਸਤਰ(wp, wlv->screen_ਪੰਕਤੀ, wp->w_wincol, wlv->ਖਾਨਾ,
+		    clear_ਸਿਰਾ ? wp->w_ਚੌੜਾਈ : -wp->w_ਚੌੜਾਈ,
+		    wlv->vcol - 1, wlv->screen_ਸਤਰ_flags);
 }
 
 /*
  * Called when finished with the line: draw the screen line and handle any
  * highlighting until the right of the window.
  */
-    static void
-draw_screen_line(win_T *wp, winlinevars_T *wlv)
+    ਸਥਿਰ ਖਾਲੀ
+draw_screen_ਸਤਰ(win_T *wp, winlinevars_T *wlv)
 {
-#ifdef FEAT_SYN_HL
-    long	v;
-    int		wcol;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਲੰਮਾ	v;
+    ਪੂਰਨ		wcol;
 
     // Highlight 'cursorcolumn' & 'colorcolumn' past end of the line.
-    if (wp->w_p_wrap)
+    ਜੇ (wp->w_p_wrap)
 	v = wlv->startrow == 0 ? wp->w_skipcol : 0;
-    else
+    ਨਹੀਂਤਾਂ
 	v = wp->w_leftcol;
 
     wcol =
 # ifdef FEAT_RIGHTLEFT
-	wp->w_p_rl ? wp->w_width - wlv->col - 1 :
+	wp->w_p_rl ? wp->w_ਚੌੜਾਈ - wlv->ਖਾਨਾ - 1 :
 # endif
-	wlv->col;
+	wlv->ਖਾਨਾ;
     // check if line ends before left margin
-    if (wlv->vcol < v + wcol - win_col_off(wp))
-	wlv->vcol = v + wcol - win_col_off(wp);
+    ਜੇ (wlv->vcol < v + wcol - win_ਖਾਨਾ_off(wp))
+	wlv->vcol = v + wcol - win_ਖਾਨਾ_off(wp);
 # ifdef FEAT_CONCEAL
     // Get rid of the boguscols now, we want to draw until the right
     // edge for 'cursorcolumn'.
-    wlv->col -= wlv->boguscols;
+    wlv->ਖਾਨਾ -= wlv->boguscols;
     wlv->boguscols = 0;
 #  define VCOL_HLC (wlv->vcol - wlv->vcol_off_co - wlv->vcol_off_tp)
-# else
+# ਨਹੀਂਤਾਂ
 #  define VCOL_HLC (wlv->vcol - wlv->vcol_off_tp)
 # endif
 
-    if (wlv->draw_color_col)
-	wlv->draw_color_col = advance_color_col(VCOL_HLC, &wlv->color_cols);
+    ਜੇ (wlv->draw_color_ਖਾਨਾ)
+	wlv->draw_color_ਖਾਨਾ = advance_color_ਖਾਨਾ(VCOL_HLC, &wlv->color_ਖਾਨੇ_ਗਿਣਤੀ);
 
-    if (((wp->w_p_cuc
-		    && (int)wp->w_virtcol >= VCOL_HLC - wlv->eol_hl_off
-		    && (int)wp->w_virtcol <
-			 (long)wp->w_width * (wlv->row - wlv->startrow + 1) + v
+    ਜੇ (((wp->w_p_cuc
+		    && (ਪੂਰਨ)wp->w_virtcol >= VCOL_HLC - wlv->eol_hl_off
+		    && (ਪੂਰਨ)wp->w_virtcol <
+			 (ਲੰਮਾ)wp->w_ਚੌੜਾਈ * (wlv->ਪੰਕਤੀ - wlv->startrow + 1) + v
 			 && wlv->lnum != wp->w_cursor.lnum)
-		|| wlv->draw_color_col
-# ifdef LINE_ATTR
-		|| wlv->line_attr != 0
+		|| wlv->draw_color_ਖਾਨਾ
+# ifdef ਸਤਰ_ATTR
+		|| wlv->ਸਤਰ_attr != 0
 # endif
 		|| wlv->win_attr != 0))
     {
-	int	rightmost_vcol = 0;
-	int	i;
+	ਪੂਰਨ	rightmost_vcol = 0;
+	ਪੂਰਨ	i;
 
-	if (wp->w_p_cuc)
+	ਜੇ (wp->w_p_cuc)
 	    rightmost_vcol = wp->w_virtcol;
-	if (wlv->draw_color_col)
+	ਜੇ (wlv->draw_color_ਖਾਨਾ)
 	    // determine rightmost colorcolumn to possibly draw
-	    for (i = 0; wlv->color_cols[i] >= 0; ++i)
-		if (rightmost_vcol < wlv->color_cols[i])
-		    rightmost_vcol = wlv->color_cols[i];
+	    ਲਈ (i = 0; wlv->color_ਖਾਨੇ_ਗਿਣਤੀ[i] >= 0; ++i)
+		ਜੇ (rightmost_vcol < wlv->color_ਖਾਨੇ_ਗਿਣਤੀ[i])
+		    rightmost_vcol = wlv->color_ਖਾਨੇ_ਗਿਣਤੀ[i];
 
-	while (
+	ਜਦੋਂ (
 # ifdef FEAT_RIGHTLEFT
-		wp->w_p_rl ? (wlv->col >= 0) :
+		wp->w_p_rl ? (wlv->ਖਾਨਾ >= 0) :
 # endif
-		(wlv->col < wp->w_width))
+		(wlv->ਖਾਨਾ < wp->w_ਚੌੜਾਈ))
 	{
-	    ScreenLines[wlv->off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[wlv->off] = 0;
+	    Screen_ਸਤਰਾਂ[wlv->off] = ' ';
+	    ਜੇ (enc_utf8)
+		Screen_ਸਤਰਾਂ_UC[wlv->off] = 0;
 
-	    if (wlv->draw_color_col)
-		wlv->draw_color_col = advance_color_col(
-						   VCOL_HLC, &wlv->color_cols);
+	    ਜੇ (wlv->draw_color_ਖਾਨਾ)
+		wlv->draw_color_ਖਾਨਾ = advance_color_ਖਾਨਾ(
+						   VCOL_HLC, &wlv->color_ਖਾਨੇ_ਗਿਣਤੀ);
 
-	    int attr = wlv->win_attr;
-# ifdef LINE_ATTR
-	    if (wlv->line_attr != 0)
-		attr = hl_combine_attr(attr, wlv->line_attr);
+	    ਪੂਰਨ attr = wlv->win_attr;
+# ifdef ਸਤਰ_ATTR
+	    ਜੇ (wlv->ਸਤਰ_attr != 0)
+		attr = hl_combine_attr(attr, wlv->ਸਤਰ_attr);
 # endif
-	    if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol
+	    ਜੇ (wp->w_p_cuc && VCOL_HLC == (ਲੰਮਾ)wp->w_virtcol
 		    && wlv->lnum != wp->w_cursor.lnum)
 		attr = hl_combine_attr(attr, HL_ATTR(HLF_CUC));
-	    else if (wlv->draw_color_col && VCOL_HLC == *wlv->color_cols)
+	    ਨਹੀਂਤਾਂ ਜੇ (wlv->draw_color_ਖਾਨਾ && VCOL_HLC == *wlv->color_ਖਾਨੇ_ਗਿਣਤੀ)
 		attr = hl_combine_attr(attr, HL_ATTR(HLF_MC));
 	    ScreenAttrs[wlv->off] = attr;
-	    ScreenCols[wlv->off] = wlv->vcol;
+	    Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv->off] = wlv->vcol;
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+	    ਜੇ (wp->w_p_rl)
 	    {
 		--wlv->off;
-		--wlv->col;
+		--wlv->ਖਾਨਾ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 # endif
 	    {
 		++wlv->off;
-		++wlv->col;
+		++wlv->ਖਾਨਾ;
 	    }
 	    ++wlv->vcol;
 
-	    if (VCOL_HLC > rightmost_vcol
-# ifdef LINE_ATTR
-		    && wlv->line_attr == 0
+	    ਜੇ (VCOL_HLC > rightmost_vcol
+# ifdef ਸਤਰ_ATTR
+		    && wlv->ਸਤਰ_attr == 0
 # endif
 		    && wlv->win_attr == 0)
-		break;
+		ਰੋਕੋ;
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     // Set increasing virtual columns in ScreenCols[] to set correct curswant
     // (or "coladd" for 'virtualedit') when clicking after end of line.
-    wlv->screen_line_flags |= SLF_INC_VCOL;
-    wlv_screen_line(wp, wlv, TRUE);
-    wlv->screen_line_flags &= ~SLF_INC_VCOL;
-    ++wlv->row;
-    ++wlv->screen_row;
+    wlv->screen_ਸਤਰ_flags |= SLF_INC_VCOL;
+    wlv_screen_ਸਤਰ(wp, wlv, TRUE);
+    wlv->screen_ਸਤਰ_flags &= ~SLF_INC_VCOL;
+    ++wlv->ਪੰਕਤੀ;
+    ++wlv->screen_ਪੰਕਤੀ;
 }
-#undef VCOL_HLC
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ VCOL_HLC
 
 /*
  * Start a screen line at column zero.
  * When "save_extra" is TRUE save and reset n_extra, p_extra, etc.
  */
-    static void
-win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
+    ਸਥਿਰ ਖਾਲੀ
+win_ਸਤਰ_ਸ਼ੁਰੂ(win_T *wp ਅਣਵਰਤਿਆ, winlinevars_T *wlv, ਪੂਰਨ save_extra)
 {
-    wlv->col = 0;
-    wlv->off = (unsigned)(current_ScreenLine - ScreenLines);
-#ifdef FEAT_LINEBREAK
+    wlv->ਖਾਨਾ = 0;
+    wlv->off = (ਬਿਨਾਨਿਸ਼ਾਨੀ)(current_Screen_ਸਤਰ - Screen_ਸਤਰਾਂ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
     wlv->need_lbr = FALSE;
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+    ਜੇ (wp->w_p_rl)
     {
 	// Rightleft window: process the text in the normal direction, but put
 	// it in current_ScreenLine[] from right to left.  Start at the
 	// rightmost column of the window.
-	wlv->col = wp->w_width - 1;
-	wlv->off += wlv->col;
-	wlv->screen_line_flags |= SLF_RIGHTLEFT;
+	wlv->ਖਾਨਾ = wp->w_ਚੌੜਾਈ - 1;
+	wlv->off += wlv->ਖਾਨਾ;
+	wlv->screen_ਸਤਰ_flags |= SLF_RIGHTLEFT;
     }
-#endif
-    if (save_extra)
+#ਜੇ_ਅੰਤ
+    ਜੇ (save_extra)
     {
 	// reset the drawing state for the start of a wrapped line
-	wlv->draw_state = WL_START;
+	wlv->draw_state = WL_ਸ਼ੁਰੂ;
 	wlv->saved_n_extra = wlv->n_extra;
 	wlv->saved_p_extra = wlv->p_extra;
 	vim_free(wlv->saved_p_extra_free);
 	wlv->saved_p_extra_free = wlv->p_extra_free;
-	wlv->p_extra_free = NULL;
+	wlv->p_extra_free = ਨਿਰਾ;
 	wlv->saved_extra_attr = wlv->extra_attr;
 	wlv->saved_n_attr_skip = wlv->n_attr_skip;
 	wlv->saved_extra_for_textprop = wlv->extra_for_textprop;
 	wlv->saved_c_extra = wlv->c_extra;
 	wlv->saved_c_final = wlv->c_final;
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 	wlv->need_lbr = TRUE;
-#endif
-#ifdef FEAT_SYN_HL
-	if (!(wlv->cul_screenline
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	ਜੇ (!(wlv->cul_screenline
 # ifdef FEAT_DIFF
 		    && wlv->diff_hlf == (hlf_T)0
 # endif
 	     ))
 	    wlv->saved_char_attr = wlv->char_attr;
-	else
-#endif
+	ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    wlv->saved_char_attr = 0;
 
 	// these are not used until restored in win_line_continue()
@@ -1089,10 +1089,10 @@ win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
 /*
  * Called when wlv->draw_state is set to WL_LINE.
  */
-    static void
-win_line_continue(winlinevars_T *wlv)
+    ਸਥਿਰ ਖਾਲੀ
+win_ਸਤਰ_continue(winlinevars_T *wlv)
 {
-    if (wlv->saved_n_extra > 0)
+    ਜੇ (wlv->saved_n_extra > 0)
     {
 	// Continue item from end of wrapped line.
 	wlv->n_extra = wlv->saved_n_extra;
@@ -1102,45 +1102,45 @@ win_line_continue(winlinevars_T *wlv)
 	wlv->p_extra = wlv->saved_p_extra;
 	vim_free(wlv->p_extra_free);
 	wlv->p_extra_free = wlv->saved_p_extra_free;
-	wlv->saved_p_extra_free = NULL;
+	wlv->saved_p_extra_free = ਨਿਰਾ;
 	wlv->extra_attr = wlv->saved_extra_attr;
 	wlv->n_attr_skip = wlv->saved_n_attr_skip;
 	wlv->extra_for_textprop = wlv->saved_extra_for_textprop;
 	wlv->char_attr = wlv->saved_char_attr;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	wlv->char_attr = wlv->win_attr;
 }
 
-#ifdef FEAT_SYN_HL
-    static void
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਸਥਿਰ ਖਾਲੀ
 apply_cursorline_highlight(
 	winlinevars_T *wlv,
-	int sign_present UNUSED)
+	ਪੂਰਨ sign_present ਅਣਵਰਤਿਆ)
 {
     wlv->cul_attr = HL_ATTR(HLF_CUL);
 # ifdef FEAT_SIGNS
     // Combine the 'cursorline' and sign highlighting, depending on
     // the sign priority.
-    if (sign_present && wlv->sattr.sat_linehl > 0)
+    ਜੇ (sign_present && wlv->sattr.sat_linehl > 0)
     {
-	if (wlv->sattr.sat_priority >= 100)
-	    wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
-	else
-	    wlv->line_attr = hl_combine_attr(wlv->line_attr, wlv->cul_attr);
+	ਜੇ (wlv->sattr.sat_ਤਰਜੀਹ >= 100)
+	    wlv->ਸਤਰ_attr = hl_combine_attr(wlv->cul_attr, wlv->ਸਤਰ_attr);
+	ਨਹੀਂਤਾਂ
+	    wlv->ਸਤਰ_attr = hl_combine_attr(wlv->ਸਤਰ_attr, wlv->cul_attr);
     }
-    else
+    ਨਹੀਂਤਾਂ
 # endif
-# if defined(FEAT_QUICKFIX)
+# ਜੇ defined(FEAT_QUICKFIX)
 	// let the line attribute overrule 'cursorline', otherwise
 	// it disappears when both have background set;
 	// 'cursorline' can use underline or bold to make it show
-	wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
-# else
-	wlv->line_attr = wlv->cul_attr;
+	wlv->ਸਤਰ_attr = hl_combine_attr(wlv->cul_attr, wlv->ਸਤਰ_attr);
+# ਨਹੀਂਤਾਂ
+	wlv->ਸਤਰ_attr = wlv->cul_attr;
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Display line "lnum" of window "wp" on the screen.
@@ -1153,196 +1153,196 @@ apply_cursorline_highlight(
  *
  * Return the number of last row the line occupies.
  */
-    int
-win_line(
+    ਪੂਰਨ
+win_ਸਤਰ(
     win_T	*wp,
     linenr_T	lnum,
-    int		startrow,
-    int		endrow,
-    int		number_only,
-    spellvars_T	*spv UNUSED)
+    ਪੂਰਨ		startrow,
+    ਪੂਰਨ		endrow,
+    ਪੂਰਨ		ਸੰਖਿਆ_only,
+    spellvars_T	*spv ਅਣਵਰਤਿਆ)
 {
     winlinevars_T	wlv;		// variables passed between functions
 
-    int		c = 0;			// init for GCC
-    char_u	*line;			// current line
+    ਪੂਰਨ		c = 0;			// init for GCC
+    char_u	*ਸਤਰ;			// current line
     char_u	*ptr;			// current position in "line"
-    int		in_curline = wp == curwin && lnum == curwin->w_cursor.lnum;
+    ਪੂਰਨ		ਵਿੱਚ_curline = wp == curwin && lnum == curwin->w_cursor.lnum;
 
-#ifdef FEAT_PROP_POPUP
-    char_u	*p_extra_free2 = NULL;   // another p_extra to be freed
-#endif
-#if defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
-    int		in_linebreak = FALSE;	// n_extra set for showing linebreak
-#endif
-    int		lcs_eol_one = wp->w_lcs_chars.eol; // eol until it's been used
-    int		lcs_prec_todo = wp->w_lcs_chars.prec;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    char_u	*p_extra_free2 = ਨਿਰਾ;   // another p_extra to be freed
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
+    ਪੂਰਨ		ਵਿੱਚ_linebreak = FALSE;	// n_extra set for showing linebreak
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		lcs_eol_one = wp->w_lcs_chars.eol; // eol until it's been used
+    ਪੂਰਨ		lcs_prec_todo = wp->w_lcs_chars.prec;
 					// prec until it's been used
 
-    int		n_attr = 0;	    // chars with special attr
-    int		saved_attr2 = 0;    // char_attr saved for n_attr
-    int		n_attr3 = 0;	    // chars with overruling special attr
-    int		saved_attr3 = 0;    // char_attr saved for n_attr3
+    ਪੂਰਨ		n_attr = 0;	    // chars with special attr
+    ਪੂਰਨ		saved_attr2 = 0;    // char_attr saved for n_attr
+    ਪੂਰਨ		n_attr3 = 0;	    // chars with overruling special attr
+    ਪੂਰਨ		saved_attr3 = 0;    // char_attr saved for n_attr3
 
-    int		skip_cells = 0;		// nr of cells to skip for w_leftcol or
+    ਪੂਰਨ		skip_cells = 0;		// nr of cells to skip for w_leftcol or
 					// w_skipcol or concealing
-    int		skipped_cells = 0;	// nr of skipped cells for virtual text
+    ਪੂਰਨ		skipped_cells = 0;	// nr of skipped cells for virtual text
 					// to be added to wlv.vcol later
-    int		lnum_in_visual_area = FALSE;
+    ਪੂਰਨ		lnum_ਵਿੱਚ_visual_area = FALSE;
     pos_T	pos;
-    long	v;
+    ਲੰਮਾ	v;
 
-    int		attr_pri = FALSE;	// char_attr has priority
-    int		area_highlighting = FALSE; // Visual or incsearch highlighting
+    ਪੂਰਨ		attr_pri = FALSE;	// char_attr has priority
+    ਪੂਰਨ		area_highlighting = FALSE; // Visual or incsearch highlighting
 					   // in this line
-    int		vi_attr = 0;		// attributes for Visual and incsearch
+    ਪੂਰਨ		vi_attr = 0;		// attributes for Visual and incsearch
 					// highlighting
-    int		area_attr = 0;		// attributes desired by highlighting
-    int		search_attr = 0;	// attributes desired by 'hlsearch' or
+    ਪੂਰਨ		area_attr = 0;		// attributes desired by highlighting
+    ਪੂਰਨ		ਖੋਜ_attr = 0;	// attributes desired by 'hlsearch' or
 					// ComplMatchIns
-#ifdef FEAT_SYN_HL
-    int		vcol_save_attr = 0;	// saved attr for 'cursorcolumn'
-    int		syntax_attr = 0;	// attributes desired by syntax
-    int		prev_syntax_col = -1;	// column of prev_syntax_attr
-    int		prev_syntax_attr = 0;	// syntax_attr at prev_syntax_col
-    int		has_syntax = FALSE;	// this buffer has syntax highl.
-    int		save_did_emsg;
-#endif
-#ifdef FEAT_PROP_POPUP
-# define WIN_LINE_TEXT_PROP_STACK_LEN 32
-    int		did_line = FALSE;	// set to TRUE when line text done
-    int		text_prop_count;
-    int		last_textprop_text_idx = -1;
-    int		text_prop_next = 0;	// next text property to use
-    textprop_T	text_props_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    int		text_prop_idxs_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    char_u	text_prop_suffix_flags_buf[WIN_LINE_TEXT_PROP_STACK_LEN + 1];
-    textprop_T	*text_props = NULL;
-    int		*text_prop_idxs = NULL;
-    char_u	*text_prop_suffix_flags = NULL;
-    int		text_props_active = 0;
-    int		text_props_need_sort = FALSE;
-    proptype_T  *text_prop_type = NULL;
-    int		text_prop_attr = 0;
-    int		text_prop_attr_comb = 0;  // text_prop_attr combined with
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+    ਪੂਰਨ		vcol_save_attr = 0;	// saved attr for 'cursorcolumn'
+    ਪੂਰਨ		syntax_attr = 0;	// attributes desired by syntax
+    ਪੂਰਨ		prev_syntax_ਖਾਨਾ = -1;	// column of prev_syntax_attr
+    ਪੂਰਨ		prev_syntax_attr = 0;	// syntax_attr at prev_syntax_col
+    ਪੂਰਨ		has_syntax = FALSE;	// this buffer has syntax highl.
+    ਪੂਰਨ		save_did_emsg;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+# define WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN 32
+    ਪੂਰਨ		did_ਸਤਰ = FALSE;	// set to TRUE when line text done
+    ਪੂਰਨ		ਪਾਠ_prop_ਗਿਣਤੀ;
+    ਪੂਰਨ		ਆਖਰੀ_textprop_ਪਾਠ_idx = -1;
+    ਪੂਰਨ		ਪਾਠ_prop_ਅਗਲਾ = 0;	// next text property to use
+    textprop_T	ਪਾਠ_props_buf[WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN];
+    ਪੂਰਨ		ਪਾਠ_prop_idxs_buf[WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN];
+    char_u	ਪਾਠ_prop_suffix_flags_buf[WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN + 1];
+    textprop_T	*ਪਾਠ_props = ਨਿਰਾ;
+    ਪੂਰਨ		*ਪਾਠ_prop_idxs = ਨਿਰਾ;
+    char_u	*ਪਾਠ_prop_suffix_flags = ਨਿਰਾ;
+    ਪੂਰਨ		ਪਾਠ_props_ਸਰਗਰਮ = 0;
+    ਪੂਰਨ		ਪਾਠ_props_need_ਛਾਂਟੋ = FALSE;
+    proptype_T  *ਪਾਠ_prop_type = ਨਿਰਾ;
+    ਪੂਰਨ		ਪਾਠ_prop_attr = 0;
+    ਪੂਰਨ		ਪਾਠ_prop_attr_comb = 0;  // text_prop_attr combined with
 					  // syntax_attr
-    int		text_prop_id = 0;	// active property ID
-    int		text_prop_flags = 0;
-    int		text_prop_above = FALSE;  // first doing virtual text above
-    int		text_prop_follows = FALSE;  // another text prop to display
-    int		saved_search_attr = 0;	// search_attr to be used when n_extra
+    ਪੂਰਨ		ਪਾਠ_prop_id = 0;	// active property ID
+    ਪੂਰਨ		ਪਾਠ_prop_flags = 0;
+    ਪੂਰਨ		ਪਾਠ_prop_above = FALSE;  // first doing virtual text above
+    ਪੂਰਨ		ਪਾਠ_prop_follows = FALSE;  // another text prop to display
+    ਪੂਰਨ		saved_ਖੋਜ_attr = 0;	// search_attr to be used when n_extra
 					// goes to zero
-    int		saved_area_attr = 0;	// idem for area_attr
-    int		reset_extra_attr = FALSE;
-#endif
-#ifdef FEAT_SPELL
-    int		can_spell = FALSE;
+    ਪੂਰਨ		saved_area_attr = 0;	// idem for area_attr
+    ਪੂਰਨ		reset_extra_attr = FALSE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+    ਪੂਰਨ		can_spell = FALSE;
 # define SPWORDLEN 150
     char_u	nextline[SPWORDLEN * 2];// text with start of the next line
-    int		nextlinecol = 0;	// column where nextline[] starts
-    int		nextline_idx = 0;	// index in nextline[] where next line
+    ਪੂਰਨ		nextlinecol = 0;	// column where nextline[] starts
+    ਪੂਰਨ		nextline_idx = 0;	// index in nextline[] where next line
 					// starts
-    int		spell_attr = 0;		// attributes desired by spelling
-    int		word_end = 0;		// last byte with same spell_attr
-    int		cur_checked_col = 0;	// checked column for current line
-#endif
-    int		extra_check = FALSE;	// has extra highlighting
-    int		multi_attr = 0;		// attributes desired by multibyte
-    int		mb_l = 1;		// multi-byte byte length
-    int		mb_c = 0;		// decoded multi-byte character
-    int		mb_utf8 = FALSE;	// screen char is UTF-8 char
-    int		u8cc[MAX_MCO];		// composing UTF-8 chars
-#ifdef FEAT_DIFF
-    int		change_start = MAXCOL;	// first col of changed area
-    int		change_end = -1;	// last col of changed area
-    diffline_T	line_changes;
-    int		change_index = -1;
-#endif
+    ਪੂਰਨ		spell_attr = 0;		// attributes desired by spelling
+    ਪੂਰਨ		ਸ਼ਬਦ_ਸਿਰਾ = 0;		// last byte with same spell_attr
+    ਪੂਰਨ		cur_checked_ਖਾਨਾ = 0;	// checked column for current line
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		extra_check = FALSE;	// has extra highlighting
+    ਪੂਰਨ		multi_attr = 0;		// attributes desired by multibyte
+    ਪੂਰਨ		mb_l = 1;		// multi-byte byte length
+    ਪੂਰਨ		mb_c = 0;		// decoded multi-byte character
+    ਪੂਰਨ		mb_utf8 = FALSE;	// screen char is UTF-8 char
+    ਪੂਰਨ		u8cc[MAX_MCO];		// composing UTF-8 chars
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+    ਪੂਰਨ		change_ਸ਼ੁਰੂ = MAXCOL;	// first col of changed area
+    ਪੂਰਨ		change_ਸਿਰਾ = -1;	// last col of changed area
+    diffline_T	ਸਤਰ_changes;
+    ਪੂਰਨ		change_ਸੂਚਕਾਂਕ = -1;
+#ਜੇ_ਅੰਤ
     colnr_T	trailcol = MAXCOL;	// start of trailing spaces
     colnr_T	leadcol = 0;		// start of leading spaces
-    int		in_multispace = FALSE;	// in multiple consecutive spaces
-    int		multispace_pos = 0;	// position in lcs-multispace string
-#ifdef LINE_ATTR
-    int		line_attr_save = 0;
-#endif
-    int		sign_present = FALSE;
-    int		num_attr = 0;		// attribute for the number column
-#ifdef FEAT_ARABIC
-    int		prev_c = 0;		// previous Arabic character
-    int		prev_c1 = 0;		// first composing char for prev_c
-#endif
-#if defined(LINE_ATTR)
-    int		did_line_attr = 0;
-#endif
-#ifdef FEAT_TERMINAL
-    int		get_term_attr = FALSE;
-#endif
+    ਪੂਰਨ		ਵਿੱਚ_multispace = FALSE;	// in multiple consecutive spaces
+    ਪੂਰਨ		multispace_pos = 0;	// position in lcs-multispace string
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸਤਰ_ATTR
+    ਪੂਰਨ		ਸਤਰ_attr_save = 0;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		sign_present = FALSE;
+    ਪੂਰਨ		ਅੰਕ_attr = 0;		// attribute for the number column
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
+    ਪੂਰਨ		prev_c = 0;		// previous Arabic character
+    ਪੂਰਨ		prev_c1 = 0;		// first composing char for prev_c
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(ਸਤਰ_ATTR)
+    ਪੂਰਨ		did_ਸਤਰ_attr = 0;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+    ਪੂਰਨ		get_ਪਦ_attr = FALSE;
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
+#ਜੇ defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
     // margin columns for the screen line, needed for when 'cursorlineopt'
     // contains "screenline"
-    int		left_curline_col = 0;
-    int		right_curline_col = 0;
-#endif
+    ਪੂਰਨ		ਖੱਬਾ_curline_ਖਾਨਾ = 0;
+    ਪੂਰਨ		ਸੱਜਾ_curline_ਖਾਨਾ = 0;
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    int		feedback_col = 0;
-    int		feedback_old_attr = -1;
-#endif
+#ਜੇ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ਪੂਰਨ		feedback_ਖਾਨਾ = 0;
+    ਪੂਰਨ		feedback_old_attr = -1;
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
-    int		match_conc	= 0;	// cchar for match functions
-#endif
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_LINEBREAK)
-    int		on_last_col     = FALSE;
-#endif
-#ifdef FEAT_CONCEAL
-    int		syntax_flags	= 0;
-    int		syntax_seqnr	= 0;
-    int		prev_syntax_id	= 0;
-    int		conceal_attr	= HL_ATTR(HLF_CONCEAL);
-    int		is_concealing	= FALSE;
-    int		did_wcol	= FALSE;
-    int		old_boguscols   = 0;
+#ਜੇ defined(FEAT_CONCEAL) || defined(FEAT_ਖੋਜ_EXTRA)
+    ਪੂਰਨ		ਮੇਲ_conc	= 0;	// cchar for match functions
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_CONCEAL) || defined(FEAT_ਖੋਜ_EXTRA) || defined(FEAT_LINEBREAK)
+    ਪੂਰਨ		on_ਆਖਰੀ_ਖਾਨਾ     = FALSE;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+    ਪੂਰਨ		syntax_flags	= 0;
+    ਪੂਰਨ		syntax_seqnr	= 0;
+    ਪੂਰਨ		prev_syntax_id	= 0;
+    ਪੂਰਨ		conceal_attr	= HL_ATTR(HLF_CONCEAL);
+    ਪੂਰਨ		is_concealing	= FALSE;
+    ਪੂਰਨ		did_wcol	= FALSE;
+    ਪੂਰਨ		old_boguscols   = 0;
 # define VCOL_HLC (wlv.vcol - wlv.vcol_off_co - wlv.vcol_off_tp)
 # define FIX_FOR_BOGUSCOLS \
     { \
 	wlv.n_extra += wlv.vcol_off_co; \
 	wlv.vcol -= wlv.vcol_off_co; \
 	wlv.vcol_off_co = 0; \
-	wlv.col -= wlv.boguscols; \
+	wlv.ਖਾਨਾ -= wlv.boguscols; \
 	old_boguscols = wlv.boguscols; \
 	wlv.boguscols = 0; \
     }
-#else
+#ਨਹੀਂਤਾਂ
 # define VCOL_HLC (wlv.vcol - wlv.vcol_off_tp)
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (startrow > endrow)		// past the end already!
-	return startrow;
+    ਜੇ (startrow > endrow)		// past the end already!
+	ਵਾਪਸ startrow;
 
-    CLEAR_FIELD(wlv);
+    CLEAR_ਖੇਤਰ(wlv);
 
     wlv.lnum = lnum;
     wlv.startrow = startrow;
-    wlv.row = startrow;
-    wlv.screen_row = wlv.row + W_WINROW(wp);
+    wlv.ਪੰਕਤੀ = startrow;
+    wlv.screen_ਪੰਕਤੀ = wlv.ਪੰਕਤੀ + W_WINROW(wp);
     wlv.fromcol = -10;
     wlv.tocol = MAXCOL;
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
     wlv.vcol_sbr = -1;
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (number_only == 0)
+    ਜੇ (ਸੰਖਿਆ_only == 0)
     {
 	// To speed up the loop below, set extra_check when there is linebreak,
 	// trailing white space and/or syntax processing to be done.
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 	extra_check = wp->w_p_lbr;
-#endif
-#ifdef FEAT_SYN_HL
-	if (syntax_present(wp) && !wp->w_s->b_syn_error
-# ifdef SYN_TIME_LIMIT
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	ਜੇ (syntax_present(wp) && !wp->w_s->b_syn_error
+# ifdef SYN_ਸਮਾਂ_ਹੱਦਬੰਦੀ
 		&& !wp->w_s->b_syn_slow
 # endif
 	   )
@@ -1351,14 +1351,14 @@ win_line(
 	    // error, stop syntax highlighting.
 	    save_did_emsg = did_emsg;
 	    did_emsg = FALSE;
-	    syntax_start(wp, lnum);
-	    if (did_emsg)
+	    syntax_ਸ਼ੁਰੂ(wp, lnum);
+	    ਜੇ (did_emsg)
 		wp->w_s->b_syn_error = TRUE;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		did_emsg = save_did_emsg;
-# ifdef SYN_TIME_LIMIT
-		if (!wp->w_s->b_syn_slow)
+# ifdef SYN_ਸਮਾਂ_ਹੱਦਬੰਦੀ
+		ਜੇ (!wp->w_s->b_syn_slow)
 # endif
 		{
 		    has_syntax = TRUE;
@@ -1368,80 +1368,80 @@ win_line(
 	}
 
 	// Check for columns to display for 'colorcolumn'.
-	wlv.color_cols = wp->w_p_cc_cols;
-	if (wlv.color_cols != NULL)
-	    wlv.draw_color_col = advance_color_col(VCOL_HLC, &wlv.color_cols);
-#endif
+	wlv.color_ਖਾਨੇ_ਗਿਣਤੀ = wp->w_p_cc_ਖਾਨੇ_ਗਿਣਤੀ;
+	ਜੇ (wlv.color_ਖਾਨੇ_ਗਿਣਤੀ != ਨਿਰਾ)
+	    wlv.draw_color_ਖਾਨਾ = advance_color_ਖਾਨਾ(VCOL_HLC, &wlv.color_ਖਾਨੇ_ਗਿਣਤੀ);
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_TERMINAL
-	if (term_show_buffer(wp->w_buffer))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TERMINAL
+	ਜੇ (ਪਦ_show_ਬਫਰ(wp->w_ਬਫਰ))
 	{
 	    extra_check = TRUE;
-	    get_term_attr = TRUE;
-	    wlv.win_attr = term_get_attr(wp, lnum, -1);
+	    get_ਪਦ_attr = TRUE;
+	    wlv.win_attr = ਪਦ_get_attr(wp, lnum, -1);
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// handle Visual active in this window
-	if (VIsual_active && wp->w_buffer == curwin->w_buffer)
+	ਜੇ (VIsual_ਸਰਗਰਮ && wp->w_ਬਫਰ == curwin->w_ਬਫਰ)
 	{
-	    pos_T	*top, *bot;
+	    pos_T	*ਸਿਖਰ, *bot;
 
-	    if (LTOREQ_POS(curwin->w_cursor, VIsual))
+	    ਜੇ (LTOREQ_POS(curwin->w_cursor, VIsual))
 	    {
 		// Visual is after curwin->w_cursor
-		top = &curwin->w_cursor;
+		ਸਿਖਰ = &curwin->w_cursor;
 		bot = &VIsual;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Visual is before curwin->w_cursor
-		top = &VIsual;
+		ਸਿਖਰ = &VIsual;
 		bot = &curwin->w_cursor;
 	    }
-	    lnum_in_visual_area = (lnum >= top->lnum && lnum <= bot->lnum);
-	    if (VIsual_mode == Ctrl_V)
+	    lnum_ਵਿੱਚ_visual_area = (lnum >= ਸਿਖਰ->lnum && lnum <= bot->lnum);
+	    ਜੇ (VIsual_ਬਹੁਲਕ == Ctrl_V)
 	    {
 		// block mode
-		if (lnum_in_visual_area)
+		ਜੇ (lnum_ਵਿੱਚ_visual_area)
 		{
 		    wlv.fromcol = wp->w_old_cursor_fcol;
 		    wlv.tocol = wp->w_old_cursor_lcol;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// non-block mode
-		if (lnum > top->lnum && lnum <= bot->lnum)
+		ਜੇ (lnum > ਸਿਖਰ->lnum && lnum <= bot->lnum)
 		    wlv.fromcol = 0;
-		else if (lnum == top->lnum)
+		ਨਹੀਂਤਾਂ ਜੇ (lnum == ਸਿਖਰ->lnum)
 		{
-		    if (VIsual_mode == 'V')	// linewise
+		    ਜੇ (VIsual_ਬਹੁਲਕ == 'V')	// linewise
 			wlv.fromcol = 0;
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			getvvcol(wp, top, &wlv.fromcol, NULL, NULL, 0);
-			if (gchar_pos(top) == NUL)
+			getvvcol(wp, ਸਿਖਰ, &wlv.fromcol, ਨਿਰਾ, ਨਿਰਾ, 0);
+			ਜੇ (gchar_pos(ਸਿਖਰ) == NUL)
 			    wlv.tocol = wlv.fromcol + 1;
 		    }
 		}
-		if (VIsual_mode != 'V' && lnum == bot->lnum)
+		ਜੇ (VIsual_ਬਹੁਲਕ != 'V' && lnum == bot->lnum)
 		{
-		    if (*p_sel == 'e' && bot->col == 0 && bot->coladd == 0)
+		    ਜੇ (*p_sel == 'e' && bot->ਖਾਨਾ == 0 && bot->coladd == 0)
 		    {
 			wlv.fromcol = -10;
 			wlv.tocol = MAXCOL;
 		    }
-		    else if (bot->col == MAXCOL)
+		    ਨਹੀਂਤਾਂ ਜੇ (bot->ਖਾਨਾ == MAXCOL)
 			wlv.tocol = MAXCOL;
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			pos = *bot;
-			if (*p_sel == 'e')
-			    getvvcol(wp, &pos, &wlv.tocol, NULL, NULL, 0);
-			else
+			ਜੇ (*p_sel == 'e')
+			    getvvcol(wp, &pos, &wlv.tocol, ਨਿਰਾ, ਨਿਰਾ, 0);
+			ਨਹੀਂਤਾਂ
 			{
-			    getvvcol(wp, &pos, NULL, NULL, &wlv.tocol, 0);
+			    getvvcol(wp, &pos, ਨਿਰਾ, ਨਿਰਾ, &wlv.tocol, 0);
 			    ++wlv.tocol;
 			}
 		    }
@@ -1449,225 +1449,225 @@ win_line(
 	    }
 
 	    // if inverting in this line set area_highlighting
-	    if (wlv.fromcol >= 0)
+	    ਜੇ (wlv.fromcol >= 0)
 	    {
 		area_highlighting = TRUE;
 		vi_attr = HL_ATTR(HLF_V);
-#if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
-		if ((clip_star.available && !clip_star.owned
-						    && clip_isautosel_star())
-			|| (clip_plus.available && !clip_plus.owned
+#ਜੇ defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
+		ਜੇ ((clip_ਤਾਰਾ.ਉਪਲਬਧ && !clip_ਤਾਰਾ.owned
+						    && clip_isautosel_ਤਾਰਾ())
+			|| (clip_plus.ਉਪਲਬਧ && !clip_plus.owned
 						    && clip_isautosel_plus()))
 		    vi_attr = HL_ATTR(HLF_VNC);
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 	}
 
 	// handle 'incsearch' and ":s///c" highlighting
-	else if (highlight_match
+	ਨਹੀਂਤਾਂ ਜੇ (highlight_ਮੇਲ
 		&& wp == curwin
 		&& lnum >= curwin->w_cursor.lnum
-		&& lnum <= curwin->w_cursor.lnum + search_match_lines)
+		&& lnum <= curwin->w_cursor.lnum + ਖੋਜ_ਮੇਲ_ਸਤਰਾਂ)
 	{
-	    if (lnum == curwin->w_cursor.lnum)
+	    ਜੇ (lnum == curwin->w_cursor.lnum)
 		getvcol(curwin, &(curwin->w_cursor),
-						&wlv.fromcol, NULL, NULL, 0);
-	    else
+						&wlv.fromcol, ਨਿਰਾ, ਨਿਰਾ, 0);
+	    ਨਹੀਂਤਾਂ
 		wlv.fromcol = 0;
-	    if (lnum == curwin->w_cursor.lnum + search_match_lines)
+	    ਜੇ (lnum == curwin->w_cursor.lnum + ਖੋਜ_ਮੇਲ_ਸਤਰਾਂ)
 	    {
 		pos.lnum = lnum;
-		pos.col = search_match_endcol;
-		getvcol(curwin, &pos, &wlv.tocol, NULL, NULL, 0);
+		pos.ਖਾਨਾ = ਖੋਜ_ਮੇਲ_endcol;
+		getvcol(curwin, &pos, &wlv.tocol, ਨਿਰਾ, ਨਿਰਾ, 0);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		wlv.tocol = MAXCOL;
 	    // do at least one character; happens when past end of line
-	    if (wlv.fromcol == wlv.tocol && search_match_endcol)
+	    ਜੇ (wlv.fromcol == wlv.tocol && ਖੋਜ_ਮੇਲ_endcol)
 		wlv.tocol = wlv.fromcol + 1;
 	    area_highlighting = TRUE;
 	    vi_attr = HL_ATTR(HLF_I);
 	}
     }
 
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 
-    int linestatus = 0;
-    wlv.filler_lines = diff_check_with_linestatus(wp, lnum, &linestatus);
+    ਪੂਰਨ linestatus = 0;
+    wlv.filler_ਸਤਰਾਂ = diff_check_with_linestatus(wp, lnum, &linestatus);
 
-    CLEAR_FIELD(line_changes);
+    CLEAR_ਖੇਤਰ(ਸਤਰ_changes);
 
-    if (linestatus < 0)
+    ਜੇ (linestatus < 0)
     {
-	if (linestatus == -1)
+	ਜੇ (linestatus == -1)
 	{
-	    if (diff_find_change(wp, lnum, &line_changes))
+	    ਜੇ (diff_ਲੱਭੋ_change(wp, lnum, &ਸਤਰ_changes))
 	    {
-		wlv.diff_hlf = HLF_ADD;	// added line
+		wlv.diff_hlf = HLF_ਜੋੜੋ;	// added line
 	    }
-	    else if (line_changes.num_changes > 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (ਸਤਰ_changes.ਅੰਕ_changes > 0)
 	    {
-		int added = diff_change_parse(
-			&line_changes, &line_changes.changes[0],
-			&change_start, &change_end);
-		if (change_start == 0)
+		ਪੂਰਨ added = diff_change_parse(
+			&ਸਤਰ_changes, &ਸਤਰ_changes.changes[0],
+			&change_ਸ਼ੁਰੂ, &change_ਸਿਰਾ);
+		ਜੇ (change_ਸ਼ੁਰੂ == 0)
 		{
-		    if (added)
+		    ਜੇ (added)
 			wlv.diff_hlf = HLF_TXA;	// added text on changed line
-		    else
+		    ਨਹੀਂਤਾਂ
 			wlv.diff_hlf = HLF_TXD;	// changed text on changed line
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    wlv.diff_hlf = HLF_CHD;	// unchanged text on changed line
-		change_index = 0;
+		change_ਸੂਚਕਾਂਕ = 0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		wlv.diff_hlf = HLF_CHD;	// changed line
-		change_index = 0;
+		change_ਸੂਚਕਾਂਕ = 0;
 	    }
 	}
-	else
-	    wlv.diff_hlf = HLF_ADD;
+	ਨਹੀਂਤਾਂ
+	    wlv.diff_hlf = HLF_ਜੋੜੋ;
 
 	area_highlighting = TRUE;
     }
 
-    if (lnum == wp->w_topline)
-	wlv.filler_lines = wp->w_topfill;
+    ਜੇ (lnum == wp->w_topline)
+	wlv.filler_ਸਤਰਾਂ = wp->w_topfill;
 
-    wlv.filler_todo = wlv.filler_lines;
-#endif
+    wlv.filler_todo = wlv.filler_ਸਤਰਾਂ;
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SIGNS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
     sign_present = buf_get_signattrs(wp, lnum, &wlv.sattr);
-    if (sign_present)
-	num_attr = wlv.sattr.sat_numhl;
-#endif
+    ਜੇ (sign_present)
+	ਅੰਕ_attr = wlv.sattr.sat_numhl;
+#ਜੇ_ਅੰਤ
 
-#ifdef LINE_ATTR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸਤਰ_ATTR
 # ifdef FEAT_SIGNS
     // If this line has a sign with line highlighting set wlv.line_attr.
-    if (sign_present)
-	wlv.line_attr = wlv.sattr.sat_linehl;
+    ਜੇ (sign_present)
+	wlv.ਸਤਰ_attr = wlv.sattr.sat_linehl;
 # endif
-# if defined(FEAT_QUICKFIX)
+# ਜੇ defined(FEAT_QUICKFIX)
     // Highlight the current line in the quickfix window.
-    if (bt_quickfix(wp->w_buffer) && qf_current_entry(wp) == lnum)
-	wlv.line_attr = HL_ATTR(HLF_QFL);
+    ਜੇ (bt_quickfix(wp->w_ਬਫਰ) && qf_current_ਇੰਦਰਾਜ(wp) == lnum)
+	wlv.ਸਤਰ_attr = HL_ATTR(HLF_QFL);
 # endif
-    if (wlv.line_attr != 0)
+    ਜੇ (wlv.ਸਤਰ_attr != 0)
 	area_highlighting = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SPELL
-    if (spv->spv_has_spell && number_only == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
+    ਜੇ (spv->spv_has_spell && ਸੰਖਿਆ_only == 0)
     {
 	// Prepare for spell checking.
 	extra_check = TRUE;
 
 	// When a word wrapped from the previous line the start of the
 	// current line is valid.
-	if (lnum == spv->spv_checked_lnum)
-	    cur_checked_col = spv->spv_checked_col;
+	ਜੇ (lnum == spv->spv_checked_lnum)
+	    cur_checked_ਖਾਨਾ = spv->spv_checked_ਖਾਨਾ;
 	// Previous line was not spell checked, check for capital. This happens
 	// for the first line in an updated region or after a closed fold.
-	if (spv->spv_capcol_lnum == 0 && check_need_cap(wp, lnum, 0))
-	    spv->spv_cap_col = 0;
-	else if (lnum != spv->spv_capcol_lnum)
-	    spv->spv_cap_col = -1;
+	ਜੇ (spv->spv_capcol_lnum == 0 && check_need_cap(wp, lnum, 0))
+	    spv->spv_cap_ਖਾਨਾ = 0;
+	ਨਹੀਂਤਾਂ ਜੇ (lnum != spv->spv_capcol_lnum)
+	    spv->spv_cap_ਖਾਨਾ = -1;
 	spv->spv_checked_lnum = 0;
 
 	// Get the start of the next line, so that words that wrap to the
 	// next line are found too: "et<line-break>al.".
 	// Trick: skip a few chars for C/shell/Vim comments
 	nextline[SPWORDLEN] = NUL;
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	ਜੇ (lnum < wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum + 1, FALSE);
-	    spell_cat_line(nextline + SPWORDLEN, line, SPWORDLEN);
+	    ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum + 1, FALSE);
+	    spell_cat_ਸਤਰ(nextline + SPWORDLEN, ਸਤਰ, SPWORDLEN);
 	}
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
 
 	// If current line is empty, check first word in next line for capital.
-	ptr = skipwhite(line);
-	if (*ptr == NUL)
+	ptr = skipwhite(ਸਤਰ);
+	ਜੇ (*ptr == NUL)
 	{
-	    spv->spv_cap_col = 0;
+	    spv->spv_cap_ਖਾਨਾ = 0;
 	    spv->spv_capcol_lnum = lnum + 1;
 	}
 	// For checking first word with a capital skip white space.
-	else if (spv->spv_cap_col == 0)
-	    spv->spv_cap_col = ptr - line;
+	ਨਹੀਂਤਾਂ ਜੇ (spv->spv_cap_ਖਾਨਾ == 0)
+	    spv->spv_cap_ਖਾਨਾ = ptr - ਸਤਰ;
 
 	// Copy the end of the current line into nextline[].
-	if (nextline[SPWORDLEN] == NUL)
+	ਜੇ (nextline[SPWORDLEN] == NUL)
 	{
 	    // No next line or it is empty.
 	    nextlinecol = MAXCOL;
 	    nextline_idx = 0;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    v = ml_get_buf_len(wp->w_buffer, lnum);
-	    if (v < SPWORDLEN)
+	    v = ml_get_buf_len(wp->w_ਬਫਰ, lnum);
+	    ਜੇ (v < SPWORDLEN)
 	    {
 		// Short line, use it completely and append the start of the
 		// next line.
 		nextlinecol = 0;
-		mch_memmove(nextline, line, (size_t)v);
+		mch_memmove(nextline, ਸਤਰ, (size_t)v);
 		STRMOVE(nextline + v, nextline + SPWORDLEN);
 		nextline_idx = v + 1;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Long line, use only the last SPWORDLEN bytes.
 		nextlinecol = v - SPWORDLEN;
-		mch_memmove(nextline, line + nextlinecol, SPWORDLEN);
+		mch_memmove(nextline, ਸਤਰ + nextlinecol, SPWORDLEN);
 		nextline_idx = SPWORDLEN + 1;
 	    }
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    ptr = line;
+    ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
+    ptr = ਸਤਰ;
 
-    if (wp->w_p_list)
+    ਜੇ (wp->w_p_list)
     {
-	if (wp->w_lcs_chars.space
-		|| wp->w_lcs_chars.multispace != NULL
-		|| wp->w_lcs_chars.leadmultispace != NULL
+	ਜੇ (wp->w_lcs_chars.space
+		|| wp->w_lcs_chars.multispace != ਨਿਰਾ
+		|| wp->w_lcs_chars.leadmultispace != ਨਿਰਾ
 		|| wp->w_lcs_chars.trail
 		|| wp->w_lcs_chars.lead
 		|| wp->w_lcs_chars.nbsp)
 	    extra_check = TRUE;
 
 	// find start of trailing whitespace
-	if (wp->w_lcs_chars.trail)
+	ਜੇ (wp->w_lcs_chars.trail)
 	{
-	    trailcol = ml_get_buf_len(wp->w_buffer, lnum);
-	    while (trailcol > (colnr_T)0 && VIM_ISWHITE(ptr[trailcol - 1]))
+	    trailcol = ml_get_buf_len(wp->w_ਬਫਰ, lnum);
+	    ਜਦੋਂ (trailcol > (colnr_T)0 && VIM_ISWHITE(ptr[trailcol - 1]))
 		--trailcol;
-	    trailcol += (colnr_T)(ptr - line);
+	    trailcol += (colnr_T)(ptr - ਸਤਰ);
 	}
 	// find end of leading whitespace
-	if (wp->w_lcs_chars.lead || wp->w_lcs_chars.leadmultispace != NULL ||
+	ਜੇ (wp->w_lcs_chars.lead || wp->w_lcs_chars.leadmultispace != ਨਿਰਾ ||
 	    wp->w_lcs_chars.leadtab1 != NUL)
 	{
 	    leadcol = 0;
-	    while (VIM_ISWHITE(ptr[leadcol]))
+	    ਜਦੋਂ (VIM_ISWHITE(ptr[leadcol]))
 		++leadcol;
-	    if (ptr[leadcol] == NUL)
+	    ਜੇ (ptr[leadcol] == NUL)
 		// in a line full of spaces all of them are treated as trailing
 		leadcol = (colnr_T)0;
-	    else
+	    ਨਹੀਂਤਾਂ
 		// keep track of the first column not filled with spaces
-		leadcol += (colnr_T)(ptr - line) + 1;
+		leadcol += (colnr_T)(ptr - ਸਤਰ) + 1;
 	}
     }
 
-    if (get_win_attr(wp) != 0)
+    ਜੇ (get_win_attr(wp) != 0)
     {
 	wlv.win_attr = get_win_attr(wp);
 	area_highlighting = TRUE;
@@ -1675,194 +1675,194 @@ win_line(
 
     // When w_skipcol is non-zero and there is virtual text above the actual
     // text, then this much of the virtual text is skipped.
-    int skipcol_in_text_prop_above = 0;
+    ਪੂਰਨ skipcol_ਵਿੱਚ_ਪਾਠ_prop_above = 0;
 
-#ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(wp))
-	wlv.screen_line_flags |= SLF_POPUP;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (WIN_IS_POPUP(wp))
+	wlv.screen_ਸਤਰ_flags |= SLF_POPUP;
 
-    char_u *prop_start;
-    text_prop_count = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
-    if (text_prop_count > 0)
+    char_u *prop_ਸ਼ੁਰੂ;
+    ਪਾਠ_prop_ਗਿਣਤੀ = get_ਪਾਠ_props(wp->w_ਬਫਰ, lnum, &prop_ਸ਼ੁਰੂ, FALSE);
+    ਜੇ (ਪਾਠ_prop_ਗਿਣਤੀ > 0)
     {
 	// Make a copy of the properties, so that they are properly
 	// aligned.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_props = text_props_buf;
-	else
-	    text_props = ALLOC_MULT(textprop_T, text_prop_count);
-	if (text_props != NULL)
+	ਜੇ (ਪਾਠ_prop_ਗਿਣਤੀ <= WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN)
+	    ਪਾਠ_props = ਪਾਠ_props_buf;
+	ਨਹੀਂਤਾਂ
+	    ਪਾਠ_props = ALLOC_MULT(textprop_T, ਪਾਠ_prop_ਗਿਣਤੀ);
+	ਜੇ (ਪਾਠ_props != ਨਿਰਾ)
 	{
-	    mch_memmove(text_props, prop_start,
-				     text_prop_count * sizeof(textprop_T));
+	    mch_memmove(ਪਾਠ_props, prop_ਸ਼ੁਰੂ,
+				     ਪਾਠ_prop_ਗਿਣਤੀ * ਆਕਾਰ(textprop_T));
 
 	    // Convert tp_text_offset to tp_text pointer for virtual
 	    // text properties.  prop_start points into the memline
 	    // after the prop_count field.
-	    char_u *count_ptr = prop_start - PROP_COUNT_SIZE;
+	    char_u *ਗਿਣਤੀ_ptr = prop_ਸ਼ੁਰੂ - PROP_ਗਿਣਤੀ_ਮਾਪ;
 
-	    for (int i = 0; i < text_prop_count; ++i)
+	    ਲਈ (ਪੂਰਨ i = 0; i < ਪਾਠ_prop_ਗਿਣਤੀ; ++i)
 	    {
-		if (text_props[i].tp_id < 0
-				&& text_props[i].u.tp_text_offset > 0)
+		ਜੇ (ਪਾਠ_props[i].tp_id < 0
+				&& ਪਾਠ_props[i].u.tp_ਪਾਠ_ਵਿੱਥ > 0)
 		{
-		    text_props[i].u.tp_text =
-			    count_ptr + text_props[i].u.tp_text_offset;
-		    text_props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
+		    ਪਾਠ_props[i].u.tp_ਪਾਠ =
+			    ਗਿਣਤੀ_ptr + ਪਾਠ_props[i].u.tp_ਪਾਠ_ਵਿੱਥ;
+		    ਪਾਠ_props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 		}
-		else
-		    text_props[i].u.tp_text = NULL;
+		ਨਹੀਂਤਾਂ
+		    ਪਾਠ_props[i].u.tp_ਪਾਠ = ਨਿਰਾ;
 	    }
 	}
 
 	// Allocate an array for the indexes.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_prop_idxs = text_prop_idxs_buf;
-	else
-	    text_prop_idxs = ALLOC_MULT(int, text_prop_count);
-	if (text_prop_idxs == NULL)
+	ਜੇ (ਪਾਠ_prop_ਗਿਣਤੀ <= WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN)
+	    ਪਾਠ_prop_idxs = ਪਾਠ_prop_idxs_buf;
+	ਨਹੀਂਤਾਂ
+	    ਪਾਠ_prop_idxs = ALLOC_MULT(ਪੂਰਨ, ਪਾਠ_prop_ਗਿਣਤੀ);
+	ਜੇ (ਪਾਠ_prop_idxs == ਨਿਰਾ)
 	{
-	    if (text_props != text_props_buf)
-		VIM_CLEAR(text_props);
-	    else
-		text_props = NULL;
+	    ਜੇ (ਪਾਠ_props != ਪਾਠ_props_buf)
+		VIM_CLEAR(ਪਾਠ_props);
+	    ਨਹੀਂਤਾਂ
+		ਪਾਠ_props = ਨਿਰਾ;
 	}
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
-	    text_prop_suffix_flags = text_prop_suffix_flags_buf;
-	else
-	    text_prop_suffix_flags = ALLOC_MULT(char_u, text_prop_count + 1);
-	if (text_prop_suffix_flags == NULL)
+	ਜੇ (ਪਾਠ_prop_ਗਿਣਤੀ <= WIN_ਸਤਰ_ਪਾਠ_PROP_ਢੇਰ_LEN)
+	    ਪਾਠ_prop_suffix_flags = ਪਾਠ_prop_suffix_flags_buf;
+	ਨਹੀਂਤਾਂ
+	    ਪਾਠ_prop_suffix_flags = ALLOC_MULT(char_u, ਪਾਠ_prop_ਗਿਣਤੀ + 1);
+	ਜੇ (ਪਾਠ_prop_suffix_flags == ਨਿਰਾ)
 	{
-	    if (text_prop_idxs != text_prop_idxs_buf)
-		vim_free(text_prop_idxs);
-	    text_prop_idxs = NULL;
-	    if (text_props != text_props_buf)
-		VIM_CLEAR(text_props);
-	    else
-		text_props = NULL;
+	    ਜੇ (ਪਾਠ_prop_idxs != ਪਾਠ_prop_idxs_buf)
+		vim_free(ਪਾਠ_prop_idxs);
+	    ਪਾਠ_prop_idxs = ਨਿਰਾ;
+	    ਜੇ (ਪਾਠ_props != ਪਾਠ_props_buf)
+		VIM_CLEAR(ਪਾਠ_props);
+	    ਨਹੀਂਤਾਂ
+		ਪਾਠ_props = ਨਿਰਾ;
 	}
 
-	if (text_props != NULL)
+	ਜੇ (ਪਾਠ_props != ਨਿਰਾ)
 	{
 	    area_highlighting = TRUE;
 	    extra_check = TRUE;
 
 	    /* Find the last text property that inserts text. */
-	    for (int i = 0; i < text_prop_count; ++i)
-		if (text_props[i].tp_id < 0)
-		    last_textprop_text_idx = i;
+	    ਲਈ (ਪੂਰਨ i = 0; i < ਪਾਠ_prop_ਗਿਣਤੀ; ++i)
+		ਜੇ (ਪਾਠ_props[i].tp_id < 0)
+		    ਆਖਰੀ_textprop_ਪਾਠ_idx = i;
 
 	    // Text props "above" move the line number down to where the text
 	    // is.  Only count the ones that are visible, not those that are
 	    // skipped because of w_skipcol.
-	    int text_width = wp->w_width - win_col_off(wp);
-	    for (int i = text_prop_count - 1; i >= 0; --i)
-		if (text_props[i].tp_flags & TP_FLAG_ALIGN_ABOVE)
+	    ਪੂਰਨ ਪਾਠ_ਚੌੜਾਈ = wp->w_ਚੌੜਾਈ - win_ਖਾਨਾ_off(wp);
+	    ਲਈ (ਪੂਰਨ i = ਪਾਠ_prop_ਗਿਣਤੀ - 1; i >= 0; --i)
+		ਜੇ (ਪਾਠ_props[i].tp_flags & TP_FLAG_ALIGN_ABOVE)
 		{
-		    if (lnum == wp->w_topline
-			    && wp->w_skipcol - skipcol_in_text_prop_above
-								 >= text_width)
+		    ਜੇ (lnum == wp->w_topline
+			    && wp->w_skipcol - skipcol_ਵਿੱਚ_ਪਾਠ_prop_above
+								 >= ਪਾਠ_ਚੌੜਾਈ)
 		    {
 			// This virtual text above is skipped, remove it from
 			// the array.
-			skipcol_in_text_prop_above += text_width;
-			for (int j = i + 1; j < text_prop_count; ++j)
-			    text_props[j - 1] = text_props[j];
+			skipcol_ਵਿੱਚ_ਪਾਠ_prop_above += ਪਾਠ_ਚੌੜਾਈ;
+			ਲਈ (ਪੂਰਨ j = i + 1; j < ਪਾਠ_prop_ਗਿਣਤੀ; ++j)
+			    ਪਾਠ_props[j - 1] = ਪਾਠ_props[j];
 			++i;
-			--text_prop_count;
+			--ਪਾਠ_prop_ਗਿਣਤੀ;
 		    }
-		    else
-			++wlv.text_prop_above_count;
+		    ਨਹੀਂਤਾਂ
+			++wlv.ਪਾਠ_prop_above_ਗਿਣਤੀ;
 		}
 
-	    text_prop_suffix_flags[text_prop_count] = 0;
-	    for (int i = text_prop_count - 1; i >= 0; --i)
+	    ਪਾਠ_prop_suffix_flags[ਪਾਠ_prop_ਗਿਣਤੀ] = 0;
+	    ਲਈ (ਪੂਰਨ i = ਪਾਠ_prop_ਗਿਣਤੀ - 1; i >= 0; --i)
 	    {
-		int flags = text_prop_suffix_flags[i + 1];
+		ਪੂਰਨ flags = ਪਾਠ_prop_suffix_flags[i + 1];
 
-		if (text_props[i].tp_col == MAXCOL)
+		ਜੇ (ਪਾਠ_props[i].tp_ਖਾਨਾ == MAXCOL)
 		{
 		    flags |= 1;
-		    if (text_props[i].tp_flags & TP_FLAG_ALIGN_BELOW)
+		    ਜੇ (ਪਾਠ_props[i].tp_flags & TP_FLAG_ALIGN_ਹੇਠਾਂ)
 			flags |= 2;
 		}
-		text_prop_suffix_flags[i] = flags;
+		ਪਾਠ_prop_suffix_flags[i] = flags;
 	    }
 	}
     }
 
-    if (number_only > 0)
+    ਜੇ (ਸੰਖਿਆ_only > 0)
     {
 	// skip over rows only used for virtual text above
-	wlv.row += wlv.text_prop_above_count;
-	if (wlv.row >= endrow)
+	wlv.ਪੰਕਤੀ += wlv.ਪਾਠ_prop_above_ਗਿਣਤੀ;
+	ਜੇ (wlv.ਪੰਕਤੀ >= endrow)
 	{
-	    if (text_props != text_props_buf)
-		vim_free(text_props);
-	    if (text_prop_idxs != text_prop_idxs_buf)
-		vim_free(text_prop_idxs);
-	    if (text_prop_suffix_flags != text_prop_suffix_flags_buf)
-		vim_free(text_prop_suffix_flags);
-	    return wlv.row;
+	    ਜੇ (ਪਾਠ_props != ਪਾਠ_props_buf)
+		vim_free(ਪਾਠ_props);
+	    ਜੇ (ਪਾਠ_prop_idxs != ਪਾਠ_prop_idxs_buf)
+		vim_free(ਪਾਠ_prop_idxs);
+	    ਜੇ (ਪਾਠ_prop_suffix_flags != ਪਾਠ_prop_suffix_flags_buf)
+		vim_free(ਪਾਠ_prop_suffix_flags);
+	    ਵਾਪਸ wlv.ਪੰਕਤੀ;
 	}
-	wlv.screen_row += wlv.text_prop_above_count;
+	wlv.screen_ਪੰਕਤੀ += wlv.ਪਾਠ_prop_above_ਗਿਣਤੀ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
-    colnr_T vcol_first_char = 0;
-    if (wp->w_p_lbr && number_only == 0)
+#ਜੇ defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
+    colnr_T vcol_ਪਹਿਲਾ_char = 0;
+    ਜੇ (wp->w_p_lbr && ਸੰਖਿਆ_only == 0)
     {
 	chartabsize_T cts;
-	init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
-	(void)win_lbr_chartabsize(&cts, NULL, NULL);
-	vcol_first_char = cts.cts_first_char;
+	init_chartabsize_arg(&cts, wp, lnum, 0, ਸਤਰ, ਸਤਰ);
+	(ਖਾਲੀ)win_lbr_chartabsize(&cts, ਨਿਰਾ, ਨਿਰਾ);
+	vcol_ਪਹਿਲਾ_char = cts.cts_ਪਹਿਲਾ_char;
 	clear_chartabsize_arg(&cts);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     // 'nowrap' or 'wrap' and a single line that doesn't fit: Advance to the
     // first character to be displayed.
-    if (wp->w_p_wrap)
-	v = startrow == 0 ? wp->w_skipcol - skipcol_in_text_prop_above : 0;
-    else
+    ਜੇ (wp->w_p_wrap)
+	v = startrow == 0 ? wp->w_skipcol - skipcol_ਵਿੱਚ_ਪਾਠ_prop_above : 0;
+    ਨਹੀਂਤਾਂ
 	v = wp->w_leftcol;
-    if (v > 0 && number_only == 0)
+    ਜੇ (v > 0 && ਸੰਖਿਆ_only == 0)
     {
 	char_u		*prev_ptr = ptr;
 	chartabsize_T	cts;
-	int		charsize = 0;
-	int		head = 0;
+	ਪੂਰਨ		charsize = 0;
+	ਪੂਰਨ		ਸਿਰ = 0;
 
-	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, line, ptr);
-	cts.cts_max_head_vcol = v;
-	while (cts.cts_vcol < v)
+	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, ਸਤਰ, ptr);
+	cts.cts_max_ਸਿਰ_vcol = v;
+	ਜਦੋਂ (cts.cts_vcol < v)
 	{
-	    head = 0;
-	    charsize = win_lbr_chartabsize(&cts, &head, NULL);
+	    ਸਿਰ = 0;
+	    charsize = win_lbr_chartabsize(&cts, &ਸਿਰ, ਨਿਰਾ);
 	    cts.cts_vcol += charsize;
 	    prev_ptr = cts.cts_ptr;
-	    if (*prev_ptr == NUL)
-		break;
+	    ਜੇ (*prev_ptr == NUL)
+		ਰੋਕੋ;
 	    MB_PTR_ADV(cts.cts_ptr);
-	    if (wp->w_p_list)
+	    ਜੇ (wp->w_p_list)
 	    {
-		in_multispace = *prev_ptr == ' ' && (*cts.cts_ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
-		if (!in_multispace)
+		ਵਿੱਚ_multispace = *prev_ptr == ' ' && (*cts.cts_ptr == ' '
+				  || (prev_ptr > ਸਤਰ && prev_ptr[-1] == ' '));
+		ਜੇ (!ਵਿੱਚ_multispace)
 		    multispace_pos = 0;
-		else if (cts.cts_ptr >= line + leadcol
-					 && wp->w_lcs_chars.multispace != NULL)
+		ਨਹੀਂਤਾਂ ਜੇ (cts.cts_ptr >= ਸਤਰ + leadcol
+					 && wp->w_lcs_chars.multispace != ਨਿਰਾ)
 		{
 		    ++multispace_pos;
-		    if (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
+		    ਜੇ (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		}
-		else if (cts.cts_ptr < line + leadcol
-				     && wp->w_lcs_chars.leadmultispace != NULL)
+		ਨਹੀਂਤਾਂ ਜੇ (cts.cts_ptr < ਸਤਰ + leadcol
+				     && wp->w_lcs_chars.leadmultispace != ਨਿਰਾ)
 		{
 		    ++multispace_pos;
-		    if (wp->w_lcs_chars.leadmultispace[multispace_pos] == NUL)
+		    ਜੇ (wp->w_lcs_chars.leadmultispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		}
 	    }
@@ -1877,106 +1877,106 @@ win_line(
 	// - 'virtualedit' is set, or
 	// - the visual mode is active,
 	// the end of the line may be before the start of the displayed part.
-	if (wlv.vcol < v && (
-#ifdef FEAT_SYN_HL
-	     wp->w_p_cuc || wlv.draw_color_col ||
-#endif
-	     virtual_active() ||
-	     (VIsual_active && wp->w_buffer == curwin->w_buffer)))
+	ਜੇ (wlv.vcol < v && (
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	     wp->w_p_cuc || wlv.draw_color_ਖਾਨਾ ||
+#ਜੇ_ਅੰਤ
+	     virtual_ਸਰਗਰਮ() ||
+	     (VIsual_ਸਰਗਰਮ && wp->w_ਬਫਰ == curwin->w_ਬਫਰ)))
 	    wlv.vcol = v;
 
 	// Handle a character that's not completely on the screen: Put ptr at
 	// that character but skip the first few screen characters.
-	if (wlv.vcol > v)
+	ਜੇ (wlv.vcol > v)
 	{
 	    wlv.vcol -= charsize;
 	    ptr = prev_ptr;
 	}
-	if (v > wlv.vcol)
-	    skip_cells = v - wlv.vcol - head;
+	ਜੇ (v > wlv.vcol)
+	    skip_cells = v - wlv.vcol - ਸਿਰ;
 
 	// Adjust for when the inverted text is before the screen,
 	// and when the start of the inverted text is before the screen.
-	if (wlv.tocol <= wlv.vcol)
+	ਜੇ (wlv.tocol <= wlv.vcol)
 	    wlv.fromcol = 0;
-	else if (wlv.fromcol >= 0 && wlv.fromcol < wlv.vcol)
+	ਨਹੀਂਤਾਂ ਜੇ (wlv.fromcol >= 0 && wlv.fromcol < wlv.vcol)
 	    wlv.fromcol = wlv.vcol;
 
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 	// When w_skipcol is non-zero, first line needs 'showbreak'
-	if (wp->w_p_wrap)
+	ਜੇ (wp->w_p_wrap)
 	    wlv.need_showbreak = TRUE;
-#endif
-#ifdef FEAT_SPELL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 	// When spell checking a word we need to figure out the start of the
 	// word and if it's badly spelled or not.
-	if (spv->spv_has_spell)
+	ਜੇ (spv->spv_has_spell)
 	{
-	    int		len;
-	    colnr_T	linecol = (colnr_T)(ptr - line);
-	    hlf_T	spell_hlf = HLF_COUNT;
+	    ਪੂਰਨ		len;
+	    colnr_T	linecol = (colnr_T)(ptr - ਸਤਰ);
+	    hlf_T	spell_hlf = HLF_ਗਿਣਤੀ;
 
 	    pos = wp->w_cursor;
 	    wp->w_cursor.lnum = lnum;
-	    wp->w_cursor.col = linecol;
-	    len = spell_move_to(wp, FORWARD, SMT_ALL, TRUE, &spell_hlf);
+	    wp->w_cursor.ਖਾਨਾ = linecol;
+	    len = spell_move_ਮੰਜ਼ਿਲ(wp, FORWARD, SMT_ALL, TRUE, &spell_hlf);
 
 	    // spell_move_to() may call ml_get() and make "line" invalid
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-	    ptr = line + linecol;
+	    ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
+	    ptr = ਸਤਰ + linecol;
 
-	    if (len == 0 || (int)wp->w_cursor.col > linecol)
+	    ਜੇ (len == 0 || (ਪੂਰਨ)wp->w_cursor.ਖਾਨਾ > linecol)
 	    {
 		// no bad word found at line start, don't check until end of a
-		// word
-		spell_hlf = HLF_COUNT;
-		word_end = (int)(spell_to_word_end(ptr, wp) - line + 1);
+		//ਸ਼ਬਦ
+		spell_hlf = HLF_ਗਿਣਤੀ;
+		ਸ਼ਬਦ_ਸਿਰਾ = (ਪੂਰਨ)(spell_ਮੰਜ਼ਿਲ_ਸ਼ਬਦ_ਸਿਰਾ(ptr, wp) - ਸਤਰ + 1);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// bad word found, use attributes until end of word
-		word_end = wp->w_cursor.col + len + 1;
+		ਸ਼ਬਦ_ਸਿਰਾ = wp->w_cursor.ਖਾਨਾ + len + 1;
 
 		// Turn index into actual attributes.
-		if (spell_hlf != HLF_COUNT)
+		ਜੇ (spell_hlf != HLF_ਗਿਣਤੀ)
 		    spell_attr = highlight_attr[spell_hlf];
 	    }
 	    wp->w_cursor = pos;
 
 # ifdef FEAT_SYN_HL
 	    // Need to restart syntax highlighting for this line.
-	    if (has_syntax)
-		syntax_start(wp, lnum);
+	    ਜੇ (has_syntax)
+		syntax_ਸ਼ੁਰੂ(wp, lnum);
 # endif
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if (wlv.fromcol >= wlv.tocol)
+    ਜੇ (wlv.fromcol >= wlv.tocol)
 	wlv.fromcol = -1;
 
-#ifdef FEAT_SEARCH_EXTRA
-    if (number_only == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+    ਜੇ (ਸੰਖਿਆ_only == 0)
     {
-	v = (long)(ptr - line);
-	area_highlighting |= prepare_search_hl_line(wp, lnum, (colnr_T)v,
-					      &line, &screen_search_hl,
-					      &search_attr);
-	ptr = line + v; // "line" may have been updated
+	v = (ਲੰਮਾ)(ptr - ਸਤਰ);
+	area_highlighting |= prepare_ਖੋਜ_hl_ਸਤਰ(wp, lnum, (colnr_T)v,
+					      &ਸਤਰ, &screen_ਖੋਜ_hl,
+					      &ਖੋਜ_attr);
+	ptr = ਸਤਰ + v; // "line" may have been updated
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if ((State & MODE_INSERT) && ins_compl_win_active(wp)
-			    && (in_curline || ins_compl_lnum_in_range(lnum)))
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && ins_compl_win_ਸਰਗਰਮ(wp)
+			    && (ਵਿੱਚ_curline || ins_compl_lnum_ਵਿੱਚ_range(lnum)))
 	area_highlighting = TRUE;
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
     // Cursor line highlighting for 'cursorline' in the current window.
-    if (wp->w_p_cul && lnum == wp->w_cursor.lnum)
+    ਜੇ (wp->w_p_cul && lnum == wp->w_cursor.lnum)
     {
 	// Do not show the cursor line in the text when Visual mode is active,
 	// because it's not clear what is selected then.
-	if (!(wp == curwin && VIsual_active)
+	ਜੇ (!(wp == curwin && VIsual_ਸਰਗਰਮ)
 					 && wp->w_p_culopt_flags != CULOPT_NBR)
 	{
 	    wlv.cul_screenline = (wp->w_p_wrap
@@ -1984,340 +1984,340 @@ win_line(
 
 	    // Only apply CursorLine highlight here when "screenline" is not
 	    // present in 'cursorlineopt'.  Otherwise it's done later.
-	    if (!wlv.cul_screenline)
+	    ਜੇ (!wlv.cul_screenline)
 		apply_cursorline_highlight(&wlv, sign_present);
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		line_attr_save = wlv.line_attr;
-		margin_columns_win(wp, &left_curline_col, &right_curline_col);
+		ਸਤਰ_attr_save = wlv.ਸਤਰ_attr;
+		margin_columns_win(wp, &ਖੱਬਾ_curline_ਖਾਨਾ, &ਸੱਜਾ_curline_ਖਾਨਾ);
 	    }
 	    area_highlighting = TRUE;
 	}
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    win_line_start(wp, &wlv, FALSE);
+    win_ਸਤਰ_ਸ਼ੁਰੂ(wp, &wlv, FALSE);
 
     // Repeat for the whole displayed line.
-    for (;;)
+    ਲਈ (;;)
     {
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
-	int	has_match_conc = 0;	// match wants to conceal
-#endif
-#ifdef FEAT_CONCEAL
-	int	did_decrement_ptr = FALSE;
-#endif
+#ਜੇ defined(FEAT_CONCEAL) || defined(FEAT_ਖੋਜ_EXTRA)
+	ਪੂਰਨ	has_ਮੇਲ_conc = 0;	// match wants to conceal
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+	ਪੂਰਨ	did_decrement_ptr = FALSE;
+#ਜੇ_ਅੰਤ
 
 	// Skip this quickly when working on the text.
-	if (wlv.draw_state != WL_LINE)
+	ਜੇ (wlv.draw_state != WL_ਸਤਰ)
 	{
-#ifdef FEAT_SYN_HL
-	    if (wlv.cul_screenline)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	    ਜੇ (wlv.cul_screenline)
 	    {
 		wlv.cul_attr = 0;
-		wlv.line_attr = line_attr_save;
+		wlv.ਸਤਰ_attr = ਸਤਰ_attr_save;
 	    }
-#endif
-	    if (wlv.draw_state == WL_CMDLINE - 1 && wlv.n_extra == 0)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (wlv.draw_state == WL_CMDLINE - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_CMDLINE;
-		if (wp == cmdwin_win)
+		ਜੇ (wp == cmdwin_win)
 		{
 		    wlv.n_extra = 1;
 		    wlv.c_final = NUL;
-		    if (wlv.row == wlv.startrow)
+		    ਜੇ (wlv.ਪੰਕਤੀ == wlv.startrow)
 		    {
 			wlv.c_extra = cmdwin_type;
 			wlv.char_attr = hl_combine_attr(
 				    get_win_attr(wp), HL_ATTR(HLF_AT));
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			wlv.c_extra = ' ';
 			wlv.char_attr = get_win_attr(wp);
 		    }
 		}
 	    }
-#ifdef FEAT_FOLDING
-	    if (wlv.draw_state == WL_FOLD - 1 && wlv.n_extra == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+	    ਜੇ (wlv.draw_state == WL_FOLD - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_FOLD;
 		handle_foldcolumn(wp, &wlv);
 	    }
-#endif
-#ifdef FEAT_SIGNS
-	    if (wlv.draw_state == WL_SIGN - 1 && wlv.n_extra == 0)
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SIGNS
+	    ਜੇ (wlv.draw_state == WL_SIGN - 1 && wlv.n_extra == 0)
 	    {
 		// Show the sign column when desired or when using Netbeans.
 		wlv.draw_state = WL_SIGN;
-		if (signcolumn_on(wp))
+		ਜੇ (signcolumn_on(wp))
 		    get_sign_display_info(FALSE, wp, &wlv);
 	    }
-#endif
-	    if (wlv.draw_state == WL_NR - 1 && wlv.n_extra == 0)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (wlv.draw_state == WL_NR - 1 && wlv.n_extra == 0)
 	    {
 		// Show the line number, if desired.
 		wlv.draw_state = WL_NR;
-		handle_lnum_col(wp, &wlv, sign_present, num_attr);
+		handle_lnum_ਖਾਨਾ(wp, &wlv, sign_present, ਅੰਕ_attr);
 	    }
 
 	    // When only displaying the (relative) line number and that's done,
 	    // stop here.
-	    if (number_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
+	    ਜੇ (ਸੰਖਿਆ_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
 	    {
-		wlv_screen_line(wp, &wlv, FALSE);
+		wlv_screen_ਸਤਰ(wp, &wlv, FALSE);
 		// Need to update more screen lines if:
 		// - LineNrAbove or LineNrBelow is used, or
 		// - still drawing filler lines.
-		if ((wlv.row + 1 - wlv.startrow < number_only
+		ਜੇ ((wlv.ਪੰਕਤੀ + 1 - wlv.startrow < ਸੰਖਿਆ_only
 			&& (HL_ATTR(HLF_LNA) != 0 || HL_ATTR(HLF_LNB) != 0))
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 			|| wlv.filler_todo > 0
-#endif
+#ਜੇ_ਅੰਤ
 			)
 		{
-		    ++wlv.row;
-		    ++wlv.screen_row;
-		    if (wlv.row == endrow)
-			break;
-#ifdef FEAT_DIFF
+		    ++wlv.ਪੰਕਤੀ;
+		    ++wlv.screen_ਪੰਕਤੀ;
+		    ਜੇ (wlv.ਪੰਕਤੀ == endrow)
+			ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    --wlv.filler_todo;
-		    if (wlv.filler_todo == 0 && wp->w_botfill)
-			break;
-#endif
-		    win_line_start(wp, &wlv, TRUE);
-		    continue;
+		    ਜੇ (wlv.filler_todo == 0 && wp->w_botfill)
+			ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+		    win_ਸਤਰ_ਸ਼ੁਰੂ(wp, &wlv, TRUE);
+		    ਜਾਰੀ;
 		}
-		else
-		    break;
+		ਨਹੀਂਤਾਂ
+		    ਰੋਕੋ;
 	    }
 
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 	    // Check if 'breakindent' applies and show it.
 	    // May change wlv.draw_state to WL_BRI or WL_BRI - 1.
-	    if (wlv.n_extra == 0)
+	    ਜੇ (wlv.n_extra == 0)
 		handle_breakindent(wp, &wlv);
-#endif
-#if defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
-	    if (wlv.draw_state == WL_SBR - 1 && wlv.n_extra == 0)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(FEAT_LINEBREAK) || defined(FEAT_DIFF)
+	    ਜੇ (wlv.draw_state == WL_SBR - 1 && wlv.n_extra == 0)
 	    {
 		wlv.draw_state = WL_SBR;
 		handle_showbreak_and_filler(wp, &wlv);
 	    }
-#endif
-	    if (wlv.draw_state == WL_LINE - 1 && wlv.n_extra == 0)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (wlv.draw_state == WL_ਸਤਰ - 1 && wlv.n_extra == 0)
 	    {
-		wlv.draw_state = WL_LINE;
-		win_line_continue(&wlv);  // use wlv.saved_ values
+		wlv.draw_state = WL_ਸਤਰ;
+		win_ਸਤਰ_continue(&wlv);  // use wlv.saved_ values
 	    }
 	}
 
-#ifdef FEAT_SYN_HL
-	if (wlv.cul_screenline && wlv.draw_state == WL_LINE
-		&& wlv.vcol >= left_curline_col
-		&& wlv.vcol < right_curline_col)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	ਜੇ (wlv.cul_screenline && wlv.draw_state == WL_ਸਤਰ
+		&& wlv.vcol >= ਖੱਬਾ_curline_ਖਾਨਾ
+		&& wlv.vcol < ਸੱਜਾ_curline_ਖਾਨਾ)
 	    apply_cursorline_highlight(&wlv, sign_present);
-#endif
+#ਜੇ_ਅੰਤ
 
 	// When still displaying '$' of change command, stop at cursor.
-	if (dollar_vcol >= 0 && in_curline && wlv.vcol >= (long)wp->w_virtcol)
+	ਜੇ (dollar_vcol >= 0 && ਵਿੱਚ_curline && wlv.vcol >= (ਲੰਮਾ)wp->w_virtcol)
 	{
-	    wlv_screen_line(wp, &wlv, FALSE);
+	    wlv_screen_ਸਤਰ(wp, &wlv, FALSE);
 	    // Pretend we have finished updating the window.  Except when
 	    // 'cursorcolumn' is set.
-#ifdef FEAT_SYN_HL
-	    if (wp->w_p_cuc)
-		wlv.row = wp->w_cline_row + wp->w_cline_height;
-	    else
-#endif
-		wlv.row = wp->w_height;
-	    break;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	    ਜੇ (wp->w_p_cuc)
+		wlv.ਪੰਕਤੀ = wp->w_cline_ਪੰਕਤੀ + wp->w_cline_ਉਚਾਈ;
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+		wlv.ਪੰਕਤੀ = wp->w_ਉਚਾਈ;
+	    ਰੋਕੋ;
 	}
 
-	if (wlv.draw_state == WL_LINE && (area_highlighting || extra_check))
+	ਜੇ (wlv.draw_state == WL_ਸਤਰ && (area_highlighting || extra_check))
 	{
-#ifdef FEAT_PROP_POPUP
-	    if (text_props != NULL)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    ਜੇ (ਪਾਠ_props != ਨਿਰਾ)
 	    {
-		int pi;
-		int bcol = (int)(ptr - line);
+		ਪੂਰਨ pi;
+		ਪੂਰਨ bcol = (ਪੂਰਨ)(ptr - ਸਤਰ);
 
-		if (wlv.n_extra > 0
+		ਜੇ (wlv.n_extra > 0
 # ifdef FEAT_LINEBREAK
-			&& !in_linebreak
+			&& !ਵਿੱਚ_linebreak
 # endif
 			)
 		    --bcol;  // still working on the previous char, e.g. Tab
 
 		// Check if any active property ends.
-		for (pi = 0; pi < text_props_active; ++pi)
+		ਲਈ (pi = 0; pi < ਪਾਠ_props_ਸਰਗਰਮ; ++pi)
 		{
-		    int		tpi = text_prop_idxs[pi];
-		    textprop_T  *tp = &text_props[tpi];
+		    ਪੂਰਨ		tpi = ਪਾਠ_prop_idxs[pi];
+		    textprop_T  *tp = &ਪਾਠ_props[tpi];
 
 		    // An inline property ends when after the start column plus
 		    // length. An "above" property ends when used and n_extra
 		    // is zero.
-		    if ((tp->tp_col != MAXCOL
-				       && bcol >= tp->tp_col - 1 + tp->tp_len))
+		    ਜੇ ((tp->tp_ਖਾਨਾ != MAXCOL
+				       && bcol >= tp->tp_ਖਾਨਾ - 1 + tp->tp_len))
 		    {
-			if (pi + 1 < text_props_active)
-			    mch_memmove(text_prop_idxs + pi,
-					text_prop_idxs + pi + 1,
-					sizeof(int)
-					     * (text_props_active - (pi + 1)));
-			--text_props_active;
-			text_props_need_sort = TRUE;
+			ਜੇ (pi + 1 < ਪਾਠ_props_ਸਰਗਰਮ)
+			    mch_memmove(ਪਾਠ_prop_idxs + pi,
+					ਪਾਠ_prop_idxs + pi + 1,
+					ਆਕਾਰ(ਪੂਰਨ)
+					     * (ਪਾਠ_props_ਸਰਗਰਮ - (pi + 1)));
+			--ਪਾਠ_props_ਸਰਗਰਮ;
+			ਪਾਠ_props_need_ਛਾਂਟੋ = TRUE;
 			--pi;
 # ifdef FEAT_LINEBREAK
 			// not exactly right but should work in most cases
-			if (in_linebreak && syntax_attr == text_prop_attr_comb)
+			ਜੇ (ਵਿੱਚ_linebreak && syntax_attr == ਪਾਠ_prop_attr_comb)
 			    syntax_attr = 0;
 # endif
 		    }
 		}
 
 # ifdef FEAT_LINEBREAK
-		if (wlv.n_extra > 0 && in_linebreak)
+		ਜੇ (wlv.n_extra > 0 && ਵਿੱਚ_linebreak)
 		    // not on the next char yet, don't start another prop
 		    --bcol;
 # endif
 		// Add any text property that starts in this column.
-		while (text_prop_next < text_prop_count)
+		ਜਦੋਂ (ਪਾਠ_prop_ਅਗਲਾ < ਪਾਠ_prop_ਗਿਣਤੀ)
 		{
-		    int active;
-		    textprop_T *tp = &text_props[text_prop_next];
-		    if (tp->tp_col == MAXCOL)
+		    ਪੂਰਨ ਸਰਗਰਮ;
+		    textprop_T *tp = &ਪਾਠ_props[ਪਾਠ_prop_ਅਗਲਾ];
+		    ਜੇ (tp->tp_ਖਾਨਾ == MAXCOL)
 		    {
-			if (bcol == 0 && (tp->tp_flags & TP_FLAG_ALIGN_ABOVE))
-			    active = TRUE;
-			else if (*ptr != NUL)
-			    break;
-			else
+			ਜੇ (bcol == 0 && (tp->tp_flags & TP_FLAG_ALIGN_ABOVE))
+			    ਸਰਗਰਮ = TRUE;
+			ਨਹੀਂਤਾਂ ਜੇ (*ptr != NUL)
+			    ਰੋਕੋ;
+			ਨਹੀਂਤਾਂ
 			{
 			    // With 'nowrap' and not in the first screen line only "below"
 			    // text prop can show.
-			    active = wp->w_p_wrap
-				  || wlv.row == startrow
-				  || (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
+			    ਸਰਗਰਮ = wp->w_p_wrap
+				  || wlv.ਪੰਕਤੀ == startrow
+				  || (tp->tp_flags & TP_FLAG_ALIGN_ਹੇਠਾਂ);
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
-			if (bcol < tp->tp_col - 1)
-			    break;
-			active = bcol <= tp->tp_col - 1 + tp->tp_len;
+			ਜੇ (bcol < tp->tp_ਖਾਨਾ - 1)
+			    ਰੋਕੋ;
+			ਸਰਗਰਮ = bcol <= tp->tp_ਖਾਨਾ - 1 + tp->tp_len;
 		    }
 
-		    if (active)
+		    ਜੇ (ਸਰਗਰਮ)
 		    {
-			text_prop_idxs[text_props_active++] = text_prop_next;
-			text_props_need_sort = TRUE;
+			ਪਾਠ_prop_idxs[ਪਾਠ_props_ਸਰਗਰਮ++] = ਪਾਠ_prop_ਅਗਲਾ;
+			ਪਾਠ_props_need_ਛਾਂਟੋ = TRUE;
 		    }
-		    ++text_prop_next;
+		    ++ਪਾਠ_prop_ਅਗਲਾ;
 		}
 
-		if (wlv.n_extra == 0 ||
+		ਜੇ (wlv.n_extra == 0 ||
 			(!wlv.extra_for_textprop
-			 && !(text_prop_type != NULL &&
-			     text_prop_flags & PT_FLAG_OVERRIDE)
+			 && !(ਪਾਠ_prop_type != ਨਿਰਾ &&
+			     ਪਾਠ_prop_flags & PT_FLAG_OVERRIDE)
 		    ))
 		{
-		    text_prop_attr = 0;
-		    text_prop_attr_comb = 0;
-		    text_prop_flags = 0;
-		    text_prop_type = NULL;
-		    text_prop_id = 0;
+		    ਪਾਠ_prop_attr = 0;
+		    ਪਾਠ_prop_attr_comb = 0;
+		    ਪਾਠ_prop_flags = 0;
+		    ਪਾਠ_prop_type = ਨਿਰਾ;
+		    ਪਾਠ_prop_id = 0;
 		    reset_extra_attr = FALSE;
 		}
-		if (text_props_active > 0 && wlv.n_extra == 0)
+		ਜੇ (ਪਾਠ_props_ਸਰਗਰਮ > 0 && wlv.n_extra == 0)
 		{
-		    int used_tpi = -1;
-		    int used_attr = 0;
-		    int other_tpi = -1;
+		    ਪੂਰਨ ਵਰਤਿਆ_tpi = -1;
+		    ਪੂਰਨ ਵਰਤਿਆ_attr = 0;
+		    ਪੂਰਨ other_tpi = -1;
 
-		    text_prop_above = FALSE;
-		    text_prop_follows = FALSE;
+		    ਪਾਠ_prop_above = FALSE;
+		    ਪਾਠ_prop_follows = FALSE;
 
-		    if (text_props_need_sort)
+		    ਜੇ (ਪਾਠ_props_need_ਛਾਂਟੋ)
 		    {
 			// The active set only changes when a property starts
 			// or ends, so avoid sorting again for every column.
-			sort_text_props(wp->w_buffer, text_props,
-					text_prop_idxs, text_props_active);
-			text_props_need_sort = FALSE;
+			ਛਾਂਟੋ_ਪਾਠ_props(wp->w_ਬਫਰ, ਪਾਠ_props,
+					ਪਾਠ_prop_idxs, ਪਾਠ_props_ਸਰਗਰਮ);
+			ਪਾਠ_props_need_ਛਾਂਟੋ = FALSE;
 		    }
 
-		    for (pi = 0; pi < text_props_active; ++pi)
+		    ਲਈ (pi = 0; pi < ਪਾਠ_props_ਸਰਗਰਮ; ++pi)
 		    {
-			int	    tpi = text_prop_idxs[pi];
-			textprop_T  *tp = &text_props[tpi];
-			proptype_T  *pt = text_prop_type_by_id(
-						    wp->w_buffer, tp->tp_type);
+			ਪੂਰਨ	    tpi = ਪਾਠ_prop_idxs[pi];
+			textprop_T  *tp = &ਪਾਠ_props[tpi];
+			proptype_T  *pt = ਪਾਠ_prop_type_by_id(
+						    wp->w_ਬਫਰ, tp->tp_type);
 
 			// Only use a text property that can be displayed.
 			// Skip "after" properties when wrap is off and at the
 			// end of the window.
-			if (pt != NULL
+			ਜੇ (pt != ਨਿਰਾ
 				&& (pt->pt_hl_id > 0 || tp->tp_id < 0)
 				&& tp->tp_id != -MAXCOL
 				&& !(tp->tp_id < 0
 				    && !wp->w_p_wrap
-				    && (tp->tp_flags & (TP_FLAG_ALIGN_RIGHT
+				    && (tp->tp_flags & (TP_FLAG_ALIGN_ਸੱਜਾ
 						| TP_FLAG_ALIGN_ABOVE
-						| TP_FLAG_ALIGN_BELOW)) == 0
-				    && wlv.col >= wp->w_width))
+						| TP_FLAG_ALIGN_ਹੇਠਾਂ)) == 0
+				    && wlv.ਖਾਨਾ >= wp->w_ਚੌੜਾਈ))
 			{
-			    if (tp->tp_col == MAXCOL
+			    ਜੇ (tp->tp_ਖਾਨਾ == MAXCOL
 				     && *ptr == NUL
 				     && ((wp->w_p_list && lcs_eol_one > 0
 					     && (tp->tp_flags
 						   & TP_FLAG_ALIGN_ABOVE) == 0)
-					 || (ptr == line
-						&& !did_line
+					 || (ptr == ਸਤਰ
+						&& !did_ਸਤਰ
 						&& (tp->tp_flags
-						      & TP_FLAG_ALIGN_BELOW))))
+						      & TP_FLAG_ALIGN_ਹੇਠਾਂ))))
 			    {
 				// skip this prop, first display the '$' after
 				// the line or display an empty line
-				text_prop_follows = TRUE;
-				continue;
+				ਪਾਠ_prop_follows = TRUE;
+				ਜਾਰੀ;
 			    }
 
-			    if (pt->pt_hl_id > 0)
-				used_attr = syn_id2attr(pt->pt_hl_id);
-			    text_prop_type = pt;
-			    text_prop_attr =
-				   hl_combine_attr(text_prop_attr, used_attr);
-			    if (used_tpi >= 0 && text_props[used_tpi].tp_id < 0)
-				other_tpi = used_tpi;
-			    text_prop_flags = pt->pt_flags;
-			    text_prop_id = tp->tp_id;
-			    used_tpi = tpi;
+			    ਜੇ (pt->pt_hl_id > 0)
+				ਵਰਤਿਆ_attr = syn_id2attr(pt->pt_hl_id);
+			    ਪਾਠ_prop_type = pt;
+			    ਪਾਠ_prop_attr =
+				   hl_combine_attr(ਪਾਠ_prop_attr, ਵਰਤਿਆ_attr);
+			    ਜੇ (ਵਰਤਿਆ_tpi >= 0 && ਪਾਠ_props[ਵਰਤਿਆ_tpi].tp_id < 0)
+				other_tpi = ਵਰਤਿਆ_tpi;
+			    ਪਾਠ_prop_flags = pt->pt_flags;
+			    ਪਾਠ_prop_id = tp->tp_id;
+			    ਵਰਤਿਆ_tpi = tpi;
 			}
 		    }
-		    if (text_prop_id < 0 && used_tpi >= 0
-				 && text_props[used_tpi].u.tp_text != NULL)
+		    ਜੇ (ਪਾਠ_prop_id < 0 && ਵਰਤਿਆ_tpi >= 0
+				 && ਪਾਠ_props[ਵਰਤਿਆ_tpi].u.tp_ਪਾਠ != ਨਿਰਾ)
 		    {
-			textprop_T  *tp = &text_props[used_tpi];
-			char_u	    *p = tp->u.tp_text;
-			int	    above = (tp->tp_flags
+			textprop_T  *tp = &ਪਾਠ_props[ਵਰਤਿਆ_tpi];
+			char_u	    *p = tp->u.tp_ਪਾਠ;
+			ਪੂਰਨ	    above = (tp->tp_flags
 							& TP_FLAG_ALIGN_ABOVE);
-			int	    bail_out = FALSE;
+			ਪੂਰਨ	    bail_ਬਾਹਰਲਾ = FALSE;
 
 			// reset the ID in the copy to avoid it being used
 			// again
 			tp->tp_id = -MAXCOL;
 
-			if (p != NULL)
+			ਜੇ (p != ਨਿਰਾ)
 			{
-			    int	    right = (tp->tp_flags
-							& TP_FLAG_ALIGN_RIGHT);
-			    int	    below = (tp->tp_flags
-							& TP_FLAG_ALIGN_BELOW);
-			    int	    wrap = tp->tp_col < MAXCOL
+			    ਪੂਰਨ	    ਸੱਜਾ = (tp->tp_flags
+							& TP_FLAG_ALIGN_ਸੱਜਾ);
+			    ਪੂਰਨ	    ਹੇਠਾਂ = (tp->tp_flags
+							& TP_FLAG_ALIGN_ਹੇਠਾਂ);
+			    ਪੂਰਨ	    wrap = tp->tp_ਖਾਨਾ < MAXCOL
 					      || (tp->tp_flags & TP_FLAG_WRAP);
-			    int	    padding = tp->tp_col == MAXCOL
+			    ਪੂਰਨ	    padding = tp->tp_ਖਾਨਾ == MAXCOL
 							  ? tp->tp_padleft : 0;
 
 			    // Insert virtual text before the current
@@ -2325,96 +2325,96 @@ win_line(
 			    wlv.p_extra = p;
 			    wlv.c_extra = NUL;
 			    wlv.c_final = NUL;
-			    wlv.n_extra = (int)STRLEN(p);
+			    wlv.n_extra = (ਪੂਰਨ)STRLEN(p);
 			    wlv.extra_for_textprop = TRUE;
-			    wlv.start_extra_for_textprop = TRUE;
+			    wlv.ਸ਼ੁਰੂ_extra_for_textprop = TRUE;
 			    wlv.extra_attr = hl_combine_attr(wlv.win_attr,
-								    used_attr);
+								    ਵਰਤਿਆ_attr);
 			    n_attr = mb_charlen(p);
-			    text_prop_attr = 0;
-			    text_prop_attr_comb = 0;
-			    if (*ptr == NUL)
+			    ਪਾਠ_prop_attr = 0;
+			    ਪਾਠ_prop_attr_comb = 0;
+			    ਜੇ (*ptr == NUL)
 				// don't combine char attr after EOL
-				text_prop_flags &= ~PT_FLAG_COMBINE;
+				ਪਾਠ_prop_flags &= ~PT_FLAG_COMBINE;
 # ifdef FEAT_LINEBREAK
-			    if (text_prop_no_showbreak(tp))
+			    ਜੇ (ਪਾਠ_prop_no_showbreak(tp))
 			    {
 				wlv.need_showbreak = FALSE;
 				wlv.dont_use_showbreak = TRUE;
 			    }
 # endif
-			    if ((right || above || below || !wrap
-					    || padding > 0) && wp->w_width > 2)
+			    ਜੇ ((ਸੱਜਾ || above || ਹੇਠਾਂ || !wrap
+					    || padding > 0) && wp->w_ਚੌੜਾਈ > 2)
 			    {
 				char_u	*prev_p_extra = wlv.p_extra;
-				int	start_line;
+				ਪੂਰਨ	ਸ਼ੁਰੂ_ਸਤਰ;
 
 				// Take care of padding, right-align and
 				// truncation.
 				// Shared with win_lbr_chartabsize(), must do
 				// exactly the same.
-				start_line = text_prop_position(wp, tp,
+				ਸ਼ੁਰੂ_ਸਤਰ = ਪਾਠ_prop_position(wp, tp,
 						    wlv.vcol,
 # ifdef FEAT_RIGHTLEFT
 						    wp->w_p_rl
-						    ? wp->w_width - wlv.col - 1
+						    ? wp->w_ਚੌੜਾਈ - wlv.ਖਾਨਾ - 1
 						    :
 # endif
-						    wlv.col,
+						    wlv.ਖਾਨਾ,
 						    &wlv.n_extra, &wlv.p_extra,
 						    &n_attr, &wlv.n_attr_skip,
 						    skip_cells > 0);
-				if (wlv.p_extra != prev_p_extra)
+				ਜੇ (wlv.p_extra != prev_p_extra)
 				{
 				    // wlv.p_extra was allocated
 				    vim_free(p_extra_free2);
 				    p_extra_free2 = wlv.p_extra;
 				}
 
-				if (above)
+				ਜੇ (above)
 				    wlv.vcol_off_tp += vim_strsize(wlv.p_extra);
 
-				if (lcs_eol_one < 0
+				ਜੇ (lcs_eol_one < 0
 					&& wp->w_p_wrap
-					&& wlv.col
-					       + wlv.n_extra - 2 > wp->w_width)
+					&& wlv.ਖਾਨਾ
+					       + wlv.n_extra - 2 > wp->w_ਚੌੜਾਈ)
 				    // don't bail out at end of line
-				    text_prop_follows = TRUE;
+				    ਪਾਠ_prop_follows = TRUE;
 
 				// When 'wrap' is off then for "below" we need
 				// to start a new line explicitly.
-				if (start_line)
+				ਜੇ (ਸ਼ੁਰੂ_ਸਤਰ)
 				{
-				    draw_screen_line(wp, &wlv);
+				    draw_screen_ਸਤਰ(wp, &wlv);
 
 				    // When line got too long for screen break
 				    // here.
-				    if (wlv.row == endrow)
+				    ਜੇ (wlv.ਪੰਕਤੀ == endrow)
 				    {
-					++wlv.row;
-					break;
+					++wlv.ਪੰਕਤੀ;
+					ਰੋਕੋ;
 				    }
-				    win_line_start(wp, &wlv, TRUE);
-				    bail_out = TRUE;
+				    win_ਸਤਰ_ਸ਼ੁਰੂ(wp, &wlv, TRUE);
+				    bail_ਬਾਹਰਲਾ = TRUE;
 				}
 			    }
 			}
 
 			// If the text didn't reach until the first window
 			// column we need to skip cells.
-			if (skip_cells > 0)
+			ਜੇ (skip_cells > 0)
 			{
-			    if (wlv.n_extra > skip_cells)
+			    ਜੇ (wlv.n_extra > skip_cells)
 			    {
 				wlv.n_extra -= skip_cells;
 				wlv.p_extra += skip_cells;
 				wlv.n_attr_skip -= skip_cells;
-				if (wlv.n_attr_skip < 0)
+				ਜੇ (wlv.n_attr_skip < 0)
 				    wlv.n_attr_skip = 0;
 				skipped_cells += skip_cells;
 				skip_cells = 0;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				// the whole text is left of the window, drop
 				// it and advance to the next one
@@ -2422,7 +2422,7 @@ win_line(
 				skipped_cells += wlv.n_extra;
 				wlv.n_extra = 0;
 				wlv.n_attr_skip = 0;
-				bail_out = TRUE;
+				bail_ਬਾਹਰਲਾ = TRUE;
 			    }
 			}
 
@@ -2430,20 +2430,20 @@ win_line(
 			// the last window column must know.
 			// If this is an "above" text prop and 'nowrap' then we
 			// must wrap anyway.
-			text_prop_above = above;
-			text_prop_follows |= other_tpi != -1
+			ਪਾਠ_prop_above = above;
+			ਪਾਠ_prop_follows |= other_tpi != -1
 					&& (wp->w_p_wrap
-					     || (text_props[other_tpi].tp_flags
-			       & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_RIGHT)));
+					     || (ਪਾਠ_props[other_tpi].tp_flags
+			       & (TP_FLAG_ALIGN_ਹੇਠਾਂ | TP_FLAG_ALIGN_ਸੱਜਾ)));
 
-			if (bail_out)
+			ਜੇ (bail_ਬਾਹਰਲਾ)
 			    // starting a new line for "below"
-			    continue;
+			    ਜਾਰੀ;
 		    }
 		}
-		else if (text_prop_next < text_prop_count
+		ਨਹੀਂਤਾਂ ਜੇ (ਪਾਠ_prop_ਅਗਲਾ < ਪਾਠ_prop_ਗਿਣਤੀ
 			   && ((*ptr != NUL && ptr[mb_ptr2len(ptr)] == NUL)
-			       || (!wp->w_p_wrap && wlv.col == wp->w_width - 1)))
+			       || (!wp->w_p_wrap && wlv.ਖਾਨਾ == wp->w_ਚੌੜਾਈ - 1)))
 		{
 		    // When at last-but-one character and a text property
 		    // follows after it, we may need to flush the line after
@@ -2452,135 +2452,135 @@ win_line(
 
 		    // Use the displayed width so a double-width or <Tab> last
 		    // character filling the rightmost column is detected too.
-		    int only_below_follows = !wp->w_p_wrap
-				 && wlv.col + win_chartabsize(wp, ptr, wlv.vcol)
-								>= wp->w_width;
-		    int suffix_flags = text_prop_suffix_flags[text_prop_next];
+		    ਪੂਰਨ only_ਹੇਠਾਂ_follows = !wp->w_p_wrap
+				 && wlv.ਖਾਨਾ + win_chartabsize(wp, ptr, wlv.vcol)
+								>= wp->w_ਚੌੜਾਈ;
+		    ਪੂਰਨ suffix_flags = ਪਾਠ_prop_suffix_flags[ਪਾਠ_prop_ਅਗਲਾ];
 
-		    text_prop_follows = (suffix_flags
-					& (only_below_follows ? 2 : 1)) != 0;
+		    ਪਾਠ_prop_follows = (suffix_flags
+					& (only_ਹੇਠਾਂ_follows ? 2 : 1)) != 0;
 		}
 	    }
 
-	    if (wlv.start_extra_for_textprop)
+	    ਜੇ (wlv.ਸ਼ੁਰੂ_extra_for_textprop)
 	    {
-		wlv.start_extra_for_textprop = FALSE;
+		wlv.ਸ਼ੁਰੂ_extra_for_textprop = FALSE;
 		// restore search_attr and area_attr when n_extra
 		// is down to zero
-		saved_search_attr = search_attr;
+		saved_ਖੋਜ_attr = ਖੋਜ_attr;
 		saved_area_attr = area_attr;
-		search_attr = 0;
+		ਖੋਜ_attr = 0;
 		area_attr = 0;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
-	    int *area_attr_p =
-#ifdef FEAT_PROP_POPUP
+	    ਪੂਰਨ *area_attr_p =
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 		wlv.extra_for_textprop ? &saved_area_attr :
-#endif
+#ਜੇ_ਅੰਤ
 							    &area_attr;
 
 	    // handle Visual or match highlighting in this line
-	    if (wlv.vcol == wlv.fromcol
+	    ਜੇ (wlv.vcol == wlv.fromcol
 		    || (has_mbyte && wlv.vcol + 1 == wlv.fromcol
 			&& ((wlv.n_extra == 0 && (*mb_ptr2cells)(ptr) > 1)
-			    || (wlv.n_extra > 0 && wlv.p_extra != NULL
+			    || (wlv.n_extra > 0 && wlv.p_extra != ਨਿਰਾ
 				&& (*mb_ptr2cells)(wlv.p_extra) > 1))))
 		*area_attr_p = vi_attr;		// start highlighting
-	    else if (*area_attr_p != 0 && wlv.vcol == wlv.tocol)
+	    ਨਹੀਂਤਾਂ ਜੇ (*area_attr_p != 0 && wlv.vcol == wlv.tocol)
 		*area_attr_p = 0;		// stop highlighting
 
-	    if (wlv.n_extra == 0)
+	    ਜੇ (wlv.n_extra == 0)
 	    {
-#ifdef FEAT_SEARCH_EXTRA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
 		// Check for start/end of 'hlsearch' and other matches.
 		// After end, check for start/end of next match.
 		// When another match, have to check for start again.
-		v = (long)(ptr - line);
-		search_attr = update_search_hl(wp, lnum, (colnr_T)v, &line,
-				      &screen_search_hl, &has_match_conc,
-				      &match_conc, did_line_attr, lcs_eol_one,
-				      &on_last_col);
-		ptr = line + v;  // "line" may have been changed
+		v = (ਲੰਮਾ)(ptr - ਸਤਰ);
+		ਖੋਜ_attr = update_ਖੋਜ_hl(wp, lnum, (colnr_T)v, &ਸਤਰ,
+				      &screen_ਖੋਜ_hl, &has_ਮੇਲ_conc,
+				      &ਮੇਲ_conc, did_ਸਤਰ_attr, lcs_eol_one,
+				      &on_ਆਖਰੀ_ਖਾਨਾ);
+		ptr = ਸਤਰ + v;  // "line" may have been changed
 
 		// Do not allow a conceal over EOL otherwise EOL will be missed
 		// and bad things happen.
-		if (*ptr == NUL)
-		    has_match_conc = 0;
-#else
-		search_attr = 0;
-#endif
+		ਜੇ (*ptr == NUL)
+		    has_ਮੇਲ_conc = 0;
+#ਨਹੀਂਤਾਂ
+		ਖੋਜ_attr = 0;
+#ਜੇ_ਅੰਤ
 
 		// Check if ComplMatchIns highlight is needed.
-		if ((State & MODE_INSERT) && ins_compl_win_active(wp)
-			    && (in_curline || ins_compl_lnum_in_range(lnum)))
+		ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && ins_compl_win_ਸਰਗਰਮ(wp)
+			    && (ਵਿੱਚ_curline || ins_compl_lnum_ਵਿੱਚ_range(lnum)))
 		{
-		    int ins_match_attr =
-			ins_compl_col_range_attr(lnum, (int)(ptr - line));
-		    if (ins_match_attr > 0)
-			search_attr =
-			    hl_combine_attr(search_attr, ins_match_attr);
+		    ਪੂਰਨ ins_ਮੇਲ_attr =
+			ins_compl_ਖਾਨਾ_range_attr(lnum, (ਪੂਰਨ)(ptr - ਸਤਰ));
+		    ਜੇ (ins_ਮੇਲ_attr > 0)
+			ਖੋਜ_attr =
+			    hl_combine_attr(ਖੋਜ_attr, ins_ਮੇਲ_attr);
 		}
 	    }
 
-#ifdef FEAT_DIFF
-	    if (wlv.diff_hlf != (hlf_T)0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+	    ਜੇ (wlv.diff_hlf != (hlf_T)0)
 	    {
-		if (line_changes.num_changes > 0
-			&& change_index >= 0
-			&& change_index < line_changes.num_changes - 1)
+		ਜੇ (ਸਤਰ_changes.ਅੰਕ_changes > 0
+			&& change_ਸੂਚਕਾਂਕ >= 0
+			&& change_ਸੂਚਕਾਂਕ < ਸਤਰ_changes.ਅੰਕ_changes - 1)
 		{
-		    if (ptr - line >= line_changes.changes[change_index+1].dc_start[line_changes.bufidx])
-			change_index += 1;
+		    ਜੇ (ptr - ਸਤਰ >= ਸਤਰ_changes.changes[change_ਸੂਚਕਾਂਕ+1].dc_ਸ਼ੁਰੂ[ਸਤਰ_changes.bufidx])
+			change_ਸੂਚਕਾਂਕ += 1;
 		}
-		int added = FALSE;
-		if (line_changes.num_changes > 0 && change_index >= 0 && change_index < line_changes.num_changes)
+		ਪੂਰਨ added = FALSE;
+		ਜੇ (ਸਤਰ_changes.ਅੰਕ_changes > 0 && change_ਸੂਚਕਾਂਕ >= 0 && change_ਸੂਚਕਾਂਕ < ਸਤਰ_changes.ਅੰਕ_changes)
 		{
-		    added = diff_change_parse(&line_changes,
-			    &line_changes.changes[change_index],
-			    &change_start,
-			    &change_end);
+		    added = diff_change_parse(&ਸਤਰ_changes,
+			    &ਸਤਰ_changes.changes[change_ਸੂਚਕਾਂਕ],
+			    &change_ਸ਼ੁਰੂ,
+			    &change_ਸਿਰਾ);
 		}
 		// When there is extra text (e.g. virtual text) it gets the
 		// diff highlighting for the line, but not for changed text.
-		if (wlv.diff_hlf == HLF_CHD && ptr - line >= change_start
+		ਜੇ (wlv.diff_hlf == HLF_CHD && ptr - ਸਤਰ >= change_ਸ਼ੁਰੂ
 							   && wlv.n_extra == 0)
 		    wlv.diff_hlf = added ? HLF_TXA : HLF_TXD;	// added/changed text
-		if ((wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
-			&& ((ptr - line >= change_end && wlv.n_extra == 0)
+		ਜੇ ((wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
+			&& ((ptr - ਸਤਰ >= change_ਸਿਰਾ && wlv.n_extra == 0)
 			       || (wlv.n_extra > 0 && wlv.extra_for_textprop)))
 		    wlv.diff_hlf = HLF_CHD;		// changed line
-		wlv.line_attr = HL_ATTR(wlv.diff_hlf);
-		if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+		wlv.ਸਤਰ_attr = HL_ATTR(wlv.diff_hlf);
+		ਜੇ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 			&& wp->w_p_culopt_flags != CULOPT_NBR
-			&& (!wlv.cul_screenline || (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
-		    wlv.line_attr = hl_combine_attr(
-					  wlv.line_attr, HL_ATTR(HLF_CUL));
+			&& (!wlv.cul_screenline || (wlv.vcol >= ਖੱਬਾ_curline_ਖਾਨਾ
+					    && wlv.vcol <= ਸੱਜਾ_curline_ਖਾਨਾ)))
+		    wlv.ਸਤਰ_attr = hl_combine_attr(
+					  wlv.ਸਤਰ_attr, HL_ATTR(HLF_CUL));
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_SYN_HL
-	    if (extra_check && wlv.n_extra == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	    ਜੇ (extra_check && wlv.n_extra == 0)
 	    {
 		syntax_attr = 0;
 # ifdef FEAT_TERMINAL
-		if (get_term_attr)
-		    syntax_attr = term_get_attr(wp, lnum, wlv.vcol);
+		ਜੇ (get_ਪਦ_attr)
+		    syntax_attr = ਪਦ_get_attr(wp, lnum, wlv.vcol);
 # endif
 		// Get syntax attribute.
-		if (has_syntax)
+		ਜੇ (has_syntax)
 		{
 		    // Get the syntax attribute for the character.  If there
 		    // is an error, disable syntax highlighting.
 		    save_did_emsg = did_emsg;
 		    did_emsg = FALSE;
 
-		    v = (long)(ptr - line);
-		    if (v == prev_syntax_col)
+		    v = (ਲੰਮਾ)(ptr - ਸਤਰ);
+		    ਜੇ (v == prev_syntax_ਖਾਨਾ)
 			// at same column again
 			syntax_attr = prev_syntax_attr;
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 # ifdef FEAT_SPELL
 			can_spell = TRUE;
@@ -2589,112 +2589,112 @@ win_line(
 # ifdef FEAT_SPELL
 					    spv->spv_has_spell ? &can_spell :
 # endif
-					    NULL, FALSE);
-			prev_syntax_col = v;
+					    ਨਿਰਾ, FALSE);
+			prev_syntax_ਖਾਨਾ = v;
 			prev_syntax_attr = syntax_attr;
 		    }
 
-		    if (did_emsg)
+		    ਜੇ (did_emsg)
 		    {
 			wp->w_s->b_syn_error = TRUE;
 			has_syntax = FALSE;
 			syntax_attr = 0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			did_emsg = save_did_emsg;
-# ifdef SYN_TIME_LIMIT
-		    if (wp->w_s->b_syn_slow)
+# ifdef SYN_ਸਮਾਂ_ਹੱਦਬੰਦੀ
+		    ਜੇ (wp->w_s->b_syn_slow)
 			has_syntax = FALSE;
 # endif
 
 		    // Need to get the line again, a multi-line regexp may
 		    // have made it invalid.
-		    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-		    ptr = line + v;
+		    ਸਤਰ = ml_get_buf(wp->w_ਬਫਰ, lnum, FALSE);
+		    ptr = ਸਤਰ + v;
 # ifdef FEAT_CONCEAL
 		    // no concealing past the end of the line, it interferes
 		    // with line highlighting
-		    if (*ptr == NUL)
+		    ਜੇ (*ptr == NUL)
 			syntax_flags = 0;
-		    else
+		    ਨਹੀਂਤਾਂ
 			syntax_flags = get_syntax_info(&syntax_seqnr);
 # endif
 		}
 	    }
 # ifdef FEAT_PROP_POPUP
 	    // Combine text property highlight into syntax highlight.
-	    if (text_prop_type != NULL)
+	    ਜੇ (ਪਾਠ_prop_type != ਨਿਰਾ)
 	    {
-		if (text_prop_flags & PT_FLAG_COMBINE)
-		    syntax_attr = hl_combine_attr(syntax_attr, text_prop_attr);
-		else
-		    syntax_attr = text_prop_attr;
-		text_prop_attr_comb = syntax_attr;
+		ਜੇ (ਪਾਠ_prop_flags & PT_FLAG_COMBINE)
+		    syntax_attr = hl_combine_attr(syntax_attr, ਪਾਠ_prop_attr);
+		ਨਹੀਂਤਾਂ
+		    syntax_attr = ਪਾਠ_prop_attr;
+		ਪਾਠ_prop_attr_comb = syntax_attr;
 	    }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 	    // Decide which of the highlight attributes to use.
 	    attr_pri = TRUE;
-#ifdef LINE_ATTR
-	    if (area_attr != 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸਤਰ_ATTR
+	    ਜੇ (area_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, area_attr);
-		if (!highlight_match)
+		wlv.char_attr = hl_combine_attr(wlv.ਸਤਰ_attr, area_attr);
+		ਜੇ (!highlight_ਮੇਲ)
 		    // let search highlight show in Visual area if possible
-		    wlv.char_attr = hl_combine_attr(search_attr, wlv.char_attr);
+		    wlv.char_attr = hl_combine_attr(ਖੋਜ_attr, wlv.char_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (search_attr != 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (ਖੋਜ_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, search_attr);
+		wlv.char_attr = hl_combine_attr(wlv.ਸਤਰ_attr, ਖੋਜ_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (wlv.line_attr != 0
+	    ਨਹੀਂਤਾਂ ਜੇ (wlv.ਸਤਰ_attr != 0
 		    && ((wlv.fromcol == -10 && wlv.tocol == MAXCOL)
 			      || wlv.vcol < wlv.fromcol
 			      || wlv.vcol >= wlv.tocol))
 	    {
 		// Use wlv.line_attr when not in the Visual or 'incsearch' area
 # ifdef FEAT_SYN_HL
-		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.line_attr);
-# else
-		wlv.char_attr = wlv.line_attr;
+		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.ਸਤਰ_attr);
+# ਨਹੀਂਤਾਂ
+		wlv.char_attr = wlv.ਸਤਰ_attr;
 # endif
 		attr_pri = FALSE;
 	    }
-#else
-	    if (area_attr != 0)
+#ਨਹੀਂਤਾਂ
+	    ਜੇ (area_attr != 0)
 		wlv.char_attr = area_attr;
-	    else if (search_attr != 0)
-		wlv.char_attr = search_attr;
-#endif
-	    else
+	    ਨਹੀਂਤਾਂ ਜੇ (ਖੋਜ_attr != 0)
+		wlv.char_attr = ਖੋਜ_attr;
+#ਜੇ_ਅੰਤ
+	    ਨਹੀਂਤਾਂ
 	    {
 		attr_pri = FALSE;
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 		wlv.char_attr = syntax_attr;
-#else
+#ਨਹੀਂਤਾਂ
 		wlv.char_attr = 0;
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 	    // override with text property highlight when "override" is TRUE
-	    if (text_prop_type != NULL && (text_prop_flags & PT_FLAG_OVERRIDE))
-		wlv.char_attr = hl_combine_attr(wlv.char_attr, text_prop_attr);
-#endif
+	    ਜੇ (ਪਾਠ_prop_type != ਨਿਰਾ && (ਪਾਠ_prop_flags & PT_FLAG_OVERRIDE))
+		wlv.char_attr = hl_combine_attr(wlv.char_attr, ਪਾਠ_prop_attr);
+#ਜੇ_ਅੰਤ
 	}
 
 	// combine attribute with HLF_WIN
-	if (wlv.win_attr != 0)
+	ਜੇ (wlv.win_attr != 0)
 	{
-	    if (wlv.char_attr == 0)
+	    ਜੇ (wlv.char_attr == 0)
 		wlv.char_attr = wlv.win_attr;
-	    else
+	    ਨਹੀਂਤਾਂ
 		wlv.char_attr = hl_combine_attr(wlv.win_attr, wlv.char_attr);
 	}
 
@@ -2707,62 +2707,62 @@ win_line(
 	// "p_extra" must end in a NUL to avoid mb_ptr2len() reads past
 	// "p_extra[n_extra]".
 	// For the '$' of the 'list' option, n_extra == 1, p_extra == "".
-	if (wlv.n_extra > 0)
+	ਜੇ (wlv.n_extra > 0)
 	{
-	    if (wlv.c_extra != NUL || (wlv.n_extra == 1 && wlv.c_final != NUL))
+	    ਜੇ (wlv.c_extra != NUL || (wlv.n_extra == 1 && wlv.c_final != NUL))
 	    {
 		c = (wlv.n_extra == 1 && wlv.c_final != NUL)
 						   ? wlv.c_final : wlv.c_extra;
 		mb_c = c;	// doesn't handle non-utf-8 multi-byte!
-		if (enc_utf8 && utf_char2len(c) > 1)
+		ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 		{
 		    mb_utf8 = TRUE;
 		    u8cc[0] = 0;
 		    c = 0xc0;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    mb_utf8 = FALSE;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		c = *wlv.p_extra;
-		if (has_mbyte)
+		ਜੇ (has_mbyte)
 		{
 		    mb_c = c;
-		    if (enc_utf8)
+		    ਜੇ (enc_utf8)
 		    {
 			// If the UTF-8 character is more than one byte:
 			// Decode it into "mb_c".
 			mb_l = utfc_ptr2len(wlv.p_extra);
 			mb_utf8 = FALSE;
-			if (mb_l > wlv.n_extra)
+			ਜੇ (mb_l > wlv.n_extra)
 			    mb_l = 1;
-			else if (mb_l > 1)
+			ਨਹੀਂਤਾਂ ਜੇ (mb_l > 1)
 			{
 			    mb_c = utfc_ptr2char(wlv.p_extra, u8cc);
 			    mb_utf8 = TRUE;
 			    c = 0xc0;
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			// if this is a DBCS character, put it in "mb_c"
 			mb_l = MB_BYTE2LEN(c);
-			if (mb_l >= wlv.n_extra)
+			ਜੇ (mb_l >= wlv.n_extra)
 			    mb_l = 1;
-			else if (mb_l > 1)
+			ਨਹੀਂਤਾਂ ਜੇ (mb_l > 1)
 			    mb_c = (c << 8) + wlv.p_extra[1];
 		    }
-		    if (mb_l == 0)  // at the NUL at end-of-line
+		    ਜੇ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
 
 		    // If a double-width char doesn't fit display a '>' in the
 		    // last column.
-		    if ((
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col <= 0) :
-#endif
-				    (wlv.col >= wp->w_width - 1))
+		    ਜੇ ((
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ਖਾਨਾ <= 0) :
+#ਜੇ_ਅੰਤ
+				    (wlv.ਖਾਨਾ >= wp->w_ਚੌੜਾਈ - 1))
 			    && (*mb_char2cells)(mb_c) == 2)
 		    {
 			c = '>';
@@ -2770,11 +2770,11 @@ win_line(
 			mb_l = 1;
 			mb_utf8 = FALSE;
 			multi_attr = HL_ATTR(HLF_AT);
-#ifdef FEAT_SYN_HL
-			if (wlv.cul_attr)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+			ਜੇ (wlv.cul_attr)
 			    multi_attr = hl_combine_attr(
 						     multi_attr, wlv.cul_attr);
-#endif
+#ਜੇ_ਅੰਤ
 			multi_attr = hl_combine_attr(wlv.win_attr, multi_attr);
 
 			// put the pointer back to output the double-width
@@ -2782,7 +2782,7 @@ win_line(
 			++wlv.n_extra;
 			--wlv.p_extra;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			wlv.n_extra -= mb_l - 1;
 			wlv.p_extra += mb_l - 1;
@@ -2791,19 +2791,19 @@ win_line(
 		++wlv.p_extra;
 	    }
 	    --wlv.n_extra;
-#if defined(FEAT_PROP_POPUP)
-	    if (wlv.n_extra <= 0)
+#ਜੇ defined(FEAT_PROP_POPUP)
+	    ਜੇ (wlv.n_extra <= 0)
 	    {
 		// Only restore search_attr and area_attr after "n_extra" in
 		// the next screen line is also done.
-		if (wlv.saved_n_extra <= 0)
+		ਜੇ (wlv.saved_n_extra <= 0)
 		{
-		    if (search_attr == 0)
-			search_attr = saved_search_attr;
-		    if (area_attr == 0 && *ptr != NUL)
+		    ਜੇ (ਖੋਜ_attr == 0)
+			ਖੋਜ_attr = saved_ਖੋਜ_attr;
+		    ਜੇ (area_attr == 0 && *ptr != NUL)
 			area_attr = saved_area_attr;
 
-		    if (wlv.extra_for_textprop)
+		    ਜੇ (wlv.extra_for_textprop)
 			// wlv.extra_attr should be used at this position but
 			// not any further.
 			reset_extra_attr = TRUE;
@@ -2811,88 +2811,88 @@ win_line(
 
 		wlv.extra_for_textprop = FALSE;
 # ifdef FEAT_LINEBREAK
-		in_linebreak = FALSE;
+		ਵਿੱਚ_linebreak = FALSE;
 # endif
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-#ifdef FEAT_LINEBREAK
-	    int		c0;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+	    ਪੂਰਨ		c0;
+#ਜੇ_ਅੰਤ
 	    char_u	*prev_ptr = ptr;
 
 	    // Get a character from the line itself.
 	    c = *ptr;
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 	    c0 = *ptr;
-#endif
-	    if (c == NUL)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (c == NUL)
 	    {
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 		// text is finished, may display a "below" virtual text
-		did_line = TRUE;
-#endif
+		did_ਸਤਰ = TRUE;
+#ਜੇ_ਅੰਤ
 		// no more cells to skip
 		skip_cells = 0;
 	    }
 
-	    if (has_mbyte)
+	    ਜੇ (has_mbyte)
 	    {
 		mb_c = c;
-		if (enc_utf8)
+		ਜੇ (enc_utf8)
 		{
 		    // If the UTF-8 character is more than one byte: Decode it
 		    // into "mb_c".
 		    mb_l = utfc_ptr2len(ptr);
 		    mb_utf8 = FALSE;
-		    if (mb_l > 1)
+		    ਜੇ (mb_l > 1)
 		    {
 			mb_c = utfc_ptr2char(ptr, u8cc);
 			// Overlong encoded ASCII or ASCII with composing char
 			// is displayed normally, except a NUL.
-			if (mb_c < 0x80)
+			ਜੇ (mb_c < 0x80)
 			{
 			    c = mb_c;
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 			    c0 = mb_c;
-#endif
+#ਜੇ_ਅੰਤ
 			}
 			mb_utf8 = TRUE;
 
 			// At start of the line we can have a composing char.
 			// Draw it as a space with a composing char.
-			if (utf_iscomposing(mb_c))
+			ਜੇ (utf_iscomposing(mb_c))
 			{
-			    int i;
+			    ਪੂਰਨ i;
 
-			    for (i = Screen_mco - 1; i > 0; --i)
+			    ਲਈ (i = Screen_mco - 1; i > 0; --i)
 				u8cc[i] = u8cc[i - 1];
 			    u8cc[0] = mb_c;
 			    mb_c = ' ';
 			}
 		    }
 
-		    if ((mb_l == 1 && c >= 0x80)
+		    ਜੇ ((mb_l == 1 && c >= 0x80)
 			    || (mb_l >= 1 && mb_c == 0)
 			    || (mb_l > 1 && (!vim_isprintc(mb_c))))
 		    {
 			// Illegal UTF-8 byte: display as <xx>.
 			// Non-BMP character : display as ? or fullwidth ?.
 			transchar_hex(wlv.extra, mb_c);
-#ifdef FEAT_RIGHTLEFT
-			if (wp->w_p_rl)		// reverse
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+			ਜੇ (wp->w_p_rl)		//ਉਲਟ
 			    rl_mirror(wlv.extra);
-#endif
+#ਜੇ_ਅੰਤ
 			wlv.p_extra = wlv.extra;
 			c = *wlv.p_extra;
 			mb_c = mb_ptr2char_adv(&wlv.p_extra);
 			mb_utf8 = (c >= 0x80);
-			wlv.n_extra = (int)STRLEN(wlv.p_extra);
+			wlv.n_extra = (ਪੂਰਨ)STRLEN(wlv.p_extra);
 			wlv.c_extra = NUL;
 			wlv.c_final = NUL;
-			if (area_attr == 0 && search_attr == 0)
+			ਜੇ (area_attr == 0 && ਖੋਜ_attr == 0)
 			{
 			    n_attr = wlv.n_extra + 1;
 			    wlv.extra_attr = hl_combine_attr(
@@ -2900,25 +2900,25 @@ win_line(
 			    saved_attr2 = wlv.char_attr; // save current attr
 			}
 		    }
-		    else if (mb_l == 0)  // at the NUL at end-of-line
+		    ਨਹੀਂਤਾਂ ਜੇ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
-#ifdef FEAT_ARABIC
-		    else if (p_arshape && !p_tbidi && ARABIC_CHAR(mb_c))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARABIC
+		    ਨਹੀਂਤਾਂ ਜੇ (p_arshape && !p_tbidi && ARABIC_CHAR(mb_c))
 		    {
 			// Do Arabic shaping.
-			int	pc, pc1, nc;
-			int	pcc[MAX_MCO];
+			ਪੂਰਨ	pc, pc1, nc;
+			ਪੂਰਨ	pcc[MAX_MCO];
 
 			// The idea of what is the previous and next
 			// character depends on 'rightleft'.
-			if (wp->w_p_rl)
+			ਜੇ (wp->w_p_rl)
 			{
 			    pc = prev_c;
 			    pc1 = prev_c1;
 			    nc = utf_ptr2char(ptr + mb_l);
 			    prev_c1 = u8cc[0];
 			}
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    pc = utfc_ptr2char(ptr + mb_l, pcc);
 			    nc = prev_c;
@@ -2928,31 +2928,31 @@ win_line(
 
 			mb_c = arabic_shape(mb_c, &c, &u8cc[0], pc, pc1, nc);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			prev_c = mb_c;
-#endif
+#ਜੇ_ਅੰਤ
 		}
-		else	// enc_dbcs
+		ਨਹੀਂਤਾਂ	// enc_dbcs
 		{
 		    mb_l = MB_BYTE2LEN(c);
-		    if (mb_l == 0)  // at the NUL at end-of-line
+		    ਜੇ (mb_l == 0)  // at the NUL at end-of-line
 			mb_l = 1;
-		    else if (mb_l > 1)
+		    ਨਹੀਂਤਾਂ ਜੇ (mb_l > 1)
 		    {
 			// We assume a second byte below 32 is illegal.
 			// Hopefully this is OK for all double-byte encodings!
-			if (ptr[1] >= 32)
+			ਜੇ (ptr[1] >= 32)
 			    mb_c = (c << 8) + ptr[1];
-			else
+			ਨਹੀਂਤਾਂ
 			{
-			    if (ptr[1] == NUL)
+			    ਜੇ (ptr[1] == NUL)
 			    {
 				// head byte at end of line
 				mb_l = 1;
-				transchar_nonprint(wp->w_buffer, wlv.extra, c);
-				wlv.n_extra = (int)STRLEN(wlv.extra) - 1;
+				transchar_nonprint(wp->w_ਬਫਰ, wlv.extra, c);
+				wlv.n_extra = (ਪੂਰਨ)STRLEN(wlv.extra) - 1;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				// illegal tail byte
 				mb_l = 2;
@@ -2963,7 +2963,7 @@ win_line(
 			    wlv.c_extra = NUL;
 			    wlv.c_final = NUL;
 			    c = *wlv.p_extra++;
-			    if (area_attr == 0 && search_attr == 0)
+			    ਜੇ (area_attr == 0 && ਖੋਜ_attr == 0)
 			    {
 				n_attr = wlv.n_extra + 1;
 				wlv.extra_attr = hl_combine_attr(
@@ -2978,11 +2978,11 @@ win_line(
 		// If a double-width char doesn't fit display a '>' in the
 		// last column; the character is displayed at the start of the
 		// next line.
-		if ((
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col <= 0) :
-#endif
-				(wlv.col >= wp->w_width - 1))
+		ਜੇ ((
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ਖਾਨਾ <= 0) :
+#ਜੇ_ਅੰਤ
+				(wlv.ਖਾਨਾ >= wp->w_ਚੌੜਾਈ - 1))
 			&& (*mb_char2cells)(mb_c) == 2)
 		{
 		    c = '>';
@@ -2993,23 +2993,23 @@ win_line(
 		    // Put pointer back so that the character will be
 		    // displayed at the start of the next line.
 		    --ptr;
-#ifdef FEAT_CONCEAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
 		    did_decrement_ptr = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 		}
-		else if (*ptr != NUL)
+		ਨਹੀਂਤਾਂ ਜੇ (*ptr != NUL)
 		    ptr += mb_l - 1;
 
 		// If a double-width char doesn't fit at the left side display
 		// a '<' in the first column.  Don't do this for unprintable
 		// characters.
-		if (skip_cells > 0 && mb_l > 1 && wlv.n_extra == 0)
+		ਜੇ (skip_cells > 0 && mb_l > 1 && wlv.n_extra == 0)
 		{
 		    wlv.n_extra = 1;
 		    wlv.c_extra = MB_FILLER_CHAR;
 		    wlv.c_final = NUL;
 		    c = ' ';
-		    if (area_attr == 0 && search_attr == 0)
+		    ਜੇ (area_attr == 0 && ਖੋਜ_attr == 0)
 		    {
 			n_attr = wlv.n_extra + 1;
 			wlv.extra_attr = hl_combine_attr(
@@ -3024,115 +3024,115 @@ win_line(
 	    }
 	    ++ptr;
 
-	    if (extra_check)
+	    ਜੇ (extra_check)
 	    {
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
 		// Check spelling (unless at the end of the line).
 		// Only do this when there is no syntax highlighting, the
 		// @Spell cluster is not used or the current syntax item
 		// contains the @Spell cluster.
-		v = (long)(ptr - line);
-		if (spv->spv_has_spell && v >= word_end && v > cur_checked_col)
+		v = (ਲੰਮਾ)(ptr - ਸਤਰ);
+		ਜੇ (spv->spv_has_spell && v >= ਸ਼ਬਦ_ਸਿਰਾ && v > cur_checked_ਖਾਨਾ)
 		{
 		    spell_attr = 0;
 		    // do not calculate cap_col at the end of the line or when
 		    // only white space is following
-		    if (c != 0 && (*skipwhite(prev_ptr) != NUL) && (
+		    ਜੇ (c != 0 && (*skipwhite(prev_ptr) != NUL) && (
 # ifdef FEAT_SYN_HL
 				!has_syntax ||
 # endif
 				can_spell))
 		    {
 			char_u	*p;
-			int	len;
-			hlf_T	spell_hlf = HLF_COUNT;
+			ਪੂਰਨ	len;
+			hlf_T	spell_hlf = HLF_ਗਿਣਤੀ;
 
-			if (has_mbyte)
+			ਜੇ (has_mbyte)
 			    v -= mb_l - 1;
 
 			// Use nextline[] if possible, it has the start of the
 			// next line concatenated.
-			if ((prev_ptr - line) - nextlinecol >= 0)
-			    p = nextline + (prev_ptr - line) - nextlinecol;
-			else
+			ਜੇ ((prev_ptr - ਸਤਰ) - nextlinecol >= 0)
+			    p = nextline + (prev_ptr - ਸਤਰ) - nextlinecol;
+			ਨਹੀਂਤਾਂ
 			    p = prev_ptr;
-			spv->spv_cap_col -= (int)(prev_ptr - line);
-			len = spell_check(wp, p, &spell_hlf, &spv->spv_cap_col,
+			spv->spv_cap_ਖਾਨਾ -= (ਪੂਰਨ)(prev_ptr - ਸਤਰ);
+			len = spell_check(wp, p, &spell_hlf, &spv->spv_cap_ਖਾਨਾ,
 							    spv->spv_unchanged);
-			word_end = v + len;
+			ਸ਼ਬਦ_ਸਿਰਾ = v + len;
 
 			// In Insert mode only highlight a word that
 			// doesn't touch the cursor.
-			if (spell_hlf != HLF_COUNT
-				&& (State & MODE_INSERT)
+			ਜੇ (spell_hlf != HLF_ਗਿਣਤੀ
+				&& (State & ਬਹੁਲਕ_ਪਾਓ)
 				&& wp->w_cursor.lnum == lnum
-				&& wp->w_cursor.col >=
-						    (colnr_T)(prev_ptr - line)
-				&& wp->w_cursor.col < (colnr_T)word_end)
+				&& wp->w_cursor.ਖਾਨਾ >=
+						    (colnr_T)(prev_ptr - ਸਤਰ)
+				&& wp->w_cursor.ਖਾਨਾ < (colnr_T)ਸ਼ਬਦ_ਸਿਰਾ)
 			{
-			    spell_hlf = HLF_COUNT;
+			    spell_hlf = HLF_ਗਿਣਤੀ;
 			    spell_redraw_lnum = lnum;
 			}
 
-			if (spell_hlf == HLF_COUNT && p != prev_ptr
+			ਜੇ (spell_hlf == HLF_ਗਿਣਤੀ && p != prev_ptr
 				       && (p - nextline) + len > nextline_idx)
 			{
 			    // Remember that the good word continues at the
 			    // start of the next line.
 			    spv->spv_checked_lnum = lnum + 1;
-			    spv->spv_checked_col = (p - nextline) + len
+			    spv->spv_checked_ਖਾਨਾ = (p - nextline) + len
 								- nextline_idx;
 			}
 
 			// Turn index into actual attributes.
-			if (spell_hlf != HLF_COUNT)
+			ਜੇ (spell_hlf != HLF_ਗਿਣਤੀ)
 			    spell_attr = highlight_attr[spell_hlf];
 
-			if (spv->spv_cap_col > 0)
+			ਜੇ (spv->spv_cap_ਖਾਨਾ > 0)
 			{
-			    if (p != prev_ptr
-				    && (p - nextline) + spv->spv_cap_col
+			    ਜੇ (p != prev_ptr
+				    && (p - nextline) + spv->spv_cap_ਖਾਨਾ
 								>= nextline_idx)
 			    {
 				// Remember that the word in the next line
 				// must start with a capital.
 				spv->spv_capcol_lnum = lnum + 1;
-				spv->spv_cap_col = ((p - nextline)
-					    + spv->spv_cap_col - nextline_idx);
+				spv->spv_cap_ਖਾਨਾ = ((p - nextline)
+					    + spv->spv_cap_ਖਾਨਾ - nextline_idx);
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 				// Compute the actual column.
-				spv->spv_cap_col += (prev_ptr - line);
+				spv->spv_cap_ਖਾਨਾ += (prev_ptr - ਸਤਰ);
 			}
 		    }
 		}
-		if (spell_attr != 0)
+		ਜੇ (spell_attr != 0)
 		{
-		    if (!attr_pri)
+		    ਜੇ (!attr_pri)
 			wlv.char_attr = hl_combine_attr(wlv.char_attr,
 								   spell_attr);
-		    else
+		    ਨਹੀਂਤਾਂ
 			wlv.char_attr = hl_combine_attr(spell_attr,
 								wlv.char_attr);
 		}
-#endif
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 		// we don't want linebreak to apply for lines that start with
 		// leading spaces, followed by long letters (since it would add
 		// a break at the beginning of a line and this might be unexpected)
 		//
 		// So only allow to linebreak, once we have found chars not in
 		// 'breakat' in the line.
-		if ( wp->w_p_lbr && !wlv.need_lbr && c != NUL &&
-			!VIM_ISBREAK((int)*ptr))
+		ਜੇ ( wp->w_p_lbr && !wlv.need_lbr && c != NUL &&
+			!VIM_ISBREAK((ਪੂਰਨ)*ptr))
 		    wlv.need_lbr = TRUE;
-#endif
-#ifdef FEAT_LINEBREAK
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
 		// Found last space before word: check for line break.
-		if (wp->w_p_lbr && c0 == c && wlv.need_lbr
-				  && VIM_ISBREAK(c) && !VIM_ISBREAK((int)*ptr))
+		ਜੇ (wp->w_p_lbr && c0 == c && wlv.need_lbr
+				  && VIM_ISBREAK(c) && !VIM_ISBREAK((ਪੂਰਨ)*ptr))
 		{
-		    int	    mb_off = has_mbyte ? (*mb_head_off)(line, ptr - 1)
+		    ਪੂਰਨ	    mb_off = has_mbyte ? (*mb_ਸਿਰ_off)(ਸਤਰ, ptr - 1)
 									   : 0;
 		    char_u  *p = ptr - (mb_off + 1);
 		    chartabsize_T cts;
@@ -3140,64 +3140,64 @@ win_line(
 
 		    colnr_T init_colnr = wlv.vcol;
 # ifdef FEAT_PROP_POPUP
-		    init_colnr -= vcol_first_char;
+		    init_colnr -= vcol_ਪਹਿਲਾ_char;
 # endif
-		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, line, p);
+		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, ਸਤਰ, p);
 
 # ifdef FEAT_PROP_POPUP
 		    // do not want virtual text counted here
-		    cts.cts_has_prop_with_text = FALSE;
+		    cts.cts_has_prop_with_ਪਾਠ = FALSE;
 # endif
 		    // TODO: consider using "tailp" here
-		    wlv.n_extra = win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+		    wlv.n_extra = win_lbr_chartabsize(&cts, ਨਿਰਾ, ਨਿਰਾ) - 1;
 		    clear_chartabsize_arg(&cts);
 
-		    if (on_last_col && c != TAB)
+		    ਜੇ (on_ਆਖਰੀ_ਖਾਨਾ && c != TAB)
 			// Do not continue search/match highlighting over the
 			// line break, but for TABs the highlighting should
 			// include the complete width of the character
-			search_attr = 0;
+			ਖੋਜ_attr = 0;
 
-		    if (c == TAB && wlv.n_extra + wlv.col > wp->w_width)
+		    ਜੇ (c == TAB && wlv.n_extra + wlv.ਖਾਨਾ > wp->w_ਚੌੜਾਈ)
 # ifdef FEAT_VARTABS
 			wlv.n_extra = tabstop_padding(wlv.vcol,
-					      wp->w_buffer->b_p_ts,
-					      wp->w_buffer->b_p_vts_array) - 1;
-# else
-			wlv.n_extra = (int)wp->w_buffer->b_p_ts
-				    - wlv.vcol % (int)wp->w_buffer->b_p_ts - 1;
+					      wp->w_ਬਫਰ->b_p_ts,
+					      wp->w_ਬਫਰ->b_p_vts_array) - 1;
+# ਨਹੀਂਤਾਂ
+			wlv.n_extra = (ਪੂਰਨ)wp->w_ਬਫਰ->b_p_ts
+				    - wlv.vcol % (ਪੂਰਨ)wp->w_ਬਫਰ->b_p_ts - 1;
 # endif
 
 		    wlv.c_extra = mb_off > 0 ? MB_FILLER_CHAR : ' ';
 		    wlv.c_final = NUL;
 # ifdef FEAT_PROP_POPUP
-		    if (wlv.n_extra > 0 && c != TAB)
-			in_linebreak = TRUE;
+		    ਜੇ (wlv.n_extra > 0 && c != TAB)
+			ਵਿੱਚ_linebreak = TRUE;
 # endif
-		    if (VIM_ISWHITE(c))
+		    ਜੇ (VIM_ISWHITE(c))
 		    {
 # ifdef FEAT_CONCEAL
-			if (c == TAB)
+			ਜੇ (c == TAB)
 			    // See "Tab alignment" below.
 			    FIX_FOR_BOGUSCOLS;
 # endif
-			if (!wp->w_p_list)
+			ਜੇ (!wp->w_p_list)
 			    c = ' ';
 		    }
 		}
-#endif
-		if (wp->w_p_list)
+#ਜੇ_ਅੰਤ
+		ਜੇ (wp->w_p_list)
 		{
-		    in_multispace = c == ' ' && (*ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
-		    if (!in_multispace)
+		    ਵਿੱਚ_multispace = c == ' ' && (*ptr == ' '
+				  || (prev_ptr > ਸਤਰ && prev_ptr[-1] == ' '));
+		    ਜੇ (!ਵਿੱਚ_multispace)
 			multispace_pos = 0;
 		}
 
 		// 'list': Change char 160 to 'nbsp' and space to 'space'
 		// setting in 'listchars'.  But not when the character is
 		// followed by a composing character (use mb_l to check that).
-		if (wp->w_p_list
+		ਜੇ (wp->w_p_list
 			&& ((((c == 160 && mb_l == 1)
 			      || (mb_utf8
 				  && ((mb_c == 160 && mb_l == 2)
@@ -3206,21 +3206,21 @@ win_line(
 			    || (c == ' '
 				&& mb_l == 1
 				&& (wp->w_lcs_chars.space
-				    || (in_multispace
-					&& wp->w_lcs_chars.multispace != NULL))
-				&& ptr - line >= leadcol
-				&& ptr - line <= trailcol)))
+				    || (ਵਿੱਚ_multispace
+					&& wp->w_lcs_chars.multispace != ਨਿਰਾ))
+				&& ptr - ਸਤਰ >= leadcol
+				&& ptr - ਸਤਰ <= trailcol)))
 		{
-		    if (in_multispace && wp->w_lcs_chars.multispace != NULL)
+		    ਜੇ (ਵਿੱਚ_multispace && wp->w_lcs_chars.multispace != ਨਿਰਾ)
 		    {
 			c = wp->w_lcs_chars.multispace[multispace_pos++];
-			if (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
+			ਜੇ (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
 			    multispace_pos = 0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			c = (c == ' ') ? wp->w_lcs_chars.space
 					: wp->w_lcs_chars.nbsp;
-		    if (area_attr == 0 && search_attr == 0)
+		    ਜੇ (area_attr == 0 && ਖੋਜ_attr == 0)
 		    {
 			n_attr = 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
@@ -3228,39 +3228,39 @@ win_line(
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			mb_utf8 = FALSE;
 		}
 
-		if (c == ' ' && ((trailcol != MAXCOL && ptr > line + trailcol)
-				    || (leadcol != 0 && ptr < line + leadcol)))
+		ਜੇ (c == ' ' && ((trailcol != MAXCOL && ptr > ਸਤਰ + trailcol)
+				    || (leadcol != 0 && ptr < ਸਤਰ + leadcol)))
 		{
-		    if (leadcol != 0 && in_multispace && ptr < line + leadcol
-			    && wp->w_lcs_chars.leadmultispace != NULL)
+		    ਜੇ (leadcol != 0 && ਵਿੱਚ_multispace && ptr < ਸਤਰ + leadcol
+			    && wp->w_lcs_chars.leadmultispace != ਨਿਰਾ)
 		    {
 			c = wp->w_lcs_chars.leadmultispace[multispace_pos++];
-			if (wp->w_lcs_chars.leadmultispace[multispace_pos]
+			ਜੇ (wp->w_lcs_chars.leadmultispace[multispace_pos]
 									== NUL)
 			    multispace_pos = 0;
 		    }
 
-		    else if (ptr > line + trailcol && wp->w_lcs_chars.trail)
+		    ਨਹੀਂਤਾਂ ਜੇ (ptr > ਸਤਰ + trailcol && wp->w_lcs_chars.trail)
 			c = wp->w_lcs_chars.trail;
 
-		    else if (ptr < line + leadcol && wp->w_lcs_chars.lead)
+		    ਨਹੀਂਤਾਂ ਜੇ (ptr < ਸਤਰ + leadcol && wp->w_lcs_chars.lead)
 			c = wp->w_lcs_chars.lead;
 
-		    else if (leadcol != 0 && wp->w_lcs_chars.space)
+		    ਨਹੀਂਤਾਂ ਜੇ (leadcol != 0 && wp->w_lcs_chars.space)
 			c = wp->w_lcs_chars.space;
 
 
-		    if (!attr_pri)
+		    ਜੇ (!attr_pri)
 		    {
 			n_attr = 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
@@ -3268,120 +3268,120 @@ win_line(
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			mb_utf8 = FALSE;
 		}
 	    }
 
 	    // Handling of non-printable characters. 'isprint' does not apply
 	    // to a UTF-8 leading byte, the character was checked above.
-	    if (!vim_isprintc(c) && !(enc_utf8 && c >= 0x80))
+	    ਜੇ (!vim_isprintc(c) && !(enc_utf8 && c >= 0x80))
 	    {
 		// when getting a character from the file, we may have to
 		// turn it into something else on the way to putting it
 		// into "ScreenLines".
-		if (c == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
+		ਜੇ (c == TAB && (!wp->w_p_list || wp->w_lcs_chars.tab1))
 		{
-		    int	    tab_len = 0;
+		    ਪੂਰਨ	    tab_len = 0;
 		    // Virtual text and 'showbreak' do not count for the size
 		    // of a Tab.
-		    long    vcol_adjusted = wlv.vcol - wlv.vcol_off_tp;
-		    int	    lcs_tab1 = wp->w_lcs_chars.tab1;
-		    int	    lcs_tab2 = wp->w_lcs_chars.tab2;
-		    int	    lcs_tab3 = wp->w_lcs_chars.tab3;
+		    ਲੰਮਾ    vcol_adjusted = wlv.vcol - wlv.vcol_off_tp;
+		    ਪੂਰਨ	    lcs_tab1 = wp->w_lcs_chars.tab1;
+		    ਪੂਰਨ	    lcs_tab2 = wp->w_lcs_chars.tab2;
+		    ਪੂਰਨ	    lcs_tab3 = wp->w_lcs_chars.tab3;
 
 		    // check if leadtab is set in 'listchars'
-		    if (wp->w_p_list && wp->w_lcs_chars.leadtab1 != NUL &&
-							  ptr < line + leadcol)
+		    ਜੇ (wp->w_p_list && wp->w_lcs_chars.leadtab1 != NUL &&
+							  ptr < ਸਤਰ + leadcol)
 		    {
 			lcs_tab1 = wp->w_lcs_chars.leadtab1;
 			lcs_tab2 = wp->w_lcs_chars.leadtab2;
 			lcs_tab3 = wp->w_lcs_chars.leadtab3;
 		    }
-#ifdef FEAT_LINEBREAK
-		    char_u  *sbr = get_showbreak_value(wp);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+		    char_u  *sbr = get_showbreak_ਮੁੱਲ(wp);
 
 		    // only adjust the tab_len, when at the first column
 		    // after the showbreak value was drawn
-		    if (*sbr != NUL && wlv.vcol == wlv.vcol_sbr && wp->w_p_wrap)
+		    ਜੇ (*sbr != NUL && wlv.vcol == wlv.vcol_sbr && wp->w_p_wrap)
 			vcol_adjusted -= MB_CHARLEN(sbr);
-#endif
+#ਜੇ_ਅੰਤ
 		    // tab amount depends on current column
-#ifdef FEAT_VARTABS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VARTABS
 		    tab_len = tabstop_padding(vcol_adjusted,
-					      wp->w_buffer->b_p_ts,
-					      wp->w_buffer->b_p_vts_array) - 1;
-#else
-		    tab_len = (int)wp->w_buffer->b_p_ts
-			       - vcol_adjusted % (int)wp->w_buffer->b_p_ts - 1;
-#endif
+					      wp->w_ਬਫਰ->b_p_ts,
+					      wp->w_ਬਫਰ->b_p_vts_array) - 1;
+#ਨਹੀਂਤਾਂ
+		    tab_len = (ਪੂਰਨ)wp->w_ਬਫਰ->b_p_ts
+			       - vcol_adjusted % (ਪੂਰਨ)wp->w_ਬਫਰ->b_p_ts - 1;
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_LINEBREAK
-		    if (!wp->w_p_lbr || !wp->w_p_list)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+		    ਜੇ (!wp->w_p_lbr || !wp->w_p_list)
+#ਜੇ_ਅੰਤ
 		    {
 			// tab amount depends on current column
 			wlv.n_extra = tab_len;
 		    }
-#ifdef FEAT_LINEBREAK
-		    else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+		    ਨਹੀਂਤਾਂ
 		    {
 			char_u	*p;
-			int	len;
-			int	i;
-			int	saved_nextra = wlv.n_extra;
+			ਪੂਰਨ	len;
+			ਪੂਰਨ	i;
+			ਪੂਰਨ	saved_nextra = wlv.n_extra;
 
 # ifdef FEAT_CONCEAL
-			if (wlv.vcol_off_co > 0)
+			ਜੇ (wlv.vcol_off_co > 0)
 			    // there are characters to conceal
 			    tab_len += wlv.vcol_off_co;
 
 			// boguscols before FIX_FOR_BOGUSCOLS macro from above
-			if (wp->w_p_list && lcs_tab1 &&
+			ਜੇ (wp->w_p_list && lcs_tab1 &&
 			    old_boguscols > 0 &&
 			    wlv.n_extra > tab_len)
 			    tab_len += wlv.n_extra - tab_len;
 # endif
-			if (tab_len > 0)
+			ਜੇ (tab_len > 0)
 			{
 			    // If wlv.n_extra > 0, it gives the number of chars
 			    // to use for a tab, else we need to calculate the
 			    // width for a tab.
-			    int tab2_len = mb_char2len(lcs_tab2);
+			    ਪੂਰਨ tab2_len = mb_char2len(lcs_tab2);
 			    len = tab_len * tab2_len;
-			    if (lcs_tab3)
+			    ਜੇ (lcs_tab3)
 				len += mb_char2len(lcs_tab3) - tab2_len;
-			    if (wlv.n_extra > 0)
+			    ਜੇ (wlv.n_extra > 0)
 				len += wlv.n_extra - tab_len;
 			    c = lcs_tab1;
 			    p = alloc(len + 1);
-			    if (p == NULL)
+			    ਜੇ (p == ਨਿਰਾ)
 				wlv.n_extra = 0;
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				vim_memset(p, ' ', len);
 				p[len] = NUL;
 				vim_free(wlv.p_extra_free);
 				wlv.p_extra_free = p;
-				for (i = 0; i < tab_len; i++)
+				ਲਈ (i = 0; i < tab_len; i++)
 				{
-				    int lcs = lcs_tab2;
+				    ਪੂਰਨ lcs = lcs_tab2;
 
-				    if (*p == NUL)
+				    ਜੇ (*p == NUL)
 				    {
 					tab_len = i;
-					break;
+					ਰੋਕੋ;
 				    }
 
 				    // if tab3 is given, use it for the last
 				    // char
-				    if (lcs_tab3 && i == tab_len - 1)
+				    ਜੇ (lcs_tab3 && i == tab_len - 1)
 					lcs = lcs_tab3;
 				    p += mb_char2bytes(lcs, p);
 				    wlv.n_extra += mb_char2len(lcs)
@@ -3392,16 +3392,16 @@ win_line(
 				// n_extra will be increased by
 				// FIX_FOX_BOGUSCOLS macro below, so need to
 				// adjust for that here
-				if (wlv.vcol_off_co > 0)
+				ਜੇ (wlv.vcol_off_co > 0)
 				    wlv.n_extra -= wlv.vcol_off_co;
 # endif
 			    }
 			}
 		    }
-#endif
-#ifdef FEAT_CONCEAL
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
 		    {
-			int vc_saved = wlv.vcol_off_co;
+			ਪੂਰਨ vc_saved = wlv.vcol_off_co;
 
 			// Tab alignment should be identical regardless of
 			// 'conceallevel' value. So tab compensates of all
@@ -3414,22 +3414,22 @@ win_line(
 			// Make sure, the highlighting for the tab char will be
 			// correctly set further below (effectively reverts the
 			// FIX_FOR_BOGUSCOLS macro).
-			if (wlv.n_extra == tab_len + vc_saved && wp->w_p_list
+			ਜੇ (wlv.n_extra == tab_len + vc_saved && wp->w_p_list
 						&& wp->w_lcs_chars.tab1)
 			    tab_len += vc_saved;
 		    }
-#endif
+#ਜੇ_ਅੰਤ
 		    mb_utf8 = FALSE;	// don't draw as UTF-8
-		    if (wp->w_p_list)
+		    ਜੇ (wp->w_p_list)
 		    {
 			c = (wlv.n_extra == 0 && lcs_tab3)  ? lcs_tab3
 							    : lcs_tab1;
-#ifdef FEAT_LINEBREAK
-			if (wp->w_p_lbr && wlv.p_extra != NULL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+			ਜੇ (wp->w_p_lbr && wlv.p_extra != ਨਿਰਾ
 							&& *wlv.p_extra != NUL)
 			    wlv.c_extra = NUL; // using p_extra from above
-			else
-#endif
+			ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 			    wlv.c_extra = lcs_tab2;
 			wlv.c_final = lcs_tab3;
 			n_attr = tab_len + 1;
@@ -3437,102 +3437,102 @@ win_line(
 							       HL_ATTR(HLF_8));
 			saved_attr2 = wlv.char_attr; // save current attr
 			mb_c = c;
-			if (enc_utf8 && utf_char2len(c) > 1)
+			ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 			{
 			    mb_utf8 = TRUE;
 			    u8cc[0] = 0;
 			    c = 0xc0;
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			wlv.c_final = NUL;
 			wlv.c_extra = ' ';
 			c = ' ';
 		    }
 		}
-		else if (c == NUL
+		ਨਹੀਂਤਾਂ ਜੇ (c == NUL
 			&& wlv.n_extra == 0
 			&& (wp->w_p_list
 			    || (wlv.fromcol >= 0
 				&& wlv.tocol > wlv.vcol
-				&& VIsual_mode != Ctrl_V
+				&& VIsual_ਬਹੁਲਕ != Ctrl_V
 				&& (
-#ifdef FEAT_RIGHTLEFT
-				    wp->w_p_rl ? (wlv.col >= 0) :
-#endif
-				    (wlv.col < wp->w_width))))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+				    wp->w_p_rl ? (wlv.ਖਾਨਾ >= 0) :
+#ਜੇ_ਅੰਤ
+				    (wlv.ਖਾਨਾ < wp->w_ਚੌੜਾਈ))))
 			&& lcs_eol_one > 0)
 		{
 		    // Display a '$' after the line or highlight an extra
 		    // character if the line break is included.
-#if defined(FEAT_DIFF) || defined(LINE_ATTR)
+#ਜੇ defined(FEAT_DIFF) || defined(ਸਤਰ_ATTR)
 		    // For a diff line the highlighting continues after the
 		    // "$".
-		    if (
+		    ਜੇ (
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf == (hlf_T)0
-#  ifdef LINE_ATTR
+#  ifdef ਸਤਰ_ATTR
 			    &&
 #  endif
 # endif
-# ifdef LINE_ATTR
-			    wlv.line_attr == 0
+# ifdef ਸਤਰ_ATTR
+			    wlv.ਸਤਰ_attr == 0
 # endif
 		       )
-#endif
+#ਜੇ_ਅੰਤ
 		    {
 			// In virtualedit, visual selections may extend
 			// beyond end of line.
-			if (!(area_highlighting && virtual_active()
+			ਜੇ (!(area_highlighting && virtual_ਸਰਗਰਮ()
 				       && wlv.tocol != MAXCOL
 				       && wlv.vcol < wlv.tocol))
 			    wlv.p_extra = (char_u *)"";
 			wlv.n_extra = 0;
 		    }
-		    if (wp->w_p_list && wp->w_lcs_chars.eol > 0)
+		    ਜੇ (wp->w_p_list && wp->w_lcs_chars.eol > 0)
 			c = wp->w_lcs_chars.eol;
-		    else
+		    ਨਹੀਂਤਾਂ
 			c = ' ';
 		    lcs_eol_one = -1;
 		    --ptr;	    // put it back at the NUL
-		    if (!attr_pri)
+		    ਜੇ (!attr_pri)
 		    {
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
 							      HL_ATTR(HLF_AT));
 			n_attr = 1;
 		    }
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			mb_utf8 = FALSE;	// don't draw as UTF-8
 		}
-		else if (c != NUL)
+		ਨਹੀਂਤਾਂ ਜੇ (c != NUL)
 		{
-		    wlv.p_extra = transchar_buf(wp->w_buffer, c);
-		    if (wlv.n_extra == 0)
+		    wlv.p_extra = transchar_buf(wp->w_ਬਫਰ, c);
+		    ਜੇ (wlv.n_extra == 0)
 			wlv.n_extra = byte2cells(c) - 1;
-#ifdef FEAT_RIGHTLEFT
-		    if ((dy_flags & DY_UHEX) && wp->w_p_rl)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+		    ਜੇ ((dy_flags & DY_UHEX) && wp->w_p_rl)
 			rl_mirror(wlv.p_extra);	// reverse "<12>"
-#endif
+#ਜੇ_ਅੰਤ
 		    wlv.c_extra = NUL;
 		    wlv.c_final = NUL;
-#ifdef FEAT_LINEBREAK
-		    if (wp->w_p_lbr)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+		    ਜੇ (wp->w_p_lbr)
 		    {
 			char_u *p;
 
 			c = *wlv.p_extra;
 			p = alloc(wlv.n_extra + 1);
-			if (p == NULL)
+			ਜੇ (p == ਨਿਰਾ)
 			    wlv.n_extra = 0;
-			else
+			ਨਹੀਂਤਾਂ
 			{
 			    vim_memset(p, ' ', wlv.n_extra);
 			    STRNCPY(p, wlv.p_extra + 1, STRLEN(wlv.p_extra) - 1);
@@ -3541,329 +3541,329 @@ win_line(
 			    wlv.p_extra_free = wlv.p_extra = p;
 			}
 		    }
-		    else
-#endif
+		    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		    {
 			wlv.n_extra = byte2cells(c) - 1;
 			c = *wlv.p_extra++;
 		    }
-		    if (!attr_pri)
+		    ਜੇ (!attr_pri)
 		    {
 			n_attr = wlv.n_extra + 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
 							       HL_ATTR(HLF_8));
-#ifdef FEAT_PROP_POPUP
-			if (text_prop_type != NULL &&
-				 text_prop_flags & PT_FLAG_OVERRIDE)
-			    wlv.extra_attr = hl_combine_attr(text_prop_attr,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+			ਜੇ (ਪਾਠ_prop_type != ਨਿਰਾ &&
+				 ਪਾਠ_prop_flags & PT_FLAG_OVERRIDE)
+			    wlv.extra_attr = hl_combine_attr(ਪਾਠ_prop_attr,
 							       wlv.extra_attr);
-#endif
+#ਜੇ_ਅੰਤ
 
 			saved_attr2 = wlv.char_attr; // save current attr
 		    }
 		    mb_utf8 = FALSE;	// don't draw as UTF-8
 		}
-		else if (VIsual_active
-			 && (VIsual_mode == Ctrl_V
-			     || VIsual_mode == 'v')
-			 && virtual_active()
+		ਨਹੀਂਤਾਂ ਜੇ (VIsual_ਸਰਗਰਮ
+			 && (VIsual_ਬਹੁਲਕ == Ctrl_V
+			     || VIsual_ਬਹੁਲਕ == 'v')
+			 && virtual_ਸਰਗਰਮ()
 			 && wlv.tocol != MAXCOL
 			 && wlv.vcol < wlv.tocol
 			 && (
-#ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col >= 0) :
-#endif
-			    (wlv.col < wp->w_width)))
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+			    wp->w_p_rl ? (wlv.ਖਾਨਾ >= 0) :
+#ਜੇ_ਅੰਤ
+			    (wlv.ਖਾਨਾ < wp->w_ਚੌੜਾਈ)))
 		{
 		    c = ' ';
 		    --ptr;	    // put it back at the NUL
 		}
-#if defined(LINE_ATTR)
-		else if ((
+#ਜੇ defined(ਸਤਰ_ATTR)
+		ਨਹੀਂਤਾਂ ਜੇ ((
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf != (hlf_T)0 ||
 # endif
 # ifdef FEAT_TERMINAL
 			    wlv.win_attr != 0 ||
 # endif
-			    wlv.line_attr != 0
+			    wlv.ਸਤਰ_attr != 0
 			) && (
 # ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? (wlv.col >= 0) :
+			    wp->w_p_rl ? (wlv.ਖਾਨਾ >= 0) :
 # endif
-			    (wlv.col
+			    (wlv.ਖਾਨਾ
 # ifdef FEAT_CONCEAL
 				- wlv.boguscols
 # endif
-					    < wp->w_width)))
+					    < wp->w_ਚੌੜਾਈ)))
 		{
 		    // Highlight until the right side of the window
 		    c = ' ';
 		    --ptr;	    // put it back at the NUL
 
 		    // Remember we do the char for line highlighting.
-		    ++did_line_attr;
+		    ++did_ਸਤਰ_attr;
 
 		    // don't do search HL for the rest of the line
-		    if (wlv.line_attr != 0 && wlv.char_attr == search_attr
-					&& (did_line_attr > 1
+		    ਜੇ (wlv.ਸਤਰ_attr != 0 && wlv.char_attr == ਖੋਜ_attr
+					&& (did_ਸਤਰ_attr > 1
 					    || (wp->w_p_list &&
 						wp->w_lcs_chars.eol > 0)))
-			wlv.char_attr = wlv.line_attr;
+			wlv.char_attr = wlv.ਸਤਰ_attr;
 # ifdef FEAT_SIGNS
 		    // At end of line: if Sign is present with line highlight, reset char_attr
 		    // but not when cursorline is active
-		    if (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_LINE
+		    ਜੇ (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_ਸਤਰ
 			 && !(wp->w_p_cul && lnum == wp->w_cursor.lnum))
 			wlv.char_attr = wlv.sattr.sat_linehl;
 # endif
 # ifdef FEAT_DIFF
-		    if (wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
+		    ਜੇ (wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
 		    {
 			wlv.diff_hlf = HLF_CHD;
-			if (vi_attr == 0 || wlv.char_attr != vi_attr)
+			ਜੇ (vi_attr == 0 || wlv.char_attr != vi_attr)
 			{
 			    wlv.char_attr = HL_ATTR(wlv.diff_hlf);
-			    if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+			    ਜੇ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 				    && wp->w_p_culopt_flags != CULOPT_NBR
 				    && (!wlv.cul_screenline
-					|| (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
+					|| (wlv.vcol >= ਖੱਬਾ_curline_ਖਾਨਾ
+					    && wlv.vcol <= ਸੱਜਾ_curline_ਖਾਨਾ)))
 				wlv.char_attr = hl_combine_attr(
 					  wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
 		    }
 # endif
 # ifdef FEAT_TERMINAL
-		    if (wlv.win_attr != 0)
+		    ਜੇ (wlv.win_attr != 0)
 		    {
 			wlv.char_attr = wlv.win_attr;
-			if (wp->w_p_cul && lnum == wp->w_cursor.lnum
+			ਜੇ (wp->w_p_cul && lnum == wp->w_cursor.lnum
 				    && wp->w_p_culopt_flags != CULOPT_NBR)
 			{
-			    if (!wlv.cul_screenline
-				    || (wlv.vcol >= left_curline_col
-					     && wlv.vcol <= right_curline_col))
+			    ਜੇ (!wlv.cul_screenline
+				    || (wlv.vcol >= ਖੱਬਾ_curline_ਖਾਨਾ
+					     && wlv.vcol <= ਸੱਜਾ_curline_ਖਾਨਾ))
 				wlv.char_attr = hl_combine_attr(
 					      wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
-			else if (wlv.line_attr)
+			ਨਹੀਂਤਾਂ ਜੇ (wlv.ਸਤਰ_attr)
 			    wlv.char_attr = hl_combine_attr(
-						 wlv.char_attr, wlv.line_attr);
+						 wlv.char_attr, wlv.ਸਤਰ_attr);
 			// Show a Visual or search highlight on the first cell
 			// of an empty line, on top of the background color.
-			if (wlv.vcol == 0)
+			ਜੇ (wlv.vcol == 0)
 			{
-			    if (area_attr != 0)
+			    ਜੇ (area_attr != 0)
 				wlv.char_attr = hl_combine_attr(
 						     wlv.char_attr, area_attr);
-			    else if (search_attr != 0)
+			    ਨਹੀਂਤਾਂ ਜੇ (ਖੋਜ_attr != 0)
 				wlv.char_attr = hl_combine_attr(
-						   wlv.char_attr, search_attr);
+						   wlv.char_attr, ਖੋਜ_attr);
 			}
 		    }
 # endif
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
 
-#ifdef FEAT_CONCEAL
-	    if (   wp->w_p_cole > 0
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+	    ਜੇ (   wp->w_p_cole > 0
 		&& (wp != curwin || lnum != wp->w_cursor.lnum
-						    || conceal_cursor_line(wp))
-		&& ((syntax_flags & HL_CONCEAL) != 0 || has_match_conc > 0)
-		&& !(lnum_in_visual_area
-				    && vim_strchr(wp->w_p_cocu, 'v') == NULL))
+						    || conceal_cursor_ਸਤਰ(wp))
+		&& ((syntax_flags & HL_CONCEAL) != 0 || has_ਮੇਲ_conc > 0)
+		&& !(lnum_ਵਿੱਚ_visual_area
+				    && vim_strchr(wp->w_p_cocu, 'v') == ਨਿਰਾ))
 	    {
-		int syntax_conceal = (syntax_flags & HL_CONCEAL) != 0;
+		ਪੂਰਨ syntax_conceal = (syntax_flags & HL_CONCEAL) != 0;
 		wlv.char_attr = conceal_attr;
-		if (((prev_syntax_id != syntax_seqnr && syntax_conceal)
-			    || has_match_conc > 1)
+		ਜੇ (((prev_syntax_id != syntax_seqnr && syntax_conceal)
+			    || has_ਮੇਲ_conc > 1)
 			&& ((syntax_conceal && syn_get_sub_char() != NUL)
-				|| (has_match_conc && match_conc)
+				|| (has_ਮੇਲ_conc && ਮੇਲ_conc)
 				|| wp->w_p_cole == 1)
 			&& wp->w_p_cole != 3)
 		{
 		    // First time at this concealed item: display one
 		    // character.
-		    if (has_match_conc && match_conc)
-			c = match_conc;
-		    else if (syntax_conceal && syn_get_sub_char() != NUL)
+		    ਜੇ (has_ਮੇਲ_conc && ਮੇਲ_conc)
+			c = ਮੇਲ_conc;
+		    ਨਹੀਂਤਾਂ ਜੇ (syntax_conceal && syn_get_sub_char() != NUL)
 			c = syn_get_sub_char();
-		    else if (wp->w_lcs_chars.conceal != NUL)
+		    ਨਹੀਂਤਾਂ ਜੇ (wp->w_lcs_chars.conceal != NUL)
 			c = wp->w_lcs_chars.conceal;
-		    else
+		    ਨਹੀਂਤਾਂ
 			c = ' ';
 
-		    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+		    ਜੇ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 			// When the first char to be concealed is double-width,
 			// need to advance one more virtual column.
 			wlv.n_extra++;
 
 		    mb_c = c;
-		    if (enc_utf8 && utf_char2len(c) > 1)
+		    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 		    {
 			mb_utf8 = TRUE;
 			u8cc[0] = 0;
 			c = 0xc0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			mb_utf8 = FALSE;	// don't draw as UTF-8
 
 		    prev_syntax_id = syntax_seqnr;
 
-		    if (wlv.n_extra > 0)
+		    ਜੇ (wlv.n_extra > 0)
 			wlv.vcol_off_co += wlv.n_extra;
 		    wlv.vcol += wlv.n_extra;
-		    if (wp->w_p_wrap && wlv.n_extra > 0)
+		    ਜੇ (wp->w_p_wrap && wlv.n_extra > 0)
 		    {
 # ifdef FEAT_RIGHTLEFT
-			if (wp->w_p_rl)
+			ਜੇ (wp->w_p_rl)
 			{
-			    wlv.col -= wlv.n_extra;
+			    wlv.ਖਾਨਾ -= wlv.n_extra;
 			    wlv.boguscols -= wlv.n_extra;
 			}
-			else
+			ਨਹੀਂਤਾਂ
 # endif
 			{
 			    wlv.boguscols += wlv.n_extra;
-			    wlv.col += wlv.n_extra;
+			    wlv.ਖਾਨਾ += wlv.n_extra;
 			}
 		    }
 		    wlv.n_extra = 0;
 		    n_attr = 0;
 		}
-		else if (skip_cells == 0)
+		ਨਹੀਂਤਾਂ ਜੇ (skip_cells == 0)
 		{
 		    is_concealing = TRUE;
 		    skip_cells = 1;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		prev_syntax_id = 0;
 		is_concealing = FALSE;
 	    }
 
-	    if (skip_cells > 0 && did_decrement_ptr)
+	    ਜੇ (skip_cells > 0 && did_decrement_ptr)
 		// not showing the '>', put pointer back to avoid getting stuck
 		++ptr;
 
-#endif // FEAT_CONCEAL
+#ਜੇ_ਅੰਤ // FEAT_CONCEAL
 	}
 
-#ifdef FEAT_CONCEAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
 	// In the cursor line and we may be concealing characters: correct
 	// the cursor column when we reach its position.
 	// With 'virtualedit' we may never reach cursor position, but we still
 	// need to correct the cursor column, so do that at end of line.
-	if (!did_wcol && wlv.draw_state == WL_LINE
-		&& in_curline && conceal_cursor_line(wp)
+	ਜੇ (!did_wcol && wlv.draw_state == WL_ਸਤਰ
+		&& ਵਿੱਚ_curline && conceal_cursor_ਸਤਰ(wp)
 		&& (wlv.vcol + skip_cells >= wp->w_virtcol || c == NUL))
 	{
 # ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
-		wp->w_wcol = wp->w_width - wlv.col + wlv.boguscols - 1;
-	    else
+	    ਜੇ (wp->w_p_rl)
+		wp->w_wcol = wp->w_ਚੌੜਾਈ - wlv.ਖਾਨਾ + wlv.boguscols - 1;
+	    ਨਹੀਂਤਾਂ
 # endif
-		wp->w_wcol = wlv.col - wlv.boguscols;
+		wp->w_wcol = wlv.ਖਾਨਾ - wlv.boguscols;
 	    // Screen cells concealed before the cursor on this screen line, so
 	    // pum_display() can line the menu up with the visible text;
 	    // "skip_cells" is the concealed cell at the cursor not yet counted.
 	    wp->w_wcol_conceal_off = wlv.vcol_off_co + skip_cells;
-	    if (wlv.vcol + skip_cells < wp->w_virtcol)
+	    ਜੇ (wlv.vcol + skip_cells < wp->w_virtcol)
 		// Cursor beyond end of the line with 'virtualedit'.
 		wp->w_wcol += wp->w_virtcol - wlv.vcol - skip_cells;
-	    wp->w_wrow = wlv.row;
+	    wp->w_wrow = wlv.ਪੰਕਤੀ;
 	    did_wcol = TRUE;
 	    curwin->w_valid |= VALID_WCOL|VALID_WROW|VALID_VIRTCOL;
 # ifdef FEAT_PROP_POPUP
 	    curwin->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
 # endif
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// Use "wlv.extra_attr", but don't override visual selection
 	// highlighting, unless text property overrides.
 	// Don't use "wlv.extra_attr" until wlv.n_attr_skip is zero.
-	if (wlv.n_attr_skip == 0 && n_attr > 0
-		&& wlv.draw_state == WL_LINE
+	ਜੇ (wlv.n_attr_skip == 0 && n_attr > 0
+		&& wlv.draw_state == WL_ਸਤਰ
 		&& (!attr_pri
-#ifdef FEAT_PROP_POPUP
-		    || (text_prop_flags & PT_FLAG_OVERRIDE)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		    || (ਪਾਠ_prop_flags & PT_FLAG_OVERRIDE)
+#ਜੇ_ਅੰਤ
 		   ))
 	{
-#ifdef LINE_ATTR
-	    if (wlv.line_attr)
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, wlv.extra_attr);
-	    else
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਸਤਰ_ATTR
+	    ਜੇ (wlv.ਸਤਰ_attr)
+		wlv.char_attr = hl_combine_attr(wlv.ਸਤਰ_attr, wlv.extra_attr);
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		wlv.char_attr = wlv.extra_attr;
-#ifdef FEAT_PROP_POPUP
-	    if (reset_extra_attr)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    ਜੇ (reset_extra_attr)
 	    {
 		reset_extra_attr = FALSE;
 		wlv.extra_attr = 0;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ਜੇ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 	// XIM don't send preedit_start and preedit_end, but they send
 	// preedit_changed and commit.  Thus Vim can't set "im_is_active", use
 	// im_is_preediting() here.
-	if (p_imst == IM_ON_THE_SPOT
-		&& xic != NULL
+	ਜੇ (p_imst == IM_ON_THE_SPOT
+		&& xic != ਨਿਰਾ
 		&& lnum == wp->w_cursor.lnum
-		&& (State & MODE_INSERT)
+		&& (State & ਬਹੁਲਕ_ਪਾਓ)
 		&& !p_imdisable
 		&& im_is_preediting()
-		&& wlv.draw_state == WL_LINE)
+		&& wlv.draw_state == WL_ਸਤਰ)
 	{
 	    colnr_T tcol;
 
-	    if (preedit_end_col == MAXCOL)
-		getvcol(curwin, &(wp->w_cursor), &tcol, NULL, NULL, 0);
-	    else
-		tcol = preedit_end_col;
-	    if ((long)preedit_start_col <= wlv.vcol && wlv.vcol < (long)tcol)
+	    ਜੇ (preedit_ਸਿਰਾ_ਖਾਨਾ == MAXCOL)
+		getvcol(curwin, &(wp->w_cursor), &tcol, ਨਿਰਾ, ਨਿਰਾ, 0);
+	    ਨਹੀਂਤਾਂ
+		tcol = preedit_ਸਿਰਾ_ਖਾਨਾ;
+	    ਜੇ ((ਲੰਮਾ)preedit_ਸ਼ੁਰੂ_ਖਾਨਾ <= wlv.vcol && wlv.vcol < (ਲੰਮਾ)tcol)
 	    {
-		if (feedback_old_attr < 0)
+		ਜੇ (feedback_old_attr < 0)
 		{
-		    feedback_col = 0;
+		    feedback_ਖਾਨਾ = 0;
 		    feedback_old_attr = wlv.char_attr;
 		}
-		wlv.char_attr = im_get_feedback_attr(feedback_col);
-		if (wlv.char_attr < 0)
+		wlv.char_attr = im_get_feedback_attr(feedback_ਖਾਨਾ);
+		ਜੇ (wlv.char_attr < 0)
 		    wlv.char_attr = feedback_old_attr;
-		feedback_col++;
+		feedback_ਖਾਨਾ++;
 	    }
-	    else if (feedback_old_attr >= 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (feedback_old_attr >= 0)
 	    {
 		wlv.char_attr = feedback_old_attr;
 		feedback_old_attr = -1;
-		feedback_col = 0;
+		feedback_ਖਾਨਾ = 0;
 	    }
 	}
-#endif
+#ਜੇ_ਅੰਤ
 	// Handle the case where we are in column 0 but not on the first
 	// character of the line and the user wants us to show us a
 	// special character (via 'listchars' option "precedes:<char>").
-	if (lcs_prec_todo != NUL
+	ਜੇ (lcs_prec_todo != NUL
 		&& wp->w_p_list
-		&& (wp->w_p_wrap ? (wp->w_skipcol > 0 && wlv.row == 0)
+		&& (wp->w_p_wrap ? (wp->w_skipcol > 0 && wlv.ਪੰਕਤੀ == 0)
 				 : wp->w_leftcol > 0)
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 		&& wlv.draw_state > WL_NR
 		&& skip_cells <= 0
 		&& c != NUL)
 	{
 	    c = wp->w_lcs_chars.prec;
 	    lcs_prec_todo = NUL;
-	    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+	    ਜੇ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// Double-width character being overwritten by the "precedes"
 		// character, need to fill up half the character.
@@ -3875,15 +3875,15 @@ win_line(
 				hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
 	    }
 	    mb_c = c;
-	    if (enc_utf8 && utf_char2len(c) > 1)
+	    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 	    {
 		mb_utf8 = TRUE;
 		u8cc[0] = 0;
 		c = 0xc0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		mb_utf8 = FALSE;	// don't draw as UTF-8
-	    if (!attr_pri)
+	    ਜੇ (!attr_pri)
 	    {
 		saved_attr3 = wlv.char_attr; // save current attr
 		wlv.char_attr = hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
@@ -3892,94 +3892,94 @@ win_line(
 	}
 
 	// At end of the text line or just after the last character.
-	if ((c == NUL
-#if defined(LINE_ATTR)
-		|| did_line_attr == 1
-#endif
+	ਜੇ ((c == NUL
+#ਜੇ defined(ਸਤਰ_ATTR)
+		|| did_ਸਤਰ_attr == 1
+#ਜੇ_ਅੰਤ
 		) && wlv.eol_hl_off == 0)
 	{
-#ifdef FEAT_SEARCH_EXTRA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
 	    // flag to indicate whether prevcol equals startcol of search_hl or
 	    // one of the matches
-	    int prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_search_hl,
-					      (long)(ptr - line) - (c == NUL));
-#endif
+	    ਪੂਰਨ prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_ਖੋਜ_hl,
+					      (ਲੰਮਾ)(ptr - ਸਤਰ) - (c == NUL));
+#ਜੇ_ਅੰਤ
 	    // Invert at least one char, used for Visual and empty line or
 	    // highlight match at end of line. If it's beyond the last
 	    // char on the screen, just overwrite that one (tricky!)  Not
 	    // needed when a '$' was displayed for 'list'.
-	    if (wp->w_lcs_chars.eol == lcs_eol_one
+	    ਜੇ (wp->w_lcs_chars.eol == lcs_eol_one
 		    && ((area_attr != 0 && wlv.vcol == wlv.fromcol
-			    && (VIsual_mode != Ctrl_V
+			    && (VIsual_ਬਹੁਲਕ != Ctrl_V
 				|| lnum == VIsual.lnum
 				|| lnum == curwin->w_cursor.lnum)
 			    && c == NUL)
-#ifdef FEAT_SEARCH_EXTRA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
 			// highlight 'hlsearch' match at end of line
 			|| (prevcol_hl_flag
 # ifdef FEAT_SYN_HL
 			    && !(wp->w_p_cul && lnum == wp->w_cursor.lnum
-				    && !(wp == curwin && VIsual_active))
+				    && !(wp == curwin && VIsual_ਸਰਗਰਮ))
 # endif
 # ifdef FEAT_DIFF
 			    && wlv.diff_hlf == (hlf_T)0
 # endif
-# if defined(LINE_ATTR)
-			    && did_line_attr <= 1
+# ਜੇ defined(ਸਤਰ_ATTR)
+			    && did_ਸਤਰ_attr <= 1
 # endif
 			   )
-#endif
+#ਜੇ_ਅੰਤ
 		       ))
 	    {
-		int n = 0;
+		ਪੂਰਨ n = 0;
 
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+		ਜੇ (wp->w_p_rl)
 		{
-		    if (wlv.col < 0)
+		    ਜੇ (wlv.ਖਾਨਾ < 0)
 			n = 1;
 		}
-		else
-#endif
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		{
-		    if (wlv.col >= wp->w_width)
+		    ਜੇ (wlv.ਖਾਨਾ >= wp->w_ਚੌੜਾਈ)
 			n = -1;
 		}
-		if (n != 0)
+		ਜੇ (n != 0)
 		{
 		    // At the window boundary, highlight the last character
 		    // instead (better than nothing).
 		    wlv.off += n;
-		    wlv.col += n;
+		    wlv.ਖਾਨਾ += n;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Add a blank character to highlight.
-		    ScreenLines[wlv.off] = ' ';
-		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+		    Screen_ਸਤਰਾਂ[wlv.off] = ' ';
+		    ਜੇ (enc_utf8)
+			Screen_ਸਤਰਾਂ_UC[wlv.off] = 0;
 		}
-#ifdef FEAT_SEARCH_EXTRA
-		if (area_attr == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+		ਜੇ (area_attr == 0)
 		{
 		    // Use attributes from match with highest priority among
 		    // 'search_hl' and the match list.
-		    get_search_match_hl(wp, &screen_search_hl,
-					   (long)(ptr - line), &wlv.char_attr);
+		    get_ਖੋਜ_ਮੇਲ_hl(wp, &screen_ਖੋਜ_hl,
+					   (ਲੰਮਾ)(ptr - ਸਤਰ), &wlv.char_attr);
 		}
-#endif
+#ਜੇ_ਅੰਤ
 		ScreenAttrs[wlv.off] = wlv.char_attr;
-		ScreenCols[wlv.off] = wlv.vcol;
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+		Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = wlv.vcol;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+		ਜੇ (wp->w_p_rl)
 		{
-		    --wlv.col;
+		    --wlv.ਖਾਨਾ;
 		    --wlv.off;
 		}
-		else
-#endif
+		ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 		{
-		    ++wlv.col;
+		    ++wlv.ਖਾਨਾ;
 		    ++wlv.off;
 		}
 		++wlv.vcol;
@@ -3988,73 +3988,73 @@ win_line(
 	}
 
 	// At end of the text line.
-	if (c == NUL)
+	ਜੇ (c == NUL)
 	{
-#ifdef FEAT_PROP_POPUP
-	    if (text_prop_follows)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    ਜੇ (ਪਾਠ_prop_follows)
 	    {
 		// Put the pointer back to the NUL.
 		--ptr;
 		c = ' ';
 	    }
-	    else
-#endif
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    {
-		draw_screen_line(wp, &wlv);
+		draw_screen_ਸਤਰ(wp, &wlv);
 
 		// Update w_cline_height and w_cline_folded if the cursor line
 		// was updated (saves a call to plines() later).
-		if (in_curline)
+		ਜੇ (ਵਿੱਚ_curline)
 		{
-		    curwin->w_cline_row = startrow;
-		    curwin->w_cline_height = wlv.row - startrow;
-#ifdef FEAT_FOLDING
+		    curwin->w_cline_ਪੰਕਤੀ = startrow;
+		    curwin->w_cline_ਉਚਾਈ = wlv.ਪੰਕਤੀ - startrow;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 		    curwin->w_cline_folded = false;
-#endif
+#ਜੇ_ਅੰਤ
 		    curwin->w_valid |= (VALID_CHEIGHT|VALID_CROW);
 		}
-		break;
+		ਰੋਕੋ;
 	    }
 	}
 
 	// Show "extends" character from 'listchars' if beyond the line end.
-	int lcs_ext = get_lcs_ext(wp);
-	if (lcs_ext != NUL
-		&& wlv.draw_state == WL_LINE
-#ifdef FEAT_DIFF
+	ਪੂਰਨ lcs_ext = get_lcs_ext(wp);
+	ਜੇ (lcs_ext != NUL
+		&& wlv.draw_state == WL_ਸਤਰ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 		&& (
-#ifdef FEAT_RIGHTLEFT
-		    wp->w_p_rl ? wlv.col == 0 :
-#endif
-		    wlv.col == wp->w_width - 1)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+		    wp->w_p_rl ? wlv.ਖਾਨਾ == 0 :
+#ਜੇ_ਅੰਤ
+		    wlv.ਖਾਨਾ == wp->w_ਚੌੜਾਈ - 1)
 		&& (*ptr != NUL
 		    || lcs_eol_one > 0
 		    || (wlv.n_extra > 0 && (wlv.c_extra != NUL
 						     || *wlv.p_extra != NUL))
-#ifdef FEAT_PROP_POPUP
-		    || text_prop_next <= last_textprop_text_idx
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		    || ਪਾਠ_prop_ਅਗਲਾ <= ਆਖਰੀ_textprop_ਪਾਠ_idx
+#ਜੇ_ਅੰਤ
 		   ))
 	{
 	    c = lcs_ext;
 	    wlv.char_attr = hl_combine_attr(wlv.win_attr, HL_ATTR(HLF_AT));
 	    mb_c = c;
-	    if (enc_utf8 && utf_char2len(c) > 1)
+	    ਜੇ (enc_utf8 && utf_char2len(c) > 1)
 	    {
 		mb_utf8 = TRUE;
 		u8cc[0] = 0;
 		c = 0xc0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		mb_utf8 = FALSE;
 	}
 
-#ifdef FEAT_SYN_HL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
 	// advance to the next 'colorcolumn'
-	if (wlv.draw_color_col)
-	    wlv.draw_color_col = advance_color_col(VCOL_HLC, &wlv.color_cols);
+	ਜੇ (wlv.draw_color_ਖਾਨਾ)
+	    wlv.draw_color_ਖਾਨਾ = advance_color_ਖਾਨਾ(VCOL_HLC, &wlv.color_ਖਾਨੇ_ਗਿਣਤੀ);
 
 	// Highlight the cursor column if 'cursorcolumn' is set.  But don't
 	// highlight the cursor position itself.
@@ -4063,144 +4063,144 @@ win_line(
 	// Also highlight the 'colorcolumn' if 'breakindent' and/or 'showbreak'
 	// options are set
 	vcol_save_attr = -1;
-	if (((wlv.draw_state == WL_LINE
+	ਜੇ (((wlv.draw_state == WL_ਸਤਰ
 		    || wlv.draw_state == WL_BRI
 		    || wlv.draw_state == WL_SBR)
-		&& !lnum_in_visual_area
-		&& search_attr == 0
+		&& !lnum_ਵਿੱਚ_visual_area
+		&& ਖੋਜ_attr == 0
 		&& area_attr == 0)
 # ifdef FEAT_DIFF
 			&& wlv.filler_todo <= 0
 # endif
 		)
 	{
-	    if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol
+	    ਜੇ (wp->w_p_cuc && VCOL_HLC == (ਲੰਮਾ)wp->w_virtcol
 						 && lnum != wp->w_cursor.lnum)
 	    {
 		vcol_save_attr = wlv.char_attr;
 		wlv.char_attr = hl_combine_attr(wlv.char_attr,
 							     HL_ATTR(HLF_CUC));
 	    }
-	    else if (wlv.draw_color_col && VCOL_HLC == *wlv.color_cols)
+	    ਨਹੀਂਤਾਂ ਜੇ (wlv.draw_color_ਖਾਨਾ && VCOL_HLC == *wlv.color_ਖਾਨੇ_ਗਿਣਤੀ)
 	    {
 		vcol_save_attr = wlv.char_attr;
 		wlv.char_attr = hl_combine_attr(wlv.char_attr, HL_ATTR(HLF_MC));
 	    }
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	// Store character to be displayed.
 	// Skip characters that are left of the screen for 'nowrap'.
-	if (wlv.draw_state < WL_LINE || skip_cells <= 0)
+	ਜੇ (wlv.draw_state < WL_ਸਤਰ || skip_cells <= 0)
 	{
 	    // Store the character.
-#if defined(FEAT_RIGHTLEFT)
-	    if (has_mbyte && wp->w_p_rl && (*mb_char2cells)(mb_c) > 1)
+#ਜੇ defined(FEAT_RIGHTLEFT)
+	    ਜੇ (has_mbyte && wp->w_p_rl && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// A double-wide character is: put first half in left cell.
 		--wlv.off;
-		--wlv.col;
+		--wlv.ਖਾਨਾ;
 	    }
-#endif
-	    ScreenLines[wlv.off] = c;
-	    if (enc_dbcs == DBCS_JPNU)
+#ਜੇ_ਅੰਤ
+	    Screen_ਸਤਰਾਂ[wlv.off] = c;
+	    ਜੇ (enc_dbcs == DBCS_JPNU)
 	    {
-		if ((mb_c & 0xff00) == 0x8e00)
-		    ScreenLines[wlv.off] = 0x8e;
+		ਜੇ ((mb_c & 0xff00) == 0x8e00)
+		    Screen_ਸਤਰਾਂ[wlv.off] = 0x8e;
 		ScreenLines2[wlv.off] = mb_c & 0xff;
 	    }
-	    else if (enc_utf8)
+	    ਨਹੀਂਤਾਂ ਜੇ (enc_utf8)
 	    {
-		if (mb_utf8)
+		ਜੇ (mb_utf8)
 		{
-		    int i;
+		    ਪੂਰਨ i;
 
-		    ScreenLinesUC[wlv.off] = mb_c;
-		    if ((c & 0xff) == 0)
-			ScreenLines[wlv.off] = 0x80;   // avoid storing zero
-		    for (i = 0; i < Screen_mco; ++i)
+		    Screen_ਸਤਰਾਂ_UC[wlv.off] = mb_c;
+		    ਜੇ ((c & 0xff) == 0)
+			Screen_ਸਤਰਾਂ[wlv.off] = 0x80;   // avoid storing zero
+		    ਲਈ (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][wlv.off] = u8cc[i];
-			if (u8cc[i] == 0)
-			    break;
+			Screen_ਸਤਰਾਂ_C[i][wlv.off] = u8cc[i];
+			ਜੇ (u8cc[i] == 0)
+			    ਰੋਕੋ;
 		    }
 		}
-		else
-		    ScreenLinesUC[wlv.off] = 0;
+		ਨਹੀਂਤਾਂ
+		    Screen_ਸਤਰਾਂ_UC[wlv.off] = 0;
 	    }
-	    if (multi_attr)
+	    ਜੇ (multi_attr)
 	    {
 		ScreenAttrs[wlv.off] = multi_attr;
 		multi_attr = 0;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		ScreenAttrs[wlv.off] = wlv.char_attr;
 
-	    if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+	    ਜੇ (wlv.draw_state > WL_NR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    && wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 		    )
-		ScreenCols[wlv.off] = wlv.vcol;
-	    else
-		ScreenCols[wlv.off] = -1;
+		Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = wlv.vcol;
+	    ਨਹੀਂਤਾਂ
+		Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = -1;
 
-	    if (has_mbyte && (*mb_char2cells)(mb_c) > 1)
+	    ਜੇ (has_mbyte && (*mb_char2cells)(mb_c) > 1)
 	    {
 		// Need to fill two screen columns.
 		++wlv.off;
-		++wlv.col;
-		if (enc_utf8)
+		++wlv.ਖਾਨਾ;
+		ਜੇ (enc_utf8)
 		    // UTF-8: Put a 0 in the second screen char.
-		    ScreenLines[wlv.off] = 0;
-		else
+		    Screen_ਸਤਰਾਂ[wlv.off] = 0;
+		ਨਹੀਂਤਾਂ
 		    // DBCS: Put second byte in the second screen char.
-		    ScreenLines[wlv.off] = mb_c & 0xff;
+		    Screen_ਸਤਰਾਂ[wlv.off] = mb_c & 0xff;
 
-		if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+		ਜੇ (wlv.draw_state > WL_NR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 			&& wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 			)
-		    ScreenCols[wlv.off] = ++wlv.vcol;
-		else
-		    ScreenCols[wlv.off] = -1;
+		    Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = ++wlv.vcol;
+		ਨਹੀਂਤਾਂ
+		    Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = -1;
 
 		// When "wlv.tocol" is halfway a character, set it to the end
 		// of the character, otherwise highlighting won't stop.
-		if (wlv.tocol == wlv.vcol)
+		ਜੇ (wlv.tocol == wlv.vcol)
 		    ++wlv.tocol;
 
-#ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+		ਜੇ (wp->w_p_rl)
 		{
 		    // now it's time to backup one cell
 		    --wlv.off;
-		    --wlv.col;
+		    --wlv.ਖਾਨਾ;
 		}
-#endif
+#ਜੇ_ਅੰਤ
 	    }
-#ifdef FEAT_RIGHTLEFT
-	    if (wp->w_p_rl)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+	    ਜੇ (wp->w_p_rl)
 	    {
 		--wlv.off;
-		--wlv.col;
+		--wlv.ਖਾਨਾ;
 	    }
-	    else
-#endif
+	    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
 	    {
 		++wlv.off;
-		++wlv.col;
+		++wlv.ਖਾਨਾ;
 	    }
 	}
-#ifdef FEAT_CONCEAL
-	else if (wp->w_p_cole > 0 && is_concealing)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+	ਨਹੀਂਤਾਂ ਜੇ (wp->w_p_cole > 0 && is_concealing)
 	{
-	    int concealed_wide = has_mbyte && (*mb_char2cells)(mb_c) > 1;
+	    ਪੂਰਨ concealed_wide = has_mbyte && (*mb_char2cells)(mb_c) > 1;
 
 	    --skip_cells;
 	    ++wlv.vcol_off_co;
-	    if (concealed_wide)
+	    ਜੇ (concealed_wide)
 	    {
 		// When a double-width char is concealed,
 		// need to advance one more virtual column.
@@ -4208,10 +4208,10 @@ win_line(
 		++wlv.vcol_off_co;
 	    }
 
-	    if (wlv.n_extra > 0)
+	    ਜੇ (wlv.n_extra > 0)
 		wlv.vcol_off_co += wlv.n_extra;
 
-	    if (wp->w_p_wrap)
+	    ਜੇ (wp->w_p_wrap)
 	    {
 		// Special voodoo required if 'wrap' is on.
 		//
@@ -4228,28 +4228,28 @@ win_line(
 		// For popup windows with fixed width, don't advance col
 		// to allow full text to be displayed.
 # ifdef FEAT_PROP_POPUP
-		int adjust_col = !WIN_IS_POPUP(wp);
-# else
-		int adjust_col = TRUE;
+		ਪੂਰਨ adjust_ਖਾਨਾ = !WIN_IS_POPUP(wp);
+# ਨਹੀਂਤਾਂ
+		ਪੂਰਨ adjust_ਖਾਨਾ = TRUE;
 # endif
-		if (wlv.n_extra > 0)
+		ਜੇ (wlv.n_extra > 0)
 		{
 		    wlv.vcol += wlv.n_extra;
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ਜੇ (wp->w_p_rl)
 		    {
-			if (adjust_col)
+			ਜੇ (adjust_ਖਾਨਾ)
 			{
-			    wlv.col -= wlv.n_extra;
+			    wlv.ਖਾਨਾ -= wlv.n_extra;
 			    wlv.boguscols -= wlv.n_extra;
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 # endif
 		    {
-			if (adjust_col)
+			ਜੇ (adjust_ਖਾਨਾ)
 			{
-			    wlv.col += wlv.n_extra;
+			    wlv.ਖਾਨਾ += wlv.n_extra;
 			    wlv.boguscols += wlv.n_extra;
 			}
 		    }
@@ -4257,51 +4257,51 @@ win_line(
 		    n_attr = 0;
 		}
 
-		if (concealed_wide)
+		ਜੇ (concealed_wide)
 		{
 		    // Need to fill two screen columns.
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ਜੇ (wp->w_p_rl)
 		    {
-			if (adjust_col)
+			ਜੇ (adjust_ਖਾਨਾ)
 			{
 			    --wlv.boguscols;
-			    --wlv.col;
+			    --wlv.ਖਾਨਾ;
 			}
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 # endif
 		    {
-			if (adjust_col)
+			ਜੇ (adjust_ਖਾਨਾ)
 			{
 			    ++wlv.boguscols;
-			    ++wlv.col;
+			    ++wlv.ਖਾਨਾ;
 			}
 		    }
 		}
 
 # ifdef FEAT_RIGHTLEFT
-		if (wp->w_p_rl)
+		ਜੇ (wp->w_p_rl)
 		{
-		    if (adjust_col)
+		    ਜੇ (adjust_ਖਾਨਾ)
 		    {
 			--wlv.boguscols;
-			--wlv.col;
+			--wlv.ਖਾਨਾ;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 # endif
 		{
-		    if (adjust_col)
+		    ਜੇ (adjust_ਖਾਨਾ)
 		    {
 			++wlv.boguscols;
-			++wlv.col;
+			++wlv.ਖਾਨਾ;
 		    }
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (wlv.n_extra > 0)
+		ਜੇ (wlv.n_extra > 0)
 		{
 		    wlv.vcol += wlv.n_extra;
 		    wlv.n_extra = 0;
@@ -4310,11 +4310,11 @@ win_line(
 	    }
 
 	}
-#endif // FEAT_CONCEAL
-	else
+#ਜੇ_ਅੰਤ // FEAT_CONCEAL
+	ਨਹੀਂਤਾਂ
 	    --skip_cells;
 
-	if (wlv.draw_state > WL_NR && skipped_cells > 0)
+	ਜੇ (wlv.draw_state > WL_NR && skipped_cells > 0)
 	{
 	    wlv.vcol += skipped_cells;
 	    skipped_cells = 0;
@@ -4322,156 +4322,156 @@ win_line(
 
 	// Only advance the "wlv.vcol" when after the 'number' or
 	// 'relativenumber' column.
-	if (wlv.draw_state > WL_NR
-#ifdef FEAT_DIFF
+	ਜੇ (wlv.draw_state > WL_NR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		&& wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 		)
 	    ++wlv.vcol;
 
-#ifdef FEAT_SYN_HL
-	if (vcol_save_attr >= 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	ਜੇ (vcol_save_attr >= 0)
 	    wlv.char_attr = vcol_save_attr;
-#endif
+#ਜੇ_ਅੰਤ
 
 	// restore attributes after "precedes" in 'listchars'
-	if (wlv.draw_state > WL_NR && n_attr3 > 0 && --n_attr3 == 0)
+	ਜੇ (wlv.draw_state > WL_NR && n_attr3 > 0 && --n_attr3 == 0)
 	    wlv.char_attr = saved_attr3;
 
 	// restore attributes after last 'listchars' or 'number' char
-	if (n_attr > 0 && wlv.draw_state == WL_LINE
+	ਜੇ (n_attr > 0 && wlv.draw_state == WL_ਸਤਰ
 				      && wlv.n_attr_skip == 0 && --n_attr == 0)
 	    wlv.char_attr = saved_attr2;
-	if (wlv.n_attr_skip > 0)
+	ਜੇ (wlv.n_attr_skip > 0)
 	    --wlv.n_attr_skip;
 
 	// At end of screen line and there is more to come: Display the line
 	// so far.  If there is no more to display it is caught above.
-	if ((
-#ifdef FEAT_RIGHTLEFT
-	    wp->w_p_rl ? (wlv.col < 0) :
-#endif
-				    (wlv.col >= wp->w_width))
-		&& (wlv.draw_state != WL_LINE
+	ਜੇ ((
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+	    wp->w_p_rl ? (wlv.ਖਾਨਾ < 0) :
+#ਜੇ_ਅੰਤ
+				    (wlv.ਖਾਨਾ >= wp->w_ਚੌੜਾਈ))
+		&& (wlv.draw_state != WL_ਸਤਰ
 		    || *ptr != NUL
-#ifdef FEAT_DIFF
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    || wlv.filler_todo > 0
-#endif
-#ifdef FEAT_PROP_POPUP
-		    || text_prop_above || text_prop_follows
-		    || text_prop_next <= last_textprop_text_idx
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		    || ਪਾਠ_prop_above || ਪਾਠ_prop_follows
+		    || ਪਾਠ_prop_ਅਗਲਾ <= ਆਖਰੀ_textprop_ਪਾਠ_idx
+#ਜੇ_ਅੰਤ
 		    || (wp->w_p_list && wp->w_lcs_chars.eol != NUL
 						&& lcs_eol_one != -1)
 		    || (wlv.n_extra != 0 && (wlv.c_extra != NUL
 						      || *wlv.p_extra != NUL)))
 		)
 	{
-#ifdef FEAT_CONCEAL
-	    wlv.col -= wlv.boguscols;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_CONCEAL
+	    wlv.ਖਾਨਾ -= wlv.boguscols;
 	    // Apply 'cursorline' and HLF_WIN highlight.
-	    if (wlv.boguscols != 0 && (
-# ifdef LINE_ATTR
-			wlv.line_attr != 0 ||
+	    ਜੇ (wlv.boguscols != 0 && (
+# ifdef ਸਤਰ_ATTR
+			wlv.ਸਤਰ_attr != 0 ||
 # endif
 			wlv.win_attr != 0
 			)
 	       )
 	    {
-		int attr = wlv.win_attr;
-# ifdef LINE_ATTR
-		if (wlv.line_attr != 0)
-		    attr = hl_combine_attr(attr, wlv.line_attr);
+		ਪੂਰਨ attr = wlv.win_attr;
+# ifdef ਸਤਰ_ATTR
+		ਜੇ (wlv.ਸਤਰ_attr != 0)
+		    attr = hl_combine_attr(attr, wlv.ਸਤਰ_attr);
 # endif
-		while ((
+		ਜਦੋਂ ((
 # ifdef FEAT_RIGHTLEFT
-			    wp->w_p_rl ? wlv.col >= 0 :
+			    wp->w_p_rl ? wlv.ਖਾਨਾ >= 0 :
 # endif
-			    wlv.col < wp->w_width))
+			    wlv.ਖਾਨਾ < wp->w_ਚੌੜਾਈ))
 		{
-		    ScreenLines[wlv.off] = ' ';
-		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+		    Screen_ਸਤਰਾਂ[wlv.off] = ' ';
+		    ਜੇ (enc_utf8)
+			Screen_ਸਤਰਾਂ_UC[wlv.off] = 0;
 		    ScreenAttrs[wlv.off] = attr;
-		    ScreenCols[wlv.off] = wlv.vcol - 1;
+		    Screen_ਖਾਨੇ_ਗਿਣਤੀ[wlv.off] = wlv.vcol - 1;
 # ifdef FEAT_RIGHTLEFT
-		    if (wp->w_p_rl)
+		    ਜੇ (wp->w_p_rl)
 		    {
 			wlv.off--;
-			wlv.col--;
+			wlv.ਖਾਨਾ--;
 			wlv.boguscols++;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 # endif
 		    {
 			wlv.off++;
-			wlv.col++;
+			wlv.ਖਾਨਾ++;
 			wlv.boguscols--;
 		    }
 		}
 	    }
-	    wlv_screen_line(wp, &wlv, TRUE);
-	    wlv.col += wlv.boguscols;
+	    wlv_screen_ਸਤਰ(wp, &wlv, TRUE);
+	    wlv.ਖਾਨਾ += wlv.boguscols;
 	    wlv.boguscols = 0;
 	    wlv.vcol_off_co = 0;
-#else
-	    wlv_screen_line(wp, &wlv, TRUE);
-#endif
-	    ++wlv.row;
-	    ++wlv.screen_row;
+#ਨਹੀਂਤਾਂ
+	    wlv_screen_ਸਤਰ(wp, &wlv, TRUE);
+#ਜੇ_ਅੰਤ
+	    ++wlv.ਪੰਕਤੀ;
+	    ++wlv.screen_ਪੰਕਤੀ;
 
 	    // When not wrapping and finished diff lines, break here.
-	    if (!wp->w_p_wrap
-#ifdef FEAT_DIFF
+	    ਜੇ (!wp->w_p_wrap
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 			&& wlv.filler_todo <= 0
-#endif
-#ifdef FEAT_PROP_POPUP
-			&& !text_prop_above
-			&& !text_prop_follows
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+			&& !ਪਾਠ_prop_above
+			&& !ਪਾਠ_prop_follows
+#ਜੇ_ਅੰਤ
 		       )
-		break;
-#ifdef FEAT_PROP_POPUP
-	    if (!wp->w_p_wrap && text_prop_follows && !text_prop_above)
+		ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	    ਜੇ (!wp->w_p_wrap && ਪਾਠ_prop_follows && !ਪਾਠ_prop_above)
 	    {
 		// do not output more of the line, only the "below" prop
-		ptr = line + (size_t)ml_get_buf_len(wp->w_buffer, lnum);
+		ptr = ਸਤਰ + (size_t)ml_get_buf_len(wp->w_ਬਫਰ, lnum);
 # ifdef FEAT_LINEBREAK
 		wlv.dont_use_showbreak = TRUE;
 # endif
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 
 	    // When the window is too narrow draw all "@" lines.
-	    if (wlv.draw_state != WL_LINE
-#ifdef FEAT_DIFF
+	    ਜੇ (wlv.draw_state != WL_ਸਤਰ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		    && wlv.filler_todo <= 0
-#endif
+#ਜੇ_ਅੰਤ
 		    )
 	    {
-		win_draw_end(wp, '@', ' ', TRUE, wlv.row, wp->w_height, HLF_AT);
-		draw_vsep_win(wp, wlv.row);
-		wlv.row = endrow;
+		win_draw_ਸਿਰਾ(wp, '@', ' ', TRUE, wlv.ਪੰਕਤੀ, wp->w_ਉਚਾਈ, HLF_AT);
+		draw_vsep_win(wp, wlv.ਪੰਕਤੀ);
+		wlv.ਪੰਕਤੀ = endrow;
 	    }
 
 	    // When line got too long for screen break here.
-	    if (wlv.row == endrow)
+	    ਜੇ (wlv.ਪੰਕਤੀ == endrow)
 	    {
-		++wlv.row;
-		break;
+		++wlv.ਪੰਕਤੀ;
+		ਰੋਕੋ;
 	    }
 
-	    if (screen_cur_row == wlv.screen_row - 1
-#ifdef FEAT_DIFF
+	    ਜੇ (screen_cur_ਪੰਕਤੀ == wlv.screen_ਪੰਕਤੀ - 1
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		     && wlv.filler_todo <= 0
-#endif
-#ifdef FEAT_PROP_POPUP
-		     && !text_prop_above && !text_prop_follows
-#endif
-		     && wp->w_width == Columns)
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+		     && !ਪਾਠ_prop_above && !ਪਾਠ_prop_follows
+#ਜੇ_ਅੰਤ
+		     && wp->w_ਚੌੜਾਈ == Columns)
 	    {
 		// Remember that the line wraps, used for modeless copy.
-		LineWraps[wlv.screen_row - 1] = TRUE;
+		ਸਤਰ_Wraps[wlv.screen_ਪੰਕਤੀ - 1] = TRUE;
 
 		// Special trick to make copy/paste of wrapped lines work with
 		// xterm/screen: write an extra character beyond the end of
@@ -4483,75 +4483,75 @@ win_line(
 		// Don't do this for the GUI.
 		// Don't do this for double-width characters.
 		// Don't do this for a window not at the right screen border.
-		if (p_tf
-#ifdef FEAT_GUI
-			 && !gui.in_use
-#endif
+		ਜੇ (p_tf
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+			 && !gui.ਵਿੱਚ_use
+#ਜੇ_ਅੰਤ
 			 && !(has_mbyte
-			     && ((*mb_off2cells)(LineOffset[wlv.screen_row],
-				   LineOffset[wlv.screen_row] + screen_Columns)
+			     && ((*mb_off2cells)(ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ],
+				   ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ] + screen_Columns)
 									  == 2
 				 || (*mb_off2cells)(
-				     LineOffset[wlv.screen_row - 1]
-							    + (int)topframe->fr_width - 2,
-				     LineOffset[wlv.screen_row]
+				     ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ - 1]
+							    + (ਪੂਰਨ)topframe->fr_ਚੌੜਾਈ - 2,
+				     ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ]
 						      + screen_Columns) == 2)))
 		{
 		    // First make sure we are at the end of the screen line,
 		    // then output the same character again to let the
 		    // terminal know about the wrap.  If the terminal doesn't
 		    // auto-wrap, we overwrite the character.
-		    if (screen_cur_col != wp->w_width)
-			screen_char(LineOffset[wlv.screen_row - 1]
-						       + (unsigned)topframe->fr_width - 1,
-				       wlv.screen_row - 1, (int)(topframe->fr_width - 1));
+		    ਜੇ (screen_cur_ਖਾਨਾ != wp->w_ਚੌੜਾਈ)
+			screen_char(ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ - 1]
+						       + (ਬਿਨਾਨਿਸ਼ਾਨੀ)topframe->fr_ਚੌੜਾਈ - 1,
+				       wlv.screen_ਪੰਕਤੀ - 1, (ਪੂਰਨ)(topframe->fr_ਚੌੜਾਈ - 1));
 
 		    // When there is a multi-byte character, just output a
 		    // space to keep it simple.
-		    if (has_mbyte && MB_BYTE2LEN(ScreenLines[LineOffset[
-				     wlv.screen_row - 1] + (topframe->fr_width - 1)]) > 1)
-			out_char(' ');
-		    else
-			out_char(ScreenLines[LineOffset[wlv.screen_row - 1]
-							    + (topframe->fr_width - 1)]);
+		    ਜੇ (has_mbyte && MB_BYTE2LEN(Screen_ਸਤਰਾਂ[ਸਤਰ_ਵਿੱਥ[
+				     wlv.screen_ਪੰਕਤੀ - 1] + (topframe->fr_ਚੌੜਾਈ - 1)]) > 1)
+			ਬਾਹਰਲਾ_char(' ');
+		    ਨਹੀਂਤਾਂ
+			ਬਾਹਰਲਾ_char(Screen_ਸਤਰਾਂ[ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ - 1]
+							    + (topframe->fr_ਚੌੜਾਈ - 1)]);
 		    // force a redraw of the first char on the next line
-		    ScreenAttrs[LineOffset[wlv.screen_row]] = (sattr_T)-1;
-		    screen_start();	// don't know where cursor is now
+		    ScreenAttrs[ਸਤਰ_ਵਿੱਥ[wlv.screen_ਪੰਕਤੀ]] = (sattr_T)-1;
+		    screen_ਸ਼ੁਰੂ();	// don't know where cursor is now
 		}
 	    }
 
-	    win_line_start(wp, &wlv, TRUE);
+	    win_ਸਤਰ_ਸ਼ੁਰੂ(wp, &wlv, TRUE);
 
 	    lcs_prec_todo = wp->w_lcs_chars.prec;
-#ifdef FEAT_LINEBREAK
-	    if (!wlv.dont_use_showbreak
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_LINEBREAK
+	    ਜੇ (!wlv.dont_use_showbreak
 # ifdef FEAT_DIFF
 		    && wlv.filler_todo <= 0
 # endif
 	       )
 		wlv.need_showbreak = TRUE;
-#endif
-#ifdef FEAT_DIFF
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 	    --wlv.filler_todo;
 	    // When the filler lines are actually below the last line of the
 	    // file, don't draw the line itself, break here.
-	    if (wlv.filler_todo == 0 && wp->w_botfill)
-		break;
-#endif
+	    ਜੇ (wlv.filler_todo == 0 && wp->w_botfill)
+		ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
 	}
 
     }	// for every character in the line
-#ifdef FEAT_PROP_POPUP
-    if (text_props != text_props_buf)
-	vim_free(text_props);
-    if (text_prop_idxs != text_prop_idxs_buf)
-	vim_free(text_prop_idxs);
-    if (text_prop_suffix_flags != text_prop_suffix_flags_buf)
-	vim_free(text_prop_suffix_flags);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (ਪਾਠ_props != ਪਾਠ_props_buf)
+	vim_free(ਪਾਠ_props);
+    ਜੇ (ਪਾਠ_prop_idxs != ਪਾਠ_prop_idxs_buf)
+	vim_free(ਪਾਠ_prop_idxs);
+    ਜੇ (ਪਾਠ_prop_suffix_flags != ਪਾਠ_prop_suffix_flags_buf)
+	vim_free(ਪਾਠ_prop_suffix_flags);
     vim_free(p_extra_free2);
-#endif
+#ਜੇ_ਅੰਤ
 
     vim_free(wlv.p_extra_free);
     vim_free(wlv.saved_p_extra_free);
-    return wlv.row;
+    ਵਾਪਸ wlv.ਪੰਕਤੀ;
 }

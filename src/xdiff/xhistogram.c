@@ -41,330 +41,330 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "xinclude.h"
 
-#define MAX_PTR	UINT_MAX
-#define MAX_CNT	UINT_MAX
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MAX_PTR	UINT_MAX
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਸਤਰ_ਸਿਰਾ_2(n) (ਸਤਰ##n + ਗਿਣਤੀ_2##n - 1)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਸਤਰ_ਸਿਰਾ_PTR(n) (*ਸਤਰ##n + *ਗਿਣਤੀ_2##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
-	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+ਬਣਤਰ histindex {
+	ਬਣਤਰ ਰਿਕਾਰਡ {
+		ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ptr, cnt;
+		ਬਣਤਰ ਰਿਕਾਰਡ *ਅਗਲਾ;
+	} **ਰਿਕਾਰਡਾਂ, /* an occurrence */
+	  **ਸਤਰ_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
-		     records_size,
-		     line_map_size;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ *ਅਗਲਾ_ptrs;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਸਾਰਣੀ_ਬਿੱਟ,
+		     ਰਿਕਾਰਡਾਂ_ਮਾਪ,
+		     ਸਤਰ_map_ਮਾਪ;
 
-	unsigned int max_chain_length,
-		     key_shift,
-		     ptr_shift;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ max_chain_ਲੰਮਾਈ,
+		     ਕੁੰਜੀ_ਖਿਸਕਾਓ,
+		     ptr_ਖਿਸਕਾਓ;
 
-	unsigned int cnt,
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ਅਚਲ *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+ਬਣਤਰ region {
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ begin1, end1;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਸਤਰ_MAP(i, a) (i->ਸਤਰ_map[(a) - i->ptr_ਖਿਸਕਾਓ])
 
-#define NEXT_PTR(index, ptr) \
-	(index->next_ptrs[(ptr) - index->ptr_shift])
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਅਗਲਾ_PTR(ਸੂਚਕਾਂਕ, ptr) \
+	(ਸੂਚਕਾਂਕ->ਅਗਲਾ_ptrs[(ptr) - ਸੂਚਕਾਂਕ->ptr_ਖਿਸਕਾਓ])
 
-#define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CNT(ਸੂਚਕਾਂਕ, ptr) \
+	((ਸਤਰ_MAP(ਸੂਚਕਾਂਕ, ptr))->cnt)
 
-#define REC(env, s, l) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+ਸਥਿਰ ਪੂਰਨ cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	ਵਾਪਸ r1->ha == r2->ha;
 
 }
 
-#define CMP(i, s1, l1, s2, l2) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਸਾਰਣੀ_HASH(ਸੂਚਕਾਂਕ, side, ਸਤਰ) \
+	XDL_HASHLONG((REC(ਸੂਚਕਾਂਕ->env, side, ਸਤਰ))->ha, ਸੂਚਕਾਂਕ->ਸਾਰਣੀ_ਬਿੱਟ)
 
-static int scanA(struct histindex *index, int line1, int count1)
+ਸਥਿਰ ਪੂਰਨ ਜਾਂਚ_A(ਬਣਤਰ histindex *ਸੂਚਕਾਂਕ, ਪੂਰਨ line1, ਪੂਰਨ count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ptr, tbl_idx;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ chain_len;
+	ਬਣਤਰ ਰਿਕਾਰਡ **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
-		tbl_idx = TABLE_HASH(index, 1, ptr);
-		rec_chain = index->records + tbl_idx;
+	ਲਈ (ptr = ਸਤਰ_ਸਿਰਾ_2(1); (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)line1 <= ptr; ptr--) {
+		tbl_idx = ਸਾਰਣੀ_HASH(ਸੂਚਕਾਂਕ, 1, ptr);
+		rec_chain = ਸੂਚਕਾਂਕ->ਰਿਕਾਰਡਾਂ + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		ਜਦੋਂ (rec) {
+			ਜੇ (CMP(ਸੂਚਕਾਂਕ, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
 				 * chain.
 				 */
-				NEXT_PTR(index, ptr) = rec->ptr;
+				ਅਗਲਾ_PTR(ਸੂਚਕਾਂਕ, ptr) = rec->ptr;
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				ਸਤਰ_MAP(ਸੂਚਕਾਂਕ, ptr) = rec;
+				ਜਾਓ continue_ਜਾਂਚ;
 			}
 
-			rec = rec->next;
+			rec = rec->ਅਗਲਾ;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		ਜੇ (chain_len == ਸੂਚਕਾਂਕ->max_chain_ਲੰਮਾਈ)
+			ਵਾਪਸ -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		ਜੇ (!(rec = xdl_cha_alloc(&ਸੂਚਕਾਂਕ->rcha)))
+			ਵਾਪਸ -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
-		rec->next = *rec_chain;
+		rec->ਅਗਲਾ = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		ਸਤਰ_MAP(ਸੂਚਕਾਂਕ, ptr) = rec;
 
-continue_scan:
+continue_ਜਾਂਚ:
 		; /* no op */
 	}
 
-	return 0;
+	ਵਾਪਸ 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+ਸਥਿਰ ਪੂਰਨ try_lcs(ਬਣਤਰ histindex *ਸੂਚਕਾਂਕ, ਬਣਤਰ region *lcs, ਪੂਰਨ b_ptr,
+	ਪੂਰਨ line1, ਪੂਰਨ count1, ਪੂਰਨ line2, ਪੂਰਨ count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ b_ਅਗਲਾ = b_ptr + 1;
+	ਬਣਤਰ ਰਿਕਾਰਡ *rec = ਸੂਚਕਾਂਕ->ਰਿਕਾਰਡਾਂ[ਸਾਰਣੀ_HASH(ਸੂਚਕਾਂਕ, 2, b_ptr)];
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ as, ae, bs, be, np, rc;
+	ਪੂਰਨ should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
-				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+	ਲਈ (; rec; rec = rec->ਅਗਲਾ) {
+		ਜੇ (rec->cnt > ਸੂਚਕਾਂਕ->cnt) {
+			ਜੇ (!ਸੂਚਕਾਂਕ->has_common)
+				ਸੂਚਕਾਂਕ->has_common = CMP(ਸੂਚਕਾਂਕ, 1, rec->ptr, 2, b_ptr);
+			ਜਾਰੀ;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		ਜੇ (!CMP(ਸੂਚਕਾਂਕ, 1, as, 2, b_ptr))
+			ਜਾਰੀ;
 
-		index->has_common = 1;
-		for (;;) {
+		ਸੂਚਕਾਂਕ->has_common = 1;
+		ਲਈ (;;) {
 			should_break = 0;
-			np = NEXT_PTR(index, as);
+			np = ਅਗਲਾ_PTR(ਸੂਚਕਾਂਕ, as);
 			bs = b_ptr;
 			ae = as;
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
-				&& CMP(index, 1, as - 1, 2, bs - 1)) {
+			ਜਦੋਂ ((ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)line1 < as && (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)line2 < bs
+				&& CMP(ਸੂਚਕਾਂਕ, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, as));
+				ਜੇ (1 < rc)
+					rc = XDL_MIN(rc, CNT(ਸੂਚਕਾਂਕ, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
-				&& CMP(index, 1, ae + 1, 2, be + 1)) {
+			ਜਦੋਂ (ae < (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)ਸਤਰ_ਸਿਰਾ_2(1) && be < (ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)ਸਤਰ_ਸਿਰਾ_2(2)
+				&& CMP(ਸੂਚਕਾਂਕ, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, ae));
+				ਜੇ (1 < rc)
+					rc = XDL_MIN(rc, CNT(ਸੂਚਕਾਂਕ, ae));
 			}
 
-			if (b_next <= be)
-				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			ਜੇ (b_ਅਗਲਾ <= be)
+				b_ਅਗਲਾ = be + 1;
+			ਜੇ (lcs->end1 - lcs->begin1 < ae - as || rc < ਸੂਚਕਾਂਕ->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
 				lcs->end2 = be;
-				index->cnt = rc;
+				ਸੂਚਕਾਂਕ->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			ਜੇ (np == 0)
+				ਰੋਕੋ;
 
-			while (np <= ae) {
-				np = NEXT_PTR(index, np);
-				if (np == 0) {
+			ਜਦੋਂ (np <= ae) {
+				np = ਅਗਲਾ_PTR(ਸੂਚਕਾਂਕ, np);
+				ਜੇ (np == 0) {
 					should_break = 1;
-					break;
+					ਰੋਕੋ;
 				}
 			}
 
-			if (should_break)
-				break;
+			ਜੇ (should_break)
+				ਰੋਕੋ;
 
 			as = np;
 		}
 	}
-	return b_next;
+	ਵਾਪਸ b_ਅਗਲਾ;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+ਸਥਿਰ ਪੂਰਨ fall_ਪਿੱਠ_ਮੰਜ਼ਿਲ_classic_diff(xpparam_t ਅਚਲ *xpp, xdfenv_t *env,
+		ਪੂਰਨ line1, ਪੂਰਨ count1, ਪੂਰਨ line2, ਪੂਰਨ count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
-	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
+	memset(&xpparam, 0, ਆਕਾਰ(xpparam));
+	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_ਨਕਾਬ;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	ਵਾਪਸ xdl_fall_ਪਿੱਠ_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਖਾਲੀ free_ਸੂਚਕਾਂਕ(ਬਣਤਰ histindex *ਸੂਚਕਾਂਕ)
 {
-	xdl_free(index->records);
-	xdl_free(index->line_map);
-	xdl_free(index->next_ptrs);
-	xdl_cha_free(&index->rcha);
+	xdl_free(ਸੂਚਕਾਂਕ->ਰਿਕਾਰਡਾਂ);
+	xdl_free(ਸੂਚਕਾਂਕ->ਸਤਰ_map);
+	xdl_free(ਸੂਚਕਾਂਕ->ਅਗਲਾ_ptrs);
+	xdl_cha_free(&ਸੂਚਕਾਂਕ->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+ਸਥਿਰ ਪੂਰਨ ਲੱਭੋ_lcs(xpparam_t ਅਚਲ *xpp, xdfenv_t *env,
+		    ਬਣਤਰ region *lcs,
+		    ਪੂਰਨ line1, ਪੂਰਨ count1, ਪੂਰਨ line2, ਪੂਰਨ count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	ਪੂਰਨ b_ptr;
+	ਪੂਰਨ ret = -1;
+	ਬਣਤਰ histindex ਸੂਚਕਾਂਕ;
 
-	memset(&index, 0, sizeof(index));
+	memset(&ਸੂਚਕਾਂਕ, 0, ਆਕਾਰ(ਸੂਚਕਾਂਕ));
 
-	index.env = env;
-	index.xpp = xpp;
+	ਸੂਚਕਾਂਕ.env = env;
+	ਸੂਚਕਾਂਕ.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	ਸੂਚਕਾਂਕ.ਰਿਕਾਰਡਾਂ = ਨਿਰਾ;
+	ਸੂਚਕਾਂਕ.ਸਤਰ_map = ਨਿਰਾ;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	ਸੂਚਕਾਂਕ.rcha.ਸਿਰ = ਨਿਰਾ;
 
-	index.table_bits = xdl_hashbits(count1);
-	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	ਸੂਚਕਾਂਕ.ਸਾਰਣੀ_ਬਿੱਟ = xdl_hashbits(count1);
+	ਸੂਚਕਾਂਕ.ਰਿਕਾਰਡਾਂ_ਮਾਪ = 1 << ਸੂਚਕਾਂਕ.ਸਾਰਣੀ_ਬਿੱਟ;
+	ਜੇ (!XDL_CALLOC_ARRAY(ਸੂਚਕਾਂਕ.ਰਿਕਾਰਡਾਂ, ਸੂਚਕਾਂਕ.ਰਿਕਾਰਡਾਂ_ਮਾਪ))
+		ਜਾਓ cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	ਸੂਚਕਾਂਕ.ਸਤਰ_map_ਮਾਪ = count1;
+	ਜੇ (!XDL_CALLOC_ARRAY(ਸੂਚਕਾਂਕ.ਸਤਰ_map, ਸੂਚਕਾਂਕ.ਸਤਰ_map_ਮਾਪ))
+		ਜਾਓ cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	ਜੇ (!XDL_CALLOC_ARRAY(ਸੂਚਕਾਂਕ.ਅਗਲਾ_ptrs, ਸੂਚਕਾਂਕ.ਸਤਰ_map_ਮਾਪ))
+		ਜਾਓ cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	ਜੇ (xdl_cha_init(&ਸੂਚਕਾਂਕ.rcha, ਆਕਾਰ(ਬਣਤਰ ਰਿਕਾਰਡ), count1 / 4 + 1) < 0)
+		ਜਾਓ cleanup;
 
-	index.ptr_shift = line1;
-	index.max_chain_length = 64;
+	ਸੂਚਕਾਂਕ.ptr_ਖਿਸਕਾਓ = line1;
+	ਸੂਚਕਾਂਕ.max_chain_ਲੰਮਾਈ = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	ਜੇ (ਜਾਂਚ_A(&ਸੂਚਕਾਂਕ, line1, count1))
+		ਜਾਓ cleanup;
 
-	index.cnt = index.max_chain_length + 1;
+	ਸੂਚਕਾਂਕ.cnt = ਸੂਚਕਾਂਕ.max_chain_ਲੰਮਾਈ + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
-		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
+	ਲਈ (b_ptr = line2; b_ptr <= ਸਤਰ_ਸਿਰਾ_2(2); )
+		b_ptr = try_lcs(&ਸੂਚਕਾਂਕ, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	ਜੇ (ਸੂਚਕਾਂਕ.has_common && ਸੂਚਕਾਂਕ.max_chain_ਲੰਮਾਈ < ਸੂਚਕਾਂਕ.cnt)
 		ret = 1;
-	else
+	ਨਹੀਂਤਾਂ
 		ret = 0;
 
 cleanup:
-	free_index(&index);
-	return ret;
+	free_ਸੂਚਕਾਂਕ(&ਸੂਚਕਾਂਕ);
+	ਵਾਪਸ ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+ਸਥਿਰ ਪੂਰਨ histogram_diff(xpparam_t ਅਚਲ *xpp, xdfenv_t *env,
+	ਪੂਰਨ line1, ਪੂਰਨ count1, ਪੂਰਨ line2, ਪੂਰਨ count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	ਬਣਤਰ region lcs;
+	ਪੂਰਨ lcs_ਮਿਲਿਆ;
+	ਪੂਰਨ ਨਤੀਜਾ;
 redo:
-	result = -1;
+	ਨਤੀਜਾ = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	ਜੇ (count1 <= 0 && count2 <= 0)
+		ਵਾਪਸ 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	ਜੇ ((ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ)ਸਤਰ_ਸਿਰਾ_2(1) >= MAX_PTR)
+		ਵਾਪਸ -1;
 
-	if (!count1) {
-		while(count2--)
-			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
-			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+	ਜੇ (!count1) {
+		ਜਦੋਂ(count2--)
+			env->xdf2.ਬਦਲਿਆ[line2++ - 1] = true;
+		ਵਾਪਸ 0;
+	} ਨਹੀਂਤਾਂ ਜੇ (!count2) {
+		ਜਦੋਂ(count1--)
+			env->xdf1.ਬਦਲਿਆ[line1++ - 1] = true;
+		ਵਾਪਸ 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
-	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
-		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
-				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
-				env->xdf2.changed[line2++ - 1] = true;
-			result = 0;
-		} else {
-			result = histogram_diff(xpp, env,
+	memset(&lcs, 0, ਆਕਾਰ(lcs));
+	lcs_ਮਿਲਿਆ = ਲੱਭੋ_lcs(xpp, env, &lcs, line1, count1, line2, count2);
+	ਜੇ (lcs_ਮਿਲਿਆ < 0)
+		ਜਾਓ ਬਾਹਰਲਾ;
+	ਨਹੀਂਤਾਂ ਜੇ (lcs_ਮਿਲਿਆ)
+		ਨਤੀਜਾ = fall_ਪਿੱਠ_ਮੰਜ਼ਿਲ_classic_diff(xpp, env, line1, count1, line2, count2);
+	ਨਹੀਂਤਾਂ {
+		ਜੇ (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			ਜਦੋਂ (count1--)
+				env->xdf1.ਬਦਲਿਆ[line1++ - 1] = true;
+			ਜਦੋਂ (count2--)
+				env->xdf2.ਬਦਲਿਆ[line2++ - 1] = true;
+			ਨਤੀਜਾ = 0;
+		} ਨਹੀਂਤਾਂ {
+			ਨਤੀਜਾ = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			ਜੇ (ਨਤੀਜਾ)
+				ਜਾਓ ਬਾਹਰਲਾ;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = ਸਤਰ_ਸਿਰਾ_2(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = ਸਤਰ_ਸਿਰਾ_2(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			ਜਾਓ redo;
 		}
 	}
-out:
-	return result;
+ਬਾਹਰਲਾ:
+	ਵਾਪਸ ਨਤੀਜਾ;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+ਪੂਰਨ xdl_do_histogram_diff(xpparam_t ਅਚਲ *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	ਵਾਪਸ histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

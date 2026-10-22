@@ -21,36 +21,36 @@
  * Enhanced Motif PushButton widget with move over behavior.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_TOOLBAR
 
-#include <Xm/XmP.h>
-#include <Xm/DrawP.h>
-#if defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
+#ਅਨ੍ਤਰ੍ਭਾਵ <Xm/XmP.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Xm/DrawP.h>
+#ਜੇ defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
 	&& defined(HAVE_XM_UNHIGHLIGHTT_H) && defined(HAVE_XM_XPMP_H)
 # include <Xm/TraitP.h>
 # include <Xm/Manager.h>
 # include <Xm/UnhighlightT.h>
 # include <Xm/XpmP.h>
 # define UNHIGHLIGHTT
-#else
+#ਨਹੀਂਤਾਂ
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  ਨਹੀਂਤਾਂ
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
-#include <Xm/ManagerP.h>
-#include <Xm/Display.h>
-#include <Xm/DisplayP.h>
+#ਜੇ_ਅੰਤ
+#ਅਨ੍ਤਰ੍ਭਾਵ <Xm/ManagerP.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Xm/Display.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <Xm/DisplayP.h>
 
-#include <X11/Shell.h>
-#include <X11/ShellP.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <X11/Shell.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <X11/ShellP.h>
 
-#include "gui_xmebwp.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "gui_xmebwp.h"
 
 // Provide some missing wrappers, which are missed from the LessTif
 // implementation.  Also missing in Motif 1.2 and earlier.
@@ -58,102 +58,102 @@
 // We neither use XmeGetPixmapData or _XmGetPixmapData, since with LessTif the
 // pixmap will not appear in its caches properly. We cache the interesting
 // values in XmEnhancedButtonPart instead ourself.
-#if defined(LESSTIF_VERSION) || (XmVersion <= 1002)
+#ਜੇ defined(LESSTIF_ਸੰਸਕਰਣ) || (Xm_ਸੰਸਕਰਣ <= 1002)
 # ifndef Lab_IsMenupane
-#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (int)XmMENU_POPUP || \
-		    Lab_MenuType(w) == (int)XmMENU_PULLDOWN)
+#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (ਪੂਰਨ)XmMENU_POPUP || \
+		    Lab_MenuType(w) == (ਪੂਰਨ)XmMENU_PULLDOWN)
 # endif
 # define XmeClearBorder	    _XmClearBorder
 # define XmeDrawShadows	    _XmDrawShadows
 # define XmeDrawHighlight(a, b, c, d, e, f, g, h) \
-    _XmDrawHighlight(a, b, c, d, e, f, g, h, LineSolid)
-#endif
+    _XmDrawHighlight(a, b, c, d, e, f, g, h, ਸਤਰ_Solid)
+#ਜੇ_ਅੰਤ
 
 // Older VMS systems do not have xos_r.h and cannot haldle XtProcessLocking
-#if defined(VMS)
-# if defined(HAVE_XOS_R_H)
-#  define XTPROCESS_LOCK XtProcessLock()
+#ਜੇ defined(VMS)
+# ਜੇ defined(HAVE_XOS_R_H)
+#  define XTPROCESS_ਤਾਲਾ Xt_Process_ਤਾਲਾ()
 #  define XTPROCESS_UNLOCK XtProcessUnlock()
-# else
-#  define XTPROCESS_LOCK
+# ਨਹੀਂਤਾਂ
+#  define XTPROCESS_ਤਾਲਾ
 #  define XTPROCESS_UNLOCK
 # endif
-#else
-# define XTPROCESS_LOCK XtProcessLock()
+#ਨਹੀਂਤਾਂ
+# define XTPROCESS_ਤਾਲਾ Xt_Process_ਤਾਲਾ()
 # define XTPROCESS_UNLOCK XtProcessUnlock()
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Motif internals we have to cheat around with.
  */
 
 // Hopefully this will never change...
-#ifndef XmFOCUS_IGNORE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ XmFOCUS_IGNORE
 # define XmFOCUS_IGNORE       1<<1
-#endif
+#ਜੇ_ਅੰਤ
 
-extern Boolean _XmGetInDragMode(Widget widget);
-extern void _XmPrimitiveEnter(Widget wid,
+ਬਾਹਰੀ Boolean Xm_Get_ਵਿੱਚ_Drag_ਬਹੁਲਕ(Widget widget);
+ਬਾਹਰੀ ਖਾਲੀ _XmPrimitiveEnter(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmPrimitiveLeave(Widget wid,
+			      String * params, Cardinal * ਅੰਕ_params);
+ਬਾਹਰੀ ਖਾਲੀ _XmPrimitiveLeave(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmSetFocusFlag(Widget w, unsigned int mask, Boolean value);
-extern void _XmCalcLabelDimensions(Widget wid);
+			      String * params, Cardinal * ਅੰਕ_params);
+ਬਾਹਰੀ ਖਾਲੀ Xm_ਸੈੱਟ_Focus_Flag(Widget w, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਨਕਾਬ, Boolean ਮੁੱਲ);
+ਬਾਹਰੀ ਖਾਲੀ _XmCalcLabelDimensions(Widget wid);
 
 /*
  * Declaration of class methods.
  */
-static void Destroy(Widget w);
-static void Initialize(Widget rq, Widget eb, ArgList args, Cardinal *n);
-static Boolean SetValues(Widget current, Widget request, Widget new, ArgList args, Cardinal *n);
-static void Redisplay(Widget, XEvent *, Region);
+ਸਥਿਰ ਖਾਲੀ Destroy(Widget w);
+ਸਥਿਰ ਖਾਲੀ Initialize(Widget rq, Widget eb, ArgList ਦਲੀਲਾਂ, Cardinal *n);
+ਸਥਿਰ Boolean ਸੈੱਟ_ਮੁੱਲਾਂ(Widget current, Widget request, Widget new, ArgList ਦਲੀਲਾਂ, Cardinal *n);
+ਸਥਿਰ ਖਾਲੀ Redisplay(Widget, XEvent *, Region);
 
 /*
  * Declaration of action methods.
  */
-static void Enter(Widget, XEvent *, String *, Cardinal *);
-static void Leave(Widget, XEvent *, String *, Cardinal *);
-static void BorderHighlight(Widget);
-static void BorderUnhighlight(Widget);
+ਸਥਿਰ ਖਾਲੀ Enter(Widget, XEvent *, String *, Cardinal *);
+ਸਥਿਰ ਖਾਲੀ Leave(Widget, XEvent *, String *, Cardinal *);
+ਸਥਿਰ ਖਾਲੀ BorderHighlight(Widget);
+ਸਥਿਰ ਖਾਲੀ BorderUnhighlight(Widget);
 
 /*
  * 4 x 4 stipple for desensitized widgets
  */
-#define stipple_width  4
-#define stipple_height 4
-static char stipple_bits[] = { 0x0a, 0x05, 0x0a, 0x05 };
-#define STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ stipple_ਚੌੜਾਈ  4
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ stipple_ਉਚਾਈ 4
+ਸਥਿਰ ਅੱਖਰ stipple_ਬਿੱਟ[] = { 0x0a, 0x05, 0x0a, 0x05 };
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
 
 /*
  * Override actions.
  */
-static XtActionsRec actionsList[] =
+ਸਥਿਰ XtActionsRec actionsList[] =
 {
     {"Enter", Enter},
     {"Leave", Leave},
 };
 
-static XtResource resources[] =
+ਸਥਿਰ XtResource resources[] =
 {
     {
-	XmNpixmapData, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_data),
-	XmRImmediate, (XtPointer) NULL
+	Xm_Npixmap_ਅੰਕੜੇ, XmCPixmap, XmRString, ਆਕਾਰ(String),
+	Xt_ਵਿੱਥ_ਦਾ(XmEnhancedButtonRec, enhancedbutton.pixmap_ਅੰਕੜੇ),
+	XmRImmediate, (Xt_ਸੂਚਕ) ਨਿਰਾ
     }, {
-	XmNpixmapFile, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
-	XmRImmediate, (XtPointer) NULL
+	XmNpixmapFile, XmCPixmap, XmRString, ਆਕਾਰ(String),
+	Xt_ਵਿੱਥ_ਦਾ(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
+	XmRImmediate, (Xt_ਸੂਚਕ) ਨਿਰਾ
     }, {
-	XmNspacing, XmCSpacing, XmRHorizontalDimension, sizeof(Dimension),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.spacing),
-	XmRImmediate, (XtPointer) 2
+	XmNspacing, XmCSpacing, XmRHorizontalDimension, ਆਕਾਰ(Dimension),
+	Xt_ਵਿੱਥ_ਦਾ(XmEnhancedButtonRec, enhancedbutton.spacing),
+	XmRImmediate, (Xt_ਸੂਚਕ) 2
     },
     {
-	XmNlabelLocation, XmCLocation, XmRInt, sizeof(int),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.label_location),
-	XtRImmediate, (XtPointer) XmRIGHT
+	XmNlabelLocation, XmCLocation, XmRInt, ਆਕਾਰ(ਪੂਰਨ),
+	Xt_ਵਿੱਥ_ਦਾ(XmEnhancedButtonRec, enhancedbutton.label_location),
+	XtRImmediate, (Xt_ਸੂਚਕ) Xm_ਸੱਜਾ
     }
 };
 
@@ -161,32 +161,32 @@ static XtResource resources[] =
 // NULL somehow results in getting it set to an invalid pointer.
 XmPrimitiveClassExtRec xmEnhancedButtonPrimClassExtRec =
 {
-    /* next_extension      */ NULL,
+    /* next_extension      */ ਨਿਰਾ,
     /* record_type	   */ NULLQUARK,
-    /* version		   */ XmPrimitiveClassExtVersion,
-    /* record_size	   */ sizeof(XmPrimitiveClassExtRec),
+    /*ਸੰਸਕਰਣ*/ Xm_Primitive_Class_Ext_ਸੰਸਕਰਣ,
+    /* record_size	   */ ਆਕਾਰ(XmPrimitiveClassExtRec),
     /* widget_baseline	   */ XmInheritBaselineProc,
     /* widget_display_rect */ XmInheritDisplayRectProc,
-    /* widget_margins      */ NULL
+    /* widget_margins      */ ਨਿਰਾ
 };
 
 XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 {
     {
 	// core_class fields
-	/* superclass		 */ (WidgetClass) & xmPushButtonClassRec,
+	/* superclass		 */ (WidgetClass) & xm_ਧੱਕੋ_Button_Class_Rec,
 	/* class_name		 */ "XmEnhancedButton",
-	/* widget_size		 */ sizeof(XmEnhancedButtonRec),
-	/* class_initialize	 */ NULL,
-	/* class_part_initialize */ NULL,
+	/* widget_size		 */ ਆਕਾਰ(XmEnhancedButtonRec),
+	/* class_initialize	 */ ਨਿਰਾ,
+	/* class_part_initialize */ ਨਿਰਾ,
 	/* class_inited		 */ False,
 	/* initialize		 */ Initialize,
-	/* initialize_hook	 */ NULL,
+	/* initialize_hook	 */ ਨਿਰਾ,
 	/* realize		 */ XtInheritRealize,
 	/* actions		 */ actionsList,
-	/* num_actions		 */ XtNumber(actionsList),
+	/* num_actions		 */ Xt_ਸੰਖਿਆ(actionsList),
 	/* resources		 */ resources,
-	/* num_resources	 */ XtNumber(resources),
+	/* num_resources	 */ Xt_ਸੰਖਿਆ(resources),
 	/* xrm_class		 */ NULLQUARK,
 	/* compress_motion	 */ True,
 	/* compress_exposure	 */ XtExposeCompressMaximal,
@@ -195,17 +195,17 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* destroy		 */ Destroy,
 	/* resize		 */ XtInheritResize,
 	/* expose		 */ Redisplay,
-	/* set_values		 */ SetValues,
-	/* set_values_hook	 */ NULL,
-	/* set_values_almost	 */ XtInheritSetValuesAlmost,
-	/* get_values_hook	 */ NULL,
+	/* set_values		 */ ਸੈੱਟ_ਮੁੱਲਾਂ,
+	/* set_values_hook	 */ ਨਿਰਾ,
+	/* set_values_almost	 */ Xt_Inherit_ਸੈੱਟ_ਮੁੱਲਾਂ_Almost,
+	/* get_values_hook	 */ ਨਿਰਾ,
 	/* accept_focus		 */ XtInheritAcceptFocus,
-	/* version		 */ XtVersion,
-	/* callback_private	 */ NULL,
-	/* tm_table		 */ NULL,
-	/* query_geometry	 */ NULL,
+	/* version		 */ Xt_ਸੰਸਕਰਣ,
+	/* callback_private	 */ ਨਿਰਾ,
+	/* tm_table		 */ ਨਿਰਾ,
+	/* query_geometry	 */ ਨਿਰਾ,
 	/* display_accelerator	 */ XtInheritDisplayAccelerator,
-	/* extension		 */ NULL
+	/* extension		 */ ਨਿਰਾ
     },
 
     // primitive_class fields
@@ -214,22 +214,22 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* border_unhighlight	 */ BorderUnhighlight,
 	/* translations		 */ XtInheritTranslations,
 	/* arm and activate	 */ XmInheritArmAndActivate,
-	/* synthetic resources	 */ NULL,
+	/* synthetic resources	 */ ਨਿਰਾ,
 	/* number of syn res	 */ 0,
-	/* extension		 */ (XtPointer)&xmEnhancedButtonPrimClassExtRec,
+	/* extension		 */ (Xt_ਸੂਚਕ)&xmEnhancedButtonPrimClassExtRec,
     },
 
     // label_class fields
     {
-	/* setOverrideCallback	 */ XmInheritSetOverrideCallback,
+	/* setOverrideCallback	 */ Xm_Inherit_ਸੈੱਟ_Override_Callback,
 	/* menuProcs		 */ XmInheritMenuProc,
 	/* translations		 */ XtInheritTranslations,
-	/* extension		 */ NULL,
+	/* extension		 */ ਨਿਰਾ,
     },
 
     // pushbutton_class record
     {
-	/* extension		 */ (XtPointer) NULL,
+	/* extension		 */ (Xt_ਸੂਚਕ) ਨਿਰਾ,
     },
 
     // enhancedbutton_class fields
@@ -246,37 +246,37 @@ WidgetClass xmEnhancedButtonWidgetClass =
 /*
  * Create a slightly fainter pixmap to be shown on button entry.
  */
-    static unsigned short
-bump_color(unsigned short value)
+    ਸਥਿਰ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ
+bump_color(ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ ਮੁੱਲ)
 {
-    int tmp = 2 * (((int) value - 65535) / 3) + 65535;
+    ਪੂਰਨ tmp = 2 * (((ਪੂਰਨ) ਮੁੱਲ - 65535) / 3) + 65535;
 
-    return tmp;
+    ਵਾਪਸ tmp;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 alloc_color(Display	*display,
 	Colormap	colormap,
-	char		*colorname,
+	ਅੱਖਰ		*colorname,
 	XColor		*xcolor,
-	void		*closure UNUSED)
+	ਖਾਲੀ		*ਘੇਰਾ ਅਣਵਰਤਿਆ)
 {
-    int status;
+    ਪੂਰਨ ਸਥਿਤੀ;
 
-    if (colorname)
-	if (!XParseColor(display, colormap, colorname, xcolor))
-	    return -1;
+    ਜੇ (colorname)
+	ਜੇ (!XParseColor(display, colormap, colorname, xcolor))
+	    ਵਾਪਸ -1;
 
     xcolor->red = bump_color(xcolor->red);
     xcolor->green = bump_color(xcolor->green);
     xcolor->blue = bump_color(xcolor->blue);
 
-    status = XAllocColor(display, colormap, xcolor);
-    return status != 0 ? 1 : 0;
+    ਸਥਿਤੀ = XAllocColor(display, colormap, xcolor);
+    ਵਾਪਸ ਸਥਿਤੀ != 0 ? 1 : 0;
 }
 
 // XPM
-static char * blank_xpm[] =
+ਸਥਿਰ ਅੱਖਰ * blank_xpm[] =
 {
 // width height ncolors cpp [x_hot y_hot]
 "12 12 4 1 0 0",
@@ -302,55 +302,55 @@ static char * blank_xpm[] =
 /*
  * Set the pixmap.
  */
-    static void
-set_pixmap(XmEnhancedButtonWidget eb)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_pixmap(XmEnhancedButtonWidget eb)
 {
     // Configure defines XPMATTRIBUTES_TYPE as XpmAttributes or as
     // XpmAttributes_21, depending on what is in Xm/XpmP.h.
     XPMATTRIBUTES_TYPE   attr;
     Pixmap	    sen_pix;
-    Window	    root;
-    static XpmColorSymbol color[8] = {
+    ਖਿੜਕੀ	    ਜੜ੍ਹ;
+    ਸਥਿਰ Xpm_Color_ਚਿੰਨ੍ਹ color[8] = {
 	{"none", "none", 0},
 	{"None", "none", 0},
-	{"background", NULL, 0},
-	{"foreground", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"highlightColor", NULL, 0},
-	{"armColor", NULL, 0}
+	{"background", ਨਿਰਾ, 0},
+	{"foreground", ਨਿਰਾ, 0},
+	{"bottomShadowColor", ਨਿਰਾ, 0},
+	{"topShadowColor", ਨਿਰਾ, 0},
+	{"highlightColor", ਨਿਰਾ, 0},
+	{"armColor", ਨਿਰਾ, 0}
     };
-    int		    scr;
+    ਪੂਰਨ		    scr;
     Display	    *dpy = XtDisplay(eb);
-    int		    x;
-    int		    y;
-    unsigned int    height, width, border, depth;
-    int		    status = 0;
-    Pixmap	    mask;
+    ਪੂਰਨ		    x;
+    ਪੂਰਨ		    y;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    ਉਚਾਈ, ਚੌੜਾਈ, border, ਡੂੰਘਾਈ;
+    ਪੂਰਨ		    ਸਥਿਤੀ = 0;
+    Pixmap	    ਨਕਾਬ;
     Pixmap	    pix = None;
     Pixmap	    arm_pix = None;
     Pixmap	    ins_pix = None;
-    Pixmap	    high_pix = None;
-    char	    **data = (char **) eb->enhancedbutton.pixmap_data;
-    char	    *fname = (char *) eb->enhancedbutton.pixmap_file;
-    int		    shift;
+    Pixmap	    ਉੱਚਾ_pix = None;
+    ਅੱਖਰ	    **ਅੰਕੜੇ = (ਅੱਖਰ **) eb->enhancedbutton.pixmap_ਅੰਕੜੇ;
+    ਅੱਖਰ	    *fname = (ਅੱਖਰ *) eb->enhancedbutton.pixmap_file;
+    ਪੂਰਨ		    ਖਿਸਕਾਓ;
     GC		    gc;
 
     // Make sure there is a default value for the pixmap.
-    if (!data)
-	return;
+    ਜੇ (!ਅੰਕੜੇ)
+	ਵਾਪਸ;
 
-    gc = XtGetGC((Widget)eb, (XtGCMask)0, NULL);
+    gc = XtGetGC((Widget)eb, (XtGCMask)0, ਨਿਰਾ);
 
     scr = DefaultScreen(dpy);
-    root = RootWindow(dpy, scr);
+    ਜੜ੍ਹ = ਜੜ੍ਹ_ਖਿੜਕੀ_2(dpy, scr);
 
     eb->label.pixmap = None;
 
-    eb->enhancedbutton.pixmap_depth = 0;
-    eb->enhancedbutton.pixmap_width = 0;
-    eb->enhancedbutton.pixmap_height = 0;
-    eb->enhancedbutton.normal_pixmap = None;
+    eb->enhancedbutton.pixmap_ਡੂੰਘਾਈ = 0;
+    eb->enhancedbutton.pixmap_ਚੌੜਾਈ = 0;
+    eb->enhancedbutton.pixmap_ਉਚਾਈ = 0;
+    eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap = None;
     eb->enhancedbutton.armed_pixmap = None;
     eb->enhancedbutton.highlight_pixmap = None;
     eb->enhancedbutton.insensitive_pixmap = None;
@@ -360,7 +360,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
 	    &eb->core.background_pixel,
 	    &eb->primitive.foreground,
 	    &eb->primitive.bottom_shadow_color,
-	    &eb->primitive.top_shadow_color,
+	    &eb->primitive.ਸਿਖਰ_shadow_color,
 	    &eb->primitive.highlight_color);
 
     // Setup color substitution table.
@@ -369,7 +369,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     color[2].pixel = eb->core.background_pixel;
     color[3].pixel = eb->primitive.foreground;
     color[4].pixel = eb->core.background_pixel;
-    color[5].pixel = eb->primitive.top_shadow_color;
+    color[5].pixel = eb->primitive.ਸਿਖਰ_shadow_color;
     color[6].pixel = eb->primitive.highlight_color;
     color[7].pixel = eb->pushbutton.arm_color;
 
@@ -377,112 +377,112 @@ set_pixmap(XmEnhancedButtonWidget eb)
     attr.valuemask = XpmColorSymbols | XpmCloseness;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_ਸੰਖਿਆ(color);
 
-    if (fname)
-	status = XpmReadFileToPixmap(dpy, root, fname, &pix, &mask, &attr);
-    if (!fname || status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    ਜੇ (fname)
+	ਸਥਿਤੀ = Xpm_Read_File_ਮੰਜ਼ਿਲ_Pixmap(dpy, ਜੜ੍ਹ, fname, &pix, &ਨਕਾਬ, &attr);
+    ਜੇ (!fname || ਸਥਿਤੀ != XpmSuccess)
+	ਸਥਿਤੀ = Xpm_Create_Pixmap_From_ਅੰਕੜੇ(dpy, ਜੜ੍ਹ, ਅੰਕੜੇ, &pix, &ਨਕਾਬ, &attr);
 
     // If something failed, we will fill in the default pixmap.
-    if (status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, blank_xpm, &pix,
-								&mask, &attr);
+    ਜੇ (ਸਥਿਤੀ != XpmSuccess)
+	ਸਥਿਤੀ = Xpm_Create_Pixmap_From_ਅੰਕੜੇ(dpy, ਜੜ੍ਹ, blank_xpm, &pix,
+								&ਨਕਾਬ, &attr);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_ਗੁਣ(&attr);
 
-    XGetGeometry(dpy, pix, &root, &x, &y, &width, &height, &border, &depth);
+    XGetGeometry(dpy, pix, &ਜੜ੍ਹ, &x, &y, &ਚੌੜਾਈ, &ਉਚਾਈ, &border, &ਡੂੰਘਾਈ);
 
     // TODO: does the shift depend on label_location somehow?
-    shift = eb->primitive.shadow_thickness / 2;
+    ਖਿਸਕਾਓ = eb->primitive.shadow_thickness / 2;
 
-    if (shift < 1)
-	shift = 1;
+    ਜੇ (ਖਿਸਕਾਓ < 1)
+	ਖਿਸਕਾਓ = 1;
 
-    sen_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    sen_pix = XCreatePixmap(dpy, ਜੜ੍ਹ, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ, ਡੂੰਘਾਈ);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
-    XFillRectangle(dpy, sen_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, width, height, shift, shift);
+    XFillRectangle(dpy, sen_pix, gc, 0, 0, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, ਨਕਾਬ);
+    XSetClipOrigin(dpy, gc, ਖਿਸਕਾਓ, ਖਿਸਕਾਓ);
+    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, ਚੌੜਾਈ, ਉਚਾਈ, ਖਿਸਕਾਓ, ਖਿਸਕਾਓ);
 
     // Create the "highlight" pixmap.
     color[4].pixel = eb->primitive.bottom_shadow_color;
-#ifdef XpmAllocColor // SGI doesn't have it
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ XpmAllocColor // SGI doesn't have it
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmAllocColor;
     attr.alloc_color = alloc_color;
-#else
+#ਨਹੀਂਤਾਂ
     attr.valuemask = XpmColorSymbols | XpmCloseness;
-#endif
+#ਜੇ_ਅੰਤ
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_ਸੰਖਿਆ(color);
 
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, NULL, &attr);
-    XpmFreeAttributes(&attr);
+    ਸਥਿਤੀ = Xpm_Create_Pixmap_From_ਅੰਕੜੇ(dpy, ਜੜ੍ਹ, ਅੰਕੜੇ, &pix, ਨਿਰਾ, &attr);
+    Xpm_Free_ਗੁਣ(&attr);
 
-    high_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ਉੱਚਾ_pix = XCreatePixmap(dpy, ਜੜ੍ਹ, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ, ਡੂੰਘਾਈ);
 
-#if 1
+#ਜੇ 1
     XSetForeground(dpy, gc, eb->core.background_pixel);
-#else
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-#endif
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, high_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
+#ਨਹੀਂਤਾਂ
+    XSetForeground(dpy, gc, eb->primitive.ਸਿਖਰ_shadow_color);
+#ਜੇ_ਅੰਤ
+    XSet_Clip_ਨਕਾਬ(dpy, gc, None);
+    XFillRectangle(dpy, ਉੱਚਾ_pix, gc, 0, 0, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, ਨਕਾਬ);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XCopyArea(dpy, pix, high_pix, gc, 0, 0, width, height, 0, 0);
+    XCopyArea(dpy, pix, ਉੱਚਾ_pix, gc, 0, 0, ਚੌੜਾਈ, ਉਚਾਈ, 0, 0);
 
-    arm_pix = XCreatePixmap(dpy, pix, width + shift, height + shift, depth);
+    arm_pix = XCreatePixmap(dpy, pix, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ, ਡੂੰਘਾਈ);
 
-    if (eb->pushbutton.fill_on_arm)
+    ਜੇ (eb->pushbutton.fill_on_arm)
 	XSetForeground(dpy, gc, eb->pushbutton.arm_color);
-    else
+    ਨਹੀਂਤਾਂ
 	XSetForeground(dpy, gc, eb->core.background_pixel);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, arm_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, width, height, 2 * shift, 2 * shift);
+    XSetClipOrigin(dpy, gc, ਖਿਸਕਾਓ, ਖਿਸਕਾਓ);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, None);
+    XFillRectangle(dpy, arm_pix, gc, 0, 0, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, ਨਕਾਬ);
+    XSetClipOrigin(dpy, gc, 2 * ਖਿਸਕਾਓ, 2 * ਖਿਸਕਾਓ);
+    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, ਚੌੜਾਈ, ਉਚਾਈ, 2 * ਖਿਸਕਾਓ, 2 * ਖਿਸਕਾਓ);
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, ਨਕਾਬ);
 
     // Create the "insensitive" pixmap.
-    attr.valuemask = XpmColorSymbols | XpmCloseness | XpmColorKey;
+    attr.valuemask = XpmColorSymbols | XpmCloseness | Xpm_Color_ਕੁੰਜੀ;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = ARRAY_LENGTH(color);
-    attr.color_key = XPM_MONO;
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    attr.numsymbols = ARRAY_ਲੰਮਾਈ(color);
+    attr.color_ਕੁੰਜੀ = XPM_MONO;
+    ਸਥਿਤੀ = Xpm_Create_Pixmap_From_ਅੰਕੜੇ(dpy, ਜੜ੍ਹ, ਅੰਕੜੇ, &pix, &ਨਕਾਬ, &attr);
 
     // Need to create new Pixmaps with the mask applied.
 
-    ins_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ins_pix = XCreatePixmap(dpy, ਜੜ੍ਹ, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ, ਡੂੰਘਾਈ);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XFillRectangle(dpy, ins_pix, gc, 2 * shift, 2 * shift, width, height);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, None);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ);
+    XSet_Clip_ਨਕਾਬ(dpy, gc, ਨਕਾਬ);
+    XSetForeground(dpy, gc, eb->primitive.ਸਿਖਰ_shadow_color);
+    XSetClipOrigin(dpy, gc, 2 * ਖਿਸਕਾਓ, 2 * ਖਿਸਕਾਓ);
+    XFillRectangle(dpy, ins_pix, gc, 2 * ਖਿਸਕਾਓ, 2 * ਖਿਸਕਾਓ, ਚੌੜਾਈ, ਉਚਾਈ);
     XSetForeground(dpy, gc, eb->primitive.bottom_shadow_color);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
+    XSetClipOrigin(dpy, gc, ਖਿਸਕਾਓ, ਖਿਸਕਾਓ);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, ਚੌੜਾਈ + ਖਿਸਕਾਓ, ਉਚਾਈ + ਖਿਸਕਾਓ);
     XtReleaseGC((Widget) eb, gc);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_ਗੁਣ(&attr);
 
-    eb->enhancedbutton.pixmap_depth = depth;
-    eb->enhancedbutton.pixmap_width = width;
-    eb->enhancedbutton.pixmap_height = height;
-    eb->enhancedbutton.normal_pixmap = sen_pix;
-    eb->enhancedbutton.highlight_pixmap = high_pix;
+    eb->enhancedbutton.pixmap_ਡੂੰਘਾਈ = ਡੂੰਘਾਈ;
+    eb->enhancedbutton.pixmap_ਚੌੜਾਈ = ਚੌੜਾਈ;
+    eb->enhancedbutton.pixmap_ਉਚਾਈ = ਉਚਾਈ;
+    eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap = sen_pix;
+    eb->enhancedbutton.highlight_pixmap = ਉੱਚਾ_pix;
     eb->enhancedbutton.insensitive_pixmap = ins_pix;
     eb->enhancedbutton.armed_pixmap = arm_pix;
 
@@ -490,75 +490,75 @@ set_pixmap(XmEnhancedButtonWidget eb)
     eb->enhancedbutton.doing_setvalues = False;
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, ਨਕਾਬ);
 }
 
-#define	BUTTON_MASK ( \
-	Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ	BUTTON_ਨਕਾਬ ( \
+	Button1_ਨਕਾਬ | Button2_ਨਕਾਬ | Button3_ਨਕਾਬ | Button4_ਨਕਾਬ | Button5_ਨਕਾਬ \
 )
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 draw_shadows(XmEnhancedButtonWidget eb)
 {
-    GC		top_gc;
+    GC		ਸਿਖਰ_gc;
     GC		bottom_gc;
-    Boolean	etched_in;
+    Boolean	etched_ਵਿੱਚ;
 
-    if (!eb->primitive.shadow_thickness)
-	return;
+    ਜੇ (!eb->primitive.shadow_thickness)
+	ਵਾਪਸ;
 
-    if ((eb->core.width <= 2 * eb->primitive.highlight_thickness)
-	    || (eb->core.height <= 2 * eb->primitive.highlight_thickness))
-	return;
+    ਜੇ ((eb->core.ਚੌੜਾਈ <= 2 * eb->primitive.highlight_thickness)
+	    || (eb->core.ਉਚਾਈ <= 2 * eb->primitive.highlight_thickness))
+	ਵਾਪਸ;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
     {
 	XmDisplay	dpy;
 
 	dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(eb));
-	etched_in = dpy->display.enable_etched_in_menu;
+	etched_ਵਿੱਚ = dpy->display.enable_etched_ਵਿੱਚ_menu;
     }
-#else
-    etched_in = False;
-#endif
-    if (!etched_in ^ eb->pushbutton.armed)
+#ਨਹੀਂਤਾਂ
+    etched_ਵਿੱਚ = False;
+#ਜੇ_ਅੰਤ
+    ਜੇ (!etched_ਵਿੱਚ ^ eb->pushbutton.armed)
     {
-	top_gc = eb->primitive.top_shadow_GC;
+	ਸਿਖਰ_gc = eb->primitive.ਸਿਖਰ_shadow_GC;
 	bottom_gc = eb->primitive.bottom_shadow_GC;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	top_gc = eb->primitive.bottom_shadow_GC;
-	bottom_gc = eb->primitive.top_shadow_GC;
+	ਸਿਖਰ_gc = eb->primitive.bottom_shadow_GC;
+	bottom_gc = eb->primitive.ਸਿਖਰ_shadow_GC;
     }
 
-    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-	    top_gc,
+    XmeDrawShadows(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
+	    ਸਿਖਰ_gc,
 	    bottom_gc,
 	    eb->primitive.highlight_thickness,
 	    eb->primitive.highlight_thickness,
-	    eb->core.width - 2 * eb->primitive.highlight_thickness,
-	    eb->core.height - 2 * eb->primitive.highlight_thickness,
+	    eb->core.ਚੌੜਾਈ - 2 * eb->primitive.highlight_thickness,
+	    eb->core.ਉਚਾਈ - 2 * eb->primitive.highlight_thickness,
 	    eb->primitive.shadow_thickness,
-	    (unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+	    (ਬਿਨਾਨਿਸ਼ਾਨੀ)(etched_ਵਿੱਚ ? Xm_SHADOW_ਵਿੱਚ : Xm_SHADOW_ਬਾਹਰਲਾ));
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 draw_highlight(XmEnhancedButtonWidget eb)
 {
     eb->primitive.highlighted = True;
     eb->primitive.highlight_drawn = True;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    ਜੇ (!Xt_ਚੌੜਾਈ(eb) || !Xt_ਉਚਾਈ(eb) || !eb->primitive.highlight_thickness)
+	ਵਾਪਸ;
 
-    XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+    XmeDrawHighlight(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 	    eb->primitive.highlight_GC, 0, 0,
-	    XtWidth(eb), XtHeight(eb),
+	    Xt_ਚੌੜਾਈ(eb), Xt_ਉਚਾਈ(eb),
 	    eb->primitive.highlight_thickness);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 draw_unhighlight(XmEnhancedButtonWidget eb)
 {
     GC manager_background_GC;
@@ -566,129 +566,129 @@ draw_unhighlight(XmEnhancedButtonWidget eb)
     eb->primitive.highlighted = False;
     eb->primitive.highlight_drawn = False;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    ਜੇ (!Xt_ਚੌੜਾਈ(eb) || !Xt_ਉਚਾਈ(eb) || !eb->primitive.highlight_thickness)
+	ਵਾਪਸ;
 
-    if (XmIsManager(eb->core.parent))
+    ਜੇ (XmIsManager(eb->core.ਮਾਪਾ))
     {
-#ifdef UNHIGHLIGHTT
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ UNHIGHLIGHTT
 	XmSpecifyUnhighlightTrait UnhighlightT;
 
-	if (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((XtPointer)
-			    XtClass(eb->core.parent), XmQTspecifyUnhighlight))
-		    != NULL) && (UnhighlightT->getUnhighlightGC != NULL))
+	ਜੇ (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((Xt_ਸੂਚਕ)
+			    XtClass(eb->core.ਮਾਪਾ), XmQTspecifyUnhighlight))
+		    != ਨਿਰਾ) && (UnhighlightT->getUnhighlightGC != ਨਿਰਾ))
 	{
 	    // if unhighlight trait in parent use specified GC...
 	    manager_background_GC =
-		 UnhighlightT->getUnhighlightGC(eb->core.parent, (Widget) eb);
+		 UnhighlightT->getUnhighlightGC(eb->core.ਮਾਪਾ, (Widget) eb);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // ...otherwise, use parent's background GC
 	    manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
+				    (eb->core.ਮਾਪਾ))->manager.background_GC;
 	}
-#else
+#ਨਹੀਂਤਾਂ
 	manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
-#endif
-	XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+				    (eb->core.ਮਾਪਾ))->manager.background_GC;
+#ਜੇ_ਅੰਤ
+	XmeDrawHighlight(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 			 manager_background_GC,
-			 0, 0, XtWidth(eb), XtHeight(eb),
+			 0, 0, Xt_ਚੌੜਾਈ(eb), Xt_ਉਚਾਈ(eb),
 			 eb->primitive.highlight_thickness);
-	if (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
-	    XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+	ਜੇ (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
+	    XmeClearBorder(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 		    eb->primitive.highlight_thickness,
 		    eb->primitive.highlight_thickness,
-		    eb->core.width - 2 * eb->primitive.highlight_thickness,
-		    eb->core.height - 2 * eb->primitive.highlight_thickness,
+		    eb->core.ਚੌੜਾਈ - 2 * eb->primitive.highlight_thickness,
+		    eb->core.ਉਚਾਈ - 2 * eb->primitive.highlight_thickness,
 		    eb->primitive.shadow_thickness);
     }
-    else
-	XmeClearBorder(XtDisplay(eb), XtWindow(eb), 0, 0, XtWidth(eb),
-		       XtHeight(eb), eb->primitive.highlight_thickness);
+    ਨਹੀਂਤਾਂ
+	XmeClearBorder(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb), 0, 0, Xt_ਚੌੜਾਈ(eb),
+		       Xt_ਉਚਾਈ(eb), eb->primitive.highlight_thickness);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 draw_pixmap(XmEnhancedButtonWidget eb,
-	    XEvent *event UNUSED,
-	    Region region UNUSED)
+	    XEvent *event ਅਣਵਰਤਿਆ,
+	    Region region ਅਣਵਰਤਿਆ)
 {
     Pixmap	pix;
-    GC		gc = eb->label.normal_GC;
-    int		depth;
-    Cardinal	width;
-    Cardinal	height;
+    GC		gc = eb->label.ਸਾਧਾਰਨ_GC;
+    ਪੂਰਨ		ਡੂੰਘਾਈ;
+    Cardinal	ਚੌੜਾਈ;
+    Cardinal	ਉਚਾਈ;
     Cardinal	w;
     Cardinal	h;
-    int		x;
-    int		y;
+    ਪੂਰਨ		x;
+    ਪੂਰਨ		y;
 
-    if (!XtIsSensitive((Widget) eb))
+    ਜੇ (!XtIsSensitive((Widget) eb))
 	pix = eb->enhancedbutton.insensitive_pixmap;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (eb->primitive.highlighted && !eb->pushbutton.armed)
+	ਜੇ (eb->primitive.highlighted && !eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.highlight_pixmap;
-	else if (eb->pushbutton.armed)
+	ਨਹੀਂਤਾਂ ਜੇ (eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.armed_pixmap;
-	else
-	    pix = eb->enhancedbutton.normal_pixmap;
+	ਨਹੀਂਤਾਂ
+	    pix = eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap;
     }
 
-    if (pix == None || !eb->enhancedbutton.pixmap_data)
-	return;
+    ਜੇ (pix == None || !eb->enhancedbutton.pixmap_ਅੰਕੜੇ)
+	ਵਾਪਸ;
 
-    depth = eb->enhancedbutton.pixmap_depth;
-    w = eb->enhancedbutton.pixmap_width;
-    h = eb->enhancedbutton.pixmap_height;
+    ਡੂੰਘਾਈ = eb->enhancedbutton.pixmap_ਡੂੰਘਾਈ;
+    w = eb->enhancedbutton.pixmap_ਚੌੜਾਈ;
+    h = eb->enhancedbutton.pixmap_ਉਚਾਈ;
 
-    gc = eb->label.normal_GC;
+    gc = eb->label.ਸਾਧਾਰਨ_GC;
     x = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_width;
+	+ eb->label.margin_ਚੌੜਾਈ;
     y = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_height;
-    width = eb->core.width - 2 * x;
-    if (w < width)
-	width = w;
-    height = eb->core.height - 2 * y;
-    if (h < height)
-	height = h;
-    if (depth == (int)eb->core.depth)
-	XCopyArea(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y);
-    else if (depth == 1)
-	XCopyPlane(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y, (unsigned long)1);
+	+ eb->label.margin_ਉਚਾਈ;
+    ਚੌੜਾਈ = eb->core.ਚੌੜਾਈ - 2 * x;
+    ਜੇ (w < ਚੌੜਾਈ)
+	ਚੌੜਾਈ = w;
+    ਉਚਾਈ = eb->core.ਉਚਾਈ - 2 * y;
+    ਜੇ (h < ਉਚਾਈ)
+	ਉਚਾਈ = h;
+    ਜੇ (ਡੂੰਘਾਈ == (ਪੂਰਨ)eb->core.ਡੂੰਘਾਈ)
+	XCopyArea(XtDisplay(eb), pix, Xt_ਖਿੜਕੀ(eb), gc, 0, 0,
+		ਚੌੜਾਈ, ਉਚਾਈ, x, y);
+    ਨਹੀਂਤਾਂ ਜੇ (ਡੂੰਘਾਈ == 1)
+	XCopyPlane(XtDisplay(eb), pix, Xt_ਖਿੜਕੀ(eb), gc, 0, 0,
+		ਚੌੜਾਈ, ਉਚਾਈ, x, y, (ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ)1);
 }
 
 /*
  * Draw the label contained in the pushbutton.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
 {
-    GC		tmp_gc = NULL;
+    GC		tmp_gc = ਨਿਰਾ;
     Boolean	replaceGC = False;
     Boolean	deadjusted = False;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
     XmDisplay	dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
-    Boolean	etched_in = dpy->display.enable_etched_in_menu;
-#else
-    Boolean	etched_in = False;
-#endif
+    Boolean	etched_ਵਿੱਚ = dpy->display.enable_etched_ਵਿੱਚ_menu;
+#ਨਹੀਂਤਾਂ
+    Boolean	etched_ਵਿੱਚ = False;
+#ਜੇ_ਅੰਤ
 
-    if (eb->pushbutton.armed
+    ਜੇ (eb->pushbutton.armed
 	    && ((!Lab_IsMenupane(eb) && eb->pushbutton.fill_on_arm)
-		|| (Lab_IsMenupane(eb) && etched_in)))
+		|| (Lab_IsMenupane(eb) && etched_ਵਿੱਚ)))
     {
-	if (eb->label.label_type == (int)XmSTRING
+	ਜੇ (eb->label.label_type == (ਪੂਰਨ)XmSTRING
 		&& eb->pushbutton.arm_color == eb->primitive.foreground)
 	{
-	    tmp_gc = eb->label.normal_GC;
-	    eb->label.normal_GC = eb->pushbutton.background_gc;
+	    tmp_gc = eb->label.ਸਾਧਾਰਨ_GC;
+	    eb->label.ਸਾਧਾਰਨ_GC = eb->pushbutton.background_gc;
 	    replaceGC = True;
 	}
     }
@@ -698,16 +698,16 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      * own pixmap.
      */
 
-    if (eb->label.label_type == (int)XmPIXMAP)
+    ਜੇ (eb->label.label_type == (ਪੂਰਨ)XmPIXMAP)
     {
-	if (eb->pushbutton.armed)
+	ਜੇ (eb->pushbutton.armed)
 	{
-	    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+	    ਜੇ (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 		eb->label.pixmap = eb->pushbutton.arm_pixmap;
-	    else
+	    ਨਹੀਂਤਾਂ
 		eb->label.pixmap = eb->pushbutton.unarm_pixmap;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // pushbutton is not armed
 	    eb->label.pixmap = eb->pushbutton.unarm_pixmap;
     }
@@ -716,278 +716,278 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      *	Temporarily remove the Xm3D_ENHANCE_PIXEL hack ("adjustment") from the
      *	margin values, so we don't confuse Label.
      */
-    if (eb->pushbutton.default_button_shadow_thickness > 0)
+    ਜੇ (eb->pushbutton.default_button_shadow_thickness > 0)
     {
 	deadjusted = True;
-	Lab_MarginLeft(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਖੱਬਾ(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਸੱਜਾ(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਸਿਖਰ(eb) -= Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) -= Xm3D_ENHANCE_PIXEL;
     }
 
     {
 	XtExposeProc expose;
 
-	XTPROCESS_LOCK;
+	XTPROCESS_ਤਾਲਾ;
 	expose = xmLabelClassRec.core_class.expose;
 	XTPROCESS_UNLOCK;
 	(*expose)((Widget) eb, event, region);
     }
 
-    if (deadjusted)
+    ਜੇ (deadjusted)
     {
-	Lab_MarginLeft(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਖੱਬਾ(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਸੱਜਾ(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_ਸਿਖਰ(eb) += Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) += Xm3D_ENHANCE_PIXEL;
     }
 
-    if (replaceGC)
-	eb->label.normal_GC = tmp_gc;
+    ਜੇ (replaceGC)
+	eb->label.ਸਾਧਾਰਨ_GC = tmp_gc;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 Enter(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params ਅਣਵਰਤਿਆ,
+    Cardinal *ਅੰਕ_params ਅਣਵਰਤਿਆ)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget) wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_ਧੱਕੋ_Button_Callback_Struct call_ਮੁੱਲ;
 
-    if (Lab_IsMenupane(eb))
+    ਜੇ (Lab_IsMenupane(eb))
     {
-	if ((((ShellWidget) XtParent(XtParent(eb)))->shell.popped_up)
-		&& _XmGetInDragMode((Widget) eb))
+	ਜੇ ((((ShellWidget) Xt_ਮਾਪਾ(Xt_ਮਾਪਾ(eb)))->shell.popped_ਉੱਪਰ)
+		&& Xm_Get_ਵਿੱਚ_Drag_ਬਹੁਲਕ((Widget) eb))
 	{
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
 	    XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	    Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	    Boolean etched_in = False;
-#endif
+	    Boolean etched_ਵਿੱਚ = dpy->display.enable_etched_ਵਿੱਚ_menu;
+#ਨਹੀਂਤਾਂ
+	    Boolean etched_ਵਿੱਚ = False;
+#ਜੇ_ਅੰਤ
 
-	    if (eb->pushbutton.armed)
-		return;
+	    ਜੇ (eb->pushbutton.armed)
+		ਵਾਪਸ;
 
 	    // ...so KHelp event is delivered correctly.
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, TRUE);
-	    XtSetKeyboardFocus(XtParent(XtParent(eb)), (Widget) eb);
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, FALSE);
+	    Xm_ਸੈੱਟ_Focus_Flag(Xt_ਮਾਪਾ(Xt_ਮਾਪਾ(eb)), XmFOCUS_IGNORE, TRUE);
+	    Xt_ਸੈੱਟ_Keyboard_Focus(Xt_ਮਾਪਾ(Xt_ਮਾਪਾ(eb)), (Widget) eb);
+	    Xm_ਸੈੱਟ_Focus_Flag(Xt_ਮਾਪਾ(Xt_ਮਾਪਾ(eb)), XmFOCUS_IGNORE, FALSE);
 
 	    eb->pushbutton.armed = TRUE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = wid;
+	    ((XmManagerWidget) Xt_ਮਾਪਾ(wid))->manager.ਸਰਗਰਮ_ਬੱਚਾ = wid;
 
 	    // etched in menu button
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    ਜੇ (etched_ਵਿੱਚ && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 			       eb->pushbutton.fill_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.ਚੌੜਾਈ, eb->core.ਉਚਾਈ);
+		draw_label(eb, event, ਨਿਰਾ);
+		draw_pixmap(eb, event, ਨਿਰਾ);
 	    }
 
-	    if ((eb->core.width > 2 * eb->primitive.highlight_thickness)
-		    && (eb->core.height >
+	    ਜੇ ((eb->core.ਚੌੜਾਈ > 2 * eb->primitive.highlight_thickness)
+		    && (eb->core.ਉਚਾਈ >
 				       2 * eb->primitive.highlight_thickness))
 	    {
-		XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			eb->primitive.top_shadow_GC,
+		XmeDrawShadows(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
+			eb->primitive.ਸਿਖਰ_shadow_GC,
 			eb->primitive.bottom_shadow_GC,
 			eb->primitive.highlight_thickness,
 			eb->primitive.highlight_thickness,
-			eb->core.width - 2 * eb->primitive.highlight_thickness,
-			eb->core.height - 2 * eb->primitive.highlight_thickness,
+			eb->core.ਚੌੜਾਈ - 2 * eb->primitive.highlight_thickness,
+			eb->core.ਉਚਾਈ - 2 * eb->primitive.highlight_thickness,
 			eb->primitive.shadow_thickness,
-			(unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+			(ਬਿਨਾਨਿਸ਼ਾਨੀ)(etched_ਵਿੱਚ ? Xm_SHADOW_ਵਿੱਚ : Xm_SHADOW_ਬਾਹਰਲਾ));
 	    }
 
-	    if (eb->pushbutton.arm_callback)
+	    ਜੇ (eb->pushbutton.arm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_ARM;
-		call_value.event = event;
+		call_ਮੁੱਲ.reason = (ਪੂਰਨ)XmCR_ARM;
+		call_ਮੁੱਲ.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.arm_callback,
-				   &call_value);
+				   &call_ਮੁੱਲ);
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	XtExposeProc expose;
 
-	_XmPrimitiveEnter((Widget) eb, event, NULL, NULL);
-	if (eb->pushbutton.armed == TRUE)
+	_XmPrimitiveEnter((Widget) eb, event, ਨਿਰਾ, ਨਿਰਾ);
+	ਜੇ (eb->pushbutton.armed == TRUE)
 	{
-	    XTPROCESS_LOCK;
+	    XTPROCESS_ਤਾਲਾ;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region) NULL);
+	    (*expose) (wid, event, (Region) ਨਿਰਾ);
 	}
 
 	draw_highlight(eb);
 	draw_shadows(eb);
-	draw_pixmap(eb, event, NULL);
+	draw_pixmap(eb, event, ਨਿਰਾ);
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 Leave(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params ਅਣਵਰਤਿਆ,
+    Cardinal *ਅੰਕ_params ਅਣਵਰਤਿਆ)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_ਧੱਕੋ_Button_Callback_Struct call_ਮੁੱਲ;
 
-    if (Lab_IsMenupane(eb))
+    ਜੇ (Lab_IsMenupane(eb))
     {
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
 	XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	Boolean etched_in = False;
-#endif
+	Boolean etched_ਵਿੱਚ = dpy->display.enable_etched_ਵਿੱਚ_menu;
+#ਨਹੀਂਤਾਂ
+	Boolean etched_ਵਿੱਚ = False;
+#ਜੇ_ਅੰਤ
 
-	if (_XmGetInDragMode((Widget)eb)
+	ਜੇ (Xm_Get_ਵਿੱਚ_Drag_ਬਹੁਲਕ((Widget)eb)
 		&& eb->pushbutton.armed
 		&& ( // !ActiveTearOff ||
-				       event->xcrossing.mode == NotifyNormal))
+				       event->xcrossing.ਬਹੁਲਕ == Notify_ਸਾਧਾਰਨ))
 	{
 	    eb->pushbutton.armed = FALSE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = NULL;
+	    ((XmManagerWidget) Xt_ਮਾਪਾ(wid))->manager.ਸਰਗਰਮ_ਬੱਚਾ = ਨਿਰਾ;
 
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    ਜੇ (etched_ਵਿੱਚ && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 			       eb->pushbutton.background_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.ਚੌੜਾਈ, eb->core.ਉਚਾਈ);
+		draw_label(eb, event, ਨਿਰਾ);
+		draw_pixmap(eb, event, ਨਿਰਾ);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		XmeClearBorder
-		    (XtDisplay(eb), XtWindow(eb),
+		    (XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 		     eb->primitive.highlight_thickness,
 		     eb->primitive.highlight_thickness,
-		     eb->core.width -
+		     eb->core.ਚੌੜਾਈ -
 		     2 * eb->primitive.highlight_thickness,
-		     eb->core.height -
+		     eb->core.ਉਚਾਈ -
 		     2 * eb->primitive.highlight_thickness,
 		     eb->primitive.shadow_thickness);
 
-	    if (eb->pushbutton.disarm_callback)
+	    ਜੇ (eb->pushbutton.disarm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_DISARM;
-		call_value.event = event;
+		call_ਮੁੱਲ.reason = (ਪੂਰਨ)XmCR_DISARM;
+		call_ਮੁੱਲ.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.disarm_callback,
-				   &call_value);
+				   &call_ਮੁੱਲ);
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	_XmPrimitiveLeave((Widget) eb, event, NULL, NULL);
+	_XmPrimitiveLeave((Widget) eb, event, ਨਿਰਾ, ਨਿਰਾ);
 
-	if (eb->pushbutton.armed == TRUE)
+	ਜੇ (eb->pushbutton.armed == TRUE)
 	{
 	    XtExposeProc expose;
 	    eb->pushbutton.armed = FALSE;
-	    XTPROCESS_LOCK;
+	    XTPROCESS_ਤਾਲਾ;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region)NULL);
+	    (*expose) (wid, event, (Region)ਨਿਰਾ);
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, ਨਿਰਾ);
 	    eb->pushbutton.armed = TRUE;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, ਨਿਰਾ);
 	}
     }
 }
 
-#define IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
 
-    static void
-set_size(XmEnhancedButtonWidget newtb)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_ਮਾਪ_2(XmEnhancedButtonWidget newtb)
 {
-    unsigned int w = 0;
-    unsigned int h = 0;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ w = 0;
+    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ h = 0;
 
     _XmCalcLabelDimensions((Widget) newtb);
 
     // Find out how big the pixmap is
-    if (newtb->enhancedbutton.pixmap_data
+    ਜੇ (newtb->enhancedbutton.pixmap_ਅੰਕੜੇ
 	    && !IsNull(newtb->label.pixmap)
-	    && !IsNull(newtb->enhancedbutton.normal_pixmap))
+	    && !IsNull(newtb->enhancedbutton.ਸਾਧਾਰਨ_pixmap))
     {
-	w = newtb->enhancedbutton.pixmap_width;
-	h = newtb->enhancedbutton.pixmap_height;
+	w = newtb->enhancedbutton.pixmap_ਚੌੜਾਈ;
+	h = newtb->enhancedbutton.pixmap_ਉਚਾਈ;
     }
 
     /*
      * Please note that we manipulate the width only in case of push buttons
      * not used in the context of a menu pane.
      */
-    if (Lab_IsMenupane(newtb))
+    ਜੇ (Lab_IsMenupane(newtb))
     {
-	newtb->label.margin_left = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_ਖੱਬਾ = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness)
-	    + newtb->label.margin_width;
+	    + newtb->label.margin_ਚੌੜਾਈ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	newtb->label.margin_left = w;
-	newtb->core.width = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_ਖੱਬਾ = w;
+	newtb->core.ਚੌੜਾਈ = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_width)
-	    + newtb->label.TextRect.width;
+		+ newtb->label.margin_ਚੌੜਾਈ)
+	    + newtb->label.ਪਾਠ_Rect.ਚੌੜਾਈ;
 
-	if (newtb->label.TextRect.width > 0)
+	ਜੇ (newtb->label.ਪਾਠ_Rect.ਚੌੜਾਈ > 0)
 	{
-	    newtb->label.margin_left += newtb->label.margin_width
+	    newtb->label.margin_ਖੱਬਾ += newtb->label.margin_ਚੌੜਾਈ
 					  + newtb->primitive.shadow_thickness;
-	    newtb->core.width += newtb->label.margin_width
+	    newtb->core.ਚੌੜਾਈ += newtb->label.margin_ਚੌੜਾਈ
 					  + newtb->primitive.shadow_thickness;
 	}
     }
-    if (newtb->label.TextRect.height < h)
+    ਜੇ (newtb->label.ਪਾਠ_Rect.ਉਚਾਈ < h)
     {
-	newtb->core.height = h  + 2 * (newtb->primitive.shadow_thickness
+	newtb->core.ਉਚਾਈ = h  + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_height);
+		+ newtb->label.margin_ਉਚਾਈ);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// FIXME: We should calculate a drawing offset for the pixmap here to
 	// adjust it.
     }
 
-#if 0
-    printf("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.normal_pixmap,
-	    h, newtb->core.height,
+#ਜੇ 0
+    ਲਿਖੋ("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.ਸਾਧਾਰਨ_pixmap,
+	    h, newtb->core.ਉਚਾਈ,
 	    newtb->primitive.shadow_thickness,
 	    newtb->primitive.highlight_thickness,
-	    newtb->label.margin_height,
-	    newtb->core.width,
-	    newtb->core.height);
-#endif
+	    newtb->label.margin_ਉਚਾਈ,
+	    newtb->core.ਚੌੜਾਈ,
+	    newtb->core.ਉਚਾਈ);
+#ਜੇ_ਅੰਤ
 
     // Invoke Label's Resize procedure.
     {
 	XtWidgetProc resize;
-	XTPROCESS_LOCK;
+	XTPROCESS_ਤਾਲਾ;
 	resize = xmLabelClassRec.core_class.resize;
 	XTPROCESS_UNLOCK;
 
@@ -995,90 +995,90 @@ set_size(XmEnhancedButtonWidget newtb)
     }
 }
 
-    static void
-Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
+    ਸਥਿਰ ਖਾਲੀ
+Initialize(Widget rq, Widget ebw, ArgList ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ, Cardinal *n ਅਣਵਰਤਿਆ)
 {
     XmEnhancedButtonWidget  request = (XmEnhancedButtonWidget)rq;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget)ebw;
     XtWidgetProc	    resize;
 
-    XTPROCESS_LOCK;
+    XTPROCESS_ਤਾਲਾ;
     resize = xmLabelClassRec.core_class.resize;
     XTPROCESS_UNLOCK;
 
     // Create a bitmap for stippling (Drawable resources are cheap).
-    if (STIPPLE_BITMAP == None)
+    ਜੇ (STIPPLE_BITMAP == None)
     {
 	Display *dpy = XtDisplay((Widget) request);
-	Window	rootW = DefaultRootWindow(dpy);
+	ਖਿੜਕੀ	ਜੜ੍ਹ_W = Default_ਜੜ੍ਹ_ਖਿੜਕੀ(dpy);
 
-	STIPPLE_BITMAP = XCreateBitmapFromData(dpy, rootW, stipple_bits,
-		stipple_width, stipple_height);
+	STIPPLE_BITMAP = XCreate_Bitmap_From_ਅੰਕੜੇ(dpy, ਜੜ੍ਹ_W, stipple_ਬਿੱਟ,
+		stipple_ਚੌੜਾਈ, stipple_ਉਚਾਈ);
     }
     eb->enhancedbutton.doing_setvalues = False;
 
     // First see what type of extended label this is.
-    if (eb->enhancedbutton.pixmap_data)
+    ਜੇ (eb->enhancedbutton.pixmap_ਅੰਕੜੇ)
     {
 	XmString str;
-	set_pixmap(eb);
+	ਸੈੱਟ_pixmap(eb);
 
 	// FIXME: this is not the perfect way to deal with menus, which do not
 	// have any string set right now.
 	str = XmStringCreateLocalized("");
-	XtVaSetValues((Widget) eb, XmNlabelString, str, NULL);
+	Xt_Va_ਸੈੱਟ_ਮੁੱਲਾਂ((Widget) eb, XmNlabelString, str, ਨਿਰਾ);
 	XmStringFree(str);
     }
-    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
+    eb->label.pixmap = eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap;
 
-    if (request->core.width == 0)
-	eb->core.width = 0;
-    if (request->core.height == 0)
-	eb->core.height = 0;
-    set_size(eb);
+    ਜੇ (request->core.ਚੌੜਾਈ == 0)
+	eb->core.ਚੌੜਾਈ = 0;
+    ਜੇ (request->core.ਉਚਾਈ == 0)
+	eb->core.ਉਚਾਈ = 0;
+    ਸੈੱਟ_ਮਾਪ_2(eb);
 
     (* resize)((Widget)eb);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 free_pixmaps(XmEnhancedButtonWidget eb)
 {
     /*
      * Clear the old pixmaps.
      */
-    Pixmap norm_pix = eb->enhancedbutton.normal_pixmap;
+    Pixmap norm_pix = eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap;
     Pixmap arm_pix = eb->enhancedbutton.armed_pixmap;
     Pixmap insen_pix = eb->enhancedbutton.insensitive_pixmap;
-    Pixmap high_pix = eb->enhancedbutton.highlight_pixmap;
+    Pixmap ਉੱਚਾ_pix = eb->enhancedbutton.highlight_pixmap;
 
-    if (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
+    ਜੇ (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), norm_pix);
 
-    if (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
+    ਜੇ (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), arm_pix);
 
-    if (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
+    ਜੇ (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), insen_pix);
 
-    if (high_pix != None && high_pix != XmUNSPECIFIED_PIXMAP)
-	XFreePixmap(XtDisplay(eb), high_pix);
+    ਜੇ (ਉੱਚਾ_pix != None && ਉੱਚਾ_pix != XmUNSPECIFIED_PIXMAP)
+	XFreePixmap(XtDisplay(eb), ਉੱਚਾ_pix);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 Destroy(Widget w)
 {
-    if (!XmIsEnhancedButton(w))
-	return;
+    ਜੇ (!XmIsEnhancedButton(w))
+	ਵਾਪਸ;
 
     free_pixmaps((XmEnhancedButtonWidget)w);
 }
 
-    static Boolean
-SetValues(Widget current,
-	  Widget request UNUSED,
+    ਸਥਿਰ Boolean
+ਸੈੱਟ_ਮੁੱਲਾਂ(Widget current,
+	  Widget request ਅਣਵਰਤਿਆ,
 	  Widget new,
-	  ArgList args UNUSED,
-	  Cardinal *n UNUSED)
+	  ArgList ਦਲੀਲਾਂ ਅਣਵਰਤਿਆ,
+	  Cardinal *n ਅਣਵਰਤਿਆ)
 {
     XmEnhancedButtonWidget  cur = (XmEnhancedButtonWidget) current;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) new;
@@ -1086,219 +1086,219 @@ SetValues(Widget current,
     Boolean		    change = True;
     Display		    *dpy = XtDisplay(current);
 
-#define NOT_EQUAL(field)       (cur->field != eb->field)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NOT_EQUAL(ਖੇਤਰ)       (cur->ਖੇਤਰ != eb->ਖੇਤਰ)
 
     /*
      * Make sure that lost sensitivity is causing the border to vanish as well.
      */
-    if (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
+    ਜੇ (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
     {
-	if (cur->core.sensitive == True)
+	ਜੇ (cur->core.sensitive == True)
 	{
 	    draw_unhighlight(eb);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    int		    r_x;
-	    int		    r_y;
-	    unsigned int    r_height;
-	    unsigned int    r_width;
-	    unsigned int    r_border;
-	    unsigned int    r_depth;
-	    int		    root_x;
-	    int		    root_y;
-	    int		    win_x;
-	    int		    win_y;
-	    Window	    root;
-	    Window	    root_q;
-	    Window	    child;
-	    unsigned int    mask;
+	    ਪੂਰਨ		    r_x;
+	    ਪੂਰਨ		    r_y;
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    r_ਉਚਾਈ;
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    r_ਚੌੜਾਈ;
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    r_border;
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    r_ਡੂੰਘਾਈ;
+	    ਪੂਰਨ		    ਜੜ੍ਹ_x;
+	    ਪੂਰਨ		    ਜੜ੍ਹ_y;
+	    ਪੂਰਨ		    win_x;
+	    ਪੂਰਨ		    win_y;
+	    ਖਿੜਕੀ	    ਜੜ੍ਹ;
+	    ਖਿੜਕੀ	    ਜੜ੍ਹ_q;
+	    ਖਿੜਕੀ	    ਬੱਚਾ;
+	    ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ    ਨਕਾਬ;
 
 	    /*
 	     * Artificially let the highlight appear if the mouse is over us.
 	     */
 	    // Best way to get the root window of object:
-	    XGetGeometry(dpy, XtWindow(cur), &root, &r_x, &r_y, &r_width,
-			 &r_height, &r_border, &r_depth);
-	    XQueryPointer(XtDisplay(cur), XtWindow(cur), &root_q, &child,
-			  &root_x, &root_y, &win_x, &win_y, &mask);
+	    XGetGeometry(dpy, Xt_ਖਿੜਕੀ(cur), &ਜੜ੍ਹ, &r_x, &r_y, &r_ਚੌੜਾਈ,
+			 &r_ਉਚਾਈ, &r_border, &r_ਡੂੰਘਾਈ);
+	    XQuery_ਸੂਚਕ(XtDisplay(cur), Xt_ਖਿੜਕੀ(cur), &ਜੜ੍ਹ_q, &ਬੱਚਾ,
+			  &ਜੜ੍ਹ_x, &ਜੜ੍ਹ_y, &win_x, &win_y, &ਨਕਾਬ);
 
-	    if (root == root_q)
+	    ਜੇ (ਜੜ੍ਹ == ਜੜ੍ਹ_q)
 	    {
-		if ((win_x < 0) || (win_y < 0))
-		    return False;
+		ਜੇ ((win_x < 0) || (win_y < 0))
+		    ਵਾਪਸ False;
 
-		if ((win_x > (int)r_width) || (win_y > (int)r_height))
-		    return False;
+		ਜੇ ((win_x > (ਪੂਰਨ)r_ਚੌੜਾਈ) || (win_y > (ਪੂਰਨ)r_ਉਚਾਈ))
+		    ਵਾਪਸ False;
 		draw_highlight(eb);
 		draw_shadows(eb);
 	    }
 	}
 
-	return True;
+	ਵਾਪਸ True;
     }
 
     /*
      * Check for changed ExtLabelString.
      */
-    if (NOT_EQUAL(primitive.shadow_thickness))
+    ਜੇ (NOT_EQUAL(primitive.shadow_thickness))
     {
 	redraw = True;
 	// Don't change the pixmaps
 	change = False;
     }
 
-    if (NOT_EQUAL(primitive.foreground))
+    ਜੇ (NOT_EQUAL(primitive.foreground))
 	redraw = True;
-    if (NOT_EQUAL(core.background_pixel))
+    ਜੇ (NOT_EQUAL(core.background_pixel))
 	redraw = True;
-    if (NOT_EQUAL(pushbutton.fill_on_arm))
+    ਜੇ (NOT_EQUAL(pushbutton.fill_on_arm))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.spacing))
+    ਜੇ (NOT_EQUAL(enhancedbutton.spacing))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.label_location))
+    ਜੇ (NOT_EQUAL(enhancedbutton.label_location))
     {
 	redraw = True;
 	change = False;
     }
-    if (NOT_EQUAL(label._label))
+    ਜੇ (NOT_EQUAL(label._label))
     {
 	redraw = True;
-	set_size(eb);
+	ਸੈੱਟ_ਮਾਪ_2(eb);
     }
 
-    if (redraw == True)
+    ਜੇ (redraw == True)
     {
-	if (change)
-	    set_pixmap(eb);
-	if (eb->primitive.highlighted)
+	ਜੇ (change)
+	    ਸੈੱਟ_pixmap(eb);
+	ਜੇ (eb->primitive.highlighted)
 	    eb->label.pixmap = eb->enhancedbutton.highlight_pixmap;
-	else
-	    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
-	if (change)
-	    set_size(eb);
+	ਨਹੀਂਤਾਂ
+	    eb->label.pixmap = eb->enhancedbutton.ਸਾਧਾਰਨ_pixmap;
+	ਜੇ (change)
+	    ਸੈੱਟ_ਮਾਪ_2(eb);
 	redraw = False;
     }
 
-    return redraw;
+    ਵਾਪਸ redraw;
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 Redisplay(Widget w, XEvent *event, Region region)
 {
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) w;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
     XmDisplay		    dpy;
     XtEnum		    default_button_emphasis;
-#endif
+#ਜੇ_ਅੰਤ
     XRectangle		    box;
-    int			    dx;
-    int			    adjust;
-    short		    fill = 0;
+    ਪੂਰਨ			    dx;
+    ਪੂਰਨ			    adjust;
+    ਛੋਟਾ		    fill = 0;
 
-    if (!XtIsRealized((Widget)eb))
-	return;
+    ਜੇ (!XtIsRealized((Widget)eb))
+	ਵਾਪਸ;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
     dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
     default_button_emphasis = dpy->display.default_button_emphasis;
-#endif
+#ਜੇ_ਅੰਤ
 
     /*
      * Compute the area allocated to the label of the pushbutton; fill in the
      * dimensions in the box.
      */
 
-    if ((eb->pushbutton.arm_color == eb->primitive.top_shadow_color)
+    ਜੇ ((eb->pushbutton.arm_color == eb->primitive.ਸਿਖਰ_shadow_color)
 	    || (eb->pushbutton.arm_color == eb->primitive.bottom_shadow_color))
 	fill = 1;
 
-    if (eb->pushbutton.compatible)
+    ਜੇ (eb->pushbutton.compatible)
 	adjust = eb->pushbutton.show_as_default;
-    else
+    ਨਹੀਂਤਾਂ
 	adjust = eb->pushbutton.default_button_shadow_thickness;
 
-    if (adjust > 0)
+    ਜੇ (adjust > 0)
     {
 	adjust = adjust + eb->primitive.shadow_thickness;
 	adjust = (adjust << 1);
 	dx = eb->primitive.highlight_thickness + adjust + fill;
     }
-    else
+    ਨਹੀਂਤਾਂ
 	dx = (eb->primitive.highlight_thickness
 		+ eb->primitive.shadow_thickness + fill);
 
     box.x = dx;
     box.y = dx;
     adjust = (dx << 1);
-    box.width  = eb->core.width - adjust;
-    box.height = eb->core.height - adjust;
+    box.ਚੌੜਾਈ  = eb->core.ਚੌੜਾਈ - adjust;
+    box.ਉਚਾਈ = eb->core.ਉਚਾਈ - adjust;
 
     /*
      * Redraw the background.
      */
-    if (!Lab_IsMenupane(eb))
+    ਜੇ (!Lab_IsMenupane(eb))
     {
 	GC  gc;
 
 	// Don't shade if the button contains a label with a pixmap, since
 	// there is no variant of the label available with the needed
 	// background.
-	if (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
+	ਜੇ (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
 	{
-		if (eb->label.label_type == (int)XmPIXMAP)
+		ਜੇ (eb->label.label_type == (ਪੂਰਨ)XmPIXMAP)
 		{
-		    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+		    ਜੇ (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 			gc = eb->pushbutton.fill_gc;
-		    else
+		    ਨਹੀਂਤਾਂ
 			gc = eb->pushbutton.background_gc;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		    gc = eb->pushbutton.fill_gc;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    gc = eb->pushbutton.background_gc;
 	// really need to fill with background if not armed ?
-	if (gc)
-	    XFillRectangle(XtDisplay(eb), XtWindow(eb), gc,
-		    box.x, box.y, box.width, box.height);
+	ਜੇ (gc)
+	    XFillRectangle(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb), gc,
+		    box.x, box.y, box.ਚੌੜਾਈ, box.ਉਚਾਈ);
     }
 
     draw_label(eb, event, region);
 
-    if (Lab_IsMenupane(eb))
+    ਜੇ (Lab_IsMenupane(eb))
     {
-	if (eb->pushbutton.armed)
-	    (*(((XmPushButtonWidgetClass)XtClass(eb))
+	ਜੇ (eb->pushbutton.armed)
+	    (*(((Xm_ਧੱਕੋ_Button_Widget_Class)XtClass(eb))
 	       ->primitive_class.border_highlight))(w);
 	draw_pixmap(eb, event, region);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	adjust = 0;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
 	/*
 	 *  NOTE: PushButton has two types of shadows: primitive-shadow and
 	 *  default-button-shadow.  If pushbutton is in a menu only primitive
 	 *  shadows are drawn.
 	 */
-	switch (default_button_emphasis)
+	ਚੋਣ (default_button_emphasis)
 	{
-	    case XmEXTERNAL_HIGHLIGHT:
+	    ਹਾਲਤ XmEXTERNAL_HIGHLIGHT:
 		adjust = (eb->primitive.highlight_thickness -
 			 (eb->pushbutton.default_button_shadow_thickness
 			  ?  Xm3D_ENHANCE_PIXEL : 0));
-		break;
+		ਰੋਕੋ;
 
-	    case XmINTERNAL_HIGHLIGHT:
-		break;
+	    ਹਾਲਤ Xm_ਅੰਦਰੂਨੀ_HIGHLIGHT:
+		ਰੋਕੋ;
 
-	    default:
-		assert(FALSE);
-		return;
+	    ਮੂਲ:
+		ਪ੍ਰਤਿਜ੍ਞਾ(FALSE);
+		ਵਾਪਸ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
 
 	/*
 	 * Clear the area not occupied by label with parents background color.
@@ -1306,43 +1306,43 @@ Redisplay(Widget w, XEvent *event, Region region)
 	 * area, which is redundant when XmEXTERNAL_HIGHLIGHT default button
 	 * shadow emphasis is used.
 	 */
-	if (box.x > adjust)
+	ਜੇ (box.x > adjust)
 	{
-	    int borderwidth =box.x - adjust;
-	    int rectwidth = eb->core.width - 2 * adjust;
-	    int rectheight = eb->core.height - 2 * adjust;
+	    ਪੂਰਨ borderwidth =box.x - adjust;
+	    ਪੂਰਨ rectwidth = eb->core.ਚੌੜਾਈ - 2 * adjust;
+	    ਪੂਰਨ rectheight = eb->core.ਉਚਾਈ - 2 * adjust;
 
-	    if (XmIsManager(XtParent(eb)))
+	    ਜੇ (XmIsManager(Xt_ਮਾਪਾ(eb)))
 	    {
-		XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
-						     XmParentBackgroundGC(eb),
+		XmeDrawHighlight(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
+						     Xm_ਮਾਪਾ_Background_GC(eb),
 			adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+		XmeClearBorder(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
 			  adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
-	    switch (default_button_emphasis)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
+	    ਚੋਣ (default_button_emphasis)
 	    {
-		case XmINTERNAL_HIGHLIGHT:
+		ਹਾਲਤ Xm_ਅੰਦਰੂਨੀ_HIGHLIGHT:
 		    // The call above erases the border highlighting.
-		    if (eb->primitive.highlight_drawn)
-			(*(((XmPushButtonWidgetClass) XtClass (eb))
+		    ਜੇ (eb->primitive.highlight_drawn)
+			(*(((Xm_ਧੱਕੋ_Button_Widget_Class) XtClass (eb))
 			   ->primitive_class.border_highlight)) ((Widget) eb) ;
-		    break;
+		    ਰੋਕੋ;
 
-		default:
-		    break;
+		ਮੂਲ:
+		    ਰੋਕੋ;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
 
-	if (eb->pushbutton.default_button_shadow_thickness)
+	ਜੇ (eb->pushbutton.default_button_shadow_thickness)
 	{
-	    if (eb->pushbutton.show_as_default)
+	    ਜੇ (eb->pushbutton.show_as_default)
 	    {
 		/*
 		 *  - get the topShadowColor and bottomShadowColor from the
@@ -1355,106 +1355,106 @@ Redisplay(Widget w, XEvent *event, Region region)
 		 *  - Should be called only if a defaultbuttonshadow is to be
 		 *  drawn.
 		 */
-		GC	    top_gc;
+		GC	    ਸਿਖਰ_gc;
 		GC	    bottom_gc;
-		int	    default_button_shadow_thickness;
-		int	    x, y, width, height, delta;
-		Widget	    parent;
+		ਪੂਰਨ	    default_button_shadow_thickness;
+		ਪੂਰਨ	    x, y, ਚੌੜਾਈ, ਉਚਾਈ, delta;
+		Widget	    ਮਾਪਾ;
 
-		if (eb->pushbutton.compatible
+		ਜੇ (eb->pushbutton.compatible
 				     && (eb->pushbutton.show_as_default == 0))
-		    return;
+		    ਵਾਪਸ;
 
-		if (!eb->pushbutton.compatible
+		ਜੇ (!eb->pushbutton.compatible
 			&& (eb->pushbutton.default_button_shadow_thickness
 									== 0))
-		    return;
+		    ਵਾਪਸ;
 
 		delta = eb->primitive.highlight_thickness;
 
 		/*
 		 * May need more complex computation for getting the GCs.
 		 */
-		parent = XtParent(eb);
-		if (XmIsManager(parent))
+		ਮਾਪਾ = Xt_ਮਾਪਾ(eb);
+		ਜੇ (XmIsManager(ਮਾਪਾ))
 		{
 		    // Use the parent's GC so monochrome works.
-		    bottom_gc = XmParentTopShadowGC(eb);
-		    top_gc = XmParentBottomShadowGC(eb);
+		    bottom_gc = Xm_ਮਾਪਾ_ਸਿਖਰ_Shadow_GC(eb);
+		    ਸਿਖਰ_gc = Xm_ਮਾਪਾ_Bottom_Shadow_GC(eb);
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Use your own pixel for drawing.
-		    bottom_gc = eb->primitive.top_shadow_GC;
-		    top_gc = eb->primitive.bottom_shadow_GC;
+		    bottom_gc = eb->primitive.ਸਿਖਰ_shadow_GC;
+		    ਸਿਖਰ_gc = eb->primitive.bottom_shadow_GC;
 		}
 
-		if ((bottom_gc == None) || (top_gc == None))
-		    return;
+		ਜੇ ((bottom_gc == None) || (ਸਿਖਰ_gc == None))
+		    ਵਾਪਸ;
 
 
-		if (eb->pushbutton.compatible)
+		ਜੇ (eb->pushbutton.compatible)
 		    default_button_shadow_thickness =
 					       eb->pushbutton.show_as_default;
-		else
+		ਨਹੀਂਤਾਂ
 		    default_button_shadow_thickness =
 			       eb->pushbutton.default_button_shadow_thickness;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#ਜੇ !defined(LESSTIF_ਸੰਸਕਰਣ) && (Xm_ਸੰਸਕਰਣ > 1002)
 		/*
 		 * Compute location of bounding box to contain the
 		 * defaultButtonShadow.
 		 */
-		switch (default_button_emphasis)
+		ਚੋਣ (default_button_emphasis)
 		{
-		    case XmEXTERNAL_HIGHLIGHT:
+		    ਹਾਲਤ XmEXTERNAL_HIGHLIGHT:
 			delta = eb->primitive.highlight_thickness;
-			break;
+			ਰੋਕੋ;
 
-		    case XmINTERNAL_HIGHLIGHT:
+		    ਹਾਲਤ Xm_ਅੰਦਰੂਨੀ_HIGHLIGHT:
 			delta = Xm3D_ENHANCE_PIXEL;
-			break;
+			ਰੋਕੋ;
 
-		    default:
-			assert(FALSE);
-			return;
+		    ਮੂਲ:
+			ਪ੍ਰਤਿਜ੍ਞਾ(FALSE);
+			ਵਾਪਸ;
 		}
-#endif
+#ਜੇ_ਅੰਤ
 
 		x = y = delta;
-		width = eb->core.width - 2 * delta;
-		height = eb->core.height - 2 * delta;
+		ਚੌੜਾਈ = eb->core.ਚੌੜਾਈ - 2 * delta;
+		ਉਚਾਈ = eb->core.ਉਚਾਈ - 2 * delta;
 
-		if ((width > 0) && (height > 0))
-		    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			    top_gc, bottom_gc, x, y, width, height,
+		ਜੇ ((ਚੌੜਾਈ > 0) && (ਉਚਾਈ > 0))
+		    XmeDrawShadows(XtDisplay(eb), Xt_ਖਿੜਕੀ(eb),
+			    ਸਿਖਰ_gc, bottom_gc, x, y, ਚੌੜਾਈ, ਉਚਾਈ,
 			    default_button_shadow_thickness,
-			    (unsigned)XmSHADOW_OUT);
+			    (ਬਿਨਾਨਿਸ਼ਾਨੀ)Xm_SHADOW_ਬਾਹਰਲਾ);
 	    }
 	}
 
-	if (eb->primitive.highlight_drawn)
+	ਜੇ (eb->primitive.highlight_drawn)
 	    draw_shadows(eb);
 	draw_pixmap(eb, event, region);
     }
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 BorderHighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_highlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_ਧੱਕੋ_Button_Class_Rec.primitive_class.border_highlight))(w);
+    draw_pixmap(eb, ਨਿਰਾ, ਨਿਰਾ);
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 BorderUnhighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_unhighlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_ਧੱਕੋ_Button_Class_Rec.primitive_class.border_unhighlight))(w);
+    draw_pixmap(eb, ਨਿਰਾ, ਨਿਰਾ);
 }
 
-#endif // FEAT_TOOLBAR
+#ਜੇ_ਅੰਤ // FEAT_TOOLBAR

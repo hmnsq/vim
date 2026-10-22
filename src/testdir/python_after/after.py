@@ -1,2 +1,2 @@
-import before_2
+ਆਯਾਤ before_2
 dir = "after"

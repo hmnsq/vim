@@ -13,63 +13,63 @@
  * Routines for Win32.
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#include <sys/types.h>
-#include <limits.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <sys/types.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <limits.h>
 
-#include <process.h>
-#include <direct.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <process.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#ਜੇ !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#ਜੇ defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 # include <dlgs.h>
 # include <winspool.h>
 # include <commdlg.h>
-#endif
+#ਜੇ_ਅੰਤ
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MCH_WRITE_DUMP
+FILE* fdDump = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-extern char g_szOrigTitle[];
-#endif
+#ਜੇ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ਬਾਹਰੀ ਅੱਖਰ g_szOrigTitle[];
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
-extern HWND s_hwnd;
-#else
-static HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
+ਬਾਹਰੀ HWND s_hwnd;
+#ਨਹੀਂਤਾਂ
+ਸਥਿਰ HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_JOB_CHANNEL
-int WSInitialized = FALSE; // WinSock is initialized
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਕੰਮ_CHANNEL
+ਪੂਰਨ WSInitialized = FALSE; // WinSock is initialized
+#ਜੇ_ਅੰਤ
 
 
 /*
  * Save the instance handle of the exe/dll.
  */
-    void
+    ਖਾਲੀ
 SaveInst(HINSTANCE hInst)
 {
     g_hinst = hInst;
 }
 
-#if defined(FEAT_GUI_MSWIN)
+#ਜੇ defined(FEAT_GUI_MSWIN)
 /*
  * GUI version of mch_exit().
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit_g(int r)
+    ਖਾਲੀ
+mch_exit_g(ਪੂਰਨ r)
 {
     exiting = TRUE;
 
@@ -80,127 +80,127 @@ mch_exit_g(int r)
 # ifdef FEAT_OLE
     UninitOLE();
 # endif
-# ifdef FEAT_JOB_CHANNEL
-    if (WSInitialized)
+# ifdef FEAT_ਕੰਮ_CHANNEL
+    ਜੇ (WSInitialized)
     {
 	WSInitialized = FALSE;
 	WSACleanup();
     }
 # endif
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_ਸਿਰਾ();
 # endif
 
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 	gui_exit(r);
 
 # ifdef EXITFREE
     free_all_mem();
 # endif
 
-    exit(r);
+    ਬਾਹਰ_ਨਿਕਲੋ(r);
 }
 
-#endif // FEAT_GUI_MSWIN
+#ਜੇ_ਅੰਤ // FEAT_GUI_MSWIN
 
 
 /*
  * Get version number including build number
  */
-typedef BOOL (WINAPI *PfnRtlGetVersion)(LPOSVERSIONINFOW);
-DWORD win_version;
-    static void
-win_version_init(void)
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ BOOL (WINAPI *Pfn_Rtl_Get_ਸੰਸਕਰਣ)(LPOSVERSIONINFOW);
+DWORD win_ਸੰਸਕਰਣ;
+    ਸਥਿਰ ਖਾਲੀ
+win_ਸੰਸਕਰਣ_init(ਖਾਲੀ)
 {
     OSVERSIONINFOW	osver;
     HMODULE		hNtdll;
-    PfnRtlGetVersion	pRtlGetVersion;
+    Pfn_Rtl_Get_ਸੰਸਕਰਣ	p_Rtl_Get_ਸੰਸਕਰਣ;
 
     hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll == NULL)
-	return;
+    ਜੇ (hNtdll == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    pRtlGetVersion =
-	(PfnRtlGetVersion) GetProcAddress(hNtdll, "RtlGetVersion");
-    if (pRtlGetVersion == NULL)
-	return;
+    p_Rtl_Get_ਸੰਸਕਰਣ =
+	(Pfn_Rtl_Get_ਸੰਸਕਰਣ) Get_Proc_ਪਤਾ(hNtdll, "RtlGetVersion");
+    ਜੇ (p_Rtl_Get_ਸੰਸਕਰਣ == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-    pRtlGetVersion(&osver);
-    win_version = MAKE_VER(min(osver.dwMajorVersion, 0xFF),
-	    min(osver.dwMinorVersion, 0xFF),
-	    min(osver.dwBuildNumber, 0xFFFF));
+    osver.dw_OSVersion_Info_ਮਾਪ = ਆਕਾਰ(OSVERSIONINFOW);
+    p_Rtl_Get_ਸੰਸਕਰਣ(&osver);
+    win_ਸੰਸਕਰਣ = MAKE_VER(min(osver.dw_Major_ਸੰਸਕਰਣ, 0xFF),
+	    min(osver.dw_Minor_ਸੰਸਕਰਣ, 0xFF),
+	    min(osver.dw_Build_ਸੰਖਿਆ, 0xFFFF));
 }
 
 /*
  * Init the tables for toupper() and tolower().
  */
-    void
-mch_early_init(void)
+    ਖਾਲੀ
+mch_early_init(ਖਾਲੀ)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    win_version_init();
+    win_ਸੰਸਕਰਣ_init();
 
     PlatformId();
 
     // Init the tables for toupper() and tolower()
-    for (i = 0; i < 256; ++i)
+    ਲਈ (i = 0; i < 256; ++i)
 	toupper_tab[i] = tolower_tab[i] = i;
-    CharUpperBuff((LPSTR)toupper_tab, 256);
-    CharLowerBuff((LPSTR)tolower_tab, 256);
+    Char_ਉੱਤਲਾ_Buff((LPSTR)toupper_tab, 256);
+    Char_ਹੇਠਲਾ_Buff((LPSTR)tolower_tab, 256);
 }
 
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
-mch_input_isatty(void)
+    ਪੂਰਨ
+mch_ਨਿਵੇਸ਼_isatty(ਖਾਲੀ)
 {
-#ifdef FEAT_GUI_MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 # endif
-	return TRUE;	    // GUI always has a tty
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
-#endif
+	ਵਾਪਸ TRUE;	    // GUI always has a tty
+#ਜੇ_ਅੰਤ
+#ਜੇ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ਜੇ (isatty(read_cmd_fd))
+	ਵਾਪਸ TRUE;
+    ਵਾਪਸ FALSE;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * mch_settitle(): set titlebar of our window
  */
-    void
+    ਖਾਲੀ
 mch_settitle(
     char_u *title,
-    char_u *icon UNUSED)
+    char_u *icon ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_GUI_MSWIN
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 # endif
     {
 	gui_mch_settitle(title, icon);
-	return;
+	ਵਾਪਸ;
     }
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (title != NULL)
+#ਜੇ_ਅੰਤ
+#ਜੇ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ਜੇ (title != ਨਿਰਾ)
     {
-	WCHAR	*wp = enc_to_utf16(title, NULL);
+	WCHAR	*wp = enc_ਮੰਜ਼ਿਲ_utf16(title, ਨਿਰਾ);
 
-	if (wp == NULL)
-	    return;
+	ਜੇ (wp == ਨਿਰਾ)
+	    ਵਾਪਸ;
 
-	SetConsoleTitleW(wp);
+	ਸੈੱਟ_Console_Title_W(wp);
 	vim_free(wp);
-	return;
+	ਵਾਪਸ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 
@@ -211,35 +211,35 @@ mch_settitle(
  *  SAVE_RESTORE_ICON:  Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH:  Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which UNUSED)
+    ਖਾਲੀ
+mch_restore_title(ਪੂਰਨ which ਅਣਵਰਤਿਆ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ਜੇ !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ਜੇ (!gui.ਵਿੱਚ_use)
 # endif
-	SetConsoleTitle(g_szOrigTitle);
-#endif
+	ਸੈੱਟ_Console_Title(g_szOrigTitle);
+#ਜੇ_ਅੰਤ
 }
 
 
 /*
  * Return TRUE if we can restore the title (we can)
  */
-    int
-mch_can_restore_title(void)
+    ਪੂਰਨ
+mch_can_restore_title(ਖਾਲੀ)
 {
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 
 /*
  * Return TRUE if we can restore the icon title (we can't)
  */
-    int
-mch_can_restore_icon(void)
+    ਪੂਰਨ
+mch_can_restore_icon(ਖਾਲੀ)
 {
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 
@@ -250,55 +250,55 @@ mch_can_restore_icon(void)
  * When 'shellslash' set do it the other way around.
  * Return OK or FAIL.
  */
-    int
-mch_FullName(
+    ਪੂਰਨ
+mch_ਭਰਿਆ_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force UNUSED)
+    ਪੂਰਨ		len,
+    ਪੂਰਨ		force ਅਣਵਰਤਿਆ)
 {
-    int		nResult = FAIL;
+    ਪੂਰਨ		n_ਨਤੀਜਾ = FAIL;
     WCHAR	*wname;
-    WCHAR	wbuf[MAX_PATH];
-    char_u	*cname = NULL;
+    WCHAR	wbuf[MAX_ਰਸਤਾ];
+    char_u	*cname = ਨਿਰਾ;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname != NULL && _wfullpath(wbuf, wname, MAX_PATH) != NULL)
+    wname = enc_ਮੰਜ਼ਿਲ_utf16(fname, ਨਿਰਾ);
+    ਜੇ (wname != ਨਿਰਾ && _wfullpath(wbuf, wname, MAX_ਰਸਤਾ) != ਨਿਰਾ)
     {
-	cname = utf16_to_enc((short_u *)wbuf, NULL);
-	if (cname != NULL)
+	cname = utf16_ਮੰਜ਼ਿਲ_enc((short_u *)wbuf, ਨਿਰਾ);
+	ਜੇ (cname != ਨਿਰਾ)
 	{
 	    vim_strncpy(buf, cname, len - 1);
-	    nResult = OK;
+	    n_ਨਤੀਜਾ = OK;
 	}
     }
     vim_free(wname);
     vim_free(cname);
 
-#ifdef USE_FNAME_CASE
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ USE_FNAME_CASE
     fname_case(buf, len);
-#else
+#ਨਹੀਂਤਾਂ
     slash_adjust(buf);
-#endif
+#ਜੇ_ਅੰਤ
 
-    return nResult;
+    ਵਾਪਸ n_ਨਤੀਜਾ;
 }
 
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    ਪੂਰਨ
+mch_is_ਭਰਿਆ_Name(char_u *fname)
 {
     // A name like "d:/foo" and "//server/share" is absolute.  "d:foo" is not.
     // /foo and \foo are absolute too because Windows keeps a current drive.
     // Another way to check is to use mch_FullName() and see if the result is
     // the same as the name or mch_FullName() fails.  However, this has quite a
     // bit of overhead, so let's not do that.
-    if (*fname == NUL)
-	return FALSE;
-    return ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
+    ਜੇ (*fname == NUL)
+	ਵਾਪਸ FALSE;
+    ਵਾਪਸ ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
 				      && (fname[2] == '/' || fname[2] == '\\'))
 	    || (fname[0] == '/' || fname[0] == '\\'));
 }
@@ -313,130 +313,130 @@ mch_isFullName(char_u *fname)
  * When 'shellslash' set do it the other way around.
  * When the path looks like a URL leave it unmodified.
  */
-    void
+    ਖਾਲੀ
 slash_adjust(char_u *p)
 {
-    if (path_with_url(p))
-	return;
+    ਜੇ (ਰਸਤਾ_with_url(p))
+	ਵਾਪਸ;
 
-    if (*p == '`')
+    ਜੇ (*p == '`')
     {
 	size_t len = STRLEN(p);
 
 	// don't replace backslash in backtick quoted strings
-	if (len > 2 && *(p + len - 1) == '`')
-	    return;
+	ਜੇ (len > 2 && *(p + len - 1) == '`')
+	    ਵਾਪਸ;
     }
 
-    while (*p)
+    ਜਦੋਂ (*p)
     {
-	if (*p == psepcN)
+	ਜੇ (*p == psepcN)
 	    *p = psepc;
 	MB_PTR_ADV(p);
     }
 }
 
-    static int
-read_reparse_point(const WCHAR *name, char_u *buf, DWORD *buf_len)
+    ਸਥਿਰ ਪੂਰਨ
+read_reparse_ਬਿੰਦੂ(ਅਚਲ WCHAR *name, char_u *buf, DWORD *buf_len)
 {
     HANDLE h;
     BOOL ok;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+    h = CreateFileW(name, FILE_READ_ਗੁਣ,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, ਨਿਰਾ,
 	    OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return FAIL;
+	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_ਬਿੰਦੂ,
+	    ਨਿਰਾ);
+    ਜੇ (h == INVALID_HANDLE_ਮੁੱਲ)
+	ਵਾਪਸ FAIL;
 
-    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buf, *buf_len,
-	    buf_len, NULL);
+    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_ਬਿੰਦੂ, ਨਿਰਾ, 0, buf, *buf_len,
+	    buf_len, ਨਿਰਾ);
     CloseHandle(h);
 
-    return ok ? OK : FAIL;
+    ਵਾਪਸ ok ? OK : FAIL;
 }
 
     char_u *
 resolve_appexeclink(char_u *fname)
 {
     DWORD		attr = 0;
-    int			idx;
-    WCHAR		*p, *end, *wname;
+    ਪੂਰਨ			idx;
+    WCHAR		*p, *ਸਿਰਾ, *wname;
     // The buffer size is arbitrarily chosen to be "big enough" (TM), the
     // ceiling should be around 16k.
     char_u		buf[4096];
-    DWORD		buf_len = sizeof(buf);
-    REPARSE_DATA_BUFFER *rb = (REPARSE_DATA_BUFFER *)buf;
+    DWORD		buf_len = ਆਕਾਰ(buf);
+    REPARSE_ਅੰਕੜੇ_ਬਫਰ *rb = (REPARSE_ਅੰਕੜੇ_ਬਫਰ *)buf;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname == NULL)
-	return NULL;
+    wname = enc_ਮੰਜ਼ਿਲ_utf16(fname, ਨਿਰਾ);
+    ਜੇ (wname == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    attr = GetFileAttributesW(wname);
-    if (attr == INVALID_FILE_ATTRIBUTES ||
-	    (attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+    attr = Get_File_ਗੁਣ_W(wname);
+    ਜੇ (attr == INVALID_FILE_ਗੁਣ ||
+	    (attr & FILE_ATTRIBUTE_REPARSE_ਬਿੰਦੂ) == 0)
     {
 	vim_free(wname);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
 
     // The applinks are similar to symlinks but with a huge difference: they can
     // only be executed, any other I/O operation on them is bound to fail with
     // ERROR_FILE_NOT_FOUND even though the file exists.
-    if (read_reparse_point(wname, buf, &buf_len) == FAIL)
+    ਜੇ (read_reparse_ਬਿੰਦੂ(wname, buf, &buf_len) == FAIL)
     {
 	vim_free(wname);
-	return NULL;
+	ਵਾਪਸ ਨਿਰਾ;
     }
     vim_free(wname);
 
-    if (rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK)
-	return NULL;
+    ਜੇ (rb->Reparse_ਟੈਗ != IO_REPARSE_ਟੈਗ_APPEXECLINK)
+	ਵਾਪਸ ਨਿਰਾ;
 
     // The (undocumented) reparse buffer contains a set of N null-terminated
     // Unicode strings, the application path is stored in the third one.
-    if (rb->AppExecLinkReparseBuffer.StringCount < 3)
-	return NULL;
+    ਜੇ (rb->App_Exec_Link_Reparse_ਬਫਰ.String_ਗਿਣਤੀ < 3)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    p = rb->AppExecLinkReparseBuffer.StringList;
-    end = p + rb->ReparseDataLength / sizeof(WCHAR);
-    for (idx = 0; p < end
-	    && idx < (int)rb->AppExecLinkReparseBuffer.StringCount
+    p = rb->App_Exec_Link_Reparse_ਬਫਰ.StringList;
+    ਸਿਰਾ = p + rb->Reparse_ਅੰਕੜੇ_ਲੰਮਾਈ / ਆਕਾਰ(WCHAR);
+    ਲਈ (idx = 0; p < ਸਿਰਾ
+	    && idx < (ਪੂਰਨ)rb->App_Exec_Link_Reparse_ਬਫਰ.String_ਗਿਣਤੀ
 	    && idx != 2; )
     {
-	if (*p++ == L'\0')
+	ਜੇ (*p++ == L'\0')
 	    ++idx;
     }
 
-    return utf16_to_enc(p, NULL);
+    ਵਾਪਸ utf16_ਮੰਜ਼ਿਲ_enc(p, ਨਿਰਾ);
 }
 
 // Use 64-bit stat functions.
-#undef stat
-#undef _stat
-#undef _wstat
-#undef _fstat
-#define stat _stat64
-#define _stat _stat64
-#define _wstat _wstat64
-#define _fstat _fstat64
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ stat
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ _stat
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ _wstat
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ _fstat
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ stat _stat64
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ _stat _stat64
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ _wstat _wstat64
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ _fstat _fstat64
 
 /*
  * Implements lstat() and stat() that can handle symlinks properly.
  */
-    static int
-mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
+    ਸਥਿਰ ਪੂਰਨ
+mswin_stat_impl(ਅਚਲ WCHAR *name, stat_T *stp, ਅਚਲ ਪੂਰਨ resolve)
 {
-    int			n;
-    int			fd;
+    ਪੂਰਨ			n;
+    ਪੂਰਨ			fd;
     BOOL		is_symlink = FALSE;
-    HANDLE		hFind, h;
+    HANDLE		h_ਲੱਭੋ, h;
     DWORD		attr = 0;
     DWORD		flag = 0;
-    WIN32_FIND_DATAW    findDataW;
+    WIN32_ਲੱਭੋ_DATAW    ਲੱਭੋ_ਅੰਕੜੇ_W;
 
-#if 0 && defined(_UCRT)
+#ਜੇ 0 && defined(_UCRT)
     // This code was disabled because the behavior of MSVC's _wstat (actually
     // _wstat64) for empty symlinks varies depending on the C runtime you link
     // to.
@@ -449,145 +449,145 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
     //
     // For more details, see:
     // https://github.com/koron/vc-stat-behavior-verification
-    if (resolve)
+    ਜੇ (resolve)
 	// Universal CRT can handle symlinks properly.
-	return _wstat(name, stp);
-#endif
+	ਵਾਪਸ _wstat(name, stp);
+#ਜੇ_ਅੰਤ
 
     // Only reparse points need a directory query to identify symbolic links.
     // In particular, avoid enumerating the directory for each missing file
     // while searching 'runtimepath'.
-    attr = GetFileAttributesW(name);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    attr = Get_File_ਗੁਣ_W(name);
+    ਜੇ (attr == INVALID_FILE_ਗੁਣ)
     {
-	DWORD error = GetLastError();
+	DWORD error = Get_ਆਖਰੀ_Error();
 
 	// A missing file or path cannot provide stat information.  Other
 	// errors and UNC paths still need the CRT fallback.
-	if ((error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
+	ਜੇ ((error == ERROR_FILE_NOT_ਮਿਲਿਆ || error == ERROR_ਰਸਤਾ_NOT_ਮਿਲਿਆ)
 		&& !((name[0] == L'\\' || name[0] == L'/')
 		    && (name[1] == L'\\' || name[1] == L'/')))
 	{
 	    errno = ENOENT;
-	    return -1;
+	    ਵਾਪਸ -1;
 	}
-	return _wstat(name, stp);
+	ਵਾਪਸ _wstat(name, stp);
     }
-    if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT))
-	return _wstat(name, stp);
+    ਜੇ (!(attr & FILE_ATTRIBUTE_REPARSE_ਬਿੰਦੂ))
+	ਵਾਪਸ _wstat(name, stp);
 
-    hFind = FindFirstFileW(name, &findDataW);
-    if (hFind != INVALID_HANDLE_VALUE)
+    h_ਲੱਭੋ = ਲੱਭੋ_ਪਹਿਲਾ_File_W(name, &ਲੱਭੋ_ਅੰਕੜੇ_W);
+    ਜੇ (h_ਲੱਭੋ != INVALID_HANDLE_ਮੁੱਲ)
     {
-	attr = findDataW.dwFileAttributes;
-	if ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
-		&& (findDataW.dwReserved0 == IO_REPARSE_TAG_SYMLINK))
+	attr = ਲੱਭੋ_ਅੰਕੜੇ_W.dw_File_ਗੁਣ;
+	ਜੇ ((attr & FILE_ATTRIBUTE_REPARSE_ਬਿੰਦੂ)
+		&& (ਲੱਭੋ_ਅੰਕੜੇ_W.dwReserved0 == IO_REPARSE_ਟੈਗ_SYMLINK))
 	    is_symlink = TRUE;
-	FindClose(hFind);
+	ਲੱਭੋ_Close(h_ਲੱਭੋ);
     }
 
     // Use the plain old stat() whenever it's possible.
-    if (!is_symlink)
-	return _wstat(name, stp);
+    ਜੇ (!is_symlink)
+	ਵਾਪਸ _wstat(name, stp);
 
-    if (!resolve && is_symlink)
-	flag = FILE_FLAG_OPEN_REPARSE_POINT;
-    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+    ਜੇ (!resolve && is_symlink)
+	flag = FILE_FLAG_OPEN_REPARSE_ਬਿੰਦੂ;
+    ਜੇ (attr & FILE_ATTRIBUTE_DIRECTORY)
 	flag |= FILE_FLAG_BACKUP_SEMANTICS;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, flag,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return -1;
+    h = CreateFileW(name, FILE_READ_ਗੁਣ,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, ਨਿਰਾ, OPEN_EXISTING, flag,
+	    ਨਿਰਾ);
+    ਜੇ (h == INVALID_HANDLE_ਮੁੱਲ)
+	ਵਾਪਸ -1;
 
     fd = _open_osfhandle((intptr_t)h, _O_RDONLY);
-    n = _fstat(fd, (struct _stat *)stp);
-    if ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
-	stp->st_mode = (stp->st_mode & ~S_IFMT) | S_IFDIR;
+    n = _fstat(fd, (ਬਣਤਰ _stat *)stp);
+    ਜੇ ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	stp->st_ਬਹੁਲਕ = (stp->st_ਬਹੁਲਕ & ~S_IFMT) | S_IFDIR;
     _close(fd);
 
-    return n;
+    ਵਾਪਸ n;
 }
 
 /*
  * stat() can't handle a trailing '/' or '\', remove it first.
  * When 'resolve' is true behave as lstat() wrt symlinks.
  */
-    static int
-stat_impl(const char *name, stat_T *stp, const int resolve)
+    ਸਥਿਰ ਪੂਰਨ
+stat_impl(ਅਚਲ ਅੱਖਰ *name, stat_T *stp, ਅਚਲ ਪੂਰਨ resolve)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3 + 1];
+    char_u	buf[MAX_ਰਸਤਾ_2 * 3 + 1];
     size_t	buflen;
     char_u	*p;
     WCHAR	*wp;
-    int		n;
+    ਪੂਰਨ		n;
 
-    vim_strncpy((char_u *)buf, (char_u *)name, sizeof(buf) - 1);
+    vim_strncpy((char_u *)buf, (char_u *)name, ਆਕਾਰ(buf) - 1);
     buflen = STRLEN(buf);
     p = buf + buflen;
-    if (p > buf)
-	MB_PTR_BACK(buf, p);
+    ਜੇ (p > buf)
+	MB_PTR_ਪਿੱਠ(buf, p);
 
     // Remove trailing '\\' except root path.
-    if (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
+    ਜੇ (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
     {
 	*p = NUL;
 	buflen = (size_t)(p - buf);
     }
 
-    if ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
+    ਜੇ ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
     {
 	// UNC root path must be followed by '\\'.
 	p = vim_strpbrk(buf + 2, (char_u *)"\\/");
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    p = vim_strpbrk(p + 1, (char_u *)"\\/");
-	    if (p == NULL)
+	    ਜੇ (p == ਨਿਰਾ)
 		STRCPY(buf + buflen, "\\");
 	}
     }
 
-    wp = enc_to_utf16(buf, NULL);
-    if (wp == NULL)
-	return -1;
+    wp = enc_ਮੰਜ਼ਿਲ_utf16(buf, ਨਿਰਾ);
+    ਜੇ (wp == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
     n = mswin_stat_impl(wp, stp, resolve);
     vim_free(wp);
-    return n;
+    ਵਾਪਸ n;
 }
 
-    int
-vim_lstat(const char *name, stat_T *stp)
+    ਪੂਰਨ
+vim_lstat(ਅਚਲ ਅੱਖਰ *name, stat_T *stp)
 {
-    return stat_impl(name, stp, FALSE);
+    ਵਾਪਸ stat_impl(name, stp, FALSE);
 }
 
-    int
-vim_stat(const char *name, stat_T *stp)
+    ਪੂਰਨ
+vim_stat(ਅਚਲ ਅੱਖਰ *name, stat_T *stp)
 {
-    return stat_impl(name, stp, TRUE);
+    ਵਾਪਸ stat_impl(name, stp, TRUE);
 }
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    void
-mch_settmode(tmode_T tmode UNUSED)
+#ਜੇ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    ਖਾਲੀ
+mch_settmode(tmode_T tmode ਅਣਵਰਤਿਆ)
 {
     // nothing to do
 }
 
-    int
-mch_get_shellsize(void)
+    ਪੂਰਨ
+mch_get_shellsize(ਖਾਲੀ)
 {
     // never used
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    void
-mch_set_shellsize(void)
+    ਖਾਲੀ
+mch_ਸੈੱਟ_shellsize(ਖਾਲੀ)
 {
     // never used
 }
@@ -595,30 +595,30 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    ਖਾਲੀ
+mch_new_shellsize(ਖਾਲੀ)
 {
     // never used
 }
 
-    void
-mch_calc_cell_size(struct cellsize *cs_out UNUSED)
+    ਖਾਲੀ
+mch_calc_cell_ਮਾਪ(ਬਣਤਰ cellsize *cs_ਬਾਹਰਲਾ ਅਣਵਰਤਿਆ)
 {
     // never used
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * We have no job control, so fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    ਖਾਲੀ
+mch_suspend(ਖਾਲੀ)
 {
     suspend_shell();
 }
 
-#if defined(USE_MCH_ERRMSG)
+#ਜੇ defined(USE_MCH_ERRMSG)
 
 # ifdef display_errors
 #  undef display_errors
@@ -627,76 +627,76 @@ mch_suspend(void)
 /*
  * Display the saved error message(s).
  */
-    void
-display_errors(void)
+    ਖਾਲੀ
+display_errors(ਖਾਲੀ)
 {
 # ifdef FEAT_GUI
     char_u *p;
 
 #  ifdef VIMDLL
-    if (gui.in_use || gui.starting)
+    ਜੇ (gui.ਵਿੱਚ_use || gui.starting)
 #  endif
     {
-	if (error_ga.ga_data != NULL)
+	ਜੇ (error_ga.ga_ਅੰਕੜੇ != ਨਿਰਾ)
 	{
 	    // avoid putting up a message box with blanks only
-	    for (p = (char_u *)error_ga.ga_data; *p; ++p)
-		if (!SAFE_isspace(*p))
+	    ਲਈ (p = (char_u *)error_ga.ga_ਅੰਕੜੇ; *p; ++p)
+		ਜੇ (!ਸੁਰੱਖਿਅਤ_isspace(*p))
 		{
 		    // Only use a dialog when not using --gui-dialog-file:
 		    // write text to a file.
-		    if (!gui_dialog_log((char_u *)"Errors", p))
-			(void)gui_mch_dialog(
+		    ਜੇ (!gui_dialog_log((char_u *)"Errors", p))
+			(ਖਾਲੀ)gui_mch_dialog(
 				     gui.starting ? VIM_INFO :
 					     VIM_ERROR,
 				     gui.starting ? (char_u *)_("Message") :
 					     (char_u *)_("Error"),
 					     p, (char_u *)_("&Ok"),
-					1, NULL, FALSE);
-		    break;
+					1, ਨਿਰਾ, FALSE);
+		    ਰੋਕੋ;
 		}
 	    ga_clear(&error_ga);
 	}
-	return;
+	ਵਾਪਸ;
     }
 # endif
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
     FlushFileBuffers(GetStdHandle(STD_ERROR_HANDLE));
 # endif
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
 /*
  * Return TRUE if "p" contain a wildcard that can be expanded by
  * dos_expandpath().
  */
-    int
+    ਪੂਰਨ
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ਲਈ ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*[", *p) != NULL
+	ਜੇ (vim_strchr((char_u *)"?*[", *p) != ਨਿਰਾ
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
  * Return TRUE if "p" contain a wildcard or a "~1" kind of thing (could be a
  * shortened file name).
  */
-    int
+    ਪੂਰਨ
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ਲਈ ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*$[`", *p) != NULL
+	ਜੇ (vim_strchr((char_u *)"?*$[`", *p) != ਨਿਰਾ
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 
@@ -704,128 +704,128 @@ mch_has_wildcard(char_u *p)
  * The normal _chdir() does not change the default drive.  This one does.
  * Returning 0 implies success; -1 implies failure.
  */
-    int
-mch_chdir(char *path)
+    ਪੂਰਨ
+mch_chdir(ਅੱਖਰ *ਰਸਤਾ)
 {
     WCHAR   *p;
-    int	    n;
+    ਪੂਰਨ	    n;
 
-    if (path[0] == NUL)		// just checking...
-	return -1;
+    ਜੇ (ਰਸਤਾ[0] == NUL)		// just checking...
+	ਵਾਪਸ -1;
 
-    if (p_verbose >= 5)
+    ਜੇ (p_verbose >= 5)
     {
 	verbose_enter();
-	smsg("chdir(%s)", path);
+	smsg("chdir(%s)", ਰਸਤਾ);
 	verbose_leave();
     }
-    if (SAFE_isalpha(path[0]) && path[1] == ':')	// has a drive name
+    ਜੇ (ਸੁਰੱਖਿਅਤ_isalpha(ਰਸਤਾ[0]) && ਰਸਤਾ[1] == ':')	// has a drive name
     {
 	// If we can change to the drive, skip that part of the path.  If we
 	// can't then the current directory may be invalid, try using chdir()
 	// with the whole path.
-	if (_chdrive(TOLOWER_ASC(path[0]) - 'a' + 1) == 0)
-	    path += 2;
+	ਜੇ (_chdrive(TOLOWER_ASC(ਰਸਤਾ[0]) - 'a' + 1) == 0)
+	    ਰਸਤਾ += 2;
     }
 
-    if (*path == NUL)		// drive name only
-	return 0;
+    ਜੇ (*ਰਸਤਾ == NUL)		// drive name only
+	ਵਾਪਸ 0;
 
-    p = enc_to_utf16((char_u *)path, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_ਮੰਜ਼ਿਲ_utf16((char_u *)ਰਸਤਾ, ਨਿਰਾ);
+    ਜੇ (p == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
     n = _wchdir(p);
     vim_free(p);
-    return n;
+    ਵਾਪਸ n;
 }
 
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#ਜੇ defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    ਪੂਰਨ
+mch_char_avail(ਖਾਲੀ)
 {
     // never used
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-# if defined(FEAT_TERMINAL)
+# ਜੇ defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    ਪੂਰਨ
+mch_check_messages(ਖਾਲੀ)
 {
     // TODO: check for messages
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 
-#if defined(FEAT_LIBCALL)
+#ਜੇ defined(FEAT_LIBCALL)
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  * Return OK if it worked, FAIL if not.
  */
-typedef char_u *(*MYSTRPROCSTR)(char_u *);
-typedef int (*MYSTRPROCINT)(char_u *);
-typedef char_u *(*MYINTPROCSTR)(int);
-typedef int (*MYINTPROCINT)(int);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ char_u *(*MYSTRPROCSTR)(char_u *);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*MYSTRPROCINT)(char_u *);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ char_u *(*MYINTPROCSTR)(ਪੂਰਨ);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*MYINTPROCINT)(ਪੂਰਨ);
 
 /*
  * Check if a pointer points to a valid NUL terminated string.
  * Return the length of the string, including terminating NUL.
  * Returns 0 for an invalid pointer, 1 for an empty string.
  */
-    static size_t
+    ਸਥਿਰ size_t
 check_str_len(char_u *str)
 {
     SYSTEM_INFO			si;
-    MEMORY_BASIC_INFORMATION	mbi;
-    size_t			length = 0;
+    ਸਮ੍ਰਿਤੀ_BASIC_INFORMATION	mbi;
+    size_t			ਲੰਮਾਈ = 0;
     size_t			i;
-    const char_u		*p;
+    ਅਚਲ char_u		*p;
 
     // get page size
     GetSystemInfo(&si);
 
     // get memory information
-    if (!VirtualQuery(str, &mbi, sizeof(mbi)))
-	return 0;
+    ਜੇ (!VirtualQuery(str, &mbi, ਆਕਾਰ(mbi)))
+	ਵਾਪਸ 0;
 
     // pre cast these (typing savers)
     long_u dwStr = (long_u)str;
-    long_u dwBaseAddress = (long_u)mbi.BaseAddress;
+    long_u dw_ਅਧਾਰ_ਪਤਾ = (long_u)mbi.ਅਧਾਰ_ਪਤਾ;
 
     // get start address of page that str is on
-    long_u strPage = dwStr - (dwStr - dwBaseAddress) % si.dwPageSize;
+    long_u str_ਪੰਨਾ = dwStr - (dwStr - dw_ਅਧਾਰ_ਪਤਾ) % si.dw_ਪੰਨਾ_ਮਾਪ;
 
     // get length from str to end of page
-    long_u pageLength = si.dwPageSize - (dwStr - strPage);
+    long_u ਪੰਨਾ_ਲੰਮਾਈ = si.dw_ਪੰਨਾ_ਮਾਪ - (dwStr - str_ਪੰਨਾ);
 
-    for (p = str; !IsBadReadPtr(p, (UINT)pageLength);
-	    p += pageLength, pageLength = si.dwPageSize)
-	for (i = 0; i < pageLength; ++i, ++length)
-	    if (p[i] == NUL)
-		return length + 1;
+    ਲਈ (p = str; !IsBadReadPtr(p, (UINT)ਪੰਨਾ_ਲੰਮਾਈ);
+	    p += ਪੰਨਾ_ਲੰਮਾਈ, ਪੰਨਾ_ਲੰਮਾਈ = si.dw_ਪੰਨਾ_ਮਾਪ)
+	ਲਈ (i = 0; i < ਪੰਨਾ_ਲੰਮਾਈ; ++i, ++ਲੰਮਾਈ)
+	    ਜੇ (p[i] == NUL)
+		ਵਾਪਸ ਲੰਮਾਈ + 1;
 
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 /*
  * Passed to do_in_runtimepath() to load a vim.ico file.
  */
-    static void
-mch_icon_load_cb(char_u *fname, void *cookie)
+    ਸਥਿਰ ਖਾਲੀ
+mch_icon_ਲੱਦੋ_cb(char_u *fname, ਖਾਲੀ *cookie)
 {
     HANDLE *h = (HANDLE *)cookie;
 
-    *h = LoadImage(NULL,
+    *h = ਲੱਦੋ_Image(ਨਿਰਾ,
 		   (LPSTR)fname,
 		   IMAGE_ICON,
 		   64,
@@ -836,122 +836,122 @@ mch_icon_load_cb(char_u *fname, void *cookie)
 /*
  * Try loading an icon file from 'runtimepath'.
  */
-    int
-mch_icon_load(HANDLE *iconp)
+    ਪੂਰਨ
+mch_icon_ਲੱਦੋ(HANDLE *iconp)
 {
-    return do_in_runtimepath((char_u *)"bitmaps/vim.ico",
-						  0, mch_icon_load_cb, iconp);
+    ਵਾਪਸ do_ਵਿੱਚ_runtimepath((char_u *)"bitmaps/vim.ico",
+						  0, mch_icon_ਲੱਦੋ_cb, iconp);
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    ਪੂਰਨ
+mch_get_random(char_u *buf, ਪੂਰਨ len)
 {
-    static int		initialized = NOTDONE;
-    static HINSTANCE	hInstLib;
-    static BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
+    ਸਥਿਰ ਪੂਰਨ		initialized = NOTDONE;
+    ਸਥਿਰ HINSTANCE	hInstLib;
+    ਸਥਿਰ BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
 
-    if (initialized == NOTDONE)
+    ਜੇ (initialized == NOTDONE)
     {
-	hInstLib = vimLoadLib("bcryptprimitives.dll");
-	if (hInstLib != NULL)
-	    pProcessPrng = (void *)GetProcAddress(hInstLib, "ProcessPrng");
-	if (hInstLib == NULL || pProcessPrng == NULL)
+	hInstLib = vim_ਲੱਦੋ_Lib("bcryptprimitives.dll");
+	ਜੇ (hInstLib != ਨਿਰਾ)
+	    pProcessPrng = (ਖਾਲੀ *)Get_Proc_ਪਤਾ(hInstLib, "ProcessPrng");
+	ਜੇ (hInstLib == ਨਿਰਾ || pProcessPrng == ਨਿਰਾ)
 	{
 	    FreeLibrary(hInstLib);
 	    initialized = FAIL;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    initialized = OK;
     }
 
-    if (initialized == FAIL)
-	return FAIL;
+    ਜੇ (initialized == FAIL)
+	ਵਾਪਸ FAIL;
 
     // According to the documentation this call cannot fail.
     pProcessPrng(buf, len);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
-    int
+    ਪੂਰਨ
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
-    char_u	**string_result,// NULL when using number_result
-    int		*number_result)
+    ਪੂਰਨ		argint,
+    char_u	**string_ਨਤੀਜਾ,// NULL when using number_result
+    ਪੂਰਨ		*ਸੰਖਿਆ_ਨਤੀਜਾ)
 {
     HINSTANCE		hinstLib;
 
-    BOOL fRunTimeLinkSuccess = FALSE;
+    BOOL f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = FALSE;
 
     // Get a handle to the DLL module.
-    hinstLib = vimLoadLib((char *)libname);
+    hinstLib = vim_ਲੱਦੋ_Lib((ਅੱਖਰ *)libname);
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    ਜੇ (hinstLib != ਨਿਰਾ)
     {
-	char_u	*retval_str = NULL;
-	int	retval_int = 0;
+	char_u	*retval_str = ਨਿਰਾ;
+	ਪੂਰਨ	retval_int = 0;
 	size_t	len;
 
 # ifdef HAVE_TRY_EXCEPT
 	__try
 	{
 # endif
-	if (argstring != NULL)
+	ਜੇ (argstring != ਨਿਰਾ)
 	{
 	    // Call with string argument
-	    if (string_result != NULL)
+	    ਜੇ (string_ਨਤੀਜਾ != ਨਿਰਾ)
 	    {
 		MYSTRPROCSTR proc;
 
-		proc = (MYSTRPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCSTR)Get_Proc_ਪਤਾ(hinstLib, (LPCSTR)funcname);
+		ਜੇ (proc != ਨਿਰਾ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = TRUE;
 		    retval_str = proc(argstring);
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		MYSTRPROCINT proc;
 
-		proc = (MYSTRPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCINT)Get_Proc_ਪਤਾ(hinstLib, (LPCSTR)funcname);
+		ਜੇ (proc != ਨਿਰਾ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = TRUE;
 		    retval_int = proc(argstring);
 		}
 	    }
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    // Call with number argument
-	    if (string_result != NULL)
+	    ਜੇ (string_ਨਤੀਜਾ != ਨਿਰਾ)
 	    {
 		MYINTPROCSTR proc;
 
-		proc = (MYINTPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCSTR)Get_Proc_ਪਤਾ(hinstLib, (LPCSTR)funcname);
+		ਜੇ (proc != ਨਿਰਾ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = TRUE;
 		    retval_str = proc(argint);
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		MYINTPROCINT proc;
 
-		proc = (MYINTPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCINT)Get_Proc_ਪਤਾ(hinstLib, (LPCSTR)funcname);
+		ਜੇ (proc != ਨਿਰਾ)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = TRUE;
 		    retval_int = proc(argint);
 		}
 	    }
@@ -959,272 +959,272 @@ mch_libcall(
 
 	// Save the string before we free the library.
 	// Assume that a "1" result is an illegal pointer.
-	if (string_result == NULL)
-	    *number_result = retval_int;
-	else if (retval_str != NULL
+	ਜੇ (string_ਨਤੀਜਾ == ਨਿਰਾ)
+	    *ਸੰਖਿਆ_ਨਤੀਜਾ = retval_int;
+	ਨਹੀਂਤਾਂ ਜੇ (retval_str != ਨਿਰਾ
 		&& (len = check_str_len(retval_str)) > 0)
 	{
-	    *string_result = alloc(len);
-	    if (*string_result != NULL)
-		mch_memmove(*string_result, retval_str, len);
+	    *string_ਨਤੀਜਾ = alloc(len);
+	    ਜੇ (*string_ਨਤੀਜਾ != ਨਿਰਾ)
+		mch_memmove(*string_ਨਤੀਜਾ, retval_str, len);
 	}
 
 # ifdef HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-	    if (GetExceptionCode() == EXCEPTION_STACK_OVERFLOW)
+	    ਜੇ (Get_Exception_ਕੋਡ() == EXCEPTION_ਢੇਰ_ਉਛਾਲ)
 		_resetstkoflw();
-	    fRunTimeLinkSuccess = FALSE;
+	    f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success = FALSE;
 	}
 # endif
 
 	// Free the DLL module.
-	(void)FreeLibrary(hinstLib);
+	(ਖਾਲੀ)FreeLibrary(hinstLib);
     }
 
-    if (!fRunTimeLinkSuccess)
+    ਜੇ (!f_ਲੜੀਵਾਰ_ਸਮਾਂ_Link_Success)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Debugging helper: expose the MCH_WRITE_DUMP stuff to other modules
  */
-    void
-DumpPutS(const char *psz UNUSED)
+    ਖਾਲੀ
+DumpPutS(ਅਚਲ ਅੱਖਰ *psz ਅਣਵਰਤਿਆ)
 {
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ MCH_WRITE_DUMP
+    ਜੇ (fdDump)
     {
 	fputs(psz, fdDump);
-	if (psz[strlen(psz) - 1] != '\n')
+	ਜੇ (psz[ਲੜੀ_ਲੰਬਾਈ(psz) - 1] != '\n')
 	    fputc('\n', fdDump);
 	fflush(fdDump);
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#ifdef _DEBUG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _DEBUG
 
-void __cdecl
+ਖਾਲੀ __cdecl
 Trace(
-    char *pszFormat,
+    ਅੱਖਰ *pszFormat,
     ...)
 {
     CHAR szBuff[2048];
-    va_list args;
+    va_list ਦਲੀਲਾਂ;
 
-    va_start(args, pszFormat);
-    vsprintf(szBuff, pszFormat, args);
-    va_end(args);
+    va_start(ਦਲੀਲਾਂ, pszFormat);
+    vsprintf(szBuff, pszFormat, ਦਲੀਲਾਂ);
+    va_end(ਦਲੀਲਾਂ);
 
     OutputDebugString(szBuff);
 }
 
-#endif //_DEBUG
+#ਜੇ_ਅੰਤ //_DEBUG
 
-#if !defined(FEAT_GUI) || defined(VIMDLL)
-extern HWND g_hWnd;	// This is in os_win32.c.
+#ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
+ਬਾਹਰੀ HWND g_hWnd;	// This is in os_win32.c.
 
 /*
  * Showing the printer dialog is tricky since we have no GUI
  * window to parent it. The following routines are needed to
  * get the window parenting and Z-order to work properly.
  */
-    static void
-GetConsoleHwnd(void)
+    ਸਥਿਰ ਖਾਲੀ
+GetConsoleHwnd(ਖਾਲੀ)
 {
     // Skip if it's already set.
-    if (s_hwnd != 0)
-	return;
+    ਜੇ (s_hwnd != 0)
+	ਵਾਪਸ;
 
     // Window handle may have been found by init code (Windows NT only)
-    if (g_hWnd != 0)
+    ਜੇ (g_hWnd != 0)
     {
 	s_hwnd = g_hWnd;
-	return;
+	ਵਾਪਸ;
     }
 
-    s_hwnd = GetConsoleWindow();
+    s_hwnd = Get_Console_ਖਿੜਕੀ();
 }
 
 /*
  * Console implementation of ":winpos".
  */
-    int
-mch_get_winpos(int *x, int *y)
+    ਪੂਰਨ
+mch_get_winpos(ਪੂਰਨ *x, ਪੂਰਨ *y)
 {
     RECT  rect;
 
     GetConsoleHwnd();
-    GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    Get_ਖਿੜਕੀ_Rect(s_hwnd, &rect);
+    *x = rect.ਖੱਬਾ;
+    *y = rect.ਸਿਖਰ;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Console implementation of ":winpos x y".
  */
-    void
-mch_set_winpos(int x, int y)
+    ਖਾਲੀ
+mch_ਸੈੱਟ_winpos(ਪੂਰਨ x, ਪੂਰਨ y)
 {
     GetConsoleHwnd();
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    ਸੈੱਟ_ਖਿੜਕੀ_Pos(s_hwnd, ਨਿਰਾ, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#ਜੇ defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 
 //=================================================================
 // Win32 printer stuff
 
-static HFONT		prt_font_handles[2][2][2];
-static PRINTDLGW	prt_dlg;
-static const int	boldface[2] = {FW_REGULAR, FW_BOLD};
-static TEXTMETRIC	prt_tm;
-static int		prt_line_height;
-static int		prt_number_width;
-static int		prt_left_margin;
-static int		prt_right_margin;
-static int		prt_top_margin;
-static char_u		szAppName[] = TEXT("VIM");
-static HWND		hDlgPrint;
-static int		*bUserAbort = NULL;
-static char_u		*prt_name = NULL;
+ਸਥਿਰ HFONT		prt_font_handles[2][2][2];
+ਸਥਿਰ PRINTDLGW	prt_dlg;
+ਸਥਿਰ ਅਚਲ ਪੂਰਨ	boldface[2] = {FW_REGULAR, FW_BOLD};
+ਸਥਿਰ TEXTMETRIC	prt_tm;
+ਸਥਿਰ ਪੂਰਨ		prt_ਸਤਰ_ਉਚਾਈ;
+ਸਥਿਰ ਪੂਰਨ		prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
+ਸਥਿਰ ਪੂਰਨ		prt_ਖੱਬਾ_margin;
+ਸਥਿਰ ਪੂਰਨ		prt_ਸੱਜਾ_margin;
+ਸਥਿਰ ਪੂਰਨ		prt_ਸਿਖਰ_margin;
+ਸਥਿਰ char_u		szAppName[] = ਪਾਠ_3("VIM");
+ਸਥਿਰ HWND		hDlgPrint;
+ਸਥਿਰ ਪੂਰਨ		*bUserAbort = ਨਿਰਾ;
+ਸਥਿਰ char_u		*prt_name = ਨਿਰਾ;
 
 // Defines which are also in vim.rc.
 # define IDC_BOX1		400
 # define IDC_PRINTTEXT1		401
 # define IDC_PRINTTEXT2		402
-# define IDC_PROGRESS		403
+# define IDC_ਤਰੱਕੀ		403
 
-    static BOOL
-vimSetDlgItemText(HWND hDlg, int nIDDlgItem, char_u *s)
+    ਸਥਿਰ BOOL
+vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(HWND hDlg, ਪੂਰਨ n_IDDlg_ਵਸਤੂ, char_u *s)
 {
     WCHAR   *wp;
     BOOL    ret;
 
-    wp = enc_to_utf16(s, NULL);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_ਮੰਜ਼ਿਲ_utf16(s, ਨਿਰਾ);
+    ਜੇ (wp == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-    ret = SetDlgItemTextW(hDlg, nIDDlgItem, wp);
+    ret = ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ_W(hDlg, n_IDDlg_ਵਸਤੂ, wp);
     vim_free(wp);
-    return ret;
+    ਵਾਪਸ ret;
 }
 
 /*
  * Convert BGR to RGB for Windows GDI calls
  */
-    static COLORREF
-swap_me(COLORREF colorref)
+    ਸਥਿਰ COLORREF
+ਅਦਲਾ_ਬਦਲੀ_me(COLORREF colorref)
 {
-    int  temp;
-    char *ptr = (char *)&colorref;
+    ਪੂਰਨ  ਆਰਜ਼ੀ;
+    ਅੱਖਰ *ptr = (ਅੱਖਰ *)&colorref;
 
-    temp = *(ptr);
+    ਆਰਜ਼ੀ = *(ptr);
     *(ptr ) = *(ptr + 2);
-    *(ptr + 2) = temp;
-    return colorref;
+    *(ptr + 2) = ਆਰਜ਼ੀ;
+    ਵਾਪਸ colorref;
 }
 
-    static INT_PTR CALLBACK
+    ਸਥਿਰ INT_PTR CALLBACK
 PrintDlgProc(
 	HWND hDlg,
-	UINT message,
-	WPARAM wParam UNUSED,
-	LPARAM lParam UNUSED)
+	UINT ਸੁਨੇਹਾ_2,
+	WPARAM wParam ਅਣਵਰਤਿਆ,
+	LPARAM lParam ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_GETTEXT
     NONCLIENTMETRICS nm;
-    static HFONT hfont;
+    ਸਥਿਰ HFONT hfont;
 # endif
 
-    switch (message)
+    ਚੋਣ (ਸੁਨੇਹਾ_2)
     {
-	case WM_INITDIALOG:
+	ਹਾਲਤ WM_INITDIALOG:
 # ifdef FEAT_GETTEXT
-	    nm.cbSize = sizeof(NONCLIENTMETRICS);
-	    if (SystemParametersInfo(
+	    nm.cb_ਮਾਪ = ਆਕਾਰ(NONCLIENTMETRICS);
+	    ਜੇ (SystemParametersInfo(
 			SPI_GETNONCLIENTMETRICS,
-			sizeof(NONCLIENTMETRICS),
+			ਆਕਾਰ(NONCLIENTMETRICS),
 			&nm,
 			0))
 	    {
-		char buff[MAX_PATH];
-		int i;
+		ਅੱਖਰ buff[MAX_ਰਸਤਾ];
+		ਪੂਰਨ i;
 
 		// Translate the dialog texts
-		hfont = CreateFontIndirect(&nm.lfMessageFont);
-		for (i = IDC_PRINTTEXT1; i <= IDC_PROGRESS; i++)
+		hfont = Create_Font_ਅਸਿੱਧਾ(&nm.lf_ਸੁਨੇਹਾ_Font);
+		ਲਈ (i = IDC_PRINTTEXT1; i <= IDC_ਤਰੱਕੀ; i++)
 		{
-		    SendDlgItemMessage(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
-		    if (GetDlgItemText(hDlg,i, buff, sizeof(buff)))
-			vimSetDlgItemText(hDlg,i, (char_u *)_(buff));
+		    Send_Dlg_ਵਸਤੂ_ਸੁਨੇਹਾ(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
+		    ਜੇ (Get_Dlg_ਵਸਤੂ_ਪਾਠ(hDlg,i, buff, ਆਕਾਰ(buff)))
+			vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(hDlg,i, (char_u *)_(buff));
 		}
-		SendDlgItemMessage(hDlg, IDCANCEL,
+		Send_Dlg_ਵਸਤੂ_ਸੁਨੇਹਾ(hDlg, IDCANCEL,
 						WM_SETFONT, (WPARAM)hfont, 1);
-		if (GetDlgItemText(hDlg,IDCANCEL, buff, sizeof(buff)))
-		    vimSetDlgItemText(hDlg,IDCANCEL, (char_u *)_(buff));
+		ਜੇ (Get_Dlg_ਵਸਤੂ_ਪਾਠ(hDlg,IDCANCEL, buff, ਆਕਾਰ(buff)))
+		    vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(hDlg,IDCANCEL, (char_u *)_(buff));
 	    }
 # endif
-	    SetWindowText(hDlg, (LPCSTR)szAppName);
-	    if (prt_name != NULL)
+	    ਸੈੱਟ_ਖਿੜਕੀ_ਪਾਠ(hDlg, (LPCSTR)szAppName);
+	    ਜੇ (prt_name != ਨਿਰਾ)
 	    {
-		vimSetDlgItemText(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
+		vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
 		VIM_CLEAR(prt_name);
 	    }
-	    EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+	    Enable_Menu_ਵਸਤੂ(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
+# ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    if (!gui.in_use)
+	    ਜੇ (!gui.ਵਿੱਚ_use)
 #  endif
-		BringWindowToTop(s_hwnd);
+		Bring_ਖਿੜਕੀ_ਮੰਜ਼ਿਲ_ਸਿਖਰ(s_hwnd);
 # endif
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
 
-	case WM_COMMAND:
+	ਹਾਲਤ WM_COMMAND:
 	    *bUserAbort = TRUE;
-	    EnableWindow(GetParent(hDlg), TRUE);
-	    DestroyWindow(hDlg);
-	    hDlgPrint = NULL;
+	    Enable_ਖਿੜਕੀ(Get_ਮਾਪਾ(hDlg), TRUE);
+	    Destroy_ਖਿੜਕੀ(hDlg);
+	    hDlgPrint = ਨਿਰਾ;
 # ifdef FEAT_GETTEXT
 	    DeleteObject(hfont);
 # endif
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    static BOOL CALLBACK
-AbortProc(HDC hdcPrn UNUSED, int iCode UNUSED)
+    ਸਥਿਰ BOOL CALLBACK
+AbortProc(HDC hdcPrn ਅਣਵਰਤਿਆ, ਪੂਰਨ i_ਕੋਡ ਅਣਵਰਤਿਆ)
 {
-    MSG msg;
+    ਸੁਨੇਹਾ_3 ਸੁਨੇਹਾ;
 
-    while (!*bUserAbort && PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    ਜਦੋਂ (!*bUserAbort && Peek_ਸੁਨੇਹਾ_W(&ਸੁਨੇਹਾ, ਨਿਰਾ, 0, 0, PM_REMOVE))
     {
-	if (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &msg))
+	ਜੇ (!hDlgPrint || !Is_Dialog_ਸੁਨੇਹਾ_W(hDlgPrint, &ਸੁਨੇਹਾ))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_ਸੁਨੇਹਾ(&ਸੁਨੇਹਾ);
+	    Dispatch_ਸੁਨੇਹਾ_W(&ਸੁਨੇਹਾ);
 	}
     }
-    return !*bUserAbort;
+    ਵਾਪਸ !*bUserAbort;
 }
 
-    static UINT_PTR CALLBACK
+    ਸਥਿਰ UINT_PTR CALLBACK
 PrintHookProc(
 	HWND hDlg,	// handle to dialog box
-	UINT uiMsg,	// message identifier
-	WPARAM wParam UNUSED,	// message parameter
+	UINT ui_ਸੁਨੇਹਾ,	// message identifier
+	WPARAM wParam ਅਣਵਰਤਿਆ,	// message parameter
 	LPARAM lParam	// message parameter
 	)
 {
@@ -1232,15 +1232,15 @@ PrintHookProc(
     RECT	rc, rcDlg, rcOwner;
     PRINTDLGW	*pPD;
 
-    if (uiMsg != WM_INITDIALOG)
-	return FALSE;
+    ਜੇ (ui_ਸੁਨੇਹਾ != WM_INITDIALOG)
+	ਵਾਪਸ FALSE;
 
     // Get the owner window and dialog box rectangles.
-    if ((hwndOwner = GetParent(hDlg)) == NULL)
-	hwndOwner = GetDesktopWindow();
+    ਜੇ ((hwndOwner = Get_ਮਾਪਾ(hDlg)) == ਨਿਰਾ)
+	hwndOwner = Get_Desktop_ਖਿੜਕੀ();
 
-    GetWindowRect(hwndOwner, &rcOwner);
-    GetWindowRect(hDlg, &rcDlg);
+    Get_ਖਿੜਕੀ_Rect(hwndOwner, &rcOwner);
+    Get_ਖਿੜਕੀ_Rect(hDlg, &rcDlg);
     CopyRect(&rc, &rcOwner);
 
     // Offset the owner and dialog box rectangles so that
@@ -1248,183 +1248,183 @@ PrintHookProc(
     // height, and then offset the owner again to discard
     // space taken up by the dialog box.
 
-    OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top);
-    OffsetRect(&rc, -rc.left, -rc.top);
-    OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
+    ਵਿੱਥ_Rect(&rcDlg, -rcDlg.ਖੱਬਾ, -rcDlg.ਸਿਖਰ);
+    ਵਿੱਥ_Rect(&rc, -rc.ਖੱਬਾ, -rc.ਸਿਖਰ);
+    ਵਿੱਥ_Rect(&rc, -rcDlg.ਸੱਜਾ, -rcDlg.bottom);
 
     // The new position is the sum of half the remaining
     // space and the owner's original position.
 
-    SetWindowPos(hDlg,
-	    HWND_TOP,
-	    rcOwner.left + (rc.right / 2),
-	    rcOwner.top + (rc.bottom / 2),
+    ਸੈੱਟ_ਖਿੜਕੀ_Pos(hDlg,
+	    HWND_ਸਿਖਰ,
+	    rcOwner.ਖੱਬਾ + (rc.ਸੱਜਾ / 2),
+	    rcOwner.ਸਿਖਰ + (rc.bottom / 2),
 	    0, 0,		// ignores size arguments
 	    SWP_NOSIZE);
 
     //  tackle the printdlg copiesctrl problem
     pPD = (PRINTDLGW *)lParam;
-    pPD->nCopies = (WORD)pPD->lCustData;
-    SetDlgItemInt( hDlg, edt3, pPD->nCopies, FALSE );
+    pPD->nCopies = (ਸ਼ਬਦ_2)pPD->l_Cust_ਅੰਕੜੇ;
+    ਸੈੱਟ_Dlg_ਵਸਤੂ_Int( hDlg, edt3, pPD->nCopies, FALSE );
     //  Bring the window to top
-    BringWindowToTop(GetParent(hDlg));
-    SetForegroundWindow(hDlg);
+    Bring_ਖਿੜਕੀ_ਮੰਜ਼ਿਲ_ਸਿਖਰ(Get_ਮਾਪਾ(hDlg));
+    ਸੈੱਟ_Foreground_ਖਿੜਕੀ(hDlg);
 
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    void
-mch_print_cleanup(void)
+    ਖਾਲੀ
+mch_print_cleanup(ਖਾਲੀ)
 {
-    int pifItalic;
-    int pifBold;
-    int pifUnderline;
+    ਪੂਰਨ pifItalic;
+    ਪੂਰਨ pifBold;
+    ਪੂਰਨ pifUnderline;
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    ਲਈ (pifBold = 0; pifBold <= 1; pifBold++)
+	ਲਈ (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    ਲਈ (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 		DeleteObject(prt_font_handles[pifBold][pifItalic][pifUnderline]);
 
-    if (prt_dlg.hDC != NULL)
+    ਜੇ (prt_dlg.hDC != ਨਿਰਾ)
 	DeleteDC(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    ਜੇ (!*bUserAbort && hDlgPrint != ਨਿਰਾ)
+	Send_ਸੁਨੇਹਾ(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    static int
-to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
+    ਸਥਿਰ ਪੂਰਨ
+ਮੰਜ਼ਿਲ_device_units(ਪੂਰਨ idx, ਪੂਰਨ dpi, ਪੂਰਨ physsize, ਪੂਰਨ ਵਿੱਥ, ਪੂਰਨ def_ਸੰਖਿਆ)
 {
-    int		ret = 0;
-    int		u;
-    int		nr;
+    ਪੂਰਨ		ret = 0;
+    ਪੂਰਨ		u;
+    ਪੂਰਨ		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    ਜੇ (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_ਸੰਖਿਆ;
     }
-    else
-	nr = printer_opts[idx].number;
+    ਨਹੀਂਤਾਂ
+	nr = printer_opts[idx].ਸੰਖਿਆ;
 
-    switch (u)
+    ਚੋਣ (u)
     {
-	case PRT_UNIT_PERC:
+	ਹਾਲਤ PRT_UNIT_PERC:
 	    ret = (physsize * nr) / 100;
-	    break;
-	case PRT_UNIT_INCH:
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_INCH:
 	    ret = (nr * dpi);
-	    break;
-	case PRT_UNIT_MM:
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_MM:
 	    ret = (nr * 10 * dpi) / 254;
-	    break;
-	case PRT_UNIT_POINT:
+	    ਰੋਕੋ;
+	ਹਾਲਤ PRT_UNIT_ਬਿੰਦੂ:
 	    ret = (nr * 10 * dpi) / 720;
-	    break;
+	    ਰੋਕੋ;
     }
 
-    if (ret < offset)
-	return 0;
-    else
-	return ret - offset;
+    ਜੇ (ret < ਵਿੱਥ)
+	ਵਾਪਸ 0;
+    ਨਹੀਂਤਾਂ
+	ਵਾਪਸ ret - ਵਿੱਥ;
 }
 
-    static int
-prt_get_cpl(void)
+    ਸਥਿਰ ਪੂਰਨ
+prt_get_cpl(ਖਾਲੀ)
 {
-    int		hr;
-    int		phyw;
-    int		dvoff;
-    int		rev_offset;
-    int		dpi;
+    ਪੂਰਨ		hr;
+    ਪੂਰਨ		phyw;
+    ਪੂਰਨ		dvoff;
+    ਪੂਰਨ		rev_ਵਿੱਥ;
+    ਪੂਰਨ		dpi;
 
-    GetTextMetrics(prt_dlg.hDC, &prt_tm);
-    prt_line_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
+    Get_ਪਾਠ_Metrics(prt_dlg.hDC, &prt_tm);
+    prt_ਸਤਰ_ਉਚਾਈ = prt_tm.tm_ਉਚਾਈ + prt_tm.tmExternalLeading;
 
     hr	    = GetDeviceCaps(prt_dlg.hDC, HORZRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALWIDTH);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETX);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSX);
 
-    rev_offset = phyw - (dvoff + hr);
+    rev_ਵਿੱਥ = phyw - (dvoff + hr);
 
-    prt_left_margin = to_device_units(OPT_PRINT_LEFT, dpi, phyw, dvoff, 10);
-    if (prt_use_number())
+    prt_ਖੱਬਾ_margin = ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਖੱਬਾ, dpi, phyw, dvoff, 10);
+    ਜੇ (prt_use_ਸੰਖਿਆ())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_tm.tmAveCharWidth;
-	prt_left_margin += prt_number_width;
+	prt_ਸੰਖਿਆ_ਚੌੜਾਈ = PRINT_ਸੰਖਿਆ_ਚੌੜਾਈ * prt_tm.tm_Ave_Char_ਚੌੜਾਈ;
+	prt_ਖੱਬਾ_margin += prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
     }
-    else
-	prt_number_width = 0;
+    ਨਹੀਂਤਾਂ
+	prt_ਸੰਖਿਆ_ਚੌੜਾਈ = 0;
 
-    prt_right_margin = hr - to_device_units(OPT_PRINT_RIGHT, dpi, phyw,
-							       rev_offset, 5);
+    prt_ਸੱਜਾ_margin = hr - ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਸੱਜਾ, dpi, phyw,
+							       rev_ਵਿੱਥ, 5);
 
-    return (prt_right_margin - prt_left_margin) / prt_tm.tmAveCharWidth;
+    ਵਾਪਸ (prt_ਸੱਜਾ_margin - prt_ਖੱਬਾ_margin) / prt_tm.tm_Ave_Char_ਚੌੜਾਈ;
 }
 
-    static int
-prt_get_lpp(void)
+    ਸਥਿਰ ਪੂਰਨ
+prt_get_lpp(ਖਾਲੀ)
 {
-    int vr;
-    int phyw;
-    int dvoff;
-    int rev_offset;
-    int	bottom_margin;
-    int	dpi;
+    ਪੂਰਨ vr;
+    ਪੂਰਨ phyw;
+    ਪੂਰਨ dvoff;
+    ਪੂਰਨ rev_ਵਿੱਥ;
+    ਪੂਰਨ	bottom_margin;
+    ਪੂਰਨ	dpi;
 
     vr	    = GetDeviceCaps(prt_dlg.hDC, VERTRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALHEIGHT);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETY);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSY);
 
-    rev_offset = phyw - (dvoff + vr);
+    rev_ਵਿੱਥ = phyw - (dvoff + vr);
 
-    prt_top_margin = to_device_units(OPT_PRINT_TOP, dpi, phyw, dvoff, 5);
+    prt_ਸਿਖਰ_margin = ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_ਸਿਖਰ, dpi, phyw, dvoff, 5);
 
     // adjust top margin if there is a header
-    prt_top_margin += prt_line_height * prt_header_height();
+    prt_ਸਿਖਰ_margin += prt_ਸਤਰ_ਉਚਾਈ * prt_ਸਿਰਲੇਖ_ਉਚਾਈ();
 
-    bottom_margin = vr - to_device_units(OPT_PRINT_BOT, dpi, phyw,
-							       rev_offset, 5);
+    bottom_margin = vr - ਮੰਜ਼ਿਲ_device_units(OPT_PRINT_BOT, dpi, phyw,
+							       rev_ਵਿੱਥ, 5);
 
-    return (bottom_margin - prt_top_margin) / prt_line_height;
+    ਵਾਪਸ (bottom_margin - prt_ਸਿਖਰ_margin) / prt_ਸਤਰ_ਉਚਾਈ;
 }
 
-    int
-mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
+    ਪੂਰਨ
+mch_print_init(prt_settings_T *psettings, char_u *jobname, ਪੂਰਨ forceit)
 {
-    static HGLOBAL	stored_dm = NULL;
-    static HGLOBAL	stored_devn = NULL;
-    static int		stored_nCopies = 1;
-    static int		stored_nFlags = 0;
+    ਸਥਿਰ HGLOBAL	stored_dm = ਨਿਰਾ;
+    ਸਥਿਰ HGLOBAL	stored_devn = ਨਿਰਾ;
+    ਸਥਿਰ ਪੂਰਨ		stored_nCopies = 1;
+    ਸਥਿਰ ਪੂਰਨ		stored_nFlags = 0;
 
     LOGFONTW		fLogFont;
-    int			pifItalic;
-    int			pifBold;
-    int			pifUnderline;
+    ਪੂਰਨ			pifItalic;
+    ਪੂਰਨ			pifBold;
+    ਪੂਰਨ			pifUnderline;
 
     DEVMODEW		*mem;
     DEVNAMES		*devname;
-    int			i;
+    ਪੂਰਨ			i;
     DWORD		err;
 
     bUserAbort = &(psettings->user_abort);
-    CLEAR_FIELD(prt_dlg);
-    prt_dlg.lStructSize = sizeof(PRINTDLGW);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    CLEAR_ਖੇਤਰ(prt_dlg);
+    prt_dlg.l_Struct_ਮਾਪ = ਆਕਾਰ(PRINTDLGW);
+# ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    ਜੇ (!gui.ਵਿੱਚ_use)
 #  endif
 	GetConsoleHwnd();	    // get value of s_hwnd
 # endif
     prt_dlg.hwndOwner = s_hwnd;
     prt_dlg.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_RETURNDC;
-    if (!forceit)
+    ਜੇ (!forceit)
     {
-	prt_dlg.hDevMode = stored_dm;
-	prt_dlg.hDevNames = stored_devn;
-	prt_dlg.lCustData = stored_nCopies; // work around bug in print dialog
+	prt_dlg.h_Dev_ਬਹੁਲਕ = stored_dm;
+	prt_dlg.h_Dev_ਨਾਂ = stored_devn;
+	prt_dlg.l_Cust_ਅੰਕੜੇ = stored_nCopies; // work around bug in print dialog
 	/*
 	 * Use hook to prevent print dialog being sent to back.
 	 */
@@ -1437,12 +1437,12 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * If bang present, return default printer setup with no dialog
      * never show dialog if we are running over telnet
      */
-    if (forceit
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    ਜੇ (forceit
+# ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    || (!gui.in_use && !term_console)
-#  else
-	    || !term_console
+	    || (!gui.ਵਿੱਚ_use && !ਪਦ_console)
+#  ਨਹੀਂਤਾਂ
+	    || !ਪਦ_console
 #  endif
 # endif
 	    )
@@ -1452,33 +1452,33 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	 * MSDN suggests setting the first parameter to WINSPOOL for
 	 * NT, but NULL appears to work just as well.
 	 */
-	if (*p_pdev != NUL)
-	    prt_dlg.hDC = CreateDC(NULL, (LPCSTR)p_pdev, NULL, NULL);
-	else
+	ਜੇ (*p_pdev != NUL)
+	    prt_dlg.hDC = CreateDC(ਨਿਰਾ, (LPCSTR)p_pdev, ਨਿਰਾ, ਨਿਰਾ);
+	ਨਹੀਂਤਾਂ
 	{
 	    prt_dlg.Flags |= PD_RETURNDEFAULT;
-	    if (PrintDlgW(&prt_dlg) == 0)
-		goto init_fail_dlg;
+	    ਜੇ (PrintDlgW(&prt_dlg) == 0)
+		ਜਾਓ init_fail_dlg;
 	}
     }
-    else if (PrintDlgW(&prt_dlg) == 0)
-	goto init_fail_dlg;
-    else
+    ਨਹੀਂਤਾਂ ਜੇ (PrintDlgW(&prt_dlg) == 0)
+	ਜਾਓ init_fail_dlg;
+    ਨਹੀਂਤਾਂ
     {
 	/*
 	 * keep the previous driver context
 	 */
-	stored_dm = prt_dlg.hDevMode;
-	stored_devn = prt_dlg.hDevNames;
+	stored_dm = prt_dlg.h_Dev_ਬਹੁਲਕ;
+	stored_devn = prt_dlg.h_Dev_ਨਾਂ;
 	stored_nFlags = prt_dlg.Flags;
 	stored_nCopies = prt_dlg.nCopies;
     }
 
-    if (prt_dlg.hDC == NULL)
+    ਜੇ (prt_dlg.hDC == ਨਿਰਾ)
     {
 	emsg(_(e_printer_selection_failed));
 	mch_print_cleanup();
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
     // Not all printer drivers report the support of color (or grey) in the
@@ -1490,89 +1490,89 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 				   || i > 2 || i == -1);
 
     // Ensure all font styles are baseline aligned
-    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_LEFT);
+    ਸੈੱਟ_ਪਾਠ_Align(prt_dlg.hDC, TA_BASELINE|TA_ਖੱਬਾ);
 
     /*
      * On some windows systems the nCopies parameter is not
      * passed back correctly. It must be retrieved from the
      * hDevMode struct.
      */
-    mem = (DEVMODEW *)GlobalLock(prt_dlg.hDevMode);
-    if (mem != NULL)
+    mem = (DEVMODEW *)Global_ਤਾਲਾ(prt_dlg.h_Dev_ਬਹੁਲਕ);
+    ਜੇ (mem != ਨਿਰਾ)
     {
-	if (mem->dmCopies != 1)
+	ਜੇ (mem->dmCopies != 1)
 	    stored_nCopies = mem->dmCopies;
-	if ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
+	ਜੇ ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
 	    psettings->duplex = TRUE;
-	if ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
+	ਜੇ ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
 	    psettings->has_color = TRUE;
     }
-    GlobalUnlock(prt_dlg.hDevMode);
+    GlobalUnlock(prt_dlg.h_Dev_ਬਹੁਲਕ);
 
-    devname = (DEVNAMES *)GlobalLock(prt_dlg.hDevNames);
-    if (devname != 0)
+    devname = (DEVNAMES *)Global_ਤਾਲਾ(prt_dlg.h_Dev_ਨਾਂ);
+    ਜੇ (devname != 0)
     {
-	WCHAR	*wprinter_name = (WCHAR *)devname + devname->wDeviceOffset;
-	WCHAR	*wport_name = (WCHAR *)devname + devname->wOutputOffset;
-	char_u	*text = (char_u *)_("to %s on %s");
-	char_u  *printer_name = utf16_to_enc(wprinter_name, NULL);
-	char_u	*port_name = utf16_to_enc(wport_name, NULL);
+	WCHAR	*wprinter_name = (WCHAR *)devname + devname->w_Device_ਵਿੱਥ;
+	WCHAR	*wport_name = (WCHAR *)devname + devname->w_Output_ਵਿੱਥ;
+	char_u	*ਪਾਠ = (char_u *)_("to %s on %s");
+	char_u  *printer_name = utf16_ਮੰਜ਼ਿਲ_enc(wprinter_name, ਨਿਰਾ);
+	char_u	*ਪੋਰਟ_name = utf16_ਮੰਜ਼ਿਲ_enc(wport_name, ਨਿਰਾ);
 
-	if (printer_name != NULL && port_name != NULL)
+	ਜੇ (printer_name != ਨਿਰਾ && ਪੋਰਟ_name != ਨਿਰਾ)
 	    prt_name = alloc(STRLEN(printer_name)
-					   + STRLEN(port_name) + STRLEN(text));
-	if (prt_name != NULL)
-	    wsprintf((char *)prt_name, (const char *)text,
-		    printer_name, port_name);
+					   + STRLEN(ਪੋਰਟ_name) + STRLEN(ਪਾਠ));
+	ਜੇ (prt_name != ਨਿਰਾ)
+	    wsprintf((ਅੱਖਰ *)prt_name, (ਅਚਲ ਅੱਖਰ *)ਪਾਠ,
+		    printer_name, ਪੋਰਟ_name);
 	vim_free(printer_name);
-	vim_free(port_name);
+	vim_free(ਪੋਰਟ_name);
     }
-    GlobalUnlock(prt_dlg.hDevNames);
+    GlobalUnlock(prt_dlg.h_Dev_ਨਾਂ);
 
     /*
      * Initialise the font according to 'printfont'
      */
-    CLEAR_FIELD(fLogFont);
-    if (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
+    CLEAR_ਖੇਤਰ(fLogFont);
+    ਜੇ (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
     {
 	semsg(_(e_unknown_printer_font_str), p_pfn);
 	mch_print_cleanup();
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    ਲਈ (pifBold = 0; pifBold <= 1; pifBold++)
+	ਲਈ (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    ਲਈ (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 	    {
-		fLogFont.lfWeight =  boldface[pifBold];
+		fLogFont.lf_ਭਾਰ =  boldface[pifBold];
 		fLogFont.lfItalic = pifItalic;
 		fLogFont.lfUnderline = pifUnderline;
 		prt_font_handles[pifBold][pifItalic][pifUnderline]
-					      = CreateFontIndirectW(&fLogFont);
+					      = Create_Font_ਅਸਿੱਧਾ_W(&fLogFont);
 	    }
 
-    SetBkMode(prt_dlg.hDC, OPAQUE);
+    ਸੈੱਟ_Bk_ਬਹੁਲਕ(prt_dlg.hDC, OPAQUE);
     SelectObject(prt_dlg.hDC, prt_font_handles[0][0][0]);
 
     /*
      * Fill in the settings struct
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
-    if (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
+    psettings->chars_ਪ੍ਰਤੀ_ਸਤਰ = prt_get_cpl();
+    psettings->ਸਤਰਾਂ_ਪ੍ਰਤੀ_ਪੰਨਾ = prt_get_lpp();
+    ਜੇ (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
     {
 	psettings->n_collated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? prt_dlg.nCopies : 1;
 	psettings->n_uncollated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? 1 : prt_dlg.nCopies;
 
-	if (psettings->n_collated_copies == 0)
+	ਜੇ (psettings->n_collated_copies == 0)
 	    psettings->n_collated_copies = 1;
 
-	if (psettings->n_uncollated_copies == 0)
+	ਜੇ (psettings->n_uncollated_copies == 0)
 	    psettings->n_uncollated_copies = 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	psettings->n_collated_copies = 1;
 	psettings->n_uncollated_copies = 1;
@@ -1580,208 +1580,208 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 
     psettings->jobname = jobname;
 
-    return TRUE;
+    ਵਾਪਸ TRUE;
 
 init_fail_dlg:
     err = CommDlgExtendedError();
-    if (err)
+    ਜੇ (err)
     {
 	char_u *buf;
 
 	// I suspect FormatMessage() doesn't work for values returned by
 	// CommDlgExtendedError().  What does?
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, err, 0, (LPTSTR)(&buf), 0, NULL);
+	Format_ਸੁਨੇਹਾ(FORMAT_ਸੁਨੇਹਾ_ALLOCATE_ਬਫਰ |
+		FORMAT_ਸੁਨੇਹਾ_FROM_SYSTEM |
+		FORMAT_ਸੁਨੇਹਾ_IGNORE_INSERTS,
+		ਨਿਰਾ, err, 0, (LPTSTR)(&buf), 0, ਨਿਰਾ);
 	semsg(_(e_print_error_str),
-		buf == NULL ? (char_u *)_("Unknown") : buf);
+		buf == ਨਿਰਾ ? (char_u *)_("Unknown") : buf);
 	LocalFree((LPVOID)(buf));
     }
-    else
-	msg_clr_eos(); // Maybe canceled
+    ਨਹੀਂਤਾਂ
+	ਸੁਨੇਹਾ_clr_eos(); // Maybe canceled
 
     mch_print_cleanup();
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 
-    int
+    ਪੂਰਨ
 mch_print_begin(prt_settings_T *psettings)
 {
-    int			ret = 0;
-    char		szBuffer[300];
+    ਪੂਰਨ			ret = 0;
+    ਅੱਖਰ		sz_ਬਫਰ[300];
     WCHAR		*wp;
 
-    hDlgPrint = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
+    hDlgPrint = CreateDialog(g_hinst, ਪਾਠ_3("PrintDlgBox"),
 					     prt_dlg.hwndOwner, PrintDlgProc);
-    SetAbortProc(prt_dlg.hDC, AbortProc);
-    wsprintf(szBuffer, _("Printing '%s'"), gettail(psettings->jobname));
-    vimSetDlgItemText(hDlgPrint, IDC_PRINTTEXT1, (char_u *)szBuffer);
+    ਸੈੱਟ_Abort_Proc(prt_dlg.hDC, AbortProc);
+    wsprintf(sz_ਬਫਰ, _("Printing '%s'"), gettail(psettings->jobname));
+    vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(hDlgPrint, IDC_PRINTTEXT1, (char_u *)sz_ਬਫਰ);
 
-    wp = enc_to_utf16(psettings->jobname, NULL);
-    if (wp != NULL)
+    wp = enc_ਮੰਜ਼ਿਲ_utf16(psettings->jobname, ਨਿਰਾ);
+    ਜੇ (wp != ਨਿਰਾ)
     {
 	DOCINFOW	di;
 
-	CLEAR_FIELD(di);
-	di.cbSize = sizeof(di);
+	CLEAR_ਖੇਤਰ(di);
+	di.cb_ਮਾਪ = ਆਕਾਰ(di);
 	di.lpszDocName = wp;
-	ret = StartDocW(prt_dlg.hDC, &di);
+	ret = ਸ਼ੁਰੂ_Doc_W(prt_dlg.hDC, &di);
 	vim_free(wp);
     }
 
 # ifdef FEAT_GUI
     // Give focus back to main window (when using MDI).
 #  ifdef VIMDLL
-    if (gui.in_use)
+    ਜੇ (gui.ਵਿੱਚ_use)
 #  endif
-	SetFocus(s_hwnd);
+	ਸੈੱਟ_Focus(s_hwnd);
 # endif
 
-    return (ret > 0);
+    ਵਾਪਸ (ret > 0);
 }
 
-    void
-mch_print_end(prt_settings_T *psettings UNUSED)
+    ਖਾਲੀ
+mch_print_ਸਿਰਾ(prt_settings_T *psettings ਅਣਵਰਤਿਆ)
 {
-    EndDoc(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    ਸਿਰਾ_Doc(prt_dlg.hDC);
+    ਜੇ (!*bUserAbort && hDlgPrint != ਨਿਰਾ)
+	Send_ਸੁਨੇਹਾ(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    int
-mch_print_end_page(void)
+    ਪੂਰਨ
+mch_print_ਸਿਰਾ_ਪੰਨਾ(ਖਾਲੀ)
 {
-    return (EndPage(prt_dlg.hDC) > 0);
+    ਵਾਪਸ (ਸਿਰਾ_ਪੰਨਾ(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_begin_page(char_u *msg)
+    ਪੂਰਨ
+mch_print_begin_ਪੰਨਾ(char_u *ਸੁਨੇਹਾ)
 {
-    if (msg != NULL)
-	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, msg);
-    return (StartPage(prt_dlg.hDC) > 0);
+    ਜੇ (ਸੁਨੇਹਾ != ਨਿਰਾ)
+	vim_ਸੈੱਟ_Dlg_ਵਸਤੂ_ਪਾਠ(hDlgPrint, IDC_ਤਰੱਕੀ, ਸੁਨੇਹਾ);
+    ਵਾਪਸ (ਸ਼ੁਰੂ_ਪੰਨਾ(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_blank_page(void)
+    ਪੂਰਨ
+mch_print_blank_ਪੰਨਾ(ਖਾਲੀ)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    ਵਾਪਸ (mch_print_begin_ਪੰਨਾ(ਨਿਰਾ) ? (mch_print_ਸਿਰਾ_ਪੰਨਾ()) : FALSE);
 }
 
-static int prt_pos_x = 0;
-static int prt_pos_y = 0;
+ਸਥਿਰ ਪੂਰਨ prt_pos_x = 0;
+ਸਥਿਰ ਪੂਰਨ prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    ਖਾਲੀ
+mch_print_ਸ਼ੁਰੂ_ਸਤਰ(ਪੂਰਨ margin, ਪੂਰਨ ਪੰਨਾ_ਸਤਰ)
 {
-    if (margin)
-	prt_pos_x = -prt_number_width;
-    else
+    ਜੇ (margin)
+	prt_pos_x = -prt_ਸੰਖਿਆ_ਚੌੜਾਈ;
+    ਨਹੀਂਤਾਂ
 	prt_pos_x = 0;
-    prt_pos_y = page_line * prt_line_height
+    prt_pos_y = ਪੰਨਾ_ਸਤਰ * prt_ਸਤਰ_ਉਚਾਈ
 				 + prt_tm.tmAscent + prt_tm.tmExternalLeading;
 }
 
-    int
-mch_print_text_out(char_u *p, int len)
+    ਪੂਰਨ
+mch_print_ਪਾਠ_ਬਾਹਰਲਾ(char_u *p, ਪੂਰਨ len)
 {
-    SIZE	sz;
+    ਮਾਪ_3	sz;
     WCHAR	*wp;
-    int		wlen = len;
-    int		ret = FALSE;
+    ਪੂਰਨ		wlen = len;
+    ਪੂਰਨ		ret = FALSE;
 
-    wp = enc_to_utf16(p, &wlen);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_ਮੰਜ਼ਿਲ_utf16(p, &wlen);
+    ਜੇ (wp == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-    TextOutW(prt_dlg.hDC, prt_pos_x + prt_left_margin,
-	    prt_pos_y + prt_top_margin, wp, wlen);
-    GetTextExtentPoint32W(prt_dlg.hDC, wp, wlen, &sz);
+    ਪਾਠ_ਬਾਹਰਲਾ_W(prt_dlg.hDC, prt_pos_x + prt_ਖੱਬਾ_margin,
+	    prt_pos_y + prt_ਸਿਖਰ_margin, wp, wlen);
+    Get_ਪਾਠ_Extent_Point32_W(prt_dlg.hDC, wp, wlen, &sz);
     vim_free(wp);
     prt_pos_x += (sz.cx - prt_tm.tmOverhang);
     // This is wrong when printing spaces for a TAB.
-    if (p[len] != NUL)
+    ਜੇ (p[len] != NUL)
     {
 	wlen = mb_ptr2len(p + len);
-	wp = enc_to_utf16(p + len, &wlen);
-	if (wp != NULL)
+	wp = enc_ਮੰਜ਼ਿਲ_utf16(p + len, &wlen);
+	ਜੇ (wp != ਨਿਰਾ)
 	{
-	    GetTextExtentPoint32W(prt_dlg.hDC, wp, 1, &sz);
-	    ret = (prt_pos_x + prt_left_margin + sz.cx > prt_right_margin);
+	    Get_ਪਾਠ_Extent_Point32_W(prt_dlg.hDC, wp, 1, &sz);
+	    ret = (prt_pos_x + prt_ਖੱਬਾ_margin + sz.cx > prt_ਸੱਜਾ_margin);
 	    vim_free(wp);
 	}
     }
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_font(ਪੂਰਨ iBold, ਪੂਰਨ iItalic, ਪੂਰਨ iUnderline)
 {
     SelectObject(prt_dlg.hDC, prt_font_handles[iBold][iItalic][iUnderline]);
 }
 
-    void
-mch_print_set_bg(long_u bgcol)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_bg(long_u bgcol)
 {
-    SetBkColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)bgcol)));
+    ਸੈੱਟ_Bk_Color(prt_dlg.hDC, Get_ਸਭ_ਤੋਂ_ਨੇੜੇ_Color(prt_dlg.hDC,
+						   ਅਦਲਾ_ਬਦਲੀ_me((COLORREF)bgcol)));
     /*
      * With a white background we can draw characters transparent, which is
      * good for italic characters that overlap to the next char cell.
      */
-    if (bgcol == 0xffffffUL)
-	SetBkMode(prt_dlg.hDC, TRANSPARENT);
-    else
-	SetBkMode(prt_dlg.hDC, OPAQUE);
+    ਜੇ (bgcol == 0xffffffUL)
+	ਸੈੱਟ_Bk_ਬਹੁਲਕ(prt_dlg.hDC, TRANSPARENT);
+    ਨਹੀਂਤਾਂ
+	ਸੈੱਟ_Bk_ਬਹੁਲਕ(prt_dlg.hDC, OPAQUE);
 }
 
-    void
-mch_print_set_fg(long_u fgcol)
+    ਖਾਲੀ
+mch_print_ਸੈੱਟ_fg(long_u fgcol)
 {
-    SetTextColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)fgcol)));
+    ਸੈੱਟ_ਪਾਠ_Color(prt_dlg.hDC, Get_ਸਭ_ਤੋਂ_ਨੇੜੇ_Color(prt_dlg.hDC,
+						   ਅਦਲਾ_ਬਦਲੀ_me((COLORREF)fgcol)));
 }
 
-#endif // FEAT_PRINTER && !FEAT_POSTSCRIPT
+#ਜੇ_ਅੰਤ // FEAT_PRINTER && !FEAT_POSTSCRIPT
 
 
 
-#if defined(FEAT_SHORTCUT)
+#ਜੇ defined(FEAT_SHORTCUT)
 # include <shlobj.h>
 
-# define is_path_sep(c)	    ((c) == L'\\' || (c) == L'/')
+# define is_ਰਸਤਾ_sep(c)	    ((c) == L'\\' || (c) == L'/')
 
-    static int
-is_reparse_point_included(LPCWSTR fname)
+    ਸਥਿਰ ਪੂਰਨ
+is_reparse_ਬਿੰਦੂ_included(LPCWSTR fname)
 {
     LPCWSTR	p = fname, q;
-    WCHAR	buf[MAX_PATH];
+    WCHAR	buf[MAX_ਰਸਤਾ];
     DWORD	attr;
 
-    if (SAFE_isalpha(p[0]) && p[1] == L':' && is_path_sep(p[2]))
+    ਜੇ (ਸੁਰੱਖਿਅਤ_isalpha(p[0]) && p[1] == L':' && is_ਰਸਤਾ_sep(p[2]))
 	p += 3;
-    else if (is_path_sep(p[0]) && is_path_sep(p[1]))
+    ਨਹੀਂਤਾਂ ਜੇ (is_ਰਸਤਾ_sep(p[0]) && is_ਰਸਤਾ_sep(p[1]))
 	p += 2;
 
-    while (*p != L'\0')
+    ਜਦੋਂ (*p != L'\0')
     {
 	q = wcspbrk(p, L"\\/");
-	if (q == NULL)
+	ਜੇ (q == ਨਿਰਾ)
 	    p = q = fname + wcslen(fname);
-	else
+	ਨਹੀਂਤਾਂ
 	    p = q + 1;
-	if (q - fname >= MAX_PATH)
-	    return FALSE;
+	ਜੇ (q - fname >= MAX_ਰਸਤਾ)
+	    ਵਾਪਸ FALSE;
 	wcsncpy(buf, fname, q - fname);
 	buf[q - fname] = L'\0';
-	attr = GetFileAttributesW(buf);
-	if (attr != INVALID_FILE_ATTRIBUTES
-		&& (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-	    return TRUE;
+	attr = Get_File_ਗੁਣ_W(buf);
+	ਜੇ (attr != INVALID_FILE_ਗੁਣ
+		&& (attr & FILE_ATTRIBUTE_REPARSE_ਬਿੰਦੂ) != 0)
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -1789,59 +1789,59 @@ is_reparse_point_included(LPCWSTR fname)
  * point, already fully resolved, or it doesn't exists.
  */
     char_u *
-resolve_reparse_point(char_u *fname)
+resolve_reparse_ਬਿੰਦੂ(char_u *fname)
 {
-    HANDLE	    h = INVALID_HANDLE_VALUE;
-    DWORD	    size;
+    HANDLE	    h = INVALID_HANDLE_ਮੁੱਲ;
+    DWORD	    ਮਾਪ;
     WCHAR	    *p, *wp;
-    char_u	    *rfname = NULL;
-    WCHAR	    *buff = NULL;
+    char_u	    *rfname = ਨਿਰਾ;
+    WCHAR	    *buff = ਨਿਰਾ;
 
-    p = enc_to_utf16(fname, NULL);
-    if (p == NULL)
-	goto fail;
+    p = enc_ਮੰਜ਼ਿਲ_utf16(fname, ਨਿਰਾ);
+    ਜੇ (p == ਨਿਰਾ)
+	ਜਾਓ fail;
 
-    if (!is_reparse_point_included(p))
+    ਜੇ (!is_reparse_ਬਿੰਦੂ_included(p))
     {
 	vim_free(p);
-	goto fail;
+	ਜਾਓ fail;
     }
 
-    h = CreateFileW(p, 0, 0, NULL, OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    h = CreateFileW(p, 0, 0, ਨਿਰਾ, OPEN_EXISTING,
+	    FILE_FLAG_BACKUP_SEMANTICS, ਨਿਰਾ);
     vim_free(p);
 
-    if (h == INVALID_HANDLE_VALUE)
-	goto fail;
+    ਜੇ (h == INVALID_HANDLE_ਮੁੱਲ)
+	ਜਾਓ fail;
 
-    size = GetFinalPathNameByHandleW(h, NULL, 0, 0);
-    if (size == 0)
-	goto fail;
-    buff = ALLOC_MULT(WCHAR, size);
-    if (buff == NULL)
-	goto fail;
-    if (GetFinalPathNameByHandleW(h, buff, size, 0) == 0)
-	goto fail;
+    ਮਾਪ = Get_Final_ਰਸਤਾ_Name_By_Handle_W(h, ਨਿਰਾ, 0, 0);
+    ਜੇ (ਮਾਪ == 0)
+	ਜਾਓ fail;
+    buff = ALLOC_MULT(WCHAR, ਮਾਪ);
+    ਜੇ (buff == ਨਿਰਾ)
+	ਜਾਓ fail;
+    ਜੇ (Get_Final_ਰਸਤਾ_Name_By_Handle_W(h, buff, ਮਾਪ, 0) == 0)
+	ਜਾਓ fail;
 
-    if (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
+    ਜੇ (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
     {
 	buff[6] = L'\\';
 	wp = buff + 6;
     }
-    else if (wcsncmp(buff, L"\\\\?\\", 4) == 0)
+    ਨਹੀਂਤਾਂ ਜੇ (wcsncmp(buff, L"\\\\?\\", 4) == 0)
 	wp = buff + 4;
-    else
+    ਨਹੀਂਤਾਂ
 	wp = buff;
 
-    rfname = utf16_to_enc(wp, NULL);
+    rfname = utf16_ਮੰਜ਼ਿਲ_enc(wp, ਨਿਰਾ);
 
 fail:
-    if (h != INVALID_HANDLE_VALUE)
+    ਜੇ (h != INVALID_HANDLE_ਮੁੱਲ)
 	CloseHandle(h);
-    if (buff != NULL)
+    ਜੇ (buff != ਨਿਰਾ)
 	vim_free(buff);
 
-    return rfname;
+    ਵਾਪਸ rfname;
 }
 
 /*
@@ -1849,59 +1849,59 @@ fail:
  * to and return that name in allocated memory.
  * Otherwise NULL is returned.
  */
-    static char_u *
+    ਸਥਿਰ char_u *
 resolve_shortcut(char_u *fname)
 {
     HRESULT		hr;
-    IShellLink		*psl = NULL;
-    IPersistFile	*ppf = NULL;
-    OLECHAR		wsz[MAX_PATH];
-    char_u		*rfname = NULL;
-    int			len;
-    IShellLinkW		*pslw = NULL;
-    WIN32_FIND_DATAW	ffdw; // we get those free of charge
+    IShellLink		*psl = ਨਿਰਾ;
+    IPersistFile	*ppf = ਨਿਰਾ;
+    OLECHAR		wsz[MAX_ਰਸਤਾ];
+    char_u		*rfname = ਨਿਰਾ;
+    ਪੂਰਨ			len;
+    IShellLinkW		*pslw = ਨਿਰਾ;
+    WIN32_ਲੱਭੋ_DATAW	ffdw; // we get those free of charge
 
     // Check if the file name ends in ".lnk". Avoid calling
     // CoCreateInstance(), it's quite slow.
-    if (fname == NULL)
-	return rfname;
-    len = (int)STRLEN(fname);
-    if (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
-	return rfname;
+    ਜੇ (fname == ਨਿਰਾ)
+	ਵਾਪਸ rfname;
+    len = (ਪੂਰਨ)STRLEN(fname);
+    ਜੇ (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
+	ਵਾਪਸ rfname;
 
-    CoInitialize(NULL);
+    CoInitialize(ਨਿਰਾ);
 
     // create a link manager object and request its interface
     hr = CoCreateInstance(
-	    &CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-	    &IID_IShellLinkW, (void**)&pslw);
-    if (hr == S_OK)
+	    &CLSID_ShellLink, ਨਿਰਾ, CLSCTX_INPROC_SERVER,
+	    &IID_IShellLinkW, (ਖਾਲੀ**)&pslw);
+    ਜੇ (hr == S_OK)
     {
-	WCHAR	*p = enc_to_utf16(fname, NULL);
+	WCHAR	*p = enc_ਮੰਜ਼ਿਲ_utf16(fname, ਨਿਰਾ);
 
-	if (p != NULL)
+	ਜੇ (p != ਨਿਰਾ)
 	{
 	    // Get a pointer to the IPersistFile interface.
 	    hr = pslw->lpVtbl->QueryInterface(
-		    pslw, &IID_IPersistFile, (void**)&ppf);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+		    pslw, &IID_IPersistFile, (ਖਾਲੀ**)&ppf);
+	    ਜੇ (hr != S_OK)
+		ਜਾਓ shortcut_errorw;
 
 	    // "load" the name and resolve the link
-	    hr = ppf->lpVtbl->Load(ppf, p, STGM_READ);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
-# if 0  // This makes Vim wait a long time if the target does not exist.
-	    hr = pslw->lpVtbl->Resolve(pslw, NULL, SLR_NO_UI);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+	    hr = ppf->lpVtbl->ਲੱਦੋ_2(ppf, p, STGM_READ);
+	    ਜੇ (hr != S_OK)
+		ਜਾਓ shortcut_errorw;
+# ਜੇ 0  // This makes Vim wait a long time if the target does not exist.
+	    hr = pslw->lpVtbl->Resolve(pslw, ਨਿਰਾ, SLR_NO_UI);
+	    ਜੇ (hr != S_OK)
+		ਜਾਓ shortcut_errorw;
 # endif
 
 	    // Get the path to the link target.
-	    ZeroMemory(wsz, MAX_PATH * sizeof(WCHAR));
-	    hr = pslw->lpVtbl->GetPath(pslw, wsz, MAX_PATH, &ffdw, 0);
-	    if (hr == S_OK && wsz[0] != NUL)
-		rfname = utf16_to_enc(wsz, NULL);
+	    Zero_ਸਮ੍ਰਿਤੀ(wsz, MAX_ਰਸਤਾ * ਆਕਾਰ(WCHAR));
+	    hr = pslw->lpVtbl->Get_ਰਸਤਾ(pslw, wsz, MAX_ਰਸਤਾ, &ffdw, 0);
+	    ਜੇ (hr == S_OK && wsz[0] != NUL)
+		rfname = utf16_ਮੰਜ਼ਿਲ_enc(wsz, ਨਿਰਾ);
 
 shortcut_errorw:
 	    vim_free(p);
@@ -1909,42 +1909,42 @@ shortcut_errorw:
     }
 
     // Release all interface pointers (both belong to the same object)
-    if (ppf != NULL)
+    ਜੇ (ppf != ਨਿਰਾ)
 	ppf->lpVtbl->Release(ppf);
-    if (psl != NULL)
+    ਜੇ (psl != ਨਿਰਾ)
 	psl->lpVtbl->Release(psl);
-    if (pslw != NULL)
+    ਜੇ (pslw != ਨਿਰਾ)
 	pslw->lpVtbl->Release(pslw);
 
     CoUninitialize();
-    return rfname;
+    ਵਾਪਸ rfname;
 }
 
     char_u *
-mch_resolve_path(char_u *fname, int reparse_point)
+mch_resolve_ਰਸਤਾ(char_u *fname, ਪੂਰਨ reparse_ਬਿੰਦੂ)
 {
-    char_u  *path = resolve_shortcut(fname);
+    char_u  *ਰਸਤਾ = resolve_shortcut(fname);
 
-    if (path == NULL && reparse_point)
-	path = resolve_reparse_point(fname);
-    return path;
+    ਜੇ (ਰਸਤਾ == ਨਿਰਾ && reparse_ਬਿੰਦੂ)
+	ਰਸਤਾ = resolve_reparse_ਬਿੰਦੂ(fname);
+    ਵਾਪਸ ਰਸਤਾ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ਜੇ defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
 /*
  * Bring ourselves to the foreground.  Does work if the OS doesn't allow it.
  */
-    void
-win32_set_foreground(void)
+    ਖਾਲੀ
+win32_ਸੈੱਟ_foreground(ਖਾਲੀ)
 {
     GetConsoleHwnd();	    // get value of s_hwnd
-    if (s_hwnd != 0)
-	SetForegroundWindow(s_hwnd);
+    ਜੇ (s_hwnd != 0)
+	ਸੈੱਟ_Foreground_ਖਿੜਕੀ(s_hwnd);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(FEAT_CLIENTSERVER)
+#ਜੇ defined(FEAT_CLIENTSERVER)
 /*
  * Client-server code for Vim
  *
@@ -1957,10 +1957,10 @@ win32_set_foreground(void)
 // GUI window at all).
 //
 // So we create a hidden window, and arrange to destroy it on exit.
-HWND message_window = 0;	    // window that's handling messages
+HWND ਸੁਨੇਹਾ_ਖਿੜਕੀ = 0;	    // window that's handling messages
 
 # define VIM_CLASSNAME      "VIM_MESSAGES"
-# define VIM_CLASSNAME_LEN  (sizeof(VIM_CLASSNAME) - 1)
+# define VIM_CLASSNAME_LEN  (ਆਕਾਰ(VIM_CLASSNAME) - 1)
 
 // Timeout for sending a message to another Vim instance.  Normally this works
 // instantly, but it may hang when the other Vim instance is halted.
@@ -1968,56 +1968,56 @@ HWND message_window = 0;	    // window that's handling messages
 
 // Communication is via WM_COPYDATA messages. The message type is sent in
 // the dwData parameter. Types are defined here.
-# define COPYDATA_KEYS		0
-# define COPYDATA_REPLY		1
-# define COPYDATA_EXPR		10
-# define COPYDATA_RESULT	11
-# define COPYDATA_ERROR_RESULT	12
+# define COPYDATA_ਕੁੰਜੀਆਂ		0
+# define COPYDATA_ਜਵਾਬ		1
+# define COPYDATA_ਵਿਅੰਜਕ		10
+# define COPYDATA_ਨਤੀਜਾ	11
+# define COPYDATA_ERROR_ਨਤੀਜਾ	12
 # define COPYDATA_ENCODING	20
 
 // This is a structure containing a server HWND and its name.
-struct server_id
+ਬਣਤਰ server_id
 {
     HWND hwnd;
     char_u *name;
 };
 
 // Last received 'encoding' that the client uses.
-static char_u	*client_enc = NULL;
+ਸਥਿਰ char_u	*client_enc = ਨਿਰਾ;
 
 /*
  * Tell the other side what encoding we are using.
  * Return -1 if timeout happens.  Other errors are ignored.
  */
-    static int
-serverSendEnc(HWND target)
+    ਸਥਿਰ ਪੂਰਨ
+serverSendEnc(HWND ਨਿਸ਼ਾਨਾ)
 {
-    COPYDATASTRUCT data;
+    COPYDATASTRUCT ਅੰਕੜੇ;
 
-    data.dwData = COPYDATA_ENCODING;
-    data.cbData = (DWORD)STRLEN(p_enc) + 1;
-    data.lpData = p_enc;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-	    (WPARAM)message_window, (LPARAM)&data,
-	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, NULL) == 0)
-	return -1;
-    return 0;
+    ਅੰਕੜੇ.dw_ਅੰਕੜੇ = COPYDATA_ENCODING;
+    ਅੰਕੜੇ.cb_ਅੰਕੜੇ = (DWORD)STRLEN(p_enc) + 1;
+    ਅੰਕੜੇ.lp_ਅੰਕੜੇ = p_enc;
+    ਜੇ (Send_ਸੁਨੇਹਾ_Timeout(ਨਿਸ਼ਾਨਾ, WM_COPYDATA,
+	    (WPARAM)ਸੁਨੇਹਾ_ਖਿੜਕੀ, (LPARAM)&ਅੰਕੜੇ,
+	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, ਨਿਰਾ) == 0)
+	ਵਾਪਸ -1;
+    ਵਾਪਸ 0;
 }
 
 /*
  * Clean up on exit. This destroys the hidden message window.
  */
-    static void
-CleanUpMessaging(void)
+    ਸਥਿਰ ਖਾਲੀ
+Clean_ਉੱਪਰ_Messaging(ਖਾਲੀ)
 {
-    if (message_window == 0)
-	return;
+    ਜੇ (ਸੁਨੇਹਾ_ਖਿੜਕੀ == 0)
+	ਵਾਪਸ;
 
-    DestroyWindow(message_window);
-    message_window = 0;
+    Destroy_ਖਿੜਕੀ(ਸੁਨੇਹਾ_ਖਿੜਕੀ);
+    ਸੁਨੇਹਾ_ਖਿੜਕੀ = 0;
 }
 
-static int save_reply(HWND server, char_u *reply, int expr);
+ਸਥਿਰ ਪੂਰਨ save_ਜਵਾਬ(HWND server, char_u *ਜਵਾਬ, ਪੂਰਨ ਵਿਅੰਜਕ);
 
 /*
  * The window procedure for the hidden message window.
@@ -2029,10 +2029,10 @@ static int save_reply(HWND server, char_u *reply, int expr);
  * not work in the console version - this basically means those
  * features which allow Vim to act as a server, rather than a client.
  */
-    static LRESULT CALLBACK
-Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    ਸਥਿਰ LRESULT CALLBACK
+Messaging_WndProc(HWND hwnd, UINT ਸੁਨੇਹਾ, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_COPYDATA)
+    ਜੇ (ਸੁਨੇਹਾ == WM_COPYDATA)
     {
 	// This is a message from another Vim. The dwData member of the
 	// COPYDATASTRUCT determines the type of message:
@@ -2054,150 +2054,150 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	//   COPYDATA_ERROR_RESULT:
 	//	A reply. We are a client, and a server has sent this message
 	//	in response to a COPYDATA_EXPR that failed to evaluate.
-	COPYDATASTRUCT	*data = (COPYDATASTRUCT*)lParam;
+	COPYDATASTRUCT	*ਅੰਕੜੇ = (COPYDATASTRUCT*)lParam;
 	HWND		sender = (HWND)wParam;
-	COPYDATASTRUCT	reply;
+	COPYDATASTRUCT	ਜਵਾਬ;
 	char_u		*res;
-	int		retval;
+	ਪੂਰਨ		retval;
 	DWORD_PTR	dwret = 0;
 	char_u		*str;
 	char_u		*tofree;
 
-	switch (data->dwData)
+	ਚੋਣ (ਅੰਕੜੇ->dw_ਅੰਕੜੇ)
 	{
-	case COPYDATA_ENCODING:
+	ਹਾਲਤ COPYDATA_ENCODING:
 	    // Remember the encoding that the client uses.
 	    vim_free(client_enc);
-	    client_enc = enc_canonize((char_u *)data->lpData);
-	    return 1;
+	    client_enc = enc_canonize((char_u *)ਅੰਕੜੇ->lp_ਅੰਕੜੇ);
+	    ਵਾਪਸ 1;
 
-	case COPYDATA_KEYS:
+	ਹਾਲਤ COPYDATA_ਕੁੰਜੀਆਂ:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_ਖਿੜਕੀ = sender;
 
 	    // Add the received keys to the input buffer.
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
+	    str = serverConvert(client_enc, (char_u *)ਅੰਕੜੇ->lp_ਅੰਕੜੇ, &tofree);
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    ਜੇ (gui.ਵਿੱਚ_use)
 		// The GUI may get here re-entrantly, so insert the keys later.
-		server_add_input(str);
-	    else
+		server_ਜੋੜੋ_ਨਿਵੇਸ਼(str);
+	    ਨਹੀਂਤਾਂ
 # endif
-		server_to_input_buf(str);
+		server_ਮੰਜ਼ਿਲ_ਨਿਵੇਸ਼_buf(str);
 	    vim_free(tofree);
 
 # ifdef FEAT_GUI
 	    // Wake up the main GUI loop.
 #  ifdef VIMDLL
-	    if (gui.in_use)
+	    ਜੇ (gui.ਵਿੱਚ_use)
 #  endif
-		if (s_hwnd != 0)
-		    PostMessage(s_hwnd, WM_NULL, 0, 0);
+		ਜੇ (s_hwnd != 0)
+		    Post_ਸੁਨੇਹਾ(s_hwnd, WM_NULL, 0, 0);
 # endif
-	    return 1;
+	    ਵਾਪਸ 1;
 
-	case COPYDATA_EXPR:
+	ਹਾਲਤ COPYDATA_ਵਿਅੰਜਕ:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_ਖਿੜਕੀ = sender;
 
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
-	    res = eval_client_expr_to_string(str);
+	    str = serverConvert(client_enc, (char_u *)ਅੰਕੜੇ->lp_ਅੰਕੜੇ, &tofree);
+	    res = eval_client_ਵਿਅੰਜਕ_ਮੰਜ਼ਿਲ_string(str);
 
-	    if (res == NULL)
+	    ਜੇ (res == ਨਿਰਾ)
 	    {
-		char	*err = _(e_invalid_expression_received);
+		ਅੱਖਰ	*err = _(e_invalid_ਵਿਅੰਜਕ_received);
 		size_t	len = STRLEN(str) + STRLEN(err) + 5;
 
 		res = alloc(len);
-		if (res != NULL)
-		    reply.cbData = (DWORD)vim_snprintf_safelen(
-			(char *)res, len, "%s: \"%s\"", err, str);
-		else
-		    reply.cbData = 0;
-		reply.dwData = COPYDATA_ERROR_RESULT;
+		ਜੇ (res != ਨਿਰਾ)
+		    ਜਵਾਬ.cb_ਅੰਕੜੇ = (DWORD)vim_snprintf_safelen(
+			(ਅੱਖਰ *)res, len, "%s: \"%s\"", err, str);
+		ਨਹੀਂਤਾਂ
+		    ਜਵਾਬ.cb_ਅੰਕੜੇ = 0;
+		ਜਵਾਬ.dw_ਅੰਕੜੇ = COPYDATA_ERROR_ਨਤੀਜਾ;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		reply.cbData = (DWORD)STRLEN(res) + 1;
-		reply.dwData = COPYDATA_RESULT;
+		ਜਵਾਬ.cb_ਅੰਕੜੇ = (DWORD)STRLEN(res) + 1;
+		ਜਵਾਬ.dw_ਅੰਕੜੇ = COPYDATA_ਨਤੀਜਾ;
 	    }
-	    reply.lpData = res;
+	    ਜਵਾਬ.lp_ਅੰਕੜੇ = res;
 
-	    if (serverSendEnc(sender) < 0)
+	    ਜੇ (serverSendEnc(sender) < 0)
 		retval = -1;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (SendMessageTimeout(sender, WM_COPYDATA,
-			(WPARAM)message_window, (LPARAM)&reply,
+		ਜੇ (Send_ਸੁਨੇਹਾ_Timeout(sender, WM_COPYDATA,
+			(WPARAM)ਸੁਨੇਹਾ_ਖਿੜਕੀ, (LPARAM)&ਜਵਾਬ,
 			SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
 		    retval = -1;
-		else
-		    retval = (int)dwret;
+		ਨਹੀਂਤਾਂ
+		    retval = (ਪੂਰਨ)dwret;
 	    }
 	    vim_free(tofree);
 	    vim_free(res);
-	    return retval;
+	    ਵਾਪਸ retval;
 
-	case COPYDATA_REPLY:
-	case COPYDATA_RESULT:
-	case COPYDATA_ERROR_RESULT:
-	    if (data->lpData != NULL)
+	ਹਾਲਤ COPYDATA_ਜਵਾਬ:
+	ਹਾਲਤ COPYDATA_ਨਤੀਜਾ:
+	ਹਾਲਤ COPYDATA_ERROR_ਨਤੀਜਾ:
+	    ਜੇ (ਅੰਕੜੇ->lp_ਅੰਕੜੇ != ਨਿਰਾ)
 	    {
-		str = serverConvert(client_enc, (char_u *)data->lpData,
+		str = serverConvert(client_enc, (char_u *)ਅੰਕੜੇ->lp_ਅੰਕੜੇ,
 								     &tofree);
-		if (tofree == NULL)
+		ਜੇ (tofree == ਨਿਰਾ)
 		    str = vim_strsave(str);
-		if (save_reply(sender, str,
-			   (data->dwData == COPYDATA_REPLY ?  0 :
-			   (data->dwData == COPYDATA_RESULT ? 1 :
+		ਜੇ (save_ਜਵਾਬ(sender, str,
+			   (ਅੰਕੜੇ->dw_ਅੰਕੜੇ == COPYDATA_ਜਵਾਬ ?  0 :
+			   (ਅੰਕੜੇ->dw_ਅੰਕੜੇ == COPYDATA_ਨਤੀਜਾ ? 1 :
 							      2))) == FAIL)
 		    vim_free(str);
-		else if (data->dwData == COPYDATA_REPLY)
+		ਨਹੀਂਤਾਂ ਜੇ (ਅੰਕੜੇ->dw_ਅੰਕੜੇ == COPYDATA_ਜਵਾਬ)
 		{
 		    char_u	winstr[30];
 
-		    sprintf((char *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
+		    sprintf((ਅੱਖਰ *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
 		    apply_autocmds(EVENT_REMOTEREPLY, winstr, str,
 								TRUE, curbuf);
 		}
 	    }
-	    return 1;
+	    ਵਾਪਸ 1;
 	}
 
-	return 0;
+	ਵਾਪਸ 0;
     }
 
-    else if (msg == WM_ACTIVATE && wParam == WA_ACTIVE)
+    ਨਹੀਂਤਾਂ ਜੇ (ਸੁਨੇਹਾ == WM_ACTIVATE && wParam == WA_ਸਰਗਰਮ)
     {
 	// When the message window is activated (brought to the foreground),
 	// this actually applies to the text window.
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# ਜੇ !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	if (!gui.in_use)
+	ਜੇ (!gui.ਵਿੱਚ_use)
 #  endif
 	    GetConsoleHwnd();	    // get value of s_hwnd
 # endif
-	if (s_hwnd != 0)
+	ਜੇ (s_hwnd != 0)
 	{
-	    SetForegroundWindow(s_hwnd);
-	    return 0;
+	    ਸੈੱਟ_Foreground_ਖਿੜਕੀ(s_hwnd);
+	    ਵਾਪਸ 0;
 	}
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    ਵਾਪਸ Def_ਖਿੜਕੀ_Proc(hwnd, ਸੁਨੇਹਾ, wParam, lParam);
 }
 
 /*
  * Initialise the message handling process.  This involves creating a window
  * to handle messages - the window will not be visible.
  */
-    void
-serverInitMessaging(void)
+    ਖਾਲੀ
+serverInitMessaging(ਖਾਲੀ)
 {
     WNDCLASS wndclass;
 
     // Clean up on exit
-    atexit(CleanUpMessaging);
+    atexit(Clean_ਉੱਪਰ_Messaging);
 
     // Register a window class - we only really care
     // about the window procedure
@@ -2206,321 +2206,321 @@ serverInitMessaging(void)
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = g_hinst;
-    wndclass.hIcon = NULL;
-    wndclass.hCursor = NULL;
-    wndclass.hbrBackground = NULL;
-    wndclass.lpszMenuName = NULL;
+    wndclass.hIcon = ਨਿਰਾ;
+    wndclass.hCursor = ਨਿਰਾ;
+    wndclass.hbrBackground = ਨਿਰਾ;
+    wndclass.lpszMenuName = ਨਿਰਾ;
     wndclass.lpszClassName = VIM_CLASSNAME;
-    RegisterClass(&wndclass);
+    ਰਜਿਸਟਰ_Class(&wndclass);
 
     // Create the message window. It will be hidden, so the details don't
     // matter.  Don't use WS_OVERLAPPEDWINDOW, it will make a shortcut remove
     // focus from gvim.
-    message_window = CreateWindow(VIM_CLASSNAME, "",
+    ਸੁਨੇਹਾ_ਖਿੜਕੀ = Create_ਖਿੜਕੀ(VIM_CLASSNAME, "",
 			 WS_POPUPWINDOW | WS_CAPTION,
 			 CW_USEDEFAULT, CW_USEDEFAULT,
-			 100, 100, NULL, NULL,
-			 g_hinst, NULL);
+			 100, 100, ਨਿਰਾ, ਨਿਰਾ,
+			 g_hinst, ਨਿਰਾ);
 }
 
 // Used by serverSendToVim() to find an alternate server name.
-static char_u *altname_buf_ptr = NULL;
+ਸਥਿਰ char_u *altname_buf_ptr = ਨਿਰਾ;
 
 /*
  * Get the title of the window "hwnd", which is the Vim server name, in
  * "name[namelen]" and return the length.
  * Returns zero if window "hwnd" is not a Vim server.
  */
-    static int
-getVimServerName(HWND hwnd, char *name, int namelen)
+    ਸਥਿਰ ਪੂਰਨ
+getVimServerName(HWND hwnd, ਅੱਖਰ *name, ਪੂਰਨ namelen)
 {
-    int		len;
-    char	buffer[VIM_CLASSNAME_LEN + 1];
+    ਪੂਰਨ		len;
+    ਅੱਖਰ	ਬਫਰ[VIM_CLASSNAME_LEN + 1];
 
     // Ignore windows which aren't Vim message windows
-    len = GetClassName(hwnd, buffer, sizeof(buffer));
-    if (len != VIM_CLASSNAME_LEN || STRCMP(buffer, VIM_CLASSNAME) != 0)
-	return 0;
+    len = GetClassName(hwnd, ਬਫਰ, ਆਕਾਰ(ਬਫਰ));
+    ਜੇ (len != VIM_CLASSNAME_LEN || STRCMP(ਬਫਰ, VIM_CLASSNAME) != 0)
+	ਵਾਪਸ 0;
 
     // Get the title of the window
-    return GetWindowText(hwnd, name, namelen);
+    ਵਾਪਸ Get_ਖਿੜਕੀ_ਪਾਠ(hwnd, name, namelen);
 }
 
-    static BOOL CALLBACK
+    ਸਥਿਰ BOOL CALLBACK
 enumWindowsGetServer(HWND hwnd, LPARAM lparam)
 {
-    struct	server_id *id = (struct server_id *)lparam;
-    char	server[MAX_PATH];
+    ਬਣਤਰ	server_id *id = (ਬਣਤਰ server_id *)lparam;
+    ਅੱਖਰ	server[MAX_ਰਸਤਾ];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    ਜੇ (getVimServerName(hwnd, server, ਆਕਾਰ(server)) == 0)
+	ਵਾਪਸ TRUE;
 
     // If this is the server we're looking for, return its HWND
-    if (STRICMP(server, id->name) == 0)
+    ਜੇ (STRICMP(server, id->name) == 0)
     {
 	id->hwnd = hwnd;
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
     // If we are looking for an alternate server, remember this name.
-    if (altname_buf_ptr != NULL)
+    ਜੇ (altname_buf_ptr != ਨਿਰਾ)
     {
 	size_t	namelen = STRLEN(id->name);
 
-	if (STRNICMP(server, id->name, namelen) == 0
+	ਜੇ (STRNICMP(server, id->name, namelen) == 0
 	    && vim_isdigit(server[namelen]))
 	{
 	    STRCPY(altname_buf_ptr, server);
-	    altname_buf_ptr = NULL;	    // don't use another name
+	    altname_buf_ptr = ਨਿਰਾ;	    // don't use another name
 	}
     }
 
     // Otherwise, keep looking
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-    static BOOL CALLBACK
-enumWindowsGetNames(HWND hwnd, LPARAM lparam)
+    ਸਥਿਰ BOOL CALLBACK
+enum_Windows_Get_ਨਾਂ(HWND hwnd, LPARAM lparam)
 {
     list_T	*list = (list_T *)lparam;
-    char	server[MAX_PATH];
+    ਅੱਖਰ	server[MAX_ਰਸਤਾ];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    ਜੇ (getVimServerName(hwnd, server, ਆਕਾਰ(server)) == 0)
+	ਵਾਪਸ TRUE;
 
     list_append_string(list, (char_u *)server, -1);
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
-struct enum_windows_s
+ਬਣਤਰ enum_windows_s
 {
     WNDENUMPROC lpEnumFunc;
     LPARAM      lParam;
 };
 
-    static BOOL CALLBACK
-enum_windows_child(HWND hwnd, LPARAM lParam)
+    ਸਥਿਰ BOOL CALLBACK
+enum_windows_ਬੱਚਾ(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    ਬਣਤਰ enum_windows_s *ew = (ਬਣਤਰ enum_windows_s *)lParam;
 
-    return (ew->lpEnumFunc)(hwnd, ew->lParam);
+    ਵਾਪਸ (ew->lpEnumFunc)(hwnd, ew->lParam);
 }
 
-    static BOOL CALLBACK
+    ਸਥਿਰ BOOL CALLBACK
 enum_windows_toplevel(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    ਬਣਤਰ enum_windows_s *ew = (ਬਣਤਰ enum_windows_s *)lParam;
 
-    if ((ew->lpEnumFunc)(hwnd, ew->lParam))
-	return TRUE;
-    return EnumChildWindows(hwnd, enum_windows_child, lParam);
+    ਜੇ ((ew->lpEnumFunc)(hwnd, ew->lParam))
+	ਵਾਪਸ TRUE;
+    ਵਾਪਸ Enum_ਬੱਚਾ_Windows(hwnd, enum_windows_ਬੱਚਾ, lParam);
 }
 
 /*
  * Enumerate all windows including children.
  */
-    static BOOL
+    ਸਥਿਰ BOOL
 enum_windows(WNDENUMPROC lpEnumFunc, LPARAM lParam)
 {
-    struct enum_windows_s ew;
+    ਬਣਤਰ enum_windows_s ew;
 
     ew.lpEnumFunc = lpEnumFunc;
     ew.lParam = lParam;
-    return EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
+    ਵਾਪਸ EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
 }
 
-    static HWND
-findServer(char_u *name)
+    ਸਥਿਰ HWND
+ਲੱਭੋ_Server(char_u *name)
 {
-    struct server_id id;
+    ਬਣਤਰ server_id id;
 
     id.name = name;
     id.hwnd = 0;
 
     enum_windows(enumWindowsGetServer, (LPARAM)(&id));
 
-    return id.hwnd;
+    ਵਾਪਸ id.hwnd;
 }
 
-    void
-serverSetName(char_u *name)
+    ਖਾਲੀ
+server_ਸੈੱਟ_Name(char_u *name)
 {
     size_t	namelen;
     char_u	*ok_name;
     HWND	hwnd = 0;
-    int		i = 0;
+    ਪੂਰਨ		i = 0;
     char_u	*p;
 
     // Leave enough space for a 9-digit suffix to ensure uniqueness!
     namelen = STRLEN(name);
     ok_name = alloc(namelen + 10);
-    if (ok_name == NULL)
-	return;
+    ਜੇ (ok_name == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     STRCPY(ok_name, name);
     p = ok_name + namelen;
 
-    for (;;)
+    ਲਈ (;;)
     {
 	// This is inefficient - we're doing an EnumWindows loop for each
 	// possible name. It would be better to grab all names in one go,
 	// and scan the list each time...
-	hwnd = findServer(ok_name);
-	if (hwnd == 0)
-	    break;
+	hwnd = ਲੱਭੋ_Server(ok_name);
+	ਜੇ (hwnd == 0)
+	    ਰੋਕੋ;
 
 	++i;
-	if (i >= 1000)
-	    break;
+	ਜੇ (i >= 1000)
+	    ਰੋਕੋ;
 
-	sprintf((char *)p, "%d", i);
+	sprintf((ਅੱਖਰ *)p, "%d", i);
     }
 
-    if (hwnd != 0)
+    ਜੇ (hwnd != 0)
 	vim_free(ok_name);
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Remember the name
 	serverName = ok_name;
 	need_maketitle = TRUE;	// update Vim window title later
 
 	// Update the message window title
-	SetWindowText(message_window, (LPCSTR)ok_name);
+	ਸੈੱਟ_ਖਿੜਕੀ_ਪਾਠ(ਸੁਨੇਹਾ_ਖਿੜਕੀ, (LPCSTR)ok_name);
 
 # ifdef FEAT_EVAL
 	// Set the servername variable
-	set_vim_var_string(VV_SEND_SERVER, serverName, -1);
+	ਸੈੱਟ_vim_var_string(VV_SEND_SERVER, serverName, -1);
 # endif
     }
 }
 
     list_T *
-serverGetVimNames(void)
+server_Get_Vim_ਨਾਂ(ਖਾਲੀ)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    ਜੇ (list == ਨਿਰਾ)
+	ਵਾਪਸ ਨਿਰਾ;
 
-    enum_windows(enumWindowsGetNames, (LPARAM)list);
+    enum_windows(enum_Windows_Get_ਨਾਂ, (LPARAM)list);
 
-    return list;
+    ਵਾਪਸ list;
 }
 
-    int
-serverSendReply(
+    ਪੂਰਨ
+server_Send_ਜਵਾਬ(
     char_u	*name,		// Where to send.
-    char_u	*reply)		// What to send.
+    char_u	*ਜਵਾਬ)		// What to send.
 {
-    HWND	target;
-    COPYDATASTRUCT data;
+    HWND	ਨਿਸ਼ਾਨਾ;
+    COPYDATASTRUCT ਅੰਕੜੇ;
     long_u	n = 0;
     DWORD_PTR	dwret = 0;
 
     // The "name" argument is a magic cookie obtained from expand("<client>").
     // It should be of the form 0xXXXXX - i.e. a C hex literal, which is the
     // value of the client's message window HWND.
-    sscanf((char *)name, SCANF_HEX_LONG_U, &n);
-    if (n == 0)
-	return -1;
+    ਲੜੀ_ਤੋਂ_ਪੜ੍ਹੋ((ਅੱਖਰ *)name, SCANF_HEX_LONG_U, &n);
+    ਜੇ (n == 0)
+	ਵਾਪਸ -1;
 
-    target = (HWND)n;
-    if (!IsWindow(target))
-	return -1;
+    ਨਿਸ਼ਾਨਾ = (HWND)n;
+    ਜੇ (!Is_ਖਿੜਕੀ(ਨਿਸ਼ਾਨਾ))
+	ਵਾਪਸ -1;
 
-    data.dwData = COPYDATA_REPLY;
-    data.cbData = (DWORD)STRLEN(reply) + 1;
-    data.lpData = reply;
+    ਅੰਕੜੇ.dw_ਅੰਕੜੇ = COPYDATA_ਜਵਾਬ;
+    ਅੰਕੜੇ.cb_ਅੰਕੜੇ = (DWORD)STRLEN(ਜਵਾਬ) + 1;
+    ਅੰਕੜੇ.lp_ਅੰਕੜੇ = ਜਵਾਬ;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    ਜੇ (serverSendEnc(ਨਿਸ਼ਾਨਾ) < 0)
+	ਵਾਪਸ -1;
+    ਜੇ (Send_ਸੁਨੇਹਾ_Timeout(ਨਿਸ਼ਾਨਾ, WM_COPYDATA,
+		(WPARAM)ਸੁਨੇਹਾ_ਖਿੜਕੀ, (LPARAM)&ਅੰਕੜੇ,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    return dwret ? 0 : -1;
+	ਵਾਪਸ -1;
+    ਵਾਪਸ dwret ? 0 : -1;
 }
 
-    int
-serverSendToVim(
+    ਪੂਰਨ
+server_Send_ਮੰਜ਼ਿਲ_Vim(
     char_u	 *name,			// Where to send.
     char_u	 *cmd,			// What to send.
-    char_u	 **result,		// Result of eval'ed expression
-    void	 *ptarget,		// HWND of server
-    int		 asExpr,		// Expression or keys?
-    int		 timeout,		// timeout in seconds or zero
-    int		 silent)		// don't complain about no server
+    char_u	 **ਨਤੀਜਾ,		// Result of eval'ed expression
+    ਖਾਲੀ	 *ptarget,		// HWND of server
+    ਪੂਰਨ		 as_ਵਿਅੰਜਕ,		// Expression or keys?
+    ਪੂਰਨ		 timeout,		// timeout in seconds or zero
+    ਪੂਰਨ		 silent)		// don't complain about no server
 {
     size_t	namelen;
-    HWND	target;
-    COPYDATASTRUCT data;
-    char_u	*retval = NULL;
-    int		retcode = 0;
+    HWND	ਨਿਸ਼ਾਨਾ;
+    COPYDATASTRUCT ਅੰਕੜੇ;
+    char_u	*retval = ਨਿਰਾ;
+    ਪੂਰਨ		retcode = 0;
     DWORD_PTR	dwret = 0;
-    char_u	altname_buf[MAX_PATH];
+    char_u	altname_buf[MAX_ਰਸਤਾ];
 
     // Execute locally if no display or target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(cmd, asExpr, result);
+    ਜੇ (serverName != ਨਿਰਾ && STRICMP(name, serverName) == 0)
+	ਵਾਪਸ send_ਮੰਜ਼ਿਲ_Local_Vim(cmd, as_ਵਿਅੰਜਕ, ਨਤੀਜਾ);
 
     // If the server name does not end in a digit then we look for an
     // alternate name.  e.g. when "name" is GVIM then we may find GVIM2.
     namelen = STRLEN(name);
-    if (namelen > 1 && !vim_isdigit(name[namelen - 1]))
+    ਜੇ (namelen > 1 && !vim_isdigit(name[namelen - 1]))
 	altname_buf_ptr = altname_buf;
     altname_buf[0] = NUL;
-    target = findServer(name);
-    altname_buf_ptr = NULL;
-    if (target == 0 && altname_buf[0] != NUL)
+    ਨਿਸ਼ਾਨਾ = ਲੱਭੋ_Server(name);
+    altname_buf_ptr = ਨਿਰਾ;
+    ਜੇ (ਨਿਸ਼ਾਨਾ == 0 && altname_buf[0] != NUL)
 	// Use another server name we found.
-	target = findServer(altname_buf);
+	ਨਿਸ਼ਾਨਾ = ਲੱਭੋ_Server(altname_buf);
 
-    if (target == 0)
+    ਜੇ (ਨਿਸ਼ਾਨਾ == 0)
     {
-	if (!silent)
+	ਜੇ (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	ਵਾਪਸ -1;
     }
 
-    if (ptarget)
-	*(HWND *)ptarget = target;
+    ਜੇ (ptarget)
+	*(HWND *)ptarget = ਨਿਸ਼ਾਨਾ;
 
-    data.dwData = asExpr ? COPYDATA_EXPR : COPYDATA_KEYS;
-    data.cbData = (DWORD)STRLEN(cmd) + 1;
-    data.lpData = cmd;
+    ਅੰਕੜੇ.dw_ਅੰਕੜੇ = as_ਵਿਅੰਜਕ ? COPYDATA_ਵਿਅੰਜਕ : COPYDATA_ਕੁੰਜੀਆਂ;
+    ਅੰਕੜੇ.cb_ਅੰਕੜੇ = (DWORD)STRLEN(cmd) + 1;
+    ਅੰਕੜੇ.lp_ਅੰਕੜੇ = cmd;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    ਜੇ (serverSendEnc(ਨਿਸ਼ਾਨਾ) < 0)
+	ਵਾਪਸ -1;
+    ਜੇ (Send_ਸੁਨੇਹਾ_Timeout(ਨਿਸ਼ਾਨਾ, WM_COPYDATA,
+		(WPARAM)ਸੁਨੇਹਾ_ਖਿੜਕੀ, (LPARAM)&ਅੰਕੜੇ,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    if (dwret == 0)
-	return -1;
+	ਵਾਪਸ -1;
+    ਜੇ (dwret == 0)
+	ਵਾਪਸ -1;
 
-    if (asExpr)
-	retval = serverGetReply(target, &retcode, TRUE, TRUE, timeout);
+    ਜੇ (as_ਵਿਅੰਜਕ)
+	retval = server_Get_ਜਵਾਬ(ਨਿਸ਼ਾਨਾ, &retcode, TRUE, TRUE, timeout);
 
-    if (result == NULL)
+    ਜੇ (ਨਤੀਜਾ == ਨਿਰਾ)
 	vim_free(retval);
-    else
-	*result = retval; // Caller assumes responsibility for freeing
+    ਨਹੀਂਤਾਂ
+	*ਨਤੀਜਾ = retval; // Caller assumes responsibility for freeing
 
-    return retcode;
+    ਵਾਪਸ retcode;
 }
 
 /*
  * Bring the server to the foreground.
  */
-    void
+    ਖਾਲੀ
 serverForeground(char_u *name)
 {
-    HWND	target = findServer(name);
+    HWND	ਨਿਸ਼ਾਨਾ = ਲੱਭੋ_Server(name);
 
-    if (target != 0)
-	SetForegroundWindow(target);
+    ਜੇ (ਨਿਸ਼ਾਨਾ != 0)
+	ਸੈੱਟ_Foreground_ਖਿੜਕੀ(ਨਿਸ਼ਾਨਾ);
 }
 
 // Replies from server need to be stored until the client picks them up via
@@ -2530,42 +2530,42 @@ serverForeground(char_u *name)
 // We just store the replies in a simple list. When we remove an entry, we
 // move list entries down to fill the gap.
 // The server ID is simply the HWND.
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
     HWND	server;		// server window
-    char_u	*reply;		// reply string
-    int		expr_result;	// 0 for REPLY, 1 for RESULT 2 for error
-} reply_T;
+    char_u	*ਜਵਾਬ;		// reply string
+    ਪੂਰਨ		ਵਿਅੰਜਕ_ਨਤੀਜਾ;	// 0 for REPLY, 1 for RESULT 2 for error
+} ਜਵਾਬ_T;
 
-static garray_T reply_list = {0, 0, sizeof(reply_T), 5, 0};
+ਸਥਿਰ garray_T ਜਵਾਬ_list = {0, 0, ਆਕਾਰ(ਜਵਾਬ_T), 5, 0};
 
-# define REPLY_ITEM(i) ((reply_T *)(reply_list.ga_data) + (i))
-# define REPLY_COUNT (reply_list.ga_len)
+# define ਜਵਾਬ_ਵਸਤੂ(i) ((ਜਵਾਬ_T *)(ਜਵਾਬ_list.ga_ਅੰਕੜੇ) + (i))
+# define ਜਵਾਬ_ਗਿਣਤੀ (ਜਵਾਬ_list.ga_len)
 
 // Flag which is used to wait for a reply
-static int reply_received = 0;
+ਸਥਿਰ ਪੂਰਨ ਜਵਾਬ_received = 0;
 
 /*
  * Store a reply.  "reply" must be allocated memory (or NULL).
  */
-    static int
-save_reply(HWND server, char_u *reply, int expr)
+    ਸਥਿਰ ਪੂਰਨ
+save_ਜਵਾਬ(HWND server, char_u *ਜਵਾਬ, ਪੂਰਨ ਵਿਅੰਜਕ)
 {
-    reply_T *rep;
+    ਜਵਾਬ_T *rep;
 
-    if (ga_grow(&reply_list, 1) == FAIL)
-	return FAIL;
+    ਜੇ (ga_grow(&ਜਵਾਬ_list, 1) == FAIL)
+	ਵਾਪਸ FAIL;
 
-    rep = REPLY_ITEM(REPLY_COUNT);
+    rep = ਜਵਾਬ_ਵਸਤੂ(ਜਵਾਬ_ਗਿਣਤੀ);
     rep->server = server;
-    rep->reply = reply;
-    rep->expr_result = expr;
-    if (rep->reply == NULL)
-	return FAIL;
+    rep->ਜਵਾਬ = ਜਵਾਬ;
+    rep->ਵਿਅੰਜਕ_ਨਤੀਜਾ = ਵਿਅੰਜਕ;
+    ਜੇ (rep->ਜਵਾਬ == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    ++REPLY_COUNT;
-    reply_received = 1;
-    return OK;
+    ++ਜਵਾਬ_ਗਿਣਤੀ;
+    ਜਵਾਬ_received = 1;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -2577,120 +2577,120 @@ save_reply(HWND server, char_u *reply, int expr)
  * if "wait" is TRUE block until a message arrives (or the server exits).
  */
     char_u *
-serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
+server_Get_ਜਵਾਬ(HWND server, ਪੂਰਨ *ਵਿਅੰਜਕ_res, ਪੂਰਨ remove, ਪੂਰਨ wait, ਪੂਰਨ timeout)
 {
-    int		i;
-    char_u	*reply;
-    reply_T	*rep;
-    int		did_process = FALSE;
-    time_t	start;
+    ਪੂਰਨ		i;
+    char_u	*ਜਵਾਬ;
+    ਜਵਾਬ_T	*rep;
+    ਪੂਰਨ		did_process = FALSE;
+    time_t	ਸ਼ੁਰੂ;
     time_t	now;
 
     // When waiting, loop until the message waiting for is received.
-    time(&start);
-    for (;;)
+    ਸਮਾਂ(&ਸ਼ੁਰੂ);
+    ਲਈ (;;)
     {
 	// Reset this here, in case a message arrives while we are going
 	// through the already received messages.
-	reply_received = 0;
+	ਜਵਾਬ_received = 0;
 
-	for (i = 0; i < REPLY_COUNT; ++i)
+	ਲਈ (i = 0; i < ਜਵਾਬ_ਗਿਣਤੀ; ++i)
 	{
-	    rep = REPLY_ITEM(i);
-	    if (rep->server == server
-		    && ((rep->expr_result != 0) == (expr_res != NULL)))
+	    rep = ਜਵਾਬ_ਵਸਤੂ(i);
+	    ਜੇ (rep->server == server
+		    && ((rep->ਵਿਅੰਜਕ_ਨਤੀਜਾ != 0) == (ਵਿਅੰਜਕ_res != ਨਿਰਾ)))
 	    {
 		// Save the values we've found for later
-		reply = rep->reply;
-		if (expr_res != NULL)
-		    *expr_res = rep->expr_result == 1 ? 0 : -1;
+		ਜਵਾਬ = rep->ਜਵਾਬ;
+		ਜੇ (ਵਿਅੰਜਕ_res != ਨਿਰਾ)
+		    *ਵਿਅੰਜਕ_res = rep->ਵਿਅੰਜਕ_ਨਤੀਜਾ == 1 ? 0 : -1;
 
-		if (remove)
+		ਜੇ (remove)
 		{
 		    // Move the rest of the list down to fill the gap
 		    mch_memmove(rep, rep + 1,
-				     (REPLY_COUNT - i - 1) * sizeof(reply_T));
-		    --REPLY_COUNT;
+				     (ਜਵਾਬ_ਗਿਣਤੀ - i - 1) * ਆਕਾਰ(ਜਵਾਬ_T));
+		    --ਜਵਾਬ_ਗਿਣਤੀ;
 		}
 
 		// Return the reply to the caller, who takes on responsibility
 		// for freeing it if "remove" is TRUE.
-		return reply;
+		ਵਾਪਸ ਜਵਾਬ;
 	    }
 	}
 
 	// If we got here, we didn't find a reply. Return immediately if the
 	// "wait" parameter isn't set.
-	if (!wait)
+	ਜੇ (!wait)
 	{
 	    // Process pending messages once. Without this, looping on
 	    // remote_peek() would never get the reply.
-	    if (!did_process)
+	    ਜੇ (!did_process)
 	    {
 		did_process = TRUE;
 		serverProcessPendingMessages();
-		continue;
+		ਜਾਰੀ;
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// We need to wait for a reply. Enter a message loop until the
 	// "reply_received" flag gets set.
 
 	// Loop until we receive a reply
-	while (reply_received == 0)
+	ਜਦੋਂ (ਜਵਾਬ_received == 0)
 	{
 # ifdef FEAT_TIMERS
 	    // TODO: use the return value to decide how long to wait.
 	    check_due_timer();
 # endif
-	    time(&now);
-	    if (timeout > 0 && (now - start) >= timeout)
-		break;
+	    ਸਮਾਂ(&now);
+	    ਜੇ (timeout > 0 && (now - ਸ਼ੁਰੂ) >= timeout)
+		ਰੋਕੋ;
 
 	    // Wait for a SendMessage() call to us.  This could be the reply
 	    // we are waiting for.  Use a timeout of a second, to catch the
 	    // situation that the server died unexpectedly.
-	    MsgWaitForMultipleObjects(0, NULL, TRUE, 1000, QS_ALLINPUT);
+	    ਸੁਨੇਹਾ_Wait_For_ਗੁਣਜ_Objects(0, ਨਿਰਾ, TRUE, 1000, QS_ALLINPUT);
 
 	    // If the server has died, give up
-	    if (!IsWindow(server))
-		return NULL;
+	    ਜੇ (!Is_ਖਿੜਕੀ(server))
+		ਵਾਪਸ ਨਿਰਾ;
 
 	    serverProcessPendingMessages();
 	}
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Process any messages in the Windows message queue.
  */
-    void
-serverProcessPendingMessages(void)
+    ਖਾਲੀ
+serverProcessPendingMessages(ਖਾਲੀ)
 {
-    MSG msg;
+    ਸੁਨੇਹਾ_3 ਸੁਨੇਹਾ;
 
-    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    ਜਦੋਂ (Peek_ਸੁਨੇਹਾ_W(&ਸੁਨੇਹਾ, ਨਿਰਾ, 0, 0, PM_REMOVE))
     {
-	TranslateMessage(&msg);
-	DispatchMessageW(&msg);
+	Translate_ਸੁਨੇਹਾ(&ਸੁਨੇਹਾ);
+	Dispatch_ਸੁਨੇਹਾ_W(&ਸੁਨੇਹਾ);
     }
 }
 
-#endif // FEAT_CLIENTSERVER
+#ਜੇ_ਅੰਤ // FEAT_CLIENTSERVER
 
-#if defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
+#ਜੇ defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
 
-struct charset_pair
+ਬਣਤਰ charset_pair
 {
     string_T	name;
     BYTE	charset;
 };
 
-static struct charset_pair
-charset_pairs[] =
+ਸਥਿਰ ਬਣਤਰ charset_pair
+charset_ਜੋੜੇ[] =
 {
     {STR_LITERAL_INIT("ANSI"),		ANSI_CHARSET},
     {STR_LITERAL_INIT("CHINESEBIG5"),	CHINESEBIG5_CHARSET},
@@ -2698,7 +2698,7 @@ charset_pairs[] =
     {STR_LITERAL_INIT("HANGEUL"),	HANGEUL_CHARSET},
     {STR_LITERAL_INIT("OEM"),		OEM_CHARSET},
     {STR_LITERAL_INIT("SHIFTJIS"),	SHIFTJIS_CHARSET},
-    {STR_LITERAL_INIT("SYMBOL"),	SYMBOL_CHARSET},
+    {STR_LITERAL_INIT("SYMBOL"),	ਚਿੰਨ੍ਹ_CHARSET},
     {STR_LITERAL_INIT("ARABIC"),	ARABIC_CHARSET},
     {STR_LITERAL_INIT("BALTIC"),	BALTIC_CHARSET},
     {STR_LITERAL_INIT("EASTEUROPE"),	EASTEUROPE_CHARSET},
@@ -2716,14 +2716,14 @@ charset_pairs[] =
 # endif
 };
 
-struct quality_pair
+ਬਣਤਰ quality_pair
 {
     string_T	name;
     DWORD	quality;
 };
 
-static struct quality_pair
-quality_pairs[] = {
+ਸਥਿਰ ਬਣਤਰ quality_pair
+quality_ਜੋੜੇ[] = {
 # ifdef CLEARTYPE_QUALITY
     {STR_LITERAL_INIT("CLEARTYPE"),	CLEARTYPE_QUALITY},
 # endif
@@ -2746,54 +2746,54 @@ quality_pairs[] = {
  * Convert a charset ID to a name.
  * Return NULL when not recognized.
  */
-    char *
-charset_id2name(int id)
+    ਅੱਖਰ *
+charset_id2name(ਪੂਰਨ id)
 {
-    int	i;
+    ਪੂਰਨ	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+    ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(charset_ਜੋੜੇ); ++i)
     {
-	if ((BYTE)id == charset_pairs[i].charset)
-	    return (char *)charset_pairs[i].name.string;
+	ਜੇ ((BYTE)id == charset_ਜੋੜੇ[i].charset)
+	    ਵਾਪਸ (ਅੱਖਰ *)charset_ਜੋੜੇ[i].name.string;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
  * Convert a quality ID to a name.
  * Return NULL when not recognized.
  */
-    char *
+    ਅੱਖਰ *
 quality_id2name(DWORD id)
 {
-    int	i;
+    ਪੂਰਨ	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+    ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(quality_ਜੋੜੇ); ++i)
     {
-	if (id == quality_pairs[i].quality)
-	    return (char *)quality_pairs[i].name.string;
+	ਜੇ (id == quality_ਜੋੜੇ[i].quality)
+	    ਵਾਪਸ (ਅੱਖਰ *)quality_ਜੋੜੇ[i].name.string;
     }
 
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 // The default font height in 100% scaling (96dpi).
 // (-16 in 96dpi equates to roughly 12pt)
-# define DEFAULT_FONT_HEIGHT	(-16)
+# define DEFAULT_FONT_ਉਚਾਈ	(-16)
 
-static const LOGFONTW s_lfDefault =
+ਸਥਿਰ ਅਚਲ LOGFONTW s_lfDefault =
 {
-    DEFAULT_FONT_HEIGHT,
-    0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+    DEFAULT_FONT_ਉਚਾਈ,
+    0, 0, 0, FW_ਸਾਧਾਰਨ, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+    ਬਾਹਰਲਾ_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
     PROOF_QUALITY, FIXED_PITCH | FF_DONTCARE,
     L""	// Default font name will be set later based on current language.
 };
 
 // This will be initialized when set_default_logfont() is called first time.
 // The value will be based on the system DPI.
-int current_font_height = 0;		// also used in gui_w32.c
+ਪੂਰਨ current_font_ਉਚਾਈ = 0;		// also used in gui_w32.c
 
 /*
  * Convert a string representing a point size into pixels. The string should
@@ -2802,88 +2802,88 @@ int current_font_height = 0;		// also used in gui_w32.c
  * character is stored in *end. The flag "vertical" says whether this
  * calculation is for a vertical (height) size or a horizontal (width) one.
  */
-    static int
-points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
+    ਸਥਿਰ ਪੂਰਨ
+points_ਮੰਜ਼ਿਲ_pixels(WCHAR *str, WCHAR **ਸਿਰਾ, ਪੂਰਨ vertical, long_i pprinter_dc)
 {
-    int		pixels;
-    int		points = 0;
-    int		divisor = 0;
+    ਪੂਰਨ		pixels;
+    ਪੂਰਨ		points = 0;
+    ਪੂਰਨ		ਭਾਜਕ = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    while (*str != NUL)
+    ਜਦੋਂ (*str != NUL)
     {
-	if (*str == L'.' && divisor == 0)
+	ਜੇ (*str == L'.' && ਭਾਜਕ == 0)
 	{
 	    // Start keeping a divisor, for later
-	    divisor = 1;
+	    ਭਾਜਕ = 1;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (!VIM_ISDIGIT(*str))
-		break;
+	    ਜੇ (!VIM_ISDIGIT(*str))
+		ਰੋਕੋ;
 
 	    points *= 10;
 	    points += *str - L'0';
-	    divisor *= 10;
+	    ਭਾਜਕ *= 10;
 	}
 	++str;
     }
 
-    if (divisor == 0)
-	divisor = 1;
+    ਜੇ (ਭਾਜਕ == 0)
+	ਭਾਜਕ = 1;
 
-    if (printer_dc == NULL)
+    ਜੇ (printer_dc == ਨਿਰਾ)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_ਖਿੜਕੀ();
+	hdc = Get_ਖਿੜਕੀ_DC(hwnd);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	hdc = printer_dc;
 
     pixels = MulDiv(points,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX),
-		    72 * divisor);
+		    72 * ਭਾਜਕ);
 
-    if (printer_dc == NULL)
+    ਜੇ (printer_dc == ਨਿਰਾ)
 	ReleaseDC(hwnd, hdc);
 
-    *end = str;
-    return pixels;
+    *ਸਿਰਾ = str;
+    ਵਾਪਸ pixels;
 }
 
 /*
  * Convert pixel into point size. This is a reverse of points_to_pixels.
  */
-    static double
-pixels_to_points(int pixels, int vertical, long_i pprinter_dc)
+    ਸਥਿਰ ਦੁੱਗਣਾ
+pixels_ਮੰਜ਼ਿਲ_points(ਪੂਰਨ pixels, ਪੂਰਨ vertical, long_i pprinter_dc)
 {
-    double	points = 0;
+    ਦੁੱਗਣਾ	points = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    if (printer_dc == NULL)
+    ਜੇ (printer_dc == ਨਿਰਾ)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_ਖਿੜਕੀ();
+	hdc = Get_ਖਿੜਕੀ_DC(hwnd);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	hdc = printer_dc;
 
     points = pixels * 72.0 / GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX);
-    if (printer_dc == NULL)
+    ਜੇ (printer_dc == ਨਿਰਾ)
 	ReleaseDC(hwnd, hdc);
 
-    return points;
+    ਵਾਪਸ points;
 }
 
-    static int CALLBACK
+    ਸਥਿਰ ਪੂਰਨ CALLBACK
 font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm ਅਣਵਰਤਿਆ,
+    DWORD	    type ਅਣਵਰਤਿਆ,
     LPARAM	    lparam)
 {
     // Return value:
@@ -2900,29 +2900,29 @@ font_enumproc(
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    ਜੇ ((ntm->tmPitchAndFamily & 1) != 0)
+	ਵਾਪਸ 1;
 # endif
 
     // Remember this LOGFONTW as a "possible"
     *lf = elf->elfLogFont;
 
     // Terminate the scan as soon as we find an ANSI font
-    if (lf->lfCharSet == ANSI_CHARSET
-	    || lf->lfCharSet == OEM_CHARSET
-	    || lf->lfCharSet == DEFAULT_CHARSET)
-	return 0;
+    ਜੇ (lf->lf_Char_ਸੈੱਟ == ANSI_CHARSET
+	    || lf->lf_Char_ਸੈੱਟ == OEM_CHARSET
+	    || lf->lf_Char_ਸੈੱਟ == DEFAULT_CHARSET)
+	ਵਾਪਸ 0;
 
     // Continue the scan - we have a non-ANSI font
-    return 2;
+    ਵਾਪਸ 2;
 }
 
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 init_logfont(LOGFONTW *lf)
 {
-    int		n;
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    ਪੂਰਨ		n;
+    HWND	hwnd = Get_Desktop_ਖਿੜਕੀ();
+    HDC		hdc = Get_ਖਿੜਕੀ_DC(hwnd);
 
     n = EnumFontFamiliesW(hdc,
 			 lf->lfFaceName,
@@ -2932,58 +2932,58 @@ init_logfont(LOGFONTW *lf)
     ReleaseDC(hwnd, hdc);
 
     // If we couldn't find a usable font, return failure
-    if (n == 1)
-	return FAIL;
+    ਜੇ (n == 1)
+	ਵਾਪਸ FAIL;
 
     // Tidy up the rest of the LOGFONTW structure. We set to a basic
     // font - get_logfont() sets bold, italic, etc based on the user's
     // input.
-    lf->lfHeight = current_font_height;
-    lf->lfWidth = 0;
+    lf->lf_ਉਚਾਈ = current_font_ਉਚਾਈ;
+    lf->lf_ਚੌੜਾਈ = 0;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_Strike_ਬਾਹਰਲਾ = FALSE;
+    lf->lf_ਭਾਰ = FW_ਸਾਧਾਰਨ;
 
     // Return success
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Call back for EnumFontFamiliesW in expand_font_enumproc.
  *
  */
-    static int CALLBACK
+    ਸਥਿਰ ਪੂਰਨ CALLBACK
 expand_font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm ਅਣਵਰਤਿਆ,
+    DWORD	    type ਅਣਵਰਤਿਆ,
     LPARAM	    lparam)
 {
     LOGFONTW *lf = (LOGFONTW*)elf;
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    ਜੇ ((ntm->tmPitchAndFamily & 1) != 0)
+	ਵਾਪਸ 1;
 # endif
 
     // Filter only on ANSI. Otherwise will see a lot of random fonts that we
     // usually don't want.
-    if (lf->lfCharSet != ANSI_CHARSET)
-	return 1;
+    ਜੇ (lf->lf_Char_ਸੈੱਟ != ANSI_CHARSET)
+	ਵਾਪਸ 1;
 
-    int (*add_match)(char_u *) = (int (*)(char_u *))lparam;
+    ਪੂਰਨ (*ਜੋੜੋ_ਮੇਲ)(char_u *) = (ਪੂਰਨ (*)(char_u *))lparam;
 
     WCHAR *faceNameW = lf->lfFaceName;
-    char_u *faceName = utf16_to_enc(faceNameW, NULL);
-    if (!faceName)
-	return 0;
+    char_u *faceName = utf16_ਮੰਜ਼ਿਲ_enc(faceNameW, ਨਿਰਾ);
+    ਜੇ (!faceName)
+	ਵਾਪਸ 0;
 
-    add_match(faceName);
+    ਜੋੜੋ_ਮੇਲ(faceName);
     vim_free(faceName);
 
-    return 1;
+    ਵਾਪਸ 1;
 }
 
 /*
@@ -2995,53 +2995,53 @@ expand_font_enumproc(
  * handling is done by the GUI code, whereas in Windows it's part of the
  * platform code.
  */
-    void
+    ਖਾਲੀ
 gui_mch_expand_font(
-    optexpand_T	*args,
-    void	*param UNUSED,
-    int		(*add_match)(char_u *val))
+    optexpand_T	*ਦਲੀਲਾਂ,
+    ਖਾਲੀ	*param ਅਣਵਰਤਿਆ,
+    ਪੂਰਨ		(*ਜੋੜੋ_ਮੇਲ)(char_u *val))
 {
-    expand_T	    *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T	    *xp = ਦਲੀਲਾਂ->oe_xp;
+    ਜੇ (xp->xp_ਨਮੂਨਾ > ਦਲੀਲਾਂ->oe_ਸੈੱਟ_arg && *(xp->xp_ਨਮੂਨਾ-1) == ':')
     {
-	char buf[30];
-	int	i;
+	ਅੱਖਰ buf[30];
+	ਪੂਰਨ	i;
 
 	// Always fill in with the current font size as first option for
 	// convenience. We simply round to the closest integer for simplicity.
-	int font_height = (int)round(
-		pixels_to_points(-current_font_height, TRUE, (long_i)NULL));
-	vim_snprintf(buf, ARRAY_LENGTH(buf), "h%d", font_height);
-	add_match((char_u *)buf);
+	ਪੂਰਨ font_ਉਚਾਈ = (ਪੂਰਨ)ਗੇੜਾ(
+		pixels_ਮੰਜ਼ਿਲ_points(-current_font_ਉਚਾਈ, TRUE, (long_i)ਨਿਰਾ));
+	vim_snprintf(buf, ARRAY_ਲੰਮਾਈ(buf), "h%d", font_ਉਚਾਈ);
+	ਜੋੜੋ_ਮੇਲ((char_u *)buf);
 
 	// Note: Keep this in sync with get_logfont(). Don't include 'c' and
 	// 'q' as we fill in all the values below.
-	static char *(p_gfn_win_opt_values[]) = {
+	ਸਥਿਰ ਅੱਖਰ *(p_gfn_win_opt_ਮੁੱਲਾਂ[]) = {
 	    "h" , "w" , "W" , "b" , "i" , "u" , "s"};
-	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_values); i++)
-	    add_match((char_u *)p_gfn_win_opt_values[i]);
+	ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(p_gfn_win_opt_ਮੁੱਲਾਂ); i++)
+	    ਜੋੜੋ_ਮੇਲ((char_u *)p_gfn_win_opt_ਮੁੱਲਾਂ[i]);
 
-	for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+	ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(charset_ਜੋੜੇ); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "c%s", charset_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, ਆਕਾਰ(buf), "c%s", charset_ਜੋੜੇ[i].name.string);
+	    ਜੋੜੋ_ਮੇਲ((char_u *)buf);
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+	ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(quality_ਜੋੜੇ); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "q%s", quality_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, ਆਕਾਰ(buf), "q%s", quality_ਜੋੜੇ[i].name.string);
+	    ਜੋੜੋ_ਮੇਲ((char_u *)buf);
 	}
-	return;
+	ਵਾਪਸ;
     }
 
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    HWND	hwnd = Get_Desktop_ਖਿੜਕੀ();
+    HDC		hdc = Get_ਖਿੜਕੀ_DC(hwnd);
 
     EnumFontFamiliesW(hdc,
-	    NULL,
+	    ਨਿਰਾ,
 	    (FONTENUMPROCW)expand_font_enumproc,
-	    (LPARAM)add_match);
+	    (LPARAM)ਜੋੜੋ_ਮੇਲ);
 
     ReleaseDC(hwnd, hdc);
 }
@@ -3050,54 +3050,54 @@ gui_mch_expand_font(
  * Compare a UTF-16 string and an ASCII string literally.
  * Only works all the code points are inside ASCII range.
  */
-    static int
-utf16ascncmp(const WCHAR *w, const char *p, size_t n)
+    ਸਥਿਰ ਪੂਰਨ
+utf16ascncmp(ਅਚਲ WCHAR *w, ਅਚਲ ਅੱਖਰ *p, size_t n)
 {
     size_t i;
 
-    for (i = 0; i < n; i++)
+    ਲਈ (i = 0; i < n; i++)
     {
-	if (w[i] == 0 || w[i] != p[i])
-	    return w[i] - p[i];
+	ਜੇ (w[i] == 0 || w[i] != p[i])
+	    ਵਾਪਸ w[i] - p[i];
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 /*
  * Equivalent of GetDpiForSystem().
  */
     UINT WINAPI
-vimGetDpiForSystem(void)
+vimGetDpiForSystem(ਖਾਲੀ)
 {
-    HWND hwnd = GetDesktopWindow();
-    HDC hdc = GetWindowDC(hwnd);
+    HWND hwnd = Get_Desktop_ਖਿੜਕੀ();
+    HDC hdc = Get_ਖਿੜਕੀ_DC(hwnd);
     UINT dpi = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(hwnd, hdc);
-    return dpi;
+    ਵਾਪਸ dpi;
 }
 
 /*
  * Set default logfont based on current language.
  */
-    static void
-set_default_logfont(LOGFONTW *lf)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_default_logfont(LOGFONTW *lf)
 {
     // Default font name for current language on MS-Windows.
     // If not translated, falls back to "Consolas".
     // This must be a fixed-pitch font.
-    const char *defaultfontname = N_("DefaultFontNameForWindows");
-    char *fontname = _(defaultfontname);
+    ਅਚਲ ਅੱਖਰ *defaultfontname = N_("DefaultFontNameForWindows");
+    ਅੱਖਰ *fontname = _(defaultfontname);
 
-    if (STRCMP(fontname, defaultfontname) == 0)
+    ਜੇ (STRCMP(fontname, defaultfontname) == 0)
 	fontname = "Consolas";
 
     *lf = s_lfDefault;
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    if (current_font_height == 0)
-	current_font_height = lf->lfHeight;
+    lf->lf_ਉਚਾਈ = DEFAULT_FONT_ਉਚਾਈ * (ਪੂਰਨ)vimGetDpiForSystem() / 96;
+    ਜੇ (current_font_ਉਚਾਈ == 0)
+	current_font_ਉਚਾਈ = lf->lf_ਉਚਾਈ;
 
-    WCHAR *wfontname = enc_to_utf16((char_u*)fontname, NULL);
-    if (wfontname != NULL)
+    WCHAR *wfontname = enc_ਮੰਜ਼ਿਲ_utf16((char_u*)fontname, ਨਿਰਾ);
+    ਜੇ (wfontname != ਨਿਰਾ)
     {
 	wcscpy_s(lf->lfFaceName, LF_FACESIZE, wfontname);
 	vim_free(wfontname);
@@ -3108,206 +3108,206 @@ set_default_logfont(LOGFONTW *lf)
  * Get font info from "name" into logfont "lf".
  * Return OK for a valid name, FAIL otherwise.
  */
-    int
+    ਪੂਰਨ
 get_logfont(
     LOGFONTW	*lf,
     char_u	*name,
     HDC		printer_dc,
-    int		verbose)
+    ਪੂਰਨ		verbose)
 {
     WCHAR	*p;
-    int		i;
-    int		ret = FAIL;
-    static LOGFONTW *lastlf = NULL;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		ret = FAIL;
+    ਸਥਿਰ LOGFONTW *lastlf = ਨਿਰਾ;
     WCHAR	*wname;
 
-    set_default_logfont(lf);
-    if (name == NULL)
-	return OK;
+    ਸੈੱਟ_default_logfont(lf);
+    ਜੇ (name == ਨਿਰਾ)
+	ਵਾਪਸ OK;
 
-    wname = enc_to_utf16(name, NULL);
-    if (wname == NULL)
-	return FAIL;
+    wname = enc_ਮੰਜ਼ਿਲ_utf16(name, ਨਿਰਾ);
+    ਜੇ (wname == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
-    if (wcscmp(wname, L"*") == 0)
+    ਜੇ (wcscmp(wname, L"*") == 0)
     {
-# if defined(FEAT_GUI_MSWIN)
+# ਜੇ defined(FEAT_GUI_MSWIN)
 	CHOOSEFONTW	cf;
 	// if name is "*", bring up std font dialog:
-	CLEAR_FIELD(cf);
-	cf.lStructSize = sizeof(cf);
+	CLEAR_ਖੇਤਰ(cf);
+	cf.l_Struct_ਮਾਪ = ਆਕਾਰ(cf);
 	cf.hwndOwner = s_hwnd;
 	cf.Flags = CF_SCREENFONTS | CF_FIXEDPITCHONLY | CF_INITTOLOGFONTSTRUCT;
-	if (lastlf != NULL)
+	ਜੇ (lastlf != ਨਿਰਾ)
 	    *lf = *lastlf;
 	cf.lpLogFont = lf;
 	cf.nFontType = 0 ; //REGULAR_FONTTYPE;
-	if (ChooseFontW(&cf))
+	ਜੇ (ਚੁਣੋ_Font_W(&cf))
 	    ret = OK;
 # endif
-	goto theend;
+	ਜਾਓ theend;
     }
 
     /*
      * Split name up, it could be <name>:h<height>:w<width> etc.
      */
-    for (p = wname; *p && *p != L':'; p++)
+    ਲਈ (p = wname; *p && *p != L':'; p++)
     {
-	if (p - wname + 1 >= LF_FACESIZE)
-	    goto theend;			// Name too long
+	ਜੇ (p - wname + 1 >= LF_FACESIZE)
+	    ਜਾਓ theend;			// Name too long
 	lf->lfFaceName[p - wname] = *p;
     }
-    if (p != wname)
+    ਜੇ (p != wname)
 	lf->lfFaceName[p - wname] = NUL;
 
     // First set defaults
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    lf->lfWidth = 0;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_ਉਚਾਈ = DEFAULT_FONT_ਉਚਾਈ * (ਪੂਰਨ)vimGetDpiForSystem() / 96;
+    lf->lf_ਚੌੜਾਈ = 0;
+    lf->lf_ਭਾਰ = FW_ਸਾਧਾਰਨ;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
+    lf->lf_Strike_ਬਾਹਰਲਾ = FALSE;
 
     /*
      * If the font can't be found, try replacing '_' by ' '.
      */
-    if (init_logfont(lf) == FAIL)
+    ਜੇ (init_logfont(lf) == FAIL)
     {
-	int	did_replace = FALSE;
+	ਪੂਰਨ	did_replace = FALSE;
 
-	for (i = 0; lf->lfFaceName[i]; ++i)
-	    if (lf->lfFaceName[i] == L'_')
+	ਲਈ (i = 0; lf->lfFaceName[i]; ++i)
+	    ਜੇ (lf->lfFaceName[i] == L'_')
 	    {
 		lf->lfFaceName[i] = L' ';
 		did_replace = TRUE;
 	    }
-	if (!did_replace || init_logfont(lf) == FAIL)
-	    goto theend;
+	ਜੇ (!did_replace || init_logfont(lf) == FAIL)
+	    ਜਾਓ theend;
     }
 
-    while (*p == L':')
+    ਜਦੋਂ (*p == L':')
 	p++;
 
     // Set the values found after ':'
-    while (*p)
+    ਜਦੋਂ (*p)
     {
-	switch (*p++)
+	ਚੋਣ (*p++)
 	{
 	    // Note: Keep this in sync with gui_mch_expand_font().
-	    case L'h':
-		lf->lfHeight = - points_to_pixels(p, &p, TRUE, (long_i)printer_dc);
-		break;
-	    case L'w':
-		lf->lfWidth = points_to_pixels(p, &p, FALSE, (long_i)printer_dc);
-		break;
-	    case L'W':
-		lf->lfWeight = wcstol(p, &p, 10);
-		break;
-	    case L'b':
-		lf->lfWeight = FW_BOLD;
-		break;
-	    case L'i':
+	    ਹਾਲਤ L'h':
+		lf->lf_ਉਚਾਈ = - points_ਮੰਜ਼ਿਲ_pixels(p, &p, TRUE, (long_i)printer_dc);
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'w':
+		lf->lf_ਚੌੜਾਈ = points_ਮੰਜ਼ਿਲ_pixels(p, &p, FALSE, (long_i)printer_dc);
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'W':
+		lf->lf_ਭਾਰ = wcstol(p, &p, 10);
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'b':
+		lf->lf_ਭਾਰ = FW_BOLD;
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'i':
 		lf->lfItalic = TRUE;
-		break;
-	    case L'u':
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'u':
 		lf->lfUnderline = TRUE;
-		break;
-	    case L's':
-		lf->lfStrikeOut = TRUE;
-		break;
-	    case L'c':
-		for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+		ਰੋਕੋ;
+	    ਹਾਲਤ L's':
+		lf->lf_Strike_ਬਾਹਰਲਾ = TRUE;
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'c':
+		ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(charset_ਜੋੜੇ); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)charset_pairs[i].name.string,
-			    charset_pairs[i].name.length) == 0)
+		    ਜੇ (utf16ascncmp(p, (ਅੱਖਰ *)charset_ਜੋੜੇ[i].name.string,
+			    charset_ਜੋੜੇ[i].name.ਲੰਮਾਈ) == 0)
 		    {
-			lf->lfCharSet = charset_pairs[i].charset;
-			p += charset_pairs[i].name.length;
-			break;
+			lf->lf_Char_ਸੈੱਟ = charset_ਜੋੜੇ[i].charset;
+			p += charset_ਜੋੜੇ[i].name.ਲੰਮਾਈ;
+			ਰੋਕੋ;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(charset_pairs) && verbose)
+		ਜੇ (i == (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(charset_ਜੋੜੇ) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_ਮੰਜ਼ਿਲ_enc(p, ਨਿਰਾ);
+		    ਜੇ (s != ਨਿਰਾ)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_ਵਿੱਚ_font_name_str),
 							   "charset", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    case L'f':
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'f':
 		// Font features (e.g., "fss19=1").
 		// Parsed separately by gui_mch_init_font(); skip here.
-		while (*p && *p != L':')
+		ਜਦੋਂ (*p && *p != L':')
 		    p++;
-		break;
-	    case L'q':
-		for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+		ਰੋਕੋ;
+	    ਹਾਲਤ L'q':
+		ਲਈ (i = 0; i < (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(quality_ਜੋੜੇ); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)quality_pairs[i].name.string,
-			    quality_pairs[i].name.length) == 0)
+		    ਜੇ (utf16ascncmp(p, (ਅੱਖਰ *)quality_ਜੋੜੇ[i].name.string,
+			    quality_ਜੋੜੇ[i].name.ਲੰਮਾਈ) == 0)
 		    {
-			lf->lfQuality = quality_pairs[i].quality;
-			p += quality_pairs[i].name.length;
-			break;
+			lf->lfQuality = quality_ਜੋੜੇ[i].quality;
+			p += quality_ਜੋੜੇ[i].name.ਲੰਮਾਈ;
+			ਰੋਕੋ;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(quality_pairs) && verbose)
+		ਜੇ (i == (ਪੂਰਨ)ARRAY_ਲੰਮਾਈ(quality_ਜੋੜੇ) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_ਮੰਜ਼ਿਲ_enc(p, ਨਿਰਾ);
+		    ਜੇ (s != ਨਿਰਾ)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_ਵਿੱਚ_font_name_str),
 							   "quality", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    default:
-		if (verbose)
-		    semsg(_(e_illegal_char_nr_in_font_name_str), p[-1], name);
-		goto theend;
+		ਰੋਕੋ;
+	    ਮੂਲ:
+		ਜੇ (verbose)
+		    semsg(_(e_illegal_char_nr_ਵਿੱਚ_font_name_str), p[-1], name);
+		ਜਾਓ theend;
 	}
-	while (*p == L':')
+	ਜਦੋਂ (*p == L':')
 	    p++;
     }
     ret = OK;
 
 theend:
     // ron: init lastlf
-    if (ret == OK && printer_dc == NULL)
+    ਜੇ (ret == OK && printer_dc == ਨਿਰਾ)
     {
 	vim_free(lastlf);
 	lastlf = ALLOC_ONE(LOGFONTW);
-	if (lastlf != NULL)
-	    mch_memmove(lastlf, lf, sizeof(LOGFONTW));
+	ਜੇ (lastlf != ਨਿਰਾ)
+	    mch_memmove(lastlf, lf, ਆਕਾਰ(LOGFONTW));
     }
     vim_free(wname);
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-#endif // defined(FEAT_GUI) || defined(FEAT_PRINTER)
+#ਜੇ_ਅੰਤ // defined(FEAT_GUI) || defined(FEAT_PRINTER)
 
-#if defined(FEAT_JOB_CHANNEL)
+#ਜੇ defined(FEAT_ਕੰਮ_CHANNEL)
 /*
  * Initialize the Winsock dll.
  */
-    void
-channel_init_winsock(void)
+    ਖਾਲੀ
+channel_init_winsock(ਖਾਲੀ)
 {
-    WSADATA wsaData;
-    int wsaerr;
+    WSADATA wsa_ਅੰਕੜੇ;
+    ਪੂਰਨ wsaerr;
 
-    if (WSInitialized)
-	return;
+    ਜੇ (WSInitialized)
+	ਵਾਪਸ;
 
-    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (wsaerr == 0)
+    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsa_ਅੰਕੜੇ);
+    ਜੇ (wsaerr == 0)
 	WSInitialized = TRUE;
 }
-#endif
+#ਜੇ_ਅੰਤ

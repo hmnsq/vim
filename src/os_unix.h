@@ -6,43 +6,43 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#include <stdio.h>
-#include <ctype.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <ctype.h>
 
-#ifdef VAXC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VAXC
 # include <types.h>
 # include <stat.h>
-#else
+#ਨਹੀਂਤਾਂ
 # include <sys/types.h>
 # include <sys/stat.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_STDLIB_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_STDLIB_H
 # include <stdlib.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef __CYGWIN__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __CYGWIN__
 # define WIN32UNIX	// Compiling for Win32 using Unix files.
-# define BINARY_FILE_IO
+# define ਦੁਆਧਾਰੀ_FILE_IO
 
 # define CASE_INSENSITIVE_FILENAME
 # define USE_FNAME_CASE	// Fix filename case differences.
-#endif
+#ਜੇ_ਅੰਤ
 
 // On AIX 4.2 there is a conflicting prototype for ioctl() in stropts.h and
 // unistd.h.  This hack should fix that (suggested by Jeff George).
 // But on AIX 4.3 it's alright (suggested by Jake Hamby).
-#if defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
+#ਜੇ defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
 # define _NO_PROTO
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_UNISTD_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_UNISTD_H
 # include <unistd.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_SYS_PARAM_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_SYS_PARAM_H
 # include <sys/param.h>	    // defines BSD, if it's a BSD system
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Using getcwd() is preferred, because it checks for a buffer overflow.
@@ -50,105 +50,105 @@
  * autoconf check for this.
  * Use getcwd() anyway if getwd() isn't present.
  */
-#if defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
+#ਜੇ defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
 # define USE_GETCWD
-#endif
+#ਜੇ_ਅੰਤ
 
 // always use unlink() to remove files
-#ifndef PROTO
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ PROTO
 # ifdef VMS
-#  define vim_mkdir(x, y) mkdir((char *)vms_fixfilename(x), y)
-#  define mch_rmdir(x)  delete((char *)vms_fixfilename(x))
-#  define mch_remove(x) delete((char *)vms_fixfilename(x))
-# else
-#  define vim_mkdir(x, y) mkdir((char *)(x), y)
-#  define mch_rmdir(x) rmdir((char *)(x))
-#  define mch_remove(x) unlink((char *)(x))
+#  define vim_mkdir(x, y) mkdir((ਅੱਖਰ *)vms_fixfilename(x), y)
+#  define mch_rmdir(x)  delete((ਅੱਖਰ *)vms_fixfilename(x))
+#  define mch_remove(x) delete((ਅੱਖਰ *)vms_fixfilename(x))
+# ਨਹੀਂਤਾਂ
+#  define vim_mkdir(x, y) mkdir((ਅੱਖਰ *)(x), y)
+#  define mch_rmdir(x) rmdir((ਅੱਖਰ *)(x))
+#  define mch_remove(x) unlink((ਅੱਖਰ *)(x))
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 // The number of arguments to a signal handler is configured here.
 // It used to be a long list of almost all systems. Any system that doesn't
 // have an argument???
-#define SIGHASARG
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SIGHASARG
 
-#ifdef SIGHASARG
-# define SIGPROTOARG	(int)
-# define SIGDEFARG(s)	(int s UNUSED)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ SIGHASARG
+# define SIGPROTOARG	(ਪੂਰਨ)
+# define SIGDEFARG(s)	(ਪੂਰਨ s ਅਣਵਰਤਿਆ)
 # define SIGDUMMYARG	0
-#else
-# define SIGPROTOARG   (void)
+#ਨਹੀਂਤਾਂ
+# define SIGPROTOARG   (ਖਾਲੀ)
 # define SIGDEFARG(s)  ()
 # define SIGDUMMYARG
-#endif
+#ਜੇ_ਅੰਤ
 
-typedef void (*sighandler_T) SIGPROTOARG;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*sighandler_T) SIGPROTOARG;
 
-#ifdef HAVE_DIRENT_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_DIRENT_H
 # include <dirent.h>
 # ifndef NAMLEN
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
+#  define NAMLEN(dirent) ਲੜੀ_ਲੰਬਾਈ((dirent)->d_name)
 # endif
-#else
-# define dirent direct
+#ਨਹੀਂਤਾਂ
+# define dirent ਸਿੱਧਾ
 # define NAMLEN(dirent) (dirent)->d_namlen
-# if HAVE_SYS_NDIR_H
+# ਜੇ HAVE_SYS_NDIR_H
 #  include <sys/ndir.h>
 # endif
-# if HAVE_SYS_DIR_H
+# ਜੇ HAVE_SYS_DIR_H
 #  include <sys/dir.h>
 # endif
-# if HAVE_NDIR_H
+# ਜੇ HAVE_NDIR_H
 #  include <ndir.h>
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#include <time.h>
-#ifdef HAVE_SYS_TIME_H
+#ਅਨ੍ਤਰ੍ਭਾਵ <time.h>
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_SYS_ਸਮਾਂ_H
 # include <sys/time.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#include <signal.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <signal.h>
 
-#if defined(DIRSIZ) && !defined(MAXNAMLEN)
+#ਜੇ defined(DIRSIZ) && !defined(MAXNAMLEN)
 # define MAXNAMLEN DIRSIZ
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
+#ਜੇ defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
 # define MAXNAMLEN UFS_MAXNAMLEN    // for dynix/ptx
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(NAME_MAX) && !defined(MAXNAMLEN)
+#ਜੇ defined(NAME_MAX) && !defined(MAXNAMLEN)
 # define MAXNAMLEN NAME_MAX	    // for Linux before .99p3
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(__sun)
+#ਜੇ defined(__sun)
 # undef MAXNAMLEN
 # define MAXNAMLEN 255
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Note: if MAXNAMLEN has the wrong value, you will get error messages
  *	 for not being able to open the swap file.
  */
-#if !defined(MAXNAMLEN)
+#ਜੇ !defined(MAXNAMLEN)
 # define MAXNAMLEN 512		    // for all other Unix
-#endif
+#ਜੇ_ਅੰਤ
 
-#define BASENAMELEN	(MAXNAMLEN - 5)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BASENAMELEN	(MAXNAMLEN - 5)
 
-#ifdef HAVE_PWD_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_PWD_H
 # include <pwd.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
+#ਜੇ (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
 	|| (defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)) \
 	|| defined(HAVE_SYSCTL) || defined(HAVE_SYSCONF)
-# define HAVE_TOTAL_MEM
-#endif
+# define HAVE_ਕੁੱਲ_MEM
+#ਜੇ_ਅੰਤ
 
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 # include <unixio.h>
 # include <unixlib.h>
 # include <signal.h>
@@ -175,189 +175,189 @@ typedef void (*sighandler_T) SIGPROTOARG;
 # include <libdef.h>
 # include <libdtdef.h>
 
-# if defined(FEAT_GUI_MOTIF)
+# ਜੇ defined(FEAT_GUI_MOTIF)
 #  define XFree XFREE
 #  define XmRepTypeInstallTearOffModelCon XMREPTYPEINSTALLTEAROFFMODELCON
 # endif
-#endif // VMS
+#ਜੇ_ਅੰਤ // VMS
 
-#ifdef HAVE_FLOCK
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_FLOCK
 # include <sys/file.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef VMS
-typedef struct dsc$descriptor   DESC;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ dsc$descriptor   DESC;
+#ਜੇ_ਅੰਤ
 
 /*
  * Unix system-dependent file names
  */
-#ifndef SYS_VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE "$VIM/vimrc"
-#endif
-#ifndef SYS_GVIMRC_FILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYS_GVIMRC_FILE
 # define SYS_GVIMRC_FILE "$VIM/gvimrc"
-#endif
-#ifndef DFLT_HELPFILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_HELPFILE
 # define DFLT_HELPFILE	"$VIMRUNTIME/doc/help.txt"
-#endif
-#ifndef SYS_MENU_FILE
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYS_MENU_FILE
 # define SYS_MENU_FILE	"$VIMRUNTIME/menu.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef USR_EXRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_EXRC_FILE
 # ifdef VMS
 #  define USR_EXRC_FILE "sys$login:.exrc"
-# else
+# ਨਹੀਂਤਾਂ
 #  define USR_EXRC_FILE "$HOME/.exrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#if !defined(USR_EXRC_FILE2) && defined(VMS)
+#ਜੇ !defined(USR_EXRC_FILE2) && defined(VMS)
 # define USR_EXRC_FILE2 "sys$login:_exrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef USR_VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_VIMRC_FILE
 # ifdef VMS
 #  define USR_VIMRC_FILE  "sys$login:.vimrc"
-# else
+# ਨਹੀਂਤਾਂ
 #  define USR_VIMRC_FILE "$HOME/.vimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 
-#if !defined(USR_VIMRC_FILE2)
+#ਜੇ !defined(USR_VIMRC_FILE2)
 # ifdef VMS
 #  define USR_VIMRC_FILE2	"sys$login:vimfiles/vimrc"
-# else
+# ਨਹੀਂਤਾਂ
 #  define USR_VIMRC_FILE2	"~/.vim/vimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef XDG_VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ XDG_VIMRC_FILE
 # define XDG_VIMRC_FILE (mch_getenv((char_u *)"XDG_CONFIG_HOME") \
 	? "$XDG_CONFIG_HOME/vim/vimrc" \
 	: "~/.config/vim/vimrc")
-#endif
+#ਜੇ_ਅੰਤ
 
-#if !defined(USR_VIMRC_FILE3) && defined(VMS)
+#ਜੇ !defined(USR_VIMRC_FILE3) && defined(VMS)
 # define USR_VIMRC_FILE3 "sys$login:_vimrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef USR_GVIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_GVIMRC_FILE
 # ifdef VMS
 #  define USR_GVIMRC_FILE "sys$login:.gvimrc"
-# else
+# ਨਹੀਂਤਾਂ
 #  define USR_GVIMRC_FILE "$HOME/.gvimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef USR_GVIMRC_FILE2
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ USR_GVIMRC_FILE2
 # ifdef VMS
 #  define USR_GVIMRC_FILE2	"sys$login:vimfiles/gvimrc"
-# else
+# ਨਹੀਂਤਾਂ
 #  define USR_GVIMRC_FILE2	"~/.vim/gvimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3  "sys$login:_gvimrc"
 # endif
-#else
+#ਨਹੀਂਤਾਂ
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3 (mch_getenv("XDG_CONFIG_HOME") \
 	? "$XDG_CONFIG_HOME/vim/gvimrc" \
 	: "~/.config/vim/gvimrc")
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef VIM_DEFAULTS_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE "$VIMRUNTIME/defaults.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef EVIM_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ EVIM_FILE
 # define EVIM_FILE	"$VIMRUNTIME/evim.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_VIMINFO
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  ifdef VMS
 #   define VIMINFO_FILE  "sys$login:.viminfo"
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define VIMINFO_FILE "$HOME/.viminfo"
 #  endif
 # endif
-# if !defined(VIMINFO_FILE2) && defined(VMS)
+# ਜੇ !defined(VIMINFO_FILE2) && defined(VMS)
 #  define VIMINFO_FILE2 "sys$login:_viminfo"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef EXRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ EXRC_FILE
 # define EXRC_FILE	".exrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef VIMRC_FILE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ VIMRC_FILE
 # define VIMRC_FILE	".vimrc"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_GUI
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_GUI
 # ifndef GVIMRC_FILE
 #  define GVIMRC_FILE	".gvimrc"
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef SYNTAX_FNAME
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SYNTAX_FNAME
 # define SYNTAX_FNAME	"$VIMRUNTIME/syntax/%s.vim"
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_BDIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_BDIR
 # ifdef VMS
 #  define DFLT_BDIR    "./,sys$login:,tmp:"
-# else
+# ਨਹੀਂਤਾਂ
 #  define DFLT_BDIR    ".,~/tmp,~/"    // default for 'backupdir'
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_DIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_DIR
 # ifdef VMS
 #  define DFLT_DIR     "./,sys$login:,tmp:"
-# else
+# ਨਹੀਂਤਾਂ
 #  define DFLT_DIR     ".,~/tmp,/var/tmp,/tmp" // default for 'directory'
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef DFLT_VDIR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_VDIR
 # ifdef VMS
 #  define DFLT_VDIR    "sys$login:vimfiles/view"
-# else
+# ਨਹੀਂਤਾਂ
 #  define DFLT_VDIR    "$HOME/.vim/view"       // default for 'viewdir'
 #  define XDG_VDIR     (mch_getenv("XDG_CONFIG_HOME") ? \
 	"$XDG_CONFIG_HOME/vim/view" : "~/.config/vim/view")
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#define DFLT_ERRORFILE		"errors.err"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DFLT_ERRORFILE		"errors.err"
 
-#ifndef DFLT_RUNTIMEPATH
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DFLT_RUNTIMEPATH
 
 # ifdef VMS
 #  define DFLT_RUNTIMEPATH      "sys$login:vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,sys$login:vimfiles/after"
 #  define CLEAN_RUNTIMEPATH      "$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
-# else
+# ਨਹੀਂਤਾਂ
 #  ifdef RUNTIME_GLOBAL
 #   ifdef RUNTIME_GLOBAL_AFTER
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER
-#   else
+#   ਨਹੀਂਤਾਂ
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after"
 #   endif
-#  else
+#  ਨਹੀਂਤਾਂ
 #   define DFLT_RUNTIMEPATH	"~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"
 #   define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$XDG_CONFIG_HOME/vim/after"
 #   define XDG_RUNTIMEPATH_FB	"~/.config/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.config/vim/after"
@@ -365,112 +365,112 @@ typedef struct dsc$descriptor   DESC;
 #  endif
 # endif
 
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef VMS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS
 # ifndef VAX
 #  define VMS_TEMPNAM    // to fix default .LIS extension
 # endif
 # define TEMPNAME       "TMP:v?XXXXXX.txt"
 # define TEMPNAMELEN    28
-#else
+#ਨਹੀਂਤਾਂ
 // Try several directories to put the temp files.
 # define TEMPDIRNAMES  "$TMPDIR", "/tmp", ".", "$HOME"
 # define TEMPNAMELEN    256
-#endif
+#ਜੇ_ਅੰਤ
 
 // Special wildcards that need to be handled by the shell
-#define SPECIAL_WILDCHAR    "`'{"
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SPECIAL_WILDCHAR    "`'{"
 
 /*
  * Unix has plenty of memory, use large buffers
  */
-#define CMDBUFFSIZE 1024	// size of the command processing buffer
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CMDBUFFSIZE 1024	// size of the command processing buffer
 
 // Use the system path length if it makes sense.
-#if defined(PATH_MAX) && (PATH_MAX > 1000)
+#ਜੇ defined(PATH_MAX) && (PATH_MAX > 1000)
 # define MAXPATHL	PATH_MAX
-#else
+#ਨਹੀਂਤਾਂ
 # define MAXPATHL	1024
-#endif
+#ਜੇ_ਅੰਤ
 
-#define CHECK_INODE		// used when checking if a swap file already
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CHECK_INODE		// used when checking if a swap file already
 				// exists for a file
-#ifdef VMS  // Use less memory because of older systems
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VMS  // Use less memory because of older systems
 # ifndef DFLT_MAXMEM
 #  define DFLT_MAXMEM (2*1024)
 # endif
 # ifndef DFLT_MAXMEMTOT
 #  define DFLT_MAXMEMTOT (5*1024)
 # endif
-#else
+#ਨਹੀਂਤਾਂ
 # ifndef DFLT_MAXMEM
 #  define DFLT_MAXMEM	(5*1024)	 // use up to 5 Mbyte for a buffer
 # endif
 # ifndef DFLT_MAXMEMTOT
 #  define DFLT_MAXMEMTOT	(10*1024)    // use up to 10 Mbyte for Vim
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 // memmove() is not present on all systems, use memmove, bcopy or memcpy.
 // Some systems have (void *) arguments, some (char *). If we use (char *) it
 // works for all
-#if defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
-# define mch_memmove(to, from, len) memmove((char *)(to), (char *)(from), len)
-#else
+#ਜੇ defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
+# define mch_memmove(ਮੰਜ਼ਿਲ, from, len) memmove((ਅੱਖਰ *)(ਮੰਜ਼ਿਲ), (ਅੱਖਰ *)(from), len)
+#ਨਹੀਂਤਾਂ
 # ifdef USEBCOPY
-#  define mch_memmove(to, from, len) bcopy((char *)(from), (char *)(to), len)
-# else
+#  define mch_memmove(ਮੰਜ਼ਿਲ, from, len) bcopy((ਅੱਖਰ *)(from), (ਅੱਖਰ *)(ਮੰਜ਼ਿਲ), len)
+# ਨਹੀਂਤਾਂ
     // ifdef USEMEMCPY
-#  define mch_memmove(to, from, len) memcpy((char *)(to), (char *)(from), len)
+#  define mch_memmove(ਮੰਜ਼ਿਲ, from, len) ਸਮ੍ਰਿਤੀ_ਨਕਲ((ਅੱਖਰ *)(ਮੰਜ਼ਿਲ), (ਅੱਖਰ *)(from), len)
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef PROTO
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ PROTO
 # ifdef HAVE_RENAME
 #  define mch_rename(src, dst) rename(src, dst)
-# else
-int mch_rename(const char *src, const char *dest);
+# ਨਹੀਂਤਾਂ
+ਪੂਰਨ mch_rename(ਅਚਲ ਅੱਖਰ *src, ਅਚਲ ਅੱਖਰ *dest);
 # endif
 # ifndef VMS
 #  ifdef __MVS__
   // on OS390 Unix getenv() doesn't return a pointer to persistent
   // storage -> use __getenv()
-#   define mch_getenv(x) (char_u *)__getenv((char *)(x))
-#  else
-#   define mch_getenv(x) (char_u *)getenv((char *)(x))
+#   define mch_getenv(x) (char_u *)__getenv((ਅੱਖਰ *)(x))
+#  ਨਹੀਂਤਾਂ
+#   define mch_getenv(x) (char_u *)getenv((ਅੱਖਰ *)(x))
 #  endif
 #  define mch_setenv(name, val, x) setenv(name, val, x)
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
 // Note: Some systems need both string.h and strings.h (Savage).  However,
 // some systems can't handle both, only use string.h in that case.
-#ifdef HAVE_STRING_H
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_STRING_H
 # include <string.h>
-#endif
-#if defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(HAVE_ਲੜੀਆਂ_H) && !defined(NO_ਲੜੀਆਂ_WITH_STRING_H)
 # include <strings.h>
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(HAVE_SETJMP_H)
+#ਜੇ defined(HAVE_SETJMP_H)
 # include <setjmp.h>
 # ifdef HAVE_SIGSETJMP
 #  define JMP_BUF sigjmp_buf
 #  define SETJMP(x) sigsetjmp((x), 1)
 #  define LONGJMP siglongjmp
-# else
+# ਨਹੀਂਤਾਂ
 #  define JMP_BUF jmp_buf
 #  define SETJMP(x) setjmp(x)
 #  define LONGJMP longjmp
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifndef HAVE_DUP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_DUP
 # define HAVE_DUP		// have dup()
-#endif
-#define HAVE_ST_MODE		// have stat.st_mode
+#ਜੇ_ਅੰਤ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_ST_ਬਹੁਲਕ		// have stat.st_mode
 
 // We have three kinds of ACL support.
-#define HAVE_ACL (HAVE_POSIX_ACL || HAVE_SOLARIS_ACL || HAVE_AIX_ACL)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ HAVE_ACL (HAVE_POSIX_ACL || HAVE_SOLARIS_ACL || HAVE_AIX_ACL)
 

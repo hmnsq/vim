@@ -11,12 +11,12 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
-#define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
+#ਜੇ !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
-#pragma once
-#endif
+#ਜੇ defined(_MSC_VER) && _MSC_VER > 1000
+#ਹਦਾਇਤ once
+#ਜੇ_ਅੰਤ
 
 // Insert your headers here
 // #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -27,30 +27,30 @@
 //
 //--------------------------------------------------------------
 
-#ifndef STRICT
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ STRICT
 # define STRICT
-#endif
+#ਜੇ_ਅੰਤ
 
-#define INC_OLE2	// MS-Windows, get ole2 from windows.h
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ਜੇ defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
+#ਜੇ_ਅੰਤ
 
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <windows.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <windowsx.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <shlobj.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <wchar.h>
 
-#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਨਤੀਜਾ_From_Short(i)  ਨਤੀਜਾ_From_Scode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // Initialize GUIDs (should be done only and at-least once per DLL/EXE)
 //
-#pragma data_seg(".text")
-#define INITGUID
-#include <initguid.h>
+#ਹਦਾਇਤ ਅੰਕੜੇ_seg(".text")
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ INITGUID
+#ਅਨ੍ਤਰ੍ਭਾਵ <initguid.h>
 
 //
 // The class ID of this Shell extension class.
@@ -78,73 +78,73 @@
 DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0x90, 0x27, 0x8b, 0xbd, 0x99);
 
 // this class factory object creates context menu handlers for windows 32 shell
-class CShellExtClassFactory : public IClassFactory
+class CShellExtClassFactory : ਜਨਤਕ IClassFactory
 {
-protected:
+ਸੁਰੱਖਿਅਤ:
     ULONG	m_cRef;
 
-public:
+ਜਨਤਕ:
     CShellExtClassFactory();
-    virtual ~CShellExtClassFactory();
+    ਆਭਾਸੀ ~CShellExtClassFactory();
 
     //IUnknown members
     STDMETHODIMP		QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG)	AddRef();
+    STDMETHODIMP_(ULONG)	ਜੋੜੋ_Ref();
     STDMETHODIMP_(ULONG)	Release();
 
     //IClassFactory members
     STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
-    STDMETHODIMP		LockServer(BOOL);
+    STDMETHODIMP		ਤਾਲਾ_Server(BOOL);
 };
-typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
-#define MAX_HWND 100
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MAX_HWND 100
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu,
+class CShellExt : ਜਨਤਕ IContextMenu,
 			 IShellExtInit
 {
-private:
-    BOOL LoadMenuIcon();
+ਨਿਜੀ:
+    BOOL ਲੱਦੋ_Menu_Icon();
 
-protected:
+ਸੁਰੱਖਿਅਤ:
     ULONG	 m_cRef;
-    LPDATAOBJECT m_pDataObj;
+    LPDATAOBJECT m_p_ਅੰਕੜੇ_Obj;
     UINT	 m_edit_existing_off;
     HBITMAP	 m_hVimIconBitmap;
 
     // For some reason, this callback must be static
-    static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
+    ਸਥਿਰ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP ਧੱਕੋ_ਮੰਜ਼ਿਲ_ਖਿੜਕੀ(HWND h_ਮਾਪਾ,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    ਪੂਰਨ iShowCmd,
+	    ਪੂਰਨ idHWnd);
 
-    STDMETHODIMP InvokeSingleGvim(HWND hParent,
+    STDMETHODIMP InvokeSingleGvim(HWND h_ਮਾਪਾ,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    ਪੂਰਨ iShowCmd,
+	    ਪੂਰਨ gvimExtraOptions);
 
-public:
-    int		 m_cntOfHWnd;
+ਜਨਤਕ:
+    ਪੂਰਨ		 m_cnt_ਦਾ_HWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
-    virtual ~CShellExt();
+    ਆਭਾਸੀ ~CShellExt();
 
     //IUnknown members
     STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG) AddRef();
+    STDMETHODIMP_(ULONG) ਜੋੜੋ_Ref();
     STDMETHODIMP_(ULONG) Release();
 
     //IShell members
     STDMETHODIMP QueryContextMenu(HMENU hMenu,
-	    UINT indexMenu,
-	    UINT idCmdFirst,
-	    UINT idCmdLast,
+	    UINT ਸੂਚਕਾਂਕ_Menu,
+	    UINT id_Cmd_ਪਹਿਲਾ,
+	    UINT id_Cmd_ਆਖਰੀ,
 	    UINT uFlags);
 
     STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
@@ -157,11 +157,11 @@ public:
 
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
-	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    LPDATAOBJECT p_ਅੰਕੜੇ_Obj,
+	    HKEY h_ਕੁੰਜੀ_ID);
 };
 
-typedef CShellExt *LPCSHELLEXT;
-#pragma data_seg()
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ CShellExt *LPCSHELLEXT;
+#ਹਦਾਇਤ ਅੰਕੜੇ_seg()
 
-#endif
+#ਜੇ_ਅੰਤ

@@ -13,20 +13,20 @@
  * Amiga system-dependent routines.
  */
 
-#include "vim.h"
-#include "version.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "version.h"
 
-#ifdef Window
-# undef Window	// Amiga has its own Window definition
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ ਖਿੜਕੀ
+# undef ਖਿੜਕੀ	// Amiga has its own Window definition
+#ਜੇ_ਅੰਤ
 
-#undef TRUE		// will be redefined by exec/types.h
-#undef FALSE
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ TRUE		// will be redefined by exec/types.h
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ FALSE
 
-#ifndef LATTICE
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ LATTICE
 # include <exec/exec.h>
 # include <intuition/intuition.h>
-#endif
+#ਜੇ_ਅੰਤ
 
 // XXX These are included from os_amiga.h
 // #include <exec/types.h>
@@ -36,23 +36,23 @@
 // #include <proto/dos.h>
 // #include <proto/intuition.h>
 
-#include <exec/memory.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <exec/memory.h>
 
-#include <dos/dostags.h>	    // for 2.0 functions
-#include <dos/dosasl.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <dos/dostags.h>	    // for 2.0 functions
+#ਅਨ੍ਤਰ੍ਭਾਵ <dos/dosasl.h>
 
 // From version 4 of AmigaOS, several system structures must be allocated
 // and freed using system functions. "struct AnchorPath" is one.
-#ifdef __amigaos4__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
 # include <dos/anchorpath.h>
 # define	free_fib(x) FreeDosObject(DOS_FIB, x)
-#else
+#ਨਹੀਂਤਾਂ
 # define	free_fib(x) vim_free(fib)
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
+#ਜੇ defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
 # include <libraries/arp_pragmas.h>
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Set stack size on startup.  1 MiB on NG systems (OS4, AROS, MorphOS)
@@ -60,31 +60,31 @@
  * highlighting and Vim9 execution but conservative for systems with as
  * little as 2 MiB of Fast RAM.
  */
-#if defined(__amigaos4__)
-static const char* __attribute__((used)) stackcookie = "$STACK: 1048576";
-#elif defined(__AROS__) || defined(__MORPHOS__)
-unsigned long __stack = 1048576;
-#elif defined(__GNUC__) && defined(AMIGA)
-unsigned long __stack = 262144;
-#endif
+#ਜੇ defined(__amigaos4__)
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ* __attribute__((ਵਰਤਿਆ)) stackcookie = "$STACK: 1048576";
+#ਜਾਂਜੇ defined(__AROS__) || defined(__MORPHOS__)
+ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ __stack = 1048576;
+#ਜਾਂਜੇ defined(__GNUC__) && defined(AMIGA)
+ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ __stack = 262144;
+#ਜੇ_ਅੰਤ
 
 /*
  * At this point TRUE and FALSE are defined as 1L and 0L, but we want 1 and 0.
  */
-#undef	TRUE
-#define TRUE (1)
-#undef	FALSE
-#define FALSE (0)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	TRUE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ TRUE (1)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ	FALSE
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ FALSE (0)
 
-#ifdef __amigaos4__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
 # define	dos_packet(a, b, c)   DoPkt(a, b, c, 0, 0, 0, 0)
-#elif !defined(AZTEC_C) && !defined(__AROS__)
-static long dos_packet(struct MsgPort *, long, long);
-#endif
-static int lock2name(BPTR lock, char_u *buf, long   len);
-static void out_num(long n);
-static struct FileInfoBlock *get_fib(char_u *);
-static int sortcmp(const void *a, const void *b);
+#ਜਾਂਜੇ !defined(AZTEC_C) && !defined(__AROS__)
+ਸਥਿਰ ਲੰਮਾ dos_packet(ਬਣਤਰ ਸੁਨੇਹਾ_ਪੋਰਟ *, ਲੰਮਾ, ਲੰਮਾ);
+#ਜੇ_ਅੰਤ
+ਸਥਿਰ ਪੂਰਨ lock2name(BPTR ਤਾਲਾ, char_u *buf, ਲੰਮਾ   len);
+ਸਥਿਰ ਖਾਲੀ ਬਾਹਰਲਾ_ਅੰਕ(ਲੰਮਾ n);
+ਸਥਿਰ ਬਣਤਰ File_Info_ਖੰਡ *get_fib(char_u *);
+ਸਥਿਰ ਪੂਰਨ sortcmp(ਅਚਲ ਖਾਲੀ *a, ਅਚਲ ਖਾਲੀ *b);
 
 /*
  * Lock() wrapper that suppresses "Please insert volume" system requesters.
@@ -93,44 +93,44 @@ static int sortcmp(const void *a, const void *b);
  * request).  Setting pr_WindowPtr to -1 suppresses the requester and makes
  * Lock() return NULL immediately.  See dos.library/ErrorReport.
  */
-    static BPTR
-safe_Lock(UBYTE *name, long mode)
+    ਸਥਿਰ BPTR
+ਸੁਰੱਖਿਅਤ_ਤਾਲਾ(UBYTE *name, ਲੰਮਾ ਬਹੁਲਕ)
 {
-    struct Process *me = (struct Process *)FindTask(NULL);
-    APTR oldwin = me->pr_WindowPtr;
+    ਬਣਤਰ Process *me = (ਬਣਤਰ Process *)ਲੱਭੋ_Task(ਨਿਰਾ);
+    APTR oldwin = me->pr_ਖਿੜਕੀ_Ptr;
     BPTR flock;
 
-    me->pr_WindowPtr = (APTR)-1L;
-    flock = Lock(name, mode);
-    me->pr_WindowPtr = oldwin;
-    return flock;
+    me->pr_ਖਿੜਕੀ_Ptr = (APTR)-1L;
+    flock = ਤਾਲਾ_2(name, ਬਹੁਲਕ);
+    me->pr_ਖਿੜਕੀ_Ptr = oldwin;
+    ਵਾਪਸ flock;
 }
 
-static BPTR		raw_in = (BPTR)NULL;
-static BPTR		raw_out = (BPTR)NULL;
-static int		close_win = FALSE;  // set if Vim opened the window
+ਸਥਿਰ BPTR		raw_ਵਿੱਚ = (BPTR)ਨਿਰਾ;
+ਸਥਿਰ BPTR		raw_ਬਾਹਰਲਾ = (BPTR)ਨਿਰਾ;
+ਸਥਿਰ ਪੂਰਨ		close_win = FALSE;  // set if Vim opened the window
 
 /* Use autoopen for AmigaOS4, AROS and MorphOS */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-struct IntuitionBase	*IntuitionBase = NULL;
-#endif
-#ifdef FEAT_ARP
-struct ArpBase		*ArpBase = NULL;
-#endif
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+ਬਣਤਰ Intuition_ਅਧਾਰ	*Intuition_ਅਧਾਰ = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+ਬਣਤਰ Arp_ਅਧਾਰ		*Arp_ਅਧਾਰ = ਨਿਰਾ;
+#ਜੇ_ਅੰਤ
 
-static struct Window	*wb_window;
-static char_u		*oldwindowtitle = NULL;
+ਸਥਿਰ ਬਣਤਰ ਖਿੜਕੀ	*wb_ਖਿੜਕੀ;
+ਸਥਿਰ char_u		*oldwindowtitle = ਨਿਰਾ;
 
-#ifdef FEAT_ARP
-int			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
-#endif
-int			size_set = FALSE;   // set to TRUE if window size was set
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+ਪੂਰਨ			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
+#ਜੇ_ਅੰਤ
+ਪੂਰਨ			ਮਾਪ_ਸੈੱਟ = FALSE;   // set to TRUE if window size was set
 
-#ifdef __GNUC__
-static char version[] __attribute__((used)) =
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __GNUC__
+ਸਥਿਰ ਅੱਖਰ ਸੰਸਕਰਣ_2[] __attribute__((ਵਰਤਿਆ)) =
     "\0$VER: Vim "
-    VIM_VERSION_MAJOR_STR "."
-    VIM_VERSION_MINOR_STR
+    VIM_ਸੰਸਕਰਣ_MAJOR_STR "."
+    VIM_ਸੰਸਕਰਣ_MINOR_STR
 # ifdef PATCHLEVEL
     "." PATCHLEVEL
 # endif
@@ -138,24 +138,24 @@ static char version[] __attribute__((used)) =
     " (" BUILDDATE ")"
 # endif
     ;
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-win_resize_on(void)
+    ਖਾਲੀ
+win_resize_on(ਖਾਲੀ)
 {
-    OUT_STR_NF("\033[12{");
+    ਬਾਹਰਲਾ_STR_NF("\033[12{");
 }
 
-    void
-win_resize_off(void)
+    ਖਾਲੀ
+win_resize_off(ਖਾਲੀ)
 {
-    OUT_STR_NF("\033[12}");
+    ਬਾਹਰਲਾ_STR_NF("\033[12}");
 }
 
-    void
-mch_write(char_u *p, int len)
+    ਖਾਲੀ
+mch_write(char_u *p, ਪੂਰਨ len)
 {
-    Write(raw_out, (char *)p, (long)len);
+    Write(raw_ਬਾਹਰਲਾ, (ਅੱਖਰ *)p, (ਲੰਮਾ)len);
 }
 
 /*
@@ -167,54 +167,54 @@ mch_write(char_u *p, int len)
  *
  * Return number of characters read.
  */
-    int
+    ਪੂਰਨ
 mch_inchar(
     char_u  *buf,
-    int	    maxlen,
-    long    time,		// milliseconds
-    int	    tb_change_cnt UNUSED)
+    ਪੂਰਨ	    maxlen,
+    ਲੰਮਾ    ਸਮਾਂ,		// milliseconds
+    ਪੂਰਨ	    tb_change_cnt ਅਣਵਰਤਿਆ)
 {
-    int	    len;
-    long    utime;
+    ਪੂਰਨ	    len;
+    ਲੰਮਾ    utime;
 
-    if (time >= 0)
+    ਜੇ (ਸਮਾਂ >= 0)
     {
-	if (time == 0)
+	ਜੇ (ਸਮਾਂ == 0)
 	    utime = 100L;	    // time = 0 causes problems in DOS 1.2
-	else
-	    utime = time * 1000L;   // convert from milli to micro secs
-	if (WaitForChar(raw_in, utime) == 0)	// no character available
-	    return 0;
+	ਨਹੀਂਤਾਂ
+	    utime = ਸਮਾਂ * 1000L;   // convert from milli to micro secs
+	ਜੇ (WaitForChar(raw_ਵਿੱਚ, utime) == 0)	// no character available
+	    ਵਾਪਸ 0;
     }
-    else    // time == -1
+    ਨਹੀਂਤਾਂ    // time == -1
     {
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (WaitForChar(raw_in, p_ut * 1000L) == 0)
+	ਜੇ (WaitForChar(raw_ਵਿੱਚ, p_ut * 1000L) == 0)
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    ਜੇ (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (ਪੂਰਨ)KE_CURSORHOLD;
+		ਵਾਪਸ 3;
 	    }
 	    before_blocking();
 	}
     }
 
-    for (;;)	    // repeat until we got a character
+    ਲਈ (;;)	    // repeat until we got a character
     {
-	len = Read(raw_in, (char *)buf, (long)maxlen / input_conv.vc_factor);
-	if (len > 0)
+	len = Read(raw_ਵਿੱਚ, (ਅੱਖਰ *)buf, (ਲੰਮਾ)maxlen / ਨਿਵੇਸ਼_conv.vc_ਗੁਣਕ);
+	ਜੇ (len > 0)
 	{
 	    // Convert from 'termencoding' to 'encoding'.
-	    if (input_conv.vc_type != CONV_NONE)
-		len = convert_input(buf, len, maxlen);
-	    return len;
+	    ਜੇ (ਨਿਵੇਸ਼_conv.vc_type != CONV_NONE)
+		len = convert_ਨਿਵੇਸ਼(buf, len, maxlen);
+	    ਵਾਪਸ len;
 	}
     }
 }
@@ -222,70 +222,70 @@ mch_inchar(
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    ਪੂਰਨ
+mch_char_avail(ਖਾਲੀ)
 {
-    return (WaitForChar(raw_in, 100L) != 0);
+    ਵਾਪਸ (WaitForChar(raw_ਵਿੱਚ, 100L) != 0);
 }
 
 /*
  * Return amount of memory still available in Kbyte.
  */
     long_u
-mch_avail_mem(int special)
+mch_avail_mem(ਪੂਰਨ special)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    return (long_u)AvailMem(MEMF_ANY) >> 10;
-#else
-    return (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
-#endif
+#ਜੇ defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    ਵਾਪਸ (long_u)AvailMem(MEMF_ANY) >> 10;
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ (long_u)(AvailMem(special ? (ਲੰਮਾ)MEMF_CHIP : (ਲੰਮਾ)MEMF_ANY)) >> 10;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Waits a specified amount of time, or until input arrives if
  * flags does not have MCH_DELAY_IGNOREINPUT.
  */
-    void
-mch_delay(long msec, int flags)
+    ਖਾਲੀ
+mch_delay(ਲੰਮਾ msec, ਪੂਰਨ flags)
 {
     // Delay() is declared in <proto/dos.h> for GCC; the local prototype is
     // only needed for the LATTICE/SAS toolchains.
-#ifdef LATTICE
-    void	    Delay(long);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LATTICE
+    ਖਾਲੀ	    Delay(ਲੰਮਾ);
+#ਜੇ_ਅੰਤ
 
-    if (msec <= 0)
-	return;
+    ਜੇ (msec <= 0)
+	ਵਾਪਸ;
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ਜੇ (flags & MCH_DELAY_IGNOREINPUT)
 	Delay(msec / 20L);	    // Delay works with 20 msec intervals
-    else
-	WaitForChar(raw_in, msec * 1000L);
+    ਨਹੀਂਤਾਂ
+	WaitForChar(raw_ਵਿੱਚ, msec * 1000L);
 }
 
 /*
  * We have no job control, fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    ਖਾਲੀ
+mch_suspend(ਖਾਲੀ)
 {
     suspend_shell();
 }
 
-#ifndef DOS_LIBRARY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ DOS_LIBRARY
 # define DOS_LIBRARY	((UBYTE *)"dos.library")
-#endif
+#ਜੇ_ਅੰਤ
 
-    void
-mch_init(void)
+    ਖਾਲੀ
+mch_init(ਖਾਲੀ)
 {
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    static char	    intlibname[] = "intuition.library";
-#endif
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ਸਥਿਰ ਅੱਖਰ	    intlibname[] = "intuition.library";
+#ਜੇ_ਅੰਤ
 
-#ifdef AZTEC_C
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AZTEC_C
     Enable_Abort = 0;		// disallow vim to be aborted
-#endif
+#ਜੇ_ਅੰਤ
 
     // Suppress "Please insert volume" system requesters.  Vim probes many
     // paths at startup ($VIM, $VIMRUNTIME, defaults.vim, vimrc, etc.) and
@@ -293,47 +293,47 @@ mch_init(void)
     // AmigaDOS (and from the C runtime library which calls Lock() internally).
     // A CLI editor should handle missing files gracefully, not pop up dialogs.
     {
-	struct Process *me = (struct Process *)FindTask(NULL);
-	me->pr_WindowPtr = (APTR)-1L;
+	ਬਣਤਰ Process *me = (ਬਣਤਰ Process *)ਲੱਭੋ_Task(ਨਿਰਾ);
+	me->pr_ਖਿੜਕੀ_Ptr = (APTR)-1L;
     }
 
     Columns = 80;
-    Rows = 24;
+    ਪੰਕਤੀਆਂ = 24;
 
     /*
      * Set input and output channels, unless we have opened our own window
      */
-    if (raw_in == (BPTR)NULL)
+    ਜੇ (raw_ਵਿੱਚ == (BPTR)ਨਿਰਾ)
     {
-	raw_in = Input();
-	raw_out = Output();
+	raw_ਵਿੱਚ = ਨਿਵੇਸ਼_3();
+	raw_ਬਾਹਰਲਾ = Output();
 	/*
 	 * If Input() is not interactive, then Output() will be (because of
 	 * check in mch_check_win()).  Used for "Vim -".
 	 * Also check the other way around, for "Vim -h | more".
 	 */
-	if (!IsInteractive(raw_in))
-	    raw_in = raw_out;
-	else if (!IsInteractive(raw_out))
-	    raw_out = raw_in;
+	ਜੇ (!IsInteractive(raw_ਵਿੱਚ))
+	    raw_ਵਿੱਚ = raw_ਬਾਹਰਲਾ;
+	ਨਹੀਂਤਾਂ ਜੇ (!IsInteractive(raw_ਬਾਹਰਲਾ))
+	    raw_ਬਾਹਰਲਾ = raw_ਵਿੱਚ;
     }
 
-    out_flush();
+    ਬਾਹਰਲਾ_flush();
 
-    wb_window = NULL;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    if ((IntuitionBase = (struct IntuitionBase *)
-				OpenLibrary((UBYTE *)intlibname, 0L)) == NULL)
+    wb_ਖਿੜਕੀ = ਨਿਰਾ;
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ਜੇ ((Intuition_ਅਧਾਰ = (ਬਣਤਰ Intuition_ਅਧਾਰ *)
+				OpenLibrary((UBYTE *)intlibname, 0L)) == ਨਿਰਾ)
     {
 	mch_errmsg(_("cannot open "));
 	mch_errmsg(intlibname);
 	mch_errmsg("!?\n");
 	mch_exit(3);
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#include <workbench/startup.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <workbench/startup.h>
 
 /*
  * Check_win checks whether we have an interactive window.
@@ -346,79 +346,79 @@ mch_init(void)
  * For the -f option (foreground mode) we open our own window and disable :sh.
  * Otherwise the calling program would never know when editing is finished.
  */
-#define BUF2SIZE 320	    // length of buffer for argument with complete path
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ BUF2_ਮਾਪ 320	    // length of buffer for argument with complete path
 
-    int
-mch_check_win(int argc, char **argv)
+    ਪੂਰਨ
+mch_check_win(ਪੂਰਨ argc, ਅੱਖਰ **argv)
 {
-    int		    i;
+    ਪੂਰਨ		    i;
     BPTR	    nilfh, fh;
     char_u	    buf1[24];
-    char_u	    buf2[BUF2SIZE];
-    static char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
+    char_u	    buf2[BUF2_ਮਾਪ];
+    ਸਥਿਰ char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
 					(char_u *)"con:0/0/640/200/",
 					(char_u *)"con:0/0/320/200/"};
-    static char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
-    struct WBArg    *argp;
-    int		    ac;
-    char	    *av;
-    char_u	    *device = NULL;
-    int		    exitval = 4;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    struct Library  *DosBase;
-#endif
-    int		    usewin = FALSE;
+    ਸਥਿਰ char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
+    ਬਣਤਰ WBArg    *argp;
+    ਪੂਰਨ		    ac;
+    ਅੱਖਰ	    *av;
+    char_u	    *device = ਨਿਰਾ;
+    ਪੂਰਨ		    exitval = 4;
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ਬਣਤਰ Library  *Dos_ਅਧਾਰ;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		    usewin = FALSE;
 
 /*
  * check if we are running under DOS 2.0x or higher
  */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    DosBase = OpenLibrary(DOS_LIBRARY, 37L);
-    if (DosBase != NULL)
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    Dos_ਅਧਾਰ = OpenLibrary(DOS_LIBRARY, 37L);
+    ਜੇ (Dos_ਅਧਾਰ != ਨਿਰਾ)
     // if (((struct Library *)DOSBase)->lib_Version >= 37)
     {
-	CloseLibrary(DosBase);
+	CloseLibrary(Dos_ਅਧਾਰ);
 # ifdef FEAT_ARP
 	dos2 = TRUE;
 # endif
     }
-    else	    // without arp functions we NEED 2.0
+    ਨਹੀਂਤਾਂ	    // without arp functions we NEED 2.0
     {
 # ifndef FEAT_ARP
 	mch_errmsg(_("Need Amigados version 2.04 or later\n"));
-	exit(3);
-# else
+	ਬਾਹਰ_ਨਿਕਲੋ(3);
+# ਨਹੀਂਤਾਂ
 		    // need arp functions for dos 1.x
-	if (!(ArpBase = (struct ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
+	ਜੇ (!(Arp_ਅਧਾਰ = (ਬਣਤਰ Arp_ਅਧਾਰ *) OpenLibrary((UBYTE *)ArpName, Arp_ਸੰਸਕਰਣ)))
 	{
-	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, ArpVersion);
-	    exit(3);
+	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, Arp_ਸੰਸਕਰਣ);
+	    ਬਾਹਰ_ਨਿਕਲੋ(3);
 	}
 # endif
     }
-#endif	/* __amigaos4__ __AROS__ __MORPHOS__ */
+#ਜੇ_ਅੰਤ	/* __amigaos4__ __AROS__ __MORPHOS__ */
 
     /*
      * scan argv[] for the "-f" and "-d" arguments
      */
-    for (i = 1; i < argc; ++i)
-	if (argv[i][0] == '-')
+    ਲਈ (i = 1; i < argc; ++i)
+	ਜੇ (argv[i][0] == '-')
 	{
-	    switch (argv[i][1])
+	    ਚੋਣ (argv[i][1])
 	    {
-	    case 'f':
+	    ਹਾਲਤ 'f':
 		usewin = TRUE;
-		break;
+		ਰੋਕੋ;
 
-	    case 'd':
-		if (i < argc - 1
-#ifdef FEAT_DIFF
+	    ਹਾਲਤ 'd':
+		ਜੇ (i < argc - 1
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 			// require using "-dev", "-d" means diff mode
 			&& argv[i][2] == 'e' && argv[i][3] == 'v'
-#endif
+#ਜੇ_ਅੰਤ
 		   )
 		    device = (char_u *)argv[i + 1];
-		break;
+		ਰੋਕੋ;
 	    }
 	}
 
@@ -427,45 +427,45 @@ mch_check_win(int argc, char **argv)
  * argument and we have been started with an interactive window, use that
  * window.
  */
-    if (argc != 0
-	    && device == NULL
-	    && (IsInteractive(Input()) || IsInteractive(Output())))
-	return OK;
+    ਜੇ (argc != 0
+	    && device == ਨਿਰਾ
+	    && (IsInteractive(ਨਿਵੇਸ਼_3()) || IsInteractive(Output())))
+	ਵਾਪਸ OK;
 
 /*
  * When given the "-f" argument, we open our own window. We can't use the
  * newcli trick below, because the calling program (mail, rn, etc.) would not
  * know when we are finished.
  */
-    if (usewin)
+    ਜੇ (usewin)
     {
 	/*
 	 * Try to open a window. First try the specified device.
 	 * Then try a 24 line 80 column window.
 	 * If that fails, try two smaller ones.
 	 */
-	for (i = -1; i < 3; ++i)
+	ਲਈ (i = -1; i < 3; ++i)
 	{
-	    if (i >= 0)
+	    ਜੇ (i >= 0)
 		device = constrings[i];
-	    if (device != NULL && (raw_in = Open((UBYTE *)device,
-					   (long)MODE_NEWFILE)) != (BPTR)NULL)
-		break;
+	    ਜੇ (device != ਨਿਰਾ && (raw_ਵਿੱਚ = Open((UBYTE *)device,
+					   (ਲੰਮਾ)ਬਹੁਲਕ_NEWFILE)) != (BPTR)ਨਿਰਾ)
+		ਰੋਕੋ;
 	}
-	if (raw_in == (BPTR)NULL)	// all three failed
+	ਜੇ (raw_ਵਿੱਚ == (BPTR)ਨਿਰਾ)	// all three failed
 	{
 	    mch_errmsg(_(winerr));
-	    goto exit;
+	    ਜਾਓ ਬਾਹਰ_ਨਿਕਲੋ;
 	}
-	raw_out = raw_in;
+	raw_ਬਾਹਰਲਾ = raw_ਵਿੱਚ;
 	close_win = TRUE;
-	return OK;
+	ਵਾਪਸ OK;
     }
 
-    if ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)NULL)
+    ਜੇ ((nilfh = Open((UBYTE *)"NIL:", (ਲੰਮਾ)ਬਹੁਲਕ_NEWFILE)) == (BPTR)ਨਿਰਾ)
     {
 	mch_errmsg(_("Cannot open NIL:\n"));
-	goto exit;
+	ਜਾਓ ਬਾਹਰ_ਨਿਕਲੋ;
     }
 
     /*
@@ -475,61 +475,61 @@ mch_check_win(int argc, char **argv)
      * we use a pointer to the current task instead. This should be a
      * shared structure and thus globally unique.
      */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    sprintf((char *)buf1, "t:nc%p", FindTask(0));
-#else
-    sprintf((char *)buf1, "t:nc%ld", (long)buf1);
-#endif
-    if ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)NULL)
+#ਜੇ !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    sprintf((ਅੱਖਰ *)buf1, "t:nc%p", ਲੱਭੋ_Task(0));
+#ਨਹੀਂਤਾਂ
+    sprintf((ਅੱਖਰ *)buf1, "t:nc%ld", (ਲੰਮਾ)buf1);
+#ਜੇ_ਅੰਤ
+    ਜੇ ((fh = Open((UBYTE *)buf1, (ਲੰਮਾ)ਬਹੁਲਕ_NEWFILE)) == (BPTR)ਨਿਰਾ)
     {
 	mch_errmsg(_("Cannot create "));
-	mch_errmsg((char *)buf1);
+	mch_errmsg((ਅੱਖਰ *)buf1);
 	mch_errmsg("\n");
-	goto exit;
+	ਜਾਓ ਬਾਹਰ_ਨਿਕਲੋ;
     }
     /*
      * Write the command into the file, put quotes around the arguments that
      * have a space in them.
      */
-    if (argc == 0)	// run from workbench
-	ac = ((struct WBStartup *)argv)->sm_NumArgs;
-    else
+    ਜੇ (argc == 0)	// run from workbench
+	ac = ((ਬਣਤਰ WBStartup *)argv)->sm_ਅੰਕ_ਦਲੀਲਾਂ;
+    ਨਹੀਂਤਾਂ
 	ac = argc;
-    for (i = 0; i < ac; ++i)
+    ਲਈ (i = 0; i < ac; ++i)
     {
-	if (argc == 0)
+	ਜੇ (argc == 0)
 	{
 	    *buf2 = NUL;
-	    argp = &(((struct WBStartup *)argv)->sm_ArgList[i]);
-	    if (argp->wa_Lock)
-		(void)lock2name(argp->wa_Lock, buf2, (long)(BUF2SIZE - 1));
-#ifdef FEAT_ARP
-	    if (dos2)	    // use 2.0 function
-#endif
-		AddPart((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (long)(BUF2SIZE - 1));
-#ifdef FEAT_ARP
-	    else	    // use arp function
-		TackOn((char *)buf2, argp->wa_Name);
-#endif
-	    av = (char *)buf2;
+	    argp = &(((ਬਣਤਰ WBStartup *)argv)->sm_ArgList[i]);
+	    ਜੇ (argp->wa_ਤਾਲਾ)
+		(ਖਾਲੀ)lock2name(argp->wa_ਤਾਲਾ, buf2, (ਲੰਮਾ)(BUF2_ਮਾਪ - 1));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+	    ਜੇ (dos2)	    // use 2.0 function
+#ਜੇ_ਅੰਤ
+		ਜੋੜੋ_Part((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (ਲੰਮਾ)(BUF2_ਮਾਪ - 1));
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+	    ਨਹੀਂਤਾਂ	    // use arp function
+		TackOn((ਅੱਖਰ *)buf2, argp->wa_Name);
+#ਜੇ_ਅੰਤ
+	    av = (ਅੱਖਰ *)buf2;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    av = argv[i];
 
 	// skip '-d' or "-dev" option
-	if (av[0] == '-' && av[1] == 'd'
-#ifdef FEAT_DIFF
+	ਜੇ (av[0] == '-' && av[1] == 'd'
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
 		&& av[2] == 'e' && av[3] == 'v'
-#endif
+#ਜੇ_ਅੰਤ
 		)
 	{
 	    ++i;
-	    continue;
+	    ਜਾਰੀ;
 	}
-	if (vim_strchr((char_u *)av, ' '))
+	ਜੇ (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
-	Write(fh, av, (long)strlen(av));
-	if (vim_strchr((char_u *)av, ' '))
+	Write(fh, av, (ਲੰਮਾ)ਲੜੀ_ਲੰਬਾਈ(av));
+	ਜੇ (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, " ", 1L);
     }
@@ -541,56 +541,56 @@ mch_check_win(int argc, char **argv)
  * to open the specified device. Then try a 24 line 80 column window.  If that
  * fails, try two smaller ones.
  */
-    for (i = -1; i < 3; ++i)
+    ਲਈ (i = -1; i < 3; ++i)
     {
-	if (i >= 0)
+	ਜੇ (i >= 0)
 	    device = constrings[i];
-	else if (device == NULL)
-	    continue;
-	sprintf((char *)buf2, "newcli <nil: >nil: %s from %s", (char *)device, (char *)buf1);
-#ifdef FEAT_ARP
-	if (dos2)
+	ਨਹੀਂਤਾਂ ਜੇ (device == ਨਿਰਾ)
+	    ਜਾਰੀ;
+	sprintf((ਅੱਖਰ *)buf2, "newcli <nil: >nil: %s from %s", (ਅੱਖਰ *)device, (ਅੱਖਰ *)buf1);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+	ਜੇ (dos2)
 	{
-#endif
-	    if (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
-		break;
-#ifdef FEAT_ARP
+#ਜੇ_ਅੰਤ
+	    ਜੇ (!System_ਟੈਗ_ਸੂਚੀ((UBYTE *)buf2, SYS_UserShell, TRUE, ਟੈਗ_ਪੂਰਾ))
+		ਰੋਕੋ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (Execute((UBYTE *)buf2, nilfh, nilfh))
-		break;
+	    ਜੇ (Execute((UBYTE *)buf2, nilfh, nilfh))
+		ਰੋਕੋ;
 	}
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if (i == 3)	    // all three failed
+    ਜੇ (i == 3)	    // all three failed
     {
 	DeleteFile((UBYTE *)buf1);
 	mch_errmsg(_(winerr));
-	goto exit;
+	ਜਾਓ ਬਾਹਰ_ਨਿਕਲੋ;
     }
     exitval = 0;    // The Execute succeeded: exit this program
 
-exit:
-    if (nilfh)
+ਬਾਹਰ_ਨਿਕਲੋ:
+    ਜੇ (nilfh)
 	Close(nilfh);
-#ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
-#endif
-    exit(exitval);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (Arp_ਅਧਾਰ)
+	CloseLibrary((ਬਣਤਰ Library *) Arp_ਅਧਾਰ);
+#ਜੇ_ਅੰਤ
+    ਬਾਹਰ_ਨਿਕਲੋ(exitval);
     // NOTREACHED
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  * We fake there is a window, because we can always open one!
  */
-    int
-mch_input_isatty(void)
+    ਪੂਰਨ
+mch_ਨਿਵੇਸ਼_isatty(ਖਾਲੀ)
 {
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 /*
@@ -599,25 +599,25 @@ mch_input_isatty(void)
  *		 if the file system ignores, but preserves case.
  */
 //ARGSUSED
-    void
+    ਖਾਲੀ
 fname_case(
     char_u	*name,
-    int		len UNUSED)		// buffer size, ignored here
+    ਪੂਰਨ		len ਅਣਵਰਤਿਆ)		// buffer size, ignored here
 {
-    struct FileInfoBlock    *fib;
+    ਬਣਤਰ File_Info_ਖੰਡ    *fib;
     size_t		    flen;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return;
+    ਜੇ (fib == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     flen = STRLEN(name);
     // TODO: Check if this fix applies to AmigaOS < 4 too.
-#ifdef __amigaos4__
-    if (fib->fib_DirEntryType == ST_ROOT)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+    ਜੇ (fib->fib_Dir_ਇੰਦਰਾਜ_Type == ST_ਜੜ੍ਹ)
 	strcat(fib->fib_FileName, ":");
-#endif
-    if (flen == strlen(fib->fib_FileName))	// safety check
+#ਜੇ_ਅੰਤ
+    ਜੇ (flen == ਲੜੀ_ਲੰਬਾਈ(fib->fib_FileName))	// safety check
 	mch_memmove(name, fib->fib_FileName, flen);
     free_fib(fib);
 }
@@ -627,42 +627,42 @@ fname_case(
  * The returned structure has to be free()d.
  * Returns NULL on error.
  */
-    static struct FileInfoBlock *
+    ਸਥਿਰ ਬਣਤਰ File_Info_ਖੰਡ *
 get_fib(char_u *fname)
 {
     BPTR		    flock;
-    struct FileInfoBlock    *fib;
+    ਬਣਤਰ File_Info_ਖੰਡ    *fib;
 
-    if (fname == NULL)	    // safety check
-	return NULL;
-#ifdef __amigaos4__
+    ਜੇ (fname == ਨਿਰਾ)	    // safety check
+	ਵਾਪਸ ਨਿਰਾ;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
     fib = AllocDosObject(DOS_FIB,0);
-#else
-    fib = ALLOC_ONE(struct FileInfoBlock);
-#endif
-    if (fib == NULL)
-	return;
+#ਨਹੀਂਤਾਂ
+    fib = ALLOC_ONE(ਬਣਤਰ File_Info_ਖੰਡ);
+#ਜੇ_ਅੰਤ
+    ਜੇ (fib == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    flock = safe_Lock((UBYTE *)fname, (long)ACCESS_READ);
-    if (flock == (BPTR)NULL || !Examine(flock, fib))
+    flock = ਸੁਰੱਖਿਅਤ_ਤਾਲਾ((UBYTE *)fname, (ਲੰਮਾ)ACCESS_READ);
+    ਜੇ (flock == (BPTR)ਨਿਰਾ || !Examine(flock, fib))
     {
 	free_fib(fib);  // in case of an error the memory is freed here
-	fib = NULL;
+	fib = ਨਿਰਾ;
     }
-    if (flock)
-	UnLock(flock);
-    return fib;
+    ਜੇ (flock)
+	Un_ਤਾਲਾ(flock);
+    ਵਾਪਸ fib;
 }
 
 /*
  * set the title of our window
  * icon name is not set
  */
-    void
+    ਖਾਲੀ
 mch_settitle(char_u *title, char_u *icon)
 {
-    if (wb_window != NULL && title != NULL)
-	SetWindowTitles(wb_window, (UBYTE *)title, (UBYTE *)-1L);
+    ਜੇ (wb_ਖਿੜਕੀ != ਨਿਰਾ && title != ਨਿਰਾ)
+	ਸੈੱਟ_ਖਿੜਕੀ_Titles(wb_ਖਿੜਕੀ, (UBYTE *)title, (UBYTE *)-1L);
 }
 
 /*
@@ -672,27 +672,27 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_ICON   Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH   Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which)
+    ਖਾਲੀ
+mch_restore_title(ਪੂਰਨ which)
 {
-    if (which & SAVE_RESTORE_TITLE)
-	mch_settitle(oldwindowtitle, NULL);
+    ਜੇ (which & SAVE_RESTORE_TITLE)
+	mch_settitle(oldwindowtitle, ਨਿਰਾ);
 }
 
-    int
-mch_can_restore_title(void)
+    ਪੂਰਨ
+mch_can_restore_title(ਖਾਲੀ)
 {
-    return (wb_window != NULL);
+    ਵਾਪਸ (wb_ਖਿੜਕੀ != ਨਿਰਾ);
 }
 
-    int
-mch_can_restore_icon(void)
+    ਪੂਰਨ
+mch_can_restore_icon(ਖਾਲੀ)
 {
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    void
-mch_setmouse(int on UNUSED)
+    ਖਾਲੀ
+mch_setmouse(ਪੂਰਨ on ਅਣਵਰਤਿਆ)
 {
     // TODO: implement
 }
@@ -700,61 +700,61 @@ mch_setmouse(int on UNUSED)
 /*
  * Insert user name in s[len].
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    ਪੂਰਨ
+mch_get_user_name(char_u *s, ਪੂਰਨ len)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    struct passwd   *pwd = getpwuid(getuid());
+#ਜੇ defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    ਬਣਤਰ passwd   *pwd = getpwuid(getuid());
 
-    if (pwd != NULL && pwd->pw_name && len > 0)
+    ਜੇ (pwd != ਨਿਰਾ && pwd->pw_name && len > 0)
     {
 	vim_strncpy(s, (char_u *)pwd->pw_name, len - 1);
-	return OK;
+	ਵਾਪਸ OK;
     }
-#endif
+#ਜੇ_ਅੰਤ
     *s = NUL;
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
 
 /*
  * Insert host name is s[len].
  */
-    void
-mch_get_host_name(char_u *s, int len)
+    ਖਾਲੀ
+mch_get_host_name(char_u *s, ਪੂਰਨ len)
 {
-#if defined(__amigaos4__) || defined(__MORPHOS__)
-    gethostname((char *)s, len);
-#else
+#ਜੇ defined(__amigaos4__) || defined(__MORPHOS__)
+    gethostname((ਅੱਖਰ *)s, len);
+#ਨਹੀਂਤਾਂ
     // AROS and classic OS 3 (libnix) do not have gethostname().
     vim_strncpy(s, (char_u *)"amiga", len - 1);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    ਲੰਮਾ
+mch_get_pid(ਖਾਲੀ)
 {
-#if defined(__amigaos4__)
-    return (long) getpid();
-#elif defined(__AROS__) || defined(__MORPHOS__)
+#ਜੇ defined(__amigaos4__)
+    ਵਾਪਸ (ਲੰਮਾ) getpid();
+#ਜਾਂਜੇ defined(__AROS__) || defined(__MORPHOS__)
     // This is as close to a pid as we can come. We could use CLI numbers also,
     // but then we would have two different types of process identifiers.
-    return((long)FindTask(0));
-#else
-    return (long)0;
-#endif
+    ਵਾਪਸ((ਲੰਮਾ)ਲੱਭੋ_Task(0));
+#ਨਹੀਂਤਾਂ
+    ਵਾਪਸ (ਲੰਮਾ)0;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    ਪੂਰਨ
+mch_dirname(char_u *buf, ਪੂਰਨ len)
 {
-    return mch_FullName((char_u *)"", buf, len, FALSE);
+    ਵਾਪਸ mch_ਭਰਿਆ_Name((char_u *)"", buf, len, FALSE);
 }
 
 /*
@@ -762,59 +762,59 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_FullName(
+    ਪੂਰਨ
+mch_ਭਰਿਆ_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)
+    ਪੂਰਨ		len,
+    ਪੂਰਨ		force)
 {
     BPTR	l;
-    int		retval = FAIL;
-    int		i;
+    ਪੂਰਨ		retval = FAIL;
+    ਪੂਰਨ		i;
 
     // Lock the file.  If it exists, we can get the exact name.
-    if ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
+    ਜੇ ((l = ਸੁਰੱਖਿਅਤ_ਤਾਲਾ((UBYTE *)fname, (ਲੰਮਾ)ACCESS_READ)) != (BPTR)0)
     {
-	retval = lock2name(l, buf, (long)len - 1);
-	UnLock(l);
+	retval = lock2name(l, buf, (ਲੰਮਾ)len - 1);
+	Un_ਤਾਲਾ(l);
     }
-    else if (force || !mch_isFullName(fname))	    // not a full path yet
+    ਨਹੀਂਤਾਂ ਜੇ (force || !mch_is_ਭਰਿਆ_Name(fname))	    // not a full path yet
     {
 	/*
 	 * If the file cannot be locked (doesn't exist), try to lock the
 	 * current directory and concatenate the file name.
 	 */
-	if ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)NULL)
+	ਜੇ ((l = ਤਾਲਾ_2((UBYTE *)"", (ਲੰਮਾ)ACCESS_READ)) != (BPTR)ਨਿਰਾ)
 	{
-	    retval = lock2name(l, buf, (long)len);
-	    UnLock(l);
-	    if (retval == OK)
+	    retval = lock2name(l, buf, (ਲੰਮਾ)len);
+	    Un_ਤਾਲਾ(l);
+	    ਜੇ (retval == OK)
 	    {
 		i = STRLEN(buf);
 		// Concatenate the fname to the directory.  Don't add a slash
 		// if fname is empty, but do change "" to "/".
-		if (i == 0 || *fname != NUL)
+		ਜੇ (i == 0 || *fname != NUL)
 		{
-		    if (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
+		    ਜੇ (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
 			buf[i++] = '/';
 		    vim_strncpy(buf + i, fname, len - i - 1);
 		}
 	    }
 	}
     }
-    if (*buf == 0 || *buf == ':')
+    ਜੇ (*buf == 0 || *buf == ':')
 	retval = FAIL;	// something failed; use the file name
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    ਪੂਰਨ
+mch_is_ਭਰਿਆ_Name(char_u *fname)
 {
-    return (vim_strchr(fname, ':') != NULL && *fname != ':');
+    ਵਾਪਸ (vim_strchr(fname, ':') != ਨਿਰਾ && *fname != ':');
 }
 
 /*
@@ -823,36 +823,36 @@ mch_isFullName(char_u *fname)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-lock2name(BPTR lock, char_u *buf, long len)
+    ਸਥਿਰ ਪੂਰਨ
+lock2name(BPTR ਤਾਲਾ, char_u *buf, ਲੰਮਾ len)
 {
-#ifdef FEAT_ARP
-    if (dos2)		    // use 2.0 function
-#endif
-	return ((int)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
-#ifdef FEAT_ARP
-    else		// use arp function
-	return ((int)PathName(lock, (char *)buf, (long)(len/32)) ? OK : FAIL);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (dos2)		    // use 2.0 function
+#ਜੇ_ਅੰਤ
+	ਵਾਪਸ ((ਪੂਰਨ)Name_From_ਤਾਲਾ(ਤਾਲਾ, (UBYTE *)buf, len) ? OK : FAIL);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਨਹੀਂਤਾਂ		// use arp function
+	ਵਾਪਸ ((ਪੂਰਨ)ਰਸਤਾ_Name(ਤਾਲਾ, (ਅੱਖਰ *)buf, (ਲੰਮਾ)(len/32)) ? OK : FAIL);
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * get file permissions for 'name'
  * Returns -1 when it doesn't exist.
  */
-    long
+    ਲੰਮਾ
 mch_getperm(char_u *name)
 {
-    struct FileInfoBlock    *fib;
-    long		    retval = -1;
+    ਬਣਤਰ File_Info_ਖੰਡ    *fib;
+    ਲੰਮਾ		    retval = -1;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return -1;
+    ਜੇ (fib == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
     retval = fib->fib_Protection;
     free_fib(fib);
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -860,18 +860,18 @@ mch_getperm(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_setperm(char_u *name, long perm)
+    ਪੂਰਨ
+mch_setperm(char_u *name, ਲੰਮਾ perm)
 {
     perm &= ~FIBF_ARCHIVE;		// reset archived bit
-    return (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
+    ਵਾਪਸ (ਸੈੱਟ_Protection((UBYTE *)name, (ਲੰਮਾ)perm) ? OK : FAIL);
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
-mch_hide(char_u *name UNUSED)
+    ਖਾਲੀ
+mch_hide(char_u *name ਅਣਵਰਤਿਆ)
 {
     // can't hide a file
 }
@@ -881,39 +881,39 @@ mch_hide(char_u *name UNUSED)
  * return TRUE if "name" is a directory.
  * return FALSE for error.
  */
-    int
+    ਪੂਰਨ
 mch_isdir(char_u *name)
 {
-    struct FileInfoBlock    *fib;
-    int			    retval = FALSE;
+    ਬਣਤਰ File_Info_ਖੰਡ    *fib;
+    ਪੂਰਨ			    retval = FALSE;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return FALSE;
+    ਜੇ (fib == ਨਿਰਾ)
+	ਵਾਪਸ FALSE;
 
-#ifdef __amigaos4__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
     retval = (FIB_IS_DRAWER(fib)) ? TRUE : FALSE;
-#else
-    retval = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
-#endif
+#ਨਹੀਂਤਾਂ
+    retval = ((fib->fib_Dir_ਇੰਦਰਾਜ_Type >= 0) ? TRUE : FALSE);
+#ਜੇ_ਅੰਤ
     free_fib(fib);
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Create directory "name".
  */
-    int
+    ਪੂਰਨ
 mch_mkdir(char_u *name)
 {
-    BPTR	lock;
+    BPTR	ਤਾਲਾ;
 
-    lock = CreateDir(name);
-    if (lock == NULL)
-	return -1;
+    ਤਾਲਾ = CreateDir(name);
+    ਜੇ (ਤਾਲਾ == ਨਿਰਾ)
+	ਵਾਪਸ -1;
 
-    UnLock(lock);
-    return 0;
+    Un_ਤਾਲਾ(ਤਾਲਾ);
+    ਵਾਪਸ 0;
 }
 
 /*
@@ -921,51 +921,51 @@ mch_mkdir(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
+    ਪੂਰਨ
+mch_can_exe(char_u *name, char_u **ਰਸਤਾ ਅਣਵਰਤਿਆ, ਪੂਰਨ use_ਰਸਤਾ)
 {
-    int exe = -1;
-#ifdef __amigaos4__
+    ਪੂਰਨ exe = -1;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
     // Load file sections using elf.library or hunk.library.
-    BPTR seg = LoadSeg(name);
+    BPTR seg = ਲੱਦੋ_Seg(name);
 
-    if (seg && GetSegListInfoTags(seg, GSLI_Native, NULL, TAG_DONE) !=
-	    GetSegListInfoTags(seg, GSLI_68KHUNK, NULL, TAG_DONE))
+    ਜੇ (seg && Get_Seg_List_Info_ਟੈਗ_ਸੂਚੀ(seg, GSLI_Native, ਨਿਰਾ, ਟੈਗ_ਪੂਰਾ) !=
+	    Get_Seg_List_Info_ਟੈਗ_ਸੂਚੀ(seg, GSLI_68KHUNK, ਨਿਰਾ, ਟੈਗ_ਪੂਰਾ))
     {
 	// Test if file permissions allow execution.
-	struct ExamineData *exd = ExamineObjectTags(EX_StringNameInput, name);
+	ਬਣਤਰ Examine_ਅੰਕੜੇ *exd = Examine_Object_ਟੈਗ_ਸੂਚੀ(EX_String_Name_ਨਿਵੇਸ਼, name);
 
 	exe = (exd && !(exd->Protection & EXDF_NO_EXECUTE)) ? 1 : 0;
 	FreeDosObject(DOS_EXAMINEDATA, exd);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	exe = 0;
     }
 
-    UnLoadSeg(seg);
+    Un_ਲੱਦੋ_Seg(seg);
 
     // Search for executable in path if applicable.
-    if (!exe && use_path)
+    ਜੇ (!exe && use_ਰਸਤਾ)
     {
 	// Save current working dir.
 	BPTR cwd = GetCurrentDir();
-	struct PathNode *head = DupCmdPathList(NULL);
+	ਬਣਤਰ ਰਸਤਾ_ਗੰਢ *ਸਿਰ = Dup_Cmd_ਰਸਤਾ_List(ਨਿਰਾ);
 
 	// For each entry, recur to check for executable.
-	for (struct PathNode *tail = head; !exe && tail;
-			       tail = (struct PathNode *) BADDR(tail->pn_Next))
+	ਲਈ (ਬਣਤਰ ਰਸਤਾ_ਗੰਢ *ਪੂਛ = ਸਿਰ; !exe && ਪੂਛ;
+			       ਪੂਛ = (ਬਣਤਰ ਰਸਤਾ_ਗੰਢ *) BADDR(ਪੂਛ->pn_ਅਗਲਾ))
 	{
-	    SetCurrentDir(tail->pn_Lock);
-	    exe = mch_can_exe(name, path, 0);
+	    ਸੈੱਟ_Current_Dir(ਪੂਛ->pn_ਤਾਲਾ);
+	    exe = mch_can_exe(name, ਰਸਤਾ, 0);
 	}
 
 	// Go back to where we were.
-	FreeCmdPathList(head);
-	SetCurrentDir(cwd);
+	Free_Cmd_ਰਸਤਾ_List(ਸਿਰ);
+	ਸੈੱਟ_Current_Dir(cwd);
     }
-#endif
-    return exe;
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ exe;
 }
 
 /*
@@ -974,56 +974,56 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
-mch_nodetype(char_u *name UNUSED)
+    ਪੂਰਨ
+mch_nodetype(char_u *name ਅਣਵਰਤਿਆ)
 {
     // TODO
-    return NODE_NORMAL;
+    ਵਾਪਸ ਗੰਢ_ਸਾਧਾਰਨ;
 }
 
-    void
-mch_early_init(void)
+    ਖਾਲੀ
+mch_early_init(ਖਾਲੀ)
 {
 }
 
 /*
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit(int r)
+    ਖਾਲੀ
+mch_exit(ਪੂਰਨ r)
 {
     exiting = TRUE;
 
-    if (raw_in)			    // put terminal in 'normal' mode
+    ਜੇ (raw_ਵਿੱਚ)			    // put terminal in 'normal' mode
     {
 	settmode(TMODE_COOK);
 	stoptermcap();
     }
-    out_char('\n');
-    if (raw_out)
+    ਬਾਹਰਲਾ_char('\n');
+    ਜੇ (raw_ਬਾਹਰਲਾ)
     {
-	if (term_console)
+	ਜੇ (ਪਦ_console)
 	{
 	    win_resize_off();	    // window resize events de-activated
-	    if (size_set)
-		OUT_STR("\233t\233u");	// reset window size (CSI t CSI u)
+	    ਜੇ (ਮਾਪ_ਸੈੱਟ)
+		ਬਾਹਰਲਾ_STR("\233t\233u");	// reset window size (CSI t CSI u)
 	}
-	out_flush();
+	ਬਾਹਰਲਾ_flush();
     }
 
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window title
 
     ml_close_all(TRUE);		    // remove all memfiles
 
-#ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
-#endif
-    if (close_win)
-	Close(raw_in);
-    if (r)
-	printf(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
-    exit(r);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (Arp_ਅਧਾਰ)
+	CloseLibrary((ਬਣਤਰ Library *) Arp_ਅਧਾਰ);
+#ਜੇ_ਅੰਤ
+    ਜੇ (close_win)
+	Close(raw_ਵਿੱਚ);
+    ਜੇ (r)
+	ਲਿਖੋ(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
+    ਬਾਹਰ_ਨਿਕਲੋ(r);
 }
 
 /*
@@ -1034,7 +1034,7 @@ mch_exit(int r)
  * Written : 18-Jun-87 By Chuck McManis.
  */
 
-#define MP(xx)	((struct MsgPort *)((struct FileHandle *) (BADDR(xx)))->fh_Type)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MP(xx)	((ਬਣਤਰ ਸੁਨੇਹਾ_ਪੋਰਟ *)((ਬਣਤਰ FileHandle *) (BADDR(xx)))->fh_Type)
 
 /*
  * Function mch_settmode() - Convert the specified file pointer to 'raw' or
@@ -1048,15 +1048,15 @@ mch_exit(int r)
  *	wait for a <CR> mode. This is exactly like raw() except that
  *	it sends a 0 to the console to make it back into a CON: from a RAW:
  */
-    void
+    ਖਾਲੀ
 mch_settmode(tmode_T tmode)
 {
-#if defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
-    if (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
-#else
-    if (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
+#ਜੇ defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
+    ਜੇ (!ਸੈੱਟ_ਬਹੁਲਕ_2(raw_ਵਿੱਚ, tmode == TMODE_RAW ? 1 : 0))
+#ਨਹੀਂਤਾਂ
+    ਜੇ (dos_packet(MP(raw_ਵਿੱਚ), (ਲੰਮਾ)ACTION_SCREEN_ਬਹੁਲਕ,
 					  tmode == TMODE_RAW ? -1L : 0L) == 0)
-#endif
+#ਜੇ_ਅੰਤ
 	mch_errmsg(_("cannot change console mode ?!\n"));
 }
 
@@ -1072,43 +1072,43 @@ mch_settmode(tmode_T tmode)
  * Heavely modified by mool.
  */
 
-#include <devices/conunit.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <devices/conunit.h>
 
 /*
  * Get console size in a system friendly way on AROS and MorphOS.
  * Return FAIL for failure, OK otherwise
  */
-#if defined(__AROS__) || defined(__MORPHOS__)
-    int
-mch_get_shellsize(void)
+#ਜੇ defined(__AROS__) || defined(__MORPHOS__)
+    ਪੂਰਨ
+mch_get_shellsize(ਖਾਲੀ)
 {
-    if (!term_console)
-	return FAIL;
+    ਜੇ (!ਪਦ_console)
+	ਵਾਪਸ FAIL;
 
-    if (raw_in && raw_out)
+    ਜੇ (raw_ਵਿੱਚ && raw_ਬਾਹਰਲਾ)
     {
 	// Save current console mode.
-	int old_tmode = cur_tmode;
-	char ctrl[] = "\x9b""0 q";
+	ਪੂਰਨ old_tmode = cur_tmode;
+	ਅੱਖਰ ctrl[] = "\x9b""0 q";
 
 	// Set RAW mode.
 	mch_settmode(TMODE_RAW);
 
 	// Write control sequence to console.
-	if (Write(raw_out, ctrl, sizeof(ctrl)) == sizeof(ctrl))
+	ਜੇ (Write(raw_ਬਾਹਰਲਾ, ctrl, ਆਕਾਰ(ctrl)) == ਆਕਾਰ(ctrl))
 	{
-	    char scan[] = "\x9b""1;1;%d;%d r",
-		 answ[sizeof(scan) + 8] = { '\0' };
+	    ਅੱਖਰ ਜਾਂਚ[] = "\x9b""1;1;%d;%d r",
+		 answ[ਆਕਾਰ(ਜਾਂਚ) + 8] = { '\0' };
 
 	    // Read return sequence from input.
-	    if (Read(raw_in, answ, sizeof(answ) - 1) > 0)
+	    ਜੇ (Read(raw_ਵਿੱਚ, answ, ਆਕਾਰ(answ) - 1) > 0)
 	    {
 		// Parse result and set Vim globals.
-		if (sscanf(answ, scan, &Rows, &Columns) == 2)
+		ਜੇ (ਲੜੀ_ਤੋਂ_ਪੜ੍ਹੋ(answ, ਜਾਂਚ, &ਪੰਕਤੀਆਂ, &Columns) == 2)
 		{
 		    // Restore console mode.
 		    mch_settmode(old_tmode);
-		    return OK;
+		    ਵਾਪਸ OK;
 		}
 	    }
 	}
@@ -1118,35 +1118,35 @@ mch_get_shellsize(void)
     }
 
     // I/O error. Default size fallback.
-    term_console = FALSE;
+    ਪਦ_console = FALSE;
     Columns = 80;
-    Rows = 24;
+    ਪੰਕਤੀਆਂ = 24;
 
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
-#else
+#ਨਹੀਂਤਾਂ
 /*
  * Try to get the real window size,
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_get_shellsize(void)
+    ਪੂਰਨ
+mch_get_shellsize(ਖਾਲੀ)
 {
-    struct ConUnit  *conUnit;
+    ਬਣਤਰ ConUnit  *conUnit;
 # ifndef __amigaos4__
-    char	    id_a[sizeof(struct InfoData) + 3];
+    ਅੱਖਰ	    id_a[ਆਕਾਰ(ਬਣਤਰ Info_ਅੰਕੜੇ) + 3];
 # endif
-    struct InfoData *id=0;
+    ਬਣਤਰ Info_ਅੰਕੜੇ *id=0;
 
-    if (!term_console)	// not an amiga window
-	goto out;
+    ਜੇ (!ਪਦ_console)	// not an amiga window
+	ਜਾਓ ਬਾਹਰਲਾ;
 
     // insure longword alignment
 # ifdef __amigaos4__
-    if (!(id = AllocDosObject(DOS_INFODATA, 0)))
-	goto out;
-# else
-    id = (struct InfoData *)(((long)id_a + 3L) & ~3L);
+    ਜੇ (!(id = AllocDosObject(DOS_INFODATA, 0)))
+	ਜਾਓ ਬਾਹਰਲਾ;
+# ਨਹੀਂਤਾਂ
+    id = (ਬਣਤਰ Info_ਅੰਕੜੇ *)(((ਲੰਮਾ)id_a + 3L) & ~3L);
 # endif
 
     /*
@@ -1154,72 +1154,72 @@ mch_get_shellsize(void)
      * Unfortunately, under DOS 2.0x this redraws the window and it
      * is rarely needed, so we skip it now, unless we changed the size.
      */
-    if (size_set)
-	OUT_STR("\233t\233u");	// CSI t CSI u
-    out_flush();
+    ਜੇ (ਮਾਪ_ਸੈੱਟ)
+	ਬਾਹਰਲਾ_STR("\233t\233u");	// CSI t CSI u
+    ਬਾਹਰਲਾ_flush();
 
-    if (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
-	    || (wb_window = (struct Window *)id->id_VolumeNode) == NULL)
+    ਜੇ (dos_packet(MP(raw_ਬਾਹਰਲਾ), (ਲੰਮਾ)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
+	    || (wb_ਖਿੜਕੀ = (ਬਣਤਰ ਖਿੜਕੀ *)id->id_Volume_ਗੰਢ) == ਨਿਰਾ)
     {
 	// it's not an amiga window, maybe aux device
 	// terminal type should be set
-	term_console = FALSE;
-	goto out;
+	ਪਦ_console = FALSE;
+	ਜਾਓ ਬਾਹਰਲਾ;
     }
-    if (oldwindowtitle == NULL)
-	oldwindowtitle = (char_u *)wb_window->Title;
-    if (id->id_InUse == (BPTR)NULL)
+    ਜੇ (oldwindowtitle == ਨਿਰਾ)
+	oldwindowtitle = (char_u *)wb_ਖਿੜਕੀ->Title;
+    ਜੇ (id->id_ਵਿੱਚ_Use == (BPTR)ਨਿਰਾ)
     {
 	mch_errmsg(_("mch_get_shellsize: not a console??\n"));
-	return FAIL;
+	ਵਾਪਸ FAIL;
     }
-    conUnit = (struct ConUnit *) ((struct IOStdReq *) id->id_InUse)->io_Unit;
+    conUnit = (ਬਣਤਰ ConUnit *) ((ਬਣਤਰ IOStdReq *) id->id_ਵਿੱਚ_Use)->io_Unit;
 
     // get window size
-    Rows = conUnit->cu_YMax + 1;
+    ਪੰਕਤੀਆਂ = conUnit->cu_YMax + 1;
     Columns = conUnit->cu_XMax + 1;
-    if (Rows < 0 || Rows > 200)	    // cannot be an amiga window
+    ਜੇ (ਪੰਕਤੀਆਂ < 0 || ਪੰਕਤੀਆਂ > 200)	    // cannot be an amiga window
     {
 	Columns = 80;
-	Rows = 24;
-	term_console = FALSE;
-	return FAIL;
+	ਪੰਕਤੀਆਂ = 24;
+	ਪਦ_console = FALSE;
+	ਵਾਪਸ FAIL;
     }
 
-    return OK;
-out:
+    ਵਾਪਸ OK;
+ਬਾਹਰਲਾ:
 # ifdef __amigaos4__
     FreeDosObject(DOS_INFODATA, id); // Safe to pass NULL
 # endif
 
-    return FAIL;
+    ਵਾਪਸ FAIL;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Try to set the real window size to Rows and Columns.
  */
-    void
-mch_set_shellsize(void)
+    ਖਾਲੀ
+mch_ਸੈੱਟ_shellsize(ਖਾਲੀ)
 {
-    if (!term_console)
-	return;
+    ਜੇ (!ਪਦ_console)
+	ਵਾਪਸ;
 
-    size_set = TRUE;
-    out_char(CSI);
-    out_num((long)Rows);
-    out_char('t');
-    out_char(CSI);
-    out_num((long)Columns);
-    out_char('u');
-    out_flush();
+    ਮਾਪ_ਸੈੱਟ = TRUE;
+    ਬਾਹਰਲਾ_char(CSI);
+    ਬਾਹਰਲਾ_ਅੰਕ((ਲੰਮਾ)ਪੰਕਤੀਆਂ);
+    ਬਾਹਰਲਾ_char('t');
+    ਬਾਹਰਲਾ_char(CSI);
+    ਬਾਹਰਲਾ_ਅੰਕ((ਲੰਮਾ)Columns);
+    ਬਾਹਰਲਾ_char('u');
+    ਬਾਹਰਲਾ_flush();
 }
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    ਖਾਲੀ
+mch_new_shellsize(ਖਾਲੀ)
 {
     // Nothing to do.
 }
@@ -1227,13 +1227,13 @@ mch_new_shellsize(void)
 /*
  * out_num - output a (big) number fast
  */
-    static void
-out_num(long n)
+    ਸਥਿਰ ਖਾਲੀ
+ਬਾਹਰਲਾ_ਅੰਕ(ਲੰਮਾ n)
 {
-    OUT_STR_NF(tltoa((unsigned long)n));
+    ਬਾਹਰਲਾ_STR_NF(tltoa((ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ)n));
 }
 
-#if !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
+#ਜੇ !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
 /*
  * Sendpacket.c
  *
@@ -1255,263 +1255,263 @@ out_num(long n)
  * Port supplied.
  */
 
-    static long
+    ਸਥਿਰ ਲੰਮਾ
 dos_packet(
-    struct MsgPort *pid,    // process identifier ... (handlers message port)
-    long	    action, // packet type ... (what you want handler to do)
-    long	    arg)    // single argument
+    ਬਣਤਰ ਸੁਨੇਹਾ_ਪੋਰਟ *pid,    // process identifier ... (handlers message port)
+    ਲੰਮਾ	    action, // packet type ... (what you want handler to do)
+    ਲੰਮਾ	    arg)    // single argument
 {
 # ifdef FEAT_ARP
-    struct MsgPort	    *replyport;
-    struct StandardPacket   *packet;
-    long		    res1;
+    ਬਣਤਰ ਸੁਨੇਹਾ_ਪੋਰਟ	    *replyport;
+    ਬਣਤਰ StandardPacket   *packet;
+    ਲੰਮਾ		    res1;
 
-    if (dos2)
+    ਜੇ (dos2)
 # endif
-	return DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
+	ਵਾਪਸ DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
 # ifdef FEAT_ARP
 
-    replyport = (struct MsgPort *) CreatePort(NULL, 0);	// use arp function
-    if (!replyport)
-	return (0);
+    replyport = (ਬਣਤਰ ਸੁਨੇਹਾ_ਪੋਰਟ *) Create_ਪੋਰਟ(ਨਿਰਾ, 0);	// use arp function
+    ਜੇ (!replyport)
+	ਵਾਪਸ (0);
 
     // Allocate space for a packet, make it public and clear it
-    packet = (struct StandardPacket *)
-	AllocMem((long) sizeof(struct StandardPacket), MEMF_PUBLIC | MEMF_CLEAR);
-    if (!packet)
+    packet = (ਬਣਤਰ StandardPacket *)
+	AllocMem((ਲੰਮਾ) ਆਕਾਰ(ਬਣਤਰ StandardPacket), MEMF_ਜਨਤਕ | MEMF_CLEAR);
+    ਜੇ (!packet)
     {
-	DeletePort(replyport);
-	return (0);
+	Delete_ਪੋਰਟ(replyport);
+	ਵਾਪਸ (0);
     }
-    packet->sp_Msg.mn_Node.ln_Name = (char *) &(packet->sp_Pkt);
-    packet->sp_Pkt.dp_Link = &(packet->sp_Msg);
-    packet->sp_Pkt.dp_Port = replyport;
+    packet->sp_ਸੁਨੇਹਾ.mn_ਗੰਢ.ln_Name = (ਅੱਖਰ *) &(packet->sp_Pkt);
+    packet->sp_Pkt.dp_Link = &(packet->sp_ਸੁਨੇਹਾ);
+    packet->sp_Pkt.dp_ਪੋਰਟ = replyport;
     packet->sp_Pkt.dp_Type = action;
     packet->sp_Pkt.dp_Arg1 = arg;
 
-    PutMsg(pid, (struct Message *)packet);	// send packet
+    Put_ਸੁਨੇਹਾ(pid, (ਬਣਤਰ ਸੁਨੇਹਾ_4 *)packet);	// send packet
 
-    WaitPort(replyport);
-    GetMsg(replyport);
+    Wait_ਪੋਰਟ(replyport);
+    Get_ਸੁਨੇਹਾ(replyport);
 
     res1 = packet->sp_Pkt.dp_Res1;
 
-    FreeMem(packet, (long) sizeof(struct StandardPacket));
-    DeletePort(replyport);
+    FreeMem(packet, (ਲੰਮਾ) ਆਕਾਰ(ਬਣਤਰ StandardPacket));
+    Delete_ਪੋਰਟ(replyport);
 
-    return (res1);
+    ਵਾਪਸ (res1);
 # endif
 }
-#endif // !defined(AZTEC_C) && !defined(__AROS__)
+#ਜੇ_ਅੰਤ // !defined(AZTEC_C) && !defined(__AROS__)
 
 /*
  * Call shell.
  * Return error number for failure, 0 otherwise
  */
-    int
+    ਪੂਰਨ
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    ਪੂਰਨ		options)	// SHELL_*, see vim.h
 {
     BPTR	mydir;
-    int		x;
-    int		tmode = cur_tmode;
-#ifdef AZTEC_C
-    int		use_execute;
-    char_u	*shellcmd = NULL;
+    ਪੂਰਨ		x;
+    ਪੂਰਨ		tmode = cur_tmode;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ AZTEC_C
+    ਪੂਰਨ		use_execute;
+    char_u	*shellcmd = ਨਿਰਾ;
     char_u	*shellarg;
-#endif
-    int		retval = 0;
+#ਜੇ_ਅੰਤ
+    ਪੂਰਨ		retval = 0;
 
-    if (close_win)
+    ਜੇ (close_win)
     {
 	// if Vim opened a window: Executing a shell may cause crashes
 	emsg(_(e_cannot_execute_shell_with_f_option));
-	return -1;
+	ਵਾਪਸ -1;
     }
 
-    if (term_console)
+    ਜੇ (ਪਦ_console)
 	win_resize_off();	    // window resize events de-activated
-    out_flush();
+    ਬਾਹਰਲਾ_flush();
 
-    if (options & SHELL_COOKED)
+    ਜੇ (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
-    mydir = Lock((UBYTE *)"", (long)ACCESS_READ);   // remember current dir
+    mydir = ਤਾਲਾ_2((UBYTE *)"", (ਲੰਮਾ)ACCESS_READ);   // remember current dir
 
-#if !defined(AZTEC_C)		    // not tested very much
-    if (cmd == NULL)
+#ਜੇ !defined(AZTEC_C)		    // not tested very much
+    ਜੇ (cmd == ਨਿਰਾ)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ਜੇ (dos2)
 # endif
-	    x = SystemTags(p_sh, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ਟੈਗ_ਸੂਚੀ(p_sh, SYS_UserShell, TRUE, ਟੈਗ_ਪੂਰਾ);
 # ifdef FEAT_ARP
-	else
-	    x = Execute(p_sh, raw_in, raw_out);
+	ਨਹੀਂਤਾਂ
+	    x = Execute(p_sh, raw_ਵਿੱਚ, raw_ਬਾਹਰਲਾ);
 # endif
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ਜੇ (dos2)
 # endif
-	    x = SystemTags((char *)cmd, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ਟੈਗ_ਸੂਚੀ((ਅੱਖਰ *)cmd, SYS_UserShell, TRUE, ਟੈਗ_ਪੂਰਾ);
 # ifdef FEAT_ARP
-	else
-	    x = Execute((char *)cmd, 0L, raw_out);
+	ਨਹੀਂਤਾਂ
+	    x = Execute((ਅੱਖਰ *)cmd, 0L, raw_ਬਾਹਰਲਾ);
 # endif
     }
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && !x))
-# else
-    if (x < 0)
+    ਜੇ ((dos2 && x < 0) || (!dos2 && !x))
+# ਨਹੀਂਤਾਂ
+    ਜੇ (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (cmd == NULL)
+	ਸੁਨੇਹਾ_puts(_("Cannot execute "));
+	ਜੇ (cmd == ਨਿਰਾ)
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(p_sh);
+	    ਸੁਨੇਹਾ_puts(_("shell "));
+	    ਸੁਨੇਹਾ_outtrans(p_sh);
 	}
-	else
-	    msg_outtrans(cmd);
-	msg_putchar('\n');
+	ਨਹੀਂਤਾਂ
+	    ਸੁਨੇਹਾ_outtrans(cmd);
+	ਸੁਨੇਹਾ_putchar('\n');
 	retval = -1;
     }
 # ifdef FEAT_ARP
-    else if (!dos2 || x)
-# else
-    else if (x)
+    ਨਹੀਂਤਾਂ ਜੇ (!dos2 || x)
+# ਨਹੀਂਤਾਂ
+    ਨਹੀਂਤਾਂ ਜੇ (x)
 # endif
     {
-	if ((x = IoErr()) != 0)
+	ਜੇ ((x = IoErr()) != 0)
 	{
-	    if (!(options & SHELL_SILENT))
+	    ਜੇ (!(options & SHELL_SILENT))
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		ਸੁਨੇਹਾ_putchar('\n');
+		ਸੁਨੇਹਾ_outnum((ਲੰਮਾ)x);
+		ਸੁਨੇਹਾ_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
     }
-#else	// else part is for AZTEC_C
-    if (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
+#ਨਹੀਂਤਾਂ	// else part is for AZTEC_C
+    ਜੇ (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
 	use_execute = 1;
-    else
+    ਨਹੀਂਤਾਂ
 	use_execute = 0;
-    if (!use_execute)
+    ਜੇ (!use_execute)
     {
 	/*
 	 * separate shell name from argument
 	 */
 	shellcmd = vim_strsave(p_sh);
-	if (shellcmd == NULL)	    // out of memory, use Execute
+	ਜੇ (shellcmd == ਨਿਰਾ)	    // out of memory, use Execute
 	    use_execute = 1;
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    shellarg = skiptowhite(shellcmd);	// find start of arguments
-	    if (*shellarg != NUL)
+	    ਜੇ (*shellarg != NUL)
 	    {
 		*shellarg++ = NUL;
 		shellarg = skipwhite(shellarg);
 	    }
 	}
     }
-    if (cmd == NULL)
+    ਜੇ (cmd == ਨਿਰਾ)
     {
-	if (use_execute)
+	ਜੇ (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (dos2)
+	    ਜੇ (dos2)
 # endif
-		x = SystemTags((UBYTE *)p_sh, SYS_UserShell, TRUE, TAG_DONE);
+		x = System_ਟੈਗ_ਸੂਚੀ((UBYTE *)p_sh, SYS_UserShell, TRUE, ਟੈਗ_ਪੂਰਾ);
 # ifdef FEAT_ARP
-	    else
-		x = !Execute((UBYTE *)p_sh, raw_in, raw_out);
+	    ਨਹੀਂਤਾਂ
+		x = !Execute((UBYTE *)p_sh, raw_ਵਿੱਚ, raw_ਬਾਹਰਲਾ);
 # endif
 	}
-	else
-	    x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg, NULL);
+	ਨਹੀਂਤਾਂ
+	    x = fexecl((ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellarg, ਨਿਰਾ);
     }
-    else if (use_execute)
+    ਨਹੀਂਤਾਂ ਜੇ (use_execute)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	ਜੇ (dos2)
 # endif
-	    x = SystemTags((UBYTE *)cmd, SYS_UserShell, TRUE, TAG_DONE);
+	    x = System_ਟੈਗ_ਸੂਚੀ((UBYTE *)cmd, SYS_UserShell, TRUE, ਟੈਗ_ਪੂਰਾ);
 # ifdef FEAT_ARP
-	else
-	    x = !Execute((UBYTE *)cmd, 0L, raw_out);
+	ਨਹੀਂਤਾਂ
+	    x = !Execute((UBYTE *)cmd, 0L, raw_ਬਾਹਰਲਾ);
 # endif
     }
-    else if (p_st & 1)
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-							   (char *)cmd, NULL);
-    else
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-					   (char *)p_shcf, (char *)cmd, NULL);
+    ਨਹੀਂਤਾਂ ਜੇ (p_st & 1)
+	x = fexecl((ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellarg,
+							   (ਅੱਖਰ *)cmd, ਨਿਰਾ);
+    ਨਹੀਂਤਾਂ
+	x = fexecl((ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellcmd, (ਅੱਖਰ *)shellarg,
+					   (ਅੱਖਰ *)p_shcf, (ਅੱਖਰ *)cmd, ਨਿਰਾ);
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && x))
-# else
-    if (x < 0)
+    ਜੇ ((dos2 && x < 0) || (!dos2 && x))
+# ਨਹੀਂਤਾਂ
+    ਜੇ (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (use_execute)
+	ਸੁਨੇਹਾ_puts(_("Cannot execute "));
+	ਜੇ (use_execute)
 	{
-	    if (cmd == NULL)
-		msg_outtrans(p_sh);
-	    else
-		msg_outtrans(cmd);
+	    ਜੇ (cmd == ਨਿਰਾ)
+		ਸੁਨੇਹਾ_outtrans(p_sh);
+	    ਨਹੀਂਤਾਂ
+		ਸੁਨੇਹਾ_outtrans(cmd);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(shellcmd);
+	    ਸੁਨੇਹਾ_puts(_("shell "));
+	    ਸੁਨੇਹਾ_outtrans(shellcmd);
 	}
-	msg_putchar('\n');
+	ਸੁਨੇਹਾ_putchar('\n');
 	retval = -1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	if (use_execute)
+	ਜੇ (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (!dos2 || x)
-# else
-	    if (x)
+	    ਜੇ (!dos2 || x)
+# ਨਹੀਂਤਾਂ
+	    ਜੇ (x)
 # endif
 		x = IoErr();
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    x = wait();
-	if (x)
+	ਜੇ (x)
 	{
-	    if (!(options & SHELL_SILENT) && !emsg_silent)
+	    ਜੇ (!(options & SHELL_SILENT) && !emsg_silent)
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		ਸੁਨੇਹਾ_putchar('\n');
+		ਸੁਨੇਹਾ_outnum((ਲੰਮਾ)x);
+		ਸੁਨੇਹਾ_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
     }
     vim_free(shellcmd);
-#endif	// AZTEC_C
+#ਜੇ_ਅੰਤ	// AZTEC_C
 
-    if ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
-	UnLock(mydir);
-    if (tmode == TMODE_RAW)
+    ਜੇ ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
+	Un_ਤਾਲਾ(mydir);
+    ਜੇ (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);		// set to raw mode
     }
     resettitle();
-    if (term_console)
+    ਜੇ (ਪਦ_console)
 	win_resize_on();		// window resize events activated
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -1519,10 +1519,10 @@ mch_call_shell(
  * We only react to a CTRL-C, but also clear the other break signals to avoid
  * trouble with lattice-c programs.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    ਖਾਲੀ
+mch_breakcheck(ਪੂਰਨ force ਅਣਵਰਤਿਆ)
 {
-   if (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
+   ਜੇ (ਸੈੱਟ_Signal(0L, (ਲੰਮਾ)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
 	got_int = TRUE;
 }
 
@@ -1530,23 +1530,23 @@ mch_breakcheck(int force UNUSED)
 // otherwise it resets our ^C when doing any I/O (even when Enable_Abort
 // is zero).  Since we want to check for our own ^C's
 
-#ifdef _DCC
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ _DCC
 # define Chk_Abort chkabort
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef LATTICE
-void __regargs __chkabort(void);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ LATTICE
+ਖਾਲੀ __regargs __chkabort(ਖਾਲੀ);
 
-void __regargs __chkabort(void)
+ਖਾਲੀ __regargs __chkabort(ਖਾਲੀ)
 {}
 
-#else
-    long
-Chk_Abort(void)
+#ਨਹੀਂਤਾਂ
+    ਲੰਮਾ
+Chk_Abort(ਖਾਲੀ)
 {
-    return(0L);
+    ਵਾਪਸ(0L);
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * mch_expandpath() - this code does wild-card pattern matching using the arp
@@ -1561,172 +1561,172 @@ Chk_Abort(void)
  *	Use and abuse as you please.
  */
 
-#ifdef __amigaos4__
-# define	ANCHOR_BUF_SIZE	1024
-#else
-# define ANCHOR_BUF_SIZE (512)
-# define ANCHOR_SIZE (sizeof(struct AnchorPath) + ANCHOR_BUF_SIZE)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+# define	ANCHOR_BUF_ਮਾਪ	1024
+#ਨਹੀਂਤਾਂ
+# define ANCHOR_BUF_ਮਾਪ (512)
+# define ANCHOR_ਮਾਪ (ਆਕਾਰ(ਬਣਤਰ Anchor_ਰਸਤਾ) + ANCHOR_BUF_ਮਾਪ)
+#ਜੇ_ਅੰਤ
 
-    int
+    ਪੂਰਨ
 mch_expandpath(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)		// EW_* flags
+    ਪੂਰਨ		flags)		// EW_* flags
 {
-    struct AnchorPath	*Anchor;
-    LONG		Result;
+    ਬਣਤਰ Anchor_ਰਸਤਾ	*Anchor;
+    LONG		ਨਤੀਜਾ_2;
     char_u		*starbuf, *sp, *dp;
-    int			start_len;
-    int			matches;
-#ifdef __amigaos4__
-    struct TagItem	AnchorTags[] = {
-	{ADO_Strlen, ANCHOR_BUF_SIZE},
+    ਪੂਰਨ			ਸ਼ੁਰੂ_len;
+    ਪੂਰਨ			matches;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+    ਬਣਤਰ ਟੈਗ_ਵਸਤੂ	Anchor_ਟੈਗ_ਸੂਚੀ[] = {
+	{ADO_Strlen, ANCHOR_BUF_ਮਾਪ},
 	{ADO_Flags, APF_DODOT|APF_DOWILD|APF_MultiAssigns},
-	{TAG_DONE, 0L}
+	{ਟੈਗ_ਪੂਰਾ, 0L}
     };
-#endif
+#ਜੇ_ਅੰਤ
 
-    start_len = gap->ga_len;
+    ਸ਼ੁਰੂ_len = gap->ga_len;
 
     // Get our AnchorBase
-#ifdef __amigaos4__
-    Anchor = AllocDosObject(DOS_ANCHORPATH, AnchorTags);
-#else
-    Anchor = alloc_clear(ANCHOR_SIZE);
-#endif
-    if (Anchor == NULL)
-	return 0;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+    Anchor = AllocDosObject(DOS_ANCHORPATH, Anchor_ਟੈਗ_ਸੂਚੀ);
+#ਨਹੀਂਤਾਂ
+    Anchor = alloc_clear(ANCHOR_ਮਾਪ);
+#ਜੇ_ਅੰਤ
+    ਜੇ (Anchor == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
-#ifndef __amigaos4__
-    Anchor->ap_Strlen = ANCHOR_BUF_SIZE;  // ap_Length not supported anymore
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+    Anchor->ap_Strlen = ANCHOR_BUF_ਮਾਪ;  // ap_Length not supported anymore
 # ifdef APF_DODOT
     Anchor->ap_Flags = APF_DODOT | APF_DOWILD;	// allow '.' for current dir
-# else
+# ਨਹੀਂਤਾਂ
     Anchor->ap_Flags = APF_DoDot | APF_DoWild;	// allow '.' for current dir
 # endif
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef FEAT_ARP
-    if (dos2)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (dos2)
     {
-#endif
+#ਜੇ_ਅੰਤ
 	// hack to replace '*' by '#?'
 	starbuf = alloc(2 * STRLEN(pat) + 1);
-	if (starbuf == NULL)
-	    goto Return;
-	for (sp = pat, dp = starbuf; *sp; ++sp)
+	ਜੇ (starbuf == ਨਿਰਾ)
+	    ਜਾਓ Return;
+	ਲਈ (sp = pat, dp = starbuf; *sp; ++sp)
 	{
-	    if (*sp == '*')
+	    ਜੇ (*sp == '*')
 	    {
 		*dp++ = '#';
 		*dp++ = '?';
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		*dp++ = *sp;
 	}
 	*dp = NUL;
-	Result = MatchFirst((UBYTE *)starbuf, Anchor);
+	ਨਤੀਜਾ_2 = ਮੇਲ_ਪਹਿਲਾ((UBYTE *)starbuf, Anchor);
 	vim_free(starbuf);
-#ifdef FEAT_ARP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
     }
-    else
-	Result = FindFirst((char *)pat, Anchor);
-#endif
+    ਨਹੀਂਤਾਂ
+	ਨਤੀਜਾ_2 = ਲੱਭੋ_ਪਹਿਲਾ((ਅੱਖਰ *)pat, Anchor);
+#ਜੇ_ਅੰਤ
 
     /*
      * Loop to get all matches.
      */
-    while (Result == 0)
+    ਜਦੋਂ (ਨਤੀਜਾ_2 == 0)
     {
-#ifdef __amigaos4__
-	addfile(gap, (char_u *)Anchor->ap_Buffer, flags);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
+	addfile(gap, (char_u *)Anchor->ap_ਬਫਰ, flags);
+#ਨਹੀਂਤਾਂ
 	addfile(gap, (char_u *)Anchor->ap_Buf, flags);
-#endif
-#ifdef FEAT_ARP
-	if (dos2)
-#endif
-	    Result = MatchNext(Anchor);
-#ifdef FEAT_ARP
-	else
-	    Result = FindNext(Anchor);
-#endif
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+	ਜੇ (dos2)
+#ਜੇ_ਅੰਤ
+	    ਨਤੀਜਾ_2 = ਮੇਲ_ਅਗਲਾ_2(Anchor);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+	ਨਹੀਂਤਾਂ
+	    ਨਤੀਜਾ_2 = ਲੱਭੋ_ਅਗਲਾ(Anchor);
+#ਜੇ_ਅੰਤ
     }
-    matches = gap->ga_len - start_len;
+    matches = gap->ga_len - ਸ਼ੁਰੂ_len;
 
-    if (Result == ERROR_BUFFER_OVERFLOW)
+    ਜੇ (ਨਤੀਜਾ_2 == ERROR_ਬਫਰ_ਉਛਾਲ)
 	emsg(_("ANCHOR_BUF_SIZE too small."));
-    else if (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
-			  && Result != ERROR_DEVICE_NOT_MOUNTED
-			  && Result != ERROR_NO_MORE_ENTRIES)
+    ਨਹੀਂਤਾਂ ਜੇ (matches == 0 && ਨਤੀਜਾ_2 != ERROR_OBJECT_NOT_ਮਿਲਿਆ
+			  && ਨਤੀਜਾ_2 != ERROR_DEVICE_NOT_MOUNTED
+			  && ਨਤੀਜਾ_2 != ERROR_NO_ਹੋਰ_ENTRIES)
 	emsg(_("I/O ERROR"));
 
     /*
      * Sort the files for this pattern.
      */
-    if (matches)
-	qsort((void *)(((char_u **)gap->ga_data) + start_len),
-				  (size_t)matches, sizeof(char_u *), sortcmp);
+    ਜੇ (matches)
+	qsort((ਖਾਲੀ *)(((char_u **)gap->ga_ਅੰਕੜੇ) + ਸ਼ੁਰੂ_len),
+				  (size_t)matches, ਆਕਾਰ(char_u *), sortcmp);
 
     // Free the wildcard stuff
-#ifdef FEAT_ARP
-    if (dos2)
-#endif
-	MatchEnd(Anchor);
-#ifdef FEAT_ARP
-    else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (dos2)
+#ਜੇ_ਅੰਤ
+	ਮੇਲ_ਸਿਰਾ_3(Anchor);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਨਹੀਂਤਾਂ
 	FreeAnchorChain(Anchor);
-#endif
+#ਜੇ_ਅੰਤ
 
 Return:
-#ifdef __amigaos4__
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __amigaos4__
     FreeDosObject(DOS_ANCHORPATH, Anchor);
-#else
+#ਨਹੀਂਤਾਂ
     vim_free(Anchor);
-#endif
+#ਜੇ_ਅੰਤ
 
-    return matches;
+    ਵਾਪਸ matches;
 }
 
-    static int
-sortcmp(const void *a, const void *b)
+    ਸਥਿਰ ਪੂਰਨ
+sortcmp(ਅਚਲ ਖਾਲੀ *a, ਅਚਲ ਖਾਲੀ *b)
 {
-    char *s = *(char **)a;
-    char *t = *(char **)b;
+    ਅੱਖਰ *s = *(ਅੱਖਰ **)a;
+    ਅੱਖਰ *t = *(ਅੱਖਰ **)b;
 
-    return pathcmp(s, t, -1);
+    ਵਾਪਸ pathcmp(s, t, -1);
 }
 
 /*
  * Return TRUE if "p" has wildcards that can be expanded by mch_expandpath().
  */
-    int
+    ਪੂਰਨ
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ਲਈ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ਜੇ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)"*?[(#", *p) != NULL)
-	    return TRUE;
+	ਨਹੀਂਤਾਂ ਜੇ (vim_strchr((char_u *)"*?[(#", *p) != ਨਿਰਾ)
+	    ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
-    int
+    ਪੂਰਨ
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    ਲਈ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ਜੇ (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)"*?[(#$`", *p) != NULL
+	ਨਹੀਂਤਾਂ
+	    ਜੇ (vim_strchr((char_u *)"*?[(#$`", *p) != ਨਿਰਾ
 		    || (*p == '~' && p[1] != NUL))
-		return TRUE;
+		ਵਾਪਸ TRUE;
     }
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 /*
@@ -1739,26 +1739,26 @@ mch_has_wildcard(char_u *p)
     char_u *
 mch_getenv(char_u *var)
 {
-    int		    len;
+    ਪੂਰਨ		    len;
     UBYTE	    *buf;		// buffer to expand in
     char_u	    *retval;		// return value
-    static char_u   *alloced = NULL;	// allocated memory
+    ਸਥਿਰ char_u   *alloced = ਨਿਰਾ;	// allocated memory
 
-#ifdef FEAT_ARP
-    if (!dos2)
-	retval = (char_u *)getenv((char *)var);
-    else
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (!dos2)
+	retval = (char_u *)getenv((ਅੱਖਰ *)var);
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
     {
 	VIM_CLEAR(alloced);
-	retval = NULL;
+	retval = ਨਿਰਾ;
 
 	buf = alloc(IOSIZE);
-	if (buf == NULL)
-	    return NULL;
+	ਜੇ (buf == ਨਿਰਾ)
+	    ਵਾਪਸ ਨਿਰਾ;
 
-	len = GetVar((UBYTE *)var, buf, (long)(IOSIZE - 1), (long)0);
-	if (len >= 0)
+	len = GetVar((UBYTE *)var, buf, (ਲੰਮਾ)(IOSIZE - 1), (ਲੰਮਾ)0);
+	ਜੇ (len >= 0)
 	{
 	    retval = vim_strsave((char_u *)buf);
 	    alloced = retval;
@@ -1768,53 +1768,53 @@ mch_getenv(char_u *var)
     }
 
     // if $VIM is not defined, use "vim:" instead
-    if (retval == NULL && STRCMP(var, "VIM") == 0)
+    ਜੇ (retval == ਨਿਰਾ && STRCMP(var, "VIM") == 0)
 	retval = (char_u *)"vim:";
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
  * Amiga version of setenv() with AmigaDOS 2.0 support.
  */
 // ARGSUSED
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    ਪੂਰਨ
+mch_setenv(ਅੱਖਰ *var, ਅੱਖਰ *ਮੁੱਲ, ਪੂਰਨ x ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_ARP
-    if (!dos2)
-	return setenv(var, value);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ARP
+    ਜੇ (!dos2)
+	ਵਾਪਸ setenv(var, ਮੁੱਲ);
+#ਜੇ_ਅੰਤ
 
-    if (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
-	return 0;   // success
-    return -1;	    // failure
+    ਜੇ (ਸੈੱਟ_Var((UBYTE *)var, (UBYTE *)ਮੁੱਲ, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
+	ਵਾਪਸ 0;   // success
+    ਵਾਪਸ -1;	    // failure
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if RANDOM: is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    ਪੂਰਨ
+mch_get_random(char_u *buf, ਪੂਰਨ len)
 {
-    struct Process *proc = (struct Process *) FindTask(0L);
-    APTR win = proc->pr_WindowPtr;
+    ਬਣਤਰ Process *proc = (ਬਣਤਰ Process *) ਲੱਭੋ_Task(0L);
+    APTR win = proc->pr_ਖਿੜਕੀ_Ptr;
 
     // Don't show requester if RANDOM: doesn't exist
-    proc->pr_WindowPtr = (APTR) -1L;
+    proc->pr_ਖਿੜਕੀ_Ptr = (APTR) -1L;
 
-    BPTR fh = Open("RANDOM:", MODE_OLDFILE);
+    BPTR fh = Open("RANDOM:", ਬਹੁਲਕ_OLDFILE);
 
-    proc->pr_WindowPtr = win;
+    proc->pr_ਖਿੜਕੀ_Ptr = win;
 
-    int status;
+    ਪੂਰਨ ਸਥਿਤੀ;
 
-    if (!fh || Read(fh, buf, len) != len)
-	status = FAIL;
-    else
-	status = OK;
+    ਜੇ (!fh || Read(fh, buf, len) != len)
+	ਸਥਿਤੀ = FAIL;
+    ਨਹੀਂਤਾਂ
+	ਸਥਿਤੀ = OK;
 
     Close(fh);
-    return status;
+    ਵਾਪਸ ਸਥਿਤੀ;
 }

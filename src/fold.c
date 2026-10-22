@@ -12,9 +12,9 @@
  * fold.c: code for folding
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
-#if defined(FEAT_FOLDING)
+#ਜੇ defined(FEAT_FOLDING)
 
 // local declarations. {{{1
 // typedef fold_T {{{2
@@ -24,14 +24,14 @@
  * fd_nested growarray.
  * The info stored in both growarrays is the same: An array of fold_T.
  */
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    linenr_T	fd_top;		// first line of fold; for nested fold
+    linenr_T	fd_ਸਿਖਰ;		// first line of fold; for nested fold
 				// relative to parent
     linenr_T	fd_len;		// number of lines in the fold
     garray_T	fd_nested;	// array of nested folds
-    char	fd_flags;	// see below
-    char	fd_small;	// TRUE, FALSE or MAYBE: fold smaller than
+    ਅੱਖਰ	fd_flags;	// see below
+    ਅੱਖਰ	fd_small;	// TRUE, FALSE or MAYBE: fold smaller than
 				// 'foldminlines'; MAYBE applies to nested
 				// folds too
 } fold_T;
@@ -43,34 +43,34 @@ typedef struct
 # define MAX_LEVEL	20	// maximum fold depth
 
 // static functions {{{2
-static void newFoldLevelWin(win_T *wp);
-static int checkCloseRec(garray_T *gap, linenr_T lnum, int level);
-static int foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp);
-static int foldLevelWin(win_T *wp, linenr_T lnum);
-static void checkupdate(win_T *wp);
-static void setFoldRepeat(linenr_T lnum, long count, int do_open);
-static linenr_T setManualFold(linenr_T lnum, int opening, int recurse, int *donep);
-static linenr_T setManualFoldWin(win_T *wp, linenr_T lnum, int opening, int recurse, int *donep);
-static void foldOpenNested(fold_T *fpr);
-static void deleteFoldEntry(garray_T *gap, int idx, int recursive);
-static void foldMarkAdjustRecurse(garray_T *gap, linenr_T line1, linenr_T line2, long amount, long amount_after);
-static int getDeepestNestingRecurse(garray_T *gap);
-static int check_closed(win_T *win, fold_T *fp, int *use_levelp, int level, int *maybe_smallp, linenr_T lnum_off);
-static void checkSmall(win_T *wp, fold_T *fp, linenr_T lnum_off);
-static void setSmallMaybe(garray_T *gap);
-static void foldCreateMarkers(linenr_T start, linenr_T end);
-static void foldAddMarker(linenr_T lnum, char_u *marker, int markerlen);
-static void deleteFoldMarkers(fold_T *fp, int recursive, linenr_T lnum_off);
-static void foldDelMarker(linenr_T lnum, char_u *marker, int markerlen);
-static void foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot);
-static void parseMarker(win_T *wp);
+ਸਥਿਰ ਖਾਲੀ newFoldLevelWin(win_T *wp);
+ਸਥਿਰ ਪੂਰਨ checkCloseRec(garray_T *gap, linenr_T lnum, ਪੂਰਨ level);
+ਸਥਿਰ ਪੂਰਨ fold_ਲੱਭੋ(garray_T *gap, linenr_T lnum, fold_T **fpp);
+ਸਥਿਰ ਪੂਰਨ foldLevelWin(win_T *wp, linenr_T lnum);
+ਸਥਿਰ ਖਾਲੀ checkupdate(win_T *wp);
+ਸਥਿਰ ਖਾਲੀ ਸੈੱਟ_Fold_Repeat(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2, ਪੂਰਨ do_open);
+ਸਥਿਰ linenr_T ਸੈੱਟ_Manual_Fold(linenr_T lnum, ਪੂਰਨ opening, ਪੂਰਨ recurse, ਪੂਰਨ *donep);
+ਸਥਿਰ linenr_T ਸੈੱਟ_Manual_Fold_Win(win_T *wp, linenr_T lnum, ਪੂਰਨ opening, ਪੂਰਨ recurse, ਪੂਰਨ *donep);
+ਸਥਿਰ ਖਾਲੀ foldOpenNested(fold_T *fpr);
+ਸਥਿਰ ਖਾਲੀ delete_Fold_ਇੰਦਰਾਜ(garray_T *gap, ਪੂਰਨ idx, ਪੂਰਨ recursive);
+ਸਥਿਰ ਖਾਲੀ foldMarkAdjustRecurse(garray_T *gap, linenr_T line1, linenr_T line2, ਲੰਮਾ amount, ਲੰਮਾ amount_after);
+ਸਥਿਰ ਪੂਰਨ get_ਸਭ_ਤੋਂ_ਡੂੰਘਾ_Nesting_Recurse(garray_T *gap);
+ਸਥਿਰ ਪੂਰਨ check_closed(win_T *win, fold_T *fp, ਪੂਰਨ *use_levelp, ਪੂਰਨ level, ਪੂਰਨ *maybe_smallp, linenr_T lnum_off);
+ਸਥਿਰ ਖਾਲੀ checkSmall(win_T *wp, fold_T *fp, linenr_T lnum_off);
+ਸਥਿਰ ਖਾਲੀ ਸੈੱਟ_Small_Maybe(garray_T *gap);
+ਸਥਿਰ ਖਾਲੀ foldCreateMarkers(linenr_T ਸ਼ੁਰੂ, linenr_T ਸਿਰਾ);
+ਸਥਿਰ ਖਾਲੀ fold_ਜੋੜੋ_Marker(linenr_T lnum, char_u *marker, ਪੂਰਨ markerlen);
+ਸਥਿਰ ਖਾਲੀ deleteFoldMarkers(fold_T *fp, ਪੂਰਨ recursive, linenr_T lnum_off);
+ਸਥਿਰ ਖਾਲੀ foldDelMarker(linenr_T lnum, char_u *marker, ਪੂਰਨ markerlen);
+ਸਥਿਰ ਖਾਲੀ foldUpdateIEMS(win_T *wp, linenr_T ਸਿਖਰ, linenr_T bot);
+ਸਥਿਰ ਖਾਲੀ parseMarker(win_T *wp);
 
 /*
  * While updating the folds lines between invalid_top and invalid_bot have an
  * undefined fold level.  Only used for the window currently being updated.
  */
-static linenr_T invalid_top = (linenr_T)0;
-static linenr_T invalid_bot = (linenr_T)0;
+ਸਥਿਰ linenr_T invalid_ਸਿਖਰ = (linenr_T)0;
+ਸਥਿਰ linenr_T invalid_bot = (linenr_T)0;
 
 /*
  * When using 'foldexpr' we sometimes get the level of the next line, which
@@ -79,17 +79,17 @@ static linenr_T invalid_bot = (linenr_T)0;
  * previous line is stored here when available.  prev_lnum is zero when the
  * level is not available.
  */
-static linenr_T prev_lnum = 0;
-static int prev_lnum_lvl = -1;
+ਸਥਿਰ linenr_T prev_lnum = 0;
+ਸਥਿਰ ਪੂਰਨ prev_lnum_lvl = -1;
 
 // Flags used for "done" argument of setManualFold.
-# define DONE_NOTHING	0
-# define DONE_ACTION	1	// did close or open a fold
-# define DONE_FOLD	2	// did find a fold
+# define ਪੂਰਾ_NOTHING	0
+# define ਪੂਰਾ_ACTION	1	// did close or open a fold
+# define ਪੂਰਾ_FOLD	2	// did find a fold
 
-static int foldstartmarkerlen;
-static char_u *foldendmarker;
-static int foldendmarkerlen;
+ਸਥਿਰ ਪੂਰਨ foldstartmarkerlen;
+ਸਥਿਰ char_u *foldendmarker;
+ਸਥਿਰ ਪੂਰਨ foldendmarkerlen;
 
 // Exported folding functions. {{{1
 // copyFoldingState() {{{2
@@ -97,23 +97,23 @@ static int foldendmarkerlen;
 /*
  * Copy that folding state from window "wp_from" to window "wp_to".
  */
-    void
-copyFoldingState(win_T *wp_from, win_T *wp_to)
+    ਖਾਲੀ
+copyFoldingState(win_T *wp_from, win_T *wp_ਮੰਜ਼ਿਲ)
 {
-    wp_to->w_fold_manual = wp_from->w_fold_manual;
-    wp_to->w_foldinvalid = wp_from->w_foldinvalid;
-    cloneFoldGrowArray(&wp_from->w_folds, &wp_to->w_folds);
+    wp_ਮੰਜ਼ਿਲ->w_fold_manual = wp_from->w_fold_manual;
+    wp_ਮੰਜ਼ਿਲ->w_foldinvalid = wp_from->w_foldinvalid;
+    cloneFoldGrowArray(&wp_from->w_folds, &wp_ਮੰਜ਼ਿਲ->w_folds);
 }
 
 // hasAnyFolding() {{{2
 /*
  * Return TRUE if there may be folded lines in window "win".
  */
-    int
+    ਪੂਰਨ
 hasAnyFolding(win_T *win)
 {
     // very simple now, but can become more complex later
-    return (win->w_p_fen
+    ਵਾਪਸ (win->w_p_fen
 	    && (!foldmethodIsManual(win) || win->w_folds.ga_len > 0));
 }
 
@@ -124,121 +124,121 @@ hasAnyFolding(win_T *win)
  * When returning TRUE, *firstp and *lastp are set to the first and last
  * lnum of the sequence of folded lines (skipped when NULL).
  */
-    int
+    ਪੂਰਨ
 hasFolding(linenr_T lnum, linenr_T *firstp, linenr_T *lastp)
 {
-    return hasFoldingWin(curwin, lnum, firstp, lastp, TRUE, NULL);
+    ਵਾਪਸ hasFoldingWin(curwin, lnum, firstp, lastp, TRUE, ਨਿਰਾ);
 }
 
 // hasFoldingWin() {{{2
-    int
+    ਪੂਰਨ
 hasFoldingWin(
     win_T	*win,
     linenr_T	lnum,
     linenr_T	*firstp,
     linenr_T	*lastp,
-    int		cache,		// when TRUE: use cached values of window
+    ਪੂਰਨ		cache,		// when TRUE: use cached values of window
     foldinfo_T	*infop)		// where to store fold info
 {
-    int		had_folded = FALSE;
-    linenr_T	first = 0;
-    linenr_T	last = 0;
+    ਪੂਰਨ		had_folded = FALSE;
+    linenr_T	ਪਹਿਲਾ = 0;
+    linenr_T	ਆਖਰੀ = 0;
     linenr_T	lnum_rel = lnum;
-    int		x;
+    ਪੂਰਨ		x;
     fold_T	*fp;
-    int		level = 0;
-    int		use_level = FALSE;
-    int		maybe_small = FALSE;
+    ਪੂਰਨ		level = 0;
+    ਪੂਰਨ		use_level = FALSE;
+    ਪੂਰਨ		maybe_small = FALSE;
     garray_T	*gap;
-    int		low_level = 0;
+    ਪੂਰਨ		ਨੀਵਾਂ_level = 0;
 
     checkupdate(win);
 
     /*
      * Return quickly when there is no folding at all in this window.
      */
-    if (!hasAnyFolding(win))
+    ਜੇ (!hasAnyFolding(win))
     {
-	if (infop != NULL)
+	ਜੇ (infop != ਨਿਰਾ)
 	    infop->fi_level = 0;
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    if (cache)
+    ਜੇ (cache)
     {
 	/*
 	 * First look in cached info for displayed lines.  This is probably
 	 * the fastest, but it can only be used if the entry is still valid.
 	 */
-	x = find_wl_entry(win, lnum);
-	if (x >= 0)
+	x = ਲੱਭੋ_wl_ਇੰਦਰਾਜ(win, lnum);
+	ਜੇ (x >= 0)
 	{
-	    first = win->w_lines[x].wl_lnum;
-	    last = win->w_lines[x].wl_lastlnum;
-	    had_folded = win->w_lines[x].wl_folded;
+	    ਪਹਿਲਾ = win->w_ਸਤਰਾਂ[x].wl_lnum;
+	    ਆਖਰੀ = win->w_ਸਤਰਾਂ[x].wl_lastlnum;
+	    had_folded = win->w_ਸਤਰਾਂ[x].wl_folded;
 	}
     }
 
-    if (first == 0)
+    ਜੇ (ਪਹਿਲਾ == 0)
     {
 	/*
 	 * Recursively search for a fold that contains "lnum".
 	 */
 	gap = &win->w_folds;
-	for (;;)
+	ਲਈ (;;)
 	{
-	    if (!foldFind(gap, lnum_rel, &fp))
-		break;
+	    ਜੇ (!fold_ਲੱਭੋ(gap, lnum_rel, &fp))
+		ਰੋਕੋ;
 
 	    // Remember lowest level of fold that starts in "lnum".
-	    if (lnum_rel == fp->fd_top && low_level == 0)
-		low_level = level + 1;
+	    ਜੇ (lnum_rel == fp->fd_ਸਿਖਰ && ਨੀਵਾਂ_level == 0)
+		ਨੀਵਾਂ_level = level + 1;
 
-	    first += fp->fd_top;
-	    last += fp->fd_top;
+	    ਪਹਿਲਾ += fp->fd_ਸਿਖਰ;
+	    ਆਖਰੀ += fp->fd_ਸਿਖਰ;
 
 	    // is this fold closed?
 	    had_folded = check_closed(win, fp, &use_level, level,
 					       &maybe_small, lnum - lnum_rel);
-	    if (had_folded)
+	    ਜੇ (had_folded)
 	    {
 		// Fold closed: Set last and quit loop.
-		last += fp->fd_len - 1;
-		break;
+		ਆਖਰੀ += fp->fd_len - 1;
+		ਰੋਕੋ;
 	    }
 
 	    // Fold found, but it's open: Check nested folds.  Line number is
 	    // relative to containing fold.
 	    gap = &fp->fd_nested;
-	    lnum_rel -= fp->fd_top;
+	    lnum_rel -= fp->fd_ਸਿਖਰ;
 	    ++level;
 	}
     }
 
-    if (!had_folded)
+    ਜੇ (!had_folded)
     {
-	if (infop != NULL)
+	ਜੇ (infop != ਨਿਰਾ)
 	{
 	    infop->fi_level = level;
 	    infop->fi_lnum = lnum - lnum_rel;
-	    infop->fi_low_level = low_level == 0 ? level : low_level;
+	    infop->fi_ਨੀਵਾਂ_level = ਨੀਵਾਂ_level == 0 ? level : ਨੀਵਾਂ_level;
 	}
-	return FALSE;
+	ਵਾਪਸ FALSE;
     }
 
-    if (last > win->w_buffer->b_ml.ml_line_count)
-	last = win->w_buffer->b_ml.ml_line_count;
-    if (lastp != NULL)
-	*lastp = last;
-    if (firstp != NULL)
-	*firstp = first;
-    if (infop != NULL)
+    ਜੇ (ਆਖਰੀ > win->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਆਖਰੀ = win->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
+    ਜੇ (lastp != ਨਿਰਾ)
+	*lastp = ਆਖਰੀ;
+    ਜੇ (firstp != ਨਿਰਾ)
+	*firstp = ਪਹਿਲਾ;
+    ਜੇ (infop != ਨਿਰਾ)
     {
 	infop->fi_level = level + 1;
-	infop->fi_lnum = first;
-	infop->fi_low_level = low_level == 0 ? level + 1 : low_level;
+	infop->fi_lnum = ਪਹਿਲਾ;
+	infop->fi_ਨੀਵਾਂ_level = ਨੀਵਾਂ_level == 0 ? level + 1 : ਨੀਵਾਂ_level;
     }
-    return TRUE;
+    ਵਾਪਸ TRUE;
 }
 
 // lineFolded()	{{{2
@@ -248,10 +248,10 @@ hasFoldingWin(
  * Return FALSE if line is not folded.
  * Return MAYBE if the line is folded when next to a folded line.
  */
-    int
-lineFolded(win_T *win, linenr_T lnum)
+    ਪੂਰਨ
+ਸਤਰ_Folded(win_T *win, linenr_T lnum)
 {
-    return foldedCount(win, lnum, NULL) != 0;
+    ਵਾਪਸ folded_ਗਿਣਤੀ(win, lnum, ਨਿਰਾ) != 0;
 }
 
 // foldedCount() {{{2
@@ -263,74 +263,74 @@ lineFolded(win_T *win, linenr_T lnum)
  * Returns number of folded lines from "lnum", or 0 if line is not folded.
  * When "infop" is not NULL, fills *infop with the fold level info.
  */
-    long
-foldedCount(win_T *win, linenr_T lnum, foldinfo_T *infop)
+    ਲੰਮਾ
+folded_ਗਿਣਤੀ(win_T *win, linenr_T lnum, foldinfo_T *infop)
 {
-    linenr_T	last;
+    linenr_T	ਆਖਰੀ;
 
-    if (hasFoldingWin(win, lnum, NULL, &last, FALSE, infop))
-	return (long)(last - lnum + 1);
-    return 0;
+    ਜੇ (hasFoldingWin(win, lnum, ਨਿਰਾ, &ਆਖਰੀ, FALSE, infop))
+	ਵਾਪਸ (ਲੰਮਾ)(ਆਖਰੀ - lnum + 1);
+    ਵਾਪਸ 0;
 }
 
 // foldmethodIsManual() {{{2
 /*
  * Return TRUE if 'foldmethod' is "manual"
  */
-    int
+    ਪੂਰਨ
 foldmethodIsManual(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[3] == 'u');
+    ਵਾਪਸ (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[3] == 'u');
 }
 
 // foldmethodIsIndent() {{{2
 /*
  * Return TRUE if 'foldmethod' is "indent"
  */
-    int
+    ਪੂਰਨ
 foldmethodIsIndent(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 'i');
+    ਵਾਪਸ (wp->w_p_fdm[0] == 'i');
 }
 
 // foldmethodIsExpr() {{{2
 /*
  * Return TRUE if 'foldmethod' is "expr"
  */
-    int
-foldmethodIsExpr(win_T *wp)
+    ਪੂਰਨ
+foldmethod_Is_ਵਿਅੰਜਕ(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[1] == 'x');
+    ਵਾਪਸ (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[1] == 'x');
 }
 
 // foldmethodIsMarker() {{{2
 /*
  * Return TRUE if 'foldmethod' is "marker"
  */
-    int
+    ਪੂਰਨ
 foldmethodIsMarker(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[2] == 'r');
+    ਵਾਪਸ (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[2] == 'r');
 }
 
 // foldmethodIsSyntax() {{{2
 /*
  * Return TRUE if 'foldmethod' is "syntax"
  */
-    int
+    ਪੂਰਨ
 foldmethodIsSyntax(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 's');
+    ਵਾਪਸ (wp->w_p_fdm[0] == 's');
 }
 
 // foldmethodIsDiff() {{{2
 /*
  * Return TRUE if 'foldmethod' is "diff"
  */
-    int
+    ਪੂਰਨ
 foldmethodIsDiff(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 'd');
+    ਵਾਪਸ (wp->w_p_fdm[0] == 'd');
 }
 
 // closeFold() {{{2
@@ -338,20 +338,20 @@ foldmethodIsDiff(win_T *wp)
  * Close fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    void
-closeFold(linenr_T lnum, long count)
+    ਖਾਲੀ
+closeFold(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    setFoldRepeat(lnum, count, FALSE);
+    ਸੈੱਟ_Fold_Repeat(lnum, ਗਿਣਤੀ_2, FALSE);
 }
 
 // closeFoldRecurse() {{{2
 /*
  * Close fold for current window at line "lnum" recursively.
  */
-    void
+    ਖਾਲੀ
 closeFoldRecurse(linenr_T lnum)
 {
-    (void)setManualFold(lnum, FALSE, TRUE, NULL);
+    (ਖਾਲੀ)ਸੈੱਟ_Manual_Fold(lnum, FALSE, TRUE, ਨਿਰਾ);
 }
 
 // opFoldRange() {{{2
@@ -359,35 +359,35 @@ closeFoldRecurse(linenr_T lnum)
  * Open or Close folds for current window in lines "first" to "last".
  * Used for "zo", "zO", "zc" and "zC" in Visual mode.
  */
-    void
+    ਖਾਲੀ
 opFoldRange(
-    linenr_T	first,
-    linenr_T	last,
-    int		opening,	// TRUE to open, FALSE to close
-    int		recurse,	// TRUE to do it recursively
-    int		had_visual)	// TRUE when Visual selection used
+    linenr_T	ਪਹਿਲਾ,
+    linenr_T	ਆਖਰੀ,
+    ਪੂਰਨ		opening,	// TRUE to open, FALSE to close
+    ਪੂਰਨ		recurse,	// TRUE to do it recursively
+    ਪੂਰਨ		had_visual)	// TRUE when Visual selection used
 {
-    int		done = DONE_NOTHING;	// avoid error messages
+    ਪੂਰਨ		ਪੂਰਾ = ਪੂਰਾ_NOTHING;	// avoid error messages
     linenr_T	lnum;
-    linenr_T	lnum_next;
+    linenr_T	lnum_ਅਗਲਾ;
 
-    for (lnum = first; lnum <= last; lnum = lnum_next + 1)
+    ਲਈ (lnum = ਪਹਿਲਾ; lnum <= ਆਖਰੀ; lnum = lnum_ਅਗਲਾ + 1)
     {
-	lnum_next = lnum;
+	lnum_ਅਗਲਾ = lnum;
 	// Opening one level only: next fold to open is after the one going to
 	// be opened.
-	if (opening && !recurse)
-	    (void)hasFolding(lnum, NULL, &lnum_next);
-	(void)setManualFold(lnum, opening, recurse, &done);
+	ਜੇ (opening && !recurse)
+	    (ਖਾਲੀ)hasFolding(lnum, ਨਿਰਾ, &lnum_ਅਗਲਾ);
+	(ਖਾਲੀ)ਸੈੱਟ_Manual_Fold(lnum, opening, recurse, &ਪੂਰਾ);
 	// Closing one level only: next line to close a fold is after just
 	// closed fold.
-	if (!opening && !recurse)
-	    (void)hasFolding(lnum, NULL, &lnum_next);
+	ਜੇ (!opening && !recurse)
+	    (ਖਾਲੀ)hasFolding(lnum, ਨਿਰਾ, &lnum_ਅਗਲਾ);
     }
-    if (done == DONE_NOTHING)
-	emsg(_(e_no_fold_found));
+    ਜੇ (ਪੂਰਾ == ਪੂਰਾ_NOTHING)
+	emsg(_(e_no_fold_ਮਿਲਿਆ));
     // Force a redraw to remove the Visual highlighting.
-    if (had_visual)
+    ਜੇ (had_visual)
 	redraw_curbuf_later(UPD_INVERTED);
 }
 
@@ -396,39 +396,39 @@ opFoldRange(
  * Open fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    void
-openFold(linenr_T lnum, long count)
+    ਖਾਲੀ
+openFold(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    setFoldRepeat(lnum, count, TRUE);
+    ਸੈੱਟ_Fold_Repeat(lnum, ਗਿਣਤੀ_2, TRUE);
 }
 
 // openFoldRecurse() {{{2
 /*
  * Open fold for current window at line "lnum" recursively.
  */
-    void
+    ਖਾਲੀ
 openFoldRecurse(linenr_T lnum)
 {
-    (void)setManualFold(lnum, TRUE, TRUE, NULL);
+    (ਖਾਲੀ)ਸੈੱਟ_Manual_Fold(lnum, TRUE, TRUE, ਨਿਰਾ);
 }
 
 // foldOpenCursor() {{{2
 /*
  * Open folds until the cursor line is not in a closed fold.
  */
-    void
-foldOpenCursor(void)
+    ਖਾਲੀ
+foldOpenCursor(ਖਾਲੀ)
 {
-    int		done;
+    ਪੂਰਨ		ਪੂਰਾ;
 
     checkupdate(curwin);
-    if (hasAnyFolding(curwin))
-	for (;;)
+    ਜੇ (hasAnyFolding(curwin))
+	ਲਈ (;;)
 	{
-	    done = DONE_NOTHING;
-	    (void)setManualFold(curwin->w_cursor.lnum, TRUE, FALSE, &done);
-	    if (!(done & DONE_ACTION))
-		break;
+	    ਪੂਰਾ = ਪੂਰਾ_NOTHING;
+	    (ਖਾਲੀ)ਸੈੱਟ_Manual_Fold(curwin->w_cursor.lnum, TRUE, FALSE, &ਪੂਰਾ);
+	    ਜੇ (!(ਪੂਰਾ & ਪੂਰਾ_ACTION))
+		ਰੋਕੋ;
 	}
 }
 
@@ -436,13 +436,13 @@ foldOpenCursor(void)
 /*
  * Set new foldlevel for current window.
  */
-    void
-newFoldLevel(void)
+    ਖਾਲੀ
+newFoldLevel(ਖਾਲੀ)
 {
     newFoldLevelWin(curwin);
 
 # ifdef FEAT_DIFF
-    if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+    ਜੇ (foldmethodIsDiff(curwin) && curwin->w_p_scb)
     {
 	win_T	    *wp;
 
@@ -451,7 +451,7 @@ newFoldLevel(void)
 	 */
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+	    ਜੇ (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 	    {
 		wp->w_p_fdl = curwin->w_p_fdl;
 		newFoldLevelWin(wp);
@@ -461,69 +461,69 @@ newFoldLevel(void)
 # endif
 }
 
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 newFoldLevelWin(win_T *wp)
 {
     fold_T	*fp;
-    int		i;
+    ਪੂਰਨ		i;
 
     checkupdate(wp);
-    if (wp->w_fold_manual)
+    ਜੇ (wp->w_fold_manual)
     {
 	// Set all flags for the first level of folds to FD_LEVEL.  Following
 	// manual open/close will then change the flags to FD_OPEN or
 	// FD_CLOSED for those folds that don't use 'foldlevel'.
-	fp = (fold_T *)wp->w_folds.ga_data;
-	for (i = 0; i < wp->w_folds.ga_len; ++i)
+	fp = (fold_T *)wp->w_folds.ga_ਅੰਕੜੇ;
+	ਲਈ (i = 0; i < wp->w_folds.ga_len; ++i)
 	    fp[i].fd_flags = FD_LEVEL;
 	wp->w_fold_manual = false;
     }
-    changed_window_setting_win(wp);
+    ਬਦਲਿਆ_ਖਿੜਕੀ_setting_win(wp);
 }
 
 // foldCheckClose() {{{2
 /*
  * Apply 'foldlevel' to all folds that don't contain the cursor.
  */
-    void
-foldCheckClose(void)
+    ਖਾਲੀ
+foldCheckClose(ਖਾਲੀ)
 {
-    if (*p_fcl == NUL)
-	return;
+    ਜੇ (*p_fcl == NUL)
+	ਵਾਪਸ;
 
     // 'foldclose' can only be "all" right now
     checkupdate(curwin);
-    if (checkCloseRec(&curwin->w_folds, curwin->w_cursor.lnum,
-		(int)curwin->w_p_fdl))
-	changed_window_setting();
+    ਜੇ (checkCloseRec(&curwin->w_folds, curwin->w_cursor.lnum,
+		(ਪੂਰਨ)curwin->w_p_fdl))
+	ਬਦਲਿਆ_ਖਿੜਕੀ_setting();
 }
 
 // checkCloseRec() {{{2
-    static int
-checkCloseRec(garray_T *gap, linenr_T lnum, int level)
+    ਸਥਿਰ ਪੂਰਨ
+checkCloseRec(garray_T *gap, linenr_T lnum, ਪੂਰਨ level)
 {
     fold_T	*fp;
-    int		retval = FALSE;
-    int		i;
+    ਪੂਰਨ		retval = FALSE;
+    ਪੂਰਨ		i;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
     {
 	// Only manually opened folds may need to be closed.
-	if (fp[i].fd_flags == FD_OPEN)
+	ਜੇ (fp[i].fd_flags == FD_OPEN)
 	{
-	    if (level <= 0 && (lnum < fp[i].fd_top
-				      || lnum >= fp[i].fd_top + fp[i].fd_len))
+	    ਜੇ (level <= 0 && (lnum < fp[i].fd_ਸਿਖਰ
+				      || lnum >= fp[i].fd_ਸਿਖਰ + fp[i].fd_len))
 	    {
 		fp[i].fd_flags = FD_LEVEL;
 		retval = TRUE;
 	    }
-	    else
-		retval |= checkCloseRec(&fp[i].fd_nested, lnum - fp[i].fd_top,
+	    ਨਹੀਂਤਾਂ
+		retval |= checkCloseRec(&fp[i].fd_nested, lnum - fp[i].fd_ਸਿਖਰ,
 								   level - 1);
 	}
     }
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 // foldManualAllowed() {{{2
@@ -531,16 +531,16 @@ checkCloseRec(garray_T *gap, linenr_T lnum, int level)
  * Return TRUE if it's allowed to manually create or delete a fold.
  * Give an error message and return FALSE if not.
  */
-    int
-foldManualAllowed(int create)
+    ਪੂਰਨ
+foldManualAllowed(ਪੂਰਨ create)
 {
-    if (foldmethodIsManual(curwin) || foldmethodIsMarker(curwin))
-	return TRUE;
-    if (create)
+    ਜੇ (foldmethodIsManual(curwin) || foldmethodIsMarker(curwin))
+	ਵਾਪਸ TRUE;
+    ਜੇ (create)
 	emsg(_(e_cannot_create_fold_with_current_foldmethod));
-    else
+    ਨਹੀਂਤਾਂ
 	emsg(_(e_cannot_delete_fold_with_current_foldmethod));
-    return FALSE;
+    ਵਾਪਸ FALSE;
 }
 
 // foldCreate() {{{2
@@ -548,131 +548,131 @@ foldManualAllowed(int create)
  * Create a fold from line "start" to line "end" (inclusive) in the current
  * window.
  */
-    void
-foldCreate(linenr_T start, linenr_T end)
+    ਖਾਲੀ
+foldCreate(linenr_T ਸ਼ੁਰੂ, linenr_T ਸਿਰਾ)
 {
     fold_T	*fp;
     garray_T	*gap;
     garray_T	fold_ga;
-    int		i, j;
-    int		cont;
-    int		use_level = FALSE;
-    int		closed = FALSE;
-    int		level = 0;
-    linenr_T	start_rel = start;
-    linenr_T	end_rel = end;
+    ਪੂਰਨ		i, j;
+    ਪੂਰਨ		cont;
+    ਪੂਰਨ		use_level = FALSE;
+    ਪੂਰਨ		closed = FALSE;
+    ਪੂਰਨ		level = 0;
+    linenr_T	ਸ਼ੁਰੂ_rel = ਸ਼ੁਰੂ;
+    linenr_T	ਸਿਰਾ_rel = ਸਿਰਾ;
 
-    if (start > end)
+    ਜੇ (ਸ਼ੁਰੂ > ਸਿਰਾ)
     {
 	// reverse the range
-	end = start_rel;
-	start = end_rel;
-	start_rel = start;
-	end_rel = end;
+	ਸਿਰਾ = ਸ਼ੁਰੂ_rel;
+	ਸ਼ੁਰੂ = ਸਿਰਾ_rel;
+	ਸ਼ੁਰੂ_rel = ਸ਼ੁਰੂ;
+	ਸਿਰਾ_rel = ਸਿਰਾ;
     }
 
     // When 'foldmethod' is "marker" add markers, which creates the folds.
-    if (foldmethodIsMarker(curwin))
+    ਜੇ (foldmethodIsMarker(curwin))
     {
-	foldCreateMarkers(start, end);
-	return;
+	foldCreateMarkers(ਸ਼ੁਰੂ, ਸਿਰਾ);
+	ਵਾਪਸ;
     }
 
     checkupdate(curwin);
 
     // Find the place to insert the new fold.
     gap = &curwin->w_folds;
-    if (gap->ga_len == 0)
+    ਜੇ (gap->ga_len == 0)
 	i = 0;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	for (;;)
+	ਲਈ (;;)
 	{
-	    if (!foldFind(gap, start_rel, &fp))
-		break;
-	    if (fp->fd_top + fp->fd_len > end_rel)
+	    ਜੇ (!fold_ਲੱਭੋ(gap, ਸ਼ੁਰੂ_rel, &fp))
+		ਰੋਕੋ;
+	    ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len > ਸਿਰਾ_rel)
 	    {
 		// New fold is completely inside this fold: Go one level
 		// deeper.
 		gap = &fp->fd_nested;
-		start_rel -= fp->fd_top;
-		end_rel -= fp->fd_top;
-		if (use_level || fp->fd_flags == FD_LEVEL)
+		ਸ਼ੁਰੂ_rel -= fp->fd_ਸਿਖਰ;
+		ਸਿਰਾ_rel -= fp->fd_ਸਿਖਰ;
+		ਜੇ (use_level || fp->fd_flags == FD_LEVEL)
 		{
 		    use_level = TRUE;
-		    if (level >= curwin->w_p_fdl)
+		    ਜੇ (level >= curwin->w_p_fdl)
 			closed = TRUE;
 		}
-		else if (fp->fd_flags == FD_CLOSED)
+		ਨਹੀਂਤਾਂ ਜੇ (fp->fd_flags == FD_CLOSED)
 		    closed = TRUE;
 		++level;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// This fold and new fold overlap: Insert here and move some
 		// folds inside the new fold.
-		break;
+		ਰੋਕੋ;
 	    }
 	}
-	if (gap->ga_len == 0)
+	ਜੇ (gap->ga_len == 0)
 	    i = 0;
-	else
-	    i = (int)(fp - (fold_T *)gap->ga_data);
+	ਨਹੀਂਤਾਂ
+	    i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
     }
 
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ਜੇ (ga_grow(gap, 1) == FAIL)
+	ਵਾਪਸ;
 
-    fp = (fold_T *)gap->ga_data + i;
-    ga_init2(&fold_ga, sizeof(fold_T), 10);
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
+    ga_init2(&fold_ga, ਆਕਾਰ(fold_T), 10);
 
     // Count number of folds that will be contained in the new fold.
-    for (cont = 0; i + cont < gap->ga_len; ++cont)
-	if (fp[cont].fd_top > end_rel)
-	    break;
-    if (cont > 0 && ga_grow(&fold_ga, cont) == OK)
+    ਲਈ (cont = 0; i + cont < gap->ga_len; ++cont)
+	ਜੇ (fp[cont].fd_ਸਿਖਰ > ਸਿਰਾ_rel)
+	    ਰੋਕੋ;
+    ਜੇ (cont > 0 && ga_grow(&fold_ga, cont) == OK)
     {
 	// If the first fold starts before the new fold, let the new fold
 	// start there.  Otherwise the existing fold would change.
-	if (start_rel > fp->fd_top)
-	    start_rel = fp->fd_top;
+	ਜੇ (ਸ਼ੁਰੂ_rel > fp->fd_ਸਿਖਰ)
+	    ਸ਼ੁਰੂ_rel = fp->fd_ਸਿਖਰ;
 
 	// When last contained fold isn't completely contained, adjust end
 	// of new fold.
-	if (end_rel < fp[cont - 1].fd_top + fp[cont - 1].fd_len - 1)
-	    end_rel = fp[cont - 1].fd_top + fp[cont - 1].fd_len - 1;
+	ਜੇ (ਸਿਰਾ_rel < fp[cont - 1].fd_ਸਿਖਰ + fp[cont - 1].fd_len - 1)
+	    ਸਿਰਾ_rel = fp[cont - 1].fd_ਸਿਖਰ + fp[cont - 1].fd_len - 1;
 	// Move contained folds to inside new fold.
-	mch_memmove(fold_ga.ga_data, fp, sizeof(fold_T) * cont);
+	mch_memmove(fold_ga.ga_ਅੰਕੜੇ, fp, ਆਕਾਰ(fold_T) * cont);
 	fold_ga.ga_len += cont;
 	i += cont;
 
 	// Adjust line numbers in contained folds to be relative to the
 	// new fold.
-	for (j = 0; j < cont; ++j)
-	    ((fold_T *)fold_ga.ga_data)[j].fd_top -= start_rel;
+	ਲਈ (j = 0; j < cont; ++j)
+	    ((fold_T *)fold_ga.ga_ਅੰਕੜੇ)[j].fd_ਸਿਖਰ -= ਸ਼ੁਰੂ_rel;
     }
     // Move remaining entries to after the new fold.
-    if (i < gap->ga_len)
-	mch_memmove(fp + 1, (fold_T *)gap->ga_data + i,
-		sizeof(fold_T) * (gap->ga_len - i));
+    ਜੇ (i < gap->ga_len)
+	mch_memmove(fp + 1, (fold_T *)gap->ga_ਅੰਕੜੇ + i,
+		ਆਕਾਰ(fold_T) * (gap->ga_len - i));
     gap->ga_len = gap->ga_len + 1 - cont;
 
     // insert new fold
     fp->fd_nested = fold_ga;
-    fp->fd_top = start_rel;
-    fp->fd_len = end_rel - start_rel + 1;
+    fp->fd_ਸਿਖਰ = ਸ਼ੁਰੂ_rel;
+    fp->fd_len = ਸਿਰਾ_rel - ਸ਼ੁਰੂ_rel + 1;
 
     // We want the new fold to be closed.  If it would remain open because
     // of using 'foldlevel', need to adjust fd_flags of containing folds.
-    if (use_level && !closed && level < curwin->w_p_fdl)
-	closeFold(start, 1L);
-    if (!use_level)
+    ਜੇ (use_level && !closed && level < curwin->w_p_fdl)
+	closeFold(ਸ਼ੁਰੂ, 1L);
+    ਜੇ (!use_level)
 	curwin->w_fold_manual = true;
     fp->fd_flags = FD_CLOSED;
     fp->fd_small = MAYBE;
 
     // redraw
-    changed_window_setting();
+    ਬਦਲਿਆ_ਖਿੜਕੀ_setting();
 }
 
 // deleteFold() {{{2
@@ -681,102 +681,102 @@ foldCreate(linenr_T start, linenr_T end)
  * When "end" is not 0, delete all folds from "start" to "end".
  * When "recursive" is TRUE delete recursively.
  */
-    void
+    ਖਾਲੀ
 deleteFold(
-    linenr_T	start,
-    linenr_T	end,
-    int		recursive,
-    int		had_visual)	// TRUE when Visual selection used
+    linenr_T	ਸ਼ੁਰੂ,
+    linenr_T	ਸਿਰਾ,
+    ਪੂਰਨ		recursive,
+    ਪੂਰਨ		had_visual)	// TRUE when Visual selection used
 {
     garray_T	*gap;
     fold_T	*fp;
-    garray_T	*found_ga;
-    fold_T	*found_fp = NULL;
-    linenr_T	found_off = 0;
-    int		use_level;
-    int		maybe_small = FALSE;
-    int		level = 0;
-    linenr_T	lnum = start;
+    garray_T	*ਮਿਲਿਆ_ga;
+    fold_T	*ਮਿਲਿਆ_fp = ਨਿਰਾ;
+    linenr_T	ਮਿਲਿਆ_off = 0;
+    ਪੂਰਨ		use_level;
+    ਪੂਰਨ		maybe_small = FALSE;
+    ਪੂਰਨ		level = 0;
+    linenr_T	lnum = ਸ਼ੁਰੂ;
     linenr_T	lnum_off;
-    int		did_one = FALSE;
-    linenr_T	first_lnum = MAXLNUM;
-    linenr_T	last_lnum = 0;
+    ਪੂਰਨ		did_one = FALSE;
+    linenr_T	ਪਹਿਲਾ_lnum = MAXLNUM;
+    linenr_T	ਆਖਰੀ_lnum = 0;
 
     checkupdate(curwin);
 
-    while (lnum <= end)
+    ਜਦੋਂ (lnum <= ਸਿਰਾ)
     {
 	// Find the deepest fold for "start".
 	gap = &curwin->w_folds;
-	found_ga = NULL;
+	ਮਿਲਿਆ_ga = ਨਿਰਾ;
 	lnum_off = 0;
 	use_level = FALSE;
-	for (;;)
+	ਲਈ (;;)
 	{
-	    if (!foldFind(gap, lnum - lnum_off, &fp))
-		break;
+	    ਜੇ (!fold_ਲੱਭੋ(gap, lnum - lnum_off, &fp))
+		ਰੋਕੋ;
 	    // lnum is inside this fold, remember info
-	    found_ga = gap;
-	    found_fp = fp;
-	    found_off = lnum_off;
+	    ਮਿਲਿਆ_ga = gap;
+	    ਮਿਲਿਆ_fp = fp;
+	    ਮਿਲਿਆ_off = lnum_off;
 
 	    // if "lnum" is folded, don't check nesting
-	    if (check_closed(curwin, fp, &use_level, level,
+	    ਜੇ (check_closed(curwin, fp, &use_level, level,
 						      &maybe_small, lnum_off))
-		break;
+		ਰੋਕੋ;
 
 	    // check nested folds
 	    gap = &fp->fd_nested;
-	    lnum_off += fp->fd_top;
+	    lnum_off += fp->fd_ਸਿਖਰ;
 	    ++level;
 	}
-	if (found_ga == NULL)
+	ਜੇ (ਮਿਲਿਆ_ga == ਨਿਰਾ)
 	{
 	    ++lnum;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    lnum = found_fp->fd_top + found_fp->fd_len + found_off;
+	    lnum = ਮਿਲਿਆ_fp->fd_ਸਿਖਰ + ਮਿਲਿਆ_fp->fd_len + ਮਿਲਿਆ_off;
 
-	    if (foldmethodIsManual(curwin))
-		deleteFoldEntry(found_ga,
-		    (int)(found_fp - (fold_T *)found_ga->ga_data), recursive);
-	    else
+	    ਜੇ (foldmethodIsManual(curwin))
+		delete_Fold_ਇੰਦਰਾਜ(ਮਿਲਿਆ_ga,
+		    (ਪੂਰਨ)(ਮਿਲਿਆ_fp - (fold_T *)ਮਿਲਿਆ_ga->ga_ਅੰਕੜੇ), recursive);
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (first_lnum > found_fp->fd_top + found_off)
-		    first_lnum = found_fp->fd_top + found_off;
-		if (last_lnum < lnum)
-		    last_lnum = lnum;
-		if (!did_one)
+		ਜੇ (ਪਹਿਲਾ_lnum > ਮਿਲਿਆ_fp->fd_ਸਿਖਰ + ਮਿਲਿਆ_off)
+		    ਪਹਿਲਾ_lnum = ਮਿਲਿਆ_fp->fd_ਸਿਖਰ + ਮਿਲਿਆ_off;
+		ਜੇ (ਆਖਰੀ_lnum < lnum)
+		    ਆਖਰੀ_lnum = lnum;
+		ਜੇ (!did_one)
 		    parseMarker(curwin);
-		deleteFoldMarkers(found_fp, recursive, found_off);
+		deleteFoldMarkers(ਮਿਲਿਆ_fp, recursive, ਮਿਲਿਆ_off);
 	    }
 	    did_one = TRUE;
 
 	    // redraw window
-	    changed_window_setting();
+	    ਬਦਲਿਆ_ਖਿੜਕੀ_setting();
 	}
     }
-    if (!did_one)
+    ਜੇ (!did_one)
     {
-	emsg(_(e_no_fold_found));
+	emsg(_(e_no_fold_ਮਿਲਿਆ));
 	// Force a redraw to remove the Visual highlighting.
-	if (had_visual)
+	ਜੇ (had_visual)
 	    redraw_curbuf_later(UPD_INVERTED);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	// Deleting markers may make cursor column invalid.
-	check_cursor_col();
+	check_cursor_ਖਾਨਾ();
 
-    if (last_lnum > 0)
-	changed_lines(first_lnum, (colnr_T)0, last_lnum, 0L);
+    ਜੇ (ਆਖਰੀ_lnum > 0)
+	ਬਦਲਿਆ_ਸਤਰਾਂ(ਪਹਿਲਾ_lnum, (colnr_T)0, ਆਖਰੀ_lnum, 0L);
 }
 
 // clearFolding() {{{2
 /*
  * Remove all folding for window "win".
  */
-    void
+    ਖਾਲੀ
 clearFolding(win_T *win)
 {
     deleteFoldRecurse(&win->w_folds);
@@ -790,52 +790,52 @@ clearFolding(win_T *win)
  * calling foldMarkAdjust().
  * The changes in lines from top to bot (inclusive).
  */
-    void
-foldUpdate(win_T *wp, linenr_T top, linenr_T bot)
+    ਖਾਲੀ
+foldUpdate(win_T *wp, linenr_T ਸਿਖਰ, linenr_T bot)
 {
     fold_T	*fp;
 
-    if (disable_fold_update > 0)
-	return;
+    ਜੇ (disable_fold_update > 0)
+	ਵਾਪਸ;
 # ifdef FEAT_DIFF
-    if (need_diff_redraw)
+    ਜੇ (need_diff_redraw)
 	// will update later
-	return;
+	ਵਾਪਸ;
 # endif
 
-    if (wp->w_folds.ga_len > 0)
+    ਜੇ (wp->w_folds.ga_len > 0)
     {
-	linenr_T	maybe_small_start = top;
-	linenr_T	maybe_small_end = bot;
+	linenr_T	maybe_small_ਸ਼ੁਰੂ = ਸਿਖਰ;
+	linenr_T	maybe_small_ਸਿਰਾ = bot;
 
 	// Mark all folds from top to bot (or bot to top) as maybe-small.
-	if (top > bot)
+	ਜੇ (ਸਿਖਰ > bot)
 	{
-	    maybe_small_start = bot;
-	    maybe_small_end = top;
+	    maybe_small_ਸ਼ੁਰੂ = bot;
+	    maybe_small_ਸਿਰਾ = ਸਿਖਰ;
 	}
-	(void)foldFind(&wp->w_folds, maybe_small_start, &fp);
-	while (fp < (fold_T *)wp->w_folds.ga_data + wp->w_folds.ga_len
-		&& fp->fd_top <= maybe_small_end)
+	(ਖਾਲੀ)fold_ਲੱਭੋ(&wp->w_folds, maybe_small_ਸ਼ੁਰੂ, &fp);
+	ਜਦੋਂ (fp < (fold_T *)wp->w_folds.ga_ਅੰਕੜੇ + wp->w_folds.ga_len
+		&& fp->fd_ਸਿਖਰ <= maybe_small_ਸਿਰਾ)
 	{
 	    fp->fd_small = MAYBE;
 	    ++fp;
 	}
     }
 
-    if (foldmethodIsIndent(wp)
-	    || foldmethodIsExpr(wp)
+    ਜੇ (foldmethodIsIndent(wp)
+	    || foldmethod_Is_ਵਿਅੰਜਕ(wp)
 	    || foldmethodIsMarker(wp)
 # ifdef FEAT_DIFF
 	    || foldmethodIsDiff(wp)
 # endif
 	    || foldmethodIsSyntax(wp))
     {
-	int save_got_int = got_int;
+	ਪੂਰਨ save_got_int = got_int;
 
 	// reset got_int here, otherwise it won't work
 	got_int = FALSE;
-	foldUpdateIEMS(wp, top, bot);
+	foldUpdateIEMS(wp, ਸਿਖਰ, bot);
 	got_int |= save_got_int;
     }
 }
@@ -847,7 +847,7 @@ foldUpdate(win_T *wp, linenr_T top, linenr_T bot)
  * The actual updating is postponed until fold info is used, to avoid doing
  * every time a setting is changed or a syntax item is added.
  */
-    void
+    ਖਾਲੀ
 foldUpdateAll(win_T *win)
 {
     win->w_foldinvalid = true;
@@ -860,149 +860,149 @@ foldUpdateAll(win_T *win)
  * If "updown" is TRUE: move to fold at the same level.
  * If not moved return FAIL.
  */
-    int
-foldMoveTo(
-    int		updown,
-    int		dir,	    // FORWARD or BACKWARD
-    long	count)
+    ਪੂਰਨ
+fold_Move_ਮੰਜ਼ਿਲ(
+    ਪੂਰਨ		updown,
+    ਪੂਰਨ		dir,	    // FORWARD or BACKWARD
+    ਲੰਮਾ	ਗਿਣਤੀ_2)
 {
-    long	n;
-    int		retval = FAIL;
+    ਲੰਮਾ	n;
+    ਪੂਰਨ		retval = FAIL;
     linenr_T	lnum_off;
-    linenr_T	lnum_found;
+    linenr_T	lnum_ਮਿਲਿਆ;
     linenr_T	lnum;
-    int		use_level;
-    int		maybe_small;
+    ਪੂਰਨ		use_level;
+    ਪੂਰਨ		maybe_small;
     garray_T	*gap;
     fold_T	*fp;
-    int		level;
-    int		last;
+    ਪੂਰਨ		level;
+    ਪੂਰਨ		ਆਖਰੀ;
 
     checkupdate(curwin);
 
     // Repeat "count" times.
-    for (n = 0; n < count; ++n)
+    ਲਈ (n = 0; n < ਗਿਣਤੀ_2; ++n)
     {
 	// Find nested folds.  Stop when a fold is closed.  The deepest fold
 	// that moves the cursor is used.
 	lnum_off = 0;
 	gap = &curwin->w_folds;
-	if (gap->ga_len == 0)
-	    break;
+	ਜੇ (gap->ga_len == 0)
+	    ਰੋਕੋ;
 	use_level = FALSE;
 	maybe_small = FALSE;
-	lnum_found = curwin->w_cursor.lnum;
+	lnum_ਮਿਲਿਆ = curwin->w_cursor.lnum;
 	level = 0;
-	last = FALSE;
-	for (;;)
+	ਆਖਰੀ = FALSE;
+	ਲਈ (;;)
 	{
-	    if (!foldFind(gap, curwin->w_cursor.lnum - lnum_off, &fp))
+	    ਜੇ (!fold_ਲੱਭੋ(gap, curwin->w_cursor.lnum - lnum_off, &fp))
 	    {
-		if (!updown || gap->ga_len == 0)
-		    break;
+		ਜੇ (!updown || gap->ga_len == 0)
+		    ਰੋਕੋ;
 
 		// When moving up, consider a fold above the cursor; when
 		// moving down consider a fold below the cursor.
-		if (dir == FORWARD)
+		ਜੇ (dir == FORWARD)
 		{
-		    if (fp - (fold_T *)gap->ga_data >= gap->ga_len)
-			break;
+		    ਜੇ (fp - (fold_T *)gap->ga_ਅੰਕੜੇ >= gap->ga_len)
+			ਰੋਕੋ;
 		    --fp;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    if (fp == (fold_T *)gap->ga_data)
-			break;
+		    ਜੇ (fp == (fold_T *)gap->ga_ਅੰਕੜੇ)
+			ਰੋਕੋ;
 		}
 		// don't look for contained folds, they will always move
 		// the cursor too far.
-		last = TRUE;
+		ਆਖਰੀ = TRUE;
 	    }
 
-	    if (!last)
+	    ਜੇ (!ਆਖਰੀ)
 	    {
 		// Check if this fold is closed.
-		if (check_closed(curwin, fp, &use_level, level,
+		ਜੇ (check_closed(curwin, fp, &use_level, level,
 						      &maybe_small, lnum_off))
-		    last = TRUE;
+		    ਆਖਰੀ = TRUE;
 
 		// "[z" and "]z" stop at closed fold
-		if (last && !updown)
-		    break;
+		ਜੇ (ਆਖਰੀ && !updown)
+		    ਰੋਕੋ;
 	    }
 
-	    if (updown)
+	    ਜੇ (updown)
 	    {
-		if (dir == FORWARD)
+		ਜੇ (dir == FORWARD)
 		{
 		    // to start of next fold if there is one
-		    if (fp + 1 - (fold_T *)gap->ga_data < gap->ga_len)
+		    ਜੇ (fp + 1 - (fold_T *)gap->ga_ਅੰਕੜੇ < gap->ga_len)
 		    {
-			lnum = fp[1].fd_top + lnum_off;
-			if (lnum > curwin->w_cursor.lnum)
-			    lnum_found = lnum;
+			lnum = fp[1].fd_ਸਿਖਰ + lnum_off;
+			ਜੇ (lnum > curwin->w_cursor.lnum)
+			    lnum_ਮਿਲਿਆ = lnum;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // to end of previous fold if there is one
-		    if (fp > (fold_T *)gap->ga_data)
+		    ਜੇ (fp > (fold_T *)gap->ga_ਅੰਕੜੇ)
 		    {
-			lnum = fp[-1].fd_top + lnum_off + fp[-1].fd_len - 1;
-			if (lnum < curwin->w_cursor.lnum)
-			    lnum_found = lnum;
+			lnum = fp[-1].fd_ਸਿਖਰ + lnum_off + fp[-1].fd_len - 1;
+			ਜੇ (lnum < curwin->w_cursor.lnum)
+			    lnum_ਮਿਲਿਆ = lnum;
 		    }
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Open fold found, set cursor to its start/end and then check
 		// nested folds.
-		if (dir == FORWARD)
+		ਜੇ (dir == FORWARD)
 		{
-		    lnum = fp->fd_top + lnum_off + fp->fd_len - 1;
-		    if (lnum > curwin->w_cursor.lnum)
-			lnum_found = lnum;
+		    lnum = fp->fd_ਸਿਖਰ + lnum_off + fp->fd_len - 1;
+		    ਜੇ (lnum > curwin->w_cursor.lnum)
+			lnum_ਮਿਲਿਆ = lnum;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
-		    lnum = fp->fd_top + lnum_off;
-		    if (lnum < curwin->w_cursor.lnum)
-			lnum_found = lnum;
+		    lnum = fp->fd_ਸਿਖਰ + lnum_off;
+		    ਜੇ (lnum < curwin->w_cursor.lnum)
+			lnum_ਮਿਲਿਆ = lnum;
 		}
 	    }
 
-	    if (last)
-		break;
+	    ਜੇ (ਆਖਰੀ)
+		ਰੋਕੋ;
 
 	    // Check nested folds (if any).
 	    gap = &fp->fd_nested;
-	    lnum_off += fp->fd_top;
+	    lnum_off += fp->fd_ਸਿਖਰ;
 	    ++level;
 	}
-	if (lnum_found != curwin->w_cursor.lnum)
+	ਜੇ (lnum_ਮਿਲਿਆ != curwin->w_cursor.lnum)
 	{
-	    if (retval == FAIL)
+	    ਜੇ (retval == FAIL)
 		setpcmark();
-	    curwin->w_cursor.lnum = lnum_found;
-	    curwin->w_cursor.col = 0;
+	    curwin->w_cursor.lnum = lnum_ਮਿਲਿਆ;
+	    curwin->w_cursor.ਖਾਨਾ = 0;
 	    retval = OK;
 	}
-	else
-	    break;
+	ਨਹੀਂਤਾਂ
+	    ਰੋਕੋ;
     }
 
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 // foldInitWin() {{{2
 /*
  * Init the fold info in a new window.
  */
-    void
+    ਖਾਲੀ
 foldInitWin(win_T *new_win)
 {
-    ga_init2(&new_win->w_folds, sizeof(fold_T), 10);
+    ga_init2(&new_win->w_folds, ਆਕਾਰ(fold_T), 10);
 }
 
 // find_wl_entry() {{{2
@@ -1012,55 +1012,55 @@ foldInitWin(win_T *new_win)
  * line number can be wrong).
  * Returns index of entry or -1 if not found.
  */
-    int
-find_wl_entry(win_T *win, linenr_T lnum)
+    ਪੂਰਨ
+ਲੱਭੋ_wl_ਇੰਦਰਾਜ(win_T *win, linenr_T lnum)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < win->w_lines_valid; ++i)
-	if (win->w_lines[i].wl_valid)
+    ਲਈ (i = 0; i < win->w_ਸਤਰਾਂ_valid; ++i)
+	ਜੇ (win->w_ਸਤਰਾਂ[i].wl_valid)
 	{
-	    if (lnum < win->w_lines[i].wl_lnum)
-		return -1;
-	    if (lnum <= win->w_lines[i].wl_lastlnum)
-		return i;
+	    ਜੇ (lnum < win->w_ਸਤਰਾਂ[i].wl_lnum)
+		ਵਾਪਸ -1;
+	    ਜੇ (lnum <= win->w_ਸਤਰਾਂ[i].wl_lastlnum)
+		ਵਾਪਸ i;
 	}
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 // foldAdjustVisual() {{{2
 /*
  * Adjust the Visual area to include any fold at the start or end completely.
  */
-    void
-foldAdjustVisual(void)
+    ਖਾਲੀ
+foldAdjustVisual(ਖਾਲੀ)
 {
-    pos_T	*start, *end;
+    pos_T	*ਸ਼ੁਰੂ, *ਸਿਰਾ;
 
-    if (!VIsual_active || !hasAnyFolding(curwin))
-	return;
+    ਜੇ (!VIsual_ਸਰਗਰਮ || !hasAnyFolding(curwin))
+	ਵਾਪਸ;
 
-    if (LTOREQ_POS(VIsual, curwin->w_cursor))
+    ਜੇ (LTOREQ_POS(VIsual, curwin->w_cursor))
     {
-	start = &VIsual;
-	end = &curwin->w_cursor;
+	ਸ਼ੁਰੂ = &VIsual;
+	ਸਿਰਾ = &curwin->w_cursor;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	start = &curwin->w_cursor;
-	end = &VIsual;
+	ਸ਼ੁਰੂ = &curwin->w_cursor;
+	ਸਿਰਾ = &VIsual;
     }
-    if (hasFolding(start->lnum, &start->lnum, NULL))
-	start->col = 0;
+    ਜੇ (hasFolding(ਸ਼ੁਰੂ->lnum, &ਸ਼ੁਰੂ->lnum, ਨਿਰਾ))
+	ਸ਼ੁਰੂ->ਖਾਨਾ = 0;
 
-    if (!hasFolding(end->lnum, NULL, &end->lnum))
-	return;
+    ਜੇ (!hasFolding(ਸਿਰਾ->lnum, ਨਿਰਾ, &ਸਿਰਾ->lnum))
+	ਵਾਪਸ;
 
-    end->col = ml_get_len(end->lnum);
-    if (end->col > 0 && *p_sel == 'o')
-	--end->col;
+    ਸਿਰਾ->ਖਾਨਾ = ml_get_len(ਸਿਰਾ->lnum);
+    ਜੇ (ਸਿਰਾ->ਖਾਨਾ > 0 && *p_sel == 'o')
+	--ਸਿਰਾ->ਖਾਨਾ;
     // prevent cursor from moving on the trail byte
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
 	mb_adjust_cursor();
 }
 
@@ -1068,10 +1068,10 @@ foldAdjustVisual(void)
 /*
  * Move the cursor to the first line of a closed fold.
  */
-    void
-foldAdjustCursor(void)
+    ਖਾਲੀ
+foldAdjustCursor(ਖਾਲੀ)
 {
-    (void)hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL);
+    (ਖਾਲੀ)hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, ਨਿਰਾ);
 }
 
 // Internal functions for "fold_T" {{{1
@@ -1081,30 +1081,30 @@ foldAdjustCursor(void)
  *
  * Return FAIL if the operation cannot be completed, otherwise OK.
  */
-    void
-cloneFoldGrowArray(garray_T *from, garray_T *to)
+    ਖਾਲੀ
+cloneFoldGrowArray(garray_T *from, garray_T *ਮੰਜ਼ਿਲ)
 {
-    int		i;
+    ਪੂਰਨ		i;
     fold_T	*from_p;
-    fold_T	*to_p;
+    fold_T	*ਮੰਜ਼ਿਲ_p;
 
-    ga_init2(to, from->ga_itemsize, from->ga_growsize);
-    if (from->ga_len == 0 || ga_grow(to, from->ga_len) == FAIL)
-	return;
+    ga_init2(ਮੰਜ਼ਿਲ, from->ga_itemsize, from->ga_growsize);
+    ਜੇ (from->ga_len == 0 || ga_grow(ਮੰਜ਼ਿਲ, from->ga_len) == FAIL)
+	ਵਾਪਸ;
 
-    from_p = (fold_T *)from->ga_data;
-    to_p = (fold_T *)to->ga_data;
+    from_p = (fold_T *)from->ga_ਅੰਕੜੇ;
+    ਮੰਜ਼ਿਲ_p = (fold_T *)ਮੰਜ਼ਿਲ->ga_ਅੰਕੜੇ;
 
-    for (i = 0; i < from->ga_len; i++)
+    ਲਈ (i = 0; i < from->ga_len; i++)
     {
-	to_p->fd_top = from_p->fd_top;
-	to_p->fd_len = from_p->fd_len;
-	to_p->fd_flags = from_p->fd_flags;
-	to_p->fd_small = from_p->fd_small;
-	cloneFoldGrowArray(&from_p->fd_nested, &to_p->fd_nested);
-	++to->ga_len;
+	ਮੰਜ਼ਿਲ_p->fd_ਸਿਖਰ = from_p->fd_ਸਿਖਰ;
+	ਮੰਜ਼ਿਲ_p->fd_len = from_p->fd_len;
+	ਮੰਜ਼ਿਲ_p->fd_flags = from_p->fd_flags;
+	ਮੰਜ਼ਿਲ_p->fd_small = from_p->fd_small;
+	cloneFoldGrowArray(&from_p->fd_nested, &ਮੰਜ਼ਿਲ_p->fd_nested);
+	++ਮੰਜ਼ਿਲ->ga_len;
 	++from_p;
-	++to_p;
+	++ਮੰਜ਼ਿਲ_p;
     }
 }
 
@@ -1115,17 +1115,17 @@ cloneFoldGrowArray(garray_T *from, garray_T *to)
  * the first fold below it (careful: it can be beyond the end of the array!).
  * Returns FALSE when there is no fold that contains "lnum".
  */
-    static int
-foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp)
+    ਸਥਿਰ ਪੂਰਨ
+fold_ਲੱਭੋ(garray_T *gap, linenr_T lnum, fold_T **fpp)
 {
-    linenr_T	low, high;
+    linenr_T	ਨੀਵਾਂ, ਉੱਚਾ;
     fold_T	*fp;
-    int		i;
+    ਪੂਰਨ		i;
 
-    if (gap->ga_len == 0)
+    ਜੇ (gap->ga_len == 0)
     {
-	*fpp = NULL;
-	return FALSE;
+	*fpp = ਨਿਰਾ;
+	ਵਾਪਸ FALSE;
     }
 
     /*
@@ -1133,65 +1133,65 @@ foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp)
      * "low" is lowest index of possible match.
      * "high" is highest index of possible match.
      */
-    fp = (fold_T *)gap->ga_data;
-    low = 0;
-    high = gap->ga_len - 1;
-    while (low <= high)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਨੀਵਾਂ = 0;
+    ਉੱਚਾ = gap->ga_len - 1;
+    ਜਦੋਂ (ਨੀਵਾਂ <= ਉੱਚਾ)
     {
-	i = (low + high) / 2;
-	if (fp[i].fd_top > lnum)
+	i = (ਨੀਵਾਂ + ਉੱਚਾ) / 2;
+	ਜੇ (fp[i].fd_ਸਿਖਰ > lnum)
 	    // fold below lnum, adjust high
-	    high = i - 1;
-	else if (fp[i].fd_top + fp[i].fd_len <= lnum)
+	    ਉੱਚਾ = i - 1;
+	ਨਹੀਂਤਾਂ ਜੇ (fp[i].fd_ਸਿਖਰ + fp[i].fd_len <= lnum)
 	    // fold above lnum, adjust low
-	    low = i + 1;
-	else
+	    ਨੀਵਾਂ = i + 1;
+	ਨਹੀਂਤਾਂ
 	{
 	    // lnum is inside this fold
 	    *fpp = fp + i;
-	    return TRUE;
+	    ਵਾਪਸ TRUE;
 	}
     }
-    *fpp = fp + low;
-    return FALSE;
+    *fpp = fp + ਨੀਵਾਂ;
+    ਵਾਪਸ FALSE;
 }
 
 // foldLevelWin() {{{2
 /*
  * Return fold level at line number "lnum" in window "wp".
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 foldLevelWin(win_T *wp, linenr_T lnum)
 {
     fold_T	*fp;
     linenr_T	lnum_rel = lnum;
-    int		level =  0;
+    ਪੂਰਨ		level =  0;
     garray_T	*gap;
 
     // Recursively search for a fold that contains "lnum".
     gap = &wp->w_folds;
-    for (;;)
+    ਲਈ (;;)
     {
-	if (!foldFind(gap, lnum_rel, &fp))
-	    break;
+	ਜੇ (!fold_ਲੱਭੋ(gap, lnum_rel, &fp))
+	    ਰੋਕੋ;
 	// Check nested folds.  Line number is relative to containing fold.
 	gap = &fp->fd_nested;
-	lnum_rel -= fp->fd_top;
+	lnum_rel -= fp->fd_ਸਿਖਰ;
 	++level;
     }
 
-    return level;
+    ਵਾਪਸ level;
 }
 
 // checkupdate() {{{2
 /*
  * Check if the folds in window "wp" are invalid and update them if needed.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 checkupdate(win_T *wp)
 {
-    if (!wp->w_foldinvalid)
-	return;
+    ਜੇ (!wp->w_foldinvalid)
+	ਵਾਪਸ;
 
     foldUpdate(wp, (linenr_T)1, (linenr_T)MAXLNUM); // will update all
     wp->w_foldinvalid = false;
@@ -1202,22 +1202,22 @@ checkupdate(win_T *wp)
  * Open or close fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    static void
-setFoldRepeat(linenr_T lnum, long count, int do_open)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_Fold_Repeat(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2, ਪੂਰਨ do_open)
 {
-    int		done;
-    long	n;
+    ਪੂਰਨ		ਪੂਰਾ;
+    ਲੰਮਾ	n;
 
-    for (n = 0; n < count; ++n)
+    ਲਈ (n = 0; n < ਗਿਣਤੀ_2; ++n)
     {
-	done = DONE_NOTHING;
-	(void)setManualFold(lnum, do_open, FALSE, &done);
-	if (!(done & DONE_ACTION))
+	ਪੂਰਾ = ਪੂਰਾ_NOTHING;
+	(ਖਾਲੀ)ਸੈੱਟ_Manual_Fold(lnum, do_open, FALSE, &ਪੂਰਾ);
+	ਜੇ (!(ਪੂਰਾ & ਪੂਰਾ_ACTION))
 	{
 	    // Only give an error message when no fold could be opened.
-	    if (n == 0 && !(done & DONE_FOLD))
-		emsg(_(e_no_fold_found));
-	    break;
+	    ਜੇ (n == 0 && !(ਪੂਰਾ & ਪੂਰਾ_FOLD))
+		emsg(_(e_no_fold_ਮਿਲਿਆ));
+	    ਰੋਕੋ;
 	}
     }
 }
@@ -1227,15 +1227,15 @@ setFoldRepeat(linenr_T lnum, long count, int do_open)
  * Open or close the fold in the current window which contains "lnum".
  * Also does this for other windows in diff mode when needed.
  */
-    static linenr_T
-setManualFold(
+    ਸਥਿਰ linenr_T
+ਸੈੱਟ_Manual_Fold(
     linenr_T	lnum,
-    int		opening,    // TRUE when opening, FALSE when closing
-    int		recurse,    // TRUE when closing/opening recursive
-    int		*donep)
+    ਪੂਰਨ		opening,    // TRUE when opening, FALSE when closing
+    ਪੂਰਨ		recurse,    // TRUE when closing/opening recursive
+    ਪੂਰਨ		*donep)
 {
 # ifdef FEAT_DIFF
-    if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+    ਜੇ (foldmethodIsDiff(curwin) && curwin->w_p_scb)
     {
 	win_T	    *wp;
 	linenr_T    dlnum;
@@ -1246,17 +1246,17 @@ setManualFold(
 	 */
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+	    ਜੇ (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 	    {
 		dlnum = diff_lnum_win(curwin->w_cursor.lnum, wp);
-		if (dlnum != 0)
-		    (void)setManualFoldWin(wp, dlnum, opening, recurse, NULL);
+		ਜੇ (dlnum != 0)
+		    (ਖਾਲੀ)ਸੈੱਟ_Manual_Fold_Win(wp, dlnum, opening, recurse, ਨਿਰਾ);
 	    }
 	}
     }
 # endif
 
-    return setManualFoldWin(curwin, lnum, opening, recurse, donep);
+    ਵਾਪਸ ਸੈੱਟ_Manual_Fold_Win(curwin, lnum, opening, recurse, donep);
 }
 
 // setManualFoldWin() {{{2
@@ -1269,25 +1269,25 @@ setManualFold(
  * Return the line number of the next line that could be closed.
  * It's only valid when "opening" is TRUE!
  */
-    static linenr_T
-setManualFoldWin(
+    ਸਥਿਰ linenr_T
+ਸੈੱਟ_Manual_Fold_Win(
     win_T	*wp,
     linenr_T	lnum,
-    int		opening,    // TRUE when opening, FALSE when closing
-    int		recurse,    // TRUE when closing/opening recursive
-    int		*donep)
+    ਪੂਰਨ		opening,    // TRUE when opening, FALSE when closing
+    ਪੂਰਨ		recurse,    // TRUE when closing/opening recursive
+    ਪੂਰਨ		*donep)
 {
     fold_T	*fp;
     fold_T	*fp2;
-    fold_T	*found = NULL;
-    int		j;
-    int		level = 0;
-    int		use_level = FALSE;
-    int		found_fold = FALSE;
+    fold_T	*ਮਿਲਿਆ = ਨਿਰਾ;
+    ਪੂਰਨ		j;
+    ਪੂਰਨ		level = 0;
+    ਪੂਰਨ		use_level = FALSE;
+    ਪੂਰਨ		ਮਿਲਿਆ_fold = FALSE;
     garray_T	*gap;
-    linenr_T	next = MAXLNUM;
+    linenr_T	ਅਗਲਾ = MAXLNUM;
     linenr_T	off = 0;
-    int		done = 0;
+    ਪੂਰਨ		ਪੂਰਾ = 0;
 
     checkupdate(wp);
 
@@ -1295,99 +1295,99 @@ setManualFoldWin(
      * Find the fold, open or close it.
      */
     gap = &wp->w_folds;
-    for (;;)
+    ਲਈ (;;)
     {
-	if (!foldFind(gap, lnum, &fp))
+	ਜੇ (!fold_ਲੱਭੋ(gap, lnum, &fp))
 	{
 	    // If there is a following fold, continue there next time.
-	    if (fp != NULL && fp < (fold_T *)gap->ga_data + gap->ga_len)
-		next = fp->fd_top + off;
-	    break;
+	    ਜੇ (fp != ਨਿਰਾ && fp < (fold_T *)gap->ga_ਅੰਕੜੇ + gap->ga_len)
+		ਅਗਲਾ = fp->fd_ਸਿਖਰ + off;
+	    ਰੋਕੋ;
 	}
 
 	// lnum is inside this fold
-	found_fold = TRUE;
+	ਮਿਲਿਆ_fold = TRUE;
 
 	// If there is a following fold, continue there next time.
-	if (fp + 1 < (fold_T *)gap->ga_data + gap->ga_len)
-	    next = fp[1].fd_top + off;
+	ਜੇ (fp + 1 < (fold_T *)gap->ga_ਅੰਕੜੇ + gap->ga_len)
+	    ਅਗਲਾ = fp[1].fd_ਸਿਖਰ + off;
 
 	// Change from level-dependent folding to manual.
-	if (use_level || fp->fd_flags == FD_LEVEL)
+	ਜੇ (use_level || fp->fd_flags == FD_LEVEL)
 	{
 	    use_level = TRUE;
-	    if (level >= wp->w_p_fdl)
+	    ਜੇ (level >= wp->w_p_fdl)
 		fp->fd_flags = FD_CLOSED;
-	    else
+	    ਨਹੀਂਤਾਂ
 		fp->fd_flags = FD_OPEN;
-	    fp2 = (fold_T *)fp->fd_nested.ga_data;
-	    for (j = 0; j < fp->fd_nested.ga_len; ++j)
+	    fp2 = (fold_T *)fp->fd_nested.ga_ਅੰਕੜੇ;
+	    ਲਈ (j = 0; j < fp->fd_nested.ga_len; ++j)
 		fp2[j].fd_flags = FD_LEVEL;
 	}
 
 	// Simple case: Close recursively means closing the fold.
-	if (!opening && recurse)
+	ਜੇ (!opening && recurse)
 	{
-	    if (fp->fd_flags != FD_CLOSED)
+	    ਜੇ (fp->fd_flags != FD_CLOSED)
 	    {
-		done |= DONE_ACTION;
+		ਪੂਰਾ |= ਪੂਰਾ_ACTION;
 		fp->fd_flags = FD_CLOSED;
 	    }
 	}
-	else if (fp->fd_flags == FD_CLOSED)
+	ਨਹੀਂਤਾਂ ਜੇ (fp->fd_flags == FD_CLOSED)
 	{
 	    // When opening, open topmost closed fold.
-	    if (opening)
+	    ਜੇ (opening)
 	    {
 		fp->fd_flags = FD_OPEN;
-		done |= DONE_ACTION;
-		if (recurse)
+		ਪੂਰਾ |= ਪੂਰਾ_ACTION;
+		ਜੇ (recurse)
 		    foldOpenNested(fp);
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	// fold is open, check nested folds
-	found = fp;
+	ਮਿਲਿਆ = fp;
 	gap = &fp->fd_nested;
-	lnum -= fp->fd_top;
-	off += fp->fd_top;
+	lnum -= fp->fd_ਸਿਖਰ;
+	off += fp->fd_ਸਿਖਰ;
 	++level;
     }
-    if (found_fold)
+    ਜੇ (ਮਿਲਿਆ_fold)
     {
 	// When closing and not recurse, close deepest open fold.
-	if (!opening && found != NULL)
+	ਜੇ (!opening && ਮਿਲਿਆ != ਨਿਰਾ)
 	{
-	    found->fd_flags = FD_CLOSED;
-	    done |= DONE_ACTION;
+	    ਮਿਲਿਆ->fd_flags = FD_CLOSED;
+	    ਪੂਰਾ |= ਪੂਰਾ_ACTION;
 	}
 	wp->w_fold_manual = true;
-	if (done & DONE_ACTION)
-	    changed_window_setting_win(wp);
-	done |= DONE_FOLD;
+	ਜੇ (ਪੂਰਾ & ਪੂਰਾ_ACTION)
+	    ਬਦਲਿਆ_ਖਿੜਕੀ_setting_win(wp);
+	ਪੂਰਾ |= ਪੂਰਾ_FOLD;
     }
-    else if (donep == NULL && wp == curwin)
-	emsg(_(e_no_fold_found));
+    ਨਹੀਂਤਾਂ ਜੇ (donep == ਨਿਰਾ && wp == curwin)
+	emsg(_(e_no_fold_ਮਿਲਿਆ));
 
-    if (donep != NULL)
-	*donep |= done;
+    ਜੇ (donep != ਨਿਰਾ)
+	*donep |= ਪੂਰਾ;
 
-    return next;
+    ਵਾਪਸ ਅਗਲਾ;
 }
 
 // foldOpenNested() {{{2
 /*
  * Open all nested folds in fold "fpr" recursively.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldOpenNested(fold_T *fpr)
 {
-    int		i;
+    ਪੂਰਨ		i;
     fold_T	*fp;
 
-    fp = (fold_T *)fpr->fd_nested.ga_data;
-    for (i = 0; i < fpr->fd_nested.ga_len; ++i)
+    fp = (fold_T *)fpr->fd_nested.ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < fpr->fd_nested.ga_len; ++i)
     {
 	foldOpenNested(&fp[i]);
 	fp[i].fd_flags = FD_OPEN;
@@ -1400,50 +1400,50 @@ foldOpenNested(fold_T *fpr)
  * When "recursive" is TRUE also delete all the folds contained in it.
  * When "recursive" is FALSE contained folds are moved one level up.
  */
-    static void
-deleteFoldEntry(garray_T *gap, int idx, int recursive)
+    ਸਥਿਰ ਖਾਲੀ
+delete_Fold_ਇੰਦਰਾਜ(garray_T *gap, ਪੂਰਨ idx, ਪੂਰਨ recursive)
 {
     fold_T	*fp;
-    int		i;
-    long	moved;
+    ਪੂਰਨ		i;
+    ਲੰਮਾ	moved;
     fold_T	*nfp;
 
-    fp = (fold_T *)gap->ga_data + idx;
-    if (recursive || fp->fd_nested.ga_len == 0)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + idx;
+    ਜੇ (recursive || fp->fd_nested.ga_len == 0)
     {
 	// recursively delete the contained folds
 	deleteFoldRecurse(&fp->fd_nested);
 	--gap->ga_len;
-	if (idx < gap->ga_len)
-	    mch_memmove(fp, fp + 1, sizeof(fold_T) * (gap->ga_len - idx));
+	ਜੇ (idx < gap->ga_len)
+	    mch_memmove(fp, fp + 1, ਆਕਾਰ(fold_T) * (gap->ga_len - idx));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// Move nested folds one level up, to overwrite the fold that is
 	// deleted.
 	moved = fp->fd_nested.ga_len;
-	if (ga_grow(gap, (int)(moved - 1)) == OK)
+	ਜੇ (ga_grow(gap, (ਪੂਰਨ)(moved - 1)) == OK)
 	{
 	    // Get "fp" again, the array may have been reallocated.
-	    fp = (fold_T *)gap->ga_data + idx;
+	    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + idx;
 
 	    // adjust fd_top and fd_flags for the moved folds
-	    nfp = (fold_T *)fp->fd_nested.ga_data;
-	    for (i = 0; i < moved; ++i)
+	    nfp = (fold_T *)fp->fd_nested.ga_ਅੰਕੜੇ;
+	    ਲਈ (i = 0; i < moved; ++i)
 	    {
-		nfp[i].fd_top += fp->fd_top;
-		if (fp->fd_flags == FD_LEVEL)
+		nfp[i].fd_ਸਿਖਰ += fp->fd_ਸਿਖਰ;
+		ਜੇ (fp->fd_flags == FD_LEVEL)
 		    nfp[i].fd_flags = FD_LEVEL;
-		if (fp->fd_small == MAYBE)
+		ਜੇ (fp->fd_small == MAYBE)
 		    nfp[i].fd_small = MAYBE;
 	    }
 
 	    // move the existing folds down to make room
-	    if (idx + 1 < gap->ga_len)
+	    ਜੇ (idx + 1 < gap->ga_len)
 		mch_memmove(fp + moved, fp + 1,
-				  sizeof(fold_T) * (gap->ga_len - (idx + 1)));
+				  ਆਕਾਰ(fold_T) * (gap->ga_len - (idx + 1)));
 	    // move the contained folds one level up
-	    mch_memmove(fp, nfp, (size_t)(sizeof(fold_T) * moved));
+	    mch_memmove(fp, nfp, (size_t)(ਆਕਾਰ(fold_T) * moved));
 	    vim_free(nfp);
 	    gap->ga_len += moved - 1;
 	}
@@ -1454,13 +1454,13 @@ deleteFoldEntry(garray_T *gap, int idx, int recursive)
 /*
  * Delete nested folds in a fold.
  */
-    void
+    ਖਾਲੀ
 deleteFoldRecurse(garray_T *gap)
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	deleteFoldRecurse(&(((fold_T *)(gap->ga_data))[i].fd_nested));
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
+	deleteFoldRecurse(&(((fold_T *)(gap->ga_ਅੰਕੜੇ))[i].fd_nested));
     ga_clear(gap);
 }
 
@@ -1471,58 +1471,58 @@ deleteFoldRecurse(garray_T *gap)
  * We are adjusting the folds in the range from line1 til line2,
  * make sure that line2 does not get smaller than line1
  */
-    void
+    ਖਾਲੀ
 foldMarkAdjust(
     win_T	*wp,
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    ਲੰਮਾ	amount,
+    ਲੰਮਾ	amount_after)
 {
     // If deleting marks from line1 to line2, but not deleting all those
     // lines, set line2 so that only deleted lines have their folds removed.
-    if (amount == MAXLNUM && line2 >= line1 && line2 - line1 >= -amount_after)
+    ਜੇ (amount == MAXLNUM && line2 >= line1 && line2 - line1 >= -amount_after)
 	line2 = line1 - amount_after - 1;
-    if (line2 < line1)
+    ਜੇ (line2 < line1)
 	line2 = line1;
     // If appending a line in Insert mode, it should be included in the fold
     // just above the line.
-    if ((State & MODE_INSERT) && amount == (linenr_T)1 && line2 == MAXLNUM)
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && amount == (linenr_T)1 && line2 == MAXLNUM)
 	--line1;
     foldMarkAdjustRecurse(&wp->w_folds, line1, line2, amount, amount_after);
 }
 
 // foldMarkAdjustRecurse() {{{2
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldMarkAdjustRecurse(
     garray_T	*gap,
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    ਲੰਮਾ	amount,
+    ਲੰਮਾ	amount_after)
 {
     fold_T	*fp;
-    int		i;
-    linenr_T	last;
-    linenr_T	top;
+    ਪੂਰਨ		i;
+    linenr_T	ਆਖਰੀ;
+    linenr_T	ਸਿਖਰ;
 
-    if (gap->ga_len == 0)
-	return;
+    ਜੇ (gap->ga_len == 0)
+	ਵਾਪਸ;
 
     // In Insert mode an inserted line at the top of a fold is considered part
     // of the fold, otherwise it isn't.
-    if ((State & MODE_INSERT) && amount == (linenr_T)1 && line2 == MAXLNUM)
-	top = line1 + 1;
-    else
-	top = line1;
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && amount == (linenr_T)1 && line2 == MAXLNUM)
+	ਸਿਖਰ = line1 + 1;
+    ਨਹੀਂਤਾਂ
+	ਸਿਖਰ = line1;
 
     // Find the fold containing or just below "line1".
-    (void)foldFind(gap, line1, &fp);
+    (ਖਾਲੀ)fold_ਲੱਭੋ(gap, line1, &fp);
 
     /*
      * Adjust all folds below "line1" that are affected.
      */
-    for (i = (int)(fp - (fold_T *)gap->ga_data); i < gap->ga_len; ++i, ++fp)
+    ਲਈ (i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ); i < gap->ga_len; ++i, ++fp)
     {
 	/*
 	 * Check for these situations:
@@ -1536,78 +1536,78 @@ foldMarkAdjustRecurse(
 	 *		3     5  6
 	 */
 
-	last = fp->fd_top + fp->fd_len - 1; // last line of fold
+	ਆਖਰੀ = fp->fd_ਸਿਖਰ + fp->fd_len - 1; // last line of fold
 
 	// 1. fold completely above line1: nothing to do
-	if (last < line1)
-	    continue;
+	ਜੇ (ਆਖਰੀ < line1)
+	    ਜਾਰੀ;
 
 	// 6. fold below line2: only adjust for amount_after
-	if (fp->fd_top > line2)
+	ਜੇ (fp->fd_ਸਿਖਰ > line2)
 	{
-	    if (amount_after == 0)
-		break;
-	    fp->fd_top += amount_after;
+	    ਜੇ (amount_after == 0)
+		ਰੋਕੋ;
+	    fp->fd_ਸਿਖਰ += amount_after;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (fp->fd_top >= top && last <= line2)
+	    ਜੇ (fp->fd_ਸਿਖਰ >= ਸਿਖਰ && ਆਖਰੀ <= line2)
 	    {
 		// 4. fold completely contained in range
-		if (amount == MAXLNUM)
+		ਜੇ (amount == MAXLNUM)
 		{
 		    // Deleting lines: delete the fold completely
-		    deleteFoldEntry(gap, i, TRUE);
+		    delete_Fold_ਇੰਦਰਾਜ(gap, i, TRUE);
 		    --i;    // adjust index for deletion
 		    --fp;
 		}
-		else
-		    fp->fd_top += amount;
+		ਨਹੀਂਤਾਂ
+		    fp->fd_ਸਿਖਰ += amount;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		if (fp->fd_top < top)
+		ਜੇ (fp->fd_ਸਿਖਰ < ਸਿਖਰ)
 		{
 		    // 2 or 3: need to correct nested folds too
-		    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_top,
-				  line2 - fp->fd_top, amount, amount_after);
-		    if (last <= line2)
+		    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_ਸਿਖਰ,
+				  line2 - fp->fd_ਸਿਖਰ, amount, amount_after);
+		    ਜੇ (ਆਖਰੀ <= line2)
 		    {
 			// 2. fold contains line1, line2 is below fold
-			if (amount == MAXLNUM)
-			    fp->fd_len = line1 - fp->fd_top;
-			else
+			ਜੇ (amount == MAXLNUM)
+			    fp->fd_len = line1 - fp->fd_ਸਿਖਰ;
+			ਨਹੀਂਤਾਂ
 			    fp->fd_len += amount;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			// 3. fold contains line1 and line2
 			fp->fd_len += amount_after;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // 5. fold is below line1 and contains line2; need to
 		    // correct nested folds too
-		    if (amount == MAXLNUM)
+		    ਜੇ (amount == MAXLNUM)
 		    {
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				  0,
-				  line2 - fp->fd_top,
+				  line2 - fp->fd_ਸਿਖਰ,
 				  amount,
-				  amount_after + (fp->fd_top - top));
-			fp->fd_len -= line2 - fp->fd_top + 1;
-			fp->fd_top = line1;
+				  amount_after + (fp->fd_ਸਿਖਰ - ਸਿਖਰ));
+			fp->fd_len -= line2 - fp->fd_ਸਿਖਰ + 1;
+			fp->fd_ਸਿਖਰ = line1;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				  0,
-				  line2 - fp->fd_top,
+				  line2 - fp->fd_ਸਿਖਰ,
 				  amount,
 				  amount_after - amount);
 			fp->fd_len += amount_after - amount;
-			fp->fd_top += amount;
+			fp->fd_ਸਿਖਰ += amount;
 		    }
 		}
 	    }
@@ -1620,103 +1620,103 @@ foldMarkAdjustRecurse(
  * Get the lowest 'foldlevel' value that makes the deepest nested fold in the
  * current window open.
  */
-    int
-getDeepestNesting(void)
+    ਪੂਰਨ
+get_ਸਭ_ਤੋਂ_ਡੂੰਘਾ_Nesting(ਖਾਲੀ)
 {
     checkupdate(curwin);
-    return getDeepestNestingRecurse(&curwin->w_folds);
+    ਵਾਪਸ get_ਸਭ_ਤੋਂ_ਡੂੰਘਾ_Nesting_Recurse(&curwin->w_folds);
 }
 
-    static int
-getDeepestNestingRecurse(garray_T *gap)
+    ਸਥਿਰ ਪੂਰਨ
+get_ਸਭ_ਤੋਂ_ਡੂੰਘਾ_Nesting_Recurse(garray_T *gap)
 {
-    int		i;
-    int		level;
-    int		maxlevel = 0;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		level;
+    ਪੂਰਨ		maxlevel = 0;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
     {
-	level = getDeepestNestingRecurse(&fp[i].fd_nested) + 1;
-	if (level > maxlevel)
+	level = get_ਸਭ_ਤੋਂ_ਡੂੰਘਾ_Nesting_Recurse(&fp[i].fd_nested) + 1;
+	ਜੇ (level > maxlevel)
 	    maxlevel = level;
     }
 
-    return maxlevel;
+    ਵਾਪਸ maxlevel;
 }
 
 // check_closed() {{{2
 /*
  * Check if a fold is closed and update the info needed to check nested folds.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 check_closed(
     win_T	*win,
     fold_T	*fp,
-    int		*use_levelp,	    // TRUE: outer fold had FD_LEVEL
-    int		level,		    // folding depth
-    int		*maybe_smallp,	    // TRUE: outer this had fd_small == MAYBE
+    ਪੂਰਨ		*use_levelp,	    // TRUE: outer fold had FD_LEVEL
+    ਪੂਰਨ		level,		    // folding depth
+    ਪੂਰਨ		*maybe_smallp,	    // TRUE: outer this had fd_small == MAYBE
     linenr_T	lnum_off)	    // line number offset for fp->fd_top
 {
-    int		closed = FALSE;
+    ਪੂਰਨ		closed = FALSE;
 
     // Check if this fold is closed.  If the flag is FD_LEVEL this
     // fold and all folds it contains depend on 'foldlevel'.
-    if (*use_levelp || fp->fd_flags == FD_LEVEL)
+    ਜੇ (*use_levelp || fp->fd_flags == FD_LEVEL)
     {
 	*use_levelp = TRUE;
-	if (level >= win->w_p_fdl)
+	ਜੇ (level >= win->w_p_fdl)
 	    closed = TRUE;
     }
-    else if (fp->fd_flags == FD_CLOSED)
+    ਨਹੀਂਤਾਂ ਜੇ (fp->fd_flags == FD_CLOSED)
 	closed = TRUE;
 
     // Small fold isn't closed anyway.
-    if (fp->fd_small == MAYBE)
+    ਜੇ (fp->fd_small == MAYBE)
 	*maybe_smallp = TRUE;
-    if (closed)
+    ਜੇ (closed)
     {
-	if (*maybe_smallp)
+	ਜੇ (*maybe_smallp)
 	    fp->fd_small = MAYBE;
 	checkSmall(win, fp, lnum_off);
-	if (fp->fd_small == TRUE)
+	ਜੇ (fp->fd_small == TRUE)
 	    closed = FALSE;
     }
-    return closed;
+    ਵਾਪਸ closed;
 }
 
 // checkSmall() {{{2
 /*
  * Update fd_small field of fold "fp".
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 checkSmall(
     win_T	*wp,
     fold_T	*fp,
     linenr_T	lnum_off)	// offset for fp->fd_top
 {
-    int		count;
-    int		n;
+    ਪੂਰਨ		ਗਿਣਤੀ_2;
+    ਪੂਰਨ		n;
 
-    if (fp->fd_small != MAYBE)
-	return;
+    ਜੇ (fp->fd_small != MAYBE)
+	ਵਾਪਸ;
 
     // Mark any nested folds to maybe-small
-    setSmallMaybe(&fp->fd_nested);
+    ਸੈੱਟ_Small_Maybe(&fp->fd_nested);
 
-    if (fp->fd_len > wp->w_p_fml)
+    ਜੇ (fp->fd_len > wp->w_p_fml)
 	fp->fd_small = FALSE;
-    else
+    ਨਹੀਂਤਾਂ
     {
-	count = 0;
-	for (n = 0; n < fp->fd_len; ++n)
+	ਗਿਣਤੀ_2 = 0;
+	ਲਈ (n = 0; n < fp->fd_len; ++n)
 	{
-	    count += plines_win_nofold(wp, fp->fd_top + lnum_off + n);
-	    if (count > wp->w_p_fml)
+	    ਗਿਣਤੀ_2 += plines_win_nofold(wp, fp->fd_ਸਿਖਰ + lnum_off + n);
+	    ਜੇ (ਗਿਣਤੀ_2 > wp->w_p_fml)
 	    {
 		fp->fd_small = FALSE;
-		return;
+		ਵਾਪਸ;
 	    }
 	}
 	fp->fd_small = TRUE;
@@ -1727,14 +1727,14 @@ checkSmall(
 /*
  * Set small flags in "gap" to MAYBE.
  */
-    static void
-setSmallMaybe(garray_T *gap)
+    ਸਥਿਰ ਖਾਲੀ
+ਸੈੱਟ_Small_Maybe(garray_T *gap)
 {
-    int		i;
+    ਪੂਰਨ		i;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < gap->ga_len; ++i)
 	fp[i].fd_small = MAYBE;
 }
 
@@ -1743,59 +1743,59 @@ setSmallMaybe(garray_T *gap)
  * Create a fold from line "start" to line "end" (inclusive) in the current
  * window by adding markers.
  */
-    static void
-foldCreateMarkers(linenr_T start, linenr_T end)
+    ਸਥਿਰ ਖਾਲੀ
+foldCreateMarkers(linenr_T ਸ਼ੁਰੂ, linenr_T ਸਿਰਾ)
 {
-    if (!curbuf->b_p_ma)
+    ਜੇ (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	ਵਾਪਸ;
     }
     parseMarker(curwin);
 
-    foldAddMarker(start, curwin->w_p_fmr, foldstartmarkerlen);
-    foldAddMarker(end, foldendmarker, foldendmarkerlen);
+    fold_ਜੋੜੋ_Marker(ਸ਼ੁਰੂ, curwin->w_p_fmr, foldstartmarkerlen);
+    fold_ਜੋੜੋ_Marker(ਸਿਰਾ, foldendmarker, foldendmarkerlen);
 
     // Update both changes here, to avoid all folds after the start are
     // changed when the start marker is inserted and the end isn't.
-    changed_lines(start, (colnr_T)0, end, 0L);
+    ਬਦਲਿਆ_ਸਤਰਾਂ(ਸ਼ੁਰੂ, (colnr_T)0, ਸਿਰਾ, 0L);
 }
 
 // foldAddMarker() {{{2
 /*
  * Add "marker[markerlen]" in 'commentstring' to line "lnum".
  */
-    static void
-foldAddMarker(linenr_T lnum, char_u *marker, int markerlen)
+    ਸਥਿਰ ਖਾਲੀ
+fold_ਜੋੜੋ_Marker(linenr_T lnum, char_u *marker, ਪੂਰਨ markerlen)
 {
     char_u	*cms = curbuf->b_p_cms;
-    char_u	*line;
-    int		line_len;
+    char_u	*ਸਤਰ;
+    ਪੂਰਨ		ਸਤਰ_len;
     char_u	*newline;
-    char_u	*p = (char_u *)strstr((char *)curbuf->b_p_cms, "%s");
-    int		line_is_comment = FALSE;
+    char_u	*p = (char_u *)ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)curbuf->b_p_cms, "%s");
+    ਪੂਰਨ		ਸਤਰ_is_comment = FALSE;
 
     // Allocate a new line: old-line + 'cms'-start + marker + 'cms'-end
-    line = ml_get(lnum);
-    line_len = ml_get_len(lnum);
+    ਸਤਰ = ml_get(lnum);
+    ਸਤਰ_len = ml_get_len(lnum);
 
-    if (u_save(lnum - 1, lnum + 1) != OK)
-	return;
+    ਜੇ (u_save(lnum - 1, lnum + 1) != OK)
+	ਵਾਪਸ;
 
     // Check if the line ends with an unclosed comment
-    (void)skip_comment(line, FALSE, FALSE, &line_is_comment);
-    newline = alloc(line_len + markerlen + STRLEN(cms) + 1);
-    if (newline == NULL)
-	return;
-    STRCPY(newline, line);
+    (ਖਾਲੀ)skip_comment(ਸਤਰ, FALSE, FALSE, &ਸਤਰ_is_comment);
+    newline = alloc(ਸਤਰ_len + markerlen + STRLEN(cms) + 1);
+    ਜੇ (newline == ਨਿਰਾ)
+	ਵਾਪਸ;
+    STRCPY(newline, ਸਤਰ);
     // Append the marker to the end of the line
-    if (p == NULL || line_is_comment)
-	vim_strncpy(newline + line_len, marker, markerlen);
-    else
+    ਜੇ (p == ਨਿਰਾ || ਸਤਰ_is_comment)
+	vim_strncpy(newline + ਸਤਰ_len, marker, markerlen);
+    ਨਹੀਂਤਾਂ
     {
-	STRCPY(newline + line_len, cms);
-	STRNCPY(newline + line_len + (p - cms), marker, markerlen);
-	STRCPY(newline + line_len + (p - cms) + markerlen, p + 2);
+	STRCPY(newline + ਸਤਰ_len, cms);
+	STRNCPY(newline + ਸਤਰ_len + (p - cms), marker, markerlen);
+	STRCPY(newline + ਸਤਰ_len + (p - cms) + markerlen, p + 2);
     }
 
     ml_replace(lnum, newline, FALSE);
@@ -1805,20 +1805,20 @@ foldAddMarker(linenr_T lnum, char_u *marker, int markerlen)
 /*
  * Delete the markers for a fold, causing it to be deleted.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 deleteFoldMarkers(
     fold_T	*fp,
-    int		recursive,
+    ਪੂਰਨ		recursive,
     linenr_T	lnum_off)	// offset for fp->fd_top
 {
-    int		i;
+    ਪੂਰਨ		i;
 
-    if (recursive)
-	for (i = 0; i < fp->fd_nested.ga_len; ++i)
-	    deleteFoldMarkers((fold_T *)fp->fd_nested.ga_data + i, TRUE,
-						       lnum_off + fp->fd_top);
-    foldDelMarker(fp->fd_top + lnum_off, curwin->w_p_fmr, foldstartmarkerlen);
-    foldDelMarker(fp->fd_top + lnum_off + fp->fd_len - 1,
+    ਜੇ (recursive)
+	ਲਈ (i = 0; i < fp->fd_nested.ga_len; ++i)
+	    deleteFoldMarkers((fold_T *)fp->fd_nested.ga_ਅੰਕੜੇ + i, TRUE,
+						       lnum_off + fp->fd_ਸਿਖਰ);
+    foldDelMarker(fp->fd_ਸਿਖਰ + lnum_off, curwin->w_p_fmr, foldstartmarkerlen);
+    foldDelMarker(fp->fd_ਸਿਖਰ + lnum_off + fp->fd_len - 1,
 					     foldendmarker, foldendmarkerlen);
 }
 
@@ -1829,51 +1829,51 @@ deleteFoldMarkers(
  * If the marker is not found, there is no error message.  Could be a missing
  * close-marker.
  */
-    static void
-foldDelMarker(linenr_T lnum, char_u *marker, int markerlen)
+    ਸਥਿਰ ਖਾਲੀ
+foldDelMarker(linenr_T lnum, char_u *marker, ਪੂਰਨ markerlen)
 {
-    char_u	*line;
+    char_u	*ਸਤਰ;
     char_u	*newline;
     char_u	*p;
-    int		len;
+    ਪੂਰਨ		len;
     char_u	*cms = curbuf->b_p_cms;
     char_u	*cms2;
 
     // end marker may be missing and fold extends below the last line
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return;
-    line = ml_get(lnum);
-    for (p = line; *p != NUL; ++p)
-	if (STRNCMP(p, marker, markerlen) == 0)
+    ਜੇ (lnum > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਵਾਪਸ;
+    ਸਤਰ = ml_get(lnum);
+    ਲਈ (p = ਸਤਰ; *p != NUL; ++p)
+	ਜੇ (STRNCMP(p, marker, markerlen) == 0)
 	{
 	    // Found the marker, include a digit if it's there.
 	    len = markerlen;
-	    if (VIM_ISDIGIT(p[len]))
+	    ਜੇ (VIM_ISDIGIT(p[len]))
 		++len;
-	    if (*cms != NUL)
+	    ਜੇ (*cms != NUL)
 	    {
 		// Also delete 'commentstring' if it matches.
-		cms2 = (char_u *)strstr((char *)cms, "%s");
-		if (cms2 != NULL && p - line >= cms2 - cms
+		cms2 = (char_u *)ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)cms, "%s");
+		ਜੇ (cms2 != ਨਿਰਾ && p - ਸਤਰ >= cms2 - cms
 			&& STRNCMP(p - (cms2 - cms), cms, cms2 - cms) == 0
 			&& STRNCMP(p + len, cms2 + 2, STRLEN(cms2 + 2)) == 0)
 		{
 		    p -= cms2 - cms;
-		    len += (int)STRLEN(cms) - 2;
+		    len += (ਪੂਰਨ)STRLEN(cms) - 2;
 		}
 	    }
-	    if (u_save(lnum - 1, lnum + 1) == OK)
+	    ਜੇ (u_save(lnum - 1, lnum + 1) == OK)
 	    {
 		// Make new line: text-before-marker + text-after-marker
 		newline = alloc(ml_get_len(lnum) - len + 1);
-		if (newline != NULL)
+		ਜੇ (newline != ਨਿਰਾ)
 		{
-		    STRNCPY(newline, line, p - line);
-		    STRCPY(newline + (p - line), p + len);
+		    STRNCPY(newline, ਸਤਰ, p - ਸਤਰ);
+		    STRCPY(newline + (p - ਸਤਰ), p + len);
 		    ml_replace(lnum, newline, FALSE);
 		}
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
 }
 
@@ -1891,113 +1891,113 @@ get_foldtext(
     foldinfo_T	*foldinfo,
     char_u	*buf)
 {
-    char_u	*text = NULL;
+    char_u	*ਪਾਠ = ਨਿਰਾ;
 # ifdef FEAT_EVAL
      // an error occurred when evaluating 'fdt' setting
-    static int	    got_fdt_error = FALSE;
-    int		    save_did_emsg = did_emsg;
-    static win_T    *last_wp = NULL;
-    static linenr_T last_lnum = 0;
+    ਸਥਿਰ ਪੂਰਨ	    got_fdt_error = FALSE;
+    ਪੂਰਨ		    save_did_emsg = did_emsg;
+    ਸਥਿਰ win_T    *ਆਖਰੀ_wp = ਨਿਰਾ;
+    ਸਥਿਰ linenr_T ਆਖਰੀ_lnum = 0;
 
-    if (last_wp != wp || last_wp == NULL
-					|| last_lnum > lnum || last_lnum == 0)
+    ਜੇ (ਆਖਰੀ_wp != wp || ਆਖਰੀ_wp == ਨਿਰਾ
+					|| ਆਖਰੀ_lnum > lnum || ਆਖਰੀ_lnum == 0)
 	// window changed, try evaluating foldtext setting once again
 	got_fdt_error = FALSE;
 
-    if (!got_fdt_error)
+    ਜੇ (!got_fdt_error)
 	// a previous error should not abort evaluating 'foldexpr'
 	did_emsg = FALSE;
 
-    if (*wp->w_p_fdt != NUL)
+    ਜੇ (*wp->w_p_fdt != NUL)
     {
 	char_u	dashes[MAX_LEVEL + 2];
-	int	level;
+	ਪੂਰਨ	level;
 	char_u	*p;
 
 	// Set "v:foldstart" and "v:foldend".
-	set_vim_var_nr(VV_FOLDSTART, lnum);
-	set_vim_var_nr(VV_FOLDEND, lnume);
+	ਸੈੱਟ_vim_var_nr(VV_FOLDSTART, lnum);
+	ਸੈੱਟ_vim_var_nr(VV_FOLDEND, lnume);
 
 	// Set "v:folddashes" to a string of "level" dashes.
 	// Set "v:foldlevel" to "level".
 	level = foldinfo->fi_level;
-	if (level > (int)sizeof(dashes) - 1)
-	    level = (int)sizeof(dashes) - 1;
+	ਜੇ (level > (ਪੂਰਨ)ਆਕਾਰ(dashes) - 1)
+	    level = (ਪੂਰਨ)ਆਕਾਰ(dashes) - 1;
 	vim_memset(dashes, '-', (size_t)level);
 	dashes[level] = NUL;
-	set_vim_var_string(VV_FOLDDASHES, dashes, level);
-	set_vim_var_nr(VV_FOLDLEVEL, (long)level);
+	ਸੈੱਟ_vim_var_string(VV_FOLDDASHES, dashes, level);
+	ਸੈੱਟ_vim_var_nr(VV_FOLDLEVEL, (ਲੰਮਾ)level);
 
 	// skip evaluating 'foldtext' on errors
-	if (!got_fdt_error)
+	ਜੇ (!got_fdt_error)
 	{
 	    win_T   *save_curwin = curwin;
 	    sctx_T  saved_sctx = current_sctx;
 
 	    curwin = wp;
-	    curbuf = wp->w_buffer;
+	    curbuf = wp->w_ਬਫਰ;
 	    current_sctx = wp->w_p_script_ctx[WV_FDT];
 
 	    ++emsg_off; // handle exceptions, but don't display errors
-	    text = eval_to_string_safe(wp->w_p_fdt,
-		       was_set_insecurely(wp, (char_u *)"foldtext", OPT_LOCAL),
+	    ਪਾਠ = eval_ਮੰਜ਼ਿਲ_string_ਸੁਰੱਖਿਅਤ(wp->w_p_fdt,
+		       was_ਸੈੱਟ_insecurely(wp, (char_u *)"foldtext", OPT_LOCAL),
 		       TRUE, TRUE);
 	    --emsg_off;
 
-	    if (text == NULL || did_emsg)
+	    ਜੇ (ਪਾਠ == ਨਿਰਾ || did_emsg)
 		got_fdt_error = TRUE;
 
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_ਬਫਰ;
 	    current_sctx = saved_sctx;
 	}
-	last_lnum = lnum;
-	last_wp   = wp;
-	set_vim_var_string(VV_FOLDDASHES, NULL, -1);
+	ਆਖਰੀ_lnum = lnum;
+	ਆਖਰੀ_wp   = wp;
+	ਸੈੱਟ_vim_var_string(VV_FOLDDASHES, ਨਿਰਾ, -1);
 
-	if (!did_emsg && save_did_emsg)
+	ਜੇ (!did_emsg && save_did_emsg)
 	    did_emsg = save_did_emsg;
 
-	if (text != NULL)
+	ਜੇ (ਪਾਠ != ਨਿਰਾ)
 	{
 	    // Replace unprintable characters, if there are any.  But
 	    // replace a TAB with a space.
-	    for (p = text; *p != NUL; ++p)
+	    ਲਈ (p = ਪਾਠ; *p != NUL; ++p)
 	    {
-		int	len;
+		ਪੂਰਨ	len;
 
-		if (has_mbyte && (len = (*mb_ptr2len)(p)) > 1)
+		ਜੇ (has_mbyte && (len = (*mb_ptr2len)(p)) > 1)
 		{
-		    if (!vim_isprintc((*mb_ptr2char)(p)))
-			break;
+		    ਜੇ (!vim_isprintc((*mb_ptr2char)(p)))
+			ਰੋਕੋ;
 		    p += len - 1;
 		}
-		else
-		    if (*p == TAB)
+		ਨਹੀਂਤਾਂ
+		    ਜੇ (*p == TAB)
 			*p = ' ';
-		    else if (ptr2cells(p) > 1)
-			break;
+		    ਨਹੀਂਤਾਂ ਜੇ (ptr2cells(p) > 1)
+			ਰੋਕੋ;
 	    }
-	    if (*p != NUL)
+	    ਜੇ (*p != NUL)
 	    {
-		p = transstr(text);
-		vim_free(text);
-		text = p;
+		p = transstr(ਪਾਠ);
+		vim_free(ਪਾਠ);
+		ਪਾਠ = p;
 	    }
 	}
     }
-    if (text == NULL)
+    ਜੇ (ਪਾਠ == ਨਿਰਾ)
 # endif
     {
-	long count = (long)(lnume - lnum + 1);
+	ਲੰਮਾ ਗਿਣਤੀ_2 = (ਲੰਮਾ)(lnume - lnum + 1);
 
-	vim_snprintf((char *)buf, FOLD_TEXT_LEN,
+	vim_snprintf((ਅੱਖਰ *)buf, FOLD_ਪਾਠ_LEN,
 		     NGETTEXT("+--%3ld line folded ",
-					       "+--%3ld lines folded ", count),
-		     count);
-	text = buf;
+					       "+--%3ld lines folded ", ਗਿਣਤੀ_2),
+		     ਗਿਣਤੀ_2);
+	ਪਾਠ = buf;
     }
-    return text;
+    ਵਾਪਸ ਪਾਠ;
 }
 
 // foldtext_cleanup() {{{2
@@ -2005,87 +2005,87 @@ get_foldtext(
 /*
  * Remove 'foldmarker' and 'commentstring' from "str" (in-place).
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldtext_cleanup(char_u *str)
 {
-    char_u	*cms_start;	// first part or the whole comment
-    int		cms_slen = 0;	// length of cms_start
-    char_u	*cms_end;	// last part of the comment or NULL
-    int		cms_elen = 0;	// length of cms_end
+    char_u	*cms_ਸ਼ੁਰੂ;	// first part or the whole comment
+    ਪੂਰਨ		cms_slen = 0;	// length of cms_start
+    char_u	*cms_ਸਿਰਾ;	// last part of the comment or NULL
+    ਪੂਰਨ		cms_elen = 0;	// length of cms_end
     char_u	*s;
     char_u	*p;
-    int		len;
-    int		did1 = FALSE;
-    int		did2 = FALSE;
+    ਪੂਰਨ		len;
+    ਪੂਰਨ		did1 = FALSE;
+    ਪੂਰਨ		did2 = FALSE;
 
     // Ignore leading and trailing white space in 'commentstring'.
-    cms_start = skipwhite(curbuf->b_p_cms);
-    cms_slen = (int)STRLEN(cms_start);
-    while (cms_slen > 0 && VIM_ISWHITE(cms_start[cms_slen - 1]))
+    cms_ਸ਼ੁਰੂ = skipwhite(curbuf->b_p_cms);
+    cms_slen = (ਪੂਰਨ)STRLEN(cms_ਸ਼ੁਰੂ);
+    ਜਦੋਂ (cms_slen > 0 && VIM_ISWHITE(cms_ਸ਼ੁਰੂ[cms_slen - 1]))
 	--cms_slen;
 
     // locate "%s" in 'commentstring', use the part before and after it.
-    cms_end = (char_u *)strstr((char *)cms_start, "%s");
-    if (cms_end != NULL)
+    cms_ਸਿਰਾ = (char_u *)ਲੜੀ_ਖੋਜ((ਅੱਖਰ *)cms_ਸ਼ੁਰੂ, "%s");
+    ਜੇ (cms_ਸਿਰਾ != ਨਿਰਾ)
     {
-	cms_elen = cms_slen - (int)(cms_end - cms_start);
-	cms_slen = (int)(cms_end - cms_start);
+	cms_elen = cms_slen - (ਪੂਰਨ)(cms_ਸਿਰਾ - cms_ਸ਼ੁਰੂ);
+	cms_slen = (ਪੂਰਨ)(cms_ਸਿਰਾ - cms_ਸ਼ੁਰੂ);
 
 	// exclude white space before "%s"
-	while (cms_slen > 0 && VIM_ISWHITE(cms_start[cms_slen - 1]))
+	ਜਦੋਂ (cms_slen > 0 && VIM_ISWHITE(cms_ਸ਼ੁਰੂ[cms_slen - 1]))
 	    --cms_slen;
 
 	// skip "%s" and white space after it
-	s = skipwhite(cms_end + 2);
-	cms_elen -= (int)(s - cms_end);
-	cms_end = s;
+	s = skipwhite(cms_ਸਿਰਾ + 2);
+	cms_elen -= (ਪੂਰਨ)(s - cms_ਸਿਰਾ);
+	cms_ਸਿਰਾ = s;
     }
     parseMarker(curwin);
 
-    for (s = str; *s != NUL; )
+    ਲਈ (s = str; *s != NUL; )
     {
 	len = 0;
-	if (STRNCMP(s, curwin->w_p_fmr, foldstartmarkerlen) == 0)
+	ਜੇ (STRNCMP(s, curwin->w_p_fmr, foldstartmarkerlen) == 0)
 	    len = foldstartmarkerlen;
-	else if (STRNCMP(s, foldendmarker, foldendmarkerlen) == 0)
+	ਨਹੀਂਤਾਂ ਜੇ (STRNCMP(s, foldendmarker, foldendmarkerlen) == 0)
 	    len = foldendmarkerlen;
-	if (len > 0)
+	ਜੇ (len > 0)
 	{
-	    if (VIM_ISDIGIT(s[len]))
+	    ਜੇ (VIM_ISDIGIT(s[len]))
 		++len;
 
 	    // May remove 'commentstring' start.  Useful when it's a double
 	    // quote and we already removed a double quote.
-	    for (p = s; p > str && VIM_ISWHITE(p[-1]); --p)
+	    ਲਈ (p = s; p > str && VIM_ISWHITE(p[-1]); --p)
 		;
-	    if (p >= str + cms_slen
-			   && STRNCMP(p - cms_slen, cms_start, cms_slen) == 0)
+	    ਜੇ (p >= str + cms_slen
+			   && STRNCMP(p - cms_slen, cms_ਸ਼ੁਰੂ, cms_slen) == 0)
 	    {
-		len += (int)(s - p) + cms_slen;
+		len += (ਪੂਰਨ)(s - p) + cms_slen;
 		s = p - cms_slen;
 	    }
 	}
-	else if (cms_end != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (cms_ਸਿਰਾ != ਨਿਰਾ)
 	{
-	    if (!did1 && cms_slen > 0 && STRNCMP(s, cms_start, cms_slen) == 0)
+	    ਜੇ (!did1 && cms_slen > 0 && STRNCMP(s, cms_ਸ਼ੁਰੂ, cms_slen) == 0)
 	    {
 		len = cms_slen;
 		did1 = TRUE;
 	    }
-	    else if (!did2 && cms_elen > 0
-					&& STRNCMP(s, cms_end, cms_elen) == 0)
+	    ਨਹੀਂਤਾਂ ਜੇ (!did2 && cms_elen > 0
+					&& STRNCMP(s, cms_ਸਿਰਾ, cms_elen) == 0)
 	    {
 		len = cms_elen;
 		did2 = TRUE;
 	    }
 	}
-	if (len != 0)
+	ਜੇ (len != 0)
 	{
-	    while (VIM_ISWHITE(s[len]))
+	    ਜਦੋਂ (VIM_ISWHITE(s[len]))
 		++len;
 	    STRMOVE(s, s + len);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    MB_PTR_ADV(s);
 	}
@@ -2095,99 +2095,99 @@ foldtext_cleanup(char_u *str)
 
 // Folding by indent, expr, marker and syntax. {{{1
 // Define "fline_T", passed to get fold level for a line. {{{2
-typedef struct
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ
 {
-    win_T	*wp;		// window
+    win_T	*wp;		//ਖਿੜਕੀ
     linenr_T	lnum;		// current line number
     linenr_T	off;		// offset between lnum and real line number
     linenr_T	lnum_save;	// line nr used by foldUpdateIEMSRecurse()
-    int		lvl;		// current level (-1 for undefined)
-    int		lvl_next;	// level used for next line
-    int		start;		// number of folds that are forced to start at
+    ਪੂਰਨ		lvl;		// current level (-1 for undefined)
+    ਪੂਰਨ		lvl_ਅਗਲਾ;	// level used for next line
+    ਪੂਰਨ		ਸ਼ੁਰੂ;		// number of folds that are forced to start at
 				// this line.
-    int		end;		// level of fold that is forced to end below
+    ਪੂਰਨ		ਸਿਰਾ;		// level of fold that is forced to end below
 				// this line
-    int		had_end;	// level of fold that is forced to end above
+    ਪੂਰਨ		had_ਸਿਰਾ;	// level of fold that is forced to end above
 				// this line (copy of "end" of prev. line)
 } fline_T;
 
 // Flag is set when redrawing is needed.
-static int fold_changed;
+ਸਥਿਰ ਪੂਰਨ fold_ਬਦਲਿਆ;
 
 // Function declarations. {{{2
-static linenr_T foldUpdateIEMSRecurse(garray_T *gap, int level, linenr_T startlnum, fline_T *flp, void (*getlevel)(fline_T *), linenr_T bot, int topflags);
-static int foldInsert(garray_T *gap, int i);
-static void foldSplit(garray_T *gap, int i, linenr_T top, linenr_T bot);
-static void foldRemove(garray_T *gap, linenr_T top, linenr_T bot);
-static void foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2);
-static void foldlevelIndent(fline_T *flp);
+ਸਥਿਰ linenr_T foldUpdateIEMSRecurse(garray_T *gap, ਪੂਰਨ level, linenr_T startlnum, fline_T *flp, ਖਾਲੀ (*getlevel)(fline_T *), linenr_T bot, ਪੂਰਨ topflags);
+ਸਥਿਰ ਪੂਰਨ fold_ਪਾਓ(garray_T *gap, ਪੂਰਨ i);
+ਸਥਿਰ ਖਾਲੀ fold_ਵੰਡੋ(garray_T *gap, ਪੂਰਨ i, linenr_T ਸਿਖਰ, linenr_T bot);
+ਸਥਿਰ ਖਾਲੀ foldRemove(garray_T *gap, linenr_T ਸਿਖਰ, linenr_T bot);
+ਸਥਿਰ ਖਾਲੀ fold_ਮਿਲਾਓ(fold_T *fp1, garray_T *gap, fold_T *fp2);
+ਸਥਿਰ ਖਾਲੀ foldlevelIndent(fline_T *flp);
 # ifdef FEAT_DIFF
-static void foldlevelDiff(fline_T *flp);
+ਸਥਿਰ ਖਾਲੀ foldlevelDiff(fline_T *flp);
 # endif
-static void foldlevelExpr(fline_T *flp);
-static void foldlevelMarker(fline_T *flp);
-static void foldlevelSyntax(fline_T *flp);
+ਸਥਿਰ ਖਾਲੀ foldlevel_ਵਿਅੰਜਕ(fline_T *flp);
+ਸਥਿਰ ਖਾਲੀ foldlevelMarker(fline_T *flp);
+ਸਥਿਰ ਖਾਲੀ foldlevelSyntax(fline_T *flp);
 
 // foldUpdateIEMS() {{{2
 /*
  * Update the folding for window "wp", at least from lines "top" to "bot".
  * Return TRUE if any folds did change.
  */
-    static void
-foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
+    ਸਥਿਰ ਖਾਲੀ
+foldUpdateIEMS(win_T *wp, linenr_T ਸਿਖਰ, linenr_T bot)
 {
-    linenr_T	start;
-    linenr_T	end;
+    linenr_T	ਸ਼ੁਰੂ;
+    linenr_T	ਸਿਰਾ;
     fline_T	fline;
-    void	(*getlevel)(fline_T *);
-    int		level;
+    ਖਾਲੀ	(*getlevel)(fline_T *);
+    ਪੂਰਨ		level;
     fold_T	*fp;
 
     // Avoid problems when being called recursively.
-    if (invalid_top != (linenr_T)0)
-	return;
+    ਜੇ (invalid_ਸਿਖਰ != (linenr_T)0)
+	ਵਾਪਸ;
 
-    if (wp->w_foldinvalid)
+    ਜੇ (wp->w_foldinvalid)
     {
 	// Need to update all folds.
-	top = 1;
-	bot = wp->w_buffer->b_ml.ml_line_count;
+	ਸਿਖਰ = 1;
+	bot = wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 	wp->w_foldinvalid = false;
 
 	// Mark all folds as maybe-small.
-	setSmallMaybe(&wp->w_folds);
+	ਸੈੱਟ_Small_Maybe(&wp->w_folds);
     }
 
 # ifdef FEAT_DIFF
     // add the context for "diff" folding
-    if (foldmethodIsDiff(wp))
+    ਜੇ (foldmethodIsDiff(wp))
     {
-	if (top > diff_context)
-	    top -= diff_context;
-	else
-	    top = 1;
+	ਜੇ (ਸਿਖਰ > diff_context)
+	    ਸਿਖਰ -= diff_context;
+	ਨਹੀਂਤਾਂ
+	    ਸਿਖਰ = 1;
 	bot += diff_context;
     }
 # endif
 
     // When deleting lines at the end of the buffer "top" can be past the end
     // of the buffer.
-    if (top > wp->w_buffer->b_ml.ml_line_count)
-	top = wp->w_buffer->b_ml.ml_line_count;
+    ਜੇ (ਸਿਖਰ > wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਸਿਖਰ = wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ;
 
-    fold_changed = FALSE;
+    fold_ਬਦਲਿਆ = FALSE;
     fline.wp = wp;
     fline.off = 0;
     fline.lvl = 0;
-    fline.lvl_next = -1;
-    fline.start = 0;
-    fline.end = MAX_LEVEL + 1;
-    fline.had_end = MAX_LEVEL + 1;
+    fline.lvl_ਅਗਲਾ = -1;
+    fline.ਸ਼ੁਰੂ = 0;
+    fline.ਸਿਰਾ = MAX_LEVEL + 1;
+    fline.had_ਸਿਰਾ = MAX_LEVEL + 1;
 
-    invalid_top = top;
+    invalid_ਸਿਖਰ = ਸਿਖਰ;
     invalid_bot = bot;
 
-    if (foldmethodIsMarker(wp))
+    ਜੇ (foldmethodIsMarker(wp))
     {
 	getlevel = foldlevelMarker;
 
@@ -2196,65 +2196,65 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
 
 	// Need to get the level of the line above top, it is used if there is
 	// no marker at the top.
-	if (top > 1)
+	ਜੇ (ਸਿਖਰ > 1)
 	{
 	    // Get the fold level at top - 1.
-	    level = foldLevelWin(wp, top - 1);
+	    level = foldLevelWin(wp, ਸਿਖਰ - 1);
 
 	    // The fold may end just above the top, check for that.
-	    fline.lnum = top - 1;
+	    fline.lnum = ਸਿਖਰ - 1;
 	    fline.lvl = level;
 	    getlevel(&fline);
 
 	    // If a fold started here, we already had the level, if it stops
 	    // here, we need to use lvl_next.  Could also start and end a fold
 	    // in the same line.
-	    if (fline.lvl > level)
-		fline.lvl = level - (fline.lvl - fline.lvl_next);
-	    else
-		fline.lvl = fline.lvl_next;
+	    ਜੇ (fline.lvl > level)
+		fline.lvl = level - (fline.lvl - fline.lvl_ਅਗਲਾ);
+	    ਨਹੀਂਤਾਂ
+		fline.lvl = fline.lvl_ਅਗਲਾ;
 	}
-	fline.lnum = top;
+	fline.lnum = ਸਿਖਰ;
 	getlevel(&fline);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	fline.lnum = top;
-	if (foldmethodIsExpr(wp))
+	fline.lnum = ਸਿਖਰ;
+	ਜੇ (foldmethod_Is_ਵਿਅੰਜਕ(wp))
 	{
-	    getlevel = foldlevelExpr;
+	    getlevel = foldlevel_ਵਿਅੰਜਕ;
 	    // start one line back, because a "<1" may indicate the end of a
 	    // fold in the topline
-	    if (top > 1)
+	    ਜੇ (ਸਿਖਰ > 1)
 		--fline.lnum;
 	}
-	else if (foldmethodIsSyntax(wp))
+	ਨਹੀਂਤਾਂ ਜੇ (foldmethodIsSyntax(wp))
 	    getlevel = foldlevelSyntax;
 # ifdef FEAT_DIFF
-	else if (foldmethodIsDiff(wp))
+	ਨਹੀਂਤਾਂ ਜੇ (foldmethodIsDiff(wp))
 	    getlevel = foldlevelDiff;
 # endif
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    getlevel = foldlevelIndent;
 	    // Start one line back, because if the line above "top" has an
 	    // undefined fold level, folding it relies on the line under it,
 	    // which is "top".
-	    if (top > 1)
+	    ਜੇ (ਸਿਖਰ > 1)
 		--fline.lnum;
 	}
 
 	// Backup to a line for which the fold level is defined.  Since it's
 	// always defined for line one, we will stop there.
 	fline.lvl = -1;
-	for ( ; !got_int; --fline.lnum)
+	ਲਈ ( ; !got_int; --fline.lnum)
 	{
 	    // Reset lvl_next each time, because it will be set to a value for
 	    // the next line, but we search backwards here.
-	    fline.lvl_next = -1;
+	    fline.lvl_ਅਗਲਾ = -1;
 	    getlevel(&fline);
-	    if (fline.lvl >= 0)
-		break;
+	    ਜੇ (fline.lvl >= 0)
+		ਰੋਕੋ;
 	}
     }
 
@@ -2265,103 +2265,103 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
      * appear). To take that into account we should adjust the value of "bot"
      * to point to the end of the current fold:
      */
-    if (foldlevelSyntax == getlevel)
+    ਜੇ (foldlevelSyntax == getlevel)
     {
 	garray_T *gap = &wp->w_folds;
-	fold_T	 *fpn = NULL;
-	int	  current_fdl = 0;
-	linenr_T  fold_start_lnum = 0;
+	fold_T	 *fpn = ਨਿਰਾ;
+	ਪੂਰਨ	  current_fdl = 0;
+	linenr_T  fold_ਸ਼ੁਰੂ_lnum = 0;
 	linenr_T  lnum_rel = fline.lnum;
 
-	while (current_fdl < fline.lvl)
+	ਜਦੋਂ (current_fdl < fline.lvl)
 	{
-	    if (!foldFind(gap, lnum_rel, &fpn))
-		break;
+	    ਜੇ (!fold_ਲੱਭੋ(gap, lnum_rel, &fpn))
+		ਰੋਕੋ;
 	    ++current_fdl;
 
-	    fold_start_lnum += fpn->fd_top;
+	    fold_ਸ਼ੁਰੂ_lnum += fpn->fd_ਸਿਖਰ;
 	    gap = &fpn->fd_nested;
-	    lnum_rel -= fpn->fd_top;
+	    lnum_rel -= fpn->fd_ਸਿਖਰ;
 	}
-	if (fpn != NULL && current_fdl == fline.lvl)
+	ਜੇ (fpn != ਨਿਰਾ && current_fdl == fline.lvl)
 	{
-	    linenr_T fold_end_lnum = fold_start_lnum + fpn->fd_len;
+	    linenr_T fold_ਸਿਰਾ_lnum = fold_ਸ਼ੁਰੂ_lnum + fpn->fd_len;
 
-	    if (fold_end_lnum > bot)
-		bot = fold_end_lnum;
+	    ਜੇ (fold_ਸਿਰਾ_lnum > bot)
+		bot = fold_ਸਿਰਾ_lnum;
 	}
     }
 
-    start = fline.lnum;
-    end = bot;
+    ਸ਼ੁਰੂ = fline.lnum;
+    ਸਿਰਾ = bot;
     // Do at least one line.
-    if (start > end && end < wp->w_buffer->b_ml.ml_line_count)
-	end = start;
-    while (!got_int)
+    ਜੇ (ਸ਼ੁਰੂ > ਸਿਰਾ && ਸਿਰਾ < wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	ਸਿਰਾ = ਸ਼ੁਰੂ;
+    ਜਦੋਂ (!got_int)
     {
 	// Always stop at the end of the file ("end" can be past the end of
 	// the file).
-	if (fline.lnum > wp->w_buffer->b_ml.ml_line_count)
-	    break;
-	if (fline.lnum > end)
+	ਜੇ (fline.lnum > wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਰੋਕੋ;
+	ਜੇ (fline.lnum > ਸਿਰਾ)
 	{
 	    // For "marker", "expr"  and "syntax"  methods: If a change caused
 	    // a fold to be removed, we need to continue at least until where
 	    // it ended.
-	    if (getlevel != foldlevelMarker
+	    ਜੇ (getlevel != foldlevelMarker
 		    && getlevel != foldlevelSyntax
-		    && getlevel != foldlevelExpr)
-		break;
-	    if ((start <= end
-			&& foldFind(&wp->w_folds, end, &fp)
-			&& fp->fd_top + fp->fd_len - 1 > end)
+		    && getlevel != foldlevel_ਵਿਅੰਜਕ)
+		ਰੋਕੋ;
+	    ਜੇ ((ਸ਼ੁਰੂ <= ਸਿਰਾ
+			&& fold_ਲੱਭੋ(&wp->w_folds, ਸਿਰਾ, &fp)
+			&& fp->fd_ਸਿਖਰ + fp->fd_len - 1 > ਸਿਰਾ)
 		    || (fline.lvl == 0
-			&& foldFind(&wp->w_folds, fline.lnum, &fp)
-			&& fp->fd_top < fline.lnum))
-		end = fp->fd_top + fp->fd_len - 1;
-	    else if (getlevel == foldlevelSyntax
+			&& fold_ਲੱਭੋ(&wp->w_folds, fline.lnum, &fp)
+			&& fp->fd_ਸਿਖਰ < fline.lnum))
+		ਸਿਰਾ = fp->fd_ਸਿਖਰ + fp->fd_len - 1;
+	    ਨਹੀਂਤਾਂ ਜੇ (getlevel == foldlevelSyntax
 		    && foldLevelWin(wp, fline.lnum) != fline.lvl)
 		// For "syntax" method: Compare the foldlevel that the syntax
 		// tells us to the foldlevel from the existing folds.  If they
 		// don't match continue updating folds.
-		end = fline.lnum;
-	    else
-		break;
+		ਸਿਰਾ = fline.lnum;
+	    ਨਹੀਂਤਾਂ
+		ਰੋਕੋ;
 	}
 
 	// A level 1 fold starts at a line with foldlevel > 0.
-	if (fline.lvl > 0)
+	ਜੇ (fline.lvl > 0)
 	{
-	    invalid_top = fline.lnum;
-	    invalid_bot = end;
-	    end = foldUpdateIEMSRecurse(&wp->w_folds,
-				   1, start, &fline, getlevel, end, FD_LEVEL);
-	    start = fline.lnum;
+	    invalid_ਸਿਖਰ = fline.lnum;
+	    invalid_bot = ਸਿਰਾ;
+	    ਸਿਰਾ = foldUpdateIEMSRecurse(&wp->w_folds,
+				   1, ਸ਼ੁਰੂ, &fline, getlevel, ਸਿਰਾ, FD_LEVEL);
+	    ਸ਼ੁਰੂ = fline.lnum;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    if (fline.lnum == wp->w_buffer->b_ml.ml_line_count)
-		break;
+	    ਜੇ (fline.lnum == wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+		ਰੋਕੋ;
 	    ++fline.lnum;
-	    fline.lvl = fline.lvl_next;
+	    fline.lvl = fline.lvl_ਅਗਲਾ;
 	    getlevel(&fline);
 	}
     }
 
     // There can't be any folds from start until end now.
-    foldRemove(&wp->w_folds, start, end);
+    foldRemove(&wp->w_folds, ਸ਼ੁਰੂ, ਸਿਰਾ);
 
     // If some fold changed, need to redraw and position cursor.
-    if (fold_changed && wp->w_p_fen)
-	changed_window_setting_win(wp);
+    ਜੇ (fold_ਬਦਲਿਆ && wp->w_p_fen)
+	ਬਦਲਿਆ_ਖਿੜਕੀ_setting_win(wp);
 
     // If we updated folds past "bot", need to redraw more lines.  Don't do
     // this in other situations, the changed lines will be redrawn anyway and
     // this method can cause the whole window to be updated.
-    if (end != bot)
-	redraw_win_range_later(wp, top, end);
+    ਜੇ (ਸਿਰਾ != bot)
+	redraw_win_range_later(wp, ਸਿਖਰ, ਸਿਰਾ);
 
-    invalid_top = (linenr_T)0;
+    invalid_ਸਿਖਰ = (linenr_T)0;
 }
 
 // foldUpdateIEMSRecurse() {{{2
@@ -2388,26 +2388,26 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
  * Returns bot, which may have been increased for lines that also need to be
  * updated as a result of a detected change in the fold.
  */
-    static linenr_T
+    ਸਥਿਰ linenr_T
 foldUpdateIEMSRecurse(
     garray_T	*gap,
-    int		level,
+    ਪੂਰਨ		level,
     linenr_T	startlnum,
     fline_T	*flp,
-    void	(*getlevel)(fline_T *),
+    ਖਾਲੀ	(*getlevel)(fline_T *),
     linenr_T	bot,
-    int		topflags)	// flags used by containing fold
+    ਪੂਰਨ		topflags)	// flags used by containing fold
 {
     linenr_T	ll;
-    fold_T	*fp = NULL;
+    fold_T	*fp = ਨਿਰਾ;
     fold_T	*fp2;
-    int		lvl = level;
+    ਪੂਰਨ		lvl = level;
     linenr_T	startlnum2 = startlnum;
     linenr_T	firstlnum = flp->lnum;	// first lnum we got
-    int		i;
-    int		finish = FALSE;
-    linenr_T	linecount = flp->wp->w_buffer->b_ml.ml_line_count - flp->off;
-    int		concat;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		ਅੰਤ = FALSE;
+    linenr_T	linecount = flp->wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ - flp->off;
+    ਪੂਰਨ		concat;
 
     /*
      * If using the marker method, the start line is not the start of a fold
@@ -2415,13 +2415,13 @@ foldUpdateIEMSRecurse(
      * the previous fold.  But ignore a fold that starts at or below
      * startlnum, it must be deleted.
      */
-    if (getlevel == foldlevelMarker && flp->start <= flp->lvl - level
+    ਜੇ (getlevel == foldlevelMarker && flp->ਸ਼ੁਰੂ <= flp->lvl - level
 							      && flp->lvl > 0)
     {
-	(void)foldFind(gap, startlnum - 1, &fp);
-	if (fp != NULL && (fp >= ((fold_T *)gap->ga_data) + gap->ga_len
-						   || fp->fd_top >= startlnum))
-	    fp = NULL;
+	(ਖਾਲੀ)fold_ਲੱਭੋ(gap, startlnum - 1, &fp);
+	ਜੇ (fp != ਨਿਰਾ && (fp >= ((fold_T *)gap->ga_ਅੰਕੜੇ) + gap->ga_len
+						   || fp->fd_ਸਿਖਰ >= startlnum))
+	    fp = ਨਿਰਾ;
     }
 
     /*
@@ -2436,124 +2436,124 @@ foldUpdateIEMSRecurse(
      * valid, thus "flp->lnum_save" is equal to "flp->lnum".
      */
     flp->lnum_save = flp->lnum;
-    while (!got_int)
+    ਜਦੋਂ (!got_int)
     {
 	// Updating folds can be slow, check for CTRL-C.
-	line_breakcheck();
+	ਸਤਰ_breakcheck();
 
 	// Set "lvl" to the level of line "flp->lnum".  When flp->start is set
 	// and after the first line of the fold, set the level to zero to
 	// force the fold to end.  Do the same when had_end is set: Previous
 	// line was marked as end of a fold.
 	lvl = flp->lvl;
-	if (lvl > MAX_LEVEL)
+	ਜੇ (lvl > MAX_LEVEL)
 	    lvl = MAX_LEVEL;
-	if (flp->lnum > firstlnum
-		&& (level > lvl - flp->start || level >= flp->had_end))
+	ਜੇ (flp->lnum > firstlnum
+		&& (level > lvl - flp->ਸ਼ੁਰੂ || level >= flp->had_ਸਿਰਾ))
 	    lvl = 0;
 
-	if (flp->lnum > bot && !finish && fp != NULL)
+	ਜੇ (flp->lnum > bot && !ਅੰਤ && fp != ਨਿਰਾ)
 	{
 	    // For "marker" and "syntax" methods:
 	    // - If a change caused a nested fold to be removed, we need to
 	    //   delete it and continue at least until where it ended.
 	    // - If a change caused a nested fold to be created, or this fold
 	    //   to continue below its original end, need to finish this fold.
-	    if (getlevel != foldlevelMarker
-		    && getlevel != foldlevelExpr
+	    ਜੇ (getlevel != foldlevelMarker
+		    && getlevel != foldlevel_ਵਿਅੰਜਕ
 		    && getlevel != foldlevelSyntax)
-		break;
+		ਰੋਕੋ;
 	    i = 0;
 	    fp2 = fp;
-	    if (lvl >= level)
+	    ਜੇ (lvl >= level)
 	    {
 		// Compute how deep the folds currently are, if it's deeper
 		// than "lvl" then some must be deleted, need to update
 		// at least one nested fold.
-		ll = flp->lnum - fp->fd_top;
-		while (foldFind(&fp2->fd_nested, ll, &fp2))
+		ll = flp->lnum - fp->fd_ਸਿਖਰ;
+		ਜਦੋਂ (fold_ਲੱਭੋ(&fp2->fd_nested, ll, &fp2))
 		{
 		    ++i;
-		    ll -= fp2->fd_top;
+		    ll -= fp2->fd_ਸਿਖਰ;
 		}
 	    }
-	    if (lvl < level + i)
+	    ਜੇ (lvl < level + i)
 	    {
-		(void)foldFind(&fp->fd_nested, flp->lnum - fp->fd_top, &fp2);
-		if (fp2 != NULL)
-		    bot = fp2->fd_top + fp2->fd_len - 1 + fp->fd_top;
+		(ਖਾਲੀ)fold_ਲੱਭੋ(&fp->fd_nested, flp->lnum - fp->fd_ਸਿਖਰ, &fp2);
+		ਜੇ (fp2 != ਨਿਰਾ)
+		    bot = fp2->fd_ਸਿਖਰ + fp2->fd_len - 1 + fp->fd_ਸਿਖਰ;
 	    }
-	    else if (fp->fd_top + fp->fd_len <= flp->lnum && lvl >= level)
-		finish = TRUE;
-	    else
-		break;
+	    ਨਹੀਂਤਾਂ ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len <= flp->lnum && lvl >= level)
+		ਅੰਤ = TRUE;
+	    ਨਹੀਂਤਾਂ
+		ਰੋਕੋ;
 	}
 
 	// At the start of the first nested fold and at the end of the current
 	// fold: check if existing folds at this level, before the current
 	// one, need to be deleted or truncated.
-	if (fp == NULL
+	ਜੇ (fp == ਨਿਰਾ
 		&& (lvl != level
 		    || flp->lnum_save >= bot
-		    || flp->start != 0
-		    || flp->had_end <= MAX_LEVEL
+		    || flp->ਸ਼ੁਰੂ != 0
+		    || flp->had_ਸਿਰਾ <= MAX_LEVEL
 		    || flp->lnum == linecount))
 	{
 	    /*
 	     * Remove or update folds that have lines between startlnum and
 	     * firstlnum.
 	     */
-	    while (!got_int)
+	    ਜਦੋਂ (!got_int)
 	    {
 		// set concat to 1 if it's allowed to concatenate this fold
 		// with a previous one that touches it.
-		if (flp->start != 0 || flp->had_end <= MAX_LEVEL)
+		ਜੇ (flp->ਸ਼ੁਰੂ != 0 || flp->had_ਸਿਰਾ <= MAX_LEVEL)
 		    concat = 0;
-		else
+		ਨਹੀਂਤਾਂ
 		    concat = 1;
 
 		// Find an existing fold to re-use.  Preferably one that
 		// includes startlnum, otherwise one that ends just before
 		// startlnum or starts after it.
-		if (gap->ga_len > 0 && (foldFind(gap, startlnum, &fp)
-			|| (fp < ((fold_T *)gap->ga_data) + gap->ga_len
-			    && fp->fd_top <= firstlnum)
-			|| foldFind(gap, firstlnum - concat, &fp)
-			|| (fp < ((fold_T *)gap->ga_data) + gap->ga_len
-			    && ((lvl < level && fp->fd_top < flp->lnum)
+		ਜੇ (gap->ga_len > 0 && (fold_ਲੱਭੋ(gap, startlnum, &fp)
+			|| (fp < ((fold_T *)gap->ga_ਅੰਕੜੇ) + gap->ga_len
+			    && fp->fd_ਸਿਖਰ <= firstlnum)
+			|| fold_ਲੱਭੋ(gap, firstlnum - concat, &fp)
+			|| (fp < ((fold_T *)gap->ga_ਅੰਕੜੇ) + gap->ga_len
+			    && ((lvl < level && fp->fd_ਸਿਖਰ < flp->lnum)
 				|| (lvl >= level
-					   && fp->fd_top <= flp->lnum_save)))))
+					   && fp->fd_ਸਿਖਰ <= flp->lnum_save)))))
 		{
-		    if (fp->fd_top + fp->fd_len + concat > firstlnum)
+		    ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len + concat > firstlnum)
 		    {
 			// Use existing fold for the new fold.  If it starts
 			// before where we started looking, extend it.  If it
 			// starts at another line, update nested folds to keep
 			// their position, compensating for the new fd_top.
-			if (fp->fd_top == firstlnum)
+			ਜੇ (fp->fd_ਸਿਖਰ == firstlnum)
 			{
 			    // have found a fold beginning where we want
 			}
-			else if (fp->fd_top >= startlnum)
+			ਨਹੀਂਤਾਂ ਜੇ (fp->fd_ਸਿਖਰ >= startlnum)
 			{
-			    if (fp->fd_top > firstlnum)
+			    ਜੇ (fp->fd_ਸਿਖਰ > firstlnum)
 				// like lines are inserted
 				foldMarkAdjustRecurse(&fp->fd_nested,
 					(linenr_T)0, (linenr_T)MAXLNUM,
-					(long)(fp->fd_top - firstlnum), 0L);
-			    else
+					(ਲੰਮਾ)(fp->fd_ਸਿਖਰ - firstlnum), 0L);
+			    ਨਹੀਂਤਾਂ
 				// like lines are deleted
 				foldMarkAdjustRecurse(&fp->fd_nested,
 					(linenr_T)0,
-					(long)(firstlnum - fp->fd_top - 1),
+					(ਲੰਮਾ)(firstlnum - fp->fd_ਸਿਖਰ - 1),
 					(linenr_T)MAXLNUM,
-					(long)(fp->fd_top - firstlnum));
-			    fp->fd_len += fp->fd_top - firstlnum;
-			    fp->fd_top = firstlnum;
+					(ਲੰਮਾ)(fp->fd_ਸਿਖਰ - firstlnum));
+			    fp->fd_len += fp->fd_ਸਿਖਰ - firstlnum;
+			    fp->fd_ਸਿਖਰ = firstlnum;
 			    fp->fd_small = MAYBE;
-			    fold_changed = TRUE;
+			    fold_ਬਦਲਿਆ = TRUE;
 			}
-			else if ((flp->start != 0 && lvl == level)
+			ਨਹੀਂਤਾਂ ਜੇ ((flp->ਸ਼ੁਰੂ != 0 && lvl == level)
 						     || firstlnum != startlnum)
 			{
 			    linenr_T breakstart;
@@ -2575,149 +2575,149 @@ foldUpdateIEMSRecurse(
 			     * range.
 			     * Any splits have to be done recursively.
 			     */
-			    if (firstlnum != startlnum)
+			    ਜੇ (firstlnum != startlnum)
 			    {
 				breakstart = startlnum;
 				breakend = firstlnum;
 			    }
-			    else
+			    ਨਹੀਂਤਾਂ
 			    {
 				breakstart = flp->lnum;
 				breakend = flp->lnum;
 			    }
-			    foldRemove(&fp->fd_nested, breakstart - fp->fd_top,
-						      breakend - fp->fd_top);
-			    i = (int)(fp - (fold_T *)gap->ga_data);
-			    foldSplit(gap, i, breakstart, breakend - 1);
-			    fp = (fold_T *)gap->ga_data + i + 1;
+			    foldRemove(&fp->fd_nested, breakstart - fp->fd_ਸਿਖਰ,
+						      breakend - fp->fd_ਸਿਖਰ);
+			    i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
+			    fold_ਵੰਡੋ(gap, i, breakstart, breakend - 1);
+			    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i + 1;
 
 			    // If using the "marker" or "syntax" method, we
 			    // need to continue until the end of the fold is
 			    // found.
-			    if (getlevel == foldlevelMarker
-				    || getlevel == foldlevelExpr
+			    ਜੇ (getlevel == foldlevelMarker
+				    || getlevel == foldlevel_ਵਿਅੰਜਕ
 				    || getlevel == foldlevelSyntax)
-				finish = TRUE;
+				ਅੰਤ = TRUE;
 			}
 
-			if (fp->fd_top == startlnum && concat)
+			ਜੇ (fp->fd_ਸਿਖਰ == startlnum && concat)
 			{
-			    i = (int)(fp - (fold_T *)gap->ga_data);
-			    if (i != 0)
+			    i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
+			    ਜੇ (i != 0)
 			    {
 				fp2 = fp - 1;
-				if (fp2->fd_top + fp2->fd_len == fp->fd_top)
+				ਜੇ (fp2->fd_ਸਿਖਰ + fp2->fd_len == fp->fd_ਸਿਖਰ)
 				{
-				    foldMerge(fp2, gap, fp);
+				    fold_ਮਿਲਾਓ(fp2, gap, fp);
 				    fp = fp2;
 				}
 			    }
 			}
-			break;
+			ਰੋਕੋ;
 		    }
-		    if (fp->fd_top >= startlnum)
+		    ਜੇ (fp->fd_ਸਿਖਰ >= startlnum)
 		    {
 			// A fold that starts at or after startlnum and stops
 			// before the new fold must be deleted.  Continue
 			// looking for the next one.
-			deleteFoldEntry(gap,
-				     (int)(fp - (fold_T *)gap->ga_data), TRUE);
+			delete_Fold_ਇੰਦਰਾਜ(gap,
+				     (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ), TRUE);
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 		    {
 			// A fold has some lines above startlnum, truncate it
 			// to stop just above startlnum.
-			fp->fd_len = startlnum - fp->fd_top;
+			fp->fd_len = startlnum - fp->fd_ਸਿਖਰ;
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				fp->fd_len, (linenr_T)MAXLNUM,
 						       (linenr_T)MAXLNUM, 0L);
-			fold_changed = TRUE;
+			fold_ਬਦਲਿਆ = TRUE;
 		    }
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // Insert new fold.  Careful: ga_data may be NULL and it
 		    // may change!
-		    if (gap->ga_len == 0)
+		    ਜੇ (gap->ga_len == 0)
 			i = 0;
-		    else
-			i = (int)(fp - (fold_T *)gap->ga_data);
-		    if (foldInsert(gap, i) != OK)
-			return bot;
-		    fp = (fold_T *)gap->ga_data + i;
+		    ਨਹੀਂਤਾਂ
+			i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
+		    ਜੇ (fold_ਪਾਓ(gap, i) != OK)
+			ਵਾਪਸ bot;
+		    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
 		    // The new fold continues until bot, unless we find the
 		    // end earlier.
-		    fp->fd_top = firstlnum;
+		    fp->fd_ਸਿਖਰ = firstlnum;
 		    fp->fd_len = bot - firstlnum + 1;
 		    // When the containing fold is open, the new fold is open.
 		    // The new fold is closed if the fold above it is closed.
 		    // The first fold depends on the containing fold.
-		    if (topflags == FD_OPEN)
+		    ਜੇ (topflags == FD_OPEN)
 		    {
 			flp->wp->w_fold_manual = true;
 			fp->fd_flags = FD_OPEN;
 		    }
-		    else if (i <= 0)
+		    ਨਹੀਂਤਾਂ ਜੇ (i <= 0)
 		    {
 			fp->fd_flags = topflags;
-			if (topflags != FD_LEVEL)
+			ਜੇ (topflags != FD_LEVEL)
 			    flp->wp->w_fold_manual = true;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			fp->fd_flags = (fp - 1)->fd_flags;
 		    fp->fd_small = MAYBE;
 		    // If using the "marker", "expr" or "syntax" method, we
 		    // need to continue until the end of the fold is found.
-		    if (getlevel == foldlevelMarker
-			    || getlevel == foldlevelExpr
+		    ਜੇ (getlevel == foldlevelMarker
+			    || getlevel == foldlevel_ਵਿਅੰਜਕ
 			    || getlevel == foldlevelSyntax)
-			finish = TRUE;
-		    fold_changed = TRUE;
-		    break;
+			ਅੰਤ = TRUE;
+		    fold_ਬਦਲਿਆ = TRUE;
+		    ਰੋਕੋ;
 		}
 	    }
 	}
 
-	if (lvl < level || flp->lnum > linecount)
+	ਜੇ (lvl < level || flp->lnum > linecount)
 	{
 	    /*
 	     * Found a line with a lower foldlevel, this fold ends just above
 	     * "flp->lnum".
 	     */
-	    break;
+	    ਰੋਕੋ;
 	}
 
 	/*
 	 * The fold includes the line "flp->lnum" and "flp->lnum_save".
 	 * Check "fp" for safety.
 	 */
-	if (lvl > level && fp != NULL)
+	ਜੇ (lvl > level && fp != ਨਿਰਾ)
 	{
 	    /*
 	     * There is a nested fold, handle it recursively.
 	     */
 	    // At least do one line (can happen when finish is TRUE).
-	    if (bot < flp->lnum)
+	    ਜੇ (bot < flp->lnum)
 		bot = flp->lnum;
 
 	    // Line numbers in the nested fold are relative to the start of
 	    // this fold.
-	    flp->lnum = flp->lnum_save - fp->fd_top;
-	    flp->off += fp->fd_top;
-	    i = (int)(fp - (fold_T *)gap->ga_data);
+	    flp->lnum = flp->lnum_save - fp->fd_ਸਿਖਰ;
+	    flp->off += fp->fd_ਸਿਖਰ;
+	    i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
 	    bot = foldUpdateIEMSRecurse(&fp->fd_nested, level + 1,
-				       startlnum2 - fp->fd_top, flp, getlevel,
-					      bot - fp->fd_top, fp->fd_flags);
-	    fp = (fold_T *)gap->ga_data + i;
-	    flp->lnum += fp->fd_top;
-	    flp->lnum_save += fp->fd_top;
-	    flp->off -= fp->fd_top;
-	    bot += fp->fd_top;
+				       startlnum2 - fp->fd_ਸਿਖਰ, flp, getlevel,
+					      bot - fp->fd_ਸਿਖਰ, fp->fd_flags);
+	    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
+	    flp->lnum += fp->fd_ਸਿਖਰ;
+	    flp->lnum_save += fp->fd_ਸਿਖਰ;
+	    flp->off -= fp->fd_ਸਿਖਰ;
+	    bot += fp->fd_ਸਿਖਰ;
 	    startlnum2 = flp->lnum;
 
 	    // This fold may end at the same line, don't incr. flp->lnum.
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
 	    /*
 	     * Get the level of the next line, then continue the loop to check
@@ -2727,22 +2727,22 @@ foldUpdateIEMSRecurse(
 	     */
 	    flp->lnum = flp->lnum_save;
 	    ll = flp->lnum + 1;
-	    while (!got_int)
+	    ਜਦੋਂ (!got_int)
 	    {
 		// Make the previous level available to foldlevel().
 		prev_lnum = flp->lnum;
 		prev_lnum_lvl = flp->lvl;
 
-		if (++flp->lnum > linecount)
-		    break;
-		flp->lvl = flp->lvl_next;
+		ਜੇ (++flp->lnum > linecount)
+		    ਰੋਕੋ;
+		flp->lvl = flp->lvl_ਅਗਲਾ;
 		getlevel(flp);
-		if (flp->lvl >= 0 || flp->had_end <= MAX_LEVEL)
-		    break;
+		ਜੇ (flp->lvl >= 0 || flp->had_ਸਿਰਾ <= MAX_LEVEL)
+		    ਰੋਕੋ;
 	    }
 	    prev_lnum = 0;
-	    if (flp->lnum > linecount)
-		break;
+	    ਜੇ (flp->lnum > linecount)
+		ਰੋਕੋ;
 
 	    // leave flp->lnum_save to lnum of the line that was used to get
 	    // the level, flp->lnum to the lnum of the next line.
@@ -2751,8 +2751,8 @@ foldUpdateIEMSRecurse(
 	}
     }
 
-    if (fp == NULL)	// only happens when got_int is set
-	return bot;
+    ਜੇ (fp == ਨਿਰਾ)	// only happens when got_int is set
+	ਵਾਪਸ bot;
 
     /*
      * Get here when:
@@ -2761,90 +2761,90 @@ foldUpdateIEMSRecurse(
      */
 
     // Current fold at least extends until lnum.
-    if (fp->fd_len < flp->lnum - fp->fd_top)
+    ਜੇ (fp->fd_len < flp->lnum - fp->fd_ਸਿਖਰ)
     {
-	fp->fd_len = flp->lnum - fp->fd_top;
+	fp->fd_len = flp->lnum - fp->fd_ਸਿਖਰ;
 	fp->fd_small = MAYBE;
-	fold_changed = TRUE;
+	fold_ਬਦਲਿਆ = TRUE;
     }
-    else if (fp->fd_top + fp->fd_len > linecount)
+    ਨਹੀਂਤਾਂ ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len > linecount)
 	// running into the end of the buffer (deleted last line)
-	fp->fd_len = linecount - fp->fd_top + 1;
+	fp->fd_len = linecount - fp->fd_ਸਿਖਰ + 1;
 
     // Delete contained folds from the end of the last one found until where
     // we stopped looking.
-    foldRemove(&fp->fd_nested, startlnum2 - fp->fd_top,
-						  flp->lnum - 1 - fp->fd_top);
+    foldRemove(&fp->fd_nested, startlnum2 - fp->fd_ਸਿਖਰ,
+						  flp->lnum - 1 - fp->fd_ਸਿਖਰ);
 
-    if (lvl < level)
+    ਜੇ (lvl < level)
     {
 	// End of fold found, update the length when it got shorter.
-	if (fp->fd_len != flp->lnum - fp->fd_top)
+	ਜੇ (fp->fd_len != flp->lnum - fp->fd_ਸਿਖਰ)
 	{
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len - 1 > bot)
 	    {
 		// fold continued below bot
-		if (getlevel == foldlevelMarker
-			|| getlevel == foldlevelExpr
+		ਜੇ (getlevel == foldlevelMarker
+			|| getlevel == foldlevel_ਵਿਅੰਜਕ
 			|| getlevel == foldlevelSyntax)
 		{
 		    // marker method: truncate the fold and make sure the
 		    // previously included lines are processed again
-		    bot = fp->fd_top + fp->fd_len - 1;
-		    fp->fd_len = flp->lnum - fp->fd_top;
+		    bot = fp->fd_ਸਿਖਰ + fp->fd_len - 1;
+		    fp->fd_len = flp->lnum - fp->fd_ਸਿਖਰ;
 		}
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    // indent or expr method: split fold to create a new one
 		    // below bot
-		    i = (int)(fp - (fold_T *)gap->ga_data);
-		    foldSplit(gap, i, flp->lnum, bot);
-		    fp = (fold_T *)gap->ga_data + i;
+		    i = (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ);
+		    fold_ਵੰਡੋ(gap, i, flp->lnum, bot);
+		    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
 		}
 	    }
-	    else
-		fp->fd_len = flp->lnum - fp->fd_top;
-	    fold_changed = TRUE;
+	    ਨਹੀਂਤਾਂ
+		fp->fd_len = flp->lnum - fp->fd_ਸਿਖਰ;
+	    fold_ਬਦਲਿਆ = TRUE;
 	}
     }
 
     // delete following folds that end before the current line
-    for (;;)
+    ਲਈ (;;)
     {
 	fp2 = fp + 1;
-	if (fp2 >= (fold_T *)gap->ga_data + gap->ga_len
-						  || fp2->fd_top > flp->lnum)
-	    break;
-	if (fp2->fd_top + fp2->fd_len > flp->lnum)
+	ਜੇ (fp2 >= (fold_T *)gap->ga_ਅੰਕੜੇ + gap->ga_len
+						  || fp2->fd_ਸਿਖਰ > flp->lnum)
+	    ਰੋਕੋ;
+	ਜੇ (fp2->fd_ਸਿਖਰ + fp2->fd_len > flp->lnum)
 	{
-	    if (fp2->fd_top < flp->lnum)
+	    ਜੇ (fp2->fd_ਸਿਖਰ < flp->lnum)
 	    {
 		// Make fold that includes lnum start at lnum.
 		foldMarkAdjustRecurse(&fp2->fd_nested,
-			(linenr_T)0, (long)(flp->lnum - fp2->fd_top - 1),
-			(linenr_T)MAXLNUM, (long)(fp2->fd_top - flp->lnum));
-		fp2->fd_len -= flp->lnum - fp2->fd_top;
-		fp2->fd_top = flp->lnum;
-		fold_changed = TRUE;
+			(linenr_T)0, (ਲੰਮਾ)(flp->lnum - fp2->fd_ਸਿਖਰ - 1),
+			(linenr_T)MAXLNUM, (ਲੰਮਾ)(fp2->fd_ਸਿਖਰ - flp->lnum));
+		fp2->fd_len -= flp->lnum - fp2->fd_ਸਿਖਰ;
+		fp2->fd_ਸਿਖਰ = flp->lnum;
+		fold_ਬਦਲਿਆ = TRUE;
 	    }
 
-	    if (lvl >= level)
+	    ਜੇ (lvl >= level)
 	    {
 		// merge new fold with existing fold that follows
-		foldMerge(fp, gap, fp2);
+		fold_ਮਿਲਾਓ(fp, gap, fp2);
 	    }
-	    break;
+	    ਰੋਕੋ;
 	}
-	fold_changed = TRUE;
-	deleteFoldEntry(gap, (int)(fp2 - (fold_T *)gap->ga_data), TRUE);
+	fold_ਬਦਲਿਆ = TRUE;
+	delete_Fold_ਇੰਦਰਾਜ(gap, (ਪੂਰਨ)(fp2 - (fold_T *)gap->ga_ਅੰਕੜੇ), TRUE);
     }
 
     // Need to redraw the lines we inspected, which might be further down than
     // was asked for.
-    if (bot < flp->lnum - 1)
+    ਜੇ (bot < flp->lnum - 1)
 	bot = flp->lnum - 1;
 
-    return bot;
+    ਵਾਪਸ bot;
 }
 
 // foldInsert() {{{2
@@ -2852,19 +2852,19 @@ foldUpdateIEMSRecurse(
  * Insert a new fold in "gap" at position "i".
  * Returns OK for success, FAIL for failure.
  */
-    static int
-foldInsert(garray_T *gap, int i)
+    ਸਥਿਰ ਪੂਰਨ
+fold_ਪਾਓ(garray_T *gap, ਪੂਰਨ i)
 {
     fold_T	*fp;
 
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    fp = (fold_T *)gap->ga_data + i;
-    if (gap->ga_len > 0 && i < gap->ga_len)
-	mch_memmove(fp + 1, fp, sizeof(fold_T) * (gap->ga_len - i));
+    ਜੇ (ga_grow(gap, 1) == FAIL)
+	ਵਾਪਸ FAIL;
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
+    ਜੇ (gap->ga_len > 0 && i < gap->ga_len)
+	mch_memmove(fp + 1, fp, ਆਕਾਰ(fold_T) * (gap->ga_len - i));
     ++gap->ga_len;
-    ga_init2(&fp->fd_nested, sizeof(fold_T), 10);
-    return OK;
+    ga_init2(&fp->fd_nested, ਆਕਾਰ(fold_T), 10);
+    ਵਾਪਸ OK;
 }
 
 // foldSplit() {{{2
@@ -2875,26 +2875,26 @@ foldInsert(garray_T *gap, int i)
  * The caller must first have taken care of any nested folds from "top" to
  * "bot"!
  */
-    static void
-foldSplit(
+    ਸਥਿਰ ਖਾਲੀ
+fold_ਵੰਡੋ(
     garray_T	*gap,
-    int		i,
-    linenr_T	top,
+    ਪੂਰਨ		i,
+    linenr_T	ਸਿਖਰ,
     linenr_T	bot)
 {
     fold_T	*fp;
     fold_T	*fp2;
     garray_T	*gap1;
     garray_T	*gap2;
-    int		idx;
-    int		len;
+    ਪੂਰਨ		idx;
+    ਪੂਰਨ		len;
 
     // The fold continues below bot, need to split it.
-    if (foldInsert(gap, i + 1) == FAIL)
-	return;
-    fp = (fold_T *)gap->ga_data + i;
-    fp[1].fd_top = bot + 1;
-    fp[1].fd_len = fp->fd_len - (fp[1].fd_top - fp->fd_top);
+    ਜੇ (fold_ਪਾਓ(gap, i + 1) == FAIL)
+	ਵਾਪਸ;
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ + i;
+    fp[1].fd_ਸਿਖਰ = bot + 1;
+    fp[1].fd_len = fp->fd_len - (fp[1].fd_ਸਿਖਰ - fp->fd_ਸਿਖਰ);
     fp[1].fd_flags = fp->fd_flags;
     fp[1].fd_small = MAYBE;
     fp->fd_small = MAYBE;
@@ -2903,24 +2903,24 @@ foldSplit(
     // any between top and bot, they have been removed by the caller.
     gap1 = &fp->fd_nested;
     gap2 = &fp[1].fd_nested;
-    (void)foldFind(gap1, bot + 1 - fp->fd_top, &fp2);
-    if (fp2 != NULL)
+    (ਖਾਲੀ)fold_ਲੱਭੋ(gap1, bot + 1 - fp->fd_ਸਿਖਰ, &fp2);
+    ਜੇ (fp2 != ਨਿਰਾ)
     {
-	len = (int)((fold_T *)gap1->ga_data + gap1->ga_len - fp2);
-	if (len > 0 && ga_grow(gap2, len) == OK)
+	len = (ਪੂਰਨ)((fold_T *)gap1->ga_ਅੰਕੜੇ + gap1->ga_len - fp2);
+	ਜੇ (len > 0 && ga_grow(gap2, len) == OK)
 	{
-	    for (idx = 0; idx < len; ++idx)
+	    ਲਈ (idx = 0; idx < len; ++idx)
 	    {
-		((fold_T *)gap2->ga_data)[idx] = fp2[idx];
-		((fold_T *)gap2->ga_data)[idx].fd_top
-						  -= fp[1].fd_top - fp->fd_top;
+		((fold_T *)gap2->ga_ਅੰਕੜੇ)[idx] = fp2[idx];
+		((fold_T *)gap2->ga_ਅੰਕੜੇ)[idx].fd_ਸਿਖਰ
+						  -= fp[1].fd_ਸਿਖਰ - fp->fd_ਸਿਖਰ;
 	    }
 	    gap2->ga_len = len;
 	    gap1->ga_len -= len;
 	}
     }
-    fp->fd_len = top - fp->fd_top;
-    fold_changed = TRUE;
+    fp->fd_len = ਸਿਖਰ - fp->fd_ਸਿਖਰ;
+    fold_ਬਦਲਿਆ = TRUE;
 }
 
 // foldRemove() {{{2
@@ -2942,77 +2942,77 @@ foldSplit(
  * 5: made to start below "bot".
  * 6: not changed
  */
-    static void
-foldRemove(garray_T *gap, linenr_T top, linenr_T bot)
+    ਸਥਿਰ ਖਾਲੀ
+foldRemove(garray_T *gap, linenr_T ਸਿਖਰ, linenr_T bot)
 {
-    fold_T	*fp = NULL;
+    fold_T	*fp = ਨਿਰਾ;
 
-    if (bot < top)
-	return;		// nothing to do
+    ਜੇ (bot < ਸਿਖਰ)
+	ਵਾਪਸ;		// nothing to do
 
-    while (gap->ga_len > 0)
+    ਜਦੋਂ (gap->ga_len > 0)
     {
 	// Find fold that includes top or a following one.
-	if (foldFind(gap, top, &fp) && fp->fd_top < top)
+	ਜੇ (fold_ਲੱਭੋ(gap, ਸਿਖਰ, &fp) && fp->fd_ਸਿਖਰ < ਸਿਖਰ)
 	{
 	    // 2: or 3: need to delete nested folds
-	    foldRemove(&fp->fd_nested, top - fp->fd_top, bot - fp->fd_top);
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    foldRemove(&fp->fd_nested, ਸਿਖਰ - fp->fd_ਸਿਖਰ, bot - fp->fd_ਸਿਖਰ);
+	    ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len - 1 > bot)
 	    {
 		// 3: need to split it.
-		foldSplit(gap, (int)(fp - (fold_T *)gap->ga_data), top, bot);
+		fold_ਵੰਡੋ(gap, (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ), ਸਿਖਰ, bot);
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// 2: truncate fold at "top".
-		fp->fd_len = top - fp->fd_top;
+		fp->fd_len = ਸਿਖਰ - fp->fd_ਸਿਖਰ;
 	    }
-	    fold_changed = TRUE;
-	    continue;
+	    fold_ਬਦਲਿਆ = TRUE;
+	    ਜਾਰੀ;
 	}
-	if (fp >= (fold_T *)(gap->ga_data) + gap->ga_len
-		|| fp->fd_top > bot)
+	ਜੇ (fp >= (fold_T *)(gap->ga_ਅੰਕੜੇ) + gap->ga_len
+		|| fp->fd_ਸਿਖਰ > bot)
 	{
 	    // 6: Found a fold below bot, can stop looking.
-	    break;
+	    ਰੋਕੋ;
 	}
-	if (fp->fd_top >= top)
+	ਜੇ (fp->fd_ਸਿਖਰ >= ਸਿਖਰ)
 	{
 	    // Found an entry below top.
-	    fold_changed = TRUE;
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    fold_ਬਦਲਿਆ = TRUE;
+	    ਜੇ (fp->fd_ਸਿਖਰ + fp->fd_len - 1 > bot)
 	    {
 		// 5: Make fold that includes bot start below bot.
 		foldMarkAdjustRecurse(&fp->fd_nested,
-			(linenr_T)0, (long)(bot - fp->fd_top),
-			(linenr_T)MAXLNUM, (long)(fp->fd_top - bot - 1));
-		fp->fd_len -= bot - fp->fd_top + 1;
-		fp->fd_top = bot + 1;
-		break;
+			(linenr_T)0, (ਲੰਮਾ)(bot - fp->fd_ਸਿਖਰ),
+			(linenr_T)MAXLNUM, (ਲੰਮਾ)(fp->fd_ਸਿਖਰ - bot - 1));
+		fp->fd_len -= bot - fp->fd_ਸਿਖਰ + 1;
+		fp->fd_ਸਿਖਰ = bot + 1;
+		ਰੋਕੋ;
 	    }
 
 	    // 4: Delete completely contained fold.
-	    deleteFoldEntry(gap, (int)(fp - (fold_T *)gap->ga_data), TRUE);
+	    delete_Fold_ਇੰਦਰਾਜ(gap, (ਪੂਰਨ)(fp - (fold_T *)gap->ga_ਅੰਕੜੇ), TRUE);
 	}
     }
 }
 
 // foldReverseOrder() {{{2
-    static void
-foldReverseOrder(garray_T *gap, linenr_T start_arg, linenr_T end_arg)
+    ਸਥਿਰ ਖਾਲੀ
+fold_ਉਲਟ_ਕ੍ਰਮ(garray_T *gap, linenr_T ਸ਼ੁਰੂ_arg, linenr_T ਸਿਰਾ_arg)
 {
-    fold_T *left, *right;
+    fold_T *ਖੱਬਾ, *ਸੱਜਾ;
     fold_T tmp;
-    linenr_T start = start_arg;
-    linenr_T end = end_arg;
+    linenr_T ਸ਼ੁਰੂ = ਸ਼ੁਰੂ_arg;
+    linenr_T ਸਿਰਾ = ਸਿਰਾ_arg;
 
-    for (; start < end; start++, end--)
+    ਲਈ (; ਸ਼ੁਰੂ < ਸਿਰਾ; ਸ਼ੁਰੂ++, ਸਿਰਾ--)
     {
-	left = (fold_T *)gap->ga_data + start;
-	right = (fold_T *)gap->ga_data + end;
-	tmp  = *left;
-	*left = *right;
-	*right = tmp;
+	ਖੱਬਾ = (fold_T *)gap->ga_ਅੰਕੜੇ + ਸ਼ੁਰੂ;
+	ਸੱਜਾ = (fold_T *)gap->ga_ਅੰਕੜੇ + ਸਿਰਾ;
+	tmp  = *ਖੱਬਾ;
+	*ਖੱਬਾ = *ਸੱਜਾ;
+	*ਸੱਜਾ = tmp;
     }
 }
 
@@ -3049,48 +3049,48 @@ foldReverseOrder(garray_T *gap, linenr_T start_arg, linenr_T end_arg)
  * 10. not changed
  */
 
-    static void
-truncate_fold(fold_T *fp, linenr_T end)
+    ਸਥਿਰ ਖਾਲੀ
+truncate_fold(fold_T *fp, linenr_T ਸਿਰਾ)
 {
-    end += 1;
-    foldRemove(&fp->fd_nested, end - fp->fd_top, MAXLNUM);
-    fp->fd_len = end - fp->fd_top;
+    ਸਿਰਾ += 1;
+    foldRemove(&fp->fd_nested, ਸਿਰਾ - fp->fd_ਸਿਖਰ, MAXLNUM);
+    fp->fd_len = ਸਿਰਾ - fp->fd_ਸਿਖਰ;
 }
 
-# define fold_end(fp) ((fp)->fd_top + (fp)->fd_len - 1)
-# define valid_fold(fp, gap) ((gap)->ga_len > 0 && (fp) < ((fold_T *)(gap)->ga_data + (gap)->ga_len))
-# define fold_index(fp, gap) ((size_t)((fp) - ((fold_T *)(gap)->ga_data)))
+# define fold_ਸਿਰਾ(fp) ((fp)->fd_ਸਿਖਰ + (fp)->fd_len - 1)
+# define valid_fold(fp, gap) ((gap)->ga_len > 0 && (fp) < ((fold_T *)(gap)->ga_ਅੰਕੜੇ + (gap)->ga_len))
+# define fold_ਸੂਚਕਾਂਕ(fp, gap) ((size_t)((fp) - ((fold_T *)(gap)->ga_ਅੰਕੜੇ)))
 
-    void
+    ਖਾਲੀ
 foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
 {
     fold_T *fp;
     linenr_T range_len = line2 - line1 + 1;
     linenr_T move_len = dest - line2;
-    int at_start = foldFind(gap, line1 - 1, &fp);
-    size_t move_start = 0, move_end = 0, dest_index = 0;
+    ਪੂਰਨ at_ਸ਼ੁਰੂ = fold_ਲੱਭੋ(gap, line1 - 1, &fp);
+    size_t move_ਸ਼ੁਰੂ = 0, move_ਸਿਰਾ = 0, dest_ਸੂਚਕਾਂਕ = 0;
 
-    if (at_start)
+    ਜੇ (at_ਸ਼ੁਰੂ)
     {
-	if (fold_end(fp) > dest)
+	ਜੇ (fold_ਸਿਰਾ(fp) > dest)
 	{
 	    // Case 4
 	   // don't have to change this fold, but have to move nested folds.
-	    foldMoveRange(&fp->fd_nested, line1 - fp->fd_top, line2 -
-		    fp->fd_top, dest - fp->fd_top);
-	    return;
+	    foldMoveRange(&fp->fd_nested, line1 - fp->fd_ਸਿਖਰ, line2 -
+		    fp->fd_ਸਿਖਰ, dest - fp->fd_ਸਿਖਰ);
+	    ਵਾਪਸ;
 	}
-	else if (fold_end(fp) > line2)
+	ਨਹੀਂਤਾਂ ਜੇ (fold_ਸਿਰਾ(fp) > line2)
 	{
 	    // Case 3
 	    // Remove nested folds between line1 and line2 & reduce the
 	    // length of fold by "range_len".
 	    // Folds after this one must be dealt with.
-	    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_top, line2 -
-		    fp->fd_top, MAXLNUM, -range_len);
+	    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_ਸਿਖਰ, line2 -
+		    fp->fd_ਸਿਖਰ, MAXLNUM, -range_len);
 	    fp->fd_len -= range_len;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    // Case 2 truncate fold, folds after this one must be dealt with.
 	    truncate_fold(fp, line1 - 1);
 
@@ -3099,84 +3099,84 @@ foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
 	fp = fp + 1;
     }
 
-    if (!valid_fold(fp, gap) || fp->fd_top > dest)
+    ਜੇ (!valid_fold(fp, gap) || fp->fd_ਸਿਖਰ > dest)
     {
 	// Case 10
 	// No folds after "line1" and before "dest"
-	return;
+	ਵਾਪਸ;
     }
-    else if (fp->fd_top > line2)
+    ਨਹੀਂਤਾਂ ਜੇ (fp->fd_ਸਿਖਰ > line2)
     {
-	for (; valid_fold(fp, gap) && fold_end(fp) <= dest; fp++)
+	ਲਈ (; valid_fold(fp, gap) && fold_ਸਿਰਾ(fp) <= dest; fp++)
 	// Case 9. (for all case 9's) -- shift up.
-	    fp->fd_top -= range_len;
+	    fp->fd_ਸਿਖਰ -= range_len;
 
-	if (valid_fold(fp, gap) && fp->fd_top <= dest)
+	ਜੇ (valid_fold(fp, gap) && fp->fd_ਸਿਖਰ <= dest)
 	{
 	    // Case 8. -- ensure truncated at dest, shift up
 	    truncate_fold(fp, dest);
-	    fp->fd_top -= range_len;
+	    fp->fd_ਸਿਖਰ -= range_len;
 	}
-	return;
+	ਵਾਪਸ;
     }
-    else if (fold_end(fp) > dest)
+    ਨਹੀਂਤਾਂ ਜੇ (fold_ਸਿਰਾ(fp) > dest)
     {
 	// Case 7 -- remove nested folds and shrink
-	foldMarkAdjustRecurse(&fp->fd_nested, line2 + 1 - fp->fd_top, dest -
-		fp->fd_top, MAXLNUM, -move_len);
+	foldMarkAdjustRecurse(&fp->fd_nested, line2 + 1 - fp->fd_ਸਿਖਰ, dest -
+		fp->fd_ਸਿਖਰ, MAXLNUM, -move_len);
 	fp->fd_len -= move_len;
-	fp->fd_top += move_len;
-	return;
+	fp->fd_ਸਿਖਰ += move_len;
+	ਵਾਪਸ;
     }
 
     // Case 5 or 6
     // changes rely on whether there are folds between the end of
     // this fold and "dest".
-    move_start = fold_index(fp, gap);
+    move_ਸ਼ੁਰੂ = fold_ਸੂਚਕਾਂਕ(fp, gap);
 
-    for (; valid_fold(fp, gap) && fp->fd_top <= dest; fp++)
+    ਲਈ (; valid_fold(fp, gap) && fp->fd_ਸਿਖਰ <= dest; fp++)
     {
-	if (fp->fd_top <= line2)
+	ਜੇ (fp->fd_ਸਿਖਰ <= line2)
 	{
 	    // 1. 2. or 3.
-	    if (fold_end(fp) > line2)
+	    ਜੇ (fold_ਸਿਰਾ(fp) > line2)
 		// 2. or 3., truncate before moving
 		truncate_fold(fp, line2);
 
-	    fp->fd_top += move_len;
-	    continue;
+	    fp->fd_ਸਿਖਰ += move_len;
+	    ਜਾਰੀ;
 	}
 
 	// Record index of the first fold after the moved range.
-	if (move_end == 0)
-	    move_end = fold_index(fp, gap);
+	ਜੇ (move_ਸਿਰਾ == 0)
+	    move_ਸਿਰਾ = fold_ਸੂਚਕਾਂਕ(fp, gap);
 
-	if (fold_end(fp) > dest)
+	ਜੇ (fold_ਸਿਰਾ(fp) > dest)
 	    truncate_fold(fp, dest);
 
-	fp->fd_top -= range_len;
+	fp->fd_ਸਿਖਰ -= range_len;
     }
 
-    dest_index = fold_index(fp, gap);
+    dest_ਸੂਚਕਾਂਕ = fold_ਸੂਚਕਾਂਕ(fp, gap);
 
     /*
      * All folds are now correct, but not necessarily in the correct order.  We
      * must swap folds in the range [move_end, dest_index) with those in the
      * range [move_start, move_end).
      */
-    if (move_end == 0)
+    ਜੇ (move_ਸਿਰਾ == 0)
 	// There are no folds after those moved, hence no folds have been moved
 	// out of order.
-	return;
-    foldReverseOrder(gap, (linenr_T)move_start, (linenr_T)dest_index - 1);
-    foldReverseOrder(gap, (linenr_T)move_start,
-			   (linenr_T)(move_start + dest_index - move_end - 1));
-    foldReverseOrder(gap, (linenr_T)(move_start + dest_index - move_end),
-						   (linenr_T)(dest_index - 1));
+	ਵਾਪਸ;
+    fold_ਉਲਟ_ਕ੍ਰਮ(gap, (linenr_T)move_ਸ਼ੁਰੂ, (linenr_T)dest_ਸੂਚਕਾਂਕ - 1);
+    fold_ਉਲਟ_ਕ੍ਰਮ(gap, (linenr_T)move_ਸ਼ੁਰੂ,
+			   (linenr_T)(move_ਸ਼ੁਰੂ + dest_ਸੂਚਕਾਂਕ - move_ਸਿਰਾ - 1));
+    fold_ਉਲਟ_ਕ੍ਰਮ(gap, (linenr_T)(move_ਸ਼ੁਰੂ + dest_ਸੂਚਕਾਂਕ - move_ਸਿਰਾ),
+						   (linenr_T)(dest_ਸੂਚਕਾਂਕ - 1));
 }
-# undef fold_end
+# undef fold_ਸਿਰਾ
 # undef valid_fold
-# undef fold_index
+# undef fold_ਸੂਚਕਾਂਕ
 
 // foldMerge() {{{2
 /*
@@ -3186,36 +3186,36 @@ foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
  * The resulting fold is "fp1", nested folds are moved from "fp2" to "fp1".
  * Fold entry "fp2" in "gap" is deleted.
  */
-    static void
-foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2)
+    ਸਥਿਰ ਖਾਲੀ
+fold_ਮਿਲਾਓ(fold_T *fp1, garray_T *gap, fold_T *fp2)
 {
     fold_T	*fp3;
     fold_T	*fp4;
-    int		idx;
+    ਪੂਰਨ		idx;
     garray_T	*gap1 = &fp1->fd_nested;
     garray_T	*gap2 = &fp2->fd_nested;
 
     // If the last nested fold in fp1 touches the first nested fold in fp2,
     // merge them recursively.
-    if (foldFind(gap1, fp1->fd_len - 1L, &fp3) && foldFind(gap2, 0L, &fp4))
-	foldMerge(fp3, gap2, fp4);
+    ਜੇ (fold_ਲੱਭੋ(gap1, fp1->fd_len - 1L, &fp3) && fold_ਲੱਭੋ(gap2, 0L, &fp4))
+	fold_ਮਿਲਾਓ(fp3, gap2, fp4);
 
     // Move nested folds in fp2 to the end of fp1.
-    if (gap2->ga_len > 0 && ga_grow(gap1, gap2->ga_len) == OK)
+    ਜੇ (gap2->ga_len > 0 && ga_grow(gap1, gap2->ga_len) == OK)
     {
-	for (idx = 0; idx < gap2->ga_len; ++idx)
+	ਲਈ (idx = 0; idx < gap2->ga_len; ++idx)
 	{
-	    ((fold_T *)gap1->ga_data)[gap1->ga_len]
-					= ((fold_T *)gap2->ga_data)[idx];
-	    ((fold_T *)gap1->ga_data)[gap1->ga_len].fd_top += fp1->fd_len;
+	    ((fold_T *)gap1->ga_ਅੰਕੜੇ)[gap1->ga_len]
+					= ((fold_T *)gap2->ga_ਅੰਕੜੇ)[idx];
+	    ((fold_T *)gap1->ga_ਅੰਕੜੇ)[gap1->ga_len].fd_ਸਿਖਰ += fp1->fd_len;
 	    ++gap1->ga_len;
 	}
 	gap2->ga_len = 0;
     }
 
     fp1->fd_len += fp2->fd_len;
-    deleteFoldEntry(gap, (int)(fp2 - (fold_T *)gap->ga_data), TRUE);
-    fold_changed = TRUE;
+    delete_Fold_ਇੰਦਰਾਜ(gap, (ਪੂਰਨ)(fp2 - (fold_T *)gap->ga_ਅੰਕੜੇ), TRUE);
+    fold_ਬਦਲਿਆ = TRUE;
 }
 
 // foldlevelIndent() {{{2
@@ -3224,32 +3224,32 @@ foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2)
  * Doesn't use any caching.
  * Returns a level of -1 if the foldlevel depends on surrounding lines.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldlevelIndent(fline_T *flp)
 {
     char_u	*s;
     buf_T	*buf;
     linenr_T	lnum = flp->lnum + flp->off;
 
-    buf = flp->wp->w_buffer;
+    buf = flp->wp->w_ਬਫਰ;
     s = skipwhite(ml_get_buf(buf, lnum, FALSE));
 
     // empty line or lines starting with a character in 'foldignore': level
     // depends on surrounding lines
-    if (*s == NUL || vim_strchr(flp->wp->w_p_fdi, *s) != NULL)
+    ਜੇ (*s == NUL || vim_strchr(flp->wp->w_p_fdi, *s) != ਨਿਰਾ)
     {
 	// first and last line can't be undefined, use level 0
-	if (lnum == 1 || lnum == buf->b_ml.ml_line_count)
+	ਜੇ (lnum == 1 || lnum == buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 	    flp->lvl = 0;
-	else
+	ਨਹੀਂਤਾਂ
 	    flp->lvl = -1;
     }
-    else
-	flp->lvl = get_indent_buf(buf, lnum) / get_sw_value(buf);
-    if (flp->lvl > flp->wp->w_p_fdn)
+    ਨਹੀਂਤਾਂ
+	flp->lvl = get_indent_buf(buf, lnum) / get_sw_ਮੁੱਲ(buf);
+    ਜੇ (flp->lvl > flp->wp->w_p_fdn)
     {
 	flp->lvl = flp->wp->w_p_fdn;
-	if (flp->lvl < 0)
+	ਜੇ (flp->lvl < 0)
 	    flp->lvl = 0;
     }
 }
@@ -3260,12 +3260,12 @@ foldlevelIndent(fline_T *flp)
  * Low level function to get the foldlevel for the "diff" method.
  * Doesn't use any caching.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldlevelDiff(fline_T *flp)
 {
-    if (diff_infold(flp->wp, flp->lnum + flp->off))
+    ਜੇ (diff_infold(flp->wp, flp->lnum + flp->off))
 	flp->lvl = 1;
-    else
+    ਨਹੀਂਤਾਂ
 	flp->lvl = 0;
 }
 # endif
@@ -3276,101 +3276,101 @@ foldlevelDiff(fline_T *flp)
  * Doesn't use any caching.
  * Returns a level of -1 if the foldlevel depends on surrounding lines.
  */
-    static void
-foldlevelExpr(fline_T *flp)
+    ਸਥਿਰ ਖਾਲੀ
+foldlevel_ਵਿਅੰਜਕ(fline_T *flp)
 {
 # ifndef FEAT_EVAL
-    flp->start = FALSE;
+    flp->ਸ਼ੁਰੂ = FALSE;
     flp->lvl = 0;
-# else
+# ਨਹੀਂਤਾਂ
     win_T	*win;
-    int		n;
-    int		c;
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		c;
     linenr_T	lnum = flp->lnum + flp->off;
-    int		save_keytyped;
+    ਪੂਰਨ		save_keytyped;
 
     win = curwin;
     curwin = flp->wp;
-    curbuf = flp->wp->w_buffer;
-    set_vim_var_nr(VV_LNUM, lnum);
+    curbuf = flp->wp->w_ਬਫਰ;
+    ਸੈੱਟ_vim_var_nr(VV_LNUM, lnum);
 
-    flp->start = 0;
-    flp->had_end = flp->end;
-    flp->end = MAX_LEVEL + 1;
-    if (lnum <= 1)
+    flp->ਸ਼ੁਰੂ = 0;
+    flp->had_ਸਿਰਾ = flp->ਸਿਰਾ;
+    flp->ਸਿਰਾ = MAX_LEVEL + 1;
+    ਜੇ (lnum <= 1)
 	flp->lvl = 0;
 
     // KeyTyped may be reset to 0 when calling a function which invokes
     // do_cmdline().  To make 'foldopen' work correctly restore KeyTyped.
-    save_keytyped = KeyTyped;
+    save_keytyped = ਕੁੰਜੀ_Typed;
     n = eval_foldexpr(flp->wp, &c);
-    KeyTyped = save_keytyped;
+    ਕੁੰਜੀ_Typed = save_keytyped;
 
-    switch (c)
+    ਚੋਣ (c)
     {
 	// "a1", "a2", .. : add to the fold level
-	case 'a': if (flp->lvl >= 0)
+	ਹਾਲਤ 'a': ਜੇ (flp->lvl >= 0)
 		  {
 		      flp->lvl += n;
-		      flp->lvl_next = flp->lvl;
+		      flp->lvl_ਅਗਲਾ = flp->lvl;
 		  }
-		  flp->start = n;
-		  break;
+		  flp->ਸ਼ੁਰੂ = n;
+		  ਰੋਕੋ;
 
 	// "s1", "s2", .. : subtract from the fold level
-	case 's': if (flp->lvl >= 0)
+	ਹਾਲਤ 's': ਜੇ (flp->lvl >= 0)
 		  {
-		      if (n > flp->lvl)
-			  flp->lvl_next = 0;
-		      else
-			  flp->lvl_next = flp->lvl - n;
-		      flp->end = flp->lvl_next + 1;
+		      ਜੇ (n > flp->lvl)
+			  flp->lvl_ਅਗਲਾ = 0;
+		      ਨਹੀਂਤਾਂ
+			  flp->lvl_ਅਗਲਾ = flp->lvl - n;
+		      flp->ਸਿਰਾ = flp->lvl_ਅਗਲਾ + 1;
 		  }
-		  break;
+		  ਰੋਕੋ;
 
 	// ">1", ">2", .. : start a fold with a certain level
-	case '>': flp->lvl = n;
-		  flp->lvl_next = n;
-		  flp->start = 1;
-		  break;
+	ਹਾਲਤ '>': flp->lvl = n;
+		  flp->lvl_ਅਗਲਾ = n;
+		  flp->ਸ਼ੁਰੂ = 1;
+		  ਰੋਕੋ;
 
 	// "<1", "<2", .. : end a fold with a certain level
-	case '<': // To prevent an unexpected start of a new fold, the next
+	ਹਾਲਤ '<': // To prevent an unexpected start of a new fold, the next
 		  // level must not exceed the level of the current fold.
-		  flp->lvl_next = MIN(flp->lvl, n - 1);
-		  flp->end = n;
-		  break;
+		  flp->lvl_ਅਗਲਾ = MIN(flp->lvl, n - 1);
+		  flp->ਸਿਰਾ = n;
+		  ਰੋਕੋ;
 
 	// "=": No change in level
-	case '=': flp->lvl_next = flp->lvl;
-		  break;
+	ਹਾਲਤ '=': flp->lvl_ਅਗਲਾ = flp->lvl;
+		  ਰੋਕੋ;
 
 	// "-1", "0", "1", ..: set fold level
-	default:  if (n < 0)
+	ਮੂਲ:  ਜੇ (n < 0)
 		      // Use the current level for the next line, so that "a1"
 		      // will work there.
-		      flp->lvl_next = flp->lvl;
-		  else
-		      flp->lvl_next = n;
+		      flp->lvl_ਅਗਲਾ = flp->lvl;
+		  ਨਹੀਂਤਾਂ
+		      flp->lvl_ਅਗਲਾ = n;
 		  flp->lvl = n;
-		  break;
+		  ਰੋਕੋ;
     }
 
     // If the level is unknown for the first or the last line in the file, use
     // level 0.
-    if (flp->lvl < 0)
+    ਜੇ (flp->lvl < 0)
     {
-	if (lnum <= 1)
+	ਜੇ (lnum <= 1)
 	{
 	    flp->lvl = 0;
-	    flp->lvl_next = 0;
+	    flp->lvl_ਅਗਲਾ = 0;
 	}
-	if (lnum == curbuf->b_ml.ml_line_count)
-	    flp->lvl_next = 0;
+	ਜੇ (lnum == curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    flp->lvl_ਅਗਲਾ = 0;
     }
 
     curwin = win;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_ਬਫਰ;
 # endif
 }
 
@@ -3380,12 +3380,12 @@ foldlevelExpr(fline_T *flp)
  * "foldendmarkerlen".
  * Relies on the option value to have been checked for correctness already.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 parseMarker(win_T *wp)
 {
     foldendmarker = vim_strchr(wp->w_p_fmr, ',');
-    foldstartmarkerlen = (int)(foldendmarker++ - wp->w_p_fmr);
-    foldendmarkerlen = (int)STRLEN(foldendmarker);
+    foldstartmarkerlen = (ਪੂਰਨ)(foldendmarker++ - wp->w_p_fmr);
+    foldendmarkerlen = (ਪੂਰਨ)STRLEN(foldendmarker);
 }
 
 // foldlevelMarker() {{{2
@@ -3398,15 +3398,15 @@ parseMarker(win_T *wp)
  * Doesn't use any caching.
  * Sets flp->start when a start marker was found.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldlevelMarker(fline_T *flp)
 {
     char_u	*startmarker;
-    int		cstart;
-    int		cend;
-    int		start_lvl = flp->lvl;
+    ਪੂਰਨ		cstart;
+    ਪੂਰਨ		cend;
+    ਪੂਰਨ		ਸ਼ੁਰੂ_lvl = flp->lvl;
     char_u	*s;
-    int		n;
+    ਪੂਰਨ		n;
 
     // cache a few values for speed
     startmarker = flp->wp->w_p_fmr;
@@ -3415,64 +3415,64 @@ foldlevelMarker(fline_T *flp)
     cend = *foldendmarker;
 
     // Default: no start found, next level is same as current level
-    flp->start = 0;
-    flp->lvl_next = flp->lvl;
+    flp->ਸ਼ੁਰੂ = 0;
+    flp->lvl_ਅਗਲਾ = flp->lvl;
 
-    s = ml_get_buf(flp->wp->w_buffer, flp->lnum + flp->off, FALSE);
-    while (*s)
+    s = ml_get_buf(flp->wp->w_ਬਫਰ, flp->lnum + flp->off, FALSE);
+    ਜਦੋਂ (*s)
     {
-	if (*s == cstart
+	ਜੇ (*s == cstart
 		  && STRNCMP(s + 1, startmarker, foldstartmarkerlen - 1) == 0)
 	{
 	    // found startmarker: set flp->lvl
 	    s += foldstartmarkerlen;
-	    if (VIM_ISDIGIT(*s))
+	    ਜੇ (VIM_ISDIGIT(*s))
 	    {
-		n = atoi((char *)s);
-		if (n > 0)
+		n = atoi((ਅੱਖਰ *)s);
+		ਜੇ (n > 0)
 		{
 		    flp->lvl = n;
-		    flp->lvl_next = n;
-		    if (n <= start_lvl)
-			flp->start = 1;
-		    else
-			flp->start = n - start_lvl;
+		    flp->lvl_ਅਗਲਾ = n;
+		    ਜੇ (n <= ਸ਼ੁਰੂ_lvl)
+			flp->ਸ਼ੁਰੂ = 1;
+		    ਨਹੀਂਤਾਂ
+			flp->ਸ਼ੁਰੂ = n - ਸ਼ੁਰੂ_lvl;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		++flp->lvl;
-		++flp->lvl_next;
-		++flp->start;
+		++flp->lvl_ਅਗਲਾ;
+		++flp->ਸ਼ੁਰੂ;
 	    }
 	}
-	else if (*s == cend
+	ਨਹੀਂਤਾਂ ਜੇ (*s == cend
 	      && STRNCMP(s + 1, foldendmarker + 1, foldendmarkerlen - 1) == 0)
 	{
 	    // found endmarker: set flp->lvl_next
 	    s += foldendmarkerlen;
-	    if (VIM_ISDIGIT(*s))
+	    ਜੇ (VIM_ISDIGIT(*s))
 	    {
-		n = atoi((char *)s);
-		if (n > 0)
+		n = atoi((ਅੱਖਰ *)s);
+		ਜੇ (n > 0)
 		{
 		    flp->lvl = n;
-		    flp->lvl_next = n - 1;
+		    flp->lvl_ਅਗਲਾ = n - 1;
 		    // never start a fold with an end marker
-		    if (flp->lvl_next > start_lvl)
-			flp->lvl_next = start_lvl;
+		    ਜੇ (flp->lvl_ਅਗਲਾ > ਸ਼ੁਰੂ_lvl)
+			flp->lvl_ਅਗਲਾ = ਸ਼ੁਰੂ_lvl;
 		}
 	    }
-	    else
-		--flp->lvl_next;
+	    ਨਹੀਂਤਾਂ
+		--flp->lvl_ਅਗਲਾ;
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	    MB_PTR_ADV(s);
     }
 
     // The level can't go negative, must be missing a start marker.
-    if (flp->lvl_next < 0)
-	flp->lvl_next = 0;
+    ਜੇ (flp->lvl_ਅਗਲਾ < 0)
+	flp->lvl_ਅਗਲਾ = 0;
 }
 
 // foldlevelSyntax() {{{2
@@ -3480,25 +3480,25 @@ foldlevelMarker(fline_T *flp)
  * Low level function to get the foldlevel for the "syntax" method.
  * Doesn't use any caching.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldlevelSyntax(fline_T *flp)
 {
 # ifndef FEAT_SYN_HL
-    flp->start = 0;
+    flp->ਸ਼ੁਰੂ = 0;
     flp->lvl = 0;
-# else
+# ਨਹੀਂਤਾਂ
     linenr_T	lnum = flp->lnum + flp->off;
-    int		n;
+    ਪੂਰਨ		n;
 
     // Use the maximum fold level at the start of this line and the next.
     flp->lvl = syn_get_foldlevel(flp->wp, lnum);
-    flp->start = 0;
-    if (lnum < flp->wp->w_buffer->b_ml.ml_line_count)
+    flp->ਸ਼ੁਰੂ = 0;
+    ਜੇ (lnum < flp->wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
     {
 	n = syn_get_foldlevel(flp->wp, lnum + 1);
-	if (n > flp->lvl)
+	ਜੇ (n > flp->lvl)
 	{
-	    flp->start = n - flp->lvl;	// fold(s) start here
+	    flp->ਸ਼ੁਰੂ = n - flp->lvl;	// fold(s) start here
 	    flp->lvl = n;
 	}
     }
@@ -3507,31 +3507,31 @@ foldlevelSyntax(fline_T *flp)
 
 // functions for storing the fold state in a View {{{1
 // put_folds() {{{2
-# if defined(FEAT_SESSION)
-static int put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off);
-static int put_foldopen_recurse(FILE *fd, win_T *wp, garray_T *gap, linenr_T off);
-static int put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off);
+# ਜੇ defined(FEAT_SESSION)
+ਸਥਿਰ ਪੂਰਨ put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off);
+ਸਥਿਰ ਪੂਰਨ put_foldopen_recurse(FILE *fd, win_T *wp, garray_T *gap, linenr_T off);
+ਸਥਿਰ ਪੂਰਨ put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off);
 
 /*
  * Write commands to "fd" to restore the manual folds in window "wp".
  * Return FAIL if writing fails.
  */
-    int
+    ਪੂਰਨ
 put_folds(FILE *fd, win_T *wp)
 {
-    if (foldmethodIsManual(wp))
+    ਜੇ (foldmethodIsManual(wp))
     {
-	if (put_line(fd, "silent! normal! zE") == FAIL
+	ਜੇ (put_ਸਤਰ(fd, "silent! normal! zE") == FAIL
 		|| put_folds_recurse(fd, &wp->w_folds, (linenr_T)0) == FAIL
-		|| put_line(fd, "&fdl = &fdl") == FAIL)
-	    return FAIL;
+		|| put_ਸਤਰ(fd, "&fdl = &fdl") == FAIL)
+	    ਵਾਪਸ FAIL;
     }
 
     // If some folds are manually opened/closed, need to restore that.
-    if (wp->w_fold_manual)
-	return put_foldopen_recurse(fd, wp, &wp->w_folds, (linenr_T)0);
+    ਜੇ (wp->w_fold_manual)
+	ਵਾਪਸ put_foldopen_recurse(fd, wp, &wp->w_folds, (linenr_T)0);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 // put_folds_recurse() {{{2
@@ -3539,25 +3539,25 @@ put_folds(FILE *fd, win_T *wp)
  * Write commands to "fd" to recreate manually created folds.
  * Returns FAIL when writing failed.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off)
 {
-    int		i;
+    ਪੂਰਨ		i;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; i++)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < gap->ga_len; i++)
     {
 	// Do nested folds first, they will be created closed.
-	if (put_folds_recurse(fd, &fp->fd_nested, off + fp->fd_top) == FAIL)
-	    return FAIL;
-	if (fprintf(fd, "sil! :%ld,%ldfold", fp->fd_top + off,
-					fp->fd_top + off + fp->fd_len - 1) < 0
+	ਜੇ (put_folds_recurse(fd, &fp->fd_nested, off + fp->fd_ਸਿਖਰ) == FAIL)
+	    ਵਾਪਸ FAIL;
+	ਜੇ (fprintf(fd, "sil! :%ld,%ldfold", fp->fd_ਸਿਖਰ + off,
+					fp->fd_ਸਿਖਰ + off + fp->fd_len - 1) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ਵਾਪਸ FAIL;
 	++fp;
     }
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 // put_foldopen_recurse() {{{2
@@ -3565,57 +3565,57 @@ put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off)
  * Write commands to "fd" to open and close manually opened/closed folds.
  * Returns FAIL when writing failed.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 put_foldopen_recurse(
     FILE	*fd,
     win_T	*wp,
     garray_T	*gap,
     linenr_T	off)
 {
-    int		i;
-    int		level;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		level;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; i++)
+    fp = (fold_T *)gap->ga_ਅੰਕੜੇ;
+    ਲਈ (i = 0; i < gap->ga_len; i++)
     {
-	if (fp->fd_flags != FD_LEVEL)
+	ਜੇ (fp->fd_flags != FD_LEVEL)
 	{
-	    if (fp->fd_nested.ga_len > 0)
+	    ਜੇ (fp->fd_nested.ga_len > 0)
 	    {
 		// open nested folds while this fold is open
 		// ignore errors
-		if (fprintf(fd, ":%ld", fp->fd_top + off) < 0
+		ਜੇ (fprintf(fd, ":%ld", fp->fd_ਸਿਖਰ + off) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "sil! normal! zo") == FAIL)
-		    return FAIL;
-		if (put_foldopen_recurse(fd, wp, &fp->fd_nested,
-							     off + fp->fd_top)
+			|| put_ਸਤਰ(fd, "sil! normal! zo") == FAIL)
+		    ਵਾਪਸ FAIL;
+		ਜੇ (put_foldopen_recurse(fd, wp, &fp->fd_nested,
+							     off + fp->fd_ਸਿਖਰ)
 			== FAIL)
-		    return FAIL;
+		    ਵਾਪਸ FAIL;
 		// close the parent when needed
-		if (fp->fd_flags == FD_CLOSED)
+		ਜੇ (fp->fd_flags == FD_CLOSED)
 		{
-		    if (put_fold_open_close(fd, fp, off) == FAIL)
-			return FAIL;
+		    ਜੇ (put_fold_open_close(fd, fp, off) == FAIL)
+			ਵਾਪਸ FAIL;
 		}
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Open or close the leaf according to the window foldlevel.
 		// Do not close a leaf that is already closed, as it will close
 		// the parent.
-		level = foldLevelWin(wp, off + fp->fd_top);
-		if ((fp->fd_flags == FD_CLOSED && wp->w_p_fdl >= level)
+		level = foldLevelWin(wp, off + fp->fd_ਸਿਖਰ);
+		ਜੇ ((fp->fd_flags == FD_CLOSED && wp->w_p_fdl >= level)
 			|| (fp->fd_flags != FD_CLOSED && wp->w_p_fdl < level))
-		if (put_fold_open_close(fd, fp, off) == FAIL)
-		    return FAIL;
+		ਜੇ (put_fold_open_close(fd, fp, off) == FAIL)
+		    ਵਾਪਸ FAIL;
 	    }
 	}
 	++fp;
     }
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 // put_fold_open_close() {{{2
@@ -3623,84 +3623,84 @@ put_foldopen_recurse(
  * Write the open or close command to "fd".
  * Returns FAIL when writing failed.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off)
 {
-    if (fprintf(fd, ":%ld", fp->fd_top + off) < 0
+    ਜੇ (fprintf(fd, ":%ld", fp->fd_ਸਿਖਰ + off) < 0
 	    || put_eol(fd) == FAIL
 	    || fprintf(fd, "sil! normal! z%c",
 			   fp->fd_flags == FD_CLOSED ? 'c' : 'o') < 0
 	    || put_eol(fd) == FAIL)
-	return FAIL;
+	ਵਾਪਸ FAIL;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 # endif // FEAT_SESSION
 
 // }}}1
-#endif // defined(FEAT_FOLDING)
+#ਜੇ_ਅੰਤ // defined(FEAT_FOLDING)
 
-#if defined(FEAT_EVAL)
+#ਜੇ defined(FEAT_EVAL)
 
 /*
  * "foldclosed()" and "foldclosedend()" functions
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 foldclosed_both(
-    typval_T	*argvars UNUSED,
+    typval_T	*argvars ਅਣਵਰਤਿਆ,
     typval_T	*rettv,
-    int		end UNUSED)
+    ਪੂਰਨ		ਸਿਰਾ ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_FOLDING
     linenr_T	lnum = 0;
-    linenr_T	first, last;
+    linenr_T	ਪਹਿਲਾ, ਆਖਰੀ;
     win_T	*wp  = curwin;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	switchwin_T	switchwin;
 	// use window specified in the second argument
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp != NULL && tp != NULL)
+	wp = win_id2wp_tp(tv_get_ਸੰਖਿਆ(&argvars[1]), &tp);
+	ਜੇ (wp != ਨਿਰਾ && tp != ਨਿਰਾ)
 	{
-	    if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	    ਜੇ (switch_win(&switchwin, wp, tp, TRUE) == OK)
 		lnum = tv_get_lnum(argvars);
 	    restore_win(&switchwin, TRUE);
 	}
-	else
+	ਨਹੀਂਤਾਂ
 	{
-	    rettv->vval.v_number = -2;
-	    return;
+	    rettv->vval.v_ਸੰਖਿਆ = -2;
+	    ਵਾਪਸ;
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lnum = tv_get_lnum(argvars);
 
-    if (lnum >= 1 && lnum <= wp->w_buffer->b_ml.ml_line_count)
+    ਜੇ (lnum >= 1 && lnum <= wp->w_ਬਫਰ->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
     {
-	if (hasFoldingWin(wp, lnum, &first, &last, FALSE, NULL))
+	ਜੇ (hasFoldingWin(wp, lnum, &ਪਹਿਲਾ, &ਆਖਰੀ, FALSE, ਨਿਰਾ))
 	{
-	    if (end)
-		rettv->vval.v_number = (varnumber_T)last;
-	    else
-		rettv->vval.v_number = (varnumber_T)first;
-	    return;
+	    ਜੇ (ਸਿਰਾ)
+		rettv->vval.v_ਸੰਖਿਆ = (varnumber_T)ਆਖਰੀ;
+	    ਨਹੀਂਤਾਂ
+		rettv->vval.v_ਸੰਖਿਆ = (varnumber_T)ਪਹਿਲਾ;
+	    ਵਾਪਸ;
 	}
     }
 # endif
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ਸੰਖਿਆ = -1;
 }
 
 /*
  * "foldclosed()" function
  */
-    void
+    ਖਾਲੀ
 f_foldclosed(typval_T *argvars, typval_T *rettv)
 {
     foldclosed_both(argvars, rettv, FALSE);
@@ -3709,7 +3709,7 @@ f_foldclosed(typval_T *argvars, typval_T *rettv)
 /*
  * "foldclosedend()" function
  */
-    void
+    ਖਾਲੀ
 f_foldclosedend(typval_T *argvars, typval_T *rettv)
 {
     foldclosed_both(argvars, rettv, TRUE);
@@ -3719,64 +3719,64 @@ f_foldclosedend(typval_T *argvars, typval_T *rettv)
 /*
  * Return fold level at line number "lnum" in the current window.
  */
-    static int
+    ਸਥਿਰ ਪੂਰਨ
 foldLevel(linenr_T lnum)
 {
     // While updating the folds lines between invalid_top and invalid_bot have
     // an undefined fold level.  Otherwise update the folds first.
-    if (invalid_top == (linenr_T)0)
+    ਜੇ (invalid_ਸਿਖਰ == (linenr_T)0)
 	checkupdate(curwin);
-    else if (lnum == prev_lnum && prev_lnum_lvl >= 0)
-	return prev_lnum_lvl;
-    else if (lnum >= invalid_top && lnum <= invalid_bot)
-	return -1;
+    ਨਹੀਂਤਾਂ ਜੇ (lnum == prev_lnum && prev_lnum_lvl >= 0)
+	ਵਾਪਸ prev_lnum_lvl;
+    ਨਹੀਂਤਾਂ ਜੇ (lnum >= invalid_ਸਿਖਰ && lnum <= invalid_bot)
+	ਵਾਪਸ -1;
 
     // Return quickly when there is no folding at all in this window.
-    if (!hasAnyFolding(curwin))
-	return 0;
+    ਜੇ (!hasAnyFolding(curwin))
+	ਵਾਪਸ 0;
 
-    return foldLevelWin(curwin, lnum);
+    ਵਾਪਸ foldLevelWin(curwin, lnum);
 }
 # endif
 
 /*
  * "foldlevel()" function
  */
-    void
-f_foldlevel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_foldlevel(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
 # ifdef FEAT_FOLDING
     linenr_T	lnum;
     switchwin_T	switchwin;
 
-    if (in_vim9script()
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T	*wp;
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp != NULL && tp != NULL)
+	wp = win_id2wp_tp(tv_get_ਸੰਖਿਆ(&argvars[1]), &tp);
+	ਜੇ (wp != ਨਿਰਾ && tp != ਨਿਰਾ)
 	{
-	    if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	    ਜੇ (switch_win(&switchwin, wp, tp, TRUE) == OK)
 	    {
 		lnum = tv_get_lnum(argvars);
-		if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-		    rettv->vval.v_number = foldLevel(lnum);
+		ਜੇ (lnum >= 1 && lnum <= curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+		    rettv->vval.v_ਸੰਖਿਆ = foldLevel(lnum);
 	    }
 	    restore_win(&switchwin, TRUE);
 	}
-	else
-	    rettv->vval.v_number = -2;
+	ਨਹੀਂਤਾਂ
+	    rettv->vval.v_ਸੰਖਿਆ = -2;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	lnum = tv_get_lnum(argvars);
-	if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	    rettv->vval.v_number = foldLevel(lnum);
+	ਜੇ (lnum >= 1 && lnum <= curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    rettv->vval.v_ਸੰਖਿਆ = foldLevel(lnum);
     }
 # endif
 }
@@ -3784,8 +3784,8 @@ f_foldlevel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "foldtext()" function
  */
-    void
-f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_foldtext(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
 # ifdef FEAT_FOLDING
     linenr_T	foldstart;
@@ -3794,49 +3794,49 @@ f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
     linenr_T	lnum;
     char_u	*s;
     char_u	*r;
-    int		len;
-    char	*txt;
-    long	count;
+    ਪੂਰਨ		len;
+    ਅੱਖਰ	*txt;
+    ਲੰਮਾ	ਗਿਣਤੀ_2;
 # endif
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 # ifdef FEAT_FOLDING
     foldstart = (linenr_T)get_vim_var_nr(VV_FOLDSTART);
     foldend = (linenr_T)get_vim_var_nr(VV_FOLDEND);
     dashes = get_vim_var_str(VV_FOLDDASHES);
-    if (foldstart > 0 && foldend <= curbuf->b_ml.ml_line_count
-	    && dashes != NULL)
+    ਜੇ (foldstart > 0 && foldend <= curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ
+	    && dashes != ਨਿਰਾ)
     {
 	// Find first non-empty line in the fold.
-	for (lnum = foldstart; lnum < foldend; ++lnum)
-	    if (!linewhite(lnum))
-		break;
+	ਲਈ (lnum = foldstart; lnum < foldend; ++lnum)
+	    ਜੇ (!linewhite(lnum))
+		ਰੋਕੋ;
 
 	// Find interesting text in this line.
 	s = skipwhite(ml_get(lnum));
 	// skip C comment-start
-	if (s[0] == '/' && (s[1] == '*' || s[1] == '/'))
+	ਜੇ (s[0] == '/' && (s[1] == '*' || s[1] == '/'))
 	{
 	    s = skipwhite(s + 2);
-	    if (*skipwhite(s) == NUL
+	    ਜੇ (*skipwhite(s) == NUL
 			    && lnum + 1 < (linenr_T)get_vim_var_nr(VV_FOLDEND))
 	    {
 		s = skipwhite(ml_get(lnum + 1));
-		if (*s == '*')
+		ਜੇ (*s == '*')
 		    s = skipwhite(s + 1);
 	    }
 	}
-	count = (long)(foldend - foldstart + 1);
-	txt = NGETTEXT("+-%s%3ld line: ", "+-%s%3ld lines: ", count);
+	ਗਿਣਤੀ_2 = (ਲੰਮਾ)(foldend - foldstart + 1);
+	txt = NGETTEXT("+-%s%3ld line: ", "+-%s%3ld lines: ", ਗਿਣਤੀ_2);
 	r = alloc(STRLEN(txt)
 		    + STRLEN(dashes)	    // for %s
 		    + 20		    // for %3ld
 		    + STRLEN(s));	    // concatenated
-	if (r != NULL)
+	ਜੇ (r != ਨਿਰਾ)
 	{
-	    sprintf((char *)r, txt, dashes, count);
-	    len = (int)STRLEN(r);
+	    sprintf((ਅੱਖਰ *)r, txt, dashes, ਗਿਣਤੀ_2);
+	    len = (ਪੂਰਨ)STRLEN(r);
 	    STRCAT(r, s);
 	    // remove 'foldmarker' and 'commentstring'
 	    foldtext_cleanup(r + len);
@@ -3849,62 +3849,62 @@ f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "foldtextresult(lnum)" function
  */
-    void
-f_foldtextresult(typval_T *argvars UNUSED, typval_T *rettv)
+    ਖਾਲੀ
+f_foldtextresult(typval_T *argvars ਅਣਵਰਤਿਆ, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ਨਿਰਾ;
 
 # ifdef FEAT_FOLDING
     linenr_T	lnum = 0;
-    char_u	*text;
-    char_u	buf[FOLD_TEXT_LEN];
+    char_u	*ਪਾਠ;
+    char_u	buf[FOLD_ਪਾਠ_LEN];
     foldinfo_T  foldinfo;
-    int		fold_count;
+    ਪੂਰਨ		fold_ਗਿਣਤੀ;
     win_T	*wp  = curwin;
-    static int	entered = FALSE;
-    if (in_vim9script()
+    ਸਥਿਰ ਪੂਰਨ	entered = FALSE;
+    ਜੇ (ਵਿੱਚ_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ਸੰਖਿਆ_arg(argvars, 1) == FAIL))
+	ਵਾਪਸ;
 
-    if (entered)
-	return; // reject recursive use
+    ਜੇ (entered)
+	ਵਾਪਸ; // reject recursive use
     entered = TRUE;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	switchwin_T	switchwin;
 	// use window specified in the second argument
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp == NULL || tp == NULL) // wrong winid
+	wp = win_id2wp_tp(tv_get_ਸੰਖਿਆ(&argvars[1]), &tp);
+	ਜੇ (wp == ਨਿਰਾ || tp == ਨਿਰਾ) // wrong winid
 	{
 	    entered = FALSE;
-	    return;
+	    ਵਾਪਸ;
 	}
-	if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	ਜੇ (switch_win(&switchwin, wp, tp, TRUE) == OK)
 	    lnum = tv_get_lnum(argvars);
 	restore_win(&switchwin, TRUE);
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lnum = tv_get_lnum(argvars);
 
     // treat illegal types and illegal string values for {lnum} the same
-    if (lnum < 0)
+    ਜੇ (lnum < 0)
 	lnum = 0;
-    fold_count = foldedCount(wp, lnum, &foldinfo);
-    if (fold_count > 0)
+    fold_ਗਿਣਤੀ = folded_ਗਿਣਤੀ(wp, lnum, &foldinfo);
+    ਜੇ (fold_ਗਿਣਤੀ > 0)
     {
-	text = get_foldtext(wp, lnum, lnum + fold_count - 1,
+	ਪਾਠ = get_foldtext(wp, lnum, lnum + fold_ਗਿਣਤੀ - 1,
 							       &foldinfo, buf);
-	if (text == buf)
-	    text = vim_strsave(text);
-	rettv->vval.v_string = text;
+	ਜੇ (ਪਾਠ == buf)
+	    ਪਾਠ = vim_strsave(ਪਾਠ);
+	rettv->vval.v_string = ਪਾਠ;
     }
 
     entered = FALSE;
 # endif
 }
 
-#endif // FEAT_EVAL
+#ਜੇ_ਅੰਤ // FEAT_EVAL

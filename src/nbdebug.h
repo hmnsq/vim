@@ -8,14 +8,14 @@
  */
 
 
-#ifndef NBDEBUG_H
-#define NBDEBUG_H
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ NBDEBUG_H
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NBDEBUG_H
 
-#ifdef NBDEBUG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c) \
-    if (!(c)) \
+    ਜੇ (!(c)) \
     { \
 	fprintf(stderr, "Assertion failed: line %d, file %s\n", \
 		__LINE__, __FILE__); \
@@ -32,26 +32,26 @@
 # define NB_PRINT		0x00000008
 # define NB_DEBUG_ALL		0xffffffff
 
-# define NBDLEVEL(flags)	(nb_debug != NULL && (nb_dlevel & (flags)))
+# define NBDLEVEL(flags)	(nb_debug != ਨਿਰਾ && (nb_dlevel & (flags)))
 
 # define NBDEBUG_TRACE	1
 
-typedef enum {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਗਿਣਤੀ {
 		WT_ENV = 1,		// look for env var if set
 		WT_WAIT,		// look for ~/.gvimwait if set
 		WT_STOP			// look for ~/.gvimstop if set
 } WtWait;
 
 
-void		 nbdbg(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ਖਾਲੀ		 nbdbg(ਅੱਖਰ *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-void nbdebug_wait(u_int wait_flags, char *wait_var, u_int wait_secs);
-void nbdebug_log_init(char *log_var, char *level_var);
+ਖਾਲੀ nbdebug_wait(u_int wait_flags, ਅੱਖਰ *wait_var, u_int wait_secs);
+ਖਾਲੀ nbdebug_log_init(ਅੱਖਰ *log_var, ਅੱਖਰ *level_var);
 
-extern FILE	*nb_debug;
-extern u_int	 nb_dlevel;		// nb_debug verbosity level
+ਬਾਹਰੀ FILE	*nb_debug;
+ਬਾਹਰੀ u_int	 nb_dlevel;		// nb_debug verbosity level
 
-#else		// not NBDEBUG
+#ਨਹੀਂਤਾਂ		// not NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c)
@@ -62,12 +62,12 @@ extern u_int	 nb_dlevel;		// nb_debug verbosity level
  * the variable number of arguments.
  */
 
-void
+ਖਾਲੀ
 nbdbg(
-	char		*fmt,
+	ਅੱਖਰ		*fmt,
 	...)
 {
 }
 
-#endif // NBDEBUG
-#endif // NBDEBUG_H
+#ਜੇ_ਅੰਤ // NBDEBUG
+#ਜੇ_ਅੰਤ // NBDEBUG_H

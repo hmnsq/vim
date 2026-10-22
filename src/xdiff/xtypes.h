@@ -20,43 +20,43 @@
  *
  */
 
-#if !defined(XTYPES_H)
-#define XTYPES_H
+#ਜੇ !defined(XTYPES_H)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_chanode {
+	ਬਣਤਰ s_chanode *ਅਗਲਾ;
+	ਲੰਮਾ icurr;
 } chanode_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
-	long isize, nsize;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_chastore {
+	chanode_t *ਸਿਰ, *ਪੂਛ;
+	ਲੰਮਾ isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
-	long scurr;
+	ਲੰਮਾ scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
-	unsigned long ha;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xrecord {
+	ਅੱਖਰ ਅਚਲ *ptr;
+	ਲੰਮਾ ਮਾਪ;
+	ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xdfile {
 	xrecord_t *recs;
-	long nrec;
-	long dstart, dend;
-	bool *changed;
-	long *rindex;
-	long nreff;
+	ਲੰਮਾ nrec;
+	ਲੰਮਾ dstart, dend;
+	bool *ਬਦਲਿਆ;
+	ਲੰਮਾ *rindex;
+	ਲੰਮਾ nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 
 
 
-#endif /* #if !defined(XTYPES_H) */
+#ਜੇ_ਅੰਤ /* #if !defined(XTYPES_H) */

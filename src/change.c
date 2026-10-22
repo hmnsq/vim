@@ -11,7 +11,7 @@
  * change.c: functions related to changing text
  */
 
-#include "vim.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vim.h"
 
 /*
  * If the file is readonly, give a warning message with the first change.
@@ -23,47 +23,47 @@
  * 'showmode' is on.
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-change_warning(int col)
+    ਖਾਲੀ
+change_warning(ਪੂਰਨ ਖਾਨਾ)
 {
-    static char *w_readonly = N_("W10: Warning: Changing a readonly file");
+    ਸਥਿਰ ਅੱਖਰ *w_readonly = N_("W10: Warning: Changing a readonly file");
 
-    if (curbuf->b_did_warn
-	    || curbufIsChanged()
+    ਜੇ (curbuf->b_did_warn
+	    || curbuf_Is_ਬਦਲਿਆ()
 	    || autocmd_busy
 	    || !curbuf->b_p_ro)
-	return;
+	ਵਾਪਸ;
 
-    ++curbuf_lock;
-    apply_autocmds(EVENT_FILECHANGEDRO, NULL, NULL, FALSE, curbuf);
-    --curbuf_lock;
-    if (!curbuf->b_p_ro)
-	return;
+    ++curbuf_ਤਾਲਾ;
+    apply_autocmds(EVENT_FILECHANGEDRO, ਨਿਰਾ, ਨਿਰਾ, FALSE, curbuf);
+    --curbuf_ਤਾਲਾ;
+    ਜੇ (!curbuf->b_p_ro)
+	ਵਾਪਸ;
 
     // Do what msg() does, but with a column offset if the warning should
     // be after the mode message.
-    msg_start();
-    if (msg_row == Rows - 1)
-	msg_col = col;
-    msg_source(HL_ATTR(HLF_W));
-    msg_puts_attr(_(w_readonly), HL_ATTR(HLF_W) | MSG_HIST);
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_readonly), -1);
-#endif
-    msg_clr_eos();
-    (void)msg_end();
-    if (msg_silent == 0 && !silent_mode
-#ifdef FEAT_EVAL
-	    && time_for_testing != 1
-#endif
+    ਸੁਨੇਹਾ_ਸ਼ੁਰੂ();
+    ਜੇ (ਸੁਨੇਹਾ_ਪੰਕਤੀ == ਪੰਕਤੀਆਂ - 1)
+	ਸੁਨੇਹਾ_ਖਾਨਾ = ਖਾਨਾ;
+    ਸੁਨੇਹਾ_ਸਰੋਤ(HL_ATTR(HLF_W));
+    ਸੁਨੇਹਾ_puts_attr(_(w_readonly), HL_ATTR(HLF_W) | ਸੁਨੇਹਾ_HIST);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+    ਸੈੱਟ_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_readonly), -1);
+#ਜੇ_ਅੰਤ
+    ਸੁਨੇਹਾ_clr_eos();
+    (ਖਾਲੀ)ਸੁਨੇਹਾ_ਸਿਰਾ();
+    ਜੇ (ਸੁਨੇਹਾ_silent == 0 && !silent_ਬਹੁਲਕ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
+	    && ਸਮਾਂ_for_testing != 1
+#ਜੇ_ਅੰਤ
        )
     {
-	out_flush();
+	ਬਾਹਰਲਾ_flush();
 	ui_delay(1002L, TRUE); // give the user time to think about it
     }
     curbuf->b_did_warn = true;
     redraw_cmdline = FALSE;	// don't redraw and erase the message
-    if (msg_row < Rows - 1)
+    ਜੇ (ਸੁਨੇਹਾ_ਪੰਕਤੀ < ਪੰਕਤੀਆਂ - 1)
 	showmode();
 }
 
@@ -75,24 +75,24 @@ change_warning(int col)
  *
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-changed(void)
+    ਖਾਲੀ
+ਬਦਲਿਆ(ਖਾਲੀ)
 {
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    if (p_imst == IM_ON_THE_SPOT)
+#ਜੇ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ਜੇ (p_imst == IM_ON_THE_SPOT)
     {
 	// The text of the preediting area is inserted, but this doesn't
 	// mean a change of the buffer yet.  That is delayed until the
 	// text is committed. (this means preedit becomes empty)
-	if (im_is_preediting() && !xim_changed_while_preediting)
-	    return;
-	xim_changed_while_preediting = FALSE;
+	ਜੇ (im_is_preediting() && !xim_ਬਦਲਿਆ_while_preediting)
+	    ਵਾਪਸ;
+	xim_ਬਦਲਿਆ_while_preediting = FALSE;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    if (!curbuf->b_changed)
+    ਜੇ (!curbuf->b_ਬਦਲਿਆ)
     {
-	int	save_msg_scroll = msg_scroll;
+	ਪੂਰਨ	save_ਸੁਨੇਹਾ_scroll = ਸੁਨੇਹਾ_scroll;
 
 	// Give a warning about changing a read-only file.  This may also
 	// check-out the file, thus change "curbuf"!
@@ -100,9 +100,9 @@ changed(void)
 
 	// Create a swap file if that is wanted.
 	// Don't do this for "nofile" and "nowrite" buffer types.
-	if (curbuf->b_may_swap && !bt_dontwrite(curbuf))
+	ਜੇ (curbuf->b_may_ਅਦਲਾ_ਬਦਲੀ && !bt_dontwrite(curbuf))
 	{
-	    int save_need_wait_return = need_wait_return;
+	    ਪੂਰਨ save_need_wait_return = need_wait_return;
 
 	    need_wait_return = FALSE;
 	    ml_open_file(curbuf);
@@ -111,66 +111,66 @@ changed(void)
 	    // Wait two seconds, to make sure the user reads this unexpected
 	    // message.  Since we could be anywhere, call wait_return() now,
 	    // and don't let the emsg() set msg_scroll.
-	    if (need_wait_return && emsg_silent == 0 && !in_assert_fails)
+	    ਜੇ (need_wait_return && emsg_silent == 0 && !ਵਿੱਚ_assert_fails)
 	    {
-		out_flush();
+		ਬਾਹਰਲਾ_flush();
 		ui_delay(2002L, TRUE);
 		wait_return(TRUE);
-		msg_scroll = save_msg_scroll;
+		ਸੁਨੇਹਾ_scroll = save_ਸੁਨੇਹਾ_scroll;
 	    }
-	    else
+	    ਨਹੀਂਤਾਂ
 		need_wait_return = save_need_wait_return;
 	}
-	changed_internal();
+	ਬਦਲਿਆ_ਅੰਦਰੂਨੀ();
     }
     ++CHANGEDTICK(curbuf);
 
-#ifdef FEAT_SEARCH_EXTRA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
     // If a pattern is highlighted, the position may now be invalid.
-    highlight_match = FALSE;
-#endif
+    highlight_ਮੇਲ = FALSE;
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Internal part of changed(), no user interaction.
  * Also used for recovery.
  */
-    void
-changed_internal(void)
+    ਖਾਲੀ
+ਬਦਲਿਆ_ਅੰਦਰੂਨੀ(ਖਾਲੀ)
 {
-    curbuf->b_changed = TRUE;
+    curbuf->b_ਬਦਲਿਆ = TRUE;
     ml_setflags(curbuf);
-    check_status(curbuf);
+    check_ਸਥਿਤੀ(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ਜੇ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
     need_maketitle = TRUE;	    // set window title later
 }
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 // Set when listener callbacks are being invoked.
-static int recursive = FALSE;
+ਸਥਿਰ ਪੂਰਨ recursive = FALSE;
 
-static long next_listener_id = 0;
+ਸਥਿਰ ਲੰਮਾ ਅਗਲਾ_listener_id = 0;
 
 // A flag that is set when any buffer listener housekeeping is required.
 // Currently the only condition is when a listener is marked for removal.
-static bool housekeeping_required;
+ਸਥਿਰ bool housekeeping_required;
 
 /*
  * Remove a given listener_T entry from its containing list.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 remove_listener_from_list(
     listener_T **list,
     listener_T *lnr,
     listener_T *prev)
 {
-    if (prev != NULL)
-	prev->lr_next = lnr->lr_next;
-    else
-	*list = lnr->lr_next;
+    ਜੇ (prev != ਨਿਰਾ)
+	prev->lr_ਅਗਲਾ = lnr->lr_ਅਗਲਾ;
+    ਨਹੀਂਤਾਂ
+	*list = lnr->lr_ਅਗਲਾ;
     free_callback(&lnr->lr_callback);
     vim_free(lnr);
 }
@@ -183,31 +183,31 @@ remove_listener_from_list(
  * will be discarded in the event that all listeners were removed.
  *
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 clean_listener_list(buf_T *buf, listener_T **list, bool all)
 {
     listener_T	*prev;
     listener_T	*lnr;
-    listener_T	*next;
+    listener_T	*ਅਗਲਾ;
 
-    prev = NULL;
-    for (lnr = *list; lnr != NULL; lnr = next)
+    prev = ਨਿਰਾ;
+    ਲਈ (lnr = *list; lnr != ਨਿਰਾ; lnr = ਅਗਲਾ)
     {
-	next = lnr->lr_next;
-	if (all || lnr->lr_id == 0)
+	ਅਗਲਾ = lnr->lr_ਅਗਲਾ;
+	ਜੇ (all || lnr->lr_id == 0)
 	    remove_listener_from_list(list, lnr, prev);
-	else
+	ਨਹੀਂਤਾਂ
 	    prev = lnr;
     }
 
     // Drop any recorded changes for a buffer with no listeners.
-    if (buf != NULL)
+    ਜੇ (buf != ਨਿਰਾ)
     {
-	if (*list == NULL && buf->b_recorded_changes != NULL)
+	ਜੇ (*list == ਨਿਰਾ && buf->b_recorded_changes != ਨਿਰਾ)
 	{
 	    list_unref(buf->b_recorded_changes);
-	    buf->b_recorded_changes = NULL;
-	    buf->b_recorded_text_size = 0;
+	    buf->b_recorded_changes = ਨਿਰਾ;
+	    buf->b_recorded_ਪਾਠ_ਮਾਪ = 0;
 	}
     }
 }
@@ -217,17 +217,17 @@ clean_listener_list(buf_T *buf, listener_T **list, bool all)
  *
  * This does nothing unless the "housekeeping_required" flag has been set.
  */
-    static void
-perform_listener_housekeeping(void)
+    ਸਥਿਰ ਖਾਲੀ
+perform_listener_housekeeping(ਖਾਲੀ)
 {
     buf_T	*buf;
 
-    if (housekeeping_required)
+    ਜੇ (housekeeping_required)
     {
 	FOR_ALL_BUFFERS(buf)
 	{
 	    clean_listener_list(buf, &buf->b_listener, FALSE);
-	    clean_listener_list(NULL, &buf->b_sync_listener, FALSE);
+	    clean_listener_list(ਨਿਰਾ, &buf->b_sync_listener, FALSE);
 	}
 	housekeeping_required = FALSE;
     }
@@ -237,53 +237,53 @@ perform_listener_housekeeping(void)
  * Check if the change at "lnum" is above or overlaps with an existing
  * change. If above then flush changes and invoke listeners.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 check_recorded_changes(
 	buf_T		*buf,
 	linenr_T	lnum,
 	linenr_T	lnume,
-	long		xtra)
+	ਲੰਮਾ		xtra)
 {
     perform_listener_housekeeping();
-    if (buf->b_recorded_changes == NULL || xtra == 0)
-	return;
+    ਜੇ (buf->b_recorded_changes == ਨਿਰਾ || xtra == 0)
+	ਵਾਪਸ;
 
     listitem_T *li;
     linenr_T	prev_lnum;
     linenr_T	prev_lnume;
 
-    FOR_ALL_LIST_ITEMS(buf->b_recorded_changes, li)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(buf->b_recorded_changes, li)
     {
-	prev_lnum = (linenr_T)dict_get_number(
+	prev_lnum = (linenr_T)dict_get_ਸੰਖਿਆ(
 		li->li_tv.vval.v_dict, "lnum");
-	prev_lnume = (linenr_T)dict_get_number(
+	prev_lnume = (linenr_T)dict_get_ਸੰਖਿਆ(
 		li->li_tv.vval.v_dict, "end");
-	if (prev_lnum >= lnum || prev_lnum > lnume || prev_lnume >= lnum)
+	ਜੇ (prev_lnum >= lnum || prev_lnum > lnume || prev_lnume >= lnum)
 	{
 	    // the current change is going to make the line number in
 	    // the older change invalid, flush now
 	    invoke_listeners(curbuf);
-	    break;
+	    ਰੋਕੋ;
 	}
     }
 }
 
 // Amount of recorded text after which the listeners are invoked, to bound the
 // memory used by a long sequence of changes.
-# define LISTENER_TEXT_MAX (4 * 1024 * 1024)
+# define LISTENER_ਪਾਠ_MAX (4 * 1024 * 1024)
 
 /*
  * Return true when any listener in "list" asked for the resulting text.
  */
-    static bool
-listeners_want_text(listener_T *list)
+    ਸਥਿਰ bool
+listeners_want_ਪਾਠ(listener_T *list)
 {
     listener_T	*lnr;
 
-    for (lnr = list; lnr != NULL; lnr = lnr->lr_next)
-	if (lnr->lr_text)
-	    return true;
-    return false;
+    ਲਈ (lnr = list; lnr != ਨਿਰਾ; lnr = lnr->lr_ਅਗਲਾ)
+	ਜੇ (lnr->lr_ਪਾਠ)
+	    ਵਾਪਸ true;
+    ਵਾਪਸ false;
 }
 
 /*
@@ -291,43 +291,43 @@ listeners_want_text(listener_T *list)
  * change: the lines from "lnum" up to but not including "lnume" + "xtra".
  * Returns the number of bytes stored.
  */
-    static size_t
-add_change_text(
+    ਸਥਿਰ size_t
+ਜੋੜੋ_change_ਪਾਠ(
     buf_T	*buf,
     dict_T	*dict,
     linenr_T	lnum,
     linenr_T	lnume,
-    long	xtra)
+    ਲੰਮਾ	xtra)
 {
     list_T	*l = list_alloc();
-    linenr_T	below = lnume + xtra;	// line below the changed region
-    size_t	size = 0;
+    linenr_T	ਹੇਠਾਂ = lnume + xtra;	// line below the changed region
+    size_t	ਮਾਪ = 0;
 
-    if (l == NULL)
-	return 0;
+    ਜੇ (l == ਨਿਰਾ)
+	ਵਾਪਸ 0;
 
-    if (below > buf->b_ml.ml_line_count + 1)
-	below = buf->b_ml.ml_line_count + 1;
-    for (linenr_T lp = lnum < 1 ? 1 : lnum; lp < below; ++lp)
+    ਜੇ (ਹੇਠਾਂ > buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1)
+	ਹੇਠਾਂ = buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ + 1;
+    ਲਈ (linenr_T lp = lnum < 1 ? 1 : lnum; lp < ਹੇਠਾਂ; ++lp)
     {
-	char_u	*line = ml_get_buf(buf, lp, FALSE);
+	char_u	*ਸਤਰ = ml_get_buf(buf, lp, FALSE);
 	colnr_T	len = ml_get_buf_len(buf, lp);
 
 	// Rather than storing a part of the text, store none of it.
-	if (list_append_string(l, line, len) == FAIL)
+	ਜੇ (list_append_string(l, ਸਤਰ, len) == FAIL)
 	{
 	    list_free(l);
-	    return 0;
+	    ਵਾਪਸ 0;
 	}
-	size += (size_t)len + 1;
+	ਮਾਪ += (size_t)len + 1;
     }
 
-    if (dict_add_list(dict, "text", l) == FAIL)
+    ਜੇ (dict_ਜੋੜੋ_list(dict, "text", l) == FAIL)
     {
 	list_free(l);
-	return 0;
+	ਵਾਪਸ 0;
     }
-    return size;
+    ਵਾਪਸ ਮਾਪ;
 }
 
 /*
@@ -337,104 +337,104 @@ add_change_text(
  * This only deals with listeners that are prepared to accept multiple buffered
  * changes.
  */
-    static void
-may_record_change(
+    ਸਥਿਰ ਖਾਲੀ
+may_ਰਿਕਾਰਡ_change(
     linenr_T	lnum,
-    colnr_T	col,
+    colnr_T	ਖਾਨਾ,
     linenr_T	lnume,
-    long	xtra)
+    ਲੰਮਾ	xtra)
 {
     dict_T	*dict;
 
     perform_listener_housekeeping();
-    if (curbuf->b_listener == NULL)
-	return;
+    ਜੇ (curbuf->b_listener == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // If the new change is going to change the line numbers in already listed
     // changes, then flush.
     check_recorded_changes(curbuf, lnum, lnume, xtra);
 
-    if (curbuf->b_recorded_changes == NULL)
+    ਜੇ (curbuf->b_recorded_changes == ਨਿਰਾ)
     {
 	curbuf->b_recorded_changes = list_alloc();
-	if (curbuf->b_recorded_changes == NULL)  // out of memory
-	    return;
+	ਜੇ (curbuf->b_recorded_changes == ਨਿਰਾ)  // out of memory
+	    ਵਾਪਸ;
 	++curbuf->b_recorded_changes->lv_refcount;
     }
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return;
-    dict_add_number(dict, "lnum", (varnumber_T)lnum);
-    dict_add_number(dict, "end", (varnumber_T)lnume);
-    dict_add_number(dict, "added", (varnumber_T)xtra);
-    dict_add_number(dict, "col", (varnumber_T)col + 1);
-    if (listeners_want_text(curbuf->b_listener))
-	curbuf->b_recorded_text_size +=
-			  add_change_text(curbuf, dict, lnum, lnume, xtra);
+    ਜੇ (dict == ਨਿਰਾ)
+	ਵਾਪਸ;
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "lnum", (varnumber_T)lnum);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "end", (varnumber_T)lnume);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "added", (varnumber_T)xtra);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "col", (varnumber_T)ਖਾਨਾ + 1);
+    ਜੇ (listeners_want_ਪਾਠ(curbuf->b_listener))
+	curbuf->b_recorded_ਪਾਠ_ਮਾਪ +=
+			  ਜੋੜੋ_change_ਪਾਠ(curbuf, dict, lnum, lnume, xtra);
 
     list_append_dict(curbuf->b_recorded_changes, dict);
 
     // Invoking the listeners resets the size, do not try while they are busy.
-    if (!recursive && curbuf->b_recorded_text_size > LISTENER_TEXT_MAX)
+    ਜੇ (!recursive && curbuf->b_recorded_ਪਾਠ_ਮਾਪ > LISTENER_ਪਾਠ_MAX)
 	invoke_listeners(curbuf);
 }
 
 /*
  * listener_add() function
  */
-    void
-f_listener_add(typval_T *argvars, typval_T *rettv)
+    ਖਾਲੀ
+f_listener_ਜੋੜੋ(typval_T *argvars, typval_T *rettv)
 {
     callback_T	callback;
     listener_T	*lnr;
     buf_T	*buf = curbuf;
     bool	unbuffered = false;
-    bool	want_text = false;
+    bool	want_ਪਾਠ = false;
 
-    if (check_secure())
-	return;
+    ਜੇ (check_secure())
+	ਵਾਪਸ;
 
-    if (recursive)
+    ਜੇ (recursive)
     {
-	emsg(_(e_cannot_add_listener_in_listener_callback));
-	return;
+	emsg(_(e_cannot_ਜੋੜੋ_listener_ਵਿੱਚ_listener_callback));
+	ਵਾਪਸ;
     }
 
-    if (in_vim9script() && (
-	    check_for_opt_buffer_arg(argvars, 1) == FAIL
+    ਜੇ (ਵਿੱਚ_vim9script() && (
+	    check_for_opt_ਬਫਰ_arg(argvars, 1) == FAIL
 	    || (argvars[1].v_type != VAR_UNKNOWN
 		&& check_for_opt_bool_or_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ਵਾਪਸ;
 
     callback = get_callback(&argvars[0]);
-    if (callback.cb_name == NULL)
-	return;
+    ਜੇ (callback.cb_name == ਨਿਰਾ)
+	ਵਾਪਸ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	buf = get_buf_arg(&argvars[1]);
-	if (buf == NULL)
+	ਜੇ (buf == ਨਿਰਾ)
 	{
 	    free_callback(&callback);
-	    return;
+	    ਵਾਪਸ;
 	}
-	if (argvars[2].v_type == VAR_DICT)
+	ਜੇ (argvars[2].v_type == VAR_DICT)
 	{
 	    dict_T *d = argvars[2].vval.v_dict;
 
 	    unbuffered = dict_get_bool(d, "unbuffered", false);
-	    want_text = dict_get_bool(d, "text", false);
+	    want_ਪਾਠ = dict_get_bool(d, "text", false);
 	}
-	else if (argvars[2].v_type != VAR_UNKNOWN)
+	ਨਹੀਂਤਾਂ ਜੇ (argvars[2].v_type != VAR_UNKNOWN)
 	    unbuffered = tv_get_bool(&argvars[2]);
     }
 
     lnr = ALLOC_CLEAR_ONE(listener_T);
-    if (lnr == NULL)
+    ਜੇ (lnr == ਨਿਰਾ)
     {
 	free_callback(&callback);
-	return;
+	ਵਾਪਸ;
     }
 
     // Perform any pending housekeeping and then make sure any buffered change
@@ -443,46 +443,46 @@ f_listener_add(typval_T *argvars, typval_T *rettv)
     perform_listener_housekeeping();
     invoke_listeners(buf);
 
-    if (unbuffered)
+    ਜੇ (unbuffered)
     {
-	lnr->lr_next = buf->b_sync_listener;
+	lnr->lr_ਅਗਲਾ = buf->b_sync_listener;
 	buf->b_sync_listener = lnr;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-	lnr->lr_next = buf->b_listener;
+	lnr->lr_ਅਗਲਾ = buf->b_listener;
 	buf->b_listener = lnr;
     }
 
-    set_callback(&lnr->lr_callback, &callback);
+    ਸੈੱਟ_callback(&lnr->lr_callback, &callback);
 
-    lnr->lr_text = want_text;
-    lnr->lr_id = ++next_listener_id;
-    rettv->vval.v_number = lnr->lr_id;
+    lnr->lr_ਪਾਠ = want_ਪਾਠ;
+    lnr->lr_id = ++ਅਗਲਾ_listener_id;
+    rettv->vval.v_ਸੰਖਿਆ = lnr->lr_id;
 }
 
 /*
  * listener_flush() function
  */
-    void
-f_listener_flush(typval_T *argvars, typval_T *rettv UNUSED)
+    ਖਾਲੀ
+f_listener_flush(typval_T *argvars, typval_T *rettv ਅਣਵਰਤਿਆ)
 {
     buf_T	*buf = curbuf;
 
-    if (check_secure())
-	return;
+    ਜੇ (check_secure())
+	ਵਾਪਸ;
 
-    if (recursive)
-	return;
+    ਜੇ (recursive)
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_opt_ਬਫਰ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ਜੇ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	buf = get_buf_arg(&argvars[0]);
-	if (buf == NULL)
-	    return;
+	ਜੇ (buf == ਨਿਰਾ)
+	    ਵਾਪਸ;
     }
     perform_listener_housekeeping();
     invoke_listeners(buf);
@@ -491,24 +491,24 @@ f_listener_flush(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * Find the buffer change listener entry for a given unique ID.
  */
-    static listener_T *
-find_listener(
-    int        id,
-    listener_T *list_start,
+    ਸਥਿਰ listener_T *
+ਲੱਭੋ_listener(
+    ਪੂਰਨ        id,
+    listener_T *list_ਸ਼ੁਰੂ,
     listener_T **prev)
 {
-    listener_T *next;
+    listener_T *ਅਗਲਾ;
     listener_T *lnr;
 
-    *prev = NULL;
-    for (lnr = list_start; lnr != NULL; lnr = next)
+    *prev = ਨਿਰਾ;
+    ਲਈ (lnr = list_ਸ਼ੁਰੂ; lnr != ਨਿਰਾ; lnr = ਅਗਲਾ)
     {
-	next = lnr->lr_next;
-	if (lnr->lr_id == id)
-	    return lnr;
+	ਅਗਲਾ = lnr->lr_ਅਗਲਾ;
+	ਜੇ (lnr->lr_id == id)
+	    ਵਾਪਸ lnr;
 	*prev = lnr;
     }
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
 }
 
 /*
@@ -517,34 +517,34 @@ find_listener(
  * This simply marks the listener_T entry as unused, by setting its ID to zero.
  * The listener_T entry gets removed later by housekeeping.
  */
-    void
+    ਖਾਲੀ
 f_listener_remove(typval_T *argvars, typval_T *rettv)
 {
     listener_T	*lnr;
     listener_T	*prev;
-    int		id;
+    ਪੂਰਨ		id;
     buf_T	*buf;
 
-    if (check_secure())
-	return;
+    ਜੇ (check_secure())
+	ਵਾਪਸ;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ਜੇ (ਵਿੱਚ_vim9script() && check_for_ਸੰਖਿਆ_arg(argvars, 0) == FAIL)
+	ਵਾਪਸ;
 
-    id = tv_get_number(argvars);
+    id = tv_get_ਸੰਖਿਆ(argvars);
     FOR_ALL_BUFFERS(buf)
     {
-	lnr = find_listener(id, buf->b_listener, &prev);
-	if (lnr == NULL)
-	    lnr = find_listener(id, buf->b_sync_listener, &prev);
-	if (lnr != NULL)
+	lnr = ਲੱਭੋ_listener(id, buf->b_listener, &prev);
+	ਜੇ (lnr == ਨਿਰਾ)
+	    lnr = ਲੱਭੋ_listener(id, buf->b_sync_listener, &prev);
+	ਜੇ (lnr != ਨਿਰਾ)
 	{
 	    // Clear the ID to indicate that the listener is unused flag
 	    // housekeeping.
 	    lnr->lr_id = 0;
 	    housekeeping_required = TRUE;
-	    rettv->vval.v_number = 1;
-	    return;
+	    rettv->vval.v_ਸੰਖਿਆ = 1;
+	    ਵਾਪਸ;
 	}
     }
 }
@@ -553,8 +553,8 @@ f_listener_remove(typval_T *argvars, typval_T *rettv)
  * Called before inserting a line above "lnum"/"lnume" or deleting line "lnum"
  * to "lnume".
  */
-    void
-may_invoke_listeners(buf_T *buf, linenr_T lnum, linenr_T lnume, int added)
+    ਖਾਲੀ
+may_invoke_listeners(buf_T *buf, linenr_T lnum, linenr_T lnume, ਪੂਰਨ added)
 {
     check_recorded_changes(buf, lnum, lnume, added);
 }
@@ -562,38 +562,38 @@ may_invoke_listeners(buf_T *buf, linenr_T lnum, linenr_T lnume, int added)
 /*
  * Common processing for invoke_listeners and invoke_sync_listeners.
  */
-    static void
-invoke_listener_set(
+    ਸਥਿਰ ਖਾਲੀ
+invoke_listener_ਸੈੱਟ(
     buf_T       *buf,
-    linenr_T	start,
-    linenr_T	end,
-    long	added,
+    linenr_T	ਸ਼ੁਰੂ,
+    linenr_T	ਸਿਰਾ,
+    ਲੰਮਾ	added,
     list_T      *recorded_changes,
     listener_T  *listeners)
 {
-    int		save_updating_screen = updating_screen;
+    ਪੂਰਨ		save_updating_screen = updating_screen;
     listener_T	*lnr;
     typval_T	rettv;
     typval_T	argv[6];
     typval_T    val;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = buf->b_fnum; // a:bufnr
-    argv[1].v_type = VAR_NUMBER;
-    argv[1].vval.v_number = start;
-    argv[2].v_type = VAR_NUMBER;
-    argv[2].vval.v_number = end;
-    argv[3].v_type = VAR_NUMBER;
-    argv[3].vval.v_number = added;
+    argv[0].v_type = VAR_ਸੰਖਿਆ;
+    argv[0].vval.v_ਸੰਖਿਆ = buf->b_fnum; // a:bufnr
+    argv[1].v_type = VAR_ਸੰਖਿਆ;
+    argv[1].vval.v_ਸੰਖਿਆ = ਸ਼ੁਰੂ;
+    argv[2].v_type = VAR_ਸੰਖਿਆ;
+    argv[2].vval.v_ਸੰਖਿਆ = ਸਿਰਾ;
+    argv[3].v_type = VAR_ਸੰਖਿਆ;
+    argv[3].vval.v_ਸੰਖਿਆ = added;
     argv[4].v_type = VAR_LIST;
     argv[4].vval.v_list = recorded_changes;
 
     // Ensure the list of changes is locked to prevent any modifications by
     // callback code..
     val.v_type = VAR_LIST;
-    val.v_lock = 0;
+    val.v_ਤਾਲਾ = 0;
     val.vval.v_list = recorded_changes;
-    item_lock(&val, -1, TRUE, FALSE);
+    ਵਸਤੂ_ਤਾਲਾ(&val, -1, TRUE, FALSE);
 
     // Protect against recursive callbacks, lock the buffer against changes and
     // set the updating_screen flag to prevent channel input processing, which
@@ -602,16 +602,16 @@ invoke_listener_set(
     ++textlock;
     updating_screen = TRUE;
 
-    for (lnr = listeners; lnr != NULL; lnr = lnr->lr_next)
+    ਲਈ (lnr = listeners; lnr != ਨਿਰਾ; lnr = lnr->lr_ਅਗਲਾ)
     {
 	call_callback(&lnr->lr_callback, -1, &rettv, 5, argv);
 	clear_tv(&rettv);
     }
 
     --textlock;
-    if (save_updating_screen)
+    ਜੇ (save_updating_screen)
 	updating_screen = TRUE;
-    else
+    ਨਹੀਂਤਾਂ
 	after_updating_screen(TRUE);
     recursive = FALSE;
 }
@@ -620,45 +620,45 @@ invoke_listener_set(
  * Called when any change occurs: invoke listeners added with the "unbuffered"
  * parameter set.
  */
-    static void
+    ਸਥਿਰ ਖਾਲੀ
 invoke_sync_listeners(
     buf_T	*buf,
-    linenr_T	start,
-    colnr_T	col,
-    linenr_T	end,
-    long	added)
+    linenr_T	ਸ਼ੁਰੂ,
+    colnr_T	ਖਾਨਾ,
+    linenr_T	ਸਿਰਾ,
+    ਲੰਮਾ	added)
 {
     list_T      *recorded_changes;
     dict_T	*dict;
 
-    if (recursive || curbuf->b_sync_listener == NULL)
-	return;
+    ਜੇ (recursive || curbuf->b_sync_listener == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Create a single entry list to store the details of the change (including
     // the column).
     recorded_changes = list_alloc();
-    if (recorded_changes == NULL)  // out of memory
-	return;
+    ਜੇ (recorded_changes == ਨਿਰਾ)  // out of memory
+	ਵਾਪਸ;
 
     ++recorded_changes->lv_refcount;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    ਜੇ (dict == ਨਿਰਾ)
     {
 	list_unref(recorded_changes);
-	return;
+	ਵਾਪਸ;
     }
 
-    dict_add_number(dict, "lnum", (varnumber_T)start);
-    dict_add_number(dict, "end", (varnumber_T)end);
-    dict_add_number(dict, "added", (varnumber_T)added);
-    dict_add_number(dict, "col", (varnumber_T)col + 1);
-    if (listeners_want_text(buf->b_sync_listener))
-	(void)add_change_text(buf, dict, start, end, added);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "lnum", (varnumber_T)ਸ਼ੁਰੂ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "end", (varnumber_T)ਸਿਰਾ);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "added", (varnumber_T)added);
+    dict_ਜੋੜੋ_ਸੰਖਿਆ(dict, "col", (varnumber_T)ਖਾਨਾ + 1);
+    ਜੇ (listeners_want_ਪਾਠ(buf->b_sync_listener))
+	(ਖਾਲੀ)ਜੋੜੋ_change_ਪਾਠ(buf, dict, ਸ਼ੁਰੂ, ਸਿਰਾ, added);
     list_append_dict(recorded_changes, dict);
 
-    invoke_listener_set(
-	buf, start, end, added, recorded_changes, buf->b_sync_listener);
+    invoke_listener_ਸੈੱਟ(
+	buf, ਸ਼ੁਰੂ, ਸਿਰਾ, added, recorded_changes, buf->b_sync_listener);
 
     list_unref(recorded_changes);
 }
@@ -667,137 +667,137 @@ invoke_sync_listeners(
  * Called when a sequence of changes is done: invoke listeners added with
  * listener_add().
  */
-    void
+    ਖਾਲੀ
 invoke_listeners(buf_T *buf)
 {
     listitem_T	*li;
-    linenr_T	start = MAXLNUM;
-    linenr_T	end = 0;
+    linenr_T	ਸ਼ੁਰੂ = MAXLNUM;
+    linenr_T	ਸਿਰਾ = 0;
     linenr_T	added = 0;
 
-    if (buf->b_recorded_changes == NULL  // nothing changed
-	    || buf->b_listener == NULL	 // no listeners
+    ਜੇ (buf->b_recorded_changes == ਨਿਰਾ  // nothing changed
+	    || buf->b_listener == ਨਿਰਾ	 // no listeners
 	    || recursive)		 // already busy
-	return;
+	ਵਾਪਸ;
 
-    FOR_ALL_LIST_ITEMS(buf->b_recorded_changes, li)
+    FOR_ALL_LIST_ਚੀਜ਼ਾਂ(buf->b_recorded_changes, li)
     {
 	varnumber_T lnum;
 
-	lnum = dict_get_number(li->li_tv.vval.v_dict, "lnum");
-	if (start > lnum)
-	    start = lnum;
-	lnum = dict_get_number(li->li_tv.vval.v_dict, "end");
-	if (end < lnum)
-	    end = lnum;
-	added += dict_get_number(li->li_tv.vval.v_dict, "added");
+	lnum = dict_get_ਸੰਖਿਆ(li->li_tv.vval.v_dict, "lnum");
+	ਜੇ (ਸ਼ੁਰੂ > lnum)
+	    ਸ਼ੁਰੂ = lnum;
+	lnum = dict_get_ਸੰਖਿਆ(li->li_tv.vval.v_dict, "end");
+	ਜੇ (ਸਿਰਾ < lnum)
+	    ਸਿਰਾ = lnum;
+	added += dict_get_ਸੰਖਿਆ(li->li_tv.vval.v_dict, "added");
     }
 
-    invoke_listener_set(
-	buf, start, end, added, buf->b_recorded_changes, buf->b_listener);
+    invoke_listener_ਸੈੱਟ(
+	buf, ਸ਼ੁਰੂ, ਸਿਰਾ, added, buf->b_recorded_changes, buf->b_listener);
 
     list_unref(buf->b_recorded_changes);
-    buf->b_recorded_changes = NULL;
-    buf->b_recorded_text_size = 0;
+    buf->b_recorded_changes = ਨਿਰਾ;
+    buf->b_recorded_ਪਾਠ_ਮਾਪ = 0;
 }
 
 /*
  * Remove all listeners associated with "buf".
  */
-    void
+    ਖਾਲੀ
 remove_listeners(buf_T *buf)
 {
     clean_listener_list(buf, &buf->b_listener, TRUE);
-    clean_listener_list(NULL, &buf->b_sync_listener, TRUE);
+    clean_listener_list(ਨਿਰਾ, &buf->b_sync_listener, TRUE);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 /*
  * Common code for when a change was made.
  * See changed_lines() for the arguments.
  * Careful: may trigger autocommands that reload the buffer.
  */
-    static void
-changed_common(
+    ਸਥਿਰ ਖਾਲੀ
+ਬਦਲਿਆ_common(
     linenr_T	lnum,
-    colnr_T	col,
+    colnr_T	ਖਾਨਾ,
     linenr_T	lnume,
-    long	xtra)
+    ਲੰਮਾ	xtra)
 {
     win_T	*wp;
     tabpage_T	*tp;
-    int		i;
-    int		cols;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		ਖਾਨੇ_ਗਿਣਤੀ;
     pos_T	*p;
-    int		add;
+    ਪੂਰਨ		ਜੋੜੋ;
 
     // mark the buffer as modified
-    changed();
+    ਬਦਲਿਆ();
 
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
     // Immediately send this change to any listeners that require changes not
     // to be buffered.
-    invoke_sync_listeners(curbuf, lnum, col, lnume, xtra);
+    invoke_sync_listeners(curbuf, lnum, ਖਾਨਾ, lnume, xtra);
 
     // If there are any listeners accepting buffered changes then add changes
     // to the current buffer's list, flushing previous changes first if necessary.
-    may_record_change(lnum, col, lnume, xtra);
-#endif
-#ifdef FEAT_DIFF
-    if (curwin->w_p_diff && diff_internal())
+    may_ਰਿਕਾਰਡ_change(lnum, ਖਾਨਾ, lnume, xtra);
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+    ਜੇ (curwin->w_p_diff && diff_ਅੰਦਰੂਨੀ())
     {
 	curtab->tp_diff_update = TRUE;
-	diff_update_line(lnum);
+	diff_update_ਸਤਰ(lnum);
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     // set the '. mark
-    if ((cmdmod.cmod_flags & CMOD_KEEPJUMPS) == 0)
+    ਜੇ ((cmdmod.cmod_flags & CMOD_KEEPJUMPS) == 0)
     {
-	curbuf->b_last_change.lnum = lnum;
-	curbuf->b_last_change.col = col;
+	curbuf->b_ਆਖਰੀ_change.lnum = lnum;
+	curbuf->b_ਆਖਰੀ_change.ਖਾਨਾ = ਖਾਨਾ;
 
 	// Create a new entry if a new undo-able change was started or we
 	// don't have an entry yet.
-	if (curbuf->b_new_change || curbuf->b_changelistlen == 0)
+	ਜੇ (curbuf->b_new_change || curbuf->b_changelistlen == 0)
 	{
-	    if (curbuf->b_changelistlen == 0)
-		add = TRUE;
-	    else
+	    ਜੇ (curbuf->b_changelistlen == 0)
+		ਜੋੜੋ = TRUE;
+	    ਨਹੀਂਤਾਂ
 	    {
 		// Don't create a new entry when the line number is the same
 		// as the last one and the column is not too far away.	Avoids
 		// creating many entries for typing "xxxxx".
 		p = &curbuf->b_changelist[curbuf->b_changelistlen - 1];
-		if (p->lnum != lnum)
-		    add = TRUE;
-		else
+		ਜੇ (p->lnum != lnum)
+		    ਜੋੜੋ = TRUE;
+		ਨਹੀਂਤਾਂ
 		{
-		    cols = comp_textwidth(FALSE);
-		    if (cols == 0)
-			cols = 79;
-		    add = (p->col + cols < col || col + cols < p->col);
+		    ਖਾਨੇ_ਗਿਣਤੀ = comp_textwidth(FALSE);
+		    ਜੇ (ਖਾਨੇ_ਗਿਣਤੀ == 0)
+			ਖਾਨੇ_ਗਿਣਤੀ = 79;
+		    ਜੋੜੋ = (p->ਖਾਨਾ + ਖਾਨੇ_ਗਿਣਤੀ < ਖਾਨਾ || ਖਾਨਾ + ਖਾਨੇ_ਗਿਣਤੀ < p->ਖਾਨਾ);
 		}
 	    }
-	    if (add)
+	    ਜੇ (ਜੋੜੋ)
 	    {
 		// This is the first of a new sequence of undo-able changes
 		// and it's at some distance of the last change.  Use a new
 		// position in the changelist.
 		curbuf->b_new_change = false;
 
-		if (curbuf->b_changelistlen == JUMPLISTSIZE)
+		ਜੇ (curbuf->b_changelistlen == JUMPLISTSIZE)
 		{
 		    // changelist is full: remove oldest entry
 		    curbuf->b_changelistlen = JUMPLISTSIZE - 1;
 		    mch_memmove(curbuf->b_changelist, curbuf->b_changelist + 1,
-					  sizeof(pos_T) * (JUMPLISTSIZE - 1));
+					  ਆਕਾਰ(pos_T) * (JUMPLISTSIZE - 1));
 		    FOR_ALL_TAB_WINDOWS(tp, wp)
 		    {
 			// Correct position in changelist for other windows on
 			// this buffer.
-			if (wp->w_buffer == curbuf && wp->w_changelistidx > 0)
+			ਜੇ (wp->w_ਬਫਰ == curbuf && wp->w_changelistidx > 0)
 			    --wp->w_changelistidx;
 		    }
 		}
@@ -805,7 +805,7 @@ changed_common(
 		{
 		    // For other windows, if the position in the changelist is
 		    // at the end it stays at the end.
-		    if (wp->w_buffer == curbuf
+		    ਜੇ (wp->w_ਬਫਰ == curbuf
 			    && wp->w_changelistidx == curbuf->b_changelistlen)
 			++wp->w_changelistidx;
 		}
@@ -813,36 +813,36 @@ changed_common(
 	    }
 	}
 	curbuf->b_changelist[curbuf->b_changelistlen - 1] =
-							curbuf->b_last_change;
+							curbuf->b_ਆਖਰੀ_change;
 	// The current window is always after the last change, so that "g,"
 	// takes you back to it.
 	curwin->w_changelistidx = curbuf->b_changelistlen;
     }
 
-    if (VIsual_active)
+    ਜੇ (VIsual_ਸਰਗਰਮ)
 	check_visual_pos();
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer == curbuf)
+	ਜੇ (wp->w_ਬਫਰ == curbuf)
 	{
-	    linenr_T last = lnume + xtra - 1;  // last line after the change
+	    linenr_T ਆਖਰੀ = lnume + xtra - 1;  // last line after the change
 
 	    // Mark this window to be redrawn later.
-	    if (!redraw_not_allowed && wp->w_redr_type < UPD_VALID)
+	    ਜੇ (!redraw_not_allowed && wp->w_redr_type < UPD_VALID)
 		wp->w_redr_type = UPD_VALID;
 
 	    // When inserting/deleting lines and the window has specific lines
 	    // to be redrawn, w_redraw_top and w_redraw_bot may now be invalid,
 	    // so just redraw everything.
-	    if (xtra != 0 && wp->w_redraw_top != 0)
+	    ਜੇ (xtra != 0 && wp->w_redraw_ਸਿਖਰ != 0)
 		redraw_win_later(wp, UPD_NOT_VALID);
 
 	    // Reset "w_skipcol" if the topline length has become smaller to
 	    // such a degree that nothing will be visible anymore, accounting
 	    // for 'smoothscroll' <<< or 'listchars' "precedes" marker.
-	    if (wp->w_skipcol > 0
-		    && (last < wp->w_topline
+	    ਜੇ (wp->w_skipcol > 0
+		    && (ਆਖਰੀ < wp->w_topline
 			|| (wp->w_topline >= lnum
 			    && wp->w_topline < lnume
 			    && linetabsize_eol(wp, wp->w_topline)
@@ -851,41 +851,41 @@ changed_common(
 
 	    // Check if a change in the buffer has invalidated the cached
 	    // values for the cursor.
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 	    // Update the folds for this window.  Can't postpone this, because
 	    // a following operator might work on the whole fold: ">>dd".
-	    foldUpdate(wp, lnum, last);
+	    foldUpdate(wp, lnum, ਆਖਰੀ);
 
 	    // The change may cause lines above or below the change to become
 	    // included in a fold.  Set lnum/lnume to the first/last line that
 	    // might be displayed differently.
 	    // Set w_cline_folded here as an efficient way to update it when
 	    // inserting lines just above a closed fold.
-	    i = hasFoldingWin(wp, lnum, &lnum, NULL, FALSE, NULL);
-	    if (wp->w_cursor.lnum == lnum)
+	    i = hasFoldingWin(wp, lnum, &lnum, ਨਿਰਾ, FALSE, ਨਿਰਾ);
+	    ਜੇ (wp->w_cursor.lnum == lnum)
 		wp->w_cline_folded = i;
-	    i = hasFoldingWin(wp, last, NULL, &last, FALSE, NULL);
-	    if (wp->w_cursor.lnum == last)
+	    i = hasFoldingWin(wp, ਆਖਰੀ, ਨਿਰਾ, &ਆਖਰੀ, FALSE, ਨਿਰਾ);
+	    ਜੇ (wp->w_cursor.lnum == ਆਖਰੀ)
 		wp->w_cline_folded = i;
 
 	    // If the changed line is in a range of previously folded lines,
 	    // compare with the first line in that range.
-	    if (wp->w_cursor.lnum <= lnum)
+	    ਜੇ (wp->w_cursor.lnum <= lnum)
 	    {
-		i = find_wl_entry(wp, lnum);
-		if (i >= 0 && wp->w_cursor.lnum > wp->w_lines[i].wl_lnum)
-		    changed_line_abv_curs_win(wp);
+		i = ਲੱਭੋ_wl_ਇੰਦਰਾਜ(wp, lnum);
+		ਜੇ (i >= 0 && wp->w_cursor.lnum > wp->w_ਸਤਰਾਂ[i].wl_lnum)
+		    ਬਦਲਿਆ_ਸਤਰ_abv_curs_win(wp);
 	    }
-#endif
-	    if (wp->w_cursor.lnum > lnum)
-		changed_line_abv_curs_win(wp);
-	    else if (wp->w_cursor.lnum == lnum && wp->w_cursor.col >= col)
-		changed_cline_bef_curs_win(wp);
-	    if (wp->w_botline >= lnum)
+#ਜੇ_ਅੰਤ
+	    ਜੇ (wp->w_cursor.lnum > lnum)
+		ਬਦਲਿਆ_ਸਤਰ_abv_curs_win(wp);
+	    ਨਹੀਂਤਾਂ ਜੇ (wp->w_cursor.lnum == lnum && wp->w_cursor.ਖਾਨਾ >= ਖਾਨਾ)
+		ਬਦਲਿਆ_cline_bef_curs_win(wp);
+	    ਜੇ (wp->w_botline >= lnum)
 	    {
-		if (xtra < 0)
+		ਜੇ (xtra < 0)
 		    invalidate_botline_win(wp);
-		else
+		ਨਹੀਂਤਾਂ
 		    // Assume that botline doesn't change (inserted lines make
 		    // other lines scroll down below botline).
 		    approximate_botline_win(wp);
@@ -895,93 +895,93 @@ changed_common(
 	    // For entries below the change: Correct the lnums for
 	    // inserted/deleted lines.	Makes it possible to stop displaying
 	    // after the change.
-	    for (i = 0; i < wp->w_lines_valid; ++i)
-		if (wp->w_lines[i].wl_valid)
+	    ਲਈ (i = 0; i < wp->w_ਸਤਰਾਂ_valid; ++i)
+		ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_valid)
 		{
-		    if (wp->w_lines[i].wl_lnum >= lnum)
+		    ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_lnum >= lnum)
 		    {
 			// Do not change wl_lnum at index zero, it is used to
 			// compare with w_topline.  Invalidate it instead.
-			if (wp->w_lines[i].wl_lnum < lnume || i == 0)
+			ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_lnum < lnume || i == 0)
 			{
 			    // line included in change
-			    wp->w_lines[i].wl_valid = FALSE;
+			    wp->w_ਸਤਰਾਂ[i].wl_valid = FALSE;
 			}
-			else if (xtra != 0)
+			ਨਹੀਂਤਾਂ ਜੇ (xtra != 0)
 			{
 			    // line below change
-			    wp->w_lines[i].wl_lnum += xtra;
-#ifdef FEAT_FOLDING
-			    wp->w_lines[i].wl_lastlnum += xtra;
-#endif
+			    wp->w_ਸਤਰਾਂ[i].wl_lnum += xtra;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+			    wp->w_ਸਤਰਾਂ[i].wl_lastlnum += xtra;
+#ਜੇ_ਅੰਤ
 			}
 		    }
-#ifdef FEAT_FOLDING
-		    else if (wp->w_lines[i].wl_lastlnum >= lnum)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
+		    ਨਹੀਂਤਾਂ ਜੇ (wp->w_ਸਤਰਾਂ[i].wl_lastlnum >= lnum)
 		    {
 			// change somewhere inside this range of folded lines,
 			// may need to be redrawn
-			wp->w_lines[i].wl_valid = FALSE;
+			wp->w_ਸਤਰਾਂ[i].wl_valid = FALSE;
 		    }
-#endif
+#ਜੇ_ਅੰਤ
 		}
 
-#ifdef FEAT_FOLDING
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_FOLDING
 	    // Take care of side effects for setting w_topline when folds have
 	    // changed.  Esp. when the buffer was changed in another window.
-	    if (hasAnyFolding(wp))
-		set_topline(wp, wp->w_topline);
-#endif
+	    ਜੇ (hasAnyFolding(wp))
+		ਸੈੱਟ_topline(wp, wp->w_topline);
+#ਜੇ_ਅੰਤ
 	    // If lines have been added or removed, relative numbering always
 	    // requires an update even if cursor didn't move.
-	    if (wp->w_p_rnu && xtra != 0)
-		wp->w_last_cursor_lnum_rnu = 0;
+	    ਜੇ (wp->w_p_rnu && xtra != 0)
+		wp->w_ਆਖਰੀ_cursor_lnum_rnu = 0;
 
-#ifdef FEAT_SYN_HL
-	    if (wp->w_p_cul && wp->w_last_cursorline >= lnum)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SYN_HL
+	    ਜੇ (wp->w_p_cul && wp->w_ਆਖਰੀ_cursorline >= lnum)
 	    {
-		if (wp->w_last_cursorline < lnume)
+		ਜੇ (wp->w_ਆਖਰੀ_cursorline < lnume)
 		    // If 'cursorline' was inside the change, it has already
 		    // been invalidated in w_lines[] by the loop above.
-		    wp->w_last_cursorline = 0;
-		else
+		    wp->w_ਆਖਰੀ_cursorline = 0;
+		ਨਹੀਂਤਾਂ
 		    // If 'cursorline' was below the change, adjust its lnum.
-		    wp->w_last_cursorline += xtra;
+		    wp->w_ਆਖਰੀ_cursorline += xtra;
 	    }
-#endif
+#ਜੇ_ਅੰਤ
 	}
-#ifdef FEAT_SEARCH_EXTRA
-	if (wp == curwin && xtra != 0 && search_hl_has_cursor_lnum >= lnum)
-	    search_hl_has_cursor_lnum += xtra;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_ਖੋਜ_EXTRA
+	ਜੇ (wp == curwin && xtra != 0 && ਖੋਜ_hl_has_cursor_lnum >= lnum)
+	    ਖੋਜ_hl_has_cursor_lnum += xtra;
+#ਜੇ_ਅੰਤ
     }
 
     // Call update_screen() later, which checks out what needs to be redrawn,
     // since it notices b_mod_set and then uses b_mod_*.
-    set_must_redraw(UPD_VALID);
+    ਸੈੱਟ_must_redraw(UPD_VALID);
 
     // when the cursor line is changed always trigger CursorMoved
-    if (lnum <= curwin->w_cursor.lnum
+    ਜੇ (lnum <= curwin->w_cursor.lnum
 		 && lnume + (xtra < 0 ? -xtra : xtra) > curwin->w_cursor.lnum)
-	last_cursormoved.lnum = 0;
+	ਆਖਰੀ_cursormoved.lnum = 0;
 }
 
-    static void
-changedOneline(buf_T *buf, linenr_T lnum)
+    ਸਥਿਰ ਖਾਲੀ
+ਬਦਲਿਆ_Oneline(buf_T *buf, linenr_T lnum)
 {
-    if (buf->b_mod_set)
+    ਜੇ (buf->b_mod_ਸੈੱਟ)
     {
 	// find the maximum area that must be redisplayed
-	if (lnum < buf->b_mod_top)
-	    buf->b_mod_top = lnum;
-	else if (lnum >= buf->b_mod_bot)
+	ਜੇ (lnum < buf->b_mod_ਸਿਖਰ)
+	    buf->b_mod_ਸਿਖਰ = lnum;
+	ਨਹੀਂਤਾਂ ਜੇ (lnum >= buf->b_mod_bot)
 	    buf->b_mod_bot = lnum + 1;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// set the area that must be redisplayed to one line
-	buf->b_mod_set = true;
-	buf->b_mod_top = lnum;
+	buf->b_mod_ਸੈੱਟ = true;
+	buf->b_mod_ਸਿਖਰ = lnum;
 	buf->b_mod_bot = lnum + 1;
 	buf->b_mod_xlines = 0;
     }
@@ -994,54 +994,54 @@ changedOneline(buf_T *buf, linenr_T lnum)
  * - invalidates cached values
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-changed_bytes(linenr_T lnum, colnr_T col)
+    ਖਾਲੀ
+ਬਦਲਿਆ_ਬਾਈਟਾਂ(linenr_T lnum, colnr_T ਖਾਨਾ)
 {
-    changedOneline(curbuf, lnum);
-    changed_common(lnum, col, lnum + 1, 0L);
+    ਬਦਲਿਆ_Oneline(curbuf, lnum);
+    ਬਦਲਿਆ_common(lnum, ਖਾਨਾ, lnum + 1, 0L);
 
-#ifdef FEAT_SPELL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_SPELL
     // When text has been changed at the end of the line, possibly the start of
     // the next line may have SpellCap that should be removed or it needs to be
     // displayed.  Schedule the next line for redrawing just in case.
     // Don't do this when displaying '$' at the end of changed text.
-    if (spell_check_window(curwin)
-	    && lnum < curbuf->b_ml.ml_line_count
-	    && vim_strchr(p_cpo, CPO_DOLLAR) == NULL)
+    ਜੇ (spell_check_ਖਿੜਕੀ(curwin)
+	    && lnum < curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ
+	    && vim_strchr(p_cpo, CPO_DOLLAR) == ਨਿਰਾ)
 	redrawWinline(curwin, lnum + 1);
-#endif
-#ifdef FEAT_DIFF
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
     // Diff highlighting in other diff windows may need to be updated too.
-    if (curwin->w_p_diff)
+    ਜੇ (curwin->w_p_diff)
     {
 	win_T	    *wp;
 	linenr_T    wlnum;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_p_diff && wp != curwin)
+	    ਜੇ (wp->w_p_diff && wp != curwin)
 	    {
 		redraw_win_later(wp, UPD_VALID);
 		wlnum = diff_lnum_win(lnum, wp);
-		if (wlnum > 0)
-		    changedOneline(wp->w_buffer, wlnum);
+		ਜੇ (wlnum > 0)
+		    ਬਦਲਿਆ_Oneline(wp->w_ਬਫਰ, wlnum);
 	    }
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Like changed_bytes() but also adjust text properties for "added" bytes.
  * When "added" is negative text was deleted.
  */
-    void
-inserted_bytes(linenr_T lnum, colnr_T col, int added UNUSED)
+    ਖਾਲੀ
+inserted_ਬਾਈਟਾਂ(linenr_T lnum, colnr_T ਖਾਨਾ, ਪੂਰਨ added ਅਣਵਰਤਿਆ)
 {
-#ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && added != 0)
-	adjust_prop_columns(lnum, col, added, 0);
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (curbuf->b_has_textprop && added != 0)
+	adjust_prop_columns(lnum, ਖਾਨਾ, added, 0);
+#ਜੇ_ਅੰਤ
 
-    changed_bytes(lnum, col);
+    ਬਦਲਿਆ_ਬਾਈਟਾਂ(lnum, ਖਾਨਾ);
 }
 
 /*
@@ -1049,20 +1049,20 @@ inserted_bytes(linenr_T lnum, colnr_T col, int added UNUSED)
  * Must be called AFTER the change and after mark_adjust().
  * Takes care of marking the buffer to be redrawn and sets the changed flag.
  */
-    void
-appended_lines(linenr_T lnum, long count)
+    ਖਾਲੀ
+appended_ਸਤਰਾਂ(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    changed_lines(lnum + 1, 0, lnum + 1, count);
+    ਬਦਲਿਆ_ਸਤਰਾਂ(lnum + 1, 0, lnum + 1, ਗਿਣਤੀ_2);
 }
 
 /*
  * Like appended_lines(), but adjust marks first.
  */
-    void
-appended_lines_mark(linenr_T lnum, long count)
+    ਖਾਲੀ
+appended_ਸਤਰਾਂ_mark(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    mark_adjust(lnum + 1, (linenr_T)MAXLNUM, count, 0L);
-    changed_lines(lnum + 1, 0, lnum + 1, count);
+    mark_adjust(lnum + 1, (linenr_T)MAXLNUM, ਗਿਣਤੀ_2, 0L);
+    ਬਦਲਿਆ_ਸਤਰਾਂ(lnum + 1, 0, lnum + 1, ਗਿਣਤੀ_2);
 }
 
 /*
@@ -1070,10 +1070,10 @@ appended_lines_mark(linenr_T lnum, long count)
  * Must be called AFTER the change and after mark_adjust().
  * Takes care of marking the buffer to be redrawn and sets the changed flag.
  */
-    void
-deleted_lines(linenr_T lnum, long count)
+    ਖਾਲੀ
+deleted_ਸਤਰਾਂ(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    changed_lines(lnum, 0, lnum + count, -count);
+    ਬਦਲਿਆ_ਸਤਰਾਂ(lnum, 0, lnum + ਗਿਣਤੀ_2, -ਗਿਣਤੀ_2);
 }
 
 /*
@@ -1081,45 +1081,45 @@ deleted_lines(linenr_T lnum, long count)
  * Make sure the cursor is on a valid line before calling, a GUI callback may
  * be triggered to display the cursor.
  */
-    void
-deleted_lines_mark(linenr_T lnum, long count)
+    ਖਾਲੀ
+deleted_ਸਤਰਾਂ_mark(linenr_T lnum, ਲੰਮਾ ਗਿਣਤੀ_2)
 {
-    mark_adjust(lnum, (linenr_T)(lnum + count - 1), (long)MAXLNUM, -count);
-    changed_lines(lnum, 0, lnum + count, -count);
+    mark_adjust(lnum, (linenr_T)(lnum + ਗਿਣਤੀ_2 - 1), (ਲੰਮਾ)MAXLNUM, -ਗਿਣਤੀ_2);
+    ਬਦਲਿਆ_ਸਤਰਾਂ(lnum, 0, lnum + ਗਿਣਤੀ_2, -ਗਿਣਤੀ_2);
 }
 
 /*
  * Marks the area to be redrawn after a change.
  * Consider also calling changed_line_display_buf().
  */
-    void
-changed_lines_buf(
+    ਖਾਲੀ
+ਬਦਲਿਆ_ਸਤਰਾਂ_buf(
     buf_T	*buf,
     linenr_T	lnum,	    // first line with change
     linenr_T	lnume,	    // line below last changed line
-    long	xtra)	    // number of extra lines (negative when deleting)
+    ਲੰਮਾ	xtra)	    // number of extra lines (negative when deleting)
 {
-    if (buf->b_mod_set)
+    ਜੇ (buf->b_mod_ਸੈੱਟ)
     {
 	// find the maximum area that must be redisplayed
-	if (lnum < buf->b_mod_top)
-	    buf->b_mod_top = lnum;
-	if (lnum < buf->b_mod_bot)
+	ਜੇ (lnum < buf->b_mod_ਸਿਖਰ)
+	    buf->b_mod_ਸਿਖਰ = lnum;
+	ਜੇ (lnum < buf->b_mod_bot)
 	{
 	    // adjust old bot position for xtra lines
 	    buf->b_mod_bot += xtra;
-	    if (buf->b_mod_bot < lnum)
+	    ਜੇ (buf->b_mod_bot < lnum)
 		buf->b_mod_bot = lnum;
 	}
-	if (lnume + xtra > buf->b_mod_bot)
+	ਜੇ (lnume + xtra > buf->b_mod_bot)
 	    buf->b_mod_bot = lnume + xtra;
 	buf->b_mod_xlines += xtra;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// set the area that must be redisplayed
-	buf->b_mod_set = true;
-	buf->b_mod_top = lnum;
+	buf->b_mod_ਸੈੱਟ = true;
+	buf->b_mod_ਸਿਖਰ = lnum;
 	buf->b_mod_bot = lnume + xtra;
 	buf->b_mod_xlines = xtra;
     }
@@ -1137,17 +1137,17 @@ changed_lines_buf(
  * Takes care of calling changed() and updating b_mod_*.
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-changed_lines(
+    ਖਾਲੀ
+ਬਦਲਿਆ_ਸਤਰਾਂ(
     linenr_T	lnum,	    // first line with change
-    colnr_T	col,	    // column in first line with change
+    colnr_T	ਖਾਨਾ,	    // column in first line with change
     linenr_T	lnume,	    // line below last changed line
-    long	xtra)	    // number of extra lines (negative when deleting)
+    ਲੰਮਾ	xtra)	    // number of extra lines (negative when deleting)
 {
-    changed_lines_buf(curbuf, lnum, lnume, xtra);
+    ਬਦਲਿਆ_ਸਤਰਾਂ_buf(curbuf, lnum, lnume, xtra);
 
-#ifdef FEAT_DIFF
-    if (xtra == 0 && curwin->w_p_diff && !diff_internal())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_DIFF
+    ਜੇ (xtra == 0 && curwin->w_p_diff && !diff_ਅੰਦਰੂਨੀ())
     {
 	// When the number of lines doesn't change then mark_adjust() isn't
 	// called and other diff buffers still need to be marked for
@@ -1156,18 +1156,18 @@ changed_lines(
 	linenr_T    wlnum;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_p_diff && wp != curwin)
+	    ਜੇ (wp->w_p_diff && wp != curwin)
 	    {
 		redraw_win_later(wp, UPD_VALID);
 		wlnum = diff_lnum_win(lnum, wp);
-		if (wlnum > 0)
-		    changed_lines_buf(wp->w_buffer, wlnum,
+		ਜੇ (wlnum > 0)
+		    ਬਦਲਿਆ_ਸਤਰਾਂ_buf(wp->w_ਬਫਰ, wlnum,
 						    lnume - lnum + wlnum, 0L);
 	    }
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    changed_common(lnum, col, lnume, xtra);
+    ਬਦਲਿਆ_common(lnum, ਖਾਨਾ, lnume, xtra);
 }
 
 /*
@@ -1176,48 +1176,48 @@ changed_lines(
  * When "always_inc_changedtick" is TRUE b:changedtick is incremented also when
  * the changed flag was off.
  */
-    void
-unchanged(buf_T *buf, int ff, int always_inc_changedtick)
+    ਖਾਲੀ
+unchanged(buf_T *buf, ਪੂਰਨ ff, ਪੂਰਨ always_inc_changedtick)
 {
-    if (buf->b_changed || (ff && file_ff_differs(buf, FALSE)))
+    ਜੇ (buf->b_ਬਦਲਿਆ || (ff && file_ff_differs(buf, FALSE)))
     {
-	buf->b_changed = 0;
+	buf->b_ਬਦਲਿਆ = 0;
 	ml_setflags(buf);
-	if (ff)
+	ਜੇ (ff)
 	    save_file_ff(buf);
-	check_status(buf);
+	check_ਸਥਿਤੀ(buf);
 	redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ਜੇ defined(FEAT_TABPANEL)
 	redraw_tabpanel = TRUE;
-#endif
+#ਜੇ_ਅੰਤ
 	need_maketitle = TRUE;	    // set window title later
 	++CHANGEDTICK(buf);
     }
-    else if (always_inc_changedtick)
+    ਨਹੀਂਤਾਂ ਜੇ (always_inc_changedtick)
 	++CHANGEDTICK(buf);
-#ifdef FEAT_NETBEANS_INTG
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
     netbeans_unmodified(buf);
-#endif
+#ਜੇ_ਅੰਤ
 }
 
 /*
  * Save the current values of 'fileformat' and 'fileencoding', so that we know
  * the file must be considered changed when the value is different.
  */
-    void
+    ਖਾਲੀ
 save_file_ff(buf_T *buf)
 {
-    buf->b_start_ffc = *buf->b_p_ff;
-    buf->b_start_eof = buf->b_p_eof;
-    buf->b_start_eol = buf->b_p_eol;
-    buf->b_start_bomb = buf->b_p_bomb;
+    buf->b_ਸ਼ੁਰੂ_ffc = *buf->b_p_ff;
+    buf->b_ਸ਼ੁਰੂ_eof = buf->b_p_eof;
+    buf->b_ਸ਼ੁਰੂ_eol = buf->b_p_eol;
+    buf->b_ਸ਼ੁਰੂ_bomb = buf->b_p_bomb;
 
     // Only use free/alloc when necessary, they take time.
-    if (buf->b_start_fenc == NULL
-			     || STRCMP(buf->b_start_fenc, buf->b_p_fenc) != 0)
+    ਜੇ (buf->b_ਸ਼ੁਰੂ_fenc == ਨਿਰਾ
+			     || STRCMP(buf->b_ਸ਼ੁਰੂ_fenc, buf->b_p_fenc) != 0)
     {
-	vim_free(buf->b_start_fenc);
-	buf->b_start_fenc = vim_strsave(buf->b_p_fenc);
+	vim_free(buf->b_ਸ਼ੁਰੂ_fenc);
+	buf->b_ਸ਼ੁਰੂ_fenc = vim_strsave(buf->b_p_fenc);
     }
 }
 
@@ -1230,62 +1230,62 @@ save_file_ff(buf_T *buf)
  * When "ignore_empty" is true don't consider a new, empty buffer to be
  * changed.
  */
-    int
-file_ff_differs(buf_T *buf, int ignore_empty)
+    ਪੂਰਨ
+file_ff_differs(buf_T *buf, ਪੂਰਨ ignore_ਖਾਲੀ_ਥਾਵਾਂ)
 {
     // In a buffer that was never loaded the options are not valid.
-    if (buf->b_flags & BF_NEVERLOADED)
-	return FALSE;
-    if (ignore_empty
+    ਜੇ (buf->b_flags & BF_NEVERLOADED)
+	ਵਾਪਸ FALSE;
+    ਜੇ (ignore_ਖਾਲੀ_ਥਾਵਾਂ
 	    && (buf->b_flags & BF_NEW)
-	    && buf->b_ml.ml_line_count == 1
+	    && buf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ == 1
 	    && *ml_get_buf(buf, (linenr_T)1, FALSE) == NUL)
-	return FALSE;
-    if (buf->b_start_ffc != *buf->b_p_ff)
-	return TRUE;
-    if ((buf->b_p_bin || !buf->b_p_fixeol)
-	    && (buf->b_start_eof != buf->b_p_eof
-		|| buf->b_start_eol != buf->b_p_eol))
-	return TRUE;
-    if (!buf->b_p_bin && buf->b_start_bomb != buf->b_p_bomb)
-	return TRUE;
-    if (buf->b_start_fenc == NULL)
-	return (*buf->b_p_fenc != NUL);
-    return (STRCMP(buf->b_start_fenc, buf->b_p_fenc) != 0);
+	ਵਾਪਸ FALSE;
+    ਜੇ (buf->b_ਸ਼ੁਰੂ_ffc != *buf->b_p_ff)
+	ਵਾਪਸ TRUE;
+    ਜੇ ((buf->b_p_bin || !buf->b_p_fixeol)
+	    && (buf->b_ਸ਼ੁਰੂ_eof != buf->b_p_eof
+		|| buf->b_ਸ਼ੁਰੂ_eol != buf->b_p_eol))
+	ਵਾਪਸ TRUE;
+    ਜੇ (!buf->b_p_bin && buf->b_ਸ਼ੁਰੂ_bomb != buf->b_p_bomb)
+	ਵਾਪਸ TRUE;
+    ਜੇ (buf->b_ਸ਼ੁਰੂ_fenc == ਨਿਰਾ)
+	ਵਾਪਸ (*buf->b_p_fenc != NUL);
+    ਵਾਪਸ (STRCMP(buf->b_ਸ਼ੁਰੂ_fenc, buf->b_p_fenc) != 0);
 }
 
 /*
  * Insert string "p" at the cursor position.  Stops at a NUL byte.
  * Handles Replace mode and multi-byte characters.
  */
-    void
-ins_bytes(char_u *p)
+    ਖਾਲੀ
+ins_ਬਾਈਟਾਂ(char_u *p)
 {
-    ins_bytes_len(p, (int)STRLEN(p));
+    ins_ਬਾਈਟਾਂ_len(p, (ਪੂਰਨ)STRLEN(p));
 }
 
 /*
  * Insert string "p" with length "len" at the cursor position.
  * Handles Replace mode and multi-byte characters.
  */
-    void
-ins_bytes_len(char_u *p, int len)
+    ਖਾਲੀ
+ins_ਬਾਈਟਾਂ_len(char_u *p, ਪੂਰਨ len)
 {
-    int		i;
-    int		n;
+    ਪੂਰਨ		i;
+    ਪੂਰਨ		n;
 
-    if (has_mbyte)
-	for (i = 0; i < len; i += n)
+    ਜੇ (has_mbyte)
+	ਲਈ (i = 0; i < len; i += n)
 	{
-	    if (enc_utf8)
+	    ਜੇ (enc_utf8)
 		// avoid reading past p[len]
 		n = utfc_ptr2len_len(p + i, len - i);
-	    else
+	    ਨਹੀਂਤਾਂ
 		n = (*mb_ptr2len)(p + i);
-	    ins_char_bytes(p + i, n);
+	    ins_char_ਬਾਈਟਾਂ(p + i, n);
 	}
-    else
-	for (i = 0; i < len; ++i)
+    ਨਹੀਂਤਾਂ
+	ਲਈ (i = 0; i < len; ++i)
 	    ins_char(p[i]);
 }
 
@@ -1296,85 +1296,85 @@ ins_bytes_len(char_u *p, int len)
  * For multi-byte characters we get the whole character, the caller must
  * convert bytes to a character.
  */
-    void
-ins_char(int c)
+    ਖਾਲੀ
+ins_char(ਪੂਰਨ c)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		n = (*mb_char2bytes)(c, buf);
+    ਪੂਰਨ		n = (*mb_char2bytes)(c, buf);
 
     // When "c" is 0x100, 0x200, etc. we don't want to insert a NUL byte.
     // Happens for CTRL-Vu9900.
-    if (buf[0] == 0)
+    ਜੇ (buf[0] == 0)
 	buf[0] = '\n';
 
-    ins_char_bytes(buf, n);
+    ins_char_ਬਾਈਟਾਂ(buf, n);
 }
 
-    void
-ins_char_bytes(char_u *buf, int charlen)
+    ਖਾਲੀ
+ins_char_ਬਾਈਟਾਂ(char_u *buf, ਪੂਰਨ charlen)
 {
-    int		c = buf[0];
-    int		newlen;		// nr of bytes inserted
-    int		oldlen;		// nr of bytes deleted (0 when not replacing)
+    ਪੂਰਨ		c = buf[0];
+    ਪੂਰਨ		newlen;		// nr of bytes inserted
+    ਪੂਰਨ		oldlen;		// nr of bytes deleted (0 when not replacing)
     char_u	*p;
     char_u	*newp;
     char_u	*oldp;
-    int		linelen;	// length of old line including NUL
-    colnr_T	col;
+    ਪੂਰਨ		linelen;	// length of old line including NUL
+    colnr_T	ਖਾਨਾ;
     linenr_T	lnum = curwin->w_cursor.lnum;
-    int		i;
+    ਪੂਰਨ		i;
 
     // Break tabs if needed.
-    if (virtual_active() && curwin->w_cursor.coladd > 0)
+    ਜੇ (virtual_ਸਰਗਰਮ() && curwin->w_cursor.coladd > 0)
 	coladvance_force(getviscol());
 
-    col = curwin->w_cursor.col;
+    ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
     oldp = ml_get(lnum);
-    linelen = (int)ml_get_len(lnum) + 1;
+    linelen = (ਪੂਰਨ)ml_get_len(lnum) + 1;
 
     // The lengths default to the values for when not replacing.
     oldlen = 0;
     newlen = charlen;
 
-    if (State & REPLACE_FLAG)
+    ਜੇ (State & REPLACE_FLAG)
     {
-	if (State & VREPLACE_FLAG)
+	ਜੇ (State & VREPLACE_FLAG)
 	{
 	    colnr_T	new_vcol = 0;	// init for GCC
 	    colnr_T	vcol;
-	    int		old_list;
+	    ਪੂਰਨ		old_list;
 
 	    // Disable 'list' temporarily, unless 'cpo' contains the 'L' flag.
 	    // Returns the old value of list, so when finished,
 	    // curwin->w_p_list should be set back to this.
 	    old_list = curwin->w_p_list;
-	    if (old_list && vim_strchr(p_cpo, CPO_LISTWM) == NULL)
+	    ਜੇ (old_list && vim_strchr(p_cpo, CPO_LISTWM) == ਨਿਰਾ)
 		curwin->w_p_list = FALSE;
 
 	    // In virtual replace mode each character may replace one or more
 	    // characters (zero if it's a TAB).  Count the number of bytes to
 	    // be deleted to make room for the new character, counting screen
 	    // cells.  May result in adding spaces to fill a gap.
-	    getvcol(curwin, &curwin->w_cursor, NULL, &vcol, NULL, 0);
+	    getvcol(curwin, &curwin->w_cursor, ਨਿਰਾ, &vcol, ਨਿਰਾ, 0);
 	    new_vcol = vcol + chartabsize(buf, vcol);
-	    while (oldp[col + oldlen] != NUL && vcol < new_vcol)
+	    ਜਦੋਂ (oldp[ਖਾਨਾ + oldlen] != NUL && vcol < new_vcol)
 	    {
-		vcol += chartabsize(oldp + col + oldlen, vcol);
+		vcol += chartabsize(oldp + ਖਾਨਾ + oldlen, vcol);
 		// Don't need to remove a TAB that takes us to the right
 		// position.
-		if (vcol > new_vcol && oldp[col + oldlen] == TAB)
-		    break;
-		oldlen += (*mb_ptr2len)(oldp + col + oldlen);
+		ਜੇ (vcol > new_vcol && oldp[ਖਾਨਾ + oldlen] == TAB)
+		    ਰੋਕੋ;
+		oldlen += (*mb_ptr2len)(oldp + ਖਾਨਾ + oldlen);
 		// Deleted a bit too much, insert spaces.
-		if (vcol > new_vcol)
+		ਜੇ (vcol > new_vcol)
 		    newlen += vcol - new_vcol;
 	    }
 	    curwin->w_p_list = old_list;
 	}
-	else if (oldp[col] != NUL)
+	ਨਹੀਂਤਾਂ ਜੇ (oldp[ਖਾਨਾ] != NUL)
 	{
 	    // normal replace
-	    oldlen = (*mb_ptr2len)(oldp + col);
+	    oldlen = (*mb_ptr2len)(oldp + ਖਾਨਾ);
 	}
 
 
@@ -1382,67 +1382,67 @@ ins_char_bytes(char_u *buf, int charlen)
 	// put back when BS is used.  The bytes of a multi-byte character are
 	// done the other way around, so that the first byte is popped off
 	// first (it tells the byte length of the character).
-	replace_push(NUL);
-	for (i = 0; i < oldlen; ++i)
+	replace_ਧੱਕੋ(NUL);
+	ਲਈ (i = 0; i < oldlen; ++i)
 	{
-	    if (has_mbyte)
-		i += replace_push_mb(oldp + col + i) - 1;
-	    else
-		replace_push(oldp[col + i]);
+	    ਜੇ (has_mbyte)
+		i += replace_ਧੱਕੋ_mb(oldp + ਖਾਨਾ + i) - 1;
+	    ਨਹੀਂਤਾਂ
+		replace_ਧੱਕੋ(oldp[ਖਾਨਾ + i]);
 	}
     }
 
     newp = alloc(linelen + newlen - oldlen);
-    if (newp == NULL)
-	return;
+    ਜੇ (newp == ਨਿਰਾ)
+	ਵਾਪਸ;
 
     // Copy bytes before the cursor.
-    if (col > 0)
-	mch_memmove(newp, oldp, (size_t)col);
+    ਜੇ (ਖਾਨਾ > 0)
+	mch_memmove(newp, oldp, (size_t)ਖਾਨਾ);
 
     // Copy bytes after the changed character(s).
-    p = newp + col;
-    if (linelen > col + oldlen)
-	mch_memmove(p + newlen, oldp + col + oldlen,
-					    (size_t)(linelen - col - oldlen));
+    p = newp + ਖਾਨਾ;
+    ਜੇ (linelen > ਖਾਨਾ + oldlen)
+	mch_memmove(p + newlen, oldp + ਖਾਨਾ + oldlen,
+					    (size_t)(linelen - ਖਾਨਾ - oldlen));
 
     // Insert or overwrite the new character.
     mch_memmove(p, buf, charlen);
     i = charlen;
 
     // Fill with spaces when necessary.
-    while (i < newlen)
+    ਜਦੋਂ (i < newlen)
 	p[i++] = ' ';
 
     // Replace the line in the buffer.
     ml_replace(lnum, newp, FALSE);
 
     // mark the buffer as changed and prepare for displaying
-    changed_bytes(lnum, col);
-#ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && newlen != oldlen)
-	adjust_prop_columns(lnum, col, newlen - oldlen,
+    ਬਦਲਿਆ_ਬਾਈਟਾਂ(lnum, ਖਾਨਾ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਜੇ (curbuf->b_has_textprop && newlen != oldlen)
+	adjust_prop_columns(lnum, ਖਾਨਾ, newlen - oldlen,
 				    State & REPLACE_FLAG ? APC_SUBSTITUTE : 0);
-#endif
+#ਜੇ_ਅੰਤ
 
     // If we're in Insert or Replace mode and 'showmatch' is set, then briefly
     // show the match for right parens and braces.
-    if (p_sm && (State & MODE_INSERT)
-	    && msg_silent == 0
-	    && !ins_compl_active())
+    ਜੇ (p_sm && (State & ਬਹੁਲਕ_ਪਾਓ)
+	    && ਸੁਨੇਹਾ_silent == 0
+	    && !ins_compl_ਸਰਗਰਮ())
     {
-	if (has_mbyte)
+	ਜੇ (has_mbyte)
 	    showmatch(mb_ptr2char(buf));
-	else
+	ਨਹੀਂਤਾਂ
 	    showmatch(c);
     }
 
-#ifdef FEAT_RIGHTLEFT
-    if (!p_ri || (State & REPLACE_FLAG))
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_RIGHTLEFT
+    ਜੇ (!p_ri || (State & REPLACE_FLAG))
+#ਜੇ_ਅੰਤ
     {
 	// Normal insert: move cursor right
-	curwin->w_cursor.col += charlen;
+	curwin->w_cursor.ਖਾਨਾ += charlen;
     }
 
     // TODO: should try to update w_row here, to avoid recomputing it later.
@@ -1453,31 +1453,31 @@ ins_char_bytes(char_u *buf, int charlen)
  * Note: Does NOT handle Replace mode.
  * Caller must have prepared for undo.
  */
-    void
+    ਖਾਲੀ
 ins_str(char_u *s, size_t slen)
 {
     char_u	*oldp, *newp;
-    int		oldlen;
-    colnr_T	col;
+    ਪੂਰਨ		oldlen;
+    colnr_T	ਖਾਨਾ;
     linenr_T	lnum = curwin->w_cursor.lnum;
 
-    if (virtual_active() && curwin->w_cursor.coladd > 0)
+    ਜੇ (virtual_ਸਰਗਰਮ() && curwin->w_cursor.coladd > 0)
 	coladvance_force(getviscol());
 
-    col = curwin->w_cursor.col;
+    ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
     oldp = ml_get(lnum);
-    oldlen = (int)ml_get_len(lnum);
+    oldlen = (ਪੂਰਨ)ml_get_len(lnum);
 
     newp = alloc(oldlen + slen + 1);
-    if (newp == NULL)
-	return;
-    if (col > 0)
-	mch_memmove(newp, oldp, (size_t)col);
-    mch_memmove(newp + col, s, slen);
-    mch_memmove(newp + col + slen, oldp + col, (size_t)(oldlen - col + 1));
+    ਜੇ (newp == ਨਿਰਾ)
+	ਵਾਪਸ;
+    ਜੇ (ਖਾਨਾ > 0)
+	mch_memmove(newp, oldp, (size_t)ਖਾਨਾ);
+    mch_memmove(newp + ਖਾਨਾ, s, slen);
+    mch_memmove(newp + ਖਾਨਾ + slen, oldp + ਖਾਨਾ, (size_t)(oldlen - ਖਾਨਾ + 1));
     ml_replace(lnum, newp, FALSE);
-    inserted_bytes(lnum, col, (int)slen);
-    curwin->w_cursor.col += (colnr_T)slen;
+    inserted_ਬਾਈਟਾਂ(lnum, ਖਾਨਾ, (ਪੂਰਨ)slen);
+    curwin->w_cursor.ਖਾਨਾ += (colnr_T)slen;
 }
 
 /*
@@ -1487,39 +1487,39 @@ ins_str(char_u *s, size_t slen)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-del_char(int fixpos)
+    ਪੂਰਨ
+del_char(ਪੂਰਨ fixpos)
 {
-    if (has_mbyte)
+    ਜੇ (has_mbyte)
     {
 	// Make sure the cursor is at the start of a character.
 	mb_adjust_cursor();
-	if (*ml_get_cursor() == NUL)
-	    return FAIL;
-	return del_chars(1L, fixpos);
+	ਜੇ (*ml_get_cursor() == NUL)
+	    ਵਾਪਸ FAIL;
+	ਵਾਪਸ del_chars(1L, fixpos);
     }
-    return del_bytes(1L, fixpos, TRUE);
+    ਵਾਪਸ del_ਬਾਈਟਾਂ(1L, fixpos, TRUE);
 }
 
 /*
  * Like del_bytes(), but delete characters instead of bytes.
  */
-    int
-del_chars(long count, int fixpos)
+    ਪੂਰਨ
+del_chars(ਲੰਮਾ ਗਿਣਤੀ_2, ਪੂਰਨ fixpos)
 {
-    long	bytes = 0;
-    long	i;
+    ਲੰਮਾ	ਬਾਈਟਾਂ = 0;
+    ਲੰਮਾ	i;
     char_u	*p;
-    int		l;
+    ਪੂਰਨ		l;
 
     p = ml_get_cursor();
-    for (i = 0; i < count && *p != NUL; ++i)
+    ਲਈ (i = 0; i < ਗਿਣਤੀ_2 && *p != NUL; ++i)
     {
 	l = (*mb_ptr2len)(p);
-	bytes += l;
+	ਬਾਈਟਾਂ += l;
 	p += l;
     }
-    return del_bytes(bytes, fixpos, TRUE);
+    ਵਾਪਸ del_ਬਾਈਟਾਂ(ਬਾਈਟਾਂ, fixpos, TRUE);
 }
 
 /*
@@ -1529,122 +1529,122 @@ del_chars(long count, int fixpos)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-del_bytes(
-    long	count,
-    int		fixpos_arg,
-    int		use_delcombine UNUSED)	    // 'delcombine' option applies
+    ਪੂਰਨ
+del_ਬਾਈਟਾਂ(
+    ਲੰਮਾ	ਗਿਣਤੀ_2,
+    ਪੂਰਨ		fixpos_arg,
+    ਪੂਰਨ		use_delcombine ਅਣਵਰਤਿਆ)	    // 'delcombine' option applies
 {
     char_u	*oldp, *newp;
     colnr_T	oldlen;
     colnr_T	newlen;
     linenr_T	lnum = curwin->w_cursor.lnum;
-    colnr_T	col = curwin->w_cursor.col;
-    int		alloc_newp;
-    long	movelen;
-    int		fixpos = fixpos_arg;
+    colnr_T	ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
+    ਪੂਰਨ		alloc_newp;
+    ਲੰਮਾ	movelen;
+    ਪੂਰਨ		fixpos = fixpos_arg;
 
     oldp = ml_get(lnum);
-    oldlen = (int)ml_get_len(lnum);
+    oldlen = (ਪੂਰਨ)ml_get_len(lnum);
 
     // Can't do anything when the cursor is on the NUL after the line.
-    if (col >= oldlen)
-	return FAIL;
+    ਜੇ (ਖਾਨਾ >= oldlen)
+	ਵਾਪਸ FAIL;
 
     // If "count" is zero there is nothing to do.
-    if (count == 0)
-	return OK;
+    ਜੇ (ਗਿਣਤੀ_2 == 0)
+	ਵਾਪਸ OK;
 
     // If "count" is negative the caller must be doing something wrong.
-    if (count < 1)
+    ਜੇ (ਗਿਣਤੀ_2 < 1)
     {
-	siemsg(e_invalid_count_for_del_bytes_nr, count);
-	return FAIL;
+	siemsg(e_invalid_ਗਿਣਤੀ_for_del_ਬਾਈਟਾਂ_nr, ਗਿਣਤੀ_2);
+	ਵਾਪਸ FAIL;
     }
 
     // If 'delcombine' is set and deleting (less than) one character, only
     // delete the last combining character.
-    if (p_deco && use_delcombine && enc_utf8
-					 && utfc_ptr2len(oldp + col) >= count)
+    ਜੇ (p_deco && use_delcombine && enc_utf8
+					 && utfc_ptr2len(oldp + ਖਾਨਾ) >= ਗਿਣਤੀ_2)
     {
-	int	cc[MAX_MCO];
-	int	n;
+	ਪੂਰਨ	cc[MAX_MCO];
+	ਪੂਰਨ	n;
 
-	(void)utfc_ptr2char(oldp + col, cc);
-	if (cc[0] != NUL)
+	(ਖਾਲੀ)utfc_ptr2char(oldp + ਖਾਨਾ, cc);
+	ਜੇ (cc[0] != NUL)
 	{
 	    // Find the last composing char, there can be several.
-	    n = col;
-	    do
+	    n = ਖਾਨਾ;
+	    ਕਰੋ
 	    {
-		col = n;
-		count = utf_ptr2len(oldp + n);
-		n += count;
-	    } while (UTF_COMPOSINGLIKE(oldp + col, oldp + n));
+		ਖਾਨਾ = n;
+		ਗਿਣਤੀ_2 = utf_ptr2len(oldp + n);
+		n += ਗਿਣਤੀ_2;
+	    } ਜਦੋਂ (UTF_COMPOSINGLIKE(oldp + ਖਾਨਾ, oldp + n));
 	    fixpos = 0;
 	}
     }
 
     // When count is too big, reduce it.
-    movelen = (long)oldlen - (long)col - count + 1; // includes trailing NUL
-    if (movelen <= 1)
+    movelen = (ਲੰਮਾ)oldlen - (ਲੰਮਾ)ਖਾਨਾ - ਗਿਣਤੀ_2 + 1; // includes trailing NUL
+    ਜੇ (movelen <= 1)
     {
 	// If we just took off the last character of a non-blank line, and
 	// fixpos is TRUE, we don't want to end up positioned at the NUL,
 	// unless "restart_edit" is set or 'virtualedit' contains "onemore".
-	if (col > 0 && fixpos && restart_edit == 0
+	ਜੇ (ਖਾਨਾ > 0 && fixpos && restart_edit == 0
 					 && (get_ve_flags() & VE_ONEMORE) == 0)
 	{
-	    --curwin->w_cursor.col;
+	    --curwin->w_cursor.ਖਾਨਾ;
 	    curwin->w_cursor.coladd = 0;
-	    if (has_mbyte)
-		curwin->w_cursor.col -=
-			    (*mb_head_off)(oldp, oldp + curwin->w_cursor.col);
+	    ਜੇ (has_mbyte)
+		curwin->w_cursor.ਖਾਨਾ -=
+			    (*mb_ਸਿਰ_off)(oldp, oldp + curwin->w_cursor.ਖਾਨਾ);
 	}
-	count = oldlen - col;
+	ਗਿਣਤੀ_2 = oldlen - ਖਾਨਾ;
 	movelen = 1;
     }
-    newlen = oldlen - count;
+    newlen = oldlen - ਗਿਣਤੀ_2;
 
     // If the old line has been allocated the deletion can be done in the
     // existing line. Otherwise a new line has to be allocated
     // Can't do this when using Netbeans, because we would need to invoke
     // netbeans_removed(), which deallocates the line.	Let ml_replace() take
     // care of notifying Netbeans.
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_NETBEANS_INTG
+    ਜੇ (netbeans_ਸਰਗਰਮ())
 	alloc_newp = TRUE;
-    else
-#endif
-	alloc_newp = !ml_line_alloced();    // check if oldp was allocated
-    if (!alloc_newp)
+    ਨਹੀਂਤਾਂ
+#ਜੇ_ਅੰਤ
+	alloc_newp = !ml_ਸਤਰ_alloced();    // check if oldp was allocated
+    ਜੇ (!alloc_newp)
 	newp = oldp;			    // use same allocated memory
-    else
+    ਨਹੀਂਤਾਂ
     {					    // need to allocate a new line
 	newp = alloc(newlen + 1);
-	if (newp == NULL)
-	    return FAIL;
-	mch_memmove(newp, oldp, (size_t)col);
+	ਜੇ (newp == ਨਿਰਾ)
+	    ਵਾਪਸ FAIL;
+	mch_memmove(newp, oldp, (size_t)ਖਾਨਾ);
     }
-    mch_memmove(newp + col, oldp + col + count, (size_t)movelen);
-    if (alloc_newp)
+    mch_memmove(newp + ਖਾਨਾ, oldp + ਖਾਨਾ + ਗਿਣਤੀ_2, (size_t)movelen);
+    ਜੇ (alloc_newp)
 	ml_replace(lnum, newp, FALSE);
-    else
+    ਨਹੀਂਤਾਂ
     {
-#ifdef FEAT_PROP_POPUP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 	// Also move any following text properties.
-	if (oldlen + 1 < curbuf->b_ml.ml_line_len)
+	ਜੇ (oldlen + 1 < curbuf->b_ml.ml_ਸਤਰ_len)
 	    mch_memmove(newp + newlen + 1, oldp + oldlen + 1,
-			       (size_t)curbuf->b_ml.ml_line_len - oldlen - 1);
-#endif
-	curbuf->b_ml.ml_line_len -= count;
-	curbuf->b_ml.ml_line_textlen = 0;
+			       (size_t)curbuf->b_ml.ml_ਸਤਰ_len - oldlen - 1);
+#ਜੇ_ਅੰਤ
+	curbuf->b_ml.ml_ਸਤਰ_len -= ਗਿਣਤੀ_2;
+	curbuf->b_ml.ml_ਸਤਰ_textlen = 0;
     }
 
     // mark the buffer as changed and prepare for displaying
-    inserted_bytes(lnum, col, -count);
+    inserted_ਬਾਈਟਾਂ(lnum, ਖਾਨਾ, -ਗਿਣਤੀ_2);
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
@@ -1671,55 +1671,55 @@ del_bytes(
  *
  * Return OK for success, FAIL for failure
  */
-    int
-open_line(
-    int		dir,		// FORWARD or BACKWARD
-    int		flags,
-    int		second_line_indent,
-    int		*did_do_comment UNUSED)
+    ਪੂਰਨ
+open_ਸਤਰ(
+    ਪੂਰਨ		dir,		// FORWARD or BACKWARD
+    ਪੂਰਨ		flags,
+    ਪੂਰਨ		ਦੂਜਾ_ਸਤਰ_indent,
+    ਪੂਰਨ		*did_do_comment ਅਣਵਰਤਿਆ)
 {
-    char_u	*saved_line;		// copy of the original line
-    char_u	*next_line = NULL;	// copy of the next line
-    char_u	*p_extra = NULL;	// what goes to next line
-    int		less_cols = 0;		// less columns for mark in new line
-    int		less_cols_off = 0;	// columns to skip for mark and
+    char_u	*saved_ਸਤਰ;		// copy of the original line
+    char_u	*ਅਗਲਾ_ਸਤਰ = ਨਿਰਾ;	// copy of the next line
+    char_u	*p_extra = ਨਿਰਾ;	// what goes to next line
+    ਪੂਰਨ		less_ਖਾਨੇ_ਗਿਣਤੀ = 0;		// less columns for mark in new line
+    ਪੂਰਨ		less_ਖਾਨੇ_ਗਿਣਤੀ_off = 0;	// columns to skip for mark and
 					// textprop adjustment
     pos_T	old_cursor;		// old cursor position
-    int		newcol = 0;		// new cursor column
-    int		newindent = 0;		// auto-indent of the new line
-    int		n;
-    int		trunc_line = FALSE;	// truncate current line afterwards
-    int		retval = FAIL;		// return value
-    int		extra_len = 0;		// length of p_extra string
-    int		lead_len;		// length of comment leader
-    int		comment_start = 0;	// start index of the comment leader
+    ਪੂਰਨ		newcol = 0;		// new cursor column
+    ਪੂਰਨ		newindent = 0;		// auto-indent of the new line
+    ਪੂਰਨ		n;
+    ਪੂਰਨ		trunc_ਸਤਰ = FALSE;	// truncate current line afterwards
+    ਪੂਰਨ		retval = FAIL;		// return value
+    ਪੂਰਨ		extra_len = 0;		// length of p_extra string
+    ਪੂਰਨ		lead_len;		// length of comment leader
+    ਪੂਰਨ		comment_ਸ਼ੁਰੂ = 0;	// start index of the comment leader
     char_u	*lead_flags;	// position in 'comments' for comment leader
-    char_u	*leader = NULL;		// copy of comment leader
-    char_u	*allocated = NULL;	// allocated memory
+    char_u	*leader = ਨਿਰਾ;		// copy of comment leader
+    char_u	*allocated = ਨਿਰਾ;	// allocated memory
     char_u	*p;
-    int		saved_char = NUL;	// init for GCC
+    ਪੂਰਨ		saved_char = NUL;	// init for GCC
     pos_T	*pos;
-    int		do_cindent;
-    int		do_si = may_do_si();
-    int		no_si = FALSE;		// reset did_si afterwards
-    int		first_char = NUL;	// init for GCC
-    int		vreplace_mode;
-    int		did_append;		// appended a new line
-    int		saved_pi = curbuf->b_p_pi; // copy of preserveindent setting
-#ifdef FEAT_PROP_POPUP
-    int		at_eol;			// cursor after last character
-#endif
+    ਪੂਰਨ		do_cindent;
+    ਪੂਰਨ		do_si = may_do_si();
+    ਪੂਰਨ		no_si = FALSE;		// reset did_si afterwards
+    ਪੂਰਨ		ਪਹਿਲਾ_char = NUL;	// init for GCC
+    ਪੂਰਨ		vreplace_ਬਹੁਲਕ;
+    ਪੂਰਨ		did_append;		// appended a new line
+    ਪੂਰਨ		saved_pi = curbuf->b_p_pi; // copy of preserveindent setting
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    ਪੂਰਨ		at_eol;			// cursor after last character
+#ਜੇ_ਅੰਤ
 
     // make a copy of the current line so we can mess with it
-    saved_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-    if (saved_line == NULL)	    // out of memory!
-	return FALSE;
+    saved_ਸਤਰ = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+    ਜੇ (saved_ਸਤਰ == ਨਿਰਾ)	    // out of memory!
+	ਵਾਪਸ FALSE;
 
-#ifdef FEAT_PROP_POPUP
-    at_eol = curwin->w_cursor.col >= (int)ml_get_curline_len();
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+    at_eol = curwin->w_cursor.ਖਾਨਾ >= (ਪੂਰਨ)ml_get_curline_len();
+#ਜੇ_ਅੰਤ
 
-    if (State & VREPLACE_FLAG)
+    ਜੇ (State & VREPLACE_FLAG)
     {
 	// With MODE_VREPLACE we make a copy of the next line, which we will be
 	// starting to replace.  First make the new line empty and let vim play
@@ -1728,102 +1728,102 @@ open_line(
 	// original line, and call ins_char() to put each new character onto
 	// the line, replacing what was there before and pushing the right
 	// stuff onto the replace stack.  -- webb.
-	if (curwin->w_cursor.lnum < orig_line_count)
-	    next_line = vim_strnsave(ml_get(curwin->w_cursor.lnum + 1), ml_get_len(curwin->w_cursor.lnum + 1));
-	else
-	    next_line = vim_strsave((char_u *)"");
-	if (next_line == NULL)	    // out of memory!
-	    goto theend;
+	ਜੇ (curwin->w_cursor.lnum < orig_ਸਤਰ_ਗਿਣਤੀ)
+	    ਅਗਲਾ_ਸਤਰ = vim_strnsave(ml_get(curwin->w_cursor.lnum + 1), ml_get_len(curwin->w_cursor.lnum + 1));
+	ਨਹੀਂਤਾਂ
+	    ਅਗਲਾ_ਸਤਰ = vim_strsave((char_u *)"");
+	ਜੇ (ਅਗਲਾ_ਸਤਰ == ਨਿਰਾ)	    // out of memory!
+	    ਜਾਓ theend;
 
 	// In MODE_VREPLACE state, a NL replaces the rest of the line, and
 	// starts replacing the next line, so push all of the characters left
 	// on the line onto the replace stack.	We'll push any other characters
 	// that might be replaced at the start of the next line (due to
 	// autoindent etc) a bit later.
-	replace_push(NUL);  // Call twice because BS over NL expects it
-	replace_push(NUL);
-	p = saved_line + curwin->w_cursor.col;
-	while (*p != NUL)
+	replace_ਧੱਕੋ(NUL);  // Call twice because BS over NL expects it
+	replace_ਧੱਕੋ(NUL);
+	p = saved_ਸਤਰ + curwin->w_cursor.ਖਾਨਾ;
+	ਜਦੋਂ (*p != NUL)
 	{
-	    if (has_mbyte)
-		p += replace_push_mb(p);
-	    else
-		replace_push(*p++);
+	    ਜੇ (has_mbyte)
+		p += replace_ਧੱਕੋ_mb(p);
+	    ਨਹੀਂਤਾਂ
+		replace_ਧੱਕੋ(*p++);
 	}
-	saved_line[curwin->w_cursor.col] = NUL;
+	saved_ਸਤਰ[curwin->w_cursor.ਖਾਨਾ] = NUL;
     }
 
-    if ((State & MODE_INSERT) && (State & VREPLACE_FLAG) == 0)
+    ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && (State & VREPLACE_FLAG) == 0)
     {
-	p_extra = saved_line + curwin->w_cursor.col;
-	if (do_si)		// need first char after new line break
+	p_extra = saved_ਸਤਰ + curwin->w_cursor.ਖਾਨਾ;
+	ਜੇ (do_si)		// need first char after new line break
 	{
 	    p = skipwhite(p_extra);
-	    first_char = *p;
+	    ਪਹਿਲਾ_char = *p;
 	}
-	extra_len = (int)STRLEN(p_extra);
+	extra_len = (ਪੂਰਨ)STRLEN(p_extra);
 	saved_char = *p_extra;
 	*p_extra = NUL;
     }
 
     u_clearline();		// cannot do "U" command when adding lines
     did_si = FALSE;
-    ai_col = 0;
+    ai_ਖਾਨਾ = 0;
 
     // If we just did an auto-indent, then we didn't type anything on
     // the prior line, and it should be truncated.  Do this even if 'ai' is not
     // set because automatically inserting a comment leader also sets did_ai.
-    if (dir == FORWARD && did_ai)
-	trunc_line = TRUE;
+    ਜੇ (dir == FORWARD && did_ai)
+	trunc_ਸਤਰ = TRUE;
 
-    if ((flags & OPENLINE_FORCE_INDENT) && second_line_indent >= 0)
-	newindent = second_line_indent;
+    ਜੇ ((flags & OPENLINE_FORCE_INDENT) && ਦੂਜਾ_ਸਤਰ_indent >= 0)
+	newindent = ਦੂਜਾ_ਸਤਰ_indent;
     // If 'autoindent' and/or 'smartindent' is set, try to figure out what
     // indent to use for the new line.
-    else if (curbuf->b_p_ai || do_si)
+    ਨਹੀਂਤਾਂ ਜੇ (curbuf->b_p_ai || do_si)
     {
 	// count white space on current line
-#ifdef FEAT_VARTABS
-	newindent = get_indent_str_vtab(saved_line, curbuf->b_p_ts,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VARTABS
+	newindent = get_indent_str_vtab(saved_ਸਤਰ, curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-	newindent = get_indent_str(saved_line, (int)curbuf->b_p_ts, FALSE);
-#endif
-	if (newindent == 0 && !(flags & OPENLINE_COM_LIST))
-	    newindent = second_line_indent; // for ^^D command in insert mode
+#ਨਹੀਂਤਾਂ
+	newindent = get_indent_str(saved_ਸਤਰ, (ਪੂਰਨ)curbuf->b_p_ts, FALSE);
+#ਜੇ_ਅੰਤ
+	ਜੇ (newindent == 0 && !(flags & OPENLINE_COM_LIST))
+	    newindent = ਦੂਜਾ_ਸਤਰ_indent; // for ^^D command in insert mode
 
 	// Do smart indenting.
 	// In insert/replace mode (only when dir == FORWARD)
 	// we may move some text to the next line. If it starts with '{'
 	// don't add an indent. Fixes inserting a NL before '{' in line
 	//	"if (condition) {"
-	if (!trunc_line && do_si && *saved_line != NUL
-				    && (p_extra == NULL || first_char != '{'))
+	ਜੇ (!trunc_ਸਤਰ && do_si && *saved_ਸਤਰ != NUL
+				    && (p_extra == ਨਿਰਾ || ਪਹਿਲਾ_char != '{'))
 	{
 	    char_u  *ptr;
-	    char_u  last_char;
+	    char_u  ਆਖਰੀ_char;
 
 	    old_cursor = curwin->w_cursor;
-	    ptr = saved_line;
-	    if (flags & OPENLINE_DO_COM)
-		lead_len = get_leader_len(ptr, NULL, FALSE, TRUE);
-	    else
+	    ptr = saved_ਸਤਰ;
+	    ਜੇ (flags & OPENLINE_DO_COM)
+		lead_len = get_leader_len(ptr, ਨਿਰਾ, FALSE, TRUE);
+	    ਨਹੀਂਤਾਂ
 		lead_len = 0;
-	    if (dir == FORWARD)
+	    ਜੇ (dir == FORWARD)
 	    {
 		// Skip preprocessor directives, unless they are
 		// recognised as comments.
-		if ( lead_len == 0 && ptr[0] == '#')
+		ਜੇ ( lead_len == 0 && ptr[0] == '#')
 		{
-		    while (ptr[0] == '#' && curwin->w_cursor.lnum > 1)
+		    ਜਦੋਂ (ptr[0] == '#' && curwin->w_cursor.lnum > 1)
 			ptr = ml_get(--curwin->w_cursor.lnum);
 		    newindent = get_indent();
 		}
-		if (flags & OPENLINE_DO_COM)
-		    lead_len = get_leader_len(ptr, NULL, FALSE, TRUE);
-		else
+		ਜੇ (flags & OPENLINE_DO_COM)
+		    lead_len = get_leader_len(ptr, ਨਿਰਾ, FALSE, TRUE);
+		ਨਹੀਂਤਾਂ
 		    lead_len = 0;
-		if (lead_len > 0)
+		ਜੇ (lead_len > 0)
 		{
 		    // This case gets the following right:
 		    //	    /*
@@ -1832,45 +1832,45 @@ open_line(
 		    // #define IN_THE_WAY
 		    //	    This should line up here;
 		    p = skipwhite(ptr);
-		    if (p[0] == '/' && p[1] == '*')
+		    ਜੇ (p[0] == '/' && p[1] == '*')
 			p++;
-		    if (p[0] == '*')
+		    ਜੇ (p[0] == '*')
 		    {
-			for (p++; *p; p++)
+			ਲਈ (p++; *p; p++)
 			{
-			    if (p[0] == '/' && p[-1] == '*')
+			    ਜੇ (p[0] == '/' && p[-1] == '*')
 			    {
 				// End of C comment, indent should line up
 				// with the line containing the start of
 				// the comment.
-				curwin->w_cursor.col = (colnr_T)(p - ptr);
-				if ((pos = findmatch(NULL, NUL)) != NULL)
+				curwin->w_cursor.ਖਾਨਾ = (colnr_T)(p - ptr);
+				ਜੇ ((pos = findmatch(ਨਿਰਾ, NUL)) != ਨਿਰਾ)
 				{
 				    curwin->w_cursor.lnum = pos->lnum;
 				    newindent = get_indent();
-				    break;
+				    ਰੋਕੋ;
 				}
 				// this may make "ptr" invalid, get it again
 				ptr = ml_get(curwin->w_cursor.lnum);
-				p = ptr + curwin->w_cursor.col;
+				p = ptr + curwin->w_cursor.ਖਾਨਾ;
 			    }
 			}
 		    }
 		}
-		else	// Not a comment line
+		ਨਹੀਂਤਾਂ	// Not a comment line
 		{
 		    // Find last non-blank in line
 		    p = ptr + STRLEN(ptr) - 1;
-		    while (p > ptr && VIM_ISWHITE(*p))
+		    ਜਦੋਂ (p > ptr && VIM_ISWHITE(*p))
 			--p;
-		    last_char = *p;
+		    ਆਖਰੀ_char = *p;
 
 		    // find the character just before the '{' or ';'
-		    if (last_char == '{' || last_char == ';')
+		    ਜੇ (ਆਖਰੀ_char == '{' || ਆਖਰੀ_char == ';')
 		    {
-			if (p > ptr)
+			ਜੇ (p > ptr)
 			    --p;
-			while (p > ptr && VIM_ISWHITE(*p))
+			ਜਦੋਂ (p > ptr && VIM_ISWHITE(*p))
 			    --p;
 		    }
 		    // Try to catch lines that are split over multiple
@@ -1879,10 +1879,10 @@ open_line(
 		    //			condition) {
 		    //		Should line up here!
 		    //	    }
-		    if (*p == ')')
+		    ਜੇ (*p == ')')
 		    {
-			curwin->w_cursor.col = (colnr_T)(p - ptr);
-			if ((pos = findmatch(NULL, '(')) != NULL)
+			curwin->w_cursor.ਖਾਨਾ = (colnr_T)(p - ptr);
+			ਜੇ ((pos = findmatch(ਨਿਰਾ, '(')) != ਨਿਰਾ)
 			{
 			    curwin->w_cursor.lnum = pos->lnum;
 			    newindent = get_indent();
@@ -1891,7 +1891,7 @@ open_line(
 		    }
 		    // If last character is '{' do indent, without
 		    // checking for "if" and the like.
-		    if (last_char == '{')
+		    ਜੇ (ਆਖਰੀ_char == '{')
 		    {
 			did_si = TRUE;	// do indent
 			no_si = TRUE;	// don't delete it when '{' typed
@@ -1899,42 +1899,42 @@ open_line(
 		    // Look for "if" and the like, use 'cinwords'.
 		    // Don't do this if the previous line ended in ';' or
 		    // '}'.
-		    else if (last_char != ';' && last_char != '}'
+		    ਨਹੀਂਤਾਂ ਜੇ (ਆਖਰੀ_char != ';' && ਆਖਰੀ_char != '}'
 						       && cin_is_cinword(ptr))
 			did_si = TRUE;
 		}
 	    }
-	    else // dir == BACKWARD
+	    ਨਹੀਂਤਾਂ // dir == BACKWARD
 	    {
 		// Skip preprocessor directives, unless they are
 		// recognised as comments.
-		if (lead_len == 0 && ptr[0] == '#')
+		ਜੇ (lead_len == 0 && ptr[0] == '#')
 		{
-		    int was_backslashed = FALSE;
+		    ਪੂਰਨ was_backslashed = FALSE;
 
-		    while ((ptr[0] == '#' || was_backslashed) &&
-			 curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    ਜਦੋਂ ((ptr[0] == '#' || was_backslashed) &&
+			 curwin->w_cursor.lnum < curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
 		    {
-			if (*ptr && ptr[STRLEN(ptr) - 1] == '\\')
+			ਜੇ (*ptr && ptr[STRLEN(ptr) - 1] == '\\')
 			    was_backslashed = TRUE;
-			else
+			ਨਹੀਂਤਾਂ
 			    was_backslashed = FALSE;
 			ptr = ml_get(++curwin->w_cursor.lnum);
 		    }
-		    if (was_backslashed)
+		    ਜੇ (was_backslashed)
 			newindent = 0;	    // Got to end of file
-		    else
+		    ਨਹੀਂਤਾਂ
 			newindent = get_indent();
 		}
 		p = skipwhite(ptr);
-		if (*p == '}')	    // if line starts with '}': do indent
+		ਜੇ (*p == '}')	    // if line starts with '}': do indent
 		    did_si = TRUE;
-		else		    // can delete indent when '{' typed
-		    can_si_back = TRUE;
+		ਨਹੀਂਤਾਂ		    // can delete indent when '{' typed
+		    can_si_ਪਿੱਠ = TRUE;
 	    }
 	    curwin->w_cursor = old_cursor;
 	}
-	if (do_si)
+	ਜੇ (do_si)
 	    can_si = TRUE;
 
 	did_ai = TRUE;
@@ -1942,231 +1942,231 @@ open_line(
 
     // May do indenting after opening a new line.
     do_cindent = !p_paste && (curbuf->b_p_cin
-#ifdef FEAT_EVAL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_EVAL
 		    || *curbuf->b_p_inde != NUL
-#endif
+#ਜੇ_ਅੰਤ
 		)
-	    && in_cinkeys(dir == FORWARD
-		? KEY_OPEN_FORW
-		: KEY_OPEN_BACK, ' ', linewhite(curwin->w_cursor.lnum))
+	    && ਵਿੱਚ_cinkeys(dir == FORWARD
+		? ਕੁੰਜੀ_OPEN_FORW
+		: ਕੁੰਜੀ_OPEN_ਪਿੱਠ, ' ', linewhite(curwin->w_cursor.lnum))
 	    && !(flags & OPENLINE_FORCE_INDENT);
 
     // Find out if the current line starts with a comment leader.
     // This may then be inserted in front of the new line.
-    end_comment_pending = NUL;
-    if (flags & OPENLINE_DO_COM)
+    ਸਿਰਾ_comment_pending = NUL;
+    ਜੇ (flags & OPENLINE_DO_COM)
     {
-	lead_len = get_leader_len(saved_line, &lead_flags,
+	lead_len = get_leader_len(saved_ਸਤਰ, &lead_flags,
 							dir == BACKWARD, TRUE);
-	if (lead_len == 0 && curbuf->b_p_cin && do_cindent && dir == FORWARD
+	ਜੇ (lead_len == 0 && curbuf->b_p_cin && do_cindent && dir == FORWARD
 		&& (!has_format_option(FO_NO_OPEN_COMS)
 						 || (flags & OPENLINE_FORMAT)))
 	{
 	    // Check for a line comment after code.
-	    comment_start = check_linecomment(saved_line);
-	    if (comment_start != MAXCOL)
+	    comment_ਸ਼ੁਰੂ = check_linecomment(saved_ਸਤਰ);
+	    ਜੇ (comment_ਸ਼ੁਰੂ != MAXCOL)
 	    {
-		lead_len = get_leader_len(saved_line + comment_start,
+		lead_len = get_leader_len(saved_ਸਤਰ + comment_ਸ਼ੁਰੂ,
 						     &lead_flags, FALSE, TRUE);
-		if (lead_len != 0)
+		ਜੇ (lead_len != 0)
 		{
-		    lead_len += comment_start;
-		    if (did_do_comment != NULL)
+		    lead_len += comment_ਸ਼ੁਰੂ;
+		    ਜੇ (did_do_comment != ਨਿਰਾ)
 			*did_do_comment = TRUE;
 		}
 	    }
 	}
     }
-    else
+    ਨਹੀਂਤਾਂ
 	lead_len = 0;
-    if (lead_len > 0)
+    ਜੇ (lead_len > 0)
     {
-	char_u	*lead_repl = NULL;	    // replaces comment leader
-	int	lead_repl_len = 0;	    // length of *lead_repl
-	char_u	lead_middle[COM_MAX_LEN];   // middle-comment string
-	int	lead_middle_len;	    // length of the lead_middle
-	char_u	lead_end[COM_MAX_LEN];	    // end-comment string
-	char_u	*comment_end = NULL;	    // where lead_end has been found
-	int	extra_space = FALSE;	    // append extra space
-	int	current_flag;
-	int	require_blank = FALSE;	    // requires blank after middle
+	char_u	*lead_repl = ਨਿਰਾ;	    // replaces comment leader
+	ਪੂਰਨ	lead_repl_len = 0;	    // length of *lead_repl
+	char_u	lead_ਵਿਚਕਾਰ[COM_MAX_LEN];   // middle-comment string
+	ਪੂਰਨ	lead_ਵਿਚਕਾਰ_len;	    // length of the lead_middle
+	char_u	lead_ਸਿਰਾ[COM_MAX_LEN];	    // end-comment string
+	char_u	*comment_ਸਿਰਾ = ਨਿਰਾ;	    // where lead_end has been found
+	ਪੂਰਨ	extra_space = FALSE;	    // append extra space
+	ਪੂਰਨ	current_flag;
+	ਪੂਰਨ	require_blank = FALSE;	    // requires blank after middle
 	char_u	*p2;
 
 	// If the comment leader has the start, middle or end flag, it may not
 	// be used or may be replaced with the middle leader.
-	for (p = lead_flags; *p && *p != ':'; ++p)
+	ਲਈ (p = lead_flags; *p && *p != ':'; ++p)
 	{
-	    if (*p == COM_BLANK)
+	    ਜੇ (*p == COM_BLANK)
 	    {
 		require_blank = TRUE;
-		continue;
+		ਜਾਰੀ;
 	    }
-	    if (*p == COM_START || *p == COM_MIDDLE)
+	    ਜੇ (*p == COM_ਸ਼ੁਰੂ || *p == COM_ਵਿਚਕਾਰ)
 	    {
 		current_flag = *p;
-		if (*p == COM_START)
+		ਜੇ (*p == COM_ਸ਼ੁਰੂ)
 		{
 		    // Doing "O" on a start of comment does not insert leader.
-		    if (dir == BACKWARD)
+		    ਜੇ (dir == BACKWARD)
 		    {
 			lead_len = 0;
-			break;
+			ਰੋਕੋ;
 		    }
 
 		    // find start of middle part
-		    (void)copy_option_part(&p, lead_middle, COM_MAX_LEN, ",");
+		    (ਖਾਲੀ)copy_option_part(&p, lead_ਵਿਚਕਾਰ, COM_MAX_LEN, ",");
 		    require_blank = FALSE;
 		}
 
 		// Isolate the strings of the middle and end leader.
-		while (*p && p[-1] != ':')	// find end of middle flags
+		ਜਦੋਂ (*p && p[-1] != ':')	// find end of middle flags
 		{
-		    if (*p == COM_BLANK)
+		    ਜੇ (*p == COM_BLANK)
 			require_blank = TRUE;
 		    ++p;
 		}
-		lead_middle_len = copy_option_part(&p, lead_middle, COM_MAX_LEN, ",");
+		lead_ਵਿਚਕਾਰ_len = copy_option_part(&p, lead_ਵਿਚਕਾਰ, COM_MAX_LEN, ",");
 
-		while (*p && p[-1] != ':')	// find end of end flags
+		ਜਦੋਂ (*p && p[-1] != ':')	// find end of end flags
 		{
 		    // Check whether we allow automatic ending of comments
-		    if (*p == COM_AUTO_END)
-			end_comment_pending = -1; // means we want to set it
+		    ਜੇ (*p == COM_AUTO_ਸਿਰਾ)
+			ਸਿਰਾ_comment_pending = -1; // means we want to set it
 		    ++p;
 		}
-		n = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
+		n = copy_option_part(&p, lead_ਸਿਰਾ, COM_MAX_LEN, ",");
 
-		if (end_comment_pending == -1)	// we can set it now
-		    end_comment_pending = lead_end[n - 1];
+		ਜੇ (ਸਿਰਾ_comment_pending == -1)	// we can set it now
+		    ਸਿਰਾ_comment_pending = lead_ਸਿਰਾ[n - 1];
 
 		// If the end of the comment is in the same line, don't use
 		// the comment leader.
-		if (dir == FORWARD)
+		ਜੇ (dir == FORWARD)
 		{
-		    for (p = saved_line + lead_len; *p; ++p)
-			if (STRNCMP(p, lead_end, n) == 0)
+		    ਲਈ (p = saved_ਸਤਰ + lead_len; *p; ++p)
+			ਜੇ (STRNCMP(p, lead_ਸਿਰਾ, n) == 0)
 			{
-			    comment_end = p;
+			    comment_ਸਿਰਾ = p;
 			    lead_len = 0;
-			    break;
+			    ਰੋਕੋ;
 			}
 		}
 
 		// Doing "o" on a start of comment inserts the middle leader.
-		if (lead_len > 0)
+		ਜੇ (lead_len > 0)
 		{
-		    if (current_flag == COM_START)
+		    ਜੇ (current_flag == COM_ਸ਼ੁਰੂ)
 		    {
-			lead_repl = lead_middle;
-			lead_repl_len = lead_middle_len;
+			lead_repl = lead_ਵਿਚਕਾਰ;
+			lead_repl_len = lead_ਵਿਚਕਾਰ_len;
 		    }
 
 		    // If we have hit RETURN immediately after the start
 		    // comment leader, then put a space after the middle
 		    // comment leader on the next line.
-		    if (!VIM_ISWHITE(saved_line[lead_len - 1])
-			    && ((p_extra != NULL
-				    && (int)curwin->w_cursor.col == lead_len)
-				|| (p_extra == NULL
-				    && saved_line[lead_len] == NUL)
+		    ਜੇ (!VIM_ISWHITE(saved_ਸਤਰ[lead_len - 1])
+			    && ((p_extra != ਨਿਰਾ
+				    && (ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ == lead_len)
+				|| (p_extra == ਨਿਰਾ
+				    && saved_ਸਤਰ[lead_len] == NUL)
 				|| require_blank))
 			extra_space = TRUE;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (*p == COM_END)
+	    ਜੇ (*p == COM_ਸਿਰਾ)
 	    {
 		// Doing "o" on the end of a comment does not insert leader.
 		// Remember where the end is, might want to use it to find the
 		// start (for C-comments).
-		if (dir == FORWARD)
+		ਜੇ (dir == FORWARD)
 		{
-		    comment_end = skipwhite(saved_line);
+		    comment_ਸਿਰਾ = skipwhite(saved_ਸਤਰ);
 		    lead_len = 0;
-		    break;
+		    ਰੋਕੋ;
 		}
 
 		// Doing "O" on the end of a comment inserts the middle leader.
 		// Find the string for the middle leader, searching backwards.
-		while (p > curbuf->b_p_com && *p != ',')
+		ਜਦੋਂ (p > curbuf->b_p_com && *p != ',')
 		    --p;
-		for (lead_repl = p; lead_repl > curbuf->b_p_com
+		ਲਈ (lead_repl = p; lead_repl > curbuf->b_p_com
 					 && lead_repl[-1] != ':'; --lead_repl)
 		    ;
-		lead_repl_len = (int)(p - lead_repl);
+		lead_repl_len = (ਪੂਰਨ)(p - lead_repl);
 
 		// We can probably always add an extra space when doing "O" on
 		// the comment-end
 		extra_space = TRUE;
 
 		// Check whether we allow automatic ending of comments
-		for (p2 = p; *p2 && *p2 != ':'; p2++)
+		ਲਈ (p2 = p; *p2 && *p2 != ':'; p2++)
 		{
-		    if (*p2 == COM_AUTO_END)
-			end_comment_pending = -1; // means we want to set it
+		    ਜੇ (*p2 == COM_AUTO_ਸਿਰਾ)
+			ਸਿਰਾ_comment_pending = -1; // means we want to set it
 		}
-		if (end_comment_pending == -1)
+		ਜੇ (ਸਿਰਾ_comment_pending == -1)
 		{
 		    // Find last character in end-comment string
-		    while (*p2 && *p2 != ',')
+		    ਜਦੋਂ (*p2 && *p2 != ',')
 			p2++;
-		    end_comment_pending = p2[-1];
+		    ਸਿਰਾ_comment_pending = p2[-1];
 		}
-		break;
+		ਰੋਕੋ;
 	    }
-	    if (*p == COM_FIRST)
+	    ਜੇ (*p == COM_ਪਹਿਲਾ)
 	    {
 		// Comment leader for first line only:	Don't repeat leader
 		// when using "O", blank out leader when using "o".
-		if (dir == BACKWARD)
+		ਜੇ (dir == BACKWARD)
 		    lead_len = 0;
-		else
+		ਨਹੀਂਤਾਂ
 		{
 		    lead_repl = (char_u *)"";
 		    lead_repl_len = 0;
 		}
-		break;
+		ਰੋਕੋ;
 	    }
 	}
-	if (lead_len)
+	ਜੇ (lead_len)
 	{
 	    // allocate buffer (may concatenate p_extra later)
 	    leader = alloc(lead_len + lead_repl_len + extra_space + extra_len
-		     + (second_line_indent > 0 ? second_line_indent : 0) + 1);
+		     + (ਦੂਜਾ_ਸਤਰ_indent > 0 ? ਦੂਜਾ_ਸਤਰ_indent : 0) + 1);
 	    allocated = leader;		    // remember to free it later
 
-	    if (leader == NULL)
+	    ਜੇ (leader == ਨਿਰਾ)
 		lead_len = 0;
-	    else
+	    ਨਹੀਂਤਾਂ
 	    {
-		int li;
+		ਪੂਰਨ li;
 
-		vim_strncpy(leader, saved_line, lead_len);
+		vim_strncpy(leader, saved_ਸਤਰ, lead_len);
 
 		// TODO: handle multi-byte and double width chars
-		for (li = 0; li < comment_start; ++li)
-		    if (!VIM_ISWHITE(leader[li]))
+		ਲਈ (li = 0; li < comment_ਸ਼ੁਰੂ; ++li)
+		    ਜੇ (!VIM_ISWHITE(leader[li]))
 			leader[li] = ' ';
 
 		// Replace leader with lead_repl, right or left adjusted
-		if (lead_repl != NULL)
+		ਜੇ (lead_repl != ਨਿਰਾ)
 		{
-		    int		c = 0;
-		    int		off = 0;
+		    ਪੂਰਨ		c = 0;
+		    ਪੂਰਨ		off = 0;
 
-		    for (p = lead_flags; *p != NUL && *p != ':'; )
+		    ਲਈ (p = lead_flags; *p != NUL && *p != ':'; )
 		    {
-			if (*p == COM_RIGHT || *p == COM_LEFT)
+			ਜੇ (*p == COM_ਸੱਜਾ || *p == COM_ਖੱਬਾ)
 			    c = *p++;
-			else if (VIM_ISDIGIT(*p) || *p == '-')
+			ਨਹੀਂਤਾਂ ਜੇ (VIM_ISDIGIT(*p) || *p == '-')
 			    off = getdigits(&p);
-			else
+			ਨਹੀਂਤਾਂ
 			    ++p;
 		    }
-		    if (c == COM_RIGHT)    // right adjusted leader
+		    ਜੇ (c == COM_ਸੱਜਾ)    // right adjusted leader
 		    {
 			// find last non-white in the leader to line up with
-			for (p = leader + lead_len - 1; p > leader
+			ਲਈ (p = leader + lead_len - 1; p > leader
 						      && VIM_ISWHITE(*p); --p)
 			    ;
 			++p;
@@ -2174,36 +2174,36 @@ open_line(
 			// Compute the length of the replaced characters in
 			// screen characters, not bytes.
 			{
-			    int	    repl_size = vim_strnsize(lead_repl,
+			    ਪੂਰਨ	    repl_ਮਾਪ = vim_strnsize(lead_repl,
 							       lead_repl_len);
-			    int	    old_size = 0;
+			    ਪੂਰਨ	    old_ਮਾਪ = 0;
 			    char_u  *endp = p;
-			    int	    l;
+			    ਪੂਰਨ	    l;
 
-			    while (old_size < repl_size && p > leader)
+			    ਜਦੋਂ (old_ਮਾਪ < repl_ਮਾਪ && p > leader)
 			    {
-				MB_PTR_BACK(leader, p);
-				old_size += ptr2cells(p);
+				MB_PTR_ਪਿੱਠ(leader, p);
+				old_ਮਾਪ += ptr2cells(p);
 			    }
-			    l = lead_repl_len - (int)(endp - p);
-			    if (l != 0)
+			    l = lead_repl_len - (ਪੂਰਨ)(endp - p);
+			    ਜੇ (l != 0)
 				mch_memmove(endp + l, endp,
 					(size_t)((leader + lead_len) - endp));
 			    lead_len += l;
 			}
 			mch_memmove(p, lead_repl, (size_t)lead_repl_len);
-			if (p + lead_repl_len > leader + lead_len)
+			ਜੇ (p + lead_repl_len > leader + lead_len)
 			    p[lead_repl_len] = NUL;
 
 			// blank-out any other chars from the old leader.
-			while (--p >= leader)
+			ਜਦੋਂ (--p >= leader)
 			{
-			    int l = mb_head_off(leader, p);
+			    ਪੂਰਨ l = mb_ਸਿਰ_off(leader, p);
 
-			    if (l > 1)
+			    ਜੇ (l > 1)
 			    {
 				p -= l;
-				if (ptr2cells(p) > 1)
+				ਜੇ (ptr2cells(p) > 1)
 				{
 				    p[1] = ' ';
 				    --l;
@@ -2213,11 +2213,11 @@ open_line(
 				lead_len -= l;
 				*p = ' ';
 			    }
-			    else if (!VIM_ISWHITE(*p))
+			    ਨਹੀਂਤਾਂ ਜੇ (!VIM_ISWHITE(*p))
 				*p = ' ';
 			}
 		    }
-		    else	// left adjusted leader
+		    ਨਹੀਂਤਾਂ	// left adjusted leader
 		    {
 			p = skipwhite(leader);
 
@@ -2225,18 +2225,18 @@ open_line(
 			// screen characters, not bytes. Move the part that is
 			// not to be overwritten.
 			{
-			    int	    repl_size = vim_strnsize(lead_repl,
+			    ਪੂਰਨ	    repl_ਮਾਪ = vim_strnsize(lead_repl,
 							       lead_repl_len);
-			    int	    i;
-			    int	    l;
+			    ਪੂਰਨ	    i;
+			    ਪੂਰਨ	    l;
 
-			    for (i = 0; i < lead_len && p[i] != NUL; i += l)
+			    ਲਈ (i = 0; i < lead_len && p[i] != NUL; i += l)
 			    {
 				l = (*mb_ptr2len)(p + i);
-				if (vim_strnsize(p, i + l) > repl_size)
-				    break;
+				ਜੇ (vim_strnsize(p, i + l) > repl_ਮਾਪ)
+				    ਰੋਕੋ;
 			    }
-			    if (i != lead_repl_len)
+			    ਜੇ (i != lead_repl_len)
 			    {
 				mch_memmove(p + lead_repl_len, p + i,
 				       (size_t)(lead_len - i - (p - leader)));
@@ -2248,23 +2248,23 @@ open_line(
 			// Replace any remaining non-white chars in the old
 			// leader by spaces.  Keep Tabs, the indent must
 			// remain the same.
-			for (p += lead_repl_len; p < leader + lead_len; ++p)
-			    if (!VIM_ISWHITE(*p))
+			ਲਈ (p += lead_repl_len; p < leader + lead_len; ++p)
+			    ਜੇ (!VIM_ISWHITE(*p))
 			    {
 				// Don't put a space before a TAB.
-				if (p + 1 < leader + lead_len && p[1] == TAB)
+				ਜੇ (p + 1 < leader + lead_len && p[1] == TAB)
 				{
 				    --lead_len;
 				    mch_memmove(p, p + 1,
 						     (leader + lead_len) - p);
 				}
-				else
+				ਨਹੀਂਤਾਂ
 				{
-				    int	    l = (*mb_ptr2len)(p);
+				    ਪੂਰਨ	    l = (*mb_ptr2len)(p);
 
-				    if (l > 1)
+				    ਜੇ (l > 1)
 				    {
-					if (ptr2cells(p) > 1)
+					ਜੇ (ptr2cells(p) > 1)
 					{
 					    // Replace a double-wide char with
 					    // two spaces
@@ -2282,44 +2282,44 @@ open_line(
 		    }
 
 		    // Recompute the indent, it may have changed.
-		    if (curbuf->b_p_ai || do_si)
-#ifdef FEAT_VARTABS
+		    ਜੇ (curbuf->b_p_ai || do_si)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_VARTABS
 			newindent = get_indent_str_vtab(leader, curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
+#ਨਹੀਂਤਾਂ
 			newindent = get_indent_str(leader,
-						   (int)curbuf->b_p_ts, FALSE);
-#endif
+						   (ਪੂਰਨ)curbuf->b_p_ts, FALSE);
+#ਜੇ_ਅੰਤ
 
 		    // Add the indent offset
-		    if (newindent + off < 0)
+		    ਜੇ (newindent + off < 0)
 		    {
 			off = -newindent;
 			newindent = 0;
 		    }
-		    else
+		    ਨਹੀਂਤਾਂ
 			newindent += off;
 
 		    // Correct trailing spaces for the shift, so that
 		    // alignment remains equal.
-		    while (off > 0 && lead_len > 0
+		    ਜਦੋਂ (off > 0 && lead_len > 0
 					       && leader[lead_len - 1] == ' ')
 		    {
 			// Don't do it when there is a tab before the space
-			if (vim_strchr(skipwhite(leader), '\t') != NULL)
-			    break;
+			ਜੇ (vim_strchr(skipwhite(leader), '\t') != ਨਿਰਾ)
+			    ਰੋਕੋ;
 			--lead_len;
 			--off;
 		    }
 
 		    // If the leader ends in white space, don't add an
 		    // extra space
-		    if (lead_len > 0 && VIM_ISWHITE(leader[lead_len - 1]))
+		    ਜੇ (lead_len > 0 && VIM_ISWHITE(leader[lead_len - 1]))
 			extra_space = FALSE;
 		    leader[lead_len] = NUL;
 		}
 
-		if (extra_space)
+		ਜੇ (extra_space)
 		{
 		    leader[lead_len++] = ' ';
 		    leader[lead_len] = NUL;
@@ -2329,9 +2329,9 @@ open_line(
 
 		// if a new indent will be set below, remove the indent that
 		// is in the comment leader
-		if (newindent || did_si)
+		ਜੇ (newindent || did_si)
 		{
-		    while (lead_len && VIM_ISWHITE(*leader))
+		    ਜਦੋਂ (lead_len && VIM_ISWHITE(*leader))
 		    {
 			--lead_len;
 			--newcol;
@@ -2342,18 +2342,18 @@ open_line(
 	    }
 	    did_si = can_si = FALSE;
 	}
-	else if (comment_end != NULL)
+	ਨਹੀਂਤਾਂ ਜੇ (comment_ਸਿਰਾ != ਨਿਰਾ)
 	{
 	    // We have finished a comment, so we don't use the leader.
 	    // If this was a C-comment and 'ai' or 'si' is set do a normal
 	    // indent to align with the line containing the start of the
 	    // comment.
-	    if (comment_end[0] == '*' && comment_end[1] == '/' &&
+	    ਜੇ (comment_ਸਿਰਾ[0] == '*' && comment_ਸਿਰਾ[1] == '/' &&
 			(curbuf->b_p_ai || do_si))
 	    {
 		old_cursor = curwin->w_cursor;
-		curwin->w_cursor.col = (colnr_T)(comment_end - saved_line);
-		if ((pos = findmatch(NULL, NUL)) != NULL)
+		curwin->w_cursor.ਖਾਨਾ = (colnr_T)(comment_ਸਿਰਾ - saved_ਸਤਰ);
+		ਜੇ ((pos = findmatch(ਨਿਰਾ, NUL)) != ਨਿਰਾ)
 		{
 		    curwin->w_cursor.lnum = pos->lnum;
 		    newindent = get_indent();
@@ -2364,7 +2364,7 @@ open_line(
     }
 
     // (State == MODE_INSERT || State == MODE_REPLACE), only when dir == FORWARD
-    if (p_extra != NULL)
+    ਜੇ (p_extra != ਨਿਰਾ)
     {
 	*p_extra = saved_char;		// restore char that NUL replaced
 
@@ -2374,240 +2374,240 @@ open_line(
 	// When in MODE_REPLACE state, put the deleted blanks on the replace
 	// stack, preceded by a NUL, so they can be put back when a BS is
 	// entered.
-	if (REPLACE_NORMAL(State))
-	    replace_push(NUL);	    // end of extra blanks
-	if (curbuf->b_p_ai || (flags & OPENLINE_DELSPACES))
+	ਜੇ (REPLACE_ਸਾਧਾਰਨ(State))
+	    replace_ਧੱਕੋ(NUL);	    // end of extra blanks
+	ਜੇ (curbuf->b_p_ai || (flags & OPENLINE_DELSPACES))
 	{
-	    while ((*p_extra == ' ' || *p_extra == '\t')
+	    ਜਦੋਂ ((*p_extra == ' ' || *p_extra == '\t')
 		    && (!enc_utf8
 			       || !utf_iscomposing(utf_ptr2char(p_extra + 1))))
 	    {
-		if (REPLACE_NORMAL(State))
-		    replace_push(*p_extra);
+		ਜੇ (REPLACE_ਸਾਧਾਰਨ(State))
+		    replace_ਧੱਕੋ(*p_extra);
 		++p_extra;
-		++less_cols_off;
+		++less_ਖਾਨੇ_ਗਿਣਤੀ_off;
 	    }
 	}
 
 	// columns for marks adjusted for removed columns
-	less_cols = (int)(p_extra - saved_line);
+	less_ਖਾਨੇ_ਗਿਣਤੀ = (ਪੂਰਨ)(p_extra - saved_ਸਤਰ);
     }
 
-    if (p_extra == NULL)
+    ਜੇ (p_extra == ਨਿਰਾ)
 	p_extra = (char_u *)"";		    // append empty line
 
     // concatenate leader and p_extra, if there is a leader
-    if (lead_len)
+    ਜੇ (lead_len)
     {
-	if (flags & OPENLINE_COM_LIST && second_line_indent > 0)
+	ਜੇ (flags & OPENLINE_COM_LIST && ਦੂਜਾ_ਸਤਰ_indent > 0)
 	{
-	    int i;
-	    int padding = second_line_indent
-					  - (newindent + (int)STRLEN(leader));
+	    ਪੂਰਨ i;
+	    ਪੂਰਨ padding = ਦੂਜਾ_ਸਤਰ_indent
+					  - (newindent + (ਪੂਰਨ)STRLEN(leader));
 
 	    // Here whitespace is inserted after the comment char.
 	    // Below, set_indent(newindent, SIN_INSERT) will insert the
 	    // whitespace needed before the comment char.
-	    for (i = 0; i < padding; i++)
+	    ਲਈ (i = 0; i < padding; i++)
 	    {
 		STRCAT(leader, " ");
-		less_cols--;
+		less_ਖਾਨੇ_ਗਿਣਤੀ--;
 		newcol++;
 	    }
 	}
 	STRCAT(leader, p_extra);
 	p_extra = leader;
 	did_ai = TRUE;	    // So truncating blanks works with comments
-	less_cols -= lead_len;
+	less_ਖਾਨੇ_ਗਿਣਤੀ -= lead_len;
     }
-    else
-	end_comment_pending = NUL;  // turns out there was no leader
+    ਨਹੀਂਤਾਂ
+	ਸਿਰਾ_comment_pending = NUL;  // turns out there was no leader
 
     old_cursor = curwin->w_cursor;
-    if (dir == BACKWARD)
+    ਜੇ (dir == BACKWARD)
 	--curwin->w_cursor.lnum;
-    if (!(State & VREPLACE_FLAG) || old_cursor.lnum >= orig_line_count)
+    ਜੇ (!(State & VREPLACE_FLAG) || old_cursor.lnum >= orig_ਸਤਰ_ਗਿਣਤੀ)
     {
-	if (ml_append(curwin->w_cursor.lnum, p_extra, (colnr_T)0, FALSE)
+	ਜੇ (ml_append(curwin->w_cursor.lnum, p_extra, (colnr_T)0, FALSE)
 								      == FAIL)
-	    goto theend;
+	    ਜਾਓ theend;
 	// Postpone calling changed_lines(), because it would mess up folding
 	// with markers.
 	mark_adjust(curwin->w_cursor.lnum + 1, (linenr_T)MAXLNUM, 1L, 0L);
 	did_append = TRUE;
-#ifdef FEAT_PROP_POPUP
-	if ((State & MODE_INSERT) && (State & VREPLACE_FLAG) == 0)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
+	ਜੇ ((State & ਬਹੁਲਕ_ਪਾਓ) && (State & VREPLACE_FLAG) == 0)
 	    // Properties after the split move to the next line.
-	    adjust_props_for_split(curwin->w_cursor.lnum, curwin->w_cursor.lnum,
-		    curwin->w_cursor.col + 1, 0, at_eol);
-#endif
+	    adjust_props_for_ਵੰਡੋ(curwin->w_cursor.lnum, curwin->w_cursor.lnum,
+		    curwin->w_cursor.ਖਾਨਾ + 1, 0, at_eol);
+#ਜੇ_ਅੰਤ
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
 	// In MODE_VREPLACE state we are starting to replace the next line.
 	curwin->w_cursor.lnum++;
-	if (curwin->w_cursor.lnum >= Insstart.lnum + vr_lines_changed)
+	ਜੇ (curwin->w_cursor.lnum >= Insstart.lnum + vr_ਸਤਰਾਂ_ਬਦਲਿਆ)
 	{
 	    // In case we NL to a new line, BS to the previous one, and NL
 	    // again, we don't want to save the new line for undo twice.
-	    (void)u_save_cursor();		    // errors are ignored!
-	    vr_lines_changed++;
+	    (ਖਾਲੀ)u_save_cursor();		    // errors are ignored!
+	    vr_ਸਤਰਾਂ_ਬਦਲਿਆ++;
 	}
 	ml_replace(curwin->w_cursor.lnum, p_extra, TRUE);
-	changed_bytes(curwin->w_cursor.lnum, 0);
+	ਬਦਲਿਆ_ਬਾਈਟਾਂ(curwin->w_cursor.lnum, 0);
 	curwin->w_cursor.lnum--;
 	did_append = FALSE;
     }
 
-    if (newindent || did_si)
+    ਜੇ (newindent || did_si)
     {
 	++curwin->w_cursor.lnum;
-	if (did_si)
+	ਜੇ (did_si)
 	{
-	    int sw = (int)get_sw_value(curbuf);
+	    ਪੂਰਨ sw = (ਪੂਰਨ)get_sw_ਮੁੱਲ(curbuf);
 
-	    if (p_sr)
+	    ਜੇ (p_sr)
 		newindent -= newindent % sw;
 	    newindent += sw;
 	}
 	// Copy the indent
-	if (curbuf->b_p_ci)
+	ਜੇ (curbuf->b_p_ci)
 	{
-	    (void)copy_indent(newindent, saved_line);
+	    (ਖਾਲੀ)copy_indent(newindent, saved_ਸਤਰ);
 
 	    // Set the 'preserveindent' option so that any further screwing
 	    // with the line doesn't entirely destroy our efforts to preserve
 	    // it.  It gets restored at the function end.
 	    curbuf->b_p_pi = TRUE;
 	}
-	else
-	    (void)set_indent(newindent, SIN_INSERT);
-	less_cols -= curwin->w_cursor.col;
+	ਨਹੀਂਤਾਂ
+	    (ਖਾਲੀ)ਸੈੱਟ_indent(newindent, SIN_ਪਾਓ);
+	less_ਖਾਨੇ_ਗਿਣਤੀ -= curwin->w_cursor.ਖਾਨਾ;
 
-	ai_col = curwin->w_cursor.col;
+	ai_ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
 
 	// In MODE_REPLACE state, for each character in the new indent, there
 	// must be a NUL on the replace stack, for when it is deleted with BS
-	if (REPLACE_NORMAL(State))
-	    for (n = 0; n < (int)curwin->w_cursor.col; ++n)
-		replace_push(NUL);
-	newcol += curwin->w_cursor.col;
-	if (no_si)
+	ਜੇ (REPLACE_ਸਾਧਾਰਨ(State))
+	    ਲਈ (n = 0; n < (ਪੂਰਨ)curwin->w_cursor.ਖਾਨਾ; ++n)
+		replace_ਧੱਕੋ(NUL);
+	newcol += curwin->w_cursor.ਖਾਨਾ;
+	ਜੇ (no_si)
 	    did_si = FALSE;
     }
 
     // In MODE_REPLACE state, for each character in the extra leader, there
     // must be a NUL on the replace stack, for when it is deleted with BS.
-    if (REPLACE_NORMAL(State))
-	while (lead_len-- > 0)
-	    replace_push(NUL);
+    ਜੇ (REPLACE_ਸਾਧਾਰਨ(State))
+	ਜਦੋਂ (lead_len-- > 0)
+	    replace_ਧੱਕੋ(NUL);
 
     curwin->w_cursor = old_cursor;
 
-    if (dir == FORWARD)
+    ਜੇ (dir == FORWARD)
     {
-	if (trunc_line || (State & MODE_INSERT))
+	ਜੇ (trunc_ਸਤਰ || (State & ਬਹੁਲਕ_ਪਾਓ))
 	{
 	    // truncate current line at cursor
-	    saved_line[curwin->w_cursor.col] = NUL;
+	    saved_ਸਤਰ[curwin->w_cursor.ਖਾਨਾ] = NUL;
 	    // Remove trailing white space, unless OPENLINE_KEEPTRAIL used.
-	    if (trunc_line && !(flags & OPENLINE_KEEPTRAIL))
-		truncate_spaces(saved_line, curwin->w_cursor.col);
-	    ml_replace(curwin->w_cursor.lnum, saved_line, FALSE);
-	    saved_line = NULL;
-	    if (did_append)
+	    ਜੇ (trunc_ਸਤਰ && !(flags & OPENLINE_KEEPTRAIL))
+		truncate_spaces(saved_ਸਤਰ, curwin->w_cursor.ਖਾਨਾ);
+	    ml_replace(curwin->w_cursor.lnum, saved_ਸਤਰ, FALSE);
+	    saved_ਸਤਰ = ਨਿਰਾ;
+	    ਜੇ (did_append)
 	    {
-		changed_lines(curwin->w_cursor.lnum, curwin->w_cursor.col,
+		ਬਦਲਿਆ_ਸਤਰਾਂ(curwin->w_cursor.lnum, curwin->w_cursor.ਖਾਨਾ,
 					       curwin->w_cursor.lnum + 1, 1L);
 		did_append = FALSE;
 
 		// Move marks after the line break to the new line.
-		if (flags & OPENLINE_MARKFIX)
-		    mark_col_adjust(curwin->w_cursor.lnum,
-					 curwin->w_cursor.col + less_cols_off,
-						      1L, (long)-less_cols, 0);
-#ifdef FEAT_PROP_POPUP
+		ਜੇ (flags & OPENLINE_MARKFIX)
+		    mark_ਖਾਨਾ_adjust(curwin->w_cursor.lnum,
+					 curwin->w_cursor.ਖਾਨਾ + less_ਖਾਨੇ_ਗਿਣਤੀ_off,
+						      1L, (ਲੰਮਾ)-less_ਖਾਨੇ_ਗਿਣਤੀ, 0);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ FEAT_PROP_POPUP
 		// Keep into account the deleted blanks on the new line.
-		if (curbuf->b_has_textprop && less_cols_off != 0)
+		ਜੇ (curbuf->b_has_textprop && less_ਖਾਨੇ_ਗਿਣਤੀ_off != 0)
 		    adjust_prop_columns(curwin->w_cursor.lnum + 1, 0,
-							    -less_cols_off, 0);
-#endif
+							    -less_ਖਾਨੇ_ਗਿਣਤੀ_off, 0);
+#ਜੇ_ਅੰਤ
 	    }
-	    else
-		changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
+	    ਨਹੀਂਤਾਂ
+		ਬਦਲਿਆ_ਬਾਈਟਾਂ(curwin->w_cursor.lnum, curwin->w_cursor.ਖਾਨਾ);
 	}
 
 	// Put the cursor on the new line.  Careful: the scrollup() above may
 	// have moved w_cursor, we must use old_cursor.
 	curwin->w_cursor.lnum = old_cursor.lnum + 1;
     }
-    if (did_append)
-	changed_lines(curwin->w_cursor.lnum, 0, curwin->w_cursor.lnum, 1L);
+    ਜੇ (did_append)
+	ਬਦਲਿਆ_ਸਤਰਾਂ(curwin->w_cursor.lnum, 0, curwin->w_cursor.lnum, 1L);
 
-    curwin->w_cursor.col = newcol;
+    curwin->w_cursor.ਖਾਨਾ = newcol;
     curwin->w_cursor.coladd = 0;
 
     // In MODE_VREPLACE state, we are handling the replace stack ourselves, so
     // stop fixthisline() from doing it (via change_indent()) by telling it
     // we're in normal MODE_INSERT state.
-    if (State & VREPLACE_FLAG)
+    ਜੇ (State & VREPLACE_FLAG)
     {
-	vreplace_mode = State;	// So we know to put things right later
-	State = MODE_INSERT;
+	vreplace_ਬਹੁਲਕ = State;	// So we know to put things right later
+	State = ਬਹੁਲਕ_ਪਾਓ;
     }
-    else
-	vreplace_mode = 0;
+    ਨਹੀਂਤਾਂ
+	vreplace_ਬਹੁਲਕ = 0;
 
-    if (!p_paste)
+    ਜੇ (!p_paste)
     {
-	if (leader == NULL
+	ਜੇ (leader == ਨਿਰਾ
 		&& !use_indentexpr_for_lisp()
 		&& curbuf->b_p_lisp
 		&& curbuf->b_p_ai)
 	{
 	    // do lisp indenting
 	    fixthisline(get_lisp_indent);
-	    ai_col = (colnr_T)getwhitecols_curline();
+	    ai_ਖਾਨਾ = (colnr_T)getwhitecols_curline();
 	}
-	else if (do_cindent || (curbuf->b_p_ai && use_indentexpr_for_lisp()))
+	ਨਹੀਂਤਾਂ ਜੇ (do_cindent || (curbuf->b_p_ai && use_indentexpr_for_lisp()))
 	{
 	    // do 'cindent' or 'indentexpr' indenting
-	    do_c_expr_indent();
-	    ai_col = (colnr_T)getwhitecols_curline();
+	    do_c_ਵਿਅੰਜਕ_indent();
+	    ai_ਖਾਨਾ = (colnr_T)getwhitecols_curline();
 	}
     }
 
-    if (vreplace_mode != 0)
-	State = vreplace_mode;
+    ਜੇ (vreplace_ਬਹੁਲਕ != 0)
+	State = vreplace_ਬਹੁਲਕ;
 
     // Finally, MODE_VREPLACE gets the stuff on the new line, then puts back
     // the original line, and inserts the new stuff char by char, pushing old
     // stuff onto the replace stack (via ins_char()).
-    if (State & VREPLACE_FLAG)
+    ਜੇ (State & VREPLACE_FLAG)
     {
 	// Put new line in p_extra
 	p_extra = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	if (p_extra == NULL)
-	    goto theend;
+	ਜੇ (p_extra == ਨਿਰਾ)
+	    ਜਾਓ theend;
 
 	// Put back original line
-	ml_replace(curwin->w_cursor.lnum, next_line, FALSE);
+	ml_replace(curwin->w_cursor.lnum, ਅਗਲਾ_ਸਤਰ, FALSE);
 
 	// Insert new stuff into line again
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.ਖਾਨਾ = 0;
 	curwin->w_cursor.coladd = 0;
-	ins_bytes(p_extra);	// will call changed_bytes()
+	ins_ਬਾਈਟਾਂ(p_extra);	// will call changed_bytes()
 	vim_free(p_extra);
-	next_line = NULL;
+	ਅਗਲਾ_ਸਤਰ = ਨਿਰਾ;
     }
 
     retval = OK;		// success!
 theend:
     curbuf->b_p_pi = saved_pi;
-    vim_free(saved_line);
-    vim_free(next_line);
+    vim_free(saved_ਸਤਰ);
+    vim_free(ਅਗਲਾ_ਸਤਰ);
     vim_free(allocated);
-    return retval;
+    ਵਾਪਸ retval;
 }
 
 /*
@@ -2617,72 +2617,72 @@ theend:
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-truncate_line(int fixpos)
+    ਪੂਰਨ
+truncate_ਸਤਰ(ਪੂਰਨ fixpos)
 {
     char_u	*newp;
     linenr_T	lnum = curwin->w_cursor.lnum;
-    colnr_T	col = curwin->w_cursor.col;
-    char_u	*old_line;
-    int		deleted;
+    colnr_T	ਖਾਨਾ = curwin->w_cursor.ਖਾਨਾ;
+    char_u	*old_ਸਤਰ;
+    ਪੂਰਨ		deleted;
 
-    old_line = ml_get(lnum);
-    if (col == 0)
+    old_ਸਤਰ = ml_get(lnum);
+    ਜੇ (ਖਾਨਾ == 0)
 	newp = vim_strsave((char_u *)"");
-    else
-	newp = vim_strnsave(old_line, col);
-    deleted = (int)ml_get_len(lnum) - col;
+    ਨਹੀਂਤਾਂ
+	newp = vim_strnsave(old_ਸਤਰ, ਖਾਨਾ);
+    deleted = (ਪੂਰਨ)ml_get_len(lnum) - ਖਾਨਾ;
 
-    if (newp == NULL)
-	return FAIL;
+    ਜੇ (newp == ਨਿਰਾ)
+	ਵਾਪਸ FAIL;
 
     ml_replace(lnum, newp, FALSE);
 
     // mark the buffer as changed and prepare for displaying
-    inserted_bytes(lnum, curwin->w_cursor.col, -deleted);
+    inserted_ਬਾਈਟਾਂ(lnum, curwin->w_cursor.ਖਾਨਾ, -deleted);
 
     // If "fixpos" is TRUE we don't want to end up positioned at the NUL.
-    if (fixpos && curwin->w_cursor.col > 0)
-	--curwin->w_cursor.col;
+    ਜੇ (fixpos && curwin->w_cursor.ਖਾਨਾ > 0)
+	--curwin->w_cursor.ਖਾਨਾ;
 
-    return OK;
+    ਵਾਪਸ OK;
 }
 
 /*
  * Delete "nlines" lines at the cursor.
  * Saves the lines for undo first if "undo" is TRUE.
  */
-    void
-del_lines(long nlines, int undo)
+    ਖਾਲੀ
+del_ਸਤਰਾਂ(ਲੰਮਾ nlines, ਪੂਰਨ undo)
 {
-    long	n;
-    linenr_T	first = curwin->w_cursor.lnum;
+    ਲੰਮਾ	n;
+    linenr_T	ਪਹਿਲਾ = curwin->w_cursor.lnum;
 
-    if (nlines <= 0)
-	return;
+    ਜੇ (nlines <= 0)
+	ਵਾਪਸ;
 
     // save the deleted lines for undo
-    if (undo && u_savedel(first, nlines) == FAIL)
-	return;
+    ਜੇ (undo && u_savedel(ਪਹਿਲਾ, nlines) == FAIL)
+	ਵਾਪਸ;
 
-    for (n = 0; n < nlines; )
+    ਲਈ (n = 0; n < nlines; )
     {
-	if (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to delete
-	    break;
+	ਜੇ (curbuf->b_ml.ml_flags & ML_ਖਾਲੀ_ਥਾਵਾਂ)	    // nothing to delete
+	    ਰੋਕੋ;
 
-	ml_delete_flags(first, ML_DEL_MESSAGE);
+	ml_delete_flags(ਪਹਿਲਾ, ML_DEL_ਸੁਨੇਹਾ);
 	++n;
 
 	// If we delete the last line in the file, stop
-	if (first > curbuf->b_ml.ml_line_count)
-	    break;
+	ਜੇ (ਪਹਿਲਾ > curbuf->b_ml.ml_ਸਤਰ_ਗਿਣਤੀ)
+	    ਰੋਕੋ;
     }
 
     // Correct the cursor position before calling deleted_lines_mark(), it may
     // trigger a callback to display the cursor.
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.ਖਾਨਾ = 0;
     check_cursor_lnum();
 
     // adjust marks, mark the buffer as changed and prepare for displaying
-    deleted_lines_mark(first, n);
+    deleted_ਸਤਰਾਂ_mark(ਪਹਿਲਾ, n);
 }

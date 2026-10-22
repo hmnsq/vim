@@ -1,82 +1,82 @@
-#define DEFINE_INLINES
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_INLINES
 
 // vim: set sw=2 :
-#include "vterm_internal.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "vterm_internal.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdio.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdlib.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdarg.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <string.h>
 
-#include "utf8.h"
+#ਅਨ੍ਤਰ੍ਭਾਵ "utf8.h"
 
 /*****************
  * API functions *
  *****************/
 
-static void *default_malloc(size_t size, void *allocdata UNUSED)
+ਸਥਿਰ ਖਾਲੀ *default_malloc(size_t ਮਾਪ, ਖਾਲੀ *allocdata ਅਣਵਰਤਿਆ)
 {
-  void *ptr = malloc(size);
-  if(ptr)
-    memset(ptr, 0, size);
-  return ptr;
+  ਖਾਲੀ *ptr = ਸਮ੍ਰਿਤੀ_ਦਿਓ(ਮਾਪ);
+  ਜੇ(ptr)
+    memset(ptr, 0, ਮਾਪ);
+  ਵਾਪਸ ptr;
 }
 
-static void default_free(void *ptr, void *allocdata UNUSED)
+ਸਥਿਰ ਖਾਲੀ default_free(ਖਾਲੀ *ptr, ਖਾਲੀ *allocdata ਅਣਵਰਤਿਆ)
 {
-  free(ptr);
+  ਮੁਕਤ(ptr);
 }
 
-static VTermAllocatorFunctions default_allocator = {
+ਸਥਿਰ VTermAllocatorFunctions default_allocator = {
   &default_malloc, // malloc
   &default_free // free
 };
 
-VTerm *vterm_new(int rows, int cols)
+VTerm *vterm_new(ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
-  return vterm_build(&builder);
+  ਬਣਤਰ VTermBuilder builder;
+  memset(&builder, 0, ਆਕਾਰ(builder));
+  builder.ਪੰਕਤੀਆਂ_2 = ਪੰਕਤੀਆਂ_2;
+  builder.ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
+  ਵਾਪਸ vterm_build(&builder);
 }
 
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata)
+VTerm *vterm_new_with_allocator(ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, VTermAllocatorFunctions *funcs, ਖਾਲੀ *allocdata)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
+  ਬਣਤਰ VTermBuilder builder;
+  memset(&builder, 0, ਆਕਾਰ(builder));
+  builder.ਪੰਕਤੀਆਂ_2 = ਪੰਕਤੀਆਂ_2;
+  builder.ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
   builder.allocator = funcs;
   builder.allocdata = allocdata;
-  return vterm_build(&builder);
+  ਵਾਪਸ vterm_build(&builder);
 }
 
 /* A handy macro for defaulting values out of builder fields */
-#define DEFAULT(v, def)  ((v) ? (v) : (def))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFAULT(v, def)  ((v) ? (v) : (def))
 
-VTerm *vterm_build(const struct VTermBuilder *builder)
+VTerm *vterm_build(ਅਚਲ ਬਣਤਰ VTermBuilder *builder)
 {
-  const VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
+  ਅਚਲ VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
 
   /* Need to bootstrap using the allocator function directly */
-  VTerm *vt = (*allocator->malloc)(sizeof(VTerm), builder->allocdata);
+  VTerm *vt = (*allocator->ਸਮ੍ਰਿਤੀ_ਦਿਓ)(ਆਕਾਰ(VTerm), builder->allocdata);
 
   vt->allocator = allocator;
   vt->allocdata = builder->allocdata;
 
-  vt->rows = builder->rows;
-  vt->cols = builder->cols;
+  vt->ਪੰਕਤੀਆਂ_2 = builder->ਪੰਕਤੀਆਂ_2;
+  vt->ਖਾਨੇ_ਗਿਣਤੀ = builder->ਖਾਨੇ_ਗਿਣਤੀ;
 
-  vt->parser.state = NORMAL;
+  vt->parser.state = ਸਾਧਾਰਨ_2;
 
-  vt->parser.callbacks = NULL;
-  vt->parser.cbdata    = NULL;
+  vt->parser.callbacks = ਨਿਰਾ;
+  vt->parser.cbdata    = ਨਿਰਾ;
 
   vt->parser.emit_nul  = FALSE;
 
-  vt->outfunc = NULL;
-  vt->outdata = NULL;
+  vt->outfunc = ਨਿਰਾ;
+  vt->outdata = ਨਿਰਾ;
 
   vt->outbuffer_len = DEFAULT(builder->outbuffer_len, 4096);
   vt->outbuffer_cur = 0;
@@ -85,25 +85,25 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
   vt->tmpbuffer_len = DEFAULT(builder->tmpbuffer_len, 4096);
   vt->tmpbuffer = vterm_allocator_malloc(vt, vt->tmpbuffer_len);
 
-  if (vt->tmpbuffer == NULL
-      || vt->outbuffer == NULL
-      || vt->tmpbuffer == NULL)
+  ਜੇ (vt->tmpbuffer == ਨਿਰਾ
+      || vt->outbuffer == ਨਿਰਾ
+      || vt->tmpbuffer == ਨਿਰਾ)
   {
     vterm_allocator_free(vt, vt->outbuffer);
     vterm_allocator_free(vt, vt->tmpbuffer);
     vterm_allocator_free(vt, vt);
-    return NULL;
+    ਵਾਪਸ ਨਿਰਾ;
   }
 
-  return vt;
+  ਵਾਪਸ vt;
 }
 
-void vterm_free(VTerm *vt)
+ਖਾਲੀ vterm_free(VTerm *vt)
 {
-  if(vt->screen)
+  ਜੇ(vt->screen)
     vterm_screen_free(vt->screen);
 
-  if(vt->state)
+  ਜੇ(vt->state)
     vterm_state_free(vt->state);
 
   vterm_allocator_free(vt, vt->outbuffer);
@@ -112,341 +112,341 @@ void vterm_free(VTerm *vt)
   vterm_allocator_free(vt, vt);
 }
 
-INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
+ਅੰਦਰੂਨੀ ਖਾਲੀ *vterm_allocator_malloc(VTerm *vt, size_t ਮਾਪ)
 {
-  return (*vt->allocator->malloc)(size, vt->allocdata);
+  ਵਾਪਸ (*vt->allocator->ਸਮ੍ਰਿਤੀ_ਦਿਓ)(ਮਾਪ, vt->allocdata);
 }
 
 /*
  * Free "ptr" unless it is NULL.
  */
-INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_allocator_free(VTerm *vt, ਖਾਲੀ *ptr)
 {
-  if (ptr)
-    (*vt->allocator->free)(ptr, vt->allocdata);
+  ਜੇ (ptr)
+    (*vt->allocator->ਮੁਕਤ)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
+ਖਾਲੀ vterm_get_ਮਾਪ(ਅਚਲ VTerm *vt, ਪੂਰਨ *rowsp, ਪੂਰਨ *colsp)
 {
-  if(rowsp)
-    *rowsp = vt->rows;
-  if(colsp)
-    *colsp = vt->cols;
+  ਜੇ(rowsp)
+    *rowsp = vt->ਪੰਕਤੀਆਂ_2;
+  ਜੇ(colsp)
+    *colsp = vt->ਖਾਨੇ_ਗਿਣਤੀ;
 }
 
-void vterm_set_size(VTerm *vt, int rows, int cols)
+ਖਾਲੀ vterm_ਸੈੱਟ_ਮਾਪ(VTerm *vt, ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ)
 {
-  if(rows < 1 || cols < 1)
-    return;
+  ਜੇ(ਪੰਕਤੀਆਂ_2 < 1 || ਖਾਨੇ_ਗਿਣਤੀ < 1)
+    ਵਾਪਸ;
 
-  vt->rows = rows;
-  vt->cols = cols;
+  vt->ਪੰਕਤੀਆਂ_2 = ਪੰਕਤੀਆਂ_2;
+  vt->ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->resize)
-    (*vt->parser.callbacks->resize)(rows, cols, vt->parser.cbdata);
+  ਜੇ(vt->parser.callbacks && vt->parser.callbacks->resize)
+    (*vt->parser.callbacks->resize)(ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ, vt->parser.cbdata);
 }
 
-int vterm_get_utf8(const VTerm *vt)
+ਪੂਰਨ vterm_get_utf8(ਅਚਲ VTerm *vt)
 {
-  return vt->mode.utf8;
+  ਵਾਪਸ vt->ਬਹੁਲਕ.utf8;
 }
 
-void vterm_set_utf8(VTerm *vt, int is_utf8)
+ਖਾਲੀ vterm_ਸੈੱਟ_utf8(VTerm *vt, ਪੂਰਨ is_utf8)
 {
-  vt->mode.utf8 = is_utf8;
+  vt->ਬਹੁਲਕ.utf8 = is_utf8;
 }
 
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
+ਖਾਲੀ vterm_output_ਸੈੱਟ_callback(VTerm *vt, VTermOutputCallback *func, ਖਾਲੀ *user)
 {
   vt->outfunc = func;
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_ਧੱਕੋ_output_ਬਾਈਟਾਂ(VTerm *vt, ਅਚਲ ਅੱਖਰ *ਬਾਈਟਾਂ, size_t len)
 {
-  if(vt->outfunc) {
-    (vt->outfunc)(bytes, len, vt->outdata);
-    return;
+  ਜੇ(vt->outfunc) {
+    (vt->outfunc)(ਬਾਈਟਾਂ, len, vt->outdata);
+    ਵਾਪਸ;
   }
 
-  if(len > vt->outbuffer_len - vt->outbuffer_cur) {
+  ਜੇ(len > vt->outbuffer_len - vt->outbuffer_cur) {
     DEBUG_LOG("vterm_push_output_bytes(): buffer overflow; dropping output\n");
-    return;
+    ਵਾਪਸ;
   }
 
-  memcpy(vt->outbuffer + vt->outbuffer_cur, bytes, len);
+  ਸਮ੍ਰਿਤੀ_ਨਕਲ(vt->outbuffer + vt->outbuffer_cur, ਬਾਈਟਾਂ, len);
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_ਧੱਕੋ_output_vsprintf(VTerm *vt, ਅਚਲ ਅੱਖਰ *format, va_list ਦਲੀਲਾਂ)
 {
   size_t len;
-#ifdef VSNPRINTF
-  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ VSNPRINTF
+  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, ਦਲੀਲਾਂ);
+#ਨਹੀਂਤਾਂ
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
-  len = vsprintf(vt->tmpbuffer, format, args);
-  if (len >= vt->tmpbuffer_len)
+  len = vsprintf(vt->tmpbuffer, format, ਦਲੀਲਾਂ);
+  ਜੇ (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
-#endif
-  vterm_push_output_bytes(vt, vt->tmpbuffer, len);
+#ਜੇ_ਅੰਤ
+  vterm_ਧੱਕੋ_output_ਬਾਈਟਾਂ(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_ਧੱਕੋ_output_sprintf(VTerm *vt, ਅਚਲ ਅੱਖਰ *format, ...)
 {
-  va_list args;
-  va_start(args, format);
-  vterm_push_output_vsprintf(vt, format, args);
-  va_end(args);
+  va_list ਦਲੀਲਾਂ;
+  va_start(ਦਲੀਲਾਂ, format);
+  vterm_ਧੱਕੋ_output_vsprintf(vt, format, ਦਲੀਲਾਂ);
+  va_end(ਦਲੀਲਾਂ);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_ਧੱਕੋ_output_sprintf_ctrl(VTerm *vt, ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ ctrl, ਅਚਲ ਅੱਖਰ *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ਜੇ(ctrl >= 0x80 && !vt->ਬਹੁਲਕ.ctrl8bit)
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         ESC_S "%c", ctrl - 0x40);
-  else
+  ਨਹੀਂਤਾਂ
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         "%c", ctrl);
-  if(cur >= vt->tmpbuffer_len)
-    return;
-  vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+  ਜੇ(cur >= vt->tmpbuffer_len)
+    ਵਾਪਸ;
+  vterm_ਧੱਕੋ_output_ਬਾਈਟਾਂ(vt, vt->tmpbuffer, cur);
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list ਦਲੀਲਾਂ;
+  va_start(ਦਲੀਲਾਂ, fmt);
+  vterm_ਧੱਕੋ_output_vsprintf(vt, fmt, ਦਲੀਲਾਂ);
+  va_end(ਦਲੀਲਾਂ);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+ਅੰਦਰੂਨੀ ਖਾਲੀ vterm_ਧੱਕੋ_output_sprintf_str(VTerm *vt, ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ ctrl, ਪੂਰਨ ਪਦ, ਅਚਲ ਅੱਖਰ *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl) {
-    if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ਜੇ(ctrl) {
+    ਜੇ(ctrl >= 0x80 && !vt->ਬਹੁਲਕ.ctrl8bit)
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           ESC_S "%c", ctrl - 0x40);
-    else
+    ਨਹੀਂਤਾਂ
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           "%c", ctrl);
 
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    ਜੇ(cur >= vt->tmpbuffer_len)
+      ਵਾਪਸ;
+    vterm_ਧੱਕੋ_output_ਬਾਈਟਾਂ(vt, vt->tmpbuffer, cur);
   }
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list ਦਲੀਲਾਂ;
+  va_start(ਦਲੀਲਾਂ, fmt);
+  vterm_ਧੱਕੋ_output_vsprintf(vt, fmt, ਦਲੀਲਾਂ);
+  va_end(ਦਲੀਲਾਂ);
 
-  if(term) {
+  ਜੇ(ਪਦ) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
-        vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+        vt->ਬਹੁਲਕ.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
+    ਜੇ(cur >= vt->tmpbuffer_len)
+      ਵਾਪਸ;
+    vterm_ਧੱਕੋ_output_ਬਾਈਟਾਂ(vt, vt->tmpbuffer, cur);
   }
 }
 
-size_t vterm_output_get_buffer_size(const VTerm *vt)
+size_t vterm_output_get_ਬਫਰ_ਮਾਪ(ਅਚਲ VTerm *vt)
 {
-  return vt->outbuffer_len;
+  ਵਾਪਸ vt->outbuffer_len;
 }
 
-size_t vterm_output_get_buffer_current(const VTerm *vt)
+size_t vterm_output_get_ਬਫਰ_current(ਅਚਲ VTerm *vt)
 {
-  return vt->outbuffer_cur;
+  ਵਾਪਸ vt->outbuffer_cur;
 }
 
-size_t vterm_output_get_buffer_remaining(const VTerm *vt)
+size_t vterm_output_get_ਬਫਰ_ਬਚਿਆ(ਅਚਲ VTerm *vt)
 {
-  return vt->outbuffer_len - vt->outbuffer_cur;
+  ਵਾਪਸ vt->outbuffer_len - vt->outbuffer_cur;
 }
 
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
+size_t vterm_output_read(VTerm *vt, ਅੱਖਰ *ਬਫਰ, size_t len)
 {
-  if(len > vt->outbuffer_cur)
+  ਜੇ(len > vt->outbuffer_cur)
     len = vt->outbuffer_cur;
 
-  memcpy(buffer, vt->outbuffer, len);
+  ਸਮ੍ਰਿਤੀ_ਨਕਲ(ਬਫਰ, vt->outbuffer, len);
 
-  if(len < vt->outbuffer_cur)
+  ਜੇ(len < vt->outbuffer_cur)
     memmove(vt->outbuffer, vt->outbuffer + len, vt->outbuffer_cur - len);
 
   vt->outbuffer_cur -= len;
 
-  return len;
+  ਵਾਪਸ len;
 }
 
-VTermValueType vterm_get_attr_type(VTermAttr attr)
+VTerm_ਮੁੱਲ_Type vterm_get_attr_type(VTermAttr attr)
 {
-  switch(attr) {
-    case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_UNDERLINE:  return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_ITALIC:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BLINK:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_REVERSE:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_CONCEAL:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_STRIKE:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_FONT:       return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_FOREGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_BACKGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_SMALL:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BASELINE:   return VTERM_VALUETYPE_INT;
+  ਚੋਣ(attr) {
+    ਹਾਲਤ VTERM_ATTR_BOLD:       ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_UNDERLINE:  ਵਾਪਸ VTERM_VALUETYPE_INT;
+    ਹਾਲਤ VTERM_ATTR_ITALIC:     ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_BLINK:      ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_ਉਲਟ:    ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_CONCEAL:    ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_STRIKE:     ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_FONT:       ਵਾਪਸ VTERM_VALUETYPE_INT;
+    ਹਾਲਤ VTERM_ATTR_FOREGROUND: ਵਾਪਸ VTERM_VALUETYPE_COLOR;
+    ਹਾਲਤ VTERM_ATTR_BACKGROUND: ਵਾਪਸ VTERM_VALUETYPE_COLOR;
+    ਹਾਲਤ VTERM_ATTR_SMALL:      ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_ATTR_BASELINE:   ਵਾਪਸ VTERM_VALUETYPE_INT;
 
-    case VTERM_N_ATTRS: return 0;
+    ਹਾਲਤ VTERM_N_ATTRS: ਵਾਪਸ 0;
   }
-  return 0; /* UNREACHABLE */
+  ਵਾਪਸ 0; /* UNREACHABLE */
 }
 
-VTermValueType vterm_get_prop_type(VTermProp prop)
+VTerm_ਮੁੱਲ_Type vterm_get_prop_type(VTermProp prop)
 {
-  switch(prop) {
-    case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORBLINK:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_ALTSCREEN:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_TITLE:         return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_ICONNAME:      return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_REVERSE:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORSHAPE:   return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_MOUSE:         return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_FOCUSREPORT:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORCOLOR:   return VTERM_VALUETYPE_STRING;
+  ਚੋਣ(prop) {
+    ਹਾਲਤ VTERM_PROP_CURSORVISIBLE: ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_PROP_CURSORBLINK:   ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_PROP_ALTSCREEN:     ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_PROP_TITLE:         ਵਾਪਸ VTERM_VALUETYPE_STRING;
+    ਹਾਲਤ VTERM_PROP_ICONNAME:      ਵਾਪਸ VTERM_VALUETYPE_STRING;
+    ਹਾਲਤ VTERM_PROP_ਉਲਟ:       ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_PROP_CURSORSHAPE:   ਵਾਪਸ VTERM_VALUETYPE_INT;
+    ਹਾਲਤ VTERM_PROP_MOUSE:         ਵਾਪਸ VTERM_VALUETYPE_INT;
+    ਹਾਲਤ VTERM_PROP_FOCUSREPORT:   ਵਾਪਸ VTERM_VALUETYPE_BOOL;
+    ਹਾਲਤ VTERM_PROP_CURSORCOLOR:   ਵਾਪਸ VTERM_VALUETYPE_STRING;
 
-    case VTERM_N_PROPS: return 0;
+    ਹਾਲਤ VTERM_N_PROPS: ਵਾਪਸ 0;
   }
-  return 0; /* UNREACHABLE */
+  ਵਾਪਸ 0; /* UNREACHABLE */
 }
 
-void vterm_scroll_rect(VTermRect rect,
-    int downward,
-    int rightward,
-    int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, int selective, void *user),
-    void *user)
+ਖਾਲੀ vterm_scroll_rect(VTermRect rect,
+    ਪੂਰਨ downward,
+    ਪੂਰਨ rightward,
+    ਪੂਰਨ (*moverect)(VTermRect src, VTermRect dest, ਖਾਲੀ *user),
+    ਪੂਰਨ (*eraserect)(VTermRect rect, ਪੂਰਨ selective, ਖਾਲੀ *user),
+    ਖਾਲੀ *user)
 {
   VTermRect src;
   VTermRect dest;
 
-  if(abs(downward)  >= rect.end_row - rect.start_row ||
-     abs(rightward) >= rect.end_col - rect.start_col) {
+  ਜੇ(ਨਿਰਪੇਖ(downward)  >= rect.ਸਿਰਾ_ਪੰਕਤੀ - rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ ||
+     ਨਿਰਪੇਖ(rightward) >= rect.ਸਿਰਾ_ਖਾਨਾ - rect.ਸ਼ੁਰੂ_ਖਾਨਾ) {
     /* Scroll more than area; just erase the lot */
     (*eraserect)(rect, 0, user);
-    return;
+    ਵਾਪਸ;
   }
 
-  if(rightward >= 0) {
+  ਜੇ(rightward >= 0) {
     /* rect: [XXX................]
      * src:     [----------------]
      * dest: [----------------]
      */
-    dest.start_col = rect.start_col;
-    dest.end_col   = rect.end_col   - rightward;
-    src.start_col  = rect.start_col + rightward;
-    src.end_col    = rect.end_col;
+    dest.ਸ਼ੁਰੂ_ਖਾਨਾ = rect.ਸ਼ੁਰੂ_ਖਾਨਾ;
+    dest.ਸਿਰਾ_ਖਾਨਾ   = rect.ਸਿਰਾ_ਖਾਨਾ   - rightward;
+    src.ਸ਼ੁਰੂ_ਖਾਨਾ  = rect.ਸ਼ੁਰੂ_ਖਾਨਾ + rightward;
+    src.ਸਿਰਾ_ਖਾਨਾ    = rect.ਸਿਰਾ_ਖਾਨਾ;
   }
-  else {
+  ਨਹੀਂਤਾਂ {
     /* rect: [................XXX]
      * src:  [----------------]
      * dest:    [----------------]
      */
-    int leftward = -rightward;
-    dest.start_col = rect.start_col + leftward;
-    dest.end_col   = rect.end_col;
-    src.start_col  = rect.start_col;
-    src.end_col    = rect.end_col - leftward;
+    ਪੂਰਨ leftward = -rightward;
+    dest.ਸ਼ੁਰੂ_ਖਾਨਾ = rect.ਸ਼ੁਰੂ_ਖਾਨਾ + leftward;
+    dest.ਸਿਰਾ_ਖਾਨਾ   = rect.ਸਿਰਾ_ਖਾਨਾ;
+    src.ਸ਼ੁਰੂ_ਖਾਨਾ  = rect.ਸ਼ੁਰੂ_ਖਾਨਾ;
+    src.ਸਿਰਾ_ਖਾਨਾ    = rect.ਸਿਰਾ_ਖਾਨਾ - leftward;
   }
 
-  if(downward >= 0) {
-    dest.start_row = rect.start_row;
-    dest.end_row   = rect.end_row   - downward;
-    src.start_row  = rect.start_row + downward;
-    src.end_row    = rect.end_row;
+  ਜੇ(downward >= 0) {
+    dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ = rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+    dest.ਸਿਰਾ_ਪੰਕਤੀ   = rect.ਸਿਰਾ_ਪੰਕਤੀ   - downward;
+    src.ਸ਼ੁਰੂ_ਪੰਕਤੀ  = rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ + downward;
+    src.ਸਿਰਾ_ਪੰਕਤੀ    = rect.ਸਿਰਾ_ਪੰਕਤੀ;
   }
-  else {
-    int upward = -downward;
-    dest.start_row = rect.start_row + upward;
-    dest.end_row   = rect.end_row;
-    src.start_row  = rect.start_row;
-    src.end_row    = rect.end_row - upward;
+  ਨਹੀਂਤਾਂ {
+    ਪੂਰਨ upward = -downward;
+    dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ = rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ + upward;
+    dest.ਸਿਰਾ_ਪੰਕਤੀ   = rect.ਸਿਰਾ_ਪੰਕਤੀ;
+    src.ਸ਼ੁਰੂ_ਪੰਕਤੀ  = rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+    src.ਸਿਰਾ_ਪੰਕਤੀ    = rect.ਸਿਰਾ_ਪੰਕਤੀ - upward;
   }
 
-  if(moverect)
+  ਜੇ(moverect)
     (*moverect)(dest, src, user);
 
-  if(downward > 0)
-    rect.start_row = rect.end_row - downward;
-  else if(downward < 0)
-    rect.end_row = rect.start_row - downward;
+  ਜੇ(downward > 0)
+    rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ = rect.ਸਿਰਾ_ਪੰਕਤੀ - downward;
+  ਨਹੀਂਤਾਂ ਜੇ(downward < 0)
+    rect.ਸਿਰਾ_ਪੰਕਤੀ = rect.ਸ਼ੁਰੂ_ਪੰਕਤੀ - downward;
 
-  if(rightward > 0)
-    rect.start_col = rect.end_col - rightward;
-  else if(rightward < 0)
-    rect.end_col = rect.start_col - rightward;
+  ਜੇ(rightward > 0)
+    rect.ਸ਼ੁਰੂ_ਖਾਨਾ = rect.ਸਿਰਾ_ਖਾਨਾ - rightward;
+  ਨਹੀਂਤਾਂ ਜੇ(rightward < 0)
+    rect.ਸਿਰਾ_ਖਾਨਾ = rect.ਸ਼ੁਰੂ_ਖਾਨਾ - rightward;
 
   (*eraserect)(rect, 0, user);
 }
 
-void vterm_copy_cells(VTermRect dest,
+ਖਾਲੀ vterm_copy_cells(VTermRect dest,
     VTermRect src,
-    void (*copycell)(VTermPos dest, VTermPos src, void *user),
-    void *user)
+    ਖਾਲੀ (*copycell)(VTermPos dest, VTermPos src, ਖਾਲੀ *user),
+    ਖਾਲੀ *user)
 {
-  int downward  = src.start_row - dest.start_row;
-  int rightward = src.start_col - dest.start_col;
+  ਪੂਰਨ downward  = src.ਸ਼ੁਰੂ_ਪੰਕਤੀ - dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+  ਪੂਰਨ rightward = src.ਸ਼ੁਰੂ_ਖਾਨਾ - dest.ਸ਼ੁਰੂ_ਖਾਨਾ;
 
-  int init_row, test_row, init_col, test_col;
-  int inc_row, inc_col;
+  ਪੂਰਨ init_ਪੰਕਤੀ, test_ਪੰਕਤੀ, init_ਖਾਨਾ, test_ਖਾਨਾ;
+  ਪੂਰਨ inc_ਪੰਕਤੀ, inc_ਖਾਨਾ;
 
-  if(downward < 0) {
-    init_row = dest.end_row - 1;
-    test_row = dest.start_row - 1;
-    inc_row = -1;
+  ਜੇ(downward < 0) {
+    init_ਪੰਕਤੀ = dest.ਸਿਰਾ_ਪੰਕਤੀ - 1;
+    test_ਪੰਕਤੀ = dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ - 1;
+    inc_ਪੰਕਤੀ = -1;
   }
-  else /* downward >= 0 */ {
-    init_row = dest.start_row;
-    test_row = dest.end_row;
-    inc_row = +1;
+  ਨਹੀਂਤਾਂ /* downward >= 0 */ {
+    init_ਪੰਕਤੀ = dest.ਸ਼ੁਰੂ_ਪੰਕਤੀ;
+    test_ਪੰਕਤੀ = dest.ਸਿਰਾ_ਪੰਕਤੀ;
+    inc_ਪੰਕਤੀ = +1;
   }
 
-  if(rightward < 0) {
-    init_col = dest.end_col - 1;
-    test_col = dest.start_col - 1;
-    inc_col = -1;
+  ਜੇ(rightward < 0) {
+    init_ਖਾਨਾ = dest.ਸਿਰਾ_ਖਾਨਾ - 1;
+    test_ਖਾਨਾ = dest.ਸ਼ੁਰੂ_ਖਾਨਾ - 1;
+    inc_ਖਾਨਾ = -1;
   }
-  else /* rightward >= 0 */ {
-    init_col = dest.start_col;
-    test_col = dest.end_col;
-    inc_col = +1;
+  ਨਹੀਂਤਾਂ /* rightward >= 0 */ {
+    init_ਖਾਨਾ = dest.ਸ਼ੁਰੂ_ਖਾਨਾ;
+    test_ਖਾਨਾ = dest.ਸਿਰਾ_ਖਾਨਾ;
+    inc_ਖਾਨਾ = +1;
   }
 
   VTermPos pos;
-  for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
-    for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
+  ਲਈ(pos.ਪੰਕਤੀ = init_ਪੰਕਤੀ; pos.ਪੰਕਤੀ != test_ਪੰਕਤੀ; pos.ਪੰਕਤੀ += inc_ਪੰਕਤੀ)
+    ਲਈ(pos.ਖਾਨਾ = init_ਖਾਨਾ; pos.ਖਾਨਾ != test_ਖਾਨਾ; pos.ਖਾਨਾ += inc_ਖਾਨਾ) {
       VTermPos srcpos;
-      srcpos.row = pos.row + downward;
-      srcpos.col = pos.col + rightward;
+      srcpos.ਪੰਕਤੀ = pos.ਪੰਕਤੀ + downward;
+      srcpos.ਖਾਨਾ = pos.ਖਾਨਾ + rightward;
       (*copycell)(pos, srcpos, user);
     }
 }
 
-void vterm_check_version(int major, int minor)
+ਖਾਲੀ vterm_check_ਸੰਸਕਰਣ(ਪੂਰਨ major, ਪੂਰਨ minor)
 {
-  if(major != VTERM_VERSION_MAJOR) {
+  ਜੇ(major != VTERM_ਸੰਸਕਰਣ_MAJOR) {
     fprintf(stderr, "libvterm major version mismatch; %d (wants) != %d (library)\n",
-        major, VTERM_VERSION_MAJOR);
-    exit(1);
+        major, VTERM_ਸੰਸਕਰਣ_MAJOR);
+    ਬਾਹਰ_ਨਿਕਲੋ(1);
   }
 
-  if(minor > VTERM_VERSION_MINOR) {
+  ਜੇ(minor > VTERM_ਸੰਸਕਰਣ_MINOR) {
     fprintf(stderr, "libvterm minor version mismatch; %d (wants) > %d (library)\n",
-        minor, VTERM_VERSION_MINOR);
-    exit(1);
+        minor, VTERM_ਸੰਸਕਰਣ_MINOR);
+    ਬਾਹਰ_ਨਿਕਲੋ(1);
   }
 
   // Happy
