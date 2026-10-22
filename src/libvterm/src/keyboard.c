@@ -1,83 +1,83 @@
-#include "vterm_internal.h"
+#ضمن "vterm_internal.h"
 
-#include <stdio.h>
+#ضمن <stdio.h>
 
-#include "utf8.h"
+#ضمن "utf8.h"
 
 // VIM: added
-int vterm_is_modify_other_keys(VTerm *vt)
+صحيح vterm_is_modify_other_مفاتيح(VTerm *vt)
 {
-  return vt->state->mode.modify_other_keys;
+  إرجاع vt->state->mode.modify_other_مفاتيح;
 }
 
 // VIM: added
-int vterm_is_kitty_keyboard(VTerm *vt)
+صحيح vterm_is_kitty_keyboard(VTerm *vt)
 {
-  return vt->state->mode.kitty_keyboard;
+  إرجاع vt->state->mode.kitty_keyboard;
 }
 
 
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
+فراغ vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
 {
   // VIM: added modifyOtherKeys support
-  if (vterm_is_modify_other_keys(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
-    return;
+  إذا (vterm_is_modify_other_مفاتيح(vt) && mod != 0) {
+    vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
+    إرجاع;
   }
 
   // VIM: added kitty keyboard protocol support
-  if (vterm_is_kitty_keyboard(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  إذا (vterm_is_kitty_keyboard(vt) && mod != 0) {
+    vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    إرجاع;
   }
 
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
-  if(c != ' ')
+  إذا(c != ' ')
     mod &= ~VTERM_MOD_SHIFT;
 
-  if(mod == 0) {
+  إذا(mod == 0) {
     // Normal text - ignore just shift
-    char str[6];
-    int seqlen = fill_utf8(c, str);
-    vterm_push_output_bytes(vt, str, seqlen);
-    return;
+    حرف str[6];
+    صحيح seqlen = fill_utf8(c, str);
+    vterm_ادفع_output_bytes(vt, str, seqlen);
+    إرجاع;
   }
 
-  int needs_CSIu;
-  switch(c) {
+  صحيح needs_CSIu;
+  بدل(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
-    case 'i': case 'j': case 'm': case '[':
+    حالة 'i': حالة 'j': حالة 'm': حالة '[':
       needs_CSIu = 1;
-      break;
+      اكسر;
     /* Ctrl-\ ] ^ _ don't need CSUu */
-    case '\\': case ']': case '^': case '_':
+    حالة '\\': حالة ']': حالة '^': حالة '_':
       needs_CSIu = 0;
-      break;
+      اكسر;
     /* Shift-space needs CSIu */
-    case ' ':
+    حالة ' ':
       needs_CSIu = !!(mod & VTERM_MOD_SHIFT);
-      break;
+      اكسر;
     /* All other characters needs CSIu except for letters a-z */
-    default:
+    افتراضي:
       needs_CSIu = (c < 'a' || c > 'z');
   }
 
   /* ALT we can just prefix with ESC; anything else requires CSI u */
-  if(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  إذا(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
+    vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    إرجاع;
   }
 
-  if(mod & VTERM_MOD_CTRL)
+  إذا(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
-  vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
+  vterm_ادفع_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
 }
 
-typedef struct {
-  enum {
+تعريفنوع بنية {
+  تعداد {
     KEYCODE_NONE,
     KEYCODE_LITERAL,
     KEYCODE_TAB,
@@ -88,12 +88,12 @@ typedef struct {
     KEYCODE_CSINUM,
     KEYCODE_KEYPAD,
   } type;
-  char literal;
-  int csinum;
+  حرف literal;
+  صحيح csinum;
 } keycodes_s;
 
 // Order here must be exactly the same as VTermKey enum!
-static keycodes_s keycodes[] = {
+ساكن keycodes_s keycodes[] = {
   { KEYCODE_NONE,       0, 0 }, // NONE
 
   { KEYCODE_ENTER,      '\r', 0 }, // ENTER
@@ -114,7 +114,7 @@ static keycodes_s keycodes[] = {
   { KEYCODE_CSINUM, '~', 6 },  // PAGEDOWN
 };
 
-static keycodes_s keycodes_fn[] = {
+ساكن keycodes_s keycodes_fn[] = {
   { KEYCODE_NONE,       0, 0 },   // F0 - shouldn't happen
   { KEYCODE_SS3,	'P', 0 }, // F1
   { KEYCODE_SS3,	'Q', 0 }, // F2
@@ -130,7 +130,7 @@ static keycodes_s keycodes_fn[] = {
   { KEYCODE_CSINUM, '~', 24 }, // F12
 };
 
-static keycodes_s keycodes_kp[] = {
+ساكن keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '0', 'p' }, // KP_0
   { KEYCODE_KEYPAD, '1', 'q' }, // KP_1
   { KEYCODE_KEYPAD, '2', 'r' }, // KP_2
@@ -151,109 +151,109 @@ static keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '=', 'X' }, // KP_EQUAL
 };
 
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
+فراغ vterm_keyboard_مفتاح(VTerm *vt, VTerm_مفتاح مفتاح, VTermModifier mod)
 {
-  if(key == VTERM_KEY_NONE)
-    return;
+  إذا(مفتاح == VTERM_مفتاح_NONE)
+    إرجاع;
 
   keycodes_s k;
-  if(key < VTERM_KEY_FUNCTION_0) {
-    if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
-      return;
-    k = keycodes[key];
+  إذا(مفتاح < VTERM_مفتاح_FUNCTION_0) {
+    إذا(مفتاح >= حجم(keycodes)/حجم(keycodes[0]))
+      إرجاع;
+    k = keycodes[مفتاح];
   }
-  else if(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
-    if((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
-      return;
-    k = keycodes_fn[key - VTERM_KEY_FUNCTION_0];
+  وإلا إذا(مفتاح >= VTERM_مفتاح_FUNCTION_0 && مفتاح <= VTERM_مفتاح_FUNCTION_MAX) {
+    إذا((مفتاح - VTERM_مفتاح_FUNCTION_0) >= حجم(keycodes_fn)/حجم(keycodes_fn[0]))
+      إرجاع;
+    k = keycodes_fn[مفتاح - VTERM_مفتاح_FUNCTION_0];
   }
-  else if(key >= VTERM_KEY_KP_0) {
-    if((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
-      return;
-    k = keycodes_kp[key - VTERM_KEY_KP_0];
+  وإلا إذا(مفتاح >= VTERM_مفتاح_KP_0) {
+    إذا((مفتاح - VTERM_مفتاح_KP_0) >= حجم(keycodes_kp)/حجم(keycodes_kp[0]))
+      إرجاع;
+    k = keycodes_kp[مفتاح - VTERM_مفتاح_KP_0];
   }
 
-  switch(k.type) {
-  case KEYCODE_NONE:
-    break;
+  بدل(k.type) {
+  حالة KEYCODE_NONE:
+    اكسر;
 
-  case KEYCODE_TAB:
-    if (vterm_is_kitty_keyboard(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
+  حالة KEYCODE_TAB:
+    إذا (vterm_is_kitty_keyboard(vt) && mod != 0)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
     /* Shift-Tab is CSI Z but plain Tab is 0x09 */
-    else if(mod == VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "Z");
-    else if(mod & VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
-    else
-      goto case_LITERAL;
-    break;
+    وإلا إذا(mod == VTERM_MOD_SHIFT)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "Z");
+    وإلا إذا(mod & VTERM_MOD_SHIFT)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
+    وإلا
+      اذهب case_LITERAL;
+    اكسر;
 
-  case KEYCODE_ENTER:
+  حالة KEYCODE_ENTER:
     /* Enter is CRLF in newline mode, but just LF in linefeed */
-    if(vt->state->mode.newline)
-      vterm_push_output_sprintf(vt, "\r\n");
-    else
-      goto case_LITERAL;
-    break;
+    إذا(vt->state->mode.newline)
+      vterm_ادفع_output_sprintf(vt, "\r\n");
+    وإلا
+      اذهب case_LITERAL;
+    اكسر;
 
-  case KEYCODE_LITERAL: case_LITERAL:
-    if (vterm_is_modify_other_keys(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
-    else if (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
-    else if ((vterm_is_kitty_keyboard(vt) && mod != 0)
+  حالة KEYCODE_LITERAL: case_LITERAL:
+    إذا (vterm_is_modify_other_مفاتيح(vt) && mod != 0)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
+    وإلا إذا (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
+    وإلا إذا ((vterm_is_kitty_keyboard(vt) && mod != 0)
 	|| (mod & (VTERM_MOD_SHIFT|VTERM_MOD_CTRL)))
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
-    else
-      vterm_push_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
-    break;
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
+    وإلا
+      vterm_ادفع_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
+    اكسر;
 
-  case KEYCODE_SS3: case_SS3:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
-    else
-      goto case_CSI;
-    break;
+  حالة KEYCODE_SS3: case_SS3:
+    إذا(mod == 0)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
+    وإلا
+      اذهب case_CSI;
+    اكسر;
 
-  case KEYCODE_CSI: case_CSI:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
-    break;
+  حالة KEYCODE_CSI: case_CSI:
+    إذا(mod == 0)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
+    وإلا
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
+    اكسر;
 
-  case KEYCODE_CSINUM:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
-    break;
+  حالة KEYCODE_CSINUM:
+    إذا(mod == 0)
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
+    وإلا
+      vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
+    اكسر;
 
-  case KEYCODE_CSI_CURSOR:
-    if(vt->state->mode.cursor)
-      goto case_SS3;
-    else
-      goto case_CSI;
+  حالة KEYCODE_CSI_CURSOR:
+    إذا(vt->state->mode.cursor)
+      اذهب case_SS3;
+    وإلا
+      اذهب case_CSI;
 
-  case KEYCODE_KEYPAD:
-    if(vt->state->mode.keypad) {
+  حالة KEYCODE_KEYPAD:
+    إذا(vt->state->mode.keypad) {
       k.literal = k.csinum;
-      goto case_SS3;
+      اذهب case_SS3;
     }
-    else
-      goto case_LITERAL;
+    وإلا
+      اذهب case_LITERAL;
   }
 }
 
-void vterm_keyboard_start_paste(VTerm *vt)
+فراغ vterm_keyboard_start_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "200~");
+  إذا(vt->state->mode.bracketpaste)
+    vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "200~");
 }
 
-void vterm_keyboard_end_paste(VTerm *vt)
+فراغ vterm_keyboard_end_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "201~");
+  إذا(vt->state->mode.bracketpaste)
+    vterm_ادفع_output_sprintf_ctrl(vt, C1_CSI, "201~");
 }

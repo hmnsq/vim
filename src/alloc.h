@@ -11,7 +11,7 @@
  * Used by test_alloc_fail() to test memory allocation failures.
  * Each entry must be on exactly one line, GetAllocId() depends on that.
  */
-typedef enum {
+تعريفنوع تعداد {
     aid_none = 0,
     aid_qf_dirname_start,
     aid_qf_dirname_now,
@@ -29,7 +29,7 @@ typedef enum {
     aid_qf_multiline_pfx,
     aid_qf_makecmd,
     aid_qf_linebuf,
-    aid_tagstack_items,
+    aid_tagstack_عناصر,
     aid_tagstack_from,
     aid_tagstack_details,
     aid_sign_getdefined,
@@ -38,7 +38,7 @@ typedef enum {
     aid_sign_getlist,
     aid_sign_getplaced_dict,
     aid_sign_getplaced_list,
-    aid_insert_sign,
+    aid_أدرج_sign,
     aid_sign_getinfo,
     aid_newbuf_bvars,
     aid_newwin_wvars,

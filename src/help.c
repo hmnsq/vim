@@ -11,68 +11,68 @@
  * help.c: functions for Vim help
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * ":help": open a read-only window on a help file
  */
-    void
+    فراغ
 ex_help(exarg_T *eap)
 {
     char_u	*arg;
     char_u	*tag;
     FILE	*helpfd;	// file descriptor of help file
-    int		n;
-    int		i;
+    صحيح		n;
+    صحيح		i;
     win_T	*wp;
-    int		num_matches;
+    صحيح		رقم_matches;
     char_u	**matches;
     char_u	*p;
-    int		empty_fnum = 0;
-    int		alt_fnum = 0;
+    صحيح		empty_fnum = 0;
+    صحيح		alt_fnum = 0;
     buf_T	*buf;
 #ifdef FEAT_MULTI_LANG
-    int		len;
+    صحيح		len;
     char_u	*lang;
 #endif
 #ifdef FEAT_FOLDING
-    int		old_KeyTyped = KeyTyped;
+    صحيح		old_مفتاح_Typed = مفتاح_Typed;
 #endif
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    إذا (ERROR_IF_ANY_POPUP_WINDOW)
+	إرجاع;
 
-    if (eap != NULL)
+    إذا (eap != عدم)
     {
 	// A ":help" command ends at the first LF, or at a '|' that is
 	// followed by some text.  Set nextcmd to the following command.
-	for (arg = eap->arg; *arg; ++arg)
+	لكل (arg = eap->arg; *arg; ++arg)
 	{
-	    if (*arg == '\n' || *arg == '\r'
+	    إذا (*arg == '\n' || *arg == '\r'
 		    || (*arg == '|' && arg[1] != NUL && arg[1] != '|'))
 	    {
 		*arg++ = NUL;
 		eap->nextcmd = arg;
-		break;
+		اكسر;
 	    }
 	}
 	arg = eap->arg;
 
-	if (eap->forceit && *arg == NUL && !curbuf->b_help)
+	إذا (eap->forceit && *arg == NUL && !curbuf->b_help)
 	{
 	    emsg(_(e_dont_panic));
-	    return;
+	    إرجاع;
 	}
 
-	if (eap->skip)	    // not executing commands
-	    return;
+	إذا (eap->skip)	    // not executing commands
+	    إرجاع;
     }
-    else
+    وإلا
 	arg = (char_u *)"";
 
     // remove trailing blanks
     p = arg + STRLEN(arg) - 1;
-    while (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
+    بينما (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
 	*p-- = NUL;
 
 #ifdef FEAT_MULTI_LANG
@@ -81,41 +81,41 @@ ex_help(exarg_T *eap)
 #endif
 
     // When no argument given go to the index.
-    if (*arg == NUL)
+    إذا (*arg == NUL)
 	arg = (char_u *)"help.txt";
 
     // Check if there is a match for the argument.
-    n = find_help_tags(arg, &num_matches, &matches,
-						 eap != NULL && eap->forceit);
+    n = find_help_tags(arg, &رقم_matches, &matches,
+						 eap != عدم && eap->forceit);
 
     i = 0;
 #ifdef FEAT_MULTI_LANG
-    if (n != FAIL && lang != NULL)
+    إذا (n != FAIL && lang != عدم)
 	// Find first item with the requested language.
-	for (i = 0; i < num_matches; ++i)
+	لكل (i = 0; i < رقم_matches; ++i)
 	{
-	    len = (int)STRLEN(matches[i]);
-	    if (len > 3 && matches[i][len - 3] == '@'
+	    len = (صحيح)STRLEN(matches[i]);
+	    إذا (len > 3 && matches[i][len - 3] == '@'
 				  && STRICMP(matches[i] + len - 2, lang) == 0)
-		break;
+		اكسر;
 	}
 #endif
-    if (i >= num_matches || n == FAIL)
+    إذا (i >= رقم_matches || n == FAIL)
     {
 #ifdef FEAT_MULTI_LANG
-	if (lang != NULL)
+	إذا (lang != عدم)
 	    semsg(_(e_sorry_no_str_help_for_str), lang, arg);
-	else
+	وإلا
 #endif
 	    semsg(_(e_sorry_no_help_for_str), arg);
-	if (n != FAIL)
-	    FreeWild(num_matches, matches);
-	return;
+	إذا (n != FAIL)
+	    FreeWild(رقم_matches, matches);
+	إرجاع;
     }
 
     // The first match (in the requested language) is the best match.
     tag = vim_strsave(matches[i]);
-    FreeWild(num_matches, matches);
+    FreeWild(رقم_matches, matches);
 
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
@@ -123,24 +123,24 @@ ex_help(exarg_T *eap)
 
     // Re-use an existing help window or open a new one.
     // Always open a new one for ":tab help".
-    if (!bt_help(curwin->w_buffer) || cmdmod.cmod_tab != 0)
+    إذا (!bt_help(curwin->w_buffer) || cmdmod.cmod_tab != 0)
     {
-	if (cmdmod.cmod_tab != 0)
-	    wp = NULL;
-	else
+	إذا (cmdmod.cmod_tab != 0)
+	    wp = عدم;
+	وإلا
 	    FOR_ALL_WINDOWS(wp)
-		if (bt_help(wp->w_buffer))
-		    break;
-	if (wp != NULL && wp->w_buffer->b_nwindows > 0)
+		إذا (bt_help(wp->w_buffer))
+		    اكسر;
+	إذا (wp != عدم && wp->w_buffer->b_nwindows > 0)
 	    win_enter(wp, TRUE);
-	else
+	وإلا
 	{
 	    // There is no help window yet.
 	    // Try to open the file specified by the "helpfile" option.
-	    if ((helpfd = mch_fopen((char *)p_hf, READBIN)) == NULL)
+	    إذا ((helpfd = mch_fopen((حرف *)p_hf, READBIN)) == عدم)
 	    {
 		smsg(_("Sorry, help file \"%s\" not found"), p_hf);
-		goto erret;
+		اذهب erret;
 	    }
 	    fclose(helpfd);
 
@@ -148,52 +148,52 @@ ex_help(exarg_T *eap)
 	    // specified, the current window is vertically split and
 	    // narrow.
 	    n = WSP_HELP;
-	    if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
+	    إذا (cmdmod.cmod_split == 0 && curwin->w_width != Columns
 						  && curwin->w_width < 80)
-		n |= p_sb ? WSP_BOT : WSP_TOP;
-	    if (win_split(0, n) == FAIL)
-		goto erret;
+		n |= p_sb ? WSP_BOT : WSP_قمة;
+	    إذا (win_split(0, n) == FAIL)
+		اذهب erret;
 
-	    if (curwin->w_height < p_hh)
-		win_setheight((int)p_hh);
+	    إذا (curwin->w_height < p_hh)
+		win_setheight((صحيح)p_hh);
 
 	    // Open help file (do_ecmd() will set b_help flag, readfile() will
 	    // set b_p_ro flag).
 	    // Set the alternate file to the previously edited file.
 	    alt_fnum = curbuf->b_fnum;
-	    (void)do_ecmd(0, NULL, NULL, NULL, ECMD_LASTL,
+	    (فراغ)do_ecmd(0, عدم, عدم, عدم, ECMD_LASTL,
 			  ECMD_HIDE + ECMD_SET_HELP,
-			  NULL);  // buffer is still open, don't store info
-	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+			  عدم);  // buffer is still open, don't store info
+	    إذا ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = alt_fnum;
 	    empty_fnum = curbuf->b_fnum;
 	}
     }
 
-    if (!p_im)
+    إذا (!p_im)
 	restart_edit = 0;	    // don't want insert mode in help file
 
 #ifdef FEAT_FOLDING
     // Restore KeyTyped, setting 'filetype=help' may reset it.
     // It is needed for do_tag top open folds under the cursor.
-    KeyTyped = old_KeyTyped;
+    مفتاح_Typed = old_مفتاح_Typed;
 #endif
 
-    if (tag != NULL)
+    إذا (tag != عدم)
 	do_tag(tag, DT_HELP, 1, FALSE, TRUE);
 
     // Delete the empty buffer if we're not using it.  Careful: autocommands
     // may have jumped to another window, check that the buffer is not in a
     // window.
-    if (empty_fnum != 0 && curbuf->b_fnum != empty_fnum)
+    إذا (empty_fnum != 0 && curbuf->b_fnum != empty_fnum)
     {
 	buf = buflist_findnr(empty_fnum);
-	if (buf != NULL && buf->b_nwindows == 0)
+	إذا (buf != عدم && buf->b_nwindows == 0)
 	    wipe_buffer(buf, TRUE);
     }
 
     // keep the previous alternate file
-    if (alt_fnum != 0 && curwin->w_alt_fnum == empty_fnum
+    إذا (alt_fnum != 0 && curwin->w_alt_fnum == empty_fnum
 				    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = alt_fnum;
 
@@ -204,22 +204,22 @@ erret:
 /*
  * ":helpclose": Close one help window
  */
-    void
+    فراغ
 ex_helpclose(exarg_T *eap UNUSED)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (bt_help(win->w_buffer))
+	إذا (bt_help(win->w_buffer))
 	{
 	    win_close(win, FALSE);
-	    return;
+	    إرجاع;
 	}
     }
 }
 
-#if defined(FEAT_MULTI_LANG)
+#إذا defined(FEAT_MULTI_LANG)
 /*
  * In an argument search for a language specifiers in the form "@xx".
  * Changes the "@" to NUL if found, and returns a pointer to "xx".
@@ -228,15 +228,15 @@ ex_helpclose(exarg_T *eap UNUSED)
     char_u *
 check_help_lang(char_u *arg)
 {
-    int len = (int)STRLEN(arg);
+    صحيح len = (صحيح)STRLEN(arg);
 
-    if (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
+    إذا (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
 					       && ASCII_ISALPHA(arg[len - 1]))
     {
 	arg[len - 3] = NUL;		// remove the '@'
-	return arg + len - 2;
+	إرجاع arg + len - 2;
     }
-    return NULL;
+    إرجاع عدم;
 }
 #endif
 
@@ -251,19 +251,19 @@ check_help_lang(char_u *arg)
  * Assumption is made that the matched_string passed has already been found to
  * match some string for which help is requested.  webb.
  */
-    int
+    صحيح
 help_heuristic(
     char_u	*matched_string,
-    int		offset,			// offset for match
-    int		wrong_case)		// no matching case
+    صحيح		offset,			// offset for match
+    صحيح		wrong_case)		// no matching case
 {
-    int		num_letters;
+    صحيح		رقم_letters;
     char_u	*p;
 
-    num_letters = 0;
-    for (p = matched_string; *p; p++)
-	if (ASCII_ISALNUM(*p))
-	    num_letters++;
+    رقم_letters = 0;
+    لكل (p = matched_string; *p; p++)
+	إذا (ASCII_ISALNUM(*p))
+	    رقم_letters++;
 
     // Multiply the number of letters by 100 to give it a much bigger
     // weighting than the number of characters.
@@ -272,41 +272,41 @@ help_heuristic(
     // somewhere in the last half.
     // If the match is more than 2 chars from the start, multiply by 200 to
     // put it after matches at the start.
-    if (ASCII_ISALNUM(matched_string[offset]) && offset > 0
+    إذا (ASCII_ISALNUM(matched_string[offset]) && offset > 0
 				 && ASCII_ISALNUM(matched_string[offset - 1]))
 	offset += 10000;
-    else if (offset > 2)
+    وإلا إذا (offset > 2)
 	offset *= 200;
-    if (wrong_case)
+    إذا (wrong_case)
 	offset += 5000;
     // Features are less interesting than the subjects themselves, but "+"
     // alone is not a feature.
-    if (matched_string[0] == '+' && matched_string[1] != NUL)
+    إذا (matched_string[0] == '+' && matched_string[1] != NUL)
 	offset += 100;
-    return (int)(100 * num_letters + STRLEN(matched_string) + offset);
+    إرجاع (صحيح)(100 * رقم_letters + STRLEN(matched_string) + offset);
 }
 
 /*
  * Compare functions for qsort() below, that checks the help heuristics number
  * that has been put after the tagname by find_tags().
  */
-    static int
-help_compare(const void *s1, const void *s2)
+    ساكن صحيح
+help_compare(ثابت فراغ *s1, ثابت فراغ *s2)
 {
-    char    *p1;
-    char    *p2;
-    int	    cmp;
+    حرف    *p1;
+    حرف    *p2;
+    صحيح	    cmp;
 
-    p1 = *(char **)s1 + strlen(*(char **)s1) + 1;
-    p2 = *(char **)s2 + strlen(*(char **)s2) + 1;
+    p1 = *(حرف **)s1 + strlen(*(حرف **)s1) + 1;
+    p2 = *(حرف **)s2 + strlen(*(حرف **)s2) + 1;
 
     // Compare by help heuristic number first.
     cmp = strcmp(p1, p2);
-    if (cmp != 0)
-	return cmp;
+    إذا (cmp != 0)
+	إرجاع cmp;
 
     // Compare by strings as tie-breaker when same heuristic number.
-    return strcmp(*(char **)s1, *(char **)s2);
+    إرجاع strcmp(*(حرف **)s1, *(حرف **)s2);
 }
 
 /*
@@ -315,18 +315,18 @@ help_compare(const void *s1, const void *s2)
  * The matches will be sorted with a "best" match algorithm.
  * When "keep_lang" is TRUE try keeping the language of the current buffer.
  */
-    int
+    صحيح
 find_help_tags(
     char_u	*arg,
-    int		*num_matches,
+    صحيح		*رقم_matches,
     char_u	***matches,
-    int		keep_lang)
+    صحيح		keep_lang)
 {
     char_u	*s, *d;
-    int		i;
+    صحيح		i;
     // Specific tags that either have a specific replacement or won't go
     // through the generic rules.
-    static char *(except_tbl[][2]) = {
+    ساكن حرف *(except_tbl[][2]) = {
 	{"*",		"star"},
 	{"g*",		"gstar"},
 	{"[*",		"[star"},
@@ -367,81 +367,81 @@ find_help_tags(
 	{"s/\\2",	"s/\\\\2"},
 	{"s/\\3",	"s/\\\\3"},
 	{"s/\\9",	"s/\\\\9"},
-	{NULL, NULL}
+	{عدم, عدم}
     };
-    static char *(expr_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
+    ساكن حرف *(تعبير_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
 				   ">=?", ">?", "is?", "isnot?"};
-    int flags;
+    صحيح flags;
 
     d = IObuff;		    // assume IObuff is long enough!
     d[0] = NUL;
 
-    if (STRNICMP(arg, "expr-", 5) == 0)
+    إذا (STRNICMP(arg, "expr-", 5) == 0)
     {
 	// When the string starting with "expr-" and containing '?' and matches
 	// the table, it is taken literally (but ~ is escaped).  Otherwise '?'
 	// is recognized as a wildcard.
-	for (i = (int)ARRAY_LENGTH(expr_table); --i >= 0; )
-	    if (STRCMP(arg + 5, expr_table[i]) == 0)
+	لكل (i = (صحيح)ARRAY_LENGTH(تعبير_table); --i >= 0; )
+	    إذا (STRCMP(arg + 5, تعبير_table[i]) == 0)
 	    {
-		int si = 0, di = 0;
+		صحيح si = 0, di = 0;
 
-		for (;;)
+		لكل (;;)
 		{
-		    if (arg[si] == '~')
+		    إذا (arg[si] == '~')
 			d[di++] = '\\';
 		    d[di++] = arg[si];
-		    if (arg[si] == NUL)
-			break;
+		    إذا (arg[si] == NUL)
+			اكسر;
 		    ++si;
 		}
-		break;
+		اكسر;
 	    }
     }
-    else
+    وإلا
     {
 	// Recognize a few exceptions to the rule.  Some strings that contain
 	// '*'are changed to "star", otherwise '*' is recognized as a wildcard.
-	for (i = 0; except_tbl[i][0] != NULL; ++i)
-	    if (STRCMP(arg, except_tbl[i][0]) == 0)
+	لكل (i = 0; except_tbl[i][0] != عدم; ++i)
+	    إذا (STRCMP(arg, except_tbl[i][0]) == 0)
 	    {
 		STRCPY(d, except_tbl[i][1]);
-		break;
+		اكسر;
 	    }
     }
 
-    if (d[0] == NUL)	// no match in table
+    إذا (d[0] == NUL)	// no match in table
     {
 	// Replace "\S" with "/\\S", etc.  Otherwise every tag is matched.
 	// Also replace "\%^" and "\%(", they match every tag too.
 	// Also "\zs", "\z1", etc.
 	// Also "\@<", "\@=", "\@<=", etc.
 	// And also "\_$" and "\_^".
-	if (arg[0] == '\\'
+	إذا (arg[0] == '\\'
 		&& ((arg[1] != NUL && arg[2] == NUL)
-		    || (vim_strchr((char_u *)"%_z@", arg[1]) != NULL
+		    || (vim_strchr((char_u *)"%_z@", arg[1]) != عدم
 							   && arg[2] != NUL)))
 	{
-	    vim_snprintf((char *)d, IOSIZE, "/\\\\%s", arg + 1);
+	    vim_snprintf((حرف *)d, IOSIZE, "/\\\\%s", arg + 1);
 	    // Check for "/\\_$", should be "/\\_\$"
-	    if (d[3] == '_' && d[4] == '$')
+	    إذا (d[3] == '_' && d[4] == '$')
 		STRCPY(d + 4, "\\$");
 	}
-	else
+	وإلا
 	{
 	  // Replace:
 	  // "[:...:]" with "\[:...:]"
 	  // "[++...]" with "\[++...]"
 	  // "\{" with "\\{"		   -- matching "} \}"
-	    if ((arg[0] == '[' && (arg[1] == ':'
+	    إذا ((arg[0] == '[' && (arg[1] == ':'
 			 || (arg[1] == '+' && arg[2] == '+')))
 		    || (arg[0] == '\\' && arg[1] == '{'))
 	      *d++ = '\\';
 
 	  // If tag starts with "('", skip the "(". Fixes CTRL-] on ('option'.
-	  if (*arg == '(' && arg[1] == '\'')
+	  إذا (*arg == '(' && arg[1] == '\'')
 	      arg++;
-	  for (s = arg; *s; ++s)
+	  لكل (s = arg; *s; ++s)
 	  {
 	    // Replace "|" with "bar" and '"' with "quote" to match the name of
 	    // the tags for these commands.
@@ -449,60 +449,60 @@ find_help_tags(
 	    // completion.
 	    // Insert a backslash before '~', '$' and '.' to avoid their
 	    // special meaning.
-	    if (d - IObuff > IOSIZE - 10)	// getting too long!?
-		break;
-	    switch (*s)
+	    إذا (d - IObuff > IOSIZE - 10)	// getting too long!?
+		اكسر;
+	    بدل (*s)
 	    {
-		case '|':   STRCPY(d, "bar");
+		حالة '|':   STRCPY(d, "bar");
 			    d += 3;
-			    continue;
-		case '"':   STRCPY(d, "quote");
+			    استمر;
+		حالة '"':   STRCPY(d, "quote");
 			    d += 5;
-			    continue;
-		case '*':   *d++ = '.';
-			    break;
-		case '?':   *d++ = '.';
-			    continue;
-		case '$':
-		case '.':
-		case '~':   *d++ = '\\';
-			    break;
+			    استمر;
+		حالة '*':   *d++ = '.';
+			    اكسر;
+		حالة '?':   *d++ = '.';
+			    استمر;
+		حالة '$':
+		حالة '.':
+		حالة '~':   *d++ = '\\';
+			    اكسر;
 	    }
 
 	    // Replace "^x" by "CTRL-X". Don't do this for "^_" to make
 	    // ":help i_^_CTRL-D" work.
 	    // Insert '-' before and after "CTRL-X" when applicable.
-	    if (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
-			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != NULL)))
+	    إذا (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
+			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != عدم)))
 	    {
-		if (d > IObuff && d[-1] != '_' && d[-1] != '\\')
+		إذا (d > IObuff && d[-1] != '_' && d[-1] != '\\')
 		    *d++ = '_';		// prepend a '_' to make x_CTRL-x
 		STRCPY(d, "CTRL-");
 		d += 5;
-		if (*s < ' ')
+		إذا (*s < ' ')
 		{
 		    *d++ = *s + '@';
-		    if (d[-1] == '\\')
+		    إذا (d[-1] == '\\')
 			*d++ = '\\';	// double a backslash
 		}
-		else
+		وإلا
 		    *d++ = *++s;
-		if (s[1] != NUL && s[1] != '_')
+		إذا (s[1] != NUL && s[1] != '_')
 		    *d++ = '_';		// append a '_'
-		continue;
+		استمر;
 	    }
-	    else if (*s == '^')		// "^" or "CTRL-^" or "^_"
+	    وإلا إذا (*s == '^')		// "^" or "CTRL-^" or "^_"
 		*d++ = '\\';
 
 	    // Insert a backslash before a backslash after a slash, for search
 	    // pattern tags: "/\|" --> "/\\|".
-	    else if (s[0] == '\\' && s[1] != '\\'
+	    وإلا إذا (s[0] == '\\' && s[1] != '\\'
 					       && *arg == '/' && s == arg + 1)
 		*d++ = '\\';
 
 	    // "CTRL-\_" -> "CTRL-\\_" to avoid the special meaning of "\_" in
 	    // "CTRL-\_CTRL-N"
-	    if (STRNICMP(s, "CTRL-\\_", 7) == 0)
+	    إذا (STRNICMP(s, "CTRL-\\_", 7) == 0)
 	    {
 		STRCPY(d, "CTRL-\\\\");
 		d += 7;
@@ -513,34 +513,34 @@ find_help_tags(
 
 	    // If tag contains "({" or "([", tag terminates at the "(".
 	    // This is for help on functions, e.g.: abs({expr}).
-	    if (*s == '(' && (s[1] == '{' || s[1] =='['))
-		break;
+	    إذا (*s == '(' && (s[1] == '{' || s[1] =='['))
+		اكسر;
 
 	    // If tag starts with ', toss everything after a second '. Fixes
 	    // CTRL-] on 'option'. (would include the trailing '.').
-	    if (*s == '\'' && s > arg && *arg == '\'')
-		break;
+	    إذا (*s == '\'' && s > arg && *arg == '\'')
+		اكسر;
 	    // Also '{' and '}'.
-	    if (*s == '}' && s > arg && *arg == '{')
-		break;
+	    إذا (*s == '}' && s > arg && *arg == '{')
+		اكسر;
 	  }
 	  *d = NUL;
 
-	  if (*IObuff == '`')
+	  إذا (*IObuff == '`')
 	  {
-	      if (d > IObuff + 2 && d[-1] == '`')
+	      إذا (d > IObuff + 2 && d[-1] == '`')
 	      {
 		  // remove the backticks from `command`
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-2] = NUL;
 	      }
-	      else if (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
+	      وإلا إذا (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
 	      {
 		  // remove the backticks and comma from `command`,
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-3] = NUL;
 	      }
-	      else if (d > IObuff + 4 && d[-3] == '`'
+	      وإلا إذا (d > IObuff + 4 && d[-3] == '`'
 					     && d[-2] == '\\' && d[-1] == '.')
 	      {
 		  // remove the backticks and dot from `command`\.
@@ -552,22 +552,22 @@ find_help_tags(
     }
 
     *matches = (char_u **)"";
-    *num_matches = 0;
+    *رقم_matches = 0;
     flags = TAG_HELP | TAG_REGEXP | TAG_NAMES | TAG_VERBOSE | TAG_NO_TAGFUNC;
-    if (keep_lang)
+    إذا (keep_lang)
 	flags |= TAG_KEEP_LANG;
-    if (find_tags(IObuff, num_matches, matches, flags, (int)MAXCOL, NULL) == OK
-	    && *num_matches > 0)
+    إذا (find_tags(IObuff, رقم_matches, matches, flags, (صحيح)MAXCOL, عدم) == OK
+	    && *رقم_matches > 0)
     {
 	// Sort the matches found on the heuristic number that is after the
 	// tag name.
-	qsort((void *)*matches, (size_t)*num_matches,
-					      sizeof(char_u *), help_compare);
+	qsort((فراغ *)*matches, (size_t)*رقم_matches,
+					      حجم(char_u *), help_compare);
 	// Delete more than TAG_MANY to reduce the size of the listing.
-	while (*num_matches > TAG_MANY)
-	    vim_free((*matches)[--*num_matches]);
+	بينما (*رقم_matches > TAG_MANY)
+	    vim_free((*matches)[--*رقم_matches]);
     }
-    return OK;
+    إرجاع OK;
 }
 
 #ifdef FEAT_MULTI_LANG
@@ -576,15 +576,15 @@ find_help_tags(
  * Remove "@ab" if the top of 'helplang' is "ab" and the language of the first
  * tag matches it.  Otherwise remove "@en" if "en" is the only language.
  */
-    void
-cleanup_help_tags(int num_file, char_u **file)
+    فراغ
+cleanup_help_tags(صحيح رقم_file, char_u **file)
 {
-    int		i, j;
-    int		len;
+    صحيح		i, j;
+    صحيح		len;
     char_u	buf[4];
     char_u	*p = buf;
 
-    if (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
+    إذا (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
     {
 	*p++ = '@';
 	*p++ = p_hlg[0];
@@ -592,32 +592,32 @@ cleanup_help_tags(int num_file, char_u **file)
     }
     *p = NUL;
 
-    for (i = 0; i < num_file; ++i)
+    لكل (i = 0; i < رقم_file; ++i)
     {
-	len = (int)STRLEN(file[i]) - 3;
-	if (len <= 0)
-	    continue;
-	if (STRCMP(file[i] + len, "@en") == 0)
+	len = (صحيح)STRLEN(file[i]) - 3;
+	إذا (len <= 0)
+	    استمر;
+	إذا (STRCMP(file[i] + len, "@en") == 0)
 	{
 	    // Sorting on priority means the same item in another language may
 	    // be anywhere.  Search all items for a match up to the "@en".
-	    for (j = 0; j < num_file; ++j)
-		if (j != i && (int)STRLEN(file[j]) == len + 3
+	    لكل (j = 0; j < رقم_file; ++j)
+		إذا (j != i && (صحيح)STRLEN(file[j]) == len + 3
 			   && STRNCMP(file[i], file[j], len + 1) == 0)
-		    break;
-	    if (j == num_file)
+		    اكسر;
+	    إذا (j == رقم_file)
 		// item only exists with @en, remove it
 		file[i][len] = NUL;
 	}
     }
 
-    if (*buf != NUL)
-	for (i = 0; i < num_file; ++i)
+    إذا (*buf != NUL)
+	لكل (i = 0; i < رقم_file; ++i)
 	{
-	    len = (int)STRLEN(file[i]) - 3;
-	    if (len <= 0)
-		continue;
-	    if (STRCMP(file[i] + len, buf) == 0)
+	    len = (صحيح)STRLEN(file[i]) - 3;
+	    إذا (len <= 0)
+		استمر;
+	    إذا (STRCMP(file[i] + len, buf) == 0)
 	    {
 		// remove the default language
 		file[i][len] = NUL;
@@ -629,8 +629,8 @@ cleanup_help_tags(int num_file, char_u **file)
 /*
  * Called when starting to edit a buffer for a help file.
  */
-    void
-prepare_help_buffer(void)
+    فراغ
+prepare_help_buffer(فراغ)
 {
     char_u	*p;
 
@@ -648,11 +648,11 @@ prepare_help_buffer(void)
     // latin1 word characters (for translated help files).
     // Only set it when needed, buf_init_chartab() is some work.
     p = (char_u *)"!-~,^*,^|,^\",192-255";
-    if (STRCMP(curbuf->b_p_isk, p) != 0)
+    إذا (STRCMP(curbuf->b_p_isk, p) != 0)
     {
 	set_string_option_direct((char_u *)"isk", -1, p, OPT_FREE|OPT_LOCAL, 0);
 	check_buf_options(curbuf);
-	(void)buf_init_chartab(curbuf, FALSE);
+	(فراغ)buf_init_chartab(curbuf, FALSE);
     }
 
 #ifdef FEAT_FOLDING
@@ -692,60 +692,60 @@ prepare_help_buffer(void)
  * After reading a help file: May cleanup a help buffer when syntax
  * highlighting is not used.
  */
-    void
-fix_help_buffer(void)
+    فراغ
+fix_help_buffer(فراغ)
 {
     linenr_T	lnum;
-    char_u	*line;
-    int		in_example = FALSE;
-    int		len;
+    char_u	*سطر;
+    صحيح		in_example = FALSE;
+    صحيح		len;
     char_u	*fname;
     char_u	*p;
     char_u	*rt;
-    int		mustfree;
+    صحيح		mustfree;
 
     // Set filetype to "help" if still needed.
-    if (STRCMP(curbuf->b_p_ft, "help") != 0)
+    إذا (STRCMP(curbuf->b_p_ft, "help") != 0)
     {
 	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	set_option_قيمة_give_err((char_u *)"ft",
 					      0L, (char_u *)"help", OPT_LOCAL);
 	--curbuf_lock;
     }
 
 #ifdef FEAT_SYN_HL
-    if (!syntax_present(curwin))
+    إذا (!syntax_present(curwin))
 #endif
     {
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	لكل (lnum = 1; lnum <= curbuf->b_ml.ml_سطر_تعداد; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
+	    سطر = ml_get_buf(curbuf, lnum, FALSE);
 	    len = ml_get_buf_len(curbuf, lnum);
-	    if (in_example && len > 0 && !VIM_ISWHITE(line[0]))
+	    إذا (in_example && len > 0 && !VIM_ISWHITE(سطر[0]))
 	    {
 		// End of example: non-white or '<' in first column.
-		if (line[0] == '<')
+		إذا (سطر[0] == '<')
 		{
 		    // blank-out a '<' in the first column
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[0] = ' ';
+		    سطر = ml_get_buf(curbuf, lnum, TRUE);
+		    سطر[0] = ' ';
 		}
 		in_example = FALSE;
 	    }
-	    if (!in_example && len > 0)
+	    إذا (!in_example && len > 0)
 	    {
-		if (line[len - 1] == '>' && (len == 1 || line[len - 2] == ' '))
+		إذا (سطر[len - 1] == '>' && (len == 1 || سطر[len - 2] == ' '))
 		{
 		    // blank-out a '>' in the last column (start of example)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    سطر = ml_get_buf(curbuf, lnum, TRUE);
+		    سطر[len - 1] = ' ';
 		    in_example = TRUE;
 		}
-		else if (line[len - 1] == '~')
+		وإلا إذا (سطر[len - 1] == '~')
 		{
 		    // blank-out a '~' at the end of line (header marker)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    سطر = ml_get_buf(curbuf, lnum, TRUE);
+		    سطر[len - 1] = ' ';
 		}
 	    }
 	}
@@ -754,7 +754,7 @@ fix_help_buffer(void)
     // In the "help.txt" and "help.abx" file, add the locally added help
     // files.  This uses the very first line in the help file.
     fname = gettail(curbuf->b_fname);
-    if (fnamecmp(fname, "help.txt") == 0
+    إذا (fnamecmp(fname, "help.txt") == 0
 #ifdef FEAT_MULTI_LANG
 	|| (fnamencmp(fname, "help.", 5) == 0
 	    && ASCII_ISALPHA(fname[5])
@@ -764,122 +764,122 @@ fix_help_buffer(void)
 #endif
 	)
     {
-	for (lnum = 1; lnum < curbuf->b_ml.ml_line_count; ++lnum)
+	لكل (lnum = 1; lnum < curbuf->b_ml.ml_سطر_تعداد; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
-	    if (strstr((char *)line, "*local-additions*") == NULL)
-		continue;
+	    سطر = ml_get_buf(curbuf, lnum, FALSE);
+	    إذا (strstr((حرف *)سطر, "*local-additions*") == عدم)
+		استمر;
 
 	    // Go through all directories in 'runtimepath', skipping
 	    // $VIMRUNTIME.
 	    p = p_rtp;
-	    while (*p != NUL)
+	    بينما (*p != NUL)
 	    {
-		int NameBufflen;
+		صحيح NameBufflen;
 
 		NameBufflen = copy_option_part(&p, NameBuff, MAXPATHL, ",");
 		mustfree = FALSE;
 		rt = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-		if (rt != NULL &&
+		إذا (rt != عدم &&
 			    fullpathcmp(rt, NameBuff, FALSE, TRUE) != FPC_SAME)
 		{
-		    int		fcount;
+		    صحيح		fcount;
 		    char_u	**fnames;
 		    FILE	*fd;
 		    char_u	*s;
-		    int		fi;
+		    صحيح		fi;
 		    vimconv_T	vc;
 		    char_u	*cp;
 
 		    // Find all "doc/ *.txt" files in this directory.
-		    if (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
+		    إذا (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
 		    {
 			STRCPY(NameBuff + NameBufflen, PATHSEPSTR);
-			NameBufflen += sizeof(PATHSEP);
+			NameBufflen += حجم(PATHSEP);
 		    }
 #ifdef FEAT_MULTI_LANG
 		    STRCPY(NameBuff + NameBufflen, "doc/*.??[tx]");
-#else
+#وإلا
 		    STRCPY(NameBuff + NameBufflen, "doc/*.txt");
 #endif
-		    if (gen_expand_wildcards(1, &NameBuff, &fcount,
+		    إذا (gen_expand_wildcards(1, &NameBuff, &fcount,
 					 &fnames, EW_FILE|EW_SILENT) == OK
 			    && fcount > 0)
 		    {
 #ifdef FEAT_MULTI_LANG
-			int	i1, i2;
+			صحيح	i1, i2;
 			char_u	*f1, *f2;
 			char_u	*t1, *t2;
 			char_u	*e1, *e2;
 
 			// If foo.abx is found use it instead of foo.txt in
 			// the same directory.
-			for (i1 = 0; i1 < fcount; ++i1)
+			لكل (i1 = 0; i1 < fcount; ++i1)
 			{
 			    f1 = fnames[i1];
 			    t1 = gettail(f1);
 			    e1 = vim_strrchr(t1, '.');
-			    if (e1 == NULL)
-				continue;
-			    if (fnamecmp(e1, ".txt") != 0
+			    إذا (e1 == عدم)
+				استمر;
+			    إذا (fnamecmp(e1, ".txt") != 0
 					       && fnamecmp(e1, fname + 4) != 0)
 			    {
 				// Not .txt and not .abx, remove it.
 				VIM_CLEAR(fnames[i1]);
-				continue;
+				استمر;
 			    }
 
-			    for (i2 = i1 + 1; i2 < fcount; ++i2)
+			    لكل (i2 = i1 + 1; i2 < fcount; ++i2)
 			    {
 				f2 = fnames[i2];
-				if (f2 == NULL)
-				    continue;
+				إذا (f2 == عدم)
+				    استمر;
 				t2 = gettail(f2);
 				e2 = vim_strrchr(t2, '.');
-				if (e2 == NULL)
-				    continue;
-				if (e1 - f1 != e2 - f2
+				إذا (e2 == عدم)
+				    استمر;
+				إذا (e1 - f1 != e2 - f2
 					    || fnamencmp(f1, f2, e1 - f1) != 0)
-				    continue;
-				if (fnamecmp(e1, ".txt") == 0
+				    استمر;
+				إذا (fnamecmp(e1, ".txt") == 0
 					       && fnamecmp(e2, fname + 4) == 0)
 				    // use .abx instead of .txt
 				    VIM_CLEAR(fnames[i1]);
 			    }
 			}
 #endif
-			for (fi = 0; fi < fcount; ++fi)
+			لكل (fi = 0; fi < fcount; ++fi)
 			{
-			    if (fnames[fi] == NULL)
-				continue;
-			    fd = mch_fopen((char *)fnames[fi], "r");
-			    if (fd != NULL)
+			    إذا (fnames[fi] == عدم)
+				استمر;
+			    fd = mch_fopen((حرف *)fnames[fi], "r");
+			    إذا (fd != عدم)
 			    {
 				vim_fgets(IObuff, IOSIZE, fd);
-				if (IObuff[0] == '*'
+				إذا (IObuff[0] == '*'
 					&& (s = vim_strchr(IObuff + 1, '*'))
-								  != NULL)
+								  != عدم)
 				{
-				    int	this_utf = MAYBE;
+				    صحيح	this_utf = MAYBE;
 
 				    // Change tag definition to a
 				    // reference and remove <CR>/<NL>.
 				    IObuff[0] = '|';
 				    *s = '|';
-				    while (*s != NUL)
+				    بينما (*s != NUL)
 				    {
-					if (*s == '\r' || *s == '\n')
+					إذا (*s == '\r' || *s == '\n')
 					    *s = NUL;
 					// The text is utf-8 when a byte
 					// above 127 is found and no
 					// illegal byte sequence is found.
-					if (*s >= 0x80 && this_utf != FALSE)
+					إذا (*s >= 0x80 && this_utf != FALSE)
 					{
-					    int	l;
+					    صحيح	l;
 
 					    this_utf = TRUE;
 					    l = utf_ptr2len(s);
-					    if (l == 1)
+					    إذا (l == 1)
 						this_utf = FALSE;
 					    s += l - 1;
 					}
@@ -893,22 +893,22 @@ fix_help_buffer(void)
 				    convert_setup(&vc, (char_u *)(
 						this_utf == TRUE ? "utf-8"
 						      : "latin1"), p_enc);
-				    if (vc.vc_type == CONV_NONE)
+				    إذا (vc.vc_type == CONV_NONE)
 					// No conversion needed.
 					cp = IObuff;
-				    else
+				    وإلا
 				    {
 					// Do the conversion.  If it fails
 					// use the unconverted text.
 					cp = string_convert(&vc, IObuff,
-								    NULL);
-					if (cp == NULL)
+								    عدم);
+					إذا (cp == عدم)
 					    cp = IObuff;
 				    }
-				    convert_setup(&vc, NULL, NULL);
+				    convert_setup(&vc, عدم, عدم);
 
 				    ml_append(lnum, cp, (colnr_T)0, FALSE);
-				    if (cp != IObuff)
+				    إذا (cp != IObuff)
 					vim_free(cp);
 				    ++lnum;
 				}
@@ -918,10 +918,10 @@ fix_help_buffer(void)
 			FreeWild(fcount, fnames);
 		    }
 		}
-		if (mustfree)
+		إذا (mustfree)
 		    vim_free(rt);
 	    }
-	    break;
+	    اكسر;
 	}
     }
 }
@@ -929,7 +929,7 @@ fix_help_buffer(void)
 /*
  * ":exusage"
  */
-    void
+    فراغ
 ex_exusage(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"help ex-cmd-index");
@@ -938,7 +938,7 @@ ex_exusage(exarg_T *eap UNUSED)
 /*
  * ":viusage"
  */
-    void
+    فراغ
 ex_viusage(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"help normal-index");
@@ -947,46 +947,46 @@ ex_viusage(exarg_T *eap UNUSED)
 /*
  * Generate tags in one help directory.
  */
-    static void
+    ساكن فراغ
 helptags_one(
     char_u	*dir,		// doc directory
     char_u	*ext,		// suffix, ".txt", ".itx", ".frx", etc.
     char_u	*tagfname,	// "tags" for English, "tags-fr" for French.
-    int		add_help_tags,	// add "help-tags" tag
-    int		ignore_writeerr)    // ignore write error
+    صحيح		add_help_tags,	// add "help-tags" tag
+    صحيح		ignore_writeerr)    // ignore write error
 {
     FILE	*fd_tags;
     FILE	*fd;
     garray_T	ga;
-    int		res;
-    int		filecount;
+    صحيح		res;
+    صحيح		filecount;
     char_u	**files;
     char_u	*p1, *p2;
-    int		fi;
+    صحيح		fi;
     char_u	*s;
-    int		i;
+    صحيح		i;
     char_u	*fname;
-    int		dirlen;
-    int		utf8 = MAYBE;
-    int		this_utf8;
-    int		firstline;
-    int		in_example;
-    int		mix = FALSE;	// detected mixed encodings
+    صحيح		dirlen;
+    صحيح		utf8 = MAYBE;
+    صحيح		this_utf8;
+    صحيح		firstline;
+    صحيح		in_example;
+    صحيح		mix = FALSE;	// detected mixed encodings
 
     // Find all *.txt files.
-    dirlen = (int)STRLEN(dir);
+    dirlen = (صحيح)STRLEN(dir);
     STRCPY(NameBuff, dir);
     STRCAT(NameBuff, "/**/*");
     STRCAT(NameBuff, ext);
     res = gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 							    EW_FILE|EW_SILENT);
-    if (res == FAIL || filecount == 0)
+    إذا (res == FAIL || filecount == 0)
     {
-	if (!got_int)
+	إذا (!got_int)
 	    semsg(_(e_no_match_str_1), NameBuff);
-	if (res != FAIL)
+	إذا (res != FAIL)
 	    FreeWild(filecount, files);
-	return;
+	إرجاع;
     }
 
     // Open the tags file for writing.
@@ -994,31 +994,31 @@ helptags_one(
     STRCPY(NameBuff, dir);
     add_pathsep(NameBuff);
     STRCAT(NameBuff, tagfname);
-    fd_tags = mch_fopen((char *)NameBuff, "w");
-    if (fd_tags == NULL)
+    fd_tags = mch_fopen((حرف *)NameBuff, "w");
+    إذا (fd_tags == عدم)
     {
-	if (!ignore_writeerr)
+	إذا (!ignore_writeerr)
 	    semsg(_(e_cannot_open_str_for_writing_1), NameBuff);
 	FreeWild(filecount, files);
-	return;
+	إرجاع;
     }
 
     // If using the "++t" argument or generating tags for "$VIMRUNTIME/doc"
     // add the "help-tags" tag.
-    ga_init2(&ga, sizeof(char_u *), 100);
-    if (add_help_tags || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
+    ga_init2(&ga, حجم(char_u *), 100);
+    إذا (add_help_tags || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
 						dir, FALSE, TRUE) == FPC_SAME)
     {
-	if (ga_grow(&ga, 1) == FAIL)
+	إذا (ga_grow(&ga, 1) == FAIL)
 	    got_int = TRUE;
-	else
+	وإلا
 	{
 	    s = alloc(18 + (unsigned)STRLEN(tagfname));
-	    if (s == NULL)
+	    إذا (s == عدم)
 		got_int = TRUE;
-	    else
+	    وإلا
 	    {
-		sprintf((char *)s, "help-tags\t%s\t1\n", tagfname);
+		sprintf((حرف *)s, "help-tags\t%s\t1\n", tagfname);
 		((char_u **)ga.ga_data)[ga.ga_len] = s;
 		++ga.ga_len;
 	    }
@@ -1026,44 +1026,44 @@ helptags_one(
     }
 
     // Go over all the files and extract the tags.
-    for (fi = 0; fi < filecount && !got_int; ++fi)
+    لكل (fi = 0; fi < filecount && !got_int; ++fi)
     {
-	fd = mch_fopen((char *)files[fi], "r");
-	if (fd == NULL)
+	fd = mch_fopen((حرف *)files[fi], "r");
+	إذا (fd == عدم)
 	{
 	    semsg(_(e_unable_to_open_str_for_reading), files[fi]);
-	    continue;
+	    استمر;
 	}
 	fname = files[fi] + dirlen + 1;
 
 	in_example = FALSE;
 	firstline = TRUE;
-	while (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
+	بينما (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
 	{
-	    if (firstline)
+	    إذا (firstline)
 	    {
 		// Detect utf-8 file by a non-ASCII char in the first line.
 		this_utf8 = MAYBE;
-		for (s = IObuff; *s != NUL; ++s)
-		    if (*s >= 0x80)
+		لكل (s = IObuff; *s != NUL; ++s)
+		    إذا (*s >= 0x80)
 		    {
-			int l;
+			صحيح l;
 
 			this_utf8 = TRUE;
 			l = utf_ptr2len(s);
-			if (l == 1)
+			إذا (l == 1)
 			{
 			    // Illegal UTF-8 byte sequence.
 			    this_utf8 = FALSE;
-			    break;
+			    اكسر;
 			}
 			s += l - 1;
 		    }
-		if (this_utf8 == MAYBE)	    // only ASCII characters found
+		إذا (this_utf8 == MAYBE)	    // only ASCII characters found
 		    this_utf8 = FALSE;
-		if (utf8 == MAYBE)	    // first file
+		إذا (utf8 == MAYBE)	    // first file
 		    utf8 = this_utf8;
-		else if (utf8 != this_utf8)
+		وإلا إذا (utf8 != this_utf8)
 		{
 		    semsg(_(e_mix_of_help_file_encodings_within_language_str), files[fi]);
 		    mix = !got_int;
@@ -1071,50 +1071,50 @@ helptags_one(
 		}
 		firstline = FALSE;
 	    }
-	    if (in_example)
+	    إذا (in_example)
 	    {
 		// skip over example; a non-white in the first column ends it
-		if (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
-		    continue;
+		إذا (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
+		    استمر;
 		in_example = FALSE;
 	    }
 	    p1 = vim_strchr(IObuff, '*');	// find first '*'
-	    while (p1 != NULL)
+	    بينما (p1 != عدم)
 	    {
 		// Use vim_strbyte() instead of vim_strchr() so that when
 		// 'encoding' is dbcs it still works, don't find '*' in the
 		// second byte.
 		p2 = vim_strbyte(p1 + 1, '*');	// find second '*'
-		if (p2 != NULL && p2 > p1 + 1)	// skip "*" and "**"
+		إذا (p2 != عدم && p2 > p1 + 1)	// skip "*" and "**"
 		{
-		    for (s = p1 + 1; s < p2; ++s)
-			if (*s == ' ' || *s == '\t' || *s == '|')
-			    break;
+		    لكل (s = p1 + 1; s < p2; ++s)
+			إذا (*s == ' ' || *s == '\t' || *s == '|')
+			    اكسر;
 
 		    // Only accept a *tag* when it consists of valid
 		    // characters, there is white space before it and is
 		    // followed by a white character or end-of-line.
-		    if (s == p2
+		    إذا (s == p2
 			    && (p1 == IObuff || p1[-1] == ' ' || p1[-1] == '\t')
-			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != NULL
+			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != عدم
 				|| s[1] == '\0'))
 		    {
 			*p2 = '\0';
 			++p1;
-			if (ga_grow(&ga, 1) == FAIL)
+			إذا (ga_grow(&ga, 1) == FAIL)
 			{
 			    got_int = TRUE;
-			    break;
+			    اكسر;
 			}
 			s = alloc(p2 - p1 + STRLEN(fname) + 2);
-			if (s == NULL)
+			إذا (s == عدم)
 			{
 			    got_int = TRUE;
-			    break;
+			    اكسر;
 			}
 			((char_u **)ga.ga_data)[ga.ga_len] = s;
 			++ga.ga_len;
-			sprintf((char *)s, "%s\t%s", p1, fname);
+			sprintf((حرف *)s, "%s\t%s", p1, fname);
 
 			// find next '*'
 			p2 = vim_strchr(p2 + 1, '*');
@@ -1123,16 +1123,16 @@ helptags_one(
 		p1 = p2;
 	    }
 	    size_t off = STRLEN(IObuff);
-	    if (off >= 2 && IObuff[off - 1] == '\n')
+	    إذا (off >= 2 && IObuff[off - 1] == '\n')
 	    {
 		off -= 2;
-		while (off > 0 && (ASCII_ISLOWER(IObuff[off])
+		بينما (off > 0 && (ASCII_ISLOWER(IObuff[off])
 						  || VIM_ISDIGIT(IObuff[off])))
 		    off--;
-		if (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
+		إذا (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
 		    in_example = TRUE;
 	    }
-	    line_breakcheck();
+	    سطر_breakcheck();
 	}
 
 	fclose(fd);
@@ -1140,51 +1140,51 @@ helptags_one(
 
     FreeWild(filecount, files);
 
-    if (!got_int)
+    إذا (!got_int)
     {
 	// Sort the tags.
-	if (ga.ga_data != NULL)
+	إذا (ga.ga_data != عدم)
 	    sort_strings((char_u **)ga.ga_data, ga.ga_len);
 
 	// Check for duplicates.
-	for (i = 1; i < ga.ga_len; ++i)
+	لكل (i = 1; i < ga.ga_len; ++i)
 	{
 	    p1 = ((char_u **)ga.ga_data)[i - 1];
 	    p2 = ((char_u **)ga.ga_data)[i];
-	    while (*p1 == *p2)
+	    بينما (*p1 == *p2)
 	    {
-		if (*p2 == '\t')
+		إذا (*p2 == '\t')
 		{
 		    *p2 = NUL;
-		    vim_snprintf((char *)NameBuff, MAXPATHL,
+		    vim_snprintf((حرف *)NameBuff, MAXPATHL,
 			    _(e_duplicate_tag_str_in_file_str_str),
 				     ((char_u **)ga.ga_data)[i], dir, p2 + 1);
-		    emsg((char *)NameBuff);
+		    emsg((حرف *)NameBuff);
 		    *p2 = '\t';
-		    break;
+		    اكسر;
 		}
 		++p1;
 		++p2;
 	    }
 	}
 
-	if (utf8 == TRUE)
+	إذا (utf8 == TRUE)
 	    fprintf(fd_tags, "!_TAG_FILE_ENCODING\tutf-8\t//\n");
 
 	// Write the tags into the file.
-	for (i = 0; i < ga.ga_len; ++i)
+	لكل (i = 0; i < ga.ga_len; ++i)
 	{
 	    s = ((char_u **)ga.ga_data)[i];
-	    if (STRNCMP(s, "help-tags\t", 10) == 0)
+	    إذا (STRNCMP(s, "help-tags\t", 10) == 0)
 		// help-tags entry was added in formatted form
-		fputs((char *)s, fd_tags);
-	    else
+		fputs((حرف *)s, fd_tags);
+	    وإلا
 	    {
 		fprintf(fd_tags, "%s\t/*", s);
-		for (p1 = s; *p1 != '\t'; ++p1)
+		لكل (p1 = s; *p1 != '\t'; ++p1)
 		{
 		    // insert backslash before '\\' and '/'
-		    if (*p1 == '\\' || *p1 == '/')
+		    إذا (*p1 == '\\' || *p1 == '/')
 			putc('\\', fd_tags);
 		    putc(*p1, fd_tags);
 		}
@@ -1192,10 +1192,10 @@ helptags_one(
 	    }
 	}
     }
-    if (mix)
+    إذا (mix)
 	got_int = FALSE;    // continue with other languages
 
-    for (i = 0; i < ga.ga_len; ++i)
+    لكل (i = 0; i < ga.ga_len; ++i)
 	vim_free(((char_u **)ga.ga_data)[i]);
     ga_clear(&ga);
     fclose(fd_tags);	    // there is no check for an error...
@@ -1204,47 +1204,47 @@ helptags_one(
 /*
  * Generate tags in one help directory, taking care of translations.
  */
-    static void
-do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
+    ساكن فراغ
+do_helptags(char_u *dirname, صحيح add_help_tags, صحيح ignore_writeerr)
 {
 #ifdef FEAT_MULTI_LANG
-    int		len;
-    int		i, j;
+    صحيح		len;
+    صحيح		i, j;
     garray_T	ga;
     char_u	lang[2];
     char_u	ext[5];
     char_u	fname[8];
-    int		filecount;
+    صحيح		filecount;
     char_u	**files;
 
     // Get a list of all files in the help directory and in subdirectories.
     STRCPY(NameBuff, dirname);
     add_pathsep(NameBuff);
     STRCAT(NameBuff, "**");
-    if (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
+    إذا (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 						    EW_FILE|EW_SILENT) == FAIL
 	    || filecount == 0)
     {
 	semsg(_(e_no_match_str_1), NameBuff);
-	return;
+	إرجاع;
     }
 
     // Go over all files in the directory to find out what languages are
     // present.
     ga_init2(&ga, 1, 10);
-    for (i = 0; i < filecount; ++i)
+    لكل (i = 0; i < filecount; ++i)
     {
-	len = (int)STRLEN(files[i]);
-	if (len <= 4)
-	    continue;
+	len = (صحيح)STRLEN(files[i]);
+	إذا (len <= 4)
+	    استمر;
 
-	if (STRICMP(files[i] + len - 4, ".txt") == 0)
+	إذا (STRICMP(files[i] + len - 4, ".txt") == 0)
 	{
 	    // ".txt" -> language "en"
 	    lang[0] = 'e';
 	    lang[1] = 'n';
 	}
-	else if (files[i][len - 4] == '.'
+	وإلا إذا (files[i][len - 4] == '.'
 		&& ASCII_ISALPHA(files[i][len - 3])
 		&& ASCII_ISALPHA(files[i][len - 2])
 		&& TOLOWER_ASC(files[i][len - 1]) == 'x')
@@ -1253,36 +1253,36 @@ do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
 	    lang[0] = TOLOWER_ASC(files[i][len - 3]);
 	    lang[1] = TOLOWER_ASC(files[i][len - 2]);
 	}
-	else
-	    continue;
+	وإلا
+	    استمر;
 
 	// Did we find this language already?
-	for (j = 0; j < ga.ga_len; j += 2)
-	    if (STRNCMP(lang, ((char_u *)ga.ga_data) + j, 2) == 0)
-		break;
-	if (j == ga.ga_len)
+	لكل (j = 0; j < ga.ga_len; j += 2)
+	    إذا (STRNCMP(lang, ((char_u *)ga.ga_data) + j, 2) == 0)
+		اكسر;
+	إذا (j == ga.ga_len)
 	{
 	    // New language, add it.
-	    if (ga_grow(&ga, 2) == FAIL)
-		break;
+	    إذا (ga_grow(&ga, 2) == FAIL)
+		اكسر;
 	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[0];
 	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[1];
 	}
     }
 
     // Loop over the found languages to generate a tags file for each one.
-    for (j = 0; j < ga.ga_len; j += 2)
+    لكل (j = 0; j < ga.ga_len; j += 2)
     {
 	STRCPY(fname, "tags-xx");
 	fname[5] = ((char_u *)ga.ga_data)[j];
 	fname[6] = ((char_u *)ga.ga_data)[j + 1];
-	if (fname[5] == 'e' && fname[6] == 'n')
+	إذا (fname[5] == 'e' && fname[6] == 'n')
 	{
 	    // English is an exception: use ".txt" and "tags".
 	    fname[4] = NUL;
 	    STRCPY(ext, ".txt");
 	}
-	else
+	وإلا
 	{
 	    // Language "ab" uses ".abx" and "tags-ab".
 	    STRCPY(ext, ".xxx");
@@ -1295,50 +1295,50 @@ do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
     ga_clear(&ga);
     FreeWild(filecount, files);
 
-#else
+#وإلا
     // No language support, just use "*.txt" and "tags".
     helptags_one(dirname, (char_u *)".txt", (char_u *)"tags", add_help_tags,
 							    ignore_writeerr);
 #endif
 }
 
-    static void
-helptags_cb(char_u *fname, void *cookie)
+    ساكن فراغ
+helptags_cb(char_u *fname, فراغ *cookie)
 {
-    do_helptags(fname, *(int *)cookie, TRUE);
+    do_helptags(fname, *(صحيح *)cookie, TRUE);
 }
 
 /*
  * ":helptags"
  */
-    void
+    فراغ
 ex_helptags(exarg_T *eap)
 {
     expand_T	xpc;
     char_u	*dirname;
-    int		add_help_tags = FALSE;
+    صحيح		add_help_tags = FALSE;
 
     // Check for ":helptags ++t {dir}".
-    if (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
+    إذا (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
     {
 	add_help_tags = TRUE;
 	eap->arg = skipwhite(eap->arg + 3);
     }
 
-    if (STRCMP(eap->arg, "ALL") == 0)
+    إذا (STRCMP(eap->arg, "ALL") == 0)
     {
 	do_in_path(p_rtp, "", (char_u *)"doc", DIP_ALL + DIP_DIR,
 						 helptags_cb, &add_help_tags);
     }
-    else
+    وإلا
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
-	dirname = ExpandOne(&xpc, eap->arg, NULL,
+	dirname = ExpandOne(&xpc, eap->arg, عدم,
 			    WILD_LIST_NOTFOUND|WILD_SILENT, WILD_EXPAND_FREE);
-	if (dirname == NULL || !mch_isdir(dirname))
+	إذا (dirname == عدم || !mch_isdir(dirname))
 	    semsg(_(e_not_a_directory_str), eap->arg);
-	else
+	وإلا
 	    do_helptags(dirname, add_help_tags, FALSE);
 	vim_free(dirname);
     }

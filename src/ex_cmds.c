@@ -11,92 +11,92 @@
  * ex_cmds.c: some functions for command line commands
  */
 
-#include "vim.h"
-#include "version.h"
+#ضمن "vim.h"
+#ضمن "version.h"
 
-#include <float.h>
+#ضمن <float.h>
 
-static int linelen(int *has_tab);
-static void do_filter(linenr_T line1, linenr_T line2, exarg_T *eap, char_u *cmd, int do_in, int do_out);
-static int not_writing(void);
-static int check_readonly(int *forceit, buf_T *buf);
-static void delbuf_msg(char_u *name);
+ساكن صحيح linelen(صحيح *has_tab);
+ساكن فراغ do_filter(linenr_T line1, linenr_T line2, exarg_T *eap, char_u *cmd, صحيح do_in, صحيح do_out);
+ساكن صحيح not_writing(فراغ);
+ساكن صحيح check_readonly(صحيح *forceit, buf_T *buf);
+ساكن فراغ delbuf_رسالة(char_u *name);
 
 /*
  * ":ascii" and "ga".
  */
-    void
+    فراغ
 do_ascii(exarg_T *eap UNUSED)
 {
-    int		c;
-    int		cval;
-    char	buf1[20];
-    char	buf2[20];
+    صحيح		c;
+    صحيح		cval;
+    حرف	buf1[20];
+    حرف	buf2[20];
     char_u	buf3[7];
 #ifdef FEAT_DIGRAPHS
     char_u      *dig;
 #endif
-    int		cc[MAX_MCO];
-    int		ci = 0;
-    int		len;
+    صحيح		cc[MAX_MCO];
+    صحيح		ci = 0;
+    صحيح		len;
 
-    if (enc_utf8)
+    إذا (enc_utf8)
 	c = utfc_ptr2char(ml_get_cursor(), cc);
-    else
+    وإلا
 	c = gchar_cursor();
-    if (c == NUL)
+    إذا (c == NUL)
     {
-	msg("NUL");
-	return;
+	رسالة("NUL");
+	إرجاع;
     }
 
     IObuff[0] = NUL;
-    if (!has_mbyte || (enc_dbcs != 0 && c < 0x100) || c < 0x80)
+    إذا (!has_mbyte || (enc_dbcs != 0 && c < 0x100) || c < 0x80)
     {
-	if (c == NL)	    // NUL is stored as NL
+	إذا (c == NL)	    // NUL is stored as NL
 	    c = NUL;
-	if (c == CAR && get_fileformat(curbuf) == EOL_MAC)
+	إذا (c == CAR && get_fileformat(curbuf) == EOL_MAC)
 	    cval = NL;	    // NL is stored as CR
-	else
+	وإلا
 	    cval = c;
-	if (vim_isprintc_strict(c) && (c < ' ' || c > '~'))
+	إذا (vim_isprintc_strict(c) && (c < ' ' || c > '~'))
 	{
 	    transchar_nonprint(curbuf, buf3, c);
-	    vim_snprintf(buf1, sizeof(buf1), "  <%s>", (char *)buf3);
+	    vim_snprintf(buf1, حجم(buf1), "  <%s>", (حرف *)buf3);
 	}
-	else
+	وإلا
 	    buf1[0] = NUL;
-	if (c >= 0x80)
-	    vim_snprintf(buf2, sizeof(buf2), "  <M-%s>",
-						 (char *)transchar(c & 0x7f));
-	else
+	إذا (c >= 0x80)
+	    vim_snprintf(buf2, حجم(buf2), "  <M-%s>",
+						 (حرف *)transchar(c & 0x7f));
+	وإلا
 	    buf2[0] = NUL;
 #ifdef FEAT_DIGRAPHS
 	dig = get_digraph_for_char(cval);
-	if (dig != NULL)
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	إذا (dig != عدم)
+	    vim_snprintf((حرف *)IObuff, IOSIZE,
 		_("<%s>%s%s  %d,  Hex %02x,  Oct %03o, Digr %s"),
 			      transchar(c), buf1, buf2, cval, cval, cval, dig);
-	else
+	وإلا
 #endif
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    vim_snprintf((حرف *)IObuff, IOSIZE,
 		_("<%s>%s%s  %d,  Hex %02x,  Octal %03o"),
 				  transchar(c), buf1, buf2, cval, cval, cval);
-	if (enc_utf8)
+	إذا (enc_utf8)
 	    c = cc[ci++];
-	else
+	وإلا
 	    c = 0;
     }
 
     // Repeat for combining characters.
-    while (has_mbyte && (c >= 0x100 || (enc_utf8 && c >= 0x80)))
+    بينما (has_mbyte && (c >= 0x100 || (enc_utf8 && c >= 0x80)))
     {
-	len = (int)STRLEN(IObuff);
+	len = (صحيح)STRLEN(IObuff);
 	// This assumes every multi-byte char is printable...
-	if (len > 0)
+	إذا (len > 0)
 	    IObuff[len++] = ' ';
 	IObuff[len++] = '<';
-	if (enc_utf8 && utf_iscomposing(c)
+	إذا (enc_utf8 && utf_iscomposing(c)
 #ifdef USE_GUI
 		&& !gui.in_use
 #endif
@@ -105,94 +105,94 @@ do_ascii(exarg_T *eap UNUSED)
 	len += (*mb_char2bytes)(c, IObuff + len);
 #ifdef FEAT_DIGRAPHS
 	dig = get_digraph_for_char(c);
-	if (dig != NULL)
-	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
+	إذا (dig != عدم)
+	    vim_snprintf((حرف *)IObuff + len, IOSIZE - len,
 			c < 0x10000 ? _("> %d, Hex %04x, Oct %o, Digr %s")
 				    : _("> %d, Hex %08x, Oct %o, Digr %s"),
 					c, c, c, dig);
-	else
+	وإلا
 #endif
-	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
+	    vim_snprintf((حرف *)IObuff + len, IOSIZE - len,
 			 c < 0x10000 ? _("> %d, Hex %04x, Octal %o")
 				     : _("> %d, Hex %08x, Octal %o"),
 				     c, c, c);
-	if (ci == MAX_MCO)
-	    break;
-	if (enc_utf8)
+	إذا (ci == MAX_MCO)
+	    اكسر;
+	إذا (enc_utf8)
 	    c = cc[ci++];
-	else
+	وإلا
 	    c = 0;
     }
 
-    msg((char *)IObuff);
+    رسالة((حرف *)IObuff);
 }
 
 /*
  * ":left", ":center" and ":right": align text.
  */
-    void
+    فراغ
 ex_align(exarg_T *eap)
 {
     pos_T	save_curpos;
-    int		len;
-    int		indent = 0;
-    int		new_indent;
-    int		has_tab;
-    int		width;
+    صحيح		len;
+    صحيح		indent = 0;
+    صحيح		new_indent;
+    صحيح		has_tab;
+    صحيح		width;
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    إذا (curwin->w_p_rl)
     {
 	// switch left and right aligning
-	if (eap->cmdidx == CMD_right)
-	    eap->cmdidx = CMD_left;
-	else if (eap->cmdidx == CMD_left)
-	    eap->cmdidx = CMD_right;
+	إذا (eap->cmdidx == CMD_يمين)
+	    eap->cmdidx = CMD_يسار;
+	وإلا إذا (eap->cmdidx == CMD_يسار)
+	    eap->cmdidx = CMD_يمين;
     }
 #endif
 
-    width = atoi((char *)eap->arg);
+    width = atoi((حرف *)eap->arg);
     save_curpos = curwin->w_cursor;
-    if (eap->cmdidx == CMD_left)    // width is used for new indent
+    إذا (eap->cmdidx == CMD_يسار)    // width is used for new indent
     {
-	if (width >= 0)
+	إذا (width >= 0)
 	    indent = width;
     }
-    else
+    وإلا
     {
 	/*
 	 * if 'textwidth' set, use it
 	 * else if 'wrapmargin' set, use it
 	 * if invalid value, use 80
 	 */
-	if (width <= 0)
+	إذا (width <= 0)
 	    width = curbuf->b_p_tw;
-	if (width == 0 && curbuf->b_p_wm > 0)
+	إذا (width == 0 && curbuf->b_p_wm > 0)
 	    width = curwin->w_width - curbuf->b_p_wm;
-	if (width <= 0)
+	إذا (width <= 0)
 	    width = 80;
     }
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    إذا (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	إرجاع;
 
-    for (curwin->w_cursor.lnum = eap->line1;
+    لكل (curwin->w_cursor.lnum = eap->line1;
 		 curwin->w_cursor.lnum <= eap->line2; ++curwin->w_cursor.lnum)
     {
-	if (eap->cmdidx == CMD_left)		// left align
+	إذا (eap->cmdidx == CMD_يسار)		// left align
 	    new_indent = indent;
-	else
+	وإلا
 	{
 	    has_tab = FALSE;	// avoid uninit warnings
-	    len = linelen(eap->cmdidx == CMD_right ? &has_tab
-						   : NULL) - get_indent();
+	    len = linelen(eap->cmdidx == CMD_يمين ? &has_tab
+						   : عدم) - get_indent();
 
-	    if (len <= 0)			// skip blank lines
-		continue;
+	    إذا (len <= 0)			// skip blank lines
+		استمر;
 
-	    if (eap->cmdidx == CMD_center)
+	    إذا (eap->cmdidx == CMD_center)
 		new_indent = (width - len) / 2;
-	    else
+	    وإلا
 	    {
 		new_indent = width - len;	// right align
 
@@ -200,31 +200,31 @@ ex_align(exarg_T *eap)
 		 * Make sure that embedded TABs don't make the text go too far
 		 * to the right.
 		 */
-		if (has_tab)
-		    while (new_indent > 0)
+		إذا (has_tab)
+		    بينما (new_indent > 0)
 		    {
-			(void)set_indent(new_indent, 0);
-			if (linelen(NULL) <= width)
+			(فراغ)set_indent(new_indent, 0);
+			إذا (linelen(عدم) <= width)
 			{
 			    /*
 			     * Now try to move the line as much as possible to
 			     * the right.  Stop when it moves too far.
 			     */
-			    do
-				(void)set_indent(++new_indent, 0);
-			    while (linelen(NULL) <= width);
+			    افعل
+				(فراغ)set_indent(++new_indent, 0);
+			    بينما (linelen(عدم) <= width);
 			    --new_indent;
-			    break;
+			    اكسر;
 			}
 			--new_indent;
 		    }
 	    }
 	}
-	if (new_indent < 0)
+	إذا (new_indent < 0)
 	    new_indent = 0;
-	(void)set_indent(new_indent, 0);		// set indent
+	(فراغ)set_indent(new_indent, 0);		// set indent
     }
-    changed_lines(eap->line1, 0, eap->line2 + 1, 0L);
+    changed_أسطر(eap->line1, 0, eap->line2 + 1, 0L);
     curwin->w_cursor = save_curpos;
     beginline(BL_WHITE | BL_FIX);
 }
@@ -232,246 +232,246 @@ ex_align(exarg_T *eap)
 /*
  * Get the length of the current line, excluding trailing white space.
  */
-    static int
-linelen(int *has_tab)
+    ساكن صحيح
+linelen(صحيح *has_tab)
 {
-    char_u  *line;
+    char_u  *سطر;
     char_u  *first;
     char_u  *last;
-    int	    save;
-    int	    len;
+    صحيح	    save;
+    صحيح	    len;
 
     // Get the line.  If it's empty bail out early (could be the empty string
     // for an unloaded buffer).
-    line = ml_get_curline();
-    if (*line == NUL)
-	return 0;
+    سطر = ml_get_curline();
+    إذا (*سطر == NUL)
+	إرجاع 0;
 
     // find the first non-blank character
-    first = skipwhite(line);
+    first = skipwhite(سطر);
 
     // find the character after the last non-blank character
-    for (last = first + STRLEN(first);
+    لكل (last = first + STRLEN(first);
 				last > first && VIM_ISWHITE(last[-1]); --last)
 	;
     save = *last;
     *last = NUL;
-    len = linetabsize_str(line);	// get line length on screen
-    if (has_tab != NULL)		// check for embedded TAB
-	*has_tab = (vim_strchr(first, TAB) != NULL);
+    len = linetabsize_str(سطر);	// get line length on screen
+    إذا (has_tab != عدم)		// check for embedded TAB
+	*has_tab = (vim_strchr(first, TAB) != عدم);
     *last = save;
 
-    return len;
+    إرجاع len;
 }
 
 // Buffer for two lines used during sorting.  They are allocated to
 // contain the longest line being sorted.
-static char_u	*sortbuf1;
-static char_u	*sortbuf2;
+ساكن char_u	*sortbuf1;
+ساكن char_u	*sortbuf2;
 
-static int	sort_lc;	// sort using locale
-static int	sort_ic;	// ignore case
-static int	sort_nr;	// sort on number
-static int	sort_rx;	// sort on regex instead of skipping it
-static int	sort_flt;	// sort on floating number
+ساكن صحيح	sort_lc;	// sort using locale
+ساكن صحيح	sort_ic;	// ignore case
+ساكن صحيح	sort_nr;	// sort on number
+ساكن صحيح	sort_rx;	// sort on regex instead of skipping it
+ساكن صحيح	sort_flt;	// sort on floating number
 
-static int	sort_abort;	// flag to indicate if sorting has been interrupted
+ساكن صحيح	sort_abort;	// flag to indicate if sorting has been interrupted
 
 // Struct to store info to be sorted.
-typedef struct
+تعريفنوع بنية
 {
     linenr_T	lnum;			// line number
-    union {
-	struct
+    اتحاد {
+	بنية
 	{
 	    varnumber_T	start_col_nr;	// starting column number
 	    varnumber_T	end_col_nr;	// ending column number
-	} line;
-	struct
+	} سطر;
+	بنية
 	{
-	    varnumber_T	value;		// value if sorting by integer
-	    int is_number;		// TRUE when line contains a number
-	} num;
-	float_T value_flt;		// value if sorting by float
+	    varnumber_T	قيمة;		// value if sorting by integer
+	    صحيح is_العدد;		// TRUE when line contains a number
+	} رقم;
+	float_T قيمة_flt;		// value if sorting by float
     } st_u;
 } sorti_T;
 
-    static int
-string_compare(const void *s1, const void *s2)
+    ساكن صحيح
+string_compare(ثابت فراغ *s1, ثابت فراغ *s2)
 {
-    if (sort_lc)
-	return strcoll((char *)s1, (char *)s2);
-    return sort_ic ? STRICMP(s1, s2) : STRCMP(s1, s2);
+    إذا (sort_lc)
+	إرجاع strcoll((حرف *)s1, (حرف *)s2);
+    إرجاع sort_ic ? STRICMP(s1, s2) : STRCMP(s1, s2);
 }
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    ساكن صحيح
+sort_compare(ثابت فراغ *s1, ثابت فراغ *s2)
 {
     sorti_T	l1 = *(sorti_T *)s1;
     sorti_T	l2 = *(sorti_T *)s2;
-    int		result = 0;
+    صحيح		result = 0;
 
     // If the user interrupts, there's no way to stop qsort() immediately, but
     // if we return 0 every time, qsort will assume it's done sorting and
     // exit.
-    if (sort_abort)
-	return 0;
+    إذا (sort_abort)
+	إرجاع 0;
     fast_breakcheck();
-    if (got_int)
+    إذا (got_int)
 	sort_abort = TRUE;
 
-    if (sort_nr)
+    إذا (sort_nr)
     {
-	if (l1.st_u.num.is_number != l2.st_u.num.is_number)
-	    result = l1.st_u.num.is_number > l2.st_u.num.is_number ? 1 : -1;
-	else
-	    result = l1.st_u.num.value == l2.st_u.num.value ? 0
-			     : l1.st_u.num.value > l2.st_u.num.value ? 1 : -1;
+	إذا (l1.st_u.رقم.is_العدد != l2.st_u.رقم.is_العدد)
+	    result = l1.st_u.رقم.is_العدد > l2.st_u.رقم.is_العدد ? 1 : -1;
+	وإلا
+	    result = l1.st_u.رقم.قيمة == l2.st_u.رقم.قيمة ? 0
+			     : l1.st_u.رقم.قيمة > l2.st_u.رقم.قيمة ? 1 : -1;
     }
-    else if (sort_flt)
-	result = l1.st_u.value_flt == l2.st_u.value_flt ? 0
-			     : l1.st_u.value_flt > l2.st_u.value_flt ? 1 : -1;
-    else
+    وإلا إذا (sort_flt)
+	result = l1.st_u.قيمة_flt == l2.st_u.قيمة_flt ? 0
+			     : l1.st_u.قيمة_flt > l2.st_u.قيمة_flt ? 1 : -1;
+    وإلا
     {
 	// We need to copy one line into "sortbuf1", because there is no
 	// guarantee that the first pointer becomes invalid when obtaining the
 	// second one.
-	STRNCPY(sortbuf1, ml_get(l1.lnum) + l1.st_u.line.start_col_nr,
-		     l1.st_u.line.end_col_nr - l1.st_u.line.start_col_nr + 1);
-	sortbuf1[l1.st_u.line.end_col_nr - l1.st_u.line.start_col_nr] = 0;
-	STRNCPY(sortbuf2, ml_get(l2.lnum) + l2.st_u.line.start_col_nr,
-		     l2.st_u.line.end_col_nr - l2.st_u.line.start_col_nr + 1);
-	sortbuf2[l2.st_u.line.end_col_nr - l2.st_u.line.start_col_nr] = 0;
+	STRNCPY(sortbuf1, ml_get(l1.lnum) + l1.st_u.سطر.start_col_nr,
+		     l1.st_u.سطر.end_col_nr - l1.st_u.سطر.start_col_nr + 1);
+	sortbuf1[l1.st_u.سطر.end_col_nr - l1.st_u.سطر.start_col_nr] = 0;
+	STRNCPY(sortbuf2, ml_get(l2.lnum) + l2.st_u.سطر.start_col_nr,
+		     l2.st_u.سطر.end_col_nr - l2.st_u.سطر.start_col_nr + 1);
+	sortbuf2[l2.st_u.سطر.end_col_nr - l2.st_u.سطر.start_col_nr] = 0;
 
 	result = string_compare(sortbuf1, sortbuf2);
     }
 
     // If two lines have the same value, preserve the original line order.
-    if (result == 0)
-	return (int)(l1.lnum - l2.lnum);
-    return result;
+    إذا (result == 0)
+	إرجاع (صحيح)(l1.lnum - l2.lnum);
+    إرجاع result;
 }
 
 /*
  * ":sort".
  */
-    void
+    فراغ
 ex_sort(exarg_T *eap)
 {
     regmatch_T	regmatch;
-    int		len;
+    صحيح		len;
     linenr_T	lnum;
     long	maxlen = 0;
     sorti_T	*nrs;
-    size_t	count = (size_t)(eap->line2 - eap->line1 + 1);
+    size_t	تعداد_2 = (size_t)(eap->line2 - eap->line1 + 1);
     size_t	i;
     char_u	*p;
     char_u	*s;
     char_u	*s2;
     char_u	c;			// temporary character storage
-    int		unique = FALSE;
+    صحيح		unique = FALSE;
     long	deleted;
     colnr_T	start_col;
     colnr_T	end_col;
-    int		sort_what = 0;
-    int		format_found = 0;
-    int		change_occurred = FALSE; // Buffer contents changed.
+    صحيح		sort_what = 0;
+    صحيح		format_found = 0;
+    صحيح		change_occurred = FALSE; // Buffer contents changed.
 
     // Sorting one line is really quick!
-    if (count <= 1)
-	return;
+    إذا (تعداد_2 <= 1)
+	إرجاع;
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
-    sortbuf1 = NULL;
-    sortbuf2 = NULL;
-    regmatch.regprog = NULL;
-    nrs = ALLOC_MULT(sorti_T, count);
-    if (nrs == NULL)
-	goto sortend;
+    إذا (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	إرجاع;
+    sortbuf1 = عدم;
+    sortbuf2 = عدم;
+    regmatch.regprog = عدم;
+    nrs = ALLOC_MULT(sorti_T, تعداد_2);
+    إذا (nrs == عدم)
+	اذهب sortend;
 
     sort_abort = sort_ic = sort_lc = sort_rx = sort_nr = 0;
     sort_flt = 0;
 
-    for (p = eap->arg; *p != NUL; ++p)
+    لكل (p = eap->arg; *p != NUL; ++p)
     {
-	if (VIM_ISWHITE(*p))
+	إذا (VIM_ISWHITE(*p))
 	    ;
-	else if (*p == 'i')
+	وإلا إذا (*p == 'i')
 	    sort_ic = TRUE;
-	else if (*p == 'l')
+	وإلا إذا (*p == 'l')
 	    sort_lc = TRUE;
-	else if (*p == 'r')
+	وإلا إذا (*p == 'r')
 	    sort_rx = TRUE;
-	else if (*p == 'n')
+	وإلا إذا (*p == 'n')
 	{
 	    sort_nr = 1;
 	    ++format_found;
 	}
-	else if (*p == 'f')
+	وإلا إذا (*p == 'f')
 	{
 	    sort_flt = 1;
 	    ++format_found;
 	}
-	else if (*p == 'b')
+	وإلا إذا (*p == 'b')
 	{
 	    sort_what = STR2NR_BIN + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'o')
+	وإلا إذا (*p == 'o')
 	{
 	    sort_what = STR2NR_OCT + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'x')
+	وإلا إذا (*p == 'x')
 	{
 	    sort_what = STR2NR_HEX + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'u')
+	وإلا إذا (*p == 'u')
 	    unique = TRUE;
-	else if (*p == '"')	// comment start
-	    break;
-	else if (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
+	وإلا إذا (*p == '"')	// comment start
+	    اكسر;
+	وإلا إذا (eap->nextcmd == عدم && check_nextcmd(p) != عدم)
 	{
 	    eap->nextcmd = check_nextcmd(p);
-	    break;
+	    اكسر;
 	}
-	else if (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
+	وإلا إذا (!ASCII_ISALPHA(*p) && regmatch.regprog == عدم)
 	{
 	    s = skip_regexp_err(p + 1, *p, TRUE);
-	    if (s == NULL)
-		goto sortend;
+	    إذا (s == عدم)
+		اذهب sortend;
 	    *s = NUL;
 	    // Use last search pattern if sort pattern is empty.
-	    if (s == p + 1)
+	    إذا (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		إذا (last_بحث_pat() == عدم)
 		{
 		    emsg(_(e_no_previous_regular_expression));
-		    goto sortend;
+		    اذهب sortend;
 		}
-		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+		regmatch.regprog = vim_regcomp(last_بحث_pat(), RE_MAGIC);
 	    }
-	    else
+	    وإلا
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
-	    if (regmatch.regprog == NULL)
-		goto sortend;
+	    إذا (regmatch.regprog == عدم)
+		اذهب sortend;
 	    p = s;		// continue after the regexp
 	    regmatch.rm_ic = p_ic;
 	}
-	else
+	وإلا
 	{
 	    semsg(_(e_invalid_argument_str), p);
-	    goto sortend;
+	    اذهب sortend;
 	}
     }
 
     // Can only have one of 'n', 'b', 'o' and 'x'.
-    if (format_found > 1)
+    إذا (format_found > 1)
     {
 	emsg(_(e_invalid_argument));
-	goto sortend;
+	اذهب sortend;
     }
 
     // From here on "sort_nr" is used as a flag for any integer number
@@ -486,30 +486,30 @@ ex_sort(exarg_T *eap)
      * matching and number conversion only has to be done once per line.
      * Also get the longest line length for allocating "sortbuf".
      */
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+    لكل (lnum = eap->line1; lnum <= eap->line2; ++lnum)
     {
 	s = ml_get(lnum);
 	len = ml_get_len(lnum);
-	if (maxlen < len)
+	إذا (maxlen < len)
 	    maxlen = len;
 
 	start_col = 0;
 	end_col = len;
-	if (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
+	إذا (regmatch.regprog != عدم && vim_regexec(&regmatch, s, 0))
 	{
-	    if (sort_rx)
+	    إذا (sort_rx)
 	    {
 		start_col = (colnr_T)(regmatch.startp[0] - s);
 		end_col = (colnr_T)(regmatch.endp[0] - s);
 	    }
-	    else
+	    وإلا
 		start_col = (colnr_T)(regmatch.endp[0] - s);
 	}
-	else
-	    if (regmatch.regprog != NULL)
+	وإلا
+	    إذا (regmatch.regprog != عدم)
 		end_col = 0;
 
-	if (sort_nr || sort_flt)
+	إذا (sort_nr || sort_flt)
 	{
 	    // Make sure vim_str2nr() doesn't read any digits past the end
 	    // of the match, by temporarily terminating the string there
@@ -518,118 +518,118 @@ ex_sort(exarg_T *eap)
 	    *s2 = NUL;
 	    // Sorting on number: Store the number itself.
 	    p = s + start_col;
-	    if (sort_nr)
+	    إذا (sort_nr)
 	    {
-		if (sort_what & STR2NR_HEX)
+		إذا (sort_what & STR2NR_HEX)
 		    s = skiptohex(p);
-		else if (sort_what & STR2NR_BIN)
+		وإلا إذا (sort_what & STR2NR_BIN)
 		    s = skiptobin(p);
-		else
+		وإلا
 		    s = skiptodigit(p);
-		if (s > p && s[-1] == '-')
+		إذا (s > p && s[-1] == '-')
 		    --s;  // include preceding negative sign
-		if (*s == NUL)
+		إذا (*s == NUL)
 		{
 		    // line without number should sort before any number
-		    nrs[lnum - eap->line1].st_u.num.is_number = FALSE;
-		    nrs[lnum - eap->line1].st_u.num.value = 0;
+		    nrs[lnum - eap->line1].st_u.رقم.is_العدد = FALSE;
+		    nrs[lnum - eap->line1].st_u.رقم.قيمة = 0;
 		}
-		else
+		وإلا
 		{
-		    nrs[lnum - eap->line1].st_u.num.is_number = TRUE;
-		    vim_str2nr(s, NULL, NULL, sort_what,
-			&nrs[lnum - eap->line1].st_u.num.value,
-			NULL, 0, FALSE, NULL);
+		    nrs[lnum - eap->line1].st_u.رقم.is_العدد = TRUE;
+		    vim_str2nr(s, عدم, عدم, sort_what,
+			&nrs[lnum - eap->line1].st_u.رقم.قيمة,
+			عدم, 0, FALSE, عدم);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		s = skipwhite(p);
-		if (*s == '+')
+		إذا (*s == '+')
 		    s = skipwhite(s + 1);
 
-		if (*s == NUL)
+		إذا (*s == NUL)
 		    // empty line should sort before any number
-		    nrs[lnum - eap->line1].st_u.value_flt = -DBL_MAX;
-		else
-		    nrs[lnum - eap->line1].st_u.value_flt =
-						      strtod((char *)s, NULL);
+		    nrs[lnum - eap->line1].st_u.قيمة_flt = -DBL_MAX;
+		وإلا
+		    nrs[lnum - eap->line1].st_u.قيمة_flt =
+						      strtod((حرف *)s, عدم);
 	    }
 	    *s2 = c;
 	}
-	else
+	وإلا
 	{
 	    // Store the column to sort at.
-	    nrs[lnum - eap->line1].st_u.line.start_col_nr = start_col;
-	    nrs[lnum - eap->line1].st_u.line.end_col_nr = end_col;
+	    nrs[lnum - eap->line1].st_u.سطر.start_col_nr = start_col;
+	    nrs[lnum - eap->line1].st_u.سطر.end_col_nr = end_col;
 	}
 
 	nrs[lnum - eap->line1].lnum = lnum;
 
-	if (regmatch.regprog != NULL)
+	إذا (regmatch.regprog != عدم)
 	    fast_breakcheck();
-	if (got_int)
-	    goto sortend;
+	إذا (got_int)
+	    اذهب sortend;
     }
 
     // Allocate a buffer that can hold the longest line.
     sortbuf1 = alloc(maxlen + 1);
-    if (sortbuf1 == NULL)
-	goto sortend;
+    إذا (sortbuf1 == عدم)
+	اذهب sortend;
     sortbuf2 = alloc(maxlen + 1);
-    if (sortbuf2 == NULL)
-	goto sortend;
+    إذا (sortbuf2 == عدم)
+	اذهب sortend;
 
     // Sort the array of line numbers.  Note: can't be interrupted!
-    qsort((void *)nrs, count, sizeof(sorti_T), sort_compare);
+    qsort((فراغ *)nrs, تعداد_2, حجم(sorti_T), sort_compare);
 
-    if (sort_abort)
-	goto sortend;
+    إذا (sort_abort)
+	اذهب sortend;
 
     // Insert the lines in the sorted order below the last one.
     lnum = eap->line2;
-    for (i = 0; i < count; ++i)
+    لكل (i = 0; i < تعداد_2; ++i)
     {
-	linenr_T get_lnum = nrs[eap->forceit ? count - i - 1 : i].lnum;
+	linenr_T get_lnum = nrs[eap->forceit ? تعداد_2 - i - 1 : i].lnum;
 
 	// If the original line number of the line being placed is not the same
 	// as "lnum" (accounting for offset), we know that the buffer changed.
-	if (get_lnum + ((linenr_T)count - 1) != lnum)
+	إذا (get_lnum + ((linenr_T)تعداد_2 - 1) != lnum)
 	    change_occurred = TRUE;
 
 	s = ml_get(get_lnum);
-	if (!unique || i == 0 || string_compare(s, sortbuf1) != 0)
+	إذا (!unique || i == 0 || string_compare(s, sortbuf1) != 0)
 	{
 	    // Copy the line into a buffer, it may become invalid in
 	    // ml_append(). And it's needed for "unique".
 	    STRCPY(sortbuf1, s);
-	    if (ml_append(lnum++, sortbuf1, (colnr_T)0, FALSE) == FAIL)
-		break;
+	    إذا (ml_append(lnum++, sortbuf1, (colnr_T)0, FALSE) == FAIL)
+		اكسر;
 	}
 	fast_breakcheck();
-	if (got_int)
-	    goto sortend;
+	إذا (got_int)
+	    اذهب sortend;
     }
 
     // delete the original lines if appending worked
-    if (i == count)
-	for (i = 0; i < count; ++i)
+    إذا (i == تعداد_2)
+	لكل (i = 0; i < تعداد_2; ++i)
 	    ml_delete(eap->line1);
-    else
-	count = 0;
+    وإلا
+	تعداد_2 = 0;
 
     // Adjust marks for deleted (or added) lines and prepare for displaying.
-    deleted = (long)(count - (lnum - eap->line2));
-    if (deleted > 0)
+    deleted = (long)(تعداد_2 - (lnum - eap->line2));
+    إذا (deleted > 0)
     {
 	mark_adjust(eap->line2 - deleted, eap->line2, (long)MAXLNUM, -deleted);
 	msgmore(-deleted);
     }
-    else if (deleted < 0)
+    وإلا إذا (deleted < 0)
 	mark_adjust(eap->line2, MAXLNUM, -deleted, 0L);
 
-    if (change_occurred || deleted != 0)
-	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
+    إذا (change_occurred || deleted != 0)
+	changed_أسطر(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
     beginline(BL_WHITE | BL_FIX);
@@ -639,119 +639,119 @@ sortend:
     vim_free(sortbuf1);
     vim_free(sortbuf2);
     vim_regfree(regmatch.regprog);
-    if (got_int)
+    إذا (got_int)
 	emsg(_(e_interrupted));
 }
 
 /*
  * ":uniq".
  */
-    void
+    فراغ
 ex_uniq(exarg_T *eap)
 {
     regmatch_T	regmatch;
-    int		len;
+    صحيح		len;
     linenr_T	lnum;
     long	maxlen = 0;
-    linenr_T	count = eap->line2 - eap->line1 + 1;
+    linenr_T	تعداد_2 = eap->line2 - eap->line1 + 1;
     char_u	*p;
     char_u	*s;
     char_u	save_c = 0;		// temporary character storage
-    int		keep_only_unique = FALSE;
-    int		keep_only_not_unique = eap->forceit ? TRUE : FALSE;
+    صحيح		keep_only_unique = FALSE;
+    صحيح		keep_only_not_unique = eap->forceit ? TRUE : FALSE;
     long	deleted = 0;
     colnr_T	start_col;
     colnr_T	end_col;
-    int		change_occurred = FALSE; // Buffer contents changed.
+    صحيح		change_occurred = FALSE; // Buffer contents changed.
 
     // Uniq one line is really quick!
-    if (count <= 1)
-	return;
+    إذا (تعداد_2 <= 1)
+	إرجاع;
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
-    sortbuf1 = NULL;
-    regmatch.regprog = NULL;
+    إذا (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	إرجاع;
+    sortbuf1 = عدم;
+    regmatch.regprog = عدم;
 
     sort_abort = sort_ic = sort_lc = sort_rx = sort_nr = 0;
     sort_flt = 0;
 
-    for (p = eap->arg; *p != NUL; ++p)
+    لكل (p = eap->arg; *p != NUL; ++p)
     {
-	if (VIM_ISWHITE(*p))
+	إذا (VIM_ISWHITE(*p))
 	    ;
-	else if (*p == 'i')
+	وإلا إذا (*p == 'i')
 	    sort_ic = TRUE;
-	else if (*p == 'l')
+	وإلا إذا (*p == 'l')
 	    sort_lc = TRUE;
-	else if (*p == 'r')
+	وإلا إذا (*p == 'r')
 	    sort_rx = TRUE;
-	else if (*p == 'u')
+	وإلا إذا (*p == 'u')
 	{
 	    // 'u' is only valid when '!' is not given.
-	    if (!keep_only_not_unique)
+	    إذا (!keep_only_not_unique)
 		keep_only_unique = TRUE;
 	}
-	else if (*p == '"')	// comment start
-	    break;
-	else if (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
+	وإلا إذا (*p == '"')	// comment start
+	    اكسر;
+	وإلا إذا (eap->nextcmd == عدم && check_nextcmd(p) != عدم)
 	{
 	    eap->nextcmd = check_nextcmd(p);
-	    break;
+	    اكسر;
 	}
-	else if (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
+	وإلا إذا (!ASCII_ISALPHA(*p) && regmatch.regprog == عدم)
 	{
 	    s = skip_regexp_err(p + 1, *p, TRUE);
-	    if (s == NULL)
-		goto uniqend;
+	    إذا (s == عدم)
+		اذهب uniqend;
 	    *s = NUL;
 	    // Use last search pattern if uniq pattern is empty.
-	    if (s == p + 1)
+	    إذا (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		إذا (last_بحث_pat() == عدم)
 		{
 		    emsg(_(e_no_previous_regular_expression));
-		    goto uniqend;
+		    اذهب uniqend;
 		}
-		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+		regmatch.regprog = vim_regcomp(last_بحث_pat(), RE_MAGIC);
 	    }
-	    else
+	    وإلا
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
-	    if (regmatch.regprog == NULL)
-		goto uniqend;
+	    إذا (regmatch.regprog == عدم)
+		اذهب uniqend;
 	    p = s;		// continue after the regexp
 	    regmatch.rm_ic = p_ic;
 	}
-	else
+	وإلا
 	{
 	    semsg(_(e_invalid_argument_str), p);
-	    goto uniqend;
+	    اذهب uniqend;
 	}
     }
 
     // Find the length of the longest line.
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+    لكل (lnum = eap->line1; lnum <= eap->line2; ++lnum)
     {
 	len = ml_get_len(lnum);
-	if (maxlen < len)
+	إذا (maxlen < len)
 	    maxlen = len;
 
-	if (got_int)
-	    goto uniqend;
+	إذا (got_int)
+	    اذهب uniqend;
     }
 
     // Allocate a buffer that can hold the longest line.
     sortbuf1 = alloc(maxlen + 1);
-    if (sortbuf1 == NULL)
-	goto uniqend;
+    إذا (sortbuf1 == عدم)
+	اذهب uniqend;
 
     // Delete lines according to options.
-    int match_continue = FALSE;
-    int next_is_unmatch = FALSE;
-    int is_match;
+    صحيح match_continue = FALSE;
+    صحيح next_is_unmatch = FALSE;
+    صحيح is_match;
     linenr_T done_lnum = eap->line1 - 1;
     linenr_T delete_lnum = 0;
-    for (linenr_T i = 0; i < count; ++i)
+    لكل (linenr_T i = 0; i < تعداد_2; ++i)
     {
 	linenr_T get_lnum = eap->line1 + i;
 
@@ -760,20 +760,20 @@ ex_uniq(exarg_T *eap)
 
 	start_col = 0;
 	end_col = len;
-	if (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
+	إذا (regmatch.regprog != عدم && vim_regexec(&regmatch, s, 0))
 	{
-	    if (sort_rx)
+	    إذا (sort_rx)
 	    {
 		start_col = (colnr_T)(regmatch.startp[0] - s);
 		end_col = (colnr_T)(regmatch.endp[0] - s);
 	    }
-	    else
+	    وإلا
 		start_col = (colnr_T)(regmatch.endp[0] - s);
 	}
-	else
-	    if (regmatch.regprog != NULL)
+	وإلا
+	    إذا (regmatch.regprog != عدم)
 		end_col = 0;
-	if (end_col > 0)
+	إذا (end_col > 0)
 	{
 	    save_c = s[end_col];
 	    s[end_col] = NUL;
@@ -781,82 +781,82 @@ ex_uniq(exarg_T *eap)
 
 	is_match = i > 0 ? !string_compare(&s[start_col], sortbuf1) : FALSE;
 	delete_lnum = 0;
-	if (next_is_unmatch)
+	إذا (next_is_unmatch)
 	{
 	    is_match = FALSE;
 	    next_is_unmatch = FALSE;
 	}
 
-	if (!keep_only_unique && !keep_only_not_unique)
+	إذا (!keep_only_unique && !keep_only_not_unique)
 	{
-	    if (is_match)
+	    إذا (is_match)
 		delete_lnum = get_lnum;
-	    else
+	    وإلا
 		STRCPY(sortbuf1, &s[start_col]);
 	}
-	else if (keep_only_not_unique)
+	وإلا إذا (keep_only_not_unique)
 	{
-	    if (is_match)
+	    إذا (is_match)
 	    {
 		done_lnum = get_lnum - 1;
 		delete_lnum = get_lnum;
 		match_continue = TRUE;
 	    }
-	    else
+	    وإلا
 	    {
-		if (i > 0 && !match_continue && get_lnum - 1 > done_lnum)
+		إذا (i > 0 && !match_continue && get_lnum - 1 > done_lnum)
 		{
 		    delete_lnum = get_lnum - 1;
 		    next_is_unmatch = TRUE;
 		}
-		else if (i >= count - 1)
+		وإلا إذا (i >= تعداد_2 - 1)
 		    delete_lnum = get_lnum;
 		match_continue = FALSE;
 		STRCPY(sortbuf1, &s[start_col]);
 	    }
 	}
-	else // keep_only_unique
+	وإلا // keep_only_unique
 	{
-	    if (is_match)
+	    إذا (is_match)
 	    {
-		if (!match_continue)
+		إذا (!match_continue)
 		    delete_lnum = get_lnum - 1;
-		else
+		وإلا
 		    delete_lnum = get_lnum;
 		match_continue = TRUE;
 	    }
-	    else
+	    وإلا
 	    {
-		if (i == 0 && match_continue)
+		إذا (i == 0 && match_continue)
 		    delete_lnum = get_lnum;
 		match_continue = FALSE;
 		STRCPY(sortbuf1, &s[start_col]);
 	    }
 	}
 
-	if (end_col > 0)
+	إذا (end_col > 0)
 	    s[end_col] = save_c;
 
-	if (delete_lnum > 0)
+	إذا (delete_lnum > 0)
 	{
 	    ml_delete(delete_lnum);
 	    i -= get_lnum - delete_lnum + 1;
-	    count--;
+	    تعداد_2--;
 	    deleted++;
 	    change_occurred = TRUE;
 	}
 
 	fast_breakcheck();
-	if (got_int)
-	    goto uniqend;
+	إذا (got_int)
+	    اذهب uniqend;
     }
 
     // Adjust marks for deleted lines and prepare for displaying.
     mark_adjust(eap->line2 - deleted, eap->line2, (long)MAXLNUM, -deleted);
     msgmore(-deleted);
 
-    if (change_occurred)
-	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
+    إذا (change_occurred)
+	changed_أسطر(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
     beginline(BL_WHITE | BL_FIX);
@@ -864,7 +864,7 @@ ex_uniq(exarg_T *eap)
 uniqend:
     vim_free(sortbuf1);
     vim_regfree(regmatch.regprog);
-    if (got_int)
+    إذا (got_int)
 	emsg(_(e_interrupted));
 }
 
@@ -873,55 +873,55 @@ uniqend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحيح
 do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 {
     char_u	*str;
     linenr_T	l;
     linenr_T	extra;	    // Num lines added before line1
-    linenr_T	num_lines;  // Num lines moved
-    linenr_T	last_line;  // Last line in file after adding new text
+    linenr_T	رقم_أسطر;  // Num lines moved
+    linenr_T	last_سطر;  // Last line in file after adding new text
 #ifdef FEAT_FOLDING
     win_T	*win;
     tabpage_T	*tp;
 #endif
 
-    if (dest >= line1 && dest < line2)
+    إذا (dest >= line1 && dest < line2)
     {
-	emsg(_(e_cannot_move_range_of_lines_into_itself));
-	return FAIL;
+	emsg(_(e_cannot_move_range_of_أسطر_into_itself));
+	إرجاع FAIL;
     }
 
     // Do nothing if we are not actually moving any lines.  This will prevent
     // the 'modified' flag from being set without cause.
-    if (dest == line1 - 1 || dest == line2)
+    إذا (dest == line1 - 1 || dest == line2)
     {
 	// Move the cursor as if lines were moved (see below) to be backwards
 	// compatible.
-	if (dest >= line1)
+	إذا (dest >= line1)
 	    curwin->w_cursor.lnum = dest;
-	else
+	وإلا
 	    curwin->w_cursor.lnum = dest + (line2 - line1) + 1;
 
-	return OK;
+	إرجاع OK;
     }
 
-    num_lines = line2 - line1 + 1;
+    رقم_أسطر = line2 - line1 + 1;
 
     /*
      * First we copy the old text to its new location -- webb
      * Also copy the flag that ":global" command uses.
      */
-    if (u_save(dest, dest + 1) == FAIL)
-	return FAIL;
-    for (extra = 0, l = line1; l <= line2; l++)
+    إذا (u_save(dest, dest + 1) == FAIL)
+	إرجاع FAIL;
+    لكل (extra = 0, l = line1; l <= line2; l++)
     {
 	str = vim_strnsave(ml_get(l + extra), ml_get_len(l + extra));
-	if (str != NULL)
+	إذا (str != عدم)
 	{
 	    ml_append(dest + l - line1, str, (colnr_T)0, FALSE);
 	    vim_free(str);
-	    if (dest < line1)
+	    إذا (dest < line1)
 		extra++;
 	}
     }
@@ -941,94 +941,94 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
      * And Finally we adjust the marks we put at the end of the file back to
      * their final destination at the new text position -- webb
      */
-    last_line = curbuf->b_ml.ml_line_count;
-    mark_adjust_nofold(line1, line2, last_line - line2, 0L);
-    if (dest >= line2)
+    last_سطر = curbuf->b_ml.ml_سطر_تعداد;
+    mark_adjust_nofold(line1, line2, last_سطر - line2, 0L);
+    إذا (dest >= line2)
     {
-	mark_adjust_nofold(line2 + 1, dest, -num_lines, 0L);
+	mark_adjust_nofold(line2 + 1, dest, -رقم_أسطر, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
-	    if (win->w_buffer == curbuf)
+	    إذا (win->w_buffer == curbuf)
 		foldMoveRange(&win->w_folds, line1, line2, dest);
 	}
 #endif
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
-	    curbuf->b_op_start.lnum = dest - num_lines + 1;
+	    curbuf->b_op_start.lnum = dest - رقم_أسطر + 1;
 	    curbuf->b_op_end.lnum = dest;
 	}
     }
-    else
+    وإلا
     {
-	mark_adjust_nofold(dest + 1, line1 - 1, num_lines, 0L);
+	mark_adjust_nofold(dest + 1, line1 - 1, رقم_أسطر, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
-	    if (win->w_buffer == curbuf)
+	    إذا (win->w_buffer == curbuf)
 		foldMoveRange(&win->w_folds, dest + 1, line1 - 1, line2);
 	}
 #endif
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    curbuf->b_op_start.lnum = dest + 1;
-	    curbuf->b_op_end.lnum = dest + num_lines;
+	    curbuf->b_op_end.lnum = dest + رقم_أسطر;
 	}
     }
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
-    mark_adjust_nofold(last_line - num_lines + 1, last_line,
-					     -(last_line - dest - extra), 0L);
+    mark_adjust_nofold(last_سطر - رقم_أسطر + 1, last_سطر,
+					     -(last_سطر - dest - extra), 0L);
 
     /*
      * Now we delete the original text -- webb
      */
-    if (u_save(line1 + extra - 1, line2 + extra + 1) == FAIL)
-	return FAIL;
+    إذا (u_save(line1 + extra - 1, line2 + extra + 1) == FAIL)
+	إرجاع FAIL;
 
-    for (l = line1; l <= line2; l++)
+    لكل (l = line1; l <= line2; l++)
 	ml_delete_flags(line1 + extra, ML_DEL_MESSAGE);
 
-    if (!global_busy && num_lines > p_report)
-	smsg(NGETTEXT("%ld line moved", "%ld lines moved", num_lines),
-			(long)num_lines);
+    إذا (!global_busy && رقم_أسطر > p_report)
+	smsg(NGETTEXT("%ld line moved", "%ld lines moved", رقم_أسطر),
+			(long)رقم_أسطر);
 
     /*
      * Leave the cursor on the last of the moved lines.
      */
-    if (dest >= line1)
+    إذا (dest >= line1)
 	curwin->w_cursor.lnum = dest;
-    else
+    وإلا
 	curwin->w_cursor.lnum = dest + (line2 - line1) + 1;
 
-    if (line1 < dest)
+    إذا (line1 < dest)
     {
-	dest += num_lines + 1;
-	last_line = curbuf->b_ml.ml_line_count;
-	if (dest > last_line + 1)
-	    dest = last_line + 1;
-	changed_lines(line1, 0, dest, 0L);
+	dest += رقم_أسطر + 1;
+	last_سطر = curbuf->b_ml.ml_سطر_تعداد;
+	إذا (dest > last_سطر + 1)
+	    dest = last_سطر + 1;
+	changed_أسطر(line1, 0, dest, 0L);
     }
-    else
-	changed_lines(dest + 1, 0, line1 + num_lines, 0L);
+    وإلا
+	changed_أسطر(dest + 1, 0, line1 + رقم_أسطر, 0L);
 
-    return OK;
+    إرجاع OK;
 }
 
 /*
  * ":copy"
  */
-    void
+    فراغ
 ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
 {
-    linenr_T	count;
+    linenr_T	تعداد_2;
     char_u	*p;
 
-    count = line2 - line1 + 1;
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    تعداد_2 = line2 - line1 + 1;
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	curbuf->b_op_start.lnum = n + 1;
-	curbuf->b_op_end.lnum = n + count;
+	curbuf->b_op_end.lnum = n + تعداد_2;
 	curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
     }
 
@@ -1043,43 +1043,43 @@ ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
      * line1 = start of source (while copying)
      * line2 = end of source (while copying)
      */
-    if (u_save(n, n + 1) == FAIL)
-	return;
+    إذا (u_save(n, n + 1) == FAIL)
+	إرجاع;
 
     curwin->w_cursor.lnum = n;
-    while (line1 <= line2)
+    بينما (line1 <= line2)
     {
 	// need to make a copy because the line will be unlocked within
 	// ml_append()
 	p = vim_strnsave(ml_get(line1), ml_get_len(line1));
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    ml_append(curwin->w_cursor.lnum, p, (colnr_T)0, FALSE);
 	    vim_free(p);
 	}
 	// situation 2: skip already copied lines
-	if (line1 == n)
+	إذا (line1 == n)
 	    line1 = curwin->w_cursor.lnum;
 	++line1;
-	if (curwin->w_cursor.lnum < line1)
+	إذا (curwin->w_cursor.lnum < line1)
 	    ++line1;
-	if (curwin->w_cursor.lnum < line2)
+	إذا (curwin->w_cursor.lnum < line2)
 	    ++line2;
 	++curwin->w_cursor.lnum;
     }
 
-    appended_lines_mark(n, count);
-    if (VIsual_active)
+    appended_أسطر_mark(n, تعداد_2);
+    إذا (VIsual_active)
 	check_pos(curbuf, &VIsual);
 
-    msgmore((long)count);
+    msgmore((long)تعداد_2);
 }
 
-static char_u	*prevcmd = NULL;	// the previous command
+ساكن char_u	*prevcmd = عدم;	// the previous command
 
-#if defined(EXITFREE)
-    void
-free_prev_shellcmd(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_prev_shellcmd(فراغ)
 {
     vim_free(prevcmd);
 }
@@ -1089,15 +1089,15 @@ free_prev_shellcmd(void)
  * Check that "prevcmd" is not NULL.  If it is NULL then give an error message
  * and return FALSE.
  */
-    static int
-prevcmd_is_set(void)
+    ساكن صحيح
+prevcmd_is_set(فراغ)
 {
-    if (prevcmd == NULL)
+    إذا (prevcmd == عدم)
     {
 	emsg(_(e_no_previous_command));
-	return FALSE;
+	إرجاع FALSE;
     }
-    return TRUE;
+    إرجاع TRUE;
 }
 
 /*
@@ -1105,39 +1105,39 @@ prevcmd_is_set(void)
  * Bangs in the argument are replaced with the previously entered command.
  * Remember the argument.
  */
-    void
+    فراغ
 do_bang(
-    int		addr_count,
+    صحيح		addr_تعداد,
     exarg_T	*eap,
-    int		forceit,
-    int		do_in,
-    int		do_out)
+    صحيح		forceit,
+    صحيح		do_in,
+    صحيح		do_out)
 {
     char_u		*arg = eap->arg;	// command
     linenr_T		line1 = eap->line1;	// start of range
     linenr_T		line2 = eap->line2;	// end of range
-    char_u		*newcmd = NULL;		// the new command
-    int			free_newcmd = FALSE;    // need to free() newcmd
-    int			ins_prevcmd;
+    char_u		*newcmd = عدم;		// the new command
+    صحيح			free_newcmd = FALSE;    // need to free() newcmd
+    صحيح			ins_prevcmd;
     char_u		*t;
     char_u		*p;
     char_u		*trailarg;
-    int			len;
-    int			scroll_save = msg_scroll;
+    صحيح			len;
+    صحيح			scroll_save = رسالة_scroll;
 
     /*
      * Disallow shell commands for "rvim".
      * Disallow shell commands from .exrc and .vimrc in current directory for
      * security reasons.
      */
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	إرجاع;
 
-    if (addr_count == 0)		// :!
+    إذا (addr_تعداد == 0)		// :!
     {
-	msg_scroll = FALSE;	    // don't scroll here
+	رسالة_scroll = FALSE;	    // don't scroll here
 	autowrite_all();
-	msg_scroll = scroll_save;
+	رسالة_scroll = scroll_save;
     }
 
     /*
@@ -1148,29 +1148,29 @@ do_bang(
 
     // Skip leading white space to avoid a strange error with some shells.
     trailarg = skipwhite(arg);
-    do
+    افعل
     {
-	len = (int)STRLEN(trailarg) + 1;
-	if (newcmd != NULL)
-	    len += (int)STRLEN(newcmd);
-	if (ins_prevcmd)
+	len = (صحيح)STRLEN(trailarg) + 1;
+	إذا (newcmd != عدم)
+	    len += (صحيح)STRLEN(newcmd);
+	إذا (ins_prevcmd)
 	{
-	    if (!prevcmd_is_set())
+	    إذا (!prevcmd_is_set())
 	    {
 		vim_free(newcmd);
-		return;
+		إرجاع;
 	    }
-	    len += (int)STRLEN(prevcmd);
+	    len += (صحيح)STRLEN(prevcmd);
 	}
-	if ((t = alloc(len)) == NULL)
+	إذا ((t = alloc(len)) == عدم)
 	{
 	    vim_free(newcmd);
-	    return;
+	    إرجاع;
 	}
 	*t = NUL;
-	if (newcmd != NULL)
+	إذا (newcmd != عدم)
 	    STRCAT(t, newcmd);
-	if (ins_prevcmd)
+	إذا (ins_prevcmd)
 	    STRCAT(t, prevcmd);
 	p = t + STRLEN(t);
 	STRCAT(t, trailarg);
@@ -1181,51 +1181,51 @@ do_bang(
 	 * Scan the rest of the argument for '!', which is replaced by the
 	 * previous command.  "\!" is replaced by "!" (this is vi compatible).
 	 */
-	trailarg = NULL;
-	while (*p)
+	trailarg = عدم;
+	بينما (*p)
 	{
-	    if (*p == '!')
+	    إذا (*p == '!')
 	    {
-		if (p > newcmd && p[-1] == '\\')
+		إذا (p > newcmd && p[-1] == '\\')
 		    STRMOVE(p - 1, p);
-		else
+		وإلا
 		{
 		    trailarg = p;
 		    *trailarg++ = NUL;
 		    ins_prevcmd = TRUE;
-		    break;
+		    اكسر;
 		}
 	    }
 	    ++p;
 	}
-    } while (trailarg != NULL);
+    } بينما (trailarg != عدم);
 
     // Only set "prevcmd" if there is a command to run, otherwise keep te one
     // we have.
-    if (STRLEN(newcmd) > 0)
+    إذا (STRLEN(newcmd) > 0)
     {
 	vim_free(prevcmd);
 	prevcmd = newcmd;
     }
-    else
+    وإلا
 	free_newcmd = TRUE;
 
-    if (bangredo)	    // put cmd in redo buffer for ! command
+    إذا (bangredo)	    // put cmd in redo buffer for ! command
     {
-	if (!prevcmd_is_set())
-	    goto theend;
+	إذا (!prevcmd_is_set())
+	    اذهب theend;
 
 	// If % or # appears in the command, it must have been escaped.
 	// Reescape them, so that redoing them does not substitute them by the
 	// buffername.
 	char_u *cmd = vim_strsave_escaped(prevcmd, (char_u *)"%#");
 
-	if (cmd != NULL)
+	إذا (cmd != عدم)
 	{
 	    AppendToRedobuffLit(cmd, -1);
 	    vim_free(cmd);
 	}
-	else
+	وإلا
 	    AppendToRedobuffLit(prevcmd, -1);
 	AppendToRedobuff((char_u *)"\n");
 	bangredo = FALSE;
@@ -1233,40 +1233,40 @@ do_bang(
     /*
      * Add quotes around the command, for shells that need them.
      */
-    if (*p_shq != NUL)
+    إذا (*p_shq != NUL)
     {
-	if (free_newcmd)
+	إذا (free_newcmd)
 	    vim_free(newcmd);
 	newcmd = alloc(STRLEN(prevcmd) + 2 * STRLEN(p_shq) + 1);
-	if (newcmd == NULL)
-	    return;
+	إذا (newcmd == عدم)
+	    إرجاع;
 	STRCPY(newcmd, p_shq);
 	STRCAT(newcmd, prevcmd);
 	STRCAT(newcmd, p_shq);
 	free_newcmd = TRUE;
     }
-    if (addr_count == 0)		// :!
+    إذا (addr_تعداد == 0)		// :!
     {
 	// echo the command
-	msg_start();
-	msg_putchar(':');
-	msg_putchar('!');
-	msg_outtrans(newcmd);
-	msg_clr_eos();
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	رسالة_start();
+	رسالة_putchar(':');
+	رسالة_putchar('!');
+	رسالة_outtrans(newcmd);
+	رسالة_clr_eos();
+	windgoto(رسالة_row, cmdline_col_off + رسالة_col);
 
 	do_shell(newcmd, 0);
     }
-    else				// :range!
+    وإلا				// :range!
     {
 	// Careful: This may recursively call do_bang() again! (because of
 	// autocommands)
 	do_filter(line1, line2, eap, newcmd, do_in, do_out);
-	apply_autocmds(EVENT_SHELLFILTERPOST, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_SHELLFILTERPOST, عدم, عدم, FALSE, curbuf);
     }
 
 theend:
-    if (free_newcmd)
+    إذا (free_newcmd)
 	vim_free(newcmd);
 }
 
@@ -1285,32 +1285,32 @@ theend:
  * We use input redirection if do_in is TRUE.
  * We use output redirection if do_out is TRUE.
  */
-    static void
+    ساكن فراغ
 do_filter(
     linenr_T	line1,
     linenr_T	line2,
     exarg_T	*eap,		// for forced 'ff' and 'fenc'
     char_u	*cmd,
-    int		do_in,
-    int		do_out)
+    صحيح		do_in,
+    صحيح		do_out)
 {
-    char_u	*itmp = NULL;
-    char_u	*otmp = NULL;
+    char_u	*itmp = عدم;
+    char_u	*otmp = عدم;
     linenr_T	linecount;
     linenr_T	read_linecount;
     pos_T	cursor_save;
     char_u	*cmd_buf;
     buf_T	*old_curbuf = curbuf;
-    int		shell_flags = 0;
+    صحيح		shell_flags = 0;
     pos_T	orig_start = curbuf->b_op_start;
     pos_T	orig_end = curbuf->b_op_end;
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    صحيح		save_cmod_flags = cmdmod.cmod_flags;
 #ifdef FEAT_FILTERPIPE
-    int		stmp = p_stmp;
+    صحيح		stmp = p_stmp;
 #endif
 
-    if (*cmd == NUL)	    // no filter command
-	return;
+    إذا (*cmd == NUL)	    // no filter command
+	إرجاع;
 
     // Temporarily disable lockmarks since that's needed to propagate changed
     // regions of the buffer for foldUpdate(), linecount, etc.
@@ -1320,7 +1320,7 @@ do_filter(
     linecount = line2 - line1 + 1;
     curwin->w_cursor.lnum = line1;
     curwin->w_cursor.col = 0;
-    changed_line_abv_curs();
+    changed_سطر_abv_curs();
     invalidate_botline();
 
     /*
@@ -1336,29 +1336,29 @@ do_filter(
      * pipe only need to do 3.
      */
 
-    if (do_out)
+    إذا (do_out)
 	shell_flags |= SHELL_DOOUT;
 
 #ifdef FEAT_FILTERPIPE
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
+    إذا (!gui.in_use && !gui.starting)
 	stmp = 1;   // Console mode doesn't support filterpipe.
 # endif
 
-    if (!do_in && do_out && !stmp)
+    إذا (!do_in && do_out && !stmp)
     {
 	// Use a pipe to fetch stdout of the command, do not use a temp file.
 	shell_flags |= SHELL_READ;
 	curwin->w_cursor.lnum = line2;
     }
-    else if (do_in && !do_out && !stmp)
+    وإلا إذا (do_in && !do_out && !stmp)
     {
 	// Use a pipe to write stdin of the command, do not use a temp file.
 	shell_flags |= SHELL_WRITE;
 	curbuf->b_op_start.lnum = line1;
 	curbuf->b_op_end.lnum = line2;
     }
-    else if (do_in && do_out && !stmp)
+    وإلا إذا (do_in && do_out && !stmp)
     {
 	// Use a pipe to write stdin and fetch stdout of the command, do not
 	// use a temp file.
@@ -1367,13 +1367,13 @@ do_filter(
 	curbuf->b_op_end.lnum = line2;
 	curwin->w_cursor.lnum = line2;
     }
-    else
+    وإلا
 #endif
-	if ((do_in && (itmp = vim_tempname('i', FALSE)) == NULL)
-		|| (do_out && (otmp = vim_tempname('o', FALSE)) == NULL))
+	إذا ((do_in && (itmp = vim_tempname('i', FALSE)) == عدم)
+		|| (do_out && (otmp = vim_tempname('o', FALSE)) == عدم))
 	{
 	    emsg(_(e_cant_get_temp_file_name));
-	    goto filterend;
+	    اذهب filterend;
 	}
 
 /*
@@ -1381,30 +1381,30 @@ do_filter(
  * Vi also doesn't do this and the messages are not very informative.
  */
     ++no_wait_return;		// don't call wait_return() while busy
-    if (itmp != NULL && buf_write(curbuf, itmp, NULL, line1, line2, eap,
+    إذا (itmp != عدم && buf_write(curbuf, itmp, عدم, line1, line2, eap,
 					   FALSE, FALSE, FALSE, TRUE) == FAIL)
     {
-	msg_putchar('\n');		// keep message from buf_write()
+	رسالة_putchar('\n');		// keep message from buf_write()
 	--no_wait_return;
-#if defined(FEAT_EVAL)
-	if (!aborting())
+#إذا defined(FEAT_EVAL)
+	إذا (!aborting())
 #endif
 	    // will call wait_return()
-	    (void)semsg(_(e_cant_create_file_str), itmp);
-	goto filterend;
+	    (فراغ)semsg(_(e_cant_create_file_str), itmp);
+	اذهب filterend;
     }
-    if (curbuf != old_curbuf)
-	goto filterend;
+    إذا (curbuf != old_curbuf)
+	اذهب filterend;
 
-    if (!do_out)
-	msg_putchar('\n');
+    إذا (!do_out)
+	رسالة_putchar('\n');
 
     // Create the shell command in allocated memory.
     cmd_buf = make_filter_cmd(cmd, itmp, otmp);
-    if (cmd_buf == NULL)
-	goto filterend;
+    إذا (cmd_buf == عدم)
+	اذهب filterend;
 
-    windgoto((int)Rows - 1, cmdline_col_off);
+    windgoto((صحيح)Rows - 1, cmdline_col_off);
     cursor_on();
 
     /*
@@ -1414,19 +1414,19 @@ do_filter(
      * If do_in is FALSE, this could be something like ":r !cat", which may
      * also mess up the screen, clear it later.
      */
-    if (!do_out || STRCMP(p_srr, ">") == 0 || !do_in)
+    إذا (!do_out || STRCMP(p_srr, ">") == 0 || !do_in)
 	redraw_later_clear();
 
-    if (do_out)
+    إذا (do_out)
     {
-	if (u_save(line2, (linenr_T)(line2 + 1)) == FAIL)
+	إذا (u_save(line2, (linenr_T)(line2 + 1)) == FAIL)
 	{
 	    vim_free(cmd_buf);
-	    goto error;
+	    اذهب error;
 	}
 	redraw_curbuf_later(UPD_VALID);
     }
-    read_linecount = curbuf->b_ml.ml_line_count;
+    read_linecount = curbuf->b_ml.ml_سطر_تعداد;
 
     /*
      * When call_shell() fails wait_return() is called to give the user a
@@ -1437,7 +1437,7 @@ do_filter(
      * like ":r !cat" hangs.
      * Pass on the SHELL_DOOUT flag when the output is being redirected.
      */
-    if (call_shell(cmd_buf, SHELL_FILTER | SHELL_COOKED | shell_flags))
+    إذا (call_shell(cmd_buf, SHELL_FILTER | SHELL_COOKED | shell_flags))
     {
 	redraw_later_clear();
 	wait_return(FALSE);
@@ -1453,44 +1453,44 @@ do_filter(
     ui_breakcheck();
     got_int = FALSE;
 
-    if (do_out)
+    إذا (do_out)
     {
-	if (otmp != NULL)
+	إذا (otmp != عدم)
 	{
-	    if (readfile(otmp, NULL, line2, (linenr_T)0, (linenr_T)MAXLNUM,
+	    إذا (readfile(otmp, عدم, line2, (linenr_T)0, (linenr_T)MAXLNUM,
 						    eap, READ_FILTER) != OK)
 	    {
-#if defined(FEAT_EVAL)
-		if (!aborting())
+#إذا defined(FEAT_EVAL)
+		إذا (!aborting())
 #endif
 		{
-		    msg_putchar('\n');
+		    رسالة_putchar('\n');
 		    semsg(_(e_cant_read_file_str), otmp);
 		}
-		goto error;
+		اذهب error;
 	    }
-	    if (curbuf != old_curbuf)
-		goto filterend;
+	    إذا (curbuf != old_curbuf)
+		اذهب filterend;
 	}
 
-	read_linecount = curbuf->b_ml.ml_line_count - read_linecount;
+	read_linecount = curbuf->b_ml.ml_سطر_تعداد - read_linecount;
 
-	if (shell_flags & SHELL_READ)
+	إذا (shell_flags & SHELL_READ)
 	{
 	    curbuf->b_op_start.lnum = line2 + 1;
 	    curbuf->b_op_end.lnum = curwin->w_cursor.lnum;
-	    appended_lines_mark(line2, read_linecount);
+	    appended_أسطر_mark(line2, read_linecount);
 	}
 
-	if (do_in)
+	إذا (do_in)
 	{
-	    if ((cmdmod.cmod_flags & CMOD_KEEPMARKS)
-				     || vim_strchr(p_cpo, CPO_REMMARK) == NULL)
+	    إذا ((cmdmod.cmod_flags & CMOD_KEEPMARKS)
+				     || vim_strchr(p_cpo, CPO_REMMARK) == عدم)
 	    {
-		if (read_linecount >= linecount)
+		إذا (read_linecount >= linecount)
 		    // move all marks from old lines to new lines
 		    mark_adjust(line1, line2, linecount, 0L);
-		else if (save_cmod_flags & CMOD_LOCKMARKS)
+		وإلا إذا (save_cmod_flags & CMOD_LOCKMARKS)
 		{
 		    // Move marks from the lines below the new lines down by
 		    // the number of lines lost.
@@ -1500,7 +1500,7 @@ do_filter(
 					       linecount - read_linecount, 0L);
 		    mark_adjust(line1, line2, linecount, 0L);
 		}
-		else
+		وإلا
 		{
 		    // move marks from old lines to new lines, delete marks
 		    // that are in deleted lines
@@ -1515,15 +1515,15 @@ do_filter(
 	     * Adjust '[ and '] (set by buf_write()).
 	     */
 	    curwin->w_cursor.lnum = line1;
-	    del_lines(linecount, TRUE);
-	    if (read_linecount == 0)
+	    del_أسطر(linecount, TRUE);
+	    إذا (read_linecount == 0)
 	    {
 		// no filter output: clamp '[ and '] to a valid line
 		curbuf->b_op_start.lnum = curbuf->b_op_end.lnum =
-					MIN(line1, curbuf->b_ml.ml_line_count);
+					MIN(line1, curbuf->b_ml.ml_سطر_تعداد);
 		curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
 	    }
-	    else
+	    وإلا
 	    {
 		curbuf->b_op_start.lnum -= linecount;	// adjust '[
 		curbuf->b_op_end.lnum -= linecount;	// adjust ']
@@ -1534,7 +1534,7 @@ do_filter(
 	    foldUpdate(curwin, curbuf->b_op_start.lnum, curbuf->b_op_end.lnum);
 #endif
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * Put cursor on last new line for ":r !cmd".
@@ -1546,21 +1546,21 @@ do_filter(
 	beginline(BL_WHITE | BL_FIX);	    // cursor on first non-blank
 	--no_wait_return;
 
-	if (linecount > p_report)
+	إذا (linecount > p_report)
 	{
-	    if (do_in)
+	    إذا (do_in)
 	    {
-		vim_snprintf(msg_buf, sizeof(msg_buf),
+		vim_snprintf(رسالة_buf, حجم(رسالة_buf),
 				    _("%ld lines filtered"), (long)linecount);
-		if (msg(msg_buf) && !msg_scroll)
+		إذا (رسالة(رسالة_buf) && !رسالة_scroll)
 		    // save message to display it after redraw
-		    set_keep_msg((char_u *)msg_buf, 0);
+		    set_keep_رسالة((char_u *)رسالة_buf, 0);
 	    }
-	    else
+	    وإلا
 		msgmore((long)linecount);
 	}
     }
-    else
+    وإلا
     {
 error:
 	// put cursor back in same position for ":w !cmd"
@@ -1572,20 +1572,20 @@ error:
 filterend:
 
     cmdmod.cmod_flags = save_cmod_flags;
-    if (curbuf != old_curbuf)
+    إذا (curbuf != old_curbuf)
     {
 	--no_wait_return;
 	emsg(_(e_filter_autocommands_must_not_change_current_buffer));
     }
-    else if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    وإلا إذا (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	curbuf->b_op_start = orig_start;
 	curbuf->b_op_end = orig_end;
     }
 
-    if (itmp != NULL)
+    إذا (itmp != عدم)
 	mch_remove(itmp);
-    if (otmp != NULL)
+    إذا (otmp != عدم)
 	mch_remove(otmp);
     vim_free(itmp);
     vim_free(otmp);
@@ -1595,41 +1595,41 @@ filterend:
  * Call a shell to execute a command.
  * When "cmd" is NULL start an interactive shell.
  */
-    void
+    فراغ
 do_shell(
     char_u	*cmd,
-    int		flags)	// may be SHELL_DOOUT when output is redirected
+    صحيح		flags)	// may be SHELL_DOOUT when output is redirected
 {
     buf_T	*buf;
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    int		save_nwr;
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    صحيح		save_nwr;
 #endif
 #ifdef MSWIN
-    int		winstart = FALSE;
+    صحيح		winstart = FALSE;
 #endif
-    int		keep_termcap = !termcap_active;
+    صحيح		keep_termcap = !termcap_active;
 
     /*
      * Disallow shell commands for "rvim".
      * Disallow shell commands from .exrc and .vimrc in current directory for
      * security reasons.
      */
-    if (check_restricted() || check_secure())
+    إذا (check_restricted() || check_secure())
     {
-	msg_end();
-	return;
+	رسالة_end();
+	إرجاع;
     }
 
 #ifdef MSWIN
     /*
      * Check if ":!start" is used.  This implies not stopping termcap mode.
      */
-    if (cmd != NULL)
+    إذا (cmd != عدم)
 	keep_termcap = winstart = (STRNICMP(cmd, "start ", 6) == 0);
 
-# if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+# إذا defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // Don't stop termcap mode when using a terminal window for the shell.
-    if (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL)
+    إذا (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != عدم)
 	keep_termcap = TRUE;
 # endif
 #endif
@@ -1638,40 +1638,40 @@ do_shell(
      * For autocommands we want to get the output on the current screen, to
      * avoid having to type return below.
      */
-    msg_putchar('\r');			// put cursor at start of line
-    if (!autocmd_busy)
+    رسالة_putchar('\r');			// put cursor at start of line
+    إذا (!autocmd_busy)
     {
-	if (!keep_termcap)
+	إذا (!keep_termcap)
 	    stoptermcap();
     }
 #ifdef MSWIN
-    if (!winstart)
+    إذا (!winstart)
 #endif
-	msg_putchar('\n');		// may shift screen one line up
+	رسالة_putchar('\n');		// may shift screen one line up
 
     // warning message before calling the shell
-    if (p_warn && !autocmd_busy && msg_silent == 0)
+    إذا (p_warn && !autocmd_busy && رسالة_silent == 0)
 	FOR_ALL_BUFFERS(buf)
-	    if (bufIsChangedNotTerm(buf))
+	    إذا (bufIsChangedNotTerm(buf))
 	    {
 #ifdef FEAT_GUI_MSWIN
-		if (!keep_termcap)
+		إذا (!keep_termcap)
 		    starttermcap();	// don't want a message box here
 #endif
-		msg_puts(_("[No write since last change]\n"));
+		رسالة_puts(_("[No write since last change]\n"));
 #ifdef FEAT_GUI_MSWIN
-		if (!keep_termcap)
+		إذا (!keep_termcap)
 		    stoptermcap();
 #endif
-		break;
+		اكسر;
 	    }
 
     // This windgoto is required for when the '\n' resulted in a "delete line
     // 1" command to the terminal.
-    if (!swapping_screen())
-	windgoto(msg_row, cmdline_col_off + msg_col);
+    إذا (!swapping_screen())
+	windgoto(رسالة_row, cmdline_col_off + رسالة_col);
     cursor_on();
-    (void)call_shell(cmd, SHELL_COOKED | flags);
+    (فراغ)call_shell(cmd, SHELL_COOKED | flags);
     did_check_timestamps = FALSE;
     need_check_timestamps = TRUE;
 
@@ -1679,18 +1679,18 @@ do_shell(
      * put the message cursor at the end of the screen, avoids wait_return()
      * to overwrite the text that the external command showed
      */
-    if (!swapping_screen())
+    إذا (!swapping_screen())
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	رسالة_row = Rows - 1;
+	رسالة_col = 0;
     }
 
-    if (autocmd_busy)
+    إذا (autocmd_busy)
     {
-	if (msg_silent == 0)
+	إذا (رسالة_silent == 0)
 	    redraw_later_clear();
     }
-    else
+    وإلا
     {
 	/*
 	 * For ":sh" there is no need to call wait_return(), just redraw.
@@ -1698,40 +1698,40 @@ do_shell(
 	 * Otherwise there is probably text on the screen that the user wants
 	 * to read before redrawing, so call wait_return().
 	 */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-	if (!gui.in_use)
+	إذا (!gui.in_use)
 # endif
 	{
-	    if (cmd == NULL
+	    إذا (cmd == عدم
 # ifdef MSWIN
 		    || (keep_termcap && !need_wait_return)
 # endif
 	       )
 	    {
-		if (msg_silent == 0)
+		إذا (رسالة_silent == 0)
 		    redraw_later_clear();
 		need_wait_return = FALSE;
 	    }
-	    else
+	    وإلا
 	    {
 		/*
 		 * If we switch screens when starttermcap() is called, we
 		 * really want to wait for "hit return to continue".
 		 */
 		save_nwr = no_wait_return;
-		if (swapping_screen())
+		إذا (swapping_screen())
 		    no_wait_return = FALSE;
 		// ":silent" leaves the output of the command on the screen,
 		// except where it cannot be seen there anyway.
-		int redraw = msg_silent == 0 || swapping_screen();
+		صحيح redraw = رسالة_silent == 0 || swapping_screen();
 # ifdef FEAT_GUI
-		if (gui.in_use)
+		إذا (gui.in_use)
 		    redraw = TRUE;
 # endif
 # ifdef AMIGA
 		wait_return(term_console ? -1 : redraw); // see below
-# else
+# وإلا
 		wait_return(redraw);
 # endif
 		no_wait_return = save_nwr;
@@ -1739,7 +1739,7 @@ do_shell(
 	}
 #endif // FEAT_GUI_MSWIN
 
-	if (!keep_termcap)	// if keep_termcap is TRUE didn't stop termcap
+	إذا (!keep_termcap)	// if keep_termcap is TRUE didn't stop termcap
 	    starttermcap();	// start termcap if not done by wait_return()
 
 	/*
@@ -1750,17 +1750,17 @@ do_shell(
 	 * but it saves an extra redraw.
 	 */
 #ifdef AMIGA
-	if (skip_redraw)		// ':' hit in wait_return()
+	إذا (skip_redraw)		// ':' hit in wait_return()
 	{
-	    if (msg_silent == 0)
+	    إذا (رسالة_silent == 0)
 		redraw_later_clear();
 	}
-	else if (term_console)
+	وإلا إذا (term_console)
 	{
 	    OUT_STR("\033[0 q");	// get window size
-	    if (got_int && msg_silent == 0)
+	    إذا (got_int && رسالة_silent == 0)
 		redraw_later_clear();	// if got_int is TRUE, redraw needed
-	    else
+	    وإلا
 		must_redraw = 0;	// no extra redraw needed
 	}
 #endif
@@ -1769,26 +1769,26 @@ do_shell(
     // display any error messages now
     display_errors();
 
-    apply_autocmds(EVENT_SHELLCMDPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_SHELLCMDPOST, عدم, عدم, FALSE, curbuf);
 }
 
-#if !defined(UNIX)
-    static char_u *
+#إذا !defined(UNIX)
+    ساكن char_u *
 find_pipe(char_u *cmd)
 {
     char_u  *p;
-    int	    inquote = FALSE;
+    صحيح	    inquote = FALSE;
 
-    for (p = cmd; *p != NUL; ++p)
+    لكل (p = cmd; *p != NUL; ++p)
     {
-	if (!inquote && *p == '|')
-	    return p;
-	if (*p == '"')
+	إذا (!inquote && *p == '|')
+	    إرجاع p;
+	إذا (*p == '"')
 	    inquote = !inquote;
-	else if (rem_backslash(p))
+	وإلا إذا (rem_backslash(p))
 	    ++p;
     }
-    return NULL;
+    إرجاع عدم;
 }
 #endif
 
@@ -1805,21 +1805,21 @@ make_filter_cmd(
 {
     char_u	*buf;
     long_u	len;
-    int		is_powershell = FALSE;
+    صحيح		is_powershell = FALSE;
 #ifdef UNIX
-    int		is_fish_shell;
+    صحيح		is_fish_shell;
 #endif
 
     char_u *shell_name = get_isolated_shell_name();
-    if (shell_name == NULL)
-	return NULL;
+    إذا (shell_name == عدم)
+	إرجاع عدم;
 
-#if defined(UNIX)
+#إذا defined(UNIX)
     // Account for fish's different syntax for subshells
     is_fish_shell = fnamecmp(shell_name, "fish") == 0;
-    if (is_fish_shell)
+    إذا (is_fish_shell)
 	len = (long_u)STRLEN(cmd) + 13;		// "begin; " + "; end" + NUL
-    else
+    وإلا
 #endif
     {
 	is_powershell = (shell_name[0] == 'p')
@@ -1827,93 +1827,93 @@ make_filter_cmd(
 				|| fnamecmp(shell_name, "powershell.exe") == 0
 				|| fnamecmp(shell_name, "pwsh") == 0
 				|| fnamecmp(shell_name, "pwsh.exe") == 0);
-	if (is_powershell)
+	إذا (is_powershell)
 	    len = (long_u)STRLEN(cmd) + 7; // "& { " + " }" + NUL
-	else
+	وإلا
 	    len = (long_u)STRLEN(cmd) + 3; // "()" + NUL
     }
 
-    if (itmp != NULL)
+    إذا (itmp != عدم)
     {
-	if (is_powershell)
+	إذا (is_powershell)
 	    // "Get-Content " + " | & "
 	    len += (long_u)STRLEN(itmp) + 17;
-	else
+	وإلا
 	    len += (long_u)STRLEN(itmp) + 9;	// " { < " + " } "
     }
-    if (otmp != NULL)
+    إذا (otmp != عدم)
 	len += (long_u)STRLEN(otmp) + (long_u)STRLEN(p_srr) + 2; // "  "
 
     vim_free(shell_name);
 
     buf = alloc(len);
-    if (buf == NULL)
-	return NULL;
+    إذا (buf == عدم)
+	إرجاع عدم;
 
-    if (is_powershell)
+    إذا (is_powershell)
     {
-	if (itmp != NULL)
-	    vim_snprintf((char *)buf, len, "& { Get-Content %s | & %s }",
+	إذا (itmp != عدم)
+	    vim_snprintf((حرف *)buf, len, "& { Get-Content %s | & %s }",
 								itmp, cmd);
-	else
-	    vim_snprintf((char *)buf, len, "& { %s }", cmd);
+	وإلا
+	    vim_snprintf((حرف *)buf, len, "& { %s }", cmd);
     }
-    else
+    وإلا
     {
-#if defined(UNIX)
+#إذا defined(UNIX)
 	// Put braces around the command (for concatenated commands) when
 	// redirecting input and/or output.
-	if (itmp != NULL || otmp != NULL)
+	إذا (itmp != عدم || otmp != عدم)
 	{
-	    if (is_fish_shell)
-		vim_snprintf((char *)buf, len, "begin; %s; end", (char *)cmd);
-	    else
-		vim_snprintf((char *)buf, len, "(%s)", (char *)cmd);
+	    إذا (is_fish_shell)
+		vim_snprintf((حرف *)buf, len, "begin; %s; end", (حرف *)cmd);
+	    وإلا
+		vim_snprintf((حرف *)buf, len, "(%s)", (حرف *)cmd);
 	}
-	else
+	وإلا
 	    STRCPY(buf, cmd);
-	if (itmp != NULL)
+	إذا (itmp != عدم)
 	{
 	    STRCAT(buf, " < ");
 	    STRCAT(buf, itmp);
 	}
-#else
+#وإلا
 	// For shells that don't understand braces around commands, at least
 	// allow the use of commands in a pipe.
-	if (*p_sxe != NUL && *p_sxq == '(')
+	إذا (*p_sxe != NUL && *p_sxq == '(')
 	{
-	    if (itmp != NULL || otmp != NULL)
-		vim_snprintf((char *)buf, len, "(%s)", (char *)cmd);
-	    else
+	    إذا (itmp != عدم || otmp != عدم)
+		vim_snprintf((حرف *)buf, len, "(%s)", (حرف *)cmd);
+	    وإلا
 		STRCPY(buf, cmd);
-	    if (itmp != NULL)
+	    إذا (itmp != عدم)
 	    {
 		STRCAT(buf, " < ");
 		STRCAT(buf, itmp);
 	    }
 	}
-	else
+	وإلا
 	{
 	    STRCPY(buf, cmd);
-	    if (itmp != NULL)
+	    إذا (itmp != عدم)
 	    {
 		char_u	*p;
 
 		// If there is a pipe, we have to put the '<' in front of it.
 		// Don't do this when 'shellquote' is not empty, otherwise the
 		// redirection would be inside the quotes.
-		if (*p_shq == NUL)
+		إذا (*p_shq == NUL)
 		{
 		    p = find_pipe(buf);
-		    if (p != NULL)
+		    إذا (p != عدم)
 			*p = NUL;
 		}
 		STRCAT(buf, " <");	// " < " causes problems on Amiga
 		STRCAT(buf, itmp);
-		if (*p_shq == NUL)
+		إذا (*p_shq == NUL)
 		{
 		    p = find_pipe(cmd);
-		    if (p != NULL)
+		    إذا (p != عدم)
 		    {
 			// insert a space before the '|' for DOS
 			STRCAT(buf, " ");
@@ -1924,10 +1924,10 @@ make_filter_cmd(
 	}
 #endif
     }
-    if (otmp != NULL)
-	append_redir(buf, (int)len, p_srr, otmp);
+    إذا (otmp != عدم)
+	append_redir(buf, (صحيح)len, p_srr, otmp);
 
-    return buf;
+    إرجاع buf;
 }
 
 /*
@@ -1937,10 +1937,10 @@ make_filter_cmd(
  * The caller should make sure that there is enough room:
  *	STRLEN(opt) + STRLEN(fname) + 3
  */
-    void
+    فراغ
 append_redir(
     char_u	*buf,
-    int		buflen,
+    صحيح		buflen,
     char_u	*opt,
     char_u	*fname)
 {
@@ -1949,24 +1949,24 @@ append_redir(
 
     end = buf + STRLEN(buf);
     // find "%s"
-    for (p = opt; (p = vim_strchr(p, '%')) != NULL; ++p)
+    لكل (p = opt; (p = vim_strchr(p, '%')) != عدم; ++p)
     {
-	if (p[1] == 's') // found %s
-	    break;
-	if (p[1] == '%') // skip %%
+	إذا (p[1] == 's') // found %s
+	    اكسر;
+	إذا (p[1] == '%') // skip %%
 	    ++p;
     }
-    if (p != NULL)
+    إذا (p != عدم)
     {
 #ifdef MSWIN
 	*end++ = ' '; // not really needed? Not with sh, ksh or bash
 #endif
-	vim_snprintf((char *)end, (size_t)(buflen - (end - buf)),
-						  (char *)opt, (char *)fname);
+	vim_snprintf((حرف *)end, (size_t)(buflen - (end - buf)),
+						  (حرف *)opt, (حرف *)fname);
     }
-    else
-	vim_snprintf((char *)end, (size_t)(buflen - (end - buf)), " %s %s",
-		(char *)opt, (char *)fname);
+    وإلا
+	vim_snprintf((حرف *)end, (size_t)(buflen - (end - buf)), " %s %s",
+		(حرف *)opt, (حرف *)fname);
 }
 
 /*
@@ -1975,52 +1975,52 @@ append_redir(
  *   ^?		^H
  * not ^?	^?
  */
-    void
+    فراغ
 do_fixdel(exarg_T *eap UNUSED)
 {
     char_u  *p;
 
     p = find_termcode((char_u *)"kb");
-    add_termcode((char_u *)"kD", p != NULL
+    add_termcode((char_u *)"kD", p != عدم
 	    && *p == DEL ? (char_u *)CTRL_H_STR : DEL_STR, FALSE);
 }
 
-    void
-print_line_no_prefix(
+    فراغ
+print_سطر_no_prefix(
     linenr_T	lnum,
-    int		use_number,
-    int		list)
+    صحيح		use_العدد,
+    صحيح		list)
 {
-    char	numbuf[30];
+    حرف	numbuf[30];
 
-    if (curwin->w_p_nu || use_number)
+    إذا (curwin->w_p_nu || use_العدد)
     {
-	vim_snprintf(numbuf, sizeof(numbuf),
-				   "%*ld ", number_width(curwin), (long)lnum);
-	msg_puts_attr(numbuf, HL_ATTR(HLF_N));	// Highlight line nrs
+	vim_snprintf(numbuf, حجم(numbuf),
+				   "%*ld ", العدد_width(curwin), (long)lnum);
+	رسالة_puts_attr(numbuf, HL_ATTR(HLF_N));	// Highlight line nrs
     }
-    msg_prt_line(ml_get(lnum), list);
+    رسالة_prt_سطر(ml_get(lnum), list);
 }
 
 /*
  * Print a text line.  Also in silent mode ("ex -s").
  */
-    void
-print_line(linenr_T lnum, int use_number, int list)
+    فراغ
+print_سطر(linenr_T lnum, صحيح use_العدد, صحيح list)
 {
-    int		save_silent = silent_mode;
+    صحيح		save_silent = silent_mode;
 
     // apply :filter /pat/
-    if (message_filtered(ml_get(lnum)))
-	return;
+    إذا (message_filtered(ml_get(lnum)))
+	إرجاع;
 
-    msg_start();
+    رسالة_start();
     silent_mode = FALSE;
     info_message = TRUE;	// use mch_msg(), not mch_errmsg()
-    print_line_no_prefix(lnum, use_number, list);
-    if (save_silent)
+    print_سطر_no_prefix(lnum, use_العدد, list);
+    إذا (save_silent)
     {
-	msg_putchar('\n');
+	رسالة_putchar('\n');
 	cursor_on();		// msg_start() switches it off
 	out_flush();
 	silent_mode = save_silent;
@@ -2028,20 +2028,20 @@ print_line(linenr_T lnum, int use_number, int list)
     info_message = FALSE;
 }
 
-    int
+    صحيح
 rename_buffer(char_u *new_fname)
 {
     char_u	*fname, *sfname, *xfname;
     buf_T	*buf;
 
     buf = curbuf;
-    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPRE, عدم, عدم, FALSE, curbuf);
     // buffer changed, don't change name now
-    if (buf != curbuf)
-	return FAIL;
+    إذا (buf != curbuf)
+	إرجاع FAIL;
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+    إذا (aborting())	    // autocmds may abort script processing
+	إرجاع FAIL;
 #endif
     /*
      * The name of the current buffer will be changed.
@@ -2053,101 +2053,101 @@ rename_buffer(char_u *new_fname)
     fname = curbuf->b_ffname;
     sfname = curbuf->b_sfname;
     xfname = curbuf->b_fname;
-    curbuf->b_ffname = NULL;
-    curbuf->b_sfname = NULL;
-    if (setfname(curbuf, new_fname, NULL, TRUE) == FAIL)
+    curbuf->b_ffname = عدم;
+    curbuf->b_sfname = عدم;
+    إذا (setfname(curbuf, new_fname, عدم, TRUE) == FAIL)
     {
 	curbuf->b_ffname = fname;
 	curbuf->b_sfname = sfname;
-	return FAIL;
+	إرجاع FAIL;
     }
     curbuf->b_flags |= BF_NOTEDITED;
-    if (xfname != NULL && *xfname != NUL)
+    إذا (xfname != عدم && *xfname != NUL)
     {
 	buf = buflist_new(fname, xfname, curwin->w_cursor.lnum, 0);
-	if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+	إذا (buf != عدم && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	    curwin->w_alt_fnum = buf->b_fnum;
     }
     vim_free(fname);
     vim_free(sfname);
-    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPOST, عدم, عدم, FALSE, curbuf);
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
-    return OK;
+    إرجاع OK;
 }
 
 /*
  * ":file[!] [fname]".
  */
-    void
+    فراغ
 ex_file(exarg_T *eap)
 {
     // ":0file" removes the file name.  Check for illegal uses ":3file",
     // "0file name", etc.
-    if (eap->addr_count > 0
+    إذا (eap->addr_تعداد > 0
 	    && (*eap->arg != NUL
 		|| eap->line2 > 0
-		|| eap->addr_count > 1))
+		|| eap->addr_تعداد > 1))
     {
 	emsg(_(e_invalid_argument));
-	return;
+	إرجاع;
     }
 
-    if (*eap->arg != NUL || eap->addr_count == 1)
+    إذا (*eap->arg != NUL || eap->addr_تعداد == 1)
     {
-	if (rename_buffer(eap->arg) == FAIL)
-	    return;
+	إذا (rename_buffer(eap->arg) == FAIL)
+	    إرجاع;
 	redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
 	redraw_tabpanel = TRUE;
 #endif
     }
 
     // print file name if no argument or 'F' is not in 'shortmess'
-    if (*eap->arg == NUL || !shortmess(SHM_FILEINFO))
+    إذا (*eap->arg == NUL || !shortmess(SHM_FILEINFO))
 	fileinfo(FALSE, FALSE, eap->forceit);
 }
 
 /*
  * ":update".
  */
-    void
+    فراغ
 ex_update(exarg_T *eap)
 {
-    if (curbufIsChanged())
-	(void)do_write(eap);
+    إذا (curbufIsChanged())
+	(فراغ)do_write(eap);
 }
 
 /*
  * ":write" and ":saveas".
  */
-    void
+    فراغ
 ex_write(exarg_T *eap)
 {
-    if (eap->cmdidx == CMD_saveas)
+    إذا (eap->cmdidx == CMD_saveas)
     {
 	// :saveas does not take a range, uses all lines.
 	eap->line1 = 1;
-	eap->line2 = curbuf->b_ml.ml_line_count;
+	eap->line2 = curbuf->b_ml.ml_سطر_تعداد;
     }
 
-    if (eap->usefilter)		// input lines to shell command
+    إذا (eap->usefilter)		// input lines to shell command
 	do_bang(1, eap, FALSE, TRUE, FALSE);
-    else
-	(void)do_write(eap);
+    وإلا
+	(فراغ)do_write(eap);
 }
 
 #ifdef UNIX
-    static int
+    ساكن صحيح
 check_writable(char_u *fname)
 {
-    if (mch_nodetype(fname) == NODE_OTHER)
+    إذا (mch_nodetype(fname) == عقدة_OTHER)
     {
 	semsg(_(e_str_is_not_file_or_writable_device), fname);
-	return FAIL;
+	إرجاع FAIL;
     }
-    return OK;
+    إرجاع OK;
 }
 #endif
 
@@ -2159,44 +2159,44 @@ check_writable(char_u *fname)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    صحيح
 do_write(exarg_T *eap)
 {
-    int		other;
-    char_u	*fname = NULL;		// init to shut up gcc
+    صحيح		other;
+    char_u	*fname = عدم;		// init to shut up gcc
     char_u	*ffname;
-    int		retval = FAIL;
-    char_u	*free_fname = NULL;
+    صحيح		retval = FAIL;
+    char_u	*free_fname = عدم;
 #ifdef FEAT_BROWSE
-    char_u	*browse_file = NULL;
+    char_u	*browse_file = عدم;
 #endif
-    buf_T	*alt_buf = NULL;
-    int		name_was_missing;
+    buf_T	*alt_buf = عدم;
+    صحيح		name_was_missing;
 
-    if (not_writing())		// check 'write' option
-	return FAIL;
+    إذا (not_writing())		// check 'write' option
+	إرجاع FAIL;
 
     ffname = eap->arg;
 #ifdef FEAT_BROWSE
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
+    إذا ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
     {
 	browse_file = do_browse(BROWSE_SAVE, (char_u *)_("Save As"), ffname,
-						    NULL, NULL, NULL, curbuf);
-	if (browse_file == NULL)
-	    goto theend;
+						    عدم, عدم, عدم, curbuf);
+	إذا (browse_file == عدم)
+	    اذهب theend;
 	ffname = browse_file;
     }
 #endif
-    if (*ffname == NUL)
+    إذا (*ffname == NUL)
     {
-	if (eap->cmdidx == CMD_saveas)
+	إذا (eap->cmdidx == CMD_saveas)
 	{
 	    emsg(_(e_argument_required));
-	    goto theend;
+	    اذهب theend;
 	}
 	other = FALSE;
     }
-    else
+    وإلا
     {
 	fname = ffname;
 	free_fname = fix_fname(ffname);
@@ -2204,7 +2204,7 @@ do_write(exarg_T *eap)
 	 * When out-of-memory, keep unexpanded file name, because we MUST be
 	 * able to write the file in this situation.
 	 */
-	if (free_fname != NULL)
+	إذا (free_fname != عدم)
 	    ffname = free_fname;
 	other = otherfile(ffname);
     }
@@ -2212,19 +2212,19 @@ do_write(exarg_T *eap)
     /*
      * If we have a new file, put its name in the list of alternate file names.
      */
-    if (other)
+    إذا (other)
     {
-	if (vim_strchr(p_cpo, CPO_ALTWRITE) != NULL
+	إذا (vim_strchr(p_cpo, CPO_ALTWRITE) != عدم
 						 || eap->cmdidx == CMD_saveas)
 	    alt_buf = setaltfname(ffname, fname, (linenr_T)1);
-	else
+	وإلا
 	    alt_buf = buflist_findname(ffname);
-	if (alt_buf != NULL && alt_buf->b_ml.ml_mfp != NULL)
+	إذا (alt_buf != عدم && alt_buf->b_ml.ml_mfp != عدم)
 	{
 	    // Overwriting a file that is loaded in another buffer is not a
 	    // good idea.
 	    emsg(_(e_file_is_loaded_in_another_buffer));
-	    goto theend;
+	    اذهب theend;
 	}
     }
 
@@ -2233,60 +2233,60 @@ do_write(exarg_T *eap)
      * and a file name is required.
      * "nofile" and "nowrite" buffers cannot be written implicitly either.
      */
-    if (!other && (bt_dontwrite_msg(curbuf) || check_fname() == FAIL
+    إذا (!other && (bt_dontwrite_رسالة(curbuf) || check_fname() == FAIL
 #ifdef UNIX
 		|| check_writable(curbuf->b_ffname) == FAIL
 #endif
 		|| check_readonly(&eap->forceit, curbuf)))
-	goto theend;
+	اذهب theend;
 
-    if (!other)
+    إذا (!other)
     {
 	ffname = curbuf->b_ffname;
 	fname = curbuf->b_fname;
 	/*
 	 * Not writing the whole file is only allowed with '!'.
 	 */
-	if (	   (eap->line1 != 1
-		    || eap->line2 != curbuf->b_ml.ml_line_count)
+	إذا (	   (eap->line1 != 1
+		    || eap->line2 != curbuf->b_ml.ml_سطر_تعداد)
 		&& !eap->forceit
 		&& !eap->append
 		&& !p_wa)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    إذا (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 	    {
-		if (vim_dialog_yesno(VIM_QUESTION, NULL,
+		إذا (vim_dialog_yesno(VIM_QUESTION, عدم,
 			       (char_u *)_("Write partial file?"), 2) != VIM_YES)
-		    goto theend;
+		    اذهب theend;
 		eap->forceit = TRUE;
 	    }
-	    else
+	    وإلا
 #endif
 	    {
 		emsg(_(e_use_bang_to_write_partial_buffer));
-		goto theend;
+		اذهب theend;
 	    }
 	}
     }
 
-    if (check_overwrite(eap, curbuf, fname, ffname, other) == OK)
+    إذا (check_overwrite(eap, curbuf, fname, ffname, other) == OK)
     {
-	if (eap->cmdidx == CMD_saveas && alt_buf != NULL)
+	إذا (eap->cmdidx == CMD_saveas && alt_buf != عدم)
 	{
 	    buf_T	*was_curbuf = curbuf;
 
-	    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
-	    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, alt_buf);
+	    apply_autocmds(EVENT_BUFFILEPRE, عدم, عدم, FALSE, curbuf);
+	    apply_autocmds(EVENT_BUFFILEPRE, عدم, عدم, FALSE, alt_buf);
 #ifdef FEAT_EVAL
-	    if (curbuf != was_curbuf || aborting())
-#else
-	    if (curbuf != was_curbuf)
+	    إذا (curbuf != was_curbuf || aborting())
+#وإلا
+	    إذا (curbuf != was_curbuf)
 #endif
 	    {
 		// buffer changed, don't change name now
 		retval = FAIL;
-		goto theend;
+		اذهب theend;
 	    }
 	    // Exchange the file names for the current and the alternate
 	    // buffer.  This makes it look like we are now editing the buffer
@@ -2304,30 +2304,30 @@ do_write(exarg_T *eap)
 	    curbuf->b_sfname = fname;
 	    buf_name_changed(curbuf);
 
-	    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
-	    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, alt_buf);
-	    if (!alt_buf->b_p_bl)
+	    apply_autocmds(EVENT_BUFFILEPOST, عدم, عدم, FALSE, curbuf);
+	    apply_autocmds(EVENT_BUFFILEPOST, عدم, عدم, FALSE, alt_buf);
+	    إذا (!alt_buf->b_p_bl)
 	    {
 		alt_buf->b_p_bl = TRUE;
-		apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, alt_buf);
+		apply_autocmds(EVENT_BUFADD, عدم, عدم, FALSE, alt_buf);
 	    }
 #ifdef FEAT_EVAL
-	    if (curbuf != was_curbuf || aborting())
-#else
-	    if (curbuf != was_curbuf)
+	    إذا (curbuf != was_curbuf || aborting())
+#وإلا
+	    إذا (curbuf != was_curbuf)
 #endif
 	    {
 		// buffer changed, don't write the file
 		retval = FAIL;
-		goto theend;
+		اذهب theend;
 	    }
 
 	    // If 'filetype' was empty try detecting it now.
-	    if (*curbuf->b_p_ft == NUL)
+	    إذا (*curbuf->b_p_ft == NUL)
 	    {
-		if (au_has_group((char_u *)"filetypedetect"))
-		    (void)do_doautocmd((char_u *)"filetypedetect BufRead",
-								  TRUE, NULL);
+		إذا (au_has_group((char_u *)"filetypedetect"))
+		    (فراغ)do_doautocmd((char_u *)"filetypedetect BufRead",
+								  TRUE, عدم);
 		do_modelines(0);
 	    }
 
@@ -2336,19 +2336,19 @@ do_write(exarg_T *eap)
 	    fname = curbuf->b_sfname;
 	}
 
-	name_was_missing = curbuf->b_ffname == NULL;
+	name_was_missing = curbuf->b_ffname == عدم;
 
 	retval = buf_write(curbuf, ffname, fname, eap->line1, eap->line2,
 				 eap, eap->append, eap->forceit, TRUE, FALSE);
 
 	// After ":saveas fname" reset 'readonly'.
-	if (eap->cmdidx == CMD_saveas)
+	إذا (eap->cmdidx == CMD_saveas)
 	{
-	    if (retval == OK)
+	    إذا (retval == OK)
 	    {
 		curbuf->b_p_ro = FALSE;
 		redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
 		redraw_tabpanel = TRUE;
 #endif
 	    }
@@ -2356,7 +2356,7 @@ do_write(exarg_T *eap)
 
 	// Change directories when the 'acd' option is set and the file name
 	// got changed or set.
-	if (eap->cmdidx == CMD_saveas || name_was_missing)
+	إذا (eap->cmdidx == CMD_saveas || name_was_missing)
 	    DO_AUTOCHDIR;
     }
 
@@ -2365,7 +2365,7 @@ theend:
     vim_free(browse_file);
 #endif
     vim_free(free_fname);
-    return retval;
+    إرجاع retval;
 }
 
 /*
@@ -2374,14 +2374,14 @@ theend:
  * May set eap->forceit if a dialog says it's OK to overwrite.
  * Return OK if it's OK, FAIL if it is not.
  */
-    int
+    صحيح
 check_overwrite(
     exarg_T	*eap,
     buf_T	*buf,
     char_u	*fname,	    // file name to be used (can differ from
 			    // buf->ffname)
     char_u	*ffname,    // full path version of fname
-    int		other)	    // writing under other name
+    صحيح		other)	    // writing under other name
 {
     /*
      * Write to another file or b_flags set or not writing the whole file:
@@ -2391,49 +2391,49 @@ check_overwrite(
      * buf_write() will only allow writing with BufWriteCmd autocommands,
      * so there is no need for an overwrite check.
      */
-    if (       (other
+    إذا (       (other
 		|| (!bt_nofilename(buf)
 		    && ((buf->b_flags & BF_NOTEDITED)
 			|| ((buf->b_flags & BF_NEW)
-			    && vim_strchr(p_cpo, CPO_OVERNEW) == NULL)
+			    && vim_strchr(p_cpo, CPO_OVERNEW) == عدم)
 			|| (buf->b_flags & BF_READERR))))
 	    && !p_wa
 	    && vim_fexists(ffname))
     {
-	if (!eap->forceit && !eap->append)
+	إذا (!eap->forceit && !eap->append)
 	{
 #ifdef UNIX
 	    // with UNIX it is possible to open a directory
-	    if (mch_isdir(ffname))
+	    إذا (mch_isdir(ffname))
 	    {
 		semsg(_(e_str_is_directory), ffname);
-		return FAIL;
+		إرجاع FAIL;
 	    }
 #endif
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    إذا (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 	    {
-		char_u	buff[DIALOG_MSG_SIZE];
+		char_u	buff[DIALOG_رسالة_SIZE];
 
-		dialog_msg(buff, _("Overwrite existing file \"%s\"?"), fname);
-		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) != VIM_YES)
-		    return FAIL;
+		dialog_رسالة(buff, _("Overwrite existing file \"%s\"?"), fname);
+		إذا (vim_dialog_yesno(VIM_QUESTION, عدم, buff, 2) != VIM_YES)
+		    إرجاع FAIL;
 		eap->forceit = TRUE;
 	    }
-	    else
+	    وإلا
 #endif
 	    {
 		emsg(_(e_file_exists));
-		return FAIL;
+		إرجاع FAIL;
 	    }
 	}
 
 	// For ":w! filename" check that no swap file exists for "filename".
-	if (other && !emsg_silent)
+	إذا (other && !emsg_silent)
 	{
 	    char_u	*dir;
 	    char_u	*p;
-	    int		r;
+	    صحيح		r;
 	    char_u	*swapname;
 
 	    // We only try the first entry in 'directory', without checking if
@@ -2441,112 +2441,112 @@ check_overwrite(
 	    // will probably fail anyway.
 	    // Use 'shortname' of the current buffer, since there is no buffer
 	    // for the written file.
-	    if (*p_dir == NUL)
+	    إذا (*p_dir == NUL)
 	    {
 		dir = alloc(5);
-		if (dir == NULL)
-		    return FAIL;
+		إذا (dir == عدم)
+		    إرجاع FAIL;
 		STRCPY(dir, ".");
 	    }
-	    else
+	    وإلا
 	    {
 		dir = alloc(MAXPATHL);
-		if (dir == NULL)
-		    return FAIL;
+		إذا (dir == عدم)
+		    إرجاع FAIL;
 		p = p_dir;
 		copy_option_part(&p, dir, MAXPATHL, ",");
 	    }
 	    swapname = makeswapname(fname, ffname, curbuf, dir);
 	    vim_free(dir);
 	    r = vim_fexists(swapname);
-	    if (r)
+	    إذا (r)
 	    {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-		if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+		إذا (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 		{
-		    char_u	buff[DIALOG_MSG_SIZE];
+		    char_u	buff[DIALOG_رسالة_SIZE];
 
-		    dialog_msg(buff,
+		    dialog_رسالة(buff,
 			    _("Swap file \"%s\" exists, overwrite anyway?"),
 								    swapname);
-		    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2)
+		    إذا (vim_dialog_yesno(VIM_QUESTION, عدم, buff, 2)
 								   != VIM_YES)
 		    {
 			vim_free(swapname);
-			return FAIL;
+			إرجاع FAIL;
 		    }
 		    eap->forceit = TRUE;
 		}
-		else
+		وإلا
 #endif
 		{
 		    semsg(_(e_swap_file_exists_str_silent_overrides), swapname);
 		    vim_free(swapname);
-		    return FAIL;
+		    إرجاع FAIL;
 		}
 	    }
 	    vim_free(swapname);
 	}
     }
-    return OK;
+    إرجاع OK;
 }
 
 /*
  * Handle ":wnext", ":wNext" and ":wprevious" commands.
  */
-    void
+    فراغ
 ex_wnext(exarg_T *eap)
 {
-    int		i;
+    صحيح		i;
 
-    if (eap->cmd[1] == 'n')
-	i = curwin->w_arg_idx + (int)eap->line2;
-    else
-	i = curwin->w_arg_idx - (int)eap->line2;
+    إذا (eap->cmd[1] == 'n')
+	i = curwin->w_arg_idx + (صحيح)eap->line2;
+    وإلا
+	i = curwin->w_arg_idx - (صحيح)eap->line2;
     eap->line1 = 1;
-    eap->line2 = curbuf->b_ml.ml_line_count;
-    if (do_write(eap) != FAIL)
+    eap->line2 = curbuf->b_ml.ml_سطر_تعداد;
+    إذا (do_write(eap) != FAIL)
 	do_argfile(eap, i);
 }
 
 /*
  * ":wall", ":wqall" and ":xall": Write all changed files (and exit).
  */
-    void
+    فراغ
 do_wqall(exarg_T *eap)
 {
     buf_T	*buf;
-    int		error = 0;
-    int		save_forceit = eap->forceit;
-    int		save_exiting = exiting;
+    صحيح		error = 0;
+    صحيح		save_forceit = eap->forceit;
+    صحيح		save_exiting = exiting;
 
-    if (eap->cmdidx == CMD_xall || eap->cmdidx == CMD_wqall)
+    إذا (eap->cmdidx == CMD_xall || eap->cmdidx == CMD_wqall)
     {
-	if (before_quit_all(eap) == FAIL)
-	    return;
+	إذا (before_quit_all(eap) == FAIL)
+	    إرجاع;
 	exiting = TRUE;
     }
 
     FOR_ALL_BUFFERS(buf)
     {
 #ifdef FEAT_TERMINAL
-	if (exiting && !eap->forceit && term_job_running(buf->b_term))
+	إذا (exiting && !eap->forceit && term_job_running(buf->b_term))
 	{
 	    bufref_T	bufref;
 
 	    set_bufref(&bufref, buf);
-	    if (term_try_stop_job(buf) == FAIL)
+	    إذا (term_try_stop_job(buf) == FAIL)
 	    {
 		no_write_message_buf(buf);
 		++error;
 	    }
 	    // Stopping the job may have freed the terminal buffer.
-	    else if (!bufref_valid(&bufref))
+	    وإلا إذا (!bufref_valid(&bufref))
 		buf = firstbuf;
 	}
-	else
+	وإلا
 #endif
-	if (bufIsChanged(buf) && !bt_dontwrite(buf))
+	إذا (bufIsChanged(buf) && !bt_dontwrite(buf))
 	{
 	    /*
 	     * Check if there is a reason the buffer cannot be written:
@@ -2555,44 +2555,44 @@ do_wqall(exarg_T *eap)
 	     * 3. if the 'readonly' is set (even after a dialog)
 	     * 4. if overwriting is allowed (even after a dialog)
 	     */
-	    if (not_writing())
+	    إذا (not_writing())
 	    {
 		++error;
-		break;
+		اكسر;
 	    }
 #ifdef FEAT_BROWSE
 	    // ":browse wall": ask for file name if there isn't one
-	    if (buf->b_ffname == NULL && (cmdmod.cmod_flags & CMOD_BROWSE))
+	    إذا (buf->b_ffname == عدم && (cmdmod.cmod_flags & CMOD_BROWSE))
 		browse_save_fname(buf);
 #endif
-	    if (buf->b_ffname == NULL)
+	    إذا (buf->b_ffname == عدم)
 	    {
 		semsg(_(e_no_file_name_for_buffer_nr), (long)buf->b_fnum);
 		++error;
 	    }
-	    else if (check_readonly(&eap->forceit, buf)
+	    وإلا إذا (check_readonly(&eap->forceit, buf)
 		    || check_overwrite(eap, buf, buf->b_fname, buf->b_ffname,
 							       FALSE) == FAIL)
 	    {
 		++error;
 	    }
-	    else
+	    وإلا
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
-		if (buf_write_all(buf, eap->forceit) == FAIL)
+		إذا (buf_write_all(buf, eap->forceit) == FAIL)
 		    ++error;
 		// an autocommand may have deleted the buffer
-		if (!bufref_valid(&bufref))
+		إذا (!bufref_valid(&bufref))
 		    buf = firstbuf;
 	    }
 	    eap->forceit = save_forceit;    // check_overwrite() may set it
 	}
     }
-    if (exiting)
+    إذا (exiting)
     {
-	if (!error)
+	إذا (!error)
 	    getout(0);		// exit Vim
 	not_exiting(save_exiting);
     }
@@ -2602,13 +2602,13 @@ do_wqall(exarg_T *eap)
  * Check the 'write' option.
  * Return TRUE and give a message when it's not set.
  */
-    static int
-not_writing(void)
+    ساكن صحيح
+not_writing(فراغ)
 {
-    if (p_write)
-	return FALSE;
+    إذا (p_write)
+	إرجاع FALSE;
     emsg(_(e_file_not_written_writing_is_disabled_by_write_option));
-    return TRUE;
+    إرجاع TRUE;
 }
 
 /*
@@ -2616,8 +2616,8 @@ not_writing(void)
  * read-only). Ask for overruling in a dialog. Return TRUE and give an error
  * message when the buffer is readonly.
  */
-    static int
-check_readonly(int *forceit, buf_T *buf)
+    ساكن صحيح
+check_readonly(صحيح *forceit, buf_T *buf)
 {
     stat_T	st;
 
@@ -2625,42 +2625,42 @@ check_readonly(int *forceit, buf_T *buf)
     // the file exists and permissions are read-only.
     // We will send 0777 to check_file_readonly(), as the "perm" variable is
     // important for device checks but not here.
-    if (!*forceit && (buf->b_p_ro
-		|| (mch_stat((char *)buf->b_ffname, &st) >= 0
+    إذا (!*forceit && (buf->b_p_ro
+		|| (mch_stat((حرف *)buf->b_ffname, &st) >= 0
 		    && check_file_readonly(buf->b_ffname, 0777))))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
-						       && buf->b_fname != NULL)
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	إذا ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+						       && buf->b_fname != عدم)
 	{
-	    char_u	buff[DIALOG_MSG_SIZE];
+	    char_u	buff[DIALOG_رسالة_SIZE];
 
-	    if (buf->b_p_ro)
-		dialog_msg(buff, _("'readonly' option is set for \"%s\".\nDo you wish to write anyway?"),
+	    إذا (buf->b_p_ro)
+		dialog_رسالة(buff, _("'readonly' option is set for \"%s\".\nDo you wish to write anyway?"),
 		    buf->b_fname);
-	    else
-		dialog_msg(buff, _("File permissions of \"%s\" are read-only.\nIt may still be possible to write it.\nDo you wish to try?"),
+	    وإلا
+		dialog_رسالة(buff, _("File permissions of \"%s\" are read-only.\nIt may still be possible to write it.\nDo you wish to try?"),
 		    buf->b_fname);
 
-	    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) == VIM_YES)
+	    إذا (vim_dialog_yesno(VIM_QUESTION, عدم, buff, 2) == VIM_YES)
 	    {
 		// Set forceit, to force the writing of a readonly file
 		*forceit = TRUE;
-		return FALSE;
+		إرجاع FALSE;
 	    }
-	    else
-		return TRUE;
+	    وإلا
+		إرجاع TRUE;
 	}
-	else
+	وإلا
 #endif
-	if (buf->b_p_ro)
+	إذا (buf->b_p_ro)
 	    emsg(_(e_readonly_option_is_set_add_bang_to_override));
-	else
+	وإلا
 	    semsg(_(e_str_is_read_only_add_bang_to_override), buf->b_fname);
-	return TRUE;
+	إرجاع TRUE;
     }
 
-    return FALSE;
+    إرجاع FALSE;
 }
 
 /*
@@ -2674,78 +2674,78 @@ check_readonly(int *forceit, buf_T *buf)
  * GETFILE_SAME_FILE for success
  * GETFILE_OPEN_OTHER for successfully opening another file.
  */
-    int
+    صحيح
 getfile(
-    int		fnum,
+    صحيح		fnum,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		setpm,
+    صحيح		setpm,
     linenr_T	lnum,
-    int		forceit)
+    صحيح		forceit)
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    int		other;
-    int		retval;
-    char_u	*free_me = NULL;
+    صحيح		other;
+    صحيح		retval;
+    char_u	*free_me = عدم;
 
-    if (!check_can_set_curbuf_forceit(forceit))
-	return GETFILE_ERROR;
+    إذا (!check_can_set_curbuf_forceit(forceit))
+	إرجاع GETFILE_ERROR;
 
-    if (text_locked())
-	return GETFILE_ERROR;
-    if (curbuf_locked())
-	return GETFILE_ERROR;
+    إذا (text_locked())
+	إرجاع GETFILE_ERROR;
+    إذا (curbuf_locked())
+	إرجاع GETFILE_ERROR;
 
-    if (fnum == 0)
+    إذا (fnum == 0)
     {
 					// make ffname full path, set sfname
 	fname_expand(curbuf, &ffname, &sfname);
 	other = otherfile(ffname);
 	free_me = ffname;		// has been allocated, free() later
     }
-    else
+    وإلا
 	other = (fnum != curbuf->b_fnum);
 
-    if (other)
+    إذا (other)
 	++no_wait_return;	    // don't wait for autowrite message
-    if (other && !forceit && curbuf->b_nwindows == 1 && !buf_hide(curbuf)
+    إذا (other && !forceit && curbuf->b_nwindows == 1 && !buf_hide(curbuf)
 		   && curbufIsChanged() && autowrite(curbuf, forceit) == FAIL)
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if (p_confirm && p_write)
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	إذا (p_confirm && p_write)
 	    dialog_changed(curbuf, FALSE);
-	if (curbufIsChanged())
+	إذا (curbufIsChanged())
 #endif
 	{
 	    --no_wait_return;
 	    no_write_message();
 	    retval = GETFILE_NOT_WRITTEN;	// file has been changed
-	    goto theend;
+	    اذهب theend;
 	}
     }
-    if (other)
+    إذا (other)
 	--no_wait_return;
-    if (setpm)
+    إذا (setpm)
 	setpcmark();
-    if (!other)
+    إذا (!other)
     {
-	if (lnum != 0)
+	إذا (lnum != 0)
 	    curwin->w_cursor.lnum = lnum;
 	check_cursor_lnum();
 	beginline(BL_SOL | BL_FIX);
 	retval = GETFILE_SAME_FILE;	// it's in the same file
     }
-    else if (do_ecmd(fnum, ffname, sfname, NULL, lnum,
+    وإلا إذا (do_ecmd(fnum, ffname, sfname, عدم, lnum,
 	     (buf_hide(curbuf) ? ECMD_HIDE : 0) + (forceit ? ECMD_FORCEIT : 0),
 		curwin) == OK)
 	retval = GETFILE_OPEN_OTHER;	// opened another file
-    else
+    وإلا
 	retval = GETFILE_ERROR;		// error encountered
 
 theend:
     vim_free(free_me);
-    return retval;
+    إرجاع retval;
 }
 
 /*
@@ -2779,68 +2779,68 @@ theend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحيح
 do_ecmd(
-    int		fnum,
+    صحيح		fnum,
     char_u	*ffname,
     char_u	*sfname,
     exarg_T	*eap,			// can be NULL!
     linenr_T	newlnum,
-    int		flags,
+    صحيح		flags,
     win_T	*oldwin)
 {
-    int		other_file;		// TRUE if editing another file
-    int		oldbuf;			// TRUE if using existing buffer
-    int		auto_buf = FALSE;	// TRUE if autocommands brought us
+    صحيح		other_file;		// TRUE if editing another file
+    صحيح		oldbuf;			// TRUE if using existing buffer
+    صحيح		auto_buf = FALSE;	// TRUE if autocommands brought us
 					// into the buffer unexpectedly
-    char_u	*new_name = NULL;
-#if defined(FEAT_EVAL)
-    int		did_set_swapcommand = FALSE;
+    char_u	*new_name = عدم;
+#إذا defined(FEAT_EVAL)
+    صحيح		did_set_swapcommand = FALSE;
 #endif
     buf_T	*buf;
     bufref_T	bufref;
     bufref_T	old_curbuf;
-    char_u	*free_fname = NULL;
+    char_u	*free_fname = عدم;
 #ifdef FEAT_BROWSE
     char_u	dot_path[] = ".";
-    char_u	*browse_file = NULL;
+    char_u	*browse_file = عدم;
 #endif
-    int		retval = FAIL;
+    صحيح		retval = FAIL;
     long	n;
     pos_T	orig_pos;
     linenr_T	topline = 0;
-    int		newcol = -1;
-    int		solcol = -1;
+    صحيح		newcol = -1;
+    صحيح		solcol = -1;
     pos_T	*pos;
-    char_u	*command = NULL;
+    char_u	*command = عدم;
 #ifdef FEAT_SPELL
-    int		did_get_winopts = FALSE;
+    صحيح		did_get_winopts = FALSE;
 #endif
-    int		readfile_flags = 0;
-    int		did_inc_redrawing_disabled = FALSE;
+    صحيح		readfile_flags = 0;
+    صحيح		did_inc_redrawing_disabled = FALSE;
     long	*so_ptr = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return FAIL;
+    إذا (ERROR_IF_TERM_POPUP_WINDOW)
+	إرجاع FAIL;
 #endif
 
-    if (eap != NULL)
+    إذا (eap != عدم)
 	command = eap->do_ecmd_cmd;
     set_bufref(&old_curbuf, curbuf);
 
-    if (fnum != 0)
+    إذا (fnum != 0)
     {
-	if (fnum == curbuf->b_fnum)	// file is already being edited
-	    return OK;			// nothing to do
+	إذا (fnum == curbuf->b_fnum)	// file is already being edited
+	    إرجاع OK;			// nothing to do
 	other_file = TRUE;
     }
-    else
+    وإلا
     {
 #ifdef FEAT_BROWSE
-	if ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
+	إذا ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
 	{
-	    if (
+	    إذا (
 # ifdef FEAT_GUI
 		!gui.in_use &&
 # endif
@@ -2848,45 +2848,45 @@ do_ecmd(
 	    {
 		// No browsing supported but we do have the file explorer:
 		// Edit the directory.
-		if (ffname == NULL || !mch_isdir(ffname))
+		إذا (ffname == عدم || !mch_isdir(ffname))
 		    ffname = dot_path;
 	    }
-	    else
+	    وإلا
 	    {
 		browse_file = do_browse(0, (char_u *)_("Edit File"), ffname,
-						    NULL, NULL, NULL, curbuf);
-		if (browse_file == NULL)
-		    goto theend;
+						    عدم, عدم, عدم, curbuf);
+		إذا (browse_file == عدم)
+		    اذهب theend;
 		ffname = browse_file;
 	    }
 	}
 #endif
 	// if no short name given, use ffname for short name
-	if (sfname == NULL)
+	إذا (sfname == عدم)
 	    sfname = ffname;
 #ifdef USE_FNAME_CASE
-	if (sfname != NULL)
+	إذا (sfname != عدم)
 	    fname_case(sfname, 0);   // set correct case for sfname
 #endif
 
-	if ((flags & (ECMD_ADDBUF | ECMD_ALTBUF))
-					 && (ffname == NULL || *ffname == NUL))
-	    goto theend;
+	إذا ((flags & (ECMD_ADDBUF | ECMD_ALTBUF))
+					 && (ffname == عدم || *ffname == NUL))
+	    اذهب theend;
 
-	if (ffname == NULL)
+	إذا (ffname == عدم)
 	    other_file = TRUE;
 					    // there is no file name
-	else if (*ffname == NUL && curbuf->b_ffname == NULL)
+	وإلا إذا (*ffname == NUL && curbuf->b_ffname == عدم)
 	    other_file = FALSE;
-	else
+	وإلا
 	{
-	    if (*ffname == NUL)		    // re-edit with same file name
+	    إذا (*ffname == NUL)		    // re-edit with same file name
 	    {
 		ffname = curbuf->b_ffname;
 		sfname = curbuf->b_fname;
 	    }
 	    free_fname = fix_fname(ffname); // may expand to full path name
-	    if (free_fname != NULL)
+	    إذا (free_fname != عدم)
 		ffname = free_fname;
 	    other_file = otherfile(ffname);
 	}
@@ -2897,17 +2897,17 @@ do_ecmd(
      * - if we are going to re-edit the same file
      * - or if we are the only window on this file and if ECMD_HIDE is FALSE
      */
-    if (  ((!other_file && !(flags & ECMD_OLDBUF))
+    إذا (  ((!other_file && !(flags & ECMD_OLDBUF))
 	    || (curbuf->b_nwindows == 1
 		&& !(flags & (ECMD_HIDE | ECMD_ADDBUF | ECMD_ALTBUF))))
 	&& check_changed(curbuf, (p_awa ? CCGD_AW : 0)
 			       | (other_file ? 0 : CCGD_MULTWIN)
 			       | ((flags & ECMD_FORCEIT) ? CCGD_FORCEIT : 0)
-			       | (eap == NULL ? 0 : CCGD_EXCMD)))
+			       | (eap == عدم ? 0 : CCGD_EXCMD)))
     {
-	if (fnum == 0 && other_file && ffname != NULL)
-	    (void)setaltfname(ffname, sfname, newlnum < 0 ? 0 : newlnum);
-	goto theend;
+	إذا (fnum == 0 && other_file && ffname != عدم)
+	    (فراغ)setaltfname(ffname, sfname, newlnum < 0 ? 0 : newlnum);
+	اذهب theend;
     }
 
 
@@ -2919,31 +2919,31 @@ do_ecmd(
     reset_VIsual();
 
     // autocommands freed window :(
-    if (oldwin != NULL && !win_valid(oldwin))
-	oldwin = NULL;
+    إذا (oldwin != عدم && !win_valid(oldwin))
+	oldwin = عدم;
 
-#if defined(FEAT_EVAL)
-    if ((command != NULL || newlnum > (linenr_T)0)
+#إذا defined(FEAT_EVAL)
+    إذا ((command != عدم || newlnum > (linenr_T)0)
 	    && *get_vim_var_str(VV_SWAPCOMMAND) == NUL)
     {
 	string_T    val;
 	size_t	    valsize;
 
 	// Set v:swapcommand for the SwapExists autocommands.
-	if (command != NULL)
-	    valsize = (int)STRLEN(command) + 3;
-	else
+	إذا (command != عدم)
+	    valsize = (صحيح)STRLEN(command) + 3;
+	وإلا
 	    valsize = 30;
 	val.string = alloc(valsize);
-	if (val.string != NULL)
+	إذا (val.string != عدم)
 	{
-	    if (command != NULL)
-		val.length = vim_snprintf_safelen((char *)val.string,
+	    إذا (command != عدم)
+		val.length = vim_snprintf_safelen((حرف *)val.string,
 		    valsize, ":%s\r", command);
-	    else
-		val.length = vim_snprintf_safelen((char *)val.string,
+	    وإلا
+		val.length = vim_snprintf_safelen((حرف *)val.string,
 		    valsize, "%ldG", (long)newlnum);
-	    set_vim_var_string(VV_SWAPCOMMAND, val.string, (int)val.length);
+	    set_vim_var_string(VV_SWAPCOMMAND, val.string, (صحيح)val.length);
 	    did_set_swapcommand = TRUE;
 	    vim_free(val.string);
 	}
@@ -2954,91 +2954,91 @@ do_ecmd(
      * If we are starting to edit another file, open a (new) buffer.
      * Otherwise we re-use the current buffer.
      */
-    if (other_file)
+    إذا (other_file)
     {
-	int prev_alt_fnum = curwin->w_alt_fnum;
+	صحيح prev_alt_fnum = curwin->w_alt_fnum;
 
-	if (!(flags & (ECMD_ADDBUF | ECMD_ALTBUF)))
+	إذا (!(flags & (ECMD_ADDBUF | ECMD_ALTBUF)))
 	{
-	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+	    إذا ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = curbuf->b_fnum;
-	    if (oldwin != NULL)
+	    إذا (oldwin != عدم)
 		buflist_altfpos(oldwin);
 	}
 
-	if (fnum)
+	إذا (fnum)
 	    buf = buflist_findnr(fnum);
-	else
+	وإلا
 	{
-	    if (flags & (ECMD_ADDBUF | ECMD_ALTBUF))
+	    إذا (flags & (ECMD_ADDBUF | ECMD_ALTBUF))
 	    {
 		// Default the line number to zero to avoid that a wininfo item
 		// is added for the current window.
 		linenr_T	tlnum = 0;
 		buf_T		*newbuf;
 
-		if (command != NULL)
+		إذا (command != عدم)
 		{
-		    tlnum = atol((char *)command);
-		    if (tlnum <= 0)
+		    tlnum = atol((حرف *)command);
+		    إذا (tlnum <= 0)
 			tlnum = 1L;
 		}
 		// Add BLN_NOCURWIN to avoid a new wininfo items are associated
 		// with the current window.
 		newbuf = buflist_new(ffname, sfname, tlnum,
 						    BLN_LISTED | BLN_NOCURWIN);
-		if (newbuf != NULL)
+		إذا (newbuf != عدم)
 		{
-		    if (flags & ECMD_ALTBUF)
+		    إذا (flags & ECMD_ALTBUF)
 			curwin->w_alt_fnum = newbuf->b_fnum;
-		    if (tlnum > 0)
+		    إذا (tlnum > 0)
 			newbuf->b_last_cursor.lnum = tlnum;
 		}
-		goto theend;
+		اذهب theend;
 	    }
 	    buf = buflist_new(ffname, sfname, 0L,
 		    BLN_CURBUF | ((flags & ECMD_SET_HELP) ? 0 : BLN_LISTED));
 
 	    // autocommands may change curwin and curbuf
-	    if (oldwin != NULL)
+	    إذا (oldwin != عدم)
 		oldwin = curwin;
 	    set_bufref(&old_curbuf, curbuf);
 	}
-	if (buf == NULL)
-	    goto theend;
+	إذا (buf == عدم)
+	    اذهب theend;
 	// autocommands try to edit a closing buffer, which like splitting, can
 	// result in more windows displaying it; abort
-	if (buf->b_locked_split)
+	إذا (buf->b_locked_split)
 	{
 	    emsg(_(e_cannot_switch_to_a_closing_buffer));
-	    goto theend;
+	    اذهب theend;
 	}
-	if (curwin->w_alt_fnum == buf->b_fnum && prev_alt_fnum != 0)
+	إذا (curwin->w_alt_fnum == buf->b_fnum && prev_alt_fnum != 0)
 	    // reusing the buffer, keep the old alternate file
 	    curwin->w_alt_fnum = prev_alt_fnum;
 
-	if (buf->b_ml.ml_mfp == NULL)		// no memfile yet
+	إذا (buf->b_ml.ml_mfp == عدم)		// no memfile yet
 	{
 	    oldbuf = FALSE;
 	}
-	else					// existing memfile
+	وإلا					// existing memfile
 	{
 	    oldbuf = TRUE;
 	    set_bufref(&bufref, buf);
-	    (void)buf_check_timestamp(buf, FALSE);
+	    (فراغ)buf_check_timestamp(buf, FALSE);
 	    // Check if autocommands made the buffer invalid or changed the
 	    // current buffer.
-	    if (!bufref_valid(&bufref) || curbuf != old_curbuf.br_buf)
-		goto theend;
+	    إذا (!bufref_valid(&bufref) || curbuf != old_curbuf.br_buf)
+		اذهب theend;
 #ifdef FEAT_EVAL
-	    if (aborting())	    // autocmds may abort script processing
-		goto theend;
+	    إذا (aborting())	    // autocmds may abort script processing
+		اذهب theend;
 #endif
 	}
 
 	// May jump to last used line number for a loaded buffer or when asked
 	// for explicitly
-	if ((oldbuf && newlnum == ECMD_LASTL) || newlnum == ECMD_LAST)
+	إذا ((oldbuf && newlnum == ECMD_LASTL) || newlnum == ECMD_LAST)
 	{
 	    pos = buflist_findfpos(buf);
 	    newlnum = pos->lnum;
@@ -3051,20 +3051,20 @@ do_ecmd(
 	 * If the current buffer was empty and has no file name, curbuf
 	 * is returned by buflist_new(), nothing to do here.
 	 */
-	if (buf != curbuf)
+	إذا (buf != curbuf)
 	{
 	    bufref_T	save_au_new_curbuf;
-	    int		save_cmdwin_type = cmdwin_type;
+	    صحيح		save_cmdwin_type = cmdwin_type;
 	    win_T	*save_cmdwin_win = cmdwin_win;
 
 	    // Should only be possible to get here if the cmdwin is closed, or
 	    // if it's opening and its buffer hasn't been set yet (the new
 	    // buffer is for it).
-	    assert(cmdwin_buf == NULL);
+	    أكد(cmdwin_buf == عدم);
 
 	    // BufLeave applies to the old buffer.
 	    cmdwin_type = 0;
-	    cmdwin_win = NULL;
+	    cmdwin_win = عدم;
 
 	    /*
 	     * Be careful: The autocommands may delete any buffer and change
@@ -3076,33 +3076,33 @@ do_ecmd(
 	     * - If we ended up in the new buffer already, need to skip a few
 	     *	 things, set auto_buf.
 	     */
-	    if (buf->b_fname != NULL)
+	    إذا (buf->b_fname != عدم)
 		new_name = vim_strsave(buf->b_fname);
 	    save_au_new_curbuf = au_new_curbuf;
 	    set_bufref(&au_new_curbuf, buf);
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_BUFLEAVE, عدم, عدم, FALSE, curbuf);
 
 	    cmdwin_type = save_cmdwin_type;
 	    cmdwin_win = save_cmdwin_win;
 
-	    if (!bufref_valid(&au_new_curbuf))
+	    إذا (!bufref_valid(&au_new_curbuf))
 	    {
 		// new buffer has been deleted
-		delbuf_msg(new_name);	// frees new_name
+		delbuf_رسالة(new_name);	// frees new_name
 		au_new_curbuf = save_au_new_curbuf;
-		goto theend;
+		اذهب theend;
 	    }
 #ifdef FEAT_EVAL
-	    if (aborting())	    // autocmds may abort script processing
+	    إذا (aborting())	    // autocmds may abort script processing
 	    {
 		vim_free(new_name);
 		au_new_curbuf = save_au_new_curbuf;
-		goto theend;
+		اذهب theend;
 	    }
 #endif
-	    if (buf == curbuf)		// already in new buffer
+	    إذا (buf == curbuf)		// already in new buffer
 		auto_buf = TRUE;
-	    else
+	    وإلا
 	    {
 		win_T	    *the_curwin = curwin;
 
@@ -3111,7 +3111,7 @@ do_ecmd(
 		++the_curwin->w_locked;
 		++buf->b_locked;
 
-		if (curbuf == old_curbuf.br_buf)
+		إذا (curbuf == old_curbuf.br_buf)
 		    buf_copy_options(buf, BCO_ENTER);
 
 		// Close the link to the current buffer. This may set
@@ -3119,50 +3119,50 @@ do_ecmd(
 		u_sync(FALSE);
 		close_buffer(curwin, curbuf,
 			 (flags & ECMD_HIDE) ? 0 : DOBUF_UNLOAD, FALSE, FALSE,
-			 oldwin != NULL);
+			 oldwin != عدم);
 
 		// Autocommands may have closed the window.
-		if (win_valid(the_curwin))
+		إذا (win_valid(the_curwin))
 		    --the_curwin->w_locked;
 		--buf->b_locked;
 
 #ifdef FEAT_EVAL
 		// autocmds may abort script processing
-		if (aborting() && curwin->w_buffer != NULL)
+		إذا (aborting() && curwin->w_buffer != عدم)
 		{
 		    vim_free(new_name);
 		    au_new_curbuf = save_au_new_curbuf;
-		    goto theend;
+		    اذهب theend;
 		}
 #endif
 		// Be careful again, like above.
-		if (!bufref_valid(&au_new_curbuf))
+		إذا (!bufref_valid(&au_new_curbuf))
 		{
 		    // New buffer was deleted.  If curwin->w_buffer is NULL, we
 		    // must enter some buffer.  Hopefully the last one is OK.
-		    if (curwin->w_buffer == NULL)
+		    إذا (curwin->w_buffer == عدم)
 			buf = lastbuf;
-		    else
+		    وإلا
 		    {
-			delbuf_msg(new_name);	// frees new_name
+			delbuf_رسالة(new_name);	// frees new_name
 			au_new_curbuf = save_au_new_curbuf;
-			goto theend;
+			اذهب theend;
 		    }
 		}
-		if (buf == curbuf)		// already in new buffer
+		إذا (buf == curbuf)		// already in new buffer
 		    auto_buf = TRUE;
-		else
+		وإلا
 		{
 #ifdef FEAT_SYN_HL
 		    /*
 		     * <VN> We could instead free the synblock
 		     * and re-attach to buffer, perhaps.
 		     */
-		    if (curwin->w_buffer == NULL
+		    إذا (curwin->w_buffer == عدم
 			    || curwin->w_s == &(curwin->w_buffer->b_s))
 			curwin->w_s = &(buf->b_s);
 #endif
-		    if (curwin->w_buffer != NULL)
+		    إذا (curwin->w_buffer != عدم)
 			--curwin->w_buffer->b_nwindows;
 
 		    curwin->w_buffer = buf;
@@ -3170,7 +3170,7 @@ do_ecmd(
 		    ++curbuf->b_nwindows;
 
 		    // Set 'fileformat', 'binary' and 'fenc' when forced.
-		    if (!oldbuf && eap != NULL)
+		    إذا (!oldbuf && eap != عدم)
 		    {
 			set_file_options(TRUE, eap);
 			set_forced_fenc(eap);
@@ -3193,10 +3193,10 @@ do_ecmd(
 	curwin->w_pcmark.lnum = 1;
 	curwin->w_pcmark.col = 0;
     }
-    else // !other_file
+    وإلا // !other_file
     {
-	if ((flags & (ECMD_ADDBUF | ECMD_ALTBUF)) || check_fname() == FAIL)
-	    goto theend;
+	إذا ((flags & (ECMD_ADDBUF | ECMD_ALTBUF)) || check_fname() == FAIL)
+	    اذهب theend;
 
 	oldbuf = (flags & ECMD_OLDBUF);
     }
@@ -3207,25 +3207,25 @@ do_ecmd(
     did_inc_redrawing_disabled = TRUE;
 
     buf = curbuf;
-    if ((flags & ECMD_SET_HELP) || keep_help_flag)
+    إذا ((flags & ECMD_SET_HELP) || keep_help_flag)
     {
 	prepare_help_buffer();
     }
-    else
+    وإلا
     {
 	// Don't make a buffer listed if it's a help buffer.  Useful when
 	// using CTRL-O to go back to a help file.
-	if (!curbuf->b_help)
+	إذا (!curbuf->b_help)
 	    set_buflisted(TRUE);
     }
 
     // If autocommands change buffers under our fingers, forget about
     // editing the file.
-    if (buf != curbuf)
-	goto theend;
+    إذا (buf != curbuf)
+	اذهب theend;
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	goto theend;
+    إذا (aborting())	    // autocmds may abort script processing
+	اذهب theend;
 #endif
 
     // Since we are starting to edit a file, consider the filetype to be
@@ -3240,34 +3240,34 @@ do_ecmd(
  *  TRUE	FALSE	    start editing new file, new buffer
  *  TRUE	TRUE	    start editing in existing buffer (nothing to do)
  */
-    if (!other_file && !oldbuf)		// re-use the buffer
+    إذا (!other_file && !oldbuf)		// re-use the buffer
     {
 	set_last_cursor(curwin);	// may set b_last_cursor
-	if (newlnum == ECMD_LAST || newlnum == ECMD_LASTL)
+	إذا (newlnum == ECMD_LAST || newlnum == ECMD_LASTL)
 	{
 	    newlnum = curwin->w_cursor.lnum;
 	    solcol = curwin->w_cursor.col;
 	}
 	buf = curbuf;
-	if (buf->b_fname != NULL)
+	إذا (buf->b_fname != عدم)
 	    new_name = vim_strsave(buf->b_fname);
-	else
-	    new_name = NULL;
+	وإلا
+	    new_name = عدم;
 	set_bufref(&bufref, buf);
 
 	// If the buffer was used before, store the current contents so that
 	// the reload can be undone.  Do not do this if the (empty) buffer is
 	// being re-used for another file.
-	if (!(curbuf->b_flags & BF_NEVERLOADED)
-		&& (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur))
+	إذا (!(curbuf->b_flags & BF_NEVERLOADED)
+		&& (p_ur < 0 || curbuf->b_ml.ml_سطر_تعداد <= p_ur))
 	{
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    if (u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE)
+	    إذا (u_savecommon(0, curbuf->b_ml.ml_سطر_تعداد + 1, 0, TRUE)
 								     == FAIL)
 	    {
 		vim_free(new_name);
-		goto theend;
+		اذهب theend;
 	    }
 	    u_unchanged(curbuf);
 	    buf_freeall(curbuf, BFA_KEEP_UNDO);
@@ -3275,26 +3275,26 @@ do_ecmd(
 	    // tell readfile() not to clear or reload undo info
 	    readfile_flags = READ_KEEP_UNDO;
 	}
-	else
+	وإلا
 	    buf_freeall(curbuf, 0);   // free all things for buffer
 
 	// If autocommands deleted the buffer we were going to re-edit, give
 	// up and jump to the end.
-	if (!bufref_valid(&bufref))
+	إذا (!bufref_valid(&bufref))
 	{
-	    delbuf_msg(new_name);	// frees new_name
-	    goto theend;
+	    delbuf_رسالة(new_name);	// frees new_name
+	    اذهب theend;
 	}
 	vim_free(new_name);
 
 	// If autocommands change buffers under our fingers, forget about
 	// re-editing the file.  Should do the buf_clear_file(), but perhaps
 	// the autocommands changed the buffer...
-	if (buf != curbuf)
-	    goto theend;
+	إذا (buf != curbuf)
+	    اذهب theend;
 #ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
-	    goto theend;
+	إذا (aborting())	    // autocmds may abort script processing
+	    اذهب theend;
 #endif
 	buf_clear_file(curbuf);
 	curbuf->b_op_start.lnum = 0;	// clear '[ and '] marks
@@ -3309,7 +3309,7 @@ do_ecmd(
 
     // If the file name was changed, reset the not-edit flag so that ":write"
     // works.
-    if (!other_file)
+    إذا (!other_file)
 	curbuf->b_flags &= ~BF_NOTEDITED;
 
     /*
@@ -3317,7 +3317,7 @@ do_ecmd(
      */
     check_arg_idx(curwin);
 
-    if (!auto_buf)
+    إذا (!auto_buf)
     {
 	/*
 	 * Set cursor and init window before reading the file and executing
@@ -3334,7 +3334,7 @@ do_ecmd(
 	    tabpage_T	    *tp;
 
 	    FOR_ALL_TAB_WINDOWS(tp, win)
-		if (win->w_buffer == curbuf)
+		إذا (win->w_buffer == curbuf)
 		    foldUpdateAll(win);
 	}
 #endif
@@ -3348,12 +3348,12 @@ do_ecmd(
 	 */
 	orig_pos = curwin->w_cursor;
 	topline = curwin->w_topline;
-	if (!oldbuf)			    // need to read the file
+	إذا (!oldbuf)			    // need to read the file
 	{
 #ifdef FEAT_PROP_POPUP
 	    // Don't use the swap-exists dialog for a popup window, can't edit
 	    // the buffer.
-	    if (WIN_IS_POPUP(curwin))
+	    إذا (WIN_IS_POPUP(curwin))
 		curbuf->b_flags |= BF_NO_SEA;
 #endif
 	    swap_exists_action = SEA_DIALOG;
@@ -3362,33 +3362,33 @@ do_ecmd(
 	    /*
 	     * Open the buffer and read the file.
 	     */
-	    if (flags & ECMD_NOWINENTER)
+	    إذا (flags & ECMD_NOWINENTER)
 		readfile_flags |= READ_NOWINENTER;
-#if defined(FEAT_EVAL)
-	    if (should_abort(open_buffer(FALSE, eap, readfile_flags)))
+#إذا defined(FEAT_EVAL)
+	    إذا (should_abort(open_buffer(FALSE, eap, readfile_flags)))
 		retval = FAIL;
-#else
-	    (void)open_buffer(FALSE, eap, readfile_flags);
+#وإلا
+	    (فراغ)open_buffer(FALSE, eap, readfile_flags);
 #endif
 
 #ifdef FEAT_PROP_POPUP
 	    curbuf->b_flags &= ~BF_NO_SEA;
 #endif
-	    if (swap_exists_action == SEA_QUIT)
+	    إذا (swap_exists_action == SEA_QUIT)
 		retval = FAIL;
 	    handle_swap_exists(&old_curbuf);
 	}
-	else
+	وإلا
 	{
 	    // Read the modelines, but only to set window-local options.  Any
 	    // buffer-local options have already been set and may have been
 	    // changed by the user.
 	    do_modelines(OPT_WINONLY);
 
-	    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE,
+	    apply_autocmds_retval(EVENT_BUFENTER, عدم, عدم, FALSE,
 							      curbuf, &retval);
-	    if ((flags & ECMD_NOWINENTER) == 0)
-		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL, FALSE,
+	    إذا ((flags & ECMD_NOWINENTER) == 0)
+		apply_autocmds_retval(EVENT_BUFWINENTER, عدم, عدم, FALSE,
 							      curbuf, &retval);
 	}
 	check_arg_idx(curwin);
@@ -3396,26 +3396,26 @@ do_ecmd(
 	// If autocommands change the cursor position or topline, we should
 	// keep it.  Also when it moves within a line. But not when it moves
 	// to the first non-blank.
-	if (!EQUAL_POS(curwin->w_cursor, orig_pos))
+	إذا (!EQUAL_POS(curwin->w_cursor, orig_pos))
 	{
 	    char_u *text = ml_get_curline();
 
-	    if (curwin->w_cursor.lnum != orig_pos.lnum
-		    || curwin->w_cursor.col != (int)(skipwhite(text) - text))
+	    إذا (curwin->w_cursor.lnum != orig_pos.lnum
+		    || curwin->w_cursor.col != (صحيح)(skipwhite(text) - text))
 	    {
 		newlnum = curwin->w_cursor.lnum;
 		newcol = curwin->w_cursor.col;
 	    }
 	}
-	if (curwin->w_topline == topline)
+	إذا (curwin->w_topline == topline)
 	    topline = 0;
 
 	// Even when cursor didn't move we need to recompute topline.
-	changed_line_abv_curs();
+	changed_سطر_abv_curs();
 
 	maketitle();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	if (WIN_IS_POPUP(curwin) && curwin->w_p_pvw && retval != FAIL)
+#إذا defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	إذا (WIN_IS_POPUP(curwin) && curwin->w_p_pvw && retval != FAIL)
 	    popup_set_title(curwin);
 #endif
     }
@@ -3424,7 +3424,7 @@ do_ecmd(
     // Tell the diff stuff that this buffer is new and/or needs updating.
     // Also needed when re-editing the same buffer, because unloading will
     // have removed it as a diff buffer.
-    if (curwin->w_p_diff)
+    إذا (curwin->w_p_diff)
     {
 	diff_buf_add(curbuf);
 	diff_invalidate(curbuf);
@@ -3434,23 +3434,23 @@ do_ecmd(
 #ifdef FEAT_SPELL
     // If the window options were changed may need to set the spell language.
     // Can only do this after the buffer has been properly setup.
-    if (did_get_winopts && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
-	(void)parse_spelllang(curwin);
+    إذا (did_get_winopts && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+	(فراغ)parse_spelllang(curwin);
 #endif
 
-    if (command == NULL)
+    إذا (command == عدم)
     {
-	if (newcol >= 0)	// position set by autocommands
+	إذا (newcol >= 0)	// position set by autocommands
 	{
 	    curwin->w_cursor.lnum = newlnum;
 	    curwin->w_cursor.col = newcol;
 	    check_cursor();
 	}
-	else if (newlnum > 0)	// line number from caller or old position
+	وإلا إذا (newlnum > 0)	// line number from caller or old position
 	{
 	    curwin->w_cursor.lnum = newlnum;
 	    check_cursor_lnum();
-	    if (solcol >= 0 && !p_sol)
+	    إذا (solcol >= 0 && !p_sol)
 	    {
 		// 'sol' is off: Use last known column.
 		curwin->w_cursor.col = solcol;
@@ -3458,13 +3458,13 @@ do_ecmd(
 		curwin->w_cursor.coladd = 0;
 		curwin->w_set_curswant = true;
 	    }
-	    else
+	    وإلا
 		beginline(BL_SOL | BL_FIX);
 	}
-	else			// no line number, go to last line in Ex mode
+	وإلا			// no line number, go to last line in Ex mode
 	{
-	    if (exmode_active)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    إذا (exmode_active)
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_تعداد;
 	    beginline(BL_WHITE | BL_FIX);
 	}
     }
@@ -3476,45 +3476,45 @@ do_ecmd(
      * Did not read the file, need to show some info about the file.
      * Do this after setting the cursor.
      */
-    if (oldbuf && !auto_buf)
+    إذا (oldbuf && !auto_buf)
     {
-	int	msg_scroll_save = msg_scroll;
+	صحيح	رسالة_scroll_save = رسالة_scroll;
 
 	// Obey the 'O' flag in 'cpoptions': overwrite any previous file
 	// message.
-	if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
-	    msg_scroll = FALSE;
-	if (!msg_scroll)	// wait a bit when overwriting an error msg
+	إذا (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
+	    رسالة_scroll = FALSE;
+	إذا (!رسالة_scroll)	// wait a bit when overwriting an error msg
 	    check_for_delay(FALSE);
-	msg_start();
-	msg_scroll = msg_scroll_save;
-	msg_scrolled_ign = TRUE;
+	رسالة_start();
+	رسالة_scroll = رسالة_scroll_save;
+	رسالة_scrolled_ign = TRUE;
 
-	if (!shortmess(SHM_FILEINFO))
+	إذا (!shortmess(SHM_FILEINFO))
 	    fileinfo(FALSE, TRUE, FALSE);
 
-	msg_scrolled_ign = FALSE;
+	رسالة_scrolled_ign = FALSE;
     }
 
 #ifdef FEAT_VIMINFO
     curbuf->b_last_used = vim_time();
 #endif
 
-    if (command != NULL)
-	do_cmdline(command, NULL, NULL, DOCMD_VERBOSE|DOCMD_RANGEOK);
+    إذا (command != عدم)
+	do_cmdline(command, عدم, عدم, DOCMD_VERBOSE|DOCMD_RANGEOK);
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
-	(void)keymap_init();
+    إذا (curbuf->b_kmap_state & KEYMAP_INIT)
+	(فراغ)keymap_init();
 #endif
 
-    if (RedrawingDisabled > 0)
+    إذا (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     did_inc_redrawing_disabled = FALSE;
-    if (!skip_redraw)
+    إذا (!skip_redraw)
     {
 	n = *so_ptr;
-	if (topline == 0 && command == NULL)
+	إذا (topline == 0 && command == عدم)
 	    *so_ptr = 9999;		// force cursor halfway the window
 	update_topline();
 	curwin->w_scbind_pos = curwin->w_topline;
@@ -3522,98 +3522,98 @@ do_ecmd(
 	redraw_curbuf_later(UPD_NOT_VALID);	// redraw this buffer later
     }
 
-    if (p_im && (State & MODE_INSERT) == 0)
+    إذا (p_im && (State & MODE_أدرج) == 0)
 	need_start_insertmode = TRUE;
 
 #ifdef FEAT_AUTOCHDIR
     // Change directories when the 'acd' option is set and we aren't already in
     // that directory (should already be done above). Expect getcwd() to be
     // faster than calling shorten_fnames() unnecessarily.
-    if (p_acd && curbuf->b_ffname != NULL)
+    إذا (p_acd && curbuf->b_ffname != عدم)
     {
 	char_u	curdir[MAXPATHL];
 	char_u	filedir[MAXPATHL];
 
 	vim_strncpy(filedir, curbuf->b_ffname, MAXPATHL - 1);
 	*gettail_sep(filedir) = NUL;
-	if (mch_dirname(curdir, MAXPATHL) != FAIL
+	إذا (mch_dirname(curdir, MAXPATHL) != FAIL
 		&& vim_fnamecmp(curdir, filedir) != 0)
 	    do_autochdir();
     }
 #endif
 
-#if defined(FEAT_NETBEANS_INTG)
-    if (curbuf->b_ffname != NULL)
+#إذا defined(FEAT_NETBEANS_INTG)
+    إذا (curbuf->b_ffname != عدم)
     {
 # ifdef FEAT_NETBEANS_INTG
-	if ((flags & ECMD_SET_HELP) != ECMD_SET_HELP)
+	إذا ((flags & ECMD_SET_HELP) != ECMD_SET_HELP)
 	    netbeans_file_opened(curbuf);
 # endif
     }
 #endif
 
 theend:
-    if (did_inc_redrawing_disabled && RedrawingDisabled > 0)
+    إذا (did_inc_redrawing_disabled && RedrawingDisabled > 0)
 	--RedrawingDisabled;
-#if defined(FEAT_EVAL)
-    if (did_set_swapcommand)
-	set_vim_var_string(VV_SWAPCOMMAND, NULL, -1);
+#إذا defined(FEAT_EVAL)
+    إذا (did_set_swapcommand)
+	set_vim_var_string(VV_SWAPCOMMAND, عدم, -1);
 #endif
 #ifdef FEAT_BROWSE
     vim_free(browse_file);
 #endif
     vim_free(free_fname);
-    return retval;
+    إرجاع retval;
 }
 
-    static void
-delbuf_msg(char_u *name)
+    ساكن فراغ
+delbuf_رسالة(char_u *name)
 {
     semsg(_(e_autocommands_unexpectedly_deleted_new_buffer_str),
-					   name == NULL ? (char_u *)"" : name);
+					   name == عدم ? (char_u *)"" : name);
     vim_free(name);
-    au_new_curbuf.br_buf = NULL;
-    au_new_curbuf.br_buf_free_count = 0;
+    au_new_curbuf.br_buf = عدم;
+    au_new_curbuf.br_buf_free_تعداد = 0;
 }
 
-static int append_indent = 0;	    // autoindent for first line
+ساكن صحيح append_indent = 0;	    // autoindent for first line
 
 /*
  * Get the next line of text for ":append", ":insert" and ":change": the text
  * after the bar, the next line of the command, or a line from the script or
  * the user.  Returns NULL when there is no more.
  */
-    static char_u *
-get_append_line(exarg_T *eap, int indent)
+    ساكن char_u *
+get_append_سطر(exarg_T *eap, صحيح indent)
 {
     char_u	*theline;
     char_u	*p;
 
-    if (*eap->arg == '|')
+    إذا (*eap->arg == '|')
     {
 	// Get the text after the trailing bar.
 	theline = vim_strsave(eap->arg + 1);
 	*eap->arg = NUL;
     }
-    else if (eap->ea_getline == NULL)
+    وإلا إذا (eap->ea_getline == عدم)
     {
 	// No getline() function, use the lines that follow. This ends
 	// when there is no more.
-	if (eap->nextcmd == NULL)
-	    return NULL;
+	إذا (eap->nextcmd == عدم)
+	    إرجاع عدم;
 	p = vim_strchr(eap->nextcmd, NL);
-	if (p == NULL)
+	إذا (p == عدم)
 	    p = eap->nextcmd + STRLEN(eap->nextcmd);
 	theline = vim_strnsave(eap->nextcmd, p - eap->nextcmd);
-	if (*p != NUL)
+	إذا (*p != NUL)
 	    ++p;
-	else
-	    p = NULL;
+	وإلا
+	    p = عدم;
 	eap->nextcmd = p;
     }
-    else
+    وإلا
     {
-	int save_State = State;
+	صحيح save_State = State;
 
 	// Set State to avoid the cursor shape to be set to MODE_INSERT
 	// state when getline() returns.
@@ -3625,119 +3625,119 @@ get_append_line(exarg_T *eap, int indent)
 		NUL, eap->cookie, indent, TRUE);
 	State = save_State;
     }
-    return theline;
+    إرجاع theline;
 }
 
 /*
  * ":insert" and ":append", also used by ":change"
  */
-    void
+    فراغ
 ex_append(exarg_T *eap)
 {
     char_u	*theline;
-    int		did_undo = FALSE;
+    صحيح		did_undo = FALSE;
     linenr_T	lnum = eap->line2;
-    int		indent = 0;
+    صحيح		indent = 0;
     char_u	*p;
-    int		vcol;
-    int		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    صحيح		vcol;
+    صحيح		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, eap->skip) == FAIL)
-	return;
+    إذا (not_in_vim9(eap, eap->skip) == FAIL)
+	إرجاع;
 #endif
-    if (eap->skip)
+    إذا (eap->skip)
     {
 	// Not executing the command, only read the lines up to the ".".
-	while ((theline = get_append_line(eap, 0)) != NULL)
+	بينما ((theline = get_append_سطر(eap, 0)) != عدم)
 	{
-	    int end = theline[0] == '.' && theline[1] == NUL;
+	    صحيح end = theline[0] == '.' && theline[1] == NUL;
 
 	    vim_free(theline);
-	    if (end)
-		break;
+	    إذا (end)
+		اكسر;
 	}
-	return;
+	إرجاع;
     }
 
     // the ! flag toggles autoindent
-    if (eap->forceit)
+    إذا (eap->forceit)
 	curbuf->b_p_ai = !curbuf->b_p_ai;
 
     // First autoindent comes from the line we start on
-    if (eap->cmdidx != CMD_change && curbuf->b_p_ai && lnum > 0)
+    إذا (eap->cmdidx != CMD_change && curbuf->b_p_ai && lnum > 0)
 	append_indent = get_indent_lnum(lnum);
 
-    if (eap->cmdidx != CMD_append)
+    إذا (eap->cmdidx != CMD_append)
 	--lnum;
 
     // when the buffer is empty need to delete the dummy line
-    if (empty && lnum == 1)
+    إذا (empty && lnum == 1)
 	lnum = 0;
 
-    State = MODE_INSERT;		    // behave like in Insert mode
-    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+    State = MODE_أدرج;		    // behave like in Insert mode
+    إذا (curbuf->b_p_iminsert == B_IMODE_LMAP)
 	State |= MODE_LANGMAP;
 
-    for (;;)
+    لكل (;;)
     {
-	msg_scroll = TRUE;
+	رسالة_scroll = TRUE;
 	need_wait_return = FALSE;
-	if (curbuf->b_p_ai)
+	إذا (curbuf->b_p_ai)
 	{
-	    if (append_indent >= 0)
+	    إذا (append_indent >= 0)
 	    {
 		indent = append_indent;
 		append_indent = -1;
 	    }
-	    else if (lnum > 0)
+	    وإلا إذا (lnum > 0)
 		indent = get_indent_lnum(lnum);
 	}
 	ex_keep_indent = FALSE;
-	theline = get_append_line(eap, indent);
-	lines_left = Rows - 1;
-	if (theline == NULL)
-	    break;
+	theline = get_append_سطر(eap, indent);
+	أسطر_يسار = Rows - 1;
+	إذا (theline == عدم)
+	    اكسر;
 
 	// Using ^ CTRL-D in getexmodeline() makes us repeat the indent.
-	if (ex_keep_indent)
+	إذا (ex_keep_indent)
 	    append_indent = indent;
 
 	// Look for the "." after automatic indent.
 	vcol = 0;
-	for (p = theline; indent > vcol; ++p)
+	لكل (p = theline; indent > vcol; ++p)
 	{
-	    if (*p == ' ')
+	    إذا (*p == ' ')
 		++vcol;
-	    else if (*p == TAB)
+	    وإلا إذا (*p == TAB)
 		vcol += 8 - vcol % 8;
-	    else
-		break;
+	    وإلا
+		اكسر;
 	}
-	if ((p[0] == '.' && p[1] == NUL)
+	إذا ((p[0] == '.' && p[1] == NUL)
 		|| (!did_undo && u_save(lnum, lnum + 1 + (empty ? 1 : 0))
 								     == FAIL))
 	{
 	    vim_free(theline);
-	    break;
+	    اكسر;
 	}
 
 	// don't use autoindent if nothing was typed.
-	if (p[0] == NUL)
+	إذا (p[0] == NUL)
 	    theline[0] = NUL;
 
 	did_undo = TRUE;
 	ml_append(lnum, theline, (colnr_T)0, FALSE);
-	if (empty)
+	إذا (empty)
 	    // there are no marks below the inserted lines
-	    appended_lines(lnum, 1L);
-	else
-	    appended_lines_mark(lnum, 1L);
+	    appended_أسطر(lnum, 1L);
+	وإلا
+	    appended_أسطر_mark(lnum, 1L);
 
 	vim_free(theline);
 	++lnum;
 
-	if (empty)
+	إذا (empty)
 	{
 	    ml_delete(2L);
 	    empty = FALSE;
@@ -3745,18 +3745,18 @@ ex_append(exarg_T *eap)
     }
     State = MODE_NORMAL;
 
-    if (eap->forceit)
+    إذا (eap->forceit)
 	curbuf->b_p_ai = !curbuf->b_p_ai;
 
     // "start" is set to eap->line2+1 unless that position is invalid (when
     // eap->line2 pointed to the end of the buffer and nothing was appended)
     // "end" is set to lnum when something has been appended, otherwise
     // it is the same as "start"  -- Acevedo
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
-	curbuf->b_op_start.lnum = (eap->line2 < curbuf->b_ml.ml_line_count) ?
-	    eap->line2 + 1 : curbuf->b_ml.ml_line_count;
-	if (eap->cmdidx != CMD_append)
+	curbuf->b_op_start.lnum = (eap->line2 < curbuf->b_ml.ml_سطر_تعداد) ?
+	    eap->line2 + 1 : curbuf->b_ml.ml_سطر_تعداد;
+	إذا (eap->cmdidx != CMD_append)
 	    --curbuf->b_op_start.lnum;
 	curbuf->b_op_end.lnum = (eap->line2 < lnum)
 					      ? lnum : curbuf->b_op_start.lnum;
@@ -3773,171 +3773,171 @@ ex_append(exarg_T *eap)
 /*
  * ":change"
  */
-    void
+    فراغ
 ex_change(exarg_T *eap)
 {
     linenr_T	lnum;
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, eap->skip) == FAIL)
-	return;
+    إذا (not_in_vim9(eap, eap->skip) == FAIL)
+	إرجاع;
 #endif
-    if (eap->skip)
+    إذا (eap->skip)
     {
 	ex_append(eap);
-	return;
+	إرجاع;
     }
-    if (eap->line2 >= eap->line1
+    إذا (eap->line2 >= eap->line1
 	    && u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
-	return;
+	إرجاع;
 
     // the ! flag toggles autoindent
-    if (eap->forceit ? !curbuf->b_p_ai : curbuf->b_p_ai)
+    إذا (eap->forceit ? !curbuf->b_p_ai : curbuf->b_p_ai)
 	append_indent = get_indent_lnum(eap->line1);
 
-    for (lnum = eap->line2; lnum >= eap->line1; --lnum)
+    لكل (lnum = eap->line2; lnum >= eap->line1; --lnum)
     {
-	if (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to delete
-	    break;
+	إذا (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to delete
+	    اكسر;
 	ml_delete(eap->line1);
     }
 
     // make sure the cursor is not beyond the end of the file now
     check_cursor_lnum();
-    deleted_lines_mark(eap->line1, (long)(eap->line2 - lnum));
+    deleted_أسطر_mark(eap->line1, (long)(eap->line2 - lnum));
 
     // ":append" on the line above the deleted lines.
     eap->line2 = eap->line1;
     ex_append(eap);
 }
 
-    void
+    فراغ
 ex_z(exarg_T *eap)
 {
     char_u	*x;
     long	bigness;
     char_u	*kind;
-    int		minus = 0;
+    صحيح		minus = 0;
     linenr_T	start, end, curs, i;
-    int		j;
+    صحيح		j;
     linenr_T	lnum = eap->line2;
 
     // Vi compatible: ":z!" uses display height, without a count uses
     // 'scroll'
-    if (eap->forceit)
+    إذا (eap->forceit)
 	bigness = Rows - 1;
-    else if (!ONE_WINDOW)
+    وإلا إذا (!ONE_WINDOW)
 	bigness = curwin->w_height - 3;
-    else
+    وإلا
 	bigness = curwin->w_p_scr * 2;
-    if (bigness < 1)
+    إذا (bigness < 1)
 	bigness = 1;
 
     x = eap->arg;
     kind = x;
-    if (*kind == '-' || *kind == '+' || *kind == '='
+    إذا (*kind == '-' || *kind == '+' || *kind == '='
 					      || *kind == '^' || *kind == '.')
 	++x;
-    while (*x == '-' || *x == '+')
+    بينما (*x == '-' || *x == '+')
 	++x;
 
-    if (*x != 0)
+    إذا (*x != 0)
     {
-	if (!VIM_ISDIGIT(*x))
+	إذا (!VIM_ISDIGIT(*x))
 	{
 	    emsg(_(e_non_numeric_argument_to_z));
-	    return;
+	    إرجاع;
 	}
-	else
+	وإلا
 	{
-	    bigness = atol((char *)x);
+	    bigness = atol((حرف *)x);
 
 	    // bigness could be < 0 if atol(x) overflows.
-	    if (bigness > 2 * curbuf->b_ml.ml_line_count || bigness < 0)
-		bigness = 2 * curbuf->b_ml.ml_line_count;
+	    إذا (bigness > 2 * curbuf->b_ml.ml_سطر_تعداد || bigness < 0)
+		bigness = 2 * curbuf->b_ml.ml_سطر_تعداد;
 
 	    p_window = bigness;
-	    if (*kind == '=')
+	    إذا (*kind == '=')
 		bigness += 2;
 	}
     }
 
     // the number of '-' and '+' multiplies the distance
-    if (*kind == '-' || *kind == '+')
-	for (x = kind + 1; *x == *kind; ++x)
+    إذا (*kind == '-' || *kind == '+')
+	لكل (x = kind + 1; *x == *kind; ++x)
 	    ;
 
-    switch (*kind)
+    بدل (*kind)
     {
-	case '-':
+	حالة '-':
 	    start = lnum - bigness * (linenr_T)(x - kind) + 1;
 	    end = start + bigness - 1;
 	    curs = end;
-	    break;
+	    اكسر;
 
-	case '=':
+	حالة '=':
 	    start = lnum - (bigness + 1) / 2 + 1;
 	    end = lnum + (bigness + 1) / 2 - 1;
 	    curs = lnum;
 	    minus = 1;
-	    break;
+	    اكسر;
 
-	case '^':
+	حالة '^':
 	    start = lnum - bigness * 2;
 	    end = lnum - bigness;
 	    curs = lnum - bigness;
-	    break;
+	    اكسر;
 
-	case '.':
+	حالة '.':
 	    start = lnum - (bigness + 1) / 2 + 1;
 	    end = lnum + (bigness + 1) / 2 - 1;
 	    curs = end;
-	    break;
+	    اكسر;
 
-	default:  // '+'
+	افتراضي:  // '+'
 	    start = lnum;
-	    if (*kind == '+')
+	    إذا (*kind == '+')
 		start += bigness * (linenr_T)(x - kind - 1) + 1;
-	    else if (eap->addr_count == 0)
+	    وإلا إذا (eap->addr_تعداد == 0)
 		++start;
 	    end = start + bigness - 1;
 	    curs = end;
-	    break;
+	    اكسر;
     }
 
-    if (start < 1)
+    إذا (start < 1)
 	start = 1;
 
-    if (end > curbuf->b_ml.ml_line_count)
-	end = curbuf->b_ml.ml_line_count;
+    إذا (end > curbuf->b_ml.ml_سطر_تعداد)
+	end = curbuf->b_ml.ml_سطر_تعداد;
 
-    if (curs > curbuf->b_ml.ml_line_count)
-	curs = curbuf->b_ml.ml_line_count;
-    else if (curs < 1)
+    إذا (curs > curbuf->b_ml.ml_سطر_تعداد)
+	curs = curbuf->b_ml.ml_سطر_تعداد;
+    وإلا إذا (curs < 1)
 	curs = 1;
 
-    for (i = start; i <= end; i++)
+    لكل (i = start; i <= end; i++)
     {
-	if (minus && i == lnum)
+	إذا (minus && i == lnum)
 	{
-	    msg_putchar('\n');
+	    رسالة_putchar('\n');
 
-	    for (j = 1; j < Columns; j++)
-		msg_putchar('-');
+	    لكل (j = 1; j < Columns; j++)
+		رسالة_putchar('-');
 	}
 
-	print_line(i, eap->flags & EXFLAG_NR, eap->flags & EXFLAG_LIST);
+	print_سطر(i, eap->flags & EXFLAG_NR, eap->flags & EXFLAG_LIST);
 
-	if (minus && i == lnum)
+	إذا (minus && i == lnum)
 	{
-	    msg_putchar('\n');
+	    رسالة_putchar('\n');
 
-	    for (j = 1; j < Columns; j++)
-		msg_putchar('-');
+	    لكل (j = 1; j < Columns; j++)
+		رسالة_putchar('-');
 	}
     }
 
-    if (curwin->w_cursor.lnum != curs)
+    إذا (curwin->w_cursor.lnum != curs)
     {
 	curwin->w_cursor.lnum = curs;
 	curwin->w_cursor.col = 0;
@@ -3950,15 +3950,15 @@ ex_z(exarg_T *eap)
  * If so, give an error message and return TRUE.
  * Otherwise, return FALSE.
  */
-    int
-check_restricted(void)
+    صحيح
+check_restricted(فراغ)
 {
-    if (restricted)
+    إذا (restricted)
     {
 	emsg(_(e_shell_commands_and_some_functionality_not_allowed_in_rvim));
-	return TRUE;
+	إرجاع TRUE;
     }
-    return FALSE;
+    إرجاع FALSE;
 }
 
 /*
@@ -3966,44 +3966,44 @@ check_restricted(void)
  * If so, give an error message and return TRUE.
  * Otherwise, return FALSE.
  */
-    int
-check_secure(void)
+    صحيح
+check_secure(فراغ)
 {
-    if (secure)
+    إذا (secure)
     {
 	secure = 2;
-	emsg(_(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search));
-	return TRUE;
+	emsg(_(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_بحث));
+	إرجاع TRUE;
     }
 #ifdef HAVE_SANDBOX
     /*
      * In the sandbox more things are not allowed, including the things
      * disallowed in secure mode.
      */
-    if (sandbox != 0)
+    إذا (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return TRUE;
+	إرجاع TRUE;
     }
 #endif
-    return FALSE;
+    إرجاع FALSE;
 }
 
-static char_u	*old_sub = NULL;	// previous substitute pattern
-static int	global_need_beginline;	// call beginline() after ":g"
+ساكن char_u	*old_sub = عدم;	// previous substitute pattern
+ساكن صحيح	global_need_beginline;	// call beginline() after ":g"
 
 /*
  * Flags that are kept between calls to :substitute.
  */
-typedef struct {
-    int	do_all;		// do multiple substitutions per line
-    int	do_ask;		// ask for confirmation
-    int	do_count;	// count only
-    int	do_error;	// if false, ignore errors
-    int	do_print;	// print last line with subs.
-    int	do_list;	// list last line with subs.
-    int	do_number;	// list last line with line nr
-    int	do_ic;		// ignore case flag
+تعريفنوع بنية {
+    صحيح	do_all;		// do multiple substitutions per line
+    صحيح	do_ask;		// ask for confirmation
+    صحيح	do_تعداد;	// count only
+    صحيح	do_error;	// if false, ignore errors
+    صحيح	do_print;	// print last line with subs.
+    صحيح	do_list;	// list last line with subs.
+    صحيح	do_العدد;	// list last line with line nr
+    صحيح	do_ic;		// ignore case flag
 } subflags_T;
 
 /*
@@ -4011,33 +4011,33 @@ typedef struct {
  * character.
  */
     char_u *
-skip_substitute(char_u *start, int delimiter)
+skip_substitute(char_u *start, صحيح delimiter)
 {
     char_u *p = start;
 
-    while (p[0])
+    بينما (p[0])
     {
-	if (p[0] == delimiter)		// end delimiter found
+	إذا (p[0] == delimiter)		// end delimiter found
 	{
 	    *p++ = NUL;			// replace it with a NUL
-	    break;
+	    اكسر;
 	}
-	if (p[0] == '\\' && p[1] != 0)	// skip escaped characters
+	إذا (p[0] == '\\' && p[1] != 0)	// skip escaped characters
 	    ++p;
 	MB_PTR_ADV(p);
     }
-    return p;
+    إرجاع p;
 }
 
-    static int
-check_regexp_delim(int c)
+    ساكن صحيح
+check_regexp_delim(صحيح c)
 {
-    if (SAFE_isalpha(c))
+    إذا (SAFE_isalpha(c))
     {
 	emsg(_(e_regular_expressions_cant_be_delimited_by_letters));
-	return FAIL;
+	إرجاع FAIL;
     }
-    return OK;
+    إرجاع OK;
 }
 
 /*
@@ -4048,72 +4048,72 @@ check_regexp_delim(int c)
  *
  * The usual escapes are supported as described in the regexp docs.
  */
-    void
+    فراغ
 ex_substitute(exarg_T *eap)
 {
     linenr_T	lnum;
     long	i = 0;
     regmmatch_T regmatch;
-    static subflags_T subflags = {FALSE, FALSE, FALSE, TRUE, FALSE,
+    ساكن subflags_T subflags = {FALSE, FALSE, FALSE, TRUE, FALSE,
 							      FALSE, FALSE, 0};
 #ifdef FEAT_EVAL
     subflags_T	subflags_save;
 #endif
-    int		save_do_all;		// remember user specified 'g' flag
-    int		save_do_ask;		// remember user specified 'c' flag
-    char_u	*sub = NULL;		// init for GCC
-    string_T	pat = {NULL, 0};
-    int		delimiter;
+    صحيح		save_do_all;		// remember user specified 'g' flag
+    صحيح		save_do_ask;		// remember user specified 'c' flag
+    char_u	*sub = عدم;		// init for GCC
+    string_T	pat = {عدم, 0};
+    صحيح		delimiter;
     size_t	sublen;
-    int		got_quit = FALSE;
-    int		got_match = FALSE;
-    int		which_pat;
+    صحيح		got_quit = FALSE;
+    صحيح		got_match = FALSE;
+    صحيح		which_pat;
     char_u	*cmd;
     char_u	*p;
-    int		save_State;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// below last changed line AFTER the
+    صحيح		save_State;
+    linenr_T	first_سطر = 0;		// first changed line
+    linenr_T	last_سطر = 0;		// below last changed line AFTER the
 					// change
-    linenr_T	old_line_count = curbuf->b_ml.ml_line_count;
+    linenr_T	old_سطر_تعداد = curbuf->b_ml.ml_سطر_تعداد;
     linenr_T	line2;
     long	nmatch;			// number of lines in match
     string_T	sub_firstline;		// allocated copy of first sub line
-    int		endcolumn = FALSE;	// cursor in last column when done
+    صحيح		endcolumn = FALSE;	// cursor in last column when done
     pos_T	old_cursor = curwin->w_cursor;
-    int		start_nsubs;
-    int		keeppatterns = cmdmod.cmod_flags & CMOD_KEEPPATTERNS;
+    صحيح		start_nsubs;
+    صحيح		keeppatterns = cmdmod.cmod_flags & CMOD_KEEPPATTERNS;
 #ifdef FEAT_EVAL
-    int		save_ma = 0;
-    int		save_sandbox = 0;
+    صحيح		save_ma = 0;
+    صحيح		save_sandbox = 0;
 #endif
 #ifdef FEAT_PROP_POPUP
-    textprop_T	*text_props = NULL;
+    textprop_T	*text_props = عدم;
 #endif
 
     cmd = eap->arg;
-    if (!global_busy)
+    إذا (!global_busy)
     {
 	sub_nsubs = 0;
 	sub_nlines = 0;
     }
     start_nsubs = sub_nsubs;
 
-    if (eap->cmdidx == CMD_tilde)
+    إذا (eap->cmdidx == CMD_tilde)
 	which_pat = RE_LAST;	// use last used regexp
-    else
+    وإلا
 	which_pat = RE_SUBST;	// use last substitute regexp
 
 				// new pattern and substitution
-    if (eap->cmd[0] == 's' && *cmd != NUL && !VIM_ISWHITE(*cmd)
-		&& vim_strchr((char_u *)"0123456789cegriIp|\"", *cmd) == NULL)
+    إذا (eap->cmd[0] == 's' && *cmd != NUL && !VIM_ISWHITE(*cmd)
+		&& vim_strchr((char_u *)"0123456789cegriIp|\"", *cmd) == عدم)
     {
 	// don't accept alphanumeric for separator
-	if (check_regexp_delim(*cmd) == FAIL)
-	    return;
+	إذا (check_regexp_delim(*cmd) == FAIL)
+	    إرجاع;
 #ifdef FEAT_EVAL
-	if (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg)
+	إذا (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg)
 								      == FAIL)
-	    return;
+	    إرجاع;
 #endif
 
 	/*
@@ -4121,33 +4121,33 @@ ex_substitute(exarg_T *eap)
 	 *  "\/sub/" and "\?sub?" use last used search pattern (almost like
 	 *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
 	 */
-	if (*cmd == '\\')
+	إذا (*cmd == '\\')
 	{
-	    if (in_vim9script())
+	    إذا (in_vim9script())
 	    {
 		emsg(_(e_cannot_use_s_backslash_in_vim9_script));
-		return;
+		إرجاع;
 	    }
 	    ++cmd;
-	    if (vim_strchr((char_u *)"/?&", *cmd) == NULL)
+	    إذا (vim_strchr((char_u *)"/?&", *cmd) == عدم)
 	    {
 		emsg(_(e_backslash_should_be_followed_by));
-		return;
+		إرجاع;
 	    }
-	    if (*cmd != '&')
-		which_pat = RE_SEARCH;	    // use last '/' pattern
+	    إذا (*cmd != '&')
+		which_pat = RE_بحث;	    // use last '/' pattern
 	    STR_LITERAL_SET(pat, "");	    // empty search pattern
 	    delimiter = *cmd++;		    // remember delimiter character
 	}
-	else		// find the end of the regexp
+	وإلا		// find the end of the regexp
 	{
 	    which_pat = RE_LAST;	    // use last used regexp
 	    delimiter = *cmd++;		    // remember delimiter character
 	    pat.string = cmd;		    // remember start of search pat
 	    cmd = skip_regexp_ex(cmd, delimiter, magic_isset(),
-							&eap->arg, NULL, NULL);
+							&eap->arg, عدم, عدم);
 	    pat.length = (size_t)(cmd - pat.string);
-	    if (cmd[0] == delimiter)	    // end delimiter found
+	    إذا (cmd[0] == delimiter)	    // end delimiter found
 		*cmd++ = NUL;		    // replace it with a NUL
 	}
 
@@ -4158,53 +4158,53 @@ ex_substitute(exarg_T *eap)
 	p = cmd;	    // remember the start of the substitution
 	cmd = skip_substitute(cmd, delimiter);
 	sub = vim_strsave(p);
-	if (sub == NULL)
+	إذا (sub == عدم)
 	    // out of memory
-	    return;
+	    إرجاع;
 
-	if (!eap->skip)
+	إذا (!eap->skip)
 	{
 	    // In POSIX vi ":s/pat/%/" uses the previous subst. string.
-	    if (STRCMP(sub, "%") == 0
-				 && vim_strchr(p_cpo, CPO_SUBPERCENT) != NULL)
+	    إذا (STRCMP(sub, "%") == 0
+				 && vim_strchr(p_cpo, CPO_SUBPERCENT) != عدم)
 	    {
-		if (old_sub == NULL)	// there is no previous command
+		إذا (old_sub == عدم)	// there is no previous command
 		{
 		    emsg(_(e_no_previous_substitute_regular_expression));
 		    vim_free(sub);
-		    return;
+		    إرجاع;
 		}
 		vim_free(sub);
 		sub = vim_strsave(old_sub);
-		if (sub == NULL)
+		إذا (sub == عدم)
 		    // out of memory
-		    return;
+		    إرجاع;
 	    }
-	    else if (!keeppatterns)
+	    وإلا إذا (!keeppatterns)
 	    {
 		vim_free(old_sub);
 		old_sub = vim_strsave(sub);
-		if (old_sub == NULL)
+		إذا (old_sub == عدم)
 		{
 		    // out of memory
 		    vim_free(sub);
-		    return;
+		    إرجاع;
 		}
 	    }
 	}
     }
-    else if (!eap->skip)	// use previous pattern and substitution
+    وإلا إذا (!eap->skip)	// use previous pattern and substitution
     {
-	if (old_sub == NULL)	// there is no previous command
+	إذا (old_sub == عدم)	// there is no previous command
 	{
 	    emsg(_(e_no_previous_substitute_regular_expression));
-	    return;
+	    إرجاع;
 	}
-	pat.string = NULL;		// search_regcomp() will use previous pattern
+	pat.string = عدم;		// search_regcomp() will use previous pattern
 	pat.length = 0;
 	sub = vim_strsave(old_sub);
-	if (sub == NULL)
-	    return;
+	إذا (sub == عدم)
+	    إرجاع;
 
 	// Vi compatibility quirk: repeating with ":s" keeps the cursor in the
 	// last column after using "$".
@@ -4215,117 +4215,117 @@ ex_substitute(exarg_T *eap)
     // more efficient.
     // TODO: find a generic solution to make line-joining operations more
     // efficient, avoid allocating a string that grows in size.
-    if (pat.string != NULL && STRCMP(pat.string, "\\n") == 0
+    إذا (pat.string != عدم && STRCMP(pat.string, "\\n") == 0
 	    && *sub == NUL
 	    && (*cmd == NUL || (cmd[1] == NUL && (*cmd == 'g' || *cmd == 'l'
 					     || *cmd == 'p' || *cmd == '#'))))
     {
-	linenr_T    joined_lines_count;
+	linenr_T    joined_أسطر_تعداد;
 
-	if (eap->skip)
+	إذا (eap->skip)
 	{
 	    vim_free(sub);
-	    return;
+	    إرجاع;
 	}
 	curwin->w_cursor.lnum = eap->line1;
-	if (*cmd == 'l')
+	إذا (*cmd == 'l')
 	    eap->flags = EXFLAG_LIST;
-	else if (*cmd == '#')
+	وإلا إذا (*cmd == '#')
 	    eap->flags = EXFLAG_NR;
-	else if (*cmd == 'p')
+	وإلا إذا (*cmd == 'p')
 	    eap->flags = EXFLAG_PRINT;
 
 	// The number of lines joined is the number of lines in the range plus
 	// one.  One less when the last line is included.
-	joined_lines_count = eap->line2 - eap->line1 + 1;
-	if (eap->line2 < curbuf->b_ml.ml_line_count)
-	    ++joined_lines_count;
-	if (joined_lines_count > 1)
+	joined_أسطر_تعداد = eap->line2 - eap->line1 + 1;
+	إذا (eap->line2 < curbuf->b_ml.ml_سطر_تعداد)
+	    ++joined_أسطر_تعداد;
+	إذا (joined_أسطر_تعداد > 1)
 	{
-	    (void)do_join(joined_lines_count, FALSE, TRUE, FALSE, TRUE);
-	    sub_nsubs = joined_lines_count - 1;
+	    (فراغ)do_join(joined_أسطر_تعداد, FALSE, TRUE, FALSE, TRUE);
+	    sub_nsubs = joined_أسطر_تعداد - 1;
 	    sub_nlines = 1;
-	    (void)do_sub_msg(FALSE);
+	    (فراغ)do_sub_رسالة(FALSE);
 	    ex_may_print(eap);
 	}
 
-	if (!keeppatterns)
+	إذا (!keeppatterns)
 	    save_re_pat(RE_SUBST, pat.string, pat.length, magic_isset());
 	// put pattern in history
-	add_to_history(HIST_SEARCH, pat.string, pat.length, TRUE, NUL);
+	add_to_history(HIST_بحث, pat.string, pat.length, TRUE, NUL);
 	vim_free(sub);
 
-	return;
+	إرجاع;
     }
 
     /*
      * Find trailing options.  When '&' is used, keep old options.
      */
-    if (*cmd == '&')
+    إذا (*cmd == '&')
 	++cmd;
-    else
+    وإلا
     {
 #ifdef FEAT_EVAL
-	if (in_vim9script())
+	إذا (in_vim9script())
 	{
 	    // ignore 'gdefault' and 'edcompatible'
 	    subflags.do_all = FALSE;
 	    subflags.do_ask = FALSE;
 	}
-	else
+	وإلا
 #endif
-	if (!p_ed)
+	إذا (!p_ed)
 	{
-	    if (p_gd)		// default is global on
+	    إذا (p_gd)		// default is global on
 		subflags.do_all = TRUE;
-	    else
+	    وإلا
 		subflags.do_all = FALSE;
 	    subflags.do_ask = FALSE;
 	}
 	subflags.do_error = TRUE;
 	subflags.do_print = FALSE;
 	subflags.do_list = FALSE;
-	subflags.do_count = FALSE;
-	subflags.do_number = FALSE;
+	subflags.do_تعداد = FALSE;
+	subflags.do_العدد = FALSE;
 	subflags.do_ic = 0;
     }
-    while (*cmd)
+    بينما (*cmd)
     {
 	/*
 	 * Note that 'g' and 'c' are always inverted, also when p_ed is off.
 	 * 'r' is never inverted.
 	 */
-	if (*cmd == 'g')
+	إذا (*cmd == 'g')
 	    subflags.do_all = !subflags.do_all;
-	else if (*cmd == 'c')
+	وإلا إذا (*cmd == 'c')
 	    subflags.do_ask = !subflags.do_ask;
-	else if (*cmd == 'n')
-	    subflags.do_count = TRUE;
-	else if (*cmd == 'e')
+	وإلا إذا (*cmd == 'n')
+	    subflags.do_تعداد = TRUE;
+	وإلا إذا (*cmd == 'e')
 	    subflags.do_error = !subflags.do_error;
-	else if (*cmd == 'r')	    // use last used regexp
+	وإلا إذا (*cmd == 'r')	    // use last used regexp
 	    which_pat = RE_LAST;
-	else if (*cmd == 'p')
+	وإلا إذا (*cmd == 'p')
 	    subflags.do_print = TRUE;
-	else if (*cmd == '#')
+	وإلا إذا (*cmd == '#')
 	{
 	    subflags.do_print = TRUE;
-	    subflags.do_number = TRUE;
+	    subflags.do_العدد = TRUE;
 	}
-	else if (*cmd == 'l')
+	وإلا إذا (*cmd == 'l')
 	{
 	    subflags.do_print = TRUE;
 	    subflags.do_list = TRUE;
 	}
-	else if (*cmd == 'i')	    // ignore case
+	وإلا إذا (*cmd == 'i')	    // ignore case
 	    subflags.do_ic = 'i';
-	else if (*cmd == 'I')	    // don't ignore case
+	وإلا إذا (*cmd == 'I')	    // don't ignore case
 	    subflags.do_ic = 'I';
-	else
-	    break;
+	وإلا
+	    اكسر;
 	++cmd;
     }
-    if (subflags.do_count)
+    إذا (subflags.do_تعداد)
 	subflags.do_ask = FALSE;
 
     save_do_all = subflags.do_all;
@@ -4335,73 +4335,73 @@ ex_substitute(exarg_T *eap)
      * check for a trailing count
      */
     cmd = skipwhite(cmd);
-    if (VIM_ISDIGIT(*cmd))
+    إذا (VIM_ISDIGIT(*cmd))
     {
 	i = getdigits(&cmd);
-	if (i <= 0 && !eap->skip && subflags.do_error)
+	إذا (i <= 0 && !eap->skip && subflags.do_error)
 	{
-	    emsg(_(e_positive_count_required));
+	    emsg(_(e_positive_تعداد_required));
 	    vim_free(sub);
-	    return;
+	    إرجاع;
 	}
-	else if (i >= INT_MAX)
+	وإلا إذا (i >= INT_MAX)
 	{
-	    char	buf[20];
-	    vim_snprintf(buf, sizeof(buf), "%ld", i);
+	    حرف	buf[20];
+	    vim_snprintf(buf, حجم(buf), "%ld", i);
 	    semsg(_(e_val_too_large), buf);
 	    vim_free(sub);
-	    return;
+	    إرجاع;
 	}
 	eap->line1 = eap->line2;
 	eap->line2 += i - 1;
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
-	    eap->line2 = curbuf->b_ml.ml_line_count;
+	إذا (eap->line2 > curbuf->b_ml.ml_سطر_تعداد)
+	    eap->line2 = curbuf->b_ml.ml_سطر_تعداد;
     }
 
     /*
      * check for trailing command or garbage
      */
     cmd = skipwhite(cmd);
-    if (*cmd && *cmd != '"')	    // if not end-of-line or comment
+    إذا (*cmd && *cmd != '"')	    // if not end-of-line or comment
     {
 	set_nextcmd(eap, cmd);
-	if (eap->nextcmd == NULL)
+	إذا (eap->nextcmd == عدم)
 	{
 	    semsg(_(e_trailing_characters_str), cmd);
 	    vim_free(sub);
-	    return;
+	    إرجاع;
 	}
     }
 
-    if (eap->skip)	    // not executing commands, only parsing
+    إذا (eap->skip)	    // not executing commands, only parsing
     {
 	vim_free(sub);
-	return;
+	إرجاع;
     }
 
-    if (!subflags.do_count && !curbuf->b_p_ma)
+    إذا (!subflags.do_تعداد && !curbuf->b_p_ma)
     {
 	// Substitution is not allowed in non-'modifiable' buffer
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
 	vim_free(sub);
-	return;
+	إرجاع;
     }
 
-    if (search_regcomp(pat.string, pat.length, NULL, RE_SUBST, which_pat, SEARCH_HIS, &regmatch) == FAIL)
+    إذا (بحث_regcomp(pat.string, pat.length, عدم, RE_SUBST, which_pat, بحث_HIS, &regmatch) == FAIL)
     {
-	if (subflags.do_error)
+	إذا (subflags.do_error)
 	    emsg(_(e_invalid_command));
 	vim_free(sub);
-	return;
+	إرجاع;
     }
 
     // the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase'
-    if (subflags.do_ic == 'i')
+    إذا (subflags.do_ic == 'i')
 	regmatch.rmm_ic = TRUE;
-    else if (subflags.do_ic == 'I')
+    وإلا إذا (subflags.do_ic == 'I')
 	regmatch.rmm_ic = FALSE;
 
-    sub_firstline.string = NULL;
+    sub_firstline.string = عدم;
     sub_firstline.length = 0;
 
     /*
@@ -4411,19 +4411,19 @@ ex_substitute(exarg_T *eap)
      * pattern.  We do it here once to avoid it to be replaced over and over
      * again.
      */
-    if (sub[0] == '\\' && sub[1] == '=')
+    إذا (sub[0] == '\\' && sub[1] == '=')
     {
 	p = vim_strsave(sub);
 	vim_free(sub);
-	if (p == NULL)
-	    return;
+	إذا (p == عدم)
+	    إرجاع;
 	sub = p;
     }
-    else
+    وإلا
     {
 	p = regtilde(sub, magic_isset());
 
-	if (p != sub)
+	إذا (p != sub)
 	{
 	    vim_free(sub);
 	    sub = p;
@@ -4434,35 +4434,35 @@ ex_substitute(exarg_T *eap)
      * Check for a match on each line.
      */
     line2 = eap->line2;
-    for (lnum = eap->line1; lnum <= line2 && !(got_quit
-#if defined(FEAT_EVAL)
+    لكل (lnum = eap->line1; lnum <= line2 && !(got_quit
+#إذا defined(FEAT_EVAL)
 		|| aborting()
 #endif
 		); ++lnum)
     {
 	nmatch = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
-						       (colnr_T)0, NULL);
-	if (nmatch)
+						       (colnr_T)0, عدم);
+	إذا (nmatch)
 	{
 	    colnr_T	copycol;
 	    colnr_T	matchcol;
 	    colnr_T	prev_matchcol = MAXCOL;
-	    string_T	new_start = {NULL, 0};
+	    string_T	new_start = {عدم, 0};
 	    size_t	new_start_size = 0;
 	    char_u	*new_end;
-	    int		did_sub = FALSE;
-	    int		lastone;
+	    صحيح		did_sub = FALSE;
+	    صحيح		lastone;
 	    size_t	copy_len;
 	    size_t	needed_size;
 	    long	nmatch_tl = 0;	// nr of lines matched below lnum
-	    int		do_again;	// do it again after joining lines
-	    int		skip_match = FALSE;
+	    صحيح		do_again;	// do it again after joining lines
+	    صحيح		skip_match = FALSE;
 	    linenr_T	sub_firstlnum;	// nr of first sub line
 	    bool	did_split = false;	// "\r" split the line
 #ifdef FEAT_PROP_POPUP
-	    int		apc_flags = APC_SAVE_FOR_UNDO | APC_SUBSTITUTE;
+	    صحيح		apc_flags = APC_SAVE_FOR_UNDO | APC_SUBSTITUTE;
 	    colnr_T	total_added =  0;
-	    int		text_prop_count = 0;
+	    صحيح		text_prop_تعداد = 0;
 #endif
 
 	    /*
@@ -4515,7 +4515,7 @@ ex_substitute(exarg_T *eap)
 	    matchcol = 0;
 
 	    // At first match, remember current cursor position.
-	    if (!got_match)
+	    إذا (!got_match)
 	    {
 		setpcmark();
 		got_match = TRUE;
@@ -4529,7 +4529,7 @@ ex_substitute(exarg_T *eap)
 	     * 4. if do_all is set, find next match
 	     * 5. break if there isn't another match in this line
 	     */
-	    for (;;)
+	    لكل (;;)
 	    {
 		string_T    tmp;
 		char_u	    *p1;
@@ -4538,7 +4538,7 @@ ex_substitute(exarg_T *eap)
 		// Advance "lnum" to the line where the match starts.  The
 		// match does not start in the first line when there is a line
 		// break before \zs.
-		if (regmatch.startpos[0].lnum > 0)
+		إذا (regmatch.startpos[0].lnum > 0)
 		{
 		    lnum += regmatch.startpos[0].lnum;
 		    sub_firstlnum += regmatch.startpos[0].lnum;
@@ -4548,18 +4548,18 @@ ex_substitute(exarg_T *eap)
 
 		// Match might be after the last line for "\n\zs" matching at
 		// the end of the last line.
-		if (lnum > curbuf->b_ml.ml_line_count)
-		    break;
+		إذا (lnum > curbuf->b_ml.ml_سطر_تعداد)
+		    اكسر;
 
-		if (sub_firstline.string == NULL)
+		إذا (sub_firstline.string == عدم)
 		{
 		    sub_firstline.length = ml_get_len(sub_firstlnum);
 		    sub_firstline.string =
 			vim_strnsave(ml_get(sub_firstlnum), sub_firstline.length);
-		    if (sub_firstline.string == NULL)
+		    إذا (sub_firstline.string == عدم)
 		    {
 			vim_free(new_start.string);
-			goto outofmem;
+			اذهب outofmem;
 		    }
 		}
 
@@ -4573,23 +4573,23 @@ ex_substitute(exarg_T *eap)
 		 * match.  This reproduces the strange vi behaviour.
 		 * This also catches endless loops.
 		 */
-		if (matchcol == prev_matchcol
+		إذا (matchcol == prev_matchcol
 			&& regmatch.endpos[0].lnum == 0
 			&& matchcol == regmatch.endpos[0].col)
 		{
-		    if (sub_firstline.string[matchcol] == NUL)
+		    إذا (sub_firstline.string[matchcol] == NUL)
 			// We already were at the end of the line.  Don't look
 			// for a match in this line again.
 			skip_match = TRUE;
-		    else
+		    وإلا
 		    {
 			 // search for a match at next column
-			if (has_mbyte)
+			إذا (has_mbyte)
 			    matchcol += mb_ptr2len(sub_firstline.string + matchcol);
-			else
+			وإلا
 			    ++matchcol;
 		    }
-		    goto skip;
+		    اذهب skip;
 		}
 
 		// Normally we continue searching for a match just after the
@@ -4601,13 +4601,13 @@ ex_substitute(exarg_T *eap)
 		 * 2. If do_count is set only increase the counter.
 		 *    If do_ask is set, ask for confirmation.
 		 */
-		if (subflags.do_count)
+		إذا (subflags.do_تعداد)
 		{
 		    // For a multi-line match, put matchcol at the NUL at
 		    // the end of the line and set nmatch to one, so that
 		    // we continue looking for a match on the next line.
 		    // Avoids that ":s/\nB\@=//gc" get stuck.
-		    if (nmatch > 1)
+		    إذا (nmatch > 1)
 		    {
 			matchcol = (colnr_T)sub_firstline.length;
 			nmatch = 1;
@@ -4618,14 +4618,14 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
 		    // Skip the substitution, unless an expression is used,
 		    // then it is evaluated in the sandbox.
-		    if (!(sub[0] == '\\' && sub[1] == '='))
+		    إذا (!(sub[0] == '\\' && sub[1] == '='))
 #endif
-			goto skip;
+			اذهب skip;
 		}
 
-		if (subflags.do_ask)
+		إذا (subflags.do_ask)
 		{
-		    int typed = 0;
+		    صحيح typed = 0;
 
 		    // change State to MODE_CONFIRM, so that the mouse works
 		    // properly
@@ -4633,97 +4633,97 @@ ex_substitute(exarg_T *eap)
 		    State = MODE_CONFIRM;
 		    setmouse();		// disable mouse in xterm
 		    curwin->w_cursor.col = regmatch.startpos[0].col;
-		    if (curwin->w_p_crb)
+		    إذا (curwin->w_p_crb)
 			do_check_cursorbind();
 
 		    // When 'cpoptions' contains "u" don't sync undo when
 		    // asking for confirmation.
-		    if (vim_strchr(p_cpo, CPO_UNDO) != NULL)
+		    إذا (vim_strchr(p_cpo, CPO_UNDO) != عدم)
 			++no_u_sync;
 
 		    /*
 		     * Loop until 'y', 'n', 'q', CTRL-E or CTRL-Y typed.
 		     */
-		    while (subflags.do_ask)
+		    بينما (subflags.do_ask)
 		    {
-			if (exmode_active)
+			إذا (exmode_active)
 			{
 			    char_u	*resp;
 			    colnr_T	sc, ec;
 
-			    print_line_no_prefix(lnum,
-					 subflags.do_number, subflags.do_list);
+			    print_سطر_no_prefix(lnum,
+					 subflags.do_العدد, subflags.do_list);
 
 			    getvcol(curwin, &curwin->w_cursor,
-							   &sc, NULL, NULL, 0);
+							   &sc, عدم, عدم, 0);
 			    curwin->w_cursor.col = regmatch.endpos[0].col - 1;
-			    if (curwin->w_cursor.col < 0)
+			    إذا (curwin->w_cursor.col < 0)
 				curwin->w_cursor.col = 0;
 			    getvcol(curwin, &curwin->w_cursor,
-							   NULL, NULL, &ec, 0);
+							   عدم, عدم, &ec, 0);
 			    curwin->w_cursor.col = regmatch.startpos[0].col;
-			    if (subflags.do_number || curwin->w_p_nu)
+			    إذا (subflags.do_العدد || curwin->w_p_nu)
 			    {
-				int numw = number_width(curwin) + 1;
+				صحيح numw = العدد_width(curwin) + 1;
 				sc += numw;
 				ec += numw;
 			    }
-			    msg_start();
-			    for (i = 0; i < (long)sc; ++i)
-				msg_putchar(' ');
-			    for ( ; i <= (long)ec; ++i)
-				msg_putchar('^');
+			    رسالة_start();
+			    لكل (i = 0; i < (long)sc; ++i)
+				رسالة_putchar(' ');
+			    لكل ( ; i <= (long)ec; ++i)
+				رسالة_putchar('^');
 
-			    resp = getexmodeline('?', NULL, 0, TRUE);
-			    if (resp != NULL)
+			    resp = getexmodeline('?', عدم, 0, TRUE);
+			    إذا (resp != عدم)
 			    {
 				typed = *resp;
 				vim_free(resp);
 				// When ":normal" runs out of characters we get
 				// an empty line.  Use "q" to get out of the
 				// loop.
-				if (ex_normal_busy && typed == NUL)
+				إذا (ex_normal_busy && typed == NUL)
 				    typed = 'q';
 			    }
 			}
-			else
+			وإلا
 			{
-			    string_T orig_line = {NULL, 0};
-			    int    len_change = 0;
-			    int	   save_p_lz = p_lz;
+			    string_T orig_سطر = {عدم, 0};
+			    صحيح    len_change = 0;
+			    صحيح	   save_p_lz = p_lz;
 #ifdef FEAT_FOLDING
-			    int save_p_fen = curwin->w_p_fen;
+			    صحيح save_p_fen = curwin->w_p_fen;
 
 			    curwin->w_p_fen = FALSE;
 #endif
 			    // Invert the matched string.
 			    // Remove the inversion afterwards.
-			    int save_RedrawingDisabled = RedrawingDisabled;
+			    صحيح save_RedrawingDisabled = RedrawingDisabled;
 			    RedrawingDisabled = 0;
 
 			    // avoid calling update_screen() in vgetorpeek()
 			    p_lz = FALSE;
 
-			    if (new_start.string != NULL)
+			    إذا (new_start.string != عدم)
 			    {
 				// There already was a substitution, we would
 				// like to show this to the user.  We cannot
 				// really update the line, it would change
 				// what matches.  Temporarily replace the line
 				// and change it back afterwards.
-				orig_line.length = ml_get_len(lnum);
-				orig_line.string = vim_strnsave(ml_get(lnum), orig_line.length);
-				if (orig_line.string != NULL)
+				orig_سطر.length = ml_get_len(lnum);
+				orig_سطر.string = vim_strnsave(ml_get(lnum), orig_سطر.length);
+				إذا (orig_سطر.string != عدم)
 				{
-				    string_T new_line;
+				    string_T new_سطر;
 
-				    new_line.string = concat_str(new_start.string,
+				    new_سطر.string = concat_str(new_start.string,
 						     sub_firstline.string + copycol);
-				    if (new_line.string == NULL)
-					VIM_CLEAR_STRING(orig_line);
-				    else
+				    إذا (new_سطر.string == عدم)
+					VIM_CLEAR_STRING(orig_سطر);
+				    وإلا
 				    {
-					new_line.length =
+					new_سطر.length =
 					    new_start.length + (sub_firstline.length - copycol);
 					// Position the cursor relative to the
 					// end of the line, the previous
@@ -4731,21 +4731,21 @@ ex_substitute(exarg_T *eap)
 					// deleted characters before the
 					// cursor.
 					len_change =
-					    (int)new_line.length - (int)orig_line.length;
+					    (صحيح)new_سطر.length - (صحيح)orig_سطر.length;
 					curwin->w_cursor.col += len_change;
-					ml_replace(lnum, new_line.string, FALSE);
+					ml_replace(lnum, new_سطر.string, FALSE);
 				    }
 				}
 			    }
 
-			    search_match_lines = regmatch.endpos[0].lnum
+			    بحث_match_أسطر = regmatch.endpos[0].lnum
 						  - regmatch.startpos[0].lnum;
-			    search_match_endcol = regmatch.endpos[0].col
+			    بحث_match_endcol = regmatch.endpos[0].col
 								 + len_change;
-			    if (search_match_lines == 0
-						   && search_match_endcol == 0)
+			    إذا (بحث_match_أسطر == 0
+						   && بحث_match_endcol == 0)
 				// highlight at least one character for /^/
-				search_match_endcol = 1;
+				بحث_match_endcol = 1;
 			    highlight_match = TRUE;
 
 			    update_topline();
@@ -4757,95 +4757,95 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_FOLDING
 			    curwin->w_p_fen = save_p_fen;
 #endif
-			    if (msg_row == Rows - 1)
-				msg_didout = FALSE;	// avoid a scroll-up
-			    msg_starthere();
-			    i = msg_scroll;
-			    msg_scroll = 0;		// truncate msg when
+			    إذا (رسالة_row == Rows - 1)
+				رسالة_didout = FALSE;	// avoid a scroll-up
+			    رسالة_starthere();
+			    i = رسالة_scroll;
+			    رسالة_scroll = 0;		// truncate msg when
 							// needed
-			    msg_no_more = TRUE;
+			    رسالة_no_more = TRUE;
 			    // write message same highlighting as for
 			    // wait_return()
 			    smsg_attr(HL_ATTR(HLF_R),
 				_("replace with %s (y/n/a/q/l/^E/^Y)?"), sub);
-			    msg_no_more = FALSE;
-			    msg_scroll = i;
+			    رسالة_no_more = FALSE;
+			    رسالة_scroll = i;
 			    showruler(TRUE);
-			    windgoto(msg_row, cmdline_col_off + msg_col);
+			    windgoto(رسالة_row, cmdline_col_off + رسالة_col);
 			    RedrawingDisabled = save_RedrawingDisabled;
 
 #ifdef USE_ON_FLY_SCROLL
 			    dont_scroll = FALSE; // allow scrolling here
 #endif
 			    ++no_mapping;	// don't map this key
-			    ++allow_keys;	// allow special keys
+			    ++allow_مفاتيح;	// allow special keys
 			    typed = plain_vgetc();
-			    --allow_keys;
+			    --allow_مفاتيح;
 			    --no_mapping;
 
 			    // clear the question
-			    msg_didout = FALSE;	// don't scroll up
-			    msg_col = 0;
+			    رسالة_didout = FALSE;	// don't scroll up
+			    رسالة_col = 0;
 			    gotocmdline(TRUE);
 			    p_lz = save_p_lz;
 
 			    // restore the line
-			    if (orig_line.string != NULL)
-				ml_replace(lnum, orig_line.string, FALSE);
+			    إذا (orig_سطر.string != عدم)
+				ml_replace(lnum, orig_سطر.string, FALSE);
 			}
 
 			need_wait_return = FALSE; // no hit-return prompt
-			if (typed == 'q' || typed == ESC || typed == Ctrl_C
+			إذا (typed == 'q' || typed == ESC || typed == Ctrl_C
 #ifdef UNIX
 				|| typed == intr_char
 #endif
 				)
 			{
 			    got_quit = TRUE;
-			    break;
+			    اكسر;
 			}
-			if (typed == 'n')
-			    break;
-			if (typed == 'y')
-			    break;
-			if (typed == 'l')
+			إذا (typed == 'n')
+			    اكسر;
+			إذا (typed == 'y')
+			    اكسر;
+			إذا (typed == 'l')
 			{
 			    // last: replace and then stop
 			    subflags.do_all = FALSE;
 			    line2 = lnum;
-			    break;
+			    اكسر;
 			}
-			if (typed == 'a')
+			إذا (typed == 'a')
 			{
 			    subflags.do_ask = FALSE;
-			    break;
+			    اكسر;
 			}
-			if (typed == Ctrl_E)
+			إذا (typed == Ctrl_E)
 			    scrollup_clamp();
-			else if (typed == Ctrl_Y)
+			وإلا إذا (typed == Ctrl_Y)
 			    scrolldown_clamp();
 		    }
 		    State = save_State;
 		    setmouse();
-		    if (vim_strchr(p_cpo, CPO_UNDO) != NULL)
+		    إذا (vim_strchr(p_cpo, CPO_UNDO) != عدم)
 			--no_u_sync;
 
-		    if (typed == 'n')
+		    إذا (typed == 'n')
 		    {
 			// For a multi-line match, put matchcol at the NUL at
 			// the end of the line and set nmatch to one, so that
 			// we continue looking for a match on the next line.
 			// Avoids that ":%s/\nB\@=//gc" and ":%s/\n/,\r/gc"
 			// get stuck when pressing 'n'.
-			if (nmatch > 1)
+			إذا (nmatch > 1)
 			{
 			    matchcol = (colnr_T)sub_firstline.length;
 			    skip_match = TRUE;
 			}
-			goto skip;
+			اذهب skip;
 		    }
-		    if (got_quit)
-			goto skip;
+		    إذا (got_quit)
+			اذهب skip;
 		}
 
 		// Move the cursor to the start of the match, so that we can
@@ -4858,7 +4858,7 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
 		save_ma = curbuf->b_p_ma;
 		save_sandbox = sandbox;
-		if (subflags.do_count)
+		إذا (subflags.do_تعداد)
 		{
 		    // prevent accidentally changing the buffer by a function
 		    curbuf->b_p_ma = FALSE;
@@ -4884,23 +4884,23 @@ ex_substitute(exarg_T *eap)
 		// the replacement.
 		// Don't keep flags set by a recursive call.
 		subflags = subflags_save;
-		if (sublen == 0 || aborting() || subflags.do_count)
+		إذا (sublen == 0 || aborting() || subflags.do_تعداد)
 		{
 		    curbuf->b_p_ma = save_ma;
 		    sandbox = save_sandbox;
-		    goto skip;
+		    اذهب skip;
 		}
 #endif
 
 		// When the match included the "$" of the last line it may
 		// go beyond the last line of the buffer.
-		if (nmatch > curbuf->b_ml.ml_line_count - sub_firstlnum + 1)
+		إذا (nmatch > curbuf->b_ml.ml_سطر_تعداد - sub_firstlnum + 1)
 		{
-		    nmatch = curbuf->b_ml.ml_line_count - sub_firstlnum + 1;
+		    nmatch = curbuf->b_ml.ml_سطر_تعداد - sub_firstlnum + 1;
 		    skip_match = TRUE;
 		    // safety check
-		    if (nmatch < 0)
-			goto skip;
+		    إذا (nmatch < 0)
+			اذهب skip;
 		}
 
 		// Need room for:
@@ -4910,19 +4910,19 @@ ex_substitute(exarg_T *eap)
 		// - original text after match
 		// Adjust text properties here, since we have all information
 		// needed.
-		if (nmatch == 1)
+		إذا (nmatch == 1)
 		{
 		    tmp.string = sub_firstline.string;
 		    tmp.length = sub_firstline.length;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    إذا (curbuf->b_has_textprop)
 		    {
-			int bytes_added = (int)sublen - 1 - (regmatch.endpos[0].col
+			صحيح bytes_added = (صحيح)sublen - 1 - (regmatch.endpos[0].col
 						   - regmatch.startpos[0].col);
 
 			// When text properties are changed, need to save for
 			// undo first, unless done already.
-			if (adjust_prop_columns(lnum,
+			إذا (adjust_prop_columns(lnum,
 					total_added + regmatch.startpos[0].col,
 						       bytes_added, apc_flags))
 			    apc_flags &= ~APC_SAVE_FOR_UNDO;
@@ -4932,16 +4932,16 @@ ex_substitute(exarg_T *eap)
 		    }
 #endif
 		}
-		else
+		وإلا
 		{
 		    linenr_T	lastlnum = sub_firstlnum + nmatch - 1;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    إذا (curbuf->b_has_textprop)
 		    {
 			char_u	*prop_start;
 
 			// Props in the first line may be shortened or deleted
-			if (adjust_prop_columns(lnum,
+			إذا (adjust_prop_columns(lnum,
 					total_added + regmatch.startpos[0].col,
 						       -MAXCOL, apc_flags))
 			    apc_flags &= ~APC_SAVE_FOR_UNDO;
@@ -4949,7 +4949,7 @@ ex_substitute(exarg_T *eap)
 			    (colnr_T)(sub_firstline.length - regmatch.startpos[0].col);
 
 			// Props in the last line may be moved or deleted
-			if (adjust_prop_columns(lastlnum,
+			إذا (adjust_prop_columns(lastlnum,
 					0, -regmatch.endpos[0].col, apc_flags))
 			    // When text properties are changed, need to save
 			    // for undo first, unless done already.
@@ -4957,37 +4957,37 @@ ex_substitute(exarg_T *eap)
 
 			// Copy the text props of the last line, they will be
 			// later appended to the changed line.
-			text_prop_count = get_text_props(curbuf, lastlnum,
+			text_prop_تعداد = get_text_props(curbuf, lastlnum,
 							   &prop_start, FALSE);
-			if (text_prop_count > 0)
+			إذا (text_prop_تعداد > 0)
 			{
 			    // TODO: what when we already did this?
 			    vim_free(text_props);
 			    text_props = ALLOC_MULT(textprop_T,
-							      text_prop_count);
-			    if (text_props != NULL)
+							      text_prop_تعداد);
+			    إذا (text_props != عدم)
 			    {
 				mch_memmove(text_props, prop_start,
-					 text_prop_count * sizeof(textprop_T));
+					 text_prop_تعداد * حجم(textprop_T));
 				// Filter out virtual text and continuation
 				// properties from deleted lines, convert
 				// offsets to pointers, and adjust columns.
-				int wi = 0;
-				for (int pi = 0; pi < text_prop_count; ++pi)
+				صحيح wi = 0;
+				لكل (صحيح pi = 0; pi < text_prop_تعداد; ++pi)
 				{
 				    // Skip virtual text and continuation
 				    // properties from the deleted line.
-				    if (text_props[pi].tp_id < 0
+				    إذا (text_props[pi].tp_id < 0
 					    || (text_props[pi].tp_flags
 							& TP_FLAG_CONT_PREV))
-					continue;
+					استمر;
 				    text_props[wi] = text_props[pi];
 				    text_props[wi].tp_col +=
 					regmatch.startpos[0].col + (colnr_T)sublen - 1;
-				    text_props[wi].u.tp_text = NULL;
+				    text_props[wi].u.tp_text = عدم;
 				    ++wi;
 				}
-				text_prop_count = wi;
+				text_prop_تعداد = wi;
 			    }
 			}
 		    }
@@ -4996,7 +4996,7 @@ ex_substitute(exarg_T *eap)
 		    tmp.length = ml_get_len(lastlnum);
 		    nmatch_tl += nmatch - 1;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    إذا (curbuf->b_has_textprop)
 			total_added +=
 			    (colnr_T)(tmp.length - regmatch.endpos[0].col);
 #endif
@@ -5006,7 +5006,7 @@ ex_substitute(exarg_T *eap)
 		needed_size = copy_len
 		    + (tmp.length - (size_t)regmatch.endpos[0].col) + sublen + 1;
 
-		if (new_start.string == NULL)
+		إذا (new_start.string == عدم)
 		{
 		    /*
 		     * Get some space for a temporary buffer to do the
@@ -5014,12 +5014,12 @@ ex_substitute(exarg_T *eap)
 		     * too many calls to alloc()/free()).
 		     */
 		    new_start_size = needed_size + 50;
-		    if ((new_start.string = alloc_clear(new_start_size)) == NULL)
-			goto outofmem;
+		    إذا ((new_start.string = alloc_clear(new_start_size)) == عدم)
+			اذهب outofmem;
 		    *new_start.string = NUL;
 		    new_start.length = 0;
 		}
-		else
+		وإلا
 		{
 		    /*
 		     * Check if the temporary buffer is long enough to do the
@@ -5027,13 +5027,13 @@ ex_substitute(exarg_T *eap)
 		     * extra to avoid too many calls to alloc()/free()).
 		     */
 		    needed_size += new_start.length;
-		    if (needed_size > new_start_size)
+		    إذا (needed_size > new_start_size)
 		    {
 			new_start_size = needed_size + 50;
-			if ((p1 = alloc_clear(new_start_size)) == NULL)
+			إذا ((p1 = alloc_clear(new_start_size)) == عدم)
 			{
 			    vim_free(new_start.string);
-			    goto outofmem;
+			    اذهب outofmem;
 			}
 			mch_memmove(p1, new_start.string, new_start.length + 1);
 			vim_free(new_start.string);
@@ -5051,7 +5051,7 @@ ex_substitute(exarg_T *eap)
 		// new text added here
 		new_end = new_start.string + new_start.length;
 
-		if (new_start_size - copy_len < sublen)
+		إذا (new_start_size - copy_len < sublen)
 		    sublen = new_start_size - copy_len - 1;
 
 #ifdef FEAT_EVAL
@@ -5059,10 +5059,10 @@ ex_substitute(exarg_T *eap)
 #endif
 		n = (size_t)vim_regsub_multi(&regmatch,
 		    sub_firstlnum - regmatch.startpos[0].lnum,
-		    sub, new_end, (int)sublen,
+		    sub, new_end, (صحيح)sublen,
 		    REGSUB_COPY | REGSUB_BACKSLASH | (magic_isset() ? REGSUB_MAGIC : 0));
 
-		if (n > 0)
+		إذا (n > 0)
 		    new_start.length += n - 1;	    // remove 1 for the NUL
 
 #ifdef FEAT_EVAL
@@ -5077,38 +5077,38 @@ ex_substitute(exarg_T *eap)
 
 		// For a multi-line match, make a copy of the last matched
 		// line and continue in that one.
-		if (nmatch > 1)
+		إذا (nmatch > 1)
 		{
 		    sub_firstlnum += nmatch - 1;
 		    vim_free(sub_firstline.string);
 		    sub_firstline.length = ml_get_len(sub_firstlnum);
 		    sub_firstline.string =
 			vim_strnsave(ml_get(sub_firstlnum), sub_firstline.length);
-		    if (sub_firstline.string == NULL)
+		    إذا (sub_firstline.string == عدم)
 		    {
 			vim_free(new_start.string);
-			goto outofmem;
+			اذهب outofmem;
 		    }
 		    // When going beyond the last line, stop substituting.
-		    if (sub_firstlnum <= line2)
+		    إذا (sub_firstlnum <= line2)
 			do_again = TRUE;
-		    else
+		    وإلا
 			subflags.do_all = FALSE;
 		}
 
 		// Remember next character to be copied.
 		copycol = regmatch.endpos[0].col;
 
-		if (skip_match)
+		إذا (skip_match)
 		{
 		    // Already hit end of the buffer, sub_firstlnum is one
 		    // less than what it ought to be.
 		    vim_free(sub_firstline.string);
 		    sub_firstline.string = vim_strnsave((char_u *)"", 0);
-		    if (sub_firstline.string == NULL)
+		    إذا (sub_firstline.string == عدم)
 		    {
 			vim_free(new_start.string);
-			goto outofmem;
+			اذهب outofmem;
 		    }
 		    sub_firstline.length = 0;
 		    copycol = 0;
@@ -5122,41 +5122,41 @@ ex_substitute(exarg_T *eap)
 		 * they must be doubled in the string and are halved here.
 		 * That is Vi compatible.
 		 */
-		for (p1 = new_end; *p1; ++p1)
+		لكل (p1 = new_end; *p1; ++p1)
 		{
-		    if (p1[0] == '\\' && p1[1] != NUL)  // remove backslash
+		    إذا (p1[0] == '\\' && p1[1] != NUL)  // remove backslash
 		    {
 			n = (size_t)(new_start.length - (p1 - new_start.string));
 			mch_memmove(p1, p1 + 1, n + 1);
 			--new_start.length;
 #ifdef FEAT_PROP_POPUP
-			if (curbuf->b_has_textprop)
+			إذا (curbuf->b_has_textprop)
 			{
 			    // When text properties are changed, need to save
 			    // for undo first, unless done already.
-			    if (adjust_prop_columns(lnum,
+			    إذا (adjust_prop_columns(lnum,
 					(colnr_T)(p1 - new_start.string), -1,
 					apc_flags))
 				apc_flags &= ~APC_SAVE_FOR_UNDO;
 			}
 #endif
 		    }
-		    else if (*p1 == CAR)
+		    وإلا إذا (*p1 == CAR)
 		    {
-			if (u_inssub(lnum) == OK)   // prepare for undo
+			إذا (u_inssub(lnum) == OK)   // prepare for undo
 			{
 			    colnr_T	plen = (colnr_T)(p1 - new_start.string + 1);
 
 			    *p1 = NUL;		    // truncate up to the CR
 			    ml_append(lnum - 1, new_start.string, plen, FALSE);
 			    mark_adjust(lnum + 1, (linenr_T)MAXLNUM, 1L, 0L);
-			    if (subflags.do_ask)
-				appended_lines(lnum - 1, 1L);
-			    else
+			    إذا (subflags.do_ask)
+				appended_أسطر(lnum - 1, 1L);
+			    وإلا
 			    {
-				if (first_line == 0)
-				    first_line = lnum;
-				last_line = lnum + 1;
+				إذا (first_سطر == 0)
+				    first_سطر = lnum;
+				last_سطر = lnum + 1;
 			    }
 #ifdef FEAT_PROP_POPUP
 			    adjust_props_for_split(lnum + 1, lnum,
@@ -5176,7 +5176,7 @@ ex_substitute(exarg_T *eap)
 			    p1 = new_start.string - 1;
 			}
 		    }
-		    else if (has_mbyte)
+		    وإلا إذا (has_mbyte)
 			p1 += (*mb_ptr2len)(p1) - 1;
 		}
 
@@ -5212,15 +5212,15 @@ skip:
 		 * When asking, undo is synced at every match, so a line split
 		 * by "\r" must be replaced in the same undo block.
 		 */
-		if (lastone
+		إذا (lastone
 			|| nmatch_tl > 0
 			|| (subflags.do_ask && did_split)
 			|| (nmatch = vim_regexec_multi(&regmatch, curwin,
 							curbuf, sub_firstlnum,
-						    matchcol, NULL)) == 0
+						    matchcol, عدم)) == 0
 			|| regmatch.startpos[0].lnum > 0)
 		{
-		    if (new_start.string != NULL)
+		    إذا (new_start.string != عدم)
 		    {
 			/*
 			 * Copy the rest of the line, that didn't match.
@@ -5236,14 +5236,14 @@ skip:
 			prev_matchcol = (colnr_T)(sub_firstline.length
 							      - prev_matchcol);
 
-			if (u_savesub(lnum) != OK)
-			    break;
+			إذا (u_savesub(lnum) != OK)
+			    اكسر;
 			ml_replace(lnum, new_start.string, TRUE);
 #ifdef FEAT_PROP_POPUP
-			if (text_props != NULL)
-			    add_text_props(lnum, text_props, text_prop_count);
+			إذا (text_props != عدم)
+			    add_text_props(lnum, text_props, text_prop_تعداد);
 #endif
-			if (nmatch_tl > 0)
+			إذا (nmatch_tl > 0)
 			{
 			    /*
 			     * Matched lines have now been substituted and are
@@ -5252,21 +5252,21 @@ skip:
 			     * it in the buffer.
 			     */
 			    ++lnum;
-			    if (u_savedel(lnum, nmatch_tl) != OK)
-				break;
-			    for (i = 0; i < nmatch_tl; ++i)
+			    إذا (u_savedel(lnum, nmatch_tl) != OK)
+				اكسر;
+			    لكل (i = 0; i < nmatch_tl; ++i)
 				ml_delete(lnum);
-			    if (copycol > 0)
+			    إذا (copycol > 0)
 				mark_adjust(lnum, lnum + nmatch_tl - 1,
 						   (long)MAXLNUM, -nmatch_tl);
-			    else
+			    وإلا
 				// The entire last matched line was consumed,
 				// so the first line was effectively replaced
 				// by lines below.
 				mark_adjust(lnum - 1, lnum - 1,
 						   (long)MAXLNUM, -nmatch_tl);
-			    if (subflags.do_ask)
-				deleted_lines(lnum, nmatch_tl);
+			    إذا (subflags.do_ask)
+				deleted_أسطر(lnum, nmatch_tl);
 			    --lnum;
 			    line2 -= nmatch_tl; // nr of lines decreases
 			    nmatch_tl = 0;
@@ -5274,20 +5274,20 @@ skip:
 
 			// When asking, undo is saved each time, must also set
 			// changed flag each time.
-			if (subflags.do_ask)
+			إذا (subflags.do_ask)
 			    changed_bytes(lnum, 0);
-			else
+			وإلا
 			{
-			    if (first_line == 0)
-				first_line = lnum;
-			    last_line = lnum + 1;
+			    إذا (first_سطر == 0)
+				first_سطر = lnum;
+			    last_سطر = lnum + 1;
 			}
 
 			sub_firstlnum = lnum;
 			vim_free(sub_firstline.string);    // free the temp buffer
 			sub_firstline.string = new_start.string;
 			sub_firstline.length = new_start.length;
-			new_start.string = NULL;
+			new_start.string = عدم;
 			new_start.length = 0;
 			matchcol = (colnr_T)(sub_firstline.length - matchcol);
 			prev_matchcol = (colnr_T)(sub_firstline.length
@@ -5295,43 +5295,43 @@ skip:
 			copycol = 0;
 			did_split = false;
 		    }
-		    if (nmatch == -1 && !lastone)
+		    إذا (nmatch == -1 && !lastone)
 			nmatch = vim_regexec_multi(&regmatch, curwin, curbuf,
-					  sub_firstlnum, matchcol, NULL);
+					  sub_firstlnum, matchcol, عدم);
 
 		    /*
 		     * 5. break if there isn't another match in this line
 		     */
-		    if (nmatch <= 0)
+		    إذا (nmatch <= 0)
 		    {
 			// If the match found didn't start where we were
 			// searching, do the next search in the line where we
 			// found the match.
-			if (nmatch == -1)
+			إذا (nmatch == -1)
 			    lnum -= regmatch.startpos[0].lnum;
-			break;
+			اكسر;
 		    }
 		}
 
-		line_breakcheck();
+		سطر_breakcheck();
 	    }
 
-	    if (did_sub)
+	    إذا (did_sub)
 		++sub_nlines;
 	    vim_free(new_start.string);	// for when substitute was cancelled
 	    VIM_CLEAR_STRING(sub_firstline);	// free the copy of the original line
 	}
 
-	line_breakcheck();
+	سطر_breakcheck();
     }
 
-    if (first_line != 0)
+    إذا (first_سطر != 0)
     {
 	// Need to subtract the number of added lines from "last_line" to get
 	// the line number before the change (same as adding the number of
 	// deleted lines).
-	i = curbuf->b_ml.ml_line_count - old_line_count;
-	changed_lines(first_line, 0, last_line - i, i);
+	i = curbuf->b_ml.ml_سطر_تعداد - old_سطر_تعداد;
+	changed_أسطر(first_سطر, 0, last_سطر - i, i);
     }
 
 outofmem:
@@ -5342,12 +5342,12 @@ outofmem:
 #endif
 
     // ":s/pat//n" doesn't move the cursor
-    if (subflags.do_count)
+    إذا (subflags.do_تعداد)
 	curwin->w_cursor = old_cursor;
 
-    if (sub_nsubs > start_nsubs)
+    إذا (sub_nsubs > start_nsubs)
     {
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set the '[ and '] marks.
 	    curbuf->b_op_start.lnum = eap->line1;
@@ -5355,37 +5355,37 @@ outofmem:
 	    curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
 	}
 
-	if (!global_busy)
+	إذا (!global_busy)
 	{
 	    // when interactive leave cursor on the match
-	    if (!subflags.do_ask)
+	    إذا (!subflags.do_ask)
 	    {
-		if (endcolumn)
+		إذا (endcolumn)
 		    coladvance((colnr_T)MAXCOL);
-		else
+		وإلا
 		    beginline(BL_WHITE | BL_FIX);
 	    }
-	    if (!do_sub_msg(subflags.do_count) && subflags.do_ask)
-		msg("");
+	    إذا (!do_sub_رسالة(subflags.do_تعداد) && subflags.do_ask)
+		رسالة("");
 	}
-	else
+	وإلا
 	    global_need_beginline = TRUE;
-	if (subflags.do_print)
-	    print_line(curwin->w_cursor.lnum,
-					 subflags.do_number, subflags.do_list);
+	إذا (subflags.do_print)
+	    print_سطر(curwin->w_cursor.lnum,
+					 subflags.do_العدد, subflags.do_list);
     }
-    else if (!global_busy)
+    وإلا إذا (!global_busy)
     {
-	if (got_int)		// interrupted
+	إذا (got_int)		// interrupted
 	    emsg(_(e_interrupted));
-	else if (got_match)	// did find something but nothing substituted
-	    msg("");
-	else if (subflags.do_error)	// nothing found
-	    semsg(_(e_pattern_not_found_str), get_search_pat());
+	وإلا إذا (got_match)	// did find something but nothing substituted
+	    رسالة("");
+	وإلا إذا (subflags.do_error)	// nothing found
+	    semsg(_(e_pattern_not_found_str), get_بحث_pat());
     }
 
 #ifdef FEAT_FOLDING
-    if (subflags.do_ask && hasAnyFolding(curwin))
+    إذا (subflags.do_ask && hasAnyFolding(curwin))
 	// Cursor position may require updating
 	changed_window_setting();
 #endif
@@ -5403,9 +5403,9 @@ outofmem:
  * Can also be used after a ":global" command.
  * Return TRUE if a message was given.
  */
-    int
-do_sub_msg(
-    int	    count_only)		// used 'n' flag for ":s"
+    صحيح
+do_sub_رسالة(
+    صحيح	    تعداد_only)		// used 'n' flag for ":s"
 {
     /*
      * Only report substitutions when:
@@ -5413,55 +5413,55 @@ do_sub_msg(
      * - command was typed by user, or number of changed lines > 'report'
      * - giving messages is not disabled by 'lazyredraw'
      */
-    if (((sub_nsubs > p_report && (KeyTyped || sub_nlines > 1 || p_report < 1))
-		|| count_only)
+    إذا (((sub_nsubs > p_report && (مفتاح_Typed || sub_nlines > 1 || p_report < 1))
+		|| تعداد_only)
 	    && messaging())
     {
-	char	*msg_single;
-	char	*msg_plural;
+	حرف	*رسالة_single;
+	حرف	*رسالة_plural;
 
-	if (got_int)
-	    STRCPY(msg_buf, _("(Interrupted) "));
-	else
-	    *msg_buf = NUL;
+	إذا (got_int)
+	    STRCPY(رسالة_buf, _("(Interrupted) "));
+	وإلا
+	    *رسالة_buf = NUL;
 
-	msg_single = count_only
+	رسالة_single = تعداد_only
 		    ? NGETTEXT("%ld match on %ld line",
 					  "%ld matches on %ld line", sub_nsubs)
 		    : NGETTEXT("%ld substitution on %ld line",
 				   "%ld substitutions on %ld line", sub_nsubs);
-	msg_plural = count_only
+	رسالة_plural = تعداد_only
 		    ? NGETTEXT("%ld match on %ld lines",
 					 "%ld matches on %ld lines", sub_nsubs)
 		    : NGETTEXT("%ld substitution on %ld lines",
 				  "%ld substitutions on %ld lines", sub_nsubs);
 
-	vim_snprintf_add(msg_buf, sizeof(msg_buf),
-				 NGETTEXT(msg_single, msg_plural, sub_nlines),
+	vim_snprintf_add(رسالة_buf, حجم(رسالة_buf),
+				 NGETTEXT(رسالة_single, رسالة_plural, sub_nlines),
 				 sub_nsubs, (long)sub_nlines);
 
-	if (msg(msg_buf))
+	إذا (رسالة(رسالة_buf))
 	    // save message to display it after redraw
-	    set_keep_msg((char_u *)msg_buf, 0);
-	return TRUE;
+	    set_keep_رسالة((char_u *)رسالة_buf, 0);
+	إرجاع TRUE;
     }
-    if (got_int)
+    إذا (got_int)
     {
 	emsg(_(e_interrupted));
-	return TRUE;
+	إرجاع TRUE;
     }
-    return FALSE;
+    إرجاع FALSE;
 }
 
-    static void
+    ساكن فراغ
 global_exe_one(char_u *cmd, linenr_T lnum)
 {
     curwin->w_cursor.lnum = lnum;
     curwin->w_cursor.col = 0;
-    if (*cmd == NUL || *cmd == '\n')
-	do_cmdline((char_u *)"p", NULL, NULL, DOCMD_NOWAIT);
-    else
-	do_cmdline(cmd, NULL, NULL, DOCMD_NOWAIT);
+    إذا (*cmd == NUL || *cmd == '\n')
+	do_cmdline((char_u *)"p", عدم, عدم, DOCMD_NOWAIT);
+    وإلا
+	do_cmdline(cmd, عدم, عدم, DOCMD_NOWAIT);
 }
 
 /*
@@ -5480,12 +5480,12 @@ global_exe_one(char_u *cmd, linenr_T lnum)
  * for each line that has a mark. This is required because after deleting
  * lines we do not know where to search for the next match.
  */
-    void
+    فراغ
 ex_global(exarg_T *eap)
 {
     linenr_T	lnum;		// line number according to old situation
-    int		ndone = 0;
-    int		type;		// first char of cmd: 'v' or 'g'
+    صحيح		ndone = 0;
+    صحيح		type;		// first char of cmd: 'v' or 'g'
     char_u	*cmd;		// command argument
 
     char_u	delim;		// delimiter, normally '/'
@@ -5493,29 +5493,29 @@ ex_global(exarg_T *eap)
     size_t	patlen;
     char_u	*used_pat;
     regmmatch_T	regmatch;
-    int		match;
-    int		which_pat;
+    صحيح		match;
+    صحيح		which_pat;
 
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
-    if (global_busy && (eap->line1 != 1
-				  || eap->line2 != curbuf->b_ml.ml_line_count))
+    إذا (global_busy && (eap->line1 != 1
+				  || eap->line2 != curbuf->b_ml.ml_سطر_تعداد))
     {
 	// will increment global_busy to break out of the loop
 	emsg(_(e_cannot_do_global_recursive_with_range));
-	return;
+	إرجاع;
     }
 
-    if (eap->forceit)		    // ":global!" is like ":vglobal"
+    إذا (eap->forceit)		    // ":global!" is like ":vglobal"
 	type = 'v';
-    else
+    وإلا
 	type = *eap->cmd;
     cmd = eap->arg;
     which_pat = RE_LAST;	    // default: use last used regexp
 
 #ifdef FEAT_EVAL
-    if (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg) == FAIL)
-	return;
+    إذا (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg) == FAIL)
+	إرجاع;
 #endif
 
     /*
@@ -5523,100 +5523,100 @@ ex_global(exarg_T *eap)
      *	"\/" and "\?": use previous search pattern.
      *		 "\&": use previous substitute pattern.
      */
-    if (*cmd == '\\')
+    إذا (*cmd == '\\')
     {
 	++cmd;
-	if (vim_strchr((char_u *)"/?&", *cmd) == NULL)
+	إذا (vim_strchr((char_u *)"/?&", *cmd) == عدم)
 	{
 	    emsg(_(e_backslash_should_be_followed_by));
-	    return;
+	    إرجاع;
 	}
-	if (*cmd == '&')
+	إذا (*cmd == '&')
 	    which_pat = RE_SUBST;	// use previous substitute pattern
-	else
-	    which_pat = RE_SEARCH;	// use previous search pattern
+	وإلا
+	    which_pat = RE_بحث;	// use previous search pattern
 	++cmd;
 	pat = (char_u *)"";
 	patlen = 0;
     }
-    else if (*cmd == NUL)
+    وإلا إذا (*cmd == NUL)
     {
 	emsg(_(e_regular_expression_missing_from_global));
-	return;
+	إرجاع;
     }
-    else if (check_regexp_delim(*cmd) == FAIL)
+    وإلا إذا (check_regexp_delim(*cmd) == FAIL)
     {
-	return;
+	إرجاع;
     }
-    else
+    وإلا
     {
 	delim = *cmd;		// get the delimiter
 	++cmd;			// skip delimiter if there is one
 	pat = cmd;		// remember start of pattern
-	cmd = skip_regexp_ex(cmd, delim, magic_isset(), &eap->arg, NULL, NULL);
-	if (cmd[0] == delim)		    // end delimiter found
+	cmd = skip_regexp_ex(cmd, delim, magic_isset(), &eap->arg, عدم, عدم);
+	إذا (cmd[0] == delim)		    // end delimiter found
 	    *cmd++ = NUL;		    // replace it with a NUL
 	patlen = STRLEN(pat);
     }
 
-    if (search_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, SEARCH_HIS,
+    إذا (بحث_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, بحث_HIS,
 							    &regmatch) == FAIL)
     {
 	emsg(_(e_invalid_command));
-	return;
+	إرجاع;
     }
 
-    if (global_busy)
+    إذا (global_busy)
     {
 	lnum = curwin->w_cursor.lnum;
 	match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
-						       (colnr_T)0, NULL);
-	if ((type == 'g' && match) || (type == 'v' && !match))
+						       (colnr_T)0, عدم);
+	إذا ((type == 'g' && match) || (type == 'v' && !match))
 	    global_exe_one(cmd, lnum);
     }
-    else
+    وإلا
     {
 	/*
 	 * pass 1: set marks for each (not) matching line
 	 */
-	for (lnum = eap->line1; lnum <= eap->line2 && !got_int; ++lnum)
+	لكل (lnum = eap->line1; lnum <= eap->line2 && !got_int; ++lnum)
 	{
 	    // a match on this line?
 	    match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
-						       (colnr_T)0, NULL);
-	    if (regmatch.regprog == NULL)
-		break;  // re-compiling regprog failed
-	    if ((type == 'g' && match) || (type == 'v' && !match))
+						       (colnr_T)0, عدم);
+	    إذا (regmatch.regprog == عدم)
+		اكسر;  // re-compiling regprog failed
+	    إذا ((type == 'g' && match) || (type == 'v' && !match))
 	    {
 		ml_setmarked(lnum);
 		ndone++;
 	    }
-	    line_breakcheck();
+	    سطر_breakcheck();
 	}
 
 	/*
 	 * pass 2: execute the command for each line that has been marked
 	 */
-	if (got_int)
-	    msg(_(e_interrupted));
-	else if (ndone == 0)
+	إذا (got_int)
+	    رسالة(_(e_interrupted));
+	وإلا إذا (ndone == 0)
 	{
-	    if (type == 'v')
+	    إذا (type == 'v')
 	    {
-		if (in_vim9script())
-		    semsg(_(e_pattern_found_in_every_line_str), used_pat);
-		else
+		إذا (in_vim9script())
+		    semsg(_(e_pattern_found_in_every_سطر_str), used_pat);
+		وإلا
 		    smsg(_("Pattern found in every line: %s"), used_pat);
 	    }
-	    else
+	    وإلا
 	    {
-		if (in_vim9script())
+		إذا (in_vim9script())
 		    semsg(_(e_pattern_not_found_str), used_pat);
-		else
+		وإلا
 		    smsg(_("Pattern not found: %s"), used_pat);
 	    }
 	}
-	else
+	وإلا
 	{
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	    inc_clip_provider();
@@ -5642,7 +5642,7 @@ ex_global(exarg_T *eap)
 /*
  * Execute "cmd" on lines marked with ml_setmarked().
  */
-    void
+    فراغ
 global_exe(char_u *cmd)
 {
     linenr_T old_lcount;	// b_ml.ml_line_count before the command
@@ -5657,40 +5657,40 @@ global_exe(char_u *cmd)
     setpcmark();
 
     // When the command writes a message, don't overwrite the command.
-    msg_didout = TRUE;
+    رسالة_didout = TRUE;
 
     sub_nsubs = 0;
     sub_nlines = 0;
     global_need_beginline = FALSE;
     global_busy = 1;
-    old_lcount = curbuf->b_ml.ml_line_count;
-    while (!got_int && (lnum = ml_firstmarked()) != 0 && global_busy == 1)
+    old_lcount = curbuf->b_ml.ml_سطر_تعداد;
+    بينما (!got_int && (lnum = ml_firstmarked()) != 0 && global_busy == 1)
     {
 	global_exe_one(cmd, lnum);
 	ui_breakcheck();
     }
 
     global_busy = 0;
-    if (global_need_beginline)
+    إذا (global_need_beginline)
 	beginline(BL_WHITE | BL_FIX);
-    else
+    وإلا
 	check_cursor();	// cursor may be beyond the end of the line
 
     // the cursor may not have moved in the text but a change in a previous
     // line may move it on the screen
-    changed_line_abv_curs();
+    changed_سطر_abv_curs();
 
     // If it looks like no message was written, allow overwriting the
     // command with the report for number of changes.
-    if (msg_col == 0 && msg_scrolled == 0)
-	msg_didout = FALSE;
+    إذا (رسالة_col == 0 && رسالة_scrolled == 0)
+	رسالة_didout = FALSE;
 
     // If substitutes done, report number of substitutes, otherwise report
     // number of extra or deleted lines.
     // Don't report extra or deleted lines in the edge case where the buffer
     // we are in after execution is different from the buffer we started in.
-    if (!do_sub_msg(FALSE) && curbuf == old_buf)
-	msgmore(curbuf->b_ml.ml_line_count - old_lcount);
+    إذا (!do_sub_رسالة(FALSE) && curbuf == old_buf)
+	msgmore(curbuf->b_ml.ml_سطر_تعداد - old_lcount);
 }
 
 #ifdef FEAT_VIMINFO
@@ -5698,15 +5698,15 @@ global_exe(char_u *cmd)
  * Get the previous substitute pattern.
  */
     char_u *
-get_old_sub(void)
+get_old_sub(فراغ)
 {
-    return old_sub;
+    إرجاع old_sub;
 }
 
 /*
  * Set the previous substitute pattern.  "val" must be allocated.
  */
-    void
+    فراغ
 set_old_sub(char_u *val)
 {
     vim_free(old_sub);
@@ -5714,24 +5714,24 @@ set_old_sub(char_u *val)
 }
 #endif // FEAT_VIMINFO
 
-#if defined(EXITFREE)
-    void
-free_old_sub(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_old_sub(فراغ)
 {
     vim_free(old_sub);
 }
 #endif
 
-#if defined(FEAT_QUICKFIX)
+#إذا defined(FEAT_QUICKFIX)
 /*
  * Set up for a tagpreview.
  * Makes the preview window the current window.
  * Return TRUE when it was created.
  */
-    int
+    صحيح
 prepare_tagpreview(
-    int		undo_sync,	    // sync undo when leaving the window
-    int		use_previewpopup,   // use popup if 'previewpopup' set
+    صحيح		undo_sync,	    // sync undo when leaving the window
+    صحيح		use_previewpopup,   // use popup if 'previewpopup' set
     use_popup_T	use_popup)	    // use other popup window
 {
     win_T	*wp;
@@ -5740,56 +5740,56 @@ prepare_tagpreview(
     need_mouse_correct = TRUE;
 # endif
 
-    if (curwin->w_p_pvw)
-	return FALSE;
+    إذا (curwin->w_p_pvw)
+	إرجاع FALSE;
 
     /*
      * If there is already a preview window open, use that one.
      */
 # ifdef FEAT_PROP_POPUP
-    if (use_previewpopup && *p_pvp != NUL)
+    إذا (use_previewpopup && *p_pvp != NUL)
     {
 	wp = popup_find_preview_window();
-	if (wp != NULL)
-	    popup_set_wantpos_cursor(wp, wp->w_minwidth, NULL);
+	إذا (wp != عدم)
+	    popup_set_wantpos_cursor(wp, wp->w_minwidth, عدم);
     }
-    else if (use_popup != USEPOPUP_NONE)
+    وإلا إذا (use_popup != USEPOPUP_NONE)
     {
 	wp = popup_find_info_window();
-	if (wp != NULL)
+	إذا (wp != عدم)
 	{
-	    if (use_popup == USEPOPUP_NORMAL)
+	    إذا (use_popup == USEPOPUP_NORMAL)
 		popup_show(wp);
-	    else
+	    وإلا
 		popup_hide(wp);
 	    // When the popup moves or resizes it may reveal part of
 	    // another window.  TODO: can this be done more efficiently?
 	    redraw_all_later(UPD_NOT_VALID);
 	}
     }
-    else
+    وإلا
 # endif
     {
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_p_pvw)
-		break;
+	    إذا (wp->w_p_pvw)
+		اكسر;
     }
-    if (wp != NULL)
+    إذا (wp != عدم)
     {
 	win_enter(wp, undo_sync);
-	return FALSE;
+	إرجاع FALSE;
     }
 
     /*
      * There is no preview window open yet.  Create one.
      */
 # ifdef FEAT_PROP_POPUP
-    if ((use_previewpopup && *p_pvp != NUL)
+    إذا ((use_previewpopup && *p_pvp != NUL)
 	    || use_popup != USEPOPUP_NONE)
-	return popup_create_preview_window(use_popup != USEPOPUP_NONE);
+	إرجاع popup_create_preview_window(use_popup != USEPOPUP_NONE);
 # endif
-    if (win_split(g_do_tagpreview > 0 ? g_do_tagpreview : 0, 0) == FAIL)
-	return FALSE;
+    إذا (win_split(g_do_tagpreview > 0 ? g_do_tagpreview : 0, 0) == FAIL)
+	إرجاع FALSE;
     curwin->w_p_pvw = TRUE;
     curwin->w_p_wfh = TRUE;
     RESET_BINDING(curwin);	    // don't take over 'scrollbind'
@@ -5800,7 +5800,7 @@ prepare_tagpreview(
 # ifdef FEAT_FOLDING
     curwin->w_p_fdc = 0;	    // no 'foldcolumn'
 # endif
-    return TRUE;
+    إرجاع TRUE;
 }
 
 #endif
@@ -5808,46 +5808,46 @@ prepare_tagpreview(
 /*
  * Make the user happy.
  */
-    void
+    فراغ
 ex_smile(exarg_T *eap UNUSED)
 {
-    static char *code[] = {
+    ساكن حرف *code[] = {
 	"\34 \4o\14$\4ox\30 \2o\30$\1ox\25 \2o\36$\1o\11 \1o\1$\3 \2$\1 \1o\1$x\5 \1o\1 \1$\1 \2o\10 \1o\44$\1o\7 \2$\1 \2$\1 \2$\1o\1$x\2 \2o\1 \1$\1 \1$\1 \1\"\1$\6 \1o\11$\4 \15$\4 \11$\1o\7 \3$\1o\2$\1o\1$x\2 \1\"\6$\1o\1$\5 \1o\11$\6 \13$\6 \12$\1o\4 \10$x\4 \7$\4 \13$\6 \13$\6 \27$x\4 \27$\4 \15$\4 \16$\2 \3\"\3$x\5 \1\"\3$\4\"\61$\5 \1\"\3$x\6 \3$\3 \1o\62$\5 \1\"\3$\1ox\5 \1o\2$\1\"\3 \63$\7 \3$\1ox\5 \3$\4 \55$\1\"\1 \1\"\6$",
 	"\5o\4$\1ox\4 \1o\3$\4o\5$\2 \45$\3 \1o\21$x\4 \10$\1\"\4$\3 \42$\5 \4$\10\"x\3 \4\"\7 \4$\4 \1\"\34$\1\"\6 \1o\3$x\16 \1\"\3$\1o\5 \3\"\22$\1\"\2$\1\"\11 \3$x\20 \3$\1o\12 \1\"\2$\2\"\6$\4\"\13 \1o\3$x\21 \4$\1o\40 \1o\3$\1\"x\22 \1\"\4$\1o\6 \1o\6$\1o\1\"\4$\1o\10 \1o\4$x\24 \1\"\5$\2o\5 \2\"\4$\1o\5$\1o\3 \1o\4$\2\"x\27 \2\"\5$\4o\2 \1\"\3$\1o\11$\3\"x\32 \2\"\7$\2o\1 \12$x\42 \4\"\13$x\46 \14$x\47 \12$\1\"x\50 \1\"\3$\4\"x"
     };
-    char *p;
-    int n;
-    int i;
+    حرف *p;
+    صحيح n;
+    صحيح i;
 
-    msg_start();
-    msg_putchar('\n');
-    for (i = 0; i < 2; ++i)
-	for (p = code[i]; *p != NUL; ++p)
-	    if (*p == 'x')
-		msg_putchar('\n');
-	    else
-		for (n = *p++; n > 0; --n)
-		    if (*p == 'o' || *p == '$')
-			msg_putchar_attr(*p, HL_ATTR(HLF_L));
-		    else
-			msg_putchar(*p);
-    msg_clr_eos();
+    رسالة_start();
+    رسالة_putchar('\n');
+    لكل (i = 0; i < 2; ++i)
+	لكل (p = code[i]; *p != NUL; ++p)
+	    إذا (*p == 'x')
+		رسالة_putchar('\n');
+	    وإلا
+		لكل (n = *p++; n > 0; --n)
+		    إذا (*p == 'o' || *p == '$')
+			رسالة_putchar_attr(*p, HL_ATTR(HLF_L));
+		    وإلا
+			رسالة_putchar(*p);
+    رسالة_clr_eos();
 }
 
 /*
  * ":drop"
  * Opens the first argument in a window, and the argument list is redefined.
  */
-    void
+    فراغ
 ex_drop(exarg_T *eap)
 {
-    int		split = FALSE;
+    صحيح		split = FALSE;
     win_T	*wp;
     buf_T	*buf;
     tabpage_T	*tp;
 
-    if (ERROR_IF_POPUP_WINDOW || ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    إذا (ERROR_IF_POPUP_WINDOW || ERROR_IF_TERM_POPUP_WINDOW)
+	إرجاع;
 
     /*
      * Check if the first argument is already being edited in a window.  If
@@ -5864,10 +5864,10 @@ ex_drop(exarg_T *eap)
      * editing "foo.pyc" and ".pyc" is in 'wildignore'.  Assume that we
      * already did an error message for this.
      */
-    if (ARGCOUNT == 0)
-	return;
+    إذا (ARGCOUNT == 0)
+	إرجاع;
 
-    if (cmdmod.cmod_tab)
+    إذا (cmdmod.cmod_tab)
     {
 	// ":tab drop file ...": open a tab for each argument that isn't
 	// edited in a window yet.  It's like ":tab all" but without closing
@@ -5875,7 +5875,7 @@ ex_drop(exarg_T *eap)
 	ex_all(eap);
 	cmdmod.cmod_tab = 0;
 	ex_rewind(eap);
-	return;
+	إرجاع;
     }
 
     // ":drop file ...": Edit the first argument.  Jump to an existing
@@ -5885,22 +5885,22 @@ ex_drop(exarg_T *eap)
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer == buf)
+	إذا (wp->w_buffer == buf)
 	{
 	    goto_tabpage_win(tp, wp);
 	    curwin->w_arg_idx = 0;
-	    if (!bufIsChanged(curbuf))
+	    إذا (!bufIsChanged(curbuf))
 	    {
-		int save_ar = curbuf->b_p_ar;
+		صحيح save_ar = curbuf->b_p_ar;
 
 		// reload the file if it is newer
 		curbuf->b_p_ar = TRUE;
 		buf_check_timestamp(curbuf, FALSE);
 		curbuf->b_p_ar = save_ar;
 	    }
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+	    إذا (curbuf->b_ml.ml_flags & ML_EMPTY)
 		ex_rewind(eap);
-	    return;
+	    إرجاع;
 	}
     }
 
@@ -5910,7 +5910,7 @@ ex_drop(exarg_T *eap)
      * Skip the check if the 'hidden' option is set, as in this case the
      * buffer won't be lost.
      */
-    if (!buf_hide(curbuf))
+    إذا (!buf_hide(curbuf))
     {
 	++emsg_off;
 	split = check_changed(curbuf, CCGD_AW | CCGD_EXCMD);
@@ -5918,12 +5918,12 @@ ex_drop(exarg_T *eap)
     }
 
     // Fake a ":sfirst" or ":first" command edit the first argument.
-    if (split)
+    إذا (split)
     {
 	eap->cmdidx = CMD_sfirst;
 	eap->cmd[0] = 's';
     }
-    else
+    وإلا
 	eap->cmdidx = CMD_first;
     ex_rewind(eap);
 }
@@ -5936,9 +5936,9 @@ ex_drop(exarg_T *eap)
  * Return a pointer to the char just past the pattern plus flags.
  */
     char_u *
-skip_vimgrep_pat(char_u *p, char_u **s, int *flags)
+skip_vimgrep_pat(char_u *p, char_u **s, صحيح *flags)
 {
-    return skip_vimgrep_pat_ext(p, s, flags, NULL, NULL);
+    إرجاع skip_vimgrep_pat_ext(p, s, flags, عدم, عدم);
 }
 
 /*
@@ -5946,19 +5946,19 @@ skip_vimgrep_pat(char_u *p, char_u **s, int *flags)
  * and the pointer to it in "nulp".
  */
     char_u *
-skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
+skip_vimgrep_pat_ext(char_u *p, char_u **s, صحيح *flags, char_u **nulp, صحيح *cp)
 {
-    int		c;
+    صحيح		c;
 
-    if (vim_isIDc(*p))
+    إذا (vim_isIDc(*p))
     {
 	// ":vimgrep pattern fname"
-	if (s != NULL)
+	إذا (s != عدم)
 	    *s = p;
 	p = skiptowhite(p);
-	if (s != NULL && *p != NUL)
+	إذا (s != عدم && *p != NUL)
 	{
-	    if (nulp != NULL)
+	    إذا (nulp != عدم)
 	    {
 		*nulp = p;
 		*cp = *p;
@@ -5966,20 +5966,20 @@ skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
 	    *p++ = NUL;
 	}
     }
-    else
+    وإلا
     {
 	// ":vimgrep /pattern/[g][j] fname"
-	if (s != NULL)
+	إذا (s != عدم)
 	    *s = p + 1;
 	c = *p;
 	p = skip_regexp(p + 1, c, TRUE);
-	if (*p != c)
-	    return NULL;
+	إذا (*p != c)
+	    إرجاع عدم;
 
 	// Truncate the pattern.
-	if (s != NULL)
+	إذا (s != عدم)
 	{
-	    if (nulp != NULL)
+	    إذا (nulp != عدم)
 	    {
 		*nulp = p;
 		*cp = *p;
@@ -5989,61 +5989,61 @@ skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
 	++p;
 
 	// Find the flags
-	while (*p == 'g' || *p == 'j' || *p == 'f')
+	بينما (*p == 'g' || *p == 'j' || *p == 'f')
 	{
-	    if (flags != NULL)
+	    إذا (flags != عدم)
 	    {
-		if (*p == 'g')
+		إذا (*p == 'g')
 		    *flags |= VGR_GLOBAL;
-		else if (*p == 'j')
+		وإلا إذا (*p == 'j')
 		    *flags |= VGR_NOJUMP;
-		else
+		وإلا
 		    *flags |= VGR_FUZZY;
 	    }
 	    ++p;
 	}
     }
-    return p;
+    إرجاع p;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * List v:oldfiles in a nice way.
  */
-    void
+    فراغ
 ex_oldfiles(exarg_T *eap UNUSED)
 {
     list_T	*l = get_vim_var_list(VV_OLDFILES);
     listitem_T	*li;
-    int		nr = 0;
+    صحيح		nr = 0;
     char_u	*fname;
     // for a single filtered match, remember the number
     // so we can jump directly to it without prompting
-    int		matches = -1;
+    صحيح		matches = -1;
 
-    if (l == NULL)
+    إذا (l == عدم)
     {
-	msg(_("No old files"));
-	return;
+	رسالة(_("No old files"));
+	إرجاع;
     }
 
-    msg_start();
-    msg_scroll = TRUE;
-    for (li = l->lv_first; li != NULL && !got_int; li = li->li_next)
+    رسالة_start();
+    رسالة_scroll = TRUE;
+    لكل (li = l->lv_first; li != عدم && !got_int; li = li->li_next)
     {
 	++nr;
 	fname = tv_get_string(&li->li_tv);
-	if (!message_filtered(fname))
+	إذا (!message_filtered(fname))
 	{
-	    if (matches < 0)
+	    إذا (matches < 0)
 		matches = nr;
-	    else
+	    وإلا
 		matches = 0;
-	    msg_outnum((long)nr);
-	    msg_puts(": ");
-	    msg_outtrans(fname);
-	    msg_clr_eos();
-	    msg_putchar('\n');
+	    رسالة_outnum((long)nr);
+	    رسالة_puts(": ");
+	    رسالة_outtrans(fname);
+	    رسالة_clr_eos();
+	    رسالة_putchar('\n');
 	    out_flush();	    // output one line at a time
 	    ui_breakcheck();
 	}
@@ -6053,31 +6053,31 @@ ex_oldfiles(exarg_T *eap UNUSED)
     got_int = FALSE;
 
 # ifdef FEAT_BROWSE_CMD
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    إذا (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	quit_more = FALSE;
 	// we only need to prompt if there is more than 1 match
-	if (matches > 0)
+	إذا (matches > 0)
 	{
 	    nr = matches;
 	    // msg_putchar above sets needs_wait_return
 	    need_wait_return = FALSE;
 	}
-	else
-	    nr = prompt_for_number(FALSE);
-	msg_starthere();
-	if (nr > 0)
+	وإلا
+	    nr = prompt_for_العدد(FALSE);
+	رسالة_starthere();
+	إذا (nr > 0)
 	{
 	    char_u *p = list_find_str(get_vim_var_list(VV_OLDFILES),
 		    (long)nr);
 
-	    if (p != NULL)
+	    إذا (p != عدم)
 	    {
 		p = expand_env_save(p);
 		eap->arg = p;
 		eap->cmdidx = CMD_edit;
 		cmdmod.cmod_flags &= ~CMOD_BROWSE;
-		do_exedit(eap, NULL);
+		do_exedit(eap, عدم);
 		vim_free(p);
 	    }
 	}

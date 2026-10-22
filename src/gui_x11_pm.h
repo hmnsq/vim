@@ -11,44 +11,44 @@
 /*
  * Icons used by the toolbar code.
  */
-#include "../pixmaps/tb_new.xpm"
-#include "../pixmaps/tb_open.xpm"
-#include "../pixmaps/tb_close.xpm"
-#include "../pixmaps/tb_save.xpm"
-#include "../pixmaps/tb_print.xpm"
-#include "../pixmaps/tb_cut.xpm"
-#include "../pixmaps/tb_copy.xpm"
-#include "../pixmaps/tb_paste.xpm"
-#include "../pixmaps/tb_find.xpm"
-#include "../pixmaps/tb_find_next.xpm"
-#include "../pixmaps/tb_find_prev.xpm"
-#include "../pixmaps/tb_find_help.xpm"
-#include "../pixmaps/tb_exit.xpm"
-#include "../pixmaps/tb_undo.xpm"
-#include "../pixmaps/tb_redo.xpm"
-#include "../pixmaps/tb_help.xpm"
-#include "../pixmaps/tb_macro.xpm"
-#include "../pixmaps/tb_make.xpm"
-#include "../pixmaps/tb_save_all.xpm"
-#include "../pixmaps/tb_jump.xpm"
-#include "../pixmaps/tb_ctags.xpm"
-#include "../pixmaps/tb_load_session.xpm"
-#include "../pixmaps/tb_save_session.xpm"
-#include "../pixmaps/tb_new_session.xpm"
-#include "../pixmaps/tb_blank.xpm"
-#include "../pixmaps/tb_maximize.xpm"
-#include "../pixmaps/tb_split.xpm"
-#include "../pixmaps/tb_minimize.xpm"
-#include "../pixmaps/tb_shell.xpm"
-#include "../pixmaps/tb_replace.xpm"
-#include "../pixmaps/tb_vsplit.xpm"
-#include "../pixmaps/tb_maxwidth.xpm"
-#include "../pixmaps/tb_minwidth.xpm"
+#ضمن "../pixmaps/tb_new.xpm"
+#ضمن "../pixmaps/tb_open.xpm"
+#ضمن "../pixmaps/tb_close.xpm"
+#ضمن "../pixmaps/tb_save.xpm"
+#ضمن "../pixmaps/tb_print.xpm"
+#ضمن "../pixmaps/tb_cut.xpm"
+#ضمن "../pixmaps/tb_copy.xpm"
+#ضمن "../pixmaps/tb_paste.xpm"
+#ضمن "../pixmaps/tb_find.xpm"
+#ضمن "../pixmaps/tb_find_next.xpm"
+#ضمن "../pixmaps/tb_find_prev.xpm"
+#ضمن "../pixmaps/tb_find_help.xpm"
+#ضمن "../pixmaps/tb_exit.xpm"
+#ضمن "../pixmaps/tb_undo.xpm"
+#ضمن "../pixmaps/tb_redo.xpm"
+#ضمن "../pixmaps/tb_help.xpm"
+#ضمن "../pixmaps/tb_macro.xpm"
+#ضمن "../pixmaps/tb_make.xpm"
+#ضمن "../pixmaps/tb_save_all.xpm"
+#ضمن "../pixmaps/tb_jump.xpm"
+#ضمن "../pixmaps/tb_ctags.xpm"
+#ضمن "../pixmaps/tb_load_session.xpm"
+#ضمن "../pixmaps/tb_save_session.xpm"
+#ضمن "../pixmaps/tb_new_session.xpm"
+#ضمن "../pixmaps/tb_blank.xpm"
+#ضمن "../pixmaps/tb_maximize.xpm"
+#ضمن "../pixmaps/tb_split.xpm"
+#ضمن "../pixmaps/tb_minimize.xpm"
+#ضمن "../pixmaps/tb_shell.xpm"
+#ضمن "../pixmaps/tb_replace.xpm"
+#ضمن "../pixmaps/tb_vsplit.xpm"
+#ضمن "../pixmaps/tb_maxwidth.xpm"
+#ضمن "../pixmaps/tb_minwidth.xpm"
 
 /*
  * Those are the pixmaps used for the default buttons.
  */
-static char **(built_in_pixmaps[]) =
+ساكن حرف **(built_in_pixmaps[]) =
 {
     tb_new_xpm,
     tb_open_xpm,
@@ -88,5 +88,5 @@ static char **(built_in_pixmaps[]) =
 #define BACKGROUND	0
 #define FOREGROUND	1
 #define BOTTOM_SHADOW	2
-#define TOP_SHADOW	3
+#define قمة_SHADOW	3
 #define HIGHLIGHT	4

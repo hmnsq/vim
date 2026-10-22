@@ -14,36 +14,36 @@
  * Don't include these while generating prototypes.  Prevents problems when
  * files are missing.
  */
-#if !defined(PROTO) && !defined(NOPROTO)
+#إذا !defined(PROTO) && !defined(NOPROTO)
 
 /*
  * Machine-dependent routines.
  */
 // avoid errors in function prototypes
-# if !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
-#  define Display int
-#  define Widget int
+# إذا !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
+#  define Display صحيح
+#  define Widget صحيح
 # endif
 # ifndef FEAT_GUI_GTK
-#  define GdkEvent int
-#  define GdkEventKey int
+#  define GdkEvent صحيح
+#  define Gdk_Event_مفتاح صحيح
 # endif
 # ifndef FEAT_X11
-#  define XImage int
+#  define XImage صحيح
 # endif
 
 # ifdef AMIGA
 #  include "os_amiga.pro"
 # endif
-# if defined(UNIX) || defined(VMS)
+# إذا defined(UNIX) || defined(VMS)
 #  include "os_unix.pro"
 # endif
 # ifdef MSWIN
 #  include "os_win32.pro"
 #  include "os_mswin.pro"
 #  include "winclip.pro"
-#  if (defined(__GNUC__) && !defined(__MINGW32__))
-extern int _stricoll(char *a, char *b);
+#  إذا (defined(__GNUC__) && !defined(__MINGW32__))
+خارجي صحيح _stricoll(حرف *a, حرف *b);
 #  endif
 # endif
 # ifdef VMS
@@ -134,26 +134,26 @@ extern int _stricoll(char *a, char *b);
 # endif
 
 // These prototypes cannot be produced automatically.
-int smsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+صحيح smsg(ثابت حرف *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int smsg_attr(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+صحيح smsg_attr(صحيح, ثابت حرف *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
-int smsg_attr_keep(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-
-// These prototypes cannot be produced automatically.
-int semsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+صحيح smsg_attr_keep(صحيح, ثابت حرف *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
 // These prototypes cannot be produced automatically.
-void siemsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+صحيح semsg(ثابت حرف *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf_add(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+// These prototypes cannot be produced automatically.
+فراغ siemsg(ثابت حرف *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
-size_t vim_snprintf_safelen(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+صحيح vim_snprintf_add(حرف *, size_t, ثابت حرف *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
 
-int vim_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap)
+صحيح vim_snprintf(حرف *, size_t, ثابت حرف *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+size_t vim_snprintf_safelen(حرف *, size_t, ثابت حرف *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+
+صحيح vim_vsnprintf(حرف *str, size_t str_m, ثابت حرف *fmt, va_list ap)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
-int vim_vsnprintf_typval(char *str, size_t str_m, const char *fmt, va_list ap, typval_T *tvs)
+صحيح vim_vsnprintf_typval(حرف *str, size_t str_m, ثابت حرف *fmt, va_list ap, typval_T *tvs)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
 
 # include "message.pro"
@@ -164,22 +164,22 @@ char_u *vim_strpbrk(char_u *s, char_u *charset);
 # endif
 # ifndef HAVE_QSORT
 // Use our own qsort(), don't define the prototype when not used.
-void qsort(void *base, size_t elm_count, size_t elm_size, int (*cmp)(const void *, const void *));
+فراغ qsort(فراغ *base, size_t elm_تعداد, size_t elm_size, صحيح (*cmp)(ثابت فراغ *, ثابت فراغ *));
 # endif
 # include "mouse.pro"
 # include "move.pro"
 # include "mbyte.pro"
 # ifdef VIMDLL
 // Function name differs when VIMDLL is defined
-int mbyte_im_get_status(void);
-void mbyte_im_set_active(int active_arg);
+صحيح mbyte_im_get_status(فراغ);
+فراغ mbyte_im_set_active(صحيح active_arg);
 # endif
 # include "normal.pro"
 # include "ops.pro"
 # include "option.pro"
 # include "optionstr.pro"
 # include "popupmenu.pro"
-# if defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
+# إذا defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
 #  include "profiler.pro"
 # endif
 # include "quickfix.pro"
@@ -191,7 +191,7 @@ void mbyte_im_set_active(int active_arg);
 # include "scriptfile.pro"
 # include "screen.pro"
 # include "session.pro"
-# if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+# إذا defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 #  include "sha256.pro"
 # endif
 # include "fuzzy.pro"
@@ -210,7 +210,7 @@ void mbyte_im_set_active(int active_arg);
 # ifdef FEAT_TERMINAL
 #  include "terminal.pro"
 # endif
-# if defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
+# إذا defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
 #  include "termlib.pro"
 # endif
 # ifdef FEAT_PROP_POPUP
@@ -279,9 +279,9 @@ void mbyte_im_set_active(int active_arg);
 // Ugly solution for "BalloonEval" not being defined while it's used in some
 // .pro files.
 # ifndef FEAT_BEVAL
-#  define BalloonEval int
+#  define BalloonEval صحيح
 # endif
-# if defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
+# إذا defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
 #  include "beval.pro"
 # endif
 
@@ -298,22 +298,22 @@ void mbyte_im_set_active(int active_arg);
 
 # ifdef FEAT_EVAL
 // Not generated automatically so that we can add an extra attribute.
-void ch_log(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-void ch_error(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+فراغ ch_log(channel_T *ch, ثابت حرف *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+فراغ ch_error(channel_T *ch, ثابت حرف *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 # endif
 
-# if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
-#  if defined(UNIX) || defined(MACOS_X) || defined(VMS)
+# إذا defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#  إذا defined(UNIX) || defined(MACOS_X) || defined(VMS)
 #   include "pty.pro"
 #  endif
 # endif
 
 # ifdef FEAT_GUI
 #  include "gui.pro"
-#  if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
-extern int putenv(const char *string);			// in misc2.c
+#  إذا !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
+خارجي صحيح putenv(ثابت حرف *string);			// in misc2.c
 #   ifdef USE_VIMPTY_GETENV
-extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
+خارجي char_u *vimpty_getenv(ثابت char_u *string);	// in misc2.c
 #   endif
 #  endif
 #  ifdef FEAT_GUI_MSWIN
@@ -322,7 +322,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 #  ifdef FEAT_GUI_GTK
 #   ifdef USE_GTK4
 #    include "gui_gtk4.pro"
-#   else
+#   وإلا
 #    include "gui_gtk.pro"
 #    include "gui_gtk_x11.pro"
 #   endif
@@ -345,7 +345,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef FEAT_OLE
 #  include "if_ole.pro"
 # endif
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# إذا defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 #  include "if_xcmdsrv.pro"
 # endif
 
@@ -356,8 +356,8 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
  * not included here for the perl files.  Use a dummy define for CV for the
  * other files.
  */
-# if defined(FEAT_PERL) && !defined(IN_PERL_FILE)
-#  define CV void
+# إذا defined(FEAT_PERL) && !defined(IN_PERL_FILE)
+#  define CV فراغ
 #  include "if_perl.pro"
 # endif
 
@@ -367,11 +367,11 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef MACOS_X
 #  include "os_macosx.pro"
 # endif
-# if defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
+# إذا defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
 // functions in os_macosx.m
-void clip_mch_lose_selection(Clipboard_T *cbd);
-int clip_mch_own_selection(Clipboard_T *cbd);
-void clip_mch_request_selection(Clipboard_T *cbd);
-void clip_mch_set_selection(Clipboard_T *cbd);
+فراغ clip_mch_lose_selection(Clipboard_T *cbd);
+صحيح clip_mch_own_selection(Clipboard_T *cbd);
+فراغ clip_mch_request_selection(Clipboard_T *cbd);
+فراغ clip_mch_set_selection(Clipboard_T *cbd);
 # endif
 #endif // !PROTO && !NOPROTO
