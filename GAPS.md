@@ -1,0 +1,628 @@
+# What is still missing
+
+76 languages. Each line says in how many languages it is missing.
+
+## Files in languages BURP cannot read yet
+
+- `.sh`: 6 files
+- `.pl`: 3 files
+- `.lua`: 2 files
+- `.ac`: 1 files
+- `.m`: 1 files
+
+## Keywords with no word in a language's table
+
+- shraeni:app: 75
+- soochee:join: 75
+- guru:_exit: 75
+- soochee:args: 75
+- shraeni:bad: 75
+- soochee:io: 75
+- shraeni:get: 75
+- shraeni:put: 75
+- soochee:replace: 75
+- guru:__FILE__: 75
+- soochee:util: 75
+- soochee:start: 74
+- soochee:out: 74
+- guru:size_t: 71
+- guru:fprintf: 71
+- guru:abort: 71
+- guru:sprintf: 71
+- guru:FILE: 71
+- guru:tm: 71
+- guru:close: 71
+- guru:fclose: 71
+- guru:putc: 71
+- guru:dirname: 71
+- guru:fputs: 71
+- guru:atoi: 71
+- guru:errno: 71
+- guru:stderr: 71
+- guru:time: 71
+- guru:EOF: 71
+- guru:getc: 71
+- guru:strchr: 71
+- guru:time_t: 71
+- guru:getenv: 71
+- guru:strtol: 71
+- guru:fwrite: 71
+- guru:fopen: 71
+- guru:offsetof: 71
+- guru:fflush: 71
+- guru:va_list: 71
+- guru:atol: 71
+- guru:sig_atomic_t: 71
+- guru:wchar_t: 71
+- guru:SIG_IGN: 71
+- guru:va_arg: 71
+- guru:setlocale: 71
+- guru:va_end: 71
+- guru:strtok: 71
+- guru:fgetc: 71
+- guru:SIGINT: 71
+- guru:SEEK_SET: 71
+- guru:stdout: 71
+- guru:stdin: 71
+- guru:va_start: 71
+- guru:kill: 71
+- guru:SIG_DFL: 71
+- guru:BUFSIZ: 71
+- guru:LONG_MAX: 71
+- guru:strerror: 71
+- guru:fgets: 71
+- guru:memmove: 71
+- guru:fputc: 71
+- guru:memcmp: 71
+- guru:memchr: 71
+- shraeni:wchar_t: 71
+- guru:bsearch: 71
+- guru:SEEK_END: 71
+- guru:rewind: 71
+- guru:INFINITY: 71
+- guru:fseek: 71
+- guru:fread: 71
+- guru:EXIT_FAILURE: 71
+- guru:SIG_ERR: 71
+- guru:INT_MIN: 71
+- shraeni:fprintf: 71
+- shraeni:stderr: 71
+- guru:perror: 71
+- guru:strncpy: 71
+- guru:system: 71
+- guru:SIGTERM: 71
+- guru:strtod: 71
+- guru:DIR: 71
+- guru:opendir: 71
+- guru:fork: 71
+- guru:remove: 71
+- guru:rename: 71
+- guru:labs: 71
+- guru:strtoul: 71
+- guru:DBL_MAX: 71
+- guru:closedir: 71
+- guru:fabs: 71
+- guru:floor: 71
+- shraeni:strerror: 71
+- shraeni:strncpy: 71
+- guru:ftell: 71
+- guru:realloc: 71
+- guru:fstat: 71
+- guru:chdir: 71
+- guru:readdir: 71
+- guru:NAN: 71
+- guru:ceil: 71
+- guru:DBL_EPSILON: 71
+- shraeni:SIG_IGN: 71
+- shraeni:tm: 71
+- guru:vfprintf: 71
+- guru:ferror: 71
+- guru:NDEBUG: 71
+- guru:SIGILL: 71
+- guru:SIGFPE: 71
+- guru:SIGSEGV: 71
+- guru:times: 71
+- soochee:close: 71
+- guru:strftime: 71
+- shraeni:strchr: 71
+- shraeni:size_t: 71
+- guru:ERANGE: 71
+- guru:mkdir: 71
+- guru:SEEK_CUR: 71
+- guru:strrchr: 71
+- shraeni:dirname: 71
+- shraeni:atof: 71
+- shraeni:strtok: 71
+- guru:atof: 71
+- guru:setvbuf: 71
+- guru:iscntrl: 71
+- guru:isgraph: 71
+- guru:ispunct: 71
+- guru:UINT_MAX: 71
+- guru:ULONG_MAX: 71
+- guru:LONG_MIN: 71
+- shraeni:SIGINT: 71
+- guru:feof: 71
+- shraeni:time: 71
+- guru:jmp_buf: 71
+- guru:longjmp: 71
+- guru:setjmp: 71
+- guru:isxdigit: 71
+- guru:vsprintf: 71
+- guru:atexit: 71
+- guru:rmdir: 71
+- guru:ctime: 71
+- guru:localtime: 71
+- guru:CHAR_BIT: 71
+- shraeni:realloc: 71
+- guru:CHAR_MAX: 71
+- guru:L_tmpnam: 71
+- guru:tmpnam: 71
+- guru:fmod: 71
+- shraeni:floor: 71
+- shraeni:chdir: 71
+- shraeni:fstat: 71
+- shraeni:memchr: 71
+- guru:freopen: 71
+- guru:islower: 71
+- guru:isprint: 71
+- guru:isupper: 71
+- guru:tolower: 71
+- guru:sigpending: 71
+- guru:ungetc: 71
+- guru:mktime: 71
+- guru:clock: 71
+- guru:strncat: 71
+- guru:strcmp: 70
+- guru:strcpy: 70
+- guru:qsort: 70
+- guru:strcat: 70
+- guru:open: 70
+- guru:memset: 70
+- guru:wait: 70
+- shraeni:strcpy: 70
+- shraeni:strcat: 70
+- guru:scanf: 70
+- guru:getchar: 70
+- guru:puts: 70
+- guru:srand: 70
+- guru:rand: 70
+- soochee:def: 67
+- soochee:print: 67
+- soochee:len: 67
+- guru:exp: 67
+- soochee:None: 67
+- soochee:is: 67
+- soochee:pass: 67
+- soochee:with: 67
+- soochee:range: 67
+- guru:log: 67
+- guru:cos: 67
+- guru:sin: 67
+- guru:#endif: 66
+- guru:#ifdef: 66
+- guru:#define: 66
+- guru:#ifndef: 66
+- shraeni:#endif: 66
+- guru:#undef: 66
+- shraeni:#ifdef: 66
+- shraeni:delete: 66
+- shraeni:#define: 66
+- shraeni:left: 66
+- shraeni:right: 66
+- shraeni:#ifndef: 66
+- guru:#pragma: 66
+
+## Names with no dictionary entry (the most common first)
+
+- `char_u`: 76
+- `p`: 76
+- `i`: 76
+- `FALSE`: 76
+- `buf`: 76
+- `wp`: 76
+- `TRUE`: 76
+- `FAIL`: 76
+- `curwin`: 76
+- `len`: 76
+- `lnum`: 76
+- `defined`: 76
+- `c`: 76
+- `NUL`: 76
+- `arg`: 76
+- `s`: 76
+- `name`: 76
+- `_`: 76
+- `argvars`: 76
+- `gui`: 76
+- `endif`: 76
+- `curbuf`: 76
+- `n`: 76
+- `idx`: 76
+- `eap`: 76
+- `rettv`: 76
+- `define`: 76
+- `vval`: 76
+- `vim_free`: 76
+- `typval_T`: 76
+- `EXTERN`: 76
+- `ifdef`: 76
+- `OK`: 76
+- `state`: 76
+- `w_cursor`: 76
+- `l`: 76
+- `v_type`: 76
+- `type`: 76
+- `INIT`: 76
+- `flags`: 76
+- `tv`: 76
+- `ga_len`: 76
+- `cctx`: 76
+- `string`: 76
+- `str`: 76
+- `N_`: 76
+- `ptr`: 76
+- `pos`: 76
+- `fp`: 76
+- `cmd`: 76
+- `ret`: 76
+- `fname`: 76
+- `self`: 76
+- `linenr_T`: 76
+- `x`: 76
+- `semsg`: 76
+- `fd`: 76
+- `FEAT_EVAL`: 76
+- `emsg`: 76
+- `cap`: 76
+- `STRLEN`: 76
+- `retval`: 76
+- `j`: 76
+- `gap`: 76
+- `menu`: 76
+- `win_T`: 76
+- `oap`: 76
+- `d`: 76
+- `id`: 76
+- `tp`: 76
+- `b_ml`: 76
+- `r`: 76
+- `PyObject`: 76
+- `wlv`: 76
+- `ga`: 76
+- `channel`: 76
+- `xp`: 76
+- `win`: 76
+- `y`: 76
+- `L`: 76
+- `off`: 76
+- `argv`: 76
+- `dict`: 76
+- `val`: 76
+- `di`: 76
+- `res`: 76
+- `STRNCMP`: 76
+- `error`: 76
+- `buf_T`: 76
+- `st`: 76
+- `hi`: 76
+- `rex`: 76
+- `colnr_T`: 76
+- `sp`: 76
+- `STRCMP`: 76
+- `attr`: 76
+- `list`: 76
+- `theend`: 76
+- `lp`: 76
+- `pat`: 76
+- `ufunc`: 76
+- `t`: 76
+- `skipwhite`: 76
+- `dp`: 76
+- `li`: 76
+- `regmbc`: 76
+- `vim_strsave`: 76
+- `cl`: 76
+- `garray_T`: 76
+- `EMIT2`: 76
+- `v_string`: 76
+- `vim_strchr`: 76
+- `FEAT_GUI`: 76
+- `type_T`: 76
+- `b`: 76
+- `cmdidx`: 76
+- `EXCMD`: 76
+- `rect`: 76
+- `exarg_T`: 76
+- `mch_memmove`: 76
+- `alloc`: 76
+- `m`: 76
+- `ea`: 76
+- `event`: 76
+- `from`: 76
+- `w`: 76
+- `options`: 76
+- `opt`: 76
+- `VAR_UNKNOWN`: 76
+- `STRCPY`: 76
+- `regmatch`: 76
+- `MSWIN`: 76
+- `matches`: 76
+- `vim_snprintf`: 76
+- `PV_NONE`: 76
+- `varp`: 76
+- `isn_arg`: 76
+- `qi`: 76
+- `IObuff`: 76
+- `pos_T`: 76
+- `buflen`: 76
+- `got_int`: 76
+- `v_list`: 76
+- `vt`: 76
+- `VAR_STRING`: 76
+- `frp`: 76
+- `si`: 76
+- `iptr`: 76
+- `screen`: 76
+- `SCTX_INIT`: 76
+- `tofree`: 76
+- `nr`: 76
+- `ccline`: 76
+- `EX_TRLBAR`: 76
+- `clear_tv`: 76
+- `dir`: 76
+- `line2`: 76
+- `tt_type`: 76
+- `FEARG_1`: 76
+- `ectx`: 76
+- `obj`: 76
+- `P_VI_DEF`: 76
+- `isn`: 76
+- `di_tv`: 76
+- `cstack`: 76
+- `mp`: 76
+- `mfp`: 76
+- `pp`: 76
+- `long_u`: 76
+- `v`: 76
+- `State`: 76
+- `errmsg`: 76
+- `ht`: 76
+- `argcount`: 76
+- `argc`: 76
+- `f`: 76
+- `dict_T`: 76
+- `has_mbyte`: 76
+- `spin`: 76
+- `opt_idx`: 76
+- `evalarg`: 76
+- `src`: 76
+- `list_T`: 76
+- `pt`: 76
+- `todo`: 76
+- `h`: 76
+- `tmp`: 76
+- `w_topline`: 76
+- `cb`: 76
+- `dpy`: 76
+- `copyID`: 76
+- `MAXPATHL`: 76
+- `bp`: 76
+- `VIM_CLEAR`: 76
+- `part`: 76
+- `FEAT_PROP_POPUP`: 76
+- `curtab`: 76
+- `cts`: 76
+- `widget`: 76
+- `vim_strnsave`: 76
+- `varnumber_T`: 76
+- `color`: 76
+- `li_tv`: 76
+- `eb`: 76
+- `skip`: 76
+- `lhs`: 76
+- `e`: 76
+- `UNIX`: 76
+- `EX_CMDWIN`: 76
+- `VAR_LIST`: 76
+- `font`: 76
+- `ADDR_NONE`: 76
+- `slang`: 76
+- `GtkWidget`: 76
+- `v_dict`: 76
+- `op`: 76
+- `line1`: 76
+- `beval`: 76
+- `qfl`: 76
+- `a`: 76
+- `forceit`: 76
+- `cp`: 76
+- `smsg`: 76
+- `VIM_ISWHITE`: 76
+- `modifiers`: 76
+- `cur`: 76
+- `tv1`: 76
+- `EX_EXTRA`: 76
+- `prop`: 76
+- `regname`: 76
+- `enc_utf8`: 76
+- `FEAT_FOLDING`: 76
+- `q`: 76
+- `Scheme_Object`: 76
+- `ch`: 76
+- `uhp`: 76
+- `typebuf`: 76
+- `FEAT_DIFF`: 76
+- `w_s`: 76
+- `ufunc_T`: 76
+- `context`: 76
+- `hp`: 76
+- `xp_context`: 76
+- `reader`: 76
+- `tuple`: 76
+- `cctx_T`: 76
+- `Widget`: 76
+- `cc`: 76
+- `info`: 76
+- `tv2`: 76
+- `su`: 76
+- `what`: 76
+- `p2`: 76
+- `button`: 76
+- `FEAT_SYN_HL`: 76
+- `mb_ptr2len`: 76
+- `n1`: 76
+- `EX_RANGE`: 76
+- `dest`: 76
+- `ae_u`: 76
+- `p1`: 76
+- `err`: 76
+- `s1`: 76
+- `PYTHON_PROC`: 76
+- `bi`: 76
+- `var`: 76
+- `sign`: 76
+- `ctx`: 76
+- `fr`: 76
+- `slen`: 76
+- `k`: 76
+- `MAXCOL`: 76
+- `FEAT_GUI_GTK`: 76
+- `sb`: 76
+- `DWORD`: 76
+- `ga_grow`: 76
+- `ap`: 76
+- `ga_init2`: 76
+- `current_sctx`: 76
+- `Columns`: 76
+- `EX_BANG`: 76
+- `amount`: 76
+- `WCHAR`: 76
+- `c1`: 76
+- `cbd`: 76
+- `regprog`: 76
+- `s2`: 76
+- `vcol`: 76
+- `scope`: 76
+- `cmdchar`: 76
+- `FEAT_GUI_MSWIN`: 76
+- `hwnd`: 76
+- `nchar`: 76
+- `bufp`: 76
+- `current`: 76
+- `interp`: 76
+- `ga_clear`: 76
+- `VAR_DICT`: 76
+- `extra`: 76
+- `guicolor_T`: 76
+
+## Comments with no translation
+
+- vi:set ts=8 sts=4 sw=4 noet:
+ *
+ * VIM - Vi IMproved	by Bram Moolenaar
+ *
+ * Do ":help uganda"  in V: 76
+- FALLTHROUGH: 76
+- out of memory: 76
+- XXX: 76
+- FEAT_EVAL: 76
+- nothing to do: 76
+- safety check: 76
+- init for GCC: 76
+- end marker: 76
+- don't know where cursor is now: 76
+- vi:set ts=8 sts=4 sw=4 noet:
+ *
+ * VIM - Vi IMproved		by Bram Moolenaar
+ *
+ * Do ":help uganda"  in : 76
+- TODO: 76
+- just in case: 76
+- +1 for NUL: 76
+- !GTK_CHECK_VERSION(3,0,0): 76
+- autocmds may abort script processing: 76
+- type error; errmsg already given: 76
+- FEAT_MENU: 76
+- <sectionflags>: 76
+- <sectionlen>: 76
+- NOTREACHED: 76
+- <sectionID>: 76
+- don't overwrite this either: 76
+- restore curwin/curbuf and a few other things: 76
+- may show different cursor shape: 76
+- FEAT_TOOLBAR: 76
+- stop Visual mode: 76
+- no match: 76
+- MSWIN: 76
+- guessed: 76
+- allocated: 76
+- ignore case: 76
+- disallow scrolling here: 76
+- file.: 76
+- set background color: 76
+- set foreground color: 76
+- can be NULL: 76
+- one.: 76
+- position.: 76
+- FEAT_GUI: 76
+- recursive!: 76
+- line number: 76
+- characters.: 76
+- VMS: 76
+- EW_* flags: 76
+- Highlight title: 76
+- Create one funccall_T for all eval_expr_typval() calls.: 76
+- defined(FEAT_EVAL): 76
+- file name: 76
+- show one line at a time: 76
+- lines.: 76
+- save current attr: 76
+- obsolete: 76
+- function.: 76
+- Don't put events in the input queue now.: 76
+- FEAT_GUI_DIALOG: 76
+- init for gcc: 76
+- sq_contains: 76
+- sq_inplace_concat: 76
+- sq_inplace_repeat: 76
+- sq_ass_slice, x[i:j]=v: 76
+- line.: 76
+- future ext.: 76
+- column to start looking for match: 76
+- This requires Python 2.6 or later.: 76
+- buffer.: 76
+- return value: 76
+- exception.: 76
+- out of memory!: 76
+- needed.: 76
+- Shouldn't happen: 76
+- -1 on type error: 76
+- ARGSUSED: 76
+- generic function: 76
+- cannot happen?: 76
+- string.: 76
+- !FEAT_GUI_GTK: 76
+- shouldn't happen: 76
+- resize: 76
+- index is ID minus one: 76
+- sq_length,    len(x): 76
+- sq_item,      x[i]: 76
+- update the inversion: 76
+- never used: 76
+- don't reselect now: 76
+- SHELL_*, see vim.h: 76
+- flag set on timeout or NULL: 76
+- Pop the state.  Restore pointers when there is no match.: 76
+- sign group: 76
+- a sign in the signlist: 76
+- <byte>: 76
+- reference count: 76
+- FEAT_CRYPT: 76
+- window.: 76
+- output one line at a time: 76
+- FEAT_WAYLAND_CLIPBOARD: 76
+- update after a big change: 76
+- invalid.: 76
+- "cannot happen": 76
+- character.: 76
