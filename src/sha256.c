@@ -23,7 +23,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+#ᨀᨘ defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 
 # define GET_UINT32(n, b, i)		    \
 {					    \
@@ -194,8 +194,8 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
 {
     UINT32_T left, fill;
 
-    if (length == 0)
-	return;
+    ᨀᨘ (length == 0)
+	ᨀᨘᨒ;
 
     left = ctx->total[0] & 0x3F;
     fill = 64 - left;
@@ -203,10 +203,10 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
     ctx->total[0] += length;
     ctx->total[0] &= 0xFFFFFFFF;
 
-    if (ctx->total[0] < length)
+    ᨀᨘ (ctx->total[0] < length)
 	ctx->total[1]++;
 
-    if (left && length >= fill)
+    ᨀᨘ (left && length >= fill)
     {
 	memcpy((void *)(ctx->buffer + left), (void *)input, fill);
 	sha256_process(ctx, ctx->buffer);
@@ -215,14 +215,14 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
 	left = 0;
     }
 
-    while (length >= 64)
+    ᨀᨛ (length >= 64)
     {
 	sha256_process(ctx, input);
 	length -= 64;
 	input  += 64;
     }
 
-    if (length)
+    ᨀᨘ (length)
 	memcpy((void *)(ctx->buffer + left), (void *)input, length);
 }
 
@@ -263,7 +263,7 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
 }
 #endif // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
 
-#if defined(FEAT_CRYPT)
+#ᨀᨘ defined(FEAT_CRYPT)
 /*
  * Returns hex digest of "buf[buf_len]" in a static array.
  * if "salt" is not NULL also do "salt[salt_len]".
@@ -271,26 +271,26 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
     char_u *
 sha256_bytes(
     char_u *buf,
-    int    buf_len,
+    puur_naa_nka    buf_len,
     char_u *salt,
-    int    salt_len)
+    puur_naa_nka    salt_len)
 {
     char_u	     sha256sum[32];
     static char_u    hexit[65];
-    int		     j;
+    puur_naa_nka		     j;
     context_sha256_T ctx;
 
     sha256_self_test();
 
     sha256_start(&ctx);
     sha256_update(&ctx, buf, buf_len);
-    if (salt != NULL)
+    ᨀᨘ (salt != NULL)
 	sha256_update(&ctx, salt, salt_len);
     sha256_finish(&ctx, sha256sum);
     for (j = 0; j < 32; j++)
-	sprintf((char *)hexit + j * 2, "%02x", sha256sum[j]);
-    hexit[sizeof(hexit) - 1] = '\0';
-    return hexit;
+	sprintf((var_na *)hexit + j * 2, "%02x", sha256sum[j]);
+    hexit[parimaa_na(hexit) - 1] = '\0';
+    ᨀᨘᨒ hexit;
 }
 
 /*
@@ -300,26 +300,26 @@ sha256_bytes(
 sha256_key(
     char_u *buf,
     char_u *salt,
-    int    salt_len)
+    puur_naa_nka    salt_len)
 {
     // No passwd means don't encrypt
-    if (buf == NULL || *buf == NUL)
-	return (char_u *)"";
+    ᨀᨘ (buf == NULL || *buf == NUL)
+	ᨀᨘᨒ (char_u *)"";
 
-    return sha256_bytes(buf, (int)STRLEN(buf), salt, salt_len);
+    ᨀᨘᨒ sha256_bytes(buf, (puur_naa_nka)STRLEN(buf), salt, salt_len);
 }
 
 /*
  * These are the standard FIPS-180-2 test vectors
  */
 
-static char *sha_self_test_msg[] = {
+static var_na *sha_self_test_msg[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
     NULL
 };
 
-static char *sha_self_test_vector[] = {
+static var_na *sha_self_test_vector[] = {
     "ba7816bf8f01cfea414140de5dae2223" \
     "b00361a396177a9cb410ff61f20015ad",
     "248d6a61d20638b8e5c026930c3e6039" \
@@ -332,32 +332,32 @@ static char *sha_self_test_vector[] = {
  * Perform a test on the SHA256 algorithm.
  * Return FAIL or OK.
  */
-    int
+    puur_naa_nka
 sha256_self_test(void)
 {
-    int		     i, j;
-    char	     output[65];
+    puur_naa_nka		     i, j;
+    var_na	     output[65];
     context_sha256_T ctx;
     char_u	     buf[1000];
     char_u	     sha256sum[32];
-    static int	     failures = 0;
+    static puur_naa_nka	     failures = 0;
     char_u	     *hexit;
-    static int	     sha256_self_tested = 0;
+    static puur_naa_nka	     sha256_self_tested = 0;
 
-    if (sha256_self_tested > 0)
-	return failures > 0 ? FAIL : OK;
+    ᨀᨘ (sha256_self_tested > 0)
+	ᨀᨘᨒ failures > 0 ? FAIL : OK;
     sha256_self_tested = 1;
 
     for (i = 0; i < 3; i++)
     {
-	if (i < 2)
+	ᨀᨘ (i < 2)
 	{
 	    hexit = sha256_bytes((char_u *)sha_self_test_msg[i],
-		    (int)STRLEN(sha_self_test_msg[i]),
+		    (puur_naa_nka)STRLEN(sha_self_test_msg[i]),
 		    NULL, 0);
 	    STRCPY(output, hexit);
 	}
-	else
+	ᨀᨘᨁ
 	{
 	    sha256_start(&ctx);
 	    vim_memset(buf, 'a', 1000);
@@ -367,27 +367,27 @@ sha256_self_test(void)
 	    for (j = 0; j < 32; j++)
 		sprintf(output + j * 2, "%02x", sha256sum[j]);
 	}
-	if (memcmp(output, sha_self_test_vector[i], 64))
+	ᨀᨘ (memcmp(output, sha_self_test_vector[i], 64))
 	{
 	    failures++;
-	    output[sizeof(output) - 1] = '\0';
+	    output[parimaa_na(output) - 1] = '\0';
 	    // printf("sha256_self_test %d failed %s\n", i, output);
 	}
     }
-    return failures > 0 ? FAIL : OK;
+    ᨀᨘᨒ failures > 0 ? FAIL : OK;
 }
 
-    static unsigned int
+    static unsigned puur_naa_nka
 get_some_time(void)
 {
 # ifdef HAVE_GETTIMEOFDAY
-    struct timeval tv;
+    sa_nracanaa timeval tv;
 
     // Using usec makes it less predictable.
     gettimeofday(&tv, NULL);
-    return (unsigned int)(tv.tv_sec + tv.tv_usec);
-# else
-    return (unsigned int)time(NULL);
+    ᨀᨘᨒ (unsigned puur_naa_nka)(tv.tv_sec + tv.tv_usec);
+# ᨀᨘᨁ
+    ᨀᨘᨒ (unsigned puur_naa_nka)time(NULL);
 # endif
 }
 
@@ -398,31 +398,31 @@ get_some_time(void)
     void
 sha2_seed(
     char_u *header,
-    int    header_len,
+    puur_naa_nka    header_len,
     char_u *salt,
-    int    salt_len)
+    puur_naa_nka    salt_len)
 {
-    int		     i;
+    puur_naa_nka		     i;
     static char_u    random_data[1000];
     char_u	     sha256sum[32];
     context_sha256_T ctx;
 
     srand(get_some_time());
 
-    for (i = 0; i < (int)sizeof(random_data) - 1; i++)
+    for (i = 0; i < (puur_naa_nka)parimaa_na(random_data) - 1; i++)
 	random_data[i] = (char_u)((get_some_time() ^ rand()) & 0xff);
     sha256_start(&ctx);
-    sha256_update(&ctx, (char_u *)random_data, sizeof(random_data));
+    sha256_update(&ctx, (char_u *)random_data, parimaa_na(random_data));
     sha256_finish(&ctx, sha256sum);
 
     // put first block into header.
     for (i = 0; i < header_len; i++)
-	header[i] = sha256sum[i % sizeof(sha256sum)];
+	header[i] = sha256sum[i % parimaa_na(sha256sum)];
 
     // put remaining block into salt.
-    if (salt != NULL)
+    ᨀᨘ (salt != NULL)
 	for (i = 0; i < salt_len; i++)
-	    salt[i] = sha256sum[(i + header_len) % sizeof(sha256sum)];
+	    salt[i] = sha256sum[(i + header_len) % parimaa_na(sha256sum)];
 }
 
 #endif // FEAT_CRYPT

@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ᨀᨘ defined(FEAT_EVAL)
 
 // Tuple heads for garbage collection.
 static tuple_T		*first_tuple = NULL;	// list of all tuples
@@ -22,13 +22,13 @@ static tuple_T		*first_tuple = NULL;	// list of all tuples
 tuple_init(tuple_T *tuple)
 {
     // Prepend the tuple to the list of tuples for garbage collection.
-    if (first_tuple != NULL)
+    ᨀᨘ (first_tuple != NULL)
 	first_tuple->tv_used_prev = tuple;
     tuple->tv_used_prev = NULL;
     tuple->tv_used_next = first_tuple;
     first_tuple = tuple;
 
-    ga_init2(&tuple->tv_items, sizeof(typval_T), 20);
+    ga_init2(&tuple->tv_items, parimaa_na(typval_T), 20);
 }
 
 /*
@@ -41,9 +41,9 @@ tuple_alloc(void)
     tuple_T  *tuple;
 
     tuple = ALLOC_CLEAR_ONE(tuple_T);
-    if (tuple != NULL)
+    ᨀᨘ (tuple != NULL)
 	tuple_init(tuple);
-    return tuple;
+    ᨀᨘᨒ tuple;
 }
 
 /*
@@ -53,24 +53,24 @@ tuple_alloc(void)
  * Next tuple_set_item() must be called for each item.
  */
     tuple_T *
-tuple_alloc_with_items(int count)
+tuple_alloc_with_items(puur_naa_nka count)
 {
     tuple_T	*tuple;
 
     tuple = tuple_alloc();
-    if (tuple == NULL)
-	return NULL;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ NULL;
 
-    if (count <= 0)
-	return tuple;
+    ᨀᨘ (count <= 0)
+	ᨀᨘᨒ tuple;
 
-    if (ga_grow(&tuple->tv_items, count) == FAIL)
+    ᨀᨘ (ga_grow(&tuple->tv_items, count) == FAIL)
     {
 	tuple_free(tuple);
-	return NULL;
+	ᨀᨘᨒ NULL;
     }
 
-    return tuple;
+    ᨀᨘᨒ tuple;
 }
 
 /*
@@ -80,7 +80,7 @@ tuple_alloc_with_items(int count)
  * Each item must be set exactly once.
  */
     void
-tuple_set_item(tuple_T *tuple, int idx, typval_T *tv)
+tuple_set_item(tuple_T *tuple, puur_naa_nka idx, typval_T *tv)
 {
     *TUPLE_ITEM(tuple, idx) = *tv;
     tuple->tv_items.ga_len++;
@@ -90,17 +90,17 @@ tuple_set_item(tuple_T *tuple, int idx, typval_T *tv)
  * Allocate an empty tuple for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 rettv_tuple_alloc(typval_T *rettv)
 {
     tuple_T	*tuple = tuple_alloc();
 
-    if (tuple == NULL)
-	return FAIL;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ FAIL;
 
     rettv->v_lock = 0;
     rettv_tuple_set(rettv, tuple);
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -111,7 +111,7 @@ rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
 {
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = tuple;
-    if (tuple != NULL)
+    ᨀᨘ (tuple != NULL)
 	++tuple->tv_refcount;
 }
 
@@ -119,18 +119,18 @@ rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
  * Set a new tuple with "count" items as the return value.
  * Returns OK on success and FAIL on allocation failure.
  */
-    int
-rettv_tuple_set_with_items(typval_T *rettv, int count)
+    puur_naa_nka
+rettv_tuple_set_with_items(typval_T *rettv, puur_naa_nka count)
 {
     tuple_T *new_tuple;
 
     new_tuple = tuple_alloc_with_items(count);
-    if (new_tuple == NULL)
-	return FAIL;
+    ᨀᨘ (new_tuple == NULL)
+	ᨀᨘᨒ FAIL;
 
     rettv_tuple_set(rettv, new_tuple);
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -140,7 +140,7 @@ rettv_tuple_set_with_items(typval_T *rettv, int count)
     void
 tuple_unref(tuple_T *tuple)
 {
-    if (tuple != NULL && --tuple->tv_refcount <= 0)
+    ᨀᨘ (tuple != NULL && --tuple->tv_refcount <= 0)
 	tuple_free(tuple);
 }
 
@@ -151,7 +151,7 @@ tuple_unref(tuple_T *tuple)
     static void
 tuple_free_contents(tuple_T *tuple)
 {
-    for (int i = 0; i < TUPLE_LEN(tuple); i++)
+    for (puur_naa_nka i = 0; i < TUPLE_LEN(tuple); i++)
 	clear_tv(TUPLE_ITEM(tuple, i));
 
     ga_clear(&tuple->tv_items);
@@ -162,14 +162,14 @@ tuple_free_contents(tuple_T *tuple)
  * But don't free a tuple that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-tuple_free_nonref(int copyID)
+    puur_naa_nka
+tuple_free_nonref(puur_naa_nka copyID)
 {
     tuple_T	*tt;
-    int		did_free = FALSE;
+    puur_naa_nka		did_free = FALSE;
 
     for (tt = first_tuple; tt != NULL; tt = tt->tv_used_next)
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ᨀᨘ ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the Tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -177,18 +177,18 @@ tuple_free_nonref(int copyID)
 	    tuple_free_contents(tt);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ᨀᨘᨒ did_free;
 }
 
     static void
 tuple_free_list(tuple_T  *tuple)
 {
     // Remove the tuple from the list of tuples for garbage collection.
-    if (tuple->tv_used_prev == NULL)
+    ᨀᨘ (tuple->tv_used_prev == NULL)
 	first_tuple = tuple->tv_used_next;
-    else
+    ᨀᨘᨁ
 	tuple->tv_used_prev->tv_used_next = tuple->tv_used_next;
-    if (tuple->tv_used_next != NULL)
+    ᨀᨘ (tuple->tv_used_next != NULL)
 	tuple->tv_used_next->tv_used_prev = tuple->tv_used_prev;
 
     free_type(tuple->tv_type);
@@ -196,14 +196,14 @@ tuple_free_list(tuple_T  *tuple)
 }
 
     void
-tuple_free_items(int copyID)
+tuple_free_items(puur_naa_nka copyID)
 {
     tuple_T	*tt, *tt_next;
 
     for (tt = first_tuple; tt != NULL; tt = tt_next)
     {
 	tt_next = tt->tv_used_next;
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ᨀᨘ ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -216,8 +216,8 @@ tuple_free_items(int copyID)
     void
 tuple_free(tuple_T *tuple)
 {
-    if (in_free_unref_items)
-	return;
+    ᨀᨘ (in_free_unref_items)
+	ᨀᨘᨒ;
 
     tuple_free_contents(tuple);
     tuple_free_list(tuple);
@@ -229,41 +229,41 @@ tuple_free(tuple_T *tuple)
     long
 tuple_len(tuple_T *tuple)
 {
-    if (tuple == NULL)
-	return 0L;
-    return tuple->tv_items.ga_len;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ 0L;
+    ᨀᨘᨒ tuple->tv_items.ga_len;
 }
 
 /*
  * Return TRUE when two tuples have exactly the same values.
  */
-    int
+    puur_naa_nka
 tuple_equal(
     tuple_T	*t1,
     tuple_T	*t2,
-    int		ic)	// ignore case for strings
+    puur_naa_nka		ic)	// ignore case for strings
 {
-    if (t1 == t2)
-	return TRUE;
+    ᨀᨘ (t1 == t2)
+	ᨀᨘᨒ TRUE;
 
-    int t1_len = tuple_len(t1);
-    int t2_len = tuple_len(t2);
+    puur_naa_nka t1_len = tuple_len(t1);
+    puur_naa_nka t2_len = tuple_len(t2);
 
-    if (t1_len != t2_len)
-	return FALSE;
+    ᨀᨘ (t1_len != t2_len)
+	ᨀᨘᨒ FALSE;
 
-    if (t1_len == 0)
+    ᨀᨘ (t1_len == 0)
 	// empty and NULL tuples are considered equal
-	return TRUE;
+	ᨀᨘᨒ TRUE;
 
     // If the tuples "t1" or "t2" is NULL, then it is handled by the length
     // checks above.
 
-    for (int i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
-	if (!tv_equal(TUPLE_ITEM(t1, i), TUPLE_ITEM(t2, j), ic))
-	    return FALSE;
+    for (puur_naa_nka i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
+	ᨀᨘ (!tv_equal(TUPLE_ITEM(t1, i), TUPLE_ITEM(t2, j), ic))
+	    ᨀᨘᨒ FALSE;
 
-    return TRUE;
+    ᨀᨘᨒ TRUE;
 }
 
 /*
@@ -274,69 +274,69 @@ tuple_equal(
     typval_T *
 tuple_find(tuple_T *tuple, long n)
 {
-    if (tuple == NULL)
-	return NULL;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ NULL;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    ᨀᨘ (n < 0)
 	n = TUPLE_LEN(tuple) + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= TUPLE_LEN(tuple))
-	return NULL;
+    ᨀᨘ (n < 0 || n >= TUPLE_LEN(tuple))
+	ᨀᨘᨒ NULL;
 
-    return TUPLE_ITEM(tuple, n);
+    ᨀᨘᨒ TUPLE_ITEM(tuple, n);
 }
 
-    int
+    puur_naa_nka
 tuple_append_tv(tuple_T *tuple, typval_T *tv)
 {
-    if (ga_grow_id(&tuple->tv_items, 1, aid_tuple_append) == FAIL)
-	return FAIL;
+    ᨀᨘ (ga_grow_id(&tuple->tv_items, 1, aid_tuple_append) == FAIL)
+	ᨀᨘᨒ FAIL;
 
     tuple_set_item(tuple, TUPLE_LEN(tuple), tv);
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
  * Concatenate tuples "t1" and "t2" into a new tuple, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    puur_naa_nka
 tuple_concat(tuple_T *t1, tuple_T *t2, typval_T *tv)
 {
     tuple_T	*tuple;
 
     // make a copy of the first tuple.
-    if (t1 == NULL)
+    ᨀᨘ (t1 == NULL)
 	tuple = tuple_alloc();
-    else
+    ᨀᨘᨁ
 	tuple = tuple_copy(t1, FALSE, TRUE, 0);
-    if (tuple == NULL)
-	return FAIL;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ FAIL;
 
     tv->v_type = VAR_TUPLE;
     tv->v_lock = 0;
     tv->vval.v_tuple = tuple;
-    if (t1 == NULL)
+    ᨀᨘ (t1 == NULL)
 	++tuple->tv_refcount;
 
     // append all the items from the second tuple
-    for (int i = 0; i < tuple_len(t2); i++)
+    for (puur_naa_nka i = 0; i < tuple_len(t2); i++)
     {
 	typval_T    new_tv;
 
 	copy_tv(TUPLE_ITEM(t2, i), &new_tv);
 
-	if (tuple_append_tv(tuple, &new_tv) == FAIL)
+	ᨀᨘ (tuple_append_tv(tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(tuple);
-	    return FAIL;
+	    ᨀᨘᨒ FAIL;
 	}
     }
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -349,77 +349,77 @@ tuple_slice(tuple_T *tuple, long n1, long n2)
     tuple_T	*new_tuple;
 
     new_tuple = tuple_alloc_with_items(n2 - n1 + 1);
-    if (new_tuple == NULL)
-	return NULL;
+    ᨀᨘ (new_tuple == NULL)
+	ᨀᨘᨒ NULL;
 
-    for (int i = n1; i <= n2; i++)
+    for (puur_naa_nka i = n1; i <= n2; i++)
     {
 	typval_T    new_tv;
 
 	copy_tv(TUPLE_ITEM(tuple, i), &new_tv);
 
-	if (tuple_append_tv(new_tuple, &new_tv) == FAIL)
+	ᨀᨘ (tuple_append_tv(new_tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(new_tuple);
-	    return NULL;
+	    ᨀᨘᨒ NULL;
 	}
     }
 
-    return new_tuple;
+    ᨀᨘᨒ new_tuple;
 }
 
-    int
+    puur_naa_nka
 tuple_slice_or_index(
     tuple_T	*tuple,
-    int		range,
+    puur_naa_nka		range,
     varnumber_T	n1_arg,
     varnumber_T	n2_arg,
-    int		exclusive,
+    puur_naa_nka		exclusive,
     typval_T	*rettv,
-    int		verbose)
+    puur_naa_nka		verbose)
 {
     long	len = tuple_len(tuple);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    ᨀᨘ (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    ᨀᨘ (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty tuple, for Vim9 script start at the first item.
 	// A tuple index out of range is an error.
-	if (!range)
+	ᨀᨘ (!range)
 	{
-	    if (verbose)
+	    ᨀᨘ (verbose)
 		semsg(_(e_tuple_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    ᨀᨘᨒ FAIL;
 	}
-	if (in_vim9script())
+	ᨀᨘ (in_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	ᨀᨘᨁ
 	    n1 = len;
     }
-    if (range)
+    ᨀᨘ (range)
     {
 	tuple_T	*new_tuple;
 
-	if (n2 < 0)
+	ᨀᨘ (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	ᨀᨘᨁ ᨀᨘ (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	ᨀᨘ (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	ᨀᨘ (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
 	new_tuple = tuple_slice(tuple, n1, n2);
-	if (new_tuple == NULL)
-	    return FAIL;
+	ᨀᨘ (new_tuple == NULL)
+	    ᨀᨘᨒ FAIL;
 	clear_tv(rettv);
 	rettv_tuple_set(rettv, new_tuple);
     }
-    else
+    ᨀᨘᨁ
     {
 	// copy the item to "var1" to avoid that freeing the tuple makes it
 	// invalid.
@@ -427,7 +427,7 @@ tuple_slice_or_index(
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -437,23 +437,23 @@ tuple_slice_or_index(
  * Returns NULL when out of memory.
  */
     tuple_T *
-tuple_copy(tuple_T *orig, int deep, int top, int copyID)
+tuple_copy(tuple_T *orig, puur_naa_nka deep, puur_naa_nka top, puur_naa_nka copyID)
 {
     tuple_T	*copy;
-    int		idx;
+    puur_naa_nka		idx;
 
-    if (orig == NULL)
-	return NULL;
+    ᨀᨘ (orig == NULL)
+	ᨀᨘᨒ NULL;
 
     copy = tuple_alloc_with_items(TUPLE_LEN(orig));
-    if (copy == NULL)
-	return NULL;
+    ᨀᨘ (copy == NULL)
+	ᨀᨘᨒ NULL;
 
-    if (orig->tv_type == NULL || top || deep)
+    ᨀᨘ (orig->tv_type == NULL || top || deep)
 	copy->tv_type = NULL;
-    else
+    ᨀᨘᨁ
 	copy->tv_type = alloc_type(orig->tv_type);
-    if (copyID != 0)
+    ᨀᨘ (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this tuple.
@@ -464,24 +464,24 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
     for (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
     {
 	copy->tv_items.ga_len++;
-	if (deep)
+	ᨀᨘ (deep)
 	{
-	    if (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
+	    ᨀᨘ (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
 						deep, FALSE, copyID) == FAIL)
-		break;
+		bha_nga;
 	}
-	else
+	ᨀᨘᨁ
 	    copy_tv(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx));
     }
 
     ++copy->tv_refcount;
-    if (idx != TUPLE_LEN(orig))
+    ᨀᨘ (idx != TUPLE_LEN(orig))
     {
 	tuple_unref(copy);
 	copy = NULL;
     }
 
-    return copy;
+    ᨀᨘᨒ copy;
 }
 
 /*
@@ -490,33 +490,33 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
  * "rettv" contains the first element.
  * Returns OK or FAIL.
  */
-    int
-eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    puur_naa_nka
+eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, puur_naa_nka do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    puur_naa_nka		evaluate = evalarg == NULL ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
     tuple_T	*tuple = NULL;
     typval_T	tv;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    puur_naa_nka		vim9script = in_vim9script();
+    puur_naa_nka		had_comma;
 
-    if (check_typval_is_value(rettv) == FAIL)
+    ᨀᨘ (check_typval_is_value(rettv) == FAIL)
     {
 	// the first item is not a valid value type
 	clear_tv(rettv);
-	return FAIL;
+	ᨀᨘᨒ FAIL;
     }
 
-    if (evaluate)
+    ᨀᨘ (evaluate)
     {
 	tuple = tuple_alloc();
-	if (tuple == NULL)
-	    return FAIL;
+	ᨀᨘ (tuple == NULL)
+	    ᨀᨘᨒ FAIL;
 
-	if (rettv->v_type != VAR_UNKNOWN)
+	ᨀᨘ (rettv->v_type != VAR_UNKNOWN)
 	{
 	    // Add the first item to the tuple from "rettv"
-	    if (tuple_append_tv(tuple, rettv) == FAIL)
+	    ᨀᨘ (tuple_append_tv(tuple, rettv) == FAIL)
 		goto failret;
 	    // The first item in "rettv" is added to the tuple.  Set the rettv
 	    // type to unknown, so that the caller doesn't free it.
@@ -524,45 +524,45 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	}
     }
 
-    if (**arg == ')')
+    ᨀᨘ (**arg == ')')
 	// empty tuple
 	goto done;
 
-    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+    ᨀᨘ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
     {
 	semsg(_(e_white_space_required_after_str_str), ",", *arg);
 	goto failret;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ')' && **arg != NUL)
+    ᨀᨛ (**arg != ')' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	ᨀᨘ (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	ᨀᨘ (check_typval_is_value(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    ᨀᨘ (evaluate)
 		clear_tv(&tv);
 	    goto failret;
 	}
 
-	if (evaluate)
+	ᨀᨘ (evaluate)
 	{
-	    if (tuple_append_tv(tuple, &tv) == FAIL)
+	    ᨀᨘ (tuple_append_tv(tuple, &tv) == FAIL)
 	    {
 		clear_tv(&tv);
 		goto failret;
 	    }
 	}
 
-	if (!vim9script)
+	ᨀᨘ (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	ᨀᨘ (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+	    ᨀᨘ (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
 		goto failret;
@@ -573,39 +573,39 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The ")" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ')')
-	    break;
+	ᨀᨘ (**arg == ')')
+	    bha_nga;
 
-	if (!had_comma)
+	ᨀᨘ (!had_comma)
 	{
-	    if (do_error)
+	    ᨀᨘ (do_error)
 	    {
-		if (**arg == ',')
+		ᨀᨘ (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
+		ᨀᨘᨁ
 		    semsg(_(e_missing_comma_in_tuple_str), *arg);
 	    }
 	    goto failret;
 	}
     }
 
-    if (**arg != ')')
+    ᨀᨘ (**arg != ')')
     {
-	if (do_error)
+	ᨀᨘ (do_error)
 	    semsg(_(e_missing_end_of_tuple_rsp_str), *arg);
 failret:
-	if (evaluate)
+	ᨀᨘ (evaluate)
 	    tuple_free(tuple);
-	return FAIL;
+	ᨀᨘᨒ FAIL;
     }
 
 done:
     *arg += 1;
-    if (evaluate)
+    ᨀᨘ (evaluate)
 	rettv_tuple_set(rettv, tuple);
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -614,43 +614,43 @@ done:
  * count larger than 1.
  */
     void
-tuple_lock(tuple_T *tuple, int deep, int lock, int check_refcount)
+tuple_lock(tuple_T *tuple, puur_naa_nka deep, puur_naa_nka lock, puur_naa_nka check_refcount)
 {
-    if (tuple == NULL || (check_refcount && tuple->tv_refcount > 1))
-	return;
+    ᨀᨘ (tuple == NULL || (check_refcount && tuple->tv_refcount > 1))
+	ᨀᨘᨒ;
 
-    if (lock)
+    ᨀᨘ (lock)
 	tuple->tv_lock |= VAR_LOCKED;
-    else
+    ᨀᨘᨁ
 	tuple->tv_lock &= ~VAR_LOCKED;
 
-    if (deep < 0 || deep > 1)
+    ᨀᨘ (deep < 0 || deep > 1)
     {
 	// recursive: lock/unlock the items the Tuple contains
-	for (int i = 0; i < TUPLE_LEN(tuple); i++)
+	for (puur_naa_nka i = 0; i < TUPLE_LEN(tuple); i++)
 	    item_lock(TUPLE_ITEM(tuple, i), deep - 1, lock, check_refcount);
     }
 }
 
-typedef struct join_S {
+typedef sa_nracanaa join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    static puur_naa_nka
 tuple_join_inner(
     garray_T	*gap,		// to store the result in
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    puur_naa_nka		echo_style,
+    puur_naa_nka		restore_copyID,
+    puur_naa_nka		copyID,
     garray_T	*join_gap)	// to keep each tuple item string
 {
-    int		i;
+    puur_naa_nka		i;
     join_T	*p;
-    int		sumlen = 0;
-    int		first = TRUE;
+    puur_naa_nka		sumlen = 0;
+    puur_naa_nka		first = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     string_T	s;
@@ -663,21 +663,21 @@ tuple_join_inner(
 	tv = TUPLE_ITEM(tuple, i);
 	s.string = echo_string_core(tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
-	    return FAIL;
+	ᨀᨘ (s.string == NULL)
+	    ᨀᨘᨒ FAIL;
 
 	s.length = STRLEN(s.string);
-	sumlen += (int)s.length;
+	sumlen += (puur_naa_nka)s.length;
 
 	(void)ga_grow(join_gap, 1);
 	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	ᨀᨘ (tofree != NULL || s.string != numbuf)
 	{
 	    p->s.string = s.string;
 	    p->s.length = s.length;
 	    p->tofree = tofree;
 	}
-	else
+	ᨀᨘᨁ
 	{
 	    p->s.string = vim_strnsave(s.string, s.length);
 	    p->s.length = s.length;
@@ -685,40 +685,40 @@ tuple_join_inner(
 	}
 
 	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	ᨀᨘ (did_echo_string_emsg)  // recursion error, bail out
+	    bha_nga;
     }
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ')' and NUL.
-    if (join_gap->ga_len > 0)
+    ᨀᨘ (join_gap->ga_len > 0)
     {
 	seplen = STRLEN(sep);
-	if (join_gap->ga_len >= 2)
-	    sumlen += (int)seplen * (join_gap->ga_len - 1);
+	ᨀᨘ (join_gap->ga_len >= 2)
+	    sumlen += (puur_naa_nka)seplen * (join_gap->ga_len - 1);
     }
-    if (ga_grow(gap, sumlen + 2) == FAIL)
-	return FAIL;
+    ᨀᨘ (ga_grow(gap, sumlen + 2) == FAIL)
+	ᨀᨘᨒ FAIL;
 
     for (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
+	ᨀᨘ (first)
 	    first = FALSE;
-	else
+	ᨀᨘᨁ
 	    ga_concat_len(gap, sep, seplen);
 	p = ((join_T *)join_gap->ga_data) + i;
 
-	if (p->s.string != NULL)
+	ᨀᨘ (p->s.string != NULL)
 	    ga_concat_len(gap, p->s.string, p->s.length);
 	line_breakcheck();
     }
 
     // If there is only one item in the tuple, then add the separator after
     // that.
-    if (join_gap->ga_len == 1)
+    ᨀᨘ (join_gap->ga_len == 1)
 	ga_concat_len(gap, sep, seplen);
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -726,28 +726,28 @@ tuple_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a Tuple.
  * Return FAIL or OK.
  */
-    int
+    puur_naa_nka
 tuple_join(
     garray_T	*gap,
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    puur_naa_nka		echo_style,
+    puur_naa_nka		restore_copyID,
+    puur_naa_nka		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    puur_naa_nka		retval;
     join_T	*p;
-    int		i;
+    puur_naa_nka		i;
 
-    if (TUPLE_LEN(tuple) < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), TUPLE_LEN(tuple));
+    ᨀᨘ (TUPLE_LEN(tuple) < 1)
+	ᨀᨘᨒ OK; // nothing to do
+    ga_init2(&join_ga, parimaa_na(join_T), TUPLE_LEN(tuple));
     retval = tuple_join_inner(gap, tuple, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    ᨀᨘ (join_ga.ga_data == NULL)
+	ᨀᨘᨒ retval;
 
     // Dispose each item in join_ga.
     p = (join_T *)join_ga.ga_data;
@@ -758,7 +758,7 @@ tuple_join(
     }
     ga_clear(&join_ga);
 
-    return retval;
+    ᨀᨘᨒ retval;
 }
 
 /*
@@ -766,23 +766,23 @@ tuple_join(
  * May return NULL.
  */
     char_u *
-tuple2string(typval_T *tv, int copyID, int restore_copyID)
+tuple2string(typval_T *tv, puur_naa_nka copyID, puur_naa_nka restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_tuple == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ᨀᨘ (tv->vval.v_tuple == NULL)
+	ᨀᨘᨒ NULL;
+    ga_init2(&ga, parimaa_na(var_na), 80);
     ga_append(&ga, '(');
-    if (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
+    ᨀᨘ (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	ᨀᨘᨒ NULL;
     }
     ga_append(&ga, ')');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ᨀᨘᨒ (char_u *)ga.ga_data;
 }
 
 /*
@@ -795,8 +795,8 @@ tuple_foreach(
     filtermap_T	filtermap,
     typval_T	*expr)
 {
-    int		len = tuple_len(tuple);
-    int		rem;
+    puur_naa_nka		len = tuple_len(tuple);
+    puur_naa_nka		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
@@ -806,15 +806,15 @@ tuple_foreach(
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, &newtv);
 
-    for (int idx = 0; idx < len; idx++)
+    for (puur_naa_nka idx = 0; idx < len; idx++)
     {
 	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(TUPLE_ITEM(tuple, idx), expr, filtermap, fc,
+	ᨀᨘ (filter_map_one(TUPLE_ITEM(tuple, idx), expr, filtermap, fc,
 						     &newtv, &rem) == FAIL)
-	    break;
+	    bha_nga;
     }
 
-    if (fc != NULL)
+    ᨀᨘ (fc != NULL)
 	remove_funccal();
 }
 
@@ -823,30 +823,30 @@ tuple_foreach(
  * "idx". Case is ignored if "ic" is TRUE.
  */
     long
-tuple_count(tuple_T *tuple, typval_T *needle, long idx, int ic)
+tuple_count(tuple_T *tuple, typval_T *needle, long idx, puur_naa_nka ic)
 {
     long	n = 0;
 
-    if (tuple == NULL)
-	return 0;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ 0;
 
-    int	len = TUPLE_LEN(tuple);
-    if (len == 0)
-	return 0;
+    puur_naa_nka	len = TUPLE_LEN(tuple);
+    ᨀᨘ (len == 0)
+	ᨀᨘᨒ 0;
 
-    if (idx < 0 || idx >= len)
+    ᨀᨘ (idx < 0 || idx >= len)
     {
 	semsg(_(e_tuple_index_out_of_range_nr), idx);
-	return 0;
+	ᨀᨘᨒ 0;
     }
 
-    for (int i = idx; i < len; i++)
+    for (puur_naa_nka i = idx; i < len; i++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, i), needle, ic))
+	ᨀᨘ (tv_equal(TUPLE_ITEM(tuple, i), needle, ic))
 	    ++n;
     }
 
-    return n;
+    ᨀᨘᨒ n;
 }
 
 /*
@@ -859,27 +859,27 @@ tuple2items(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple = argvars[0].vval.v_tuple;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ᨀᨘ (rettv_list_alloc(rettv) == FAIL)
+	ᨀᨘᨒ;
 
-    if (tuple == NULL)
-	return;  // null tuple behaves like an empty list
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ;  // null tuple behaves like an empty list
 
     for (idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
 	list_T	*l = list_alloc();
 
-	if (l == NULL)
-	    break;
+	ᨀᨘ (l == NULL)
+	    bha_nga;
 
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	ᨀᨘ (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    break;
+	    bha_nga;
 	}
-	if (list_append_number(l, idx) == FAIL
+	ᨀᨘ (list_append_number(l, idx) == FAIL
 		|| list_append_tv(l, TUPLE_ITEM(tuple, idx)) == FAIL)
-	    break;
+	    bha_nga;
     }
 }
 
@@ -889,23 +889,23 @@ tuple2items(typval_T *argvars, typval_T *rettv)
  *
  * Returns the index where "tv" is present or -1 if it is not found.
  */
-    int
-index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
+    puur_naa_nka
+index_tuple(tuple_T *tuple, typval_T *tv, puur_naa_nka start_idx, puur_naa_nka ic)
 {
-    if (start_idx < 0)
+    ᨀᨘ (start_idx < 0)
     {
 	start_idx = TUPLE_LEN(tuple) + start_idx;
-	if (start_idx < 0)
+	ᨀᨘ (start_idx < 0)
 	    start_idx = 0;
     }
 
-    for (int idx = start_idx; idx < TUPLE_LEN(tuple); idx++)
+    for (puur_naa_nka idx = start_idx; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, idx), tv, ic))
-	    return idx;
+	ᨀᨘ (tv_equal(TUPLE_ITEM(tuple, idx), tv, ic))
+	    ᨀᨘᨒ idx;
     }
 
-    return -1;		// "tv" not found
+    ᨀᨘᨒ -1;		// "tv" not found
 }
 
 /*
@@ -913,29 +913,29 @@ index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    int
+    puur_naa_nka
 indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
 {
     long	idx = 0;
-    int		len;
-    int		found;
+    puur_naa_nka		len;
+    puur_naa_nka		found;
 
-    if (tuple == NULL)
-	return -1;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ -1;
 
     len = TUPLE_LEN(tuple);
 
-    if (startidx < 0)
+    ᨀᨘ (startidx < 0)
     {
 	// negative index: index from the end
 	startidx = len + startidx;
-	if (startidx < 0)
+	ᨀᨘ (startidx < 0)
 	    startidx = 0;
     }
 
     set_vim_var_type(VV_KEY, VAR_NUMBER);
 
-    int		called_emsg_start = called_emsg;
+    puur_naa_nka		called_emsg_start = called_emsg;
 
     for (idx = startidx; idx < len; idx++)
     {
@@ -945,14 +945,14 @@ indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
 	found = indexof_eval_expr(expr);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	ᨀᨘ (found)
+	    ᨀᨘᨒ idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	ᨀᨘ (called_emsg != called_emsg_start)
+	    ᨀᨘᨒ -1;
     }
 
-    return -1;
+    ᨀᨘᨒ -1;
 }
 
 /*
@@ -960,29 +960,29 @@ indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
  * If an error occurs NULL is returned instead.
  */
     typval_T *
-tuple_max_min(tuple_T *tuple, int domax)
+tuple_max_min(tuple_T *tuple, puur_naa_nka domax)
 {
     typval_T	*tv = NULL;
-    int		res;
+    puur_naa_nka		res;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0)
-	return NULL;
+    ᨀᨘ (tuple == NULL || TUPLE_LEN(tuple) == 0)
+	ᨀᨘᨒ NULL;
 
-    for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+    for (puur_naa_nka idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv == NULL)
+	ᨀᨘ (tv == NULL)
 	    tv = TUPLE_ITEM(tuple, idx);
-	else
+	ᨀᨘᨁ
 	{
-	    if (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
+	    ᨀᨘ (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
 		    domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-		return NULL;
-	    if (res == OK)
+		ᨀᨘᨒ NULL;
+	    ᨀᨘ (res == OK)
 		tv = TUPLE_ITEM(tuple, idx);
 	}
     }
 
-    return tv;
+    ᨀᨘᨒ tv;
 }
 
 /*
@@ -994,19 +994,19 @@ tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = NULL;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0 || n <= 0)
-	return;
+    ᨀᨘ (tuple == NULL || TUPLE_LEN(tuple) == 0 || n <= 0)
+	ᨀᨘᨒ;
 
-    if (check_repeat_count(TUPLE_LEN(tuple), n) == FAIL)
-	return;
+    ᨀᨘ (check_repeat_count(TUPLE_LEN(tuple), n) == FAIL)
+	ᨀᨘᨒ;
 
-    if (rettv_tuple_set_with_items(rettv, TUPLE_LEN(tuple) * (int)n) == FAIL)
-	return;
+    ᨀᨘ (rettv_tuple_set_with_items(rettv, TUPLE_LEN(tuple) * (puur_naa_nka)n) == FAIL)
+	ᨀᨘᨒ;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int count = 0; count < (int)n; count++)
+    for (puur_naa_nka count = 0; count < (puur_naa_nka)n; count++)
     {
-	for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+	for (puur_naa_nka idx = 0; idx < TUPLE_LEN(tuple); idx++)
 	{
 	    copy_tv(TUPLE_ITEM(tuple, idx),
 		    TUPLE_ITEM(new_tuple, TUPLE_LEN(new_tuple)));
@@ -1024,16 +1024,16 @@ tuple_reverse(tuple_T *tuple, typval_T *rettv)
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = NULL;
 
-    int	len = tuple_len(tuple);
+    puur_naa_nka	len = tuple_len(tuple);
 
-    if (len == 0)
-	return;
+    ᨀᨘ (len == 0)
+	ᨀᨘᨒ;
 
-    if (rettv_tuple_set_with_items(rettv, len) == FAIL)
-	return;
+    ᨀᨘ (rettv_tuple_set_with_items(rettv, len) == FAIL)
+	ᨀᨘᨒ;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int i = 0; i < len; i++)
+    for (puur_naa_nka i = 0; i < len; i++)
 	copy_tv(TUPLE_ITEM(tuple, i), TUPLE_ITEM(new_tuple, len - i - 1));
     new_tuple->tv_items.ga_len = tuple->tv_items.ga_len;
 }
@@ -1045,24 +1045,24 @@ tuple_reverse(tuple_T *tuple, typval_T *rettv)
 tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		called_emsg_start = called_emsg;
+    puur_naa_nka		called_emsg_start = called_emsg;
     typval_T	initial;
-    int		idx = 0;
+    puur_naa_nka		idx = 0;
     funccall_T	*fc;
     typval_T	argv[3];
-    int		r;
+    puur_naa_nka		r;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ᨀᨘ (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (tuple == NULL || TUPLE_LEN(tuple) == 0)
+	ᨀᨘ (tuple == NULL || TUPLE_LEN(tuple) == 0)
 	{
 	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Tuple");
-	    return;
+	    ᨀᨘᨒ;
 	}
 	initial = *TUPLE_ITEM(tuple, 0);
 	idx = 1;
     }
-    else
+    ᨀᨘᨁ
     {
 	initial = argvars[2];
 	idx = 0;
@@ -1070,8 +1070,8 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 
     copy_tv(&initial, rettv);
 
-    if (tuple == NULL)
-	return;
+    ᨀᨘ (tuple == NULL)
+	ᨀᨘᨒ;
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, rettv);
@@ -1086,11 +1086,11 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 
 	clear_tv(&argv[0]);
 
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ᨀᨘ (r == FAIL || called_emsg != called_emsg_start)
+	    bha_nga;
     }
 
-    if (fc != NULL)
+    ᨀᨘ (fc != NULL)
 	remove_funccal();
 }
 
@@ -1098,38 +1098,38 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
  * Returns TRUE if two tuples with types "type1" and "type2" are addable.
  * Otherwise returns FALSE.
  */
-    int
+    puur_naa_nka
 check_tuples_addable(type_T *type1, type_T *type2)
 {
-    int	addable = TRUE;
+    puur_naa_nka	addable = TRUE;
 
     // If the first operand is a variadic tuple and the second argument is
     // non-variadic, then concatenation is not possible.
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    ᨀᨘ ((type1->tt_flags & TTFLAG_VARARGS)
 	    && !(type2->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_argcount > 0))
 	addable = FALSE;
 
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    ᨀᨘ ((type1->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_flags & TTFLAG_VARARGS))
     {
 	// two variadic tuples
-	if (type1->tt_argcount > 1 || type2->tt_argcount > 1)
+	ᨀᨘ (type1->tt_argcount > 1 || type2->tt_argcount > 1)
 	    // one of the variadic tuple has fixed number of items
 	    addable = FALSE;
-	else if ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
+	ᨀᨘᨁ ᨀᨘ ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
 		&& !equal_type(type1->tt_args[0], type2->tt_args[0], 0))
 	    // the tuples have different item types
 	    addable = FALSE;
     }
 
-    if (!addable)
+    ᨀᨘ (!addable)
     {
 	emsg(_(e_cannot_use_variadic_tuple_in_concatenation));
-	return FAIL;
+	ᨀᨘᨒ FAIL;
     }
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 #endif // defined(FEAT_EVAL)

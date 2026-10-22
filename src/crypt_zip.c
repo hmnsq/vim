@@ -12,7 +12,7 @@
  */
 #include "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ᨀᨘ defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,10 +24,10 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+typedef unsigned puur_naa_nka u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
+typedef sa_nracanaa {
     u32_T keys[3];
 } zip_state_T;
 
@@ -41,10 +41,10 @@ static u32_T crc_32_table[256];
 make_crc_tab(void)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    static puur_naa_nka	done = FALSE;
 
-    if (done)
-	return;
+    ᨀᨘ (done)
+	ᨀᨘᨒ;
     for (t = 0; t < 256; t++)
     {
 	v = t;
@@ -55,7 +55,7 @@ make_crc_tab(void)
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((puur_naa_nka)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
@@ -63,7 +63,7 @@ make_crc_tab(void)
 #define DECRYPT_BYTE_ZIP(keys, t) \
 { \
     short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    t = (puur_naa_nka)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
@@ -73,13 +73,13 @@ make_crc_tab(void)
     keys[0] = CRC32(keys[0], (c)); \
     keys[1] += keys[0] & 0xff; \
     keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+    keys[2] = CRC32(keys[2], (puur_naa_nka)(keys[1] >> 24)); \
+} ᨀᨛ (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    puur_naa_nka
 crypt_zip_init(
     cryptstate_T    *state,
     char_u	    *key,
@@ -89,8 +89,8 @@ crypt_zip_init(
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    ᨀᨘ (zs == NULL)
+	ᨀᨘᨒ FAIL;
     state->method_state = zs;
 
     make_crc_tab();
@@ -98,9 +98,9 @@ crypt_zip_init(
     zs->keys[1] = 591751049L;
     zs->keys[2] = 878082192L;
     for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+	UPDATE_KEYS_ZIP(zs->keys, (puur_naa_nka)*p);
 
-    return OK;
+    ᨀᨘᨒ OK;
 }
 
 /*
@@ -113,11 +113,11 @@ crypt_zip_encode(
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    puur_naa_nka		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    puur_naa_nka		ztemp, t;
 
     for (i = 0; i < len; ++i)
     {
@@ -137,7 +137,7 @@ crypt_zip_decode(
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    puur_naa_nka		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
@@ -146,7 +146,7 @@ crypt_zip_decode(
     for (i = 0; i < len; ++i)
     {
 	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
+	temp = (puur_naa_nka)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
 	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
     }
 }

@@ -15,36 +15,36 @@ except ImportError:
 def make_dap_message(obj):
     payload = json.dumps(obj).encode("utf-8")
     header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    ᨀᨘᨒ header + payload
 
 
 def parse_messages(buffer):
     messages = []
 
-    while True:
+    ᨀᨛ True:
         hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+        ᨀᨘ hdr_end == -1:
+            bha_nga
 
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        for line anta_h header.split("\r\n"):
+            ᨀᨘ line.lower().startswith("content-length:"):
+                content_length = puur_naa_nka(line.split(":")[1].strip())
 
-        if content_length is None:
-            break
+        ᨀᨘ content_length is None:
+            bha_nga
 
         total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        ᨀᨘ len(buffer) < total_len:
+            bha_nga  # partial
 
         body = buffer[hdr_end + 4:total_len]
         messages.append(json.loads(body.decode("utf-8")))
         buffer = buffer[total_len:]
 
-    return messages, buffer
+    ᨀᨘᨒ messages, buffer
 
 
 class DAPHandler(socketserver.BaseRequestHandler):
@@ -77,31 +77,31 @@ class DAPHandler(socketserver.BaseRequestHandler):
     def handle_request(self, msg):
         cmd = msg.get("command")
 
-        if cmd == "initialize":
+        ᨀᨘ cmd == "initialize":
             self.send_response(msg, {
                 "supportsConfigurationDoneRequest": True
             })
             self.send_event("initialized")
-        else:
+        ᨀᨘᨁ:
             self.send_response(msg)
 
-        return True
+        ᨀᨘᨒ True
 
     def handle(self):
         buffer = b""
 
-        while True:
+        ᨀᨛ True:
             data = self.request.recv(4096)
-            if not data:
-                break
+            ᨀᨘ na data:
+                bha_nga
 
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            for msg anta_h messages:
+                ᨀᨘ msg.get("type") == "request":
+                    ᨀᨘ na self.handle_request(msg):
+                        ᨀᨘᨒ
 
 
 class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -125,11 +125,11 @@ def main():
     thread.start()
 
     try:
-        while thread.is_alive():
+        ᨀᨛ thread.is_alive():
             thread.join(1)
     except KeyboardInterrupt:
         server.shutdown()
 
-if __name__ == "__main__":
+ᨀᨘ __name__ == "__main__":
     main()
 
