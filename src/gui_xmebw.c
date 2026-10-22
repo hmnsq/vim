@@ -21,36 +21,36 @@
  * Enhanced Motif PushButton widget with move over behavior.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#اگر_تعریف_شدہ FEAT_TOOLBAR
 
-#include <Xm/XmP.h>
-#include <Xm/DrawP.h>
-#if defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
+#شامل <Xm/XmP.h>
+#شامل <Xm/DrawP.h>
+#اگر defined(HAVE_XM_TRAITP_H) && defined(HAVE_XM_MANAGER_H) \
 	&& defined(HAVE_XM_UNHIGHLIGHTT_H) && defined(HAVE_XM_XPMP_H)
 # include <Xm/TraitP.h>
 # include <Xm/Manager.h>
 # include <Xm/UnhighlightT.h>
 # include <Xm/XpmP.h>
 # define UNHIGHLIGHTT
-#else
+#ورنہ
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  ورنہ
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
-#include <Xm/ManagerP.h>
-#include <Xm/Display.h>
-#include <Xm/DisplayP.h>
+#اگر_ختم
+#شامل <Xm/ManagerP.h>
+#شامل <Xm/Display.h>
+#شامل <Xm/DisplayP.h>
 
-#include <X11/Shell.h>
-#include <X11/ShellP.h>
+#شامل <X11/Shell.h>
+#شامل <X11/ShellP.h>
 
-#include "gui_xmebwp.h"
+#شامل "gui_xmebwp.h"
 
 // Provide some missing wrappers, which are missed from the LessTif
 // implementation.  Also missing in Motif 1.2 and earlier.
@@ -58,102 +58,102 @@
 // We neither use XmeGetPixmapData or _XmGetPixmapData, since with LessTif the
 // pixmap will not appear in its caches properly. We cache the interesting
 // values in XmEnhancedButtonPart instead ourself.
-#if defined(LESSTIF_VERSION) || (XmVersion <= 1002)
+#اگر defined(LESSTIF_نسخہ) || (Xm_نسخہ <= 1002)
 # ifndef Lab_IsMenupane
-#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (int)XmMENU_POPUP || \
-		    Lab_MenuType(w) == (int)XmMENU_PULLDOWN)
+#  define Lab_IsMenupane(w) (Lab_MenuType(w) == (صحیح)XmMENU_POPUP || \
+		    Lab_MenuType(w) == (صحیح)XmMENU_PULLDOWN)
 # endif
 # define XmeClearBorder	    _XmClearBorder
 # define XmeDrawShadows	    _XmDrawShadows
 # define XmeDrawHighlight(a, b, c, d, e, f, g, h) \
-    _XmDrawHighlight(a, b, c, d, e, f, g, h, LineSolid)
-#endif
+    _XmDrawHighlight(a, b, c, d, e, f, g, h, سطر_Solid)
+#اگر_ختم
 
 // Older VMS systems do not have xos_r.h and cannot haldle XtProcessLocking
-#if defined(VMS)
-# if defined(HAVE_XOS_R_H)
-#  define XTPROCESS_LOCK XtProcessLock()
+#اگر defined(VMS)
+# اگر defined(HAVE_XOS_R_H)
+#  define XTPROCESS_تالا Xt_Process_تالا()
 #  define XTPROCESS_UNLOCK XtProcessUnlock()
-# else
-#  define XTPROCESS_LOCK
+# ورنہ
+#  define XTPROCESS_تالا
 #  define XTPROCESS_UNLOCK
 # endif
-#else
-# define XTPROCESS_LOCK XtProcessLock()
+#ورنہ
+# define XTPROCESS_تالا Xt_Process_تالا()
 # define XTPROCESS_UNLOCK XtProcessUnlock()
-#endif
+#اگر_ختم
 
 /*
  * Motif internals we have to cheat around with.
  */
 
 // Hopefully this will never change...
-#ifndef XmFOCUS_IGNORE
+#اگر_غیر_تعریف_شدہ XmFOCUS_IGNORE
 # define XmFOCUS_IGNORE       1<<1
-#endif
+#اگر_ختم
 
-extern Boolean _XmGetInDragMode(Widget widget);
-extern void _XmPrimitiveEnter(Widget wid,
+خارجی Boolean Xm_Get_اندر_Drag_منوال(Widget widget);
+خارجی خالی _XmPrimitiveEnter(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmPrimitiveLeave(Widget wid,
+			      String * params, Cardinal * عدد_params);
+خارجی خالی _XmPrimitiveLeave(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmSetFocusFlag(Widget w, unsigned int mask, Boolean value);
-extern void _XmCalcLabelDimensions(Widget wid);
+			      String * params, Cardinal * عدد_params);
+خارجی خالی Xm_سیٹ_Focus_Flag(Widget w, غیرعلامتی صحیح نقاب, Boolean قدر);
+خارجی خالی _XmCalcLabelDimensions(Widget wid);
 
 /*
  * Declaration of class methods.
  */
-static void Destroy(Widget w);
-static void Initialize(Widget rq, Widget eb, ArgList args, Cardinal *n);
-static Boolean SetValues(Widget current, Widget request, Widget new, ArgList args, Cardinal *n);
-static void Redisplay(Widget, XEvent *, Region);
+ساکن خالی Destroy(Widget w);
+ساکن خالی Initialize(Widget rq, Widget eb, ArgList دلائل, Cardinal *n);
+ساکن Boolean سیٹ_اقدار(Widget current, Widget request, Widget new, ArgList دلائل, Cardinal *n);
+ساکن خالی Redisplay(Widget, XEvent *, Region);
 
 /*
  * Declaration of action methods.
  */
-static void Enter(Widget, XEvent *, String *, Cardinal *);
-static void Leave(Widget, XEvent *, String *, Cardinal *);
-static void BorderHighlight(Widget);
-static void BorderUnhighlight(Widget);
+ساکن خالی Enter(Widget, XEvent *, String *, Cardinal *);
+ساکن خالی Leave(Widget, XEvent *, String *, Cardinal *);
+ساکن خالی BorderHighlight(Widget);
+ساکن خالی BorderUnhighlight(Widget);
 
 /*
  * 4 x 4 stipple for desensitized widgets
  */
-#define stipple_width  4
-#define stipple_height 4
-static char stipple_bits[] = { 0x0a, 0x05, 0x0a, 0x05 };
-#define STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
+#تعریف_کرو stipple_چوڑائی  4
+#تعریف_کرو stipple_اونچائی 4
+ساکن حرف stipple_بٹ[] = { 0x0a, 0x05, 0x0a, 0x05 };
+#تعریف_کرو STIPPLE_BITMAP	xmEnhancedButtonClassRec.enhancedbutton_class.stipple_bitmap
 
 /*
  * Override actions.
  */
-static XtActionsRec actionsList[] =
+ساکن XtActionsRec actionsList[] =
 {
     {"Enter", Enter},
     {"Leave", Leave},
 };
 
-static XtResource resources[] =
+ساکن XtResource resources[] =
 {
     {
-	XmNpixmapData, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_data),
-	XmRImmediate, (XtPointer) NULL
+	Xm_Npixmap_ڈیٹا, XmCPixmap, XmRString, حجم(String),
+	Xt_انحراف_کا(XmEnhancedButtonRec, enhancedbutton.pixmap_ڈیٹا),
+	XmRImmediate, (Xt_اشارہ_گر) تہی
     }, {
-	XmNpixmapFile, XmCPixmap, XmRString, sizeof(String),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
-	XmRImmediate, (XtPointer) NULL
+	XmNpixmapFile, XmCPixmap, XmRString, حجم(String),
+	Xt_انحراف_کا(XmEnhancedButtonRec, enhancedbutton.pixmap_file),
+	XmRImmediate, (Xt_اشارہ_گر) تہی
     }, {
-	XmNspacing, XmCSpacing, XmRHorizontalDimension, sizeof(Dimension),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.spacing),
-	XmRImmediate, (XtPointer) 2
+	XmNspacing, XmCSpacing, XmRHorizontalDimension, حجم(Dimension),
+	Xt_انحراف_کا(XmEnhancedButtonRec, enhancedbutton.spacing),
+	XmRImmediate, (Xt_اشارہ_گر) 2
     },
     {
-	XmNlabelLocation, XmCLocation, XmRInt, sizeof(int),
-	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.label_location),
-	XtRImmediate, (XtPointer) XmRIGHT
+	XmNlabelLocation, XmCLocation, XmRInt, حجم(صحیح),
+	Xt_انحراف_کا(XmEnhancedButtonRec, enhancedbutton.label_location),
+	XtRImmediate, (Xt_اشارہ_گر) Xm_دایاں
     }
 };
 
@@ -161,32 +161,32 @@ static XtResource resources[] =
 // NULL somehow results in getting it set to an invalid pointer.
 XmPrimitiveClassExtRec xmEnhancedButtonPrimClassExtRec =
 {
-    /* next_extension      */ NULL,
+    /* next_extension      */ تہی,
     /* record_type	   */ NULLQUARK,
-    /* version		   */ XmPrimitiveClassExtVersion,
-    /* record_size	   */ sizeof(XmPrimitiveClassExtRec),
+    /*نسخہ*/ Xm_Primitive_Class_Ext_نسخہ,
+    /* record_size	   */ حجم(XmPrimitiveClassExtRec),
     /* widget_baseline	   */ XmInheritBaselineProc,
     /* widget_display_rect */ XmInheritDisplayRectProc,
-    /* widget_margins      */ NULL
+    /* widget_margins      */ تہی
 };
 
 XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 {
     {
 	// core_class fields
-	/* superclass		 */ (WidgetClass) & xmPushButtonClassRec,
+	/* superclass		 */ (WidgetClass) & xm_ڈالو_Button_Class_Rec,
 	/* class_name		 */ "XmEnhancedButton",
-	/* widget_size		 */ sizeof(XmEnhancedButtonRec),
-	/* class_initialize	 */ NULL,
-	/* class_part_initialize */ NULL,
+	/* widget_size		 */ حجم(XmEnhancedButtonRec),
+	/* class_initialize	 */ تہی,
+	/* class_part_initialize */ تہی,
 	/* class_inited		 */ False,
 	/* initialize		 */ Initialize,
-	/* initialize_hook	 */ NULL,
+	/* initialize_hook	 */ تہی,
 	/* realize		 */ XtInheritRealize,
 	/* actions		 */ actionsList,
-	/* num_actions		 */ XtNumber(actionsList),
+	/* num_actions		 */ Xt_نمبر(actionsList),
 	/* resources		 */ resources,
-	/* num_resources	 */ XtNumber(resources),
+	/* num_resources	 */ Xt_نمبر(resources),
 	/* xrm_class		 */ NULLQUARK,
 	/* compress_motion	 */ True,
 	/* compress_exposure	 */ XtExposeCompressMaximal,
@@ -195,17 +195,17 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* destroy		 */ Destroy,
 	/* resize		 */ XtInheritResize,
 	/* expose		 */ Redisplay,
-	/* set_values		 */ SetValues,
-	/* set_values_hook	 */ NULL,
-	/* set_values_almost	 */ XtInheritSetValuesAlmost,
-	/* get_values_hook	 */ NULL,
+	/* set_values		 */ سیٹ_اقدار,
+	/* set_values_hook	 */ تہی,
+	/* set_values_almost	 */ Xt_Inherit_سیٹ_اقدار_Almost,
+	/* get_values_hook	 */ تہی,
 	/* accept_focus		 */ XtInheritAcceptFocus,
-	/* version		 */ XtVersion,
-	/* callback_private	 */ NULL,
-	/* tm_table		 */ NULL,
-	/* query_geometry	 */ NULL,
+	/* version		 */ Xt_نسخہ,
+	/* callback_private	 */ تہی,
+	/* tm_table		 */ تہی,
+	/* query_geometry	 */ تہی,
 	/* display_accelerator	 */ XtInheritDisplayAccelerator,
-	/* extension		 */ NULL
+	/* extension		 */ تہی
     },
 
     // primitive_class fields
@@ -214,22 +214,22 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* border_unhighlight	 */ BorderUnhighlight,
 	/* translations		 */ XtInheritTranslations,
 	/* arm and activate	 */ XmInheritArmAndActivate,
-	/* synthetic resources	 */ NULL,
+	/* synthetic resources	 */ تہی,
 	/* number of syn res	 */ 0,
-	/* extension		 */ (XtPointer)&xmEnhancedButtonPrimClassExtRec,
+	/* extension		 */ (Xt_اشارہ_گر)&xmEnhancedButtonPrimClassExtRec,
     },
 
     // label_class fields
     {
-	/* setOverrideCallback	 */ XmInheritSetOverrideCallback,
+	/* setOverrideCallback	 */ Xm_Inherit_سیٹ_Override_Callback,
 	/* menuProcs		 */ XmInheritMenuProc,
 	/* translations		 */ XtInheritTranslations,
-	/* extension		 */ NULL,
+	/* extension		 */ تہی,
     },
 
     // pushbutton_class record
     {
-	/* extension		 */ (XtPointer) NULL,
+	/* extension		 */ (Xt_اشارہ_گر) تہی,
     },
 
     // enhancedbutton_class fields
@@ -246,37 +246,37 @@ WidgetClass xmEnhancedButtonWidgetClass =
 /*
  * Create a slightly fainter pixmap to be shown on button entry.
  */
-    static unsigned short
-bump_color(unsigned short value)
+    ساکن غیرعلامتی مختصر
+bump_color(غیرعلامتی مختصر قدر)
 {
-    int tmp = 2 * (((int) value - 65535) / 3) + 65535;
+    صحیح tmp = 2 * (((صحیح) قدر - 65535) / 3) + 65535;
 
-    return tmp;
+    واپس tmp;
 }
 
-    static int
+    ساکن صحیح
 alloc_color(Display	*display,
 	Colormap	colormap,
-	char		*colorname,
+	حرف		*colorname,
 	XColor		*xcolor,
-	void		*closure UNUSED)
+	خالی		*احاطہ غیر_مستعمل)
 {
-    int status;
+    صحیح حالت_2;
 
-    if (colorname)
-	if (!XParseColor(display, colormap, colorname, xcolor))
-	    return -1;
+    اگر (colorname)
+	اگر (!XParseColor(display, colormap, colorname, xcolor))
+	    واپس -1;
 
     xcolor->red = bump_color(xcolor->red);
     xcolor->green = bump_color(xcolor->green);
     xcolor->blue = bump_color(xcolor->blue);
 
-    status = XAllocColor(display, colormap, xcolor);
-    return status != 0 ? 1 : 0;
+    حالت_2 = XAllocColor(display, colormap, xcolor);
+    واپس حالت_2 != 0 ? 1 : 0;
 }
 
 // XPM
-static char * blank_xpm[] =
+ساکن حرف * blank_xpm[] =
 {
 // width height ncolors cpp [x_hot y_hot]
 "12 12 4 1 0 0",
@@ -302,55 +302,55 @@ static char * blank_xpm[] =
 /*
  * Set the pixmap.
  */
-    static void
-set_pixmap(XmEnhancedButtonWidget eb)
+    ساکن خالی
+سیٹ_pixmap(XmEnhancedButtonWidget eb)
 {
     // Configure defines XPMATTRIBUTES_TYPE as XpmAttributes or as
     // XpmAttributes_21, depending on what is in Xm/XpmP.h.
     XPMATTRIBUTES_TYPE   attr;
     Pixmap	    sen_pix;
-    Window	    root;
-    static XpmColorSymbol color[8] = {
+    کھڑکی	    جڑ;
+    ساکن Xpm_Color_علامت color[8] = {
 	{"none", "none", 0},
 	{"None", "none", 0},
-	{"background", NULL, 0},
-	{"foreground", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"highlightColor", NULL, 0},
-	{"armColor", NULL, 0}
+	{"background", تہی, 0},
+	{"foreground", تہی, 0},
+	{"bottomShadowColor", تہی, 0},
+	{"topShadowColor", تہی, 0},
+	{"highlightColor", تہی, 0},
+	{"armColor", تہی, 0}
     };
-    int		    scr;
+    صحیح		    scr;
     Display	    *dpy = XtDisplay(eb);
-    int		    x;
-    int		    y;
-    unsigned int    height, width, border, depth;
-    int		    status = 0;
-    Pixmap	    mask;
+    صحیح		    x;
+    صحیح		    y;
+    غیرعلامتی صحیح    اونچائی, چوڑائی, border, گہرائی;
+    صحیح		    حالت_2 = 0;
+    Pixmap	    نقاب;
     Pixmap	    pix = None;
     Pixmap	    arm_pix = None;
     Pixmap	    ins_pix = None;
-    Pixmap	    high_pix = None;
-    char	    **data = (char **) eb->enhancedbutton.pixmap_data;
-    char	    *fname = (char *) eb->enhancedbutton.pixmap_file;
-    int		    shift;
+    Pixmap	    بلند_pix = None;
+    حرف	    **ڈیٹا = (حرف **) eb->enhancedbutton.pixmap_ڈیٹا;
+    حرف	    *fname = (حرف *) eb->enhancedbutton.pixmap_file;
+    صحیح		    سرکاؤ;
     GC		    gc;
 
     // Make sure there is a default value for the pixmap.
-    if (!data)
-	return;
+    اگر (!ڈیٹا)
+	واپس;
 
-    gc = XtGetGC((Widget)eb, (XtGCMask)0, NULL);
+    gc = XtGetGC((Widget)eb, (XtGCMask)0, تہی);
 
     scr = DefaultScreen(dpy);
-    root = RootWindow(dpy, scr);
+    جڑ = جڑ_کھڑکی_2(dpy, scr);
 
     eb->label.pixmap = None;
 
-    eb->enhancedbutton.pixmap_depth = 0;
-    eb->enhancedbutton.pixmap_width = 0;
-    eb->enhancedbutton.pixmap_height = 0;
-    eb->enhancedbutton.normal_pixmap = None;
+    eb->enhancedbutton.pixmap_گہرائی = 0;
+    eb->enhancedbutton.pixmap_چوڑائی = 0;
+    eb->enhancedbutton.pixmap_اونچائی = 0;
+    eb->enhancedbutton.معمول_pixmap = None;
     eb->enhancedbutton.armed_pixmap = None;
     eb->enhancedbutton.highlight_pixmap = None;
     eb->enhancedbutton.insensitive_pixmap = None;
@@ -360,7 +360,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
 	    &eb->core.background_pixel,
 	    &eb->primitive.foreground,
 	    &eb->primitive.bottom_shadow_color,
-	    &eb->primitive.top_shadow_color,
+	    &eb->primitive.چوٹی_shadow_color,
 	    &eb->primitive.highlight_color);
 
     // Setup color substitution table.
@@ -369,7 +369,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     color[2].pixel = eb->core.background_pixel;
     color[3].pixel = eb->primitive.foreground;
     color[4].pixel = eb->core.background_pixel;
-    color[5].pixel = eb->primitive.top_shadow_color;
+    color[5].pixel = eb->primitive.چوٹی_shadow_color;
     color[6].pixel = eb->primitive.highlight_color;
     color[7].pixel = eb->pushbutton.arm_color;
 
@@ -377,112 +377,112 @@ set_pixmap(XmEnhancedButtonWidget eb)
     attr.valuemask = XpmColorSymbols | XpmCloseness;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_نمبر(color);
 
-    if (fname)
-	status = XpmReadFileToPixmap(dpy, root, fname, &pix, &mask, &attr);
-    if (!fname || status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    اگر (fname)
+	حالت_2 = Xpm_Read_File_مقصد_Pixmap(dpy, جڑ, fname, &pix, &نقاب, &attr);
+    اگر (!fname || حالت_2 != XpmSuccess)
+	حالت_2 = Xpm_Create_Pixmap_From_ڈیٹا(dpy, جڑ, ڈیٹا, &pix, &نقاب, &attr);
 
     // If something failed, we will fill in the default pixmap.
-    if (status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, blank_xpm, &pix,
-								&mask, &attr);
+    اگر (حالت_2 != XpmSuccess)
+	حالت_2 = Xpm_Create_Pixmap_From_ڈیٹا(dpy, جڑ, blank_xpm, &pix,
+								&نقاب, &attr);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_اوصاف(&attr);
 
-    XGetGeometry(dpy, pix, &root, &x, &y, &width, &height, &border, &depth);
+    XGetGeometry(dpy, pix, &جڑ, &x, &y, &چوڑائی, &اونچائی, &border, &گہرائی);
 
     // TODO: does the shift depend on label_location somehow?
-    shift = eb->primitive.shadow_thickness / 2;
+    سرکاؤ = eb->primitive.shadow_thickness / 2;
 
-    if (shift < 1)
-	shift = 1;
+    اگر (سرکاؤ < 1)
+	سرکاؤ = 1;
 
-    sen_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    sen_pix = XCreatePixmap(dpy, جڑ, چوڑائی + سرکاؤ, اونچائی + سرکاؤ, گہرائی);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
-    XFillRectangle(dpy, sen_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, width, height, shift, shift);
+    XFillRectangle(dpy, sen_pix, gc, 0, 0, چوڑائی + سرکاؤ, اونچائی + سرکاؤ);
+    XSet_Clip_نقاب(dpy, gc, نقاب);
+    XSetClipOrigin(dpy, gc, سرکاؤ, سرکاؤ);
+    XCopyArea(dpy, pix, sen_pix, gc, 0, 0, چوڑائی, اونچائی, سرکاؤ, سرکاؤ);
 
     // Create the "highlight" pixmap.
     color[4].pixel = eb->primitive.bottom_shadow_color;
-#ifdef XpmAllocColor // SGI doesn't have it
+#اگر_تعریف_شدہ XpmAllocColor // SGI doesn't have it
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmAllocColor;
     attr.alloc_color = alloc_color;
-#else
+#ورنہ
     attr.valuemask = XpmColorSymbols | XpmCloseness;
-#endif
+#اگر_ختم
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_نمبر(color);
 
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, NULL, &attr);
-    XpmFreeAttributes(&attr);
+    حالت_2 = Xpm_Create_Pixmap_From_ڈیٹا(dpy, جڑ, ڈیٹا, &pix, تہی, &attr);
+    Xpm_Free_اوصاف(&attr);
 
-    high_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    بلند_pix = XCreatePixmap(dpy, جڑ, چوڑائی + سرکاؤ, اونچائی + سرکاؤ, گہرائی);
 
-#if 1
+#اگر 1
     XSetForeground(dpy, gc, eb->core.background_pixel);
-#else
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-#endif
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, high_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
+#ورنہ
+    XSetForeground(dpy, gc, eb->primitive.چوٹی_shadow_color);
+#اگر_ختم
+    XSet_Clip_نقاب(dpy, gc, None);
+    XFillRectangle(dpy, بلند_pix, gc, 0, 0, چوڑائی + سرکاؤ, اونچائی + سرکاؤ);
+    XSet_Clip_نقاب(dpy, gc, نقاب);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XCopyArea(dpy, pix, high_pix, gc, 0, 0, width, height, 0, 0);
+    XCopyArea(dpy, pix, بلند_pix, gc, 0, 0, چوڑائی, اونچائی, 0, 0);
 
-    arm_pix = XCreatePixmap(dpy, pix, width + shift, height + shift, depth);
+    arm_pix = XCreatePixmap(dpy, pix, چوڑائی + سرکاؤ, اونچائی + سرکاؤ, گہرائی);
 
-    if (eb->pushbutton.fill_on_arm)
+    اگر (eb->pushbutton.fill_on_arm)
 	XSetForeground(dpy, gc, eb->pushbutton.arm_color);
-    else
+    ورنہ
 	XSetForeground(dpy, gc, eb->core.background_pixel);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, arm_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, width, height, 2 * shift, 2 * shift);
+    XSetClipOrigin(dpy, gc, سرکاؤ, سرکاؤ);
+    XSet_Clip_نقاب(dpy, gc, None);
+    XFillRectangle(dpy, arm_pix, gc, 0, 0, چوڑائی + سرکاؤ, اونچائی + سرکاؤ);
+    XSet_Clip_نقاب(dpy, gc, نقاب);
+    XSetClipOrigin(dpy, gc, 2 * سرکاؤ, 2 * سرکاؤ);
+    XCopyArea(dpy, pix, arm_pix, gc, 0, 0, چوڑائی, اونچائی, 2 * سرکاؤ, 2 * سرکاؤ);
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, نقاب);
 
     // Create the "insensitive" pixmap.
-    attr.valuemask = XpmColorSymbols | XpmCloseness | XpmColorKey;
+    attr.valuemask = XpmColorSymbols | XpmCloseness | Xpm_Color_کلید;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = ARRAY_LENGTH(color);
-    attr.color_key = XPM_MONO;
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    attr.numsymbols = ARRAY_لمبائی(color);
+    attr.color_کلید = XPM_MONO;
+    حالت_2 = Xpm_Create_Pixmap_From_ڈیٹا(dpy, جڑ, ڈیٹا, &pix, &نقاب, &attr);
 
     // Need to create new Pixmaps with the mask applied.
 
-    ins_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ins_pix = XCreatePixmap(dpy, جڑ, چوڑائی + سرکاؤ, اونچائی + سرکاؤ, گہرائی);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
-    XSetClipMask(dpy, gc, mask);
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
-    XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
-    XFillRectangle(dpy, ins_pix, gc, 2 * shift, 2 * shift, width, height);
+    XSet_Clip_نقاب(dpy, gc, None);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, چوڑائی + سرکاؤ, اونچائی + سرکاؤ);
+    XSet_Clip_نقاب(dpy, gc, نقاب);
+    XSetForeground(dpy, gc, eb->primitive.چوٹی_shadow_color);
+    XSetClipOrigin(dpy, gc, 2 * سرکاؤ, 2 * سرکاؤ);
+    XFillRectangle(dpy, ins_pix, gc, 2 * سرکاؤ, 2 * سرکاؤ, چوڑائی, اونچائی);
     XSetForeground(dpy, gc, eb->primitive.bottom_shadow_color);
-    XSetClipOrigin(dpy, gc, shift, shift);
-    XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
+    XSetClipOrigin(dpy, gc, سرکاؤ, سرکاؤ);
+    XFillRectangle(dpy, ins_pix, gc, 0, 0, چوڑائی + سرکاؤ, اونچائی + سرکاؤ);
     XtReleaseGC((Widget) eb, gc);
 
-    XpmFreeAttributes(&attr);
+    Xpm_Free_اوصاف(&attr);
 
-    eb->enhancedbutton.pixmap_depth = depth;
-    eb->enhancedbutton.pixmap_width = width;
-    eb->enhancedbutton.pixmap_height = height;
-    eb->enhancedbutton.normal_pixmap = sen_pix;
-    eb->enhancedbutton.highlight_pixmap = high_pix;
+    eb->enhancedbutton.pixmap_گہرائی = گہرائی;
+    eb->enhancedbutton.pixmap_چوڑائی = چوڑائی;
+    eb->enhancedbutton.pixmap_اونچائی = اونچائی;
+    eb->enhancedbutton.معمول_pixmap = sen_pix;
+    eb->enhancedbutton.highlight_pixmap = بلند_pix;
     eb->enhancedbutton.insensitive_pixmap = ins_pix;
     eb->enhancedbutton.armed_pixmap = arm_pix;
 
@@ -490,75 +490,75 @@ set_pixmap(XmEnhancedButtonWidget eb)
     eb->enhancedbutton.doing_setvalues = False;
 
     XFreePixmap(dpy, pix);
-    XFreePixmap(dpy, mask);
+    XFreePixmap(dpy, نقاب);
 }
 
-#define	BUTTON_MASK ( \
-	Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask \
+#تعریف_کرو	BUTTON_نقاب ( \
+	Button1_نقاب | Button2_نقاب | Button3_نقاب | Button4_نقاب | Button5_نقاب \
 )
 
-    static void
+    ساکن خالی
 draw_shadows(XmEnhancedButtonWidget eb)
 {
-    GC		top_gc;
+    GC		چوٹی_gc;
     GC		bottom_gc;
-    Boolean	etched_in;
+    Boolean	etched_اندر;
 
-    if (!eb->primitive.shadow_thickness)
-	return;
+    اگر (!eb->primitive.shadow_thickness)
+	واپس;
 
-    if ((eb->core.width <= 2 * eb->primitive.highlight_thickness)
-	    || (eb->core.height <= 2 * eb->primitive.highlight_thickness))
-	return;
+    اگر ((eb->core.چوڑائی <= 2 * eb->primitive.highlight_thickness)
+	    || (eb->core.اونچائی <= 2 * eb->primitive.highlight_thickness))
+	واپس;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
     {
 	XmDisplay	dpy;
 
 	dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(eb));
-	etched_in = dpy->display.enable_etched_in_menu;
+	etched_اندر = dpy->display.enable_etched_اندر_menu;
     }
-#else
-    etched_in = False;
-#endif
-    if (!etched_in ^ eb->pushbutton.armed)
+#ورنہ
+    etched_اندر = False;
+#اگر_ختم
+    اگر (!etched_اندر ^ eb->pushbutton.armed)
     {
-	top_gc = eb->primitive.top_shadow_GC;
+	چوٹی_gc = eb->primitive.چوٹی_shadow_GC;
 	bottom_gc = eb->primitive.bottom_shadow_GC;
     }
-    else
+    ورنہ
     {
-	top_gc = eb->primitive.bottom_shadow_GC;
-	bottom_gc = eb->primitive.top_shadow_GC;
+	چوٹی_gc = eb->primitive.bottom_shadow_GC;
+	bottom_gc = eb->primitive.چوٹی_shadow_GC;
     }
 
-    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-	    top_gc,
+    XmeDrawShadows(XtDisplay(eb), Xt_کھڑکی(eb),
+	    چوٹی_gc,
 	    bottom_gc,
 	    eb->primitive.highlight_thickness,
 	    eb->primitive.highlight_thickness,
-	    eb->core.width - 2 * eb->primitive.highlight_thickness,
-	    eb->core.height - 2 * eb->primitive.highlight_thickness,
+	    eb->core.چوڑائی - 2 * eb->primitive.highlight_thickness,
+	    eb->core.اونچائی - 2 * eb->primitive.highlight_thickness,
 	    eb->primitive.shadow_thickness,
-	    (unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+	    (غیرعلامتی)(etched_اندر ? Xm_SHADOW_اندر : Xm_SHADOW_برآمد));
 }
 
-    static void
+    ساکن خالی
 draw_highlight(XmEnhancedButtonWidget eb)
 {
     eb->primitive.highlighted = True;
     eb->primitive.highlight_drawn = True;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    اگر (!Xt_چوڑائی(eb) || !Xt_اونچائی(eb) || !eb->primitive.highlight_thickness)
+	واپس;
 
-    XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+    XmeDrawHighlight(XtDisplay(eb), Xt_کھڑکی(eb),
 	    eb->primitive.highlight_GC, 0, 0,
-	    XtWidth(eb), XtHeight(eb),
+	    Xt_چوڑائی(eb), Xt_اونچائی(eb),
 	    eb->primitive.highlight_thickness);
 }
 
-    static void
+    ساکن خالی
 draw_unhighlight(XmEnhancedButtonWidget eb)
 {
     GC manager_background_GC;
@@ -566,129 +566,129 @@ draw_unhighlight(XmEnhancedButtonWidget eb)
     eb->primitive.highlighted = False;
     eb->primitive.highlight_drawn = False;
 
-    if (!XtWidth(eb) || !XtHeight(eb) || !eb->primitive.highlight_thickness)
-	return;
+    اگر (!Xt_چوڑائی(eb) || !Xt_اونچائی(eb) || !eb->primitive.highlight_thickness)
+	واپس;
 
-    if (XmIsManager(eb->core.parent))
+    اگر (XmIsManager(eb->core.والد))
     {
-#ifdef UNHIGHLIGHTT
+#اگر_تعریف_شدہ UNHIGHLIGHTT
 	XmSpecifyUnhighlightTrait UnhighlightT;
 
-	if (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((XtPointer)
-			    XtClass(eb->core.parent), XmQTspecifyUnhighlight))
-		    != NULL) && (UnhighlightT->getUnhighlightGC != NULL))
+	اگر (((UnhighlightT = (XmSpecifyUnhighlightTrait) XmeTraitGet((Xt_اشارہ_گر)
+			    XtClass(eb->core.والد), XmQTspecifyUnhighlight))
+		    != تہی) && (UnhighlightT->getUnhighlightGC != تہی))
 	{
 	    // if unhighlight trait in parent use specified GC...
 	    manager_background_GC =
-		 UnhighlightT->getUnhighlightGC(eb->core.parent, (Widget) eb);
+		 UnhighlightT->getUnhighlightGC(eb->core.والد, (Widget) eb);
 	}
-	else
+	ورنہ
 	{
 	    // ...otherwise, use parent's background GC
 	    manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
+				    (eb->core.والد))->manager.background_GC;
 	}
-#else
+#ورنہ
 	manager_background_GC = ((XmManagerWidget)
-				    (eb->core.parent))->manager.background_GC;
-#endif
-	XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
+				    (eb->core.والد))->manager.background_GC;
+#اگر_ختم
+	XmeDrawHighlight(XtDisplay(eb), Xt_کھڑکی(eb),
 			 manager_background_GC,
-			 0, 0, XtWidth(eb), XtHeight(eb),
+			 0, 0, Xt_چوڑائی(eb), Xt_اونچائی(eb),
 			 eb->primitive.highlight_thickness);
-	if (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
-	    XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+	اگر (!eb->pushbutton.armed && eb->primitive.shadow_thickness)
+	    XmeClearBorder(XtDisplay(eb), Xt_کھڑکی(eb),
 		    eb->primitive.highlight_thickness,
 		    eb->primitive.highlight_thickness,
-		    eb->core.width - 2 * eb->primitive.highlight_thickness,
-		    eb->core.height - 2 * eb->primitive.highlight_thickness,
+		    eb->core.چوڑائی - 2 * eb->primitive.highlight_thickness,
+		    eb->core.اونچائی - 2 * eb->primitive.highlight_thickness,
 		    eb->primitive.shadow_thickness);
     }
-    else
-	XmeClearBorder(XtDisplay(eb), XtWindow(eb), 0, 0, XtWidth(eb),
-		       XtHeight(eb), eb->primitive.highlight_thickness);
+    ورنہ
+	XmeClearBorder(XtDisplay(eb), Xt_کھڑکی(eb), 0, 0, Xt_چوڑائی(eb),
+		       Xt_اونچائی(eb), eb->primitive.highlight_thickness);
 }
 
-    static void
+    ساکن خالی
 draw_pixmap(XmEnhancedButtonWidget eb,
-	    XEvent *event UNUSED,
-	    Region region UNUSED)
+	    XEvent *event غیر_مستعمل,
+	    Region region غیر_مستعمل)
 {
     Pixmap	pix;
-    GC		gc = eb->label.normal_GC;
-    int		depth;
-    Cardinal	width;
-    Cardinal	height;
+    GC		gc = eb->label.معمول_GC;
+    صحیح		گہرائی;
+    Cardinal	چوڑائی;
+    Cardinal	اونچائی;
     Cardinal	w;
     Cardinal	h;
-    int		x;
-    int		y;
+    صحیح		x;
+    صحیح		y;
 
-    if (!XtIsSensitive((Widget) eb))
+    اگر (!XtIsSensitive((Widget) eb))
 	pix = eb->enhancedbutton.insensitive_pixmap;
-    else
+    ورنہ
     {
-	if (eb->primitive.highlighted && !eb->pushbutton.armed)
+	اگر (eb->primitive.highlighted && !eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.highlight_pixmap;
-	else if (eb->pushbutton.armed)
+	ورنہ اگر (eb->pushbutton.armed)
 	    pix = eb->enhancedbutton.armed_pixmap;
-	else
-	    pix = eb->enhancedbutton.normal_pixmap;
+	ورنہ
+	    pix = eb->enhancedbutton.معمول_pixmap;
     }
 
-    if (pix == None || !eb->enhancedbutton.pixmap_data)
-	return;
+    اگر (pix == None || !eb->enhancedbutton.pixmap_ڈیٹا)
+	واپس;
 
-    depth = eb->enhancedbutton.pixmap_depth;
-    w = eb->enhancedbutton.pixmap_width;
-    h = eb->enhancedbutton.pixmap_height;
+    گہرائی = eb->enhancedbutton.pixmap_گہرائی;
+    w = eb->enhancedbutton.pixmap_چوڑائی;
+    h = eb->enhancedbutton.pixmap_اونچائی;
 
-    gc = eb->label.normal_GC;
+    gc = eb->label.معمول_GC;
     x = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_width;
+	+ eb->label.margin_چوڑائی;
     y = eb->primitive.highlight_thickness
 	+ eb->primitive.shadow_thickness
-	+ eb->label.margin_height;
-    width = eb->core.width - 2 * x;
-    if (w < width)
-	width = w;
-    height = eb->core.height - 2 * y;
-    if (h < height)
-	height = h;
-    if (depth == (int)eb->core.depth)
-	XCopyArea(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y);
-    else if (depth == 1)
-	XCopyPlane(XtDisplay(eb), pix, XtWindow(eb), gc, 0, 0,
-		width, height, x, y, (unsigned long)1);
+	+ eb->label.margin_اونچائی;
+    چوڑائی = eb->core.چوڑائی - 2 * x;
+    اگر (w < چوڑائی)
+	چوڑائی = w;
+    اونچائی = eb->core.اونچائی - 2 * y;
+    اگر (h < اونچائی)
+	اونچائی = h;
+    اگر (گہرائی == (صحیح)eb->core.گہرائی)
+	XCopyArea(XtDisplay(eb), pix, Xt_کھڑکی(eb), gc, 0, 0,
+		چوڑائی, اونچائی, x, y);
+    ورنہ اگر (گہرائی == 1)
+	XCopyPlane(XtDisplay(eb), pix, Xt_کھڑکی(eb), gc, 0, 0,
+		چوڑائی, اونچائی, x, y, (غیرعلامتی طویل)1);
 }
 
 /*
  * Draw the label contained in the pushbutton.
  */
-    static void
+    ساکن خالی
 draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
 {
-    GC		tmp_gc = NULL;
+    GC		tmp_gc = تہی;
     Boolean	replaceGC = False;
     Boolean	deadjusted = False;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
     XmDisplay	dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
-    Boolean	etched_in = dpy->display.enable_etched_in_menu;
-#else
-    Boolean	etched_in = False;
-#endif
+    Boolean	etched_اندر = dpy->display.enable_etched_اندر_menu;
+#ورنہ
+    Boolean	etched_اندر = False;
+#اگر_ختم
 
-    if (eb->pushbutton.armed
+    اگر (eb->pushbutton.armed
 	    && ((!Lab_IsMenupane(eb) && eb->pushbutton.fill_on_arm)
-		|| (Lab_IsMenupane(eb) && etched_in)))
+		|| (Lab_IsMenupane(eb) && etched_اندر)))
     {
-	if (eb->label.label_type == (int)XmSTRING
+	اگر (eb->label.label_type == (صحیح)XmSTRING
 		&& eb->pushbutton.arm_color == eb->primitive.foreground)
 	{
-	    tmp_gc = eb->label.normal_GC;
-	    eb->label.normal_GC = eb->pushbutton.background_gc;
+	    tmp_gc = eb->label.معمول_GC;
+	    eb->label.معمول_GC = eb->pushbutton.background_gc;
 	    replaceGC = True;
 	}
     }
@@ -698,16 +698,16 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      * own pixmap.
      */
 
-    if (eb->label.label_type == (int)XmPIXMAP)
+    اگر (eb->label.label_type == (صحیح)XmPIXMAP)
     {
-	if (eb->pushbutton.armed)
+	اگر (eb->pushbutton.armed)
 	{
-	    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+	    اگر (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 		eb->label.pixmap = eb->pushbutton.arm_pixmap;
-	    else
+	    ورنہ
 		eb->label.pixmap = eb->pushbutton.unarm_pixmap;
 	}
-	else
+	ورنہ
 	    // pushbutton is not armed
 	    eb->label.pixmap = eb->pushbutton.unarm_pixmap;
     }
@@ -716,278 +716,278 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
      *	Temporarily remove the Xm3D_ENHANCE_PIXEL hack ("adjustment") from the
      *	margin values, so we don't confuse Label.
      */
-    if (eb->pushbutton.default_button_shadow_thickness > 0)
+    اگر (eb->pushbutton.default_button_shadow_thickness > 0)
     {
 	deadjusted = True;
-	Lab_MarginLeft(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_بایاں(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_دایاں(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_چوٹی(eb) -= Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) -= Xm3D_ENHANCE_PIXEL;
     }
 
     {
 	XtExposeProc expose;
 
-	XTPROCESS_LOCK;
+	XTPROCESS_تالا;
 	expose = xmLabelClassRec.core_class.expose;
 	XTPROCESS_UNLOCK;
 	(*expose)((Widget) eb, event, region);
     }
 
-    if (deadjusted)
+    اگر (deadjusted)
     {
-	Lab_MarginLeft(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_بایاں(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_دایاں(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_چوٹی(eb) += Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) += Xm3D_ENHANCE_PIXEL;
     }
 
-    if (replaceGC)
-	eb->label.normal_GC = tmp_gc;
+    اگر (replaceGC)
+	eb->label.معمول_GC = tmp_gc;
 }
 
-    static void
+    ساکن خالی
 Enter(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params غیر_مستعمل,
+    Cardinal *عدد_params غیر_مستعمل)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget) wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_ڈالو_Button_Callback_Struct call_قدر;
 
-    if (Lab_IsMenupane(eb))
+    اگر (Lab_IsMenupane(eb))
     {
-	if ((((ShellWidget) XtParent(XtParent(eb)))->shell.popped_up)
-		&& _XmGetInDragMode((Widget) eb))
+	اگر ((((ShellWidget) Xt_والد(Xt_والد(eb)))->shell.popped_اوپر)
+		&& Xm_Get_اندر_Drag_منوال((Widget) eb))
 	{
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
 	    XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	    Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	    Boolean etched_in = False;
-#endif
+	    Boolean etched_اندر = dpy->display.enable_etched_اندر_menu;
+#ورنہ
+	    Boolean etched_اندر = False;
+#اگر_ختم
 
-	    if (eb->pushbutton.armed)
-		return;
+	    اگر (eb->pushbutton.armed)
+		واپس;
 
 	    // ...so KHelp event is delivered correctly.
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, TRUE);
-	    XtSetKeyboardFocus(XtParent(XtParent(eb)), (Widget) eb);
-	    _XmSetFocusFlag(XtParent(XtParent(eb)), XmFOCUS_IGNORE, FALSE);
+	    Xm_سیٹ_Focus_Flag(Xt_والد(Xt_والد(eb)), XmFOCUS_IGNORE, TRUE);
+	    Xt_سیٹ_Keyboard_Focus(Xt_والد(Xt_والد(eb)), (Widget) eb);
+	    Xm_سیٹ_Focus_Flag(Xt_والد(Xt_والد(eb)), XmFOCUS_IGNORE, FALSE);
 
 	    eb->pushbutton.armed = TRUE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = wid;
+	    ((XmManagerWidget) Xt_والد(wid))->manager.فعال_بچہ = wid;
 
 	    // etched in menu button
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    اگر (etched_اندر && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_کھڑکی(eb),
 			       eb->pushbutton.fill_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.چوڑائی, eb->core.اونچائی);
+		draw_label(eb, event, تہی);
+		draw_pixmap(eb, event, تہی);
 	    }
 
-	    if ((eb->core.width > 2 * eb->primitive.highlight_thickness)
-		    && (eb->core.height >
+	    اگر ((eb->core.چوڑائی > 2 * eb->primitive.highlight_thickness)
+		    && (eb->core.اونچائی >
 				       2 * eb->primitive.highlight_thickness))
 	    {
-		XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			eb->primitive.top_shadow_GC,
+		XmeDrawShadows(XtDisplay(eb), Xt_کھڑکی(eb),
+			eb->primitive.چوٹی_shadow_GC,
 			eb->primitive.bottom_shadow_GC,
 			eb->primitive.highlight_thickness,
 			eb->primitive.highlight_thickness,
-			eb->core.width - 2 * eb->primitive.highlight_thickness,
-			eb->core.height - 2 * eb->primitive.highlight_thickness,
+			eb->core.چوڑائی - 2 * eb->primitive.highlight_thickness,
+			eb->core.اونچائی - 2 * eb->primitive.highlight_thickness,
 			eb->primitive.shadow_thickness,
-			(unsigned)(etched_in ? XmSHADOW_IN : XmSHADOW_OUT));
+			(غیرعلامتی)(etched_اندر ? Xm_SHADOW_اندر : Xm_SHADOW_برآمد));
 	    }
 
-	    if (eb->pushbutton.arm_callback)
+	    اگر (eb->pushbutton.arm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_ARM;
-		call_value.event = event;
+		call_قدر.reason = (صحیح)XmCR_ARM;
+		call_قدر.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.arm_callback,
-				   &call_value);
+				   &call_قدر);
 	    }
 	}
     }
-    else
+    ورنہ
     {
 	XtExposeProc expose;
 
-	_XmPrimitiveEnter((Widget) eb, event, NULL, NULL);
-	if (eb->pushbutton.armed == TRUE)
+	_XmPrimitiveEnter((Widget) eb, event, تہی, تہی);
+	اگر (eb->pushbutton.armed == TRUE)
 	{
-	    XTPROCESS_LOCK;
+	    XTPROCESS_تالا;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region) NULL);
+	    (*expose) (wid, event, (Region) تہی);
 	}
 
 	draw_highlight(eb);
 	draw_shadows(eb);
-	draw_pixmap(eb, event, NULL);
+	draw_pixmap(eb, event, تہی);
     }
 }
 
-    static void
+    ساکن خالی
 Leave(Widget wid,
     XEvent *event,
-    String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    String *params غیر_مستعمل,
+    Cardinal *عدد_params غیر_مستعمل)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_ڈالو_Button_Callback_Struct call_قدر;
 
-    if (Lab_IsMenupane(eb))
+    اگر (Lab_IsMenupane(eb))
     {
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
 	XmDisplay dpy = (XmDisplay) XmGetXmDisplay(XtDisplay(wid));
-	Boolean etched_in = dpy->display.enable_etched_in_menu;
-#else
-	Boolean etched_in = False;
-#endif
+	Boolean etched_اندر = dpy->display.enable_etched_اندر_menu;
+#ورنہ
+	Boolean etched_اندر = False;
+#اگر_ختم
 
-	if (_XmGetInDragMode((Widget)eb)
+	اگر (Xm_Get_اندر_Drag_منوال((Widget)eb)
 		&& eb->pushbutton.armed
 		&& ( // !ActiveTearOff ||
-				       event->xcrossing.mode == NotifyNormal))
+				       event->xcrossing.منوال == Notify_معمول))
 	{
 	    eb->pushbutton.armed = FALSE;
 
-	    ((XmManagerWidget) XtParent(wid))->manager.active_child = NULL;
+	    ((XmManagerWidget) Xt_والد(wid))->manager.فعال_بچہ = تہی;
 
-	    if (etched_in && !XmIsTearOffButton(eb))
+	    اگر (etched_اندر && !XmIsTearOffButton(eb))
 	    {
-		XFillRectangle(XtDisplay(eb), XtWindow(eb),
+		XFillRectangle(XtDisplay(eb), Xt_کھڑکی(eb),
 			       eb->pushbutton.background_gc,
-			       0, 0, eb->core.width, eb->core.height);
-		draw_label(eb, event, NULL);
-		draw_pixmap(eb, event, NULL);
+			       0, 0, eb->core.چوڑائی, eb->core.اونچائی);
+		draw_label(eb, event, تہی);
+		draw_pixmap(eb, event, تہی);
 	    }
-	    else
+	    ورنہ
 		XmeClearBorder
-		    (XtDisplay(eb), XtWindow(eb),
+		    (XtDisplay(eb), Xt_کھڑکی(eb),
 		     eb->primitive.highlight_thickness,
 		     eb->primitive.highlight_thickness,
-		     eb->core.width -
+		     eb->core.چوڑائی -
 		     2 * eb->primitive.highlight_thickness,
-		     eb->core.height -
+		     eb->core.اونچائی -
 		     2 * eb->primitive.highlight_thickness,
 		     eb->primitive.shadow_thickness);
 
-	    if (eb->pushbutton.disarm_callback)
+	    اگر (eb->pushbutton.disarm_callback)
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_DISARM;
-		call_value.event = event;
+		call_قدر.reason = (صحیح)XmCR_DISARM;
+		call_قدر.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.disarm_callback,
-				   &call_value);
+				   &call_قدر);
 	    }
 	}
     }
-    else
+    ورنہ
     {
-	_XmPrimitiveLeave((Widget) eb, event, NULL, NULL);
+	_XmPrimitiveLeave((Widget) eb, event, تہی, تہی);
 
-	if (eb->pushbutton.armed == TRUE)
+	اگر (eb->pushbutton.armed == TRUE)
 	{
 	    XtExposeProc expose;
 	    eb->pushbutton.armed = FALSE;
-	    XTPROCESS_LOCK;
+	    XTPROCESS_تالا;
 	    expose = XtClass(eb)->core_class.expose;
 	    XTPROCESS_UNLOCK;
-	    (*expose) (wid, event, (Region)NULL);
+	    (*expose) (wid, event, (Region)تہی);
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, تہی);
 	    eb->pushbutton.armed = TRUE;
 	}
-	else
+	ورنہ
 	{
 	    draw_unhighlight(eb);
-	    draw_pixmap(eb, event, NULL);
+	    draw_pixmap(eb, event, تہی);
 	}
     }
 }
 
-#define IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
+#تعریف_کرو IsNull(p)   ((p) == XmUNSPECIFIED_PIXMAP)
 
-    static void
-set_size(XmEnhancedButtonWidget newtb)
+    ساکن خالی
+سیٹ_سائز_2(XmEnhancedButtonWidget newtb)
 {
-    unsigned int w = 0;
-    unsigned int h = 0;
+    غیرعلامتی صحیح w = 0;
+    غیرعلامتی صحیح h = 0;
 
     _XmCalcLabelDimensions((Widget) newtb);
 
     // Find out how big the pixmap is
-    if (newtb->enhancedbutton.pixmap_data
+    اگر (newtb->enhancedbutton.pixmap_ڈیٹا
 	    && !IsNull(newtb->label.pixmap)
-	    && !IsNull(newtb->enhancedbutton.normal_pixmap))
+	    && !IsNull(newtb->enhancedbutton.معمول_pixmap))
     {
-	w = newtb->enhancedbutton.pixmap_width;
-	h = newtb->enhancedbutton.pixmap_height;
+	w = newtb->enhancedbutton.pixmap_چوڑائی;
+	h = newtb->enhancedbutton.pixmap_اونچائی;
     }
 
     /*
      * Please note that we manipulate the width only in case of push buttons
      * not used in the context of a menu pane.
      */
-    if (Lab_IsMenupane(newtb))
+    اگر (Lab_IsMenupane(newtb))
     {
-	newtb->label.margin_left = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_بایاں = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness)
-	    + newtb->label.margin_width;
+	    + newtb->label.margin_چوڑائی;
     }
-    else
+    ورنہ
     {
-	newtb->label.margin_left = w;
-	newtb->core.width = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_بایاں = w;
+	newtb->core.چوڑائی = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_width)
-	    + newtb->label.TextRect.width;
+		+ newtb->label.margin_چوڑائی)
+	    + newtb->label.متن_Rect.چوڑائی;
 
-	if (newtb->label.TextRect.width > 0)
+	اگر (newtb->label.متن_Rect.چوڑائی > 0)
 	{
-	    newtb->label.margin_left += newtb->label.margin_width
+	    newtb->label.margin_بایاں += newtb->label.margin_چوڑائی
 					  + newtb->primitive.shadow_thickness;
-	    newtb->core.width += newtb->label.margin_width
+	    newtb->core.چوڑائی += newtb->label.margin_چوڑائی
 					  + newtb->primitive.shadow_thickness;
 	}
     }
-    if (newtb->label.TextRect.height < h)
+    اگر (newtb->label.متن_Rect.اونچائی < h)
     {
-	newtb->core.height = h  + 2 * (newtb->primitive.shadow_thickness
+	newtb->core.اونچائی = h  + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
-		+ newtb->label.margin_height);
+		+ newtb->label.margin_اونچائی);
     }
-    else
+    ورنہ
     {
 	// FIXME: We should calculate a drawing offset for the pixmap here to
 	// adjust it.
     }
 
-#if 0
-    printf("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.normal_pixmap,
-	    h, newtb->core.height,
+#اگر 0
+    لکھو("%d %d %d %d %d %d - %d %d\n", newtb->enhancedbutton.معمول_pixmap,
+	    h, newtb->core.اونچائی,
 	    newtb->primitive.shadow_thickness,
 	    newtb->primitive.highlight_thickness,
-	    newtb->label.margin_height,
-	    newtb->core.width,
-	    newtb->core.height);
-#endif
+	    newtb->label.margin_اونچائی,
+	    newtb->core.چوڑائی,
+	    newtb->core.اونچائی);
+#اگر_ختم
 
     // Invoke Label's Resize procedure.
     {
 	XtWidgetProc resize;
-	XTPROCESS_LOCK;
+	XTPROCESS_تالا;
 	resize = xmLabelClassRec.core_class.resize;
 	XTPROCESS_UNLOCK;
 
@@ -995,90 +995,90 @@ set_size(XmEnhancedButtonWidget newtb)
     }
 }
 
-    static void
-Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
+    ساکن خالی
+Initialize(Widget rq, Widget ebw, ArgList دلائل غیر_مستعمل, Cardinal *n غیر_مستعمل)
 {
     XmEnhancedButtonWidget  request = (XmEnhancedButtonWidget)rq;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget)ebw;
     XtWidgetProc	    resize;
 
-    XTPROCESS_LOCK;
+    XTPROCESS_تالا;
     resize = xmLabelClassRec.core_class.resize;
     XTPROCESS_UNLOCK;
 
     // Create a bitmap for stippling (Drawable resources are cheap).
-    if (STIPPLE_BITMAP == None)
+    اگر (STIPPLE_BITMAP == None)
     {
 	Display *dpy = XtDisplay((Widget) request);
-	Window	rootW = DefaultRootWindow(dpy);
+	کھڑکی	جڑ_W = Default_جڑ_کھڑکی(dpy);
 
-	STIPPLE_BITMAP = XCreateBitmapFromData(dpy, rootW, stipple_bits,
-		stipple_width, stipple_height);
+	STIPPLE_BITMAP = XCreate_Bitmap_From_ڈیٹا(dpy, جڑ_W, stipple_بٹ,
+		stipple_چوڑائی, stipple_اونچائی);
     }
     eb->enhancedbutton.doing_setvalues = False;
 
     // First see what type of extended label this is.
-    if (eb->enhancedbutton.pixmap_data)
+    اگر (eb->enhancedbutton.pixmap_ڈیٹا)
     {
 	XmString str;
-	set_pixmap(eb);
+	سیٹ_pixmap(eb);
 
 	// FIXME: this is not the perfect way to deal with menus, which do not
 	// have any string set right now.
 	str = XmStringCreateLocalized("");
-	XtVaSetValues((Widget) eb, XmNlabelString, str, NULL);
+	Xt_Va_سیٹ_اقدار((Widget) eb, XmNlabelString, str, تہی);
 	XmStringFree(str);
     }
-    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
+    eb->label.pixmap = eb->enhancedbutton.معمول_pixmap;
 
-    if (request->core.width == 0)
-	eb->core.width = 0;
-    if (request->core.height == 0)
-	eb->core.height = 0;
-    set_size(eb);
+    اگر (request->core.چوڑائی == 0)
+	eb->core.چوڑائی = 0;
+    اگر (request->core.اونچائی == 0)
+	eb->core.اونچائی = 0;
+    سیٹ_سائز_2(eb);
 
     (* resize)((Widget)eb);
 }
 
-    static void
+    ساکن خالی
 free_pixmaps(XmEnhancedButtonWidget eb)
 {
     /*
      * Clear the old pixmaps.
      */
-    Pixmap norm_pix = eb->enhancedbutton.normal_pixmap;
+    Pixmap norm_pix = eb->enhancedbutton.معمول_pixmap;
     Pixmap arm_pix = eb->enhancedbutton.armed_pixmap;
     Pixmap insen_pix = eb->enhancedbutton.insensitive_pixmap;
-    Pixmap high_pix = eb->enhancedbutton.highlight_pixmap;
+    Pixmap بلند_pix = eb->enhancedbutton.highlight_pixmap;
 
-    if (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
+    اگر (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), norm_pix);
 
-    if (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
+    اگر (arm_pix != None && arm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), arm_pix);
 
-    if (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
+    اگر (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), insen_pix);
 
-    if (high_pix != None && high_pix != XmUNSPECIFIED_PIXMAP)
-	XFreePixmap(XtDisplay(eb), high_pix);
+    اگر (بلند_pix != None && بلند_pix != XmUNSPECIFIED_PIXMAP)
+	XFreePixmap(XtDisplay(eb), بلند_pix);
 }
 
-    static void
+    ساکن خالی
 Destroy(Widget w)
 {
-    if (!XmIsEnhancedButton(w))
-	return;
+    اگر (!XmIsEnhancedButton(w))
+	واپس;
 
     free_pixmaps((XmEnhancedButtonWidget)w);
 }
 
-    static Boolean
-SetValues(Widget current,
-	  Widget request UNUSED,
+    ساکن Boolean
+سیٹ_اقدار(Widget current,
+	  Widget request غیر_مستعمل,
 	  Widget new,
-	  ArgList args UNUSED,
-	  Cardinal *n UNUSED)
+	  ArgList دلائل غیر_مستعمل,
+	  Cardinal *n غیر_مستعمل)
 {
     XmEnhancedButtonWidget  cur = (XmEnhancedButtonWidget) current;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) new;
@@ -1086,219 +1086,219 @@ SetValues(Widget current,
     Boolean		    change = True;
     Display		    *dpy = XtDisplay(current);
 
-#define NOT_EQUAL(field)       (cur->field != eb->field)
+#تعریف_کرو NOT_EQUAL(میدان)       (cur->میدان != eb->میدان)
 
     /*
      * Make sure that lost sensitivity is causing the border to vanish as well.
      */
-    if (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
+    اگر (NOT_EQUAL(core.sensitive) && !Lab_IsMenupane(current))
     {
-	if (cur->core.sensitive == True)
+	اگر (cur->core.sensitive == True)
 	{
 	    draw_unhighlight(eb);
 	}
-	else
+	ورنہ
 	{
-	    int		    r_x;
-	    int		    r_y;
-	    unsigned int    r_height;
-	    unsigned int    r_width;
-	    unsigned int    r_border;
-	    unsigned int    r_depth;
-	    int		    root_x;
-	    int		    root_y;
-	    int		    win_x;
-	    int		    win_y;
-	    Window	    root;
-	    Window	    root_q;
-	    Window	    child;
-	    unsigned int    mask;
+	    صحیح		    r_x;
+	    صحیح		    r_y;
+	    غیرعلامتی صحیح    r_اونچائی;
+	    غیرعلامتی صحیح    r_چوڑائی;
+	    غیرعلامتی صحیح    r_border;
+	    غیرعلامتی صحیح    r_گہرائی;
+	    صحیح		    جڑ_x;
+	    صحیح		    جڑ_y;
+	    صحیح		    win_x;
+	    صحیح		    win_y;
+	    کھڑکی	    جڑ;
+	    کھڑکی	    جڑ_q;
+	    کھڑکی	    بچہ;
+	    غیرعلامتی صحیح    نقاب;
 
 	    /*
 	     * Artificially let the highlight appear if the mouse is over us.
 	     */
 	    // Best way to get the root window of object:
-	    XGetGeometry(dpy, XtWindow(cur), &root, &r_x, &r_y, &r_width,
-			 &r_height, &r_border, &r_depth);
-	    XQueryPointer(XtDisplay(cur), XtWindow(cur), &root_q, &child,
-			  &root_x, &root_y, &win_x, &win_y, &mask);
+	    XGetGeometry(dpy, Xt_کھڑکی(cur), &جڑ, &r_x, &r_y, &r_چوڑائی,
+			 &r_اونچائی, &r_border, &r_گہرائی);
+	    XQuery_اشارہ_گر(XtDisplay(cur), Xt_کھڑکی(cur), &جڑ_q, &بچہ,
+			  &جڑ_x, &جڑ_y, &win_x, &win_y, &نقاب);
 
-	    if (root == root_q)
+	    اگر (جڑ == جڑ_q)
 	    {
-		if ((win_x < 0) || (win_y < 0))
-		    return False;
+		اگر ((win_x < 0) || (win_y < 0))
+		    واپس False;
 
-		if ((win_x > (int)r_width) || (win_y > (int)r_height))
-		    return False;
+		اگر ((win_x > (صحیح)r_چوڑائی) || (win_y > (صحیح)r_اونچائی))
+		    واپس False;
 		draw_highlight(eb);
 		draw_shadows(eb);
 	    }
 	}
 
-	return True;
+	واپس True;
     }
 
     /*
      * Check for changed ExtLabelString.
      */
-    if (NOT_EQUAL(primitive.shadow_thickness))
+    اگر (NOT_EQUAL(primitive.shadow_thickness))
     {
 	redraw = True;
 	// Don't change the pixmaps
 	change = False;
     }
 
-    if (NOT_EQUAL(primitive.foreground))
+    اگر (NOT_EQUAL(primitive.foreground))
 	redraw = True;
-    if (NOT_EQUAL(core.background_pixel))
+    اگر (NOT_EQUAL(core.background_pixel))
 	redraw = True;
-    if (NOT_EQUAL(pushbutton.fill_on_arm))
+    اگر (NOT_EQUAL(pushbutton.fill_on_arm))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.spacing))
+    اگر (NOT_EQUAL(enhancedbutton.spacing))
 	redraw = True;
-    if (NOT_EQUAL(enhancedbutton.label_location))
+    اگر (NOT_EQUAL(enhancedbutton.label_location))
     {
 	redraw = True;
 	change = False;
     }
-    if (NOT_EQUAL(label._label))
+    اگر (NOT_EQUAL(label._label))
     {
 	redraw = True;
-	set_size(eb);
+	سیٹ_سائز_2(eb);
     }
 
-    if (redraw == True)
+    اگر (redraw == True)
     {
-	if (change)
-	    set_pixmap(eb);
-	if (eb->primitive.highlighted)
+	اگر (change)
+	    سیٹ_pixmap(eb);
+	اگر (eb->primitive.highlighted)
 	    eb->label.pixmap = eb->enhancedbutton.highlight_pixmap;
-	else
-	    eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
-	if (change)
-	    set_size(eb);
+	ورنہ
+	    eb->label.pixmap = eb->enhancedbutton.معمول_pixmap;
+	اگر (change)
+	    سیٹ_سائز_2(eb);
 	redraw = False;
     }
 
-    return redraw;
+    واپس redraw;
 }
 
-    static void
+    ساکن خالی
 Redisplay(Widget w, XEvent *event, Region region)
 {
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget) w;
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
     XmDisplay		    dpy;
     XtEnum		    default_button_emphasis;
-#endif
+#اگر_ختم
     XRectangle		    box;
-    int			    dx;
-    int			    adjust;
-    short		    fill = 0;
+    صحیح			    dx;
+    صحیح			    adjust;
+    مختصر		    fill = 0;
 
-    if (!XtIsRealized((Widget)eb))
-	return;
+    اگر (!XtIsRealized((Widget)eb))
+	واپس;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
     dpy = (XmDisplay)XmGetXmDisplay(XtDisplay(eb));
     default_button_emphasis = dpy->display.default_button_emphasis;
-#endif
+#اگر_ختم
 
     /*
      * Compute the area allocated to the label of the pushbutton; fill in the
      * dimensions in the box.
      */
 
-    if ((eb->pushbutton.arm_color == eb->primitive.top_shadow_color)
+    اگر ((eb->pushbutton.arm_color == eb->primitive.چوٹی_shadow_color)
 	    || (eb->pushbutton.arm_color == eb->primitive.bottom_shadow_color))
 	fill = 1;
 
-    if (eb->pushbutton.compatible)
+    اگر (eb->pushbutton.compatible)
 	adjust = eb->pushbutton.show_as_default;
-    else
+    ورنہ
 	adjust = eb->pushbutton.default_button_shadow_thickness;
 
-    if (adjust > 0)
+    اگر (adjust > 0)
     {
 	adjust = adjust + eb->primitive.shadow_thickness;
 	adjust = (adjust << 1);
 	dx = eb->primitive.highlight_thickness + adjust + fill;
     }
-    else
+    ورنہ
 	dx = (eb->primitive.highlight_thickness
 		+ eb->primitive.shadow_thickness + fill);
 
     box.x = dx;
     box.y = dx;
     adjust = (dx << 1);
-    box.width  = eb->core.width - adjust;
-    box.height = eb->core.height - adjust;
+    box.چوڑائی  = eb->core.چوڑائی - adjust;
+    box.اونچائی = eb->core.اونچائی - adjust;
 
     /*
      * Redraw the background.
      */
-    if (!Lab_IsMenupane(eb))
+    اگر (!Lab_IsMenupane(eb))
     {
 	GC  gc;
 
 	// Don't shade if the button contains a label with a pixmap, since
 	// there is no variant of the label available with the needed
 	// background.
-	if (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
+	اگر (eb->pushbutton.armed && eb->pushbutton.fill_on_arm)
 	{
-		if (eb->label.label_type == (int)XmPIXMAP)
+		اگر (eb->label.label_type == (صحیح)XmPIXMAP)
 		{
-		    if (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
+		    اگر (eb->pushbutton.arm_pixmap != XmUNSPECIFIED_PIXMAP)
 			gc = eb->pushbutton.fill_gc;
-		    else
+		    ورنہ
 			gc = eb->pushbutton.background_gc;
 		}
-		else
+		ورنہ
 		    gc = eb->pushbutton.fill_gc;
 	}
-	else
+	ورنہ
 	    gc = eb->pushbutton.background_gc;
 	// really need to fill with background if not armed ?
-	if (gc)
-	    XFillRectangle(XtDisplay(eb), XtWindow(eb), gc,
-		    box.x, box.y, box.width, box.height);
+	اگر (gc)
+	    XFillRectangle(XtDisplay(eb), Xt_کھڑکی(eb), gc,
+		    box.x, box.y, box.چوڑائی, box.اونچائی);
     }
 
     draw_label(eb, event, region);
 
-    if (Lab_IsMenupane(eb))
+    اگر (Lab_IsMenupane(eb))
     {
-	if (eb->pushbutton.armed)
-	    (*(((XmPushButtonWidgetClass)XtClass(eb))
+	اگر (eb->pushbutton.armed)
+	    (*(((Xm_ڈالو_Button_Widget_Class)XtClass(eb))
 	       ->primitive_class.border_highlight))(w);
 	draw_pixmap(eb, event, region);
     }
-    else
+    ورنہ
     {
 	adjust = 0;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
 	/*
 	 *  NOTE: PushButton has two types of shadows: primitive-shadow and
 	 *  default-button-shadow.  If pushbutton is in a menu only primitive
 	 *  shadows are drawn.
 	 */
-	switch (default_button_emphasis)
+	انتخاب (default_button_emphasis)
 	{
-	    case XmEXTERNAL_HIGHLIGHT:
+	    حالت XmEXTERNAL_HIGHLIGHT:
 		adjust = (eb->primitive.highlight_thickness -
 			 (eb->pushbutton.default_button_shadow_thickness
 			  ?  Xm3D_ENHANCE_PIXEL : 0));
-		break;
+		توڑو;
 
-	    case XmINTERNAL_HIGHLIGHT:
-		break;
+	    حالت Xm_اندرونی_HIGHLIGHT:
+		توڑو;
 
-	    default:
-		assert(FALSE);
-		return;
+	    طےشدہ:
+		أكد(FALSE);
+		واپس;
 	}
-#endif
+#اگر_ختم
 
 	/*
 	 * Clear the area not occupied by label with parents background color.
@@ -1306,43 +1306,43 @@ Redisplay(Widget w, XEvent *event, Region region)
 	 * area, which is redundant when XmEXTERNAL_HIGHLIGHT default button
 	 * shadow emphasis is used.
 	 */
-	if (box.x > adjust)
+	اگر (box.x > adjust)
 	{
-	    int borderwidth =box.x - adjust;
-	    int rectwidth = eb->core.width - 2 * adjust;
-	    int rectheight = eb->core.height - 2 * adjust;
+	    صحیح borderwidth =box.x - adjust;
+	    صحیح rectwidth = eb->core.چوڑائی - 2 * adjust;
+	    صحیح rectheight = eb->core.اونچائی - 2 * adjust;
 
-	    if (XmIsManager(XtParent(eb)))
+	    اگر (XmIsManager(Xt_والد(eb)))
 	    {
-		XmeDrawHighlight(XtDisplay(eb), XtWindow(eb),
-						     XmParentBackgroundGC(eb),
+		XmeDrawHighlight(XtDisplay(eb), Xt_کھڑکی(eb),
+						     Xm_والد_Background_GC(eb),
 			adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
-	    else
+	    ورنہ
 	    {
-		XmeClearBorder(XtDisplay(eb), XtWindow(eb),
+		XmeClearBorder(XtDisplay(eb), Xt_کھڑکی(eb),
 			  adjust, adjust, rectwidth, rectheight, borderwidth);
 	    }
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
-	    switch (default_button_emphasis)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
+	    انتخاب (default_button_emphasis)
 	    {
-		case XmINTERNAL_HIGHLIGHT:
+		حالت Xm_اندرونی_HIGHLIGHT:
 		    // The call above erases the border highlighting.
-		    if (eb->primitive.highlight_drawn)
-			(*(((XmPushButtonWidgetClass) XtClass (eb))
+		    اگر (eb->primitive.highlight_drawn)
+			(*(((Xm_ڈالو_Button_Widget_Class) XtClass (eb))
 			   ->primitive_class.border_highlight)) ((Widget) eb) ;
-		    break;
+		    توڑو;
 
-		default:
-		    break;
+		طےشدہ:
+		    توڑو;
 	    }
-#endif
+#اگر_ختم
 	}
 
-	if (eb->pushbutton.default_button_shadow_thickness)
+	اگر (eb->pushbutton.default_button_shadow_thickness)
 	{
-	    if (eb->pushbutton.show_as_default)
+	    اگر (eb->pushbutton.show_as_default)
 	    {
 		/*
 		 *  - get the topShadowColor and bottomShadowColor from the
@@ -1355,106 +1355,106 @@ Redisplay(Widget w, XEvent *event, Region region)
 		 *  - Should be called only if a defaultbuttonshadow is to be
 		 *  drawn.
 		 */
-		GC	    top_gc;
+		GC	    چوٹی_gc;
 		GC	    bottom_gc;
-		int	    default_button_shadow_thickness;
-		int	    x, y, width, height, delta;
-		Widget	    parent;
+		صحیح	    default_button_shadow_thickness;
+		صحیح	    x, y, چوڑائی, اونچائی, delta;
+		Widget	    والد;
 
-		if (eb->pushbutton.compatible
+		اگر (eb->pushbutton.compatible
 				     && (eb->pushbutton.show_as_default == 0))
-		    return;
+		    واپس;
 
-		if (!eb->pushbutton.compatible
+		اگر (!eb->pushbutton.compatible
 			&& (eb->pushbutton.default_button_shadow_thickness
 									== 0))
-		    return;
+		    واپس;
 
 		delta = eb->primitive.highlight_thickness;
 
 		/*
 		 * May need more complex computation for getting the GCs.
 		 */
-		parent = XtParent(eb);
-		if (XmIsManager(parent))
+		والد = Xt_والد(eb);
+		اگر (XmIsManager(والد))
 		{
 		    // Use the parent's GC so monochrome works.
-		    bottom_gc = XmParentTopShadowGC(eb);
-		    top_gc = XmParentBottomShadowGC(eb);
+		    bottom_gc = Xm_والد_چوٹی_Shadow_GC(eb);
+		    چوٹی_gc = Xm_والد_Bottom_Shadow_GC(eb);
 		}
-		else
+		ورنہ
 		{
 		    // Use your own pixel for drawing.
-		    bottom_gc = eb->primitive.top_shadow_GC;
-		    top_gc = eb->primitive.bottom_shadow_GC;
+		    bottom_gc = eb->primitive.چوٹی_shadow_GC;
+		    چوٹی_gc = eb->primitive.bottom_shadow_GC;
 		}
 
-		if ((bottom_gc == None) || (top_gc == None))
-		    return;
+		اگر ((bottom_gc == None) || (چوٹی_gc == None))
+		    واپس;
 
 
-		if (eb->pushbutton.compatible)
+		اگر (eb->pushbutton.compatible)
 		    default_button_shadow_thickness =
 					       eb->pushbutton.show_as_default;
-		else
+		ورنہ
 		    default_button_shadow_thickness =
 			       eb->pushbutton.default_button_shadow_thickness;
 
-#if !defined(LESSTIF_VERSION) && (XmVersion > 1002)
+#اگر !defined(LESSTIF_نسخہ) && (Xm_نسخہ > 1002)
 		/*
 		 * Compute location of bounding box to contain the
 		 * defaultButtonShadow.
 		 */
-		switch (default_button_emphasis)
+		انتخاب (default_button_emphasis)
 		{
-		    case XmEXTERNAL_HIGHLIGHT:
+		    حالت XmEXTERNAL_HIGHLIGHT:
 			delta = eb->primitive.highlight_thickness;
-			break;
+			توڑو;
 
-		    case XmINTERNAL_HIGHLIGHT:
+		    حالت Xm_اندرونی_HIGHLIGHT:
 			delta = Xm3D_ENHANCE_PIXEL;
-			break;
+			توڑو;
 
-		    default:
-			assert(FALSE);
-			return;
+		    طےشدہ:
+			أكد(FALSE);
+			واپس;
 		}
-#endif
+#اگر_ختم
 
 		x = y = delta;
-		width = eb->core.width - 2 * delta;
-		height = eb->core.height - 2 * delta;
+		چوڑائی = eb->core.چوڑائی - 2 * delta;
+		اونچائی = eb->core.اونچائی - 2 * delta;
 
-		if ((width > 0) && (height > 0))
-		    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			    top_gc, bottom_gc, x, y, width, height,
+		اگر ((چوڑائی > 0) && (اونچائی > 0))
+		    XmeDrawShadows(XtDisplay(eb), Xt_کھڑکی(eb),
+			    چوٹی_gc, bottom_gc, x, y, چوڑائی, اونچائی,
 			    default_button_shadow_thickness,
-			    (unsigned)XmSHADOW_OUT);
+			    (غیرعلامتی)Xm_SHADOW_برآمد);
 	    }
 	}
 
-	if (eb->primitive.highlight_drawn)
+	اگر (eb->primitive.highlight_drawn)
 	    draw_shadows(eb);
 	draw_pixmap(eb, event, region);
     }
 }
 
-    static void
+    ساکن خالی
 BorderHighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_highlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_ڈالو_Button_Class_Rec.primitive_class.border_highlight))(w);
+    draw_pixmap(eb, تہی, تہی);
 }
 
-    static void
+    ساکن خالی
 BorderUnhighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_unhighlight))(w);
-    draw_pixmap(eb, NULL, NULL);
+    (*(xm_ڈالو_Button_Class_Rec.primitive_class.border_unhighlight))(w);
+    draw_pixmap(eb, تہی, تہی);
 }
 
-#endif // FEAT_TOOLBAR
+#اگر_ختم // FEAT_TOOLBAR

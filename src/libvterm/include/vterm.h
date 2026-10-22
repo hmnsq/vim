@@ -1,50 +1,50 @@
 /*
  * NOTE: This is a MODIFIED version of libvterm, see the README file.
  */
-#ifndef __VTERM_H__
-#define __VTERM_H__
+#اگر_غیر_تعریف_شدہ __VTERM_H__
+#تعریف_کرو __VTERM_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#اگر_تعریف_شدہ __cplusplus
+خارجی "C" {
+#اگر_ختم
 
-#include <stdlib.h>
+#شامل <stdlib.h>
 
-#include "vterm_keycodes.h"
+#شامل "vterm_keycodes.h"
 
 // VIM: use TRUE and FALSE instead of true and false
-#define TRUE 1
-#define FALSE 0
+#تعریف_کرو TRUE 1
+#تعریف_کرو FALSE 0
 
 // VIM: from stdint.h
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
+قسمتعریف غیرعلامتی حرف		uint8_t;
+قسمتعریف غیرعلامتی مختصر		uint16_t;
+قسمتعریف غیرعلامتی صحیح		uint32_t;
 
 // VIM: define max screen cols and rows
-#define VTERM_MAX_COLS 1000
-#define VTERM_MAX_ROWS 1000
+#تعریف_کرو VTERM_MAX_ستون_تعداد 1000
+#تعریف_کرو VTERM_MAX_صفیں 1000
 
-#define VTERM_VERSION_MAJOR 0
-#define VTERM_VERSION_MINOR 3
-#define VTERM_VERSION_PATCH 3
+#تعریف_کرو VTERM_نسخہ_MAJOR 0
+#تعریف_کرو VTERM_نسخہ_MINOR 3
+#تعریف_کرو VTERM_نسخہ_PATCH 3
 
-#define VTERM_CHECK_VERSION \
-        vterm_check_version(VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR)
+#تعریف_کرو VTERM_CHECK_نسخہ \
+        vterm_check_نسخہ(VTERM_نسخہ_MAJOR, VTERM_نسخہ_MINOR)
 
 /* Any cell can contain at most one basic printing character and 5 combining
  * characters. This number could be changed but will be ABI-incompatible if
  * you do */
-#define VTERM_MAX_CHARS_PER_CELL 6
+#تعریف_کرو VTERM_MAX_CHARS_فی_CELL 6
 
-typedef struct VTerm VTerm;
-typedef struct VTermState VTermState;
-typedef struct VTermScreen VTermScreen;
+قسمتعریف ساخت VTerm VTerm;
+قسمتعریف ساخت VTermState VTermState;
+قسمتعریف ساخت VTermScreen VTermScreen;
 
 // Specifies a screen point.
-typedef struct {
-  int row;
-  int col;
+قسمتعریف ساخت {
+  صحیح صف;
+  صحیح ستون;
 } VTermPos;
 
 /* some small utility functions; we can just keep these static here */
@@ -55,51 +55,51 @@ typedef struct {
  * Return  0  if "a" and "b" are equal
  * Return > 0 if "a" is after "b".
  */
-int vterm_pos_cmp(VTermPos a, VTermPos b);
+صحیح vterm_pos_cmp(VTermPos a, VTermPos b);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_pos_cmp(VTermPos a, VTermPos b)
+#اگر defined(DEFINE_INLINES) || USE_INLINE
+INLINE صحیح vterm_pos_cmp(VTermPos a, VTermPos b)
 {
-  return (a.row == b.row) ? a.col - b.col : a.row - b.row;
+  واپس (a.صف == b.صف) ? a.ستون - b.ستون : a.صف - b.صف;
 }
-#endif
+#اگر_ختم
 
 // Specifies a rectangular screen area.
-typedef struct {
-  int start_row;
-  int end_row;
-  int start_col;
-  int end_col;
+قسمتعریف ساخت {
+  صحیح آغاز_صف;
+  صحیح انتہا_صف;
+  صحیح آغاز_ستون;
+  صحیح انتہا_ستون;
 } VTermRect;
 
 /* true if the rect contains the point */
-int vterm_rect_contains(VTermRect r, VTermPos p);
+صحیح vterm_rect_شامل_ہے(VTermRect r, VTermPos p);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
+#اگر defined(DEFINE_INLINES) || USE_INLINE
+INLINE صحیح vterm_rect_شامل_ہے(VTermRect r, VTermPos p)
 {
-  return p.row >= r.start_row && p.row < r.end_row &&
-         p.col >= r.start_col && p.col < r.end_col;
+  واپس p.صف >= r.آغاز_صف && p.صف < r.انتہا_صف &&
+         p.ستون >= r.آغاز_ستون && p.ستون < r.انتہا_ستون;
 }
-#endif
+#اگر_ختم
 
 /* move a rect */
 // Move "rect" "row_delta" down and "col_delta" right.
 // Does not check boundaries.
-void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta);
+خالی vterm_rect_move(VTermRect *rect, صحیح صف_delta, صحیح ستون_delta);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
+#اگر defined(DEFINE_INLINES) || USE_INLINE
+INLINE خالی vterm_rect_move(VTermRect *rect, صحیح صف_delta, صحیح ستون_delta)
 {
-  rect->start_row += row_delta; rect->end_row += row_delta;
-  rect->start_col += col_delta; rect->end_col += col_delta;
+  rect->آغاز_صف += صف_delta; rect->انتہا_صف += صف_delta;
+  rect->آغاز_ستون += ستون_delta; rect->انتہا_ستون += ستون_delta;
 }
-#endif
+#اگر_ختم
 
 /**
  * Bit-field describing the value of VTermColor.type
  */
-typedef enum {
+قسمتعریف شمار {
   /**
    * If the lower bit of `type` is not set, the colour is 24-bit RGB.
    */
@@ -108,12 +108,12 @@ typedef enum {
   /**
    * The colour is an index into a palette of 256 colours.
    */
-  VTERM_COLOR_INDEXED = 0x01,
+  VTERM_COLOR_اشاریہ_دار = 0x01,
 
   /**
    * Mask that can be used to extract the RGB/Indexed bit.
    */
-  VTERM_COLOR_TYPE_MASK = 0x01,
+  VTERM_COLOR_TYPE_نقاب = 0x01,
 
   /**
    * If set, indicates that this colour should be the default foreground
@@ -134,7 +134,7 @@ typedef enum {
   /**
    * Mask that can be used to extract the default foreground/background bit.
    */
-  VTERM_COLOR_DEFAULT_MASK = 0x06,
+  VTERM_COLOR_DEFAULT_نقاب = 0x06,
 
   /**
    * VIM: If set, indicates that the color is invalid.
@@ -146,40 +146,40 @@ typedef enum {
  * Returns true if the VTERM_COLOR_RGB `type` flag is set, indicating that the
  * given VTermColor instance is an indexed colour.
  */
-#define VTERM_COLOR_IS_INDEXED(col) \
-  (((col)->type & VTERM_COLOR_TYPE_MASK) == VTERM_COLOR_INDEXED)
+#تعریف_کرو VTERM_COLOR_IS_اشاریہ_دار(ستون) \
+  (((ستون)->type & VTERM_COLOR_TYPE_نقاب) == VTERM_COLOR_اشاریہ_دار)
 
 /**
  * Returns true if the VTERM_COLOR_INDEXED `type` flag is set, indicating that
  * the given VTermColor instance is an rgb colour.
  */
-#define VTERM_COLOR_IS_RGB(col) \
-  (((col)->type & VTERM_COLOR_TYPE_MASK) == VTERM_COLOR_RGB)
+#تعریف_کرو VTERM_COLOR_IS_RGB(ستون) \
+  (((ستون)->type & VTERM_COLOR_TYPE_نقاب) == VTERM_COLOR_RGB)
 
 /**
  * Returns true if the VTERM_COLOR_DEFAULT_FG `type` flag is set, indicating
  * that the given VTermColor instance corresponds to the default foreground
  * color.
  */
-#define VTERM_COLOR_IS_DEFAULT_FG(col) \
-  (!!((col)->type & VTERM_COLOR_DEFAULT_FG))
+#تعریف_کرو VTERM_COLOR_IS_DEFAULT_FG(ستون) \
+  (!!((ستون)->type & VTERM_COLOR_DEFAULT_FG))
 
 /**
  * Returns true if the VTERM_COLOR_DEFAULT_BG `type` flag is set, indicating
  * that the given VTermColor instance corresponds to the default background
  * color.
  */
-#define VTERM_COLOR_IS_DEFAULT_BG(col) \
-  (!!((col)->type & VTERM_COLOR_DEFAULT_BG))
+#تعریف_کرو VTERM_COLOR_IS_DEFAULT_BG(ستون) \
+  (!!((ستون)->type & VTERM_COLOR_DEFAULT_BG))
 
 /**
  * Returns true if the VTERM_COLOR_INVALID `type` flag is set, indicating
  * that the given VTermColor instance is an invalid color.
  */
-#define VTERM_COLOR_IS_INVALID(col) (!!((col)->type & VTERM_COLOR_INVALID))
+#تعریف_کرو VTERM_COLOR_IS_INVALID(ستون) (!!((ستون)->type & VTERM_COLOR_INVALID))
 
 // VIM: this was a union, but that doesn't always work.
-typedef struct {
+قسمتعریف ساخت {
   /**
    * Tag indicating which member is actually valid.
    * Please use the `VTERM_COLOR_IS_*` test macros to check whether a
@@ -189,26 +189,26 @@ typedef struct {
 
   uint8_t red, green, blue;
 
-  uint8_t index;
+  uint8_t اشاریہ;
 } VTermColor;
 
 /**
  * Constructs a new VTermColor instance representing the given RGB values.
  */
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
+خالی vterm_color_rgb(VTermColor *ستون, uint8_t red, uint8_t green, uint8_t blue);
 
 /**
  * Construct a new VTermColor instance representing an indexed color with the
  * given index.
  */
-void vterm_color_indexed(VTermColor *col, uint8_t idx);
+خالی vterm_color_اشاریہ_دار(VTermColor *ستون, uint8_t idx);
 
 /**
  * Compares two colours. Returns true if the colors are equal, false otherwise.
  */
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
+صحیح vterm_color_is_equal(ثابت VTermColor *a, ثابت VTermColor *b);
 
-typedef enum {
+قسمتعریف شمار {
   /* VTERM_VALUETYPE_NONE = 0 */
   VTERM_VALUETYPE_BOOL = 1,
   VTERM_VALUETYPE_INT,
@@ -216,29 +216,29 @@ typedef enum {
   VTERM_VALUETYPE_COLOR,
 
   VTERM_N_VALUETYPES
-} VTermValueType;
+} VTerm_قدر_Type;
 
-typedef struct {
-  const char *str;
+قسمتعریف ساخت {
+  ثابت حرف *str;
   size_t      len : 30;
-  unsigned int  initial : 1;
-  unsigned int  final : 1;
+  غیرعلامتی صحیح  initial : 1;
+  غیرعلامتی صحیح  final : 1;
 } VTermStringFragment;
 
-typedef union {
-  int boolean;
-  int number;
+قسمتعریف اتحاد {
+  صحیح boolean;
+  صحیح نمبر;
   VTermStringFragment string;
   VTermColor color;
-} VTermValue;
+} VTerm_قدر;
 
-typedef enum {
+قسمتعریف شمار {
   /* VTERM_ATTR_NONE = 0 */
   VTERM_ATTR_BOLD = 1,   // bool:   1, 22
   VTERM_ATTR_UNDERLINE,  // number: 4, 21, 24
   VTERM_ATTR_ITALIC,     // bool:   3, 23
   VTERM_ATTR_BLINK,      // bool:   5, 25
-  VTERM_ATTR_REVERSE,    // bool:   7, 27
+  VTERM_ATTR_الٹ,    // bool:   7, 27
   VTERM_ATTR_CONCEAL,    // bool:   8, 28
   VTERM_ATTR_STRIKE,     // bool:   9, 29
   VTERM_ATTR_FONT,       // number: 10-19
@@ -250,31 +250,31 @@ typedef enum {
   VTERM_N_ATTRS
 } VTermAttr;
 
-typedef enum {
+قسمتعریف شمار {
   /* VTERM_PROP_NONE = 0 */
   VTERM_PROP_CURSORVISIBLE = 1, // bool
   VTERM_PROP_CURSORBLINK,       // bool
   VTERM_PROP_ALTSCREEN,         // bool
   VTERM_PROP_TITLE,             // string
   VTERM_PROP_ICONNAME,          // string
-  VTERM_PROP_REVERSE,           // bool
-  VTERM_PROP_CURSORSHAPE,       // number
-  VTERM_PROP_MOUSE,             // number
+  VTERM_PROP_الٹ,           // bool
+  VTERM_PROP_CURSORSHAPE,       //نمبر
+  VTERM_PROP_MOUSE,             //نمبر
   VTERM_PROP_FOCUSREPORT,       // bool
   VTERM_PROP_CURSORCOLOR,       // VIM - string
 
   VTERM_N_PROPS
 } VTermProp;
 
-enum {
-  VTERM_PROP_CURSORSHAPE_BLOCK = 1,
+شمار {
+  VTERM_PROP_CURSORSHAPE_بلاک = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
+  VTERM_PROP_CURSORSHAPE_BAR_بایاں,
 
   VTERM_N_PROP_CURSORSHAPES
 };
 
-enum {
+شمار {
   VTERM_PROP_MOUSE_NONE = 0,
   VTERM_PROP_MOUSE_CLICK,
   VTERM_PROP_MOUSE_DRAG,
@@ -283,108 +283,108 @@ enum {
   VTERM_N_PROP_MOUSES
 };
 
-typedef enum {
+قسمتعریف شمار {
   VTERM_SELECTION_CLIPBOARD = (1<<0),
   VTERM_SELECTION_PRIMARY   = (1<<1),
   VTERM_SELECTION_SECONDARY = (1<<2),
   VTERM_SELECTION_SELECT    = (1<<3),
   VTERM_SELECTION_CUT0      = (1<<4), /* also CUT1 .. CUT7 by bitshifting */
-} VTermSelectionMask;
+} VTerm_Selection_نقاب;
 
-typedef struct {
-  const uint32_t *chars;
-  int             width;
-  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
-  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
-  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+قسمتعریف ساخت {
+  ثابت uint32_t *chars;
+  صحیح             چوڑائی;
+  غیرعلامتی صحیح    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  غیرعلامتی صحیح    dwl:1;             /* DECDWL or DECDHL double-width line */
+  غیرعلامتی صحیح    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
 } VTermGlyphInfo;
 
-typedef struct {
-  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
-  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
-  unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
-} VTermLineInfo;
+قسمتعریف ساخت {
+  غیرعلامتی صحیح    doublewidth:1;     /* DECDWL or DECDHL line */
+  غیرعلامتی صحیح    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+  غیرعلامتی صحیح    continuation:1;    /* Line is a flow continuation of the previous */
+} VTerm_سطر_Info;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
  * edit. 'resize' callback gets total control of these fields and may
  * free-and-reallocate them if required. They will be copied back from the
  * struct after the callback has returned.
  */
-typedef struct {
+قسمتعریف ساخت {
   VTermPos pos;                /* current cursor position */
-  VTermLineInfo *lineinfos[2]; /* [1] may be NULL */
+  VTerm_سطر_Info *lineinfos[2]; /* [1] may be NULL */
 } VTermStateFields;
 
-typedef struct {
+قسمتعریف ساخت {
   /* libvterm relies on this memory to be zeroed out before it is returned
    * by the allocator. */
-  void *(*malloc)(size_t size, void *allocdata);
-  void  (*free)(void *ptr, void *allocdata);
+  خالی *(*حافظہ_دو)(size_t سائز, خالی *allocdata);
+  خالی  (*آزاد)(خالی *ptr, خالی *allocdata);
 } VTermAllocatorFunctions;
 
-void vterm_check_version(int major, int minor);
+خالی vterm_check_نسخہ(صحیح major, صحیح minor);
 
-struct VTermBuilder {
-  int ver; /* currently unused but reserved for some sort of ABI version flag */
+ساخت VTermBuilder {
+  صحیح ver; /* currently unused but reserved for some sort of ABI version flag */
 
-  int rows, cols;
+  صحیح صفیں_2, ستون_تعداد;
 
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  ثابت VTermAllocatorFunctions *allocator;
+  خالی *allocdata;
 
   /* Override default sizes for various structures */
   size_t outbuffer_len;  /* default: 4096 */
   size_t tmpbuffer_len;  /* default: 4096 */
 };
 
-VTerm *vterm_build(const struct VTermBuilder *builder);
+VTerm *vterm_build(ثابت ساخت VTermBuilder *builder);
 
 /* A convenient shortcut for default cases */
 // Allocate and initialize a new terminal with default allocators.
-VTerm *vterm_new(int rows, int cols);
+VTerm *vterm_new(صحیح صفیں_2, صحیح ستون_تعداد);
 /* These shortcuts are generally discouraged in favour of just using vterm_build() */
 
 // Allocate and initialize a new terminal with specified allocators.
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
+VTerm *vterm_new_with_allocator(صحیح صفیں_2, صحیح ستون_تعداد, VTermAllocatorFunctions *funcs, خالی *allocdata);
 
 // Free and cleanup a terminal and all its data.
-void   vterm_free(VTerm* vt);
+خالی   vterm_free(VTerm* vt);
 
 // Get the current size of the terminal and store in "rowsp" and "colsp".
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
+خالی vterm_get_سائز(ثابت VTerm *vt, صحیح *rowsp, صحیح *colsp);
 
-void vterm_set_size(VTerm *vt, int rows, int cols);
+خالی vterm_سیٹ_سائز(VTerm *vt, صحیح صفیں_2, صحیح ستون_تعداد);
 
-int  vterm_get_utf8(const VTerm *vt);
-void vterm_set_utf8(VTerm *vt, int is_utf8);
+صحیح  vterm_get_utf8(ثابت VTerm *vt);
+خالی vterm_سیٹ_utf8(VTerm *vt, صحیح is_utf8);
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
+size_t vterm_داخلہ_write(VTerm *vt, ثابت حرف *بائٹیں, size_t len);
 
 /* Setting output callback will override the buffer logic */
-typedef void VTermOutputCallback(const char *s, size_t len, void *user);
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user);
+قسمتعریف خالی VTermOutputCallback(ثابت حرف *s, size_t len, خالی *user);
+خالی vterm_output_سیٹ_callback(VTerm *vt, VTermOutputCallback *func, خالی *user);
 
 /* These buffer functions only work if output callback is NOT set
  * These are deprecated and will be removed in a later version */
-size_t vterm_output_get_buffer_size(const VTerm *vt);
-size_t vterm_output_get_buffer_current(const VTerm *vt);
-size_t vterm_output_get_buffer_remaining(const VTerm *vt);
+size_t vterm_output_get_بفر_سائز(ثابت VTerm *vt);
+size_t vterm_output_get_بفر_current(ثابت VTerm *vt);
+size_t vterm_output_get_بفر_بقایا(ثابت VTerm *vt);
 
 /* This too */
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
+size_t vterm_output_read(VTerm *vt, حرف *بفر, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
-int vterm_is_kitty_keyboard(VTerm *vt);
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
+صحیح vterm_is_modify_other_کلیدیں(VTerm *vt);
+صحیح vterm_is_kitty_keyboard(VTerm *vt);
+خالی vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
+خالی vterm_keyboard_کلید(VTerm *vt, VTerm_کلید کلید, VTermModifier mod);
 
-void vterm_keyboard_start_paste(VTerm *vt);
-void vterm_keyboard_end_paste(VTerm *vt);
+خالی vterm_keyboard_آغاز_paste(VTerm *vt);
+خالی vterm_keyboard_انتہا_paste(VTerm *vt);
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod);
+خالی vterm_mouse_move(VTerm *vt, صحیح صف, صحیح ستون, VTermModifier mod);
 // "button" is 1 for left, 2 for middle, 3 for right.
 // Button 4 is scroll wheel down, button 5 is scroll wheel up.
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
+خالی vterm_mouse_button(VTerm *vt, صحیح button, صحیح pressed, VTermModifier mod);
 
 // ------------
 // Parser layer
@@ -398,119 +398,119 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
  *
  * Don't confuse this with the final byte of the CSI escape; 'a' in this case.
  */
-#define CSI_ARG_FLAG_MORE (1U<<31)
-#define CSI_ARG_MASK      (~(1U<<31))
+#تعریف_کرو CSI_ARG_FLAG_مزید (1U<<31)
+#تعریف_کرو CSI_ARG_نقاب      (~(1U<<31))
 
-#define CSI_ARG_HAS_MORE(a) ((a) & CSI_ARG_FLAG_MORE)
-#define CSI_ARG(a)          ((a) & CSI_ARG_MASK)
+#تعریف_کرو CSI_ARG_HAS_مزید(a) ((a) & CSI_ARG_FLAG_مزید)
+#تعریف_کرو CSI_ARG(a)          ((a) & CSI_ARG_نقاب)
 
 /* Can't use -1 to indicate a missing argument; use this instead */
 // VIM: changed 31 to 30 to avoid an overflow warning
-#define CSI_ARG_MISSING ((1<<30)-1)
+#تعریف_کرو CSI_ARG_MISSING ((1<<30)-1)
 
-#define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
-#define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+#تعریف_کرو CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
+#تعریف_کرو CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
+#تعریف_کرو CSI_ARG_گنتی(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
-typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
-  int (*resize)(int rows, int cols, void *user);
+قسمتعریف ساخت {
+  صحیح (*متن)(ثابت حرف *بائٹیں, size_t len, خالی *user);
+  صحیح (*control)(غیرعلامتی حرف control, خالی *user);
+  صحیح (*escape)(ثابت حرف *بائٹیں, size_t len, خالی *user);
+  صحیح (*csi)(ثابت حرف *leader, ثابت طویل دلائل[], صحیح argcount, ثابت حرف *intermed, حرف command, خالی *user);
+  صحیح (*osc)(صحیح command, VTermStringFragment frag, خالی *user);
+  صحیح (*dcs)(ثابت حرف *command, size_t commandlen, VTermStringFragment frag, خالی *user);
+  صحیح (*apc)(VTermStringFragment frag, خالی *user);
+  صحیح (*pm)(VTermStringFragment frag, خالی *user);
+  صحیح (*sos)(VTermStringFragment frag, خالی *user);
+  صحیح (*resize)(صحیح صفیں_2, صحیح ستون_تعداد, خالی *user);
 } VTermParserCallbacks;
 
-void  vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
-void *vterm_parser_get_cbdata(VTerm *vt);
+خالی  vterm_parser_سیٹ_callbacks(VTerm *vt, ثابت VTermParserCallbacks *callbacks, خالی *user);
+خالی *vterm_parser_get_cbdata(VTerm *vt);
 
 /* Normally NUL, CAN, SUB and DEL are ignored. Setting this true causes them
  * to be emitted by the 'control' callback
  */
-void vterm_parser_set_emit_nul(VTerm *vt, int emit);
+خالی vterm_parser_سیٹ_emit_nul(VTerm *vt, صحیح emit);
 
 // -----------
 // State layer
 // -----------
 
-typedef struct {
-  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, int selective, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+قسمتعریف ساخت {
+  صحیح (*putglyph)(VTermGlyphInfo *info, VTermPos pos, خالی *user);
+  صحیح (*movecursor)(VTermPos pos, VTermPos oldpos, صحیح visible, خالی *user);
+  صحیح (*scrollrect)(VTermRect rect, صحیح downward, صحیح rightward, خالی *user);
+  صحیح (*moverect)(VTermRect dest, VTermRect src, خالی *user);
+  صحیح (*erase)(VTermRect rect, صحیح selective, خالی *user);
+  صحیح (*initpen)(خالی *user);
+  صحیح (*setpenattr)(VTermAttr attr, VTerm_قدر *val, خالی *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
-  int (*sb_clear)(void *user);
+  صحیح (*settermprop)(VTermProp prop, VTerm_قدر *val, خالی *user);
+  صحیح (*bell)(خالی *user);
+  صحیح (*resize)(صحیح صفیں_2, صحیح ستون_تعداد, VTermStateFields *fields, خالی *user);
+  صحیح (*setlineinfo)(صحیح صف, ثابت VTerm_سطر_Info *newinfo, ثابت VTerm_سطر_Info *oldinfo, خالی *user);
+  صحیح (*sb_clear)(خالی *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
-  int (*premove)(VTermRect dest, void *user);
+  صحیح (*premove)(VTermRect dest, خالی *user);
 } VTermStateCallbacks;
 
 // VIM: added
-typedef struct {
+قسمتعریف ساخت {
   VTermPos pos;
-  int	   buttons;
-#define MOUSE_BUTTON_LEFT 0x01
-#define MOUSE_BUTTON_MIDDLE 0x02
-#define MOUSE_BUTTON_RIGHT 0x04
-  int      flags;
-#define MOUSE_WANT_CLICK 0x01
-#define MOUSE_WANT_DRAG  0x02
-#define MOUSE_WANT_MOVE  0x04
+  صحیح	   buttons;
+#تعریف_کرو MOUSE_BUTTON_بایاں 0x01
+#تعریف_کرو MOUSE_BUTTON_درمیان 0x02
+#تعریف_کرو MOUSE_BUTTON_دایاں 0x04
+  صحیح      flags;
+#تعریف_کرو MOUSE_WANT_CLICK 0x01
+#تعریف_کرو MOUSE_WANT_DRAG  0x02
+#تعریف_کرو MOUSE_WANT_MOVE  0x04
   // useful to add protocol?
 } VTermMouseState;
 
-typedef struct {
-  int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
+قسمتعریف ساخت {
+  صحیح (*control)(غیرعلامتی حرف control, خالی *user);
+  صحیح (*csi)(ثابت حرف *leader, ثابت طویل دلائل[], صحیح argcount, ثابت حرف *intermed, حرف command, خالی *user);
+  صحیح (*osc)(صحیح command, VTermStringFragment frag, خالی *user);
+  صحیح (*dcs)(ثابت حرف *command, size_t commandlen, VTermStringFragment frag, خالی *user);
+  صحیح (*apc)(VTermStringFragment frag, خالی *user);
+  صحیح (*pm)(VTermStringFragment frag, خالی *user);
+  صحیح (*sos)(VTermStringFragment frag, خالی *user);
 } VTermStateFallbacks;
 
-typedef struct {
-  int (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
-  int (*query)(VTermSelectionMask mask, void *user);
+قسمتعریف ساخت {
+  صحیح (*سیٹ_2)(VTerm_Selection_نقاب نقاب, VTermStringFragment frag, خالی *user);
+  صحیح (*query)(VTerm_Selection_نقاب نقاب, خالی *user);
 } VTermSelectionCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
 
-void  vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user);
-void *vterm_state_get_cbdata(VTermState *state);
+خالی  vterm_state_سیٹ_callbacks(VTermState *state, ثابت VTermStateCallbacks *callbacks, خالی *user);
+خالی *vterm_state_get_cbdata(VTermState *state);
 
-void vterm_state_callbacks_has_premove(VTermState *state);
+خالی vterm_state_callbacks_has_premove(VTermState *state);
 
-void  vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_state_get_unrecognised_fbdata(VTermState *state);
+خالی  vterm_state_سیٹ_unrecognised_fallbacks(VTermState *state, ثابت VTermStateFallbacks *fallbacks, خالی *user);
+خالی *vterm_state_get_unrecognised_fbdata(VTermState *state);
 
 // Initialize the state.
-void vterm_state_reset(VTermState *state, int hard);
+خالی vterm_state_reset(VTermState *state, صحیح hard);
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
+خالی vterm_state_get_cursorpos(ثابت VTermState *state, VTermPos *cursorpos);
 // VIM: added
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate);
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
-void vterm_state_focus_in(VTermState *state);
-void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+خالی vterm_state_get_mousestate(ثابت VTermState *state, VTermMouseState *mousestate);
+خالی vterm_state_get_default_colors(ثابت VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+خالی vterm_state_get_palette_color(ثابت VTermState *state, صحیح اشاریہ, VTermColor *ستون);
+خالی vterm_state_سیٹ_default_colors(VTermState *state, ثابت VTermColor *default_fg, ثابت VTermColor *default_bg);
+خالی vterm_state_سیٹ_palette_color(VTermState *state, صحیح اشاریہ, ثابت VTermColor *ستون);
+خالی vterm_state_سیٹ_bold_highbright(VTermState *state, صحیح bold_is_highbright);
+صحیح  vterm_state_get_penattr(ثابت VTermState *state, VTermAttr attr, VTerm_قدر *val);
+صحیح  vterm_state_سیٹ_termprop(VTermState *state, VTermProp prop, VTerm_قدر *val);
+خالی vterm_state_focus_اندر(VTermState *state);
+خالی vterm_state_focus_برآمد(VTermState *state);
+ثابت VTerm_سطر_Info *vterm_state_get_lineinfo(ثابت VTermState *state, صحیح صف);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -522,68 +522,68 @@ const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
  * @param col is a pointer at the VTermColor instance that should be converted
  * to an RGB colour.
  */
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col);
+خالی vterm_state_convert_color_مقصد_rgb(ثابت VTermState *state, VTermColor *ستون);
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen);
+خالی vterm_state_سیٹ_selection_callbacks(VTermState *state, ثابت VTermSelectionCallbacks *callbacks, خالی *user,
+    حرف *بفر, size_t buflen);
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
+خالی vterm_state_send_selection(VTermState *state, VTerm_Selection_نقاب نقاب, VTermStringFragment frag);
 
 // ------------
 // Screen layer
 // ------------
 
-typedef struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int conceal   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
-    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
-    unsigned int small     : 1;
-    unsigned int baseline  : 2;
+قسمتعریف ساخت {
+    غیرعلامتی صحیح bold      : 1;
+    غیرعلامتی صحیح underline : 2;
+    غیرعلامتی صحیح italic    : 1;
+    غیرعلامتی صحیح blink     : 1;
+    غیرعلامتی صحیح الٹ   : 1;
+    غیرعلامتی صحیح conceal   : 1;
+    غیرعلامتی صحیح strike    : 1;
+    غیرعلامتی صحیح font      : 4; /* 0 to 9 */
+    غیرعلامتی صحیح dwl       : 1; /* On a DECDWL or DECDHL line */
+    غیرعلامتی صحیح dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+    غیرعلامتی صحیح small     : 1;
+    غیرعلامتی صحیح baseline  : 2;
 } VTermScreenCellAttrs;
 
-enum {
+شمار {
   VTERM_UNDERLINE_OFF,
   VTERM_UNDERLINE_SINGLE,
   VTERM_UNDERLINE_DOUBLE,
   VTERM_UNDERLINE_CURLY,
 };
 
-enum {
-  VTERM_BASELINE_NORMAL,
+شمار {
+  VTERM_BASELINE_معمول,
   VTERM_BASELINE_RAISE,
-  VTERM_BASELINE_LOWER,
+  VTERM_BASELINE_زیریں,
 };
 
-typedef struct {
-  uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
-  char     width;
+قسمتعریف ساخت {
+  uint32_t chars[VTERM_MAX_CHARS_فی_CELL];
+  حرف     چوڑائی;
   VTermScreenCellAttrs attrs;
   VTermColor fg, bg;
 } VTermScreenCell;
 
 // All fields are optional, NULL when not used.
-typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
+قسمتعریف ساخت {
+  صحیح (*damage)(VTermRect rect, خالی *user);
+  صحیح (*moverect)(VTermRect dest, VTermRect src, خالی *user);
+  صحیح (*movecursor)(VTermPos pos, VTermPos oldpos, صحیح visible, خالی *user);
+  صحیح (*settermprop)(VTermProp prop, VTerm_قدر *val, خالی *user);
+  صحیح (*bell)(خالی *user);
+  صحیح (*resize)(صحیح صفیں_2, صحیح ستون_تعداد, خالی *user);
   // A line was pushed off the top of the window.
   // "cells[cols]" contains the cells of that line.
   // Return value is unused.
-  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
-  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
-  int (*sb_clear)(void* user);
+  صحیح (*sb_pushline)(صحیح ستون_تعداد, ثابت VTermScreenCell *cells, خالی *user);
+  صحیح (*sb_popline)(صحیح ستون_تعداد, VTermScreenCell *cells, خالی *user);
+  صحیح (*sb_clear)(خالی* user);
   /* ABI-compat this is only used if vterm_screen_callbacks_has_pushline4() is called */
-  int (*sb_pushline4)(int cols, const VTermScreenCell *cells, int continuation, void *user);
+  صحیح (*sb_pushline4)(صحیح ستون_تعداد, ثابت VTermScreenCell *cells, صحیح continuation, خالی *user);
 } VTermScreenCallbacks;
 
 // Return the screen of the vterm.
@@ -593,104 +593,104 @@ VTermScreen *vterm_obtain_screen(VTerm *vt);
  * Install screen callbacks.  These are invoked when the screen contents is
  * changed.  "user" is passed into to the callback.
  */
-void  vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user);
-void *vterm_screen_get_cbdata(VTermScreen *screen);
+خالی  vterm_screen_سیٹ_callbacks(VTermScreen *screen, ثابت VTermScreenCallbacks *callbacks, خالی *user);
+خالی *vterm_screen_get_cbdata(VTermScreen *screen);
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
+خالی vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
 
-void  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
+خالی  vterm_screen_سیٹ_unrecognised_fallbacks(VTermScreen *screen, ثابت VTermStateFallbacks *fallbacks, خالی *user);
+خالی *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
+خالی vterm_screen_enable_reflow(VTermScreen *screen, صحیح reflow);
 
 // Back-compat alias for the brief time it was in 0.3-RC1
-#define vterm_screen_set_reflow  vterm_screen_enable_reflow
+#تعریف_کرو vterm_screen_سیٹ_reflow  vterm_screen_enable_reflow
 
 // Enable support for using the alternate screen if "altscreen" is non-zero.
 // Before that switching to the alternate screen won't work.
 // Calling with "altscreen" zero has no effect.
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen);
+خالی vterm_screen_enable_altscreen(VTermScreen *screen, صحیح altscreen);
 
-typedef enum {
+قسمتعریف شمار {
   VTERM_DAMAGE_CELL,    /* every cell */
-  VTERM_DAMAGE_ROW,     /* entire rows */
+  VTERM_DAMAGE_صف,     /* entire rows */
   VTERM_DAMAGE_SCREEN,  /* entire screen */
   VTERM_DAMAGE_SCROLL,  /* entire screen + scrollrect */
 
   VTERM_N_DAMAGES
-} VTermDamageSize;
+} VTerm_Damage_سائز;
 
 // Invoke the relevant callbacks to update the screen.
-void vterm_screen_flush_damage(VTermScreen *screen);
+خالی vterm_screen_flush_damage(VTermScreen *screen);
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
+خالی vterm_screen_سیٹ_damage_ملاؤ(VTermScreen *screen, VTerm_Damage_سائز سائز);
 
 /*
  * Reset the screen.  Also invokes vterm_state_reset().
  * Must be called before the terminal can be used.
  */
-void   vterm_screen_reset(VTermScreen *screen, int hard);
+خالی   vterm_screen_reset(VTermScreen *screen, صحیح hard);
 
 /* Neither of these functions NUL-terminate the buffer */
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect);
+size_t vterm_screen_get_chars(ثابت VTermScreen *screen, uint32_t *chars, size_t len, ثابت VTermRect rect);
+size_t vterm_screen_get_متن(ثابت VTermScreen *screen, حرف *str, size_t len, ثابت VTermRect rect);
 
-typedef enum {
-  VTERM_ATTR_BOLD_MASK       = 1 << 0,
-  VTERM_ATTR_UNDERLINE_MASK  = 1 << 1,
-  VTERM_ATTR_ITALIC_MASK     = 1 << 2,
-  VTERM_ATTR_BLINK_MASK      = 1 << 3,
-  VTERM_ATTR_REVERSE_MASK    = 1 << 4,
-  VTERM_ATTR_STRIKE_MASK     = 1 << 5,
-  VTERM_ATTR_FONT_MASK       = 1 << 6,
-  VTERM_ATTR_FOREGROUND_MASK = 1 << 7,
-  VTERM_ATTR_BACKGROUND_MASK = 1 << 8,
-  VTERM_ATTR_CONCEAL_MASK    = 1 << 9,
-  VTERM_ATTR_SMALL_MASK      = 1 << 10,
-  VTERM_ATTR_BASELINE_MASK   = 1 << 11,
+قسمتعریف شمار {
+  VTERM_ATTR_BOLD_نقاب       = 1 << 0,
+  VTERM_ATTR_UNDERLINE_نقاب  = 1 << 1,
+  VTERM_ATTR_ITALIC_نقاب     = 1 << 2,
+  VTERM_ATTR_BLINK_نقاب      = 1 << 3,
+  VTERM_ATTR_الٹ_نقاب    = 1 << 4,
+  VTERM_ATTR_STRIKE_نقاب     = 1 << 5,
+  VTERM_ATTR_FONT_نقاب       = 1 << 6,
+  VTERM_ATTR_FOREGROUND_نقاب = 1 << 7,
+  VTERM_ATTR_BACKGROUND_نقاب = 1 << 8,
+  VTERM_ATTR_CONCEAL_نقاب    = 1 << 9,
+  VTERM_ATTR_SMALL_نقاب      = 1 << 10,
+  VTERM_ATTR_BASELINE_نقاب   = 1 << 11,
 
-  VTERM_ALL_ATTRS_MASK = (1 << 12) - 1
-} VTermAttrMask;
+  VTERM_ALL_ATTRS_نقاب = (1 << 12) - 1
+} VTerm_Attr_نقاب;
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
+صحیح vterm_screen_get_attrs_extent(ثابت VTermScreen *screen, VTermRect *extent, VTermPos pos, VTerm_Attr_نقاب attrs);
 
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+صحیح vterm_screen_get_cell(ثابت VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
+صحیح vterm_screen_is_eol(ثابت VTermScreen *screen, VTermPos pos);
 
 /**
  * Same as vterm_state_convert_color_to_rgb(), but takes a `screen` instead of a `state`
  * instance.
  */
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col);
+خالی vterm_screen_convert_color_مقصد_rgb(ثابت VTermScreen *screen, VTermColor *ستون);
 
 /**
  * Similar to vterm_state_set_default_colors(), but also resets colours in the
  * screen buffer(s)
  */
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg);
+خالی vterm_screen_سیٹ_default_colors(VTermScreen *screen, ثابت VTermColor *default_fg, ثابت VTermColor *default_bg);
 
 // ---------
 // Utilities
 // ---------
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+VTerm_قدر_Type vterm_get_attr_type(VTermAttr attr);
+VTerm_قدر_Type vterm_get_prop_type(VTermProp prop);
 
-void vterm_scroll_rect(VTermRect rect,
-                       int downward,
-                       int rightward,
-                       int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, int selective, void *user),
-                       void *user);
+خالی vterm_scroll_rect(VTermRect rect,
+                       صحیح downward,
+                       صحیح rightward,
+                       صحیح (*moverect)(VTermRect src, VTermRect dest, خالی *user),
+                       صحیح (*eraserect)(VTermRect rect, صحیح selective, خالی *user),
+                       خالی *user);
 
-void vterm_copy_cells(VTermRect dest,
+خالی vterm_copy_cells(VTermRect dest,
                       VTermRect src,
-                      void (*copycell)(VTermPos dest, VTermPos src, void *user),
-                      void *user);
+                      خالی (*copycell)(VTermPos dest, VTermPos src, خالی *user),
+                      خالی *user);
 
-#ifdef __cplusplus
+#اگر_تعریف_شدہ __cplusplus
 }
-#endif
+#اگر_ختم
 
-#endif
+#اگر_ختم

@@ -27,32 +27,32 @@
  * precompiled for OS/2. That one probably works better.
  */
 
-#ifndef _MSC_VER
+#اگر_غیر_تعریف_شدہ _MSC_VER
 # include <unistd.h>
-#endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#اگر_ختم
+#شامل <malloc.h>
+#شامل <stdio.h>
+#شامل <stdlib.h>
+#شامل <string.h>
+#شامل <fcntl.h>
 
-#ifdef _WIN32
+#اگر_تعریف_شدہ _WIN32
 # define sysconf(x) -1
-#endif
+#اگر_ختم
 
-void usage(void)
+خالی usage(خالی)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
-\t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
-as well as to the standard output.\n\
+\t-a\tappend مقصد files instead کا truncating\n\
+\nTee reads its داخلہ, and writes مقصد each کا the specified files,\n\
+as well as مقصد the standard output.\n\
 \n\
-This version supplied with Vim 4.2 to make ':make' possible.\n\
-For a more complete and stable version, consider getting\n\
-[a port of] the GNU shellutils package.\n\
+This نسخہ_2 supplied with Vim 4.2 مقصد make ':make' possible.\n\
+For a مزید complete and stable نسخہ_2, consider getting\n\
+[a پورٹ کا] the GNU shellutils package.\n\
 ");
 }
 
@@ -61,105 +61,105 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+صحیح
+myfread(حرف *buf, صحیح elsize /*ignored*/, صحیح max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	صحیح	c;
+	صحیح	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	جب ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		اگر (c == '\n' || c == '\r')
+			توڑو;
 	}
-	return n;
+	واپس n;
 }
 
 
-int
-main(int argc, char *argv[])
+صحیح
+مین(صحیح argc, حرف *argv[])
 {
-	int	append = 0;
+	صحیح	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	صحیح	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	صحیح	i;
+	حرف	buf[BUFSIZ];
+	صحیح	n;
+	صحیح	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	برائے (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		اگر (argv[i][0] != '-')
+			توڑو;
+		اگر (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		ورنہ
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	اگر (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
-		exit(2);
+		باہر_نکلو(2);
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	اگر (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	اگر (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
-		exit(1);
+		باہر_نکلو(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = صفر_حافظہ_دو(numfiles, حجم(FILE *));
+	اگر (filepointers == تہی)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
-															   (long)numfiles);
-		exit(1);
+															   (طویل)numfiles);
+		باہر_نکلو(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	برائے (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		اگر (filepointers[i] == تہی)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
-			exit(1);
+			باہر_نکلو(1);
 		}
 	}
-#ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+#اگر_تعریف_شدہ _WIN32
+	setmode(fileno(stdin),  O_ثنائی);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
-#endif
+	setmode(fileno(stdout),  O_ثنائی);
+#اگر_ختم
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	جب ((n = myfread(buf, حجم(حرف), حجم(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, حجم(حرف), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		برائے (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			اگر (filepointers[i] &&
+			     fwrite(buf, حجم(حرف), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = تہی;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	برائے (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		اگر (filepointers[i])
 			fclose(filepointers[i]);
 	}
 
-	exit(0);
+	باہر_نکلو(0);
 }

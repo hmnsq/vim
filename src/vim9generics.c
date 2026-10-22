@@ -11,25 +11,25 @@
  * vim9generics.c: Vim9 script generics support
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 
 
 /*
  * A hash table is used to lookup a generic function with specific types.
  * The specific type names are used as the key.
  */
-typedef struct gfitem_S gfitem_T;
-struct gfitem_S
+قسمتعریف ساخت gfitem_S gfitem_T;
+ساخت gfitem_S
 {
     ufunc_T	*gfi_ufunc;
     char_u	gfi_name[1];	// actually longer
 };
-#define GFITEM_KEY_OFF	offsetof(gfitem_T, gfi_name)
-#define HI2GFITEM(hi)	((gfitem_T *)((hi)->hi_key - GFITEM_KEY_OFF))
+#تعریف_کرو GFITEM_کلید_OFF	offsetof(gfitem_T, gfi_name)
+#تعریف_کرو HI2GFITEM(hi)	((gfitem_T *)((hi)->hi_کلید - GFITEM_کلید_OFF))
 
-static type_T *find_generic_type_in_cctx(char_u *gt_name, size_t len, cctx_T *cctx);
+ساکن type_T *ڈھونڈو_generic_type_اندر_cctx(char_u *gt_name, size_t len, cctx_T *cctx);
 
 /*
  * Returns a pointer to the first '<' character in "name" that starts the
@@ -46,26 +46,26 @@ static type_T *find_generic_type_in_cctx(char_u *gt_name, size_t len, cctx_T *cc
  *   "Func()"                 -> returns NULL
  */
     char_u *
-generic_func_find_open_bracket(char_u *name)
+generic_func_ڈھونڈو_open_bracket(char_u *name)
 {
     char_u	*p = name;
 
-    if (name[0] == '<')
+    اگر (name[0] == '<')
     {
 	// Skip the <SNR> or <lambda> at the start of the name
-	if (STRNCMP(name + 1, "SNR>", 4) == 0)
+	اگر (STRNCMP(name + 1, "SNR>", 4) == 0)
 	    p += 5;
-	else if (STRNCMP(name + 1, "lambda>", 7) == 0)
+	ورنہ اگر (STRNCMP(name + 1, "lambda>", 7) == 0)
 	    p += 8;
     }
 
-    while (*p && *p != '(' && *p != '<')
+    جب (*p && *p != '(' && *p != '<')
 	p++;
 
-    if (*p == '<')
-	return p;
+    اگر (*p == '<')
+	واپس p;
 
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -84,86 +84,86 @@ generic_func_find_open_bracket(char_u *name)
  *   Pointer to the matching '>' character if found and syntax is valid,
  *   or NULL if not found, invalid syntax, or on error.
  */
-    static char_u *
-generic_func_find_close_bracket(char_u *start)
+    ساکن char_u *
+generic_func_ڈھونڈو_close_bracket(char_u *آغاز)
 {
-    char_u	*p = start + 1;
-    int		type_count = 0;
+    char_u	*p = آغاز + 1;
+    صحیح		type_گنتی = 0;
 
-    while (*p && *p != '>')
+    جب (*p && *p != '>')
     {
 	char_u	*typename = p;
 
-	if (VIM_ISWHITE(*p))
+	اگر (VIM_ISWHITE(*p))
 	{
-	    char tmpstr[2];
+	    حرف tmpstr[2];
 	    tmpstr[0] = *(p - 1); tmpstr[1] = NUL;
-	    semsg(_(e_no_white_space_allowed_after_str_str), tmpstr, start);
-	    return NULL;
+	    semsg(_(e_no_white_space_allowed_after_str_str), tmpstr, آغاز);
+	    واپس تہی;
 	}
 
 	p = skip_type(p, FALSE);
-	if (p == typename)
+	اگر (p == typename)
 	{
 	    char_u cc = *p;
 	    *p = NUL;
-	    semsg(_(e_missing_type_after_str), start);
+	    semsg(_(e_missing_type_after_str), آغاز);
 	    *p = cc;
-	    return NULL;
+	    واپس تہی;
 	}
-	type_count++;
+	type_گنتی++;
 
-	if (*p == '>' || *p == NUL)
-	    break;
+	اگر (*p == '>' || *p == NUL)
+	    توڑو;
 
-	if (VIM_ISWHITE(*p))
+	اگر (VIM_ISWHITE(*p))
 	{
 	    char_u cc = *p;
 	    *p = NUL;
-	    semsg(_(e_no_white_space_allowed_after_str_str), typename, start);
+	    semsg(_(e_no_white_space_allowed_after_str_str), typename, آغاز);
 	    *p = cc;
-	    return NULL;
+	    واپس تہی;
 	}
 
-	if (*p != ',')
+	اگر (*p != ',')
 	{
-	    semsg(_(e_missing_comma_in_generic_function_str), start);
-	    return NULL;
+	    semsg(_(e_missing_comma_اندر_generic_function_str), آغاز);
+	    واپس تہی;
 	}
 	p++;
 
-	if (*p == NUL)
-	    break;
+	اگر (*p == NUL)
+	    توڑو;
 
-	if (!VIM_ISWHITE(*p))
+	اگر (!VIM_ISWHITE(*p))
 	{
-	    semsg(_(e_white_space_required_after_str_str), ",", start);
-	    return NULL;
+	    semsg(_(e_white_space_required_after_str_str), ",", آغاز);
+	    واپس تہی;
 	}
 	p = skipwhite(p);
     }
 
-    if (*p != '>')
+    اگر (*p != '>')
     {
-	semsg(_(e_missing_closing_angle_bracket_in_generic_function_str), start);
-	return NULL;
+	semsg(_(e_missing_closing_angle_bracket_اندر_generic_function_str), آغاز);
+	واپس تہی;
     }
 
-    if (VIM_ISWHITE(*(p + 1)) && *skipwhite(p + 1) == '(')
+    اگر (VIM_ISWHITE(*(p + 1)) && *skipwhite(p + 1) == '(')
     {
 	// white space not allowed between '>' and '('
-	semsg(_(e_no_white_space_allowed_after_str_str), ">", start);
-	return NULL;
+	semsg(_(e_no_white_space_allowed_after_str_str), ">", آغاز);
+	واپس تہی;
     }
 
 
-    if (type_count == 0)
+    اگر (type_گنتی == 0)
     {
-	semsg(_(e_empty_type_list_for_generic_function_str), start);
-	return NULL;
+	semsg(_(e_خالی_خانے_type_list_for_generic_function_str), آغاز);
+	واپس تہی;
     }
 
-    return p;
+    واپس p;
 }
 
 /*
@@ -177,16 +177,16 @@ generic_func_find_close_bracket(char_u *start)
  * Returns OK on success, or FAIL if the type argument list is invalid or no
  * matching '>' is found. On failure, "*argp" is not modified.
  */
-    int
-skip_generic_func_type_args(char_u **argp)
+    صحیح
+skip_generic_func_type_دلائل(char_u **argp)
 {
-    char_u *p = generic_func_find_close_bracket(*argp);
-    if (p == NULL)
-	return FAIL;
+    char_u *p = generic_func_ڈھونڈو_close_bracket(*argp);
+    اگر (p == تہی)
+	واپس FAIL;
 
     *argp = p + 1;	// skip '>'
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -207,30 +207,30 @@ skip_generic_func_type_args(char_u **argp)
  * The caller is responsible for freeing the returned string.
  */
     char_u *
-append_generic_func_type_args(
+append_generic_func_type_دلائل(
     char_u	*funcname,
     size_t	namelen,
     char_u	**argp)
 {
-    char_u	*p = generic_func_find_close_bracket(*argp);
+    char_u	*p = generic_func_ڈھونڈو_close_bracket(*argp);
     size_t	argslen;
     char_u	*name;
 
-    if (p == NULL)
-	return NULL;
+    اگر (p == تہی)
+	واپس تہی;
 
     // The type arguments can be of any length, do not use IObuff.
     argslen = (size_t)(p - *argp) + 1;
     name = alloc(namelen + argslen + 1);
-    if (name == NULL)
-	return NULL;
+    اگر (name == تہی)
+	واپس تہی;
     mch_memmove(name, funcname, namelen);
     mch_memmove(name + namelen, *argp, argslen);
     name[namelen + argslen] = NUL;
 
     *argp = p + 1;
 
-    return name;
+    واپس name;
 }
 
 /*
@@ -251,13 +251,13 @@ append_generic_func_type_args(
     char_u *
 get_generic_func_name(ufunc_T *fp, char_u **argp)
 {
-    if (!IS_GENERIC_FUNC(fp))
+    اگر (!IS_GENERIC_FUNC(fp))
     {
 	emsg_funcname(e_not_a_generic_function_str, fp->uf_name);
-	return NULL;
+	واپس تہی;
     }
 
-    return append_generic_func_type_args(fp->uf_name, fp->uf_namelen, argp);
+    واپس append_generic_func_type_دلائل(fp->uf_name, fp->uf_namelen, argp);
 }
 
 /*
@@ -281,59 +281,59 @@ get_generic_func_name(ufunc_T *fp, char_u **argp)
  * including whitespace rules, comma separation, and non-empty argument lists.
  */
     char_u *
-parse_generic_func_type_args(
+parse_generic_func_type_دلائل(
     char_u		*func_name,
     size_t		namelen,
-    char_u		*start,
+    char_u		*آغاز,
     gfargs_tab_T	*gfatab,
     cctx_T		*cctx)
 {
     generic_T	*generic_arg;
     type_T	*type_arg;
-    char_u	*p = start;
+    char_u	*p = آغاز;
 
     // White spaces not allowed after '<'
-    if (VIM_ISWHITE(*(p + 1)))
+    اگر (VIM_ISWHITE(*(p + 1)))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str), "<", p);
-	return NULL;
+	واپس تہی;
     }
 
     ++p;	// skip the '<'
 
     // parse each type argument until '>' or end of string
-    while (*p && *p != '>')
+    جب (*p && *p != '>')
     {
 	p = skipwhite(p);
 
-	if (!ASCII_ISALNUM(*p))
+	اگر (!ASCII_ISALNUM(*p))
 	{
-	    semsg(_(e_missing_type_after_str), start);
-	    return NULL;
+	    semsg(_(e_missing_type_after_str), آغاز);
+	    واپس تہی;
 	}
 
 	// parse the type
-	type_arg = parse_type(&p, &gfatab->gfat_arg_types, NULL, cctx, TRUE);
-	if (type_arg == NULL || !valid_declaration_type(type_arg))
-	    return NULL;
+	type_arg = parse_type(&p, &gfatab->gfat_arg_types, تہی, cctx, TRUE);
+	اگر (type_arg == تہی || !valid_declaration_type(type_arg))
+	    واپس تہی;
 
-	char	*ret_free = NULL;
-	char	*ret_name = type_name(type_arg, &ret_free);
+	حرف	*ret_free = تہی;
+	حرف	*ret_name = type_name(type_arg, &ret_free);
 
 	// create space for the name and the new type
-	if (ga_grow(&gfatab->gfat_args, 1) == FAIL)
+	اگر (ga_grow(&gfatab->gfat_دلائل, 1) == FAIL)
 	{
 	    vim_free(ret_free);
-	    return NULL;
+	    واپس تہی;
 	}
-	generic_arg = (generic_T *)gfatab->gfat_args.ga_data +
-						gfatab->gfat_args.ga_len;
-	gfatab->gfat_args.ga_len++;
+	generic_arg = (generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا +
+						gfatab->gfat_دلائل.ga_len;
+	gfatab->gfat_دلائل.ga_len++;
 
 	// copy the type name
 	generic_arg->gt_name = alloc(STRLEN(ret_name) + 1);
-	if (generic_arg->gt_name == NULL)
-	    return NULL;
+	اگر (generic_arg->gt_name == تہی)
+	    واپس تہی;
 	STRCPY(generic_arg->gt_name, ret_name);
 	vim_free(ret_free);
 
@@ -342,55 +342,55 @@ parse_generic_func_type_args(
 
 	p = skipwhite(p);
 
-	if (*p == NUL || *p == '>')
-	    break;
+	اگر (*p == NUL || *p == '>')
+	    توڑو;
 
 	// after a type, expect ',' or '>'
-	if (*p != ',')
+	اگر (*p != ',')
 	{
-	    semsg(_(e_missing_comma_in_generic_function_str), start);
-	    return NULL;
+	    semsg(_(e_missing_comma_اندر_generic_function_str), آغاز);
+	    واپس تہی;
 	}
 
-	if (*(p + 1) == NUL)
-	    break;
+	اگر (*(p + 1) == NUL)
+	    توڑو;
 
 	// Require whitespace after a comma and skip it
-	if (!VIM_ISWHITE(*(p + 1)))
+	اگر (!VIM_ISWHITE(*(p + 1)))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ",", p);
-	    return NULL;
+	    واپس تہی;
 	}
 	p++;
     }
 
     // ensure the list of types ends in a closing '>'
-    if (*p != '>')
+    اگر (*p != '>')
     {
-	semsg(_(e_missing_closing_angle_bracket_in_generic_function_str),
+	semsg(_(e_missing_closing_angle_bracket_اندر_generic_function_str),
 		func_name);
-	return NULL;
+	واپس تہی;
     }
 
     // no whitespace allowed before '>'
-    if (VIM_ISWHITE(*(p - 1)))
+    اگر (VIM_ISWHITE(*(p - 1)))
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), ">", p);
-	return NULL;
+	واپس تہی;
     }
 
     // at least one type argument is required
-    if (generic_func_args_table_size(gfatab) == 0)
+    اگر (generic_func_دلائل_جدول_سائز(gfatab) == 0)
     {
 	char_u	cc = func_name[namelen];
 	func_name[namelen] = NUL;
-	semsg(_(e_empty_type_list_for_generic_function_str), func_name);
+	semsg(_(e_خالی_خانے_type_list_for_generic_function_str), func_name);
 	func_name[namelen] = cc;
-	return NULL;
+	واپس تہی;
     }
     ++p;	// skip the '>'
 
-    return p;
+    واپس p;
 }
 
 /*
@@ -412,7 +412,7 @@ parse_generic_func_type_args(
  * Returns:
  *   TRUE if the name already exists or conflicts, FALSE otherwise.
  */
-    static int
+    ساکن صحیح
 generic_name_exists(
     char_u		*gt_name,
     size_t		name_len,
@@ -423,33 +423,33 @@ generic_name_exists(
 
     tv.v_type = VAR_UNKNOWN;
 
-    if (eval_variable_import(gt_name, &tv) == OK)
+    اگر (eval_variable_import(gt_name, &tv) == OK)
     {
-	semsg(_(e_redefining_script_item_str), gt_name);
+	semsg(_(e_redefining_script_شے_str), gt_name);
 	clear_tv(&tv);
-	return TRUE;
+	واپس TRUE;
     }
 
-    for (int i = 0; i < gfatab->gfat_args.ga_len; i++)
+    برائے (صحیح i = 0; i < gfatab->gfat_دلائل.ga_len; i++)
     {
-	generic_T *generic = &((generic_T *)gfatab->gfat_args.ga_data)[i];
+	generic_T *generic = &((generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا)[i];
 
-	if (STRNCMP(gt_name, generic->gt_name, name_len) == 0
+	اگر (STRNCMP(gt_name, generic->gt_name, name_len) == 0
 				&& generic->gt_name[name_len] == NUL)
 	{
 	    semsg(_(e_duplicate_type_var_name_str), gt_name);
-	    return TRUE;
+	    واپس TRUE;
 	}
     }
 
-    if (cctx != NULL &&
-	    find_generic_type_in_cctx(gt_name, name_len, cctx) != NULL)
+    اگر (cctx != تہی &&
+	    ڈھونڈو_generic_type_اندر_cctx(gt_name, name_len, cctx) != تہی)
     {
 	semsg(_(e_duplicate_type_var_name_str), gt_name);
-	return TRUE;
+	واپس TRUE;
     }
 
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
@@ -482,141 +482,141 @@ parse_generic_func_type_params(
     cctx_T		*cctx)
 {
     // No white space allowed before the '<'
-    if (VIM_ISWHITE(*(p - 1)))
+    اگر (VIM_ISWHITE(*(p - 1)))
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), "<", p);
-	return NULL;
+	واپس تہی;
     }
 
-    if (VIM_ISWHITE(*(p + 1)))
+    اگر (VIM_ISWHITE(*(p + 1)))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str), "<", p);
-	return NULL;
+	واپس تہی;
     }
 
     // Find the start of the function name before the '<'.  It is always
     // preceded by "def" and white space, or "g:".
-    char_u	    *fname_start = p;
-    while (ASCII_ISALNUM(fname_start[-1]) || fname_start[-1] == '_')
-	--fname_start;
-    size_t	    fname_len = p - fname_start;
+    char_u	    *fname_آغاز = p;
+    جب (ASCII_ISALNUM(fname_آغاز[-1]) || fname_آغاز[-1] == '_')
+	--fname_آغاز;
+    size_t	    fname_len = p - fname_آغاز;
 
-    char_u	    *start = ++p;
+    char_u	    *آغاز = ++p;
 
-    while (*p && *p != '>')
+    جب (*p && *p != '>')
     {
 	p = skipwhite(p);
 
-	if (*p == NUL || *p == '>')
+	اگر (*p == NUL || *p == '>')
 	{
 	    semsg(_(e_missing_type_after_str), p - 1);
-	    return NULL;
+	    واپس تہی;
 	}
 
-	if (!ASCII_ISUPPER(*p))
+	اگر (!ASCII_ISUPPER(*p))
 	{
-	    if (ASCII_ISLOWER(*p))
-		semsg(_(e_type_var_name_must_start_with_uppercase_letter_str), p);
-	    else
+	    اگر (ASCII_ISLOWER(*p))
+		semsg(_(e_type_var_name_must_آغاز_with_uppercase_letter_str), p);
+	    ورنہ
 		semsg(_(e_missing_type_after_str), p - 1);
-	    return NULL;
+	    واپس تہی;
 	}
 
-	char_u	*name_start = p;
-	char_u	*name_end = NULL;
+	char_u	*name_آغاز = p;
+	char_u	*name_انتہا = تہی;
 	char_u	cc;
 	size_t	name_len = 0;
 
 	p++;
-	while (ASCII_ISALNUM(*p) || *p == '_')
+	جب (ASCII_ISALNUM(*p) || *p == '_')
 	    p++;
-	name_end = p;
+	name_انتہا = p;
 
-	name_len = name_end - name_start;
-	cc = *name_end;
-	*name_end = NUL;
+	name_len = name_انتہا - name_آغاز;
+	cc = *name_انتہا;
+	*name_انتہا = NUL;
 
 	// The type variable cannot have the name of the function being
 	// defined.  Use the name as it appears before the '<', a nested
 	// function internally has a "<lambda>N" name.
-	if (fname_len == name_len
-			&& STRNCMP(fname_start, name_start, name_len) == 0)
+	اگر (fname_len == name_len
+			&& STRNCMP(fname_آغاز, name_آغاز, name_len) == 0)
 	{
-	    semsg(_(e_redefining_script_item_str), name_start);
-	    *name_end = cc;
-	    return NULL;
+	    semsg(_(e_redefining_script_شے_str), name_آغاز);
+	    *name_انتہا = cc;
+	    واپس تہی;
 	}
 
-	int name_exists = generic_name_exists(name_start, name_len, gfatab,
+	صحیح name_exists = generic_name_exists(name_آغاز, name_len, gfatab,
 									cctx);
-	*name_end = cc;
-	if (name_exists)
-	    return NULL;
+	*name_انتہا = cc;
+	اگر (name_exists)
+	    واپس تہی;
 
-	if (ga_grow(&gfatab->gfat_args, 1) == FAIL)
-	    return NULL;
+	اگر (ga_grow(&gfatab->gfat_دلائل, 1) == FAIL)
+	    واپس تہی;
 	generic_T *generic =
-	    &((generic_T *)gfatab->gfat_args.ga_data)[gfatab->gfat_args.ga_len];
-	gfatab->gfat_args.ga_len++;
+	    &((generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا)[gfatab->gfat_دلائل.ga_len];
+	gfatab->gfat_دلائل.ga_len++;
 
 	generic->gt_name = alloc(name_len + 1);
-	if (generic->gt_name == NULL)
-	    return NULL;
-	vim_strncpy(generic->gt_name, name_start, name_len);
-	generic->gt_type = NULL;
+	اگر (generic->gt_name == تہی)
+	    واپس تہی;
+	vim_strncpy(generic->gt_name, name_آغاز, name_len);
+	generic->gt_type = تہی;
 
-	if (VIM_ISWHITE(*p))
+	اگر (VIM_ISWHITE(*p))
 	{
 	    semsg(_(e_no_white_space_allowed_after_str_str), generic->gt_name,
-		    name_start);
-	    return NULL;
+		    name_آغاز);
+	    واپس تہی;
 	}
 
-	if (*p != ',' && *p != '>')
+	اگر (*p != ',' && *p != '>')
 	{
-	    semsg(_(e_missing_comma_in_generic_function_str), start);
-	    return NULL;
+	    semsg(_(e_missing_comma_اندر_generic_function_str), آغاز);
+	    واپس تہی;
 	}
-	if (*p == ',')
+	اگر (*p == ',')
 	{
-	    if (!VIM_ISWHITE(*(p + 1)))
+	    اگر (!VIM_ISWHITE(*(p + 1)))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", p);
-		return NULL;
+		واپس تہی;
 	    }
 	    p++;
 	}
     }
-    if (*p != '>')
-	return NULL;
+    اگر (*p != '>')
+	واپس تہی;
     p++;
 
-    int gfat_sz = generic_func_args_table_size(gfatab);
+    صحیح gfat_sz = generic_func_دلائل_جدول_سائز(gfatab);
 
-    if (gfat_sz == 0)
+    اگر (gfat_sz == 0)
     {
-	emsg_funcname(e_empty_type_list_for_generic_function_str, func_name);
-	return NULL;
+	emsg_funcname(e_خالی_خانے_type_list_for_generic_function_str, func_name);
+	واپس تہی;
     }
 
     // set the generic params to VAR_ANY type
-    if (ga_grow(&gfatab->gfat_param_types, gfat_sz) == FAIL)
-	return NULL;
+    اگر (ga_grow(&gfatab->gfat_param_types, gfat_sz) == FAIL)
+	واپس تہی;
 
     gfatab->gfat_param_types.ga_len = gfat_sz;
-    for (int i = 0; i < generic_func_args_table_size(gfatab); i++)
+    برائے (صحیح i = 0; i < generic_func_دلائل_جدول_سائز(gfatab); i++)
     {
-	type_T *gt = &((type_T *)gfatab->gfat_param_types.ga_data)[i];
+	type_T *gt = &((type_T *)gfatab->gfat_param_types.ga_ڈیٹا)[i];
 
-	CLEAR_POINTER(gt);
+	CLEAR_اشارہ_گر(gt);
 	gt->tt_type = VAR_ANY;
 	gt->tt_flags = TTFLAG_GENERIC;
 
-	generic_T *generic = &((generic_T *)gfatab->gfat_args.ga_data)[i];
+	generic_T *generic = &((generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا)[i];
 	generic->gt_type = gt;
     }
 
-    return p;
+    واپس p;
 }
 
 /*
@@ -629,14 +629,14 @@ parse_generic_func_type_params(
  *   - Transfers ownership of the arrays from the growarrays to the function.
  *   - Initializes the generic function's lookup table.
  */
-    void
+    خالی
 generic_func_init(ufunc_T *fp, gfargs_tab_T *gfatab)
 {
     fp->uf_flags |= FC_GENERIC;
-    fp->uf_generic_argcount = gfatab->gfat_args.ga_len;
-    fp->uf_generic_args = (generic_T *)gfatab->gfat_args.ga_data;
-    ga_init(&gfatab->gfat_args);	// remove the reference to the args
-    fp->uf_generic_param_types = (type_T *)gfatab->gfat_param_types.ga_data;
+    fp->uf_generic_argcount = gfatab->gfat_دلائل.ga_len;
+    fp->uf_generic_دلائل = (generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا;
+    ga_init(&gfatab->gfat_دلائل);	// remove the reference to the args
+    fp->uf_generic_param_types = (type_T *)gfatab->gfat_param_types.ga_ڈیٹا;
     ga_init(&gfatab->gfat_param_types);	// remove the reference to the types
     ga_init(&fp->uf_generic_arg_types);
     hash_init(&fp->uf_generic_functab);
@@ -645,74 +645,74 @@ generic_func_init(ufunc_T *fp, gfargs_tab_T *gfatab)
 /*
  * Initialize the generic function args table
  */
-    void
-generic_func_args_table_init(gfargs_tab_T *gfatab)
+    خالی
+generic_func_دلائل_جدول_init(gfargs_tab_T *gfatab)
 {
-    ga_init2(&gfatab->gfat_args, sizeof(generic_T), 10);
-    ga_init2(&gfatab->gfat_param_types, sizeof(type_T), 10);
-    ga_init2(&gfatab->gfat_arg_types, sizeof(type_T), 10);
+    ga_init2(&gfatab->gfat_دلائل, حجم(generic_T), 10);
+    ga_init2(&gfatab->gfat_param_types, حجم(type_T), 10);
+    ga_init2(&gfatab->gfat_arg_types, حجم(type_T), 10);
 }
 
 /*
  * Return the number of entries in the generic function args table
  */
-    int
-generic_func_args_table_size(gfargs_tab_T *gfatab)
+    صحیح
+generic_func_دلائل_جدول_سائز(gfargs_tab_T *gfatab)
 {
-    return gfatab->gfat_args.ga_len;
+    واپس gfatab->gfat_دلائل.ga_len;
 }
 
 /*
  * Free all the generic function args table items
  */
-    void
-generic_func_args_table_clear(gfargs_tab_T *gfatab)
+    خالی
+generic_func_دلائل_جدول_clear(gfargs_tab_T *gfatab)
 {
     clear_type_list(&gfatab->gfat_param_types);
     clear_type_list(&gfatab->gfat_arg_types);
-    for (int i = 0; i < gfatab->gfat_args.ga_len; i++)
+    برائے (صحیح i = 0; i < gfatab->gfat_دلائل.ga_len; i++)
     {
-	generic_T *generic = &((generic_T *)gfatab->gfat_args.ga_data)[i];
+	generic_T *generic = &((generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا)[i];
 	VIM_CLEAR(generic->gt_name);
     }
-    ga_clear(&gfatab->gfat_args);
+    ga_clear(&gfatab->gfat_دلائل);
 }
 
 /*
  * When a cloning a function "fp" to "new_fp", copy the generic function
  * related information.
  */
-    void
+    خالی
 copy_generic_function(ufunc_T *fp, ufunc_T *new_fp)
 {
-    int		i;
-    int		sz;
+    صحیح		i;
+    صحیح		sz;
 
-    if (!IS_GENERIC_FUNC(fp))
-	return;
+    اگر (!IS_GENERIC_FUNC(fp))
+	واپس;
 
-    sz = fp->uf_generic_argcount * sizeof(type_T);
+    sz = fp->uf_generic_argcount * حجم(type_T);
     new_fp->uf_generic_param_types = alloc_clear(sz);
-    if (new_fp->uf_generic_param_types == NULL)
-	return;
+    اگر (new_fp->uf_generic_param_types == تہی)
+	واپس;
 
-    memcpy(new_fp->uf_generic_param_types, fp->uf_generic_param_types, sz);
+    حافظہ_نقل(new_fp->uf_generic_param_types, fp->uf_generic_param_types, sz);
 
-    sz = fp->uf_generic_argcount * sizeof(generic_T);
-    new_fp->uf_generic_args = alloc_clear(sz);
-    if (new_fp->uf_generic_args == NULL)
+    sz = fp->uf_generic_argcount * حجم(generic_T);
+    new_fp->uf_generic_دلائل = alloc_clear(sz);
+    اگر (new_fp->uf_generic_دلائل == تہی)
     {
 	VIM_CLEAR(new_fp->uf_generic_param_types);
-	return;
+	واپس;
     }
-    memcpy(new_fp->uf_generic_args, fp->uf_generic_args, sz);
+    حافظہ_نقل(new_fp->uf_generic_دلائل, fp->uf_generic_دلائل, sz);
 
-    for (i = 0; i < fp->uf_generic_argcount; i++)
-	new_fp->uf_generic_args[i].gt_name =
-	    vim_strsave(fp->uf_generic_args[i].gt_name);
+    برائے (i = 0; i < fp->uf_generic_argcount; i++)
+	new_fp->uf_generic_دلائل[i].gt_name =
+	    vim_strsave(fp->uf_generic_دلائل[i].gt_name);
 
-    for (i = 0; i < fp->uf_generic_argcount; i++)
-	new_fp->uf_generic_args[i].gt_type =
+    برائے (i = 0; i < fp->uf_generic_argcount; i++)
+	new_fp->uf_generic_دلائل[i].gt_type =
 	    &new_fp->uf_generic_param_types[i];
 
     ga_init(&new_fp->uf_generic_arg_types);
@@ -732,15 +732,15 @@ copy_generic_function(ufunc_T *fp, ufunc_T *new_fp)
  *   The zero-based index of "t" in fp->uf_generic_param_types if found,
  *   or -1 if not found.
  */
-    static int
-get_generic_type_index(ufunc_T *fp, type_T *t)
+    ساکن صحیح
+get_generic_type_اشاریہ(ufunc_T *fp, type_T *t)
 {
-    for (int i = 0; i < fp->uf_generic_argcount; i++)
+    برائے (صحیح i = 0; i < fp->uf_generic_argcount; i++)
     {
-	if (&fp->uf_generic_param_types[i] == t)
-	    return i;
+	اگر (&fp->uf_generic_param_types[i] == t)
+	    واپس i;
     }
-    return -1;
+    واپس -1;
 }
 
 /*
@@ -774,23 +774,23 @@ eval_generic_func(
     char_u	*name,
     char_u	**argp)
 {
-    if (IS_GENERIC_FUNC(ufunc))
+    اگر (IS_GENERIC_FUNC(ufunc))
     {
-	if (**argp == '<')
-	    ufunc = find_generic_func(ufunc, name, argp);
-	else
+	اگر (**argp == '<')
+	    ufunc = ڈھونڈو_generic_func(ufunc, name, argp);
+	ورنہ
 	{
-	    emsg_funcname(e_generic_func_missing_type_args_str, name);
-	    return NULL;
+	    emsg_funcname(e_generic_func_missing_type_دلائل_str, name);
+	    واپس تہی;
 	}
     }
-    else if (**argp == '<')
+    ورنہ اگر (**argp == '<')
     {
 	emsg_funcname(e_not_a_generic_function_str, name);
-	return NULL;
+	واپس تہی;
     }
 
-    return ufunc;
+    واپس ufunc;
 }
 
 /*
@@ -805,22 +805,22 @@ eval_generic_func(
  * Example:
  *   "<number, string>("
  */
-    int
+    صحیح
 generic_func_call(char_u **argp)
 {
     char_u	*p = *argp;
 
-    if (*p != '<')
-	return FALSE;
+    اگر (*p != '<')
+	واپس FALSE;
 
-    if (skip_generic_func_type_args(&p) == FAIL)
-	return FALSE;
+    اگر (skip_generic_func_type_دلائل(&p) == FAIL)
+	واپس FALSE;
 
-    if (*p != '(')
-	return FALSE;
+    اگر (*p != '(')
+	واپس FALSE;
 
     *argp = p;
-    return TRUE;
+    واپس TRUE;
 }
 
 /*
@@ -841,7 +841,7 @@ generic_func_call(char_u **argp)
  *		     set
  *   func_type     - pointer to the function type to update (may be NULL)
  */
-    static void
+    ساکن خالی
 update_generic_type(
     ufunc_T	*ufunc,
     ufunc_T	*new_ufunc,
@@ -849,45 +849,45 @@ update_generic_type(
     type_T	**specific_type,
     type_T	**func_type)
 {
-    int	idx;
+    صحیح	idx;
 
-    switch (generic_type->tt_type)
+    انتخاب (generic_type->tt_type)
     {
-	case VAR_ANY:
-	    idx = get_generic_type_index(ufunc, generic_type);
-	    if (idx != -1)
+	حالت VAR_ANY:
+	    idx = get_generic_type_اشاریہ(ufunc, generic_type);
+	    اگر (idx != -1)
 	    {
-		*specific_type = new_ufunc->uf_generic_args[idx].gt_type;
-		if (func_type != NULL)
-		    *func_type = new_ufunc->uf_generic_args[idx].gt_type;
+		*specific_type = new_ufunc->uf_generic_دلائل[idx].gt_type;
+		اگر (func_type != تہی)
+		    *func_type = new_ufunc->uf_generic_دلائل[idx].gt_type;
 	    }
-	    break;
-	case VAR_LIST:
-	case VAR_DICT:
+	    توڑو;
+	حالت VAR_LIST:
+	حالت VAR_DICT:
 	    update_generic_type(ufunc, new_ufunc, generic_type->tt_member,
 		    &(*specific_type)->tt_member,
-		    func_type != NULL ? &(*func_type)->tt_member : NULL);
-	    break;
-	case VAR_TUPLE:
-	    for (int i = 0; i < generic_type->tt_argcount; i++)
+		    func_type != تہی ? &(*func_type)->tt_member : تہی);
+	    توڑو;
+	حالت VAR_TUPLE:
+	    برائے (صحیح i = 0; i < generic_type->tt_argcount; i++)
 		update_generic_type(ufunc, new_ufunc,
-			generic_type->tt_args[i],
-			&(*specific_type)->tt_args[i],
-			func_type != NULL ? &(*func_type)->tt_args[i] : NULL);
-	    break;
-	case VAR_FUNC:
-	    for (int i = 0; i < generic_type->tt_argcount; i++)
+			generic_type->tt_دلائل[i],
+			&(*specific_type)->tt_دلائل[i],
+			func_type != تہی ? &(*func_type)->tt_دلائل[i] : تہی);
+	    توڑو;
+	حالت VAR_FUNC:
+	    برائے (صحیح i = 0; i < generic_type->tt_argcount; i++)
 		update_generic_type(ufunc, new_ufunc,
-			generic_type->tt_args[i],
-			&(*specific_type)->tt_args[i],
-			func_type != NULL ? &(*func_type)->tt_args[i] : NULL);
+			generic_type->tt_دلائل[i],
+			&(*specific_type)->tt_دلائل[i],
+			func_type != تہی ? &(*func_type)->tt_دلائل[i] : تہی);
 	    update_generic_type(ufunc, new_ufunc,
 		    generic_type->tt_member,
 		    &(*specific_type)->tt_member,
-		    func_type != NULL ? &(*func_type)->tt_member : NULL);
-	    break;
-	default:
-	    break;
+		    func_type != تہی ? &(*func_type)->tt_member : تہی);
+	    توڑو;
+	طےشدہ:
+	    توڑو;
     }
 }
 
@@ -897,10 +897,10 @@ update_generic_type(
  * The type variables of "fp" in these types are replaced with the types of
  * the type variables of "new_fp", see update_generic_type().
  */
-    void
+    خالی
 generic_func_copy_types(ufunc_T *fp, ufunc_T *new_fp)
 {
-    int		i;
+    صحیح		i;
 
     // create a copy of
     // - all the argument types
@@ -908,50 +908,50 @@ generic_func_copy_types(ufunc_T *fp, ufunc_T *new_fp)
     // - vararg type
     // - function type
     // if any generic type is used, it will be replaced below).
-    if (fp->uf_arg_types != NULL)
-	for (i = 0; i < fp->uf_args.ga_len; i++)
+    اگر (fp->uf_arg_types != تہی)
+	برائے (i = 0; i < fp->uf_دلائل.ga_len; i++)
 	    new_fp->uf_arg_types[i] = copy_type_deep(fp->uf_arg_types[i],
 						&new_fp->uf_type_list);
 
-    if (fp->uf_ret_type != NULL)
+    اگر (fp->uf_ret_type != تہی)
 	new_fp->uf_ret_type = copy_type_deep(fp->uf_ret_type,
 						&new_fp->uf_type_list);
 
-    if (fp->uf_va_type != NULL)
+    اگر (fp->uf_va_type != تہی)
 	new_fp->uf_va_type = copy_type_deep(fp->uf_va_type,
 						&new_fp->uf_type_list);
 
-    if (fp->uf_func_type != NULL)
+    اگر (fp->uf_func_type != تہی)
 	new_fp->uf_func_type = copy_type_deep(fp->uf_func_type,
 						&new_fp->uf_type_list);
 
     type_T	*ft = new_fp->uf_func_type;
 
     // Update any generic types in the function arguments
-    if (fp->uf_arg_types != NULL)
-	for (i = 0; i < fp->uf_args.ga_len; i++)
+    اگر (fp->uf_arg_types != تہی)
+	برائے (i = 0; i < fp->uf_دلائل.ga_len; i++)
 	    update_generic_type(fp, new_fp, fp->uf_arg_types[i],
 			    &new_fp->uf_arg_types[i],
-			    ft != NULL && ft->tt_args != NULL
+			    ft != تہی && ft->tt_دلائل != تہی
 					&& ft->tt_argcount > i
-						    ? &ft->tt_args[i] : NULL);
+						    ? &ft->tt_دلائل[i] : تہی);
 
     // Update the vararg type if it uses generic types.  It is the last
     // argument of the function type.
-    if (fp->uf_va_type != NULL)
+    اگر (fp->uf_va_type != تہی)
     {
-	int	va_idx = fp->uf_args.ga_len;
+	صحیح	va_idx = fp->uf_دلائل.ga_len;
 
 	update_generic_type(fp, new_fp, fp->uf_va_type, &new_fp->uf_va_type,
-			    ft != NULL && ft->tt_args != NULL
+			    ft != تہی && ft->tt_دلائل != تہی
 					&& ft->tt_argcount > va_idx
-						? &ft->tt_args[va_idx] : NULL);
+						? &ft->tt_دلائل[va_idx] : تہی);
     }
 
     // Update the return type if it is a generic type
-    if (fp->uf_ret_type != NULL)
+    اگر (fp->uf_ret_type != تہی)
 	update_generic_type(fp, new_fp, fp->uf_ret_type, &new_fp->uf_ret_type,
-			    ft != NULL ? &ft->tt_member : NULL);
+			    ft != تہی ? &ft->tt_member : تہی);
 }
 
 /*
@@ -981,31 +981,31 @@ generic_func_copy_types(ufunc_T *fp, ufunc_T *new_fp)
  *   - Sets the new function's status to UF_TO_BE_COMPILED.
  *   - Registers the new function in the generic function's lookup table.
  */
-    static ufunc_T *
-generic_func_add(ufunc_T *fp, char_u *key, gfargs_tab_T *gfatab)
+    ساکن ufunc_T *
+generic_func_جوڑو(ufunc_T *fp, char_u *کلید, gfargs_tab_T *gfatab)
 {
     hashtab_T	*ht = &fp->uf_generic_functab;
     long_u	hash;
     hashitem_T	*hi;
-    int		i;
+    صحیح		i;
 
-    hash = hash_hash(key);
-    hi = hash_lookup(ht, key, hash);
-    if (!HASHITEM_EMPTY(hi))
-	return NULL;
+    hash = hash_hash(کلید);
+    hi = hash_lookup(ht, کلید, hash);
+    اگر (!HASHITEM_خالی_خانے(hi))
+	واپس تہی;
 
-    size_t	keylen = STRLEN(key);
-    gfitem_T    *gfitem = alloc(sizeof(gfitem_T) + keylen);
-    if (gfitem == NULL)
-	return NULL;
+    size_t	keylen = STRLEN(کلید);
+    gfitem_T    *gfitem = alloc(حجم(gfitem_T) + keylen);
+    اگر (gfitem == تہی)
+	واپس تہی;
 
-    STRCPY(gfitem->gfi_name, key);
+    STRCPY(gfitem->gfi_name, کلید);
 
-    ufunc_T *new_fp = copy_function(fp, (int)(keylen + 2));
-    if (new_fp == NULL)
+    ufunc_T *new_fp = copy_function(fp, (صحیح)(keylen + 2));
+    اگر (new_fp == تہی)
     {
 	vim_free(gfitem);
-	return NULL;
+	واپس تہی;
     }
 
     new_fp->uf_generic_arg_types = gfatab->gfat_arg_types;
@@ -1013,23 +1013,23 @@ generic_func_add(ufunc_T *fp, char_u *key, gfargs_tab_T *gfatab)
     // arguments
     ga_init(&gfatab->gfat_arg_types);
 
-    if (fp->uf_class != NULL)
+    اگر (fp->uf_class != تہی)
 	new_fp->uf_class = fp->uf_class;
 
     // Create a new name for the function: name<type1, type2...>
     new_fp->uf_name[new_fp->uf_namelen] =  '<';
-    STRCPY(new_fp->uf_name + new_fp->uf_namelen + 1, key);
+    STRCPY(new_fp->uf_name + new_fp->uf_namelen + 1, کلید);
     new_fp->uf_name[new_fp->uf_namelen + keylen + 1] =  '>';
     new_fp->uf_namelen += keylen + 2;
 
-    if (new_fp->uf_name_exp != NULL)
+    اگر (new_fp->uf_name_exp != تہی)
     {
 	char_u	*new_name_exp = alloc(STRLEN(new_fp->uf_name_exp) + keylen + 3);
-	if (new_name_exp != NULL)
+	اگر (new_name_exp != تہی)
 	{
 	    STRCPY(new_name_exp, new_fp->uf_name_exp);
 	    STRCAT(new_name_exp, "<");
-	    STRCAT(new_name_exp, key);
+	    STRCAT(new_name_exp, کلید);
 	    STRCAT(new_name_exp, ">");
 	    vim_free(new_fp->uf_name_exp);
 	    new_fp->uf_name_exp = new_name_exp;
@@ -1037,22 +1037,22 @@ generic_func_add(ufunc_T *fp, char_u *key, gfargs_tab_T *gfatab)
     }
 
     gfitem->gfi_ufunc = new_fp;
-    gfitem->gfi_ufunc->uf_def_status = UF_TO_BE_COMPILED;
+    gfitem->gfi_ufunc->uf_def_حالت = UF_مقصد_BE_COMPILED;
 
     // Replace the t_any generic types with the actual types
-    for (i = 0; i < fp->uf_generic_argcount; i++)
+    برائے (i = 0; i < fp->uf_generic_argcount; i++)
     {
 	generic_T  *generic_arg;
-	generic_arg = (generic_T *)gfatab->gfat_args.ga_data + i;
-	generic_T *gt = &new_fp->uf_generic_args[i];
+	generic_arg = (generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا + i;
+	generic_T *gt = &new_fp->uf_generic_دلائل[i];
 	gt->gt_type = generic_arg->gt_type;
     }
 
     generic_func_copy_types(fp, new_fp);
 
-    hash_add_item(ht, hi, gfitem->gfi_name, hash);
+    hash_جوڑو_شے(ht, hi, gfitem->gfi_name, hash);
 
-    return new_fp;
+    واپس new_fp;
 }
 
 /*
@@ -1073,20 +1073,20 @@ generic_func_add(ufunc_T *fp, char_u *key, gfargs_tab_T *gfatab)
  *   Pointer to the ufunc_T representing the concrete function if found, or
  *   NULL if no matching function exists.
  */
-    static ufunc_T *
+    ساکن ufunc_T *
 generic_lookup_func(ufunc_T *fp, gfargs_tab_T *gfatab, garray_T *gfkey_gap)
 {
     hashtab_T	*ht = &fp->uf_generic_functab;
     hashitem_T	*hi;
 
-    for (int i = 0; i < gfatab->gfat_args.ga_len; i++)
+    برائے (صحیح i = 0; i < gfatab->gfat_دلائل.ga_len; i++)
     {
 	generic_T  *generic_arg;
 
-	generic_arg = (generic_T *)gfatab->gfat_args.ga_data + i;
+	generic_arg = (generic_T *)gfatab->gfat_دلائل.ga_ڈیٹا + i;
 	ga_concat(gfkey_gap, generic_arg->gt_name);
 
-	if (i != gfatab->gfat_args.ga_len - 1)
+	اگر (i != gfatab->gfat_دلائل.ga_len - 1)
 	{
 	    ga_append(gfkey_gap, ',');
 	    ga_append(gfkey_gap, ' ');
@@ -1094,15 +1094,15 @@ generic_lookup_func(ufunc_T *fp, gfargs_tab_T *gfatab, garray_T *gfkey_gap)
     }
     ga_append(gfkey_gap, NUL);
 
-    char_u	*key = ((char_u *)gfkey_gap->ga_data);
+    char_u	*کلید = ((char_u *)gfkey_gap->ga_ڈیٹا);
 
-    hi = hash_find(ht, key);
+    hi = hash_ڈھونڈو(ht, کلید);
 
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
+    اگر (HASHITEM_خالی_خانے(hi))
+	واپس تہی;
 
     gfitem_T	*gfitem = HI2GFITEM(hi);
-    return gfitem->gfi_ufunc;
+    واپس gfitem->gfi_ufunc;
 }
 
 /*
@@ -1132,29 +1132,29 @@ generic_lookup_func(ufunc_T *fp, gfargs_tab_T *gfatab, garray_T *gfkey_gap)
     ufunc_T *
 generic_func_get(ufunc_T *fp, gfargs_tab_T *gfatab)
 {
-    char	*emsg = NULL;
+    حرف	*emsg = تہی;
 
-    if (!IS_GENERIC_FUNC(fp))
+    اگر (!IS_GENERIC_FUNC(fp))
     {
-	if (gfatab && generic_func_args_table_size(gfatab) > 0)
+	اگر (gfatab && generic_func_دلائل_جدول_سائز(gfatab) > 0)
 	{
 	    emsg_funcname(e_not_a_generic_function_str, fp->uf_name);
-	    return NULL;
+	    واپس تہی;
 	}
-	return fp;
+	واپس fp;
     }
 
-    if (gfatab == NULL || gfatab->gfat_args.ga_len == 0)
-	emsg = e_generic_func_missing_type_args_str;
-    else if (gfatab->gfat_args.ga_len < fp->uf_generic_argcount)
+    اگر (gfatab == تہی || gfatab->gfat_دلائل.ga_len == 0)
+	emsg = e_generic_func_missing_type_دلائل_str;
+    ورنہ اگر (gfatab->gfat_دلائل.ga_len < fp->uf_generic_argcount)
 	emsg = e_not_enough_types_for_generic_function_str;
-    else if (gfatab->gfat_args.ga_len > fp->uf_generic_argcount)
+    ورنہ اگر (gfatab->gfat_دلائل.ga_len > fp->uf_generic_argcount)
 	emsg = e_too_many_types_for_generic_function_str;
 
-    if (emsg != NULL)
+    اگر (emsg != تہی)
     {
 	emsg_funcname(emsg, printable_func_name(fp));
-	return NULL;
+	واپس تہی;
     }
 
     // generic function call
@@ -1164,13 +1164,13 @@ generic_func_get(ufunc_T *fp, gfargs_tab_T *gfatab)
 
     // Look up the function with specific types
     ufunc_T	*generic_fp = generic_lookup_func(fp, gfatab, &gfkey_ga);
-    if (generic_fp == NULL)
+    اگر (generic_fp == تہی)
 	// generic function with these type arguments doesn't exist.
 	// Create a new one.
-	generic_fp = generic_func_add(fp, (char_u *)gfkey_ga.ga_data, gfatab);
+	generic_fp = generic_func_جوڑو(fp, (char_u *)gfkey_ga.ga_ڈیٹا, gfatab);
     ga_clear(&gfkey_ga);
 
-    return generic_fp;
+    واپس generic_fp;
 }
 
 /*
@@ -1186,28 +1186,28 @@ generic_func_get(ufunc_T *fp, gfargs_tab_T *gfatab)
 generic_func_get_same_types(ufunc_T *fp, ufunc_T *inst)
 {
     gfargs_tab_T	gfatab;
-    ufunc_T		*new_fp = NULL;
-    int			argcount = inst->uf_generic_argcount;
-    int			i;
+    ufunc_T		*new_fp = تہی;
+    صحیح			argcount = inst->uf_generic_argcount;
+    صحیح			i;
 
-    generic_func_args_table_init(&gfatab);
+    generic_func_دلائل_جدول_init(&gfatab);
 
-    if (ga_grow(&gfatab.gfat_args, argcount) == FAIL)
-	goto done;
-    for (i = 0; i < argcount; i++)
+    اگر (ga_grow(&gfatab.gfat_دلائل, argcount) == FAIL)
+	جاؤ مکمل;
+    برائے (i = 0; i < argcount; i++)
     {
-	generic_T	*generic_arg = (generic_T *)gfatab.gfat_args.ga_data + i;
-	type_T		*type = inst->uf_generic_args[i].gt_type;
-	char		*tofree = NULL;
+	generic_T	*generic_arg = (generic_T *)gfatab.gfat_دلائل.ga_ڈیٹا + i;
+	type_T		*type = inst->uf_generic_دلائل[i].gt_type;
+	حرف		*tofree = تہی;
 
 	generic_arg->gt_name = vim_strsave(
 				    (char_u *)type_name(type, &tofree));
 	vim_free(tofree);
-	if (generic_arg->gt_name == NULL)
-	    goto done;
+	اگر (generic_arg->gt_name == تہی)
+	    جاؤ مکمل;
 	// The types of "inst" are used for the lookup, see below.
 	generic_arg->gt_type = type;
-	gfatab.gfat_args.ga_len++;
+	gfatab.gfat_دلائل.ga_len++;
     }
 
     // Usually the function exists, look it up first to avoid copying the
@@ -1217,26 +1217,26 @@ generic_func_get_same_types(ufunc_T *fp, ufunc_T *inst)
     ga_init2(&gfkey_ga, 1, 80);
     new_fp = generic_lookup_func(fp, &gfatab, &gfkey_ga);
     ga_clear(&gfkey_ga);
-    if (new_fp != NULL)
-	goto done;
+    اگر (new_fp != تہی)
+	جاؤ مکمل;
 
     // The new function owns the types, use a copy of the types of "inst".
-    for (i = 0; i < argcount; i++)
+    برائے (i = 0; i < argcount; i++)
     {
-	generic_T   *generic_arg = (generic_T *)gfatab.gfat_args.ga_data + i;
+	generic_T   *generic_arg = (generic_T *)gfatab.gfat_دلائل.ga_ڈیٹا + i;
 	type_T	    *type = copy_type_deep(generic_arg->gt_type,
 							&gfatab.gfat_arg_types);
 
 	// out of memory when the type is returned, it must not be used
-	if (type == generic_arg->gt_type)
-	    goto done;
+	اگر (type == generic_arg->gt_type)
+	    جاؤ مکمل;
 	generic_arg->gt_type = type;
     }
     new_fp = generic_func_get(fp, &gfatab);
 
-done:
-    generic_func_args_table_clear(&gfatab);
-    return new_fp;
+مکمل:
+    generic_func_دلائل_جدول_clear(&gfatab);
+    واپس new_fp;
 }
 
 /*
@@ -1263,25 +1263,25 @@ done:
  *   - Advances "*argp" to after the type argument list on success.
  */
     ufunc_T *
-find_generic_func(ufunc_T *ufunc, char_u *name, char_u **argp)
+ڈھونڈو_generic_func(ufunc_T *ufunc, char_u *name, char_u **argp)
 {
     gfargs_tab_T    gfatab;
     char_u	*p;
-    ufunc_T	*new_ufunc = NULL;
+    ufunc_T	*new_ufunc = تہی;
 
-    generic_func_args_table_init(&gfatab);
+    generic_func_دلائل_جدول_init(&gfatab);
 
     // Get the list of types following the name
-    p = parse_generic_func_type_args(name, *argp - name, *argp, &gfatab, NULL);
-    if (p != NULL)
+    p = parse_generic_func_type_دلائل(name, *argp - name, *argp, &gfatab, تہی);
+    اگر (p != تہی)
     {
 	new_ufunc = generic_func_get(ufunc, &gfatab);
 	*argp = p;
     }
 
-    generic_func_args_table_clear(&gfatab);
+    generic_func_دلائل_جدول_clear(&gfatab);
 
-    return new_ufunc;
+    واپس new_ufunc;
 }
 
 /*
@@ -1296,26 +1296,26 @@ find_generic_func(ufunc_T *ufunc, char_u *name, char_u **argp)
  *   Pointer to the type_T representing the found generic type,
  *   or NULL if the type is not found or if "ufunc" is not a generic function.
  */
-    static type_T *
-find_generic_type_in_ufunc(char_u *gt_name, size_t name_len, ufunc_T *ufunc)
+    ساکن type_T *
+ڈھونڈو_generic_type_اندر_ufunc(char_u *gt_name, size_t name_len, ufunc_T *ufunc)
 {
-    if (!IS_GENERIC_FUNC(ufunc))
-	return NULL;
+    اگر (!IS_GENERIC_FUNC(ufunc))
+	واپس تہی;
 
-    for (int i = 0; i < ufunc->uf_generic_argcount; i++)
+    برائے (صحیح i = 0; i < ufunc->uf_generic_argcount; i++)
     {
 	generic_T *generic;
 
-	generic = ((generic_T *)ufunc->uf_generic_args) + i;
-	if (STRNCMP(generic->gt_name, gt_name, name_len) == 0
+	generic = ((generic_T *)ufunc->uf_generic_دلائل) + i;
+	اگر (STRNCMP(generic->gt_name, gt_name, name_len) == 0
 				&& generic->gt_name[name_len] == NUL)
 	{
 	    type_T *type = generic->gt_type;
-	    return type;
+	    واپس type;
 	}
     }
 
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -1330,19 +1330,19 @@ find_generic_type_in_ufunc(char_u *gt_name, size_t name_len, ufunc_T *ufunc)
  *   Pointer to the type_T representing the found generic type,
  *   or NULL if the type is not found in the current or any outer context.
  */
-    static type_T *
-find_generic_type_in_cctx(char_u *gt_name, size_t name_len, cctx_T *cctx)
+    ساکن type_T *
+ڈھونڈو_generic_type_اندر_cctx(char_u *gt_name, size_t name_len, cctx_T *cctx)
 {
     type_T	*type;
 
-    type = find_generic_type_in_ufunc(gt_name, name_len, cctx->ctx_ufunc);
-    if (type != NULL)
-	return type;
+    type = ڈھونڈو_generic_type_اندر_ufunc(gt_name, name_len, cctx->ctx_ufunc);
+    اگر (type != تہی)
+	واپس type;
 
-    if (cctx->ctx_outer != NULL)
-	return find_generic_type_in_cctx(gt_name, name_len, cctx->ctx_outer);
+    اگر (cctx->ctx_outer != تہی)
+	واپس ڈھونڈو_generic_type_اندر_cctx(gt_name, name_len, cctx->ctx_outer);
 
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -1361,25 +1361,25 @@ find_generic_type_in_cctx(char_u *gt_name, size_t name_len, cctx_T *cctx)
  *   type is not found in the given function or any outer context.
  */
     type_T *
-find_generic_type(
+ڈھونڈو_generic_type(
     char_u	*gt_name,
     size_t	name_len,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
-    if (ufunc != NULL)
+    اگر (ufunc != تہی)
     {
-	type_T *type = find_generic_type_in_ufunc(gt_name, name_len, ufunc);
-	if (type != NULL)
-	    return type;
+	type_T *type = ڈھونڈو_generic_type_اندر_ufunc(gt_name, name_len, ufunc);
+	اگر (type != تہی)
+	    واپس type;
     }
 
     // Also when "ufunc" is the compiled function: a lambda can use the type
     // variables of the function it is defined in.
-    if (cctx != NULL)
-	return find_generic_type_in_cctx(gt_name, name_len, cctx);
+    اگر (cctx != تہی)
+	واپس ڈھونڈو_generic_type_اندر_cctx(gt_name, name_len, cctx);
 
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -1390,17 +1390,17 @@ find_generic_type(
  * Arguments:
  *   fp - the generic function whose function table should be freed
  */
-    static void
+    ساکن خالی
 free_generic_functab(ufunc_T *fp)
 {
     hashtab_T	*ht = &fp->uf_generic_functab;
-    long	todo;
+    طویل	todo;
     hashitem_T	*hi;
 
-    todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (طویل)ht->ht_مستعمل;
+    FOR_ALL_HASHTAB_اشیاء(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	اگر (!HASHITEM_خالی_خانے(hi))
 	{
 	    gfitem_T    *gfitem = HI2GFITEM(hi);
 
@@ -1420,16 +1420,16 @@ free_generic_functab(ufunc_T *fp)
  * Arguments:
  *   fp - the generic function to clear
  */
-    void
-generic_func_clear_items(ufunc_T *fp)
+    خالی
+generic_func_clear_اشیاء(ufunc_T *fp)
 {
     VIM_CLEAR(fp->uf_generic_param_types);
     clear_type_list(&fp->uf_generic_arg_types);
-    for (int i = 0; i < fp->uf_generic_argcount; i++)
-	VIM_CLEAR(fp->uf_generic_args[i].gt_name);
-    VIM_CLEAR(fp->uf_generic_args);
+    برائے (صحیح i = 0; i < fp->uf_generic_argcount; i++)
+	VIM_CLEAR(fp->uf_generic_دلائل[i].gt_name);
+    VIM_CLEAR(fp->uf_generic_دلائل);
     free_generic_functab(fp);
     fp->uf_flags &= ~FC_GENERIC;
 }
 
-#endif // FEAT_EVAL
+#اگر_ختم // FEAT_EVAL

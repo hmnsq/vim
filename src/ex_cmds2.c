@@ -11,8 +11,8 @@
  * ex_cmds2.c: some more functions for command line commands
  */
 
-#include "vim.h"
-#include "version.h"
+#شامل "vim.h"
+#شامل "version.h"
 
 /*
  * If 'autowrite' option set, try to write the file.
@@ -20,48 +20,48 @@
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-autowrite(buf_T *buf, int forceit)
+    صحیح
+autowrite(buf_T *buf, صحیح forceit)
 {
-    int		r;
+    صحیح		r;
     bufref_T	bufref;
 
-    if (!(p_aw || p_awa) || !p_write
+    اگر (!(p_aw || p_awa) || !p_write
 	    // never autowrite a "nofile" or "nowrite" buffer
 	    || bt_dontwrite(buf)
-	    || (!forceit && buf->b_p_ro) || buf->b_ffname == NULL)
-	return FAIL;
-    set_bufref(&bufref, buf);
+	    || (!forceit && buf->b_p_ro) || buf->b_ffname == تہی)
+	واپس FAIL;
+    سیٹ_bufref(&bufref, buf);
     r = buf_write_all(buf, forceit);
 
     // Writing may succeed but the buffer still changed, e.g., when there is a
     // conversion error.  We do want to return FAIL then.
-    if (bufref_valid(&bufref) && bufIsChanged(buf))
+    اگر (bufref_valid(&bufref) && buf_Is_بدلا(buf))
 	r = FAIL;
-    return r;
+    واپس r;
 }
 
 /*
  * Flush all buffers, except the ones that are readonly or are never written.
  */
-    void
-autowrite_all(void)
+    خالی
+autowrite_all(خالی)
 {
     buf_T	*buf;
 
-    if (!(p_aw || p_awa) || !p_write)
-	return;
+    اگر (!(p_aw || p_awa) || !p_write)
+	واپس;
     FOR_ALL_BUFFERS(buf)
-	if (bufIsChanged(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
+	اگر (buf_Is_بدلا(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
 	{
 	    bufref_T	bufref;
 
-	    set_bufref(&bufref, buf);
+	    سیٹ_bufref(&bufref, buf);
 
-	    (void)buf_write_all(buf, FALSE);
+	    (خالی)buf_write_all(buf, FALSE);
 
 	    // an autocommand may have deleted the buffer
-	    if (!bufref_valid(&bufref))
+	    اگر (!bufref_valid(&bufref))
 		buf = firstbuf;
 	}
 }
@@ -70,82 +70,82 @@ autowrite_all(void)
  * Return TRUE if buffer was changed and cannot be abandoned.
  * For flags use the CCGD_ values.
  */
-    int
-check_changed(buf_T *buf, int flags)
+    صحیح
+check_بدلا(buf_T *buf, صحیح flags)
 {
-    int		forceit = (flags & CCGD_FORCEIT);
+    صحیح		forceit = (flags & CCGD_FORCEIT);
     bufref_T	bufref;
 
-    set_bufref(&bufref, buf);
+    سیٹ_bufref(&bufref, buf);
 
-    if (       !forceit
-	    && bufIsChanged(buf)
+    اگر (       !forceit
+	    && buf_Is_بدلا(buf)
 	    && ((flags & CCGD_MULTWIN) || buf->b_nwindows <= 1)
 	    && (!(flags & CCGD_AW) || autowrite(buf, forceit) == FAIL))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#اگر defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	اگر ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    اگر (رکن_کام_running(buf->b_رکن))
 	    {
-		return term_confirm_stop(buf) == FAIL;
+		واپس رکن_confirm_stop(buf) == FAIL;
 	    }
 # endif
 
 	    buf_T	*buf2;
-	    int		count = 0;
+	    صحیح		گنتی = 0;
 
-	    if (flags & CCGD_ALLBUF)
+	    اگر (flags & CCGD_ALLBUF)
 		FOR_ALL_BUFFERS(buf2)
-		    if (bufIsChanged(buf2)
-				     && (buf2->b_ffname != NULL
+		    اگر (buf_Is_بدلا(buf2)
+				     && (buf2->b_ffname != تہی
 # ifdef FEAT_BROWSE
 					 || (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
 					))
-			++count;
-	    if (!bufref_valid(&bufref))
+			++گنتی;
+	    اگر (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
+		واپس FALSE;
 
-	    dialog_changed(buf, count > 1);
+	    dialog_بدلا(buf, گنتی > 1);
 
-	    if (!bufref_valid(&bufref))
+	    اگر (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
-	    return bufIsChanged(buf);
+		واپس FALSE;
+	    واپس buf_Is_بدلا(buf);
 	}
-#endif
-	if (flags & CCGD_EXCMD)
-	    no_write_message();
-	else
-	    no_write_message_nobang(curbuf);
-	return TRUE;
+#اگر_ختم
+	اگر (flags & CCGD_EXCMD)
+	    no_write_پیغام();
+	ورنہ
+	    no_write_پیغام_nobang(curbuf);
+	واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#اگر defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 
-# if defined(FEAT_BROWSE)
+# اگر defined(FEAT_BROWSE)
 /*
  * When wanting to write a file without a file name, ask the user for a name.
  */
-    void
+    خالی
 browse_save_fname(buf_T *buf)
 {
-    if (buf->b_fname != NULL)
-	return;
+    اگر (buf->b_fname != تہی)
+	واپس;
 
     char_u *fname;
 
     fname = do_browse(BROWSE_SAVE, (char_u *)_("Save As"),
-	    (char_u *)"Untitled", NULL, NULL, NULL, buf);
-    if (fname == NULL)
-	return;
+	    (char_u *)"Untitled", تہی, تہی, تہی, buf);
+    اگر (fname == تہی)
+	واپس;
 
-    if (setfname(buf, fname, NULL, TRUE) == OK)
+    اگر (setfname(buf, fname, تہی, TRUE) == OK)
 	buf->b_flags |= BF_NOTEDITED;
     vim_free(fname);
 }
@@ -155,62 +155,62 @@ browse_save_fname(buf_T *buf)
  * Ask the user what to do when abandoning a changed buffer.
  * Must check 'write' option first!
  */
-    void
-dialog_changed(
+    خالی
+dialog_بدلا(
     buf_T	*buf,
-    int		checkall)	// may abandon all changed buffers
+    صحیح		checkall)	// may abandon all changed buffers
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int		ret;
+    char_u	buff[DIALOG_پیغام_سائز];
+    صحیح		ret;
     buf_T	*buf2;
     exarg_T	ea;
 
-    dialog_msg(buff, _("Save changes to \"%s\"?"), buf->b_fname);
-    if (checkall)
-	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, NULL, buff, 1);
-    else
-	ret = vim_dialog_yesnocancel(VIM_QUESTION, NULL, buff, 1);
+    dialog_پیغام(buff, _("Save changes to \"%s\"?"), buf->b_fname);
+    اگر (checkall)
+	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, تہی, buff, 1);
+    ورنہ
+	ret = vim_dialog_yesnocancel(VIM_QUESTION, تہی, buff, 1);
 
     // Init ea pseudo-structure, this is needed for the check_overwrite()
     // function.
-    CLEAR_FIELD(ea);
+    CLEAR_میدان(ea);
 
-    if (ret == VIM_YES)
+    اگر (ret == VIM_YES)
     {
-	int	empty_bufname;
+	صحیح	خالی_خانے_bufname;
 
 # ifdef FEAT_BROWSE
 	// May get file name, when there is none
 	browse_save_fname(buf);
 
 	// User cancelled the file dialog; keep the buffer modified.
-	if (buf->b_fname == NULL)
-	    return;
+	اگر (buf->b_fname == تہی)
+	    واپس;
 # endif
-	empty_bufname = buf->b_fname == NULL ? TRUE : FALSE;
-	if (empty_bufname)
-	    buf_set_name(buf->b_fnum, (char_u *)"Untitled");
+	خالی_خانے_bufname = buf->b_fname == تہی ? TRUE : FALSE;
+	اگر (خالی_خانے_bufname)
+	    buf_سیٹ_name(buf->b_fnum, (char_u *)"Untitled");
 
-	if (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
+	اگر (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
 	{
 	    // didn't hit Cancel
-	    if (buf_write_all(buf, FALSE) == OK)
-		return;
+	    اگر (buf_write_all(buf, FALSE) == OK)
+		واپس;
 	}
 
 	// restore to empty when write failed or was cancelled
-	if (empty_bufname)
+	اگر (خالی_خانے_bufname)
 	{
-	    buf->b_fname = NULL;
+	    buf->b_fname = تہی;
 	    VIM_CLEAR(buf->b_ffname);
 	    VIM_CLEAR(buf->b_sfname);
 	}
     }
-    else if (ret == VIM_NO)
+    ورنہ اگر (ret == VIM_NO)
     {
 	unchanged(buf, TRUE, FALSE);
     }
-    else if (ret == VIM_ALL)
+    ورنہ اگر (ret == VIM_ALL)
     {
 	/*
 	 * Write all modified files that can be written.
@@ -219,8 +219,8 @@ dialog_changed(
 	 */
 	FOR_ALL_BUFFERS(buf2)
 	{
-	    if (bufIsChanged(buf2)
-		    && (buf2->b_ffname != NULL
+	    اگر (buf_Is_بدلا(buf2)
+		    && (buf2->b_ffname != تہی
 # ifdef FEAT_BROWSE
 			|| (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
@@ -230,23 +230,23 @@ dialog_changed(
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf2);
+		سیٹ_bufref(&bufref, buf2);
 # ifdef FEAT_BROWSE
 		// May get file name, when there is none
 		browse_save_fname(buf2);
 # endif
-		if (buf2->b_fname != NULL && check_overwrite(&ea, buf2,
+		اگر (buf2->b_fname != تہی && check_overwrite(&ea, buf2,
 				  buf2->b_fname, buf2->b_ffname, FALSE) == OK)
 		    // didn't hit Cancel
-		    (void)buf_write_all(buf2, FALSE);
+		    (خالی)buf_write_all(buf2, FALSE);
 
 		// an autocommand may have deleted the buffer
-		if (!bufref_valid(&bufref))
+		اگر (!bufref_valid(&bufref))
 		    buf2 = firstbuf;
 	    }
 	}
     }
-    else if (ret == VIM_DISCARDALL)
+    ورنہ اگر (ret == VIM_DISCARDALL)
     {
 	/*
 	 * mark all buffers as unchanged
@@ -255,17 +255,17 @@ dialog_changed(
 	    unchanged(buf2, TRUE, FALSE);
     }
 }
-#endif
+#اگر_ختم
 
 /*
  * Return TRUE if the buffer "buf" can be abandoned, either by making it
  * hidden, autowriting it or unloading it.
  */
-    int
-can_abandon(buf_T *buf, int forceit)
+    صحیح
+can_abandon(buf_T *buf, صحیح forceit)
 {
-    return (	   buf_hide(buf)
-		|| !bufIsChanged(buf)
+    واپس (	   buf_hide(buf)
+		|| !buf_Is_بدلا(buf)
 		|| buf->b_nwindows > 1
 		|| autowrite(buf, forceit) == OK
 		|| forceit);
@@ -274,14 +274,14 @@ can_abandon(buf_T *buf, int forceit)
 /*
  * Add a buffer number to "bufnrs", unless it's already there.
  */
-    static void
-add_bufnum(int *bufnrs, int *bufnump, int nr)
+    ساکن خالی
+جوڑو_bufnum(صحیح *bufnrs, صحیح *bufnump, صحیح nr)
 {
-    int i;
+    صحیح i;
 
-    for (i = 0; i < *bufnump; ++i)
-	if (bufnrs[i] == nr)
-	    return;
+    برائے (i = 0; i < *bufnump; ++i)
+	اگر (bufnrs[i] == nr)
+	    واپس;
     bufnrs[*bufnump] = nr;
     *bufnump = *bufnump + 1;
 }
@@ -292,18 +292,18 @@ add_bufnum(int *bufnrs, int *bufnump, int nr)
  * When "unload" is TRUE the current buffer is unloaded instead of making it
  * hidden.  This is used for ":q!".
  */
-    int
-check_changed_any(
-    int		hidden,		// Only check hidden buffers
-    int		unload)
+    صحیح
+check_بدلا_any(
+    صحیح		hidden,		// Only check hidden buffers
+    صحیح		unload)
 {
-    int		ret = FALSE;
+    صحیح		ret = FALSE;
     buf_T	*buf;
-    int		save;
-    int		i;
-    int		bufnum = 0;
-    int		bufcount = 0;
-    int		*bufnrs;
+    صحیح		save;
+    صحیح		i;
+    صحیح		bufnum = 0;
+    صحیح		bufcount = 0;
+    صحیح		*bufnrs;
     tabpage_T   *tp;
     win_T	*wp;
 
@@ -311,89 +311,89 @@ check_changed_any(
     FOR_ALL_BUFFERS(buf)
 	++bufcount;
 
-    if (bufcount == 0)
-	return FALSE;
+    اگر (bufcount == 0)
+	واپس FALSE;
 
-    bufnrs = ALLOC_MULT(int, bufcount);
-    if (bufnrs == NULL)
-	return FALSE;
+    bufnrs = ALLOC_MULT(صحیح, bufcount);
+    اگر (bufnrs == تہی)
+	واپس FALSE;
 
     // curbuf
     bufnrs[bufnum++] = curbuf->b_fnum;
 
     // buffers in current tab
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != curbuf)
-	    add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
+	اگر (wp->w_بفر != curbuf)
+	    جوڑو_bufnum(bufnrs, &bufnum, wp->w_بفر->b_fnum);
 
     // buffers in other tabs
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
+	اگر (tp != curtab)
+	    FOR_ALL_WINDOWS_اندر_TAB(tp, wp)
+		جوڑو_bufnum(bufnrs, &bufnum, wp->w_بفر->b_fnum);
 
     // any other buffer
     FOR_ALL_BUFFERS(buf)
-	add_bufnum(bufnrs, &bufnum, buf->b_fnum);
+	جوڑو_bufnum(bufnrs, &bufnum, buf->b_fnum);
 
-    for (i = 0; i < bufnum; ++i)
+    برائے (i = 0; i < bufnum; ++i)
     {
 	buf = buflist_findnr(bufnrs[i]);
-	if (buf == NULL)
-	    continue;
-	if ((!hidden || buf->b_nwindows == 0) && bufIsChanged(buf))
+	اگر (buf == تہی)
+	    جاری;
+	اگر ((!hidden || buf->b_nwindows == 0) && buf_Is_بدلا(buf))
 	{
 	    bufref_T bufref;
 
-	    set_bufref(&bufref, buf);
-#ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    سیٹ_bufref(&bufref, buf);
+#اگر_تعریف_شدہ FEAT_TERMINAL
+	    اگر (رکن_کام_running(buf->b_رکن))
 	    {
-		if (term_try_stop_job(buf) == FAIL)
-		    break;
+		اگر (رکن_try_stop_کام(buf) == FAIL)
+		    توڑو;
 	    }
-	    else
-#endif
+	    ورنہ
+#اگر_ختم
 	    // Try auto-writing the buffer.  If this fails but the buffer no
 	    // longer exists it's not changed, that's OK.
-	    if (check_changed(buf, (p_awa ? CCGD_AW : 0)
+	    اگر (check_بدلا(buf, (p_awa ? CCGD_AW : 0)
 				 | CCGD_MULTWIN
 				 | CCGD_ALLBUF) && bufref_valid(&bufref))
-		break;	    // didn't save - still changes
+		توڑو;	    // didn't save - still changes
 	}
     }
 
-    if (i >= bufnum)
-	goto theend;
+    اگر (i >= bufnum)
+	جاؤ theend;
 
     // Get here if "buf" cannot be abandoned.
     ret = TRUE;
     exiting = FALSE;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#اگر defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     /*
      * When ":confirm" used, don't give an error message.
      */
-    if (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
-#endif
+    اگر (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
+#اگر_ختم
     {
 	// There must be a wait_return() for this message, do_buffer()
 	// may cause a redraw.  But wait_return() is a no-op when vgetc()
 	// is busy (Quit used from window menu), then make sure we don't
 	// cause a scroll up.
-	if (vgetc_busy > 0)
+	اگر (vgetc_busy > 0)
 	{
-	    msg_row = cmdline_row;
-	    msg_col = 0;
-	    msg_didout = FALSE;
+	    پیغام_صف = cmdline_صف;
+	    پیغام_ستون = 0;
+	    پیغام_didout = FALSE;
 	}
-	if (
-#ifdef FEAT_TERMINAL
-		term_job_running(buf->b_term)
-		    ? semsg(_(e_job_still_running_in_buffer_str), buf->b_fname)
+	اگر (
+#اگر_تعریف_شدہ FEAT_TERMINAL
+		رکن_کام_running(buf->b_رکن)
+		    ? semsg(_(e_کام_still_running_اندر_بفر_str), buf->b_fname)
 		    :
-#endif
-		semsg(_(e_no_write_since_last_change_for_buffer_str),
-		    buf_spname(buf) != NULL ? buf_spname(buf) : buf->b_fname))
+#اگر_ختم
+		semsg(_(e_no_write_since_آخری_change_for_بفر_str),
+		    buf_spname(buf) != تہی ? buf_spname(buf) : buf->b_fname))
 	{
 	    save = no_wait_return;
 	    no_wait_return = FALSE;
@@ -403,45 +403,45 @@ check_changed_any(
     }
 
     // Try to find a window that contains the buffer.
-    if (buf != curbuf)
+    اگر (buf != curbuf)
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf)
+	    اگر (wp->w_بفر == buf)
 	    {
 		bufref_T bufref;
 
-		set_bufref(&bufref, buf);
+		سیٹ_bufref(&bufref, buf);
 
 		goto_tabpage_win(tp, wp);
 
 		// Paranoia: did autocmd wipe out the buffer with changes?
-		if (!bufref_valid(&bufref))
-		    goto theend;
-		goto buf_found;
+		اگر (!bufref_valid(&bufref))
+		    جاؤ theend;
+		جاؤ buf_ملا;
 	    }
-buf_found:
+buf_ملا:
 
     // Open the changed buffer in the current window.
-    if (buf != curbuf)
-	set_curbuf(buf, unload ? DOBUF_UNLOAD : DOBUF_GOTO);
+    اگر (buf != curbuf)
+	سیٹ_curbuf(buf, unload ? DOBUF_UNLOAD : DOBUF_GOTO);
 
 theend:
     vim_free(bufnrs);
-    return ret;
+    واپس ret;
 }
 
 /*
  * return FAIL if there is no file name, OK if there is one
  * give error message for FAIL
  */
-    int
-check_fname(void)
+    صحیح
+check_fname(خالی)
 {
-    if (curbuf->b_ffname == NULL)
+    اگر (curbuf->b_ffname == تہی)
     {
 	emsg(_(e_no_file_name));
-	return FAIL;
+	واپس FAIL;
     }
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -449,218 +449,218 @@ check_fname(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-buf_write_all(buf_T *buf, int forceit)
+    صحیح
+buf_write_all(buf_T *buf, صحیح forceit)
 {
-    int	    retval;
+    صحیح	    retval;
     buf_T	*old_curbuf = curbuf;
 
     retval = (buf_write(buf, buf->b_ffname, buf->b_fname,
-				   (linenr_T)1, buf->b_ml.ml_line_count, NULL,
+				   (linenr_T)1, buf->b_ml.ml_سطر_گنتی, تہی,
 						  FALSE, forceit, TRUE, FALSE));
-    if (curbuf != old_curbuf)
+    اگر (curbuf != old_curbuf)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
+	پیغام_ماخذ(HL_ATTR(HLF_W));
+	پیغام(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
     }
-    return retval;
+    واپس retval;
 }
 
 /*
  * ":argdo", ":windo", ":bufdo", ":tabdo", ":cdo", ":ldo", ":cfdo" and ":lfdo"
  */
-    void
+    خالی
 ex_listdo(exarg_T *eap)
 {
-    int		i;
+    صحیح		i;
     win_T	*wp;
     tabpage_T	*tp;
     buf_T	*buf = curbuf;
-    int		next_fnum = 0;
+    صحیح		اگلا_fnum = 0;
 
     // ":windo" and ":tabdo" only visit existing windows/tabpages, they don't
     // change the current window's buffer, so they can't escape a 'winfixbuf'
     // window (which would create a split).
-    if (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
+    اگر (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
 	    eap->cmdidx != CMD_tabdo)
     {
-	if ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
+	اگر ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
 		!eap->forceit)
 	{
 	    // Disallow :ldo if 'winfixbuf' is applied
-	    emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	    return;
+	    emsg(_(e_winfixbuf_cannot_go_مقصد_بفر));
+	    واپس;
 	}
 
-	if (win_valid(prevwin) && !prevwin->w_p_wfb)
+	اگر (win_valid(prevwin) && !prevwin->w_p_wfb)
 	    // 'winfixbuf' is set; attempt to change to a window without it.
 	    win_goto(prevwin);
-	if (curwin->w_p_wfb)
+	اگر (curwin->w_p_wfb)
 	{
 	    // Split the window, which will be 'nowinfixbuf', and set curwin to
 	    // that
-	    (void)win_split(0, 0);
+	    (خالی)win_بانٹو(0, 0);
 
-	    if (curwin->w_p_wfb)
+	    اگر (curwin->w_p_wfb)
 	    {
 		// Autocommands set 'winfixbuf' or sent us to another window
 		// with it set, or we failed to split the window.  Give up.
-		emsg(_(e_winfixbuf_cannot_go_to_buffer));
-		return;
+		emsg(_(e_winfixbuf_cannot_go_مقصد_بفر));
+		واپس;
 	    }
 	}
     }
 
-#if defined(FEAT_SYN_HL)
-    char_u	*save_ei = NULL;
-#endif
-#ifdef FEAT_QUICKFIX
-    int		qf_size = 0;
-    int		qf_idx;
-#endif
+#اگر defined(FEAT_SYN_HL)
+    char_u	*save_ei = تہی;
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_QUICKFIX
+    صحیح		qf_سائز = 0;
+    صحیح		qf_idx;
+#اگر_ختم
 
-#ifndef FEAT_QUICKFIX
-    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
+#اگر_غیر_تعریف_شدہ FEAT_QUICKFIX
+    اگر (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
 	    eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
     {
 	ex_ni(eap);
-	return;
+	واپس;
     }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_SYN_HL)
-    if (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
+#اگر defined(FEAT_SYN_HL)
+    اگر (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
     {
 	// Don't do syntax HL autocommands.  Skipping the syntax file is a
 	// great speed improvement.
 	save_ei = au_event_disable(",Syntax");
 
 	FOR_ALL_BUFFERS(buf)
-	    buf->b_flags &= ~BF_SYN_SET;
+	    buf->b_flags &= ~BF_SYN_سیٹ;
 	buf = curbuf;
     }
-#endif
-#ifdef FEAT_CLIPBOARD
-    start_global_changes();
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_CLIPBOARD
+    آغاز_global_changes();
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-#endif
+#اگر_ختم
 
-    if (eap->cmdidx == CMD_windo
+    اگر (eap->cmdidx == CMD_windo
 	    || eap->cmdidx == CMD_tabdo
 	    || buf_hide(curbuf)
-	    || !check_changed(curbuf, CCGD_AW
+	    || !check_بدلا(curbuf, CCGD_AW
 				    | (eap->forceit ? CCGD_FORCEIT : 0)
 				    | CCGD_EXCMD))
     {
 	i = 0;
 	// start at the eap->line1 argument/window/buffer
 	wp = firstwin;
-	tp = first_tabpage;
-	switch (eap->cmdidx)
+	tp = پہلا_tabpage;
+	انتخاب (eap->cmdidx)
 	{
-	    case CMD_windo:
-		for ( ; wp != NULL && i + 1 < eap->line1; wp = wp->w_next)
+	    حالت CMD_windo:
+		برائے ( ; wp != تہی && i + 1 < eap->line1; wp = wp->w_اگلا)
 		    i++;
-		break;
-	    case CMD_tabdo:
-		for ( ; tp != NULL && i + 1 < eap->line1; tp = tp->tp_next)
+		توڑو;
+	    حالت CMD_tabdo:
+		برائے ( ; tp != تہی && i + 1 < eap->line1; tp = tp->tp_اگلا)
 		    i++;
-		break;
-	    case CMD_argdo:
+		توڑو;
+	    حالت CMD_argdo:
 		i = eap->line1 - 1;
-		break;
-	    default:
-		break;
+		توڑو;
+	    طےشدہ:
+		توڑو;
 	}
 	// set pcmark now
-	if (eap->cmdidx == CMD_bufdo)
+	اگر (eap->cmdidx == CMD_bufdo)
 	{
 	    // Advance to the first listed buffer after "eap->line1".
-	    for (buf = firstbuf; buf != NULL && (buf->b_fnum < eap->line1
-					  || !buf->b_p_bl); buf = buf->b_next)
-		if (buf->b_fnum > eap->line2)
+	    برائے (buf = firstbuf; buf != تہی && (buf->b_fnum < eap->line1
+					  || !buf->b_p_bl); buf = buf->b_اگلا)
+		اگر (buf->b_fnum > eap->line2)
 		{
-		    buf = NULL;
-		    break;
+		    buf = تہی;
+		    توڑو;
 		}
-	    if (buf != NULL)
-		goto_buffer(eap, DOBUF_FIRST, FORWARD, buf->b_fnum);
+	    اگر (buf != تہی)
+		goto_بفر(eap, DOBUF_پہلا, FORWARD, buf->b_fnum);
 	}
-#ifdef FEAT_QUICKFIX
-	else if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+#اگر_تعریف_شدہ FEAT_QUICKFIX
+	ورنہ اگر (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		|| eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	{
-	    qf_size = qf_get_valid_size(eap);
-	    if (qf_size <= 0 || eap->line1 > qf_size)
-		buf = NULL;
-	    else
+	    qf_سائز = qf_get_valid_سائز(eap);
+	    اگر (qf_سائز <= 0 || eap->line1 > qf_سائز)
+		buf = تہی;
+	    ورنہ
 	    {
-		save_clear_shm_value();
+		save_clear_shm_قدر();
 		ex_cc(eap);
-		restore_shm_value();
+		restore_shm_قدر();
 
 		buf = curbuf;
 		i = eap->line1 - 1;
-		if (eap->addr_count <= 0)
+		اگر (eap->addr_گنتی <= 0)
 		    // default is all the quickfix/location list entries
-		    eap->line2 = qf_size;
+		    eap->line2 = qf_سائز;
 	    }
 	}
-#endif
-	else
+#اگر_ختم
+	ورنہ
 	    setpcmark();
 	listcmd_busy = TRUE;	    // avoids setting pcmark below
 
-	while (!got_int && buf != NULL)
+	جب (!got_int && buf != تہی)
 	{
-	    if (eap->cmdidx == CMD_argdo)
+	    اگر (eap->cmdidx == CMD_argdo)
 	    {
 		// go to argument "i"
-		if (i == ARGCOUNT)
-		    break;
+		اگر (i == ARGCOUNT)
+		    توڑو;
 		// Don't call do_argfile() when already there, it will try
 		// reloading the file.
-		if (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
+		اگر (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
 		{
 		    // Clear 'shm' to avoid that the file message overwrites
 		    // any output from the command.
-		    save_clear_shm_value();
+		    save_clear_shm_قدر();
 		    do_argfile(eap, i);
-		    restore_shm_value();
+		    restore_shm_قدر();
 		}
-		if (curwin->w_arg_idx != i)
-		    break;
+		اگر (curwin->w_arg_idx != i)
+		    توڑو;
 	    }
-	    else if (eap->cmdidx == CMD_windo)
+	    ورنہ اگر (eap->cmdidx == CMD_windo)
 	    {
 		// go to window "wp"
-		if (!win_valid(wp))
-		    break;
+		اگر (!win_valid(wp))
+		    توڑو;
 		win_goto(wp);
-		if (curwin != wp)
-		    break;  // something must be wrong
-		wp = curwin->w_next;
+		اگر (curwin != wp)
+		    توڑو;  // something must be wrong
+		wp = curwin->w_اگلا;
 	    }
-	    else if (eap->cmdidx == CMD_tabdo)
+	    ورنہ اگر (eap->cmdidx == CMD_tabdo)
 	    {
 		// go to window "tp"
-		if (!valid_tabpage(tp))
-		    break;
+		اگر (!valid_tabpage(tp))
+		    توڑو;
 		goto_tabpage_tp(tp, TRUE, TRUE);
-		tp = tp->tp_next;
+		tp = tp->tp_اگلا;
 	    }
-	    else if (eap->cmdidx == CMD_bufdo)
+	    ورنہ اگر (eap->cmdidx == CMD_bufdo)
 	    {
 		// Remember the number of the next listed buffer, in case
 		// ":bwipe" is used or autocommands do something strange.
-		next_fnum = -1;
-		for (buf = curbuf->b_next; buf != NULL; buf = buf->b_next)
-		    if (buf->b_p_bl)
+		اگلا_fnum = -1;
+		برائے (buf = curbuf->b_اگلا; buf != تہی; buf = buf->b_اگلا)
+		    اگر (buf->b_p_bl)
 		    {
-			next_fnum = buf->b_fnum;
-			break;
+			اگلا_fnum = buf->b_fnum;
+			توڑو;
 		    }
 	    }
 
@@ -670,90 +670,90 @@ ex_listdo(exarg_T *eap)
 	    do_cmdline(eap->arg, eap->ea_getline, eap->cookie,
 						DOCMD_VERBOSE + DOCMD_NOWAIT);
 
-	    if (eap->cmdidx == CMD_bufdo)
+	    اگر (eap->cmdidx == CMD_bufdo)
 	    {
 		// Done?
-		if (next_fnum < 0 || next_fnum > eap->line2)
-		    break;
+		اگر (اگلا_fnum < 0 || اگلا_fnum > eap->line2)
+		    توڑو;
 		// Check if the buffer still exists.
 		FOR_ALL_BUFFERS(buf)
-		    if (buf->b_fnum == next_fnum)
-			break;
-		if (buf == NULL)
-		    break;
+		    اگر (buf->b_fnum == اگلا_fnum)
+			توڑو;
+		اگر (buf == تہی)
+		    توڑو;
 
 		// Go to the next buffer.  Clear 'shm' to avoid that the file
 		// message overwrites any output from the command.
-		save_clear_shm_value();
-		goto_buffer(eap, DOBUF_FIRST, FORWARD, next_fnum);
-		restore_shm_value();
+		save_clear_shm_قدر();
+		goto_بفر(eap, DOBUF_پہلا, FORWARD, اگلا_fnum);
+		restore_shm_قدر();
 
 		// If autocommands took us elsewhere, quit here.
-		if (curbuf->b_fnum != next_fnum)
-		    break;
+		اگر (curbuf->b_fnum != اگلا_fnum)
+		    توڑو;
 	    }
 
-#ifdef FEAT_QUICKFIX
-	    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+#اگر_تعریف_شدہ FEAT_QUICKFIX
+	    اگر (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		    || eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	    {
-		if (i >= qf_size || i >= eap->line2)
-		    break;
+		اگر (i >= qf_سائز || i >= eap->line2)
+		    توڑو;
 
 		qf_idx = qf_get_cur_idx(eap);
 
-		save_clear_shm_value();
+		save_clear_shm_قدر();
 		ex_cnext(eap);
-		restore_shm_value();
+		restore_shm_قدر();
 
 		// If jumping to the next quickfix entry fails, quit here
-		if (qf_get_cur_idx(eap) == qf_idx)
-		    break;
+		اگر (qf_get_cur_idx(eap) == qf_idx)
+		    توڑو;
 	    }
-#endif
+#اگر_ختم
 
-	    if (eap->cmdidx == CMD_windo)
+	    اگر (eap->cmdidx == CMD_windo)
 	    {
 		validate_cursor();	// cursor may have moved
 
 		// required when 'scrollbind' has been set
-		if (curwin->w_p_scb)
+		اگر (curwin->w_p_scb)
 		    do_check_scrollbind(TRUE);
 	    }
 
-	    if (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
-		if (i+1 > eap->line2)
-		    break;
-	    if (eap->cmdidx == CMD_argdo && i >= eap->line2)
-		break;
+	    اگر (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
+		اگر (i+1 > eap->line2)
+		    توڑو;
+	    اگر (eap->cmdidx == CMD_argdo && i >= eap->line2)
+		توڑو;
 	}
 	listcmd_busy = FALSE;
     }
 
-#if defined(FEAT_SYN_HL)
-    if (save_ei != NULL)
+#اگر defined(FEAT_SYN_HL)
+    اگر (save_ei != تہی)
     {
 	buf_T		*bnext;
 	aco_save_T	aco;
 
 	au_event_restore(save_ei);
 
-	for (buf = firstbuf; buf != NULL; buf = bnext)
+	برائے (buf = firstbuf; buf != تہی; buf = bnext)
 	{
-	    bnext = buf->b_next;
-	    if (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_SET))
+	    bnext = buf->b_اگلا;
+	    اگر (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_سیٹ))
 	    {
-		buf->b_flags &= ~BF_SYN_SET;
+		buf->b_flags &= ~BF_SYN_سیٹ;
 
 		// buffer was opened while Syntax autocommands were disabled,
 		// need to trigger them now.
-		if (buf == curbuf)
+		اگر (buf == curbuf)
 		    apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn,
 					       curbuf->b_fname, TRUE, curbuf);
-		else
+		ورنہ
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    اگر (curbuf == buf)
 		    {
 			apply_autocmds(EVENT_SYNTAX, buf->b_p_syn,
 						      buf->b_fname, TRUE, buf);
@@ -766,45 +766,45 @@ ex_listdo(exarg_T *eap)
 	    }
 	}
     }
-#endif
-#ifdef FEAT_CLIPBOARD
-    end_global_changes();
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_CLIPBOARD
+    انتہا_global_changes();
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
-#endif
+#اگر_ختم
 }
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 /*
  * ":compiler[!] {name}"
  */
-    void
+    خالی
 ex_compiler(exarg_T *eap)
 {
     char_u	*buf;
-    char_u	*old_cur_comp = NULL;
+    char_u	*old_cur_comp = تہی;
     char_u	*p;
 
-    if (*eap->arg == NUL)
+    اگر (*eap->arg == NUL)
     {
 	// List all compiler scripts.
 	do_cmdline_cmd((char_u *)"echo globpath(&rtp, 'compiler/*.vim')");
 					// ) keep the indenter happy...
-	return;
+	واپس;
     }
 
     buf = alloc(STRLEN(eap->arg) + 14);
-    if (buf == NULL)
-	return;
+    اگر (buf == تہی)
+	واپس;
 
-    if (eap->forceit)
+    اگر (eap->forceit)
     {
 	// ":compiler! {name}" sets global options
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet set <args>");
     }
-    else
+    ورنہ
     {
 	// ":compiler! {name}" sets local options.
 	// To remain backwards compatible "current_compiler" is always
@@ -812,8 +812,8 @@ ex_compiler(exarg_T *eap)
 	// plugin will then skip the settings.  Afterwards set
 	// "b:current_compiler" and restore "current_compiler".
 	// Explicitly prepend "g:" to make it work in a function.
-	old_cur_comp = get_var_value((char_u *)"g:current_compiler");
-	if (old_cur_comp != NULL)
+	old_cur_comp = get_var_قدر((char_u *)"g:current_compiler");
+	اگر (old_cur_comp != تہی)
 	    old_cur_comp = vim_strsave(old_cur_comp);
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet setlocal <args>");
@@ -821,47 +821,47 @@ ex_compiler(exarg_T *eap)
     do_unlet((char_u *)"g:current_compiler", TRUE);
     do_unlet((char_u *)"b:current_compiler", TRUE);
 
-    sprintf((char *)buf, "compiler/%s.vim", eap->arg);
-    if (source_runtime(buf, DIP_ALL) == FAIL)
+    sprintf((حرف *)buf, "compiler/%s.vim", eap->arg);
+    اگر (ماخذ_runtime(buf, DIP_ALL) == FAIL)
 	semsg(_(e_compiler_not_supported_str), eap->arg);
     vim_free(buf);
 
     do_cmdline_cmd((char_u *)":delcommand CompilerSet");
 
     // Set "b:current_compiler" from "current_compiler".
-    p = get_var_value((char_u *)"g:current_compiler");
-    if (p != NULL)
-	set_internal_string_var((char_u *)"b:current_compiler", p);
+    p = get_var_قدر((char_u *)"g:current_compiler");
+    اگر (p != تہی)
+	سیٹ_اندرونی_string_var((char_u *)"b:current_compiler", p);
 
     // Restore "current_compiler" for ":compiler {name}".
-    if (!eap->forceit)
+    اگر (!eap->forceit)
     {
-	if (old_cur_comp != NULL)
+	اگر (old_cur_comp != تہی)
 	{
-	    set_internal_string_var((char_u *)"g:current_compiler",
+	    سیٹ_اندرونی_string_var((char_u *)"g:current_compiler",
 		    old_cur_comp);
 	    vim_free(old_cur_comp);
 	}
-	else
+	ورنہ
 	    do_unlet((char_u *)"g:current_compiler", TRUE);
     }
 }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
+#اگر defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# اگر defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 /*
  * Detect Python 3 or 2, and initialize 'pyxversion'.
  */
-    void
-init_pyxversion(void)
+    خالی
+init_pyxversion(خالی)
 {
-    if (p_pyx == 0)
+    اگر (p_pyx == 0)
     {
-	if (python3_enabled(FALSE))
+	اگر (python3_enabled(FALSE))
 	    p_pyx = 3;
-	else if (python_enabled(FALSE))
+	ورنہ اگر (python_enabled(FALSE))
 	    p_pyx = 2;
     }
 }
@@ -876,71 +876,71 @@ init_pyxversion(void)
  * "# requires python 3.x"  => returns 3
  * otherwise return 0.
  */
-    static int
-requires_py_version(char_u *filename)
+    ساکن صحیح
+requires_py_نسخہ(char_u *filename)
 {
     FILE    *file;
-    int	    requires_py_version = 0;
-    int	    i, lines;
+    صحیح	    requires_py_نسخہ = 0;
+    صحیح	    i, سطریں;
 
-    lines = (int)p_mls;
-    if (lines < 0)
-	lines = 5;
+    سطریں = (صحیح)p_mls;
+    اگر (سطریں < 0)
+	سطریں = 5;
 
-    file = mch_fopen((char *)filename, "r");
-    if (file == NULL)
-	return 0;
+    file = mch_fopen((حرف *)filename, "r");
+    اگر (file == تہی)
+	واپس 0;
 
-    for (i = 0; i < lines; i++)
+    برائے (i = 0; i < سطریں; i++)
     {
-	if (vim_fgets(IObuff, IOSIZE, file))
-	    break;
-	if (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
+	اگر (vim_fgets(IObuff, IOSIZE, file))
+	    توڑو;
+	اگر (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
 	{
 	    // Check shebang.
-	    if (strstr((char *)IObuff + 2, "python2") != NULL)
+	    اگر (لڑی_تلاش((حرف *)IObuff + 2, "python2") != تہی)
 	    {
-		requires_py_version = 2;
-		break;
+		requires_py_نسخہ = 2;
+		توڑو;
 	    }
-	    if (strstr((char *)IObuff + 2, "python3") != NULL)
+	    اگر (لڑی_تلاش((حرف *)IObuff + 2, "python3") != تہی)
 	    {
-		requires_py_version = 3;
-		break;
+		requires_py_نسخہ = 3;
+		توڑو;
 	    }
 	}
 	IObuff[21] = '\0';
-	if (STRCMP("# requires python 2.x", IObuff) == 0)
+	اگر (STRCMP("# requires python 2.x", IObuff) == 0)
 	{
-	    requires_py_version = 2;
-	    break;
+	    requires_py_نسخہ = 2;
+	    توڑو;
 	}
-	if (STRCMP("# requires python 3.x", IObuff) == 0)
+	اگر (STRCMP("# requires python 3.x", IObuff) == 0)
 	{
-	    requires_py_version = 3;
-	    break;
+	    requires_py_نسخہ = 3;
+	    توڑو;
 	}
     }
     fclose(file);
-    return requires_py_version;
+    واپس requires_py_نسخہ;
 }
 
 
 /*
  * Source a python file using the requested python version.
  */
-    static void
-source_pyx_file(exarg_T *eap, char_u *fname)
+    ساکن خالی
+ماخذ_pyx_file(exarg_T *eap, char_u *fname)
 {
     exarg_T ex;
-    int	    v = requires_py_version(fname);
+    صحیح	    v = requires_py_نسخہ(fname);
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# اگر defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
 # endif
-    if (v == 0)
+    اگر (v == 0)
     {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# اگر defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 	// user didn't choose a preference, 'pyx' is used
 	v = p_pyx;
 # elif defined(FEAT_PYTHON)
@@ -954,59 +954,59 @@ source_pyx_file(exarg_T *eap, char_u *fname)
      * now source, if required python version is not supported show
      * unobtrusive message.
      */
-    if (eap == NULL)
-	CLEAR_FIELD(ex);
-    else
+    اگر (eap == تہی)
+	CLEAR_میدان(ex);
+    ورنہ
 	ex = *eap;
     ex.arg = fname;
     ex.cmd = (char_u *)(v == 2 ? "pyfile" : "pyfile3");
 
-    if (v == 2)
+    اگر (v == 2)
     {
 # ifdef FEAT_PYTHON
 	ex_pyfile(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# ورنہ
+	vim_snprintf((حرف *)IObuff, IOSIZE,
 		_("W20: Required python version 2.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	پیغام((حرف *)IObuff);
 # endif
-	return;
+	واپس;
     }
-    else
+    ورنہ
     {
 # ifdef FEAT_PYTHON3
 	ex_py3file(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# ورنہ
+	vim_snprintf((حرف *)IObuff, IOSIZE,
 		_("W21: Required python version 3.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	پیغام((حرف *)IObuff);
 # endif
-	return;
+	واپس;
     }
 }
 
 /*
  * ":pyxfile {fname}"
  */
-    void
+    خالی
 ex_pyxfile(exarg_T *eap)
 {
-    source_pyx_file(eap, eap->arg);
+    ماخذ_pyx_file(eap, eap->arg);
 }
 
 /*
  * ":pyx"
  */
-    void
+    خالی
 ex_pyx(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# اگر defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    اگر (p_pyx == 2)
 	ex_python(eap);
-    else
+    ورنہ
 	ex_py3(eap);
 # elif defined(FEAT_PYTHON)
     ex_python(eap);
@@ -1018,14 +1018,14 @@ ex_pyx(exarg_T *eap)
 /*
  * ":pyxdo"
  */
-    void
+    خالی
 ex_pyxdo(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# اگر defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    اگر (p_pyx == 2)
 	ex_pydo(eap);
-    else
+    ورنہ
 	ex_py3do(eap);
 # elif defined(FEAT_PYTHON)
     ex_pydo(eap);
@@ -1034,25 +1034,25 @@ ex_pyxdo(exarg_T *eap)
 # endif
 }
 
-#endif
+#اگر_ختم
 
 /*
  * ":checktime [buffer]"
  */
-    void
+    خالی
 ex_checktime(exarg_T *eap)
 {
     buf_T	*buf;
-    int		save_no_check_timestamps = no_check_timestamps;
+    صحیح		save_no_check_timestamps = no_check_timestamps;
 
     no_check_timestamps = 0;
-    if (eap->addr_count == 0)	// default is all buffers
+    اگر (eap->addr_گنتی == 0)	// default is all buffers
 	check_timestamps(FALSE);
-    else
+    ورنہ
     {
-	buf = buflist_findnr((int)eap->line2);
-	if (buf != NULL)	// cannot happen?
-	    (void)buf_check_timestamp(buf, FALSE);
+	buf = buflist_findnr((صحیح)eap->line2);
+	اگر (buf != تہی)	// cannot happen?
+	    (خالی)buf_check_timestamp(buf, FALSE);
     }
     no_check_timestamps = save_no_check_timestamps;
 }

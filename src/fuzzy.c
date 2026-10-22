@@ -31,38 +31,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#تعریف_کرو USING_FLOAT_STUFF
+#شامل "vim.h"
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
-static int fuzzy_match_item_compare(const void *s1, const void *s2);
-static void fuzzy_match_in_list(list_T *l, char_u *str, int matchseq, char_u *key, callback_T *item_cb, int retmatchpos, list_T *fmatchlist, long max_matches);
-static void do_fuzzymatch(typval_T *argvars, typval_T *rettv, int retmatchpos);
-#endif
-static int fuzzy_match_str_compare(const void *s1, const void *s2);
-static void fuzzy_match_str_sort(fuzmatch_str_T *fm, int sz);
-static int fuzzy_match_func_compare(const void *s1, const void *s2);
-static void fuzzy_match_func_sort(fuzmatch_str_T *fm, int sz);
+#اگر defined(FEAT_EVAL) || defined(FEAT_PROTO)
+ساکن صحیح fuzzy_مطابقت_شے_compare(ثابت خالی *s1, ثابت خالی *s2);
+ساکن خالی fuzzy_مطابقت_اندر_list(list_T *l, char_u *str, صحیح matchseq, char_u *کلید, callback_T *شے_cb, صحیح retmatchpos, list_T *fmatchlist, طویل max_matches);
+ساکن خالی do_fuzzymatch(typval_T *argvars, typval_T *rettv, صحیح retmatchpos);
+#اگر_ختم
+ساکن صحیح fuzzy_مطابقت_str_compare(ثابت خالی *s1, ثابت خالی *s2);
+ساکن خالی fuzzy_مطابقت_str_ترتیب_دو(fuzmatch_str_T *fm, صحیح sz);
+ساکن صحیح fuzzy_مطابقت_func_compare(ثابت خالی *s1, ثابت خالی *s2);
+ساکن خالی fuzzy_مطابقت_func_ترتیب_دو(fuzmatch_str_T *fm, صحیح sz);
 
-typedef double score_t;
-static score_t match_positions(char_u *needle, char_u *haystack, int_u *positions);
-static int has_match(char_u *needle, char_u *haystack);
+قسمتعریف دوہرا score_t;
+ساکن score_t مطابقت_positions(char_u *needle, char_u *haystack, int_u *positions);
+ساکن صحیح has_مطابقت(char_u *needle, char_u *haystack);
 
-#define SCORE_MAX INFINITY
-#define SCORE_MIN (-INFINITY)
-#define SCORE_SCALE 1000
+#تعریف_کرو SCORE_MAX INFINITY
+#تعریف_کرو SCORE_MIN (-INFINITY)
+#تعریف_کرو SCORE_SCALE 1000
 
-typedef struct
+قسمتعریف ساخت
 {
-    int		idx;		// used for stable sort
-    listitem_T	*item;
-    int		score;
+    صحیح		idx;		// used for stable sort
+    listitem_T	*شے;
+    صحیح		score;
     list_T	*lmatchpos;
     char_u	*pat;
     char_u	*itemstr;
-    int		itemstr_allocated;
-    int		startpos;
-} fuzzyItem_T;
+    صحیح		itemstr_allocated;
+    صحیح		startpos;
+} fuzzy_شے_T;
 
 /*
  * fuzzy_match()
@@ -70,139 +70,139 @@ typedef struct
  * Returns TRUE if "pat_arg" matches "str". Also returns the match score in
  * "outScore" and the matching character positions in "matches".
  */
-    int
-fuzzy_match(
+    صحیح
+fuzzy_مطابقت(
     char_u	*str,
     char_u	*pat_arg,
-    int		matchseq,
-    int		*outScore,
+    صحیح		matchseq,
+    صحیح		*برآمد_Score,
     int_u	*matches,
-    int		maxMatches)
+    صحیح		maxMatches)
 {
     char_u	*save_pat;
     char_u	*pat;
     char_u	*p;
-    int		complete = FALSE;
-    int		score = 0;
-    int		numMatches = 0;
-    int		pat_chars = 0;
+    صحیح		complete = FALSE;
+    صحیح		score = 0;
+    صحیح		عدد_Matches = 0;
+    صحیح		pat_chars = 0;
     score_t	fzy_score;
 
-    *outScore = 0;
+    *برآمد_Score = 0;
 
     save_pat = vim_strsave(pat_arg);
-    if (save_pat == NULL)
-	return FALSE;
+    اگر (save_pat == تہی)
+	واپس FALSE;
     pat = save_pat;
     p = pat;
 
     // Try matching each word in 'pat_arg' in 'str'
-    while (TRUE)
+    جب (TRUE)
     {
-	if (matchseq)
+	اگر (matchseq)
 	    complete = TRUE;
-	else
+	ورنہ
 	{
 	    // Extract one word from the pattern (separated by space)
 	    p = skipwhite(p);
-	    if (*p == NUL)
-		break;
+	    اگر (*p == NUL)
+		توڑو;
 	    pat = p;
-	    while (*p != NUL && !VIM_ISWHITE(PTR2CHAR(p)))
+	    جب (*p != NUL && !VIM_ISWHITE(PTR2CHAR(p)))
 	    {
-		if (has_mbyte)
+		اگر (has_mbyte)
 		    MB_PTR_ADV(p);
-		else
+		ورنہ
 		    ++p;
 	    }
-	    if (*p == NUL)		// processed all the words
+	    اگر (*p == NUL)		// processed all the words
 		complete = TRUE;
 	    *p = NUL;
 	}
 	// match_positions() always writes pat_chars entries,
 	// so bail if they won't fit.
 	pat_chars = MB_CHARLEN(pat);
-	if (pat_chars > maxMatches)
+	اگر (pat_chars > maxMatches)
 	    pat_chars = maxMatches;
-	if (numMatches > maxMatches - pat_chars)
+	اگر (عدد_Matches > maxMatches - pat_chars)
 	{
-	    numMatches = 0;
-	    *outScore = FUZZY_SCORE_NONE;
-	    break;
+	    عدد_Matches = 0;
+	    *برآمد_Score = FUZZY_SCORE_NONE;
+	    توڑو;
 	}
 
 	score = FUZZY_SCORE_NONE;
-	if (has_match(pat, str))
+	اگر (has_مطابقت(pat, str))
 	{
-	    fzy_score = match_positions(pat, str, matches + numMatches);
-	    if (fzy_score != SCORE_MIN)
-		score = (fzy_score == SCORE_MAX) ? INT_MAX
-		    : (fzy_score < 0) ? (int)ceil(fzy_score * SCORE_SCALE - 0.5)
-		    : (int)floor(fzy_score * SCORE_SCALE + 0.5);
+	    fzy_score = مطابقت_positions(pat, str, matches + عدد_Matches);
+	    اگر (fzy_score != SCORE_MIN)
+		score = (fzy_score == SCORE_MAX) ? زیادہ_سے_زیادہ_عدد
+		    : (fzy_score < 0) ? (صحیح)ceil(fzy_score * SCORE_SCALE - 0.5)
+		    : (صحیح)floor(fzy_score * SCORE_SCALE + 0.5);
 	}
 
-	if (score == FUZZY_SCORE_NONE)
+	اگر (score == FUZZY_SCORE_NONE)
 	{
-	    numMatches = 0;
-	    *outScore = FUZZY_SCORE_NONE;
-	    break;
+	    عدد_Matches = 0;
+	    *برآمد_Score = FUZZY_SCORE_NONE;
+	    توڑو;
 	}
 
-	if (score > 0 && *outScore > INT_MAX - score)
-	    *outScore = INT_MAX;
-	else if (score < 0 && *outScore < INT_MIN + 1 - score)
-	    *outScore = INT_MIN + 1;
-	else
-	    *outScore += score;
+	اگر (score > 0 && *برآمد_Score > زیادہ_سے_زیادہ_عدد - score)
+	    *برآمد_Score = زیادہ_سے_زیادہ_عدد;
+	ورنہ اگر (score < 0 && *برآمد_Score < INT_MIN + 1 - score)
+	    *برآمد_Score = INT_MIN + 1;
+	ورنہ
+	    *برآمد_Score += score;
 
-	numMatches += pat_chars;
+	عدد_Matches += pat_chars;
 
-	if (complete || numMatches >= maxMatches)
-	    break;
+	اگر (complete || عدد_Matches >= maxMatches)
+	    توڑو;
 
 	// try matching the next word
 	++p;
     }
 
     vim_free(save_pat);
-    return numMatches != 0;
+    واپس عدد_Matches != 0;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#اگر defined(FEAT_EVAL) || defined(FEAT_PROTO)
 /*
  * Sort the fuzzy matches in the descending order of the match score.
  * For items with same score, retain the order using the index (stable sort)
  */
-    static int
-fuzzy_match_item_compare(const void *s1, const void *s2)
+    ساکن صحیح
+fuzzy_مطابقت_شے_compare(ثابت خالی *s1, ثابت خالی *s2)
 {
-    int		v1 = ((fuzzyItem_T *)s1)->score;
-    int		v2 = ((fuzzyItem_T *)s2)->score;
+    صحیح		v1 = ((fuzzy_شے_T *)s1)->score;
+    صحیح		v2 = ((fuzzy_شے_T *)s2)->score;
 
-    if (v1 == v2)
+    اگر (v1 == v2)
     {
-	int exact_match1 = FALSE, exact_match2 = FALSE;
-	char_u *pat = ((fuzzyItem_T *)s1)->pat;
-	int patlen = (int)STRLEN(pat);
-	int startpos = ((fuzzyItem_T *)s1)->startpos;
+	صحیح exact_match1 = FALSE, exact_match2 = FALSE;
+	char_u *pat = ((fuzzy_شے_T *)s1)->pat;
+	صحیح patlen = (صحیح)STRLEN(pat);
+	صحیح startpos = ((fuzzy_شے_T *)s1)->startpos;
 	exact_match1 = (startpos >= 0) && STRNCMP(pat,
-		((fuzzyItem_T *)s1)->itemstr + startpos, patlen) == 0;
-	startpos = ((fuzzyItem_T *)s2)->startpos;
+		((fuzzy_شے_T *)s1)->itemstr + startpos, patlen) == 0;
+	startpos = ((fuzzy_شے_T *)s2)->startpos;
 	exact_match2 = (startpos >= 0) && STRNCMP(pat,
-		((fuzzyItem_T *)s2)->itemstr + startpos, patlen) == 0;
+		((fuzzy_شے_T *)s2)->itemstr + startpos, patlen) == 0;
 
-	if (exact_match1 == exact_match2)
+	اگر (exact_match1 == exact_match2)
 	{
-	    int idx1 = ((fuzzyItem_T *)s1)->idx;
-	    int idx2 = ((fuzzyItem_T *)s2)->idx;
-	    return idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
+	    صحیح idx1 = ((fuzzy_شے_T *)s1)->idx;
+	    صحیح idx2 = ((fuzzy_شے_T *)s2)->idx;
+	    واپس idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
 	}
-	else if (exact_match2)
-	    return 1;
-	return -1;
+	ورنہ اگر (exact_match2)
+	    واپس 1;
+	واپس -1;
     }
-    else
-	return v1 > v2 ? -1 : 1;
+    ورنہ
+	واپس v1 > v2 ? -1 : 1;
 }
 
 /*
@@ -216,58 +216,58 @@ fuzzy_match_item_compare(const void *s1, const void *s2)
  * If 'retmatchpos' is TRUE, then return a list of positions where 'str'
  * matches for each item.
  */
-    static void
-fuzzy_match_in_list(
+    ساکن خالی
+fuzzy_مطابقت_اندر_list(
     list_T	*l,
     char_u	*str,
-    int		matchseq,
-    char_u	*key,
-    callback_T	*item_cb,
-    int		retmatchpos,
+    صحیح		matchseq,
+    char_u	*کلید,
+    callback_T	*شے_cb,
+    صحیح		retmatchpos,
     list_T	*fmatchlist,
-    long	max_matches)
+    طویل	max_matches)
 {
-    long	    len;
-    fuzzyItem_T	    *items = NULL;
+    طویل	    len;
+    fuzzy_شے_T	    *اشیاء = تہی;
     listitem_T	    *li;
-    long	    match_count = 0;
-    int_u	    matches[FUZZY_MATCH_MAX_LEN];
+    طویل	    مطابقت_گنتی = 0;
+    int_u	    matches[FUZZY_مطابقت_MAX_LEN];
 
     len = list_len(l);
-    if (len == 0)
-	return;
-    if (max_matches > 0 && len > max_matches)
+    اگر (len == 0)
+	واپس;
+    اگر (max_matches > 0 && len > max_matches)
 	len = max_matches;
 
-    items = ALLOC_CLEAR_MULT(fuzzyItem_T, len);
-    if (items == NULL)
-	return;
+    اشیاء = ALLOC_CLEAR_MULT(fuzzy_شے_T, len);
+    اگر (اشیاء == تہی)
+	واپس;
 
     // For all the string items in items, get the fuzzy matching score
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_اشیاء(l, li)
     {
-	int		score;
-	char_u		*itemstr = NULL;
-	char_u		*itemstr_copy = NULL;
+	صحیح		score;
+	char_u		*itemstr = تہی;
+	char_u		*itemstr_copy = تہی;
 	typval_T	rettv;
-	int		itemstr_allocate = FALSE;
-	list_T		*match_positions = NULL;
+	صحیح		itemstr_allocate = FALSE;
+	list_T		*مطابقت_positions = تہی;
 
-	if (max_matches > 0 && match_count >= max_matches)
-	    break;
+	اگر (max_matches > 0 && مطابقت_گنتی >= max_matches)
+	    توڑو;
 
 	rettv.v_type = VAR_UNKNOWN;
-	if (li->li_tv.v_type == VAR_STRING)	// list of strings
+	اگر (li->li_tv.v_type == VAR_STRING)	// list of strings
 	    itemstr = li->li_tv.vval.v_string;
-	else if (li->li_tv.v_type == VAR_DICT
-				&& (key != NULL || item_cb->cb_name != NULL))
+	ورنہ اگر (li->li_tv.v_type == VAR_DICT
+				&& (کلید != تہی || شے_cb->cb_name != تہی))
 	{
 	    // For a dict, either use the specified key to lookup the string or
 	    // use the specified callback function to get the string.
-	    if (key != NULL)
+	    اگر (کلید != تہی)
 		itemstr = dict_get_string(li->li_tv.vval.v_dict,
-							   (char *)key, FALSE);
-	    else
+							   (حرف *)کلید, FALSE);
+	    ورنہ
 	    {
 		typval_T	argv[2];
 
@@ -276,9 +276,9 @@ fuzzy_match_in_list(
 		argv[0].v_type = VAR_DICT;
 		argv[0].vval.v_dict = li->li_tv.vval.v_dict;
 		argv[1].v_type = VAR_UNKNOWN;
-		if (call_callback(item_cb, -1, &rettv, 1, argv) != FAIL)
+		اگر (call_callback(شے_cb, -1, &rettv, 1, argv) != FAIL)
 		{
-		    if (rettv.v_type == VAR_STRING)
+		    اگر (rettv.v_type == VAR_STRING)
 		    {
 			itemstr = rettv.vval.v_string;
 			itemstr_allocate = TRUE;
@@ -288,87 +288,87 @@ fuzzy_match_in_list(
 	    }
 	}
 
-	if (itemstr != NULL
-		&& fuzzy_match(itemstr, str, matchseq, &score, matches,
-						FUZZY_MATCH_MAX_LEN))
+	اگر (itemstr != تہی
+		&& fuzzy_مطابقت(itemstr, str, matchseq, &score, matches,
+						FUZZY_مطابقت_MAX_LEN))
 	{
-	    if (itemstr_allocate)
+	    اگر (itemstr_allocate)
 	    {
 		itemstr_copy = vim_strsave(itemstr);
-		if (itemstr_copy == NULL)
+		اگر (itemstr_copy == تہی)
 		{
 		    clear_tv(&rettv);
-		    continue;
+		    جاری;
 		}
 	    }
-	    else
+	    ورنہ
 		itemstr_copy = itemstr;
 
 	    // Copy the list of matching positions in itemstr to a list, if
 	    // "retmatchpos" is set.
-	    if (retmatchpos)
+	    اگر (retmatchpos)
 	    {
-		match_positions = list_alloc();
-		if (match_positions == NULL)
+		مطابقت_positions = list_alloc();
+		اگر (مطابقت_positions == تہی)
 		{
-		    if (itemstr_allocate && itemstr_copy)
+		    اگر (itemstr_allocate && itemstr_copy)
 			vim_free(itemstr_copy);
 		    clear_tv(&rettv);
-		    continue;
+		    جاری;
 		}
 
 		// Fill position information
-		int	j = 0;
+		صحیح	j = 0;
 		char_u	*p = str;
-		int	success = TRUE;
+		صحیح	success = TRUE;
 
-		while (*p != NUL && j < FUZZY_MATCH_MAX_LEN && success)
+		جب (*p != NUL && j < FUZZY_مطابقت_MAX_LEN && success)
 		{
-		    if (!VIM_ISWHITE(PTR2CHAR(p)) || matchseq)
+		    اگر (!VIM_ISWHITE(PTR2CHAR(p)) || matchseq)
 		    {
-			if (list_append_number(match_positions, matches[j]) == FAIL)
+			اگر (list_append_نمبر(مطابقت_positions, matches[j]) == FAIL)
 			{
 			    success = FALSE;
-			    break;
+			    توڑو;
 			}
 			j++;
 		    }
-		    if (has_mbyte)
+		    اگر (has_mbyte)
 			MB_PTR_ADV(p);
-		    else
+		    ورنہ
 			++p;
 		}
 
-		if (!success)
+		اگر (!success)
 		{
-		    list_free(match_positions);
-		    if (itemstr_allocate && itemstr_copy)
+		    list_free(مطابقت_positions);
+		    اگر (itemstr_allocate && itemstr_copy)
 			vim_free(itemstr_copy);
 		    clear_tv(&rettv);
-		    continue;
+		    جاری;
 		}
 	    }
-	    items[match_count].idx = match_count;
-	    items[match_count].item = li;
-	    items[match_count].score = score;
-	    items[match_count].pat = str;
-	    items[match_count].startpos = matches[0];
-	    items[match_count].itemstr = itemstr_copy;
-	    items[match_count].itemstr_allocated = itemstr_allocate;
-	    items[match_count].lmatchpos = match_positions;
+	    اشیاء[مطابقت_گنتی].idx = مطابقت_گنتی;
+	    اشیاء[مطابقت_گنتی].شے = li;
+	    اشیاء[مطابقت_گنتی].score = score;
+	    اشیاء[مطابقت_گنتی].pat = str;
+	    اشیاء[مطابقت_گنتی].startpos = matches[0];
+	    اشیاء[مطابقت_گنتی].itemstr = itemstr_copy;
+	    اشیاء[مطابقت_گنتی].itemstr_allocated = itemstr_allocate;
+	    اشیاء[مطابقت_گنتی].lmatchpos = مطابقت_positions;
 
-	    ++match_count;
+	    ++مطابقت_گنتی;
 	}
 	clear_tv(&rettv);
     }
 
-    if (match_count > 0)
+    اگر (مطابقت_گنتی > 0)
     {
 	list_T		*retlist;
 
 	// Sort the list by the descending order of the match score
-	qsort((void *)items, (size_t)match_count, sizeof(fuzzyItem_T),
-		fuzzy_match_item_compare);
+	qsort((خالی *)اشیاء, (size_t)مطابقت_گنتی, حجم(fuzzy_شے_T),
+		fuzzy_مطابقت_شے_compare);
 
 	// For matchfuzzy(), return a list of matched strings.
 	//	    ['str1', 'str2', 'str3']
@@ -377,155 +377,155 @@ fuzzy_match_in_list(
 	// is a list of lists where each list item is a list of matched
 	// character positions. The third item is a list of matching scores.
 	//	[['str1', 'str2', 'str3'], [[1, 3], [1, 3], [1, 3]]]
-	if (retmatchpos)
+	اگر (retmatchpos)
 	{
-	    li = list_find(fmatchlist, 0);
-	    if (li == NULL || li->li_tv.vval.v_list == NULL)
-		goto done;
+	    li = list_ڈھونڈو(fmatchlist, 0);
+	    اگر (li == تہی || li->li_tv.vval.v_list == تہی)
+		جاؤ مکمل;
 	    retlist = li->li_tv.vval.v_list;
 	}
-	else
+	ورنہ
 	    retlist = fmatchlist;
 
 	// Copy the matching strings to the return list
-	for (int i = 0; i < match_count; i++)
+	برائے (صحیح i = 0; i < مطابقت_گنتی; i++)
 	{
-	    if (list_append_tv(retlist, &items[i].item->li_tv) == FAIL)
-		goto done;
+	    اگر (list_append_tv(retlist, &اشیاء[i].شے->li_tv) == FAIL)
+		جاؤ مکمل;
 	}
 
 	// next copy the list of matching positions
-	if (retmatchpos)
+	اگر (retmatchpos)
 	{
-	    li = list_find(fmatchlist, -2);
-	    if (li == NULL || li->li_tv.vval.v_list == NULL)
-		goto done;
+	    li = list_ڈھونڈو(fmatchlist, -2);
+	    اگر (li == تہی || li->li_tv.vval.v_list == تہی)
+		جاؤ مکمل;
 	    retlist = li->li_tv.vval.v_list;
 
-	    for (int i = 0; i < match_count; i++)
+	    برائے (صحیح i = 0; i < مطابقت_گنتی; i++)
 	    {
-		if (items[i].lmatchpos != NULL)
+		اگر (اشیاء[i].lmatchpos != تہی)
 		{
-		    if (list_append_list(retlist, items[i].lmatchpos) == OK)
-			items[i].lmatchpos = NULL;
-		    else
-			goto done;
+		    اگر (list_append_list(retlist, اشیاء[i].lmatchpos) == OK)
+			اشیاء[i].lmatchpos = تہی;
+		    ورنہ
+			جاؤ مکمل;
 
 		}
 	    }
 
 	    // copy the matching scores
-	    li = list_find(fmatchlist, -1);
-	    if (li == NULL || li->li_tv.vval.v_list == NULL)
-		goto done;
+	    li = list_ڈھونڈو(fmatchlist, -1);
+	    اگر (li == تہی || li->li_tv.vval.v_list == تہی)
+		جاؤ مکمل;
 	    retlist = li->li_tv.vval.v_list;
-	    for (int i = 0; i < match_count; i++)
+	    برائے (صحیح i = 0; i < مطابقت_گنتی; i++)
 	    {
-		if (list_append_number(retlist, items[i].score) == FAIL)
-		    goto done;
+		اگر (list_append_نمبر(retlist, اشیاء[i].score) == FAIL)
+		    جاؤ مکمل;
 	    }
 	}
     }
 
-done:
-    for (int i = 0; i < match_count; i++)
+مکمل:
+    برائے (صحیح i = 0; i < مطابقت_گنتی; i++)
     {
-	if (items[i].itemstr_allocated)
-	    vim_free(items[i].itemstr);
+	اگر (اشیاء[i].itemstr_allocated)
+	    vim_free(اشیاء[i].itemstr);
 
-	if (items[i].lmatchpos)
-	    list_free(items[i].lmatchpos);
+	اگر (اشیاء[i].lmatchpos)
+	    list_free(اشیاء[i].lmatchpos);
     }
-    vim_free(items);
+    vim_free(اشیاء);
 }
 
 /*
  * Do fuzzy matching. Returns the list of matched strings in 'rettv'.
  * If 'retmatchpos' is TRUE, also returns the matching character positions.
  */
-    static void
-do_fuzzymatch(typval_T *argvars, typval_T *rettv, int retmatchpos)
+    ساکن خالی
+do_fuzzymatch(typval_T *argvars, typval_T *rettv, صحیح retmatchpos)
 {
     callback_T	cb;
-    char_u	*key = NULL;
-    int		ret;
-    int		matchseq = FALSE;
-    long	max_matches = 0;
+    char_u	*کلید = تہی;
+    صحیح		ret;
+    صحیح		matchseq = FALSE;
+    طویل	max_matches = 0;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	واپس;
 
-    CLEAR_POINTER(&cb);
+    CLEAR_اشارہ_گر(&cb);
 
     // validate and get the arguments
-    if (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
+    اگر (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == تہی)
     {
-	semsg(_(e_argument_of_str_must_be_list),
+	semsg(_(e_دلیل_کا_str_must_be_list),
 			     retmatchpos ? "matchfuzzypos()" : "matchfuzzy()");
-	return;
+	واپس;
     }
-    if (argvars[1].v_type != VAR_STRING
-	    || argvars[1].vval.v_string == NULL)
+    اگر (argvars[1].v_type != VAR_STRING
+	    || argvars[1].vval.v_string == تہی)
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	return;
+	semsg(_(e_invalid_دلیل_str), tv_get_string(&argvars[1]));
+	واپس;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T		*d;
 	dictitem_T	*di;
 
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	اگر (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    واپس;
 
 	// To search a dict, either a callback function or a key can be
 	// specified.
 	d = argvars[2].vval.v_dict;
-	if ((di = dict_find(d, (char_u *)"key", -1)) != NULL)
+	اگر ((di = dict_ڈھونڈو(d, (char_u *)"key", -1)) != تہی)
 	{
-	    if (di->di_tv.v_type != VAR_STRING
-		    || di->di_tv.vval.v_string == NULL
+	    اگر (di->di_tv.v_type != VAR_STRING
+		    || di->di_tv.vval.v_string == تہی
 		    || *di->di_tv.vval.v_string == NUL)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "key",
+		semsg(_(e_invalid_قدر_for_دلیل_str_str), "key",
 						    tv_get_string(&di->di_tv));
-		return;
+		واپس;
 	    }
-	    key = tv_get_string(&di->di_tv);
+	    کلید = tv_get_string(&di->di_tv);
 	}
-	else if ((di = dict_find(d, (char_u *)"text_cb", -1)) != NULL)
+	ورنہ اگر ((di = dict_ڈھونڈو(d, (char_u *)"text_cb", -1)) != تہی)
 	{
 	    cb = get_callback(&di->di_tv);
-	    if (cb.cb_name == NULL)
+	    اگر (cb.cb_name == تہی)
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "text_cb");
-		return;
+		semsg(_(e_invalid_قدر_for_دلیل_str), "text_cb");
+		واپس;
 	    }
 	}
 
-	if ((di = dict_find(d, (char_u *)"limit", -1)) != NULL)
+	اگر ((di = dict_ڈھونڈو(d, (char_u *)"limit", -1)) != تہی)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    اگر (di->di_tv.v_type != VAR_نمبر)
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "limit");
-		return;
+		semsg(_(e_invalid_قدر_for_دلیل_str), "limit");
+		واپس;
 	    }
-	    max_matches = (long)tv_get_number_chk(&di->di_tv, NULL);
+	    max_matches = (طویل)tv_get_نمبر_chk(&di->di_tv, تہی);
 	}
 
-	if (dict_has_key(d, "matchseq"))
+	اگر (dict_has_کلید(d, "matchseq"))
 	    matchseq = TRUE;
     }
 
     // get the fuzzy matches
     ret = rettv_list_alloc(rettv);
-    if (ret == FAIL)
-	goto done;
-    if (retmatchpos)
+    اگر (ret == FAIL)
+	جاؤ مکمل;
+    اگر (retmatchpos)
     {
 	list_T	*l;
 
@@ -534,42 +534,42 @@ do_fuzzymatch(typval_T *argvars, typval_T *rettv, int retmatchpos)
 	// lists with matching positions within each string and the third item
 	// is the list of scores of the matches.
 	l = list_alloc();
-	if (l == NULL)
-	    goto done;
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	اگر (l == تہی)
+	    جاؤ مکمل;
+	اگر (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    goto done;
+	    جاؤ مکمل;
 	}
 	l = list_alloc();
-	if (l == NULL)
-	    goto done;
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	اگر (l == تہی)
+	    جاؤ مکمل;
+	اگر (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    goto done;
+	    جاؤ مکمل;
 	}
 	l = list_alloc();
-	if (l == NULL)
-	    goto done;
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	اگر (l == تہی)
+	    جاؤ مکمل;
+	اگر (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    goto done;
+	    جاؤ مکمل;
 	}
     }
 
-    fuzzy_match_in_list(argvars[0].vval.v_list, tv_get_string(&argvars[1]),
-	    matchseq, key, &cb, retmatchpos, rettv->vval.v_list, max_matches);
+    fuzzy_مطابقت_اندر_list(argvars[0].vval.v_list, tv_get_string(&argvars[1]),
+	    matchseq, کلید, &cb, retmatchpos, rettv->vval.v_list, max_matches);
 
-done:
+مکمل:
     free_callback(&cb);
 }
 
 /*
  * "matchfuzzy()" function
  */
-    void
+    خالی
 f_matchfuzzy(typval_T *argvars, typval_T *rettv)
 {
     do_fuzzymatch(argvars, rettv, FALSE);
@@ -578,94 +578,94 @@ f_matchfuzzy(typval_T *argvars, typval_T *rettv)
 /*
  * "matchfuzzypos()" function
  */
-    void
+    خالی
 f_matchfuzzypos(typval_T *argvars, typval_T *rettv)
 {
     do_fuzzymatch(argvars, rettv, TRUE);
 }
-#endif
+#اگر_ختم
 
 /*
  * Same as fuzzy_match_item_compare() except for use with a string match
  */
-    static int
-fuzzy_match_str_compare(const void *s1, const void *s2)
+    ساکن صحیح
+fuzzy_مطابقت_str_compare(ثابت خالی *s1, ثابت خالی *s2)
 {
-    int		v1 = ((fuzmatch_str_T *)s1)->score;
-    int		v2 = ((fuzmatch_str_T *)s2)->score;
-    int		idx1 = ((fuzmatch_str_T *)s1)->idx;
-    int		idx2 = ((fuzmatch_str_T *)s2)->idx;
+    صحیح		v1 = ((fuzmatch_str_T *)s1)->score;
+    صحیح		v2 = ((fuzmatch_str_T *)s2)->score;
+    صحیح		idx1 = ((fuzmatch_str_T *)s1)->idx;
+    صحیح		idx2 = ((fuzmatch_str_T *)s2)->idx;
 
-    if (v1 == v2)
-	return idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
-    else
-	return v1 > v2 ? -1 : 1;
+    اگر (v1 == v2)
+	واپس idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
+    ورنہ
+	واپس v1 > v2 ? -1 : 1;
 }
 
 /*
  * Sort fuzzy matches by score
  */
-    static void
-fuzzy_match_str_sort(fuzmatch_str_T *fm, int sz)
+    ساکن خالی
+fuzzy_مطابقت_str_ترتیب_دو(fuzmatch_str_T *fm, صحیح sz)
 {
     // Sort the list by the descending order of the match score
-    qsort((void *)fm, (size_t)sz, sizeof(fuzmatch_str_T),
-	    fuzzy_match_str_compare);
+    qsort((خالی *)fm, (size_t)sz, حجم(fuzmatch_str_T),
+	    fuzzy_مطابقت_str_compare);
 }
 
 /*
  * Same as fuzzy_match_item_compare() except for use with a function name
  * string match. <SNR> functions should be sorted to the end.
  */
-    static int
-fuzzy_match_func_compare(const void *s1, const void *s2)
+    ساکن صحیح
+fuzzy_مطابقت_func_compare(ثابت خالی *s1, ثابت خالی *s2)
 {
-    int		v1 = ((fuzmatch_str_T *)s1)->score;
-    int		v2 = ((fuzmatch_str_T *)s2)->score;
-    int		idx1 = ((fuzmatch_str_T *)s1)->idx;
-    int		idx2 = ((fuzmatch_str_T *)s2)->idx;
+    صحیح		v1 = ((fuzmatch_str_T *)s1)->score;
+    صحیح		v2 = ((fuzmatch_str_T *)s2)->score;
+    صحیح		idx1 = ((fuzmatch_str_T *)s1)->idx;
+    صحیح		idx2 = ((fuzmatch_str_T *)s2)->idx;
     char_u	*str1 = ((fuzmatch_str_T *)s1)->str;
     char_u	*str2 = ((fuzmatch_str_T *)s2)->str;
 
-    if (*str1 != '<' && *str2 == '<')
-	return -1;
-    if (*str1 == '<' && *str2 != '<')
-	return 1;
-    if (v1 == v2)
-	return idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
-    else
-	return v1 > v2 ? -1 : 1;
+    اگر (*str1 != '<' && *str2 == '<')
+	واپس -1;
+    اگر (*str1 == '<' && *str2 != '<')
+	واپس 1;
+    اگر (v1 == v2)
+	واپس idx1 == idx2 ? 0 : idx1 > idx2 ? 1 : -1;
+    ورنہ
+	واپس v1 > v2 ? -1 : 1;
 }
 
 /*
  * Sort fuzzy matches of function names by score.
  * <SNR> functions should be sorted to the end.
  */
-    static void
-fuzzy_match_func_sort(fuzmatch_str_T *fm, int sz)
+    ساکن خالی
+fuzzy_مطابقت_func_ترتیب_دو(fuzmatch_str_T *fm, صحیح sz)
 {
     // Sort the list by the descending order of the match score
-    qsort((void *)fm, (size_t)sz, sizeof(fuzmatch_str_T),
-		fuzzy_match_func_compare);
+    qsort((خالی *)fm, (size_t)sz, حجم(fuzmatch_str_T),
+		fuzzy_مطابقت_func_compare);
 }
 
 /*
  * Fuzzy match 'pat' in 'str'. Returns 0 if there is no match. Otherwise,
  * returns the match score.
  */
-    int
-fuzzy_match_str(char_u *str, char_u *pat)
+    صحیح
+fuzzy_مطابقت_str(char_u *str, char_u *pat)
 {
-    int		score = FUZZY_SCORE_NONE;
-    int_u	matchpos[FUZZY_MATCH_MAX_LEN];
+    صحیح		score = FUZZY_SCORE_NONE;
+    int_u	matchpos[FUZZY_مطابقت_MAX_LEN];
 
-    if (str == NULL || pat == NULL)
-	return score;
+    اگر (str == تہی || pat == تہی)
+	واپس score;
 
-    fuzzy_match(str, pat, TRUE, &score, matchpos,
-				sizeof(matchpos) / sizeof(matchpos[0]));
+    fuzzy_مطابقت(str, pat, TRUE, &score, matchpos,
+				حجم(matchpos) / حجم(matchpos[0]));
 
-    return score;
+    واپس score;
 }
 
 /*
@@ -674,51 +674,51 @@ fuzzy_match_str(char_u *str, char_u *pat)
  * returns NULL.
  */
     garray_T *
-fuzzy_match_str_with_pos(char_u *str UNUSED, char_u *pat UNUSED)
+fuzzy_مطابقت_str_with_pos(char_u *str غیر_مستعمل, char_u *pat غیر_مستعمل)
 {
-#ifdef FEAT_SEARCH_EXTRA
-    int		    score = FUZZY_SCORE_NONE;
-    garray_T	    *match_positions = NULL;
-    int_u	    matches[FUZZY_MATCH_MAX_LEN];
-    int		    j = 0;
+#اگر_تعریف_شدہ FEAT_تلاش_EXTRA
+    صحیح		    score = FUZZY_SCORE_NONE;
+    garray_T	    *مطابقت_positions = تہی;
+    int_u	    matches[FUZZY_مطابقت_MAX_LEN];
+    صحیح		    j = 0;
 
-    if (str == NULL || pat == NULL)
-	return NULL;
+    اگر (str == تہی || pat == تہی)
+	واپس تہی;
 
-    match_positions = ALLOC_ONE(garray_T);
-    if (match_positions == NULL)
-	return NULL;
-    ga_init2(match_positions, sizeof(int_u), 10);
+    مطابقت_positions = ALLOC_ONE(garray_T);
+    اگر (مطابقت_positions == تہی)
+	واپس تہی;
+    ga_init2(مطابقت_positions, حجم(int_u), 10);
 
-    if (!fuzzy_match(str, pat, FALSE, &score, matches, FUZZY_MATCH_MAX_LEN)
+    اگر (!fuzzy_مطابقت(str, pat, FALSE, &score, matches, FUZZY_مطابقت_MAX_LEN)
 	    || score == FUZZY_SCORE_NONE)
     {
-	ga_clear(match_positions);
-	vim_free(match_positions);
-	return NULL;
+	ga_clear(مطابقت_positions);
+	vim_free(مطابقت_positions);
+	واپس تہی;
     }
 
-    for (char_u *p = pat; *p != NUL; MB_PTR_ADV(p))
+    برائے (char_u *p = pat; *p != NUL; MB_PTR_ADV(p))
     {
-	if (!VIM_ISWHITE(PTR2CHAR(p)))
+	اگر (!VIM_ISWHITE(PTR2CHAR(p)))
 	{
-	    if (ga_grow(match_positions, 1) == FAIL)
+	    اگر (ga_grow(مطابقت_positions, 1) == FAIL)
 	    {
-		ga_clear(match_positions);
-		vim_free(match_positions);
-		return NULL;
+		ga_clear(مطابقت_positions);
+		vim_free(مطابقت_positions);
+		واپس تہی;
 	    }
-	    ((int_u *)match_positions->ga_data)[match_positions->ga_len] =
+	    ((int_u *)مطابقت_positions->ga_ڈیٹا)[مطابقت_positions->ga_len] =
 								    matches[j];
-	    match_positions->ga_len++;
+	    مطابقت_positions->ga_len++;
 	    j++;
 	}
     }
 
-    return match_positions;
-#else
-    return NULL;
-#endif
+    واپس مطابقت_positions;
+#ورنہ
+    واپس تہی;
+#اگر_ختم
 }
 
 /*
@@ -733,63 +733,63 @@ fuzzy_match_str_with_pos(char_u *str UNUSED, char_u *pat UNUSED)
  *
  * If no match is found, `*ptr` is updated to the end of the line.
  */
-    int
-fuzzy_match_str_in_line(
+    صحیح
+fuzzy_مطابقت_str_اندر_سطر(
     char_u	**ptr,
     char_u	*pat,
-    int		*len,
+    صحیح		*len,
     pos_T	*current_pos,
-    int		*score)
+    صحیح		*score)
 {
     char_u	*str = *ptr;
     char_u	*strBegin = str;
-    char_u	*end = NULL;
-    char_u	*start = NULL;
-    int		found = FALSE;
-    char	save_end;
-    char_u	*line_end = NULL;
+    char_u	*انتہا = تہی;
+    char_u	*آغاز = تہی;
+    صحیح		ملا = FALSE;
+    حرف	save_انتہا;
+    char_u	*سطر_انتہا = تہی;
 
-    if (str == NULL || pat == NULL)
-	return found;
-    line_end = find_line_end(str);
+    اگر (str == تہی || pat == تہی)
+	واپس ملا;
+    سطر_انتہا = ڈھونڈو_سطر_انتہا(str);
 
-    while (str < line_end)
+    جب (str < سطر_انتہا)
     {
 	// Skip non-word characters
-	start = find_word_start(str);
-	if (*start == NUL)
-	    break;
-	end = find_word_end(start);
+	آغاز = ڈھونڈو_لفظ_آغاز(str);
+	اگر (*آغاز == NUL)
+	    توڑو;
+	انتہا = ڈھونڈو_لفظ_انتہا(آغاز);
 
 	// Extract the word from start to end
-	save_end = *end;
-	*end = NUL;
+	save_انتہا = *انتہا;
+	*انتہا = NUL;
 
 	// Perform fuzzy match
-	*score = fuzzy_match_str(start, pat);
-	*end = save_end;
+	*score = fuzzy_مطابقت_str(آغاز, pat);
+	*انتہا = save_انتہا;
 
-	if (*score != FUZZY_SCORE_NONE)
+	اگر (*score != FUZZY_SCORE_NONE)
 	{
-	    *len = (int)(end - start);
-	    found = TRUE;
-	    *ptr = start;
-	    if (current_pos)
-		current_pos->col += (int)(end - strBegin);
-	    break;
+	    *len = (صحیح)(انتہا - آغاز);
+	    ملا = TRUE;
+	    *ptr = آغاز;
+	    اگر (current_pos)
+		current_pos->ستون += (صحیح)(انتہا - strBegin);
+	    توڑو;
 	}
 
 	// Move to the end of the current word for the next iteration
-	str = end;
+	str = انتہا;
 	// Ensure we continue searching after the current word
-	while (*str != NUL && !vim_iswordp(str))
+	جب (*str != NUL && !vim_iswordp(str))
 	    MB_PTR_ADV(str);
     }
 
-    if (!found)
-	*ptr = line_end;
+    اگر (!ملا)
+	*ptr = سطر_انتہا;
 
-    return found;
+    واپس ملا;
 }
 
 /*
@@ -800,130 +800,130 @@ fuzzy_match_str_in_line(
  *
  * Return TRUE if a match is found, otherwise FALSE.
  */
-    int
-search_for_fuzzy_match(
+    صحیح
+تلاش_for_fuzzy_مطابقت(
     buf_T	*buf,
     pos_T	*pos,
-    char_u	*pattern,
-    int		dir,
-    pos_T	*start_pos,
-    int		*len,
+    char_u	*نمونہ,
+    صحیح		dir,
+    pos_T	*آغاز_pos,
+    صحیح		*len,
     char_u	**ptr,
-    int		*score)
+    صحیح		*score)
 {
     pos_T	current_pos = *pos;
-    pos_T	circly_end;
-    int		found_new_match = FALSE;
-    int		looped_around = FALSE;
-    int		whole_line = ctrl_x_mode_whole_line();
+    pos_T	circly_انتہا;
+    صحیح		ملا_new_مطابقت = FALSE;
+    صحیح		looped_around = FALSE;
+    صحیح		پورا_سطر = ctrl_x_منوال_پورا_سطر();
 
-    if (buf == curbuf)
-	circly_end = *start_pos;
-    else
+    اگر (buf == curbuf)
+	circly_انتہا = *آغاز_pos;
+    ورنہ
     {
-	circly_end.lnum = buf->b_ml.ml_line_count;
-	circly_end.col = 0;
-	circly_end.coladd = 0;
+	circly_انتہا.lnum = buf->b_ml.ml_سطر_گنتی;
+	circly_انتہا.ستون = 0;
+	circly_انتہا.coladd = 0;
     }
 
-    if (whole_line && start_pos->lnum != pos->lnum)
+    اگر (پورا_سطر && آغاز_pos->lnum != pos->lnum)
 	current_pos.lnum += dir;
 
-    do
+    کرو
     {
 
 	// Check if looped around and back to start position
-	if (looped_around && (whole_line ? current_pos.lnum == circly_end.lnum
-					: EQUAL_POS(current_pos, circly_end)))
-	    break;
+	اگر (looped_around && (پورا_سطر ? current_pos.lnum == circly_انتہا.lnum
+					: EQUAL_POS(current_pos, circly_انتہا)))
+	    توڑو;
 
 	// Ensure current_pos is valid
-	if (current_pos.lnum >= 1 && current_pos.lnum <= buf->b_ml.ml_line_count)
+	اگر (current_pos.lnum >= 1 && current_pos.lnum <= buf->b_ml.ml_سطر_گنتی)
 	{
 	    // Get the current line buffer
 	    *ptr = ml_get_buf(buf, current_pos.lnum, FALSE);
-	    if (!whole_line)
-		*ptr += current_pos.col;
+	    اگر (!پورا_سطر)
+		*ptr += current_pos.ستون;
 
 	    // If ptr is end of line is reached, move to next line
 	    // or previous line based on direction
-	    if (*ptr != NULL && **ptr != NUL)
+	    اگر (*ptr != تہی && **ptr != NUL)
 	    {
-		if (!whole_line)
+		اگر (!پورا_سطر)
 		{
 		    // Try to find a fuzzy match in the current line starting
 		    // from current position
-		    found_new_match = fuzzy_match_str_in_line(ptr, pattern,
+		    ملا_new_مطابقت = fuzzy_مطابقت_str_اندر_سطر(ptr, نمونہ,
 						    len, &current_pos, score);
-		    if (found_new_match)
+		    اگر (ملا_new_مطابقت)
 		    {
 			*pos = current_pos;
-			break;
+			توڑو;
 		    }
-		    else if (looped_around && current_pos.lnum == circly_end.lnum)
-			break;
+		    ورنہ اگر (looped_around && current_pos.lnum == circly_انتہا.lnum)
+			توڑو;
 		}
-		else
+		ورنہ
 		{
-		    char_u *line = *ptr;
-		    char_u *p = skipwhite(line);
-		    if (fuzzy_match_str(p, pattern) != FUZZY_SCORE_NONE)
+		    char_u *سطر = *ptr;
+		    char_u *p = skipwhite(سطر);
+		    اگر (fuzzy_مطابقت_str(p, نمونہ) != FUZZY_SCORE_NONE)
 		    {
-			found_new_match = TRUE;
+			ملا_new_مطابقت = TRUE;
 			*pos = current_pos;
 			*ptr = p;
-			*len = (int)ml_get_buf_len(buf, current_pos.lnum) -
-								(int)(p - line);
-			break;
+			*len = (صحیح)ml_get_buf_len(buf, current_pos.lnum) -
+								(صحیح)(p - سطر);
+			توڑو;
 		    }
 		}
 	    }
 	}
 
 	// Move to the next line or previous line based on direction
-	if (dir == FORWARD)
+	اگر (dir == FORWARD)
 	{
-	    if (++current_pos.lnum > buf->b_ml.ml_line_count)
+	    اگر (++current_pos.lnum > buf->b_ml.ml_سطر_گنتی)
 	    {
-		if (p_ws)
+		اگر (p_ws)
 		{
 		    current_pos.lnum = 1;
 		    looped_around = TRUE;
 		}
-		else
-		    break;
+		ورنہ
+		    توڑو;
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (--current_pos.lnum < 1)
+	    اگر (--current_pos.lnum < 1)
 	    {
-		if (p_ws)
+		اگر (p_ws)
 		{
-		    current_pos.lnum = buf->b_ml.ml_line_count;
+		    current_pos.lnum = buf->b_ml.ml_سطر_گنتی;
 		    looped_around = TRUE;
 		}
-		else
-		    break;
+		ورنہ
+		    توڑو;
 
 	    }
 	}
-	current_pos.col = 0;
-    } while (TRUE);
+	current_pos.ستون = 0;
+    } جب (TRUE);
 
-    return found_new_match;
+    واپس ملا_new_مطابقت;
 }
 
 /*
  * Free an array of fuzzy string matches "fuzmatch[count]".
  */
-    void
-fuzmatch_str_free(fuzmatch_str_T *fuzmatch, int count)
+    خالی
+fuzmatch_str_free(fuzmatch_str_T *fuzmatch, صحیح گنتی)
 {
-    if (fuzmatch == NULL)
-	return;
+    اگر (fuzmatch == تہی)
+	واپس;
 
-    for (int i = 0; i < count; ++i)
+    برائے (صحیح i = 0; i < گنتی; ++i)
 	vim_free(fuzmatch[i].str);
     vim_free(fuzmatch);
 }
@@ -933,35 +933,35 @@ fuzmatch_str_free(fuzmatch_str_T *fuzmatch, int count)
  * the fuzzy score. Frees the memory allocated for 'fuzmatch'.
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    int
-fuzzymatches_to_strmatches(
+    صحیح
+fuzzymatches_مقصد_strmatches(
 	fuzmatch_str_T	*fuzmatch,
 	char_u		***matches,
-	int		count,
-	int		funcsort)
+	صحیح		گنتی,
+	صحیح		funcsort)
 {
-    if (count <= 0)
-	goto theend;
+    اگر (گنتی <= 0)
+	جاؤ theend;
 
-    *matches = ALLOC_MULT(char_u *, count);
-    if (*matches == NULL)
+    *matches = ALLOC_MULT(char_u *, گنتی);
+    اگر (*matches == تہی)
     {
-	fuzmatch_str_free(fuzmatch, count);
-	return FAIL;
+	fuzmatch_str_free(fuzmatch, گنتی);
+	واپس FAIL;
     }
 
     // Sort the list by the descending order of the match score
-    if (funcsort)
-	fuzzy_match_func_sort((void *)fuzmatch, (size_t)count);
-    else
-	fuzzy_match_str_sort((void *)fuzmatch, (size_t)count);
+    اگر (funcsort)
+	fuzzy_مطابقت_func_ترتیب_دو((خالی *)fuzmatch, (size_t)گنتی);
+    ورنہ
+	fuzzy_مطابقت_str_ترتیب_دو((خالی *)fuzmatch, (size_t)گنتی);
 
-    for (int i = 0; i < count; i++)
+    برائے (صحیح i = 0; i < گنتی; i++)
 	(*matches)[i] = fuzmatch[i].str;
 
 theend:
     vim_free(fuzmatch);
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -969,178 +969,178 @@ theend:
  * This implementation extends the original by supporting multibyte characters.
  */
 
-#define MATCH_MAX_LEN FUZZY_MATCH_MAX_LEN
+#تعریف_کرو مطابقت_MAX_LEN FUZZY_مطابقت_MAX_LEN
 
-#define SCORE_GAP_LEADING -0.005
-#define SCORE_GAP_TRAILING -0.005
-#define SCORE_GAP_INNER -0.01
-#define SCORE_MATCH_CONSECUTIVE 1.0
-#define SCORE_MATCH_SLASH 0.9
-#define SCORE_MATCH_WORD 0.8
-#define SCORE_MATCH_CAPITAL 0.7
-#define SCORE_MATCH_DOT 0.6
+#تعریف_کرو SCORE_GAP_LEADING -0.005
+#تعریف_کرو SCORE_GAP_TRAILING -0.005
+#تعریف_کرو SCORE_GAP_INNER -0.01
+#تعریف_کرو SCORE_مطابقت_CONSECUTIVE 1.0
+#تعریف_کرو SCORE_مطابقت_SLASH 0.9
+#تعریف_کرو SCORE_مطابقت_لفظ 0.8
+#تعریف_کرو SCORE_مطابقت_CAPITAL 0.7
+#تعریف_کرو SCORE_مطابقت_DOT 0.6
 
-    static int
-has_match(char_u *needle, char_u *haystack)
+    ساکن صحیح
+has_مطابقت(char_u *needle, char_u *haystack)
 {
-    if (!needle || !haystack || !*needle)
-	return FAIL;
+    اگر (!needle || !haystack || !*needle)
+	واپس FAIL;
 
     char_u *n_ptr = needle;
     char_u *h_ptr = haystack;
 
-    while (*n_ptr)
+    جب (*n_ptr)
     {
-	int n_char = mb_ptr2char(n_ptr);
-	int n_upper = MB_TOUPPER(n_char);
-	int found = FALSE;
+	صحیح n_char = mb_ptr2char(n_ptr);
+	صحیح n_بالائی = MB_TOUPPER(n_char);
+	صحیح ملا = FALSE;
 
-	while (*h_ptr)
+	جب (*h_ptr)
 	{
-	    int h_char = mb_ptr2char(h_ptr);
-	    if (h_char == n_char || h_char == n_upper)
+	    صحیح h_char = mb_ptr2char(h_ptr);
+	    اگر (h_char == n_char || h_char == n_بالائی)
 	    {
-		found = TRUE;
+		ملا = TRUE;
 		h_ptr += mb_ptr2len(h_ptr);
-		break;
+		توڑو;
 	    }
 	    h_ptr += mb_ptr2len(h_ptr);
 	}
 
-	if (!found)
-	    return FAIL;
+	اگر (!ملا)
+	    واپس FAIL;
 
 	n_ptr += mb_ptr2len(n_ptr);
     }
 
-    return OK;
+    واپس OK;
 }
 
-typedef struct match_struct
+قسمتعریف ساخت مطابقت_struct
 {
-    int needle_len;
-    int haystack_len;
-    int lower_needle[MATCH_MAX_LEN];     // stores codepoints
-    int lower_haystack[MATCH_MAX_LEN];   // stores codepoints
-    score_t match_bonus[MATCH_MAX_LEN];
-} match_struct;
+    صحیح needle_len;
+    صحیح haystack_len;
+    صحیح زیریں_needle[مطابقت_MAX_LEN];     // stores codepoints
+    صحیح زیریں_haystack[مطابقت_MAX_LEN];   // stores codepoints
+    score_t مطابقت_bonus[مطابقت_MAX_LEN];
+} مطابقت_struct;
 
-#define IS_WORD_SEP(c) ((c) == '-' || (c) == '_' || (c) == ' ')
-#define IS_PATH_SEP(c) ((c) == '/')
-#define IS_DOT(c)      ((c) == '.')
+#تعریف_کرو IS_لفظ_SEP(c) ((c) == '-' || (c) == '_' || (c) == ' ')
+#تعریف_کرو IS_راستہ_SEP(c) ((c) == '/')
+#تعریف_کرو IS_DOT(c)      ((c) == '.')
 
-    static score_t
-compute_bonus_codepoint(int last_c, int c)
+    ساکن score_t
+compute_bonus_codepoint(صحیح آخری_c, صحیح c)
 {
-    if (ASCII_ISALNUM(c) || vim_iswordc(c))
+    اگر (ASCII_ISALNUM(c) || vim_iswordc(c))
     {
-	if (IS_PATH_SEP(last_c))
-	    return SCORE_MATCH_SLASH;
-	if (IS_WORD_SEP(last_c))
-	    return SCORE_MATCH_WORD;
-	if (IS_DOT(last_c))
-	    return SCORE_MATCH_DOT;
-	if (MB_ISUPPER(c) && MB_ISLOWER(last_c))
-	    return SCORE_MATCH_CAPITAL;
+	اگر (IS_راستہ_SEP(آخری_c))
+	    واپس SCORE_مطابقت_SLASH;
+	اگر (IS_لفظ_SEP(آخری_c))
+	    واپس SCORE_مطابقت_لفظ;
+	اگر (IS_DOT(آخری_c))
+	    واپس SCORE_مطابقت_DOT;
+	اگر (MB_ISUPPER(c) && MB_ISLOWER(آخری_c))
+	    واپس SCORE_مطابقت_CAPITAL;
     }
-    return 0;
+    واپس 0;
 }
 
-    static void
-setup_match_struct(match_struct *match, char_u *needle, char_u *haystack)
+    ساکن خالی
+تیاری_مطابقت_struct(مطابقت_struct *مطابقت, char_u *needle, char_u *haystack)
 {
-    int i = 0;
+    صحیح i = 0;
     char_u *p = needle;
-    while (*p != NUL && i < MATCH_MAX_LEN)
+    جب (*p != NUL && i < مطابقت_MAX_LEN)
     {
-	int c = mb_ptr2char(p);
-	match->lower_needle[i++] = MB_TOLOWER(c);
+	صحیح c = mb_ptr2char(p);
+	مطابقت->زیریں_needle[i++] = MB_TOLOWER(c);
 	MB_PTR_ADV(p);
     }
-    match->needle_len = i;
+    مطابقت->needle_len = i;
 
     i = 0;
     p = haystack;
-    int prev_c = '/';
-    while (*p != NUL && i < MATCH_MAX_LEN)
+    صحیح پچھلا_c = '/';
+    جب (*p != NUL && i < مطابقت_MAX_LEN)
     {
-	int c = mb_ptr2char(p);
-	match->lower_haystack[i] = MB_TOLOWER(c);
-	match->match_bonus[i] = compute_bonus_codepoint(prev_c, c);
-	prev_c = c;
+	صحیح c = mb_ptr2char(p);
+	مطابقت->زیریں_haystack[i] = MB_TOLOWER(c);
+	مطابقت->مطابقت_bonus[i] = compute_bonus_codepoint(پچھلا_c, c);
+	پچھلا_c = c;
 	MB_PTR_ADV(p);
 	i++;
     }
-    match->haystack_len = i;
+    مطابقت->haystack_len = i;
 }
 
-    static inline void
-match_row(const match_struct *match, int row, score_t *curr_D,
-	score_t *curr_M, const score_t *last_D, const score_t *last_M)
+    ساکن اندرونی خالی
+مطابقت_صف(ثابت مطابقت_struct *مطابقت, صحیح صف, score_t *curr_D,
+	score_t *curr_M, ثابت score_t *آخری_D, ثابت score_t *آخری_M)
 {
-    int n = match->needle_len;
-    int m = match->haystack_len;
-    int i = row;
+    صحیح n = مطابقت->needle_len;
+    صحیح m = مطابقت->haystack_len;
+    صحیح i = صف;
 
-    const int *lower_needle = match->lower_needle;
-    const int *lower_haystack = match->lower_haystack;
-    const score_t *match_bonus = match->match_bonus;
+    ثابت صحیح *زیریں_needle = مطابقت->زیریں_needle;
+    ثابت صحیح *زیریں_haystack = مطابقت->زیریں_haystack;
+    ثابت score_t *مطابقت_bonus = مطابقت->مطابقت_bonus;
 
-    score_t prev_score = SCORE_MIN;
+    score_t پچھلا_score = SCORE_MIN;
     score_t gap_score = i == n - 1 ? SCORE_GAP_TRAILING : SCORE_GAP_INNER;
 
     // These will not be used with this value, but not all compilers see it
-    score_t prev_M = SCORE_MIN, prev_D = SCORE_MIN;
+    score_t پچھلا_M = SCORE_MIN, پچھلا_D = SCORE_MIN;
 
-    for (int j = 0; j < m; j++)
+    برائے (صحیح j = 0; j < m; j++)
     {
-	if (lower_needle[i] == lower_haystack[j])
+	اگر (زیریں_needle[i] == زیریں_haystack[j])
 	{
 	    score_t score = SCORE_MIN;
-	    if (!i)
+	    اگر (!i)
 	    {
-		score = (j * SCORE_GAP_LEADING) + match_bonus[j];
+		score = (j * SCORE_GAP_LEADING) + مطابقت_bonus[j];
 	    }
-	    else if (j)
+	    ورنہ اگر (j)
 	    { /* i > 0 && j > 0*/
 		score = MAX(
-			prev_M + match_bonus[j],
+			پچھلا_M + مطابقت_bonus[j],
 			// consecutive match, doesn't stack with match_bonus
-			prev_D + SCORE_MATCH_CONSECUTIVE);
+			پچھلا_D + SCORE_مطابقت_CONSECUTIVE);
 	    }
-	    prev_D = last_D[j];
-	    prev_M = last_M[j];
+	    پچھلا_D = آخری_D[j];
+	    پچھلا_M = آخری_M[j];
 	    curr_D[j] = score;
-	    curr_M[j] = prev_score = MAX(score, prev_score + gap_score);
+	    curr_M[j] = پچھلا_score = MAX(score, پچھلا_score + gap_score);
 	}
-	else
+	ورنہ
 	{
-	    prev_D = last_D[j];
-	    prev_M = last_M[j];
+	    پچھلا_D = آخری_D[j];
+	    پچھلا_M = آخری_M[j];
 	    curr_D[j] = SCORE_MIN;
-	    curr_M[j] = prev_score = prev_score + gap_score;
+	    curr_M[j] = پچھلا_score = پچھلا_score + gap_score;
 	}
     }
 }
 
-    static score_t
-match_positions(char_u *needle, char_u *haystack, int_u *positions)
+    ساکن score_t
+مطابقت_positions(char_u *needle, char_u *haystack, int_u *positions)
 {
-    if (!needle || !haystack || !*needle)
-	return SCORE_MIN;
+    اگر (!needle || !haystack || !*needle)
+	واپس SCORE_MIN;
 
-    match_struct match;
-    setup_match_struct(&match, needle, haystack);
+    مطابقت_struct مطابقت;
+    تیاری_مطابقت_struct(&مطابقت, needle, haystack);
 
-    int n = match.needle_len;
-    int m = match.haystack_len;
+    صحیح n = مطابقت.needle_len;
+    صحیح m = مطابقت.haystack_len;
 
-    if (m > MATCH_MAX_LEN || n > m)
+    اگر (m > مطابقت_MAX_LEN || n > m)
     {
 	// Unreasonably large candidate: return no score
-	return SCORE_MIN;
+	واپس SCORE_MIN;
     }
-    else if (n == m)
+    ورنہ اگر (n == m)
     {
 	// Since this method can only be called with a haystack which
 	// matches needle. If the lengths of the strings are equal the
@@ -1148,51 +1148,51 @@ match_positions(char_u *needle, char_u *haystack, int_u *positions)
 	// After truncation to MATCH_MAX_LEN n == m can also happen for
 	// unequal strings, so check before taking the shortcut.
 	bool equal = true;
-	for (int i = 0; i < n; i++)
+	برائے (صحیح i = 0; i < n; i++)
 	{
-	    if (match.lower_needle[i] != match.lower_haystack[i])
+	    اگر (مطابقت.زیریں_needle[i] != مطابقت.زیریں_haystack[i])
 	    {
 		equal = false;
-		break;
+		توڑو;
 	    }
 	}
-	if (equal)
+	اگر (equal)
 	{
-	    if (positions)
+	    اگر (positions)
 	    {
-		for (int i = 0; i < n; i++)
+		برائے (صحیح i = 0; i < n; i++)
 		    positions[i] = i;
 	    }
-	    return SCORE_MAX;
+	    واپس SCORE_MAX;
 	}
     }
 
     // ensure n * MATCH_MAX_LEN * 2 won't overflow
-    if ((size_t)n > (SIZE_MAX / sizeof(score_t)) / MATCH_MAX_LEN / 2)
-	return SCORE_MIN;
+    اگر ((size_t)n > (سائز_MAX / حجم(score_t)) / مطابقت_MAX_LEN / 2)
+	واپس SCORE_MIN;
 
     // Allocate for both D and M matrices in one contiguous block
-    score_t *block = (score_t*)alloc(sizeof(score_t) * MATCH_MAX_LEN * n * 2);
-    if (!block)
-	return SCORE_MIN;
+    score_t *بلاک = (score_t*)alloc(حجم(score_t) * مطابقت_MAX_LEN * n * 2);
+    اگر (!بلاک)
+	واپس SCORE_MIN;
 
     // D[][] Stores the best score for this position ending with a match.
     // M[][] Stores the best possible score at this position.
-    score_t (*D)[MATCH_MAX_LEN] = (score_t(*)[MATCH_MAX_LEN])block;
-    score_t (*M)[MATCH_MAX_LEN] = (score_t(*)[MATCH_MAX_LEN])(block
-							+ MATCH_MAX_LEN * n);
+    score_t (*D)[مطابقت_MAX_LEN] = (score_t(*)[مطابقت_MAX_LEN])بلاک;
+    score_t (*M)[مطابقت_MAX_LEN] = (score_t(*)[مطابقت_MAX_LEN])(بلاک
+							+ مطابقت_MAX_LEN * n);
 
-    match_row(&match, 0, D[0], M[0], D[0], M[0]);
-    for (int i = 1; i < n; i++)
-	match_row(&match, i, D[i], M[i], D[i - 1], M[i - 1]);
+    مطابقت_صف(&مطابقت, 0, D[0], M[0], D[0], M[0]);
+    برائے (صحیح i = 1; i < n; i++)
+	مطابقت_صف(&مطابقت, i, D[i], M[i], D[i - 1], M[i - 1]);
 
     // backtrace to find the positions of optimal matching
-    if (positions)
+    اگر (positions)
     {
-	int match_required = 0;
-	for (int i = n - 1, j = m - 1; i >= 0; i--)
+	صحیح مطابقت_required = 0;
+	برائے (صحیح i = n - 1, j = m - 1; i >= 0; i--)
 	{
-	    for (; j >= 0; j--)
+	    برائے (; j >= 0; j--)
 	    {
 		// There may be multiple paths which result in
 		// the optimal weight.
@@ -1200,22 +1200,22 @@ match_positions(char_u *needle, char_u *haystack, int_u *positions)
 		// For simplicity, we will pick the first one
 		// we encounter, the latest in the candidate
 		// string.
-		if (D[i][j] != SCORE_MIN &&
-			(match_required || D[i][j] == M[i][j]))
+		اگر (D[i][j] != SCORE_MIN &&
+			(مطابقت_required || D[i][j] == M[i][j]))
 		{
 		    // If this score was determined using
 		    // SCORE_MATCH_CONSECUTIVE, the
 		    // previous character MUST be a match
-		    match_required = i && j &&
-			M[i][j] == D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE;
+		    مطابقت_required = i && j &&
+			M[i][j] == D[i - 1][j - 1] + SCORE_مطابقت_CONSECUTIVE;
 		    positions[i] = j--;
-		    break;
+		    توڑو;
 		}
 	    }
 	}
     }
 
-    score_t result = M[n - 1][m - 1];
-    vim_free(block);
-    return result;
+    score_t نتیجہ = M[n - 1][m - 1];
+    vim_free(بلاک);
+    واپس نتیجہ;
 }

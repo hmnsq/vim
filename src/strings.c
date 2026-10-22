@@ -11,8 +11,8 @@
  * strings.c: string manipulation functions
  */
 
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#تعریف_کرو USING_FLOAT_STUFF
+#شامل "vim.h"
 
 /*
  * Copy "string" into newly allocated memory.
@@ -25,9 +25,9 @@ vim_strsave(char_u *string)
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    اگر (p != تہی)
 	mch_memmove(p, string, len);
-    return p;
+    واپس p;
 }
 
 /*
@@ -42,12 +42,12 @@ vim_strnsave(char_u *string, size_t len)
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    اگر (p == تہی)
+	واپس تہی;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    واپس p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    واپس vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    صحیح		cc,
+    صحیح		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
-    unsigned	length;
-    int		l;
+    غیرعلامتی	لمبائی;
+    صحیح		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
-    length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    لمبائی = 1;				// count the trailing NUL
+    برائے (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	اگر (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    length += l;		// count a multibyte char
+	    لمبائی += l;		// count a multibyte char
 	    p += l - 1;
-	    continue;
+	    جاری;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
-	    ++length;			// count a backslash
-	++length;			// count an ordinary char
+	اگر (vim_strchr(esc_chars, *p) != تہی || (bsl && rem_backslash(p)))
+	    ++لمبائی;			// count a backslash
+	++لمبائی;			// count an ordinary char
     }
-    escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    escaped_string = alloc(لمبائی);
+    اگر (escaped_string == تہی)
+	واپس تہی;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    برائے (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	اگر (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    mch_memmove(p2, p, (size_t)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
-	    continue;
+	    جاری;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	اگر (vim_strchr(esc_chars, *p) != تہی || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    واپس escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
-csh_like_shell(void)
+    صحیح
+csh_like_shell(خالی)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    واپس (لڑی_تلاش((حرف *)gettail(p_sh), "csh") != تہی);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
-fish_like_shell(void)
+    ساکن صحیح
+fish_like_shell(خالی)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    واپس (لڑی_تلاش((حرف *)gettail(p_sh), "fish") != تہی);
 }
 
 /*
@@ -145,20 +145,20 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, صحیح do_special, صحیح do_newline)
 {
-    unsigned	length;
+    غیرعلامتی	لمبائی;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
     size_t	l;
-    int		csh_like;
-    int		fish_like;
+    صحیح		csh_like;
+    صحیح		fish_like;
     char_u	*shname;
-    int		powershell;
-#ifdef MSWIN
-    int		double_quotes;
-#endif
+    صحیح		powershell;
+#اگر_تعریف_شدہ MSWIN
+    صحیح		double_quotes;
+#اگر_ختم
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
     // the like we must not put a backslash before it, it will be taken
@@ -172,85 +172,85 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
-#ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = لڑی_تلاش((حرف *)shname, "pwsh") != تہی;
+#اگر_تعریف_شدہ MSWIN
+    powershell = powershell || لڑی_تلاش((حرف *)shname, "powershell") != تہی;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
-#endif
+#اگر_ختم
 
     // First count the number of extra bytes required.
-    length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    لمبائی = (غیرعلامتی)STRLEN(string) + 3;  // two quotes and a trailing NUL
+    برائے (p = string; *p != NUL; MB_PTR_ADV(p))
     {
-#ifdef MSWIN
-	if (double_quotes)
+#اگر_تعریف_شدہ MSWIN
+	اگر (double_quotes)
 	{
-	    if (*p == '"')
-		++length;		// " -> ""
+	    اگر (*p == '"')
+		++لمبائی;		// " -> ""
 	}
-	else
-#endif
-	if (*p == '\'')
+	ورنہ
+#اگر_ختم
+	اگر (*p == '\'')
 	{
-	    if (powershell)
-		length += 2;		// ' => ''
-	    else
-		length += 3;		// ' => '\''
+	    اگر (powershell)
+		لمبائی += 2;		// ' => ''
+	    ورنہ
+		لمبائی += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	اگر ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
-	    ++length;			// insert backslash
-	    if (csh_like && do_special)
-		++length;		// insert backslash
+	    ++لمبائی;			// insert backslash
+	    اگر (csh_like && do_special)
+		++لمبائی;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	اگر (do_special && ڈھونڈو_cmdline_var(p, &l) >= 0)
 	{
-	    ++length;			// insert backslash
+	    ++لمبائی;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
-	    ++length;			// insert backslash
+	اگر (*p == '\\' && fish_like)
+	    ++لمبائی;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
-    escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    escaped_string = alloc(لمبائی);
+    اگر (escaped_string != تہی)
     {
 	d = escaped_string;
 
 	// add opening quote
-#ifdef MSWIN
-	if (double_quotes)
+#اگر_تعریف_شدہ MSWIN
+	اگر (double_quotes)
 	    *d++ = '"';
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	برائے (p = string; *p != NUL; )
 	{
-#ifdef MSWIN
-	    if (double_quotes)
+#اگر_تعریف_شدہ MSWIN
+	    اگر (double_quotes)
 	    {
-		if (*p == '"')
+		اگر (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
 		    ++p;
-		    continue;
+		    جاری;
 		}
 	    }
-	    else
-#endif
-	    if (*p == '\'')
+	    ورنہ
+#اگر_ختم
+	    اگر (*p == '\'')
 	    {
-		if (powershell)
+		اگر (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		ورنہ
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -258,46 +258,46 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    *d++ = '\'';
 		}
 		++p;
-		continue;
+		جاری;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    اگر ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		اگر (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
-		continue;
+		جاری;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    اگر (do_special && ڈھونڈو_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
-		memcpy(d, p, l);	// copy the var
+		حافظہ_نقل(d, p, l);	// copy the var
 		d += l;
 		p += l;
-		continue;
+		جاری;
 	    }
-	    if (*p == '\\' && fish_like)
+	    اگر (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
-		continue;
+		جاری;
 	    }
 
 	    MB_COPY_CHAR(p, d);
 	}
 
 	// add terminating quote and finish with a NUL
-#ifdef MSWIN
-	if (double_quotes)
+#اگر_تعریف_شدہ MSWIN
+	اگر (double_quotes)
 	    *d++ = '"';
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    واپس escaped_string;
 }
 
 /*
@@ -305,13 +305,13 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
  * This uses ASCII lower-to-upper case translation, language independent.
  */
     char_u *
-vim_strsave_up(char_u *string)
+vim_strsave_اوپر(char_u *string)
 {
     char_u *p1;
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    واپس p1;
 }
 
 /*
@@ -319,40 +319,40 @@ vim_strsave_up(char_u *string)
  * This uses ASCII lower-to-upper case translation, language independent.
  */
     char_u *
-vim_strnsave_up(char_u *string, size_t len)
+vim_strnsave_اوپر(char_u *string, size_t len)
 {
     char_u *p1;
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    واپس p1;
 }
 
 /*
  * ASCII lower-to-upper case translation, language independent.
  */
-    void
+    خالی
 vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    صحیح	    c;
 
-    if (p == NULL)
-	return;
+    اگر (p == تہی)
+	واپس;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    جب ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#اگر defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
  * Returns NULL when out of memory.
  */
-    static char_u *
+    ساکن char_u *
 strup_save(char_u *orig)
 {
     char_u	*p;
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    اگر (res != تہی)
+	جب (*p != NUL)
 	{
-	    int		l;
+	    صحیح		l;
 
-	    if (enc_utf8)
+	    اگر (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		صحیح	c, uc;
+		صحیح	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		اگر (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		اگر (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    اگر (s == تہی)
 		    {
 			vim_free(res);
-			return NULL;
+			واپس تہی;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    ورنہ اگر (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    ورنہ
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    واپس res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    اگر (res != تہی)
+	جب (*p != NUL)
 	{
-	    int		l;
+	    صحیح		l;
 
-	    if (enc_utf8)
+	    اگر (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		صحیح	c, lc;
+		صحیح	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		اگر (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		اگر (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    اگر (s == تہی)
 		    {
 			vim_free(res);
-			return NULL;
+			واپس تہی;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,29 +469,29 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    ورنہ اگر (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    ورنہ
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    واپس res;
 }
-#endif
+#اگر_ختم
 
 /*
  * delete spaces at the end of a string
  */
-    void
+    خالی
 del_trailing_spaces(char_u *ptr)
 {
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    جب (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -499,118 +499,118 @@ del_trailing_spaces(char_u *ptr)
  * Like strncpy(), but always terminate the result with one NUL.
  * "to" must be "len + 1" long!
  */
-    void
-vim_strncpy(char_u *to, char_u *from, size_t len)
+    خالی
+vim_strncpy(char_u *مقصد, char_u *from, size_t len)
 {
-    STRNCPY(to, from, len);
-    to[len] = NUL;
+    STRNCPY(مقصد, from, len);
+    مقصد[len] = NUL;
 }
 
 /*
  * Like strcat(), but make sure the result fits in "tosize" bytes and is
  * always NUL terminated. "from" and "to" may overlap.
  */
-    void
-vim_strcat(char_u *to, char_u *from, size_t tosize)
+    خالی
+vim_strcat(char_u *مقصد, char_u *from, size_t tosize)
 {
-    size_t tolen = STRLEN(to);
+    size_t tolen = STRLEN(مقصد);
     size_t fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    اگر (tolen + fromlen + 1 > tosize)
     {
-	mch_memmove(to + tolen, from, tosize - tolen - 1);
-	to[tosize - 1] = NUL;
+	mch_memmove(مقصد + tolen, from, tosize - tolen - 1);
+	مقصد[tosize - 1] = NUL;
     }
-    else
-	mch_memmove(to + tolen, from, fromlen + 1);
+    ورنہ
+	mch_memmove(مقصد + tolen, from, fromlen + 1);
 }
 
 /*
  * A version of strlen() that has a maximum length.
  */
     size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+vim_strlen_maxlen(حرف *s, size_t maxlen)
 {
     size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    برائے (i = 0; i < maxlen; ++i)
+	اگر (s[i] == NUL)
+	    توڑو;
+    واپس i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#اگر !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    صحیح
+vim_stricmp(حرف *s1, حرف *s2)
 {
-    int		i;
+    صحیح		i;
 
-    for (;;)
+    برائے (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (صحیح)TOLOWER_LOC(*s1) - (صحیح)TOLOWER_LOC(*s2);
+	اگر (i != 0)
+	    واپس i;			    // this character different
+	اگر (*s1 == NUL)
+	    توڑو;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    واپس 0;				    // strings match
 }
-#endif
+#اگر_ختم
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#اگر !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    صحیح
+vim_strnicmp(حرف *s1, حرف *s2, size_t len)
 {
-    int		i;
+    صحیح		i;
 
-    while (len > 0)
+    جب (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (صحیح)TOLOWER_LOC(*s1) - (صحیح)TOLOWER_LOC(*s2);
+	اگر (i != 0)
+	    واپس i;			    // this character different
+	اگر (*s1 == NUL)
+	    توڑو;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    واپس 0;				    // strings match
 }
-#endif
+#اگر_ختم
 
 /*
  * Compare two ASCII strings, for length "len", ignoring case, ignoring locale
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    صحیح
+vim_strnicmp_asc(حرف *s1, حرف *s2, size_t len)
 {
-    int                i = 0;
+    صحیح                i = 0;
 
-    while (len > 0)
+    جب (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	اگر (i != 0)
+	    توڑو;			// this character is different
+	اگر (*s1 == NUL)
+	    توڑو;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    واپس i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, صحیح c)
 {
     char_u	*p;
-    int		b;
+    صحیح		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    اگر (enc_utf8 && c > 0 && c < 0x80)
+	واپس vim_strbyte(string, c);
+    اگر (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	جب (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    صحیح l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    اگر (utf_ptr2char(p) == c && l > 1)
+		واپس p;
 	    p += l;
 	}
-	return NULL;
+	واپس تہی;
     }
-    if (enc_dbcs != 0 && c > 255)
+    اگر (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	صحیح	n2 = c & 0xff;
 
-	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	c = ((غیرعلامتی)c >> 8) & 0xff;
+	جب ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    اگر (b == c && p[1] == n2)
+		واپس p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	واپس تہی;
     }
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	جب ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    اگر (b == c)
+		واپس p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	واپس تہی;
     }
-    while ((b = *p) != NUL)
+    جب ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	اگر (b == c)
+	    واپس p;
 	++p;
     }
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, صحیح c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    اگر (c <= 0 || c > 255)
+	واپس تہی;
+    واپس (char_u *)strchr((حرف *)string, c);
 }
 
 /*
@@ -697,25 +697,25 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, صحیح c)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = تہی;
     char_u	*p = string;
 
-    while (*p)
+    جب (*p)
     {
-	if (*p == c)
+	اگر (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    واپس retval;
 }
 
 /*
  * Vim's version of strpbrk(), in case it's missing.
  * Don't generate a prototype for this, causes problems when it's not used.
  */
-#ifndef PROTO
+#اگر_غیر_تعریف_شدہ PROTO
 # ifndef HAVE_STRPBRK
 #  ifdef vim_strpbrk
 #   undef vim_strpbrk
@@ -723,53 +723,53 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    جب (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	اگر (vim_strchr(charset, *s) != تہی)
+	    واپس s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    واپس تہی;
 }
 # endif
-#endif
+#اگر_ختم
 
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+ساکن صحیح ترتیب_دو_compare(ثابت خالی *s1, ثابت خالی *s2);
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    ساکن صحیح
+ترتیب_دو_compare(ثابت خالی *s1, ثابت خالی *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    واپس STRCMP(*(حرف **)s1, *(حرف **)s2);
 }
 
-    void
-sort_strings(
+    خالی
+ترتیب_دو_لڑیاں(
     char_u	**files,
-    int		count)
+    صحیح		گنتی)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((خالی *)files, (size_t)گنتی, حجم(char_u *), ترتیب_دو_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#اگر defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    صحیح
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    اگر (s != تہی)
+	برائے (p = s; *p != NUL; ++p)
+	    اگر (*p >= 128)
+		واپس TRUE;
+    واپس FALSE;
 }
-#endif
+#اگر_ختم
 
 /*
  * Concatenate two strings and return the result in allocated memory.
@@ -779,212 +779,212 @@ has_non_ascii(char_u *s)
 concat_str(char_u *str1, char_u *str2)
 {
     char_u  *dest;
-    size_t  l = str1 == NULL ? 0 : STRLEN(str1);
+    size_t  l = str1 == تہی ? 0 : STRLEN(str1);
 
-    dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    dest = alloc(l + (str2 == تہی ? 0 : STRLEN(str2)) + 1L);
+    اگر (dest == تہی)
+	واپس تہی;
+    اگر (str1 == تہی)
 	*dest = NUL;
-    else
+    ورنہ
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    اگر (str2 != تہی)
 	STRCPY(dest + l, str2);
-    return dest;
+    واپس dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#اگر defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
  */
     char_u *
-reverse_text(char_u *s)
+الٹ_متن(char_u *s)
 {
     size_t len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    اگر (rev == تہی)
+	واپس تہی;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    برائے (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    صحیح mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	ورنہ
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    واپس rev;
 }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, صحیح function)
 {
-    unsigned	len;
+    غیرعلامتی	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    اگر (str != تہی)
     {
-	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	len += (غیرعلامتی)STRLEN(str);
+	برائے (p = str; *p != NUL; MB_PTR_ADV(p))
+	    اگر (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    اگر (r == تہی)
+	واپس تہی;
 
-    if (function)
+    اگر (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    ورنہ
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    اگر (str != تہی)
+	برائے (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    اگر (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    اگر (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    واپس s;
 }
 
 /*
  * Count the number of times "needle" occurs in string "haystack". Case is
  * ignored if "ic" is TRUE.
  */
-    long
-string_count(char_u *haystack, char_u *needle, int ic)
+    طویل
+string_گنتی(char_u *haystack, char_u *needle, صحیح ic)
 {
-    long	n = 0;
+    طویل	n = 0;
     char_u	*p = haystack;
-    char_u	*next;
+    char_u	*اگلا;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    اگر (p == تہی || needle == تہی || *needle == NUL)
+	واپس 0;
 
     size_t  needlelen = STRLEN(needle);
-    if (ic)
+    اگر (ic)
     {
-	while (*p != NUL)
+	جب (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    اگر (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    ورنہ
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    ورنہ
+	جب ((اگلا = (char_u *)لڑی_تلاش((حرف *)p, (حرف *)needle)) != تہی)
 	{
 	    ++n;
-	    p = next + needlelen;
+	    p = اگلا + needlelen;
 	}
 
-    return n;
+    واپس n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+    ساکن صحیح
+copy_پہلا_char_مقصد_tv(char_u *داخلہ, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    صحیح		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    اگر (داخلہ == تہی || output == تہی)
+	واپس -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(داخلہ) : 1;
+    STRNCPY(buf, داخلہ, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    واپس output->vval.v_string == تہی ? -1 : len;
 }
 
 /*
  * Implementation of map() and filter() for a String. Apply "expr" to every
  * character in string "str" and return the result in "rettv".
  */
-    void
+    خالی
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*اظہاریہ,
 	typval_T	*rettv)
 {
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    صحیح		len = 0;
+    صحیح		idx = 0;
+    صحیح		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = تہی;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    سیٹ_vim_var_type(VV_کلید, VAR_نمبر);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_اظہاریہ_get_funccal(اظہاریہ, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, حجم(حرف), 80);
+    برائے (p = str; *p != NUL; p += len)
     {
-	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	len = copy_پہلا_char_مقصد_tv(p, &tv);
+	اگر (len < 0)
+	    توڑو;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	سیٹ_vim_var_nr(VV_کلید, idx);
+	اگر (filter_map_one(&tv, اظہاریہ, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    توڑو;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	اگر (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    اگر (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		توڑو;
 	    }
-	    else
+	    ورنہ
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	ورنہ اگر (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -993,8 +993,8 @@ string_filter_map(
 	++idx;
     }
     ga_append(&ga, NUL);
-    rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    rettv->vval.v_string = ga.ga_ڈیٹا;
+    اگر (fc != تہی)
 	remove_funccal();
 }
 
@@ -1003,126 +1003,126 @@ string_filter_map(
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    خالی
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*اظہاریہ,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    صحیح		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    صحیح		r;
+    صحیح		called_emsg_آغاز = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    اگر (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	اگر (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    semsg(_(e_reduce_کا_an_خالی_خانے_str_with_no_initial_قدر), "String");
+	    واپس;
 	}
-	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	len = copy_پہلا_char_مقصد_tv(p, rettv);
+	اگر (len < 0)
+	    واپس;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    ورنہ اگر (check_for_string_arg(argvars, 2) == FAIL)
+	واپس;
+    ورنہ
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_اظہاریہ_get_funccal(اظہاریہ, rettv);
 
-    for ( ; *p != NUL; p += len)
+    برائے ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	len = copy_پہلا_char_مقصد_tv(p, &argv[1]);
+	اگر (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    توڑو;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_اظہاریہ_typval(اظہاریہ, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	اگر (r == FAIL || called_emsg != called_emsg_آغاز)
+	    توڑو;
     }
 
-    if (fc != NULL)
+    اگر (fc != تہی)
 	remove_funccal();
 }
 
 /*
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
-    static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+    ساکن خالی
+byteidx_common(typval_T *argvars, typval_T *rettv, صحیح comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	واپس;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_نمبر_chk(&argvars[1], تہی);
+    اگر (str == تہی || idx < 0)
+	واپس;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	صحیح error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	اگر (error)
+	    واپس;
+	اگر (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    semsg(_(e_using_نمبر_as_bool_nr), utf16idx);
+	    واپس;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    صحیح (*ptr2len)(char_u *);
+    اگر (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    ورنہ
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    برائے ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	اگر (*t == NUL)		// EOL reached
+	    واپس;
+	اگر (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    صحیح clen = ptr2len(t);
+	    صحیح c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    اگر (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    اگر (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	ورنہ اگر (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_نمبر = (varnumber_T)(t - str);
 }
 
 /*
  * "byteidx()" function
  */
-    void
+    خالی
 f_byteidx(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, FALSE);
@@ -1131,7 +1131,7 @@ f_byteidx(typval_T *argvars, typval_T *rettv)
 /*
  * "byteidxcomp()" function
  */
-    void
+    خالی
 f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, TRUE);
@@ -1140,114 +1140,114 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 /*
  * "charidx()" function
  */
-    void
+    خالی
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    اگر (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	واپس;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_نمبر_chk(&argvars[1], تہی);
+    اگر (str == تہی || idx < 0)
+	واپس;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	اگر (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    صحیح (*ptr2len)(char_u *);
+    اگر (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    ورنہ
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    صحیح		len;
+    برائے (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	اگر (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    اگر (utf16idx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_نمبر = len;
+	    واپس;
 	}
-	if (utf16idx)
+	اگر (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    صحیح clen = ptr2len(p);
+	    صحیح c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    اگر (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_نمبر = len > 0 ? len - 1 : 0;
 }
 
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
-convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
+    ساکن صحیح
+convert_string(string_T *str, char_u *from, char_u *مقصد, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    اگر (convert_تیاری(&vimconv, from, مقصد) == FAIL)
+	واپس FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    اگر (vimconv.vc_type == CONV_NONE)
     {
-	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
-	    ret->length = 0;
-	else
-	    ret->length = str->length;
+	ret->string = vim_strnsave(str->string, str->لمبائی);
+	اگر (ret->string == تہی)
+	    ret->لمبائی = 0;
+	ورنہ
+	    ret->لمبائی = str->لمبائی;
     }
-    else
+    ورنہ
     {
-	int len = (int)str->length;
+	صحیح len = (صحیح)str->لمبائی;
 	ret->string = string_convert(&vimconv, str->string, &len);
-	ret->length = len;
+	ret->لمبائی = len;
     }
-    convert_setup(&vimconv, NULL, NULL);
+    convert_تیاری(&vimconv, تہی, تہی);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    واپس (ret->string == تہی) ? FAIL : OK;
 }
 
 /*
  * Add the bytes from "str" to "blob".
  */
-    static void
+    ساکن خالی
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    صحیح	    len = (صحیح)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
-    dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
+    اگر (len == 0)
+	واپس;
+    اگر (ga_grow(&blob->bv_ga, len) == FAIL)
+	واپس;
+    dest = (char_u *)blob->bv_ga.ga_ڈیٹا + blob->bv_ga.ga_len;
     mch_memmove(dest, str, (size_t)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    برائے (صحیح i = 0; i < len; ++i)
+	اگر (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,45 +1260,45 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
-string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
+    ساکن صحیح
+string_from_blob(blob_T *blob, طویل *آغاز_idx, string_T *ret)
 {
-    long	blen = blob_len(blob);
-    long	start = *start_idx;
+    طویل	blen = blob_len(blob);
+    طویل	آغاز = *آغاز_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    طویل	سطر_len;
 
-    if (start >= blen)
+    اگر (آغاز >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
-	ret->length = 0;
-	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	ret->لمبائی = 0;
+	*آغاز_idx = blen;
+	واپس (ret->string == تہی) ? FAIL : OK;
     }
 
-    src = (char_u *)blob->bv_ga.ga_data + start;
-    nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    src = (char_u *)blob->bv_ga.ga_ڈیٹا + آغاز;
+    nl = (char_u *)memchr(src, NL, (size_t)(blen - آغاز));
+    سطر_len = (nl == تہی) ? (blen - آغاز) : (طویل)(nl - src);
 
-    ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(سطر_len + 1);
+    اگر (ret->string == تہی)
     {
-	ret->length = 0;
-	return FAIL;
+	ret->لمبائی = 0;
+	واپس FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    اگر (سطر_len > 0)
+	mch_memmove(ret->string, src, (size_t)سطر_len);
+    ret->string[سطر_len] = NUL;
+    ret->لمبائی = (size_t)سطر_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    برائے (طویل i = 0; i < سطر_len; i++)
+	اگر (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    *آغاز_idx = آغاز + سطر_len + (nl != تہی ? 1 : 0);
+    واپس OK;
 }
 
 /*
@@ -1306,22 +1306,22 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
  * For example: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
  * Returns allocated string or NULL on allocation failure.
  */
-    static char_u *
+    ساکن char_u *
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    اگر (from_encoding_raw == تہی)
+	واپس تہی;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    جب (*s != NUL)
     {
-	if (*s == '_')
+	اگر (*s == '_')
 	    *pe++ = '-';
-	else
+	ورنہ
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    اگر ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,117 +1337,117 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    واپس from_encoding_raw;
 }
 
 /*
  * "blob2str()" function
  * Converts a blob to a string, ensuring valid UTF-8 encoding.
  */
-    static void
-append_converted_string_to_list(
+    ساکن خالی
+append_converted_string_مقصد_list(
 	string_T *converted,
-	int validate_utf8,
+	صحیح validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    اگر (converted->string != تہی)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
-	char_u *end = converted->string + converted->length;
-	while (p < end)
+	char_u *انتہا = converted->string + converted->لمبائی;
+	جب (p < انتہا)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	سطر;
+	    char_u	*سطر_آغاز = p;
 
-	    while (p < end && *p != NL)
+	    جب (p < انتہا && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    سطر.لمبائی = (size_t)(p - سطر_آغاز);
+	    سطر.string = vim_strnsave(سطر_آغاز, سطر.لمبائی);
+	    اگر (سطر.string != تہی)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		اگر (validate_utf8 && !utf_valid_string(سطر.string, تہی))
 		{
-		    vim_free(line.string);
+		    vim_free(سطر.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    واپس; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		اگر (list_append_string(list, سطر.string, (صحیح)سطر.لمبائی) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(سطر.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    واپس; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(سطر.string);
 	    }
-	    else
+	    ورنہ
 	    {
 		// Allocation failure: report error and stop processing
-		emsg(_(e_out_of_memory));
+		emsg(_(e_برآمد_کا_حافظہ));
 		vim_free(converted->string);
-		return;
+		واپس;
 	    }
 
-	    if (*p == NL)
+	    اگر (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    ورنہ
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    ساکن صحیح
+append_validated_سطر_مقصد_list(string_T *سطر, صحیح validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    اگر (validate_utf8 && !utf_valid_string(سطر->string, تہی))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
-	return FAIL;
+	vim_free(سطر->string);
+	واپس FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
-    return ret;
+    صحیح ret = list_append_string(list, سطر->string, (صحیح)سطر->لمبائی);
+    vim_free(سطر->string);
+    واپس ret;
 }
 
-    void
+    خالی
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
-    long	idx;
-    int		validate_utf8 = FALSE;
+    صحیح		blen;
+    طویل	idx;
+    صحیح		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    اگر (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	واپس;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    اگر (rettv_list_alloc(rettv) == FAIL)
+	واپس;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    اگر (blob == تہی)
+	واپس;
     blen = blob_len(blob);
 
-    char_u	*from_encoding = NULL;
-    char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*from_encoding = تہی;
+    char_u	*from_encoding_raw = تہی;  // Encoding name with endianness preserved for iconv
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	اگر (d != تہی)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    اگر (enc != تہی)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		اگر (from_encoding_raw == تہی)
 		{
-		    emsg(_(e_out_of_memory));
+		    emsg(_(e_برآمد_کا_حافظہ));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    واپس;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    اگر (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    اگر (from_encoding != تہی && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,23 +1476,23 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    صحیح from_prop = 0;
+    اگر (from_encoding != تہی)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    اگر (from_encoding != تہی && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2_لفظ)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
-	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	صحیح nul_سائز = (from_prop & ENC_4BYTE) ? 4 : 2;
+	ga_init2(&blob_ga, 1, blen + nul_سائز);
+	اگر (ga_grow(&blob_ga, blen + nul_سائز) == OK)
 	{
-	    if (blen > 0)
-		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
+	    اگر (blen > 0)
+		mch_memmove(blob_ga.ga_ڈیٹا, blob->bv_ga.ga_ڈیٹا, (size_t)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
-	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
-	    blob_ga.ga_len = blen + nul_size;
+	    vim_memset((char_u *)blob_ga.ga_ڈیٹا + blen, 0, (size_t)nul_سائز);
+	    blob_ga.ga_len = blen + nul_سائز;
 	}
 
 	// Convert the entire blob at once
@@ -1500,63 +1500,63 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	اگر (convert_تیاری_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
-	    goto done;
+	    جاؤ مکمل;
 	}
 	vimconv.vc_fail = TRUE;
 
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	صحیح len = blen;
 	converted.string =
-	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
-	converted.length = len;
-	convert_setup(&vimconv, NULL, NULL);
+	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_ڈیٹا, &len, تہی);
+	converted.لمبائی = len;
+	convert_تیاری(&vimconv, تہی, تہی);
 	ga_clear(&blob_ga);
-	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
+	append_converted_string_مقصد_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    ورنہ
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	جب (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    اگر (string_from_blob(blob, &idx, &str) != OK)
+		توڑو;
 
-	    if (from_encoding != NULL)
+	    اگر (from_encoding != تہی)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		صحیح	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		اگر (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
-		    goto done;
+		    جاؤ مکمل;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.لمبائی = converted.لمبائی;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
-		goto done;
+	    اگر (append_validated_سطر_مقصد_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+		جاؤ مکمل;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    اگر (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
-done:
+مکمل:
     vim_free(from_encoding);
     vim_free(from_encoding_raw);
 }
@@ -1564,47 +1564,47 @@ done:
 /*
  * "str2blob()" function
  */
-    void
+    خالی
 f_str2blob(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    اگر (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	واپس;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    اگر (rettv_blob_alloc(rettv) == FAIL)
+	واپس;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    اگر (list == تہی)
+	واپس;
 
-    char_u	*to_encoding = NULL;
-    char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*مقصد_encoding = تہی;
+    char_u	*مقصد_encoding_raw = تہی;  // Encoding name with endianness preserved for iconv
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	اگر (d != تہی)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    اگر (enc != تہی)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
-		to_encoding = enc_canonize(enc_skipped);
+		مقصد_encoding = enc_canonize(enc_skipped);
 
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
-		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		مقصد_encoding_raw = normalize_encoding_name(enc_skipped);
+		اگر (مقصد_encoding_raw == تہی)
 		{
-		    emsg(_(e_out_of_memory));
-		    VIM_CLEAR(to_encoding);
-		    return;
+		    emsg(_(e_برآمد_کا_حافظہ));
+		    VIM_CLEAR(مقصد_encoding);
+		    واپس;
 		}
 	    }
 	}
@@ -1615,253 +1615,253 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
-	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    صحیح مقصد_prop = 0;
+    اگر (مقصد_encoding != تہی)
+	مقصد_prop = enc_canon_props(مقصد_encoding);
+    اگر (مقصد_encoding != تہی && (مقصد_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2_لفظ)))
     {
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_اشیاء(list, li)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    اگر (li->li_tv.v_type != VAR_STRING)
+		جاری;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    اگر (li != list->lv_پہلا)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    اگر (s != تہی && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		صحیح slen = (صحیح)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		اگر (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
-		    goto done;
+		    جاؤ مکمل;
 		}
-		mch_memmove((char_u *)str_ga.ga_data + str_ga.ga_len, s,
+		mch_memmove((char_u *)str_ga.ga_ڈیٹا + str_ga.ga_len, s,
 								(size_t)slen);
 		str_ga.ga_len += slen;
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	اگر (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    اگر (convert_تیاری_ext(&vimconv, p_enc, FALSE, مقصد_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
-		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		semsg(_(e_str_encoding_مقصد_failed), مقصد_encoding);
+		جاؤ مکمل;
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    صحیح		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
-				    (char_u *)str_ga.ga_data, &len, NULL);
-	    convert_setup(&vimconv, NULL, NULL);
+				    (char_u *)str_ga.ga_ڈیٹا, &len, تہی);
+	    convert_تیاری(&vimconv, تہی, تہی);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    اگر (converted == تہی)
 	    {
-		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		semsg(_(e_str_encoding_مقصد_failed), مقصد_encoding);
+		جاؤ مکمل;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    اگر (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
-		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
+		mch_memmove((char_u *)blob->bv_ga.ga_ڈیٹا + blob->bv_ga.ga_len,
 						    converted, (size_t)len);
 		blob->bv_ga.ga_len += len;
 	    }
 	    vim_free(converted);
 	}
-	else
+	ورنہ
 	    ga_clear(&str_ga);
     }
-    else
+    ورنہ
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_اشیاء(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    اگر (li->li_tv.v_type != VAR_STRING)
+		جاری;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
-		STR_LITERAL_SET(str, "");
-	    else
-		str.length = STRLEN(str.string);
+	    اگر (str.string == تہی)
+		STR_LITERAL_سیٹ(str, "");
+	    ورنہ
+		str.لمبائی = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    اگر (مقصد_encoding != تہی)
 	    {
-		int	    res;
+		صحیح	    res;
 		string_T    converted;
 
-		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		res = convert_string(&str, p_enc, مقصد_encoding, &converted);
+		اگر (res != OK)
 		{
-		    semsg(_(e_str_encoding_to_failed), to_encoding);
-		    goto done;
+		    semsg(_(e_str_encoding_مقصد_failed), مقصد_encoding);
+		    جاؤ مکمل;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.لمبائی = converted.لمبائی;
 	    }
 
-	    if (li != list->lv_first)
+	    اگر (li != list->lv_پہلا)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    اگر (مقصد_encoding != تہی)
 		vim_free(str.string);
 	}
     }
 
-done:
-    if (to_encoding != NULL)
-	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
-	vim_free(to_encoding_raw);
+مکمل:
+    اگر (مقصد_encoding != تہی)
+	vim_free(مقصد_encoding);
+    اگر (مقصد_encoding_raw != تہی)
+	vim_free(مقصد_encoding_raw);
 }
 
 /*
  * "str2list()" function
  */
-    void
+    خالی
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    صحیح		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    اگر (rettv_list_alloc(rettv) == FAIL)
+	واپس;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	واپس;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (صحیح)tv_get_bool_chk(&argvars[1], تہی);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    اگر (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	صحیح (*ptr2len)(char_u *);
+	صحیح (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	اگر (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	ورنہ
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	برائے ( ; *p != NUL; p += (*ptr2len)(p))
+	    list_append_نمبر(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+    ورنہ
+	برائے ( ; *p != NUL; ++p)
+	    list_append_نمبر(rettv->vval.v_list, *p);
 }
 
 /*
  * "str2nr()" function
  */
-    void
+    خالی
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    صحیح		بنیاد = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    صحیح		what = 0;
+    صحیح		isneg;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_نمبر_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	واپس;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	بنیاد = (صحیح)tv_get_نمبر(&argvars[1]);
+	اگر (بنیاد != 2 && بنیاد != 8 && بنیاد != 10 && بنیاد != 16)
 	{
-	    emsg(_(e_invalid_argument));
-	    return;
+	    emsg(_(e_invalid_دلیل));
+	    واپس;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	اگر (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    اگر (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    switch (base)
+    انتخاب (بنیاد)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	حالت 2: what |= STR2NR_BIN + STR2NR_FORCE; توڑو;
+	حالت 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; توڑو;
+	حالت 16: what |= STR2NR_HEX + STR2NR_FORCE; توڑو;
     }
-    vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
+    vim_str2nr(p, تہی, تہی, what, &n, تہی, 0, FALSE, تہی);
     // Text after the number is silently ignored.
-    if (isneg)
-	rettv->vval.v_number = -n;
-    else
-	rettv->vval.v_number = n;
+    اگر (isneg)
+	rettv->vval.v_نمبر = -n;
+    ورنہ
+	rettv->vval.v_نمبر = n;
 
 }
 
 /*
  * "strgetchar()" function
  */
-    void
+    خالی
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    صحیح		len;
+    صحیح		error = FALSE;
+    صحیح		charidx;
+    صحیح		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_نمبر_arg(argvars, 1) == FAIL))
+	واپس;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    اگر (str == تہی)
+	واپس;
+    len = (صحیح)STRLEN(str);
+    charidx = (صحیح)tv_get_نمبر_chk(&argvars[1], &error);
+    اگر (error)
+	واپس;
 
-    while (charidx >= 0 && byteidx < len)
+    جب (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	اگر (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    rettv->vval.v_نمبر = mb_ptr2char(str + byteidx);
+	    توڑو;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1871,7 +1871,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
 /*
  * "stridx()" function
  */
-    void
+    خالی
 f_stridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
@@ -1879,40 +1879,40 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    صحیح		آغاز_idx;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_نمبر_arg(argvars, 2) == FAIL))
+	واپس;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_نمبر = -1;
+    اگر (needle == تہی || haystack == تہی)
+	واپس;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	صحیح	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
-	    haystack += start_idx;
+	آغاز_idx = (صحیح)tv_get_نمبر_chk(&argvars[2], &error);
+	اگر (error || آغاز_idx >= (صحیح)STRLEN(haystack))
+	    واپس;
+	اگر (آغاز_idx >= 0)
+	    haystack += آغاز_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+    pos	= (char_u *)لڑی_تلاش((حرف *)haystack, (حرف *)needle);
+    اگر (pos != تہی)
+	rettv->vval.v_نمبر = (varnumber_T)(pos - save_haystack);
 }
 
 /*
  * "string()" function
  */
-    void
+    خالی
 f_string(typval_T *argvars, typval_T *rettv)
 {
     char_u	*tofree;
@@ -1922,49 +1922,49 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    اگر (rettv->vval.v_string != تہی && tofree == تہی)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
 /*
  * "strlen()" function
  */
-    void
+    خالی
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script()
+	    && check_for_string_or_نمبر_arg(argvars, 0) == FAIL)
+	واپس;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_نمبر = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
-    static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+    ساکن خالی
+strchar_common(typval_T *argvars, typval_T *rettv, صحیح skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    صحیح			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    جب (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_نمبر = len;
 }
 
 /*
  * "strcharlen()" function
  */
-    void
+    خالی
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script()
+	    && check_for_string_or_نمبر_arg(argvars, 0) == FAIL)
+	واپس;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1972,26 +1972,26 @@ f_strcharlen(typval_T *argvars, typval_T *rettv)
 /*
  * "strchars()" function
  */
-    void
+    خالی
 f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	واپس;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	صحیح error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	اگر (error)
+	    واپس;
+	اگر (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    semsg(_(e_using_نمبر_as_bool_nr), skipcc);
+	    واپس;
 	}
     }
 
@@ -2001,161 +2001,161 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 /*
  * "strutf16len()" function
  */
-    void
+    خالی
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    اگر (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	واپس;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    صحیح			(*func_mb_ptr2char_adv)(char_u **pp);
+    صحیح			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    جب (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	اگر (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_نمبر = len;
 }
 
 /*
  * "strdisplaywidth()" function
  */
-    void
+    خالی
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    صحیح		ستون = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_نمبر_arg(argvars, 1) == FAIL))
+	واپس;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    اگر (argvars[1].v_type != VAR_UNKNOWN)
+	ستون = (صحیح)tv_get_نمبر(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_نمبر = (varnumber_T)(linetabsize_ستون(ستون, s) - ستون);
 }
 
 /*
  * "strwidth()" function
  */
-    void
+    خالی
 f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_نمبر = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
  * "strcharpart()" function
  */
-    void
+    خالی
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    صحیح		nchar;
+    صحیح		nbyte = 0;
+    صحیح		charlen;
+    صحیح		skipcc = FALSE;
+    صحیح		len = 0;
+    صحیح		slen;
+    صحیح		error = FALSE;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
+		|| check_for_opt_نمبر_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	واپس;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (صحیح)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (صحیح)tv_get_نمبر_chk(&argvars[1], &error);
+    اگر (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	اگر (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    اگر (error)
+		واپس;
+	    اگر (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		semsg(_(e_using_نمبر_as_bool_nr), skipcc);
+		واپس;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	اگر (nchar > 0)
+	    جب (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		اگر (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		ورنہ
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	ورنہ
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	اگر (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (صحیح)tv_get_نمبر(&argvars[2]);
+	    جب (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		صحیح off = nbyte + len;
 
-		if (off < 0)
+		اگر (off < 0)
 		    len += 1;
-		else
+		ورنہ
 		{
-		    if (skipcc)
+		    اگر (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    ورنہ
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	ورنہ
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    اگر (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    ورنہ اگر (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    اگر (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    ورنہ اگر (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2165,54 +2165,54 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strpart()" function
  */
-    void
+    خالی
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    صحیح		n;
+    صحیح		len;
+    صحیح		slen;
+    صحیح		error = FALSE;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
+		|| check_for_opt_نمبر_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	واپس;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (صحیح)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (صحیح)tv_get_نمبر_chk(&argvars[1], &error);
+    اگر (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    ورنہ اگر (argvars[2].v_type != VAR_UNKNOWN)
+	len = (صحیح)tv_get_نمبر(&argvars[2]);
+    ورنہ
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    اگر (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    ورنہ اگر (n > slen)
 	n = slen;
-    if (len < 0)
+    اگر (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    ورنہ اگر (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	صحیح off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	برائے (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2224,70 +2224,70 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strridx()" function
  */
-    void
+    خالی
 f_strridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*needle;
     char_u	*haystack;
     char_u	*rest;
-    char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    char_u	*lastmatch = تہی;
+    صحیح		haystack_len, انتہا_idx;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_نمبر_arg(argvars, 2) == FAIL))
+	واپس;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_نمبر = -1;
+    اگر (needle == تہی || haystack == تہی)
+	واپس;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (صحیح)STRLEN(haystack);
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	انتہا_idx = (صحیح)tv_get_نمبر_chk(&argvars[2], تہی);
+	اگر (انتہا_idx < 0)
+	    واپس;	// can never find a match
     }
-    else
-	end_idx = haystack_len;
+    ورنہ
+	انتہا_idx = haystack_len;
 
-    if (*needle == NUL)
+    اگر (*needle == NUL)
     {
 	// Empty string matches past the end.
-	lastmatch = haystack + end_idx;
+	lastmatch = haystack + انتہا_idx;
     }
-    else
+    ورنہ
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	برائے (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)لڑی_تلاش((حرف *)rest, (حرف *)needle);
+	    اگر (rest == تہی || rest > haystack + انتہا_idx)
+		توڑو;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+    اگر (lastmatch == تہی)
+	rettv->vval.v_نمبر = -1;
+    ورنہ
+	rettv->vval.v_نمبر = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
  * "strtrans()" function
  */
-    void
+    خالی
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2300,73 +2300,73 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
  * Converts a byte or character offset in a string to the corresponding UTF-16
  * code unit offset.
  */
-    void
+    خالی
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_نمبر = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+    اگر (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_نمبر_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    واپس;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_نمبر_chk(&argvars[1], تہی);
+    اگر (str == تہی || idx < 0)
+	واپس;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	اگر (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    صحیح (*ptr2len)(char_u *);
+    اگر (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    ورنہ
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    صحیح		len;
+    صحیح		utf16idx = 0;
+    برائے (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	اگر (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    اگر (charidx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_نمبر = len;
+	    واپس;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	صحیح clen = ptr2len(p);
+	صحیح c = (clen > 1) ? utf_ptr2char(p) : *p;
+	اگر (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	اگر (charidx)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_نمبر = utf16idx;
 }
 
 /*
  * "tolower(string)" function
  */
-    void
+    خالی
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2375,11 +2375,11 @@ f_tolower(typval_T *argvars, typval_T *rettv)
 /*
  * "toupper(string)" function
  */
-    void
+    خالی
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2388,225 +2388,225 @@ f_toupper(typval_T *argvars, typval_T *rettv)
 /*
  * "tr(string, fromstr, tostr)" function
  */
-    void
+    خالی
 f_tr(typval_T *argvars, typval_T *rettv)
 {
-    char_u	*in_str;
+    char_u	*اندر_str;
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    صحیح		inlen;
+    صحیح		fromlen;
+    صحیح		tolen;
+    صحیح		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    صحیح		cplen;
+    صحیح		پہلا = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	واپس;
 
-    in_str = tv_get_string(&argvars[0]);
+    اندر_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
     tostr = tv_get_string_buf_chk(&argvars[2], buf2);
 
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    rettv->vval.v_string = تہی;
+    اگر (fromstr == تہی || tostr == تہی)
+	    واپس;		// type error; errmsg already given
+    ga_init2(&ga, حجم(حرف), 80);
 
-    if (!has_mbyte)
+    اگر (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	اگر (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
-	    semsg(_(e_invalid_argument_str), fromstr);
+	    semsg(_(e_invalid_دلیل_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    واپس;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    جب (*اندر_str != NUL)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
-	    inlen = (*mb_ptr2len)(in_str);
-	    cpstr = in_str;
+	    inlen = (*mb_ptr2len)(اندر_str);
+	    cpstr = اندر_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    برائے (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		اگر (fromlen == inlen && STRNCMP(اندر_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    برائے (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			اگر (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    توڑو;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
-			goto error;
-		    break;
+		    اگر (*p == NUL)	// tostr is shorter than fromstr
+			جاؤ error;
+		    توڑو;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    اگر (پہلا && cpstr == اندر_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
-		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		پہلا = FALSE;
+		برائے (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
-		    goto error;
+		اگر (idx != 0)
+		    جاؤ error;
 	    }
 
-	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    (خالی)ga_grow(&ga, cplen);
+	    mch_memmove((حرف *)ga.ga_ڈیٹا + ga.ga_len, cpstr, (size_t)cplen);
 	    ga.ga_len += cplen;
 
-	    in_str += inlen;
+	    اندر_str += inlen;
 	}
-	else
+	ورنہ
 	{
 	    // When not using multi-byte chars we can do it faster.
-	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    p = vim_strchr(fromstr, *اندر_str);
+	    اگر (p != تہی)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
-		ga_append(&ga, *in_str);
-	    ++in_str;
+	    ورنہ
+		ga_append(&ga, *اندر_str);
+	    ++اندر_str;
 	}
     }
 
     // add a terminating NUL
-    (void)ga_grow(&ga, 1);
+    (خالی)ga_grow(&ga, 1);
     ga_append(&ga, NUL);
 
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_ڈیٹا;
 }
 
 /*
  * "trim({expr})" function
  */
-    void
+    خالی
 f_trim(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*head;
-    char_u	*mask = NULL;
-    char_u	*tail;
-    char_u	*prev;
+    char_u	*سر;
+    char_u	*نقاب = تہی;
+    char_u	*دم;
+    char_u	*پچھلا;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    صحیح		c1;
+    صحیح		dir = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = تہی;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_نمبر_arg(argvars, 2) == FAIL)))
+	واپس;
 
-    head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    سر = tv_get_string_buf_chk(&argvars[0], buf1);
+    اگر (سر == تہی)
+	واپس;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    اگر (check_for_opt_string_arg(argvars, 1) == FAIL)
+	واپس;
 
-    if (argvars[1].v_type == VAR_STRING)
+    اگر (argvars[1].v_type == VAR_STRING)
     {
-	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
-	    mask = NULL;
+	نقاب = tv_get_string_buf_chk(&argvars[1], buf2);
+	اگر (*نقاب == NUL)
+	    نقاب = تہی;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	اگر (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    صحیح	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (صحیح)tv_get_نمبر_chk(&argvars[2], &error);
+	    اگر (error)
+		واپس;
+	    اگر (dir < 0 || dir > 2)
 	    {
-		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		semsg(_(e_invalid_دلیل_str), tv_get_string(&argvars[2]));
+		واپس;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    اگر (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	جب (*سر != NUL)
 	{
-	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    c1 = PTR2CHAR(سر);
+	    اگر (نقاب == تہی)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		اگر (c1 > ' ' && c1 != 0xa0)
+		    توڑو;
 	    }
-	    else
+	    ورنہ
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		برائے (p = نقاب; *p != NUL; MB_PTR_ADV(p))
+		    اگر (c1 == PTR2CHAR(p))
+			توڑو;
+		اگر (*p == NUL)
+		    توڑو;
 	    }
-	    MB_PTR_ADV(head);
+	    MB_PTR_ADV(سر);
 	}
     }
 
-    tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    دم = سر + STRLEN(سر);
+    اگر (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	برائے (; دم > سر; دم = پچھلا)
 	{
-	    prev = tail;
-	    MB_PTR_BACK(head, prev);
-	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    پچھلا = دم;
+	    MB_PTR_عقب(سر, پچھلا);
+	    c1 = PTR2CHAR(پچھلا);
+	    اگر (نقاب == تہی)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		اگر (c1 > ' ' && c1 != 0xa0)
+		    توڑو;
 	    }
-	    else
+	    ورنہ
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		برائے (p = نقاب; *p != NUL; MB_PTR_ADV(p))
+		    اگر (c1 == PTR2CHAR(p))
+			توڑو;
+		اگر (*p == NUL)
+		    توڑو;
 	    }
 	}
     }
-    rettv->vval.v_string = vim_strnsave(head, tail - head);
+    rettv->vval.v_string = vim_strnsave(سر, دم - سر);
 }
 
 /*
@@ -2625,69 +2625,69 @@ f_trim(typval_T *argvars, typval_T *rettv)
  *
  * Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    ساکن char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    اگر (str == تہی)
+	واپس تہی;
 
     size_t len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    اگر (!decoded)
+	واپس تہی;
 
     char_u	*p = decoded;
     size_t	i = 0;
 
-    while (i < len)
+    جب (i < len)
     {
-	if (str[i] == '%')
+	اگر (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    اگر (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		اگر (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    ورنہ
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		صحیح val = hexhex2nr(&str[i + 1]);
+		اگر (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		ورنہ
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    برائے (صحیح j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	ورنہ
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    واپس decoded;
 }
 
 /*
  * "uri_decode({str})" function
  */
-    void
+    خالی
 f_uridecode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = تہی;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2706,76 +2706,76 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
  *
  *   Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    ساکن char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    اگر (str == تہی)
+	واپس تہی;
 
     size_t len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    اگر (encoded == تہی)
+	واپس تہی;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    برائے (size_t i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	اگر (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	ورنہ
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    sprintf((حرف *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    واپس encoded;
 }
 
 /*
  * "uri_encode({str})" function
  */
-    void
+    خالی
 f_uriencode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = تہی;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+ساکن حرف *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+    ساکن varnumber_T
+tv_nr(typval_T *tvs, صحیح *idxp)
 {
-    int		idx = *idxp - 1;
+    صحیح		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    صحیح		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    اگر (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ورنہ
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	n = tv_get_نمبر_chk(&tvs[idx], &err);
+	اگر (err)
 	    n = 0;
     }
-    return n;
+    واپس n;
 }
 
 /*
@@ -2786,72 +2786,72 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    ساکن حرف *
+tv_str(typval_T *tvs, صحیح *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
-    static char_u   numbuf[NUMBUFLEN];
+    صحیح		    idx = *idxp - 1;
+    حرف	    *s = تہی;
+    ساکن char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    اگر (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ورنہ
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	اگر (tofree != تہی)
+	    s = (حرف *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	ورنہ
+	    s = (حرف *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    واپس s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    ساکن دوہرا
+tv_float(typval_T *tvs, صحیح *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    صحیح		idx = *idxp - 1;
+    دوہرا	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    اگر (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ورنہ
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	اگر (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
-	    emsg(_(e_expected_float_argument_for_printf));
+	ورنہ اگر (tvs[idx].v_type == VAR_نمبر)
+	    f = (دوہرا)tvs[idx].vval.v_نمبر;
+	ورنہ
+	    emsg(_(e_expected_float_دلیل_for_printf));
     }
-    return f;
+    واپس f;
 }
 
-#endif
+#اگر_ختم
 
 /*
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    ساکن ثابت حرف *
+infinity_str(صحیح مثبت,
+	     حرف fmt_spec,
+	     صحیح force_sign,
+	     صحیح space_for_مثبت)
 {
-    static const char *table[] =
+    ساکن ثابت حرف *جدول[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    صحیح idx = مثبت * (1 + force_sign + force_sign * space_for_مثبت);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    اگر (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    واپس جدول[idx];
 }
 
 /*
@@ -2898,37 +2898,37 @@ infinity_str(int positive,
 
 // When generating prototypes all of this is skipped, cproto doesn't
 // understand this.
-#ifndef PROTO
+#اگر_غیر_تعریف_شدہ PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    صحیح
+vim_snprintf_جوڑو(حرف *str, size_t str_m, ثابت حرف *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    صحیح		str_l;
     size_t	len = STRLEN(str);
     size_t	space;
 
-    if (str_m <= len)
+    اگر (str_m <= len)
 	space = 0;
-    else
+    ورنہ
 	space = str_m - len;
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
     va_end(ap);
-    return str_l;
+    واپس str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    صحیح
+vim_snprintf(حرف *str, size_t str_m, ثابت حرف *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    صحیح		str_l;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
     va_end(ap);
-    return str_l;
+    واپس str_l;
 }
 
 /*
@@ -2941,37 +2941,37 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * guarantees the returned length will never be greater than the destination length.
  */
     size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+vim_snprintf_safelen(حرف *str, size_t str_m, ثابت حرف *fmt, ...)
 {
     va_list ap;
-    int	    str_l;
+    صحیح	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    اگر (str_m == 0)
+	واپس 0;
 
     va_start(ap, fmt);
-    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, تہی);
     va_end(ap);
 
-    if (str_l < 0)
+    اگر (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	واپس 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    واپس ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
 }
 
-    int
+    صحیح
 vim_vsnprintf(
-    char	*str,
+    حرف	*str,
     size_t	str_m,
-    const char	*fmt,
+    ثابت حرف	*fmt,
     va_list	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    واپس vim_vsnprintf_typval(str, str_m, fmt, ap, تہی);
 }
 
-enum
+شمار
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2980,7 +2980,7 @@ enum
     TYPE_UNSIGNEDINT,
     TYPE_UNSIGNEDLONGINT,
     TYPE_UNSIGNEDLONGLONGINT,
-    TYPE_POINTER,
+    TYPE_اشارہ_گر,
     TYPE_PERCENT,
     TYPE_CHAR,
     TYPE_STRING,
@@ -2989,330 +2989,330 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    ساکن صحیح
 format_typeof(
-    const char	*type)
+    ثابت حرف	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    حرف    لمبائی_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    حرف    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    اگر (*type == 'h' || *type == 'l')
     {
-	length_modifier = *type;
+	لمبائی_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	اگر (لمبائی_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
-	    length_modifier = 'L';
+	    لمبائی_modifier = 'L';
 	    type++;
 	}
     }
     fmt_spec = *type;
 
     // common synonyms:
-    switch (fmt_spec)
+    انتخاب (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	حالت 'i': fmt_spec = 'd'; توڑو;
+	حالت '*': fmt_spec = 'd'; لمبائی_modifier = 'h'; توڑو;
+	حالت 'D': fmt_spec = 'd'; لمبائی_modifier = 'l'; توڑو;
+	حالت 'U': fmt_spec = 'u'; لمبائی_modifier = 'l'; توڑو;
+	حالت 'O': fmt_spec = 'o'; لمبائی_modifier = 'l'; توڑو;
+	طےشدہ: توڑو;
     }
 
     // get parameter value, do initial processing
-    switch (fmt_spec)
+    انتخاب (fmt_spec)
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    حالت '%':
+	واپس TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    حالت 'c':
+	واپس TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    حالت 's':
+    حالت 'S':
+	واپس TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    حالت 'd': حالت 'u':
+    حالت 'b': حالت 'B':
+    حالت 'o':
+    حالت 'x': حالت 'X':
+    حالت 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //قدر
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    اگر (fmt_spec == 'p')
+		واپس TYPE_اشارہ_گر;
+	    ورنہ اگر (fmt_spec == 'b' || fmt_spec == 'B')
+		واپس TYPE_UNSIGNEDLONGLONGINT;
+	    ورنہ اگر (fmt_spec == 'd')
 	    {
 		// signed
-		switch (length_modifier)
+		انتخاب (لمبائی_modifier)
 		{
-		case '\0':
-		case 'h':
+		حالت '\0':
+		حالت 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    واپس TYPE_INT;
+		حالت 'l':
+		    واپس TYPE_LONGINT;
+		حالت 'L':
+		    واپس TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
 		// unsigned
-		switch (length_modifier)
+		انتخاب (لمبائی_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    حالت '\0':
+		    حالت 'h':
+			واپس TYPE_UNSIGNEDINT;
+		    حالت 'l':
+			واپس TYPE_UNSIGNEDLONGINT;
+		    حالت 'L':
+			واپس TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	توڑو;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    حالت 'f':
+    حالت 'F':
+    حالت 'e':
+    حالت 'E':
+    حالت 'g':
+    حالت 'G':
+	واپس TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    واپس TYPE_UNKNOWN;
 }
 
-    static char *
+    ساکن حرف *
 format_typename(
-    const char  *type)
+    ثابت حرف  *type)
 {
-    switch (format_typeof(type))
+    انتخاب (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	حالت TYPE_INT:
+	    واپس typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	حالت TYPE_LONGINT:
+	    واپس typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	حالت TYPE_LONGLONGINT:
+	    واپس typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	حالت TYPE_UNSIGNEDINT:
+	    واپس typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	حالت TYPE_UNSIGNEDLONGINT:
+	    واپس typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	حالت TYPE_UNSIGNEDLONGLONGINT:
+	    واپس typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	حالت TYPE_اشارہ_گر:
+	    واپس _(typename_اشارہ_گر);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	حالت TYPE_PERCENT:
+	    واپس _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	حالت TYPE_CHAR:
+	    واپس typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	حالت TYPE_STRING:
+	    واپس _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	حالت TYPE_FLOAT:
+	    واپس typename_float;
     }
 
-    return _(typename_unknown);
+    واپس _(typename_unknown);
 }
 
-    static int
+    ساکن صحیح
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    ثابت حرف ***ap_types,
+    صحیح arg,
+    صحیح *عدد_posarg,
+    ثابت حرف *type)
 {
-    if (arg <= 0)
+    اگر (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	واپس FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    اگر (*ap_types == تہی || *عدد_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	صحیح	    idx;
+	ثابت حرف  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	اگر (*ap_types == تہی)
+	    new_types = ALLOC_CLEAR_MULT(ثابت حرف *, arg);
+	ورنہ
+	    new_types = vim_realloc((حرف **)*ap_types,
+						arg * حجم(ثابت حرف *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	اگر (new_types == تہی)
+	    واپس FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
-	    new_types[idx] = NULL;
+	برائے (idx = *عدد_posarg; idx < arg; ++idx)
+	    new_types[idx] = تہی;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*عدد_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    اگر ((*ap_types)[arg - 1] != تہی)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	اگر ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    ثابت حرف *pt = type;
+	    اگر (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    اگر (pt[0] != '*')
 	    {
-		switch (pt[0])
+		انتخاب (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
-		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+		    حالت 'd':
+		    حالت 'i': توڑو;
+		    طےشدہ:
+			semsg(_(e_positional_عدد_میدان_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			واپس FAIL;
 		}
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    اگر (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		semsg(_( e_positional_arg_عدد_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		واپس FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    واپس OK;
 }
 
-    static void
-format_overflow_error(const char *pstart)
+    ساکن خالی
+format_حد_سے_تجاوز_error(ثابت حرف *pstart)
 {
     size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    حرف	*argcopy = تہی;
+    ثابت حرف	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    جب (VIM_ISDIGIT((صحیح)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(حرف, arglen + 1);
+    اگر (argcopy != تہی)
     {
 	strncpy(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
-	free(argcopy);
+	آزاد(argcopy);
     }
-    else
-	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
+    ورنہ
+	semsg(_(e_برآمد_کا_حافظہ_allocating_nr_بائٹیں), arglen);
 }
 
-# define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
+# define MAX_ALLOWED_STRING_چوڑائی 1048576    // 1 MiB
 
-    static int
+    ساکن صحیح
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    ثابت حرف *pstart,
+    ثابت حرف **p,
+    غیرعلامتی صحیح *uj,
+    صحیح حد_سے_تجاوز_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    جب (VIM_ISDIGIT((صحیح)(**p)) && *uj < MAX_ALLOWED_STRING_چوڑائی)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (غیرعلامتی صحیح)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    اگر (*uj > MAX_ALLOWED_STRING_چوڑائی)
     {
-	if (overflow_err)
+	اگر (حد_سے_تجاوز_err)
 	{
-	    format_overflow_error(pstart);
-	    return FAIL;
+	    format_حد_سے_تجاوز_error(pstart);
+	    واپس FAIL;
 	}
-	else
-	    *uj = MAX_ALLOWED_STRING_WIDTH;
+	ورنہ
+	    *uj = MAX_ALLOWED_STRING_چوڑائی;
     }
 
-    return OK;
+    واپس OK;
 }
 
 
-    static int
+    ساکن صحیح
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
-    typval_T	*tvs UNUSED
+    ثابت حرف  ***ap_types,
+    صحیح		*عدد_posarg,
+    ثابت حرف  *fmt,
+    typval_T	*tvs غیر_مستعمل
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    ثابت حرف	*p = fmt;
+    ثابت حرف	*arg = تہی;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    صحیح		any_pos = 0;
+    صحیح		any_arg = 0;
+    صحیح		arg_idx;
 
-# define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+# define CHECK_POS_ARG کرو { \
+    اگر (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
-	goto error; \
+	جاؤ error; \
     } \
-} while (0);
+} جب (0);
 
-    if (p == NULL)
-	return OK;
+    اگر (p == تہی)
+	واپس OK;
 
-    while (*p != NUL)
+    جب (*p != NUL)
     {
-	if (*p != '%')
+	اگر (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ثابت حرف    *q = strchr(p + 1, '%');
+	    size_t  n = (q == تہی) ? STRLEN(p) : (size_t)(q - p);
 
 	    p += n;
 	}
-	else
+	ورنہ
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    حرف	لمبائی_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    صحیح		pos_arg = -1;
+	    ثابت حرف	*ptype = تہی;
+	    ثابت حرف	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,23 +3320,23 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    جب (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    اگر (*ptype == '$')
 	    {
-		if (*p == '0')
+		اگر (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    جاؤ error;
 		}
 
 		// Positional argument
-		unsigned int uj;
+		غیرعلامتی صحیح uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		اگر (get_unsigned_int(pstart, &p, &uj, tvs != تہی) == FAIL)
+		    جاؤ error;
 
 		pos_arg = uj;
 
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    جب (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		انتخاب (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    حالت '0': توڑو;
+		    حالت '-': توڑو;
+		    حالت '+': توڑو;
+		    حالت ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      توڑو;
+		    حالت '#': توڑو;
+		    حالت '\'': توڑو;
 		}
 		p++;
 	    }
@@ -3367,114 +3367,114 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    اگر (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		اگر (VIM_ISDIGIT((صحیح)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    غیرعلامتی صحیح uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    اگر (get_unsigned_int(arg + 1, &p, &uj, tvs != تہی) == FAIL)
+			جاؤ error;
 
-		    if (*p != '$')
+		    اگر (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			جاؤ error;
 		    }
-		    else
+		    ورنہ
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-			    goto error;
+			اگر (adjust_types(ap_types, uj, عدد_posarg, arg) == FAIL)
+			    جاؤ error;
 		    }
 		}
-		else
+		ورنہ
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    ورنہ اگر (VIM_ISDIGIT((صحیح)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ثابت حرف *digstart = p;
+		غیرعلامتی صحیح uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+		    جاؤ error;
 
-		if (*p == '$')
+		اگر (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    جاؤ error;
 		}
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    اگر (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		اگر (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    اگر (VIM_ISDIGIT((صحیح)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			غیرعلامتی صحیح uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			اگر (get_unsigned_int(arg + 1, &p, &uj, tvs != تہی) == FAIL)
+			    جاؤ error;
 
-			if (*p == '$')
+			اگر (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-				goto error;
+			    اگر (adjust_types(ap_types, uj, عدد_posarg, arg) == FAIL)
+				جاؤ error;
 			}
-			else
+			ورنہ
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
-			    goto error;
+			    جاؤ error;
 			}
 		    }
-		    else
+		    ورنہ
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		ورنہ اگر (VIM_ISDIGIT((صحیح)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ثابت حرف *digstart = p;
+		    غیرعلامتی صحیح uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+			جاؤ error;
 
-		    if (*p == '$')
+		    اگر (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			جاؤ error;
 		    }
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    اگر (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    اگر (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		لمبائی_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		اگر (لمبائی_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3495,172 +3495,172 @@ parse_fmt_types(
 		}
 	    }
 
-	    switch (*p)
+	    انتخاب (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		حالت 'i':
+		حالت '*':
+		حالت 'd':
+		حالت 'u':
+		حالت 'o':
+		حالت 'D':
+		حالت 'U':
+		حالت 'O':
+		حالت 'x':
+		حالت 'X':
+		حالت 'b':
+		حالت 'B':
+		حالت 'c':
+		حالت 's':
+		حالت 'S':
+		حالت 'p':
+		حالت 'f':
+		حالت 'F':
+		حالت 'e':
+		حالت 'E':
+		حالت 'g':
+		حالت 'G':
+		    اگر (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
-			    goto error;
+			اگر (adjust_types(ap_types, pos_arg, عدد_posarg, ptype) == FAIL)
+			    جاؤ error;
 		    }
-		    else
+		    ورنہ
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    توڑو;
 
-		default:
-		    if (pos_arg != -1)
+		طےشدہ:
+		    اگر (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
-			goto error;
+			جاؤ error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    اگر (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    برائے (arg_idx = 0; arg_idx < *عدد_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	اگر ((*ap_types)[arg_idx] == تہی)
 	{
-	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
-	    goto error;
+	    semsg(_(e_fmt_arg_nr_غیر_مستعمل_str), arg_idx + 1, fmt);
+	    جاؤ error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# اگر defined(FEAT_EVAL)
+	اگر (tvs != تہی && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
-	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
-	    goto error;
+	    semsg(_(e_positional_nr_برآمد_کا_bounds_str), arg_idx + 1, fmt);
+	    جاؤ error;
 	}
 # endif
     }
 
-    return OK;
+    واپس OK;
 
 error:
-    vim_free((char**)*ap_types);
-    *ap_types = NULL;
-    *num_posarg = 0;
-    return FAIL;
+    vim_free((حرف**)*ap_types);
+    *ap_types = تہی;
+    *عدد_posarg = 0;
+    واپس FAIL;
 }
 
-    static void
-skip_to_arg(
-    const char	**ap_types,
-    va_list	ap_start,
+    ساکن خالی
+skip_مقصد_arg(
+    ثابت حرف	**ap_types,
+    va_list	ap_آغاز,
     va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    صحیح		*arg_idx,
+    صحیح		*arg_cur,
+    ثابت حرف	*fmt)
 {
-    int		arg_min = 0;
+    صحیح		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    اگر (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	واپس;
     }
 
-    if (*arg_cur >= *arg_idx)
+    اگر (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
 	va_end(*ap);
-	va_copy(*ap, ap_start);
+	va_copy(*ap, ap_آغاز);
     }
-    else
+    ورنہ
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    برائے (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	ثابت حرف *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	اگر (ap_types == تہی || ap_types[*arg_cur] == تہی)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    واپس;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	صحیح fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
-	switch (fmt_type)
+	انتخاب (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	حالت TYPE_PERCENT:
+	حالت TYPE_UNKNOWN:
+	    توڑو;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	حالت TYPE_CHAR:
+	    va_arg(*ap, صحیح);
+	    توڑو;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	حالت TYPE_STRING:
+	    va_arg(*ap, حرف *);
+	    توڑو;
 
-	case TYPE_POINTER:
-	    va_arg(*ap, void *);
-	    break;
+	حالت TYPE_اشارہ_گر:
+	    va_arg(*ap, خالی *);
+	    توڑو;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	حالت TYPE_INT:
+	    va_arg(*ap, صحیح);
+	    توڑو;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	حالت TYPE_LONGINT:
+	    va_arg(*ap, طویل صحیح);
+	    توڑو;
 
-	case TYPE_LONGLONGINT:
+	حالت TYPE_LONGLONGINT:
 	    va_arg(*ap, varnumber_T);
-	    break;
+	    توڑو;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	حالت TYPE_UNSIGNEDINT:
+	    va_arg(*ap, غیرعلامتی صحیح);
+	    توڑو;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	حالت TYPE_UNSIGNEDLONGINT:
+	    va_arg(*ap, غیرعلامتی طویل صحیح);
+	    توڑو;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
+	حالت TYPE_UNSIGNEDLONGLONGINT:
 	    va_arg(*ap, uvarnumber_T);
-	    break;
+	    توڑو;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	حالت TYPE_FLOAT:
+	    va_arg(*ap, دوہرا);
+	    توڑو;
 	}
     }
 
@@ -3670,41 +3670,41 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    واپس;
 }
 
-    int
+    صحیح
 vim_vsnprintf_typval(
-    char	*str,
+    حرف	*str,
     size_t	str_m,
-    const char	*fmt,
-    va_list	ap_start,
+    ثابت حرف	*fmt,
+    va_list	ap_آغاز,
     typval_T	*tvs)
 {
     size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
+    ثابت حرف	*p = fmt;
+    صحیح		arg_cur = 0;
+    صحیح		عدد_posarg = 0;
+    صحیح		arg_idx = 1;
     va_list	ap;
-    const char	**ap_types = NULL;
+    ثابت حرف	**ap_types = تہی;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    اگر (parse_fmt_types(&ap_types, &عدد_posarg, fmt, tvs) == FAIL)
+	واپس 0;
 
-    va_copy(ap, ap_start);
+    va_copy(ap, ap_آغاز);
 
-    if (p == NULL)
+    اگر (p == تہی)
 	p = "";
-    while (*p != NUL)
+    جب (*p != NUL)
     {
-	if (*p != '%')
+	اگر (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ثابت حرف    *q = strchr(p + 1, '%');
+	    size_t  n = (q == تہی) ? STRLEN(p) : (size_t)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    اگر (str_l < str_m)
 	    {
 		size_t avail = str_m - str_l;
 
@@ -3713,27 +3713,27 @@ vim_vsnprintf_typval(
 	    p += n;
 	    str_l += n;
 	}
-	else
+	ورنہ
 	{
-	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    size_t  min_میدان_چوڑائی = 0, precision = 0;
+	    صحیح	    zero_padding = 0, precision_specified = 0, justify_بایاں = 0;
+	    صحیح	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    صحیح	    space_for_مثبت = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    حرف    لمبائی_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    حرف    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    ثابت حرف  *str_arg = تہی;
 
 	    // natural field width of arg without padding and sign
 	    size_t  str_arg_l;
@@ -3741,24 +3741,24 @@ vim_vsnprintf_typval(
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    غیرعلامتی حرف uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    size_t  نمبر_کا_zeros_مقصد_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
 	    size_t  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    حرف    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
-	    char_u  *tofree = NULL;
+	    char_u  *tofree = تہی;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    صحیح	    pos_arg = -1;
+	    ثابت حرف	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,17 +3767,17 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    جب (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    اگر (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		ثابت حرف *digstart = p;
+		غیرعلامتی صحیح uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+		    جاؤ error;
 
 		pos_arg = uj;
 
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    جب (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		انتخاب (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    حالت '0': zero_padding = 1; توڑو;
+		    حالت '-': justify_بایاں = 1; توڑو;
+		    حالت '+': force_sign = 1; space_for_مثبت = 0; توڑو;
+		    حالت ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      توڑو;
+		    حالت '#': alternate_form = 1; توڑو;
+		    حالت '\'': توڑو;
 		}
 		p++;
 	    }
@@ -3806,20 +3806,20 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    اگر (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		صحیح j;
+		ثابت حرف *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		اگر (VIM_ISDIGIT((صحیح)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    غیرعلامتی صحیح uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+			جاؤ error;
 
 		    arg_idx = uj;
 
@@ -3827,77 +3827,77 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
-		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+		    tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			va_arg(ap, صحیح));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		اگر (j > MAX_ALLOWED_STRING_چوڑائی)
 		{
-		    if (tvs != NULL)
+		    اگر (tvs != تہی)
 		    {
-			format_overflow_error(digstart);
-			goto error;
+			format_حد_سے_تجاوز_error(digstart);
+			جاؤ error;
 		    }
-		    else
-			j = MAX_ALLOWED_STRING_WIDTH;
+		    ورنہ
+			j = MAX_ALLOWED_STRING_چوڑائی;
 		}
 
-		if (j >= 0)
-		    min_field_width = j;
-		else
+		اگر (j >= 0)
+		    min_میدان_چوڑائی = j;
+		ورنہ
 		{
-		    min_field_width = -j;
-		    justify_left = 1;
+		    min_میدان_چوڑائی = -j;
+		    justify_بایاں = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    ورنہ اگر (VIM_ISDIGIT((صحیح)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ثابت حرف *digstart = p;
+		غیرعلامتی صحیح uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+		    جاؤ error;
 
-		min_field_width = uj;
+		min_میدان_چوڑائی = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    اگر (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		اگر (VIM_ISDIGIT((صحیح)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ثابت حرف *digstart = p;
+		    غیرعلامتی صحیح uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+			جاؤ error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		ورنہ اگر (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    صحیح j;
+		    ثابت حرف *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    اگر (VIM_ISDIGIT((صحیح)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			غیرعلامتی صحیح uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			اگر (get_unsigned_int(digstart, &p, &uj, tvs != تہی) == FAIL)
+			    جاؤ error;
 
 			arg_idx = uj;
 
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+			tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    va_arg(ap, صحیح));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    اگر (j > MAX_ALLOWED_STRING_چوڑائی)
 		    {
-			if (tvs != NULL)
+			اگر (tvs != تہی)
 			{
-			    format_overflow_error(digstart);
-			    goto error;
+			    format_حد_سے_تجاوز_error(digstart);
+			    جاؤ error;
 			}
-			else
-			    j = MAX_ALLOWED_STRING_WIDTH;
+			ورنہ
+			    j = MAX_ALLOWED_STRING_چوڑائی;
 		    }
 
-		    if (j >= 0)
+		    اگر (j >= 0)
 			precision = j;
-		    else
+		    ورنہ
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,157 +3934,157 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    اگر (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		لمبائی_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		اگر (لمبائی_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
-		    length_modifier = 'L';
+		    لمبائی_modifier = 'L';
 		    p++;
 		}
 	    }
 	    fmt_spec = *p;
 
 	    // common synonyms:
-	    switch (fmt_spec)
+	    انتخاب (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		حالت 'i': fmt_spec = 'd'; توڑو;
+		حالت 'D': fmt_spec = 'd'; لمبائی_modifier = 'l'; توڑو;
+		حالت 'U': fmt_spec = 'u'; لمبائی_modifier = 'l'; توڑو;
+		حالت 'O': fmt_spec = 'o'; لمبائی_modifier = 'l'; توڑو;
+		طےشدہ: توڑو;
 	    }
 
-# if defined(FEAT_EVAL)
-	    switch (fmt_spec)
+# اگر defined(FEAT_EVAL)
+	    انتخاب (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
-			length_modifier = 'L';
+		حالت 'd': حالت 'u': حالت 'o': حالت 'x': حالت 'X':
+		    اگر (tvs != تہی && لمبائی_modifier == '\0')
+			لمبائی_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    اگر (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
-	    switch (fmt_spec)
+	    انتخاب (fmt_spec)
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    حالت '%':
+	    حالت 'c':
+	    حالت 's':
+	    حالت 'S':
 		str_arg_l = 1;
-		switch (fmt_spec)
+		انتخاب (fmt_spec)
 		{
-		case '%':
+		حالت '%':
 		    str_arg = p;
-		    break;
+		    توڑو;
 
-		case 'c':
+		حالت 'c':
 		    {
-			int j;
+			صحیح j;
 
 			j =
-# if defined(FEAT_EVAL)
-			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+			    tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+				(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				va_arg(ap, صحیح));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (غیرعلامتی حرف)j;
+			str_arg = (حرف *)&uchar_arg;
+			توڑو;
 		    }
 
-		case 's':
-		case 'S':
+		حالت 's':
+		حالت 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
-				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
+# اگر defined(FEAT_EVAL)
+				tvs != تہی ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
-				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+				    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    va_arg(ap, حرف *));
 
-		    if (str_arg == NULL)
+		    اگر (str_arg == تہی)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
-			str_arg_l = strlen(str_arg);
+		    ورنہ اگر (!precision_specified)
+			str_arg_l = لڑی_لمبائی(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    ورنہ اگر (precision == 0)
 			str_arg_l = 0;
-		    else
+		    ورنہ
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
+			ثابت حرف *q = memchr(str_arg, '\0',
 				  precision <= (size_t)0x7fffffffL ? precision
 						       : (size_t)0x7fffffffL);
 
-			str_arg_l = (q == NULL) ? precision
+			str_arg_l = (q == تہی) ? precision
 						      : (size_t)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    اگر (fmt_spec == 'S')
 		    {
 			char_u	*p1;
 			size_t	i;
-			int	cell;
+			صحیح	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			برائے (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    اگر (precision_specified && i + cell > precision)
+				توڑو;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
-			    min_field_width += str_arg_l - i;
+			اگر (min_میدان_چوڑائی != 0)
+			    min_میدان_چوڑائی += str_arg_l - i;
 		    }
-		    break;
+		    توڑو;
 
-		default:
-		    break;
+		طےشدہ:
+		    توڑو;
 		}
-		break;
+		توڑو;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    حالت 'd': حالت 'u':
+	    حالت 'b': حالت 'B':
+	    حالت 'o':
+	    حالت 'x': حالت 'X':
+	    حالت 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //قدر
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    صحیح arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    صحیح int_arg = 0;
+		    غیرعلامتی صحیح uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    طویل صحیح long_arg = 0;
+		    غیرعلامتی طویل صحیح ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4095,133 +4095,133 @@ vim_vsnprintf_typval(
 
 		    // pointer argument value -only defined for p
 		    // conversion
-		    void *ptr_arg = NULL;
+		    خالی *ptr_arg = تہی;
 
-		    if (fmt_spec == 'p')
+		    اگر (fmt_spec == 'p')
 		    {
-			length_modifier = '\0';
+			لمبائی_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
-				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
-									NULL) :
+# اگر defined(FEAT_EVAL)
+				 tvs != تہی ? (خالی *)tv_str(tvs, &arg_idx,
+									تہی) :
 # endif
-					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, void *));
+					va_arg(ap, خالی *));
 
-			if (ptr_arg != NULL)
+			اگر (ptr_arg != تہی)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    ورنہ اگر (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
-				    tvs != NULL ?
+# اگر defined(FEAT_EVAL)
+				    tvs != تہی ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
-					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 						     &arg_cur, fmt),
 					va_arg(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			اگر (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    ورنہ اگر (fmt_spec == 'd')
 		    {
 			// signed
-			switch (length_modifier)
+			انتخاب (لمبائی_modifier)
 			{
-			case '\0':
-			case 'h':
+			حالت '\0':
+			حالت 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+					tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    va_arg(ap, صحیح));
 
-			    if (int_arg > 0)
+			    اگر (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    ورنہ اگر (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    توڑو;
+			حالت 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+					tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    va_arg(ap, طویل صحیح));
 
-			    if (long_arg > 0)
+			    اگر (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    ورنہ اگر (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    توڑو;
+			حالت 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+					tvs != تہی ? tv_nr(tvs, &arg_idx) :
 # endif
-					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+					    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							 &arg_cur, fmt),
 					    va_arg(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    اگر (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    ورنہ اگر (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    توڑو;
 			}
 		    }
-		    else
+		    ورنہ
 		    {
 			// unsigned
-			switch (length_modifier)
+			انتخاب (لمبائی_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    حالت '\0':
+			    حالت 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned)
+# اگر defined(FEAT_EVAL)
+					    tvs != تہی ? (غیرعلامتی)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						va_arg(ap, غیرعلامتی صحیح));
 
-				if (uint_arg != 0)
+				اگر (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				توڑو;
+			    حالت 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned long)
+# اگر defined(FEAT_EVAL)
+					    tvs != تہی ? (غیرعلامتی طویل)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						va_arg(ap, غیرعلامتی طویل صحیح));
 
-				if (ulong_arg != 0)
+				اگر (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				توڑو;
+			    حالت 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (uvarnumber_T)
+# اگر defined(FEAT_EVAL)
+					    tvs != تہی ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
-						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+						(skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 							     &arg_cur, fmt),
 						va_arg(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				اگر (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				توڑو;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    اگر (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    اگر (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
-			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
+			اگر (force_sign && arg_sign >= 0)
+			    tmp[str_arg_l++] = space_for_مثبت ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    ورنہ اگر (alternate_form)
 		    {
-			if (arg_sign != 0
+			اگر (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    اگر (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    اگر (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    ورنہ
 		    {
-			char	f[6];
-			int	f_l = 0;
+			حرف	f[6];
+			صحیح	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			اگر (!لمبائی_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			ورنہ اگر (لمبائی_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# ورنہ
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
-			    f[f_l++] = length_modifier;
+			ورنہ
+			    f[f_l++] = لمبائی_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
+			اگر (fmt_spec == 'p')
 			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			ورنہ اگر (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
+			    حرف	    b[8 * حجم(uvarnumber_T)];
 			    size_t	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
-			    do
+			    کرو
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[حجم(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    جب (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    حافظہ_نقل(tmp + str_arg_l, b + حجم(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			ورنہ اگر (fmt_spec == 'd')
 			{
 			    // signed
-			    switch (length_modifier)
+			    انتخاب (لمبائی_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    حالت '\0': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       توڑو;
+			    حالت 'h': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
-						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						 (مختصر)int_arg);
+				      توڑو;
+			    حالت 'l': str_arg_l += sprintf(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      توڑو;
+			    حالت 'L': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      توڑو;
 			    }
 			}
-			else
+			ورنہ
 			{
 			    // unsigned
-			    switch (length_modifier)
+			    انتخاب (لمبائی_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    حالت '\0': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       توڑو;
+			    حالت 'h': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
-						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+						(غیرعلامتی مختصر)uint_arg);
+				      توڑو;
+			    حالت 'l': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      توڑو;
+			    حالت 'L': str_arg_l += sprintf(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      توڑو;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			اگر (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			اگر (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4364,10 +4364,10 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			size_t عدد_کا_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			اگر (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,84 +4375,84 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+			    اگر (!precision_specified
+					     || precision < عدد_کا_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = عدد_کا_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			اگر (عدد_کا_digits < precision)
+			    نمبر_کا_zeros_مقصد_pad = precision - عدد_کا_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    اگر (!justify_بایاں && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
-			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			صحیح n = (صحیح)(min_میدان_چوڑائی - (str_arg_l
+						    + نمبر_کا_zeros_مقصد_pad));
+			اگر (n > 0)
+			    نمبر_کا_zeros_مقصد_pad += n;
 		    }
-		    break;
+		    توڑو;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    حالت 'f':
+	    حالت 'F':
+	    حالت 'e':
+	    حالت 'E':
+	    حالت 'g':
+	    حالت 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    دوہرا	f;
+		    دوہرا	abs_f;
+		    حرف	format[40];
+		    صحیح		l;
+		    صحیح		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_float(tvs, &arg_idx) :
+# اگر defined(FEAT_EVAL)
+			tvs != تہی ? tv_float(tvs, &arg_idx) :
 # endif
-			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
+			    (skip_مقصد_arg(ap_types, ap_آغاز, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    va_arg(ap, دوہرا));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    اگر (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			اگر ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			ورنہ
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    اگر ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# ورنہ
 			    abs_f > 1.0e307
 # endif
 			    )
 		    {
 			// Avoid a buffer overflow
 			STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
-					      force_sign, space_for_positive));
+					      force_sign, space_for_مثبت));
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    ورنہ
 		    {
-			if (isnan(f))
+			اگر (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,32 +4460,32 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			ورنہ اگر (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
-					      force_sign, space_for_positive));
+					      force_sign, space_for_مثبت));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			ورنہ
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
-				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    اگر (force_sign)
+				format[l++] = space_for_مثبت ? ' ' : '+';
+			    اگر (precision_specified)
 			    {
 				size_t max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				اگر ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
 				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				اگر (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += sprintf(format + l, ".%d", (صحیح)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
@@ -4493,30 +4493,30 @@ vim_vsnprintf_typval(
 			    str_arg_l = sprintf(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			اگر (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    صحیح i;
+			    حرف *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    اگر (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    ورنہ
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (حرف *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				اگر (tp != تہی)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    اگر (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    جب (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    اگر (tp != تہی && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				جب (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			ورنہ
 			{
-			    char *tp;
+			    حرف *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (حرف *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    اگر (tp != تہی && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,49 +4556,49 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    اگر (zero_padding && min_میدان_چوڑائی > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			نمبر_کا_zeros_مقصد_pad = min_میدان_چوڑائی - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    توڑو;
 		}
 
-	    default:
+	    طےشدہ:
 		// unrecognized conversion specifier, keep format string
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
-		min_field_width = 0;		    // reset flags
+		justify_بایاں = 1;
+		min_میدان_چوڑائی = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		اگر (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		توڑو;
 	    }
 
-	    if (*p != NUL)
+	    اگر (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    اگر (!justify_بایاں)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		صحیح pn = (صحیح)(min_میدان_چوڑائی - (str_arg_l + نمبر_کا_zeros_مقصد_pad));
 
-		if (pn > 0)
+		اگر (pn > 0)
 		{
-		    if (str_l < str_m)
+		    اگر (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4612,21 +4612,21 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    اگر (نمبر_کا_zeros_مقصد_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    ورنہ
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		صحیح zn = (صحیح)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		اگر (zn > 0)
 		{
-		    if (str_l < str_m)
+		    اگر (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4639,10 +4639,10 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (صحیح)نمبر_کا_zeros_مقصد_pad;
+		اگر (zn > 0)
 		{
-		    if (str_l < str_m)
+		    اگر (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4657,11 +4657,11 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		صحیح sn = (صحیح)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		اگر (sn > 0)
 		{
-		    if (str_l < str_m)
+		    اگر (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4674,15 +4674,15 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    اگر (justify_بایاں)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+		صحیح pn = (صحیح)(min_میدان_چوڑائی
+				      - (str_arg_l + نمبر_کا_zeros_مقصد_pad));
 
-		if (pn > 0)
+		اگر (pn > 0)
 		{
-		    if (str_l < str_m)
+		    اگر (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    اگر (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
-	emsg(_(e_too_many_arguments_to_printf));
+    اگر (tvs != تہی && tvs[عدد_posarg != 0 ? عدد_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+	emsg(_(e_too_many_arguments_مقصد_printf));
 
 error:
-    vim_free((char*)ap_types);
+    vim_free((حرف*)ap_types);
     va_end(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    واپس (صحیح)str_l;
 }
 
-#endif // PROTO
+#اگر_ختم // PROTO

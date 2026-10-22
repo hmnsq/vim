@@ -6,27 +6,27 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifndef OS_MAC__H
-#define OS_MAC__H
+#اگر_غیر_تعریف_شدہ OS_MAC__H
+#تعریف_کرو OS_MAC__H
 
 // Before Including the MacOS specific files,
 // let's set the OPAQUE_TOOLBOX_STRUCTS to 0 so we
 // can access the internal structures.
 // (Until fully Carbon compliant)
 // TODO: Can we remove this? (Dany)
-#if 0
+#اگر 0
 # define OPAQUE_TOOLBOX_STRUCTS 0
-#endif
+#اگر_ختم
 
 // Include MAC_OS_X_VERSION_* macros
-#ifdef HAVE_AVAILABILITYMACROS_H
+#اگر_تعریف_شدہ HAVE_AVAILABILITYMACROS_H
 # include <AvailabilityMacros.h>
-#endif
+#اگر_ختم
 
 /*
  * Unix interface
  */
-#if defined(__APPLE_CC__) // for Project Builder and ...
+#اگر defined(__APPLE_CC__) // for Project Builder and ...
 # include <unistd.h>
 // Get stat.h or something similar. Comment: How come some OS get in vim.h
 # include <sys/stat.h>
@@ -38,227 +38,227 @@
 # undef ospeed
 // OK defined to 0 in MacOS X 10.2 curses!  Remove it, we define it to be 1.
 # undef OK
-#endif
-#include <signal.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <dirent.h>
+#اگر_ختم
+#شامل <signal.h>
+#شامل <errno.h>
+#شامل <stdio.h>
+#شامل <stdlib.h>
+#شامل <time.h>
+#شامل <dirent.h>
 
 /*
  * Mach interface
  */
-#include <mach/task.h>
+#شامل <mach/task.h>
 
 /*
  * MacOS specific #define
  */
 
 // This will go away when CMD_KEY fully tested
-#define USE_CMD_KEY
+#تعریف_کرو USE_CMD_کلید
 // On MacOS X use the / not the :
 // TODO: Should file such as ~/.vimrc reside instead in
 //       ~/Library/Vim or ~/Library/Preferences/org.vim.vim/ ? (Dany)
 // When compiled under MacOS X (including CARBON version)
 // we use the Unix File path style.  Also when UNIX is defined.
-#define USE_UNIXFILENAME
+#تعریف_کرو USE_UNIXFILENAME
 
 
 /*
  * Generic Vim #define for Mac
  */
 
-#define FEAT_SOURCE_FFS
-#define FEAT_SOURCE_FF_MAC
+#تعریف_کرو FEAT_ماخذ_FFS
+#تعریف_کرو FEAT_ماخذ_FF_MAC
 
-#define USE_EXE_NAME		    // to find  $VIM
-#define CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
+#تعریف_کرو USE_EXE_NAME		    // to find  $VIM
+#تعریف_کرو CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
 
-#define USE_FNAME_CASE		// make ":e os_Mac.c" open the file in its
+#تعریف_کرو USE_FNAME_CASE		// make ":e os_Mac.c" open the file in its
 				// original case, as "os_mac.c"
-#define BINARY_FILE_IO
-#define EOL_DEFAULT EOL_MAC
-#define HAVE_AVAIL_MEM
+#تعریف_کرو ثنائی_FILE_IO
+#تعریف_کرو EOL_DEFAULT EOL_MAC
+#تعریف_کرو HAVE_AVAIL_MEM
 
-#ifndef HAVE_CONFIG_H
+#اگر_غیر_تعریف_شدہ HAVE_CONFIG_H
 # define HAVE_STRING_H
 # define HAVE_MEMSET
 # define USE_TMPNAM		// use tmpnam() instead of mktemp()
 # define HAVE_FCNTL_H
 # define HAVE_QSORT
-# define HAVE_ST_MODE		// have stat.st_mode
+# define HAVE_ST_منوال		// have stat.st_mode
 # define HAVE_MATH_H
 
-# if defined(__DATE__) && defined(__TIME__)
-#  define HAVE_DATE_TIME
+# اگر defined(__DATE__) && defined(__TIME__)
+#  define HAVE_DATE_وقت
 # endif
 # define HAVE_STRFTIME
-#endif
+#اگر_ختم
 
 /*
  * Names for the EXRC, HELP and temporary files.
  * Some of these may have been defined in the makefile.
  */
 
-#ifndef SYS_VIMRC_FILE
+#اگر_غیر_تعریف_شدہ SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE "$VIM/vimrc"
-#endif
-#ifndef SYS_GVIMRC_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ SYS_GVIMRC_FILE
 # define SYS_GVIMRC_FILE "$VIM/gvimrc"
-#endif
-#ifndef SYS_MENU_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ SYS_MENU_FILE
 # define SYS_MENU_FILE	"$VIMRUNTIME/menu.vim"
-#endif
-#ifndef SYS_OPTWIN_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ SYS_OPTWIN_FILE
 # define SYS_OPTWIN_FILE "$VIMRUNTIME/optwin.vim"
-#endif
-#ifndef VIM_DEFAULTS_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE "$VIMRUNTIME/defaults.vim"
-#endif
-#ifndef EVIM_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ EVIM_FILE
 # define EVIM_FILE	"$VIMRUNTIME/evim.vim"
-#endif
+#اگر_ختم
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ FEAT_GUI
 # ifndef USR_GVIMRC_FILE
 #  define USR_GVIMRC_FILE "~/.gvimrc"
 # endif
 # ifndef GVIMRC_FILE
 #  define GVIMRC_FILE	"_gvimrc"
 # endif
-#endif
-#ifndef USR_VIMRC_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ USR_VIMRC_FILE
 # define USR_VIMRC_FILE	"~/.vimrc"
-#endif
+#اگر_ختم
 
-#ifndef USR_EXRC_FILE
+#اگر_غیر_تعریف_شدہ USR_EXRC_FILE
 # define USR_EXRC_FILE	"~/.exrc"
-#endif
+#اگر_ختم
 
-#ifndef VIMRC_FILE
+#اگر_غیر_تعریف_شدہ VIMRC_FILE
 # define VIMRC_FILE	"_vimrc"
-#endif
+#اگر_ختم
 
-#ifndef EXRC_FILE
+#اگر_غیر_تعریف_شدہ EXRC_FILE
 # define EXRC_FILE	"_exrc"
-#endif
+#اگر_ختم
 
-#ifndef DFLT_HELPFILE
+#اگر_غیر_تعریف_شدہ DFLT_HELPFILE
 # define DFLT_HELPFILE	"$VIMRUNTIME/doc/help.txt"
-#endif
+#اگر_ختم
 
-#ifndef SYNTAX_FNAME
+#اگر_غیر_تعریف_شدہ SYNTAX_FNAME
 # define SYNTAX_FNAME	"$VIMRUNTIME/syntax/%s.vim"
-#endif
+#اگر_ختم
 
-#ifdef FEAT_VIMINFO
+#اگر_تعریف_شدہ FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  define VIMINFO_FILE	"~/.viminfo"
 # endif
-#endif // FEAT_VIMINFO
+#اگر_ختم // FEAT_VIMINFO
 
-#ifndef DFLT_BDIR
+#اگر_غیر_تعریف_شدہ DFLT_BDIR
 # define DFLT_BDIR	"."	// default for 'backupdir'
-#endif
+#اگر_ختم
 
-#ifndef DFLT_DIR
+#اگر_غیر_تعریف_شدہ DFLT_DIR
 # define DFLT_DIR	"."	// default for 'directory'
-#endif
+#اگر_ختم
 
-#ifndef DFLT_VDIR
+#اگر_غیر_تعریف_شدہ DFLT_VDIR
 # define DFLT_VDIR	"$VIM/vimfiles/view"	// default for 'viewdir'
-#endif
+#اگر_ختم
 
-#define DFLT_ERRORFILE		"errors.err"
+#تعریف_کرو DFLT_ERRORFILE		"errors.err"
 
-#ifndef DFLT_RUNTIMEPATH
+#اگر_غیر_تعریف_شدہ DFLT_RUNTIMEPATH
 # define DFLT_RUNTIMEPATH	"~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"
-#endif
-#ifndef CLEAN_RUNTIMEPATH
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ CLEAN_RUNTIMEPATH
 # define CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
-#endif
+#اگر_ختم
 
 /*
  * Macintosh has plenty of memory, use large buffers
  */
-#define CMDBUFFSIZE 1024	// size of the command processing buffer
+#تعریف_کرو CMDBUFFSIZE 1024	// size of the command processing buffer
 
-#ifndef DFLT_MAXMEM
+#اگر_غیر_تعریف_شدہ DFLT_MAXMEM
 # define DFLT_MAXMEM	512	// use up to  512 Kbyte for buffer
-#endif
+#اگر_ختم
 
-#ifndef DFLT_MAXMEMTOT
+#اگر_غیر_تعریف_شدہ DFLT_MAXMEMTOT
 # define DFLT_MAXMEMTOT	2048	// use up to 2048 Kbyte for Vim
-#endif
+#اگر_ختم
 
-#define WILDCHAR_LIST "*?[{`$"
+#تعریف_کرو WILDCHAR_LIST "*?[{`$"
 
 /**************/
-#define mch_rename(src, dst) rename(src, dst)
-#define mch_remove(x) unlink((char *)(x))
-#ifndef mch_getenv
-# if defined(__APPLE_CC__)
-#  define mch_getenv(name)  ((char_u *)getenv((char *)(name)))
+#تعریف_کرو mch_rename(src, dst) rename(src, dst)
+#تعریف_کرو mch_remove(x) unlink((حرف *)(x))
+#اگر_غیر_تعریف_شدہ mch_getenv
+# اگر defined(__APPLE_CC__)
+#  define mch_getenv(name)  ((char_u *)getenv((حرف *)(name)))
 #  define mch_setenv(name, val, x) setenv(name, val, x)
-# else
+# ورنہ
   // vim_getenv() is in pty.c
 #  define USE_VIMPTY_GETENV
 #  define mch_getenv(x) vimpty_getenv(x)
 #  define mch_setenv(name, val, x) setenv(name, val, x)
 # endif
-#endif
+#اگر_ختم
 
-#ifndef HAVE_CONFIG_H
+#اگر_غیر_تعریف_شدہ HAVE_CONFIG_H
 # ifdef __APPLE_CC__
 // Assuming compiling for MacOS X
 // Trying to take advantage of the prebinding
 #  define HAVE_TGETENT
 #  define OSPEED_EXTERN
-#  define UP_BC_PC_EXTERN
+#  define اوپر_BC_PC_EXTERN
 # endif
-#endif
+#اگر_ختم
 
 // Some "prep work" definition to be able to compile the MacOS X
 // version with os_unix.c instead of os_mac.c. Based on the result
 // of ./configure for console MacOS X.
 
-#ifndef SIGPROTOARG
-# define SIGPROTOARG	(int)
-#endif
-#ifndef SIGDEFARG
-# define SIGDEFARG(s)	(s) int s UNUSED;
-#endif
-#ifndef SIGDUMMYARG
+#اگر_غیر_تعریف_شدہ SIGPROTOARG
+# define SIGPROTOARG	(صحیح)
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ SIGDEFARG
+# define SIGDEFARG(s)	(s) صحیح s غیر_مستعمل;
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ SIGDUMMYARG
 # define SIGDUMMYARG	0
-#endif
-#undef  HAVE_AVAIL_MEM
-#ifndef HAVE_CONFIG_H
+#اگر_ختم
+#تعریف_منسوخ  HAVE_AVAIL_MEM
+#اگر_غیر_تعریف_شدہ HAVE_CONFIG_H
 //# define USE_SYSTEM  // Output ship do debugger :(, but not compile
 # define HAVE_SYS_WAIT_H 1 // Attempt
 # define HAVE_TERMIOS_H 1
-# define SYS_SELECT_WITH_SYS_TIME 1
+# define SYS_SELECT_WITH_SYS_وقت 1
 # define HAVE_SELECT 1
 # define HAVE_SYS_SELECT_H 1
 # define HAVE_PUTENV
 # define HAVE_SETENV
 # define HAVE_RENAME
-#endif
+#اگر_ختم
 
-#if !defined(HAVE_CONFIG_H)
+#اگر !defined(HAVE_CONFIG_H)
 # define HAVE_PUTENV
-#endif
+#اگر_ختم
 
 // A Mac constant causing big problem to syntax highlighting
-#define UNKNOWN_CREATOR '\?\?\?\?'
+#تعریف_کرو UNKNOWN_CREATOR '\?\?\?\?'
 
-#ifdef FEAT_RELTIME
+#اگر_تعریف_شدہ FEAT_RELTIME
 
 # include <dispatch/dispatch.h>
 
-# if !defined(MAC_OS_X_VERSION_10_12) \
-	|| (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-typedef int clockid_t;
+# اگر !defined(MAC_OS_X_نسخہ_10_12) \
+	|| (MAC_OS_X_نسخہ_MAX_ALLOWED < MAC_OS_X_نسخہ_10_12)
+قسمتعریف صحیح clockid_t;
 # endif
 # ifndef CLOCK_REALTIME
 #  define CLOCK_REALTIME 0
@@ -267,36 +267,36 @@ typedef int clockid_t;
 #  define CLOCK_MONOTONIC 1
 # endif
 
-struct itimerspec
+ساخت itimerspec
 {
-    struct timespec it_interval;  // timer period
-    struct timespec it_value;	  // initial expiration
+    ساخت timespec it_interval;  // timer period
+    ساخت timespec it_value;	  // initial expiration
 };
 
-struct sigevent;
+ساخت sigevent;
 
-struct macos_timer
+ساخت macos_timer
 {
-    dispatch_queue_t tim_queue;
-    dispatch_source_t tim_timer;
-    void (*tim_func)(union sigval);
-    void *tim_arg;
+    dispatch_قطار_t tim_قطار;
+    dispatch_ماخذ_t tim_timer;
+    خالی (*tim_func)(اتحاد sigval);
+    خالی *tim_arg;
 };
 
-typedef struct macos_timer *timer_t;
+قسمتعریف ساخت macos_timer *timer_t;
 
-extern int timer_create(
+خارجی صحیح timer_create(
     clockid_t clockid,
-    struct sigevent *sevp,
+    ساخت sigevent *sevp,
     timer_t *timerid);
 
-extern int timer_delete(timer_t timerid);
+خارجی صحیح timer_delete(timer_t timerid);
 
-extern int timer_settime(
-    timer_t timerid, int flags,
-    const struct itimerspec *new_value,
-    struct itimerspec *unused);
+خارجی صحیح timer_settime(
+    timer_t timerid, صحیح flags,
+    ثابت ساخت itimerspec *new_قدر_2,
+    ساخت itimerspec *غیر_مستعمل_2);
 
-#endif // FEAT_RELTIME
+#اگر_ختم // FEAT_RELTIME
 
-#endif // OS_MAC__H
+#اگر_ختم // OS_MAC__H

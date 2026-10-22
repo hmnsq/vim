@@ -20,7 +20,7 @@
  *    long name of the command.
  */
 
-#ifdef DO_DECLARE_NVCMD
+#اگر_تعریف_شدہ DO_DECLARE_NVCMD
 
 /*
  * Used when building Vim.
@@ -31,7 +31,7 @@
 # ifdef FEAT_GUI
 #  define NV_VER_SCROLLBAR	nv_ver_scrollbar
 #  define NV_HOR_SCROLLBAR	nv_hor_scrollbar
-# else
+# ورنہ
 #  define NV_VER_SCROLLBAR nv_error
 #  define NV_HOR_SCROLLBAR nv_error
 # endif
@@ -39,20 +39,20 @@
 # ifdef FEAT_GUI_TABLINE
 #  define NV_TABLINE	nv_tabline
 #  define NV_TABMENU	nv_tabmenu
-# else
+# ورنہ
 #  define NV_TABLINE	nv_error
 #  define NV_TABMENU	nv_error
 # endif
 
 # ifdef FEAT_NETBEANS_INTG
 #  define NV_NBCMD	nv_nbcmd
-# else
+# ورنہ
 #  define NV_NBCMD	nv_error
 # endif
 
 # ifdef FEAT_DND
 #  define NV_DROP		nv_drop
-# else
+# ورنہ
 #  define NV_DROP		nv_error
 # endif
 
@@ -60,7 +60,7 @@
  * Function to be called for a Normal or Visual mode command.
  * The argument is a cmdarg_T.
  */
-typedef void (*nv_func_T)(cmdarg_T *cap);
+قسمتعریف خالی (*nv_func_T)(cmdarg_T *cap);
 
 // Values for cmd_flags.
 # define NV_NCH	    0x01	  // may need to get a second char
@@ -91,57 +91,57 @@ typedef void (*nv_func_T)(cmdarg_T *cap);
  * script to generate the nv_cmd_idx[] lookup table.
  * It is faster when all keys from zero to '~' are present.
  */
-static const struct nv_cmd
+ساکن ثابت ساخت nv_cmd
 {
-    int		cmd_char;	// (first) command character
+    صحیح		cmd_char;	// (first) command character
     nv_func_T   cmd_func;	// function for this command
     short_u	cmd_flags;	// NV_ flags
-    short	cmd_arg;	// value for ca.arg
+    مختصر	cmd_arg;	// value for ca.arg
 } nv_cmds[] =
 
-#else  // DO_DECLARE_NVCMD
+#ورنہ  // DO_DECLARE_NVCMD
 
 /*
  * Used when creating nv_cmdidxs.h.
  */
 # define NVCMD(a, b, c, d)  a
-static const int nv_cmds[] =
+ساکن ثابت صحیح nv_cmds[] =
 
-#endif // DO_DECLARE_NVCMD
+#اگر_ختم // DO_DECLARE_NVCMD
 {
     NVCMD(NUL,		nv_error,	0,			0),
     NVCMD(Ctrl_A,	nv_addsub,	0,			0),
-    NVCMD(Ctrl_B,	nv_page,	NV_STS,			BACKWARD),
+    NVCMD(Ctrl_B,	nv_صفحہ,	NV_STS,			BACKWARD),
     NVCMD(Ctrl_C,	nv_esc,		0,			TRUE),
     NVCMD(Ctrl_D,	nv_halfpage,	0,			0),
-    NVCMD(Ctrl_E,	nv_scroll_line,	0,			TRUE),
-    NVCMD(Ctrl_F,	nv_page,	NV_STS,			FORWARD),
+    NVCMD(Ctrl_E,	nv_scroll_سطر,	0,			TRUE),
+    NVCMD(Ctrl_F,	nv_صفحہ,	NV_STS,			FORWARD),
     NVCMD(Ctrl_G,	nv_ctrlg,	0,			0),
     NVCMD(Ctrl_H,	nv_ctrlh,	0,			0),
     NVCMD(Ctrl_I,	nv_pcmark,	0,			0),
-    NVCMD(NL,		nv_down,	0,			FALSE),
+    NVCMD(NL,		nv_نیچے_کو,	0,			FALSE),
     NVCMD(Ctrl_K,	nv_error,	0,			0),
     NVCMD(Ctrl_L,	nv_clear,	0,			0),
-    NVCMD(CAR,		nv_down,	0,			TRUE),
-    NVCMD(Ctrl_N,	nv_down,	NV_STS,			FALSE),
+    NVCMD(CAR,		nv_نیچے_کو,	0,			TRUE),
+    NVCMD(Ctrl_N,	nv_نیچے_کو,	NV_STS,			FALSE),
     NVCMD(Ctrl_O,	nv_ctrlo,	0,			0),
-    NVCMD(Ctrl_P,	nv_up,		NV_STS,			FALSE),
+    NVCMD(Ctrl_P,	nv_اوپر,		NV_STS,			FALSE),
     NVCMD(Ctrl_Q,	nv_visual,	0,			FALSE),
-    NVCMD(Ctrl_R,	nv_redo_or_register, 0,			0),
+    NVCMD(Ctrl_R,	nv_redo_or_رجسٹر, 0,			0),
     NVCMD(Ctrl_S,	nv_ignore,	0,			0),
     NVCMD(Ctrl_T,	nv_tagpop,	NV_NCW,			0),
     NVCMD(Ctrl_U,	nv_halfpage,	0,			0),
     NVCMD(Ctrl_V,	nv_visual,	0,			FALSE),
-    NVCMD(Ctrl_W,	nv_window,	0,			0),
+    NVCMD(Ctrl_W,	nv_کھڑکی,	0,			0),
     NVCMD(Ctrl_X,	nv_addsub,	0,			0),
-    NVCMD(Ctrl_Y,	nv_scroll_line,	0,			FALSE),
+    NVCMD(Ctrl_Y,	nv_scroll_سطر,	0,			FALSE),
     NVCMD(Ctrl_Z,	nv_suspend,	0,			0),
     NVCMD(ESC,		nv_esc,		0,			FALSE),
-    NVCMD(Ctrl_BSL,	nv_normal,	NV_NCH_ALW,		0),
+    NVCMD(Ctrl_BSL,	nv_معمول,	NV_NCH_ALW,		0),
     NVCMD(Ctrl_RSB,	nv_ident,	NV_NCW,			0),
     NVCMD(Ctrl_HAT,	nv_hat,		NV_NCW,			0),
     NVCMD(Ctrl__,	nv_error,	0,			0),
-    NVCMD(' ',		nv_right,	0,			0),
+    NVCMD(' ',		nv_دایاں,	0,			0),
     NVCMD('!',		nv_operator,	0,			0),
     NVCMD('"',		nv_regname,	NV_NCH_NOP|NV_KEEPREG,	0),
     NVCMD('#',		nv_ident,	0,			0),
@@ -152,11 +152,11 @@ static const int nv_cmds[] =
     NVCMD('(',		nv_brace,	0,			BACKWARD),
     NVCMD(')',		nv_brace,	0,			FORWARD),
     NVCMD('*',		nv_ident,	0,			0),
-    NVCMD('+',		nv_down,	0,			TRUE),
+    NVCMD('+',		nv_نیچے_کو,	0,			TRUE),
     NVCMD(',',		nv_csearch,	0,			TRUE),
-    NVCMD('-',		nv_up,		0,			TRUE),
+    NVCMD('-',		nv_اوپر,		0,			TRUE),
     NVCMD('.',		nv_dot,		NV_KEEPREG,		0),
-    NVCMD('/',		nv_search,	0,			FALSE),
+    NVCMD('/',		nv_تلاش,	0,			FALSE),
     NVCMD('0',		nv_beginline,	0,			0),
     NVCMD('1',		nv_ignore,	0,			0),
     NVCMD('2',		nv_ignore,	0,			0),
@@ -172,10 +172,10 @@ static const int nv_cmds[] =
     NVCMD('<',		nv_operator,	NV_RL,			0),
     NVCMD('=',		nv_operator,	0,			0),
     NVCMD('>',		nv_operator,	NV_RL,			0),
-    NVCMD('?',		nv_search,	0,			FALSE),
+    NVCMD('?',		nv_تلاش,	0,			FALSE),
     NVCMD('@',		nv_at,		NV_NCH_NOP,		FALSE),
     NVCMD('A',		nv_edit,	0,			0),
-    NVCMD('B',		nv_bck_word,	0,			1),
+    NVCMD('B',		nv_bck_لفظ,	0,			1),
     NVCMD('C',		nv_abbrev,	NV_KEEPREG,		0),
     NVCMD('D',		nv_abbrev,	NV_KEEPREG,		0),
     NVCMD('E',		nv_wordcmd,	0,			TRUE),
@@ -187,7 +187,7 @@ static const int nv_cmds[] =
     NVCMD('K',		nv_ident,	0,			0),
     NVCMD('L',		nv_scroll,	0,			0),
     NVCMD('M',		nv_scroll,	0,			0),
-    NVCMD('N',		nv_next,	0,			SEARCH_REV),
+    NVCMD('N',		nv_اگلا,	0,			تلاش_REV),
     NVCMD('O',		nv_open,	0,			0),
     NVCMD('P',		nv_put,		0,			0),
     NVCMD('Q',		nv_exmode,	NV_NCW,			0),
@@ -207,22 +207,22 @@ static const int nv_cmds[] =
     NVCMD('_',		nv_lineop,	0,			0),
     NVCMD('`',		nv_gomark,	NV_NCH_ALW,		FALSE),
     NVCMD('a',		nv_edit,	NV_NCH,			0),
-    NVCMD('b',		nv_bck_word,	0,			0),
+    NVCMD('b',		nv_bck_لفظ,	0,			0),
     NVCMD('c',		nv_operator,	0,			0),
     NVCMD('d',		nv_operator,	0,			0),
     NVCMD('e',		nv_wordcmd,	0,			FALSE),
     NVCMD('f',		nv_csearch,	NV_NCH_ALW|NV_LANG,	FORWARD),
     NVCMD('g',		nv_g_cmd,	NV_NCH_ALW,		FALSE),
-    NVCMD('h',		nv_left,	NV_RL,			0),
+    NVCMD('h',		nv_بایاں,	NV_RL,			0),
     NVCMD('i',		nv_edit,	NV_NCH,			0),
-    NVCMD('j',		nv_down,	0,			FALSE),
-    NVCMD('k',		nv_up,		0,			FALSE),
-    NVCMD('l',		nv_right,	NV_RL,			0),
+    NVCMD('j',		nv_نیچے_کو,	0,			FALSE),
+    NVCMD('k',		nv_اوپر,		0,			FALSE),
+    NVCMD('l',		nv_دایاں,	NV_RL,			0),
     NVCMD('m',		nv_mark,	NV_NCH_NOP,		0),
-    NVCMD('n',		nv_next,	0,			0),
+    NVCMD('n',		nv_اگلا,	0,			0),
     NVCMD('o',		nv_open,	0,			0),
     NVCMD('p',		nv_put,		0,			0),
-    NVCMD('q',		nv_record,	NV_NCH,			0),
+    NVCMD('q',		nv_ریکارڈ,	NV_NCH,			0),
     NVCMD('r',		nv_replace,	NV_NCH_NOP|NV_LANG,	0),
     NVCMD('s',		nv_subst,	NV_KEEPREG,		0),
     NVCMD('t',		nv_csearch,	NV_NCH_ALW|NV_LANG,	FORWARD),
@@ -239,10 +239,10 @@ static const int nv_cmds[] =
 
     // pound sign
     NVCMD(POUND,	nv_ident,	0,			0),
-    NVCMD(K_MOUSEUP,	nv_mousescroll,	0,			MSCR_UP),
-    NVCMD(K_MOUSEDOWN,	nv_mousescroll, 0,			MSCR_DOWN),
-    NVCMD(K_MOUSELEFT,	nv_mousescroll, 0,			MSCR_LEFT),
-    NVCMD(K_MOUSERIGHT, nv_mousescroll, 0,			MSCR_RIGHT),
+    NVCMD(K_MOUSEUP,	nv_mousescroll,	0,			MSCR_اوپر),
+    NVCMD(K_MOUSEDOWN,	nv_mousescroll, 0,			MSCR_نیچے_کو),
+    NVCMD(K_MOUSELEFT,	nv_mousescroll, 0,			MSCR_بایاں),
+    NVCMD(K_MOUSERIGHT, nv_mousescroll, 0,			MSCR_دایاں),
     NVCMD(K_LEFTMOUSE,	nv_mouse,	0,			0),
     NVCMD(K_LEFTMOUSE_NM, nv_mouse,	0,			0),
     NVCMD(K_LEFTDRAG,	nv_mouse,	0,			0),
@@ -266,24 +266,24 @@ static const int nv_cmds[] =
     NVCMD(K_INS,	nv_edit,	0,			0),
     NVCMD(K_KINS,	nv_edit,	0,			0),
     NVCMD(K_BS,		nv_ctrlh,	0,			0),
-    NVCMD(K_UP,		nv_up,		NV_SSS|NV_STS,		FALSE),
-    NVCMD(K_S_UP,	nv_page,	NV_SS,			BACKWARD),
-    NVCMD(K_DOWN,	nv_down,	NV_SSS|NV_STS,		FALSE),
-    NVCMD(K_S_DOWN,	nv_page,	NV_SS,			FORWARD),
-    NVCMD(K_LEFT,	nv_left,	NV_SSS|NV_STS|NV_RL,	0),
-    NVCMD(K_S_LEFT,	nv_bck_word,	NV_SS|NV_RL,		0),
-    NVCMD(K_C_LEFT,	nv_bck_word,	NV_SSS|NV_RL|NV_STS,	1),
-    NVCMD(K_RIGHT,	nv_right,	NV_SSS|NV_STS|NV_RL,	0),
-    NVCMD(K_S_RIGHT,	nv_wordcmd,	NV_SS|NV_RL,		FALSE),
-    NVCMD(K_C_RIGHT,	nv_wordcmd,	NV_SSS|NV_RL|NV_STS,	TRUE),
-    NVCMD(K_PAGEUP,	nv_page,	NV_SSS|NV_STS,		BACKWARD),
-    NVCMD(K_KPAGEUP,	nv_page,	NV_SSS|NV_STS,		BACKWARD),
-    NVCMD(K_PAGEDOWN,	nv_page,	NV_SSS|NV_STS,		FORWARD),
-    NVCMD(K_KPAGEDOWN,	nv_page,	NV_SSS|NV_STS,		FORWARD),
-    NVCMD(K_END,	nv_end,		NV_SSS|NV_STS,		FALSE),
-    NVCMD(K_KEND,	nv_end,		NV_SSS|NV_STS,		FALSE),
-    NVCMD(K_S_END,	nv_end,		NV_SS,			FALSE),
-    NVCMD(K_C_END,	nv_end,		NV_SSS|NV_STS,		TRUE),
+    NVCMD(K_اوپر,		nv_اوپر,		NV_SSS|NV_STS,		FALSE),
+    NVCMD(K_S_اوپر,	nv_صفحہ,	NV_SS,			BACKWARD),
+    NVCMD(K_نیچے_کو,	nv_نیچے_کو,	NV_SSS|NV_STS,		FALSE),
+    NVCMD(K_S_نیچے_کو,	nv_صفحہ,	NV_SS,			FORWARD),
+    NVCMD(K_بایاں,	nv_بایاں,	NV_SSS|NV_STS|NV_RL,	0),
+    NVCMD(K_S_بایاں,	nv_bck_لفظ,	NV_SS|NV_RL,		0),
+    NVCMD(K_C_بایاں,	nv_bck_لفظ,	NV_SSS|NV_RL|NV_STS,	1),
+    NVCMD(K_دایاں,	nv_دایاں,	NV_SSS|NV_STS|NV_RL,	0),
+    NVCMD(K_S_دایاں,	nv_wordcmd,	NV_SS|NV_RL,		FALSE),
+    NVCMD(K_C_دایاں,	nv_wordcmd,	NV_SSS|NV_RL|NV_STS,	TRUE),
+    NVCMD(K_PAGEUP,	nv_صفحہ,	NV_SSS|NV_STS,		BACKWARD),
+    NVCMD(K_KPAGEUP,	nv_صفحہ,	NV_SSS|NV_STS,		BACKWARD),
+    NVCMD(K_PAGEDOWN,	nv_صفحہ,	NV_SSS|NV_STS,		FORWARD),
+    NVCMD(K_KPAGEDOWN,	nv_صفحہ,	NV_SSS|NV_STS,		FORWARD),
+    NVCMD(K_انتہا,	nv_انتہا,		NV_SSS|NV_STS,		FALSE),
+    NVCMD(K_KEND,	nv_انتہا,		NV_SSS|NV_STS,		FALSE),
+    NVCMD(K_S_انتہا,	nv_انتہا,		NV_SS,			FALSE),
+    NVCMD(K_C_انتہا,	nv_انتہا,		NV_SSS|NV_STS,		TRUE),
     NVCMD(K_HOME,	nv_home,	NV_SSS|NV_STS,		0),
     NVCMD(K_KHOME,	nv_home,	NV_SSS|NV_STS,		0),
     NVCMD(K_S_HOME,	nv_home,	NV_SS,			0),
@@ -308,4 +308,4 @@ static const int nv_cmds[] =
 };
 
 // Number of commands in nv_cmds[].
-#define NV_CMDS_SIZE ARRAY_LENGTH(nv_cmds)
+#تعریف_کرو NV_CMDS_سائز ARRAY_لمبائی(nv_cmds)

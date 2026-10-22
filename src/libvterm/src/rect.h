@@ -2,55 +2,55 @@
  * Some utility functions on VTermRect structures
  */
 
-#define STRFrect "(%d,%d-%d,%d)"
-#define ARGSrect(r) (r).start_row, (r).start_col, (r).end_row, (r).end_col
+#تعریف_کرو STRFrect "(%d,%d-%d,%d)"
+#تعریف_کرو ARGSrect(r) (r).آغاز_صف, (r).آغاز_ستون, (r).انتہا_صف, (r).انتہا_ستون
 
 /* Expand dst to contain src as well */
-static void rect_expand(VTermRect *dst, VTermRect *src)
+ساکن خالی rect_expand(VTermRect *dst, VTermRect *src)
 {
-  if(dst->start_row > src->start_row) dst->start_row = src->start_row;
-  if(dst->start_col > src->start_col) dst->start_col = src->start_col;
-  if(dst->end_row   < src->end_row)   dst->end_row   = src->end_row;
-  if(dst->end_col   < src->end_col)   dst->end_col   = src->end_col;
+  اگر(dst->آغاز_صف > src->آغاز_صف) dst->آغاز_صف = src->آغاز_صف;
+  اگر(dst->آغاز_ستون > src->آغاز_ستون) dst->آغاز_ستون = src->آغاز_ستون;
+  اگر(dst->انتہا_صف   < src->انتہا_صف)   dst->انتہا_صف   = src->انتہا_صف;
+  اگر(dst->انتہا_ستون   < src->انتہا_ستون)   dst->انتہا_ستون   = src->انتہا_ستون;
 }
 
 /* Clip the dst to ensure it does not step outside of bounds */
-static void rect_clip(VTermRect *dst, VTermRect *bounds)
+ساکن خالی rect_clip(VTermRect *dst, VTermRect *bounds)
 {
-  if(dst->start_row < bounds->start_row) dst->start_row = bounds->start_row;
-  if(dst->start_col < bounds->start_col) dst->start_col = bounds->start_col;
-  if(dst->end_row   > bounds->end_row)   dst->end_row   = bounds->end_row;
-  if(dst->end_col   > bounds->end_col)   dst->end_col   = bounds->end_col;
+  اگر(dst->آغاز_صف < bounds->آغاز_صف) dst->آغاز_صف = bounds->آغاز_صف;
+  اگر(dst->آغاز_ستون < bounds->آغاز_ستون) dst->آغاز_ستون = bounds->آغاز_ستون;
+  اگر(dst->انتہا_صف   > bounds->انتہا_صف)   dst->انتہا_صف   = bounds->انتہا_صف;
+  اگر(dst->انتہا_ستون   > bounds->انتہا_ستون)   dst->انتہا_ستون   = bounds->انتہا_ستون;
   /* Ensure it doesn't end up negatively-sized */
-  if(dst->end_row < dst->start_row) dst->end_row = dst->start_row;
-  if(dst->end_col < dst->start_col) dst->end_col = dst->start_col;
+  اگر(dst->انتہا_صف < dst->آغاز_صف) dst->انتہا_صف = dst->آغاز_صف;
+  اگر(dst->انتہا_ستون < dst->آغاز_ستون) dst->انتہا_ستون = dst->آغاز_ستون;
 }
 
 /* True if the two rectangles are equal */
-static int rect_equal(VTermRect *a, VTermRect *b)
+ساکن صحیح rect_equal(VTermRect *a, VTermRect *b)
 {
-  return (a->start_row == b->start_row) &&
-         (a->start_col == b->start_col) &&
-         (a->end_row   == b->end_row)   &&
-         (a->end_col   == b->end_col);
+  واپس (a->آغاز_صف == b->آغاز_صف) &&
+         (a->آغاز_ستون == b->آغاز_ستون) &&
+         (a->انتہا_صف   == b->انتہا_صف)   &&
+         (a->انتہا_ستون   == b->انتہا_ستون);
 }
 
 /* True if small is contained entirely within big */
-static int rect_contains(VTermRect *big, VTermRect *small)
+ساکن صحیح rect_شامل_ہے(VTermRect *big, VTermRect *small)
 {
-  if(small->start_row < big->start_row) return 0;
-  if(small->start_col < big->start_col) return 0;
-  if(small->end_row   > big->end_row)   return 0;
-  if(small->end_col   > big->end_col)   return 0;
-  return 1;
+  اگر(small->آغاز_صف < big->آغاز_صف) واپس 0;
+  اگر(small->آغاز_ستون < big->آغاز_ستون) واپس 0;
+  اگر(small->انتہا_صف   > big->انتہا_صف)   واپس 0;
+  اگر(small->انتہا_ستون   > big->انتہا_ستون)   واپس 0;
+  واپس 1;
 }
 
 /* True if the rectangles overlap at all */
-static int rect_intersects(VTermRect *a, VTermRect *b)
+ساکن صحیح rect_intersects(VTermRect *a, VTermRect *b)
 {
-  if(a->start_row > b->end_row || b->start_row > a->end_row)
-    return 0;
-  if(a->start_col > b->end_col || b->start_col > a->end_col)
-    return 0;
-  return 1;
+  اگر(a->آغاز_صف > b->انتہا_صف || b->آغاز_صف > a->انتہا_صف)
+    واپس 0;
+  اگر(a->آغاز_ستون > b->انتہا_ستون || b->آغاز_ستون > a->انتہا_ستون)
+    واپس 0;
+  واپس 1;
 }

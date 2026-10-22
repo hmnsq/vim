@@ -40,17 +40,17 @@
 // Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#اگر defined(FEAT_GUI) || defined(FEAT_کام_CHANNEL)
 
-#include <signal.h>
+#شامل <signal.h>
 
-#ifdef HAVE_SYS_IOCTL_H
+#اگر_تعریف_شدہ HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
-#endif
+#اگر_ختم
 
-#if HAVE_STROPTS_H
+#اگر HAVE_STROPTS_H
 # include <sys/types.h>
 # ifdef sinix
 #  define buf_T __system_buf_t__
@@ -61,386 +61,386 @@
 # endif
 # ifdef SUN_SYSTEM
 #  include <sys/conf.h>
-#  if defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS)
+#  اگر defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS)
 #   include <sys/ptms.h>
 #  endif
 # endif
-#endif
+#اگر_ختم
 
-#ifdef HAVE_UNISTD_H
+#اگر_تعریف_شدہ HAVE_UNISTD_H
 # include <unistd.h>
-#endif
+#اگر_ختم
 
-#if HAVE_TERMIO_H
+#اگر HAVE_TERMIO_H
 # include <termio.h>
-#else
+#ورنہ
 # ifdef HAVE_TERMIOS_H
 #  include <termios.h>
 # endif
-#endif
+#اگر_ختم
 
-#if HAVE_SYS_STREAM_H
+#اگر HAVE_SYS_دھارا_H
 # include <sys/stream.h>
-#endif
+#اگر_ختم
 
-#if HAVE_SYS_PTEM_H
+#اگر HAVE_SYS_PTEM_H
 # include <sys/ptem.h>
-#endif
+#اگر_ختم
 
-#if !defined(SUN_SYSTEM) && !defined(VMS)
+#اگر !defined(SUN_SYSTEM) && !defined(VMS)
 # include <sys/ioctl.h>
-#endif
+#اگر_ختم
 
-#if defined(SUN_SYSTEM) && defined(LOCKPTY) && !defined(TIOCEXCL)
+#اگر defined(SUN_SYSTEM) && defined(LOCKPTY) && !defined(TIOCEXCL)
 # include <sys/ttold.h>
-#endif
+#اگر_ختم
 
-#ifdef ISC
+#اگر_تعریف_شدہ ISC
 # include <sys/tty.h>
 # include <sys/sioctl.h>
 # include <sys/pty.h>
-#endif
+#اگر_ختم
 
-#ifdef sgi
+#اگر_تعریف_شدہ sgi
 # include <sys/sysmacros.h>
-#endif
+#اگر_ختم
 
-#if defined(_INCLUDE_HPUX_SOURCE) && !defined(hpux)
+#اگر defined(INCLUDE_HPUX_ماخذ) && !defined(hpux)
 # define hpux
-#endif
+#اگر_ختم
 
 /*
  * if no PTYRANGE[01] is in the config file, we pick a default
  */
-#ifndef PTYRANGE0
+#اگر_غیر_تعریف_شدہ PTYRANGE0
 # define PTYRANGE0 "qprs"
-#endif
-#ifndef PTYRANGE1
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ PTYRANGE1
 # define PTYRANGE1 "0123456789abcdef"
-#endif
+#اگر_ختم
 
 // SVR4 pseudo ttys don't seem to work with SCO-5
-#ifdef M_UNIX
+#اگر_تعریف_شدہ M_UNIX
 # undef HAVE_SVR4_PTYS
-#endif
+#اگر_ختم
 
 /*
  *  Open all ptys with O_NOCTTY, just to be on the safe side.
  */
-#ifndef O_NOCTTY
+#اگر_غیر_تعریف_شدہ O_NOCTTY
 # define O_NOCTTY 0
-#endif
+#اگر_ختم
 
-#if defined(HAVE_SVR4_PTYS) || defined(HAVE_POSIX_OPENPT)
+#اگر defined(HAVE_SVR4_PTYS) || defined(HAVE_POSIX_OPENPT)
 // These should be in stdlib.h, but it depends on _XOPEN_SOURCE.
-char *ptsname(int);
-int unlockpt(int);
-int grantpt(int);
-int posix_openpt(int flags);
-#endif
+حرف *ptsname(صحیح);
+صحیح unlockpt(صحیح);
+صحیح grantpt(صحیح);
+صحیح posix_openpt(صحیح flags);
+#اگر_ختم
 
-    static void
-initmaster(int f UNUSED)
+    ساکن خالی
+initmaster(صحیح f غیر_مستعمل)
 {
-#ifndef VMS
+#اگر_غیر_تعریف_شدہ VMS
 # ifdef POSIX
     tcflush(f, TCIOFLUSH);
-# else
+# ورنہ
 #  ifdef TIOCFLUSH
-    (void)ioctl(f, TIOCFLUSH, (char *) 0);
+    (خالی)ioctl(f, TIOCFLUSH, (حرف *) 0);
 #  endif
 # endif
 # ifdef LOCKPTY
-    (void)ioctl(f, TIOCEXCL, (char *) 0);
+    (خالی)ioctl(f, TIOCEXCL, (حرف *) 0);
 # endif
-#endif
+#اگر_ختم
 }
 
 /*
  * This causes a hang on some systems, but is required for a properly working
  * pty on others.  Needs to be tuned...
  */
-    int
-setup_slavepty(int fd)
+    صحیح
+تیاری_slavepty(صحیح fd)
 {
-    if (fd < 0)
-	return 0;
-#if defined(I_PUSH) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
+    اگر (fd < 0)
+	واپس 0;
+#اگر defined(I_ڈالو) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
 	&& !defined(linux) && !defined(__osf__) && !defined(M_UNIX)
-# if defined(HAVE_SYS_PTEM_H) || defined(hpux)
-    if (ioctl(fd, I_PUSH, "ptem") != 0)
-	return -1;
+# اگر defined(HAVE_SYS_PTEM_H) || defined(hpux)
+    اگر (ioctl(fd, I_ڈالو, "ptem") != 0)
+	واپس -1;
 # endif
-    if (ioctl(fd, I_PUSH, "ldterm") != 0)
-	return -1;
+    اگر (ioctl(fd, I_ڈالو, "ldterm") != 0)
+	واپس -1;
 # ifdef SUN_SYSTEM
-    if (ioctl(fd, I_PUSH, "ttcompat") != 0)
-	return -1;
+    اگر (ioctl(fd, I_ڈالو, "ttcompat") != 0)
+	واپس -1;
 # endif
-#endif
-    return 0;
+#اگر_ختم
+    واپس 0;
 }
 
-#if defined(HAVE_POSIX_OPENPT) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#اگر defined(HAVE_POSIX_OPENPT) && !defined(PTY_مکمل)
+# define PTY_مکمل
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    int			f;
-    char		*m;
+    صحیح			f;
+    حرف		*m;
     sighandler_T	sigcld;
-    static char TtyName[32];  // used for opening a new pty-pair
+    ساکن حرف TtyName[32];  // used for opening a new pty-pair
 
-    if ((f = posix_openpt(O_RDWR | O_NOCTTY | O_EXTRA)) == -1)
-	return -1;
+    اگر ((f = posix_openpt(O_RDWR | O_NOCTTY | O_EXTRA)) == -1)
+	واپس -1;
 
     // SIGCHLD set to SIG_DFL for grantpt() because it fork()s and
     // exec()s pt_chmod
     sigcld = mch_signal(SIGCHLD, SIG_DFL);
-    if ((m = ptsname(f)) == NULL || grantpt(f) || unlockpt(f))
+    اگر ((m = ptsname(f)) == تہی || grantpt(f) || unlockpt(f))
     {
 	mch_signal(SIGCHLD, sigcld);
 	close(f);
-	return -1;
+	واپس -1;
     }
     mch_signal(SIGCHLD, sigcld);
-    vim_strncpy((char_u *)TtyName, (char_u *)m, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)m, حجم(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#if defined(OSX) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#اگر defined(OSX) && !defined(PTY_مکمل)
+# define PTY_مکمل
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    int		f;
-    static char TtyName[32];
+    صحیح		f;
+    ساکن حرف TtyName[32];
 
-    if ((f = open_controlling_pty(TtyName)) < 0)
-	return -1;
+    اگر ((f = open_controlling_pty(TtyName)) < 0)
+	واپس -1;
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#if (defined(sequent) || defined(_SEQUENT_)) && defined(HAVE_GETPSEUDOTTY) \
-	&& !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#اگر (defined(sequent) || defined(_SEQUENT_)) && defined(HAVE_GETPSEUDOTTY) \
+	&& !defined(PTY_مکمل)
+# define PTY_مکمل
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    char	*m, *s;
-    int		f;
+    حرف	*m, *s;
+    صحیح		f;
     // used for opening a new pty-pair:
-    static char PtyName[32];
-    static char TtyName[32];
+    ساکن حرف PtyName[32];
+    ساکن حرف TtyName[32];
 
-    if ((f = getpseudotty(&s, &m)) < 0)
-	return -1;
+    اگر ((f = getpseudotty(&s, &m)) < 0)
+	واپس -1;
 # ifdef _SEQUENT_
     fvhangup(s);
 # endif
-    vim_strncpy((char_u *)PtyName, (char_u *)m, sizeof(PtyName) - 1);
-    vim_strncpy((char_u *)TtyName, (char_u *)s, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)PtyName, (char_u *)m, حجم(PtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)s, حجم(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#if defined(MIPS) && defined(HAVE_DEV_PTC) && !defined(PTY_DONE)
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+#اگر defined(MIPS) && defined(HAVE_DEV_PTC) && !defined(PTY_مکمل)
+# define PTY_مکمل
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    int		f;
+    صحیح		f;
     stat_T	buf;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ساکن حرف TtyName[32];
 
-    if ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_NONBLOCK | O_EXTRA, 0)) < 0)
-	return -1;
-    if (mch_fstat(f, &buf) < 0)
+    اگر ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_NONBLOCK | O_EXTRA, 0)) < 0)
+	واپس -1;
+    اگر (mch_fstat(f, &buf) < 0)
     {
 	close(f);
-	return -1;
+	واپس -1;
     }
     sprintf(TtyName, "/dev/ttyq%d", minor(buf.st_rdev));
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#if defined(HAVE_SVR4_PTYS) && !defined(PTY_DONE) && !defined(hpux) \
-	    && !(defined(MACOS_X) && !defined(MAC_OS_X_VERSION_10_6))
+#اگر defined(HAVE_SVR4_PTYS) && !defined(PTY_مکمل) && !defined(hpux) \
+	    && !(defined(MACOS_X) && !defined(MAC_OS_X_نسخہ_10_6))
 
 // NOTE: Even though HPUX can have /dev/ptmx, the code below doesn't work!
 // Same for Mac OS X Leopard (10.5).
-# define PTY_DONE
-    int
-mch_openpty(char **ttyn)
+# define PTY_مکمل
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    int			f;
-    char		*m;
+    صحیح			f;
+    حرف		*m;
     sighandler_T	sigcld;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ساکن حرف TtyName[32];
 
-    if ((f = open("/dev/ptmx", O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
-	return -1;
+    اگر ((f = open("/dev/ptmx", O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
+	واپس -1;
 
     /*
      * SIGCHLD set to SIG_DFL for grantpt() because it fork()s and
      * exec()s pt_chmod
      */
     sigcld = mch_signal(SIGCHLD, SIG_DFL);
-    if ((m = ptsname(f)) == NULL || grantpt(f) || unlockpt(f))
+    اگر ((m = ptsname(f)) == تہی || grantpt(f) || unlockpt(f))
     {
 	mch_signal(SIGCHLD, sigcld);
 	close(f);
-	return -1;
+	واپس -1;
     }
     mch_signal(SIGCHLD, sigcld);
-    vim_strncpy((char_u *)TtyName, (char_u *)m, sizeof(TtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)m, حجم(TtyName) - 1);
     initmaster(f);
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#if defined(_AIX) && defined(HAVE_DEV_PTC) && !defined(PTY_DONE)
-# define PTY_DONE
+#اگر defined(_AIX) && defined(HAVE_DEV_PTC) && !defined(PTY_مکمل)
+# define PTY_مکمل
 
 # ifdef _IBMR2
-static int aixhack = -1;
+ساکن صحیح aixhack = -1;
 # endif
 
-    int
-mch_openpty(char **ttyn)
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    int		f;
+    صحیح		f;
     // used for opening a new pty-pair:
-    static char TtyName[32];
+    ساکن حرف TtyName[32];
 
     // a dumb looking loop replaced by mycrofts code:
-    if ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_EXTRA)) < 0)
-	return -1;
-    vim_strncpy((char_u *)TtyName, (char_u *)ttyname(f), sizeof(TtyName) - 1);
-    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+    اگر ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_EXTRA)) < 0)
+	واپس -1;
+    vim_strncpy((char_u *)TtyName, (char_u *)ttyname(f), حجم(TtyName) - 1);
+    اگر (geteuid() != جڑ_UID && mch_access(TtyName, R_OK | W_OK))
     {
 	close(f);
-	return -1;
+	واپس -1;
     }
     initmaster(f);
 # ifdef _IBMR2
-    if (aixhack >= 0)
+    اگر (aixhack >= 0)
 	close(aixhack);
-    if ((aixhack = open(TtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) < 0)
+    اگر ((aixhack = open(TtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) < 0)
     {
 	close(f);
-	return -1;
+	واپس -1;
     }
 # endif
     *ttyn = TtyName;
-    return f;
+    واپس f;
 }
-#endif
+#اگر_ختم
 
-#ifndef PTY_DONE
+#اگر_غیر_تعریف_شدہ PTY_مکمل
 
 # ifdef hpux
-static const char PtyProto[] = "/dev/ptym/ptyXY";
-static const char TtyProto[] = "/dev/pty/ttyXY";
-# else
+ساکن ثابت حرف PtyProto[] = "/dev/ptym/ptyXY";
+ساکن ثابت حرف TtyProto[] = "/dev/pty/ttyXY";
+# ورنہ
 #  ifdef __HAIKU__
-static const char PtyProto[] = "/dev/pt/XY";
-static const char TtyProto[] = "/dev/tt/XY";
-#  else
-static const char PtyProto[] = "/dev/ptyXY";
-static const char TtyProto[] = "/dev/ttyXY";
+ساکن ثابت حرف PtyProto[] = "/dev/pt/XY";
+ساکن ثابت حرف TtyProto[] = "/dev/tt/XY";
+#  ورنہ
+ساکن ثابت حرف PtyProto[] = "/dev/ptyXY";
+ساکن ثابت حرف TtyProto[] = "/dev/ttyXY";
 #  endif
 # endif
 
-    int
-mch_openpty(char **ttyn)
+    صحیح
+mch_openpty(حرف **ttyn)
 {
-    char	*p, *q, *l, *d;
-    int		f;
+    حرف	*p, *q, *l, *d;
+    صحیح		f;
     // used for opening a new pty-pair:
-    static char PtyName[32];
-    static char TtyName[32];
+    ساکن حرف PtyName[32];
+    ساکن حرف TtyName[32];
 
-    vim_strncpy((char_u *)PtyName, (char_u *)PtyProto, sizeof(PtyName) - 1);
-    vim_strncpy((char_u *)TtyName, (char_u *)TtyProto, sizeof(TtyName) - 1);
-    for (p = PtyName; *p != 'X'; p++)
+    vim_strncpy((char_u *)PtyName, (char_u *)PtyProto, حجم(PtyName) - 1);
+    vim_strncpy((char_u *)TtyName, (char_u *)TtyProto, حجم(TtyName) - 1);
+    برائے (p = PtyName; *p != 'X'; p++)
 	;
-    for (q = TtyName; *q != 'X'; q++)
+    برائے (q = TtyName; *q != 'X'; q++)
 	;
-    for (l = PTYRANGE0; (*p = *l) != '\0'; l++)
+    برائے (l = PTYRANGE0; (*p = *l) != '\0'; l++)
     {
-	for (d = PTYRANGE1; (p[1] = *d) != '\0'; d++)
+	برائے (d = PTYRANGE1; (p[1] = *d) != '\0'; d++)
 	{
-	    if ((f = open(PtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
-		continue;
+	    اگر ((f = open(PtyName, O_RDWR | O_NOCTTY | O_EXTRA, 0)) == -1)
+		جاری;
 	    q[0] = *l;
 	    q[1] = *d;
-	    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+	    اگر (geteuid() != جڑ_UID && mch_access(TtyName, R_OK | W_OK))
 	    {
 		close(f);
-		continue;
+		جاری;
 	    }
-# if defined(SUN_SYSTEM) && defined(TIOCGPGRP) && !defined(SUNOS3)
+# اگر defined(SUN_SYSTEM) && defined(TIOCGPGRP) && !defined(SUNOS3)
 	    // Hack to ensure that the slave side of the pty is
 	    // unused. May not work in anything other than SunOS4.1
 	    {
-		int pgrp;
+		صحیح pgrp;
 
 		// tcgetpgrp does not work (uses TIOCGETPGRP)!
-		if (ioctl(f, TIOCGPGRP, (char *)&pgrp) != -1 || errno != EIO)
+		اگر (ioctl(f, TIOCGPGRP, (حرف *)&pgrp) != -1 || errno != EIO)
 		{
 		    close(f);
-		    continue;
+		    جاری;
 		}
 	    }
 # endif
 	    initmaster(f);
 	    *ttyn = TtyName;
-	    return f;
+	    واپس f;
 	}
     }
-    return -1;
+    واپس -1;
 }
-#endif
+#اگر_ختم
 
 /*
  * Call isatty(fd), except for SunOS where it's done differently.
  */
-    int
-mch_isatty(int fd)
+    صحیح
+mch_isatty(صحیح fd)
 {
-#if defined(I_STR) && defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS) \
+#اگر defined(I_STR) && defined(HAVE_SYS_PTMS_H) && defined(HAVE_SVR4_PTYS) \
 	&& defined(SUN_SYSTEM)
     // On SunOS, isatty() for /dev/ptmx returns false or sometimes can hang up
     // in the inner ioctl(), and therefore first determine whether "fd" is a
     // master device.
-    struct strioctl istr;
+    ساخت strioctl istr;
 
     istr.ic_cmd = ISPTM;
     istr.ic_timout = 0;
-    istr.ic_dp = NULL;
+    istr.ic_dp = تہی;
     istr.ic_len = 0;
 
-    if (ioctl(fd, I_STR, &istr) == 0)
+    اگر (ioctl(fd, I_STR, &istr) == 0)
 	// Trick: return 2 in order to advice the caller that "fd" is a master
 	// device. cf. src/os_unix.c:get_tty_fd()
-	return 2;
-#endif
-    return isatty(fd);
+	واپس 2;
+#اگر_ختم
+    واپس isatty(fd);
 }
 
-#endif // FEAT_GUI || FEAT_JOB_CHANNEL
+#اگر_ختم // FEAT_GUI || FEAT_JOB_CHANNEL

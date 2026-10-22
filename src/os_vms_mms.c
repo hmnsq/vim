@@ -1,77 +1,77 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#شامل	<stdio.h>
+#شامل	<stdlib.h>
+#شامل	<string.h>
+#شامل	<unixio.h>
+#شامل	"vim.h"
+صحیح مین(صحیح argc, حرف *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    حرف	cmd[132], buf[BUFSIZ], *argp, *error_file, ہدف[132], *mms;
+    صحیح		err = 0, err_سطر = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    جب (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	اگر (*argp == '-')
 	{
-	    switch (*++argp)
+	    انتخاب (*++argp)
 	    {
-		case 'm':
+		حالت 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    توڑو;
+		حالت 'e':
+		    اگر (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    توڑو;
+		طےشدہ:
+		    توڑو;
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (*target)
-		strcat(target, " ");
-	    strcat(target, argp);
+	    اگر (*ہدف)
+		strcat(ہدف, " ");
+	    strcat(ہدف, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
-								 mms, target);
+    vim_snprintf(cmd, حجم(cmd), "%s/output=tmp:errors.vim_tmp %s",
+								 mms, ہدف);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    جب (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	اگر (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
-	    buf[strlen(buf)-1] = '\0';
+	    err_سطر++;
+	    buf[لڑی_لمبائی(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	ورنہ
 	{
-	    if (err_line)
+	    اگر (err_سطر)
 	    {
-		if (strstr(buf, _("At line")))
+		اگر (لڑی_تلاش(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_سطر = 0;
 		    fprintf(fpo, "@");
 		}
-		else
-		    buf[strlen(buf)-1] = '\0';
+		ورنہ
+		    buf[لڑی_لمبائی(buf)-1] = '\0';
 	    }
 	}
 	fprintf(fpo, "%s", buf);
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    جب (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
-    exit(err ? 44 : 1);
-    return(0);
+    باہر_نکلو(err ? 44 : 1);
+    واپس(0);
 }

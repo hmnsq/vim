@@ -11,46 +11,46 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "protodef.h"
-#ifdef HAVE_CONFIG_H
+#شامل "protodef.h"
+#اگر_تعریف_شدہ HAVE_CONFIG_H
 # include "auto/config.h"
-#endif
+#اگر_ختم
 
-#include <stdio.h>
-#include <string.h>
+#شامل <stdio.h>
+#شامل <string.h>
 
-#ifdef _WIN32
+#اگر_تعریف_شدہ _WIN32
 # ifndef DYNAMIC_RUBY
 #  define NT
 #  define IMPORT // For static dll usage __declspec(dllimport)
 #  define RUBYEXTERN __declspec(dllimport)
 # endif
-#endif
-#ifndef RUBYEXTERN
-# define RUBYEXTERN extern
-#endif
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ RUBYEXTERN
+# define RUBYEXTERN خارجی
+#اگر_ختم
 
-#ifdef DYNAMIC_RUBY
+#اگر_تعریف_شدہ DYNAMIC_RUBY
 /*
  * This is tricky.  In ruby.h there is (inline) function rb_class_of()
  * definition.  This function use these variables.  But we want function to
  * use dll_* variables.
  */
-# if RUBY_VERSION >= 24
+# اگر RUBY_نسخہ >= 24
 #  define USE_RUBY_INTEGER
 # endif
 
 # define rb_cFalseClass		(*dll_rb_cFalseClass)
 # define rb_cFixnum		(*dll_rb_cFixnum)
-# if defined(USE_RUBY_INTEGER)
+# اگر defined(USE_RUBY_INTEGER)
 #  define rb_cInteger		(*dll_rb_cInteger)
 # endif
-# if RUBY_VERSION >= 20
+# اگر RUBY_نسخہ >= 20
 #  define rb_cFloat		(*dll_rb_cFloat)
 # endif
 # define rb_cNilClass		(*dll_rb_cNilClass)
 # define rb_cString		(*dll_rb_cString)
-# define rb_cSymbol		(*dll_rb_cSymbol)
+# define rb_c_علامت		(*dll_rb_c_علامت)
 # define rb_cTrueClass		(*dll_rb_cTrueClass)
 
 /*
@@ -66,83 +66,83 @@
 # define rb_num2long	rb_num2long_stub
 # define rb_int2big	rb_int2big_stub
 
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# اگر RUBY_نسخہ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
 // Ruby 1.9 defines a number of static functions which use rb_fix2int and
 // rb_num2int if VIM_SIZEOF_INT < VIM_SIZEOF_LONG (64bit)
 #  define rb_fix2int	rb_fix2int_stub
 #  define rb_num2int	rb_num2int_stub
 # endif
 
-# if RUBY_VERSION >= 20
+# اگر RUBY_نسخہ >= 20
 // USE_TYPEDDATA is not defined yet. We just check for 2.0.
 #  define rb_check_typeddata		rb_check_typeddata_stub
 # endif
 
-# if RUBY_VERSION == 21
+# اگر RUBY_نسخہ == 21
 // Ruby 2.1 adds new GC called RGenGC and RARRAY_PTR uses
 // rb_gc_writebarrier_unprotect_promoted if USE_RGENGC
 #  define rb_gc_writebarrier_unprotect_promoted	rb_gc_writebarrier_unprotect_promoted_stub
 # endif
 
-# if RUBY_VERSION >= 22
+# اگر RUBY_نسخہ >= 22
 #  define rb_gc_writebarrier_unprotect	rb_gc_writebarrier_unprotect_stub
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# اگر RUBY_نسخہ >= 26 && RUBY_نسخہ <= 32
 #  define rb_ary_detransient	rb_ary_detransient_stub
 # endif
 
-# if RUBY_VERSION >= 30
+# اگر RUBY_نسخہ >= 30
 #  define rb_check_type			rb_check_type_stub
 #  define rb_num2uint			rb_num2uint_stub
-#  define ruby_malloc_size_overflow	ruby_malloc_size_overflow_stub
+#  define ruby_malloc_سائز_حد_سے_تجاوز	ruby_malloc_سائز_حد_سے_تجاوز_stub
 # endif
 
-# if RUBY_VERSION >= 31
+# اگر RUBY_نسخہ >= 31
 #  define rb_debug_rstring_null_ptr	rb_debug_rstring_null_ptr_stub
 #  define rb_unexpected_type		rb_unexpected_type_stub
 # endif
 
-#endif  // ifdef DYNAMIC_RUBY
+#اگر_ختم  // ifdef DYNAMIC_RUBY
 
 // On macOS pre-installed Ruby defines "SIZEOF_TIME_T" as "SIZEOF_LONG" so it
 // conflicts with the definition in config.h then causes a macro-redefined
 // warning.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#اگر_تعریف_شدہ SIZEOF_وقت_T
+# undef SIZEOF_وقت_T
+#اگر_ختم
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic push
+#اگر defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic ڈالو
 # pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#اگر_ختم
 
-#if defined(__clang__) && (__clang_major__ >= 21)
+#اگر defined(__clang__) && (__clang_major__ >= 21)
 # pragma GCC diagnostic ignored "-Wdefault-const-init-field-unsafe"
-#endif
+#اگر_ختم
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#شامل <ruby.h>
+#شامل <ruby/encoding.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
+#اگر defined(__GNUC__) || defined(__clang__)
+# pragma GCC diagnostic نکالو
+#اگر_ختم
 
 // See above.
-#ifdef SIZEOF_TIME_T
-# undef SIZEOF_TIME_T
-#endif
+#اگر_تعریف_شدہ SIZEOF_وقت_T
+# undef SIZEOF_وقت_T
+#اگر_ختم
 
-#undef off_t	// ruby defines off_t as _int64, Mingw uses long
-#undef EXTERN
-#undef _
+#تعریف_منسوخ off_t	// ruby defines off_t as _int64, Mingw uses long
+#تعریف_منسوخ EXTERN
+#تعریف_منسوخ _
 
 // T_DATA defined both by Ruby and Mac header files, hack around it...
-#if defined(MACOS_X)
+#اگر defined(MACOS_X)
 # define __OPENTRANSPORT__
 # define __OPENTRANSPORTPROTOCOL__
 # define __OPENTRANSPORTPROVIDERS__
-#endif
+#اگر_ختم
 
 /*
  * The TypedData_XXX macro family can be used since Ruby 1.9.2 but
@@ -150,9 +150,9 @@
  * The old Data_XXX macro family was deprecated on Ruby 2.2.
  * Use TypedData_XXX if available.
  */
-#if defined(TypedData_Wrap_Struct) && (RUBY_VERSION >= 20)
+#اگر defined(Typed_ڈیٹا_Wrap_Struct) && (RUBY_نسخہ >= 20)
 # define USE_TYPEDDATA	1
-#endif
+#اگر_ختم
 
 /*
  * Backward compatibility for Ruby 1.8 and earlier.
@@ -160,125 +160,125 @@
  * Ruby 1.9 does not provide RXXX(s)->len and RXXX(s)->ptr, instead
  * RXXX_LEN(s) and RXXX_PTR(s) are provided.
  */
-#ifndef StringValuePtr
-# define StringValuePtr(s) STR2CSTR(s)
-#endif
-#ifndef RARRAY_LEN
+#اگر_غیر_تعریف_شدہ String_قدر_Ptr
+# define String_قدر_Ptr(s) STR2CSTR(s)
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ RARRAY_LEN
 # define RARRAY_LEN(s) RARRAY(s)->len
-#endif
-#ifndef RARRAY_PTR
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ RARRAY_PTR
 # define RARRAY_PTR(s) RARRAY(s)->ptr
-#endif
-#ifndef RSTRING_LEN
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ RSTRING_LEN
 # define RSTRING_LEN(s) RSTRING(s)->len
-#endif
-#ifndef RSTRING_PTR
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ RSTRING_PTR
 # define RSTRING_PTR(s) RSTRING(s)->ptr
-#endif
+#اگر_ختم
 
-#ifdef HAVE_DUP
+#اگر_تعریف_شدہ HAVE_DUP
 # undef HAVE_DUP
-#endif
-#ifdef HAVE_FSYNC
+#اگر_ختم
+#اگر_تعریف_شدہ HAVE_FSYNC
 # undef HAVE_FSYNC
-#endif
+#اگر_ختم
 
 // Avoid redefining TRUE/FALSE in vterm.h.
-#ifdef TRUE
+#اگر_تعریف_شدہ TRUE
 # undef TRUE
-#endif
-#ifdef FALSE
+#اگر_ختم
+#اگر_تعریف_شدہ FALSE
 # undef FALSE
-#endif
+#اگر_ختم
 
-#include "vim.h"
-#include "version.h"
+#شامل "vim.h"
+#شامل "version.h"
 
-#ifdef DYNAMIC_RUBY
+#اگر_تعریف_شدہ DYNAMIC_RUBY
 # ifdef MSWIN	// must come after including vim.h, where it is defined
 #  define RUBY_PROC FARPROC
-#  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define بھرو_dll vim_بھرو_Lib
+#  define علامت_from_dll Get_Proc_پتہ
 #  define close_dll FreeLibrary
-#  define load_dll_error GetWin32Error
-# else
+#  define بھرو_dll_error GetWin32Error
+# ورنہ
 #  include <dlfcn.h>
-#  define HINSTANCE void*
-#  define RUBY_PROC void*
-#  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define HINSTANCE خالی*
+#  define RUBY_PROC خالی*
+#  define بھرو_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
+#  define علامت_from_dll dlsym
 #  define close_dll dlclose
-#  define load_dll_error dlerror
+#  define بھرو_dll_error dlerror
 # endif
-#endif
+#اگر_ختم
 
-static int ruby_initialized = 0;
-static void *ruby_stack_start;
-static VALUE objtbl;
+ساکن صحیح ruby_initialized = 0;
+ساکن خالی *ruby_ڈھیر_آغاز;
+ساکن قدر_3 objtbl;
 
-static VALUE mVIM;
-static VALUE cBuffer;
-static VALUE cVimWindow;
-static VALUE eDeletedBufferError;
-static VALUE eDeletedWindowError;
+ساکن قدر_3 mVIM;
+ساکن قدر_3 c_بفر;
+ساکن قدر_3 c_Vim_کھڑکی;
+ساکن قدر_3 e_Deleted_بفر_Error;
+ساکن قدر_3 e_Deleted_کھڑکی_Error;
 
-static int ensure_ruby_initialized(void);
-static void error_print(int);
-static void ruby_io_init(void);
-static void ruby_vim_init(void);
-static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
+ساکن صحیح ensure_ruby_initialized(خالی);
+ساکن خالی error_print(صحیح);
+ساکن خالی ruby_io_init(خالی);
+ساکن خالی ruby_vim_init(خالی);
+ساکن صحیح ruby_convert_مقصد_vim_قدر(قدر_3 val, typval_T *rettv);
 
-#if defined(__ia64) && !defined(ruby_init_stack)
-# define ruby_init_stack(addr) ruby_init_stack((addr), rb_ia64_bsp())
-#endif
+#اگر defined(__ia64) && !defined(ruby_init_ڈھیر)
+# define ruby_init_ڈھیر(addr) ruby_init_ڈھیر((addr), rb_ia64_bsp())
+#اگر_ختم
 
-#if defined(DYNAMIC_RUBY)
+#اگر defined(DYNAMIC_RUBY)
 
 /*
  * Wrapper defines
  */
 // Ruby 2.7 actually expands the following symbols as macro.
-# if RUBY_VERSION >= 27
+# اگر RUBY_نسخہ >= 27
 #  undef rb_define_global_function
-#  undef rb_define_method
+#  undef rb_define_طریقہ
 #  undef rb_define_module_function
-#  undef rb_define_singleton_method
+#  undef rb_define_singleton_طریقہ
 # endif
 
 # define rb_assoc_new			dll_rb_assoc_new
 # define rb_cObject			(*dll_rb_cObject)
 # define rb_class_new_instance		dll_rb_class_new_instance
-# if RUBY_VERSION < 30
+# اگر RUBY_نسخہ < 30
 #  define rb_check_type			dll_rb_check_type
 # endif
-# define rb_class_path			dll_rb_class_path
+# define rb_class_راستہ			dll_rb_class_راستہ
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-#   define rb_data_typed_object_wrap	dll_rb_data_typed_object_wrap
-#  else
-#   define rb_data_typed_object_alloc	dll_rb_data_typed_object_alloc
+#  اگر RUBY_نسخہ >= 23
+#   define rb_ڈیٹا_typed_object_wrap	dll_rb_ڈیٹا_typed_object_wrap
+#  ورنہ
+#   define rb_ڈیٹا_typed_object_alloc	dll_rb_ڈیٹا_typed_object_alloc
 #  endif
-# else
-#  define rb_data_object_alloc		dll_rb_data_object_alloc
+# ورنہ
+#  define rb_ڈیٹا_object_alloc		dll_rb_ڈیٹا_object_alloc
 # endif
 # define rb_define_class_under		dll_rb_define_class_under
 # define rb_define_const			dll_rb_define_const
 # define rb_define_global_function	dll_rb_define_global_function
-# define rb_define_method		dll_rb_define_method
+# define rb_define_طریقہ		dll_rb_define_طریقہ
 # define rb_define_module		dll_rb_define_module
 # define rb_define_module_function	dll_rb_define_module_function
-# define rb_define_singleton_method	dll_rb_define_singleton_method
+# define rb_define_singleton_طریقہ	dll_rb_define_singleton_طریقہ
 # define rb_define_virtual_variable	dll_rb_define_virtual_variable
 # define rb_stdout			(*dll_rb_stdout)
 # define rb_stderr			(*dll_rb_stderr)
 # define rb_eArgError			(*dll_rb_eArgError)
-# define rb_eIndexError			(*dll_rb_eIndexError)
+# define rb_e_اشاریہ_Error			(*dll_rb_e_اشاریہ_Error)
 # define rb_eRuntimeError		(*dll_rb_eRuntimeError)
 # define rb_eStandardError		(*dll_rb_eStandardError)
 # define rb_eval_string_protect		dll_rb_eval_string_protect
-# if RUBY_VERSION >= 21
+# اگر RUBY_نسخہ >= 21
 #  define rb_funcallv			dll_rb_funcallv
-# else
+# ورنہ
 #  define rb_funcall2			dll_rb_funcall2
 # endif
 # define rb_global_variable		dll_rb_global_variable
@@ -293,17 +293,17 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # undef rb_intern
 # define rb_intern			dll_rb_intern
 
-# if VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
-#  if RUBY_VERSION < 30
+# اگر VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
+#  اگر RUBY_نسخہ < 30
 #   define rb_num2uint			dll_rb_num2uint
 #  endif
 # endif
 # define rb_num2dbl			dll_rb_num2dbl
 # define rb_lastline_get			dll_rb_lastline_get
-# define rb_lastline_set			dll_rb_lastline_set
+# define rb_lastline_سیٹ			dll_rb_lastline_سیٹ
 # define rb_protect			dll_rb_protect
-# define rb_load			dll_rb_load
-# if RUBY_VERSION < 20
+# define rb_بھرو			dll_rb_بھرو
+# اگر RUBY_نسخہ < 20
 #  define rb_num2ulong			dll_rb_num2ulong
 # endif
 # define rb_obj_alloc			dll_rb_obj_alloc
@@ -321,11 +321,11 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 // __builtin_constant_p extension.
 #  undef rb_str_new_cstr
 #  define rb_str_new_cstr		dll_rb_str_new_cstr
-# else
+# ورنہ
 #  define rb_str_new2			dll_rb_str_new2
 # endif
-# define rb_string_value		dll_rb_string_value
-# define rb_string_value_ptr		dll_rb_string_value_ptr
+# define rb_string_قدر		dll_rb_string_قدر
+# define rb_string_قدر_ptr		dll_rb_string_قدر_ptr
 # define rb_float_new			dll_rb_float_new
 # define rb_ary_new			dll_rb_ary_new
 # ifdef rb_ary_new4
@@ -333,13 +333,13 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 #  undef rb_ary_new4
 # endif
 # define rb_ary_new4			dll_rb_ary_new4
-# define rb_ary_push			dll_rb_ary_push
+# define rb_ary_ڈالو			dll_rb_ary_ڈالو
 # ifdef __ia64
 #  define rb_ia64_bsp			dll_rb_ia64_bsp
-#  undef ruby_init_stack
-#  define ruby_init_stack(addr)	dll_ruby_init_stack((addr), rb_ia64_bsp())
-# else
-#  define ruby_init_stack		dll_ruby_init_stack
+#  undef ruby_init_ڈھیر
+#  define ruby_init_ڈھیر(addr)	dll_ruby_init_ڈھیر((addr), rb_ia64_bsp())
+# ورنہ
+#  define ruby_init_ڈھیر		dll_ruby_init_ڈھیر
 # endif
 # define rb_errinfo			dll_rb_errinfo
 # define ruby_init			dll_ruby_init
@@ -350,8 +350,8 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # endif
 
 # define ruby_script			dll_ruby_script
-# define rb_enc_find_index		dll_rb_enc_find_index
-# define rb_enc_find			dll_rb_enc_find
+# define rb_enc_ڈھونڈو_اشاریہ		dll_rb_enc_ڈھونڈو_اشاریہ
+# define rb_enc_ڈھونڈو			dll_rb_enc_ڈھونڈو
 # undef rb_enc_str_new
 # define rb_enc_str_new			dll_rb_enc_str_new
 # define rb_sprintf			dll_rb_sprintf
@@ -361,321 +361,321 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 /*
  * Pointers for dynamic link
  */
-static VALUE (*dll_rb_assoc_new) (VALUE, VALUE);
-VALUE *dll_rb_cFalseClass;
-VALUE *dll_rb_cFixnum;
-# if defined(USE_RUBY_INTEGER)
-VALUE *dll_rb_cInteger;
+ساکن قدر_3 (*dll_rb_assoc_new) (قدر_3, قدر_3);
+قدر_3 *dll_rb_cFalseClass;
+قدر_3 *dll_rb_cFixnum;
+# اگر defined(USE_RUBY_INTEGER)
+قدر_3 *dll_rb_cInteger;
 # endif
-# if RUBY_VERSION >= 20
-VALUE *dll_rb_cFloat;
+# اگر RUBY_نسخہ >= 20
+قدر_3 *dll_rb_cFloat;
 # endif
-VALUE *dll_rb_cNilClass;
-static VALUE *dll_rb_cObject;
-VALUE *dll_rb_cString;
-VALUE *dll_rb_cSymbol;
-VALUE *dll_rb_cTrueClass;
-static VALUE (*dll_rb_class_new_instance) (int,VALUE*,VALUE);
-static void (*dll_rb_check_type) (VALUE,int);
+قدر_3 *dll_rb_cNilClass;
+ساکن قدر_3 *dll_rb_cObject;
+قدر_3 *dll_rb_cString;
+قدر_3 *dll_rb_c_علامت;
+قدر_3 *dll_rb_cTrueClass;
+ساکن قدر_3 (*dll_rb_class_new_instance) (صحیح,قدر_3*,قدر_3);
+ساکن خالی (*dll_rb_check_type) (قدر_3,صحیح);
 # ifdef USE_TYPEDDATA
-static void *(*dll_rb_check_typeddata) (VALUE,const rb_data_type_t *);
+ساکن خالی *(*dll_rb_check_typeddata) (قدر_3,ثابت rb_ڈیٹا_type_t *);
 # endif
-static VALUE (*dll_rb_class_path) (VALUE);
+ساکن قدر_3 (*dll_rb_class_راستہ) (قدر_3);
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-static VALUE (*dll_rb_data_typed_object_wrap) (VALUE, void*, const rb_data_type_t *);
-#  else
-static VALUE (*dll_rb_data_typed_object_alloc) (VALUE, void*, const rb_data_type_t *);
+#  اگر RUBY_نسخہ >= 23
+ساکن قدر_3 (*dll_rb_ڈیٹا_typed_object_wrap) (قدر_3, خالی*, ثابت rb_ڈیٹا_type_t *);
+#  ورنہ
+ساکن قدر_3 (*dll_rb_ڈیٹا_typed_object_alloc) (قدر_3, خالی*, ثابت rb_ڈیٹا_type_t *);
 #  endif
-# else
-static VALUE (*dll_rb_data_object_alloc) (VALUE, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
+# ورنہ
+ساکن قدر_3 (*dll_rb_ڈیٹا_object_alloc) (قدر_3, خالی*, RUBY_ڈیٹا_FUNC, RUBY_ڈیٹا_FUNC);
 # endif
-# if RUBY_VERSION >= 31
-static void (*dll_rb_debug_rstring_null_ptr) (const char*);
+# اگر RUBY_نسخہ >= 31
+ساکن خالی (*dll_rb_debug_rstring_null_ptr) (ثابت حرف*);
 # endif
-static VALUE (*dll_rb_define_class_under) (VALUE, const char*, VALUE);
-static void (*dll_rb_define_const) (VALUE,const char*,VALUE);
-static void (*dll_rb_define_global_function) (const char*,VALUE(*)(int,VALUE*,VALUE),int);
-static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static VALUE (*dll_rb_define_module) (const char*);
-static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),int);
-static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static void (*dll_rb_define_virtual_variable) (const char*,VALUE(*)(ID,VALUE*),void(*)());
-static VALUE *dll_rb_stdout;
-static VALUE *dll_rb_stderr;
-static VALUE *dll_rb_eArgError;
-static VALUE *dll_rb_eIndexError;
-static VALUE *dll_rb_eRuntimeError;
-static VALUE *dll_rb_eStandardError;
-static VALUE (*dll_rb_eval_string_protect) (const char*, int*);
-# if RUBY_VERSION >= 21
-static VALUE (*dll_rb_funcallv) (VALUE, ID, int, const VALUE*);
-# else
-static VALUE (*dll_rb_funcall2) (VALUE, ID, int, const VALUE*);
+ساکن قدر_3 (*dll_rb_define_class_under) (قدر_3, ثابت حرف*, قدر_3);
+ساکن خالی (*dll_rb_define_const) (قدر_3,ثابت حرف*,قدر_3);
+ساکن خالی (*dll_rb_define_global_function) (ثابت حرف*,قدر_3(*)(صحیح,قدر_3*,قدر_3),صحیح);
+ساکن خالی (*dll_rb_define_طریقہ) (قدر_3,ثابت حرف*,قدر_3(*)(ANYARGS),صحیح);
+ساکن قدر_3 (*dll_rb_define_module) (ثابت حرف*);
+ساکن خالی (*dll_rb_define_module_function) (قدر_3,ثابت حرف*,قدر_3(*)(قدر_3,قدر_3),صحیح);
+ساکن خالی (*dll_rb_define_singleton_طریقہ) (قدر_3,ثابت حرف*,قدر_3(*)(ANYARGS),صحیح);
+ساکن خالی (*dll_rb_define_virtual_variable) (ثابت حرف*,قدر_3(*)(ID,قدر_3*),خالی(*)());
+ساکن قدر_3 *dll_rb_stdout;
+ساکن قدر_3 *dll_rb_stderr;
+ساکن قدر_3 *dll_rb_eArgError;
+ساکن قدر_3 *dll_rb_e_اشاریہ_Error;
+ساکن قدر_3 *dll_rb_eRuntimeError;
+ساکن قدر_3 *dll_rb_eStandardError;
+ساکن قدر_3 (*dll_rb_eval_string_protect) (ثابت حرف*, صحیح*);
+# اگر RUBY_نسخہ >= 21
+ساکن قدر_3 (*dll_rb_funcallv) (قدر_3, ID, صحیح, ثابت قدر_3*);
+# ورنہ
+ساکن قدر_3 (*dll_rb_funcall2) (قدر_3, ID, صحیح, ثابت قدر_3*);
 # endif
-static void (*dll_rb_global_variable) (VALUE*);
-static VALUE (*dll_rb_hash_aset) (VALUE, VALUE, VALUE);
-static VALUE (*dll_rb_hash_foreach) (VALUE, int (*)(VALUE, VALUE, VALUE), VALUE);
-static VALUE (*dll_rb_hash_new) (void);
-static VALUE (*dll_rb_inspect) (VALUE);
-static VALUE (*dll_rb_int2inum) (long);
-static ID (*dll_rb_intern) (const char*);
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-static long (*dll_rb_fix2int) (VALUE);
-static long (*dll_rb_num2int) (VALUE);
-static unsigned long (*dll_rb_num2uint) (VALUE);
+ساکن خالی (*dll_rb_global_variable) (قدر_3*);
+ساکن قدر_3 (*dll_rb_hash_aset) (قدر_3, قدر_3, قدر_3);
+ساکن قدر_3 (*dll_rb_hash_foreach) (قدر_3, صحیح (*)(قدر_3, قدر_3, قدر_3), قدر_3);
+ساکن قدر_3 (*dll_rb_hash_new) (خالی);
+ساکن قدر_3 (*dll_rb_inspect) (قدر_3);
+ساکن قدر_3 (*dll_rb_int2inum) (طویل);
+ساکن ID (*dll_rb_intern) (ثابت حرف*);
+# اگر RUBY_نسخہ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+ساکن طویل (*dll_rb_fix2int) (قدر_3);
+ساکن طویل (*dll_rb_num2int) (قدر_3);
+ساکن غیرعلامتی طویل (*dll_rb_num2uint) (قدر_3);
 # endif
-static double (*dll_rb_num2dbl) (VALUE);
-static VALUE (*dll_rb_lastline_get) (void);
-static void (*dll_rb_lastline_set) (VALUE);
-static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, int*);
-static void (*dll_rb_load) (VALUE, int);
-static long (*dll_rb_num2long) (VALUE);
-static unsigned long (*dll_rb_num2ulong) (VALUE);
-static VALUE (*dll_rb_obj_alloc) (VALUE);
-static VALUE (*dll_rb_obj_as_string) (VALUE);
-static VALUE (*dll_rb_obj_id) (VALUE);
-static void (*dll_rb_raise) (VALUE, const char*, ...);
-static VALUE (*dll_rb_string_value) (volatile VALUE*);
-static VALUE (*dll_rb_str_cat) (VALUE, const char*, long);
-static VALUE (*dll_rb_str_concat) (VALUE, VALUE);
-static VALUE (*dll_rb_str_new) (const char*, long);
+ساکن دوہرا (*dll_rb_num2dbl) (قدر_3);
+ساکن قدر_3 (*dll_rb_lastline_get) (خالی);
+ساکن خالی (*dll_rb_lastline_سیٹ) (قدر_3);
+ساکن قدر_3 (*dll_rb_protect) (قدر_3 (*)(قدر_3), قدر_3, صحیح*);
+ساکن خالی (*dll_rb_بھرو) (قدر_3, صحیح);
+ساکن طویل (*dll_rb_num2long) (قدر_3);
+ساکن غیرعلامتی طویل (*dll_rb_num2ulong) (قدر_3);
+ساکن قدر_3 (*dll_rb_obj_alloc) (قدر_3);
+ساکن قدر_3 (*dll_rb_obj_as_string) (قدر_3);
+ساکن قدر_3 (*dll_rb_obj_id) (قدر_3);
+ساکن خالی (*dll_rb_raise) (قدر_3, ثابت حرف*, ...);
+ساکن قدر_3 (*dll_rb_string_قدر) (متلون قدر_3*);
+ساکن قدر_3 (*dll_rb_str_cat) (قدر_3, ثابت حرف*, طویل);
+ساکن قدر_3 (*dll_rb_str_concat) (قدر_3, قدر_3);
+ساکن قدر_3 (*dll_rb_str_new) (ثابت حرف*, طویل);
 # ifdef need_rb_str_new_cstr
 // Ruby may #define rb_str_new2 to use rb_str_new_cstr.
-static VALUE (*dll_rb_str_new_cstr) (const char*);
-# else
-static VALUE (*dll_rb_str_new2) (const char*);
+ساکن قدر_3 (*dll_rb_str_new_cstr) (ثابت حرف*);
+# ورنہ
+ساکن قدر_3 (*dll_rb_str_new2) (ثابت حرف*);
 # endif
-static VALUE (*dll_rb_errinfo) (void);
-static void (*dll_ruby_init) (void);
-static void (*dll_ruby_init_loadpath) (void);
+ساکن قدر_3 (*dll_rb_errinfo) (خالی);
+ساکن خالی (*dll_ruby_init) (خالی);
+ساکن خالی (*dll_ruby_init_loadpath) (خالی);
 # ifdef MSWIN
-static void (*dll_ruby_sysinit) (int*, char***);
-static int (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
+ساکن خالی (*dll_ruby_sysinit) (صحیح*, حرف***);
+ساکن صحیح (*dll_rb_w32_snprintf)(حرف*, size_t, ثابت حرف*, ...);
 # endif
-# if RUBY_VERSION >= 31
+# اگر RUBY_نسخہ >= 31
 #  ifdef _MSC_VER
-static void (*dll_rb_unexpected_type) (VALUE, int);
-#  else
-NORETURN(static void (*dll_rb_unexpected_type) (VALUE, int));
+ساکن خالی (*dll_rb_unexpected_type) (قدر_3, صحیح);
+#  ورنہ
+NORETURN(ساکن خالی (*dll_rb_unexpected_type) (قدر_3, صحیح));
 #  endif
 # endif
-static char * (*dll_rb_string_value_ptr) (volatile VALUE*);
-static VALUE (*dll_rb_float_new) (double);
-static VALUE (*dll_rb_ary_new) (void);
-static VALUE (*dll_rb_ary_new4) (long n, const VALUE *elts);
-static VALUE (*dll_rb_ary_push) (VALUE, VALUE);
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-static void (*dll_rb_ary_detransient) (VALUE);
+ساکن حرف * (*dll_rb_string_قدر_ptr) (متلون قدر_3*);
+ساکن قدر_3 (*dll_rb_float_new) (دوہرا);
+ساکن قدر_3 (*dll_rb_ary_new) (خالی);
+ساکن قدر_3 (*dll_rb_ary_new4) (طویل n, ثابت قدر_3 *elts);
+ساکن قدر_3 (*dll_rb_ary_ڈالو) (قدر_3, قدر_3);
+# اگر RUBY_نسخہ >= 26 && RUBY_نسخہ <= 32
+ساکن خالی (*dll_rb_ary_detransient) (قدر_3);
 # endif
 # ifdef __ia64
-static void * (*dll_rb_ia64_bsp) (void);
-static void (*dll_ruby_init_stack)(VALUE*, void*);
-# else
-static void (*dll_ruby_init_stack)(VALUE*);
+ساکن خالی * (*dll_rb_ia64_bsp) (خالی);
+ساکن خالی (*dll_ruby_init_ڈھیر)(قدر_3*, خالی*);
+# ورنہ
+ساکن خالی (*dll_ruby_init_ڈھیر)(قدر_3*);
 # endif
-static VALUE (*dll_rb_int2big)(SIGNED_VALUE);
+ساکن قدر_3 (*dll_rb_int2big)(SIGNED_قدر);
 
-static void (*dll_ruby_script) (const char*);
-static int (*dll_rb_enc_find_index) (const char*);
-static rb_encoding* (*dll_rb_enc_find) (const char*);
-static VALUE (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
-static VALUE (*dll_rb_sprintf) (const char*, ...);
-static VALUE (*dll_rb_require) (const char*);
-static void* (*dll_ruby_options)(int, char**);
+ساکن خالی (*dll_ruby_script) (ثابت حرف*);
+ساکن صحیح (*dll_rb_enc_ڈھونڈو_اشاریہ) (ثابت حرف*);
+ساکن rb_encoding* (*dll_rb_enc_ڈھونڈو) (ثابت حرف*);
+ساکن قدر_3 (*dll_rb_enc_str_new) (ثابت حرف*, طویل, rb_encoding*);
+ساکن قدر_3 (*dll_rb_sprintf) (ثابت حرف*, ...);
+ساکن قدر_3 (*dll_rb_require) (ثابت حرف*);
+ساکن خالی* (*dll_ruby_options)(صحیح, حرف**);
 
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
-static void (*dll_rb_gc_writebarrier_unprotect_promoted)(VALUE);
-#  else
-static void (*dll_rb_gc_writebarrier_unprotect)(VALUE obj);
+# اگر defined(USE_RGENGC) && USE_RGENGC
+#  اگر RUBY_نسخہ == 21
+ساکن خالی (*dll_rb_gc_writebarrier_unprotect_promoted)(قدر_3);
+#  ورنہ
+ساکن خالی (*dll_rb_gc_writebarrier_unprotect)(قدر_3 obj);
 #  endif
 # endif
 
-# if RUBY_VERSION >= 30
+# اگر RUBY_نسخہ >= 30
 #  ifdef _MSC_VER
-static void (*dll_ruby_malloc_size_overflow)(size_t, size_t);
-#  else
-NORETURN(static void (*dll_ruby_malloc_size_overflow)(size_t, size_t));
+ساکن خالی (*dll_ruby_malloc_سائز_حد_سے_تجاوز)(size_t, size_t);
+#  ورنہ
+NORETURN(ساکن خالی (*dll_ruby_malloc_سائز_حد_سے_تجاوز)(size_t, size_t));
 #  endif
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-void rb_ary_detransient_stub(VALUE x);
+# اگر RUBY_نسخہ >= 26 && RUBY_نسخہ <= 32
+خالی rb_ary_detransient_stub(قدر_3 x);
 # endif
 
 // Do not generate a prototype here, VALUE isn't always defined.
 # ifndef PROTO
-#  if RUBY_VERSION >= 22
-    long
-rb_num2long_stub(VALUE x)
-#  else
-    SIGNED_VALUE
-rb_num2long_stub(VALUE x)
+#  اگر RUBY_نسخہ >= 22
+    طویل
+rb_num2long_stub(قدر_3 x)
+#  ورنہ
+    SIGNED_قدر
+rb_num2long_stub(قدر_3 x)
 #  endif
 {
-    return dll_rb_num2long(x);
+    واپس dll_rb_num2long(x);
 }
-#  if RUBY_VERSION >= 26
-    VALUE
+#  اگر RUBY_نسخہ >= 26
+    قدر_3
 rb_int2big_stub(intptr_t x)
-#  else
-    VALUE
-rb_int2big_stub(SIGNED_VALUE x)
+#  ورنہ
+    قدر_3
+rb_int2big_stub(SIGNED_قدر x)
 #  endif
 {
-    return dll_rb_int2big(x);
+    واپس dll_rb_int2big(x);
 }
-#  if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-    long
-rb_fix2int_stub(VALUE x)
+#  اگر RUBY_نسخہ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+    طویل
+rb_fix2int_stub(قدر_3 x)
 {
-    return dll_rb_fix2int(x);
+    واپس dll_rb_fix2int(x);
 }
-    long
-rb_num2int_stub(VALUE x)
+    طویل
+rb_num2int_stub(قدر_3 x)
 {
-    return dll_rb_num2int(x);
+    واپس dll_rb_num2int(x);
 }
 #  endif
-#  if RUBY_VERSION >= 20
-    VALUE
-rb_float_new_in_heap(double d)
+#  اگر RUBY_نسخہ >= 20
+    قدر_3
+rb_float_new_اندر_ڈھیر(دوہرا d)
 {
-    return dll_rb_float_new(d);
+    واپس dll_rb_float_new(d);
 }
-#   if RUBY_VERSION >= 22
-    unsigned long
-rb_num2ulong(VALUE x)
-#   else
-    VALUE
-rb_num2ulong(VALUE x)
+#   اگر RUBY_نسخہ >= 22
+    غیرعلامتی طویل
+rb_num2ulong(قدر_3 x)
+#   ورنہ
+    قدر_3
+rb_num2ulong(قدر_3 x)
 #   endif
 {
-    return (long)RSHIFT((SIGNED_VALUE)(x),1);
+    واپس (طویل)RSHIFT((SIGNED_قدر)(x),1);
 }
 #  endif
-#  if defined(USE_RGENGC) && USE_RGENGC
-#   if RUBY_VERSION == 21
-    void
-rb_gc_writebarrier_unprotect_promoted_stub(VALUE obj)
+#  اگر defined(USE_RGENGC) && USE_RGENGC
+#   اگر RUBY_نسخہ == 21
+    خالی
+rb_gc_writebarrier_unprotect_promoted_stub(قدر_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect_promoted(obj);
 }
-#   else
-    void
-rb_gc_writebarrier_unprotect_stub(VALUE obj)
+#   ورنہ
+    خالی
+rb_gc_writebarrier_unprotect_stub(قدر_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect(obj);
 }
 #   endif
 #  endif
-#  if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-    void
-rb_ary_detransient_stub(VALUE x)
+#  اگر RUBY_نسخہ >= 26 && RUBY_نسخہ <= 32
+    خالی
+rb_ary_detransient_stub(قدر_3 x)
 {
     dll_rb_ary_detransient(x);
 }
 #  endif
-#  if RUBY_VERSION >= 30
-    void
-rb_check_type_stub(VALUE obj, int t)
+#  اگر RUBY_نسخہ >= 30
+    خالی
+rb_check_type_stub(قدر_3 obj, صحیح t)
 {
     dll_rb_check_type(obj, t);
 }
-    unsigned long
-rb_num2uint_stub(VALUE x)
+    غیرعلامتی طویل
+rb_num2uint_stub(قدر_3 x)
 {
-    return dll_rb_num2uint(x);
+    واپس dll_rb_num2uint(x);
 }
-    void
-ruby_malloc_size_overflow_stub(size_t x, size_t y)
+    خالی
+ruby_malloc_سائز_حد_سے_تجاوز_stub(size_t x, size_t y)
 {
-    dll_ruby_malloc_size_overflow(x, y);
+    dll_ruby_malloc_سائز_حد_سے_تجاوز(x, y);
 }
 #  endif
-#  if RUBY_VERSION >= 31
-    void
-rb_debug_rstring_null_ptr_stub(const char *func)
+#  اگر RUBY_نسخہ >= 31
+    خالی
+rb_debug_rstring_null_ptr_stub(ثابت حرف *func)
 {
     dll_rb_debug_rstring_null_ptr(func);
 }
-    void
-rb_unexpected_type_stub(VALUE self, int t)
+    خالی
+rb_unexpected_type_stub(قدر_3 self, صحیح t)
 {
     dll_rb_unexpected_type(self, t);
 }
 #  endif
 #  ifdef USE_TYPEDDATA
-void *rb_check_typeddata_stub(VALUE obj, const rb_data_type_t *data_type)
+خالی *rb_check_typeddata_stub(قدر_3 obj, ثابت rb_ڈیٹا_type_t *ڈیٹا_type)
 {
-    return dll_rb_check_typeddata(obj, data_type);
+    واپس dll_rb_check_typeddata(obj, ڈیٹا_type);
 }
 #  endif
 # endif // ifndef PROTO
 
-static HINSTANCE hinstRuby = NULL; // Instance of ruby.dll
+ساکن HINSTANCE hinstRuby = تہی; // Instance of ruby.dll
 
 /*
  * Table of name to function pointer of ruby.
  */
-static struct
+ساکن ساخت
 {
-    char *name;
+    حرف *name;
     RUBY_PROC *ptr;
-} ruby_funcname_table[] =
+} ruby_funcname_جدول[] =
 {
     {"rb_assoc_new", (RUBY_PROC*)&dll_rb_assoc_new},
     {"rb_cFalseClass", (RUBY_PROC*)&dll_rb_cFalseClass},
-# if defined(USE_RUBY_INTEGER)
+# اگر defined(USE_RUBY_INTEGER)
     {"rb_cInteger", (RUBY_PROC*)&dll_rb_cInteger},
-# else
+# ورنہ
     {"rb_cFixnum", (RUBY_PROC*)&dll_rb_cFixnum},
 # endif
-# if RUBY_VERSION >= 20
+# اگر RUBY_نسخہ >= 20
     {"rb_cFloat", (RUBY_PROC*)&dll_rb_cFloat},
 # endif
     {"rb_cNilClass", (RUBY_PROC*)&dll_rb_cNilClass},
     {"rb_cObject", (RUBY_PROC*)&dll_rb_cObject},
     {"rb_cString", (RUBY_PROC*)&dll_rb_cString},
-    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_cSymbol},
+    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_c_علامت},
     {"rb_cTrueClass", (RUBY_PROC*)&dll_rb_cTrueClass},
     {"rb_class_new_instance", (RUBY_PROC*)&dll_rb_class_new_instance},
     {"rb_check_type", (RUBY_PROC*)&dll_rb_check_type},
 # ifdef USE_TYPEDDATA
     {"rb_check_typeddata", (RUBY_PROC*)&dll_rb_check_typeddata},
 # endif
-    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_path},
+    {"rb_class_path", (RUBY_PROC*)&dll_rb_class_راستہ},
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
-    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_data_typed_object_wrap},
-#  else
-    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_data_typed_object_alloc},
+#  اگر RUBY_نسخہ >= 23
+    {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_ڈیٹا_typed_object_wrap},
+#  ورنہ
+    {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_ڈیٹا_typed_object_alloc},
 #  endif
-# else
-    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_data_object_alloc},
+# ورنہ
+    {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_ڈیٹا_object_alloc},
 # endif
-# if RUBY_VERSION >= 31
+# اگر RUBY_نسخہ >= 31
     {"rb_debug_rstring_null_ptr", (RUBY_PROC*)&dll_rb_debug_rstring_null_ptr},
 # endif
     {"rb_define_class_under", (RUBY_PROC*)&dll_rb_define_class_under},
     {"rb_define_const", (RUBY_PROC*)&dll_rb_define_const},
     {"rb_define_global_function", (RUBY_PROC*)&dll_rb_define_global_function},
-    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_method},
+    {"rb_define_method", (RUBY_PROC*)&dll_rb_define_طریقہ},
     {"rb_define_module", (RUBY_PROC*)&dll_rb_define_module},
     {"rb_define_module_function", (RUBY_PROC*)&dll_rb_define_module_function},
-    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_method},
+    {"rb_define_singleton_method", (RUBY_PROC*)&dll_rb_define_singleton_طریقہ},
     {"rb_define_virtual_variable", (RUBY_PROC*)&dll_rb_define_virtual_variable},
     {"rb_stdout", (RUBY_PROC*)&dll_rb_stdout},
     {"rb_stderr", (RUBY_PROC*)&dll_rb_stderr},
     {"rb_eArgError", (RUBY_PROC*)&dll_rb_eArgError},
-    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_eIndexError},
+    {"rb_eIndexError", (RUBY_PROC*)&dll_rb_e_اشاریہ_Error},
     {"rb_eRuntimeError", (RUBY_PROC*)&dll_rb_eRuntimeError},
     {"rb_eStandardError", (RUBY_PROC*)&dll_rb_eStandardError},
     {"rb_eval_string_protect", (RUBY_PROC*)&dll_rb_eval_string_protect},
-# if RUBY_VERSION >= 21
+# اگر RUBY_نسخہ >= 21
     {"rb_funcallv", (RUBY_PROC*)&dll_rb_funcallv},
-# else
+# ورنہ
     {"rb_funcall2", (RUBY_PROC*)&dll_rb_funcall2},
 # endif
     {"rb_global_variable", (RUBY_PROC*)&dll_rb_global_variable},
@@ -685,29 +685,29 @@ static struct
     {"rb_inspect", (RUBY_PROC*)&dll_rb_inspect},
     {"rb_int2inum", (RUBY_PROC*)&dll_rb_int2inum},
     {"rb_intern", (RUBY_PROC*)&dll_rb_intern},
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# اگر RUBY_نسخہ >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     {"rb_fix2int", (RUBY_PROC*)&dll_rb_fix2int},
     {"rb_num2int", (RUBY_PROC*)&dll_rb_num2int},
     {"rb_num2uint", (RUBY_PROC*)&dll_rb_num2uint},
 # endif
     {"rb_num2dbl", (RUBY_PROC*)&dll_rb_num2dbl},
     {"rb_lastline_get", (RUBY_PROC*)&dll_rb_lastline_get},
-    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_set},
+    {"rb_lastline_set", (RUBY_PROC*)&dll_rb_lastline_سیٹ},
     {"rb_protect", (RUBY_PROC*)&dll_rb_protect},
-    {"rb_load", (RUBY_PROC*)&dll_rb_load},
+    {"rb_load", (RUBY_PROC*)&dll_rb_بھرو},
     {"rb_num2long", (RUBY_PROC*)&dll_rb_num2long},
     {"rb_num2ulong", (RUBY_PROC*)&dll_rb_num2ulong},
     {"rb_obj_alloc", (RUBY_PROC*)&dll_rb_obj_alloc},
     {"rb_obj_as_string", (RUBY_PROC*)&dll_rb_obj_as_string},
     {"rb_obj_id", (RUBY_PROC*)&dll_rb_obj_id},
     {"rb_raise", (RUBY_PROC*)&dll_rb_raise},
-    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_value},
+    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_قدر},
     {"rb_str_cat", (RUBY_PROC*)&dll_rb_str_cat},
     {"rb_str_concat", (RUBY_PROC*)&dll_rb_str_concat},
     {"rb_str_new", (RUBY_PROC*)&dll_rb_str_new},
 # ifdef need_rb_str_new_cstr
     {"rb_str_new_cstr", (RUBY_PROC*)&dll_rb_str_new_cstr},
-# else
+# ورنہ
     {"rb_str_new2", (RUBY_PROC*)&dll_rb_str_new2},
 # endif
     {"rb_errinfo", (RUBY_PROC*)&dll_rb_errinfo},
@@ -717,29 +717,29 @@ static struct
     {"ruby_sysinit", (RUBY_PROC*)&dll_ruby_sysinit},
     {"rb_w32_snprintf", (RUBY_PROC*)&dll_rb_w32_snprintf},
 # endif
-# if RUBY_VERSION >= 31
+# اگر RUBY_نسخہ >= 31
     {"rb_unexpected_type", (RUBY_PROC*)&dll_rb_unexpected_type},
 # endif
-    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_value_ptr},
-# if RUBY_VERSION >= 20
+    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_قدر_ptr},
+# اگر RUBY_نسخہ >= 20
     {"rb_float_new_in_heap", (RUBY_PROC*)&dll_rb_float_new},
-# else
+# ورنہ
     {"rb_float_new", (RUBY_PROC*)&dll_rb_float_new},
 # endif
     {"rb_ary_new", (RUBY_PROC*)&dll_rb_ary_new},
 # ifdef RB_ARY_NEW4_MACRO
     {"rb_ary_new_from_values", (RUBY_PROC*)&dll_rb_ary_new4},
-# else
+# ورنہ
     {"rb_ary_new4", (RUBY_PROC*)&dll_rb_ary_new4},
 # endif
-    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_push},
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_ڈالو},
+# اگر RUBY_نسخہ >= 26 && RUBY_نسخہ <= 32
     {"rb_ary_detransient", (RUBY_PROC*)&dll_rb_ary_detransient},
 # endif
     {"rb_int2big", (RUBY_PROC*)&dll_rb_int2big},
     {"ruby_script", (RUBY_PROC*)&dll_ruby_script},
-    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_find_index},
-    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_find},
+    {"rb_enc_find_index", (RUBY_PROC*)&dll_rb_enc_ڈھونڈو_اشاریہ},
+    {"rb_enc_find", (RUBY_PROC*)&dll_rb_enc_ڈھونڈو},
     {"rb_enc_str_new", (RUBY_PROC*)&dll_rb_enc_str_new},
     {"rb_sprintf", (RUBY_PROC*)&dll_rb_sprintf},
     {"rb_require", (RUBY_PROC*)&dll_rb_require},
@@ -747,18 +747,18 @@ static struct
 # ifdef __ia64
     {"rb_ia64_bsp", (RUBY_PROC*)&dll_rb_ia64_bsp},
 # endif
-    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_stack},
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
+    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_ڈھیر},
+# اگر defined(USE_RGENGC) && USE_RGENGC
+#  اگر RUBY_نسخہ == 21
     {"rb_gc_writebarrier_unprotect_promoted", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect_promoted},
-#  else
+#  ورنہ
     {"rb_gc_writebarrier_unprotect", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect},
 #  endif
 # endif
-# if RUBY_VERSION >= 30
-    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_size_overflow},
+# اگر RUBY_نسخہ >= 30
+    {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_سائز_حد_سے_تجاوز},
 # endif
-    {"", NULL},
+    {"", تہی},
 };
 
 /*
@@ -766,66 +766,66 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-ruby_runtime_link_init(char *libname, int verbose)
+    ساکن صحیح
+ruby_runtime_link_init(حرف *libname, صحیح verbose)
 {
-    int i;
+    صحیح i;
 
-    if (hinstRuby)
-	return OK;
-    hinstRuby = load_dll(libname);
-    if (!hinstRuby)
+    اگر (hinstRuby)
+	واپس OK;
+    hinstRuby = بھرو_dll(libname);
+    اگر (!hinstRuby)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	اگر (verbose)
+	    semsg(_(e_could_not_بھرو_library_str_str), libname, بھرو_dll_error());
+	واپس FAIL;
     }
 
-    for (i = 0; ruby_funcname_table[i].ptr; ++i)
+    برائے (i = 0; ruby_funcname_جدول[i].ptr; ++i)
     {
-	if (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
-			ruby_funcname_table[i].name)))
+	اگر (!(*ruby_funcname_جدول[i].ptr = علامت_from_dll(hinstRuby,
+			ruby_funcname_جدول[i].name)))
 	{
 	    close_dll(hinstRuby);
-	    hinstRuby = NULL;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), ruby_funcname_table[i].name);
-	    return FAIL;
+	    hinstRuby = تہی;
+	    اگر (verbose)
+		semsg(_(e_could_not_بھرو_library_function_str), ruby_funcname_جدول[i].name);
+	    واپس FAIL;
 	}
     }
-    return OK;
+    واپس OK;
 }
 
 /*
  * If ruby is enabled (there is installed ruby on Windows system) return TRUE,
  * else FALSE.
  */
-    int
-ruby_enabled(int verbose)
+    صحیح
+ruby_enabled(صحیح verbose)
 {
-    return ruby_runtime_link_init((char *)p_rubydll, verbose) == OK;
+    واپس ruby_runtime_link_init((حرف *)p_rubydll, verbose) == OK;
 }
-#endif // defined(DYNAMIC_RUBY)
+#اگر_ختم // defined(DYNAMIC_RUBY)
 
-    void
-ruby_end(void)
+    خالی
+ruby_انتہا(خالی)
 {
 }
 
-    void
+    خالی
 ex_ruby(exarg_T *eap)
 {
-    int state;
-    char *script = NULL;
+    صحیح state;
+    حرف *script = تہی;
 
-    script = (char *)script_get(eap, eap->arg);
-    if (!eap->skip && ensure_ruby_initialized())
+    script = (حرف *)script_get(eap, eap->arg);
+    اگر (!eap->skip && ensure_ruby_initialized())
     {
-	if (script == NULL)
-	    rb_eval_string_protect((char *)eap->arg, &state);
-	else
+	اگر (script == تہی)
+	    rb_eval_string_protect((حرف *)eap->arg, &state);
+	ورنہ
 	    rb_eval_string_protect(script, &state);
-	if (state)
+	اگر (state)
 	    error_print(state);
     }
     vim_free(script);
@@ -836,156 +836,156 @@ ex_ruby(exarg_T *eap)
  *  conversion buffer string of vim to ruby String object using
  *  VIM encoding option.
  */
-    static VALUE
-vim_str2rb_enc_str(const char *s)
+    ساکن قدر_3
+vim_str2rb_enc_str(ثابت حرف *s)
 {
-    long lval;
+    طویل lval;
     char_u *sval;
     rb_encoding *enc;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    اگر (get_option_قدر((char_u *)"enc", &lval, &sval, تہی, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_ڈھونڈو((حرف *)sval);
 	vim_free(sval);
-	if (enc)
-	    return rb_enc_str_new(s, (long)strlen(s), enc);
+	اگر (enc)
+	    واپس rb_enc_str_new(s, (طویل)لڑی_لمبائی(s), enc);
     }
-    return rb_str_new2(s);
+    واپس rb_str_new2(s);
 }
 
-    static VALUE
-eval_enc_string_protect(const char *str, int *state)
+    ساکن قدر_3
+eval_enc_string_protect(ثابت حرف *str, صحیح *state)
 {
-    long lval;
+    طویل lval;
     char_u *sval;
     rb_encoding *enc;
-    VALUE v;
+    قدر_3 v;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    اگر (get_option_قدر((char_u *)"enc", &lval, &sval, تہی, 0) == gov_string)
     {
-	enc = rb_enc_find((char *)sval);
+	enc = rb_enc_ڈھونڈو((حرف *)sval);
 	vim_free(sval);
-	if (enc)
+	اگر (enc)
 	{
 	    v = rb_sprintf("#-*- coding:%s -*-\n%s", rb_enc_name(enc), str);
-	    return rb_eval_string_protect(StringValuePtr(v), state);
+	    واپس rb_eval_string_protect(String_قدر_Ptr(v), state);
 	}
     }
-    return rb_eval_string_protect(str, state);
+    واپس rb_eval_string_protect(str, state);
 }
 
-    void
+    خالی
 ex_rubydo(exarg_T *eap)
 {
-    int state;
+    صحیح state;
     linenr_T i;
     buf_T   *was_curbuf = curbuf;
 
-    if (!ensure_ruby_initialized())
-	return;
+    اگر (!ensure_ruby_initialized())
+	واپس;
 
-    if (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
-	return;
-    for (i = eap->line1; i <= eap->line2; i++)
+    اگر (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
+	واپس;
+    برائے (i = eap->line1; i <= eap->line2; i++)
     {
-	VALUE line;
+	قدر_3 سطر;
 
-	if (i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = vim_str2rb_enc_str((char *)ml_get(i));
-	rb_lastline_set(line);
-	eval_enc_string_protect((char *) eap->arg, &state);
-	if (state)
+	اگر (i > curbuf->b_ml.ml_سطر_گنتی)
+	    توڑو;
+	سطر = vim_str2rb_enc_str((حرف *)ml_get(i));
+	rb_lastline_سیٹ(سطر);
+	eval_enc_string_protect((حرف *) eap->arg, &state);
+	اگر (state)
 	{
 	    error_print(state);
-	    break;
+	    توڑو;
 	}
-	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
-	    break;
-	line = rb_lastline_get();
-	if (!NIL_P(line))
+	اگر (was_curbuf != curbuf || i > curbuf->b_ml.ml_سطر_گنتی)
+	    توڑو;
+	سطر = rb_lastline_get();
+	اگر (!NIL_P(سطر))
 	{
-	    if (TYPE(line) != T_STRING)
+	    اگر (TYPE(سطر) != T_STRING)
 	    {
-		emsg(_(e_dollar_must_be_an_instance_of_string));
-		return;
+		emsg(_(e_dollar_must_be_an_instance_کا_string));
+		واپس;
 	    }
-	    ml_replace(i, (char_u *) StringValuePtr(line), 1);
-	    changed();
-#ifdef SYNTAX_HL
-	    syn_changed(i); // recompute syntax hl. for this line
-#endif
+	    ml_replace(i, (char_u *) String_قدر_Ptr(سطر), 1);
+	    بدلا();
+#اگر_تعریف_شدہ SYNTAX_HL
+	    syn_بدلا(i); // recompute syntax hl. for this line
+#اگر_ختم
 	}
     }
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static VALUE
-rb_load_wrap(VALUE file_to_load)
+    ساکن قدر_3
+rb_بھرو_wrap(قدر_3 file_مقصد_بھرو)
 {
-    rb_load(file_to_load, 0);
-    return Qnil;
+    rb_بھرو(file_مقصد_بھرو, 0);
+    واپس Qnil;
 }
 
-    void
+    خالی
 ex_rubyfile(exarg_T *eap)
 {
-    int state;
+    صحیح state;
 
-    if (!ensure_ruby_initialized())
-	return;
+    اگر (!ensure_ruby_initialized())
+	واپس;
 
-    VALUE file_to_load = rb_str_new2((const char *)eap->arg);
-    rb_protect(rb_load_wrap, file_to_load, &state);
-    if (state)
+    قدر_3 file_مقصد_بھرو = rb_str_new2((ثابت حرف *)eap->arg);
+    rb_protect(rb_بھرو_wrap, file_مقصد_بھرو, &state);
+    اگر (state)
 	error_print(state);
 }
 
-    void
-ruby_buffer_free(buf_T *buf)
+    خالی
+ruby_بفر_free(buf_T *buf)
 {
-    if (buf->b_ruby_ref == NULL)
-	return;
+    اگر (buf->b_ruby_ref == تہی)
+	واپس;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) buf->b_ruby_ref), Qnil);
-    RDATA(buf->b_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((قدر_3) buf->b_ruby_ref), Qnil);
+    RDATA(buf->b_ruby_ref)->ڈیٹا = تہی;
 }
 
-    void
-ruby_window_free(win_T *win)
+    خالی
+ruby_کھڑکی_free(win_T *win)
 {
-    if (win->w_ruby_ref == NULL)
-	return;
+    اگر (win->w_ruby_ref == تہی)
+	واپس;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) win->w_ruby_ref), Qnil);
-    RDATA(win->w_ruby_ref)->data = NULL;
+    rb_hash_aset(objtbl, rb_obj_id((قدر_3) win->w_ruby_ref), Qnil);
+    RDATA(win->w_ruby_ref)->ڈیٹا = تہی;
 }
 
-    static int
-ensure_ruby_initialized(void)
+    ساکن صحیح
+ensure_ruby_initialized(خالی)
 {
-    if (ruby_initialized)
-	return ruby_initialized;
+    اگر (ruby_initialized)
+	واپس ruby_initialized;
 
-#ifdef DYNAMIC_RUBY
-    if (ruby_enabled(TRUE))
-#endif
+#اگر_تعریف_شدہ DYNAMIC_RUBY
+    اگر (ruby_enabled(TRUE))
+#اگر_ختم
     {
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
 	// suggested by Ariya Mizutani
-	int argc = 1;
-	char *argv[] = {"gvim.exe"};
-	char **argvp = argv;
+	صحیح argc = 1;
+	حرف *argv[] = {"gvim.exe"};
+	حرف **argvp = argv;
 	ruby_sysinit(&argc, &argvp);
-#endif
+#اگر_ختم
 	{
-	    ruby_init_stack(ruby_stack_start);
+	    ruby_init_ڈھیر(ruby_ڈھیر_آغاز);
 	    ruby_init();
 	}
 	{
-	    int dummy_argc = 2;
-	    char *dummy_argv[] = {"vim-ruby", "-e_=0"};
+	    صحیح dummy_argc = 2;
+	    حرف *dummy_argv[] = {"vim-ruby", "-e_=0"};
 	    ruby_options(dummy_argc, dummy_argv);
 	}
 	ruby_script("vim-ruby");
@@ -993,235 +993,235 @@ ensure_ruby_initialized(void)
 	ruby_vim_init();
 	ruby_initialized = 1;
     }
-#ifdef DYNAMIC_RUBY
-    else
+#اگر_تعریف_شدہ DYNAMIC_RUBY
+    ورنہ
     {
 	emsg(_(e_sorry_this_command_is_disabled_the_ruby_library_could_not_be_loaded));
-	return 0;
+	واپس 0;
     }
-#endif
+#اگر_ختم
 
-    return ruby_initialized;
+    واپس ruby_initialized;
 }
 
-    static void
-error_print(int state)
+    ساکن خالی
+error_print(صحیح state)
 {
-    VALUE error;
-    VALUE eclass;
-    VALUE einfo;
-    VALUE bt;
-    int attr;
-    char buff[BUFSIZ];
-    long i;
+    قدر_3 error;
+    قدر_3 eclass;
+    قدر_3 einfo;
+    قدر_3 bt;
+    صحیح attr;
+    حرف buff[BUFSIZ];
+    طویل i;
 
-#define TAG_RETURN	0x1
-#define TAG_BREAK	0x2
-#define TAG_NEXT	0x3
-#define TAG_RETRY	0x4
-#define TAG_REDO	0x5
-#define TAG_RAISE	0x6
-#define TAG_THROW	0x7
-#define TAG_FATAL	0x8
-#define TAG_MASK	0xf
+#تعریف_کرو لیبل_RETURN	0x1
+#تعریف_کرو لیبل_BREAK	0x2
+#تعریف_کرو لیبل_اگلا	0x3
+#تعریف_کرو لیبل_RETRY	0x4
+#تعریف_کرو لیبل_REDO	0x5
+#تعریف_کرو لیبل_RAISE	0x6
+#تعریف_کرو لیبل_THROW	0x7
+#تعریف_کرو لیبل_FATAL	0x8
+#تعریف_کرو لیبل_نقاب	0xf
 
-    switch (state)
+    انتخاب (state)
     {
-	case TAG_RETURN:
+	حالت لیبل_RETURN:
 	    emsg(_(e_unexpected_return));
-	    break;
-	case TAG_NEXT:
-	    emsg(_(e_unexpected_next));
-	    break;
-	case TAG_BREAK:
+	    توڑو;
+	حالت لیبل_اگلا:
+	    emsg(_(e_unexpected_اگلا));
+	    توڑو;
+	حالت لیبل_BREAK:
 	    emsg(_(e_unexpected_break));
-	    break;
-	case TAG_REDO:
+	    توڑو;
+	حالت لیبل_REDO:
 	    emsg(_(e_unexpected_redo));
-	    break;
-	case TAG_RETRY:
-	    emsg(_(e_retry_outside_of_rescue_clause));
-	    break;
-	case TAG_RAISE:
-	case TAG_FATAL:
+	    توڑو;
+	حالت لیبل_RETRY:
+	    emsg(_(e_retry_outside_کا_rescue_clause));
+	    توڑو;
+	حالت لیبل_RAISE:
+	حالت لیبل_FATAL:
 	    error = rb_errinfo();
-	    eclass = CLASS_OF(error);
+	    eclass = CLASS_کا(error);
 	    einfo = rb_obj_as_string(error);
-	    if (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
+	    اگر (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
 	    {
 		emsg(_(e_unhandled_exception));
 	    }
-	    else
+	    ورنہ
 	    {
-		VALUE epath;
-		char *p;
+		قدر_3 epath;
+		حرف *p;
 
-		epath = rb_class_path(eclass);
+		epath = rb_class_راستہ(eclass);
 		vim_snprintf(buff, BUFSIZ, "%s: %s",
 			 RSTRING_PTR(epath), RSTRING_PTR(einfo));
 		p = strchr(buff, '\n');
-		if (p) *p = '\0';
+		اگر (p) *p = '\0';
 		emsg(buff);
 	    }
 
 	    attr = syn_name2attr((char_u *)"Error");
-#if RUBY_VERSION >= 21
+#اگر RUBY_نسخہ >= 21
 	    bt = rb_funcallv(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
-#else
+	    برائے (i = 0; i < RARRAY_LEN(bt); i++)
+		پیغام_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
+#ورنہ
 	    bt = rb_funcall2(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
-#endif
-	    break;
-	default:
-	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_status_nr), state);
+	    برائے (i = 0; i < RARRAY_LEN(bt); i++)
+		پیغام_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
+#اگر_ختم
+	    توڑو;
+	طےشدہ:
+	    vim_snprintf(buff, BUFSIZ, _(e_unknown_longjmp_حالت_nr), state);
 	    emsg(buff);
-	    break;
+	    توڑو;
     }
 }
 
-    static VALUE
-vim_message(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+vim_پیغام(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-    char *buff, *p;
+    حرف *buff, *p;
 
     str = rb_obj_as_string(str);
-    if (RSTRING_LEN(str) > 0)
+    اگر (RSTRING_LEN(str) > 0)
     {
 	// Only do this when the string isn't empty, alloc(0) causes trouble.
-	buff = ALLOCA_N(char, RSTRING_LEN(str) + 1);
+	buff = ALLOCA_N(حرف, RSTRING_LEN(str) + 1);
 	strcpy(buff, RSTRING_PTR(str));
 	p = strchr(buff, '\n');
-	if (p) *p = '\0';
-	msg(buff);
+	اگر (p) *p = '\0';
+	پیغام(buff);
     }
-    else
+    ورنہ
     {
-	msg("");
+	پیغام("");
     }
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-vim_set_option(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+vim_سیٹ_option(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-    do_set((char_u *)StringValuePtr(str), 0);
+    do_سیٹ((char_u *)String_قدر_Ptr(str), 0);
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-vim_command(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+vim_command(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-    do_cmdline_cmd((char_u *)StringValuePtr(str));
-    return Qnil;
+    do_cmdline_cmd((char_u *)String_قدر_Ptr(str));
+    واپس Qnil;
 }
 
-#ifdef FEAT_EVAL
-    static VALUE
-vim_to_ruby(typval_T *tv)
+#اگر_تعریف_شدہ FEAT_EVAL
+    ساکن قدر_3
+vim_مقصد_ruby(typval_T *tv)
 {
-    VALUE result = Qnil;
+    قدر_3 نتیجہ = Qnil;
 
-    if (tv->v_type == VAR_STRING)
+    اگر (tv->v_type == VAR_STRING)
     {
-	result = rb_str_new2(tv->vval.v_string == NULL
-					  ? "" : (char *)(tv->vval.v_string));
+	نتیجہ = rb_str_new2(tv->vval.v_string == تہی
+					  ? "" : (حرف *)(tv->vval.v_string));
     }
-    else if (tv->v_type == VAR_NUMBER)
+    ورنہ اگر (tv->v_type == VAR_نمبر)
     {
-	result = INT2NUM(tv->vval.v_number);
+	نتیجہ = INT2_عدد(tv->vval.v_نمبر);
     }
-    else if (tv->v_type == VAR_FLOAT)
+    ورنہ اگر (tv->v_type == VAR_FLOAT)
     {
-	result = rb_float_new(tv->vval.v_float);
+	نتیجہ = rb_float_new(tv->vval.v_float);
     }
-    else if (tv->v_type == VAR_LIST)
+    ورنہ اگر (tv->v_type == VAR_LIST)
     {
 	list_T      *list = tv->vval.v_list;
 	listitem_T  *curr;
 
-	result = rb_ary_new();
+	نتیجہ = rb_ary_new();
 
-	if (list != NULL)
+	اگر (list != تہی)
 	{
-	    FOR_ALL_LIST_ITEMS(list, curr)
-		rb_ary_push(result, vim_to_ruby(&curr->li_tv));
+	    FOR_ALL_LIST_اشیاء(list, curr)
+		rb_ary_ڈالو(نتیجہ, vim_مقصد_ruby(&curr->li_tv));
 	}
     }
-    else if (tv->v_type == VAR_DICT)
+    ورنہ اگر (tv->v_type == VAR_DICT)
     {
-	result = rb_hash_new();
+	نتیجہ = rb_hash_new();
 
-	if (tv->vval.v_dict != NULL)
+	اگر (tv->vval.v_dict != تہی)
 	{
 	    hashtab_T   *ht = &tv->vval.v_dict->dv_hashtab;
-	    long_u      todo = ht->ht_used;
+	    long_u      todo = ht->ht_مستعمل;
 	    hashitem_T  *hi;
 	    dictitem_T  *di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_اشیاء(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		اگر (!HASHITEM_خالی_خانے(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
-		    rb_hash_aset(result, rb_str_new2((char *)hi->hi_key),
-						     vim_to_ruby(&di->di_tv));
+		    rb_hash_aset(نتیجہ, rb_str_new2((حرف *)hi->hi_کلید),
+						     vim_مقصد_ruby(&di->di_tv));
 		}
 	    }
 	}
     }
-    else if (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
+    ورنہ اگر (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
     {
-	if (tv->vval.v_number == VVAL_TRUE)
-	    result = Qtrue;
-	else if (tv->vval.v_number == VVAL_FALSE)
-	    result = Qfalse;
+	اگر (tv->vval.v_نمبر == VVAL_TRUE)
+	    نتیجہ = Qtrue;
+	ورنہ اگر (tv->vval.v_نمبر == VVAL_FALSE)
+	    نتیجہ = Qfalse;
     }
-    else if (tv->v_type == VAR_BLOB)
+    ورنہ اگر (tv->v_type == VAR_BLOB)
     {
-	result = rb_str_new(tv->vval.v_blob->bv_ga.ga_data,
+	نتیجہ = rb_str_new(tv->vval.v_blob->bv_ga.ga_ڈیٹا,
 		tv->vval.v_blob->bv_ga.ga_len);
     }
     // else return Qnil;
 
-    return result;
+    واپس نتیجہ;
 }
-#endif
+#اگر_ختم
 
-    static VALUE
-vim_evaluate(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+vim_evaluate(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     typval_T    *tv;
-    VALUE       result;
+    قدر_3       نتیجہ;
 
-    tv = eval_expr((char_u *)StringValuePtr(str), NULL);
-    if (tv == NULL)
-	return Qnil;
-    result = vim_to_ruby(tv);
+    tv = eval_اظہاریہ((char_u *)String_قدر_Ptr(str), تہی);
+    اگر (tv == تہی)
+	واپس Qnil;
+    نتیجہ = vim_مقصد_ruby(tv);
 
     free_tv(tv);
 
-    return result;
-#else
-    return Qnil;
-#endif
+    واپس نتیجہ;
+#ورنہ
+    واپس Qnil;
+#اگر_ختم
 }
 
-#ifdef USE_TYPEDDATA
-static size_t buffer_dsize(const void *buf);
+#اگر_تعریف_شدہ USE_TYPEDDATA
+ساکن size_t بفر_dsize(ثابت خالی *buf);
 
-static const rb_data_type_t buffer_type = {
+ساکن ثابت rb_ڈیٹا_type_t بفر_type = {
     "vim_buffer",
-    {0, 0, buffer_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, بفر_dsize,
+# اگر RUBY_نسخہ >= 27
 	0, {0}
-# else
+# ورنہ
 	{0, 0}
 # endif
     },
@@ -1231,174 +1231,174 @@ static const rb_data_type_t buffer_type = {
 # endif
 };
 
-    static size_t
-buffer_dsize(const void *buf UNUSED)
+    ساکن size_t
+بفر_dsize(ثابت خالی *buf غیر_مستعمل)
 {
-    return sizeof(buf_T);
+    واپس حجم(buf_T);
 }
-#endif
+#اگر_ختم
 
-    static VALUE
-buffer_new(buf_T *buf)
+    ساکن قدر_3
+بفر_new(buf_T *buf)
 {
-    if (buf->b_ruby_ref)
+    اگر (buf->b_ruby_ref)
     {
-	return (VALUE) buf->b_ruby_ref;
+	واپس (قدر_3) buf->b_ruby_ref;
     }
-    else
+    ورنہ
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
-#else
-	VALUE obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
-#endif
-	buf->b_ruby_ref = (void *) obj;
+#اگر_تعریف_شدہ USE_TYPEDDATA
+	قدر_3 obj = Typed_ڈیٹا_Wrap_Struct(c_بفر, &بفر_type, buf);
+#ورنہ
+	قدر_3 obj = ڈیٹا_Wrap_Struct(c_بفر, 0, 0, buf);
+#اگر_ختم
+	buf->b_ruby_ref = (خالی *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	واپس obj;
     }
 }
 
-    static buf_T *
-get_buf(VALUE obj)
+    ساکن buf_T *
+get_buf(قدر_3 obj)
 {
     buf_T *buf;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, buf_T, &buffer_type, buf);
-#else
-    Data_Get_Struct(obj, buf_T, buf);
-#endif
-    if (buf == NULL)
-	rb_raise(eDeletedBufferError, "attempt to refer to deleted buffer");
-    return buf;
+#اگر_تعریف_شدہ USE_TYPEDDATA
+    Typed_ڈیٹا_Get_Struct(obj, buf_T, &بفر_type, buf);
+#ورنہ
+    ڈیٹا_Get_Struct(obj, buf_T, buf);
+#اگر_ختم
+    اگر (buf == تہی)
+	rb_raise(e_Deleted_بفر_Error, "attempt to refer to deleted buffer");
+    واپس buf;
 }
 
-    static VALUE
-vim_blob(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+vim_blob(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-    VALUE result = rb_str_new("0z", 2);
-    char    buf[4];
-    int	i;
-    for (i = 0; i < RSTRING_LEN(str); i++)
+    قدر_3 نتیجہ = rb_str_new("0z", 2);
+    حرف    buf[4];
+    صحیح	i;
+    برائے (i = 0; i < RSTRING_LEN(str); i++)
     {
-	sprintf(buf, "%02X", (unsigned char)(RSTRING_PTR(str)[i]));
-	rb_str_concat(result, rb_str_new2(buf));
+	sprintf(buf, "%02X", (غیرعلامتی حرف)(RSTRING_PTR(str)[i]));
+	rb_str_concat(نتیجہ, rb_str_new2(buf));
     }
-    return result;
+    واپس نتیجہ;
 }
 
-    static VALUE
-buffer_s_current(VALUE self UNUSED)
+    ساکن قدر_3
+بفر_s_current(قدر_3 self غیر_مستعمل)
 {
-    return buffer_new(curbuf);
+    واپس بفر_new(curbuf);
 }
 
-    static VALUE
-buffer_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    ساکن قدر_3
+بفر_s_current_getter(ID id غیر_مستعمل, قدر_3 *x غیر_مستعمل)
 {
-    return buffer_new(curbuf);
+    واپس بفر_new(curbuf);
 }
 
-    static VALUE
-buffer_s_count(VALUE self UNUSED)
+    ساکن قدر_3
+بفر_s_گنتی(قدر_3 self غیر_مستعمل)
 {
     buf_T *b;
-    int n = 0;
+    صحیح n = 0;
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (b->b_p_bl)
+	اگر (b->b_p_bl)
 	    n++;
     }
 
-    return INT2NUM(n);
+    واپس INT2_عدد(n);
 }
 
-    static VALUE
-buffer_s_aref(VALUE self UNUSED, VALUE num)
+    ساکن قدر_3
+بفر_s_aref(قدر_3 self غیر_مستعمل, قدر_3 عدد)
 {
     buf_T *b;
-    int n = NUM2INT(num);
+    صحیح n = NUM2INT(عدد);
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (!b->b_p_bl)
-	    continue;
+	اگر (!b->b_p_bl)
+	    جاری;
 
-	if (n == 0)
-	    return buffer_new(b);
+	اگر (n == 0)
+	    واپس بفر_new(b);
 
 	n--;
     }
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-buffer_name(VALUE self)
+    ساکن قدر_3
+بفر_name(قدر_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
+    واپس buf->b_ffname ? rb_str_new2((حرف *)buf->b_ffname) : Qnil;
 }
 
-    static VALUE
-buffer_number(VALUE self)
+    ساکن قدر_3
+بفر_نمبر(قدر_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_fnum);
+    واپس INT2_عدد(buf->b_fnum);
 }
 
-    static VALUE
-buffer_count(VALUE self)
+    ساکن قدر_3
+بفر_گنتی(قدر_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_ml.ml_line_count);
+    واپس INT2_عدد(buf->b_ml.ml_سطر_گنتی);
 }
 
-    static VALUE
-get_buffer_line(buf_T *buf, linenr_T n)
+    ساکن قدر_3
+get_بفر_سطر(buf_T *buf, linenr_T n)
 {
-    if (n <= 0 || n > buf->b_ml.ml_line_count)
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
-    return vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
+    اگر (n <= 0 || n > buf->b_ml.ml_سطر_گنتی)
+	rb_raise(rb_e_اشاریہ_Error, "line number %ld out of range", (طویل)n);
+    واپس vim_str2rb_enc_str((حرف *)ml_get_buf(buf, n, FALSE));
 }
 
-    static VALUE
-buffer_aref(VALUE self, VALUE num)
+    ساکن قدر_3
+بفر_aref(قدر_3 self, قدر_3 عدد)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return get_buffer_line(buf, (linenr_T)NUM2LONG(num));
-    return Qnil; // For stop warning
+    اگر (buf != تہی)
+	واپس get_بفر_سطر(buf, (linenr_T)NUM2LONG(عدد));
+    واپس Qnil; // For stop warning
 }
 
-    static VALUE
-set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
+    ساکن قدر_3
+سیٹ_بفر_سطر(buf_T *buf, linenr_T n, قدر_3 str)
 {
-    char	*line = StringValuePtr(str);
+    حرف	*سطر = String_قدر_Ptr(str);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
+    اگر (n > 0 && n <= buf->b_ml.ml_سطر_گنتی && سطر != تہی)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	اگر (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savesub(n) == OK)
+	    اگر (u_savesub(n) == OK)
 	    {
-		ml_replace(n, (char_u *)line, TRUE);
-		changed();
-#ifdef SYNTAX_HL
-		syn_changed(n); // recompute syntax hl. for this line
-#endif
+		ml_replace(n, (char_u *)سطر, TRUE);
+		بدلا();
+#اگر_تعریف_شدہ SYNTAX_HL
+		syn_بدلا(n); // recompute syntax hl. for this line
+#اگر_ختم
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1408,46 +1408,46 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ورنہ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
+	rb_raise(rb_e_اشاریہ_Error, "line number %ld out of range", (طویل)n);
     }
-    return str;
+    واپس str;
 }
 
-    static VALUE
-buffer_aset(VALUE self, VALUE num, VALUE str)
+    ساکن قدر_3
+بفر_aset(قدر_3 self, قدر_3 عدد, قدر_3 str)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
-    return str;
+    اگر (buf != تہی)
+	واپس سیٹ_بفر_سطر(buf, (linenr_T)NUM2LONG(عدد), str);
+    واپس str;
 }
 
-    static VALUE
-buffer_delete(VALUE self, VALUE num)
+    ساکن قدر_3
+بفر_delete(قدر_3 self, قدر_3 عدد)
 {
     buf_T	*buf = get_buf(self);
-    long	n = NUM2LONG(num);
+    طویل	n = NUM2LONG(عدد);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count)
+    اگر (n > 0 && n <= buf->b_ml.ml_سطر_گنتی)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	اگر (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savedel(n, 1) == OK)
+	    اگر (u_savedel(n, 1) == OK)
 	    {
 		ml_delete(n);
 
 		// Changes to non-active buffers should properly refresh
 		//   SegPhault - 01/09/05
-		deleted_lines_mark(n, 1L);
+		deleted_سطریں_mark(n, 1L);
 
-		changed();
+		بدلا();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1457,41 +1457,41 @@ buffer_delete(VALUE self, VALUE num)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ورنہ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_اشاریہ_Error, "line number %ld out of range", n);
     }
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-buffer_append(VALUE self, VALUE num, VALUE str)
+    ساکن قدر_3
+بفر_append(قدر_3 self, قدر_3 عدد, قدر_3 str)
 {
     buf_T	*buf = get_buf(self);
-    char	*line = StringValuePtr(str);
-    long	n = NUM2LONG(num);
+    حرف	*سطر = String_قدر_Ptr(str);
+    طویل	n = NUM2LONG(عدد);
     aco_save_T	aco;
 
-    if (line == NULL)
+    اگر (سطر == تہی)
     {
-	rb_raise(rb_eIndexError, "NULL line");
+	rb_raise(rb_e_اشاریہ_Error, "NULL line");
     }
-    else if (n >= 0 && n <= buf->b_ml.ml_line_count)
+    ورنہ اگر (n >= 0 && n <= buf->b_ml.ml_سطر_گنتی)
     {
 	// set curwin/curbuf for "buf" and save some things
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	اگر (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_inssub(n + 1) == OK)
+	    اگر (u_inssub(n + 1) == OK)
 	    {
-		ml_append(n, (char_u *) line, (colnr_T) 0, FALSE);
+		ml_append(n, (char_u *) سطر, (colnr_T) 0, FALSE);
 
 		//  Changes to non-active buffers should properly refresh screen
 		//    SegPhault - 12/20/04
-		appended_lines_mark(n, 1L);
+		appended_سطریں_mark(n, 1L);
 
-		changed();
+		بدلا();
 	    }
 
 	    // restore curwin/curbuf and a few other things
@@ -1501,22 +1501,22 @@ buffer_append(VALUE self, VALUE num, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    ورنہ
     {
-	rb_raise(rb_eIndexError, "line number %ld out of range", n);
+	rb_raise(rb_e_اشاریہ_Error, "line number %ld out of range", n);
     }
-    return str;
+    واپس str;
 }
 
-#ifdef USE_TYPEDDATA
-static size_t window_dsize(const void *buf);
+#اگر_تعریف_شدہ USE_TYPEDDATA
+ساکن size_t کھڑکی_dsize(ثابت خالی *buf);
 
-static const rb_data_type_t window_type = {
+ساکن ثابت rb_ڈیٹا_type_t کھڑکی_type = {
     "vim_window",
-    {0, 0, window_dsize,
-# if RUBY_VERSION >= 27
+    {0, 0, کھڑکی_dsize,
+# اگر RUBY_نسخہ >= 27
 	0, {0}
-# else
+# ورنہ
 	{0, 0}
 # endif
     },
@@ -1526,224 +1526,224 @@ static const rb_data_type_t window_type = {
 # endif
 };
 
-    static size_t
-window_dsize(const void *win UNUSED)
+    ساکن size_t
+کھڑکی_dsize(ثابت خالی *win غیر_مستعمل)
 {
-    return sizeof(win_T);
+    واپس حجم(win_T);
 }
-#endif
+#اگر_ختم
 
-    static VALUE
-window_new(win_T *win)
+    ساکن قدر_3
+کھڑکی_new(win_T *win)
 {
-    if (win->w_ruby_ref)
+    اگر (win->w_ruby_ref)
     {
-	return (VALUE) win->w_ruby_ref;
+	واپس (قدر_3) win->w_ruby_ref;
     }
-    else
+    ورنہ
     {
-#ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
-#else
-	VALUE obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
-#endif
-	win->w_ruby_ref = (void *) obj;
+#اگر_تعریف_شدہ USE_TYPEDDATA
+	قدر_3 obj = Typed_ڈیٹا_Wrap_Struct(c_Vim_کھڑکی, &کھڑکی_type, win);
+#ورنہ
+	قدر_3 obj = ڈیٹا_Wrap_Struct(c_Vim_کھڑکی, 0, 0, win);
+#اگر_ختم
+	win->w_ruby_ref = (خالی *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	واپس obj;
     }
 }
 
-    static win_T *
-get_win(VALUE obj)
+    ساکن win_T *
+get_win(قدر_3 obj)
 {
     win_T *win;
 
-#ifdef USE_TYPEDDATA
-    TypedData_Get_Struct(obj, win_T, &window_type, win);
-#else
-    Data_Get_Struct(obj, win_T, win);
-#endif
-    if (win == NULL)
-	rb_raise(eDeletedWindowError, "attempt to refer to deleted window");
-    return win;
+#اگر_تعریف_شدہ USE_TYPEDDATA
+    Typed_ڈیٹا_Get_Struct(obj, win_T, &کھڑکی_type, win);
+#ورنہ
+    ڈیٹا_Get_Struct(obj, win_T, win);
+#اگر_ختم
+    اگر (win == تہی)
+	rb_raise(e_Deleted_کھڑکی_Error, "attempt to refer to deleted window");
+    واپس win;
 }
 
-    static VALUE
-window_s_current(VALUE self UNUSED)
+    ساکن قدر_3
+کھڑکی_s_current(قدر_3 self غیر_مستعمل)
 {
-    return window_new(curwin);
+    واپس کھڑکی_new(curwin);
 }
 
-    static VALUE
-window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    ساکن قدر_3
+کھڑکی_s_current_getter(ID id غیر_مستعمل, قدر_3 *x غیر_مستعمل)
 {
-    return window_new(curwin);
+    واپس کھڑکی_new(curwin);
 }
 
 /*
  * Added line manipulation functions
  *    SegPhault - 03/07/05
  */
-    static VALUE
-line_s_current(VALUE self UNUSED)
+    ساکن قدر_3
+سطر_s_current(قدر_3 self غیر_مستعمل)
 {
-    return get_buffer_line(curbuf, curwin->w_cursor.lnum);
+    واپس get_بفر_سطر(curbuf, curwin->w_cursor.lnum);
 }
 
-    static VALUE
-set_current_line(VALUE self UNUSED, VALUE str)
+    ساکن قدر_3
+سیٹ_current_سطر(قدر_3 self غیر_مستعمل, قدر_3 str)
 {
-    return set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
+    واپس سیٹ_بفر_سطر(curbuf, curwin->w_cursor.lnum, str);
 }
 
-    static VALUE
-current_line_number(VALUE self UNUSED)
+    ساکن قدر_3
+current_سطر_نمبر(قدر_3 self غیر_مستعمل)
 {
-    return INT2FIX((int)curwin->w_cursor.lnum);
+    واپس INT2FIX((صحیح)curwin->w_cursor.lnum);
 }
 
-    static VALUE
-window_s_count(VALUE self UNUSED)
+    ساکن قدر_3
+کھڑکی_s_گنتی(قدر_3 self غیر_مستعمل)
 {
     win_T	*w;
-    int n = 0;
+    صحیح n = 0;
 
     FOR_ALL_WINDOWS(w)
 	n++;
-    return INT2NUM(n);
+    واپس INT2_عدد(n);
 }
 
-    static VALUE
-window_s_aref(VALUE self UNUSED, VALUE num)
+    ساکن قدر_3
+کھڑکی_s_aref(قدر_3 self غیر_مستعمل, قدر_3 عدد)
 {
     win_T *w;
-    int n = NUM2INT(num);
+    صحیح n = NUM2INT(عدد);
 
-    for (w = firstwin; w != NULL; w = w->w_next, --n)
-	if (n == 0)
-	    return window_new(w);
-    return Qnil;
+    برائے (w = firstwin; w != تہی; w = w->w_اگلا, --n)
+	اگر (n == 0)
+	    واپس کھڑکی_new(w);
+    واپس Qnil;
 }
 
-    static VALUE
-window_buffer(VALUE self)
+    ساکن قدر_3
+کھڑکی_بفر(قدر_3 self)
 {
     win_T *win = get_win(self);
 
-    return buffer_new(win->w_buffer);
+    واپس بفر_new(win->w_بفر);
 }
 
-    static VALUE
-window_height(VALUE self)
+    ساکن قدر_3
+کھڑکی_اونچائی(قدر_3 self)
 {
     win_T *win = get_win(self);
 
-    return INT2NUM(win->w_height);
+    واپس INT2_عدد(win->w_اونچائی);
 }
 
-    static VALUE
-window_set_height(VALUE self, VALUE height)
-{
-    win_T *win = get_win(self);
-    win_T *savewin = curwin;
-
-    curwin = win;
-    win_setheight(NUM2INT(height));
-    curwin = savewin;
-    return height;
-}
-
-    static VALUE
-window_width(VALUE self UNUSED)
-{
-    return INT2NUM(get_win(self)->w_width);
-}
-
-    static VALUE
-window_set_width(VALUE self UNUSED, VALUE width)
+    ساکن قدر_3
+کھڑکی_سیٹ_اونچائی(قدر_3 self, قدر_3 اونچائی)
 {
     win_T *win = get_win(self);
     win_T *savewin = curwin;
 
     curwin = win;
-    win_setwidth(NUM2INT(width));
+    win_setheight(NUM2INT(اونچائی));
     curwin = savewin;
-    return width;
+    واپس اونچائی;
 }
 
-    static VALUE
-window_cursor(VALUE self)
+    ساکن قدر_3
+کھڑکی_چوڑائی(قدر_3 self غیر_مستعمل)
+{
+    واپس INT2_عدد(get_win(self)->w_چوڑائی);
+}
+
+    ساکن قدر_3
+کھڑکی_سیٹ_چوڑائی(قدر_3 self غیر_مستعمل, قدر_3 چوڑائی)
+{
+    win_T *win = get_win(self);
+    win_T *savewin = curwin;
+
+    curwin = win;
+    win_setwidth(NUM2INT(چوڑائی));
+    curwin = savewin;
+    واپس چوڑائی;
+}
+
+    ساکن قدر_3
+کھڑکی_cursor(قدر_3 self)
 {
     win_T *win = get_win(self);
 
-    return rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
+    واپس rb_assoc_new(INT2_عدد(win->w_cursor.lnum), INT2_عدد(win->w_cursor.ستون));
 }
 
-    static VALUE
-window_set_cursor(VALUE self, VALUE pos)
+    ساکن قدر_3
+کھڑکی_سیٹ_cursor(قدر_3 self, قدر_3 pos)
 {
-    VALUE lnum, col;
+    قدر_3 lnum, ستون;
     win_T *win = get_win(self);
 
     Check_Type(pos, T_ARRAY);
-    if (RARRAY_LEN(pos) != 2)
+    اگر (RARRAY_LEN(pos) != 2)
 	rb_raise(rb_eArgError, "array length must be 2");
     lnum = RARRAY_PTR(pos)[0];
-    col = RARRAY_PTR(pos)[1];
+    ستون = RARRAY_PTR(pos)[1];
     win->w_cursor.lnum = NUM2LONG(lnum);
-    win->w_cursor.col = NUM2UINT(col);
-    win->w_set_curswant = true;
+    win->w_cursor.ستون = NUM2UINT(ستون);
+    win->w_سیٹ_curswant = true;
     check_cursor();		    // put cursor on an existing line
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-f_nop(VALUE self UNUSED)
+    ساکن قدر_3
+f_nop(قدر_3 self غیر_مستعمل)
 {
-    return Qnil;
+    واپس Qnil;
 }
 
-    static VALUE
-f_p(int argc, VALUE *argv, VALUE self UNUSED)
+    ساکن قدر_3
+f_p(صحیح argc, قدر_3 *argv, قدر_3 self غیر_مستعمل)
 {
-    int i;
-    VALUE str = rb_str_new("", 0);
-    VALUE ret = Qnil;
+    صحیح i;
+    قدر_3 str = rb_str_new("", 0);
+    قدر_3 ret = Qnil;
 
-    for (i = 0; i < argc; i++)
+    برائے (i = 0; i < argc; i++)
     {
-	if (i > 0) rb_str_cat(str, ", ", 2);
+	اگر (i > 0) rb_str_cat(str, ", ", 2);
 	rb_str_concat(str, rb_inspect(argv[i]));
     }
-    msg(RSTRING_PTR(str));
+    پیغام(RSTRING_PTR(str));
 
-    if (argc == 1)
+    اگر (argc == 1)
 	ret = argv[0];
-    else if (argc > 1)
+    ورنہ اگر (argc > 1)
 	ret = rb_ary_new4(argc, argv);
-    return ret;
+    واپس ret;
 }
 
-    static void
-ruby_io_init(void)
+    ساکن خالی
+ruby_io_init(خالی)
 {
-#ifndef DYNAMIC_RUBY
-    RUBYEXTERN VALUE rb_stdout;
-    RUBYEXTERN VALUE rb_stderr;
-#endif
+#اگر_غیر_تعریف_شدہ DYNAMIC_RUBY
+    RUBYEXTERN قدر_3 rb_stdout;
+    RUBYEXTERN قدر_3 rb_stderr;
+#اگر_ختم
 
     rb_stdout = rb_obj_alloc(rb_cObject);
     rb_stderr = rb_obj_alloc(rb_cObject);
-    rb_define_singleton_method(rb_stdout, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stdout, "flush", (void*)f_nop, 0);
-    rb_define_singleton_method(rb_stderr, "write", (void*)vim_message, 1);
-    rb_define_singleton_method(rb_stderr, "flush", (void*)f_nop, 0);
+    rb_define_singleton_طریقہ(rb_stdout, "write", (خالی*)vim_پیغام, 1);
+    rb_define_singleton_طریقہ(rb_stdout, "flush", (خالی*)f_nop, 0);
+    rb_define_singleton_طریقہ(rb_stderr, "write", (خالی*)vim_پیغام, 1);
+    rb_define_singleton_طریقہ(rb_stderr, "flush", (خالی*)f_nop, 0);
     rb_define_global_function("p", f_p, -1);
 }
 
-    static void
-ruby_vim_init(void)
+    ساکن خالی
+ruby_vim_init(خالی)
 {
     objtbl = rb_hash_new();
     rb_global_variable(&objtbl);
@@ -1752,139 +1752,139 @@ ruby_vim_init(void)
     // alias "VIM" for backwards compatibility.
     mVIM = rb_define_module("Vim");
     rb_define_const(rb_cObject, "VIM", mVIM);
-    rb_define_const(mVIM, "VERSION_MAJOR", INT2NUM(VIM_VERSION_MAJOR));
-    rb_define_const(mVIM, "VERSION_MINOR", INT2NUM(VIM_VERSION_MINOR));
-    rb_define_const(mVIM, "VERSION_BUILD", INT2NUM(VIM_VERSION_BUILD));
-    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2NUM(VIM_VERSION_PATCHLEVEL));
-    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_VERSION_SHORT));
-    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_VERSION_MEDIUM));
-    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_VERSION_LONG));
-    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_VERSION_LONG_DATE));
-    rb_define_module_function(mVIM, "message", vim_message, 1);
-    rb_define_module_function(mVIM, "set_option", vim_set_option, 1);
+    rb_define_const(mVIM, "VERSION_MAJOR", INT2_عدد(VIM_نسخہ_MAJOR));
+    rb_define_const(mVIM, "VERSION_MINOR", INT2_عدد(VIM_نسخہ_MINOR));
+    rb_define_const(mVIM, "VERSION_BUILD", INT2_عدد(VIM_نسخہ_BUILD));
+    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2_عدد(VIM_نسخہ_PATCHLEVEL));
+    rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_نسخہ_SHORT));
+    rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_نسخہ_MEDIUM));
+    rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_نسخہ_LONG));
+    rb_define_const(mVIM, "VERSION_LONG_DATE", rb_str_new2(VIM_نسخہ_LONG_DATE));
+    rb_define_module_function(mVIM, "message", vim_پیغام, 1);
+    rb_define_module_function(mVIM, "set_option", vim_سیٹ_option, 1);
     rb_define_module_function(mVIM, "command", vim_command, 1);
     rb_define_module_function(mVIM, "evaluate", vim_evaluate, 1);
     rb_define_module_function(mVIM, "blob", vim_blob, 1);
 
-    eDeletedBufferError = rb_define_class_under(mVIM, "DeletedBufferError",
+    e_Deleted_بفر_Error = rb_define_class_under(mVIM, "DeletedBufferError",
 						rb_eStandardError);
-    eDeletedWindowError = rb_define_class_under(mVIM, "DeletedWindowError",
+    e_Deleted_کھڑکی_Error = rb_define_class_under(mVIM, "DeletedWindowError",
 						rb_eStandardError);
 
-    cBuffer = rb_define_class_under(mVIM, "Buffer", rb_cObject);
-    rb_define_singleton_method(cBuffer, "current", (void*)buffer_s_current, 0);
-    rb_define_singleton_method(cBuffer, "count", (void*)buffer_s_count, 0);
-    rb_define_singleton_method(cBuffer, "[]", (void*)buffer_s_aref, 1);
-    rb_define_method(cBuffer, "name", (void*)buffer_name, 0);
-    rb_define_method(cBuffer, "number", (void*)buffer_number, 0);
-    rb_define_method(cBuffer, "count", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "length", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "[]", (void*)buffer_aref, 1);
-    rb_define_method(cBuffer, "[]=", (void*)buffer_aset, 2);
-    rb_define_method(cBuffer, "delete", (void*)buffer_delete, 1);
-    rb_define_method(cBuffer, "append", (void*)buffer_append, 2);
+    c_بفر = rb_define_class_under(mVIM, "Buffer", rb_cObject);
+    rb_define_singleton_طریقہ(c_بفر, "current", (خالی*)بفر_s_current, 0);
+    rb_define_singleton_طریقہ(c_بفر, "count", (خالی*)بفر_s_گنتی, 0);
+    rb_define_singleton_طریقہ(c_بفر, "[]", (خالی*)بفر_s_aref, 1);
+    rb_define_طریقہ(c_بفر, "name", (خالی*)بفر_name, 0);
+    rb_define_طریقہ(c_بفر, "number", (خالی*)بفر_نمبر, 0);
+    rb_define_طریقہ(c_بفر, "count", (خالی*)بفر_گنتی, 0);
+    rb_define_طریقہ(c_بفر, "length", (خالی*)بفر_گنتی, 0);
+    rb_define_طریقہ(c_بفر, "[]", (خالی*)بفر_aref, 1);
+    rb_define_طریقہ(c_بفر, "[]=", (خالی*)بفر_aset, 2);
+    rb_define_طریقہ(c_بفر, "delete", (خالی*)بفر_delete, 1);
+    rb_define_طریقہ(c_بفر, "append", (خالی*)بفر_append, 2);
 
     // Added line manipulation functions
     //   SegPhault - 03/07/05
-    rb_define_method(cBuffer, "line_number", (void*)current_line_number, 0);
-    rb_define_method(cBuffer, "line", (void*)line_s_current, 0);
-    rb_define_method(cBuffer, "line=", (void*)set_current_line, 1);
+    rb_define_طریقہ(c_بفر, "line_number", (خالی*)current_سطر_نمبر, 0);
+    rb_define_طریقہ(c_بفر, "line", (خالی*)سطر_s_current, 0);
+    rb_define_طریقہ(c_بفر, "line=", (خالی*)سیٹ_current_سطر, 1);
 
 
-    cVimWindow = rb_define_class_under(mVIM, "Window", rb_cObject);
-    rb_define_singleton_method(cVimWindow, "current", (void*)window_s_current, 0);
-    rb_define_singleton_method(cVimWindow, "count", (void*)window_s_count, 0);
-    rb_define_singleton_method(cVimWindow, "[]", (void*)window_s_aref, 1);
-    rb_define_method(cVimWindow, "buffer", (void*)window_buffer, 0);
-    rb_define_method(cVimWindow, "height", (void*)window_height, 0);
-    rb_define_method(cVimWindow, "height=", (void*)window_set_height, 1);
-    rb_define_method(cVimWindow, "width", (void*)window_width, 0);
-    rb_define_method(cVimWindow, "width=", (void*)window_set_width, 1);
-    rb_define_method(cVimWindow, "cursor", (void*)window_cursor, 0);
-    rb_define_method(cVimWindow, "cursor=", (void*)window_set_cursor, 1);
+    c_Vim_کھڑکی = rb_define_class_under(mVIM, "Window", rb_cObject);
+    rb_define_singleton_طریقہ(c_Vim_کھڑکی, "current", (خالی*)کھڑکی_s_current, 0);
+    rb_define_singleton_طریقہ(c_Vim_کھڑکی, "count", (خالی*)کھڑکی_s_گنتی, 0);
+    rb_define_singleton_طریقہ(c_Vim_کھڑکی, "[]", (خالی*)کھڑکی_s_aref, 1);
+    rb_define_طریقہ(c_Vim_کھڑکی, "buffer", (خالی*)کھڑکی_بفر, 0);
+    rb_define_طریقہ(c_Vim_کھڑکی, "height", (خالی*)کھڑکی_اونچائی, 0);
+    rb_define_طریقہ(c_Vim_کھڑکی, "height=", (خالی*)کھڑکی_سیٹ_اونچائی, 1);
+    rb_define_طریقہ(c_Vim_کھڑکی, "width", (خالی*)کھڑکی_چوڑائی, 0);
+    rb_define_طریقہ(c_Vim_کھڑکی, "width=", (خالی*)کھڑکی_سیٹ_چوڑائی, 1);
+    rb_define_طریقہ(c_Vim_کھڑکی, "cursor", (خالی*)کھڑکی_cursor, 0);
+    rb_define_طریقہ(c_Vim_کھڑکی, "cursor=", (خالی*)کھڑکی_سیٹ_cursor, 1);
 
-    rb_define_virtual_variable("$curbuf", buffer_s_current_getter, 0);
-    rb_define_virtual_variable("$curwin", window_s_current_getter, 0);
+    rb_define_virtual_variable("$curbuf", بفر_s_current_getter, 0);
+    rb_define_virtual_variable("$curwin", کھڑکی_s_current_getter, 0);
 }
 
-    void
-vim_ruby_init(void *stack_start)
+    خالی
+vim_ruby_init(خالی *ڈھیر_آغاز)
 {
     // should get machine stack start address early in main function
-    ruby_stack_start = stack_start;
+    ruby_ڈھیر_آغاز = ڈھیر_آغاز;
 }
 
-    static int
-convert_hash2dict(VALUE key, VALUE val, VALUE arg)
+    ساکن صحیح
+convert_hash2dict(قدر_3 کلید, قدر_3 val, قدر_3 arg)
 {
     dict_T *d = (dict_T *)arg;
     dictitem_T *di;
 
-    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(key)));
-    if (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
-						     || dict_add(d, di) != OK)
+    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(کلید)));
+    اگر (di == تہی || ruby_convert_مقصد_vim_قدر(val, &di->di_tv) != OK
+						     || dict_جوڑو(d, di) != OK)
     {
 	d->dv_hashtab.ht_flags |= HTFLAGS_ERROR;
-	return ST_STOP;
+	واپس ST_STOP;
     }
-    return ST_CONTINUE;
+    واپس ST_CONTINUE;
 }
 
-    static int
-ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
+    ساکن صحیح
+ruby_convert_مقصد_vim_قدر(قدر_3 val, typval_T *rettv)
 {
-    switch (TYPE(val))
+    انتخاب (TYPE(val))
     {
-	case T_NIL:
+	حالت T_NIL:
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
-	    break;
-	case T_TRUE:
+	    rettv->vval.v_نمبر = VVAL_NULL;
+	    توڑو;
+	حالت T_TRUE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_TRUE;
-	    break;
-	case T_FALSE:
+	    rettv->vval.v_نمبر = VVAL_TRUE;
+	    توڑو;
+	حالت T_FALSE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_FALSE;
-	    break;
-	case T_BIGNUM:
-	case T_FIXNUM:
-	    rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = (varnumber_T)NUM2LONG(val);
-	    break;
-	case T_FLOAT:
+	    rettv->vval.v_نمبر = VVAL_FALSE;
+	    توڑو;
+	حالت T_BIGNUM:
+	حالت T_FIXNUM:
+	    rettv->v_type = VAR_نمبر;
+	    rettv->vval.v_نمبر = (varnumber_T)NUM2LONG(val);
+	    توڑو;
+	حالت T_FLOAT:
 	    rettv->v_type = VAR_FLOAT;
 	    rettv->vval.v_float = (float_T)NUM2DBL(val);
-	    break;
-	default:
+	    توڑو;
+	طےشدہ:
 	    val = rb_obj_as_string(val);
 	    // FALLTHROUGH
-	case T_STRING:
+	حالت T_STRING:
 	    {
-		VALUE str = (VALUE)RSTRING(val);
+		قدر_3 str = (قدر_3)RSTRING(val);
 
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = vim_strnsave((char_u *)RSTRING_PTR(str),
 							     RSTRING_LEN(str));
 	    }
-	    break;
-	case T_ARRAY:
+	    توڑو;
+	حالت T_ARRAY:
 	    {
 		list_T *l;
-		long i;
+		طویل i;
 		typval_T v;
 
 		l = list_alloc();
-		if (l == NULL)
-		    return FAIL;
+		اگر (l == تہی)
+		    واپس FAIL;
 
-		for (i = 0; i < RARRAY_LEN(val); ++i)
+		برائے (i = 0; i < RARRAY_LEN(val); ++i)
 		{
-		    if (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
+		    اگر (ruby_convert_مقصد_vim_قدر((قدر_3)RARRAY_PTR(val)[i],
 									&v) != OK)
 		    {
 			list_unref(l);
-			return FAIL;
+			واپس FAIL;
 		    }
 		    list_append_tv(l, &v);
 		    clear_tv(&v);
@@ -1894,50 +1894,50 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		rettv->vval.v_list = l;
 		++l->lv_refcount;
 	    }
-	    break;
-	case T_HASH:
+	    توڑو;
+	حالت T_HASH:
 	    {
 		dict_T *d;
 
 		d = dict_alloc();
-		if (d == NULL)
-		    return FAIL;
+		اگر (d == تہی)
+		    واپس FAIL;
 
-		rb_hash_foreach(val, convert_hash2dict, (VALUE)d);
-		if (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
+		rb_hash_foreach(val, convert_hash2dict, (قدر_3)d);
+		اگر (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
 		{
 		    dict_unref(d);
-		    return FAIL;
+		    واپس FAIL;
 		}
 
 		rettv->v_type = VAR_DICT;
 		rettv->vval.v_dict = d;
 		++d->dv_refcount;
 	    }
-	    break;
+	    توڑو;
     }
-    return OK;
+    واپس OK;
 }
 
-    void
+    خالی
 do_rubyeval(char_u *str, typval_T *rettv)
 {
-    int retval = FAIL;
+    صحیح retval = FAIL;
 
-    if (ensure_ruby_initialized())
+    اگر (ensure_ruby_initialized())
     {
-	int state;
-	VALUE obj;
+	صحیح state;
+	قدر_3 obj;
 
-	obj = rb_eval_string_protect((const char *)str, &state);
-	if (state)
+	obj = rb_eval_string_protect((ثابت حرف *)str, &state);
+	اگر (state)
 	    error_print(state);
-	else
-	    retval = ruby_convert_to_vim_value(obj, rettv);
+	ورنہ
+	    retval = ruby_convert_مقصد_vim_قدر(obj, rettv);
     }
-    if (retval == FAIL)
+    اگر (retval == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_نمبر;
+	rettv->vval.v_نمبر = 0;
     }
 }

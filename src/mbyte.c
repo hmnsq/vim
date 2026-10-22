@@ -77,64 +77,64 @@
  * some commands, like ":menutrans"
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#ifdef WIN32UNIX
-# ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
+#اگر_تعریف_شدہ WIN32UNIX
+# ifndef WIN32_LEAN_AND_اوسط
+#  define WIN32_LEAN_AND_اوسط
 # endif
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# اگر defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 #  ifdef __CYGWIN__
     // ControlMask from <X11/X.h> (included in "vim.h") is conflicting with
     // <w32api/windows.h> (included in <X11/Xwindows.h>).
-#   undef ControlMask
+#   undef Control_نقاب
 #  endif
 #  include <X11/Xwindows.h>
 #  define WINBYTE wBYTE
-# else
+# ورنہ
 #  include <windows.h>
 #  define WINBYTE BYTE
 # endif
 # ifdef WIN32
 #  undef WIN32	    // Some windows.h define WIN32, we don't want that here.
 # endif
-#else
+#ورنہ
 # define WINBYTE BYTE
-#endif
+#اگر_ختم
 
-#if defined(MSWIN) || defined(WIN32UNIX)
+#اگر defined(MSWIN) || defined(WIN32UNIX)
 # include <winnls.h>
-#endif
+#اگر_ختم
 
-#ifdef FEAT_GUI_X11
+#اگر_تعریف_شدہ FEAT_GUI_X11
 # include <X11/Intrinsic.h>
-#endif
-#ifdef X_LOCALE
+#اگر_ختم
+#اگر_تعریف_شدہ X_LOCALE
 # include <X11/Xlocale.h>
-# if !defined(HAVE_MBLEN) && !defined(mblen)
+# اگر !defined(HAVE_MBLEN) && !defined(mblen)
 #  define mblen _Xmblen
 # endif
-#endif
+#اگر_ختم
 
-#ifdef HAVE_WCHAR_H
+#اگر_تعریف_شدہ HAVE_WCHAR_H
 # include <wchar.h>
-#endif
+#اگر_ختم
 
-static int dbcs_char2len(int c);
-static int dbcs_char2bytes(int c, char_u *buf);
-static int dbcs_ptr2len(char_u *p);
-static int dbcs_ptr2len_len(char_u *p, int size);
-static int utf_ptr2cells_len(char_u *p, int size);
-static int dbcs_char2cells(int c);
-static int dbcs_ptr2cells_len(char_u *p, int size);
-static int dbcs_ptr2char(char_u *p);
-static int dbcs_head_off(char_u *base, char_u *p);
-static inline int utf_ptr2char_and_len(char_u *p, int *lenp);
-static inline int utf_ptr2char_and_len_len(char_u *p, int size, int *lenp);
-static inline int utf_iscomposinglike_char(int c1, int c2);
-#ifdef FEAT_EVAL
-static int cw_value(int c);
-#endif
+ساکن صحیح dbcs_char2len(صحیح c);
+ساکن صحیح dbcs_char2bytes(صحیح c, char_u *buf);
+ساکن صحیح dbcs_ptr2len(char_u *p);
+ساکن صحیح dbcs_ptr2len_len(char_u *p, صحیح سائز);
+ساکن صحیح utf_ptr2cells_len(char_u *p, صحیح سائز);
+ساکن صحیح dbcs_char2cells(صحیح c);
+ساکن صحیح dbcs_ptr2cells_len(char_u *p, صحیح سائز);
+ساکن صحیح dbcs_ptr2char(char_u *p);
+ساکن صحیح dbcs_سر_off(char_u *بنیاد, char_u *p);
+ساکن اندرونی صحیح utf_ptr2char_and_len(char_u *p, صحیح *lenp);
+ساکن اندرونی صحیح utf_ptr2char_and_len_len(char_u *p, صحیح سائز, صحیح *lenp);
+ساکن اندرونی صحیح utf_iscomposinglike_char(صحیح c1, صحیح c2);
+#اگر_تعریف_شدہ FEAT_EVAL
+ساکن صحیح cw_قدر(صحیح c);
+#اگر_ختم
 
 /*
  * Lookup table to quickly get the length in bytes of a UTF-8 character from
@@ -142,7 +142,7 @@ static int cw_value(int c);
  * Bytes which are illegal when used as the first byte have a 1.
  * The NUL byte has length 1.
  */
-static char utf8len_tab[256] =
+ساکن حرف utf8len_tab[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -157,7 +157,7 @@ static char utf8len_tab[256] =
 /*
  * Like utf8len_tab above, but using a zero for illegal lead bytes.
  */
-static char utf8len_tab_zero[256] =
+ساکن حرف utf8len_tab_zero[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -174,149 +174,149 @@ static char utf8len_tab_zero[256] =
  * Canonical encoding names and their properties.
  * "iso-8859-n" is handled by enc_canonize() directly.
  */
-static struct
-{   char *name;		int prop;		int codepage;}
-enc_canon_table[] =
+ساکن ساخت
+{   حرف *name;		صحیح prop;		صحیح codepage;}
+enc_canon_جدول[] =
 {
-#define IDX_LATIN_1	0
-    {"latin1",		ENC_8BIT + ENC_LATIN1,	1252},
-#define IDX_ISO_2	1
-    {"iso-8859-2",	ENC_8BIT,		0},
-#define IDX_ISO_3	2
-    {"iso-8859-3",	ENC_8BIT,		0},
-#define IDX_ISO_4	3
-    {"iso-8859-4",	ENC_8BIT,		0},
-#define IDX_ISO_5	4
-    {"iso-8859-5",	ENC_8BIT,		0},
-#define IDX_ISO_6	5
-    {"iso-8859-6",	ENC_8BIT,		0},
-#define IDX_ISO_7	6
-    {"iso-8859-7",	ENC_8BIT,		0},
-#define IDX_ISO_8	7
-    {"iso-8859-8",	ENC_8BIT,		0},
-#define IDX_ISO_9	8
-    {"iso-8859-9",	ENC_8BIT,		0},
-#define IDX_ISO_10	9
-    {"iso-8859-10",	ENC_8BIT,		0},
-#define IDX_ISO_11	10
-    {"iso-8859-11",	ENC_8BIT,		0},
-#define IDX_ISO_13	11
-    {"iso-8859-13",	ENC_8BIT,		0},
-#define IDX_ISO_14	12
-    {"iso-8859-14",	ENC_8BIT,		0},
-#define IDX_ISO_15	13
-    {"iso-8859-15",	ENC_8BIT + ENC_LATIN9,	0},
-#define IDX_KOI8_R	14
-    {"koi8-r",		ENC_8BIT,		0},
-#define IDX_KOI8_U	15
-    {"koi8-u",		ENC_8BIT,		0},
-#define IDX_UTF8	16
+#تعریف_کرو IDX_LATIN_1	0
+    {"latin1",		ENC_8_ثنائی_ہندسہ + ENC_LATIN1,	1252},
+#تعریف_کرو IDX_ISO_2	1
+    {"iso-8859-2",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_3	2
+    {"iso-8859-3",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_4	3
+    {"iso-8859-4",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_5	4
+    {"iso-8859-5",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_6	5
+    {"iso-8859-6",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_7	6
+    {"iso-8859-7",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_8	7
+    {"iso-8859-8",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_9	8
+    {"iso-8859-9",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_10	9
+    {"iso-8859-10",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_11	10
+    {"iso-8859-11",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_13	11
+    {"iso-8859-13",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_14	12
+    {"iso-8859-14",	ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_ISO_15	13
+    {"iso-8859-15",	ENC_8_ثنائی_ہندسہ + ENC_LATIN9,	0},
+#تعریف_کرو IDX_KOI8_R	14
+    {"koi8-r",		ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_KOI8_U	15
+    {"koi8-u",		ENC_8_ثنائی_ہندسہ,		0},
+#تعریف_کرو IDX_UTF8	16
     {"utf-8",		ENC_UNICODE,		0},
-#define IDX_UCS2	17
+#تعریف_کرو IDX_UCS2	17
     {"ucs-2",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2BYTE, 0},
-#define IDX_UCS2LE	18
+#تعریف_کرو IDX_UCS2LE	18
     {"ucs-2le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_2BYTE, 0},
-#define IDX_UTF16	19
-    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16BE	20
-    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2WORD, 0},
-#define IDX_UTF16LE	21
-    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2WORD, 0},
-#define IDX_UCS4	22
+#تعریف_کرو IDX_UTF16	19
+    {"utf-16",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_لفظ, 0},
+#تعریف_کرو IDX_UTF16BE	20
+    {"utf-16be",		ENC_UNICODE + ENC_ENDIAN_B + ENC_2_لفظ, 0},
+#تعریف_کرو IDX_UTF16LE	21
+    {"utf-16le",	ENC_UNICODE + ENC_ENDIAN_L + ENC_2_لفظ, 0},
+#تعریف_کرو IDX_UCS4	22
     {"ucs-4",		ENC_UNICODE + ENC_ENDIAN_B + ENC_4BYTE, 0},
-#define IDX_UCS4LE	23
+#تعریف_کرو IDX_UCS4LE	23
     {"ucs-4le",		ENC_UNICODE + ENC_ENDIAN_L + ENC_4BYTE, 0},
 
     // For debugging DBCS encoding on Unix.
-#define IDX_DEBUG	24
+#تعریف_کرو IDX_DEBUG	24
     {"debug",		ENC_DBCS,		DBCS_DEBUG},
-#define IDX_EUC_JP	25
+#تعریف_کرو IDX_EUC_JP	25
     {"euc-jp",		ENC_DBCS,		DBCS_JPNU},
-#define IDX_SJIS	26
+#تعریف_کرو IDX_SJIS	26
     {"sjis",		ENC_DBCS,		DBCS_JPN},
-#define IDX_EUC_KR	27
+#تعریف_کرو IDX_EUC_KR	27
     {"euc-kr",		ENC_DBCS,		DBCS_KORU},
-#define IDX_EUC_CN	28
+#تعریف_کرو IDX_EUC_CN	28
     {"euc-cn",		ENC_DBCS,		DBCS_CHSU},
-#define IDX_EUC_TW	29
+#تعریف_کرو IDX_EUC_TW	29
     {"euc-tw",		ENC_DBCS,		DBCS_CHTU},
-#define IDX_BIG5	30
+#تعریف_کرو IDX_BIG5	30
     {"big5",		ENC_DBCS,		DBCS_CHT},
 
     // MS-DOS and MS-Windows codepages are included here, so that they can be
     // used on Unix too.  Most of them are similar to ISO-8859 encodings, but
     // not exactly the same.
-#define IDX_CP437	31
-    {"cp437",		ENC_8BIT,		437}, // like iso-8859-1
-#define IDX_CP737	32
-    {"cp737",		ENC_8BIT,		737}, // like iso-8859-7
-#define IDX_CP775	33
-    {"cp775",		ENC_8BIT,		775}, // Baltic
-#define IDX_CP850	34
-    {"cp850",		ENC_8BIT,		850}, // like iso-8859-4
-#define IDX_CP852	35
-    {"cp852",		ENC_8BIT,		852}, // like iso-8859-1
-#define IDX_CP855	36
-    {"cp855",		ENC_8BIT,		855}, // like iso-8859-2
-#define IDX_CP857	37
-    {"cp857",		ENC_8BIT,		857}, // like iso-8859-5
-#define IDX_CP860	38
-    {"cp860",		ENC_8BIT,		860}, // like iso-8859-9
-#define IDX_CP861	39
-    {"cp861",		ENC_8BIT,		861}, // like iso-8859-1
-#define IDX_CP862	40
-    {"cp862",		ENC_8BIT,		862}, // like iso-8859-1
-#define IDX_CP863	41
-    {"cp863",		ENC_8BIT,		863}, // like iso-8859-8
-#define IDX_CP865	42
-    {"cp865",		ENC_8BIT,		865}, // like iso-8859-1
-#define IDX_CP866	43
-    {"cp866",		ENC_8BIT,		866}, // like iso-8859-5
-#define IDX_CP869	44
-    {"cp869",		ENC_8BIT,		869}, // like iso-8859-7
-#define IDX_CP874	45
-    {"cp874",		ENC_8BIT,		874}, // Thai
-#define IDX_CP932	46
+#تعریف_کرو IDX_CP437	31
+    {"cp437",		ENC_8_ثنائی_ہندسہ,		437}, // like iso-8859-1
+#تعریف_کرو IDX_CP737	32
+    {"cp737",		ENC_8_ثنائی_ہندسہ,		737}, // like iso-8859-7
+#تعریف_کرو IDX_CP775	33
+    {"cp775",		ENC_8_ثنائی_ہندسہ,		775}, // Baltic
+#تعریف_کرو IDX_CP850	34
+    {"cp850",		ENC_8_ثنائی_ہندسہ,		850}, // like iso-8859-4
+#تعریف_کرو IDX_CP852	35
+    {"cp852",		ENC_8_ثنائی_ہندسہ,		852}, // like iso-8859-1
+#تعریف_کرو IDX_CP855	36
+    {"cp855",		ENC_8_ثنائی_ہندسہ,		855}, // like iso-8859-2
+#تعریف_کرو IDX_CP857	37
+    {"cp857",		ENC_8_ثنائی_ہندسہ,		857}, // like iso-8859-5
+#تعریف_کرو IDX_CP860	38
+    {"cp860",		ENC_8_ثنائی_ہندسہ,		860}, // like iso-8859-9
+#تعریف_کرو IDX_CP861	39
+    {"cp861",		ENC_8_ثنائی_ہندسہ,		861}, // like iso-8859-1
+#تعریف_کرو IDX_CP862	40
+    {"cp862",		ENC_8_ثنائی_ہندسہ,		862}, // like iso-8859-1
+#تعریف_کرو IDX_CP863	41
+    {"cp863",		ENC_8_ثنائی_ہندسہ,		863}, // like iso-8859-8
+#تعریف_کرو IDX_CP865	42
+    {"cp865",		ENC_8_ثنائی_ہندسہ,		865}, // like iso-8859-1
+#تعریف_کرو IDX_CP866	43
+    {"cp866",		ENC_8_ثنائی_ہندسہ,		866}, // like iso-8859-5
+#تعریف_کرو IDX_CP869	44
+    {"cp869",		ENC_8_ثنائی_ہندسہ,		869}, // like iso-8859-7
+#تعریف_کرو IDX_CP874	45
+    {"cp874",		ENC_8_ثنائی_ہندسہ,		874}, // Thai
+#تعریف_کرو IDX_CP932	46
     {"cp932",		ENC_DBCS,		DBCS_JPN},
-#define IDX_CP936	47
+#تعریف_کرو IDX_CP936	47
     {"cp936",		ENC_DBCS,		DBCS_CHS},
-#define IDX_CP949	48
+#تعریف_کرو IDX_CP949	48
     {"cp949",		ENC_DBCS,		DBCS_KOR},
-#define IDX_CP950	49
+#تعریف_کرو IDX_CP950	49
     {"cp950",		ENC_DBCS,		DBCS_CHT},
-#define IDX_CP1250	50
-    {"cp1250",		ENC_8BIT,		1250}, // Czech, Polish, etc.
-#define IDX_CP1251	51
-    {"cp1251",		ENC_8BIT,		1251}, // Cyrillic
+#تعریف_کرو IDX_CP1250	50
+    {"cp1250",		ENC_8_ثنائی_ہندسہ,		1250}, // Czech, Polish, etc.
+#تعریف_کرو IDX_CP1251	51
+    {"cp1251",		ENC_8_ثنائی_ہندسہ,		1251}, // Cyrillic
     // cp1252 is considered to be equal to latin1
-#define IDX_CP1253	52
-    {"cp1253",		ENC_8BIT,		1253}, // Greek
-#define IDX_CP1254	53
-    {"cp1254",		ENC_8BIT,		1254}, // Turkish
-#define IDX_CP1255	54
-    {"cp1255",		ENC_8BIT,		1255}, // Hebrew
-#define IDX_CP1256	55
-    {"cp1256",		ENC_8BIT,		1256}, // Arabic
-#define IDX_CP1257	56
-    {"cp1257",		ENC_8BIT,		1257}, // Baltic
-#define IDX_CP1258	57
-    {"cp1258",		ENC_8BIT,		1258}, // Vietnamese
+#تعریف_کرو IDX_CP1253	52
+    {"cp1253",		ENC_8_ثنائی_ہندسہ,		1253}, // Greek
+#تعریف_کرو IDX_CP1254	53
+    {"cp1254",		ENC_8_ثنائی_ہندسہ,		1254}, // Turkish
+#تعریف_کرو IDX_CP1255	54
+    {"cp1255",		ENC_8_ثنائی_ہندسہ,		1255}, // Hebrew
+#تعریف_کرو IDX_CP1256	55
+    {"cp1256",		ENC_8_ثنائی_ہندسہ,		1256}, // Arabic
+#تعریف_کرو IDX_CP1257	56
+    {"cp1257",		ENC_8_ثنائی_ہندسہ,		1257}, // Baltic
+#تعریف_کرو IDX_CP1258	57
+    {"cp1258",		ENC_8_ثنائی_ہندسہ,		1258}, // Vietnamese
 
-#define IDX_MACROMAN	58
-    {"macroman",	ENC_8BIT + ENC_MACROMAN, 0},	// Mac OS
-#define IDX_DECMCS	59
-    {"dec-mcs",		ENC_8BIT,		0},	// DEC MCS
-#define IDX_HPROMAN8	60
-    {"hp-roman8",	ENC_8BIT,		0},	// HP Roman8
-#define IDX_COUNT	61
+#تعریف_کرو IDX_MACROMAN	58
+    {"macroman",	ENC_8_ثنائی_ہندسہ + ENC_MACROMAN, 0},	// Mac OS
+#تعریف_کرو IDX_DECMCS	59
+    {"dec-mcs",		ENC_8_ثنائی_ہندسہ,		0},	// DEC MCS
+#تعریف_کرو IDX_HPROMAN8	60
+    {"hp-roman8",	ENC_8_ثنائی_ہندسہ,		0},	// HP Roman8
+#تعریف_کرو IDX_گنتی	61
 };
 
 /*
  * Aliases for encoding names.
  */
-static struct
-{   char *name;		int canon;}
-enc_alias_table[] =
+ساکن ساخت
+{   حرف *name;		صحیح canon;}
+enc_alias_جدول[] =
 {
     {"ansi",		IDX_LATIN_1},
     {"iso-8859-1",	IDX_LATIN_1},
@@ -327,11 +327,11 @@ enc_alias_table[] =
     {"cyrillic",	IDX_ISO_5},
     {"arabic",		IDX_ISO_6},
     {"greek",		IDX_ISO_7},
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
     {"hebrew",		IDX_CP1255},
-#else
+#ورنہ
     {"hebrew",		IDX_ISO_8},
-#endif
+#اگر_ختم
     {"latin5",		IDX_ISO_9},
     {"turkish",		IDX_ISO_9}, // ?
     {"latin6",		IDX_ISO_10},
@@ -375,14 +375,14 @@ enc_alias_table[] =
     {"euccn",		IDX_EUC_CN},
     {"gb2312",		IDX_EUC_CN},
     {"euctw",		IDX_EUC_TW},
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#اگر defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
     {"japan",		IDX_CP932},
     {"korea",		IDX_CP949},
     {"prc",		IDX_CP936},
     {"chinese",		IDX_CP936},
     {"taiwan",		IDX_CP950},
     {"big5",		IDX_CP950},
-#else
+#ورنہ
     {"japan",		IDX_EUC_JP},
     {"korea",		IDX_EUC_KR},
     {"prc",		IDX_EUC_CN},
@@ -390,29 +390,29 @@ enc_alias_table[] =
     {"taiwan",		IDX_EUC_TW},
     {"cp950",		IDX_BIG5},
     {"950",		IDX_BIG5},
-#endif
+#اگر_ختم
     {"mac",		IDX_MACROMAN},
     {"mac-roman",	IDX_MACROMAN},
-    {NULL,		0}
+    {تہی,		0}
 };
 
-#ifndef CP_UTF8
+#اگر_غیر_تعریف_شدہ CP_UTF8
 # define CP_UTF8 65001	// magic number from winnls.h
-#endif
+#اگر_ختم
 
 /*
  * Find encoding "name" in the list of canonical encoding names.
  * Returns -1 if not found.
  */
-    static int
-enc_canon_search(char_u *name)
+    ساکن صحیح
+enc_canon_تلاش(char_u *name)
 {
-    int		i;
+    صحیح		i;
 
-    for (i = 0; i < IDX_COUNT; ++i)
-	if (STRCMP(name, enc_canon_table[i].name) == 0)
-	    return i;
-    return -1;
+    برائے (i = 0; i < IDX_گنتی; ++i)
+	اگر (STRCMP(name, enc_canon_جدول[i].name) == 0)
+	    واپس i;
+    واپس -1;
 }
 
 
@@ -420,37 +420,37 @@ enc_canon_search(char_u *name)
  * Find canonical encoding "name" in the list and return its properties.
  * Returns 0 if not found.
  */
-    int
+    صحیح
 enc_canon_props(char_u *name)
 {
-    int		i;
+    صحیح		i;
 
-    i = enc_canon_search(name);
-    if (i >= 0)
-	return enc_canon_table[i].prop;
-#ifdef MSWIN
-    if (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
+    i = enc_canon_تلاش(name);
+    اگر (i >= 0)
+	واپس enc_canon_جدول[i].prop;
+#اگر_تعریف_شدہ MSWIN
+    اگر (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)name + 2), &cpinfo) != 0)
+	اگر (GetCPInfo(atoi((حرف *)name + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1) // some single-byte encoding
-		return ENC_8BIT;
-	    if (cpinfo.MaxCharSize == 2
+	    اگر (cpinfo.Max_Char_سائز == 1) // some single-byte encoding
+		واپس ENC_8_ثنائی_ہندسہ;
+	    اگر (cpinfo.Max_Char_سائز == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 		// must be a DBCS encoding
-		return ENC_DBCS;
+		واپس ENC_DBCS;
 	}
-	return 0;
+	واپس 0;
     }
-#endif
-    if (STRNCMP(name, "2byte-", 6) == 0)
-	return ENC_DBCS;
-    if (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
-	return ENC_8BIT;
-    return 0;
+#اگر_ختم
+    اگر (STRNCMP(name, "2byte-", 6) == 0)
+	واپس ENC_DBCS;
+    اگر (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
+	واپس ENC_8_ثنائی_ہندسہ;
+    واپس 0;
 }
 
 /*
@@ -465,126 +465,126 @@ enc_canon_props(char_u *name)
  * When there is something wrong: Returns an error message and doesn't change
  * anything.
  */
-    char *
-mb_init(void)
+    حرف *
+mb_init(خالی)
 {
-    int		i;
-    int		idx;
-    int		n;
-    int		enc_dbcs_new = 0;
-#if defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
+    صحیح		i;
+    صحیح		idx;
+    صحیح		n;
+    صحیح		enc_dbcs_new = 0;
+#اگر defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
 	&& !defined(MACOS_CONVERT)
 # define LEN_FROM_CONV
     vimconv_T	vimconv;
     char_u	*p;
-#endif
+#اگر_ختم
 
-    if (p_enc == NULL)
+    اگر (p_enc == تہی)
     {
 	// Just starting up: set the whole table to one's.
-	for (i = 0; i < 256; ++i)
+	برائے (i = 0; i < 256; ++i)
 	    mb_bytelen_tab[i] = 1;
-	input_conv.vc_type = CONV_NONE;
-	input_conv.vc_factor = 1;
+	داخلہ_conv.vc_type = CONV_NONE;
+	داخلہ_conv.vc_ضربی_عدد = 1;
 	output_conv.vc_type = CONV_NONE;
-	return NULL;
+	واپس تہی;
     }
 
-#ifdef MSWIN
-    if (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
+#اگر_تعریف_شدہ MSWIN
+    اگر (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)p_enc + 2), &cpinfo) != 0)
+	اگر (GetCPInfo(atoi((حرف *)p_enc + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1)
+	    اگر (cpinfo.Max_Char_سائز == 1)
 	    {
 		// some single-byte encoding
 		enc_unicode = 0;
 		enc_utf8 = FALSE;
 	    }
-	    else if (cpinfo.MaxCharSize == 2
+	    ورنہ اگر (cpinfo.Max_Char_سائز == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 	    {
 		// must be a DBCS encoding, check below
-		enc_dbcs_new = atoi((char *)p_enc + 2);
+		enc_dbcs_new = atoi((حرف *)p_enc + 2);
 	    }
-	    else
-		goto codepage_invalid;
+	    ورنہ
+		جاؤ codepage_invalid;
 	}
-	else if (GetLastError() == ERROR_INVALID_PARAMETER)
+	ورنہ اگر (Get_آخری_Error() == ERROR_INVALID_PARAMETER)
 	{
 codepage_invalid:
-	    return N_(e_not_valid_codepage);
+	    واپس N_(e_not_valid_codepage);
 	}
     }
-#endif
-    else if (STRNCMP(p_enc, "8bit-", 5) == 0
+#اگر_ختم
+    ورنہ اگر (STRNCMP(p_enc, "8bit-", 5) == 0
 	    || STRNCMP(p_enc, "iso-8859-", 9) == 0)
     {
 	// Accept any "8bit-" or "iso-8859-" name.
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    ورنہ اگر (STRNCMP(p_enc, "2byte-", 6) == 0)
     {
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
 	// Windows: accept only valid codepage numbers, check below.
-	if (p_enc[6] != 'c' || p_enc[7] != 'p'
-			      || (enc_dbcs_new = atoi((char *)p_enc + 8)) == 0)
-	    return e_invalid_argument;
-#else
+	اگر (p_enc[6] != 'c' || p_enc[7] != 'p'
+			      || (enc_dbcs_new = atoi((حرف *)p_enc + 8)) == 0)
+	    واپس e_invalid_دلیل;
+#ورنہ
 	// Unix: accept any "2byte-" name, assume current locale.
 	enc_dbcs_new = DBCS_2BYTE;
-#endif
+#اگر_ختم
     }
-    else if ((idx = enc_canon_search(p_enc)) >= 0)
+    ورنہ اگر ((idx = enc_canon_تلاش(p_enc)) >= 0)
     {
-	i = enc_canon_table[idx].prop;
-	if (i & ENC_UNICODE)
+	i = enc_canon_جدول[idx].prop;
+	اگر (i & ENC_UNICODE)
 	{
 	    // Unicode
 	    enc_utf8 = TRUE;
-	    if (i & (ENC_2BYTE | ENC_2WORD))
+	    اگر (i & (ENC_2BYTE | ENC_2_لفظ))
 		enc_unicode = 2;
-	    else if (i & ENC_4BYTE)
+	    ورنہ اگر (i & ENC_4BYTE)
 		enc_unicode = 4;
-	    else
+	    ورنہ
 		enc_unicode = 0;
 	}
-	else if (i & ENC_DBCS)
+	ورنہ اگر (i & ENC_DBCS)
 	{
 	    // 2byte, handle below
-	    enc_dbcs_new = enc_canon_table[idx].codepage;
+	    enc_dbcs_new = enc_canon_جدول[idx].codepage;
 	}
-	else
+	ورنہ
 	{
 	    // Must be 8-bit.
 	    enc_unicode = 0;
 	    enc_utf8 = FALSE;
 	}
     }
-    else    // Don't know what encoding this is, reject it.
-	return e_invalid_argument;
+    ورنہ    // Don't know what encoding this is, reject it.
+	واپس e_invalid_دلیل;
 
-    if (enc_dbcs_new != 0)
+    اگر (enc_dbcs_new != 0)
     {
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
 	// Check if the DBCS code page is OK.
-	if (!IsValidCodePage(enc_dbcs_new))
-	    goto codepage_invalid;
-#endif
+	اگر (!Is_Valid_رمز_صفحہ(enc_dbcs_new))
+	    جاؤ codepage_invalid;
+#اگر_ختم
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
     enc_dbcs = enc_dbcs_new;
     has_mbyte = (enc_dbcs != 0 || enc_utf8);
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#اگر defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     enc_codepage = encname2codepage(p_enc);
     enc_latin9 = (STRCMP(p_enc, "iso-8859-15") == 0);
-#endif
+#اگر_ختم
 
     // Detect an encoding that uses latin1 characters.
     enc_latin1like = (enc_utf8 || STRCMP(p_enc, "latin1") == 0
@@ -593,7 +593,7 @@ codepage_invalid:
     /*
      * Set the function pointers.
      */
-    if (enc_utf8)
+    اگر (enc_utf8)
     {
 	mb_ptr2len = utfc_ptr2len;
 	mb_ptr2len_len = utfc_ptr2len_len;
@@ -604,9 +604,9 @@ codepage_invalid:
 	mb_char2cells = utf_char2cells;
 	mb_off2cells = utf_off2cells;
 	mb_ptr2char = utf_ptr2char;
-	mb_head_off = utf_head_off;
+	mb_سر_off = utf_سر_off;
     }
-    else if (enc_dbcs != 0)
+    ورنہ اگر (enc_dbcs != 0)
     {
 	mb_ptr2len = dbcs_ptr2len;
 	mb_ptr2len_len = dbcs_ptr2len_len;
@@ -617,9 +617,9 @@ codepage_invalid:
 	mb_char2cells = dbcs_char2cells;
 	mb_off2cells = dbcs_off2cells;
 	mb_ptr2char = dbcs_ptr2char;
-	mb_head_off = dbcs_head_off;
+	mb_سر_off = dbcs_سر_off;
     }
-    else
+    ورنہ
     {
 	mb_ptr2len = latin_ptr2len;
 	mb_ptr2len_len = latin_ptr2len_len;
@@ -630,45 +630,45 @@ codepage_invalid:
 	mb_char2cells = latin_char2cells;
 	mb_off2cells = latin_off2cells;
 	mb_ptr2char = latin_ptr2char;
-	mb_head_off = latin_head_off;
+	mb_سر_off = latin_سر_off;
     }
 
     /*
      * Fill the mb_bytelen_tab[] for MB_BYTE2LEN().
      */
-#ifdef LEN_FROM_CONV
+#اگر_تعریف_شدہ LEN_FROM_CONV
     // When 'encoding' is different from the current locale mblen() won't
     // work.  Use conversion to "utf-8" instead.
     vimconv.vc_type = CONV_NONE;
-    if (enc_dbcs)
+    اگر (enc_dbcs)
     {
 	p = enc_locale();
-	if (p == NULL || STRCMP(p, p_enc) != 0)
+	اگر (p == تہی || STRCMP(p, p_enc) != 0)
 	{
-	    convert_setup(&vimconv, p_enc, (char_u *)"utf-8");
+	    convert_تیاری(&vimconv, p_enc, (char_u *)"utf-8");
 	    vimconv.vc_fail = TRUE;
 	}
 	vim_free(p);
     }
-#endif
+#اگر_ختم
 
-    for (i = 0; i < 256; ++i)
+    برائے (i = 0; i < 256; ++i)
     {
 	// Our own function to reliably check the length of UTF-8 characters,
 	// independent of mblen().
-	if (enc_utf8)
+	اگر (enc_utf8)
 	    n = utf8len_tab[i];
-	else if (enc_dbcs == 0)
+	ورنہ اگر (enc_dbcs == 0)
 	    n = 1;
-	else
+	ورنہ
 	{
-#if defined(MSWIN) || defined(WIN32UNIX)
+#اگر defined(MSWIN) || defined(WIN32UNIX)
 	    // enc_dbcs is set by setting 'fileencoding'.  It becomes a Windows
 	    // CodePage identifier, which we can pass directly in to Windows
 	    // API
 	    n = IsDBCSLeadByteEx(enc_dbcs, (WINBYTE)i) ? 2 : 1;
-#else
-# if defined(__amigaos4__) || defined(__ANDROID__) || \
+#ورنہ
+# اگر defined(__amigaos4__) || defined(__ANDROID__) || \
 				   !(defined(HAVE_MBLEN) || defined(X_LOCALE))
 	    /*
 	     * if mblen() is not available, character which MSB is turned on
@@ -676,32 +676,32 @@ codepage_invalid:
 	     * is not always true.)
 	     */
 	    n = (i & 0x80) ? 2 : 1;
-# else
-	    char buf[MB_MAXBYTES + 1];
+# ورنہ
+	    حرف buf[MB_MAXBYTES + 1];
 
-	    if (i == NUL)	// just in case mblen() can't handle ""
+	    اگر (i == NUL)	// just in case mblen() can't handle ""
 		n = 1;
-	    else
+	    ورنہ
 	    {
 		buf[0] = i;
 		buf[1] = 0;
 #  ifdef LEN_FROM_CONV
-		if (vimconv.vc_type != CONV_NONE)
+		اگر (vimconv.vc_type != CONV_NONE)
 		{
 		    /*
 		     * string_convert() should fail when converting the first
 		     * byte of a double-byte character.
 		     */
-		    p = string_convert(&vimconv, (char_u *)buf, NULL);
-		    if (p != NULL)
+		    p = string_convert(&vimconv, (char_u *)buf, تہی);
+		    اگر (p != تہی)
 		    {
 			vim_free(p);
 			n = 1;
 		    }
-		    else
+		    ورنہ
 			n = 2;
 		}
-		else
+		ورنہ
 #  endif
 		{
 		    /*
@@ -710,58 +710,58 @@ codepage_invalid:
 		     * where mblen() returns 0 for invalid character.
 		     * Therefore, following condition includes 0.
 		     */
-		    vim_ignored = mblen(NULL, 0);  // First reset the state.
-		    if (mblen(buf, (size_t)1) <= 0)
+		    vim_ignored = mblen(تہی, 0);  // First reset the state.
+		    اگر (mblen(buf, (size_t)1) <= 0)
 			n = 2;
-		    else
+		    ورنہ
 			n = 1;
 		}
 	    }
 # endif
-#endif
+#اگر_ختم
 	}
 
 	mb_bytelen_tab[i] = n;
     }
 
-#ifdef LEN_FROM_CONV
-    convert_setup(&vimconv, NULL, NULL);
-#endif
+#اگر_تعریف_شدہ LEN_FROM_CONV
+    convert_تیاری(&vimconv, تہی, تہی);
+#اگر_ختم
 
     // The cell width depends on the type of multi-byte characters.
-    (void)init_chartab();
+    (خالی)init_chartab();
 
     // When enc_utf8 is set or reset, (de)allocate ScreenLinesUC[]
     screenalloc(FALSE);
 
     // When using Unicode, set default for 'fileencodings'.
-    if (enc_utf8 && !option_was_set((char_u *)"fencs"))
-	set_fencs_unicode();
+    اگر (enc_utf8 && !option_was_سیٹ((char_u *)"fencs"))
+	سیٹ_fencs_unicode();
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
+#اگر defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
     // GNU gettext 0.10.37 supports this feature: set the codeset used for
     // translated messages independently from the current locale.
-    (void)bind_textdomain_codeset(VIMPACKAGE,
-					  enc_utf8 ? "utf-8" : (char *)p_enc);
-#endif
+    (خالی)bind_textdomain_codeset(VIMPACKAGE,
+					  enc_utf8 ? "utf-8" : (حرف *)p_enc);
+#اگر_ختم
 
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
     // When changing 'encoding' while starting up, then convert the command
     // line arguments from the active codepage to 'encoding'.
-    if (starting != 0)
+    اگر (starting != 0)
 	fix_arg_enc();
-#endif
+#اگر_ختم
 
     // Fire an autocommand to let people do custom font setup. This must be
     // after Vim has been setup for the new encoding.
-    apply_autocmds(EVENT_ENCODINGCHANGED, NULL, (char_u *)"", FALSE, curbuf);
+    apply_autocmds(EVENT_ENCODINGCHANGED, تہی, (char_u *)"", FALSE, curbuf);
 
-#ifdef FEAT_SPELL
+#اگر_تعریف_شدہ FEAT_SPELL
     // Need to reload spell dictionaries
     spell_reload();
-#endif
+#اگر_ختم
 
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -771,55 +771,55 @@ codepage_invalid:
  * 4 - UCS-4 BOM
  * 3 - UTF-8 BOM
  */
-    int
-bomb_size(void)
+    صحیح
+bomb_سائز(خالی)
 {
-    int n = 0;
+    صحیح n = 0;
 
-    if (curbuf->b_p_bomb && !curbuf->b_p_bin)
+    اگر (curbuf->b_p_bomb && !curbuf->b_p_bin)
     {
-	if (*curbuf->b_p_fenc == NUL)
+	اگر (*curbuf->b_p_fenc == NUL)
 	{
-	    if (enc_utf8)
+	    اگر (enc_utf8)
 	    {
-		if (enc_unicode != 0)
+		اگر (enc_unicode != 0)
 		    n = enc_unicode;
-		else
+		ورنہ
 		    n = 3;
 	    }
 	}
-	else if (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
+	ورنہ اگر (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
 	    n = 3;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
+	ورنہ اگر (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
 		|| STRNCMP(curbuf->b_p_fenc, "utf-16", 6) == 0)
 	    n = 2;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
+	ورنہ اگر (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
 	    n = 4;
     }
-    return n;
+    واپس n;
 }
 
-#if defined(FEAT_QUICKFIX)
+#اگر defined(FEAT_QUICKFIX)
 /*
  * Remove all BOM from "s" by moving remaining text.
  */
-    void
+    خالی
 remove_bom(char_u *s)
 {
-    if (!enc_utf8)
-	return;
+    اگر (!enc_utf8)
+	واپس;
 
     char_u *p = s;
 
-    while ((p = vim_strbyte(p, 0xef)) != NULL)
+    جب ((p = vim_strbyte(p, 0xef)) != تہی)
     {
-	if (p[1] == 0xbb && p[2] == 0xbf)
+	اگر (p[1] == 0xbb && p[2] == 0xbf)
 	    STRMOVE(p, p + 3);
-	else
+	ورنہ
 	    ++p;
     }
 }
-#endif
+#اگر_ختم
 
 /*
  * Get class of pointer:
@@ -828,65 +828,65 @@ remove_bom(char_u *s)
  * 2 for an alphanumeric word character
  * >2 for other word characters, including CJK and emoji
  */
-    int
+    صحیح
 mb_get_class(char_u *p)
 {
-    return mb_get_class_buf(p, curbuf);
+    واپس mb_get_class_buf(p, curbuf);
 }
 
-    int
+    صحیح
 mb_get_class_buf(char_u *p, buf_T *buf)
 {
-    if (MB_BYTE2LEN(p[0]) == 1)
+    اگر (MB_BYTE2LEN(p[0]) == 1)
     {
-	if (p[0] == NUL || VIM_ISWHITE(p[0]))
-	    return 0;
-	if (vim_iswordc_buf(p[0], buf))
-	    return 2;
-	return 1;
+	اگر (p[0] == NUL || VIM_ISWHITE(p[0]))
+	    واپس 0;
+	اگر (vim_iswordc_buf(p[0], buf))
+	    واپس 2;
+	واپس 1;
     }
-    if (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
-	return dbcs_class(p[0], p[1]);
-    if (enc_utf8)
-	return utf_class_buf(utf_ptr2char(p), buf);
-    return 0;
+    اگر (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
+	واپس dbcs_class(p[0], p[1]);
+    اگر (enc_utf8)
+	واپس utf_class_buf(utf_ptr2char(p), buf);
+    واپس 0;
 }
 
 /*
  * Get class of a double-byte character.  This always returns 3 or bigger.
  * TODO: Should return 1 for punctuation.
  */
-    int
-dbcs_class(unsigned lead, unsigned trail)
+    صحیح
+dbcs_class(غیرعلامتی lead, غیرعلامتی trail)
 {
-    switch (enc_dbcs)
+    انتخاب (enc_dbcs)
     {
 	// please add classify routine for your language in here
 
-	case DBCS_JPNU:	// ?
-	case DBCS_JPN:
+	حالت DBCS_JPNU:	// ?
+	حالت DBCS_JPN:
 	    {
 		// JIS code classification
-		unsigned char lb = lead;
-		unsigned char tb = trail;
+		غیرعلامتی حرف lb = lead;
+		غیرعلامتی حرف tb = trail;
 
 		// convert process code to JIS
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#اگر defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
 		// process code is SJIS
-		if (lb <= 0x9f)
+		اگر (lb <= 0x9f)
 		    lb = (lb - 0x81) * 2 + 0x21;
-		else
+		ورنہ
 		    lb = (lb - 0xc1) * 2 + 0x21;
-		if (tb <= 0x7e)
+		اگر (tb <= 0x7e)
 		    tb -= 0x1f;
-		else if (tb <= 0x9e)
+		ورنہ اگر (tb <= 0x9e)
 		    tb -= 0x20;
-		else
+		ورنہ
 		{
 		    tb -= 0x7e;
 		    lb += 1;
 		}
-#else
+#ورنہ
 		/*
 		 * XXX: Code page identification can not use with all
 		 *	    system! So, some other encoding information
@@ -899,57 +899,57 @@ dbcs_class(unsigned lead, unsigned trail)
 		// assume process code is JAPANESE-EUC
 		lb &= 0x7f;
 		tb &= 0x7f;
-#endif
+#اگر_ختم
 		// exceptions
-		switch (lb << 8 | tb)
+		انتخاب (lb << 8 | tb)
 		{
-		    case 0x2121: // ZENKAKU space
-			return 0;
-		    case 0x2122: // TOU-TEN (Japanese comma)
-		    case 0x2123: // KU-TEN (Japanese period)
-		    case 0x2124: // ZENKAKU comma
-		    case 0x2125: // ZENKAKU period
-			return 1;
-		    case 0x213c: // prolongedsound handled as KATAKANA
-			return 13;
+		    حالت 0x2121: // ZENKAKU space
+			واپس 0;
+		    حالت 0x2122: // TOU-TEN (Japanese comma)
+		    حالت 0x2123: // KU-TEN (Japanese period)
+		    حالت 0x2124: // ZENKAKU comma
+		    حالت 0x2125: // ZENKAKU period
+			واپس 1;
+		    حالت 0x213c: // prolongedsound handled as KATAKANA
+			واپس 13;
 		}
 		// sieved by KU code
-		switch (lb)
+		انتخاب (lb)
 		{
-		    case 0x21:
-		    case 0x22:
+		    حالت 0x21:
+		    حالت 0x22:
 			// special symbols
-			return 10;
-		    case 0x23:
+			واپس 10;
+		    حالت 0x23:
 			// alphanumeric
-			return 11;
-		    case 0x24:
+			واپس 11;
+		    حالت 0x24:
 			// hiragana
-			return 12;
-		    case 0x25:
+			واپس 12;
+		    حالت 0x25:
 			// katakana
-			return 13;
-		    case 0x26:
+			واپس 13;
+		    حالت 0x26:
 			// greek
-			return 14;
-		    case 0x27:
+			واپس 14;
+		    حالت 0x27:
 			// russian
-			return 15;
-		    case 0x28:
-			// lines
-			return 16;
-		    default:
+			واپس 15;
+		    حالت 0x28:
+			//سطریں
+			واپس 16;
+		    طےشدہ:
 			// kanji
-			return 17;
+			واپس 17;
 		}
 	    }
 
-	case DBCS_KORU:	// ?
-	case DBCS_KOR:
+	حالت DBCS_KORU:	// ?
+	حالت DBCS_KOR:
 	    {
 		// KS code classification
-		unsigned char c1 = lead;
-		unsigned char c2 = trail;
+		غیرعلامتی حرف c1 = lead;
+		غیرعلامتی حرف c2 = trail;
 
 		/*
 		 * 20 : Hangul
@@ -965,63 +965,63 @@ dbcs_class(unsigned lead, unsigned trail)
 		 * 30 : Cyrillic Letter
 		 */
 
-		if (c1 >= 0xB0 && c1 <= 0xC8)
+		اگر (c1 >= 0xB0 && c1 <= 0xC8)
 		    // Hangul
-		    return 20;
-#if defined(MSWIN) || defined(WIN32UNIX)
-		else if (c1 <= 0xA0 || c2 <= 0xA0)
+		    واپس 20;
+#اگر defined(MSWIN) || defined(WIN32UNIX)
+		ورنہ اگر (c1 <= 0xA0 || c2 <= 0xA0)
 		    // Extended Hangul Region : MS UHC(Unified Hangul Code)
 		    // c1: 0x81-0xA0 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xFE
 		    // c1: 0xA1-0xC6 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xA0
-		    return 20;
-#endif
+		    واپس 20;
+#اگر_ختم
 
-		else if (c1 >= 0xCA && c1 <= 0xFD)
+		ورنہ اگر (c1 >= 0xCA && c1 <= 0xFD)
 		    // Hanja
-		    return 21;
-		else switch (c1)
+		    واپس 21;
+		ورنہ انتخاب (c1)
 		{
-		    case 0xA1:
-		    case 0xA2:
+		    حالت 0xA1:
+		    حالت 0xA2:
 			// Symbols
-			return 22;
-		    case 0xA3:
+			واپس 22;
+		    حالت 0xA3:
 			// Alphanumeric
-			return 23;
-		    case 0xA4:
+			واپس 23;
+		    حالت 0xA4:
 			// Hangul Letter(Alphabet)
-			return 24;
-		    case 0xA5:
+			واپس 24;
+		    حالت 0xA5:
 			// Roman Numeral/Greek Letter
-			return 25;
-		    case 0xA6:
+			واپس 25;
+		    حالت 0xA6:
 			// Box Drawings
-			return 26;
-		    case 0xA7:
+			واپس 26;
+		    حالت 0xA7:
 			// Unit Symbols
-			return 27;
-		    case 0xA8:
-		    case 0xA9:
-			if (c2 <= 0xAF)
-			    return 25;  // Roman Letter
-			else if (c2 >= 0xF6)
-			    return 22;  // Symbols
-			else
+			واپس 27;
+		    حالت 0xA8:
+		    حالت 0xA9:
+			اگر (c2 <= 0xAF)
+			    واپس 25;  // Roman Letter
+			ورنہ اگر (c2 >= 0xF6)
+			    واپس 22;  // Symbols
+			ورنہ
 			    // Circled/Parenthesized Letter
-			    return 28;
-		    case 0xAA:
-		    case 0xAB:
+			    واپس 28;
+		    حالت 0xAA:
+		    حالت 0xAB:
 			// Hiragana/Katakana
-			return 29;
-		    case 0xAC:
+			واپس 29;
+		    حالت 0xAC:
 			// Cyrillic Letter
-			return 30;
+			واپس 30;
 		}
 	    }
-	default:
-	    break;
+	طےشدہ:
+	    توڑو;
     }
-    return 3;
+    واپس 3;
 }
 
 /*
@@ -1029,19 +1029,19 @@ dbcs_class(unsigned lead, unsigned trail)
  * Return length in bytes of character "c".
  * Returns 1 for a single-byte character.
  */
-    int
-latin_char2len(int c UNUSED)
+    صحیح
+latin_char2len(صحیح c غیر_مستعمل)
 {
-    return 1;
+    واپس 1;
 }
 
-    static int
+    ساکن صحیح
 dbcs_char2len(
-    int		c)
+    صحیح		c)
 {
-    if (c >= 0x100)
-	return 2;
-    return 1;
+    اگر (c >= 0x100)
+	واپس 2;
+    واپس 1;
 }
 
 /*
@@ -1049,57 +1049,57 @@ dbcs_char2len(
  * Convert a character to its bytes.
  * Returns the length in bytes.
  */
-    int
-latin_char2bytes(int c, char_u *buf)
+    صحیح
+latin_char2bytes(صحیح c, char_u *buf)
 {
     buf[0] = c;
-    return 1;
+    واپس 1;
 }
 
-    static int
-dbcs_char2bytes(int c, char_u *buf)
+    ساکن صحیح
+dbcs_char2bytes(صحیح c, char_u *buf)
 {
-    if (c >= 0x100)
+    اگر (c >= 0x100)
     {
-	buf[0] = (unsigned)c >> 8;
+	buf[0] = (غیرعلامتی)c >> 8;
 	buf[1] = c;
 	// Never use a NUL byte, it causes lots of trouble.  It's an invalid
 	// character anyway.
-	if (buf[1] == NUL)
+	اگر (buf[1] == NUL)
 	    buf[1] = '\n';
-	return 2;
+	واپس 2;
     }
     buf[0] = c;
-    return 1;
+    واپس 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' latin.
  */
-    int
+    صحیح
 latin_ptr2len(char_u *p)
 {
-    return *p == NUL ? 0 : 1;
+    واپس *p == NUL ? 0 : 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' DBCS.
  */
-    static int
+    ساکن صحیح
 dbcs_ptr2len(char_u *p)
 {
-    int		len;
+    صحیح		len;
 
-    if (*p == NUL)
-	return 0;
+    اگر (*p == NUL)
+	واپس 0;
 
     // if the second byte is missing the length is 1
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    اگر (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    واپس len;
 }
 
 /*
@@ -1108,67 +1108,67 @@ dbcs_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-latin_ptr2len_len(char_u *p, int size)
+    صحیح
+latin_ptr2len_len(char_u *p, صحیح سائز)
 {
-    if (size < 1 || *p == NUL)
-	return 0;
-    return 1;
+    اگر (سائز < 1 || *p == NUL)
+	واپس 0;
+    واپس 1;
 }
 
-    static int
-dbcs_ptr2len_len(char_u *p, int size)
+    ساکن صحیح
+dbcs_ptr2len_len(char_u *p, صحیح سائز)
 {
-    int		len;
+    صحیح		len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (size == 1)
-	return 1;
+    اگر (سائز < 1 || *p == NUL)
+	واپس 0;
+    اگر (سائز == 1)
+	واپس 1;
     // Check that second byte is not missing.
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    اگر (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    واپس len;
 }
 
-struct interval
+ساخت interval
 {
-    long first;
-    long last;
+    طویل پہلا;
+    طویل آخری;
 };
 
 /*
  * Return TRUE if "c" is in "table[size / sizeof(struct interval)]".
  */
-    static int
-intable(struct interval *table, size_t size, int c)
+    ساکن صحیح
+intable(ساخت interval *جدول, size_t سائز, صحیح c)
 {
-    int mid, bot, top;
+    صحیح mid, bot, چوٹی;
 
     // first quick check for Latin1 etc. characters
-    if (c < table[0].first)
-	return FALSE;
+    اگر (c < جدول[0].پہلا)
+	واپس FALSE;
 
     // binary search in table
     bot = 0;
-    top = (int)(size / sizeof(struct interval) - 1);
-    while (top >= bot)
+    چوٹی = (صحیح)(سائز / حجم(ساخت interval) - 1);
+    جب (چوٹی >= bot)
     {
-	mid = (bot + top) / 2;
-	if (table[mid].last < c)
+	mid = (bot + چوٹی) / 2;
+	اگر (جدول[mid].آخری < c)
 	    bot = mid + 1;
-	else if (table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return TRUE;
+	ورنہ اگر (جدول[mid].پہلا > c)
+	    چوٹی = mid - 1;
+	ورنہ
+	    واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 // Sorted list of non-overlapping intervals of East Asian Ambiguous
 // characters, generated with ../runtime/tools/unicode.vim.
-static struct interval ambiguous[] =
+ساکن ساخت interval ambiguous[] =
 {
     {0x00a1, 0x00a1},
     {0x00a4, 0x00a4},
@@ -1351,18 +1351,18 @@ static struct interval ambiguous[] =
     {0x100000, 0x10fffd}
 };
 
-#if defined(FEAT_TERMINAL)
+#اگر defined(FEAT_TERMINAL)
 /*
  * utf_char2cells() with different argument type for libvterm.
  */
-    int
+    صحیح
 utf_uint2cells(UINT32_T c)
 {
-    if (c >= 0x100 && utf_iscomposing((int)c))
-	return 0;
-    return utf_char2cells((int)c);
+    اگر (c >= 0x100 && utf_iscomposing((صحیح)c))
+	واپس 0;
+    واپس utf_char2cells((صحیح)c);
 }
-#endif
+#اگر_ختم
 
 /*
  * For UTF-8 character "c" return 2 for a double-width character, 1 for others.
@@ -1371,12 +1371,12 @@ utf_uint2cells(UINT32_T c)
  * When p_ambw is "double", return 2 for a character with East Asian Width
  * class 'A'(mbiguous).
  */
-    int
-utf_char2cells(int c)
+    صحیح
+utf_char2cells(صحیح c)
 {
     // Sorted list of non-overlapping intervals of East Asian double width
     // characters, generated with ../runtime/tools/unicode.vim.
-    static struct interval doublewidth[] =
+    ساکن ساخت interval doublewidth[] =
     {
 	{0x1100, 0x115f},
 	{0x231a, 0x231b},
@@ -1505,7 +1505,7 @@ utf_char2cells(int c)
     // Sorted list of non-overlapping intervals of Emoji characters that don't
     // have ambiguous or double width,
     // based on http://unicode.org/emoji/charts/emoji-list.html
-    static struct interval emoji_wide[] =
+    ساکن ساخت interval emoji_wide[] =
     {
 	{0x23ed, 0x23ef},
 	{0x23f1, 0x23f2},
@@ -1562,7 +1562,7 @@ utf_char2cells(int c)
 	{0x1f6f0, 0x1f6f0},
 	{0x1f6f3, 0x1f6f3}
 
-#ifdef MACOS_X
+#اگر_تعریف_شدہ MACOS_X
 	// Include SF Symbols 4 characters, which should be rendered as
 	// double-width.  SF Symbols is an Apple-specific set of symbols and
 	// icons for use in Apple operating systems.  They are included as
@@ -1584,38 +1584,38 @@ utf_char2cells(int c)
 	//
 	// Also see https://en.wikipedia.org/wiki/San_Francisco_(sans-serif_typeface)#SF_Symbols
 	, {0x100000, 0x1018c7}
-#endif
+#اگر_ختم
     };
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     // Use the value from setcellwidths() at 0x80 and higher, unless the
     // character is not printable.
-    if (c >= 0x80 && vim_isprintc(c))
+    اگر (c >= 0x80 && vim_isprintc(c))
     {
-	int n = cw_value(c);
-	if (n != 0)
-	    return n;
+	صحیح n = cw_قدر(c);
+	اگر (n != 0)
+	    واپس n;
     }
-#endif
+#اگر_ختم
 
-    if (c >= 0x100)
+    اگر (c >= 0x100)
     {
-	if (!utf_printable(c))
-	    return 6;		// unprintable, displays <xxxx>
-	if (intable(doublewidth, sizeof(doublewidth), c))
-	    return 2;
-	if (p_emoji && intable(emoji_wide, sizeof(emoji_wide), c))
-	    return 2;
+	اگر (!utf_printable(c))
+	    واپس 6;		// unprintable, displays <xxxx>
+	اگر (intable(doublewidth, حجم(doublewidth), c))
+	    واپس 2;
+	اگر (p_emoji && intable(emoji_wide, حجم(emoji_wide), c))
+	    واپس 2;
     }
 
     // Characters below 0x100 are influenced by 'isprint' option
-    else if (c >= 0x80 && !vim_isprintc(c))
-	return 4;		// unprintable, displays <xx>
+    ورنہ اگر (c >= 0x80 && !vim_isprintc(c))
+	واپس 4;		// unprintable, displays <xx>
 
-    if (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, sizeof(ambiguous), c))
-	return 2;
+    اگر (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, حجم(ambiguous), c))
+	واپس 2;
 
-    return 1;
+    واپس 1;
 }
 
 /*
@@ -1623,42 +1623,42 @@ utf_char2cells(int c)
  * Return the number of display cells character at "*p" occupies.
  * This doesn't take care of unprintable characters, use ptr2cells() for that.
  */
-    int
-latin_ptr2cells(char_u *p UNUSED)
+    صحیح
+latin_ptr2cells(char_u *p غیر_مستعمل)
 {
-    return 1;
+    واپس 1;
 }
 
-    int
+    صحیح
 utf_ptr2cells(
     char_u	*p)
 {
-    int		c;
-    int		len;
+    صحیح		c;
+    صحیح		len;
 
     // Need to convert to a character number.
-    if (*p >= 0x80)
+    اگر (*p >= 0x80)
     {
 	c = utf_ptr2char_and_len(p, &len);
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	اگر (len == 1 || c == NUL)
+	    واپس 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	اگر (c < 0x80)
+	    واپس vim_isprintc(c) ? char2cells(c) : 4;
+	واپس utf_char2cells(c);
     }
-    return 1;
+    واپس 1;
 }
 
-    int
+    صحیح
 dbcs_ptr2cells(char_u *p)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && *p == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(*p);
+    اگر (enc_dbcs == DBCS_JPNU && *p == 0x8e)
+	واپس 1;
+    واپس MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1666,43 +1666,43 @@ dbcs_ptr2cells(char_u *p)
  * Like mb_ptr2cells(), but limit string length to "size".
  * For an empty string or truncated character returns 1.
  */
-    int
-latin_ptr2cells_len(char_u *p UNUSED, int size UNUSED)
+    صحیح
+latin_ptr2cells_len(char_u *p غیر_مستعمل, صحیح سائز غیر_مستعمل)
 {
-    return 1;
+    واپس 1;
 }
 
-    static int
-utf_ptr2cells_len(char_u *p, int size)
+    ساکن صحیح
+utf_ptr2cells_len(char_u *p, صحیح سائز)
 {
-    int		c;
-    int		len;
+    صحیح		c;
+    صحیح		len;
 
     // Need to convert to a wide character.
-    if (size > 0 && *p >= 0x80)
+    اگر (سائز > 0 && *p >= 0x80)
     {
-	c = utf_ptr2char_and_len_len(p, size, &len);
-	if (len > size)
-	    return 4;  // truncated, display as illegal byte
+	c = utf_ptr2char_and_len_len(p, سائز, &len);
+	اگر (len > سائز)
+	    واپس 4;  // truncated, display as illegal byte
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	اگر (len == 1 || c == NUL)
+	    واپس 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	اگر (c < 0x80)
+	    واپس vim_isprintc(c) ? char2cells(c) : 4;
+	واپس utf_char2cells(c);
     }
-    return 1;
+    واپس 1;
 }
 
-    static int
-dbcs_ptr2cells_len(char_u *p, int size)
+    ساکن صحیح
+dbcs_ptr2cells_len(char_u *p, صحیح سائز)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (size <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
-	return 1;
-    return MB_BYTE2LEN(*p);
+    اگر (سائز <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
+	واپس 1;
+    واپس MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1710,36 +1710,36 @@ dbcs_ptr2cells_len(char_u *p, int size)
  * Return the number of display cells character "c" occupies.
  * Only takes care of multi-byte chars, not "^C" and such.
  */
-    int
-latin_char2cells(int c UNUSED)
+    صحیح
+latin_char2cells(صحیح c غیر_مستعمل)
 {
-    return 1;
+    واپس 1;
 }
 
-    static int
-dbcs_char2cells(int c)
+    ساکن صحیح
+dbcs_char2cells(صحیح c)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
-	return 1;
+    اگر (enc_dbcs == DBCS_JPNU && ((غیرعلامتی)c >> 8) == 0x8e)
+	واپس 1;
     // use the first byte
-    return MB_BYTE2LEN((unsigned)c >> 8);
+    واپس MB_BYTE2LEN((غیرعلامتی)c >> 8);
 }
 
 /*
  * Return the number of cells occupied by string "p".
  * Stop at a NUL character.  When "len" >= 0 stop at character "p[len]".
  */
-    int
-mb_string2cells(char_u *p, int len)
+    صحیح
+mb_string2cells(char_u *p, صحیح len)
 {
-    int i;
-    int clen = 0;
+    صحیح i;
+    صحیح clen = 0;
 
-    for (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
+    برائے (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
 	clen += (*mb_ptr2cells)(p + i);
-    return clen;
+    واپس clen;
 }
 
 /*
@@ -1747,48 +1747,48 @@ mb_string2cells(char_u *p, int len)
  * Return number of display cells for char at ScreenLines[off].
  * We make sure that the offset used is less than "max_off".
  */
-    int
-latin_off2cells(unsigned off UNUSED, unsigned max_off UNUSED)
+    صحیح
+latin_off2cells(غیرعلامتی off غیر_مستعمل, غیرعلامتی max_off غیر_مستعمل)
 {
-    return 1;
+    واپس 1;
 }
 
-    int
-dbcs_off2cells(unsigned off, unsigned max_off)
+    صحیح
+dbcs_off2cells(غیرعلامتی off, غیرعلامتی max_off)
 {
     // never check beyond end of the line
-    if (off >= max_off)
-	return 1;
+    اگر (off >= max_off)
+	واپس 1;
 
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(ScreenLines[off]);
+    اگر (enc_dbcs == DBCS_JPNU && Screen_سطریں[off] == 0x8e)
+	واپس 1;
+    واپس MB_BYTE2LEN(Screen_سطریں[off]);
 }
 
-    int
-utf_off2cells(unsigned off, unsigned max_off)
+    صحیح
+utf_off2cells(غیرعلامتی off, غیرعلامتی max_off)
 {
-    return (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
+    واپس (off + 1 < max_off && Screen_سطریں[off + 1] == 0) ? 2 : 1;
 }
 
 /*
  * mb_ptr2char() function pointer.
  * Convert a byte sequence into a character.
  */
-    int
+    صحیح
 latin_ptr2char(char_u *p)
 {
-    return *p;
+    واپس *p;
 }
 
-    static int
+    ساکن صحیح
 dbcs_ptr2char(char_u *p)
 {
-    if (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
-	return (p[0] << 8) + p[1];
-    return *p;
+    اگر (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
+	واپس (p[0] << 8) + p[1];
+    واپس *p;
 }
 
 /*
@@ -1796,78 +1796,78 @@ dbcs_ptr2char(char_u *p)
  * Returns the character and sets "*lenp" to its byte length.
  * Illegal bytes are returned as-is with a length of one.
  */
-    static inline int
-utf_ptr2char_and_len(char_u *p, int *lenp)
+    ساکن اندرونی صحیح
+utf_ptr2char_and_len(char_u *p, صحیح *lenp)
 {
-    int		len;
-    int		c;
+    صحیح		len;
+    صحیح		c;
 
-    if (p[0] < 0x80)
+    اگر (p[0] < 0x80)
     {
 	*lenp = p[0] == NUL ? 0 : 1;
-	return p[0];
+	واپس p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1 || (p[1] & 0xc0) != 0x80)
+    اگر (len <= 1 || (p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    اگر (len == 2)
     {
 	*lenp = 2;
-	return c;
+	واپس c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    اگر ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    اگر (len == 3)
     {
 	*lenp = 3;
-	return c;
+	واپس c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    اگر ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    اگر (len == 4)
     {
 	*lenp = 4;
-	return c;
+	واپس c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    اگر ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    اگر (len == 5)
     {
 	*lenp = 5;
-	return c;
+	واپس c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    اگر ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    واپس ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
@@ -1877,120 +1877,120 @@ utf_ptr2char_and_len(char_u *p, int *lenp)
  * Like utf_ptr2char_and_len(), but never reads beyond "size" bytes.
  * For an incomplete sequence "*lenp" is set to the expected length.
  */
-    static inline int
-utf_ptr2char_and_len_len(char_u *p, int size, int *lenp)
+    ساکن اندرونی صحیح
+utf_ptr2char_and_len_len(char_u *p, صحیح سائز, صحیح *lenp)
 {
-    int		len;
-    int		c;
+    صحیح		len;
+    صحیح		c;
 
-    if (size < 1)
+    اگر (سائز < 1)
     {
 	*lenp = 1;
-	return NUL;
+	واپس NUL;
     }
-    if (p[0] < 0x80)
+    اگر (p[0] < 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1)
+    اگر (len <= 1)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
-    if (len > size)
+    اگر (len > سائز)
     {
-	int		i;
+	صحیح		i;
 
 	// Incomplete sequence: validate continuation bytes within range.
-	for (i = 1; i < size; ++i)
-	    if ((p[i] & 0xc0) != 0x80)
+	برائے (i = 1; i < سائز; ++i)
+	    اگر ((p[i] & 0xc0) != 0x80)
 	    {
 		*lenp = 1;
-		return p[0];
+		واپس p[0];
 	    }
 	*lenp = len;
-	return p[0];
+	واپس p[0];
     }
-    if ((p[1] & 0xc0) != 0x80)
+    اگر ((p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    اگر (len == 2)
     {
 	*lenp = 2;
-	return c;
+	واپس c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    اگر ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    اگر (len == 3)
     {
 	*lenp = 3;
-	return c;
+	واپس c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    اگر ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    اگر (len == 4)
     {
 	*lenp = 4;
-	return c;
+	واپس c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    اگر ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    اگر (len == 5)
     {
 	*lenp = 5;
-	return c;
+	واپس c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    اگر ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	واپس p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    واپس ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
 }
 
-    static inline int
-utf_iscomposinglike_char(int c1, int c2)
+    ساکن اندرونی صحیح
+utf_iscomposinglike_char(صحیح c1, صحیح c2)
 {
-    if (utf_iscomposing(c2))
-	return TRUE;
-#ifdef FEAT_ARABIC
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(c1, c2);
-#else
-    (void)c1;
-    return FALSE;
-#endif
+    اگر (utf_iscomposing(c2))
+	واپس TRUE;
+#اگر_تعریف_شدہ FEAT_ARABIC
+    اگر (!arabic_maycombine(c2))
+	واپس FALSE;
+    واپس arabic_combine(c1, c2);
+#ورنہ
+    (خالی)c1;
+    واپس FALSE;
+#اگر_ختم
 }
 
 /*
@@ -2000,12 +2000,12 @@ utf_iscomposinglike_char(int c1, int c2)
  * For an overlong sequence this may return zero.
  * Does not include composing characters, of course.
  */
-    int
+    صحیح
 utf_ptr2char(char_u *p)
 {
-    int		len;
+    صحیح		len;
 
-    return utf_ptr2char_and_len(p, &len);
+    واپس utf_ptr2char_and_len(p, &len);
 }
 
 /*
@@ -2024,24 +2024,24 @@ utf_ptr2char(char_u *p)
  * If byte sequence is illegal or incomplete, returns -1 and does not advance
  * "s".
  */
-    static int
-utf_safe_read_char_adv(char_u **s, size_t *n)
+    ساکن صحیح
+utf_محفوظ_read_char_adv(char_u **s, size_t *n)
 {
-    int		c, k;
+    صحیح		c, k;
 
-    if (*n == 0) // end of buffer
-	return 0;
+    اگر (*n == 0) // end of buffer
+	واپس 0;
 
     k = utf8len_tab_zero[**s];
 
-    if (k == 1)
+    اگر (k == 1)
     {
 	// ASCII character or NUL
 	(*n)--;
-	return *(*s)++;
+	واپس *(*s)++;
     }
 
-    if ((size_t)k <= *n)
+    اگر ((size_t)k <= *n)
     {
 	// We have a multibyte sequence and it isn't truncated by buffer
 	// limits so utf_ptr2char() is safe to use. Or the first byte is
@@ -2053,156 +2053,156 @@ utf_safe_read_char_adv(char_u **s, size_t *n)
 	// which equals the first byte of its own UTF-8 representation is
 	// U+00C3 (UTF-8: 0xC3 0x83), so need to check that special case too.
 	// It's safe even if n=1, else we would have k=2 > n.
-	if (c != (int)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
+	اگر (c != (صحیح)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
 	{
 	    // byte sequence was successfully decoded
 	    *s += k;
 	    *n -= k;
-	    return c;
+	    واپس c;
 	}
     }
 
     // byte sequence is incomplete or illegal
-    return -1;
+    واپس -1;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are skipped!
  */
-    int
+    صحیح
 mb_ptr2char_adv(char_u **pp)
 {
-    int		c;
+    صحیح		c;
 
     c = (*mb_ptr2char)(*pp);
     *pp += (*mb_ptr2len)(*pp);
-    return c;
+    واپس c;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are returned as separate characters.
  */
-    int
+    صحیح
 mb_cptr2char_adv(char_u **pp)
 {
-    int		c;
+    صحیح		c;
 
     c = (*mb_ptr2char)(*pp);
-    if (enc_utf8)
+    اگر (enc_utf8)
 	*pp += utf_ptr2len(*pp);
-    else
+    ورنہ
 	*pp += (*mb_ptr2len)(*pp);
-    return c;
+    واپس c;
 }
 
-#if defined(FEAT_ARABIC)
+#اگر defined(FEAT_ARABIC)
 /*
  * Check if the character pointed to by "p2" is a composing character when it
  * comes after "p1".  For Arabic sometimes "ab" is replaced with "c", which
  * behaves like a composing character.
  */
-    int
+    صحیح
 utf_composinglike(char_u *p1, char_u *p2)
 {
-    int		c2;
+    صحیح		c2;
 
     c2 = utf_ptr2char(p2);
-    if (utf_iscomposing(c2))
-	return TRUE;
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(utf_ptr2char(p1), c2);
+    اگر (utf_iscomposing(c2))
+	واپس TRUE;
+    اگر (!arabic_maycombine(c2))
+	واپس FALSE;
+    واپس arabic_combine(utf_ptr2char(p1), c2);
 }
-#endif
+#اگر_ختم
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.
  */
-    int
+    صحیح
 utfc_ptr2char(
     char_u	*p,
-    int		*pcc)	// return: composing chars, last one is 0
+    صحیح		*pcc)	// return: composing chars, last one is 0
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    صحیح		len;
+    صحیح		c;
+    صحیح		cc;
+    صحیح		cc_len;
+    صحیح		i = 0;
 
     c = utf_ptr2char_and_len(p, &len);
 
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && p[len] >= 0x80)
+    اگر ((len > 1 || *p < 0x80) && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (utf_iscomposinglike_char(c, cc))
+	اگر (utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    برائے (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		اگر (i == MAX_MCO)
+		    توڑو;
 		len += cc_len;
-		if (p[len] < 0x80)
-		    break;
+		اگر (p[len] < 0x80)
+		    توڑو;
 		cc = utf_ptr2char_and_len(p + len, &cc_len);
-		if (!utf_iscomposing(cc))
-		    break;
+		اگر (!utf_iscomposing(cc))
+		    توڑو;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    اگر (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    واپس c;
 }
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.  Use no more than p[maxlen].
  */
-    int
+    صحیح
 utfc_ptr2char_len(
     char_u	*p,
-    int		*pcc,	// return: composing chars, last one is 0
-    int		maxlen)
+    صحیح		*pcc,	// return: composing chars, last one is 0
+    صحیح		maxlen)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    صحیح		len;
+    صحیح		c;
+    صحیح		cc;
+    صحیح		cc_len;
+    صحیح		i = 0;
 
     c = utf_ptr2char_and_len_len(p, maxlen, &len);
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
+    اگر ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-	if (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
+	اگر (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    برائے (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
-		    break;
+		اگر (i == MAX_MCO)
+		    توڑو;
 		len += cc_len;
-		if (len >= maxlen || p[len] < 0x80)
-		    break;
+		اگر (len >= maxlen || p[len] < 0x80)
+		    توڑو;
 		cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-		if (cc_len > maxlen - len || !utf_iscomposing(cc))
-		    break;
+		اگر (cc_len > maxlen - len || !utf_iscomposing(cc))
+		    توڑو;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    اگر (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    واپس c;
 }
 
 /*
@@ -2212,20 +2212,20 @@ utfc_ptr2char_len(
  * Only to be used when ScreenLinesUC[off] != 0.
  * Returns the produced number of bytes.
  */
-    int
-utfc_char2bytes(int off, char_u *buf)
+    صحیح
+utfc_char2bytes(صحیح off, char_u *buf)
 {
-    int		len;
-    int		i;
+    صحیح		len;
+    صحیح		i;
 
-    len = utf_char2bytes(ScreenLinesUC[off], buf);
-    for (i = 0; i < Screen_mco; ++i)
+    len = utf_char2bytes(Screen_سطریں_UC[off], buf);
+    برائے (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] == 0)
-	    break;
-	len += utf_char2bytes(ScreenLinesC[i][off], buf + len);
+	اگر (Screen_سطریں_C[i][off] == 0)
+	    توڑو;
+	len += utf_char2bytes(Screen_سطریں_C[i][off], buf + len);
     }
-    return len;
+    واپس len;
 }
 
 /*
@@ -2234,13 +2234,13 @@ utfc_char2bytes(int off, char_u *buf)
  * Returns 0 for "".
  * Returns 1 for an illegal byte sequence.
  */
-    int
+    صحیح
 utf_ptr2len(char_u *p)
 {
-    int		len;
+    صحیح		len;
 
     utf_ptr2char_and_len(p, &len);
-    return len;
+    واپس len;
 }
 
 /*
@@ -2248,10 +2248,10 @@ utf_ptr2len(char_u *p)
  * "b" must be between 0 and 255!
  * Returns 1 for an invalid first byte value.
  */
-    int
-utf_byte2len(int b)
+    صحیح
+utf_byte2len(صحیح b)
 {
-    return utf8len_tab[b];
+    واپس utf8len_tab[b];
 }
 
 /*
@@ -2259,10 +2259,10 @@ utf_byte2len(int b)
  * "b" must be between 0 and 255!
  * Returns 0 for an invalid first byte value.
  */
-    int
-utf_byte2len_zero(int b)
+    صحیح
+utf_byte2len_zero(صحیح b)
 {
-    return utf8len_tab_zero[b];
+    واپس utf8len_tab_zero[b];
 }
 
 /*
@@ -2273,13 +2273,13 @@ utf_byte2len_zero(int b)
  * Returns number > "size" for an incomplete byte sequence.
  * Never returns zero.
  */
-    int
-utf_ptr2len_len(char_u *p, int size)
+    صحیح
+utf_ptr2len_len(char_u *p, صحیح سائز)
 {
-    int		len;
+    صحیح		len;
 
-    utf_ptr2char_and_len_len(p, size, &len);
-    return len;
+    utf_ptr2char_and_len_len(p, سائز, &len);
+    واپس len;
 }
 
 /*
@@ -2287,47 +2287,47 @@ utf_ptr2len_len(char_u *p, int size)
  * This includes following composing characters.
  * Returns zero for NUL.
  */
-    int
+    صحیح
 utfc_ptr2len(char_u *p)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		b0 = *p;
+    صحیح		len;
+    صحیح		c;
+    صحیح		cc;
+    صحیح		cc_len;
+    صحیح		b0 = *p;
 
-    if (b0 == NUL)
-	return 0;
-    if (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
-	return 1;
+    اگر (b0 == NUL)
+	واپس 0;
+    اگر (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
+	واپس 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
     c = utf_ptr2char_and_len(p, &len);
 
     // Check for illegal byte.
-    if (len == 1 && b0 >= 0x80)
-	return 1;
+    اگر (len == 1 && b0 >= 0x80)
+	واپس 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (p[len] < 0x80)
-	return len;
+    اگر (p[len] < 0x80)
+	واپس len;
 
     cc = utf_ptr2char_and_len(p + len, &cc_len);
-    if (!utf_iscomposinglike_char(c, cc))
-	return len;
+    اگر (!utf_iscomposinglike_char(c, cc))
+	واپس len;
 
-    for (;;)
+    برائے (;;)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (p[len] < 0x80)
-	    return len;
+	اگر (p[len] < 0x80)
+	    واپس len;
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (!utf_iscomposing(cc))
-	    return len;
+	اگر (!utf_iscomposing(cc))
+	    واپس len;
     }
 }
 
@@ -2337,146 +2337,146 @@ utfc_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-utfc_ptr2len_len(char_u *p, int size)
+    صحیح
+utfc_ptr2len_len(char_u *p, صحیح سائز)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
+    صحیح		len;
+    صحیح		c;
+    صحیح		cc;
+    صحیح		cc_len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (p[0] < 0x80 && (size == 1 || p[1] < 0x80)) // be quick for ASCII
-	return 1;
+    اگر (سائز < 1 || *p == NUL)
+	واپس 0;
+    اگر (p[0] < 0x80 && (سائز == 1 || p[1] < 0x80)) // be quick for ASCII
+	واپس 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
-    c = utf_ptr2char_and_len_len(p, size, &len);
+    c = utf_ptr2char_and_len_len(p, سائز, &len);
 
     // Check for illegal byte and incomplete byte sequence.
-    if ((len == 1 && p[0] >= 0x80) || len > size)
-	return 1;
+    اگر ((len == 1 && p[0] >= 0x80) || len > سائز)
+	واپس 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (len >= size || p[len] < 0x80)
-	return len;
+    اگر (len >= سائز || p[len] < 0x80)
+	واپس len;
 
-    cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-    if (cc_len > size - len || !utf_iscomposinglike_char(c, cc))
-	return len;
+    cc = utf_ptr2char_and_len_len(p + len, سائز - len, &cc_len);
+    اگر (cc_len > سائز - len || !utf_iscomposinglike_char(c, cc))
+	واپس len;
 
-    while (len < size)
+    جب (len < سائز)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (len >= size || p[len] < 0x80)
-	    break;
-	cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-	if (cc_len > size - len)
-	    break;
-	if (!utf_iscomposing(cc))
-	    break;
+	اگر (len >= سائز || p[len] < 0x80)
+	    توڑو;
+	cc = utf_ptr2char_and_len_len(p + len, سائز - len, &cc_len);
+	اگر (cc_len > سائز - len)
+	    توڑو;
+	اگر (!utf_iscomposing(cc))
+	    توڑو;
     }
-    return len;
+    واپس len;
 }
 
 /*
  * Return the number of bytes the UTF-8 encoding of character "c" takes.
  * This does not include composing characters.
  */
-    int
-utf_char2len(int c)
+    صحیح
+utf_char2len(صحیح c)
 {
-    if (c < 0x80)
-	return 1;
-    if (c < 0x800)
-	return 2;
-    if (c < 0x10000)
-	return 3;
-    if (c < 0x200000)
-	return 4;
-    if (c < 0x4000000)
-	return 5;
-    return 6;
+    اگر (c < 0x80)
+	واپس 1;
+    اگر (c < 0x800)
+	واپس 2;
+    اگر (c < 0x10000)
+	واپس 3;
+    اگر (c < 0x200000)
+	واپس 4;
+    اگر (c < 0x4000000)
+	واپس 5;
+    واپس 6;
 }
 
 /*
  * Convert Unicode character "c" to UTF-8 string in "buf[]".
  * Returns the number of bytes.
  */
-    int
-utf_char2bytes(int c, char_u *buf)
+    صحیح
+utf_char2bytes(صحیح c, char_u *buf)
 {
-    if (c < 0x80)		// 7 bits
+    اگر (c < 0x80)		// 7 bits
     {
 	buf[0] = c;
-	return 1;
+	واپس 1;
     }
-    if (c < 0x800)		// 11 bits
+    اگر (c < 0x800)		// 11 bits
     {
-	buf[0] = 0xc0 + ((unsigned)c >> 6);
+	buf[0] = 0xc0 + ((غیرعلامتی)c >> 6);
 	buf[1] = 0x80 + (c & 0x3f);
-	return 2;
+	واپس 2;
     }
-    if (c < 0x10000)		// 16 bits
+    اگر (c < 0x10000)		// 16 bits
     {
-	buf[0] = 0xe0 + ((unsigned)c >> 12);
-	buf[1] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xe0 + ((غیرعلامتی)c >> 12);
+	buf[1] = 0x80 + (((غیرعلامتی)c >> 6) & 0x3f);
 	buf[2] = 0x80 + (c & 0x3f);
-	return 3;
+	واپس 3;
     }
-    if (c < 0x200000)		// 21 bits
+    اگر (c < 0x200000)		// 21 bits
     {
-	buf[0] = 0xf0 + ((unsigned)c >> 18);
-	buf[1] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf0 + ((غیرعلامتی)c >> 18);
+	buf[1] = 0x80 + (((غیرعلامتی)c >> 12) & 0x3f);
+	buf[2] = 0x80 + (((غیرعلامتی)c >> 6) & 0x3f);
 	buf[3] = 0x80 + (c & 0x3f);
-	return 4;
+	واپس 4;
     }
-    if (c < 0x4000000)		// 26 bits
+    اگر (c < 0x4000000)		// 26 bits
     {
-	buf[0] = 0xf8 + ((unsigned)c >> 24);
-	buf[1] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-	buf[2] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-	buf[3] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+	buf[0] = 0xf8 + ((غیرعلامتی)c >> 24);
+	buf[1] = 0x80 + (((غیرعلامتی)c >> 18) & 0x3f);
+	buf[2] = 0x80 + (((غیرعلامتی)c >> 12) & 0x3f);
+	buf[3] = 0x80 + (((غیرعلامتی)c >> 6) & 0x3f);
 	buf[4] = 0x80 + (c & 0x3f);
-	return 5;
+	واپس 5;
     }
 				// 31 bits
-    buf[0] = 0xfc + ((unsigned)c >> 30);
-    buf[1] = 0x80 + (((unsigned)c >> 24) & 0x3f);
-    buf[2] = 0x80 + (((unsigned)c >> 18) & 0x3f);
-    buf[3] = 0x80 + (((unsigned)c >> 12) & 0x3f);
-    buf[4] = 0x80 + (((unsigned)c >> 6) & 0x3f);
+    buf[0] = 0xfc + ((غیرعلامتی)c >> 30);
+    buf[1] = 0x80 + (((غیرعلامتی)c >> 24) & 0x3f);
+    buf[2] = 0x80 + (((غیرعلامتی)c >> 18) & 0x3f);
+    buf[3] = 0x80 + (((غیرعلامتی)c >> 12) & 0x3f);
+    buf[4] = 0x80 + (((غیرعلامتی)c >> 6) & 0x3f);
     buf[5] = 0x80 + (c & 0x3f);
-    return 6;
+    واپس 6;
 }
 
-#if defined(FEAT_TERMINAL)
+#اگر defined(FEAT_TERMINAL)
 /*
  * utf_iscomposing() with different argument type for libvterm.
  */
-    int
+    صحیح
 utf_iscomposing_uint(UINT32_T c)
 {
-    return utf_iscomposing((int)c);
+    واپس utf_iscomposing((صحیح)c);
 }
-#endif
+#اگر_ختم
 
 /*
  * Return TRUE if "c" is a composing UTF-8 character.  This means it will be
  * drawn on top of the preceding character.
  * Based on code from Markus Kuhn.
  */
-    int
-utf_iscomposing(int c)
+    صحیح
+utf_iscomposing(صحیح c)
 {
     // Sorted list of non-overlapping intervals.
     // Generated by ../runtime/tools/unicode.vim.
-    static struct interval combining[] =
+    ساکن ساخت interval combining[] =
     {
 	{0x0300, 0x036f},
 	{0x0483, 0x0489},
@@ -2834,33 +2834,33 @@ utf_iscomposing(int c)
 	{0xe0100, 0xe01ef}
     };
 
-    return intable(combining, sizeof(combining), c);
+    واپس intable(combining, حجم(combining), c);
 }
 
 /*
  * Return TRUE for characters that can be displayed in a normal way.
  * Only for characters of 0x100 and above!
  */
-    int
-utf_printable(int c)
+    صحیح
+utf_printable(صحیح c)
 {
     // Sorted list of non-overlapping intervals.
     // 0xd800-0xdfff is reserved for UTF-16, actually illegal.
-    static struct interval nonprint[] =
+    ساکن ساخت interval nonprint[] =
     {
 	{0x070f, 0x070f}, {0x180b, 0x180e}, {0x200b, 0x200f}, {0x202a, 0x202e},
 	{0x2060, 0x206f}, {0xd800, 0xdfff}, {0xfeff, 0xfeff}, {0xfff9, 0xfffb},
 	{0xfffe, 0xffff}
     };
 
-    return !intable(nonprint, sizeof(nonprint), c);
+    واپس !intable(nonprint, حجم(nonprint), c);
 }
 
 // Sorted list of non-overlapping intervals of all Emoji characters,
 // based on http://unicode.org/emoji/charts/emoji-list.html
 // Generated by ../runtime/tools/unicode.vim.
 // Excludes 0x00a9 and 0x00ae because they are considered latin1.
-static struct interval emoji_all[] =
+ساکن ساخت interval emoji_all[] =
 {
     {0x203c, 0x203c},
     {0x2049, 0x2049},
@@ -3016,21 +3016,21 @@ static struct interval emoji_all[] =
  * 1: punctuation
  * 2 or bigger: some class of word character.
  */
-    int
-utf_class(int c)
+    صحیح
+utf_class(صحیح c)
 {
-    return utf_class_buf(c, curbuf);
+    واپس utf_class_buf(c, curbuf);
 }
 
-    int
-utf_class_buf(int c, buf_T *buf)
+    صحیح
+utf_class_buf(صحیح c, buf_T *buf)
 {
     // sorted list of non-overlapping intervals
-    static struct clinterval
+    ساکن ساخت clinterval
     {
-	unsigned int first;
-	unsigned int last;
-	unsigned int class;
+	غیرعلامتی صحیح پہلا;
+	غیرعلامتی صحیح آخری;
+	غیرعلامتی صحیح class;
     } classes[] =
     {
 	{0x037e, 0x037e, 1},		// Greek question mark
@@ -3106,45 +3106,45 @@ utf_class_buf(int c, buf_T *buf)
 	{0x2f800, 0x2fa1f, 0x4e00},	// CJK Ideographs
     };
 
-    int bot = 0;
-    int top = ARRAY_LENGTH(classes) - 1;
-    int mid;
+    صحیح bot = 0;
+    صحیح چوٹی = ARRAY_لمبائی(classes) - 1;
+    صحیح mid;
 
     // First quick check for Latin1 characters, use 'iskeyword'.
-    if (c < 0x100)
+    اگر (c < 0x100)
     {
-	if (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
-	    return 0;	    // blank
-	if (vim_iswordc_buf(c, buf))
-	    return 2;	    // word character
-	return 1;	    // punctuation
+	اگر (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
+	    واپس 0;	    // blank
+	اگر (vim_iswordc_buf(c, buf))
+	    واپس 2;	    // word character
+	واپس 1;	    // punctuation
     }
 
     // emoji
-    if (intable(emoji_all, sizeof(emoji_all), c))
-	return 3;
+    اگر (intable(emoji_all, حجم(emoji_all), c))
+	واپس 3;
 
     // binary search in table
-    while (top >= bot)
+    جب (چوٹی >= bot)
     {
-	mid = (bot + top) / 2;
-	if (classes[mid].last < (unsigned int)c)
+	mid = (bot + چوٹی) / 2;
+	اگر (classes[mid].آخری < (غیرعلامتی صحیح)c)
 	    bot = mid + 1;
-	else if (classes[mid].first > (unsigned int)c)
-	    top = mid - 1;
-	else
-	    return (int)classes[mid].class;
+	ورنہ اگر (classes[mid].پہلا > (غیرعلامتی صحیح)c)
+	    چوٹی = mid - 1;
+	ورنہ
+	    واپس (صحیح)classes[mid].class;
     }
 
     // most other characters are "word" characters
-    return 2;
+    واپس 2;
 }
 
-    int
-utf_ambiguous_width(int c)
+    صحیح
+utf_ambiguous_چوڑائی(صحیح c)
 {
-    return c >= 0x80 && (intable(ambiguous, sizeof(ambiguous), c)
-	    || intable(emoji_all, sizeof(emoji_all), c));
+    واپس c >= 0x80 && (intable(ambiguous, حجم(ambiguous), c)
+	    || intable(emoji_all, حجم(emoji_all), c));
 }
 
 /*
@@ -3161,15 +3161,15 @@ utf_ambiguous_width(int c)
  * range from 0x41 to 0x5a inclusive, stepping by 1, are changed to
  * folded/upper/lower by adding 32.
  */
-typedef struct
+قسمتعریف ساخت
 {
-    int rangeStart;
-    int rangeEnd;
-    int step;
-    int offset;
+    صحیح range_آغاز_2;
+    صحیح range_انتہا_2;
+    صحیح قدم;
+    صحیح انحراف;
 } convertStruct;
 
-static convertStruct foldCase[] =
+ساکن convertStruct foldCase[] =
 {
 	{0x41,0x5a,1,32},
 	{0xb5,0xb5,-1,775},
@@ -3384,49 +3384,49 @@ static convertStruct foldCase[] =
  * Return the converted equivalent of "a", which is a UCS-4 character.  Use
  * the given conversion "table".  Uses binary search on "table".
  */
-    static int
+    ساکن صحیح
 utf_convert(
-    int			a,
-    convertStruct	table[],
-    int			tableSize)
+    صحیح			a,
+    convertStruct	جدول[],
+    صحیح			جدول_سائز_3)
 {
-    int start, mid, end; // indices into table
-    int entries = tableSize / sizeof(convertStruct);
+    صحیح آغاز, mid, انتہا; // indices into table
+    صحیح entries = جدول_سائز_3 / حجم(convertStruct);
 
-    start = 0;
-    end = entries;
-    while (start < end)
+    آغاز = 0;
+    انتہا = entries;
+    جب (آغاز < انتہا)
     {
 	// need to search further
-	mid = (end + start) / 2;
-	if (table[mid].rangeEnd < a)
-	    start = mid + 1;
-	else
-	    end = mid;
+	mid = (انتہا + آغاز) / 2;
+	اگر (جدول[mid].range_انتہا_2 < a)
+	    آغاز = mid + 1;
+	ورنہ
+	    انتہا = mid;
     }
-    if (start < entries
-	    && table[start].rangeStart <= a
-	    && a <= table[start].rangeEnd
-	    && (a - table[start].rangeStart) % table[start].step == 0)
-	return (a + table[start].offset);
-    else
-	return a;
+    اگر (آغاز < entries
+	    && جدول[آغاز].range_آغاز_2 <= a
+	    && a <= جدول[آغاز].range_انتہا_2
+	    && (a - جدول[آغاز].range_آغاز_2) % جدول[آغاز].قدم == 0)
+	واپس (a + جدول[آغاز].انحراف);
+    ورنہ
+	واپس a;
 }
 
 /*
  * Return the folded-case equivalent of "a", which is a UCS-4 character.  Uses
  * simple case folding.
  */
-    int
-utf_fold(int a)
+    صحیح
+utf_fold(صحیح a)
 {
-    if (a < 0x80)
+    اگر (a < 0x80)
 	// be fast for ASCII
-	return a >= 0x41 && a <= 0x5a ? a + 32 : a;
-    return utf_convert(a, foldCase, (int)sizeof(foldCase));
+	واپس a >= 0x41 && a <= 0x5a ? a + 32 : a;
+    واپس utf_convert(a, foldCase, (صحیح)حجم(foldCase));
 }
 
-static convertStruct toLower[] =
+ساکن convertStruct مقصد_زیریں[] =
 {
 	{0x41,0x5a,1,32},
 	{0xc0,0xd6,1,32},
@@ -3615,7 +3615,7 @@ static convertStruct toLower[] =
 
 // Note: UnicodeData.txt does not define U+1E9E as being the corresponding upper
 // case letter for U+00DF (ß), however it is part of the toLower table
-static convertStruct toUpper[] =
+ساکن convertStruct مقصد_بالائی[] =
 {
 	{0x61,0x7a,1,-32},
 	{0xb5,0xb5,-1,743},
@@ -3821,99 +3821,99 @@ static convertStruct toUpper[] =
  * Return the upper-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_toupper(int a)
+    صحیح
+utf_toupper(صحیح a)
 {
     // If 'casemap' contains "keepascii" use ASCII style toupper().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOUPPER_ASC(a);
+    اگر (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	واپس TOUPPER_ASC(a);
 
-#if defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
+#اگر defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
     // If towupper() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towupper(a);
-#endif
+    اگر (!(cmp_flags & CMP_اندرونی))
+	واپس towupper(a);
+#اگر_ختم
 
     // For characters below 128 use locale sensitive toupper().
-    if (a < 128)
-	return TOUPPER_LOC(a);
+    اگر (a < 128)
+	واپس TOUPPER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toUpper, (int)sizeof(toUpper));
+    واپس utf_convert(a, مقصد_بالائی, (صحیح)حجم(مقصد_بالائی));
 }
 
-    int
-utf_islower(int a)
+    صحیح
+utf_islower(صحیح a)
 {
     // German sharp s is lower case but has no upper case equivalent.
-    return (utf_toupper(a) != a) || a == 0xdf;
+    واپس (utf_toupper(a) != a) || a == 0xdf;
 }
 
 /*
  * Return the lower-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_tolower(int a)
+    صحیح
+utf_tolower(صحیح a)
 {
     // If 'casemap' contains "keepascii" use ASCII style tolower().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOLOWER_ASC(a);
+    اگر (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	واپس TOLOWER_ASC(a);
 
-#if defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
+#اگر defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
     // If towlower() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towlower(a);
-#endif
+    اگر (!(cmp_flags & CMP_اندرونی))
+	واپس towlower(a);
+#اگر_ختم
 
     // For characters below 128 use locale sensitive tolower().
-    if (a < 128)
-	return TOLOWER_LOC(a);
+    اگر (a < 128)
+	واپس TOLOWER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toLower, (int)sizeof(toLower));
+    واپس utf_convert(a, مقصد_زیریں, (صحیح)حجم(مقصد_زیریں));
 }
 
-    int
-utf_isupper(int a)
+    صحیح
+utf_isupper(صحیح a)
 {
-    return (utf_tolower(a) != a);
+    واپس (utf_tolower(a) != a);
 }
 
-    static int
+    ساکن صحیح
 utf_strnicmp(
     char_u      *s1,
     char_u      *s2,
     size_t      n1,
     size_t      n2)
 {
-    int		c1, c2, cdiff;
-    char_u	buffer[6];
+    صحیح		c1, c2, cdiff;
+    char_u	بفر[6];
 
-    for (;;)
+    برائے (;;)
     {
-	c1 = utf_safe_read_char_adv(&s1, &n1);
-	c2 = utf_safe_read_char_adv(&s2, &n2);
+	c1 = utf_محفوظ_read_char_adv(&s1, &n1);
+	c2 = utf_محفوظ_read_char_adv(&s2, &n2);
 
-	if (c1 <= 0 || c2 <= 0)
-	    break;
+	اگر (c1 <= 0 || c2 <= 0)
+	    توڑو;
 
-	if (c1 == c2)
-	    continue;
+	اگر (c1 == c2)
+	    جاری;
 
 	cdiff = utf_fold(c1) - utf_fold(c2);
-	if (cdiff != 0)
-	    return cdiff;
+	اگر (cdiff != 0)
+	    واپس cdiff;
     }
 
     // some string ended or has an incomplete/illegal character sequence
 
-    if (c1 == 0 || c2 == 0)
+    اگر (c1 == 0 || c2 == 0)
     {
 	// some string ended. shorter string is smaller
-	if (c1 == 0 && c2 == 0)
-	    return 0;
-	return c1 == 0 ? -1 : 1;
+	اگر (c1 == 0 && c2 == 0)
+	    واپس 0;
+	واپس c1 == 0 ? -1 : 1;
     }
 
     // Continue with bytewise comparison to produce some result that
@@ -3923,22 +3923,22 @@ utf_strnicmp(
     // folded version of the other string. In this case it is enough
     // to fold just one character to determine the result of comparison.
 
-    if (c1 != -1 && c2 == -1)
+    اگر (c1 != -1 && c2 == -1)
     {
-	n1 = utf_char2bytes(utf_fold(c1), buffer);
-	s1 = buffer;
+	n1 = utf_char2bytes(utf_fold(c1), بفر);
+	s1 = بفر;
     }
-    else if (c2 != -1 && c1 == -1)
+    ورنہ اگر (c2 != -1 && c1 == -1)
     {
-	n2 = utf_char2bytes(utf_fold(c2), buffer);
-	s2 = buffer;
+	n2 = utf_char2bytes(utf_fold(c2), بفر);
+	s2 = بفر;
     }
 
-    while (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
+    جب (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
     {
-	cdiff = (int)(*s1) - (int)(*s2);
-	if (cdiff != 0)
-	    return cdiff;
+	cdiff = (صحیح)(*s1) - (صحیح)(*s2);
+	اگر (cdiff != 0)
+	    واپس cdiff;
 
 	s1++;
 	s2++;
@@ -3946,14 +3946,14 @@ utf_strnicmp(
 	n2--;
     }
 
-    if (n1 > 0 && *s1 == NUL)
+    اگر (n1 > 0 && *s1 == NUL)
 	n1 = 0;
-    if (n2 > 0 && *s2 == NUL)
+    اگر (n2 > 0 && *s2 == NUL)
 	n2 = 0;
 
-    if (n1 == 0 && n2 == 0)
-	return 0;
-    return n1 == 0 ? -1 : 1;
+    اگر (n1 == 0 && n2 == 0)
+	واپس 0;
+    واپس n1 == 0 ? -1 : 1;
 }
 
 /*
@@ -3964,103 +3964,103 @@ utf_strnicmp(
  * Returns zero if s1 and s2 are equal (ignoring case), the difference between
  * two characters otherwise.
  */
-    int
+    صحیح
 mb_strnicmp2(char_u *s1, char_u *s2, size_t n1, size_t n2)
 {
-    if (n1 == n2 || !enc_utf8)
-	return mb_strnicmp(s1, s2, n1);
-    else
-	return utf_strnicmp(s1, s2, n1, n2);
+    اگر (n1 == n2 || !enc_utf8)
+	واپس mb_strnicmp(s1, s2, n1);
+    ورنہ
+	واپس utf_strnicmp(s1, s2, n1, n2);
 }
 
-    int
+    صحیح
 mb_strnicmp(char_u *s1, char_u *s2, size_t nn)
 {
-    int		i, l;
-    int		cdiff;
-    int		n = (int)nn;
+    صحیح		i, l;
+    صحیح		cdiff;
+    صحیح		n = (صحیح)nn;
 
-    if (enc_utf8)
+    اگر (enc_utf8)
     {
-	return utf_strnicmp(s1, s2, nn, nn);
+	واپس utf_strnicmp(s1, s2, nn, nn);
     }
-    else
+    ورنہ
     {
-	for (i = 0; i < n; i += l)
+	برائے (i = 0; i < n; i += l)
 	{
-	    if (s1[i] == NUL && s2[i] == NUL)	// both strings end
-		return 0;
+	    اگر (s1[i] == NUL && s2[i] == NUL)	// both strings end
+		واپس 0;
 
 	    l = (*mb_ptr2len)(s1 + i);
-	    if (l <= 1)
+	    اگر (l <= 1)
 	    {
 		// Single byte: first check normally, then with ignore case.
-		if (s1[i] != s2[i])
+		اگر (s1[i] != s2[i])
 		{
 		    cdiff = MB_TOLOWER(s1[i]) - MB_TOLOWER(s2[i]);
-		    if (cdiff != 0)
-			return cdiff;
+		    اگر (cdiff != 0)
+			واپس cdiff;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
 		// For non-Unicode multi-byte don't ignore case.
-		if (l > n - i)
+		اگر (l > n - i)
 		    l = n - i;
 		cdiff = STRNCMP(s1 + i, s2 + i, l);
-		if (cdiff != 0)
-		    return cdiff;
+		اگر (cdiff != 0)
+		    واپس cdiff;
 	    }
 	}
     }
-    return 0;
+    واپس 0;
 }
 
 /*
  * "g8": show bytes of the UTF-8 char under the cursor.  Doesn't matter what
  * 'encoding' has been set to.
  */
-    void
-show_utf8(void)
+    خالی
+show_utf8(خالی)
 {
-    int		len;
-    int		rlen = 0;
-    char_u	*line;
-    int		clen;
-    int		i;
+    صحیح		len;
+    صحیح		rlen = 0;
+    char_u	*سطر;
+    صحیح		clen;
+    صحیح		i;
 
     // Get the byte length of the char under the cursor, including composing
     // characters.
-    line = ml_get_cursor();
-    len = utfc_ptr2len(line);
-    if (len == 0)
+    سطر = ml_get_cursor();
+    len = utfc_ptr2len(سطر);
+    اگر (len == 0)
     {
-	msg("NUL");
-	return;
+	پیغام("NUL");
+	واپس;
     }
 
     clen = 0;
-    for (i = 0; i < len; ++i)
+    برائے (i = 0; i < len; ++i)
     {
-	if (clen == 0)
+	اگر (clen == 0)
 	{
 	    // start of (composing) character, get its length
-	    if (i > 0)
+	    اگر (i > 0)
 	    {
 		STRCPY(IObuff + rlen, "+ ");
 		rlen += 2;
 	    }
-	    clen = utf_ptr2len(line + i);
+	    clen = utf_ptr2len(سطر + i);
 	}
-	sprintf((char *)IObuff + rlen, "%02x ",
-		(line[i] == NL) ? NUL : line[i]);  // NUL is stored as NL
+	sprintf((حرف *)IObuff + rlen, "%02x ",
+		(سطر[i] == NL) ? NUL : سطر[i]);  // NUL is stored as NL
 	--clen;
-	rlen += (int)STRLEN(IObuff + rlen);
-	if (rlen > IOSIZE - 20)
-	    break;
+	rlen += (صحیح)STRLEN(IObuff + rlen);
+	اگر (rlen > IOSIZE - 20)
+	    توڑو;
     }
 
-    msg((char *)IObuff);
+    پیغام((حرف *)IObuff);
 }
 
 /*
@@ -4069,36 +4069,36 @@ show_utf8(void)
  * If "p" points to the NUL at the end of the string return 0.
  * Returns 0 when already at the first byte of a character.
  */
-    int
-latin_head_off(char_u *base UNUSED, char_u *p UNUSED)
+    صحیح
+latin_سر_off(char_u *بنیاد غیر_مستعمل, char_u *p غیر_مستعمل)
 {
-    return 0;
+    واپس 0;
 }
 
-    static int
-dbcs_head_off(char_u *base, char_u *p)
+    ساکن صحیح
+dbcs_سر_off(char_u *بنیاد, char_u *p)
 {
     char_u	*q;
 
     // It can't be a trailing byte when not using DBCS, at the start of the
     // string or the previous byte can't start a double-byte.
-    if (p <= base || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
-	return 0;
+    اگر (p <= بنیاد || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
+	واپس 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
-    q = base;
-    while (q < p)
+    q = بنیاد;
+    جب (q < p)
 	q += dbcs_ptr2len(q);
-    return (q == p) ? 0 : 1;
+    واپس (q == p) ? 0 : 1;
 }
 
 /*
  * Special version of dbcs_head_off() that works for ScreenLines[], where
  * single-width DBCS_JPNU characters are stored separately.
  */
-    int
-dbcs_screen_head_off(char_u *base, char_u *p)
+    صحیح
+dbcs_screen_سر_off(char_u *بنیاد, char_u *p)
 {
     char_u	*q;
 
@@ -4106,25 +4106,25 @@ dbcs_screen_head_off(char_u *base, char_u *p)
     // string or the previous byte can't start a double-byte.
     // For euc-jp an 0x8e byte in the previous cell always means we have a
     // lead byte in the current cell.
-    if (p <= base
+    اگر (p <= بنیاد
 	    || (enc_dbcs == DBCS_JPNU && p[-1] == 0x8e)
 	    || MB_BYTE2LEN(p[-1]) == 1
 	    || *p == NUL)
-	return 0;
+	واپس 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
     // For DBCS_JPNU look out for 0x8e, which means the second byte is not
     // stored as the next byte.
-    q = base;
-    while (q < p)
+    q = بنیاد;
+    جب (q < p)
     {
-	if (enc_dbcs == DBCS_JPNU && *q == 0x8e)
+	اگر (enc_dbcs == DBCS_JPNU && *q == 0x8e)
 	    ++q;
-	else
+	ورنہ
 	    q += dbcs_ptr2len(q);
     }
-    return (q == p) ? 0 : 1;
+    واپس (q == p) ? 0 : 1;
 }
 
 /*
@@ -4132,69 +4132,69 @@ dbcs_screen_head_off(char_u *base, char_u *p)
  * characters.  "base" must be the start of the string, which must be NUL
  * terminated.
  */
-    int
-utf_head_off(char_u *base, char_u *p)
+    صحیح
+utf_سر_off(char_u *بنیاد, char_u *p)
 {
     char_u	*q;
     char_u	*s;
-    int		c;
-    int		len;
-#ifdef FEAT_ARABIC
+    صحیح		c;
+    صحیح		len;
+#اگر_تعریف_شدہ FEAT_ARABIC
     char_u	*j;
-#endif
+#اگر_ختم
 
-    if (*p < 0x80)		// be quick for ASCII
-	return 0;
+    اگر (*p < 0x80)		// be quick for ASCII
+	واپس 0;
 
     // Skip backwards over trailing bytes: 10xx.xxxx
     // Skip backwards again if on a composing char.
-    for (q = p; ; --q)
+    برائے (q = p; ; --q)
     {
 	// Move s to the last byte of this char.
-	for (s = q; (s[1] & 0xc0) == 0x80; ++s)
+	برائے (s = q; (s[1] & 0xc0) == 0x80; ++s)
 	    ;
 	// Move q to the first byte of this char.
-	while (q > base && (*q & 0xc0) == 0x80)
+	جب (q > بنیاد && (*q & 0xc0) == 0x80)
 	    --q;
 	// Check for illegal sequence. Do allow an illegal byte after where we
 	// started.
 	len = utf8len_tab[*q];
-	if (len != (int)(s - q + 1) && len != (int)(p - q + 1))
-	    return 0;
+	اگر (len != (صحیح)(s - q + 1) && len != (صحیح)(p - q + 1))
+	    واپس 0;
 
-	if (q <= base)
-	    break;
+	اگر (q <= بنیاد)
+	    توڑو;
 
 	c = utf_ptr2char(q);
-	if (utf_iscomposing(c))
-	    continue;
+	اگر (utf_iscomposing(c))
+	    جاری;
 
-#ifdef FEAT_ARABIC
-	if (arabic_maycombine(c))
+#اگر_تعریف_شدہ FEAT_ARABIC
+	اگر (arabic_maycombine(c))
 	{
 	    // Advance to get a sneak-peak at the next char
 	    j = q;
 	    --j;
 	    // Move j to the first byte of this char.
-	    while (j > base && (*j & 0xc0) == 0x80)
+	    جب (j > بنیاد && (*j & 0xc0) == 0x80)
 		--j;
-	    if (arabic_combine(utf_ptr2char(j), c))
-		continue;
+	    اگر (arabic_combine(utf_ptr2char(j), c))
+		جاری;
 	}
-#endif
-	break;
+#اگر_ختم
+	توڑو;
     }
 
-    return (int)(p - q);
+    واپس (صحیح)(p - q);
 }
 
 /*
  * Whether space is NOT allowed before/after 'c'.
  */
-    int
-utf_eat_space(int cc)
+    صحیح
+utf_eat_space(صحیح cc)
 {
-    return ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
+    واپس ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
 	 || (cc >= 0x2e00 && cc <= 0x2e7f)	// Supplemental punctuations
 	 || (cc >= 0x3000 && cc <= 0x303f)	// CJK symbols and punctuations
 	 || (cc >= 0xff01 && cc <= 0xff0f)	// Full width ASCII punctuations
@@ -4206,10 +4206,10 @@ utf_eat_space(int cc)
 /*
  * Whether line break is allowed before "cc".
  */
-    int
-utf_allow_break_before(int cc)
+    صحیح
+utf_allow_break_before(صحیح cc)
 {
-    static const int BOL_prohibition_punct[] =
+    ساکن ثابت صحیح BOL_prohibition_punct[] =
     {
 	'!',
 	'%',
@@ -4256,32 +4256,32 @@ utf_allow_break_before(int cc)
 	0xff5d, // ｝ fullwidth right curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(BOL_prohibition_punct) - 1;
-    int mid   = 0;
+    صحیح پہلا = 0;
+    صحیح آخری  = ARRAY_لمبائی(BOL_prohibition_punct) - 1;
+    صحیح mid   = 0;
 
-    while (first < last)
+    جب (پہلا < آخری)
     {
-	mid = (first + last)/2;
+	mid = (پہلا + آخری)/2;
 
-	if (cc == BOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > BOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	اگر (cc == BOL_prohibition_punct[mid])
+	    واپس FALSE;
+	ورنہ اگر (cc > BOL_prohibition_punct[mid])
+	    پہلا = mid + 1;
+	ورنہ
+	    آخری = mid - 1;
     }
 
-    return cc != BOL_prohibition_punct[first];
+    واپس cc != BOL_prohibition_punct[پہلا];
 }
 
 /*
  * Whether line break is allowed after "cc".
  */
-    static int
-utf_allow_break_after(int cc)
+    ساکن صحیح
+utf_allow_break_after(صحیح cc)
 {
-    static const int EOL_prohibition_punct[] =
+    ساکن ثابت صحیح EOL_prohibition_punct[] =
     {
 	'(',
 	'<',
@@ -4306,47 +4306,47 @@ utf_allow_break_after(int cc)
 	0xff5b, // ｛ fullwidth left curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(EOL_prohibition_punct) - 1;
-    int mid   = 0;
+    صحیح پہلا = 0;
+    صحیح آخری  = ARRAY_لمبائی(EOL_prohibition_punct) - 1;
+    صحیح mid   = 0;
 
-    while (first < last)
+    جب (پہلا < آخری)
     {
-	mid = (first + last)/2;
+	mid = (پہلا + آخری)/2;
 
-	if (cc == EOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > EOL_prohibition_punct[mid])
-	    first = mid + 1;
-	else
-	    last = mid - 1;
+	اگر (cc == EOL_prohibition_punct[mid])
+	    واپس FALSE;
+	ورنہ اگر (cc > EOL_prohibition_punct[mid])
+	    پہلا = mid + 1;
+	ورنہ
+	    آخری = mid - 1;
     }
 
-    return cc != EOL_prohibition_punct[first];
+    واپس cc != EOL_prohibition_punct[پہلا];
 }
 
 /*
  * Whether line break is allowed between "cc" and "ncc".
  */
-    int
-utf_allow_break(int cc, int ncc)
+    صحیح
+utf_allow_break(صحیح cc, صحیح ncc)
 {
     // don't break between two-letter punctuations
-    if (cc == ncc
+    اگر (cc == ncc
 	    && (cc == 0x2014 // em dash
 		|| cc == 0x2026)) // horizontal ellipsis
-	return FALSE;
+	واپس FALSE;
 
-    return utf_allow_break_after(cc) && utf_allow_break_before(ncc);
+    واپس utf_allow_break_after(cc) && utf_allow_break_before(ncc);
 }
 
 /*
  * Copy a character from "*fp" to "*tp" and advance the pointers.
  */
-    void
+    خالی
 mb_copy_char(char_u **fp, char_u **tp)
 {
-    int	    l = (*mb_ptr2len)(*fp);
+    صحیح	    l = (*mb_ptr2len)(*fp);
 
     mch_memmove(*tp, *fp, (size_t)l);
     *tp += l;
@@ -4358,15 +4358,15 @@ mb_copy_char(char_u **fp, char_u **tp)
  * at the start of a character 0 is returned, otherwise the offset to the next
  * character.  Can start anywhere in a stream of bytes.
  */
-    int
-mb_off_next(char_u *base, char_u *p)
+    صحیح
+mb_off_اگلا(char_u *بنیاد, char_u *p)
 {
-    int		head_off = (*mb_head_off)(base, p);
+    صحیح		سر_off = (*mb_سر_off)(بنیاد, p);
 
-    if (head_off == 0)
-	return 0;
+    اگر (سر_off == 0)
+	واپس 0;
 
-    return (*mb_ptr2len)(p - head_off) - head_off;
+    واپس (*mb_ptr2len)(p - سر_off) - سر_off;
 }
 
 /*
@@ -4374,102 +4374,102 @@ mb_off_next(char_u *base, char_u *p)
  * into.  Can start anywhere in a stream of bytes.
  * Composing characters are not included.
  */
-    int
-mb_tail_off(char_u *base, char_u *p)
+    صحیح
+mb_دم_off(char_u *بنیاد, char_u *p)
 {
-    int		i;
-    int		j;
+    صحیح		i;
+    صحیح		j;
 
-    if (*p == NUL)
-	return 0;
+    اگر (*p == NUL)
+	واپس 0;
 
-    if (enc_utf8)
+    اگر (enc_utf8)
     {
 	// Find the last character that is 10xx.xxxx
-	for (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
+	برائے (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
 	    ;
 	// Check for illegal sequence.
-	for (j = 0; p - j > base; ++j)
-	    if ((p[-j] & 0xc0) != 0x80)
-		break;
-	if (utf8len_tab[p[-j]] != i + j + 1)
-	    return 0;
-	return i;
+	برائے (j = 0; p - j > بنیاد; ++j)
+	    اگر ((p[-j] & 0xc0) != 0x80)
+		توڑو;
+	اگر (utf8len_tab[p[-j]] != i + j + 1)
+	    واپس 0;
+	واپس i;
     }
 
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
-    if (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
-	return 0;
+    اگر (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
+	واپس 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_head_off(base, p);
+    واپس 1 - dbcs_سر_off(بنیاد, p);
 }
 
 /*
  * Find the next illegal byte sequence.
  */
-    void
-utf_find_illegal(void)
+    خالی
+utf_ڈھونڈو_illegal(خالی)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*p;
-    int		len;
+    صحیح		len;
     vimconv_T	vimconv;
-    char_u	*tofree = NULL;
+    char_u	*tofree = تہی;
 
     vimconv.vc_type = CONV_NONE;
-    if (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
+    اگر (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8_ثنائی_ہندسہ))
     {
 	// 'encoding' is "utf-8" but we are editing a 8-bit encoded file,
 	// possibly a utf-8 file with illegal bytes.  Setup for conversion
 	// from utf-8 to 'fileencoding'.
-	convert_setup(&vimconv, p_enc, curbuf->b_p_fenc);
+	convert_تیاری(&vimconv, p_enc, curbuf->b_p_fenc);
     }
 
     curwin->w_cursor.coladd = 0;
-    for (;;)
+    برائے (;;)
     {
 	p = ml_get_cursor();
-	if (vimconv.vc_type != CONV_NONE)
+	اگر (vimconv.vc_type != CONV_NONE)
 	{
 	    vim_free(tofree);
-	    tofree = string_convert(&vimconv, p, NULL);
-	    if (tofree == NULL)
-		break;
+	    tofree = string_convert(&vimconv, p, تہی);
+	    اگر (tofree == تہی)
+		توڑو;
 	    p = tofree;
 	}
 
-	while (*p != NUL)
+	جب (*p != NUL)
 	{
 	    // Illegal means that there are not enough trail bytes (checked by
 	    // utf_ptr2len()) or too many of them (overlong sequence).
 	    len = utf_ptr2len(p);
-	    if (*p >= 0x80 && (len == 1
+	    اگر (*p >= 0x80 && (len == 1
 				     || utf_char2len(utf_ptr2char(p)) != len))
 	    {
-		if (vimconv.vc_type == CONV_NONE)
-		    curwin->w_cursor.col += (colnr_T)(p - ml_get_cursor());
-		else
+		اگر (vimconv.vc_type == CONV_NONE)
+		    curwin->w_cursor.ستون += (colnr_T)(p - ml_get_cursor());
+		ورنہ
 		{
-		    int	    l;
+		    صحیح	    l;
 
-		    len = (int)(p - tofree);
-		    for (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
+		    len = (صحیح)(p - tofree);
+		    برائے (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
 		    {
 			l = utf_ptr2len(p);
-			curwin->w_cursor.col += l;
+			curwin->w_cursor.ستون += l;
 		    }
 		}
-		curwin->w_set_curswant = TRUE;
-		goto theend;
+		curwin->w_سیٹ_curswant = TRUE;
+		جاؤ theend;
 	    }
 	    p += len;
 	}
-	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
-	    break;
+	اگر (curwin->w_cursor.lnum == curbuf->b_ml.ml_سطر_گنتی)
+	    توڑو;
 	++curwin->w_cursor.lnum;
-	curwin->w_cursor.col = 0;
+	curwin->w_cursor.ستون = 0;
     }
 
     // didn't find it: don't move and beep
@@ -4478,64 +4478,64 @@ utf_find_illegal(void)
 
 theend:
     vim_free(tofree);
-    convert_setup(&vimconv, NULL, NULL);
+    convert_تیاری(&vimconv, تہی, تہی);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
+#اگر defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
 /*
  * Return TRUE if string "s" is a valid utf-8 string.
  * When "end" is NULL stop at the first NUL.  Otherwise stop at "end".
  */
-    int
-utf_valid_string(char_u *s, char_u *end)
+    صحیح
+utf_valid_string(char_u *s, char_u *انتہا)
 {
-    int		l;
+    صحیح		l;
     char_u	*p = s;
 
-    while (end == NULL ? *p != NUL : p < end)
+    جب (انتہا == تہی ? *p != NUL : p < انتہا)
     {
 	l = utf8len_tab_zero[*p];
-	if (l == 0)
-	    return FALSE;	// invalid lead byte
-	if (end != NULL && p + l > end)
-	    return FALSE;	// incomplete byte sequence
+	اگر (l == 0)
+	    واپس FALSE;	// invalid lead byte
+	اگر (انتہا != تہی && p + l > انتہا)
+	    واپس FALSE;	// incomplete byte sequence
 	++p;
-	while (--l > 0)
-	    if ((*p++ & 0xc0) != 0x80)
-		return FALSE;	// invalid trail byte
+	جب (--l > 0)
+	    اگر ((*p++ & 0xc0) != 0x80)
+		واپس FALSE;	// invalid trail byte
     }
-    return TRUE;
+    واپس TRUE;
 }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_GUI)
+#اگر defined(FEAT_GUI)
 /*
  * Special version of mb_tail_off() for use in ScreenLines[].
  */
-    int
-dbcs_screen_tail_off(char_u *base, char_u *p)
+    صحیح
+dbcs_screen_دم_off(char_u *بنیاد, char_u *p)
 {
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
     // For euc-jp an 0x8e byte always means we have a lead byte in the current
     // cell.
-    if (*p == NUL || p[1] == NUL
+    اگر (*p == NUL || p[1] == NUL
 	    || (enc_dbcs == DBCS_JPNU && *p == 0x8e)
 	    || MB_BYTE2LEN(*p) == 1)
-	return 0;
+	واپس 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_screen_head_off(base, p);
+    واپس 1 - dbcs_screen_سر_off(بنیاد, p);
 }
-#endif
+#اگر_ختم
 
 /*
  * If the cursor moves on an trail byte, set the cursor on the lead byte.
  * Thus it moves left if necessary.
  * Return TRUE when the cursor was adjusted.
  */
-    void
-mb_adjust_cursor(void)
+    خالی
+mb_adjust_cursor(خالی)
 {
     mb_adjustpos(curbuf, &curwin->w_cursor);
 }
@@ -4544,24 +4544,24 @@ mb_adjust_cursor(void)
  * Adjust position "*lp" to point to the first byte of a multi-byte character.
  * If it points to a tail byte it's moved backwards to the head byte.
  */
-    void
+    خالی
 mb_adjustpos(buf_T *buf, pos_T *lp)
 {
     char_u	*p;
 
-    if (lp->col > 0 || lp->coladd > 1)
+    اگر (lp->ستون > 0 || lp->coladd > 1)
     {
 	p = ml_get_buf(buf, lp->lnum, FALSE);
-	if (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->col)
-	    lp->col = 0;
-	else
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
+	اگر (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->ستون)
+	    lp->ستون = 0;
+	ورنہ
+	    lp->ستون -= (*mb_سر_off)(p, p + lp->ستون);
 	// Reset "coladd" when the cursor would be on the right half of a
 	// double-wide character.
-	if (lp->coladd == 1
-		&& p[lp->col] != TAB
-		&& vim_isprintc((*mb_ptr2char)(p + lp->col))
-		&& ptr2cells(p + lp->col) > 1)
+	اگر (lp->coladd == 1
+		&& p[lp->ستون] != TAB
+		&& vim_isprintc((*mb_ptr2char)(p + lp->ستون))
+		&& ptr2cells(p + lp->ستون) > 1)
 	    lp->coladd = 0;
     }
 }
@@ -4571,46 +4571,46 @@ mb_adjustpos(buf_T *buf, pos_T *lp)
  */
     char_u *
 mb_prevptr(
-    char_u *line,	// start of the string
+    char_u *سطر,	// start of the string
     char_u *p)
 {
-    if (p > line)
-	MB_PTR_BACK(line, p);
-    return p;
+    اگر (p > سطر)
+	MB_PTR_عقب(سطر, p);
+    واپس p;
 }
 
 /*
  * Return the character length of "str".  Each multi-byte character (with
  * following composing characters) counts as one.
  */
-    int
+    صحیح
 mb_charlen(char_u *str)
 {
     char_u	*p = str;
-    int		count;
+    صحیح		گنتی;
 
-    if (p == NULL)
-	return 0;
+    اگر (p == تہی)
+	واپس 0;
 
-    for (count = 0; *p != NUL; count++)
+    برائے (گنتی = 0; *p != NUL; گنتی++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    واپس گنتی;
 }
 
 /*
  * Like mb_charlen() but for a string with specified length.
  */
-    int
-mb_charlen_len(char_u *str, int len)
+    صحیح
+mb_charlen_len(char_u *str, صحیح len)
 {
     char_u	*p = str;
-    int		count;
+    صحیح		گنتی;
 
-    for (count = 0; *p != NUL && p < str + len; count++)
+    برائے (گنتی = 0; *p != NUL && p < str + len; گنتی++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    واپس گنتی;
 }
 
 /*
@@ -4623,57 +4623,57 @@ mb_charlen_len(char_u *str, int len)
     char_u *
 mb_unescape(char_u **pp)
 {
-    static char_u	buf[6];
-    int			n;
-    int			m = 0;
+    ساکن char_u	buf[6];
+    صحیح			n;
+    صحیح			m = 0;
     char_u		*str = *pp;
 
     // Must translate K_SPECIAL KS_SPECIAL KE_FILLER to K_SPECIAL and CSI
     // KS_EXTRA KE_CSI to CSI.
     // Maximum length of a utf-8 character is 4 bytes.
-    for (n = 0; str[n] != NUL && m < 4; ++n)
+    برائے (n = 0; str[n] != NUL && m < 4; ++n)
     {
-	if (str[n] == K_SPECIAL
+	اگر (str[n] == K_SPECIAL
 		&& str[n + 1] == KS_SPECIAL
 		&& str[n + 2] == KE_FILLER)
 	{
 	    buf[m++] = K_SPECIAL;
 	    n += 2;
 	}
-	else if ((str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	ورنہ اگر ((str[n] == K_SPECIAL
+#اگر_تعریف_شدہ FEAT_GUI
 		    || str[n] == CSI
-#endif
+#اگر_ختم
 		 )
 		&& str[n + 1] == KS_EXTRA
-		&& str[n + 2] == (int)KE_CSI)
+		&& str[n + 2] == (صحیح)KE_CSI)
 	{
 	    buf[m++] = CSI;
 	    n += 2;
 	}
-	else if (str[n] == K_SPECIAL
-#ifdef FEAT_GUI
+	ورنہ اگر (str[n] == K_SPECIAL
+#اگر_تعریف_شدہ FEAT_GUI
 		|| str[n] == CSI
-#endif
+#اگر_ختم
 		)
-	    break;		// a special key can't be a multibyte char
-	else
+	    توڑو;		// a special key can't be a multibyte char
+	ورنہ
 	    buf[m++] = str[n];
 	buf[m] = NUL;
 
 	// Return a multi-byte character if it's found.  An illegal sequence
 	// will result in a 1 here.
-	if ((*mb_ptr2len)(buf) > 1)
+	اگر ((*mb_ptr2len)(buf) > 1)
 	{
 	    *pp = str + n + 1;
-	    return buf;
+	    واپس buf;
 	}
 
 	// Bail out quickly for ASCII.
-	if (buf[0] < 128)
-	    break;
+	اگر (buf[0] < 128)
+	    توڑو;
     }
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -4681,37 +4681,37 @@ mb_unescape(char_u **pp)
  * of a double-width character.
  * Caller must make sure "row" and "col" are not invalid!
  */
-    int
-mb_lefthalve(int row, int col)
+    صحیح
+mb_lefthalve(صحیح صف, صحیح ستون)
 {
-    return (*mb_off2cells)(LineOffset[row] + col,
-					LineOffset[row] + screen_Columns) > 1;
+    واپس (*mb_off2cells)(سطر_انحراف[صف] + ستون,
+					سطر_انحراف[صف] + screen_Columns) > 1;
 }
 
 /*
  * Correct a position on the screen, if it's the right half of a double-wide
  * char move it to the left half.  Returns the corrected column.
  */
-    int
-mb_fix_col(int col, int row)
+    صحیح
+mb_fix_ستون(صحیح ستون, صحیح صف)
 {
-    int off;
+    صحیح off;
 
-    col = check_col(col);
-    row = check_row(row);
-    off = LineOffset[row] + col;
-    if (has_mbyte && ScreenLines != NULL && col > 0
+    ستون = check_ستون(ستون);
+    صف = check_صف(صف);
+    off = سطر_انحراف[صف] + ستون;
+    اگر (has_mbyte && Screen_سطریں != تہی && ستون > 0
 	    && ((enc_dbcs
-		    && ScreenLines[off] != NUL
-		    && dbcs_screen_head_off(ScreenLines + LineOffset[row],
-					 ScreenLines + off))
-		|| (enc_utf8 && ScreenLines[off] == 0
-						  && ScreenLinesUC[off] == 0)))
-	return col - 1;
-    return col;
+		    && Screen_سطریں[off] != NUL
+		    && dbcs_screen_سر_off(Screen_سطریں + سطر_انحراف[صف],
+					 Screen_سطریں + off))
+		|| (enc_utf8 && Screen_سطریں[off] == 0
+						  && Screen_سطریں_UC[off] == 0)))
+	واپس ستون - 1;
+    واپس ستون;
 }
 
-static int enc_alias_search(char_u *name);
+ساکن صحیح enc_alias_تلاش(char_u *name);
 
 /*
  * Skip the Vim specific head of a 'encoding' name.
@@ -4719,11 +4719,11 @@ static int enc_alias_search(char_u *name);
     char_u *
 enc_skip(char_u *p)
 {
-    if (STRNCMP(p, "2byte-", 6) == 0)
-	return p + 6;
-    if (STRNCMP(p, "8bit-", 5) == 0)
-	return p + 5;
-    return p;
+    اگر (STRNCMP(p, "2byte-", 6) == 0)
+	واپس p + 6;
+    اگر (STRNCMP(p, "8bit-", 5) == 0)
+	واپس p + 5;
+    واپس p;
 }
 
 /*
@@ -4737,34 +4737,34 @@ enc_canonize(char_u *enc)
 {
     char_u	*r;
     char_u	*p, *s;
-    int		i;
+    صحیح		i;
 
-    if (STRCMP(enc, "default") == 0)
+    اگر (STRCMP(enc, "default") == 0)
     {
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
 	// Use the system encoding, the default is always utf-8.
 	r = enc_locale();
-#else
+#ورنہ
 	// Use the default encoding as it's found by set_init_1().
 	r = get_encoding_default();
-#endif
-	if (r == NULL)
+#اگر_ختم
+	اگر (r == تہی)
 	    r = (char_u *)ENC_DFLT;
-	return vim_strsave(r);
+	واپس vim_strsave(r);
     }
 
     // copy "enc" to allocated memory, with room for two '-'
     r = alloc(STRLEN(enc) + 3);
-    if (r == NULL)
-	return NULL;
+    اگر (r == تہی)
+	واپس تہی;
 
     // Make it all lower case and replace '_' with '-'.
     p = r;
-    for (s = enc; *s != NUL; ++s)
+    برائے (s = enc; *s != NUL; ++s)
     {
-	if (*s == '_')
+	اگر (*s == '_')
 	    *p++ = '-';
-	else
+	ورنہ
 	    *p++ = TOLOWER_ASC(*s);
     }
     *p = NUL;
@@ -4773,83 +4773,83 @@ enc_canonize(char_u *enc)
     p = enc_skip(r);
 
     // Change "microsoft-cp" to "cp".  Used in some spell files.
-    if (STRNCMP(p, "microsoft-cp", 12) == 0)
+    اگر (STRNCMP(p, "microsoft-cp", 12) == 0)
 	STRMOVE(p, p + 10);
 
     // "iso8859" -> "iso-8859"
-    if (STRNCMP(p, "iso8859", 7) == 0)
+    اگر (STRNCMP(p, "iso8859", 7) == 0)
     {
 	STRMOVE(p + 4, p + 3);
 	p[3] = '-';
     }
 
     // "iso-8859n" -> "iso-8859-n"
-    if (STRNCMP(p, "iso-8859", 8) == 0 && SAFE_isdigit(p[8]))
+    اگر (STRNCMP(p, "iso-8859", 8) == 0 && محفوظ_isdigit(p[8]))
     {
 	STRMOVE(p + 9, p + 8);
 	p[8] = '-';
     }
 
     // "latin-N" -> "latinN"
-    if (STRNCMP(p, "latin-", 6) == 0)
+    اگر (STRNCMP(p, "latin-", 6) == 0)
 	STRMOVE(p + 5, p + 6);
 
-    if (enc_canon_search(p) >= 0)
+    اگر (enc_canon_تلاش(p) >= 0)
     {
 	// canonical name can be used unmodified
-	if (p != r)
+	اگر (p != r)
 	    STRMOVE(r, p);
     }
-    else if ((i = enc_alias_search(p)) >= 0)
+    ورنہ اگر ((i = enc_alias_تلاش(p)) >= 0)
     {
 	// alias recognized, get canonical name
 	vim_free(r);
-	r = vim_strsave((char_u *)enc_canon_table[i].name);
+	r = vim_strsave((char_u *)enc_canon_جدول[i].name);
     }
-    return r;
+    واپس r;
 }
 
 /*
  * Search for an encoding alias of "name".
  * Returns -1 when not found.
  */
-    static int
-enc_alias_search(char_u *name)
+    ساکن صحیح
+enc_alias_تلاش(char_u *name)
 {
-    int		i;
+    صحیح		i;
 
-    for (i = 0; enc_alias_table[i].name != NULL; ++i)
-	if (STRCMP(name, enc_alias_table[i].name) == 0)
-	    return enc_alias_table[i].canon;
-    return -1;
+    برائے (i = 0; enc_alias_جدول[i].name != تہی; ++i)
+	اگر (STRCMP(name, enc_alias_جدول[i].name) == 0)
+	    واپس enc_alias_جدول[i].canon;
+    واپس -1;
 }
 
 
-#ifdef HAVE_LANGINFO_H
+#اگر_تعریف_شدہ HAVE_LANGINFO_H
 # include <langinfo.h>
-#endif
+#اگر_ختم
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#اگر !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Get the canonicalized encoding from the specified locale string "locale"
  * or from the environment variables LC_ALL, LC_CTYPE and LANG.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale_env(char *locale)
+enc_locale_env(حرف *locale)
 {
-    char	*s = locale;
-    char	*p;
-    int		i;
-    char	buf[50];
+    حرف	*s = locale;
+    حرف	*p;
+    صحیح		i;
+    حرف	buf[50];
 
-    if (s == NULL || *s == NUL)
-	if ((s = getenv("LC_ALL")) == NULL || *s == NUL)
-	    if ((s = getenv("LC_CTYPE")) == NULL || *s == NUL)
+    اگر (s == تہی || *s == NUL)
+	اگر ((s = getenv("LC_ALL")) == تہی || *s == NUL)
+	    اگر ((s = getenv("LC_CTYPE")) == تہی || *s == NUL)
 		s = getenv("LANG");
 
-    if (s == NULL || *s == NUL)
-	return NULL;
+    اگر (s == تہی || *s == NUL)
+	واپس تہی;
 
     // The most generic locale format is:
     // language[_territory][.codeset][@modifier][+special][,[sponsor][_revision]]
@@ -4858,10 +4858,10 @@ enc_locale_env(char *locale)
     // Make the name lowercase and replace '_' with '-'.
     // Exception: "ja_JP.EUC" == "euc-jp", "zh_CN.EUC" = "euc-cn",
     // "ko_KR.EUC" == "euc-kr"
-    if ((p = (char *)vim_strchr((char_u *)s, '.')) != NULL)
+    اگر ((p = (حرف *)vim_strchr((char_u *)s, '.')) != تہی)
     {
-	if (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
-			&& !SAFE_isalnum((int)p[4]) && p[4] != '-' && p[-3] == '_')
+	اگر (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
+			&& !محفوظ_isalnum((صحیح)p[4]) && p[4] != '-' && p[-3] == '_')
 	{
 	    // copy "XY.EUC" to "euc-XY" to buf[10]
 	    STRCPY(buf + 10, "euc-");
@@ -4870,90 +4870,90 @@ enc_locale_env(char *locale)
 	    buf[16] = 0;
 	    s = buf + 10;
 	}
-	else
+	ورنہ
 	    s = p + 1;
     }
-    for (i = 0; i < (int)sizeof(buf) - 1 && s[i] != NUL; ++i)
+    برائے (i = 0; i < (صحیح)حجم(buf) - 1 && s[i] != NUL; ++i)
     {
-	if (s[i] == '_' || s[i] == '-')
+	اگر (s[i] == '_' || s[i] == '-')
 	    buf[i] = '-';
-	else if (SAFE_isalnum(s[i]))
+	ورنہ اگر (محفوظ_isalnum(s[i]))
 	    buf[i] = TOLOWER_ASC(s[i]);
-	else
-	    break;
+	ورنہ
+	    توڑو;
     }
     buf[i] = NUL;
 
-    return enc_canonize((char_u *)buf);
+    واپس enc_canonize((char_u *)buf);
 }
-#endif
+#اگر_ختم
 
 /*
  * Get the canonicalized encoding of the current locale.
  * Returns an allocated string when successful, NULL when not.
  */
     char_u *
-enc_locale(void)
+enc_locale(خالی)
 {
-#ifdef MSWIN
-    char	buf[50];
-    long	acp = GetACP();
+#اگر_تعریف_شدہ MSWIN
+    حرف	buf[50];
+    طویل	acp = GetACP();
 
-    if (acp == 1200)
+    اگر (acp == 1200)
 	STRCPY(buf, "ucs-2le");
-    else if (acp == 1252)	    // cp1252 is used as latin1
+    ورنہ اگر (acp == 1252)	    // cp1252 is used as latin1
 	STRCPY(buf, "latin1");
-    else if (acp == 65001)
+    ورنہ اگر (acp == 65001)
 	STRCPY(buf, "utf-8");
-    else
+    ورنہ
 	sprintf(buf, "cp%ld", acp);
 
-    return enc_canonize((char_u *)buf);
-#else
-    char	*s;
+    واپس enc_canonize((char_u *)buf);
+#ورنہ
+    حرف	*s;
 
 # ifdef HAVE_NL_LANGINFO_CODESET
-    if ((s = nl_langinfo(CODESET)) == NULL || *s == NUL)
+    اگر ((s = nl_langinfo(CODESET)) == تہی || *s == NUL)
 # endif
-# if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	if ((s = setlocale(LC_CTYPE, NULL)) == NULL || *s == NUL)
+# اگر defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	اگر ((s = setlocale(LC_CTYPE, تہی)) == تہی || *s == NUL)
 # endif
-	    s = NULL;
+	    s = تہی;
 
-    return enc_locale_env(s);
-#endif
+    واپس enc_locale_env(s);
+#اگر_ختم
 }
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#اگر defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
 /*
  * Convert an encoding name to an MS-Windows codepage.
  * Returns zero if no codepage can be figured out.
  */
-    int
+    صحیح
 encname2codepage(char_u *name)
 {
-    int		cp;
+    صحیح		cp;
     char_u	*p = name;
-    int		idx;
+    صحیح		idx;
 
-    if (STRNCMP(p, "8bit-", 5) == 0)
+    اگر (STRNCMP(p, "8bit-", 5) == 0)
 	p += 5;
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    ورنہ اگر (STRNCMP(p_enc, "2byte-", 6) == 0)
 	p += 6;
 
-    if (p[0] == 'c' && p[1] == 'p')
-	cp = atoi((char *)p + 2);
-    else if ((idx = enc_canon_search(p)) >= 0)
-	cp = enc_canon_table[idx].codepage;
-    else
-	return 0;
-    if (IsValidCodePage(cp))
-	return cp;
-    return 0;
+    اگر (p[0] == 'c' && p[1] == 'p')
+	cp = atoi((حرف *)p + 2);
+    ورنہ اگر ((idx = enc_canon_تلاش(p)) >= 0)
+	cp = enc_canon_جدول[idx].codepage;
+    ورنہ
+	واپس 0;
+    اگر (Is_Valid_رمز_صفحہ(cp))
+	واپس cp;
+    واپس 0;
 }
-#endif
+#اگر_ختم
 
-#if defined(USE_ICONV)
+#اگر defined(USE_ICONV)
 
 /*
  * Call iconv_open() with a check if iconv() works properly (there are broken
@@ -4961,28 +4961,28 @@ encname2codepage(char_u *name)
  * Returns (void *)-1 if failed.
  * (should return iconv_t, but that causes problems with prototypes).
  */
-    void *
-my_iconv_open(char_u *to, char_u *from)
+    خالی *
+my_iconv_open(char_u *مقصد, char_u *from)
 {
     iconv_t	fd;
 # define ICONV_TESTLEN 400
     char_u	tobuf[ICONV_TESTLEN];
-    char	*p;
+    حرف	*p;
     size_t	tolen;
-    static int	iconv_ok = -1;
+    ساکن صحیح	iconv_ok = -1;
 
-    if (iconv_ok == FALSE)
-	return (void *)-1;	// detected a broken iconv() previously
+    اگر (iconv_ok == FALSE)
+	واپس (خالی *)-1;	// detected a broken iconv() previously
 
 # ifdef DYNAMIC_ICONV
     // Check if the iconv.dll can be found.
-    if (!iconv_enabled(TRUE))
-	return (void *)-1;
+    اگر (!iconv_enabled(TRUE))
+	واپس (خالی *)-1;
 # endif
 
-    fd = iconv_open((char *)enc_skip(to), (char *)enc_skip(from));
+    fd = iconv_open((حرف *)enc_skip(مقصد), (حرف *)enc_skip(from));
 
-    if (fd != (iconv_t)-1 && iconv_ok == -1)
+    اگر (fd != (iconv_t)-1 && iconv_ok == -1)
     {
 	/*
 	 * Do a dummy iconv() call to check if it actually works.  There is a
@@ -4991,20 +4991,20 @@ my_iconv_open(char_u *to, char_u *from)
 	 * the initial shift state the "to" pointer is NULL and conversion
 	 * stops for no apparent reason after about 8160 characters.
 	 */
-	p = (char *)tobuf;
+	p = (حرف *)tobuf;
 	tolen = ICONV_TESTLEN;
-	(void)iconv(fd, NULL, NULL, &p, &tolen);
-	if (p == NULL)
+	(خالی)iconv(fd, تہی, تہی, &p, &tolen);
+	اگر (p == تہی)
 	{
 	    iconv_ok = FALSE;
 	    iconv_close(fd);
 	    fd = (iconv_t)-1;
 	}
-	else
+	ورنہ
 	    iconv_ok = TRUE;
     }
 
-    return (void *)fd;
+    واپس (خالی *)fd;
 }
 
 /*
@@ -5014,113 +5014,113 @@ my_iconv_open(char_u *to, char_u *from)
  * Returns the converted string in allocated memory.  NULL for an error.
  * If resultlenp is not NULL, sets it to the result length in bytes.
  */
-    static char_u *
+    ساکن char_u *
 iconv_string(
     vimconv_T	*vcp,
     char_u	*str,
-    int		slen,
-    int		*unconvlenp,
-    int		*resultlenp)
+    صحیح		slen,
+    صحیح		*unconvlenp,
+    صحیح		*resultlenp)
 {
-    const char	*from;
+    ثابت حرف	*from;
     size_t	fromlen;
-    char	*to;
+    حرف	*مقصد;
     size_t	tolen;
     size_t	len = 0;
-    size_t	done = 0;
-    char_u	*result = NULL;
+    size_t	مکمل = 0;
+    char_u	*نتیجہ = تہی;
     char_u	*p;
-    int		l;
+    صحیح		l;
 
-    from = (char *)str;
+    from = (حرف *)str;
     fromlen = slen;
-    for (;;)
+    برائے (;;)
     {
-	if (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
+	اگر (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
 	{
 	    // Allocate enough room for most conversions.  When re-allocating
 	    // increase the buffer size.
 	    len = len + fromlen * 2 + 40;
 	    p = alloc(len);
-	    if (p != NULL && done > 0)
-		mch_memmove(p, result, done);
-	    vim_free(result);
-	    result = p;
-	    if (result == NULL)	// out of memory
-		break;
+	    اگر (p != تہی && مکمل > 0)
+		mch_memmove(p, نتیجہ, مکمل);
+	    vim_free(نتیجہ);
+	    نتیجہ = p;
+	    اگر (نتیجہ == تہی)	// out of memory
+		توڑو;
 	}
 
-	to = (char *)result + done;
-	tolen = len - done - 2;
+	مقصد = (حرف *)نتیجہ + مکمل;
+	tolen = len - مکمل - 2;
 	// Avoid a warning for systems with a wrong iconv() prototype by
 	// casting the second argument to void *.
-	if (iconv(vcp->vc_fd, (void *)&from, &fromlen, &to, &tolen)
+	اگر (iconv(vcp->vc_fd, (خالی *)&from, &fromlen, &مقصد, &tolen)
 								!= (size_t)-1)
 	{
 	    // Finished, append a NUL.
-	    *to = NUL;
-	    break;
+	    *مقصد = NUL;
+	    توڑو;
 	}
 
 	// Check both ICONV_EINVAL and EINVAL, because the dynamically loaded
 	// iconv library may use one of them.
-	if (!vcp->vc_fail && unconvlenp != NULL
+	اگر (!vcp->vc_fail && unconvlenp != تہی
 		&& (ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Handle an incomplete sequence at the end.
-	    *to = NUL;
-	    *unconvlenp = (int)fromlen;
-	    break;
+	    *مقصد = NUL;
+	    *unconvlenp = (صحیح)fromlen;
+	    توڑو;
 	}
 
 	// Check both ICONV_EILSEQ and EILSEQ, because the dynamically loaded
 	// iconv library may use one of them.
-	else if (!vcp->vc_fail
+	ورنہ اگر (!vcp->vc_fail
 		&& (ICONV_ERRNO == ICONV_EILSEQ || ICONV_ERRNO == EILSEQ
 		    || ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Can't convert: insert a '?' and skip a character.  This assumes
 	    // conversion from 'encoding' to something else.  In other
 	    // situations we don't know what to skip anyway.
-	    *to++ = '?';
-	    if ((*mb_ptr2cells)((char_u *)from) > 1)
-		*to++ = '?';
-	    if (enc_utf8)
-		l = utfc_ptr2len_len((char_u *)from, (int)fromlen);
-	    else
+	    *مقصد++ = '?';
+	    اگر ((*mb_ptr2cells)((char_u *)from) > 1)
+		*مقصد++ = '?';
+	    اگر (enc_utf8)
+		l = utfc_ptr2len_len((char_u *)from, (صحیح)fromlen);
+	    ورنہ
 	    {
 		l = (*mb_ptr2len)((char_u *)from);
-		if (l > (int)fromlen)
-		    l = (int)fromlen;
+		اگر (l > (صحیح)fromlen)
+		    l = (صحیح)fromlen;
 	    }
 	    from += l;
 	    fromlen -= l;
 	}
-	else if (ICONV_ERRNO != ICONV_E2BIG)
+	ورنہ اگر (ICONV_ERRNO != ICONV_E2BIG)
 	{
 	    // conversion failed
-	    VIM_CLEAR(result);
-	    break;
+	    VIM_CLEAR(نتیجہ);
+	    توڑو;
 	}
 	// Not enough room or skipping illegal sequence.
-	done = to - (char *)result;
+	مکمل = مقصد - (حرف *)نتیجہ;
     }
 
-    if (resultlenp != NULL && result != NULL)
-	*resultlenp = (int)(to - (char *)result);
-    return result;
+    اگر (resultlenp != تہی && نتیجہ != تہی)
+	*resultlenp = (صحیح)(مقصد - (حرف *)نتیجہ);
+    واپس نتیجہ;
 }
 
-# if defined(DYNAMIC_ICONV)
+# اگر defined(DYNAMIC_ICONV)
 /*
  * Dynamically load the "iconv.dll" on Win32.
  */
 
 #  ifndef DYNAMIC_ICONV	    // must be generating prototypes
-#   define HINSTANCE int
+#   define HINSTANCE صحیح
 #  endif
-static HINSTANCE hIconvDLL = 0;
-static HINSTANCE hMsvcrtDLL = 0;
+ساکن HINSTANCE hIconvDLL = 0;
+ساکن HINSTANCE hMsvcrtDLL = 0;
 
 #  ifndef DYNAMIC_ICONV_DLL
 #   define DYNAMIC_ICONV_DLL "iconv.dll"
@@ -5135,142 +5135,142 @@ static HINSTANCE hMsvcrtDLL = 0;
 /*
  * Try opening the iconv.dll and return TRUE if iconv() can be used.
  */
-    int
-iconv_enabled(int verbose)
+    صحیح
+iconv_enabled(صحیح verbose)
 {
-    if (hIconvDLL != 0 && hMsvcrtDLL != 0)
-	return TRUE;
+    اگر (hIconvDLL != 0 && hMsvcrtDLL != 0)
+	واپس TRUE;
 
     // The iconv DLL file goes under different names, try them all.
     // Do the "2" version first, it's newer.
 #  ifdef DYNAMIC_ICONV_DLL_ALT2
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT2);
+    اگر (hIconvDLL == 0)
+	hIconvDLL = vim_بھرو_Lib(DYNAMIC_ICONV_DLL_ALT2);
 #  endif
 #  ifdef DYNAMIC_ICONV_DLL_ALT3
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT3);
+    اگر (hIconvDLL == 0)
+	hIconvDLL = vim_بھرو_Lib(DYNAMIC_ICONV_DLL_ALT3);
 #  endif
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL);
+    اگر (hIconvDLL == 0)
+	hIconvDLL = vim_بھرو_Lib(DYNAMIC_ICONV_DLL);
 #  ifdef DYNAMIC_ICONV_DLL_ALT1
-    if (hIconvDLL == 0)
-	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT1);
+    اگر (hIconvDLL == 0)
+	hIconvDLL = vim_بھرو_Lib(DYNAMIC_ICONV_DLL_ALT1);
 #  endif
 
-    if (hIconvDLL != 0)
-	hMsvcrtDLL = vimLoadLib(DYNAMIC_MSVCRT_DLL);
-    if (hIconvDLL == 0 || hMsvcrtDLL == 0)
+    اگر (hIconvDLL != 0)
+	hMsvcrtDLL = vim_بھرو_Lib(DYNAMIC_MSVCRT_DLL);
+    اگر (hIconvDLL == 0 || hMsvcrtDLL == 0)
     {
 	// Only give the message when 'verbose' is set, otherwise it might be
 	// done whenever a conversion is attempted.
-	if (verbose && p_verbose > 0)
+	اگر (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str),
+	    semsg(_(e_could_not_بھرو_library_str_str),
 		    hIconvDLL == 0 ? DYNAMIC_ICONV_DLL : DYNAMIC_MSVCRT_DLL,
 		    GetWin32Error());
 	    verbose_leave();
 	}
-	iconv_end();
-	return FALSE;
+	iconv_انتہا();
+	واپس FALSE;
     }
 
-    iconv	= (size_t (*)(iconv_t, const char **,
-			size_t *, char **, size_t *))
-				GetProcAddress(hIconvDLL, "libiconv");
-    iconv_open	= (iconv_t (*)(const char *, const char *))
-				GetProcAddress(hIconvDLL, "libiconv_open");
-    iconv_close	= (int (*)(iconv_t))
-				GetProcAddress(hIconvDLL, "libiconv_close");
-    iconvctl	= (int (*)(iconv_t, int, void *))
-				GetProcAddress(hIconvDLL, "libiconvctl");
-    iconv_errno	= (int *(*)(void))get_dll_import_func(hIconvDLL, "_errno");
-    if (iconv_errno == NULL)
-	iconv_errno = (int *(*)(void))GetProcAddress(hMsvcrtDLL, "_errno");
-    if (iconv == NULL || iconv_open == NULL || iconv_close == NULL
-	    || iconvctl == NULL || iconv_errno == NULL)
+    iconv	= (size_t (*)(iconv_t, ثابت حرف **,
+			size_t *, حرف **, size_t *))
+				Get_Proc_پتہ(hIconvDLL, "libiconv");
+    iconv_open	= (iconv_t (*)(ثابت حرف *, ثابت حرف *))
+				Get_Proc_پتہ(hIconvDLL, "libiconv_open");
+    iconv_close	= (صحیح (*)(iconv_t))
+				Get_Proc_پتہ(hIconvDLL, "libiconv_close");
+    iconvctl	= (صحیح (*)(iconv_t, صحیح, خالی *))
+				Get_Proc_پتہ(hIconvDLL, "libiconvctl");
+    iconv_errno	= (صحیح *(*)(خالی))get_dll_import_func(hIconvDLL, "_errno");
+    اگر (iconv_errno == تہی)
+	iconv_errno = (صحیح *(*)(خالی))Get_Proc_پتہ(hMsvcrtDLL, "_errno");
+    اگر (iconv == تہی || iconv_open == تہی || iconv_close == تہی
+	    || iconvctl == تہی || iconv_errno == تہی)
     {
-	iconv_end();
-	if (verbose && p_verbose > 0)
+	iconv_انتہا();
+	اگر (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_function_str), "for libiconv");
+	    semsg(_(e_could_not_بھرو_library_function_str), "for libiconv");
 	    verbose_leave();
 	}
-	return FALSE;
+	واپس FALSE;
     }
-    return TRUE;
+    واپس TRUE;
 }
 
-    void
-iconv_end(void)
+    خالی
+iconv_انتہا(خالی)
 {
     // Don't use iconv() when inputting or outputting characters.
-    if (input_conv.vc_type == CONV_ICONV)
-	convert_setup(&input_conv, NULL, NULL);
-    if (output_conv.vc_type == CONV_ICONV)
-	convert_setup(&output_conv, NULL, NULL);
+    اگر (داخلہ_conv.vc_type == CONV_ICONV)
+	convert_تیاری(&داخلہ_conv, تہی, تہی);
+    اگر (output_conv.vc_type == CONV_ICONV)
+	convert_تیاری(&output_conv, تہی, تہی);
 
-    if (hIconvDLL != 0)
+    اگر (hIconvDLL != 0)
 	FreeLibrary(hIconvDLL);
-    if (hMsvcrtDLL != 0)
+    اگر (hMsvcrtDLL != 0)
 	FreeLibrary(hMsvcrtDLL);
     hIconvDLL = 0;
     hMsvcrtDLL = 0;
 }
 # endif // DYNAMIC_ICONV
-#endif // USE_ICONV
+#اگر_ختم // USE_ICONV
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * "getimstatus()" function
  */
-    void
-f_getimstatus(typval_T *argvars UNUSED, typval_T *rettv)
+    خالی
+f_getimstatus(typval_T *argvars غیر_مستعمل, typval_T *rettv)
 {
-# if defined(HAVE_INPUT_METHOD)
-    rettv->vval.v_number = im_get_status();
+# اگر defined(HAVE_داخلہ_طریقہ)
+    rettv->vval.v_نمبر = im_get_حالت();
 # endif
 }
 
 /*
  * iconv() function
  */
-    void
-f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
+    خالی
+f_iconv(typval_T *argvars غیر_مستعمل, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*from, *to, *str;
+    char_u	*from, *مقصد, *str;
     vimconv_T	vimconv;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = تہی;
 
-    if (in_vim9script()
+    اگر (اندر_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	واپس;
 
     str = tv_get_string(&argvars[0]);
     from = enc_canonize(enc_skip(tv_get_string_buf(&argvars[1], buf1)));
-    to = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
+    مقصد = enc_canonize(enc_skip(tv_get_string_buf(&argvars[2], buf2)));
     vimconv.vc_type = CONV_NONE;
-    convert_setup(&vimconv, from, to);
+    convert_تیاری(&vimconv, from, مقصد);
 
     // If the encodings are equal, no conversion needed.
-    if (vimconv.vc_type == CONV_NONE)
+    اگر (vimconv.vc_type == CONV_NONE)
 	rettv->vval.v_string = vim_strsave(str);
-    else
-	rettv->vval.v_string = string_convert(&vimconv, str, NULL);
+    ورنہ
+	rettv->vval.v_string = string_convert(&vimconv, str, تہی);
 
-    convert_setup(&vimconv, NULL, NULL);
+    convert_تیاری(&vimconv, تہی, تہی);
     vim_free(from);
-    vim_free(to);
+    vim_free(مقصد);
 }
-#endif
+#اگر_ختم
 
 /*
  * Setup "vcp" for conversion from "from" to "to".
@@ -5281,179 +5281,179 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
  * Afterwards invoke with "from" and "to" equal to NULL to cleanup.
  * Return FAIL when conversion is not supported, OK otherwise.
  */
-    int
-convert_setup(vimconv_T *vcp, char_u *from, char_u *to)
+    صحیح
+convert_تیاری(vimconv_T *vcp, char_u *from, char_u *مقصد)
 {
-    return convert_setup_ext(vcp, from, TRUE, to, TRUE);
+    واپس convert_تیاری_ext(vcp, from, TRUE, مقصد, TRUE);
 }
 
 /*
  * As convert_setup(), but only when from_unicode_is_utf8 is TRUE will all
  * "from" unicode charsets be considered utf-8.  Same for "to".
  */
-    int
-convert_setup_ext(
+    صحیح
+convert_تیاری_ext(
     vimconv_T	*vcp,
     char_u	*from,
-    int		from_unicode_is_utf8,
-    char_u	*to,
-    int		to_unicode_is_utf8)
+    صحیح		from_unicode_is_utf8,
+    char_u	*مقصد,
+    صحیح		مقصد_unicode_is_utf8)
 {
-    int		from_prop;
-    int		to_prop;
-    int		from_is_utf8;
-    int		to_is_utf8;
+    صحیح		from_prop;
+    صحیح		مقصد_prop;
+    صحیح		from_is_utf8;
+    صحیح		مقصد_is_utf8;
 
     // Reset to no conversion.
-#ifdef USE_ICONV
-    if (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
+#اگر_تعریف_شدہ USE_ICONV
+    اگر (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
 	iconv_close(vcp->vc_fd);
-#endif
+#اگر_ختم
     vcp->vc_type = CONV_NONE;
-    vcp->vc_factor = 1;
+    vcp->vc_ضربی_عدد = 1;
     vcp->vc_fail = FALSE;
 
     // No conversion when one of the names is empty or they are equal.
-    if (from == NULL || *from == NUL || to == NULL || *to == NUL
-						     || STRCMP(from, to) == 0)
-	return OK;
+    اگر (from == تہی || *from == NUL || مقصد == تہی || *مقصد == NUL
+						     || STRCMP(from, مقصد) == 0)
+	واپس OK;
 
     from_prop = enc_canon_props(from);
-    to_prop = enc_canon_props(to);
-    if (from_unicode_is_utf8)
+    مقصد_prop = enc_canon_props(مقصد);
+    اگر (from_unicode_is_utf8)
 	from_is_utf8 = from_prop & ENC_UNICODE;
-    else
+    ورنہ
 	from_is_utf8 = from_prop == ENC_UNICODE;
-    if (to_unicode_is_utf8)
-	to_is_utf8 = to_prop & ENC_UNICODE;
-    else
-	to_is_utf8 = to_prop == ENC_UNICODE;
+    اگر (مقصد_unicode_is_utf8)
+	مقصد_is_utf8 = مقصد_prop & ENC_UNICODE;
+    ورنہ
+	مقصد_is_utf8 = مقصد_prop == ENC_UNICODE;
 
-    if ((from_prop & ENC_LATIN1) && to_is_utf8)
+    اگر ((from_prop & ENC_LATIN1) && مقصد_is_utf8)
     {
 	// Internal latin1 -> utf-8 conversion.
-	vcp->vc_type = CONV_TO_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_type = CONV_مقصد_UTF8;
+	vcp->vc_ضربی_عدد = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN9) && to_is_utf8)
+    ورنہ اگر ((from_prop & ENC_LATIN9) && مقصد_is_utf8)
     {
 	// Internal latin9 -> utf-8 conversion.
-	vcp->vc_type = CONV_9_TO_UTF8;
-	vcp->vc_factor = 3;	// up to three as long (euro sign)
+	vcp->vc_type = CONV_9_مقصد_UTF8;
+	vcp->vc_ضربی_عدد = 3;	// up to three as long (euro sign)
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN1))
+    ورنہ اگر (from_is_utf8 && (مقصد_prop & ENC_LATIN1))
     {
 	// Internal utf-8 -> latin1 conversion.
-	vcp->vc_type = CONV_TO_LATIN1;
+	vcp->vc_type = CONV_مقصد_LATIN1;
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN9))
+    ورنہ اگر (from_is_utf8 && (مقصد_prop & ENC_LATIN9))
     {
 	// Internal utf-8 -> latin9 conversion.
-	vcp->vc_type = CONV_TO_LATIN9;
+	vcp->vc_type = CONV_مقصد_LATIN9;
     }
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
     // Win32-specific codepage <-> codepage conversion without iconv.
-    else if ((from_is_utf8 || encname2codepage(from) > 0)
-	    && (to_is_utf8 || encname2codepage(to) > 0))
+    ورنہ اگر ((from_is_utf8 || encname2codepage(from) > 0)
+	    && (مقصد_is_utf8 || encname2codepage(مقصد) > 0))
     {
 	vcp->vc_type = CONV_CODEPAGE;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_ضربی_عدد = 2;	// up to twice as long
 	vcp->vc_cpfrom = from_is_utf8 ? 0 : encname2codepage(from);
-	vcp->vc_cpto = to_is_utf8 ? 0 : encname2codepage(to);
+	vcp->vc_cpto = مقصد_is_utf8 ? 0 : encname2codepage(مقصد);
     }
-#endif
-#ifdef MACOS_CONVERT
-    else if ((from_prop & ENC_MACROMAN) && (to_prop & ENC_LATIN1))
+#اگر_ختم
+#اگر_تعریف_شدہ MACOS_CONVERT
+    ورنہ اگر ((from_prop & ENC_MACROMAN) && (مقصد_prop & ENC_LATIN1))
     {
 	vcp->vc_type = CONV_MAC_LATIN1;
     }
-    else if ((from_prop & ENC_MACROMAN) && to_is_utf8)
+    ورنہ اگر ((from_prop & ENC_MACROMAN) && مقصد_is_utf8)
     {
 	vcp->vc_type = CONV_MAC_UTF8;
-	vcp->vc_factor = 2;	// up to twice as long
+	vcp->vc_ضربی_عدد = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN1) && (to_prop & ENC_MACROMAN))
+    ورنہ اگر ((from_prop & ENC_LATIN1) && (مقصد_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_LATIN1_MAC;
     }
-    else if (from_is_utf8 && (to_prop & ENC_MACROMAN))
+    ورنہ اگر (from_is_utf8 && (مقصد_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_UTF8_MAC;
     }
-#endif
-#ifdef USE_ICONV
-    else
+#اگر_ختم
+#اگر_تعریف_شدہ USE_ICONV
+    ورنہ
     {
 	// Use iconv() for conversion.
 	vcp->vc_fd = (iconv_t)my_iconv_open(
-		to_is_utf8 ? (char_u *)"utf-8" : to,
+		مقصد_is_utf8 ? (char_u *)"utf-8" : مقصد,
 		from_is_utf8 ? (char_u *)"utf-8" : from);
-	if (vcp->vc_fd != (iconv_t)-1)
+	اگر (vcp->vc_fd != (iconv_t)-1)
 	{
 	    vcp->vc_type = CONV_ICONV;
-	    vcp->vc_factor = 4;	// could be longer too...
+	    vcp->vc_ضربی_عدد = 4;	// could be longer too...
 	}
     }
-#endif
-    if (vcp->vc_type == CONV_NONE)
-	return FAIL;
+#اگر_ختم
+    اگر (vcp->vc_type == CONV_NONE)
+	واپس FAIL;
 
-    return OK;
+    واپس OK;
 }
 
-#if defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
+#اگر defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
 /*
  * Do conversion on typed input characters in-place.
  * The input and output are not NUL terminated!
  * Returns the length after conversion.
  */
-    int
-convert_input(char_u *ptr, int len, int maxlen)
+    صحیح
+convert_داخلہ(char_u *ptr, صحیح len, صحیح maxlen)
 {
-    return convert_input_safe(ptr, len, maxlen, NULL, NULL);
+    واپس convert_داخلہ_محفوظ(ptr, len, maxlen, تہی, تہی);
 }
-#endif
+#اگر_ختم
 
 /*
  * Like convert_input(), but when there is an incomplete byte sequence at the
  * end return that as an allocated string in "restp" and set "*restlenp" to
  * the length.  If "restp" is NULL it is not used.
  */
-    int
-convert_input_safe(
+    صحیح
+convert_داخلہ_محفوظ(
     char_u	*ptr,
-    int		len,
-    int		maxlen,
+    صحیح		len,
+    صحیح		maxlen,
     char_u	**restp,
-    int		*restlenp)
+    صحیح		*restlenp)
 {
     char_u	*d;
-    int		dlen = len;
-    int		unconvertlen = 0;
+    صحیح		dlen = len;
+    صحیح		unconvertlen = 0;
 
-    d = string_convert_ext(&input_conv, ptr, &dlen,
-					restp == NULL ? NULL : &unconvertlen);
-    if (d == NULL)
-	return dlen;
+    d = string_convert_ext(&داخلہ_conv, ptr, &dlen,
+					restp == تہی ? تہی : &unconvertlen);
+    اگر (d == تہی)
+	واپس dlen;
 
-    if (dlen <= maxlen)
+    اگر (dlen <= maxlen)
     {
-	if (unconvertlen > 0)
+	اگر (unconvertlen > 0)
 	{
 	    // Move the unconverted characters to allocated memory.
 	    *restp = alloc(unconvertlen);
-	    if (*restp != NULL)
+	    اگر (*restp != تہی)
 		mch_memmove(*restp, ptr + len - unconvertlen, unconvertlen);
 	    *restlenp = unconvertlen;
 	}
 	mch_memmove(ptr, d, dlen);
     }
-    else
+    ورنہ
 	// result is too long, keep the unconverted text (the caller must
 	// have done something wrong!)
 	dlen = len;
     vim_free(d);
-    return dlen;
+    واپس dlen;
 }
 
 /*
@@ -5467,9 +5467,9 @@ convert_input_safe(
 string_convert(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp)
+    صحیح		*lenp)
 {
-    return string_convert_ext(vcp, ptr, lenp, NULL);
+    واپس string_convert_ext(vcp, ptr, lenp, تہی);
 }
 
 /*
@@ -5481,137 +5481,137 @@ string_convert(
 string_convert_ext(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp,
-    int		*unconvlenp)
+    صحیح		*lenp,
+    صحیح		*unconvlenp)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = تہی;
     char_u	*d;
-    int		len;
-    int		i;
-    int		l;
-    int		c;
+    صحیح		len;
+    صحیح		i;
+    صحیح		l;
+    صحیح		c;
 
-    if (lenp == NULL)
-	len = (int)STRLEN(ptr);
-    else
+    اگر (lenp == تہی)
+	len = (صحیح)STRLEN(ptr);
+    ورنہ
 	len = *lenp;
-    if (len == 0)
-	return vim_strsave((char_u *)"");
+    اگر (len == 0)
+	واپس vim_strsave((char_u *)"");
 
-    switch (vcp->vc_type)
+    انتخاب (vcp->vc_type)
     {
-	case CONV_TO_UTF8:	// latin1 to utf-8 conversion
+	حالت CONV_مقصد_UTF8:	// latin1 to utf-8 conversion
 	    retval = alloc(len * 2 + 1);
-	    if (retval == NULL)
-		break;
+	    اگر (retval == تہی)
+		توڑو;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    برائے (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		if (c < 0x80)
+		اگر (c < 0x80)
 		    *d++ = c;
-		else
+		ورنہ
 		{
-		    *d++ = 0xc0 + ((unsigned)c >> 6);
+		    *d++ = 0xc0 + ((غیرعلامتی)c >> 6);
 		    *d++ = 0x80 + (c & 0x3f);
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    اگر (lenp != تہی)
+		*lenp = (صحیح)(d - retval);
+	    توڑو;
 
-	case CONV_9_TO_UTF8:	// latin9 to utf-8 conversion
+	حالت CONV_9_مقصد_UTF8:	// latin9 to utf-8 conversion
 	    retval = alloc(len * 3 + 1);
-	    if (retval == NULL)
-		break;
+	    اگر (retval == تہی)
+		توڑو;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    برائے (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		switch (c)
+		انتخاب (c)
 		{
-		    case 0xa4: c = 0x20ac; break;   // euro
-		    case 0xa6: c = 0x0160; break;   // S hat
-		    case 0xa8: c = 0x0161; break;   // S -hat
-		    case 0xb4: c = 0x017d; break;   // Z hat
-		    case 0xb8: c = 0x017e; break;   // Z -hat
-		    case 0xbc: c = 0x0152; break;   // OE
-		    case 0xbd: c = 0x0153; break;   // oe
-		    case 0xbe: c = 0x0178; break;   // Y
+		    حالت 0xa4: c = 0x20ac; توڑو;   // euro
+		    حالت 0xa6: c = 0x0160; توڑو;   // S hat
+		    حالت 0xa8: c = 0x0161; توڑو;   // S -hat
+		    حالت 0xb4: c = 0x017d; توڑو;   // Z hat
+		    حالت 0xb8: c = 0x017e; توڑو;   // Z -hat
+		    حالت 0xbc: c = 0x0152; توڑو;   // OE
+		    حالت 0xbd: c = 0x0153; توڑو;   // oe
+		    حالت 0xbe: c = 0x0178; توڑو;   // Y
 		}
 		d += utf_char2bytes(c, d);
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    اگر (lenp != تہی)
+		*lenp = (صحیح)(d - retval);
+	    توڑو;
 
-	case CONV_TO_LATIN1:	// utf-8 to latin1 conversion
-	case CONV_TO_LATIN9:	// utf-8 to latin9 conversion
+	حالت CONV_مقصد_LATIN1:	// utf-8 to latin1 conversion
+	حالت CONV_مقصد_LATIN9:	// utf-8 to latin9 conversion
 	    retval = alloc(len + 1);
-	    if (retval == NULL)
-		break;
+	    اگر (retval == تہی)
+		توڑو;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    برائے (i = 0; i < len; ++i)
 	    {
 		l = utf_ptr2len_len(ptr + i, len - i);
-		if (l == 0)
+		اگر (l == 0)
 		    *d++ = NUL;
-		else if (l == 1)
+		ورنہ اگر (l == 1)
 		{
-		    int l_w = utf8len_tab_zero[ptr[i]];
+		    صحیح l_w = utf8len_tab_zero[ptr[i]];
 
-		    if (l_w == 0)
+		    اگر (l_w == 0)
 		    {
 			// Illegal utf-8 byte cannot be converted
 			vim_free(retval);
-			return NULL;
+			واپس تہی;
 		    }
-		    if (unconvlenp != NULL && l_w > len - i)
+		    اگر (unconvlenp != تہی && l_w > len - i)
 		    {
 			// Incomplete sequence at the end.
 			*unconvlenp = len - i;
-			break;
+			توڑو;
 		    }
 		    *d++ = ptr[i];
 		}
-		else
+		ورنہ
 		{
 		    c = utf_ptr2char(ptr + i);
-		    if (vcp->vc_type == CONV_TO_LATIN9)
-			switch (c)
+		    اگر (vcp->vc_type == CONV_مقصد_LATIN9)
+			انتخاب (c)
 			{
-			    case 0x20ac: c = 0xa4; break;   // euro
-			    case 0x0160: c = 0xa6; break;   // S hat
-			    case 0x0161: c = 0xa8; break;   // S -hat
-			    case 0x017d: c = 0xb4; break;   // Z hat
-			    case 0x017e: c = 0xb8; break;   // Z -hat
-			    case 0x0152: c = 0xbc; break;   // OE
-			    case 0x0153: c = 0xbd; break;   // oe
-			    case 0x0178: c = 0xbe; break;   // Y
-			    case 0xa4:
-			    case 0xa6:
-			    case 0xa8:
-			    case 0xb4:
-			    case 0xb8:
-			    case 0xbc:
-			    case 0xbd:
-			    case 0xbe: c = 0x100; break; // not in latin9
+			    حالت 0x20ac: c = 0xa4; توڑو;   // euro
+			    حالت 0x0160: c = 0xa6; توڑو;   // S hat
+			    حالت 0x0161: c = 0xa8; توڑو;   // S -hat
+			    حالت 0x017d: c = 0xb4; توڑو;   // Z hat
+			    حالت 0x017e: c = 0xb8; توڑو;   // Z -hat
+			    حالت 0x0152: c = 0xbc; توڑو;   // OE
+			    حالت 0x0153: c = 0xbd; توڑو;   // oe
+			    حالت 0x0178: c = 0xbe; توڑو;   // Y
+			    حالت 0xa4:
+			    حالت 0xa6:
+			    حالت 0xa8:
+			    حالت 0xb4:
+			    حالت 0xb8:
+			    حالت 0xbc:
+			    حالت 0xbd:
+			    حالت 0xbe: c = 0x100; توڑو; // not in latin9
 			}
-		    if (!utf_iscomposing(c))	// skip composing chars
+		    اگر (!utf_iscomposing(c))	// skip composing chars
 		    {
-			if (c < 0x100)
+			اگر (c < 0x100)
 			    *d++ = c;
-			else if (vcp->vc_fail)
+			ورنہ اگر (vcp->vc_fail)
 			{
 			    vim_free(retval);
-			    return NULL;
+			    واپس تہی;
 			}
-			else
+			ورنہ
 			{
 			    *d++ = 0xbf;
-			    if (utf_char2cells(c) > 1)
+			    اگر (utf_char2cells(c) > 1)
 				*d++ = '?';
 			}
 		    }
@@ -5619,351 +5619,351 @@ string_convert_ext(
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
-	    break;
+	    اگر (lenp != تہی)
+		*lenp = (صحیح)(d - retval);
+	    توڑو;
 
-#ifdef MACOS_CONVERT
-	case CONV_MAC_LATIN1:
+#اگر_تعریف_شدہ MACOS_CONVERT
+	حالت CONV_MAC_LATIN1:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'l', unconvlenp);
-	    break;
+	    توڑو;
 
-	case CONV_LATIN1_MAC:
+	حالت CONV_LATIN1_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'l', 'm', unconvlenp);
-	    break;
+	    توڑو;
 
-	case CONV_MAC_UTF8:
+	حالت CONV_MAC_UTF8:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'm', 'u', unconvlenp);
-	    break;
+	    توڑو;
 
-	case CONV_UTF8_MAC:
+	حالت CONV_UTF8_MAC:
 	    retval = mac_string_convert(ptr, len, lenp, vcp->vc_fail,
 					'u', 'm', unconvlenp);
-	    break;
-#endif
+	    توڑو;
+#اگر_ختم
 
-#ifdef USE_ICONV
-	case CONV_ICONV:	// conversion with output_conv.vc_fd
+#اگر_تعریف_شدہ USE_ICONV
+	حالت CONV_ICONV:	// conversion with output_conv.vc_fd
 	    retval = iconv_string(vcp, ptr, len, unconvlenp, lenp);
-	    break;
-#endif
-#ifdef MSWIN
-	case CONV_CODEPAGE:		// codepage -> codepage
+	    توڑو;
+#اگر_ختم
+#اگر_تعریف_شدہ MSWIN
+	حالت CONV_CODEPAGE:		// codepage -> codepage
 	{
-	    int		retlen;
-	    int		tmp_len;
+	    صحیح		retlen;
+	    صحیح		tmp_len;
 	    short_u	*tmp;
 
 	    // 1. codepage/UTF-8  ->  ucs-2.
-	    if (vcp->vc_cpfrom == 0)
-		tmp_len = utf8_to_utf16(ptr, len, NULL, NULL);
-	    else
+	    اگر (vcp->vc_cpfrom == 0)
+		tmp_len = utf8_مقصد_utf16(ptr, len, تہی, تہی);
+	    ورنہ
 	    {
-		tmp_len = MultiByteToWideChar(vcp->vc_cpfrom,
+		tmp_len = Multi_Byte_مقصد_Wide_Char(vcp->vc_cpfrom,
 					unconvlenp ? MB_ERR_INVALID_CHARS : 0,
-					(char *)ptr, len, 0, 0);
-		if (tmp_len == 0
-			&& GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
+					(حرف *)ptr, len, 0, 0);
+		اگر (tmp_len == 0
+			&& Get_آخری_Error() == ERROR_NO_UNICODE_TRANSLATION)
 		{
-		    if (lenp != NULL)
+		    اگر (lenp != تہی)
 			*lenp = 0;
-		    if (unconvlenp != NULL)
+		    اگر (unconvlenp != تہی)
 			*unconvlenp = len;
 		    retval = alloc(1);
-		    if (retval)
+		    اگر (retval)
 			retval[0] = NUL;
-		    return retval;
+		    واپس retval;
 		}
 	    }
 	    tmp = ALLOC_MULT(short_u, tmp_len);
-	    if (tmp == NULL)
-		break;
-	    if (vcp->vc_cpfrom == 0)
-		utf8_to_utf16(ptr, len, tmp, unconvlenp);
-	    else
-		MultiByteToWideChar(vcp->vc_cpfrom, 0,
-			(char *)ptr, len, tmp, tmp_len);
+	    اگر (tmp == تہی)
+		توڑو;
+	    اگر (vcp->vc_cpfrom == 0)
+		utf8_مقصد_utf16(ptr, len, tmp, unconvlenp);
+	    ورنہ
+		Multi_Byte_مقصد_Wide_Char(vcp->vc_cpfrom, 0,
+			(حرف *)ptr, len, tmp, tmp_len);
 
 	    // 2. ucs-2  ->  codepage/UTF-8.
-	    if (vcp->vc_cpto == 0)
-		retlen = utf16_to_utf8(tmp, tmp_len, NULL);
-	    else
-		retlen = WideCharToMultiByte(vcp->vc_cpto, 0,
+	    اگر (vcp->vc_cpto == 0)
+		retlen = utf16_مقصد_utf8(tmp, tmp_len, تہی);
+	    ورنہ
+		retlen = Wide_Char_مقصد_Multi_Byte(vcp->vc_cpto, 0,
 						    tmp, tmp_len, 0, 0, 0, 0);
 	    retval = alloc(retlen + 1);
-	    if (retval != NULL)
+	    اگر (retval != تہی)
 	    {
-		if (vcp->vc_cpto == 0)
-		    utf16_to_utf8(tmp, tmp_len, retval);
-		else
-		    WideCharToMultiByte(vcp->vc_cpto, 0,
+		اگر (vcp->vc_cpto == 0)
+		    utf16_مقصد_utf8(tmp, tmp_len, retval);
+		ورنہ
+		    Wide_Char_مقصد_Multi_Byte(vcp->vc_cpto, 0,
 					  tmp, tmp_len,
-					  (char *)retval, retlen, 0, 0);
+					  (حرف *)retval, retlen, 0, 0);
 		retval[retlen] = NUL;
-		if (lenp != NULL)
+		اگر (lenp != تہی)
 		    *lenp = retlen;
 	    }
 	    vim_free(tmp);
-	    break;
+	    توڑو;
 	}
-#endif
+#اگر_ختم
     }
 
-    return retval;
+    واپس retval;
 }
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    int
-get_cellwidth(int c UNUSED)
+    صحیح
+get_cellwidth(صحیح c غیر_مستعمل)
 {
-#ifdef FEAT_EVAL
-    return cw_value(c);
-#else
-    return 0;
-#endif
+#اگر_تعریف_شدہ FEAT_EVAL
+    واپس cw_قدر(c);
+#ورنہ
+    واپس 0;
+#اگر_ختم
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 
 /*
  * Table set by setcellwidths().
  */
-typedef struct
+قسمتعریف ساخت
 {
-    long    first;
-    long    last;
-    char    width;
+    طویل    پہلا;
+    طویل    آخری;
+    حرف    چوڑائی;
 } cw_interval_T;
 
-static cw_interval_T	*cw_table = NULL;
-static size_t		cw_table_size = 0;
+ساکن cw_interval_T	*cw_جدول = تہی;
+ساکن size_t		cw_جدول_سائز = 0;
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    static int
-cw_value(int c)
+    ساکن صحیح
+cw_قدر(صحیح c)
 {
-    int mid, bot, top;
+    صحیح mid, bot, چوٹی;
 
-    if (cw_table == NULL)
-	return 0;
+    اگر (cw_جدول == تہی)
+	واپس 0;
 
     // first quick check for Latin1 etc. characters
-    if (c < cw_table[0].first)
-	return 0;
+    اگر (c < cw_جدول[0].پہلا)
+	واپس 0;
 
     // binary search in table
     bot = 0;
-    top = (int)cw_table_size - 1;
-    while (top >= bot)
+    چوٹی = (صحیح)cw_جدول_سائز - 1;
+    جب (چوٹی >= bot)
     {
-	mid = (bot + top) / 2;
-	if (cw_table[mid].last < c)
+	mid = (bot + چوٹی) / 2;
+	اگر (cw_جدول[mid].آخری < c)
 	    bot = mid + 1;
-	else if (cw_table[mid].first > c)
-	    top = mid - 1;
-	else
-	    return cw_table[mid].width;
+	ورنہ اگر (cw_جدول[mid].پہلا > c)
+	    چوٹی = mid - 1;
+	ورنہ
+	    واپس cw_جدول[mid].چوڑائی;
     }
-    return 0;
+    واپس 0;
 }
 
-    static int
-tv_nr_compare(const void *a1, const void *a2)
+    ساکن صحیح
+tv_nr_compare(ثابت خالی *a1, ثابت خالی *a2)
 {
     listitem_T *li1 = *(listitem_T **)a1;
     listitem_T *li2 = *(listitem_T **)a2;
 
-    return li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
-	li1->li_tv.vval.v_number > li2->li_tv.vval.v_number ? 1 : -1;
+    واپس li1->li_tv.vval.v_نمبر == li2->li_tv.vval.v_نمبر ? 0 :
+	li1->li_tv.vval.v_نمبر > li2->li_tv.vval.v_نمبر ? 1 : -1;
 }
 
-    void
-f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
+    خالی
+f_setcellwidths(typval_T *argvars, typval_T *rettv غیر_مستعمل)
 {
     list_T	    *l;
     listitem_T	    *li;
-    int		    item;
-    int		    i;
+    صحیح		    شے;
+    صحیح		    i;
     listitem_T	    **ptrs;
-    cw_interval_T   *table = NULL;
-    size_t	    table_size;
-    cw_interval_T   *cw_table_save;
-    size_t	    cw_table_size_save;
-    char	    *error = NULL;
+    cw_interval_T   *جدول = تہی;
+    size_t	    جدول_سائز_2;
+    cw_interval_T   *cw_جدول_save;
+    size_t	    cw_جدول_سائز_save;
+    حرف	    *error = تہی;
 
-    if (check_for_nonnull_list_arg(argvars, 0) == FAIL)
-	return;
+    اگر (check_for_nonnull_list_arg(argvars, 0) == FAIL)
+	واپس;
 
     l = argvars[0].vval.v_list;
-    table_size = (size_t)l->lv_len;
-    if (table_size == 0)
+    جدول_سائز_2 = (size_t)l->lv_len;
+    اگر (جدول_سائز_2 == 0)
 	// Clearing the table.
-	goto update;
+	جاؤ update;
 
-    ptrs = ALLOC_MULT(listitem_T *, table_size);
-    if (ptrs == NULL)
-	return;
+    ptrs = ALLOC_MULT(listitem_T *, جدول_سائز_2);
+    اگر (ptrs == تہی)
+	واپس;
 
     // Check that all entries are a list with three numbers, the range is
     // valid and the cell width is valid.
-    item = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    شے = 0;
+    FOR_ALL_LIST_اشیاء(l, li)
     {
 	listitem_T *lili;
 	varnumber_T n1;
 
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	اگر (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == تہی)
 	{
-	    semsg(_(e_list_item_nr_is_not_list), item);
+	    semsg(_(e_list_شے_nr_is_not_list), شے);
 	    vim_free(ptrs);
-	    return;
+	    واپس;
 	}
 
-	lili = li->li_tv.vval.v_list->lv_first;
-	ptrs[item] = lili;
-	for (i = 0; lili != NULL; lili = lili->li_next, ++i)
+	lili = li->li_tv.vval.v_list->lv_پہلا;
+	ptrs[شے] = lili;
+	برائے (i = 0; lili != تہی; lili = lili->li_اگلا, ++i)
 	{
-	    if (lili->li_tv.v_type != VAR_NUMBER)
-		break;
-	    if (i == 0)
+	    اگر (lili->li_tv.v_type != VAR_نمبر)
+		توڑو;
+	    اگر (i == 0)
 	    {
-		n1 = lili->li_tv.vval.v_number;
-		if (n1 < 0x80)
+		n1 = lili->li_tv.vval.v_نمبر;
+		اگر (n1 < 0x80)
 		{
-		    emsg(_(e_only_values_of_0x80_and_higher_supported));
+		    emsg(_(e_only_اقدار_کا_0x80_and_higher_supported));
 		    vim_free(ptrs);
-		    return;
+		    واپس;
 		}
 	    }
-	    else if (i == 1 && lili->li_tv.vval.v_number < n1)
+	    ورنہ اگر (i == 1 && lili->li_tv.vval.v_نمبر < n1)
 	    {
-		semsg(_(e_list_item_nr_range_invalid), item);
+		semsg(_(e_list_شے_nr_range_invalid), شے);
 		vim_free(ptrs);
-		return;
+		واپس;
 	    }
-	    else if (i == 2 && (lili->li_tv.vval.v_number < 1
-					     || lili->li_tv.vval.v_number > 2))
+	    ورنہ اگر (i == 2 && (lili->li_tv.vval.v_نمبر < 1
+					     || lili->li_tv.vval.v_نمبر > 2))
 	    {
-		semsg(_(e_list_item_nr_cell_width_invalid), item);
+		semsg(_(e_list_شے_nr_cell_چوڑائی_invalid), شے);
 		vim_free(ptrs);
-		return;
+		واپس;
 	    }
 	}
-	if (i != 3)
+	اگر (i != 3)
 	{
-	    semsg(_(e_list_item_nr_does_not_contain_3_numbers), item);
+	    semsg(_(e_list_شے_nr_does_not_contain_3_numbers), شے);
 	    vim_free(ptrs);
-	    return;
+	    واپس;
 	}
-	++item;
+	++شے;
     }
 
     // Sort the list on the first number.
-    qsort((void *)ptrs, table_size, sizeof(listitem_T *), tv_nr_compare);
+    qsort((خالی *)ptrs, جدول_سائز_2, حجم(listitem_T *), tv_nr_compare);
 
-    table = ALLOC_MULT(cw_interval_T, table_size);
-    if (table == NULL)
+    جدول = ALLOC_MULT(cw_interval_T, جدول_سائز_2);
+    اگر (جدول == تہی)
     {
 	vim_free(ptrs);
-	return;
+	واپس;
     }
 
     // Store the items in the new table.
-    for (item = 0; (size_t)item < table_size; ++item)
+    برائے (شے = 0; (size_t)شے < جدول_سائز_2; ++شے)
     {
-	listitem_T	*lili = ptrs[item];
+	listitem_T	*lili = ptrs[شے];
 	varnumber_T	n1;
 
-	n1 = lili->li_tv.vval.v_number;
-	if (item > 0 && n1 <= table[item - 1].last)
+	n1 = lili->li_tv.vval.v_نمبر;
+	اگر (شے > 0 && n1 <= جدول[شے - 1].آخری)
 	{
-	    semsg(_(e_overlapping_ranges_for_nr), (long)n1);
+	    semsg(_(e_overlapping_ranges_for_nr), (طویل)n1);
 	    vim_free(ptrs);
-	    vim_free(table);
-	    return;
+	    vim_free(جدول);
+	    واپس;
 	}
-	table[item].first = n1;
-	lili = lili->li_next;
-	table[item].last = lili->li_tv.vval.v_number;
-	lili = lili->li_next;
-	table[item].width = lili->li_tv.vval.v_number;
+	جدول[شے].پہلا = n1;
+	lili = lili->li_اگلا;
+	جدول[شے].آخری = lili->li_tv.vval.v_نمبر;
+	lili = lili->li_اگلا;
+	جدول[شے].چوڑائی = lili->li_tv.vval.v_نمبر;
     }
 
     vim_free(ptrs);
 
 update:
-    cw_table_save = cw_table;
-    cw_table_size_save = cw_table_size;
-    cw_table = table;
-    cw_table_size = table_size;
+    cw_جدول_save = cw_جدول;
+    cw_جدول_سائز_save = cw_جدول_سائز;
+    cw_جدول = جدول;
+    cw_جدول_سائز = جدول_سائز_2;
 
     // Check that the new value does not conflict with 'listchars' or
     // 'fillchars'.
     error = check_chars_options();
-    if (error != NULL)
+    اگر (error != تہی)
     {
 	emsg(_(error));
-	cw_table = cw_table_save;
-	cw_table_size = cw_table_size_save;
-	vim_free(table);
-	return;
+	cw_جدول = cw_جدول_save;
+	cw_جدول_سائز = cw_جدول_سائز_save;
+	vim_free(جدول);
+	واپس;
     }
 
-    vim_free(cw_table_save);
-    changed_window_setting_all();
+    vim_free(cw_جدول_save);
+    بدلا_کھڑکی_setting_all();
     redraw_all_later(UPD_CLEAR);
 }
 
-    void
-f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
+    خالی
+f_getcellwidths(typval_T *argvars غیر_مستعمل, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    اگر (rettv_list_alloc(rettv) == FAIL)
+	واپس;
 
-    for (size_t i = 0; i < cw_table_size; i++)
+    برائے (size_t i = 0; i < cw_جدول_سائز; i++)
     {
-	list_T *entry = list_alloc();
-	if (entry == NULL)
-	    break;
-	if (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].last) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].width) == FAIL
-	   || list_append_list(rettv->vval.v_list, entry) == FAIL)
+	list_T *اندراج_2 = list_alloc();
+	اگر (اندراج_2 == تہی)
+	    توڑو;
+	اگر (list_append_نمبر(اندراج_2, (varnumber_T)cw_جدول[i].پہلا) == FAIL
+	   || list_append_نمبر(اندراج_2, (varnumber_T)cw_جدول[i].آخری) == FAIL
+	   || list_append_نمبر(اندراج_2, (varnumber_T)cw_جدول[i].چوڑائی) == FAIL
+	   || list_append_list(rettv->vval.v_list, اندراج_2) == FAIL)
 	{
-	    list_free(entry);
-	    break;
+	    list_free(اندراج_2);
+	    توڑو;
 	}
     }
 }
 
-    void
-f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
+    خالی
+f_charclass(typval_T *argvars, typval_T *rettv غیر_مستعمل)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || argvars[0].vval.v_string == NULL)
-	return;
-    rettv->vval.v_number = mb_get_class(argvars[0].vval.v_string);
+    اگر (check_for_string_arg(argvars, 0) == FAIL
+	    || argvars[0].vval.v_string == تہی)
+	واپس;
+    rettv->vval.v_نمبر = mb_get_class(argvars[0].vval.v_string);
 }
-#endif
+#اگر_ختم
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * encoding options.
  */
     char_u *
-get_encoding_name(expand_T *xp UNUSED, int idx)
+get_encoding_name(expand_T *xp غیر_مستعمل, صحیح idx)
 {
-    if (idx >= (int)(sizeof(enc_canon_table) / sizeof(enc_canon_table[0])))
-	return NULL;
+    اگر (idx >= (صحیح)(حجم(enc_canon_جدول) / حجم(enc_canon_جدول[0])))
+	واپس تہی;
 
-    return (char_u*)enc_canon_table[idx].name;
+    واپس (char_u*)enc_canon_جدول[idx].name;
 }

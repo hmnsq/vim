@@ -21,27 +21,27 @@
  * To disable all of this when compiling Vim for debugging, undefine DEBUG in
  * regexp.c
  */
-#ifdef DEBUG
+#اگر_تعریف_شدہ DEBUG
 # define NFA_REGEXP_ERROR_LOG	"nfa_regexp_error.log"
 # define ENABLE_LOG
 # define NFA_REGEXP_DUMP_LOG	"nfa_regexp_dump.log"
-# define NFA_REGEXP_RUN_LOG	"nfa_regexp_run.log"
+# define NFA_REGEXP_تسلسل_LOG	"nfa_regexp_run.log"
 # define NFA_REGEXP_DEBUG_LOG	"nfa_regexp_debug.log"
-#endif
+#اگر_ختم
 
 // Added to NFA_ANY - NFA_NUPPER_IC to include a NL.
-#define NFA_ADD_NL		31
+#تعریف_کرو NFA_جوڑو_NL		31
 
-enum
+شمار
 {
-    NFA_SPLIT = -1024,
-    NFA_MATCH,
-    NFA_EMPTY,			    // matches 0-length
+    NFA_بانٹو = -1024,
+    NFA_مطابقت,
+    NFA_خالی_خانے,			    // matches 0-length
 
-    NFA_START_COLL,		    // [abc] start
-    NFA_END_COLL,		    // [abc] end
-    NFA_START_NEG_COLL,		    // [^abc] start
-    NFA_END_NEG_COLL,		    // [^abc] end (postfix only)
+    NFA_آغاز_COLL,		    // [abc] start
+    NFA_انتہا_COLL,		    // [abc] end
+    NFA_آغاز_NEG_COLL,		    // [^abc] start
+    NFA_انتہا_NEG_COLL,		    // [^abc] end (postfix only)
     NFA_RANGE,			    // range of the two previous items
 				    // (postfix only)
     NFA_RANGE_MIN,		    // low end of a range
@@ -50,8 +50,8 @@ enum
     NFA_CONCAT,			    // concatenate two previous items (postfix
 				    // only)
     NFA_OR,			    // \| (postfix only)
-    NFA_STAR,			    // greedy * (postfix only)
-    NFA_STAR_NONGREEDY,		    // non-greedy * (postfix only)
+    NFA_ستارہ,			    // greedy * (postfix only)
+    NFA_ستارہ_NONGREEDY,		    // non-greedy * (postfix only)
     NFA_QUEST,			    // greedy \? (postfix only)
     NFA_QUEST_NONGREEDY,	    // non-greedy \? (postfix only)
 
@@ -66,30 +66,30 @@ enum
     NFA_ZEND,			    // Used for \ze
     NFA_NOPEN,			    // Start of subexpression marked with \%(
     NFA_NCLOSE,			    // End of subexpr. marked with \%( ... \)
-    NFA_START_INVISIBLE,
-    NFA_START_INVISIBLE_FIRST,
-    NFA_START_INVISIBLE_NEG,
-    NFA_START_INVISIBLE_NEG_FIRST,
-    NFA_START_INVISIBLE_BEFORE,
-    NFA_START_INVISIBLE_BEFORE_FIRST,
-    NFA_START_INVISIBLE_BEFORE_NEG,
-    NFA_START_INVISIBLE_BEFORE_NEG_FIRST,
-    NFA_START_PATTERN,
-    NFA_END_INVISIBLE,
-    NFA_END_INVISIBLE_NEG,
-    NFA_END_PATTERN,
+    NFA_آغاز_INVISIBLE,
+    NFA_آغاز_INVISIBLE_پہلا,
+    NFA_آغاز_INVISIBLE_NEG,
+    NFA_آغاز_INVISIBLE_NEG_پہلا,
+    NFA_آغاز_INVISIBLE_BEFORE,
+    NFA_آغاز_INVISIBLE_BEFORE_پہلا,
+    NFA_آغاز_INVISIBLE_BEFORE_NEG,
+    NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا,
+    NFA_آغاز_نمونہ,
+    NFA_انتہا_INVISIBLE,
+    NFA_انتہا_INVISIBLE_NEG,
+    NFA_انتہا_نمونہ,
     NFA_COMPOSING,		    // Next nodes in NFA are part of the
 				    // composing multibyte char
-    NFA_END_COMPOSING,		    // End of a composing char in the NFA
+    NFA_انتہا_COMPOSING,		    // End of a composing char in the NFA
     NFA_ANY_COMPOSING,		    // \%C: Any composing characters.
     NFA_OPT_CHARS,		    // \%[abc]
 
     // The following are used only in the postfix form, not in the NFA
-    NFA_PREV_ATOM_NO_WIDTH,	    // Used for \@=
-    NFA_PREV_ATOM_NO_WIDTH_NEG,	    // Used for \@!
-    NFA_PREV_ATOM_JUST_BEFORE,	    // Used for \@<=
-    NFA_PREV_ATOM_JUST_BEFORE_NEG,  // Used for \@<!
-    NFA_PREV_ATOM_LIKE_PATTERN,	    // Used for \@>
+    NFA_پچھلا_ATOM_NO_چوڑائی,	    // Used for \@=
+    NFA_پچھلا_ATOM_NO_چوڑائی_NEG,	    // Used for \@!
+    NFA_پچھلا_ATOM_JUST_BEFORE,	    // Used for \@<=
+    NFA_پچھلا_ATOM_JUST_BEFORE_NEG,  // Used for \@<!
+    NFA_پچھلا_ATOM_LIKE_نمونہ,	    // Used for \@>
 
     NFA_BACKREF1,		    // \1
     NFA_BACKREF2,		    // \2
@@ -100,7 +100,7 @@ enum
     NFA_BACKREF7,		    // \7
     NFA_BACKREF8,		    // \8
     NFA_BACKREF9,		    // \9
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     NFA_ZREF1,			    // \z1
     NFA_ZREF2,			    // \z2
     NFA_ZREF3,			    // \z3
@@ -110,7 +110,7 @@ enum
     NFA_ZREF7,			    // \z7
     NFA_ZREF8,			    // \z8
     NFA_ZREF9,			    // \z9
-#endif
+#اگر_ختم
     NFA_SKIP,			    // Skip characters
 
     NFA_MOPEN,
@@ -135,7 +135,7 @@ enum
     NFA_MCLOSE8,
     NFA_MCLOSE9,
 
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     NFA_ZOPEN,
     NFA_ZOPEN1,
     NFA_ZOPEN2,
@@ -157,7 +157,7 @@ enum
     NFA_ZCLOSE7,
     NFA_ZCLOSE8,
     NFA_ZCLOSE9,
-#endif
+#اگر_ختم
 
     // NFA_FIRST_NL
     NFA_ANY,		//	Match any one character.
@@ -177,31 +177,31 @@ enum
     NFA_NHEX,		//	Match non-hex char
     NFA_OCTAL,		//	Match octal char
     NFA_NOCTAL,		//	Match non-octal char
-    NFA_WORD,		//	Match word char
+    NFA_لفظ,		//	Match word char
     NFA_NWORD,		//	Match non-word char
-    NFA_HEAD,		//	Match head char
+    NFA_سر,		//	Match head char
     NFA_NHEAD,		//	Match non-head char
     NFA_ALPHA,		//	Match alpha char
     NFA_NALPHA,		//	Match non-alpha char
-    NFA_LOWER,		//	Match lowercase char
+    NFA_زیریں,		//	Match lowercase char
     NFA_NLOWER,		//	Match non-lowercase char
-    NFA_UPPER,		//	Match uppercase char
+    NFA_بالائی,		//	Match uppercase char
     NFA_NUPPER,		//	Match non-uppercase char
-    NFA_LOWER_IC,	//	Match [a-z]
+    NFA_زیریں_IC,	//	Match [a-z]
     NFA_NLOWER_IC,	//	Match [^a-z]
-    NFA_UPPER_IC,	//	Match [A-Z]
+    NFA_بالائی_IC,	//	Match [A-Z]
     NFA_NUPPER_IC,	//	Match [^A-Z]
 
-    NFA_FIRST_NL = NFA_ANY + NFA_ADD_NL,
-    NFA_LAST_NL = NFA_NUPPER_IC + NFA_ADD_NL,
+    NFA_پہلا_NL = NFA_ANY + NFA_جوڑو_NL,
+    NFA_آخری_NL = NFA_NUPPER_IC + NFA_جوڑو_NL,
 
     NFA_CURSOR,		//	Match cursor pos
     NFA_LNUM,		//	Match line number
     NFA_LNUM_GT,	//	Match > line number
     NFA_LNUM_LT,	//	Match < line number
-    NFA_COL,		//	Match cursor column
-    NFA_COL_GT,		//	Match > cursor column
-    NFA_COL_LT,		//	Match < cursor column
+    NFA_ستون,		//	Match cursor column
+    NFA_ستون_GT,		//	Match > cursor column
+    NFA_ستون_LT,		//	Match < cursor column
     NFA_VCOL,		//	Match cursor virtual column
     NFA_VCOL_GT,	//	Match > cursor virtual column
     NFA_VCOL_LT,	//	Match < cursor virtual column
@@ -216,12 +216,12 @@ enum
     NFA_CLASS_BLANK,
     NFA_CLASS_CNTRL,
     NFA_CLASS_DIGIT,
-    NFA_CLASS_GRAPH,
-    NFA_CLASS_LOWER,
+    NFA_CLASS_گراف,
+    NFA_CLASS_زیریں,
     NFA_CLASS_PRINT,
     NFA_CLASS_PUNCT,
     NFA_CLASS_SPACE,
-    NFA_CLASS_UPPER,
+    NFA_CLASS_بالائی,
     NFA_CLASS_XDIGIT,
     NFA_CLASS_TAB,
     NFA_CLASS_RETURN,
@@ -233,252 +233,252 @@ enum
 };
 
 // Keep in sync with classchars.
-static const int nfa_classcodes[] = {
+ساکن ثابت صحیح nfa_classcodes[] = {
     NFA_ANY, NFA_IDENT, NFA_SIDENT, NFA_KWORD,NFA_SKWORD,
     NFA_FNAME, NFA_SFNAME, NFA_PRINT, NFA_SPRINT,
     NFA_WHITE, NFA_NWHITE, NFA_DIGIT, NFA_NDIGIT,
     NFA_HEX, NFA_NHEX, NFA_OCTAL, NFA_NOCTAL,
-    NFA_WORD, NFA_NWORD, NFA_HEAD, NFA_NHEAD,
-    NFA_ALPHA, NFA_NALPHA, NFA_LOWER, NFA_NLOWER,
-    NFA_UPPER, NFA_NUPPER
+    NFA_لفظ, NFA_NWORD, NFA_سر, NFA_NHEAD,
+    NFA_ALPHA, NFA_NALPHA, NFA_زیریں, NFA_NLOWER,
+    NFA_بالائی, NFA_NUPPER
 };
 
 // Variables only used in nfa_regcomp() and descendants.
-static int nfa_re_flags; // re_flags passed to nfa_regcomp()
-static int *post_start;  // holds the postfix form of r.e.
-static int post_start_len;  // size of allocated post_start (in ints)
-static int *post_end;
-static int *post_ptr;
-static int nfa_reg_parse_depth;	// nesting depth in nfa_reg()
+ساکن صحیح nfa_re_flags; // re_flags passed to nfa_regcomp()
+ساکن صحیح *post_آغاز;  // holds the postfix form of r.e.
+ساکن صحیح post_آغاز_len;  // size of allocated post_start (in ints)
+ساکن صحیح *post_انتہا;
+ساکن صحیح *post_ptr;
+ساکن صحیح nfa_reg_parse_گہرائی;	// nesting depth in nfa_reg()
 
 // The postfix list (post_start) and fragment stack (nfa_stack) are reused
 // across compilations; a buffer that grew past these sizes for a big pattern
 // is freed afterwards instead of being kept, to avoid holding much memory.
-#define NFA_POSTFIX_KEEP	10000	// number of ints (~40 Kbyte)
-#define NFA_STACK_KEEP		4000	// number of Frag_T (~64 Kbyte)
+#تعریف_کرو NFA_POSTFIX_KEEP	10000	// number of ints (~40 Kbyte)
+#تعریف_کرو NFA_ڈھیر_KEEP		4000	// number of Frag_T (~64 Kbyte)
 
 // Set when the pattern should use the NFA engine.
 // E.g. [[:upper:]] only allows 8bit characters for BT engine,
 // while NFA engine handles multibyte characters correctly.
-static int wants_nfa;
+ساکن صحیح چاہتا_nfa;
 
-static int nstate;	// Number of states in the NFA.
-static int istate;	// Index in the state vector, used in alloc_state()
+ساکن صحیح nstate;	// Number of states in the NFA.
+ساکن صحیح istate;	// Index in the state vector, used in alloc_state()
 
 // If not NULL match must end at this position
-static save_se_T *nfa_endp = NULL;
+ساکن save_se_T *nfa_endp = تہی;
 
 // 0 for first call to nfa_regmatch(), 1 for recursive call.
-static int nfa_ll_index = 0;
+ساکن صحیح nfa_ll_اشاریہ = 0;
 
-static int realloc_post_list(void);
-static int nfa_reg(int paren);
-#ifdef DEBUG
-static void nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
-#endif
-static int match_follows(nfa_state_T *startstate, int depth);
-static int failure_chance(nfa_state_T *state, int depth);
+ساکن صحیح realloc_post_list(خالی);
+ساکن صحیح nfa_reg(صحیح paren);
+#اگر_تعریف_شدہ DEBUG
+ساکن خالی nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
+#اگر_ختم
+ساکن صحیح مطابقت_follows(nfa_state_T *startstate, صحیح گہرائی);
+ساکن صحیح failure_chance(nfa_state_T *state, صحیح گہرائی);
 
 // helper functions used when doing re2post() ... regatom() parsing
-#define EMIT(c)	do {				\
-		    if (post_ptr >= post_end && realloc_post_list() == FAIL) \
-			return FAIL;		\
+#تعریف_کرو EMIT(c)	کرو {				\
+		    اگر (post_ptr >= post_انتہا && realloc_post_list() == FAIL) \
+			واپس FAIL;		\
 		    *post_ptr++ = c;		\
-		} while (0)
+		} جب (0)
 
 /*
  * Initialize internal variables before NFA compilation.
  * Return OK on success, FAIL otherwise.
  */
-    static int
-nfa_regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    ساکن صحیح
+nfa_regcomp_آغاز(
+    char_u	*اظہاریہ,
+    صحیح		re_flags)	    // see vim_regcomp()
 {
-    size_t	postfix_size;
-    int		nstate_max;
+    size_t	postfix_سائز;
+    صحیح		nstate_max;
 
     nstate = 0;
     istate = 0;
     // A reasonable estimation for maximum size
-    nstate_max = (int)(STRLEN(expr) + 1) * 25;
+    nstate_max = (صحیح)(STRLEN(اظہاریہ) + 1) * 25;
 
     // Some items blow up in size, such as [A-z].  Add more space for that.
     // When it is still not enough realloc_post_list() will be used.
     nstate_max += 1000;
 
     // Size for postfix representation of expr.
-    postfix_size = sizeof(int) * nstate_max;
+    postfix_سائز = حجم(صحیح) * nstate_max;
 
     // Reuse the postfix buffer across compilations, only growing it when the
     // estimate exceeds the current size; it is freed in free_regexp_stuff().
-    if (post_start == NULL || post_start_len < nstate_max)
+    اگر (post_آغاز == تہی || post_آغاز_len < nstate_max)
     {
-	vim_free(post_start);
-	post_start = alloc(postfix_size);
-	if (post_start == NULL)
+	vim_free(post_آغاز);
+	post_آغاز = alloc(postfix_سائز);
+	اگر (post_آغاز == تہی)
 	{
-	    post_start_len = 0;
-	    return FAIL;
+	    post_آغاز_len = 0;
+	    واپس FAIL;
 	}
-	post_start_len = nstate_max;
+	post_آغاز_len = nstate_max;
     }
-    post_ptr = post_start;
-    post_end = post_start + post_start_len;
-    wants_nfa = FALSE;
+    post_ptr = post_آغاز;
+    post_انتہا = post_آغاز + post_آغاز_len;
+    چاہتا_nfa = FALSE;
     rex.nfa_has_zend = FALSE;
     rex.nfa_has_backref = FALSE;
-    nfa_reg_parse_depth = 0;
+    nfa_reg_parse_گہرائی = 0;
 
     // shared with BT engine
-    regcomp_start(expr, re_flags);
+    regcomp_آغاز(اظہاریہ, re_flags);
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * Figure out if the NFA state list starts with an anchor, must match at start
  * of the line.
  */
-    static int
-nfa_get_reganch(nfa_state_T *start, int depth)
+    ساکن صحیح
+nfa_get_reganch(nfa_state_T *آغاز, صحیح گہرائی)
 {
-    nfa_state_T *p = start;
+    nfa_state_T *p = آغاز;
 
-    if (depth > 4)
-	return 0;
+    اگر (گہرائی > 4)
+	واپس 0;
 
-    while (p != NULL)
+    جب (p != تہی)
     {
-	switch (p->c)
+	انتخاب (p->c)
 	{
-	    case NFA_BOL:
-	    case NFA_BOF:
-		return 1; // yes!
+	    حالت NFA_BOL:
+	    حالت NFA_BOF:
+		واپس 1; // yes!
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
+	    حالت NFA_ZSTART:
+	    حالت NFA_ZEND:
+	    حالت NFA_CURSOR:
+	    حالت NFA_VISUAL:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-		p = p->out;
-		break;
+	    حالت NFA_MOPEN:
+	    حالت NFA_MOPEN1:
+	    حالت NFA_MOPEN2:
+	    حالت NFA_MOPEN3:
+	    حالت NFA_MOPEN4:
+	    حالت NFA_MOPEN5:
+	    حالت NFA_MOPEN6:
+	    حالت NFA_MOPEN7:
+	    حالت NFA_MOPEN8:
+	    حالت NFA_MOPEN9:
+	    حالت NFA_NOPEN:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZOPEN:
+	    حالت NFA_ZOPEN1:
+	    حالت NFA_ZOPEN2:
+	    حالت NFA_ZOPEN3:
+	    حالت NFA_ZOPEN4:
+	    حالت NFA_ZOPEN5:
+	    حالت NFA_ZOPEN6:
+	    حالت NFA_ZOPEN7:
+	    حالت NFA_ZOPEN8:
+	    حالت NFA_ZOPEN9:
+#اگر_ختم
+		p = p->برآمد;
+		توڑو;
 
-	    case NFA_SPLIT:
-		return nfa_get_reganch(p->out, depth + 1)
-				       && nfa_get_reganch(p->out1, depth + 1);
+	    حالت NFA_بانٹو:
+		واپس nfa_get_reganch(p->برآمد, گہرائی + 1)
+				       && nfa_get_reganch(p->out1, گہرائی + 1);
 
-	    default:
-		return 0; // noooo
+	    طےشدہ:
+		واپس 0; // noooo
 	}
     }
-    return 0;
+    واپس 0;
 }
 
 /*
  * Figure out if the NFA state list starts with a character which must match
  * at start of the match.
  */
-    static int
-nfa_get_regstart(nfa_state_T *start, int depth)
+    ساکن صحیح
+nfa_get_regstart(nfa_state_T *آغاز, صحیح گہرائی)
 {
-    nfa_state_T *p = start;
+    nfa_state_T *p = آغاز;
 
-    if (depth > 4)
-	return 0;
+    اگر (گہرائی > 4)
+	واپس 0;
 
-    while (p != NULL)
+    جب (p != تہی)
     {
-	switch (p->c)
+	انتخاب (p->c)
 	{
 	    // all kinds of zero-width matches
-	    case NFA_BOL:
-	    case NFA_BOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    حالت NFA_BOL:
+	    حالت NFA_BOF:
+	    حالت NFA_BOW:
+	    حالت NFA_EOW:
+	    حالت NFA_ZSTART:
+	    حالت NFA_ZEND:
+	    حالت NFA_CURSOR:
+	    حالت NFA_VISUAL:
+	    حالت NFA_LNUM:
+	    حالت NFA_LNUM_GT:
+	    حالت NFA_LNUM_LT:
+	    حالت NFA_ستون:
+	    حالت NFA_ستون_GT:
+	    حالت NFA_ستون_LT:
+	    حالت NFA_VCOL:
+	    حالت NFA_VCOL_GT:
+	    حالت NFA_VCOL_LT:
+	    حالت NFA_MARK:
+	    حالت NFA_MARK_GT:
+	    حالت NFA_MARK_LT:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-		p = p->out;
-		break;
+	    حالت NFA_MOPEN:
+	    حالت NFA_MOPEN1:
+	    حالت NFA_MOPEN2:
+	    حالت NFA_MOPEN3:
+	    حالت NFA_MOPEN4:
+	    حالت NFA_MOPEN5:
+	    حالت NFA_MOPEN6:
+	    حالت NFA_MOPEN7:
+	    حالت NFA_MOPEN8:
+	    حالت NFA_MOPEN9:
+	    حالت NFA_NOPEN:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZOPEN:
+	    حالت NFA_ZOPEN1:
+	    حالت NFA_ZOPEN2:
+	    حالت NFA_ZOPEN3:
+	    حالت NFA_ZOPEN4:
+	    حالت NFA_ZOPEN5:
+	    حالت NFA_ZOPEN6:
+	    حالت NFA_ZOPEN7:
+	    حالت NFA_ZOPEN8:
+	    حالت NFA_ZOPEN9:
+#اگر_ختم
+		p = p->برآمد;
+		توڑو;
 
-	    case NFA_SPLIT:
+	    حالت NFA_بانٹو:
 	    {
-		int c1 = nfa_get_regstart(p->out, depth + 1);
-		int c2 = nfa_get_regstart(p->out1, depth + 1);
+		صحیح c1 = nfa_get_regstart(p->برآمد, گہرائی + 1);
+		صحیح c2 = nfa_get_regstart(p->out1, گہرائی + 1);
 
-		if (c1 == c2)
-		    return c1; // yes!
-		return 0;
+		اگر (c1 == c2)
+		    واپس c1; // yes!
+		واپس 0;
 	    }
 
-	    default:
-		if (p->c > 0)
-		    return p->c; // yes!
-		return 0;
+	    طےشدہ:
+		اگر (p->c > 0)
+		    واپس p->c; // yes!
+		واپس 0;
 	}
     }
-    return 0;
+    واپس 0;
 }
 
 /*
@@ -486,69 +486,69 @@ nfa_get_regstart(nfa_state_T *start, int depth)
  * else.  If so return a string in allocated memory with what must match after
  * regstart.  Otherwise return NULL.
  */
-    static char_u *
-nfa_get_match_text(nfa_state_T *start)
+    ساکن char_u *
+nfa_get_مطابقت_متن(nfa_state_T *آغاز)
 {
-    nfa_state_T *p = start;
-    int		len = 0;
+    nfa_state_T *p = آغاز;
+    صحیح		len = 0;
     char_u	*ret;
     char_u	*s;
 
-    if (p->c != NFA_MOPEN)
-	return NULL; // just in case
-    p = p->out;
-    while (p->c > 0)
+    اگر (p->c != NFA_MOPEN)
+	واپس تہی; // just in case
+    p = p->برآمد;
+    جب (p->c > 0)
     {
 	len += MB_CHAR2LEN(p->c);
-	p = p->out;
+	p = p->برآمد;
     }
-    if (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
-	return NULL;
+    اگر (p->c != NFA_MCLOSE || p->برآمد->c != NFA_مطابقت)
+	واپس تہی;
 
     ret = alloc(len);
-    if (ret == NULL)
-	return NULL;
+    اگر (ret == تہی)
+	واپس تہی;
 
-    p = start->out->out; // skip first char, it goes into regstart
+    p = آغاز->برآمد->برآمد; // skip first char, it goes into regstart
     s = ret;
-    while (p->c > 0)
+    جب (p->c > 0)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    s += (*mb_char2bytes)(p->c, s);
-	else
+	ورنہ
 	    *s++ = p->c;
-	p = p->out;
+	p = p->برآمد;
     }
     *s = NUL;
-    return ret;
+    واپس ret;
 }
 
 /*
  * Allocate more space for post_start.  Called when
  * running above the estimated number of states.
  */
-    static int
-realloc_post_list(void)
+    ساکن صحیح
+realloc_post_list(خالی)
 {
-    int   nstate_max = (int)(post_end - post_start);
-    int   new_max;
-    int   *new_start;
-    int	  *old_start;
+    صحیح   nstate_max = (صحیح)(post_انتہا - post_آغاز);
+    صحیح   new_max;
+    صحیح   *new_آغاز;
+    صحیح	  *old_آغاز;
 
     // For weird patterns the number of states can be very high. Increasing by
     // 50% seems a reasonable compromise between memory use and speed.
     new_max = nstate_max * 3 / 2;
-    new_start = ALLOC_MULT(int, new_max);
-    if (new_start == NULL)
-	return FAIL;
-    mch_memmove(new_start, post_start, nstate_max * sizeof(int));
-    old_start = post_start;
-    post_start = new_start;
-    post_start_len = new_max;
-    post_ptr = new_start + (post_ptr - old_start);
-    post_end = post_start + new_max;
-    vim_free(old_start);
-    return OK;
+    new_آغاز = ALLOC_MULT(صحیح, new_max);
+    اگر (new_آغاز == تہی)
+	واپس FAIL;
+    mch_memmove(new_آغاز, post_آغاز, nstate_max * حجم(صحیح));
+    old_آغاز = post_آغاز;
+    post_آغاز = new_آغاز;
+    post_آغاز_len = new_max;
+    post_ptr = new_آغاز + (post_ptr - old_آغاز);
+    post_انتہا = post_آغاز + new_max;
+    vim_free(old_آغاز);
+    واپس OK;
 }
 
 /*
@@ -561,57 +561,57 @@ realloc_post_list(void)
  * Keep in mind that 'ignorecase' applies at execution time, thus [a-z] may
  * need to be interpreted as [a-zA-Z].
  */
-    static int
-nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
+    ساکن صحیح
+nfa_recognize_char_class(char_u *آغاز, char_u *انتہا, صحیح extra_newl)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    صحیح		newl;
+    صحیح		config = get_char_class_بٹ(آغاز, انتہا, &newl);
 
-    if (config < 0)
-	return FAIL;
+    اگر (config < 0)
+	واپس FAIL;
 
-    if (extra_newl == TRUE)
+    اگر (extra_newl == TRUE)
 	newl = TRUE;
 
-    if (newl == TRUE)
-	extra_newl = NFA_ADD_NL;
+    اگر (newl == TRUE)
+	extra_newl = NFA_جوڑو_NL;
 
-    switch (config)
+    انتخاب (config)
     {
-	case CLASS_o9:
-	    return extra_newl + NFA_DIGIT;
-	case CLASS_not |  CLASS_o9:
-	    return extra_newl + NFA_NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_NHEX;
-	case CLASS_o7:
-	    return extra_newl + NFA_OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return extra_newl + NFA_NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_NALPHA;
-	case CLASS_az:
-	   return extra_newl + NFA_LOWER_IC;
-	case CLASS_not | CLASS_az:
-	    return extra_newl + NFA_NLOWER_IC;
-	case CLASS_AZ:
-	    return extra_newl + NFA_UPPER_IC;
-	case CLASS_not | CLASS_AZ:
-	    return extra_newl + NFA_NUPPER_IC;
+	حالت CLASS_o9:
+	    واپس extra_newl + NFA_DIGIT;
+	حالت CLASS_not |  CLASS_o9:
+	    واپس extra_newl + NFA_NDIGIT;
+	حالت CLASS_af | CLASS_AF | CLASS_o9:
+	    واپس extra_newl + NFA_HEX;
+	حالت CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    واپس extra_newl + NFA_NHEX;
+	حالت CLASS_o7:
+	    واپس extra_newl + NFA_OCTAL;
+	حالت CLASS_not | CLASS_o7:
+	    واپس extra_newl + NFA_NOCTAL;
+	حالت CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    واپس extra_newl + NFA_لفظ;
+	حالت CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    واپس extra_newl + NFA_NWORD;
+	حالت CLASS_az | CLASS_AZ | CLASS_underscore:
+	    واپس extra_newl + NFA_سر;
+	حالت CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    واپس extra_newl + NFA_NHEAD;
+	حالت CLASS_az | CLASS_AZ:
+	    واپس extra_newl + NFA_ALPHA;
+	حالت CLASS_not | CLASS_az | CLASS_AZ:
+	    واپس extra_newl + NFA_NALPHA;
+	حالت CLASS_az:
+	   واپس extra_newl + NFA_زیریں_IC;
+	حالت CLASS_not | CLASS_az:
+	    واپس extra_newl + NFA_NLOWER_IC;
+	حالت CLASS_AZ:
+	    واپس extra_newl + NFA_بالائی_IC;
+	حالت CLASS_not | CLASS_AZ:
+	    واپس extra_newl + NFA_NUPPER_IC;
     }
-    return FAIL;
+    واپس FAIL;
 }
 
 /*
@@ -622,79 +622,79 @@ nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
  *
  * NOTE! When changing this function, also update reg_equi_class()
  */
-    static int
-nfa_emit_equi_class(int c)
+    ساکن صحیح
+nfa_emit_equi_class(صحیح c)
 {
-#define EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
+#تعریف_کرو EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
 
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    اگر (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-#define A_grave 0xc0
-#define A_acute 0xc1
-#define A_circumflex 0xc2
-#define A_virguilla 0xc3
-#define A_diaeresis 0xc4
-#define A_ring 0xc5
-#define C_cedilla 0xc7
-#define E_grave 0xc8
-#define E_acute 0xc9
-#define E_circumflex 0xca
-#define E_diaeresis 0xcb
-#define I_grave 0xcc
-#define I_acute 0xcd
-#define I_circumflex 0xce
-#define I_diaeresis 0xcf
-#define N_virguilla 0xd1
-#define O_grave 0xd2
-#define O_acute 0xd3
-#define O_circumflex 0xd4
-#define O_virguilla 0xd5
-#define O_diaeresis 0xd6
-#define O_slash 0xd8
-#define U_grave 0xd9
-#define U_acute 0xda
-#define U_circumflex 0xdb
-#define U_diaeresis 0xdc
-#define Y_acute 0xdd
-#define a_grave 0xe0
-#define a_acute 0xe1
-#define a_circumflex 0xe2
-#define a_virguilla 0xe3
-#define a_diaeresis 0xe4
-#define a_ring 0xe5
-#define c_cedilla 0xe7
-#define e_grave 0xe8
-#define e_acute 0xe9
-#define e_circumflex 0xea
-#define e_diaeresis 0xeb
-#define i_grave 0xec
-#define i_acute 0xed
-#define i_circumflex 0xee
-#define i_diaeresis 0xef
-#define n_virguilla 0xf1
-#define o_grave 0xf2
-#define o_acute 0xf3
-#define o_circumflex 0xf4
-#define o_virguilla 0xf5
-#define o_diaeresis 0xf6
-#define o_slash 0xf8
-#define u_grave 0xf9
-#define u_acute 0xfa
-#define u_circumflex 0xfb
-#define u_diaeresis 0xfc
-#define y_acute 0xfd
-#define y_diaeresis 0xff
-	switch (c)
+#تعریف_کرو A_grave 0xc0
+#تعریف_کرو A_acute 0xc1
+#تعریف_کرو A_circumflex 0xc2
+#تعریف_کرو A_virguilla 0xc3
+#تعریف_کرو A_diaeresis 0xc4
+#تعریف_کرو A_ring 0xc5
+#تعریف_کرو C_cedilla 0xc7
+#تعریف_کرو E_grave 0xc8
+#تعریف_کرو E_acute 0xc9
+#تعریف_کرو E_circumflex 0xca
+#تعریف_کرو E_diaeresis 0xcb
+#تعریف_کرو I_grave 0xcc
+#تعریف_کرو I_acute 0xcd
+#تعریف_کرو I_circumflex 0xce
+#تعریف_کرو I_diaeresis 0xcf
+#تعریف_کرو N_virguilla 0xd1
+#تعریف_کرو O_grave 0xd2
+#تعریف_کرو O_acute 0xd3
+#تعریف_کرو O_circumflex 0xd4
+#تعریف_کرو O_virguilla 0xd5
+#تعریف_کرو O_diaeresis 0xd6
+#تعریف_کرو O_slash 0xd8
+#تعریف_کرو U_grave 0xd9
+#تعریف_کرو U_acute 0xda
+#تعریف_کرو U_circumflex 0xdb
+#تعریف_کرو U_diaeresis 0xdc
+#تعریف_کرو Y_acute 0xdd
+#تعریف_کرو a_grave 0xe0
+#تعریف_کرو a_acute 0xe1
+#تعریف_کرو a_circumflex 0xe2
+#تعریف_کرو a_virguilla 0xe3
+#تعریف_کرو a_diaeresis 0xe4
+#تعریف_کرو a_ring 0xe5
+#تعریف_کرو c_cedilla 0xe7
+#تعریف_کرو e_grave 0xe8
+#تعریف_کرو e_acute 0xe9
+#تعریف_کرو e_circumflex 0xea
+#تعریف_کرو e_diaeresis 0xeb
+#تعریف_کرو i_grave 0xec
+#تعریف_کرو i_acute 0xed
+#تعریف_کرو i_circumflex 0xee
+#تعریف_کرو i_diaeresis 0xef
+#تعریف_کرو n_virguilla 0xf1
+#تعریف_کرو o_grave 0xf2
+#تعریف_کرو o_acute 0xf3
+#تعریف_کرو o_circumflex 0xf4
+#تعریف_کرو o_virguilla 0xf5
+#تعریف_کرو o_diaeresis 0xf6
+#تعریف_کرو o_slash 0xf8
+#تعریف_کرو u_grave 0xf9
+#تعریف_کرو u_acute 0xfa
+#تعریف_کرو u_circumflex 0xfb
+#تعریف_کرو u_diaeresis 0xfc
+#تعریف_کرو y_acute 0xfd
+#تعریف_کرو y_diaeresis 0xff
+	انتخاب (c)
 	{
-	    case 'A': case A_grave: case A_acute: case A_circumflex:
-	    case A_virguilla: case A_diaeresis: case A_ring:
-	    case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x200:
-	    case 0x202: case 0x226: case 0x23a: case 0x1e00:
-	    case 0x1ea0: case 0x1ea2: case 0x1ea4: case 0x1ea6:
-	    case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    حالت 'A': حالت A_grave: حالت A_acute: حالت A_circumflex:
+	    حالت A_virguilla: حالت A_diaeresis: حالت A_ring:
+	    حالت 0x100: حالت 0x102: حالت 0x104: حالت 0x1cd:
+	    حالت 0x1de: حالت 0x1e0: حالت 0x1fa: حالت 0x200:
+	    حالت 0x202: حالت 0x226: حالت 0x23a: حالت 0x1e00:
+	    حالت 0x1ea0: حالت 0x1ea2: حالت 0x1ea4: حالت 0x1ea6:
+	    حالت 0x1ea8: حالت 0x1eaa: حالت 0x1eac: حالت 0x1eae:
+	    حالت 0x1eb0: حالت 0x1eb2: حالت 0x1eb4: حالت 0x1eb6:
 		    EMIT2('A') EMIT2(A_grave) EMIT2(A_acute)
 		    EMIT2(A_circumflex) EMIT2(A_virguilla)
 		    EMIT2(A_diaeresis) EMIT2(A_ring)
@@ -706,39 +706,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ea6) EMIT2(0x1ea8) EMIT2(0x1eaa)
 		    EMIT2(0x1eac) EMIT2(0x1eae) EMIT2(0x1eb0)
 		    EMIT2(0x1eb2) EMIT2(0x1eb6) EMIT2(0x1eb4)
-		    return OK;
+		    واپس OK;
 
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+	    حالت 'B': حالت 0x181: حالت 0x243: حالت 0x1e02:
+	    حالت 0x1e04: حالت 0x1e06:
 		    EMIT2('B')
 		    EMIT2(0x181) EMIT2(0x243) EMIT2(0x1e02)
 		    EMIT2(0x1e04) EMIT2(0x1e06)
-		    return OK;
+		    واپس OK;
 
-	    case 'C': case C_cedilla: case 0x106: case 0x108:
-	    case 0x10a: case 0x10c: case 0x187: case 0x23b:
-	    case 0x1e08: case 0xa792:
+	    حالت 'C': حالت C_cedilla: حالت 0x106: حالت 0x108:
+	    حالت 0x10a: حالت 0x10c: حالت 0x187: حالت 0x23b:
+	    حالت 0x1e08: حالت 0xa792:
 		    EMIT2('C') EMIT2(C_cedilla)
 		    EMIT2(0x106) EMIT2(0x108) EMIT2(0x10a)
 		    EMIT2(0x10c) EMIT2(0x187) EMIT2(0x23b)
 		    EMIT2(0x1e08) EMIT2(0xa792)
-		    return OK;
+		    واپس OK;
 
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+	    حالت 'D': حالت 0x10e: حالت 0x110: حالت 0x18a:
+	    حالت 0x1e0a: حالت 0x1e0c: حالت 0x1e0e: حالت 0x1e10:
+	    حالت 0x1e12:
 		    EMIT2('D') EMIT2(0x10e) EMIT2(0x110) EMIT2(0x18a)
 		    EMIT2(0x1e0a) EMIT2(0x1e0c) EMIT2(0x1e0e)
 		    EMIT2(0x1e10) EMIT2(0x1e12)
-		    return OK;
+		    واپس OK;
 
-	    case 'E': case E_grave: case E_acute: case E_circumflex:
-	    case E_diaeresis: case 0x112: case 0x114: case 0x116:
-	    case 0x118: case 0x11a: case 0x204: case 0x206:
-	    case 0x228: case 0x246: case 0x1e14: case 0x1e16:
-	    case 0x1e18: case 0x1e1a: case 0x1e1c: case 0x1eb8:
-	    case 0x1eba: case 0x1ebc: case 0x1ebe: case 0x1ec0:
-	    case 0x1ec2: case 0x1ec4: case 0x1ec6:
+	    حالت 'E': حالت E_grave: حالت E_acute: حالت E_circumflex:
+	    حالت E_diaeresis: حالت 0x112: حالت 0x114: حالت 0x116:
+	    حالت 0x118: حالت 0x11a: حالت 0x204: حالت 0x206:
+	    حالت 0x228: حالت 0x246: حالت 0x1e14: حالت 0x1e16:
+	    حالت 0x1e18: حالت 0x1e1a: حالت 0x1e1c: حالت 0x1eb8:
+	    حالت 0x1eba: حالت 0x1ebc: حالت 0x1ebe: حالت 0x1ec0:
+	    حالت 0x1ec2: حالت 0x1ec4: حالت 0x1ec6:
 		    EMIT2('E') EMIT2(E_grave) EMIT2(E_acute)
 		    EMIT2(E_circumflex) EMIT2(E_diaeresis)
 		    EMIT2(0x112) EMIT2(0x114) EMIT2(0x116)
@@ -749,34 +749,34 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eba) EMIT2(0x1ebc) EMIT2(0x1ebe)
 		    EMIT2(0x1ec0) EMIT2(0x1ec2) EMIT2(0x1ec4)
 		    EMIT2(0x1ec6)
-		    return OK;
+		    واپس OK;
 
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+	    حالت 'F': حالت 0x191: حالت 0x1e1e: حالت 0xa798:
 		    EMIT2('F') EMIT2(0x191) EMIT2(0x1e1e) EMIT2(0xa798)
-		    return OK;
+		    واپس OK;
 
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+	    حالت 'G': حالت 0x11c: حالت 0x11e: حالت 0x120:
+	    حالت 0x122: حالت 0x193: حالت 0x1e4: حالت 0x1e6:
+	    حالت 0x1f4: حالت 0x1e20: حالت 0xa7a0:
 		    EMIT2('G') EMIT2(0x11c) EMIT2(0x11e) EMIT2(0x120)
 		    EMIT2(0x122) EMIT2(0x193) EMIT2(0x1e4)
 		    EMIT2(0x1e6) EMIT2(0x1f4) EMIT2(0x1e20)
 		    EMIT2(0xa7a0)
-		    return OK;
+		    واپس OK;
 
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26: case 0x1e28:
-	    case 0x1e2a: case 0x2c67:
+	    حالت 'H': حالت 0x124: حالت 0x126: حالت 0x21e:
+	    حالت 0x1e22: حالت 0x1e24: حالت 0x1e26: حالت 0x1e28:
+	    حالت 0x1e2a: حالت 0x2c67:
 		    EMIT2('H') EMIT2(0x124) EMIT2(0x126) EMIT2(0x21e)
 		    EMIT2(0x1e22) EMIT2(0x1e24) EMIT2(0x1e26)
 		    EMIT2(0x1e28) EMIT2(0x1e2a) EMIT2(0x2c67)
-		    return OK;
+		    واپس OK;
 
-	    case 'I': case I_grave: case I_acute: case I_circumflex:
-	    case I_diaeresis: case 0x128: case 0x12a: case 0x12c:
-	    case 0x12e: case 0x130: case 0x197: case 0x1cf:
-	    case 0x208: case 0x20a: case 0x1e2c: case 0x1e2e:
-	    case 0x1ec8: case 0x1eca:
+	    حالت 'I': حالت I_grave: حالت I_acute: حالت I_circumflex:
+	    حالت I_diaeresis: حالت 0x128: حالت 0x12a: حالت 0x12c:
+	    حالت 0x12e: حالت 0x130: حالت 0x197: حالت 0x1cf:
+	    حالت 0x208: حالت 0x20a: حالت 0x1e2c: حالت 0x1e2e:
+	    حالت 0x1ec8: حالت 0x1eca:
 		    EMIT2('I') EMIT2(I_grave) EMIT2(I_acute)
 		    EMIT2(I_circumflex) EMIT2(I_diaeresis)
 		    EMIT2(0x128) EMIT2(0x12a) EMIT2(0x12c)
@@ -784,53 +784,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1cf) EMIT2(0x208) EMIT2(0x20a)
 		    EMIT2(0x1e2c) EMIT2(0x1e2e) EMIT2(0x1ec8)
 		    EMIT2(0x1eca)
-		    return OK;
+		    واپس OK;
 
-	    case 'J': case 0x134: case 0x248:
+	    حالت 'J': حالت 0x134: حالت 0x248:
 		    EMIT2('J') EMIT2(0x134) EMIT2(0x248)
-		    return OK;
+		    واپس OK;
 
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+	    حالت 'K': حالت 0x136: حالت 0x198: حالت 0x1e8: حالت 0x1e30:
+	    حالت 0x1e32: حالت 0x1e34: حالت 0x2c69: حالت 0xa740:
 		    EMIT2('K') EMIT2(0x136) EMIT2(0x198) EMIT2(0x1e8)
 		    EMIT2(0x1e30) EMIT2(0x1e32) EMIT2(0x1e34)
 		    EMIT2(0x2c69) EMIT2(0xa740)
-		    return OK;
+		    واپس OK;
 
-	    case 'L': case 0x139: case 0x13b: case 0x13d:
-	    case 0x13f: case 0x141: case 0x23d: case 0x1e36:
-	    case 0x1e38: case 0x1e3a: case 0x1e3c: case 0x2c60:
+	    حالت 'L': حالت 0x139: حالت 0x13b: حالت 0x13d:
+	    حالت 0x13f: حالت 0x141: حالت 0x23d: حالت 0x1e36:
+	    حالت 0x1e38: حالت 0x1e3a: حالت 0x1e3c: حالت 0x2c60:
 		    EMIT2('L') EMIT2(0x139) EMIT2(0x13b)
 		    EMIT2(0x13d) EMIT2(0x13f) EMIT2(0x141)
 		    EMIT2(0x23d) EMIT2(0x1e36) EMIT2(0x1e38)
 		    EMIT2(0x1e3a) EMIT2(0x1e3c) EMIT2(0x2c60)
-		    return OK;
+		    واپس OK;
 
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+	    حالت 'M': حالت 0x1e3e: حالت 0x1e40: حالت 0x1e42:
 		    EMIT2('M') EMIT2(0x1e3e) EMIT2(0x1e40)
 		    EMIT2(0x1e42)
-		    return OK;
+		    واپس OK;
 
-	    case 'N': case N_virguilla:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+	    حالت 'N': حالت N_virguilla:
+	    حالت 0x143: حالت 0x145: حالت 0x147: حالت 0x1f8:
+	    حالت 0x1e44: حالت 0x1e46: حالت 0x1e48: حالت 0x1e4a:
+	    حالت 0xa7a4:
 		    EMIT2('N') EMIT2(N_virguilla)
 		    EMIT2(0x143) EMIT2(0x145) EMIT2(0x147)
 		    EMIT2(0x1f8) EMIT2(0x1e44) EMIT2(0x1e46)
 		    EMIT2(0x1e48) EMIT2(0x1e4a) EMIT2(0xa7a4)
-		    return OK;
+		    واپس OK;
 
-	    case 'O': case O_grave: case O_acute: case O_circumflex:
-	    case O_virguilla: case O_diaeresis: case O_slash:
-	    case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec:
-	    case 0x1fe: case 0x20c: case 0x20e: case 0x22a:
-	    case 0x22c: case 0x22e: case 0x230: case 0x1e4c:
-	    case 0x1e4e: case 0x1e50: case 0x1e52: case 0x1ecc:
-	    case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc:
-	    case 0x1ede: case 0x1ee0: case 0x1ee2:
+	    حالت 'O': حالت O_grave: حالت O_acute: حالت O_circumflex:
+	    حالت O_virguilla: حالت O_diaeresis: حالت O_slash:
+	    حالت 0x14c: حالت 0x14e: حالت 0x150: حالت 0x19f:
+	    حالت 0x1a0: حالت 0x1d1: حالت 0x1ea: حالت 0x1ec:
+	    حالت 0x1fe: حالت 0x20c: حالت 0x20e: حالت 0x22a:
+	    حالت 0x22c: حالت 0x22e: حالت 0x230: حالت 0x1e4c:
+	    حالت 0x1e4e: حالت 0x1e50: حالت 0x1e52: حالت 0x1ecc:
+	    حالت 0x1ece: حالت 0x1ed0: حالت 0x1ed2: حالت 0x1ed4:
+	    حالت 0x1ed6: حالت 0x1ed8: حالت 0x1eda: حالت 0x1edc:
+	    حالت 0x1ede: حالت 0x1ee0: حالت 0x1ee2:
 		    EMIT2('O') EMIT2(O_grave) EMIT2(O_acute)
 		    EMIT2(O_circumflex) EMIT2(O_virguilla)
 		    EMIT2(O_diaeresis) EMIT2(O_slash)
@@ -845,51 +845,51 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed6) EMIT2(0x1ed8) EMIT2(0x1eda)
 		    EMIT2(0x1edc) EMIT2(0x1ede) EMIT2(0x1ee0)
 		    EMIT2(0x1ee2)
-		    return OK;
+		    واپس OK;
 
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+	    حالت 'P': حالت 0x1a4: حالت 0x1e54: حالت 0x1e56: حالت 0x2c63:
 		    EMIT2('P') EMIT2(0x1a4) EMIT2(0x1e54) EMIT2(0x1e56)
 		    EMIT2(0x2c63)
-		    return OK;
+		    واپس OK;
 
-	    case 'Q': case 0x24a:
+	    حالت 'Q': حالت 0x24a:
 		    EMIT2('Q') EMIT2(0x24a)
-		    return OK;
+		    واپس OK;
 
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+	    حالت 'R': حالت 0x154: حالت 0x156: حالت 0x158: حالت 0x210:
+	    حالت 0x212: حالت 0x24c: حالت 0x1e58: حالت 0x1e5a:
+	    حالت 0x1e5c: حالت 0x1e5e: حالت 0x2c64: حالت 0xa7a6:
 		    EMIT2('R') EMIT2(0x154) EMIT2(0x156) EMIT2(0x158)
 		    EMIT2(0x210) EMIT2(0x212) EMIT2(0x24c) EMIT2(0x1e58)
 		    EMIT2(0x1e5a) EMIT2(0x1e5c) EMIT2(0x1e5e) EMIT2(0x2c64)
 		    EMIT2(0xa7a6)
-		    return OK;
+		    واپس OK;
 
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+	    حالت 'S': حالت 0x15a: حالت 0x15c: حالت 0x15e: حالت 0x160:
+	    حالت 0x218: حالت 0x1e60: حالت 0x1e62: حالت 0x1e64:
+	    حالت 0x1e66: حالت 0x1e68: حالت 0x2c7e: حالت 0xa7a8:
 		    EMIT2('S') EMIT2(0x15a) EMIT2(0x15c) EMIT2(0x15e)
 		    EMIT2(0x160) EMIT2(0x218) EMIT2(0x1e60) EMIT2(0x1e62)
 		    EMIT2(0x1e64) EMIT2(0x1e66) EMIT2(0x1e68) EMIT2(0x2c7e)
 		    EMIT2(0xa7a8)
-		    return OK;
+		    واپس OK;
 
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+	    حالت 'T': حالت 0x162: حالت 0x164: حالت 0x166: حالت 0x1ac:
+	    حالت 0x1ae: حالت 0x21a: حالت 0x23e: حالت 0x1e6a: حالت 0x1e6c:
+	    حالت 0x1e6e: حالت 0x1e70:
 		    EMIT2('T') EMIT2(0x162) EMIT2(0x164) EMIT2(0x166)
 		    EMIT2(0x1ac) EMIT2(0x1ae) EMIT2(0x23e) EMIT2(0x21a)
 		    EMIT2(0x1e6a) EMIT2(0x1e6c) EMIT2(0x1e6e) EMIT2(0x1e70)
-		    return OK;
+		    واپس OK;
 
-	    case 'U': case U_grave: case U_acute: case U_diaeresis:
-	    case U_circumflex: case 0x168: case 0x16a: case 0x16c:
-	    case 0x16e: case 0x170: case 0x172: case 0x1af:
-	    case 0x1d3: case 0x1d5: case 0x1d7: case 0x1d9:
-	    case 0x1db: case 0x214: case 0x216: case 0x244:
-	    case 0x1e72: case 0x1e74: case 0x1e76: case 0x1e78:
-	    case 0x1e7a: case 0x1ee4: case 0x1ee6: case 0x1ee8:
-	    case 0x1eea: case 0x1eec: case 0x1eee: case 0x1ef0:
+	    حالت 'U': حالت U_grave: حالت U_acute: حالت U_diaeresis:
+	    حالت U_circumflex: حالت 0x168: حالت 0x16a: حالت 0x16c:
+	    حالت 0x16e: حالت 0x170: حالت 0x172: حالت 0x1af:
+	    حالت 0x1d3: حالت 0x1d5: حالت 0x1d7: حالت 0x1d9:
+	    حالت 0x1db: حالت 0x214: حالت 0x216: حالت 0x244:
+	    حالت 0x1e72: حالت 0x1e74: حالت 0x1e76: حالت 0x1e78:
+	    حالت 0x1e7a: حالت 0x1ee4: حالت 0x1ee6: حالت 0x1ee8:
+	    حالت 0x1eea: حالت 0x1eec: حالت 0x1eee: حالت 0x1ef0:
 		    EMIT2('U') EMIT2(U_grave) EMIT2(U_acute)
 		    EMIT2(U_diaeresis) EMIT2(U_circumflex)
 		    EMIT2(0x168) EMIT2(0x16a)
@@ -902,49 +902,49 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ee4) EMIT2(0x1ee6) EMIT2(0x1ee8)
 		    EMIT2(0x1eea) EMIT2(0x1eec) EMIT2(0x1eee)
 		    EMIT2(0x1ef0)
-		    return OK;
+		    واپس OK;
 
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+	    حالت 'V': حالت 0x1b2: حالت 0x1e7c: حالت 0x1e7e:
 		    EMIT2('V') EMIT2(0x1b2) EMIT2(0x1e7c) EMIT2(0x1e7e)
-		    return OK;
+		    واپس OK;
 
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82: case 0x1e84:
-	    case 0x1e86: case 0x1e88:
+	    حالت 'W': حالت 0x174: حالت 0x1e80: حالت 0x1e82: حالت 0x1e84:
+	    حالت 0x1e86: حالت 0x1e88:
 		    EMIT2('W') EMIT2(0x174) EMIT2(0x1e80) EMIT2(0x1e82)
 		    EMIT2(0x1e84) EMIT2(0x1e86) EMIT2(0x1e88)
-		    return OK;
+		    واپس OK;
 
-	    case 'X': case 0x1e8a: case 0x1e8c:
+	    حالت 'X': حالت 0x1e8a: حالت 0x1e8c:
 		    EMIT2('X') EMIT2(0x1e8a) EMIT2(0x1e8c)
-		    return OK;
+		    واپس OK;
 
-	    case 'Y': case Y_acute: case 0x176: case 0x178:
-	    case 0x1b3: case 0x232: case 0x24e: case 0x1e8e:
-	    case 0x1ef2: case 0x1ef4: case 0x1ef6: case 0x1ef8:
+	    حالت 'Y': حالت Y_acute: حالت 0x176: حالت 0x178:
+	    حالت 0x1b3: حالت 0x232: حالت 0x24e: حالت 0x1e8e:
+	    حالت 0x1ef2: حالت 0x1ef4: حالت 0x1ef6: حالت 0x1ef8:
 		    EMIT2('Y') EMIT2(Y_acute)
 		    EMIT2(0x176) EMIT2(0x178) EMIT2(0x1b3)
 		    EMIT2(0x232) EMIT2(0x24e) EMIT2(0x1e8e)
 		    EMIT2(0x1ef2) EMIT2(0x1ef4) EMIT2(0x1ef6)
 		    EMIT2(0x1ef8)
-		    return OK;
+		    واپس OK;
 
-	    case 'Z': case 0x179: case 0x17b: case 0x17d:
-	    case 0x1b5: case 0x1e90: case 0x1e92: case 0x1e94:
-	    case 0x2c6b:
+	    حالت 'Z': حالت 0x179: حالت 0x17b: حالت 0x17d:
+	    حالت 0x1b5: حالت 0x1e90: حالت 0x1e92: حالت 0x1e94:
+	    حالت 0x2c6b:
 		    EMIT2('Z') EMIT2(0x179) EMIT2(0x17b) EMIT2(0x17d)
 		    EMIT2(0x1b5) EMIT2(0x1e90) EMIT2(0x1e92)
 		    EMIT2(0x1e94) EMIT2(0x2c6b)
-		    return OK;
+		    واپس OK;
 
-	    case 'a': case a_grave: case a_acute: case a_circumflex:
-	    case a_virguilla: case a_diaeresis: case a_ring:
-	    case 0x101: case 0x103: case 0x105: case 0x1ce:
-	    case 0x1df: case 0x1e1: case 0x1fb: case 0x201:
-	    case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+	    حالت 'a': حالت a_grave: حالت a_acute: حالت a_circumflex:
+	    حالت a_virguilla: حالت a_diaeresis: حالت a_ring:
+	    حالت 0x101: حالت 0x103: حالت 0x105: حالت 0x1ce:
+	    حالت 0x1df: حالت 0x1e1: حالت 0x1fb: حالت 0x201:
+	    حالت 0x203: حالت 0x227: حالت 0x1d8f: حالت 0x1e01:
+	    حالت 0x1e9a: حالت 0x1ea1: حالت 0x1ea3: حالت 0x1ea5:
+	    حالت 0x1ea7: حالت 0x1ea9: حالت 0x1eab: حالت 0x1ead:
+	    حالت 0x1eaf: حالت 0x1eb1: حالت 0x1eb3: حالت 0x1eb5:
+	    حالت 0x1eb7: حالت 0x2c65:
 		    EMIT2('a') EMIT2(a_grave) EMIT2(a_acute)
 		    EMIT2(a_circumflex) EMIT2(a_virguilla)
 		    EMIT2(a_diaeresis) EMIT2(a_ring)
@@ -957,39 +957,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eab) EMIT2(0x1ead) EMIT2(0x1eaf)
 		    EMIT2(0x1eb1) EMIT2(0x1eb3) EMIT2(0x1eb5)
 		    EMIT2(0x1eb7) EMIT2(0x2c65)
-		    return OK;
+		    واپس OK;
 
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+	    حالت 'b': حالت 0x180: حالت 0x253: حالت 0x1d6c: حالت 0x1d80:
+	    حالت 0x1e03: حالت 0x1e05: حالت 0x1e07:
 		    EMIT2('b') EMIT2(0x180) EMIT2(0x253) EMIT2(0x1d6c)
 		    EMIT2(0x1d80) EMIT2(0x1e03) EMIT2(0x1e05) EMIT2(0x1e07)
-		    return OK;
+		    واپس OK;
 
-	    case 'c': case c_cedilla: case 0x107: case 0x109: case 0x10b:
-	    case 0x10d: case 0x188: case 0x23c: case 0x1e09: case 0xa793:
-	    case 0xa794:
+	    حالت 'c': حالت c_cedilla: حالت 0x107: حالت 0x109: حالت 0x10b:
+	    حالت 0x10d: حالت 0x188: حالت 0x23c: حالت 0x1e09: حالت 0xa793:
+	    حالت 0xa794:
 		    EMIT2('c') EMIT2(c_cedilla)
 		    EMIT2(0x107) EMIT2(0x109) EMIT2(0x10b)
 		    EMIT2(0x10d) EMIT2(0x188) EMIT2(0x23c)
 		    EMIT2(0x1e09) EMIT2(0xa793) EMIT2(0xa794)
-		    return OK;
+		    واپس OK;
 
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d: case 0x1e0f:
-	    case 0x1e11: case 0x1e13:
+	    حالت 'd': حالت 0x10f: حالت 0x111: حالت 0x257: حالت 0x1d6d:
+	    حالت 0x1d81: حالت 0x1d91: حالت 0x1e0b: حالت 0x1e0d: حالت 0x1e0f:
+	    حالت 0x1e11: حالت 0x1e13:
 		    EMIT2('d') EMIT2(0x10f) EMIT2(0x111)
 		    EMIT2(0x257) EMIT2(0x1d6d) EMIT2(0x1d81)
 		    EMIT2(0x1d91) EMIT2(0x1e0b) EMIT2(0x1e0d)
 		    EMIT2(0x1e0f) EMIT2(0x1e11) EMIT2(0x1e13)
-		    return OK;
+		    واپس OK;
 
-	    case 'e': case e_grave: case e_acute: case e_circumflex:
-	    case e_diaeresis: case 0x113: case 0x115: case 0x117:
-	    case 0x119: case 0x11b: case 0x205: case 0x207:
-	    case 0x229: case 0x247: case 0x1d92: case 0x1e15:
-	    case 0x1e17: case 0x1e19: case 0x1e1b: case 0x1e1d:
-	    case 0x1eb9: case 0x1ebb: case 0x1ebd: case 0x1ebf:
-	    case 0x1ec1: case 0x1ec3: case 0x1ec5: case 0x1ec7:
+	    حالت 'e': حالت e_grave: حالت e_acute: حالت e_circumflex:
+	    حالت e_diaeresis: حالت 0x113: حالت 0x115: حالت 0x117:
+	    حالت 0x119: حالت 0x11b: حالت 0x205: حالت 0x207:
+	    حالت 0x229: حالت 0x247: حالت 0x1d92: حالت 0x1e15:
+	    حالت 0x1e17: حالت 0x1e19: حالت 0x1e1b: حالت 0x1e1d:
+	    حالت 0x1eb9: حالت 0x1ebb: حالت 0x1ebd: حالت 0x1ebf:
+	    حالت 0x1ec1: حالت 0x1ec3: حالت 0x1ec5: حالت 0x1ec7:
 		    EMIT2('e') EMIT2(e_grave) EMIT2(e_acute)
 		    EMIT2(e_circumflex) EMIT2(e_diaeresis)
 		    EMIT2(0x113) EMIT2(0x115)
@@ -1000,37 +1000,37 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e1d) EMIT2(0x1eb9) EMIT2(0x1ebb)
 		    EMIT2(0x1ebd) EMIT2(0x1ebf) EMIT2(0x1ec1)
 		    EMIT2(0x1ec3) EMIT2(0x1ec5) EMIT2(0x1ec7)
-		    return OK;
+		    واپس OK;
 
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+	    حالت 'f': حالت 0x192: حالت 0x1d6e: حالت 0x1d82:
+	    حالت 0x1e1f: حالت 0xa799:
 		    EMIT2('f') EMIT2(0x192) EMIT2(0x1d6e) EMIT2(0x1d82)
 		    EMIT2(0x1e1f) EMIT2(0xa799)
-		    return OK;
+		    واپس OK;
 
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x1f5: case 0x260: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+	    حالت 'g': حالت 0x11d: حالت 0x11f: حالت 0x121: حالت 0x123:
+	    حالت 0x1e5: حالت 0x1e7: حالت 0x1f5: حالت 0x260: حالت 0x1d83:
+	    حالت 0x1e21: حالت 0xa7a1:
 		    EMIT2('g') EMIT2(0x11d) EMIT2(0x11f) EMIT2(0x121)
 		    EMIT2(0x123) EMIT2(0x1e5) EMIT2(0x1e7)
 		    EMIT2(0x1f5) EMIT2(0x260) EMIT2(0x1d83)
 		    EMIT2(0x1e21) EMIT2(0xa7a1)
-		    return OK;
+		    واپس OK;
 
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+	    حالت 'h': حالت 0x125: حالت 0x127: حالت 0x21f: حالت 0x1e23:
+	    حالت 0x1e25: حالت 0x1e27: حالت 0x1e29: حالت 0x1e2b:
+	    حالت 0x1e96: حالت 0x2c68: حالت 0xa795:
 		    EMIT2('h') EMIT2(0x125) EMIT2(0x127) EMIT2(0x21f)
 		    EMIT2(0x1e23) EMIT2(0x1e25) EMIT2(0x1e27)
 		    EMIT2(0x1e29) EMIT2(0x1e2b) EMIT2(0x1e96)
 		    EMIT2(0x2c68) EMIT2(0xa795)
-		    return OK;
+		    واپس OK;
 
-	    case 'i': case i_grave: case i_acute: case i_circumflex:
-	    case i_diaeresis: case 0x129: case 0x12b: case 0x12d:
-	    case 0x12f: case 0x1d0: case 0x209: case 0x20b:
-	    case 0x268: case 0x1d96: case 0x1e2d: case 0x1e2f:
-	    case 0x1ec9: case 0x1ecb:
+	    حالت 'i': حالت i_grave: حالت i_acute: حالت i_circumflex:
+	    حالت i_diaeresis: حالت 0x129: حالت 0x12b: حالت 0x12d:
+	    حالت 0x12f: حالت 0x1d0: حالت 0x209: حالت 0x20b:
+	    حالت 0x268: حالت 0x1d96: حالت 0x1e2d: حالت 0x1e2f:
+	    حالت 0x1ec9: حالت 0x1ecb:
 		    EMIT2('i') EMIT2(i_grave) EMIT2(i_acute)
 		    EMIT2(i_circumflex) EMIT2(i_diaeresis)
 		    EMIT2(0x129) EMIT2(0x12b) EMIT2(0x12d)
@@ -1038,53 +1038,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x20b) EMIT2(0x268) EMIT2(0x1d96)
 		    EMIT2(0x1e2d) EMIT2(0x1e2f) EMIT2(0x1ec9)
 		    EMIT2(0x1ecb)
-		    return OK;
+		    واپس OK;
 
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+	    حالت 'j': حالت 0x135: حالت 0x1f0: حالت 0x249:
 		    EMIT2('j') EMIT2(0x135) EMIT2(0x1f0) EMIT2(0x249)
-		    return OK;
+		    واپس OK;
 
-	    case 'k': case 0x137: case 0x199: case 0x1e9: case 0x1d84:
-	    case 0x1e31: case 0x1e33: case 0x1e35: case 0x2c6a: case 0xa741:
+	    حالت 'k': حالت 0x137: حالت 0x199: حالت 0x1e9: حالت 0x1d84:
+	    حالت 0x1e31: حالت 0x1e33: حالت 0x1e35: حالت 0x2c6a: حالت 0xa741:
 		    EMIT2('k') EMIT2(0x137) EMIT2(0x199) EMIT2(0x1e9)
 		    EMIT2(0x1d84) EMIT2(0x1e31) EMIT2(0x1e33)
 		    EMIT2(0x1e35) EMIT2(0x2c6a) EMIT2(0xa741)
-		    return OK;
+		    واپس OK;
 
-	    case 'l': case 0x13a: case 0x13c: case 0x13e: case 0x140:
-	    case 0x142: case 0x19a: case 0x1e37: case 0x1e39: case 0x1e3b:
-	    case 0x1e3d: case 0x2c61:
+	    حالت 'l': حالت 0x13a: حالت 0x13c: حالت 0x13e: حالت 0x140:
+	    حالت 0x142: حالت 0x19a: حالت 0x1e37: حالت 0x1e39: حالت 0x1e3b:
+	    حالت 0x1e3d: حالت 0x2c61:
 		    EMIT2('l') EMIT2(0x13a) EMIT2(0x13c)
 		    EMIT2(0x13e) EMIT2(0x140) EMIT2(0x142)
 		    EMIT2(0x19a) EMIT2(0x1e37) EMIT2(0x1e39)
 		    EMIT2(0x1e3b) EMIT2(0x1e3d) EMIT2(0x2c61)
-		    return OK;
+		    واپس OK;
 
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+	    حالت 'm': حالت 0x1d6f: حالت 0x1e3f: حالت 0x1e41: حالت 0x1e43:
 		    EMIT2('m') EMIT2(0x1d6f) EMIT2(0x1e3f)
 		    EMIT2(0x1e41) EMIT2(0x1e43)
-		    return OK;
+		    واپس OK;
 
-	    case 'n': case n_virguilla: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87: case 0x1e45:
-	    case 0x1e47: case 0x1e49: case 0x1e4b: case 0xa7a5:
+	    حالت 'n': حالت n_virguilla: حالت 0x144: حالت 0x146: حالت 0x148:
+	    حالت 0x149: حالت 0x1f9: حالت 0x1d70: حالت 0x1d87: حالت 0x1e45:
+	    حالت 0x1e47: حالت 0x1e49: حالت 0x1e4b: حالت 0xa7a5:
 		    EMIT2('n') EMIT2(n_virguilla)
 		    EMIT2(0x144) EMIT2(0x146) EMIT2(0x148)
 		    EMIT2(0x149) EMIT2(0x1f9) EMIT2(0x1d70)
 		    EMIT2(0x1d87) EMIT2(0x1e45) EMIT2(0x1e47)
 		    EMIT2(0x1e49) EMIT2(0x1e4b) EMIT2(0xa7a5)
-		    return OK;
+		    واپس OK;
 
-	    case 'o': case o_grave: case o_acute: case o_circumflex:
-	    case o_virguilla: case o_diaeresis: case o_slash:
-	    case 0x14d: case 0x14f: case 0x151: case 0x1a1:
-	    case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d:
-	    case 0x22f: case 0x231: case 0x275: case 0x1e4d:
-	    case 0x1e4f: case 0x1e51: case 0x1e53: case 0x1ecd:
-	    case 0x1ecf: case 0x1ed1: case 0x1ed3: case 0x1ed5:
-	    case 0x1ed7: case 0x1ed9: case 0x1edb: case 0x1edd:
-	    case 0x1edf: case 0x1ee1: case 0x1ee3:
+	    حالت 'o': حالت o_grave: حالت o_acute: حالت o_circumflex:
+	    حالت o_virguilla: حالت o_diaeresis: حالت o_slash:
+	    حالت 0x14d: حالت 0x14f: حالت 0x151: حالت 0x1a1:
+	    حالت 0x1d2: حالت 0x1eb: حالت 0x1ed: حالت 0x1ff:
+	    حالت 0x20d: حالت 0x20f: حالت 0x22b: حالت 0x22d:
+	    حالت 0x22f: حالت 0x231: حالت 0x275: حالت 0x1e4d:
+	    حالت 0x1e4f: حالت 0x1e51: حالت 0x1e53: حالت 0x1ecd:
+	    حالت 0x1ecf: حالت 0x1ed1: حالت 0x1ed3: حالت 0x1ed5:
+	    حالت 0x1ed7: حالت 0x1ed9: حالت 0x1edb: حالت 0x1edd:
+	    حالت 0x1edf: حالت 0x1ee1: حالت 0x1ee3:
 		    EMIT2('o') EMIT2(o_grave) EMIT2(o_acute)
 		    EMIT2(o_circumflex) EMIT2(o_virguilla)
 		    EMIT2(o_diaeresis) EMIT2(o_slash)
@@ -1099,54 +1099,54 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed7) EMIT2(0x1ed9) EMIT2(0x1edb)
 		    EMIT2(0x1edd) EMIT2(0x1edf) EMIT2(0x1ee1)
 		    EMIT2(0x1ee3)
-		    return OK;
+		    واپس OK;
 
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d7d: case 0x1d88:
-	    case 0x1e55: case 0x1e57:
+	    حالت 'p': حالت 0x1a5: حالت 0x1d71: حالت 0x1d7d: حالت 0x1d88:
+	    حالت 0x1e55: حالت 0x1e57:
 		    EMIT2('p') EMIT2(0x1a5) EMIT2(0x1d71) EMIT2(0x1d7d)
 		    EMIT2(0x1d88) EMIT2(0x1e55) EMIT2(0x1e57)
-		    return OK;
+		    واپس OK;
 
-	    case 'q': case 0x24b: case 0x2a0:
+	    حالت 'q': حالت 0x24b: حالت 0x2a0:
 		    EMIT2('q') EMIT2(0x24b) EMIT2(0x2a0)
-		    return OK;
+		    واپس OK;
 
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+	    حالت 'r': حالت 0x155: حالت 0x157: حالت 0x159: حالت 0x211:
+	    حالت 0x213: حالت 0x24d: حالت 0x27d: حالت 0x1d72: حالت 0x1d73:
+	    حالت 0x1d89: حالت 0x1e59: حالت 0x1e5b: حالت 0x1e5d: حالت 0x1e5f:
+	    حالت 0xa7a7:
 		    EMIT2('r') EMIT2(0x155) EMIT2(0x157) EMIT2(0x159)
 		    EMIT2(0x211) EMIT2(0x213) EMIT2(0x24d) EMIT2(0x27d)
 		    EMIT2(0x1d72) EMIT2(0x1d73) EMIT2(0x1d89) EMIT2(0x1e59)
 		    EMIT2(0x1e5b) EMIT2(0x1e5d) EMIT2(0x1e5f) EMIT2(0xa7a7)
-		    return OK;
+		    واپس OK;
 
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x219: case 0x23f: case 0x1d74: case 0x1d8a: case 0x1e61:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+	    حالت 's': حالت 0x15b: حالت 0x15d: حالت 0x15f: حالت 0x161:
+	    حالت 0x219: حالت 0x23f: حالت 0x1d74: حالت 0x1d8a: حالت 0x1e61:
+	    حالت 0x1e63: حالت 0x1e65: حالت 0x1e67: حالت 0x1e69: حالت 0xa7a9:
 		    EMIT2('s') EMIT2(0x15b) EMIT2(0x15d) EMIT2(0x15f)
 		    EMIT2(0x161) EMIT2(0x219) EMIT2(0x23f) EMIT2(0x1d74)
 		    EMIT2(0x1d8a) EMIT2(0x1e61) EMIT2(0x1e63) EMIT2(0x1e65)
 		    EMIT2(0x1e67) EMIT2(0x1e69) EMIT2(0xa7a9)
-		    return OK;
+		    واپس OK;
 
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+	    حالت 't': حالت 0x163: حالت 0x165: حالت 0x167: حالت 0x1ab:
+	    حالت 0x1ad: حالت 0x21b: حالت 0x288: حالت 0x1d75: حالت 0x1e6b:
+	    حالت 0x1e6d: حالت 0x1e6f: حالت 0x1e71: حالت 0x1e97: حالت 0x2c66:
 		    EMIT2('t') EMIT2(0x163) EMIT2(0x165) EMIT2(0x167)
 		    EMIT2(0x1ab) EMIT2(0x1ad) EMIT2(0x21b) EMIT2(0x288)
 		    EMIT2(0x1d75) EMIT2(0x1e6b) EMIT2(0x1e6d) EMIT2(0x1e6f)
 		    EMIT2(0x1e71) EMIT2(0x1e97) EMIT2(0x2c66)
-		    return OK;
+		    واپس OK;
 
-	    case 'u': case u_grave: case u_acute: case u_circumflex:
-	    case u_diaeresis: case 0x169: case 0x16b: case 0x16d:
-	    case 0x16f: case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc: case 0x215:
-	    case 0x217: case 0x289: case 0x1d7e: case 0x1d99: case 0x1e73:
-	    case 0x1e75: case 0x1e77: case 0x1e79: case 0x1e7b:
-	    case 0x1ee5: case 0x1ee7: case 0x1ee9: case 0x1eeb:
-	    case 0x1eed: case 0x1eef: case 0x1ef1:
+	    حالت 'u': حالت u_grave: حالت u_acute: حالت u_circumflex:
+	    حالت u_diaeresis: حالت 0x169: حالت 0x16b: حالت 0x16d:
+	    حالت 0x16f: حالت 0x171: حالت 0x173: حالت 0x1b0: حالت 0x1d4:
+	    حالت 0x1d6: حالت 0x1d8: حالت 0x1da: حالت 0x1dc: حالت 0x215:
+	    حالت 0x217: حالت 0x289: حالت 0x1d7e: حالت 0x1d99: حالت 0x1e73:
+	    حالت 0x1e75: حالت 0x1e77: حالت 0x1e79: حالت 0x1e7b:
+	    حالت 0x1ee5: حالت 0x1ee7: حالت 0x1ee9: حالت 0x1eeb:
+	    حالت 0x1eed: حالت 0x1eef: حالت 0x1ef1:
 		    EMIT2('u') EMIT2(u_grave) EMIT2(u_acute)
 		    EMIT2(u_circumflex) EMIT2(u_diaeresis)
 		    EMIT2(0x169) EMIT2(0x16b)
@@ -1159,48 +1159,48 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e79) EMIT2(0x1e7b) EMIT2(0x1ee5)
 		    EMIT2(0x1ee7) EMIT2(0x1ee9) EMIT2(0x1eeb)
 		    EMIT2(0x1eed) EMIT2(0x1eef) EMIT2(0x1ef1)
-		    return OK;
+		    واپس OK;
 
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+	    حالت 'v': حالت 0x28b: حالت 0x1d8c: حالت 0x1e7d: حالت 0x1e7f:
 		    EMIT2('v') EMIT2(0x28b) EMIT2(0x1d8c) EMIT2(0x1e7d)
 		    EMIT2(0x1e7f)
-		    return OK;
+		    واپس OK;
 
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83: case 0x1e85:
-	    case 0x1e87: case 0x1e89: case 0x1e98:
+	    حالت 'w': حالت 0x175: حالت 0x1e81: حالت 0x1e83: حالت 0x1e85:
+	    حالت 0x1e87: حالت 0x1e89: حالت 0x1e98:
 		    EMIT2('w') EMIT2(0x175) EMIT2(0x1e81) EMIT2(0x1e83)
 		    EMIT2(0x1e85) EMIT2(0x1e87) EMIT2(0x1e89) EMIT2(0x1e98)
-		    return OK;
+		    واپس OK;
 
-	    case 'x': case 0x1e8b: case 0x1e8d:
+	    حالت 'x': حالت 0x1e8b: حالت 0x1e8d:
 		    EMIT2('x') EMIT2(0x1e8b) EMIT2(0x1e8d)
-		    return OK;
+		    واپس OK;
 
-	    case 'y': case y_acute: case y_diaeresis: case 0x177:
-	    case 0x1b4: case 0x233: case 0x24f: case 0x1e8f:
-	    case 0x1e99: case 0x1ef3: case 0x1ef5: case 0x1ef7:
-	    case 0x1ef9:
+	    حالت 'y': حالت y_acute: حالت y_diaeresis: حالت 0x177:
+	    حالت 0x1b4: حالت 0x233: حالت 0x24f: حالت 0x1e8f:
+	    حالت 0x1e99: حالت 0x1ef3: حالت 0x1ef5: حالت 0x1ef7:
+	    حالت 0x1ef9:
 		    EMIT2('y') EMIT2(y_acute) EMIT2(y_diaeresis)
 		    EMIT2(0x177) EMIT2(0x1b4) EMIT2(0x233) EMIT2(0x24f)
 		    EMIT2(0x1e8f) EMIT2(0x1e99) EMIT2(0x1ef3)
 		    EMIT2(0x1ef5) EMIT2(0x1ef7) EMIT2(0x1ef9)
-		    return OK;
+		    واپس OK;
 
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+	    حالت 'z': حالت 0x17a: حالت 0x17c: حالت 0x17e: حالت 0x1b6:
+	    حالت 0x1d76: حالت 0x1d8e: حالت 0x1e91: حالت 0x1e93:
+	    حالت 0x1e95: حالت 0x2c6c:
 		    EMIT2('z') EMIT2(0x17a) EMIT2(0x17c) EMIT2(0x17e)
 		    EMIT2(0x1b6) EMIT2(0x1d76) EMIT2(0x1d8e) EMIT2(0x1e91)
 		    EMIT2(0x1e93) EMIT2(0x1e95) EMIT2(0x2c6c)
-		    return OK;
+		    واپس OK;
 
 	    // default: character itself
 	}
     }
 
     EMIT2(c);
-    return OK;
-#undef EMIT2
+    واپس OK;
+#تعریف_منسوخ EMIT2
 }
 
 /*
@@ -1223,73 +1223,73 @@ nfa_emit_equi_class(int c)
  *     or  \%( pattern \)
  *     or  \z( pattern \)
  */
-    static int
-nfa_regatom(void)
+    ساکن صحیح
+nfa_regatom(خالی)
 {
-    int		c;
-    int		charclass;
-    int		equiclass;
-    int		collclass;
-    int		got_coll_char;
+    صحیح		c;
+    صحیح		charclass;
+    صحیح		equiclass;
+    صحیح		collclass;
+    صحیح		got_coll_char;
     char_u	*p;
     char_u	*endp;
     char_u	*old_regparse = regparse;
-    int		extra = 0;
-    int		emit_range;
-    int		negated;
-    int		result;
-    int		startc = -1;
-    int		save_prev_at_start = prev_at_start;
+    صحیح		extra = 0;
+    صحیح		emit_range;
+    صحیح		negated;
+    صحیح		نتیجہ;
+    صحیح		startc = -1;
+    صحیح		save_پچھلا_at_آغاز = پچھلا_at_آغاز;
 
     c = getchr();
-    switch (c)
+    انتخاب (c)
     {
-	case NUL:
-	    EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
+	حالت NUL:
+	    EMSG_RET_FAIL(_(e_nfa_regexp_انتہا_encountered_prematurely));
 
-	case Magic('^'):
+	حالت Magic('^'):
 	    EMIT(NFA_BOL);
-	    break;
+	    توڑو;
 
-	case Magic('$'):
+	حالت Magic('$'):
 	    EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#اگر defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
-#endif
-	    break;
+#اگر_ختم
+	    توڑو;
 
-	case Magic('<'):
+	حالت Magic('<'):
 	    EMIT(NFA_BOW);
-	    break;
+	    توڑو;
 
-	case Magic('>'):
+	حالت Magic('>'):
 	    EMIT(NFA_EOW);
-	    break;
+	    توڑو;
 
-	case Magic('_'):
+	حالت Magic('_'):
 	    c = no_Magic(getchr());
-	    if (c == NUL)
-		EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
+	    اگر (c == NUL)
+		EMSG_RET_FAIL(_(e_nfa_regexp_انتہا_encountered_prematurely));
 
-	    if (c == '^')	// "\_^" is start-of-line
+	    اگر (c == '^')	// "\_^" is start-of-line
 	    {
 		EMIT(NFA_BOL);
-		break;
+		توڑو;
 	    }
-	    if (c == '$')	// "\_$" is end-of-line
+	    اگر (c == '$')	// "\_$" is end-of-line
 	    {
 		EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#اگر defined(FEAT_SYN_HL)
 		had_eol = TRUE;
-#endif
-		break;
+#اگر_ختم
+		توڑو;
 	    }
 
-	    extra = NFA_ADD_NL;
+	    extra = NFA_جوڑو_NL;
 
 	    // "\_[" is collection plus newline
-	    if (c == '[')
-		goto collection;
+	    اگر (c == '[')
+		جاؤ collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
@@ -1297,269 +1297,269 @@ nfa_regatom(void)
 	/*
 	 * Character classes.
 	 */
-	case Magic('.'):
-	case Magic('i'):
-	case Magic('I'):
-	case Magic('k'):
-	case Magic('K'):
-	case Magic('f'):
-	case Magic('F'):
-	case Magic('p'):
-	case Magic('P'):
-	case Magic('s'):
-	case Magic('S'):
-	case Magic('d'):
-	case Magic('D'):
-	case Magic('x'):
-	case Magic('X'):
-	case Magic('o'):
-	case Magic('O'):
-	case Magic('w'):
-	case Magic('W'):
-	case Magic('h'):
-	case Magic('H'):
-	case Magic('a'):
-	case Magic('A'):
-	case Magic('l'):
-	case Magic('L'):
-	case Magic('u'):
-	case Magic('U'):
+	حالت Magic('.'):
+	حالت Magic('i'):
+	حالت Magic('I'):
+	حالت Magic('k'):
+	حالت Magic('K'):
+	حالت Magic('f'):
+	حالت Magic('F'):
+	حالت Magic('p'):
+	حالت Magic('P'):
+	حالت Magic('s'):
+	حالت Magic('S'):
+	حالت Magic('d'):
+	حالت Magic('D'):
+	حالت Magic('x'):
+	حالت Magic('X'):
+	حالت Magic('o'):
+	حالت Magic('O'):
+	حالت Magic('w'):
+	حالت Magic('W'):
+	حالت Magic('h'):
+	حالت Magic('H'):
+	حالت Magic('a'):
+	حالت Magic('A'):
+	حالت Magic('l'):
+	حالت Magic('L'):
+	حالت Magic('u'):
+	حالت Magic('U'):
 	    p = vim_strchr(classchars, no_Magic(c));
-	    if (p == NULL)
+	    اگر (p == تہی)
 	    {
-		if (extra == NFA_ADD_NL)
+		اگر (extra == NFA_جوڑو_NL)
 		{
 		    semsg(_(e_nfa_regexp_invalid_character_class_nr), c);
 		    rc_did_emsg = TRUE;
-		    return FAIL;
+		    واپس FAIL;
 		}
 		siemsg("Unknown character class char: %d", c);
-		return FAIL;
+		واپس FAIL;
 	    }
 
 	    // When '.' is followed by a composing char ignore the dot, so that
 	    // the composing char is matched here.
-	    if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	    اگر (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	    {
 		old_regparse = regparse;
 		c = getchr();
-		goto nfa_do_multibyte;
+		جاؤ nfa_do_multibyte;
 	    }
 	    EMIT(nfa_classcodes[p - classchars]);
-	    if (extra == NFA_ADD_NL)
+	    اگر (extra == NFA_جوڑو_NL)
 	    {
 		EMIT(NFA_NEWL);
 		EMIT(NFA_OR);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    توڑو;
 
-	case Magic('n'):
-	    if (reg_string)
+	حالت Magic('n'):
+	    اگر (reg_string)
 		// In a string "\n" matches a newline character.
 		EMIT(NL);
-	    else
+	    ورنہ
 	    {
 		// In buffer text "\n" matches the end of a line.
 		EMIT(NFA_NEWL);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    توڑو;
 
-	case Magic('('):
-	    if (nfa_reg(REG_PAREN) == FAIL)
-		return FAIL;	    // cascaded error
-	    break;
+	حالت Magic('('):
+	    اگر (nfa_reg(REG_PAREN) == FAIL)
+		واپس FAIL;	    // cascaded error
+	    توڑو;
 
-	case Magic('|'):
-	case Magic('&'):
-	case Magic(')'):
+	حالت Magic('|'):
+	حالت Magic('&'):
+	حالت Magic(')'):
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    واپس FAIL;
 
-	case Magic('='):
-	case Magic('?'):
-	case Magic('+'):
-	case Magic('@'):
-	case Magic('*'):
-	case Magic('{'):
+	حالت Magic('='):
+	حالت Magic('?'):
+	حالت Magic('+'):
+	حالت Magic('@'):
+	حالت Magic('*'):
+	حالت Magic('{'):
 	    // these should follow an atom, not form an atom
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    واپس FAIL;
 
-	case Magic('~'):
+	حالت Magic('~'):
 	    {
 		char_u	    *lp;
 
 		// Previous substitute pattern.
 		// Generated as "\%(pattern\)".
-		if (reg_prev_sub == NULL)
+		اگر (reg_پچھلا_sub == تہی)
 		{
-		    emsg(_(e_no_previous_substitute_regular_expression));
-		    return FAIL;
+		    emsg(_(e_no_پچھلا_substitute_regular_عبارت));
+		    واپس FAIL;
 		}
-		for (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
+		برائے (lp = reg_پچھلا_sub; *lp != NUL; MB_CPTR_ADV(lp))
 		{
 		    EMIT(PTR2CHAR(lp));
-		    if (lp != reg_prev_sub)
+		    اگر (lp != reg_پچھلا_sub)
 			EMIT(NFA_CONCAT);
 		}
 		EMIT(NFA_NOPEN);
-		break;
+		توڑو;
 	    }
 
-	case Magic('1'):
-	case Magic('2'):
-	case Magic('3'):
-	case Magic('4'):
-	case Magic('5'):
-	case Magic('6'):
-	case Magic('7'):
-	case Magic('8'):
-	case Magic('9'):
+	حالت Magic('1'):
+	حالت Magic('2'):
+	حالت Magic('3'):
+	حالت Magic('4'):
+	حالت Magic('5'):
+	حالت Magic('6'):
+	حالت Magic('7'):
+	حالت Magic('8'):
+	حالت Magic('9'):
 	    {
-		int refnum = no_Magic(c) - '1';
+		صحیح refnum = no_Magic(c) - '1';
 
-		if (!seen_endbrace(refnum + 1))
-		    return FAIL;
+		اگر (!نظر_آیا_endbrace(refnum + 1))
+		    واپس FAIL;
 		EMIT(NFA_BACKREF1 + refnum);
 		rex.nfa_has_backref = TRUE;
 	    }
-	    break;
+	    توڑو;
 
-	case Magic('z'):
+	حالت Magic('z'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    انتخاب (c)
 	    {
-		case 's':
+		حالت 's':
 		    EMIT(NFA_ZSTART);
-		    if (re_mult_next("\\zs") == FAIL)
-			return FAIL;
-		    break;
-		case 'e':
+		    اگر (re_mult_اگلا("\\zs") == FAIL)
+			واپس FAIL;
+		    توڑو;
+		حالت 'e':
 		    EMIT(NFA_ZEND);
 		    rex.nfa_has_zend = TRUE;
-		    if (re_mult_next("\\ze") == FAIL)
-			return FAIL;
-		    break;
-#ifdef FEAT_SYN_HL
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+		    اگر (re_mult_اگلا("\\ze") == FAIL)
+			واپس FAIL;
+		    توڑو;
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		حالت '1':
+		حالت '2':
+		حالت '3':
+		حالت '4':
+		حالت '5':
+		حالت '6':
+		حالت '7':
+		حالت '8':
+		حالت '9':
 		    // \z1...\z9
-		    if ((reg_do_extmatch & REX_USE) == 0)
-			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_here));
+		    اگر ((reg_do_extmatch & REX_USE) == 0)
+			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_یہاں));
 		    EMIT(NFA_ZREF1 + (no_Magic(c) - '1'));
 		    // No need to set rex.nfa_has_backref, the sub-matches don't
 		    // change when \z1 .. \z9 matches or not.
 		    re_has_z = REX_USE;
-		    break;
-		case '(':
+		    توڑو;
+		حالت '(':
 		    // \z(
-		    if ((reg_do_extmatch & REX_SET) == 0)
-			EMSG_RET_FAIL(_(e_z_not_allowed_here));
-		    if (nfa_reg(REG_ZPAREN) == FAIL)
-			return FAIL;	    // cascaded error
-		    re_has_z = REX_SET;
-		    break;
-#endif
-		default:
+		    اگر ((reg_do_extmatch & REX_سیٹ) == 0)
+			EMSG_RET_FAIL(_(e_z_not_allowed_یہاں));
+		    اگر (nfa_reg(REG_ZPAREN) == FAIL)
+			واپس FAIL;	    // cascaded error
+		    re_has_z = REX_سیٹ;
+		    توڑو;
+#اگر_ختم
+		طےشدہ:
 		    semsg(_(e_nfa_regexp_unknown_operator_z_chr), no_Magic(c));
-		    return FAIL;
+		    واپس FAIL;
 	    }
-	    break;
+	    توڑو;
 
-	case Magic('%'):
+	حالت Magic('%'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    انتخاب (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (nfa_reg(REG_NPAREN) == FAIL)
-			return FAIL;
+		حالت '(':
+		    اگر (nfa_reg(REG_NPAREN) == FAIL)
+			واپس FAIL;
 		    EMIT(NFA_NOPEN);
-		    break;
+		    توڑو;
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		حالت 'd':   // %d123 decimal
+		حالت 'o':   // %o123 octal
+		حالت 'x':   // %xab hex 2
+		حالت 'u':   // %uabcd hex 4
+		حالت 'U':   // %U1234abcd hex 8
 		    {
 			vimlong_T nr;
 
-			switch (c)
+			انتخاب (c)
 			{
-			    case 'd': nr = getdecchrs(); break;
-			    case 'o': nr = getoctchrs(); break;
-			    case 'x': nr = gethexchrs(2); break;
-			    case 'u': nr = gethexchrs(4); break;
-			    case 'U': nr = gethexchrs(8); break;
-			    default:  nr = -1; break;
+			    حالت 'd': nr = getdecchrs(); توڑو;
+			    حالت 'o': nr = getoctchrs(); توڑو;
+			    حالت 'x': nr = gethexchrs(2); توڑو;
+			    حالت 'u': nr = gethexchrs(4); توڑو;
+			    حالت 'U': nr = gethexchrs(8); توڑو;
+			    طےشدہ:  nr = -1; توڑو;
 			}
 
-			if (nr < 0 || nr > INT_MAX)
+			اگر (nr < 0 || nr > زیادہ_سے_زیادہ_عدد)
 			    EMSG2_RET_FAIL(_(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
 			// A NUL is stored in the text as NL
 			// TODO: what if a composing character follows?
-			EMIT(nr == 0 ? 0x0a : (long)nr);
+			EMIT(nr == 0 ? 0x0a : (طویل)nr);
 		    }
-		    break;
+		    توڑو;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		حالت '^':
 		    EMIT(NFA_BOF);
-		    break;
+		    توڑو;
 
-		case '$':
+		حالت '$':
 		    EMIT(NFA_EOF);
-		    break;
+		    توڑو;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		حالت '#':
+		    اگر (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
-			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
+			semsg(_(e_atom_engine_must_be_at_آغاز_کا_نمونہ),
 								  regparse[1]);
-			return FAIL;
+			واپس FAIL;
 		    }
 		    EMIT(NFA_CURSOR);
-		    break;
+		    توڑو;
 
-		case 'V':
+		حالت 'V':
 		    EMIT(NFA_VISUAL);
-		    break;
+		    توڑو;
 
-		case 'C':
+		حالت 'C':
 		    EMIT(NFA_ANY_COMPOSING);
-		    break;
+		    توڑو;
 
-		case '[':
+		حالت '[':
 		    {
-			int	    n;
+			صحیح	    n;
 
 			// \%[abc]
-			for (n = 0; (c = peekchr()) != ']'; ++n)
+			برائے (n = 0; (c = peekchr()) != ']'; ++n)
 			{
-			    if (c == NUL)
+			    اگر (c == NUL)
 				EMSG2_RET_FAIL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 			    // recursive call!
-			    if (nfa_regatom() == FAIL)
-				return FAIL;
+			    اگر (nfa_regatom() == FAIL)
+				واپس FAIL;
 			}
 			getchr();  // get the ]
-			if (n == 0)
-			    EMSG2_RET_FAIL(_(e_empty_str_brackets),
+			اگر (n == 0)
+			    EMSG2_RET_FAIL(_(e_خالی_خانے_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			EMIT(NFA_OPT_CHARS);
 			EMIT(n);
@@ -1572,115 +1572,115 @@ nfa_regatom(void)
 			// not allowing NFA_SPLIT multiple times, it is used
 			// a lot.
 			EMIT(NFA_NOPEN);
-			break;
+			توڑو;
 		    }
 
-		default:
+		طےشدہ:
 		    {
 			long_u	n = 0;
-			int	cmp = c;
-			int	cur = FALSE;
-			int	got_digit = FALSE;
+			صحیح	cmp = c;
+			صحیح	cur = FALSE;
+			صحیح	got_digit = FALSE;
 
-			if (c == '<' || c == '>')
+			اگر (c == '<' || c == '>')
 			    c = getchr();
-			if (no_Magic(c) == '.')
+			اگر (no_Magic(c) == '.')
 			{
 			    cur = TRUE;
 			    c = getchr();
 			}
-			while (VIM_ISDIGIT(c))
+			جب (VIM_ISDIGIT(c))
 			{
 			    long_u tmp;
 
-			    if (cur)
+			    اگر (cur)
 			    {
-				semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				semsg(_(e_regexp_نمبر_after_dot_pos_تلاش_chr),
 								  no_Magic(c));
-				return FAIL;
+				واپس FAIL;
 			    }
 			    tmp = n * 10 + (c - '0');
 
-			    if (tmp < n)
+			    اگر (tmp < n)
 			    {
 				// overflow.
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_قدر_too_large));
+				واپس FAIL;
 			    }
 			    n = tmp;
 			    c = getchr();
 			    got_digit = TRUE;
 			}
-			if (c == 'l' || c == 'c' || c == 'v')
+			اگر (c == 'l' || c == 'c' || c == 'v')
 			{
-			    long_u limit = INT_MAX;
+			    long_u حد_بندی = زیادہ_سے_زیادہ_عدد;
 
-			    if (!cur && !got_digit)
+			    اگر (!cur && !got_digit)
 			    {
-				semsg(_(e_nfa_regexp_missing_value_in_chr),
+				semsg(_(e_nfa_regexp_missing_قدر_اندر_chr),
 								  no_Magic(c));
-				return FAIL;
+				واپس FAIL;
 			    }
-			    if (c == 'l')
+			    اگر (c == 'l')
 			    {
-				if (cur)
+				اگر (cur)
 				    n = curwin->w_cursor.lnum;
 				// \%{n}l  \%{n}<l  \%{n}>l
 				EMIT(cmp == '<' ? NFA_LNUM_LT :
 				     cmp == '>' ? NFA_LNUM_GT : NFA_LNUM);
-				if (save_prev_at_start)
-				    at_start = TRUE;
+				اگر (save_پچھلا_at_آغاز)
+				    at_آغاز = TRUE;
 			    }
-			    else if (c == 'c')
+			    ورنہ اگر (c == 'c')
 			    {
-				if (cur)
+				اگر (cur)
 				{
-				    n = curwin->w_cursor.col;
+				    n = curwin->w_cursor.ستون;
 				    n++;
 				}
 				// \%{n}c  \%{n}<c  \%{n}>c
-				EMIT(cmp == '<' ? NFA_COL_LT :
-				     cmp == '>' ? NFA_COL_GT : NFA_COL);
+				EMIT(cmp == '<' ? NFA_ستون_LT :
+				     cmp == '>' ? NFA_ستون_GT : NFA_ستون);
 			    }
-			    else
+			    ورنہ
 			    {
-				if (cur)
+				اگر (cur)
 				{
 				    colnr_T vcol = 0;
 
 				    getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 تہی, تہی, &vcol, 0);
 				    n = ++vcol;
 				}
 				// \%{n}v  \%{n}<v  \%{n}>v
 				EMIT(cmp == '<' ? NFA_VCOL_LT :
 				     cmp == '>' ? NFA_VCOL_GT : NFA_VCOL);
-				limit = INT_MAX / MB_MAXBYTES;
+				حد_بندی = زیادہ_سے_زیادہ_عدد / MB_MAXBYTES;
 			    }
-			    if (n >= limit)
+			    اگر (n >= حد_بندی)
 			    {
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_قدر_too_large));
+				واپس FAIL;
 			    }
-			    EMIT((int)n);
-			    break;
+			    EMIT((صحیح)n);
+			    توڑو;
 			}
-			else if (no_Magic(c) == '\'' && n == 0)
+			ورنہ اگر (no_Magic(c) == '\'' && n == 0)
 			{
 			    // \%'m  \%<'m  \%>'m
 			    EMIT(cmp == '<' ? NFA_MARK_LT :
 				 cmp == '>' ? NFA_MARK_GT : NFA_MARK);
 			    EMIT(getchr());
-			    break;
+			    توڑو;
 			}
 		    }
 		    semsg(_(e_nfa_regexp_unknown_operator_percent_chr),
 								  no_Magic(c));
-		    return FAIL;
+		    واپس FAIL;
 	    }
-	    break;
+	    توڑو;
 
-	case Magic('['):
+	حالت Magic('['):
 collection:
 	    /*
 	     * [abc]  uses NFA_START_COLL - NFA_END_COLL
@@ -1694,30 +1694,30 @@ collection:
 
 	    p = regparse;
 	    endp = skip_anyof(p);
-	    if (*endp == ']')
+	    اگر (*endp == ']')
 	    {
-		int plen;
+		صحیح plen;
 		bool range_endpoint;
 		/*
 		 * Try to reverse engineer character classes. For example,
 		 * recognize that [0-9] stands for \d and [A-Za-z_] for \h,
 		 * and perform the necessary substitutions in the NFA.
 		 */
-		result = nfa_recognize_char_class(regparse, endp,
-							 extra == NFA_ADD_NL);
-		if (result != FAIL)
+		نتیجہ = nfa_recognize_char_class(regparse, endp,
+							 extra == NFA_جوڑو_NL);
+		اگر (نتیجہ != FAIL)
 		{
-		    if (result >= NFA_FIRST_NL && result <= NFA_LAST_NL)
+		    اگر (نتیجہ >= NFA_پہلا_NL && نتیجہ <= NFA_آخری_NL)
 		    {
-			EMIT(result - NFA_ADD_NL);
+			EMIT(نتیجہ - NFA_جوڑو_NL);
 			EMIT(NFA_NEWL);
 			EMIT(NFA_OR);
 		    }
-		    else
-			EMIT(result);
+		    ورنہ
+			EMIT(نتیجہ);
 		    regparse = endp;
 		    MB_PTR_ADV(regparse);
-		    return OK;
+		    واپس OK;
 		}
 		/*
 		 * Failed to recognize a character class. Use the simple
@@ -1725,15 +1725,15 @@ collection:
 		 */
 		startc = -1;
 		negated = FALSE;
-		if (*regparse == '^')			// negated range
+		اگر (*regparse == '^')			// negated range
 		{
 		    negated = TRUE;
 		    MB_PTR_ADV(regparse);
-		    EMIT(NFA_START_NEG_COLL);
+		    EMIT(NFA_آغاز_NEG_COLL);
 		}
-		else
-		    EMIT(NFA_START_COLL);
-		if (*regparse == '-')
+		ورنہ
+		    EMIT(NFA_آغاز_COLL);
+		اگر (*regparse == '-')
 		{
 		    startc = '-';
 		    EMIT(startc);
@@ -1742,106 +1742,106 @@ collection:
 		}
 		// Emit the OR branches for each character in the []
 		emit_range = FALSE;
-		while (regparse < endp)
+		جب (regparse < endp)
 		{
-		    int	    oldstartc = startc;
+		    صحیح	    oldstartc = startc;
 		    range_endpoint = false;
 
 		    startc = -1;
 		    got_coll_char = FALSE;
-		    if (*regparse == '[')
+		    اگر (*regparse == '[')
 		    {
 			// Check for [: :], [= =], [. .]
 			equiclass = collclass = 0;
 			charclass = get_char_class(&regparse);
-			if (charclass == CLASS_NONE)
+			اگر (charclass == CLASS_NONE)
 			{
 			    equiclass = get_equi_class(&regparse);
-			    if (equiclass == 0)
+			    اگر (equiclass == 0)
 				collclass = get_coll_element(&regparse);
 			}
 
 			// Character class like [:alpha:]
-			if (charclass != CLASS_NONE)
+			اگر (charclass != CLASS_NONE)
 			{
-			    switch (charclass)
+			    انتخاب (charclass)
 			    {
-				case CLASS_ALNUM:
+				حالت CLASS_ALNUM:
 				    EMIT(NFA_CLASS_ALNUM);
-				    break;
-				case CLASS_ALPHA:
+				    توڑو;
+				حالت CLASS_ALPHA:
 				    EMIT(NFA_CLASS_ALPHA);
-				    break;
-				case CLASS_BLANK:
+				    توڑو;
+				حالت CLASS_BLANK:
 				    EMIT(NFA_CLASS_BLANK);
-				    break;
-				case CLASS_CNTRL:
+				    توڑو;
+				حالت CLASS_CNTRL:
 				    EMIT(NFA_CLASS_CNTRL);
-				    break;
-				case CLASS_DIGIT:
+				    توڑو;
+				حالت CLASS_DIGIT:
 				    EMIT(NFA_CLASS_DIGIT);
-				    break;
-				case CLASS_GRAPH:
-				    EMIT(NFA_CLASS_GRAPH);
-				    break;
-				case CLASS_LOWER:
-				    wants_nfa = TRUE;
-				    EMIT(NFA_CLASS_LOWER);
-				    break;
-				case CLASS_PRINT:
+				    توڑو;
+				حالت CLASS_گراف:
+				    EMIT(NFA_CLASS_گراف);
+				    توڑو;
+				حالت CLASS_زیریں:
+				    چاہتا_nfa = TRUE;
+				    EMIT(NFA_CLASS_زیریں);
+				    توڑو;
+				حالت CLASS_PRINT:
 				    EMIT(NFA_CLASS_PRINT);
-				    break;
-				case CLASS_PUNCT:
+				    توڑو;
+				حالت CLASS_PUNCT:
 				    EMIT(NFA_CLASS_PUNCT);
-				    break;
-				case CLASS_SPACE:
+				    توڑو;
+				حالت CLASS_SPACE:
 				    EMIT(NFA_CLASS_SPACE);
-				    break;
-				case CLASS_UPPER:
-				    wants_nfa = TRUE;
-				    EMIT(NFA_CLASS_UPPER);
-				    break;
-				case CLASS_XDIGIT:
+				    توڑو;
+				حالت CLASS_بالائی:
+				    چاہتا_nfa = TRUE;
+				    EMIT(NFA_CLASS_بالائی);
+				    توڑو;
+				حالت CLASS_XDIGIT:
 				    EMIT(NFA_CLASS_XDIGIT);
-				    break;
-				case CLASS_TAB:
+				    توڑو;
+				حالت CLASS_TAB:
 				    EMIT(NFA_CLASS_TAB);
-				    break;
-				case CLASS_RETURN:
+				    توڑو;
+				حالت CLASS_RETURN:
 				    EMIT(NFA_CLASS_RETURN);
-				    break;
-				case CLASS_BACKSPACE:
+				    توڑو;
+				حالت CLASS_BACKSPACE:
 				    EMIT(NFA_CLASS_BACKSPACE);
-				    break;
-				case CLASS_ESCAPE:
+				    توڑو;
+				حالت CLASS_ESCAPE:
 				    EMIT(NFA_CLASS_ESCAPE);
-				    break;
-				case CLASS_IDENT:
+				    توڑو;
+				حالت CLASS_IDENT:
 				    EMIT(NFA_CLASS_IDENT);
-				    break;
-				case CLASS_KEYWORD:
+				    توڑو;
+				حالت CLASS_KEYWORD:
 				    EMIT(NFA_CLASS_KEYWORD);
-				    break;
-				case CLASS_FNAME:
+				    توڑو;
+				حالت CLASS_FNAME:
 				    EMIT(NFA_CLASS_FNAME);
-				    break;
+				    توڑو;
 			    }
 			    EMIT(NFA_CONCAT);
-			    continue;
+			    جاری;
 			}
 			// Try equivalence class [=a=] and the like
-			if (equiclass != 0)
+			اگر (equiclass != 0)
 			{
-			    result = nfa_emit_equi_class(equiclass);
-			    if (result == FAIL)
+			    نتیجہ = nfa_emit_equi_class(equiclass);
+			    اگر (نتیجہ == FAIL)
 			    {
 				// should never happen
 				EMSG_RET_FAIL(_(e_error_building_nfa_with_equivalence_class));
 			    }
-			    continue;
+			    جاری;
 			}
 			// Try collating class like [. .]
-			if (collclass != 0)
+			اگر (collclass != 0)
 			{
 			    startc = collclass;	 // allow [.a.]-x as a range
 			    // Will emit the proper atom at the end of the
@@ -1850,12 +1850,12 @@ collection:
 		    }
 		    // Try a range like 'a-x' or '\t-z'. Also allows '-' as a
 		    // start character.
-		    if (*regparse == '-' && oldstartc != -1)
+		    اگر (*regparse == '-' && oldstartc != -1)
 		    {
 			emit_range = TRUE;
 			startc = oldstartc;
 			MB_PTR_ADV(regparse);
-			continue;	    // reading the end of the range
+			جاری;	    // reading the end of the range
 		    }
 
 		    // Now handle simple and escaped characters.
@@ -1863,22 +1863,22 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    if (*regparse == '\\'
+		    اگر (*regparse == '\\'
 			    && !reg_cpo_bsl
 			    && regparse + 1 <= endp
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != تہی
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR, regparse[1])
-								      != NULL)
+								      != تہی)
 			    )
 			)
 		    {
 			MB_PTR_ADV(regparse);
 
-			if (*regparse == 'n')
+			اگر (*regparse == 'n')
 			    startc = (reg_string || emit_range
 					|| regparse[1] == '-') ? NL : NFA_NEWL;
-			else if (*regparse == 'd'
+			ورنہ اگر (*regparse == 'd'
 				    || *regparse == 'o'
 				    || *regparse == 'x'
 				    || *regparse == 'u'
@@ -1889,12 +1889,12 @@ collection:
 				startc = coll_get_char();
 				// max UTF-8 Codepoint is U+10FFFF,
 				// but allow values until INT_MAX
-				if (startc == INT_MAX)
+				اگر (startc == زیادہ_سے_زیادہ_عدد)
 				    EMSG_RET_FAIL(_(e_unicode_val_too_large));
 				got_coll_char = TRUE;
-				MB_PTR_BACK(old_regparse, regparse);
+				MB_PTR_عقب(old_regparse, regparse);
 			    }
-			    else
+			    ورنہ
 			    {
 				// \r,\t,\e,\b
 				startc = backslash_trans(*regparse);
@@ -1902,49 +1902,49 @@ collection:
 		    }
 
 		    // Normal printable char
-		    if (startc == -1)
+		    اگر (startc == -1)
 			startc = PTR2CHAR(regparse);
 
 		    // Previous char was '-', so this char is end of range.
-		    if (emit_range)
+		    اگر (emit_range)
 		    {
-			int	endc = startc;
+			صحیح	endc = startc;
 			range_endpoint = true;
 
 			startc = oldstartc;
-			if (startc > endc)
-			    EMSG_RET_FAIL(_(e_reverse_range_in_character_class));
+			اگر (startc > endc)
+			    EMSG_RET_FAIL(_(e_الٹ_range_اندر_character_class));
 
-			if (endc > startc + 2)
+			اگر (endc > startc + 2)
 			{
 			    // Emit a range instead of the sequence of
 			    // individual characters.
-			    if (startc == 0)
+			    اگر (startc == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    ورنہ
 				--post_ptr; // remove NFA_CONCAT
 			    EMIT(endc);
 			    EMIT(NFA_RANGE);
 			    EMIT(NFA_CONCAT);
 			}
-			else if (has_mbyte && ((*mb_char2len)(startc) > 1
+			ورنہ اگر (has_mbyte && ((*mb_char2len)(startc) > 1
 				    || (*mb_char2len)(endc) > 1))
 			{
 			    // Emit the characters in the range.
 			    // "startc" was already emitted, so skip it.
 			    //
-			    for (c = startc + 1; c <= endc; c++)
+			    برائے (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
 			    }
 			}
-			else
+			ورنہ
 			{
 			    // Emit the range. "startc" was already emitted, so
 			    // skip it.
-			    for (c = startc + 1; c <= endc; c++)
+			    برائے (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
@@ -1953,7 +1953,7 @@ collection:
 			emit_range = FALSE;
 			startc = -1;
 		    }
-		    else
+		    ورنہ
 		    {
 			// This char (startc) is not part of a range. Just
 			// emit it.
@@ -1962,25 +1962,25 @@ collection:
 			// 0x0a.
 			// This is needed to completely mimic the behaviour of
 			// the backtracking engine.
-			if (startc == NFA_NEWL)
+			اگر (startc == NFA_NEWL)
 			{
 			    // Line break can't be matched as part of the
 			    // collection, add an OR below. But not for negated
 			    // range.
-			    if (!negated)
-				extra = NFA_ADD_NL;
+			    اگر (!negated)
+				extra = NFA_جوڑو_NL;
 			}
-			else
+			ورنہ
 			{
-			    if (got_coll_char == TRUE && startc == 0)
+			    اگر (got_coll_char == TRUE && startc == 0)
 			    {
 				EMIT(0x0a);
 				EMIT(NFA_CONCAT);
 			    }
-			    else
+			    ورنہ
 			    {
 				EMIT(startc);
-				if (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
+				اگر (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
 				{
 				    EMIT(NFA_CONCAT);
 				}
@@ -1994,24 +1994,24 @@ collection:
 		    // codepoint; emitting the composing part again would duplicate the
 		    // character in the postfix stream and corrupt the NFA stack.
 		    //
-		    if (!range_endpoint && enc_utf8 &&
+		    اگر (!range_endpoint && enc_utf8 &&
 			    (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse))))
 		    {
-			int i = utf_ptr2len(regparse);
+			صحیح i = utf_ptr2len(regparse);
 
 			c = utf_ptr2char(regparse + i);
 
 			// Add composing characters
-			for (;;)
+			برائے (;;)
 			{
-			    if (c == 0)
+			    اگر (c == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    ورنہ
 				EMIT(c);
 			    EMIT(NFA_CONCAT);
-			    if ((i += utf_char2len(c)) >= plen)
-				break;
+			    اگر ((i += utf_char2len(c)) >= plen)
+				توڑو;
 			    c = utf_ptr2char(regparse + i);
 			}
 			EMIT(NFA_COMPOSING);
@@ -2020,8 +2020,8 @@ collection:
 		    MB_PTR_ADV(regparse);
 		} // while (p < endp)
 
-		MB_PTR_BACK(old_regparse, regparse);
-		if (*regparse == '-')	    // if last, '-' is just a char
+		MB_PTR_عقب(old_regparse, regparse);
+		اگر (*regparse == '-')	    // if last, '-' is just a char
 		{
 		    EMIT('-');
 		    EMIT(NFA_CONCAT);
@@ -2032,36 +2032,36 @@ collection:
 		MB_PTR_ADV(regparse);
 
 		// Mark end of the collection.
-		if (negated == TRUE)
-		    EMIT(NFA_END_NEG_COLL);
-		else
-		    EMIT(NFA_END_COLL);
+		اگر (negated == TRUE)
+		    EMIT(NFA_انتہا_NEG_COLL);
+		ورنہ
+		    EMIT(NFA_انتہا_COLL);
 
 		// \_[] also matches \n but it's not negated
-		if (extra == NFA_ADD_NL)
+		اگر (extra == NFA_جوڑو_NL)
 		{
 		    EMIT(reg_string ? NL : NFA_NEWL);
 		    EMIT(NFA_OR);
 		}
 
-		return OK;
+		واپس OK;
 	    } // if exists closing ]
 
-	    if (reg_strict)
+	    اگر (reg_strict)
 		EMSG_RET_FAIL(_(e_missing_rsb_after_str_lsb));
 	    // FALLTHROUGH
 
-	default:
+	طےشدہ:
 	    {
-		int	plen;
+		صحیح	plen;
 
 nfa_do_multibyte:
 		// plen is length of current char with composing chars
-		if (enc_utf8 && ((*mb_char2len)(c)
+		اگر (enc_utf8 && ((*mb_char2len)(c)
 			    != (plen = utfc_ptr2len(old_regparse))
 						       || utf_iscomposing(c)))
 		{
-		    int i = 0;
+		    صحیح i = 0;
 
 		    // A base character plus composing characters, or just one
 		    // or more composing characters.
@@ -2071,28 +2071,28 @@ nfa_do_multibyte:
 		    // building the postfix form, not the NFA itself;
 		    // a composing char could be: a, b, c, NFA_COMPOSING
 		    // where 'b' and 'c' are chars with codes > 256.
-		    for (;;)
+		    برائے (;;)
 		    {
 			EMIT(c);
-			if (i > 0)
+			اگر (i > 0)
 			    EMIT(NFA_CONCAT);
-			if ((i += utf_char2len(c)) >= plen)
-			    break;
+			اگر ((i += utf_char2len(c)) >= plen)
+			    توڑو;
 			c = utf_ptr2char(old_regparse + i);
 		    }
 		    EMIT(NFA_COMPOSING);
 		    regparse = old_regparse + plen;
 		}
-		else
+		ورنہ
 		{
 		    c = no_Magic(c);
 		    EMIT(c);
 		}
-		return OK;
+		واپس OK;
 	    }
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -2105,44 +2105,44 @@ nfa_do_multibyte:
  * piece   ::=	    atom
  *	or  atom  multi
  */
-    static int
-nfa_regpiece(void)
+    ساکن صحیح
+nfa_regpiece(خالی)
 {
-    int		i;
-    int		op;
-    int		ret;
-    long	minval, maxval;
-    int		greedy = TRUE;      // Braces are prefixed with '-' ?
+    صحیح		i;
+    صحیح		op;
+    صحیح		ret;
+    طویل	minval, maxval;
+    صحیح		greedy = TRUE;      // Braces are prefixed with '-' ?
     parse_state_T old_state;
     parse_state_T new_state;
-    long	c2;
-    int		old_post_pos;
-    int		my_post_start;
-    int		quest;
+    طویل	c2;
+    صحیح		old_post_pos;
+    صحیح		my_post_آغاز;
+    صحیح		quest;
 
     // Save the current parse state, so that we can use it if <atom>{m,n} is
     // next.
     save_parse_state(&old_state);
 
     // store current pos in the postfix form, for \{m,n} involving 0s
-    my_post_start = (int)(post_ptr - post_start);
+    my_post_آغاز = (صحیح)(post_ptr - post_آغاز);
 
     ret = nfa_regatom();
-    if (ret == FAIL)
-	return FAIL;	    // cascaded error
+    اگر (ret == FAIL)
+	واپس FAIL;	    // cascaded error
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
-	return OK;
+    اگر (re_multi_type(op) == NOT_MULTI)
+	واپس OK;
 
     skipchr();
-    switch (op)
+    انتخاب (op)
     {
-	case Magic('*'):
-	    EMIT(NFA_STAR);
-	    break;
+	حالت Magic('*'):
+	    EMIT(NFA_ستارہ);
+	    توڑو;
 
-	case Magic('+'):
+	حالت Magic('+'):
 	    /*
 	     * Trick: Normally, (a*)\+ would match the whole input "aaa".  The
 	     * first and only submatch would be "aaa". But the backtracking
@@ -2156,58 +2156,58 @@ nfa_regpiece(void)
 	     */
 	    restore_parse_state(&old_state);
 	    curchr = -1;
-	    if (nfa_regatom() == FAIL)
-		return FAIL;
-	    EMIT(NFA_STAR);
+	    اگر (nfa_regatom() == FAIL)
+		واپس FAIL;
+	    EMIT(NFA_ستارہ);
 	    EMIT(NFA_CONCAT);
 	    skipchr();		// skip the \+
-	    break;
+	    توڑو;
 
-	case Magic('@'):
-	    c2 = (long)getdecchrs();
+	حالت Magic('@'):
+	    c2 = (طویل)getdecchrs();
 	    op = no_Magic(getchr());
 	    i = 0;
-	    switch(op)
+	    انتخاب(op)
 	    {
-		case '=':
+		حالت '=':
 		    // \@=
-		    i = NFA_PREV_ATOM_NO_WIDTH;
-		    break;
-		case '!':
+		    i = NFA_پچھلا_ATOM_NO_چوڑائی;
+		    توڑو;
+		حالت '!':
 		    // \@!
-		    i = NFA_PREV_ATOM_NO_WIDTH_NEG;
-		    break;
-		case '<':
+		    i = NFA_پچھلا_ATOM_NO_چوڑائی_NEG;
+		    توڑو;
+		حالت '<':
 		    op = no_Magic(getchr());
-		    if (op == '=')
+		    اگر (op == '=')
 			// \@<=
-			i = NFA_PREV_ATOM_JUST_BEFORE;
-		    else if (op == '!')
+			i = NFA_پچھلا_ATOM_JUST_BEFORE;
+		    ورنہ اگر (op == '!')
 			// \@<!
-			i = NFA_PREV_ATOM_JUST_BEFORE_NEG;
-		    break;
-		case '>':
+			i = NFA_پچھلا_ATOM_JUST_BEFORE_NEG;
+		    توڑو;
+		حالت '>':
 		    // \@>
-		    i = NFA_PREV_ATOM_LIKE_PATTERN;
-		    break;
+		    i = NFA_پچھلا_ATOM_LIKE_نمونہ;
+		    توڑو;
 	    }
-	    if (i == 0)
+	    اگر (i == 0)
 	    {
 		semsg(_(e_nfa_regexp_unknown_operator_at_chr), op);
-		return FAIL;
+		واپس FAIL;
 	    }
 	    EMIT(i);
-	    if (i == NFA_PREV_ATOM_JUST_BEFORE
-					|| i == NFA_PREV_ATOM_JUST_BEFORE_NEG)
+	    اگر (i == NFA_پچھلا_ATOM_JUST_BEFORE
+					|| i == NFA_پچھلا_ATOM_JUST_BEFORE_NEG)
 		EMIT(c2);
-	    break;
+	    توڑو;
 
-	case Magic('?'):
-	case Magic('='):
+	حالت Magic('?'):
+	حالت Magic('='):
 	    EMIT(NFA_QUEST);
-	    break;
+	    توڑو;
 
-	case Magic('{'):
+	حالت Magic('{'):
 	    // a{2,5} will expand to 'aaa?a?a?'
 	    // a{-1,3} will expand to 'aa??a??', where ?? is the nongreedy
 	    // version of '?'
@@ -2216,35 +2216,35 @@ nfa_regpiece(void)
 
 	    greedy = TRUE;
 	    c2 = peekchr();
-	    if (c2 == '-' || c2 == Magic('-'))
+	    اگر (c2 == '-' || c2 == Magic('-'))
 	    {
 		skipchr();
 		greedy = FALSE;
 	    }
-	    if (!read_limits(&minval, &maxval))
+	    اگر (!read_limits(&minval, &maxval))
 		EMSG_RET_FAIL(_(e_nfa_regexp_error_reading_repetition_limits));
 
 	    //  <atom>{0,inf}, <atom>{0,} and <atom>{}  are equivalent to
 	    //  <atom>*
-	    if (minval == 0 && maxval == MAX_LIMIT)
+	    اگر (minval == 0 && maxval == MAX_حد_بندی)
 	    {
-		if (greedy)		// { { (match the braces)
+		اگر (greedy)		// { { (match the braces)
 		    // \{}, \{0,}
-		    EMIT(NFA_STAR);
-		else			// { { (match the braces)
+		    EMIT(NFA_ستارہ);
+		ورنہ			// { { (match the braces)
 		    // \{-}, \{-0,}
-		    EMIT(NFA_STAR_NONGREEDY);
-		break;
+		    EMIT(NFA_ستارہ_NONGREEDY);
+		توڑو;
 	    }
 
 	    // Special case: x{0} or x{-0}
-	    if (maxval == 0)
+	    اگر (maxval == 0)
 	    {
 		// Ignore result of previous call to nfa_regatom()
-		post_ptr = post_start + my_post_start;
+		post_ptr = post_آغاز + my_post_آغاز;
 		// NFA_EMPTY is 0-length and works everywhere
-		EMIT(NFA_EMPTY);
-		return OK;
+		EMIT(NFA_خالی_خانے);
+		واپس OK;
 	    }
 
 	    // The engine is very inefficient (uses too many states) when the
@@ -2254,60 +2254,60 @@ nfa_regpiece(void)
 	    // Bail out if we can use the other engine, but only, when the
 	    // pattern does not need the NFA engine like (e.g. [[:upper:]]\{2,\}
 	    // does not work with characters > 8 bit with the BT engine)
-	    if ((nfa_re_flags & RE_AUTO)
+	    اگر ((nfa_re_flags & RE_AUTO)
 				   && (maxval > 500 || maxval > minval + 200)
-				   && (maxval != MAX_LIMIT && minval < 200)
-				   && !wants_nfa)
-		return FAIL;
+				   && (maxval != MAX_حد_بندی && minval < 200)
+				   && !چاہتا_nfa)
+		واپس FAIL;
 
 	    // Ignore previous call to nfa_regatom()
-	    post_ptr = post_start + my_post_start;
+	    post_ptr = post_آغاز + my_post_آغاز;
 	    // Save parse state after the repeated atom and the \{}
 	    save_parse_state(&new_state);
 
 	    quest = (greedy == TRUE? NFA_QUEST : NFA_QUEST_NONGREEDY);
-	    for (i = 0; i < maxval; i++)
+	    برائے (i = 0; i < maxval; i++)
 	    {
 		// Goto beginning of the repeated atom
 		restore_parse_state(&old_state);
-		old_post_pos = (int)(post_ptr - post_start);
-		if (nfa_regatom() == FAIL)
-		    return FAIL;
+		old_post_pos = (صحیح)(post_ptr - post_آغاز);
+		اگر (nfa_regatom() == FAIL)
+		    واپس FAIL;
 		// after "minval" times, atoms are optional
-		if (i + 1 > minval)
+		اگر (i + 1 > minval)
 		{
-		    if (maxval == MAX_LIMIT)
+		    اگر (maxval == MAX_حد_بندی)
 		    {
-			if (greedy)
-			    EMIT(NFA_STAR);
-			else
-			    EMIT(NFA_STAR_NONGREEDY);
+			اگر (greedy)
+			    EMIT(NFA_ستارہ);
+			ورنہ
+			    EMIT(NFA_ستارہ_NONGREEDY);
 		    }
-		    else
+		    ورنہ
 			EMIT(quest);
 		}
-		if (old_post_pos != my_post_start)
+		اگر (old_post_pos != my_post_آغاز)
 		    EMIT(NFA_CONCAT);
-		if (i + 1 > minval && maxval == MAX_LIMIT)
-		    break;
+		اگر (i + 1 > minval && maxval == MAX_حد_بندی)
+		    توڑو;
 	    }
 
 	    // Go to just after the repeated atom and the \{}
 	    restore_parse_state(&new_state);
 	    curchr = -1;
 
-	    break;
+	    توڑو;
 
 
-	default:
-	    break;
+	طےشدہ:
+	    توڑو;
     }	// end switch
 
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    اگر (re_multi_type(peekchr()) != NOT_MULTI)
 	// Can't have a multi follow a multi.
 	EMSG_RET_FAIL(_(e_nfa_regexp_cant_have_multi_follow_multi));
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -2320,68 +2320,68 @@ nfa_regpiece(void)
  *	or  piece piece piece
  *	etc.
  */
-    static int
-nfa_regconcat(void)
+    ساکن صحیح
+nfa_regconcat(خالی)
 {
-    int		cont = TRUE;
-    int		first = TRUE;
+    صحیح		cont = TRUE;
+    صحیح		پہلا = TRUE;
 
-    while (cont)
+    جب (cont)
     {
-	switch (peekchr())
+	انتخاب (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    حالت NUL:
+	    حالت Magic('|'):
+	    حالت Magic('&'):
+	    حالت Magic(')'):
 		cont = FALSE;
-		break;
+		توڑو;
 
-	    case Magic('Z'):
+	    حالت Magic('Z'):
 		regflags |= RF_ICOMBINE;
 		skipchr_keepstart();
-		break;
-	    case Magic('c'):
+		توڑو;
+	    حالت Magic('c'):
 		regflags |= RF_ICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('C'):
+		توڑو;
+	    حالت Magic('C'):
 		regflags |= RF_NOICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('v'):
+		توڑو;
+	    حالت Magic('v'):
 		reg_magic = MAGIC_ALL;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('m'):
+		توڑو;
+	    حالت Magic('m'):
 		reg_magic = MAGIC_ON;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('M'):
+		توڑو;
+	    حالت Magic('M'):
 		reg_magic = MAGIC_OFF;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('V'):
+		توڑو;
+	    حالت Magic('V'):
 		reg_magic = MAGIC_NONE;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
+		توڑو;
 
-	    default:
-		if (nfa_regpiece() == FAIL)
-		    return FAIL;
-		if (first == FALSE)
+	    طےشدہ:
+		اگر (nfa_regpiece() == FAIL)
+		    واپس FAIL;
+		اگر (پہلا == FALSE)
 		    EMIT(NFA_CONCAT);
-		else
-		    first = FALSE;
-		break;
+		ورنہ
+		    پہلا = FALSE;
+		توڑو;
 	}
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -2396,40 +2396,40 @@ nfa_regconcat(void)
  *		or  concat \& concat \& concat
  *		etc.
  */
-    static int
-nfa_regbranch(void)
+    ساکن صحیح
+nfa_regbranch(خالی)
 {
-    int		old_post_pos;
+    صحیح		old_post_pos;
 
-    old_post_pos = (int)(post_ptr - post_start);
+    old_post_pos = (صحیح)(post_ptr - post_آغاز);
 
     // First branch, possibly the only one
-    if (nfa_regconcat() == FAIL)
-	return FAIL;
+    اگر (nfa_regconcat() == FAIL)
+	واپس FAIL;
 
     // Try next concats
-    while (peekchr() == Magic('&'))
+    جب (peekchr() == Magic('&'))
     {
 	skipchr();
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
-	    EMIT(NFA_EMPTY);
+	اگر (old_post_pos == (صحیح)(post_ptr - post_آغاز))
+	    EMIT(NFA_خالی_خانے);
 	EMIT(NFA_NOPEN);
-	EMIT(NFA_PREV_ATOM_NO_WIDTH);
-	old_post_pos = (int)(post_ptr - post_start);
-	if (nfa_regconcat() == FAIL)
-	    return FAIL;
+	EMIT(NFA_پچھلا_ATOM_NO_چوڑائی);
+	old_post_pos = (صحیح)(post_ptr - post_آغاز);
+	اگر (nfa_regconcat() == FAIL)
+	    واپس FAIL;
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
-	    EMIT(NFA_EMPTY);
+	اگر (old_post_pos == (صحیح)(post_ptr - post_آغاز))
+	    EMIT(NFA_خالی_خانے);
 	EMIT(NFA_CONCAT);
     }
 
     // if a branch is empty, emit one node for it
-    if (old_post_pos == (int)(post_ptr - post_start))
-	EMIT(NFA_EMPTY);
+    اگر (old_post_pos == (صحیح)(post_ptr - post_آغاز))
+	EMIT(NFA_خالی_خانے);
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -2443,353 +2443,353 @@ nfa_regbranch(void)
  *	or  branch \| branch \| branch
  *	etc.
  */
-    static int
+    ساکن صحیح
 nfa_reg(
-    int		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    صحیح		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
 {
-    int		parno = 0;
-    int		status = FAIL;
+    صحیح		parno = 0;
+    صحیح		حالت_2 = FAIL;
 
-    if (paren == REG_PAREN)
+    اگر (paren == REG_PAREN)
     {
-	if (regnpar >= NSUBEXP) // Too many `('
+	اگر (regnpar >= NSUBEXP) // Too many `('
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_parens));
 	parno = regnpar++;
     }
-#ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+    ورنہ اگر (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	اگر (regnzpar >= NSUBEXP)
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_z));
 	parno = regnzpar++;
     }
-#endif
+#اگر_ختم
 
-    if (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    اگر (nfa_reg_parse_گہرائی >= REG_MAX_PAREN_گہرائی)
 	EMSG_RET_FAIL(_(e_command_too_complex));
-    ++nfa_reg_parse_depth;
+    ++nfa_reg_parse_گہرائی;
 
-    if (nfa_regbranch() == FAIL)
-	goto theend;	    // cascaded error
+    اگر (nfa_regbranch() == FAIL)
+	جاؤ theend;	    // cascaded error
 
-    while (peekchr() == Magic('|'))
+    جب (peekchr() == Magic('|'))
     {
 	skipchr();
-	if (nfa_regbranch() == FAIL)
-	    goto theend;    // cascaded error
+	اگر (nfa_regbranch() == FAIL)
+	    جاؤ theend;    // cascaded error
 	EMIT(NFA_OR);
     }
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    اگر (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-	if (paren == REG_NPAREN)
+	اگر (paren == REG_NPAREN)
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	ورنہ
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	rc_did_emsg = TRUE;
-	goto theend;
+	جاؤ theend;
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    ورنہ اگر (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (peekchr() == Magic(')'))
+	اگر (peekchr() == Magic(')'))
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	ورنہ
 	    emsg(_(e_nfa_regexp_proper_termination_error));
 	rc_did_emsg = TRUE;
-	goto theend;
+	جاؤ theend;
     }
     /*
      * Here we set the flag allowing back references to this set of
      * parentheses.
      */
-    if (paren == REG_PAREN)
+    اگر (paren == REG_PAREN)
     {
 	had_endbrace[parno] = TRUE;     // have seen the close paren
 	EMIT(NFA_MOPEN + parno);
     }
-#ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+    ورنہ اگر (paren == REG_ZPAREN)
 	EMIT(NFA_ZOPEN + parno);
-#endif
+#اگر_ختم
 
-    status = OK;
+    حالت_2 = OK;
 
 theend:
-    --nfa_reg_parse_depth;
-    return status;
+    --nfa_reg_parse_گہرائی;
+    واپس حالت_2;
 }
 
-#ifdef DEBUG
-static char_u code[50];
+#اگر_تعریف_شدہ DEBUG
+ساکن char_u رمز[50];
 
-    static void
-nfa_set_code(int c)
+    ساکن خالی
+nfa_سیٹ_رمز(صحیح c)
 {
-    int	    addnl = FALSE;
+    صحیح	    addnl = FALSE;
 
-    if (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
+    اگر (c >= NFA_پہلا_NL && c <= NFA_آخری_NL)
     {
 	addnl = TRUE;
-	c -= NFA_ADD_NL;
+	c -= NFA_جوڑو_NL;
     }
 
-    STRCPY(code, "");
-    switch (c)
+    STRCPY(رمز, "");
+    انتخاب (c)
     {
-	case NFA_MATCH:	    STRCPY(code, "NFA_MATCH "); break;
-	case NFA_SPLIT:	    STRCPY(code, "NFA_SPLIT "); break;
-	case NFA_CONCAT:    STRCPY(code, "NFA_CONCAT "); break;
-	case NFA_NEWL:	    STRCPY(code, "NFA_NEWL "); break;
-	case NFA_ZSTART:    STRCPY(code, "NFA_ZSTART"); break;
-	case NFA_ZEND:	    STRCPY(code, "NFA_ZEND"); break;
+	حالت NFA_مطابقت:	    STRCPY(رمز, "NFA_MATCH "); توڑو;
+	حالت NFA_بانٹو:	    STRCPY(رمز, "NFA_SPLIT "); توڑو;
+	حالت NFA_CONCAT:    STRCPY(رمز, "NFA_CONCAT "); توڑو;
+	حالت NFA_NEWL:	    STRCPY(رمز, "NFA_NEWL "); توڑو;
+	حالت NFA_ZSTART:    STRCPY(رمز, "NFA_ZSTART"); توڑو;
+	حالت NFA_ZEND:	    STRCPY(رمز, "NFA_ZEND"); توڑو;
 
-	case NFA_BACKREF1:  STRCPY(code, "NFA_BACKREF1"); break;
-	case NFA_BACKREF2:  STRCPY(code, "NFA_BACKREF2"); break;
-	case NFA_BACKREF3:  STRCPY(code, "NFA_BACKREF3"); break;
-	case NFA_BACKREF4:  STRCPY(code, "NFA_BACKREF4"); break;
-	case NFA_BACKREF5:  STRCPY(code, "NFA_BACKREF5"); break;
-	case NFA_BACKREF6:  STRCPY(code, "NFA_BACKREF6"); break;
-	case NFA_BACKREF7:  STRCPY(code, "NFA_BACKREF7"); break;
-	case NFA_BACKREF8:  STRCPY(code, "NFA_BACKREF8"); break;
-	case NFA_BACKREF9:  STRCPY(code, "NFA_BACKREF9"); break;
+	حالت NFA_BACKREF1:  STRCPY(رمز, "NFA_BACKREF1"); توڑو;
+	حالت NFA_BACKREF2:  STRCPY(رمز, "NFA_BACKREF2"); توڑو;
+	حالت NFA_BACKREF3:  STRCPY(رمز, "NFA_BACKREF3"); توڑو;
+	حالت NFA_BACKREF4:  STRCPY(رمز, "NFA_BACKREF4"); توڑو;
+	حالت NFA_BACKREF5:  STRCPY(رمز, "NFA_BACKREF5"); توڑو;
+	حالت NFA_BACKREF6:  STRCPY(رمز, "NFA_BACKREF6"); توڑو;
+	حالت NFA_BACKREF7:  STRCPY(رمز, "NFA_BACKREF7"); توڑو;
+	حالت NFA_BACKREF8:  STRCPY(رمز, "NFA_BACKREF8"); توڑو;
+	حالت NFA_BACKREF9:  STRCPY(رمز, "NFA_BACKREF9"); توڑو;
 # ifdef FEAT_SYN_HL
-	case NFA_ZREF1:	    STRCPY(code, "NFA_ZREF1"); break;
-	case NFA_ZREF2:	    STRCPY(code, "NFA_ZREF2"); break;
-	case NFA_ZREF3:	    STRCPY(code, "NFA_ZREF3"); break;
-	case NFA_ZREF4:	    STRCPY(code, "NFA_ZREF4"); break;
-	case NFA_ZREF5:	    STRCPY(code, "NFA_ZREF5"); break;
-	case NFA_ZREF6:	    STRCPY(code, "NFA_ZREF6"); break;
-	case NFA_ZREF7:	    STRCPY(code, "NFA_ZREF7"); break;
-	case NFA_ZREF8:	    STRCPY(code, "NFA_ZREF8"); break;
-	case NFA_ZREF9:	    STRCPY(code, "NFA_ZREF9"); break;
+	حالت NFA_ZREF1:	    STRCPY(رمز, "NFA_ZREF1"); توڑو;
+	حالت NFA_ZREF2:	    STRCPY(رمز, "NFA_ZREF2"); توڑو;
+	حالت NFA_ZREF3:	    STRCPY(رمز, "NFA_ZREF3"); توڑو;
+	حالت NFA_ZREF4:	    STRCPY(رمز, "NFA_ZREF4"); توڑو;
+	حالت NFA_ZREF5:	    STRCPY(رمز, "NFA_ZREF5"); توڑو;
+	حالت NFA_ZREF6:	    STRCPY(رمز, "NFA_ZREF6"); توڑو;
+	حالت NFA_ZREF7:	    STRCPY(رمز, "NFA_ZREF7"); توڑو;
+	حالت NFA_ZREF8:	    STRCPY(رمز, "NFA_ZREF8"); توڑو;
+	حالت NFA_ZREF9:	    STRCPY(رمز, "NFA_ZREF9"); توڑو;
 # endif
-	case NFA_SKIP:	    STRCPY(code, "NFA_SKIP"); break;
+	حالت NFA_SKIP:	    STRCPY(رمز, "NFA_SKIP"); توڑو;
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH"); break;
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH_NEG"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE:
-			    STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-			 STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); break;
-	case NFA_PREV_ATOM_LIKE_PATTERN:
-			    STRCPY(code, "NFA_PREV_ATOM_LIKE_PATTERN"); break;
+	حالت NFA_پچھلا_ATOM_NO_چوڑائی:
+			    STRCPY(رمز, "NFA_PREV_ATOM_NO_WIDTH"); توڑو;
+	حالت NFA_پچھلا_ATOM_NO_چوڑائی_NEG:
+			    STRCPY(رمز, "NFA_PREV_ATOM_NO_WIDTH_NEG"); توڑو;
+	حالت NFA_پچھلا_ATOM_JUST_BEFORE:
+			    STRCPY(رمز, "NFA_PREV_ATOM_JUST_BEFORE"); توڑو;
+	حالت NFA_پچھلا_ATOM_JUST_BEFORE_NEG:
+			 STRCPY(رمز, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); توڑو;
+	حالت NFA_پچھلا_ATOM_LIKE_نمونہ:
+			    STRCPY(رمز, "NFA_PREV_ATOM_LIKE_PATTERN"); توڑو;
 
-	case NFA_NOPEN:		    STRCPY(code, "NFA_NOPEN"); break;
-	case NFA_NCLOSE:	    STRCPY(code, "NFA_NCLOSE"); break;
-	case NFA_START_INVISIBLE:   STRCPY(code, "NFA_START_INVISIBLE"); break;
-	case NFA_START_INVISIBLE_FIRST:
-			     STRCPY(code, "NFA_START_INVISIBLE_FIRST"); break;
-	case NFA_START_INVISIBLE_NEG:
-			       STRCPY(code, "NFA_START_INVISIBLE_NEG"); break;
-	case NFA_START_INVISIBLE_NEG_FIRST:
-			 STRCPY(code, "NFA_START_INVISIBLE_NEG_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE:
-			    STRCPY(code, "NFA_START_INVISIBLE_BEFORE"); break;
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-		      STRCPY(code, "NFA_START_INVISIBLE_BEFORE_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-			STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-		  STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); break;
-	case NFA_START_PATTERN:   STRCPY(code, "NFA_START_PATTERN"); break;
-	case NFA_END_INVISIBLE:	    STRCPY(code, "NFA_END_INVISIBLE"); break;
-	case NFA_END_INVISIBLE_NEG: STRCPY(code, "NFA_END_INVISIBLE_NEG"); break;
-	case NFA_END_PATTERN:	    STRCPY(code, "NFA_END_PATTERN"); break;
+	حالت NFA_NOPEN:		    STRCPY(رمز, "NFA_NOPEN"); توڑو;
+	حالت NFA_NCLOSE:	    STRCPY(رمز, "NFA_NCLOSE"); توڑو;
+	حالت NFA_آغاز_INVISIBLE:   STRCPY(رمز, "NFA_START_INVISIBLE"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_پہلا:
+			     STRCPY(رمز, "NFA_START_INVISIBLE_FIRST"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_NEG:
+			       STRCPY(رمز, "NFA_START_INVISIBLE_NEG"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_NEG_پہلا:
+			 STRCPY(رمز, "NFA_START_INVISIBLE_NEG_FIRST"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_BEFORE:
+			    STRCPY(رمز, "NFA_START_INVISIBLE_BEFORE"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_BEFORE_پہلا:
+		      STRCPY(رمز, "NFA_START_INVISIBLE_BEFORE_FIRST"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_BEFORE_NEG:
+			STRCPY(رمز, "NFA_START_INVISIBLE_BEFORE_NEG"); توڑو;
+	حالت NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا:
+		  STRCPY(رمز, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); توڑو;
+	حالت NFA_آغاز_نمونہ:   STRCPY(رمز, "NFA_START_PATTERN"); توڑو;
+	حالت NFA_انتہا_INVISIBLE:	    STRCPY(رمز, "NFA_END_INVISIBLE"); توڑو;
+	حالت NFA_انتہا_INVISIBLE_NEG: STRCPY(رمز, "NFA_END_INVISIBLE_NEG"); توڑو;
+	حالت NFA_انتہا_نمونہ:	    STRCPY(رمز, "NFA_END_PATTERN"); توڑو;
 
-	case NFA_COMPOSING:	    STRCPY(code, "NFA_COMPOSING"); break;
-	case NFA_END_COMPOSING:	    STRCPY(code, "NFA_END_COMPOSING"); break;
-	case NFA_OPT_CHARS:	    STRCPY(code, "NFA_OPT_CHARS"); break;
+	حالت NFA_COMPOSING:	    STRCPY(رمز, "NFA_COMPOSING"); توڑو;
+	حالت NFA_انتہا_COMPOSING:	    STRCPY(رمز, "NFA_END_COMPOSING"); توڑو;
+	حالت NFA_OPT_CHARS:	    STRCPY(رمز, "NFA_OPT_CHARS"); توڑو;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-	    STRCPY(code, "NFA_MOPEN(x)");
-	    code[10] = c - NFA_MOPEN + '0';
-	    break;
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-	    STRCPY(code, "NFA_MCLOSE(x)");
-	    code[11] = c - NFA_MCLOSE + '0';
-	    break;
+	حالت NFA_MOPEN:
+	حالت NFA_MOPEN1:
+	حالت NFA_MOPEN2:
+	حالت NFA_MOPEN3:
+	حالت NFA_MOPEN4:
+	حالت NFA_MOPEN5:
+	حالت NFA_MOPEN6:
+	حالت NFA_MOPEN7:
+	حالت NFA_MOPEN8:
+	حالت NFA_MOPEN9:
+	    STRCPY(رمز, "NFA_MOPEN(x)");
+	    رمز[10] = c - NFA_MOPEN + '0';
+	    توڑو;
+	حالت NFA_MCLOSE:
+	حالت NFA_MCLOSE1:
+	حالت NFA_MCLOSE2:
+	حالت NFA_MCLOSE3:
+	حالت NFA_MCLOSE4:
+	حالت NFA_MCLOSE5:
+	حالت NFA_MCLOSE6:
+	حالت NFA_MCLOSE7:
+	حالت NFA_MCLOSE8:
+	حالت NFA_MCLOSE9:
+	    STRCPY(رمز, "NFA_MCLOSE(x)");
+	    رمز[11] = c - NFA_MCLOSE + '0';
+	    توڑو;
 # ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-	    STRCPY(code, "NFA_ZOPEN(x)");
-	    code[10] = c - NFA_ZOPEN + '0';
-	    break;
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-	    STRCPY(code, "NFA_ZCLOSE(x)");
-	    code[11] = c - NFA_ZCLOSE + '0';
-	    break;
+	حالت NFA_ZOPEN:
+	حالت NFA_ZOPEN1:
+	حالت NFA_ZOPEN2:
+	حالت NFA_ZOPEN3:
+	حالت NFA_ZOPEN4:
+	حالت NFA_ZOPEN5:
+	حالت NFA_ZOPEN6:
+	حالت NFA_ZOPEN7:
+	حالت NFA_ZOPEN8:
+	حالت NFA_ZOPEN9:
+	    STRCPY(رمز, "NFA_ZOPEN(x)");
+	    رمز[10] = c - NFA_ZOPEN + '0';
+	    توڑو;
+	حالت NFA_ZCLOSE:
+	حالت NFA_ZCLOSE1:
+	حالت NFA_ZCLOSE2:
+	حالت NFA_ZCLOSE3:
+	حالت NFA_ZCLOSE4:
+	حالت NFA_ZCLOSE5:
+	حالت NFA_ZCLOSE6:
+	حالت NFA_ZCLOSE7:
+	حالت NFA_ZCLOSE8:
+	حالت NFA_ZCLOSE9:
+	    STRCPY(رمز, "NFA_ZCLOSE(x)");
+	    رمز[11] = c - NFA_ZCLOSE + '0';
+	    توڑو;
 # endif
-	case NFA_EOL:		STRCPY(code, "NFA_EOL "); break;
-	case NFA_BOL:		STRCPY(code, "NFA_BOL "); break;
-	case NFA_EOW:		STRCPY(code, "NFA_EOW "); break;
-	case NFA_BOW:		STRCPY(code, "NFA_BOW "); break;
-	case NFA_EOF:		STRCPY(code, "NFA_EOF "); break;
-	case NFA_BOF:		STRCPY(code, "NFA_BOF "); break;
-	case NFA_LNUM:		STRCPY(code, "NFA_LNUM "); break;
-	case NFA_LNUM_GT:	STRCPY(code, "NFA_LNUM_GT "); break;
-	case NFA_LNUM_LT:	STRCPY(code, "NFA_LNUM_LT "); break;
-	case NFA_COL:		STRCPY(code, "NFA_COL "); break;
-	case NFA_COL_GT:	STRCPY(code, "NFA_COL_GT "); break;
-	case NFA_COL_LT:	STRCPY(code, "NFA_COL_LT "); break;
-	case NFA_VCOL:		STRCPY(code, "NFA_VCOL "); break;
-	case NFA_VCOL_GT:	STRCPY(code, "NFA_VCOL_GT "); break;
-	case NFA_VCOL_LT:	STRCPY(code, "NFA_VCOL_LT "); break;
-	case NFA_MARK:		STRCPY(code, "NFA_MARK "); break;
-	case NFA_MARK_GT:	STRCPY(code, "NFA_MARK_GT "); break;
-	case NFA_MARK_LT:	STRCPY(code, "NFA_MARK_LT "); break;
-	case NFA_CURSOR:	STRCPY(code, "NFA_CURSOR "); break;
-	case NFA_VISUAL:	STRCPY(code, "NFA_VISUAL "); break;
-	case NFA_ANY_COMPOSING:	STRCPY(code, "NFA_ANY_COMPOSING "); break;
+	حالت NFA_EOL:		STRCPY(رمز, "NFA_EOL "); توڑو;
+	حالت NFA_BOL:		STRCPY(رمز, "NFA_BOL "); توڑو;
+	حالت NFA_EOW:		STRCPY(رمز, "NFA_EOW "); توڑو;
+	حالت NFA_BOW:		STRCPY(رمز, "NFA_BOW "); توڑو;
+	حالت NFA_EOF:		STRCPY(رمز, "NFA_EOF "); توڑو;
+	حالت NFA_BOF:		STRCPY(رمز, "NFA_BOF "); توڑو;
+	حالت NFA_LNUM:		STRCPY(رمز, "NFA_LNUM "); توڑو;
+	حالت NFA_LNUM_GT:	STRCPY(رمز, "NFA_LNUM_GT "); توڑو;
+	حالت NFA_LNUM_LT:	STRCPY(رمز, "NFA_LNUM_LT "); توڑو;
+	حالت NFA_ستون:		STRCPY(رمز, "NFA_COL "); توڑو;
+	حالت NFA_ستون_GT:	STRCPY(رمز, "NFA_COL_GT "); توڑو;
+	حالت NFA_ستون_LT:	STRCPY(رمز, "NFA_COL_LT "); توڑو;
+	حالت NFA_VCOL:		STRCPY(رمز, "NFA_VCOL "); توڑو;
+	حالت NFA_VCOL_GT:	STRCPY(رمز, "NFA_VCOL_GT "); توڑو;
+	حالت NFA_VCOL_LT:	STRCPY(رمز, "NFA_VCOL_LT "); توڑو;
+	حالت NFA_MARK:		STRCPY(رمز, "NFA_MARK "); توڑو;
+	حالت NFA_MARK_GT:	STRCPY(رمز, "NFA_MARK_GT "); توڑو;
+	حالت NFA_MARK_LT:	STRCPY(رمز, "NFA_MARK_LT "); توڑو;
+	حالت NFA_CURSOR:	STRCPY(رمز, "NFA_CURSOR "); توڑو;
+	حالت NFA_VISUAL:	STRCPY(رمز, "NFA_VISUAL "); توڑو;
+	حالت NFA_ANY_COMPOSING:	STRCPY(رمز, "NFA_ANY_COMPOSING "); توڑو;
 
-	case NFA_STAR:		STRCPY(code, "NFA_STAR "); break;
-	case NFA_STAR_NONGREEDY: STRCPY(code, "NFA_STAR_NONGREEDY "); break;
-	case NFA_QUEST:		STRCPY(code, "NFA_QUEST"); break;
-	case NFA_QUEST_NONGREEDY: STRCPY(code, "NFA_QUEST_NON_GREEDY"); break;
-	case NFA_EMPTY:		STRCPY(code, "NFA_EMPTY"); break;
-	case NFA_OR:		STRCPY(code, "NFA_OR"); break;
+	حالت NFA_ستارہ:		STRCPY(رمز, "NFA_STAR "); توڑو;
+	حالت NFA_ستارہ_NONGREEDY: STRCPY(رمز, "NFA_STAR_NONGREEDY "); توڑو;
+	حالت NFA_QUEST:		STRCPY(رمز, "NFA_QUEST"); توڑو;
+	حالت NFA_QUEST_NONGREEDY: STRCPY(رمز, "NFA_QUEST_NON_GREEDY"); توڑو;
+	حالت NFA_خالی_خانے:		STRCPY(رمز, "NFA_EMPTY"); توڑو;
+	حالت NFA_OR:		STRCPY(رمز, "NFA_OR"); توڑو;
 
-	case NFA_START_COLL:	STRCPY(code, "NFA_START_COLL"); break;
-	case NFA_END_COLL:	STRCPY(code, "NFA_END_COLL"); break;
-	case NFA_START_NEG_COLL: STRCPY(code, "NFA_START_NEG_COLL"); break;
-	case NFA_END_NEG_COLL:	STRCPY(code, "NFA_END_NEG_COLL"); break;
-	case NFA_RANGE:		STRCPY(code, "NFA_RANGE"); break;
-	case NFA_RANGE_MIN:	STRCPY(code, "NFA_RANGE_MIN"); break;
-	case NFA_RANGE_MAX:	STRCPY(code, "NFA_RANGE_MAX"); break;
+	حالت NFA_آغاز_COLL:	STRCPY(رمز, "NFA_START_COLL"); توڑو;
+	حالت NFA_انتہا_COLL:	STRCPY(رمز, "NFA_END_COLL"); توڑو;
+	حالت NFA_آغاز_NEG_COLL: STRCPY(رمز, "NFA_START_NEG_COLL"); توڑو;
+	حالت NFA_انتہا_NEG_COLL:	STRCPY(رمز, "NFA_END_NEG_COLL"); توڑو;
+	حالت NFA_RANGE:		STRCPY(رمز, "NFA_RANGE"); توڑو;
+	حالت NFA_RANGE_MIN:	STRCPY(رمز, "NFA_RANGE_MIN"); توڑو;
+	حالت NFA_RANGE_MAX:	STRCPY(رمز, "NFA_RANGE_MAX"); توڑو;
 
-	case NFA_CLASS_ALNUM:	STRCPY(code, "NFA_CLASS_ALNUM"); break;
-	case NFA_CLASS_ALPHA:	STRCPY(code, "NFA_CLASS_ALPHA"); break;
-	case NFA_CLASS_BLANK:	STRCPY(code, "NFA_CLASS_BLANK"); break;
-	case NFA_CLASS_CNTRL:	STRCPY(code, "NFA_CLASS_CNTRL"); break;
-	case NFA_CLASS_DIGIT:	STRCPY(code, "NFA_CLASS_DIGIT"); break;
-	case NFA_CLASS_GRAPH:	STRCPY(code, "NFA_CLASS_GRAPH"); break;
-	case NFA_CLASS_LOWER:	STRCPY(code, "NFA_CLASS_LOWER"); break;
-	case NFA_CLASS_PRINT:	STRCPY(code, "NFA_CLASS_PRINT"); break;
-	case NFA_CLASS_PUNCT:	STRCPY(code, "NFA_CLASS_PUNCT"); break;
-	case NFA_CLASS_SPACE:	STRCPY(code, "NFA_CLASS_SPACE"); break;
-	case NFA_CLASS_UPPER:	STRCPY(code, "NFA_CLASS_UPPER"); break;
-	case NFA_CLASS_XDIGIT:	STRCPY(code, "NFA_CLASS_XDIGIT"); break;
-	case NFA_CLASS_TAB:	STRCPY(code, "NFA_CLASS_TAB"); break;
-	case NFA_CLASS_RETURN:	STRCPY(code, "NFA_CLASS_RETURN"); break;
-	case NFA_CLASS_BACKSPACE:   STRCPY(code, "NFA_CLASS_BACKSPACE"); break;
-	case NFA_CLASS_ESCAPE:	STRCPY(code, "NFA_CLASS_ESCAPE"); break;
-	case NFA_CLASS_IDENT:	STRCPY(code, "NFA_CLASS_IDENT"); break;
-	case NFA_CLASS_KEYWORD:	STRCPY(code, "NFA_CLASS_KEYWORD"); break;
-	case NFA_CLASS_FNAME:	STRCPY(code, "NFA_CLASS_FNAME"); break;
+	حالت NFA_CLASS_ALNUM:	STRCPY(رمز, "NFA_CLASS_ALNUM"); توڑو;
+	حالت NFA_CLASS_ALPHA:	STRCPY(رمز, "NFA_CLASS_ALPHA"); توڑو;
+	حالت NFA_CLASS_BLANK:	STRCPY(رمز, "NFA_CLASS_BLANK"); توڑو;
+	حالت NFA_CLASS_CNTRL:	STRCPY(رمز, "NFA_CLASS_CNTRL"); توڑو;
+	حالت NFA_CLASS_DIGIT:	STRCPY(رمز, "NFA_CLASS_DIGIT"); توڑو;
+	حالت NFA_CLASS_گراف:	STRCPY(رمز, "NFA_CLASS_GRAPH"); توڑو;
+	حالت NFA_CLASS_زیریں:	STRCPY(رمز, "NFA_CLASS_LOWER"); توڑو;
+	حالت NFA_CLASS_PRINT:	STRCPY(رمز, "NFA_CLASS_PRINT"); توڑو;
+	حالت NFA_CLASS_PUNCT:	STRCPY(رمز, "NFA_CLASS_PUNCT"); توڑو;
+	حالت NFA_CLASS_SPACE:	STRCPY(رمز, "NFA_CLASS_SPACE"); توڑو;
+	حالت NFA_CLASS_بالائی:	STRCPY(رمز, "NFA_CLASS_UPPER"); توڑو;
+	حالت NFA_CLASS_XDIGIT:	STRCPY(رمز, "NFA_CLASS_XDIGIT"); توڑو;
+	حالت NFA_CLASS_TAB:	STRCPY(رمز, "NFA_CLASS_TAB"); توڑو;
+	حالت NFA_CLASS_RETURN:	STRCPY(رمز, "NFA_CLASS_RETURN"); توڑو;
+	حالت NFA_CLASS_BACKSPACE:   STRCPY(رمز, "NFA_CLASS_BACKSPACE"); توڑو;
+	حالت NFA_CLASS_ESCAPE:	STRCPY(رمز, "NFA_CLASS_ESCAPE"); توڑو;
+	حالت NFA_CLASS_IDENT:	STRCPY(رمز, "NFA_CLASS_IDENT"); توڑو;
+	حالت NFA_CLASS_KEYWORD:	STRCPY(رمز, "NFA_CLASS_KEYWORD"); توڑو;
+	حالت NFA_CLASS_FNAME:	STRCPY(رمز, "NFA_CLASS_FNAME"); توڑو;
 
-	case NFA_ANY:	STRCPY(code, "NFA_ANY"); break;
-	case NFA_IDENT:	STRCPY(code, "NFA_IDENT"); break;
-	case NFA_SIDENT:STRCPY(code, "NFA_SIDENT"); break;
-	case NFA_KWORD:	STRCPY(code, "NFA_KWORD"); break;
-	case NFA_SKWORD:STRCPY(code, "NFA_SKWORD"); break;
-	case NFA_FNAME:	STRCPY(code, "NFA_FNAME"); break;
-	case NFA_SFNAME:STRCPY(code, "NFA_SFNAME"); break;
-	case NFA_PRINT:	STRCPY(code, "NFA_PRINT"); break;
-	case NFA_SPRINT:STRCPY(code, "NFA_SPRINT"); break;
-	case NFA_WHITE:	STRCPY(code, "NFA_WHITE"); break;
-	case NFA_NWHITE:STRCPY(code, "NFA_NWHITE"); break;
-	case NFA_DIGIT:	STRCPY(code, "NFA_DIGIT"); break;
-	case NFA_NDIGIT:STRCPY(code, "NFA_NDIGIT"); break;
-	case NFA_HEX:	STRCPY(code, "NFA_HEX"); break;
-	case NFA_NHEX:	STRCPY(code, "NFA_NHEX"); break;
-	case NFA_OCTAL:	STRCPY(code, "NFA_OCTAL"); break;
-	case NFA_NOCTAL:STRCPY(code, "NFA_NOCTAL"); break;
-	case NFA_WORD:	STRCPY(code, "NFA_WORD"); break;
-	case NFA_NWORD:	STRCPY(code, "NFA_NWORD"); break;
-	case NFA_HEAD:	STRCPY(code, "NFA_HEAD"); break;
-	case NFA_NHEAD:	STRCPY(code, "NFA_NHEAD"); break;
-	case NFA_ALPHA:	STRCPY(code, "NFA_ALPHA"); break;
-	case NFA_NALPHA:STRCPY(code, "NFA_NALPHA"); break;
-	case NFA_LOWER:	STRCPY(code, "NFA_LOWER"); break;
-	case NFA_NLOWER:STRCPY(code, "NFA_NLOWER"); break;
-	case NFA_UPPER:	STRCPY(code, "NFA_UPPER"); break;
-	case NFA_NUPPER:STRCPY(code, "NFA_NUPPER"); break;
-	case NFA_LOWER_IC:  STRCPY(code, "NFA_LOWER_IC"); break;
-	case NFA_NLOWER_IC: STRCPY(code, "NFA_NLOWER_IC"); break;
-	case NFA_UPPER_IC:  STRCPY(code, "NFA_UPPER_IC"); break;
-	case NFA_NUPPER_IC: STRCPY(code, "NFA_NUPPER_IC"); break;
+	حالت NFA_ANY:	STRCPY(رمز, "NFA_ANY"); توڑو;
+	حالت NFA_IDENT:	STRCPY(رمز, "NFA_IDENT"); توڑو;
+	حالت NFA_SIDENT:STRCPY(رمز, "NFA_SIDENT"); توڑو;
+	حالت NFA_KWORD:	STRCPY(رمز, "NFA_KWORD"); توڑو;
+	حالت NFA_SKWORD:STRCPY(رمز, "NFA_SKWORD"); توڑو;
+	حالت NFA_FNAME:	STRCPY(رمز, "NFA_FNAME"); توڑو;
+	حالت NFA_SFNAME:STRCPY(رمز, "NFA_SFNAME"); توڑو;
+	حالت NFA_PRINT:	STRCPY(رمز, "NFA_PRINT"); توڑو;
+	حالت NFA_SPRINT:STRCPY(رمز, "NFA_SPRINT"); توڑو;
+	حالت NFA_WHITE:	STRCPY(رمز, "NFA_WHITE"); توڑو;
+	حالت NFA_NWHITE:STRCPY(رمز, "NFA_NWHITE"); توڑو;
+	حالت NFA_DIGIT:	STRCPY(رمز, "NFA_DIGIT"); توڑو;
+	حالت NFA_NDIGIT:STRCPY(رمز, "NFA_NDIGIT"); توڑو;
+	حالت NFA_HEX:	STRCPY(رمز, "NFA_HEX"); توڑو;
+	حالت NFA_NHEX:	STRCPY(رمز, "NFA_NHEX"); توڑو;
+	حالت NFA_OCTAL:	STRCPY(رمز, "NFA_OCTAL"); توڑو;
+	حالت NFA_NOCTAL:STRCPY(رمز, "NFA_NOCTAL"); توڑو;
+	حالت NFA_لفظ:	STRCPY(رمز, "NFA_WORD"); توڑو;
+	حالت NFA_NWORD:	STRCPY(رمز, "NFA_NWORD"); توڑو;
+	حالت NFA_سر:	STRCPY(رمز, "NFA_HEAD"); توڑو;
+	حالت NFA_NHEAD:	STRCPY(رمز, "NFA_NHEAD"); توڑو;
+	حالت NFA_ALPHA:	STRCPY(رمز, "NFA_ALPHA"); توڑو;
+	حالت NFA_NALPHA:STRCPY(رمز, "NFA_NALPHA"); توڑو;
+	حالت NFA_زیریں:	STRCPY(رمز, "NFA_LOWER"); توڑو;
+	حالت NFA_NLOWER:STRCPY(رمز, "NFA_NLOWER"); توڑو;
+	حالت NFA_بالائی:	STRCPY(رمز, "NFA_UPPER"); توڑو;
+	حالت NFA_NUPPER:STRCPY(رمز, "NFA_NUPPER"); توڑو;
+	حالت NFA_زیریں_IC:  STRCPY(رمز, "NFA_LOWER_IC"); توڑو;
+	حالت NFA_NLOWER_IC: STRCPY(رمز, "NFA_NLOWER_IC"); توڑو;
+	حالت NFA_بالائی_IC:  STRCPY(رمز, "NFA_UPPER_IC"); توڑو;
+	حالت NFA_NUPPER_IC: STRCPY(رمز, "NFA_NUPPER_IC"); توڑو;
 
-	default:
-	    STRCPY(code, "CHAR(x)");
-	    code[5] = c;
+	طےشدہ:
+	    STRCPY(رمز, "CHAR(x)");
+	    رمز[5] = c;
     }
 
-    if (addnl == TRUE)
-	STRCAT(code, " + NEWLINE ");
+    اگر (addnl == TRUE)
+	STRCAT(رمز, " + NEWLINE ");
 
 }
 
 # ifdef ENABLE_LOG
-static FILE *log_fd;
-static char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
+ساکن FILE *log_fd;
+ساکن char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
 
 /*
  * Print the postfix notation of the current regexp.
  */
-    static void
-nfa_postfix_dump(char_u *expr, int retval)
+    ساکن خالی
+nfa_postfix_dump(char_u *اظہاریہ, صحیح retval)
 {
-    int *p;
+    صحیح *p;
     FILE *f;
 
     f = fopen(NFA_REGEXP_DUMP_LOG, "a");
-    if (f == NULL)
-	return;
+    اگر (f == تہی)
+	واپس;
 
     fprintf(f, "\n-------------------------\n");
-    if (retval == FAIL)
+    اگر (retval == FAIL)
 	fprintf(f, ">>> NFA engine failed... \n");
-    else if (retval == OK)
+    ورنہ اگر (retval == OK)
 	fprintf(f, ">>> NFA engine succeeded !\n");
-    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", expr);
-    for (p = post_start; *p && p < post_ptr; p++)
+    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", اظہاریہ);
+    برائے (p = post_آغاز; *p && p < post_ptr; p++)
     {
-	nfa_set_code(*p);
-	fprintf(f, "%s, ", code);
+	nfa_سیٹ_رمز(*p);
+	fprintf(f, "%s, ", رمز);
     }
     fprintf(f, "\"\nPostfix notation (int): ");
-    for (p = post_start; *p && p < post_ptr; p++)
+    برائے (p = post_آغاز; *p && p < post_ptr; p++)
 	fprintf(f, "%d ", *p);
     fprintf(f, "\n\n");
     fclose(f);
@@ -2798,7 +2798,7 @@ nfa_postfix_dump(char_u *expr, int retval)
 /*
  * Print the NFA starting with a root node "state".
  */
-    static void
+    ساکن خالی
 nfa_print_state(FILE *debugf, nfa_state_T *state)
 {
     garray_T indent;
@@ -2809,51 +2809,51 @@ nfa_print_state(FILE *debugf, nfa_state_T *state)
     ga_clear(&indent);
 }
 
-    static void
+    ساکن خالی
 nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 {
     char_u  *p;
 
-    if (state == NULL)
-	return;
+    اگر (state == تہی)
+	واپس;
 
-    fprintf(debugf, "(%2d)", abs(state->id));
+    fprintf(debugf, "(%2d)", مطلق_قدر(state->id));
 
     // Output indent
-    p = (char_u *)indent->ga_data;
-    if (indent->ga_len >= 3)
+    p = (char_u *)indent->ga_ڈیٹا;
+    اگر (indent->ga_len >= 3)
     {
-	int	last = indent->ga_len - 3;
+	صحیح	آخری = indent->ga_len - 3;
 	char_u	save[2];
 
-	STRNCPY(save, &p[last], 2);
-	memcpy(&p[last], "+-", 2);
+	STRNCPY(save, &p[آخری], 2);
+	حافظہ_نقل(&p[آخری], "+-", 2);
 	fprintf(debugf, " %s", p);
-	STRNCPY(&p[last], save, 2);
+	STRNCPY(&p[آخری], save, 2);
     }
-    else
+    ورنہ
 	fprintf(debugf, " %s", p);
 
-    nfa_set_code(state->c);
+    nfa_سیٹ_رمز(state->c);
     fprintf(debugf, "%s (%d) (id=%d) val=%d\n",
-		 code,
+		 رمز,
 		 state->c,
-		 abs(state->id),
+		 مطلق_قدر(state->id),
 		 state->val);
-    if (state->id < 0)
-	return;
+    اگر (state->id < 0)
+	واپس;
 
-    state->id = abs(state->id) * -1;
+    state->id = مطلق_قدر(state->id) * -1;
 
     // grow indent for state->out
     indent->ga_len -= 1;
-    if (state->out1)
+    اگر (state->out1)
 	GA_CONCAT_LITERAL(indent, "| ");
-    else
+    ورنہ
 	GA_CONCAT_LITERAL(indent, "  ");
     ga_append(indent, NUL);
 
-    nfa_print_state2(debugf, state->out, indent);
+    nfa_print_state2(debugf, state->برآمد, indent);
 
     // replace last part of indent for state->out1
     indent->ga_len -= 3;
@@ -2870,40 +2870,40 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 /*
  * Print the NFA state machine.
  */
-    static void
+    ساکن خالی
 nfa_dump(nfa_regprog_T *prog)
 {
     FILE *debugf = fopen(NFA_REGEXP_DUMP_LOG, "a");
 
-    if (debugf == NULL)
-	return;
+    اگر (debugf == تہی)
+	واپس;
 
-    nfa_print_state(debugf, prog->start);
+    nfa_print_state(debugf, prog->آغاز);
 
-    if (prog->reganch)
+    اگر (prog->reganch)
 	fprintf(debugf, "reganch: %d\n", prog->reganch);
-    if (prog->regstart != NUL)
+    اگر (prog->regstart != NUL)
 	fprintf(debugf, "regstart: %c (decimal: %d)\n",
 		prog->regstart, prog->regstart);
-    if (prog->match_text != NULL)
-	fprintf(debugf, "match_text: \"%s\"\n", prog->match_text);
+    اگر (prog->مطابقت_متن != تہی)
+	fprintf(debugf, "match_text: \"%s\"\n", prog->مطابقت_متن);
 
     fclose(debugf);
 }
 # endif	    // ENABLE_LOG
-#endif	    // DEBUG
+#اگر_ختم	    // DEBUG
 
 /*
  * Parse r.e. @expr and convert it into postfix form.
  * Return the postfix string on success, NULL otherwise.
  */
-    static int *
-re2post(void)
+    ساکن صحیح *
+re2post(خالی)
 {
-    if (nfa_reg(REG_NOPAREN) == FAIL)
-	return NULL;
+    اگر (nfa_reg(REG_NOPAREN) == FAIL)
+	واپس تہی;
     EMIT(NFA_MOPEN);
-    return post_start;
+    واپس post_آغاز;
 }
 
 // NB. Some of the code below is inspired by Russ's.
@@ -2915,23 +2915,23 @@ re2post(void)
  * If c < 256, labeled arrow with character c to out.
  */
 
-static nfa_state_T	*state_ptr; // points to nfa_prog->state
+ساکن nfa_state_T	*state_ptr; // points to nfa_prog->state
 
 /*
  * Allocate and initialize nfa_state_T.
  */
-    static nfa_state_T *
-alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
+    ساکن nfa_state_T *
+alloc_state(صحیح c, nfa_state_T *برآمد, nfa_state_T *out1)
 {
     nfa_state_T *s;
 
-    if (istate >= nstate)
-	return NULL;
+    اگر (istate >= nstate)
+	واپس تہی;
 
     s = &state_ptr[istate++];
 
     s->c    = c;
-    s->out  = out;
+    s->برآمد  = برآمد;
     s->out1 = out1;
     s->val  = 0;
 
@@ -2939,7 +2939,7 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
     s->lastlist[0] = 0;
     s->lastlist[1] = 0;
 
-    return s;
+    واپس s;
 }
 
 /*
@@ -2952,62 +2952,62 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
 // Since the out pointers in the list are always
 // uninitialized, we use the pointers themselves
 // as storage for the Ptrlists.
-typedef union Ptrlist Ptrlist;
-union Ptrlist
+قسمتعریف اتحاد Ptrlist Ptrlist;
+اتحاد Ptrlist
 {
-    Ptrlist	*next;
+    Ptrlist	*اگلا;
     nfa_state_T	*s;
 };
 
-struct Frag
+ساخت Frag
 {
-    nfa_state_T *start;
-    Ptrlist	*out;
+    nfa_state_T *آغاز;
+    Ptrlist	*برآمد;
 };
-typedef struct Frag Frag_T;
+قسمتعریف ساخت Frag Frag_T;
 
 // Reused across compilations by post2nfa(); freed in free_regexp_stuff().
-static Frag_T *nfa_stack;
-static int nfa_stack_len;
+ساکن Frag_T *nfa_ڈھیر;
+ساکن صحیح nfa_ڈھیر_len;
 
 /*
  * Initialize a Frag_T struct and return it.
  */
-    static Frag_T
-frag(nfa_state_T *start, Ptrlist *out)
+    ساکن Frag_T
+frag(nfa_state_T *آغاز, Ptrlist *برآمد)
 {
     Frag_T n;
 
-    n.start = start;
-    n.out = out;
-    return n;
+    n.آغاز = آغاز;
+    n.برآمد = برآمد;
+    واپس n;
 }
 
 /*
  * Create singleton list containing just outp.
  */
-    static Ptrlist *
+    ساکن Ptrlist *
 list1(
     nfa_state_T	**outp)
 {
     Ptrlist *l;
 
     l = (Ptrlist *)outp;
-    l->next = NULL;
-    return l;
+    l->اگلا = تہی;
+    واپس l;
 }
 
 /*
  * Patch the list of states at out to point to start.
  */
-    static void
+    ساکن خالی
 patch(Ptrlist *l, nfa_state_T *s)
 {
-    Ptrlist *next;
+    Ptrlist *اگلا;
 
-    for (; l; l = next)
+    برائے (; l; l = اگلا)
     {
-	next = l->next;
+	اگلا = l->اگلا;
 	l->s = s;
     }
 }
@@ -3016,75 +3016,75 @@ patch(Ptrlist *l, nfa_state_T *s)
 /*
  * Join the two lists l1 and l2, returning the combination.
  */
-    static Ptrlist *
+    ساکن Ptrlist *
 append(Ptrlist *l1, Ptrlist *l2)
 {
     Ptrlist *oldl1;
 
     oldl1 = l1;
-    while (l1->next)
-	l1 = l1->next;
-    l1->next = l2;
-    return oldl1;
+    جب (l1->اگلا)
+	l1 = l1->اگلا;
+    l1->اگلا = l2;
+    واپس oldl1;
 }
 
 /*
  * Stack used for transforming postfix form into NFA.
  */
-static Frag_T empty;
+ساکن Frag_T خالی_خانے_2;
 
-    static void
-st_error(int *postfix UNUSED, int *end UNUSED, int *p UNUSED)
+    ساکن خالی
+st_error(صحیح *postfix غیر_مستعمل, صحیح *انتہا غیر_مستعمل, صحیح *p غیر_مستعمل)
 {
-#ifdef NFA_REGEXP_ERROR_LOG
+#اگر_تعریف_شدہ NFA_REGEXP_ERROR_LOG
     FILE *df;
-    int *p2;
+    صحیح *p2;
 
     df = fopen(NFA_REGEXP_ERROR_LOG, "a");
-    if (df)
+    اگر (df)
     {
 	fprintf(df, "Error popping the stack!\n");
 # ifdef DEBUG
-	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.اظہاریہ);
 # endif
 	fprintf(df, "Postfix form is: ");
 # ifdef DEBUG
-	for (p2 = postfix; p2 < end; p2++)
+	برائے (p2 = postfix; p2 < انتہا; p2++)
 	{
-	    nfa_set_code(*p2);
-	    fprintf(df, "%s, ", code);
+	    nfa_سیٹ_رمز(*p2);
+	    fprintf(df, "%s, ", رمز);
 	}
-	nfa_set_code(*p);
+	nfa_سیٹ_رمز(*p);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	برائے (p2 = postfix; p2 <= p; p2 ++)
 	{
-	    nfa_set_code(*p2);
-	    fprintf(df, "%s, ", code);
+	    nfa_سیٹ_رمز(*p2);
+	    fprintf(df, "%s, ", رمز);
 	}
-# else
-	for (p2 = postfix; p2 < end; p2++)
+# ورنہ
+	برائے (p2 = postfix; p2 < انتہا; p2++)
 	    fprintf(df, "%d, ", *p2);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	برائے (p2 = postfix; p2 <= p; p2 ++)
 	    fprintf(df, "%d, ", *p2);
 # endif
 	fprintf(df, "\n--------------------------\n");
 	fclose(df);
     }
-#endif
-    emsg(_(e_nfa_regexp_could_not_pop_stack));
+#اگر_ختم
+    emsg(_(e_nfa_regexp_could_not_نکالو_ڈھیر));
 }
 
 /*
  * Push an item onto the stack.
  */
-    static void
-st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
+    ساکن خالی
+st_ڈالو(Frag_T s, Frag_T **p, Frag_T *ڈھیر_انتہا)
 {
     Frag_T *stackp = *p;
 
-    if (stackp >= stack_end)
-	return;
+    اگر (stackp >= ڈھیر_انتہا)
+	واپس;
     *stackp = s;
     *p = *p + 1;
 }
@@ -3092,438 +3092,438 @@ st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
 /*
  * Pop an item from the stack.
  */
-    static Frag_T
-st_pop(Frag_T **p, Frag_T *stack)
+    ساکن Frag_T
+st_نکالو(Frag_T **p, Frag_T *ڈھیر)
 {
     Frag_T *stackp;
 
     *p = *p - 1;
     stackp = *p;
-    if (stackp < stack)
-	return empty;
-    return **p;
+    اگر (stackp < ڈھیر)
+	واپس خالی_خانے_2;
+    واپس **p;
 }
 
 /*
  * Estimate the maximum byte length of anything matching "state".
  * When unknown or unlimited return -1.
  */
-    static int
-nfa_max_width(nfa_state_T *startstate, int depth)
+    ساکن صحیح
+nfa_max_چوڑائی(nfa_state_T *startstate, صحیح گہرائی)
 {
-    int		    l, r;
+    صحیح		    l, r;
     nfa_state_T	    *state = startstate;
-    int		    len = 0;
+    صحیح		    len = 0;
 
     // detect looping in a NFA_SPLIT
-    if (depth > 4)
-	return -1;
+    اگر (گہرائی > 4)
+	واپس -1;
 
-    while (state != NULL)
+    جب (state != تہی)
     {
-	switch (state->c)
+	انتخاب (state->c)
 	{
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
+	    حالت NFA_انتہا_INVISIBLE:
+	    حالت NFA_انتہا_INVISIBLE_NEG:
 		// the end, return what we have
-		return len;
+		واپس len;
 
-	    case NFA_SPLIT:
+	    حالت NFA_بانٹو:
 		// two alternatives, use the maximum
-		l = nfa_max_width(state->out, depth + 1);
-		r = nfa_max_width(state->out1, depth + 1);
-		if (l < 0 || r < 0)
-		    return -1;
-		return len + (l > r ? l : r);
+		l = nfa_max_چوڑائی(state->برآمد, گہرائی + 1);
+		r = nfa_max_چوڑائی(state->out1, گہرائی + 1);
+		اگر (l < 0 || r < 0)
+		    واپس -1;
+		واپس len + (l > r ? l : r);
 
-	    case NFA_ANY:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    حالت NFA_ANY:
+	    حالت NFA_آغاز_COLL:
+	    حالت NFA_آغاز_NEG_COLL:
 		// matches some character, including composing chars
-		if (enc_utf8)
+		اگر (enc_utf8)
 		    len += MB_MAXBYTES;
-		else if (has_mbyte)
+		ورنہ اگر (has_mbyte)
 		    len += 2;
-		else
+		ورنہ
 		    ++len;
-		if (state->c != NFA_ANY)
+		اگر (state->c != NFA_ANY)
 		{
 		    // Skip over the compiled collection.
 		    // malformed NFAs must not crash width estimation.
-		    if (state->out1 == NULL || state->out1->out == NULL)
-			return -1;
-		    state = state->out1->out;
-		    continue;
+		    اگر (state->out1 == تہی || state->out1->برآمد == تہی)
+			واپس -1;
+		    state = state->out1->برآمد;
+		    جاری;
 		}
-		break;
+		توڑو;
 
-	    case NFA_DIGIT:
-	    case NFA_WHITE:
-	    case NFA_HEX:
-	    case NFA_OCTAL:
+	    حالت NFA_DIGIT:
+	    حالت NFA_WHITE:
+	    حالت NFA_HEX:
+	    حالت NFA_OCTAL:
 		// ascii
 		++len;
-		break;
+		توڑو;
 
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_NWHITE:
-	    case NFA_NDIGIT:
-	    case NFA_NHEX:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_ANY_COMPOSING:
+	    حالت NFA_IDENT:
+	    حالت NFA_SIDENT:
+	    حالت NFA_KWORD:
+	    حالت NFA_SKWORD:
+	    حالت NFA_FNAME:
+	    حالت NFA_SFNAME:
+	    حالت NFA_PRINT:
+	    حالت NFA_SPRINT:
+	    حالت NFA_NWHITE:
+	    حالت NFA_NDIGIT:
+	    حالت NFA_NHEX:
+	    حالت NFA_NOCTAL:
+	    حالت NFA_لفظ:
+	    حالت NFA_NWORD:
+	    حالت NFA_سر:
+	    حالت NFA_NHEAD:
+	    حالت NFA_ALPHA:
+	    حالت NFA_NALPHA:
+	    حالت NFA_زیریں:
+	    حالت NFA_NLOWER:
+	    حالت NFA_بالائی:
+	    حالت NFA_NUPPER:
+	    حالت NFA_زیریں_IC:
+	    حالت NFA_NLOWER_IC:
+	    حالت NFA_بالائی_IC:
+	    حالت NFA_NUPPER_IC:
+	    حالت NFA_ANY_COMPOSING:
 		// possibly non-ascii
-		if (has_mbyte)
+		اگر (has_mbyte)
 		    len += 3;
-		else
+		ورنہ
 		    ++len;
-		break;
+		توڑو;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
+	    حالت NFA_آغاز_INVISIBLE:
+	    حالت NFA_آغاز_INVISIBLE_NEG:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_NEG:
 		// zero-width, out1 points to the END state
-		state = state->out1->out;
-		continue;
+		state = state->out1->برآمد;
+		جاری;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
-#endif
-	    case NFA_NEWL:
-	    case NFA_SKIP:
+	    حالت NFA_BACKREF1:
+	    حالت NFA_BACKREF2:
+	    حالت NFA_BACKREF3:
+	    حالت NFA_BACKREF4:
+	    حالت NFA_BACKREF5:
+	    حالت NFA_BACKREF6:
+	    حالت NFA_BACKREF7:
+	    حالت NFA_BACKREF8:
+	    حالت NFA_BACKREF9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZREF1:
+	    حالت NFA_ZREF2:
+	    حالت NFA_ZREF3:
+	    حالت NFA_ZREF4:
+	    حالت NFA_ZREF5:
+	    حالت NFA_ZREF6:
+	    حالت NFA_ZREF7:
+	    حالت NFA_ZREF8:
+	    حالت NFA_ZREF9:
+#اگر_ختم
+	    حالت NFA_NEWL:
+	    حالت NFA_SKIP:
 		// unknown width
-		return -1;
+		واپس -1;
 
-	    case NFA_BOL:
-	    case NFA_EOL:
-	    case NFA_BOF:
-	    case NFA_EOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-	    case NFA_ZCLOSE:
-	    case NFA_ZCLOSE1:
-	    case NFA_ZCLOSE2:
-	    case NFA_ZCLOSE3:
-	    case NFA_ZCLOSE4:
-	    case NFA_ZCLOSE5:
-	    case NFA_ZCLOSE6:
-	    case NFA_ZCLOSE7:
-	    case NFA_ZCLOSE8:
-	    case NFA_ZCLOSE9:
-#endif
-	    case NFA_MCLOSE:
-	    case NFA_MCLOSE1:
-	    case NFA_MCLOSE2:
-	    case NFA_MCLOSE3:
-	    case NFA_MCLOSE4:
-	    case NFA_MCLOSE5:
-	    case NFA_MCLOSE6:
-	    case NFA_MCLOSE7:
-	    case NFA_MCLOSE8:
-	    case NFA_MCLOSE9:
-	    case NFA_NOPEN:
-	    case NFA_NCLOSE:
+	    حالت NFA_BOL:
+	    حالت NFA_EOL:
+	    حالت NFA_BOF:
+	    حالت NFA_EOF:
+	    حالت NFA_BOW:
+	    حالت NFA_EOW:
+	    حالت NFA_MOPEN:
+	    حالت NFA_MOPEN1:
+	    حالت NFA_MOPEN2:
+	    حالت NFA_MOPEN3:
+	    حالت NFA_MOPEN4:
+	    حالت NFA_MOPEN5:
+	    حالت NFA_MOPEN6:
+	    حالت NFA_MOPEN7:
+	    حالت NFA_MOPEN8:
+	    حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZOPEN:
+	    حالت NFA_ZOPEN1:
+	    حالت NFA_ZOPEN2:
+	    حالت NFA_ZOPEN3:
+	    حالت NFA_ZOPEN4:
+	    حالت NFA_ZOPEN5:
+	    حالت NFA_ZOPEN6:
+	    حالت NFA_ZOPEN7:
+	    حالت NFA_ZOPEN8:
+	    حالت NFA_ZOPEN9:
+	    حالت NFA_ZCLOSE:
+	    حالت NFA_ZCLOSE1:
+	    حالت NFA_ZCLOSE2:
+	    حالت NFA_ZCLOSE3:
+	    حالت NFA_ZCLOSE4:
+	    حالت NFA_ZCLOSE5:
+	    حالت NFA_ZCLOSE6:
+	    حالت NFA_ZCLOSE7:
+	    حالت NFA_ZCLOSE8:
+	    حالت NFA_ZCLOSE9:
+#اگر_ختم
+	    حالت NFA_MCLOSE:
+	    حالت NFA_MCLOSE1:
+	    حالت NFA_MCLOSE2:
+	    حالت NFA_MCLOSE3:
+	    حالت NFA_MCLOSE4:
+	    حالت NFA_MCLOSE5:
+	    حالت NFA_MCLOSE6:
+	    حالت NFA_MCLOSE7:
+	    حالت NFA_MCLOSE8:
+	    حالت NFA_MCLOSE9:
+	    حالت NFA_NOPEN:
+	    حالت NFA_NCLOSE:
 
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_CURSOR:
-	    case NFA_COL:
-	    case NFA_VCOL:
-	    case NFA_MARK:
+	    حالت NFA_LNUM_GT:
+	    حالت NFA_LNUM_LT:
+	    حالت NFA_ستون_GT:
+	    حالت NFA_ستون_LT:
+	    حالت NFA_VCOL_GT:
+	    حالت NFA_VCOL_LT:
+	    حالت NFA_MARK_GT:
+	    حالت NFA_MARK_LT:
+	    حالت NFA_VISUAL:
+	    حالت NFA_LNUM:
+	    حالت NFA_CURSOR:
+	    حالت NFA_ستون:
+	    حالت NFA_VCOL:
+	    حالت NFA_MARK:
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_OPT_CHARS:
-	    case NFA_EMPTY:
-	    case NFA_START_PATTERN:
-	    case NFA_END_PATTERN:
-	    case NFA_COMPOSING:
-	    case NFA_END_COMPOSING:
+	    حالت NFA_ZSTART:
+	    حالت NFA_ZEND:
+	    حالت NFA_OPT_CHARS:
+	    حالت NFA_خالی_خانے:
+	    حالت NFA_آغاز_نمونہ:
+	    حالت NFA_انتہا_نمونہ:
+	    حالت NFA_COMPOSING:
+	    حالت NFA_انتہا_COMPOSING:
 		// zero-width
-		break;
+		توڑو;
 
-	    default:
-		if (state->c < 0)
+	    طےشدہ:
+		اگر (state->c < 0)
 		    // don't know what this is
-		    return -1;
+		    واپس -1;
 		// normal character
 		len += MB_CHAR2LEN(state->c);
-		break;
+		توڑو;
 	}
 
 	// normal way to continue
-	state = state->out;
+	state = state->برآمد;
     }
 
     // unrecognized, "cannot happen"
-    return -1;
+    واپس -1;
 }
 
 /*
  * Convert a postfix form into its equivalent NFA.
  * Return the NFA start state on success, NULL otherwise.
  */
-    static nfa_state_T *
-post2nfa(int *postfix, int *end, int nfa_calc_size)
+    ساکن nfa_state_T *
+post2nfa(صحیح *postfix, صحیح *انتہا, صحیح nfa_calc_سائز)
 {
-    int		*p;
-    int		mopen;
-    int		mclose;
-    Frag_T	*stack = NULL;
-    Frag_T	*stackp = NULL;
-    Frag_T	*stack_end = NULL;
+    صحیح		*p;
+    صحیح		mopen;
+    صحیح		mclose;
+    Frag_T	*ڈھیر = تہی;
+    Frag_T	*stackp = تہی;
+    Frag_T	*ڈھیر_انتہا = تہی;
     Frag_T	e1;
     Frag_T	e2;
     Frag_T	e;
     nfa_state_T	*s;
     nfa_state_T	*s1;
     nfa_state_T	*matchstate;
-    nfa_state_T	*ret = NULL;
+    nfa_state_T	*ret = تہی;
 
-    if (postfix == NULL)
-	return NULL;
+    اگر (postfix == تہی)
+	واپس تہی;
 
-#define PUSH(s)	    st_push((s), &stackp, stack_end)
-#define POP()	    st_pop(&stackp, stack);		\
-		    if (stackp < stack)			\
+#تعریف_کرو ڈالو_2(s)	    st_ڈالو((s), &stackp, ڈھیر_انتہا)
+#تعریف_کرو نکالو_2()	    st_نکالو(&stackp, ڈھیر);		\
+		    اگر (stackp < ڈھیر)			\
 		    {					\
-			st_error(postfix, end, p);	\
-			return NULL;			\
+			st_error(postfix, انتہا, p);	\
+			واپس تہی;			\
 		    }
 
-    if (nfa_calc_size == FALSE)
+    اگر (nfa_calc_سائز == FALSE)
     {
 	// Reuse the fragment stack across compilations, growing when needed;
 	// it is freed in free_regexp_stuff().
-	if (nfa_stack == NULL || nfa_stack_len < nstate + 1)
+	اگر (nfa_ڈھیر == تہی || nfa_ڈھیر_len < nstate + 1)
 	{
-	    vim_free(nfa_stack);
-	    nfa_stack = ALLOC_MULT(Frag_T, nstate + 1);
-	    if (nfa_stack == NULL)
+	    vim_free(nfa_ڈھیر);
+	    nfa_ڈھیر = ALLOC_MULT(Frag_T, nstate + 1);
+	    اگر (nfa_ڈھیر == تہی)
 	    {
-		nfa_stack_len = 0;
-		return NULL;
+		nfa_ڈھیر_len = 0;
+		واپس تہی;
 	    }
-	    nfa_stack_len = nstate + 1;
+	    nfa_ڈھیر_len = nstate + 1;
 	}
-	stack = nfa_stack;
-	stackp = stack;
-	stack_end = stack + (nstate + 1);
+	ڈھیر = nfa_ڈھیر;
+	stackp = ڈھیر;
+	ڈھیر_انتہا = ڈھیر + (nstate + 1);
     }
 
-    for (p = postfix; p < end; ++p)
+    برائے (p = postfix; p < انتہا; ++p)
     {
-	switch (*p)
+	انتخاب (*p)
 	{
-	case NFA_CONCAT:
+	حالت NFA_CONCAT:
 	    // Concatenation.
 	    // Pay attention: this operator does not exist in the r.e. itself
 	    // (it is implicit, really).  It is added when r.e. is translated
 	    // to postfix form in re2post().
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		توڑو;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    e2 = نکالو_2();
+	    e1 = نکالو_2();
+	    patch(e1.برآمد, e2.آغاز);
+	    ڈالو_2(frag(e1.آغاز, e2.برآمد));
+	    توڑو;
 
-	case NFA_OR:
+	حالت NFA_OR:
 	    // Alternation
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    s = alloc_state(NFA_SPLIT, e1.start, e2.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e1.out, e2.out)));
-	    break;
+	    e2 = نکالو_2();
+	    e1 = نکالو_2();
+	    s = alloc_state(NFA_بانٹو, e1.آغاز, e2.آغاز);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    ڈالو_2(frag(s, append(e1.برآمد, e2.برآمد)));
+	    توڑو;
 
-	case NFA_STAR:
+	حالت NFA_ستارہ:
 	    // Zero or more, prefer more
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out1)));
-	    break;
+	    e = نکالو_2();
+	    s = alloc_state(NFA_بانٹو, e.آغاز, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    patch(e.برآمد, s);
+	    ڈالو_2(frag(s, list1(&s->out1)));
+	    توڑو;
 
-	case NFA_STAR_NONGREEDY:
+	حالت NFA_ستارہ_NONGREEDY:
 	    // Zero or more, prefer zero
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    e = نکالو_2();
+	    s = alloc_state(NFA_بانٹو, تہی, e.آغاز);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    patch(e.برآمد, s);
+	    ڈالو_2(frag(s, list1(&s->برآمد)));
+	    توڑو;
 
-	case NFA_QUEST:
+	حالت NFA_QUEST:
 	    // one or zero atoms=> greedy match
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out1))));
-	    break;
+	    e = نکالو_2();
+	    s = alloc_state(NFA_بانٹو, e.آغاز, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    ڈالو_2(frag(s, append(e.برآمد, list1(&s->out1))));
+	    توڑو;
 
-	case NFA_QUEST_NONGREEDY:
+	حالت NFA_QUEST_NONGREEDY:
 	    // zero or one atoms => non-greedy match
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out))));
-	    break;
+	    e = نکالو_2();
+	    s = alloc_state(NFA_بانٹو, تہی, e.آغاز);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    ڈالو_2(frag(s, append(e.برآمد, list1(&s->برآمد))));
+	    توڑو;
 
-	case NFA_END_COLL:
-	case NFA_END_NEG_COLL:
+	حالت NFA_انتہا_COLL:
+	حالت NFA_انتہا_NEG_COLL:
 	    // On the stack is the sequence starting with NFA_START_COLL or
 	    // NFA_START_NEG_COLL and all possible characters. Patch it to
 	    // add the output to the start.
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_END_COLL, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    patch(e.out, s);
-	    e.start->out1 = s;
-	    PUSH(frag(e.start, list1(&s->out)));
-	    break;
+	    e = نکالو_2();
+	    s = alloc_state(NFA_انتہا_COLL, تہی, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    patch(e.برآمد, s);
+	    e.آغاز->out1 = s;
+	    ڈالو_2(frag(e.آغاز, list1(&s->برآمد)));
+	    توڑو;
 
-	case NFA_RANGE:
+	حالت NFA_RANGE:
 	    // Before this are two characters, the low and high end of a
 	    // range.  Turn them into two states with MIN and MAX.
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		توڑو;
 	    }
-	    e2 = POP();
-	    e1 = POP();
-	    e2.start->val = e2.start->c;
-	    e2.start->c = NFA_RANGE_MAX;
-	    e1.start->val = e1.start->c;
-	    e1.start->c = NFA_RANGE_MIN;
-	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    e2 = نکالو_2();
+	    e1 = نکالو_2();
+	    e2.آغاز->val = e2.آغاز->c;
+	    e2.آغاز->c = NFA_RANGE_MAX;
+	    e1.آغاز->val = e1.آغاز->c;
+	    e1.آغاز->c = NFA_RANGE_MIN;
+	    patch(e1.برآمد, e2.آغاز);
+	    ڈالو_2(frag(e1.آغاز, e2.برآمد));
+	    توڑو;
 
-	case NFA_EMPTY:
+	حالت NFA_خالی_خانے:
 	    // 0-length, used in a repetition with max/min count of 0
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    s = alloc_state(NFA_EMPTY, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(NFA_خالی_خانے, تہی, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    ڈالو_2(frag(s, list1(&s->برآمد)));
+	    توڑو;
 
-	case NFA_OPT_CHARS:
+	حالت NFA_OPT_CHARS:
 	  {
-	    int    n;
+	    صحیح    n;
 
 	    // \%[abc] implemented as:
 	    //    NFA_SPLIT
@@ -3537,70 +3537,70 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    //    |   +- next
 	    //    +- next
 	    n = *++p; // get number of characters
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate += n;
-		break;
+		توڑو;
 	    }
-	    s = NULL; // avoid compiler warning
-	    e1.out = NULL; // stores list with out1's
-	    s1 = NULL; // previous NFA_SPLIT to connect to
-	    while (n-- > 0)
+	    s = تہی; // avoid compiler warning
+	    e1.برآمد = تہی; // stores list with out1's
+	    s1 = تہی; // previous NFA_SPLIT to connect to
+	    جب (n-- > 0)
 	    {
-		e = POP(); // get character
-		s = alloc_state(NFA_SPLIT, e.start, NULL);
-		if (s == NULL)
-		    goto theend;
-		if (e1.out == NULL)
+		e = نکالو_2(); // get character
+		s = alloc_state(NFA_بانٹو, e.آغاز, تہی);
+		اگر (s == تہی)
+		    جاؤ theend;
+		اگر (e1.برآمد == تہی)
 		    e1 = e;
-		patch(e.out, s1);
-		append(e1.out, list1(&s->out1));
+		patch(e.برآمد, s1);
+		append(e1.برآمد, list1(&s->out1));
 		s1 = s;
 	    }
-	    PUSH(frag(s, e1.out));
-	    break;
+	    ڈالو_2(frag(s, e1.برآمد));
+	    توڑو;
 	  }
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-	case NFA_PREV_ATOM_JUST_BEFORE:
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-	case NFA_PREV_ATOM_LIKE_PATTERN:
+	حالت NFA_پچھلا_ATOM_NO_چوڑائی:
+	حالت NFA_پچھلا_ATOM_NO_چوڑائی_NEG:
+	حالت NFA_پچھلا_ATOM_JUST_BEFORE:
+	حالت NFA_پچھلا_ATOM_JUST_BEFORE_NEG:
+	حالت NFA_پچھلا_ATOM_LIKE_نمونہ:
 	  {
-	    int before = (*p == NFA_PREV_ATOM_JUST_BEFORE
-				      || *p == NFA_PREV_ATOM_JUST_BEFORE_NEG);
-	    int pattern = (*p == NFA_PREV_ATOM_LIKE_PATTERN);
-	    int start_state;
-	    int end_state;
-	    int n = 0;
+	    صحیح before = (*p == NFA_پچھلا_ATOM_JUST_BEFORE
+				      || *p == NFA_پچھلا_ATOM_JUST_BEFORE_NEG);
+	    صحیح نمونہ = (*p == NFA_پچھلا_ATOM_LIKE_نمونہ);
+	    صحیح آغاز_state;
+	    صحیح انتہا_state;
+	    صحیح n = 0;
 	    nfa_state_T *zend;
 	    nfa_state_T *skip;
 
-	    switch (*p)
+	    انتخاب (*p)
 	    {
-		case NFA_PREV_ATOM_NO_WIDTH:
-		    start_state = NFA_START_INVISIBLE;
-		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_NO_WIDTH_NEG:
-		    start_state = NFA_START_INVISIBLE_NEG;
-		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE:
-		    start_state = NFA_START_INVISIBLE_BEFORE;
-		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-		    start_state = NFA_START_INVISIBLE_BEFORE_NEG;
-		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		default: // NFA_PREV_ATOM_LIKE_PATTERN:
-		    start_state = NFA_START_PATTERN;
-		    end_state = NFA_END_PATTERN;
-		    break;
+		حالت NFA_پچھلا_ATOM_NO_چوڑائی:
+		    آغاز_state = NFA_آغاز_INVISIBLE;
+		    انتہا_state = NFA_انتہا_INVISIBLE;
+		    توڑو;
+		حالت NFA_پچھلا_ATOM_NO_چوڑائی_NEG:
+		    آغاز_state = NFA_آغاز_INVISIBLE_NEG;
+		    انتہا_state = NFA_انتہا_INVISIBLE_NEG;
+		    توڑو;
+		حالت NFA_پچھلا_ATOM_JUST_BEFORE:
+		    آغاز_state = NFA_آغاز_INVISIBLE_BEFORE;
+		    انتہا_state = NFA_انتہا_INVISIBLE;
+		    توڑو;
+		حالت NFA_پچھلا_ATOM_JUST_BEFORE_NEG:
+		    آغاز_state = NFA_آغاز_INVISIBLE_BEFORE_NEG;
+		    انتہا_state = NFA_انتہا_INVISIBLE_NEG;
+		    توڑو;
+		طےشدہ: // NFA_PREV_ATOM_LIKE_PATTERN:
+		    آغاز_state = NFA_آغاز_نمونہ;
+		    انتہا_state = NFA_انتہا_نمونہ;
+		    توڑو;
 	    }
 
-	    if (before)
+	    اگر (before)
 		n = *++p; // get the count
 
 	    // The \@= operator: match the preceding atom with zero width.
@@ -3610,310 +3610,310 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // Surrounds the preceding atom with START_INVISIBLE and
 	    // END_INVISIBLE, similarly to MOPEN.
 
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
-		nstate += pattern ? 4 : 2;
-		break;
+		nstate += نمونہ ? 4 : 2;
+		توڑو;
 	    }
-	    e = POP();
-	    s1 = alloc_state(end_state, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
+	    e = نکالو_2();
+	    s1 = alloc_state(انتہا_state, تہی, تہی);
+	    اگر (s1 == تہی)
+		جاؤ theend;
 
-	    s = alloc_state(start_state, e.start, s1);
-	    if (s == NULL)
-		goto theend;
-	    if (pattern)
+	    s = alloc_state(آغاز_state, e.آغاز, s1);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    اگر (نمونہ)
 	    {
 		// NFA_ZEND -> NFA_END_PATTERN -> NFA_SKIP -> what follows.
-		skip = alloc_state(NFA_SKIP, NULL, NULL);
-		if (skip == NULL)
-		    goto theend;
-		zend = alloc_state(NFA_ZEND, s1, NULL);
-		if (zend == NULL)
-		    goto theend;
-		s1->out= skip;
-		patch(e.out, zend);
-		PUSH(frag(s, list1(&skip->out)));
+		skip = alloc_state(NFA_SKIP, تہی, تہی);
+		اگر (skip == تہی)
+		    جاؤ theend;
+		zend = alloc_state(NFA_ZEND, s1, تہی);
+		اگر (zend == تہی)
+		    جاؤ theend;
+		s1->برآمد= skip;
+		patch(e.برآمد, zend);
+		ڈالو_2(frag(s, list1(&skip->برآمد)));
 	    }
-	    else
+	    ورنہ
 	    {
-		patch(e.out, s1);
-		PUSH(frag(s, list1(&s1->out)));
-		if (before)
+		patch(e.برآمد, s1);
+		ڈالو_2(frag(s, list1(&s1->برآمد)));
+		اگر (before)
 		{
-		    if (n <= 0)
+		    اگر (n <= 0)
 			// See if we can guess the maximum width, it avoids a
 			// lot of pointless tries.
-			n = nfa_max_width(e.start, 0);
+			n = nfa_max_چوڑائی(e.آغاز, 0);
 		    s->val = n; // store the count
 		}
 	    }
-	    break;
+	    توڑو;
 	  }
 
-	case NFA_COMPOSING:	// char with composing char
-#if 0
+	حالت NFA_COMPOSING:	// char with composing char
+#اگر 0
 	    // TODO
-	    if (regflags & RF_ICOMBINE)
+	    اگر (regflags & RF_ICOMBINE)
 	    {
 		// use the base character only
 	    }
-#endif
+#اگر_ختم
 	    // FALLTHROUGH
 
-	case NFA_MOPEN:	// \( \) Submatch
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:	// \z( \) Submatch
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_NOPEN:	// \%( \) "Invisible Submatch"
-	    if (nfa_calc_size == TRUE)
+	حالت NFA_MOPEN:	// \( \) Submatch
+	حالت NFA_MOPEN1:
+	حالت NFA_MOPEN2:
+	حالت NFA_MOPEN3:
+	حالت NFA_MOPEN4:
+	حالت NFA_MOPEN5:
+	حالت NFA_MOPEN6:
+	حالت NFA_MOPEN7:
+	حالت NFA_MOPEN8:
+	حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZOPEN:	// \z( \) Submatch
+	حالت NFA_ZOPEN1:
+	حالت NFA_ZOPEN2:
+	حالت NFA_ZOPEN3:
+	حالت NFA_ZOPEN4:
+	حالت NFA_ZOPEN5:
+	حالت NFA_ZOPEN6:
+	حالت NFA_ZOPEN7:
+	حالت NFA_ZOPEN8:
+	حالت NFA_ZOPEN9:
+#اگر_ختم
+	حالت NFA_NOPEN:	// \%( \) "Invisible Submatch"
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate += 2;
-		break;
+		توڑو;
 	    }
 
 	    mopen = *p;
-	    switch (*p)
+	    انتخاب (*p)
 	    {
-		case NFA_NOPEN: mclose = NFA_NCLOSE; break;
-#ifdef FEAT_SYN_HL
-		case NFA_ZOPEN: mclose = NFA_ZCLOSE; break;
-		case NFA_ZOPEN1: mclose = NFA_ZCLOSE1; break;
-		case NFA_ZOPEN2: mclose = NFA_ZCLOSE2; break;
-		case NFA_ZOPEN3: mclose = NFA_ZCLOSE3; break;
-		case NFA_ZOPEN4: mclose = NFA_ZCLOSE4; break;
-		case NFA_ZOPEN5: mclose = NFA_ZCLOSE5; break;
-		case NFA_ZOPEN6: mclose = NFA_ZCLOSE6; break;
-		case NFA_ZOPEN7: mclose = NFA_ZCLOSE7; break;
-		case NFA_ZOPEN8: mclose = NFA_ZCLOSE8; break;
-		case NFA_ZOPEN9: mclose = NFA_ZCLOSE9; break;
-#endif
-		case NFA_COMPOSING: mclose = NFA_END_COMPOSING; break;
-		default:
+		حالت NFA_NOPEN: mclose = NFA_NCLOSE; توڑو;
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		حالت NFA_ZOPEN: mclose = NFA_ZCLOSE; توڑو;
+		حالت NFA_ZOPEN1: mclose = NFA_ZCLOSE1; توڑو;
+		حالت NFA_ZOPEN2: mclose = NFA_ZCLOSE2; توڑو;
+		حالت NFA_ZOPEN3: mclose = NFA_ZCLOSE3; توڑو;
+		حالت NFA_ZOPEN4: mclose = NFA_ZCLOSE4; توڑو;
+		حالت NFA_ZOPEN5: mclose = NFA_ZCLOSE5; توڑو;
+		حالت NFA_ZOPEN6: mclose = NFA_ZCLOSE6; توڑو;
+		حالت NFA_ZOPEN7: mclose = NFA_ZCLOSE7; توڑو;
+		حالت NFA_ZOPEN8: mclose = NFA_ZCLOSE8; توڑو;
+		حالت NFA_ZOPEN9: mclose = NFA_ZCLOSE9; توڑو;
+#اگر_ختم
+		حالت NFA_COMPOSING: mclose = NFA_انتہا_COMPOSING; توڑو;
+		طےشدہ:
 		    // NFA_MOPEN, NFA_MOPEN1 .. NFA_MOPEN9
 		    mclose = *p + NSUBEXP;
-		    break;
+		    توڑو;
 	    }
 
 	    // Allow "NFA_MOPEN" as a valid postfix representation for
 	    // the empty regexp "". In this case, the NFA will be
 	    // NFA_MOPEN -> NFA_MCLOSE. Note that this also allows
 	    // empty groups of parenthesis, and empty mbyte chars
-	    if (stackp == stack)
+	    اگر (stackp == ڈھیر)
 	    {
-		s = alloc_state(mopen, NULL, NULL);
-		if (s == NULL)
-		    goto theend;
-		s1 = alloc_state(mclose, NULL, NULL);
-		if (s1 == NULL)
-		    goto theend;
-		patch(list1(&s->out), s1);
-		PUSH(frag(s, list1(&s1->out)));
-		break;
+		s = alloc_state(mopen, تہی, تہی);
+		اگر (s == تہی)
+		    جاؤ theend;
+		s1 = alloc_state(mclose, تہی, تہی);
+		اگر (s1 == تہی)
+		    جاؤ theend;
+		patch(list1(&s->برآمد), s1);
+		ڈالو_2(frag(s, list1(&s1->برآمد)));
+		توڑو;
 	    }
 
 	    // At least one node was emitted before NFA_MOPEN, so
 	    // at least one node will be between NFA_MOPEN and NFA_MCLOSE
-	    e = POP();
-	    s = alloc_state(mopen, e.start, NULL);   // `('
-	    if (s == NULL)
-		goto theend;
+	    e = نکالو_2();
+	    s = alloc_state(mopen, e.آغاز, تہی);   // `('
+	    اگر (s == تہی)
+		جاؤ theend;
 
-	    s1 = alloc_state(mclose, NULL, NULL);   // `)'
-	    if (s1 == NULL)
-		goto theend;
-	    patch(e.out, s1);
+	    s1 = alloc_state(mclose, تہی, تہی);   // `)'
+	    اگر (s1 == تہی)
+		جاؤ theend;
+	    patch(e.برآمد, s1);
 
-	    if (mopen == NFA_COMPOSING)
+	    اگر (mopen == NFA_COMPOSING)
 		// COMPOSING->out1 = END_COMPOSING
 		patch(list1(&s->out1), s1);
 
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    ڈالو_2(frag(s, list1(&s1->برآمد)));
+	    توڑو;
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
-#endif
-	    if (nfa_calc_size == TRUE)
+	حالت NFA_BACKREF1:
+	حالت NFA_BACKREF2:
+	حالت NFA_BACKREF3:
+	حالت NFA_BACKREF4:
+	حالت NFA_BACKREF5:
+	حالت NFA_BACKREF6:
+	حالت NFA_BACKREF7:
+	حالت NFA_BACKREF8:
+	حالت NFA_BACKREF9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZREF1:
+	حالت NFA_ZREF2:
+	حالت NFA_ZREF3:
+	حالت NFA_ZREF4:
+	حالت NFA_ZREF5:
+	حالت NFA_ZREF6:
+	حالت NFA_ZREF7:
+	حالت NFA_ZREF8:
+	حالت NFA_ZREF9:
+#اگر_ختم
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate += 2;
-		break;
+		توڑو;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    s1 = alloc_state(NFA_SKIP, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
-	    patch(list1(&s->out), s1);
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    s = alloc_state(*p, تہی, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    s1 = alloc_state(NFA_SKIP, تہی, تہی);
+	    اگر (s1 == تہی)
+		جاؤ theend;
+	    patch(list1(&s->برآمد), s1);
+	    ڈالو_2(frag(s, list1(&s1->برآمد)));
+	    توڑو;
 
-	case NFA_LNUM:
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_VCOL:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_COL:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_MARK:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
+	حالت NFA_LNUM:
+	حالت NFA_LNUM_GT:
+	حالت NFA_LNUM_LT:
+	حالت NFA_VCOL:
+	حالت NFA_VCOL_GT:
+	حالت NFA_VCOL_LT:
+	حالت NFA_ستون:
+	حالت NFA_ستون_GT:
+	حالت NFA_ستون_LT:
+	حالت NFA_MARK:
+	حالت NFA_MARK_GT:
+	حالت NFA_MARK_LT:
 	  {
-	    int n = *++p; // lnum, col or mark name
+	    صحیح n = *++p; // lnum, col or mark name
 
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate += 1;
-		break;
+		توڑو;
 	    }
-	    s = alloc_state(p[-1], NULL, NULL);
-	    if (s == NULL)
-		goto theend;
+	    s = alloc_state(p[-1], تہی, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
 	    s->val = n;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    ڈالو_2(frag(s, list1(&s->برآمد)));
+	    توڑو;
 	  }
 
-	case NFA_ZSTART:
-	case NFA_ZEND:
-	default:
+	حالت NFA_ZSTART:
+	حالت NFA_ZEND:
+	طےشدہ:
 	    // Operands
-	    if (nfa_calc_size == TRUE)
+	    اگر (nfa_calc_سائز == TRUE)
 	    {
 		nstate++;
-		break;
+		توڑو;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(*p, تہی, تہی);
+	    اگر (s == تہی)
+		جاؤ theend;
+	    ڈالو_2(frag(s, list1(&s->برآمد)));
+	    توڑو;
 
 	} // switch(*p)
 
     } // for (p = postfix; *p; ++p)
 
-    if (nfa_calc_size == TRUE)
+    اگر (nfa_calc_سائز == TRUE)
     {
 	nstate++;
-	goto theend;	// Return value when counting size is ignored anyway
+	جاؤ theend;	// Return value when counting size is ignored anyway
     }
 
-    e = POP();
-    if (stackp != stack)
-	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_to_nfa_too_many_stats_left_on_stack));
+    e = نکالو_2();
+    اگر (stackp != ڈھیر)
+	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_مقصد_nfa_too_many_stats_بایاں_on_ڈھیر));
 
-    if (istate >= nstate)
-	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_to_store_whole_nfa));
+    اگر (istate >= nstate)
+	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_مقصد_store_پورا_nfa));
 
     matchstate = &state_ptr[istate++]; // the match state
-    matchstate->c = NFA_MATCH;
-    matchstate->out = matchstate->out1 = NULL;
+    matchstate->c = NFA_مطابقت;
+    matchstate->برآمد = matchstate->out1 = تہی;
     matchstate->id = 0;
 
-    patch(e.out, matchstate);
-    ret = e.start;
+    patch(e.برآمد, matchstate);
+    ret = e.آغاز;
 
 theend:
-    return ret;
+    واپس ret;
 
-#undef POP1
-#undef PUSH1
-#undef POP2
-#undef PUSH2
-#undef POP
-#undef PUSH
+#تعریف_منسوخ POP1
+#تعریف_منسوخ PUSH1
+#تعریف_منسوخ POP2
+#تعریف_منسوخ PUSH2
+#تعریف_منسوخ نکالو_2
+#تعریف_منسوخ ڈالو_2
 }
 
 /*
  * After building the NFA program, inspect it to add optimization hints.
  */
-    static void
+    ساکن خالی
 nfa_postprocess(nfa_regprog_T *prog)
 {
-    int i;
-    int c;
+    صحیح i;
+    صحیح c;
 
-    for (i = 0; i < prog->nstate; ++i)
+    برائے (i = 0; i < prog->nstate; ++i)
     {
 	c = prog->state[i].c;
-	if (c == NFA_START_INVISIBLE
-		|| c == NFA_START_INVISIBLE_NEG
-		|| c == NFA_START_INVISIBLE_BEFORE
-		|| c == NFA_START_INVISIBLE_BEFORE_NEG)
+	اگر (c == NFA_آغاز_INVISIBLE
+		|| c == NFA_آغاز_INVISIBLE_NEG
+		|| c == NFA_آغاز_INVISIBLE_BEFORE
+		|| c == NFA_آغاز_INVISIBLE_BEFORE_NEG)
 	{
-	    int directly;
+	    صحیح directly;
 
 	    // Do it directly when what follows is possibly the end of the
 	    // match.
-	    if (match_follows(prog->state[i].out1->out, 0))
+	    اگر (مطابقت_follows(prog->state[i].out1->برآمد, 0))
 		directly = TRUE;
-	    else
+	    ورنہ
 	    {
-		int ch_invisible = failure_chance(prog->state[i].out, 0);
-		int ch_follows = failure_chance(prog->state[i].out1->out, 0);
+		صحیح ch_invisible = failure_chance(prog->state[i].برآمد, 0);
+		صحیح ch_follows = failure_chance(prog->state[i].out1->برآمد, 0);
 
 		// Postpone when the invisible match is expensive or has a
 		// lower chance of failing.
-		if (c == NFA_START_INVISIBLE_BEFORE
-		     || c == NFA_START_INVISIBLE_BEFORE_NEG)
+		اگر (c == NFA_آغاز_INVISIBLE_BEFORE
+		     || c == NFA_آغاز_INVISIBLE_BEFORE_NEG)
 		{
 		    // "before" matches are very expensive when
 		    // unbounded, always prefer what follows then,
 		    // unless what follows will always match.
 		    // Otherwise strongly prefer what follows.
-		    if (prog->state[i].val <= 0 && ch_follows > 0)
+		    اگر (prog->state[i].val <= 0 && ch_follows > 0)
 			directly = FALSE;
-		    else
+		    ورنہ
 			directly = ch_follows * 10 < ch_invisible;
 		}
-		else
+		ورنہ
 		{
 		    // normal invisible, first do the one with the
 		    // highest failure chance
 		    directly = ch_follows < ch_invisible;
 		}
 	    }
-	    if (directly)
+	    اگر (directly)
 		// switch to the _FIRST state
 		++prog->state[i].c;
 	}
@@ -3924,250 +3924,250 @@ nfa_postprocess(nfa_regprog_T *prog)
 // NFA execution code.
 /////////////////////////////////////////////////////////////////
 
-typedef struct
+قسمتعریف ساخت
 {
-    int	    in_use; // number of subexpr with useful info
+    صحیح	    اندر_use; // number of subexpr with useful info
 
     // When REG_MULTI is TRUE list.multi is used, otherwise list.line.
-    union
+    اتحاد
     {
-	struct multipos
+	ساخت multipos
 	{
-	    linenr_T	start_lnum;
-	    linenr_T	end_lnum;
-	    colnr_T	start_col;
-	    colnr_T	end_col;
+	    linenr_T	آغاز_lnum;
+	    linenr_T	انتہا_lnum;
+	    colnr_T	آغاز_ستون;
+	    colnr_T	انتہا_ستون;
 	} multi[NSUBEXP];
-	struct linepos
+	ساخت linepos
 	{
-	    char_u	*start;
-	    char_u	*end;
-	} line[NSUBEXP];
+	    char_u	*آغاز;
+	    char_u	*انتہا;
+	} سطر[NSUBEXP];
     } list;
-    colnr_T	orig_start_col;  // list.multi[0].start_col without \zs
+    colnr_T	orig_آغاز_ستون;  // list.multi[0].start_col without \zs
 } regsub_T;
 
-typedef struct
+قسمتعریف ساخت
 {
     regsub_T	norm; // \( .. \) matches
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     regsub_T	synt; // \z( .. \) matches
-#endif
+#اگر_ختم
 } regsubs_T;
 
 // nfa_pim_T stores a Postponed Invisible Match.
-typedef struct nfa_pim_S nfa_pim_T;
-struct nfa_pim_S
+قسمتعریف ساخت nfa_pim_S nfa_pim_T;
+ساخت nfa_pim_S
 {
-    int		result;		// NFA_PIM_*, see below
+    صحیح		نتیجہ;		// NFA_PIM_*, see below
     nfa_state_T	*state;		// the invisible match start state
     regsubs_T	subs;		// submatch info, only party used
-    union
+    اتحاد
     {
 	lpos_T	pos;
 	char_u	*ptr;
-    } end;			// where the match must end
+    } انتہا;			// where the match must end
 };
 
 // Values for done in nfa_pim_T.
-#define NFA_PIM_UNUSED   0	// pim not used
-#define NFA_PIM_TODO     1	// pim not done yet
-#define NFA_PIM_MATCH    2	// pim executed, matches
-#define NFA_PIM_NOMATCH  3	// pim executed, no match
+#تعریف_کرو NFA_PIM_غیر_مستعمل   0	// pim not used
+#تعریف_کرو NFA_PIM_TODO     1	// pim not done yet
+#تعریف_کرو NFA_PIM_مطابقت    2	// pim executed, matches
+#تعریف_کرو NFA_PIM_NOMATCH  3	// pim executed, no match
 
 
 // nfa_thread_T contains execution information of a NFA state
-typedef struct
+قسمتعریف ساخت
 {
     nfa_state_T	*state;
-    int		count;
+    صحیح		گنتی;
     nfa_pim_T	pim;		// if pim.result != NFA_PIM_UNUSED: postponed
 				// invisible match
     regsubs_T	subs;		// submatch info, only party used
 } nfa_thread_T;
 
 // nfa_list_T contains the alternative NFA execution states.
-typedef struct
+قسمتعریف ساخت
 {
     nfa_thread_T    *t;		// allocated array of states
-    int		    n;		// nr of states currently in "t"
-    int		    len;	// max nr of states in "t"
-    int		    id;		// ID of the list
-    int		    has_pim;	// TRUE when any state has a PIM
+    صحیح		    n;		// nr of states currently in "t"
+    صحیح		    len;	// max nr of states in "t"
+    صحیح		    id;		// ID of the list
+    صحیح		    has_pim;	// TRUE when any state has a PIM
 } nfa_list_T;
 
-#ifdef ENABLE_LOG
-static void log_subexpr(regsub_T *sub);
+#اگر_تعریف_شدہ ENABLE_LOG
+ساکن خالی log_subexpr(regsub_T *sub);
 
-    static void
+    ساکن خالی
 log_subsexpr(regsubs_T *subs)
 {
     log_subexpr(&subs->norm);
 # ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    اگر (rex.nfa_has_zsubexpr)
 	log_subexpr(&subs->synt);
 # endif
 }
 
-    static void
+    ساکن خالی
 log_subexpr(regsub_T *sub)
 {
-    int j;
+    صحیح j;
 
-    for (j = 0; j < sub->in_use; j++)
-	if (REG_MULTI)
+    برائے (j = 0; j < sub->اندر_use; j++)
+	اگر (REG_MULTI)
 	    fprintf(log_fd,
 		    "*** group %d, start: c=%d, l=%d, end: c=%d, l=%d\n",
 		    j,
-		    sub->list.multi[j].start_col,
-		    (int)sub->list.multi[j].start_lnum,
-		    sub->list.multi[j].end_col,
-		    (int)sub->list.multi[j].end_lnum);
-	else
+		    sub->list.multi[j].آغاز_ستون,
+		    (صحیح)sub->list.multi[j].آغاز_lnum,
+		    sub->list.multi[j].انتہا_ستون,
+		    (صحیح)sub->list.multi[j].انتہا_lnum);
+	ورنہ
 	{
-	    char *s = (char *)sub->list.line[j].start;
-	    char *e = (char *)sub->list.line[j].end;
+	    حرف *s = (حرف *)sub->list.سطر[j].آغاز;
+	    حرف *e = (حرف *)sub->list.سطر[j].انتہا;
 
 	    fprintf(log_fd, "*** group %d, start: \"%s\", end: \"%s\"\n",
 		    j,
-		    s == NULL ? "NULL" : s,
-		    e == NULL ? "NULL" : e);
+		    s == تہی ? "NULL" : s,
+		    e == تہی ? "NULL" : e);
 	}
 }
 
-    static char *
+    ساکن حرف *
 pim_info(nfa_pim_T *pim)
 {
-    static char buf[30];
+    ساکن حرف buf[30];
 
-    if (pim == NULL || pim->result == NFA_PIM_UNUSED)
+    اگر (pim == تہی || pim->نتیجہ == NFA_PIM_غیر_مستعمل)
 	buf[0] = NUL;
-    else
+    ورنہ
     {
-	sprintf(buf, " PIM col %d", REG_MULTI ? (int)pim->end.pos.col
-		: (int)(pim->end.ptr - rex.input));
+	sprintf(buf, " PIM col %d", REG_MULTI ? (صحیح)pim->انتہا.pos.ستون
+		: (صحیح)(pim->انتہا.ptr - rex.داخلہ));
     }
-    return buf;
+    واپس buf;
 }
 
-#endif
+#اگر_ختم
 
 // Used during execution: whether a match has been found.
-static int	    nfa_match;
-#ifdef FEAT_RELTIME
-static int	   *nfa_timed_out;
-#endif
+ساکن صحیح	    nfa_مطابقت;
+#اگر_تعریف_شدہ FEAT_RELTIME
+ساکن صحیح	   *nfa_timed_برآمد;
+#اگر_ختم
 
-static inline void copy_sub(regsub_T *to, regsub_T *from);
-static int pim_equal(nfa_pim_T *one, nfa_pim_T *two);
+ساکن اندرونی خالی copy_sub(regsub_T *مقصد, regsub_T *from);
+ساکن صحیح pim_equal(nfa_pim_T *one, nfa_pim_T *two);
 
 /*
  * Copy postponed invisible match info from "from" to "to".
  */
-    static void
-copy_pim(nfa_pim_T *to, nfa_pim_T *from)
+    ساکن خالی
+copy_pim(nfa_pim_T *مقصد, nfa_pim_T *from)
 {
-    to->result = from->result;
-    to->state = from->state;
-    copy_sub(&to->subs.norm, &from->subs.norm);
-#ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
-	copy_sub(&to->subs.synt, &from->subs.synt);
-#endif
-    to->end = from->end;
+    مقصد->نتیجہ = from->نتیجہ;
+    مقصد->state = from->state;
+    copy_sub(&مقصد->subs.norm, &from->subs.norm);
+#اگر_تعریف_شدہ FEAT_SYN_HL
+    اگر (rex.nfa_has_zsubexpr)
+	copy_sub(&مقصد->subs.synt, &from->subs.synt);
+#اگر_ختم
+    مقصد->انتہا = from->انتہا;
 }
 
-    static void
+    ساکن خالی
 clear_sub(regsub_T *sub)
 {
-    if (REG_MULTI)
+    اگر (REG_MULTI)
 	// Use 0xff to set lnum to -1
 	vim_memset(sub->list.multi, 0xff,
-				  sizeof(struct multipos) * rex.nfa_nsubexpr);
-    else
-	vim_memset(sub->list.line, 0,
-				   sizeof(struct linepos) * rex.nfa_nsubexpr);
-    sub->in_use = 0;
+				  حجم(ساخت multipos) * rex.nfa_nsubexpr);
+    ورنہ
+	vim_memset(sub->list.سطر, 0,
+				   حجم(ساخت linepos) * rex.nfa_nsubexpr);
+    sub->اندر_use = 0;
 }
 
 /*
  * Copy the submatches from "from" to "to".
  */
-    static inline void
-copy_sub(regsub_T *to, regsub_T *from)
+    ساکن اندرونی خالی
+copy_sub(regsub_T *مقصد, regsub_T *from)
 {
-    to->in_use = from->in_use;
-    if (from->in_use <= 0)
-	return;
+    مقصد->اندر_use = from->اندر_use;
+    اگر (from->اندر_use <= 0)
+	واپس;
 
     // Copy the match start and end positions.  addstate() calls this for
     // every state it adds, so it is very hot.  Patterns without capturing
     // groups only use subexpression zero (the whole match), so special-case
     // "in_use == 1" with a direct assignment to avoid the mch_memmove() call.
-    if (REG_MULTI)
+    اگر (REG_MULTI)
     {
-	if (from->in_use == 1)
-	    to->list.multi[0] = from->list.multi[0];
-	else
-	    mch_memmove(&to->list.multi[0],
+	اگر (from->اندر_use == 1)
+	    مقصد->list.multi[0] = from->list.multi[0];
+	ورنہ
+	    mch_memmove(&مقصد->list.multi[0],
 		    &from->list.multi[0],
-		    sizeof(struct multipos) * from->in_use);
-	to->orig_start_col = from->orig_start_col;
+		    حجم(ساخت multipos) * from->اندر_use);
+	مقصد->orig_آغاز_ستون = from->orig_آغاز_ستون;
     }
-    else
+    ورنہ
     {
-	if (from->in_use == 1)
-	    to->list.line[0] = from->list.line[0];
-	else
-	    mch_memmove(&to->list.line[0],
-		    &from->list.line[0],
-		    sizeof(struct linepos) * from->in_use);
+	اگر (from->اندر_use == 1)
+	    مقصد->list.سطر[0] = from->list.سطر[0];
+	ورنہ
+	    mch_memmove(&مقصد->list.سطر[0],
+		    &from->list.سطر[0],
+		    حجم(ساخت linepos) * from->اندر_use);
     }
 }
 
 /*
  * Like copy_sub() but exclude the main match.
  */
-    static void
-copy_sub_off(regsub_T *to, regsub_T *from)
+    ساکن خالی
+copy_sub_off(regsub_T *مقصد, regsub_T *from)
 {
-    if (to->in_use < from->in_use)
-	to->in_use = from->in_use;
-    if (from->in_use <= 1)
-	return;
+    اگر (مقصد->اندر_use < from->اندر_use)
+	مقصد->اندر_use = from->اندر_use;
+    اگر (from->اندر_use <= 1)
+	واپس;
 
     // Copy the match start and end positions.
-    if (REG_MULTI)
-	mch_memmove(&to->list.multi[1],
+    اگر (REG_MULTI)
+	mch_memmove(&مقصد->list.multi[1],
 		&from->list.multi[1],
-		sizeof(struct multipos) * (from->in_use - 1));
-    else
-	mch_memmove(&to->list.line[1],
-		&from->list.line[1],
-		sizeof(struct linepos) * (from->in_use - 1));
+		حجم(ساخت multipos) * (from->اندر_use - 1));
+    ورنہ
+	mch_memmove(&مقصد->list.سطر[1],
+		&from->list.سطر[1],
+		حجم(ساخت linepos) * (from->اندر_use - 1));
 }
 
 /*
  * Like copy_sub() but only do the end of the main match if \ze is present.
  */
-    static void
-copy_ze_off(regsub_T *to, regsub_T *from)
+    ساکن خالی
+copy_ze_off(regsub_T *مقصد, regsub_T *from)
 {
-    if (!rex.nfa_has_zend)
-	return;
+    اگر (!rex.nfa_has_zend)
+	واپس;
 
-    if (REG_MULTI)
+    اگر (REG_MULTI)
     {
-	if (from->list.multi[0].end_lnum >= 0)
+	اگر (from->list.multi[0].انتہا_lnum >= 0)
 	{
-	    to->list.multi[0].end_lnum = from->list.multi[0].end_lnum;
-	    to->list.multi[0].end_col = from->list.multi[0].end_col;
+	    مقصد->list.multi[0].انتہا_lnum = from->list.multi[0].انتہا_lnum;
+	    مقصد->list.multi[0].انتہا_ستون = from->list.multi[0].انتہا_ستون;
 	}
     }
-    else
+    ورنہ
     {
-	if (from->list.line[0].end != NULL)
-	    to->list.line[0].end = from->list.line[0].end;
+	اگر (from->list.سطر[0].انتہا != تہی)
+	    مقصد->list.سطر[0].انتہا = from->list.سطر[0].انتہا;
     }
 }
 
@@ -4175,115 +4175,115 @@ copy_ze_off(regsub_T *to, regsub_T *from)
  * Return TRUE if "sub1" and "sub2" have the same start positions.
  * When using back-references also check the end position.
  */
-    static int
+    ساکن صحیح
 sub_equal(regsub_T *sub1, regsub_T *sub2)
 {
-    int		i;
-    int		todo;
+    صحیح		i;
+    صحیح		todo;
     linenr_T	s1;
     linenr_T	s2;
     char_u	*sp1;
     char_u	*sp2;
 
-    todo = sub1->in_use > sub2->in_use ? sub1->in_use : sub2->in_use;
-    if (REG_MULTI)
+    todo = sub1->اندر_use > sub2->اندر_use ? sub1->اندر_use : sub2->اندر_use;
+    اگر (REG_MULTI)
     {
-	for (i = 0; i < todo; ++i)
+	برائے (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
-		s1 = sub1->list.multi[i].start_lnum;
-	    else
+	    اگر (i < sub1->اندر_use)
+		s1 = sub1->list.multi[i].آغاز_lnum;
+	    ورنہ
 		s1 = -1;
-	    if (i < sub2->in_use)
-		s2 = sub2->list.multi[i].start_lnum;
-	    else
+	    اگر (i < sub2->اندر_use)
+		s2 = sub2->list.multi[i].آغاز_lnum;
+	    ورنہ
 		s2 = -1;
-	    if (s1 != s2)
-		return FALSE;
-	    if (s1 != -1 && sub1->list.multi[i].start_col
-					     != sub2->list.multi[i].start_col)
-		return FALSE;
+	    اگر (s1 != s2)
+		واپس FALSE;
+	    اگر (s1 != -1 && sub1->list.multi[i].آغاز_ستون
+					     != sub2->list.multi[i].آغاز_ستون)
+		واپس FALSE;
 
-	    if (rex.nfa_has_backref)
+	    اگر (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
-		    s1 = sub1->list.multi[i].end_lnum;
-		else
+		اگر (i < sub1->اندر_use)
+		    s1 = sub1->list.multi[i].انتہا_lnum;
+		ورنہ
 		    s1 = -1;
-		if (i < sub2->in_use)
-		    s2 = sub2->list.multi[i].end_lnum;
-		else
+		اگر (i < sub2->اندر_use)
+		    s2 = sub2->list.multi[i].انتہا_lnum;
+		ورنہ
 		    s2 = -1;
-		if (s1 != s2)
-		    return FALSE;
-		if (s1 != -1 && sub1->list.multi[i].end_col
-					       != sub2->list.multi[i].end_col)
-		return FALSE;
+		اگر (s1 != s2)
+		    واپس FALSE;
+		اگر (s1 != -1 && sub1->list.multi[i].انتہا_ستون
+					       != sub2->list.multi[i].انتہا_ستون)
+		واپس FALSE;
 	    }
 	}
     }
-    else
+    ورنہ
     {
-	for (i = 0; i < todo; ++i)
+	برائے (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
-		sp1 = sub1->list.line[i].start;
-	    else
-		sp1 = NULL;
-	    if (i < sub2->in_use)
-		sp2 = sub2->list.line[i].start;
-	    else
-		sp2 = NULL;
-	    if (sp1 != sp2)
-		return FALSE;
-	    if (rex.nfa_has_backref)
+	    اگر (i < sub1->اندر_use)
+		sp1 = sub1->list.سطر[i].آغاز;
+	    ورنہ
+		sp1 = تہی;
+	    اگر (i < sub2->اندر_use)
+		sp2 = sub2->list.سطر[i].آغاز;
+	    ورنہ
+		sp2 = تہی;
+	    اگر (sp1 != sp2)
+		واپس FALSE;
+	    اگر (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
-		    sp1 = sub1->list.line[i].end;
-		else
-		    sp1 = NULL;
-		if (i < sub2->in_use)
-		    sp2 = sub2->list.line[i].end;
-		else
-		    sp2 = NULL;
-		if (sp1 != sp2)
-		    return FALSE;
+		اگر (i < sub1->اندر_use)
+		    sp1 = sub1->list.سطر[i].انتہا;
+		ورنہ
+		    sp1 = تہی;
+		اگر (i < sub2->اندر_use)
+		    sp2 = sub2->list.سطر[i].انتہا;
+		ورنہ
+		    sp2 = تہی;
+		اگر (sp1 != sp2)
+		    واپس FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    واپس TRUE;
 }
 
-#ifdef FEAT_RELTIME
+#اگر_تعریف_شدہ FEAT_RELTIME
 /*
  * Check if we are past the time limit, if there is one.
  */
-    static int
-nfa_did_time_out(void)
+    ساکن صحیح
+nfa_did_وقت_برآمد(خالی)
 {
-    if (*timeout_flag)
+    اگر (*timeout_flag)
     {
-	if (nfa_timed_out != NULL)
+	اگر (nfa_timed_برآمد != تہی)
 	{
 # ifdef FEAT_EVAL
-	    if (!*nfa_timed_out)
-		ch_log(NULL, "NFA regexp timed out");
+	    اگر (!*nfa_timed_برآمد)
+		ch_log(تہی, "NFA regexp timed out");
 # endif
-	    *nfa_timed_out = TRUE;
+	    *nfa_timed_برآمد = TRUE;
 	}
-	return TRUE;
+	واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
-#endif
+#اگر_ختم
 
-#ifdef ENABLE_LOG
-    static void
-open_debug_log(int result)
+#اگر_تعریف_شدہ ENABLE_LOG
+    ساکن خالی
+open_debug_log(صحیح نتیجہ)
 {
-    log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    log_fd = fopen(NFA_REGEXP_تسلسل_LOG, "a");
+    اگر (log_fd == تہی)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -4291,41 +4291,41 @@ open_debug_log(int result)
 
     fprintf(log_fd, "****************************\n");
     fprintf(log_fd, "FINISHED RUNNING nfa_regmatch() recursively\n");
-    fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : result == MAYBE
+    fprintf(log_fd, "MATCH = %s\n", نتیجہ == TRUE ? "OK" : نتیجہ == MAYBE
 	    ? "MAYBE" : "FALSE");
     fprintf(log_fd, "****************************\n");
 }
 
-    static void
-report_state(char *action,
+    ساکن خالی
+report_state(حرف *action,
 	     regsub_T *sub,
 	     nfa_state_T *state,
-	     int lid,
+	     صحیح lid,
 	     nfa_pim_T *pim)
 {
-    int col;
+    صحیح ستون;
 
-    if (sub->in_use <= 0)
-	col = -1;
-    else if (REG_MULTI)
-	col = sub->list.multi[0].start_col;
-    else
-	col = (int)(sub->list.line[0].start - rex.line);
-    nfa_set_code(state->c);
-    if (log_fd == NULL)
+    اگر (sub->اندر_use <= 0)
+	ستون = -1;
+    ورنہ اگر (REG_MULTI)
+	ستون = sub->list.multi[0].آغاز_ستون;
+    ورنہ
+	ستون = (صحیح)(sub->list.سطر[0].آغاز - rex.سطر);
+    nfa_سیٹ_رمز(state->c);
+    اگر (log_fd == تہی)
 	open_debug_log(MAYBE);
 
     fprintf(log_fd, "> %s state %d to list %d. char %d: %s (start col %d)%s\n",
-	    action, abs(state->id), lid, state->c, code, col,
+	    action, مطلق_قدر(state->id), lid, state->c, رمز, ستون,
 	    pim_info(pim));
 }
-#endif
+#اگر_ختم
 
 /*
  * Return TRUE if the same state is already in list "l" with the same
  * positions as "subs".
  */
-    static int
+    ساکن صحیح
 has_state_with_pos(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
@@ -4333,566 +4333,566 @@ has_state_with_pos(
     nfa_pim_T		*pim)	// postponed match or NULL
 {
     nfa_thread_T	*thread;
-    int			i;
+    صحیح			i;
 
-    for (i = 0; i < l->n; ++i)
+    برائے (i = 0; i < l->n; ++i)
     {
 	thread = &l->t[i];
-	if (thread->state->id == state->id
+	اگر (thread->state->id == state->id
 		&& sub_equal(&thread->subs.norm, &subs->norm)
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
 		&& (!rex.nfa_has_zsubexpr
 				|| sub_equal(&thread->subs.synt, &subs->synt))
-#endif
+#اگر_ختم
 		&& pim_equal(&thread->pim, pim))
-	    return TRUE;
+	    واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
  * Return TRUE if "one" and "two" are equal.  That includes when both are not
  * set.
  */
-    static int
+    ساکن صحیح
 pim_equal(nfa_pim_T *one, nfa_pim_T *two)
 {
-    int one_unused = (one == NULL || one->result == NFA_PIM_UNUSED);
-    int two_unused = (two == NULL || two->result == NFA_PIM_UNUSED);
+    صحیح one_غیر_مستعمل = (one == تہی || one->نتیجہ == NFA_PIM_غیر_مستعمل);
+    صحیح two_غیر_مستعمل = (two == تہی || two->نتیجہ == NFA_PIM_غیر_مستعمل);
 
-    if (one_unused)
+    اگر (one_غیر_مستعمل)
 	// one is unused: equal when two is also unused
-	return two_unused;
-    if (two_unused)
+	واپس two_غیر_مستعمل;
+    اگر (two_غیر_مستعمل)
 	// one is used and two is not: not equal
-	return FALSE;
+	واپس FALSE;
     // compare the state id
-    if (one->state->id != two->state->id)
-	return FALSE;
+    اگر (one->state->id != two->state->id)
+	واپس FALSE;
     // compare the position
-    if (REG_MULTI)
-	return one->end.pos.lnum == two->end.pos.lnum
-	    && one->end.pos.col == two->end.pos.col;
-    return one->end.ptr == two->end.ptr;
+    اگر (REG_MULTI)
+	واپس one->انتہا.pos.lnum == two->انتہا.pos.lnum
+	    && one->انتہا.pos.ستون == two->انتہا.pos.ستون;
+    واپس one->انتہا.ptr == two->انتہا.ptr;
 }
 
 /*
  * Return TRUE if "state" leads to a NFA_MATCH without advancing the input.
  */
-    static int
-match_follows(nfa_state_T *startstate, int depth)
+    ساکن صحیح
+مطابقت_follows(nfa_state_T *startstate, صحیح گہرائی)
 {
     nfa_state_T	    *state = startstate;
 
     // avoid too much recursion
-    if (depth > 10)
-	return FALSE;
+    اگر (گہرائی > 10)
+	واپس FALSE;
 
-    while (state != NULL)
+    جب (state != تہی)
     {
-	switch (state->c)
+	انتخاب (state->c)
 	{
-	    case NFA_MATCH:
-	    case NFA_MCLOSE:
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
-		return TRUE;
+	    حالت NFA_مطابقت:
+	    حالت NFA_MCLOSE:
+	    حالت NFA_انتہا_INVISIBLE:
+	    حالت NFA_انتہا_INVISIBLE_NEG:
+	    حالت NFA_انتہا_نمونہ:
+		واپس TRUE;
 
-	    case NFA_SPLIT:
-		return match_follows(state->out, depth + 1)
-				     || match_follows(state->out1, depth + 1);
+	    حالت NFA_بانٹو:
+		واپس مطابقت_follows(state->برآمد, گہرائی + 1)
+				     || مطابقت_follows(state->out1, گہرائی + 1);
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	    case NFA_COMPOSING:
+	    حالت NFA_آغاز_INVISIBLE:
+	    حالت NFA_آغاز_INVISIBLE_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_NEG:
+	    حالت NFA_آغاز_INVISIBLE_NEG_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_NEG:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا:
+	    حالت NFA_COMPOSING:
 		// skip ahead to next state
-		state = state->out1->out;
-		continue;
+		state = state->out1->برآمد;
+		جاری;
 
-	    case NFA_ANY:
-	    case NFA_ANY_COMPOSING:
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_WHITE:
-	    case NFA_NWHITE:
-	    case NFA_DIGIT:
-	    case NFA_NDIGIT:
-	    case NFA_HEX:
-	    case NFA_NHEX:
-	    case NFA_OCTAL:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
-	    case NFA_NEWL:
+	    حالت NFA_ANY:
+	    حالت NFA_ANY_COMPOSING:
+	    حالت NFA_IDENT:
+	    حالت NFA_SIDENT:
+	    حالت NFA_KWORD:
+	    حالت NFA_SKWORD:
+	    حالت NFA_FNAME:
+	    حالت NFA_SFNAME:
+	    حالت NFA_PRINT:
+	    حالت NFA_SPRINT:
+	    حالت NFA_WHITE:
+	    حالت NFA_NWHITE:
+	    حالت NFA_DIGIT:
+	    حالت NFA_NDIGIT:
+	    حالت NFA_HEX:
+	    حالت NFA_NHEX:
+	    حالت NFA_OCTAL:
+	    حالت NFA_NOCTAL:
+	    حالت NFA_لفظ:
+	    حالت NFA_NWORD:
+	    حالت NFA_سر:
+	    حالت NFA_NHEAD:
+	    حالت NFA_ALPHA:
+	    حالت NFA_NALPHA:
+	    حالت NFA_زیریں:
+	    حالت NFA_NLOWER:
+	    حالت NFA_بالائی:
+	    حالت NFA_NUPPER:
+	    حالت NFA_زیریں_IC:
+	    حالت NFA_NLOWER_IC:
+	    حالت NFA_بالائی_IC:
+	    حالت NFA_NUPPER_IC:
+	    حالت NFA_آغاز_COLL:
+	    حالت NFA_آغاز_NEG_COLL:
+	    حالت NFA_NEWL:
 		// state will advance input
-		return FALSE;
+		واپس FALSE;
 
-	    default:
-		if (state->c > 0)
+	    طےشدہ:
+		اگر (state->c > 0)
 		    // state will advance input
-		    return FALSE;
+		    واپس FALSE;
 
 		// Others: zero-width or possibly zero-width, might still find
 		// a match at the same position, keep looking.
-		break;
+		توڑو;
 	}
-	state = state->out;
+	state = state->برآمد;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 
 /*
  * Return TRUE if "state" is already in list "l".
  */
-    static int
-state_in_list(
+    ساکن صحیح
+state_اندر_list(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs)	// pointers to subexpressions
 {
-    if (state->lastlist[nfa_ll_index] == l->id)
+    اگر (state->lastlist[nfa_ll_اشاریہ] == l->id)
     {
-	if (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, NULL))
-	    return TRUE;
+	اگر (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, تہی))
+	    واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 // Offset used for "off" by addstate_here().
-#define ADDSTATE_HERE_OFFSET 10
+#تعریف_کرو ADDSTATE_یہاں_انحراف 10
 
 /*
  * Add "state" and possibly what follows to state list ".".
  * Returns "subs_arg", possibly copied into temp_subs.
  * Returns NULL when recursiveness is too deep or timed out.
  */
-    static regsubs_T *
+    ساکن regsubs_T *
 addstate(
     nfa_list_T		*l,	    // runtime state list
     nfa_state_T		*state,	    // state to update
     regsubs_T		*subs_arg,  // pointers to subexpressions
     nfa_pim_T		*pim,	    // postponed look-behind match
-    int			off_arg,    // byte offset, when -1 go to next line
-    int			depth)	    // recursion depth
+    صحیح			off_arg,    // byte offset, when -1 go to next line
+    صحیح			گہرائی)	    // recursion depth
 {
-    int			subidx;
-    int			off = off_arg;
-    int			add_here = FALSE;
-    int			listindex = 0;
-    int			k;
-    int			found = FALSE;
+    صحیح			subidx;
+    صحیح			off = off_arg;
+    صحیح			جوڑو_یہاں = FALSE;
+    صحیح			listindex = 0;
+    صحیح			k;
+    صحیح			ملا = FALSE;
     nfa_thread_T	*thread;
-    struct multipos	save_multipos;
-    int			save_in_use;
+    ساخت multipos	save_multipos;
+    صحیح			save_اندر_use;
     char_u		*save_ptr;
-    int			i;
+    صحیح			i;
     regsub_T		*sub;
     regsubs_T		*subs = subs_arg;
-    static regsubs_T	temp_subs;
-#ifdef ENABLE_LOG
-    int			did_print = FALSE;
-#endif
+    ساکن regsubs_T	عارضی_subs;
+#اگر_تعریف_شدہ ENABLE_LOG
+    صحیح			did_print = FALSE;
+#اگر_ختم
 
-#ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return NULL;
-#endif
+#اگر_تعریف_شدہ FEAT_RELTIME
+    اگر (nfa_did_وقت_برآمد())
+	واپس تہی;
+#اگر_ختم
 
     // This function is called recursively.  When the depth is too much we run
     // out of stack and crash, limit recursiveness here.
-    if (depth >= 5000 || subs == NULL)
-	return NULL;
+    اگر (گہرائی >= 5000 || subs == تہی)
+	واپس تہی;
 
-    if (off_arg <= -ADDSTATE_HERE_OFFSET)
+    اگر (off_arg <= -ADDSTATE_یہاں_انحراف)
     {
-	add_here = TRUE;
+	جوڑو_یہاں = TRUE;
 	off = 0;
-	listindex = -(off_arg + ADDSTATE_HERE_OFFSET);
+	listindex = -(off_arg + ADDSTATE_یہاں_انحراف);
     }
 
-    switch (state->c)
+    انتخاب (state->c)
     {
-	case NFA_NCLOSE:
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_MOPEN:
-	case NFA_ZEND:
-	case NFA_SPLIT:
-	case NFA_EMPTY:
+	حالت NFA_NCLOSE:
+	حالت NFA_MCLOSE:
+	حالت NFA_MCLOSE1:
+	حالت NFA_MCLOSE2:
+	حالت NFA_MCLOSE3:
+	حالت NFA_MCLOSE4:
+	حالت NFA_MCLOSE5:
+	حالت NFA_MCLOSE6:
+	حالت NFA_MCLOSE7:
+	حالت NFA_MCLOSE8:
+	حالت NFA_MCLOSE9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZCLOSE:
+	حالت NFA_ZCLOSE1:
+	حالت NFA_ZCLOSE2:
+	حالت NFA_ZCLOSE3:
+	حالت NFA_ZCLOSE4:
+	حالت NFA_ZCLOSE5:
+	حالت NFA_ZCLOSE6:
+	حالت NFA_ZCLOSE7:
+	حالت NFA_ZCLOSE8:
+	حالت NFA_ZCLOSE9:
+#اگر_ختم
+	حالت NFA_MOPEN:
+	حالت NFA_ZEND:
+	حالت NFA_بانٹو:
+	حالت NFA_خالی_خانے:
 	    // These nodes are not added themselves but their "out" and/or
 	    // "out1" may be added below.
-	    break;
+	    توڑو;
 
-	case NFA_BOL:
-	case NFA_BOF:
+	حالت NFA_BOL:
+	حالت NFA_BOF:
 	    // "^" won't match past end-of-line, don't bother trying.
 	    // Except when at the end of the line, or when we are going to the
 	    // next line for a look-behind match.
-	    if (rex.input > rex.line
-		    && *rex.input != NUL
-		    && (nfa_endp == NULL
+	    اگر (rex.داخلہ > rex.سطر
+		    && *rex.داخلہ != NUL
+		    && (nfa_endp == تہی
 			|| !REG_MULTI
 			|| rex.lnum == nfa_endp->se_u.pos.lnum))
-		goto skip_add;
+		جاؤ skip_جوڑو;
 	    // FALLTHROUGH
 
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_NOPEN:
-	case NFA_ZSTART:
+	حالت NFA_MOPEN1:
+	حالت NFA_MOPEN2:
+	حالت NFA_MOPEN3:
+	حالت NFA_MOPEN4:
+	حالت NFA_MOPEN5:
+	حالت NFA_MOPEN6:
+	حالت NFA_MOPEN7:
+	حالت NFA_MOPEN8:
+	حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZOPEN:
+	حالت NFA_ZOPEN1:
+	حالت NFA_ZOPEN2:
+	حالت NFA_ZOPEN3:
+	حالت NFA_ZOPEN4:
+	حالت NFA_ZOPEN5:
+	حالت NFA_ZOPEN6:
+	حالت NFA_ZOPEN7:
+	حالت NFA_ZOPEN8:
+	حالت NFA_ZOPEN9:
+#اگر_ختم
+	حالت NFA_NOPEN:
+	حالت NFA_ZSTART:
 	    // These nodes need to be added so that we can bail out when it
 	    // was added to this list before at the same position to avoid an
 	    // endless loop for "\(\)*"
 
-	default:
-	    if (state->lastlist[nfa_ll_index] == l->id && state->c != NFA_SKIP)
+	طےشدہ:
+	    اگر (state->lastlist[nfa_ll_اشاریہ] == l->id && state->c != NFA_SKIP)
 	    {
 		// This state is already in the list, don't add it again,
 		// unless it is an MOPEN that is used for a backreference or
 		// when there is a PIM. For NFA_MATCH check the position,
 		// lower position is preferred.
-		if (!rex.nfa_has_backref && pim == NULL && !l->has_pim
-						     && state->c != NFA_MATCH)
+		اگر (!rex.nfa_has_backref && pim == تہی && !l->has_pim
+						     && state->c != NFA_مطابقت)
 		{
 		    // When called from addstate_here() do insert before
 		    // existing states.
-		    if (add_here)
+		    اگر (جوڑو_یہاں)
 		    {
-			for (k = 0; k < l->n && k < listindex; ++k)
-			    if (l->t[k].state->id == state->id)
+			برائے (k = 0; k < l->n && k < listindex; ++k)
+			    اگر (l->t[k].state->id == state->id)
 			    {
-				found = TRUE;
-				break;
+				ملا = TRUE;
+				توڑو;
 			    }
 		    }
-		    if (!add_here || found)
+		    اگر (!جوڑو_یہاں || ملا)
 		    {
-skip_add:
-#ifdef ENABLE_LOG
-			nfa_set_code(state->c);
+skip_جوڑو:
+#اگر_تعریف_شدہ ENABLE_LOG
+			nfa_سیٹ_رمز(state->c);
 			fprintf(log_fd, "> Not adding state %d to list %d. char %d: %s pim: %s has_pim: %d found: %d\n",
-			    abs(state->id), l->id, state->c, code,
-			    pim == NULL ? "NULL" : "yes", l->has_pim, found);
-#endif
-			return subs;
+			    مطلق_قدر(state->id), l->id, state->c, رمز,
+			    pim == تہی ? "NULL" : "yes", l->has_pim, ملا);
+#اگر_ختم
+			واپس subs;
 		    }
 		}
 
 		// Do not add the state again when it exists with the same
 		// positions.
-		if (has_state_with_pos(l, state, subs, pim))
-		    goto skip_add;
+		اگر (has_state_with_pos(l, state, subs, pim))
+		    جاؤ skip_جوڑو;
 	    }
 
 	    // When there are backreferences or PIMs the number of states may
 	    // be (a lot) bigger than anticipated.
-	    if (l->n == l->len)
+	    اگر (l->n == l->len)
 	    {
-		int		newlen = l->len * 3 / 2 + 50;
-		size_t		newsize = newlen * sizeof(nfa_thread_T);
+		صحیح		newlen = l->len * 3 / 2 + 50;
+		size_t		newsize = newlen * حجم(nfa_thread_T);
 		nfa_thread_T	*newt;
 
-		if ((long)(newsize >> 10) >= p_mmp)
+		اگر ((طویل)(newsize >> 10) >= p_mmp)
 		{
-		    emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		    return NULL;
+		    emsg(_(e_نمونہ_استعمال_کرتا_مزید_حافظہ_than_maxmempattern));
+		    واپس تہی;
 		}
-		if (subs != &temp_subs)
+		اگر (subs != &عارضی_subs)
 		{
 		    // "subs" may point into the current array, need to make a
 		    // copy before it becomes invalid.
-		    copy_sub(&temp_subs.norm, &subs->norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
-			copy_sub(&temp_subs.synt, &subs->synt);
-#endif
-		    subs = &temp_subs;
+		    copy_sub(&عارضی_subs.norm, &subs->norm);
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		    اگر (rex.nfa_has_zsubexpr)
+			copy_sub(&عارضی_subs.synt, &subs->synt);
+#اگر_ختم
+		    subs = &عارضی_subs;
 		}
 
 		newt = vim_realloc(l->t, newsize);
-		if (newt == NULL)
+		اگر (newt == تہی)
 		{
 		    // out of memory
-		    return NULL;
+		    واپس تہی;
 		}
 		l->t = newt;
 		l->len = newlen;
 	    }
 
 	    // add the state to the list
-	    state->lastlist[nfa_ll_index] = l->id;
+	    state->lastlist[nfa_ll_اشاریہ] = l->id;
 	    thread = &l->t[l->n++];
 	    thread->state = state;
-	    if (pim == NULL)
-		thread->pim.result = NFA_PIM_UNUSED;
-	    else
+	    اگر (pim == تہی)
+		thread->pim.نتیجہ = NFA_PIM_غیر_مستعمل;
+	    ورنہ
 	    {
 		copy_pim(&thread->pim, pim);
 		l->has_pim = TRUE;
 	    }
 	    copy_sub(&thread->subs.norm, &subs->norm);
-#ifdef FEAT_SYN_HL
-	    if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    اگر (rex.nfa_has_zsubexpr)
 		copy_sub(&thread->subs.synt, &subs->synt);
-#endif
-#ifdef ENABLE_LOG
+#اگر_ختم
+#اگر_تعریف_شدہ ENABLE_LOG
 	    report_state("Adding", &thread->subs.norm, state, l->id, pim);
 	    did_print = TRUE;
-#endif
+#اگر_ختم
     }
 
-#ifdef ENABLE_LOG
-    if (!did_print)
+#اگر_تعریف_شدہ ENABLE_LOG
+    اگر (!did_print)
 	report_state("Processing", &subs->norm, state, l->id, pim);
-#endif
-    switch (state->c)
+#اگر_ختم
+    انتخاب (state->c)
     {
-	case NFA_MATCH:
-	    break;
+	حالت NFA_مطابقت:
+	    توڑو;
 
-	case NFA_SPLIT:
+	حالت NFA_بانٹو:
 	    // order matters here
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    subs = addstate(l, state->out1, subs, pim, off_arg, depth + 1);
-	    break;
+	    subs = addstate(l, state->برآمد, subs, pim, off_arg, گہرائی + 1);
+	    subs = addstate(l, state->out1, subs, pim, off_arg, گہرائی + 1);
+	    توڑو;
 
-	case NFA_EMPTY:
-	case NFA_NOPEN:
-	case NFA_NCLOSE:
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    break;
+	حالت NFA_خالی_خانے:
+	حالت NFA_NOPEN:
+	حالت NFA_NCLOSE:
+	    subs = addstate(l, state->برآمد, subs, pim, off_arg, گہرائی + 1);
+	    توڑو;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-#endif
-	case NFA_ZSTART:
-	    if (state->c == NFA_ZSTART)
+	حالت NFA_MOPEN:
+	حالت NFA_MOPEN1:
+	حالت NFA_MOPEN2:
+	حالت NFA_MOPEN3:
+	حالت NFA_MOPEN4:
+	حالت NFA_MOPEN5:
+	حالت NFA_MOPEN6:
+	حالت NFA_MOPEN7:
+	حالت NFA_MOPEN8:
+	حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZOPEN:
+	حالت NFA_ZOPEN1:
+	حالت NFA_ZOPEN2:
+	حالت NFA_ZOPEN3:
+	حالت NFA_ZOPEN4:
+	حالت NFA_ZOPEN5:
+	حالت NFA_ZOPEN6:
+	حالت NFA_ZOPEN7:
+	حالت NFA_ZOPEN8:
+	حالت NFA_ZOPEN9:
+#اگر_ختم
+	حالت NFA_ZSTART:
+	    اگر (state->c == NFA_ZSTART)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
-#ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    ورنہ اگر (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 	    {
 		subidx = state->c - NFA_ZOPEN;
 		sub = &subs->synt;
 	    }
-#endif
-	    else
+#اگر_ختم
+	    ورنہ
 	    {
 		subidx = state->c - NFA_MOPEN;
 		sub = &subs->norm;
 	    }
 
 	    // avoid compiler warnings
-	    save_ptr = NULL;
-	    CLEAR_FIELD(save_multipos);
+	    save_ptr = تہی;
+	    CLEAR_میدان(save_multipos);
 
 	    // Set the position (with "off" added) in the subexpression.  Save
 	    // and restore it when it was in use.  Otherwise fill any gap.
-	    if (REG_MULTI)
+	    اگر (REG_MULTI)
 	    {
-		if (subidx < sub->in_use)
+		اگر (subidx < sub->اندر_use)
 		{
 		    save_multipos = sub->list.multi[subidx];
-		    save_in_use = -1;
+		    save_اندر_use = -1;
 		}
-		else
+		ورنہ
 		{
-		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    save_اندر_use = sub->اندر_use;
+		    برائے (i = sub->اندر_use; i < subidx; ++i)
 		    {
-			sub->list.multi[i].start_lnum = -1;
-			sub->list.multi[i].end_lnum = -1;
+			sub->list.multi[i].آغاز_lnum = -1;
+			sub->list.multi[i].انتہا_lnum = -1;
 		    }
-		    sub->in_use = subidx + 1;
+		    sub->اندر_use = subidx + 1;
 		}
-		if (off == -1)
+		اگر (off == -1)
 		{
-		    sub->list.multi[subidx].start_lnum = rex.lnum + 1;
-		    sub->list.multi[subidx].start_col = 0;
+		    sub->list.multi[subidx].آغاز_lnum = rex.lnum + 1;
+		    sub->list.multi[subidx].آغاز_ستون = 0;
 		}
-		else
+		ورنہ
 		{
-		    sub->list.multi[subidx].start_lnum = rex.lnum;
-		    sub->list.multi[subidx].start_col =
-					 (colnr_T)(rex.input - rex.line + off);
+		    sub->list.multi[subidx].آغاز_lnum = rex.lnum;
+		    sub->list.multi[subidx].آغاز_ستون =
+					 (colnr_T)(rex.داخلہ - rex.سطر + off);
 		}
-		sub->list.multi[subidx].end_lnum = -1;
+		sub->list.multi[subidx].انتہا_lnum = -1;
 	    }
-	    else
+	    ورنہ
 	    {
-		if (subidx < sub->in_use)
+		اگر (subidx < sub->اندر_use)
 		{
-		    save_ptr = sub->list.line[subidx].start;
-		    save_in_use = -1;
+		    save_ptr = sub->list.سطر[subidx].آغاز;
+		    save_اندر_use = -1;
 		}
-		else
+		ورنہ
 		{
-		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    save_اندر_use = sub->اندر_use;
+		    برائے (i = sub->اندر_use; i < subidx; ++i)
 		    {
-			sub->list.line[i].start = NULL;
-			sub->list.line[i].end = NULL;
+			sub->list.سطر[i].آغاز = تہی;
+			sub->list.سطر[i].انتہا = تہی;
 		    }
-		    sub->in_use = subidx + 1;
+		    sub->اندر_use = subidx + 1;
 		}
-		sub->list.line[subidx].start = rex.input + off;
+		sub->list.سطر[subidx].آغاز = rex.داخلہ + off;
 	    }
 
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    subs = addstate(l, state->برآمد, subs, pim, off_arg, گہرائی + 1);
+	    اگر (subs == تہی)
+		توڑو;
 	    // "subs" may have changed, need to set "sub" again
-#ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    اگر (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 		sub = &subs->synt;
-	    else
-#endif
+	    ورنہ
+#اگر_ختم
 		sub = &subs->norm;
 
-	    if (save_in_use == -1)
+	    اگر (save_اندر_use == -1)
 	    {
-		if (REG_MULTI)
+		اگر (REG_MULTI)
 		    sub->list.multi[subidx] = save_multipos;
-		else
-		    sub->list.line[subidx].start = save_ptr;
+		ورنہ
+		    sub->list.سطر[subidx].آغاز = save_ptr;
 	    }
-	    else
-		sub->in_use = save_in_use;
-	    break;
+	    ورنہ
+		sub->اندر_use = save_اندر_use;
+	    توڑو;
 
-	case NFA_MCLOSE:
-	    if (rex.nfa_has_zend && (REG_MULTI
-			? subs->norm.list.multi[0].end_lnum >= 0
-			: subs->norm.list.line[0].end != NULL))
+	حالت NFA_MCLOSE:
+	    اگر (rex.nfa_has_zend && (REG_MULTI
+			? subs->norm.list.multi[0].انتہا_lnum >= 0
+			: subs->norm.list.سطر[0].انتہا != تہی))
 	    {
 		// Do not overwrite the position set by \ze.
-		subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-		break;
+		subs = addstate(l, state->برآمد, subs, pim, off_arg, گہرائی + 1);
+		توڑو;
 	    }
 	    // FALLTHROUGH
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_ZEND:
-	    if (state->c == NFA_ZEND)
+	حالت NFA_MCLOSE1:
+	حالت NFA_MCLOSE2:
+	حالت NFA_MCLOSE3:
+	حالت NFA_MCLOSE4:
+	حالت NFA_MCLOSE5:
+	حالت NFA_MCLOSE6:
+	حالت NFA_MCLOSE7:
+	حالت NFA_MCLOSE8:
+	حالت NFA_MCLOSE9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZCLOSE:
+	حالت NFA_ZCLOSE1:
+	حالت NFA_ZCLOSE2:
+	حالت NFA_ZCLOSE3:
+	حالت NFA_ZCLOSE4:
+	حالت NFA_ZCLOSE5:
+	حالت NFA_ZCLOSE6:
+	حالت NFA_ZCLOSE7:
+	حالت NFA_ZCLOSE8:
+	حالت NFA_ZCLOSE9:
+#اگر_ختم
+	حالت NFA_ZEND:
+	    اگر (state->c == NFA_ZEND)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
-#ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    ورنہ اگر (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 	    {
 		subidx = state->c - NFA_ZCLOSE;
 		sub = &subs->synt;
 	    }
-#endif
-	    else
+#اگر_ختم
+	    ورنہ
 	    {
 		subidx = state->c - NFA_MCLOSE;
 		sub = &subs->norm;
@@ -4900,53 +4900,53 @@ skip_add:
 
 	    // We don't fill in gaps here, there must have been an MOPEN that
 	    // has done that.
-	    save_in_use = sub->in_use;
-	    if (sub->in_use <= subidx)
-		sub->in_use = subidx + 1;
-	    if (REG_MULTI)
+	    save_اندر_use = sub->اندر_use;
+	    اگر (sub->اندر_use <= subidx)
+		sub->اندر_use = subidx + 1;
+	    اگر (REG_MULTI)
 	    {
 		save_multipos = sub->list.multi[subidx];
-		if (off == -1)
+		اگر (off == -1)
 		{
-		    sub->list.multi[subidx].end_lnum = rex.lnum + 1;
-		    sub->list.multi[subidx].end_col = 0;
+		    sub->list.multi[subidx].انتہا_lnum = rex.lnum + 1;
+		    sub->list.multi[subidx].انتہا_ستون = 0;
 		}
-		else
+		ورنہ
 		{
-		    sub->list.multi[subidx].end_lnum = rex.lnum;
-		    sub->list.multi[subidx].end_col =
-					  (colnr_T)(rex.input - rex.line + off);
+		    sub->list.multi[subidx].انتہا_lnum = rex.lnum;
+		    sub->list.multi[subidx].انتہا_ستون =
+					  (colnr_T)(rex.داخلہ - rex.سطر + off);
 		}
 		// avoid compiler warnings
-		save_ptr = NULL;
+		save_ptr = تہی;
 	    }
-	    else
+	    ورنہ
 	    {
-		save_ptr = sub->list.line[subidx].end;
-		sub->list.line[subidx].end = rex.input + off;
+		save_ptr = sub->list.سطر[subidx].انتہا;
+		sub->list.سطر[subidx].انتہا = rex.داخلہ + off;
 		// avoid compiler warnings
-		CLEAR_FIELD(save_multipos);
+		CLEAR_میدان(save_multipos);
 	    }
 
-	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    subs = addstate(l, state->برآمد, subs, pim, off_arg, گہرائی + 1);
+	    اگر (subs == تہی)
+		توڑو;
 	    // "subs" may have changed, need to set "sub" again
-#ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    اگر (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 		sub = &subs->synt;
-	    else
-#endif
+	    ورنہ
+#اگر_ختم
 		sub = &subs->norm;
 
-	    if (REG_MULTI)
+	    اگر (REG_MULTI)
 		sub->list.multi[subidx] = save_multipos;
-	    else
-		sub->list.line[subidx].end = save_ptr;
-	    sub->in_use = save_in_use;
-	    break;
+	    ورنہ
+		sub->list.سطر[subidx].انتہا = save_ptr;
+	    sub->اندر_use = save_اندر_use;
+	    توڑو;
     }
-    return subs;
+    واپس subs;
 }
 
 /*
@@ -4955,289 +4955,289 @@ skip_add:
  * This makes sure the order of states to be tried does not change, which
  * matters for alternatives.
  */
-    static regsubs_T *
-addstate_here(
+    ساکن regsubs_T *
+addstate_یہاں(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs,	// pointers to subexpressions
     nfa_pim_T		*pim,   // postponed look-behind match
-    int			*ip)
+    صحیح			*ip)
 {
-    int tlen = l->n;
-    int count;
-    int listidx = *ip;
+    صحیح tlen = l->n;
+    صحیح گنتی;
+    صحیح listidx = *ip;
     regsubs_T *r;
 
     // First add the state(s) at the end, so that we know how many there are.
     // Pass the listidx as offset (avoids adding another argument to
     // addstate()).
-    r = addstate(l, state, subs, pim, -listidx - ADDSTATE_HERE_OFFSET, 0);
-    if (r == NULL)
-	return NULL;
+    r = addstate(l, state, subs, pim, -listidx - ADDSTATE_یہاں_انحراف, 0);
+    اگر (r == تہی)
+	واپس تہی;
 
     // when "*ip" was at the end of the list, nothing to do
-    if (listidx + 1 == tlen)
-	return r;
+    اگر (listidx + 1 == tlen)
+	واپس r;
 
     // re-order to put the new state at the current position
-    count = l->n - tlen;
-    if (count == 0)
-	return r; // no state got added
-    if (count == 1)
+    گنتی = l->n - tlen;
+    اگر (گنتی == 0)
+	واپس r; // no state got added
+    اگر (گنتی == 1)
     {
 	// overwrite the current state
 	l->t[listidx] = l->t[l->n - 1];
     }
-    else if (count > 1)
+    ورنہ اگر (گنتی > 1)
     {
-	if (l->n + count - 1 >= l->len)
+	اگر (l->n + گنتی - 1 >= l->len)
 	{
 	    // not enough space to move the new states, reallocate the list
 	    // and move the states to the right position
-	    int		    newlen = l->len * 3 / 2 + 50;
-	    size_t	    newsize = newlen * sizeof(nfa_thread_T);
+	    صحیح		    newlen = l->len * 3 / 2 + 50;
+	    size_t	    newsize = newlen * حجم(nfa_thread_T);
 	    nfa_thread_T    *newl;
 
-	    if ((long)(newsize >> 10) >= p_mmp)
+	    اگر ((طویل)(newsize >> 10) >= p_mmp)
 	    {
-		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		return NULL;
+		emsg(_(e_نمونہ_استعمال_کرتا_مزید_حافظہ_than_maxmempattern));
+		واپس تہی;
 	    }
 	    newl = alloc(newsize);
-	    if (newl == NULL)
-		return NULL;
+	    اگر (newl == تہی)
+		واپس تہی;
 	    l->len = newlen;
 	    mch_memmove(&(newl[0]),
 		    &(l->t[0]),
-		    sizeof(nfa_thread_T) * listidx);
+		    حجم(nfa_thread_T) * listidx);
 	    mch_memmove(&(newl[listidx]),
-		    &(l->t[l->n - count]),
-		    sizeof(nfa_thread_T) * count);
-	    mch_memmove(&(newl[listidx + count]),
+		    &(l->t[l->n - گنتی]),
+		    حجم(nfa_thread_T) * گنتی);
+	    mch_memmove(&(newl[listidx + گنتی]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - count - listidx - 1));
+		    حجم(nfa_thread_T) * (l->n - گنتی - listidx - 1));
 	    vim_free(l->t);
 	    l->t = newl;
 	}
-	else
+	ورنہ
 	{
 	    // make space for new states, then move them from the
 	    // end to the current position
-	    mch_memmove(&(l->t[listidx + count]),
+	    mch_memmove(&(l->t[listidx + گنتی]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - listidx - 1));
+		    حجم(nfa_thread_T) * (l->n - listidx - 1));
 	    mch_memmove(&(l->t[listidx]),
 		    &(l->t[l->n - 1]),
-		    sizeof(nfa_thread_T) * count);
+		    حجم(nfa_thread_T) * گنتی);
 	}
     }
     --l->n;
     *ip = listidx - 1;
 
-    return r;
+    واپس r;
 }
 
 /*
  * Check character class "class" against current character c.
  */
-    static int
-check_char_class(int class, int c)
+    ساکن صحیح
+check_char_class(صحیح class, صحیح c)
 {
-    switch (class)
+    انتخاب (class)
     {
-	case NFA_CLASS_ALNUM:
-	    if (c >= 1 && c < 128 && isalnum(c))
-		return OK;
-	    break;
-	case NFA_CLASS_ALPHA:
-	    if (c >= 1 && c < 128 && isalpha(c))
-		return OK;
-	    break;
-	case NFA_CLASS_BLANK:
-	    if (c == ' ' || c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_CNTRL:
-	    if (c >= 1 && c <= 127 && iscntrl(c))
-		return OK;
-	    break;
-	case NFA_CLASS_DIGIT:
-	    if (VIM_ISDIGIT(c))
-		return OK;
-	    break;
-	case NFA_CLASS_GRAPH:
-	    if (c >= 1 && c <= 127 && isgraph(c))
-		return OK;
-	    break;
-	case NFA_CLASS_LOWER:
-	    if (MB_ISLOWER(c) && c != 170 && c != 186)
-		return OK;
-	    break;
-	case NFA_CLASS_PRINT:
-	    if (vim_isprintc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_PUNCT:
-	    if (c >= 1 && c < 128 && ispunct(c))
-		return OK;
-	    break;
-	case NFA_CLASS_SPACE:
-	    if ((c >= 9 && c <= 13) || (c == ' '))
-		return OK;
-	    break;
-	case NFA_CLASS_UPPER:
-	    if (MB_ISUPPER(c))
-		return OK;
-	    break;
-	case NFA_CLASS_XDIGIT:
-	    if (vim_isxdigit(c))
-		return OK;
-	    break;
-	case NFA_CLASS_TAB:
-	    if (c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_RETURN:
-	    if (c == '\r')
-		return OK;
-	    break;
-	case NFA_CLASS_BACKSPACE:
-	    if (c == '\b')
-		return OK;
-	    break;
-	case NFA_CLASS_ESCAPE:
-	    if (c == '\033')
-		return OK;
-	    break;
-	case NFA_CLASS_IDENT:
-	    if (vim_isIDc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_KEYWORD:
-	    if (reg_iswordc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_FNAME:
-	    if (vim_isfilec(c))
-		return OK;
-	    break;
+	حالت NFA_CLASS_ALNUM:
+	    اگر (c >= 1 && c < 128 && حرف_یا_ہندسہ(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_ALPHA:
+	    اگر (c >= 1 && c < 128 && حرف_ہے(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_BLANK:
+	    اگر (c == ' ' || c == '\t')
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_CNTRL:
+	    اگر (c >= 1 && c <= 127 && iscntrl(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_DIGIT:
+	    اگر (VIM_ISDIGIT(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_گراف:
+	    اگر (c >= 1 && c <= 127 && isgraph(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_زیریں:
+	    اگر (MB_ISLOWER(c) && c != 170 && c != 186)
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_PRINT:
+	    اگر (vim_isprintc(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_PUNCT:
+	    اگر (c >= 1 && c < 128 && ispunct(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_SPACE:
+	    اگر ((c >= 9 && c <= 13) || (c == ' '))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_بالائی:
+	    اگر (MB_ISUPPER(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_XDIGIT:
+	    اگر (vim_isxdigit(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_TAB:
+	    اگر (c == '\t')
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_RETURN:
+	    اگر (c == '\r')
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_BACKSPACE:
+	    اگر (c == '\b')
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_ESCAPE:
+	    اگر (c == '\033')
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_IDENT:
+	    اگر (vim_isIDc(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_KEYWORD:
+	    اگر (reg_iswordc(c))
+		واپس OK;
+	    توڑو;
+	حالت NFA_CLASS_FNAME:
+	    اگر (vim_isfilec(c))
+		واپس OK;
+	    توڑو;
 
-	default:
+	طےشدہ:
 	    // should not be here :P
 	    siemsg(_(e_nfa_regexp_invalid_character_class_nr), class);
-	    return FAIL;
+	    واپس FAIL;
     }
-    return FAIL;
+    واپس FAIL;
 }
 
 /*
  * Check for a match with subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
-match_backref(
+    ساکن صحیح
+مطابقت_backref(
     regsub_T	*sub,	    // pointers to subexpressions
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    صحیح		subidx,
+    صحیح		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    صحیح		len;
 
-    if (sub->in_use <= subidx)
+    اگر (sub->اندر_use <= subidx)
     {
 retempty:
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	واپس TRUE;
     }
 
-    if (REG_MULTI)
+    اگر (REG_MULTI)
     {
-	if (sub->list.multi[subidx].start_lnum < 0
-				       || sub->list.multi[subidx].end_lnum < 0)
-	    goto retempty;
-	if (sub->list.multi[subidx].start_lnum == rex.lnum
-			       && sub->list.multi[subidx].end_lnum == rex.lnum)
+	اگر (sub->list.multi[subidx].آغاز_lnum < 0
+				       || sub->list.multi[subidx].انتہا_lnum < 0)
+	    جاؤ retempty;
+	اگر (sub->list.multi[subidx].آغاز_lnum == rex.lnum
+			       && sub->list.multi[subidx].انتہا_lnum == rex.lnum)
 	{
-	    len = sub->list.multi[subidx].end_col
-					  - sub->list.multi[subidx].start_col;
-	    if (cstrncmp(rex.line + sub->list.multi[subidx].start_col,
-							 rex.input, &len) == 0)
+	    len = sub->list.multi[subidx].انتہا_ستون
+					  - sub->list.multi[subidx].آغاز_ستون;
+	    اگر (cstrncmp(rex.سطر + sub->list.multi[subidx].آغاز_ستون,
+							 rex.داخلہ, &len) == 0)
 	    {
 		*bytelen = len;
-		return TRUE;
+		واپس TRUE;
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (match_with_backref(
-			sub->list.multi[subidx].start_lnum,
-			sub->list.multi[subidx].start_col,
-			sub->list.multi[subidx].end_lnum,
-			sub->list.multi[subidx].end_col,
-			bytelen) == RA_MATCH)
-		return TRUE;
+	    اگر (مطابقت_with_backref(
+			sub->list.multi[subidx].آغاز_lnum,
+			sub->list.multi[subidx].آغاز_ستون,
+			sub->list.multi[subidx].انتہا_lnum,
+			sub->list.multi[subidx].انتہا_ستون,
+			bytelen) == RA_مطابقت)
+		واپس TRUE;
 	}
     }
-    else
+    ورنہ
     {
-	if (sub->list.line[subidx].start == NULL
-					|| sub->list.line[subidx].end == NULL)
-	    goto retempty;
-	len = (int)(sub->list.line[subidx].end - sub->list.line[subidx].start);
-	if (cstrncmp(sub->list.line[subidx].start, rex.input, &len) == 0)
+	اگر (sub->list.سطر[subidx].آغاز == تہی
+					|| sub->list.سطر[subidx].انتہا == تہی)
+	    جاؤ retempty;
+	len = (صحیح)(sub->list.سطر[subidx].انتہا - sub->list.سطر[subidx].آغاز);
+	اگر (cstrncmp(sub->list.سطر[subidx].آغاز, rex.داخلہ, &len) == 0)
 	{
 	    *bytelen = len;
-	    return TRUE;
+	    واپس TRUE;
 	}
     }
-    return FALSE;
+    واپس FALSE;
 }
 
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
 
 /*
  * Check for a match with \z subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
-match_zref(
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    ساکن صحیح
+مطابقت_zref(
+    صحیح		subidx,
+    صحیح		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    صحیح		len;
 
     cleanup_zsubexpr();
-    if (re_extmatch_in == NULL || re_extmatch_in->matches[subidx] == NULL)
+    اگر (re_extmatch_اندر == تہی || re_extmatch_اندر->matches[subidx] == تہی)
     {
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	واپس TRUE;
     }
 
-    len = (int)STRLEN(re_extmatch_in->matches[subidx]);
-    if (cstrncmp(re_extmatch_in->matches[subidx], rex.input, &len) == 0)
+    len = (صحیح)STRLEN(re_extmatch_اندر->matches[subidx]);
+    اگر (cstrncmp(re_extmatch_اندر->matches[subidx], rex.داخلہ, &len) == 0)
     {
 	*bytelen = len;
-	return TRUE;
+	واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
-#endif
+#اگر_ختم
 
 /*
  * Save list IDs for all NFA states of "prog" into "list".
  * Also reset the IDs to zero.
  * Only used for the recursive value lastlist[1].
  */
-    static void
-nfa_save_listids(nfa_regprog_T *prog, int *list)
+    ساکن خالی
+nfa_save_listids(nfa_regprog_T *prog, صحیح *list)
 {
-    int		    i;
+    صحیح		    i;
     nfa_state_T	    *p;
 
     // Order in the list is reverse, it's a bit faster that way.
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    برائے (i = prog->nstate; --i >= 0; )
     {
 	list[i] = p->lastlist[1];
 	p->lastlist[1] = 0;
@@ -5248,151 +5248,151 @@ nfa_save_listids(nfa_regprog_T *prog, int *list)
 /*
  * Restore list IDs from "list" to all NFA states.
  */
-    static void
-nfa_restore_listids(nfa_regprog_T *prog, int *list)
+    ساکن خالی
+nfa_restore_listids(nfa_regprog_T *prog, صحیح *list)
 {
-    int		    i;
+    صحیح		    i;
     nfa_state_T	    *p;
 
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    برائے (i = prog->nstate; --i >= 0; )
     {
 	p->lastlist[1] = list[i];
 	++p;
     }
 }
 
-    static int
-nfa_re_num_cmp(long_u val, int op, long_u pos)
+    ساکن صحیح
+nfa_re_عدد_cmp(long_u val, صحیح op, long_u pos)
 {
-    if (op == 1) return pos > val;
-    if (op == 2) return pos < val;
-    return val == pos;
+    اگر (op == 1) واپس pos > val;
+    اگر (op == 2) واپس pos < val;
+    واپس val == pos;
 }
 
-static int nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
+ساکن صحیح nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *آغاز, regsubs_T *submatch, regsubs_T *m);
 
 /*
  * Recursively call nfa_regmatch()
  * "pim" is NULL or contains info about a Postponed Invisible Match (start
  * position).
  */
-    static int
+    ساکن صحیح
 recursive_regmatch(
     nfa_state_T	    *state,
     nfa_pim_T	    *pim,
     nfa_regprog_T   *prog,
     regsubs_T	    *submatch,
     regsubs_T	    *m,
-    int		    **listids,
-    int		    *listids_len)
+    صحیح		    **listids,
+    صحیح		    *listids_len)
 {
-    int		save_reginput_col = (int)(rex.input - rex.line);
-    int		save_reglnum = rex.lnum;
-    int		save_nfa_match = nfa_match;
-    int		save_nfa_listid = rex.nfa_listid;
+    صحیح		save_reginput_ستون = (صحیح)(rex.داخلہ - rex.سطر);
+    صحیح		save_reglnum = rex.lnum;
+    صحیح		save_nfa_مطابقت = nfa_مطابقت;
+    صحیح		save_nfa_listid = rex.nfa_listid;
     save_se_T   *save_nfa_endp = nfa_endp;
     save_se_T   endpos;
-    save_se_T   *endposp = NULL;
-    int		result;
-    int		need_restore = FALSE;
+    save_se_T   *endposp = تہی;
+    صحیح		نتیجہ;
+    صحیح		need_restore = FALSE;
 
-    if (pim != NULL)
+    اگر (pim != تہی)
     {
 	// start at the position where the postponed match was
-	if (REG_MULTI)
-	    rex.input = rex.line + pim->end.pos.col;
-	else
-	    rex.input = pim->end.ptr;
+	اگر (REG_MULTI)
+	    rex.داخلہ = rex.سطر + pim->انتہا.pos.ستون;
+	ورنہ
+	    rex.داخلہ = pim->انتہا.ptr;
     }
 
-    if (state->c == NFA_START_INVISIBLE_BEFORE
-	    || state->c == NFA_START_INVISIBLE_BEFORE_FIRST
-	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG
-	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
+    اگر (state->c == NFA_آغاز_INVISIBLE_BEFORE
+	    || state->c == NFA_آغاز_INVISIBLE_BEFORE_پہلا
+	    || state->c == NFA_آغاز_INVISIBLE_BEFORE_NEG
+	    || state->c == NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا)
     {
 	// The recursive match must end at the current position. When "pim" is
 	// not NULL it specifies the current position.
 	endposp = &endpos;
-	if (REG_MULTI)
+	اگر (REG_MULTI)
 	{
-	    if (pim == NULL)
+	    اگر (pim == تہی)
 	    {
-		endpos.se_u.pos.col = (int)(rex.input - rex.line);
+		endpos.se_u.pos.ستون = (صحیح)(rex.داخلہ - rex.سطر);
 		endpos.se_u.pos.lnum = rex.lnum;
 	    }
-	    else
-		endpos.se_u.pos = pim->end.pos;
+	    ورنہ
+		endpos.se_u.pos = pim->انتہا.pos;
 	}
-	else
+	ورنہ
 	{
-	    if (pim == NULL)
-		endpos.se_u.ptr = rex.input;
-	    else
-		endpos.se_u.ptr = pim->end.ptr;
+	    اگر (pim == تہی)
+		endpos.se_u.ptr = rex.داخلہ;
+	    ورنہ
+		endpos.se_u.ptr = pim->انتہا.ptr;
 	}
 
 	// Go back the specified number of bytes, or as far as the
 	// start of the previous line, to try matching "\@<=" or
 	// not matching "\@<!". This is very inefficient, limit the number of
 	// bytes if possible.
-	if (state->val <= 0)
+	اگر (state->val <= 0)
 	{
-	    if (REG_MULTI)
+	    اگر (REG_MULTI)
 	    {
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.سطر = reg_getline(--rex.lnum);
+		اگر (rex.سطر == تہی)
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
+		    rex.سطر = reg_getline(++rex.lnum);
 	    }
-	    rex.input = rex.line;
+	    rex.داخلہ = rex.سطر;
 	}
-	else
+	ورنہ
 	{
-	    if (REG_MULTI && (int)(rex.input - rex.line) < state->val)
+	    اگر (REG_MULTI && (صحیح)(rex.داخلہ - rex.سطر) < state->val)
 	    {
 		// Not enough bytes in this line, go to end of
 		// previous line.
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.سطر = reg_getline(--rex.lnum);
+		اگر (rex.سطر == تہی)
 		{
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
-		    rex.input = rex.line;
+		    rex.سطر = reg_getline(++rex.lnum);
+		    rex.داخلہ = rex.سطر;
 		}
-		else
-		    rex.input = rex.line + reg_getline_len(rex.lnum);
+		ورنہ
+		    rex.داخلہ = rex.سطر + reg_getline_len(rex.lnum);
 	    }
-	    if ((int)(rex.input - rex.line) >= state->val)
+	    اگر ((صحیح)(rex.داخلہ - rex.سطر) >= state->val)
 	    {
-		rex.input -= state->val;
-		if (has_mbyte)
-		    rex.input -= mb_head_off(rex.line, rex.input);
+		rex.داخلہ -= state->val;
+		اگر (has_mbyte)
+		    rex.داخلہ -= mb_سر_off(rex.سطر, rex.داخلہ);
 	    }
-	    else
-		rex.input = rex.line;
+	    ورنہ
+		rex.داخلہ = rex.سطر;
 	}
     }
 
-#ifdef ENABLE_LOG
-    if (log_fd != stderr)
+#اگر_تعریف_شدہ ENABLE_LOG
+    اگر (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
-#endif
+    log_fd = تہی;
+#اگر_ختم
     // Have to clear the lastlist field of the NFA nodes, so that
     // nfa_regmatch() and addstate() can run properly after recursion.
-    if (nfa_ll_index == 1)
+    اگر (nfa_ll_اشاریہ == 1)
     {
 	// Already calling nfa_regmatch() recursively.  Save the lastlist[1]
 	// values and clear them.
-	if (*listids == NULL || *listids_len < prog->nstate)
+	اگر (*listids == تہی || *listids_len < prog->nstate)
 	{
 	    vim_free(*listids);
-	    *listids = ALLOC_MULT(int, prog->nstate);
-	    if (*listids == NULL)
+	    *listids = ALLOC_MULT(صحیح, prog->nstate);
+	    اگر (*listids == تہی)
 	    {
-		emsg(_(e_nfa_regexp_could_not_allocate_memory_for_branch_traversal));
-		return 0;
+		emsg(_(e_nfa_regexp_could_not_allocate_حافظہ_for_branch_traversal));
+		واپس 0;
 	    }
 	    *listids_len = prog->nstate;
 	}
@@ -5400,46 +5400,46 @@ recursive_regmatch(
 	need_restore = TRUE;
 	// any value of rex.nfa_listid will do
     }
-    else
+    ورنہ
     {
 	// First recursive nfa_regmatch() call, switch to the second lastlist
 	// entry.  Make sure rex.nfa_listid is different from a previous
 	// recursive call, because some states may still have this ID.
-	++nfa_ll_index;
-	if (rex.nfa_listid <= rex.nfa_alt_listid)
+	++nfa_ll_اشاریہ;
+	اگر (rex.nfa_listid <= rex.nfa_alt_listid)
 	    rex.nfa_listid = rex.nfa_alt_listid;
     }
 
     // Call nfa_regmatch() to check if the current concat matches at this
     // position. The concat ends with the node NFA_END_INVISIBLE
     nfa_endp = endposp;
-    result = nfa_regmatch(prog, state->out, submatch, m);
+    نتیجہ = nfa_regmatch(prog, state->برآمد, submatch, m);
 
-    if (need_restore)
+    اگر (need_restore)
 	nfa_restore_listids(prog, *listids);
-    else
+    ورنہ
     {
-	--nfa_ll_index;
+	--nfa_ll_اشاریہ;
 	rex.nfa_alt_listid = rex.nfa_listid;
     }
 
     // restore position in input text
     rex.lnum = save_reglnum;
-    if (REG_MULTI)
-	rex.line = reg_getline(rex.lnum);
-    rex.input = rex.line + save_reginput_col;
-    if (result != NFA_TOO_EXPENSIVE)
+    اگر (REG_MULTI)
+	rex.سطر = reg_getline(rex.lnum);
+    rex.داخلہ = rex.سطر + save_reginput_ستون;
+    اگر (نتیجہ != NFA_TOO_EXPENSIVE)
     {
-	nfa_match = save_nfa_match;
+	nfa_مطابقت = save_nfa_مطابقت;
 	rex.nfa_listid = save_nfa_listid;
     }
     nfa_endp = save_nfa_endp;
 
-#ifdef ENABLE_LOG
-    open_debug_log(result);
-#endif
+#اگر_تعریف_شدہ ENABLE_LOG
+    open_debug_log(نتیجہ);
+#اگر_ختم
 
-    return result;
+    واپس نتیجہ;
 }
 
 /*
@@ -5448,180 +5448,180 @@ recursive_regmatch(
  * NFA_ANY: 1
  * specific character: 99
  */
-    static int
-failure_chance(nfa_state_T *state, int depth)
+    ساکن صحیح
+failure_chance(nfa_state_T *state, صحیح گہرائی)
 {
-    int c = state->c;
-    int l, r;
+    صحیح c = state->c;
+    صحیح l, r;
 
     // detect looping
-    if (depth > 4)
-	return 1;
+    اگر (گہرائی > 4)
+	واپس 1;
 
-    switch (c)
+    انتخاب (c)
     {
-	case NFA_SPLIT:
-	    if (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
+	حالت NFA_بانٹو:
+	    اگر (state->برآمد->c == NFA_بانٹو || state->out1->c == NFA_بانٹو)
 		// avoid recursive stuff
-		return 1;
+		واپس 1;
 	    // two alternatives, use the lowest failure chance
-	    l = failure_chance(state->out, depth + 1);
-	    r = failure_chance(state->out1, depth + 1);
-	    return l < r ? l : r;
+	    l = failure_chance(state->برآمد, گہرائی + 1);
+	    r = failure_chance(state->out1, گہرائی + 1);
+	    واپس l < r ? l : r;
 
-	case NFA_ANY:
+	حالت NFA_ANY:
 	    // matches anything, unlikely to fail
-	    return 1;
+	    واپس 1;
 
-	case NFA_MATCH:
-	case NFA_MCLOSE:
-	case NFA_ANY_COMPOSING:
+	حالت NFA_مطابقت:
+	حالت NFA_MCLOSE:
+	حالت NFA_ANY_COMPOSING:
 	    // empty match works always
-	    return 0;
+	    واپس 0;
 
-	case NFA_START_INVISIBLE:
-	case NFA_START_INVISIBLE_FIRST:
-	case NFA_START_INVISIBLE_NEG:
-	case NFA_START_INVISIBLE_NEG_FIRST:
-	case NFA_START_INVISIBLE_BEFORE:
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	case NFA_START_PATTERN:
+	حالت NFA_آغاز_INVISIBLE:
+	حالت NFA_آغاز_INVISIBLE_پہلا:
+	حالت NFA_آغاز_INVISIBLE_NEG:
+	حالت NFA_آغاز_INVISIBLE_NEG_پہلا:
+	حالت NFA_آغاز_INVISIBLE_BEFORE:
+	حالت NFA_آغاز_INVISIBLE_BEFORE_پہلا:
+	حالت NFA_آغاز_INVISIBLE_BEFORE_NEG:
+	حالت NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا:
+	حالت NFA_آغاز_نمونہ:
 	    // recursive regmatch is expensive, use low failure chance
-	    return 5;
+	    واپس 5;
 
-	case NFA_BOL:
-	case NFA_EOL:
-	case NFA_BOF:
-	case NFA_EOF:
-	case NFA_NEWL:
-	    return 99;
+	حالت NFA_BOL:
+	حالت NFA_EOL:
+	حالت NFA_BOF:
+	حالت NFA_EOF:
+	حالت NFA_NEWL:
+	    واپس 99;
 
-	case NFA_BOW:
-	case NFA_EOW:
-	    return 90;
+	حالت NFA_BOW:
+	حالت NFA_EOW:
+	    واپس 90;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
-#endif
-	case NFA_NOPEN:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-	case NFA_NCLOSE:
-	    return failure_chance(state->out, depth + 1);
+	حالت NFA_MOPEN:
+	حالت NFA_MOPEN1:
+	حالت NFA_MOPEN2:
+	حالت NFA_MOPEN3:
+	حالت NFA_MOPEN4:
+	حالت NFA_MOPEN5:
+	حالت NFA_MOPEN6:
+	حالت NFA_MOPEN7:
+	حالت NFA_MOPEN8:
+	حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZOPEN:
+	حالت NFA_ZOPEN1:
+	حالت NFA_ZOPEN2:
+	حالت NFA_ZOPEN3:
+	حالت NFA_ZOPEN4:
+	حالت NFA_ZOPEN5:
+	حالت NFA_ZOPEN6:
+	حالت NFA_ZOPEN7:
+	حالت NFA_ZOPEN8:
+	حالت NFA_ZOPEN9:
+	حالت NFA_ZCLOSE:
+	حالت NFA_ZCLOSE1:
+	حالت NFA_ZCLOSE2:
+	حالت NFA_ZCLOSE3:
+	حالت NFA_ZCLOSE4:
+	حالت NFA_ZCLOSE5:
+	حالت NFA_ZCLOSE6:
+	حالت NFA_ZCLOSE7:
+	حالت NFA_ZCLOSE8:
+	حالت NFA_ZCLOSE9:
+#اگر_ختم
+	حالت NFA_NOPEN:
+	حالت NFA_MCLOSE1:
+	حالت NFA_MCLOSE2:
+	حالت NFA_MCLOSE3:
+	حالت NFA_MCLOSE4:
+	حالت NFA_MCLOSE5:
+	حالت NFA_MCLOSE6:
+	حالت NFA_MCLOSE7:
+	حالت NFA_MCLOSE8:
+	حالت NFA_MCLOSE9:
+	حالت NFA_NCLOSE:
+	    واپس failure_chance(state->برآمد, گہرائی + 1);
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
-#endif
+	حالت NFA_BACKREF1:
+	حالت NFA_BACKREF2:
+	حالت NFA_BACKREF3:
+	حالت NFA_BACKREF4:
+	حالت NFA_BACKREF5:
+	حالت NFA_BACKREF6:
+	حالت NFA_BACKREF7:
+	حالت NFA_BACKREF8:
+	حالت NFA_BACKREF9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	حالت NFA_ZREF1:
+	حالت NFA_ZREF2:
+	حالت NFA_ZREF3:
+	حالت NFA_ZREF4:
+	حالت NFA_ZREF5:
+	حالت NFA_ZREF6:
+	حالت NFA_ZREF7:
+	حالت NFA_ZREF8:
+	حالت NFA_ZREF9:
+#اگر_ختم
 	    // backreferences don't match in many places
-	    return 94;
+	    واپس 94;
 
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
-	case NFA_VISUAL:
+	حالت NFA_LNUM_GT:
+	حالت NFA_LNUM_LT:
+	حالت NFA_ستون_GT:
+	حالت NFA_ستون_LT:
+	حالت NFA_VCOL_GT:
+	حالت NFA_VCOL_LT:
+	حالت NFA_MARK_GT:
+	حالت NFA_MARK_LT:
+	حالت NFA_VISUAL:
 	    // before/after positions don't match very often
-	    return 85;
+	    واپس 85;
 
-	case NFA_LNUM:
-	    return 90;
+	حالت NFA_LNUM:
+	    واپس 90;
 
-	case NFA_CURSOR:
-	case NFA_COL:
-	case NFA_VCOL:
-	case NFA_MARK:
+	حالت NFA_CURSOR:
+	حالت NFA_ستون:
+	حالت NFA_VCOL:
+	حالت NFA_MARK:
 	    // specific positions rarely match
-	    return 98;
+	    واپس 98;
 
-	case NFA_COMPOSING:
-	    return 95;
+	حالت NFA_COMPOSING:
+	    واپس 95;
 
-	default:
-	    if (c > 0)
+	طےشدہ:
+	    اگر (c > 0)
 		// character match fails often
-		return 95;
+		واپس 95;
     }
 
     // something else, includes character classes
-    return 50;
+    واپس 50;
 }
 
 /*
  * Skip until the char "c" we know a match must start with.
  */
-    static int
-skip_to_start(int c, colnr_T *colp)
+    ساکن صحیح
+skip_مقصد_آغاز(صحیح c, colnr_T *colp)
 {
     char_u *s;
 
     // Used often, do some work to avoid call overhead.
-    if (!rex.reg_ic && !has_mbyte)
-	s = vim_strbyte(rex.line + *colp, c);
-    else
-	s = cstrchr(rex.line + *colp, c);
-    if (s == NULL)
-	return FAIL;
-    *colp = (int)(s - rex.line);
-    return OK;
+    اگر (!rex.reg_ic && !has_mbyte)
+	s = vim_strbyte(rex.سطر + *colp, c);
+    ورنہ
+	s = cstrchr(rex.سطر + *colp, c);
+    اگر (s == تہی)
+	واپس FAIL;
+    *colp = (صحیح)(s - rex.سطر);
+    واپس OK;
 }
 
 /*
@@ -5629,61 +5629,61 @@ skip_to_start(int c, colnr_T *colp)
  * Called after skip_to_start() has found regstart.
  * Returns zero for no match, 1 for a match.
  */
-    static long
-find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
+    ساکن طویل
+ڈھونڈو_مطابقت_متن(colnr_T *startcol, صحیح regstart, char_u *مطابقت_متن)
 {
-    colnr_T col = *startcol;
-    int	    c1, c2;
-    int	    len1, len2;
-    int	    match;
+    colnr_T ستون = *startcol;
+    صحیح	    c1, c2;
+    صحیح	    len1, len2;
+    صحیح	    مطابقت;
 
-    for (;;)
+    برائے (;;)
     {
-	match = TRUE;
+	مطابقت = TRUE;
 	// Skip the input character: case-folding can change its byte length.
-	len2 = MB_CPTR2LEN(rex.line + col);
-	for (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
+	len2 = MB_CPTR2LEN(rex.سطر + ستون);
+	برائے (len1 = 0; مطابقت_متن[len1] != NUL; len1 += MB_CHAR2LEN(c1))
 	{
-	    c1 = PTR2CHAR(match_text + len1);
-	    c2 = PTR2CHAR(rex.line + col + len2);
-	    if (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
+	    c1 = PTR2CHAR(مطابقت_متن + len1);
+	    c2 = PTR2CHAR(rex.سطر + ستون + len2);
+	    اگر (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
 	    {
-		match = FALSE;
-		break;
+		مطابقت = FALSE;
+		توڑو;
 	    }
-	    len2 += enc_utf8 ? utf_ptr2len(rex.line + col + len2)
+	    len2 += enc_utf8 ? utf_ptr2len(rex.سطر + ستون + len2)
 							     : MB_CHAR2LEN(c2);
 	}
-	if (match
+	اگر (مطابقت
 		// check that no composing char follows
 		&& !(enc_utf8
-			  && utf_iscomposing(PTR2CHAR(rex.line + col + len2))))
+			  && utf_iscomposing(PTR2CHAR(rex.سطر + ستون + len2))))
 	{
 	    cleanup_subexpr();
-	    if (REG_MULTI)
+	    اگر (REG_MULTI)
 	    {
 		rex.reg_startpos[0].lnum = rex.lnum;
-		rex.reg_startpos[0].col = col;
+		rex.reg_startpos[0].ستون = ستون;
 		rex.reg_endpos[0].lnum = rex.lnum;
-		rex.reg_endpos[0].col = col + len2;
+		rex.reg_endpos[0].ستون = ستون + len2;
 	    }
-	    else
+	    ورنہ
 	    {
-		rex.reg_startp[0] = rex.line + col;
-		rex.reg_endp[0] = rex.line + col + len2;
+		rex.reg_startp[0] = rex.سطر + ستون;
+		rex.reg_endp[0] = rex.سطر + ستون + len2;
 	    }
-	    *startcol = col;
-	    return 1L;
+	    *startcol = ستون;
+	    واپس 1L;
 	}
 
 	// Try finding regstart after the current match.
-	col += MB_CPTR2LEN(rex.line + col); // skip the input character
-	if (skip_to_start(regstart, &col) == FAIL)
-	    break;
+	ستون += MB_CPTR2LEN(rex.سطر + ستون); // skip the input character
+	اگر (skip_مقصد_آغاز(regstart, &ستون) == FAIL)
+	    توڑو;
     }
 
-    *startcol = col;
-    return 0L;
+    *startcol = ستون;
+    واپس 0L;
 }
 
 /*
@@ -5693,59 +5693,59 @@ find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
  * length.
  * Returns OK when it matches, FAIL otherwise.
  */
-    static int
-match_composing(nfa_state_T *sta, int curc, int clen)
+    ساکن صحیح
+مطابقت_composing(nfa_state_T *sta, صحیح curc, صحیح clen)
 {
-    int		mc = curc;
-    int		len = 0;
-    int		cchars[MAX_MCO];
-    int		ccount = 0;
-    int		j;
+    صحیح		mc = curc;
+    صحیح		len = 0;
+    صحیح		cchars[MAX_MCO];
+    صحیح		ccount = 0;
+    صحیح		j;
 
-    if (utf_iscomposing(sta->c))
+    اگر (utf_iscomposing(sta->c))
 	// Only match composing character(s), ignore base character.  Used
 	// for ".{composing}" and "{composing}" (no preceding character).
 	len += mb_char2len(mc);
 
-    if (rex.reg_icombine && len == 0)
+    اگر (rex.reg_icombine && len == 0)
 	// If \Z was present, then ignore composing characters.  When
 	// ignoring the base character this always matches.
-	return sta->c == curc ? OK : FAIL;
+	واپس sta->c == curc ? OK : FAIL;
 
     // Check base character matches first, unless ignored.
-    if (len == 0 && mc != sta->c)
-	return FAIL;
+    اگر (len == 0 && mc != sta->c)
+	واپس FAIL;
 
-    if (len == 0)
+    اگر (len == 0)
     {
 	len += mb_char2len(mc);
-	sta = sta->out;
+	sta = sta->برآمد;
     }
 
     // We don't care about the order of composing characters.  Get them into
     // cchars[] first.
-    while (len < clen)
+    جب (len < clen)
     {
-	mc = mb_ptr2char(rex.input + len);
+	mc = mb_ptr2char(rex.داخلہ + len);
 	cchars[ccount++] = mc;
 	len += mb_char2len(mc);
-	if (ccount == MAX_MCO)
-	    break;
+	اگر (ccount == MAX_MCO)
+	    توڑو;
     }
 
     // Check that each composing char in the pattern matches a composing char
     // in the text.  We do not check if all composing chars are matched.
-    while (sta->c != NFA_END_COMPOSING)
+    جب (sta->c != NFA_انتہا_COMPOSING)
     {
-	for (j = 0; j < ccount; ++j)
-	    if (cchars[j] == sta->c)
-		break;
-	if (j == ccount)
-	    return FAIL;
-	sta = sta->out;
+	برائے (j = 0; j < ccount; ++j)
+	    اگر (cchars[j] == sta->c)
+		توڑو;
+	اگر (j == ccount)
+	    واپس FAIL;
+	sta = sta->برآمد;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -5761,89 +5761,89 @@ match_composing(nfa_state_T *sta, int curc, int clen)
  *
  * Note: Caller must ensure that: start != NULL.
  */
-    static int
+    ساکن صحیح
 nfa_regmatch(
     nfa_regprog_T	*prog,
-    nfa_state_T		*start,
+    nfa_state_T		*آغاز,
     regsubs_T		*submatch,
     regsubs_T		*m)
 {
-    int		result = FALSE;
-    size_t	size = 0;
-    int		flag = 0;
-    int		go_to_nextline = FALSE;
+    صحیح		نتیجہ = FALSE;
+    size_t	سائز = 0;
+    صحیح		flag = 0;
+    صحیح		go_مقصد_nextline = FALSE;
     nfa_thread_T *t;
     nfa_list_T	list[2];
-    int		listidx;
+    صحیح		listidx;
     nfa_list_T	*thislist;
     nfa_list_T	*nextlist;
-    int		*listids = NULL;
-    int		listids_len = 0;
-    nfa_state_T *add_state;
-    int		add_here;
-    int		add_count;
-    int		add_off = 0;
-    int		toplevel = start->c == NFA_MOPEN;
+    صحیح		*listids = تہی;
+    صحیح		listids_len = 0;
+    nfa_state_T *جوڑو_state;
+    صحیح		جوڑو_یہاں;
+    صحیح		جوڑو_گنتی;
+    صحیح		جوڑو_off = 0;
+    صحیح		toplevel = آغاز->c == NFA_MOPEN;
     regsubs_T	*r;
-#ifdef NFA_REGEXP_DEBUG_LOG
+#اگر_تعریف_شدہ NFA_REGEXP_DEBUG_LOG
     FILE	*debug;
-#endif
+#اگر_ختم
 
     // Some patterns may take a long time to match, especially when using
     // recursive_regmatch(). Allow interrupting them with CTRL-C.
     fast_breakcheck();
-    if (got_int)
-	return FALSE;
-#ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return FALSE;
-#endif
+    اگر (got_int)
+	واپس FALSE;
+#اگر_تعریف_شدہ FEAT_RELTIME
+    اگر (nfa_did_وقت_برآمد())
+	واپس FALSE;
+#اگر_ختم
 
-#ifdef NFA_REGEXP_DEBUG_LOG
+#اگر_تعریف_شدہ NFA_REGEXP_DEBUG_LOG
     debug = fopen(NFA_REGEXP_DEBUG_LOG, "a");
-    if (debug == NULL)
+    اگر (debug == تہی)
     {
 	semsg("(NFA) COULD NOT OPEN %s!", NFA_REGEXP_DEBUG_LOG);
-	return FALSE;
+	واپس FALSE;
     }
-#endif
-    nfa_match = FALSE;
+#اگر_ختم
+    nfa_مطابقت = FALSE;
 
     // Allocate memory for the lists of nodes.
-    size = (prog->nstate + 1) * sizeof(nfa_thread_T);
+    سائز = (prog->nstate + 1) * حجم(nfa_thread_T);
 
     // Reuse cached list buffers from prog when available (top-level call).
     // Recursive calls must allocate their own buffers.
-    if (toplevel && prog->listbuf[0] != NULL)
+    اگر (toplevel && prog->listbuf[0] != تہی)
     {
 	list[0].t = (nfa_thread_T *)prog->listbuf[0];
 	list[1].t = (nfa_thread_T *)prog->listbuf[1];
-	prog->listbuf[0] = NULL;
-	prog->listbuf[1] = NULL;
+	prog->listbuf[0] = تہی;
+	prog->listbuf[1] = تہی;
     }
-    else
+    ورنہ
     {
-	list[0].t = alloc(size);
-	list[1].t = alloc(size);
+	list[0].t = alloc(سائز);
+	list[1].t = alloc(سائز);
     }
     list[0].len = prog->nstate + 1;
     list[1].len = prog->nstate + 1;
-    if (list[0].t == NULL || list[1].t == NULL)
-	goto theend;
+    اگر (list[0].t == تہی || list[1].t == تہی)
+	جاؤ theend;
 
-#ifdef ENABLE_LOG
-    log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+#اگر_تعریف_شدہ ENABLE_LOG
+    log_fd = fopen(NFA_REGEXP_تسلسل_LOG, "a");
+    اگر (log_fd == تہی)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
     }
     fprintf(log_fd, "**********************************\n");
-    nfa_set_code(start->c);
+    nfa_سیٹ_رمز(آغاز->c);
     fprintf(log_fd, " RUNNING nfa_regmatch() starting with state %d, code %s\n",
-    abs(start->id), code);
+    مطلق_قدر(آغاز->id), رمز);
     fprintf(log_fd, "**********************************\n");
-#endif
+#اگر_ختم
 
     thislist = &list[0];
     thislist->n = 0;
@@ -5851,74 +5851,74 @@ nfa_regmatch(
     nextlist = &list[1];
     nextlist->n = 0;
     nextlist->has_pim = FALSE;
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
     fprintf(log_fd, "(---) STARTSTATE first\n");
-#endif
+#اگر_ختم
     thislist->id = rex.nfa_listid + 1;
 
     // Inline optimized code for addstate(thislist, start, m, 0) if we know
     // it's the first MOPEN.
-    if (toplevel)
+    اگر (toplevel)
     {
-	if (REG_MULTI)
+	اگر (REG_MULTI)
 	{
-	    m->norm.list.multi[0].start_lnum = rex.lnum;
-	    m->norm.list.multi[0].start_col = (colnr_T)(rex.input - rex.line);
-	    m->norm.orig_start_col = m->norm.list.multi[0].start_col;
+	    m->norm.list.multi[0].آغاز_lnum = rex.lnum;
+	    m->norm.list.multi[0].آغاز_ستون = (colnr_T)(rex.داخلہ - rex.سطر);
+	    m->norm.orig_آغاز_ستون = m->norm.list.multi[0].آغاز_ستون;
 	}
-	else
-	    m->norm.list.line[0].start = rex.input;
-	m->norm.in_use = 1;
-	r = addstate(thislist, start->out, m, NULL, 0, 0);
+	ورنہ
+	    m->norm.list.سطر[0].آغاز = rex.داخلہ;
+	m->norm.اندر_use = 1;
+	r = addstate(thislist, آغاز->برآمد, m, تہی, 0, 0);
     }
-    else
-	r = addstate(thislist, start, m, NULL, 0, 0);
-    if (r == NULL)
+    ورنہ
+	r = addstate(thislist, آغاز, m, تہی, 0, 0);
+    اگر (r == تہی)
     {
-	nfa_match = NFA_TOO_EXPENSIVE;
-	goto theend;
+	nfa_مطابقت = NFA_TOO_EXPENSIVE;
+	جاؤ theend;
     }
 
-#define	ADD_STATE_IF_MATCH(state)	\
-    if (result)				\
+#تعریف_کرو	جوڑو_STATE_IF_مطابقت(state)	\
+    اگر (نتیجہ)				\
     {					\
-	add_state = state->out;		\
-	add_off = clen;			\
+	جوڑو_state = state->برآمد;		\
+	جوڑو_off = clen;			\
     }
 
     /*
      * Run for each character.
      */
-    for (;;)
+    برائے (;;)
     {
-	int	curc;
-	int	clen;
+	صحیح	curc;
+	صحیح	clen;
 
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
 	    // Fast path for an ASCII byte not followed by a composing
 	    // character, matching the check in utfc_ptr2len().  Avoids two
 	    // indirect calls for the common case.
-	    if (rex.input[0] != NUL && rex.input[0] < 0x80 && rex.input[1] < 0x80)
+	    اگر (rex.داخلہ[0] != NUL && rex.داخلہ[0] < 0x80 && rex.داخلہ[1] < 0x80)
 	    {
-		curc = rex.input[0];
+		curc = rex.داخلہ[0];
 		clen = 1;
 	    }
-	    else
+	    ورنہ
 	    {
-		curc = (*mb_ptr2char)(rex.input);
-		clen = (*mb_ptr2len)(rex.input);
+		curc = (*mb_ptr2char)(rex.داخلہ);
+		clen = (*mb_ptr2len)(rex.داخلہ);
 	    }
 	}
-	else
+	ورنہ
 	{
-	    curc = *rex.input;
+	    curc = *rex.داخلہ;
 	    clen = 1;
 	}
-	if (curc == NUL)
+	اگر (curc == NUL)
 	{
 	    clen = 0;
-	    go_to_nextline = FALSE;
+	    go_مقصد_nextline = FALSE;
 	}
 
 	// swap lists
@@ -5927,124 +5927,124 @@ nfa_regmatch(
 	nextlist->n = 0;	    // clear nextlist
 	nextlist->has_pim = FALSE;
 	++rex.nfa_listid;
-	if (prog->re_engine == AUTOMATIC_ENGINE
-		&& (rex.nfa_listid >= NFA_MAX_STATES
-#ifdef FEAT_EVAL
+	اگر (prog->re_engine == AUTOMATIC_ENGINE
+		&& (rex.nfa_listid >= NFA_MAX_حالتیں
+#اگر_تعریف_شدہ FEAT_EVAL
 		    || nfa_fail_for_testing
-#endif
+#اگر_ختم
 		    ))
 	{
 	    // too many states, retry with old engine
-	    nfa_match = NFA_TOO_EXPENSIVE;
-	    goto theend;
+	    nfa_مطابقت = NFA_TOO_EXPENSIVE;
+	    جاؤ theend;
 	}
 
 	thislist->id = rex.nfa_listid;
 	nextlist->id = rex.nfa_listid + 1;
 
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 	fprintf(log_fd, "------------------------------------------\n");
-	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.input);
-	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (int)curc);
+	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.داخلہ);
+	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (صحیح)curc);
 	fprintf(log_fd, ">>> Thislist has %d states available: ", thislist->n);
 	{
-	    int i;
+	    صحیح i;
 
-	    for (i = 0; i < thislist->n; i++)
-		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
+	    برائے (i = 0; i < thislist->n; i++)
+		fprintf(log_fd, "%d  ", مطلق_قدر(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
-#endif
+#اگر_ختم
 
-#ifdef NFA_REGEXP_DEBUG_LOG
+#اگر_تعریف_شدہ NFA_REGEXP_DEBUG_LOG
 	fprintf(debug, "\n-------------------\n");
-#endif
+#اگر_ختم
 	/*
 	 * If the state lists are empty we can stop.
 	 */
-	if (thislist->n == 0)
-	    break;
+	اگر (thislist->n == 0)
+	    توڑو;
 
 	// compute nextlist
-	for (listidx = 0; listidx < thislist->n; ++listidx)
+	برائے (listidx = 0; listidx < thislist->n; ++listidx)
 	{
 	    // If the list gets very long there probably is something wrong.
 	    // At least allow interrupting with CTRL-C.  Only check once in a
 	    // while, calling ui_breakcheck() for every state is too slow.
-	    static int	breakcheck_count = 0;  // using "static" makes it faster
-	    if (unlikely(++breakcheck_count >= 100000))
+	    ساکن صحیح	breakcheck_گنتی = 0;  // using "static" makes it faster
+	    اگر (unlikely(++breakcheck_گنتی >= 100000))
 	    {
 		ui_breakcheck();
-		breakcheck_count = 0;
+		breakcheck_گنتی = 0;
 	    }
-	    if (got_int)
-		break;
-#ifdef FEAT_RELTIME
-	    if (nfa_did_time_out())
-		break;
-#endif
+	    اگر (got_int)
+		توڑو;
+#اگر_تعریف_شدہ FEAT_RELTIME
+	    اگر (nfa_did_وقت_برآمد())
+		توڑو;
+#اگر_ختم
 	    t = &thislist->t[listidx];
 
-#ifdef NFA_REGEXP_DEBUG_LOG
-	    nfa_set_code(t->state->c);
-	    fprintf(debug, "%s, ", code);
-#endif
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ NFA_REGEXP_DEBUG_LOG
+	    nfa_سیٹ_رمز(t->state->c);
+	    fprintf(debug, "%s, ", رمز);
+#اگر_ختم
+#اگر_تعریف_شدہ ENABLE_LOG
 	    {
-		int col;
+		صحیح ستون;
 
-		if (t->subs.norm.in_use <= 0)
-		    col = -1;
-		else if (REG_MULTI)
-		    col = t->subs.norm.list.multi[0].start_col;
-		else
-		    col = (int)(t->subs.norm.list.line[0].start - rex.line);
-		nfa_set_code(t->state->c);
+		اگر (t->subs.norm.اندر_use <= 0)
+		    ستون = -1;
+		ورنہ اگر (REG_MULTI)
+		    ستون = t->subs.norm.list.multi[0].آغاز_ستون;
+		ورنہ
+		    ستون = (صحیح)(t->subs.norm.list.سطر[0].آغاز - rex.سطر);
+		nfa_سیٹ_رمز(t->state->c);
 		fprintf(log_fd, "(%d) char %d %s (start col %d)%s... \n",
-			abs(t->state->id), (int)t->state->c, code, col,
+			مطلق_قدر(t->state->id), (صحیح)t->state->c, رمز, ستون,
 			pim_info(&t->pim));
 	    }
-#endif
+#اگر_ختم
 
 	    /*
 	     * Handle the possible codes of the current state.
 	     * The most important is NFA_MATCH.
 	     */
-	    add_state = NULL;
-	    add_here = FALSE;
-	    add_count = 0;
-	    switch (t->state->c)
+	    جوڑو_state = تہی;
+	    جوڑو_یہاں = FALSE;
+	    جوڑو_گنتی = 0;
+	    انتخاب (t->state->c)
 	    {
-	    case NFA_MATCH:
+	    حالت NFA_مطابقت:
 	      {
 		// If the match is not at the start of the line, ends before a
 		// composing characters and rex.reg_icombine is not set, that
 		// is not really a match.
-		if (enc_utf8 && !rex.reg_icombine
-			     && rex.input != rex.line && utf_iscomposing(curc))
-		    break;
+		اگر (enc_utf8 && !rex.reg_icombine
+			     && rex.داخلہ != rex.سطر && utf_iscomposing(curc))
+		    توڑو;
 
-		nfa_match = TRUE;
+		nfa_مطابقت = TRUE;
 		copy_sub(&submatch->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		اگر (rex.nfa_has_zsubexpr)
 		    copy_sub(&submatch->synt, &t->subs.synt);
-#endif
-#ifdef ENABLE_LOG
+#اگر_ختم
+#اگر_تعریف_شدہ ENABLE_LOG
 		log_subsexpr(&t->subs);
-#endif
+#اگر_ختم
 		// Found the left-most longest match, do not look at any other
 		// states at this position.  When the list of states is going
 		// to be empty quit without advancing, so that "rex.input" is
 		// correct.
-		if (nextlist->n == 0)
+		اگر (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		جاؤ nextchar;
 	      }
 
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
+	    حالت NFA_انتہا_INVISIBLE:
+	    حالت NFA_انتہا_INVISIBLE_NEG:
+	    حالت NFA_انتہا_نمونہ:
 		/*
 		 * This is only encountered after a NFA_START_INVISIBLE or
 		 * NFA_START_INVISIBLE_BEFORE node.
@@ -6056,108 +6056,108 @@ nfa_regmatch(
 		 * in the position in "nfa_endp".
 		 * Submatches are stored in *m, and used in the parent call.
 		 */
-#ifdef ENABLE_LOG
-		if (nfa_endp != NULL)
+#اگر_تعریف_شدہ ENABLE_LOG
+		اگر (nfa_endp != تہی)
 		{
-		    if (REG_MULTI)
+		    اگر (REG_MULTI)
 			fprintf(log_fd, "Current lnum: %d, endp lnum: %d; current col: %d, endp col: %d\n",
-				(int)rex.lnum,
-				(int)nfa_endp->se_u.pos.lnum,
-				(int)(rex.input - rex.line),
-				nfa_endp->se_u.pos.col);
-		    else
+				(صحیح)rex.lnum,
+				(صحیح)nfa_endp->se_u.pos.lnum,
+				(صحیح)(rex.داخلہ - rex.سطر),
+				nfa_endp->se_u.pos.ستون);
+		    ورنہ
 			fprintf(log_fd, "Current col: %d, endp col: %d\n",
-				(int)(rex.input - rex.line),
-				(int)(nfa_endp->se_u.ptr - rex.input));
+				(صحیح)(rex.داخلہ - rex.سطر),
+				(صحیح)(nfa_endp->se_u.ptr - rex.داخلہ));
 		}
-#endif
+#اگر_ختم
 		// If "nfa_endp" is set it's only a match if it ends at
 		// "nfa_endp"
-		if (nfa_endp != NULL && (REG_MULTI
+		اگر (nfa_endp != تہی && (REG_MULTI
 			? (rex.lnum != nfa_endp->se_u.pos.lnum
-			    || (int)(rex.input - rex.line)
-						!= nfa_endp->se_u.pos.col)
-			: rex.input != nfa_endp->se_u.ptr))
-		    break;
+			    || (صحیح)(rex.داخلہ - rex.سطر)
+						!= nfa_endp->se_u.pos.ستون)
+			: rex.داخلہ != nfa_endp->se_u.ptr))
+		    توڑو;
 
 		// do not set submatches for \@!
-		if (t->state->c != NFA_END_INVISIBLE_NEG)
+		اگر (t->state->c != NFA_انتہا_INVISIBLE_NEG)
 		{
 		    copy_sub(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		    اگر (rex.nfa_has_zsubexpr)
 			copy_sub(&m->synt, &t->subs.synt);
-#endif
+#اگر_ختم
 		}
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 		fprintf(log_fd, "Match found:\n");
 		log_subsexpr(m);
-#endif
-		nfa_match = TRUE;
+#اگر_ختم
+		nfa_مطابقت = TRUE;
 		// See comment above at "goto nextchar".
-		if (nextlist->n == 0)
+		اگر (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		جاؤ nextchar;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+	    حالت NFA_آغاز_INVISIBLE:
+	    حالت NFA_آغاز_INVISIBLE_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_NEG:
+	    حالت NFA_آغاز_INVISIBLE_NEG_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_پہلا:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_NEG:
+	    حالت NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا:
 		{
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 		    fprintf(log_fd, "Failure chance invisible: %d, what follows: %d\n",
-			    failure_chance(t->state->out, 0),
-			    failure_chance(t->state->out1->out, 0));
-#endif
+			    failure_chance(t->state->برآمد, 0),
+			    failure_chance(t->state->out1->برآمد, 0));
+#اگر_ختم
 		    // Do it directly if there already is a PIM or when
 		    // nfa_postprocess() detected it will work better.
-		    if (t->pim.result != NFA_PIM_UNUSED
-			 || t->state->c == NFA_START_INVISIBLE_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_BEFORE_FIRST
-			 || t->state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
+		    اگر (t->pim.نتیجہ != NFA_PIM_غیر_مستعمل
+			 || t->state->c == NFA_آغاز_INVISIBLE_پہلا
+			 || t->state->c == NFA_آغاز_INVISIBLE_NEG_پہلا
+			 || t->state->c == NFA_آغاز_INVISIBLE_BEFORE_پہلا
+			 || t->state->c == NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا)
 		    {
-			int in_use = m->norm.in_use;
+			صحیح اندر_use = m->norm.اندر_use;
 
 			// Copy submatch info for the recursive call, opposite
 			// of what happens on success below.
 			copy_sub_off(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+			اگر (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&m->synt, &t->subs.synt);
-#endif
+#اگر_ختم
 
 			/*
 			 * First try matching the invisible match, then what
 			 * follows.
 			 */
-			result = recursive_regmatch(t->state, NULL, prog,
+			نتیجہ = recursive_regmatch(t->state, تہی, prog,
 					  submatch, m, &listids, &listids_len);
-			if (result == NFA_TOO_EXPENSIVE)
+			اگر (نتیجہ == NFA_TOO_EXPENSIVE)
 			{
-			    nfa_match = result;
-			    goto theend;
+			    nfa_مطابقت = نتیجہ;
+			    جاؤ theend;
 			}
 
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (t->state->c == NFA_START_INVISIBLE_NEG
-			       || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
+			اگر (نتیجہ != (t->state->c == NFA_آغاز_INVISIBLE_NEG
+			       || t->state->c == NFA_آغاز_INVISIBLE_NEG_پہلا
 			       || t->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_آغاز_INVISIBLE_BEFORE_NEG
 			       || t->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا))
 			{
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&t->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+			    اگر (rex.nfa_has_zsubexpr)
 				copy_sub_off(&t->subs.synt, &m->synt);
-#endif
+#اگر_ختم
 			    // If the pattern has \ze and it matched in the
 			    // sub pattern, use it.
 			    copy_ze_off(&t->subs.norm, &m->norm);
@@ -6165,12 +6165,12 @@ nfa_regmatch(
 			    // t->state->out1 is the corresponding
 			    // END_INVISIBLE node; Add its out to the current
 			    // list (zero-width match).
-			    add_here = TRUE;
-			    add_state = t->state->out1->out;
+			    جوڑو_یہاں = TRUE;
+			    جوڑو_state = t->state->out1->برآمد;
 			}
-			m->norm.in_use = in_use;
+			m->norm.اندر_use = اندر_use;
 		    }
-		    else
+		    ورنہ
 		    {
 			nfa_pim_T pim;
 
@@ -6181,891 +6181,891 @@ nfa_regmatch(
 			 * about the invisible match.
 			 */
 			pim.state = t->state;
-			pim.result = NFA_PIM_TODO;
-			pim.subs.norm.in_use = 0;
-#ifdef FEAT_SYN_HL
-			pim.subs.synt.in_use = 0;
-#endif
-			if (REG_MULTI)
+			pim.نتیجہ = NFA_PIM_TODO;
+			pim.subs.norm.اندر_use = 0;
+#اگر_تعریف_شدہ FEAT_SYN_HL
+			pim.subs.synt.اندر_use = 0;
+#اگر_ختم
+			اگر (REG_MULTI)
 			{
-			    pim.end.pos.col = (int)(rex.input - rex.line);
-			    pim.end.pos.lnum = rex.lnum;
+			    pim.انتہا.pos.ستون = (صحیح)(rex.داخلہ - rex.سطر);
+			    pim.انتہا.pos.lnum = rex.lnum;
 			}
-			else
-			    pim.end.ptr = rex.input;
+			ورنہ
+			    pim.انتہا.ptr = rex.داخلہ;
 
 			// t->state->out1 is the corresponding END_INVISIBLE
 			// node; Add its out to the current list (zero-width
 			// match).
-			if (addstate_here(thislist, t->state->out1->out,
-					     &t->subs, &pim, &listidx) == NULL)
+			اگر (addstate_یہاں(thislist, t->state->out1->برآمد,
+					     &t->subs, &pim, &listidx) == تہی)
 			{
-			    nfa_match = NFA_TOO_EXPENSIVE;
-			    goto theend;
+			    nfa_مطابقت = NFA_TOO_EXPENSIVE;
+			    جاؤ theend;
 			}
 		    }
 		}
-		break;
+		توڑو;
 
-	    case NFA_START_PATTERN:
+	    حالت NFA_آغاز_نمونہ:
 	      {
-		nfa_state_T *skip = NULL;
-#ifdef ENABLE_LOG
-		int	    skip_lid = 0;
-#endif
+		nfa_state_T *skip = تہی;
+#اگر_تعریف_شدہ ENABLE_LOG
+		صحیح	    skip_lid = 0;
+#اگر_ختم
 
 		// There is no point in trying to match the pattern if the
 		// output state is not going to be added to the list.
-		if (state_in_list(nextlist, t->state->out1->out, &t->subs))
+		اگر (state_اندر_list(nextlist, t->state->out1->برآمد, &t->subs))
 		{
-		    skip = t->state->out1->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->برآمد;
+#اگر_تعریف_شدہ ENABLE_LOG
 		    skip_lid = nextlist->id;
-#endif
+#اگر_ختم
 		}
-		else if (state_in_list(nextlist,
-					  t->state->out1->out->out, &t->subs))
+		ورنہ اگر (state_اندر_list(nextlist,
+					  t->state->out1->برآمد->برآمد, &t->subs))
 		{
-		    skip = t->state->out1->out->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->برآمد->برآمد;
+#اگر_تعریف_شدہ ENABLE_LOG
 		    skip_lid = nextlist->id;
-#endif
+#اگر_ختم
 		}
-		else if (state_in_list(thislist,
-					  t->state->out1->out->out, &t->subs))
+		ورنہ اگر (state_اندر_list(thislist,
+					  t->state->out1->برآمد->برآمد, &t->subs))
 		{
-		    skip = t->state->out1->out->out;
-#ifdef ENABLE_LOG
+		    skip = t->state->out1->برآمد->برآمد;
+#اگر_تعریف_شدہ ENABLE_LOG
 		    skip_lid = thislist->id;
-#endif
+#اگر_ختم
 		}
-		if (skip != NULL)
+		اگر (skip != تہی)
 		{
-#ifdef ENABLE_LOG
-		    nfa_set_code(skip->c);
+#اگر_تعریف_شدہ ENABLE_LOG
+		    nfa_سیٹ_رمز(skip->c);
 		    fprintf(log_fd, "> Not trying to match pattern, output state %d is already in list %d. char %d: %s\n",
-			    abs(skip->id), skip_lid, skip->c, code);
-#endif
-		    break;
+			    مطلق_قدر(skip->id), skip_lid, skip->c, رمز);
+#اگر_ختم
+		    توڑو;
 		}
 		// Copy submatch info to the recursive call, opposite of what
 		// happens afterwards.
 		copy_sub_off(&m->norm, &t->subs.norm);
-#ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		اگر (rex.nfa_has_zsubexpr)
 		    copy_sub_off(&m->synt, &t->subs.synt);
-#endif
+#اگر_ختم
 
 		// First try matching the pattern.
-		result = recursive_regmatch(t->state, NULL, prog,
+		نتیجہ = recursive_regmatch(t->state, تہی, prog,
 					  submatch, m, &listids, &listids_len);
-		if (result == NFA_TOO_EXPENSIVE)
+		اگر (نتیجہ == NFA_TOO_EXPENSIVE)
 		{
-		    nfa_match = result;
-		    goto theend;
+		    nfa_مطابقت = نتیجہ;
+		    جاؤ theend;
 		}
-		if (result)
+		اگر (نتیجہ)
 		{
-		    int bytelen;
+		    صحیح bytelen;
 
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN matches:\n");
 		    log_subsexpr(m);
-#endif
+#اگر_ختم
 		    // Copy submatch info from the recursive call
 		    copy_sub_off(&t->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		    اگر (rex.nfa_has_zsubexpr)
 			copy_sub_off(&t->subs.synt, &m->synt);
-#endif
+#اگر_ختم
 		    // Now we need to skip over the matched text and then
 		    // continue with what follows.
-		    if (REG_MULTI)
+		    اگر (REG_MULTI)
 			// TODO: multi-line match
-			bytelen = m->norm.list.multi[0].end_col
-						  - (int)(rex.input - rex.line);
-		    else
-			bytelen = (int)(m->norm.list.line[0].end - rex.input);
+			bytelen = m->norm.list.multi[0].انتہا_ستون
+						  - (صحیح)(rex.داخلہ - rex.سطر);
+		    ورنہ
+			bytelen = (صحیح)(m->norm.list.سطر[0].انتہا - rex.داخلہ);
 
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN length: %d\n", bytelen);
-#endif
-		    if (bytelen == 0)
+#اگر_ختم
+		    اگر (bytelen == 0)
 		    {
 			// empty match, output of corresponding
 			// NFA_END_PATTERN/NFA_SKIP to be used at current
 			// position
-			add_here = TRUE;
-			add_state = t->state->out1->out->out;
+			جوڑو_یہاں = TRUE;
+			جوڑو_state = t->state->out1->برآمد->برآمد;
 		    }
-		    else if (bytelen <= clen)
+		    ورنہ اگر (bytelen <= clen)
 		    {
 			// match current character, output of corresponding
 			// NFA_END_PATTERN to be used at next position.
-			add_state = t->state->out1->out->out;
-			add_off = clen;
+			جوڑو_state = t->state->out1->برآمد->برآمد;
+			جوڑو_off = clen;
 		    }
-		    else
+		    ورنہ
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
-			add_state = t->state->out1->out;
-			add_off = bytelen;
-			add_count = bytelen - clen;
+			جوڑو_state = t->state->out1->برآمد;
+			جوڑو_off = bytelen;
+			جوڑو_گنتی = bytelen - clen;
 		    }
 		}
-		break;
+		توڑو;
 	      }
 
-	    case NFA_BOL:
-		if (rex.input == rex.line)
+	    حالت NFA_BOL:
+		اگر (rex.داخلہ == rex.سطر)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_EOL:
-		if (curc == NUL)
+	    حالت NFA_EOL:
+		اگر (curc == NUL)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_BOW:
-		result = TRUE;
+	    حالت NFA_BOW:
+		نتیجہ = TRUE;
 
-		if (curc == NUL)
-		    result = FALSE;
-		else if (has_mbyte)
+		اگر (curc == NUL)
+		    نتیجہ = FALSE;
+		ورنہ اگر (has_mbyte)
 		{
-		    int this_class;
+		    صحیح this_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    if (this_class <= 1)
-			result = FALSE;
-		    else if (reg_prev_class() == this_class)
-			result = FALSE;
+		    this_class = mb_get_class_buf(rex.داخلہ, rex.reg_buf);
+		    اگر (this_class <= 1)
+			نتیجہ = FALSE;
+		    ورنہ اگر (reg_پچھلا_class() == this_class)
+			نتیجہ = FALSE;
 		}
-		else if (!vim_iswordc_buf(curc, rex.reg_buf)
-			   || (rex.input > rex.line
-			       && vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		ورنہ اگر (!vim_iswordc_buf(curc, rex.reg_buf)
+			   || (rex.داخلہ > rex.سطر
+			       && vim_iswordc_buf(rex.داخلہ[-1], rex.reg_buf)))
+		    نتیجہ = FALSE;
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_EOW:
-		result = TRUE;
-		if (rex.input == rex.line)
-		    result = FALSE;
-		else if (has_mbyte)
+	    حالت NFA_EOW:
+		نتیجہ = TRUE;
+		اگر (rex.داخلہ == rex.سطر)
+		    نتیجہ = FALSE;
+		ورنہ اگر (has_mbyte)
 		{
-		    int this_class, prev_class;
+		    صحیح this_class, پچھلا_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    prev_class = reg_prev_class();
-		    if (this_class == prev_class
-					|| prev_class == 0 || prev_class == 1)
-			result = FALSE;
+		    this_class = mb_get_class_buf(rex.داخلہ, rex.reg_buf);
+		    پچھلا_class = reg_پچھلا_class();
+		    اگر (this_class == پچھلا_class
+					|| پچھلا_class == 0 || پچھلا_class == 1)
+			نتیجہ = FALSE;
 		}
-		else if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		ورنہ اگر (!vim_iswordc_buf(rex.داخلہ[-1], rex.reg_buf)
+			|| (rex.داخلہ[0] != NUL
 					&& vim_iswordc_buf(curc, rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		    نتیجہ = FALSE;
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_BOF:
-		if (rex.lnum == 0 && rex.input == rex.line
+	    حالت NFA_BOF:
+		اگر (rex.lnum == 0 && rex.داخلہ == rex.سطر
 				     && (!REG_MULTI || rex.reg_firstlnum == 1))
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_EOF:
-		if (rex.lnum == rex.reg_maxline && curc == NUL)
+	    حالت NFA_EOF:
+		اگر (rex.lnum == rex.reg_maxline && curc == NUL)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_COMPOSING:
+	    حالت NFA_COMPOSING:
 	    {
-		nfa_state_T *end;
+		nfa_state_T *انتہا;
 
-		result = match_composing(t->state->out, curc, clen);
+		نتیجہ = مطابقت_composing(t->state->برآمد, curc, clen);
 
-		end = t->state->out1;	    // NFA_END_COMPOSING
-		ADD_STATE_IF_MATCH(end);
-		break;
+		انتہا = t->state->out1;	    // NFA_END_COMPOSING
+		جوڑو_STATE_IF_مطابقت(انتہا);
+		توڑو;
 	    }
 
-	    case NFA_NEWL:
-		if (curc == NUL && !rex.reg_line_lbr && REG_MULTI
+	    حالت NFA_NEWL:
+		اگر (curc == NUL && !rex.reg_سطر_lbr && REG_MULTI
 						&& rex.lnum <= rex.reg_maxline)
 		{
-		    go_to_nextline = TRUE;
+		    go_مقصد_nextline = TRUE;
 		    // Pass -1 for the offset, which means taking the position
 		    // at the start of the next line.
-		    add_state = t->state->out;
-		    add_off = -1;
+		    جوڑو_state = t->state->برآمد;
+		    جوڑو_off = -1;
 		}
-		else if (curc == '\n' && rex.reg_line_lbr)
+		ورنہ اگر (curc == '\n' && rex.reg_سطر_lbr)
 		{
 		    // match \n as if it is an ordinary character
-		    add_state = t->state->out;
-		    add_off = 1;
+		    جوڑو_state = t->state->برآمد;
+		    جوڑو_off = 1;
 		}
-		break;
+		توڑو;
 
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    حالت NFA_آغاز_COLL:
+	    حالت NFA_آغاز_NEG_COLL:
 	      {
 		// What follows is a list of characters, until NFA_END_COLL.
 		// One of them must match or none of them must match.
 		nfa_state_T	*state;
-		int		result_if_matched;
-		int		c1, c2;
+		صحیح		نتیجہ_if_matched;
+		صحیح		c1, c2;
 
 		// Never match EOL. If it's part of the collection it is added
 		// as a separate state with an OR.
-		if (curc == NUL)
-		    break;
+		اگر (curc == NUL)
+		    توڑو;
 
-		state = t->state->out;
-		result_if_matched = (t->state->c == NFA_START_COLL);
-		for (;;)
+		state = t->state->برآمد;
+		نتیجہ_if_matched = (t->state->c == NFA_آغاز_COLL);
+		برائے (;;)
 		{
-		    if (state->c == NFA_COMPOSING)
+		    اگر (state->c == NFA_COMPOSING)
 		    {
-			nfa_state_T *end;
+			nfa_state_T *انتہا;
 
-			result = match_composing(t->state->out->out, curc,
+			نتیجہ = مطابقت_composing(t->state->برآمد->برآمد, curc,
 									clen);
 
-			if (t->state->out->out1 != NULL
-				&& t->state->out->out1->c == NFA_END_COMPOSING)
+			اگر (t->state->برآمد->out1 != تہی
+				&& t->state->برآمد->out1->c == NFA_انتہا_COMPOSING)
 			{
-			    end = t->state->out->out1;
-			    ADD_STATE_IF_MATCH(end);
+			    انتہا = t->state->برآمد->out1;
+			    جوڑو_STATE_IF_مطابقت(انتہا);
 			}
-			break;
+			توڑو;
 		    }
-		    if (state->c == NFA_END_COLL)
+		    اگر (state->c == NFA_انتہا_COLL)
 		    {
-			result = !result_if_matched;
-			break;
+			نتیجہ = !نتیجہ_if_matched;
+			توڑو;
 		    }
-		    if (state->c == NFA_RANGE_MIN)
+		    اگر (state->c == NFA_RANGE_MIN)
 		    {
 			c1 = state->val;
-			state = state->out; // advance to NFA_RANGE_MAX
+			state = state->برآمد; // advance to NFA_RANGE_MAX
 			c2 = state->val;
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 			fprintf(log_fd, "NFA_RANGE_MIN curc=%d c1=%d c2=%d\n",
 				curc, c1, c2);
-#endif
-			if (curc >= c1 && curc <= c2)
+#اگر_ختم
+			اگر (curc >= c1 && curc <= c2)
 			{
-			    result = result_if_matched;
-			    break;
+			    نتیجہ = نتیجہ_if_matched;
+			    توڑو;
 			}
-			if (rex.reg_ic)
+			اگر (rex.reg_ic)
 			{
-			    int curc_low = MB_CASEFOLD(curc);
-			    int done = FALSE;
+			    صحیح curc_کم = MB_CASEFOLD(curc);
+			    صحیح مکمل = FALSE;
 
-			    for ( ; c1 <= c2; ++c1)
-				if (MB_CASEFOLD(c1) == curc_low)
+			    برائے ( ; c1 <= c2; ++c1)
+				اگر (MB_CASEFOLD(c1) == curc_کم)
 				{
-				    result = result_if_matched;
-				    done = TRUE;
-				    break;
+				    نتیجہ = نتیجہ_if_matched;
+				    مکمل = TRUE;
+				    توڑو;
 				}
-			    if (done)
-				break;
+			    اگر (مکمل)
+				توڑو;
 			}
 		    }
-		    else if (state->c < 0 ? check_char_class(state->c, curc)
+		    ورنہ اگر (state->c < 0 ? check_char_class(state->c, curc)
 			       : (curc == state->c
 				   || (rex.reg_ic && MB_CASEFOLD(curc)
 						    == MB_CASEFOLD(state->c))))
 		    {
-			result = result_if_matched;
-			break;
+			نتیجہ = نتیجہ_if_matched;
+			توڑو;
 		    }
-		    state = state->out;
+		    state = state->برآمد;
 		}
-		if (result)
+		اگر (نتیجہ)
 		{
 		    // next state is in out of the NFA_END_COLL, out1 of
 		    // START points to the END state
-		    add_state = t->state->out1->out;
-		    add_off = clen;
+		    جوڑو_state = t->state->out1->برآمد;
+		    جوڑو_off = clen;
 		}
-		break;
+		توڑو;
 	      }
 
-	    case NFA_ANY:
+	    حالت NFA_ANY:
 		// Any char except '\0', (end of input) does not match.
-		if (curc > 0)
+		اگر (curc > 0)
 		{
-		    add_state = t->state->out;
-		    add_off = clen;
+		    جوڑو_state = t->state->برآمد;
+		    جوڑو_off = clen;
 		}
-		break;
+		توڑو;
 
-	    case NFA_ANY_COMPOSING:
+	    حالت NFA_ANY_COMPOSING:
 		// On a composing character skip over it.  Otherwise do
 		// nothing.  Always matches.
-		if (enc_utf8 && utf_iscomposing(curc))
+		اگر (enc_utf8 && utf_iscomposing(curc))
 		{
-		    add_off = clen;
+		    جوڑو_off = clen;
 		}
-		else
+		ورنہ
 		{
-		    add_here = TRUE;
-		    add_off = 0;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_off = 0;
 		}
-		add_state = t->state->out;
-		break;
+		جوڑو_state = t->state->برآمد;
+		توڑو;
 
 	    /*
 	     * Character classes like \a for alpha, \d for digit etc.
 	     */
-	    case NFA_IDENT:	//  \i
-		result = vim_isIDc(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_IDENT:	//  \i
+		نتیجہ = vim_isIDc(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_SIDENT:	//  \I
-		result = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_SIDENT:	//  \I
+		نتیجہ = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_KWORD:	//  \k
-		result = vim_iswordp_buf(rex.input, rex.reg_buf);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_KWORD:	//  \k
+		نتیجہ = vim_iswordp_buf(rex.داخلہ, rex.reg_buf);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_SKWORD:	//  \K
-		result = !VIM_ISDIGIT(curc)
-				     && vim_iswordp_buf(rex.input, rex.reg_buf);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_SKWORD:	//  \K
+		نتیجہ = !VIM_ISDIGIT(curc)
+				     && vim_iswordp_buf(rex.داخلہ, rex.reg_buf);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_FNAME:	//  \f
-		result = vim_isfilec(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_FNAME:	//  \f
+		نتیجہ = vim_isfilec(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_SFNAME:	//  \F
-		result = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_SFNAME:	//  \F
+		نتیجہ = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_PRINT:	//  \p
-		result = vim_isprintc(PTR2CHAR(rex.input));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_PRINT:	//  \p
+		نتیجہ = vim_isprintc(PTR2CHAR(rex.داخلہ));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_SPRINT:	//  \P
-		result = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.input));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_SPRINT:	//  \P
+		نتیجہ = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.داخلہ));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_WHITE:	//  \s
-		result = VIM_ISWHITE(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_WHITE:	//  \s
+		نتیجہ = VIM_ISWHITE(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NWHITE:	//  \S
-		result = curc != NUL && !VIM_ISWHITE(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NWHITE:	//  \S
+		نتیجہ = curc != NUL && !VIM_ISWHITE(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_DIGIT:	//  \d
-		result = ri_digit(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_DIGIT:	//  \d
+		نتیجہ = ri_digit(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NDIGIT:	//  \D
-		result = curc != NUL && !ri_digit(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NDIGIT:	//  \D
+		نتیجہ = curc != NUL && !ri_digit(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_HEX:	//  \x
-		result = ri_hex(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_HEX:	//  \x
+		نتیجہ = ri_hex(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NHEX:	//  \X
-		result = curc != NUL && !ri_hex(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NHEX:	//  \X
+		نتیجہ = curc != NUL && !ri_hex(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_OCTAL:	//  \o
-		result = ri_octal(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_OCTAL:	//  \o
+		نتیجہ = ri_octal(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NOCTAL:	//  \O
-		result = curc != NUL && !ri_octal(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NOCTAL:	//  \O
+		نتیجہ = curc != NUL && !ri_octal(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_WORD:	//  \w
-		result = ri_word(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_لفظ:	//  \w
+		نتیجہ = ri_لفظ(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NWORD:	//  \W
-		result = curc != NUL && !ri_word(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NWORD:	//  \W
+		نتیجہ = curc != NUL && !ri_لفظ(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_HEAD:	//  \h
-		result = ri_head(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_سر:	//  \h
+		نتیجہ = ri_سر(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NHEAD:	//  \H
-		result = curc != NUL && !ri_head(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NHEAD:	//  \H
+		نتیجہ = curc != NUL && !ri_سر(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_ALPHA:	//  \a
-		result = ri_alpha(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_ALPHA:	//  \a
+		نتیجہ = ri_alpha(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NALPHA:	//  \A
-		result = curc != NUL && !ri_alpha(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NALPHA:	//  \A
+		نتیجہ = curc != NUL && !ri_alpha(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_LOWER:	//  \l
-		result = ri_lower(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_زیریں:	//  \l
+		نتیجہ = ri_زیریں(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NLOWER:	//  \L
-		result = curc != NUL && !ri_lower(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NLOWER:	//  \L
+		نتیجہ = curc != NUL && !ri_زیریں(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_UPPER:	//  \u
-		result = ri_upper(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_بالائی:	//  \u
+		نتیجہ = ri_بالائی(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NUPPER:	// \U
-		result = curc != NUL && !ri_upper(curc);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NUPPER:	// \U
+		نتیجہ = curc != NUL && !ri_بالائی(curc);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_LOWER_IC:	// [a-z]
-		result = ri_lower(curc) || (rex.reg_ic && ri_upper(curc));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_زیریں_IC:	// [a-z]
+		نتیجہ = ri_زیریں(curc) || (rex.reg_ic && ri_بالائی(curc));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NLOWER_IC:	// [^a-z]
-		result = curc != NUL
-			&& !(ri_lower(curc) || (rex.reg_ic && ri_upper(curc)));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NLOWER_IC:	// [^a-z]
+		نتیجہ = curc != NUL
+			&& !(ri_زیریں(curc) || (rex.reg_ic && ri_بالائی(curc)));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_UPPER_IC:	// [A-Z]
-		result = ri_upper(curc) || (rex.reg_ic && ri_lower(curc));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_بالائی_IC:	// [A-Z]
+		نتیجہ = ri_بالائی(curc) || (rex.reg_ic && ri_زیریں(curc));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_NUPPER_IC:	// ^[A-Z]
-		result = curc != NUL
-			&& !(ri_upper(curc) || (rex.reg_ic && ri_lower(curc)));
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+	    حالت NFA_NUPPER_IC:	// ^[A-Z]
+		نتیجہ = curc != NUL
+			&& !(ri_بالائی(curc) || (rex.reg_ic && ri_زیریں(curc)));
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
-#endif
+	    حالت NFA_BACKREF1:
+	    حالت NFA_BACKREF2:
+	    حالت NFA_BACKREF3:
+	    حالت NFA_BACKREF4:
+	    حالت NFA_BACKREF5:
+	    حالت NFA_BACKREF6:
+	    حالت NFA_BACKREF7:
+	    حالت NFA_BACKREF8:
+	    حالت NFA_BACKREF9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZREF1:
+	    حالت NFA_ZREF2:
+	    حالت NFA_ZREF3:
+	    حالت NFA_ZREF4:
+	    حالت NFA_ZREF5:
+	    حالت NFA_ZREF6:
+	    حالت NFA_ZREF7:
+	    حالت NFA_ZREF8:
+	    حالت NFA_ZREF9:
+#اگر_ختم
 		// \1 .. \9  \z1 .. \z9
 	      {
-		int subidx;
-		int bytelen;
+		صحیح subidx;
+		صحیح bytelen;
 
-#ifdef FEAT_SYN_HL
-		if (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
-#endif
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		اگر (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
+#اگر_ختم
 		{
 		    subidx = t->state->c - NFA_BACKREF1 + 1;
-		    result = match_backref(&t->subs.norm, subidx, &bytelen);
+		    نتیجہ = مطابقت_backref(&t->subs.norm, subidx, &bytelen);
 		}
-#ifdef FEAT_SYN_HL
-		else
+#اگر_تعریف_شدہ FEAT_SYN_HL
+		ورنہ
 		{
 		    subidx = t->state->c - NFA_ZREF1 + 1;
-		    result = match_zref(subidx, &bytelen);
+		    نتیجہ = مطابقت_zref(subidx, &bytelen);
 		}
-#endif
+#اگر_ختم
 
-		if (result)
+		اگر (نتیجہ)
 		{
-		    if (bytelen == 0)
+		    اگر (bytelen == 0)
 		    {
 			// empty match always works, output of NFA_SKIP to be
 			// used next
-			add_here = TRUE;
-			add_state = t->state->out->out;
+			جوڑو_یہاں = TRUE;
+			جوڑو_state = t->state->برآمد->برآمد;
 		    }
-		    else if (bytelen <= clen)
+		    ورنہ اگر (bytelen <= clen)
 		    {
 			// match current character, jump ahead to out of
 			// NFA_SKIP
-			add_state = t->state->out->out;
-			add_off = clen;
+			جوڑو_state = t->state->برآمد->برآمد;
+			جوڑو_off = clen;
 		    }
-		    else
+		    ورنہ
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
-			add_state = t->state->out;
-			add_off = bytelen;
-			add_count = bytelen - clen;
+			جوڑو_state = t->state->برآمد;
+			جوڑو_off = bytelen;
+			جوڑو_گنتی = bytelen - clen;
 		    }
 		}
-		break;
+		توڑو;
 	      }
-	    case NFA_SKIP:
+	    حالت NFA_SKIP:
 	      // character of previous matching \1 .. \9  or \@>
-	      if (t->count - clen <= 0)
+	      اگر (t->گنتی - clen <= 0)
 	      {
 		  // end of match, go to what follows
-		  add_state = t->state->out;
-		  add_off = clen;
+		  جوڑو_state = t->state->برآمد;
+		  جوڑو_off = clen;
 	      }
-	      else
+	      ورنہ
 	      {
 		  // add state again with decremented count
-		  add_state = t->state;
-		  add_off = 0;
-		  add_count = t->count - clen;
+		  جوڑو_state = t->state;
+		  جوڑو_off = 0;
+		  جوڑو_گنتی = t->گنتی - clen;
 	      }
-	      break;
+	      توڑو;
 
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-		result = (REG_MULTI &&
-			nfa_re_num_cmp(t->state->val, t->state->c - NFA_LNUM,
+	    حالت NFA_LNUM:
+	    حالت NFA_LNUM_GT:
+	    حالت NFA_LNUM_LT:
+		نتیجہ = (REG_MULTI &&
+			nfa_re_عدد_cmp(t->state->val, t->state->c - NFA_LNUM,
 			    (long_u)(rex.lnum + rex.reg_firstlnum)));
-		if (result)
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-		result = nfa_re_num_cmp(t->state->val, t->state->c - NFA_COL,
-			(long_u)(rex.input - rex.line) + 1);
-		if (result)
+	    حالت NFA_ستون:
+	    حالت NFA_ستون_GT:
+	    حالت NFA_ستون_LT:
+		نتیجہ = nfa_re_عدد_cmp(t->state->val, t->state->c - NFA_ستون,
+			(long_u)(rex.داخلہ - rex.سطر) + 1);
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
+	    حالت NFA_VCOL:
+	    حالت NFA_VCOL_GT:
+	    حالت NFA_VCOL_LT:
 		{
-		    int     op = t->state->c - NFA_VCOL;
-		    colnr_T col = (colnr_T)(rex.input - rex.line);
-		    win_T   *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		    صحیح     op = t->state->c - NFA_VCOL;
+		    colnr_T ستون = (colnr_T)(rex.داخلہ - rex.سطر);
+		    win_T   *wp = rex.reg_win == تہی ? curwin : rex.reg_win;
 
 		    // Bail out quickly when there can't be a match, avoid the
 		    // overhead of win_linetabsize() on long lines.
-		    if (op != 1 && col > t->state->val
+		    اگر (op != 1 && ستون > t->state->val
 			    * (has_mbyte ? MB_MAXBYTES : 1))
-			break;
-		    result = FALSE;
-		    if (op == 1 && col - 1 > t->state->val && col > 100)
+			توڑو;
+		    نتیجہ = FALSE;
+		    اگر (op == 1 && ستون - 1 > t->state->val && ستون > 100)
 		    {
-			int ts = wp->w_buffer->b_p_ts;
+			صحیح ts = wp->w_بفر->b_p_ts;
 
 			// Guess that a character won't use more columns than
 			// 'tabstop', with a minimum of 4.
-			if (ts < 4)
+			اگر (ts < 4)
 			    ts = 4;
-			result = col > t->state->val * ts;
+			نتیجہ = ستون > t->state->val * ts;
 		    }
-		    if (!result)
+		    اگر (!نتیجہ)
 		    {
 			linenr_T    lnum = REG_MULTI
 					    ? rex.reg_firstlnum + rex.lnum : 1;
 			long_u	    vcol;
 
-			if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+			اگر (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_بفر->b_ml.ml_سطر_گنتی))
 			    lnum = 1;
-			vcol = (long_u)win_linetabsize(wp, lnum, rex.line, col);
-			result = nfa_re_num_cmp(t->state->val, op, vcol + 1);
+			vcol = (long_u)win_linetabsize(wp, lnum, rex.سطر, ستون);
+			نتیجہ = nfa_re_عدد_cmp(t->state->val, op, vcol + 1);
 		    }
-		    if (result)
+		    اگر (نتیجہ)
 		    {
-			add_here = TRUE;
-			add_state = t->state->out;
+			جوڑو_یہاں = TRUE;
+			جوڑو_state = t->state->برآمد;
 		    }
 		}
-		break;
+		توڑو;
 
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    حالت NFA_MARK:
+	    حالت NFA_MARK_GT:
+	    حالت NFA_MARK_LT:
 	      {
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	ستون = REG_MULTI ? rex.داخلہ - rex.سطر : 0;
 
 		pos = getmark_buf(rex.reg_buf, t->state->val, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		اگر (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.سطر = reg_getline(rex.lnum);
+		    rex.داخلہ = rex.سطر + ستون;
 		}
 
 		// Compare the mark position to the match position, if the mark
 		// exists and mark is set in reg_buf.
-		if (pos != NULL && pos->lnum > 0)
+		اگر (pos != تہی && pos->lnum > 0)
 		{
-		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
-							  && pos->col == MAXCOL
+		    colnr_T pos_ستون = pos->lnum == rex.lnum + rex.reg_firstlnum
+							  && pos->ستون == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
-				      : pos->col;
+				      : pos->ستون;
 
-		    result = (pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    نتیجہ = (pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_ستون == (colnr_T)(rex.داخلہ - rex.سطر)
 				    ? t->state->c == NFA_MARK
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_ستون < (colnr_T)(rex.داخلہ - rex.سطر)
 					? t->state->c == NFA_MARK_GT
 					: t->state->c == NFA_MARK_LT))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? t->state->c == NFA_MARK_GT
 				    : t->state->c == NFA_MARK_LT));
-		    if (result)
+		    اگر (نتیجہ)
 		    {
-			add_here = TRUE;
-			add_state = t->state->out;
+			جوڑو_یہاں = TRUE;
+			جوڑو_state = t->state->برآمد;
 		    }
 		}
-		break;
+		توڑو;
 	      }
 
-	    case NFA_CURSOR:
-		result = (rex.reg_win != NULL
+	    حالت NFA_CURSOR:
+		نتیجہ = (rex.reg_win != تہی
 			&& (rex.lnum + rex.reg_firstlnum
 						 == rex.reg_win->w_cursor.lnum)
-			&& ((colnr_T)(rex.input - rex.line)
-						== rex.reg_win->w_cursor.col));
-		if (result)
+			&& ((colnr_T)(rex.داخلہ - rex.سطر)
+						== rex.reg_win->w_cursor.ستون));
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_VISUAL:
-		result = reg_match_visual();
-		if (result)
+	    حالت NFA_VISUAL:
+		نتیجہ = reg_مطابقت_visual();
+		اگر (نتیجہ)
 		{
-		    add_here = TRUE;
-		    add_state = t->state->out;
+		    جوڑو_یہاں = TRUE;
+		    جوڑو_state = t->state->برآمد;
 		}
-		break;
+		توڑو;
 
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-#ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-#endif
-	    case NFA_NOPEN:
-	    case NFA_ZSTART:
+	    حالت NFA_MOPEN1:
+	    حالت NFA_MOPEN2:
+	    حالت NFA_MOPEN3:
+	    حالت NFA_MOPEN4:
+	    حالت NFA_MOPEN5:
+	    حالت NFA_MOPEN6:
+	    حالت NFA_MOPEN7:
+	    حالت NFA_MOPEN8:
+	    حالت NFA_MOPEN9:
+#اگر_تعریف_شدہ FEAT_SYN_HL
+	    حالت NFA_ZOPEN:
+	    حالت NFA_ZOPEN1:
+	    حالت NFA_ZOPEN2:
+	    حالت NFA_ZOPEN3:
+	    حالت NFA_ZOPEN4:
+	    حالت NFA_ZOPEN5:
+	    حالت NFA_ZOPEN6:
+	    حالت NFA_ZOPEN7:
+	    حالت NFA_ZOPEN8:
+	    حالت NFA_ZOPEN9:
+#اگر_ختم
+	    حالت NFA_NOPEN:
+	    حالت NFA_ZSTART:
 		// These states are only added to be able to bail out when
 		// they are added again, nothing is to be done.
-		break;
+		توڑو;
 
-	    default:	// regular character
+	    طےشدہ:	// regular character
 	      {
-		int c = t->state->c;
+		صحیح c = t->state->c;
 
-#ifdef DEBUG
-		if (c < 0)
-		    siemsg("Negative state char: %ld", (long)c);
-#endif
-		result = (c == curc);
+#اگر_تعریف_شدہ DEBUG
+		اگر (c < 0)
+		    siemsg("Negative state char: %ld", (طویل)c);
+#اگر_ختم
+		نتیجہ = (c == curc);
 
-		if (!result && rex.reg_ic)
-		    result = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
+		اگر (!نتیجہ && rex.reg_ic)
+		    نتیجہ = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
 		// If rex.reg_icombine is not set only skip over the character
 		// itself.  When it is set skip over composing characters.
-		if (result && enc_utf8 && !rex.reg_icombine)
-		    clen = utf_ptr2len(rex.input);
-		ADD_STATE_IF_MATCH(t->state);
-		break;
+		اگر (نتیجہ && enc_utf8 && !rex.reg_icombine)
+		    clen = utf_ptr2len(rex.داخلہ);
+		جوڑو_STATE_IF_مطابقت(t->state);
+		توڑو;
 	      }
 
 	    } // switch (t->state->c)
 
-	    if (add_state != NULL)
+	    اگر (جوڑو_state != تہی)
 	    {
 		nfa_pim_T *pim;
 		nfa_pim_T pim_copy;
 
-		if (t->pim.result == NFA_PIM_UNUSED)
-		    pim = NULL;
-		else
+		اگر (t->pim.نتیجہ == NFA_PIM_غیر_مستعمل)
+		    pim = تہی;
+		ورنہ
 		    pim = &t->pim;
 
 		// Handle the postponed invisible match if the match might end
 		// without advancing and before the end of the line.
-		if (pim != NULL && (clen == 0 || match_follows(add_state, 0)))
+		اگر (pim != تہی && (clen == 0 || مطابقت_follows(جوڑو_state, 0)))
 		{
-		    if (pim->result == NFA_PIM_TODO)
+		    اگر (pim->نتیجہ == NFA_PIM_TODO)
 		    {
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 			fprintf(log_fd, "\n");
 			fprintf(log_fd, "==================================\n");
 			fprintf(log_fd, "Postponed recursive nfa_regmatch()\n");
 			fprintf(log_fd, "\n");
-#endif
-			result = recursive_regmatch(pim->state, pim,
+#اگر_ختم
+			نتیجہ = recursive_regmatch(pim->state, pim,
 				    prog, submatch, m, &listids, &listids_len);
-			pim->result = result ? NFA_PIM_MATCH : NFA_PIM_NOMATCH;
+			pim->نتیجہ = نتیجہ ? NFA_PIM_مطابقت : NFA_PIM_NOMATCH;
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
-			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
+			اگر (نتیجہ != (pim->state->c == NFA_آغاز_INVISIBLE_NEG
+			     || pim->state->c == NFA_آغاز_INVISIBLE_NEG_پہلا
 			     || pim->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_آغاز_INVISIBLE_BEFORE_NEG
 			     || pim->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا))
 			{
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&pim->subs.norm, &m->norm);
-#ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+			    اگر (rex.nfa_has_zsubexpr)
 				copy_sub_off(&pim->subs.synt, &m->synt);
-#endif
+#اگر_ختم
 			}
 		    }
-		    else
+		    ورنہ
 		    {
-			result = (pim->result == NFA_PIM_MATCH);
-#ifdef ENABLE_LOG
+			نتیجہ = (pim->نتیجہ == NFA_PIM_مطابقت);
+#اگر_تعریف_شدہ ENABLE_LOG
 			fprintf(log_fd, "\n");
-			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->result);
-			fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : "FALSE");
+			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->نتیجہ);
+			fprintf(log_fd, "MATCH = %s\n", نتیجہ == TRUE ? "OK" : "FALSE");
 			fprintf(log_fd, "\n");
-#endif
+#اگر_ختم
 		    }
 
 		    // for \@! and \@<! it is a match when result is FALSE
-		    if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
-			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
+		    اگر (نتیجہ != (pim->state->c == NFA_آغاز_INVISIBLE_NEG
+			     || pim->state->c == NFA_آغاز_INVISIBLE_NEG_پہلا
 			     || pim->state->c
-					   == NFA_START_INVISIBLE_BEFORE_NEG
+					   == NFA_آغاز_INVISIBLE_BEFORE_NEG
 			     || pim->state->c
-				     == NFA_START_INVISIBLE_BEFORE_NEG_FIRST))
+				     == NFA_آغاز_INVISIBLE_BEFORE_NEG_پہلا))
 		    {
 			// Copy submatch info from the recursive call
 			copy_sub_off(&t->subs.norm, &pim->subs.norm);
-#ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+#اگر_تعریف_شدہ FEAT_SYN_HL
+			اگر (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&t->subs.synt, &pim->subs.synt);
-#endif
+#اگر_ختم
 		    }
-		    else
+		    ورنہ
 			// look-behind match failed, don't add the state
-			continue;
+			جاری;
 
 		    // Postponed invisible match was handled, don't add it to
 		    // following states.
-		    pim = NULL;
+		    pim = تہی;
 		}
 
 		// If "pim" points into l->t it will become invalid when
 		// adding the state causes the list to be reallocated.  Make a
 		// local copy to avoid that.
-		if (pim == &t->pim)
+		اگر (pim == &t->pim)
 		{
 		    copy_pim(&pim_copy, pim);
 		    pim = &pim_copy;
 		}
 
-		if (add_here)
-		    r = addstate_here(thislist, add_state, &t->subs,
+		اگر (جوڑو_یہاں)
+		    r = addstate_یہاں(thislist, جوڑو_state, &t->subs,
 								pim, &listidx);
-		else
+		ورنہ
 		{
-		    r = addstate(nextlist, add_state, &t->subs, pim, add_off, 0);
-		    if (add_count > 0)
-			nextlist->t[nextlist->n - 1].count = add_count;
+		    r = addstate(nextlist, جوڑو_state, &t->subs, pim, جوڑو_off, 0);
+		    اگر (جوڑو_گنتی > 0)
+			nextlist->t[nextlist->n - 1].گنتی = جوڑو_گنتی;
 		}
-		if (r == NULL)
+		اگر (r == تہی)
 		{
-		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    nfa_مطابقت = NFA_TOO_EXPENSIVE;
+		    جاؤ theend;
 		}
 	    }
 
@@ -7079,312 +7079,312 @@ nfa_regmatch(
 	// because recursive calls should only start in the first position.
 	// Unless "nfa_endp" is not NULL, then we match the end position.
 	// Also don't start a match past the first line.
-	if (nfa_match == FALSE
+	اگر (nfa_مطابقت == FALSE
 		&& ((toplevel
 			&& rex.lnum == 0
 			&& clen != 0
 			&& (rex.reg_maxcol == 0
-			  || (colnr_T)(rex.input - rex.line) < rex.reg_maxcol))
-		    || (nfa_endp != NULL
+			  || (colnr_T)(rex.داخلہ - rex.سطر) < rex.reg_maxcol))
+		    || (nfa_endp != تہی
 			&& (REG_MULTI
 			    ? (rex.lnum < nfa_endp->se_u.pos.lnum
 			       || (rex.lnum == nfa_endp->se_u.pos.lnum
-				   && (int)(rex.input - rex.line)
-						    < nfa_endp->se_u.pos.col))
-			    : rex.input < nfa_endp->se_u.ptr))))
+				   && (صحیح)(rex.داخلہ - rex.سطر)
+						    < nfa_endp->se_u.pos.ستون))
+			    : rex.داخلہ < nfa_endp->se_u.ptr))))
 	{
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 	    fprintf(log_fd, "(---) STARTSTATE\n");
-#endif
+#اگر_ختم
 	    // Inline optimized code for addstate() if we know the state is
 	    // the first MOPEN.
-	    if (toplevel)
+	    اگر (toplevel)
 	    {
-		int add = TRUE;
-		int c;
+		صحیح جوڑو = TRUE;
+		صحیح c;
 
-		if (prog->regstart != NUL && clen != 0)
+		اگر (prog->regstart != NUL && clen != 0)
 		{
-		    if (nextlist->n == 0)
+		    اگر (nextlist->n == 0)
 		    {
-			colnr_T col = (colnr_T)(rex.input - rex.line) + clen;
+			colnr_T ستون = (colnr_T)(rex.داخلہ - rex.سطر) + clen;
 
 			// Nextlist is empty, we can skip ahead to the
 			// character that must appear at the start.
-			if (skip_to_start(prog->regstart, &col) == FAIL)
-			    break;
-#ifdef ENABLE_LOG
+			اگر (skip_مقصد_آغاز(prog->regstart, &ستون) == FAIL)
+			    توڑو;
+#اگر_تعریف_شدہ ENABLE_LOG
 			fprintf(log_fd, "  Skipping ahead %d bytes to regstart\n",
-				col - ((colnr_T)(rex.input - rex.line) + clen));
-#endif
-			rex.input = rex.line + col - clen;
+				ستون - ((colnr_T)(rex.داخلہ - rex.سطر) + clen));
+#اگر_ختم
+			rex.داخلہ = rex.سطر + ستون - clen;
 		    }
-		    else
+		    ورنہ
 		    {
 			// Checking if the required start character matches is
 			// cheaper than adding a state that won't match.
-			c = PTR2CHAR(rex.input + clen);
-			if (c != prog->regstart && (!rex.reg_ic
+			c = PTR2CHAR(rex.داخلہ + clen);
+			اگر (c != prog->regstart && (!rex.reg_ic
 			     || MB_CASEFOLD(c) != MB_CASEFOLD(prog->regstart)))
 			{
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 			    fprintf(log_fd, "  Skipping start state, regstart does not match\n");
-#endif
-			    add = FALSE;
+#اگر_ختم
+			    جوڑو = FALSE;
 			}
 		    }
 		}
 
-		if (add)
+		اگر (جوڑو)
 		{
-		    if (REG_MULTI)
+		    اگر (REG_MULTI)
 		    {
-			m->norm.list.multi[0].start_col =
-					 (colnr_T)(rex.input - rex.line) + clen;
-			m->norm.orig_start_col =
-					       m->norm.list.multi[0].start_col;
+			m->norm.list.multi[0].آغاز_ستون =
+					 (colnr_T)(rex.داخلہ - rex.سطر) + clen;
+			m->norm.orig_آغاز_ستون =
+					       m->norm.list.multi[0].آغاز_ستون;
 		    }
-		    else
-			m->norm.list.line[0].start = rex.input + clen;
-		    if (addstate(nextlist, start->out, m, NULL, clen, 0) == NULL)
+		    ورنہ
+			m->norm.list.سطر[0].آغاز = rex.داخلہ + clen;
+		    اگر (addstate(nextlist, آغاز->برآمد, m, تہی, clen, 0) == تہی)
 		    {
-			nfa_match = NFA_TOO_EXPENSIVE;
-			goto theend;
+			nfa_مطابقت = NFA_TOO_EXPENSIVE;
+			جاؤ theend;
 		    }
 		}
 	    }
-	    else
+	    ورنہ
 	    {
-		char_u	    *save_line = rex.line;
-		char_u	    *save_input = rex.input;
+		char_u	    *save_سطر = rex.سطر;
+		char_u	    *save_داخلہ = rex.داخلہ;
 		linenr_T    save_lnum = rex.lnum;
 
 		// At the end of a line the match can only start on the next
 		// line, use that position instead of the line break.
-		if (REG_MULTI && clen == 0 && nfa_endp != NULL
+		اگر (REG_MULTI && clen == 0 && nfa_endp != تہی
 					 && rex.lnum < nfa_endp->se_u.pos.lnum)
 		{
-		    char_u  *next_line = reg_getline(rex.lnum + 1);
+		    char_u  *اگلا_سطر = reg_getline(rex.lnum + 1);
 
-		    if (next_line != NULL)
+		    اگر (اگلا_سطر != تہی)
 		    {
-			rex.line = next_line;
-			rex.input = rex.line;
+			rex.سطر = اگلا_سطر;
+			rex.داخلہ = rex.سطر;
 			++rex.lnum;
 		    }
 		}
 
-		r = addstate(nextlist, start, m, NULL, clen, 0);
+		r = addstate(nextlist, آغاز, m, تہی, clen, 0);
 
-		rex.line = save_line;
-		rex.input = save_input;
+		rex.سطر = save_سطر;
+		rex.داخلہ = save_داخلہ;
 		rex.lnum = save_lnum;
 
-		if (r == NULL)
+		اگر (r == تہی)
 		{
-		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    nfa_مطابقت = NFA_TOO_EXPENSIVE;
+		    جاؤ theend;
 		}
 	    }
 	}
 
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
 	fprintf(log_fd, ">>> Thislist had %d states available: ", thislist->n);
 	{
-	    int i;
+	    صحیح i;
 
-	    for (i = 0; i < thislist->n; i++)
-		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
+	    برائے (i = 0; i < thislist->n; i++)
+		fprintf(log_fd, "%d  ", مطلق_قدر(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
-#endif
+#اگر_ختم
 
 nextchar:
 	// Advance to the next character, or advance to the next line, or
 	// finish.
-	if (clen != 0)
-	    rex.input += clen;
-	else if (go_to_nextline || (nfa_endp != NULL && REG_MULTI
+	اگر (clen != 0)
+	    rex.داخلہ += clen;
+	ورنہ اگر (go_مقصد_nextline || (nfa_endp != تہی && REG_MULTI
 					&& rex.lnum < nfa_endp->se_u.pos.lnum))
 	    reg_nextline();
-	else
-	    break;
+	ورنہ
+	    توڑو;
 
 	// Allow interrupting with CTRL-C.
-	line_breakcheck();
-	if (got_int)
-	    break;
-#ifdef FEAT_RELTIME
-	if (nfa_did_time_out())
-	    break;
-#endif
+	سطر_breakcheck();
+	اگر (got_int)
+	    توڑو;
+#اگر_تعریف_شدہ FEAT_RELTIME
+	اگر (nfa_did_وقت_برآمد())
+	    توڑو;
+#اگر_ختم
     }
 
-#ifdef ENABLE_LOG
-    if (log_fd != stderr)
+#اگر_تعریف_شدہ ENABLE_LOG
+    اگر (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
-#endif
+    log_fd = تہی;
+#اگر_ختم
 
 theend:
     // Cache list buffers in prog for reuse, or free if prog already has
     // cached buffers (recursive call case).
-    if (prog->listbuf[0] == NULL && list[0].t != NULL && list[1].t != NULL)
+    اگر (prog->listbuf[0] == تہی && list[0].t != تہی && list[1].t != تہی)
     {
 	prog->listbuf[0] = list[0].t;
 	prog->listbuf[1] = list[1].t;
     }
-    else
+    ورنہ
     {
 	vim_free(list[0].t);
 	vim_free(list[1].t);
     }
     vim_free(listids);
-#undef ADD_STATE_IF_MATCH
-#ifdef NFA_REGEXP_DEBUG_LOG
+#تعریف_منسوخ جوڑو_STATE_IF_مطابقت
+#اگر_تعریف_شدہ NFA_REGEXP_DEBUG_LOG
     fclose(debug);
-#endif
+#اگر_ختم
 
-    return nfa_match;
+    واپس nfa_مطابقت;
 }
 
 /*
  * Try match of "prog" with at rex.line["col"].
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ساکن طویل
 nfa_regtry(
     nfa_regprog_T   *prog,
-    colnr_T	    col,
-    int		    *timed_out UNUSED)	// flag set on timeout or NULL
+    colnr_T	    ستون,
+    صحیح		    *timed_برآمد غیر_مستعمل)	// flag set on timeout or NULL
 {
-    int		i;
+    صحیح		i;
     regsubs_T	subs, m;
-    nfa_state_T	*start = prog->start;
-    int		result;
-#ifdef ENABLE_LOG
+    nfa_state_T	*آغاز = prog->آغاز;
+    صحیح		نتیجہ;
+#اگر_تعریف_شدہ ENABLE_LOG
     FILE	*f;
-#endif
+#اگر_ختم
 
-    rex.input = rex.line + col;
-#ifdef FEAT_RELTIME
-    nfa_timed_out = timed_out;
-#endif
+    rex.داخلہ = rex.سطر + ستون;
+#اگر_تعریف_شدہ FEAT_RELTIME
+    nfa_timed_برآمد = timed_برآمد;
+#اگر_ختم
 
-#ifdef ENABLE_LOG
-    f = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (f != NULL)
+#اگر_تعریف_شدہ ENABLE_LOG
+    f = fopen(NFA_REGEXP_تسلسل_LOG, "a");
+    اگر (f != تہی)
     {
 	fprintf(f, "\n\n\t=======================================================\n");
 # ifdef DEBUG
-	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.اظہاریہ);
 # endif
-	fprintf(f, "\tInput text is \"%s\" \n", rex.input);
+	fprintf(f, "\tInput text is \"%s\" \n", rex.داخلہ);
 	fprintf(f, "\t=======================================================\n\n");
-	nfa_print_state(f, start);
+	nfa_print_state(f, آغاز);
 	fprintf(f, "\n\n");
 	fclose(f);
     }
-    else
+    ورنہ
 	emsg("Could not open temporary log file for writing");
-#endif
+#اگر_ختم
 
     clear_sub(&subs.norm);
     clear_sub(&m.norm);
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     clear_sub(&subs.synt);
     clear_sub(&m.synt);
-#endif
+#اگر_ختم
 
-    result = nfa_regmatch(prog, start, &subs, &m);
-    if (result == FALSE)
-	return 0;
-    else if (result == NFA_TOO_EXPENSIVE)
-	return result;
+    نتیجہ = nfa_regmatch(prog, آغاز, &subs, &m);
+    اگر (نتیجہ == FALSE)
+	واپس 0;
+    ورنہ اگر (نتیجہ == NFA_TOO_EXPENSIVE)
+	واپس نتیجہ;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    اگر (REG_MULTI)
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	برائے (i = 0; i < subs.norm.اندر_use; i++)
 	{
-	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].start_lnum;
-	    rex.reg_startpos[i].col = subs.norm.list.multi[i].start_col;
+	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].آغاز_lnum;
+	    rex.reg_startpos[i].ستون = subs.norm.list.multi[i].آغاز_ستون;
 
-	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].end_lnum;
-	    rex.reg_endpos[i].col = subs.norm.list.multi[i].end_col;
+	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].انتہا_lnum;
+	    rex.reg_endpos[i].ستون = subs.norm.list.multi[i].انتہا_ستون;
 	}
-	if (rex.reg_mmatch != NULL)
-	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_start_col;
+	اگر (rex.reg_mmatch != تہی)
+	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_آغاز_ستون;
 
-	if (rex.reg_startpos[0].lnum < 0)
+	اگر (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
-	    rex.reg_startpos[0].col = col;
+	    rex.reg_startpos[0].ستون = ستون;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	اگر (rex.reg_endpos[0].lnum < 0)
 	{
 	    // pattern has a \ze but it didn't match, use current end
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].ستون = (صحیح)(rex.داخلہ - rex.سطر);
 	}
-	else
+	ورنہ
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    ورنہ
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	برائے (i = 0; i < subs.norm.اندر_use; i++)
 	{
-	    rex.reg_startp[i] = subs.norm.list.line[i].start;
-	    rex.reg_endp[i] = subs.norm.list.line[i].end;
+	    rex.reg_startp[i] = subs.norm.list.سطر[i].آغاز;
+	    rex.reg_endp[i] = subs.norm.list.سطر[i].انتہا;
 	}
 
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	اگر (rex.reg_startp[0] == تہی)
+	    rex.reg_startp[0] = rex.سطر + ستون;
+	اگر (rex.reg_endp[0] == تہی)
+	    rex.reg_endp[0] = rex.داخلہ;
     }
 
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
-    unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    unref_extmatch(re_extmatch_برآمد);
+    re_extmatch_برآمد = تہی;
 
-    if (prog->reghasz == REX_SET)
+    اگر (prog->reghasz == REX_سیٹ)
     {
 	cleanup_zsubexpr();
-	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
+	re_extmatch_برآمد = make_extmatch();
+	اگر (re_extmatch_برآمد == تہی)
+	    واپس 0;
 	// Loop over \z1, \z2, etc.  There is no \z0.
-	for (i = 1; i < subs.synt.in_use; i++)
+	برائے (i = 1; i < subs.synt.اندر_use; i++)
 	{
-	    if (REG_MULTI)
+	    اگر (REG_MULTI)
 	    {
-		struct multipos *mpos = &subs.synt.list.multi[i];
+		ساخت multipos *mpos = &subs.synt.list.multi[i];
 
 		// Only accept single line matches that are valid.
-		if (mpos->start_lnum >= 0
-			&& mpos->start_lnum == mpos->end_lnum
-			&& mpos->end_col >= mpos->start_col)
-		    re_extmatch_out->matches[i] =
-			vim_strnsave(reg_getline(mpos->start_lnum)
-							    + mpos->start_col,
-					     mpos->end_col - mpos->start_col);
+		اگر (mpos->آغاز_lnum >= 0
+			&& mpos->آغاز_lnum == mpos->انتہا_lnum
+			&& mpos->انتہا_ستون >= mpos->آغاز_ستون)
+		    re_extmatch_برآمد->matches[i] =
+			vim_strnsave(reg_getline(mpos->آغاز_lnum)
+							    + mpos->آغاز_ستون,
+					     mpos->انتہا_ستون - mpos->آغاز_ستون);
 	    }
-	    else
+	    ورنہ
 	    {
-		struct linepos *lpos = &subs.synt.list.line[i];
+		ساخت linepos *lpos = &subs.synt.list.سطر[i];
 
-		if (lpos->start != NULL && lpos->end != NULL)
-		    re_extmatch_out->matches[i] =
-			    vim_strnsave(lpos->start, lpos->end - lpos->start);
+		اگر (lpos->آغاز != تہی && lpos->انتہا != تہی)
+		    re_extmatch_برآمد->matches[i] =
+			    vim_strnsave(lpos->آغاز, lpos->انتہا - lpos->آغاز);
 	    }
 	}
     }
-#endif
+#اگر_ختم
 
-    return 1 + rex.lnum;
+    واپس 1 + rex.lnum;
 }
 
 /*
@@ -7393,49 +7393,49 @@ nfa_regtry(
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ساکن طویل
 nfa_regexec_both(
-    char_u	*line,
+    char_u	*سطر,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    صحیح		*timed_برآمد)	// flag set on timeout or NULL
 {
     nfa_regprog_T   *prog;
-    long	    retval = 0L;
-    int		    i;
-    colnr_T	    col = startcol;
+    طویل	    retval = 0L;
+    صحیح		    i;
+    colnr_T	    ستون = startcol;
 
-    if (REG_MULTI)
+    اگر (REG_MULTI)
     {
 	prog = (nfa_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);    // relative to the cursor
+	سطر = reg_getline((linenr_T)0);    // relative to the cursor
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    ورنہ
     {
-	prog = (nfa_regprog_T *)rex.reg_match->regprog;
-	rex.reg_startp = rex.reg_match->startp;
-	rex.reg_endp = rex.reg_match->endp;
+	prog = (nfa_regprog_T *)rex.reg_مطابقت->regprog;
+	rex.reg_startp = rex.reg_مطابقت->startp;
+	rex.reg_endp = rex.reg_مطابقت->endp;
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    اگر (prog == تہی || سطر == تہی)
     {
-	iemsg(e_null_argument);
-	goto theend;
+	iemsg(e_null_دلیل);
+	جاؤ theend;
     }
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    اگر (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    ورنہ اگر (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    اگر (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
-    rex.line = line;
+    rex.سطر = سطر;
     rex.lnum = 0;    // relative to line
 
     rex.nfa_has_zend = prog->has_zend;
@@ -7443,142 +7443,142 @@ nfa_regexec_both(
     rex.nfa_nsubexpr = prog->nsubexp;
     rex.nfa_listid = 1;
     rex.nfa_alt_listid = 2;
-#ifdef DEBUG
-    nfa_regengine.expr = prog->pattern;
-#endif
+#اگر_تعریف_شدہ DEBUG
+    nfa_regengine.اظہاریہ = prog->نمونہ;
+#اگر_ختم
 
-    if (prog->reganch && col > 0)
-	return 0L;
+    اگر (prog->reganch && ستون > 0)
+	واپس 0L;
 
     rex.need_clear_subexpr = TRUE;
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    if (prog->reghasz == REX_SET)
+    اگر (prog->reghasz == REX_سیٹ)
     {
 	rex.nfa_has_zsubexpr = TRUE;
 	rex.need_clear_zsubexpr = TRUE;
     }
-    else
+    ورنہ
     {
 	rex.nfa_has_zsubexpr = FALSE;
 	rex.need_clear_zsubexpr = FALSE;
     }
-#endif
+#اگر_ختم
 
-    if (prog->regstart != NUL)
+    اگر (prog->regstart != NUL)
     {
 	// Skip ahead until a character we know the match must start with.
 	// When there is none there is no match.
-	if (skip_to_start(prog->regstart, &col) == FAIL)
-	    return 0L;
+	اگر (skip_مقصد_آغاز(prog->regstart, &ستون) == FAIL)
+	    واپس 0L;
 
 	// If match_text is set it contains the full text that must match.
 	// Nothing else to try. Doesn't handle combining chars well.
-	if (prog->match_text != NULL && *prog->match_text != NUL && !rex.reg_icombine)
+	اگر (prog->مطابقت_متن != تہی && *prog->مطابقت_متن != NUL && !rex.reg_icombine)
 	{
-	    retval = find_match_text(&col, prog->regstart, prog->match_text);
-	    if (REG_MULTI)
-		rex.reg_mmatch->rmm_matchcol = col;
-	    else
-		rex.reg_match->rm_matchcol = col;
-	    return retval;
+	    retval = ڈھونڈو_مطابقت_متن(&ستون, prog->regstart, prog->مطابقت_متن);
+	    اگر (REG_MULTI)
+		rex.reg_mmatch->rmm_matchcol = ستون;
+	    ورنہ
+		rex.reg_مطابقت->rm_matchcol = ستون;
+	    واپس retval;
 	}
     }
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    اگر (rex.reg_maxcol > 0 && ستون >= rex.reg_maxcol)
+	جاؤ theend;
 
     // Set the "nstate" used by nfa_regcomp() to zero to trigger an error when
     // it's accidentally used during execution.
     nstate = 0;
-    for (i = 0; i < prog->nstate; ++i)
+    برائے (i = 0; i < prog->nstate; ++i)
     {
 	prog->state[i].id = i;
 	prog->state[i].lastlist[0] = 0;
 	prog->state[i].lastlist[1] = 0;
     }
 
-    retval = nfa_regtry(prog, col, timed_out);
+    retval = nfa_regtry(prog, ستون, timed_برآمد);
 
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
+#اگر_تعریف_شدہ DEBUG
+    nfa_regengine.اظہاریہ = تہی;
+#اگر_ختم
 
 theend:
-    if (retval > 0)
+    اگر (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs and
 	// \ze are used.
-	if (REG_MULTI)
+	اگر (REG_MULTI)
 	{
-	    lpos_T *start = &rex.reg_mmatch->startpos[0];
-	    lpos_T *end = &rex.reg_mmatch->endpos[0];
+	    lpos_T *آغاز = &rex.reg_mmatch->startpos[0];
+	    lpos_T *انتہا = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
-			|| (end->lnum == start->lnum && end->col < start->col))
+	    اگر (انتہا->lnum < آغاز->lnum
+			|| (انتہا->lnum == آغاز->lnum && انتہا->ستون < آغاز->ستون))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 	}
-	else
+	ورنہ
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
-		rex.reg_match->endp[0] = rex.reg_match->startp[0];
+	    اگر (rex.reg_مطابقت->endp[0] < rex.reg_مطابقت->startp[0])
+		rex.reg_مطابقت->endp[0] = rex.reg_مطابقت->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_match->rm_matchcol = col;
+	    rex.reg_مطابقت->rm_matchcol = ستون;
 	}
     }
 
-    return retval;
+    واپس retval;
 }
 
 /*
  * Compile a regular expression into internal code for the NFA matcher.
  * Returns the program in allocated space.  Returns NULL for an error.
  */
-    static regprog_T *
-nfa_regcomp(char_u *expr, int re_flags)
+    ساکن regprog_T *
+nfa_regcomp(char_u *اظہاریہ, صحیح re_flags)
 {
-    nfa_regprog_T	*prog = NULL;
-    size_t		prog_size;
-    int			*postfix;
+    nfa_regprog_T	*prog = تہی;
+    size_t		prog_سائز;
+    صحیح			*postfix;
 
-    if (expr == NULL)
-	return NULL;
+    اگر (اظہاریہ == تہی)
+	واپس تہی;
 
-#ifdef DEBUG
-    nfa_regengine.expr = expr;
-#endif
+#اگر_تعریف_شدہ DEBUG
+    nfa_regengine.اظہاریہ = اظہاریہ;
+#اگر_ختم
     nfa_re_flags = re_flags;
 
     init_class_tab();
 
-    if (nfa_regcomp_start(expr, re_flags) == FAIL)
-	return NULL;
+    اگر (nfa_regcomp_آغاز(اظہاریہ, re_flags) == FAIL)
+	واپس تہی;
 
     // Build postfix form of the regexp. Needed to build the NFA
     // (and count its size).
     postfix = re2post();
-    if (postfix == NULL)
-	goto fail;	    // Cascaded (syntax?) error
+    اگر (postfix == تہی)
+	جاؤ fail;	    // Cascaded (syntax?) error
 
     /*
      * In order to build the NFA, we parse the input regexp twice:
      * 1. first pass to count size (so we can allocate space)
      * 2. second to emit code
      */
-#ifdef ENABLE_LOG
+#اگر_تعریف_شدہ ENABLE_LOG
     {
-	FILE *f = fopen(NFA_REGEXP_RUN_LOG, "a");
+	FILE *f = fopen(NFA_REGEXP_تسلسل_LOG, "a");
 
-	if (f != NULL)
+	اگر (f != تہی)
 	{
-	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", expr);
+	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", اظہاریہ);
 	    fclose(f);
 	}
     }
-#endif
+#اگر_ختم
 
     /*
      * PASS 1
@@ -7587,22 +7587,22 @@ nfa_regcomp(char_u *expr, int re_flags)
     post2nfa(postfix, post_ptr, TRUE);
 
     // allocate the regprog with space for the compiled regexp
-    prog_size = offsetof(nfa_regprog_T, state) + sizeof(nfa_state_T) * nstate;
-    prog = alloc(prog_size);
-    if (prog == NULL)
-	goto fail;
+    prog_سائز = offsetof(nfa_regprog_T, state) + حجم(nfa_state_T) * nstate;
+    prog = alloc(prog_سائز);
+    اگر (prog == تہی)
+	جاؤ fail;
     state_ptr = prog->state;
-    prog->re_in_use = FALSE;
-    prog->listbuf[0] = NULL;
-    prog->listbuf[1] = NULL;
+    prog->re_اندر_use = FALSE;
+    prog->listbuf[0] = تہی;
+    prog->listbuf[1] = تہی;
 
     /*
      * PASS 2
      * Build the NFA
      */
-    prog->start = post2nfa(postfix, post_ptr, FALSE);
-    if (prog->start == NULL)
-	goto fail;
+    prog->آغاز = post2nfa(postfix, post_ptr, FALSE);
+    اگر (prog->آغاز == تہی)
+	جاؤ fail;
 
     prog->regflags = regflags;
     prog->engine = &nfa_regengine;
@@ -7613,63 +7613,63 @@ nfa_regcomp(char_u *expr, int re_flags)
 
     nfa_postprocess(prog);
 
-    prog->reganch = nfa_get_reganch(prog->start, 0);
-    prog->regstart = nfa_get_regstart(prog->start, 0);
-    prog->match_text = nfa_get_match_text(prog->start);
+    prog->reganch = nfa_get_reganch(prog->آغاز, 0);
+    prog->regstart = nfa_get_regstart(prog->آغاز, 0);
+    prog->مطابقت_متن = nfa_get_مطابقت_متن(prog->آغاز);
 
-#ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, OK);
+#اگر_تعریف_شدہ ENABLE_LOG
+    nfa_postfix_dump(اظہاریہ, OK);
     nfa_dump(prog);
-#endif
-#ifdef FEAT_SYN_HL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     prog->reghasz = re_has_z;
-#endif
-    prog->pattern = vim_strsave(expr);
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
+#اگر_ختم
+    prog->نمونہ = vim_strsave(اظہاریہ);
+#اگر_تعریف_شدہ DEBUG
+    nfa_regengine.اظہاریہ = تہی;
+#اگر_ختم
 
-out:
+برآمد:
     // The postfix list and fragment stack are reused by the next compilation
     // (and freed in free_regexp_stuff()), but drop ones that grew large for a
     // big pattern to avoid holding much memory.
-    if (post_start_len > NFA_POSTFIX_KEEP)
+    اگر (post_آغاز_len > NFA_POSTFIX_KEEP)
     {
-	VIM_CLEAR(post_start);
-	post_start_len = 0;
+	VIM_CLEAR(post_آغاز);
+	post_آغاز_len = 0;
     }
-    post_ptr = post_end = NULL;
-    if (nfa_stack_len > NFA_STACK_KEEP)
+    post_ptr = post_انتہا = تہی;
+    اگر (nfa_ڈھیر_len > NFA_ڈھیر_KEEP)
     {
-	VIM_CLEAR(nfa_stack);
-	nfa_stack_len = 0;
+	VIM_CLEAR(nfa_ڈھیر);
+	nfa_ڈھیر_len = 0;
     }
-    state_ptr = NULL;
-    return (regprog_T *)prog;
+    state_ptr = تہی;
+    واپس (regprog_T *)prog;
 
 fail:
     VIM_CLEAR(prog);
-#ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, FAIL);
-#endif
-#ifdef DEBUG
-    nfa_regengine.expr = NULL;
-#endif
-    goto out;
+#اگر_تعریف_شدہ ENABLE_LOG
+    nfa_postfix_dump(اظہاریہ, FAIL);
+#اگر_ختم
+#اگر_تعریف_شدہ DEBUG
+    nfa_regengine.اظہاریہ = تہی;
+#اگر_ختم
+    جاؤ برآمد;
 }
 
 /*
  * Free a compiled regexp program, returned by nfa_regcomp().
  */
-    static void
+    ساکن خالی
 nfa_regfree(regprog_T *prog)
 {
-    if (prog == NULL)
-	return;
+    اگر (prog == تہی)
+	واپس;
 
-    vim_free(((nfa_regprog_T *)prog)->match_text);
-    vim_free(((nfa_regprog_T *)prog)->pattern);
+    vim_free(((nfa_regprog_T *)prog)->مطابقت_متن);
+    vim_free(((nfa_regprog_T *)prog)->نمونہ);
     vim_free(((nfa_regprog_T *)prog)->listbuf[0]);
     vim_free(((nfa_regprog_T *)prog)->listbuf[1]);
     vim_free(prog);
@@ -7683,23 +7683,23 @@ nfa_regfree(regprog_T *prog)
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    ساکن صحیح
 nfa_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
-    colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    char_u	*سطر,	// string to match against
+    colnr_T	ستون,	// column to start looking for match
+    صحیح		سطر_lbr)
 {
-    rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_مطابقت = rmp;
+    rex.reg_mmatch = تہی;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_سطر_lbr = سطر_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = تہی;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
-    return nfa_regexec_both(line, col, NULL);
+    واپس nfa_regexec_both(سطر, ستون, تہی);
 }
 
 
@@ -7728,19 +7728,19 @@ nfa_regexec_nl(
  *
  * FIXME if this behavior is not compatible.
  */
-    static long
+    ساکن طویل
 nfa_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
-    colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    colnr_T	ستون,		// column to start looking for match
+    صحیح		*timed_برآمد)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return nfa_regexec_both(NULL, col, timed_out);
+    واپس nfa_regexec_both(تہی, ستون, timed_برآمد);
 }
 
-#ifdef DEBUG
+#اگر_تعریف_شدہ DEBUG
 # undef ENABLE_LOG
-#endif
+#اگر_ختم

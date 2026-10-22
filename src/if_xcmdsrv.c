@@ -11,10 +11,10 @@
  *
  */
 
-#include "vim.h"
-#include "version.h"
+#شامل "vim.h"
+#شامل "version.h"
 
-#if (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
+#اگر (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
 
 # ifdef FEAT_X11
 #  include <X11/Intrinsic.h>
@@ -62,18 +62,18 @@
  * It's unlikely, but possible.
  */
 
-typedef struct PendingCommand
+قسمتعریف ساخت PendingCommand
 {
-    int	    serial;	// Serial number expected in result.
-    int	    code;	// Result Code. 0 is OK
-    char_u  *result;	// String result for command (malloc'ed).
+    صحیح	    serial;	// Serial number expected in result.
+    صحیح	    رمز;	// Result Code. 0 is OK
+    char_u  *نتیجہ;	// String result for command (malloc'ed).
 			// NULL means command still pending.
-    struct PendingCommand *nextPtr;
+    ساخت PendingCommand *اگلا_Ptr;
 			// Next in list of all outstanding commands.
 			// NULL means end of list.
 } PendingCommand;
 
-static PendingCommand *pendingCommands = NULL;
+ساکن PendingCommand *pendingCommands = تہی;
 				// List of all commands currently
 				// being waited for.
 
@@ -157,111 +157,111 @@ static PendingCommand *pendingCommands = NULL;
  * this module:
  */
 
-# define MAX_PROP_WORDS 100000
+# define MAX_PROP_الفاظ 100000
 
-struct ServerReply
+ساخت Server_جواب
 {
-    Window  id;
-    garray_T strings;
+    کھڑکی  id;
+    garray_T لڑیاں;
 };
-static garray_T serverReply = { 0, 0, 0, 0, 0 };
-enum ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
+ساکن garray_T server_جواب = { 0, 0, 0, 0, 0 };
+شمار Server_جواب_Op { SROP_ڈھونڈو, SROP_جوڑو, SROP_Delete };
 
-typedef int (*EndCond)(void *);
+قسمتعریف صحیح (*انتہا_Cond)(خالی *);
 
-struct x_cmdqueue
+ساخت x_cmdqueue
 {
     char_u		*propInfo;
     long_u		len;
-    struct x_cmdqueue	*next;
-    struct x_cmdqueue	*prev;
+    ساخت x_cmdqueue	*اگلا;
+    ساخت x_cmdqueue	*پچھلا;
 };
 
-typedef struct x_cmdqueue x_queue_T;
+قسمتعریف ساخت x_cmdqueue x_قطار_T;
 
 // dummy node, header for circular queue
-static x_queue_T head = {NULL, 0, NULL, NULL};
+ساکن x_قطار_T سر = {تہی, 0, تہی, تہی};
 
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
-static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose);
-static int	SendInit(Display *dpy);
-static int	DoRegisterName(Display *dpy, char_u *name);
-static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
-static int	WaitForPend(void *p);
-static int	WindowValid(Display *dpy, Window w);
-static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
-static int	x_error_check(Display *dpy, XErrorEvent *error_event);
-static int	IsSerialName(char_u *name);
-static void	save_in_queue(char_u *buf, long_u len);
-static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
+ساکن کھڑکی	LookupName(Display *dpy, char_u *name, صحیح delete, char_u **loose);
+ساکن صحیح	SendInit(Display *dpy);
+ساکن صحیح	Do_رجسٹر_Name(Display *dpy, char_u *name);
+ساکن خالی	DeleteAnyLingerer(Display *dpy, کھڑکی w);
+ساکن صحیح	GetRegProp(Display *dpy, char_u **regPropp, long_u *عدد_Itemsp, صحیح domsg);
+ساکن صحیح	WaitForPend(خالی *p);
+ساکن صحیح	کھڑکی_Valid(Display *dpy, کھڑکی w);
+ساکن خالی	ServerWait(Display *dpy, کھڑکی w, انتہا_Cond انتہا_Cond_2, خالی *انتہا_ڈیٹا, صحیح localLoop, صحیح seconds);
+ساکن صحیح	AppendPropCarefully(Display *display, کھڑکی کھڑکی_2, Atom property, char_u *قدر, صحیح لمبائی);
+ساکن صحیح	x_error_check(Display *dpy, XErrorEvent *error_event);
+ساکن صحیح	IsSerialName(char_u *name);
+ساکن خالی	save_اندر_قطار(char_u *buf, long_u len);
+ساکن خالی	server_parse_پیغام(Display *dpy, char_u *propInfo, long_u عدد_اشیاء);
 
 // Private variables for the "server" functionality
-static Atom	registryProperty = None;
-static Atom	vimProperty = None;
-static int	got_x_error = FALSE;
+ساکن Atom	registryProperty = None;
+ساکن Atom	vimProperty = None;
+ساکن صحیح	got_x_error = FALSE;
 
-static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
+ساکن char_u	*خالی_خانے_prop = (char_u *)"";	// empty GetRegProp() result
 
 /*
  * Associate an ASCII name with Vim.  Try real hard to get a unique one.
  * Returns FAIL or OK.
  */
-    int
-serverRegisterName(
+    صحیح
+server_رجسٹر_Name(
     Display	*dpy,		// display to register with
     char_u	*name)		// the name that will be used as a base
 {
-    int		i;
-    int		res;
-    char_u	*p = NULL;
+    صحیح		i;
+    صحیح		res;
+    char_u	*p = تہی;
 
-    res = DoRegisterName(dpy, name);
-    if (res >= 0)
-	return OK;
+    res = Do_رجسٹر_Name(dpy, name);
+    اگر (res >= 0)
+	واپس OK;
 
     i = 1;
-    do
+    کرو
     {
-	if (res < -1 || i >= 1000)
+	اگر (res < -1 || i >= 1000)
 	{
-	    msg_attr(_("Unable to register a command server name"),
+	    پیغام_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
-	    return FAIL;
+	    واپس FAIL;
 	}
-	if (p == NULL)
+	اگر (p == تہی)
 	    p = alloc(STRLEN(name) + 10);
-	if (p == NULL)
+	اگر (p == تہی)
 	{
 	    res = -10;
-	    continue;
+	    جاری;
 	}
-	sprintf((char *)p, "%s%d", name, i++);
-	res = DoRegisterName(dpy, p);
+	sprintf((حرف *)p, "%s%d", name, i++);
+	res = Do_رجسٹر_Name(dpy, p);
     }
-    while (res < 0)
+    جب (res < 0)
 	;
     vim_free(p);
 
-    return OK;
+    واپس OK;
 }
 
-    static int
-DoRegisterName(Display *dpy, char_u *name)
+    ساکن صحیح
+Do_رجسٹر_Name(Display *dpy, char_u *name)
 {
-    Window	w;
+    کھڑکی	w;
     XErrorHandler old_handler;
-# define MAX_NAME_LENGTH 100
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+# define MAX_NAME_لمبائی 100
+    char_u	propInfo[MAX_NAME_لمبائی + 20];
 
-    if (commProperty == None)
+    اگر (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	اگر (SendInit(dpy) < 0)
+	    واپس -2;
     }
 
     /*
@@ -272,13 +272,13 @@ DoRegisterName(Display *dpy, char_u *name)
      * server!
      */
     XGrabServer(dpy);
-    w = LookupName(dpy, name, FALSE, NULL);
-    if (w != (Window)0)
+    w = LookupName(dpy, name, FALSE, تہی);
+    اگر (w != (کھڑکی)0)
     {
-	Status		status;
-	int		dummyInt;
-	unsigned int	dummyUns;
-	Window		dummyWin;
+	حالت_3		حالت_2;
+	صحیح		dummyInt;
+	غیرعلامتی صحیح	dummyUns;
+	کھڑکی		dummyWin;
 
 	/*
 	 * The name is currently registered.  See if the commWindow
@@ -288,73 +288,73 @@ DoRegisterName(Display *dpy, char_u *name)
 	 * registry).
 	 */
 	old_handler = XSetErrorHandler(x_error_check);
-	status = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
+	حالت_2 = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
 				  &dummyUns, &dummyUns, &dummyUns, &dummyUns);
-	(void)XSetErrorHandler(old_handler);
-	if (status != Success && w != commWindow)
+	(خالی)XSetErrorHandler(old_handler);
+	اگر (حالت_2 != Success && w != comm_کھڑکی)
 	{
 	    XUngrabServer(dpy);
 	    XFlush(dpy);
-	    return -1;
+	    واپس -1;
 	}
-	(void)LookupName(dpy, name, /*delete=*/TRUE, NULL);
+	(خالی)LookupName(dpy, name, /*delete=*/TRUE, تہی);
     }
-    sprintf((char *)propInfo, "%x %.*s", (int_u)commWindow,
-						       MAX_NAME_LENGTH, name);
+    sprintf((حرف *)propInfo, "%x %.*s", (int_u)comm_کھڑکی,
+						       MAX_NAME_لمبائی, name);
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
-		    PropModeAppend, propInfo, STRLEN(propInfo) + 1);
+    XChangeProperty(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty, XA_STRING, 8,
+		    Prop_منوال_Append, propInfo, STRLEN(propInfo) + 1);
     XUngrabServer(dpy);
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (خالی)XSetErrorHandler(old_handler);
 
-    if (!got_x_error)
+    اگر (!got_x_error)
     {
 	size_t	namelen;
 
 	namelen = STRLEN(name);
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_SEND_SERVER, name, (int)namelen);
+	سیٹ_vim_var_string(VV_SEND_SERVER, name, (صحیح)namelen);
 # endif
 	serverName = vim_strnsave(name, namelen);
 	need_maketitle = TRUE;
-	return 0;
+	واپس 0;
     }
-    return -2;
+    واپس -2;
 }
 
-# if defined(FEAT_GUI)
+# اگر defined(FEAT_GUI)
 /*
  * Clean out new ID from registry and set it as comm win.
  * Change any registered window ID.
  */
-    void
-serverChangeRegisteredWindow(
+    خالی
+server_Change_Registered_کھڑکی(
     Display	*dpy,		// Display to register with
-    Window	newwin)		// Re-register to this ID
+    کھڑکی	newwin)		// Re-register to this ID
 {
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+    char_u	propInfo[MAX_NAME_لمبائی + 20];
 
-    commWindow = newwin;
+    comm_کھڑکی = newwin;
 
     // Always call SendInit() here, to make sure commWindow is marked as a Vim
     // window.
-    if (SendInit(dpy) < 0)
-	return;
+    اگر (SendInit(dpy) < 0)
+	واپس;
 
     // WARNING: Do not step through this while debugging, it will hangup the X
     // server!
     XGrabServer(dpy);
     DeleteAnyLingerer(dpy, newwin);
-    if (serverName != NULL)
+    اگر (serverName != تہی)
     {
 	// Reinsert name if it was already registered
-	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
-	sprintf((char *)propInfo, "%x %.*s",
-		(int_u)newwin, MAX_NAME_LENGTH, serverName);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
-			PropModeAppend, (char_u *)propInfo,
+	(خالی)LookupName(dpy, serverName, /*delete=*/TRUE, تہی);
+	sprintf((حرف *)propInfo, "%x %.*s",
+		(int_u)newwin, MAX_NAME_لمبائی, serverName);
+	XChangeProperty(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty, XA_STRING, 8,
+			Prop_منوال_Append, (char_u *)propInfo,
 			STRLEN(propInfo) + 1);
     }
     XUngrabServer(dpy);
@@ -365,43 +365,43 @@ serverChangeRegisteredWindow(
  * Send to an instance of Vim via the X display.
  * Returns 0 for OK, negative for an error.
  */
-    int
-serverSendToVim(
+    صحیح
+server_Send_مقصد_Vim(
     Display	*dpy,			// Where to send.
     char_u	*name,			// Where to send.
     char_u	*cmd,			// What to send.
-    char_u	**result,		// Result of eval'ed expression
-    Window	*server,		// Actual ID of receiving app
-    Bool	asExpr,			// Interpret as keystrokes or expr ?
-    int		timeout,		// seconds to wait or zero
+    char_u	**نتیجہ,		// Result of eval'ed expression
+    کھڑکی	*server,		// Actual ID of receiving app
+    Bool	as_اظہاریہ,			// Interpret as keystrokes or expr ?
+    صحیح		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
-    int		silent)			// don't complain about no server
+    صحیح		silent)			// don't complain about no server
 {
-    Window	    w;
+    کھڑکی	    w;
     char_u	    *property;
-    int		    length;
-    int		    res;
-    static int	    serial = 0;	// Running count of sent commands.
+    صحیح		    لمبائی;
+    صحیح		    res;
+    ساکن صحیح	    serial = 0;	// Running count of sent commands.
 				// Used to give each command a
 				// different serial number.
     PendingCommand  pending;
-    char_u	    *loosename = NULL;
+    char_u	    *loosename = تہی;
 
-    if (result != NULL)
-	*result = NULL;
-    if (name == NULL || *name == NUL)
+    اگر (نتیجہ != تہی)
+	*نتیجہ = تہی;
+    اگر (name == تہی || *name == NUL)
 	name = (char_u *)"GVIM";    // use a default name
 
-    if (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
-	return -1;
+    اگر (commProperty == None && dpy != تہی && SendInit(dpy) < 0)
+	واپس -1;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim(%s, %s)", name, cmd);
+# اگر defined(FEAT_EVAL)
+    ch_log(تہی, "serverSendToVim(%s, %s)", name, cmd);
 # endif
 
     // Execute locally if no display or target is ourselves
-    if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+    اگر (dpy == تہی || (serverName != تہی && STRICMP(name, serverName) == 0))
+	واپس send_مقصد_Local_Vim(cmd, as_اظہاریہ, نتیجہ);
 
     /*
      * Bind the server name to a communication window.
@@ -411,31 +411,31 @@ serverSendToVim(
      *
      * Delete any lingering names from dead editors.
      */
-    while (TRUE)
+    جب (TRUE)
     {
 	w = LookupName(dpy, name, FALSE, &loosename);
 	// Check that the window is hot
-	if (w != None)
+	اگر (w != None)
 	{
-	    if (!WindowValid(dpy, w))
+	    اگر (!کھڑکی_Valid(dpy, w))
 	    {
 		LookupName(dpy, loosename ? loosename : name,
-			   /*DELETE=*/TRUE, NULL);
+			   /*DELETE=*/TRUE, تہی);
 		VIM_CLEAR(loosename);
-		continue;
+		جاری;
 	    }
 	}
-	break;
+	توڑو;
     }
-    if (w == None)
+    اگر (w == None)
     {
-	if (!silent)
+	اگر (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	واپس -1;
     }
-    else if (loosename != NULL)
+    ورنہ اگر (loosename != تہی)
 	name = loosename;
-    if (server != NULL)
+    اگر (server != تہی)
 	*server = w;
 
     /*
@@ -443,30 +443,30 @@ serverSendToVim(
      * comm window in the communication window.
      * Length must be computed exactly!
      */
-    length = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
-    property = alloc(length + 30);
+    لمبائی = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
+    property = alloc(لمبائی + 30);
 
-    sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
-		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
-    if (name == loosename)
+    sprintf((حرف *)property, "%c%c%c-n %s%c-E %s%c-s %s",
+		      0, as_اظہاریہ ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
+    اگر (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
     serial++;
-    sprintf((char *)property + length, "%c-r %x %d",
-						0, (int_u)commWindow, serial);
+    sprintf((حرف *)property + لمبائی, "%c-r %x %d",
+						0, (int_u)comm_کھڑکی, serial);
     // Add length of what "-r %x %d" resulted in, skipping the NUL.
-    length += STRLEN(property + length + 1) + 1;
+    لمبائی += STRLEN(property + لمبائی + 1) + 1;
 
-    res = AppendPropCarefully(dpy, w, commProperty, property, length + 1);
+    res = AppendPropCarefully(dpy, w, commProperty, property, لمبائی + 1);
     vim_free(property);
-    if (res < 0)
+    اگر (res < 0)
     {
-	emsg(_(e_failed_to_send_command_to_destination_program));
-	return -1;
+	emsg(_(e_failed_مقصد_send_command_مقصد_destination_پروگرام));
+	واپس -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
-	return 0;
+    اگر (!as_اظہاریہ) // There is no answer for this - Keys are sent async
+	واپس 0;
 
     /*
      * Register the fact that we're waiting for a command to
@@ -474,9 +474,9 @@ serverSendToVim(
      * AppendErrorProc to pass back the command's results).
      */
     pending.serial = serial;
-    pending.code = 0;
-    pending.result = NULL;
-    pending.nextPtr = pendingCommands;
+    pending.رمز = 0;
+    pending.نتیجہ = تہی;
+    pending.اگلا_Ptr = pendingCommands;
     pendingCommands = &pending;
 
     ServerWait(dpy, w, WaitForPend, &pending, localLoop,
@@ -486,81 +486,81 @@ serverSendToVim(
      * Unregister the information about the pending command
      * and return the result.
      */
-    if (pendingCommands == &pending)
-	pendingCommands = pending.nextPtr;
-    else
+    اگر (pendingCommands == &pending)
+	pendingCommands = pending.اگلا_Ptr;
+    ورنہ
     {
 	PendingCommand *pcPtr;
 
-	for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
-	    if (pcPtr->nextPtr == &pending)
+	برائے (pcPtr = pendingCommands; pcPtr != تہی; pcPtr = pcPtr->اگلا_Ptr)
+	    اگر (pcPtr->اگلا_Ptr == &pending)
 	    {
-		pcPtr->nextPtr = pending.nextPtr;
-		break;
+		pcPtr->اگلا_Ptr = pending.اگلا_Ptr;
+		توڑو;
 	    }
     }
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim() result: %s",
-	    pending.result == NULL ? "NULL" : (char *)pending.result);
+# اگر defined(FEAT_EVAL)
+    ch_log(تہی, "serverSendToVim() result: %s",
+	    pending.نتیجہ == تہی ? "NULL" : (حرف *)pending.نتیجہ);
 # endif
-    if (result != NULL)
-	*result = pending.result;
-    else
-	vim_free(pending.result);
+    اگر (نتیجہ != تہی)
+	*نتیجہ = pending.نتیجہ;
+    ورنہ
+	vim_free(pending.نتیجہ);
 
-    return pending.code == 0 ? 0 : -1;
+    واپس pending.رمز == 0 ? 0 : -1;
 }
 
-    static int
-WaitForPend(void *p)
+    ساکن صحیح
+WaitForPend(خالی *p)
 {
     PendingCommand *pending = (PendingCommand *) p;
-    return pending->result != NULL;
+    واپس pending->نتیجہ != تہی;
 }
 
 /*
  * Return TRUE if window "w" exists and has a "Vim" property on it.
  */
-    static int
-WindowValid(Display *dpy, Window w)
+    ساکن صحیح
+کھڑکی_Valid(Display *dpy, کھڑکی w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
-    int		    i;
+    صحیح		    عدد_Prop;
+    صحیح		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
-    plist = XListProperties(dpy, w, &numProp);
+    plist = XListProperties(dpy, w, &عدد_Prop);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
-    if (plist == NULL || got_x_error)
-	return FALSE;
+    اگر (plist == تہی || got_x_error)
+	واپس FALSE;
 
-    for (i = 0; i < numProp; i++)
-	if (plist[i] == vimProperty)
+    برائے (i = 0; i < عدد_Prop; i++)
+	اگر (plist[i] == vimProperty)
 	{
 	    XFree(plist);
-	    return TRUE;
+	    واپس TRUE;
 	}
     XFree(plist);
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
  * Enter a loop processing X events & polling chars until we see a result
  */
-    static void
+    ساکن خالی
 ServerWait(
     Display	*dpy,
-    Window	w,
-    EndCond	endCond,
-    void	*endData,
-    int		localLoop,
-    int		seconds)
+    کھڑکی	w,
+    انتہا_Cond	انتہا_Cond_2,
+    خالی	*انتہا_ڈیٹا,
+    صحیح		localLoop,
+    صحیح		seconds)
 {
-    time_t	    start;
+    time_t	    آغاز;
     time_t	    now;
     XEvent	    event;
 
@@ -570,55 +570,55 @@ ServerWait(
     fd_set	    fds;
 
     FD_ZERO(&fds);
-    FD_SET(ConnectionNumber(dpy), &fds);
-# else
-    struct pollfd   fds;
+    FD_SET(Connection_نمبر(dpy), &fds);
+# ورنہ
+    ساخت pollfd   fds;
 
-    fds.fd = ConnectionNumber(dpy);
+    fds.fd = Connection_نمبر(dpy);
     fds.events = POLLIN;
 # endif
 
-    time(&start);
-    while (TRUE)
+    وقت(&آغاز);
+    جب (TRUE)
     {
-	while (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
+	جب (XCheck_کھڑکی_Event(dpy, comm_کھڑکی, Property_Change_نقاب, &event))
 	    serverEventProc(dpy, &event, 1);
 	server_parse_messages();
 
-	if (endCond(endData) != 0)
-	    break;
-	if (!WindowValid(dpy, w))
-	    break;
-	time(&now);
-	if (seconds >= 0 && (now - start) >= seconds)
-	    break;
+	اگر (انتہا_Cond_2(انتہا_ڈیٹا) != 0)
+	    توڑو;
+	اگر (!کھڑکی_Valid(dpy, w))
+	    توڑو;
+	وقت(&now);
+	اگر (seconds >= 0 && (now - آغاز) >= seconds)
+	    توڑو;
 
 # ifdef FEAT_TIMERS
 	check_due_timer();
 # endif
 
 	// Just look out for the answer without calling back into Vim
-	if (localLoop)
+	اگر (localLoop)
 	{
 # ifdef HAVE_SELECT
-	    struct timeval  tv;
+	    ساخت timeval  tv;
 
 	    // Set the time every call, select() may change it to the remaining
 	    // time.
 	    tv.tv_sec = 0;
 	    tv.tv_usec =  SEND_MSEC_POLL * 1000;
-	    if (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
-		break;
-# else
-	    if (poll(&fds, 1, SEND_MSEC_POLL) < 0)
-		break;
+	    اگر (select(FD_SETSIZE, &fds, تہی, تہی, &tv) < 0)
+		توڑو;
+# ورنہ
+	    اگر (poll(&fds, 1, SEND_MSEC_POLL) < 0)
+		توڑو;
 # endif
 	}
-	else
+	ورنہ
 	{
-	    if (got_int)
-		break;
-	    ui_delay((long)UI_MSEC_DELAY, TRUE);
+	    اگر (got_int)
+		توڑو;
+	    ui_delay((طویل)UI_MSEC_DELAY, TRUE);
 	    ui_breakcheck();
 	}
     }
@@ -632,152 +632,152 @@ ServerWait(
  * Returns a list of strings or NULL on failure.
  */
     list_T *
-serverGetVimNames(Display *dpy)
+server_Get_Vim_نام(Display *dpy)
 {
     char_u	*regProp;
-    char_u	*entry;
+    char_u	*اندراج_2;
     char_u	*p;
-    long_u	numItems;
+    long_u	عدد_اشیاء;
     int_u	w;
     list_T	*list;
 
-    if (registryProperty == None)
+    اگر (registryProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return NULL;
+	اگر (SendInit(dpy) < 0)
+	    واپس تہی;
     }
 
     list = list_alloc();
-    if (list == NULL)
-	return NULL;
+    اگر (list == تہی)
+	واپس تہی;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
-	return NULL;
+    اگر (GetRegProp(dpy, &regProp, &عدد_اشیاء, TRUE) == FAIL)
+	واپس تہی;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    برائے (p = regProp; (long_u)(p - regProp) < عدد_اشیاء; p++)
     {
-	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	اندراج_2 = p;
+	جب (*p != 0 && !محفوظ_isspace(*p))
 	    p++;
-	if (*p != 0)
+	اگر (*p != 0)
 	{
 	    w = None;
-	    sscanf((char *)entry, "%x", &w);
-	    if (WindowValid(dpy, (Window)w))
+	    لڑی_سے_پڑھو((حرف *)اندراج_2, "%x", &w);
+	    اگر (کھڑکی_Valid(dpy, (کھڑکی)w))
 		list_append_string(list, p + 1, -1);
-	    while (*p != 0)
+	    جب (*p != 0)
 		p++;
 	}
     }
-    if (regProp != empty_prop)
+    اگر (regProp != خالی_خانے_prop)
 	XFree(regProp);
-    return list;
+    واپس list;
 }
 
 /////////////////////////////////////////////////////////////
 // Reply stuff
 
-    static struct ServerReply *
-ServerReplyFind(Window w, enum ServerReplyOp op)
+    ساکن ساخت Server_جواب *
+Server_جواب_ڈھونڈو(کھڑکی w, شمار Server_جواب_Op op)
 {
-    struct ServerReply *p;
-    struct ServerReply e;
-    int		i;
+    ساخت Server_جواب *p;
+    ساخت Server_جواب e;
+    صحیح		i;
 
-    p = (struct ServerReply *) serverReply.ga_data;
-    for (i = 0; i < serverReply.ga_len; i++, p++)
-	if (p->id == w)
-	    break;
-    if (i >= serverReply.ga_len)
-	p = NULL;
+    p = (ساخت Server_جواب *) server_جواب.ga_ڈیٹا;
+    برائے (i = 0; i < server_جواب.ga_len; i++, p++)
+	اگر (p->id == w)
+	    توڑو;
+    اگر (i >= server_جواب.ga_len)
+	p = تہی;
 
-    if (p == NULL && op == SROP_Add)
+    اگر (p == تہی && op == SROP_جوڑو)
     {
-	if (serverReply.ga_growsize == 0)
-	    ga_init2(&serverReply, sizeof(struct ServerReply), 1);
-	if (ga_grow(&serverReply, 1) == OK)
+	اگر (server_جواب.ga_growsize == 0)
+	    ga_init2(&server_جواب, حجم(ساخت Server_جواب), 1);
+	اگر (ga_grow(&server_جواب, 1) == OK)
 	{
-	    p = ((struct ServerReply *) serverReply.ga_data)
-		+ serverReply.ga_len;
+	    p = ((ساخت Server_جواب *) server_جواب.ga_ڈیٹا)
+		+ server_جواب.ga_len;
 	    e.id = w;
-	    ga_init2(&e.strings, 1, 100);
-	    mch_memmove(p, &e, sizeof(e));
-	    serverReply.ga_len++;
+	    ga_init2(&e.لڑیاں, 1, 100);
+	    mch_memmove(p, &e, حجم(e));
+	    server_جواب.ga_len++;
 	}
     }
-    else if (p != NULL && op == SROP_Delete)
+    ورنہ اگر (p != تہی && op == SROP_Delete)
     {
-	ga_clear(&p->strings);
-	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * sizeof(*p));
-	serverReply.ga_len--;
+	ga_clear(&p->لڑیاں);
+	mch_memmove(p, p + 1, (server_جواب.ga_len - i - 1) * حجم(*p));
+	server_جواب.ga_len--;
     }
 
-    return p;
+    واپس p;
 }
 
 /*
  * Convert string to windowid.
  * Issue an error if the id is invalid.
  */
-    Window
-serverStrToWin(char_u *str)
+    کھڑکی
+server_Str_مقصد_Win(char_u *str)
 {
-    unsigned  id = None;
+    غیرعلامتی  id = None;
 
-    sscanf((char *)str, "0x%x", &id);
-    if (id == None)
-	semsg(_(e_invalid_server_id_used_str), str);
+    لڑی_سے_پڑھو((حرف *)str, "0x%x", &id);
+    اگر (id == None)
+	semsg(_(e_invalid_server_id_مستعمل_str), str);
 
-    return (Window)id;
+    واپس (کھڑکی)id;
 }
 
 /*
  * Send a reply string (notification) to client with id "name".
  * Return -1 if the window is invalid.
  */
-    int
-serverSendReply(char_u *name, char_u *str)
+    صحیح
+server_Send_جواب(char_u *name, char_u *str)
 {
     char_u	*property;
-    int		length;
-    int		res;
+    صحیح		لمبائی;
+    صحیح		res;
     Display	*dpy = X_DISPLAY;
-    Window	win = serverStrToWin(name);
+    کھڑکی	win = server_Str_مقصد_Win(name);
 
-    if (commProperty == None)
+    اگر (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	اگر (SendInit(dpy) < 0)
+	    واپس -2;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
+    اگر (!کھڑکی_Valid(dpy, win))
+	واپس -1;
 
-    length = STRLEN(p_enc) + STRLEN(str) + 14;
-    if ((property = alloc(length + 30)) == NULL)
-	return -1;
+    لمبائی = STRLEN(p_enc) + STRLEN(str) + 14;
+    اگر ((property = alloc(لمبائی + 30)) == تہی)
+	واپس -1;
 
-    sprintf((char *)property, "%cn%c-E %s%c-n %s%c-w %x",
-	    0, 0, p_enc, 0, str, 0, (unsigned int)commWindow);
+    sprintf((حرف *)property, "%cn%c-E %s%c-n %s%c-w %x",
+	    0, 0, p_enc, 0, str, 0, (غیرعلامتی صحیح)comm_کھڑکی);
     // Add length of what "%x" resulted in.
-    length += STRLEN(property + length);
-    res = AppendPropCarefully(dpy, win, commProperty, property, length + 1);
+    لمبائی += STRLEN(property + لمبائی);
+    res = AppendPropCarefully(dpy, win, commProperty, property, لمبائی + 1);
     vim_free(property);
 
-    return res;
+    واپس res;
 }
 
-    static int
-WaitForReply(void *p)
+    ساکن صحیح
+Wait_For_جواب(خالی *p)
 {
-    Window  *w = (Window *) p;
+    کھڑکی  *w = (کھڑکی *) p;
 
-    return ServerReplyFind(*w, SROP_Find) != NULL;
+    واپس Server_جواب_ڈھونڈو(*w, SROP_ڈھونڈو) != تہی;
 }
 
 /*
@@ -786,60 +786,60 @@ WaitForReply(void *p)
  * Return 0 and the allocated string in "*str" when a reply is available.
  * Return -1 if the window becomes invalid while waiting.
  */
-    int
-serverReadReply(
+    صحیح
+server_Read_جواب(
     Display	*dpy,
-    Window	win,
+    کھڑکی	win,
     char_u	**str,
-    int		localLoop,
-    int		timeout)
+    صحیح		localLoop,
+    صحیح		timeout)
 {
-    int		len;
+    صحیح		len;
     char_u	*s;
-    struct	ServerReply *p;
+    ساخت	Server_جواب *p;
 
-    ServerWait(dpy, win, WaitForReply, &win, localLoop,
+    ServerWait(dpy, win, Wait_For_جواب, &win, localLoop,
 						   timeout > 0 ? timeout : -1);
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    اگر ((p = Server_جواب_ڈھونڈو(win, SROP_ڈھونڈو)) != تہی && p->لڑیاں.ga_len > 0)
     {
-	*str = vim_strsave(p->strings.ga_data);
+	*str = vim_strsave(p->لڑیاں.ga_ڈیٹا);
 	len = STRLEN(*str) + 1;
-	if (len < p->strings.ga_len)
+	اگر (len < p->لڑیاں.ga_len)
 	{
-	    s = (char_u *) p->strings.ga_data;
-	    mch_memmove(s, s + len, p->strings.ga_len - len);
-	    p->strings.ga_len -= len;
+	    s = (char_u *) p->لڑیاں.ga_ڈیٹا;
+	    mch_memmove(s, s + len, p->لڑیاں.ga_len - len);
+	    p->لڑیاں.ga_len -= len;
 	}
-	else
+	ورنہ
 	{
 	    // Last string read.  Remove from list
-	    ga_clear(&p->strings);
-	    ServerReplyFind(win, SROP_Delete);
+	    ga_clear(&p->لڑیاں);
+	    Server_جواب_ڈھونڈو(win, SROP_Delete);
 	}
-	return 0;
+	واپس 0;
     }
-    return -1;
+    واپس -1;
 }
 
 /*
  * Check for replies from id (win).
  * Return TRUE and a non-malloc'ed string if there is.  Else return FALSE.
  */
-    int
-serverPeekReply(Display *dpy, Window win, char_u **str)
+    صحیح
+server_Peek_جواب(Display *dpy, کھڑکی win, char_u **str)
 {
-    struct ServerReply *p;
+    ساخت Server_جواب *p;
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    اگر ((p = Server_جواب_ڈھونڈو(win, SROP_ڈھونڈو)) != تہی && p->لڑیاں.ga_len > 0)
     {
-	if (str != NULL)
-	    *str = p->strings.ga_data;
-	return 1;
+	اگر (str != تہی)
+	    *str = p->لڑیاں.ga_ڈیٹا;
+	واپس 1;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
-    return 0;
+    اگر (!کھڑکی_Valid(dpy, win))
+	واپس -1;
+    واپس 0;
 }
 
 
@@ -847,7 +847,7 @@ serverPeekReply(Display *dpy, Window win, char_u **str)
  * Initialize the communication channels for sending commands and receiving
  * results.
  */
-    static int
+    ساکن صحیح
 SendInit(Display *dpy)
 {
     XErrorHandler old_handler;
@@ -859,36 +859,36 @@ SendInit(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    if (commProperty == None)
+    اگر (commProperty == None)
 	commProperty = XInternAtom(dpy, "Comm", False);
-    if (vimProperty == None)
+    اگر (vimProperty == None)
 	vimProperty = XInternAtom(dpy, "Vim", False);
-    if (registryProperty == None)
+    اگر (registryProperty == None)
 	registryProperty = XInternAtom(dpy, "VimRegistry", False);
 
-    if (commWindow == None)
+    اگر (comm_کھڑکی == None)
     {
-	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
+	comm_کھڑکی = XCreate_Simple_کھڑکی(dpy, XDefault_جڑ_کھڑکی(dpy),
 				getpid(), 0, 10, 10, 0,
 				WhitePixel(dpy, DefaultScreen(dpy)),
 				WhitePixel(dpy, DefaultScreen(dpy)));
-	XSelectInput(dpy, commWindow, PropertyChangeMask);
+	XSelect_داخلہ(dpy, comm_کھڑکی, Property_Change_نقاب);
 	// WARNING: Do not step through this while debugging, it will hangup
 	// the X server!
 	XGrabServer(dpy);
-	DeleteAnyLingerer(dpy, commWindow);
+	DeleteAnyLingerer(dpy, comm_کھڑکی);
 	XUngrabServer(dpy);
     }
 
     // Make window recognizable as a vim window
-    XChangeProperty(dpy, commWindow, vimProperty, XA_STRING,
-		    8, PropModeReplace, (char_u *)VIM_VERSION_SHORT,
-			(int)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
+    XChangeProperty(dpy, comm_کھڑکی, vimProperty, XA_STRING,
+		    8, Prop_منوال_Replace, (char_u *)VIM_نسخہ_SHORT,
+			(صحیح)STRLEN_LITERAL(VIM_نسخہ_SHORT) + 1);
 
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (خالی)XSetErrorHandler(old_handler);
 
-    return got_x_error ? -1 : 0;
+    واپس got_x_error ? -1 : 0;
 }
 
 /*
@@ -903,61 +903,61 @@ SendInit(Display *dpy)
  *	If "delete" is non-zero, then if the named server is found it is
  *	removed from the registry property.
  */
-    static Window
+    ساکن کھڑکی
 LookupName(
     Display	*dpy,	    // Display whose registry to check.
     char_u	*name,	    // Name of a server.
-    int		delete,	    // If non-zero, delete info about name.
+    صحیح		delete,	    // If non-zero, delete info about name.
     char_u	**loose)    // Do another search matching -999 if not found
 			    // Return result here if a match is found
 {
-    char_u	*regProp, *entry;
+    char_u	*regProp, *اندراج_2;
     char_u	*p;
-    long_u	numItems;
-    int_u	returnValue;
+    long_u	عدد_اشیاء;
+    int_u	return_قدر;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return 0;
+    اگر (GetRegProp(dpy, &regProp, &عدد_اشیاء, FALSE) == FAIL)
+	واپس 0;
 
     /*
      * Scan the property for the desired name.
      */
-    returnValue = (int_u)None;
-    entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    return_قدر = (int_u)None;
+    اندراج_2 = تہی;	// Not needed, but eliminates compiler warning.
+    برائے (p = regProp; (long_u)(p - regProp) < عدد_اشیاء; )
     {
-	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	اندراج_2 = p;
+	جب (*p != 0 && !محفوظ_isspace(*p))
 	    p++;
-	if (*p != 0 && STRICMP(name, p + 1) == 0)
+	اگر (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
-	    sscanf((char *)entry, "%x", &returnValue);
-	    break;
+	    لڑی_سے_پڑھو((حرف *)اندراج_2, "%x", &return_قدر);
+	    توڑو;
 	}
-	while (*p != 0)
+	جب (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    اگر (loose != تہی && return_قدر == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	برائے (p = regProp; (long_u)(p - regProp) < عدد_اشیاء; )
 	{
-	    entry = p;
-	    while (*p != 0 && !SAFE_isspace(*p))
+	    اندراج_2 = p;
+	    جب (*p != 0 && !محفوظ_isspace(*p))
 		p++;
-	    if (*p != 0 && IsSerialName(p + 1)
+	    اگر (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
-			&& returnValue != (int_u)None)
+		اگر (لڑی_سے_پڑھو((حرف *)اندراج_2, "%x", &return_قدر) == 1
+			&& return_قدر != (int_u)None)
 		    *loose = vim_strsave(p + 1);
-		break;
+		توڑو;
 	    }
-	    while (*p != 0)
+	    جب (*p != 0)
 		p++;
 	    p++;
 	}
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    اگر (delete && return_قدر != (int_u)None)
     {
-	int count;
+	صحیح گنتی;
 
-	while (*p != 0)
+	جب (*p != 0)
 	    p++;
 	p++;
-	count = numItems - (p - regProp);
-	if (count > 0)
-	    mch_memmove(entry, p, count);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
-			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+	گنتی = عدد_اشیاء - (p - regProp);
+	اگر (گنتی > 0)
+	    mch_memmove(اندراج_2, p, گنتی);
+	XChangeProperty(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty, XA_STRING,
+			8, Prop_منوال_Replace, regProp,
+			(صحیح)(عدد_اشیاء - (p - اندراج_2)));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    اگر (regProp != خالی_خانے_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    واپس (کھڑکی)return_قدر;
 }
 
 /*
@@ -998,59 +998,59 @@ LookupName(
  * 2. We get that id for our commWindow but only want to send, not register.
  * 3. The window will mistakenly be regarded valid because of own commWindow
  */
-    static void
+    ساکن خالی
 DeleteAnyLingerer(
     Display	*dpy,	// Display whose registry to check.
-    Window	win)	// Window to remove
+    کھڑکی	win)	// Window to remove
 {
-    char_u	*regProp, *entry = NULL;
+    char_u	*regProp, *اندراج_2 = تہی;
     char_u	*p;
-    long_u	numItems;
+    long_u	عدد_اشیاء;
     int_u	wwin;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return;
+    اگر (GetRegProp(dpy, &regProp, &عدد_اشیاء, FALSE) == FAIL)
+	واپس;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    برائے (p = regProp; (long_u)(p - regProp) < عدد_اشیاء; )
     {
-	if (*p != 0)
+	اگر (*p != 0)
 	{
-	    sscanf((char *)p, "%x", &wwin);
-	    if ((Window)wwin == win)
+	    لڑی_سے_پڑھو((حرف *)p, "%x", &wwin);
+	    اگر ((کھڑکی)wwin == win)
 	    {
-		int lastHalf;
+		صحیح آخری_Half;
 
 		// Copy down the remainder to delete entry
-		entry = p;
-		while (*p != 0)
+		اندراج_2 = p;
+		جب (*p != 0)
 		    p++;
 		p++;
-		lastHalf = numItems - (p - regProp);
-		if (lastHalf > 0)
-		    mch_memmove(entry, p, lastHalf);
-		numItems = (entry - regProp) + lastHalf;
-		p = entry;
-		continue;
+		آخری_Half = عدد_اشیاء - (p - regProp);
+		اگر (آخری_Half > 0)
+		    mch_memmove(اندراج_2, p, آخری_Half);
+		عدد_اشیاء = (اندراج_2 - regProp) + آخری_Half;
+		p = اندراج_2;
+		جاری;
 	    }
 	}
-	while (*p != 0)
+	جب (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (entry != NULL)
+    اگر (اندراج_2 != تہی)
     {
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
-			XA_STRING, 8, PropModeReplace, regProp,
-			(int)(p - regProp));
+	XChangeProperty(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty,
+			XA_STRING, 8, Prop_منوال_Replace, regProp,
+			(صحیح)(p - regProp));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    اگر (regProp != خالی_خانے_prop)
 	XFree(regProp);
 }
 
@@ -1060,52 +1060,52 @@ DeleteAnyLingerer(
  * exist yet.
  * Return OK when successful.
  */
-    static int
+    ساکن صحیح
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
-    long_u	*numItemsp,
-    int		domsg)		// When TRUE give error message.
+    long_u	*عدد_Itemsp,
+    صحیح		domsg)		// When TRUE give error message.
 {
-    int		result, actualFormat;
-    long_u	bytesAfter;
+    صحیح		نتیجہ, actualFormat;
+    long_u	بائٹیں_After;
     Atom	actualType;
     XErrorHandler old_handler;
 
-    *regPropp = NULL;
+    *regPropp = تہی;
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    result = XGetWindowProperty(dpy, RootWindow(dpy, 0), registryProperty, 0L,
-				(long)MAX_PROP_WORDS, False,
+    نتیجہ = XGet_کھڑکی_Property(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty, 0L,
+				(طویل)MAX_PROP_الفاظ, False,
 				XA_STRING, &actualType,
-				&actualFormat, numItemsp, &bytesAfter,
+				&actualFormat, عدد_Itemsp, &بائٹیں_After,
 				regPropp);
 
     XSync(dpy, FALSE);
-    (void)XSetErrorHandler(old_handler);
-    if (got_x_error)
-	return FAIL;
+    (خالی)XSetErrorHandler(old_handler);
+    اگر (got_x_error)
+	واپس FAIL;
 
-    if (actualType == None)
+    اگر (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
-	*numItemsp = 0;
-	*regPropp = empty_prop;
-	return OK;
+	*عدد_Itemsp = 0;
+	*regPropp = خالی_خانے_prop;
+	واپس OK;
     }
 
     // If the property is improperly formed, then delete it.
-    if (result != Success || actualFormat != 8 || actualType != XA_STRING)
+    اگر (نتیجہ != Success || actualFormat != 8 || actualType != XA_STRING)
     {
-	if (*regPropp != NULL)
+	اگر (*regPropp != تہی)
 	    XFree(*regPropp);
-	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
-	if (domsg)
+	XDeleteProperty(dpy, جڑ_کھڑکی_2(dpy, 0), registryProperty);
+	اگر (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
-	return FAIL;
+	واپس FAIL;
     }
-    return OK;
+    واپس OK;
 }
 
 
@@ -1117,92 +1117,92 @@ GetRegProp(
  * unintended behavior and should only be used for code that blocks for a
  * response.
  */
-    void
+    خالی
 serverEventProc(
     Display	*dpy,
     XEvent	*eventPtr,	// Information about event.
-    int		immediate)	// Run event immediately. Should mostly be 0.
+    صحیح		فوری)	// Run event immediately. Should mostly be 0.
 {
     char_u	*propInfo;
-    int		result, actualFormat;
-    long_u	numItems, bytesAfter;
+    صحیح		نتیجہ, actualFormat;
+    long_u	عدد_اشیاء, بائٹیں_After;
     Atom	actualType;
 
-    if (eventPtr != NULL)
+    اگر (eventPtr != تہی)
     {
-	if (eventPtr->xproperty.atom != commProperty
-		|| eventPtr->xproperty.state != PropertyNewValue)
-	    return;
+	اگر (eventPtr->xproperty.atom != commProperty
+		|| eventPtr->xproperty.state != Property_New_قدر)
+	    واپس;
     }
 
     /*
      * Read the comm property and delete it.
      */
-    propInfo = NULL;
-    result = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
-				(long)MAX_PROP_WORDS, True,
+    propInfo = تہی;
+    نتیجہ = XGet_کھڑکی_Property(dpy, comm_کھڑکی, commProperty, 0L,
+				(طویل)MAX_PROP_الفاظ, True,
 				XA_STRING, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
+				&actualFormat, &عدد_اشیاء, &بائٹیں_After,
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
-    if (result != Success || actualType != XA_STRING || actualFormat != 8)
+    اگر (نتیجہ != Success || actualType != XA_STRING || actualFormat != 8)
     {
-	if (propInfo != NULL)
+	اگر (propInfo != تہی)
 	    XFree(propInfo);
-	return;
+	واپس;
     }
-    if (immediate)
-	server_parse_message(dpy, propInfo, numItems);
-    else
-	save_in_queue(propInfo, numItems);
+    اگر (فوری)
+	server_parse_پیغام(dpy, propInfo, عدد_اشیاء);
+    ورنہ
+	save_اندر_قطار(propInfo, عدد_اشیاء);
 }
 
 /*
  * Saves x clientserver commands in a queue so that they can be called when
  * vim is idle.
  */
-    static void
-save_in_queue(char_u *propInfo, long_u len)
+    ساکن خالی
+save_اندر_قطار(char_u *propInfo, long_u len)
 {
-    x_queue_T *node;
+    x_قطار_T *گرہ;
 
-    node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
-	return;	    // out of memory
-    node->propInfo = propInfo;
-    node->len = len;
+    گرہ = ALLOC_ONE(x_قطار_T);
+    اگر (گرہ == تہی)
+	واپس;	    // out of memory
+    گرہ->propInfo = propInfo;
+    گرہ->len = len;
 
-    if (head.next == NULL)   // initialize circular queue
+    اگر (سر.اگلا == تہی)   // initialize circular queue
     {
-	head.next = &head;
-	head.prev = &head;
+	سر.اگلا = &سر;
+	سر.پچھلا = &سر;
     }
 
     // insert node at tail of queue
-    node->next = &head;
-    node->prev = head.prev;
-    head.prev->next = node;
-    head.prev = node;
+    گرہ->اگلا = &سر;
+    گرہ->پچھلا = سر.پچھلا;
+    سر.پچھلا->اگلا = گرہ;
+    سر.پچھلا = گرہ;
 }
 
 /*
  * Parses queued clientserver messages.
  */
-    void
-server_parse_messages(void)
+    خالی
+server_parse_messages(خالی)
 {
-    x_queue_T	*node;
+    x_قطار_T	*گرہ;
 
-    if (!X_DISPLAY)
-	return; // cannot happen?
-    while (head.next != NULL && head.next != &head)
+    اگر (!X_DISPLAY)
+	واپس; // cannot happen?
+    جب (سر.اگلا != تہی && سر.اگلا != &سر)
     {
-	node = head.next;
-	head.next = node->next;
-	node->next->prev = node->prev;
-	server_parse_message(X_DISPLAY, node->propInfo, node->len);
-	vim_free(node);
+	گرہ = سر.اگلا;
+	سر.اگلا = گرہ->اگلا;
+	گرہ->اگلا->پچھلا = گرہ->پچھلا;
+	server_parse_پیغام(X_DISPLAY, گرہ->propInfo, گرہ->len);
+	vim_free(گرہ);
     }
 }
 
@@ -1210,10 +1210,10 @@ server_parse_messages(void)
  * Returns a non-zero value if there are clientserver messages waiting
  * int the queue.
  */
-    int
-server_waiting(void)
+    صحیح
+server_انتظار(خالی)
 {
-    return head.next != NULL && head.next != &head;
+    واپس سر.اگلا != تہی && سر.اگلا != &سر;
 }
 
 /*
@@ -1221,18 +1221,18 @@ server_waiting(void)
  * commands.
  * "propInfo" will be freed.
  */
-    static void
-server_parse_message(
+    ساکن خالی
+server_parse_پیغام(
     Display	*dpy,
     char_u	*propInfo, // A string containing 0 or more X commands
-    long_u	numItems)  // The size of propInfo in bytes.
+    long_u	عدد_اشیاء)  // The size of propInfo in bytes.
 {
     char_u	*p;
-    int		code;
+    صحیح		رمز;
     char_u	*tofree;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
+# اگر defined(FEAT_EVAL)
+    ch_log(تہی, "server_parse_message() numItems: %ld", عدد_اشیاء);
 # endif
 
     /*
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    برائے (p = propInfo; (long_u)(p - propInfo) < عدد_اشیاء; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1248,17 +1248,17 @@ server_parse_message(
 	 * is, we'll be able to tell that a new command/result is
 	 * starting.
 	 */
-	if (*p == 0)
+	اگر (*p == 0)
 	{
 	    p++;
-	    continue;
+	    جاری;
 	}
 
-	if ((*p == 'c' || *p == 'k') && p[1] == 0)
+	اگر ((*p == 'c' || *p == 'k') && p[1] == 0)
 	{
-	    Window	resWindow;
-	    char_u	*name, *script, *serial, *end;
-	    Bool	asKeys = *p == 'k';
+	    کھڑکی	res_کھڑکی;
+	    char_u	*name, *script, *serial, *انتہا;
+	    Bool	as_کلیدیں = *p == 'k';
 	    char_u	*enc;
 
 	    /*
@@ -1268,99 +1268,99 @@ server_parse_message(
 	     * like an option.
 	     */
 	    p += 2;
-	    name = NULL;
-	    resWindow = None;
+	    name = تہی;
+	    res_کھڑکی = None;
 	    serial = (char_u *)"";
-	    script = NULL;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    script = تہی;
+	    enc = تہی;
+	    جب ((long_u)(p - propInfo) < عدد_اشیاء && *p == '-')
 	    {
-# if defined(FEAT_EVAL)
-		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
+# اگر defined(FEAT_EVAL)
+		ch_log(تہی, "server_parse_message() item: %c, %s", p[-2], p);
 # endif
-		switch (p[1])
+		انتخاب (p[1])
 		{
-		    case 'r':
-			end = skipwhite(p + 2);
-			resWindow = 0;
-			while (vim_isxdigit(*end))
+		    حالت 'r':
+			انتہا = skipwhite(p + 2);
+			res_کھڑکی = 0;
+			جب (vim_isxdigit(*انتہا))
 			{
-			    resWindow = 16 * resWindow + (long_u)hex2nr(*end);
-			    ++end;
+			    res_کھڑکی = 16 * res_کھڑکی + (long_u)hex2nr(*انتہا);
+			    ++انتہا;
 			}
-			if (end == p + 2 || *end != ' ')
-			    resWindow = None;
-			else
+			اگر (انتہا == p + 2 || *انتہا != ' ')
+			    res_کھڑکی = None;
+			ورنہ
 			{
-			    p = serial = end + 1;
-			    clientWindow = resWindow; // Remember in global
+			    p = serial = انتہا + 1;
+			    client_کھڑکی = res_کھڑکی; // Remember in global
 			}
-			break;
-		    case 'n':
-			if (p[2] == ' ')
+			توڑو;
+		    حالت 'n':
+			اگر (p[2] == ' ')
 			    name = p + 3;
-			break;
-		    case 's':
-			if (p[2] == ' ')
+			توڑو;
+		    حالت 's':
+			اگر (p[2] == ' ')
 			    script = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			توڑو;
+		    حالت 'E':
+			اگر (p[2] == ' ')
 			    enc = p + 3;
-			break;
+			توڑو;
 		}
-		while (*p != 0)
+		جب (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (script == NULL || name == NULL)
-		continue;
+	    اگر (script == تہی || name == تہی)
+		جاری;
 
-	    if (serverName != NULL && STRICMP(name, serverName) == 0)
+	    اگر (serverName != تہی && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
-		    server_to_input_buf(script);
-		else
+		اگر (as_کلیدیں)
+		    server_مقصد_داخلہ_buf(script);
+		ورنہ
 		{
 		    char_u      *res;
 
-		    res = eval_client_expr_to_string(script);
-		    if (resWindow != None)
+		    res = eval_client_اظہاریہ_مقصد_string(script);
+		    اگر (res_کھڑکی != None)
 		    {
-			garray_T    reply;
+			garray_T    جواب;
 
 			// Initialize the result property.
-			ga_init2(&reply, 1, 100);
-			(void)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
-			sprintf(reply.ga_data, "%cr%c-E %s%c-s %s%c-r ",
+			ga_init2(&جواب, 1, 100);
+			(خالی)ga_grow(&جواب, 50 + STRLEN(p_enc) + STRLEN(serial));
+			sprintf(جواب.ga_ڈیٹا, "%cr%c-E %s%c-s %s%c-r ",
 						   0, 0, p_enc, 0, serial, 0);
-			reply.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
+			جواب.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
 
 			// Evaluate the expression and return the result.
-			if (res != NULL)
-			    ga_concat(&reply, res);
-			else
+			اگر (res != تہی)
+			    ga_concat(&جواب, res);
+			ورنہ
 			{
-			    ga_concat(&reply,
-				   (char_u *)_(e_invalid_expression_received));
-			    ga_append(&reply, 0);
-			    GA_CONCAT_LITERAL(&reply, "-c 1");
+			    ga_concat(&جواب,
+				   (char_u *)_(e_invalid_عبارت_received));
+			    ga_append(&جواب, 0);
+			    GA_CONCAT_LITERAL(&جواب, "-c 1");
 			}
-			ga_append(&reply, NUL);
-			(void)AppendPropCarefully(dpy, resWindow, commProperty,
-						 reply.ga_data, reply.ga_len);
-			ga_clear(&reply);
+			ga_append(&جواب, NUL);
+			(خالی)AppendPropCarefully(dpy, res_کھڑکی, commProperty,
+						 جواب.ga_ڈیٹا, جواب.ga_len);
+			ga_clear(&جواب);
 		    }
 		    vim_free(res);
 		}
 		vim_free(tofree);
 	    }
 	}
-	else if (*p == 'r' && p[1] == 0)
+	ورنہ اگر (*p == 'r' && p[1] == 0)
 	{
-	    int		    serial, gotSerial;
+	    صحیح		    serial, gotSerial;
 	    char_u	    *res;
 	    PendingCommand  *pcPtr;
 	    char_u	    *enc;
@@ -1373,61 +1373,61 @@ server_parse_message(
 	    p += 2;
 	    gotSerial = 0;
 	    res = (char_u *)"";
-	    code = 0;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    رمز = 0;
+	    enc = تہی;
+	    جب ((long_u)(p - propInfo) < عدد_اشیاء && *p == '-')
 	    {
-		switch (p[1])
+		انتخاب (p[1])
 		{
-		    case 'r':
-			if (p[2] == ' ')
+		    حالت 'r':
+			اگر (p[2] == ' ')
 			    res = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			توڑو;
+		    حالت 'E':
+			اگر (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 's':
-			if (sscanf((char *)p + 2, " %d", &serial) == 1)
+			توڑو;
+		    حالت 's':
+			اگر (لڑی_سے_پڑھو((حرف *)p + 2, " %d", &serial) == 1)
 			    gotSerial = 1;
-			break;
-		    case 'c':
-			if (sscanf((char *)p + 2, " %d", &code) != 1)
-			    code = 0;
-			break;
+			توڑو;
+		    حالت 'c':
+			اگر (لڑی_سے_پڑھو((حرف *)p + 2, " %d", &رمز) != 1)
+			    رمز = 0;
+			توڑو;
 		}
-		while (*p != 0)
+		جب (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotSerial)
-		continue;
+	    اگر (!gotSerial)
+		جاری;
 
 	    /*
 	     * Give the result information to anyone who's
 	     * waiting for it.
 	     */
-	    for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    برائے (pcPtr = pendingCommands; pcPtr != تہی; pcPtr = pcPtr->اگلا_Ptr)
 	    {
-		if (serial != pcPtr->serial || pcPtr->result != NULL)
-		    continue;
+		اگر (serial != pcPtr->serial || pcPtr->نتیجہ != تہی)
+		    جاری;
 
-		pcPtr->code = code;
+		pcPtr->رمز = رمز;
 		res = serverConvert(enc, res, &tofree);
-		if (tofree == NULL)
+		اگر (tofree == تہی)
 		    res = vim_strsave(res);
-		pcPtr->result = res;
-		break;
+		pcPtr->نتیجہ = res;
+		توڑو;
 	    }
 	}
-	else if (*p == 'n' && p[1] == 0)
+	ورنہ اگر (*p == 'n' && p[1] == 0)
 	{
-	    Window	win = 0;
-	    unsigned int u;
-	    int		gotWindow;
+	    کھڑکی	win = 0;
+	    غیرعلامتی صحیح u;
+	    صحیح		got_کھڑکی;
 	    char_u	*str;
-	    struct	ServerReply *r;
+	    ساخت	Server_جواب *r;
 	    char_u	*enc;
 
 	    /*
@@ -1435,51 +1435,51 @@ server_parse_message(
 	     * script.  Execute any autocommand and save it for later retrieval
 	     */
 	    p += 2;
-	    gotWindow = 0;
+	    got_کھڑکی = 0;
 	    str = (char_u *)"";
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = تہی;
+	    جب ((long_u)(p - propInfo) < عدد_اشیاء && *p == '-')
 	    {
-		switch (p[1])
+		انتخاب (p[1])
 		{
-		    case 'n':
-			if (p[2] == ' ')
+		    حالت 'n':
+			اگر (p[2] == ' ')
 			    str = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			توڑو;
+		    حالت 'E':
+			اگر (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 'w':
-			if (sscanf((char *)p + 2, " %x", &u) == 1)
+			توڑو;
+		    حالت 'w':
+			اگر (لڑی_سے_پڑھو((حرف *)p + 2, " %x", &u) == 1)
 			{
 			    win = u;
-			    gotWindow = 1;
+			    got_کھڑکی = 1;
 			}
-			break;
+			توڑو;
 		}
-		while (*p != 0)
+		جب (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotWindow)
-		continue;
+	    اگر (!got_کھڑکی)
+		جاری;
 	    str = serverConvert(enc, str, &tofree);
-	    if ((r = ServerReplyFind(win, SROP_Add)) != NULL)
+	    اگر ((r = Server_جواب_ڈھونڈو(win, SROP_جوڑو)) != تہی)
 	    {
-		ga_concat(&(r->strings), str);
-		ga_append(&(r->strings), NUL);
+		ga_concat(&(r->لڑیاں), str);
+		ga_append(&(r->لڑیاں), NUL);
 	    }
 	    {
 		char_u	winstr[30];
 
-		sprintf((char *)winstr, "0x%x", (unsigned int)win);
+		sprintf((حرف *)winstr, "0x%x", (غیرعلامتی صحیح)win);
 		apply_autocmds(EVENT_REMOTEREPLY, winstr, str, TRUE, curbuf);
 	    }
 	    vim_free(tofree);
 	}
-	else
+	ورنہ
 	{
 	    /*
 	     * Didn't recognize this thing.  Just skip through the next
@@ -1487,7 +1487,7 @@ server_parse_message(
 	     * Even if we get an 'r'(eply) we will throw it away as we
 	     * never specify (and thus expect) one
 	     */
-	    while (*p != 0)
+	    جب (*p != 0)
 		p++;
 	    p++;
 	}
@@ -1501,45 +1501,45 @@ server_parse_message(
  * than having Xlib panic.
  * Return: 0 for OK, -1 for error
  */
-    static int
+    ساکن صحیح
 AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
-    Window	window,		// Window whose property is to be modified.
+    کھڑکی	کھڑکی_2,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
-    char_u	*value,		// Characters  to append to property.
-    int		length)		// How much to append
+    char_u	*قدر,		// Characters  to append to property.
+    صحیح		لمبائی)		// How much to append
 {
     XErrorHandler old_handler;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, window, property, XA_STRING, 8,
-					       PropModeAppend, value, length);
+    XChangeProperty(dpy, کھڑکی_2, property, XA_STRING, 8,
+					       Prop_منوال_Append, قدر, لمبائی);
     XSync(dpy, False);
-    (void) XSetErrorHandler(old_handler);
-    return got_x_error ? -1 : 0;
+    (خالی) XSetErrorHandler(old_handler);
+    واپس got_x_error ? -1 : 0;
 }
 
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
-x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
+    ساکن صحیح
+x_error_check(Display *dpy غیر_مستعمل, XErrorEvent *error_event غیر_مستعمل)
 {
     got_x_error = TRUE;
-    return 0;
+    واپس 0;
 }
 
 /*
  * Check if "str" looks like it had a serial number appended.
  * Actually just checks if the name ends in a digit.
  */
-    static int
+    ساکن صحیح
 IsSerialName(char_u *str)
 {
-    int len = STRLEN(str);
+    صحیح len = STRLEN(str);
 
-    return (len > 1 && vim_isdigit(str[len - 1]));
+    واپس (len > 1 && vim_isdigit(str[len - 1]));
 }
-#endif	// FEAT_CLIENTSERVER
+#اگر_ختم	// FEAT_CLIENTSERVER

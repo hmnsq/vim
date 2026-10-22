@@ -10,71 +10,71 @@
 /*
  * popupmenu.c: Popup menu (PUM)
  */
-#include "vim.h"
+#شامل "vim.h"
 
-static pumitem_T *pum_array = NULL;	// items of displayed pum
-static int pum_size;			// nr of items in "pum_array"
-static int pum_selected;		// index of selected item or -1
-static int pum_first = 0;		// index of top item
+ساکن pumitem_T *pum_array = تہی;	// items of displayed pum
+ساکن صحیح pum_سائز;			// nr of items in "pum_array"
+ساکن صحیح pum_selected;		// index of selected item or -1
+ساکن صحیح pum_پہلا = 0;		// index of top item
 
-static int call_update_screen = FALSE;
-static int pum_in_cmdline = FALSE;
+ساکن صحیح call_update_screen = FALSE;
+ساکن صحیح pum_اندر_cmdline = FALSE;
 
-static int pum_height;			// nr of displayed pum items
-static int pum_width;			// width of displayed pum items
-static int pum_base_width;		// width of pum items base
-static int pum_kind_width;		// width of pum items kind column
-static int pum_extra_width;		// width of extra stuff
-static int pum_scrollbar;		// TRUE when scrollbar present
-#ifdef FEAT_RIGHTLEFT
-static int pum_rl;			// TRUE when pum is drawn 'rightleft'
-#endif
+ساکن صحیح pum_اونچائی;			// nr of displayed pum items
+ساکن صحیح pum_چوڑائی;			// width of displayed pum items
+ساکن صحیح pum_بنیاد_چوڑائی;		// width of pum items base
+ساکن صحیح pum_قسم_چوڑائی;		// width of pum items kind column
+ساکن صحیح pum_extra_چوڑائی;		// width of extra stuff
+ساکن صحیح pum_scrollbar;		// TRUE when scrollbar present
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+ساکن صحیح pum_rl;			// TRUE when pum is drawn 'rightleft'
+#اگر_ختم
 
-static int pum_row;			// top row of pum
-static int pum_col;			// left column of pum
+ساکن صحیح pum_صف;			// top row of pum
+ساکن صحیح pum_ستون;			// left column of pum
 
-static win_T *pum_window = NULL;
-static int pum_win_row;
-static int pum_win_height;
-static int pum_win_col;
-static int pum_win_wcol;
-static int pum_win_width;
+ساکن win_T *pum_کھڑکی = تہی;
+ساکن صحیح pum_win_صف;
+ساکن صحیح pum_win_اونچائی;
+ساکن صحیح pum_win_ستون;
+ساکن صحیح pum_win_wcol;
+ساکن صحیح pum_win_چوڑائی;
 
 // Some parts are not updated when a popup menu is visible.  Setting this flag
 // makes pum_visible() return FALSE even when there is a popup menu.
-static int pum_pretend_not_visible = FALSE;
+ساکن صحیح pum_pretend_not_visible = FALSE;
 
 // Border support
-static int pum_border = 0;
-static int pum_margin = 0;	// margin of 1 cell on left and right
-static int pum_shadow = 0;
+ساکن صحیح pum_border = 0;
+ساکن صحیح pum_margin = 0;	// margin of 1 cell on left and right
+ساکن صحیح pum_shadow = 0;
 
-#ifdef FEAT_IMAGE_POPUP
-static image_placement_T *pum_imagep = NULL;
-#endif
+#اگر_تعریف_شدہ FEAT_IMAGE_POPUP
+ساکن image_placement_T *pum_imagep = تہی;
+#اگر_ختم
 
 // Border characters
-static struct {
-    int top;
-    int right;
-    int bottom;
-    int left;
-    int top_left;
-    int top_right;
-    int bottom_right;
-    int bottom_left;
+ساکن ساخت {
+    صحیح چوٹی;
+    صحیح دایاں;
+    صحیح bottom;
+    صحیح بایاں;
+    صحیح چوٹی_بایاں;
+    صحیح چوٹی_دایاں;
+    صحیح bottom_دایاں;
+    صحیح bottom_بایاں;
 } pum_border_chars;
 
-static int pum_set_selected(int n, int repeat);
-static void pum_draw_border(void);
-static void pum_draw_shadow(void);
-static void compute_margins(int *right_margin, int *left_margin, int *left_padding);
+ساکن صحیح pum_سیٹ_selected(صحیح n, صحیح repeat);
+ساکن خالی pum_draw_border(خالی);
+ساکن خالی pum_draw_shadow(خالی);
+ساکن خالی compute_margins(صحیح *دایاں_margin, صحیح *بایاں_margin, صحیح *بایاں_padding);
 
-#define PUM_DEF_HEIGHT 10
+#تعریف_کرو PUM_DEF_اونچائی 10
 
-#define DEFINE_PUM_SETTER(feature) \
-	void \
-    pum_set_##feature(int enable) \
+#تعریف_کرو DEFINE_PUM_SETTER(feature) \
+	خالی \
+    pum_سیٹ##feature(صحیح enable) \
     { \
 	pum_##feature = enable ? 1 : 0; \
     }
@@ -83,34 +83,34 @@ DEFINE_PUM_SETTER(border)
 DEFINE_PUM_SETTER(shadow)
 DEFINE_PUM_SETTER(margin)
 
-    static void
-pum_compute_size(void)
+    ساکن خالی
+pum_compute_سائز(خالی)
 {
-    int	w;
+    صحیح	w;
 
     // Compute the width of the widest match and the widest extra.
-    pum_base_width = 0;
-    pum_kind_width = 0;
-    pum_extra_width = 0;
-    for (int i = 0; i < pum_size; ++i)
+    pum_بنیاد_چوڑائی = 0;
+    pum_قسم_چوڑائی = 0;
+    pum_extra_چوڑائی = 0;
+    برائے (صحیح i = 0; i < pum_سائز; ++i)
     {
-	if (pum_array[i].pum_text != NULL)
+	اگر (pum_array[i].pum_متن != تہی)
 	{
-	    w = vim_strsize(pum_array[i].pum_text);
-	    if (pum_base_width < w)
-		pum_base_width = w;
+	    w = vim_strsize(pum_array[i].pum_متن);
+	    اگر (pum_بنیاد_چوڑائی < w)
+		pum_بنیاد_چوڑائی = w;
 	}
-	if (pum_array[i].pum_kind != NULL)
+	اگر (pum_array[i].pum_قسم != تہی)
 	{
-	    w = vim_strsize(pum_array[i].pum_kind) + 1;
-	    if (pum_kind_width < w)
-		pum_kind_width = w;
+	    w = vim_strsize(pum_array[i].pum_قسم) + 1;
+	    اگر (pum_قسم_چوڑائی < w)
+		pum_قسم_چوڑائی = w;
 	}
-	if (pum_array[i].pum_extra != NULL)
+	اگر (pum_array[i].pum_extra != تہی)
 	{
 	    w = vim_strsize(pum_array[i].pum_extra) + 1;
-	    if (pum_extra_width < w)
-		pum_extra_width = w;
+	    اگر (pum_extra_چوڑائی < w)
+		pum_extra_چوڑائی = w;
 	}
     }
 }
@@ -119,169 +119,169 @@ pum_compute_size(void)
  * Calculate vertical placement for popup menu.
  * Sets pum_row and pum_height based on available space.
  */
-    static void
+    ساکن خالی
 pum_compute_vertical_placement(
-	int size,
-	int above_row,
-	int below_row)
+	صحیح سائز,
+	صحیح above_صف,
+	صحیح نیچے_صف)
 {
-    int context_lines;
-    int cline_visible_offset;
-    int extra_height = 2 * pum_border + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
+    صحیح context_سطریں;
+    صحیح cline_visible_انحراف;
+    صحیح extra_اونچائی = 2 * pum_border + pum_shadow;
+    صحیح extra_انحراف = pum_border + pum_shadow;
 
-    pum_height = MIN(size, PUM_DEF_HEIGHT);
-    if (p_ph > 0 && pum_height > p_ph)
-	pum_height = p_ph;
+    pum_اونچائی = MIN(سائز, PUM_DEF_اونچائی);
+    اگر (p_ph > 0 && pum_اونچائی > p_ph)
+	pum_اونچائی = p_ph;
 
     // Put the pum below "pum_win_row" if possible.  If there are few lines
     // decide on where there is more room.
-    if (pum_win_row + 2 >= below_row - pum_height - extra_height
-	    && pum_win_row - above_row > (below_row - above_row) / 2)
+    اگر (pum_win_صف + 2 >= نیچے_صف - pum_اونچائی - extra_اونچائی
+	    && pum_win_صف - above_صف > (نیچے_صف - above_صف) / 2)
     {
 	// pum above "pum_win_row"
-	if (State & MODE_CMDLINE)
+	اگر (State & منوال_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_سطریں = 0;
+	ورنہ
 	    // Leave two lines of context if possible
-	    context_lines = MIN(2, curwin->w_wrow - curwin->w_cline_row);
+	    context_سطریں = MIN(2, curwin->w_wrow - curwin->w_cline_صف);
 
-	if (pum_win_row >= size + context_lines + extra_height)
+	اگر (pum_win_صف >= سائز + context_سطریں + extra_اونچائی)
 	{
-	    pum_row = pum_win_row - size - context_lines - extra_offset;
-	    pum_height = size;
+	    pum_صف = pum_win_صف - سائز - context_سطریں - extra_انحراف;
+	    pum_اونچائی = سائز;
 	}
-	else
+	ورنہ
 	{
-	    pum_row = pum_border;
-	    pum_height = pum_win_row - context_lines - extra_height;
+	    pum_صف = pum_border;
+	    pum_اونچائی = pum_win_صف - context_سطریں - extra_اونچائی;
 	}
-	if (p_ph > 0 && pum_height > p_ph)
+	اگر (p_ph > 0 && pum_اونچائی > p_ph)
 	{
-	    pum_row += pum_height - p_ph;
-	    pum_height = p_ph;
+	    pum_صف += pum_اونچائی - p_ph;
+	    pum_اونچائی = p_ph;
 	}
     }
-    else
+    ورنہ
     {
 	// pum below "pum_win_row"
-	if (State & MODE_CMDLINE)
+	اگر (State & منوال_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_سطریں = 0;
+	ورنہ
 	{
 	    // Leave three lines of context if possible
 	    validate_cheight();
-	    cline_visible_offset = curwin->w_cline_row +
-		curwin->w_cline_height - curwin->w_wrow;
-	    context_lines = MIN(3, cline_visible_offset);
+	    cline_visible_انحراف = curwin->w_cline_صف +
+		curwin->w_cline_اونچائی - curwin->w_wrow;
+	    context_سطریں = MIN(3, cline_visible_انحراف);
 	}
 
-	pum_row = pum_win_row + context_lines + pum_border;
-	pum_height = MIN(below_row - pum_row - extra_offset, size);
-	if (p_ph > 0 && pum_height > p_ph)
-	    pum_height = p_ph;
+	pum_صف = pum_win_صف + context_سطریں + pum_border;
+	pum_اونچائی = MIN(نیچے_صف - pum_صف - extra_انحراف, سائز);
+	اگر (p_ph > 0 && pum_اونچائی > p_ph)
+	    pum_اونچائی = p_ph;
     }
 
-#if defined(FEAT_QUICKFIX)
+#اگر defined(FEAT_QUICKFIX)
     // If there is a preview window above avoid drawing over it.
-    if (above_row > 0 && pum_row < above_row && pum_height > above_row)
+    اگر (above_صف > 0 && pum_صف < above_صف && pum_اونچائی > above_صف)
     {
-	pum_row = above_row;
-	pum_height = pum_win_row - above_row;
+	pum_صف = above_صف;
+	pum_اونچائی = pum_win_صف - above_صف;
     }
-#endif
+#اگر_ختم
 }
 
 /*
  * Try to set 'pum_width' so that it fits within available_width.
  * Returns TRUE if pum_width was successfully set, FALSE otherwise.
  */
-    static int
-set_pum_width_aligned_with_cursor(int width, int available_width)
+    ساکن صحیح
+سیٹ_pum_چوڑائی_aligned_with_cursor(صحیح چوڑائی, صحیح دستیاب_چوڑائی)
 {
-    int end_padding = TRUE;
+    صحیح انتہا_padding = TRUE;
 
-    if (width < p_pw)
+    اگر (چوڑائی < p_pw)
     {
-	width = p_pw;
-	end_padding = FALSE;
+	چوڑائی = p_pw;
+	انتہا_padding = FALSE;
     }
-    if (p_pmw > 0 && width >= p_pmw)
+    اگر (p_pmw > 0 && چوڑائی >= p_pmw)
     {
-	width = p_pmw;
-	end_padding = FALSE;
+	چوڑائی = p_pmw;
+	انتہا_padding = FALSE;
     }
 
-    pum_width = width + (end_padding && width >= p_pw ? 1 : 0);
-    return available_width >= pum_width;
+    pum_چوڑائی = چوڑائی + (انتہا_padding && چوڑائی >= p_pw ? 1 : 0);
+    واپس دستیاب_چوڑائی >= pum_چوڑائی;
 }
 
 /*
  * Calculate horizontal placement for popup menu. Sets pum_col and pum_width
  * based on cursor position and available space.
  */
-    static void
-pum_compute_horizontal_placement(int cursor_col)
+    ساکن خالی
+pum_compute_horizontal_placement(صحیح cursor_ستون)
 {
-    int desired_width = pum_base_width + pum_kind_width + pum_extra_width;
-    int available_width;
-    int col_offset;
-    int trailing_overhead = pum_scrollbar + pum_border
+    صحیح desired_چوڑائی = pum_بنیاد_چوڑائی + pum_قسم_چوڑائی + pum_extra_چوڑائی;
+    صحیح دستیاب_چوڑائی;
+    صحیح ستون_انحراف;
+    صحیح trailing_overhead = pum_scrollbar + pum_border
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
     {
-	col_offset = pum_border && (cursor_col >= Columns - 2)
-	    ? (3 - Columns + cursor_col) : 0;
-	available_width = cursor_col + 1;
-	pum_col = cursor_col - col_offset;
+	ستون_انحراف = pum_border && (cursor_ستون >= Columns - 2)
+	    ? (3 - Columns + cursor_ستون) : 0;
+	دستیاب_چوڑائی = cursor_ستون + 1;
+	pum_ستون = cursor_ستون - ستون_انحراف;
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	col_offset = pum_border && (cursor_col <= 1) ? (2 - cursor_col) : 0;
-	available_width = Columns - cursor_col;
-	pum_col = cursor_col + col_offset;
+	ستون_انحراف = pum_border && (cursor_ستون <= 1) ? (2 - cursor_ستون) : 0;
+	دستیاب_چوڑائی = Columns - cursor_ستون;
+	pum_ستون = cursor_ستون + ستون_انحراف;
     }
 
-    available_width -= trailing_overhead + col_offset;
+    دستیاب_چوڑائی -= trailing_overhead + ستون_انحراف;
 
     // Case 1: Align pum with "cursor_col"
-    if (set_pum_width_aligned_with_cursor(desired_width, available_width))
-	return;
+    اگر (سیٹ_pum_چوڑائی_aligned_with_cursor(desired_چوڑائی, دستیاب_چوڑائی))
+	واپس;
     // Show the pum truncated, provided it is at least as wide as 'pum_width'
-    if (available_width > p_pw)
+    اگر (دستیاب_چوڑائی > p_pw)
     {
-	pum_width = available_width;
-	return;
+	pum_چوڑائی = دستیاب_چوڑائی;
+	واپس;
     }
 
     // Case 2: Truncated pum is no longer aligned with "cursor_col"
-    available_width = Columns - trailing_overhead - col_offset;
+    دستیاب_چوڑائی = Columns - trailing_overhead - ستون_انحراف;
 
-    if (available_width > p_pw)
+    اگر (دستیاب_چوڑائی > p_pw)
     {
-	pum_width = p_pw;  // Truncate beyond 'pum_width'
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    pum_col = pum_width + trailing_overhead;
-	else
-#endif
-	    pum_col = Columns - pum_width - trailing_overhead;
-	return;
+	pum_چوڑائی = p_pw;  // Truncate beyond 'pum_width'
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    pum_ستون = pum_چوڑائی + trailing_overhead;
+	ورنہ
+#اگر_ختم
+	    pum_ستون = Columns - pum_چوڑائی - trailing_overhead;
+	واپس;
     }
 
     // Case 3: Not enough room anywhere, use what we have
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	pum_col = Columns - 1 - col_offset;
-    else
-#endif
-	pum_col = col_offset;
-    pum_width = Columns - trailing_overhead;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
+	pum_ستون = Columns - 1 - ستون_انحراف;
+    ورنہ
+#اگر_ختم
+	pum_ستون = ستون_انحراف;
+    pum_چوڑائی = Columns - trailing_overhead;
 }
 
 /*
@@ -290,116 +290,116 @@ pum_compute_horizontal_placement(int cursor_col)
  * When possible the leftmost character is aligned with cursor column.
  * The menu appears above the screen line "row" or at "row" + "height" - 1.
  */
-    void
+    خالی
 pum_display(
 	pumitem_T   *array,
-	int	    size,
-	int	    selected,   // index of initially selected item, -1 if
+	صحیح	    سائز,
+	صحیح	    selected,   // index of initially selected item, -1 if
 				// out of range
-	int	    pum_wcol)   // screen column to align the menu to, or -1
+	صحیح	    pum_wcol)   // screen column to align the menu to, or -1
 				// to use the cursor column
 {
-    int	    cursor_col;
-    int	    above_row;
-    int	    below_row;
-    int	    redo_count = 0;
-#if defined(FEAT_QUICKFIX)
+    صحیح	    cursor_ستون;
+    صحیح	    above_صف;
+    صحیح	    نیچے_صف;
+    صحیح	    redo_گنتی = 0;
+#اگر defined(FEAT_QUICKFIX)
     win_T   *pvwin;
-#endif
+#اگر_ختم
 
-#ifdef FEAT_RIGHTLEFT
-    pum_rl = (State & MODE_CMDLINE) == 0 && curwin->w_p_rl;
-#endif
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    pum_rl = (State & منوال_CMDLINE) == 0 && curwin->w_p_rl;
+#اگر_ختم
 
-    do
+    کرو
     {
-	above_row = 0;
-	below_row = cmdline_row;
+	above_صف = 0;
+	نیچے_صف = cmdline_صف;
 
 	// Pretend the pum is already there to avoid that must_redraw is set
 	// when 'cuc' is on.
 	pum_array = (pumitem_T *)1;
-	validate_cursor_col();
-	pum_array = NULL;
+	validate_cursor_ستون();
+	pum_array = تہی;
 
 	// Remember the essential parts of the window position and size, so we
 	// can decide when to reposition the popup menu.
-	pum_window = curwin;
-	if (State & MODE_CMDLINE)
+	pum_کھڑکی = curwin;
+	اگر (State & منوال_CMDLINE)
 	    // cmdline completion popup menu
-	    pum_win_row = cmdline_row;
-	else
-	    pum_win_row = curwin->w_wrow + W_WINROW(curwin);
-	pum_win_height = curwin->w_height;
-	pum_win_col = curwin->w_wincol;
+	    pum_win_صف = cmdline_صف;
+	ورنہ
+	    pum_win_صف = curwin->w_wrow + W_WINROW(curwin);
+	pum_win_اونچائی = curwin->w_اونچائی;
+	pum_win_ستون = curwin->w_wincol;
 	pum_win_wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
-	pum_win_width = curwin->w_width;
+	pum_win_چوڑائی = curwin->w_چوڑائی;
 
-#if defined(FEAT_QUICKFIX)
+#اگر defined(FEAT_QUICKFIX)
 	FOR_ALL_WINDOWS(pvwin)
-	    if (pvwin->w_p_pvw)
-		break;
-	if (pvwin != NULL)
+	    اگر (pvwin->w_p_pvw)
+		توڑو;
+	اگر (pvwin != تہی)
 	{
-	    if (W_WINROW(pvwin) < W_WINROW(curwin))
-		above_row = W_WINROW(pvwin) + pvwin->w_height;
-	    else if (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
-		below_row = W_WINROW(pvwin);
+	    اگر (W_WINROW(pvwin) < W_WINROW(curwin))
+		above_صف = W_WINROW(pvwin) + pvwin->w_اونچائی;
+	    ورنہ اگر (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_اونچائی)
+		نیچے_صف = W_WINROW(pvwin);
 	}
-#endif
+#اگر_ختم
 
 	// Figure out the vertical size and position of the pum.
-	pum_compute_vertical_placement(size, above_row, below_row);
+	pum_compute_vertical_placement(سائز, above_صف, نیچے_صف);
 
 	// don't display when we only have room for one line
-	if (pum_height < 1 || (pum_height == 1 && size > 1))
-	    return;
+	اگر (pum_اونچائی < 1 || (pum_اونچائی == 1 && سائز > 1))
+	    واپس;
 
 	pum_array = array;
-	pum_size = size;
-	pum_compute_size();
+	pum_سائز = سائز;
+	pum_compute_سائز();
 
 	// Calculate cursor column
-	if (State & MODE_CMDLINE)
+	اگر (State & منوال_CMDLINE)
 	    // cmdline completion popup menu
-	    cursor_col = cmdline_compl_startcol();
-	else
+	    cursor_ستون = cmdline_compl_startcol();
+	ورنہ
 	{
-	    int wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
+	    صحیح wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	    // w_wcol includes virtual text "above".
-	    if (curwin->w_width > 0)
-		wcol %= curwin->w_width;
-	    else
+	    اگر (curwin->w_چوڑائی > 0)
+		wcol %= curwin->w_چوڑائی;
+	    ورنہ
 		wcol = 0;
-#ifdef FEAT_CONCEAL
+#اگر_تعریف_شدہ FEAT_CONCEAL
 	    // w_wcol does not account for text concealed before the cursor;
 	    // shift by the offset win_line() recorded for the cursor line so the
 	    // menu lines up with the visible text.
-	    if (curwin->w_p_cole > 0 && conceal_cursor_line(curwin))
+	    اگر (curwin->w_p_cole > 0 && conceal_cursor_سطر(curwin))
 	    {
 		wcol -= curwin->w_wcol_conceal_off;
-		if (wcol < 0)
+		اگر (wcol < 0)
 		    wcol = 0;
 	    }
-#endif
-#ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
-		cursor_col = curwin->w_wincol + curwin->w_width - wcol - 1;
-	    else
-#endif
-		cursor_col = curwin->w_wincol + wcol;
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	    اگر (pum_rl)
+		cursor_ستون = curwin->w_wincol + curwin->w_چوڑائی - wcol - 1;
+	    ورنہ
+#اگر_ختم
+		cursor_ستون = curwin->w_wincol + wcol;
 	}
 
 	// if there are more items than room we need a scrollbar
-	pum_scrollbar = (pum_height < size) ? 1 : 0;
+	pum_scrollbar = (pum_اونچائی < سائز) ? 1 : 0;
 
 	// Figure out the horizontal size and position of the pum.
-	pum_compute_horizontal_placement(cursor_col);
+	pum_compute_horizontal_placement(cursor_ستون);
 
 	// Set selected item and redraw.  If the window size changed need to
 	// redo the positioning.  Limit this to two times, when there is not
 	// much room the window size will keep changing.
-    } while (pum_set_selected(selected, redo_count) && ++redo_count <= 2);
+    } جب (pum_سیٹ_selected(selected, redo_گنتی) && ++redo_گنتی <= 2);
 
     pum_redraw();
 }
@@ -408,8 +408,8 @@ pum_display(
  * Set a flag that when pum_redraw() is called it first calls update_screen().
  * This will avoid clearing and redrawing the popup menu, prevent flicker.
  */
-    void
-pum_call_update_screen(void)
+    خالی
+pum_call_update_screen(خالی)
 {
     call_update_screen = TRUE;
 
@@ -424,122 +424,122 @@ pum_call_update_screen(void)
  * Return TRUE if we are going to redraw the popup menu and the screen position
  * "row"/"col" is under the popup menu.
  */
-    int
-pum_under_menu(int row, int col, int only_redrawing)
+    صحیح
+pum_under_menu(صحیح صف, صحیح ستون, صحیح only_redrawing)
 {
-    int	extra_left = pum_border + (pum_margin && pum_border ? 1 : 0);
-    int	extra_right = pum_border + (pum_margin && pum_border ? 1 : 0)
+    صحیح	extra_بایاں = pum_border + (pum_margin && pum_border ? 1 : 0);
+    صحیح	extra_دایاں = pum_border + (pum_margin && pum_border ? 1 : 0)
 						+ (pum_shadow ? 2 : 0);
-    int	extra_above = pum_border;
-    int	extra_below = pum_border + (pum_shadow ? 1 : 0);
-    int	top = pum_row - extra_above;
-    int	bot = pum_row + pum_height + extra_below;
-    int	left = pum_col - 1 - extra_left;
-    int	right = pum_col + pum_width + pum_scrollbar + extra_right;
+    صحیح	extra_above = pum_border;
+    صحیح	extra_نیچے = pum_border + (pum_shadow ? 1 : 0);
+    صحیح	چوٹی = pum_صف - extra_above;
+    صحیح	bot = pum_صف + pum_اونچائی + extra_نیچے;
+    صحیح	بایاں = pum_ستون - 1 - extra_بایاں;
+    صحیح	دایاں = pum_ستون + pum_چوڑائی + pum_scrollbar + extra_دایاں;
 
-    if (!((!only_redrawing || pum_will_redraw)
-	    && row >= top && row < bot && col >= left && col < right))
-	return FALSE;
+    اگر (!((!only_redrawing || pum_will_redraw)
+	    && صف >= چوٹی && صف < bot && ستون >= بایاں && ستون < دایاں))
+	واپس FALSE;
 
-    if (pum_shadow)
+    اگر (pum_shadow)
     {
 	// The shadow recolors the cells underneath.  When the menu will be
 	// redrawn, leave the shadow cells unprotected so the window refreshes
 	// them first, clearing stale content left by a larger menu.
-	if (only_redrawing)
+	اگر (only_redrawing)
 	{
-	    if (col >= right - 2 || row == bot - 1)
-		return FALSE;
+	    اگر (ستون >= دایاں - 2 || صف == bot - 1)
+		واپس FALSE;
 	}
-	else
+	ورنہ
 	{
 	    // Menu stays as-is: exclude only the corner cells the shadow never
 	    // draws.
-	    int	    right_margin, left_margin, left_padding;
+	    صحیح	    دایاں_margin, بایاں_margin, بایاں_padding;
 
-	    compute_margins(&right_margin, &left_margin, &left_padding);
-	    if (row == top && col >= right - 2)
-		return FALSE;
-	    if (row == bot - 1 && col < pum_col + 2 - left_padding - pum_border
-		    - left_margin)
-		return FALSE;
+	    compute_margins(&دایاں_margin, &بایاں_margin, &بایاں_padding);
+	    اگر (صف == چوٹی && ستون >= دایاں - 2)
+		واپس FALSE;
+	    اگر (صف == bot - 1 && ستون < pum_ستون + 2 - بایاں_padding - pum_border
+		    - بایاں_margin)
+		واپس FALSE;
 	}
     }
-    return TRUE;
+    واپس TRUE;
 }
 
 /*
  * Computes attributes of text on the popup menu.
  * Returns attributes for every cell, or NULL if all attributes are the same.
  */
-    static int *
-pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
+    ساکن صحیح *
+pum_compute_متن_attrs(char_u *متن, hlf_T hlf, صحیح user_hlattr)
 {
-    int		i;
+    صحیح		i;
     size_t	leader_len;
-    int		char_cells;
-    int		new_attr;
-    char_u	*ptr = text;
-    int		cell_idx = 0;
-    garray_T	*ga = NULL;
-    int		*attrs = NULL;
-    char_u	*leader = NULL;
-    int		in_fuzzy;
-    int		matched_len = -1;
+    صحیح		char_cells;
+    صحیح		new_attr;
+    char_u	*ptr = متن;
+    صحیح		cell_idx = 0;
+    garray_T	*ga = تہی;
+    صحیح		*attrs = تہی;
+    char_u	*leader = تہی;
+    صحیح		اندر_fuzzy;
+    صحیح		matched_len = -1;
     int_u	char_pos = 0;
-    int		is_select = FALSE;
+    صحیح		is_select = FALSE;
 
-    if (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
+    اگر (*متن == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
 	    || (highlight_attr[HLF_PMSI] == highlight_attr[HLF_PSI]
 		&& highlight_attr[HLF_PMNI] == highlight_attr[HLF_PNI]))
-	return NULL;
+	واپس تہی;
 
     is_select = hlf == HLF_PSI;
-    leader = (State & MODE_CMDLINE) ? cmdline_compl_pattern()
+    leader = (State & منوال_CMDLINE) ? cmdline_compl_نمونہ()
 							  : ins_compl_leader();
-    if (leader == NULL || *leader == NUL)
-	return NULL;
+    اگر (leader == تہی || *leader == NUL)
+	واپس تہی;
 
-    attrs = ALLOC_MULT(int, vim_strsize(text));
-    if (attrs == NULL)
-	return NULL;
+    attrs = ALLOC_MULT(صحیح, vim_strsize(متن));
+    اگر (attrs == تہی)
+	واپس تہی;
 
-    in_fuzzy = (State & MODE_CMDLINE) ? cmdline_compl_is_fuzzy()
+    اندر_fuzzy = (State & منوال_CMDLINE) ? cmdline_compl_is_fuzzy()
 					  : (get_cot_flags() & COT_FUZZY) != 0;
     leader_len = STRLEN(leader);
 
-    if (in_fuzzy)
+    اگر (اندر_fuzzy)
     {
-	ga = fuzzy_match_str_with_pos(text, leader);
-	if (!ga)
+	ga = fuzzy_مطابقت_str_with_pos(متن, leader);
+	اگر (!ga)
 	{
 	    vim_free(attrs);
-	    return NULL;
+	    واپس تہی;
 	}
     }
 
-    while (*ptr != NUL)
+    جب (*ptr != NUL)
     {
 	new_attr = highlight_attr[hlf];
 
-	if (ga != NULL)
+	اگر (ga != تہی)
 	{
 	    // Handle fuzzy matching
-	    for (i = 0; i < ga->ga_len; i++)
+	    برائے (i = 0; i < ga->ga_len; i++)
 	    {
-		if (char_pos == ((int_u *)ga->ga_data)[i])
+		اگر (char_pos == ((int_u *)ga->ga_ڈیٹا)[i])
 		{
 		    new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		    new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
-		    break;
+		    توڑو;
 		}
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
-		matched_len = (int)leader_len;
-	    if (matched_len > 0)
+	    اگر (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
+		matched_len = (صحیح)leader_len;
+	    اگر (matched_len > 0)
 	    {
 		new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
@@ -548,11 +548,11 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	}
 
 	new_attr = hl_combine_attr(highlight_attr[HLF_PNI], new_attr);
-	if (user_hlattr > 0)
+	اگر (user_hlattr > 0)
 	    new_attr = hl_combine_attr(new_attr, user_hlattr);
 
 	char_cells = mb_ptr2cells(ptr);
-	for (i = 0; i < char_cells; i++)
+	برائے (i = 0; i < char_cells; i++)
 	    attrs[cell_idx + i] = new_attr;
 	cell_idx += char_cells;
 
@@ -560,122 +560,122 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	char_pos++;
     }
 
-    if (ga != NULL)
+    اگر (ga != تہی)
     {
 	ga_clear(ga);
 	vim_free(ga);
     }
-    return attrs;
+    واپس attrs;
 }
 
 /*
  * Displays text on the popup menu with specific attributes.
  */
-    static void
+    ساکن خالی
 pum_screen_puts_with_attrs(
-    int		row,
-    int		col,
-    int		cells UNUSED,
-    char_u	*text,
-    int		textlen,
-    int		*attrs)
+    صحیح		صف,
+    صحیح		ستون,
+    صحیح		cells غیر_مستعمل,
+    char_u	*متن,
+    صحیح		textlen,
+    صحیح		*attrs)
 {
-    int		col_start = col;
-    char_u	*ptr = text;
-    int		char_len;
-    int		attr;
+    صحیح		ستون_آغاز = ستون;
+    char_u	*ptr = متن;
+    صحیح		char_len;
+    صحیح		attr;
 
     // Render text with proper attributes
-    while (*ptr != NUL && ptr < text + textlen)
+    جب (*ptr != NUL && ptr < متن + textlen)
     {
 	char_len = mb_ptr2len(ptr);
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    attr = attrs[col_start + cells - col - 1];
-	else
-#endif
-	    attr = attrs[col - col_start];
-	screen_puts_len(ptr, char_len, row, col, attr);
-	col += mb_ptr2cells(ptr);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    attr = attrs[ستون_آغاز + cells - ستون - 1];
+	ورنہ
+#اگر_ختم
+	    attr = attrs[ستون - ستون_آغاز];
+	screen_puts_len(ptr, char_len, صف, ستون, attr);
+	ستون += mb_ptr2cells(ptr);
 	ptr += char_len;
     }
 }
 
-    static inline char_u *
-pum_get_item(int index, int type)
+    ساکن اندرونی char_u *
+pum_get_شے(صحیح اشاریہ, صحیح type)
 {
-    switch(type)
+    انتخاب(type)
     {
-	case CPT_ABBR: return pum_array[index].pum_text;
-	case CPT_KIND: return pum_array[index].pum_kind;
-	case CPT_MENU: return pum_array[index].pum_extra;
+	حالت CPT_ABBR: واپس pum_array[اشاریہ].pum_متن;
+	حالت CPT_قسم: واپس pum_array[اشاریہ].pum_قسم;
+	حالت CPT_MENU: واپس pum_array[اشاریہ].pum_extra;
     }
-    return NULL;
+    واپس تہی;
 }
 
-    static inline int
-pum_user_attr_combine(int idx, int type, int attr)
+    ساکن اندرونی صحیح
+pum_user_attr_combine(صحیح idx, صحیح type, صحیح attr)
 {
-    int user_attr[] = {
+    صحیح user_attr[] = {
 	pum_array[idx].pum_user_abbr_hlattr,
-	pum_array[idx].pum_user_kind_hlattr,
+	pum_array[idx].pum_user_قسم_hlattr,
     };
 
-    return user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
+    واپس user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
 }
 
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
 /*
  * Display RTL text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
-pum_display_rtl_text(
-	int	row,
-	int     col,
+    ساکن صحیح
+pum_display_rtl_متن(
+	صحیح	صف,
+	صحیح     ستون,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	صحیح     attr,
+	صحیح     *attrs,
+	صحیح     چوڑائی,
+	صحیح     چوڑائی_حد_بندی,
+	صحیح     totwidth,
+	صحیح     اگلا_isempty,
+	صحیح	selected)
 {
-    char_u  *rt = NULL;
-    int     cells = 0;
-    int     over_cell = 0;
-    int     truncated = FALSE;
-    int     pad = next_isempty ? 0 : 2;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    truncrl = curwin->w_fill_chars.truncrl != NUL
+    char_u  *rt = تہی;
+    صحیح     cells = 0;
+    صحیح     over_cell = 0;
+    صحیح     truncated = FALSE;
+    صحیح     pad = اگلا_isempty ? 0 : 2;
+    صحیح     بقایا = 0;
+    صحیح	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    صحیح	    truncrl = curwin->w_fill_chars.truncrl != NUL
 					? curwin->w_fill_chars.truncrl : '<';
 
-    if (st == NULL)
-	return col;
+    اگر (st == تہی)
+	واپس ستون;
 
-    rt = reverse_text(st);
-    if (rt == NULL)
+    rt = الٹ_متن(st);
+    اگر (rt == تہی)
     {
 	VIM_CLEAR(st);
-	return col;
+	واپس ستون;
     }
 
-    char_u *rt_start = rt;
+    char_u *rt_آغاز = rt;
     cells = mb_string2cells(rt, -1);
-    truncated = width_limit - totwidth < cells + pad;
+    truncated = چوڑائی_حد_بندی - totwidth < cells + pad;
 
     // only draw the text that fits
-    if (cells > width_limit)
+    اگر (cells > چوڑائی_حد_بندی)
     {
-	do
+	کرو
 	{
 	    cells -= has_mbyte ? (*mb_ptr2cells)(rt) : 1;
 	    MB_PTR_ADV(rt);
-	} while (cells > width_limit);
+	} جب (cells > چوڑائی_حد_بندی);
 
-	if (cells < width_limit)
+	اگر (cells < چوڑائی_حد_بندی)
 	{
 	    // Most left character requires 2-cells
 	    // but only 1 cell is available on screen.
@@ -685,133 +685,133 @@ pum_display_rtl_text(
 	}
     }
 
-    if (truncated)
+    اگر (truncated)
     {
 	char_u  *orig_rt = rt;
-	int     size = 0;
+	صحیح     سائز = 0;
 
-	remaining = width_limit - totwidth - 1;
+	بقایا = چوڑائی_حد_بندی - totwidth - 1;
 	cells = mb_string2cells(rt, -1);
-	if (cells > remaining)
+	اگر (cells > بقایا)
 	{
-	    while (cells > remaining)
+	    جب (cells > بقایا)
 	    {
 		MB_PTR_ADV(orig_rt);
 		cells -= has_mbyte ? (*mb_ptr2cells)(orig_rt) : 1;
 	    }
 	}
-	size = (int)STRLEN(orig_rt);
-	if (cells < remaining)
-	    over_cell = remaining - cells;
+	سائز = (صحیح)STRLEN(orig_rt);
+	اگر (cells < بقایا)
+	    over_cell = بقایا - cells;
 
-	cells = mb_string2cells(orig_rt, size);
-	width = cells + over_cell + 1;
+	cells = mb_string2cells(orig_rt, سائز);
+	چوڑائی = cells + over_cell + 1;
 	rt = orig_rt;
 
-	screen_putchar(truncrl, row, col - width + 1, trunc_attr);
+	screen_putchar(truncrl, صف, ستون - چوڑائی + 1, trunc_attr);
 
-	if (over_cell > 0)
-	    screen_fill(row, row + 1, col - width + 2,
-		    col - width + 2 + over_cell, ' ', ' ', attr);
+	اگر (over_cell > 0)
+	    screen_fill(صف, صف + 1, ستون - چوڑائی + 2,
+		    ستون - چوڑائی + 2 + over_cell, ' ', ' ', attr);
     }
 
-    if (attrs == NULL)
-	screen_puts_len(rt, (int)STRLEN(rt), row, col - cells + 1, attr);
-    else
-	pum_screen_puts_with_attrs(row, col - cells + 1, cells, rt,
-		(int)STRLEN(rt), attrs);
+    اگر (attrs == تہی)
+	screen_puts_len(rt, (صحیح)STRLEN(rt), صف, ستون - cells + 1, attr);
+    ورنہ
+	pum_screen_puts_with_attrs(صف, ستون - cells + 1, cells, rt,
+		(صحیح)STRLEN(rt), attrs);
 
-    vim_free(rt_start);
+    vim_free(rt_آغاز);
     VIM_CLEAR(st);
-    return col - width;
+    واپس ستون - چوڑائی;
 }
-#endif
+#اگر_ختم
 
 /*
  * Display LTR text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
-pum_display_ltr_text(
-	int     row,
-	int     col,
+    ساکن صحیح
+pum_display_ltr_متن(
+	صحیح     صف,
+	صحیح     ستون,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,        // width already calculated in outer loop
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	صحیح     attr,
+	صحیح     *attrs,
+	صحیح     چوڑائی,        // width already calculated in outer loop
+	صحیح     چوڑائی_حد_بندی,
+	صحیح     totwidth,
+	صحیح     اگلا_isempty,
+	صحیح	selected)
 {
-    int     size = 0;
-    int     cells = 0;
-    char_u  *st_end = NULL;
-    int     over_cell = 0;
-    int     pad = next_isempty ? 0 : 2;
-    int     truncated = FALSE;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    trunc = curwin->w_fill_chars.trunc != NUL
+    صحیح     سائز = 0;
+    صحیح     cells = 0;
+    char_u  *st_انتہا = تہی;
+    صحیح     over_cell = 0;
+    صحیح     pad = اگلا_isempty ? 0 : 2;
+    صحیح     truncated = FALSE;
+    صحیح     بقایا = 0;
+    صحیح	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    صحیح	    trunc = curwin->w_fill_chars.trunc != NUL
 					    ? curwin->w_fill_chars.trunc : '>';
 
-    if (st == NULL)
-	return col;
+    اگر (st == تہی)
+	واپس ستون;
 
-    size = (int)STRLEN(st);
-    cells = (*mb_string2cells)(st, size);
-    truncated = width_limit - totwidth < cells + pad;
+    سائز = (صحیح)STRLEN(st);
+    cells = (*mb_string2cells)(st, سائز);
+    truncated = چوڑائی_حد_بندی - totwidth < cells + pad;
 
     // only draw the text that fits
-    while (size > 0 && col + cells > width_limit + pum_col)
+    جب (سائز > 0 && ستون + cells > چوڑائی_حد_بندی + pum_ستون)
     {
-	--size;
-	if (has_mbyte)
+	--سائز;
+	اگر (has_mbyte)
 	{
-	    size -= (*mb_head_off)(st, st + size);
-	    cells -= (*mb_ptr2cells)(st + size);
+	    سائز -= (*mb_سر_off)(st, st + سائز);
+	    cells -= (*mb_ptr2cells)(st + سائز);
 	}
-	else
+	ورنہ
 	    --cells;
     }
 
     // truncated
-    if (truncated)
+    اگر (truncated)
     {
-	remaining = width_limit - totwidth - 1;
-	if (cells > remaining)
+	بقایا = چوڑائی_حد_بندی - totwidth - 1;
+	اگر (cells > بقایا)
 	{
-	    st_end = st + size;
-	    while (st_end > st && cells > remaining)
+	    st_انتہا = st + سائز;
+	    جب (st_انتہا > st && cells > بقایا)
 	    {
-		MB_PTR_BACK(st, st_end);
-		cells -= has_mbyte ? (*mb_ptr2cells)(st_end) : 1;
+		MB_PTR_عقب(st, st_انتہا);
+		cells -= has_mbyte ? (*mb_ptr2cells)(st_انتہا) : 1;
 	    }
-	    size = st_end - st;
+	    سائز = st_انتہا - st;
 	}
 
-	if (cells < remaining)
-	    over_cell = remaining - cells;
-	cells = mb_string2cells(st, size);
-	width = cells + over_cell + 1;
+	اگر (cells < بقایا)
+	    over_cell = بقایا - cells;
+	cells = mb_string2cells(st, سائز);
+	چوڑائی = cells + over_cell + 1;
     }
 
-    if (attrs == NULL)
-	screen_puts_len(st, size, row, col, attr);
-    else
-	pum_screen_puts_with_attrs(row, col, cells, st, size, attrs);
+    اگر (attrs == تہی)
+	screen_puts_len(st, سائز, صف, ستون, attr);
+    ورنہ
+	pum_screen_puts_with_attrs(صف, ستون, cells, st, سائز, attrs);
 
-    if (truncated)
+    اگر (truncated)
     {
-	if (over_cell > 0)
-	    screen_fill(row, row + 1, col + cells,
-		    col + cells + over_cell, ' ', ' ', attr);
+	اگر (over_cell > 0)
+	    screen_fill(صف, صف + 1, ستون + cells,
+		    ستون + cells + over_cell, ' ', ' ', attr);
 
-	screen_putchar(trunc, row, col + cells + over_cell, trunc_attr);
+	screen_putchar(trunc, صف, ستون + cells + over_cell, trunc_attr);
     }
 
     VIM_CLEAR(st);
-    return col + width;
+    واپس ستون + چوڑائی;
 }
 
 
@@ -819,133 +819,133 @@ pum_display_ltr_text(
  * Process and display a single popup menu item (text/kind/extra).
  * Returns the new column position after drawing.
  */
-    static int
-pum_process_item(
-	int     row,
-	int     col,
-	int     idx,
-	int     j,         // Current position in order array
-	int     *order,    // Order array
+    ساکن صحیح
+pum_process_شے(
+	صحیح     صف,
+	صحیح     ستون,
+	صحیح     idx,
+	صحیح     j,         // Current position in order array
+	صحیح     *ترتیب,    // Order array
 	hlf_T   hlf,
-	int     attr,
-	int     *totwidth_ptr,
-	int     next_isempty)
+	صحیح     attr,
+	صحیح     *totwidth_ptr,
+	صحیح     اگلا_isempty)
 {
-    int     item_type = order[j];
-    char_u  *s = NULL;
-    char_u  *p = pum_get_item(idx, item_type);
-    int     width = 0;  // item width
-    int     w;		// char width
-    int	    selected = idx == pum_selected;
+    صحیح     شے_type = ترتیب[j];
+    char_u  *s = تہی;
+    char_u  *p = pum_get_شے(idx, شے_type);
+    صحیح     چوڑائی = 0;  // item width
+    صحیح     w;		// char width
+    صحیح	    selected = idx == pum_selected;
 
-    for ( ; ; MB_PTR_ADV(p))
+    برائے ( ; ; MB_PTR_ADV(p))
     {
-	if (s == NULL)
+	اگر (s == تہی)
 	    s = p;
 	w = ptr2cells(p);
-	if (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
+	اگر (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_چوڑائی)
 	{
-	    width += w;
-	    continue;
+	    چوڑائی += w;
+	    جاری;
 	}
 
 	// Display the text that fits or comes before a Tab.
 	// First convert it to printable characters.
 	char_u  *st;
-	int     *attrs = NULL;
-	int     saved = *p;
+	صحیح     *attrs = تہی;
+	صحیح     saved = *p;
 
-	if (saved != NUL)
+	اگر (saved != NUL)
 	    *p = NUL;
 	st = transstr(s);
-	if (saved != NUL)
+	اگر (saved != NUL)
 	    *p = saved;
 
-	if (item_type == CPT_ABBR)
-	    attrs = pum_compute_text_attrs(st, hlf,
+	اگر (شے_type == CPT_ABBR)
+	    attrs = pum_compute_متن_attrs(st, hlf,
 		      pum_array[idx].pum_user_abbr_hlattr);
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    col = pum_display_rtl_text(row, col, st, attr, attrs,
-		    width, pum_width, *totwidth_ptr, next_isempty, selected);
-	else
-#endif
-	    col = pum_display_ltr_text(row, col, st, attr, attrs,
-		    width, pum_width, *totwidth_ptr, next_isempty, selected);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    ستون = pum_display_rtl_متن(صف, ستون, st, attr, attrs,
+		    چوڑائی, pum_چوڑائی, *totwidth_ptr, اگلا_isempty, selected);
+	ورنہ
+#اگر_ختم
+	    ستون = pum_display_ltr_متن(صف, ستون, st, attr, attrs,
+		    چوڑائی, pum_چوڑائی, *totwidth_ptr, اگلا_isempty, selected);
 
-	if (attrs != NULL)
+	اگر (attrs != تہی)
 	    VIM_CLEAR(attrs);
 
-	if (*p != TAB)
-	    break;
+	اگر (*p != TAB)
+	    توڑو;
 
 	// Display two spaces for a Tab.
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
 	{
-	    screen_puts_len((char_u *)"  ", 2, row, col - 1, attr);
-	    col -= 2;
+	    screen_puts_len((char_u *)"  ", 2, صف, ستون - 1, attr);
+	    ستون -= 2;
 	}
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	{
-	    screen_puts_len((char_u *)"  ", 2, row, col, attr);
-	    col += 2;
+	    screen_puts_len((char_u *)"  ", 2, صف, ستون, attr);
+	    ستون += 2;
 	}
 	*totwidth_ptr += 2;
-	s = NULL;  // start text at next char
-	width = 0;
+	s = تہی;  // start text at next char
+	چوڑائی = 0;
     }
 
-    return col;
+    واپس ستون;
 }
 
 /*
  * Draw the scrollbar for the popup menu.
  */
-    static void
+    ساکن خالی
 pum_draw_scrollbar(
-	int	row,
-	int	i,
-	int	thumb_pos,
-	int	thumb_height)
+	صحیح	صف,
+	صحیح	i,
+	صحیح	thumb_pos,
+	صحیح	thumb_اونچائی)
 {
-    if (pum_scrollbar <= 0)
-	return;
+    اگر (pum_scrollbar <= 0)
+	واپس;
 
-    int attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
+    صحیح attr = (i >= thumb_pos && i < thumb_pos + thumb_اونچائی) ?
 			highlight_attr[HLF_PST] : highlight_attr[HLF_PSB];
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	screen_putchar(' ', row, pum_col - pum_width, attr);
-    else
-#endif
-	screen_putchar(' ', row, pum_col + pum_width, attr);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
+	screen_putchar(' ', صف, pum_ستون - pum_چوڑائی, attr);
+    ورنہ
+#اگر_ختم
+	screen_putchar(' ', صف, pum_ستون + pum_چوڑائی, attr);
 }
 
-    static inline void
-pum_align_order(int *order)
+    ساکن اندرونی خالی
+pum_align_ترتیب(صحیح *ترتیب)
 {
-    int is_default = cia_flags == 0;
-    order[0] = is_default ? CPT_ABBR : cia_flags / 100;
-    order[1] = is_default ? CPT_KIND : (cia_flags / 10) % 10;
-    order[2] = is_default ? CPT_MENU : cia_flags % 10;
+    صحیح is_default = cia_flags == 0;
+    ترتیب[0] = is_default ? CPT_ABBR : cia_flags / 100;
+    ترتیب[1] = is_default ? CPT_قسم : (cia_flags / 10) % 10;
+    ترتیب[2] = is_default ? CPT_MENU : cia_flags % 10;
 }
 
-static void pum_free_bg(void);
+ساکن خالی pum_free_bg(خالی);
 
 /*
  * Called when the pum opacity value has changed.
  * Invalidates cached background and triggers redraw if pum is visible.
  */
-    void
-pum_opacity_changed(void)
+    خالی
+pum_opacity_بدلا(خالی)
 {
     // Invalidate cached background so it gets re-saved.
     pum_free_bg();
 
-    if (pum_visible())
+    اگر (pum_visible())
     {
 	// Force full screen clear so ScreenAttrs doesn't retain
 	// stale blended values from the previous pumopacity.
@@ -955,72 +955,72 @@ pum_opacity_changed(void)
     }
 }
 
-    static void
-pum_free_bg(void)
+    ساکن خالی
+pum_free_bg(خالی)
 {
-    int k;
+    صحیح k;
     VIM_CLEAR(pum_bg_attrs);
-    VIM_CLEAR(pum_bg_lines);
-    VIM_CLEAR(pum_bg_linesUC);
-    for (k = 0; k < MAX_MCO; ++k)
-	VIM_CLEAR(pum_bg_linesC[k]);
-    pum_bg_top = 0;
+    VIM_CLEAR(pum_bg_سطریں);
+    VIM_CLEAR(pum_bg_سطریں_UC);
+    برائے (k = 0; k < MAX_MCO; ++k)
+	VIM_CLEAR(pum_bg_سطریں_C[k]);
+    pum_bg_چوٹی = 0;
     pum_bg_bot = 0;
-    pum_bg_cols = 0;
+    pum_bg_ستون_تعداد = 0;
 }
 
 /*
  * Redraw the popup menu, using "pum_first" and "pum_selected".
  */
-    void
-pum_redraw(void)
+    خالی
+pum_redraw(خالی)
 {
-    int		row = pum_row;
-    int		col;
+    صحیح		صف = pum_صف;
+    صحیح		ستون;
     hlf_T	*hlfs; // array used for highlights
     hlf_T	hlf;
-    int		attr;
-    int		i, j;
-    int		idx;
-    char_u	*p = NULL;
-    int		totwidth;
-    int		thumb_pos = 0;
-    int		thumb_height = 1;
-    int		item_type;
-    int		order[3];
-    int		next_isempty = FALSE;
-    int		n;
-    int		items_width_array[3] = { pum_base_width, pum_kind_width,
-							    pum_extra_width };
-    int		basic_width;  // first item width
-    int		last_isabbr = FALSE;
-    int		orig_attr = -1;
-    int		scroll_range = pum_size - pum_height;
+    صحیح		attr;
+    صحیح		i, j;
+    صحیح		idx;
+    char_u	*p = تہی;
+    صحیح		totwidth;
+    صحیح		thumb_pos = 0;
+    صحیح		thumb_اونچائی = 1;
+    صحیح		شے_type;
+    صحیح		ترتیب[3];
+    صحیح		اگلا_isempty = FALSE;
+    صحیح		n;
+    صحیح		اشیاء_چوڑائی_array[3] = { pum_بنیاد_چوڑائی, pum_قسم_چوڑائی,
+							    pum_extra_چوڑائی };
+    صحیح		basic_چوڑائی;  // first item width
+    صحیح		آخری_isabbr = FALSE;
+    صحیح		orig_attr = -1;
+    صحیح		scroll_range = pum_سائز - pum_اونچائی;
     bool	override_success;
-    int		opacity_active = (p_po > 0 && p_po < 100);
+    صحیح		opacity_فعال = (p_po > 0 && p_po < 100);
 
     // Use current window for highlight overrides when using 'winhighlight'
-    override_success = push_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
+    override_success = ڈالو_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
 
     // Batch the underlying screen update and the pum drawing into a single
     // synchronized output frame to avoid flicker.
-    term_set_sync_output(TERM_SYNC_OUTPUT_ENABLE);
+    رکن_سیٹ_sync_output(رکن_SYNC_OUTPUT_ENABLE);
 
-#ifdef FEAT_IMAGE_POPUP
+#اگر_تعریف_شدہ FEAT_IMAGE_POPUP
     // Create a image placement so that other images are clipped correctly
-    if (pum_imagep == NULL)
+    اگر (pum_imagep == تہی)
 	// Make pom always be on top of any image placement with same zindex.
-	pum_imagep = image_placement_new(NULL, UINT_MAX,
+	pum_imagep = image_placement_new(تہی, UINT_MAX,
 		IMAGE_PLACEMENT_USE_PUM, true);
-    if (pum_imagep != NULL)
+    اگر (pum_imagep != تہی)
     {
-	image_placement_set_zindex(pum_imagep, POPUPMENU_ZINDEX);
-	image_placement_set_position(pum_imagep, pum_row, pum_col);
-	image_placement_set_bounding_box(pum_imagep, pum_row, pum_col,
-		pum_height, pum_width);
-	image_placement_set_enable(pum_imagep, true);
+	image_placement_سیٹ_zindex(pum_imagep, POPUPMENU_ZINDEX);
+	image_placement_سیٹ_position(pum_imagep, pum_صف, pum_ستون);
+	image_placement_سیٹ_bounding_box(pum_imagep, pum_صف, pum_ستون,
+		pum_اونچائی, pum_چوڑائی);
+	image_placement_سیٹ_enable(pum_imagep, true);
     }
-#endif
+#اگر_ختم
 
     hlf_T	hlfsNorm[3];
     hlf_T	hlfsSel[3];
@@ -1034,17 +1034,17 @@ pum_redraw(void)
     hlfsNorm[2] = HLF_PNX;
     hlfsSel[2] = HLF_PSX;
 
-    if (call_update_screen)
+    اگر (call_update_screen)
     {
 	call_update_screen = FALSE;
 	// Invalidate cached background if screen size changed (e.g.
 	// after window resize).
-	if (opacity_active && pum_bg_lines != NULL
-		&& (pum_bg_cols != screen_Columns
-		    || pum_bg_bot > screen_Rows))
+	اگر (opacity_فعال && pum_bg_سطریں != تہی
+		&& (pum_bg_ستون_تعداد != screen_Columns
+		    || pum_bg_bot > screen_صفیں))
 	    pum_free_bg();
 
-	if (opacity_active && pum_bg_lines != NULL)
+	اگر (opacity_فعال && pum_bg_سطریں != تہی)
 	{
 	    // Already have saved background; skip update_screen to avoid
 	    // flickering.  Just do a normal pum_will_redraw update.
@@ -1052,7 +1052,7 @@ pum_redraw(void)
 	    update_screen(0);
 	    pum_will_redraw = FALSE;
 	}
-	else if (opacity_active)
+	ورنہ اگر (opacity_فعال)
 	{
 	    // For opacity: draw background including the area under the
 	    // pum, then save it.
@@ -1061,66 +1061,66 @@ pum_redraw(void)
 	    pum_pretend_not_visible = FALSE;
 
 	    // Save background to static buffers.
-	    if (ScreenLines != NULL && ScreenAttrs != NULL)
+	    اگر (Screen_سطریں != تہی && ScreenAttrs != تہی)
 	    {
-		int	save_top, save_bot, save_ncells, k;
+		صحیح	save_چوٹی, save_bot, save_ncells, k;
 
 		pum_free_bg();
-		save_top = pum_row - pum_border;
-		save_bot = pum_row + pum_height + pum_border
+		save_چوٹی = pum_صف - pum_border;
+		save_bot = pum_صف + pum_اونچائی + pum_border
 					    + (pum_shadow ? 1 : 0) + 1;
-		if (save_top < 0)
-		    save_top = 0;
-		if (save_bot > screen_Rows)
-		    save_bot = screen_Rows;
-		pum_bg_top = save_top;
+		اگر (save_چوٹی < 0)
+		    save_چوٹی = 0;
+		اگر (save_bot > screen_صفیں)
+		    save_bot = screen_صفیں;
+		pum_bg_چوٹی = save_چوٹی;
 		pum_bg_bot = save_bot;
-		pum_bg_cols = screen_Columns;
-		if (save_top < save_bot)
+		pum_bg_ستون_تعداد = screen_Columns;
+		اگر (save_چوٹی < save_bot)
 		{
-		    save_ncells = (save_bot - save_top) * screen_Columns;
+		    save_ncells = (save_bot - save_چوٹی) * screen_Columns;
 		    pum_bg_attrs = LALLOC_MULT(sattr_T, save_ncells);
-		    pum_bg_lines = LALLOC_MULT(schar_T, save_ncells);
-		    if (enc_utf8)
+		    pum_bg_سطریں = LALLOC_MULT(schar_T, save_ncells);
+		    اگر (enc_utf8)
 		    {
-			pum_bg_linesUC = LALLOC_MULT(u8char_T, save_ncells);
-			for (k = 0; k < MAX_MCO; ++k)
-			    pum_bg_linesC[k] = LALLOC_MULT(u8char_T,
+			pum_bg_سطریں_UC = LALLOC_MULT(u8char_T, save_ncells);
+			برائے (k = 0; k < MAX_MCO; ++k)
+			    pum_bg_سطریں_C[k] = LALLOC_MULT(u8char_T,
 							    save_ncells);
 		    }
-		    if (pum_bg_attrs != NULL && pum_bg_lines != NULL)
+		    اگر (pum_bg_attrs != تہی && pum_bg_سطریں != تہی)
 		    {
-			for (int r = save_top; r < save_bot; ++r)
+			برائے (صحیح r = save_چوٹی; r < save_bot; ++r)
 			{
-			    int soff = (r - save_top) * screen_Columns;
-			    int loff = LineOffset[r];
+			    صحیح soff = (r - save_چوٹی) * screen_Columns;
+			    صحیح loff = سطر_انحراف[r];
 
 			    mch_memmove(pum_bg_attrs + soff,
 				    ScreenAttrs + loff,
-				    screen_Columns * sizeof(sattr_T));
-			    mch_memmove(pum_bg_lines + soff,
-				    ScreenLines + loff,
-				    screen_Columns * sizeof(schar_T));
-			    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+				    screen_Columns * حجم(sattr_T));
+			    mch_memmove(pum_bg_سطریں + soff,
+				    Screen_سطریں + loff,
+				    screen_Columns * حجم(schar_T));
+			    اگر (enc_utf8 && pum_bg_سطریں_UC != تہی
+						&& Screen_سطریں_UC != تہی)
 			    {
-				mch_memmove(pum_bg_linesUC + soff,
-					ScreenLinesUC + loff,
-					screen_Columns * sizeof(u8char_T));
-				for (k = 0; k < MAX_MCO; ++k)
-				    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-					mch_memmove(pum_bg_linesC[k] + soff,
-						ScreenLinesC[k] + loff,
+				mch_memmove(pum_bg_سطریں_UC + soff,
+					Screen_سطریں_UC + loff,
+					screen_Columns * حجم(u8char_T));
+				برائے (k = 0; k < MAX_MCO; ++k)
+				    اگر (pum_bg_سطریں_C[k] != تہی
+						    && Screen_سطریں_C[k] != تہی)
+					mch_memmove(pum_bg_سطریں_C[k] + soff,
+						Screen_سطریں_C[k] + loff,
 						screen_Columns
-						    * sizeof(u8char_T));
+						    * حجم(u8char_T));
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	else
+	ورنہ
 	{
 	    // Do not redraw in pum_may_redraw() and don't draw in the area
 	    // where the popup menu will be.
@@ -1131,199 +1131,199 @@ pum_redraw(void)
     }
 
     // never display more than we have
-    pum_first = MIN(pum_first, scroll_range);
+    pum_پہلا = MIN(pum_پہلا, scroll_range);
 
-    if (pum_scrollbar)
+    اگر (pum_scrollbar)
     {
-	thumb_height = pum_height * pum_height / pum_size;
-	if (thumb_height == 0)
-	    thumb_height = 1;
-	thumb_pos = (pum_first * (pum_height - thumb_height)
+	thumb_اونچائی = pum_اونچائی * pum_اونچائی / pum_سائز;
+	اگر (thumb_اونچائی == 0)
+	    thumb_اونچائی = 1;
+	thumb_pos = (pum_پہلا * (pum_اونچائی - thumb_اونچائی)
 			    + scroll_range / 2) / scroll_range;
     }
 
-#ifdef FEAT_PROP_POPUP
+#اگر_تعریف_شدہ FEAT_PROP_POPUP
     // The popup menu is drawn over popup menus with zindex under
     // POPUPMENU_ZINDEX.
     screen_zindex = POPUPMENU_ZINDEX;
-#endif
+#اگر_ختم
 
     // Draw border and shadow first if enabled, before setting blend
     // so that border/shadow characters are drawn without opacity.
-    if (pum_border)
+    اگر (pum_border)
 	pum_draw_border();
-    if (pum_shadow)
+    اگر (pum_shadow)
 	pum_draw_shadow();
 
     // Set blend for screen_puts_len / screen_fill to use.
     // Only the pum content area should be blended, not border/shadow.
-    if (opacity_active)
-	screen_pum_blend = 100 - (int)p_po;
+    اگر (opacity_فعال)
+	screen_pum_blend = 100 - (صحیح)p_po;
 
-    for (i = 0; i < pum_height; ++i)
+    برائے (i = 0; i < pum_اونچائی; ++i)
     {
-	idx = i + pum_first;
+	idx = i + pum_پہلا;
 	hlfs = (idx == pum_selected) ? hlfsSel : hlfsNorm;
 	hlf = hlfs[0]; // start with "word" highlight
 	attr = highlight_attr[hlf];
 
 	// prepend a space if there is room
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
 	{
-	    if (pum_col < curwin->w_wincol + curwin->w_width - 1
+	    اگر (pum_ستون < curwin->w_wincol + curwin->w_چوڑائی - 1
 							    - pum_border)
-		screen_putchar(' ', row, pum_col + 1, attr);
+		screen_putchar(' ', صف, pum_ستون + 1, attr);
 	}
-	else
-#endif
-	    if (pum_col > pum_border)
-		screen_putchar(' ', row, pum_col - 1, attr);
+	ورنہ
+#اگر_ختم
+	    اگر (pum_ستون > pum_border)
+		screen_putchar(' ', صف, pum_ستون - 1, attr);
 
 	// Display each entry, use two spaces for a Tab.
 	// Do this 3 times and order from p_cia
-	col = pum_col;
+	ستون = pum_ستون;
 	totwidth = 0;
-	pum_align_order(order);
-	basic_width = items_width_array[order[0]];
-	last_isabbr = order[2] == CPT_ABBR;
-	for (j = 0; j < 3; ++j)
+	pum_align_ترتیب(ترتیب);
+	basic_چوڑائی = اشیاء_چوڑائی_array[ترتیب[0]];
+	آخری_isabbr = ترتیب[2] == CPT_ABBR;
+	برائے (j = 0; j < 3; ++j)
 	{
-	    item_type = order[j];
-	    hlf = hlfs[item_type];
+	    شے_type = ترتیب[j];
+	    hlf = hlfs[شے_type];
 	    attr = highlight_attr[hlf];
 	    orig_attr = attr;
-	    if (item_type < 2)  // try combine attr with user custom
-		attr = pum_user_attr_combine(idx, item_type, attr);
-	    p = pum_get_item(idx, item_type);
+	    اگر (شے_type < 2)  // try combine attr with user custom
+		attr = pum_user_attr_combine(idx, شے_type, attr);
+	    p = pum_get_شے(idx, شے_type);
 
-	    if (j + 1 < 3)
-		next_isempty = pum_get_item(idx, order[j + 1]) == NULL;
-	    else
-		next_isempty = TRUE;
+	    اگر (j + 1 < 3)
+		اگلا_isempty = pum_get_شے(idx, ترتیب[j + 1]) == تہی;
+	    ورنہ
+		اگلا_isempty = TRUE;
 
-	    if (p != NULL)
+	    اگر (p != تہی)
 		// Process and display the item
-		col = pum_process_item(row, col, idx, j, order, hlf, attr,
-						    &totwidth, next_isempty);
+		ستون = pum_process_شے(صف, ستون, idx, j, ترتیب, hlf, attr,
+						    &totwidth, اگلا_isempty);
 
-	    if (j > 0)
-		n = items_width_array[order[1]] + (last_isabbr ? 0 : 1);
-	    else
-		n = order[j] == CPT_ABBR ? 1 : 0;
+	    اگر (j > 0)
+		n = اشیاء_چوڑائی_array[ترتیب[1]] + (آخری_isabbr ? 0 : 1);
+	    ورنہ
+		n = ترتیب[j] == CPT_ABBR ? 1 : 0;
 
 	    // Stop when there is nothing more to display.
-	    if (j == 2
-		    || (next_isempty && (j == 1 || (j == 0
-				&& pum_get_item(idx, order[j + 2]) == NULL)))
-		    || basic_width + n >= pum_width)
-		break;
-#ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    اگر (j == 2
+		    || (اگلا_isempty && (j == 1 || (j == 0
+				&& pum_get_شے(idx, ترتیب[j + 2]) == تہی)))
+		    || basic_چوڑائی + n >= pum_چوڑائی)
+		توڑو;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	    اگر (pum_rl)
 	    {
-		screen_fill(row, row + 1, pum_col - basic_width - n + 1,
-						col + 1, ' ', ' ', orig_attr);
-		col = pum_col - basic_width - n;
+		screen_fill(صف, صف + 1, pum_ستون - basic_چوڑائی - n + 1,
+						ستون + 1, ' ', ' ', orig_attr);
+		ستون = pum_ستون - basic_چوڑائی - n;
 	    }
-	    else
-#endif
+	    ورنہ
+#اگر_ختم
 	    {
-		screen_fill(row, row + 1, col, pum_col + basic_width + n,
+		screen_fill(صف, صف + 1, ستون, pum_ستون + basic_چوڑائی + n,
 							' ', ' ', orig_attr);
-		col = pum_col + basic_width + n;
+		ستون = pum_ستون + basic_چوڑائی + n;
 	    }
-	    totwidth = basic_width + n;
+	    totwidth = basic_چوڑائی + n;
 	}
 
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    screen_fill(row, row + 1, pum_col - pum_width + 1, col + 1,
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    screen_fill(صف, صف + 1, pum_ستون - pum_چوڑائی + 1, ستون + 1,
 							    ' ', ' ', orig_attr);
-	else
-#endif
-	    screen_fill(row, row + 1, col, pum_col + pum_width, ' ', ' ',
+	ورنہ
+#اگر_ختم
+	    screen_fill(صف, صف + 1, ستون, pum_ستون + pum_چوڑائی, ' ', ' ',
 								orig_attr);
-	pum_draw_scrollbar(row, i, thumb_pos, thumb_height);
+	pum_draw_scrollbar(صف, i, thumb_pos, thumb_اونچائی);
 
-	++row;
+	++صف;
     }
 
     screen_pum_blend = 0;
 
-#ifdef FEAT_PROP_POPUP
+#اگر_تعریف_شدہ FEAT_PROP_POPUP
     screen_zindex = 0;
-#endif
+#اگر_ختم
 
-    if (override_success)
-	pop_highlight_overrides();
+    اگر (override_success)
+	نکالو_highlight_overrides();
 
-    term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
+    رکن_سیٹ_sync_output(رکن_SYNC_OUTPUT_DISABLE);
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#اگر defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * Position the info popup relative to the popup menu item.
  */
-    void
+    خالی
 pum_position_info_popup(win_T *wp)
 {
-    int col = pum_col + pum_width + pum_scrollbar + 1;
-    int row = pum_row;
-    int botpos = POPPOS_BOTLEFT;
-    int	used_maxwidth_opt = FALSE;
-    int	right_margin, left_margin, dummy;
-    int left_extra_width, right_extra_width;
+    صحیح ستون = pum_ستون + pum_چوڑائی + pum_scrollbar + 1;
+    صحیح صف = pum_صف;
+    صحیح botpos = POPPOS_BOTLEFT;
+    صحیح	مستعمل_maxwidth_opt = FALSE;
+    صحیح	دایاں_margin, بایاں_margin, dummy;
+    صحیح بایاں_extra_چوڑائی, دایاں_extra_چوڑائی;
 
-    (void)compute_margins(&right_margin, &left_margin, &dummy);
+    (خالی)compute_margins(&دایاں_margin, &بایاں_margin, &dummy);
 
-    left_extra_width = pum_border + left_margin;
-    right_extra_width = pum_border + right_margin + (pum_shadow ? 2 : 0);
-    col += right_extra_width;
+    بایاں_extra_چوڑائی = pum_border + بایاں_margin;
+    دایاں_extra_چوڑائی = pum_border + دایاں_margin + (pum_shadow ? 2 : 0);
+    ستون += دایاں_extra_چوڑائی;
 
     wp->w_popup_pos = POPPOS_TOPLEFT;
-    if (Columns - col < 20 && Columns - col < pum_col)
+    اگر (Columns - ستون < 20 && Columns - ستون < pum_ستون)
     {
-	col = pum_col - 1 - left_extra_width;
+	ستون = pum_ستون - 1 - بایاں_extra_چوڑائی;
 	wp->w_popup_pos = POPPOS_TOPRIGHT;
 	botpos = POPPOS_BOTRIGHT;
-	wp->w_maxwidth = pum_col - 1 - left_extra_width;
+	wp->w_maxwidth = pum_ستون - 1 - بایاں_extra_چوڑائی;
     }
-    else
-	wp->w_maxwidth = Columns - col + 1;
-    wp->w_maxwidth -= popup_extra_width(wp);
-    if (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
+    ورنہ
+	wp->w_maxwidth = Columns - ستون + 1;
+    wp->w_maxwidth -= popup_extra_چوڑائی(wp);
+    اگر (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
     {
 	// option value overrules computed value
 	wp->w_maxwidth = wp->w_maxwidth_opt;
-	used_maxwidth_opt = TRUE;
+	مستعمل_maxwidth_opt = TRUE;
     }
 
-    row -= popup_top_extra(wp);
-    if (wp->w_popup_flags & POPF_INFO_MENU)
+    صف -= popup_چوٹی_extra(wp);
+    اگر (wp->w_popup_flags & POPF_INFO_MENU)
     {
-	if (pum_row < pum_win_row)
+	اگر (pum_صف < pum_win_صف)
 	{
 	    // menu above cursor line, align with bottom
-	    row += pum_height;
+	    صف += pum_اونچائی;
 	    wp->w_popup_pos = botpos;
 	}
-	else
+	ورنہ
 	    // menu below cursor line, align with top
-	    row += 1;
+	    صف += 1;
     }
-    else
+    ورنہ
 	// align with the selected item
-	row += pum_selected - pum_first + 1;
+	صف += pum_selected - pum_پہلا + 1;
 
     wp->w_popup_flags &= ~POPF_HIDDEN;
-    if (wp->w_maxwidth < 10 && !used_maxwidth_opt)
+    اگر (wp->w_maxwidth < 10 && !مستعمل_maxwidth_opt)
 	// The popup is not going to fit or will overlap with the cursor
 	// position, hide the popup.
 	wp->w_popup_flags |= POPF_HIDDEN;
-    else
-	popup_set_wantpos_rowcol(wp, row, col);
+    ورنہ
+	popup_سیٹ_wantpos_rowcol(wp, صف, ستون);
 }
-#endif
+#اگر_ختم
 
 /*
  * Set the index of the currently selected item.  The menu will scroll when
@@ -1335,63 +1335,63 @@ pum_position_info_popup(win_T *wp)
  * Returns TRUE when the window was resized and the location of the popup menu
  * must be recomputed.
  */
-    static int
-pum_set_selected(int n, int repeat UNUSED)
+    ساکن صحیح
+pum_سیٹ_selected(صحیح n, صحیح repeat غیر_مستعمل)
 {
-    int	    resized = FALSE;
-    int	    context = pum_height / 2;
-    int	    scroll_offset;
-#ifdef FEAT_QUICKFIX
-    int	    prev_selected = pum_selected;
-    unsigned	cur_cot_flags = get_cot_flags();
-#endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    int	    has_info = FALSE;
-#endif
+    صحیح	    resized = FALSE;
+    صحیح	    context = pum_اونچائی / 2;
+    صحیح	    scroll_انحراف;
+#اگر_تعریف_شدہ FEAT_QUICKFIX
+    صحیح	    پچھلا_selected = pum_selected;
+    غیرعلامتی	cur_cot_flags = get_cot_flags();
+#اگر_ختم
+#اگر defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    صحیح	    has_info = FALSE;
+#اگر_ختم
 
     pum_selected = n;
-    scroll_offset = pum_selected - pum_height;
+    scroll_انحراف = pum_selected - pum_اونچائی;
 
-    if (pum_selected >= 0 && pum_selected < pum_size)
+    اگر (pum_selected >= 0 && pum_selected < pum_سائز)
     {
-	if (pum_first > pum_selected - 4)
+	اگر (pum_پہلا > pum_selected - 4)
 	{
 	    // scroll down; when we did a jump it's probably a PageUp then
 	    // scroll a whole page
-	    if (pum_first > pum_selected - 2)
+	    اگر (pum_پہلا > pum_selected - 2)
 	    {
-		pum_first -= pum_height - 2;
-		if (pum_first < 0)
-		    pum_first = 0;
-		else if (pum_first > pum_selected)
-		    pum_first = pum_selected;
+		pum_پہلا -= pum_اونچائی - 2;
+		اگر (pum_پہلا < 0)
+		    pum_پہلا = 0;
+		ورنہ اگر (pum_پہلا > pum_selected)
+		    pum_پہلا = pum_selected;
 	    }
-	    else
-		pum_first = pum_selected;
+	    ورنہ
+		pum_پہلا = pum_selected;
 	}
-	else if (pum_first < scroll_offset + 5)
+	ورنہ اگر (pum_پہلا < scroll_انحراف + 5)
 	{
 	    // scroll up; when we did a jump it's probably a PageDown then
 	    // scroll a whole page
-	    if (pum_first < scroll_offset + 3)
-		pum_first = MAX(pum_first + pum_height - 2, scroll_offset + 1);
-	    else
-		pum_first = scroll_offset + 1;
+	    اگر (pum_پہلا < scroll_انحراف + 3)
+		pum_پہلا = MAX(pum_پہلا + pum_اونچائی - 2, scroll_انحراف + 1);
+	    ورنہ
+		pum_پہلا = scroll_انحراف + 1;
 	}
 
 	// Give a few lines of context when possible.
 	context = MIN(context, 3);
-	if (pum_height > 2)
+	اگر (pum_اونچائی > 2)
 	{
-	    if (pum_first > pum_selected - context)
-		pum_first = MAX(pum_selected - context, 0);  // scroll down
-	    else if (pum_first < pum_selected + context - pum_height + 1)
-		pum_first = pum_selected + context - pum_height + 1;  // up
+	    اگر (pum_پہلا > pum_selected - context)
+		pum_پہلا = MAX(pum_selected - context, 0);  // scroll down
+	    ورنہ اگر (pum_پہلا < pum_selected + context - pum_اونچائی + 1)
+		pum_پہلا = pum_selected + context - pum_اونچائی + 1;  //اوپر
 	}
 	// adjust for the number of lines displayed
-	pum_first = MIN(pum_first, pum_size - pum_height);
+	pum_پہلا = MIN(pum_پہلا, pum_سائز - pum_اونچائی);
 
-#if defined(FEAT_QUICKFIX)
+#اگر defined(FEAT_QUICKFIX)
 	/*
 	 * Show extra info in the preview window if there is something and
 	 * 'completeopt' contains "preview" or "popup" or "popuphidden".
@@ -1400,8 +1400,8 @@ pum_set_selected(int n, int repeat UNUSED)
 	 * Skip this for command-window when 'completeopt' contains "preview".
 	 * NOTE: Be very careful not to sync undo!
 	 */
-	if (pum_array[pum_selected].pum_info != NULL
-		&& Rows > 10
+	اگر (pum_array[pum_selected].pum_info != تہی
+		&& صفیں > 10
 		&& repeat <= 1
 		&& (cur_cot_flags & COT_ANY_PREVIEW)
 		&& !((cur_cot_flags & COT_PREVIEW) && cmdwin_type != 0))
@@ -1410,26 +1410,26 @@ pum_set_selected(int n, int repeat UNUSED)
 	    tabpage_T   *curtab_save = curtab;
 # ifdef FEAT_PROP_POPUP
 	    use_popup_T	use_popup;
-# else
+# ورنہ
 #  define use_popup USEPOPUP_NONE
 # endif
 # ifdef FEAT_PROP_POPUP
 	    has_info = TRUE;
-	    if (cur_cot_flags & COT_POPUPHIDDEN)
+	    اگر (cur_cot_flags & COT_POPUPHIDDEN)
 		use_popup = USEPOPUP_HIDDEN;
-	    else if (cur_cot_flags & COT_POPUP)
-		use_popup = USEPOPUP_NORMAL;
-	    else
+	    ورنہ اگر (cur_cot_flags & COT_POPUP)
+		use_popup = USEPOPUP_معمول;
+	    ورنہ
 		use_popup = USEPOPUP_NONE;
-	    if (use_popup != USEPOPUP_NONE)
+	    اگر (use_popup != USEPOPUP_NONE)
 		// don't use WinEnter or WinLeave autocommands for the info
 		// popup
-		block_autocmds();
+		بلاک_autocmds();
 # endif
 	    // Open a preview window and set "curwin" to it.
 	    // 3 lines by default, prefer 'previewheight' if set and smaller.
 	    g_do_tagpreview = 3;
-	    if (p_pvh > 0 && p_pvh < g_do_tagpreview)
+	    اگر (p_pvh > 0 && p_pvh < g_do_tagpreview)
 		g_do_tagpreview = p_pvh;
 	    ++RedrawingDisabled;
 	    // Prevent undo sync here, if an autocommand syncs undo weird
@@ -1437,118 +1437,118 @@ pum_set_selected(int n, int repeat UNUSED)
 	    ++no_u_sync;
 	    resized = prepare_tagpreview(FALSE, FALSE, use_popup);
 	    --no_u_sync;
-	    if (RedrawingDisabled > 0)
+	    اگر (RedrawingDisabled > 0)
 		--RedrawingDisabled;
 	    g_do_tagpreview = 0;
 
-	    if (curwin->w_p_pvw
+	    اگر (curwin->w_p_pvw
 # ifdef FEAT_PROP_POPUP
 		    || (curwin->w_popup_flags & POPF_INFO)
 # endif
 		    )
 	    {
-		int	res = OK;
+		صحیح	res = OK;
 
-		if (!resized
+		اگر (!resized
 			&& curbuf->b_nwindows == 1
-			&& curbuf->b_fname == NULL
+			&& curbuf->b_fname == تہی
 			&& bt_nofile(curbuf)
 			&& curbuf->b_p_bh[0] == 'w')
 		{
 		    // Already a "wipeout" buffer, make it empty.
-		    while (!BUFEMPTY())
+		    جب (!BUFEMPTY())
 			ml_delete((linenr_T)1);
 		}
-		else
+		ورنہ
 		{
 		    // Don't want to sync undo in the current buffer.
 		    ++no_u_sync;
-		    res = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, 0, NULL);
+		    res = do_ecmd(0, تہی, تہی, تہی, ECMD_ONE, 0, تہی);
 		    --no_u_sync;
-		    if (res == OK)
+		    اگر (res == OK)
 		    {
 			// Edit a new, empty buffer. Set options for a "wipeout"
 			// buffer.
-			set_option_value_give_err((char_u *)"swf",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bl",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bt",
+			سیٹ_option_قدر_give_err((char_u *)"swf",
+							  0L, تہی, OPT_LOCAL);
+			سیٹ_option_قدر_give_err((char_u *)"bl",
+							  0L, تہی, OPT_LOCAL);
+			سیٹ_option_قدر_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bh",
+			سیٹ_option_قدر_give_err((char_u *)"bh",
 					      0L, (char_u *)"wipe", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"diff",
-							  0L, NULL, OPT_LOCAL);
+			سیٹ_option_قدر_give_err((char_u *)"diff",
+							  0L, تہی, OPT_LOCAL);
 		    }
 		}
-		if (res == OK)
+		اگر (res == OK)
 		{
 		    char_u	*p, *e;
 		    linenr_T	lnum = 0;
 
-		    for (p = pum_array[pum_selected].pum_info; *p != NUL; )
+		    برائے (p = pum_array[pum_selected].pum_info; *p != NUL; )
 		    {
 			e = vim_strchr(p, '\n');
-			if (e == NULL)
+			اگر (e == تہی)
 			{
 			    ml_append(lnum++, p, 0, FALSE);
-			    break;
+			    توڑو;
 			}
 			*e = NUL;
-			ml_append(lnum++, p, (int)(e - p + 1), FALSE);
+			ml_append(lnum++, p, (صحیح)(e - p + 1), FALSE);
 			*e = '\n';
 			p = e + 1;
 		    }
 		    // delete the empty last line
-		    ml_delete(curbuf->b_ml.ml_line_count);
+		    ml_delete(curbuf->b_ml.ml_سطر_گنتی);
 
 		    // Increase the height of the preview window to show the
 		    // text, but no more than 'previewheight' lines.
-		    if (repeat == 0 && use_popup == USEPOPUP_NONE)
+		    اگر (repeat == 0 && use_popup == USEPOPUP_NONE)
 		    {
 			lnum = MIN(lnum, p_pvh);
-			if (curwin->w_height < lnum)
+			اگر (curwin->w_اونچائی < lnum)
 			{
-			    win_setheight((int)lnum);
+			    win_setheight((صحیح)lnum);
 			    resized = TRUE;
 			}
 		    }
 
-		    curbuf->b_changed = 0;
+		    curbuf->b_بدلا = 0;
 		    curbuf->b_p_ma = FALSE;
-		    if (pum_selected != prev_selected)
+		    اگر (pum_selected != پچھلا_selected)
 		    {
 # ifdef FEAT_PROP_POPUP
 			curwin->w_firstline = 0;
 # endif
 			curwin->w_topline = 1;
 		    }
-		    else if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-			curwin->w_topline = curbuf->b_ml.ml_line_count;
+		    ورنہ اگر (curwin->w_topline > curbuf->b_ml.ml_سطر_گنتی)
+			curwin->w_topline = curbuf->b_ml.ml_سطر_گنتی;
 		    curwin->w_cursor.lnum = curwin->w_topline;
-		    curwin->w_cursor.col = 0;
+		    curwin->w_cursor.ستون = 0;
 # ifdef FEAT_PROP_POPUP
-		    if (use_popup != USEPOPUP_NONE)
+		    اگر (use_popup != USEPOPUP_NONE)
 		    {
 			pum_position_info_popup(curwin);
-			if (win_valid(curwin_save))
+			اگر (win_valid(curwin_save))
 			    redraw_win_later(curwin_save, UPD_SOME_VALID);
 		    }
 # endif
-		    if ((curwin != curwin_save && win_valid(curwin_save))
+		    اگر ((curwin != curwin_save && win_valid(curwin_save))
 			    || (curtab != curtab_save
 						&& valid_tabpage(curtab_save)))
 		    {
-			int save_redr_status;
+			صحیح save_redr_حالت;
 
-			if (curtab != curtab_save && valid_tabpage(curtab_save))
+			اگر (curtab != curtab_save && valid_tabpage(curtab_save))
 			    goto_tabpage_tp(curtab_save, FALSE, FALSE);
 
 			// When the first completion is done and the preview
 			// window is not resized, skip the preview window's
 			// status line redrawing.
-			if (ins_compl_active() && !resized)
-			    curwin->w_redr_status = false;
+			اگر (ins_compl_فعال() && !resized)
+			    curwin->w_redr_حالت = false;
 
 			// Return cursor to where we were
 			validate_cursor();
@@ -1558,7 +1558,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			// update the view on the buffer.  Only go back to
 			// the window when needed, otherwise it will always be
 			// redrawn.
-			if (resized && win_valid(curwin_save))
+			اگر (resized && win_valid(curwin_save))
 			{
 			    ++no_u_sync;
 			    win_enter(curwin_save, TRUE);
@@ -1577,14 +1577,14 @@ pum_set_selected(int n, int repeat UNUSED)
 			// current window here, to avoid it gets drawn with
 			// StatusLineNC for a moment and cause flicker.
 			pum_will_redraw = !resized;
-			save_redr_status = curwin_save->w_redr_status;
-			curwin_save->w_redr_status = false;
+			save_redr_حالت = curwin_save->w_redr_حالت;
+			curwin_save->w_redr_حالت = false;
 			update_screen(0);
 			pum_pretend_not_visible = FALSE;
 			pum_will_redraw = FALSE;
-			curwin_save->w_redr_status = save_redr_status;
+			curwin_save->w_redr_حالت = save_redr_حالت;
 
-			if (!resized && win_valid(curwin_save))
+			اگر (!resized && win_valid(curwin_save))
 			{
 # ifdef FEAT_PROP_POPUP
 			    win_T *wp = curwin;
@@ -1593,7 +1593,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			    win_enter(curwin_save, TRUE);
 			    --no_u_sync;
 # ifdef FEAT_PROP_POPUP
-			    if (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
+			    اگر (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
 				popup_hide(wp);
 # endif
 			}
@@ -1609,67 +1609,67 @@ pum_set_selected(int n, int repeat UNUSED)
 		    }
 		}
 	    }
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	    if (WIN_IS_POPUP(curwin))
+# اگر defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	    اگر (WIN_IS_POPUP(curwin))
 		// can't keep focus in a popup window
 		win_enter(firstwin, TRUE);
 # endif
 # ifdef FEAT_PROP_POPUP
-	    if (use_popup != USEPOPUP_NONE)
+	    اگر (use_popup != USEPOPUP_NONE)
 		unblock_autocmds();
 # endif
 	}
-#endif
+#اگر_ختم
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    if (!has_info)
+#اگر defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    اگر (!has_info)
 	// hide any popup info window
 	popup_hide_info();
-#endif
+#اگر_ختم
 
-    return resized;
+    واپس resized;
 }
 
 /*
  * Undisplay the popup menu (later).
  */
-    void
-pum_undisplay(void)
+    خالی
+pum_undisplay(خالی)
 {
-#ifdef FEAT_IMAGE_POPUP
-    if (pum_imagep != NULL)
+#اگر_تعریف_شدہ FEAT_IMAGE_POPUP
+    اگر (pum_imagep != تہی)
     {
 	image_placement_free(pum_imagep);
-	pum_imagep = NULL;
+	pum_imagep = تہی;
     }
-#endif
+#اگر_ختم
     pum_free_bg();
-    pum_array = NULL;
+    pum_array = تہی;
     redraw_all_later(UPD_NOT_VALID);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#اگر defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-    if (pum_in_cmdline)
+#اگر_ختم
+    اگر (pum_اندر_cmdline)
     {
 	clear_cmdline = TRUE;
-	pum_in_cmdline = FALSE;
+	pum_اندر_cmdline = FALSE;
     }
-    status_redraw_all();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    حالت_redraw_all();
+#اگر defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     // hide any popup info window
     popup_hide_info();
-#endif
+#اگر_ختم
 }
 
 /*
  * Clear the popup menu.  Currently only resets the offset to the first
  * displayed item.
  */
-    void
-pum_clear(void)
+    خالی
+pum_clear(خالی)
 {
-    pum_first = 0;
+    pum_پہلا = 0;
 }
 
 /*
@@ -1677,60 +1677,60 @@ pum_clear(void)
  * that could overwrite it.  Overruled when "pum_pretend_not_visible" is set,
  * used to redraw the status lines.
  */
-    int
-pum_visible(void)
+    صحیح
+pum_visible(خالی)
 {
-    return !pum_pretend_not_visible && pum_array != NULL;
+    واپس !pum_pretend_not_visible && pum_array != تہی;
 }
 
 /*
  * Return TRUE if the popup can be redrawn in the same position.
  */
-    static int
-pum_in_same_position(void)
+    ساکن صحیح
+pum_اندر_same_position(خالی)
 {
-    int	    row = (State & MODE_CMDLINE)
-			? cmdline_row
+    صحیح	    صف = (State & منوال_CMDLINE)
+			? cmdline_صف
 			: curwin->w_wrow + W_WINROW(curwin);
 
-    return pum_window != curwin
-	    || (pum_win_row == row
-		&& pum_win_height == curwin->w_height
-		&& pum_win_col == curwin->w_wincol
-		&& pum_win_width == curwin->w_width);
+    واپس pum_کھڑکی != curwin
+	    || (pum_win_صف == صف
+		&& pum_win_اونچائی == curwin->w_اونچائی
+		&& pum_win_ستون == curwin->w_wincol
+		&& pum_win_چوڑائی == curwin->w_چوڑائی);
 }
 
 /*
  * Return TRUE when pum_may_redraw() will call pum_redraw().
  * This means that the pum area should not be overwritten to avoid flicker.
  */
-    int
-pum_redraw_in_same_position(void)
+    صحیح
+pum_redraw_اندر_same_position(خالی)
 {
-    if (!pum_visible() || pum_will_redraw)
-	return FALSE;  // nothing to do
+    اگر (!pum_visible() || pum_will_redraw)
+	واپس FALSE;  // nothing to do
 
-    return pum_in_same_position();
+    واپس pum_اندر_same_position();
 }
 
 /*
  * Reposition the popup menu to adjust for window layout changes.
  */
-    void
-pum_may_redraw(void)
+    خالی
+pum_may_redraw(خالی)
 {
     pumitem_T	*array = pum_array;
-    int		len = pum_size;
-    int		selected = pum_selected;
+    صحیح		len = pum_سائز;
+    صحیح		selected = pum_selected;
 
-    if (!pum_visible() || pum_will_redraw)
-	return;  // nothing to do
+    اگر (!pum_visible() || pum_will_redraw)
+	واپس;  // nothing to do
 
-    if (pum_in_same_position())
+    اگر (pum_اندر_same_position())
     {
 	pum_redraw();  // Redraw window in same position
     }
-    else
+    ورنہ
     {
 	// Window layout changed, recompute the position.
 	// Use the remembered w_wcol value, the cursor may have moved when a
@@ -1744,60 +1744,60 @@ pum_may_redraw(void)
  * Return the height of the popup menu, the number of entries visible.
  * Only valid when pum_visible() returns TRUE!
  */
-    int
-pum_get_height(void)
+    صحیح
+pum_get_اونچائی(خالی)
 {
-    return pum_height;
+    واپس pum_اونچائی;
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Add size information about the pum to "dict".
  */
-    void
-pum_set_event_info(dict_T *dict)
+    خالی
+pum_سیٹ_event_info(dict_T *dict)
 {
-    if (!pum_visible())
-	return;
-    (void)dict_add_number(dict, "height", pum_height);
-    (void)dict_add_number(dict, "width", pum_width);
-    (void)dict_add_number(dict, "row", pum_row);
-    (void)dict_add_number(dict, "col", pum_col);
-    (void)dict_add_number(dict, "size", pum_size);
-    (void)dict_add_bool(dict, "scrollbar",
+    اگر (!pum_visible())
+	واپس;
+    (خالی)dict_جوڑو_نمبر(dict, "height", pum_اونچائی);
+    (خالی)dict_جوڑو_نمبر(dict, "width", pum_چوڑائی);
+    (خالی)dict_جوڑو_نمبر(dict, "row", pum_صف);
+    (خالی)dict_جوڑو_نمبر(dict, "col", pum_ستون);
+    (خالی)dict_جوڑو_نمبر(dict, "size", pum_سائز);
+    (خالی)dict_جوڑو_bool(dict, "scrollbar",
 				       pum_scrollbar ? VVAL_TRUE : VVAL_FALSE);
 }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
-    static void
-pum_position_at_mouse(int min_width)
+#اگر defined(FEAT_BEVAL_رکن) || defined(FEAT_رکن_POPUP_MENU)
+    ساکن خالی
+pum_position_at_mouse(صحیح min_چوڑائی)
 {
-    int extra_height = pum_border * 2 + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
-    int trailing_overhead = 0;
-    int col_offset = 0;
-    int available_width;
+    صحیح extra_اونچائی = pum_border * 2 + pum_shadow;
+    صحیح extra_انحراف = pum_border + pum_shadow;
+    صحیح trailing_overhead = 0;
+    صحیح ستون_انحراف = 0;
+    صحیح دستیاب_چوڑائی;
 
-    if (Rows - mouse_row - extra_height > pum_size
-	    || Rows - mouse_row > mouse_row)
+    اگر (صفیں - mouse_صف - extra_اونچائی > pum_سائز
+	    || صفیں - mouse_صف > mouse_صف)
     {
 	// Enough space below the mouse row,
 	// or there is more space below the mouse row than above.
-	pum_row = mouse_row + 1 + pum_border;
-	if (pum_height > Rows - pum_row - extra_height)
-	    pum_height = Rows - pum_row - extra_height;
-	if (pum_row + pum_height + extra_offset >= cmdline_row)
-	    pum_in_cmdline = TRUE;
+	pum_صف = mouse_صف + 1 + pum_border;
+	اگر (pum_اونچائی > صفیں - pum_صف - extra_اونچائی)
+	    pum_اونچائی = صفیں - pum_صف - extra_اونچائی;
+	اگر (pum_صف + pum_اونچائی + extra_انحراف >= cmdline_صف)
+	    pum_اندر_cmdline = TRUE;
     }
-    else
+    ورنہ
     {
 	// Show above the mouse row, reduce height if it does not fit.
-	pum_row = mouse_row - pum_size - extra_offset;
-	if (pum_row < pum_border)
+	pum_صف = mouse_صف - pum_سائز - extra_انحراف;
+	اگر (pum_صف < pum_border)
 	{
-	    pum_height += pum_row - pum_border;
-	    pum_row = pum_border;
+	    pum_اونچائی += pum_صف - pum_border;
+	    pum_صف = pum_border;
 	}
     }
 
@@ -1805,52 +1805,52 @@ pum_position_at_mouse(int min_width)
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 # ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    اگر (pum_rl)
     {
-	col_offset = (mouse_col == Columns - 1) && pum_border;
-	available_width = mouse_col + 1 - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	ستون_انحراف = (mouse_ستون == Columns - 1) && pum_border;
+	دستیاب_چوڑائی = mouse_ستون + 1 - trailing_overhead - ستون_انحراف;
+	اگر (دستیاب_چوڑائی >= pum_بنیاد_چوڑائی || دستیاب_چوڑائی > min_چوڑائی)
 	    // Enough space to show at mouse column.
-	    pum_col = mouse_col - col_offset;
-	else
+	    pum_ستون = mouse_ستون - ستون_انحراف;
+	ورنہ
 	    // Not enough space, left align with window.
-	    pum_col = MIN(pum_base_width, min_width) - 1 + trailing_overhead;
-	pum_width = pum_col + 1 - trailing_overhead;
+	    pum_ستون = MIN(pum_بنیاد_چوڑائی, min_چوڑائی) - 1 + trailing_overhead;
+	pum_چوڑائی = pum_ستون + 1 - trailing_overhead;
     }
-    else
+    ورنہ
 # endif
     {
-	col_offset = (mouse_col == 0) && pum_border;
-	available_width = Columns - mouse_col - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	ستون_انحراف = (mouse_ستون == 0) && pum_border;
+	دستیاب_چوڑائی = Columns - mouse_ستون - trailing_overhead - ستون_انحراف;
+	اگر (دستیاب_چوڑائی >= pum_بنیاد_چوڑائی || دستیاب_چوڑائی > min_چوڑائی)
 	    // Enough space to show at mouse column.
-	    pum_col = mouse_col + col_offset;
-	else
+	    pum_ستون = mouse_ستون + ستون_انحراف;
+	ورنہ
 	    // Not enough space, right align with window.
-	    pum_col = Columns - MIN(pum_base_width, min_width)
+	    pum_ستون = Columns - MIN(pum_بنیاد_چوڑائی, min_چوڑائی)
 		- trailing_overhead;
-	pum_width = Columns - pum_col - trailing_overhead;
+	pum_چوڑائی = Columns - pum_ستون - trailing_overhead;
     }
 
-    pum_width = MIN(pum_width, pum_base_width + 1);
+    pum_چوڑائی = MIN(pum_چوڑائی, pum_بنیاد_چوڑائی + 1);
     // Do not redraw at cursor position.
-    pum_window = NULL;
+    pum_کھڑکی = تہی;
 }
 
-#endif
+#اگر_ختم
 
-#if defined(FEAT_BEVAL_TERM)
-static pumitem_T *balloon_array = NULL;
-static int balloon_arraysize;
+#اگر defined(FEAT_BEVAL_رکن)
+ساکن pumitem_T *balloon_array = تہی;
+ساکن صحیح balloon_arraysize;
 
-# define BALLOON_MIN_WIDTH 50
-# define BALLOON_MIN_HEIGHT 10
+# define BALLOON_MIN_چوڑائی 50
+# define BALLOON_MIN_اونچائی 10
 
-typedef struct {
-    char_u	*start;
-    int		bytelen;
-    int		cells;
-    int		indent;
+قسمتعریف ساخت {
+    char_u	*آغاز;
+    صحیح		bytelen;
+    صحیح		cells;
+    صحیح		indent;
 } balpart_T;
 
 /*
@@ -1859,253 +1859,253 @@ typedef struct {
  * strings and make a struct look good.
  * Resulting array is stored in "array" and returns the size of the array.
  */
-    int
-split_message(char_u *mesg, pumitem_T **array)
+    صحیح
+بانٹو_پیغام(char_u *mesg, pumitem_T **array)
 {
     garray_T	ga;
     char_u	*p;
-    balpart_T	*item;
-    int		quoted = FALSE;
-    int		height;
-    int		line;
-    int		item_idx;
-    int		indent = 0;
-    int		max_cells = 0;
-    int		max_height = Rows / 2 - 1;
-    int		long_item_count = 0;
-    int		split_long_items = FALSE;
+    balpart_T	*شے;
+    صحیح		quoted = FALSE;
+    صحیح		اونچائی;
+    صحیح		سطر;
+    صحیح		شے_idx;
+    صحیح		indent = 0;
+    صحیح		max_cells = 0;
+    صحیح		max_اونچائی_2 = صفیں / 2 - 1;
+    صحیح		long_شے_گنتی = 0;
+    صحیح		بانٹو_long_اشیاء = FALSE;
 
-    ga_init2(&ga, sizeof(balpart_T), 20);
+    ga_init2(&ga, حجم(balpart_T), 20);
     p = mesg;
 
-    while (*p != NUL)
+    جب (*p != NUL)
     {
-	if (ga_grow(&ga, 1) == FAIL)
-	    goto failed;
-	item = ((balpart_T *)ga.ga_data) + ga.ga_len;
-	item->start = p;
-	item->indent = indent;
-	item->cells = indent * 2;
+	اگر (ga_grow(&ga, 1) == FAIL)
+	    جاؤ failed;
+	شے = ((balpart_T *)ga.ga_ڈیٹا) + ga.ga_len;
+	شے->آغاز = p;
+	شے->indent = indent;
+	شے->cells = indent * 2;
 	++ga.ga_len;
-	while (*p != NUL)
+	جب (*p != NUL)
 	{
-	    if (*p == '"')
+	    اگر (*p == '"')
 		quoted = !quoted;
-	    else if (*p == '\n')
-		break;
-	    else if (*p == '\\' && p[1] != NUL)
+	    ورنہ اگر (*p == '\n')
+		توڑو;
+	    ورنہ اگر (*p == '\\' && p[1] != NUL)
 		++p;
-	    else if (!quoted)
+	    ورنہ اگر (!quoted)
 	    {
-		if ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
+		اگر ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
 		{
 		    // Looks like a good point to break.
-		    if (*p == '{')
+		    اگر (*p == '{')
 			++indent;
-		    else if (*p == '}' && indent > 0)
+		    ورنہ اگر (*p == '}' && indent > 0)
 			--indent;
-		    ++item->cells;
+		    ++شے->cells;
 		    p = skipwhite(p + 1);
-		    break;
+		    توڑو;
 		}
 	    }
-	    item->cells += ptr2cells(p);
+	    شے->cells += ptr2cells(p);
 	    p += mb_ptr2len(p);
 	}
-	item->bytelen = p - item->start;
-	if (*p == '\n')
+	شے->bytelen = p - شے->آغاز;
+	اگر (*p == '\n')
 	    ++p;
-	if (item->cells > max_cells)
-	    max_cells = item->cells;
-	long_item_count += (item->cells - 1) / BALLOON_MIN_WIDTH;
+	اگر (شے->cells > max_cells)
+	    max_cells = شے->cells;
+	long_شے_گنتی += (شے->cells - 1) / BALLOON_MIN_چوڑائی;
     }
 
-    height = 2 + ga.ga_len;
+    اونچائی = 2 + ga.ga_len;
 
     // If there are long items and the height is below the limit: split lines
-    if (long_item_count > 0 && height + long_item_count <= max_height)
+    اگر (long_شے_گنتی > 0 && اونچائی + long_شے_گنتی <= max_اونچائی_2)
     {
-	split_long_items = TRUE;
-	height += long_item_count;
+	بانٹو_long_اشیاء = TRUE;
+	اونچائی += long_شے_گنتی;
     }
 
     // Limit to half the window height, it has to fit above or below the mouse
     // position.
-    if (height > max_height)
-	height = max_height;
-    *array = ALLOC_CLEAR_MULT(pumitem_T, height);
-    if (*array == NULL)
-	goto failed;
+    اگر (اونچائی > max_اونچائی_2)
+	اونچائی = max_اونچائی_2;
+    *array = ALLOC_CLEAR_MULT(pumitem_T, اونچائی);
+    اگر (*array == تہی)
+	جاؤ failed;
 
     // Add an empty line above and below, looks better.
-    (*array)->pum_text = vim_strsave((char_u *)"");
-    (*array + height - 1)->pum_text = vim_strsave((char_u *)"");
+    (*array)->pum_متن = vim_strsave((char_u *)"");
+    (*array + اونچائی - 1)->pum_متن = vim_strsave((char_u *)"");
 
-    for (line = 1, item_idx = 0; line < height - 1; ++item_idx)
+    برائے (سطر = 1, شے_idx = 0; سطر < اونچائی - 1; ++شے_idx)
     {
-	int	skip;
-	int	thislen;
-	int	copylen;
-	int	ind;
-	int	cells;
+	صحیح	skip;
+	صحیح	thislen;
+	صحیح	copylen;
+	صحیح	ind;
+	صحیح	cells;
 
-	item = ((balpart_T *)ga.ga_data) + item_idx;
-	if (item->bytelen == 0)
-	    (*array)[line++].pum_text = vim_strsave((char_u *)"");
-	else
-	    for (skip = 0; skip < item->bytelen; skip += thislen)
+	شے = ((balpart_T *)ga.ga_ڈیٹا) + شے_idx;
+	اگر (شے->bytelen == 0)
+	    (*array)[سطر++].pum_متن = vim_strsave((char_u *)"");
+	ورنہ
+	    برائے (skip = 0; skip < شے->bytelen; skip += thislen)
 	    {
-		if (split_long_items && item->cells >= BALLOON_MIN_WIDTH)
+		اگر (بانٹو_long_اشیاء && شے->cells >= BALLOON_MIN_چوڑائی)
 		{
-		    cells = item->indent * 2;
-		    for (p = item->start + skip;
-			    p < item->start + item->bytelen;
+		    cells = شے->indent * 2;
+		    برائے (p = شے->آغاز + skip;
+			    p < شے->آغاز + شے->bytelen;
 							    p += mb_ptr2len(p))
-			if ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
-			    break;
-		    thislen = p - (item->start + skip);
+			اگر ((cells += ptr2cells(p)) > BALLOON_MIN_چوڑائی)
+			    توڑو;
+		    thislen = p - (شے->آغاز + skip);
 		}
-		else
-		    thislen = item->bytelen;
+		ورنہ
+		    thislen = شے->bytelen;
 
 		// put indent at the start
-		p = alloc(thislen + item->indent * 2 + 1);
-		if (p == NULL)
+		p = alloc(thislen + شے->indent * 2 + 1);
+		اگر (p == تہی)
 		{
-		    for (line = 0; line <= height - 1; ++line)
-			vim_free((*array)[line].pum_text);
+		    برائے (سطر = 0; سطر <= اونچائی - 1; ++سطر)
+			vim_free((*array)[سطر].pum_متن);
 		    vim_free(*array);
-		    goto failed;
+		    جاؤ failed;
 		}
-		for (ind = 0; ind < item->indent * 2; ++ind)
+		برائے (ind = 0; ind < شے->indent * 2; ++ind)
 		    p[ind] = ' ';
 
 		// exclude spaces at the end of the string
-		for (copylen = thislen; copylen > 0; --copylen)
-		    if (item->start[skip + copylen - 1] != ' ')
-			break;
+		برائے (copylen = thislen; copylen > 0; --copylen)
+		    اگر (شے->آغاز[skip + copylen - 1] != ' ')
+			توڑو;
 
-		vim_strncpy(p + ind, item->start + skip, copylen);
-		(*array)[line].pum_text = p;
-		item->indent = 0;  // wrapped line has no indent
-		++line;
+		vim_strncpy(p + ind, شے->آغاز + skip, copylen);
+		(*array)[سطر].pum_متن = p;
+		شے->indent = 0;  // wrapped line has no indent
+		++سطر;
 	    }
     }
     ga_clear(&ga);
-    return height;
+    واپس اونچائی;
 
 failed:
     ga_clear(&ga);
-    return 0;
+    واپس 0;
 }
 
-    void
-ui_remove_balloon(void)
+    خالی
+ui_remove_balloon(خالی)
 {
-    if (balloon_array == NULL)
-	return;
+    اگر (balloon_array == تہی)
+	واپس;
 
     pum_undisplay();
-    while (balloon_arraysize > 0)
-	vim_free(balloon_array[--balloon_arraysize].pum_text);
+    جب (balloon_arraysize > 0)
+	vim_free(balloon_array[--balloon_arraysize].pum_متن);
     VIM_CLEAR(balloon_array);
 }
 
 /*
  * Terminal version of a balloon, uses the popup menu code.
  */
-    void
+    خالی
 ui_post_balloon(char_u *mesg, list_T *list)
 {
     ui_remove_balloon();
 
-    if (mesg == NULL && list == NULL)
+    اگر (mesg == تہی && list == تہی)
     {
 	pum_undisplay();
-	return;
+	واپس;
     }
-    if (list != NULL)
+    اگر (list != تہی)
     {
 	listitem_T  *li;
-	int	    idx;
+	صحیح	    idx;
 
 	balloon_arraysize = list->lv_len;
 	balloon_array = ALLOC_CLEAR_MULT(pumitem_T, list->lv_len);
-	if (balloon_array == NULL)
-	    return;
+	اگر (balloon_array == تہی)
+	    واپس;
 	CHECK_LIST_MATERIALIZE(list);
-	for (idx = 0, li = list->lv_first; li != NULL; li = li->li_next, ++idx)
+	برائے (idx = 0, li = list->lv_پہلا; li != تہی; li = li->li_اگلا, ++idx)
 	{
-	    char_u *text = tv_get_string_chk(&li->li_tv);
+	    char_u *متن = tv_get_string_chk(&li->li_tv);
 
-	    balloon_array[idx].pum_text = vim_strsave(
-					   text == NULL ? (char_u *)"" : text);
+	    balloon_array[idx].pum_متن = vim_strsave(
+					   متن == تہی ? (char_u *)"" : متن);
 	}
     }
-    else
-	balloon_arraysize = split_message(mesg, &balloon_array);
+    ورنہ
+	balloon_arraysize = بانٹو_پیغام(mesg, &balloon_array);
 
-    if (balloon_arraysize <= 0)
-	return;
+    اگر (balloon_arraysize <= 0)
+	واپس;
 
     pum_array = balloon_array;
-    pum_size = balloon_arraysize;
-    pum_compute_size();
+    pum_سائز = balloon_arraysize;
+    pum_compute_سائز();
     pum_scrollbar = 0;
-    pum_height = balloon_arraysize;
+    pum_اونچائی = balloon_arraysize;
 # ifdef FEAT_RIGHTLEFT
     pum_rl = curwin->w_p_rl;
 # endif
 
-    pum_position_at_mouse(BALLOON_MIN_WIDTH);
+    pum_position_at_mouse(BALLOON_MIN_چوڑائی);
     pum_selected = -1;
-    pum_first = 0;
+    pum_پہلا = 0;
     pum_redraw();
 }
 
 /*
  * Called when the mouse moved, may remove any displayed balloon.
  */
-    void
-ui_may_remove_balloon(void)
+    خالی
+ui_may_remove_balloon(خالی)
 {
     // For now: remove the balloon whenever the mouse moves to another screen
     // cell.
     ui_remove_balloon();
 }
-#endif
+#اگر_ختم
 
-#if defined(FEAT_TERM_POPUP_MENU)
+#اگر defined(FEAT_رکن_POPUP_MENU)
 /*
  * Select the pum entry at the mouse position.
  */
-    static void
-pum_select_mouse_pos(void)
+    ساکن خالی
+pum_select_mouse_pos(خالی)
 {
-    int idx = mouse_row - pum_row;
+    صحیح idx = mouse_صف - pum_صف;
 
-    if (idx < 0 || idx >= pum_height)
+    اگر (idx < 0 || idx >= pum_اونچائی)
 	pum_selected = -1;
-    else if (*pum_array[idx].pum_text != NUL)
+    ورنہ اگر (*pum_array[idx].pum_متن != NUL)
 	pum_selected = idx;
 }
 
 /*
  * Execute the currently selected popup menu item.
  */
-    static void
-pum_execute_menu(vimmenu_T *menu, int mode)
+    ساکن خالی
+pum_execute_menu(vimmenu_T *menu, صحیح منوال)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    صحیح		idx = 0;
     exarg_T	ea;
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
-	if ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
+    FOR_ALL_بچہ_MENUS(menu, mp)
+	اگر ((mp->modes & mp->enabled & منوال) && idx++ == pum_selected)
 	{
-	    CLEAR_FIELD(ea);
+	    CLEAR_میدان(ea);
 	    execute_menu(&ea, mp, -1);
-	    break;
+	    توڑو;
 	}
 }
 
@@ -2113,345 +2113,345 @@ pum_execute_menu(vimmenu_T *menu, int mode)
  * Open the terminal version of the popup menu and don't return until it is
  * closed.
  */
-    void
+    خالی
 pum_show_popupmenu(vimmenu_T *menu)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    صحیح		idx = 0;
     pumitem_T	*array;
-# ifdef FEAT_BEVAL_TERM
-    int		save_bevalterm = p_bevalterm;
+# ifdef FEAT_BEVAL_رکن
+    صحیح		save_bevalterm = p_bevalterm;
 # endif
-    int		mode;
+    صحیح		منوال;
 
     pum_undisplay();
-    pum_size = 0;
-    mode = get_menu_mode_flag();
+    pum_سائز = 0;
+    منوال = get_menu_منوال_flag();
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
-	if (menu_is_separator(mp->dname)
-		|| (mp->modes & mp->enabled & mode))
-	    ++pum_size;
+    FOR_ALL_بچہ_MENUS(menu, mp)
+	اگر (menu_is_separator(mp->dname)
+		|| (mp->modes & mp->enabled & منوال))
+	    ++pum_سائز;
 
     // When there are only Terminal mode menus, using "popup Edit" results in
     // pum_size being zero.
-    if (pum_size <= 0)
+    اگر (pum_سائز <= 0)
     {
-	emsg(_(e_menu_only_exists_in_another_mode));
-	return;
+	emsg(_(e_menu_only_exists_اندر_another_منوال));
+	واپس;
     }
 
-    array = ALLOC_CLEAR_MULT(pumitem_T, pum_size);
-    if (array == NULL)
-	return;
+    array = ALLOC_CLEAR_MULT(pumitem_T, pum_سائز);
+    اگر (array == تہی)
+	واپس;
 
-    FOR_ALL_CHILD_MENUS(menu, mp)
+    FOR_ALL_بچہ_MENUS(menu, mp)
     {
-	char_u *s = NULL;
+	char_u *s = تہی;
 
 	// Make a copy of the text, the menu may be redefined in a callback.
-	if (menu_is_separator(mp->dname))
+	اگر (menu_is_separator(mp->dname))
 	    s = (char_u *)"";
-	else if (mp->modes & mp->enabled & mode)
+	ورنہ اگر (mp->modes & mp->enabled & منوال)
 	    s = mp->dname;
-	if (s != NULL)
+	اگر (s != تہی)
 	{
 	    s = vim_strsave(s);
-	    if (s != NULL)
-		array[idx++].pum_text = s;
+	    اگر (s != تہی)
+		array[idx++].pum_متن = s;
 	}
     }
 
     pum_array = array;
-    pum_compute_size();
+    pum_compute_سائز();
     pum_scrollbar = 0;
-    pum_height = pum_size;
+    pum_اونچائی = pum_سائز;
 # ifdef FEAT_RIGHTLEFT
     pum_rl = curwin->w_p_rl;
 # endif
     pum_position_at_mouse(20);
 
     pum_selected = -1;
-    pum_first = 0;
-# ifdef FEAT_BEVAL_TERM
+    pum_پہلا = 0;
+# ifdef FEAT_BEVAL_رکن
     p_bevalterm = TRUE;  // track mouse movement
     mch_setmouse(TRUE);
 # endif
 
-    for (;;)
+    برائے (;;)
     {
-	int	c;
+	صحیح	c;
 
 	pum_redraw();
 	setcursor_mayforce(TRUE);
-	out_flush();
+	برآمد_flush();
 
 	c = vgetc();
 
 	// Bail out when typing Esc, CTRL-C or some callback or <expr> mapping
 	// closed the popup menu.
-	if (c == ESC || c == Ctrl_C || pum_array == NULL)
-	    break;
-	else if (c == CAR || c == NL)
+	اگر (c == ESC || c == Ctrl_C || pum_array == تہی)
+	    توڑو;
+	ورنہ اگر (c == CAR || c == NL)
 	{
 	    // enter: select current item, if any, and close
-	    pum_execute_menu(menu, mode);
-	    break;
+	    pum_execute_menu(menu, منوال);
+	    توڑو;
 	}
-	else if (c == 'k' || c == K_UP || c == K_MOUSEUP)
+	ورنہ اگر (c == 'k' || c == K_اوپر || c == K_MOUSEUP)
 	{
 	    // cursor up: select previous item
-	    while (pum_selected > 0)
+	    جب (pum_selected > 0)
 	    {
 		--pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		اگر (*array[pum_selected].pum_متن != NUL)
+		    توڑو;
 	    }
 	}
-	else if (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
+	ورنہ اگر (c == 'j' || c == K_نیچے_کو || c == K_MOUSEDOWN)
 	{
 	    // cursor down: select next item
-	    while (pum_selected < pum_size - 1)
+	    جب (pum_selected < pum_سائز - 1)
 	    {
 		++pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		اگر (*array[pum_selected].pum_متن != NUL)
+		    توڑو;
 	    }
 	}
-	else if (c == K_RIGHTMOUSE)
+	ورنہ اگر (c == K_RIGHTMOUSE)
 	{
 	    // Right mouse down: reposition the menu.
 	    vungetc(c);
-	    break;
+	    توڑو;
 	}
-	else if (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
+	ورنہ اگر (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
 	{
 	    // mouse moved: select item in the mouse row
 	    pum_select_mouse_pos();
 	}
-	else if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
+	ورنہ اگر (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
 	{
 	    // left mouse click: select clicked item, if any, and close;
 	    // right mouse release: select clicked item, close if any
 	    pum_select_mouse_pos();
-	    if (pum_selected >= 0)
+	    اگر (pum_selected >= 0)
 	    {
-		pum_execute_menu(menu, mode);
-		break;
+		pum_execute_menu(menu, منوال);
+		توڑو;
 	    }
-	    if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
-		break;
+	    اگر (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
+		توڑو;
 	}
     }
 
-    for (idx = 0; idx < pum_size; ++idx)
-	vim_free(array[idx].pum_text);
+    برائے (idx = 0; idx < pum_سائز; ++idx)
+	vim_free(array[idx].pum_متن);
     vim_free(array);
     pum_undisplay();
-# ifdef FEAT_BEVAL_TERM
+# ifdef FEAT_BEVAL_رکن
     p_bevalterm = save_bevalterm;
     mch_setmouse(TRUE);
 # endif
 }
 
-    void
-pum_make_popup(char_u *path_name, int use_mouse_pos)
+    خالی
+pum_make_popup(char_u *راستہ_name, صحیح use_mouse_pos)
 {
     vimmenu_T *menu;
 
-    if (!use_mouse_pos)
+    اگر (!use_mouse_pos)
     {
 	// Hack: set mouse position at the cursor so that the menu pops up
 	// around there.
-	mouse_row = W_WINROW(curwin) + curwin->w_wrow;
-	mouse_col =
+	mouse_صف = W_WINROW(curwin) + curwin->w_wrow;
+	mouse_ستون =
 # ifdef FEAT_RIGHTLEFT
 	    curwin->w_p_rl ? W_ENDCOL(curwin) - curwin->w_wcol - 1 :
 # endif
 	    curwin->w_wincol + curwin->w_wcol;
     }
 
-    menu = gui_find_menu(path_name);
-    if (menu != NULL)
+    menu = gui_ڈھونڈو_menu(راستہ_name);
+    اگر (menu != تہی)
 	pum_show_popupmenu(menu);
 }
-#endif
+#اگر_ختم
 
-    static int
-is_singlewidth(int c)
+    ساکن صحیح
+is_singlewidth(صحیح c)
 {
-    if (c >= 0 && c < 0x80)
-	return TRUE;
-    if (utf_char2cells(c) == 1)
-	return TRUE;
-    return FALSE;
+    اگر (c >= 0 && c < 0x80)
+	واپس TRUE;
+    اگر (utf_char2cells(c) == 1)
+	واپس TRUE;
+    واپس FALSE;
 }
 
 /*
  * Set border characters for popup menu.
  */
-    void
-pum_set_border_chars(
-	int top,
-	int right,
-	int bottom,
-	int left,
-	int top_left,
-	int top_right,
-	int bottom_right,
-	int bottom_left)
+    خالی
+pum_سیٹ_border_chars(
+	صحیح چوٹی,
+	صحیح دایاں,
+	صحیح bottom,
+	صحیح بایاں,
+	صحیح چوٹی_بایاں,
+	صحیح چوٹی_دایاں,
+	صحیح bottom_دایاں,
+	صحیح bottom_بایاں)
 {
-    if (!is_singlewidth(top) || !is_singlewidth(right)
-	    || !is_singlewidth(bottom) || !is_singlewidth(left)
-	    || !is_singlewidth(top_left) || !is_singlewidth(top_right)
-	    || !is_singlewidth(bottom_right) || !is_singlewidth(bottom_left))
-	return;
-    pum_border_chars.top = top;
-    pum_border_chars.right = right;
+    اگر (!is_singlewidth(چوٹی) || !is_singlewidth(دایاں)
+	    || !is_singlewidth(bottom) || !is_singlewidth(بایاں)
+	    || !is_singlewidth(چوٹی_بایاں) || !is_singlewidth(چوٹی_دایاں)
+	    || !is_singlewidth(bottom_دایاں) || !is_singlewidth(bottom_بایاں))
+	واپس;
+    pum_border_chars.چوٹی = چوٹی;
+    pum_border_chars.دایاں = دایاں;
     pum_border_chars.bottom = bottom;
-    pum_border_chars.left = left;
-    pum_border_chars.top_left = top_left;
-    pum_border_chars.top_right = top_right;
-    pum_border_chars.bottom_right = bottom_right;
-    pum_border_chars.bottom_left = bottom_left;
+    pum_border_chars.بایاں = بایاں;
+    pum_border_chars.چوٹی_بایاں = چوٹی_بایاں;
+    pum_border_chars.چوٹی_دایاں = چوٹی_دایاں;
+    pum_border_chars.bottom_دایاں = bottom_دایاں;
+    pum_border_chars.bottom_بایاں = bottom_بایاں;
     pum_border = 1;
 }
 
 /*
  * Compute margins for the popup menu.
  */
-    static void
-compute_margins(int *right_margin, int *left_margin, int *left_padding)
+    ساکن خالی
+compute_margins(صحیح *دایاں_margin, صحیح *بایاں_margin, صحیح *بایاں_padding)
 {
-    *right_margin = pum_margin && pum_border;
+    *دایاں_margin = pum_margin && pum_border;
 
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
     {
-	*left_padding = (pum_col < Columns - 1 - pum_border);
-	*left_margin = *right_margin && (pum_col < Columns - 3);
-	return;
+	*بایاں_padding = (pum_ستون < Columns - 1 - pum_border);
+	*بایاں_margin = *دایاں_margin && (pum_ستون < Columns - 3);
+	واپس;
     }
-#endif
-    *left_padding = (pum_col > pum_border);
-    *left_margin = *right_margin && (pum_col > 2);
+#اگر_ختم
+    *بایاں_padding = (pum_ستون > pum_border);
+    *بایاں_margin = *دایاں_margin && (pum_ستون > 2);
 }
 
 /*
  * Draw the border around the popup menu
  */
-    static void
-pum_draw_border(void)
+    ساکن خالی
+pum_draw_border(خالی)
 {
-    int	top_row = pum_row - 1;
-    int	bottom_row = pum_row + pum_height;
-    int	col;
-    int	attr = highlight_attr[HLF_PMB];
-    int	right_margin, left_margin, left_padding;
-    int	inner_width;
+    صحیح	چوٹی_صف = pum_صف - 1;
+    صحیح	bottom_صف = pum_صف + pum_اونچائی;
+    صحیح	ستون;
+    صحیح	attr = highlight_attr[HLF_PMB];
+    صحیح	دایاں_margin, بایاں_margin, بایاں_padding;
+    صحیح	inner_چوڑائی;
 
-    if (!pum_border)
-	return;
+    اگر (!pum_border)
+	واپس;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
+    (خالی)compute_margins(&دایاں_margin, &بایاں_margin, &بایاں_padding);
 
-    inner_width = pum_width + pum_scrollbar + left_padding;
+    inner_چوڑائی = pum_چوڑائی + pum_scrollbar + بایاں_padding;
 
     // Draw border left to right or right to left (for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	col = pum_col + left_padding + 1;
-    else
-#endif
-	col = pum_col - left_padding - 1;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
+	ستون = pum_ستون + بایاں_padding + 1;
+    ورنہ
+#اگر_ختم
+	ستون = pum_ستون - بایاں_padding - 1;
 
     // left corners (right corners for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_right, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col + 1, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', bottom_row, col + 1, attr);
+	screen_putchar(pum_border_chars.چوٹی_دایاں, چوٹی_صف, ستون, attr);
+	اگر (بایاں_margin)
+	    screen_putchar(' ', چوٹی_صف, ستون + 1, attr);
+	screen_putchar(pum_border_chars.bottom_دایاں, bottom_صف, ستون, attr);
+	اگر (بایاں_margin)
+	    screen_putchar(' ', bottom_صف, ستون + 1, attr);
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	screen_putchar(pum_border_chars.top_left, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col - 1, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', bottom_row, col - 1, attr);
+	screen_putchar(pum_border_chars.چوٹی_بایاں, چوٹی_صف, ستون, attr);
+	اگر (بایاں_margin)
+	    screen_putchar(' ', چوٹی_صف, ستون - 1, attr);
+	screen_putchar(pum_border_chars.bottom_بایاں, bottom_صف, ستون, attr);
+	اگر (بایاں_margin)
+	    screen_putchar(' ', bottom_صف, ستون - 1, attr);
     }
 
     // Top horizontal lines
-    for (int i = 0; i < inner_width; i++)
+    برائے (صحیح i = 0; i < inner_چوڑائی; i++)
     {
-	int cur_col;
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    cur_col = col - 1 - i;
-	else
-#endif
-	    cur_col = col + 1 + i;
-	screen_putchar(pum_border_chars.top, top_row, cur_col, attr);
-	screen_putchar(pum_border_chars.bottom, bottom_row, cur_col, attr);
+	صحیح cur_ستون;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    cur_ستون = ستون - 1 - i;
+	ورنہ
+#اگر_ختم
+	    cur_ستون = ستون + 1 + i;
+	screen_putchar(pum_border_chars.چوٹی, چوٹی_صف, cur_ستون, attr);
+	screen_putchar(pum_border_chars.bottom, bottom_صف, cur_ستون, attr);
     }
 
     // right corners (left corners for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_left, top_row,
-		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col - inner_width - 2, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row,
-		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', bottom_row, col - inner_width - 2, attr);
+	screen_putchar(pum_border_chars.چوٹی_بایاں, چوٹی_صف,
+		ستون - inner_چوڑائی - 1, attr);
+	اگر (دایاں_margin)
+	    screen_putchar(' ', چوٹی_صف, ستون - inner_چوڑائی - 2, attr);
+	screen_putchar(pum_border_chars.bottom_بایاں, bottom_صف,
+		ستون - inner_چوڑائی - 1, attr);
+	اگر (دایاں_margin)
+	    screen_putchar(' ', bottom_صف, ستون - inner_چوڑائی - 2, attr);
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	screen_putchar(pum_border_chars.top_right, top_row,
-		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col + inner_width + 2, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row,
-		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', bottom_row, col + inner_width + 2, attr);
+	screen_putchar(pum_border_chars.چوٹی_دایاں, چوٹی_صف,
+		ستون + inner_چوڑائی + 1, attr);
+	اگر (دایاں_margin)
+	    screen_putchar(' ', چوٹی_صف, ستون + inner_چوڑائی + 2, attr);
+	screen_putchar(pum_border_chars.bottom_دایاں, bottom_صف,
+		ستون + inner_چوڑائی + 1, attr);
+	اگر (دایاں_margin)
+	    screen_putchar(' ', bottom_صف, ستون + inner_چوڑائی + 2, attr);
     }
 
     // Draw side borders
-    for (int i = 0; i < pum_height; i++)
+    برائے (صحیح i = 0; i < pum_اونچائی; i++)
     {
-	int row = pum_row + i;
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	صحیح صف = pum_صف + i;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
-		screen_putchar(' ', row, col + 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
-		    col - inner_width - 1, attr);
-	    if (right_margin)
-		screen_putchar(' ', row, col - inner_width - 2, attr);
+	    screen_putchar(pum_border_chars.بایاں, صف, ستون, attr);
+	    اگر (بایاں_margin)
+		screen_putchar(' ', صف, ستون + 1, attr);
+	    screen_putchar(pum_border_chars.دایاں, صف,
+		    ستون - inner_چوڑائی - 1, attr);
+	    اگر (دایاں_margin)
+		screen_putchar(' ', صف, ستون - inner_چوڑائی - 2, attr);
 	}
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
-		screen_putchar(' ', row, col - 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
-		    col + inner_width + 1, attr);
-	    if (right_margin)
-		screen_putchar(' ', row, col + inner_width + 2, attr);
+	    screen_putchar(pum_border_chars.بایاں, صف, ستون, attr);
+	    اگر (بایاں_margin)
+		screen_putchar(' ', صف, ستون - 1, attr);
+	    screen_putchar(pum_border_chars.دایاں, صف,
+		    ستون + inner_چوڑائی + 1, attr);
+	    اگر (دایاں_margin)
+		screen_putchar(' ', صف, ستون + inner_چوڑائی + 2, attr);
 	}
     }
 }
@@ -2460,69 +2460,69 @@ pum_draw_border(void)
  * Get the underlying character and redraw with shadow highlight.
  * Preserve bold, italic, underline, and reverse text underneath the shadow.
  */
-    void
-put_shadow_char(int row, int col)
+    خالی
+put_shadow_char(صحیح صف, صحیح ستون)
 {
     char_u  buf[MB_MAXBYTES + 1];
-    int	    shadow_attr = highlight_attr[HLF_PMS];
-    int	    char_attr, new_attr;
+    صحیح	    shadow_attr = highlight_attr[HLF_PMS];
+    صحیح	    char_attr, new_attr;
 
-    screen_getbytes(row, col, buf, &char_attr);
+    screen_getbytes(صف, ستون, buf, &char_attr);
     new_attr = hl_combine_attr(char_attr, shadow_attr);
-    screen_putchar((*mb_ptr2char)(buf), row, col, new_attr);
+    screen_putchar((*mb_ptr2char)(buf), صف, ستون, new_attr);
 }
 
 /*
  * Draw the shadow
  */
-    static void
-pum_draw_shadow(void)
+    ساکن خالی
+pum_draw_shadow(خالی)
 {
-    int	row, col, next_col;
-    int	width, offset;
-    int	inner_width;
-    int	right_margin, left_margin, left_padding;
+    صحیح	صف, ستون, اگلا_ستون;
+    صحیح	چوڑائی, انحراف;
+    صحیح	inner_چوڑائی;
+    صحیح	دایاں_margin, بایاں_margin, بایاں_padding;
 
-    if (!pum_shadow)
-	return;
+    اگر (!pum_shadow)
+	واپس;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
-    inner_width = pum_width + pum_scrollbar + pum_border + right_margin;
+    (خالی)compute_margins(&دایاں_margin, &بایاں_margin, &بایاں_padding);
+    inner_چوڑائی = pum_چوڑائی + pum_scrollbar + pum_border + دایاں_margin;
 
     // Draw right side shadow (left for RTL)
-#ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (pum_rl)
     {
-	col = pum_col - inner_width;
-	next_col = col - 1;
+	ستون = pum_ستون - inner_چوڑائی;
+	اگلا_ستون = ستون - 1;
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	col = pum_col + inner_width;
-	next_col = col + 1;
+	ستون = pum_ستون + inner_چوڑائی;
+	اگلا_ستون = ستون + 1;
     }
 
-    for (int i = 0; i < pum_height + pum_border; i++)
+    برائے (صحیح i = 0; i < pum_اونچائی + pum_border; i++)
     {
-	row = pum_row + 1 + i - pum_border;
-	put_shadow_char(row, col);
-	put_shadow_char(row, next_col);
+	صف = pum_صف + 1 + i - pum_border;
+	put_shadow_char(صف, ستون);
+	put_shadow_char(صف, اگلا_ستون);
     }
 
     // Bottom shadow
-    row = pum_row + pum_height + pum_border;
-    width = inner_width + left_padding + pum_border + left_margin;
-    offset = 2 - left_padding - pum_border - left_margin;
+    صف = pum_صف + pum_اونچائی + pum_border;
+    چوڑائی = inner_چوڑائی + بایاں_padding + pum_border + بایاں_margin;
+    انحراف = 2 - بایاں_padding - pum_border - بایاں_margin;
 
-    for (int i = 0; i < width; i++)
+    برائے (صحیح i = 0; i < چوڑائی; i++)
     {
-#ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
-	    col = pum_col - offset - i;
-	else
-#endif
-	    col = pum_col + offset + i;
-	put_shadow_char(row, col);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (pum_rl)
+	    ستون = pum_ستون - انحراف - i;
+	ورنہ
+#اگر_ختم
+	    ستون = pum_ستون + انحراف + i;
+	put_shadow_char(صف, ستون);
     }
 }

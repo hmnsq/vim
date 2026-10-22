@@ -7,12 +7,12 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef HARDCOPY_POSTSCRIPT_H
-#define HARDCOPY_POSTSCRIPT_H
+#اگر_غیر_تعریف_شدہ HARDCOPY_POSTSCRIPT_H
+#تعریف_کرو HARDCOPY_POSTSCRIPT_H
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_POSTSCRIPT)
+#اگر defined(FEAT_POSTSCRIPT)
 
 # define OPT_MBFONT_USECOURIER  0
 # define OPT_MBFONT_ASCII       1
@@ -20,10 +20,10 @@
 # define OPT_MBFONT_BOLD	3
 # define OPT_MBFONT_OBLIQUE     4
 # define OPT_MBFONT_BOLDOBLIQUE 5
-# define OPT_MBFONT_NUM_OPTIONS 6
+# define OPT_MBFONT_عدد_OPTIONS 6
 
-extern option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS];
+خارجی option_جدول_T mbfont_opts[OPT_MBFONT_عدد_OPTIONS];
 
-#endif
+#اگر_ختم
 
-#endif
+#اگر_ختم

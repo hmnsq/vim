@@ -11,36 +11,36 @@
  * hardcopy.h: common stuff for hardcopy feature
  */
 
-#ifndef HARDCOPY_H
-#define HARDCOPY_H
+#اگر_غیر_تعریف_شدہ HARDCOPY_H
+#تعریف_کرو HARDCOPY_H
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_PRINTER)
+#اگر defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+خارجی صحیح	prt_curr_italic;
+خارجی صحیح	prt_curr_bold;
+خارجی صحیح	prt_curr_underline;
+خارجی long_u	prt_curr_bg;
+خارجی long_u	prt_curr_fg;
+خارجی صحیح	prt_صفحہ_گنتی;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# اگر defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+قسمتعریف ساخت
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    حرف	*name;
+    دوہرا	چوڑائی; // Width and height in points for portrait
+    دوہرا	اونچائی;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+خارجی prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
-#endif
+#اگر_ختم
 
-#endif
+#اگر_ختم

@@ -237,91 +237,91 @@
  *			    few bytes as possible, see offset2bytes())
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_SPELL)
+#اگر defined(FEAT_SPELL)
 
-#include <time.h>	// for time_t
+#شامل <time.h>	// for time_t
 
 // Special byte values for <byte>.  Some are only used in the tree for
 // postponed prefixes, some only in the other trees.  This is a bit messy...
-#define BY_NOFLAGS	0	// end of word without flags or region; for
+#تعریف_کرو BY_NOFLAGS	0	// end of word without flags or region; for
 				// postponed prefix: no <pflags>
-#define BY_INDEX	1	// child is shared, index follows
-#define BY_FLAGS	2	// end of word, <flags> byte follows; for
+#تعریف_کرو BY_اشاریہ	1	// child is shared, index follows
+#تعریف_کرو BY_FLAGS	2	// end of word, <flags> byte follows; for
 				// postponed prefix: <pflags> follows
-#define BY_FLAGS2	3	// end of word, <flags> and <flags2> bytes
+#تعریف_کرو BY_FLAGS2	3	// end of word, <flags> and <flags2> bytes
 				// follow; never used in prefix tree
-#define BY_SPECIAL  BY_FLAGS2	// highest special byte value
+#تعریف_کرو BY_SPECIAL  BY_FLAGS2	// highest special byte value
 
-#define ZERO_FLAG	65009	// used when flag is zero: "0"
+#تعریف_کرو ZERO_FLAG	65009	// used when flag is zero: "0"
 
 // Flags used in .spl file for soundsalike flags.
-#define SAL_F0LLOWUP		1
-#define SAL_COLLAPSE		2
-#define SAL_REM_ACCENTS		4
+#تعریف_کرو SAL_F0LLOWUP		1
+#تعریف_کرو SAL_COLLAPSE		2
+#تعریف_کرو SAL_REM_ACCENTS		4
 
-#define VIMSPELLMAGIC "VIMspell"  // string at start of Vim spell file
-#define VIMSPELLMAGICL 8
-#define VIMSPELLVERSION 50
+#تعریف_کرو VIMSPELLMAGIC "VIMspell"  // string at start of Vim spell file
+#تعریف_کرو VIMSPELLMAGICL 8
+#تعریف_کرو VIMSPELLVERSION 50
 
 // Section IDs.  Only renumber them when VIMSPELLVERSION changes!
-#define SN_REGION	0	// <regionname> section
-#define SN_CHARFLAGS	1	// charflags section
-#define SN_MIDWORD	2	// <midword> section
-#define SN_PREFCOND	3	// <prefcond> section
-#define SN_REP		4	// REP items section
-#define SN_SAL		5	// SAL items section
-#define SN_SOFO		6	// soundfolding section
-#define SN_MAP		7	// MAP items section
-#define SN_COMPOUND	8	// compound words section
-#define SN_SYLLABLE	9	// syllable section
-#define SN_NOBREAK	10	// NOBREAK section
-#define SN_SUGFILE	11	// timestamp for .sug file
-#define SN_REPSAL	12	// REPSAL items section
-#define SN_WORDS	13	// common words
-#define SN_NOSPLITSUGS	14	// don't split word for suggestions
-#define SN_INFO		15	// info section
-#define SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
-#define SN_END		255	// end of sections
+#تعریف_کرو SN_REGION	0	// <regionname> section
+#تعریف_کرو SN_CHARFLAGS	1	// charflags section
+#تعریف_کرو SN_MIDWORD	2	// <midword> section
+#تعریف_کرو SN_PREFCOND	3	// <prefcond> section
+#تعریف_کرو SN_REP		4	// REP items section
+#تعریف_کرو SN_SAL		5	// SAL items section
+#تعریف_کرو SN_SOFO		6	// soundfolding section
+#تعریف_کرو SN_MAP		7	// MAP items section
+#تعریف_کرو SN_COMPOUND	8	// compound words section
+#تعریف_کرو SN_SYLLABLE	9	// syllable section
+#تعریف_کرو SN_NOBREAK	10	// NOBREAK section
+#تعریف_کرو SN_SUGFILE	11	// timestamp for .sug file
+#تعریف_کرو SN_REPSAL	12	// REPSAL items section
+#تعریف_کرو SN_الفاظ	13	// common words
+#تعریف_کرو SN_NOSPLITSUGS	14	// don't split word for suggestions
+#تعریف_کرو SN_INFO		15	// info section
+#تعریف_کرو SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
+#تعریف_کرو SN_انتہا		255	// end of sections
 
-#define SNF_REQUIRED	1	// <sectionflags>: required section
+#تعریف_کرو SNF_REQUIRED	1	// <sectionflags>: required section
 
-#define CF_WORD		0x01
-#define CF_UPPER	0x02
+#تعریف_کرو CF_لفظ		0x01
+#تعریف_کرو CF_بالائی	0x02
 
 // Max allowed length for COMPOUND section
-#define COMPOUND_MAX_LEN	100000
+#تعریف_کرو COMPOUND_MAX_LEN	100000
 
 /*
  * Loop through all the siblings of a node (including the node)
  */
-#define FOR_ALL_NODE_SIBLINGS(node, np) \
-    for ((np) = (node); (np) != NULL; (np) = (np)->wn_sibling)
+#تعریف_کرو FOR_ALL_گرہ_SIBLINGS(گرہ, np) \
+    برائے ((np) = (گرہ); (np) != تہی; (np) = (np)->wn_sibling)
 
-static int set_spell_finish(spelltab_T	*new_st);
-static int write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
-static int read_region_section(FILE *fd, slang_T *slang, int len);
-static int read_charflags_section(FILE *fd);
-static int read_prefcond_section(FILE *fd, slang_T *lp);
-static int read_rep_section(FILE *fd, garray_T *gap, short *first);
-static int read_sal_section(FILE *fd, slang_T *slang);
-static int read_words_section(FILE *fd, slang_T *lp, int len);
-static int read_sofo_section(FILE *fd, slang_T *slang);
-static int read_compound(FILE *fd, slang_T *slang, int len);
-static int set_sofo(slang_T *lp, char_u *from, char_u *to);
-static void set_sal_first(slang_T *lp);
-static int *mb_str2wide(char_u *s);
-static int spell_read_tree(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, int prefixtree, int prefixcnt);
-static idx_T read_tree_node(FILE *fd, char_u *byts, idx_T *idxs, int maxidx, idx_T startidx, int prefixtree, int maxprefcondnr, int depth);
-static void set_spell_charflags(char_u *flags, int cnt, char_u *upp);
-static int set_spell_chartab(char_u *fol, char_u *low, char_u *upp);
-static void set_map_str(slang_T *lp, char_u *map);
+ساکن صحیح سیٹ_spell_اختتام(spelltab_T	*new_st);
+ساکن صحیح write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
+ساکن صحیح read_region_section(FILE *fd, slang_T *slang, صحیح len);
+ساکن صحیح read_charflags_section(FILE *fd);
+ساکن صحیح read_prefcond_section(FILE *fd, slang_T *lp);
+ساکن صحیح read_rep_section(FILE *fd, garray_T *gap, مختصر *پہلا);
+ساکن صحیح read_sal_section(FILE *fd, slang_T *slang);
+ساکن صحیح read_الفاظ_section(FILE *fd, slang_T *lp, صحیح len);
+ساکن صحیح read_sofo_section(FILE *fd, slang_T *slang);
+ساکن صحیح read_compound(FILE *fd, slang_T *slang, صحیح len);
+ساکن صحیح سیٹ_sofo(slang_T *lp, char_u *from, char_u *مقصد);
+ساکن خالی سیٹ_sal_پہلا(slang_T *lp);
+ساکن صحیح *mb_str2wide(char_u *s);
+ساکن صحیح spell_read_درخت(FILE *fd, char_u **bytsp, طویل *bytsp_len, idx_T **idxsp, صحیح prefixtree, صحیح prefixcnt);
+ساکن idx_T read_درخت_گرہ(FILE *fd, char_u *byts, idx_T *idxs, صحیح maxidx, idx_T startidx, صحیح prefixtree, صحیح maxprefcondnr, صحیح گہرائی);
+ساکن خالی سیٹ_spell_charflags(char_u *flags, صحیح cnt, char_u *upp);
+ساکن صحیح سیٹ_spell_chartab(char_u *fol, char_u *کم, char_u *upp);
+ساکن خالی سیٹ_map_str(slang_T *lp, char_u *map);
 
 
-static char *e_afftrailing = N_("Trailing text in %s line %d: %s");
-static char *e_affname = N_("Affix name too long in %s line %d: %s");
-static char *msg_compressing = N_("Compressing word tree...");
+ساکن حرف *e_afftrailing = N_("Trailing text in %s line %d: %s");
+ساکن حرف *e_affname = N_("Affix name too long in %s line %d: %s");
+ساکن حرف *پیغام_compressing = N_("Compressing word tree...");
 
 /*
  * Load one spell file and store the info into a slang_T.
@@ -337,86 +337,86 @@ static char *msg_compressing = N_("Compressing word tree...");
  * Returns the slang_T the spell file was loaded into.  NULL for error.
  */
     slang_T *
-spell_load_file(
+spell_بھرو_file(
     char_u	*fname,
     char_u	*lang,
     slang_T	*old_lp,
-    int		silent)		// no error if file doesn't exist
+    صحیح		silent)		// no error if file doesn't exist
 {
     FILE	*fd;
     char_u	buf[VIMSPELLMAGICL];
     char_u	*p;
-    int		i;
-    int		n;
-    int		len;
-    slang_T	*lp = NULL;
-    int		c = 0;
-    int		res;
-    int		did_estack_push = FALSE;
+    صحیح		i;
+    صحیح		n;
+    صحیح		len;
+    slang_T	*lp = تہی;
+    صحیح		c = 0;
+    صحیح		res;
+    صحیح		did_estack_ڈالو = FALSE;
     ESTACK_CHECK_DECLARATION;
 
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "r");
+    اگر (fd == تہی)
     {
-	if (!silent)
+	اگر (!silent)
 	    semsg(_(e_cant_open_file_str), fname);
-	else if (p_verbose > 2)
+	ورنہ اگر (p_verbose > 2)
 	{
 	    verbose_enter();
-	    smsg((const char *)e_cant_open_file_str, fname);
+	    smsg((ثابت حرف *)e_cant_open_file_str, fname);
 	    verbose_leave();
 	}
-	goto endFAIL;
+	جاؤ انتہا_FAIL;
     }
-    if (p_verbose > 2)
+    اگر (p_verbose > 2)
     {
 	verbose_enter();
 	smsg(_("Reading spell file \"%s\""), fname);
 	verbose_leave();
     }
 
-    if (old_lp == NULL)
+    اگر (old_lp == تہی)
     {
 	lp = slang_alloc(lang);
-	if (lp == NULL)
-	    goto endFAIL;
+	اگر (lp == تہی)
+	    جاؤ انتہا_FAIL;
 
 	// Remember the file name, used to reload the file when it's updated.
 	lp->sl_fname = vim_strsave(fname);
-	if (lp->sl_fname == NULL)
-	    goto endFAIL;
+	اگر (lp->sl_fname == تہی)
+	    جاؤ انتہا_FAIL;
 
 	// Check for .add.spl (_add.spl for VMS).
-	lp->sl_add = strstr((char *)gettail(fname), SPL_FNAME_ADD) != NULL;
+	lp->sl_جوڑو = لڑی_تلاش((حرف *)gettail(fname), SPL_FNAME_جوڑو) != تہی;
     }
-    else
+    ورنہ
 	lp = old_lp;
 
     // Set sourcing_name, so that error messages mention the file name.
-    estack_push(ETYPE_SPELL, fname, 0);
-    ESTACK_CHECK_SETUP;
-    did_estack_push = TRUE;
+    estack_ڈالو(ETYPE_SPELL, fname, 0);
+    ESTACK_CHECK_تیاری;
+    did_estack_ڈالو = TRUE;
 
     /*
      * <HEADER>: <fileID>
      */
-    for (i = 0; i < VIMSPELLMAGICL; ++i)
+    برائے (i = 0; i < VIMSPELLMAGICL; ++i)
 	buf[i] = (c = getc(fd)) == EOF ? 0 : c;		// <fileID>
-    if (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
+    اگر (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
     {
 	emsg(_(e_this_does_not_look_like_spell_file));
-	goto endFAIL;
+	جاؤ انتہا_FAIL;
     }
     c = getc(fd);					// <versionnr>
-    if (c < VIMSPELLVERSION)
+    اگر (c < VIMSPELLVERSION)
     {
-	emsg(_(e_old_spell_file_needs_to_be_updated));
-	goto endFAIL;
+	emsg(_(e_old_spell_file_needs_مقصد_be_updated));
+	جاؤ انتہا_FAIL;
     }
-    else if (c > VIMSPELLVERSION)
+    ورنہ اگر (c > VIMSPELLVERSION)
     {
-	emsg(_(e_spell_file_is_for_newer_version_of_vim));
-	goto endFAIL;
+	emsg(_(e_spell_file_is_for_newer_نسخہ_کا_vim));
+	جاؤ انتہا_FAIL;
     }
 
 
@@ -424,231 +424,231 @@ spell_load_file(
      * <SECTIONS>: <section> ... <sectionend>
      * <section>: <sectionID> <sectionflags> <sectionlen> (section contents)
      */
-    for (;;)
+    برائے (;;)
     {
 	n = getc(fd);			    // <sectionID> or <sectionend>
-	if (n == SN_END)
-	    break;
+	اگر (n == SN_انتہا)
+	    توڑو;
 	c = getc(fd);					// <sectionflags>
 	len = get4c(fd);				// <sectionlen>
-	if (len < 0)
-	    goto truncerr;
+	اگر (len < 0)
+	    جاؤ truncerr;
 
 	res = 0;
-	switch (n)
+	انتخاب (n)
 	{
-	    case SN_INFO:
+	    حالت SN_INFO:
 		lp->sl_info = read_string(fd, len);	// <infotext>
-		if (lp->sl_info == NULL)
-		    goto endFAIL;
-		break;
+		اگر (lp->sl_info == تہی)
+		    جاؤ انتہا_FAIL;
+		توڑو;
 
-	    case SN_REGION:
+	    حالت SN_REGION:
 		res = read_region_section(fd, lp, len);
-		break;
+		توڑو;
 
-	    case SN_CHARFLAGS:
+	    حالت SN_CHARFLAGS:
 		res = read_charflags_section(fd);
-		break;
+		توڑو;
 
-	    case SN_MIDWORD:
+	    حالت SN_MIDWORD:
 		lp->sl_midword = read_string(fd, len);	// <midword>
-		if (lp->sl_midword == NULL)
-		    goto endFAIL;
-		break;
+		اگر (lp->sl_midword == تہی)
+		    جاؤ انتہا_FAIL;
+		توڑو;
 
-	    case SN_PREFCOND:
+	    حالت SN_PREFCOND:
 		res = read_prefcond_section(fd, lp);
-		break;
+		توڑو;
 
-	    case SN_REP:
-		res = read_rep_section(fd, &lp->sl_rep, lp->sl_rep_first);
-		break;
+	    حالت SN_REP:
+		res = read_rep_section(fd, &lp->sl_rep, lp->sl_rep_پہلا);
+		توڑو;
 
-	    case SN_REPSAL:
-		res = read_rep_section(fd, &lp->sl_repsal, lp->sl_repsal_first);
-		break;
+	    حالت SN_REPSAL:
+		res = read_rep_section(fd, &lp->sl_repsal, lp->sl_repsal_پہلا);
+		توڑو;
 
-	    case SN_SAL:
+	    حالت SN_SAL:
 		res = read_sal_section(fd, lp);
-		break;
+		توڑو;
 
-	    case SN_SOFO:
+	    حالت SN_SOFO:
 		res = read_sofo_section(fd, lp);
-		break;
+		توڑو;
 
-	    case SN_MAP:
+	    حالت SN_MAP:
 		p = read_string(fd, len);		// <mapstr>
-		if (p == NULL)
-		    goto endFAIL;
-		set_map_str(lp, p);
+		اگر (p == تہی)
+		    جاؤ انتہا_FAIL;
+		سیٹ_map_str(lp, p);
 		vim_free(p);
-		break;
+		توڑو;
 
-	    case SN_WORDS:
-		res = read_words_section(fd, lp, len);
-		break;
+	    حالت SN_الفاظ:
+		res = read_الفاظ_section(fd, lp, len);
+		توڑو;
 
-	    case SN_SUGFILE:
+	    حالت SN_SUGFILE:
 		lp->sl_sugtime = get8ctime(fd);		// <timestamp>
-		break;
+		توڑو;
 
-	    case SN_NOSPLITSUGS:
+	    حالت SN_NOSPLITSUGS:
 		lp->sl_nosplitsugs = TRUE;
-		break;
+		توڑو;
 
-	    case SN_NOCOMPOUNDSUGS:
+	    حالت SN_NOCOMPOUNDSUGS:
 		lp->sl_nocompoundsugs = TRUE;
-		break;
+		توڑو;
 
-	    case SN_COMPOUND:
+	    حالت SN_COMPOUND:
 		res = read_compound(fd, lp, len);
-		break;
+		توڑو;
 
-	    case SN_NOBREAK:
+	    حالت SN_NOBREAK:
 		lp->sl_nobreak = TRUE;
-		break;
+		توڑو;
 
-	    case SN_SYLLABLE:
+	    حالت SN_SYLLABLE:
 		lp->sl_syllable = read_string(fd, len);	// <syllable>
-		if (lp->sl_syllable == NULL)
-		    goto endFAIL;
-		if (init_syl_tab(lp) != OK)
-		    goto endFAIL;
-		break;
+		اگر (lp->sl_syllable == تہی)
+		    جاؤ انتہا_FAIL;
+		اگر (init_syl_tab(lp) != OK)
+		    جاؤ انتہا_FAIL;
+		توڑو;
 
-	    default:
+	    طےشدہ:
 		// Unsupported section.  When it's required give an error
 		// message.  When it's not required skip the contents.
-		if (c & SNF_REQUIRED)
+		اگر (c & SNF_REQUIRED)
 		{
-		    emsg(_(e_unsupported_section_in_spell_file));
-		    goto endFAIL;
+		    emsg(_(e_unsupported_section_اندر_spell_file));
+		    جاؤ انتہا_FAIL;
 		}
-		while (--len >= 0)
-		    if (getc(fd) < 0)
-			goto truncerr;
-		break;
+		جب (--len >= 0)
+		    اگر (getc(fd) < 0)
+			جاؤ truncerr;
+		توڑو;
 	}
 someerror:
-	if (res == SP_FORMERROR)
+	اگر (res == SP_FORMERROR)
 	{
-	    emsg(_(e_format_error_in_spell_file));
-	    goto endFAIL;
+	    emsg(_(e_format_error_اندر_spell_file));
+	    جاؤ انتہا_FAIL;
 	}
-	if (res == SP_TRUNCERROR)
+	اگر (res == SP_TRUNCERROR)
 	{
 truncerr:
 	    emsg(_(e_truncated_spell_file));
-	    goto endFAIL;
+	    جاؤ انتہا_FAIL;
 	}
-	if (res == SP_OTHERERROR)
-	    goto endFAIL;
+	اگر (res == SP_OTHERERROR)
+	    جاؤ انتہا_FAIL;
     }
 
     // <LWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
+    res = spell_read_درخت(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
 						      &lp->sl_fidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    اگر (res != 0)
+	جاؤ someerror;
 
     // <KWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_kbyts, NULL, &lp->sl_kidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    res = spell_read_درخت(fd, &lp->sl_kbyts, تہی, &lp->sl_kidxs, FALSE, 0);
+    اگر (res != 0)
+	جاؤ someerror;
 
     // <PREFIXTREE>
-    res = spell_read_tree(fd, &lp->sl_pbyts, NULL, &lp->sl_pidxs, TRUE,
+    res = spell_read_درخت(fd, &lp->sl_pbyts, تہی, &lp->sl_pidxs, TRUE,
 							    lp->sl_prefixcnt);
-    if (res != 0)
-	goto someerror;
+    اگر (res != 0)
+	جاؤ someerror;
 
     // For a new file link it in the list of spell files.
-    if (old_lp == NULL && lang != NULL)
+    اگر (old_lp == تہی && lang != تہی)
     {
-	lp->sl_next = first_lang;
-	first_lang = lp;
+	lp->sl_اگلا = پہلا_lang;
+	پہلا_lang = lp;
     }
 
-    goto endOK;
+    جاؤ انتہا_OK;
 
-endFAIL:
-    if (lang != NULL)
+انتہا_FAIL:
+    اگر (lang != تہی)
 	// truncating the name signals the error to spell_load_lang()
 	*lang = NUL;
-    if (lp != NULL && old_lp == NULL)
+    اگر (lp != تہی && old_lp == تہی)
 	slang_free(lp);
-    lp = NULL;
+    lp = تہی;
 
-endOK:
-    if (fd != NULL)
+انتہا_OK:
+    اگر (fd != تہی)
 	fclose(fd);
-    if (did_estack_push)
+    اگر (did_estack_ڈالو)
     {
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_نکالو();
     }
 
-    return lp;
+    واپس lp;
 }
 
 /*
  * Fill in the wordcount fields for a trie.
  * Returns the total number of words.
  */
-    static void
-tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
+    ساکن خالی
+درخت_گنتی_الفاظ(char_u *byts, طویل byts_len, idx_T *idxs)
 {
-    int		depth;
+    صحیح		گہرائی;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
-    int		c;
+    صحیح		curi[MAXWLEN];
+    صحیح		c;
     idx_T	n;
-    int		wordcount[MAXWLEN];
+    صحیح		wordcount[MAXWLEN];
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
-    depth = 0;
-    while (depth >= 0 && !got_int)
+    گہرائی = 0;
+    جب (گہرائی >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	اگر (curi[گہرائی] > byts[arridx[گہرائی]])
 	{
 	    // Done all bytes at this node, go up one level.
-	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
-		wordcount[depth - 1] += wordcount[depth];
+	    idxs[arridx[گہرائی]] = wordcount[گہرائی];
+	    اگر (گہرائی > 0)
+		wordcount[گہرائی - 1] += wordcount[گہرائی];
 
-	    --depth;
+	    --گہرائی;
 	    fast_breakcheck();
 	}
-	else
+	ورنہ
 	{
 	    // Do one more byte at this node.
-	    n = arridx[depth] + curi[depth];
-	    ++curi[depth];
+	    n = arridx[گہرائی] + curi[گہرائی];
+	    ++curi[گہرائی];
 
 	    c = byts[n];
-	    if (c == 0)
+	    اگر (c == 0)
 	    {
 		// End of word, count it.
-		++wordcount[depth];
+		++wordcount[گہرائی];
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < byts_len && byts[n + 1] == 0)
+		جب (n + 1 < byts_len && byts[n + 1] == 0)
 		{
 		    ++n;
-		    ++curi[depth];
+		    ++curi[گہرائی];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    ورنہ اگر (گہرائی < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper to count the words.
-		++depth;
-		arridx[depth] = idxs[n];
-		curi[depth] = 1;
-		wordcount[depth] = 0;
+		++گہرائی;
+		arridx[گہرائی] = idxs[n];
+		curi[گہرائی] = 1;
+		wordcount[گہرائی] = 0;
 	    }
 	}
     }
@@ -657,28 +657,28 @@ tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
 /*
  * Load the .sug files for languages that have one and weren't loaded yet.
  */
-    void
-suggest_load_files(void)
+    خالی
+suggest_بھرو_files(خالی)
 {
     langp_T	*lp;
-    int		lpi;
+    صحیح		lpi;
     slang_T	*slang;
     char_u	*dotp;
     FILE	*fd;
     char_u	buf[MAXWLEN];
-    int		i;
+    صحیح		i;
     time_t	timestamp;
-    int		wcount;
-    int		wordnr;
+    صحیح		wcount;
+    صحیح		wordnr;
     garray_T	ga;
-    int		c;
+    صحیح		c;
 
     // Do this for all languages that support sound folding.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    برائے (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
-	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
+	lp = LANGP_اندراج(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
+	اگر (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
 	{
 	    // Change ".spl" to ".sug" and open the file.  When the file isn't
 	    // found silently skip it.  Do set "sl_sugloaded" so that we
@@ -686,60 +686,60 @@ suggest_load_files(void)
 	    slang->sl_sugloaded = TRUE;
 
 	    dotp = vim_strrchr(slang->sl_fname, '.');
-	    if (dotp == NULL || fnamecmp(dotp, ".spl") != 0)
-		continue;
+	    اگر (dotp == تہی || fnamecmp(dotp, ".spl") != 0)
+		جاری;
 	    STRCPY(dotp, ".sug");
-	    fd = mch_fopen((char *)slang->sl_fname, "r");
-	    if (fd == NULL)
-		goto nextone;
+	    fd = mch_fopen((حرف *)slang->sl_fname, "r");
+	    اگر (fd == تہی)
+		جاؤ nextone;
 
 	    /*
 	     * <SUGHEADER>: <fileID> <versionnr> <timestamp>
 	     */
-	    for (i = 0; i < VIMSUGMAGICL; ++i)
+	    برائے (i = 0; i < VIMSUGMAGICL; ++i)
 		buf[i] = (c = getc(fd)) == EOF ? 0 : c;	// <fileID>
-	    if (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
+	    اگر (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
 	    {
 		semsg(_(e_this_does_not_look_like_sug_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		جاؤ nextone;
 	    }
 	    c = getc(fd);				// <versionnr>
-	    if (c < VIMSUGVERSION)
+	    اگر (c < VIMSUGVERSION)
 	    {
-		semsg(_(e_old_sug_file_needs_to_be_updated_str),
+		semsg(_(e_old_sug_file_needs_مقصد_be_updated_str),
 							     slang->sl_fname);
-		goto nextone;
+		جاؤ nextone;
 	    }
-	    else if (c > VIMSUGVERSION)
+	    ورنہ اگر (c > VIMSUGVERSION)
 	    {
-		semsg(_(e_sug_file_is_for_newer_version_of_vim_str),
+		semsg(_(e_sug_file_is_for_newer_نسخہ_کا_vim_str),
 							     slang->sl_fname);
-		goto nextone;
+		جاؤ nextone;
 	    }
 
 	    // Check the timestamp, it must be exactly the same as the one in
 	    // the .spl file.  Otherwise the word numbers won't match.
 	    timestamp = get8ctime(fd);			// <timestamp>
-	    if (timestamp != slang->sl_sugtime)
+	    اگر (timestamp != slang->sl_sugtime)
 	    {
-		semsg(_(e_sug_file_doesnt_match_spl_file_str),
+		semsg(_(e_sug_file_doesnt_مطابقت_spl_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		جاؤ nextone;
 	    }
 
 	    /*
 	     * <SUGWORDTREE>: <wordtree>
 	     * Read the trie with the soundfolded words.
 	     */
-	    if (spell_read_tree(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
+	    اگر (spell_read_درخت(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
 			&slang->sl_sidxs, FALSE, 0) != 0)
 	    {
 someerror:
 		semsg(_(e_error_while_reading_sug_file_str),
 							     slang->sl_fname);
 		slang_clear_sug(slang);
-		goto nextone;
+		جاؤ nextone;
 	    }
 
 	    /*
@@ -750,31 +750,31 @@ someerror:
 	     * possible to swap the info and save on memory use.
 	     */
 	    slang->sl_sugbuf = open_spellbuf();
-	    if (slang->sl_sugbuf == NULL)
-		goto someerror;
+	    اگر (slang->sl_sugbuf == تہی)
+		جاؤ someerror;
 							    // <sugwcount>
 	    wcount = get4c(fd);
-	    if (wcount < 0)
-		goto someerror;
+	    اگر (wcount < 0)
+		جاؤ someerror;
 
 	    // Read all the wordnr lists into the buffer, one NUL terminated
 	    // list per line.
 	    ga_init2(&ga, 1, 100);
-	    for (wordnr = 0; wordnr < wcount; ++wordnr)
+	    برائے (wordnr = 0; wordnr < wcount; ++wordnr)
 	    {
 		ga.ga_len = 0;
-		for (;;)
+		برائے (;;)
 		{
 		    c = getc(fd);			    // <sugline>
-		    if (c < 0 || ga_grow(&ga, 1) == FAIL)
-			goto someerror;
-		    ((char_u *)ga.ga_data)[ga.ga_len++] = c;
-		    if (c == NUL)
-			break;
+		    اگر (c < 0 || ga_grow(&ga, 1) == FAIL)
+			جاؤ someerror;
+		    ((char_u *)ga.ga_ڈیٹا)[ga.ga_len++] = c;
+		    اگر (c == NUL)
+			توڑو;
 		}
-		if (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
-					 ga.ga_data, ga.ga_len, TRUE) == FAIL)
-		    goto someerror;
+		اگر (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
+					 ga.ga_ڈیٹا, ga.ga_len, TRUE) == FAIL)
+		    جاؤ someerror;
 	    }
 	    ga_clear(&ga);
 
@@ -782,13 +782,13 @@ someerror:
 	     * Need to put word counts in the word tries, so that we can find
 	     * a word by its number.
 	     */
-	    tree_count_words(slang->sl_fbyts, slang->sl_fbyts_len,
+	    درخت_گنتی_الفاظ(slang->sl_fbyts, slang->sl_fbyts_len,
 		    slang->sl_fidxs);
-	    tree_count_words(slang->sl_sbyts, slang->sl_sbyts_len,
+	    درخت_گنتی_الفاظ(slang->sl_sbyts, slang->sl_sbyts_len,
 		    slang->sl_sidxs);
 
 nextone:
-	    if (fd != NULL)
+	    اگر (fd != تہی)
 		fclose(fd);
 	    STRCPY(dotp, ".spl");
 	}
@@ -803,51 +803,51 @@ nextone:
  * Sets "*cntp" to SP_*ERROR when there is an error, length of the result
  * otherwise.
  */
-    static char_u *
-read_cnt_string(FILE *fd, int cnt_bytes, int *cntp)
+    ساکن char_u *
+read_cnt_string(FILE *fd, صحیح cnt_بائٹیں, صحیح *cntp)
 {
-    int		cnt = 0;
-    int		i;
+    صحیح		cnt = 0;
+    صحیح		i;
     char_u	*str;
 
     // read the length bytes, MSB first
-    for (i = 0; i < cnt_bytes; ++i)
+    برائے (i = 0; i < cnt_بائٹیں; ++i)
     {
-	int c = getc(fd);
+	صحیح c = getc(fd);
 
-	if (c == EOF)
+	اگر (c == EOF)
 	{
 	    *cntp = SP_TRUNCERROR;
-	    return NULL;
+	    واپس تہی;
 	}
-	cnt = (cnt << 8) + (unsigned)c;
+	cnt = (cnt << 8) + (غیرعلامتی)c;
     }
     *cntp = cnt;
-    if (cnt == 0)
-	return NULL;	    // nothing to read, return NULL
+    اگر (cnt == 0)
+	واپس تہی;	    // nothing to read, return NULL
 
     str = read_string(fd, cnt);
-    if (str == NULL)
+    اگر (str == تہی)
 	*cntp = SP_OTHERERROR;
-    return str;
+    واپس str;
 }
 
 /*
  * Read SN_REGION: <regionname> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_region_section(FILE *fd, slang_T *lp, int len)
+    ساکن صحیح
+read_region_section(FILE *fd, slang_T *lp, صحیح len)
 {
-    int		i;
-    int		c = 0;
+    صحیح		i;
+    صحیح		c = 0;
 
-    if (len > MAXREGIONS * 2)
-	return SP_FORMERROR;
-    for (i = 0; i < len; ++i)
+    اگر (len > MAXREGIONS * 2)
+	واپس SP_FORMERROR;
+    برائے (i = 0; i < len; ++i)
 	lp->sl_regions[i] = (c = getc(fd)) == EOF ? 0 : c; // <regionname>
     lp->sl_regions[len] = NUL;
-    return c == EOF ? SP_TRUNCERROR : 0;
+    واپس c == EOF ? SP_TRUNCERROR : 0;
 }
 
 /*
@@ -855,353 +855,353 @@ read_region_section(FILE *fd, slang_T *lp, int len)
  *				<folcharslen> <folchars>
  * Return SP_*ERROR flags.
  */
-    static int
+    ساکن صحیح
 read_charflags_section(FILE *fd)
 {
     char_u	*flags;
     char_u	*fol;
-    int		flagslen, follen;
+    صحیح		flagslen, follen;
 
     // <charflagslen> <charflags>
     flags = read_cnt_string(fd, 1, &flagslen);
-    if (flagslen < 0)
-	return flagslen;
+    اگر (flagslen < 0)
+	واپس flagslen;
 
     // <folcharslen> <folchars>
     fol = read_cnt_string(fd, 2, &follen);
-    if (follen < 0)
+    اگر (follen < 0)
     {
 	vim_free(flags);
-	return follen;
+	واپس follen;
     }
 
     // Set the word-char flags and fill SPELL_ISUPPER() table.
-    if (flags != NULL && fol != NULL)
-	set_spell_charflags(flags, flagslen, fol);
+    اگر (flags != تہی && fol != تہی)
+	سیٹ_spell_charflags(flags, flagslen, fol);
 
     vim_free(flags);
     vim_free(fol);
 
     // When <charflagslen> is zero then <fcharlen> must also be zero.
-    if ((flags == NULL) != (fol == NULL))
-	return SP_FORMERROR;
-    return 0;
+    اگر ((flags == تہی) != (fol == تہی))
+	واپس SP_FORMERROR;
+    واپس 0;
 }
 
 /*
  * Read SN_PREFCOND section.
  * Return SP_*ERROR flags.
  */
-    static int
+    ساکن صحیح
 read_prefcond_section(FILE *fd, slang_T *lp)
 {
-    int		cnt;
-    int		i;
-    int		n;
-    int		c;
+    صحیح		cnt;
+    صحیح		i;
+    صحیح		n;
+    صحیح		c;
     char_u	*p;
     char_u	buf[MAXWLEN + 1];
 
     // <prefcondcnt> <prefcond> ...
     cnt = get2c(fd);					// <prefcondcnt>
-    if (cnt <= 0)
-	return SP_FORMERROR;
+    اگر (cnt <= 0)
+	واپس SP_FORMERROR;
 
     lp->sl_prefprog = ALLOC_CLEAR_MULT(regprog_T *, cnt);
-    if (lp->sl_prefprog == NULL)
-	return SP_OTHERERROR;
+    اگر (lp->sl_prefprog == تہی)
+	واپس SP_OTHERERROR;
     lp->sl_prefixcnt = cnt;
 
-    for (i = 0; i < cnt; ++i)
+    برائے (i = 0; i < cnt; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
 	n = getc(fd);					// <condlen>
-	if (n < 0 || n >= MAXWLEN)
-	    return SP_FORMERROR;
+	اگر (n < 0 || n >= MAXWLEN)
+	    واپس SP_FORMERROR;
 
 	// When <condlen> is zero we have an empty condition.  Otherwise
 	// compile the regexp program used to check for the condition.
-	if (n > 0)
+	اگر (n > 0)
 	{
 	    buf[0] = '^';	    // always match at one position only
 	    p = buf + 1;
-	    while (n-- > 0)
+	    جب (n-- > 0)
 		*p++ = (c = getc(fd)) == EOF ? 0 : c;	    // <condstr>
-	    if (c == EOF)
-		break;
+	    اگر (c == EOF)
+		توڑو;
 	    *p = NUL;
 	    lp->sl_prefprog[i] = vim_regcomp(buf, RE_MAGIC + RE_STRING);
 	}
     }
-    return 0;
+    واپس 0;
 }
 
 /*
  * Read REP or REPSAL items section from "fd": <repcount> <rep> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_rep_section(FILE *fd, garray_T *gap, short *first)
+    ساکن صحیح
+read_rep_section(FILE *fd, garray_T *gap, مختصر *پہلا)
 {
-    int		cnt;
+    صحیح		cnt;
     fromto_T	*ftp;
-    int		i;
+    صحیح		i;
 
     cnt = get2c(fd);					// <repcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    اگر (cnt < 0)
+	واپس SP_TRUNCERROR;
 
-    if (ga_grow(gap, cnt) == FAIL)
-	return SP_OTHERERROR;
+    اگر (ga_grow(gap, cnt) == FAIL)
+	واپس SP_OTHERERROR;
 
     // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    برائے (; gap->ga_len < cnt; ++gap->ga_len)
     {
-	ftp = &((fromto_T *)gap->ga_data)[gap->ga_len];
+	ftp = &((fromto_T *)gap->ga_ڈیٹا)[gap->ga_len];
 	ftp->ft_from = read_cnt_string(fd, 1, &i);
-	if (i < 0)
-	    return i;
-	if (i == 0)
-	    return SP_FORMERROR;
-	ftp->ft_to = read_cnt_string(fd, 1, &i);
-	if (i <= 0)
+	اگر (i < 0)
+	    واپس i;
+	اگر (i == 0)
+	    واپس SP_FORMERROR;
+	ftp->ft_مقصد = read_cnt_string(fd, 1, &i);
+	اگر (i <= 0)
 	{
 	    vim_free(ftp->ft_from);
-	    if (i < 0)
-		return i;
-	    return SP_FORMERROR;
+	    اگر (i < 0)
+		واپس i;
+	    واپس SP_FORMERROR;
 	}
     }
 
     // Fill the first-index table.
-    for (i = 0; i < 256; ++i)
-	first[i] = -1;
-    for (i = 0; i < gap->ga_len; ++i)
+    برائے (i = 0; i < 256; ++i)
+	پہلا[i] = -1;
+    برائے (i = 0; i < gap->ga_len; ++i)
     {
-	ftp = &((fromto_T *)gap->ga_data)[i];
-	if (first[*ftp->ft_from] == -1)
-	    first[*ftp->ft_from] = i;
+	ftp = &((fromto_T *)gap->ga_ڈیٹا)[i];
+	اگر (پہلا[*ftp->ft_from] == -1)
+	    پہلا[*ftp->ft_from] = i;
     }
-    return 0;
+    واپس 0;
 }
 
 /*
  * Read SN_SAL section: <salflags> <salcount> <sal> ...
  * Return SP_*ERROR flags.
  */
-    static int
+    ساکن صحیح
 read_sal_section(FILE *fd, slang_T *slang)
 {
-    int		i;
-    int		cnt;
+    صحیح		i;
+    صحیح		cnt;
     garray_T	*gap;
     salitem_T	*smp;
-    int		ccnt;
+    صحیح		ccnt;
     char_u	*p;
 
     slang->sl_sofo = FALSE;
 
     i = getc(fd);				// <salflags>
-    if (i & SAL_F0LLOWUP)
+    اگر (i & SAL_F0LLOWUP)
 	slang->sl_followup = TRUE;
-    if (i & SAL_COLLAPSE)
+    اگر (i & SAL_COLLAPSE)
 	slang->sl_collapse = TRUE;
-    if (i & SAL_REM_ACCENTS)
+    اگر (i & SAL_REM_ACCENTS)
 	slang->sl_rem_accents = TRUE;
 
     cnt = get2c(fd);				// <salcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    اگر (cnt < 0)
+	واپس SP_TRUNCERROR;
 
     gap = &slang->sl_sal;
-    ga_init2(gap, sizeof(salitem_T), 10);
-    if (ga_grow(gap, cnt + 1) == FAIL)
-	return SP_OTHERERROR;
+    ga_init2(gap, حجم(salitem_T), 10);
+    اگر (ga_grow(gap, cnt + 1) == FAIL)
+	واپس SP_OTHERERROR;
 
     // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    برائے (; gap->ga_len < cnt; ++gap->ga_len)
     {
-	int	c = NUL;
+	صحیح	c = NUL;
 
-	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
+	smp = &((salitem_T *)gap->ga_ڈیٹا)[gap->ga_len];
 	ccnt = getc(fd);			// <salfromlen>
-	if (ccnt < 0)
-	    return SP_TRUNCERROR;
-	if ((p = alloc(ccnt + 2)) == NULL)
-	    return SP_OTHERERROR;
+	اگر (ccnt < 0)
+	    واپس SP_TRUNCERROR;
+	اگر ((p = alloc(ccnt + 2)) == تہی)
+	    واپس SP_OTHERERROR;
 	smp->sm_lead = p;
 
 	// Read up to the first special char into sm_lead.
-	for (i = 0; i < ccnt; ++i)
+	برائے (i = 0; i < ccnt; ++i)
 	{
 	    c = getc(fd);			// <salfrom>
-	    if (vim_strchr((char_u *)"0123456789(-<^$", c) != NULL)
-		break;
+	    اگر (vim_strchr((char_u *)"0123456789(-<^$", c) != تہی)
+		توڑو;
 	    *p++ = c;
 	}
-	smp->sm_leadlen = (int)(p - smp->sm_lead);
+	smp->sm_leadlen = (صحیح)(p - smp->sm_lead);
 	*p++ = NUL;
 
 	// Put (abc) chars in sm_oneof, if any.
-	if (c == '(')
+	اگر (c == '(')
 	{
 	    smp->sm_oneof = p;
-	    for (++i; i < ccnt; ++i)
+	    برائے (++i; i < ccnt; ++i)
 	    {
 		c = getc(fd);			// <salfrom>
-		if (c == ')')
-		    break;
+		اگر (c == ')')
+		    توڑو;
 		*p++ = c;
 	    }
 	    *p++ = NUL;
-	    if (++i < ccnt)
+	    اگر (++i < ccnt)
 		c = getc(fd);
 	}
-	else
-	    smp->sm_oneof = NULL;
+	ورنہ
+	    smp->sm_oneof = تہی;
 
 	// Any following chars go in sm_rules.
-	smp->sm_rules = p;
-	if (i < ccnt)
+	smp->sm_قواعد = p;
+	اگر (i < ccnt)
 	    // store the char we got while checking for end of sm_lead
 	    *p++ = c;
-	for (++i; i < ccnt; ++i)
+	برائے (++i; i < ccnt; ++i)
 	    *p++ = (c = getc(fd)) == EOF ? 0 : c;	// <salfrom>
 	*p++ = NUL;
 
 	// <saltolen> <salto>
-	smp->sm_to = read_cnt_string(fd, 1, &ccnt);
-	if (ccnt < 0)
+	smp->sm_مقصد = read_cnt_string(fd, 1, &ccnt);
+	اگر (ccnt < 0)
 	{
 	    vim_free(smp->sm_lead);
-	    return ccnt;
+	    واپس ccnt;
 	}
 
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
 	    // convert the multi-byte strings to wide char strings
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = mb_charlen(smp->sm_lead);
-	    if (smp->sm_oneof == NULL)
-		smp->sm_oneof_w = NULL;
-	    else
+	    اگر (smp->sm_oneof == تہی)
+		smp->sm_oneof_w = تہی;
+	    ورنہ
 		smp->sm_oneof_w = mb_str2wide(smp->sm_oneof);
-	    if (smp->sm_to == NULL)
-		smp->sm_to_w = NULL;
-	    else
-		smp->sm_to_w = mb_str2wide(smp->sm_to);
-	    if (smp->sm_lead_w == NULL
-		    || (smp->sm_oneof_w == NULL && smp->sm_oneof != NULL)
-		    || (smp->sm_to_w == NULL && smp->sm_to != NULL))
+	    اگر (smp->sm_مقصد == تہی)
+		smp->sm_مقصد_w = تہی;
+	    ورنہ
+		smp->sm_مقصد_w = mb_str2wide(smp->sm_مقصد);
+	    اگر (smp->sm_lead_w == تہی
+		    || (smp->sm_oneof_w == تہی && smp->sm_oneof != تہی)
+		    || (smp->sm_مقصد_w == تہی && smp->sm_مقصد != تہی))
 	    {
 		vim_free(smp->sm_lead);
-		vim_free(smp->sm_to);
+		vim_free(smp->sm_مقصد);
 		vim_free(smp->sm_lead_w);
 		vim_free(smp->sm_oneof_w);
-		vim_free(smp->sm_to_w);
-		return SP_OTHERERROR;
+		vim_free(smp->sm_مقصد_w);
+		واپس SP_OTHERERROR;
 	    }
 	}
     }
 
-    if (gap->ga_len > 0)
+    اگر (gap->ga_len > 0)
     {
 	// Add one extra entry to mark the end with an empty sm_lead.  Avoids
 	// that we need to check the index every time.
-	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
-	if ((p = alloc(1)) == NULL)
-	    return SP_OTHERERROR;
+	smp = &((salitem_T *)gap->ga_ڈیٹا)[gap->ga_len];
+	اگر ((p = alloc(1)) == تہی)
+	    واپس SP_OTHERERROR;
 	p[0] = NUL;
 	smp->sm_lead = p;
 	smp->sm_leadlen = 0;
-	smp->sm_oneof = NULL;
-	smp->sm_rules = p;
-	smp->sm_to = NULL;
-	if (has_mbyte)
+	smp->sm_oneof = تہی;
+	smp->sm_قواعد = p;
+	smp->sm_مقصد = تہی;
+	اگر (has_mbyte)
 	{
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = 0;
-	    smp->sm_oneof_w = NULL;
-	    smp->sm_to_w = NULL;
+	    smp->sm_oneof_w = تہی;
+	    smp->sm_مقصد_w = تہی;
 	}
 	++gap->ga_len;
     }
 
     // Fill the first-index table.
-    set_sal_first(slang);
+    سیٹ_sal_پہلا(slang);
 
-    return 0;
+    واپس 0;
 }
 
 /*
  * Read SN_WORDS: <word> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_words_section(FILE *fd, slang_T *lp, int len)
+    ساکن صحیح
+read_الفاظ_section(FILE *fd, slang_T *lp, صحیح len)
 {
-    int		done = 0;
-    int		i;
-    int		c;
-    char_u	word[MAXWLEN];
+    صحیح		مکمل = 0;
+    صحیح		i;
+    صحیح		c;
+    char_u	لفظ[MAXWLEN];
 
-    while (done < len)
+    جب (مکمل < len)
     {
 	// Read one word at a time.
-	for (i = 0; ; ++i)
+	برائے (i = 0; ; ++i)
 	{
 	    c = getc(fd);
-	    if (c == EOF)
-		return SP_TRUNCERROR;
-	    word[i] = c;
-	    if (word[i] == NUL)
-		break;
-	    if (i == MAXWLEN - 1)
-		return SP_FORMERROR;
+	    اگر (c == EOF)
+		واپس SP_TRUNCERROR;
+	    لفظ[i] = c;
+	    اگر (لفظ[i] == NUL)
+		توڑو;
+	    اگر (i == MAXWLEN - 1)
+		واپس SP_FORMERROR;
 	}
 
 	// Init the count to 10.
-	count_common_word(lp, word, -1, 10);
-	done += i + 1;
+	گنتی_common_لفظ(lp, لفظ, -1, 10);
+	مکمل += i + 1;
     }
-    return 0;
+    واپس 0;
 }
 
 /*
  * SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
  * Return SP_*ERROR flags.
  */
-    static int
+    ساکن صحیح
 read_sofo_section(FILE *fd, slang_T *slang)
 {
-    int		cnt;
-    char_u	*from, *to;
-    int		res;
+    صحیح		cnt;
+    char_u	*from, *مقصد;
+    صحیح		res;
 
     // <sofofromlen> <sofofrom>
     from = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
-	return cnt;
+    اگر (cnt < 0)
+	واپس cnt;
 
     // <sofotolen> <sofoto>
-    to = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
+    مقصد = read_cnt_string(fd, 2, &cnt);
+    اگر (cnt < 0)
     {
 	vim_free(from);
-	return cnt;
+	واپس cnt;
     }
 
     // Store the info in slang->sl_sal and/or slang->sl_sal_first.
-    if (from != NULL && to != NULL)
-	res = set_sofo(slang, from, to);
-    else if (from != NULL || to != NULL)
+    اگر (from != تہی && مقصد != تہی)
+	res = سیٹ_sofo(slang, from, مقصد);
+    ورنہ اگر (from != تہی || مقصد != تہی)
 	res = SP_FORMERROR;    // only one of two strings is an error
-    else
+    ورنہ
 	res = 0;
 
     vim_free(from);
-    vim_free(to);
-    return res;
+    vim_free(مقصد);
+    واپس res;
 }
 
 /*
@@ -1209,47 +1209,47 @@ read_sofo_section(FILE *fd, slang_T *slang)
  *	<compmax> <compminlen> <compsylmax> <compoptions> <compflags>
  * Returns SP_*ERROR flags.
  */
-    static int
-read_compound(FILE *fd, slang_T *slang, int len)
+    ساکن صحیح
+read_compound(FILE *fd, slang_T *slang, صحیح len)
 {
-    int		todo = len;
-    int		c;
-    int		atstart;
+    صحیح		todo = len;
+    صحیح		c;
+    صحیح		atstart;
     char_u	*pat;
     char_u	*pp;
     char_u	*cp;
     char_u	*ap;
     char_u	*crp;
-    int		cnt;
+    صحیح		cnt;
     garray_T	*gap;
     size_t	patsize;
     size_t	flagsize;
 
-    if (todo < 2)
-	return SP_FORMERROR;	// need at least two bytes
+    اگر (todo < 2)
+	واپس SP_FORMERROR;	// need at least two bytes
 
     --todo;
     c = getc(fd);					// <compmax>
-    if (c < 2)
+    اگر (c < 2)
 	c = MAXWLEN;
     slang->sl_compmax = c;
 
     --todo;
     c = getc(fd);					// <compminlen>
-    if (c < 1)
+    اگر (c < 1)
 	c = 0;
     slang->sl_compminlen = c;
 
     --todo;
     c = getc(fd);					// <compsylmax>
-    if (c < 1)
+    اگر (c < 1)
 	c = MAXWLEN;
     slang->sl_compsylmax = c;
 
     c = getc(fd);					// <compoptions>
-    if (c != 0)
+    اگر (c != 0)
 	ungetc(c, fd);	    // be backwards compatible with Vim 7.0b
-    else
+    ورنہ
     {
 	--todo;
 	c = getc(fd);	    // only use the lower byte for now
@@ -1258,54 +1258,54 @@ read_compound(FILE *fd, slang_T *slang, int len)
 
 	gap = &slang->sl_comppat;
 	c = get2c(fd);					// <comppatcount>
-	if (c < 0)
-	    return SP_TRUNCERROR;
+	اگر (c < 0)
+	    واپس SP_TRUNCERROR;
 	todo -= 2;
-	ga_init2(gap, sizeof(char_u *), c);
-	if (ga_grow(gap, c) == OK)
-	    while (--c >= 0)
+	ga_init2(gap, حجم(char_u *), c);
+	اگر (ga_grow(gap, c) == OK)
+	    جب (--c >= 0)
 	    {
-		((char_u **)(gap->ga_data))[gap->ga_len++] =
+		((char_u **)(gap->ga_ڈیٹا))[gap->ga_len++] =
 						  read_cnt_string(fd, 1, &cnt);
 					    // <comppatlen> <comppattext>
-		if (cnt < 0)
-		    return cnt;
+		اگر (cnt < 0)
+		    واپس cnt;
 		todo -= cnt + 1;
 	    }
     }
-    if (todo < 0)
-	return SP_FORMERROR;
+    اگر (todo < 0)
+	واپس SP_FORMERROR;
 
     // Turn the COMPOUNDRULE items into a regexp pattern:
     // "a[bc]/a*b+" -> "^\(a[bc]\|a*b\+\)$".
     // Inserting backslashes may double the length, "^\(\)$<Nul>" is 7 bytes.
     // Conversion to utf-8 may double the size.
-    if ((size_t)todo > COMPOUND_MAX_LEN)
-	return SP_FORMERROR;
+    اگر ((size_t)todo > COMPOUND_MAX_LEN)
+	واپس SP_FORMERROR;
     patsize = (size_t)todo * 2 + 7;
-    if (enc_utf8)
+    اگر (enc_utf8)
 	patsize += (size_t)todo * 2;
     flagsize = (size_t)todo + 1;
     pat = alloc(patsize);
-    if (pat == NULL)
-	return SP_OTHERERROR;
+    اگر (pat == تہی)
+	واپس SP_OTHERERROR;
 
     // We also need a list of all flags that can appear at the start and one
     // for all flags.
     cp = alloc(flagsize);
-    if (cp == NULL)
+    اگر (cp == تہی)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	واپس SP_OTHERERROR;
     }
     slang->sl_compstartflags = cp;
     *cp = NUL;
 
     ap = alloc(flagsize);
-    if (ap == NULL)
+    اگر (ap == تہی)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	واپس SP_OTHERERROR;
     }
     slang->sl_compallflags = ap;
     *ap = NUL;
@@ -1322,68 +1322,68 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '(';
 
     atstart = 1;
-    while (todo-- > 0)
+    جب (todo-- > 0)
     {
 	c = getc(fd);					// <compflags>
-	if (c == EOF)
+	اگر (c == EOF)
 	{
 	    vim_free(pat);
-	    return SP_TRUNCERROR;
+	    واپس SP_TRUNCERROR;
 	}
 
 	// Add all flags to "sl_compallflags".
-	if (vim_strchr((char_u *)"?*+[]/", c) == NULL
-		&& !byte_in_str(slang->sl_compallflags, c))
+	اگر (vim_strchr((char_u *)"?*+[]/", c) == تہی
+		&& !byte_اندر_str(slang->sl_compallflags, c))
 	{
 	    *ap++ = c;
 	    *ap = NUL;
 	}
 
-	if (atstart != 0)
+	اگر (atstart != 0)
 	{
 	    // At start of item: copy flags to "sl_compstartflags".  For a
 	    // [abc] item set "atstart" to 2 and copy up to the ']'.
-	    if (c == '[')
+	    اگر (c == '[')
 		atstart = 2;
-	    else if (c == ']')
+	    ورنہ اگر (c == ']')
 		atstart = 0;
-	    else
+	    ورنہ
 	    {
-		if (!byte_in_str(slang->sl_compstartflags, c))
+		اگر (!byte_اندر_str(slang->sl_compstartflags, c))
 		{
 		    *cp++ = c;
 		    *cp = NUL;
 		}
-		if (atstart == 1)
+		اگر (atstart == 1)
 		    atstart = 0;
 	    }
 	}
 
 	// Copy flag to "sl_comprules", unless we run into a wildcard.
-	if (crp != NULL)
+	اگر (crp != تہی)
 	{
-	    if (c == '?' || c == '+' || c == '*')
+	    اگر (c == '?' || c == '+' || c == '*')
 	    {
 		VIM_CLEAR(slang->sl_comprules);
-		crp = NULL;
+		crp = تہی;
 	    }
-	    else
+	    ورنہ
 		*crp++ = c;
 	}
 
-	if (c == '/')	    // slash separates two items
+	اگر (c == '/')	    // slash separates two items
 	{
 	    *pp++ = '\\';
 	    *pp++ = '|';
 	    atstart = 1;
 	}
-	else		    // normal char, "[abc]" and '*' are copied as-is
+	ورنہ		    // normal char, "[abc]" and '*' are copied as-is
 	{
-	    if (c == '?' || c == '+' || c == '~')
+	    اگر (c == '?' || c == '+' || c == '~')
 		*pp++ = '\\';	    // "a?" becomes "a\?", "a+" becomes "a\+"
-	    if (enc_utf8)
+	    اگر (enc_utf8)
 		pp += mb_char2bytes(c, pp);
-	    else
+	    ورنہ
 		*pp++ = c;
 	}
     }
@@ -1393,153 +1393,153 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '$';
     *pp = NUL;
 
-    if (crp != NULL)
+    اگر (crp != تہی)
 	*crp = NUL;
 
     slang->sl_compprog = vim_regcomp(pat, RE_MAGIC + RE_STRING + RE_STRICT);
     vim_free(pat);
-    if (slang->sl_compprog == NULL)
-	return SP_FORMERROR;
+    اگر (slang->sl_compprog == تہی)
+	واپس SP_FORMERROR;
 
-    return 0;
+    واپس 0;
 }
 
 /*
  * Set the SOFOFROM and SOFOTO items in language "lp".
  * Returns SP_*ERROR flags when there is something wrong.
  */
-    static int
-set_sofo(slang_T *lp, char_u *from, char_u *to)
+    ساکن صحیح
+سیٹ_sofo(slang_T *lp, char_u *from, char_u *مقصد)
 {
-    int		i;
+    صحیح		i;
 
     garray_T	*gap;
     char_u	*s;
     char_u	*p;
-    int		c;
-    int		*inp;
+    صحیح		c;
+    صحیح		*inp;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
-	free_sal_items(&lp->sl_sal);
+	free_sal_اشیاء(&lp->sl_sal);
 
 	// Use "sl_sal" as an array with 256 pointers to a list of wide
 	// characters.  The index is the low byte of the character.
 	// The list contains from-to pairs with a terminating NUL.
 	// sl_sal_first[] is used for latin1 "from" characters.
 	gap = &lp->sl_sal;
-	ga_init2(gap, sizeof(int *), 1);
-	if (ga_grow(gap, 256) == FAIL)
-	    return SP_OTHERERROR;
-	vim_memset(gap->ga_data, 0, sizeof(int *) * 256);
+	ga_init2(gap, حجم(صحیح *), 1);
+	اگر (ga_grow(gap, 256) == FAIL)
+	    واپس SP_OTHERERROR;
+	vim_memset(gap->ga_ڈیٹا, 0, حجم(صحیح *) * 256);
 	gap->ga_len = 256;
 	lp->sl_sofo = TRUE;
 
 	// First count the number of items for each list.  Temporarily use
 	// sl_sal_first[] for this.  Reset it first: a preceding SN_SAL section
 	// may have set the entries to -1 via set_sal_first().
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_پہلا, 0, حجم(salfirst_T) * 256);
+	برائے (p = from, s = مقصد; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    MB_CPTR_ADV(s);
-	    if (c >= 256)
-		++lp->sl_sal_first[c & 0xff];
+	    اگر (c >= 256)
+		++lp->sl_sal_پہلا[c & 0xff];
 	}
-	if (*p != NUL || *s != NUL)	    // lengths differ
-	    return SP_FORMERROR;
+	اگر (*p != NUL || *s != NUL)	    // lengths differ
+	    واپس SP_FORMERROR;
 
 	// Allocate the lists.
-	for (i = 0; i < 256; ++i)
-	    if (lp->sl_sal_first[i] > 0)
+	برائے (i = 0; i < 256; ++i)
+	    اگر (lp->sl_sal_پہلا[i] > 0)
 	    {
-		p = alloc(sizeof(int) * (lp->sl_sal_first[i] * 2 + 1));
-		if (p == NULL)
-		    return SP_OTHERERROR;
-		((int **)gap->ga_data)[i] = (int *)p;
-		*(int *)p = 0;
+		p = alloc(حجم(صحیح) * (lp->sl_sal_پہلا[i] * 2 + 1));
+		اگر (p == تہی)
+		    واپس SP_OTHERERROR;
+		((صحیح **)gap->ga_ڈیٹا)[i] = (صحیح *)p;
+		*(صحیح *)p = 0;
 	    }
 
 	// Put the characters up to 255 in sl_sal_first[] the rest in a sl_sal
 	// list.
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_پہلا, 0, حجم(salfirst_T) * 256);
+	برائے (p = from, s = مقصد; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    i = mb_cptr2char_adv(&s);
-	    if (c >= 256)
+	    اگر (c >= 256)
 	    {
 		// Append the from-to chars at the end of the list with
 		// the low byte.
-		inp = ((int **)gap->ga_data)[c & 0xff];
-		while (*inp != 0)
+		inp = ((صحیح **)gap->ga_ڈیٹا)[c & 0xff];
+		جب (*inp != 0)
 		    ++inp;
 		*inp++ = c;		// from char
 		*inp++ = i;		// to char
 		*inp++ = NUL;		// NUL at the end
 	    }
-	    else
+	    ورنہ
 		// mapping byte to char is done in sl_sal_first[]
-		lp->sl_sal_first[c] = i;
+		lp->sl_sal_پہلا[c] = i;
 	}
     }
-    else
+    ورنہ
     {
 	// mapping bytes to bytes is done in sl_sal_first[]
-	if (STRLEN(from) != STRLEN(to))
-	    return SP_FORMERROR;
+	اگر (STRLEN(from) != STRLEN(مقصد))
+	    واپس SP_FORMERROR;
 
-	for (i = 0; to[i] != NUL; ++i)
-	    lp->sl_sal_first[from[i]] = to[i];
+	برائے (i = 0; مقصد[i] != NUL; ++i)
+	    lp->sl_sal_پہلا[from[i]] = مقصد[i];
 	lp->sl_sal.ga_len = 1;		// indicates we have soundfolding
 	lp->sl_sofo = TRUE;
     }
 
-    return 0;
+    واپس 0;
 }
 
 /*
  * Fill the first-index table for "lp".
  */
-    static void
-set_sal_first(slang_T *lp)
+    ساکن خالی
+سیٹ_sal_پہلا(slang_T *lp)
 {
     salfirst_T	*sfirst;
-    int		i;
+    صحیح		i;
     salitem_T	*smp;
-    int		c;
+    صحیح		c;
     garray_T	*gap = &lp->sl_sal;
 
-    sfirst = lp->sl_sal_first;
-    for (i = 0; i < 256; ++i)
+    sfirst = lp->sl_sal_پہلا;
+    برائے (i = 0; i < 256; ++i)
 	sfirst[i] = -1;
-    smp = (salitem_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    smp = (salitem_T *)gap->ga_ڈیٹا;
+    برائے (i = 0; i < gap->ga_len; ++i)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    // Use the lowest byte of the first character.  For latin1 it's
 	    // the character, for other encodings it should differ for most
 	    // characters.
 	    c = *smp[i].sm_lead_w & 0xff;
-	else
+	ورنہ
 	    c = *smp[i].sm_lead;
-	if (sfirst[c] == -1)
+	اگر (sfirst[c] == -1)
 	{
 	    sfirst[c] = i;
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 	    {
-		int		n;
+		صحیح		n;
 
 		// Make sure all entries with this byte are following each
 		// other.  Move the ones that are in the wrong position.  Do
 		// keep the same ordering!
-		while (i + 1 < gap->ga_len
+		جب (i + 1 < gap->ga_len
 				       && (*smp[i + 1].sm_lead_w & 0xff) == c)
 		    // Skip over entry with same index byte.
 		    ++i;
 
-		for (n = 1; i + n < gap->ga_len; ++n)
-		    if ((*smp[i + n].sm_lead_w & 0xff) == c)
+		برائے (n = 1; i + n < gap->ga_len; ++n)
+		    اگر ((*smp[i + n].sm_lead_w & 0xff) == c)
 		    {
 			salitem_T  tsal;
 
@@ -1549,7 +1549,7 @@ set_sal_first(slang_T *lp)
 			--n;
 			tsal = smp[i + n];
 			mch_memmove(smp + i + 1, smp + i,
-						       sizeof(salitem_T) * n);
+						       حجم(salitem_T) * n);
 			smp[i] = tsal;
 		    }
 	    }
@@ -1561,21 +1561,21 @@ set_sal_first(slang_T *lp)
  * Turn a multi-byte string into a wide character string.
  * Return it in allocated memory (NULL for out-of-memory)
  */
-    static int *
+    ساکن صحیح *
 mb_str2wide(char_u *s)
 {
-    int		*res;
+    صحیح		*res;
     char_u	*p;
-    int		i = 0;
+    صحیح		i = 0;
 
-    res = ALLOC_MULT(int, mb_charlen(s) + 1);
-    if (res == NULL)
-	return NULL;
+    res = ALLOC_MULT(صحیح, mb_charlen(s) + 1);
+    اگر (res == تہی)
+	واپس تہی;
 
-    for (p = s; *p != NUL; )
+    برائے (p = s; *p != NUL; )
 	res[i++] = mb_ptr2char_adv(&p);
     res[i] = NUL;
-    return res;
+    واپس res;
 }
 
 /*
@@ -1584,55 +1584,55 @@ mb_str2wide(char_u *s)
  * This is skipped when the tree has zero length.
  * Returns zero when OK, SP_ value for an error.
  */
-    static int
-spell_read_tree(
+    ساکن صحیح
+spell_read_درخت(
     FILE	*fd,
     char_u	**bytsp,
-    long	*bytsp_len,
+    طویل	*bytsp_len,
     idx_T	**idxsp,
-    int		prefixtree,	// TRUE for the prefix tree
-    int		prefixcnt)	// when "prefixtree" is TRUE: prefix count
+    صحیح		prefixtree,	// TRUE for the prefix tree
+    صحیح		prefixcnt)	// when "prefixtree" is TRUE: prefix count
 {
-    long	len;
-    int		idx;
+    طویل	len;
+    صحیح		idx;
     char_u	*bp;
     idx_T	*ip;
 
     // The tree size was computed when writing the file, so that we can
     // allocate it as one long block. <nodecount>
     len = get4c(fd);
-    if (len < 0)
-	return SP_TRUNCERROR;
-    if ((size_t)len > SIZE_MAX / sizeof(int))
+    اگر (len < 0)
+	واپس SP_TRUNCERROR;
+    اگر ((size_t)len > سائز_MAX / حجم(صحیح))
 	// Invalid length, multiply with sizeof(int) would overflow.
-	return SP_FORMERROR;
-    if (len <= 0)
-	return 0;
+	واپس SP_FORMERROR;
+    اگر (len <= 0)
+	واپس 0;
 
     // Allocate the byte array.  Zero-initialize so that any position the
     // tree does not visit reads as 0; a stray BY_INDEX shared reference
     // into such a slot then behaves as end-of-word in spellsuggest()
     // instead of consuming an arbitrary heap byte as a siblingcount.
     bp = alloc_clear(len);
-    if (bp == NULL)
-	return SP_OTHERERROR;
+    اگر (bp == تہی)
+	واپس SP_OTHERERROR;
     *bytsp = bp;
-    if (bytsp_len != NULL)
+    اگر (bytsp_len != تہی)
 	*bytsp_len = len;
 
     // Allocate the index array.
-    ip = lalloc_clear(len * sizeof(int), TRUE);
-    if (ip == NULL)
-	return SP_OTHERERROR;
+    ip = lalloc_clear(len * حجم(صحیح), TRUE);
+    اگر (ip == تہی)
+	واپس SP_OTHERERROR;
     *idxsp = ip;
 
     // Recursively read the tree and store it in the array.
-    idx = read_tree_node(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
-    if (idx < 0)
-	return idx;
-    if (idx != len)
-	return SP_FORMERROR;
-    return 0;
+    idx = read_درخت_گرہ(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
+    اگر (idx < 0)
+	واپس idx;
+    اگر (idx != len)
+	واپس SP_FORMERROR;
+    واپس 0;
 }
 
 /*
@@ -1645,109 +1645,109 @@ spell_read_tree(
  * Returns SP_TRUNCERROR if the file is shorter than expected.
  * Returns SP_FORMERROR if there is a format error.
  */
-    static idx_T
-read_tree_node(
+    ساکن idx_T
+read_درخت_گرہ(
     FILE	*fd,
     char_u	*byts,
     idx_T	*idxs,
-    int		maxidx,		    // size of arrays
+    صحیح		maxidx,		    // size of arrays
     idx_T	startidx,	    // current index in "byts" and "idxs"
-    int		prefixtree,	    // TRUE for reading PREFIXTREE
-    int		maxprefcondnr,	    // maximum for <prefcondnr>
-    int		depth)		    // recursion level
+    صحیح		prefixtree,	    // TRUE for reading PREFIXTREE
+    صحیح		maxprefcondnr,	    // maximum for <prefcondnr>
+    صحیح		گہرائی)		    // recursion level
 {
-    int		len;
-    int		i;
-    int		n;
+    صحیح		len;
+    صحیح		i;
+    صحیح		n;
     idx_T	idx = startidx;
-    int		c;
-    int		c2;
-#define SHARED_MASK	0x8000000
+    صحیح		c;
+    صحیح		c2;
+#تعریف_کرو SHARED_نقاب	0x8000000
 
     // Bail out on a crafted .spl whose tree recurses beyond the maximum
     // word length: each tree level corresponds to one byte of a word, so
     // any well-formed file has depth <= MAXWLEN.
-    if (depth > MAXWLEN)
-	return SP_FORMERROR;
+    اگر (گہرائی > MAXWLEN)
+	واپس SP_FORMERROR;
 
     len = getc(fd);					// <siblingcount>
-    if (len <= 0)
-	return SP_TRUNCERROR;
+    اگر (len <= 0)
+	واپس SP_TRUNCERROR;
 
-    if (len >= maxidx - startidx)
-	return SP_FORMERROR;
+    اگر (len >= maxidx - startidx)
+	واپس SP_FORMERROR;
     byts[idx++] = len;
 
     // Read the byte values, flag/region bytes and shared indexes.
-    for (i = 1; i <= len; ++i)
+    برائے (i = 1; i <= len; ++i)
     {
 	c = getc(fd);					// <byte>
-	if (c < 0)
-	    return SP_TRUNCERROR;
-	if (c <= BY_SPECIAL)
+	اگر (c < 0)
+	    واپس SP_TRUNCERROR;
+	اگر (c <= BY_SPECIAL)
 	{
-	    if (c == BY_NOFLAGS && !prefixtree)
+	    اگر (c == BY_NOFLAGS && !prefixtree)
 	    {
 		// No flags, all regions.
 		idxs[idx] = 0;
 		c = 0;
 	    }
-	    else if (c != BY_INDEX)
+	    ورنہ اگر (c != BY_اشاریہ)
 	    {
-		if (prefixtree)
+		اگر (prefixtree)
 		{
 		    // Read the optional pflags byte, the prefix ID and the
 		    // condition nr.  In idxs[] store the prefix ID in the low
 		    // byte, the condition index shifted up 8 bits, the flags
 		    // shifted up 24 bits.
-		    if (c == BY_FLAGS)
+		    اگر (c == BY_FLAGS)
 		    {
 			n = getc(fd);			// <pflags>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			اگر (n < 0)
+			    واپس SP_TRUNCERROR;
 			c = n << 24;
 		    }
-		    else
+		    ورنہ
 			c = 0;
 
 		    n = getc(fd);			// <affixID>
-		    if (n < 0)
-			return SP_TRUNCERROR;
+		    اگر (n < 0)
+			واپس SP_TRUNCERROR;
 		    c |= n;
 
 		    n = get2c(fd);			// <prefcondnr>
-		    if (n < 0 || n >= maxprefcondnr)
-			return SP_FORMERROR;
+		    اگر (n < 0 || n >= maxprefcondnr)
+			واپس SP_FORMERROR;
 		    c |= (n << 8);
 		}
-		else // c must be BY_FLAGS or BY_FLAGS2
+		ورنہ // c must be BY_FLAGS or BY_FLAGS2
 		{
 		    // Read flags and optional region and prefix ID.  In
 		    // idxs[] the flags go in the low two bytes, region above
 		    // that and prefix ID above the region.
 		    c2 = c;
 		    c = getc(fd);			// <flags>
-		    if (c < 0)
-			return SP_TRUNCERROR;
-		    if (c2 == BY_FLAGS2)
+		    اگر (c < 0)
+			واپس SP_TRUNCERROR;
+		    اگر (c2 == BY_FLAGS2)
 		    {
 			n = getc(fd);			// <flags2>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			اگر (n < 0)
+			    واپس SP_TRUNCERROR;
 			c = (n << 8) + c;
 		    }
-		    if (c & WF_REGION)
+		    اگر (c & WF_REGION)
 		    {
 			n = getc(fd);			// <region>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			اگر (n < 0)
+			    واپس SP_TRUNCERROR;
 			c = (n << 16) + c;
 		    }
-		    if (c & WF_AFX)
+		    اگر (c & WF_AFX)
 		    {
 			n = getc(fd);			// <affixID>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			اگر (n < 0)
+			    واپس SP_TRUNCERROR;
 			c = (n << 24) + c;
 		    }
 		}
@@ -1755,13 +1755,13 @@ read_tree_node(
 		idxs[idx] = c;
 		c = 0;
 	    }
-	    else // c == BY_INDEX
+	    ورنہ // c == BY_INDEX
 	    {
 							// <nodeidx>
 		n = get3c(fd);
-		if (n < 0 || n >= maxidx)
-		    return SP_FORMERROR;
-		idxs[idx] = n + SHARED_MASK;
+		اگر (n < 0 || n >= maxidx)
+		    واپس SP_FORMERROR;
+		idxs[idx] = n + SHARED_نقاب;
 		c = getc(fd);				// <xbyte>
 	    }
 	}
@@ -1771,41 +1771,41 @@ read_tree_node(
     // Recursively read the children for non-shared siblings.
     // Skip the end-of-word ones (zero byte value) and the shared ones (and
     // remove SHARED_MASK)
-    for (i = 1; i <= len; ++i)
-	if (byts[startidx + i] != 0)
+    برائے (i = 1; i <= len; ++i)
+	اگر (byts[startidx + i] != 0)
 	{
-	    if (idxs[startidx + i] & SHARED_MASK)
-		idxs[startidx + i] &= ~SHARED_MASK;
-	    else
+	    اگر (idxs[startidx + i] & SHARED_نقاب)
+		idxs[startidx + i] &= ~SHARED_نقاب;
+	    ورنہ
 	    {
 		idxs[startidx + i] = idx;
-		idx = read_tree_node(fd, byts, idxs, maxidx, idx,
-					prefixtree, maxprefcondnr, depth + 1);
-		if (idx < 0)
-		    break;
+		idx = read_درخت_گرہ(fd, byts, idxs, maxidx, idx,
+					prefixtree, maxprefcondnr, گہرائی + 1);
+		اگر (idx < 0)
+		    توڑو;
 	    }
 	}
 
-    return idx;
+    واپس idx;
 }
 
 /*
  * Reload the spell file "fname" if it's loaded.
  */
-    static void
+    ساکن خالی
 spell_reload_one(
     char_u	*fname,
-    int		added_word)	// invoked through "zg"
+    صحیح		added_لفظ)	// invoked through "zg"
 {
     slang_T	*slang;
-    int		didit = FALSE;
+    صحیح		didit = FALSE;
 
     FOR_ALL_SPELL_LANGS(slang)
     {
-	if (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	اگر (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
 	{
 	    slang_clear(slang);
-	    if (spell_load_file(fname, NULL, slang, FALSE) == NULL)
+	    اگر (spell_بھرو_file(fname, تہی, slang, FALSE) == تہی)
 		// reloading failed, clear the language
 		slang_clear(slang);
 	    redraw_all_later(UPD_SOME_VALID);
@@ -1815,7 +1815,7 @@ spell_reload_one(
 
     // When "zg" was used and the file wasn't loaded yet, should redo
     // 'spelllang' to load it now.
-    if (added_word && !didit)
+    اگر (added_لفظ && !didit)
 	parse_spelllang(curwin);
 }
 
@@ -1824,76 +1824,76 @@ spell_reload_one(
  * Functions for ":mkspell".
  */
 
-#define MAXLINELEN  500		// Maximum length in bytes of a line in a .aff
+#تعریف_کرو MAXLINELEN  500		// Maximum length in bytes of a line in a .aff
 				// and .dic file.
 /*
  * Main structure to store the contents of a ".aff" file.
  */
-typedef struct afffile_S
+قسمتعریف ساخت afffile_S
 {
     char_u	*af_enc;	// "SET", normalized, alloc'ed string or NULL
-    int		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
-    unsigned	af_rare;	// RARE ID for rare word
-    unsigned	af_keepcase;	// KEEPCASE ID for keep-case word
-    unsigned	af_bad;		// BAD ID for banned word
-    unsigned	af_needaffix;	// NEEDAFFIX ID
-    unsigned	af_circumfix;	// CIRCUMFIX ID
-    unsigned	af_needcomp;	// NEEDCOMPOUND ID
-    unsigned	af_comproot;	// COMPOUNDROOT ID
-    unsigned	af_compforbid;	// COMPOUNDFORBIDFLAG ID
-    unsigned	af_comppermit;	// COMPOUNDPERMITFLAG ID
-    unsigned	af_nosuggest;	// NOSUGGEST ID
-    int		af_pfxpostpone;	// postpone prefixes without chop string and
+    صحیح		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
+    غیرعلامتی	af_rare;	// RARE ID for rare word
+    غیرعلامتی	af_keepcase;	// KEEPCASE ID for keep-case word
+    غیرعلامتی	af_bad;		// BAD ID for banned word
+    غیرعلامتی	af_needaffix;	// NEEDAFFIX ID
+    غیرعلامتی	af_circumfix;	// CIRCUMFIX ID
+    غیرعلامتی	af_needcomp;	// NEEDCOMPOUND ID
+    غیرعلامتی	af_comproot;	// COMPOUNDROOT ID
+    غیرعلامتی	af_compforbid;	// COMPOUNDFORBIDFLAG ID
+    غیرعلامتی	af_comppermit;	// COMPOUNDPERMITFLAG ID
+    غیرعلامتی	af_nosuggest;	// NOSUGGEST ID
+    صحیح		af_pfxpostpone;	// postpone prefixes without chop string and
 				// without flags
-    int		af_ignoreextra;	// IGNOREEXTRA present
+    صحیح		af_ignoreextra;	// IGNOREEXTRA present
     hashtab_T	af_pref;	// hashtable for prefixes, affheader_T
     hashtab_T	af_suff;	// hashtable for suffixes, affheader_T
     hashtab_T	af_comp;	// hashtable for compound flags, compitem_T
 } afffile_T;
 
-#define AFT_CHAR	0	// flags are one character
-#define AFT_LONG	1	// flags are two characters
-#define AFT_CAPLONG	2	// flags are one or two characters
-#define AFT_NUM		3	// flags are numbers, comma separated
+#تعریف_کرو AFT_CHAR	0	// flags are one character
+#تعریف_کرو AFT_LONG	1	// flags are two characters
+#تعریف_کرو AFT_CAPLONG	2	// flags are one or two characters
+#تعریف_کرو AFT_عدد		3	// flags are numbers, comma separated
 
-typedef struct affentry_S affentry_T;
+قسمتعریف ساخت affentry_S affentry_T;
 // Affix entry from ".aff" file.  Used for prefixes and suffixes.
-struct affentry_S
+ساخت affentry_S
 {
-    affentry_T	*ae_next;	// next affix with same name/number
+    affentry_T	*ae_اگلا;	// next affix with same name/number
     char_u	*ae_chop;	// text to chop off basic word (can be NULL)
-    char_u	*ae_add;	// text to add to basic word (can be NULL)
+    char_u	*ae_جوڑو;	// text to add to basic word (can be NULL)
     char_u	*ae_flags;	// flags on the affix (can be NULL)
     char_u	*ae_cond;	// condition (NULL for ".")
     regprog_T	*ae_prog;	// regexp program for ae_cond or NULL
-    char	ae_compforbid;	// COMPOUNDFORBIDFLAG found
-    char	ae_comppermit;	// COMPOUNDPERMITFLAG found
+    حرف	ae_compforbid;	// COMPOUNDFORBIDFLAG found
+    حرف	ae_comppermit;	// COMPOUNDPERMITFLAG found
 };
 
-#define AH_KEY_LEN 17		// 2 x 8 bytes + NUL
+#تعریف_کرو AH_کلید_LEN 17		// 2 x 8 bytes + NUL
 
 // Affix header from ".aff" file.  Used for af_pref and af_suff.
-typedef struct affheader_S
+قسمتعریف ساخت affheader_S
 {
-    char_u	ah_key[AH_KEY_LEN]; // key for hashtab == name of affix
-    unsigned	ah_flag;	// affix name as number, uses "af_flagtype"
-    int		ah_newID;	// prefix ID after renumbering; 0 if not used
-    int		ah_combine;	// suffix may combine with prefix
-    int		ah_follows;	// another affix block should be following
-    affentry_T	*ah_first;	// first affix entry
+    char_u	ah_کلید[AH_کلید_LEN]; // key for hashtab == name of affix
+    غیرعلامتی	ah_flag;	// affix name as number, uses "af_flagtype"
+    صحیح		ah_newID;	// prefix ID after renumbering; 0 if not used
+    صحیح		ah_combine;	// suffix may combine with prefix
+    صحیح		ah_follows;	// another affix block should be following
+    affentry_T	*ah_پہلا;	// first affix entry
 } affheader_T;
 
-#define HI2AH(hi)   ((affheader_T *)(hi)->hi_key)
+#تعریف_کرو HI2AH(hi)   ((affheader_T *)(hi)->hi_کلید)
 
 // Flag used in compound items.
-typedef struct compitem_S
+قسمتعریف ساخت compitem_S
 {
-    char_u	ci_key[AH_KEY_LEN]; // key for hashtab == name of compound
-    unsigned	ci_flag;	// affix name as number, uses "af_flagtype"
-    int		ci_newID;	// affix ID after renumbering.
+    char_u	ci_کلید[AH_کلید_LEN]; // key for hashtab == name of compound
+    غیرعلامتی	ci_flag;	// affix name as number, uses "af_flagtype"
+    صحیح		ci_newID;	// affix ID after renumbering.
 } compitem_T;
 
-#define HI2CI(hi)   ((compitem_T *)(hi)->hi_key)
+#تعریف_کرو HI2CI(hi)   ((compitem_T *)(hi)->hi_کلید)
 
 /*
  * Structure that is used to store the items in the word tree.  This avoids
@@ -1903,36 +1903,36 @@ typedef struct compitem_S
  * "sb_data" is correct for systems where pointers must be aligned on
  * pointer-size boundaries and sizeof(pointer) > sizeof(int) (e.g., Sparc).
  */
-#define  SBLOCKSIZE 16000	// size of sb_data
-typedef struct sblock_S sblock_T;
-struct sblock_S
+#تعریف_کرو  SBLOCKSIZE 16000	// size of sb_data
+قسمتعریف ساخت sblock_S sblock_T;
+ساخت sblock_S
 {
-    int		sb_used;	// nr of bytes already in use
-    sblock_T	*sb_next;	// next block in list
-    char_u	sb_data[1];	// data, actually longer
+    صحیح		sb_مستعمل;	// nr of bytes already in use
+    sblock_T	*sb_اگلا;	// next block in list
+    char_u	sb_ڈیٹا[1];	// data, actually longer
 };
 
 /*
  * A node in the tree.
  */
-typedef struct wordnode_S wordnode_T;
-struct wordnode_S
+قسمتعریف ساخت wordnode_S wordnode_T;
+ساخت wordnode_S
 {
-    union   // shared to save space
+    اتحاد   // shared to save space
     {
 	char_u	hashkey[6];	// the hash key, only used while compressing
-	int	index;		// index in written nodes (valid after first
+	صحیح	اشاریہ;		// index in written nodes (valid after first
 				// round)
     } wn_u1;
-    union   // shared to save space
+    اتحاد   // shared to save space
     {
-	wordnode_T *next;	// next node with same hash key
+	wordnode_T *اگلا;	// next node with same hash key
 	wordnode_T *wnode;	// parent node that will write this node
     } wn_u2;
-    wordnode_T	*wn_child;	// child (next byte in word)
+    wordnode_T	*wn_بچہ;	// child (next byte in word)
     wordnode_T  *wn_sibling;	// next sibling (alternate byte in word,
 				// always sorted)
-    int		wn_refs;	// Nr. of references to this node.  Only
+    صحیح		wn_refs;	// Nr. of references to this node.  Only
 				// relevant for first node in a list of
 				// siblings, in following siblings it is
 				// always one.
@@ -1944,56 +1944,56 @@ struct wordnode_S
     // "wn_region" the LSW of the wordnr.
     char_u	wn_affixID;	// supported/required prefix ID or 0
     short_u	wn_flags;	// WF_ flags
-    short	wn_region;	// region mask
+    مختصر	wn_region;	// region mask
 
-#ifdef SPELL_PRINTTREE
-    int		wn_nr;		// sequence nr for printing
-#endif
+#اگر_تعریف_شدہ SPELL_PRINTTREE
+    صحیح		wn_nr;		// sequence nr for printing
+#اگر_ختم
 };
 
-#define WN_MASK	 0xffff		// mask relevant bits of "wn_flags"
+#تعریف_کرو WN_نقاب	 0xffff		// mask relevant bits of "wn_flags"
 
-#define HI2WN(hi)    (wordnode_T *)((hi)->hi_key)
+#تعریف_کرو HI2WN(hi)    (wordnode_T *)((hi)->hi_کلید)
 
 /*
  * Info used while reading the spell files.
  */
-typedef struct spellinfo_S
+قسمتعریف ساخت spellinfo_S
 {
     wordnode_T	*si_foldroot;	// tree with case-folded words
-    long	si_foldwcount;	// nr of words in si_foldroot
+    طویل	si_foldwcount;	// nr of words in si_foldroot
 
     wordnode_T	*si_keeproot;	// tree with keep-case words
-    long	si_keepwcount;	// nr of words in si_keeproot
+    طویل	si_keepwcount;	// nr of words in si_keeproot
 
     wordnode_T	*si_prefroot;	// tree with postponed prefixes
 
-    long	si_sugtree;	// creating the soundfolding trie
+    طویل	si_sugtree;	// creating the soundfolding trie
 
-    sblock_T	*si_blocks;	// memory blocks used
-    long	si_blocks_cnt;	// memory blocks allocated
-    int		si_did_emsg;	// TRUE when ran out of memory
+    sblock_T	*si_بلاکیں;	// memory blocks used
+    طویل	si_بلاکیں_cnt;	// memory blocks allocated
+    صحیح		si_did_emsg;	// TRUE when ran out of memory
 
-    long	si_compress_cnt;    // words to add before lowering
+    طویل	si_compress_cnt;    // words to add before lowering
 				    // compression limit
-    wordnode_T	*si_first_free; // List of nodes that have been freed during
+    wordnode_T	*si_پہلا_free; // List of nodes that have been freed during
 				// compression, linked by "wn_child" field.
-    long	si_free_count;	// number of nodes in si_first_free
-#ifdef SPELL_PRINTTREE
-    int		si_wordnode_nr;	// sequence nr for nodes
-#endif
+    طویل	si_free_گنتی;	// number of nodes in si_first_free
+#اگر_تعریف_شدہ SPELL_PRINTTREE
+    صحیح		si_wordnode_nr;	// sequence nr for nodes
+#اگر_ختم
     buf_T	*si_spellbuf;	// buffer used to store soundfold word table
 
-    int		si_ascii;	// handling only ASCII words
-    int		si_add;		// addition file
-    int		si_clear_chartab;   // when TRUE clear char tables
-    int		si_region;	// region mask
+    صحیح		si_ascii;	// handling only ASCII words
+    صحیح		si_جوڑو;		// addition file
+    صحیح		si_clear_chartab;   // when TRUE clear char tables
+    صحیح		si_region;	// region mask
     vimconv_T	si_conv;	// for conversion to 'encoding'
-    int		si_memtot;	// runtime memory used
-    int		si_verbose;	// verbose messages
-    int		si_msg_count;	// number of words added since last message
+    صحیح		si_memtot;	// runtime memory used
+    صحیح		si_verbose;	// verbose messages
+    صحیح		si_پیغام_گنتی;	// number of words added since last message
     char_u	*si_info;	// info text chars or NULL
-    int		si_region_count; // number of regions supported (1 when there
+    صحیح		si_region_گنتی; // number of regions supported (1 when there
 				 // are no regions)
     char_u	si_region_name[MAXREGIONS * 2 + 1];
 				// region names; used only if
@@ -2004,20 +2004,20 @@ typedef struct spellinfo_S
     garray_T	si_sal;		// list of fromto_T entries from SAL lines
     char_u	*si_sofofr;	// SOFOFROM text
     char_u	*si_sofoto;	// SOFOTO text
-    int		si_nosugfile;	// NOSUGFILE item found
-    int		si_nosplitsugs;	// NOSPLITSUGS item found
-    int		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
-    int		si_followup;	// soundsalike: ?
-    int		si_collapse;	// soundsalike: ?
+    صحیح		si_nosugfile;	// NOSUGFILE item found
+    صحیح		si_nosplitsugs;	// NOSPLITSUGS item found
+    صحیح		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
+    صحیح		si_followup;	// soundsalike: ?
+    صحیح		si_collapse;	// soundsalike: ?
     hashtab_T	si_commonwords;	// hashtable for common words
     time_t	si_sugtime;	// timestamp for .sug file
-    int		si_rem_accents;	// soundsalike: remove accents
+    صحیح		si_rem_accents;	// soundsalike: remove accents
     garray_T	si_map;		// MAP info concatenated
     char_u	*si_midword;	// MIDWORD chars or NULL
-    int		si_compmax;	// max nr of words for compounding
-    int		si_compminlen;	// minimal length for compounding
-    int		si_compsylmax;	// max nr of syllables for compounding
-    int		si_compoptions;	// COMP_ flags
+    صحیح		si_compmax;	// max nr of words for compounding
+    صحیح		si_compminlen;	// minimal length for compounding
+    صحیح		si_compsylmax;	// max nr of syllables for compounding
+    صحیح		si_compoptions;	// COMP_ flags
     garray_T	si_comppat;	// CHECKCOMPOUNDPATTERN items, each stored as
 				// a string
     char_u	*si_compflags;	// flags used for compounding
@@ -2025,105 +2025,105 @@ typedef struct spellinfo_S
     char_u	*si_syllable;	// syllable string
     garray_T	si_prefcond;	// table with conditions for postponed
 				// prefixes, each stored as a string
-    int		si_newprefID;	// current value for ah_newID
-    int		si_newcompID;	// current value for compound ID
+    صحیح		si_newprefID;	// current value for ah_newID
+    صحیح		si_newcompID;	// current value for compound ID
 } spellinfo_T;
 
-static int is_aff_rule(char_u **items, int itemcnt, char *rulename, int	 mincount);
-static void aff_process_flags(afffile_T *affile, affentry_T *entry);
-static int spell_info_item(char_u *s);
-static unsigned affitem2flag(int flagtype, char_u *item, char_u	*fname, int lnum);
-static unsigned get_affitem(int flagtype, char_u **pp);
-static void process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
-static void check_renumber(spellinfo_T *spin);
-static void aff_check_number(int spinval, int affval, char *name);
-static void aff_check_string(char_u *spinval, char_u *affval, char *name);
-static int str_equal(char_u *s1, char_u	*s2);
-static void add_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *to);
-static int sal_to_bool(char_u *s);
-static int get_affix_flags(afffile_T *affile, char_u *afflist);
-static int get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int store_aff_word(spellinfo_T *spin, char_u *word, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, int condit, int flags, char_u *pfxlist, int pfxlen);
-static void *getroom(spellinfo_T *spin, size_t len, int align);
-static char_u *getroom_save(spellinfo_T *spin, char_u *s);
-static int store_word(spellinfo_T *spin, char_u *word, int flags, int region, char_u *pfxlist, int need_affix);
-static int tree_add_word(spellinfo_T *spin, char_u *word, wordnode_T *tree, int flags, int region, int affixID);
-static wordnode_T *get_wordnode(spellinfo_T *spin);
-static void free_wordnode(spellinfo_T *spin, wordnode_T *n);
-static void wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name);
-static long node_compress(spellinfo_T *spin, wordnode_T *node, hashtab_T *ht, long *tot);
-static int node_equal(wordnode_T *n1, wordnode_T *n2);
-static void clear_node(wordnode_T *node);
-static int put_node(FILE *fd, wordnode_T *node, int idx, int regionmask, int prefixtree);
-static int sug_filltree(spellinfo_T *spin, slang_T *slang);
-static int sug_maketable(spellinfo_T *spin);
-static int sug_filltable(spellinfo_T *spin, wordnode_T *node, int startwordnr, garray_T *gap);
-static int offset2bytes(int nr, char_u *buf);
-static void sug_write(spellinfo_T *spin, char_u *fname);
-static void spell_message(spellinfo_T *spin, char_u *str);
-static void init_spellfile(void);
+ساکن صحیح is_aff_قاعدہ(char_u **اشیاء, صحیح itemcnt, حرف *rulename, صحیح	 mincount);
+ساکن خالی aff_process_flags(afffile_T *affile, affentry_T *اندراج_2);
+ساکن صحیح spell_info_شے(char_u *s);
+ساکن غیرعلامتی affitem2flag(صحیح flagtype, char_u *شے, char_u	*fname, صحیح lnum);
+ساکن غیرعلامتی get_affitem(صحیح flagtype, char_u **pp);
+ساکن خالی process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
+ساکن خالی check_renumber(spellinfo_T *spin);
+ساکن خالی aff_check_نمبر(صحیح spinval, صحیح affval, حرف *name);
+ساکن خالی aff_check_string(char_u *spinval, char_u *affval, حرف *name);
+ساکن صحیح str_equal(char_u *s1, char_u	*s2);
+ساکن خالی جوڑو_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *مقصد);
+ساکن صحیح sal_مقصد_bool(char_u *s);
+ساکن صحیح get_affix_flags(afffile_T *affile, char_u *afflist);
+ساکن صحیح get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, صحیح *cntp);
+ساکن صحیح get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, صحیح *cntp);
+ساکن صحیح store_aff_لفظ(spellinfo_T *spin, char_u *لفظ, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, صحیح condit, صحیح flags, char_u *pfxlist, صحیح pfxlen);
+ساکن خالی *getroom(spellinfo_T *spin, size_t len, صحیح align);
+ساکن char_u *getroom_save(spellinfo_T *spin, char_u *s);
+ساکن صحیح store_لفظ(spellinfo_T *spin, char_u *لفظ, صحیح flags, صحیح region, char_u *pfxlist, صحیح need_affix);
+ساکن صحیح درخت_جوڑو_لفظ(spellinfo_T *spin, char_u *لفظ, wordnode_T *درخت, صحیح flags, صحیح region, صحیح affixID);
+ساکن wordnode_T *get_wordnode(spellinfo_T *spin);
+ساکن خالی free_wordnode(spellinfo_T *spin, wordnode_T *n);
+ساکن خالی wordtree_compress(spellinfo_T *spin, wordnode_T *جڑ, حرف *name);
+ساکن طویل گرہ_compress(spellinfo_T *spin, wordnode_T *گرہ, hashtab_T *ht, طویل *tot);
+ساکن صحیح گرہ_equal(wordnode_T *n1, wordnode_T *n2);
+ساکن خالی clear_گرہ(wordnode_T *گرہ);
+ساکن صحیح put_گرہ(FILE *fd, wordnode_T *گرہ, صحیح idx, صحیح regionmask, صحیح prefixtree);
+ساکن صحیح sug_filltree(spellinfo_T *spin, slang_T *slang);
+ساکن صحیح sug_maketable(spellinfo_T *spin);
+ساکن صحیح sug_filltable(spellinfo_T *spin, wordnode_T *گرہ, صحیح startwordnr, garray_T *gap);
+ساکن صحیح offset2bytes(صحیح nr, char_u *buf);
+ساکن خالی sug_write(spellinfo_T *spin, char_u *fname);
+ساکن خالی spell_پیغام(spellinfo_T *spin, char_u *str);
+ساکن خالی init_spellfile(خالی);
 
 // In the postponed prefixes tree wn_flags is used to store the WFP_ flags,
 // but it must be negative to indicate the prefix tree to tree_add_word().
 // Use a negative number with the lower 8 bits zero.
-#define PFX_FLAGS	(-256)
+#تعریف_کرو PFX_FLAGS	(-256)
 
 // flags for "condit" argument of store_aff_word()
-#define CONDIT_COMB	1	// affix must combine
-#define CONDIT_CFIX	2	// affix must have CIRCUMFIX flag
-#define CONDIT_SUF	4	// add a suffix for matching flags
-#define CONDIT_AFF	8	// word already has an affix
+#تعریف_کرو CONDIT_COMB	1	// affix must combine
+#تعریف_کرو CONDIT_CFIX	2	// affix must have CIRCUMFIX flag
+#تعریف_کرو CONDIT_SUF	4	// add a suffix for matching flags
+#تعریف_کرو CONDIT_AFF	8	// word already has an affix
 
 /*
  * Tunable parameters for when the tree is compressed.  Filled from the
  * 'mkspellmem' option.
  */
-static long compress_start = 30000;	// memory / SBLOCKSIZE
-static long compress_inc = 100;		// memory / SBLOCKSIZE
-static long compress_added = 500000;	// word count
+ساکن طویل compress_آغاز = 30000;	// memory / SBLOCKSIZE
+ساکن طویل compress_inc = 100;		// memory / SBLOCKSIZE
+ساکن طویل compress_added = 500000;	// word count
 
 /*
  * Check the 'mkspellmem' option.  Return FAIL if it's wrong.
  * Sets "sps_flags".
  */
-    int
-spell_check_msm(void)
+    صحیح
+spell_check_msm(خالی)
 {
     char_u	*p = p_msm;
-    long	start = 0;
-    long	incr = 0;
-    long	added = 0;
+    طویل	آغاز = 0;
+    طویل	incr = 0;
+    طویل	added = 0;
 
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    اگر (!VIM_ISDIGIT(*p))
+	واپس FAIL;
     // block count = (value * 1024) / SBLOCKSIZE (but avoid overflow)
-    start = (getdigits(&p) * 10) / (SBLOCKSIZE / 102);
-    if (*p != ',')
-	return FAIL;
+    آغاز = (getdigits(&p) * 10) / (SBLOCKSIZE / 102);
+    اگر (*p != ',')
+	واپس FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    اگر (!VIM_ISDIGIT(*p))
+	واپس FAIL;
     incr = (getdigits(&p) * 102) / (SBLOCKSIZE / 10);
-    if (*p != ',')
-	return FAIL;
+    اگر (*p != ',')
+	واپس FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    اگر (!VIM_ISDIGIT(*p))
+	واپس FAIL;
     added = getdigits(&p) * 1024;
-    if (*p != NUL)
-	return FAIL;
+    اگر (*p != NUL)
+	واپس FAIL;
 
-    if (start == 0 || incr == 0 || added == 0 || incr > start)
-	return FAIL;
+    اگر (آغاز == 0 || incr == 0 || added == 0 || incr > آغاز)
+	واپس FAIL;
 
-    compress_start = start;
+    compress_آغاز = آغاز;
     compress_inc = incr;
     compress_added = added;
-    return OK;
+    واپس OK;
 }
 
-#ifdef SPELL_PRINTTREE
+#اگر_تعریف_شدہ SPELL_PRINTTREE
 /*
  * For debugging the tree code: print the current tree in a (more or less)
  * readable format, so that we can see what happens when adding a word and/or
@@ -2133,150 +2133,150 @@ spell_check_msm(void)
 # define PRINTLINESIZE	1000
 # define PRINTWIDTH	6
 
-# define PRINTSOME(l, depth, fmt, a1, a2) vim_snprintf(l + depth * PRINTWIDTH, \
-	    PRINTLINESIZE - PRINTWIDTH * depth, fmt, a1, a2)
+# define PRINTSOME(l, گہرائی, fmt, a1, a2) vim_snprintf(l + گہرائی * PRINTWIDTH, \
+	    PRINTLINESIZE - PRINTWIDTH * گہرائی, fmt, a1, a2)
 
-static char line1[PRINTLINESIZE];
-static char line2[PRINTLINESIZE];
-static char line3[PRINTLINESIZE];
+ساکن حرف line1[PRINTLINESIZE];
+ساکن حرف line2[PRINTLINESIZE];
+ساکن حرف line3[PRINTLINESIZE];
 
-    static void
-spell_clear_flags(wordnode_T *node)
+    ساکن خالی
+spell_clear_flags(wordnode_T *گرہ)
 {
     wordnode_T	*np;
 
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_گرہ_SIBLINGS(گرہ, np)
     {
-	np->wn_u1.index = FALSE;
-	spell_clear_flags(np->wn_child);
+	np->wn_u1.اشاریہ = FALSE;
+	spell_clear_flags(np->wn_بچہ);
     }
 }
 
-    static void
-spell_print_node(wordnode_T *node, int depth)
+    ساکن خالی
+spell_print_گرہ(wordnode_T *گرہ, صحیح گہرائی)
 {
-    if (node->wn_u1.index)
+    اگر (گرہ->wn_u1.اشاریہ)
     {
 	// Done this node before, print the reference.
-	PRINTSOME(line1, depth, "(%d)", node->wn_nr, 0);
-	PRINTSOME(line2, depth, "    ", 0, 0);
-	PRINTSOME(line3, depth, "    ", 0, 0);
-	msg(line1);
-	msg(line2);
-	msg(line3);
+	PRINTSOME(line1, گہرائی, "(%d)", گرہ->wn_nr, 0);
+	PRINTSOME(line2, گہرائی, "    ", 0, 0);
+	PRINTSOME(line3, گہرائی, "    ", 0, 0);
+	پیغام(line1);
+	پیغام(line2);
+	پیغام(line3);
     }
-    else
+    ورنہ
     {
-	node->wn_u1.index = TRUE;
+	گرہ->wn_u1.اشاریہ = TRUE;
 
-	if (node->wn_byte != NUL)
+	اگر (گرہ->wn_byte != NUL)
 	{
-	    if (node->wn_child != NULL)
-		PRINTSOME(line1, depth, " %c -> ", node->wn_byte, 0);
-	    else
+	    اگر (گرہ->wn_بچہ != تہی)
+		PRINTSOME(line1, گہرائی, " %c -> ", گرہ->wn_byte, 0);
+	    ورنہ
 		// Cannot happen?
-		PRINTSOME(line1, depth, " %c ???", node->wn_byte, 0);
+		PRINTSOME(line1, گہرائی, " %c ???", گرہ->wn_byte, 0);
 	}
-	else
-	    PRINTSOME(line1, depth, " $    ", 0, 0);
+	ورنہ
+	    PRINTSOME(line1, گہرائی, " $    ", 0, 0);
 
-	PRINTSOME(line2, depth, "%d/%d    ", node->wn_nr, node->wn_refs);
+	PRINTSOME(line2, گہرائی, "%d/%d    ", گرہ->wn_nr, گرہ->wn_refs);
 
-	if (node->wn_sibling != NULL)
-	    PRINTSOME(line3, depth, " |    ", 0, 0);
-	else
-	    PRINTSOME(line3, depth, "      ", 0, 0);
+	اگر (گرہ->wn_sibling != تہی)
+	    PRINTSOME(line3, گہرائی, " |    ", 0, 0);
+	ورنہ
+	    PRINTSOME(line3, گہرائی, "      ", 0, 0);
 
-	if (node->wn_byte == NUL)
+	اگر (گرہ->wn_byte == NUL)
 	{
-	    msg(line1);
-	    msg(line2);
-	    msg(line3);
+	    پیغام(line1);
+	    پیغام(line2);
+	    پیغام(line3);
 	}
 
 	// do the children
-	if (node->wn_byte != NUL && node->wn_child != NULL)
-	    spell_print_node(node->wn_child, depth + 1);
+	اگر (گرہ->wn_byte != NUL && گرہ->wn_بچہ != تہی)
+	    spell_print_گرہ(گرہ->wn_بچہ, گہرائی + 1);
 
 	// do the siblings
-	if (node->wn_sibling != NULL)
+	اگر (گرہ->wn_sibling != تہی)
 	{
 	    // get rid of all parent details except |
 	    STRCPY(line1, line3);
 	    STRCPY(line2, line3);
-	    spell_print_node(node->wn_sibling, depth);
+	    spell_print_گرہ(گرہ->wn_sibling, گہرائی);
 	}
     }
 }
 
-    static void
-spell_print_tree(wordnode_T *root)
+    ساکن خالی
+spell_print_درخت(wordnode_T *جڑ)
 {
-    if (root == NULL)
-	return;
+    اگر (جڑ == تہی)
+	واپس;
 
     // Clear the "wn_u1.index" fields, used to remember what has been done.
-    spell_clear_flags(root);
+    spell_clear_flags(جڑ);
 
     // Recursively print the tree.
-    spell_print_node(root, 0);
+    spell_print_گرہ(جڑ, 0);
 }
-#endif // SPELL_PRINTTREE
+#اگر_ختم // SPELL_PRINTTREE
 
 /*
  * Read the affix file "fname".
  * Returns an afffile_T, NULL for complete failure.
  */
-    static afffile_T *
+    ساکن afffile_T *
 spell_read_aff(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
     afffile_T	*aff;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
-#define MAXITEMCNT  30
-    char_u	*(items[MAXITEMCNT]);
-    int		itemcnt;
+    char_u	*سطر;
+    char_u	*pc = تہی;
+#تعریف_کرو MAXITEMCNT  30
+    char_u	*(اشیاء[MAXITEMCNT]);
+    صحیح		itemcnt;
     char_u	*p;
-    int		lnum = 0;
-    affheader_T	*cur_aff = NULL;
-    int		did_postpone_prefix = FALSE;
-    int		aff_todo = 0;
+    صحیح		lnum = 0;
+    affheader_T	*cur_aff = تہی;
+    صحیح		did_postpone_سابقہ = FALSE;
+    صحیح		aff_todo = 0;
     hashtab_T	*tp;
-    char_u	*low = NULL;
-    char_u	*fol = NULL;
-    char_u	*upp = NULL;
-    int		do_rep;
-    int		do_repsal;
-    int		do_sal;
-    int		do_mapline;
-    int		found_map = FALSE;
+    char_u	*کم = تہی;
+    char_u	*fol = تہی;
+    char_u	*upp = تہی;
+    صحیح		do_rep;
+    صحیح		do_repsal;
+    صحیح		do_sal;
+    صحیح		do_mapline;
+    صحیح		ملا_map = FALSE;
     hashitem_T	*hi;
-    int		l;
-    int		compminlen = 0;		// COMPOUNDMIN value
-    int		compsylmax = 0;		// COMPOUNDSYLMAX value
-    int		compoptions = 0;	// COMP_ flags
-    int		compmax = 0;		// COMPOUNDWORDMAX value
-    char_u	*compflags = NULL;	// COMPOUNDFLAG and COMPOUNDRULE
+    صحیح		l;
+    صحیح		compminlen = 0;		// COMPOUNDMIN value
+    صحیح		compsylmax = 0;		// COMPOUNDSYLMAX value
+    صحیح		compoptions = 0;	// COMP_ flags
+    صحیح		compmax = 0;		// COMPOUNDWORDMAX value
+    char_u	*compflags = تہی;	// COMPOUNDFLAG and COMPOUNDRULE
 					// concatenated
-    char_u	*midword = NULL;	// MIDWORD value
-    char_u	*syllable = NULL;	// SYLLABLE value
-    char_u	*sofofrom = NULL;	// SOFOFROM value
-    char_u	*sofoto = NULL;		// SOFOTO value
+    char_u	*midword = تہی;	// MIDWORD value
+    char_u	*syllable = تہی;	// SYLLABLE value
+    char_u	*sofofrom = تہی;	// SOFOFROM value
+    char_u	*sofoto = تہی;		// SOFOTO value
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "r");
+    اگر (fd == تہی)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return NULL;
+	واپس تہی;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
-    spell_message(spin, IObuff);
+    vim_snprintf((حرف *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
+    spell_پیغام(spin, IObuff);
 
     // Only do REP lines when not done in another .aff file already.
     do_rep = spin->si_rep.ga_len == 0;
@@ -2293,11 +2293,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Allocate and init the afffile_T structure.
      */
-    aff = (afffile_T *)getroom(spin, sizeof(afffile_T), TRUE);
-    if (aff == NULL)
+    aff = (afffile_T *)getroom(spin, حجم(afffile_T), TRUE);
+    اگر (aff == تہی)
     {
 	fclose(fd);
-	return NULL;
+	واپس تہی;
     }
     hash_init(&aff->af_pref);
     hash_init(&aff->af_suff);
@@ -2306,85 +2306,85 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    جب (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	سطر_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	اگر (*rline == '#')
+	    جاری;
 
 	// Convert from "SET" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	اگر (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, تہی);
+	    اگر (pc == تہی)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
 							   fname, lnum, rline);
-		continue;
+		جاری;
 	    }
-	    line = pc;
+	    سطر = pc;
 	}
-	else
+	ورنہ
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = تہی;
+	    سطر = rline;
 	}
 
 	// Split the line up in white separated items.  Put a NUL after each
 	// item.
 	itemcnt = 0;
-	for (p = line; ; )
+	برائے (p = سطر; ; )
 	{
-	    while (*p != NUL && *p <= ' ')  // skip white space and CR/NL
+	    جب (*p != NUL && *p <= ' ')  // skip white space and CR/NL
 		++p;
-	    if (*p == NUL)
-		break;
-	    if (itemcnt == MAXITEMCNT)	    // too many items
-		break;
-	    items[itemcnt++] = p;
+	    اگر (*p == NUL)
+		توڑو;
+	    اگر (itemcnt == MAXITEMCNT)	    // too many items
+		توڑو;
+	    اشیاء[itemcnt++] = p;
 	    // A few items have arbitrary text argument, don't split them.
-	    if (itemcnt == 2 && spell_info_item(items[0]))
-		while (*p >= ' ' || *p == TAB)    // skip until CR/NL
+	    اگر (itemcnt == 2 && spell_info_شے(اشیاء[0]))
+		جب (*p >= ' ' || *p == TAB)    // skip until CR/NL
 		    ++p;
-	    else
-		while (*p > ' ')    // skip until white space or CR/NL
+	    ورنہ
+		جب (*p > ' ')    // skip until white space or CR/NL
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    اگر (*p == NUL)
+		توڑو;
 	    *p++ = NUL;
 	}
 
 	// Handle non-empty lines.
-	if (itemcnt > 0)
+	اگر (itemcnt > 0)
 	{
-	    if (is_aff_rule(items, itemcnt, "SET", 2) && aff->af_enc == NULL)
+	    اگر (is_aff_قاعدہ(اشیاء, itemcnt, "SET", 2) && aff->af_enc == تہی)
 	    {
 		// Setup for conversion from "ENC" to 'encoding'.
-		aff->af_enc = enc_canonize(items[1]);
-		if (aff->af_enc != NULL && !spin->si_ascii
-			&& convert_setup(&spin->si_conv, aff->af_enc,
+		aff->af_enc = enc_canonize(اشیاء[1]);
+		اگر (aff->af_enc != تہی && !spin->si_ascii
+			&& convert_تیاری(&spin->si_conv, aff->af_enc,
 							       p_enc) == FAIL)
 		    smsg(_("Conversion in %s not supported: from %s to %s"),
 					       fname, aff->af_enc, p_enc);
 		spin->si_conv.vc_fail = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FLAG", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "FLAG", 2)
 					      && aff->af_flagtype == AFT_CHAR)
 	    {
-		if (STRCMP(items[1], "long") == 0)
+		اگر (STRCMP(اشیاء[1], "long") == 0)
 		    aff->af_flagtype = AFT_LONG;
-		else if (STRCMP(items[1], "num") == 0)
-		    aff->af_flagtype = AFT_NUM;
-		else if (STRCMP(items[1], "caplong") == 0)
+		ورنہ اگر (STRCMP(اشیاء[1], "num") == 0)
+		    aff->af_flagtype = AFT_عدد;
+		ورنہ اگر (STRCMP(اشیاء[1], "caplong") == 0)
 		    aff->af_flagtype = AFT_CAPLONG;
-		else
+		ورنہ
 		    smsg(_("Invalid value for FLAG in %s line %d: %s"),
-			    fname, lnum, items[1]);
-		if (aff->af_rare != 0
+			    fname, lnum, اشیاء[1]);
+		اگر (aff->af_rare != 0
 			|| aff->af_keepcase != 0
 			|| aff->af_bad != 0
 			|| aff->af_needaffix != 0
@@ -2392,291 +2392,291 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			|| aff->af_needcomp != 0
 			|| aff->af_comproot != 0
 			|| aff->af_nosuggest != 0
-			|| compflags != NULL
-			|| aff->af_suff.ht_used > 0
-			|| aff->af_pref.ht_used > 0)
+			|| compflags != تہی
+			|| aff->af_suff.ht_مستعمل > 0
+			|| aff->af_pref.ht_مستعمل > 0)
 		    smsg(_("FLAG after using flags in %s line %d: %s"),
-			    fname, lnum, items[1]);
+			    fname, lnum, اشیاء[1]);
 	    }
-	    else if (spell_info_item(items[0]))
+	    ورنہ اگر (spell_info_شے(اشیاء[0]))
 	    {
 		    p = (char_u *)getroom(spin,
-			    (spin->si_info == NULL ? 0 : STRLEN(spin->si_info))
-			    + STRLEN(items[0])
-			    + STRLEN(items[1]) + 3, FALSE);
-		    if (p != NULL)
+			    (spin->si_info == تہی ? 0 : STRLEN(spin->si_info))
+			    + STRLEN(اشیاء[0])
+			    + STRLEN(اشیاء[1]) + 3, FALSE);
+		    اگر (p != تہی)
 		    {
-			if (spin->si_info != NULL)
+			اگر (spin->si_info != تہی)
 			{
 			    STRCPY(p, spin->si_info);
 			    STRCAT(p, "\n");
 			}
-			STRCAT(p, items[0]);
+			STRCAT(p, اشیاء[0]);
 			STRCAT(p, " ");
-			STRCAT(p, items[1]);
+			STRCAT(p, اشیاء[1]);
 			spin->si_info = p;
 		    }
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MIDWORD", 2)
-							   && midword == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "MIDWORD", 2)
+							   && midword == تہی)
 	    {
-		midword = getroom_save(spin, items[1]);
+		midword = getroom_save(spin, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "TRY", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "TRY", 2))
 	    {
 		// ignored, we look in the tree for what chars may appear
 	    }
 	    // TODO: remove "RAR" later
-	    else if ((is_aff_rule(items, itemcnt, "RAR", 2)
-			|| is_aff_rule(items, itemcnt, "RARE", 2))
+	    ورنہ اگر ((is_aff_قاعدہ(اشیاء, itemcnt, "RAR", 2)
+			|| is_aff_قاعدہ(اشیاء, itemcnt, "RARE", 2))
 							 && aff->af_rare == 0)
 	    {
-		aff->af_rare = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_rare = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
 	    // TODO: remove "KEP" later
-	    else if ((is_aff_rule(items, itemcnt, "KEP", 2)
-			|| is_aff_rule(items, itemcnt, "KEEPCASE", 2))
+	    ورنہ اگر ((is_aff_قاعدہ(اشیاء, itemcnt, "KEP", 2)
+			|| is_aff_قاعدہ(اشیاء, itemcnt, "KEEPCASE", 2))
 						     && aff->af_keepcase == 0)
 	    {
-		aff->af_keepcase = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_keepcase = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "BAD", 2)
-			|| is_aff_rule(items, itemcnt, "FORBIDDENWORD", 2))
+	    ورنہ اگر ((is_aff_قاعدہ(اشیاء, itemcnt, "BAD", 2)
+			|| is_aff_قاعدہ(اشیاء, itemcnt, "FORBIDDENWORD", 2))
 							  && aff->af_bad == 0)
 	    {
-		aff->af_bad = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_bad = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NEEDAFFIX", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NEEDAFFIX", 2)
 						    && aff->af_needaffix == 0)
 	    {
-		aff->af_needaffix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needaffix = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CIRCUMFIX", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CIRCUMFIX", 2)
 						    && aff->af_circumfix == 0)
 	    {
-		aff->af_circumfix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_circumfix = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGGEST", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NOSUGGEST", 2)
 						    && aff->af_nosuggest == 0)
 	    {
-		aff->af_nosuggest = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_nosuggest = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "NEEDCOMPOUND", 2)
-			|| is_aff_rule(items, itemcnt, "ONLYINCOMPOUND", 2))
+	    ورنہ اگر ((is_aff_قاعدہ(اشیاء, itemcnt, "NEEDCOMPOUND", 2)
+			|| is_aff_قاعدہ(اشیاء, itemcnt, "ONLYINCOMPOUND", 2))
 						     && aff->af_needcomp == 0)
 	    {
-		aff->af_needcomp = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needcomp = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDROOT", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDROOT", 2)
 						     && aff->af_comproot == 0)
 	    {
-		aff->af_comproot = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comproot = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFORBIDFLAG", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDFORBIDFLAG", 2)
 						   && aff->af_compforbid == 0)
 	    {
-		aff->af_compforbid = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_compforbid = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		اگر (aff->af_pref.ht_مستعمل > 0)
 		    smsg(_("Defining COMPOUNDFORBIDFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDPERMITFLAG", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDPERMITFLAG", 2)
 						   && aff->af_comppermit == 0)
 	    {
-		aff->af_comppermit = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comppermit = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		اگر (aff->af_pref.ht_مستعمل > 0)
 		    smsg(_("Defining COMPOUNDPERMITFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFLAG", 2)
-							 && compflags == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDFLAG", 2)
+							 && compflags == تہی)
 	    {
 		// Turn flag "c" into COMPOUNDRULE compatible string "c+",
 		// "Na" into "Na+", "1234" into "1234+".
-		p = getroom(spin, STRLEN(items[1]) + 2, FALSE);
-		if (p != NULL)
+		p = getroom(spin, STRLEN(اشیاء[1]) + 2, FALSE);
+		اگر (p != تہی)
 		{
-		    STRCPY(p, items[1]);
+		    STRCPY(p, اشیاء[1]);
 		    STRCAT(p, "+");
 		    compflags = p;
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULES", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDRULES", 2))
 	    {
 		// We don't use the count, but do check that it's a number and
 		// not COMPOUNDRULE mistyped.
-		if (atoi((char *)items[1]) == 0)
+		اگر (atoi((حرف *)اشیاء[1]) == 0)
 		    smsg(_("Wrong COMPOUNDRULES value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULE", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDRULE", 2))
 	    {
 		// Don't use the first rule if it is a number.
-		if (compflags != NULL || *skipdigits(items[1]) != NUL)
+		اگر (compflags != تہی || *skipdigits(اشیاء[1]) != NUL)
 		{
 		    // Concatenate this string to previously defined ones,
 		    // using a slash to separate them.
-		    l = (int)STRLEN(items[1]) + 1;
-		    if (compflags != NULL)
-			l += (int)STRLEN(compflags) + 1;
+		    l = (صحیح)STRLEN(اشیاء[1]) + 1;
+		    اگر (compflags != تہی)
+			l += (صحیح)STRLEN(compflags) + 1;
 		    p = getroom(spin, l, FALSE);
-		    if (p != NULL)
+		    اگر (p != تہی)
 		    {
-			if (compflags != NULL)
+			اگر (compflags != تہی)
 			{
 			    STRCPY(p, compflags);
 			    STRCAT(p, "/");
 			}
-			STRCAT(p, items[1]);
+			STRCAT(p, اشیاء[1]);
 			compflags = p;
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDWORDMAX", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDWORDMAX", 2)
 							      && compmax == 0)
 	    {
-		compmax = atoi((char *)items[1]);
-		if (compmax == 0)
+		compmax = atoi((حرف *)اشیاء[1]);
+		اگر (compmax == 0)
 		    smsg(_("Wrong COMPOUNDWORDMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDMIN", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDMIN", 2)
 							   && compminlen == 0)
 	    {
-		compminlen = atoi((char *)items[1]);
-		if (compminlen == 0)
+		compminlen = atoi((حرف *)اشیاء[1]);
+		اگر (compminlen == 0)
 		    smsg(_("Wrong COMPOUNDMIN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDSYLMAX", 2)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "COMPOUNDSYLMAX", 2)
 							   && compsylmax == 0)
 	    {
-		compsylmax = atoi((char *)items[1]);
-		if (compsylmax == 0)
+		compsylmax = atoi((حرف *)اشیاء[1]);
+		اگر (compsylmax == 0)
 		    smsg(_("Wrong COMPOUNDSYLMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDDUP", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDDUP", 1))
 	    {
 		compoptions |= COMP_CHECKDUP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDREP", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDREP", 1))
 	    {
 		compoptions |= COMP_CHECKREP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDCASE", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDCASE", 1))
 	    {
 		compoptions |= COMP_CHECKCASE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
 	    {
 		compoptions |= COMP_CHECKTRIPLE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
 	    {
-		if (atoi((char *)items[1]) == 0)
+		اگر (atoi((حرف *)اشیاء[1]) == 0)
 		    smsg(_("Wrong CHECKCOMPOUNDPATTERN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
 	    {
 		garray_T    *gap = &spin->si_comppat;
-		int	    i;
+		صحیح	    i;
 
 		// Only add the couple if it isn't already there.
-		for (i = 0; i < gap->ga_len - 1; i += 2)
-		    if (STRCMP(((char_u **)(gap->ga_data))[i], items[1]) == 0
-			    && STRCMP(((char_u **)(gap->ga_data))[i + 1],
-							       items[2]) == 0)
-			break;
-		if (i >= gap->ga_len && ga_grow(gap, 2) == OK)
+		برائے (i = 0; i < gap->ga_len - 1; i += 2)
+		    اگر (STRCMP(((char_u **)(gap->ga_ڈیٹا))[i], اشیاء[1]) == 0
+			    && STRCMP(((char_u **)(gap->ga_ڈیٹا))[i + 1],
+							       اشیاء[2]) == 0)
+			توڑو;
+		اگر (i >= gap->ga_len && ga_grow(gap, 2) == OK)
 		{
-		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[1]);
-		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[2]);
+		    ((char_u **)(gap->ga_ڈیٹا))[gap->ga_len++]
+					       = getroom_save(spin, اشیاء[1]);
+		    ((char_u **)(gap->ga_ڈیٹا))[gap->ga_len++]
+					       = getroom_save(spin, اشیاء[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SYLLABLE", 2)
-							  && syllable == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "SYLLABLE", 2)
+							  && syllable == تہی)
 	    {
-		syllable = getroom_save(spin, items[1]);
+		syllable = getroom_save(spin, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOBREAK", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NOBREAK", 1))
 	    {
 		spin->si_nobreak = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSPLITSUGS", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NOSPLITSUGS", 1))
 	    {
 		spin->si_nosplitsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOCOMPOUNDSUGS", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NOCOMPOUNDSUGS", 1))
 	    {
 		spin->si_nocompoundsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGFILE", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "NOSUGFILE", 1))
 	    {
 		spin->si_nosugfile = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "PFXPOSTPONE", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "PFXPOSTPONE", 1))
 	    {
 		aff->af_pfxpostpone = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "IGNOREEXTRA", 1))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "IGNOREEXTRA", 1))
 	    {
 		aff->af_ignoreextra = TRUE;
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    ورنہ اگر ((STRCMP(اشیاء[0], "PFX") == 0
+					      || STRCMP(اشیاء[0], "SFX") == 0)
 		    && aff_todo == 0
 		    && itemcnt >= 4)
 	    {
-		int	lasti = 4;
-		char_u	key[AH_KEY_LEN];
+		صحیح	lasti = 4;
+		char_u	کلید[AH_کلید_LEN];
 
-		if (*items[0] == 'P')
+		اگر (*اشیاء[0] == 'P')
 		    tp = &aff->af_pref;
-		else
+		ورنہ
 		    tp = &aff->af_suff;
 
 		// Myspell allows the same affix name to be used multiple
 		// times.  The affix files that do this have an undocumented
 		// "S" flag on all but the last block, thus we check for that
 		// and store it in ah_follows.
-		vim_strncpy(key, items[1], AH_KEY_LEN - 1);
-		hi = hash_find(tp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(کلید, اشیاء[1], AH_کلید_LEN - 1);
+		hi = hash_ڈھونڈو(tp, کلید);
+		اگر (!HASHITEM_خالی_خانے(hi))
 		{
 		    cur_aff = HI2AH(hi);
-		    if (cur_aff->ah_combine != (*items[2] == 'Y'))
+		    اگر (cur_aff->ah_combine != (*اشیاء[2] == 'Y'))
 			smsg(_("Different combining flag in continued affix block in %s line %d: %s"),
-						   fname, lnum, items[1]);
-		    if (!cur_aff->ah_follows)
+						   fname, lnum, اشیاء[1]);
+		    اگر (!cur_aff->ah_follows)
 			smsg(_("Duplicate affix in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, اشیاء[1]);
 		}
-		else
+		ورنہ
 		{
 		    // New affix letter.
 		    cur_aff = (affheader_T *)getroom(spin,
-						   sizeof(affheader_T), TRUE);
-		    if (cur_aff == NULL)
-			break;
-		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, items[1],
+						   حجم(affheader_T), TRUE);
+		    اگر (cur_aff == تہی)
+			توڑو;
+		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, اشیاء[1],
 								 fname, lnum);
-		    if (cur_aff->ah_flag == 0 || STRLEN(items[1]) >= AH_KEY_LEN)
-			break;
-		    if (cur_aff->ah_flag == aff->af_bad
+		    اگر (cur_aff->ah_flag == 0 || STRLEN(اشیاء[1]) >= AH_کلید_LEN)
+			توڑو;
+		    اگر (cur_aff->ah_flag == aff->af_bad
 			    || cur_aff->ah_flag == aff->af_rare
 			    || cur_aff->ah_flag == aff->af_keepcase
 			    || cur_aff->ah_flag == aff->af_needaffix
@@ -2685,35 +2685,35 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    || cur_aff->ah_flag == aff->af_needcomp
 			    || cur_aff->ah_flag == aff->af_comproot)
 			smsg(_("Affix also used for BAD/RARE/KEEPCASE/NEEDAFFIX/NEEDCOMPOUND/NOSUGGEST in %s line %d: %s"),
-						       fname, lnum, items[1]);
-		    STRCPY(cur_aff->ah_key, items[1]);
-		    hash_add(tp, cur_aff->ah_key, "spelling");
+						       fname, lnum, اشیاء[1]);
+		    STRCPY(cur_aff->ah_کلید, اشیاء[1]);
+		    hash_جوڑو(tp, cur_aff->ah_کلید, "spelling");
 
-		    cur_aff->ah_combine = (*items[2] == 'Y');
+		    cur_aff->ah_combine = (*اشیاء[2] == 'Y');
 		}
 
 		// Check for the "S" flag, which apparently means that another
 		// block with the same affix name is following.
-		if (itemcnt > lasti && STRCMP(items[lasti], "S") == 0)
+		اگر (itemcnt > lasti && STRCMP(اشیاء[lasti], "S") == 0)
 		{
 		    ++lasti;
 		    cur_aff->ah_follows = TRUE;
 		}
-		else
+		ورنہ
 		    cur_aff->ah_follows = FALSE;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter.
-		if (itemcnt > lasti && *items[lasti] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		اگر (itemcnt > lasti && *اشیاء[lasti] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, اشیاء[lasti]);
 
-		if (STRCMP(items[2], "Y") != 0 && STRCMP(items[2], "N") != 0)
+		اگر (STRCMP(اشیاء[2], "Y") != 0 && STRCMP(اشیاء[2], "N") != 0)
 		    smsg(_("Expected Y or N in %s line %d: %s"),
-						       fname, lnum, items[2]);
+						       fname, lnum, اشیاء[2]);
 
-		if (*items[0] == 'P' && aff->af_pfxpostpone)
+		اگر (*اشیاء[0] == 'P' && aff->af_pfxpostpone)
 		{
-		    if (cur_aff->ah_newID == 0)
+		    اگر (cur_aff->ah_newID == 0)
 		    {
 			// Use a new number in the .spl file later, to be able
 			// to handle multiple .aff files.
@@ -2723,138 +2723,138 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			// We only really use ah_newID if the prefix is
 			// postponed.  We know that only after handling all
 			// the items.
-			did_postpone_prefix = FALSE;
+			did_postpone_سابقہ = FALSE;
 		    }
-		    else
+		    ورنہ
 			// Did use the ID in a previous block.
-			did_postpone_prefix = TRUE;
+			did_postpone_سابقہ = TRUE;
 		}
 
-		aff_todo = atoi((char *)items[3]);
+		aff_todo = atoi((حرف *)اشیاء[3]);
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    ورنہ اگر ((STRCMP(اشیاء[0], "PFX") == 0
+					      || STRCMP(اشیاء[0], "SFX") == 0)
 		    && aff_todo > 0
-		    && STRCMP(cur_aff->ah_key, items[1]) == 0
+		    && STRCMP(cur_aff->ah_کلید, اشیاء[1]) == 0
 		    && itemcnt >= 5)
 	    {
-		affentry_T	*aff_entry;
-		int		upper = FALSE;
-		int		lasti = 5;
+		affentry_T	*aff_اندراج;
+		صحیح		بالائی_2 = FALSE;
+		صحیح		lasti = 5;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter,
 		// unless IGNOREEXTRA is used.  Hunspell uses a "-" item.
-		if (itemcnt > lasti
+		اگر (itemcnt > lasti
 			&& !aff->af_ignoreextra
-			&& *items[lasti] != '#'
-			&& (STRCMP(items[lasti], "-") != 0
+			&& *اشیاء[lasti] != '#'
+			&& (STRCMP(اشیاء[lasti], "-") != 0
 						     || itemcnt != lasti + 1))
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		    smsg(_(e_afftrailing), fname, lnum, اشیاء[lasti]);
 
 		// New item for an affix letter.
 		--aff_todo;
-		aff_entry = (affentry_T *)getroom(spin,
-						    sizeof(affentry_T), TRUE);
-		if (aff_entry == NULL)
-		    break;
+		aff_اندراج = (affentry_T *)getroom(spin,
+						    حجم(affentry_T), TRUE);
+		اگر (aff_اندراج == تہی)
+		    توڑو;
 
-		if (STRCMP(items[2], "0") != 0)
-		    aff_entry->ae_chop = getroom_save(spin, items[2]);
-		if (STRCMP(items[3], "0") != 0)
+		اگر (STRCMP(اشیاء[2], "0") != 0)
+		    aff_اندراج->ae_chop = getroom_save(spin, اشیاء[2]);
+		اگر (STRCMP(اشیاء[3], "0") != 0)
 		{
-		    aff_entry->ae_add = getroom_save(spin, items[3]);
+		    aff_اندراج->ae_جوڑو = getroom_save(spin, اشیاء[3]);
 
 		    // Recognize flags on the affix: abcd/XYZ
-		    aff_entry->ae_flags = vim_strchr(aff_entry->ae_add, '/');
-		    if (aff_entry->ae_flags != NULL)
+		    aff_اندراج->ae_flags = vim_strchr(aff_اندراج->ae_جوڑو, '/');
+		    اگر (aff_اندراج->ae_flags != تہی)
 		    {
-			*aff_entry->ae_flags++ = NUL;
-			aff_process_flags(aff, aff_entry);
+			*aff_اندراج->ae_flags++ = NUL;
+			aff_process_flags(aff, aff_اندراج);
 		    }
 		}
 
 		// Don't use an affix entry with non-ASCII characters when
 		// "spin->si_ascii" is TRUE.
-		if (!spin->si_ascii || !(has_non_ascii(aff_entry->ae_chop)
-					  || has_non_ascii(aff_entry->ae_add)))
+		اگر (!spin->si_ascii || !(has_non_ascii(aff_اندراج->ae_chop)
+					  || has_non_ascii(aff_اندراج->ae_جوڑو)))
 		{
-		    aff_entry->ae_next = cur_aff->ah_first;
-		    cur_aff->ah_first = aff_entry;
+		    aff_اندراج->ae_اگلا = cur_aff->ah_پہلا;
+		    cur_aff->ah_پہلا = aff_اندراج;
 
-		    if (STRCMP(items[4], ".") != 0)
+		    اگر (STRCMP(اشیاء[4], ".") != 0)
 		    {
 			char_u	buf[MAXLINELEN];
 
-			aff_entry->ae_cond = getroom_save(spin, items[4]);
+			aff_اندراج->ae_cond = getroom_save(spin, اشیاء[4]);
 			// Note: this silently truncates the buffer, but this should
 			// not happen in practice
-			if (*items[0] == 'P')
-			    vim_snprintf((char *)buf, sizeof(buf), "^%s", items[4]);
-			else
-			    vim_snprintf((char *)buf, sizeof(buf), "%s$", items[4]);
-			aff_entry->ae_prog = vim_regcomp(buf,
+			اگر (*اشیاء[0] == 'P')
+			    vim_snprintf((حرف *)buf, حجم(buf), "^%s", اشیاء[4]);
+			ورنہ
+			    vim_snprintf((حرف *)buf, حجم(buf), "%s$", اشیاء[4]);
+			aff_اندراج->ae_prog = vim_regcomp(buf,
 					    RE_MAGIC + RE_STRING + RE_STRICT);
-			if (aff_entry->ae_prog == NULL)
+			اگر (aff_اندراج->ae_prog == تہی)
 			    smsg(_("Broken condition in %s line %d: %s"),
-						       fname, lnum, items[4]);
+						       fname, lnum, اشیاء[4]);
 		    }
 
 		    // For postponed prefixes we need an entry in si_prefcond
 		    // for the condition.  Use an existing one if possible.
 		    // Can't be done for an affix with flags, ignoring
 		    // COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG.
-		    if (*items[0] == 'P' && aff->af_pfxpostpone
-					       && aff_entry->ae_flags == NULL)
+		    اگر (*اشیاء[0] == 'P' && aff->af_pfxpostpone
+					       && aff_اندراج->ae_flags == تہی)
 		    {
 			// When the chop string is one lower-case letter and
 			// the add string ends in the upper-case letter we set
 			// the "upper" flag, clear "ae_chop" and remove the
 			// letters from "ae_add".  The condition must either
 			// be empty or start with the same letter.
-			if (aff_entry->ae_chop != NULL
-				&& aff_entry->ae_add != NULL
-				&& aff_entry->ae_chop[(*mb_ptr2len)(
-						   aff_entry->ae_chop)] == NUL)
+			اگر (aff_اندراج->ae_chop != تہی
+				&& aff_اندراج->ae_جوڑو != تہی
+				&& aff_اندراج->ae_chop[(*mb_ptr2len)(
+						   aff_اندراج->ae_chop)] == NUL)
 			{
-			    int		c, c_up;
+			    صحیح		c, c_اوپر;
 
-			    c = PTR2CHAR(aff_entry->ae_chop);
-			    c_up = SPELL_TOUPPER(c);
-			    if (c_up != c
-				    && (aff_entry->ae_cond == NULL
-					|| PTR2CHAR(aff_entry->ae_cond) == c))
+			    c = PTR2CHAR(aff_اندراج->ae_chop);
+			    c_اوپر = SPELL_TOUPPER(c);
+			    اگر (c_اوپر != c
+				    && (aff_اندراج->ae_cond == تہی
+					|| PTR2CHAR(aff_اندراج->ae_cond) == c))
 			    {
-				p = aff_entry->ae_add
-						  + STRLEN(aff_entry->ae_add);
-				MB_PTR_BACK(aff_entry->ae_add, p);
-				if (PTR2CHAR(p) == c_up)
+				p = aff_اندراج->ae_جوڑو
+						  + STRLEN(aff_اندراج->ae_جوڑو);
+				MB_PTR_عقب(aff_اندراج->ae_جوڑو, p);
+				اگر (PTR2CHAR(p) == c_اوپر)
 				{
-				    upper = TRUE;
-				    aff_entry->ae_chop = NULL;
+				    بالائی_2 = TRUE;
+				    aff_اندراج->ae_chop = تہی;
 				    *p = NUL;
 
 				    // The condition is matched with the
 				    // actual word, thus must check for the
 				    // upper-case letter.
-				    if (aff_entry->ae_cond != NULL)
+				    اگر (aff_اندراج->ae_cond != تہی)
 				    {
 					char_u	buf[MAXLINELEN];
 
-					if (has_mbyte)
+					اگر (has_mbyte)
 					{
-					    onecap_copy(items[4], buf, TRUE);
-					    aff_entry->ae_cond = getroom_save(
+					    onecap_copy(اشیاء[4], buf, TRUE);
+					    aff_اندراج->ae_cond = getroom_save(
 								   spin, buf);
 					}
-					else
-					    *aff_entry->ae_cond = c_up;
-					if (aff_entry->ae_cond != NULL)
+					ورنہ
+					    *aff_اندراج->ae_cond = c_اوپر;
+					اگر (aff_اندراج->ae_cond != تہی)
 					{
-					    sprintf((char *)buf, "^%s",
-							  aff_entry->ae_cond);
-					    vim_regfree(aff_entry->ae_prog);
-					    aff_entry->ae_prog = vim_regcomp(
+					    sprintf((حرف *)buf, "^%s",
+							  aff_اندراج->ae_cond);
+					    vim_regfree(aff_اندراج->ae_prog);
+					    aff_اندراج->ae_prog = vim_regcomp(
 						    buf, RE_MAGIC + RE_STRING);
 					}
 				    }
@@ -2862,58 +2862,58 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    }
 			}
 
-			if (aff_entry->ae_chop == NULL
-					       && aff_entry->ae_flags == NULL)
+			اگر (aff_اندراج->ae_chop == تہی
+					       && aff_اندراج->ae_flags == تہی)
 			{
-			    int		idx;
+			    صحیح		idx;
 			    char_u	**pp;
-			    int		n;
+			    صحیح		n;
 
 			    // Find a previously used condition.
-			    for (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
+			    برائے (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
 									--idx)
 			    {
-				p = ((char_u **)spin->si_prefcond.ga_data)[idx];
-				if (str_equal(p, aff_entry->ae_cond))
-				    break;
+				p = ((char_u **)spin->si_prefcond.ga_ڈیٹا)[idx];
+				اگر (str_equal(p, aff_اندراج->ae_cond))
+				    توڑو;
 			    }
-			    if (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
+			    اگر (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
 			    {
 				// Not found, add a new condition.
 				idx = spin->si_prefcond.ga_len++;
-				pp = ((char_u **)spin->si_prefcond.ga_data)
+				pp = ((char_u **)spin->si_prefcond.ga_ڈیٹا)
 									+ idx;
-				if (aff_entry->ae_cond == NULL)
-				    *pp = NULL;
-				else
+				اگر (aff_اندراج->ae_cond == تہی)
+				    *pp = تہی;
+				ورنہ
 				    *pp = getroom_save(spin,
-							  aff_entry->ae_cond);
+							  aff_اندراج->ae_cond);
 			    }
 
 			    // Add the prefix to the prefix tree.
-			    if (aff_entry->ae_add == NULL)
+			    اگر (aff_اندراج->ae_جوڑو == تہی)
 				p = (char_u *)"";
-			    else
-				p = aff_entry->ae_add;
+			    ورنہ
+				p = aff_اندراج->ae_جوڑو;
 
 			    // PFX_FLAGS is a negative number, so that
 			    // tree_add_word() knows this is the prefix tree.
 			    n = PFX_FLAGS;
-			    if (!cur_aff->ah_combine)
+			    اگر (!cur_aff->ah_combine)
 				n |= WFP_NC;
-			    if (upper)
-				n |= WFP_UP;
-			    if (aff_entry->ae_comppermit)
+			    اگر (بالائی_2)
+				n |= WFP_اوپر;
+			    اگر (aff_اندراج->ae_comppermit)
 				n |= WFP_COMPPERMIT;
-			    if (aff_entry->ae_compforbid)
+			    اگر (aff_اندراج->ae_compforbid)
 				n |= WFP_COMPFORBID;
-			    tree_add_word(spin, p, spin->si_prefroot, n,
+			    درخت_جوڑو_لفظ(spin, p, spin->si_prefroot, n,
 						      idx, cur_aff->ah_newID);
-			    did_postpone_prefix = TRUE;
+			    did_postpone_سابقہ = TRUE;
 			}
 
 			// Didn't actually use ah_newID, backup si_newprefID.
-			if (aff_todo == 0 && !did_postpone_prefix)
+			اگر (aff_todo == 0 && !did_postpone_سابقہ)
 			{
 			    --spin->si_newprefID;
 			    cur_aff->ah_newID = 0;
@@ -2921,138 +2921,138 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FOL", 2) && fol == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "FOL", 2) && fol == تہی)
 	    {
-		fol = vim_strsave(items[1]);
+		fol = vim_strsave(اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "LOW", 2) && low == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "LOW", 2) && کم == تہی)
 	    {
-		low = vim_strsave(items[1]);
+		کم = vim_strsave(اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "UPP", 2) && upp == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "UPP", 2) && upp == تہی)
 	    {
-		upp = vim_strsave(items[1]);
+		upp = vim_strsave(اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "REP", 2)
-		     || is_aff_rule(items, itemcnt, "REPSAL", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "REP", 2)
+		     || is_aff_قاعدہ(اشیاء, itemcnt, "REPSAL", 2))
 	    {
 		// Ignore REP/REPSAL count
-		if (!SAFE_isdigit(*items[1]))
+		اگر (!محفوظ_isdigit(*اشیاء[1]))
 		    smsg(_("Expected REP(SAL) count in %s line %d"),
 								 fname, lnum);
 	    }
-	    else if ((STRCMP(items[0], "REP") == 0
-			|| STRCMP(items[0], "REPSAL") == 0)
+	    ورنہ اگر ((STRCMP(اشیاء[0], "REP") == 0
+			|| STRCMP(اشیاء[0], "REPSAL") == 0)
 		    && itemcnt >= 3)
 	    {
 		// REP/REPSAL item
 		// Myspell ignores extra arguments, we require it starts with
 		// # to detect mistakes.
-		if (itemcnt > 3 && items[3][0] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[3]);
-		if (items[0][3] == 'S' ? do_repsal : do_rep)
+		اگر (itemcnt > 3 && اشیاء[3][0] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, اشیاء[3]);
+		اگر (اشیاء[0][3] == 'S' ? do_repsal : do_rep)
 		{
 		    // Replace underscore with space (can't include a space
 		    // directly).
-		    for (p = items[1]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    برائے (p = اشیاء[1]; *p != NUL; MB_PTR_ADV(p))
+			اگر (*p == '_')
 			    *p = ' ';
-		    for (p = items[2]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    برائے (p = اشیاء[2]; *p != NUL; MB_PTR_ADV(p))
+			اگر (*p == '_')
 			    *p = ' ';
-		    add_fromto(spin, items[0][3] == 'S'
+		    جوڑو_fromto(spin, اشیاء[0][3] == 'S'
 					 ? &spin->si_repsal
-					 : &spin->si_rep, items[1], items[2]);
+					 : &spin->si_rep, اشیاء[1], اشیاء[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MAP", 2))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "MAP", 2))
 	    {
 		// MAP item or count
-		if (!found_map)
+		اگر (!ملا_map)
 		{
 		    // First line contains the count.
-		    found_map = TRUE;
-		    if (!SAFE_isdigit(*items[1]))
+		    ملا_map = TRUE;
+		    اگر (!محفوظ_isdigit(*اشیاء[1]))
 			smsg(_("Expected MAP count in %s line %d"),
 								 fname, lnum);
 		}
-		else if (do_mapline)
+		ورنہ اگر (do_mapline)
 		{
-		    int		c;
+		    صحیح		c;
 
 		    // Check that every character appears only once.
-		    for (p = items[1]; *p != NUL; )
+		    برائے (p = اشیاء[1]; *p != NUL; )
 		    {
 			c = mb_ptr2char_adv(&p);
-			if ((spin->si_map.ga_len > 0
-				    && vim_strchr(spin->si_map.ga_data, c)
-								      != NULL)
-				|| vim_strchr(p, c) != NULL)
+			اگر ((spin->si_map.ga_len > 0
+				    && vim_strchr(spin->si_map.ga_ڈیٹا, c)
+								      != تہی)
+				|| vim_strchr(p, c) != تہی)
 			    smsg(_("Duplicate character in MAP in %s line %d"),
 								 fname, lnum);
 		    }
 
 		    // We simply concatenate all the MAP strings, separated by
 		    // slashes.
-		    ga_concat(&spin->si_map, items[1]);
+		    ga_concat(&spin->si_map, اشیاء[1]);
 		    ga_append(&spin->si_map, '/');
 		}
 	    }
 	    // Accept "SAL from to" and "SAL from to  #comment".
-	    else if (is_aff_rule(items, itemcnt, "SAL", 3))
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "SAL", 3))
 	    {
-		if (do_sal)
+		اگر (do_sal)
 		{
 		    // SAL item (sounds-a-like)
 		    // Either one of the known keys or a from-to pair.
-		    if (STRCMP(items[1], "followup") == 0)
-			spin->si_followup = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "collapse_result") == 0)
-			spin->si_collapse = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "remove_accents") == 0)
-			spin->si_rem_accents = sal_to_bool(items[2]);
-		    else
+		    اگر (STRCMP(اشیاء[1], "followup") == 0)
+			spin->si_followup = sal_مقصد_bool(اشیاء[2]);
+		    ورنہ اگر (STRCMP(اشیاء[1], "collapse_result") == 0)
+			spin->si_collapse = sal_مقصد_bool(اشیاء[2]);
+		    ورنہ اگر (STRCMP(اشیاء[1], "remove_accents") == 0)
+			spin->si_rem_accents = sal_مقصد_bool(اشیاء[2]);
+		    ورنہ
 			// when "to" is "_" it means empty
-			add_fromto(spin, &spin->si_sal, items[1],
-				     STRCMP(items[2], "_") == 0 ? (char_u *)""
-								: items[2]);
+			جوڑو_fromto(spin, &spin->si_sal, اشیاء[1],
+				     STRCMP(اشیاء[2], "_") == 0 ? (char_u *)""
+								: اشیاء[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOFROM", 2)
-							  && sofofrom == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "SOFOFROM", 2)
+							  && sofofrom == تہی)
 	    {
-		sofofrom = getroom_save(spin, items[1]);
+		sofofrom = getroom_save(spin, اشیاء[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOTO", 2)
-							    && sofoto == NULL)
+	    ورنہ اگر (is_aff_قاعدہ(اشیاء, itemcnt, "SOFOTO", 2)
+							    && sofoto == تہی)
 	    {
-		sofoto = getroom_save(spin, items[1]);
+		sofoto = getroom_save(spin, اشیاء[1]);
 	    }
-	    else if (STRCMP(items[0], "COMMON") == 0)
+	    ورنہ اگر (STRCMP(اشیاء[0], "COMMON") == 0)
 	    {
-		int	i;
+		صحیح	i;
 
-		for (i = 1; i < itemcnt; ++i)
+		برائے (i = 1; i < itemcnt; ++i)
 		{
-		    if (HASHITEM_EMPTY(hash_find(&spin->si_commonwords,
-								   items[i])))
+		    اگر (HASHITEM_خالی_خانے(hash_ڈھونڈو(&spin->si_commonwords,
+								   اشیاء[i])))
 		    {
-			p = vim_strsave(items[i]);
-			if (p == NULL)
-			    break;
-			hash_add(&spin->si_commonwords, p, "spelling");
+			p = vim_strsave(اشیاء[i]);
+			اگر (p == تہی)
+			    توڑو;
+			hash_جوڑو(&spin->si_commonwords, p, "spelling");
 		    }
 		}
 	    }
-	    else
+	    ورنہ
 		smsg(_("Unrecognized or duplicate item in %s line %d: %s"),
-						       fname, lnum, items[0]);
+						       fname, lnum, اشیاء[0]);
 	}
     }
 
-    if (fol != NULL || low != NULL || upp != NULL)
+    اگر (fol != تہی || کم != تہی || upp != تہی)
     {
-	if (spin->si_clear_chartab)
+	اگر (spin->si_clear_chartab)
 	{
 	    // Clear the char type tables, don't want to use any of the
 	    // currently used spell properties.
@@ -3066,74 +3066,74 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	 * Don't write one for utf-8 either, we use utf_*() and
 	 * mb_get_class(), the list of chars in the file will be incomplete.
 	 */
-	if (!spin->si_ascii && !enc_utf8)
+	اگر (!spin->si_ascii && !enc_utf8)
 	{
-	    if (fol == NULL || low == NULL || upp == NULL)
+	    اگر (fol == تہی || کم == تہی || upp == تہی)
 		smsg(_("Missing FOL/LOW/UPP line in %s"), fname);
-	    else
-		(void)set_spell_chartab(fol, low, upp);
+	    ورنہ
+		(خالی)سیٹ_spell_chartab(fol, کم, upp);
 	}
 
 	vim_free(fol);
-	vim_free(low);
+	vim_free(کم);
 	vim_free(upp);
     }
 
     // Use compound specifications of the .aff file for the spell info.
-    if (compmax != 0)
+    اگر (compmax != 0)
     {
-	aff_check_number(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
+	aff_check_نمبر(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
 	spin->si_compmax = compmax;
     }
 
-    if (compminlen != 0)
+    اگر (compminlen != 0)
     {
-	aff_check_number(spin->si_compminlen, compminlen, "COMPOUNDMIN");
+	aff_check_نمبر(spin->si_compminlen, compminlen, "COMPOUNDMIN");
 	spin->si_compminlen = compminlen;
     }
 
-    if (compsylmax != 0)
+    اگر (compsylmax != 0)
     {
-	if (syllable == NULL)
+	اگر (syllable == تہی)
 	    smsg(_("COMPOUNDSYLMAX used without SYLLABLE"));
-	aff_check_number(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
+	aff_check_نمبر(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
 	spin->si_compsylmax = compsylmax;
     }
 
-    if (compoptions != 0)
+    اگر (compoptions != 0)
     {
-	aff_check_number(spin->si_compoptions, compoptions, "COMPOUND options");
+	aff_check_نمبر(spin->si_compoptions, compoptions, "COMPOUND options");
 	spin->si_compoptions |= compoptions;
     }
 
-    if (compflags != NULL)
+    اگر (compflags != تہی)
 	process_compflags(spin, aff, compflags);
 
     // Check that we didn't use too many renumbered flags.
-    if (spin->si_newcompID < spin->si_newprefID)
+    اگر (spin->si_newcompID < spin->si_newprefID)
     {
-	if (spin->si_newcompID == 127 || spin->si_newcompID == 255)
-	    msg(_("Too many postponed prefixes"));
-	else if (spin->si_newprefID == 0 || spin->si_newprefID == 127)
-	    msg(_("Too many compound flags"));
-	else
-	    msg(_("Too many postponed prefixes and/or compound flags"));
+	اگر (spin->si_newcompID == 127 || spin->si_newcompID == 255)
+	    پیغام(_("Too many postponed prefixes"));
+	ورنہ اگر (spin->si_newprefID == 0 || spin->si_newprefID == 127)
+	    پیغام(_("Too many compound flags"));
+	ورنہ
+	    پیغام(_("Too many postponed prefixes and/or compound flags"));
     }
 
-    if (syllable != NULL)
+    اگر (syllable != تہی)
     {
 	aff_check_string(spin->si_syllable, syllable, "SYLLABLE");
 	spin->si_syllable = syllable;
     }
 
-    if (sofofrom != NULL || sofoto != NULL)
+    اگر (sofofrom != تہی || sofoto != تہی)
     {
-	if (sofofrom == NULL || sofoto == NULL)
+	اگر (sofofrom == تہی || sofoto == تہی)
 	    smsg(_("Missing SOFO%s line in %s"),
-				     sofofrom == NULL ? "FROM" : "TO", fname);
-	else if (spin->si_sal.ga_len > 0)
+				     sofofrom == تہی ? "FROM" : "TO", fname);
+	ورنہ اگر (spin->si_sal.ga_len > 0)
 	    smsg(_("Both SAL and SOFO lines in %s"), fname);
-	else
+	ورنہ
 	{
 	    aff_check_string(spin->si_sofofr, sofofrom, "SOFOFROM");
 	    aff_check_string(spin->si_sofoto, sofoto, "SOFOTO");
@@ -3142,7 +3142,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	}
     }
 
-    if (midword != NULL)
+    اگر (midword != تہی)
     {
 	aff_check_string(spin->si_midword, midword, "MIDWORD");
 	spin->si_midword = midword;
@@ -3150,67 +3150,67 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
     vim_free(pc);
     fclose(fd);
-    return aff;
+    واپس aff;
 }
 
 /*
  * Return TRUE when items[0] equals "rulename", there are "mincount" items or
  * a comment is following after item "mincount".
  */
-    static int
-is_aff_rule(
-    char_u	**items,
-    int		itemcnt,
-    char	*rulename,
-    int		mincount)
+    ساکن صحیح
+is_aff_قاعدہ(
+    char_u	**اشیاء,
+    صحیح		itemcnt,
+    حرف	*rulename,
+    صحیح		mincount)
 {
-    return (STRCMP(items[0], rulename) == 0
+    واپس (STRCMP(اشیاء[0], rulename) == 0
 	    && (itemcnt == mincount
-		|| (itemcnt > mincount && items[mincount][0] == '#')));
+		|| (itemcnt > mincount && اشیاء[mincount][0] == '#')));
 }
 
 /*
  * For affix "entry" move COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG from
  * ae_flags to ae_comppermit and ae_compforbid.
  */
-    static void
-aff_process_flags(afffile_T *affile, affentry_T *entry)
+    ساکن خالی
+aff_process_flags(afffile_T *affile, affentry_T *اندراج_2)
 {
     char_u	*p;
     char_u	*prevp;
-    unsigned	flag;
+    غیرعلامتی	flag;
 
-    if (entry->ae_flags != NULL
+    اگر (اندراج_2->ae_flags != تہی
 		&& (affile->af_compforbid != 0 || affile->af_comppermit != 0))
     {
-	for (p = entry->ae_flags; *p != NUL; )
+	برائے (p = اندراج_2->ae_flags; *p != NUL; )
 	{
 	    prevp = p;
 	    flag = get_affitem(affile->af_flagtype, &p);
-	    if (flag == affile->af_comppermit || flag == affile->af_compforbid)
+	    اگر (flag == affile->af_comppermit || flag == affile->af_compforbid)
 	    {
 		STRMOVE(prevp, p);
 		p = prevp;
-		if (flag == affile->af_comppermit)
-		    entry->ae_comppermit = TRUE;
-		else
-		    entry->ae_compforbid = TRUE;
+		اگر (flag == affile->af_comppermit)
+		    اندراج_2->ae_comppermit = TRUE;
+		ورنہ
+		    اندراج_2->ae_compforbid = TRUE;
 	    }
-	    if (affile->af_flagtype == AFT_NUM && *p == ',')
+	    اگر (affile->af_flagtype == AFT_عدد && *p == ',')
 		++p;
 	}
-	if (*entry->ae_flags == NUL)
-	    entry->ae_flags = NULL;	// nothing left
+	اگر (*اندراج_2->ae_flags == NUL)
+	    اندراج_2->ae_flags = تہی;	// nothing left
     }
 }
 
 /*
  * Return TRUE if "s" is the name of an info item in the affix file.
  */
-    static int
-spell_info_item(char_u *s)
+    ساکن صحیح
+spell_info_شے(char_u *s)
 {
-    return STRCMP(s, "NAME") == 0
+    واپس STRCMP(s, "NAME") == 0
 	|| STRCMP(s, "HOME") == 0
 	|| STRCMP(s, "VERSION") == 0
 	|| STRCMP(s, "AUTHOR") == 0
@@ -3222,33 +3222,33 @@ spell_info_item(char_u *s)
  * Turn an affix flag name into a number, according to the FLAG type.
  * returns zero for failure.
  */
-    static unsigned
+    ساکن غیرعلامتی
 affitem2flag(
-    int		flagtype,
-    char_u	*item,
+    صحیح		flagtype,
+    char_u	*شے,
     char_u	*fname,
-    int		lnum)
+    صحیح		lnum)
 {
-    unsigned	res;
-    char_u	*p = item;
+    غیرعلامتی	res;
+    char_u	*p = شے;
 
     res = get_affitem(flagtype, &p);
-    if (res == 0)
+    اگر (res == 0)
     {
-	if (flagtype == AFT_NUM)
+	اگر (flagtype == AFT_عدد)
 	    smsg(_("Flag is not a number in %s line %d: %s"),
-							   fname, lnum, item);
-	else
+							   fname, lnum, شے);
+	ورنہ
 	    smsg(_("Illegal flag in %s line %d: %s"),
-							   fname, lnum, item);
+							   fname, lnum, شے);
     }
-    if (*p != NUL)
+    اگر (*p != NUL)
     {
-	smsg(_(e_affname), fname, lnum, item);
-	return 0;
+	smsg(_(e_affname), fname, lnum, شے);
+	واپس 0;
     }
 
-    return res;
+    واپس res;
 }
 
 /*
@@ -3256,34 +3256,34 @@ affitem2flag(
  * Returns ZERO_FLAG for "0".
  * Returns zero for an error, still advances the pointer then.
  */
-    static unsigned
-get_affitem(int flagtype, char_u **pp)
+    ساکن غیرعلامتی
+get_affitem(صحیح flagtype, char_u **pp)
 {
-    int		res;
+    صحیح		res;
 
-    if (flagtype == AFT_NUM)
+    اگر (flagtype == AFT_عدد)
     {
-	if (!VIM_ISDIGIT(**pp))
+	اگر (!VIM_ISDIGIT(**pp))
 	{
 	    ++*pp;	// always advance, avoid getting stuck
-	    return 0;
+	    واپس 0;
 	}
 	res = getdigits(pp);
-	if (res == 0)
+	اگر (res == 0)
 	    res = ZERO_FLAG;
     }
-    else
+    ورنہ
     {
 	res = mb_ptr2char_adv(pp);
-	if (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
+	اگر (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
 						 && res >= 'A' && res <= 'Z'))
 	{
-	    if (**pp == NUL)
-		return 0;
+	    اگر (**pp == NUL)
+		واپس 0;
 	    res = mb_ptr2char_adv(pp) + (res << 16);
 	}
     }
-    return res;
+    واپس res;
 }
 
 /*
@@ -3292,7 +3292,7 @@ get_affitem(int flagtype, char_u **pp)
  * The processing involves changing the affix names to ID numbers, so that
  * they fit in one byte.
  */
-    static void
+    ساکن خالی
 process_compflags(
     spellinfo_T	*spin,
     afffile_T	*aff,
@@ -3300,24 +3300,24 @@ process_compflags(
 {
     char_u	*p;
     char_u	*prevp;
-    unsigned	flag;
+    غیرعلامتی	flag;
     compitem_T	*ci;
-    int		id;
-    int		len;
+    صحیح		id;
+    صحیح		len;
     char_u	*tp;
-    char_u	key[AH_KEY_LEN];
+    char_u	کلید[AH_کلید_LEN];
     hashitem_T	*hi;
 
     // Make room for the old and the new compflags, concatenated with a / in
     // between.  Processing it makes it shorter, but we don't know by how
     // much, thus allocate the maximum.
-    len = (int)STRLEN(compflags) + 1;
-    if (spin->si_compflags != NULL)
-	len += (int)STRLEN(spin->si_compflags) + 1;
+    len = (صحیح)STRLEN(compflags) + 1;
+    اگر (spin->si_compflags != تہی)
+	len += (صحیح)STRLEN(spin->si_compflags) + 1;
     p = getroom(spin, len, FALSE);
-    if (p == NULL)
-	return;
-    if (spin->si_compflags != NULL)
+    اگر (p == تہی)
+	واپس;
+    اگر (spin->si_compflags != تہی)
     {
 	STRCPY(p, spin->si_compflags);
 	STRCAT(p, "/");
@@ -3325,44 +3325,44 @@ process_compflags(
     spin->si_compflags = p;
     tp = p + STRLEN(p);
 
-    for (p = compflags; *p != NUL; )
+    برائے (p = compflags; *p != NUL; )
     {
-	if (vim_strchr((char_u *)"/?*+[]", *p) != NULL)
+	اگر (vim_strchr((char_u *)"/?*+[]", *p) != تہی)
 	    // Copy non-flag characters directly.
 	    *tp++ = *p++;
-	else
+	ورنہ
 	{
 	    // First get the flag number, also checks validity.
 	    prevp = p;
 	    flag = get_affitem(aff->af_flagtype, &p);
-	    if (flag != 0)
+	    اگر (flag != 0)
 	    {
 		// Find the flag in the hashtable.  If it was used before, use
 		// the existing ID.  Otherwise add a new entry.
-		vim_strncpy(key, prevp, p - prevp);
-		hi = hash_find(&aff->af_comp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(کلید, prevp, p - prevp);
+		hi = hash_ڈھونڈو(&aff->af_comp, کلید);
+		اگر (!HASHITEM_خالی_خانے(hi))
 		    id = HI2CI(hi)->ci_newID;
-		else
+		ورنہ
 		{
-		    ci = (compitem_T *)getroom(spin, sizeof(compitem_T), TRUE);
-		    if (ci == NULL)
-			break;
-		    STRCPY(ci->ci_key, key);
+		    ci = (compitem_T *)getroom(spin, حجم(compitem_T), TRUE);
+		    اگر (ci == تہی)
+			توڑو;
+		    STRCPY(ci->ci_کلید, کلید);
 		    ci->ci_flag = flag;
 		    // Avoid using a flag ID that has a special meaning in a
 		    // regexp (also inside []).
-		    do
+		    کرو
 		    {
 			check_renumber(spin);
 			id = spin->si_newcompID--;
-		    } while (vim_strchr((char_u *)"/?*+[]\\-^", id) != NULL);
+		    } جب (vim_strchr((char_u *)"/?*+[]\\-^", id) != تہی);
 		    ci->ci_newID = id;
-		    hash_add(&aff->af_comp, ci->ci_key, "spelling");
+		    hash_جوڑو(&aff->af_comp, ci->ci_کلید, "spelling");
 		}
 		*tp++ = id;
 	    }
-	    if (aff->af_flagtype == AFT_NUM && *p == ',')
+	    اگر (aff->af_flagtype == AFT_عدد && *p == ',')
 		++p;
 	}
     }
@@ -3376,10 +3376,10 @@ process_compflags(
  * using two bytes for utf-8.  When the 0-127 range is used up go to 128-255.
  * When that is used up an error message is given.
  */
-    static void
+    ساکن خالی
 check_renumber(spellinfo_T *spin)
 {
-    if (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
+    اگر (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
     {
 	spin->si_newprefID = 127;
 	spin->si_newcompID = 255;
@@ -3390,82 +3390,82 @@ check_renumber(spellinfo_T *spin)
  * Append one affix or compound ID to "store_afflist".
  * Returns FAIL when this would overrun the fixed-size buffer.
  */
-    static int
-store_afflist_add(
+    ساکن صحیح
+store_afflist_جوڑو(
     char_u	*store_afflist,
-    int		*cntp,
-    int		id)
+    صحیح		*cntp,
+    صحیح		id)
 {
-    if (*cntp >= MAXWLEN - 1)
+    اگر (*cntp >= MAXWLEN - 1)
     {
 	emsg(_(e_too_many_postponed_prefixes_spell));
-	return FAIL;
+	واپس FAIL;
     }
     store_afflist[(*cntp)++] = id;
     store_afflist[*cntp] = NUL;
-    return OK;
+    واپس OK;
 }
 
 /*
  * Return TRUE if flag "flag" appears in affix list "afflist".
  */
-    static int
-flag_in_afflist(int flagtype, char_u *afflist, unsigned flag)
+    ساکن صحیح
+flag_اندر_afflist(صحیح flagtype, char_u *afflist, غیرعلامتی flag)
 {
     char_u	*p;
-    unsigned	n;
+    غیرعلامتی	n;
 
-    switch (flagtype)
+    انتخاب (flagtype)
     {
-	case AFT_CHAR:
-	    return vim_strchr(afflist, flag) != NULL;
+	حالت AFT_CHAR:
+	    واپس vim_strchr(afflist, flag) != تہی;
 
-	case AFT_CAPLONG:
-	case AFT_LONG:
-	    for (p = afflist; *p != NUL; )
+	حالت AFT_CAPLONG:
+	حالت AFT_LONG:
+	    برائے (p = afflist; *p != NUL; )
 	    {
 		n = mb_ptr2char_adv(&p);
-		if ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
+		اگر ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
 								 && *p != NUL)
 		    n = mb_ptr2char_adv(&p) + (n << 16);
-		if (n == flag)
-		    return TRUE;
+		اگر (n == flag)
+		    واپس TRUE;
 	    }
-	    break;
+	    توڑو;
 
-	case AFT_NUM:
-	    for (p = afflist; *p != NUL; )
+	حالت AFT_عدد:
+	    برائے (p = afflist; *p != NUL; )
 	    {
 		n = getdigits(&p);
-		if (n == 0)
+		اگر (n == 0)
 		    n = ZERO_FLAG;
-		if (n == flag)
-		    return TRUE;
-		if (*p != NUL)	// skip over comma
+		اگر (n == flag)
+		    واپس TRUE;
+		اگر (*p != NUL)	// skip over comma
 		    ++p;
 	    }
-	    break;
+	    توڑو;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
  * Give a warning when "spinval" and "affval" numbers are set and not the same.
  */
-    static void
-aff_check_number(int spinval, int affval, char *name)
+    ساکن خالی
+aff_check_نمبر(صحیح spinval, صحیح affval, حرف *name)
 {
-    if (spinval != 0 && spinval != affval)
+    اگر (spinval != 0 && spinval != affval)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
 /*
  * Give a warning when "spinval" and "affval" strings are set and not the same.
  */
-    static void
-aff_check_string(char_u *spinval, char_u *affval, char *name)
+    ساکن خالی
+aff_check_string(char_u *spinval, char_u *affval, حرف *name)
 {
-    if (spinval != NULL && STRCMP(spinval, affval) != 0)
+    اگر (spinval != تہی && STRCMP(spinval, affval) != 0)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
@@ -3473,78 +3473,78 @@ aff_check_string(char_u *spinval, char_u *affval, char *name)
  * Return TRUE if strings "s1" and "s2" are equal.  Also consider both being
  * NULL as equal.
  */
-    static int
+    ساکن صحیح
 str_equal(char_u *s1, char_u *s2)
 {
-    if (s1 == NULL || s2 == NULL)
-	return s1 == s2;
-    return STRCMP(s1, s2) == 0;
+    اگر (s1 == تہی || s2 == تہی)
+	واپس s1 == s2;
+    واپس STRCMP(s1, s2) == 0;
 }
 
 /*
  * Add a from-to item to "gap".  Used for REP and SAL items.
  * They are stored case-folded.
  */
-    static void
-add_fromto(
+    ساکن خالی
+جوڑو_fromto(
     spellinfo_T	*spin,
     garray_T	*gap,
     char_u	*from,
-    char_u	*to)
+    char_u	*مقصد)
 {
     fromto_T	*ftp;
-    char_u	word[MAXWLEN];
+    char_u	لفظ[MAXWLEN];
 
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    اگر (ga_grow(gap, 1) == FAIL)
+	واپس;
 
-    ftp = ((fromto_T *)gap->ga_data) + gap->ga_len;
-    (void)spell_casefold(curwin, from, (int)STRLEN(from), word, MAXWLEN);
-    ftp->ft_from = getroom_save(spin, word);
-    (void)spell_casefold(curwin, to, (int)STRLEN(to), word, MAXWLEN);
-    ftp->ft_to = getroom_save(spin, word);
+    ftp = ((fromto_T *)gap->ga_ڈیٹا) + gap->ga_len;
+    (خالی)spell_casefold(curwin, from, (صحیح)STRLEN(from), لفظ, MAXWLEN);
+    ftp->ft_from = getroom_save(spin, لفظ);
+    (خالی)spell_casefold(curwin, مقصد, (صحیح)STRLEN(مقصد), لفظ, MAXWLEN);
+    ftp->ft_مقصد = getroom_save(spin, لفظ);
     ++gap->ga_len;
 }
 
 /*
  * Convert a boolean argument in a SAL line to TRUE or FALSE;
  */
-    static int
-sal_to_bool(char_u *s)
+    ساکن صحیح
+sal_مقصد_bool(char_u *s)
 {
-    return STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
+    واپس STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
 }
 
 /*
  * Free the structure filled by spell_read_aff().
  */
-    static void
+    ساکن خالی
 spell_free_aff(afffile_T *aff)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
-    int		todo;
+    صحیح		todo;
     affheader_T	*ah;
     affentry_T	*ae;
 
     vim_free(aff->af_enc);
 
     // All this trouble to free the "ae_prog" items...
-    for (ht = &aff->af_pref; ; ht = &aff->af_suff)
+    برائے (ht = &aff->af_pref; ; ht = &aff->af_suff)
     {
-	todo = (int)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	todo = (صحیح)ht->ht_مستعمل;
+	FOR_ALL_HASHTAB_اشیاء(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    اگر (!HASHITEM_خالی_خانے(hi))
 	    {
 		--todo;
 		ah = HI2AH(hi);
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		برائے (ae = ah->ah_پہلا; ae != تہی; ae = ae->ae_اگلا)
 		    vim_regfree(ae->ae_prog);
 	    }
 	}
-	if (ht == &aff->af_suff)
-	    break;
+	اگر (ht == &aff->af_suff)
+	    توڑو;
     }
 
     hash_clear(&aff->af_pref);
@@ -3556,220 +3556,220 @@ spell_free_aff(afffile_T *aff)
  * Read dictionary file "fname".
  * Returns OK or FAIL;
  */
-    static int
+    ساکن صحیح
 spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 {
     hashtab_T	ht;
-    char_u	line[MAXLINELEN];
+    char_u	سطر[MAXLINELEN];
     char_u	*p;
     char_u	*afflist;
     char_u	store_afflist[MAXWLEN];
-    int		pfxlen;
-    int		totlen;
-    int		need_affix;
+    صحیح		pfxlen;
+    صحیح		totlen;
+    صحیح		need_affix;
     char_u	*dw;
     char_u	*pc;
     char_u	*w;
-    int		l;
+    صحیح		l;
     hash_T	hash;
     hashitem_T	*hi;
     FILE	*fd;
-    int		lnum = 1;
-    int		non_ascii = 0;
-    int		retval = OK;
-    char_u	message[MAXLINELEN + MAXWLEN];
-    int		flags;
-    int		duplicate = 0;
-    time_T	last_msg_time = 0;
+    صحیح		lnum = 1;
+    صحیح		non_ascii = 0;
+    صحیح		retval = OK;
+    char_u	پیغام_2[MAXLINELEN + MAXWLEN];
+    صحیح		flags;
+    صحیح		duplicate = 0;
+    وقت_T	آخری_پیغام_وقت = 0;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "r");
+    اگر (fd == تہی)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	واپس FAIL;
     }
 
     // The hashtable is only used to detect duplicated words.
     hash_init(&ht);
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((حرف *)IObuff, IOSIZE,
 				  _("Reading dictionary file %s..."), fname);
-    spell_message(spin, IObuff);
+    spell_پیغام(spin, IObuff);
 
     // start with a message for the first line
-    spin->si_msg_count = 999999;
+    spin->si_پیغام_گنتی = 999999;
 
     // Read and ignore the first line: word count.
-    if (vim_fgets(line, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(line)))
-	semsg(_(e_no_word_count_in_str), fname);
+    اگر (vim_fgets(سطر, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(سطر)))
+	semsg(_(e_no_لفظ_گنتی_اندر_str), fname);
 
     /*
      * Read all the lines in the file one by one.
      * The words are converted to 'encoding' here, before being added to
      * the hashtable.
      */
-    while (!vim_fgets(line, MAXLINELEN, fd) && !got_int)
+    جب (!vim_fgets(سطر, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	سطر_breakcheck();
 	++lnum;
-	if (line[0] == '#' || line[0] == '/')
-	    continue;	// comment line
+	اگر (سطر[0] == '#' || سطر[0] == '/')
+	    جاری;	// comment line
 
 	// Remove CR, LF and white space from the end.  White space halfway
 	// the word is kept to allow e.g., "et al.".
-	l = (int)STRLEN(line);
-	while (l > 0 && line[l - 1] <= ' ')
+	l = (صحیح)STRLEN(سطر);
+	جب (l > 0 && سطر[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty line
-	line[l] = NUL;
+	اگر (l == 0)
+	    جاری;	// empty line
+	سطر[l] = NUL;
 
 	// Convert from "SET" to 'encoding' when needed.
-	if (spin->si_conv.vc_type != CONV_NONE)
+	اگر (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, line, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, سطر, تہی);
+	    اگر (pc == تہی)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
-						       fname, lnum, line);
-		continue;
+						       fname, lnum, سطر);
+		جاری;
 	    }
 	    w = pc;
 	}
-	else
+	ورنہ
 	{
-	    pc = NULL;
-	    w = line;
+	    pc = تہی;
+	    w = سطر;
 	}
 
 	// Truncate the word at the "/", set "afflist" to what follows.
 	// Replace "\/" by "/" and "\\" by "\".
-	afflist = NULL;
-	for (p = w; *p != NUL; MB_PTR_ADV(p))
+	afflist = تہی;
+	برائے (p = w; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
+	    اگر (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
 		STRMOVE(p, p + 1);
-	    else if (*p == '/')
+	    ورنہ اگر (*p == '/')
 	    {
 		*p = NUL;
 		afflist = p + 1;
-		break;
+		توڑو;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(w))
+	اگر (spin->si_ascii && has_non_ascii(w))
 	{
 	    ++non_ascii;
 	    vim_free(pc);
-	    continue;
+	    جاری;
 	}
 
 	// This takes time, print a message every 10000 words, but not more
 	// often than once per second.
-	if (spin->si_verbose && spin->si_msg_count > 10000)
+	اگر (spin->si_verbose && spin->si_پیغام_گنتی > 10000)
 	{
-	    spin->si_msg_count = 0;
-	    if (vim_time() > last_msg_time)
+	    spin->si_پیغام_گنتی = 0;
+	    اگر (vim_وقت() > آخری_پیغام_وقت)
 	    {
-		last_msg_time = vim_time();
-		vim_snprintf((char *)message, sizeof(message),
+		آخری_پیغام_وقت = vim_وقت();
+		vim_snprintf((حرف *)پیغام_2, حجم(پیغام_2),
 			_("line %6d, word %6ld - %s"),
 			   lnum, spin->si_foldwcount + spin->si_keepwcount, w);
-		msg_start();
-		msg_outtrans_long_attr(message, 0);
-		msg_clr_eos();
-		msg_didout = FALSE;
-		msg_col = 0;
-		out_flush();
+		پیغام_آغاز();
+		پیغام_outtrans_long_attr(پیغام_2, 0);
+		پیغام_clr_eos();
+		پیغام_didout = FALSE;
+		پیغام_ستون = 0;
+		برآمد_flush();
 	    }
 	}
 
 	// Store the word in the hashtable to be able to find duplicates.
 	dw = getroom_save(spin, w);
-	if (dw == NULL)
+	اگر (dw == تہی)
 	{
 	    retval = FAIL;
 	    vim_free(pc);
-	    break;
+	    توڑو;
 	}
 
 	hash = hash_hash(dw);
 	hi = hash_lookup(&ht, dw, hash);
-	if (!HASHITEM_EMPTY(hi))
+	اگر (!HASHITEM_خالی_خانے(hi))
 	{
-	    if (p_verbose > 0)
+	    اگر (p_verbose > 0)
 		smsg(_("Duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
-	    else if (duplicate == 0)
+	    ورنہ اگر (duplicate == 0)
 		smsg(_("First duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
 	    ++duplicate;
 	}
-	else
-	    hash_add_item(&ht, hi, dw, hash);
+	ورنہ
+	    hash_جوڑو_شے(&ht, hi, dw, hash);
 
 	flags = 0;
 	store_afflist[0] = NUL;
 	pfxlen = 0;
 	totlen = 0;
 	need_affix = FALSE;
-	if (afflist != NULL)
+	اگر (afflist != تہی)
 	{
 	    // Extract flags from the affix list.
 	    flags |= get_affix_flags(affile, afflist);
 
-	    if (affile->af_needaffix != 0 && flag_in_afflist(
+	    اگر (affile->af_needaffix != 0 && flag_اندر_afflist(
 			  affile->af_flagtype, afflist, affile->af_needaffix))
 		need_affix = TRUE;
 
-	    if (affile->af_pfxpostpone)
+	    اگر (affile->af_pfxpostpone)
 	    {
 		// Need to store the list of prefix IDs with the word.
-		if (get_pfxlist(affile, afflist, store_afflist, &totlen)
+		اگر (get_pfxlist(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    توڑو;
 		}
 		pfxlen = totlen;
 	    }
 
-	    if (spin->si_compflags != NULL)
+	    اگر (spin->si_compflags != تہی)
 	    {
 		// Need to store the list of compound flags with the word.
 		// Concatenate them to the list of prefix IDs.
-		if (get_compflags(affile, afflist, store_afflist, &totlen)
+		اگر (get_compflags(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    توڑو;
 		}
 	    }
 	}
 
 	// Add the word to the word tree(s).
-	if (store_word(spin, dw, flags, spin->si_region,
+	اگر (store_لفظ(spin, dw, flags, spin->si_region,
 					   store_afflist, need_affix) == FAIL)
 	    retval = FAIL;
 
-	if (afflist != NULL)
+	اگر (afflist != تہی)
 	{
 	    // Find all matching suffixes and add the resulting words.
 	    // Additionally do matching prefixes that combine.
-	    if (store_aff_word(spin, dw, afflist, affile,
+	    اگر (store_aff_لفظ(spin, dw, afflist, affile,
 			   &affile->af_suff, &affile->af_pref,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 
 	    // Find all matching prefixes and add the resulting words.
-	    if (store_aff_word(spin, dw, afflist, affile,
-			  &affile->af_pref, NULL,
+	    اگر (store_aff_لفظ(spin, dw, afflist, affile,
+			  &affile->af_pref, تہی,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 	}
@@ -3777,45 +3777,45 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 	vim_free(pc);
     }
 
-    if (duplicate > 0)
+    اگر (duplicate > 0)
 	smsg(_("%d duplicate word(s) in %s"), duplicate, fname);
-    if (spin->si_ascii && non_ascii > 0)
+    اگر (spin->si_ascii && non_ascii > 0)
 	smsg(_("Ignored %d word(s) with non-ASCII characters in %s"),
 							    non_ascii, fname);
     hash_clear(&ht);
 
     fclose(fd);
-    return retval;
+    واپس retval;
 }
 
 /*
  * Check for affix flags in "afflist" that are turned into word flags.
  * Return WF_ flags.
  */
-    static int
+    ساکن صحیح
 get_affix_flags(afffile_T *affile, char_u *afflist)
 {
-    int		flags = 0;
+    صحیح		flags = 0;
 
-    if (affile->af_keepcase != 0 && flag_in_afflist(
+    اگر (affile->af_keepcase != 0 && flag_اندر_afflist(
 			   affile->af_flagtype, afflist, affile->af_keepcase))
 	flags |= WF_KEEPCAP | WF_FIXCAP;
-    if (affile->af_rare != 0 && flag_in_afflist(
+    اگر (affile->af_rare != 0 && flag_اندر_afflist(
 			       affile->af_flagtype, afflist, affile->af_rare))
 	flags |= WF_RARE;
-    if (affile->af_bad != 0 && flag_in_afflist(
+    اگر (affile->af_bad != 0 && flag_اندر_afflist(
 				affile->af_flagtype, afflist, affile->af_bad))
 	flags |= WF_BANNED;
-    if (affile->af_needcomp != 0 && flag_in_afflist(
+    اگر (affile->af_needcomp != 0 && flag_اندر_afflist(
 			   affile->af_flagtype, afflist, affile->af_needcomp))
 	flags |= WF_NEEDCOMP;
-    if (affile->af_comproot != 0 && flag_in_afflist(
+    اگر (affile->af_comproot != 0 && flag_اندر_afflist(
 			   affile->af_flagtype, afflist, affile->af_comproot))
 	flags |= WF_COMPROOT;
-    if (affile->af_nosuggest != 0 && flag_in_afflist(
+    اگر (affile->af_nosuggest != 0 && flag_اندر_afflist(
 			  affile->af_flagtype, afflist, affile->af_nosuggest))
 	flags |= WF_NOSUGGEST;
-    return flags;
+    واپس flags;
 }
 
 /*
@@ -3824,40 +3824,40 @@ get_affix_flags(afffile_T *affile, char_u *afflist)
  * Put the resulting flags in "store_afflist[MAXWLEN]" with a terminating NUL.
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    ساکن صحیح
 get_pfxlist(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    صحیح		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    int		id;
-    char_u	key[AH_KEY_LEN];
+    صحیح		id;
+    char_u	کلید[AH_کلید_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    برائے (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	اگر (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a postponed prefix flag if it appears in "af_pref"
 	    // and its ID is not zero.
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_pref, key);
-	    if (!HASHITEM_EMPTY(hi))
+	    vim_strncpy(کلید, prevp, p - prevp);
+	    hi = hash_ڈھونڈو(&affile->af_pref, کلید);
+	    اگر (!HASHITEM_خالی_خانے(hi))
 	    {
 		id = HI2AH(hi)->ah_newID;
-		if (id != 0 && store_afflist_add(store_afflist, cntp, id) == FAIL)
-		    return FAIL;
+		اگر (id != 0 && store_afflist_جوڑو(store_afflist, cntp, id) == FAIL)
+		    واپس FAIL;
 	    }
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	اگر (affile->af_flagtype == AFT_عدد && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -3866,36 +3866,36 @@ get_pfxlist(
  * Puts the flags in "store_afflist[]".
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    ساکن صحیح
 get_compflags(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    صحیح		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    char_u	key[AH_KEY_LEN];
+    char_u	کلید[AH_کلید_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    برائے (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	اگر (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a compound flag if it appears in "af_comp".
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_comp, key);
-	    if (!HASHITEM_EMPTY(hi)
-		    && store_afflist_add(store_afflist, cntp,
+	    vim_strncpy(کلید, prevp, p - prevp);
+	    hi = hash_ڈھونڈو(&affile->af_comp, کلید);
+	    اگر (!HASHITEM_خالی_خانے(hi)
+		    && store_afflist_جوڑو(store_afflist, cntp,
 					      HI2CI(hi)->ci_newID) == FAIL)
-		return FAIL;
+		واپس FAIL;
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	اگر (affile->af_flagtype == AFT_عدد && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -3907,53 +3907,53 @@ get_compflags(
  *
  * Returns FAIL when out of memory.
  */
-    static int
-store_aff_word(
+    ساکن صحیح
+store_aff_لفظ(
     spellinfo_T	*spin,		// spell info
-    char_u	*word,		// basic word start
+    char_u	*لفظ,		// basic word start
     char_u	*afflist,	// list of names of supported affixes
     afffile_T	*affile,
     hashtab_T	*ht,
     hashtab_T	*xht,
-    int		condit,		// CONDIT_SUF et al.
-    int		flags,		// flags for the word
+    صحیح		condit,		// CONDIT_SUF et al.
+    صحیح		flags,		// flags for the word
     char_u	*pfxlist,	// list of prefix IDs
-    int		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
+    صحیح		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
 				// is compound flags
 {
-    int		todo;
+    صحیح		todo;
     hashitem_T	*hi;
     affheader_T	*ah;
     affentry_T	*ae;
     char_u	newword[MAXWLEN];
-    int		retval = OK;
-    int		i, j;
+    صحیح		retval = OK;
+    صحیح		i, j;
     char_u	*p;
-    int		use_flags;
+    صحیح		use_flags;
     char_u	*use_pfxlist;
-    int		use_pfxlen;
-    int		need_affix;
+    صحیح		use_pfxlen;
+    صحیح		need_affix;
     char_u	store_afflist[MAXWLEN];
     char_u	pfx_pfxlist[MAXWLEN];
-    size_t	wordlen = STRLEN(word);
-    int		use_condit;
+    size_t	wordlen = STRLEN(لفظ);
+    صحیح		use_condit;
 
-    todo = (int)ht->ht_used;
-    for (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
+    todo = (صحیح)ht->ht_مستعمل;
+    برائے (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	اگر (!HASHITEM_خالی_خانے(hi))
 	{
 	    --todo;
 	    ah = HI2AH(hi);
 
 	    // Check that the affix combines, if required, and that the word
 	    // supports this affix.
-	    if (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
-		    && flag_in_afflist(affile->af_flagtype, afflist,
+	    اگر (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
+		    && flag_اندر_afflist(affile->af_flagtype, afflist,
 								 ah->ah_flag))
 	    {
 		// Loop over all affix entries with this name.
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		برائے (ae = ah->ah_پہلا; ae != تہی; ae = ae->ae_اگلا)
 		{
 		    // Check the condition.  It's not logical to match case
 		    // here, but it is required for compatibility with
@@ -3965,62 +3965,62 @@ store_aff_word(
 		    // When a previously added affix had CIRCUMFIX this one
 		    // must have it too, if it had not then this one must not
 		    // have one either.
-		    if ((xht != NULL || !affile->af_pfxpostpone
-				|| ae->ae_chop != NULL
-				|| ae->ae_flags != NULL)
-			    && (ae->ae_chop == NULL
+		    اگر ((xht != تہی || !affile->af_pfxpostpone
+				|| ae->ae_chop != تہی
+				|| ae->ae_flags != تہی)
+			    && (ae->ae_chop == تہی
 				|| STRLEN(ae->ae_chop) < wordlen)
-			    && (ae->ae_prog == NULL
+			    && (ae->ae_prog == تہی
 				|| vim_regexec_prog(&ae->ae_prog, FALSE,
-							    word, (colnr_T)0))
+							    لفظ, (colnr_T)0))
 			    && (((condit & CONDIT_CFIX) == 0)
 				== ((condit & CONDIT_AFF) == 0
-				    || ae->ae_flags == NULL
-				    || !flag_in_afflist(affile->af_flagtype,
+				    || ae->ae_flags == تہی
+				    || !flag_اندر_afflist(affile->af_flagtype,
 					ae->ae_flags, affile->af_circumfix))))
 		    {
 			// Match.  Remove the chop and add the affix.
-			if (xht == NULL)
+			اگر (xht == تہی)
 			{
 			    // prefix: chop/add at the start of the word
-			    if (ae->ae_add == NULL)
+			    اگر (ae->ae_جوڑو == تہی)
 				*newword = NUL;
-			    else
-				vim_strncpy(newword, ae->ae_add, MAXWLEN - 1);
-			    p = word;
-			    if (ae->ae_chop != NULL)
+			    ورنہ
+				vim_strncpy(newword, ae->ae_جوڑو, MAXWLEN - 1);
+			    p = لفظ;
+			    اگر (ae->ae_chop != تہی)
 			    {
 				// Skip chop string.
-				if (has_mbyte)
+				اگر (has_mbyte)
 				{
 				    i = mb_charlen(ae->ae_chop);
-				    for ( ; i > 0; --i)
+				    برائے ( ; i > 0; --i)
 					MB_PTR_ADV(p);
 				}
-				else
+				ورنہ
 				    p += STRLEN(ae->ae_chop);
 			    }
 			    // Note: this silently truncates the buffer, but this should
 			    // not happen in practice
 			    STRNCAT(newword, p, MAXWLEN - STRLEN(newword) - 1);
 			}
-			else
+			ورنہ
 			{
 			    // suffix: chop/add at the end of the word
-			    vim_strncpy(newword, word, MAXWLEN - 1);
-			    if (ae->ae_chop != NULL)
+			    vim_strncpy(newword, لفظ, MAXWLEN - 1);
+			    اگر (ae->ae_chop != تہی)
 			    {
 				// Remove chop string.
 				p = newword + STRLEN(newword);
-				i = (int)MB_CHARLEN(ae->ae_chop);
-				for ( ; i > 0; --i)
-				    MB_PTR_BACK(newword, p);
+				i = (صحیح)MB_CHARLEN(ae->ae_chop);
+				برائے ( ; i > 0; --i)
+				    MB_PTR_عقب(newword, p);
 				*p = NUL;
 			    }
-			    if (ae->ae_add != NULL)
+			    اگر (ae->ae_جوڑو != تہی)
 				// Note: this silently truncates the buffer, but this should
 				// not happen in practice
-				STRNCAT(newword, ae->ae_add, MAXWLEN - STRLEN(newword) - 1);
+				STRNCAT(newword, ae->ae_جوڑو, MAXWLEN - STRLEN(newword) - 1);
 			}
 
 			use_flags = flags;
@@ -4028,12 +4028,12 @@ store_aff_word(
 			use_pfxlen = pfxlen;
 			need_affix = FALSE;
 			use_condit = condit | CONDIT_COMB | CONDIT_AFF;
-			if (ae->ae_flags != NULL)
+			اگر (ae->ae_flags != تہی)
 			{
 			    // Extract flags from the affix list.
 			    use_flags |= get_affix_flags(affile, ae->ae_flags);
 
-			    if (affile->af_needaffix != 0 && flag_in_afflist(
+			    اگر (affile->af_needaffix != 0 && flag_اندر_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_needaffix))
 				need_affix = TRUE;
@@ -4041,102 +4041,102 @@ store_aff_word(
 			    // When there is a CIRCUMFIX flag the other affix
 			    // must also have it and we don't add the word
 			    // with one affix.
-			    if (affile->af_circumfix != 0 && flag_in_afflist(
+			    اگر (affile->af_circumfix != 0 && flag_اندر_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_circumfix))
 			    {
 				use_condit |= CONDIT_CFIX;
-				if ((condit & CONDIT_CFIX) == 0)
+				اگر ((condit & CONDIT_CFIX) == 0)
 				    need_affix = TRUE;
 			    }
 
-			    if (affile->af_pfxpostpone
-						|| spin->si_compflags != NULL)
+			    اگر (affile->af_pfxpostpone
+						|| spin->si_compflags != تہی)
 			    {
-				int listlen = 0;
+				صحیح listlen = 0;
 
-				if (affile->af_pfxpostpone)
+				اگر (affile->af_pfxpostpone)
 				{
 				    // Get prefix IDS from the affix list.
-				    if (get_pfxlist(affile, ae->ae_flags,
+				    اگر (get_pfxlist(affile, ae->ae_flags,
 						    store_afflist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					توڑو;
 				    }
 				    use_pfxlen = listlen;
 				}
-				else
+				ورنہ
 				    use_pfxlen = 0;
 				use_pfxlist = store_afflist;
 
 				// Combine the prefix IDs. Avoid adding the
 				// same ID twice.
-				for (i = 0; i < pfxlen; ++i)
+				برائے (i = 0; i < pfxlen; ++i)
 				{
-				    for (j = 0; j < use_pfxlen; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (j == use_pfxlen
-					    && store_afflist_add(use_pfxlist,
+				    برائے (j = 0; j < use_pfxlen; ++j)
+					اگر (pfxlist[i] == use_pfxlist[j])
+					    توڑو;
+				    اگر (j == use_pfxlen
+					    && store_afflist_جوڑو(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					توڑو;
 				    }
 				    use_pfxlen = listlen;
 				}
-				if (retval == FAIL)
-				    break;
+				اگر (retval == FAIL)
+				    توڑو;
 
-				if (spin->si_compflags != NULL)
+				اگر (spin->si_compflags != تہی)
 				    // Get compound IDS from the affix list.
-				    if (get_compflags(affile, ae->ae_flags,
+				    اگر (get_compflags(affile, ae->ae_flags,
 						      use_pfxlist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					توڑو;
 				    }
-				if (retval == FAIL)
-				    break;
+				اگر (retval == FAIL)
+				    توڑو;
 
 				// Combine the list of compound flags.
 				// Concatenate them to the prefix IDs list.
 				// Avoid adding the same ID twice.
-				for (i = pfxlen; pfxlist[i] != NUL; ++i)
+				برائے (i = pfxlen; pfxlist[i] != NUL; ++i)
 				{
-				    for (j = use_pfxlen;
+				    برائے (j = use_pfxlen;
 						   use_pfxlist[j] != NUL; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (use_pfxlist[j] == NUL
-					    && store_afflist_add(use_pfxlist,
+					اگر (pfxlist[i] == use_pfxlist[j])
+					    توڑو;
+				    اگر (use_pfxlist[j] == NUL
+					    && store_afflist_جوڑو(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					توڑو;
 				    }
 				}
-				if (retval == FAIL)
-				    break;
+				اگر (retval == FAIL)
+				    توڑو;
 			    }
 			}
 
 			// Obey a "COMPOUNDFORBIDFLAG" of the affix: don't
 			// use the compound flags.
-			if (use_pfxlist != NULL && ae->ae_compforbid)
+			اگر (use_pfxlist != تہی && ae->ae_compforbid)
 			{
 			    vim_strncpy(pfx_pfxlist, use_pfxlist, use_pfxlen);
 			    use_pfxlist = pfx_pfxlist;
 			}
 
 			// When there are postponed prefixes...
-			if (spin->si_prefroot != NULL
-				&& spin->si_prefroot->wn_sibling != NULL)
+			اگر (spin->si_prefroot != تہی
+				&& spin->si_prefroot->wn_sibling != تہی)
 			{
 			    // ... add a flag to indicate an affix was used.
 			    use_flags |= WF_HAS_AFF;
@@ -4144,33 +4144,33 @@ store_aff_word(
 			    // ... don't use a prefix list if combining
 			    // affixes is not allowed.  But do use the
 			    // compound flags after them.
-			    if (!ah->ah_combine && use_pfxlist != NULL)
+			    اگر (!ah->ah_combine && use_pfxlist != تہی)
 				use_pfxlist += use_pfxlen;
 			}
 
 			// When compounding is supported and there is no
 			// "COMPOUNDPERMITFLAG" then forbid compounding on the
 			// side where the affix is applied.
-			if (spin->si_compflags != NULL && !ae->ae_comppermit)
+			اگر (spin->si_compflags != تہی && !ae->ae_comppermit)
 			{
-			    if (xht != NULL)
+			    اگر (xht != تہی)
 				use_flags |= WF_NOCOMPAFT;
-			    else
+			    ورنہ
 				use_flags |= WF_NOCOMPBEF;
 			}
 
 			// Store the modified word.
-			if (store_word(spin, newword, use_flags,
+			اگر (store_لفظ(spin, newword, use_flags,
 						 spin->si_region, use_pfxlist,
 							  need_affix) == FAIL)
 			    retval = FAIL;
 
 			// When added a prefix or a first suffix and the affix
 			// has flags may add a(nother) suffix.  RECURSIVE!
-			if ((condit & CONDIT_SUF) && ae->ae_flags != NULL)
-			    if (store_aff_word(spin, newword, ae->ae_flags,
+			اگر ((condit & CONDIT_SUF) && ae->ae_flags != تہی)
+			    اگر (store_aff_لفظ(spin, newword, ae->ae_flags,
 					affile, &affile->af_suff, xht,
-					   use_condit & (xht == NULL
+					   use_condit & (xht == تہی
 							? ~0 :  ~CONDIT_SUF),
 				      use_flags, use_pfxlist, pfxlen) == FAIL)
 				retval = FAIL;
@@ -4178,17 +4178,17 @@ store_aff_word(
 			// When added a suffix and combining is allowed also
 			// try adding a prefix additionally.  Both for the
 			// word flags and for the affix flags.  RECURSIVE!
-			if (xht != NULL && ah->ah_combine)
+			اگر (xht != تہی && ah->ah_combine)
 			{
-			    if (store_aff_word(spin, newword,
+			    اگر (store_aff_لفظ(spin, newword,
 					afflist, affile,
-					xht, NULL, use_condit,
+					xht, تہی, use_condit,
 					use_flags, use_pfxlist,
 					pfxlen) == FAIL
-				    || (ae->ae_flags != NULL
-					&& store_aff_word(spin, newword,
+				    || (ae->ae_flags != تہی
+					&& store_aff_لفظ(spin, newword,
 					    ae->ae_flags, affile,
-					    xht, NULL, use_condit,
+					    xht, تہی, use_condit,
 					    use_flags, use_pfxlist,
 					    pfxlen) == FAIL))
 				retval = FAIL;
@@ -4199,205 +4199,205 @@ store_aff_word(
 	}
     }
 
-    return retval;
+    واپس retval;
 }
 
 /*
  * Read a file with a list of words.
  */
-    static int
+    ساکن صحیح
 spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    long	lnum = 0;
+    طویل	lnum = 0;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
+    char_u	*سطر;
+    char_u	*pc = تہی;
     char_u	*p;
-    int		l;
-    int		retval = OK;
-    int		did_word = FALSE;
-    int		non_ascii = 0;
-    int		flags;
-    int		regionmask;
+    صحیح		l;
+    صحیح		retval = OK;
+    صحیح		did_لفظ = FALSE;
+    صحیح		non_ascii = 0;
+    صحیح		flags;
+    صحیح		regionmask;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "r");
+    اگر (fd == تہی)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	واپس FAIL;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
-    spell_message(spin, IObuff);
+    vim_snprintf((حرف *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
+    spell_پیغام(spin, IObuff);
 
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    جب (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	سطر_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	اگر (*rline == '#')
+	    جاری;
 
 	// Remove CR, LF and white space from the end.
-	l = (int)STRLEN(rline);
-	while (l > 0 && rline[l - 1] <= ' ')
+	l = (صحیح)STRLEN(rline);
+	جب (l > 0 && rline[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty or blank line
+	اگر (l == 0)
+	    جاری;	// empty or blank line
 	rline[l] = NUL;
 
 	// Convert from "/encoding={encoding}" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	اگر (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, تہی);
+	    اگر (pc == تہی)
 	    {
 		smsg(_("Conversion failure for word in %s line %ld: %s"),
 							   fname, lnum, rline);
-		continue;
+		جاری;
 	    }
-	    line = pc;
+	    سطر = pc;
 	}
-	else
+	ورنہ
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = تہی;
+	    سطر = rline;
 	}
 
-	if (*line == '/')
+	اگر (*سطر == '/')
 	{
-	    ++line;
-	    if (STRNCMP(line, "encoding=", 9) == 0)
+	    ++سطر;
+	    اگر (STRNCMP(سطر, "encoding=", 9) == 0)
 	    {
-		if (spin->si_conv.vc_type != CONV_NONE)
+		اگر (spin->si_conv.vc_type != CONV_NONE)
 		    smsg(_("Duplicate /encoding= line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else if (did_word)
+						       fname, lnum, سطر - 1);
+		ورنہ اگر (did_لفظ)
 		    smsg(_("/encoding= line after word ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else
+						       fname, lnum, سطر - 1);
+		ورنہ
 		{
 		    char_u	*enc;
 
 		    // Setup for conversion to 'encoding'.
-		    line += 9;
-		    enc = enc_canonize(line);
-		    if (enc != NULL && !spin->si_ascii
-			    && convert_setup(&spin->si_conv, enc,
+		    سطر += 9;
+		    enc = enc_canonize(سطر);
+		    اگر (enc != تہی && !spin->si_ascii
+			    && convert_تیاری(&spin->si_conv, enc,
 							       p_enc) == FAIL)
 			smsg(_("Conversion in %s not supported: from %s to %s"),
-							  fname, line, p_enc);
+							  fname, سطر, p_enc);
 		    vim_free(enc);
 		    spin->si_conv.vc_fail = TRUE;
 		}
-		continue;
+		جاری;
 	    }
 
-	    if (STRNCMP(line, "regions=", 8) == 0)
+	    اگر (STRNCMP(سطر, "regions=", 8) == 0)
 	    {
-		if (spin->si_region_count > 1)
+		اگر (spin->si_region_گنتی > 1)
 		    smsg(_("Duplicate /regions= line ignored in %s line %ld: %s"),
-						       fname, lnum, line);
-		else
+						       fname, lnum, سطر);
+		ورنہ
 		{
-		    line += 8;
-		    if (STRLEN(line) > MAXREGIONS * 2)
+		    سطر += 8;
+		    اگر (STRLEN(سطر) > MAXREGIONS * 2)
 			smsg(_("Too many regions in %s line %ld: %s"),
-						       fname, lnum, line);
-		    else
+						       fname, lnum, سطر);
+		    ورنہ
 		    {
-			spin->si_region_count = (int)STRLEN(line) / 2;
-			STRCPY(spin->si_region_name, line);
+			spin->si_region_گنتی = (صحیح)STRLEN(سطر) / 2;
+			STRCPY(spin->si_region_name, سطر);
 
 			// Adjust the mask for a word valid in all regions.
-			spin->si_region = (1 << spin->si_region_count) - 1;
+			spin->si_region = (1 << spin->si_region_گنتی) - 1;
 		    }
 		}
-		continue;
+		جاری;
 	    }
 
 	    smsg(_("/ line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-	    continue;
+						       fname, lnum, سطر - 1);
+	    جاری;
 	}
 
 	flags = 0;
 	regionmask = spin->si_region;
 
 	// Check for flags and region after a slash.
-	p = vim_strchr(line, '/');
-	if (p != NULL)
+	p = vim_strchr(سطر, '/');
+	اگر (p != تہی)
 	{
 	    *p++ = NUL;
-	    while (*p != NUL)
+	    جب (*p != NUL)
 	    {
-		if (*p == '=')		// keep-case word
+		اگر (*p == '=')		// keep-case word
 		    flags |= WF_KEEPCAP | WF_FIXCAP;
-		else if (*p == '!')	// Bad, bad, wicked word.
+		ورنہ اگر (*p == '!')	// Bad, bad, wicked word.
 		    flags |= WF_BANNED;
-		else if (*p == '?')	// Rare word.
+		ورنہ اگر (*p == '?')	// Rare word.
 		    flags |= WF_RARE;
-		else if (VIM_ISDIGIT(*p)) // region number(s)
+		ورنہ اگر (VIM_ISDIGIT(*p)) // region number(s)
 		{
-		    if ((flags & WF_REGION) == 0)   // first one
+		    اگر ((flags & WF_REGION) == 0)   // first one
 			regionmask = 0;
 		    flags |= WF_REGION;
 
 		    l = *p - '0';
-		    if (l == 0 || l > spin->si_region_count)
+		    اگر (l == 0 || l > spin->si_region_گنتی)
 		    {
 			smsg(_("Invalid region nr in %s line %ld: %s"),
 							  fname, lnum, p);
-			break;
+			توڑو;
 		    }
 		    regionmask |= 1 << (l - 1);
 		}
-		else
+		ورنہ
 		{
 		    smsg(_("Unrecognized flags in %s line %ld: %s"),
 							      fname, lnum, p);
-		    break;
+		    توڑو;
 		}
 		++p;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(line))
+	اگر (spin->si_ascii && has_non_ascii(سطر))
 	{
 	    ++non_ascii;
-	    continue;
+	    جاری;
 	}
 
 	// Normal word: store it.
-	if (store_word(spin, line, flags, regionmask, NULL, FALSE) == FAIL)
+	اگر (store_لفظ(spin, سطر, flags, regionmask, تہی, FALSE) == FAIL)
 	{
 	    retval = FAIL;
-	    break;
+	    توڑو;
 	}
-	did_word = TRUE;
+	did_لفظ = TRUE;
     }
 
     vim_free(pc);
     fclose(fd);
 
-    if (spin->si_ascii && non_ascii > 0)
+    اگر (spin->si_ascii && non_ascii > 0)
     {
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((حرف *)IObuff, IOSIZE,
 		  _("Ignored %d words with non-ASCII characters"), non_ascii);
-	spell_message(spin, IObuff);
+	spell_پیغام(spin, IObuff);
     }
 
-    return retval;
+    واپس retval;
 }
 
 /*
@@ -4407,78 +4407,78 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
  * The memory is cleared to all zeros.
  * Returns NULL when out of memory.
  */
-    static void *
+    ساکن خالی *
 getroom(
     spellinfo_T *spin,
     size_t	len,		// length needed
-    int		align)		// align for pointer
+    صحیح		align)		// align for pointer
 {
     char_u	*p;
-    sblock_T	*bl = spin->si_blocks;
+    sblock_T	*bl = spin->si_بلاکیں;
 
-    if (align && bl != NULL)
+    اگر (align && bl != تہی)
 	// Round size up for alignment.  On some systems structures need to be
 	// aligned to the size of a pointer (e.g., SPARC).
-	bl->sb_used = (bl->sb_used + sizeof(char *) - 1)
-						      & ~(sizeof(char *) - 1);
+	bl->sb_مستعمل = (bl->sb_مستعمل + حجم(حرف *) - 1)
+						      & ~(حجم(حرف *) - 1);
 
-    if (bl == NULL || bl->sb_used + len > SBLOCKSIZE)
+    اگر (bl == تہی || bl->sb_مستعمل + len > SBLOCKSIZE)
     {
-	if (len >= SBLOCKSIZE)
-	    bl = NULL;
-	else
+	اگر (len >= SBLOCKSIZE)
+	    bl = تہی;
+	ورنہ
 	    // Allocate a block of memory. It is not freed until much later.
-	    bl = alloc_clear(offsetof(sblock_T, sb_data) + SBLOCKSIZE + 1);
-	if (bl == NULL)
+	    bl = alloc_clear(offsetof(sblock_T, sb_ڈیٹا) + SBLOCKSIZE + 1);
+	اگر (bl == تہی)
 	{
-	    if (!spin->si_did_emsg)
+	    اگر (!spin->si_did_emsg)
 	    {
-		emsg(_(e_insufficient_memory_word_list_will_be_incomplete));
+		emsg(_(e_insufficient_حافظہ_لفظ_list_will_be_incomplete));
 		spin->si_did_emsg = TRUE;
 	    }
-	    return NULL;
+	    واپس تہی;
 	}
-	bl->sb_next = spin->si_blocks;
-	spin->si_blocks = bl;
-	bl->sb_used = 0;
-	++spin->si_blocks_cnt;
+	bl->sb_اگلا = spin->si_بلاکیں;
+	spin->si_بلاکیں = bl;
+	bl->sb_مستعمل = 0;
+	++spin->si_بلاکیں_cnt;
     }
 
-    p = bl->sb_data + bl->sb_used;
-    bl->sb_used += (int)len;
+    p = bl->sb_ڈیٹا + bl->sb_مستعمل;
+    bl->sb_مستعمل += (صحیح)len;
 
-    return p;
+    واپس p;
 }
 
 /*
  * Make a copy of a string into memory allocated with getroom().
  * Returns NULL when out of memory.
  */
-    static char_u *
+    ساکن char_u *
 getroom_save(spellinfo_T *spin, char_u *s)
 {
     char_u	*sc;
 
     sc = (char_u *)getroom(spin, STRLEN(s) + 1, FALSE);
-    if (sc != NULL)
+    اگر (sc != تہی)
 	STRCPY(sc, s);
-    return sc;
+    واپس sc;
 }
 
 
 /*
  * Free the list of allocated sblock_T.
  */
-    static void
-free_blocks(sblock_T *bl)
+    ساکن خالی
+free_بلاکیں(sblock_T *bl)
 {
-    sblock_T	*next;
+    sblock_T	*اگلا;
 
-    while (bl != NULL)
+    جب (bl != تہی)
     {
-	next = bl->sb_next;
+	اگلا = bl->sb_اگلا;
 	vim_free(bl);
-	bl = next;
+	bl = اگلا;
     }
 }
 
@@ -4486,27 +4486,27 @@ free_blocks(sblock_T *bl)
  * Allocate the root of a word tree.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    ساکن wordnode_T *
 wordtree_alloc(spellinfo_T *spin)
 {
-    return (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
+    واپس (wordnode_T *)getroom(spin, حجم(wordnode_T), TRUE);
 }
 
 /*
  * Return TRUE if "word" contains valid word characters.
  * Control characters and trailing '/' are invalid.  Space is OK.
  */
-    static int
-valid_spell_word(char_u *word, char_u *end)
+    ساکن صحیح
+valid_spell_لفظ(char_u *لفظ, char_u *انتہا)
 {
     char_u *p;
 
-    if (enc_utf8 && !utf_valid_string(word, end))
-	return FALSE;
-    for (p = word; *p != NUL && p < end; p += mb_ptr2len(p))
-	if (*p < ' ' || (p[0] == '/' && p[1] == NUL))
-	    return FALSE;
-    return TRUE;
+    اگر (enc_utf8 && !utf_valid_string(لفظ, انتہا))
+	واپس FALSE;
+    برائے (p = لفظ; *p != NUL && p < انتہا; p += mb_ptr2len(p))
+	اگر (*p < ' ' || (p[0] == '/' && p[1] == NUL))
+	    واپس FALSE;
+    واپس TRUE;
 }
 
 /*
@@ -4518,49 +4518,49 @@ valid_spell_word(char_u *word, char_u *end)
  * When "pfxlist" is not NULL store the word for each postponed prefix ID and
  * compound flag.
  */
-    static int
-store_word(
+    ساکن صحیح
+store_لفظ(
     spellinfo_T	*spin,
-    char_u	*word,
-    int		flags,		// extra flags, WF_BANNED
-    int		region,		// supported region(s)
+    char_u	*لفظ,
+    صحیح		flags,		// extra flags, WF_BANNED
+    صحیح		region,		// supported region(s)
     char_u	*pfxlist,	// list of prefix IDs or NULL
-    int		need_affix)	// only store word with affix ID
+    صحیح		need_affix)	// only store word with affix ID
 {
-    int		len = (int)STRLEN(word);
-    int		ct = captype(word, word + len);
+    صحیح		len = (صحیح)STRLEN(لفظ);
+    صحیح		ct = captype(لفظ, لفظ + len);
     char_u	foldword[MAXWLEN];
-    int		res = OK;
+    صحیح		res = OK;
     char_u	*p;
 
     // Avoid adding illegal bytes to the word tree.
-    if (!valid_spell_word(word, word + len))
-	return FAIL;
+    اگر (!valid_spell_لفظ(لفظ, لفظ + len))
+	واپس FAIL;
 
-    (void)spell_casefold(curwin, word, len, foldword, MAXWLEN);
-    for (p = pfxlist; res == OK; ++p)
+    (خالی)spell_casefold(curwin, لفظ, len, foldword, MAXWLEN);
+    برائے (p = pfxlist; res == OK; ++p)
     {
-	if (!need_affix || (p != NULL && *p != NUL))
-	    res = tree_add_word(spin, foldword, spin->si_foldroot, ct | flags,
-						  region, p == NULL ? 0 : *p);
-	if (p == NULL || *p == NUL)
-	    break;
+	اگر (!need_affix || (p != تہی && *p != NUL))
+	    res = درخت_جوڑو_لفظ(spin, foldword, spin->si_foldroot, ct | flags,
+						  region, p == تہی ? 0 : *p);
+	اگر (p == تہی || *p == NUL)
+	    توڑو;
     }
     ++spin->si_foldwcount;
 
-    if (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
+    اگر (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
     {
-	for (p = pfxlist; res == OK; ++p)
+	برائے (p = pfxlist; res == OK; ++p)
 	{
-	    if (!need_affix || (p != NULL && *p != NUL))
-		res = tree_add_word(spin, word, spin->si_keeproot, flags,
-						  region, p == NULL ? 0 : *p);
-	    if (p == NULL || *p == NUL)
-		break;
+	    اگر (!need_affix || (p != تہی && *p != NUL))
+		res = درخت_جوڑو_لفظ(spin, لفظ, spin->si_keeproot, flags,
+						  region, p == تہی ? 0 : *p);
+	    اگر (p == تہی || *p == NUL)
+		توڑو;
 	}
 	++spin->si_keepwcount;
     }
-    return res;
+    واپس res;
 }
 
 /*
@@ -4569,42 +4569,42 @@ store_word(
  * "rare" and "region" is the condition nr.
  * Returns FAIL when out of memory.
  */
-    static int
-tree_add_word(
+    ساکن صحیح
+درخت_جوڑو_لفظ(
     spellinfo_T	*spin,
-    char_u	*word,
-    wordnode_T	*root,
-    int		flags,
-    int		region,
-    int		affixID)
+    char_u	*لفظ,
+    wordnode_T	*جڑ,
+    صحیح		flags,
+    صحیح		region,
+    صحیح		affixID)
 {
-    wordnode_T	*node = root;
+    wordnode_T	*گرہ = جڑ;
     wordnode_T	*np;
     wordnode_T	*copyp, **copyprev;
-    wordnode_T	**prev = NULL;
-    int		i;
+    wordnode_T	**پچھلا = تہی;
+    صحیح		i;
 
     // Add each byte of the word to the tree, including the NUL at the end.
-    for (i = 0; ; ++i)
+    برائے (i = 0; ; ++i)
     {
 	// When there is more than one reference to this node we need to make
 	// a copy, so that we can modify it.  Copy the whole list of siblings
 	// (we don't optimize for a partly shared list of siblings).
-	if (node != NULL && node->wn_refs > 1)
+	اگر (گرہ != تہی && گرہ->wn_refs > 1)
 	{
-	    --node->wn_refs;
-	    copyprev = prev;
-	    FOR_ALL_NODE_SIBLINGS(node, copyp)
+	    --گرہ->wn_refs;
+	    copyprev = پچھلا;
+	    FOR_ALL_گرہ_SIBLINGS(گرہ, copyp)
 	    {
 		// Allocate a new node and copy the info.
 		np = get_wordnode(spin);
-		if (np == NULL)
-		    return FAIL;
-		np->wn_child = copyp->wn_child;
-		if (np->wn_child != NULL)
-		    ++np->wn_child->wn_refs;	// child gets extra ref
+		اگر (np == تہی)
+		    واپس FAIL;
+		np->wn_بچہ = copyp->wn_بچہ;
+		اگر (np->wn_بچہ != تہی)
+		    ++np->wn_بچہ->wn_refs;	// child gets extra ref
 		np->wn_byte = copyp->wn_byte;
-		if (np->wn_byte == NUL)
+		اگر (np->wn_byte == NUL)
 		{
 		    np->wn_flags = copyp->wn_flags;
 		    np->wn_region = copyp->wn_region;
@@ -4613,13 +4613,13 @@ tree_add_word(
 
 		// Link the new node in the list, there will be one ref.
 		np->wn_refs = 1;
-		if (copyprev != NULL)
+		اگر (copyprev != تہی)
 		    *copyprev = np;
 		copyprev = &np->wn_sibling;
 
 		// Let "node" point to the head of the copied list.
-		if (copyp == node)
-		    node = np;
+		اگر (copyp == گرہ)
+		    گرہ = np;
 	    }
 	}
 
@@ -4627,75 +4627,75 @@ tree_add_word(
 	// on byte value, thus stop searching when a sibling is found with a
 	// higher byte value.  For zero bytes (end of word) the sorting is
 	// done on flags and then on affixID.
-	while (node != NULL
-		&& (node->wn_byte < word[i]
-		    || (node->wn_byte == NUL
+	جب (گرہ != تہی
+		&& (گرہ->wn_byte < لفظ[i]
+		    || (گرہ->wn_byte == NUL
 			&& (flags < 0
-			    ? node->wn_affixID < (unsigned)affixID
-			    : (node->wn_flags < (unsigned)(flags & WN_MASK)
-				|| (node->wn_flags == (flags & WN_MASK)
+			    ? گرہ->wn_affixID < (غیرعلامتی)affixID
+			    : (گرہ->wn_flags < (غیرعلامتی)(flags & WN_نقاب)
+				|| (گرہ->wn_flags == (flags & WN_نقاب)
 				    && (spin->si_sugtree
-					? (node->wn_region & 0xffff) < region
-					: node->wn_affixID
-						    < (unsigned)affixID)))))))
+					? (گرہ->wn_region & 0xffff) < region
+					: گرہ->wn_affixID
+						    < (غیرعلامتی)affixID)))))))
 	{
-	    prev = &node->wn_sibling;
-	    node = *prev;
+	    پچھلا = &گرہ->wn_sibling;
+	    گرہ = *پچھلا;
 	}
-	if (node == NULL
-		|| node->wn_byte != word[i]
-		|| (word[i] == NUL
+	اگر (گرہ == تہی
+		|| گرہ->wn_byte != لفظ[i]
+		|| (لفظ[i] == NUL
 		    && (flags < 0
 			|| spin->si_sugtree
-			|| node->wn_flags != (flags & WN_MASK)
-			|| node->wn_affixID != affixID)))
+			|| گرہ->wn_flags != (flags & WN_نقاب)
+			|| گرہ->wn_affixID != affixID)))
 	{
 	    // Allocate a new node.
 	    np = get_wordnode(spin);
-	    if (np == NULL)
-		return FAIL;
-	    np->wn_byte = word[i];
+	    اگر (np == تہی)
+		واپس FAIL;
+	    np->wn_byte = لفظ[i];
 
 	    // If "node" is NULL this is a new child or the end of the sibling
 	    // list: ref count is one.  Otherwise use ref count of sibling and
 	    // make ref count of sibling one (matters when inserting in front
 	    // of the list of siblings).
-	    if (node == NULL)
+	    اگر (گرہ == تہی)
 		np->wn_refs = 1;
-	    else
+	    ورنہ
 	    {
-		np->wn_refs = node->wn_refs;
-		node->wn_refs = 1;
+		np->wn_refs = گرہ->wn_refs;
+		گرہ->wn_refs = 1;
 	    }
-	    if (prev != NULL)
-		*prev = np;
-	    np->wn_sibling = node;
-	    node = np;
+	    اگر (پچھلا != تہی)
+		*پچھلا = np;
+	    np->wn_sibling = گرہ;
+	    گرہ = np;
 	}
 
-	if (word[i] == NUL)
+	اگر (لفظ[i] == NUL)
 	{
-	    node->wn_flags = flags;
-	    node->wn_region |= region;
-	    node->wn_affixID = affixID;
-	    break;
+	    گرہ->wn_flags = flags;
+	    گرہ->wn_region |= region;
+	    گرہ->wn_affixID = affixID;
+	    توڑو;
 	}
-	prev = &node->wn_child;
-	node = *prev;
+	پچھلا = &گرہ->wn_بچہ;
+	گرہ = *پچھلا;
     }
-#ifdef SPELL_PRINTTREE
-    smsg("Added \"%s\"", word);
-    spell_print_tree(root->wn_sibling);
-#endif
+#اگر_تعریف_شدہ SPELL_PRINTTREE
+    smsg("Added \"%s\"", لفظ);
+    spell_print_درخت(جڑ->wn_sibling);
+#اگر_ختم
 
     // count nr of words added since last message
-    ++spin->si_msg_count;
+    ++spin->si_پیغام_گنتی;
 
-    if (spin->si_compress_cnt > 1)
+    اگر (spin->si_compress_cnt > 1)
     {
-	if (--spin->si_compress_cnt == 1)
+	اگر (--spin->si_compress_cnt == 1)
 	    // Did enough words to lower the block count limit.
-	    spin->si_blocks_cnt += compress_inc;
+	    spin->si_بلاکیں_cnt += compress_inc;
     }
 
     /*
@@ -4710,27 +4710,27 @@ tree_add_word(
      *    (si_compress_cnt == 1) and the number of free nodes drops below the
      *    maximum word length.
      */
-#ifndef SPELL_COMPRESS_ALWAYS
-    if (spin->si_compress_cnt == 1
-	    ? spin->si_free_count < MAXWLEN
-	    : spin->si_blocks_cnt >= compress_start)
-#endif
+#اگر_غیر_تعریف_شدہ SPELL_COMPRESS_ALWAYS
+    اگر (spin->si_compress_cnt == 1
+	    ? spin->si_free_گنتی < MAXWLEN
+	    : spin->si_بلاکیں_cnt >= compress_آغاز)
+#اگر_ختم
     {
 	// Decrement the block counter.  The effect is that we compress again
 	// when the freed up room has been used and another "compress_inc"
 	// blocks have been allocated.  Unless "compress_added" words have
 	// been added, then the limit is put back again.
-	spin->si_blocks_cnt -= compress_inc;
+	spin->si_بلاکیں_cnt -= compress_inc;
 	spin->si_compress_cnt = compress_added;
 
-	if (spin->si_verbose)
+	اگر (spin->si_verbose)
 	{
-	    msg_start();
-	    msg_puts(_(msg_compressing));
-	    msg_clr_eos();
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    out_flush();
+	    پیغام_آغاز();
+	    پیغام_puts(_(پیغام_compressing));
+	    پیغام_clr_eos();
+	    پیغام_didout = FALSE;
+	    پیغام_ستون = 0;
+	    برآمد_flush();
 	}
 
 	// Compress both trees.  Either they both have many nodes, which makes
@@ -4738,11 +4738,11 @@ tree_add_word(
 	// compression goes fast.  But when filling the soundfold word tree
 	// there is no keep-case tree.
 	wordtree_compress(spin, spin->si_foldroot, "case-folded");
-	if (affixID >= 0)
+	اگر (affixID >= 0)
 	    wordtree_compress(spin, spin->si_keeproot, "keep-case");
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -4750,25 +4750,25 @@ tree_add_word(
  * allocate a new one.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    ساکن wordnode_T *
 get_wordnode(spellinfo_T *spin)
 {
     wordnode_T *n;
 
-    if (spin->si_first_free == NULL)
-	n = (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
-    else
+    اگر (spin->si_پہلا_free == تہی)
+	n = (wordnode_T *)getroom(spin, حجم(wordnode_T), TRUE);
+    ورنہ
     {
-	n = spin->si_first_free;
-	spin->si_first_free = n->wn_child;
-	CLEAR_POINTER(n);
-	--spin->si_free_count;
+	n = spin->si_پہلا_free;
+	spin->si_پہلا_free = n->wn_بچہ;
+	CLEAR_اشارہ_گر(n);
+	--spin->si_free_گنتی;
     }
-#ifdef SPELL_PRINTTREE
-    if (n != NULL)
+#اگر_تعریف_شدہ SPELL_PRINTTREE
+    اگر (n != تہی)
 	n->wn_nr = ++spin->si_wordnode_nr;
-#endif
-    return n;
+#اگر_ختم
+    واپس n;
 }
 
 /*
@@ -4777,75 +4777,75 @@ get_wordnode(spellinfo_T *spin)
  * siblings.
  * Returns the number of nodes actually freed.
  */
-    static int
-deref_wordnode(spellinfo_T *spin, wordnode_T *node)
+    ساکن صحیح
+deref_wordnode(spellinfo_T *spin, wordnode_T *گرہ)
 {
     wordnode_T	*np;
-    int		cnt = 0;
+    صحیح		cnt = 0;
 
-    if (--node->wn_refs == 0)
+    اگر (--گرہ->wn_refs == 0)
     {
-	FOR_ALL_NODE_SIBLINGS(node, np)
+	FOR_ALL_گرہ_SIBLINGS(گرہ, np)
 	{
-	    if (np->wn_child != NULL)
-		cnt += deref_wordnode(spin, np->wn_child);
+	    اگر (np->wn_بچہ != تہی)
+		cnt += deref_wordnode(spin, np->wn_بچہ);
 	    free_wordnode(spin, np);
 	    ++cnt;
 	}
 	++cnt;	    // length field
     }
-    return cnt;
+    واپس cnt;
 }
 
 /*
  * Free a wordnode_T for re-use later.
  * Only the "wn_child" field becomes invalid.
  */
-    static void
+    ساکن خالی
 free_wordnode(spellinfo_T *spin, wordnode_T *n)
 {
-    n->wn_child = spin->si_first_free;
-    spin->si_first_free = n;
-    ++spin->si_free_count;
+    n->wn_بچہ = spin->si_پہلا_free;
+    spin->si_پہلا_free = n;
+    ++spin->si_free_گنتی;
 }
 
 /*
  * Compress a tree: find tails that are identical and can be shared.
  */
-    static void
-wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
+    ساکن خالی
+wordtree_compress(spellinfo_T *spin, wordnode_T *جڑ, حرف *name)
 {
     hashtab_T	    ht;
-    long	    n;
-    long	    tot = 0;
-    long	    perc;
+    طویل	    n;
+    طویل	    tot = 0;
+    طویل	    perc;
 
     // Skip the root itself, it's not actually used.  The first sibling is the
     // start of the tree.
-    if (root->wn_sibling == NULL)
-	return;
+    اگر (جڑ->wn_sibling == تہی)
+	واپس;
 
     hash_init(&ht);
-    n = node_compress(spin, root->wn_sibling, &ht, &tot);
+    n = گرہ_compress(spin, جڑ->wn_sibling, &ht, &tot);
 
-#ifndef SPELL_PRINTTREE
-    if (spin->si_verbose || p_verbose > 2)
-#endif
+#اگر_غیر_تعریف_شدہ SPELL_PRINTTREE
+    اگر (spin->si_verbose || p_verbose > 2)
+#اگر_ختم
     {
-	if (tot > 1000000)
+	اگر (tot > 1000000)
 	    perc = (tot - n) / (tot / 100);
-	else if (tot == 0)
+	ورنہ اگر (tot == 0)
 	    perc = 0;
-	else
+	ورنہ
 	    perc = (tot - n) * 100 / tot;
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((حرف *)IObuff, IOSIZE,
 		_("Compressed %s: %ld of %ld nodes; %ld (%ld%%) remaining"),
 		name, n, tot, tot - n, perc);
-	spell_message(spin, IObuff);
+	spell_پیغام(spin, IObuff);
     }
-#ifdef SPELL_PRINTTREE
-    spell_print_tree(root->wn_sibling);
-#endif
+#اگر_تعریف_شدہ SPELL_PRINTTREE
+    spell_print_درخت(جڑ->wn_sibling);
+#اگر_ختم
     hash_clear(&ht);
 }
 
@@ -4853,22 +4853,22 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
  * Compress a node, its siblings and its children, depth first.
  * Returns the number of compressed nodes.
  */
-    static long
-node_compress(
+    ساکن طویل
+گرہ_compress(
     spellinfo_T	*spin,
-    wordnode_T	*node,
+    wordnode_T	*گرہ,
     hashtab_T	*ht,
-    long	*tot)	    // total count of nodes before compressing,
+    طویل	*tot)	    // total count of nodes before compressing,
 			    // incremented while going through the tree
 {
     wordnode_T	*np;
     wordnode_T	*tp;
-    wordnode_T	*child;
+    wordnode_T	*بچہ;
     hash_T	hash;
     hashitem_T	*hi;
-    long	len = 0;
-    unsigned	nr, n;
-    long	compressed = 0;
+    طویل	len = 0;
+    غیرعلامتی	nr, n;
+    طویل	compressed = 0;
 
     /*
      * Go through the list of siblings.  Compress each child and then try
@@ -4876,47 +4876,47 @@ node_compress(
      * Note that with "child" we mean not just the node that is pointed to,
      * but the whole list of siblings of which the child node is the first.
      */
-    for (np = node; np != NULL && !got_int; np = np->wn_sibling)
+    برائے (np = گرہ; np != تہی && !got_int; np = np->wn_sibling)
     {
 	++len;
-	if ((child = np->wn_child) != NULL)
+	اگر ((بچہ = np->wn_بچہ) != تہی)
 	{
 	    // Compress the child first.  This fills hashkey.
-	    compressed += node_compress(spin, child, ht, tot);
+	    compressed += گرہ_compress(spin, بچہ, ht, tot);
 
 	    // Try to find an identical child.
-	    hash = hash_hash(child->wn_u1.hashkey);
-	    hi = hash_lookup(ht, child->wn_u1.hashkey, hash);
-	    if (!HASHITEM_EMPTY(hi))
+	    hash = hash_hash(بچہ->wn_u1.hashkey);
+	    hi = hash_lookup(ht, بچہ->wn_u1.hashkey, hash);
+	    اگر (!HASHITEM_خالی_خانے(hi))
 	    {
 		// There are children we encountered before with a hash value
 		// identical to the current child.  Now check if there is one
 		// that is really identical.
-		for (tp = HI2WN(hi); tp != NULL; tp = tp->wn_u2.next)
-		    if (node_equal(child, tp))
+		برائے (tp = HI2WN(hi); tp != تہی; tp = tp->wn_u2.اگلا)
+		    اگر (گرہ_equal(بچہ, tp))
 		    {
 			// Found one!  Now use that child in place of the
 			// current one.  This means the current child and all
 			// its siblings is unlinked from the tree.
 			++tp->wn_refs;
-			compressed += deref_wordnode(spin, child);
-			np->wn_child = tp;
-			break;
+			compressed += deref_wordnode(spin, بچہ);
+			np->wn_بچہ = tp;
+			توڑو;
 		    }
-		if (tp == NULL)
+		اگر (tp == تہی)
 		{
 		    // No other child with this hash value equals the child of
 		    // the node, add it to the linked list after the first
 		    // item.
 		    tp = HI2WN(hi);
-		    child->wn_u2.next = tp->wn_u2.next;
-		    tp->wn_u2.next = child;
+		    بچہ->wn_u2.اگلا = tp->wn_u2.اگلا;
+		    tp->wn_u2.اگلا = بچہ;
 		}
 	    }
-	    else
+	    ورنہ
 		// No other child has this hash value, add it to the
 		// hashtable.
-		hash_add_item(ht, hi, child->wn_u1.hashkey, hash);
+		hash_جوڑو_شے(ht, hi, بچہ->wn_u1.hashkey, hash);
 	}
     }
     *tot += len + 1;	// add one for the node that stores the length
@@ -4926,107 +4926,107 @@ node_compress(
      * find a lookalike node.  This must be done after compressing the sibling
      * list, otherwise the hash key would become invalid by the compression.
      */
-    node->wn_u1.hashkey[0] = len;
+    گرہ->wn_u1.hashkey[0] = len;
     nr = 0;
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_گرہ_SIBLINGS(گرہ, np)
     {
-	if (np->wn_byte == NUL)
+	اگر (np->wn_byte == NUL)
 	    // end node: use wn_flags, wn_region and wn_affixID
 	    n = np->wn_flags + (np->wn_region << 8) + (np->wn_affixID << 16);
-	else
+	ورنہ
 	    // byte node: use the byte value and the child pointer
-	    n = (unsigned)(np->wn_byte + ((long_u)np->wn_child << 8));
+	    n = (غیرعلامتی)(np->wn_byte + ((long_u)np->wn_بچہ << 8));
 	nr = nr * 101 + n;
     }
 
     // Avoid NUL bytes, it terminates the hash key.
     n = nr & 0xff;
-    node->wn_u1.hashkey[1] = n == 0 ? 1 : n;
+    گرہ->wn_u1.hashkey[1] = n == 0 ? 1 : n;
     n = (nr >> 8) & 0xff;
-    node->wn_u1.hashkey[2] = n == 0 ? 1 : n;
+    گرہ->wn_u1.hashkey[2] = n == 0 ? 1 : n;
     n = (nr >> 16) & 0xff;
-    node->wn_u1.hashkey[3] = n == 0 ? 1 : n;
+    گرہ->wn_u1.hashkey[3] = n == 0 ? 1 : n;
     n = (nr >> 24) & 0xff;
-    node->wn_u1.hashkey[4] = n == 0 ? 1 : n;
-    node->wn_u1.hashkey[5] = NUL;
+    گرہ->wn_u1.hashkey[4] = n == 0 ? 1 : n;
+    گرہ->wn_u1.hashkey[5] = NUL;
 
     // Check for CTRL-C pressed now and then.
     veryfast_breakcheck();
 
-    return compressed;
+    واپس compressed;
 }
 
 /*
  * Return TRUE when two nodes have identical siblings and children.
  */
-    static int
-node_equal(wordnode_T *n1, wordnode_T *n2)
+    ساکن صحیح
+گرہ_equal(wordnode_T *n1, wordnode_T *n2)
 {
     wordnode_T	*p1;
     wordnode_T	*p2;
 
-    for (p1 = n1, p2 = n2; p1 != NULL && p2 != NULL;
+    برائے (p1 = n1, p2 = n2; p1 != تہی && p2 != تہی;
 				     p1 = p1->wn_sibling, p2 = p2->wn_sibling)
-	if (p1->wn_byte != p2->wn_byte
+	اگر (p1->wn_byte != p2->wn_byte
 		|| (p1->wn_byte == NUL
 		    ? (p1->wn_flags != p2->wn_flags
 			|| p1->wn_region != p2->wn_region
 			|| p1->wn_affixID != p2->wn_affixID)
-		    : (p1->wn_child != p2->wn_child)))
-	    break;
+		    : (p1->wn_بچہ != p2->wn_بچہ)))
+	    توڑو;
 
-    return p1 == NULL && p2 == NULL;
+    واپس p1 == تہی && p2 == تہی;
 }
 
-static int rep_compare(const void *s1, const void *s2);
+ساکن صحیح rep_compare(ثابت خالی *s1, ثابت خالی *s2);
 
 /*
  * Function given to qsort() to sort the REP items on "from" string.
  */
-    static int
-rep_compare(const void *s1, const void *s2)
+    ساکن صحیح
+rep_compare(ثابت خالی *s1, ثابت خالی *s2)
 {
     fromto_T	*p1 = (fromto_T *)s1;
     fromto_T	*p2 = (fromto_T *)s2;
 
-    return STRCMP(p1->ft_from, p2->ft_from);
+    واپس STRCMP(p1->ft_from, p2->ft_from);
 }
 
 /*
  * Write the Vim .spl file "fname".
  * Return FAIL or OK;
  */
-    static int
+    ساکن صحیح
 write_vim_spell(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    int		regionmask;
-    int		round;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		i;
-    int		l;
+    صحیح		regionmask;
+    صحیح		باری;
+    wordnode_T	*درخت;
+    صحیح		nodecount;
+    صحیح		i;
+    صحیح		l;
     garray_T	*gap;
     fromto_T	*ftp;
     char_u	*p;
-    int		rr;
-    int		retval = OK;
+    صحیح		rr;
+    صحیح		retval = OK;
     size_t	fwv = 1;  // collect return value of fwrite() to avoid
 			  // warnings from picky compiler
 
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "w");
+    اگر (fd == تہی)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	واپس FAIL;
     }
 
     // <HEADER>: <fileID> <versionnr>
 							    // <fileID>
     fwv &= fwrite(VIMSPELLMAGIC, VIMSPELLMAGICL, (size_t)1, fd);
-    if (fwv != (size_t)1)
+    اگر (fwv != (size_t)1)
 	// Catch first write error, don't try writing more.
-	goto theend;
+	جاؤ theend;
 
     putc(VIMSPELLVERSION, fd);				    // <versionnr>
 
@@ -5035,29 +5035,29 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
      */
 
     // SN_INFO: <infotext>
-    if (spin->si_info != NULL)
+    اگر (spin->si_info != تہی)
     {
 	putc(SN_INFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	i = (int)STRLEN(spin->si_info);
-	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
+	i = (صحیح)STRLEN(spin->si_info);
+	put_بائٹیں(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_info, (size_t)i, (size_t)1, fd); // <infotext>
     }
 
     // SN_REGION: <regionname> ...
     // Write the region names only if there is more than one.
-    if (spin->si_region_count > 1)
+    اگر (spin->si_region_گنتی > 1)
     {
 	putc(SN_REGION, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
-	l = spin->si_region_count * 2;
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = spin->si_region_گنتی * 2;
+	put_بائٹیں(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_region_name, (size_t)l, (size_t)1, fd);
 							// <regionname> ...
-	regionmask = (1 << spin->si_region_count) - 1;
+	regionmask = (1 << spin->si_region_گنتی) - 1;
     }
-    else
+    ورنہ
 	regionmask = 0;
 
     // SN_CHARFLAGS: <charflagslen> <charflags> <folcharslen> <folchars>
@@ -5069,60 +5069,60 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // 'encoding'.
     // Also skip this for an .add.spl file, the main spell file must contain
     // the table (avoids that it conflicts).  File is shorter too.
-    if (!spin->si_ascii && !spin->si_add)
+    اگر (!spin->si_ascii && !spin->si_جوڑو)
     {
 	char_u	folchars[128 * 8];
-	int	flags;
+	صحیح	flags;
 
 	putc(SN_CHARFLAGS, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
 	// Form the <folchars> string first, we need to know its length.
 	l = 0;
-	for (i = 128; i < 256; ++i)
+	برائے (i = 128; i < 256; ++i)
 	{
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 		l += mb_char2bytes(spelltab.st_fold[i], folchars + l);
-	    else
+	    ورنہ
 		folchars[l++] = spelltab.st_fold[i];
 	}
-	put_bytes(fd, (long_u)(1 + 128 + 2 + l), 4);	// <sectionlen>
+	put_بائٹیں(fd, (long_u)(1 + 128 + 2 + l), 4);	// <sectionlen>
 
 	fputc(128, fd);					// <charflagslen>
-	for (i = 128; i < 256; ++i)
+	برائے (i = 128; i < 256; ++i)
 	{
 	    flags = 0;
-	    if (spelltab.st_isw[i])
-		flags |= CF_WORD;
-	    if (spelltab.st_isu[i])
-		flags |= CF_UPPER;
+	    اگر (spelltab.st_isw[i])
+		flags |= CF_لفظ;
+	    اگر (spelltab.st_isu[i])
+		flags |= CF_بالائی;
 	    fputc(flags, fd);				// <charflags>
 	}
 
-	put_bytes(fd, (long_u)l, 2);			// <folcharslen>
+	put_بائٹیں(fd, (long_u)l, 2);			// <folcharslen>
 	fwv &= fwrite(folchars, (size_t)l, (size_t)1, fd); // <folchars>
     }
 
     // SN_MIDWORD: <midword>
-    if (spin->si_midword != NULL)
+    اگر (spin->si_midword != تہی)
     {
 	putc(SN_MIDWORD, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	i = (int)STRLEN(spin->si_midword);
-	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
+	i = (صحیح)STRLEN(spin->si_midword);
+	put_بائٹیں(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_midword, (size_t)i, (size_t)1, fd);
 							// <midword>
     }
 
     // SN_PREFCOND: <prefcondcnt> <prefcond> ...
-    if (spin->si_prefcond.ga_len > 0)
+    اگر (spin->si_prefcond.ga_len > 0)
     {
 	putc(SN_PREFCOND, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	l = write_spell_prefcond(NULL, &spin->si_prefcond, &fwv);
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = write_spell_prefcond(تہی, &spin->si_prefcond, &fwv);
+	put_بائٹیں(fd, (long_u)l, 4);			// <sectionlen>
 
 	write_spell_prefcond(fd, &spin->si_prefcond, &fwv);
     }
@@ -5134,30 +5134,30 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // round 1: SN_REP section
     // round 2: SN_SAL section (unless SN_SOFO is used)
     // round 3: SN_REPSAL section
-    for (round = 1; round <= 3; ++round)
+    برائے (باری = 1; باری <= 3; ++باری)
     {
-	if (round == 1)
+	اگر (باری == 1)
 	    gap = &spin->si_rep;
-	else if (round == 2)
+	ورنہ اگر (باری == 2)
 	{
 	    // Don't write SN_SAL when using a SN_SOFO section
-	    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
-		continue;
+	    اگر (spin->si_sofofr != تہی && spin->si_sofoto != تہی)
+		جاری;
 	    gap = &spin->si_sal;
 	}
-	else
+	ورنہ
 	    gap = &spin->si_repsal;
 
 	// Don't write the section if there are no items.
-	if (gap->ga_len == 0)
-	    continue;
+	اگر (gap->ga_len == 0)
+	    جاری;
 
 	// Sort the REP/REPSAL items.
-	if (round != 2)
-	    qsort(gap->ga_data, (size_t)gap->ga_len,
-					       sizeof(fromto_T), rep_compare);
+	اگر (باری != 2)
+	    qsort(gap->ga_ڈیٹا, (size_t)gap->ga_len,
+					       حجم(fromto_T), rep_compare);
 
-	i = round == 1 ? SN_REP : (round == 2 ? SN_SAL : SN_REPSAL);
+	i = باری == 1 ? SN_REP : (باری == 2 ? SN_SAL : SN_REPSAL);
 	putc(i, fd);					// <sectionID>
 
 	// This is for making suggestions, section is not required.
@@ -5165,40 +5165,40 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
 	// Compute the length of what follows.
 	l = 2;	    // count <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	برائے (i = 0; i < gap->ga_len; ++i)
 	{
-	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    l += 1 + (int)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
-	    l += 1 + (int)STRLEN(ftp->ft_to);    // count <*tolen> and <*to>
+	    ftp = &((fromto_T *)gap->ga_ڈیٹا)[i];
+	    l += 1 + (صحیح)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
+	    l += 1 + (صحیح)STRLEN(ftp->ft_مقصد);    // count <*tolen> and <*to>
 	}
-	if (round == 2)
+	اگر (باری == 2)
 	    ++l;	// count <salflags>
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	put_بائٹیں(fd, (long_u)l, 4);			// <sectionlen>
 
-	if (round == 2)
+	اگر (باری == 2)
 	{
 	    i = 0;
-	    if (spin->si_followup)
+	    اگر (spin->si_followup)
 		i |= SAL_F0LLOWUP;
-	    if (spin->si_collapse)
+	    اگر (spin->si_collapse)
 		i |= SAL_COLLAPSE;
-	    if (spin->si_rem_accents)
+	    اگر (spin->si_rem_accents)
 		i |= SAL_REM_ACCENTS;
 	    putc(i, fd);			// <salflags>
 	}
 
-	put_bytes(fd, (long_u)gap->ga_len, 2);	// <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	put_بائٹیں(fd, (long_u)gap->ga_len, 2);	// <repcount> or <salcount>
+	برائے (i = 0; i < gap->ga_len; ++i)
 	{
 	    // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
 	    // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
-	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    for (rr = 1; rr <= 2; ++rr)
+	    ftp = &((fromto_T *)gap->ga_ڈیٹا)[i];
+	    برائے (rr = 1; rr <= 2; ++rr)
 	    {
-		p = rr == 1 ? ftp->ft_from : ftp->ft_to;
-		l = (int)STRLEN(p);
+		p = rr == 1 ? ftp->ft_from : ftp->ft_مقصد;
+		l = (صحیح)STRLEN(p);
 		putc(l, fd);
-		if (l > 0)
+		اگر (l > 0)
 		    fwv &= fwrite(p, l, (size_t)1, fd);
 	    }
 	}
@@ -5207,62 +5207,62 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
     // SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
     // This is for making suggestions, section is not required.
-    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
+    اگر (spin->si_sofofr != تہی && spin->si_sofoto != تہی)
     {
 	putc(SN_SOFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_sofofr);
-	put_bytes(fd, (long_u)(l + STRLEN(spin->si_sofoto) + 4), 4);
+	l = (صحیح)STRLEN(spin->si_sofofr);
+	put_بائٹیں(fd, (long_u)(l + STRLEN(spin->si_sofoto) + 4), 4);
 							// <sectionlen>
 
-	put_bytes(fd, (long_u)l, 2);			// <sofofromlen>
+	put_بائٹیں(fd, (long_u)l, 2);			// <sofofromlen>
 	fwv &= fwrite(spin->si_sofofr, l, (size_t)1, fd); // <sofofrom>
 
-	l = (int)STRLEN(spin->si_sofoto);
-	put_bytes(fd, (long_u)l, 2);			// <sofotolen>
+	l = (صحیح)STRLEN(spin->si_sofoto);
+	put_بائٹیں(fd, (long_u)l, 2);			// <sofotolen>
 	fwv &= fwrite(spin->si_sofoto, l, (size_t)1, fd); // <sofoto>
     }
 
     // SN_WORDS: <word> ...
     // This is for making suggestions, section is not required.
-    if (spin->si_commonwords.ht_used > 0)
+    اگر (spin->si_commonwords.ht_مستعمل > 0)
     {
-	putc(SN_WORDS, fd);				// <sectionID>
+	putc(SN_الفاظ, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// round 1: count the bytes
 	// round 2: write the bytes
-	for (round = 1; round <= 2; ++round)
+	برائے (باری = 1; باری <= 2; ++باری)
 	{
-	    int		todo;
-	    int		len = 0;
+	    صحیح		todo;
+	    صحیح		len = 0;
 	    hashitem_T	*hi;
 
-	    todo = (int)spin->si_commonwords.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&spin->si_commonwords, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (صحیح)spin->si_commonwords.ht_مستعمل;
+	    FOR_ALL_HASHTAB_اشیاء(&spin->si_commonwords, hi, todo)
+		اگر (!HASHITEM_خالی_خانے(hi))
 		{
-		    l = (int)STRLEN(hi->hi_key) + 1;
+		    l = (صحیح)STRLEN(hi->hi_کلید) + 1;
 		    len += l;
-		    if (round == 2)			// <word>
-			fwv &= fwrite(hi->hi_key, (size_t)l, (size_t)1, fd);
+		    اگر (باری == 2)			// <word>
+			fwv &= fwrite(hi->hi_کلید, (size_t)l, (size_t)1, fd);
 		    --todo;
 		}
-	    if (round == 1)
-		put_bytes(fd, (long_u)len, 4);		// <sectionlen>
+	    اگر (باری == 1)
+		put_بائٹیں(fd, (long_u)len, 4);		// <sectionlen>
 	}
     }
 
     // SN_MAP: <mapstr>
     // This is for making suggestions, section is not required.
-    if (spin->si_map.ga_len > 0)
+    اگر (spin->si_map.ga_len > 0)
     {
 	putc(SN_MAP, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 	l = spin->si_map.ga_len;
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
-	fwv &= fwrite(spin->si_map.ga_data, (size_t)l, (size_t)1, fd);
+	put_بائٹیں(fd, (long_u)l, 4);			// <sectionlen>
+	fwv &= fwrite(spin->si_map.ga_ڈیٹا, (size_t)l, (size_t)1, fd);
 							// <mapstr>
     }
 
@@ -5271,63 +5271,63 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // same time allows for checking that a .sug file that is found matches
     // with this .spl file.  That's because the word numbers must be exactly
     // right.
-    if (!spin->si_nosugfile
+    اگر (!spin->si_nosugfile
 	    && (spin->si_sal.ga_len > 0
-		     || (spin->si_sofofr != NULL && spin->si_sofoto != NULL)))
+		     || (spin->si_sofofr != تہی && spin->si_sofoto != تہی)))
     {
 	putc(SN_SUGFILE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)8, 4);			// <sectionlen>
+	put_بائٹیں(fd, (long_u)8, 4);			// <sectionlen>
 
 	// Set si_sugtime and write it to the file.
-	spin->si_sugtime = time(NULL);
-	put_time(fd, spin->si_sugtime);			// <timestamp>
+	spin->si_sugtime = وقت(تہی);
+	put_وقت(fd, spin->si_sugtime);			// <timestamp>
     }
 
     // SN_NOSPLITSUGS: nothing
     // This is used to notify that no suggestions with word splits are to be
     // made.
-    if (spin->si_nosplitsugs)
+    اگر (spin->si_nosplitsugs)
     {
 	putc(SN_NOSPLITSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_بائٹیں(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_NOCOMPUNDSUGS: nothing
     // This is used to notify that no suggestions with compounds are to be
     // made.
-    if (spin->si_nocompoundsugs)
+    اگر (spin->si_nocompoundsugs)
     {
 	putc(SN_NOCOMPOUNDSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_بائٹیں(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_COMPOUND: compound info.
     // We don't mark it required, when not supported all compound words will
     // be bad words.
-    if (spin->si_compflags != NULL)
+    اگر (spin->si_compflags != تہی)
     {
 	putc(SN_COMPOUND, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_compflags);
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
-	    l += (int)STRLEN(((char_u **)(spin->si_comppat.ga_data))[i]) + 1;
-	put_bytes(fd, (long_u)(l + 7), 4);		// <sectionlen>
+	l = (صحیح)STRLEN(spin->si_compflags);
+	برائے (i = 0; i < spin->si_comppat.ga_len; ++i)
+	    l += (صحیح)STRLEN(((char_u **)(spin->si_comppat.ga_ڈیٹا))[i]) + 1;
+	put_بائٹیں(fd, (long_u)(l + 7), 4);		// <sectionlen>
 
 	putc(spin->si_compmax, fd);			// <compmax>
 	putc(spin->si_compminlen, fd);			// <compminlen>
 	putc(spin->si_compsylmax, fd);			// <compsylmax>
 	putc(0, fd);		// for Vim 7.0b compatibility
 	putc(spin->si_compoptions, fd);			// <compoptions>
-	put_bytes(fd, (long_u)spin->si_comppat.ga_len, 2);
+	put_بائٹیں(fd, (long_u)spin->si_comppat.ga_len, 2);
 							// <comppatcount>
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
+	برائے (i = 0; i < spin->si_comppat.ga_len; ++i)
 	{
-	    p = ((char_u **)(spin->si_comppat.ga_data))[i];
-	    putc((int)STRLEN(p), fd);			// <comppatlen>
+	    p = ((char_u **)(spin->si_comppat.ga_ڈیٹا))[i];
+	    putc((صحیح)STRLEN(p), fd);			// <comppatlen>
 	    fwv &= fwrite(p, (size_t)STRLEN(p), (size_t)1, fd);
 							// <comppattext>
 	}
@@ -5337,75 +5337,75 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     }
 
     // SN_NOBREAK: NOBREAK flag
-    if (spin->si_nobreak)
+    اگر (spin->si_nobreak)
     {
 	putc(SN_NOBREAK, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// It's empty, the presence of the section flags the feature.
-	put_bytes(fd, (long_u)0, 4);			// <sectionlen>
+	put_بائٹیں(fd, (long_u)0, 4);			// <sectionlen>
     }
 
     // SN_SYLLABLE: syllable info.
     // We don't mark it required, when not supported syllables will not be
     // counted.
-    if (spin->si_syllable != NULL)
+    اگر (spin->si_syllable != تہی)
     {
 	putc(SN_SYLLABLE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_syllable);
-	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
+	l = (صحیح)STRLEN(spin->si_syllable);
+	put_بائٹیں(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_syllable, (size_t)l, (size_t)1, fd);
 							// <syllable>
     }
 
     // end of <SECTIONS>
-    putc(SN_END, fd);					// <sectionend>
+    putc(SN_انتہا, fd);					// <sectionend>
 
 
     /*
      * <LWORDTREE>  <KWORDTREE>  <PREFIXTREE>
      */
     spin->si_memtot = 0;
-    for (round = 1; round <= 3; ++round)
+    برائے (باری = 1; باری <= 3; ++باری)
     {
-	if (round == 1)
-	    tree = spin->si_foldroot->wn_sibling;
-	else if (round == 2)
-	    tree = spin->si_keeproot->wn_sibling;
-	else
-	    tree = spin->si_prefroot->wn_sibling;
+	اگر (باری == 1)
+	    درخت = spin->si_foldroot->wn_sibling;
+	ورنہ اگر (باری == 2)
+	    درخت = spin->si_keeproot->wn_sibling;
+	ورنہ
+	    درخت = spin->si_prefroot->wn_sibling;
 
 	// Clear the index and wnode fields in the tree.
-	clear_node(tree);
+	clear_گرہ(درخت);
 
 	// Count the number of nodes.  Needed to be able to allocate the
 	// memory when reading the nodes.  Also fills in index for shared
 	// nodes.
-	nodecount = put_node(NULL, tree, 0, regionmask, round == 3);
+	nodecount = put_گرہ(تہی, درخت, 0, regionmask, باری == 3);
 
 	// number of nodes in 4 bytes
-	put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-	spin->si_memtot += nodecount + nodecount * sizeof(int);
+	put_بائٹیں(fd, (long_u)nodecount, 4);	// <nodecount>
+	spin->si_memtot += nodecount + nodecount * حجم(صحیح);
 
 	// Write the nodes.
-	(void)put_node(fd, tree, 0, regionmask, round == 3);
+	(خالی)put_گرہ(fd, درخت, 0, regionmask, باری == 3);
     }
 
     // Write another byte to check for errors (file system full).
-    if (putc(0, fd) == EOF)
+    اگر (putc(0, fd) == EOF)
 	retval = FAIL;
 theend:
-    if (fclose(fd) == EOF)
+    اگر (fclose(fd) == EOF)
 	retval = FAIL;
 
-    if (fwv != (size_t)1)
+    اگر (fwv != (size_t)1)
 	retval = FAIL;
-    if (retval == FAIL)
+    اگر (retval == FAIL)
 	emsg(_(e_error_while_writing));
 
-    return retval;
+    واپس retval;
 }
 
 /*
@@ -5413,19 +5413,19 @@ theend:
  * children.  This is needed because they are a union with other items to save
  * space.
  */
-    static void
-clear_node(wordnode_T *node)
+    ساکن خالی
+clear_گرہ(wordnode_T *گرہ)
 {
     wordnode_T	*np;
 
-    if (node != NULL)
-	FOR_ALL_NODE_SIBLINGS(node, np)
+    اگر (گرہ != تہی)
+	FOR_ALL_گرہ_SIBLINGS(گرہ, np)
 	{
-	    np->wn_u1.index = 0;
-	    np->wn_u2.wnode = NULL;
+	    np->wn_u1.اشاریہ = 0;
+	    np->wn_u2.wnode = تہی;
 
-	    if (np->wn_byte != NUL)
-		clear_node(np->wn_child);
+	    اگر (np->wn_byte != NUL)
+		clear_گرہ(np->wn_بچہ);
 	}
 }
 
@@ -5442,114 +5442,114 @@ clear_node(wordnode_T *node)
  *
  * Returns the number of nodes used.
  */
-    static int
-put_node(
+    ساکن صحیح
+put_گرہ(
     FILE	*fd,		// NULL when only counting
-    wordnode_T	*node,
-    int		idx,
-    int		regionmask,
-    int		prefixtree)	// TRUE for PREFIXTREE
+    wordnode_T	*گرہ,
+    صحیح		idx,
+    صحیح		regionmask,
+    صحیح		prefixtree)	// TRUE for PREFIXTREE
 {
-    int		newindex = idx;
-    int		siblingcount = 0;
+    صحیح		newindex = idx;
+    صحیح		siblingcount = 0;
     wordnode_T	*np;
-    int		flags;
+    صحیح		flags;
 
     // If "node" is zero the tree is empty.
-    if (node == NULL)
-	return 0;
+    اگر (گرہ == تہی)
+	واپس 0;
 
     // Store the index where this node is written.
-    node->wn_u1.index = idx;
+    گرہ->wn_u1.اشاریہ = idx;
 
     // Count the number of siblings.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_گرہ_SIBLINGS(گرہ, np)
 	++siblingcount;
 
     // Write the sibling count.
-    if (fd != NULL)
+    اگر (fd != تہی)
 	putc(siblingcount, fd);				// <siblingcount>
 
     // Write each sibling byte and optionally extra info.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_گرہ_SIBLINGS(گرہ, np)
     {
-	if (np->wn_byte == 0)
+	اگر (np->wn_byte == 0)
 	{
-	    if (fd != NULL)
+	    اگر (fd != تہی)
 	    {
 		// For a NUL byte (end of word) write the flags etc.
-		if (prefixtree)
+		اگر (prefixtree)
 		{
 		    // In PREFIXTREE write the required affixID and the
 		    // associated condition nr (stored in wn_region).  The
 		    // byte value is misused to store the "rare" and "not
 		    // combining" flags
-		    if (np->wn_flags == (short_u)PFX_FLAGS)
+		    اگر (np->wn_flags == (short_u)PFX_FLAGS)
 			putc(BY_NOFLAGS, fd);		// <byte>
-		    else
+		    ورنہ
 		    {
 			putc(BY_FLAGS, fd);		// <byte>
 			putc(np->wn_flags, fd);		// <pflags>
 		    }
 		    putc(np->wn_affixID, fd);		// <affixID>
-		    put_bytes(fd, (long_u)np->wn_region, 2); // <prefcondnr>
+		    put_بائٹیں(fd, (long_u)np->wn_region, 2); // <prefcondnr>
 		}
-		else
+		ورنہ
 		{
 		    // For word trees we write the flag/region items.
 		    flags = np->wn_flags;
-		    if (regionmask != 0 && np->wn_region != regionmask)
+		    اگر (regionmask != 0 && np->wn_region != regionmask)
 			flags |= WF_REGION;
-		    if (np->wn_affixID != 0)
+		    اگر (np->wn_affixID != 0)
 			flags |= WF_AFX;
-		    if (flags == 0)
+		    اگر (flags == 0)
 		    {
 			// word without flags or region
 			putc(BY_NOFLAGS, fd);			// <byte>
 		    }
-		    else
+		    ورنہ
 		    {
-			if (np->wn_flags >= 0x100)
+			اگر (np->wn_flags >= 0x100)
 			{
 			    putc(BY_FLAGS2, fd);		// <byte>
 			    putc(flags, fd);			// <flags>
-			    putc((unsigned)flags >> 8, fd);	// <flags2>
+			    putc((غیرعلامتی)flags >> 8, fd);	// <flags2>
 			}
-			else
+			ورنہ
 			{
 			    putc(BY_FLAGS, fd);			// <byte>
 			    putc(flags, fd);			// <flags>
 			}
-			if (flags & WF_REGION)
+			اگر (flags & WF_REGION)
 			    putc(np->wn_region, fd);		// <region>
-			if (flags & WF_AFX)
+			اگر (flags & WF_AFX)
 			    putc(np->wn_affixID, fd);		// <affixID>
 		    }
 		}
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (np->wn_child->wn_u1.index != 0
-					 && np->wn_child->wn_u2.wnode != node)
+	    اگر (np->wn_بچہ->wn_u1.اشاریہ != 0
+					 && np->wn_بچہ->wn_u2.wnode != گرہ)
 	    {
 		// The child is written elsewhere, write the reference.
-		if (fd != NULL)
+		اگر (fd != تہی)
 		{
-		    putc(BY_INDEX, fd);			// <byte>
+		    putc(BY_اشاریہ, fd);			// <byte>
 							// <nodeidx>
-		    put_bytes(fd, (long_u)np->wn_child->wn_u1.index, 3);
+		    put_بائٹیں(fd, (long_u)np->wn_بچہ->wn_u1.اشاریہ, 3);
 		}
 	    }
-	    else if (np->wn_child->wn_u2.wnode == NULL)
+	    ورنہ اگر (np->wn_بچہ->wn_u2.wnode == تہی)
 		// We will write the child below and give it an index.
-		np->wn_child->wn_u2.wnode = node;
+		np->wn_بچہ->wn_u2.wnode = گرہ;
 
-	    if (fd != NULL)
-		if (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
+	    اگر (fd != تہی)
+		اگر (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
 		{
 		    emsg(_(e_error_while_writing));
-		    return 0;
+		    واپس 0;
 		}
 	}
     }
@@ -5559,12 +5559,12 @@ put_node(
     newindex += siblingcount + 1;
 
     // Recursively dump the children of each sibling.
-    FOR_ALL_NODE_SIBLINGS(node, np)
-	if (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == node)
-	    newindex = put_node(fd, np->wn_child, newindex, regionmask,
+    FOR_ALL_گرہ_SIBLINGS(گرہ, np)
+	اگر (np->wn_byte != 0 && np->wn_بچہ->wn_u2.wnode == گرہ)
+	    newindex = put_گرہ(fd, np->wn_بچہ, newindex, regionmask,
 								  prefixtree);
 
-    return newindex;
+    واپس newindex;
 }
 
 
@@ -5572,23 +5572,23 @@ put_node(
  * ":mkspell [-ascii] outfile  infile ..."
  * ":mkspell [-ascii] addfile"
  */
-    void
+    خالی
 ex_mkspell(exarg_T *eap)
 {
-    int		fcount;
+    صحیح		fcount;
     char_u	**fnames;
     char_u	*arg = eap->arg;
-    int		ascii = FALSE;
+    صحیح		ascii = FALSE;
 
-    if (STRNCMP(arg, "-ascii", 6) == 0)
+    اگر (STRNCMP(arg, "-ascii", 6) == 0)
     {
 	ascii = TRUE;
 	arg = skipwhite(arg + 6);
     }
 
     // Expand all the remaining arguments (e.g., $VIMRUNTIME).
-    if (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
-	return;
+    اگر (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
+	واپس;
 
     mkspell(fcount, fnames, ascii, eap->forceit, FALSE);
     FreeWild(fcount, fnames);
@@ -5599,13 +5599,13 @@ ex_mkspell(exarg_T *eap)
  * Uses the soundfold info in "spin".
  * Writes the file with the name "wfname", with ".spl" changed to ".sug".
  */
-    static void
+    ساکن خالی
 spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
 {
-    char_u	*fname = NULL;
-    int		len;
+    char_u	*fname = تہی;
+    صحیح		len;
     slang_T	*slang;
-    int		free_slang = FALSE;
+    صحیح		free_slang = FALSE;
 
     /*
      * Read back the .spl file that was written.  This fills the required
@@ -5615,34 +5615,34 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * It might have been done already by spell_reload_one().
      */
     FOR_ALL_SPELL_LANGS(slang)
-	if (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-	    break;
-    if (slang == NULL)
+	اگر (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	    توڑو;
+    اگر (slang == تہی)
     {
-	spell_message(spin, (char_u *)_("Reading back spell file..."));
-	slang = spell_load_file(wfname, NULL, NULL, FALSE);
-	if (slang == NULL)
-	    return;
+	spell_پیغام(spin, (char_u *)_("Reading back spell file..."));
+	slang = spell_بھرو_file(wfname, تہی, تہی, FALSE);
+	اگر (slang == تہی)
+	    واپس;
 	free_slang = TRUE;
     }
 
     /*
      * Clear the info in "spin" that is used.
      */
-    spin->si_blocks = NULL;
-    spin->si_blocks_cnt = 0;
+    spin->si_بلاکیں = تہی;
+    spin->si_بلاکیں_cnt = 0;
     spin->si_compress_cnt = 0;	    // will stay at 0 all the time
-    spin->si_free_count = 0;
-    spin->si_first_free = NULL;
+    spin->si_free_گنتی = 0;
+    spin->si_پہلا_free = تہی;
     spin->si_foldwcount = 0;
 
     /*
      * Go through the trie of good words, soundfold each word and add it to
      * the soundfold trie.
      */
-    spell_message(spin, (char_u *)_("Performing soundfolding..."));
-    if (sug_filltree(spin, slang) == FAIL)
-	goto theend;
+    spell_پیغام(spin, (char_u *)_("Performing soundfolding..."));
+    اگر (sug_filltree(spin, slang) == FAIL)
+	جاؤ theend;
 
     /*
      * Create the table which links each soundfold word with a list of the
@@ -5650,16 +5650,16 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * This also removes the wordnr from the NUL byte entries to make
      * compression possible.
      */
-    if (sug_maketable(spin) == FAIL)
-	goto theend;
+    اگر (sug_maketable(spin) == FAIL)
+	جاؤ theend;
 
     smsg(_("Number of words after soundfolding: %ld"),
-				 (long)spin->si_spellbuf->b_ml.ml_line_count);
+				 (طویل)spin->si_spellbuf->b_ml.ml_سطر_گنتی);
 
     /*
      * Compress the soundfold trie.
      */
-    spell_message(spin, (char_u *)_(msg_compressing));
+    spell_پیغام(spin, (char_u *)_(پیغام_compressing));
     wordtree_compress(spin, spin->si_foldroot, "case-folded");
 
     /*
@@ -5667,44 +5667,44 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * Make the file name by changing ".spl" to ".sug".
      */
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	goto theend;
+    اگر (fname == تہی)
+	جاؤ theend;
     vim_strncpy(fname, wfname, MAXPATHL - 1);
-    len = (int)STRLEN(fname);
+    len = (صحیح)STRLEN(fname);
     fname[len - 2] = 'u';
     fname[len - 1] = 'g';
     sug_write(spin, fname);
 
 theend:
     vim_free(fname);
-    if (free_slang)
+    اگر (free_slang)
 	slang_free(slang);
-    free_blocks(spin->si_blocks);
+    free_بلاکیں(spin->si_بلاکیں);
     close_spellbuf(spin->si_spellbuf);
 }
 
 /*
  * Build the soundfold trie for language "slang".
  */
-    static int
+    ساکن صحیح
 sug_filltree(spellinfo_T *spin, slang_T *slang)
 {
     char_u	*byts;
     idx_T	*idxs;
-    int		depth;
+    صحیح		گہرائی;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    صحیح		curi[MAXWLEN];
     char_u	tword[MAXWLEN];
     char_u	tsalword[MAXWLEN];
-    int		c;
+    صحیح		c;
     idx_T	n;
-    unsigned	words_done = 0;
-    int		wordcount[MAXWLEN];
+    غیرعلامتی	الفاظ_مکمل = 0;
+    صحیح		wordcount[MAXWLEN];
 
     // We use si_foldroot for the soundfolded trie.
     spin->si_foldroot = wordtree_alloc(spin);
-    if (spin->si_foldroot == NULL)
-	return FAIL;
+    اگر (spin->si_foldroot == تہی)
+	واپس FAIL;
 
     // let tree_add_word() know we're adding to the soundfolded tree
     spin->si_sugtree = TRUE;
@@ -5715,76 +5715,76 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
      */
     byts = slang->sl_fbyts;
     idxs = slang->sl_fidxs;
-    if (byts == NULL || idxs == NULL)
-	return FAIL;
+    اگر (byts == تہی || idxs == تہی)
+	واپس FAIL;
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
 
-    depth = 0;
-    while (depth >= 0 && !got_int)
+    گہرائی = 0;
+    جب (گہرائی >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	اگر (curi[گہرائی] > byts[arridx[گہرائی]])
 	{
 	    // Done all bytes at this node, go up one level.
-	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
-		wordcount[depth - 1] += wordcount[depth];
+	    idxs[arridx[گہرائی]] = wordcount[گہرائی];
+	    اگر (گہرائی > 0)
+		wordcount[گہرائی - 1] += wordcount[گہرائی];
 
-	    --depth;
-	    line_breakcheck();
+	    --گہرائی;
+	    سطر_breakcheck();
 	}
-	else
+	ورنہ
 	{
 
 	    // Do one more byte at this node.
-	    n = arridx[depth] + curi[depth];
-	    ++curi[depth];
+	    n = arridx[گہرائی] + curi[گہرائی];
+	    ++curi[گہرائی];
 
 	    c = byts[n];
-	    if (c == 0)
+	    اگر (c == 0)
 	    {
 		// Sound-fold the word.
-		tword[depth] = NUL;
+		tword[گہرائی] = NUL;
 		spell_soundfold(slang, tword, TRUE, tsalword);
 
 		// We use the "flags" field for the MSB of the wordnr,
 		// "region" for the LSB of the wordnr.
-		if (tree_add_word(spin, tsalword, spin->si_foldroot,
-				words_done >> 16, words_done & 0xffff,
+		اگر (درخت_جوڑو_لفظ(spin, tsalword, spin->si_foldroot,
+				الفاظ_مکمل >> 16, الفاظ_مکمل & 0xffff,
 							   0) == FAIL)
-		    return FAIL;
+		    واپس FAIL;
 
-		++words_done;
-		++wordcount[depth];
+		++الفاظ_مکمل;
+		++wordcount[گہرائی];
 
 		// Reset the block count each time to avoid compression
 		// kicking in.
-		spin->si_blocks_cnt = 0;
+		spin->si_بلاکیں_cnt = 0;
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
+		جب (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
 		{
 		    ++n;
-		    ++curi[depth];
+		    ++curi[گہرائی];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    ورنہ اگر (گہرائی < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper.
-		tword[depth++] = c;
-		arridx[depth] = idxs[n];
-		curi[depth] = 1;
-		wordcount[depth] = 0;
+		tword[گہرائی++] = c;
+		arridx[گہرائی] = idxs[n];
+		curi[گہرائی] = 1;
+		wordcount[گہرائی] = 0;
 	    }
 	}
     }
 
-    smsg(_("Total number of words: %d"), words_done);
+    smsg(_("Total number of words: %d"), الفاظ_مکمل);
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -5794,28 +5794,28 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
  * the table efficiently.
  * Returns FAIL when out of memory.
  */
-    static int
+    ساکن صحیح
 sug_maketable(spellinfo_T *spin)
 {
     garray_T	ga;
-    int		res = OK;
+    صحیح		res = OK;
 
     // Allocate a buffer, open a memline for it and create the swap file
     // (uses a temp file, not a .swp file).
     spin->si_spellbuf = open_spellbuf();
-    if (spin->si_spellbuf == NULL)
-	return FAIL;
+    اگر (spin->si_spellbuf == تہی)
+	واپس FAIL;
 
     // Use a buffer to store the line info, avoids allocating many small
     // pieces of memory.
     ga_init2(&ga, 1, 100);
 
     // recursively go through the tree
-    if (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
+    اگر (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
 	res = FAIL;
 
     ga_clear(&ga);
-    return res;
+    واپس res;
 }
 
 /*
@@ -5823,51 +5823,51 @@ sug_maketable(spellinfo_T *spin)
  * Returns the wordnr at the start of the node.
  * Returns -1 when out of memory.
  */
-    static int
+    ساکن صحیح
 sug_filltable(
     spellinfo_T	*spin,
-    wordnode_T	*node,
-    int		startwordnr,
+    wordnode_T	*گرہ,
+    صحیح		startwordnr,
     garray_T	*gap)	    // place to store line of numbers
 {
     wordnode_T	*p, *np;
-    int		wordnr = startwordnr;
-    int		nr;
-    int		prev_nr;
+    صحیح		wordnr = startwordnr;
+    صحیح		nr;
+    صحیح		پچھلا_nr;
 
-    FOR_ALL_NODE_SIBLINGS(node, p)
+    FOR_ALL_گرہ_SIBLINGS(گرہ, p)
     {
-	if (p->wn_byte == NUL)
+	اگر (p->wn_byte == NUL)
 	{
 	    gap->ga_len = 0;
-	    prev_nr = 0;
-	    for (np = p; np != NULL && np->wn_byte == NUL; np = np->wn_sibling)
+	    پچھلا_nr = 0;
+	    برائے (np = p; np != تہی && np->wn_byte == NUL; np = np->wn_sibling)
 	    {
-		if (ga_grow(gap, 10) == FAIL)
-		    return -1;
+		اگر (ga_grow(gap, 10) == FAIL)
+		    واپس -1;
 
 		nr = (np->wn_flags << 16) + (np->wn_region & 0xffff);
 		// Compute the offset from the previous nr and store the
 		// offset in a way that it takes a minimum number of bytes.
 		// It's a bit like utf-8, but without the need to mark
 		// following bytes.
-		nr -= prev_nr;
-		prev_nr += nr;
+		nr -= پچھلا_nr;
+		پچھلا_nr += nr;
 		gap->ga_len += offset2bytes(nr,
-					 (char_u *)gap->ga_data + gap->ga_len);
+					 (char_u *)gap->ga_ڈیٹا + gap->ga_len);
 	    }
 
 	    // add the NUL byte
-	    ((char_u *)gap->ga_data)[gap->ga_len++] = NUL;
+	    ((char_u *)gap->ga_ڈیٹا)[gap->ga_len++] = NUL;
 
-	    if (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
-				     gap->ga_data, gap->ga_len, TRUE) == FAIL)
-		return -1;
+	    اگر (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
+				     gap->ga_ڈیٹا, gap->ga_len, TRUE) == FAIL)
+		واپس -1;
 	    ++wordnr;
 
 	    // Remove extra NUL entries, we no longer need them. We don't
 	    // bother freeing the nodes, they won't be reused anyway.
-	    while (p->wn_sibling != NULL && p->wn_sibling->wn_byte == NUL)
+	    جب (p->wn_sibling != تہی && p->wn_sibling->wn_byte == NUL)
 		p->wn_sibling = p->wn_sibling->wn_sibling;
 
 	    // Clear the flags on the remaining NUL node, so that compression
@@ -5875,14 +5875,14 @@ sug_filltable(
 	    p->wn_flags = 0;
 	    p->wn_region = 0;
 	}
-	else
+	ورنہ
 	{
-	    wordnr = sug_filltable(spin, p->wn_child, wordnr, gap);
-	    if (wordnr == -1)
-		return -1;
+	    wordnr = sug_filltable(spin, p->wn_بچہ, wordnr, gap);
+	    اگر (wordnr == -1)
+		واپس -1;
 	}
     }
-    return wordnr;
+    واپس wordnr;
 }
 
 /*
@@ -5890,11 +5890,11 @@ sug_filltable(
  * Similar to utf_char2byters, but use 8 bits in followup bytes and avoid NUL
  * bytes.
  */
-    static int
-offset2bytes(int nr, char_u *buf)
+    ساکن صحیح
+offset2bytes(صحیح nr, char_u *buf)
 {
-    int	    rem;
-    int	    b1, b2, b3, b4;
+    صحیح	    rem;
+    صحیح	    b1, b2, b3, b4;
 
     // Split the number in parts of base 255.  We need to avoid NUL bytes.
     b1 = nr % 255 + 1;
@@ -5904,118 +5904,118 @@ offset2bytes(int nr, char_u *buf)
     b3 = rem % 255 + 1;
     b4 = rem / 255 + 1;
 
-    if (b4 > 1 || b3 > 0x1f)	// 4 bytes
+    اگر (b4 > 1 || b3 > 0x1f)	// 4 bytes
     {
 	buf[0] = 0xe0 + b4;
 	buf[1] = b3;
 	buf[2] = b2;
 	buf[3] = b1;
-	return 4;
+	واپس 4;
     }
-    if (b3 > 1 || b2 > 0x3f )	// 3 bytes
+    اگر (b3 > 1 || b2 > 0x3f )	// 3 bytes
     {
 	buf[0] = 0xc0 + b3;
 	buf[1] = b2;
 	buf[2] = b1;
-	return 3;
+	واپس 3;
     }
-    if (b2 > 1 || b1 > 0x7f )	// 2 bytes
+    اگر (b2 > 1 || b1 > 0x7f )	// 2 bytes
     {
 	buf[0] = 0x80 + b2;
 	buf[1] = b1;
-	return 2;
+	واپس 2;
     }
 				// 1 byte
     buf[0] = b1;
-    return 1;
+    واپس 1;
 }
 
 /*
  * Write the .sug file in "fname".
  */
-    static void
+    ساکن خالی
 sug_write(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		wcount;
-    char_u	*line;
+    wordnode_T	*درخت;
+    صحیح		nodecount;
+    صحیح		wcount;
+    char_u	*سطر;
     linenr_T	lnum;
-    int		len;
+    صحیح		len;
 
     // Create the file.  Note that an existing file is silently overwritten!
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)fname, "w");
+    اگر (fd == تہی)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return;
+	واپس;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((حرف *)IObuff, IOSIZE,
 				  _("Writing suggestion file %s..."), fname);
-    spell_message(spin, IObuff);
+    spell_پیغام(spin, IObuff);
 
     /*
      * <SUGHEADER>: <fileID> <versionnr> <timestamp>
      */
-    if (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
+    اگر (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
     {
 	emsg(_(e_error_while_writing));
-	goto theend;
+	جاؤ theend;
     }
     putc(VIMSUGVERSION, fd);				// <versionnr>
 
     // Write si_sugtime to the file.
-    put_time(fd, spin->si_sugtime);			// <timestamp>
+    put_وقت(fd, spin->si_sugtime);			// <timestamp>
 
     /*
      * <SUGWORDTREE>
      */
     spin->si_memtot = 0;
-    tree = spin->si_foldroot->wn_sibling;
+    درخت = spin->si_foldroot->wn_sibling;
 
     // Clear the index and wnode fields in the tree.
-    clear_node(tree);
+    clear_گرہ(درخت);
 
     // Count the number of nodes.  Needed to be able to allocate the
     // memory when reading the nodes.  Also fills in index for shared
     // nodes.
-    nodecount = put_node(NULL, tree, 0, 0, FALSE);
+    nodecount = put_گرہ(تہی, درخت, 0, 0, FALSE);
 
     // number of nodes in 4 bytes
-    put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-    spin->si_memtot += nodecount + nodecount * sizeof(int);
+    put_بائٹیں(fd, (long_u)nodecount, 4);	// <nodecount>
+    spin->si_memtot += nodecount + nodecount * حجم(صحیح);
 
     // Write the nodes.
-    (void)put_node(fd, tree, 0, 0, FALSE);
+    (خالی)put_گرہ(fd, درخت, 0, 0, FALSE);
 
     /*
      * <SUGTABLE>: <sugwcount> <sugline> ...
      */
-    wcount = spin->si_spellbuf->b_ml.ml_line_count;
-    put_bytes(fd, (long_u)wcount, 4);	// <sugwcount>
+    wcount = spin->si_spellbuf->b_ml.ml_سطر_گنتی;
+    put_بائٹیں(fd, (long_u)wcount, 4);	// <sugwcount>
 
-    for (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
+    برائے (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
     {
 	// <sugline>: <sugnr> ... NUL
-	line = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
+	سطر = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
 	len = ml_get_buf_len(spin->si_spellbuf, lnum) + 1;
-	if (fwrite(line, (size_t)len, (size_t)1, fd) == 0)
+	اگر (fwrite(سطر, (size_t)len, (size_t)1, fd) == 0)
 	{
 	    emsg(_(e_error_while_writing));
-	    goto theend;
+	    جاؤ theend;
 	}
 	spin->si_memtot += len;
     }
 
     // Write another byte to check for errors.
-    if (putc(0, fd) == EOF)
+    اگر (putc(0, fd) == EOF)
 	emsg(_(e_error_while_writing));
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((حرف *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin->si_memtot);
-    spell_message(spin, IObuff);
+    spell_پیغام(spin, IObuff);
 
 theend:
     // close the file
@@ -6030,36 +6030,36 @@ theend:
  * Exception: when "fnames[0]" ends in ".add" it's used as the input file name
  * and ".spl" is appended to make the output file name.
  */
-    void
+    خالی
 mkspell(
-    int		fcount,
+    صحیح		fcount,
     char_u	**fnames,
-    int		ascii,		    // -ascii argument given
-    int		over_write,	    // overwrite existing output file
-    int		added_word)	    // invoked through "zg"
+    صحیح		ascii,		    // -ascii argument given
+    صحیح		over_write,	    // overwrite existing output file
+    صحیح		added_لفظ)	    // invoked through "zg"
 {
-    char_u	*fname = NULL;
+    char_u	*fname = تہی;
     char_u	*wfname;
     char_u	**innames;
-    int		incount;
+    صحیح		incount;
     afffile_T	*(afile[MAXREGIONS]);
-    int		i;
-    int		len;
+    صحیح		i;
+    صحیح		len;
     stat_T	st;
-    int		error = FALSE;
+    صحیح		error = FALSE;
     spellinfo_T spin;
 
-    CLEAR_FIELD(spin);
-    spin.si_verbose = !added_word;
+    CLEAR_میدان(spin);
+    spin.si_verbose = !added_لفظ;
     spin.si_ascii = ascii;
     spin.si_followup = TRUE;
     spin.si_rem_accents = TRUE;
-    ga_init2(&spin.si_rep, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_repsal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_sal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_map, sizeof(char_u), 100);
-    ga_init2(&spin.si_comppat, sizeof(char_u *), 20);
-    ga_init2(&spin.si_prefcond, sizeof(char_u *), 50);
+    ga_init2(&spin.si_rep, حجم(fromto_T), 20);
+    ga_init2(&spin.si_repsal, حجم(fromto_T), 20);
+    ga_init2(&spin.si_sal, حجم(fromto_T), 20);
+    ga_init2(&spin.si_map, حجم(char_u), 100);
+    ga_init2(&spin.si_comppat, حجم(char_u *), 20);
+    ga_init2(&spin.si_prefcond, حجم(char_u *), 50);
     hash_init(&spin.si_commonwords);
     spin.si_newcompID = 127;	// start compound ID at first maximum
 
@@ -6069,103 +6069,103 @@ mkspell(
     incount = fcount - 1;
 
     wfname = alloc(MAXPATHL);
-    if (wfname == NULL)
-	return;
+    اگر (wfname == تہی)
+	واپس;
 
-    if (fcount >= 1)
+    اگر (fcount >= 1)
     {
-	len = (int)STRLEN(fnames[0]);
-	if (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
+	len = (صحیح)STRLEN(fnames[0]);
+	اگر (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
 	{
 	    // For ":mkspell path/en.latin1.add" output file is
 	    // "path/en.latin1.add.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, "%s.spl", fnames[0]);
+	    vim_snprintf((حرف *)wfname, MAXPATHL, "%s.spl", fnames[0]);
 	}
-	else if (fcount == 1)
+	ورنہ اگر (fcount == 1)
 	{
 	    // For ":mkspell path/vim" output file is "path/vim.latin1.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((حرف *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 	}
-	else if (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
+	ورنہ اگر (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
 	{
 	    // Name ends in ".spl", use as the file name.
 	    vim_strncpy(wfname, fnames[0], MAXPATHL - 1);
 	}
-	else
+	ورنہ
 	    // Name should be language, make the file name from it.
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((حرف *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 
 	// Check for .ascii.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ASCII) != NULL)
+	اگر (لڑی_تلاش((حرف *)gettail(wfname), SPL_FNAME_ASCII) != تہی)
 	    spin.si_ascii = TRUE;
 
 	// Check for .add.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ADD) != NULL)
-	    spin.si_add = TRUE;
+	اگر (لڑی_تلاش((حرف *)gettail(wfname), SPL_FNAME_جوڑو) != تہی)
+	    spin.si_جوڑو = TRUE;
     }
 
-    if (incount <= 0)
-	emsg(_(e_invalid_argument));	// need at least output and input names
-    else if (vim_strchr(gettail(wfname), '_') != NULL)
+    اگر (incount <= 0)
+	emsg(_(e_invalid_دلیل));	// need at least output and input names
+    ورنہ اگر (vim_strchr(gettail(wfname), '_') != تہی)
 	emsg(_(e_output_file_name_must_not_have_region_name));
-    else if (incount > MAXREGIONS)
-	semsg(_(e_only_up_to_nr_regions_supported), MAXREGIONS);
-    else
+    ورنہ اگر (incount > MAXREGIONS)
+	semsg(_(e_only_اوپر_مقصد_nr_regions_supported), MAXREGIONS);
+    ورنہ
     {
 	// Check for overwriting before doing things that may take a lot of
 	// time.
-	if (!over_write && mch_stat((char *)wfname, &st) >= 0)
+	اگر (!over_write && mch_stat((حرف *)wfname, &st) >= 0)
 	{
 	    emsg(_(e_file_exists));
-	    goto theend;
+	    جاؤ theend;
 	}
-	if (mch_isdir(wfname))
+	اگر (mch_isdir(wfname))
 	{
 	    semsg(_(e_str_is_directory), wfname);
-	    goto theend;
+	    جاؤ theend;
 	}
 
 	fname = alloc(MAXPATHL);
-	if (fname == NULL)
-	    goto theend;
+	اگر (fname == تہی)
+	    جاؤ theend;
 
 	/*
 	 * Init the aff and dic pointers.
 	 * Get the region names if there are more than 2 arguments.
 	 */
-	for (i = 0; i < incount; ++i)
+	برائے (i = 0; i < incount; ++i)
 	{
-	    afile[i] = NULL;
+	    afile[i] = تہی;
 
-	    if (incount > 1)
+	    اگر (incount > 1)
 	    {
-		len = (int)STRLEN(innames[i]);
-		if (STRLEN(gettail(innames[i])) < 5
+		len = (صحیح)STRLEN(innames[i]);
+		اگر (STRLEN(gettail(innames[i])) < 5
 						|| innames[i][len - 3] != '_')
 		{
-		    semsg(_(e_invalid_region_in_str), innames[i]);
-		    goto theend;
+		    semsg(_(e_invalid_region_اندر_str), innames[i]);
+		    جاؤ theend;
 		}
 		spin.si_region_name[i * 2] = TOLOWER_ASC(innames[i][len - 2]);
 		spin.si_region_name[i * 2 + 1] =
 					     TOLOWER_ASC(innames[i][len - 1]);
 	    }
 	}
-	spin.si_region_count = incount;
+	spin.si_region_گنتی = incount;
 
 	spin.si_foldroot = wordtree_alloc(&spin);
 	spin.si_keeproot = wordtree_alloc(&spin);
 	spin.si_prefroot = wordtree_alloc(&spin);
-	if (spin.si_foldroot == NULL
-		|| spin.si_keeproot == NULL
-		|| spin.si_prefroot == NULL)
+	اگر (spin.si_foldroot == تہی
+		|| spin.si_keeproot == تہی
+		|| spin.si_prefroot == تہی)
 	{
-	    free_blocks(spin.si_blocks);
-	    goto theend;
+	    free_بلاکیں(spin.si_بلاکیں);
+	    جاؤ theend;
 	}
 
 	// When not producing a .add.spl file clear the character table when
@@ -6173,7 +6173,7 @@ mkspell(
 	// one in the .spl file if the .aff file doesn't define one.  That's
 	// better than guessing the contents, the table will match a
 	// previously loaded spell file.
-	if (!spin.si_add)
+	اگر (!spin.si_جوڑو)
 	    spin.si_clear_chartab = TRUE;
 
 	/*
@@ -6181,75 +6181,75 @@ mkspell(
 	 * Text is converted to 'encoding'.
 	 * Words are stored in the case-folded and keep-case trees.
 	 */
-	for (i = 0; i < incount && !error; ++i)
+	برائے (i = 0; i < incount && !error; ++i)
 	{
 	    spin.si_conv.vc_type = CONV_NONE;
 	    spin.si_region = 1 << i;
 
-	    vim_snprintf((char *)fname, MAXPATHL, "%s.aff", innames[i]);
-	    if (mch_stat((char *)fname, &st) >= 0)
+	    vim_snprintf((حرف *)fname, MAXPATHL, "%s.aff", innames[i]);
+	    اگر (mch_stat((حرف *)fname, &st) >= 0)
 	    {
 		// Read the .aff file.  Will init "spin->si_conv" based on the
 		// "SET" line.
 		afile[i] = spell_read_aff(&spin, fname);
-		if (afile[i] == NULL)
+		اگر (afile[i] == تہی)
 		    error = TRUE;
-		else
+		ورنہ
 		{
 		    // Read the .dic file and store the words in the trees.
-		    vim_snprintf((char *)fname, MAXPATHL, "%s.dic",
+		    vim_snprintf((حرف *)fname, MAXPATHL, "%s.dic",
 								  innames[i]);
-		    if (spell_read_dic(&spin, fname, afile[i]) == FAIL)
+		    اگر (spell_read_dic(&spin, fname, afile[i]) == FAIL)
 			error = TRUE;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
 		// No .aff file, try reading the file as a word list.  Store
 		// the words in the trees.
-		if (spell_read_wordfile(&spin, innames[i]) == FAIL)
+		اگر (spell_read_wordfile(&spin, innames[i]) == FAIL)
 		    error = TRUE;
 	    }
 
 	    // Free any conversion stuff.
-	    convert_setup(&spin.si_conv, NULL, NULL);
+	    convert_تیاری(&spin.si_conv, تہی, تہی);
 	}
 
-	if (spin.si_compflags != NULL && spin.si_nobreak)
-	    msg(_("Warning: both compounding and NOBREAK specified"));
+	اگر (spin.si_compflags != تہی && spin.si_nobreak)
+	    پیغام(_("Warning: both compounding and NOBREAK specified"));
 
-	if (!error && !got_int)
+	اگر (!error && !got_int)
 	{
 	    /*
 	     * Combine tails in the tree.
 	     */
-	    spell_message(&spin, (char_u *)_(msg_compressing));
+	    spell_پیغام(&spin, (char_u *)_(پیغام_compressing));
 	    wordtree_compress(&spin, spin.si_foldroot, "case-folded");
 	    wordtree_compress(&spin, spin.si_keeproot, "keep-case");
 	    wordtree_compress(&spin, spin.si_prefroot, "prefixes");
 	}
 
-	if (!error && !got_int)
+	اگر (!error && !got_int)
 	{
 	    /*
 	     * Write the info in the spell file.
 	     */
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    vim_snprintf((حرف *)IObuff, IOSIZE,
 				      _("Writing spell file %s..."), wfname);
-	    spell_message(&spin, IObuff);
+	    spell_پیغام(&spin, IObuff);
 
 	    error = write_vim_spell(&spin, wfname) == FAIL;
 
-	    spell_message(&spin, (char_u *)_("Done!"));
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    spell_پیغام(&spin, (char_u *)_("Done!"));
+	    vim_snprintf((حرف *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin.si_memtot);
-	    spell_message(&spin, IObuff);
+	    spell_پیغام(&spin, IObuff);
 
 	    /*
 	     * If the file is loaded need to reload it.
 	     */
-	    if (!error)
-		spell_reload_one(wfname, added_word);
+	    اگر (!error)
+		spell_reload_one(wfname, added_لفظ);
 	}
 
 	// Free the allocated memory.
@@ -6262,18 +6262,18 @@ mkspell(
 	hash_clear_all(&spin.si_commonwords, 0);
 
 	// Free the .aff file structures.
-	for (i = 0; i < incount; ++i)
-	    if (afile[i] != NULL)
+	برائے (i = 0; i < incount; ++i)
+	    اگر (afile[i] != تہی)
 		spell_free_aff(afile[i]);
 
 	// Free all the bits and pieces at once.
-	free_blocks(spin.si_blocks);
+	free_بلاکیں(spin.si_بلاکیں);
 
 	/*
 	 * If there is soundfolding info and no NOSUGFILE item create the
 	 * .sug file with the soundfolded word trie.
 	 */
-	if (spin.si_sugtime != 0 && !error && !got_int)
+	اگر (spin.si_sugtime != 0 && !error && !got_int)
 	    spell_make_sugfile(&spin, wfname);
 
     }
@@ -6287,16 +6287,16 @@ theend:
  * Display a message for spell file processing when 'verbose' is set or using
  * ":mkspell".  "str" can be IObuff.
  */
-    static void
-spell_message(spellinfo_T *spin, char_u *str)
+    ساکن خالی
+spell_پیغام(spellinfo_T *spin, char_u *str)
 {
-    if (spin->si_verbose || p_verbose > 2)
+    اگر (spin->si_verbose || p_verbose > 2)
     {
-	if (!spin->si_verbose)
+	اگر (!spin->si_verbose)
 	    verbose_enter();
-	msg((char *)str);
-	out_flush();
-	if (!spin->si_verbose)
+	پیغام((حرف *)str);
+	برآمد_flush();
+	اگر (!spin->si_verbose)
 	    verbose_leave();
     }
 }
@@ -6307,151 +6307,151 @@ spell_message(spellinfo_T *spin, char_u *str)
  * ":[count]spellundo  {word}"
  * ":[count]spellrare  {word}"
  */
-    void
+    خالی
 ex_spell(exarg_T *eap)
 {
-    spell_add_word(eap->arg, (int)STRLEN(eap->arg),
-		eap->cmdidx == CMD_spellwrong ? SPELL_ADD_BAD :
-		eap->cmdidx == CMD_spellrare ? SPELL_ADD_RARE : SPELL_ADD_GOOD,
-				   eap->forceit ? 0 : (int)eap->line2,
+    spell_جوڑو_لفظ(eap->arg, (صحیح)STRLEN(eap->arg),
+		eap->cmdidx == CMD_spellwrong ? SPELL_جوڑو_BAD :
+		eap->cmdidx == CMD_spellrare ? SPELL_جوڑو_RARE : SPELL_جوڑو_GOOD,
+				   eap->forceit ? 0 : (صحیح)eap->line2,
 				   eap->cmdidx == CMD_spellundo);
 }
 
 /*
  * Add "word[len]" to 'spellfile' as a good, rare or bad word.
  */
-    void
-spell_add_word(
-    char_u	*word,
-    int		len,
-    int		what,	    // SPELL_ADD_ values
-    int		idx,	    // "zG" and "zW": zero, otherwise index in
+    خالی
+spell_جوڑو_لفظ(
+    char_u	*لفظ,
+    صحیح		len,
+    صحیح		what,	    // SPELL_ADD_ values
+    صحیح		idx,	    // "zG" and "zW": zero, otherwise index in
 			    // 'spellfile'
-    int		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
+    صحیح		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
 {
-    FILE	*fd = NULL;
-    buf_T	*buf = NULL;
-    int		new_spf = FALSE;
+    FILE	*fd = تہی;
+    buf_T	*buf = تہی;
+    صحیح		new_spf = FALSE;
     char_u	*fname;
-    char_u	*fnamebuf = NULL;
-    char_u	line[MAXWLEN * 2];
-    long	fpos, fpos_next = 0;
-    int		i;
+    char_u	*fnamebuf = تہی;
+    char_u	سطر[MAXWLEN * 2];
+    طویل	fpos, fpos_اگلا = 0;
+    صحیح		i;
     size_t	linelen;
     char_u	*spf;
 
-    if (!valid_spell_word(word, word + len))
+    اگر (!valid_spell_لفظ(لفظ, لفظ + len))
     {
-	emsg(_(e_illegal_character_in_word));
-	return;
+	emsg(_(e_illegal_character_اندر_لفظ));
+	واپس;
     }
 
-    if (idx == 0)	    // use internal wordlist
+    اگر (idx == 0)	    // use internal wordlist
     {
-	if (int_wordlist == NULL)
+	اگر (int_wordlist == تہی)
 	{
 	    int_wordlist = vim_tempname('s', FALSE);
-	    if (int_wordlist == NULL)
-		return;
+	    اگر (int_wordlist == تہی)
+		واپس;
 	}
 	fname = int_wordlist;
     }
-    else
+    ورنہ
     {
 	// If 'spellfile' isn't set figure out a good default value.
-	if (*curwin->w_s->b_p_spf == NUL)
+	اگر (*curwin->w_s->b_p_spf == NUL)
 	{
 	    init_spellfile();
 	    new_spf = TRUE;
 	}
 
-	if (*curwin->w_s->b_p_spf == NUL)
+	اگر (*curwin->w_s->b_p_spf == NUL)
 	{
-	    semsg(_(e_option_str_is_not_set), "spellfile");
-	    return;
+	    semsg(_(e_option_str_is_not_سیٹ), "spellfile");
+	    واپس;
 	}
 	fnamebuf = alloc(MAXPATHL);
-	if (fnamebuf == NULL)
-	    return;
+	اگر (fnamebuf == تہی)
+	    واپس;
 
-	for (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
+	برائے (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
 	{
 	    copy_option_part(&spf, fnamebuf, MAXPATHL, ",");
-	    if (i == idx)
-		break;
-	    if (*spf == NUL)
+	    اگر (i == idx)
+		توڑو;
+	    اگر (*spf == NUL)
 	    {
 		semsg(_(e_spellfile_does_not_have_nr_entries), idx);
 		vim_free(fnamebuf);
-		return;
+		واپس;
 	    }
 	}
 
 	// Check that the user isn't editing the .add file somewhere.
 	buf = buflist_findname_exp(fnamebuf);
-	if (buf != NULL && buf->b_ml.ml_mfp == NULL)
-	    buf = NULL;
-	if (buf != NULL && bufIsChanged(buf))
+	اگر (buf != تہی && buf->b_ml.ml_mfp == تہی)
+	    buf = تہی;
+	اگر (buf != تہی && buf_Is_بدلا(buf))
 	{
-	    emsg(_(e_file_is_loaded_in_another_buffer));
+	    emsg(_(e_file_is_loaded_اندر_another_بفر));
 	    vim_free(fnamebuf);
-	    return;
+	    واپس;
 	}
 
 	fname = fnamebuf;
     }
 
-    if (what == SPELL_ADD_BAD || undo)
+    اگر (what == SPELL_جوڑو_BAD || undo)
     {
 	// When the word appears as good word we need to remove that one,
 	// since its flags sort before the one with WF_BANNED.
-	fd = mch_fopen((char *)fname, "r");
-	if (fd != NULL)
+	fd = mch_fopen((حرف *)fname, "r");
+	اگر (fd != تہی)
 	{
-	    while (!vim_fgets(line, MAXWLEN * 2, fd))
+	    جب (!vim_fgets(سطر, MAXWLEN * 2, fd))
 	    {
-		fpos = fpos_next;
-		fpos_next = ftell(fd);
-		if (fpos_next < 0)
-		    break;  // should never happen
-		linelen = STRLEN(line);
-		if (linelen >= (size_t)len
-			&& STRNCMP(word, line, len) == 0
-			&& (line[len] == '/' || line[len] < ' '))
+		fpos = fpos_اگلا;
+		fpos_اگلا = ftell(fd);
+		اگر (fpos_اگلا < 0)
+		    توڑو;  // should never happen
+		linelen = STRLEN(سطر);
+		اگر (linelen >= (size_t)len
+			&& STRNCMP(لفظ, سطر, len) == 0
+			&& (سطر[len] == '/' || سطر[len] < ' '))
 		{
 		    // Found duplicate word.  Remove it by writing a '#' at
 		    // the start of the line.  Mixing reading and writing
 		    // doesn't work for all systems, close the file first.
 		    fclose(fd);
-		    fd = mch_fopen((char *)fname, "r+");
-		    if (fd == NULL)
-			break;
-		    if (fseek(fd, fpos, SEEK_SET) == 0)
+		    fd = mch_fopen((حرف *)fname, "r+");
+		    اگر (fd == تہی)
+			توڑو;
+		    اگر (fseek(fd, fpos, SEEK_SET) == 0)
 		    {
 			fputc('#', fd);
-			if (undo)
+			اگر (undo)
 			{
-			    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
+			    home_replace(تہی, fname, NameBuff, MAXPATHL, TRUE);
 			    smsg(_("Word '%.*s' removed from %s"),
-							 len, word, NameBuff);
+							 len, لفظ, NameBuff);
 			}
 		    }
-		    if (fseek(fd, fpos_next, SEEK_SET) != 0)
+		    اگر (fseek(fd, fpos_اگلا, SEEK_SET) != 0)
 		    {
 			PERROR(_("Seek error in spellfile"));
-			break;
+			توڑو;
 		    }
 		}
 	    }
-	    if (fd != NULL)
+	    اگر (fd != تہی)
 		fclose(fd);
 	}
     }
 
-    if (!undo)
+    اگر (!undo)
     {
-	fd = mch_fopen((char *)fname, "a");
-	if (fd == NULL && new_spf)
+	fd = mch_fopen((حرف *)fname, "a");
+	اگر (fd == تہی && new_spf)
 	{
 	    char_u *p;
 
@@ -6459,44 +6459,44 @@ spell_add_word(
 	    // file.  We may need to create the "spell" directory first.  We
 	    // already checked the runtime directory is writable in
 	    // init_spellfile().
-	    if (!dir_of_file_exists(fname) && (p = gettail_sep(fname)) != fname)
+	    اگر (!dir_کا_file_exists(fname) && (p = gettail_sep(fname)) != fname)
 	    {
-		int c = *p;
+		صحیح c = *p;
 
 		// The directory doesn't exist.  Try creating it and opening
 		// the file again.
 		*p = NUL;
 		vim_mkdir(fname, 0755);
 		*p = c;
-		fd = mch_fopen((char *)fname, "a");
+		fd = mch_fopen((حرف *)fname, "a");
 	    }
 	}
 
-	if (fd == NULL)
+	اگر (fd == تہی)
 	    semsg(_(e_cant_open_file_str), fname);
-	else
+	ورنہ
 	{
-	    if (what == SPELL_ADD_BAD)
-		fprintf(fd, "%.*s/!\n", len, word);
-	    else if (what == SPELL_ADD_RARE)
-		fprintf(fd, "%.*s/?\n", len, word);
-	    else
-		fprintf(fd, "%.*s\n", len, word);
+	    اگر (what == SPELL_جوڑو_BAD)
+		fprintf(fd, "%.*s/!\n", len, لفظ);
+	    ورنہ اگر (what == SPELL_جوڑو_RARE)
+		fprintf(fd, "%.*s/?\n", len, لفظ);
+	    ورنہ
+		fprintf(fd, "%.*s\n", len, لفظ);
 	    fclose(fd);
 
-	    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
-	    smsg(_("Word '%.*s' added to %s"), len, word, NameBuff);
+	    home_replace(تہی, fname, NameBuff, MAXPATHL, TRUE);
+	    smsg(_("Word '%.*s' added to %s"), len, لفظ, NameBuff);
 	}
     }
 
-    if (fd != NULL)
+    اگر (fd != تہی)
     {
 	// Update the .add.spl file.
 	mkspell(1, &fname, FALSE, TRUE, TRUE);
 
 	// If the .add file is edited somewhere, reload it.
-	if (buf != NULL)
-	    buf_reload(buf, buf->b_orig_mode, FALSE);
+	اگر (buf != تہی)
+	    buf_reload(buf, buf->b_orig_منوال, FALSE);
 
 	redraw_all_later(UPD_SOME_VALID);
     }
@@ -6506,30 +6506,30 @@ spell_add_word(
 /*
  * Initialize 'spellfile' for the current buffer.
  */
-    static void
-init_spellfile(void)
+    ساکن خالی
+init_spellfile(خالی)
 {
     string_T	buf;
     char_u	*fname;
     char_u	*rtp;
     char_u	*lend;
-    int		aspath = FALSE;
+    صحیح		aspath = FALSE;
     char_u	*lstart = curbuf->b_s.b_p_spl;
 
-    if (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
-	return;
+    اگر (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
+	واپس;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    اگر (buf.string == تہی)
+	واپس;
 
-    buf.length = 0;
+    buf.لمبائی = 0;
 
     // Find the end of the language name.  Exclude the region.  If there
     // is a path separator remember the start of the tail.
-    for (lend = curwin->w_s->b_p_spl; *lend != NUL
-	    && vim_strchr((char_u *)",._", *lend) == NULL; ++lend)
-	if (vim_ispathsep(*lend))
+    برائے (lend = curwin->w_s->b_p_spl; *lend != NUL
+	    && vim_strchr((char_u *)",._", *lend) == تہی; ++lend)
+	اگر (vim_ispathsep(*lend))
 	{
 	    aspath = TRUE;
 	    lstart = lend + 1;
@@ -6538,51 +6538,51 @@ init_spellfile(void)
     // Loop over all entries in 'runtimepath'.  Use the first one where we
     // are allowed to write.
     rtp = p_rtp;
-    while (*rtp != NUL)
+    جب (*rtp != NUL)
     {
-	if (aspath)
+	اگر (aspath)
 	    // Use directory of an entry with path, e.g., for
 	    // "/dir/lg.utf-8.spl" use "/dir".
 	    vim_strncpy(buf.string, curbuf->b_s.b_p_spl,
 		    lstart - curbuf->b_s.b_p_spl - 1);
-	else
+	ورنہ
 	    // Copy the path from 'runtimepath' to buf[].
-	    buf.length = (size_t)copy_option_part(&rtp, buf.string, MAXPATHL, ",");
-	if (filewritable(buf.string) == 2)
+	    buf.لمبائی = (size_t)copy_option_part(&rtp, buf.string, MAXPATHL, ",");
+	اگر (filewritable(buf.string) == 2)
 	{
 	    // Use the first language name from 'spelllang' and the
 	    // encoding used in the first loaded .spl file.
-	    if (aspath)
+	    اگر (aspath)
 	    {
-		buf.length = (size_t)(lend - curbuf->b_s.b_p_spl);
-		vim_strncpy(buf.string, curbuf->b_s.b_p_spl, buf.length);
+		buf.لمبائی = (size_t)(lend - curbuf->b_s.b_p_spl);
+		vim_strncpy(buf.string, curbuf->b_s.b_p_spl, buf.لمبائی);
 	    }
-	    else
+	    ورنہ
 	    {
 		// Create the "spell" directory if it doesn't exist yet.
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		    MAXPATHL - buf.length, "/spell");
-		if (filewritable(buf.string) != 2)
+		buf.لمبائی += vim_snprintf_safelen((حرف *)buf.string + buf.لمبائی,
+		    MAXPATHL - buf.لمبائی, "/spell");
+		اگر (filewritable(buf.string) != 2)
 		{
-		    if (vim_mkdir(buf.string, 0755) != 0)
+		    اگر (vim_mkdir(buf.string, 0755) != 0)
 		    {
 			vim_free(buf.string);
-			return;
+			واپس;
 		    }
 		}
 
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		    MAXPATHL - buf.length, "/%.*s", (int)(lend - lstart), lstart);
+		buf.لمبائی += vim_snprintf_safelen((حرف *)buf.string + buf.لمبائی,
+		    MAXPATHL - buf.لمبائی, "/%.*s", (صحیح)(lend - lstart), lstart);
 	    }
-	    fname = LANGP_ENTRY(curwin->w_s->b_langp, 0)
+	    fname = LANGP_اندراج(curwin->w_s->b_langp, 0)
 		->lp_slang->sl_fname;
-	    vim_snprintf((char *)buf.string + buf.length, MAXPATHL - buf.length,
+	    vim_snprintf((حرف *)buf.string + buf.لمبائی, MAXPATHL - buf.لمبائی,
 		".%s.add",
-		fname != NULL && strstr((char *)gettail(fname), ".ascii.") != NULL
+		fname != تہی && لڑی_تلاش((حرف *)gettail(fname), ".ascii.") != تہی
 		    ? (char_u *)"ascii" : spell_enc());
-	    set_option_value_give_err((char_u *)"spellfile",
+	    سیٹ_option_قدر_give_err((char_u *)"spellfile",
 		    0L, buf.string, OPT_LOCAL);
-	    break;
+	    توڑو;
 	}
 	aspath = FALSE;
     }
@@ -6595,44 +6595,44 @@ init_spellfile(void)
 /*
  * Set the spell character tables from strings in the affix file.
  */
-    static int
-set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
+    ساکن صحیح
+سیٹ_spell_chartab(char_u *fol, char_u *کم, char_u *upp)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    char_u	*pf = fol, *pl = low, *pu = upp;
-    int		f, l, u;
+    char_u	*pf = fol, *pl = کم, *pu = upp;
+    صحیح		f, l, u;
 
     clear_spell_chartab(&new_st);
 
-    while (*pf != NUL)
+    جب (*pf != NUL)
     {
-	if (*pl == NUL || *pu == NUL)
+	اگر (*pl == NUL || *pu == NUL)
 	{
-	    emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	    return FAIL;
+	    emsg(_(e_format_error_اندر_affix_file_fol_کم_or_upp));
+	    واپس FAIL;
 	}
 	f = mb_ptr2char_adv(&pf);
 	l = mb_ptr2char_adv(&pl);
 	u = mb_ptr2char_adv(&pu);
 
 	// Every character that appears is a word character.
-	if (f < 256)
+	اگر (f < 256)
 	    new_st.st_isw[f] = TRUE;
-	if (l < 256)
+	اگر (l < 256)
 	    new_st.st_isw[l] = TRUE;
-	if (u < 256)
+	اگر (u < 256)
 	    new_st.st_isw[u] = TRUE;
 
 	// if "LOW" and "FOL" are not the same the "LOW" char needs
 	// case-folding
-	if (l < 256 && l != f)
+	اگر (l < 256 && l != f)
 	{
-	    if (f >= 256)
+	    اگر (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_اندر_fol_کم_or_upp_is_برآمد_کا_range));
+		واپس FAIL;
 	    }
 	    new_st.st_fold[l] = f;
 	}
@@ -6640,154 +6640,154 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	// if "UPP" and "FOL" are not the same the "UPP" char needs
 	// case-folding, it's upper case and the "UPP" is the upper case of
 	// "FOL" .
-	if (u < 256 && u != f)
+	اگر (u < 256 && u != f)
 	{
-	    if (f >= 256)
+	    اگر (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_اندر_fol_کم_or_upp_is_برآمد_کا_range));
+		واپس FAIL;
 	    }
 	    new_st.st_fold[u] = f;
 	    new_st.st_isu[u] = TRUE;
-	    new_st.st_upper[f] = u;
+	    new_st.st_بالائی[f] = u;
 	}
     }
 
-    if (*pl != NUL || *pu != NUL)
+    اگر (*pl != NUL || *pu != NUL)
     {
-	emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	return FAIL;
+	emsg(_(e_format_error_اندر_affix_file_fol_کم_or_upp));
+	واپس FAIL;
     }
 
-    return set_spell_finish(&new_st);
+    واپس سیٹ_spell_اختتام(&new_st);
 }
 
 /*
  * Set the spell character tables from strings in the .spl file.
  */
-    static void
-set_spell_charflags(
+    ساکن خالی
+سیٹ_spell_charflags(
     char_u	*flags,
-    int		cnt,	    // length of "flags"
+    صحیح		cnt,	    // length of "flags"
     char_u	*fol)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    int		i;
+    صحیح		i;
     char_u	*p = fol;
-    int		c;
+    صحیح		c;
 
     clear_spell_chartab(&new_st);
 
-    for (i = 0; i < 128; ++i)
+    برائے (i = 0; i < 128; ++i)
     {
-	if (i < cnt)
+	اگر (i < cnt)
 	{
-	    new_st.st_isw[i + 128] = (flags[i] & CF_WORD) != 0;
-	    new_st.st_isu[i + 128] = (flags[i] & CF_UPPER) != 0;
+	    new_st.st_isw[i + 128] = (flags[i] & CF_لفظ) != 0;
+	    new_st.st_isu[i + 128] = (flags[i] & CF_بالائی) != 0;
 	}
 
-	if (*p != NUL)
+	اگر (*p != NUL)
 	{
 	    c = mb_ptr2char_adv(&p);
 	    new_st.st_fold[i + 128] = c;
-	    if (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
-		new_st.st_upper[c] = i + 128;
+	    اگر (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
+		new_st.st_بالائی[c] = i + 128;
 	}
     }
 
-    (void)set_spell_finish(&new_st);
+    (خالی)سیٹ_spell_اختتام(&new_st);
 }
 
-    static int
-set_spell_finish(spelltab_T *new_st)
+    ساکن صحیح
+سیٹ_spell_اختتام(spelltab_T *new_st)
 {
-    int		i;
+    صحیح		i;
 
-    if (did_set_spelltab)
+    اگر (did_سیٹ_spelltab)
     {
 	// check that it's the same table
-	for (i = 0; i < 256; ++i)
+	برائے (i = 0; i < 256; ++i)
 	{
-	    if (spelltab.st_isw[i] != new_st->st_isw[i]
+	    اگر (spelltab.st_isw[i] != new_st->st_isw[i]
 		    || spelltab.st_isu[i] != new_st->st_isu[i]
 		    || spelltab.st_fold[i] != new_st->st_fold[i]
-		    || spelltab.st_upper[i] != new_st->st_upper[i])
+		    || spelltab.st_بالائی[i] != new_st->st_بالائی[i])
 	    {
-		emsg(_(e_word_characters_differ_between_spell_files));
-		return FAIL;
+		emsg(_(e_لفظ_characters_فرق_between_spell_files));
+		واپس FAIL;
 	    }
 	}
     }
-    else
+    ورنہ
     {
 	// copy the new spelltab into the one being used
 	spelltab = *new_st;
-	did_set_spelltab = TRUE;
+	did_سیٹ_spelltab = TRUE;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * Write the table with prefix conditions to the .spl file.
  * When "fd" is NULL only count the length of what is written and return it.
  */
-    static int
+    ساکن صحیح
 write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv)
 {
-    int		i;
+    صحیح		i;
     char_u	*p;
-    int		len;
-    int		totlen;
+    صحیح		len;
+    صحیح		totlen;
 
-    if (fd != NULL)
-	put_bytes(fd, (long_u)gap->ga_len, 2);	    // <prefcondcnt>
+    اگر (fd != تہی)
+	put_بائٹیں(fd, (long_u)gap->ga_len, 2);	    // <prefcondcnt>
 
     totlen = 2 + gap->ga_len; // length of <prefcondcnt> and <condlen> bytes
 
-    for (i = 0; i < gap->ga_len; ++i)
+    برائے (i = 0; i < gap->ga_len; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
-	p = ((char_u **)gap->ga_data)[i];
-	if (p != NULL)
+	p = ((char_u **)gap->ga_ڈیٹا)[i];
+	اگر (p != تہی)
 	{
-	    len = (int)STRLEN(p);
-	    if (fd != NULL)
+	    len = (صحیح)STRLEN(p);
+	    اگر (fd != تہی)
 	    {
 		fputc(len, fd);
 		*fwv &= fwrite(p, (size_t)len, (size_t)1, fd);
 	    }
 	    totlen += len;
 	}
-	else if (fd != NULL)
+	ورنہ اگر (fd != تہی)
 	    fputc(0, fd);
     }
 
-    return totlen;
+    واپس totlen;
 }
 
 /*
  * Use map string "map" for languages "lp".
  */
-    static void
-set_map_str(slang_T *lp, char_u *map)
+    ساکن خالی
+سیٹ_map_str(slang_T *lp, char_u *map)
 {
     char_u	*p;
-    int		headc = 0;
-    int		c;
-    int		i;
+    صحیح		headc = 0;
+    صحیح		c;
+    صحیح		i;
 
-    if (*map == NUL)
+    اگر (*map == NUL)
     {
 	lp->sl_has_map = FALSE;
-	return;
+	واپس;
     }
     lp->sl_has_map = TRUE;
 
     // Init the array and hash tables empty.
-    for (i = 0; i < 256; ++i)
+    برائے (i = 0; i < 256; ++i)
 	lp->sl_map_array[i] = 0;
     hash_init(&lp->sl_map_hash);
 
@@ -6796,50 +6796,50 @@ set_map_str(slang_T *lp, char_u *map)
      * "aaa/bbb/ccc/".  Fill sl_map_array[c] with the character before c and
      * before the same slash.  For characters above 255 sl_map_hash is used.
      */
-    for (p = map; *p != NUL; )
+    برائے (p = map; *p != NUL; )
     {
 	c = mb_cptr2char_adv(&p);
-	if (c == '/')
+	اگر (c == '/')
 	    headc = 0;
-	else
+	ورنہ
 	{
-	    if (headc == 0)
+	    اگر (headc == 0)
 		 headc = c;
 
 	    // Characters above 255 don't fit in sl_map_array[], put them in
 	    // the hash table.  Each entry is the char, a NUL the headchar and
 	    // a NUL.
-	    if (c >= 256)
+	    اگر (c >= 256)
 	    {
-		int	    cl = mb_char2len(c);
-		int	    headcl = mb_char2len(headc);
+		صحیح	    cl = mb_char2len(c);
+		صحیح	    headcl = mb_char2len(headc);
 		char_u	    *b;
 		hash_T	    hash;
 		hashitem_T  *hi;
 
 		b = alloc(cl + headcl + 2);
-		if (b == NULL)
-		    return;
+		اگر (b == تہی)
+		    واپس;
 		mb_char2bytes(c, b);
 		b[cl] = NUL;
 		mb_char2bytes(headc, b + cl + 1);
 		b[cl + 1 + headcl] = NUL;
 		hash = hash_hash(b);
 		hi = hash_lookup(&lp->sl_map_hash, b, hash);
-		if (HASHITEM_EMPTY(hi))
-		    hash_add_item(&lp->sl_map_hash, hi, b, hash);
-		else
+		اگر (HASHITEM_خالی_خانے(hi))
+		    hash_جوڑو_شے(&lp->sl_map_hash, hi, b, hash);
+		ورنہ
 		{
 		    // This should have been checked when generating the .spl
 		    // file.
-		    emsg(_(e_duplicate_char_in_map_entry));
+		    emsg(_(e_duplicate_char_اندر_map_اندراج));
 		    vim_free(b);
 		}
 	    }
-	    else
+	    ورنہ
 		lp->sl_map_array[c] = headc;
 	}
     }
 }
 
-#endif  // FEAT_SPELL
+#اگر_ختم  // FEAT_SPELL

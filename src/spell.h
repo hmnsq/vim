@@ -13,34 +13,34 @@
 
 // Use SPELL_PRINTTREE for debugging: dump the word tree after adding a word.
 // Only use it for small word lists!
-#if 0
+#اگر 0
 # define SPELL_PRINTTREE
-#endif
+#اگر_ختم
 
 // Use SPELL_COMPRESS_ALWAYS for debugging: compress the word tree after
 // adding a word.  Only use it for small word lists!
-#if 0
+#اگر 0
 # define SPELL_COMPRESS_ALWAYS
-#endif
+#اگر_ختم
 
 // Use DEBUG_TRIEWALK to print the changes made in suggest_trie_walk() for a
 // specific word.
-#if 0
+#اگر 0
 # define DEBUG_TRIEWALK
-#endif
+#اگر_ختم
 
-#define MAXWLEN 254		// Assume max. word len is this many bytes.
+#تعریف_کرو MAXWLEN 254		// Assume max. word len is this many bytes.
 				// Some places assume a word length fits in a
 				// byte, thus it can't be above 255.
 				// Must be >= PFD_NOTSPECIAL.
 
-#define MAXREGIONS 8		// Number of regions supported.
+#تعریف_کرو MAXREGIONS 8		// Number of regions supported.
 
 // Type used for indexes in the word tree need to be at least 4 bytes.  If int
 // is 8 bytes we could use something smaller, but what?
-typedef int idx_T;
+قسمتعریف صحیح idx_T;
 
-typedef int salfirst_T;
+قسمتعریف صحیح salfirst_T;
 
 /*
  * Structure used to store words and other info for one language, loaded from
@@ -57,16 +57,16 @@ typedef int salfirst_T;
  * the flags, region mask and affixID for the word.  There may be several
  * zeros in sequence for alternative flag/region/affixID combinations.
  */
-typedef struct slang_S slang_T;
-struct slang_S
+قسمتعریف ساخت slang_S slang_T;
+ساخت slang_S
 {
-    slang_T	*sl_next;	// next language
+    slang_T	*sl_اگلا;	// next language
     char_u	*sl_name;	// language name "en", "en.rare", "nl", etc.
     char_u	*sl_fname;	// name of .spl file
-    int		sl_add;		// TRUE if it's a .add file.
+    صحیح		sl_جوڑو;		// TRUE if it's a .add file.
 
     char_u	*sl_fbyts;	// case-folded word bytes
-    long	sl_fbyts_len;	// length of sl_fbyts
+    طویل	sl_fbyts_len;	// length of sl_fbyts
     idx_T	*sl_fidxs;	// case-folded word indexes
     char_u	*sl_kbyts;	// keep-case word bytes
     idx_T	*sl_kidxs;	// keep-case word indexes
@@ -82,10 +82,10 @@ struct slang_S
 
     hashtab_T	sl_wordcount;	// hashtable with word count, wordcount_T
 
-    int		sl_compmax;	// COMPOUNDWORDMAX (default: MAXWLEN)
-    int		sl_compminlen;	// COMPOUNDMIN (default: 0)
-    int		sl_compsylmax;	// COMPOUNDSYLMAX (default: MAXWLEN)
-    int		sl_compoptions;	// COMP_* flags
+    صحیح		sl_compmax;	// COMPOUNDWORDMAX (default: MAXWLEN)
+    صحیح		sl_compminlen;	// COMPOUNDMIN (default: 0)
+    صحیح		sl_compsylmax;	// COMPOUNDSYLMAX (default: MAXWLEN)
+    صحیح		sl_compoptions;	// COMP_* flags
     garray_T	sl_comppat;	// CHECKCOMPOUNDPATTERN items
     regprog_T	*sl_compprog;	// COMPOUNDRULE turned into a regexp progrm
 				// (NULL when no compounding)
@@ -94,155 +94,155 @@ struct slang_S
     char_u	*sl_compallflags; // all flags for compound words
     char_u	sl_nobreak;	// When TRUE: no spaces between words
     char_u	*sl_syllable;	// SYLLABLE repeatable chars or NULL
-    garray_T	sl_syl_items;	// syllable items
+    garray_T	sl_syl_اشیاء;	// syllable items
 
-    int		sl_prefixcnt;	// number of items in "sl_prefprog"
+    صحیح		sl_prefixcnt;	// number of items in "sl_prefprog"
     regprog_T	**sl_prefprog;	// table with regprogs for prefixes
 
     garray_T	sl_rep;		// list of fromto_T entries from REP lines
-    short	sl_rep_first[256];  // indexes where byte first appears, -1 if
+    مختصر	sl_rep_پہلا[256];  // indexes where byte first appears, -1 if
 				    // there is none
     garray_T	sl_sal;		// list of salitem_T entries from SAL lines
-    salfirst_T	sl_sal_first[256];  // indexes where byte first appears, -1 if
+    salfirst_T	sl_sal_پہلا[256];  // indexes where byte first appears, -1 if
 				    // there is none
-    int		sl_followup;	// SAL followup
-    int		sl_collapse;	// SAL collapse_result
-    int		sl_rem_accents;	// SAL remove_accents
-    int		sl_sofo;	// SOFOFROM and SOFOTO instead of SAL items:
+    صحیح		sl_followup;	// SAL followup
+    صحیح		sl_collapse;	// SAL collapse_result
+    صحیح		sl_rem_accents;	// SAL remove_accents
+    صحیح		sl_sofo;	// SOFOFROM and SOFOTO instead of SAL items:
 				// "sl_sal_first" maps chars, when has_mbyte
 				// "sl_sal" is a list of wide char lists.
     garray_T	sl_repsal;	// list of fromto_T entries from REPSAL lines
-    short	sl_repsal_first[256];  // sl_rep_first for REPSAL lines
-    int		sl_nosplitsugs;	// don't suggest splitting a word
-    int		sl_nocompoundsugs; // don't suggest compounding
+    مختصر	sl_repsal_پہلا[256];  // sl_rep_first for REPSAL lines
+    صحیح		sl_nosplitsugs;	// don't suggest splitting a word
+    صحیح		sl_nocompoundsugs; // don't suggest compounding
 
     // Info from the .sug file.  Loaded on demand.
     time_t	sl_sugtime;	// timestamp for .sug file
     char_u	*sl_sbyts;	// soundfolded word bytes
-    long	sl_sbyts_len;	// length of sl_sbyts
+    طویل	sl_sbyts_len;	// length of sl_sbyts
     idx_T	*sl_sidxs;	// soundfolded word indexes
     buf_T	*sl_sugbuf;	// buffer with word number table
-    int		sl_sugloaded;	// TRUE when .sug file was loaded or failed to
-				// load
+    صحیح		sl_sugloaded;	// TRUE when .sug file was loaded or failed to
+				//بھرو
 
-    int		sl_has_map;	// TRUE if there is a MAP line
+    صحیح		sl_has_map;	// TRUE if there is a MAP line
     hashtab_T	sl_map_hash;	// MAP for multi-byte chars
-    int		sl_map_array[256]; // MAP for first 256 chars
+    صحیح		sl_map_array[256]; // MAP for first 256 chars
     hashtab_T	sl_sounddone;	// table with soundfolded words that have
 				// handled, see add_sound_suggest()
 };
 
-#ifdef VMS
+#اگر_تعریف_شدہ VMS
 # define SPL_FNAME_TMPL  "%s_%s.spl"
-# define SPL_FNAME_ADD   "_add."
+# define SPL_FNAME_جوڑو   "_add."
 # define SPL_FNAME_ASCII "_ascii."
-#else
+#ورنہ
 # define SPL_FNAME_TMPL  "%s.%s.spl"
-# define SPL_FNAME_ADD   ".add."
+# define SPL_FNAME_جوڑو   ".add."
 # define SPL_FNAME_ASCII ".ascii."
-#endif
+#اگر_ختم
 
 // Flags used for a word.  Only the lowest byte can be used, the region byte
 // comes above it.
-#define WF_REGION   0x01	// region byte follows
-#define WF_ONECAP   0x02	// word with one capital (or all capitals)
-#define WF_ALLCAP   0x04	// word must be all capitals
-#define WF_RARE	    0x08	// rare word
-#define WF_BANNED   0x10	// bad word
-#define WF_AFX	    0x20	// affix ID follows
-#define WF_FIXCAP   0x40	// keep-case word, allcap not allowed
-#define WF_KEEPCAP  0x80	// keep-case word
+#تعریف_کرو WF_REGION   0x01	// region byte follows
+#تعریف_کرو WF_ONECAP   0x02	// word with one capital (or all capitals)
+#تعریف_کرو WF_ALLCAP   0x04	// word must be all capitals
+#تعریف_کرو WF_RARE	    0x08	// rare word
+#تعریف_کرو WF_BANNED   0x10	// bad word
+#تعریف_کرو WF_AFX	    0x20	// affix ID follows
+#تعریف_کرو WF_FIXCAP   0x40	// keep-case word, allcap not allowed
+#تعریف_کرو WF_KEEPCAP  0x80	// keep-case word
 
-#define WF_CAPMASK (WF_ONECAP | WF_ALLCAP | WF_KEEPCAP | WF_FIXCAP)
+#تعریف_کرو WF_CAPMASK (WF_ONECAP | WF_ALLCAP | WF_KEEPCAP | WF_FIXCAP)
 
 // for <flags2>, shifted up one byte to be used in wn_flags
-#define WF_HAS_AFF  0x0100	// word includes affix
-#define WF_NEEDCOMP 0x0200	// word only valid in compound
-#define WF_NOSUGGEST 0x0400	// word not to be suggested
-#define WF_COMPROOT 0x0800	// already compounded word, COMPOUNDROOT
-#define WF_NOCOMPBEF 0x1000	// no compounding before this word
-#define WF_NOCOMPAFT 0x2000	// no compounding after this word
+#تعریف_کرو WF_HAS_AFF  0x0100	// word includes affix
+#تعریف_کرو WF_NEEDCOMP 0x0200	// word only valid in compound
+#تعریف_کرو WF_NOSUGGEST 0x0400	// word not to be suggested
+#تعریف_کرو WF_COMPROOT 0x0800	// already compounded word, COMPOUNDROOT
+#تعریف_کرو WF_NOCOMPBEF 0x1000	// no compounding before this word
+#تعریف_کرو WF_NOCOMPAFT 0x2000	// no compounding after this word
 
 // flags for <pflags>
-#define WFP_RARE	    0x01	// rare prefix
-#define WFP_NC		    0x02	// prefix is not combining
-#define WFP_UP		    0x04	// to-upper prefix
-#define WFP_COMPPERMIT	    0x08	// prefix with COMPOUNDPERMITFLAG
-#define WFP_COMPFORBID	    0x10	// prefix with COMPOUNDFORBIDFLAG
+#تعریف_کرو WFP_RARE	    0x01	// rare prefix
+#تعریف_کرو WFP_NC		    0x02	// prefix is not combining
+#تعریف_کرو WFP_اوپر		    0x04	// to-upper prefix
+#تعریف_کرو WFP_COMPPERMIT	    0x08	// prefix with COMPOUNDPERMITFLAG
+#تعریف_کرو WFP_COMPFORBID	    0x10	// prefix with COMPOUNDFORBIDFLAG
 
 // Flags for postponed prefixes in "sl_pidxs".  Must be above affixID (one
 // byte) and prefcondnr (two bytes).
-#define WF_RAREPFX  (WFP_RARE << 24)	// rare postponed prefix
-#define WF_PFX_NC   (WFP_NC << 24)	// non-combining postponed prefix
-#define WF_PFX_UP   (WFP_UP << 24)	// to-upper postponed prefix
-#define WF_PFX_COMPPERMIT (WFP_COMPPERMIT << 24) // postponed prefix with
+#تعریف_کرو WF_RAREPFX  (WFP_RARE << 24)	// rare postponed prefix
+#تعریف_کرو WF_PFX_NC   (WFP_NC << 24)	// non-combining postponed prefix
+#تعریف_کرو WF_PFX_اوپر   (WFP_اوپر << 24)	// to-upper postponed prefix
+#تعریف_کرو WF_PFX_COMPPERMIT (WFP_COMPPERMIT << 24) // postponed prefix with
 						 // COMPOUNDPERMITFLAG
-#define WF_PFX_COMPFORBID (WFP_COMPFORBID << 24) // postponed prefix with
+#تعریف_کرو WF_PFX_COMPFORBID (WFP_COMPFORBID << 24) // postponed prefix with
 						 // COMPOUNDFORBIDFLAG
 
 // flags for <compoptions>
-#define COMP_CHECKDUP		1	// CHECKCOMPOUNDDUP
-#define COMP_CHECKREP		2	// CHECKCOMPOUNDREP
-#define COMP_CHECKCASE		4	// CHECKCOMPOUNDCASE
-#define COMP_CHECKTRIPLE	8	// CHECKCOMPOUNDTRIPLE
+#تعریف_کرو COMP_CHECKDUP		1	// CHECKCOMPOUNDDUP
+#تعریف_کرو COMP_CHECKREP		2	// CHECKCOMPOUNDREP
+#تعریف_کرو COMP_CHECKCASE		4	// CHECKCOMPOUNDCASE
+#تعریف_کرو COMP_CHECKTRIPLE	8	// CHECKCOMPOUNDTRIPLE
 
 // Info from "REP", "REPSAL" and "SAL" entries in ".aff" file used in si_rep,
 // si_repsal, sl_rep, and si_sal.  Not for sl_sal!
 // One replacement: from "ft_from" to "ft_to".
-typedef struct fromto_S
+قسمتعریف ساخت fromto_S
 {
     char_u	*ft_from;
-    char_u	*ft_to;
+    char_u	*ft_مقصد;
 } fromto_T;
 
 // Info from "SAL" entries in ".aff" file used in sl_sal.
 // The info is split for quick processing by spell_soundfold().
 // Note that "sm_oneof" and "sm_rules" point into sm_lead.
-typedef struct salitem_S
+قسمتعریف ساخت salitem_S
 {
     char_u	*sm_lead;	// leading letters
-    int		sm_leadlen;	// length of "sm_lead"
+    صحیح		sm_leadlen;	// length of "sm_lead"
     char_u	*sm_oneof;	// letters from () or NULL
-    char_u	*sm_rules;	// rules like ^, $, priority
-    char_u	*sm_to;		// replacement.
-    int		*sm_lead_w;	// wide character copy of "sm_lead"
-    int		*sm_oneof_w;	// wide character copy of "sm_oneof"
-    int		*sm_to_w;	// wide character copy of "sm_to"
+    char_u	*sm_قواعد;	// rules like ^, $, priority
+    char_u	*sm_مقصد;		// replacement.
+    صحیح		*sm_lead_w;	// wide character copy of "sm_lead"
+    صحیح		*sm_oneof_w;	// wide character copy of "sm_oneof"
+    صحیح		*sm_مقصد_w;	// wide character copy of "sm_to"
 } salitem_T;
 
 // Values for SP_*ERROR are negative, positive values are used by
 // read_cnt_string().
-#define	SP_TRUNCERROR	(-1)	// spell file truncated error
-#define	SP_FORMERROR	(-2)	// format error in spell file
-#define SP_OTHERERROR	(-3)	// other error while reading spell file
+#تعریف_کرو	SP_TRUNCERROR	(-1)	// spell file truncated error
+#تعریف_کرو	SP_FORMERROR	(-2)	// format error in spell file
+#تعریف_کرو SP_OTHERERROR	(-3)	// other error while reading spell file
 
 /*
  * Structure used in "b_langp", filled from 'spelllang'.
  */
-typedef struct langp_S
+قسمتعریف ساخت langp_S
 {
     slang_T	*lp_slang;	// info for this language
     slang_T	*lp_sallang;	// language used for sound folding or NULL
     slang_T	*lp_replang;	// language used for REP items or NULL
-    int		lp_region;	// bitmask for region or REGION_ALL
+    صحیح		lp_region;	// bitmask for region or REGION_ALL
 } langp_T;
 
-#define LANGP_ENTRY(ga, i)	(((langp_T *)(ga).ga_data) + (i))
+#تعریف_کرو LANGP_اندراج(ga, i)	(((langp_T *)(ga).ga_ڈیٹا) + (i))
 
-#define VIMSUGMAGIC "VIMsug"	// string at start of Vim .sug file
-#define VIMSUGMAGICL 6
-#define VIMSUGVERSION 1
+#تعریف_کرو VIMSUGMAGIC "VIMsug"	// string at start of Vim .sug file
+#تعریف_کرو VIMSUGMAGICL 6
+#تعریف_کرو VIMSUGVERSION 1
 
 /*
  * The tables used for recognizing word characters according to spelling.
  * These are only used for the first 256 characters of 'encoding'.
  */
-typedef struct spelltab_S
+قسمتعریف ساخت spelltab_S
 {
     char_u  st_isw[256];	// flags: is word char
     char_u  st_isu[256];	// flags: is uppercase char
     char_u  st_fold[256];	// chars: folded case
-    char_u  st_upper[256];	// chars: upper case
+    char_u  st_بالائی[256];	// chars: upper case
 } spelltab_T;
 
 /*
@@ -250,71 +250,71 @@ typedef struct spelltab_S
  * differ from what the .spl file uses.
  * These must not be called with negative number!
  */
-#if defined(HAVE_WCHAR_H)
+#اگر defined(HAVE_WCHAR_H)
 # include <wchar.h>	    // for towupper() and towlower()
-#endif
+#اگر_ختم
 // Multi-byte implementation.  For Unicode we can call utf_*(), but don't do
 // that for ASCII, because we don't want to use 'casemap' here.  Otherwise use
 // the "w" library function for characters above 255 if available.
-#ifdef HAVE_TOWLOWER
+#اگر_تعریف_شدہ HAVE_TOWLOWER
 # define SPELL_TOFOLD(c) (enc_utf8 && (c) >= 128 ? utf_fold(c) \
-	    : (c) < 256 ? (int)spelltab.st_fold[c] : (int)towlower(c))
-#else
+	    : (c) < 256 ? (صحیح)spelltab.st_fold[c] : (صحیح)towlower(c))
+#ورنہ
 # define SPELL_TOFOLD(c) (enc_utf8 && (c) >= 128 ? utf_fold(c) \
-	    : (c) < 256 ? (int)spelltab.st_fold[c] : (c))
-#endif
+	    : (c) < 256 ? (صحیح)spelltab.st_fold[c] : (c))
+#اگر_ختم
 
-#ifdef HAVE_TOWUPPER
+#اگر_تعریف_شدہ HAVE_TOWUPPER
 # define SPELL_TOUPPER(c) (enc_utf8 && (c) >= 128 ? utf_toupper(c) \
-	    : (c) < 256 ? (int)spelltab.st_upper[c] : (int)towupper(c))
-#else
+	    : (c) < 256 ? (صحیح)spelltab.st_بالائی[c] : (صحیح)towupper(c))
+#ورنہ
 # define SPELL_TOUPPER(c) (enc_utf8 && (c) >= 128 ? utf_toupper(c) \
-	    : (c) < 256 ? (int)spelltab.st_upper[c] : (c))
-#endif
+	    : (c) < 256 ? (صحیح)spelltab.st_بالائی[c] : (c))
+#اگر_ختم
 
-#ifdef HAVE_ISWUPPER
+#اگر_تعریف_شدہ HAVE_ISWUPPER
 # define SPELL_ISUPPER(c) (enc_utf8 && (c) >= 128 ? utf_isupper(c) \
 	    : (c) < 256 ? spelltab.st_isu[c] : iswupper(c))
-#else
+#ورنہ
 # define SPELL_ISUPPER(c) (enc_utf8 && (c) >= 128 ? utf_isupper(c) \
 	    : (c) < 256 ? spelltab.st_isu[c] : (FALSE))
-#endif
+#اگر_ختم
 
-#ifdef FEAT_SPELL
-# ifdef IN_SPELL_C
+#اگر_تعریف_شدہ FEAT_SPELL
+# ifdef اندر_SPELL_C
 #  define SPELL_EXTERN
 #  define SPELL_INIT(x) x
-# else
-#  define SPELL_EXTERN extern
+# ورنہ
+#  define SPELL_EXTERN خارجی
 #  define SPELL_INIT(x)
 # endif
 
 // First language that is loaded, start of the linked list of loaded
 // languages.
-SPELL_EXTERN slang_T	*first_lang SPELL_INIT(= NULL);
+SPELL_EXTERN slang_T	*پہلا_lang SPELL_INIT(= تہی);
 
 // file used for "zG" and "zW"
-SPELL_EXTERN char_u	*int_wordlist SPELL_INIT(= NULL);
+SPELL_EXTERN char_u	*int_wordlist SPELL_INIT(= تہی);
 
 SPELL_EXTERN spelltab_T   spelltab;
-SPELL_EXTERN int	  did_set_spelltab;
+SPELL_EXTERN صحیح	  did_سیٹ_spelltab;
 
 // Values for "what" argument of spell_add_word()
-# define SPELL_ADD_GOOD	0
-# define SPELL_ADD_BAD	1
-# define SPELL_ADD_RARE	2
+# define SPELL_جوڑو_GOOD	0
+# define SPELL_جوڑو_BAD	1
+# define SPELL_جوڑو_RARE	2
 
-typedef struct wordcount_S
+قسمتعریف ساخت wordcount_S
 {
-    short_u	wc_count;	    // nr of times word was seen
-    char_u	wc_word[1];	    // word, actually longer
+    short_u	wc_گنتی;	    // nr of times word was seen
+    char_u	wc_لفظ[1];	    // word, actually longer
 } wordcount_T;
 
-# define WC_KEY_OFF  offsetof(wordcount_T, wc_word)
-# define HI2WC(hi)     ((wordcount_T *)((hi)->hi_key - WC_KEY_OFF))
+# define WC_کلید_OFF  offsetof(wordcount_T, wc_لفظ)
+# define HI2WC(hi)     ((wordcount_T *)((hi)->hi_کلید - WC_کلید_OFF))
 # define MAXWORDCOUNT 0xffff
 
 // Remember what "z?" replaced.
-SPELL_EXTERN char_u	*repl_from SPELL_INIT(= NULL);
-SPELL_EXTERN char_u	*repl_to SPELL_INIT(= NULL);
-#endif
+SPELL_EXTERN char_u	*repl_from SPELL_INIT(= تہی);
+SPELL_EXTERN char_u	*repl_مقصد SPELL_INIT(= تہی);
+#اگر_ختم

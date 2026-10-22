@@ -1,16 +1,16 @@
-#include "vterm_internal.h"
+#شامل "vterm_internal.h"
 
-#include <stdio.h>
+#شامل <stdio.h>
 
 /**
  * Structure used to store RGB triples without the additional metadata stored in
  * VTermColor.
  */
-typedef struct {
+قسمتعریف ساخت {
   uint8_t red, green, blue;
 } VTermRGB;
 
-static const VTermRGB ansi_colors[] = {
+ساکن ثابت VTermRGB ansi_colors[] = {
   /* R    G    B */
   {   0,   0,   0 }, // black
   { 224,   0,   0 }, // red
@@ -32,597 +32,597 @@ static const VTermRGB ansi_colors[] = {
   { 255, 255, 255 }, // white for real
 };
 
-static int ramp6[] = {
+ساکن صحیح ramp6[] = {
   0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF,
 };
 
 // Use 0x81 instead of 0x80 to be able to distinguish from ansi black
-static int ramp24[] = {
+ساکن صحیح ramp24[] = {
   0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
   0x81, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE,
 };
 
-static void lookup_default_colour_ansi(long idx, VTermColor *col)
+ساکن خالی lookup_default_رنگ_ansi(طویل idx, VTermColor *ستون)
 {
   // VIM: store both RGB color and index
   vterm_color_rgb(
-      col,
+      ستون,
       ansi_colors[idx].red, ansi_colors[idx].green, ansi_colors[idx].blue);
-  col->index = (uint8_t)idx;
-  col->type = VTERM_COLOR_INDEXED;
+  ستون->اشاریہ = (uint8_t)idx;
+  ستون->type = VTERM_COLOR_اشاریہ_دار;
 }
 
-static int lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
+ساکن صحیح lookup_رنگ_ansi(ثابت VTermState *state, طویل اشاریہ, VTermColor *ستون)
 {
-  if(index >= 0 && index < 16) {
-    *col = state->colors[index];
-    return TRUE;
+  اگر(اشاریہ >= 0 && اشاریہ < 16) {
+    *ستون = state->colors[اشاریہ];
+    واپس TRUE;
   }
 
-  return FALSE;
+  واپس FALSE;
 }
 
-static int lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
+ساکن صحیح lookup_رنگ_palette(ثابت VTermState *state, طویل اشاریہ, VTermColor *ستون)
 {
-  if(index >= 0 && index < 16) {
+  اگر(اشاریہ >= 0 && اشاریہ < 16) {
     // Normal 8 colours or high intensity - parse as palette 0
-    return lookup_colour_ansi(state, index, col);
+    واپس lookup_رنگ_ansi(state, اشاریہ, ستون);
   }
-  else if(index >= 16 && index < 232) {
+  ورنہ اگر(اشاریہ >= 16 && اشاریہ < 232) {
     // 216-colour cube
-    index -= 16;
+    اشاریہ -= 16;
 
-    vterm_color_rgb(col, ramp6[index/6/6 % 6],
-                         ramp6[index/6   % 6],
-                         ramp6[index     % 6]);
+    vterm_color_rgb(ستون, ramp6[اشاریہ/6/6 % 6],
+                         ramp6[اشاریہ/6   % 6],
+                         ramp6[اشاریہ     % 6]);
 
-    return TRUE;
+    واپس TRUE;
   }
-  else if(index >= 232 && index < 256) {
+  ورنہ اگر(اشاریہ >= 232 && اشاریہ < 256) {
     // 24 greyscales
-    index -= 232;
+    اشاریہ -= 232;
 
-    vterm_color_rgb(col, ramp24[index], ramp24[index], ramp24[index]);
+    vterm_color_rgb(ستون, ramp24[اشاریہ], ramp24[اشاریہ], ramp24[اشاریہ]);
 
-    return TRUE;
+    واپس TRUE;
   }
 
-  return FALSE;
+  واپس FALSE;
 }
 
-static int lookup_colour(const VTermState *state, int palette, const long args[], int argcount, VTermColor *col)
+ساکن صحیح lookup_رنگ(ثابت VTermState *state, صحیح palette, ثابت طویل دلائل[], صحیح argcount, VTermColor *ستون)
 {
-  switch(palette) {
-  case 2: // RGB mode - 3 args contain colour values directly
-    if(argcount < 3)
-      return argcount;
+  انتخاب(palette) {
+  حالت 2: // RGB mode - 3 args contain colour values directly
+    اگر(argcount < 3)
+      واپس argcount;
 
-    vterm_color_rgb(col, (uint8_t)CSI_ARG(args[0]), (uint8_t)CSI_ARG(args[1]), (uint8_t)CSI_ARG(args[2]));
+    vterm_color_rgb(ستون, (uint8_t)CSI_ARG(دلائل[0]), (uint8_t)CSI_ARG(دلائل[1]), (uint8_t)CSI_ARG(دلائل[2]));
 
-    return 3;
+    واپس 3;
 
-  case 5: // XTerm 256-colour mode
-    if (!argcount || CSI_ARG_IS_MISSING(args[0])) {
-      return argcount ? 1 : 0;
+  حالت 5: // XTerm 256-colour mode
+    اگر (!argcount || CSI_ARG_IS_MISSING(دلائل[0])) {
+      واپس argcount ? 1 : 0;
     }
 
-    lookup_colour_palette(state, args[0], col);
-    return 1;
+    lookup_رنگ_palette(state, دلائل[0], ستون);
+    واپس 1;
 
-  default:
+  طےشدہ:
     DEBUG_LOG1("Unrecognised colour palette %d\n", palette);
-    return 0;
+    واپس 0;
   }
 }
 
 // Some conveniences
 
-static void setpenattr(VTermState *state, VTermAttr attr, VTermValueType type UNUSED, VTermValue *val)
+ساکن خالی setpenattr(VTermState *state, VTermAttr attr, VTerm_قدر_Type type غیر_مستعمل, VTerm_قدر *val)
 {
-#ifdef DEBUG
-  if(type != vterm_get_attr_type(attr)) {
+#اگر_تعریف_شدہ DEBUG
+  اگر(type != vterm_get_attr_type(attr)) {
     DEBUG_LOG3("Cannot set attr %d as it has type %d, not type %d\n",
         attr, vterm_get_attr_type(attr), type);
-    return;
+    واپس;
   }
-#endif
-  if(state->callbacks && state->callbacks->setpenattr)
+#اگر_ختم
+  اگر(state->callbacks && state->callbacks->setpenattr)
     (*state->callbacks->setpenattr)(attr, val, state->cbdata);
 }
 
-static void setpenattr_bool(VTermState *state, VTermAttr attr, int boolean)
+ساکن خالی setpenattr_bool(VTermState *state, VTermAttr attr, صحیح boolean)
 {
-  VTermValue val;
+  VTerm_قدر val;
   val.boolean = boolean;
   setpenattr(state, attr, VTERM_VALUETYPE_BOOL, &val);
 }
 
-static void setpenattr_int(VTermState *state, VTermAttr attr, int number)
+ساکن خالی setpenattr_int(VTermState *state, VTermAttr attr, صحیح نمبر)
 {
-  VTermValue val;
-  val.number = number;
+  VTerm_قدر val;
+  val.نمبر = نمبر;
   setpenattr(state, attr, VTERM_VALUETYPE_INT, &val);
 }
 
-static void setpenattr_col(VTermState *state, VTermAttr attr, VTermColor color)
+ساکن خالی setpenattr_ستون(VTermState *state, VTermAttr attr, VTermColor color)
 {
-  VTermValue val;
+  VTerm_قدر val;
   val.color = color;
   setpenattr(state, attr, VTERM_VALUETYPE_COLOR, &val);
 }
 
-static void set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
+ساکن خالی سیٹ_pen_ستون_ansi(VTermState *state, VTermAttr attr, طویل ستون)
 {
   VTermColor *colp = (attr == VTERM_ATTR_BACKGROUND) ? &state->pen.bg : &state->pen.fg;
 
-  lookup_colour_ansi(state, col, colp);
+  lookup_رنگ_ansi(state, ستون, colp);
 
-  setpenattr_col(state, attr, *colp);
+  setpenattr_ستون(state, attr, *colp);
 }
 
-INTERNAL void vterm_state_newpen(VTermState *state)
+اندرونی_2 خالی vterm_state_newpen(VTermState *state)
 {
   // 90% grey so that pure white is brighter
   vterm_color_rgb(&state->default_fg, 240, 240, 240);
   vterm_color_rgb(&state->default_bg, 0, 0, 0);
-  vterm_state_set_default_colors(state, &state->default_fg, &state->default_bg);
+  vterm_state_سیٹ_default_colors(state, &state->default_fg, &state->default_bg);
 
-  for(int col = 0; col < 16; col++)
-    lookup_default_colour_ansi(col, &state->colors[col]);
+  برائے(صحیح ستون = 0; ستون < 16; ستون++)
+    lookup_default_رنگ_ansi(ستون, &state->colors[ستون]);
 }
 
-INTERNAL void vterm_state_resetpen(VTermState *state)
+اندرونی_2 خالی vterm_state_resetpen(VTermState *state)
 {
   state->pen.bold = 0;      setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
   state->pen.underline = 0; setpenattr_int (state, VTERM_ATTR_UNDERLINE, 0);
   state->pen.italic = 0;    setpenattr_bool(state, VTERM_ATTR_ITALIC, 0);
   state->pen.blink = 0;     setpenattr_bool(state, VTERM_ATTR_BLINK, 0);
-  state->pen.reverse = 0;   setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
+  state->pen.الٹ = 0;   setpenattr_bool(state, VTERM_ATTR_الٹ, 0);
   state->pen.conceal = 0;   setpenattr_bool(state, VTERM_ATTR_CONCEAL, 0);
   state->pen.strike = 0;    setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
   state->pen.font = 0;      setpenattr_int (state, VTERM_ATTR_FONT, 0);
   state->pen.small = 0;     setpenattr_bool(state, VTERM_ATTR_SMALL, 0);
   state->pen.baseline = 0;  setpenattr_int (state, VTERM_ATTR_BASELINE, 0);
 
-  state->pen.fg = state->default_fg;  setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->default_fg);
-  state->pen.bg = state->default_bg;  setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->default_bg);
+  state->pen.fg = state->default_fg;  setpenattr_ستون(state, VTERM_ATTR_FOREGROUND, state->default_fg);
+  state->pen.bg = state->default_bg;  setpenattr_ستون(state, VTERM_ATTR_BACKGROUND, state->default_bg);
 }
 
-INTERNAL void vterm_state_savepen(VTermState *state, int save)
+اندرونی_2 خالی vterm_state_savepen(VTermState *state, صحیح save)
 {
-  if(save) {
+  اگر(save) {
     state->saved.pen = state->pen;
   }
-  else {
+  ورنہ {
     state->pen = state->saved.pen;
 
     setpenattr_bool(state, VTERM_ATTR_BOLD,      state->pen.bold);
     setpenattr_int (state, VTERM_ATTR_UNDERLINE, state->pen.underline);
     setpenattr_bool(state, VTERM_ATTR_ITALIC,    state->pen.italic);
     setpenattr_bool(state, VTERM_ATTR_BLINK,     state->pen.blink);
-    setpenattr_bool(state, VTERM_ATTR_REVERSE,   state->pen.reverse);
+    setpenattr_bool(state, VTERM_ATTR_الٹ,   state->pen.الٹ);
     setpenattr_bool(state, VTERM_ATTR_CONCEAL,   state->pen.conceal);
     setpenattr_bool(state, VTERM_ATTR_STRIKE,    state->pen.strike);
     setpenattr_int (state, VTERM_ATTR_FONT,      state->pen.font);
     setpenattr_bool(state, VTERM_ATTR_SMALL,     state->pen.small);
     setpenattr_int (state, VTERM_ATTR_BASELINE,  state->pen.baseline);
 
-    setpenattr_col( state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-    setpenattr_col( state, VTERM_ATTR_BACKGROUND, state->pen.bg);
+    setpenattr_ستون( state, VTERM_ATTR_FOREGROUND, state->pen.fg);
+    setpenattr_ستون( state, VTERM_ATTR_BACKGROUND, state->pen.bg);
   }
 }
 
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
+خالی vterm_color_rgb(VTermColor *ستون, uint8_t red, uint8_t green, uint8_t blue)
 {
-  col->type = VTERM_COLOR_RGB;
-  col->red   = red;
-  col->green = green;
-  col->blue  = blue;
+  ستون->type = VTERM_COLOR_RGB;
+  ستون->red   = red;
+  ستون->green = green;
+  ستون->blue  = blue;
 }
 
-void vterm_color_indexed(VTermColor *col, uint8_t idx)
+خالی vterm_color_اشاریہ_دار(VTermColor *ستون, uint8_t idx)
 {
-  col->type = VTERM_COLOR_INDEXED;
-  col->index = idx;
+  ستون->type = VTERM_COLOR_اشاریہ_دار;
+  ستون->اشاریہ = idx;
 }
 
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
+صحیح vterm_color_is_equal(ثابت VTermColor *a, ثابت VTermColor *b)
 {
   /* First make sure that the two colours are of the same type (RGB/Indexed) */
-  if (a->type != b->type) {
-    return FALSE;
+  اگر (a->type != b->type) {
+    واپس FALSE;
   }
 
   /* Depending on the type inspect the corresponding members */
-  if (VTERM_COLOR_IS_INDEXED(a)) {
-    return a->index == b->index;
+  اگر (VTERM_COLOR_IS_اشاریہ_دار(a)) {
+    واپس a->اشاریہ == b->اشاریہ;
   }
-  else if (VTERM_COLOR_IS_RGB(a)) {
-    return    (a->red   == b->red)
+  ورنہ اگر (VTERM_COLOR_IS_RGB(a)) {
+    واپس    (a->red   == b->red)
            && (a->green == b->green)
            && (a->blue  == b->blue);
   }
 
-  return 0;
+  واپس 0;
 }
 
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
+خالی vterm_state_get_default_colors(ثابت VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
 {
   *default_fg = state->default_fg;
   *default_bg = state->default_bg;
 }
 
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col)
+خالی vterm_state_get_palette_color(ثابت VTermState *state, صحیح اشاریہ, VTermColor *ستون)
 {
-  lookup_colour_palette(state, index, col);
+  lookup_رنگ_palette(state, اشاریہ, ستون);
 }
 
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg)
+خالی vterm_state_سیٹ_default_colors(VTermState *state, ثابت VTermColor *default_fg, ثابت VTermColor *default_bg)
 {
-  if(default_fg) {
+  اگر(default_fg) {
     state->default_fg = *default_fg;
-    state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_MASK)
+    state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_نقاب)
                            | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg) {
+  اگر(default_bg) {
     state->default_bg = *default_bg;
-    state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_MASK)
+    state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_نقاب)
                            | VTERM_COLOR_DEFAULT_BG;
   }
 }
 
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col)
+خالی vterm_state_سیٹ_palette_color(VTermState *state, صحیح اشاریہ, ثابت VTermColor *ستون)
 {
-  if(index >= 0 && index < 16)
-    state->colors[index] = *col;
+  اگر(اشاریہ >= 0 && اشاریہ < 16)
+    state->colors[اشاریہ] = *ستون;
 }
 
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col)
+خالی vterm_state_convert_color_مقصد_rgb(ثابت VTermState *state, VTermColor *ستون)
 {
-  if (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
-    lookup_colour_palette(state, col->index, col);
+  اگر (VTERM_COLOR_IS_اشاریہ_دار(ستون)) { /* Convert indexed colors to RGB */
+    lookup_رنگ_palette(state, ستون->اشاریہ, ستون);
   }
-  col->type &= VTERM_COLOR_TYPE_MASK; /* Reset any metadata but the type */
+  ستون->type &= VTERM_COLOR_TYPE_نقاب; /* Reset any metadata but the type */
 }
 
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright)
+خالی vterm_state_سیٹ_bold_highbright(VTermState *state, صحیح bold_is_highbright)
 {
   state->bold_is_highbright = bold_is_highbright;
 }
 
-INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argcount)
+اندرونی_2 خالی vterm_state_setpen(VTermState *state, ثابت طویل دلائل[], صحیح argcount)
 {
   // SGR - ECMA-48 8.3.117
 
-  int argi = 0;
-  int value;
+  صحیح argi = 0;
+  صحیح قدر;
 
-  while(argi < argcount) {
+  جب(argi < argcount) {
     // This logic is easier to do 'done' backwards; set it true, and make it
     // false again in the 'default' case
-    int done = 1;
+    صحیح مکمل = 1;
 
-    long arg;
-    switch(arg = CSI_ARG(args[argi])) {
-    case CSI_ARG_MISSING:
-    case 0: // Reset
+    طویل arg;
+    انتخاب(arg = CSI_ARG(دلائل[argi])) {
+    حالت CSI_ARG_MISSING:
+    حالت 0: // Reset
       vterm_state_resetpen(state);
-      break;
+      توڑو;
 
-    case 1: { // Bold on
-      const VTermColor *fg = &state->pen.fg;
+    حالت 1: { // Bold on
+      ثابت VTermColor *fg = &state->pen.fg;
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
-      if(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
-        set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, fg->index + (state->pen.bold ? 8 : 0));
-      break;
+      اگر(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_اشاریہ_دار(fg) && fg->اشاریہ < 8 && state->bold_is_highbright)
+        سیٹ_pen_ستون_ansi(state, VTERM_ATTR_FOREGROUND, fg->اشاریہ + (state->pen.bold ? 8 : 0));
+      توڑو;
     }
 
-    case 3: // Italic on
+    حالت 3: // Italic on
       state->pen.italic = 1;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 1);
-      break;
+      توڑو;
 
-    case 4: // Underline
+    حالت 4: // Underline
       state->pen.underline = VTERM_UNDERLINE_SINGLE;
-      if(CSI_ARG_HAS_MORE(args[argi])) {
+      اگر(CSI_ARG_HAS_مزید(دلائل[argi])) {
         argi++;
-        switch(CSI_ARG(args[argi])) {
-          case 0:
+        انتخاب(CSI_ARG(دلائل[argi])) {
+          حالت 0:
             state->pen.underline = 0;
-            break;
-          case 1:
+            توڑو;
+          حالت 1:
             state->pen.underline = VTERM_UNDERLINE_SINGLE;
-            break;
-          case 2:
+            توڑو;
+          حالت 2:
             state->pen.underline = VTERM_UNDERLINE_DOUBLE;
-            break;
-          case 3:
+            توڑو;
+          حالت 3:
             state->pen.underline = VTERM_UNDERLINE_CURLY;
-            break;
+            توڑو;
         }
       }
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      توڑو;
 
-    case 5: // Blink
+    حالت 5: // Blink
       state->pen.blink = 1;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 1);
-      break;
+      توڑو;
 
-    case 7: // Reverse on
-      state->pen.reverse = 1;
-      setpenattr_bool(state, VTERM_ATTR_REVERSE, 1);
-      break;
+    حالت 7: // Reverse on
+      state->pen.الٹ = 1;
+      setpenattr_bool(state, VTERM_ATTR_الٹ, 1);
+      توڑو;
 
-    case 8: // Conceal on
+    حالت 8: // Conceal on
       state->pen.conceal = 1;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 1);
-      break;
+      توڑو;
 
-    case 9: // Strikethrough on
+    حالت 9: // Strikethrough on
       state->pen.strike = 1;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 1);
-      break;
+      توڑو;
 
-    case 10: case 11: case 12: case 13: case 14:
-    case 15: case 16: case 17: case 18: case 19: // Select font
-      state->pen.font = CSI_ARG(args[argi]) - 10;
+    حالت 10: حالت 11: حالت 12: حالت 13: حالت 14:
+    حالت 15: حالت 16: حالت 17: حالت 18: حالت 19: // Select font
+      state->pen.font = CSI_ARG(دلائل[argi]) - 10;
       setpenattr_int(state, VTERM_ATTR_FONT, state->pen.font);
-      break;
+      توڑو;
 
-    case 21: // Underline double
+    حالت 21: // Underline double
       state->pen.underline = VTERM_UNDERLINE_DOUBLE;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      توڑو;
 
-    case 22: // Bold off
+    حالت 22: // Bold off
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
-      break;
+      توڑو;
 
-    case 23: // Italic and Gothic (currently unsupported) off
+    حالت 23: // Italic and Gothic (currently unsupported) off
       state->pen.italic = 0;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 0);
-      break;
+      توڑو;
 
-    case 24: // Underline off
+    حالت 24: // Underline off
       state->pen.underline = 0;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, 0);
-      break;
+      توڑو;
 
-    case 25: // Blink off
+    حالت 25: // Blink off
       state->pen.blink = 0;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 0);
-      break;
+      توڑو;
 
-    case 27: // Reverse off
-      state->pen.reverse = 0;
-      setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
-      break;
+    حالت 27: // Reverse off
+      state->pen.الٹ = 0;
+      setpenattr_bool(state, VTERM_ATTR_الٹ, 0);
+      توڑو;
 
-    case 28: // Conceal off (Reveal)
+    حالت 28: // Conceal off (Reveal)
       state->pen.conceal = 0;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 0);
-      break;
+      توڑو;
 
-    case 29: // Strikethrough off
+    حالت 29: // Strikethrough off
       state->pen.strike = 0;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
-      break;
+      توڑو;
 
-    case 30: case 31: case 32: case 33:
-    case 34: case 35: case 36: case 37: // Foreground colour palette
-      value = CSI_ARG(args[argi]) - 30;
-      if(state->pen.bold && state->bold_is_highbright)
-        value += 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    حالت 30: حالت 31: حالت 32: حالت 33:
+    حالت 34: حالت 35: حالت 36: حالت 37: // Foreground colour palette
+      قدر = CSI_ARG(دلائل[argi]) - 30;
+      اگر(state->pen.bold && state->bold_is_highbright)
+        قدر += 8;
+      سیٹ_pen_ستون_ansi(state, VTERM_ATTR_FOREGROUND, قدر);
+      توڑو;
 
-    case 38: // Foreground colour alternative palette
-      if(argcount - argi < 1)
-        return;
-      argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.fg);
-      setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+    حالت 38: // Foreground colour alternative palette
+      اگر(argcount - argi < 1)
+        واپس;
+      argi += 1 + lookup_رنگ(state, CSI_ARG(دلائل[argi+1]), دلائل+argi+2, argcount-argi-2, &state->pen.fg);
+      setpenattr_ستون(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
+      توڑو;
 
-    case 39: // Foreground colour default
+    حالت 39: // Foreground colour default
       state->pen.fg = state->default_fg;
-      setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      setpenattr_ستون(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
+      توڑو;
 
-    case 40: case 41: case 42: case 43:
-    case 44: case 45: case 46: case 47: // Background colour palette
-      value = CSI_ARG(args[argi]) - 40;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    حالت 40: حالت 41: حالت 42: حالت 43:
+    حالت 44: حالت 45: حالت 46: حالت 47: // Background colour palette
+      قدر = CSI_ARG(دلائل[argi]) - 40;
+      سیٹ_pen_ستون_ansi(state, VTERM_ATTR_BACKGROUND, قدر);
+      توڑو;
 
-    case 48: // Background colour alternative palette
-      if(argcount - argi < 1)
-        return;
-      argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.bg);
-      setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+    حالت 48: // Background colour alternative palette
+      اگر(argcount - argi < 1)
+        واپس;
+      argi += 1 + lookup_رنگ(state, CSI_ARG(دلائل[argi+1]), دلائل+argi+2, argcount-argi-2, &state->pen.bg);
+      setpenattr_ستون(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
+      توڑو;
 
-    case 49: // Default background
+    حالت 49: // Default background
       state->pen.bg = state->default_bg;
-      setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      setpenattr_ستون(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
+      توڑو;
 
-    case 73: // Superscript
-    case 74: // Subscript
-    case 75: // Superscript/subscript off
+    حالت 73: // Superscript
+    حالت 74: // Subscript
+    حالت 75: // Superscript/subscript off
       state->pen.small = (arg != 75);
       state->pen.baseline =
         (arg == 73) ? VTERM_BASELINE_RAISE :
-        (arg == 74) ? VTERM_BASELINE_LOWER :
-                      VTERM_BASELINE_NORMAL;
+        (arg == 74) ? VTERM_BASELINE_زیریں :
+                      VTERM_BASELINE_معمول;
       setpenattr_bool(state, VTERM_ATTR_SMALL,    state->pen.small);
       setpenattr_int (state, VTERM_ATTR_BASELINE, state->pen.baseline);
-      break;
+      توڑو;
 
-    case 90: case 91: case 92: case 93:
-    case 94: case 95: case 96: case 97: // Foreground colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 90 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    حالت 90: حالت 91: حالت 92: حالت 93:
+    حالت 94: حالت 95: حالت 96: حالت 97: // Foreground colour high-intensity palette
+      قدر = CSI_ARG(دلائل[argi]) - 90 + 8;
+      سیٹ_pen_ستون_ansi(state, VTERM_ATTR_FOREGROUND, قدر);
+      توڑو;
 
-    case 100: case 101: case 102: case 103:
-    case 104: case 105: case 106: case 107: // Background colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 100 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    حالت 100: حالت 101: حالت 102: حالت 103:
+    حالت 104: حالت 105: حالت 106: حالت 107: // Background colour high-intensity palette
+      قدر = CSI_ARG(دلائل[argi]) - 100 + 8;
+      سیٹ_pen_ستون_ansi(state, VTERM_ATTR_BACKGROUND, قدر);
+      توڑو;
 
-    default:
-      done = 0;
-      break;
+    طےشدہ:
+      مکمل = 0;
+      توڑو;
     }
 
-    if(!done)
+    اگر(!مکمل)
     {
       DEBUG_LOG1("libvterm: Unhandled CSI SGR %ld\n", arg);
     }
 
-    while(CSI_ARG_HAS_MORE(args[argi++]))
+    جب(CSI_ARG_HAS_مزید(دلائل[argi++]))
       ;
   }
 }
 
-static int vterm_state_getpen_color(const VTermColor *col, int argi, long args[], int fg)
+ساکن صحیح vterm_state_getpen_color(ثابت VTermColor *ستون, صحیح argi, طویل دلائل[], صحیح fg)
 {
     /* Do nothing if the given color is the default color */
-    if (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
-        (!fg && VTERM_COLOR_IS_DEFAULT_BG(col))) {
-        return argi;
+    اگر (( fg && VTERM_COLOR_IS_DEFAULT_FG(ستون)) ||
+        (!fg && VTERM_COLOR_IS_DEFAULT_BG(ستون))) {
+        واپس argi;
     }
 
     /* Decide whether to send an indexed color or an RGB color */
-    if (VTERM_COLOR_IS_INDEXED(col)) {
-        const uint8_t idx = col->index;
-        if (idx < 8) {
-            args[argi++] = (idx + (fg ? 30 : 40));
+    اگر (VTERM_COLOR_IS_اشاریہ_دار(ستون)) {
+        ثابت uint8_t idx = ستون->اشاریہ;
+        اگر (idx < 8) {
+            دلائل[argi++] = (idx + (fg ? 30 : 40));
         }
-        else if (idx < 16) {
-            args[argi++] = (idx - 8 + (fg ? 90 : 100));
+        ورنہ اگر (idx < 16) {
+            دلائل[argi++] = (idx - 8 + (fg ? 90 : 100));
         }
-        else {
-            args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
-            args[argi++] = CSI_ARG_FLAG_MORE | 5;
-            args[argi++] = idx;
+        ورنہ {
+            دلائل[argi++] = CSI_ARG_FLAG_مزید | (fg ? 38 : 48);
+            دلائل[argi++] = CSI_ARG_FLAG_مزید | 5;
+            دلائل[argi++] = idx;
         }
     }
-    else if (VTERM_COLOR_IS_RGB(col)) {
-        args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
-        args[argi++] = CSI_ARG_FLAG_MORE | 2;
-        args[argi++] = CSI_ARG_FLAG_MORE | col->red;
-        args[argi++] = CSI_ARG_FLAG_MORE | col->green;
-        args[argi++] = col->blue;
+    ورنہ اگر (VTERM_COLOR_IS_RGB(ستون)) {
+        دلائل[argi++] = CSI_ARG_FLAG_مزید | (fg ? 38 : 48);
+        دلائل[argi++] = CSI_ARG_FLAG_مزید | 2;
+        دلائل[argi++] = CSI_ARG_FLAG_مزید | ستون->red;
+        دلائل[argi++] = CSI_ARG_FLAG_مزید | ستون->green;
+        دلائل[argi++] = ستون->blue;
     }
-    return argi;
+    واپس argi;
 }
 
-INTERNAL int vterm_state_getpen(VTermState *state, long args[], int argcount UNUSED)
+اندرونی_2 صحیح vterm_state_getpen(VTermState *state, طویل دلائل[], صحیح argcount غیر_مستعمل)
 {
-  int argi = 0;
+  صحیح argi = 0;
 
-  if(state->pen.bold)
-    args[argi++] = 1;
+  اگر(state->pen.bold)
+    دلائل[argi++] = 1;
 
-  if(state->pen.italic)
-    args[argi++] = 3;
+  اگر(state->pen.italic)
+    دلائل[argi++] = 3;
 
-  if(state->pen.underline == VTERM_UNDERLINE_SINGLE)
-    args[argi++] = 4;
-  if(state->pen.underline == VTERM_UNDERLINE_CURLY)
-    args[argi++] = 4 | CSI_ARG_FLAG_MORE, args[argi++] = 3;
+  اگر(state->pen.underline == VTERM_UNDERLINE_SINGLE)
+    دلائل[argi++] = 4;
+  اگر(state->pen.underline == VTERM_UNDERLINE_CURLY)
+    دلائل[argi++] = 4 | CSI_ARG_FLAG_مزید, دلائل[argi++] = 3;
 
-  if(state->pen.blink)
-    args[argi++] = 5;
+  اگر(state->pen.blink)
+    دلائل[argi++] = 5;
 
-  if(state->pen.reverse)
-    args[argi++] = 7;
+  اگر(state->pen.الٹ)
+    دلائل[argi++] = 7;
 
-  if(state->pen.conceal)
-    args[argi++] = 8;
+  اگر(state->pen.conceal)
+    دلائل[argi++] = 8;
 
-  if(state->pen.strike)
-    args[argi++] = 9;
+  اگر(state->pen.strike)
+    دلائل[argi++] = 9;
 
-  if(state->pen.font)
-    args[argi++] = 10 + state->pen.font;
+  اگر(state->pen.font)
+    دلائل[argi++] = 10 + state->pen.font;
 
-  if(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
-    args[argi++] = 21;
+  اگر(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
+    دلائل[argi++] = 21;
 
-  argi = vterm_state_getpen_color(&state->pen.fg, argi, args, TRUE);
+  argi = vterm_state_getpen_color(&state->pen.fg, argi, دلائل, TRUE);
 
-  argi = vterm_state_getpen_color(&state->pen.bg, argi, args, FALSE);
+  argi = vterm_state_getpen_color(&state->pen.bg, argi, دلائل, FALSE);
 
-  if(state->pen.small) {
-    if(state->pen.baseline == VTERM_BASELINE_RAISE)
-      args[argi++] = 73;
-    else if(state->pen.baseline == VTERM_BASELINE_LOWER)
-      args[argi++] = 74;
+  اگر(state->pen.small) {
+    اگر(state->pen.baseline == VTERM_BASELINE_RAISE)
+      دلائل[argi++] = 73;
+    ورنہ اگر(state->pen.baseline == VTERM_BASELINE_زیریں)
+      دلائل[argi++] = 74;
   }
 
-  return argi;
+  واپس argi;
 }
 
-int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
+صحیح vterm_state_get_penattr(ثابت VTermState *state, VTermAttr attr, VTerm_قدر *val)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  انتخاب(attr) {
+  حالت VTERM_ATTR_BOLD:
     val->boolean = state->pen.bold;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_UNDERLINE:
-    val->number = state->pen.underline;
-    return 1;
+  حالت VTERM_ATTR_UNDERLINE:
+    val->نمبر = state->pen.underline;
+    واپس 1;
 
-  case VTERM_ATTR_ITALIC:
+  حالت VTERM_ATTR_ITALIC:
     val->boolean = state->pen.italic;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_BLINK:
+  حالت VTERM_ATTR_BLINK:
     val->boolean = state->pen.blink;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_REVERSE:
-    val->boolean = state->pen.reverse;
-    return 1;
+  حالت VTERM_ATTR_الٹ:
+    val->boolean = state->pen.الٹ;
+    واپس 1;
 
-  case VTERM_ATTR_CONCEAL:
+  حالت VTERM_ATTR_CONCEAL:
     val->boolean = state->pen.conceal;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_STRIKE:
+  حالت VTERM_ATTR_STRIKE:
     val->boolean = state->pen.strike;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_FONT:
-    val->number = state->pen.font;
-    return 1;
+  حالت VTERM_ATTR_FONT:
+    val->نمبر = state->pen.font;
+    واپس 1;
 
-  case VTERM_ATTR_FOREGROUND:
+  حالت VTERM_ATTR_FOREGROUND:
     val->color = state->pen.fg;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_BACKGROUND:
+  حالت VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_SMALL:
+  حالت VTERM_ATTR_SMALL:
     val->boolean = state->pen.small;
-    return 1;
+    واپس 1;
 
-  case VTERM_ATTR_BASELINE:
-    val->number = state->pen.baseline;
-    return 1;
+  حالت VTERM_ATTR_BASELINE:
+    val->نمبر = state->pen.baseline;
+    واپس 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  حالت VTERM_N_ATTRS:
+    واپس 0;
   }
 
-  return 0;
+  واپس 0;
 }

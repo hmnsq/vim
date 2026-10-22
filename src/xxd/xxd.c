@@ -87,53 +87,53 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#اگر _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#اگر_ختم
+#اگر !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
-#endif
+#اگر_ختم
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
-# define _XOPEN_SOURCE 700   /* for fdopen() */
-#endif
+#اگر (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+# define XOPEN_ماخذ 700   /* for fdopen() */
+#اگر_ختم
 
-#include <stdio.h>
-#ifdef VAXC
+#شامل <stdio.h>
+#اگر_تعریف_شدہ VAXC
 # include <file.h>
-#else
+#ورنہ
 # include <fcntl.h>
-#endif
-#if defined(WIN32) || defined(CYGWIN)
+#اگر_ختم
+#اگر defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
-#endif
-#ifdef WIN32
+#اگر_ختم
+#اگر_تعریف_شدہ WIN32
 # include <windows.h>
-#endif
-#ifdef UNIX
+#اگر_ختم
+#اگر_تعریف_شدہ UNIX
 # include <unistd.h>
-#endif
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#اگر_ختم
+#شامل <stdlib.h>
+#شامل <string.h>
+#شامل <ctype.h>
+#شامل <limits.h>
+#اگر __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
-#endif
+#اگر_ختم
 
 
 /*  This corrects the problem of missing prototypes for certain functions
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#اگر defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
-#endif
+#اگر_ختم
 
-#ifndef __USE_FIXED_PROTOTYPES__
+#اگر_غیر_تعریف_شدہ __USE_FIXED_PROTOTYPES__
 /*
  * This is historic and works only if the compiler really has no prototypes:
  *
@@ -141,119 +141,119 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# اگر defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+خارجی صحیح fprintf __P((FILE *, حرف *, ...));
+خارجی صحیح fputs   __P((حرف *, FILE *));
+خارجی صحیح _flsbuf __P((غیرعلامتی حرف, FILE *));
+خارجی صحیح _filbuf __P((FILE *));
+خارجی صحیح fflush  __P((FILE *));
+خارجی صحیح fclose  __P((FILE *));
+خارجی صحیح fseek   __P((FILE *, طویل, صحیح));
+خارجی صحیح rewind  __P((FILE *));
 
-extern void perror __P((char *));
+خارجی خالی perror __P((حرف *));
 # endif
-#endif
+#اگر_ختم
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
-#ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
-#endif
+حرف نسخہ_2[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+#اگر_تعریف_شدہ WIN32
+حرف osver[] = " (Win32)";
+#ورنہ
+حرف osver[] = "";
+#اگر_ختم
 
-#if defined(WIN32)
+#اگر defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
-# define PATH_SEP '\\'
-#elif defined(CYGWIN)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ثنائی) : O_CREAT)
+# define BIN_تفویض(fp, yes) setmode(fileno(fp), (yes) ? O_ثنائی : O_متن_2)
+# define راستہ_SEP '\\'
+#وگرنہ_اگر defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
-# define PATH_SEP '/'
-#else
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ثنائی) : O_CREAT)
+# define BIN_تفویض(fp, yes) ((yes) ? (خالی) setmode(fileno(fp), O_ثنائی) : (خالی) (fp))
+# define راستہ_SEP '/'
+#ورنہ
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
-#  define BIN_ASSIGN(fp, dummy) fp
-#  define PATH_SEP ']'
+#  define BIN_تفویض(fp, dummy) fp
+#  define راستہ_SEP ']'
 #  define FILE_SEP '.'
-# else
+# ورنہ
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
-#  define BIN_ASSIGN(fp, dummy) fp
-#  define PATH_SEP '/'
+#  define BIN_تفویض(fp, dummy) fp
+#  define راستہ_SEP '/'
 # endif
-#endif
+#اگر_ختم
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
-# define OPEN(name, mode, umask) open(name, mode)
-#else
-# define OPEN(name, mode, umask) open(name, mode, umask)
-#endif
+#اگر __MWERKS__
+# define OPEN(name, منوال, umask) open(name, منوال)
+#ورنہ
+# define OPEN(name, منوال, umask) open(name, منوال, umask)
+#اگر_ختم
 
-#ifdef AMIGA
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
-#endif
+#اگر_تعریف_شدہ AMIGA
+# define STRNCMP(s1, s2, l) لڑی_موازنہ(s1, s2, (size_t)l)
+#ورنہ
+# define STRNCMP(s1, s2, l) لڑی_موازنہ(s1, s2, l)
+#اگر_ختم
 
-#ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+#اگر_غیر_تعریف_شدہ __P
+# اگر defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# ورنہ
 #  define __P(a) ()
 # endif
-#endif
+#اگر_ختم
 
-#define TRY_SEEK	/* attempt to use lseek, or skip forward by reading */
-#define COLS 256	/* change here, if you ever need more columns */
+#تعریف_کرو TRY_SEEK	/* attempt to use lseek, or skip forward by reading */
+#تعریف_کرو ستون_تعداد_2 256	/* change here, if you ever need more columns */
 
 /*
  * LLEN is the maximum length of a line; other than the visible characters
  * we need to consider also the escape color sequence prologue/epilogue ,
  * (11 bytes for each character).
  */
-#define LLEN \
+#تعریف_کرو LLEN \
     (39            /* addr: ⌈log10(ULONG_MAX)⌉ if "-d" flag given. We assume ULONG_MAX = 2**128 */ \
     + 2            /* ": " */ \
-    + 13 * COLS    /* hex dump with colors */ \
-    + (COLS - 1)   /* whitespace between groups if "-g1" option given and "-c" maxed out */ \
+    + 13 * ستون_تعداد_2    /* hex dump with colors */ \
+    + (ستون_تعداد_2 - 1)   /* whitespace between groups if "-g1" option given and "-c" maxed out */ \
     + 2            /* whitespace */ \
-    + 12 * COLS    /* ASCII dump with colors */ \
+    + 12 * ستون_تعداد_2    /* ASCII dump with colors */ \
     + 2)           /* "\n\0" */
 
 /*
  * LLEN_NO_COLOR is the maximum length of a line excluding the colors.
  */
-#define LLEN_NO_COLOR \
+#تعریف_کرو LLEN_NO_COLOR \
     (39            /* addr: ⌈log10(ULONG_MAX)⌉ if "-d" flag given. We assume ULONG_MAX = 2**128 */ \
     + 2            /* ": " */ \
-    + 9 * COLS     /* hex dump, worst case: bitwise output using -b */ \
+    + 9 * ستون_تعداد_2     /* hex dump, worst case: bitwise output using -b */ \
     + 2            /* whitespace */ \
-    + COLS         /* ASCII dump */ \
+    + ستون_تعداد_2         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+حرف hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
-#define HEX_NORMAL         0x00 /* no flags set */
-#define HEX_POSTSCRIPT     0x01
-#define HEX_CINCLUDE       0x02
-#define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
-#define HEX_LITTLEENDIAN   0x08
+#تعریف_کرو HEX_معمول         0x00 /* no flags set */
+#تعریف_کرو HEX_POSTSCRIPT     0x01
+#تعریف_کرو HEX_CINCLUDE       0x02
+#تعریف_کرو HEX_بٹ           0x04 /* not hex a dump, but bits: 01111001 */
+#تعریف_کرو HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#تعریف_کرو CONDITIONAL_CAPITALIZE(c) (capitalize ? بڑا_حرف((غیرعلامتی حرف)(c)) : (c))
 
-#define COLOR_PROLOGUE(color) \
+#تعریف_کرو COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
 l_colored[c++] = '['; \
 l_colored[c++] = '1'; \
@@ -262,21 +262,21 @@ l_colored[c++] = '3'; \
 l_colored[c++] = (color); \
 l_colored[c++] = 'm';
 
-#define COLOR_EPILOGUE \
+#تعریف_کرو COLOR_EPILOGUE \
 l_colored[c++] = '\033'; \
 l_colored[c++] = '['; \
 l_colored[c++] = '0'; \
 l_colored[c++] = 'm';
-#define COLOR_RED '1'
-#define COLOR_GREEN '2'
-#define COLOR_YELLOW '3'
-#define COLOR_BLUE '4'
-#define COLOR_WHITE '7'
+#تعریف_کرو COLOR_RED '1'
+#تعریف_کرو COLOR_GREEN '2'
+#تعریف_کرو COLOR_YELLOW '3'
+#تعریف_کرو COLOR_BLUE '4'
+#تعریف_کرو COLOR_WHITE '7'
 
-static char *pname;
+ساکن حرف *pname;
 
-  static void
-exit_with_usage(void)
+  ساکن خالی
+exit_with_usage(خالی)
 {
   fprintf(stderr, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
   fprintf(stderr, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
@@ -299,64 +299,64 @@ exit_with_usage(void)
 		  "    -r -s off   revert with <off> added to file positions found in hexdump.\n"
 		  "    -d          show offset in decimal instead of hex.\n");
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
-#ifdef TRY_SEEK
+#اگر_تعریف_شدہ TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#ورنہ
 	  "", "");
-#endif
+#اگر_ختم
   fprintf(stderr, "    -u          use upper case hex letters.\n"
 		  "    -R when     colorize the output; <when> can be 'always', 'auto' or 'never'. Default: 'auto'.\n"
-		  "    -v          show version: \"%s%s\".\n", version, osver);
-  exit(1);
+		  "    -v          show version: \"%s%s\".\n", نسخہ_2, osver);
+  باہر_نکلو(1);
 }
 
-  static void
-perror_exit(int ret)
+  ساکن خالی
+perror_exit(صحیح ret)
 {
   fprintf(stderr, "%s: ", pname);
-  perror(NULL);
-  exit(ret);
+  perror(تہی);
+  باہر_نکلو(ret);
 }
 
-  static void
-error_exit(int ret, char *msg)
+  ساکن خالی
+error_exit(صحیح ret, حرف *پیغام)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
-  exit(ret);
+  fprintf(stderr, "%s: %s\n", pname, پیغام);
+  باہر_نکلو(ret);
 }
 
-  static int
+  ساکن صحیح
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  صحیح c = getc(fpi);
+  اگر (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  واپس c;
 }
 
-  static void
-putc_or_die(int c, FILE *fpo)
+  ساکن خالی
+putc_or_die(صحیح c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  اگر (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
-  static void
-fputs_or_die(char *s, FILE *fpo)
+  ساکن خالی
+fputs_or_die(حرف *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  اگر (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#تعریف_کرو FPRINTF_OR_DIE(دلائل) اگر (fprintf دلائل < 0) perror_exit(3)
 
-  static void
+  ساکن خالی
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  اگر (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  اگر (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  ساکن صحیح
+parse_hex_digit(صحیح c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  واپس (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  ساکن صحیح
+parse_bin_digit(صحیح c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  واپس (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  ساکن صحیح
+skip_مقصد_eol(FILE *fpi, صحیح c)
 {
-  while (c != '\n' && c != EOF)
+  جب (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  واپس c;
 }
 
 /*
@@ -404,169 +404,169 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  ساکن صحیح
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
-  long base_off)
+  صحیح ستون_تعداد,
+  صحیح hextype,
+  طویل بنیاد_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
-  long have_off = 0, want_off = 0;
+  صحیح c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = ستون_تعداد, bt = 0, b = 0, bcnt = 0;
+  طویل have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  جب ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
-	continue;
+      اگر (c == '\r')	/* Doze style input file? */
+	جاری;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
-	continue;
+      اگر (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+	جاری;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      اگر (hextype == HEX_معمول || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  اگر (n1 == -1 && ign_garb)
+	    جاری;
 	}
-      else /* HEX_BITS */
+      ورنہ /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  اگر (n1 == -1 && ign_garb)
+	    جاری;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  اگر (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (صحیح)(((غیرعلامتی)b << 1) | (غیرعلامتی)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      اگر ((hextype != HEX_POSTSCRIPT) && (p >= ستون_تعداد))
 	{
-	  if (hextype == HEX_NORMAL)
+	  اگر (hextype == HEX_معمول)
 	    {
-	      if (n1 < 0)
+	      اگر (n1 < 0)
 		{
 		  p = 0;
-		  continue;
+		  جاری;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (طویل)(((غیرعلامتی طویل)want_off << 4) | (غیرعلامتی)n1);
 	    }
-	  else /* HEX_BITS */
+	  ورنہ /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      اگر (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
-		  continue;
+		  جاری;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (طویل)(((غیرعلامتی طویل)want_off << 4) | (غیرعلامتی)n1);
 	    }
-	  continue;
+	  جاری;
 	}
 
-      if (base_off + want_off != have_off)
+      اگر (بنیاد_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  اگر (fflush(fpo) != 0)
 	    perror_exit(3);
-#ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
-	    have_off = base_off + want_off;
-#endif
-	  if (base_off + want_off < have_off)
+#اگر_تعریف_شدہ TRY_SEEK
+	  اگر (fseek(fpo, بنیاد_off + want_off - have_off, SEEK_CUR) >= 0)
+	    have_off = بنیاد_off + want_off;
+#اگر_ختم
+	  اگر (بنیاد_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  برائے (; have_off < بنیاد_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      اگر (hextype == HEX_معمول || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  اگر (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      اگر (!hextype && (++p >= ستون_تعداد))
 	      /* skip the rest of the line as garbage */
-	      c = skip_to_eol(fpi, c);
+	      c = skip_مقصد_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  ورنہ اگر (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
-	    c = skip_to_eol(fpi, c);
+	    c = skip_مقصد_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      ورنہ /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  اگر (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      اگر (++p >= ستون_تعداد)
 		/* skip the rest of the line as garbage */
-		 c = skip_to_eol(fpi, c);
+		 c = skip_مقصد_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      اگر (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  اگر (hextype == HEX_معمول || hextype == HEX_بٹ)
 	    want_off = 0;
-	  p = cols;
+	  p = ستون_تعداد;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  اگر (fflush(fpo) != 0)
     perror_exit(3);
-#ifdef TRY_SEEK
+#اگر_تعریف_شدہ TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
-#endif
+#اگر_ختم
   fclose_or_die(fpi, fpo);
-  return 0;
+  واپس 0;
 }
 
 
 /*
  * Print line l with given colors.
  */
-  static void
-print_colored_line(FILE *fp, char *l, char *colors)
+  ساکن خالی
+print_colored_سطر(FILE *fp, حرف *l, حرف *colors)
 {
-  static char l_colored[LLEN+1];
+  ساکن حرف l_colored[LLEN+1];
 
-  if (colors)
+  اگر (colors)
     {
-      int c = 0;
-      if (colors[0])
+      صحیح c = 0;
+      اگر (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      صحیح i;
+      برائے (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  اگر (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      اگر (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      اگر (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      اگر (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  ورنہ
     fputs_or_die(l, fp);
 }
 
@@ -598,47 +598,47 @@ print_colored_line(FILE *fp, char *l, char *colors)
  *
  * If nz is always positive, lines are never suppressed.
  */
-  static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+  ساکن خالی
+xxdline(FILE *fp, حرف *l, حرف *colors, صحیح nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  ساکن حرف z[LLEN_NO_COLOR+1];
+  ساکن حرف z_colors[LLEN_NO_COLOR+1];
+  ساکن علامتی حرف zero_نظر_آیا = 0;
 
-  if (!nz && zero_seen == 1)
+  اگر (!nz && zero_نظر_آیا == 1)
     {
       strcpy(z, l);
-      if (colors)
-	  memcpy(z_colors, colors, strlen(z));
+      اگر (colors)
+	  حافظہ_نقل(z_colors, colors, لڑی_لمبائی(z));
     }
 
-  if (nz || !zero_seen++)
+  اگر (nz || !zero_نظر_آیا++)
     {
-      if (nz)
+      اگر (nz)
 	{
-	  if (nz < 0)
-	    zero_seen--;
-	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  اگر (nz < 0)
+	    zero_نظر_آیا--;
+	  اگر (zero_نظر_آیا == 2)
+	    print_colored_سطر(fp, z, z_colors);
+	  اگر (zero_نظر_آیا > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+      اگر (nz >= 0 || zero_نظر_آیا > 0)
+	print_colored_سطر(fp, l, colors);
 
-      if (nz)
-	zero_seen = 0;
+      اگر (nz)
+	zero_نظر_آیا = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
-    zero_seen = 4;
+  اگر (zero_نظر_آیا >= 0x7F)
+    zero_نظر_آیا = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+ساکن غیرعلامتی حرف etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,524 +666,524 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  ساکن حرف
+get_color_char (صحیح e, صحیح ebcdic)
 {
-  if (ebcdic)
+  اگر (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      اگر ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	واپس COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      ورنہ اگر (e == 37 || e == 13 || e == 5)
+	واپس COLOR_YELLOW;
+      ورنہ اگر (e == 0)
+	واپس COLOR_WHITE;
+      ورنہ اگر (e == 255)
+	واپس COLOR_BLUE;
+      ورنہ
+	واپس COLOR_RED;
     }
-  else  /* ASCII */
+  ورنہ  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
-#endif
+#اگر defined(__MVS__) && __CHARSET_LIB == 0
+      اگر (e >= 64)
+	واپس COLOR_GREEN;
+#ورنہ
+      اگر (e > 31 && e < 127)
+	واپس COLOR_GREEN;
+#اگر_ختم
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      ورنہ اگر (e == 9 || e == 10 || e == 13)
+	واپس COLOR_YELLOW;
+      ورنہ اگر (e == 0)
+	واپس COLOR_WHITE;
+      ورنہ اگر (e == 255)
+	واپس COLOR_BLUE;
+      ورنہ
+	واپس COLOR_RED;
     }
-    return 0;
+    واپس 0;
 }
 
-  static int
-enable_color(void)
+  ساکن صحیح
+enable_color(خالی)
 {
-#ifdef WIN32
-  DWORD   mode;
-  HANDLE  out;
+#اگر_تعریف_شدہ WIN32
+  DWORD   منوال;
+  HANDLE  برآمد;
 
-  if (!isatty(1))
-    return 0;
+  اگر (!isatty(1))
+    واپس 0;
 
-  out = GetStdHandle(STD_OUTPUT_HANDLE);
-  GetConsoleMode(out, &mode);
-  mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
-#elif defined(UNIX)
-  char *term;
+  برآمد = GetStdHandle(STD_OUTPUT_HANDLE);
+  Get_Console_منوال(برآمد, &منوال);
+  منوال |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  واپس (صحیح)سیٹ_Console_منوال(برآمد, منوال);
+#وگرنہ_اگر defined(UNIX)
+  حرف *رکن;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  اگر (!isatty(STDOUT_FILENO))
+    واپس 0;
 
-  term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  رکن = getenv("TERM");
+  اگر (رکن == تہی || *رکن == '\0' || !strcmp(رکن, "dumb"))
+    واپس 0;
 
-  return 1;
-#else
-  return 0;
-#endif
+  واپس 1;
+#ورنہ
+  واپس 0;
+#اگر_ختم
 }
 
-  int
-main(int argc, char *argv[])
+  صحیح
+مین(صحیح argc, حرف *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
-  long length = -1, n = 0, seekoff = 0;
-  unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  صحیح c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  صحیح ستون_تعداد = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_معمول;
+  صحیح capitalize = 0, decimal_انحراف = 0;
+  صحیح ebcdic = 0;
+  صحیح termination = 0;
+  صحیح octspergrp = -1;	/* number of octets grouped in output */
+  صحیح grplen;		/* total chars per octet group excluding colors */
+  طویل لمبائی = -1, n = 0, seekoff = 0;
+  غیرعلامتی طویل displayoff = 0;
+  ساکن حرف l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  ساکن حرف colors[LLEN_NO_COLOR+1]; /* color array */
+  حرف *pp;
+  حرف *varname = تہی;
+  صحیح addrlen = 9;
+  صحیح color = 0;
+  صحیح color_forced = 0;	/* set when -R always is used */
+  حرف *no_color;
+  حرف cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  اگر (no_color == تہی || no_color[0] == '\0')
     color = enable_color();
 
-#ifdef AMIGA
+#اگر_تعریف_شدہ AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
-    exit(1);
-#endif
+  اگر (argc == 0)
+    باہر_نکلو(1);
+#اگر_ختم
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  برائے (pp = pname; *pp; )
+    اگر (*pp++ == راستہ_SEP)
       pname = pp;
-#ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+#اگر_تعریف_شدہ FILE_SEP
+  برائے (pp = pname; *pp; pp++)
+    اگر (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	توڑو;
       }
-#endif
+#اگر_ختم
 
-  while (argc >= 2)
+  جب (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   اگر (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      ورنہ اگر (!STRNCMP(pp, "-b", 2)) hextype |= HEX_بٹ;
+      ورنہ اگر (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      ورنہ اگر (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      ورنہ اگر (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      ورنہ اگر (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      ورنہ اگر (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      ورنہ اگر (!STRNCMP(pp, "-d", 2)) decimal_انحراف = 1;
+      ورنہ اگر (!STRNCMP(pp, "-r", 2)) revert++;
+      ورنہ اگر (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      ورنہ اگر (!STRNCMP(pp, "-t", 2)) termination++;
+      ورنہ اگر (!STRNCMP(pp, "-v", 2))
 	{
-	  fprintf(stderr, "%s%s\n", version, osver);
-	  exit(0);
+	  fprintf(stderr, "%s%s\n", نسخہ_2, osver);
+	  باہر_نکلو(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      ورنہ اگر (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  اگر (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  ورنہ اگر (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      ستون_تعداد = (صحیح)strtol(pp + 2, تہی, 0);
 	    }
-	  else
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      ستون_تعداد = (صحیح)strtol(argv[2], تہی, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      ورنہ اگر (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  اگر (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (صحیح)strtol(pp + 2, تہی, 0);
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (صحیح)strtol(argv[2], تہی, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      ورنہ اگر (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
-	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  صحیح reloffset = 0;
+	  صحیح negoffset = 0;
+	  اگر (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	    displayoff = strtoul(pp + 2, تہی, 0);
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      اگر (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     اگر (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
-	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
-	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
+	     اگر (negoffset)
+	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, تہی, 0) + 1;
+	     ورنہ
+	       displayoff = strtoul(argv[2] + reloffset+negoffset, تہی, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      ورنہ اگر (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  اگر (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
-#ifdef TRY_SEEK
-	      if (pp[2] == '+')
+#اگر_تعریف_شدہ TRY_SEEK
+	      اگر (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      اگر (pp[2+relseek] == '-')
 		negseek++;
-#endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+#اگر_ختم
+	      seekoff = strtol(pp + 2+relseek+negseek, (حرف **)تہی, 0);
 	    }
-	  else
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
-#ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+#اگر_تعریف_شدہ TRY_SEEK
+	      اگر (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      اگر (argv[2][relseek] == '-')
 		negseek++;
-#endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+#اگر_ختم
+	      seekoff = strtol(argv[2] + relseek+negseek, (حرف **)تہی, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      ورنہ اگر (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  اگر (pp[2] && STRNCMP("en", pp + 2, 2))
+	    لمبائی = strtol(pp + 2, (حرف **)تہی, 0);
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      لمبائی = strtol(argv[2], (حرف **)تہی, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      ورنہ اگر (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  اگر (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  ورنہ
 	    {
-	      if (!argv[2])
+	      اگر (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      ورنہ اگر (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  حرف *pw = pp + 2;
+	  اگر (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  اگر (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  اگر (!STRNCMP(pw, "always", 6))
 	    {
-	      (void)enable_color();
+	      (خالی)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  ورنہ اگر (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  ورنہ اگر (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  ورنہ
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      ورنہ اگر (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  توڑو;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      ورنہ اگر (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      ورنہ
+	توڑو;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  اگر (hextype != (HEX_CINCLUDE | HEX_بٹ))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	اگر (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
-    switch (hextype)
+  اگر (!colsgiven || (!ستون_تعداد && hextype != HEX_POSTSCRIPT))
+    انتخاب (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      حالت HEX_POSTSCRIPT:	ستون_تعداد = 30; توڑو;
+      حالت HEX_CINCLUDE:	ستون_تعداد = 12; توڑو;
+      حالت HEX_CINCLUDE | HEX_بٹ:
+      حالت HEX_بٹ:		ستون_تعداد = 6; توڑو;
+      حالت HEX_معمول:
+      حالت HEX_LITTLEENDIAN:
+      طےشدہ:			ستون_تعداد = 16; توڑو;
       }
 
-  if (octspergrp < 0)
-    switch (hextype)
+  اگر (octspergrp < 0)
+    انتخاب (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      حالت HEX_CINCLUDE | HEX_بٹ:
+      حالت HEX_بٹ:		octspergrp = 1; توڑو;
+      حالت HEX_معمول:		octspergrp = 2; توڑو;
+      حالت HEX_LITTLEENDIAN:	octspergrp = 4; توڑو;
+      حالت HEX_POSTSCRIPT:
+      حالت HEX_CINCLUDE:
+      طےشدہ:			octspergrp = 0; توڑو;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
-      (hextype != HEX_POSTSCRIPT && cols < 1) ||
-      ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
-							    && (cols > COLS)))
+  اگر ((hextype == HEX_POSTSCRIPT && ستون_تعداد < 0) ||
+      (hextype != HEX_POSTSCRIPT && ستون_تعداد < 1) ||
+      ((hextype == HEX_معمول || hextype == HEX_بٹ || hextype == HEX_LITTLEENDIAN)
+							    && (ستون_تعداد > ستون_تعداد_2)))
     {
-      fprintf(stderr, "%s: invalid number of columns (max. %d).\n", pname, COLS);
-      exit(1);
+      fprintf(stderr, "%s: invalid number of columns (max. %d).\n", pname, ستون_تعداد_2);
+      باہر_نکلو(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
-    octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  اگر (octspergrp < 1 || octspergrp > ستون_تعداد)
+    octspergrp = ستون_تعداد;
+  ورنہ اگر (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  اگر (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
-    BIN_ASSIGN(fp = stdin, !revert);
-  else
+  اگر (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+    BIN_تفویض(fp = stdin, !revert);
+  ورنہ
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      اگر ((fp = fopen(argv[1], BIN_READ(!revert))) == تہی)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  واپس 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
-    BIN_ASSIGN(fpo = stdout, revert);
-  else
+  اگر (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+    BIN_تفویض(fpo = stdout, revert);
+  ورنہ
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      صحیح fd;
+      صحیح منوال = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
-	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
+      اگر (((fd = OPEN(argv[2], منوال | BIN_CREAT(revert), 0666)) < 0) ||
+	  (fpo = fdopen(fd, BIN_WRITE(revert))) == تہی)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  واپس 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      اگر (!color_forced)
 	color = 0;
     }
 
-  if (revert)
-    switch (hextype)
+  اگر (revert)
+    انتخاب (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      حالت HEX_معمول:
+      حالت HEX_POSTSCRIPT:
+      حالت HEX_بٹ:
+	واپس huntype(fp, fpo, ستون_تعداد, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
-      default:
+	توڑو;
+      طےشدہ:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  اگر (seekoff || negseek || !relseek)
     {
-#ifdef TRY_SEEK
-      if (relseek)
+#اگر_تعریف_شدہ TRY_SEEK
+      اگر (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      ورنہ
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      اگر (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      اگر (e >= 0)
 	seekoff = ftell(fp);
-      else
-#endif
+      ورنہ
+#اگر_ختم
 	{
-	  long s = seekoff;
+	  طویل s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  جب (s--)
+	    اگر (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  اگر (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      اگر (varname == تہی && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      اگر (varname != تہی)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", ہندسہ_ہے((غیرعلامتی حرف)varname[0]) ? "__" : ""));
+	  برائے (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(حرف_یا_ہندسہ((غیرعلامتی حرف)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      جب ((لمبائی < 0 || p < لمبائی) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  اگر (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  اگر (hextype & HEX_بٹ)
 	    {
-	      if (p == 0)
+	      اگر (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      ورنہ اگر (p % ستون_تعداد == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      ورنہ
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      برائے (صحیح j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  ورنہ
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
-		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
+		(p % ستون_تعداد) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  اگر (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      توڑو ;
 	    }
 	}
 
-      if (p)
+      اگر (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      اگر (varname != تہی)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", ہندسہ_ہے((غیرعلامتی حرف)varname[0]) ? "__" : ""));
+	  برائے (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(حرف_یا_ہندسہ((غیرعلامتی حرف)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      واپس 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  اگر (hextype == HEX_POSTSCRIPT)
     {
-      p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      p = ستون_تعداد;
+      جب ((لمبائی < 0 || n < لمبائی) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  اگر (ستون_تعداد > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
-	      p = cols;
+	      p = ستون_تعداد;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      اگر (ستون_تعداد == 0 || p < ستون_تعداد)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      واپس 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  اگر (hextype != HEX_بٹ)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  ورنہ	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  جب ((لمبائی < 0 || n < لمبائی) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      اگر (p == 0)
 	{
-	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
-				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  addrlen = sprintf(l, decimal_انحراف ? "%08lu:" : "%08lx:",
+				  ((غیرعلامتی طویل)(n + seekoff + displayoff)));
+	  برائے (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      اگر (hextype == HEX_معمول || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  اگر (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,71 +1193,71 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      ورنہ /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  اگر (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  برائے (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      اگر (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      اگر (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      اگر (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
-	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
-	c = (grplen * cols - 1) / octspergrp;
+	c = grplen * ((ستون_تعداد + octspergrp - 1) / octspergrp);
+      ورنہ
+	c = (grplen * ستون_تعداد - 1) / octspergrp;
 
 
-      if (ebcdic)
+      اگر (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      اگر (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      اگر (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#اگر defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#ورنہ
 	  (e > 31 && e < 127)
-#endif
+#اگر_ختم
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      اگر (++p == ستون_تعداد)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
 
-	  xxdline(fpo, l, color ? colors : NULL, autoskip ? nonzero : 1);
+	  xxdline(fpo, l, color ? colors : تہی, autoskip ? nonzero : 1);
 	  memset(colors, 0, c);
 	  nonzero = 0;
 	  p = 0;
 	}
     }
-  if (p)
+  اگر (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      اگر (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  اگر (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      صحیح fill = octspergrp - (p % octspergrp);
+	      اگر (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      برائے (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  اگر (hextype != HEX_بٹ)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
-	      c += cols - p;
-	      c += (cols - p) / octspergrp;
+	      c += ستون_تعداد - p;
+	      c += (ستون_تعداد - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      برائے (i = ستون_تعداد - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
-	xxdline(fpo, l, NULL, 1);
+      ورنہ
+	xxdline(fpo, l, تہی, 1);
     }
-  else if (autoskip)
-    xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
+  ورنہ اگر (autoskip)
+    xxdline(fpo, l, color ? colors : تہی, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  واپس 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

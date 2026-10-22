@@ -24,11 +24,11 @@
  *	      used from the respective data device.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#ifdef FEAT_WAYLAND
+#اگر_تعریف_شدہ FEAT_WAYLAND
 
-#include "wayland.h"
+#شامل "wayland.h"
 
 vwl_connection_T    *wayland_ct;
 bool		    is_reading = false;
@@ -37,205 +37,205 @@ bool		    is_reading = false;
  * Like wl_display_flush but always writes all the data in the buffer to the
  * display fd. Returns FAIL on failure and OK on success.
  */
-    int
+    صحیح
 vwl_connection_flush(vwl_connection_T *self)
 {
-#ifndef HAVE_SELECT
-    struct pollfd fds;
+#اگر_غیر_تعریف_شدہ HAVE_SELECT
+    ساخت pollfd fds;
 
     fds.fd = self->display.fd;
     fds.events = POLLOUT;
-#else
+#ورنہ
     fd_set	    wfds;
-    struct timeval  tv;
+    ساخت timeval  tv;
 
     FD_ZERO(&wfds);
     FD_SET(self->display.fd, &wfds);
-#endif
+#اگر_ختم
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    اگر (self->display.proxy == تہی)
+	واپس FAIL;
 
     // Send the requests we have made to the compositor, until we have written
     // all the data. Poll in order to check if the display fd is writable, if
     // not, then wait until it is and continue writing or until we timeout.
-    while (true)
+    جب (true)
     {
-	int ret = wl_display_flush(self->display.proxy);
+	صحیح ret = wl_display_flush(self->display.proxy);
 
-	if (ret == -1 && errno == EAGAIN)
+	اگر (ret == -1 && errno == EAGAIN)
 	{
-#ifndef HAVE_SELECT
-	    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+#اگر_غیر_تعریف_شدہ HAVE_SELECT
+	    اگر (poll(&fds, 1, p_wtm) <= 0)
+#ورنہ
 	    tv.tv_sec = p_wtm / 1000;
 	    tv.tv_usec = (p_wtm % 1000) * 1000;
-	    if (select(self->display.fd + 1, NULL, &wfds, NULL, &tv) <= 0)
-		return FAIL;
-#endif
+	    اگر (select(self->display.fd + 1, تہی, &wfds, تہی, &tv) <= 0)
+		واپس FAIL;
+#اگر_ختم
 	}
-	else if (ret == -1)
-	    return FAIL;
-	else
-	    break;
+	ورنہ اگر (ret == -1)
+	    واپس FAIL;
+	ورنہ
+	    توڑو;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * number of events dispatched on success else -1 on failure.
  */
-    int
+    صحیح
 vwl_connection_dispatch(vwl_connection_T *self)
 {
-#ifndef HAVE_SELECT
-    struct pollfd   fds;
+#اگر_غیر_تعریف_شدہ HAVE_SELECT
+    ساخت pollfd   fds;
 
     fds.fd = self->display.fd;
     fds.events = POLLIN;
-#else
+#ورنہ
     fd_set	    rfds;
-    struct timeval  tv;
+    ساخت timeval  tv;
 
     FD_ZERO(&rfds);
     FD_SET(self->display.fd, &rfds);
-#endif
+#اگر_ختم
 
-    if (self->display.proxy == NULL)
-	return -1;
+    اگر (self->display.proxy == تہی)
+	واپس -1;
 
-    while (wl_display_prepare_read(self->display.proxy) == -1)
+    جب (wl_display_prepare_read(self->display.proxy) == -1)
 	// Dispatch any queued events so that we can start reading
-	if (wl_display_dispatch_pending(self->display.proxy) == -1)
-	    return -1;
+	اگر (wl_display_dispatch_pending(self->display.proxy) == -1)
+	    واپس -1;
 
     // Send any requests before we starting blocking to read display fd
-    if (vwl_connection_flush(self) == FAIL)
+    اگر (vwl_connection_flush(self) == FAIL)
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	واپس -1;
     }
 
     // Poll until there is data to read from the display fd.
-#ifndef HAVE_SELECT
-    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+#اگر_غیر_تعریف_شدہ HAVE_SELECT
+    اگر (poll(&fds, 1, p_wtm) <= 0)
+#ورنہ
     tv.tv_sec = p_wtm / 1000;
     tv.tv_usec = (p_wtm % 1000) * 1000;
-    if (select(self->display.fd + 1, &rfds, NULL, NULL, &tv) <= 0)
-#endif
+    اگر (select(self->display.fd + 1, &rfds, تہی, تہی, &tv) <= 0)
+#اگر_ختم
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	واپس -1;
     }
 
     // Read events into the queue
-    if (wl_display_read_events(self->display.proxy) == -1)
+    اگر (wl_display_read_events(self->display.proxy) == -1)
 	// No need to cancel
-	return -1;
+	واپس -1;
 
     // Dispatch those events (call the handlers associated for each event)
-    return wl_display_dispatch_pending(self->display.proxy);
+    واپس wl_display_dispatch_pending(self->display.proxy);
 }
 
 /*
  * Called when compositor is done processing requests/events.
  */
-    static void
-vwl_callback_event_done(void *data, struct wl_callback *callback,
-	uint32_t callback_data UNUSED)
+    ساکن خالی
+vwl_callback_event_مکمل(خالی *ڈیٹا, ساخت wl_callback *callback,
+	uint32_t callback_ڈیٹا غیر_مستعمل)
 {
-    *((bool*)data) = true;
+    *((bool*)ڈیٹا) = true;
     wl_callback_destroy(callback);
 }
 
-static const struct wl_callback_listener vwl_callback_listener = {
-    .done = vwl_callback_event_done
+ساکن ثابت ساخت wl_callback_listener vwl_callback_listener = {
+    .مکمل = vwl_callback_event_مکمل
 };
 
 /*
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * FAIL on failure and OK on success.
  */
-    int
+    صحیح
 vwl_connection_roundtrip(vwl_connection_T *self)
 {
-    struct wl_callback	*callback;
-    int			ret;
-    bool		done = false;
-#ifdef ELAPSED_FUNC
-    elapsed_T		start_tv;
-#endif
+    ساخت wl_callback	*callback;
+    صحیح			ret;
+    bool		مکمل = false;
+#اگر_تعریف_شدہ ELAPSED_FUNC
+    elapsed_T		آغاز_tv;
+#اگر_ختم
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    اگر (self->display.proxy == تہی)
+	واپس FAIL;
 
     // Tell compositor to emit 'done' event after processing all requests we
     // have sent and handling events.
     callback = wl_display_sync(self->display.proxy);
 
-    if (callback == NULL)
-	return FAIL;
+    اگر (callback == تہی)
+	واپس FAIL;
 
-    wl_callback_add_listener(callback, &vwl_callback_listener, &done);
+    wl_callback_جوڑو_listener(callback, &vwl_callback_listener, &مکمل);
 
-#ifdef ELAPSED_FUNC
-    ELAPSED_INIT(start_tv);
-#endif
+#اگر_تعریف_شدہ ELAPSED_FUNC
+    ELAPSED_INIT(آغاز_tv);
+#اگر_ختم
 
     // Wait till we get the done event (which will set `done` to TRUE), unless
     // we timeout
-    while (true)
+    جب (true)
     {
 	ret = vwl_connection_dispatch(self);
 
-	if (done || ret == -1)
-	    break;
+	اگر (مکمل || ret == -1)
+	    توڑو;
 
-#ifdef ELAPSED_FUNC
-	if (ELAPSED_FUNC(start_tv) >= p_wtm)
+#اگر_تعریف_شدہ ELAPSED_FUNC
+	اگر (ELAPSED_FUNC(آغاز_tv) >= p_wtm)
 	{
 	    ret = -1;
-	    break;
+	    توڑو;
 	}
-#endif
+#اگر_ختم
     }
 
-    if (ret == -1)
+    اگر (ret == -1)
     {
-	if (!done)
+	اگر (!مکمل)
 	    wl_callback_destroy(callback);
-	return FAIL;
+	واپس FAIL;
     }
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * Redirect libwayland logging to use ch_log + emsg instead.
  */
-    static void
-vwl_log_handler(const char *fmt, va_list args)
+    ساکن خالی
+vwl_log_handler(ثابت حرف *fmt, va_list دلائل)
 {
     // 512 bytes should be big enough
-    char	*buf	= alloc(512);
-    char	*prefix = _("wayland protocol error -> ");
-    size_t	len	= STRLEN(prefix);
+    حرف	*buf	= alloc(512);
+    حرف	*سابقہ = _("wayland protocol error -> ");
+    size_t	len	= STRLEN(سابقہ);
 
-    if (buf == NULL)
-	return;
+    اگر (buf == تہی)
+	واپس;
 
-    vim_strncpy((char_u*)buf, (char_u*)prefix, len);
-    vim_vsnprintf(buf + len, 512 - len, fmt, args);
+    vim_strncpy((char_u*)buf, (char_u*)سابقہ, len);
+    vim_vsnprintf(buf + len, 512 - len, fmt, دلائل);
 
     // Remove newline that libwayland puts
     buf[STRLEN(buf) - 1] = NUL;
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "%s", buf);
-#endif
+#اگر_تعریف_شدہ FEAT_EVAL
+    ch_log(تہی, "%s", buf);
+#اگر_ختم
     emsg(buf);
 
     vim_free(buf);
@@ -244,93 +244,93 @@ vwl_log_handler(const char *fmt, va_list args)
 /*
  * Callback for seat text label/name
  */
-    static void
+    ساکن خالی
 wl_seat_listener_event_name(
-	void		*data,
-	struct wl_seat	*seat_proxy UNUSED,
-	const char	*name)
+	خالی		*ڈیٹا,
+	ساخت wl_seat	*seat_proxy غیر_مستعمل,
+	ثابت حرف	*name)
 {
-    vwl_seat_T *seat = data;
+    vwl_seat_T *seat = ڈیٹا;
 
-    seat->label = (char *)vim_strsave((char_u *)name);
+    seat->label = (حرف *)vim_strsave((char_u *)name);
 }
 
 /*
  * Callback for seat capabilities
  */
-    static void
+    ساکن خالی
 wl_seat_listener_event_capabilities(
-	void		*data,
-	struct wl_seat	*seat_proxy UNUSED,
+	خالی		*ڈیٹا,
+	ساخت wl_seat	*seat_proxy غیر_مستعمل,
 	uint32_t	capabilities)
 {
-    vwl_seat_T *seat = data;
+    vwl_seat_T *seat = ڈیٹا;
 
     seat->capabilities = capabilities;
 }
 
-static const struct wl_seat_listener wl_seat_listener = {
+ساکن ثابت ساخت wl_seat_listener wl_seat_listener = {
     .name = wl_seat_listener_event_name,
     .capabilities = wl_seat_listener_event_capabilities
 };
 
-static void vwl_seat_destroy(vwl_seat_T *self);
+ساکن خالی vwl_seat_destroy(vwl_seat_T *self);
 
 /*
  * Callback for global event, for each global interface the compositor supports.
  * Keep in sync with vwl_disconnect_display().
  */
-    static void
+    ساکن خالی
 wl_registry_listener_event_global(
-	void		    *data,
-	struct wl_registry  *registry,
+	خالی		    *ڈیٹا,
+	ساخت wl_registry  *registry,
 	uint32_t	    name,
-	const char	    *interface,
-	uint32_t	    version)
+	ثابت حرف	    *interface,
+	uint32_t	    نسخہ_2)
 {
-    vwl_connection_T *ct = data;
+    vwl_connection_T *ct = ڈیٹا;
 
-    if (STRCMP(interface, wl_seat_interface.name) == 0)
+    اگر (STRCMP(interface, wl_seat_interface.name) == 0)
     {
-	struct wl_seat	*seat_proxy = wl_registry_bind(registry, name,
-		&wl_seat_interface, version > 5 ? 5 : version);
+	ساخت wl_seat	*seat_proxy = wl_registry_bind(registry, name,
+		&wl_seat_interface, نسخہ_2 > 5 ? 5 : نسخہ_2);
 	vwl_seat_T	*seat;
 
-	if (seat_proxy == NULL)
-	    return;
+	اگر (seat_proxy == تہی)
+	    واپس;
 
 	seat = ALLOC_CLEAR_ONE(vwl_seat_T);
 
-	if (seat == NULL || ga_grow(&ct->gobjects.seats, 1) == FAIL)
+	اگر (seat == تہی || ga_grow(&ct->gobjects.seats, 1) == FAIL)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    واپس;
 	}
 
 	seat->proxy = seat_proxy;
-	wl_seat_add_listener(seat_proxy, &wl_seat_listener, seat);
+	wl_seat_جوڑو_listener(seat_proxy, &wl_seat_listener, seat);
 
-	if (vwl_connection_roundtrip(ct) == FAIL || seat->label == NULL)
+	اگر (vwl_connection_roundtrip(ct) == FAIL || seat->label == تہی)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    واپس;
 	}
 
-	((vwl_seat_T **)ct->gobjects.seats.ga_data)[ct->gobjects.seats.ga_len++]
+	((vwl_seat_T **)ct->gobjects.seats.ga_ڈیٹا)[ct->gobjects.seats.ga_len++]
 	    = seat;
     }
-#ifdef FEAT_WAYLAND_CLIPBOARD
-    else if (STRCMP(interface, zwlr_data_control_manager_v1_interface.name) == 0)
-	ct->gobjects.zwlr_data_control_manager_v1 =
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
+    ورنہ اگر (STRCMP(interface, zwlr_ڈیٹا_control_manager_v1_interface.name) == 0)
+	ct->gobjects.zwlr_ڈیٹا_control_manager_v1 =
 	    wl_registry_bind(registry, name,
-		    &zwlr_data_control_manager_v1_interface,
-		    version > 2 ? 2 : version);
+		    &zwlr_ڈیٹا_control_manager_v1_interface,
+		    نسخہ_2 > 2 ? 2 : نسخہ_2);
 
-    else if (STRCMP(interface, ext_data_control_manager_v1_interface.name) == 0)
-	ct->gobjects.ext_data_control_manager_v1 =
+    ورنہ اگر (STRCMP(interface, ext_ڈیٹا_control_manager_v1_interface.name) == 0)
+	ct->gobjects.ext_ڈیٹا_control_manager_v1 =
 	    wl_registry_bind(registry, name,
-		    &ext_data_control_manager_v1_interface, 1);
-#endif // FEAT_WAYLAND_CLIPBOARD
+		    &ext_ڈیٹا_control_manager_v1_interface, 1);
+#اگر_ختم // FEAT_WAYLAND_CLIPBOARD
 
 }
 
@@ -340,102 +340,102 @@ wl_registry_listener_event_global(
  * the user call :wlrestore in order to reset everything. Requests to that
  * global will just be ignored on the compositor side.
  */
-    static void
+    ساکن خالی
 wl_registry_listener_event_global_remove(
-	void		    *data UNUSED,
-	struct wl_registry  *registry UNUSED,
-	uint32_t	    name UNUSED)
+	خالی		    *ڈیٹا غیر_مستعمل,
+	ساخت wl_registry  *registry غیر_مستعمل,
+	uint32_t	    name غیر_مستعمل)
 {
 }
 
-static const struct wl_registry_listener wl_registry_listener = {
+ساکن ثابت ساخت wl_registry_listener wl_registry_listener = {
     .global = wl_registry_listener_event_global,
     .global_remove = wl_registry_listener_event_global_remove
 };
 
-static void vwl_connection_destroy(vwl_connection_T *self);
+ساکن خالی vwl_connection_destroy(vwl_connection_T *self);
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
 
 # define VWL_DESTROY_GOBJECT(ct, object) \
-    if (ct->gobjects.object != NULL) \
+    اگر (ct->gobjects.object != تہی) \
     { \
 	object##_destroy(ct->gobjects.object); \
-	ct->gobjects.object = NULL; \
+	ct->gobjects.object = تہی; \
     }
 
-# define VWL_GOBJECT_AVAIL(ct, object) (ct->gobjects.object != NULL)
+# define VWL_GOBJECT_AVAIL(ct, object) (ct->gobjects.object != تہی)
 
-#endif
+#اگر_ختم
 
 // Make sure to call wayland_set_display(display);
-    static vwl_connection_T *
-vwl_connection_new(const char *display)
+    ساکن vwl_connection_T *
+vwl_connection_new(ثابت حرف *display)
 {
     vwl_connection_T	*ct;
 
-    if (wayland_no_connect)
-	return NULL;
+    اگر (wayland_no_connect)
+	واپس تہی;
 
     // We will get an error if XDG_RUNTIME_DIR is not set.
-    if (mch_getenv("XDG_RUNTIME_DIR") == NULL)
-	return NULL;
+    اگر (mch_getenv("XDG_RUNTIME_DIR") == تہی)
+	واپس تہی;
 
     ct = ALLOC_CLEAR_ONE(vwl_connection_T);
 
-    if (ct == NULL)
-	return NULL;
+    اگر (ct == تہی)
+	واپس تہی;
 
     // Must set log handler before we connect display in order to work.
-    wl_log_set_handler_client(vwl_log_handler);
+    wl_log_سیٹ_handler_client(vwl_log_handler);
 
     ct->display.proxy = wl_display_connect(display);
 
-    if (ct->display.proxy == NULL)
+    اگر (ct->display.proxy == تہی)
     {
 	vim_free(ct);
-	return NULL;
+	واپس تہی;
     }
 
     ct->display.fd = wl_display_get_fd(ct->display.proxy);
     ct->registry.proxy = wl_display_get_registry(ct->display.proxy);
 
-    if (ct->registry.proxy == NULL)
+    اگر (ct->registry.proxy == تہی)
     {
 	wl_display_disconnect(ct->display.proxy);
 	vim_free(ct);
-	return NULL;
+	واپس تہی;
     }
 
-    ga_init2(&ct->gobjects.seats, sizeof(vwl_seat_T *), 1);
+    ga_init2(&ct->gobjects.seats, حجم(vwl_seat_T *), 1);
 
-    wl_registry_add_listener(ct->registry.proxy, &wl_registry_listener, ct);
+    wl_registry_جوڑو_listener(ct->registry.proxy, &wl_registry_listener, ct);
 
-    if (vwl_connection_roundtrip(ct) == FAIL)
+    اگر (vwl_connection_roundtrip(ct) == FAIL)
     {
 	vwl_connection_destroy(ct);
-	return NULL;
+	واپس تہی;
     }
 
-    return ct;
+    واپس ct;
 }
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
 
 /*
  * Destroy/free seat.
  */
-    static void
+    ساکن خالی
 vwl_seat_destroy(vwl_seat_T *self)
 {
-    if (self == NULL)
-	return;
-    if (self->proxy != NULL)
+    اگر (self == تہی)
+	واپس;
+    اگر (self->proxy != تہی)
     {
-	if (wl_seat_get_version(self->proxy) >= 5)
+	اگر (wl_seat_get_نسخہ(self->proxy) >= 5)
 	    // Helpful for the compositor
 	    wl_seat_release(self->proxy);
-	else
+	ورنہ
 	    wl_seat_destroy(self->proxy);
     }
     vim_free(self->label);
@@ -446,28 +446,28 @@ vwl_seat_destroy(vwl_seat_T *self)
  * Disconnects the display and frees up all resources, including all global
  * objects.
  */
-    static void
+    ساکن خالی
 vwl_connection_destroy(vwl_connection_T *self)
 {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    VWL_DESTROY_GOBJECT(self, ext_data_control_manager_v1)
-    VWL_DESTROY_GOBJECT(self, zwlr_data_control_manager_v1)
+    VWL_DESTROY_GOBJECT(self, ext_ڈیٹا_control_manager_v1)
+    VWL_DESTROY_GOBJECT(self, zwlr_ڈیٹا_control_manager_v1)
 # endif
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
-	vwl_seat_destroy(((vwl_seat_T **)self->gobjects.seats.ga_data)[i]);
+    برائے (صحیح i = 0; i < self->gobjects.seats.ga_len; i++)
+	vwl_seat_destroy(((vwl_seat_T **)self->gobjects.seats.ga_ڈیٹا)[i]);
     ga_clear(&self->gobjects.seats);
     self->gobjects.seats.ga_len = 0;
 
-    if (self->registry.proxy != NULL)
+    اگر (self->registry.proxy != تہی)
     {
 	wl_registry_destroy(self->registry.proxy);
-	self->registry.proxy = NULL;
+	self->registry.proxy = تہی;
     }
-    if (self->display.proxy != NULL)
+    اگر (self->display.proxy != تہی)
     {
 	wl_display_disconnect(self->display.proxy);
-	self->display.proxy = NULL;
+	self->display.proxy = تہی;
     }
     vim_free(self);
 }
@@ -478,53 +478,53 @@ vwl_connection_destroy(vwl_connection_T *self)
  * seat found is used.
  */
     vwl_seat_T *
-vwl_connection_get_seat(vwl_connection_T *self, const char *label)
+vwl_connection_get_seat(vwl_connection_T *self, ثابت حرف *label)
 {
-    if ((STRCMP(label, "") == 0 || label == NULL)
+    اگر ((STRCMP(label, "") == 0 || label == تہی)
 	    && self->gobjects.seats.ga_len > 0)
-	return ((vwl_seat_T **)self->gobjects.seats.ga_data)[0];
+	واپس ((vwl_seat_T **)self->gobjects.seats.ga_ڈیٹا)[0];
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
+    برائے (صحیح i = 0; i < self->gobjects.seats.ga_len; i++)
     {
-	vwl_seat_T *seat = ((vwl_seat_T **)self->gobjects.seats.ga_data)[i];
-	if (STRCMP(seat->label, label) == 0)
-	    return seat;
+	vwl_seat_T *seat = ((vwl_seat_T **)self->gobjects.seats.ga_ڈیٹا)[i];
+	اگر (STRCMP(seat->label, label) == 0)
+	    واپس seat;
     }
-    return NULL;
+    واپس تہی;
 }
 
-#endif
+#اگر_ختم
 
 /*
  * Set wayland_display_name to display. Note that this allocate a copy of the
  * string, unless NULL is passed. If NULL is passed then v:wayland_display is
  * set to $WAYLAND_DISPLAY, but wayland_display_name is set to NULL.
  */
-    static void
-wayland_set_display(const char *display)
+    ساکن خالی
+wayland_سیٹ_display(ثابت حرف *display)
 {
-    if (display == NULL)
-	display = (char*)mch_getenv((char_u*)"WAYLAND_DISPLAY");
-    else if (display == wayland_display_name)
+    اگر (display == تہی)
+	display = (حرف*)mch_getenv((char_u*)"WAYLAND_DISPLAY");
+    ورنہ اگر (display == wayland_display_name)
 	// Don't want to be freeing vwl_display_strname then trying to copy it
 	// after.
-	goto exit;
+	جاؤ باہر_نکلو;
 
-    if (display == NULL)
+    اگر (display == تہی)
 	// $WAYLAND_DISPLAY is not set
 	display = "";
 
     // Leave unchanged if display is empty (but not NULL)
-    if (STRCMP(display, "") != 0)
+    اگر (STRCMP(display, "") != 0)
     {
 	vim_free(wayland_display_name);
-	wayland_display_name = (char*)vim_strsave((char_u*)display);
+	wayland_display_name = (حرف*)vim_strsave((char_u*)display);
     }
 
-exit:
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_WAYLAND_DISPLAY, (char_u*)display, -1);
-#endif
+باہر_نکلو:
+#اگر_تعریف_شدہ FEAT_EVAL
+    سیٹ_vim_var_string(VV_WAYLAND_DISPLAY, (char_u*)display, -1);
+#اگر_ختم
 }
 
 /*
@@ -534,60 +534,60 @@ exit:
  * libwayland). Returns FAIL on failure and OK on
  * success
  */
-    int
-wayland_init_connection(const char *display)
+    صحیح
+wayland_init_connection(ثابت حرف *display)
 {
-    wayland_set_display(display);
+    wayland_سیٹ_display(display);
 
     wayland_ct = vwl_connection_new(display);
 
-    if (wayland_ct == NULL)
-	goto fail;
+    اگر (wayland_ct == تہی)
+	جاؤ fail;
 
-    return OK;
+    واپس OK;
 fail:
     // Set v:wayland_display to empty string (but not wayland_display_name)
-    wayland_set_display("");
-    return FAIL;
+    wayland_سیٹ_display("");
+    واپس FAIL;
 }
 
 /*
  * Disconnect global Wayland connection and free up all resources used.
  */
-    void
-wayland_uninit_connection(void)
+    خالی
+wayland_uninit_connection(خالی)
 {
-    if (wayland_ct == NULL)
-	return;
-#ifdef FEAT_WAYLAND_CLIPBOARD
+    اگر (wayland_ct == تہی)
+	واپس;
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
     clip_uninit_wayland();
-#endif
+#اگر_ختم
     vwl_connection_destroy(wayland_ct);
-    wayland_ct = NULL;
+    wayland_ct = تہی;
     is_reading = false;
-    wayland_set_display("");
+    wayland_سیٹ_display("");
 }
 
-static int wayland_ct_restore_count = 0;
+ساکن صحیح wayland_ct_restore_گنتی = 0;
 
 /*
  * Attempts to restore the Wayland display connection.
  */
-    static void
-wayland_restore_connection(void)
+    ساکن خالی
+wayland_restore_connection(خالی)
 {
     // No point in restoring the connection if we are exiting or dying.
-    if (exiting || v_dying || wayland_ct_restore_count <= 0)
-	wayland_set_display("");
+    اگر (exiting || v_dying || wayland_ct_restore_گنتی <= 0)
+	wayland_سیٹ_display("");
 
-    --wayland_ct_restore_count;
+    --wayland_ct_restore_گنتی;
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == OK)
+    اگر (wayland_init_connection(wayland_display_name) == OK)
     {
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
 	clip_init_wayland();
-#endif
+#اگر_ختم
     }
 }
 
@@ -595,595 +595,595 @@ wayland_restore_connection(void)
  * Should be called before polling (select or poll) the global Wayland
  * connection display fd. Returns fd on success and -1 on failure.
  */
-    int
-wayland_prepare_read(void)
+    صحیح
+wayland_prepare_read(خالی)
 {
-    if (wayland_ct == NULL)
-	return -1;
+    اگر (wayland_ct == تہی)
+	واپس -1;
 
-    if (is_reading)
+    اگر (is_reading)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
 	is_reading = false;
     }
 
-    while (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
+    جب (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
 	// Event queue not empty, dispatch the events
-	if (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
-	    return -1;
+	اگر (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
+	    واپس -1;
 
-    if (vwl_connection_flush(wayland_ct) < 0)
+    اگر (vwl_connection_flush(wayland_ct) < 0)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return -1;
+	واپس -1;
     }
 
     is_reading = true;
 
-    return wayland_ct->display.fd;
+    واپس wayland_ct->display.fd;
 }
 
 /*
  * Catch up on any queued events
  */
-    int
-wayland_update(void)
+    صحیح
+wayland_update(خالی)
 {
-    if (wayland_ct == NULL)
-	return FAIL;
-    return vwl_connection_roundtrip(wayland_ct);
+    اگر (wayland_ct == تہی)
+	واپس FAIL;
+    واپس vwl_connection_roundtrip(wayland_ct);
 }
 
-#if !defined(HAVE_SELECT)
+#اگر !defined(HAVE_SELECT)
 
-    void
-wayland_poll_check(int revents)
+    خالی
+wayland_poll_check(صحیح revents)
 {
-    if (wayland_ct == NULL)
-	return;
+    اگر (wayland_ct == تہی)
+	واپس;
 
     is_reading = false;
-    if (revents & POLLIN)
+    اگر (revents & POLLIN)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	اگر (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	{
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	    return;
+	    واپس;
 	}
     }
-    else if (revents & (POLLHUP | POLLERR))
+    ورنہ اگر (revents & (POLLHUP | POLLERR))
 	wl_display_cancel_read(wayland_ct->display.proxy);
-    else
+    ورنہ
     {
 	// Nothing happened
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return;
+	واپس;
     }
     wayland_restore_connection();
 }
 
-#endif
-#if defined(HAVE_SELECT)
+#اگر_ختم
+#اگر defined(HAVE_SELECT)
 
-    void
-wayland_select_check(bool is_set)
+    خالی
+wayland_select_check(bool is_سیٹ)
 {
-    if (wayland_ct == NULL)
-	return;
+    اگر (wayland_ct == تہی)
+	واپس;
 
     is_reading = false;
-    if (is_set)
+    اگر (is_سیٹ)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	اگر (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	else
+	ورنہ
 	{
 	    wl_display_cancel_read(wayland_ct->display.proxy);
 	    wayland_restore_connection();
 	}
     }
-    else
+    ورنہ
 	wl_display_cancel_read(wayland_ct->display.proxy);
 }
 
-#endif
+#اگر_ختم
 
 /*
  * Disconnect then reconnect Wayland connection, and update clipmethod.
  */
-    void
+    خالی
 ex_wlrestore(exarg_T *eap)
 {
-    char *display;
+    حرف *display;
 
-    if (eap->arg == NULL || STRLEN(eap->arg) == 0)
+    اگر (eap->arg == تہی || STRLEN(eap->arg) == 0)
 	// Use current display name if none given
 	display = wayland_display_name;
-    else
-	display = (char*)eap->arg;
+    ورنہ
+	display = (حرف*)eap->arg;
 
     // Return early if shebang is not passed, we are still connected, and if not
     // changing to a new Wayland display.
-    if (!eap->forceit && wayland_ct != NULL &&
+    اگر (!eap->forceit && wayland_ct != تہی &&
 	    (display == wayland_display_name ||
-	     (wayland_display_name != NULL &&
+	     (wayland_display_name != تہی &&
 	      STRCMP(wayland_display_name, display) == 0)))
-	return;
+	واپس;
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
+    اگر (clipmethod == CLIPMETHOD_WAYLAND)
     {
 	// Lose any selections we own
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	اگر (clip_ستارہ.owned)
+	    clip_lose_selection(&clip_ستارہ);
+	اگر (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
-#endif
+#اگر_ختم
 
-    if (display != NULL)
-	display = (char*)vim_strsave((char_u*)display);
+    اگر (display != تہی)
+	display = (حرف*)vim_strsave((char_u*)display);
 
     // Will lose any selections we own
     wayland_uninit_connection();
 
     // Reset amount of available tries to reconnect the display to 5
-    wayland_ct_restore_count = 5;
+    wayland_ct_restore_گنتی = 5;
 
-    if (wayland_init_connection(display) == OK)
+    اگر (wayland_init_connection(display) == OK)
     {
 	smsg(_("restoring Wayland display %s"), wayland_display_name);
 
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_WAYLAND_CLIPBOARD
 	clip_init_wayland();
-#endif
+#اگر_ختم
     }
-    else
-	msg(_("failed restoring, lost connection to Wayland display"));
+    ورنہ
+	پیغام(_("failed restoring, lost connection to Wayland display"));
 
     vim_free(display);
 
-    choose_clipmethod();
+    انتخاب_clipmethod();
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#اگر defined(FEAT_WAYLAND_CLIPBOARD)
 
 /*
  * Get a suitable data device manager from connection. "supported" should be
  * initialized to VWL_DATA_PROTOCOL_NONE beforehand. Returns NULL if there are
  * no data device manager available with the required selection.
  */
-    vwl_data_device_manager_T *
-vwl_connection_get_data_device_manager(
+    vwl_ڈیٹا_device_manager_T *
+vwl_connection_get_ڈیٹا_device_manager(
 	vwl_connection_T *self,
 	wayland_selection_T req_sel,
 	int_u *supported)
 {
-    vwl_data_device_manager_T *manager =
-	ALLOC_CLEAR_ONE(vwl_data_device_manager_T);
+    vwl_ڈیٹا_device_manager_T *manager =
+	ALLOC_CLEAR_ONE(vwl_ڈیٹا_device_manager_T);
 
     // Prioritize ext-data-control-v1 over wlr-data-control-unstable-v1 because
     // it is newer.
-    if (self->gobjects.ext_data_control_manager_v1 != NULL)
+    اگر (self->gobjects.ext_ڈیٹا_control_manager_v1 != تہی)
     {
-	manager->proxy = self->gobjects.ext_data_control_manager_v1;
-	manager->protocol = VWL_DATA_PROTOCOL_EXT;
+	manager->proxy = self->gobjects.ext_ڈیٹا_control_manager_v1;
+	manager->protocol = VWL_ڈیٹا_PROTOCOL_EXT;
 
 	*supported |= (WAYLAND_SELECTION_REGULAR | WAYLAND_SELECTION_PRIMARY);
     }
-    else if (self->gobjects.zwlr_data_control_manager_v1 != NULL)
+    ورنہ اگر (self->gobjects.zwlr_ڈیٹا_control_manager_v1 != تہی)
     {
-	manager->proxy = self->gobjects.zwlr_data_control_manager_v1;
-	manager->protocol = VWL_DATA_PROTOCOL_WLR;
+	manager->proxy = self->gobjects.zwlr_ڈیٹا_control_manager_v1;
+	manager->protocol = VWL_ڈیٹا_PROTOCOL_WLR;
 
 	*supported |= WAYLAND_SELECTION_REGULAR;
 
 	// Only version 2 or greater supports the primary selection
-	if (zwlr_data_control_manager_v1_get_version(manager->proxy) >= 2)
+	اگر (zwlr_ڈیٹا_control_manager_v1_get_نسخہ(manager->proxy) >= 2)
 	    *supported |= WAYLAND_SELECTION_PRIMARY;
     }
 
-    if (!(*supported & req_sel))
+    اگر (!(*supported & req_sel))
     {
 	vim_free(manager);
-	return NULL;
+	واپس تہی;
     }
 
-    return manager;
+    واپس manager;
 }
 
-    vwl_data_device_T *
-vwl_data_device_manager_get_data_device(
-	vwl_data_device_manager_T *self,
+    vwl_ڈیٹا_device_T *
+vwl_ڈیٹا_device_manager_get_ڈیٹا_device(
+	vwl_ڈیٹا_device_manager_T *self,
 	vwl_seat_T *seat)
 {
-    vwl_data_device_T *device = ALLOC_CLEAR_ONE(vwl_data_device_T);
+    vwl_ڈیٹا_device_T *device = ALLOC_CLEAR_ONE(vwl_ڈیٹا_device_T);
 
-    switch (self->protocol)
+    انتخاب (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    device->proxy = ext_data_control_manager_v1_get_data_device(
+	حالت VWL_ڈیٹا_PROTOCOL_EXT:
+	    device->proxy = ext_ڈیٹا_control_manager_v1_get_ڈیٹا_device(
 		    self->proxy, seat->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    device->proxy = zwlr_data_control_manager_v1_get_data_device(
+	    توڑو;
+	حالت VWL_ڈیٹا_PROTOCOL_WLR:
+	    device->proxy = zwlr_ڈیٹا_control_manager_v1_get_ڈیٹا_device(
 		    self->proxy, seat->proxy);
-	    break;
-	default:
+	    توڑو;
+	طےشدہ:
 	    vim_free(device);
-	    return NULL;
+	    واپس تہی;
     }
     device->protocol = self->protocol;
 
-    return device;
+    واپس device;
 }
 
-    vwl_data_source_T *
-vwl_data_device_manager_create_data_source(vwl_data_device_manager_T *self)
+    vwl_ڈیٹا_ماخذ_T *
+vwl_ڈیٹا_device_manager_create_ڈیٹا_ماخذ(vwl_ڈیٹا_device_manager_T *self)
 {
-    vwl_data_source_T *source = ALLOC_CLEAR_ONE(vwl_data_source_T);
+    vwl_ڈیٹا_ماخذ_T *ماخذ = ALLOC_CLEAR_ONE(vwl_ڈیٹا_ماخذ_T);
 
-    switch (self->protocol)
+    انتخاب (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    source->proxy = ext_data_control_manager_v1_create_data_source(
+	حالت VWL_ڈیٹا_PROTOCOL_EXT:
+	    ماخذ->proxy = ext_ڈیٹا_control_manager_v1_create_ڈیٹا_ماخذ(
 		    self->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    source->proxy = zwlr_data_control_manager_v1_create_data_source(
+	    توڑو;
+	حالت VWL_ڈیٹا_PROTOCOL_WLR:
+	    ماخذ->proxy = zwlr_ڈیٹا_control_manager_v1_create_ڈیٹا_ماخذ(
 		    self->proxy);
-	    break;
-	default:
-	    vim_free(source);
-	    return NULL;
+	    توڑو;
+	طےشدہ:
+	    vim_free(ماخذ);
+	    واپس تہی;
     }
-    source->protocol = self->protocol;
+    ماخذ->protocol = self->protocol;
 
-    return source;
+    واپس ماخذ;
 }
 
-    static vwl_data_offer_T *
-vwl_data_device_wrap_offer_proxy(vwl_data_device_T *self, void *proxy)
+    ساکن vwl_ڈیٹا_offer_T *
+vwl_ڈیٹا_device_wrap_offer_proxy(vwl_ڈیٹا_device_T *self, خالی *proxy)
 {
-    vwl_data_offer_T *offer = ALLOC_CLEAR_ONE(vwl_data_offer_T);
+    vwl_ڈیٹا_offer_T *offer = ALLOC_CLEAR_ONE(vwl_ڈیٹا_offer_T);
 
-    if (offer == NULL)
-	return NULL;
+    اگر (offer == تہی)
+	واپس تہی;
 
     offer->proxy = proxy;
     offer->protocol = self->protocol;
-    offer->data = self->data;
-    ga_init2(&offer->mime_types, sizeof(char *), 10);
+    offer->ڈیٹا = self->ڈیٹا;
+    ga_init2(&offer->mime_types, حجم(حرف *), 10);
 
     // Try pre allocating the array, 10 mime types seems to usually be the
     // maximum from experience.
     ga_grow(&offer->mime_types, 10);
 
-    return offer;
+    واپس offer;
 }
 
-# define VWL_FUNC_DATA_PROXY_DESTROY(type) \
-	void \
-    vwl_data_##type##_destroy(vwl_data_##type##_T *self) \
+# define VWL_FUNC_ڈیٹا_PROXY_DESTROY(type) \
+	خالی \
+    vwl_ڈیٹا##type##_destroy(vwl_ڈیٹا##type##_T *self) \
     { \
-	if (self == NULL) \
-	    return; \
-	switch (self->protocol) \
+	اگر (self == تہی) \
+	    واپس; \
+	انتخاب (self->protocol) \
 	{ \
-	    case VWL_DATA_PROTOCOL_EXT: \
-		ext_data_control_##type##_v1_destroy(self->proxy); \
-		break; \
-	    case VWL_DATA_PROTOCOL_WLR: \
-		zwlr_data_control_##type##_v1_destroy(self->proxy); \
-		break; \
-	    default: \
-		break; \
+	    حالت VWL_ڈیٹا_PROTOCOL_EXT: \
+		ext_ڈیٹا_control##type##_v1_destroy(self->proxy); \
+		توڑو; \
+	    حالت VWL_ڈیٹا_PROTOCOL_WLR: \
+		zwlr_ڈیٹا_control##type##_v1_destroy(self->proxy); \
+		توڑو; \
+	    طےشدہ: \
+		توڑو; \
 	} \
 	vim_free(self); \
     }
 
-VWL_FUNC_DATA_PROXY_DESTROY(device)
-VWL_FUNC_DATA_PROXY_DESTROY(source)
+VWL_FUNC_ڈیٹا_PROXY_DESTROY(device)
+VWL_FUNC_ڈیٹا_PROXY_DESTROY(ماخذ)
 
-    void
-vwl_data_offer_destroy(vwl_data_offer_T *self)
+    خالی
+vwl_ڈیٹا_offer_destroy(vwl_ڈیٹا_offer_T *self)
 {
-    if (self == NULL)
-	return;
-    switch (self->protocol)
+    اگر (self == تہی)
+	واپس;
+    انتخاب (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_offer_v1_destroy(self->proxy);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_offer_v1_destroy(self->proxy);
-	    break;
-	default:
-	    break;
+	حالت VWL_ڈیٹا_PROTOCOL_EXT:
+	    ext_ڈیٹا_control_offer_v1_destroy(self->proxy);
+	    توڑو;
+	حالت VWL_ڈیٹا_PROTOCOL_WLR:
+	    zwlr_ڈیٹا_control_offer_v1_destroy(self->proxy);
+	    توڑو;
+	طےشدہ:
+	    توڑو;
     }
-    ga_clear_strings(&self->mime_types);
+    ga_clear_لڑیاں(&self->mime_types);
     vim_free(self);
 }
 
 /*
  * Doesn't destroy the actual global object proxy, only frees the structure.
  */
-void
-vwl_data_device_manager_discard(vwl_data_device_manager_T *self)
+خالی
+vwl_ڈیٹا_device_manager_discard(vwl_ڈیٹا_device_manager_T *self)
 {
-    if (self == NULL)
-	return;
+    اگر (self == تہی)
+	واپس;
     vim_free(self);
 }
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_ڈیٹا_DEVICE_EVENT_ڈیٹا_OFFER(device_type, offer_type) \
+	ساکن خالی \
     device_type##_listener_event_data_offer( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer) \
+	    خالی *ڈیٹا, \
+	    ساخت device_type *device غیر_مستعمل, \
+	    ساخت offer_type *offer) \
     { \
-	vwl_data_device_T *self = data; \
-	self->offer = vwl_data_device_wrap_offer_proxy(self, offer); \
-	self->listener->data_offer(self->data, self, self->offer); \
+	vwl_ڈیٹا_device_T *self = ڈیٹا; \
+	self->offer = vwl_ڈیٹا_device_wrap_offer_proxy(self, offer); \
+	self->listener->ڈیٹا_offer(self->ڈیٹا, self, self->offer); \
     }
 
 // We want to set the offer to NULL after the selection callback, because the
 // callback may free the offer, and we don't want a dangling pointer.
-# define VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_ڈیٹا_DEVICE_EVENT_SELECTION(device_type, offer_type) \
+	ساکن خالی \
     device_type##_listener_event_selection( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer UNUSED) \
+	    خالی *ڈیٹا, \
+	    ساخت device_type *device غیر_مستعمل, \
+	    ساخت offer_type *offer غیر_مستعمل) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->selection(self->data, self, self->offer, \
+	vwl_ڈیٹا_device_T *self = ڈیٹا; \
+	self->listener->selection(self->ڈیٹا, self, self->offer, \
 		WAYLAND_SELECTION_REGULAR); \
-	self->offer = NULL; \
+	self->offer = تہی; \
     } \
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(device_type, offer_type) \
-	static void \
+# define VWL_FUNC_ڈیٹا_DEVICE_EVENT_PRIMARY_SELECTION(device_type, offer_type) \
+	ساکن خالی \
     device_type##_listener_event_primary_selection( \
-	    void *data, \
-	    struct device_type *device UNUSED, \
-	    struct offer_type *offer UNUSED) \
+	    خالی *ڈیٹا, \
+	    ساخت device_type *device غیر_مستعمل, \
+	    ساخت offer_type *offer غیر_مستعمل) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->selection(self->data, self, self->offer, \
+	vwl_ڈیٹا_device_T *self = ڈیٹا; \
+	self->listener->selection(self->ڈیٹا, self, self->offer, \
 		WAYLAND_SELECTION_PRIMARY); \
-	self->offer = NULL; \
+	self->offer = تہی; \
     }
 
-# define VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(device_type) \
-	static void \
+# define VWL_FUNC_ڈیٹا_DEVICE_EVENT_ختم_شدہ(device_type) \
+	ساکن خالی \
     device_type##_listener_event_finished( \
-	    void *data, \
-	    struct device_type *device UNUSED) \
+	    خالی *ڈیٹا, \
+	    ساخت device_type *device غیر_مستعمل) \
     { \
-	vwl_data_device_T *self = data; \
-	self->listener->finished(self->data, self); \
+	vwl_ڈیٹا_device_T *self = ڈیٹا; \
+	self->listener->ختم_شدہ(self->ڈیٹا, self); \
     }
 
-VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(
-    ext_data_control_device_v1, ext_data_control_offer_v1)
-VWL_FUNC_DATA_DEVICE_EVENT_DATA_OFFER(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1)
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_ڈیٹا_OFFER(
+    ext_ڈیٹا_control_device_v1, ext_ڈیٹا_control_offer_v1)
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_ڈیٹا_OFFER(
+    zwlr_ڈیٹا_control_device_v1, zwlr_ڈیٹا_control_offer_v1)
 
-VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(
-    ext_data_control_device_v1, ext_data_control_offer_v1
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_SELECTION(
+    ext_ڈیٹا_control_device_v1, ext_ڈیٹا_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_SELECTION(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_SELECTION(
+    zwlr_ڈیٹا_control_device_v1, zwlr_ڈیٹا_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(
-    ext_data_control_device_v1, ext_data_control_offer_v1
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_PRIMARY_SELECTION(
+    ext_ڈیٹا_control_device_v1, ext_ڈیٹا_control_offer_v1
 )
-VWL_FUNC_DATA_DEVICE_EVENT_PRIMARY_SELECTION(
-    zwlr_data_control_device_v1, zwlr_data_control_offer_v1
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_PRIMARY_SELECTION(
+    zwlr_ڈیٹا_control_device_v1, zwlr_ڈیٹا_control_offer_v1
 )
 
-VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(ext_data_control_device_v1)
-VWL_FUNC_DATA_DEVICE_EVENT_FINISHED(zwlr_data_control_device_v1)
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_ختم_شدہ(ext_ڈیٹا_control_device_v1)
+VWL_FUNC_ڈیٹا_DEVICE_EVENT_ختم_شدہ(zwlr_ڈیٹا_control_device_v1)
 
-static struct ext_data_control_device_v1_listener
-    ext_data_control_device_v1_listener = {
-	.data_offer = ext_data_control_device_v1_listener_event_data_offer,
-	.selection = ext_data_control_device_v1_listener_event_selection,
+ساکن ساخت ext_ڈیٹا_control_device_v1_listener
+    ext_ڈیٹا_control_device_v1_listener = {
+	.ڈیٹا_offer = ext_ڈیٹا_control_device_v1_listener_event_ڈیٹا_offer,
+	.selection = ext_ڈیٹا_control_device_v1_listener_event_selection,
 	.primary_selection =
-	    ext_data_control_device_v1_listener_event_primary_selection,
-	.finished = ext_data_control_device_v1_listener_event_finished
+	    ext_ڈیٹا_control_device_v1_listener_event_primary_selection,
+	.ختم_شدہ = ext_ڈیٹا_control_device_v1_listener_event_ختم_شدہ
 };
-static const struct zwlr_data_control_device_v1_listener
-    zwlr_data_control_device_v1_listener = {
-	.data_offer = zwlr_data_control_device_v1_listener_event_data_offer,
-	.selection = zwlr_data_control_device_v1_listener_event_selection,
+ساکن ثابت ساخت zwlr_ڈیٹا_control_device_v1_listener
+    zwlr_ڈیٹا_control_device_v1_listener = {
+	.ڈیٹا_offer = zwlr_ڈیٹا_control_device_v1_listener_event_ڈیٹا_offer,
+	.selection = zwlr_ڈیٹا_control_device_v1_listener_event_selection,
 	.primary_selection =
-	    zwlr_data_control_device_v1_listener_event_primary_selection,
-	.finished = zwlr_data_control_device_v1_listener_event_finished
+	    zwlr_ڈیٹا_control_device_v1_listener_event_primary_selection,
+	.ختم_شدہ = zwlr_ڈیٹا_control_device_v1_listener_event_ختم_شدہ
 };
 
-# define VWL_FUNC_DATA_SOURCE_EVENT_SEND(source_type) \
-	static void \
-    source_type##_listener_event_send( \
-	    void *data, struct source_type *source UNUSED, \
-	    const char *mime_type, int fd) \
+# define VWL_FUNC_ڈیٹا_ماخذ_EVENT_SEND(ماخذ_type) \
+	ساکن خالی \
+    ماخذ_type##_listener_event_send( \
+	    خالی *ڈیٹا, ساخت ماخذ_type *ماخذ غیر_مستعمل, \
+	    ثابت حرف *mime_type, صحیح fd) \
     { \
-	vwl_data_source_T *self = data; \
-	self->listener->send(self->data, self, mime_type, fd); \
+	vwl_ڈیٹا_ماخذ_T *self = ڈیٹا; \
+	self->listener->send(self->ڈیٹا, self, mime_type, fd); \
     }
 
-# define VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(source_type) \
-	static void \
-    source_type##_listener_event_cancelled( \
-	    void *data, struct source_type *source UNUSED) \
+# define VWL_FUNC_ڈیٹا_ماخذ_EVENT_CANCELLED(ماخذ_type) \
+	ساکن خالی \
+    ماخذ_type##_listener_event_cancelled( \
+	    خالی *ڈیٹا, ساخت ماخذ_type *ماخذ غیر_مستعمل) \
     { \
-	vwl_data_source_T *self = data; \
-	self->listener->cancelled(self->data, self); \
+	vwl_ڈیٹا_ماخذ_T *self = ڈیٹا; \
+	self->listener->cancelled(self->ڈیٹا, self); \
     }
 
-VWL_FUNC_DATA_SOURCE_EVENT_SEND(ext_data_control_source_v1)
-VWL_FUNC_DATA_SOURCE_EVENT_SEND(zwlr_data_control_source_v1)
+VWL_FUNC_ڈیٹا_ماخذ_EVENT_SEND(ext_ڈیٹا_control_ماخذ_v1)
+VWL_FUNC_ڈیٹا_ماخذ_EVENT_SEND(zwlr_ڈیٹا_control_ماخذ_v1)
 
-VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(ext_data_control_source_v1)
-VWL_FUNC_DATA_SOURCE_EVENT_CANCELLED(zwlr_data_control_source_v1)
+VWL_FUNC_ڈیٹا_ماخذ_EVENT_CANCELLED(ext_ڈیٹا_control_ماخذ_v1)
+VWL_FUNC_ڈیٹا_ماخذ_EVENT_CANCELLED(zwlr_ڈیٹا_control_ماخذ_v1)
 
-static const struct ext_data_control_source_v1_listener
-    ext_data_control_source_v1_listener = {
-	.send = ext_data_control_source_v1_listener_event_send,
-	.cancelled = ext_data_control_source_v1_listener_event_cancelled
+ساکن ثابت ساخت ext_ڈیٹا_control_ماخذ_v1_listener
+    ext_ڈیٹا_control_ماخذ_v1_listener = {
+	.send = ext_ڈیٹا_control_ماخذ_v1_listener_event_send,
+	.cancelled = ext_ڈیٹا_control_ماخذ_v1_listener_event_cancelled
 };
-static const struct zwlr_data_control_source_v1_listener
-    zwlr_data_control_source_v1_listener = {
-	.send = zwlr_data_control_source_v1_listener_event_send,
-	.cancelled = zwlr_data_control_source_v1_listener_event_cancelled
+ساکن ثابت ساخت zwlr_ڈیٹا_control_ماخذ_v1_listener
+    zwlr_ڈیٹا_control_ماخذ_v1_listener = {
+	.send = zwlr_ڈیٹا_control_ماخذ_v1_listener_event_send,
+	.cancelled = zwlr_ڈیٹا_control_ماخذ_v1_listener_event_cancelled
 };
 
-# define VWL_FUNC_DATA_OFFER_EVENT_OFFER(offer_type) \
-	static void \
+# define VWL_FUNC_ڈیٹا_OFFER_EVENT_OFFER(offer_type) \
+	ساکن خالی \
     offer_type##_listener_event_offer( \
-	    void *data, \
-	    struct offer_type *offer UNUSED, \
-	    const char *mime_type) \
+	    خالی *ڈیٹا, \
+	    ساخت offer_type *offer غیر_مستعمل, \
+	    ثابت حرف *mime_type) \
     { \
-	vwl_data_offer_T *self = data; \
-	if (self->listener->offer(self->data, self, mime_type)) \
+	vwl_ڈیٹا_offer_T *self = ڈیٹا; \
+	اگر (self->listener->offer(self->ڈیٹا, self, mime_type)) \
 	{ \
-	    char *mime = (char *)vim_strsave((char_u *)mime_type); \
-	    if (ga_grow(&self->mime_types, 1) == FAIL) \
+	    حرف *mime = (حرف *)vim_strsave((char_u *)mime_type); \
+	    اگر (ga_grow(&self->mime_types, 1) == FAIL) \
 		vim_free(mime); \
-	    else \
-		if (mime != NULL) \
-		    ((char **)self->mime_types.ga_data) \
+	    ورنہ \
+		اگر (mime != تہی) \
+		    ((حرف **)self->mime_types.ga_ڈیٹا) \
 					[self->mime_types.ga_len++] = mime; \
 	} \
     }
 
-VWL_FUNC_DATA_OFFER_EVENT_OFFER(ext_data_control_offer_v1)
-VWL_FUNC_DATA_OFFER_EVENT_OFFER(zwlr_data_control_offer_v1)
+VWL_FUNC_ڈیٹا_OFFER_EVENT_OFFER(ext_ڈیٹا_control_offer_v1)
+VWL_FUNC_ڈیٹا_OFFER_EVENT_OFFER(zwlr_ڈیٹا_control_offer_v1)
 
-static const struct ext_data_control_offer_v1_listener
-    ext_data_control_offer_v1_listener = {
-	.offer = ext_data_control_offer_v1_listener_event_offer
+ساکن ثابت ساخت ext_ڈیٹا_control_offer_v1_listener
+    ext_ڈیٹا_control_offer_v1_listener = {
+	.offer = ext_ڈیٹا_control_offer_v1_listener_event_offer
 };
-static const struct zwlr_data_control_offer_v1_listener
-    zwlr_data_control_offer_v1_listener = {
-	.offer = zwlr_data_control_offer_v1_listener_event_offer
+ساکن ثابت ساخت zwlr_ڈیٹا_control_offer_v1_listener
+    zwlr_ڈیٹا_control_offer_v1_listener = {
+	.offer = zwlr_ڈیٹا_control_offer_v1_listener_event_offer
 };
 
-# define VWL_FUNC_DATA_PROXY_ADD_LISTENER(type) \
-	void \
-    vwl_data_##type##_add_listener( \
-	    vwl_data_##type##_T *self, \
-	    const vwl_data_##type##_listener_T *listener, \
-	    void *data) \
+# define VWL_FUNC_ڈیٹا_PROXY_جوڑو_LISTENER(type) \
+	خالی \
+    vwl_ڈیٹا##type##_add_listener( \
+	    vwl_ڈیٹا##type##_T *self, \
+	    ثابت vwl_ڈیٹا##type##_listener_T *listener, \
+	    خالی *ڈیٹا) \
     { \
-	if (self == NULL) \
-	    return; \
-	self->data = data; \
+	اگر (self == تہی) \
+	    واپس; \
+	self->ڈیٹا = ڈیٹا; \
 	self->listener = listener; \
-	switch (self->protocol) \
+	انتخاب (self->protocol) \
 	{ \
-	    case VWL_DATA_PROTOCOL_EXT: \
-		ext_data_control_##type##_v1_add_listener(self->proxy, \
-			&ext_data_control_##type##_v1_listener, self); \
-		break; \
-	    case VWL_DATA_PROTOCOL_WLR: \
-		zwlr_data_control_##type##_v1_add_listener(self->proxy, \
-			&zwlr_data_control_##type##_v1_listener, self); \
-		break; \
-	    default: \
-		break; \
+	    حالت VWL_ڈیٹا_PROTOCOL_EXT: \
+		ext_ڈیٹا_control##type##_v1_add_listener(self->proxy, \
+			&ext_ڈیٹا_control##type##_v1_listener, self); \
+		توڑو; \
+	    حالت VWL_ڈیٹا_PROTOCOL_WLR: \
+		zwlr_ڈیٹا_control##type##_v1_add_listener(self->proxy, \
+			&zwlr_ڈیٹا_control##type##_v1_listener, self); \
+		توڑو; \
+	    طےشدہ: \
+		توڑو; \
 	} \
     }
 
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(device)
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(source)
-VWL_FUNC_DATA_PROXY_ADD_LISTENER(offer)
+VWL_FUNC_ڈیٹا_PROXY_جوڑو_LISTENER(device)
+VWL_FUNC_ڈیٹا_PROXY_جوڑو_LISTENER(ماخذ)
+VWL_FUNC_ڈیٹا_PROXY_جوڑو_LISTENER(offer)
 /*
  * Set the given selection to source. If a data control protocol is being used,
  * "serial" is ignored.
  */
-    void
-vwl_data_device_set_selection(
-    vwl_data_device_T *self,
-    vwl_data_source_T *source,
-    uint32_t serial UNUSED,
+    خالی
+vwl_ڈیٹا_device_سیٹ_selection(
+    vwl_ڈیٹا_device_T *self,
+    vwl_ڈیٹا_ماخذ_T *ماخذ,
+    uint32_t serial غیر_مستعمل,
     wayland_selection_T selection
 )
 {
-    void *proxy = source == NULL ? NULL : source->proxy;
+    خالی *proxy = ماخذ == تہی ? تہی : ماخذ->proxy;
 
-    if (selection == WAYLAND_SELECTION_REGULAR)
+    اگر (selection == WAYLAND_SELECTION_REGULAR)
     {
-	switch (self->protocol)
+	انتخاب (self->protocol)
 	{
-	    case VWL_DATA_PROTOCOL_EXT:
-		ext_data_control_device_v1_set_selection(self->proxy, proxy);
-		break;
-	    case VWL_DATA_PROTOCOL_WLR:
-		zwlr_data_control_device_v1_set_selection(self->proxy, proxy);
-		break;
-	    default:
-		break;
+	    حالت VWL_ڈیٹا_PROTOCOL_EXT:
+		ext_ڈیٹا_control_device_v1_سیٹ_selection(self->proxy, proxy);
+		توڑو;
+	    حالت VWL_ڈیٹا_PROTOCOL_WLR:
+		zwlr_ڈیٹا_control_device_v1_سیٹ_selection(self->proxy, proxy);
+		توڑو;
+	    طےشدہ:
+		توڑو;
 	}
     }
-    else if (selection == WAYLAND_SELECTION_PRIMARY)
+    ورنہ اگر (selection == WAYLAND_SELECTION_PRIMARY)
     {
-	switch (self->protocol)
+	انتخاب (self->protocol)
 	{
-	    case VWL_DATA_PROTOCOL_EXT:
-		ext_data_control_device_v1_set_primary_selection(
+	    حالت VWL_ڈیٹا_PROTOCOL_EXT:
+		ext_ڈیٹا_control_device_v1_سیٹ_primary_selection(
 			self->proxy, proxy
 			);
-		break;
-	    case VWL_DATA_PROTOCOL_WLR:
-		zwlr_data_control_device_v1_set_primary_selection(
+		توڑو;
+	    حالت VWL_ڈیٹا_PROTOCOL_WLR:
+		zwlr_ڈیٹا_control_device_v1_سیٹ_primary_selection(
 			self->proxy, proxy
 			);
-		break;
-	    default:
-		break;
+		توڑو;
+	    طےشدہ:
+		توڑو;
 	}
     }
 }
 
-    void
-vwl_data_source_offer(vwl_data_source_T *self, const char *mime_type)
+    خالی
+vwl_ڈیٹا_ماخذ_offer(vwl_ڈیٹا_ماخذ_T *self, ثابت حرف *mime_type)
 {
-    switch (self->protocol)
+    انتخاب (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_source_v1_offer(self->proxy, mime_type);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_source_v1_offer(self->proxy, mime_type);
-	    break;
-	default:
-	    break;
+	حالت VWL_ڈیٹا_PROTOCOL_EXT:
+	    ext_ڈیٹا_control_ماخذ_v1_offer(self->proxy, mime_type);
+	    توڑو;
+	حالت VWL_ڈیٹا_PROTOCOL_WLR:
+	    zwlr_ڈیٹا_control_ماخذ_v1_offer(self->proxy, mime_type);
+	    توڑو;
+	طےشدہ:
+	    توڑو;
     }
 }
 
-    void
-vwl_data_offer_receive(
-	vwl_data_offer_T *self,
-	const char *mime_type,
+    خالی
+vwl_ڈیٹا_offer_receive(
+	vwl_ڈیٹا_offer_T *self,
+	ثابت حرف *mime_type,
 	int32_t fd)
 {
-    switch (self->protocol)
+    انتخاب (self->protocol)
     {
-	case VWL_DATA_PROTOCOL_EXT:
-	    ext_data_control_offer_v1_receive(self->proxy, mime_type, fd);
-	    break;
-	case VWL_DATA_PROTOCOL_WLR:
-	    zwlr_data_control_offer_v1_receive(self->proxy, mime_type, fd);
-	    break;
-	default:
-	    break;
+	حالت VWL_ڈیٹا_PROTOCOL_EXT:
+	    ext_ڈیٹا_control_offer_v1_receive(self->proxy, mime_type, fd);
+	    توڑو;
+	حالت VWL_ڈیٹا_PROTOCOL_WLR:
+	    zwlr_ڈیٹا_control_offer_v1_receive(self->proxy, mime_type, fd);
+	    توڑو;
+	طےشدہ:
+	    توڑو;
     }
 }
 
-#endif // FEAT_WAYLAND_CLIPBOARD
+#اگر_ختم // FEAT_WAYLAND_CLIPBOARD
 
-#endif // FEAT_WAYLAND
+#اگر_ختم // FEAT_WAYLAND

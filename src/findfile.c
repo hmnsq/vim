@@ -11,7 +11,7 @@
  * findfile.c: Search for files in directories listed in 'path'
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
 /*
  * File searching functions for 'path', 'tags' and 'cdpath' options.
@@ -60,56 +60,56 @@
 /*
  * type for the directory search stack
  */
-typedef struct ff_stack
+قسمتعریف ساخت ff_ڈھیر
 {
-    struct ff_stack	*ffs_prev;
+    ساخت ff_ڈھیر	*ffs_پچھلا;
 
     // the fix part (no wildcards) and the part containing the wildcards
     // of the search path
-    string_T		ffs_fix_path;
-    string_T		ffs_wc_path;
+    string_T		ffs_fix_راستہ;
+    string_T		ffs_wc_راستہ;
 
     // files/dirs found in the above directory, matched by the first wildcard
     // of wc_part
     char_u		**ffs_filearray;
-    int			ffs_filearray_size;
-    int			ffs_filearray_cur;   // needed for partly handled dirs
+    صحیح			ffs_filearray_سائز;
+    صحیح			ffs_filearray_cur;   // needed for partly handled dirs
 
     // to store status of partly handled directories
     // 0: we work on this directory for the first time
     // 1: this directory was partly searched in an earlier step
-    int			ffs_stage;
+    صحیح			ffs_stage;
 
     // How deep are we in the directory tree?
     // Counts backward from value of level parameter to vim_findfile_init
-    int			ffs_level;
+    صحیح			ffs_level;
 
     // Did we already expand '**' to an empty string?
-    int			ffs_star_star_empty;
-} ff_stack_T;
+    صحیح			ffs_ستارہ_ستارہ_خالی_خانے;
+} ff_ڈھیر_T;
 
 /*
  * type for already visited directories or files.
  */
-typedef struct ff_visited
+قسمتعریف ساخت ff_دیکھا
 {
-    struct ff_visited	*ffv_next;
+    ساخت ff_دیکھا	*ffv_اگلا;
 
     // Visited directories are different if the wildcard string are
     // different. So we have to save it.
-    char_u		*ffv_wc_path;
+    char_u		*ffv_wc_راستہ;
 
     // for unix use inode etc for comparison (needed because of links), else
     // use filename.
-#ifdef UNIX
-    int			ffv_dev_valid;	// ffv_dev and ffv_ino were set
+#اگر_تعریف_شدہ UNIX
+    صحیح			ffv_dev_valid;	// ffv_dev and ffv_ino were set
     dev_t		ffv_dev;	// device number
     ino_t		ffv_ino;	// inode number
-#endif
+#اگر_ختم
     // The memory for this struct is allocated according to the length of
     // ffv_fname.
     char_u		ffv_fname[1];	// actually longer
-} ff_visited_T;
+} ff_دیکھا_T;
 
 /*
  * We might have to manage several visited lists during a search.
@@ -125,23 +125,23 @@ typedef struct ff_visited
  * The struct ff_visited_list_hdr is used to manage a linked list of already
  * visited lists.
  */
-typedef struct ff_visited_list_hdr
+قسمتعریف ساخت ff_دیکھا_list_hdr
 {
-    struct ff_visited_list_hdr	*ffvl_next;
+    ساخت ff_دیکھا_list_hdr	*ffvl_اگلا;
 
     // the filename the attached visited list is for
     char_u			*ffvl_filename;
 
-    ff_visited_T		*ffvl_visited_list;
+    ff_دیکھا_T		*ffvl_دیکھا_list;
 
-} ff_visited_list_hdr_T;
+} ff_دیکھا_list_hdr_T;
 
 
 /*
  * '**' can be expanded to several directory levels.
  * Set the default maximum depth.
  */
-#define FF_MAX_STAR_STAR_EXPAND ((char_u)30)
+#تعریف_کرو FF_MAX_ستارہ_ستارہ_EXPAND ((char_u)30)
 
 /*
  * The search context:
@@ -160,72 +160,72 @@ typedef struct ff_visited_list_hdr
  *   ffsc_find_what:	FINDFILE_BOTH, FINDFILE_DIR or FINDFILE_FILE
  *   ffsc_tagfile:	searching for tags file, don't use 'suffixesadd'
  */
-typedef struct ff_search_ctx_T
+قسمتعریف ساخت ff_تلاش_ctx_T
 {
-    ff_stack_T			*ffsc_stack_ptr;
-    ff_visited_list_hdr_T	*ffsc_visited_list;
-    ff_visited_list_hdr_T	*ffsc_dir_visited_list;
-    ff_visited_list_hdr_T	*ffsc_visited_lists_list;
-    ff_visited_list_hdr_T	*ffsc_dir_visited_lists_list;
-    string_T			ffsc_file_to_search;
-    string_T			ffsc_start_dir;
-    string_T			ffsc_fix_path;
-    string_T			ffsc_wc_path;
-    int				ffsc_level;
+    ff_ڈھیر_T			*ffsc_ڈھیر_ptr;
+    ff_دیکھا_list_hdr_T	*ffsc_دیکھا_list;
+    ff_دیکھا_list_hdr_T	*ffsc_dir_دیکھا_list;
+    ff_دیکھا_list_hdr_T	*ffsc_دیکھا_lists_list;
+    ff_دیکھا_list_hdr_T	*ffsc_dir_دیکھا_lists_list;
+    string_T			ffsc_file_مقصد_تلاش;
+    string_T			ffsc_آغاز_dir;
+    string_T			ffsc_fix_راستہ;
+    string_T			ffsc_wc_راستہ;
+    صحیح				ffsc_level;
     string_T			*ffsc_stopdirs_v;
-    int				ffsc_find_what;
-    int				ffsc_tagfile;
-} ff_search_ctx_T;
+    صحیح				ffsc_ڈھونڈو_what;
+    صحیح				ffsc_tagfile;
+} ff_تلاش_ctx_T;
 
 // locally needed functions
-static int ff_check_visited(ff_visited_T **, char_u *, size_t, char_u *, size_t);
-static void vim_findfile_free_visited(void *search_ctx_arg);
-static void vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp);
-static void ff_free_visited_list(ff_visited_T *vl);
-static ff_visited_list_hdr_T* ff_get_visited_list(char_u *, size_t, ff_visited_list_hdr_T **list_headp);
+ساکن صحیح ff_check_دیکھا(ff_دیکھا_T **, char_u *, size_t, char_u *, size_t);
+ساکن خالی vim_findfile_free_دیکھا(خالی *تلاش_ctx_arg);
+ساکن خالی vim_findfile_free_دیکھا_list(ff_دیکھا_list_hdr_T **list_headp);
+ساکن خالی ff_free_دیکھا_list(ff_دیکھا_T *vl);
+ساکن ff_دیکھا_list_hdr_T* ff_get_دیکھا_list(char_u *, size_t, ff_دیکھا_list_hdr_T **list_headp);
 
-static void ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr);
-static ff_stack_T *ff_pop(ff_search_ctx_T *search_ctx);
-static void ff_clear(ff_search_ctx_T *search_ctx);
-static void ff_free_stack_element(ff_stack_T *stack_ptr);
-static ff_stack_T *ff_create_stack_element(char_u *, size_t, char_u *, size_t, int, int);
-static int ff_path_in_stoplist(char_u *, int, string_T *);
+ساکن خالی ff_ڈالو(ff_تلاش_ctx_T *تلاش_ctx, ff_ڈھیر_T *ڈھیر_ptr);
+ساکن ff_ڈھیر_T *ff_نکالو(ff_تلاش_ctx_T *تلاش_ctx);
+ساکن خالی ff_clear(ff_تلاش_ctx_T *تلاش_ctx);
+ساکن خالی ff_free_ڈھیر_element(ff_ڈھیر_T *ڈھیر_ptr);
+ساکن ff_ڈھیر_T *ff_create_ڈھیر_element(char_u *, size_t, char_u *, size_t, صحیح, صحیح);
+ساکن صحیح ff_راستہ_اندر_stoplist(char_u *, صحیح, string_T *);
 
-static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filenames
+ساکن string_T ff_expand_بفر = {تہی, 0};	    // used for expanding filenames
 
-#if 0
+#اگر 0
 /*
  * if someone likes findfirst/findnext, here are the functions
  * NOT TESTED!!
  */
 
-static void *ff_fn_search_context = NULL;
+ساکن خالی *ff_fn_تلاش_context = تہی;
 
     char_u *
-vim_findfirst(char_u *path, char_u *filename, int level)
+vim_findfirst(char_u *راستہ, char_u *filename, صحیح level)
 {
-    ff_fn_search_context =
-	vim_findfile_init(path, filename, NULL, level, TRUE, FALSE,
-		ff_fn_search_context, rel_fname);
-    if (NULL == ff_fn_search_context)
-	return NULL;
-    else
-	return vim_findnext()
+    ff_fn_تلاش_context =
+	vim_findfile_init(راستہ, filename, تہی, level, TRUE, FALSE,
+		ff_fn_تلاش_context, rel_fname);
+    اگر (تہی == ff_fn_تلاش_context)
+	واپس تہی;
+    ورنہ
+	واپس vim_findnext()
 }
 
     char_u *
-vim_findnext(void)
+vim_findnext(خالی)
 {
-    char_u *ret = vim_findfile(ff_fn_search_context);
+    char_u *ret = vim_findfile(ff_fn_تلاش_context);
 
-    if (NULL == ret)
+    اگر (تہی == ret)
     {
-	vim_findfile_cleanup(ff_fn_search_context);
-	ff_fn_search_context = NULL;
+	vim_findfile_cleanup(ff_fn_تلاش_context);
+	ff_fn_تلاش_context = تہی;
     }
-    return ret;
+    واپس ret;
 }
-#endif
+#اگر_ختم
 
 /*
  * Initialization routine for vim_findfile().
@@ -279,125 +279,125 @@ vim_findnext(void)
  * This function silently ignores a few errors, vim_findfile() will have
  * limited functionality then.
  */
-    void *
+    خالی *
 vim_findfile_init(
-    char_u	*path,
+    char_u	*راستہ,
     char_u	*filename,
     size_t	filenamelen,
-    char_u	*stopdirs UNUSED,
-    int		level,
-    int		free_visited,
-    int		find_what,
-    void	*search_ctx_arg,
-    int		tagfile,	// expanding names of tags files
+    char_u	*stopdirs غیر_مستعمل,
+    صحیح		level,
+    صحیح		free_دیکھا,
+    صحیح		ڈھونڈو_what,
+    خالی	*تلاش_ctx_arg,
+    صحیح		tagfile,	// expanding names of tags files
     char_u	*rel_fname)	// file name to use for "."
 {
     char_u		*wc_part;
-    ff_stack_T		*sptr;
-    ff_search_ctx_T	*search_ctx;
-    int			add_sep;
+    ff_ڈھیر_T		*sptr;
+    ff_تلاش_ctx_T	*تلاش_ctx;
+    صحیح			جوڑو_sep;
 
     // If a search context is given by the caller, reuse it, else allocate a
     // new one.
-    if (search_ctx_arg != NULL)
-	search_ctx = search_ctx_arg;
-    else
+    اگر (تلاش_ctx_arg != تہی)
+	تلاش_ctx = تلاش_ctx_arg;
+    ورنہ
     {
-	search_ctx = ALLOC_CLEAR_ONE(ff_search_ctx_T);
-	if (search_ctx == NULL)
-	    goto error_return;
+	تلاش_ctx = ALLOC_CLEAR_ONE(ff_تلاش_ctx_T);
+	اگر (تلاش_ctx == تہی)
+	    جاؤ error_return;
     }
-    search_ctx->ffsc_find_what = find_what;
-    search_ctx->ffsc_tagfile = tagfile;
+    تلاش_ctx->ffsc_ڈھونڈو_what = ڈھونڈو_what;
+    تلاش_ctx->ffsc_tagfile = tagfile;
 
     // clear the search context, but NOT the visited lists
-    ff_clear(search_ctx);
+    ff_clear(تلاش_ctx);
 
     // clear visited list if wanted
-    if (free_visited == TRUE)
-	vim_findfile_free_visited(search_ctx);
-    else
+    اگر (free_دیکھا == TRUE)
+	vim_findfile_free_دیکھا(تلاش_ctx);
+    ورنہ
     {
 	// Reuse old visited lists. Get the visited list for the given
 	// filename. If no list for the current filename exists, creates a new
 	// one.
-	search_ctx->ffsc_visited_list = ff_get_visited_list(filename,
-					filenamelen, &search_ctx->ffsc_visited_lists_list);
-	if (search_ctx->ffsc_visited_list == NULL)
-	    goto error_return;
-	search_ctx->ffsc_dir_visited_list = ff_get_visited_list(filename,
-				    filenamelen, &search_ctx->ffsc_dir_visited_lists_list);
-	if (search_ctx->ffsc_dir_visited_list == NULL)
-	    goto error_return;
+	تلاش_ctx->ffsc_دیکھا_list = ff_get_دیکھا_list(filename,
+					filenamelen, &تلاش_ctx->ffsc_دیکھا_lists_list);
+	اگر (تلاش_ctx->ffsc_دیکھا_list == تہی)
+	    جاؤ error_return;
+	تلاش_ctx->ffsc_dir_دیکھا_list = ff_get_دیکھا_list(filename,
+				    filenamelen, &تلاش_ctx->ffsc_dir_دیکھا_lists_list);
+	اگر (تلاش_ctx->ffsc_dir_دیکھا_list == تہی)
+	    جاؤ error_return;
     }
 
-    if (ff_expand_buffer.string == NULL)
+    اگر (ff_expand_بفر.string == تہی)
     {
-	ff_expand_buffer.length = 0;
-	ff_expand_buffer.string = alloc(MAXPATHL);
-	if (ff_expand_buffer.string == NULL)
-	    goto error_return;
+	ff_expand_بفر.لمبائی = 0;
+	ff_expand_بفر.string = alloc(MAXPATHL);
+	اگر (ff_expand_بفر.string == تہی)
+	    جاؤ error_return;
     }
 
     // Store information on starting dir now if path is relative.
     // If path is absolute, we do that later.
-    if (path[0] == '.'
-	    && (vim_ispathsep(path[1]) || path[1] == NUL)
-	    && (!tagfile || vim_strchr(p_cpo, CPO_DOTTAG) == NULL)
-	    && rel_fname != NULL)
+    اگر (راستہ[0] == '.'
+	    && (vim_ispathsep(راستہ[1]) || راستہ[1] == NUL)
+	    && (!tagfile || vim_strchr(p_cpo, CPO_DOTTAG) == تہی)
+	    && rel_fname != تہی)
     {
-	int	len = (int)(gettail(rel_fname) - rel_fname);
+	صحیح	len = (صحیح)(gettail(rel_fname) - rel_fname);
 
-	if (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
+	اگر (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
 	{
 	    // Make the start dir an absolute path name.
-	    vim_strncpy(ff_expand_buffer.string, rel_fname, len);
-	    ff_expand_buffer.length = len;
+	    vim_strncpy(ff_expand_بفر.string, rel_fname, len);
+	    ff_expand_بفر.لمبائی = len;
 
-	    search_ctx->ffsc_start_dir.string = FullName_save(ff_expand_buffer.string, FALSE);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
-		goto error_return;
-	    search_ctx->ffsc_start_dir.length = STRLEN(search_ctx->ffsc_start_dir.string);
+	    تلاش_ctx->ffsc_آغاز_dir.string = بھرا_Name_save(ff_expand_بفر.string, FALSE);
+	    اگر (تلاش_ctx->ffsc_آغاز_dir.string == تہی)
+		جاؤ error_return;
+	    تلاش_ctx->ffsc_آغاز_dir.لمبائی = STRLEN(تلاش_ctx->ffsc_آغاز_dir.string);
 	}
-	else
+	ورنہ
 	{
-	    search_ctx->ffsc_start_dir.length = len;
-	    search_ctx->ffsc_start_dir.string = vim_strnsave(rel_fname,
-		search_ctx->ffsc_start_dir.length);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
-		goto error_return;
+	    تلاش_ctx->ffsc_آغاز_dir.لمبائی = len;
+	    تلاش_ctx->ffsc_آغاز_dir.string = vim_strnsave(rel_fname,
+		تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+	    اگر (تلاش_ctx->ffsc_آغاز_dir.string == تہی)
+		جاؤ error_return;
 	}
 
-	if (*++path != NUL)
-	    ++path;
+	اگر (*++راستہ != NUL)
+	    ++راستہ;
     }
-    else if (*path == NUL || !vim_isAbsName(path))
+    ورنہ اگر (*راستہ == NUL || !vim_isAbsName(راستہ))
     {
-#ifdef BACKSLASH_IN_FILENAME
+#اگر_تعریف_شدہ BACKSLASH_اندر_FILENAME
 	// "c:dir" needs "c:" to be expanded, otherwise use current dir
-	if (*path != NUL && path[1] == ':')
+	اگر (*راستہ != NUL && راستہ[1] == ':')
 	{
 	    char_u  drive[3];
 
-	    drive[0] = path[0];
+	    drive[0] = راستہ[0];
 	    drive[1] = ':';
 	    drive[2] = NUL;
-	    if (vim_FullName(drive, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
-		goto error_return;
-	    path += 2;
+	    اگر (vim_بھرا_Name(drive, ff_expand_بفر.string, MAXPATHL, TRUE) == FAIL)
+		جاؤ error_return;
+	    راستہ += 2;
 	}
-	else
-#endif
-	if (mch_dirname(ff_expand_buffer.string, MAXPATHL) == FAIL)
-	    goto error_return;
+	ورنہ
+#اگر_ختم
+	اگر (mch_dirname(ff_expand_بفر.string, MAXPATHL) == FAIL)
+	    جاؤ error_return;
 
-	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
+	ff_expand_بفر.لمبائی = STRLEN(ff_expand_بفر.string);
 
-	search_ctx->ffsc_start_dir.length = ff_expand_buffer.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
-	    goto error_return;
+	تلاش_ctx->ffsc_آغاز_dir.لمبائی = ff_expand_بفر.لمبائی;
+	تلاش_ctx->ffsc_آغاز_dir.string = vim_strnsave(ff_expand_بفر.string,
+	    تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+	اگر (تلاش_ctx->ffsc_آغاز_dir.string == تہی)
+	    جاؤ error_return;
     }
 
     /*
@@ -409,90 +409,90 @@ vim_findfile_init(
      * is handled as unlimited upward search.  See function
      * ff_path_in_stoplist() for details.
      */
-    if (stopdirs != NULL)
+    اگر (stopdirs != تہی)
     {
 	char_u	*walker = stopdirs;
-	int	dircount;
+	صحیح	dircount;
 
-	while (*walker == ';')
+	جب (*walker == ';')
 	    walker++;
 
 	dircount = 1;
-	search_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
+	تلاش_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
 
-	if (search_ctx->ffsc_stopdirs_v != NULL)
+	اگر (تلاش_ctx->ffsc_stopdirs_v != تہی)
 	{
 	    string_T	*tmp;			// for convenience
 
-	    do
+	    کرو
 	    {
 		char_u	*helper;
-		void	*ptr;
+		خالی	*ptr;
 		size_t	len;
 
 		helper = walker;
-		ptr = vim_realloc(search_ctx->ffsc_stopdirs_v,
-					   (dircount + 1) * sizeof(string_T));
-		if (ptr)
-		    search_ctx->ffsc_stopdirs_v = ptr;
-		else
+		ptr = vim_realloc(تلاش_ctx->ffsc_stopdirs_v,
+					   (dircount + 1) * حجم(string_T));
+		اگر (ptr)
+		    تلاش_ctx->ffsc_stopdirs_v = ptr;
+		ورنہ
 		    // ignore, keep what we have and continue
-		    break;
+		    توڑو;
 		walker = vim_strchr(walker, ';');
 		len = walker ? (size_t)(walker - helper) : STRLEN(helper);
 		// "" means ascent till top of directory tree.
 
-		if (*helper != NUL && !vim_isAbsName(helper)
+		اگر (*helper != NUL && !vim_isAbsName(helper)
 							 && len + 1 < MAXPATHL)
 		{
 		    // Make the stop dir an absolute path name.
-		    vim_strncpy(ff_expand_buffer.string, helper, len);
-		    ff_expand_buffer.length = len;
+		    vim_strncpy(ff_expand_بفر.string, helper, len);
+		    ff_expand_بفر.لمبائی = len;
 
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-		    tmp->string = FullName_save(ff_expand_buffer.string, FALSE);
-		    if (tmp->string != NULL)
-			tmp->length = STRLEN(tmp->string);
+		    tmp = &تلاش_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp->string = بھرا_Name_save(ff_expand_بفر.string, FALSE);
+		    اگر (tmp->string != تہی)
+			tmp->لمبائی = STRLEN(tmp->string);
 		}
-		else
+		ورنہ
 		{
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-		    tmp->length = len;
-		    tmp->string = vim_strnsave(helper, tmp->length);
-		    if (tmp->string == NULL)
-			tmp->length = 0;
+		    tmp = &تلاش_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp->لمبائی = len;
+		    tmp->string = vim_strnsave(helper, tmp->لمبائی);
+		    اگر (tmp->string == تہی)
+			tmp->لمبائی = 0;
 		}
-		if (walker)
+		اگر (walker)
 		    walker++;
 		dircount++;
 
-	    } while (walker != NULL);
+	    } جب (walker != تہی);
 
-	    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
-	    tmp->string = NULL;
-	    tmp->length = 0;
+	    tmp = &تلاش_ctx->ffsc_stopdirs_v[dircount - 1];
+	    tmp->string = تہی;
+	    tmp->لمبائی = 0;
 	}
     }
 
-    search_ctx->ffsc_level = level;
+    تلاش_ctx->ffsc_level = level;
 
     /*
      * split into:
      *  -fix path
      *  -wildcard_stuff (might be NULL)
      */
-    wc_part = vim_strchr(path, '*');
-    if (wc_part != NULL)
+    wc_part = vim_strchr(راستہ, '*');
+    اگر (wc_part != تہی)
     {
-	int	llevel;
-	char	*errpt;
+	صحیح	llevel;
+	حرف	*errpt;
 
 	// save the fix part of the path
-	search_ctx->ffsc_fix_path.length = (size_t)(wc_part - path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
-	    goto error_return;
+	تلاش_ctx->ffsc_fix_راستہ.لمبائی = (size_t)(wc_part - راستہ);
+	تلاش_ctx->ffsc_fix_راستہ.string = vim_strnsave(راستہ,
+	    تلاش_ctx->ffsc_fix_راستہ.لمبائی);
+	اگر (تلاش_ctx->ffsc_fix_راستہ.string == تہی)
+	    جاؤ error_return;
 
 	/*
 	 * copy wc_path and add restricts to the '**' wildcard.
@@ -503,185 +503,185 @@ vim_findfile_init(
 	 * Due to this technique the path looks awful if you print it as a
 	 * string.
 	 */
-	ff_expand_buffer.length = 0;
-	while (*wc_part != NUL)
+	ff_expand_بفر.لمبائی = 0;
+	جب (*wc_part != NUL)
 	{
-	    if (ff_expand_buffer.length + 5 >= MAXPATHL)
+	    اگر (ff_expand_بفر.لمبائی + 5 >= MAXPATHL)
 	    {
-		emsg(_(e_path_too_long_for_completion));
-		break;
+		emsg(_(e_راستہ_too_long_for_completion));
+		توڑو;
 	    }
-	    if (STRNCMP(wc_part, "**", 2) == 0)
+	    اگر (STRNCMP(wc_part, "**", 2) == 0)
 	    {
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
+		ff_expand_بفر.string[ff_expand_بفر.لمبائی++] = *wc_part++;
+		ff_expand_بفر.string[ff_expand_بفر.لمبائی++] = *wc_part++;
 
-		llevel = strtol((char *)wc_part, &errpt, 10);
-		if ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
-		    ff_expand_buffer.string[ff_expand_buffer.length++] = llevel;
-		else if ((char_u *)errpt != wc_part && llevel == 0)
+		llevel = strtol((حرف *)wc_part, &errpt, 10);
+		اگر ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
+		    ff_expand_بفر.string[ff_expand_بفر.لمبائی++] = llevel;
+		ورنہ اگر ((char_u *)errpt != wc_part && llevel == 0)
 		    // restrict is 0 -> remove already added '**'
-		    ff_expand_buffer.length -= 2;
-		else
-		    ff_expand_buffer.string[ff_expand_buffer.length++] = FF_MAX_STAR_STAR_EXPAND;
+		    ff_expand_بفر.لمبائی -= 2;
+		ورنہ
+		    ff_expand_بفر.string[ff_expand_بفر.لمبائی++] = FF_MAX_ستارہ_ستارہ_EXPAND;
 		wc_part = (char_u *)errpt;
-		if (*wc_part != NUL && !vim_ispathsep(*wc_part))
+		اگر (*wc_part != NUL && !vim_ispathsep(*wc_part))
 		{
-		    semsg(_(e_invalid_path_number_must_be_at_end_of_path_or_be_followed_by_str), PATHSEPSTR);
-		    goto error_return;
+		    semsg(_(e_invalid_راستہ_نمبر_must_be_at_انتہا_کا_راستہ_or_be_followed_by_str), PATHSEPSTR);
+		    جاؤ error_return;
 		}
 	    }
-	    else
-		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
+	    ورنہ
+		ff_expand_بفر.string[ff_expand_بفر.لمبائی++] = *wc_part++;
 	}
-	ff_expand_buffer.string[ff_expand_buffer.length] = NUL;
+	ff_expand_بفر.string[ff_expand_بفر.لمبائی] = NUL;
 
-	search_ctx->ffsc_wc_path.length = ff_expand_buffer.length;
-	search_ctx->ffsc_wc_path.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_wc_path.length);
-	if (search_ctx->ffsc_wc_path.string == NULL)
-	    goto error_return;
+	تلاش_ctx->ffsc_wc_راستہ.لمبائی = ff_expand_بفر.لمبائی;
+	تلاش_ctx->ffsc_wc_راستہ.string = vim_strnsave(ff_expand_بفر.string,
+	    تلاش_ctx->ffsc_wc_راستہ.لمبائی);
+	اگر (تلاش_ctx->ffsc_wc_راستہ.string == تہی)
+	    جاؤ error_return;
     }
-    else
+    ورنہ
     {
-	search_ctx->ffsc_fix_path.length = STRLEN(path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
-	    goto error_return;
+	تلاش_ctx->ffsc_fix_راستہ.لمبائی = STRLEN(راستہ);
+	تلاش_ctx->ffsc_fix_راستہ.string = vim_strnsave(راستہ,
+	    تلاش_ctx->ffsc_fix_راستہ.لمبائی);
+	اگر (تلاش_ctx->ffsc_fix_راستہ.string == تہی)
+	    جاؤ error_return;
     }
 
-    if (search_ctx->ffsc_start_dir.string == NULL)
+    اگر (تلاش_ctx->ffsc_آغاز_dir.string == تہی)
     {
 	// store the fix part as startdir.
 	// This is needed if the parameter path is fully qualified.
-	search_ctx->ffsc_start_dir.length = search_ctx->ffsc_fix_path.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(search_ctx->ffsc_fix_path.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
-	    goto error_return;
-	search_ctx->ffsc_fix_path.string[0] = NUL;
-	search_ctx->ffsc_fix_path.length = 0;
+	تلاش_ctx->ffsc_آغاز_dir.لمبائی = تلاش_ctx->ffsc_fix_راستہ.لمبائی;
+	تلاش_ctx->ffsc_آغاز_dir.string = vim_strnsave(تلاش_ctx->ffsc_fix_راستہ.string,
+	    تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+	اگر (تلاش_ctx->ffsc_آغاز_dir.string == تہی)
+	    جاؤ error_return;
+	تلاش_ctx->ffsc_fix_راستہ.string[0] = NUL;
+	تلاش_ctx->ffsc_fix_راستہ.لمبائی = 0;
     }
 
     // create an absolute path
-    if (search_ctx->ffsc_start_dir.length
-	    + search_ctx->ffsc_fix_path.length + 3 >= MAXPATHL)
+    اگر (تلاش_ctx->ffsc_آغاز_dir.لمبائی
+	    + تلاش_ctx->ffsc_fix_راستہ.لمبائی + 3 >= MAXPATHL)
     {
-	emsg(_(e_path_too_long_for_completion));
-	goto error_return;
+	emsg(_(e_راستہ_too_long_for_completion));
+	جاؤ error_return;
     }
 
-    add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-	search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-    ff_expand_buffer.length = vim_snprintf(
-	    (char *)ff_expand_buffer.string,
+    جوڑو_sep = !after_pathsep(تلاش_ctx->ffsc_آغاز_dir.string,
+	تلاش_ctx->ffsc_آغاز_dir.string + تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+    ff_expand_بفر.لمبائی = vim_snprintf(
+	    (حرف *)ff_expand_بفر.string,
 	    MAXPATHL,
 	    "%s%s",
-	    search_ctx->ffsc_start_dir.string,
-	    add_sep ? PATHSEPSTR : "");
+	    تلاش_ctx->ffsc_آغاز_dir.string,
+	    جوڑو_sep ? PATHSEPSTR : "");
 
     {
-	size_t	bufsize = ff_expand_buffer.length + search_ctx->ffsc_fix_path.length + 1;
+	size_t	bufsize = ff_expand_بفر.لمبائی + تلاش_ctx->ffsc_fix_راستہ.لمبائی + 1;
 	char_u	*buf = alloc(bufsize);
 
-	if (buf == NULL)
-	    goto error_return;
+	اگر (buf == تہی)
+	    جاؤ error_return;
 
 	vim_snprintf(
-		(char *)buf,
+		(حرف *)buf,
 		bufsize,
 		"%s%s",
-		ff_expand_buffer.string,
-		search_ctx->ffsc_fix_path.string);
-	if (mch_isdir(buf))
+		ff_expand_بفر.string,
+		تلاش_ctx->ffsc_fix_راستہ.string);
+	اگر (mch_isdir(buf))
 	{
-	    if (search_ctx->ffsc_fix_path.length > 0)
+	    اگر (تلاش_ctx->ffsc_fix_راستہ.لمبائی > 0)
 	    {
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
-		ff_expand_buffer.length += vim_snprintf(
-			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
-			MAXPATHL - ff_expand_buffer.length,
+		جوڑو_sep = !after_pathsep(تلاش_ctx->ffsc_fix_راستہ.string,
+		    تلاش_ctx->ffsc_fix_راستہ.string + تلاش_ctx->ffsc_fix_راستہ.لمبائی);
+		ff_expand_بفر.لمبائی += vim_snprintf(
+			(حرف *)ff_expand_بفر.string + ff_expand_بفر.لمبائی,
+			MAXPATHL - ff_expand_بفر.لمبائی,
 			"%s%s",
-			search_ctx->ffsc_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			تلاش_ctx->ffsc_fix_راستہ.string,
+			جوڑو_sep ? PATHSEPSTR : "");
 	    }
 	}
-	else
+	ورنہ
 	{
-	    char_u *p = gettail(search_ctx->ffsc_fix_path.string);
-	    int    len = (int)search_ctx->ffsc_fix_path.length;
+	    char_u *p = gettail(تلاش_ctx->ffsc_fix_راستہ.string);
+	    صحیح    len = (صحیح)تلاش_ctx->ffsc_fix_راستہ.لمبائی;
 
-	    if (p > search_ctx->ffsc_fix_path.string)
+	    اگر (p > تلاش_ctx->ffsc_fix_راستہ.string)
 	    {
 		// do not add '..' to the path and start upwards searching
-		len = (int)(p - search_ctx->ffsc_fix_path.string) - 1;
-		if ((len >= 2
-			&& STRNCMP(search_ctx->ffsc_fix_path.string, "..", 2) == 0)
-			&& (len == 2 || search_ctx->ffsc_fix_path.string[2] == PATHSEP))
+		len = (صحیح)(p - تلاش_ctx->ffsc_fix_راستہ.string) - 1;
+		اگر ((len >= 2
+			&& STRNCMP(تلاش_ctx->ffsc_fix_راستہ.string, "..", 2) == 0)
+			&& (len == 2 || تلاش_ctx->ffsc_fix_راستہ.string[2] == PATHSEP))
 		{
 		    vim_free(buf);
-		    goto error_return;
+		    جاؤ error_return;
 		}
 
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
-		ff_expand_buffer.length += vim_snprintf(
-			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
-			MAXPATHL - ff_expand_buffer.length,
+		جوڑو_sep = !after_pathsep(تلاش_ctx->ffsc_fix_راستہ.string,
+		    تلاش_ctx->ffsc_fix_راستہ.string + تلاش_ctx->ffsc_fix_راستہ.لمبائی);
+		ff_expand_بفر.لمبائی += vim_snprintf(
+			(حرف *)ff_expand_بفر.string + ff_expand_بفر.لمبائی,
+			MAXPATHL - ff_expand_بفر.لمبائی,
 			"%.*s%s",
 			len,
-			search_ctx->ffsc_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			تلاش_ctx->ffsc_fix_راستہ.string,
+			جوڑو_sep ? PATHSEPSTR : "");
 	    }
 
-	    if (search_ctx->ffsc_wc_path.string != NULL)
+	    اگر (تلاش_ctx->ffsc_wc_راستہ.string != تہی)
 	    {
-		size_t	tempsize = (search_ctx->ffsc_fix_path.length - len)
-				+ search_ctx->ffsc_wc_path.length
+		size_t	tempsize = (تلاش_ctx->ffsc_fix_راستہ.لمبائی - len)
+				+ تلاش_ctx->ffsc_wc_راستہ.لمبائی
 				+ 1;
-		char_u	*temp = alloc(tempsize);
+		char_u	*عارضی = alloc(tempsize);
 
-		if (temp == NULL)
+		اگر (عارضی == تہی)
 		{
 		    vim_free(buf);
-		    vim_free(temp);
-		    goto error_return;
+		    vim_free(عارضی);
+		    جاؤ error_return;
 		}
 
-		search_ctx->ffsc_wc_path.length = vim_snprintf(
-			    (char *)temp,
+		تلاش_ctx->ffsc_wc_راستہ.لمبائی = vim_snprintf(
+			    (حرف *)عارضی,
 			    tempsize,
 			    "%s%s",
-			    search_ctx->ffsc_fix_path.string + len,
-			    search_ctx->ffsc_wc_path.string);
-		vim_free(search_ctx->ffsc_wc_path.string);
-		search_ctx->ffsc_wc_path.string = temp;
+			    تلاش_ctx->ffsc_fix_راستہ.string + len,
+			    تلاش_ctx->ffsc_wc_راستہ.string);
+		vim_free(تلاش_ctx->ffsc_wc_راستہ.string);
+		تلاش_ctx->ffsc_wc_راستہ.string = عارضی;
 	    }
 	}
 	vim_free(buf);
     }
 
-    sptr = ff_create_stack_element(ff_expand_buffer.string,
-			ff_expand_buffer.length,
-			search_ctx->ffsc_wc_path.string,
-			search_ctx->ffsc_wc_path.length,
+    sptr = ff_create_ڈھیر_element(ff_expand_بفر.string,
+			ff_expand_بفر.لمبائی,
+			تلاش_ctx->ffsc_wc_راستہ.string,
+			تلاش_ctx->ffsc_wc_راستہ.لمبائی,
 			level,
 			0);
 
-    if (sptr == NULL)
-	goto error_return;
+    اگر (sptr == تہی)
+	جاؤ error_return;
 
-    ff_push(search_ctx, sptr);
+    ff_ڈالو(تلاش_ctx, sptr);
 
-    search_ctx->ffsc_file_to_search.length = filenamelen;
-    search_ctx->ffsc_file_to_search.string = vim_strnsave(filename,
-	search_ctx->ffsc_file_to_search.length);
-    if (search_ctx->ffsc_file_to_search.string == NULL)
-	goto error_return;
+    تلاش_ctx->ffsc_file_مقصد_تلاش.لمبائی = filenamelen;
+    تلاش_ctx->ffsc_file_مقصد_تلاش.string = vim_strnsave(filename,
+	تلاش_ctx->ffsc_file_مقصد_تلاش.لمبائی);
+    اگر (تلاش_ctx->ffsc_file_مقصد_تلاش.string == تہی)
+	جاؤ error_return;
 
-    return search_ctx;
+    واپس تلاش_ctx;
 
 error_return:
     /*
@@ -689,8 +689,8 @@ error_return:
      * Even when the caller gave us a (perhaps valid) context we free it here,
      * as we might have already destroyed it.
      */
-    vim_findfile_cleanup(search_ctx);
-    return NULL;
+    vim_findfile_cleanup(تلاش_ctx);
+    واپس تہی;
 }
 
 /*
@@ -700,43 +700,43 @@ error_return:
 vim_findfile_stopdir(char_u *buf)
 {
     char_u	*r_ptr = buf;
-    char_u	*r_ptr_end = NULL;	    // points to NUL at end of string "r_ptr"
+    char_u	*r_ptr_انتہا = تہی;	    // points to NUL at end of string "r_ptr"
 
-    while (*r_ptr != NUL && *r_ptr != ';')
+    جب (*r_ptr != NUL && *r_ptr != ';')
     {
-	if (r_ptr[0] == '\\' && r_ptr[1] == ';')
+	اگر (r_ptr[0] == '\\' && r_ptr[1] == ';')
 	{
 	    // Overwrite the escape char,
 	    // use STRLEN(r_ptr) to move the trailing '\0'.
-	    if (r_ptr_end == NULL)
-		r_ptr_end = r_ptr + STRLEN(r_ptr);
+	    اگر (r_ptr_انتہا == تہی)
+		r_ptr_انتہا = r_ptr + STRLEN(r_ptr);
 	    mch_memmove(r_ptr, r_ptr + 1,
-		(size_t)(r_ptr_end - (r_ptr + 1)) + 1);	// +1 for NUL
+		(size_t)(r_ptr_انتہا - (r_ptr + 1)) + 1);	// +1 for NUL
 	    r_ptr++;
-	    --r_ptr_end;
+	    --r_ptr_انتہا;
 	}
 	r_ptr++;
     }
-    if (*r_ptr == ';')
+    اگر (*r_ptr == ';')
     {
 	*r_ptr = NUL;
 	r_ptr++;
     }
-    else if (*r_ptr == NUL)
-	r_ptr = NULL;
-    return r_ptr;
+    ورنہ اگر (*r_ptr == NUL)
+	r_ptr = تہی;
+    واپس r_ptr;
 }
 
 /*
  * Clean up the given search context. Can handle a NULL pointer.
  */
-    void
-vim_findfile_cleanup(void *ctx)
+    خالی
+vim_findfile_cleanup(خالی *ctx)
 {
-    if (ctx == NULL)
-	return;
+    اگر (ctx == تہی)
+	واپس;
 
-    vim_findfile_free_visited(ctx);
+    vim_findfile_free_دیکھا(ctx);
     ff_clear(ctx);
     vim_free(ctx);
 }
@@ -754,46 +754,46 @@ vim_findfile_cleanup(void *ctx)
  * top of the list).
  */
     char_u *
-vim_findfile(void *search_ctx_arg)
+vim_findfile(خالی *تلاش_ctx_arg)
 {
-    string_T	file_path;
-    string_T	rest_of_wildcards;
-    char_u	*path_end = NULL;
-    ff_stack_T	*stackp;
-    ff_search_ctx_T *search_ctx;
+    string_T	file_راستہ;
+    string_T	rest_کا_wildcards;
+    char_u	*راستہ_انتہا = تہی;
+    ff_ڈھیر_T	*stackp;
+    ff_تلاش_ctx_T *تلاش_ctx;
 
-    if (search_ctx_arg == NULL)
-	return NULL;
+    اگر (تلاش_ctx_arg == تہی)
+	واپس تہی;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
+    تلاش_ctx = (ff_تلاش_ctx_T *)تلاش_ctx_arg;
 
     /*
      * filepath is used as buffer for various actions and as the storage to
      * return a found filename.
      */
-    if ((file_path.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
+    اگر ((file_راستہ.string = alloc(MAXPATHL)) == تہی)
+	واپس تہی;
 
     // store the end of the start dir -- needed for upward search
-    if (search_ctx->ffsc_start_dir.string != NULL)
-	path_end = &search_ctx->ffsc_start_dir.string[
-					    search_ctx->ffsc_start_dir.length];
+    اگر (تلاش_ctx->ffsc_آغاز_dir.string != تہی)
+	راستہ_انتہا = &تلاش_ctx->ffsc_آغاز_dir.string[
+					    تلاش_ctx->ffsc_آغاز_dir.لمبائی];
 
     // upward search loop
-    for (;;)
+    برائے (;;)
     {
 	// downward search loop
-	for (;;)
+	برائے (;;)
 	{
 	    // check if user wants to stop the search
 	    ui_breakcheck();
-	    if (got_int)
-		break;
+	    اگر (got_int)
+		توڑو;
 
 	    // get directory to work on from stack
-	    stackp = ff_pop(search_ctx);
-	    if (stackp == NULL)
-		break;
+	    stackp = ff_نکالو(تلاش_ctx);
+	    اگر (stackp == تہی)
+		توڑو;
 
 	    /*
 	     * TODO: decide if we leave this test in
@@ -814,49 +814,49 @@ vim_findfile(void *search_ctx_arg)
 	     * This check is only needed for directories we work on for the
 	     * first time (hence stackp->ff_filearray == NULL)
 	     */
-	    if (stackp->ffs_filearray == NULL
-		    && ff_check_visited(&search_ctx->ffsc_dir_visited_list
-							  ->ffvl_visited_list,
-			    stackp->ffs_fix_path.string,
-			    stackp->ffs_fix_path.length,
-			    stackp->ffs_wc_path.string,
-			    stackp->ffs_wc_path.length) == FAIL)
+	    اگر (stackp->ffs_filearray == تہی
+		    && ff_check_دیکھا(&تلاش_ctx->ffsc_dir_دیکھا_list
+							  ->ffvl_دیکھا_list,
+			    stackp->ffs_fix_راستہ.string,
+			    stackp->ffs_fix_راستہ.لمبائی,
+			    stackp->ffs_wc_راستہ.string,
+			    stackp->ffs_wc_راستہ.لمبائی) == FAIL)
 	    {
-#ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+#اگر_تعریف_شدہ FF_VERBOSE
+		اگر (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("Already Searched: %s (%s)",
-				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
+				   stackp->ffs_fix_راستہ.string, stackp->ffs_wc_راستہ.string);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    پیغام_puts("\n");
 		    verbose_leave_scroll();
 		}
-#endif
-		ff_free_stack_element(stackp);
-		continue;
+#اگر_ختم
+		ff_free_ڈھیر_element(stackp);
+		جاری;
 	    }
-#ifdef FF_VERBOSE
-	    else if (p_verbose >= 5)
+#اگر_تعریف_شدہ FF_VERBOSE
+	    ورنہ اگر (p_verbose >= 5)
 	    {
 		verbose_enter_scroll();
 		smsg("Searching: %s (%s)",
-				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
+				   stackp->ffs_fix_راستہ.string, stackp->ffs_wc_راستہ.string);
 		// don't overwrite this either
-		msg_puts("\n");
+		پیغام_puts("\n");
 		verbose_leave_scroll();
 	    }
-#endif
+#اگر_ختم
 
 	    // check depth
-	    if (stackp->ffs_level <= 0)
+	    اگر (stackp->ffs_level <= 0)
 	    {
-		ff_free_stack_element(stackp);
-		continue;
+		ff_free_ڈھیر_element(stackp);
+		جاری;
 	    }
 
-	    file_path.string[0] = NUL;
-	    file_path.length = 0;
+	    file_راستہ.string[0] = NUL;
+	    file_راستہ.لمبائی = 0;
 
 	    /*
 	     * If no filearray till now expand wildcards
@@ -864,99 +864,99 @@ vim_findfile(void *search_ctx_arg)
 	     * and all possible expands are returned in one array. We use this
 	     * to handle the expansion of '**' into an empty string.
 	     */
-	    if (stackp->ffs_filearray == NULL)
+	    اگر (stackp->ffs_filearray == تہی)
 	    {
 		char_u *dirptrs[2];
 
 		// we use filepath to build the path expand_wildcards() should
 		// expand.
-		dirptrs[0] = file_path.string;
-		dirptrs[1] = NULL;
+		dirptrs[0] = file_راستہ.string;
+		dirptrs[1] = تہی;
 
 		// if we have a start dir copy it in
-		if (!vim_isAbsName(stackp->ffs_fix_path.string)
-						&& search_ctx->ffsc_start_dir.string)
+		اگر (!vim_isAbsName(stackp->ffs_fix_راستہ.string)
+						&& تلاش_ctx->ffsc_آغاز_dir.string)
 		{
-		    if (search_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
+		    اگر (تلاش_ctx->ffsc_آغاز_dir.لمبائی + 1 < MAXPATHL)
 		    {
-			int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-			file_path.length = vim_snprintf(
-			    (char *)file_path.string,
+			صحیح جوڑو_sep = !after_pathsep(تلاش_ctx->ffsc_آغاز_dir.string,
+			    تلاش_ctx->ffsc_آغاز_dir.string + تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+			file_راستہ.لمبائی = vim_snprintf(
+			    (حرف *)file_راستہ.string,
 			    MAXPATHL,
 			    "%s%s",
-			    search_ctx->ffsc_start_dir.string,
-			    add_sep ? PATHSEPSTR : "");
+			    تلاش_ctx->ffsc_آغاز_dir.string,
+			    جوڑو_sep ? PATHSEPSTR : "");
 		    }
-		    else
+		    ورنہ
 		    {
-			ff_free_stack_element(stackp);
-			goto fail;
+			ff_free_ڈھیر_element(stackp);
+			جاؤ fail;
 		    }
 		}
 
 		// append the fix part of the search path
-		if (file_path.length + stackp->ffs_fix_path.length + 1 < MAXPATHL)
+		اگر (file_راستہ.لمبائی + stackp->ffs_fix_راستہ.لمبائی + 1 < MAXPATHL)
 		{
-		    int add_sep = !after_pathsep(stackp->ffs_fix_path.string,
-			stackp->ffs_fix_path.string + stackp->ffs_fix_path.length);
-		    file_path.length += vim_snprintf(
-			(char *)file_path.string + file_path.length,
-			MAXPATHL - file_path.length,
+		    صحیح جوڑو_sep = !after_pathsep(stackp->ffs_fix_راستہ.string,
+			stackp->ffs_fix_راستہ.string + stackp->ffs_fix_راستہ.لمبائی);
+		    file_راستہ.لمبائی += vim_snprintf(
+			(حرف *)file_راستہ.string + file_راستہ.لمبائی,
+			MAXPATHL - file_راستہ.لمبائی,
 			"%s%s",
-			stackp->ffs_fix_path.string,
-			add_sep ? PATHSEPSTR : "");
+			stackp->ffs_fix_راستہ.string,
+			جوڑو_sep ? PATHSEPSTR : "");
 		}
-		else
+		ورنہ
 		{
-		    ff_free_stack_element(stackp);
-		    goto fail;
+		    ff_free_ڈھیر_element(stackp);
+		    جاؤ fail;
 		}
 
-		rest_of_wildcards.string = stackp->ffs_wc_path.string;
-		rest_of_wildcards.length = stackp->ffs_wc_path.length;
-		if (*rest_of_wildcards.string != NUL)
+		rest_کا_wildcards.string = stackp->ffs_wc_راستہ.string;
+		rest_کا_wildcards.لمبائی = stackp->ffs_wc_راستہ.لمبائی;
+		اگر (*rest_کا_wildcards.string != NUL)
 		{
-		    if (STRNCMP(rest_of_wildcards.string, "**", 2) == 0)
+		    اگر (STRNCMP(rest_کا_wildcards.string, "**", 2) == 0)
 		    {
 			char_u	*p;
 
 			// pointer to the restrict byte
 			// The restrict byte is not a character!
-			p = rest_of_wildcards.string + 2;
+			p = rest_کا_wildcards.string + 2;
 
-			if (*p > 0)
+			اگر (*p > 0)
 			{
 			    (*p)--;
-			    if (file_path.length + 1 < MAXPATHL)
-				file_path.string[file_path.length++] = '*';
-			    else
+			    اگر (file_راستہ.لمبائی + 1 < MAXPATHL)
+				file_راستہ.string[file_راستہ.لمبائی++] = '*';
+			    ورنہ
 			    {
-				ff_free_stack_element(stackp);
-				goto fail;
+				ff_free_ڈھیر_element(stackp);
+				جاؤ fail;
 			    }
 			}
 
-			if (*p == 0)
+			اگر (*p == 0)
 			{
 			    // remove '**<numb> from wildcards
-			    mch_memmove(rest_of_wildcards.string,
-					rest_of_wildcards.string + 3,
-					(size_t)(rest_of_wildcards.length - 3) + 1);    // +1 for NUL
-			    rest_of_wildcards.length -= 3;
-			    stackp->ffs_wc_path.length = rest_of_wildcards.length;
+			    mch_memmove(rest_کا_wildcards.string,
+					rest_کا_wildcards.string + 3,
+					(size_t)(rest_کا_wildcards.لمبائی - 3) + 1);    // +1 for NUL
+			    rest_کا_wildcards.لمبائی -= 3;
+			    stackp->ffs_wc_راستہ.لمبائی = rest_کا_wildcards.لمبائی;
 			}
-			else
+			ورنہ
 			{
-			    rest_of_wildcards.string += 3;
-			    rest_of_wildcards.length -= 3;
+			    rest_کا_wildcards.string += 3;
+			    rest_کا_wildcards.لمبائی -= 3;
 			}
 
-			if (stackp->ffs_star_star_empty == 0)
+			اگر (stackp->ffs_ستارہ_ستارہ_خالی_خانے == 0)
 			{
 			    // if not done before, expand '**' to empty
-			    stackp->ffs_star_star_empty = 1;
-			    dirptrs[1] = stackp->ffs_fix_path.string;
+			    stackp->ffs_ستارہ_ستارہ_خالی_خانے = 1;
+			    dirptrs[1] = stackp->ffs_fix_راستہ.string;
 			}
 		    }
 
@@ -967,26 +967,26 @@ vim_findfile(void *search_ctx_arg)
 		     * pushing every directory returned from expand_wildcards()
 		     * on the stack again for further search.
 		     */
-		    while (*rest_of_wildcards.string
-			    && !vim_ispathsep(*rest_of_wildcards.string))
+		    جب (*rest_کا_wildcards.string
+			    && !vim_ispathsep(*rest_کا_wildcards.string))
 		    {
-			if (file_path.length + 1 < MAXPATHL)
+			اگر (file_راستہ.لمبائی + 1 < MAXPATHL)
 			{
-			    file_path.string[file_path.length++] = *rest_of_wildcards.string++;
-			    --rest_of_wildcards.length;
+			    file_راستہ.string[file_راستہ.لمبائی++] = *rest_کا_wildcards.string++;
+			    --rest_کا_wildcards.لمبائی;
 			}
-			else
+			ورنہ
 			{
-			    ff_free_stack_element(stackp);
-			    goto fail;
+			    ff_free_ڈھیر_element(stackp);
+			    جاؤ fail;
 			}
 		    }
 
-		    file_path.string[file_path.length] = NUL;
-		    if (vim_ispathsep(*rest_of_wildcards.string))
+		    file_راستہ.string[file_راستہ.لمبائی] = NUL;
+		    اگر (vim_ispathsep(*rest_کا_wildcards.string))
 		    {
-			rest_of_wildcards.string++;
-			rest_of_wildcards.length--;
+			rest_کا_wildcards.string++;
+			rest_کا_wildcards.لمبائی--;
 		    }
 		}
 
@@ -994,41 +994,41 @@ vim_findfile(void *search_ctx_arg)
 		 * Expand wildcards like "*" and "$VAR".
 		 * If the path is a URL don't try this.
 		 */
-		if (path_with_url(dirptrs[0]))
+		اگر (راستہ_with_url(dirptrs[0]))
 		{
 		    stackp->ffs_filearray = ALLOC_ONE(char_u *);
-		    if (stackp->ffs_filearray != NULL
+		    اگر (stackp->ffs_filearray != تہی
 			    && (stackp->ffs_filearray[0]
-				= vim_strnsave(dirptrs[0], file_path.length)) != NULL)
-			stackp->ffs_filearray_size = 1;
-		    else
-			stackp->ffs_filearray_size = 0;
+				= vim_strnsave(dirptrs[0], file_راستہ.لمبائی)) != تہی)
+			stackp->ffs_filearray_سائز = 1;
+		    ورنہ
+			stackp->ffs_filearray_سائز = 0;
 		}
-		else
+		ورنہ
 		    // Add EW_NOTWILD because the expanded path may contain
 		    // wildcard characters that are to be taken literally.
 		    // This is a bit of a hack.
-		    expand_wildcards((dirptrs[1] == NULL) ? 1 : 2, dirptrs,
-			    &stackp->ffs_filearray_size,
+		    expand_wildcards((dirptrs[1] == تہی) ? 1 : 2, dirptrs,
+			    &stackp->ffs_filearray_سائز,
 			    &stackp->ffs_filearray,
 			    EW_DIR|EW_ADDSLASH|EW_SILENT|EW_NOTWILD);
 
 		stackp->ffs_filearray_cur = 0;
 		stackp->ffs_stage = 0;
 	    }
-	    else
+	    ورنہ
 	    {
-		rest_of_wildcards.string = &stackp->ffs_wc_path.string[
-							stackp->ffs_wc_path.length];
-		rest_of_wildcards.length = 0;
+		rest_کا_wildcards.string = &stackp->ffs_wc_راستہ.string[
+							stackp->ffs_wc_راستہ.لمبائی];
+		rest_کا_wildcards.لمبائی = 0;
 	    }
 
-	    if (stackp->ffs_stage == 0)
+	    اگر (stackp->ffs_stage == 0)
 	    {
-		int i;
+		صحیح i;
 
 		// this is the first time we work on this directory
-		if (*rest_of_wildcards.string == NUL)
+		اگر (*rest_کا_wildcards.string == NUL)
 		{
 		    size_t  len;
 		    char_u  *suf;
@@ -1037,146 +1037,146 @@ vim_findfile(void *search_ctx_arg)
 		     * We don't have further wildcards to expand, so we have to
 		     * check for the final file now.
 		     */
-		    for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		    برائے (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_سائز; ++i)
 		    {
-			if (!path_with_url(stackp->ffs_filearray[i])
+			اگر (!راستہ_with_url(stackp->ffs_filearray[i])
 				      && !mch_isdir(stackp->ffs_filearray[i]))
-			    continue;   // not a directory
+			    جاری;   // not a directory
 
 			// prepare the filename to be checked for existence
-			// below
+			//نیچے
 			len = STRLEN(stackp->ffs_filearray[i]);
-			if (len + 1 + search_ctx->ffsc_file_to_search.length
+			اگر (len + 1 + تلاش_ctx->ffsc_file_مقصد_تلاش.لمبائی
 									< MAXPATHL)
 			{
-			    int	add_sep = !after_pathsep(stackp->ffs_filearray[i],
+			    صحیح	جوڑو_sep = !after_pathsep(stackp->ffs_filearray[i],
 				    stackp->ffs_filearray[i] + len);
-			    file_path.length = vim_snprintf(
-				    (char *)file_path.string,
+			    file_راستہ.لمبائی = vim_snprintf(
+				    (حرف *)file_راستہ.string,
 				    MAXPATHL,
 				    "%s%s%s",
 				    stackp->ffs_filearray[i],
-				    add_sep ? PATHSEPSTR : "",
-				    search_ctx->ffsc_file_to_search.string);
+				    جوڑو_sep ? PATHSEPSTR : "",
+				    تلاش_ctx->ffsc_file_مقصد_تلاش.string);
 			}
-			else
+			ورنہ
 			{
-			    ff_free_stack_element(stackp);
-			    goto fail;
+			    ff_free_ڈھیر_element(stackp);
+			    جاؤ fail;
 			}
 
 			/*
 			 * Try without extra suffix and then with suffixes
 			 * from 'suffixesadd'.
 			 */
-			len = file_path.length;
-			if (search_ctx->ffsc_tagfile)
+			len = file_راستہ.لمبائی;
+			اگر (تلاش_ctx->ffsc_tagfile)
 			    suf = (char_u *)"";
-			else
+			ورنہ
 			    suf = curbuf->b_p_sua;
-			for (;;)
+			برائے (;;)
 			{
 			    // if file exists and we didn't already find it
-			    if ((path_with_url(file_path.string)
-				  || (mch_getperm(file_path.string) >= 0
-				      && (search_ctx->ffsc_find_what
+			    اگر ((راستہ_with_url(file_راستہ.string)
+				  || (mch_getperm(file_راستہ.string) >= 0
+				      && (تلاش_ctx->ffsc_ڈھونڈو_what
 							      == FINDFILE_BOTH
-					  || ((search_ctx->ffsc_find_what
+					  || ((تلاش_ctx->ffsc_ڈھونڈو_what
 							      == FINDFILE_DIR)
-						   == mch_isdir(file_path.string)))))
-#ifndef FF_VERBOSE
-				    && (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
-							   ->ffvl_visited_list,
-					    file_path.string,
-					    file_path.length,
+						   == mch_isdir(file_راستہ.string)))))
+#اگر_غیر_تعریف_شدہ FF_VERBOSE
+				    && (ff_check_دیکھا(
+					    &تلاش_ctx->ffsc_دیکھا_list
+							   ->ffvl_دیکھا_list,
+					    file_راستہ.string,
+					    file_راستہ.لمبائی,
 					    (char_u *)"", 0) == OK)
-#endif
+#اگر_ختم
 			       )
 			    {
-#ifdef FF_VERBOSE
-				if (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
-							   ->ffvl_visited_list,
-					      file_path.string,
-					      file_path.length,
+#اگر_تعریف_شدہ FF_VERBOSE
+				اگر (ff_check_دیکھا(
+					    &تلاش_ctx->ffsc_دیکھا_list
+							   ->ffvl_دیکھا_list,
+					      file_راستہ.string,
+					      file_راستہ.لمبائی,
 					      (char_u *)"", 0) == FAIL)
 				{
-				    if (p_verbose >= 5)
+				    اگر (p_verbose >= 5)
 				    {
 					verbose_enter_scroll();
-					smsg("Already: %s", file_path.string);
+					smsg("Already: %s", file_راستہ.string);
 					// don't overwrite this either
-					msg_puts("\n");
+					پیغام_puts("\n");
 					verbose_leave_scroll();
 				    }
-				    continue;
+				    جاری;
 				}
-#endif
+#اگر_ختم
 
 				// push dir to examine rest of subdirs later
 				stackp->ffs_filearray_cur = i + 1;
-				ff_push(search_ctx, stackp);
+				ff_ڈالو(تلاش_ctx, stackp);
 
-				if (!path_with_url(file_path.string))
-				    file_path.length = simplify_filename(file_path.string);
+				اگر (!راستہ_with_url(file_راستہ.string))
+				    file_راستہ.لمبائی = simplify_filename(file_راستہ.string);
 
-				if (mch_dirname(ff_expand_buffer.string, MAXPATHL)
+				اگر (mch_dirname(ff_expand_بفر.string, MAXPATHL)
 									== OK)
 				{
 				    char_u  *p;
 
-				    ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
-				    p = shorten_fname(file_path.string,
-							    ff_expand_buffer.string);
-				    if (p != NULL)
+				    ff_expand_بفر.لمبائی = STRLEN(ff_expand_بفر.string);
+				    p = shorten_fname(file_راستہ.string,
+							    ff_expand_بفر.string);
+				    اگر (p != تہی)
 				    {
-					mch_memmove(file_path.string, p,
-					    (size_t)((file_path.string + file_path.length) - p) + 1);  // +1 for NUL
-					file_path.length -= (p - file_path.string);
+					mch_memmove(file_راستہ.string, p,
+					    (size_t)((file_راستہ.string + file_راستہ.لمبائی) - p) + 1);  // +1 for NUL
+					file_راستہ.لمبائی -= (p - file_راستہ.string);
 				    }
 				}
-#ifdef FF_VERBOSE
-				if (p_verbose >= 5)
+#اگر_تعریف_شدہ FF_VERBOSE
+				اگر (p_verbose >= 5)
 				{
 				    verbose_enter_scroll();
-				    smsg("HIT: %s", file_path.string);
+				    smsg("HIT: %s", file_راستہ.string);
 				    // don't overwrite this either
-				    msg_puts("\n");
+				    پیغام_puts("\n");
 				    verbose_leave_scroll();
 				}
-#endif
-				return file_path.string;
+#اگر_ختم
+				واپس file_راستہ.string;
 			    }
 
 			    // Not found or found already, try next suffix.
-			    if (*suf == NUL)
-				break;
-			    file_path.length = len + copy_option_part(&suf,
-				  file_path.string + len,
-				  (int)(MAXPATHL - len), ",");
+			    اگر (*suf == NUL)
+				توڑو;
+			    file_راستہ.لمبائی = len + copy_option_part(&suf,
+				  file_راستہ.string + len,
+				  (صحیح)(MAXPATHL - len), ",");
 			}
 		    }
 		}
-		else
+		ورنہ
 		{
 		    /*
 		     * still wildcards left, push the directories for further
 		     * search
 		     */
-		    for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		    برائے (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_سائز; ++i)
 		    {
-			if (!mch_isdir(stackp->ffs_filearray[i]))
-			    continue;	// not a directory
+			اگر (!mch_isdir(stackp->ffs_filearray[i]))
+			    جاری;	// not a directory
 
-			ff_push(search_ctx,
-				ff_create_stack_element(
+			ff_ڈالو(تلاش_ctx,
+				ff_create_ڈھیر_element(
 						     stackp->ffs_filearray[i],
 						     STRLEN(stackp->ffs_filearray[i]),
-						     rest_of_wildcards.string,
-						     rest_of_wildcards.length,
+						     rest_کا_wildcards.string,
+						     rest_کا_wildcards.لمبائی,
 						     stackp->ffs_level - 1, 0));
 		    }
 		}
@@ -1188,211 +1188,211 @@ vim_findfile(void *search_ctx_arg)
 	     * if wildcards contains '**' we have to descent till we reach the
 	     * leaves of the directory tree.
 	     */
-	    if (STRNCMP(stackp->ffs_wc_path.string, "**", 2) == 0)
+	    اگر (STRNCMP(stackp->ffs_wc_راستہ.string, "**", 2) == 0)
 	    {
-		int i;
+		صحیح i;
 
-		for (i = stackp->ffs_filearray_cur;
-					  i < stackp->ffs_filearray_size; ++i)
+		برائے (i = stackp->ffs_filearray_cur;
+					  i < stackp->ffs_filearray_سائز; ++i)
 		{
-		    if (fnamecmp(stackp->ffs_filearray[i],
-						   stackp->ffs_fix_path.string) == 0)
-			continue; // don't repush same directory
-		    if (!mch_isdir(stackp->ffs_filearray[i]))
-			continue;   // not a directory
-		    ff_push(search_ctx,
-			    ff_create_stack_element(
+		    اگر (fnamecmp(stackp->ffs_filearray[i],
+						   stackp->ffs_fix_راستہ.string) == 0)
+			جاری; // don't repush same directory
+		    اگر (!mch_isdir(stackp->ffs_filearray[i]))
+			جاری;   // not a directory
+		    ff_ڈالو(تلاش_ctx,
+			    ff_create_ڈھیر_element(
 				stackp->ffs_filearray[i],
 				STRLEN(stackp->ffs_filearray[i]),
-				stackp->ffs_wc_path.string,
-				stackp->ffs_wc_path.length,
+				stackp->ffs_wc_راستہ.string,
+				stackp->ffs_wc_راستہ.لمبائی,
 				stackp->ffs_level - 1, 1));
 		}
 	    }
 
 	    // we are done with the current directory
-	    ff_free_stack_element(stackp);
+	    ff_free_ڈھیر_element(stackp);
 	}
 
 	// If we reached this, we didn't find anything downwards.
 	// Let's check if we should do an upward search.
-	if (search_ctx->ffsc_start_dir.string
-		&& search_ctx->ffsc_stopdirs_v != NULL && !got_int)
+	اگر (تلاش_ctx->ffsc_آغاز_dir.string
+		&& تلاش_ctx->ffsc_stopdirs_v != تہی && !got_int)
 	{
-	    ff_stack_T  *sptr;
+	    ff_ڈھیر_T  *sptr;
 	    // path_end may point to the NUL or the previous path separator
-	    int plen = (path_end - search_ctx->ffsc_start_dir.string)
-							  + (*path_end != NUL);
+	    صحیح plen = (راستہ_انتہا - تلاش_ctx->ffsc_آغاز_dir.string)
+							  + (*راستہ_انتہا != NUL);
 
 	    // is the last starting directory in the stop list?
-	    if (ff_path_in_stoplist(search_ctx->ffsc_start_dir.string,
-				    plen, search_ctx->ffsc_stopdirs_v) == TRUE)
-		break;
+	    اگر (ff_راستہ_اندر_stoplist(تلاش_ctx->ffsc_آغاز_dir.string,
+				    plen, تلاش_ctx->ffsc_stopdirs_v) == TRUE)
+		توڑو;
 
 	    // cut of last dir
-	    while (path_end > search_ctx->ffsc_start_dir.string
-						  && vim_ispathsep(*path_end))
-		path_end--;
-	    while (path_end > search_ctx->ffsc_start_dir.string
-					      && !vim_ispathsep(path_end[-1]))
-		path_end--;
-	    *path_end = NUL;
+	    جب (راستہ_انتہا > تلاش_ctx->ffsc_آغاز_dir.string
+						  && vim_ispathsep(*راستہ_انتہا))
+		راستہ_انتہا--;
+	    جب (راستہ_انتہا > تلاش_ctx->ffsc_آغاز_dir.string
+					      && !vim_ispathsep(راستہ_انتہا[-1]))
+		راستہ_انتہا--;
+	    *راستہ_انتہا = NUL;
 
 	    // we may have shortened search_ctx->ffsc_start_dir, so update it's length
-	    search_ctx->ffsc_start_dir.length = (size_t)(path_end - search_ctx->ffsc_start_dir.string);
-	    path_end--;
+	    تلاش_ctx->ffsc_آغاز_dir.لمبائی = (size_t)(راستہ_انتہا - تلاش_ctx->ffsc_آغاز_dir.string);
+	    راستہ_انتہا--;
 
-	    if (*search_ctx->ffsc_start_dir.string == NUL)
-		break;
+	    اگر (*تلاش_ctx->ffsc_آغاز_dir.string == NUL)
+		توڑو;
 
-	    if (search_ctx->ffsc_start_dir.length + 1
-		    + search_ctx->ffsc_fix_path.length < MAXPATHL)
+	    اگر (تلاش_ctx->ffsc_آغاز_dir.لمبائی + 1
+		    + تلاش_ctx->ffsc_fix_راستہ.لمبائی < MAXPATHL)
 	    {
-		int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
-		file_path.length = vim_snprintf(
-			(char *)file_path.string,
+		صحیح جوڑو_sep = !after_pathsep(تلاش_ctx->ffsc_آغاز_dir.string,
+			    تلاش_ctx->ffsc_آغاز_dir.string + تلاش_ctx->ffsc_آغاز_dir.لمبائی);
+		file_راستہ.لمبائی = vim_snprintf(
+			(حرف *)file_راستہ.string,
 			MAXPATHL,
 			"%s%s%s",
-			search_ctx->ffsc_start_dir.string,
-			add_sep ? PATHSEPSTR : "",
-			search_ctx->ffsc_fix_path.string);
+			تلاش_ctx->ffsc_آغاز_dir.string,
+			جوڑو_sep ? PATHSEPSTR : "",
+			تلاش_ctx->ffsc_fix_راستہ.string);
 	    }
-	    else
-		goto fail;
+	    ورنہ
+		جاؤ fail;
 
 	    // create a new stack entry
-	    sptr = ff_create_stack_element(file_path.string, file_path.length,
-		    search_ctx->ffsc_wc_path.string, search_ctx->ffsc_wc_path.length,
-		    search_ctx->ffsc_level, 0);
-	    if (sptr == NULL)
-		break;
-	    ff_push(search_ctx, sptr);
+	    sptr = ff_create_ڈھیر_element(file_راستہ.string, file_راستہ.لمبائی,
+		    تلاش_ctx->ffsc_wc_راستہ.string, تلاش_ctx->ffsc_wc_راستہ.لمبائی,
+		    تلاش_ctx->ffsc_level, 0);
+	    اگر (sptr == تہی)
+		توڑو;
+	    ff_ڈالو(تلاش_ctx, sptr);
 	}
-	else
-	    break;
+	ورنہ
+	    توڑو;
     }
 
 fail:
-    vim_free(file_path.string);
-    return NULL;
+    vim_free(file_راستہ.string);
+    واپس تہی;
 }
 
 /*
  * Free the list of lists of visited files and directories
  * Can handle it if the passed search_context is NULL;
  */
-    static void
-vim_findfile_free_visited(void *search_ctx_arg)
+    ساکن خالی
+vim_findfile_free_دیکھا(خالی *تلاش_ctx_arg)
 {
-    ff_search_ctx_T *search_ctx;
+    ff_تلاش_ctx_T *تلاش_ctx;
 
-    if (search_ctx_arg == NULL)
-	return;
+    اگر (تلاش_ctx_arg == تہی)
+	واپس;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
-    vim_findfile_free_visited_list(&search_ctx->ffsc_visited_lists_list);
-    vim_findfile_free_visited_list(&search_ctx->ffsc_dir_visited_lists_list);
+    تلاش_ctx = (ff_تلاش_ctx_T *)تلاش_ctx_arg;
+    vim_findfile_free_دیکھا_list(&تلاش_ctx->ffsc_دیکھا_lists_list);
+    vim_findfile_free_دیکھا_list(&تلاش_ctx->ffsc_dir_دیکھا_lists_list);
 }
 
-    static void
-vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp)
+    ساکن خالی
+vim_findfile_free_دیکھا_list(ff_دیکھا_list_hdr_T **list_headp)
 {
-    ff_visited_list_hdr_T *vp;
+    ff_دیکھا_list_hdr_T *vp;
 
-    while (*list_headp != NULL)
+    جب (*list_headp != تہی)
     {
-	vp = (*list_headp)->ffvl_next;
-	ff_free_visited_list((*list_headp)->ffvl_visited_list);
+	vp = (*list_headp)->ffvl_اگلا;
+	ff_free_دیکھا_list((*list_headp)->ffvl_دیکھا_list);
 
 	vim_free((*list_headp)->ffvl_filename);
 	vim_free(*list_headp);
 	*list_headp = vp;
     }
-    *list_headp = NULL;
+    *list_headp = تہی;
 }
 
-    static void
-ff_free_visited_list(ff_visited_T *vl)
+    ساکن خالی
+ff_free_دیکھا_list(ff_دیکھا_T *vl)
 {
-    ff_visited_T *vp;
+    ff_دیکھا_T *vp;
 
-    while (vl != NULL)
+    جب (vl != تہی)
     {
-	vp = vl->ffv_next;
-	vim_free(vl->ffv_wc_path);
+	vp = vl->ffv_اگلا;
+	vim_free(vl->ffv_wc_راستہ);
 	vim_free(vl);
 	vl = vp;
     }
-    vl = NULL;
+    vl = تہی;
 }
 
 /*
  * Returns the already visited list for the given filename. If none is found it
  * allocates a new one.
  */
-    static ff_visited_list_hdr_T*
-ff_get_visited_list(
+    ساکن ff_دیکھا_list_hdr_T*
+ff_get_دیکھا_list(
     char_u			*filename,
     size_t			filenamelen,
-    ff_visited_list_hdr_T	**list_headp)
+    ff_دیکھا_list_hdr_T	**list_headp)
 {
-    ff_visited_list_hdr_T  *retptr = NULL;
+    ff_دیکھا_list_hdr_T  *retptr = تہی;
 
     // check if a visited list for the given filename exists
-    if (*list_headp != NULL)
+    اگر (*list_headp != تہی)
     {
 	retptr = *list_headp;
-	while (retptr != NULL)
+	جب (retptr != تہی)
 	{
-	    if (fnamecmp(filename, retptr->ffvl_filename) == 0)
+	    اگر (fnamecmp(filename, retptr->ffvl_filename) == 0)
 	    {
-#ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+#اگر_تعریف_شدہ FF_VERBOSE
+		اگر (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("ff_get_visited_list: FOUND list for %s",
 								    filename);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    پیغام_puts("\n");
 		    verbose_leave_scroll();
 		}
-#endif
-		return retptr;
+#اگر_ختم
+		واپس retptr;
 	    }
-	    retptr = retptr->ffvl_next;
+	    retptr = retptr->ffvl_اگلا;
 	}
     }
 
-#ifdef FF_VERBOSE
-    if (p_verbose >= 5)
+#اگر_تعریف_شدہ FF_VERBOSE
+    اگر (p_verbose >= 5)
     {
 	verbose_enter_scroll();
 	smsg("ff_get_visited_list: new list for %s", filename);
 	// don't overwrite this either
-	msg_puts("\n");
+	پیغام_puts("\n");
 	verbose_leave_scroll();
     }
-#endif
+#اگر_ختم
 
     /*
      * if we reach this we didn't find a list and we have to allocate new list
      */
-    retptr = ALLOC_ONE(ff_visited_list_hdr_T);
-    if (retptr == NULL)
-	return NULL;
+    retptr = ALLOC_ONE(ff_دیکھا_list_hdr_T);
+    اگر (retptr == تہی)
+	واپس تہی;
 
-    retptr->ffvl_visited_list = NULL;
+    retptr->ffvl_دیکھا_list = تہی;
     retptr->ffvl_filename = vim_strnsave(filename, filenamelen);
-    if (retptr->ffvl_filename == NULL)
+    اگر (retptr->ffvl_filename == تہی)
     {
 	vim_free(retptr);
-	return NULL;
+	واپس تہی;
     }
-    retptr->ffvl_next = *list_headp;
+    retptr->ffvl_اگلا = *list_headp;
     *list_headp = retptr;
 
-    return retptr;
+    واپس retptr;
 }
 
 /*
@@ -1404,36 +1404,36 @@ ff_get_visited_list(
  *  - the only differences are in the counters behind a '**', so
  *    '**\20' is equal to '**\24'
  */
-    static int
+    ساکن صحیح
 ff_wc_equal(char_u *s1, char_u *s2)
 {
-    int		i, j;
-    int		c1 = NUL;
-    int		c2 = NUL;
-    int		prev1 = NUL;
-    int		prev2 = NUL;
+    صحیح		i, j;
+    صحیح		c1 = NUL;
+    صحیح		c2 = NUL;
+    صحیح		prev1 = NUL;
+    صحیح		prev2 = NUL;
 
-    if (s1 == s2)
-	return TRUE;
+    اگر (s1 == s2)
+	واپس TRUE;
 
-    if (s1 == NULL || s2 == NULL)
-	return FALSE;
+    اگر (s1 == تہی || s2 == تہی)
+	واپس FALSE;
 
-    for (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
+    برائے (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
     {
 	c1 = PTR2CHAR(s1 + i);
 	c2 = PTR2CHAR(s2 + j);
 
-	if ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
+	اگر ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
 		&& (prev1 != '*' || prev2 != '*'))
-	    return FALSE;
+	    واپس FALSE;
 	prev2 = prev1;
 	prev1 = c1;
 
 	i += mb_ptr2len(s1 + i);
 	j += mb_ptr2len(s2 + j);
     }
-    return s1[i] == s2[j];
+    واپس s1[i] == s2[j];
 }
 
 /*
@@ -1445,60 +1445,60 @@ ff_wc_equal(char_u *s1, char_u *s2)
  *	 -> return TRUE - Better the file is found several times instead of
  *	    never.
  */
-    static int
-ff_check_visited(
-    ff_visited_T	**visited_list,
+    ساکن صحیح
+ff_check_دیکھا(
+    ff_دیکھا_T	**دیکھا_list,
     char_u		*fname,
     size_t		fnamelen,
-    char_u		*wc_path,
+    char_u		*wc_راستہ,
     size_t		wc_pathlen)
 {
-    ff_visited_T	*vp;
-#ifdef UNIX
+    ff_دیکھا_T	*vp;
+#اگر_تعریف_شدہ UNIX
     stat_T		st;
-    int			url = FALSE;
-#endif
+    صحیح			url = FALSE;
+#اگر_ختم
 
     // For a URL we only compare the name, otherwise we compare the
     // device/inode (unix) or the full path name (not Unix).
-    if (path_with_url(fname))
+    اگر (راستہ_with_url(fname))
     {
-	vim_strncpy(ff_expand_buffer.string, fname, fnamelen);
-	ff_expand_buffer.length = fnamelen;
-#ifdef UNIX
+	vim_strncpy(ff_expand_بفر.string, fname, fnamelen);
+	ff_expand_بفر.لمبائی = fnamelen;
+#اگر_تعریف_شدہ UNIX
 	url = TRUE;
-#endif
+#اگر_ختم
     }
-    else
+    ورنہ
     {
-	ff_expand_buffer.string[0] = NUL;
-	ff_expand_buffer.length = 0;
-#ifdef UNIX
-	if (mch_stat((char *)fname, &st) < 0)
-	    return FAIL;
-#else
-	if (vim_FullName(fname, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
-	    return FAIL;
-	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
-#endif
+	ff_expand_بفر.string[0] = NUL;
+	ff_expand_بفر.لمبائی = 0;
+#اگر_تعریف_شدہ UNIX
+	اگر (mch_stat((حرف *)fname, &st) < 0)
+	    واپس FAIL;
+#ورنہ
+	اگر (vim_بھرا_Name(fname, ff_expand_بفر.string, MAXPATHL, TRUE) == FAIL)
+	    واپس FAIL;
+	ff_expand_بفر.لمبائی = STRLEN(ff_expand_بفر.string);
+#اگر_ختم
     }
 
     // check against list of already visited files
-    for (vp = *visited_list; vp != NULL; vp = vp->ffv_next)
+    برائے (vp = *دیکھا_list; vp != تہی; vp = vp->ffv_اگلا)
     {
-	if (
-#ifdef UNIX
+	اگر (
+#اگر_تعریف_شدہ UNIX
 		!url ? (vp->ffv_dev_valid && vp->ffv_dev == st.st_dev
 						  && vp->ffv_ino == st.st_ino)
 		     :
-#endif
-		fnamecmp(vp->ffv_fname, ff_expand_buffer.string) == 0
+#اگر_ختم
+		fnamecmp(vp->ffv_fname, ff_expand_بفر.string) == 0
 	   )
 	{
 	    // are the wildcard parts equal
-	    if (ff_wc_equal(vp->ffv_wc_path, wc_path) == TRUE)
+	    اگر (ff_wc_equal(vp->ffv_wc_راستہ, wc_راستہ) == TRUE)
 		// already visited
-		return FAIL;
+		واپس FAIL;
 	}
     }
 
@@ -1506,195 +1506,195 @@ ff_check_visited(
      * New file/dir.  Add it to the list of visited files/dirs.
      */
     vp = alloc(
-	     offsetof(ff_visited_T, ffv_fname) + ff_expand_buffer.length + 1);
-    if (vp == NULL)
-	return OK;
+	     offsetof(ff_دیکھا_T, ffv_fname) + ff_expand_بفر.لمبائی + 1);
+    اگر (vp == تہی)
+	واپس OK;
 
-#ifdef UNIX
-    if (!url)
+#اگر_تعریف_شدہ UNIX
+    اگر (!url)
     {
 	vp->ffv_dev_valid = TRUE;
 	vp->ffv_dev = st.st_dev;
 	vp->ffv_ino = st.st_ino;
 	vp->ffv_fname[0] = NUL;
     }
-    else
+    ورنہ
     {
 	vp->ffv_dev_valid = FALSE;
-#endif
-	STRCPY(vp->ffv_fname, ff_expand_buffer.string);
-#ifdef UNIX
+#اگر_ختم
+	STRCPY(vp->ffv_fname, ff_expand_بفر.string);
+#اگر_تعریف_شدہ UNIX
     }
-#endif
-    if (wc_path != NULL)
-	vp->ffv_wc_path = vim_strnsave(wc_path, wc_pathlen);
-    else
-	vp->ffv_wc_path = NULL;
+#اگر_ختم
+    اگر (wc_راستہ != تہی)
+	vp->ffv_wc_راستہ = vim_strnsave(wc_راستہ, wc_pathlen);
+    ورنہ
+	vp->ffv_wc_راستہ = تہی;
 
-    vp->ffv_next = *visited_list;
-    *visited_list = vp;
+    vp->ffv_اگلا = *دیکھا_list;
+    *دیکھا_list = vp;
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * create stack element from given path pieces
  */
-    static ff_stack_T *
-ff_create_stack_element(
+    ساکن ff_ڈھیر_T *
+ff_create_ڈھیر_element(
     char_u	*fix_part,
     size_t	fix_partlen,
     char_u	*wc_part,
     size_t	wc_partlen,
-    int		level,
-    int		star_star_empty)
+    صحیح		level,
+    صحیح		ستارہ_ستارہ_خالی_خانے)
 {
-    ff_stack_T	*new;
+    ff_ڈھیر_T	*new;
 
-    new = ALLOC_ONE(ff_stack_T);
-    if (new == NULL)
-	return NULL;
+    new = ALLOC_ONE(ff_ڈھیر_T);
+    اگر (new == تہی)
+	واپس تہی;
 
-    new->ffs_prev	   = NULL;
-    new->ffs_filearray	   = NULL;
-    new->ffs_filearray_size = 0;
+    new->ffs_پچھلا	   = تہی;
+    new->ffs_filearray	   = تہی;
+    new->ffs_filearray_سائز = 0;
     new->ffs_filearray_cur  = 0;
     new->ffs_stage	   = 0;
     new->ffs_level	   = level;
-    new->ffs_star_star_empty = star_star_empty;
+    new->ffs_ستارہ_ستارہ_خالی_خانے = ستارہ_ستارہ_خالی_خانے;
 
     // the following saves NULL pointer checks in vim_findfile
-    if (fix_part == NULL)
+    اگر (fix_part == تہی)
     {
 	fix_part = (char_u *)"";
 	fix_partlen = 0;
     }
-    new->ffs_fix_path.string = vim_strnsave(fix_part, fix_partlen);
-    new->ffs_fix_path.length = fix_partlen;
+    new->ffs_fix_راستہ.string = vim_strnsave(fix_part, fix_partlen);
+    new->ffs_fix_راستہ.لمبائی = fix_partlen;
 
-    if (wc_part == NULL)
+    اگر (wc_part == تہی)
     {
 	wc_part = (char_u *)"";
 	wc_partlen = 0;
     }
-    new->ffs_wc_path.string = vim_strnsave(wc_part, wc_partlen);
-    new->ffs_wc_path.length = wc_partlen;
+    new->ffs_wc_راستہ.string = vim_strnsave(wc_part, wc_partlen);
+    new->ffs_wc_راستہ.لمبائی = wc_partlen;
 
-    if (new->ffs_fix_path.string == NULL || new->ffs_wc_path.string == NULL)
+    اگر (new->ffs_fix_راستہ.string == تہی || new->ffs_wc_راستہ.string == تہی)
     {
-	ff_free_stack_element(new);
-	new = NULL;
+	ff_free_ڈھیر_element(new);
+	new = تہی;
     }
 
-    return new;
+    واپس new;
 }
 
 /*
  * Push a dir on the directory stack.
  */
-    static void
-ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr)
+    ساکن خالی
+ff_ڈالو(ff_تلاش_ctx_T *تلاش_ctx, ff_ڈھیر_T *ڈھیر_ptr)
 {
     // check for NULL pointer, not to return an error to the user, but
     // to prevent a crash
-    if (stack_ptr == NULL)
-	return;
+    اگر (ڈھیر_ptr == تہی)
+	واپس;
 
-    stack_ptr->ffs_prev = search_ctx->ffsc_stack_ptr;
-    search_ctx->ffsc_stack_ptr = stack_ptr;
+    ڈھیر_ptr->ffs_پچھلا = تلاش_ctx->ffsc_ڈھیر_ptr;
+    تلاش_ctx->ffsc_ڈھیر_ptr = ڈھیر_ptr;
 }
 
 /*
  * Pop a dir from the directory stack.
  * Returns NULL if stack is empty.
  */
-    static ff_stack_T *
-ff_pop(ff_search_ctx_T *search_ctx)
+    ساکن ff_ڈھیر_T *
+ff_نکالو(ff_تلاش_ctx_T *تلاش_ctx)
 {
-    ff_stack_T  *sptr;
+    ff_ڈھیر_T  *sptr;
 
-    sptr = search_ctx->ffsc_stack_ptr;
-    if (search_ctx->ffsc_stack_ptr != NULL)
-	search_ctx->ffsc_stack_ptr = search_ctx->ffsc_stack_ptr->ffs_prev;
+    sptr = تلاش_ctx->ffsc_ڈھیر_ptr;
+    اگر (تلاش_ctx->ffsc_ڈھیر_ptr != تہی)
+	تلاش_ctx->ffsc_ڈھیر_ptr = تلاش_ctx->ffsc_ڈھیر_ptr->ffs_پچھلا;
 
-    return sptr;
+    واپس sptr;
 }
 
 /*
  * free the given stack element
  */
-    static void
-ff_free_stack_element(ff_stack_T *stack_ptr)
+    ساکن خالی
+ff_free_ڈھیر_element(ff_ڈھیر_T *ڈھیر_ptr)
 {
     // VIM_CLEAR_STRING handles possible NULL pointers
-    VIM_CLEAR_STRING(stack_ptr->ffs_fix_path);
-    VIM_CLEAR_STRING(stack_ptr->ffs_wc_path);
+    VIM_CLEAR_STRING(ڈھیر_ptr->ffs_fix_راستہ);
+    VIM_CLEAR_STRING(ڈھیر_ptr->ffs_wc_راستہ);
 
-    if (stack_ptr->ffs_filearray != NULL)
-	FreeWild(stack_ptr->ffs_filearray_size, stack_ptr->ffs_filearray);
+    اگر (ڈھیر_ptr->ffs_filearray != تہی)
+	FreeWild(ڈھیر_ptr->ffs_filearray_سائز, ڈھیر_ptr->ffs_filearray);
 
-    vim_free(stack_ptr);
+    vim_free(ڈھیر_ptr);
 }
 
 /*
  * Clear the search context, but NOT the visited list.
  */
-    static void
-ff_clear(ff_search_ctx_T *search_ctx)
+    ساکن خالی
+ff_clear(ff_تلاش_ctx_T *تلاش_ctx)
 {
-    ff_stack_T   *sptr;
+    ff_ڈھیر_T   *sptr;
 
     // clear up stack
-    while ((sptr = ff_pop(search_ctx)) != NULL)
-	ff_free_stack_element(sptr);
+    جب ((sptr = ff_نکالو(تلاش_ctx)) != تہی)
+	ff_free_ڈھیر_element(sptr);
 
-    if (search_ctx->ffsc_stopdirs_v != NULL)
+    اگر (تلاش_ctx->ffsc_stopdirs_v != تہی)
     {
-	int  i = 0;
+	صحیح  i = 0;
 
-	while (search_ctx->ffsc_stopdirs_v[i].string != NULL)
+	جب (تلاش_ctx->ffsc_stopdirs_v[i].string != تہی)
 	{
-	    vim_free(search_ctx->ffsc_stopdirs_v[i].string);
+	    vim_free(تلاش_ctx->ffsc_stopdirs_v[i].string);
 	    i++;
 	}
-	VIM_CLEAR(search_ctx->ffsc_stopdirs_v);
+	VIM_CLEAR(تلاش_ctx->ffsc_stopdirs_v);
     }
 
     // reset everything
-    VIM_CLEAR_STRING(search_ctx->ffsc_file_to_search);
-    VIM_CLEAR_STRING(search_ctx->ffsc_start_dir);
-    VIM_CLEAR_STRING(search_ctx->ffsc_fix_path);
-    VIM_CLEAR_STRING(search_ctx->ffsc_wc_path);
-    search_ctx->ffsc_level = 0;
+    VIM_CLEAR_STRING(تلاش_ctx->ffsc_file_مقصد_تلاش);
+    VIM_CLEAR_STRING(تلاش_ctx->ffsc_آغاز_dir);
+    VIM_CLEAR_STRING(تلاش_ctx->ffsc_fix_راستہ);
+    VIM_CLEAR_STRING(تلاش_ctx->ffsc_wc_راستہ);
+    تلاش_ctx->ffsc_level = 0;
 }
 
 /*
  * check if the given path is in the stopdirs
  * returns TRUE if yes else FALSE
  */
-    static int
-ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
+    ساکن صحیح
+ff_راستہ_اندر_stoplist(char_u *راستہ, صحیح راستہ_len, string_T *stopdirs_v)
 {
-    int		i = 0;
+    صحیح		i = 0;
 
     // eat up trailing path separators, except the first
-    while (path_len > 1 && vim_ispathsep(path[path_len - 1]))
-	path_len--;
+    جب (راستہ_len > 1 && vim_ispathsep(راستہ[راستہ_len - 1]))
+	راستہ_len--;
 
     // if no path consider it as match
-    if (path_len == 0)
-	return TRUE;
+    اگر (راستہ_len == 0)
+	واپس TRUE;
 
-    for (i = 0; stopdirs_v[i].string != NULL; i++)
+    برائے (i = 0; stopdirs_v[i].string != تہی; i++)
 	// match for parent directory. So '/home' also matches
 	// '/home/rks'. Check for PATHSEP in stopdirs_v[i], else
 	// '/home/r' would also match '/home/rks'
-	if (fnamencmp(stopdirs_v[i].string, path, path_len) == 0
-		&& ((int)stopdirs_v[i].length <= path_len
-		    || vim_ispathsep(stopdirs_v[i].string[path_len])))
-	    return TRUE;
+	اگر (fnamencmp(stopdirs_v[i].string, راستہ, راستہ_len) == 0
+		&& ((صحیح)stopdirs_v[i].لمبائی <= راستہ_len
+		    || vim_ispathsep(stopdirs_v[i].string[راستہ_len])))
+	    واپس TRUE;
 
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
@@ -1723,28 +1723,28 @@ ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
  *
  */
     char_u *
-find_file_in_path(
+ڈھونڈو_file_اندر_راستہ(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
+    صحیح		len,		// length of file name
+    صحیح		options,
+    صحیح		پہلا,		// use count'th matching file name
     char_u	*rel_fname,	// file name searching relative to
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char_u	**file_مقصد_ڈھونڈو,	// in/out: modified copy of file name
+    حرف	**تلاش_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, first,
-	    *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path,
+    واپس ڈھونڈو_file_اندر_راستہ_option(ptr, len, options, پہلا,
+	    *curbuf->b_p_راستہ == NUL ? p_راستہ : curbuf->b_p_راستہ,
 	    FINDFILE_BOTH, rel_fname, curbuf->b_p_sua,
-	    file_to_find, search_ctx);
+	    file_مقصد_ڈھونڈو, تلاش_ctx);
 }
 
-#if defined(EXITFREE)
-    void
-free_findfile(void)
+#اگر defined(EXITFREE)
+    خالی
+free_findfile(خالی)
 {
-    VIM_CLEAR_STRING(ff_expand_buffer);
+    VIM_CLEAR_STRING(ff_expand_بفر);
 }
-#endif
+#اگر_ختم
 
 /*
  * Find the directory name "ptr[len]" in the path.
@@ -1758,99 +1758,99 @@ free_findfile(void)
  * Returns an allocated string for the file name.  NULL for error.
  */
     char_u *
-find_directory_in_path(
+ڈھونڈو_directory_اندر_راستہ(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
+    صحیح		len,		// length of file name
+    صحیح		options,
     char_u	*rel_fname,	// file name searching relative to
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char_u	**file_مقصد_ڈھونڈو,	// in/out: modified copy of file name
+    حرف	**تلاش_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, TRUE, p_cdpath,
+    واپس ڈھونڈو_file_اندر_راستہ_option(ptr, len, options, TRUE, p_cdpath,
 				       FINDFILE_DIR, rel_fname, (char_u *)"",
-				       file_to_find, search_ctx);
+				       file_مقصد_ڈھونڈو, تلاش_ctx);
 }
 
     char_u *
-find_file_in_path_option(
+ڈھونڈو_file_اندر_راستہ_option(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
-    char_u	*path_option,	// p_path or p_cdpath
-    int		find_what,	// FINDFILE_FILE, _DIR or _BOTH
+    صحیح		len,		// length of file name
+    صحیح		options,
+    صحیح		پہلا,		// use count'th matching file name
+    char_u	*راستہ_option,	// p_path or p_cdpath
+    صحیح		ڈھونڈو_what,	// FINDFILE_FILE, _DIR or _BOTH
     char_u	*rel_fname,	// file name we are looking relative to.
     char_u	*suffixes,	// list of suffixes, 'suffixesadd' option
-    char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx_arg) // in/out: state of the search
+    char_u	**file_مقصد_ڈھونڈو,	// in/out: modified copy of file name
+    حرف	**تلاش_ctx_arg) // in/out: state of the search
 {
-    ff_search_ctx_T	**search_ctx = (ff_search_ctx_T **)search_ctx_arg;
-    static char_u	*dir;
-    static int		did_findfile_init = FALSE;
-    char_u		*file_name = NULL;
-    int			rel_to_curdir;
-#ifdef AMIGA
-    struct Process	*proc = (struct Process *)FindTask(0L);
-    APTR		save_winptr = proc->pr_WindowPtr;
+    ff_تلاش_ctx_T	**تلاش_ctx = (ff_تلاش_ctx_T **)تلاش_ctx_arg;
+    ساکن char_u	*dir;
+    ساکن صحیح		did_findfile_init = FALSE;
+    char_u		*file_name = تہی;
+    صحیح			rel_مقصد_curdir;
+#اگر_تعریف_شدہ AMIGA
+    ساخت Process	*proc = (ساخت Process *)ڈھونڈو_Task(0L);
+    APTR		save_winptr = proc->pr_کھڑکی_Ptr;
 
     // Avoid a requester here for a volume that doesn't exist.
-    proc->pr_WindowPtr = (APTR)-1L;
-#endif
-    static size_t	file_to_findlen = 0;
+    proc->pr_کھڑکی_Ptr = (APTR)-1L;
+#اگر_ختم
+    ساکن size_t	file_مقصد_findlen = 0;
 
-    if (first == TRUE)
+    اگر (پہلا == TRUE)
     {
 	char_u	save_char;
 
-	if (len == 0)
-	    return NULL;
+	اگر (len == 0)
+	    واپس تہی;
 
 	// copy file name into NameBuff, expanding environment variables
 	save_char = ptr[len];
 	ptr[len] = NUL;
-	file_to_findlen = expand_env_esc(ptr, NameBuff, MAXPATHL, NULL, TRUE, NULL);
+	file_مقصد_findlen = expand_env_esc(ptr, NameBuff, MAXPATHL, تہی, TRUE, تہی);
 	ptr[len] = save_char;
 
-	vim_free(*file_to_find);
-	*file_to_find = vim_strnsave(NameBuff, file_to_findlen);
-	if (*file_to_find == NULL)	// out of memory
+	vim_free(*file_مقصد_ڈھونڈو);
+	*file_مقصد_ڈھونڈو = vim_strnsave(NameBuff, file_مقصد_findlen);
+	اگر (*file_مقصد_ڈھونڈو == تہی)	// out of memory
 	{
-	    file_name = NULL;
-	    file_to_findlen = 0;
-	    goto theend;
+	    file_name = تہی;
+	    file_مقصد_findlen = 0;
+	    جاؤ theend;
 	}
-	if (options & FNAME_UNESC)
+	اگر (options & FNAME_UNESC)
 	{
 	    // Change all "\ " to " ".
-	    for (ptr = *file_to_find; *ptr != NUL; ++ptr)
-		if (ptr[0] == '\\' && ptr[1] == ' ')
+	    برائے (ptr = *file_مقصد_ڈھونڈو; *ptr != NUL; ++ptr)
+		اگر (ptr[0] == '\\' && ptr[1] == ' ')
 		{
 		    mch_memmove(ptr, ptr + 1,
-			(size_t)((*file_to_find + file_to_findlen) - (ptr + 1)) + 1);
-		    --file_to_findlen;
+			(size_t)((*file_مقصد_ڈھونڈو + file_مقصد_findlen) - (ptr + 1)) + 1);
+		    --file_مقصد_findlen;
 		}
 	}
     }
 
-    rel_to_curdir = ((*file_to_find)[0] == '.'
-		    && ((*file_to_find)[1] == NUL
-			|| vim_ispathsep((*file_to_find)[1])
-			|| ((*file_to_find)[1] == '.'
-			    && ((*file_to_find)[2] == NUL
-				|| vim_ispathsep((*file_to_find)[2])))));
-    if (vim_isAbsName(*file_to_find)
+    rel_مقصد_curdir = ((*file_مقصد_ڈھونڈو)[0] == '.'
+		    && ((*file_مقصد_ڈھونڈو)[1] == NUL
+			|| vim_ispathsep((*file_مقصد_ڈھونڈو)[1])
+			|| ((*file_مقصد_ڈھونڈو)[1] == '.'
+			    && ((*file_مقصد_ڈھونڈو)[2] == NUL
+				|| vim_ispathsep((*file_مقصد_ڈھونڈو)[2])))));
+    اگر (vim_isAbsName(*file_مقصد_ڈھونڈو)
 	    // "..", "../path", "." and "./path": don't use the path_option
-	    || rel_to_curdir
-#if defined(MSWIN)
+	    || rel_مقصد_curdir
+#اگر defined(MSWIN)
 	    // handle "\tmp" as absolute path
-	    || vim_ispathsep((*file_to_find)[0])
+	    || vim_ispathsep((*file_مقصد_ڈھونڈو)[0])
 	    // handle "c:name" as absolute path
-	    || ((*file_to_find)[0] != NUL && (*file_to_find)[1] == ':')
-#endif
-#ifdef AMIGA
+	    || ((*file_مقصد_ڈھونڈو)[0] != NUL && (*file_مقصد_ڈھونڈو)[1] == ':')
+#اگر_ختم
+#اگر_تعریف_شدہ AMIGA
 	    // handle ":tmp" as absolute path
-	    || (*file_to_find)[0] == ':'
-#endif
+	    || (*file_مقصد_ڈھونڈو)[0] == ':'
+#اگر_ختم
        )
     {
 	/*
@@ -1858,109 +1858,109 @@ find_file_in_path_option(
 	 * If this is not a first call, return NULL.  We already returned a
 	 * filename on the first call.
 	 */
-	if (first == TRUE)
+	اگر (پہلا == TRUE)
 	{
-	    int		l;
-	    int		run;
+	    صحیح		l;
+	    صحیح		تسلسل;
 	    size_t	rel_fnamelen = 0;
 	    char_u	*suffix;
 
-	    if (path_with_url(*file_to_find))
+	    اگر (راستہ_with_url(*file_مقصد_ڈھونڈو))
 	    {
-		file_name = vim_strnsave(*file_to_find, file_to_findlen);
-		goto theend;
+		file_name = vim_strnsave(*file_مقصد_ڈھونڈو, file_مقصد_findlen);
+		جاؤ theend;
 	    }
 
-	    if (rel_fname != NULL)
+	    اگر (rel_fname != تہی)
 		rel_fnamelen = STRLEN(rel_fname);
 
 	    // When FNAME_REL flag given first use the directory of the file.
 	    // Otherwise or when this fails use the current directory.
-	    for (run = 1; run <= 2; ++run)
+	    برائے (تسلسل = 1; تسلسل <= 2; ++تسلسل)
 	    {
-		l = (int)file_to_findlen;
-		if (run == 1
-			&& rel_to_curdir
+		l = (صحیح)file_مقصد_findlen;
+		اگر (تسلسل == 1
+			&& rel_مقصد_curdir
 			&& (options & FNAME_REL)
-			&& rel_fname != NULL
+			&& rel_fname != تہی
 			&& rel_fnamelen + l < MAXPATHL)
 		{
 		    l = vim_snprintf(
-			(char *)NameBuff,
+			(حرف *)NameBuff,
 			MAXPATHL,
 			"%.*s%s",
-			(int)(gettail(rel_fname) - rel_fname),
+			(صحیح)(gettail(rel_fname) - rel_fname),
 			rel_fname,
-			*file_to_find);
+			*file_مقصد_ڈھونڈو);
 		}
-		else
+		ورنہ
 		{
-		    STRCPY(NameBuff, *file_to_find);
-		    run = 2;
+		    STRCPY(NameBuff, *file_مقصد_ڈھونڈو);
+		    تسلسل = 2;
 		}
 
 		// When the file doesn't exist, try adding parts of
 		// 'suffixesadd'.
 		suffix = suffixes;
-		for (;;)
+		برائے (;;)
 		{
-		    if (mch_getperm(NameBuff) >= 0
-			     && (find_what == FINDFILE_BOTH
-				 || ((find_what == FINDFILE_DIR)
+		    اگر (mch_getperm(NameBuff) >= 0
+			     && (ڈھونڈو_what == FINDFILE_BOTH
+				 || ((ڈھونڈو_what == FINDFILE_DIR)
 						    == mch_isdir(NameBuff))))
 		    {
 			file_name = vim_strnsave(NameBuff,
 						  simplify_filename(NameBuff));
-			goto theend;
+			جاؤ theend;
 		    }
-		    if (*suffix == NUL)
-			break;
+		    اگر (*suffix == NUL)
+			توڑو;
 		    copy_option_part(&suffix, NameBuff + l, MAXPATHL - l, ",");
 		}
 	    }
 	}
     }
-    else
+    ورنہ
     {
 	/*
 	 * Loop over all paths in the 'path' or 'cdpath' option.
 	 * When "first" is set, first setup to the start of the option.
 	 * Otherwise continue to find the next match.
 	 */
-	if (first == TRUE)
+	اگر (پہلا == TRUE)
 	{
 	    // vim_findfile_free_visited can handle a possible NULL pointer
-	    vim_findfile_free_visited(*search_ctx);
-	    dir = path_option;
+	    vim_findfile_free_دیکھا(*تلاش_ctx);
+	    dir = راستہ_option;
 	    did_findfile_init = FALSE;
 	}
 
-	for (;;)
+	برائے (;;)
 	{
-	    if (did_findfile_init)
+	    اگر (did_findfile_init)
 	    {
-		file_name = vim_findfile(*search_ctx);
-		if (file_name != NULL)
-		    break;
+		file_name = vim_findfile(*تلاش_ctx);
+		اگر (file_name != تہی)
+		    توڑو;
 
 		did_findfile_init = FALSE;
 	    }
-	    else
+	    ورنہ
 	    {
 		char_u	*buf;
 		char_u  *r_ptr;
 
-		if (dir == NULL || *dir == NUL)
+		اگر (dir == تہی || *dir == NUL)
 		{
 		    // We searched all paths of the option, now we can
 		    // free the search context.
-		    vim_findfile_cleanup(*search_ctx);
-		    *search_ctx = NULL;
-		    break;
+		    vim_findfile_cleanup(*تلاش_ctx);
+		    *تلاش_ctx = تہی;
+		    توڑو;
 		}
 
-		if ((buf = alloc(MAXPATHL)) == NULL)
-		    break;
+		اگر ((buf = alloc(MAXPATHL)) == تہی)
+		    توڑو;
 
 		// copy next path
 		buf[0] = NUL;
@@ -1968,39 +1968,39 @@ find_file_in_path_option(
 
 		// get the stopdir string
 		r_ptr = vim_findfile_stopdir(buf);
-		*search_ctx = vim_findfile_init(buf, *file_to_find, file_to_findlen,
-					    r_ptr, 100, FALSE, find_what,
-					   *search_ctx, FALSE, rel_fname);
-		if (*search_ctx != NULL)
+		*تلاش_ctx = vim_findfile_init(buf, *file_مقصد_ڈھونڈو, file_مقصد_findlen,
+					    r_ptr, 100, FALSE, ڈھونڈو_what,
+					   *تلاش_ctx, FALSE, rel_fname);
+		اگر (*تلاش_ctx != تہی)
 		    did_findfile_init = TRUE;
 		vim_free(buf);
 	    }
 	}
     }
-    if (file_name == NULL && (options & FNAME_MESS))
+    اگر (file_name == تہی && (options & FNAME_MESS))
     {
-	if (first == TRUE)
+	اگر (پہلا == TRUE)
 	{
-	    if (find_what == FINDFILE_DIR)
-		semsg(_(e_cant_find_directory_str_in_cdpath), *file_to_find);
-	    else
-		semsg(_(e_cant_find_file_str_in_path), *file_to_find);
+	    اگر (ڈھونڈو_what == FINDFILE_DIR)
+		semsg(_(e_cant_ڈھونڈو_directory_str_اندر_cdpath), *file_مقصد_ڈھونڈو);
+	    ورنہ
+		semsg(_(e_cant_ڈھونڈو_file_str_اندر_راستہ), *file_مقصد_ڈھونڈو);
 	}
-	else
+	ورنہ
 	{
-	    if (find_what == FINDFILE_DIR)
-		semsg(_(e_no_more_directory_str_found_in_cdpath),
-								*file_to_find);
-	    else
-		semsg(_(e_no_more_file_str_found_in_path), *file_to_find);
+	    اگر (ڈھونڈو_what == FINDFILE_DIR)
+		semsg(_(e_no_مزید_directory_str_ملا_اندر_cdpath),
+								*file_مقصد_ڈھونڈو);
+	    ورنہ
+		semsg(_(e_no_مزید_file_str_ملا_اندر_راستہ), *file_مقصد_ڈھونڈو);
 	}
     }
 
 theend:
-#ifdef AMIGA
-    proc->pr_WindowPtr = save_winptr;
-#endif
-    return file_name;
+#اگر_تعریف_شدہ AMIGA
+    proc->pr_کھڑکی_Ptr = save_winptr;
+#اگر_ختم
+    واپس file_name;
 }
 
 /*
@@ -2009,28 +2009,28 @@ theend:
  * Returns the name in allocated memory, NULL for failure.
  */
     char_u *
-grab_file_name(long count, linenr_T *file_lnum)
+grab_file_name(طویل گنتی, linenr_T *file_lnum)
 {
-    int options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
+    صحیح options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
 
-    if (VIsual_active)
+    اگر (VIsual_فعال)
     {
-	int	len;
+	صحیح	len;
 	char_u	*ptr;
 
-	if (get_visual_text(NULL, &ptr, &len) == FAIL)
-	    return NULL;
+	اگر (get_visual_متن(تہی, &ptr, &len) == FAIL)
+	    واپس تہی;
 	// Only recognize ":123" here
-	if (file_lnum != NULL && ptr[len] == ':' && SAFE_isdigit(ptr[len + 1]))
+	اگر (file_lnum != تہی && ptr[len] == ':' && محفوظ_isdigit(ptr[len + 1]))
 	{
 	    char_u *p = ptr + len + 1;
 
 	    *file_lnum = getdigits(&p);
 	}
-	return find_file_name_in_path(ptr, len, options,
-						     count, curbuf->b_ffname);
+	واپس ڈھونڈو_file_name_اندر_راستہ(ptr, len, options,
+						     گنتی, curbuf->b_ffname);
     }
-    return file_name_at_cursor(options | FNAME_HYP, count, file_lnum);
+    واپس file_name_at_cursor(options | FNAME_HYP, گنتی, file_lnum);
 }
 
 /*
@@ -2047,10 +2047,10 @@ grab_file_name(long count, linenr_T *file_lnum)
  * FNAME_INCL	    apply "includeexpr"
  */
     char_u *
-file_name_at_cursor(int options, long count, linenr_T *file_lnum)
+file_name_at_cursor(صحیح options, طویل گنتی, linenr_T *file_lnum)
 {
-    return file_name_in_line(ml_get_curline(),
-		      curwin->w_cursor.col, options, count, curbuf->b_ffname,
+    واپس file_name_اندر_سطر(ml_get_curline(),
+		      curwin->w_cursor.ستون, options, گنتی, curbuf->b_ffname,
 		      file_lnum);
 }
 
@@ -2059,45 +2059,45 @@ file_name_at_cursor(int options, long count, linenr_T *file_lnum)
  * Otherwise like file_name_at_cursor().
  */
     char_u *
-file_name_in_line(
-    char_u	*line,
-    int		col,
-    int		options,
-    long	count,
+file_name_اندر_سطر(
+    char_u	*سطر,
+    صحیح		ستون,
+    صحیح		options,
+    طویل	گنتی,
     char_u	*rel_fname,	// file we are searching relative to
     linenr_T	*file_lnum)	// line number after the file name
 {
     char_u	*ptr;
-    int		len;
-    int		in_type = TRUE;
-    int		is_url = FALSE;
+    صحیح		len;
+    صحیح		اندر_type = TRUE;
+    صحیح		is_url = FALSE;
 
     /*
      * search forward for what could be the start of a file name
      */
-    ptr = line + col;
-    while (*ptr != NUL && !vim_isfilec(*ptr))
+    ptr = سطر + ستون;
+    جب (*ptr != NUL && !vim_isfilec(*ptr))
 	MB_PTR_ADV(ptr);
-    if (*ptr == NUL)		// nothing found
+    اگر (*ptr == NUL)		// nothing found
     {
-	if (options & FNAME_MESS)
+	اگر (options & FNAME_MESS)
 	    emsg(_(e_no_file_name_under_cursor));
-	return NULL;
+	واپس تہی;
     }
 
     /*
      * Search backward for first char of the file name.
      * Go one char back to ":" before "//" even when ':' is not in 'isfname'.
      */
-    while (ptr > line)
+    جب (ptr > سطر)
     {
-	if (has_mbyte && (len = (*mb_head_off)(line, ptr - 1)) > 0)
+	اگر (has_mbyte && (len = (*mb_سر_off)(سطر, ptr - 1)) > 0)
 	    ptr -= len + 1;
-	else if (vim_isfilec(ptr[-1])
-		|| ((options & FNAME_HYP) && path_is_url(ptr - 1)))
+	ورنہ اگر (vim_isfilec(ptr[-1])
+		|| ((options & FNAME_HYP) && راستہ_is_url(ptr - 1)))
 	    --ptr;
-	else
-	    break;
+	ورنہ
+	    توڑو;
     }
 
     /*
@@ -2105,27 +2105,27 @@ file_name_in_line(
      * Also allow "://" when ':' is not in 'isfname'.
      */
     len = 0;
-    while (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
-		 || ((options & FNAME_HYP) && path_is_url(ptr + len))
-		 || (is_url && vim_strchr((char_u *)":?&=", ptr[len]) != NULL))
+    جب (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
+		 || ((options & FNAME_HYP) && راستہ_is_url(ptr + len))
+		 || (is_url && vim_strchr((char_u *)":?&=", ptr[len]) != تہی))
     {
 	// After type:// we also include :, ?, & and = as valid characters, so
 	// that http://google.com:8080?q=this&that=ok works.
-	if ((ptr[len] >= 'A' && ptr[len] <= 'Z')
+	اگر ((ptr[len] >= 'A' && ptr[len] <= 'Z')
 				       || (ptr[len] >= 'a' && ptr[len] <= 'z'))
 	{
-	    if (in_type && path_is_url(ptr + len + 1))
+	    اگر (اندر_type && راستہ_is_url(ptr + len + 1))
 		is_url = TRUE;
 	}
-	else
-	    in_type = FALSE;
+	ورنہ
+	    اندر_type = FALSE;
 
-	if (ptr[len] == '\\')
+	اگر (ptr[len] == '\\')
 	    // Skip over the "\" in "\ ".
 	    ++len;
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    len += (*mb_ptr2len)(ptr + len);
-	else
+	ورنہ
 	    ++len;
     }
 
@@ -2133,153 +2133,153 @@ file_name_in_line(
      * If there is trailing punctuation, remove it.
      * But don't remove "..", could be a directory name.
      */
-    if (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != NULL
+    اگر (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != تہی
 						       && ptr[len - 2] != '.')
 	--len;
 
-    if (file_lnum != NULL)
+    اگر (file_lnum != تہی)
     {
 	char_u	*p;
-	char	*match_text = " line ";		// english
-	size_t	match_textlen = 6;
+	حرف	*مطابقت_متن = " line ";		// english
+	size_t	مطابقت_textlen = 6;
 
 	// Get the number after the file name and a separator character.
 	// Also accept " line 999" with and without the same translation as
 	// used in last_set_msg().
 	p = ptr + len;
-	if (STRNCMP(p, match_text, match_textlen) == 0)
-	    p += match_textlen;
-	else
+	اگر (STRNCMP(p, مطابقت_متن, مطابقت_textlen) == 0)
+	    p += مطابقت_textlen;
+	ورنہ
 	{
 	    // no match with english, try localized
-	    match_text = _(line_msg);
-	    match_textlen = STRLEN(match_text);
+	    مطابقت_متن = _(سطر_پیغام);
+	    مطابقت_textlen = STRLEN(مطابقت_متن);
 
-	    if (STRNCMP(p, match_text, match_textlen) == 0)
-		p += match_textlen;
-	    else
+	    اگر (STRNCMP(p, مطابقت_متن, مطابقت_textlen) == 0)
+		p += مطابقت_textlen;
+	    ورنہ
 		p = skipwhite(p);
 	}
-	if (*p != NUL)
+	اگر (*p != NUL)
 	{
-	    if (!SAFE_isdigit(*p))
+	    اگر (!محفوظ_isdigit(*p))
 		++p;		    // skip the separator
 	    p = skipwhite(p);
-	    if (SAFE_isdigit(*p))
-		*file_lnum = (int)getdigits(&p);
+	    اگر (محفوظ_isdigit(*p))
+		*file_lnum = (صحیح)getdigits(&p);
 	}
     }
 
-    return find_file_name_in_path(ptr, len, options, count, rel_fname);
+    واپس ڈھونڈو_file_name_اندر_راستہ(ptr, len, options, گنتی, rel_fname);
 }
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    static char_u *
-eval_includeexpr(char_u *ptr, int len)
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
+    ساکن char_u *
+eval_includeexpr(char_u *ptr, صحیح len)
 {
     char_u	*res;
     sctx_T	save_sctx = current_sctx;
 
-    set_vim_var_string(VV_FNAME, ptr, len);
+    سیٹ_vim_var_string(VV_FNAME, ptr, len);
     current_sctx = curbuf->b_p_script_ctx[BV_INEX];
 
-    res = eval_to_string_safe(curbuf->b_p_inex,
-	    was_set_insecurely(curwin, (char_u *)"includeexpr", OPT_LOCAL),
+    res = eval_مقصد_string_محفوظ(curbuf->b_p_inex,
+	    was_سیٹ_insecurely(curwin, (char_u *)"includeexpr", OPT_LOCAL),
 								   TRUE, TRUE);
 
-    set_vim_var_string(VV_FNAME, NULL, 0);
+    سیٹ_vim_var_string(VV_FNAME, تہی, 0);
     current_sctx = save_sctx;
-    return res;
+    واپس res;
 }
-#endif
+#اگر_ختم
 
 /*
  * Return the name of the file ptr[len] in 'path'.
  * Otherwise like file_name_at_cursor().
  */
     char_u *
-find_file_name_in_path(
+ڈھونڈو_file_name_اندر_راستہ(
     char_u	*ptr,
-    int		len,
-    int		options,
-    long	count,
+    صحیح		len,
+    صحیح		options,
+    طویل	گنتی,
     char_u	*rel_fname)	// file we are searching relative to
 {
     char_u	*file_name;
-    int		c;
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    char_u	*tofree = NULL;
-#endif
+    صحیح		c;
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
+    char_u	*tofree = تہی;
+#اگر_ختم
 
-    if (len == 0)
-	return NULL;
+    اگر (len == 0)
+	واپس تہی;
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    if ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
+    اگر ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
     {
 	tofree = eval_includeexpr(ptr, len);
-	if (tofree != NULL)
+	اگر (tofree != تہی)
 	{
 	    ptr = tofree;
-	    len = (int)STRLEN(ptr);
+	    len = (صحیح)STRLEN(ptr);
 	}
     }
-#endif
+#اگر_ختم
 
-    if (options & FNAME_EXP)
+    اگر (options & FNAME_EXP)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_مقصد_ڈھونڈو = تہی;
+	حرف	*تلاش_ctx = تہی;
 
-	file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+	file_name = ڈھونڈو_file_اندر_راستہ(ptr, len, options & ~FNAME_MESS,
+				  TRUE, rel_fname, &file_مقصد_ڈھونڈو, &تلاش_ctx);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
 	/*
 	 * If the file could not be found in a normal way, try applying
 	 * 'includeexpr' (unless done already).
 	 */
-	if (file_name == NULL
+	اگر (file_name == تہی
 		&& !(options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
 	{
 	    tofree = eval_includeexpr(ptr, len);
-	    if (tofree != NULL)
+	    اگر (tofree != تہی)
 	    {
 		ptr = tofree;
-		len = (int)STRLEN(ptr);
-		file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+		len = (صحیح)STRLEN(ptr);
+		file_name = ڈھونڈو_file_اندر_راستہ(ptr, len, options & ~FNAME_MESS,
+				  TRUE, rel_fname, &file_مقصد_ڈھونڈو, &تلاش_ctx);
 	    }
 	}
-#endif
-	if (file_name == NULL && (options & FNAME_MESS))
+#اگر_ختم
+	اگر (file_name == تہی && (options & FNAME_MESS))
 	{
 	    c = ptr[len];
 	    ptr[len] = NUL;
-	    semsg(_(e_cant_find_file_str_in_path_2), ptr);
+	    semsg(_(e_cant_ڈھونڈو_file_str_اندر_راستہ_2), ptr);
 	    ptr[len] = c;
 	}
 
 	// Repeat finding the file "count" times.  This matters when it
 	// appears several times in the path.
-	while (file_name != NULL && --count > 0)
+	جب (file_name != تہی && --گنتی > 0)
 	{
 	    vim_free(file_name);
-	    file_name = find_file_in_path(ptr, len, options, FALSE, rel_fname,
-						   &file_to_find, &search_ctx);
+	    file_name = ڈھونڈو_file_اندر_راستہ(ptr, len, options, FALSE, rel_fname,
+						   &file_مقصد_ڈھونڈو, &تلاش_ctx);
 	}
 
-	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_free(file_مقصد_ڈھونڈو);
+	vim_findfile_cleanup(تلاش_ctx);
     }
-    else
+    ورنہ
 	file_name = vim_strnsave(ptr, len);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
     vim_free(tofree);
-#endif
+#اگر_ختم
 
-    return file_name;
+    واپس file_name;
 }
 
 /*
@@ -2288,99 +2288,99 @@ find_file_name_in_path(
  * "/path/file", "/path/dir/", "/path//dir", "/file"
  *	 ^	       ^	     ^	      ^
  */
-    static char_u *
+    ساکن char_u *
 gettail_dir(char_u *fname)
 {
-    char_u	*dir_end = fname;
-    char_u	*next_dir_end = fname;
-    int		look_for_sep = TRUE;
+    char_u	*dir_انتہا = fname;
+    char_u	*اگلا_dir_انتہا = fname;
+    صحیح		look_for_sep = TRUE;
     char_u	*p;
 
-    for (p = fname; *p != NUL; )
+    برائے (p = fname; *p != NUL; )
     {
-	if (vim_ispathsep(*p))
+	اگر (vim_ispathsep(*p))
 	{
-	    if (look_for_sep)
+	    اگر (look_for_sep)
 	    {
-		next_dir_end = p;
+		اگلا_dir_انتہا = p;
 		look_for_sep = FALSE;
 	    }
 	}
-	else
+	ورنہ
 	{
-	    if (!look_for_sep)
-		dir_end = next_dir_end;
+	    اگر (!look_for_sep)
+		dir_انتہا = اگلا_dir_انتہا;
 	    look_for_sep = TRUE;
 	}
 	MB_PTR_ADV(p);
     }
-    return dir_end;
+    واپس dir_انتہا;
 }
 
 /*
  * return TRUE if 'c' is a path list separator.
  */
-    int
-vim_ispathlistsep(int c)
+    صحیح
+vim_ispathlistsep(صحیح c)
 {
-#ifdef UNIX
-    return (c == ':');
-#else
-    return (c == ';');	// might not be right for every system...
-#endif
+#اگر_تعریف_شدہ UNIX
+    واپس (c == ':');
+#ورنہ
+    واپس (c == ';');	// might not be right for every system...
+#اگر_ختم
 }
 
 /*
  * Moves "*psep" back to the previous path separator in "path".
  * Returns FAIL is "*psep" ends up at the beginning of "path".
  */
-    static int
-find_previous_pathsep(char_u *path, char_u **psep)
+    ساکن صحیح
+ڈھونڈو_پچھلا_pathsep(char_u *راستہ, char_u **psep)
 {
     // skip the current separator
-    if (*psep > path && vim_ispathsep(**psep))
+    اگر (*psep > راستہ && vim_ispathsep(**psep))
 	--*psep;
 
     // find the previous separator
-    while (*psep > path)
+    جب (*psep > راستہ)
     {
-	if (vim_ispathsep(**psep))
-	    return OK;
-	MB_PTR_BACK(path, *psep);
+	اگر (vim_ispathsep(**psep))
+	    واپس OK;
+	MB_PTR_عقب(راستہ, *psep);
     }
 
-    return FAIL;
+    واپس FAIL;
 }
 
 /*
  * Returns TRUE if "maybe_unique" is unique wrt other_paths in "gap".
  * "maybe_unique" is the end portion of "((char_u **)gap->ga_data)[i]".
  */
-    static int
-is_unique(char_u *maybe_unique, garray_T *gap, int i)
+    ساکن صحیح
+is_unique(char_u *maybe_unique, garray_T *gap, صحیح i)
 {
-    int	    j;
-    int	    candidate_len = (int)STRLEN(maybe_unique);
-    int	    other_path_len;
-    char_u  **other_paths = (char_u **)gap->ga_data;
+    صحیح	    j;
+    صحیح	    candidate_len = (صحیح)STRLEN(maybe_unique);
+    صحیح	    other_راستہ_len;
+    char_u  **other_paths = (char_u **)gap->ga_ڈیٹا;
     char_u  *rival;
 
-    for (j = 0; j < gap->ga_len; j++)
+    برائے (j = 0; j < gap->ga_len; j++)
     {
-	if (j == i)
-	    continue;  // don't compare it with itself
+	اگر (j == i)
+	    جاری;  // don't compare it with itself
 
-	other_path_len = (int)STRLEN(other_paths[j]);
-	if (other_path_len < candidate_len)
-	    continue;  // it's different when it's shorter
+	other_راستہ_len = (صحیح)STRLEN(other_paths[j]);
+	اگر (other_راستہ_len < candidate_len)
+	    جاری;  // it's different when it's shorter
 
-	rival = other_paths[j] + other_path_len - candidate_len;
-	if (fnamecmp(maybe_unique, rival) == 0
+	rival = other_paths[j] + other_راستہ_len - candidate_len;
+	اگر (fnamecmp(maybe_unique, rival) == 0
 		&& (rival == other_paths[j] || vim_ispathsep(*(rival - 1))))
-	    return FALSE;  // match
+	    واپس FALSE;  //مطابقت
     }
 
-    return TRUE;  // no match found
+    واپس TRUE;  // no match found
 }
 
 /*
@@ -2392,10 +2392,10 @@ is_unique(char_u *maybe_unique, garray_T *gap, int i)
  * TODO: handle upward search (;) and path limiter (**N) notations by
  * expanding each into their equivalent path(s).
  */
-    static void
-expand_path_option(
+    ساکن خالی
+expand_راستہ_option(
 	char_u		*curdir,
-	char_u		*path_option,	// p_path or p_cdpath
+	char_u		*راستہ_option,	// p_path or p_cdpath
 	garray_T	*gap)
 {
     char_u	*buf;
@@ -2403,55 +2403,55 @@ expand_path_option(
     char_u	*p;
     size_t	curdirlen = 0;
 
-    if ((buf = alloc(MAXPATHL)) == NULL)
-	return;
+    اگر ((buf = alloc(MAXPATHL)) == تہی)
+	واپس;
 
-    while (*path_option != NUL)
+    جب (*راستہ_option != NUL)
     {
-	buflen = copy_option_part(&path_option, buf, MAXPATHL, " ,");
+	buflen = copy_option_part(&راستہ_option, buf, MAXPATHL, " ,");
 
 	// do not expand backticks, could have been set via a modeline
-	if (vim_strchr(buf, '`') != NULL)
-	    continue;
+	اگر (vim_strchr(buf, '`') != تہی)
+	    جاری;
 
-	if (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
+	اگر (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
 	{
 	    size_t  plen;
 
 	    // Relative to current buffer:
 	    // "/path/file" + "." -> "/path/"
 	    // "/path/file"  + "./subdir" -> "/path/subdir"
-	    if (curbuf->b_ffname == NULL)
-		continue;
+	    اگر (curbuf->b_ffname == تہی)
+		جاری;
 	    p = gettail(curbuf->b_ffname);
 	    plen = (size_t)(p - curbuf->b_ffname);
-	    if (plen + buflen >= MAXPATHL)
-		continue;
-	    if (buf[1] == NUL)
+	    اگر (plen + buflen >= MAXPATHL)
+		جاری;
+	    اگر (buf[1] == NUL)
 		buf[plen] = NUL;
-	    else
+	    ورنہ
 		mch_memmove(buf + plen, buf + 2, (buflen - 2) + 1); // +1 for NUL
 	    mch_memmove(buf, curbuf->b_ffname, plen);
 	    buflen = simplify_filename(buf);
 	}
-	else if (buf[0] == NUL)
+	ورنہ اگر (buf[0] == NUL)
 	{
 	    // relative to current directory
 	    STRCPY(buf, curdir);
-	    if (curdirlen == 0)
+	    اگر (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
 	    buflen = curdirlen;
 	}
-	else if (path_with_url(buf))
+	ورنہ اگر (راستہ_with_url(buf))
 	    // URL can't be used here
-	    continue;
-	else if (!mch_isFullName(buf))
+	    جاری;
+	ورنہ اگر (!mch_is_بھرا_Name(buf))
 	{
 	    // Expand relative path to their full path equivalent
-	    if (curdirlen == 0)
+	    اگر (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
-	    if (curdirlen + buflen + 3 > MAXPATHL)
-		continue;
+	    اگر (curdirlen + buflen + 3 > MAXPATHL)
+		جاری;
 
 	    mch_memmove(buf + curdirlen + 1, buf, buflen + 1);	    // +1 for NUL
 	    STRCPY(buf, curdir);
@@ -2459,20 +2459,20 @@ expand_path_option(
 	    buflen = simplify_filename(buf);
 	}
 
-	if (ga_grow(gap, 1) == FAIL)
-	    break;
+	اگر (ga_grow(gap, 1) == FAIL)
+	    توڑو;
 
-#if defined(MSWIN)
+#اگر defined(MSWIN)
 	// Avoid the path ending in a backslash, it fails when a comma is
 	// appended.
-	if (buf[buflen - 1] == '\\')
+	اگر (buf[buflen - 1] == '\\')
 	    buf[buflen - 1] = '/';
-#endif
+#اگر_ختم
 
 	p = vim_strnsave(buf, buflen);
-	if (p == NULL)
-	    break;
-	((char_u **)gap->ga_data)[gap->ga_len++] = p;
+	اگر (p == تہی)
+	    توڑو;
+	((char_u **)gap->ga_ڈیٹا)[gap->ga_len++] = p;
     }
 
     vim_free(buf);
@@ -2486,25 +2486,25 @@ expand_path_option(
  *   fname: /foo/bar/baz/quux.txt
  * returns:		 ^this
  */
-    static char_u *
-get_path_cutoff(char_u *fname, garray_T *gap)
+    ساکن char_u *
+get_راستہ_cutoff(char_u *fname, garray_T *gap)
 {
-    int	    i;
-    int	    maxlen = 0;
-    char_u  **path_part = (char_u **)gap->ga_data;
-    char_u  *cutoff = NULL;
+    صحیح	    i;
+    صحیح	    maxlen = 0;
+    char_u  **راستہ_part = (char_u **)gap->ga_ڈیٹا;
+    char_u  *cutoff = تہی;
 
-    for (i = 0; i < gap->ga_len; i++)
+    برائے (i = 0; i < gap->ga_len; i++)
     {
-	int j = 0;
+	صحیح j = 0;
 
-	while ((fname[j] == path_part[i][j]
-#if defined(MSWIN)
-		|| (vim_ispathsep(fname[j]) && vim_ispathsep(path_part[i][j]))
-#endif
-			     ) && fname[j] != NUL && path_part[i][j] != NUL)
+	جب ((fname[j] == راستہ_part[i][j]
+#اگر defined(MSWIN)
+		|| (vim_ispathsep(fname[j]) && vim_ispathsep(راستہ_part[i][j]))
+#اگر_ختم
+			     ) && fname[j] != NUL && راستہ_part[i][j] != NUL)
 	    j++;
-	if (j > maxlen)
+	اگر (j > maxlen)
 	{
 	    maxlen = j;
 	    cutoff = &fname[j];
@@ -2512,11 +2512,11 @@ get_path_cutoff(char_u *fname, garray_T *gap)
     }
 
     // skip to the file or directory name
-    if (cutoff != NULL)
-	while (vim_ispathsep(*cutoff))
+    اگر (cutoff != تہی)
+	جب (vim_ispathsep(*cutoff))
 	    MB_PTR_ADV(cutoff);
 
-    return cutoff;
+    واپس cutoff;
 }
 
 /*
@@ -2524,107 +2524,107 @@ get_path_cutoff(char_u *fname, garray_T *gap)
  * that they are unique with respect to each other while conserving the part
  * that matches the pattern. Beware, this is at least O(n^2) wrt "gap->ga_len".
  */
-    void
+    خالی
 uniquefy_paths(
 	garray_T *gap,
-	char_u *pattern,
-	char_u *path_option)	// p_path or p_cdpath
+	char_u *نمونہ,
+	char_u *راستہ_option)	// p_path or p_cdpath
 {
-    int		i;
-    int		len;
-    char_u	**fnames = (char_u **)gap->ga_data;
-    int		sort_again = FALSE;
+    صحیح		i;
+    صحیح		len;
+    char_u	**fnames = (char_u **)gap->ga_ڈیٹا;
+    صحیح		ترتیب_دو_again = FALSE;
     char_u	*pat;
-    char_u      *file_pattern;
+    char_u      *file_نمونہ;
     char_u	*curdir;
     regmatch_T	regmatch;
-    garray_T	path_ga;
-    char_u	**in_curdir = NULL;
+    garray_T	راستہ_ga;
+    char_u	**اندر_curdir = تہی;
     char_u	*short_name;
 
     remove_duplicates(gap);
-    ga_init2(&path_ga, sizeof(char_u *), 1);
+    ga_init2(&راستہ_ga, حجم(char_u *), 1);
 
     /*
      * We need to prepend a '*' at the beginning of file_pattern so that the
      * regex matches anywhere in the path. FIXME: is this valid for all
      * possible patterns?
      */
-    len = (int)STRLEN(pattern);
-    file_pattern = alloc(len + 2);
-    if (file_pattern == NULL)
-	return;
-    file_pattern[0] = '*';
-    STRCPY(file_pattern + 1, pattern);
-    pat = file_pat_to_reg_pat(file_pattern, NULL, NULL, FALSE);
-    vim_free(file_pattern);
-    if (pat == NULL)
-	return;
+    len = (صحیح)STRLEN(نمونہ);
+    file_نمونہ = alloc(len + 2);
+    اگر (file_نمونہ == تہی)
+	واپس;
+    file_نمونہ[0] = '*';
+    STRCPY(file_نمونہ + 1, نمونہ);
+    pat = file_pat_مقصد_reg_pat(file_نمونہ, تہی, تہی, FALSE);
+    vim_free(file_نمونہ);
+    اگر (pat == تہی)
+	واپس;
 
     regmatch.rm_ic = TRUE;		// always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
     vim_free(pat);
-    if (regmatch.regprog == NULL)
-	return;
+    اگر (regmatch.regprog == تہی)
+	واپس;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
-	goto theend;
+    اگر ((curdir = alloc(MAXPATHL)) == تہی)
+	جاؤ theend;
     mch_dirname(curdir, MAXPATHL);
-    expand_path_option(curdir, path_option, &path_ga);
+    expand_راستہ_option(curdir, راستہ_option, &راستہ_ga);
 
-    in_curdir = ALLOC_CLEAR_MULT(char_u *, gap->ga_len);
-    if (in_curdir == NULL)
-	goto theend;
+    اندر_curdir = ALLOC_CLEAR_MULT(char_u *, gap->ga_len);
+    اگر (اندر_curdir == تہی)
+	جاؤ theend;
 
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    برائے (i = 0; i < gap->ga_len && !got_int; i++)
     {
-	char_u	    *path = fnames[i];
-	int	    is_in_curdir;
-	char_u	    *dir_end = gettail_dir(path);
-	char_u	    *path_cutoff;
+	char_u	    *راستہ = fnames[i];
+	صحیح	    is_اندر_curdir;
+	char_u	    *dir_انتہا = gettail_dir(راستہ);
+	char_u	    *راستہ_cutoff;
 
-	len = (int)STRLEN(path);
-	is_in_curdir = fnamencmp(curdir, path, dir_end - path) == 0
-					     && curdir[dir_end - path] == NUL;
-	if (is_in_curdir)
-	    in_curdir[i] = vim_strnsave(path, len);
+	len = (صحیح)STRLEN(راستہ);
+	is_اندر_curdir = fnamencmp(curdir, راستہ, dir_انتہا - راستہ) == 0
+					     && curdir[dir_انتہا - راستہ] == NUL;
+	اگر (is_اندر_curdir)
+	    اندر_curdir[i] = vim_strnsave(راستہ, len);
 
 	// Shorten the filename while maintaining its uniqueness
-	path_cutoff = get_path_cutoff(path, &path_ga);
+	راستہ_cutoff = get_راستہ_cutoff(راستہ, &راستہ_ga);
 
 	// Don't assume all files can be reached without path when search
 	// pattern starts with star star slash, so only remove path_cutoff
 	// when possible.
-	if (pattern[0] == '*' && pattern[1] == '*'
-		&& vim_ispathsep_nocolon(pattern[2])
-		&& path_cutoff != NULL
-		&& vim_regexec(&regmatch, path_cutoff, (colnr_T)0)
-		&& is_unique(path_cutoff, gap, i))
+	اگر (نمونہ[0] == '*' && نمونہ[1] == '*'
+		&& vim_ispathsep_nocolon(نمونہ[2])
+		&& راستہ_cutoff != تہی
+		&& vim_regexec(&regmatch, راستہ_cutoff, (colnr_T)0)
+		&& is_unique(راستہ_cutoff, gap, i))
 	{
-	    sort_again = TRUE;
-	    mch_memmove(path, path_cutoff, STRLEN(path_cutoff) + 1);
+	    ترتیب_دو_again = TRUE;
+	    mch_memmove(راستہ, راستہ_cutoff, STRLEN(راستہ_cutoff) + 1);
 	}
-	else
+	ورنہ
 	{
 	    // Here all files can be reached without path, so get shortest
 	    // unique path.  We start at the end of the path.
-	    char_u  *pathsep_p = path + len - 1;
+	    char_u  *pathsep_p = راستہ + len - 1;
 
-	    while (find_previous_pathsep(path, &pathsep_p))
+	    جب (ڈھونڈو_پچھلا_pathsep(راستہ, &pathsep_p))
 	    {
-		if (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
+		اگر (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
 			&& is_unique(pathsep_p + 1, gap, i)
-			&& path_cutoff != NULL && pathsep_p + 1 >= path_cutoff)
+			&& راستہ_cutoff != تہی && pathsep_p + 1 >= راستہ_cutoff)
 		{
-		    sort_again = TRUE;
-		    mch_memmove(path, pathsep_p + 1,
-			    (size_t)((path + len) - (pathsep_p + 1)) + 1);  // +1 for NUL
-		    break;
+		    ترتیب_دو_again = TRUE;
+		    mch_memmove(راستہ, pathsep_p + 1,
+			    (size_t)((راستہ + len) - (pathsep_p + 1)) + 1);  // +1 for NUL
+		    توڑو;
 		}
 	    }
 	}
 
-	if (mch_isFullName(path))
+	اگر (mch_is_بھرا_Name(راستہ))
 	{
 	    /*
 	     * Last resort: shorten relative to curdir if possible.
@@ -2638,69 +2638,69 @@ uniquefy_paths(
 	     *	    /file.txt		  /		/file.txt
 	     *	    c:\file.txt		  c:\		.\file.txt
 	     */
-	    short_name = shorten_fname(path, curdir);
-	    if (short_name != NULL && short_name > path + 1
-#if defined(MSWIN)
+	    short_name = shorten_fname(راستہ, curdir);
+	    اگر (short_name != تہی && short_name > راستہ + 1
+#اگر defined(MSWIN)
 		    // On windows,
 		    //	    shorten_fname("c:\a\a.txt", "c:\a\b")
 		    // returns "\a\a.txt", which is not really the short
 		    // name, hence:
 		    && !vim_ispathsep(*short_name)
-#endif
+#اگر_ختم
 		)
 	    {
-		vim_snprintf((char *)path, MAXPATHL, ".%s%s", PATHSEPSTR, short_name);
+		vim_snprintf((حرف *)راستہ, MAXPATHL, ".%s%s", PATHSEPSTR, short_name);
 	    }
 	}
 	ui_breakcheck();
     }
 
     // Shorten filenames in /in/current/directory/{filename}
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    برائے (i = 0; i < gap->ga_len && !got_int; i++)
     {
 	size_t	rel_pathsize;
-	char_u	*rel_path;
-	char_u	*path = in_curdir[i];
+	char_u	*rel_راستہ;
+	char_u	*راستہ = اندر_curdir[i];
 
-	if (path == NULL)
-	    continue;
+	اگر (راستہ == تہی)
+	    جاری;
 
 	// If the {filename} is not unique, change it to ./{filename}.
 	// Else reduce it to {filename}
-	short_name = shorten_fname(path, curdir);
-	if (short_name == NULL)
-	    short_name = path;
-	if (is_unique(short_name, gap, i))
+	short_name = shorten_fname(راستہ, curdir);
+	اگر (short_name == تہی)
+	    short_name = راستہ;
+	اگر (is_unique(short_name, gap, i))
 	{
 	    STRCPY(fnames[i], short_name);
-	    continue;
+	    جاری;
 	}
 
-	rel_pathsize = 1 + sizeof(PATHSEP) + STRLEN(short_name) + 1;
-	rel_path = alloc(rel_pathsize);
-	if (rel_path == NULL)
-	    goto theend;
+	rel_pathsize = 1 + حجم(PATHSEP) + STRLEN(short_name) + 1;
+	rel_راستہ = alloc(rel_pathsize);
+	اگر (rel_راستہ == تہی)
+	    جاؤ theend;
 
-	vim_snprintf((char *)rel_path, rel_pathsize, ".%s%s", PATHSEPSTR, short_name);
+	vim_snprintf((حرف *)rel_راستہ, rel_pathsize, ".%s%s", PATHSEPSTR, short_name);
 
 	vim_free(fnames[i]);
-	fnames[i] = rel_path;
-	sort_again = TRUE;
+	fnames[i] = rel_راستہ;
+	ترتیب_دو_again = TRUE;
 	ui_breakcheck();
     }
 
 theend:
     vim_free(curdir);
-    if (in_curdir != NULL)
+    اگر (اندر_curdir != تہی)
     {
-	for (i = 0; i < gap->ga_len; i++)
-	    vim_free(in_curdir[i]);
-	vim_free(in_curdir);
+	برائے (i = 0; i < gap->ga_len; i++)
+	    vim_free(اندر_curdir[i]);
+	vim_free(اندر_curdir);
     }
-    ga_clear_strings(&path_ga);
+    ga_clear_لڑیاں(&راستہ_ga);
     vim_regfree(regmatch.regprog);
 
-    if (sort_again)
+    اگر (ترتیب_دو_again)
 	remove_duplicates(gap);
 }
 
@@ -2709,44 +2709,44 @@ theend:
  * result in "gap".
  * Returns the total number of matches.
  */
-    int
-expand_in_path(
+    صحیح
+expand_اندر_راستہ(
     garray_T	*gap,
-    char_u	*pattern,
-    int		flags)		// EW_* flags
+    char_u	*نمونہ,
+    صحیح		flags)		// EW_* flags
 {
     char_u	*curdir;
-    garray_T	path_ga;
-    char_u	*paths = NULL;
-    int		glob_flags = 0;
-    char_u	*path_option = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
+    garray_T	راستہ_ga;
+    char_u	*paths = تہی;
+    صحیح		glob_flags = 0;
+    char_u	*راستہ_option = *curbuf->b_p_راستہ == NUL ? p_راستہ : curbuf->b_p_راستہ;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
-	return 0;
+    اگر ((curdir = alloc(MAXPATHL)) == تہی)
+	واپس 0;
     mch_dirname(curdir, MAXPATHL);
 
-    ga_init2(&path_ga, sizeof(char_u *), 1);
-    if (flags & EW_CDPATH)
-	expand_path_option(curdir, p_cdpath, &path_ga);
-    else
-	expand_path_option(curdir, path_option, &path_ga);
+    ga_init2(&راستہ_ga, حجم(char_u *), 1);
+    اگر (flags & EW_CDPATH)
+	expand_راستہ_option(curdir, p_cdpath, &راستہ_ga);
+    ورنہ
+	expand_راستہ_option(curdir, راستہ_option, &راستہ_ga);
     vim_free(curdir);
-    if (path_ga.ga_len == 0)
-	return 0;
+    اگر (راستہ_ga.ga_len == 0)
+	واپس 0;
 
-    paths = ga_concat_strings(&path_ga, ",");
-    ga_clear_strings(&path_ga);
-    if (paths == NULL)
-	return 0;
+    paths = ga_concat_لڑیاں(&راستہ_ga, ",");
+    ga_clear_لڑیاں(&راستہ_ga);
+    اگر (paths == تہی)
+	واپس 0;
 
-    if (flags & EW_ICASE)
+    اگر (flags & EW_ICASE)
 	glob_flags |= WILD_ICASE;
-    if (flags & EW_ADDSLASH)
-	glob_flags |= WILD_ADD_SLASH;
-    globpath(paths, pattern, gap, glob_flags, !!(flags & EW_CDPATH));
+    اگر (flags & EW_ADDSLASH)
+	glob_flags |= WILD_جوڑو_SLASH;
+    globpath(paths, نمونہ, gap, glob_flags, !!(flags & EW_CDPATH));
     vim_free(paths);
 
-    return gap->ga_len;
+    واپس gap->ga_len;
 }
 
 
@@ -2759,101 +2759,101 @@ expand_in_path(
     size_t
 simplify_filename(char_u *filename)
 {
-#ifndef AMIGA	    // Amiga doesn't have "..", it uses "/"
-    int		components = 0;
-    char_u	*p, *tail, *start;
-    char_u	*p_end;			    // point to NUL at end of string "p"
-    int		stripping_disabled = FALSE;
-    int		relative = TRUE;
+#اگر_غیر_تعریف_شدہ AMIGA	    // Amiga doesn't have "..", it uses "/"
+    صحیح		components = 0;
+    char_u	*p, *دم, *آغاز;
+    char_u	*p_انتہا;			    // point to NUL at end of string "p"
+    صحیح		stripping_disabled = FALSE;
+    صحیح		relative = TRUE;
 
     p = filename;
-# ifdef BACKSLASH_IN_FILENAME
-    if (p[0] != NUL && p[1] == ':')	    // skip "x:"
+# ifdef BACKSLASH_اندر_FILENAME
+    اگر (p[0] != NUL && p[1] == ':')	    // skip "x:"
 	p += 2;
 # endif
 
-    if (vim_ispathsep(*p))
+    اگر (vim_ispathsep(*p))
     {
 	relative = FALSE;
-	do
+	کرو
 	    ++p;
-	while (vim_ispathsep(*p));
+	جب (vim_ispathsep(*p));
     }
-    start = p;	    // remember start after "c:/" or "/" or "///"
-    p_end = p + STRLEN(p);
+    آغاز = p;	    // remember start after "c:/" or "/" or "///"
+    p_انتہا = p + STRLEN(p);
 # ifdef UNIX
     // Posix says that "//path" is unchanged but "///path" is "/path".
-    if (start > filename + 2)
+    اگر (آغاز > filename + 2)
     {
-	mch_memmove(filename + 1, p, (size_t)(p_end - p) + 1);	    // +1 for NUL
-	p_end -= (size_t)(p - (filename + 1));
-	start = p = filename + 1;
+	mch_memmove(filename + 1, p, (size_t)(p_انتہا - p) + 1);	    // +1 for NUL
+	p_انتہا -= (size_t)(p - (filename + 1));
+	آغاز = p = filename + 1;
     }
 # endif
 
-    do
+    کرو
     {
 	// At this point "p" is pointing to the char following a single "/"
 	// or "p" is at the "start" of the (absolute or relative) path name.
 # ifdef VMS
 	// VMS allows device:[path] - don't strip the [ in directory
-	if ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
+	اگر ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
 	{
 	    // :[ or :< composition: vms directory component
 	    ++components;
 	    p = getnextcomp(p + 1);
 	}
 	// allow remote calls as host"user passwd"::device:[path]
-	else if (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
+	ورنہ اگر (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
 	{
 	    // ":: composition: vms host/passwd component
 	    ++components;
 	    p = getnextcomp(p + 2);
 	}
-	else
+	ورنہ
 # endif
-	if (vim_ispathsep(*p))
+	اگر (vim_ispathsep(*p))
 	{
-	    mch_memmove(p, p + 1, (size_t)(p_end - (p + 1)) + 1); // remove duplicate "/"
-	    --p_end;
+	    mch_memmove(p, p + 1, (size_t)(p_انتہا - (p + 1)) + 1); // remove duplicate "/"
+	    --p_انتہا;
 	}
-	else if (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
+	ورنہ اگر (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
 	{
-	    if (p == start && relative)
+	    اگر (p == آغاز && relative)
 		p += 1 + (p[1] != NUL);	// keep single "." or leading "./"
-	    else
+	    ورنہ
 	    {
 		// Strip "./" or ".///".  If we are at the end of the file name
 		// and there is no trailing path separator, either strip "/." if
 		// we are after "start", or strip "." if we are at the beginning
 		// of an absolute path name .
-		tail = p + 1;
-		if (p[1] != NUL)
-		    while (vim_ispathsep(*tail))
-			MB_PTR_ADV(tail);
-		else if (p > start)
+		دم = p + 1;
+		اگر (p[1] != NUL)
+		    جب (vim_ispathsep(*دم))
+			MB_PTR_ADV(دم);
+		ورنہ اگر (p > آغاز)
 		    --p;		// strip preceding path separator
 
-		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);
-		p_end -= (size_t)(tail - p);
+		mch_memmove(p, دم, (size_t)(p_انتہا - دم) + 1);
+		p_انتہا -= (size_t)(دم - p);
 	    }
 	}
-	else if (p[0] == '.' && p[1] == '.' &&
+	ورنہ اگر (p[0] == '.' && p[1] == '.' &&
 	    (vim_ispathsep(p[2]) || p[2] == NUL))
 	{
 	    // Skip to after ".." or "../" or "..///".
-	    tail = p + 2;
-	    while (vim_ispathsep(*tail))
-		MB_PTR_ADV(tail);
+	    دم = p + 2;
+	    جب (vim_ispathsep(*دم))
+		MB_PTR_ADV(دم);
 
-	    if (components > 0)		// strip one preceding component
+	    اگر (components > 0)		// strip one preceding component
 	    {
-		int		do_strip = FALSE;
+		صحیح		do_strip = FALSE;
 		char_u		saved_char;
 		stat_T		st;
 
 		// Don't strip for an erroneous file name.
-		if (!stripping_disabled)
+		اگر (!stripping_disabled)
 		{
 		    // If the preceding component does not exist in the file
 		    // system, we strip it.  On Unix, we don't accept a symbolic
@@ -2861,19 +2861,19 @@ simplify_filename(char_u *filename)
 		    saved_char = p[-1];
 		    p[-1] = NUL;
 # ifdef UNIX
-		    if (mch_lstat((char *)filename, &st) < 0)
-# else
-			if (mch_stat((char *)filename, &st) < 0)
+		    اگر (mch_lstat((حرف *)filename, &st) < 0)
+# ورنہ
+			اگر (mch_stat((حرف *)filename, &st) < 0)
 # endif
 			    do_strip = TRUE;
 		    p[-1] = saved_char;
 
 		    --p;
 		    // Skip back to after previous '/'.
-		    while (p > start && !after_pathsep(start, p))
-			MB_PTR_BACK(start, p);
+		    جب (p > آغاز && !after_pathsep(آغاز, p))
+			MB_PTR_عقب(آغاز, p);
 
-		    if (!do_strip)
+		    اگر (!do_strip)
 		    {
 			// If the component exists in the file system, check
 			// that stripping it won't change the meaning of the
@@ -2885,15 +2885,15 @@ simplify_filename(char_u *filename)
 			// don't want to replace an erroneous file name by
 			// a valid one, and we disable stripping of later
 			// components.
-			saved_char = *tail;
-			*tail = NUL;
-			if (mch_stat((char *)filename, &st) >= 0)
+			saved_char = *دم;
+			*دم = NUL;
+			اگر (mch_stat((حرف *)filename, &st) >= 0)
 			    do_strip = TRUE;
-			else
+			ورنہ
 			    stripping_disabled = TRUE;
-			*tail = saved_char;
+			*دم = saved_char;
 # ifdef UNIX
-			if (do_strip)
+			اگر (do_strip)
 			{
 			    stat_T	new_st;
 
@@ -2904,17 +2904,17 @@ simplify_filename(char_u *filename)
 			    // same as the stripped file name.  (The latter
 			    // exists in the file system since it is the
 			    // component's parent directory.)
-			    if (p == start && relative)
-				(void)mch_stat(".", &new_st);
-			    else
+			    اگر (p == آغاز && relative)
+				(خالی)mch_stat(".", &new_st);
+			    ورنہ
 			    {
 				saved_char = *p;
 				*p = NUL;
-				(void)mch_stat((char *)filename, &new_st);
+				(خالی)mch_stat((حرف *)filename, &new_st);
 				*p = saved_char;
 			    }
 
-			    if (new_st.st_ino != st.st_ino ||
+			    اگر (new_st.st_ino != st.st_ino ||
 				new_st.st_dev != st.st_dev)
 			    {
 				do_strip = FALSE;
@@ -2927,14 +2927,14 @@ simplify_filename(char_u *filename)
 		    }
 		}
 
-		if (!do_strip)
+		اگر (!do_strip)
 		{
 		    // Skip the ".." or "../" and reset the counter for the
 		    // components that might be stripped later on.
-		    p = tail;
+		    p = دم;
 		    components = 0;
 		}
-		else
+		ورنہ
 		{
 		    // Strip previous component.  If the result would get empty
 		    // and there is no trailing path separator, leave a single
@@ -2942,68 +2942,68 @@ simplify_filename(char_u *filename)
 		    // there is no trailing path separator and a preceding
 		    // component is left after stripping, strip its trailing
 		    // path separator as well.
-		    if (p == start && relative && tail[-1] == '.')
+		    اگر (p == آغاز && relative && دم[-1] == '.')
 		    {
 			*p++ = '.';
 			*p = NUL;
 		    }
-		    else
+		    ورنہ
 		    {
-			if (p > start && tail[-1] == '.')
+			اگر (p > آغاز && دم[-1] == '.')
 			    --p;
 
-			mch_memmove(p, tail, (size_t)(p_end - tail) + 1);	// strip previous component
-			p_end -= (size_t)(tail - p);
+			mch_memmove(p, دم, (size_t)(p_انتہا - دم) + 1);	// strip previous component
+			p_انتہا -= (size_t)(دم - p);
 		    }
 
 		    --components;
 		}
 	    }
-	    else if (p == start && !relative)	// leading "/.." or "/../"
+	    ورنہ اگر (p == آغاز && !relative)	// leading "/.." or "/../"
 	    {
-		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);		// strip ".." or "../"
-		p_end -= (size_t)(tail - p);
+		mch_memmove(p, دم, (size_t)(p_انتہا - دم) + 1);		// strip ".." or "../"
+		p_انتہا -= (size_t)(دم - p);
 	    }
-	    else
+	    ورنہ
 	    {
-		if (p == start + 2 && p[-2] == '.')	// leading "./../"
+		اگر (p == آغاز + 2 && p[-2] == '.')	// leading "./../"
 		{
-		    mch_memmove(p - 2, p, (size_t)(p_end - p) + 1); // strip leading "./"
-		    p_end -= 2;
-		    tail -= 2;
+		    mch_memmove(p - 2, p, (size_t)(p_انتہا - p) + 1); // strip leading "./"
+		    p_انتہا -= 2;
+		    دم -= 2;
 		}
-		p = tail;		// skip to char after ".." or "../"
+		p = دم;		// skip to char after ".." or "../"
 	    }
 	}
-	else
+	ورنہ
 	{
 	    ++components;		// simple path component
 	    p = getnextcomp(p);
 	}
-    } while (*p != NUL);
+    } جب (*p != NUL);
 
-    return (size_t)(p_end - filename);
-#else
+    واپس (size_t)(p_انتہا - filename);
+#ورنہ
     // Don't touch Amiga filenames
-    return STRLEN(filename);
-#endif // !AMIGA
+    واپس STRLEN(filename);
+#اگر_ختم // !AMIGA
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * "simplify()" function
  */
-    void
+    خالی
 f_simplify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (اندر_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	واپس;
 
     p = tv_get_string_strict(&argvars[0]);
     rettv->vval.v_string = vim_strsave(p);
     simplify_filename(rettv->vval.v_string);	// simplify in place
     rettv->v_type = VAR_STRING;
 }
-#endif // FEAT_EVAL
+#اگر_ختم // FEAT_EVAL

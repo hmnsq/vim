@@ -11,39 +11,39 @@
  * profiler.c: Vim script profiler
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_EVAL)
-# if defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
+#اگر defined(FEAT_EVAL)
+# اگر defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
 /*
  * Store the current time in "tm".
  */
-    void
-profile_start(proftime_T *tm)
+    خالی
+profile_آغاز(proftime_T *tm)
 {
 #  ifdef MSWIN
-    QueryPerformanceCounter(tm);
-#  else
-    PROF_GET_TIME(tm);
+    Query_Performance_شمار(tm);
+#  ورنہ
+    PROF_GET_وقت(tm);
 #  endif
 }
 
 /*
  * Compute the elapsed time from "tm" till now and store in "tm".
  */
-    void
-profile_end(proftime_T *tm)
+    خالی
+profile_انتہا(proftime_T *tm)
 {
     proftime_T now;
 
 #  ifdef MSWIN
-    QueryPerformanceCounter(&now);
+    Query_Performance_شمار(&now);
     tm->QuadPart = now.QuadPart - tm->QuadPart;
-#  else
-    PROF_GET_TIME(&now);
+#  ورنہ
+    PROF_GET_وقت(&now);
     tm->tv_fsec = now.tv_fsec - tm->tv_fsec;
     tm->tv_sec = now.tv_sec - tm->tv_sec;
-    if (tm->tv_fsec < 0)
+    اگر (tm->tv_fsec < 0)
     {
 	tm->tv_fsec += TV_FSEC_SEC;
 	--tm->tv_sec;
@@ -54,15 +54,15 @@ profile_end(proftime_T *tm)
 /*
  * Subtract the time "tm2" from "tm".
  */
-    void
+    خالی
 profile_sub(proftime_T *tm, proftime_T *tm2)
 {
 #  ifdef MSWIN
     tm->QuadPart -= tm2->QuadPart;
-#  else
+#  ورنہ
     tm->tv_fsec -= tm2->tv_fsec;
     tm->tv_sec -= tm2->tv_sec;
-    if (tm->tv_fsec < 0)
+    اگر (tm->tv_fsec < 0)
     {
 	tm->tv_fsec += TV_FSEC_SEC;
 	--tm->tv_sec;
@@ -74,20 +74,20 @@ profile_sub(proftime_T *tm, proftime_T *tm2)
  * Return a string that represents the time in "tm".
  * Uses a static buffer!
  */
-    char *
-profile_msg(proftime_T *tm)
+    حرف *
+profile_پیغام(proftime_T *tm)
 {
-    static char buf[50];
+    ساکن حرف buf[50];
 
 #  ifdef MSWIN
     LARGE_INTEGER   fr;
 
     QueryPerformanceFrequency(&fr);
-    sprintf(buf, "%10.6lf", (double)tm->QuadPart / (double)fr.QuadPart);
-#  else
-    sprintf(buf, PROF_TIME_FORMAT, (long)tm->tv_sec, (long)tm->tv_fsec);
+    sprintf(buf, "%10.6lf", (دوہرا)tm->QuadPart / (دوہرا)fr.QuadPart);
+#  ورنہ
+    sprintf(buf, PROF_وقت_FORMAT, (طویل)tm->tv_sec, (طویل)tm->tv_fsec);
 #  endif
-    return buf;
+    واپس buf;
 }
 
 /*
@@ -100,36 +100,36 @@ profile_float(proftime_T *tm)
     LARGE_INTEGER   fr;
 
     QueryPerformanceFrequency(&fr);
-    return (float_T)tm->QuadPart / (float_T)fr.QuadPart;
-#  else
-    return (float_T)tm->tv_sec + (float_T)tm->tv_fsec / (float_T)TV_FSEC_SEC;
+    واپس (float_T)tm->QuadPart / (float_T)fr.QuadPart;
+#  ورنہ
+    واپس (float_T)tm->tv_sec + (float_T)tm->tv_fsec / (float_T)TV_FSEC_SEC;
 #  endif
 }
 
 /*
  * Put the time "msec" past now in "tm".
  */
-    void
-profile_setlimit(long msec, proftime_T *tm)
+    خالی
+profile_setlimit(طویل msec, proftime_T *tm)
 {
-    if (msec <= 0)   // no limit
+    اگر (msec <= 0)   // no limit
 	profile_zero(tm);
-    else
+    ورنہ
     {
 #  ifdef MSWIN
 	LARGE_INTEGER   fr;
 
-	QueryPerformanceCounter(tm);
+	Query_Performance_شمار(tm);
 	QueryPerformanceFrequency(&fr);
-	tm->QuadPart += (LONGLONG)((double)msec / 1000.0 * (double)fr.QuadPart);
-#  else
+	tm->QuadPart += (LONGLONG)((دوہرا)msec / 1000.0 * (دوہرا)fr.QuadPart);
+#  ورنہ
 	varnumber_T	    fsec;	// this should be 64 bit if possible
 
-	PROF_GET_TIME(tm);
+	PROF_GET_وقت(tm);
 	fsec = (varnumber_T)tm->tv_fsec
 		       + (varnumber_T)msec * (varnumber_T)(TV_FSEC_SEC / 1000);
-	tm->tv_fsec = fsec % (long)TV_FSEC_SEC;
-	tm->tv_sec += fsec / (long)TV_FSEC_SEC;
+	tm->tv_fsec = fsec % (طویل)TV_FSEC_SEC;
+	tm->tv_sec += fsec / (طویل)TV_FSEC_SEC;
 #  endif
     }
 }
@@ -137,21 +137,21 @@ profile_setlimit(long msec, proftime_T *tm)
 /*
  * Return TRUE if the current time is past "tm".
  */
-    int
-profile_passed_limit(proftime_T *tm)
+    صحیح
+profile_passed_حد_بندی(proftime_T *tm)
 {
     proftime_T	now;
 
 #  ifdef MSWIN
-    if (tm->QuadPart == 0)  // timer was not set
-	return FALSE;
-    QueryPerformanceCounter(&now);
-    return (now.QuadPart > tm->QuadPart);
-#  else
-    if (tm->tv_sec == 0)    // timer was not set
-	return FALSE;
-    PROF_GET_TIME(&now);
-    return (now.tv_sec > tm->tv_sec
+    اگر (tm->QuadPart == 0)  // timer was not set
+	واپس FALSE;
+    Query_Performance_شمار(&now);
+    واپس (now.QuadPart > tm->QuadPart);
+#  ورنہ
+    اگر (tm->tv_sec == 0)    // timer was not set
+	واپس FALSE;
+    PROF_GET_وقت(&now);
+    واپس (now.tv_sec > tm->tv_sec
 	    || (now.tv_sec == tm->tv_sec && now.tv_fsec > tm->tv_fsec));
 #  endif
 }
@@ -159,12 +159,12 @@ profile_passed_limit(proftime_T *tm)
 /*
  * Set the time in "tm" to zero.
  */
-    void
+    خالی
 profile_zero(proftime_T *tm)
 {
 #  ifdef MSWIN
     tm->QuadPart = 0;
-#  else
+#  ورنہ
     tm->tv_fsec = 0;
     tm->tv_sec = 0;
 #  endif
@@ -172,52 +172,52 @@ profile_zero(proftime_T *tm)
 
 # endif  // FEAT_PROFILE || FEAT_RELTIME
 
-# if defined(FEAT_SYN_HL) && defined(FEAT_RELTIME) && defined(FEAT_PROFILE)
-#  if defined(HAVE_MATH_H)
+# اگر defined(FEAT_SYN_HL) && defined(FEAT_RELTIME) && defined(FEAT_PROFILE)
+#  اگر defined(HAVE_MATH_H)
 #   include <math.h>
 #  endif
 
 /*
  * Divide the time "tm" by "count" and store in "tm2".
  */
-    void
-profile_divide(proftime_T *tm, int count, proftime_T *tm2)
+    خالی
+profile_divide(proftime_T *tm, صحیح گنتی, proftime_T *tm2)
 {
-    if (count == 0)
+    اگر (گنتی == 0)
 	profile_zero(tm2);
-    else
+    ورنہ
     {
 #  ifdef MSWIN
-	tm2->QuadPart = tm->QuadPart / count;
-#  else
-	double fsec = (tm->tv_sec * (float_T)TV_FSEC_SEC + tm->tv_fsec)
-								       / count;
+	tm2->QuadPart = tm->QuadPart / گنتی;
+#  ورنہ
+	دوہرا fsec = (tm->tv_sec * (float_T)TV_FSEC_SEC + tm->tv_fsec)
+								       / گنتی;
 
 	tm2->tv_sec = floor(fsec / (float_T)TV_FSEC_SEC);
-	tm2->tv_fsec = vim_round(fsec - (tm2->tv_sec * (float_T)TV_FSEC_SEC));
+	tm2->tv_fsec = vim_باری(fsec - (tm2->tv_sec * (float_T)TV_FSEC_SEC));
 #  endif
     }
 }
 # endif
 
-# if defined(FEAT_PROFILE)
+# اگر defined(FEAT_PROFILE)
 /*
  * Functions for profiling.
  */
-static proftime_T prof_wait_time;
+ساکن proftime_T prof_wait_وقت;
 
 /*
  * Add the time "tm2" to "tm".
  */
-    void
-profile_add(proftime_T *tm, proftime_T *tm2)
+    خالی
+profile_جوڑو(proftime_T *tm, proftime_T *tm2)
 {
 #  ifdef MSWIN
     tm->QuadPart += tm2->QuadPart;
-#  else
+#  ورنہ
     tm->tv_fsec += tm2->tv_fsec;
     tm->tv_sec += tm2->tv_sec;
-    if (tm->tv_fsec >= TV_FSEC_SEC)
+    اگر (tm->tv_fsec >= TV_FSEC_SEC)
     {
 	tm->tv_fsec -= TV_FSEC_SEC;
 	++tm->tv_sec;
@@ -228,40 +228,40 @@ profile_add(proftime_T *tm, proftime_T *tm2)
 /*
  * Add the "self" time from the total time and the children's time.
  */
-    void
-profile_self(proftime_T *self, proftime_T *total, proftime_T *children)
+    خالی
+profile_self(proftime_T *self, proftime_T *کل, proftime_T *children)
 {
     // Check that the result won't be negative.  Can happen with recursive
     // calls.
 #  ifdef MSWIN
-    if (total->QuadPart <= children->QuadPart)
-	return;
-#  else
-    if (total->tv_sec < children->tv_sec
-	    || (total->tv_sec == children->tv_sec
-		&& total->tv_fsec <= children->tv_fsec))
-	return;
+    اگر (کل->QuadPart <= children->QuadPart)
+	واپس;
+#  ورنہ
+    اگر (کل->tv_sec < children->tv_sec
+	    || (کل->tv_sec == children->tv_sec
+		&& کل->tv_fsec <= children->tv_fsec))
+	واپس;
 #  endif
-    profile_add(self, total);
+    profile_جوڑو(self, کل);
     profile_sub(self, children);
 }
 
 /*
  * Get the current waittime.
  */
-    static void
+    ساکن خالی
 profile_get_wait(proftime_T *tm)
 {
-    *tm = prof_wait_time;
+    *tm = prof_wait_وقت;
 }
 
 /*
  * Subtract the passed waittime since "tm" from "tma".
  */
-    void
+    خالی
 profile_sub_wait(proftime_T *tm, proftime_T *tma)
 {
-    proftime_T tm3 = prof_wait_time;
+    proftime_T tm3 = prof_wait_وقت;
 
     profile_sub(&tm3, tm);
     profile_sub(tma, &tm3);
@@ -270,64 +270,64 @@ profile_sub_wait(proftime_T *tm, proftime_T *tma)
 /*
  * Return TRUE if "tm1" and "tm2" are equal.
  */
-    static int
+    ساکن صحیح
 profile_equal(proftime_T *tm1, proftime_T *tm2)
 {
 #  ifdef MSWIN
-    return (tm1->QuadPart == tm2->QuadPart);
-#  else
-    return (tm1->tv_fsec == tm2->tv_fsec && tm1->tv_sec == tm2->tv_sec);
+    واپس (tm1->QuadPart == tm2->QuadPart);
+#  ورنہ
+    واپس (tm1->tv_fsec == tm2->tv_fsec && tm1->tv_sec == tm2->tv_sec);
 #  endif
 }
 
 /*
  * Return <0, 0 or >0 if "tm1" < "tm2", "tm1" == "tm2" or "tm1" > "tm2"
  */
-    int
-profile_cmp(const proftime_T *tm1, const proftime_T *tm2)
+    صحیح
+profile_cmp(ثابت proftime_T *tm1, ثابت proftime_T *tm2)
 {
 #  ifdef MSWIN
-    return tm2->QuadPart == tm1->QuadPart ? 0 :
+    واپس tm2->QuadPart == tm1->QuadPart ? 0 :
 	tm2->QuadPart > tm1->QuadPart ? 1 : -1;
-#  else
-    if (tm1->tv_sec == tm2->tv_sec)
-	return tm2->tv_fsec == tm1->tv_fsec ? 0 :
+#  ورنہ
+    اگر (tm1->tv_sec == tm2->tv_sec)
+	واپس tm2->tv_fsec == tm1->tv_fsec ? 0 :
 	    tm2->tv_fsec > tm1->tv_fsec ? 1 : -1;
-    return tm2->tv_sec > tm1->tv_sec ? 1 : -1;
+    واپس tm2->tv_sec > tm1->tv_sec ? 1 : -1;
 #  endif
 }
 
-static char_u	*profile_fname = NULL;
-static proftime_T pause_time;
+ساکن char_u	*profile_fname = تہی;
+ساکن proftime_T pause_وقت;
 
 /*
  * Reset all profiling information.
  */
-    static void
-profile_reset(void)
+    ساکن خالی
+profile_reset(خالی)
 {
-    int		id;
-    int		todo;
+    صحیح		id;
+    صحیح		todo;
     hashtab_T	*functbl;
     hashitem_T	*hi;
 
     // Reset sourced files.
-    for (id = 1; id <= script_items.ga_len; id++)
+    برائے (id = 1; id <= script_اشیاء.ga_len; id++)
     {
-	scriptitem_T *si = SCRIPT_ITEM(id);
-	if (si->sn_prof_on)
+	scriptitem_T *si = SCRIPT_شے(id);
+	اگر (si->sn_prof_on)
 	{
 	    si->sn_prof_on      = FALSE;
 	    si->sn_pr_force     = FALSE;
-	    profile_zero(&si->sn_pr_child);
+	    profile_zero(&si->sn_pr_بچہ);
 	    si->sn_pr_nest      = 0;
-	    si->sn_pr_count     = 0;
-	    profile_zero(&si->sn_pr_total);
+	    si->sn_pr_گنتی     = 0;
+	    profile_zero(&si->sn_pr_کل);
 	    profile_zero(&si->sn_pr_self);
-	    profile_zero(&si->sn_pr_start);
+	    profile_zero(&si->sn_pr_آغاز);
 	    profile_zero(&si->sn_pr_children);
 	    ga_clear(&si->sn_prl_ga);
-	    profile_zero(&si->sn_prl_start);
+	    profile_zero(&si->sn_prl_آغاز);
 	    profile_zero(&si->sn_prl_children);
 	    profile_zero(&si->sn_prl_wait);
 	    si->sn_prl_idx      = -1;
@@ -337,35 +337,35 @@ profile_reset(void)
 
     // Reset functions.
     functbl = func_tbl_get();
-    todo = (int)functbl->ht_used;
+    todo = (صحیح)functbl->ht_مستعمل;
 
-    FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
+    FOR_ALL_HASHTAB_اشیاء(functbl, hi, todo)
     {
 	ufunc_T *fp;
-	int	i;
+	صحیح	i;
 
-	if (HASHITEM_EMPTY(hi))
-	    continue;
+	اگر (HASHITEM_خالی_خانے(hi))
+	    جاری;
 
 	todo--;
 	fp = HI2UF(hi);
-	if (fp->uf_prof_initialized)
+	اگر (fp->uf_prof_initialized)
 	{
 	    fp->uf_profiling    = 0;
 	    fp->uf_prof_initialized = FALSE;
-	    fp->uf_tm_count     = 0;
-	    profile_zero(&fp->uf_tm_total);
+	    fp->uf_tm_گنتی     = 0;
+	    profile_zero(&fp->uf_tm_کل);
 	    profile_zero(&fp->uf_tm_self);
 	    profile_zero(&fp->uf_tm_children);
 
-	    for (i = 0; i < fp->uf_lines.ga_len; i++)
+	    برائے (i = 0; i < fp->uf_سطریں.ga_len; i++)
 	    {
-		fp->uf_tml_count[i] = 0;
-		profile_zero(&fp->uf_tml_total[i]);
+		fp->uf_tml_گنتی[i] = 0;
+		profile_zero(&fp->uf_tml_کل[i]);
 		profile_zero(&fp->uf_tml_self[i]);
 	    }
 
-	    profile_zero(&fp->uf_tml_start);
+	    profile_zero(&fp->uf_tml_آغاز);
 	    profile_zero(&fp->uf_tml_children);
 	    profile_zero(&fp->uf_tml_wait);
 	    fp->uf_tml_idx      = -1;
@@ -379,51 +379,51 @@ profile_reset(void)
 /*
  * ":profile cmd args"
  */
-    void
+    خالی
 ex_profile(exarg_T *eap)
 {
     char_u	*e;
-    int		len;
+    صحیح		len;
 
     e = skiptowhite(eap->arg);
-    len = (int)(e - eap->arg);
+    len = (صحیح)(e - eap->arg);
     e = skipwhite(e);
 
-    if (len == 5 && STRNCMP(eap->arg, "start", 5) == 0 && *e != NUL)
+    اگر (len == 5 && STRNCMP(eap->arg, "start", 5) == 0 && *e != NUL)
     {
 	VIM_CLEAR(profile_fname);
-	profile_fname = expand_env_save_opt(e, TRUE, NULL);
+	profile_fname = expand_env_save_opt(e, TRUE, تہی);
 	do_profiling = PROF_YES;
-	profile_zero(&prof_wait_time);
-	set_vim_var_nr(VV_PROFILING, 1L);
+	profile_zero(&prof_wait_وقت);
+	سیٹ_vim_var_nr(VV_PROFILING, 1L);
     }
-    else if (do_profiling == PROF_NONE)
-	emsg(_(e_first_use_profile_start_fname));
-    else if (STRCMP(eap->arg, "stop") == 0)
+    ورنہ اگر (do_profiling == PROF_NONE)
+	emsg(_(e_پہلا_use_profile_آغاز_fname));
+    ورنہ اگر (STRCMP(eap->arg, "stop") == 0)
     {
 	profile_dump();
 	do_profiling = PROF_NONE;
-	set_vim_var_nr(VV_PROFILING, 0L);
+	سیٹ_vim_var_nr(VV_PROFILING, 0L);
 	profile_reset();
     }
-    else if (STRCMP(eap->arg, "pause") == 0)
+    ورنہ اگر (STRCMP(eap->arg, "pause") == 0)
     {
-	if (do_profiling == PROF_YES)
-	    profile_start(&pause_time);
+	اگر (do_profiling == PROF_YES)
+	    profile_آغاز(&pause_وقت);
 	do_profiling = PROF_PAUSED;
     }
-    else if (STRCMP(eap->arg, "continue") == 0)
+    ورنہ اگر (STRCMP(eap->arg, "continue") == 0)
     {
-	if (do_profiling == PROF_PAUSED)
+	اگر (do_profiling == PROF_PAUSED)
 	{
-	    profile_end(&pause_time);
-	    profile_add(&prof_wait_time, &pause_time);
+	    profile_انتہا(&pause_وقت);
+	    profile_جوڑو(&prof_wait_وقت, &pause_وقت);
 	}
 	do_profiling = PROF_YES;
     }
-    else if (STRCMP(eap->arg, "dump") == 0)
+    ورنہ اگر (STRCMP(eap->arg, "dump") == 0)
 	profile_dump();
-    else
+    ورنہ
     {
 	// The rest is similar to ":breakadd".
 	ex_breakadd(eap);
@@ -431,13 +431,13 @@ ex_profile(exarg_T *eap)
 }
 
 // Command line expansion for :profile.
-static enum
+ساکن شمار
 {
     PEXP_SUBCMD,	// expand :profile sub-commands
     PEXP_FUNC		// expand :profile func {funcname}
 } pexpand_what;
 
-static char *pexpand_cmds[] = {
+ساکن حرف *pexpand_cmds[] = {
 			"start",
 			"stop",
 			"pause",
@@ -445,7 +445,7 @@ static char *pexpand_cmds[] = {
 			"func",
 			"file",
 			"dump",
-			NULL
+			تہی
 };
 
 /*
@@ -453,70 +453,70 @@ static char *pexpand_cmds[] = {
  * specific expansion.
  */
     char_u *
-get_profile_name(expand_T *xp UNUSED, int idx)
+get_profile_name(expand_T *xp غیر_مستعمل, صحیح idx)
 {
-    switch (pexpand_what)
+    انتخاب (pexpand_what)
     {
-    case PEXP_SUBCMD:
-	return (char_u *)pexpand_cmds[idx];
-    default:
-	return NULL;
+    حالت PEXP_SUBCMD:
+	واپس (char_u *)pexpand_cmds[idx];
+    طےشدہ:
+	واپس تہی;
     }
 }
 
 /*
  * Handle command line completion for :profile command.
  */
-    void
-set_context_in_profile_cmd(expand_T *xp, char_u *arg)
+    خالی
+سیٹ_context_اندر_profile_cmd(expand_T *xp, char_u *arg)
 {
-    char_u	*end_subcmd;
+    char_u	*انتہا_subcmd;
 
     // Default: expand subcommands.
     xp->xp_context = EXPAND_PROFILE;
     pexpand_what = PEXP_SUBCMD;
-    xp->xp_pattern = arg;
+    xp->xp_نمونہ = arg;
 
-    end_subcmd = skiptowhite(arg);
-    if (*end_subcmd == NUL)
-	return;
+    انتہا_subcmd = skiptowhite(arg);
+    اگر (*انتہا_subcmd == NUL)
+	واپس;
 
-    if ((end_subcmd - arg == 5 && STRNCMP(arg, "start", 5) == 0)
-	    || (end_subcmd - arg == 4 && STRNCMP(arg, "file", 4) == 0))
+    اگر ((انتہا_subcmd - arg == 5 && STRNCMP(arg, "start", 5) == 0)
+	    || (انتہا_subcmd - arg == 4 && STRNCMP(arg, "file", 4) == 0))
     {
 	xp->xp_context = EXPAND_FILES;
-	xp->xp_pattern = skipwhite(end_subcmd);
-	return;
+	xp->xp_نمونہ = skipwhite(انتہا_subcmd);
+	واپس;
     }
-    else if (end_subcmd - arg == 4 && STRNCMP(arg, "func", 4) == 0)
+    ورنہ اگر (انتہا_subcmd - arg == 4 && STRNCMP(arg, "func", 4) == 0)
     {
 	xp->xp_context = EXPAND_USER_FUNC;
-	xp->xp_pattern = skipwhite(end_subcmd);
-	return;
+	xp->xp_نمونہ = skipwhite(انتہا_subcmd);
+	واپس;
     }
 
     xp->xp_context = EXPAND_NOTHING;
 }
 
-static proftime_T inchar_time;
+ساکن proftime_T inchar_وقت;
 
 /*
  * Called when starting to wait for the user to type a character.
  */
-    void
-prof_inchar_enter(void)
+    خالی
+prof_inchar_enter(خالی)
 {
-    profile_start(&inchar_time);
+    profile_آغاز(&inchar_وقت);
 }
 
 /*
  * Called when finished waiting for the user to type a character.
  */
-    void
-prof_inchar_exit(void)
+    خالی
+prof_inchar_exit(خالی)
 {
-    profile_end(&inchar_time);
-    profile_add(&prof_wait_time, &inchar_time);
+    profile_انتہا(&inchar_وقت);
+    profile_جوڑو(&prof_wait_وقت, &inchar_وقت);
 }
 
 
@@ -524,62 +524,62 @@ prof_inchar_exit(void)
  * Return TRUE when a function defined in the current script should be
  * profiled.
  */
-    int
-prof_def_func(void)
+    صحیح
+prof_def_func(خالی)
 {
-    if (current_sctx.sc_sid > 0)
-	return SCRIPT_ITEM(current_sctx.sc_sid)->sn_pr_force;
-    return FALSE;
+    اگر (current_sctx.sc_sid > 0)
+	واپس SCRIPT_شے(current_sctx.sc_sid)->sn_pr_force;
+    واپس FALSE;
 }
 
 /*
  * Print the count and times for one function or function line.
  */
-    static void
-prof_func_line(
+    ساکن خالی
+prof_func_سطر(
     FILE	*fd,
-    int		count,
-    proftime_T	*total,
+    صحیح		گنتی,
+    proftime_T	*کل,
     proftime_T	*self,
-    int		prefer_self)	// when equal print only self time
+    صحیح		prefer_self)	// when equal print only self time
 {
-    if (count > 0)
+    اگر (گنتی > 0)
     {
-	fprintf(fd, "%5d ", count);
-	if (prefer_self && profile_equal(total, self))
-	    fprintf(fd, PROF_TIME_BLANK);
-	else
-	    fprintf(fd, "%s ", profile_msg(total));
-	if (!prefer_self && profile_equal(total, self))
-	    fprintf(fd, PROF_TIME_BLANK);
-	else
-	    fprintf(fd, "%s ", profile_msg(self));
+	fprintf(fd, "%5d ", گنتی);
+	اگر (prefer_self && profile_equal(کل, self))
+	    fprintf(fd, PROF_وقت_BLANK);
+	ورنہ
+	    fprintf(fd, "%s ", profile_پیغام(کل));
+	اگر (!prefer_self && profile_equal(کل, self))
+	    fprintf(fd, PROF_وقت_BLANK);
+	ورنہ
+	    fprintf(fd, "%s ", profile_پیغام(self));
     }
-    else
-	fprintf(fd, "      %s%s", PROF_TIME_BLANK, PROF_TIME_BLANK);
+    ورنہ
+	fprintf(fd, "      %s%s", PROF_وقت_BLANK, PROF_وقت_BLANK);
 }
 
-    static void
-prof_sort_list(
+    ساکن خالی
+prof_ترتیب_دو_list(
     FILE	*fd,
     ufunc_T	**sorttab,
-    int		st_len,
-    char	*title,
-    int		prefer_self)	// when equal print only self time
+    صحیح		st_len,
+    حرف	*title,
+    صحیح		prefer_self)	// when equal print only self time
 {
-    int		i;
+    صحیح		i;
     ufunc_T	*fp;
 
     fprintf(fd, "FUNCTIONS SORTED ON %s TIME\n", title);
-    fprintf(fd, "%s  function\n", PROF_TOTALS_HEADER);
-    for (i = 0; i < 20 && i < st_len; ++i)
+    fprintf(fd, "%s  function\n", PROF_TOTALS_سرخی);
+    برائے (i = 0; i < 20 && i < st_len; ++i)
     {
 	fp = sorttab[i];
-	prof_func_line(fd, fp->uf_tm_count, &fp->uf_tm_total, &fp->uf_tm_self,
+	prof_func_سطر(fd, fp->uf_tm_گنتی, &fp->uf_tm_کل, &fp->uf_tm_self,
 								 prefer_self);
-	if (fp->uf_name[0] == K_SPECIAL)
+	اگر (fp->uf_name[0] == K_SPECIAL)
 	    fprintf(fd, " <SNR>%s()\n", fp->uf_name + 3);
-	else
+	ورنہ
 	    fprintf(fd, " %s()\n", fp->uf_name);
     }
     fprintf(fd, "\n");
@@ -588,54 +588,54 @@ prof_sort_list(
 /*
  * Compare function for total time sorting.
  */
-    static int
-prof_total_cmp(const void *s1, const void *s2)
+    ساکن صحیح
+prof_کل_cmp(ثابت خالی *s1, ثابت خالی *s2)
 {
     ufunc_T	*p1, *p2;
 
     p1 = *(ufunc_T **)s1;
     p2 = *(ufunc_T **)s2;
-    return profile_cmp(&p1->uf_tm_total, &p2->uf_tm_total);
+    واپس profile_cmp(&p1->uf_tm_کل, &p2->uf_tm_کل);
 }
 
 /*
  * Compare function for self time sorting.
  */
-    static int
-prof_self_cmp(const void *s1, const void *s2)
+    ساکن صحیح
+prof_self_cmp(ثابت خالی *s1, ثابت خالی *s2)
 {
     ufunc_T	*p1, *p2;
 
     p1 = *(ufunc_T **)s1;
     p2 = *(ufunc_T **)s2;
-    return profile_cmp(&p1->uf_tm_self, &p2->uf_tm_self);
+    واپس profile_cmp(&p1->uf_tm_self, &p2->uf_tm_self);
 }
 
 /*
  * Start profiling function "fp".
  */
-    void
+    خالی
 func_do_profile(ufunc_T *fp)
 {
-    int		len = fp->uf_lines.ga_len;
+    صحیح		len = fp->uf_سطریں.ga_len;
 
-    if (!fp->uf_prof_initialized)
+    اگر (!fp->uf_prof_initialized)
     {
-	if (len == 0)
+	اگر (len == 0)
 	    len = 1;  // avoid getting error for allocating zero bytes
-	fp->uf_tm_count = 0;
+	fp->uf_tm_گنتی = 0;
 	profile_zero(&fp->uf_tm_self);
-	profile_zero(&fp->uf_tm_total);
-	if (fp->uf_tml_count == NULL)
-	    fp->uf_tml_count = ALLOC_CLEAR_MULT(int, len);
-	if (fp->uf_tml_total == NULL)
-	    fp->uf_tml_total = ALLOC_CLEAR_MULT(proftime_T, len);
-	if (fp->uf_tml_self == NULL)
+	profile_zero(&fp->uf_tm_کل);
+	اگر (fp->uf_tml_گنتی == تہی)
+	    fp->uf_tml_گنتی = ALLOC_CLEAR_MULT(صحیح, len);
+	اگر (fp->uf_tml_کل == تہی)
+	    fp->uf_tml_کل = ALLOC_CLEAR_MULT(proftime_T, len);
+	اگر (fp->uf_tml_self == تہی)
 	    fp->uf_tml_self = ALLOC_CLEAR_MULT(proftime_T, len);
 	fp->uf_tml_idx = -1;
-	if (fp->uf_tml_count == NULL || fp->uf_tml_total == NULL
-						    || fp->uf_tml_self == NULL)
-	    return;	    // out of memory
+	اگر (fp->uf_tml_گنتی == تہی || fp->uf_tml_کل == تہی
+						    || fp->uf_tml_self == تہی)
+	    واپس;	    // out of memory
 	fp->uf_prof_initialized = TRUE;
     }
 
@@ -645,17 +645,17 @@ func_do_profile(ufunc_T *fp)
 /*
  * Save time when starting to invoke another script or function.
  */
-    static void
+    ساکن خالی
 script_prof_save(
     proftime_T	*tm)	    // place to store wait time
 {
     scriptitem_T    *si;
 
-    if (SCRIPT_ID_VALID(current_sctx.sc_sid))
+    اگر (SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
-	si = SCRIPT_ITEM(current_sctx.sc_sid);
-	if (si->sn_prof_on && si->sn_pr_nest++ == 0)
-	    profile_start(&si->sn_pr_child);
+	si = SCRIPT_شے(current_sctx.sc_sid);
+	اگر (si->sn_prof_on && si->sn_pr_nest++ == 0)
+	    profile_آغاز(&si->sn_pr_بچہ);
     }
     profile_get_wait(tm);
 }
@@ -663,41 +663,41 @@ script_prof_save(
 /*
  * When calling a function: may initialize for profiling.
  */
-    void
-profile_may_start_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
+    خالی
+profile_may_آغاز_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
 {
-    if (!fp->uf_profiling && has_profiling(FALSE, fp->uf_name, NULL,
+    اگر (!fp->uf_profiling && has_profiling(FALSE, fp->uf_name, تہی,
 								&fp->uf_hash))
     {
 	info->pi_started_profiling = TRUE;
 	func_do_profile(fp);
     }
-    if (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
+    اگر (fp->uf_profiling || (caller != تہی && caller->uf_profiling))
     {
-	++fp->uf_tm_count;
-	profile_start(&info->pi_call_start);
+	++fp->uf_tm_گنتی;
+	profile_آغاز(&info->pi_call_آغاز);
 	profile_zero(&fp->uf_tm_children);
     }
-    script_prof_save(&info->pi_wait_start);
+    script_prof_save(&info->pi_wait_آغاز);
 }
 
 /*
  * After calling a function: may handle profiling.  profile_may_start_func()
  * must have been called previously.
  */
-    void
-profile_may_end_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
+    خالی
+profile_may_انتہا_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
 {
-    profile_end(&info->pi_call_start);
-    profile_sub_wait(&info->pi_wait_start, &info->pi_call_start);
-    profile_add(&fp->uf_tm_total, &info->pi_call_start);
-    profile_self(&fp->uf_tm_self, &info->pi_call_start, &fp->uf_tm_children);
-    if (caller != NULL && caller->uf_profiling)
+    profile_انتہا(&info->pi_call_آغاز);
+    profile_sub_wait(&info->pi_wait_آغاز, &info->pi_call_آغاز);
+    profile_جوڑو(&fp->uf_tm_کل, &info->pi_call_آغاز);
+    profile_self(&fp->uf_tm_self, &info->pi_call_آغاز, &fp->uf_tm_children);
+    اگر (caller != تہی && caller->uf_profiling)
     {
-	profile_add(&caller->uf_tm_children, &info->pi_call_start);
-	profile_add(&caller->uf_tml_children, &info->pi_call_start);
+	profile_جوڑو(&caller->uf_tm_children, &info->pi_call_آغاز);
+	profile_جوڑو(&caller->uf_tml_children, &info->pi_call_آغاز);
     }
-    if (info->pi_started_profiling)
+    اگر (info->pi_started_profiling)
 	// make a ":profdel func" stop profiling the function
 	fp->uf_profiling = FALSE;
 }
@@ -707,14 +707,14 @@ profile_may_end_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
  * counted for the script/function itself.
  * Should always be called in pair with prof_child_exit().
  */
-    void
-prof_child_enter(
+    خالی
+prof_بچہ_enter(
     proftime_T *tm)	// place to store waittime
 {
     funccall_T *fc = get_current_funccal();
 
-    if (fc != NULL && fc->fc_func->uf_profiling)
-	profile_start(&fc->fc_prof_child);
+    اگر (fc != تہی && fc->fc_func->uf_profiling)
+	profile_آغاز(&fc->fc_prof_بچہ);
     script_prof_save(tm);
 }
 
@@ -722,18 +722,18 @@ prof_child_enter(
  * Take care of time spent in a child.
  * Should always be called after prof_child_enter().
  */
-    void
-prof_child_exit(
+    خالی
+prof_بچہ_exit(
     proftime_T *tm)	// where waittime was stored
 {
     funccall_T *fc = get_current_funccal();
 
-    if (fc != NULL && fc->fc_func->uf_profiling)
+    اگر (fc != تہی && fc->fc_func->uf_profiling)
     {
-	profile_end(&fc->fc_prof_child);
-	profile_sub_wait(tm, &fc->fc_prof_child); // don't count waiting time
-	profile_add(&fc->fc_func->uf_tm_children, &fc->fc_prof_child);
-	profile_add(&fc->fc_func->uf_tml_children, &fc->fc_prof_child);
+	profile_انتہا(&fc->fc_prof_بچہ);
+	profile_sub_wait(tm, &fc->fc_prof_بچہ); // don't count waiting time
+	profile_جوڑو(&fc->fc_func->uf_tm_children, &fc->fc_prof_بچہ);
+	profile_جوڑو(&fc->fc_func->uf_tml_children, &fc->fc_prof_بچہ);
     }
     script_prof_restore(tm);
 }
@@ -744,20 +744,20 @@ prof_child_exit(
  * When skipping lines it may not actually be executed, but we won't find out
  * until later and we need to store the time now.
  */
-    void
-func_line_start(void *cookie, long lnum)
+    خالی
+func_سطر_آغاز(خالی *cookie, طویل lnum)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_lines.ga_len)
+    اگر (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_سطریں.ga_len)
     {
 	fp->uf_tml_idx = lnum - 1;
 	// Skip continuation lines.
-	while (fp->uf_tml_idx > 0 && FUNCLINE(fp, fp->uf_tml_idx) == NULL)
+	جب (fp->uf_tml_idx > 0 && FUNCLINE(fp, fp->uf_tml_idx) == تہی)
 	    --fp->uf_tml_idx;
 	fp->uf_tml_execed = FALSE;
-	profile_start(&fp->uf_tml_start);
+	profile_آغاز(&fp->uf_tml_آغاز);
 	profile_zero(&fp->uf_tml_children);
 	profile_get_wait(&fp->uf_tml_wait);
     }
@@ -766,34 +766,34 @@ func_line_start(void *cookie, long lnum)
 /*
  * Called when actually executing a function line.
  */
-    void
-func_line_exec(void *cookie)
+    خالی
+func_سطر_exec(خالی *cookie)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && fp->uf_tml_idx >= 0)
+    اگر (fp->uf_profiling && fp->uf_tml_idx >= 0)
 	fp->uf_tml_execed = TRUE;
 }
 
 /*
  * Called when done with a function line.
  */
-    void
-func_line_end(void *cookie)
+    خالی
+func_سطر_انتہا(خالی *cookie)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && fp->uf_tml_idx >= 0)
+    اگر (fp->uf_profiling && fp->uf_tml_idx >= 0)
     {
-	if (fp->uf_tml_execed)
+	اگر (fp->uf_tml_execed)
 	{
-	    ++fp->uf_tml_count[fp->uf_tml_idx];
-	    profile_end(&fp->uf_tml_start);
-	    profile_sub_wait(&fp->uf_tml_wait, &fp->uf_tml_start);
-	    profile_add(&fp->uf_tml_total[fp->uf_tml_idx], &fp->uf_tml_start);
-	    profile_self(&fp->uf_tml_self[fp->uf_tml_idx], &fp->uf_tml_start,
+	    ++fp->uf_tml_گنتی[fp->uf_tml_idx];
+	    profile_انتہا(&fp->uf_tml_آغاز);
+	    profile_sub_wait(&fp->uf_tml_wait, &fp->uf_tml_آغاز);
+	    profile_جوڑو(&fp->uf_tml_کل[fp->uf_tml_idx], &fp->uf_tml_آغاز);
+	    profile_self(&fp->uf_tml_self[fp->uf_tml_idx], &fp->uf_tml_آغاز,
 							&fp->uf_tml_children);
 	}
 	fp->uf_tml_idx = -1;
@@ -803,66 +803,66 @@ func_line_end(void *cookie)
 /*
  * Dump the profiling results for all functions in file "fd".
  */
-    static void
+    ساکن خالی
 func_dump_profile(FILE *fd)
 {
     hashtab_T	*functbl;
     hashitem_T	*hi;
-    int		todo;
+    صحیح		todo;
     ufunc_T	*fp;
-    int		i;
+    صحیح		i;
     ufunc_T	**sorttab;
-    int		st_len = 0;
+    صحیح		st_len = 0;
     char_u	*p;
 
     functbl = func_tbl_get();
-    todo = (int)functbl->ht_used;
-    if (todo == 0)
-	return;     // nothing to dump
+    todo = (صحیح)functbl->ht_مستعمل;
+    اگر (todo == 0)
+	واپس;     // nothing to dump
 
     sorttab = ALLOC_MULT(ufunc_T *, todo);
 
-    FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
+    FOR_ALL_HASHTAB_اشیاء(functbl, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	اگر (!HASHITEM_خالی_خانے(hi))
 	{
 	    --todo;
 	    fp = HI2UF(hi);
-	    if (fp->uf_prof_initialized)
+	    اگر (fp->uf_prof_initialized)
 	    {
-		if (sorttab != NULL)
+		اگر (sorttab != تہی)
 		    sorttab[st_len++] = fp;
 
-		if (fp->uf_name[0] == K_SPECIAL)
+		اگر (fp->uf_name[0] == K_SPECIAL)
 		    fprintf(fd, "FUNCTION  <SNR>%s()\n", fp->uf_name + 3);
-		else
+		ورنہ
 		    fprintf(fd, "FUNCTION  %s()\n", fp->uf_name);
-		if (fp->uf_script_ctx.sc_sid > 0)
+		اگر (fp->uf_script_ctx.sc_sid > 0)
 		{
-		    p = home_replace_save(NULL,
+		    p = home_replace_save(تہی,
 				     get_scriptname(fp->uf_script_ctx.sc_sid));
-		    if (p != NULL)
+		    اگر (p != تہی)
 		    {
 			fprintf(fd, "    Defined: %s:%ld\n",
-					   p, (long)fp->uf_script_ctx.sc_lnum);
+					   p, (طویل)fp->uf_script_ctx.sc_lnum);
 			vim_free(p);
 		    }
 		}
-		if (fp->uf_tm_count == 1)
+		اگر (fp->uf_tm_گنتی == 1)
 		    fprintf(fd, "Called 1 time\n");
-		else
-		    fprintf(fd, "Called %d times\n", fp->uf_tm_count);
-		fprintf(fd, "Total time: %s\n", profile_msg(&fp->uf_tm_total));
-		fprintf(fd, " Self time: %s\n", profile_msg(&fp->uf_tm_self));
+		ورنہ
+		    fprintf(fd, "Called %d times\n", fp->uf_tm_گنتی);
+		fprintf(fd, "Total time: %s\n", profile_پیغام(&fp->uf_tm_کل));
+		fprintf(fd, " Self time: %s\n", profile_پیغام(&fp->uf_tm_self));
 		fprintf(fd, "\n");
-		fprintf(fd, "%s\n", PROF_TOTALS_HEADER);
+		fprintf(fd, "%s\n", PROF_TOTALS_سرخی);
 
-		for (i = 0; i < fp->uf_lines.ga_len; ++i)
+		برائے (i = 0; i < fp->uf_سطریں.ga_len; ++i)
 		{
-		    if (FUNCLINE(fp, i) == NULL)
-			continue;
-		    prof_func_line(fd, fp->uf_tml_count[i],
-			     &fp->uf_tml_total[i], &fp->uf_tml_self[i], TRUE);
+		    اگر (FUNCLINE(fp, i) == تہی)
+			جاری;
+		    prof_func_سطر(fd, fp->uf_tml_گنتی[i],
+			     &fp->uf_tml_کل[i], &fp->uf_tml_self[i], TRUE);
 		    fprintf(fd, "%s\n", FUNCLINE(fp, i));
 		}
 		fprintf(fd, "\n");
@@ -870,14 +870,14 @@ func_dump_profile(FILE *fd)
 	}
     }
 
-    if (sorttab != NULL && st_len > 0)
+    اگر (sorttab != تہی && st_len > 0)
     {
-	qsort((void *)sorttab, (size_t)st_len, sizeof(ufunc_T *),
-							      prof_total_cmp);
-	prof_sort_list(fd, sorttab, st_len, "TOTAL", FALSE);
-	qsort((void *)sorttab, (size_t)st_len, sizeof(ufunc_T *),
+	qsort((خالی *)sorttab, (size_t)st_len, حجم(ufunc_T *),
+							      prof_کل_cmp);
+	prof_ترتیب_دو_list(fd, sorttab, st_len, "TOTAL", FALSE);
+	qsort((خالی *)sorttab, (size_t)st_len, حجم(ufunc_T *),
 							      prof_self_cmp);
-	prof_sort_list(fd, sorttab, st_len, "SELF", TRUE);
+	prof_ترتیب_دو_list(fd, sorttab, st_len, "SELF", TRUE);
     }
 
     vim_free(sorttab);
@@ -886,14 +886,14 @@ func_dump_profile(FILE *fd)
 /*
  * Start profiling script "fp".
  */
-    void
+    خالی
 script_do_profile(scriptitem_T *si)
 {
-    si->sn_pr_count = 0;
-    profile_zero(&si->sn_pr_total);
+    si->sn_pr_گنتی = 0;
+    profile_zero(&si->sn_pr_کل);
     profile_zero(&si->sn_pr_self);
 
-    ga_init2(&si->sn_prl_ga, sizeof(sn_prl_T), 100);
+    ga_init2(&si->sn_prl_ga, حجم(sn_prl_T), 100);
     si->sn_prl_idx = -1;
     si->sn_prof_on = TRUE;
     si->sn_pr_nest = 0;
@@ -902,92 +902,92 @@ script_do_profile(scriptitem_T *si)
 /*
  * Count time spent in children after invoking another script or function.
  */
-    void
+    خالی
 script_prof_restore(proftime_T *tm)
 {
     scriptitem_T    *si;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
+    اگر (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	واپس;
 
-    si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && --si->sn_pr_nest == 0)
+    si = SCRIPT_شے(current_sctx.sc_sid);
+    اگر (si->sn_prof_on && --si->sn_pr_nest == 0)
     {
-	profile_end(&si->sn_pr_child);
-	profile_sub_wait(tm, &si->sn_pr_child); // don't count wait time
-	profile_add(&si->sn_pr_children, &si->sn_pr_child);
-	profile_add(&si->sn_prl_children, &si->sn_pr_child);
+	profile_انتہا(&si->sn_pr_بچہ);
+	profile_sub_wait(tm, &si->sn_pr_بچہ); // don't count wait time
+	profile_جوڑو(&si->sn_pr_children, &si->sn_pr_بچہ);
+	profile_جوڑو(&si->sn_prl_children, &si->sn_pr_بچہ);
     }
 }
 
 /*
  * Dump the profiling results for all scripts in file "fd".
  */
-    static void
+    ساکن خالی
 script_dump_profile(FILE *fd)
 {
-    int		    id;
+    صحیح		    id;
     scriptitem_T    *si;
-    int		    i;
+    صحیح		    i;
     FILE	    *sfd;
     sn_prl_T	    *pp;
 
-    for (id = 1; id <= script_items.ga_len; ++id)
+    برائے (id = 1; id <= script_اشیاء.ga_len; ++id)
     {
-	si = SCRIPT_ITEM(id);
-	if (si->sn_prof_on)
+	si = SCRIPT_شے(id);
+	اگر (si->sn_prof_on)
 	{
 	    fprintf(fd, "SCRIPT  %s\n", si->sn_name);
-	    if (si->sn_pr_count == 1)
+	    اگر (si->sn_pr_گنتی == 1)
 		fprintf(fd, "Sourced 1 time\n");
-	    else
-		fprintf(fd, "Sourced %d times\n", si->sn_pr_count);
-	    fprintf(fd, "Total time: %s\n", profile_msg(&si->sn_pr_total));
-	    fprintf(fd, " Self time: %s\n", profile_msg(&si->sn_pr_self));
+	    ورنہ
+		fprintf(fd, "Sourced %d times\n", si->sn_pr_گنتی);
+	    fprintf(fd, "Total time: %s\n", profile_پیغام(&si->sn_pr_کل));
+	    fprintf(fd, " Self time: %s\n", profile_پیغام(&si->sn_pr_self));
 	    fprintf(fd, "\n");
-	    fprintf(fd, "%s\n", PROF_TOTALS_HEADER);
+	    fprintf(fd, "%s\n", PROF_TOTALS_سرخی);
 
-	    sfd = mch_fopen((char *)si->sn_name, "r");
-	    if (sfd == NULL)
+	    sfd = mch_fopen((حرف *)si->sn_name, "r");
+	    اگر (sfd == تہی)
 		fprintf(fd, "Cannot open file!\n");
-	    else
+	    ورنہ
 	    {
 		// Keep going till the end of file, so that trailing
 		// continuation lines are listed.
-		for (i = 0; ; ++i)
+		برائے (i = 0; ; ++i)
 		{
-		    if (vim_fgets(IObuff, IOSIZE, sfd))
-			break;
+		    اگر (vim_fgets(IObuff, IOSIZE, sfd))
+			توڑو;
 		    // When a line has been truncated, append NL, taking care
 		    // of multi-byte characters .
-		    if (IObuff[IOSIZE - 2] != NUL && IObuff[IOSIZE - 2] != NL)
+		    اگر (IObuff[IOSIZE - 2] != NUL && IObuff[IOSIZE - 2] != NL)
 		    {
-			int n = IOSIZE - 2;
+			صحیح n = IOSIZE - 2;
 
-			if (enc_utf8)
+			اگر (enc_utf8)
 			{
 			    // Move to the first byte of this char.
 			    // utf_head_off() doesn't work, because it checks
 			    // for a truncated character.
-			    while (n > 0 && (IObuff[n] & 0xc0) == 0x80)
+			    جب (n > 0 && (IObuff[n] & 0xc0) == 0x80)
 				--n;
 			}
-			else if (has_mbyte)
-			    n -= mb_head_off(IObuff, IObuff + n);
+			ورنہ اگر (has_mbyte)
+			    n -= mb_سر_off(IObuff, IObuff + n);
 			IObuff[n] = NL;
 			IObuff[n + 1] = NUL;
 		    }
-		    if (i < si->sn_prl_ga.ga_len
-				     && (pp = &PRL_ITEM(si, i))->snp_count > 0)
+		    اگر (i < si->sn_prl_ga.ga_len
+				     && (pp = &PRL_شے(si, i))->snp_گنتی > 0)
 		    {
-			fprintf(fd, "%5d ", pp->snp_count);
-			if (profile_equal(&pp->sn_prl_total, &pp->sn_prl_self))
+			fprintf(fd, "%5d ", pp->snp_گنتی);
+			اگر (profile_equal(&pp->sn_prl_کل, &pp->sn_prl_self))
 			    fprintf(fd, "           ");
-			else
-			    fprintf(fd, "%s ", profile_msg(&pp->sn_prl_total));
-			fprintf(fd, "%s ", profile_msg(&pp->sn_prl_self));
+			ورنہ
+			    fprintf(fd, "%s ", profile_پیغام(&pp->sn_prl_کل));
+			fprintf(fd, "%s ", profile_پیغام(&pp->sn_prl_self));
 		    }
-		    else
+		    ورنہ
 			fprintf(fd, "                            ");
 		    fprintf(fd, "%s", IObuff);
 		}
@@ -1001,18 +1001,18 @@ script_dump_profile(FILE *fd)
 /*
  * Dump the profiling info.
  */
-    void
-profile_dump(void)
+    خالی
+profile_dump(خالی)
 {
     FILE	*fd;
 
-    if (profile_fname == NULL)
-	return;
+    اگر (profile_fname == تہی)
+	واپس;
 
-    fd = mch_fopen((char *)profile_fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((حرف *)profile_fname, "w");
+    اگر (fd == تہی)
 	semsg(_(e_cant_open_file_str), profile_fname);
-    else
+    ورنہ
     {
 	script_dump_profile(fd);
 	func_dump_profile(fd);
@@ -1026,34 +1026,34 @@ profile_dump(void)
  * When skipping lines it may not actually be executed, but we won't find out
  * until later and we need to store the time now.
  */
-    void
-script_line_start(void)
+    خالی
+script_سطر_آغاز(خالی)
 {
     scriptitem_T    *si;
     sn_prl_T	    *pp;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
-    si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && SOURCING_LNUM >= 1)
+    اگر (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	واپس;
+    si = SCRIPT_شے(current_sctx.sc_sid);
+    اگر (si->sn_prof_on && SOURCING_LNUM >= 1)
     {
 	// Grow the array before starting the timer, so that the time spent
 	// here isn't counted.
-	(void)ga_grow(&si->sn_prl_ga,
-				  (int)(SOURCING_LNUM - si->sn_prl_ga.ga_len));
+	(خالی)ga_grow(&si->sn_prl_ga,
+				  (صحیح)(SOURCING_LNUM - si->sn_prl_ga.ga_len));
 	si->sn_prl_idx = SOURCING_LNUM - 1;
-	while (si->sn_prl_ga.ga_len <= si->sn_prl_idx
+	جب (si->sn_prl_ga.ga_len <= si->sn_prl_idx
 		&& si->sn_prl_ga.ga_len < si->sn_prl_ga.ga_maxlen)
 	{
 	    // Zero counters for a line that was not used before.
-	    pp = &PRL_ITEM(si, si->sn_prl_ga.ga_len);
-	    pp->snp_count = 0;
-	    profile_zero(&pp->sn_prl_total);
+	    pp = &PRL_شے(si, si->sn_prl_ga.ga_len);
+	    pp->snp_گنتی = 0;
+	    profile_zero(&pp->sn_prl_کل);
 	    profile_zero(&pp->sn_prl_self);
 	    ++si->sn_prl_ga.ga_len;
 	}
 	si->sn_prl_execed = FALSE;
-	profile_start(&si->sn_prl_start);
+	profile_آغاز(&si->sn_prl_آغاز);
 	profile_zero(&si->sn_prl_children);
 	profile_get_wait(&si->sn_prl_wait);
     }
@@ -1062,41 +1062,41 @@ script_line_start(void)
 /*
  * Called when actually executing a function line.
  */
-    void
-script_line_exec(void)
+    خالی
+script_سطر_exec(خالی)
 {
     scriptitem_T    *si;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
-    si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && si->sn_prl_idx >= 0)
+    اگر (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	واپس;
+    si = SCRIPT_شے(current_sctx.sc_sid);
+    اگر (si->sn_prof_on && si->sn_prl_idx >= 0)
 	si->sn_prl_execed = TRUE;
 }
 
 /*
  * Called when done with a script line.
  */
-    void
-script_line_end(void)
+    خالی
+script_سطر_انتہا(خالی)
 {
     scriptitem_T    *si;
     sn_prl_T	    *pp;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
-    si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && si->sn_prl_idx >= 0
+    اگر (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	واپس;
+    si = SCRIPT_شے(current_sctx.sc_sid);
+    اگر (si->sn_prof_on && si->sn_prl_idx >= 0
 				     && si->sn_prl_idx < si->sn_prl_ga.ga_len)
     {
-	if (si->sn_prl_execed)
+	اگر (si->sn_prl_execed)
 	{
-	    pp = &PRL_ITEM(si, si->sn_prl_idx);
-	    ++pp->snp_count;
-	    profile_end(&si->sn_prl_start);
-	    profile_sub_wait(&si->sn_prl_wait, &si->sn_prl_start);
-	    profile_add(&pp->sn_prl_total, &si->sn_prl_start);
-	    profile_self(&pp->sn_prl_self, &si->sn_prl_start,
+	    pp = &PRL_شے(si, si->sn_prl_idx);
+	    ++pp->snp_گنتی;
+	    profile_انتہا(&si->sn_prl_آغاز);
+	    profile_sub_wait(&si->sn_prl_wait, &si->sn_prl_آغاز);
+	    profile_جوڑو(&pp->sn_prl_کل, &si->sn_prl_آغاز);
+	    profile_self(&pp->sn_prl_self, &si->sn_prl_آغاز,
 							&si->sn_prl_children);
 	}
 	si->sn_prl_idx = -1;
@@ -1104,4 +1104,4 @@ script_line_end(void)
 }
 # endif // FEAT_PROFILE
 
-#endif
+#اگر_ختم

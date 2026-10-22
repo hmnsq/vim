@@ -21,9 +21,9 @@
  *  sha256_self_test() is implicitly called once.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+#اگر defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 
 # define GET_UINT32(n, b, i)		    \
 {					    \
@@ -41,11 +41,11 @@
     (b)[(i) + 3] = (char_u)((n)      );   \
 }
 
-    void
-sha256_start(context_sha256_T *ctx)
+    خالی
+sha256_آغاز(context_sha256_T *ctx)
 {
-    ctx->total[0] = 0;
-    ctx->total[1] = 0;
+    ctx->کل[0] = 0;
+    ctx->کل[1] = 0;
 
     ctx->state[0] = 0x6A09E667;
     ctx->state[1] = 0xBB67AE85;
@@ -57,28 +57,28 @@ sha256_start(context_sha256_T *ctx)
     ctx->state[7] = 0x5BE0CD19;
 }
 
-    static void
-sha256_process(context_sha256_T *ctx, char_u data[64])
+    ساکن خالی
+sha256_process(context_sha256_T *ctx, char_u ڈیٹا[64])
 {
     UINT32_T temp1, temp2, W[64];
     UINT32_T A, B, C, D, E, F, G, H;
 
-    GET_UINT32(W[0],  data,  0);
-    GET_UINT32(W[1],  data,  4);
-    GET_UINT32(W[2],  data,  8);
-    GET_UINT32(W[3],  data, 12);
-    GET_UINT32(W[4],  data, 16);
-    GET_UINT32(W[5],  data, 20);
-    GET_UINT32(W[6],  data, 24);
-    GET_UINT32(W[7],  data, 28);
-    GET_UINT32(W[8],  data, 32);
-    GET_UINT32(W[9],  data, 36);
-    GET_UINT32(W[10], data, 40);
-    GET_UINT32(W[11], data, 44);
-    GET_UINT32(W[12], data, 48);
-    GET_UINT32(W[13], data, 52);
-    GET_UINT32(W[14], data, 56);
-    GET_UINT32(W[15], data, 60);
+    GET_UINT32(W[0],  ڈیٹا,  0);
+    GET_UINT32(W[1],  ڈیٹا,  4);
+    GET_UINT32(W[2],  ڈیٹا,  8);
+    GET_UINT32(W[3],  ڈیٹا, 12);
+    GET_UINT32(W[4],  ڈیٹا, 16);
+    GET_UINT32(W[5],  ڈیٹا, 20);
+    GET_UINT32(W[6],  ڈیٹا, 24);
+    GET_UINT32(W[7],  ڈیٹا, 28);
+    GET_UINT32(W[8],  ڈیٹا, 32);
+    GET_UINT32(W[9],  ڈیٹا, 36);
+    GET_UINT32(W[10], ڈیٹا, 40);
+    GET_UINT32(W[11], ڈیٹا, 44);
+    GET_UINT32(W[12], ڈیٹا, 48);
+    GET_UINT32(W[13], ڈیٹا, 52);
+    GET_UINT32(W[14], ڈیٹا, 56);
+    GET_UINT32(W[15], ڈیٹا, 60);
 
 # define  SHR(x, n) (((x) & 0xFFFFFFFF) >> (n))
 # define ROTR(x, n) (SHR(x, n) | ((x) << (32 - (n))))
@@ -189,65 +189,65 @@ sha256_process(context_sha256_T *ctx, char_u data[64])
     ctx->state[7] += H;
 }
 
-    void
-sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
+    خالی
+sha256_update(context_sha256_T *ctx, char_u *داخلہ, UINT32_T لمبائی)
 {
-    UINT32_T left, fill;
+    UINT32_T بایاں, fill;
 
-    if (length == 0)
-	return;
+    اگر (لمبائی == 0)
+	واپس;
 
-    left = ctx->total[0] & 0x3F;
-    fill = 64 - left;
+    بایاں = ctx->کل[0] & 0x3F;
+    fill = 64 - بایاں;
 
-    ctx->total[0] += length;
-    ctx->total[0] &= 0xFFFFFFFF;
+    ctx->کل[0] += لمبائی;
+    ctx->کل[0] &= 0xFFFFFFFF;
 
-    if (ctx->total[0] < length)
-	ctx->total[1]++;
+    اگر (ctx->کل[0] < لمبائی)
+	ctx->کل[1]++;
 
-    if (left && length >= fill)
+    اگر (بایاں && لمبائی >= fill)
     {
-	memcpy((void *)(ctx->buffer + left), (void *)input, fill);
-	sha256_process(ctx, ctx->buffer);
-	length -= fill;
-	input  += fill;
-	left = 0;
+	حافظہ_نقل((خالی *)(ctx->بفر + بایاں), (خالی *)داخلہ, fill);
+	sha256_process(ctx, ctx->بفر);
+	لمبائی -= fill;
+	داخلہ  += fill;
+	بایاں = 0;
     }
 
-    while (length >= 64)
+    جب (لمبائی >= 64)
     {
-	sha256_process(ctx, input);
-	length -= 64;
-	input  += 64;
+	sha256_process(ctx, داخلہ);
+	لمبائی -= 64;
+	داخلہ  += 64;
     }
 
-    if (length)
-	memcpy((void *)(ctx->buffer + left), (void *)input, length);
+    اگر (لمبائی)
+	حافظہ_نقل((خالی *)(ctx->بفر + بایاں), (خالی *)داخلہ, لمبائی);
 }
 
-static char_u sha256_padding[64] = {
+ساکن char_u sha256_padding[64] = {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-    void
-sha256_finish(context_sha256_T *ctx, char_u digest[32])
+    خالی
+sha256_اختتام(context_sha256_T *ctx, char_u digest[32])
 {
-    UINT32_T last, padn;
-    UINT32_T high, low;
+    UINT32_T آخری, padn;
+    UINT32_T بلند, کم;
     char_u   msglen[8];
 
-    high = (ctx->total[0] >> 29) | (ctx->total[1] <<  3);
-    low  = (ctx->total[0] <<  3);
+    بلند = (ctx->کل[0] >> 29) | (ctx->کل[1] <<  3);
+    کم  = (ctx->کل[0] <<  3);
 
-    PUT_UINT32(high, msglen, 0);
-    PUT_UINT32(low,  msglen, 4);
+    PUT_UINT32(بلند, msglen, 0);
+    PUT_UINT32(کم,  msglen, 4);
 
-    last = ctx->total[0] & 0x3F;
-    padn = (last < 56) ? (56 - last) : (120 - last);
+    آخری = ctx->کل[0] & 0x3F;
+    padn = (آخری < 56) ? (56 - آخری) : (120 - آخری);
 
     sha256_update(ctx, sha256_padding, padn);
     sha256_update(ctx, msglen, 8);
@@ -261,65 +261,65 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
     PUT_UINT32(ctx->state[6], digest, 24);
     PUT_UINT32(ctx->state[7], digest, 28);
 }
-#endif // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
+#اگر_ختم // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
 
-#if defined(FEAT_CRYPT)
+#اگر defined(FEAT_CRYPT)
 /*
  * Returns hex digest of "buf[buf_len]" in a static array.
  * if "salt" is not NULL also do "salt[salt_len]".
  */
     char_u *
-sha256_bytes(
+sha256_بائٹیں(
     char_u *buf,
-    int    buf_len,
+    صحیح    buf_len,
     char_u *salt,
-    int    salt_len)
+    صحیح    salt_len)
 {
     char_u	     sha256sum[32];
-    static char_u    hexit[65];
-    int		     j;
+    ساکن char_u    hexit[65];
+    صحیح		     j;
     context_sha256_T ctx;
 
     sha256_self_test();
 
-    sha256_start(&ctx);
+    sha256_آغاز(&ctx);
     sha256_update(&ctx, buf, buf_len);
-    if (salt != NULL)
+    اگر (salt != تہی)
 	sha256_update(&ctx, salt, salt_len);
-    sha256_finish(&ctx, sha256sum);
-    for (j = 0; j < 32; j++)
-	sprintf((char *)hexit + j * 2, "%02x", sha256sum[j]);
-    hexit[sizeof(hexit) - 1] = '\0';
-    return hexit;
+    sha256_اختتام(&ctx, sha256sum);
+    برائے (j = 0; j < 32; j++)
+	sprintf((حرف *)hexit + j * 2, "%02x", sha256sum[j]);
+    hexit[حجم(hexit) - 1] = '\0';
+    واپس hexit;
 }
 
 /*
  * Returns sha256(buf) as 64 hex chars in static array.
  */
     char_u *
-sha256_key(
+sha256_کلید(
     char_u *buf,
     char_u *salt,
-    int    salt_len)
+    صحیح    salt_len)
 {
     // No passwd means don't encrypt
-    if (buf == NULL || *buf == NUL)
-	return (char_u *)"";
+    اگر (buf == تہی || *buf == NUL)
+	واپس (char_u *)"";
 
-    return sha256_bytes(buf, (int)STRLEN(buf), salt, salt_len);
+    واپس sha256_بائٹیں(buf, (صحیح)STRLEN(buf), salt, salt_len);
 }
 
 /*
  * These are the standard FIPS-180-2 test vectors
  */
 
-static char *sha_self_test_msg[] = {
+ساکن حرف *sha_self_test_پیغام[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-    NULL
+    تہی
 };
 
-static char *sha_self_test_vector[] = {
+ساکن حرف *sha_self_test_سمتیہ[] = {
     "ba7816bf8f01cfea414140de5dae2223" \
     "b00361a396177a9cb410ff61f20015ad",
     "248d6a61d20638b8e5c026930c3e6039" \
@@ -332,62 +332,62 @@ static char *sha_self_test_vector[] = {
  * Perform a test on the SHA256 algorithm.
  * Return FAIL or OK.
  */
-    int
-sha256_self_test(void)
+    صحیح
+sha256_self_test(خالی)
 {
-    int		     i, j;
-    char	     output[65];
+    صحیح		     i, j;
+    حرف	     output[65];
     context_sha256_T ctx;
     char_u	     buf[1000];
     char_u	     sha256sum[32];
-    static int	     failures = 0;
+    ساکن صحیح	     failures = 0;
     char_u	     *hexit;
-    static int	     sha256_self_tested = 0;
+    ساکن صحیح	     sha256_self_tested = 0;
 
-    if (sha256_self_tested > 0)
-	return failures > 0 ? FAIL : OK;
+    اگر (sha256_self_tested > 0)
+	واپس failures > 0 ? FAIL : OK;
     sha256_self_tested = 1;
 
-    for (i = 0; i < 3; i++)
+    برائے (i = 0; i < 3; i++)
     {
-	if (i < 2)
+	اگر (i < 2)
 	{
-	    hexit = sha256_bytes((char_u *)sha_self_test_msg[i],
-		    (int)STRLEN(sha_self_test_msg[i]),
-		    NULL, 0);
+	    hexit = sha256_بائٹیں((char_u *)sha_self_test_پیغام[i],
+		    (صحیح)STRLEN(sha_self_test_پیغام[i]),
+		    تہی, 0);
 	    STRCPY(output, hexit);
 	}
-	else
+	ورنہ
 	{
-	    sha256_start(&ctx);
+	    sha256_آغاز(&ctx);
 	    vim_memset(buf, 'a', 1000);
-	    for (j = 0; j < 1000; j++)
+	    برائے (j = 0; j < 1000; j++)
 		sha256_update(&ctx, (char_u *)buf, 1000);
-	    sha256_finish(&ctx, sha256sum);
-	    for (j = 0; j < 32; j++)
+	    sha256_اختتام(&ctx, sha256sum);
+	    برائے (j = 0; j < 32; j++)
 		sprintf(output + j * 2, "%02x", sha256sum[j]);
 	}
-	if (memcmp(output, sha_self_test_vector[i], 64))
+	اگر (memcmp(output, sha_self_test_سمتیہ[i], 64))
 	{
 	    failures++;
-	    output[sizeof(output) - 1] = '\0';
+	    output[حجم(output) - 1] = '\0';
 	    // printf("sha256_self_test %d failed %s\n", i, output);
 	}
     }
-    return failures > 0 ? FAIL : OK;
+    واپس failures > 0 ? FAIL : OK;
 }
 
-    static unsigned int
-get_some_time(void)
+    ساکن غیرعلامتی صحیح
+get_some_وقت(خالی)
 {
 # ifdef HAVE_GETTIMEOFDAY
-    struct timeval tv;
+    ساخت timeval tv;
 
     // Using usec makes it less predictable.
-    gettimeofday(&tv, NULL);
-    return (unsigned int)(tv.tv_sec + tv.tv_usec);
-# else
-    return (unsigned int)time(NULL);
+    gettimeofday(&tv, تہی);
+    واپس (غیرعلامتی صحیح)(tv.tv_sec + tv.tv_usec);
+# ورنہ
+    واپس (غیرعلامتی صحیح)وقت(تہی);
 # endif
 }
 
@@ -395,34 +395,34 @@ get_some_time(void)
  * Fill "header[header_len]" with random_data.
  * Also "salt[salt_len]" when "salt" is not NULL.
  */
-    void
-sha2_seed(
-    char_u *header,
-    int    header_len,
+    خالی
+sha2_بیج(
+    char_u *سرخی,
+    صحیح    سرخی_len,
     char_u *salt,
-    int    salt_len)
+    صحیح    salt_len)
 {
-    int		     i;
-    static char_u    random_data[1000];
+    صحیح		     i;
+    ساکن char_u    random_data[1000];
     char_u	     sha256sum[32];
     context_sha256_T ctx;
 
-    srand(get_some_time());
+    srand(get_some_وقت());
 
-    for (i = 0; i < (int)sizeof(random_data) - 1; i++)
-	random_data[i] = (char_u)((get_some_time() ^ rand()) & 0xff);
-    sha256_start(&ctx);
-    sha256_update(&ctx, (char_u *)random_data, sizeof(random_data));
-    sha256_finish(&ctx, sha256sum);
+    برائے (i = 0; i < (صحیح)حجم(random_data) - 1; i++)
+	random_data[i] = (char_u)((get_some_وقت() ^ rand()) & 0xff);
+    sha256_آغاز(&ctx);
+    sha256_update(&ctx, (char_u *)random_data, حجم(random_data));
+    sha256_اختتام(&ctx, sha256sum);
 
     // put first block into header.
-    for (i = 0; i < header_len; i++)
-	header[i] = sha256sum[i % sizeof(sha256sum)];
+    برائے (i = 0; i < سرخی_len; i++)
+	سرخی[i] = sha256sum[i % حجم(sha256sum)];
 
     // put remaining block into salt.
-    if (salt != NULL)
-	for (i = 0; i < salt_len; i++)
-	    salt[i] = sha256sum[(i + header_len) % sizeof(sha256sum)];
+    اگر (salt != تہی)
+	برائے (i = 0; i < salt_len; i++)
+	    salt[i] = sha256sum[(i + سرخی_len) % حجم(sha256sum)];
 }
 
-#endif // FEAT_CRYPT
+#اگر_ختم // FEAT_CRYPT

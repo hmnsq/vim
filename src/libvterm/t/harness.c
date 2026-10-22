@@ -1,296 +1,296 @@
-#include "vterm.h"
-#include "../src/vterm_internal.h" // We pull in some internal bits too
+#شامل "vterm.h"
+#شامل "../src/vterm_internal.h" // We pull in some internal bits too
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#شامل <assert.h>
+#شامل <stdio.h>
+#شامل <string.h>
 
-#define streq(a,b) (!strcmp(a,b))
-#define strstartswith(a,b) (!strncmp(a,b,strlen(b)))
+#تعریف_کرو streq(a,b) (!strcmp(a,b))
+#تعریف_کرو strstartswith(a,b) (!لڑی_موازنہ(a,b,لڑی_لمبائی(b)))
 
-static size_t inplace_hex2bytes(char *s)
+ساکن size_t inplace_hex2bytes(حرف *s)
 {
-  char *inpos = s, *outpos = s;
+  حرف *inpos = s, *outpos = s;
 
-  while(*inpos) {
-    unsigned int ch;
-    if(sscanf(inpos, "%2x", &ch) < 1)
-      break;
+  جب(*inpos) {
+    غیرعلامتی صحیح ch;
+    اگر(لڑی_سے_پڑھو(inpos, "%2x", &ch) < 1)
+      توڑو;
     *outpos = ch;
     outpos += 1; inpos += 2;
   }
 
-  return outpos - s;
+  واپس outpos - s;
 }
 
-static VTermModifier strpe_modifiers(char **strp)
+ساکن VTermModifier strpe_modifiers(حرف **strp)
 {
   VTermModifier state = 0;
 
-  while((*strp)[0]) {
-    switch(((*strp)++)[0]) {
-      case 'S': state |= VTERM_MOD_SHIFT; break;
-      case 'C': state |= VTERM_MOD_CTRL;  break;
-      case 'A': state |= VTERM_MOD_ALT;   break;
-      default: return state;
+  جب((*strp)[0]) {
+    انتخاب(((*strp)++)[0]) {
+      حالت 'S': state |= VTERM_MOD_سرکاؤ; توڑو;
+      حالت 'C': state |= VTERM_MOD_CTRL;  توڑو;
+      حالت 'A': state |= VTERM_MOD_ALT;   توڑو;
+      طےشدہ: واپس state;
     }
   }
 
-  return state;
+  واپس state;
 }
 
-static VTermKey strp_key(char *str)
+ساکن VTerm_کلید strp_کلید(حرف *str)
 {
-  static struct {
-    char *name;
-    VTermKey key;
-  } keys[] = {
-    { "Up",    VTERM_KEY_UP },
-    { "Tab",   VTERM_KEY_TAB },
-    { "Enter", VTERM_KEY_ENTER },
-    { "KP0",   VTERM_KEY_KP_0 },
-    { "F1",    VTERM_KEY_FUNCTION(1) },
-    { NULL,    VTERM_KEY_NONE },
+  ساکن ساخت {
+    حرف *name;
+    VTerm_کلید کلید;
+  } کلیدیں[] = {
+    { "Up",    VTERM_کلید_اوپر },
+    { "Tab",   VTERM_کلید_TAB },
+    { "Enter", VTERM_کلید_ENTER },
+    { "KP0",   VTERM_کلید_KP_0 },
+    { "F1",    VTERM_کلید_FUNCTION(1) },
+    { تہی,    VTERM_کلید_NONE },
   };
-  int i;
+  صحیح i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  برائے(i = 0; کلیدیں[i].name; i++) {
+    اگر(streq(str, کلیدیں[i].name))
+      واپس کلیدیں[i].کلید;
   }
 
-  return VTERM_KEY_NONE;
+  واپس VTERM_کلید_NONE;
 }
 
-static void print_color(const VTermColor *col)
+ساکن خالی print_color(ثابت VTermColor *ستون)
 {
-  if (VTERM_COLOR_IS_RGB(col)) {
-    printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
+  اگر (VTERM_COLOR_IS_RGB(ستون)) {
+    لکھو("rgb(%d,%d,%d", ستون->red, ستون->green, ستون->blue);
   }
-  else if (VTERM_COLOR_IS_INDEXED(col)) {
-    printf("idx(%d", col->index);
+  ورنہ اگر (VTERM_COLOR_IS_اشاریہ_دار(ستون)) {
+    لکھو("idx(%d", ستون->اشاریہ);
   }
-  else {
-    printf("invalid(%d", col->type);
+  ورنہ {
+    لکھو("invalid(%d", ستون->type);
   }
-  if (VTERM_COLOR_IS_DEFAULT_FG(col)) {
-    printf(",is_default_fg");
+  اگر (VTERM_COLOR_IS_DEFAULT_FG(ستون)) {
+    لکھو(",is_default_fg");
   }
-  if (VTERM_COLOR_IS_DEFAULT_BG(col)) {
-    printf(",is_default_bg");
+  اگر (VTERM_COLOR_IS_DEFAULT_BG(ستون)) {
+    لکھو(",is_default_bg");
   }
-  printf(")");
+  لکھو(")");
 }
 
-static VTermColor strpe_color(char **strp)
+ساکن VTermColor strpe_color(حرف **strp)
 {
   uint8_t r, g, b, idx;
-  int len = 0;
-  VTermColor col;
+  صحیح len = 0;
+  VTermColor ستون;
 
-  if(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
+  اگر(لڑی_سے_پڑھو(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
     *strp += len;
-    vterm_color_rgb(&col, r, g, b);
+    vterm_color_rgb(&ستون, r, g, b);
   }
-  else if(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
+  ورنہ اگر(لڑی_سے_پڑھو(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
     *strp += len;
-    vterm_color_indexed(&col, idx);
+    vterm_color_اشاریہ_دار(&ستون, idx);
   }
-  else
-    vterm_color_rgb(&col, 127, 127, 127);
+  ورنہ
+    vterm_color_rgb(&ستون, 127, 127, 127);
 
-  return col;
+  واپس ستون;
 }
 
-static VTerm *vt;
-static VTermState *state;
-static VTermScreen *screen;
+ساکن VTerm *vt;
+ساکن VTermState *state;
+ساکن VTermScreen *screen;
 
-static VTermEncodingInstance encoding;
+ساکن VTermEncodingInstance encoding;
 
-static void term_output(const char *s, size_t len, void *user UNUSED)
+ساکن خالی رکن_output(ثابت حرف *s, size_t len, خالی *user غیر_مستعمل)
 {
   size_t i;
 
-  printf("output ");
-  for(i = 0; i < len; i++)
-    printf("%x%s", (unsigned char)s[i], i < len-1 ? "," : "\n");
+  لکھو("output ");
+  برائے(i = 0; i < len; i++)
+    لکھو("%x%s", (غیرعلامتی حرف)s[i], i < len-1 ? "," : "\n");
 }
 
-static void printhex(const char *s, size_t len)
+ساکن خالی printhex(ثابت حرف *s, size_t len)
 {
-  while(len--)
-    printf("%02x", (uint8_t)(s++)[0]);
+  جب(len--)
+    لکھو("%02x", (uint8_t)(s++)[0]);
 }
 
-static int parser_text(const char bytes[], size_t len, void *user UNUSED)
+ساکن صحیح parser_متن(ثابت حرف بائٹیں[], size_t len, خالی *user غیر_مستعمل)
 {
   size_t i;
 
-  printf("text ");
-  for(i = 0; i < len; i++) {
-    unsigned char b = bytes[i];
-    if(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
-      break;
-    printf(i ? ",%x" : "%x", b);
+  لکھو("text ");
+  برائے(i = 0; i < len; i++) {
+    غیرعلامتی حرف b = بائٹیں[i];
+    اگر(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
+      توڑو;
+    لکھو(i ? ",%x" : "%x", b);
   }
-  printf("\n");
+  لکھو("\n");
 
-  return i;
+  واپس i;
 }
 
-static int parser_control(unsigned char control, void *user UNUSED)
+ساکن صحیح parser_control(غیرعلامتی حرف control, خالی *user غیر_مستعمل)
 {
-  printf("control %02x\n", control);
+  لکھو("control %02x\n", control);
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
+ساکن صحیح parser_escape(ثابت حرف بائٹیں[], size_t len, خالی *user غیر_مستعمل)
 {
-  if(bytes[0] >= 0x20 && bytes[0] < 0x30) {
-    if(len < 2)
-      return -1;
+  اگر(بائٹیں[0] >= 0x20 && بائٹیں[0] < 0x30) {
+    اگر(len < 2)
+      واپس -1;
     len = 2;
   }
-  else {
+  ورنہ {
     len = 1;
   }
 
-  printf("escape ");
-  printhex(bytes, len);
-  printf("\n");
+  لکھو("escape ");
+  printhex(بائٹیں, len);
+  لکھو("\n");
 
-  return len;
+  واپس len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+ساکن صحیح parser_csi(ثابت حرف *leader, ثابت طویل دلائل[], صحیح argcount, ثابت حرف *intermed, حرف command, خالی *user غیر_مستعمل)
 {
-  int i;
-  printf("csi %02x", command);
+  صحیح i;
+  لکھو("csi %02x", command);
 
-  if(leader && leader[0]) {
-    printf(" L=");
-    for(i = 0; leader[i]; i++)
-      printf("%02x", leader[i]);
+  اگر(leader && leader[0]) {
+    لکھو(" L=");
+    برائے(i = 0; leader[i]; i++)
+      لکھو("%02x", leader[i]);
   }
 
-  for(i = 0; i < argcount; i++) {
-    char sep = i ? ',' : ' ';
+  برائے(i = 0; i < argcount; i++) {
+    حرف sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
-      printf("%c*", sep);
-    else
-      printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
+    اگر(دلائل[i] == CSI_ARG_MISSING)
+      لکھو("%c*", sep);
+    ورنہ
+      لکھو("%c%ld%s", sep, CSI_ARG(دلائل[i]), CSI_ARG_HAS_مزید(دلائل[i]) ? "+" : "");
   }
 
-  if(intermed && intermed[0]) {
-    printf(" I=");
-    for(i = 0; intermed[i]; i++)
-      printf("%02x", intermed[i]);
+  اگر(intermed && intermed[0]) {
+    لکھو(" I=");
+    برائے(i = 0; intermed[i]; i++)
+      لکھو("%02x", intermed[i]);
   }
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_osc(int command, VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح parser_osc(صحیح command, VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
 
-  printf("osc ");
+  لکھو("osc ");
 
-  if(frag.initial) {
-    if(command == -1)
-      printf("[");
-    else
-      printf("[%d;", command);
+  اگر(frag.initial) {
+    اگر(command == -1)
+      لکھو("[");
+    ورنہ
+      لکھو("[%d;", command);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  اگر(frag.final)
+    لکھو("]");
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح parser_dcs(ثابت حرف *command, size_t commandlen, VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
-  printf("dcs ");
+  لکھو("dcs ");
 
-  if(frag.initial) {
+  اگر(frag.initial) {
     size_t i;
-    printf("[");
-    for(i = 0; i < commandlen; i++)
-      printf("%02x", command[i]);
+    لکھو("[");
+    برائے(i = 0; i < commandlen; i++)
+      لکھو("%02x", command[i]);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  اگر(frag.final)
+    لکھو("]");
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_apc(VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح parser_apc(VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
-  printf("apc ");
+  لکھو("apc ");
 
-  if(frag.initial)
-    printf("[");
+  اگر(frag.initial)
+    لکھو("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  اگر(frag.final)
+    لکھو("]");
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_pm(VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح parser_pm(VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
-  printf("pm ");
+  لکھو("pm ");
 
-  if(frag.initial)
-    printf("[");
+  اگر(frag.initial)
+    لکھو("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  اگر(frag.final)
+    لکھو("]");
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int parser_sos(VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح parser_sos(VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
-  printf("sos ");
+  لکھو("sos ");
 
-  if(frag.initial)
-    printf("[");
+  اگر(frag.initial)
+    لکھو("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
-    printf("]");
+  اگر(frag.final)
+    لکھو("]");
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static VTermParserCallbacks parser_cbs = {
-  parser_text, // text
+ساکن VTermParserCallbacks parser_cbs = {
+  parser_متن, //متن
   parser_control, // control
   parser_escape, // escape
   parser_csi, // csi
@@ -299,10 +299,10 @@ static VTermParserCallbacks parser_cbs = {
   parser_apc, // apc
   parser_pm, // pm
   parser_sos, // sos
-  NULL // resize
+  تہی // resize
 };
 
-static VTermStateFallbacks fallbacks = {
+ساکن VTermStateFallbacks fallbacks = {
   parser_control, // control
   parser_csi, // csi
   parser_osc, // osc
@@ -314,198 +314,198 @@ static VTermStateFallbacks fallbacks = {
 
 /* These callbacks are shared by State and Screen */
 
-static int want_movecursor = 0;
-static VTermPos state_pos;
-static int movecursor(VTermPos pos, VTermPos oldpos UNUSED, int visible UNUSED, void *user UNUSED)
+ساکن صحیح want_movecursor = 0;
+ساکن VTermPos state_pos;
+ساکن صحیح movecursor(VTermPos pos, VTermPos oldpos غیر_مستعمل, صحیح visible غیر_مستعمل, خالی *user غیر_مستعمل)
 {
   state_pos = pos;
 
-  if(want_movecursor)
-    printf("movecursor %d,%d\n", pos.row, pos.col);
+  اگر(want_movecursor)
+    لکھو("movecursor %d,%d\n", pos.صف, pos.ستون);
 
-  return 1;
+  واپس 1;
 }
 
-static int want_premove = 0;
-static int premove(VTermRect rect, void *user UNUSED)
+ساکن صحیح want_premove = 0;
+ساکن صحیح premove(VTermRect rect, خالی *user غیر_مستعمل)
 {
-  if(!want_premove)
-    return 0;
+  اگر(!want_premove)
+    واپس 0;
 
-  printf("premove %d..%d,%d..%d\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col);
+  لکھو("premove %d..%d,%d..%d\n",
+      rect.آغاز_صف, rect.انتہا_صف, rect.آغاز_ستون, rect.انتہا_ستون);
 
-  return 1;
+  واپس 1;
 }
 
-static int want_scrollrect = 0;
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user UNUSED)
+ساکن صحیح want_scrollrect = 0;
+ساکن صحیح scrollrect(VTermRect rect, صحیح downward, صحیح rightward, خالی *user غیر_مستعمل)
 {
-  if(!want_scrollrect)
-    return 0;
+  اگر(!want_scrollrect)
+    واپس 0;
 
-  printf("scrollrect %d..%d,%d..%d => %+d,%+d\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col,
+  لکھو("scrollrect %d..%d,%d..%d => %+d,%+d\n",
+      rect.آغاز_صف, rect.انتہا_صف, rect.آغاز_ستون, rect.انتہا_ستون,
       downward, rightward);
 
-  return 1;
+  واپس 1;
 }
 
-static int want_moverect = 0;
-static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
+ساکن صحیح want_moverect = 0;
+ساکن صحیح moverect(VTermRect dest, VTermRect src, خالی *user غیر_مستعمل)
 {
-  if(!want_moverect)
-    return 0;
+  اگر(!want_moverect)
+    واپس 0;
 
-  printf("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
-      src.start_row,  src.end_row,  src.start_col,  src.end_col,
-      dest.start_row, dest.end_row, dest.start_col, dest.end_col);
+  لکھو("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
+      src.آغاز_صف,  src.انتہا_صف,  src.آغاز_ستون,  src.انتہا_ستون,
+      dest.آغاز_صف, dest.انتہا_صف, dest.آغاز_ستون, dest.انتہا_ستون);
 
-  return 1;
+  واپس 1;
 }
 
-static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+ساکن صحیح want_settermprop = 0;
+ساکن صحیح settermprop(VTermProp prop, VTerm_قدر *val, خالی *user غیر_مستعمل)
 {
-  VTermValueType type;
-  if(!want_settermprop)
-    return 1;
+  VTerm_قدر_Type type;
+  اگر(!want_settermprop)
+    واپس 1;
 
   type = vterm_get_prop_type(prop);
-  switch(type) {
-  case VTERM_VALUETYPE_BOOL:
-    printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
-    return 1;
-  case VTERM_VALUETYPE_INT:
-    printf("settermprop %d %d\n", prop, val->number);
-    return 1;
-  case VTERM_VALUETYPE_STRING:
-    printf("settermprop %d %s\"%.*s\"%s\n", prop,
+  انتخاب(type) {
+  حالت VTERM_VALUETYPE_BOOL:
+    لکھو("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
+    واپس 1;
+  حالت VTERM_VALUETYPE_INT:
+    لکھو("settermprop %d %d\n", prop, val->نمبر);
+    واپس 1;
+  حالت VTERM_VALUETYPE_STRING:
+    لکھو("settermprop %d %s\"%.*s\"%s\n", prop,
         val->string.initial ? "[" : "", val->string.len, val->string.str, val->string.final ? "]" : "");
-    return 1;
-  case VTERM_VALUETYPE_COLOR:
-    printf("settermprop %d ", prop);
+    واپس 1;
+  حالت VTERM_VALUETYPE_COLOR:
+    لکھو("settermprop %d ", prop);
     print_color(&val->color);
-    printf("\n");
-    return 1;
+    لکھو("\n");
+    واپس 1;
 
-  case VTERM_N_VALUETYPES:
-    return 0;
+  حالت VTERM_N_VALUETYPES:
+    واپس 0;
   }
 
-  return 0;
+  واپس 0;
 }
 
 // These callbacks are for State
 
-static int want_state_putglyph = 0;
-static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
+ساکن صحیح want_state_putglyph = 0;
+ساکن صحیح state_putglyph(VTermGlyphInfo *info, VTermPos pos, خالی *user غیر_مستعمل)
 {
-  int i;
-  if(!want_state_putglyph)
-    return 1;
+  صحیح i;
+  اگر(!want_state_putglyph)
+    واپس 1;
 
-  printf("putglyph ");
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
-    printf(i ? ",%x" : "%x", info->chars[i]);
-  printf(" %d %d,%d", info->width, pos.row, pos.col);
-  if(info->protected_cell)
-    printf(" prot");
-  if(info->dwl)
-    printf(" dwl");
-  if(info->dhl)
-    printf(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
-  printf("\n");
+  لکھو("putglyph ");
+  برائے(i = 0; i < VTERM_MAX_CHARS_فی_CELL && info->chars[i]; i++)
+    لکھو(i ? ",%x" : "%x", info->chars[i]);
+  لکھو(" %d %d,%d", info->چوڑائی, pos.صف, pos.ستون);
+  اگر(info->protected_cell)
+    لکھو(" prot");
+  اگر(info->dwl)
+    لکھو(" dwl");
+  اگر(info->dhl)
+    لکھو(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int want_state_erase = 0;
-static int state_erase(VTermRect rect, int selective, void *user UNUSED)
+ساکن صحیح want_state_erase = 0;
+ساکن صحیح state_erase(VTermRect rect, صحیح selective, خالی *user غیر_مستعمل)
 {
-  if(!want_state_erase)
-    return 1;
+  اگر(!want_state_erase)
+    واپس 1;
 
-  printf("erase %d..%d,%d..%d%s\n",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col,
+  لکھو("erase %d..%d,%d..%d%s\n",
+      rect.آغاز_صف, rect.انتہا_صف, rect.آغاز_ستون, rect.انتہا_ستون,
       selective ? " selective" : "");
 
-  return 1;
+  واپس 1;
 }
 
-static struct {
-  int bold;
-  int underline;
-  int italic;
-  int blink;
-  int reverse;
-  int conceal;
-  int strike;
-  int font;
-  int small;
-  int baseline;
+ساکن ساخت {
+  صحیح bold;
+  صحیح underline;
+  صحیح italic;
+  صحیح blink;
+  صحیح الٹ;
+  صحیح conceal;
+  صحیح strike;
+  صحیح font;
+  صحیح small;
+  صحیح baseline;
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+ساکن صحیح state_setpenattr(VTermAttr attr, VTerm_قدر *val, خالی *user غیر_مستعمل)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  انتخاب(attr) {
+  حالت VTERM_ATTR_BOLD:
     state_pen.bold = val->boolean;
-    break;
-  case VTERM_ATTR_UNDERLINE:
-    state_pen.underline = val->number;
-    break;
-  case VTERM_ATTR_ITALIC:
+    توڑو;
+  حالت VTERM_ATTR_UNDERLINE:
+    state_pen.underline = val->نمبر;
+    توڑو;
+  حالت VTERM_ATTR_ITALIC:
     state_pen.italic = val->boolean;
-    break;
-  case VTERM_ATTR_BLINK:
+    توڑو;
+  حالت VTERM_ATTR_BLINK:
     state_pen.blink = val->boolean;
-    break;
-  case VTERM_ATTR_REVERSE:
-    state_pen.reverse = val->boolean;
-    break;
-  case VTERM_ATTR_CONCEAL:
+    توڑو;
+  حالت VTERM_ATTR_الٹ:
+    state_pen.الٹ = val->boolean;
+    توڑو;
+  حالت VTERM_ATTR_CONCEAL:
     state_pen.conceal = val->boolean;
-    break;
-  case VTERM_ATTR_STRIKE:
+    توڑو;
+  حالت VTERM_ATTR_STRIKE:
     state_pen.strike = val->boolean;
-    break;
-  case VTERM_ATTR_FONT:
-    state_pen.font = val->number;
-    break;
-  case VTERM_ATTR_SMALL:
+    توڑو;
+  حالت VTERM_ATTR_FONT:
+    state_pen.font = val->نمبر;
+    توڑو;
+  حالت VTERM_ATTR_SMALL:
     state_pen.small = val->boolean;
-    break;
-  case VTERM_ATTR_BASELINE:
-    state_pen.baseline = val->number;
-    break;
-  case VTERM_ATTR_FOREGROUND:
+    توڑو;
+  حالت VTERM_ATTR_BASELINE:
+    state_pen.baseline = val->نمبر;
+    توڑو;
+  حالت VTERM_ATTR_FOREGROUND:
     state_pen.foreground = val->color;
-    break;
-  case VTERM_ATTR_BACKGROUND:
+    توڑو;
+  حالت VTERM_ATTR_BACKGROUND:
     state_pen.background = val->color;
-    break;
+    توڑو;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  حالت VTERM_N_ATTRS:
+    واپس 0;
   }
 
-  return 1;
+  واپس 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+ساکن صحیح state_setlineinfo(صحیح صف غیر_مستعمل, ثابت VTerm_سطر_Info *newinfo غیر_مستعمل, ثابت VTerm_سطر_Info *oldinfo غیر_مستعمل, خالی *user غیر_مستعمل)
 {
-  return 1;
+  واپس 1;
 }
 
-static int want_state_scrollback = 0;
-static int state_sb_clear(void *user UNUSED) {
-  if(!want_state_scrollback)
-    return 1;
+ساکن صحیح want_state_scrollback = 0;
+ساکن صحیح state_sb_clear(خالی *user غیر_مستعمل) {
+  اگر(!want_state_scrollback)
+    واپس 1;
 
-  printf("sb_clear\n");
-  return 0;
+  لکھو("sb_clear\n");
+  واپس 0;
 }
 
 VTermStateCallbacks state_cbs = {
@@ -514,143 +514,143 @@ VTermStateCallbacks state_cbs = {
   scrollrect, // scrollrect
   moverect, // moverect
   state_erase, // erase
-  NULL, // initpen
+  تہی, // initpen
   state_setpenattr, // setpenattr
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
+  تہی, // bell
+  تہی, // resize
   state_setlineinfo, // setlineinfo
   state_sb_clear, // sb_clear
   premove, // premove
 };
 
-static int selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
+ساکن صحیح selection_سیٹ(VTerm_Selection_نقاب نقاب, VTermStringFragment frag, خالی *user غیر_مستعمل)
 {
-  printf("selection-set mask=%04X ", mask);
-  if(frag.initial)
-    printf("[");
+  لکھو("selection-set mask=%04X ", نقاب);
+  اگر(frag.initial)
+    لکھو("[");
   printhex(frag.str, frag.len);
-  if(frag.final)
-    printf("]");
-  printf("\n");
+  اگر(frag.final)
+    لکھو("]");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int selection_query(VTermSelectionMask mask, void *user UNUSED)
+ساکن صحیح selection_query(VTerm_Selection_نقاب نقاب, خالی *user غیر_مستعمل)
 {
-  printf("selection-query mask=%04X\n", mask);
+  لکھو("selection-query mask=%04X\n", نقاب);
 
-  return 1;
+  واپس 1;
 }
 
 VTermSelectionCallbacks selection_cbs = {
-  .set   = selection_set,
+  .سیٹ_2   = selection_سیٹ,
   .query = selection_query,
 };
 
-static int want_screen_damage = 0;
-static int want_screen_damage_cells = 0;
-static int screen_damage(VTermRect rect, void *user UNUSED)
+ساکن صحیح want_screen_damage = 0;
+ساکن صحیح want_screen_damage_cells = 0;
+ساکن صحیح screen_damage(VTermRect rect, خالی *user غیر_مستعمل)
 {
-  if(!want_screen_damage)
-    return 1;
+  اگر(!want_screen_damage)
+    واپس 1;
 
-  printf("damage %d..%d,%d..%d",
-      rect.start_row, rect.end_row, rect.start_col, rect.end_col);
+  لکھو("damage %d..%d,%d..%d",
+      rect.آغاز_صف, rect.انتہا_صف, rect.آغاز_ستون, rect.انتہا_ستون);
 
-  if(want_screen_damage_cells) {
-    int equals = FALSE;
-    int row;
-    int col;
+  اگر(want_screen_damage_cells) {
+    صحیح equals = FALSE;
+    صحیح صف;
+    صحیح ستون;
 
-    for(row = rect.start_row; row < rect.end_row; row++) {
-      int eol = rect.end_col;
-      while(eol > rect.start_col) {
+    برائے(صف = rect.آغاز_صف; صف < rect.انتہا_صف; صف++) {
+      صحیح eol = rect.انتہا_ستون;
+      جب(eol > rect.آغاز_ستون) {
         VTermScreenCell cell;
 	VTermPos pos;
-	pos.row = row;
-	pos.col = eol-1;
+	pos.صف = صف;
+	pos.ستون = eol-1;
         vterm_screen_get_cell(screen, pos, &cell);
-        if(cell.chars[0])
-          break;
+        اگر(cell.chars[0])
+          توڑو;
 
         eol--;
       }
 
-      if(eol == rect.start_col)
-        break;
+      اگر(eol == rect.آغاز_ستون)
+        توڑو;
 
-      if(!equals)
-        printf(" ="), equals = TRUE;
+      اگر(!equals)
+        لکھو(" ="), equals = TRUE;
 
-      printf(" %d<", row);
-      for(col = rect.start_col; col < eol; col++) {
+      لکھو(" %d<", صف);
+      برائے(ستون = rect.آغاز_ستون; ستون < eol; ستون++) {
         VTermScreenCell cell;
 	VTermPos pos;
-	pos.row = row;
-	pos.col = col;
+	pos.صف = صف;
+	pos.ستون = ستون;
         vterm_screen_get_cell(screen, pos, &cell);
-        printf(col == rect.start_col ? "%02X" : " %02X", cell.chars[0]);
+        لکھو(ستون == rect.آغاز_ستون ? "%02X" : " %02X", cell.chars[0]);
       }
-      printf(">");
+      لکھو(">");
     }
   }
 
-  printf("\n");
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int want_screen_scrollback = 0;
-static int screen_sb_pushline4(int cols, const VTermScreenCell *cells, int continuation, void *user UNUSED)
+ساکن صحیح want_screen_scrollback = 0;
+ساکن صحیح screen_sb_pushline4(صحیح ستون_تعداد, ثابت VTermScreenCell *cells, صحیح continuation, خالی *user غیر_مستعمل)
 {
-  int eol;
-  int c;
+  صحیح eol;
+  صحیح c;
 
-  if(!want_screen_scrollback)
-    return 1;
+  اگر(!want_screen_scrollback)
+    واپس 1;
 
-  eol = cols;
-  while(eol && !cells[eol-1].chars[0])
+  eol = ستون_تعداد;
+  جب(eol && !cells[eol-1].chars[0])
     eol--;
 
-  printf("sb_pushline %d%s =", cols, continuation ? " cont" : "");
-  for(c = 0; c < eol; c++)
-    printf(" %02X", cells[c].chars[0]);
-  printf("\n");
+  لکھو("sb_pushline %d%s =", ستون_تعداد, continuation ? " cont" : "");
+  برائے(c = 0; c < eol; c++)
+    لکھو(" %02X", cells[c].chars[0]);
+  لکھو("\n");
 
-  return 1;
+  واپس 1;
 }
 
-static int screen_sb_popline(int cols, VTermScreenCell *cells, void *user UNUSED)
+ساکن صحیح screen_sb_popline(صحیح ستون_تعداد, VTermScreenCell *cells, خالی *user غیر_مستعمل)
 {
-  int col;
+  صحیح ستون;
 
-  if(!want_screen_scrollback)
-    return 0;
+  اگر(!want_screen_scrollback)
+    واپس 0;
 
   // All lines of scrollback contain "ABCDE"
-  for(col = 0; col < cols; col++) {
-    if(col < 5)
-      cells[col].chars[0] = 'A' + col;
-    else
-      cells[col].chars[0] = 0;
+  برائے(ستون = 0; ستون < ستون_تعداد; ستون++) {
+    اگر(ستون < 5)
+      cells[ستون].chars[0] = 'A' + ستون;
+    ورنہ
+      cells[ستون].chars[0] = 0;
 
-    cells[col].width = 1;
+    cells[ستون].چوڑائی = 1;
   }
 
-  printf("sb_popline %d\n", cols);
-  return 1;
+  لکھو("sb_popline %d\n", ستون_تعداد);
+  واپس 1;
 }
 
-static int screen_sb_clear(void *user UNUSED)
+ساکن صحیح screen_sb_clear(خالی *user غیر_مستعمل)
 {
-  if(!want_screen_scrollback)
-    return 1;
+  اگر(!want_screen_scrollback)
+    واپس 1;
 
-  printf("sb_clear\n");
-  return 0;
+  لکھو("sb_clear\n");
+  واپس 0;
 }
 
 VTermScreenCallbacks screen_cbs = {
@@ -658,635 +658,635 @@ VTermScreenCallbacks screen_cbs = {
   moverect, // moverect
   movecursor, // movecursor
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
-  NULL, // sb_pushline
+  تہی, // bell
+  تہی, // resize
+  تہی, // sb_pushline
   screen_sb_popline, // sb_popline
   screen_sb_clear, // sb_clear
   screen_sb_pushline4, // sb_pushline4
 };
 
-int main(int argc UNUSED, char **argv UNUSED)
+صحیح مین(صحیح argc غیر_مستعمل, حرف **argv غیر_مستعمل)
 {
-  char line[1024] = {0};
-  int flag;
+  حرف سطر[1024] = {0};
+  صحیح flag;
 
-  int err;
+  صحیح err;
 
-  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stdout, تہی, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
-    char *nl;
+  جب(fgets(سطر, حجم سطر, stdin)) {
+    حرف *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    اگر((nl = strchr(سطر, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
-      if(!vt)
+    اگر(streq(سطر, "INIT")) {
+      اگر(!vt)
         vt = vterm_new(25, 80);
 
       // Somehow this makes tests fail
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
-      assert(vt);
-      vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
+    ورنہ اگر(streq(سطر, "WANTPARSER")) {
+      أكد(vt);
+      vterm_parser_سیٹ_callbacks(vt, &parser_cbs, تہی);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
-      int i = 9;
-      int sense = 1;
-      assert(vt);
-      if(!state) {
+    ورنہ اگر(strstartswith(سطر, "WANTSTATE") && (سطر[9] == '\0' || سطر[9] == ' ')) {
+      صحیح i = 9;
+      صحیح sense = 1;
+      أكد(vt);
+      اگر(!state) {
         state = vterm_obtain_state(vt);
-        vterm_state_set_callbacks(state, &state_cbs, NULL);
+        vterm_state_سیٹ_callbacks(state, &state_cbs, تہی);
         vterm_state_callbacks_has_premove(state);
         /* In some tests we want to check the behaviour of overflowing the
          * buffer, so make it nicely small
          */
-        vterm_state_set_selection_callbacks(state, &selection_cbs, NULL, NULL, 16);
-        vterm_state_set_bold_highbright(state, 1);
+        vterm_state_سیٹ_selection_callbacks(state, &selection_cbs, تہی, تہی, 16);
+        vterm_state_سیٹ_bold_highbright(state, 1);
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      جب(سطر[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '+':
+      برائے( ; سطر[i]; i++)
+        انتخاب(سطر[i]) {
+        حالت '+':
           sense = 1;
-          break;
-        case '-':
+          توڑو;
+        حالت '-':
           sense = 0;
-          break;
-        case 'g':
+          توڑو;
+        حالت 'g':
           want_state_putglyph = sense;
-          break;
-        case 's':
+          توڑو;
+        حالت 's':
           want_scrollrect = sense;
-          break;
-        case 'P':
+          توڑو;
+        حالت 'P':
           want_premove = sense;
-          break;
-        case 'm':
+          توڑو;
+        حالت 'm':
           want_moverect = sense;
-          break;
-        case 'e':
+          توڑو;
+        حالت 'e':
           want_state_erase = sense;
-          break;
-        case 'p':
+          توڑو;
+        حالت 'p':
           want_settermprop = sense;
-          break;
-        case 'f':
-          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : NULL, NULL);
-          break;
-        case 'b':
+          توڑو;
+        حالت 'f':
+          vterm_state_سیٹ_unrecognised_fallbacks(state, sense ? &fallbacks : تہی, تہی);
+          توڑو;
+        حالت 'b':
           want_state_scrollback = sense;
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", line[i]);
+          توڑو;
+        طےشدہ:
+          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", سطر[i]);
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
-      int i = 10;
-      int sense = 1;
-      assert(vt);
-      if(!screen)
+    ورنہ اگر(strstartswith(سطر, "WANTSCREEN") && (سطر[10] == '\0' || سطر[10] == ' ')) {
+      صحیح i = 10;
+      صحیح sense = 1;
+      أكد(vt);
+      اگر(!screen)
         screen = vterm_obtain_screen(vt);
-      vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
+      vterm_screen_سیٹ_callbacks(screen, &screen_cbs, تہی);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      جب(سطر[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '-':
+      برائے( ; سطر[i]; i++)
+        انتخاب(سطر[i]) {
+        حالت '-':
           sense = 0;
-          break;
-        case 'a':
+          توڑو;
+        حالت 'a':
           vterm_screen_enable_altscreen(screen, 1);
-          break;
-        case 'd':
+          توڑو;
+        حالت 'd':
           want_screen_damage = sense;
-          break;
-        case 'D':
+          توڑو;
+        حالت 'D':
           want_screen_damage = sense;
           want_screen_damage_cells = sense;
-          break;
-        case 'm':
+          توڑو;
+        حالت 'm':
           want_moverect = sense;
-          break;
-        case 'c':
+          توڑو;
+        حالت 'c':
           want_movecursor = sense;
-          break;
-        case 'p':
+          توڑو;
+        حالت 'p':
           want_settermprop = 1;
-          break;
-        case 'b':
+          توڑو;
+        حالت 'b':
           want_screen_scrollback = sense;
-          break;
-        case 'r':
+          توڑو;
+        حالت 'r':
           vterm_screen_enable_reflow(screen, sense);
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", line[i]);
+          توڑو;
+        طےشدہ:
+          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", سطر[i]);
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
-      vterm_set_utf8(vt, flag);
+    ورنہ اگر(لڑی_سے_پڑھو(سطر, "UTF8 %d", &flag)) {
+      vterm_سیٹ_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
-      if(state) {
+    ورنہ اگر(streq(سطر, "RESET")) {
+      اگر(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
       }
-      if(screen) {
+      اگر(screen) {
         vterm_screen_reset(screen, 1);
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
-      int rows, cols;
-      char *linep = line + 7;
-      while(linep[0] == ' ')
+    ورنہ اگر(strstartswith(سطر, "RESIZE ")) {
+      صحیح صفیں_2, ستون_تعداد;
+      حرف *linep = سطر + 7;
+      جب(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%d, %d", &rows, &cols);
-      vterm_set_size(vt, rows, cols);
+      لڑی_سے_پڑھو(linep, "%d, %d", &صفیں_2, &ستون_تعداد);
+      vterm_سیٹ_سائز(vt, صفیں_2, ستون_تعداد);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
-      char *bytes = line + 5;
-      size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+    ورنہ اگر(strstartswith(سطر, "PUSH ")) {
+      حرف *بائٹیں = سطر + 5;
+      size_t len = inplace_hex2bytes(بائٹیں);
+      أكد(len);
 
-      size_t written = vterm_input_write(vt, bytes, len);
-      if(written < len)
+      size_t written = vterm_داخلہ_write(vt, بائٹیں, len);
+      اگر(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    ورنہ اگر(streq(سطر, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-      if(encoding.enc->init)
-        (*encoding.enc->init)(encoding.enc, encoding.data);
+      اگر(encoding.enc->init)
+        (*encoding.enc->init)(encoding.enc, encoding.ڈیٹا);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
-      char *bytes = line + 6;
-      size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+    ورنہ اگر(strstartswith(سطر, "ENCIN ")) {
+      حرف *بائٹیں = سطر + 6;
+      size_t len = inplace_hex2bytes(بائٹیں);
+      أكد(len);
 
       uint32_t cp[1024];
-      int cpi = 0;
+      صحیح cpi = 0;
       size_t pos = 0;
 
-      (*encoding.enc->decode)(encoding.enc, encoding.data,
-          cp, &cpi, len, bytes, &pos, len);
+      (*encoding.enc->decode)(encoding.enc, encoding.ڈیٹا,
+          cp, &cpi, len, بائٹیں, &pos, len);
 
-      if(cpi > 0) {
-	int i;
-        printf("encout ");
-        for(i = 0; i < cpi; i++) {
-          printf(i ? ",%x" : "%x", cp[i]);
+      اگر(cpi > 0) {
+	صحیح i;
+        لکھو("encout ");
+        برائے(i = 0; i < cpi; i++) {
+          لکھو(i ? ",%x" : "%x", cp[i]);
         }
-        printf("\n");
+        لکھو("\n");
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
-      char *linep = line + 7;
-      unsigned int c = 0;
+    ورنہ اگر(strstartswith(سطر, "INCHAR ")) {
+      حرف *linep = سطر + 7;
+      غیرعلامتی صحیح c = 0;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      sscanf(linep, " %x", &c);
+      لڑی_سے_پڑھو(linep, " %x", &c);
 
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    ورنہ اگر(strstartswith(سطر, "INKEY ")) {
       VTermModifier mod;
-      VTermKey key;
-      char *linep = line + 6;
-      while(linep[0] == ' ')
+      VTerm_کلید کلید;
+      حرف *linep = سطر + 6;
+      جب(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
-      key = strp_key(linep);
+      کلید = strp_کلید(linep);
 
-      vterm_keyboard_key(vt, key, mod);
+      vterm_keyboard_کلید(vt, کلید, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
-      char *linep = line + 6;
-      if(streq(linep, "START"))
-        vterm_keyboard_start_paste(vt);
-      else if(streq(linep, "END"))
-        vterm_keyboard_end_paste(vt);
-      else
-        goto abort_line;
+    ورنہ اگر(strstartswith(سطر, "PASTE ")) {
+      حرف *linep = سطر + 6;
+      اگر(streq(linep, "START"))
+        vterm_keyboard_آغاز_paste(vt);
+      ورنہ اگر(streq(linep, "END"))
+        vterm_keyboard_انتہا_paste(vt);
+      ورنہ
+        جاؤ abort_سطر;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
-      assert(state);
-      char *linep = line + 6;
-      if(streq(linep, "IN"))
-        vterm_state_focus_in(state);
-      else if(streq(linep, "OUT"))
-        vterm_state_focus_out(state);
-      else
-        goto abort_line;
+    ورنہ اگر(strstartswith(سطر, "FOCUS ")) {
+      أكد(state);
+      حرف *linep = سطر + 6;
+      اگر(streq(linep, "IN"))
+        vterm_state_focus_اندر(state);
+      ورنہ اگر(streq(linep, "OUT"))
+        vterm_state_focus_برآمد(state);
+      ورنہ
+        جاؤ abort_سطر;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
-      char *linep = line + 10;
-      int row, col, len;
+    ورنہ اگر(strstartswith(سطر, "MOUSEMOVE ")) {
+      حرف *linep = سطر + 10;
+      صحیح صف, ستون, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%d,%d%n", &row, &col, &len);
+      لڑی_سے_پڑھو(linep, "%d,%d%n", &صف, &ستون, &len);
       linep += len;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      vterm_mouse_move(vt, row, col, mod);
+      vterm_mouse_move(vt, صف, ستون, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
-      char *linep = line + 9;
-      char press;
-      int button, len;
+    ورنہ اگر(strstartswith(سطر, "MOUSEBTN ")) {
+      حرف *linep = سطر + 9;
+      حرف press;
+      صحیح button, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
-      sscanf(linep, "%c %d%n", &press, &button, &len);
+      لڑی_سے_پڑھو(linep, "%c %d%n", &press, &button, &len);
       linep += len;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
-      char *linep = line + 10;
-      unsigned int mask;
-      int len;
+    ورنہ اگر(strstartswith(سطر, "SELECTION ")) {
+      حرف *linep = سطر + 10;
+      غیرعلامتی صحیح نقاب;
+      صحیح len;
       VTermStringFragment frag = { 0 };
-      sscanf(linep, "%x%n", &mask, &len);
+      لڑی_سے_پڑھو(linep, "%x%n", &نقاب, &len);
       linep += len;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
-      if(linep[0] == '[') {
+      اگر(linep[0] == '[') {
         frag.initial = TRUE;
         linep++;
-        while(linep[0] == ' ')
+        جب(linep[0] == ' ')
           linep++;
       }
       frag.len = inplace_hex2bytes(linep);
       frag.str = linep;
-      assert(frag.len);
+      أكد(frag.len);
 
       linep += frag.len * 2;
-      while(linep[0] == ' ')
+      جب(linep[0] == ' ')
         linep++;
-      if(linep[0] == ']') {
+      اگر(linep[0] == ']') {
         frag.final = TRUE;
       }
-      vterm_state_send_selection(state, mask, frag);
+      vterm_state_send_selection(state, نقاب, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
-      assert(screen);
-      char *linep = line + 12;
-      while(linep[0] == ' ')
+    ورنہ اگر(strstartswith(سطر, "DAMAGEMERGE ")) {
+      أكد(screen);
+      حرف *linep = سطر + 12;
+      جب(linep[0] == ' ')
         linep++;
-      if(streq(linep, "CELL"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_CELL);
-      else if(streq(linep, "ROW"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_ROW);
-      else if(streq(linep, "SCREEN"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCREEN);
-      else if(streq(linep, "SCROLL"))
-        vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
+      اگر(streq(linep, "CELL"))
+        vterm_screen_سیٹ_damage_ملاؤ(screen, VTERM_DAMAGE_CELL);
+      ورنہ اگر(streq(linep, "ROW"))
+        vterm_screen_سیٹ_damage_ملاؤ(screen, VTERM_DAMAGE_صف);
+      ورنہ اگر(streq(linep, "SCREEN"))
+        vterm_screen_سیٹ_damage_ملاؤ(screen, VTERM_DAMAGE_SCREEN);
+      ورنہ اگر(streq(linep, "SCROLL"))
+        vterm_screen_سیٹ_damage_ملاؤ(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
-      assert(screen);
+    ورنہ اگر(strstartswith(سطر, "DAMAGEFLUSH")) {
+      أكد(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
-      assert(screen);
-      char *linep = line + 14;
-      while(linep[0] == ' ')
+    ورنہ اگر(strstartswith(سطر, "SETDEFAULTCOL ")) {
+      أكد(screen);
+      حرف *linep = سطر + 14;
+      جب(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
-      if(linep[0]) {
-        while(linep[0] == ' ')
+      اگر(linep[0]) {
+        جب(linep[0] == ' ')
           linep++;
         VTermColor bg = strpe_color(&linep);
 
-        vterm_screen_set_default_colors(screen, &fg, &bg);
+        vterm_screen_سیٹ_default_colors(screen, &fg, &bg);
       }
-      else
-        vterm_screen_set_default_colors(screen, &fg, NULL);
+      ورنہ
+        vterm_screen_سیٹ_default_colors(screen, &fg, تہی);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
-        assert(state);
+    ورنہ اگر(سطر[0] == '?') {
+      اگر(streq(سطر, "?cursor")) {
+        أكد(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
-        if(pos.row != state_pos.row)
-          printf("! row mismatch: state=%d,%d event=%d,%d\n",
-              pos.row, pos.col, state_pos.row, state_pos.col);
-        else if(pos.col != state_pos.col)
-          printf("! col mismatch: state=%d,%d event=%d,%d\n",
-              pos.row, pos.col, state_pos.row, state_pos.col);
-        else
-          printf("%d,%d\n", state_pos.row, state_pos.col);
+        اگر(pos.صف != state_pos.صف)
+          لکھو("! row mismatch: state=%d,%d event=%d,%d\n",
+              pos.صف, pos.ستون, state_pos.صف, state_pos.ستون);
+        ورنہ اگر(pos.ستون != state_pos.ستون)
+          لکھو("! col mismatch: state=%d,%d event=%d,%d\n",
+              pos.صف, pos.ستون, state_pos.صف, state_pos.ستون);
+        ورنہ
+          لکھو("%d,%d\n", state_pos.صف, state_pos.ستون);
       }
-      else if(strstartswith(line, "?pen ")) {
-        assert(state);
-        VTermValue val;
-        char *linep = line + 5;
-        while(linep[0] == ' ')
+      ورنہ اگر(strstartswith(سطر, "?pen ")) {
+        أكد(state);
+        VTerm_قدر val;
+        حرف *linep = سطر + 5;
+        جب(linep[0] == ' ')
           linep++;
 
-#define BOOLSTR(v) ((v) ? "on" : "off")
+#تعریف_کرو BOOLSTR(v) ((v) ? "on" : "off")
 
-        if(streq(linep, "bold")) {
+        اگر(streq(linep, "bold")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BOLD, &val);
-          if(val.boolean != state_pen.bold)
-            printf("! pen bold mismatch; state=%s, event=%s\n",
+          اگر(val.boolean != state_pen.bold)
+            لکھو("! pen bold mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.bold));
-          else
-            printf("%s\n", BOOLSTR(state_pen.bold));
+          ورنہ
+            لکھو("%s\n", BOOLSTR(state_pen.bold));
         }
-        else if(streq(linep, "underline")) {
+        ورنہ اگر(streq(linep, "underline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_UNDERLINE, &val);
-          if(val.boolean != state_pen.underline)
-            printf("! pen underline mismatch; state=%d, event=%d\n",
+          اگر(val.boolean != state_pen.underline)
+            لکھو("! pen underline mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.underline);
-          else
-            printf("%d\n", state_pen.underline);
+          ورنہ
+            لکھو("%d\n", state_pen.underline);
         }
-        else if(streq(linep, "italic")) {
+        ورنہ اگر(streq(linep, "italic")) {
           vterm_state_get_penattr(state, VTERM_ATTR_ITALIC, &val);
-          if(val.boolean != state_pen.italic)
-            printf("! pen italic mismatch; state=%s, event=%s\n",
+          اگر(val.boolean != state_pen.italic)
+            لکھو("! pen italic mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.italic));
-          else
-            printf("%s\n", BOOLSTR(state_pen.italic));
+          ورنہ
+            لکھو("%s\n", BOOLSTR(state_pen.italic));
         }
-        else if(streq(linep, "blink")) {
+        ورنہ اگر(streq(linep, "blink")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BLINK, &val);
-          if(val.boolean != state_pen.blink)
-            printf("! pen blink mismatch; state=%s, event=%s\n",
+          اگر(val.boolean != state_pen.blink)
+            لکھو("! pen blink mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.blink));
-          else
-            printf("%s\n", BOOLSTR(state_pen.blink));
+          ورنہ
+            لکھو("%s\n", BOOLSTR(state_pen.blink));
         }
-        else if(streq(linep, "reverse")) {
-          vterm_state_get_penattr(state, VTERM_ATTR_REVERSE, &val);
-          if(val.boolean != state_pen.reverse)
-            printf("! pen reverse mismatch; state=%s, event=%s\n",
-                BOOLSTR(val.boolean), BOOLSTR(state_pen.reverse));
-          else
-            printf("%s\n", BOOLSTR(state_pen.reverse));
+        ورنہ اگر(streq(linep, "reverse")) {
+          vterm_state_get_penattr(state, VTERM_ATTR_الٹ, &val);
+          اگر(val.boolean != state_pen.الٹ)
+            لکھو("! pen reverse mismatch; state=%s, event=%s\n",
+                BOOLSTR(val.boolean), BOOLSTR(state_pen.الٹ));
+          ورنہ
+            لکھو("%s\n", BOOLSTR(state_pen.الٹ));
         }
-        else if(streq(linep, "font")) {
+        ورنہ اگر(streq(linep, "font")) {
           vterm_state_get_penattr(state, VTERM_ATTR_FONT, &val);
-          if(val.boolean != state_pen.font)
-            printf("! pen font mismatch; state=%d, event=%d\n",
+          اگر(val.boolean != state_pen.font)
+            لکھو("! pen font mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.font);
-          else
-            printf("%d\n", state_pen.font);
+          ورنہ
+            لکھو("%d\n", state_pen.font);
         }
-        else if(streq(linep, "small")) {
+        ورنہ اگر(streq(linep, "small")) {
           vterm_state_get_penattr(state, VTERM_ATTR_SMALL, &val);
-          if(val.boolean != state_pen.small)
-            printf("! pen small mismatch; state=%s, event=%s\n",
+          اگر(val.boolean != state_pen.small)
+            لکھو("! pen small mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.small));
-          else
-            printf("%s\n", BOOLSTR(state_pen.small));
+          ورنہ
+            لکھو("%s\n", BOOLSTR(state_pen.small));
         }
-        else if(streq(linep, "baseline")) {
+        ورنہ اگر(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
-            printf("! pen baseline mismatch: state=%d, event=%d\n",
-                val.number, state_pen.baseline);
-          else
-            printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
-                         : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
+          اگر(val.نمبر != state_pen.baseline)
+            لکھو("! pen baseline mismatch: state=%d, event=%d\n",
+                val.نمبر, state_pen.baseline);
+          ورنہ
+            لکھو("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
+                         : state_pen.baseline == VTERM_BASELINE_زیریں ? "lower"
                          : "normal");
         }
-        else if(streq(linep, "foreground")) {
+        ورنہ اگر(streq(linep, "foreground")) {
           print_color(&state_pen.foreground);
-          printf("\n");
+          لکھو("\n");
         }
-        else if(streq(linep, "background")) {
+        ورنہ اگر(streq(linep, "background")) {
           print_color(&state_pen.background);
-          printf("\n");
+          لکھو("\n");
         }
-        else
-          printf("?\n");
+        ورنہ
+          لکھو("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
-        assert(state);
-        char *linep = line + 10;
-        int row;
-        const VTermLineInfo *info;
-        while(linep[0] == ' ')
+      ورنہ اگر(strstartswith(سطر, "?lineinfo ")) {
+        أكد(state);
+        حرف *linep = سطر + 10;
+        صحیح صف;
+        ثابت VTerm_سطر_Info *info;
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d", &row) < 1) {
-          printf("! lineinfo unrecognised input\n");
-          goto abort_line;
+        اگر(لڑی_سے_پڑھو(linep, "%d", &صف) < 1) {
+          لکھو("! lineinfo unrecognised input\n");
+          جاؤ abort_سطر;
         }
-        info = vterm_state_get_lineinfo(state, row);
-        if(info->doublewidth)
-          printf("dwl ");
-        if(info->doubleheight)
-          printf("dhl ");
-        if(info->continuation)
-          printf("cont ");
-        printf("\n");
+        info = vterm_state_get_lineinfo(state, صف);
+        اگر(info->doublewidth)
+          لکھو("dwl ");
+        اگر(info->doubleheight)
+          لکھو("dhl ");
+        اگر(info->continuation)
+          لکھو("cont ");
+        لکھو("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
-        assert(screen);
-        char *linep = line + 13;
+      ورنہ اگر(strstartswith(سطر, "?screen_chars ")) {
+        أكد(screen);
+        حرف *linep = سطر + 13;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
+        اگر(لڑی_سے_پڑھو(linep, "%d,%d,%d,%d", &rect.آغاز_صف, &rect.آغاز_ستون, &rect.انتہا_صف, &rect.انتہا_ستون) == 4)
           ; // fine
-        else if(sscanf(linep, "%d", &rect.start_row) == 1) {
-          rect.end_row = rect.start_row + 1;
-          rect.start_col = 0;
-          vterm_get_size(vt, NULL, &rect.end_col);
+        ورنہ اگر(لڑی_سے_پڑھو(linep, "%d", &rect.آغاز_صف) == 1) {
+          rect.انتہا_صف = rect.آغاز_صف + 1;
+          rect.آغاز_ستون = 0;
+          vterm_get_سائز(vt, تہی, &rect.انتہا_ستون);
         }
-        else {
-          printf("! screen_chars unrecognised input\n");
-          goto abort_line;
+        ورنہ {
+          لکھو("! screen_chars unrecognised input\n");
+          جاؤ abort_سطر;
         }
-        len = vterm_screen_get_chars(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
-          printf("! screen_chars error\n");
-        else if(len == 0)
-          printf("\n");
-        else {
-          uint32_t *chars = malloc(sizeof(uint32_t) * len);
+        len = vterm_screen_get_chars(screen, تہی, 0, rect);
+        اگر(len == (size_t)-1)
+          لکھو("! screen_chars error\n");
+        ورنہ اگر(len == 0)
+          لکھو("\n");
+        ورنہ {
+          uint32_t *chars = حافظہ_دو(حجم(uint32_t) * len);
           size_t i;
           vterm_screen_get_chars(screen, chars, len, rect);
-          for(i = 0; i < len; i++) {
-            printf("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
+          برائے(i = 0; i < len; i++) {
+            لکھو("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
           }
-          free(chars);
+          آزاد(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
-        assert(screen);
-        char *linep = line + 12;
+      ورنہ اگر(strstartswith(سطر, "?screen_text ")) {
+        أكد(screen);
+        حرف *linep = سطر + 12;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
-          printf("! screen_text unrecognised input\n");
-          goto abort_line;
+        اگر(لڑی_سے_پڑھو(linep, "%d,%d,%d,%d", &rect.آغاز_صف, &rect.آغاز_ستون, &rect.انتہا_صف, &rect.انتہا_ستون) < 4) {
+          لکھو("! screen_text unrecognised input\n");
+          جاؤ abort_سطر;
         }
-        len = vterm_screen_get_text(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
-          printf("! screen_text error\n");
-        else if(len == 0)
-          printf("\n");
-        else {
+        len = vterm_screen_get_متن(screen, تہی, 0, rect);
+        اگر(len == (size_t)-1)
+          لکھو("! screen_text error\n");
+        ورنہ اگر(len == 0)
+          لکھو("\n");
+        ورنہ {
           // Put an overwrite guard at both ends of the buffer
-          unsigned char *buffer = malloc(len + 4);
-          unsigned char *text = buffer + 2;
-          text[-2] = 0x55; text[-1] = 0xAA;
-          text[len] = 0x55; text[len+1] = 0xAA;
+          غیرعلامتی حرف *بفر = حافظہ_دو(len + 4);
+          غیرعلامتی حرف *متن = بفر + 2;
+          متن[-2] = 0x55; متن[-1] = 0xAA;
+          متن[len] = 0x55; متن[len+1] = 0xAA;
 
-          vterm_screen_get_text(screen, (char *)text, len, rect);
+          vterm_screen_get_متن(screen, (حرف *)متن, len, rect);
 
-          if(text[-2] != 0x55 || text[-1] != 0xAA)
-            printf("! screen_get_text buffer overrun left [%02x,%02x]\n", text[-2], text[-1]);
-          else if(text[len] != 0x55 || text[len+1] != 0xAA)
-            printf("! screen_get_text buffer overrun right [%02x,%02x]\n", text[len], text[len+1]);
-          else
+          اگر(متن[-2] != 0x55 || متن[-1] != 0xAA)
+            لکھو("! screen_get_text buffer overrun left [%02x,%02x]\n", متن[-2], متن[-1]);
+          ورنہ اگر(متن[len] != 0x55 || متن[len+1] != 0xAA)
+            لکھو("! screen_get_text buffer overrun right [%02x,%02x]\n", متن[len], متن[len+1]);
+          ورنہ
 	  {
 	    size_t i;
-            for(i = 0; i < len; i++) {
-              printf("0x%02x%s", text[i], i < len-1 ? "," : "\n");
+            برائے(i = 0; i < len; i++) {
+              لکھو("0x%02x%s", متن[i], i < len-1 ? "," : "\n");
             }
 	  }
 
-          free(buffer);
+          آزاد(بفر);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
-        assert(screen);
-        char *linep = line + 12;
-	int i;
+      ورنہ اگر(strstartswith(سطر, "?screen_cell ")) {
+        أكد(screen);
+        حرف *linep = سطر + 12;
+	صحیح i;
         VTermPos pos;
         VTermScreenCell cell;
-        while(linep[0] == ' ')
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_cell unrecognised input\n");
-          goto abort_line;
+        اگر(لڑی_سے_پڑھو(linep, "%d,%d\n", &pos.صف, &pos.ستون) < 2) {
+          لکھو("! screen_cell unrecognised input\n");
+          جاؤ abort_سطر;
         }
-        if(!vterm_screen_get_cell(screen, pos, &cell))
-          goto abort_line;
-        printf("{");
-        for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
-          printf("%s0x%x", i ? "," : "", cell.chars[i]);
+        اگر(!vterm_screen_get_cell(screen, pos, &cell))
+          جاؤ abort_سطر;
+        لکھو("{");
+        برائے(i = 0; i < VTERM_MAX_CHARS_فی_CELL && cell.chars[i]; i++) {
+          لکھو("%s0x%x", i ? "," : "", cell.chars[i]);
         }
-        printf("} width=%d attrs={", cell.width);
-        if(cell.attrs.bold)      printf("B");
-        if(cell.attrs.underline) printf("U%d", cell.attrs.underline);
-        if(cell.attrs.italic)    printf("I");
-        if(cell.attrs.blink)     printf("K");
-        if(cell.attrs.reverse)   printf("R");
-        if(cell.attrs.font)      printf("F%d", cell.attrs.font);
-        if(cell.attrs.small)     printf("S");
-        if(cell.attrs.baseline)  printf(
+        لکھو("} width=%d attrs={", cell.چوڑائی);
+        اگر(cell.attrs.bold)      لکھو("B");
+        اگر(cell.attrs.underline) لکھو("U%d", cell.attrs.underline);
+        اگر(cell.attrs.italic)    لکھو("I");
+        اگر(cell.attrs.blink)     لکھو("K");
+        اگر(cell.attrs.الٹ)   لکھو("R");
+        اگر(cell.attrs.font)      لکھو("F%d", cell.attrs.font);
+        اگر(cell.attrs.small)     لکھو("S");
+        اگر(cell.attrs.baseline)  لکھو(
             cell.attrs.baseline == VTERM_BASELINE_RAISE ? "^" :
                                                           "_");
-        printf("} ");
-        if(cell.attrs.dwl)       printf("dwl ");
-        if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
-        printf("fg=");
-        vterm_screen_convert_color_to_rgb(screen, &cell.fg);
+        لکھو("} ");
+        اگر(cell.attrs.dwl)       لکھو("dwl ");
+        اگر(cell.attrs.dhl)       لکھو("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
+        لکھو("fg=");
+        vterm_screen_convert_color_مقصد_rgb(screen, &cell.fg);
         print_color(&cell.fg);
-        printf(" bg=");
-        vterm_screen_convert_color_to_rgb(screen, &cell.bg);
+        لکھو(" bg=");
+        vterm_screen_convert_color_مقصد_rgb(screen, &cell.bg);
         print_color(&cell.bg);
-        printf("\n");
+        لکھو("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
-        assert(screen);
+      ورنہ اگر(strstartswith(سطر, "?screen_eol ")) {
+        أكد(screen);
         VTermPos pos;
-        char *linep = line + 12;
-        while(linep[0] == ' ')
+        حرف *linep = سطر + 12;
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_eol unrecognised input\n");
-          goto abort_line;
+        اگر(لڑی_سے_پڑھو(linep, "%d,%d\n", &pos.صف, &pos.ستون) < 2) {
+          لکھو("! screen_eol unrecognised input\n");
+          جاؤ abort_سطر;
         }
-        printf("%d\n", vterm_screen_is_eol(screen, pos));
+        لکھو("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
-        assert(screen);
+      ورنہ اگر(strstartswith(سطر, "?screen_attrs_extent ")) {
+        أكد(screen);
         VTermPos pos;
         VTermRect rect;
-        char *linep = line + 21;
-        while(linep[0] == ' ')
+        حرف *linep = سطر + 21;
+        جب(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
-          printf("! screen_attrs_extent unrecognised input\n");
-          goto abort_line;
+        اگر(لڑی_سے_پڑھو(linep, "%d,%d\n", &pos.صف, &pos.ستون) < 2) {
+          لکھو("! screen_attrs_extent unrecognised input\n");
+          جاؤ abort_سطر;
         }
-	rect.start_col = 0;
-	rect.end_col   = -1;
-        if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
-          printf("! screen_attrs_extent failed\n");
-          goto abort_line;
+	rect.آغاز_ستون = 0;
+	rect.انتہا_ستون   = -1;
+        اگر(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
+          لکھو("! screen_attrs_extent failed\n");
+          جاؤ abort_سطر;
         }
-        printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
+        لکھو("%d,%d-%d,%d\n", rect.آغاز_صف, rect.آغاز_ستون, rect.انتہا_صف, rect.انتہا_ستون);
       }
-      else
-        printf("?\n");
+      ورنہ
+        لکھو("?\n");
 
-      memset(line, 0, sizeof line);
-      continue;
+      memset(سطر, 0, حجم سطر);
+      جاری;
     }
 
-    else
-      abort_line: err = 1;
+    ورنہ
+      abort_سطر: err = 1;
 
-    outlen = vterm_output_get_buffer_current(vt);
-    if(outlen > 0) {
-      char outbuff[1024];
+    outlen = vterm_output_get_بفر_current(vt);
+    اگر(outlen > 0) {
+      حرف outbuff[1024];
       vterm_output_read(vt, outbuff, outlen);
 
-      term_output(outbuff, outlen, NULL);
+      رکن_output(outbuff, outlen, تہی);
     }
 
-    printf(err ? "?\n" : "DONE\n");
+    لکھو(err ? "?\n" : "DONE\n");
   }
 
   vterm_free(vt);
 
-  return 0;
+  واپس 0;
 }

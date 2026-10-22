@@ -12,34 +12,34 @@
  * os_qnx.c
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
-#endif
+#اگر defined(FEAT_GUI_PHOTON)
+صحیح is_photon_دستیاب;
+#اگر_ختم
 
-void qnx_init(void)
+خالی qnx_init(خالی)
 {
-#if defined(FEAT_GUI_PHOTON)
+#اگر defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
-    CLEAR_FIELD(parms);
-    parms.flags = Ph_DYNAMIC_BUFFER;
+    CLEAR_میدان(parms);
+    parms.flags = Ph_DYNAMIC_بفر;
 
-    is_photon_available = (PhAttach(NULL, &parms) != NULL) ? TRUE : FALSE;
-#endif
+    is_photon_دستیاب = (PhAttach(تہی, &parms) != تہی) ? TRUE : FALSE;
+#اگر_ختم
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#اگر defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
-# define CLIP_TYPE_TEXT "TEXT"
+# define CLIP_TYPE_متن "TEXT"
 
 // Turn on the clipboard for a console vim when photon is running
-void qnx_clip_init(void)
+خالی qnx_clip_init(خالی)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    اگر (is_photon_دستیاب == TRUE && !gui.اندر_use)
 	clip_init(TRUE);
 }
 
@@ -47,109 +47,109 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+صحیح
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    واپس FALSE;
 }
 
-void
+خالی
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
 }
 
-void
+خالی
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
-    void	    *cbdata;
-    PhClipHeader    *clip_header;
-    char_u	    *clip_text = NULL;
+    صحیح		    type = MLINE, clip_لمبائی = 0, is_type_سیٹ = FALSE;
+    خالی	    *cbdata;
+    Ph_Clip_سرخی    *clip_سرخی;
+    char_u	    *clip_متن = تہی;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    cbdata = Ph_Clipboard_Paste_آغاز(Ph_داخلہ_گروہ(تہی));
+    اگر (cbdata == تہی)
+	واپس;
 
     // Look for the vim specific clip first
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    clip_سرخی = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
+    اگر (clip_سرخی != تہی && clip_سرخی->ڈیٹا != تہی)
     {
-	switch(*(char *) clip_header->data)
+	انتخاب(*(حرف *) clip_سرخی->ڈیٹا)
 	{
-	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    طےشدہ: // fallthrough to line type
+	    حالت 'L': type = MLINE; توڑو;
+	    حالت 'C': type = MCHAR; توڑو;
+	    حالت 'B': type = MBLOCK; توڑو;
 	}
-	is_type_set = TRUE;
+	is_type_سیٹ = TRUE;
     }
 
     // Try for just normal text
-    clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    clip_سرخی = PhClipboardPasteType(cbdata, CLIP_TYPE_متن);
+    اگر (clip_سرخی != تہی)
     {
-	clip_text = clip_header->data;
-	clip_length  = clip_header->length - 1;
+	clip_متن = clip_سرخی->ڈیٹا;
+	clip_لمبائی  = clip_سرخی->لمبائی - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	اگر (clip_متن != تہی && is_type_سیٹ == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
-	clip_yank_selection(type, clip_text, clip_length, cbd);
+    اگر ((clip_متن != تہی) && (clip_لمبائی > 0))
+	clip_yank_selection(type, clip_متن, clip_لمبائی, cbd);
 
-    PhClipboardPasteFinish(cbdata);
+    Ph_Clipboard_Paste_اختتام(cbdata);
 }
 
-void
-clip_mch_set_selection(Clipboard_T *cbd)
+خالی
+clip_mch_سیٹ_selection(Clipboard_T *cbd)
 {
-    int type;
+    صحیح type;
     long_u  len;
-    char_u *text_clip, vim_clip[2], *str = NULL;
-    PhClipHeader clip_header[2];
+    char_u *متن_clip, vim_clip[2], *str = تہی;
+    Ph_Clip_سرخی clip_سرخی[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    اگر (cbd->owned == TRUE)
+	واپس;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    اگر (type >= 0)
     {
-	text_clip = alloc(len + 1); // Normal text
+	متن_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	اگر (متن_clip && vim_clip)
 	{
-	    CLEAR_FIELD(clip_header);
+	    CLEAR_میدان(clip_سرخی);
 
-	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
-	    clip_header[0].data   = vim_clip;
+	    STRNCPY(clip_سرخی[0].type, CLIP_TYPE_VIM, 8);
+	    clip_سرخی[0].لمبائی = حجم(vim_clip);
+	    clip_سرخی[0].ڈیٹا   = vim_clip;
 
-	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
-	    clip_header[1].length = len + 1;
-	    clip_header[1].data   = text_clip;
+	    STRNCPY(clip_سرخی[1].type, CLIP_TYPE_متن, 8);
+	    clip_سرخی[1].لمبائی = len + 1;
+	    clip_سرخی[1].ڈیٹا   = متن_clip;
 
-	    switch(type)
+	    انتخاب(type)
 	    {
-		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		طےشدہ: // fallthrough to MLINE
+		حالت MLINE:	*vim_clip = 'L'; توڑو;
+		حالت MCHAR:	*vim_clip = 'C'; توڑو;
+		حالت MBLOCK:	*vim_clip = 'B'; توڑو;
 	    }
 
-	    vim_strncpy(text_clip, str, len);
+	    vim_strncpy(متن_clip, str, len);
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_داخلہ_گروہ(تہی), 2, clip_سرخی);
 	}
-	vim_free(text_clip);
+	vim_free(متن_clip);
     }
     vim_free(str);
 }
-#endif
+#اگر_ختم

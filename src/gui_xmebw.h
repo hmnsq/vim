@@ -17,56 +17,56 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef EnhancedB_H
-#define EnhancedB_H
+#اگر_غیر_تعریف_شدہ EnhancedB_H
+#تعریف_کرو EnhancedB_H
 
 /*
  * New resources for the Extended Pushbutton widget
  */
 
-#ifndef XmNshift
+#اگر_غیر_تعریف_شدہ XmNshift
 # define XmNshift		"shift"
-#endif
-#ifndef XmCShift
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ XmCShift
 # define XmCShift		"Shift"
-#endif
+#اگر_ختم
 
-#ifndef XmNlabelLocation
+#اگر_غیر_تعریف_شدہ XmNlabelLocation
 # define XmNlabelLocation	"labelLocation"
-#endif
-#ifndef XmCLocation
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ XmCLocation
 # define XmCLocation		"Location"
-#endif
+#اگر_ختم
 
-#ifndef XmNpixmapData
-# define XmNpixmapData		"pixmapData"
-#endif
+#اگر_غیر_تعریف_شدہ Xm_Npixmap_ڈیٹا
+# define Xm_Npixmap_ڈیٹا		"pixmapData"
+#اگر_ختم
 
-#ifndef XmNpixmapFile
+#اگر_غیر_تعریف_شدہ XmNpixmapFile
 # define XmNpixmapFile		"pixmapFile"
-#endif
+#اگر_ختم
 
 /*
  * Constants for labelLocation.
  */
-#ifdef HAVE_XM_JOINSIDET_H
+#اگر_تعریف_شدہ HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+#ورنہ
+# define Xm_بایاں	    1
+# define Xm_دایاں    2
+# define Xm_چوٹی	    3
 # define XmBOTTOM   4
-#endif
+#اگر_ختم
 
-#define XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
+#تعریف_کرو XmIsEnhancedButton(w) XtIsSubclass(w, xmEnhancedButtonWidgetClass)
 
 /*
  * Convenience creation function.
  */
-extern Widget XgCreateEPushButtonWidget(Widget, char *, ArgList, Cardinal);
+خارجی Widget XgCreateEPushButtonWidget(Widget, حرف *, ArgList, Cardinal);
 
-extern WidgetClass xmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonRec *XmEnhancedButtonWidget;
+خارجی WidgetClass xmEnhancedButtonWidgetClass;
+قسمتعریف ساخت _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
+قسمتعریف ساخت _XmEnhancedButtonRec *XmEnhancedButtonWidget;
 
-#endif
+#اگر_ختم

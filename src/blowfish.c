@@ -20,43 +20,43 @@
  *   repeats.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_CRYPT)
+#اگر defined(FEAT_CRYPT)
 
-#define BF_BLOCK    8
-#define BF_BLOCK_MASK 7
-#define BF_MAX_CFB_LEN  (8 * BF_BLOCK)
+#تعریف_کرو BF_بلاک    8
+#تعریف_کرو BF_بلاک_نقاب 7
+#تعریف_کرو BF_MAX_CFB_LEN  (8 * BF_بلاک)
 
-typedef union {
+قسمتعریف اتحاد {
     UINT32_T ul[2];
     char_u   uc[8];
 } block8;
 
-#if defined(MSWIN)
+#اگر defined(MSWIN)
   // MS-Windows is always little endian
-#else
-# if defined(HAVE_CONFIG_H) || defined(WORDS_BIGENDIAN) || defined(AMIGA)
+#ورنہ
+# اگر defined(HAVE_CONFIG_H) || defined(الفاظ_BIGENDIAN) || defined(AMIGA)
    // Endianness determined by configure, explicit define, or known platform.
    // Amiga (68k) is always big-endian.
-# else
-#  error Please change this code to define WORDS_BIGENDIAN for big-endian machines.
+# ورنہ
+#  error Please change this رمز مقصد define الفاظ_BIGENDIAN برائے big-endian machines.
 # endif
-#endif
+#اگر_ختم
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
+قسمتعریف ساخت {
     UINT32_T	pax[18];	    // P-array
     UINT32_T	sbx[4][256];	    // S-boxes
-    int		randbyte_offset;
-    int		update_offset;
-    char_u	cfb_buffer[BF_MAX_CFB_LEN]; // up to 64 bytes used
-    int		cfb_len;	    // size of cfb_buffer actually used
+    صحیح		randbyte_انحراف;
+    صحیح		update_انحراف;
+    char_u	cfb_بفر[BF_MAX_CFB_LEN]; // up to 64 bytes used
+    صحیح		cfb_len;	    // size of cfb_buffer actually used
 } bf_state_T;
 
 
 // Blowfish code
-static UINT32_T pax_init[18] = {
+ساکن UINT32_T pax_init[18] = {
     0x243f6a88u, 0x85a308d3u, 0x13198a2eu,
     0x03707344u, 0xa4093822u, 0x299f31d0u,
     0x082efa98u, 0xec4e6c89u, 0x452821e6u,
@@ -65,7 +65,7 @@ static UINT32_T pax_init[18] = {
     0xb5470917u, 0x9216d5d9u, 0x8979fb1bu
 };
 
-static UINT32_T sbx_init[4][256] = {
+ساکن UINT32_T sbx_init[4][256] = {
    {0xd1310ba6u, 0x98dfb5acu, 0x2ffd72dbu, 0xd01adfb7u,
     0xb8e1afedu, 0x6a267e96u, 0xba7c9045u, 0xf12c7f99u,
     0x24a19947u, 0xb3916cf7u, 0x0801f2e2u, 0x858efc16u,
@@ -325,27 +325,27 @@ static UINT32_T sbx_init[4][256] = {
  }
 };
 
-#define F1(i) \
+#تعریف_کرو F1(i) \
     xl ^= bfs->pax[i]; \
     xr ^= ((bfs->sbx[0][xl >> 24] + \
     bfs->sbx[1][(xl & 0xFF0000) >> 16]) ^ \
     bfs->sbx[2][(xl & 0xFF00) >> 8]) + \
     bfs->sbx[3][xl & 0xFF];
 
-#define F2(i) \
+#تعریف_کرو F2(i) \
     xr ^= bfs->pax[i]; \
     xl ^= ((bfs->sbx[0][xr >> 24] + \
     bfs->sbx[1][(xr & 0xFF0000) >> 16]) ^ \
     bfs->sbx[2][(xr & 0xFF00) >> 8]) + \
     bfs->sbx[3][xr & 0xFF];
 
-    static void
-bf_e_block(
+    ساکن خالی
+bf_e_بلاک(
     bf_state_T *bfs,
     UINT32_T *p_xl,
     UINT32_T *p_xr)
 {
-    UINT32_T temp;
+    UINT32_T عارضی;
     UINT32_T xl = *p_xl;
     UINT32_T xr = *p_xr;
 
@@ -359,101 +359,101 @@ bf_e_block(
     F1(14) F2(15)
     xl ^= bfs->pax[16];
     xr ^= bfs->pax[17];
-    temp = xl;
+    عارضی = xl;
     xl = xr;
-    xr = temp;
+    xr = عارضی;
     *p_xl = xl;
     *p_xr = xr;
 }
 
 
-#ifdef WORDS_BIGENDIAN
+#اگر_تعریف_شدہ الفاظ_BIGENDIAN
 # define htonl2(x) \
     x = ((((x) &     0xffL) << 24) | (((x) & 0xff00L)     <<  8) | \
 	 (((x) & 0xff0000L) >>  8) | (((x) & 0xff000000L) >> 24))
-#else
+#ورنہ
 # define htonl2(x)
-#endif
+#اگر_ختم
 
-    static void
+    ساکن خالی
 bf_e_cblock(
     bf_state_T *bfs,
-    char_u *block)
+    char_u *بلاک)
 {
     block8	bk;
 
-    memcpy(bk.uc, block, 8);
+    حافظہ_نقل(bk.uc, بلاک, 8);
     htonl2(bk.ul[0]);
     htonl2(bk.ul[1]);
-    bf_e_block(bfs, &bk.ul[0], &bk.ul[1]);
+    bf_e_بلاک(bfs, &bk.ul[0], &bk.ul[1]);
     htonl2(bk.ul[0]);
     htonl2(bk.ul[1]);
-    memcpy(block, bk.uc, 8);
+    حافظہ_نقل(بلاک, bk.uc, 8);
 }
 
 /*
  * Initialize the crypt method using "password" as the encryption key and
  * "salt[salt_len]" as the salt.
  */
-    static void
-bf_key_init(
+    ساکن خالی
+bf_کلید_init(
     bf_state_T	*bfs,
     char_u	*password,
     char_u	*salt,
-    int		salt_len)
+    صحیح		salt_len)
 {
-    int      i, j, keypos = 0;
-    unsigned u;
-    UINT32_T val, data_l, data_r;
-    char_u   *key;
-    int      keylen;
+    صحیح      i, j, keypos = 0;
+    غیرعلامتی u;
+    UINT32_T val, ڈیٹا_l, ڈیٹا_r;
+    char_u   *کلید;
+    صحیح      keylen;
 
     // Process the key 1001 times.
     // See http://en.wikipedia.org/wiki/Key_strengthening.
-    key = sha256_key(password, salt, salt_len);
-    for (i = 0; i < 1000; i++)
-	key = sha256_key(key, salt, salt_len);
+    کلید = sha256_کلید(password, salt, salt_len);
+    برائے (i = 0; i < 1000; i++)
+	کلید = sha256_کلید(کلید, salt, salt_len);
 
     // Convert the key from 64 hex chars to 32 binary chars.
-    keylen = (int)STRLEN(key) / 2;
-    if (keylen == 0)
+    keylen = (صحیح)STRLEN(کلید) / 2;
+    اگر (keylen == 0)
     {
-	iemsg(e_bf_key_init_called_with_empty_password);
-	return;
+	iemsg(e_bf_کلید_init_called_with_خالی_خانے_password);
+	واپس;
     }
-    for (i = 0; i < keylen; i++)
+    برائے (i = 0; i < keylen; i++)
     {
-	sscanf((char *)&key[i * 2], "%2x", &u);
-	key[i] = u;
+	لڑی_سے_پڑھو((حرف *)&کلید[i * 2], "%2x", &u);
+	کلید[i] = u;
     }
 
     // Use "key" to initialize the P-array ("pax") and S-boxes ("sbx") of
     // Blowfish.
     mch_memmove(bfs->sbx, sbx_init, 4 * 4 * 256);
 
-    for (i = 0; i < 18; ++i)
+    برائے (i = 0; i < 18; ++i)
     {
 	val = 0;
-	for (j = 0; j < 4; ++j)
-	    val = (val << 8) | key[keypos++ % keylen];
+	برائے (j = 0; j < 4; ++j)
+	    val = (val << 8) | کلید[keypos++ % keylen];
 	bfs->pax[i] = pax_init[i] ^ val;
     }
 
-    data_l = data_r = 0;
-    for (i = 0; i < 18; i += 2)
+    ڈیٹا_l = ڈیٹا_r = 0;
+    برائے (i = 0; i < 18; i += 2)
     {
-	bf_e_block(bfs, &data_l, &data_r);
-	bfs->pax[i + 0] = data_l;
-	bfs->pax[i + 1] = data_r;
+	bf_e_بلاک(bfs, &ڈیٹا_l, &ڈیٹا_r);
+	bfs->pax[i + 0] = ڈیٹا_l;
+	bfs->pax[i + 1] = ڈیٹا_r;
     }
 
-    for (i = 0; i < 4; ++i)
+    برائے (i = 0; i < 4; ++i)
     {
-	for (j = 0; j < 256; j += 2)
+	برائے (j = 0; j < 256; j += 2)
 	{
-	    bf_e_block(bfs, &data_l, &data_r);
-	    bfs->sbx[i][j + 0] = data_l;
-	    bfs->sbx[i][j + 1] = data_r;
+	    bf_e_بلاک(bfs, &ڈیٹا_l, &ڈیٹا_r);
+	    bfs->sbx[i][j + 0] = ڈیٹا_l;
+	    bfs->sbx[i][j + 1] = ڈیٹا_r;
 	}
     }
 }
@@ -461,37 +461,37 @@ bf_key_init(
 /*
  * Blowfish self-test for corrupted tables or instructions.
  */
-    static int
+    ساکن صحیح
 bf_check_tables(
     UINT32_T pax[18],
     UINT32_T sbx[4][256],
     UINT32_T val)
 {
-    int i, j;
+    صحیح i, j;
     UINT32_T c = 0;
 
-    for (i = 0; i < 18; i++)
+    برائے (i = 0; i < 18; i++)
 	c ^= pax[i];
-    for (i = 0; i < 4; i++)
-	for (j = 0; j < 256; j++)
+    برائے (i = 0; i < 4; i++)
+	برائے (j = 0; j < 256; j++)
 	    c ^= sbx[i][j];
-    return c == val;
+    واپس c == val;
 }
 
-typedef struct {
+قسمتعریف ساخت {
     char_u   password[64];
     char_u   salt[9];
     char_u   plaintxt[9];
     char_u   cryptxt[9];
     char_u   badcryptxt[9]; // cryptxt when big/little endian is wrong
     UINT32_T keysum;
-} struct_bf_test_data;
+} struct_bf_test_ڈیٹا;
 
 /*
  * Assert bf(password, plaintxt) is cryptxt.
  * Assert csum(pax sbx(password)) is keysum.
  */
-static struct_bf_test_data bf_test_data[] = {
+ساکن struct_bf_test_ڈیٹا bf_test_ڈیٹا[] = {
   {
       "password",
       "salt",
@@ -505,50 +505,50 @@ static struct_bf_test_data bf_test_data[] = {
 /*
  * Return FAIL when there is something wrong with blowfish encryption.
  */
-    static int
-bf_self_test(void)
+    ساکن صحیح
+bf_self_test(خالی)
 {
-    int    i, bn;
-    int    err = 0;
+    صحیح    i, bn;
+    صحیح    err = 0;
     block8 bk;
     UINT32_T ui = 0xffffffffUL;
     bf_state_T state;
 
-    CLEAR_FIELD(state);
+    CLEAR_میدان(state);
     state.cfb_len = BF_MAX_CFB_LEN;
 
     // We can't simply use sizeof(UINT32_T), it would generate a compiler
     // warning.
-    if (ui != 0xffffffffUL || ui + 1 != 0)
+    اگر (ui != 0xffffffffUL || ui + 1 != 0)
     {
 	err++;
 	emsg(_(e_sizeof_uint32_isnot_four));
     }
 
-    if (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
+    اگر (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
 	err++;
 
-    bn = ARRAY_LENGTH(bf_test_data);
-    for (i = 0; i < bn; i++)
+    bn = ARRAY_لمبائی(bf_test_ڈیٹا);
+    برائے (i = 0; i < bn; i++)
     {
-	bf_key_init(&state, (char_u *)(bf_test_data[i].password),
-		    bf_test_data[i].salt,
-		    (int)STRLEN(bf_test_data[i].salt));
-	if (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
+	bf_کلید_init(&state, (char_u *)(bf_test_ڈیٹا[i].password),
+		    bf_test_ڈیٹا[i].salt,
+		    (صحیح)STRLEN(bf_test_ڈیٹا[i].salt));
+	اگر (!bf_check_tables(state.pax, state.sbx, bf_test_ڈیٹا[i].keysum))
 	    err++;
 
 	// Don't modify bf_test_data[i].plaintxt, self test is idempotent.
-	memcpy(bk.uc, bf_test_data[i].plaintxt, 8);
+	حافظہ_نقل(bk.uc, bf_test_ڈیٹا[i].plaintxt, 8);
 	bf_e_cblock(&state, bk.uc);
-	if (memcmp(bk.uc, bf_test_data[i].cryptxt, 8) != 0)
+	اگر (memcmp(bk.uc, bf_test_ڈیٹا[i].cryptxt, 8) != 0)
 	{
-	    if (err == 0 && memcmp(bk.uc, bf_test_data[i].badcryptxt, 8) == 0)
+	    اگر (err == 0 && memcmp(bk.uc, bf_test_ڈیٹا[i].badcryptxt, 8) == 0)
 		emsg(_(e_blowfish_big_little_endian_use_wrong));
 	    err++;
 	}
     }
 
-    return err > 0 ? FAIL : OK;
+    واپس err > 0 ? FAIL : OK;
 }
 
 /*
@@ -558,130 +558,130 @@ bf_self_test(void)
 /*
  * Initialize with seed "seed[seed_len]".
  */
-    static void
+    ساکن خالی
 bf_cfb_init(
     bf_state_T	*bfs,
-    char_u	*seed,
-    int		seed_len)
+    char_u	*بیج,
+    صحیح		بیج_len)
 {
-    int i, mi;
+    صحیح i, mi;
 
-    bfs->randbyte_offset = bfs->update_offset = 0;
-    vim_memset(bfs->cfb_buffer, 0, bfs->cfb_len);
-    if (seed_len > 0)
+    bfs->randbyte_انحراف = bfs->update_انحراف = 0;
+    vim_memset(bfs->cfb_بفر, 0, bfs->cfb_len);
+    اگر (بیج_len > 0)
     {
-	mi = seed_len > bfs->cfb_len ? seed_len : bfs->cfb_len;
-	for (i = 0; i < mi; i++)
-	    bfs->cfb_buffer[i % bfs->cfb_len] ^= seed[i % seed_len];
+	mi = بیج_len > bfs->cfb_len ? بیج_len : bfs->cfb_len;
+	برائے (i = 0; i < mi; i++)
+	    bfs->cfb_بفر[i % bfs->cfb_len] ^= بیج[i % بیج_len];
     }
 }
 
-#define BF_CFB_UPDATE(bfs, c) \
+#تعریف_کرو BF_CFB_UPDATE(bfs, c) \
 { \
-    bfs->cfb_buffer[bfs->update_offset] ^= (char_u)c; \
-    if (++bfs->update_offset == bfs->cfb_len) \
-	bfs->update_offset = 0; \
+    bfs->cfb_بفر[bfs->update_انحراف] ^= (char_u)c; \
+    اگر (++bfs->update_انحراف == bfs->cfb_len) \
+	bfs->update_انحراف = 0; \
 }
 
-#define BF_RANBYTE(bfs, t) \
+#تعریف_کرو BF_RANBYTE(bfs, t) \
 { \
-    if ((bfs->randbyte_offset & BF_BLOCK_MASK) == 0) \
-	bf_e_cblock(bfs, &(bfs->cfb_buffer[bfs->randbyte_offset])); \
-    t = bfs->cfb_buffer[bfs->randbyte_offset]; \
-    if (++bfs->randbyte_offset == bfs->cfb_len) \
-	bfs->randbyte_offset = 0; \
+    اگر ((bfs->randbyte_انحراف & BF_بلاک_نقاب) == 0) \
+	bf_e_cblock(bfs, &(bfs->cfb_بفر[bfs->randbyte_انحراف])); \
+    t = bfs->cfb_بفر[bfs->randbyte_انحراف]; \
+    اگر (++bfs->randbyte_انحراف == bfs->cfb_len) \
+	bfs->randbyte_انحراف = 0; \
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    خالی
 crypt_blowfish_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*مقصد,
+    صحیح		آخری غیر_مستعمل)
 {
-    bf_state_T *bfs = state->method_state;
+    bf_state_T *bfs = state->طریقہ_state;
     size_t	i;
-    int		ztemp, t;
+    صحیح		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    برائے (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
 	BF_RANBYTE(bfs, t);
 	BF_CFB_UPDATE(bfs, ztemp);
-	to[i] = t ^ ztemp;
+	مقصد[i] = t ^ ztemp;
     }
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    خالی
 crypt_blowfish_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*مقصد,
+    صحیح		آخری غیر_مستعمل)
 {
-    bf_state_T *bfs = state->method_state;
+    bf_state_T *bfs = state->طریقہ_state;
     size_t	i;
-    int		t;
+    صحیح		t;
 
-    for (i = 0; i < len; ++i)
+    برائے (i = 0; i < len; ++i)
     {
 	BF_RANBYTE(bfs, t);
-	to[i] = from[i] ^ t;
-	BF_CFB_UPDATE(bfs, to[i]);
+	مقصد[i] = from[i] ^ t;
+	BF_CFB_UPDATE(bfs, مقصد[i]);
     }
 }
 
-    int
+    صحیح
 crypt_blowfish_init(
     cryptstate_T	*state,
-    char_u		*key,
+    char_u		*کلید,
     crypt_arg_T		*arg)
 {
     bf_state_T	*bfs = ALLOC_CLEAR_ONE(bf_state_T);
 
-    if (bfs == NULL)
-	return FAIL;
-    state->method_state = bfs;
+    اگر (bfs == تہی)
+	واپس FAIL;
+    state->طریقہ_state = bfs;
 
     // "blowfish" uses a 64 byte buffer, causing it to repeat 8 byte groups 8
     // times.  "blowfish2" uses an 8 byte buffer to avoid repeating.
-    bfs->cfb_len = state->method_nr == CRYPT_M_BF ? BF_MAX_CFB_LEN : BF_BLOCK;
+    bfs->cfb_len = state->طریقہ_nr == CRYPT_M_BF ? BF_MAX_CFB_LEN : BF_بلاک;
 
-    if (blowfish_self_test() == FAIL)
-	return FAIL;
+    اگر (blowfish_self_test() == FAIL)
+	واپس FAIL;
 
-    bf_key_init(bfs, key, arg->cat_salt, arg->cat_salt_len);
-    bf_cfb_init(bfs, arg->cat_seed, arg->cat_seed_len);
+    bf_کلید_init(bfs, کلید, arg->cat_salt, arg->cat_salt_len);
+    bf_cfb_init(bfs, arg->cat_بیج, arg->cat_بیج_len);
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * Run a test to check if the encryption works as expected.
  * Give an error and return FAIL when not.
  */
-    int
-blowfish_self_test(void)
+    صحیح
+blowfish_self_test(خالی)
 {
-    if (sha256_self_test() == FAIL)
+    اگر (sha256_self_test() == FAIL)
     {
 	emsg(_(e_sha256_test_failed));
-	return FAIL;
+	واپس FAIL;
     }
-    if (bf_self_test() == FAIL)
+    اگر (bf_self_test() == FAIL)
     {
 	emsg(_(e_blowfish_test_failed));
-	return FAIL;
+	واپس FAIL;
     }
-    return OK;
+    واپس OK;
 }
-#endif // FEAT_CRYPT
+#اگر_ختم // FEAT_CRYPT

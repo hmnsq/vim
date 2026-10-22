@@ -32,61 +32,61 @@
  * file is opened.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
 /*
  * Some systems have the page size in statfs.f_bsize, some in stat.st_blksize
  */
-#ifdef HAVE_ST_BLKSIZE
+#اگر_تعریف_شدہ HAVE_ST_BLKSIZE
 # define STATFS stat
 # define F_BSIZE st_blksize
 # define fstatfs(fd, buf, len, nul) mch_fstat((fd), (buf))
-#else
+#ورنہ
 # ifdef HAVE_SYS_STATFS_H
 #  include <sys/statfs.h>
 #  define STATFS statfs
 #  define F_BSIZE f_bsize
 # endif
-#endif
+#اگر_ختم
 
 /*
  * for Amiga Dos 2.0x we use Flush
  */
-#ifdef AMIGA
+#اگر_تعریف_شدہ AMIGA
 # ifdef FEAT_ARP
-extern int dos2;			// this is in os_amiga.c
+خارجی صحیح dos2;			// this is in os_amiga.c
 # endif
 # ifdef SASC
 #  include <ios1.h>			// for chkufb()
 # endif
-#endif
+#اگر_ختم
 
-#define MEMFILE_PAGE_SIZE 4096		// default page size
+#تعریف_کرو MEMFILE_صفحہ_سائز 4096		// default page size
 
-static long_u	total_mem_used = 0;	// total memory used for memfiles
+ساکن long_u	کل_mem_مستعمل = 0;	// total memory used for memfiles
 
-static void mf_ins_hash(memfile_T *, bhdr_T *);
-static void mf_rem_hash(memfile_T *, bhdr_T *);
-static bhdr_T *mf_find_hash(memfile_T *, blocknr_T);
-static void mf_ins_used(memfile_T *, bhdr_T *);
-static void mf_rem_used(memfile_T *, bhdr_T *);
-static bhdr_T *mf_release(memfile_T *, int);
-static bhdr_T *mf_alloc_bhdr(memfile_T *, int);
-static void mf_free_bhdr(bhdr_T *);
-static void mf_ins_free(memfile_T *, bhdr_T *);
-static bhdr_T *mf_rem_free(memfile_T *);
-static int  mf_read(memfile_T *, bhdr_T *);
-static int  mf_write(memfile_T *, bhdr_T *);
-static int  mf_write_block(memfile_T *mfp, bhdr_T *hp, off_T offset, unsigned size);
-static int  mf_trans_add(memfile_T *, bhdr_T *);
-static void mf_do_open(memfile_T *, char_u *, int);
-static void mf_hash_init(mf_hashtab_T *);
-static void mf_hash_free(mf_hashtab_T *);
-static void mf_hash_free_all(mf_hashtab_T *);
-static mf_hashitem_T *mf_hash_find(mf_hashtab_T *, blocknr_T);
-static void mf_hash_add_item(mf_hashtab_T *, mf_hashitem_T *);
-static void mf_hash_rem_item(mf_hashtab_T *, mf_hashitem_T *);
-static int mf_hash_grow(mf_hashtab_T *);
+ساکن خالی mf_ins_hash(memfile_T *, bhdr_T *);
+ساکن خالی mf_rem_hash(memfile_T *, bhdr_T *);
+ساکن bhdr_T *mf_ڈھونڈو_hash(memfile_T *, blocknr_T);
+ساکن خالی mf_ins_مستعمل(memfile_T *, bhdr_T *);
+ساکن خالی mf_rem_مستعمل(memfile_T *, bhdr_T *);
+ساکن bhdr_T *mf_release(memfile_T *, صحیح);
+ساکن bhdr_T *mf_alloc_bhdr(memfile_T *, صحیح);
+ساکن خالی mf_free_bhdr(bhdr_T *);
+ساکن خالی mf_ins_free(memfile_T *, bhdr_T *);
+ساکن bhdr_T *mf_rem_free(memfile_T *);
+ساکن صحیح  mf_read(memfile_T *, bhdr_T *);
+ساکن صحیح  mf_write(memfile_T *, bhdr_T *);
+ساکن صحیح  mf_write_بلاک(memfile_T *mfp, bhdr_T *hp, off_T انحراف, غیرعلامتی سائز);
+ساکن صحیح  mf_trans_جوڑو(memfile_T *, bhdr_T *);
+ساکن خالی mf_do_open(memfile_T *, char_u *, صحیح);
+ساکن خالی mf_hash_init(mf_hashtab_T *);
+ساکن خالی mf_hash_free(mf_hashtab_T *);
+ساکن خالی mf_hash_free_all(mf_hashtab_T *);
+ساکن mf_hashitem_T *mf_hash_ڈھونڈو(mf_hashtab_T *, blocknr_T);
+ساکن خالی mf_hash_جوڑو_شے(mf_hashtab_T *, mf_hashitem_T *);
+ساکن خالی mf_hash_rem_شے(mf_hashtab_T *, mf_hashitem_T *);
+ساکن صحیح mf_hash_grow(mf_hashtab_T *);
 
 /*
  * The functions for using a memfile:
@@ -117,49 +117,49 @@ static int mf_hash_grow(mf_hashtab_T *);
  * return value: identifier for this memory block file.
  */
     memfile_T *
-mf_open(char_u *fname, int flags)
+mf_open(char_u *fname, صحیح flags)
 {
     memfile_T		*mfp;
-    off_T		size;
-#if defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
+    off_T		سائز;
+#اگر defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
 # define USE_FSTATFS
-    struct STATFS	stf;
-#endif
+    ساخت STATFS	stf;
+#اگر_ختم
 
-    if ((mfp = ALLOC_ONE(memfile_T)) == NULL)
-	return NULL;
+    اگر ((mfp = ALLOC_ONE(memfile_T)) == تہی)
+	واپس تہی;
 
-    if (fname == NULL)	    // no file for this memfile, use memory only
+    اگر (fname == تہی)	    // no file for this memfile, use memory only
     {
-	mfp->mf_fname = NULL;
-	mfp->mf_ffname = NULL;
+	mfp->mf_fname = تہی;
+	mfp->mf_ffname = تہی;
 	mfp->mf_fd = -1;
     }
-    else
+    ورنہ
     {
 	mf_do_open(mfp, fname, flags);	// try to open the file
 
 	// if the file cannot be opened, return here
-	if (mfp->mf_fd < 0)
+	اگر (mfp->mf_fd < 0)
 	{
 	    vim_free(mfp);
-	    return NULL;
+	    واپس تہی;
 	}
     }
 
-    mfp->mf_free_first = NULL;		// free list is empty
-    mfp->mf_used_first = NULL;		// used list is empty
-    mfp->mf_used_last = NULL;
+    mfp->mf_free_پہلا = تہی;		// free list is empty
+    mfp->mf_مستعمل_پہلا = تہی;		// used list is empty
+    mfp->mf_مستعمل_آخری = تہی;
     mfp->mf_dirty = MF_DIRTY_NO;
-    mfp->mf_used_count = 0;
+    mfp->mf_مستعمل_گنتی = 0;
     mf_hash_init(&mfp->mf_hash);
     mf_hash_init(&mfp->mf_trans);
-    mfp->mf_page_size = MEMFILE_PAGE_SIZE;
-#ifdef FEAT_CRYPT
-    mfp->mf_old_key = NULL;
-#endif
+    mfp->mf_صفحہ_سائز = MEMFILE_صفحہ_سائز;
+#اگر_تعریف_شدہ FEAT_CRYPT
+    mfp->mf_old_کلید = تہی;
+#اگر_ختم
 
-#ifdef USE_FSTATFS
+#اگر_تعریف_شدہ USE_FSTATFS
     /*
      * Try to set the page size equal to the block size of the device.
      * Speeds up I/O a lot.
@@ -167,22 +167,22 @@ mf_open(char_u *fname, int flags)
      * in ml_recover().  The size used here may be wrong, therefore
      * mf_blocknr_max must be rounded up.
      */
-    if (mfp->mf_fd >= 0
-	    && fstatfs(mfp->mf_fd, &stf, sizeof(struct statfs), 0) == 0
-	    && stf.F_BSIZE >= MIN_SWAP_PAGE_SIZE
-	    && stf.F_BSIZE <= MAX_SWAP_PAGE_SIZE)
-	mfp->mf_page_size = stf.F_BSIZE;
-#endif
+    اگر (mfp->mf_fd >= 0
+	    && fstatfs(mfp->mf_fd, &stf, حجم(ساخت statfs), 0) == 0
+	    && stf.F_BSIZE >= MIN_تبادلہ_صفحہ_سائز
+	    && stf.F_BSIZE <= MAX_تبادلہ_صفحہ_سائز)
+	mfp->mf_صفحہ_سائز = stf.F_BSIZE;
+#اگر_ختم
 
-    if (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
-		  || (size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
+    اگر (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
+		  || (سائز = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	mfp->mf_blocknr_max = 0;	// no file or empty file
-    else
-	mfp->mf_blocknr_max = (blocknr_T)((size + mfp->mf_page_size - 1)
-							 / mfp->mf_page_size);
+    ورنہ
+	mfp->mf_blocknr_max = (blocknr_T)((سائز + mfp->mf_صفحہ_سائز - 1)
+							 / mfp->mf_صفحہ_سائز);
     mfp->mf_blocknr_min = -1;
-    mfp->mf_neg_count = 0;
-    mfp->mf_infile_count = mfp->mf_blocknr_max;
+    mfp->mf_neg_گنتی = 0;
+    mfp->mf_infile_گنتی = mfp->mf_blocknr_max;
 
     /*
      * Compute maximum number of pages ('maxmem' is in Kbyte):
@@ -190,20 +190,20 @@ mf_open(char_u *fname, int flags)
      * Avoid overflow by first reducing page size as much as possible.
      */
     {
-	int	    shift = 10;
-	unsigned    page_size = mfp->mf_page_size;
+	صحیح	    سرکاؤ = 10;
+	غیرعلامتی    صفحہ_سائز = mfp->mf_صفحہ_سائز;
 
-	while (shift > 0 && (page_size & 1) == 0)
+	جب (سرکاؤ > 0 && (صفحہ_سائز & 1) == 0)
 	{
-	    page_size = page_size >> 1;
-	    --shift;
+	    صفحہ_سائز = صفحہ_سائز >> 1;
+	    --سرکاؤ;
 	}
-	mfp->mf_used_count_max = (p_mm << shift) / page_size;
-	if (mfp->mf_used_count_max < 10)
-	    mfp->mf_used_count_max = 10;
+	mfp->mf_مستعمل_گنتی_max = (p_mm << سرکاؤ) / صفحہ_سائز;
+	اگر (mfp->mf_مستعمل_گنتی_max < 10)
+	    mfp->mf_مستعمل_گنتی_max = 10;
     }
 
-    return mfp;
+    واپس mfp;
 }
 
 /*
@@ -216,43 +216,43 @@ mf_open(char_u *fname, int flags)
  *
  * return value: FAIL if file could not be opened, OK otherwise
  */
-    int
+    صحیح
 mf_open_file(memfile_T *mfp, char_u *fname)
 {
     mf_do_open(mfp, fname, O_RDWR|O_CREAT|O_EXCL); // try to open the file
 
-    if (mfp->mf_fd < 0)
-	return FAIL;
+    اگر (mfp->mf_fd < 0)
+	واپس FAIL;
 
     mfp->mf_dirty = MF_DIRTY_YES;
-    return OK;
+    واپس OK;
 }
 
 /*
  * Close a memory file and delete the associated file if 'del_file' is TRUE.
  */
-    void
-mf_close(memfile_T *mfp, int del_file)
+    خالی
+mf_close(memfile_T *mfp, صحیح del_file)
 {
     bhdr_T	*hp, *nextp;
 
-    if (mfp == NULL)		    // safety check
-	return;
-    if (mfp->mf_fd >= 0)
+    اگر (mfp == تہی)		    // safety check
+	واپس;
+    اگر (mfp->mf_fd >= 0)
     {
-	if (close(mfp->mf_fd) < 0)
-	    emsg(_(e_close_error_on_swap_file));
+	اگر (close(mfp->mf_fd) < 0)
+	    emsg(_(e_close_error_on_تبادلہ_file));
     }
-    if (del_file && mfp->mf_fname != NULL)
+    اگر (del_file && mfp->mf_fname != تہی)
 	mch_remove(mfp->mf_fname);
 					    // free entries in used list
-    for (hp = mfp->mf_used_first; hp != NULL; hp = nextp)
+    برائے (hp = mfp->mf_مستعمل_پہلا; hp != تہی; hp = nextp)
     {
-	total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
-	nextp = hp->bh_next;
+	کل_mem_مستعمل -= (long_u)hp->bh_صفحہ_گنتی * mfp->mf_صفحہ_سائز;
+	nextp = hp->bh_اگلا;
 	mf_free_bhdr(hp);
     }
-    while (mfp->mf_free_first != NULL)	    // free entries in free list
+    جب (mfp->mf_free_پہلا != تہی)	    // free entries in free list
 	vim_free(mf_rem_free(mfp));
     mf_hash_free(&mfp->mf_hash);
     mf_hash_free_all(&mfp->mf_trans);	    // free hashtable and its items
@@ -264,33 +264,33 @@ mf_close(memfile_T *mfp, int del_file)
 /*
  * Close the swap file for a memfile.  Used when 'swapfile' is reset.
  */
-    void
+    خالی
 mf_close_file(
     buf_T	*buf,
-    int		getlines)	// get all lines into memory?
+    صحیح		getlines)	// get all lines into memory?
 {
     memfile_T	*mfp;
     linenr_T	lnum;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd < 0)		// nothing to close
-	return;
+    اگر (mfp == تہی || mfp->mf_fd < 0)		// nothing to close
+	واپس;
 
-    if (getlines)
+    اگر (getlines)
     {
 	// get all blocks in memory by accessing all lines (clumsy!)
 	mf_dont_release = TRUE;
-	for (lnum = 1; lnum <= buf->b_ml.ml_line_count; ++lnum)
-	    (void)ml_get_buf(buf, lnum, FALSE);
+	برائے (lnum = 1; lnum <= buf->b_ml.ml_سطر_گنتی; ++lnum)
+	    (خالی)ml_get_buf(buf, lnum, FALSE);
 	mf_dont_release = FALSE;
 	// TODO: should check if all blocks are really in core
     }
 
-    if (close(mfp->mf_fd) < 0)			// close the file
-	emsg(_(e_close_error_on_swap_file));
+    اگر (close(mfp->mf_fd) < 0)			// close the file
+	emsg(_(e_close_error_on_تبادلہ_file));
     mfp->mf_fd = -1;
 
-    if (mfp->mf_fname != NULL)
+    اگر (mfp->mf_fname != تہی)
     {
 	mch_remove(mfp->mf_fname);		// delete the swap file
 	VIM_CLEAR(mfp->mf_fname);
@@ -302,13 +302,13 @@ mf_close_file(
  * Set new size for a memfile.  Used when block 0 of a swapfile has been read
  * and the size it indicates differs from what was guessed.
  */
-    void
-mf_new_page_size(memfile_T *mfp, unsigned new_size)
+    خالی
+mf_new_صفحہ_سائز(memfile_T *mfp, غیرعلامتی new_سائز)
 {
     // Correct the memory used for block 0 to the new size, because it will be
     // freed with that size later on.
-    total_mem_used += new_size - mfp->mf_page_size;
-    mfp->mf_page_size = new_size;
+    کل_mem_مستعمل += new_سائز - mfp->mf_صفحہ_سائز;
+    mfp->mf_صفحہ_سائز = new_سائز;
 }
 
 /*
@@ -317,7 +317,7 @@ mf_new_page_size(memfile_T *mfp, unsigned new_size)
  *   negative: TRUE if negative block number desired (data block)
  */
     bhdr_T *
-mf_new(memfile_T *mfp, int negative, int page_count)
+mf_new(memfile_T *mfp, صحیح negative, صحیح صفحہ_گنتی)
 {
     bhdr_T	*hp;	// new bhdr_T
     bhdr_T	*freep;	// first block in free list
@@ -327,7 +327,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * If we reached the maximum size for the used memory blocks, release one
      * If a bhdr_T is returned, use it and adjust the page_count if necessary.
      */
-    hp = mf_release(mfp, page_count);
+    hp = mf_release(mfp, صفحہ_گنتی);
 
 /*
  * Decide on the number to use:
@@ -335,8 +335,8 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Otherwise use mf_block_min for a negative number, mf_block_max for
  * a positive number.
  */
-    freep = mfp->mf_free_first;
-    if (!negative && freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_پہلا;
+    اگر (!negative && freep != تہی && freep->bh_صفحہ_گنتی >= صفحہ_گنتی)
     {
 	/*
 	 * If the block in the free list has more pages, take only the number
@@ -348,57 +348,57 @@ mf_new(memfile_T *mfp, int negative, int page_count)
 	 * If the number of pages matches and mf_release() returned a bhdr_T,
 	 * just use the number and free the bhdr_T from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	اگر (freep->bh_صفحہ_گنتی > صفحہ_گنتی)
 	{
-	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-		return NULL;
+	    اگر (hp == تہی && (hp = mf_alloc_bhdr(mfp, صفحہ_گنتی)) == تہی)
+		واپس تہی;
 	    hp->bh_bnum = freep->bh_bnum;
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += صفحہ_گنتی;
+	    freep->bh_صفحہ_گنتی -= صفحہ_گنتی;
 	}
-	else if (hp == NULL)	    // need to allocate memory for this block
+	ورنہ اگر (hp == تہی)	    // need to allocate memory for this block
 	{
-	    if ((p = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
-		return NULL;
+	    اگر ((p = alloc((size_t)mfp->mf_صفحہ_سائز * صفحہ_گنتی)) == تہی)
+		واپس تہی;
 	    hp = mf_rem_free(mfp);
-	    hp->bh_data = p;
+	    hp->bh_ڈیٹا = p;
 	}
-	else		    // use the number, remove entry from free list
+	ورنہ		    // use the number, remove entry from free list
 	{
 	    freep = mf_rem_free(mfp);
 	    hp->bh_bnum = freep->bh_bnum;
 	    vim_free(freep);
 	}
     }
-    else	// get a new number
+    ورنہ	// get a new number
     {
-	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-	    return NULL;
-	if (negative)
+	اگر (hp == تہی && (hp = mf_alloc_bhdr(mfp, صفحہ_گنتی)) == تہی)
+	    واپس تہی;
+	اگر (negative)
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_min--;
-	    mfp->mf_neg_count++;
+	    mfp->mf_neg_گنتی++;
 	}
-	else
+	ورنہ
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_max;
-	    mfp->mf_blocknr_max += page_count;
+	    mfp->mf_blocknr_max += صفحہ_گنتی;
 	}
     }
     hp->bh_flags = BH_LOCKED | BH_DIRTY;	// new block is always dirty
     mfp->mf_dirty = MF_DIRTY_YES;
-    hp->bh_page_count = page_count;
-    mf_ins_used(mfp, hp);
+    hp->bh_صفحہ_گنتی = صفحہ_گنتی;
+    mf_ins_مستعمل(mfp, hp);
     mf_ins_hash(mfp, hp);
 
     /*
      * Init the data to all zero, to avoid reading uninitialized data.
      * This also avoids that the passwd file ends up in the swap file!
      */
-    (void)vim_memset((char *)(hp->bh_data), 0,
-				      (size_t)mfp->mf_page_size * page_count);
+    (خالی)vim_memset((حرف *)(hp->bh_ڈیٹا), 0,
+				      (size_t)mfp->mf_صفحہ_سائز * صفحہ_گنتی);
 
-    return hp;
+    واپس hp;
 }
 
 /*
@@ -407,21 +407,21 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Note: The caller should first check a negative nr with mf_trans_del()
  */
     bhdr_T *
-mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
+mf_get(memfile_T *mfp, blocknr_T nr, صحیح صفحہ_گنتی)
 {
     bhdr_T    *hp;
 						// doesn't exist
-    if (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
-	return NULL;
+    اگر (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
+	واپس تہی;
 
     /*
      * see if it is in the cache
      */
-    hp = mf_find_hash(mfp, nr);
-    if (hp == NULL)	// not in the hash list
+    hp = mf_ڈھونڈو_hash(mfp, nr);
+    اگر (hp == تہی)	// not in the hash list
     {
-	if (nr < 0 || nr >= mfp->mf_infile_count)   // can't be in the file
-	    return NULL;
+	اگر (nr < 0 || nr >= mfp->mf_infile_گنتی)   // can't be in the file
+	    واپس تہی;
 
 	// could check here if the block is in the free list
 
@@ -430,32 +430,32 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
 	 * If so, use that block.
 	 * If not, allocate a new block.
 	 */
-	hp = mf_release(mfp, page_count);
-	if (hp == NULL && page_count > 0)
-	    hp = mf_alloc_bhdr(mfp, page_count);
-	if (hp == NULL)
-	    return NULL;
+	hp = mf_release(mfp, صفحہ_گنتی);
+	اگر (hp == تہی && صفحہ_گنتی > 0)
+	    hp = mf_alloc_bhdr(mfp, صفحہ_گنتی);
+	اگر (hp == تہی)
+	    واپس تہی;
 
 	hp->bh_bnum = nr;
 	hp->bh_flags = 0;
-	hp->bh_page_count = page_count;
-	if (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
+	hp->bh_صفحہ_گنتی = صفحہ_گنتی;
+	اگر (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
 	{
 	    mf_free_bhdr(hp);
-	    return NULL;
+	    واپس تہی;
 	}
     }
-    else
+    ورنہ
     {
-	mf_rem_used(mfp, hp);	// remove from list, insert in front below
+	mf_rem_مستعمل(mfp, hp);	// remove from list, insert in front below
 	mf_rem_hash(mfp, hp);
     }
 
     hp->bh_flags |= BH_LOCKED;
-    mf_ins_used(mfp, hp);	// put in front of used list
+    mf_ins_مستعمل(mfp, hp);	// put in front of used list
     mf_ins_hash(mfp, hp);	// put in front of hash list
 
-    return hp;
+    واپس hp;
 }
 
 /*
@@ -466,46 +466,46 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
  *
  *  no return value, function cannot fail
  */
-    void
+    خالی
 mf_put(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    int		dirty,
-    int		infile)
+    صحیح		dirty,
+    صحیح		infile)
 {
-    int		flags;
+    صحیح		flags;
 
     flags = hp->bh_flags;
 
-    if ((flags & BH_LOCKED) == 0)
-	iemsg(e_block_was_not_locked);
+    اگر ((flags & BH_LOCKED) == 0)
+	iemsg(e_بلاک_was_not_locked);
     flags &= ~BH_LOCKED;
-    if (dirty)
+    اگر (dirty)
     {
 	flags |= BH_DIRTY;
-	if (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
+	اگر (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
 	    mfp->mf_dirty = MF_DIRTY_YES;
     }
     hp->bh_flags = flags;
-    if (infile)
-	mf_trans_add(mfp, hp);	    // may translate negative in positive nr
+    اگر (infile)
+	mf_trans_جوڑو(mfp, hp);	    // may translate negative in positive nr
 }
 
 /*
  * block *hp is no longer in used, may put it in the free list of memfile *mfp
  */
-    void
+    خالی
 mf_free(memfile_T *mfp, bhdr_T *hp)
 {
-    vim_free(hp->bh_data);	// free the memory
+    vim_free(hp->bh_ڈیٹا);	// free the memory
     mf_rem_hash(mfp, hp);	// get *hp out of the hash list
-    mf_rem_used(mfp, hp);	// get *hp out of the used list
-    if (hp->bh_bnum < 0)
+    mf_rem_مستعمل(mfp, hp);	// get *hp out of the used list
+    اگر (hp->bh_bnum < 0)
     {
 	vim_free(hp);		// don't want negative numbers in free list
-	mfp->mf_neg_count--;
+	mfp->mf_neg_گنتی--;
     }
-    else
+    ورنہ
 	mf_ins_free(mfp, hp);	// put *hp in the free list
 }
 
@@ -522,18 +522,18 @@ mf_free(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    int
-mf_sync(memfile_T *mfp, int flags)
+    صحیح
+mf_sync(memfile_T *mfp, صحیح flags)
 {
-    int		status;
+    صحیح		حالت_2;
     bhdr_T	*hp;
-    int		got_int_save = got_int;
+    صحیح		got_int_save = got_int;
 
-    if (mfp->mf_fd < 0)
+    اگر (mfp->mf_fd < 0)
     {
 	// there is no file, nothing to do
 	mfp->mf_dirty = MF_DIRTY_NO;
-	return FAIL;
+	واپس FAIL;
     }
 
     // Only a CTRL-C while writing will break us here, not one typed
@@ -546,119 +546,119 @@ mf_sync(memfile_T *mfp, int flags)
      * Then we only try to write blocks within the existing file. If that also
      * fails then we give up.
      */
-    status = OK;
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (((flags & MFS_ALL) || hp->bh_bnum >= 0)
+    حالت_2 = OK;
+    برائے (hp = mfp->mf_مستعمل_آخری; hp != تہی; hp = hp->bh_پچھلا)
+	اگر (((flags & MFS_ALL) || hp->bh_bnum >= 0)
 		&& (hp->bh_flags & BH_DIRTY)
-		&& (status == OK || (hp->bh_bnum >= 0
-		    && hp->bh_bnum < mfp->mf_infile_count)))
+		&& (حالت_2 == OK || (hp->bh_bnum >= 0
+		    && hp->bh_bnum < mfp->mf_infile_گنتی)))
 	{
-	    if ((flags & MFS_ZERO) && hp->bh_bnum != 0)
-		continue;
-	    if (mf_write(mfp, hp) == FAIL)
+	    اگر ((flags & MFS_ZERO) && hp->bh_bnum != 0)
+		جاری;
+	    اگر (mf_write(mfp, hp) == FAIL)
 	    {
-		if (status == FAIL)	// double error: quit syncing
-		    break;
-		status = FAIL;
+		اگر (حالت_2 == FAIL)	// double error: quit syncing
+		    توڑو;
+		حالت_2 = FAIL;
 	    }
-	    if (flags & MFS_STOP)
+	    اگر (flags & MFS_STOP)
 	    {
 		// Stop when char available now.
-		if (ui_char_avail())
-		    break;
+		اگر (ui_char_avail())
+		    توڑو;
 	    }
-	    else
+	    ورنہ
 		ui_breakcheck();
-	    if (got_int)
-		break;
+	    اگر (got_int)
+		توڑو;
 	}
 
     /*
      * If the whole list is flushed, the memfile is not dirty anymore.
      * In case of an error this flag is also set, to avoid trying all the time.
      */
-    if (hp == NULL || status == FAIL)
+    اگر (hp == تہی || حالت_2 == FAIL)
 	mfp->mf_dirty = MF_DIRTY_NO;
 
-    if ((flags & MFS_FLUSH) && *p_sws != NUL)
+    اگر ((flags & MFS_FLUSH) && *p_sws != NUL)
     {
-#if defined(UNIX)
+#اگر defined(UNIX)
 # ifdef HAVE_FSYNC
 	/*
 	 * most Unixes have the very useful fsync() function, just what we need.
 	 */
-	if (STRCMP(p_sws, "fsync") == 0)
+	اگر (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    اگر (vim_fsync(mfp->mf_fd))
+		حالت_2 = FAIL;
 	}
-	else
+	ورنہ
 # endif
 # ifdef HAVE_SYNC
 	    sync();
-# else
-	    fflush(NULL);
+# ورنہ
+	    fflush(تہی);
 # endif
-#endif
-#ifdef VMS
-	if (STRCMP(p_sws, "fsync") == 0)
+#اگر_ختم
+#اگر_تعریف_شدہ VMS
+	اگر (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
-		status = FAIL;
+	    اگر (vim_fsync(mfp->mf_fd))
+		حالت_2 = FAIL;
 	}
-#endif
-#ifdef MSWIN
-	if (_commit(mfp->mf_fd))
-	    status = FAIL;
-#endif
-#ifdef AMIGA
-# if defined(__AROS__) || defined(__amigaos4__)
-	if (vim_fsync(mfp->mf_fd) != 0)
-	    status = FAIL;
-# else
+#اگر_ختم
+#اگر_تعریف_شدہ MSWIN
+	اگر (_commit(mfp->mf_fd))
+	    حالت_2 = FAIL;
+#اگر_ختم
+#اگر_تعریف_شدہ AMIGA
+# اگر defined(__AROS__) || defined(__amigaos4__)
+	اگر (vim_fsync(mfp->mf_fd) != 0)
+	    حالت_2 = FAIL;
+# ورنہ
 	/*
 	 * Flush() only exists for AmigaDos 2.0.
 	 * For 1.3 it should be done with close() + open(), but then the risk
 	 * is that the open() may fail and lose the file....
 	 */
 #  ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 #  endif
 #  ifdef SASC
 	{
-	    struct UFB *fp = chkufb(mfp->mf_fd);
+	    ساخت UFB *fp = chkufb(mfp->mf_fd);
 
-	    if (fp != NULL)
+	    اگر (fp != تہی)
 		Flush(fp->ufbfh);
 	}
-#  else
-#   if defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
+#  ورنہ
+#   اگر defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
 	{
-#    if defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
+#    اگر defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
 	    // Have function (in libnix at least),
 	    // but ain't got no prototype anywhere.
-	    extern unsigned long fdtofh(int filedescriptor);
+	    خارجی غیرعلامتی طویل fdtofh(صحیح filedescriptor);
 #    endif
-#    if !defined(__libnix__)
-	    fflush(NULL);
-#    else
+#    اگر !defined(__libnix__)
+	    fflush(تہی);
+#    ورنہ
 	    BPTR fh = (BPTR)fdtofh(mfp->mf_fd);
 
-	    if (fh != 0)
+	    اگر (fh != 0)
 		Flush(fh);
 #    endif
 	}
-#   else // assume Manx
+#   ورنہ // assume Manx
 	    Flush(_devtab[mfp->mf_fd].fd);
 #   endif
 #  endif
 # endif
-#endif // AMIGA
+#اگر_ختم // AMIGA
     }
 
     got_int |= got_int_save;
 
-    return status;
+    واپس حالت_2;
 }
 
 /*
@@ -666,13 +666,13 @@ mf_sync(memfile_T *mfp, int flags)
  * the dirty flag.  These are blocks that need to be written to a newly
  * created swapfile.
  */
-    void
-mf_set_dirty(memfile_T *mfp)
+    خالی
+mf_سیٹ_dirty(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (hp->bh_bnum > 0)
+    برائے (hp = mfp->mf_مستعمل_آخری; hp != تہی; hp = hp->bh_پچھلا)
+	اگر (hp->bh_bnum > 0)
 	    hp->bh_flags |= BH_DIRTY;
     mfp->mf_dirty = MF_DIRTY_YES;
 }
@@ -680,63 +680,63 @@ mf_set_dirty(memfile_T *mfp)
 /*
  * insert block *hp in front of hashlist of memfile *mfp
  */
-    static void
+    ساکن خالی
 mf_ins_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_add_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_جوڑو_شے(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * remove block *hp from hashlist of memfile list *mfp
  */
-    static void
+    ساکن خالی
 mf_rem_hash(memfile_T *mfp, bhdr_T *hp)
 {
-    mf_hash_rem_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
+    mf_hash_rem_شے(&mfp->mf_hash, (mf_hashitem_T *)hp);
 }
 
 /*
  * look in hash lists of memfile *mfp for block header with number 'nr'
  */
-    static bhdr_T *
-mf_find_hash(memfile_T *mfp, blocknr_T nr)
+    ساکن bhdr_T *
+mf_ڈھونڈو_hash(memfile_T *mfp, blocknr_T nr)
 {
-    return (bhdr_T *)mf_hash_find(&mfp->mf_hash, nr);
+    واپس (bhdr_T *)mf_hash_ڈھونڈو(&mfp->mf_hash, nr);
 }
 
 /*
  * insert block *hp in front of used list of memfile *mfp
  */
-    static void
-mf_ins_used(memfile_T *mfp, bhdr_T *hp)
+    ساکن خالی
+mf_ins_مستعمل(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_used_first;
-    mfp->mf_used_first = hp;
-    hp->bh_prev = NULL;
-    if (hp->bh_next == NULL)	    // list was empty, adjust last pointer
-	mfp->mf_used_last = hp;
-    else
-	hp->bh_next->bh_prev = hp;
-    mfp->mf_used_count += hp->bh_page_count;
-    total_mem_used += (long_u)hp->bh_page_count * mfp->mf_page_size;
+    hp->bh_اگلا = mfp->mf_مستعمل_پہلا;
+    mfp->mf_مستعمل_پہلا = hp;
+    hp->bh_پچھلا = تہی;
+    اگر (hp->bh_اگلا == تہی)	    // list was empty, adjust last pointer
+	mfp->mf_مستعمل_آخری = hp;
+    ورنہ
+	hp->bh_اگلا->bh_پچھلا = hp;
+    mfp->mf_مستعمل_گنتی += hp->bh_صفحہ_گنتی;
+    کل_mem_مستعمل += (long_u)hp->bh_صفحہ_گنتی * mfp->mf_صفحہ_سائز;
 }
 
 /*
  * remove block *hp from used list of memfile *mfp
  */
-    static void
-mf_rem_used(memfile_T *mfp, bhdr_T *hp)
+    ساکن خالی
+mf_rem_مستعمل(memfile_T *mfp, bhdr_T *hp)
 {
-    if (hp->bh_next == NULL)	    // last block in used list
-	mfp->mf_used_last = hp->bh_prev;
-    else
-	hp->bh_next->bh_prev = hp->bh_prev;
-    if (hp->bh_prev == NULL)	    // first block in used list
-	mfp->mf_used_first = hp->bh_next;
-    else
-	hp->bh_prev->bh_next = hp->bh_next;
-    mfp->mf_used_count -= hp->bh_page_count;
-    total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+    اگر (hp->bh_اگلا == تہی)	    // last block in used list
+	mfp->mf_مستعمل_آخری = hp->bh_پچھلا;
+    ورنہ
+	hp->bh_اگلا->bh_پچھلا = hp->bh_پچھلا;
+    اگر (hp->bh_پچھلا == تہی)	    // first block in used list
+	mfp->mf_مستعمل_پہلا = hp->bh_اگلا;
+    ورنہ
+	hp->bh_پچھلا->bh_اگلا = hp->bh_اگلا;
+    mfp->mf_مستعمل_گنتی -= hp->bh_صفحہ_گنتی;
+    کل_mem_مستعمل -= (long_u)hp->bh_صفحہ_گنتی * mfp->mf_صفحہ_سائز;
 }
 
 /*
@@ -748,35 +748,35 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
  *
  * Returns NULL if no block is released.
  */
-    static bhdr_T *
-mf_release(memfile_T *mfp, int page_count)
+    ساکن bhdr_T *
+mf_release(memfile_T *mfp, صحیح صفحہ_گنتی)
 {
     bhdr_T	*hp;
-    int		need_release;
+    صحیح		need_release;
     buf_T	*buf;
 
     // don't release while in mf_close_file()
-    if (mf_dont_release)
-	return NULL;
+    اگر (mf_dont_release)
+	واپس تہی;
 
     /*
      * Need to release a block if the number of blocks for this memfile is
      * higher than the maximum or total memory used is over 'maxmemtot'
      */
-    need_release = ((mfp->mf_used_count >= mfp->mf_used_count_max)
-				  || (total_mem_used >> 10) >= (long_u)p_mmt);
+    need_release = ((mfp->mf_مستعمل_گنتی >= mfp->mf_مستعمل_گنتی_max)
+				  || (کل_mem_مستعمل >> 10) >= (long_u)p_mmt);
 
     /*
      * Try to create a swap file if the amount of memory used is getting too
      * high.
      */
-    if (mfp->mf_fd < 0 && need_release && p_uc)
+    اگر (mfp->mf_fd < 0 && need_release && p_uc)
     {
 	// find for which buffer this memfile is
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp == mfp)
-		break;
-	if (buf != NULL && buf->b_may_swap)
+	    اگر (buf->b_ml.ml_mfp == mfp)
+		توڑو;
+	اگر (buf != تہی && buf->b_may_تبادلہ)
 	    ml_open_file(buf);
     }
 
@@ -788,42 +788,42 @@ mf_release(memfile_T *mfp, int page_count)
      *	  and
      *	total memory used is not up to 'maxmemtot'
      */
-    if (mfp->mf_fd < 0 || !need_release)
-	return NULL;
+    اگر (mfp->mf_fd < 0 || !need_release)
+	واپس تہی;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (!(hp->bh_flags & BH_LOCKED))
-	    break;
-    if (hp == NULL)	// not a single one that can be released
-	return NULL;
+    برائے (hp = mfp->mf_مستعمل_آخری; hp != تہی; hp = hp->bh_پچھلا)
+	اگر (!(hp->bh_flags & BH_LOCKED))
+	    توڑو;
+    اگر (hp == تہی)	// not a single one that can be released
+	واپس تہی;
 
     /*
      * If the block is dirty, write it.
      * If the write fails we don't free it.
      */
-    if ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
-	return NULL;
+    اگر ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
+	واپس تہی;
 
-    mf_rem_used(mfp, hp);
+    mf_rem_مستعمل(mfp, hp);
     mf_rem_hash(mfp, hp);
 
     /*
      * If a bhdr_T is returned, make sure that the page_count of bh_data is
      * right
      */
-    if (hp->bh_page_count != page_count)
+    اگر (hp->bh_صفحہ_گنتی != صفحہ_گنتی)
     {
-	VIM_CLEAR(hp->bh_data);
-	if (page_count > 0)
-	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count);
-	if (hp->bh_data == NULL)
+	VIM_CLEAR(hp->bh_ڈیٹا);
+	اگر (صفحہ_گنتی > 0)
+	    hp->bh_ڈیٹا = alloc((size_t)mfp->mf_صفحہ_سائز * صفحہ_گنتی);
+	اگر (hp->bh_ڈیٹا == تہی)
 	{
 	    vim_free(hp);
-	    return NULL;
+	    واپس تہی;
 	}
-	hp->bh_page_count = page_count;
+	hp->bh_صفحہ_گنتی = صفحہ_گنتی;
     }
-    return hp;
+    واپس hp;
 }
 
 /*
@@ -832,99 +832,99 @@ mf_release(memfile_T *mfp, int page_count)
  *
  * return TRUE if any memory was released
  */
-    int
-mf_release_all(void)
+    صحیح
+mf_release_all(خالی)
 {
     buf_T	*buf;
     memfile_T	*mfp;
     bhdr_T	*hp;
-    int		retval = FALSE;
+    صحیح		retval = FALSE;
 
     FOR_ALL_BUFFERS(buf)
     {
 	mfp = buf->b_ml.ml_mfp;
-	if (mfp != NULL)
+	اگر (mfp != تہی)
 	{
 	    // If no swap file yet, may open one
-	    if (mfp->mf_fd < 0 && buf->b_may_swap)
+	    اگر (mfp->mf_fd < 0 && buf->b_may_تبادلہ)
 		ml_open_file(buf);
 
 	    // only if there is a swapfile
-	    if (mfp->mf_fd >= 0)
+	    اگر (mfp->mf_fd >= 0)
 	    {
-		for (hp = mfp->mf_used_last; hp != NULL; )
+		برائے (hp = mfp->mf_مستعمل_آخری; hp != تہی; )
 		{
-		    if (!(hp->bh_flags & BH_LOCKED)
+		    اگر (!(hp->bh_flags & BH_LOCKED)
 			    && (!(hp->bh_flags & BH_DIRTY)
 				|| mf_write(mfp, hp) != FAIL))
 		    {
-			mf_rem_used(mfp, hp);
+			mf_rem_مستعمل(mfp, hp);
 			mf_rem_hash(mfp, hp);
 			mf_free_bhdr(hp);
-			hp = mfp->mf_used_last;	// re-start, list was changed
+			hp = mfp->mf_مستعمل_آخری;	// re-start, list was changed
 			retval = TRUE;
 		    }
-		    else
-			hp = hp->bh_prev;
+		    ورنہ
+			hp = hp->bh_پچھلا;
 		}
 	    }
 	}
     }
-    return retval;
+    واپس retval;
 }
 
 /*
  * Allocate a block header and a block of memory for it.
  */
-    static bhdr_T *
-mf_alloc_bhdr(memfile_T *mfp, int page_count)
+    ساکن bhdr_T *
+mf_alloc_bhdr(memfile_T *mfp, صحیح صفحہ_گنتی)
 {
     bhdr_T	*hp;
 
-    if ((hp = ALLOC_ONE(bhdr_T)) == NULL)
-	return NULL;
+    اگر ((hp = ALLOC_ONE(bhdr_T)) == تہی)
+	واپس تہی;
 
-    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+    اگر ((hp->bh_ڈیٹا = alloc((size_t)mfp->mf_صفحہ_سائز * صفحہ_گنتی)) == تہی)
     {
 	vim_free(hp);	    // not enough memory
-	return NULL;
+	واپس تہی;
     }
-    hp->bh_page_count = page_count;
-    return hp;
+    hp->bh_صفحہ_گنتی = صفحہ_گنتی;
+    واپس hp;
 }
 
 /*
  * Free a block header and the block of memory for it.
  */
-    static void
+    ساکن خالی
 mf_free_bhdr(bhdr_T *hp)
 {
-    vim_free(hp->bh_data);
+    vim_free(hp->bh_ڈیٹا);
     vim_free(hp);
 }
 
 /*
  * Insert entry *hp in the free list.
  */
-    static void
+    ساکن خالی
 mf_ins_free(memfile_T *mfp, bhdr_T *hp)
 {
-    hp->bh_next = mfp->mf_free_first;
-    mfp->mf_free_first = hp;
+    hp->bh_اگلا = mfp->mf_free_پہلا;
+    mfp->mf_free_پہلا = hp;
 }
 
 /*
  * remove the first entry from the free list and return a pointer to it
  * Note: caller must check that mfp->mf_free_first is not NULL!
  */
-    static bhdr_T *
+    ساکن bhdr_T *
 mf_rem_free(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    hp = mfp->mf_free_first;
-    mfp->mf_free_first = hp->bh_next;
-    return hp;
+    hp = mfp->mf_free_پہلا;
+    mfp->mf_free_پہلا = hp->bh_اگلا;
+    واپس hp;
 }
 
 /*
@@ -932,38 +932,38 @@ mf_rem_free(memfile_T *mfp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    ساکن صحیح
 mf_read(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;
-    unsigned	page_size;
-    unsigned	size;
+    off_T	انحراف;
+    غیرعلامتی	صفحہ_سائز;
+    غیرعلامتی	سائز;
 
-    if (mfp->mf_fd < 0)	    // there is no file, can't read
-	return FAIL;
+    اگر (mfp->mf_fd < 0)	    // there is no file, can't read
+	واپس FAIL;
 
-    page_size = mfp->mf_page_size;
-    offset = (off_T)page_size * hp->bh_bnum;
-    size = page_size * hp->bh_page_count;
-    if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+    صفحہ_سائز = mfp->mf_صفحہ_سائز;
+    انحراف = (off_T)صفحہ_سائز * hp->bh_bnum;
+    سائز = صفحہ_سائز * hp->bh_صفحہ_گنتی;
+    اگر (vim_lseek(mfp->mf_fd, انحراف, SEEK_SET) != انحراف)
     {
-	PERROR(_(e_seek_error_in_swap_file_read));
-	return FAIL;
+	PERROR(_(e_seek_error_اندر_تبادلہ_file_read));
+	واپس FAIL;
     }
-    if ((unsigned)read_eintr(mfp->mf_fd, hp->bh_data, size) != size)
+    اگر ((غیرعلامتی)read_eintr(mfp->mf_fd, hp->bh_ڈیٹا, سائز) != سائز)
     {
-	PERROR(_(e_read_error_in_swap_file));
-	return FAIL;
+	PERROR(_(e_read_error_اندر_تبادلہ_file));
+	واپس FAIL;
     }
 
-#ifdef FEAT_CRYPT
+#اگر_تعریف_شدہ FEAT_CRYPT
     // Decrypt if 'key' is set and this is a data block. And when changing the
     // key.
-    if (*mfp->mf_buffer->b_p_key != NUL || mfp->mf_old_key != NULL)
-	ml_decrypt_data(mfp, hp->bh_data, offset, size);
-#endif
+    اگر (*mfp->mf_بفر->b_p_کلید != NUL || mfp->mf_old_کلید != تہی)
+	ml_decrypt_ڈیٹا(mfp, hp->bh_ڈیٹا, انحراف, سائز);
+#اگر_ختم
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -971,25 +971,25 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    ساکن صحیح
 mf_write(memfile_T *mfp, bhdr_T *hp)
 {
-    off_T	offset;	    // offset in the file
+    off_T	انحراف;	    // offset in the file
     blocknr_T	nr;	    // block nr which is being written
     bhdr_T	*hp2;
-    unsigned	page_size;  // number of bytes in a page
-    unsigned	page_count; // number of pages written
-    unsigned	size;	    // number of bytes written
+    غیرعلامتی	صفحہ_سائز;  // number of bytes in a page
+    غیرعلامتی	صفحہ_گنتی; // number of pages written
+    غیرعلامتی	سائز;	    // number of bytes written
 
-    if (mfp->mf_fd < 0 && !mfp->mf_reopen)
+    اگر (mfp->mf_fd < 0 && !mfp->mf_reopen)
 	// there is no file and there was no file, can't write
-	return FAIL;
+	واپس FAIL;
 
-    if (hp->bh_bnum < 0)	// must assign file block number
-	if (mf_trans_add(mfp, hp) == FAIL)
-	    return FAIL;
+    اگر (hp->bh_bnum < 0)	// must assign file block number
+	اگر (mf_trans_جوڑو(mfp, hp) == FAIL)
+	    واپس FAIL;
 
-    page_size = mfp->mf_page_size;
+    صفحہ_سائز = mfp->mf_صفحہ_سائز;
 
     /*
      * We don't want gaps in the file. Write the blocks in front of *hp
@@ -997,73 +997,73 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
      * If block 'mf_infile_count' is not in the hash list, it has been
      * freed. Fill the space in the file with data from the current block.
      */
-    for (;;)
+    برائے (;;)
     {
-	int attempt;
+	صحیح attempt;
 
 	nr = hp->bh_bnum;
-	if (nr > mfp->mf_infile_count)		// beyond end of file
+	اگر (nr > mfp->mf_infile_گنتی)		// beyond end of file
 	{
-	    nr = mfp->mf_infile_count;
-	    hp2 = mf_find_hash(mfp, nr);	// NULL caught below
+	    nr = mfp->mf_infile_گنتی;
+	    hp2 = mf_ڈھونڈو_hash(mfp, nr);	// NULL caught below
 	}
-	else
+	ورنہ
 	    hp2 = hp;
 
-	offset = (off_T)page_size * nr;
-	if (hp2 == NULL)	    // freed block, fill with dummy data
-	    page_count = 1;
-	else
-	    page_count = hp2->bh_page_count;
-	size = page_size * page_count;
+	انحراف = (off_T)صفحہ_سائز * nr;
+	اگر (hp2 == تہی)	    // freed block, fill with dummy data
+	    صفحہ_گنتی = 1;
+	ورنہ
+	    صفحہ_گنتی = hp2->bh_صفحہ_گنتی;
+	سائز = صفحہ_سائز * صفحہ_گنتی;
 
-	for (attempt = 1; attempt <= 2; ++attempt)
+	برائے (attempt = 1; attempt <= 2; ++attempt)
 	{
-	    if (mfp->mf_fd >= 0)
+	    اگر (mfp->mf_fd >= 0)
 	    {
-		if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+		اگر (vim_lseek(mfp->mf_fd, انحراف, SEEK_SET) != انحراف)
 		{
-		    PERROR(_(e_seek_error_in_swap_file_write));
-		    return FAIL;
+		    PERROR(_(e_seek_error_اندر_تبادلہ_file_write));
+		    واپس FAIL;
 		}
-		if (mf_write_block(mfp,
-				   hp2 == NULL ? hp : hp2, offset, size) == OK)
-		    break;
+		اگر (mf_write_بلاک(mfp,
+				   hp2 == تہی ? hp : hp2, انحراف, سائز) == OK)
+		    توڑو;
 	    }
 
-	    if (attempt == 1)
+	    اگر (attempt == 1)
 	    {
 		// If the swap file is on a network drive, and the network
 		// gets disconnected and then re-connected, we can maybe fix it
 		// by closing and then re-opening the file.
-		if (mfp->mf_fd >= 0)
+		اگر (mfp->mf_fd >= 0)
 		    close(mfp->mf_fd);
-		mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, mfp->mf_flags);
+		mfp->mf_fd = mch_open_rw((حرف *)mfp->mf_fname, mfp->mf_flags);
 		mfp->mf_reopen = (mfp->mf_fd < 0);
 	    }
-	    if (attempt == 2 || mfp->mf_fd < 0)
+	    اگر (attempt == 2 || mfp->mf_fd < 0)
 	    {
 		// Avoid repeating the error message, this mostly happens when
 		// the disk is full. We give the message again only after a
 		// successful write or when hitting a key. We keep on trying,
 		// in case some space becomes available.
-		if (!did_swapwrite_msg)
-		    emsg(_(e_write_error_in_swap_file));
-		did_swapwrite_msg = TRUE;
-		return FAIL;
+		اگر (!did_swapwrite_پیغام)
+		    emsg(_(e_write_error_اندر_تبادلہ_file));
+		did_swapwrite_پیغام = TRUE;
+		واپس FAIL;
 	    }
 	}
 
-	did_swapwrite_msg = FALSE;
-	if (hp2 != NULL)		    // written a non-dummy block
+	did_swapwrite_پیغام = FALSE;
+	اگر (hp2 != تہی)		    // written a non-dummy block
 	    hp2->bh_flags &= ~BH_DIRTY;
 					    // appended to the file
-	if (nr + (blocknr_T)page_count > mfp->mf_infile_count)
-	    mfp->mf_infile_count = nr + page_count;
-	if (nr == hp->bh_bnum)		    // written the desired block
-	    break;
+	اگر (nr + (blocknr_T)صفحہ_گنتی > mfp->mf_infile_گنتی)
+	    mfp->mf_infile_گنتی = nr + صفحہ_گنتی;
+	اگر (nr == hp->bh_bnum)		    // written the desired block
+	    توڑو;
     }
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -1071,35 +1071,35 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
  * Takes care of encryption.
  * Return FAIL or OK.
  */
-    static int
-mf_write_block(
+    ساکن صحیح
+mf_write_بلاک(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    off_T	offset UNUSED,
-    unsigned	size)
+    off_T	انحراف غیر_مستعمل,
+    غیرعلامتی	سائز)
 {
-    char_u	*data = hp->bh_data;
-    int		result = OK;
+    char_u	*ڈیٹا = hp->bh_ڈیٹا;
+    صحیح		نتیجہ = OK;
 
-#ifdef FEAT_CRYPT
+#اگر_تعریف_شدہ FEAT_CRYPT
     // Encrypt if 'key' is set and this is a data block.
-    if (*mfp->mf_buffer->b_p_key != NUL)
+    اگر (*mfp->mf_بفر->b_p_کلید != NUL)
     {
-	data = ml_encrypt_data(mfp, data, offset, size);
-	if (data == NULL)
-	    return FAIL;
+	ڈیٹا = ml_encrypt_ڈیٹا(mfp, ڈیٹا, انحراف, سائز);
+	اگر (ڈیٹا == تہی)
+	    واپس FAIL;
     }
-#endif
+#اگر_ختم
 
-    if ((unsigned)write_eintr(mfp->mf_fd, data, size) != size)
-	result = FAIL;
+    اگر ((غیرعلامتی)write_eintr(mfp->mf_fd, ڈیٹا, سائز) != سائز)
+	نتیجہ = FAIL;
 
-#ifdef FEAT_CRYPT
-    if (data != hp->bh_data)
-	vim_free(data);
-#endif
+#اگر_تعریف_شدہ FEAT_CRYPT
+    اگر (ڈیٹا != hp->bh_ڈیٹا)
+	vim_free(ڈیٹا);
+#اگر_ختم
 
-    return result;
+    واپس نتیجہ;
 }
 
 /*
@@ -1107,49 +1107,49 @@ mf_write_block(
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
-mf_trans_add(memfile_T *mfp, bhdr_T *hp)
+    ساکن صحیح
+mf_trans_جوڑو(memfile_T *mfp, bhdr_T *hp)
 {
     bhdr_T	*freep;
     blocknr_T	new_bnum;
     NR_TRANS	*np;
-    int		page_count;
+    صحیح		صفحہ_گنتی;
 
-    if (hp->bh_bnum >= 0)		    // it's already positive
-	return OK;
+    اگر (hp->bh_bnum >= 0)		    // it's already positive
+	واپس OK;
 
-    if ((np = ALLOC_ONE(NR_TRANS)) == NULL)
-	return FAIL;
+    اگر ((np = ALLOC_ONE(NR_TRANS)) == تہی)
+	واپس FAIL;
 
 /*
  * Get a new number for the block.
  * If the first item in the free list has sufficient pages, use its number
  * Otherwise use mf_blocknr_max.
  */
-    freep = mfp->mf_free_first;
-    page_count = hp->bh_page_count;
-    if (freep != NULL && freep->bh_page_count >= page_count)
+    freep = mfp->mf_free_پہلا;
+    صفحہ_گنتی = hp->bh_صفحہ_گنتی;
+    اگر (freep != تہی && freep->bh_صفحہ_گنتی >= صفحہ_گنتی)
     {
 	new_bnum = freep->bh_bnum;
 	/*
 	 * If the page count of the free block was larger, reduce it.
 	 * If the page count matches, remove the block from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	اگر (freep->bh_صفحہ_گنتی > صفحہ_گنتی)
 	{
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += صفحہ_گنتی;
+	    freep->bh_صفحہ_گنتی -= صفحہ_گنتی;
 	}
-	else
+	ورنہ
 	{
 	    freep = mf_rem_free(mfp);
 	    vim_free(freep);
 	}
     }
-    else
+    ورنہ
     {
 	new_bnum = mfp->mf_blocknr_max;
-	mfp->mf_blocknr_max += page_count;
+	mfp->mf_blocknr_max += صفحہ_گنتی;
     }
 
     np->nt_old_bnum = hp->bh_bnum;	    // adjust number
@@ -1160,9 +1160,9 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     mf_ins_hash(mfp, hp);		    // insert in new hash list
 
     // Insert "np" into "mf_trans" hashtable with key "np->nt_old_bnum"
-    mf_hash_add_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_جوڑو_شے(&mfp->mf_trans, (mf_hashitem_T *)np);
 
-    return OK;
+    واپس OK;
 }
 
 /*
@@ -1176,20 +1176,20 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
     NR_TRANS	*np;
     blocknr_T	new_bnum;
 
-    np = (NR_TRANS *)mf_hash_find(&mfp->mf_trans, old_nr);
+    np = (NR_TRANS *)mf_hash_ڈھونڈو(&mfp->mf_trans, old_nr);
 
-    if (np == NULL)		// not found
-	return old_nr;
+    اگر (np == تہی)		// not found
+	واپس old_nr;
 
-    mfp->mf_neg_count--;
+    mfp->mf_neg_گنتی--;
     new_bnum = np->nt_new_bnum;
 
     // remove entry from the trans list
-    mf_hash_rem_item(&mfp->mf_trans, (mf_hashitem_T *)np);
+    mf_hash_rem_شے(&mfp->mf_trans, (mf_hashitem_T *)np);
 
     vim_free(np);
 
-    return new_bnum;
+    واپس new_bnum;
 }
 
 /*
@@ -1197,34 +1197,34 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
  * Only called when creating or renaming the swapfile.	Either way it's a new
  * name so we must work out the full path name.
  */
-    void
-mf_set_ffname(memfile_T *mfp)
+    خالی
+mf_سیٹ_ffname(memfile_T *mfp)
 {
-    mfp->mf_ffname = FullName_save(mfp->mf_fname, FALSE);
+    mfp->mf_ffname = بھرا_Name_save(mfp->mf_fname, FALSE);
 }
 
 /*
  * Make the name of the file used for the memfile a full path.
  * Used before doing a :cd
  */
-    void
+    خالی
 mf_fullname(memfile_T *mfp)
 {
-    if (mfp == NULL || mfp->mf_fname == NULL || mfp->mf_ffname == NULL)
-	return;
+    اگر (mfp == تہی || mfp->mf_fname == تہی || mfp->mf_ffname == تہی)
+	واپس;
 
     vim_free(mfp->mf_fname);
     mfp->mf_fname = mfp->mf_ffname;
-    mfp->mf_ffname = NULL;
+    mfp->mf_ffname = تہی;
 }
 
 /*
  * return TRUE if there are any translations pending for 'mfp'
  */
-    int
+    صحیح
 mf_need_trans(memfile_T *mfp)
 {
-    return (mfp->mf_fname != NULL && mfp->mf_neg_count > 0);
+    واپس (mfp->mf_fname != تہی && mfp->mf_neg_گنتی > 0);
 }
 
 /*
@@ -1232,15 +1232,15 @@ mf_need_trans(memfile_T *mfp)
  * The "fname" must be in allocated memory, and is consumed (also when an
  * error occurs).
  */
-    static void
+    ساکن خالی
 mf_do_open(
     memfile_T	*mfp,
     char_u	*fname,
-    int		flags)		// flags for open()
+    صحیح		flags)		// flags for open()
 {
-#ifdef HAVE_LSTAT
+#اگر_تعریف_شدہ HAVE_LSTAT
     stat_T	sb;
-#endif
+#اگر_ختم
 
     mfp->mf_fname = fname;
 
@@ -1249,60 +1249,60 @@ mf_do_open(
      * not possible after the open on the Amiga.
      * fname cannot be NameBuff, because it must have been allocated.
      */
-    mf_set_ffname(mfp);
-#if defined(MSWIN)
+    mf_سیٹ_ffname(mfp);
+#اگر defined(MSWIN)
     /*
      * A ":!cd e:xxx" may change the directory without us knowing, use the
      * full pathname always.  Careful: This frees fname!
      */
     mf_fullname(mfp);
-#endif
+#اگر_ختم
 
-#ifdef HAVE_LSTAT
+#اگر_تعریف_شدہ HAVE_LSTAT
     /*
      * Extra security check: When creating a swap file it really shouldn't
      * exist yet.  If there is a symbolic link, this is most likely an attack.
      */
-    if ((flags & O_CREAT) && mch_lstat((char *)mfp->mf_fname, &sb) >= 0)
+    اگر ((flags & O_CREAT) && mch_lstat((حرف *)mfp->mf_fname, &sb) >= 0)
     {
 	mfp->mf_fd = -1;
-	emsg(_(e_swap_file_already_exists_symlink_attack));
+	emsg(_(e_تبادلہ_file_already_exists_symlink_attack));
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
 	/*
 	 * try to open the file
 	 */
 	flags |= O_EXTRA | O_NOFOLLOW;
-#ifdef MSWIN
+#اگر_تعریف_شدہ MSWIN
 	// Prevent handle inheritance that cause problems with Cscope
 	// (swap file may not be deleted if cscope connection was open after
 	// the file)
 	flags |= O_NOINHERIT;
-#endif
+#اگر_ختم
 	mfp->mf_flags = flags;
-	mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, flags);
+	mfp->mf_fd = mch_open_rw((حرف *)mfp->mf_fname, flags);
     }
 
     /*
      * If the file cannot be opened, use memory only
      */
-    if (mfp->mf_fd < 0)
+    اگر (mfp->mf_fd < 0)
     {
 	VIM_CLEAR(mfp->mf_fname);
 	VIM_CLEAR(mfp->mf_ffname);
     }
-    else
+    ورنہ
     {
-#ifdef HAVE_FD_CLOEXEC
-	int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+#اگر_تعریف_شدہ HAVE_FD_CLOEXEC
+	صحیح fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	اگر (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (خالی)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+#اگر_ختم
+#اگر defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	mch_copy_sec(fname, mfp->mf_fname);
-#endif
+#اگر_ختم
 	mch_hide(mfp->mf_fname);    // try setting the 'hidden' flag
     }
 }
@@ -1316,45 +1316,45 @@ mf_do_open(
  * MHT_GROWTH_FACTOR when the average number of items per bucket
  * exceeds 2 ^ MHT_LOG_LOAD_FACTOR.
  */
-#define MHT_LOG_LOAD_FACTOR 6
-#define MHT_GROWTH_FACTOR   2   // must be a power of two
+#تعریف_کرو MHT_LOG_بھرو_ضربی_عدد 6
+#تعریف_کرو MHT_GROWTH_ضربی_عدد   2   // must be a power of two
 
 /*
  * Initialize an empty hash table.
  */
-    static void
+    ساکن خالی
 mf_hash_init(mf_hashtab_T *mht)
 {
-    CLEAR_POINTER(mht);
+    CLEAR_اشارہ_گر(mht);
     mht->mht_buckets = mht->mht_small_buckets;
-    mht->mht_mask = MHT_INIT_SIZE - 1;
+    mht->mht_نقاب = MHT_INIT_سائز - 1;
 }
 
 /*
  * Free the array of a hash table.  Does not free the items it contains!
  * The hash table must not be used again without another mf_hash_init() call.
  */
-    static void
+    ساکن خالی
 mf_hash_free(mf_hashtab_T *mht)
 {
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    اگر (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 }
 
 /*
  * Free the array of a hash table and all the items it contains.
  */
-    static void
+    ساکن خالی
 mf_hash_free_all(mf_hashtab_T *mht)
 {
     long_u	    idx;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *next;
+    mf_hashitem_T   *اگلا;
 
-    for (idx = 0; idx <= mht->mht_mask; idx++)
-	for (mhi = mht->mht_buckets[idx]; mhi != NULL; mhi = next)
+    برائے (idx = 0; idx <= mht->mht_نقاب; idx++)
+	برائے (mhi = mht->mht_buckets[idx]; mhi != تہی; mhi = اگلا)
 	{
-	    next = mhi->mhi_next;
+	    اگلا = mhi->mhi_اگلا;
 	    vim_free(mhi);
 	}
 
@@ -1365,44 +1365,44 @@ mf_hash_free_all(mf_hashtab_T *mht)
  * Find "key" in hashtable "mht".
  * Returns a pointer to a mf_hashitem_T or NULL if the item was not found.
  */
-    static mf_hashitem_T *
-mf_hash_find(mf_hashtab_T *mht, blocknr_T key)
+    ساکن mf_hashitem_T *
+mf_hash_ڈھونڈو(mf_hashtab_T *mht, blocknr_T کلید)
 {
     mf_hashitem_T   *mhi;
 
-    mhi = mht->mht_buckets[key & mht->mht_mask];
-    while (mhi != NULL && mhi->mhi_key != key)
-	mhi = mhi->mhi_next;
+    mhi = mht->mht_buckets[کلید & mht->mht_نقاب];
+    جب (mhi != تہی && mhi->mhi_کلید != کلید)
+	mhi = mhi->mhi_اگلا;
 
-    return mhi;
+    واپس mhi;
 }
 
 /*
  * Add item "mhi" to hashtable "mht".
  * "mhi" must not be NULL.
  */
-    static void
-mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    ساکن خالی
+mf_hash_جوڑو_شے(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     long_u	    idx;
 
-    idx = mhi->mhi_key & mht->mht_mask;
-    mhi->mhi_next = mht->mht_buckets[idx];
-    mhi->mhi_prev = NULL;
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi;
+    idx = mhi->mhi_کلید & mht->mht_نقاب;
+    mhi->mhi_اگلا = mht->mht_buckets[idx];
+    mhi->mhi_پچھلا = تہی;
+    اگر (mhi->mhi_اگلا != تہی)
+	mhi->mhi_اگلا->mhi_پچھلا = mhi;
     mht->mht_buckets[idx] = mhi;
 
-    mht->mht_count++;
+    mht->mht_گنتی++;
 
     /*
      * Grow hashtable when we have more thank 2^MHT_LOG_LOAD_FACTOR
      * items per bucket on average
      */
-    if (mht->mht_fixed == 0
-	&& (mht->mht_count >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
+    اگر (mht->mht_fixed == 0
+	&& (mht->mht_گنتی >> MHT_LOG_بھرو_ضربی_عدد) > mht->mht_نقاب)
     {
-	if (mf_hash_grow(mht) == FAIL)
+	اگر (mf_hash_grow(mht) == FAIL)
 	{
 	    // stop trying to grow after first failure to allocate memory
 	    mht->mht_fixed = 1;
@@ -1414,18 +1414,18 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * Remove item "mhi" from hashtable "mht".
  * "mhi" must not be NULL and must have been inserted into "mht".
  */
-    static void
-mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
+    ساکن خالی
+mf_hash_rem_شے(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
-    if (mhi->mhi_prev == NULL)
-	mht->mht_buckets[mhi->mhi_key & mht->mht_mask] = mhi->mhi_next;
-    else
-	mhi->mhi_prev->mhi_next = mhi->mhi_next;
+    اگر (mhi->mhi_پچھلا == تہی)
+	mht->mht_buckets[mhi->mhi_کلید & mht->mht_نقاب] = mhi->mhi_اگلا;
+    ورنہ
+	mhi->mhi_پچھلا->mhi_اگلا = mhi->mhi_اگلا;
 
-    if (mhi->mhi_next != NULL)
-	mhi->mhi_next->mhi_prev = mhi->mhi_prev;
+    اگر (mhi->mhi_اگلا != تہی)
+	mhi->mhi_اگلا->mhi_پچھلا = mhi->mhi_پچھلا;
 
-    mht->mht_count--;
+    mht->mht_گنتی--;
 
     // We could shrink the table here, but it typically takes little memory,
     // so why bother?
@@ -1436,26 +1436,26 @@ mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * rehash items.
  * Returns FAIL when out of memory.
  */
-    static int
+    ساکن صحیح
 mf_hash_grow(mf_hashtab_T *mht)
 {
     long_u	    i, j;
-    int		    shift;
+    صحیح		    سرکاؤ;
     mf_hashitem_T   *mhi;
-    mf_hashitem_T   *tails[MHT_GROWTH_FACTOR];
+    mf_hashitem_T   *tails[MHT_GROWTH_ضربی_عدد];
     mf_hashitem_T   **buckets;
-    size_t	    size;
+    size_t	    سائز;
 
-    size = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR * sizeof(void *);
-    buckets = lalloc_clear(size, FALSE);
-    if (buckets == NULL)
-	return FAIL;
+    سائز = (mht->mht_نقاب + 1) * MHT_GROWTH_ضربی_عدد * حجم(خالی *);
+    buckets = lalloc_clear(سائز, FALSE);
+    اگر (buckets == تہی)
+	واپس FAIL;
 
-    shift = 0;
-    while ((mht->mht_mask >> shift) != 0)
-	shift++;
+    سرکاؤ = 0;
+    جب ((mht->mht_نقاب >> سرکاؤ) != 0)
+	سرکاؤ++;
 
-    for (i = 0; i <= mht->mht_mask; i++)
+    برائے (i = 0; i <= mht->mht_نقاب; i++)
     {
 	/*
 	 * Traverse the items in the i-th original bucket and move them into
@@ -1468,35 +1468,35 @@ mf_hash_grow(mf_hashtab_T *mht)
 	 * a power of two.
 	 */
 
-	CLEAR_FIELD(tails);
+	CLEAR_میدان(tails);
 
-	for (mhi = mht->mht_buckets[i]; mhi != NULL; mhi = mhi->mhi_next)
+	برائے (mhi = mht->mht_buckets[i]; mhi != تہی; mhi = mhi->mhi_اگلا)
 	{
-	    j = (mhi->mhi_key >> shift) & (MHT_GROWTH_FACTOR - 1);
-	    if (tails[j] == NULL)
+	    j = (mhi->mhi_کلید >> سرکاؤ) & (MHT_GROWTH_ضربی_عدد - 1);
+	    اگر (tails[j] == تہی)
 	    {
-		buckets[i + (j << shift)] = mhi;
+		buckets[i + (j << سرکاؤ)] = mhi;
 		tails[j] = mhi;
-		mhi->mhi_prev = NULL;
+		mhi->mhi_پچھلا = تہی;
 	    }
-	    else
+	    ورنہ
 	    {
-		tails[j]->mhi_next = mhi;
-		mhi->mhi_prev = tails[j];
+		tails[j]->mhi_اگلا = mhi;
+		mhi->mhi_پچھلا = tails[j];
 		tails[j] = mhi;
 	    }
 	}
 
-	for (j = 0; j < MHT_GROWTH_FACTOR; j++)
-	    if (tails[j] != NULL)
-		tails[j]->mhi_next = NULL;
+	برائے (j = 0; j < MHT_GROWTH_ضربی_عدد; j++)
+	    اگر (tails[j] != تہی)
+		tails[j]->mhi_اگلا = تہی;
     }
 
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    اگر (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 
     mht->mht_buckets = buckets;
-    mht->mht_mask = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR - 1;
+    mht->mht_نقاب = (mht->mht_نقاب + 1) * MHT_GROWTH_ضربی_عدد - 1;
 
-    return OK;
+    واپس OK;
 }

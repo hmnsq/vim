@@ -18,40 +18,40 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#شامل <stdio.h>
+#شامل <string.h>
 
-	int
-main(int argc, char **argv)
+	صحیح
+مین(صحیح argc, حرف **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	حرف بفر[BUFSIZ];
+	حرف *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	جب (fgets(بفر, BUFSIZ, stdin) != تہی)
 	{
-		for (p = buffer; *p != 0; p++)
+		برائے (p = بفر; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
-				|| strncmp(p, "charset=UTF-8", 13) == 0)
+			اگر (لڑی_موازنہ(p, "charset=utf-8", 13) == 0
+				|| لڑی_موازنہ(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			ورنہ اگر (لڑی_موازنہ(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				جب (p[1] != '\n')
 					++p;
 			}
-			else
+			ورنہ
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				اگر (*(غیرعلامتی حرف *)p >= 0xA1)
 				{
-					putchar(*p++);
-					if (*p == '\\')
-						putchar(*p);
+					حرف_لکھو(*p++);
+					اگر (*p == '\\')
+						حرف_لکھو(*p);
 				}
-				putchar(*p);
+				حرف_لکھو(*p);
 			}
 		}
 	}

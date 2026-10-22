@@ -11,28 +11,28 @@
 
 *********************************************************/
 
-#define PROXY_DELEGATION
+#تعریف_کرو PROXY_DELEGATION
 
-#include <rpcproxy.h>
+#شامل <rpcproxy.h>
 
-#ifdef __cplusplus
-extern "C"   {
-#endif
+#اگر_تعریف_شدہ __cplusplus
+خارجی "C"   {
+#اگر_ختم
 
 EXTERN_PROXY_FILE( if_ole )
 
 
-PROXYFILE_LIST_START
+PROXYFILE_LIST_آغاز
 /* Start of list */
   REFERENCE_PROXY_FILE( if_ole ),
 /* End of list */
-PROXYFILE_LIST_END
+PROXYFILE_LIST_انتہا
 
 
 DLLDATA_ROUTINES( aProxyFileList, GET_DLL_CLSID )
 
-#ifdef __cplusplus
+#اگر_تعریف_شدہ __cplusplus
 }  /*extern "C" */
-#endif
+#اگر_ختم
 
 /* end of generated dlldata file */

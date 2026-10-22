@@ -41,55 +41,55 @@
 /*
  * +small is now an alias for +tiny
  */
-#if defined(FEAT_SMALL)
+#اگر defined(FEAT_SMALL)
 # undef FEAT_SMALL
-# if !defined(FEAT_TINY)
+# اگر !defined(FEAT_TINY)
 #  define FEAT_TINY
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +big is now an alias for +normal
  */
-#if defined(FEAT_BIG)
+#اگر defined(FEAT_BIG)
 # undef FEAT_BIG
-# if !defined(FEAT_NORMAL)
-#  define FEAT_NORMAL
+# اگر !defined(FEAT_معمول)
+#  define FEAT_معمول
 # endif
-#endif
+#اگر_ختم
 
 /*
  * Uncomment one of these to override the default.  For unix use a configure
  * argument, see Makefile.
  */
-#if !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
+#اگر !defined(FEAT_TINY) && !defined(FEAT_معمول) && !defined(FEAT_HUGE)
 // #define FEAT_TINY
 // #define FEAT_NORMAL
 // #define FEAT_HUGE
-#endif
+#اگر_ختم
 
 /*
  * For Unix, Mac and Win32 use +huge by default.  These days CPUs are fast and
  * Memory is cheap.
  * Otherwise use +normal
  */
-#if !defined(FEAT_TINY) && !defined(FEAT_NORMAL) && !defined(FEAT_HUGE)
-# if defined(UNIX) || defined(MSWIN) || defined(MACOS_X)
+#اگر !defined(FEAT_TINY) && !defined(FEAT_معمول) && !defined(FEAT_HUGE)
+# اگر defined(UNIX) || defined(MSWIN) || defined(MACOS_X)
 #  define FEAT_HUGE
-# else
-#  define FEAT_NORMAL
+# ورنہ
+#  define FEAT_معمول
 # endif
-#endif
+#اگر_ختم
 
 /*
  * Each feature implies including the "smaller" ones.
  */
-#ifdef FEAT_HUGE
-# define FEAT_NORMAL
-#endif
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_HUGE
+# define FEAT_معمول
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_TINY
-#endif
+#اگر_ختم
 
 /*
  * Optional code (see ":help +feature-list")
@@ -140,191 +140,191 @@
 /*
  * +folding		Fold lines.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_FOLDING
-#endif
+#اگر_ختم
 
 /*
  * +digraphs		Digraphs.
  *			In insert mode and on the command line you will be
  *			able to use digraphs. The CTRL-K command will work.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_DIGRAPHS
-#endif
+#اگر_ختم
 
 /*
  * +langmap		'langmap' option.  Only useful when you put your
  *			keyboard in a special language mode, e.g. for typing
  *			greek.
  */
-#ifdef FEAT_HUGE
+#اگر_تعریف_شدہ FEAT_HUGE
 # define FEAT_LANGMAP
-#endif
+#اگر_ختم
 
 /*
  * +keymap		'keymap' option.  Allows you to map typed keys in
  *			Insert mode for a special language.
  */
-#ifdef FEAT_HUGE
+#اگر_تعریف_شدہ FEAT_HUGE
 # define FEAT_KEYMAP
-#endif
+#اگر_ختم
 
 /*
  * +linebreak		'showbreak', 'breakat' and 'linebreak' options.
  *			Also 'numberwidth'.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_LINEBREAK
-#endif
+#اگر_ختم
 
 /*
  * +extra_search	'hlsearch' and 'incsearch' options.
  */
-#ifdef FEAT_NORMAL
-# define FEAT_SEARCH_EXTRA
-#endif
+#اگر_تعریف_شدہ FEAT_معمول
+# define FEAT_تلاش_EXTRA
+#اگر_ختم
 
 /*
  * +quickfix		Quickfix commands.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_QUICKFIX
-#endif
+#اگر_ختم
 
 /*
  * +find_in_path	"[I" ":isearch" "^W^I", ":checkpath", etc.
  */
-#ifdef FEAT_NORMAL
-# define FEAT_FIND_ID
-#endif
+#اگر_تعریف_شدہ FEAT_معمول
+# define FEAT_ڈھونڈو_ID
+#اگر_ختم
 
 /*
  * +rightleft		Right-to-left editing/typing support.
  *			Note that this isn't perfect, but enough users say they
  *			use it to keep supporting it.
  */
-#if defined(FEAT_HUGE) && !defined(DISABLE_RIGHTLEFT)
+#اگر defined(FEAT_HUGE) && !defined(DISABLE_RIGHTLEFT)
 # define FEAT_RIGHTLEFT
-#endif
+#اگر_ختم
 
 /*
  * +arabic		Arabic keymap and shaping support.
  *			Requires FEAT_RIGHTLEFT
  */
-#if defined(FEAT_HUGE) && !defined(DISABLE_ARABIC)
+#اگر defined(FEAT_HUGE) && !defined(DISABLE_ARABIC)
 # define FEAT_ARABIC
-#endif
-#ifdef FEAT_ARABIC
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_ARABIC
 # ifndef FEAT_RIGHTLEFT
 #  define FEAT_RIGHTLEFT
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +emacs_tags		When FEAT_EMACS_TAGS defined: Include support for
  *			emacs style TAGS file.
  */
-#ifdef FEAT_HUGE
-# define FEAT_EMACS_TAGS
-#endif
+#اگر_تعریف_شدہ FEAT_HUGE
+# define FEAT_EMACS_لیبل_فہرست
+#اگر_ختم
 
 /*
  * +cscope		Unix only: Cscope support.
  */
-#if defined(UNIX) && defined(FEAT_HUGE) && defined(ENABLE_CSCOPE)
+#اگر defined(UNIX) && defined(FEAT_HUGE) && defined(ENABLE_CSCOPE)
 # define FEAT_CSCOPE
-#endif
+#اگر_ختم
 
 /*
  * +eval		Built-in script language and expression evaluation,
  *			":let", ":if", etc.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_EVAL
-#endif
+#اگر_ختم
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 # define HAVE_SANDBOX
-#endif
+#اگر_ختم
 
 /*
  * +profile		Profiling for functions and scripts.
  */
-#if defined(FEAT_HUGE) \
+#اگر defined(FEAT_HUGE) \
 	&& defined(FEAT_EVAL) \
-	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)) \
+	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_وقت_H)) \
 		|| defined(MSWIN))
 # define FEAT_PROFILE
-#endif
+#اگر_ختم
 
 /*
  * +reltime		reltime() function
  */
-#if defined(FEAT_NORMAL) \
+#اگر defined(FEAT_معمول) \
 	&& defined(FEAT_EVAL) \
-	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H) \
+	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_وقت_H) \
 		&& (!defined(MACOS_X) || defined(HAVE_DISPATCH_DISPATCH_H))) \
 	    || defined(MSWIN))
 # define FEAT_RELTIME
-#endif
+#اگر_ختم
 
 /*
  * +timers		timer_start()
  */
-#if defined(FEAT_RELTIME) && (defined(UNIX) || defined(MSWIN) || defined(VMS))
+#اگر defined(FEAT_RELTIME) && (defined(UNIX) || defined(MSWIN) || defined(VMS))
 # define FEAT_TIMERS
-#endif
+#اگر_ختم
 
 /*
  *			Insert mode completion with 'completefunc'.
  */
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 # define FEAT_COMPL_FUNC
-#endif
+#اگر_ختم
 
 /*
  * +printer		":hardcopy" command
  * +postscript		Printing uses PostScript file output.
  */
-#if defined(FEAT_NORMAL) && (defined(MSWIN) || defined(FEAT_EVAL)) \
+#اگر defined(FEAT_معمول) && (defined(MSWIN) || defined(FEAT_EVAL)) \
 	&& !defined(AMIGA)
 # define FEAT_PRINTER
-#endif
-#if defined(FEAT_PRINTER) && !defined(FEAT_PRINT_PANGO) \
+#اگر_ختم
+#اگر defined(FEAT_PRINTER) && !defined(FEAT_PRINT_PANGO) \
     && ((defined(MSWIN) && defined(MSWINPS)) \
 	    || (!defined(MSWIN) && defined(FEAT_EVAL)))
 # define FEAT_POSTSCRIPT
-#endif
-#if !defined(FEAT_PRINTER) && defined(FEAT_PRINT_PANGO)
+#اگر_ختم
+#اگر !defined(FEAT_PRINTER) && defined(FEAT_PRINT_PANGO)
 # undef FEAT_PRINT_PANGO
-#endif
+#اگر_ختم
 
 /*
  * +diff		Displaying diffs in a nice way.
  *			Can be enabled in autoconf already.
  */
-#if defined(FEAT_NORMAL) && !defined(FEAT_DIFF)
+#اگر defined(FEAT_معمول) && !defined(FEAT_DIFF)
 # define FEAT_DIFF
-#endif
+#اگر_ختم
 
 /*
  * +statusline		'statusline', 'statuslineopt', 'rulerformat' and
  *			special format of 'titlestring' and 'iconstring'
  *			options.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_STL_OPT
-#endif
+#اگر_ختم
 
 /*
  * +byte_offset		'%o' in 'statusline' and builtin functions line2byte()
  *			and byte2line().
  *			Note: Required for Macintosh.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_BYTEOFF
-#endif
+#اگر_ختم
 
 /*
  * +viminfo		reading/writing the viminfo file. Takes about 8Kbyte
@@ -332,170 +332,170 @@
  * VIMINFO_FILE		Location of user .viminfo file (should start with $).
  * VIMINFO_FILE2	Location of alternate user .viminfo file.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_VIMINFO
 // #define VIMINFO_FILE	"$HOME/foo/.viminfo"
 // #define VIMINFO_FILE2 "~/bar/.viminfo"
-#endif
+#اگر_ختم
 
 /*
  * +syntax		syntax highlighting.  When using this, it's a good
  *			idea to have +eval too.
  */
-#if defined(FEAT_NORMAL)
+#اگر defined(FEAT_معمول)
 # define FEAT_SYN_HL
-#endif
+#اگر_ختم
 
 /*
  * +conceal		'conceal' option.  Depends on syntax highlighting
  *			as this is how the concealed text is defined.
  */
-#if defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)
+#اگر defined(FEAT_معمول) && defined(FEAT_SYN_HL)
 # define FEAT_CONCEAL
-#endif
+#اگر_ختم
 
 /*
  * +spell		spell checking
  */
-#if defined(FEAT_NORMAL)
+#اگر defined(FEAT_معمول)
 # define FEAT_SPELL
-#endif
+#اگر_ختم
 
 /*
  * +cryptv		Encryption (originally by Mohsin Ahmed <mosh@sasi.com>).
  */
-#if defined(FEAT_NORMAL) && !defined(FEAT_CRYPT)
+#اگر defined(FEAT_معمول) && !defined(FEAT_CRYPT)
 # define FEAT_CRYPT
-#endif
+#اگر_ختم
 
 /*
  * libsodium - add advanced cryptography support
  */
-#if defined(HAVE_SODIUM) && defined(FEAT_CRYPT)
+#اگر defined(HAVE_SODIUM) && defined(FEAT_CRYPT)
 # define FEAT_SODIUM
-#endif
+#اگر_ختم
 
 /*
  * +mksession		":mksession" command.
  *			fully depends on +eval
  */
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 # define FEAT_SESSION
-#endif
+#اگر_ختم
 
 /*
  * +multi_lang		Multi language support. ":menutrans", ":language", etc.
  * +gettext		Message translations (requires +multi_lang)
  *			(only when "lang" archive unpacked)
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_MULTI_LANG
-#endif
-#if defined(HAVE_GETTEXT) && defined(FEAT_MULTI_LANG) \
+#اگر_ختم
+#اگر defined(HAVE_GETTEXT) && defined(FEAT_MULTI_LANG) \
 	&& (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 # define FEAT_GETTEXT
-#endif
+#اگر_ختم
 
 /*
  * +multi_byte_ime	Win32 IME input method.  Only for far-east Windows, so
  *			IME can be used to input chars.  Not tested much!
  */
-#if defined(FEAT_GUI_MSWIN) && !defined(FEAT_MBYTE_IME)
+#اگر defined(FEAT_GUI_MSWIN) && !defined(FEAT_MBYTE_IME)
 // #define FEAT_MBYTE_IME
-#endif
+#اگر_ختم
 
-#if defined(FEAT_HUGE) && defined(FEAT_GUI_HAIKU) && !defined(FEAT_MBYTE_IME)
+#اگر defined(FEAT_HUGE) && defined(FEAT_GUI_HAIKU) && !defined(FEAT_MBYTE_IME)
 # define FEAT_MBYTE_IME
-#endif
+#اگر_ختم
 
 // Use iconv() when it's available.
-#if (defined(HAVE_ICONV_H) && defined(HAVE_ICONV)) || defined(DYNAMIC_ICONV)
+#اگر (defined(HAVE_ICONV_H) && defined(HAVE_ICONV)) || defined(DYNAMIC_ICONV)
 # define USE_ICONV
-#endif
+#اگر_ختم
 
 /*
  * +xim			X Input Method.  For entering special languages like
  *			chinese and Japanese.
  *			this is for Unix and VMS only.
  */
-#ifndef FEAT_XIM
+#اگر_غیر_تعریف_شدہ FEAT_XIM
 // #define FEAT_XIM
-#endif
+#اگر_ختم
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#اگر defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 # define USE_XIM 1		// needed for GTK include files
-#endif
+#اگر_ختم
 
-#if defined(FEAT_XIM)
+#اگر defined(FEAT_XIM)
 // # define X_LOCALE			// for OS with incomplete locale
 					// support, like old linux versions.
-#endif
+#اگر_ختم
 
 /*
  * +xfontset		X fontset support.  For outputting wide characters.
  */
-#ifndef FEAT_XFONTSET
-# if defined(HAVE_X11) && !defined(FEAT_GUI_GTK)
+#اگر_غیر_تعریف_شدہ FEAT_XFONTSET
+# اگر defined(HAVE_X11) && !defined(FEAT_GUI_GTK)
 #  define FEAT_XFONTSET
-# else
+# ورنہ
 // #  define FEAT_XFONTSET
 # endif
-#else
-# if defined(USE_GTK4)
+#ورنہ
+# اگر defined(USE_GTK4)
 #  undef FEAT_XFONTSET
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +libcall		libcall() function
  */
 // Using dlopen() also requires dlsym() to be available.
-#if defined(HAVE_DLOPEN) && defined(HAVE_DLSYM)
+#اگر defined(HAVE_DLOPEN) && defined(HAVE_DLSYM)
 # define USE_DLOPEN
-#endif
-#if defined(FEAT_EVAL) && (defined(MSWIN) || ((defined(UNIX) || defined(VMS)) \
-	&& (defined(USE_DLOPEN) || defined(HAVE_SHL_LOAD))))
+#اگر_ختم
+#اگر defined(FEAT_EVAL) && (defined(MSWIN) || ((defined(UNIX) || defined(VMS)) \
+	&& (defined(USE_DLOPEN) || defined(HAVE_SHL_بھرو))))
 # define FEAT_LIBCALL
-#endif
+#اگر_ختم
 
 /*
  * +menu		":menu" command
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_MENU
 # ifdef FEAT_GUI_MSWIN
 #  define FEAT_TEAROFF
 # endif
-#endif
+#اگر_ختم
 
 /*
  * popup menu in a terminal
  */
-#if defined(FEAT_MENU) && !defined(ALWAYS_USE_GUI)
-# define FEAT_TERM_POPUP_MENU
-#endif
+#اگر defined(FEAT_MENU) && !defined(ALWAYS_USE_GUI)
+# define FEAT_رکن_POPUP_MENU
+#اگر_ختم
 
 /*
  * sound
  */
-#if !defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
+#اگر !defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
 # define FEAT_SOUND
-#endif
-#if defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
+#اگر_ختم
+#اگر defined(FEAT_SOUND) && defined(HAVE_CANBERRA)
 # define FEAT_SOUND_CANBERRA
-#endif
+#اگر_ختم
 
 // There are two ways to use XPM.
-#if (defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF)) \
+#اگر (defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF)) \
 		|| defined(HAVE_X11_XPM_H)
 # define HAVE_XPM 1
-#endif
+#اگر_ختم
 
 /*
  * +toolbar		Include code for a toolbar (for the Win32 GUI, GTK
  *			always has it).  But only if menus are enabled.
  */
-#if defined(FEAT_NORMAL) && defined(FEAT_MENU) \
+#اگر defined(FEAT_معمول) && defined(FEAT_MENU) \
 	&& (defined(FEAT_GUI_GTK) \
 		|| defined(FEAT_GUI_MSWIN) \
 		|| (defined(FEAT_GUI_MOTIF) && defined(HAVE_XPM)) \
@@ -503,84 +503,84 @@
 		|| defined(FEAT_GUI_HAIKU))
 
 # define FEAT_TOOLBAR
-#endif
+#اگر_ختم
 
 
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_MENU)
+#اگر defined(FEAT_TOOLBAR) && !defined(FEAT_MENU)
 # define FEAT_MENU
-#endif
+#اگر_ختم
 
 /*
  * GUI dark theme variant
  */
-#if (defined(FEAT_GUI_GTK) && (defined(USE_GTK3) || defined(USE_GTK4))) \
+#اگر (defined(FEAT_GUI_GTK) && (defined(USE_GTK3) || defined(USE_GTK4))) \
 	|| defined(FEAT_GUI_MSWIN)
 # define FEAT_GUI_DARKTHEME
-#endif
+#اگر_ختم
 
 /*
  * GUI tabline
  */
-#if defined(FEAT_NORMAL) \
+#اگر defined(FEAT_معمول) \
     && (defined(FEAT_GUI_GTK) \
 	|| (defined(FEAT_GUI_MOTIF) && defined(HAVE_XM_NOTEBOOK_H)) \
 	|| defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_GUI_MSWIN))
 # define FEAT_GUI_TABLINE
-#endif
+#اگر_ختم
 
 /*
  * +tabpanel		Tab SideBar
  */
-#ifdef FEAT_HUGE
+#اگر_تعریف_شدہ FEAT_HUGE
 # define FEAT_TABPANEL
-#endif
+#اگر_ختم
 
 /*
  * +browse		":browse" command.
  *			or just the ":browse" command modifier
  */
-#if defined(FEAT_NORMAL)
+#اگر defined(FEAT_معمول)
 # define FEAT_BROWSE_CMD
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# اگر defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) || defined(FEAT_GUI_PHOTON)
 #  define FEAT_BROWSE
 # endif
-#endif
+#اگر_ختم
 
 /*
  * On some systems, when we compile with the GUI, we always use it.  On Mac
  * there is no terminal version, and on Windows we can't figure out how to
  * fork one off with :gui.
  */
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#اگر defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define ALWAYS_USE_GUI
-#endif
+#اگر_ختم
 
 /*
  * +dialog_gui		Use GUI dialog.
  * +dialog_con		May use Console dialog.
  *			When none of these defined there is no dialog support.
  */
-#ifdef FEAT_NORMAL
-# if (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
+#اگر_تعریف_شدہ FEAT_معمول
+# اگر (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_PHOTON) \
 	|| defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_GUI_MSWIN)
 #  define FEAT_CON_DIALOG
 #  define FEAT_GUI_DIALOG
-# else
+# ورنہ
 #  define FEAT_CON_DIALOG
 # endif
-#endif
-#if !defined(FEAT_GUI_DIALOG) && (defined(FEAT_GUI_MOTIF) \
+#اگر_ختم
+#اگر !defined(FEAT_GUI_DIALOG) && (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_MSWIN))
 // need a dialog to show error messages when starting from the desktop
 # define FEAT_GUI_DIALOG
-#endif
-#if defined(FEAT_GUI_DIALOG) && \
+#اگر_ختم
+#اگر defined(FEAT_GUI_DIALOG) && \
 	(defined(FEAT_GUI_MOTIF) \
 	 || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN) \
 	 || defined(FEAT_GUI_PHOTON) \
@@ -589,21 +589,21 @@
 # ifndef ALWAYS_USE_GUI
 #  define FEAT_CON_DIALOG
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +termguicolors	'termguicolors' option.
  */
-#if (defined(FEAT_NORMAL) && defined(FEAT_SYN_HL)) && !defined(ALWAYS_USE_GUI)
+#اگر (defined(FEAT_معمول) && defined(FEAT_SYN_HL)) && !defined(ALWAYS_USE_GUI)
 # define FEAT_TERMGUICOLORS
-#endif
+#اگر_ختم
 
 /*
  * +vartabs		'vartabstop' and 'varsofttabstop' options.
  */
-#ifdef FEAT_HUGE
+#اگر_تعریف_شدہ FEAT_HUGE
 # define FEAT_VARTABS
-#endif
+#اگر_ختم
 
 /*
  * Preferences:
@@ -621,9 +621,9 @@
  *			version handling it does not have any purpose.
  *			Overwrite will write to the new version.
  */
-#ifndef VMS
+#اگر_غیر_تعریف_شدہ VMS
 # define FEAT_WRITEBACKUP
-#endif
+#اگر_ختم
 
 /*
  * +xterm_save		The t_ti and t_te entries for the builtin xterm will
@@ -641,11 +641,11 @@
  * STARTUPTIME		Time the startup process.  Writes a file with
  *			timestamps.
  */
-#if defined(FEAT_NORMAL) \
-	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)) \
+#اگر defined(FEAT_معمول) \
+	&& ((defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_وقت_H)) \
 		|| defined(MSWIN))
 # define STARTUPTIME 1
-#endif
+#اگر_ختم
 
 /*
  * MEM_PROFILE		Debugging of memory allocation and freeing.
@@ -670,7 +670,7 @@
 /*
  * SESSION_FILE		Name of the default ":mksession" file.
  */
-#define SESSION_FILE	"Session.vim"
+#تعریف_کرو SESSION_FILE	"Session.vim"
 
 /*
  * USR_VIMRC_FILE	Name of the user .vimrc file.
@@ -730,24 +730,24 @@
  * FTPLUGOF_FILE	used for loading settings files
  * INDOFF_FILE		used for loading indent files
  */
-#ifndef FILETYPE_FILE
+#اگر_غیر_تعریف_شدہ FILETYPE_FILE
 # define FILETYPE_FILE		"filetype.vim"
-#endif
-#ifndef FTPLUGIN_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ FTPLUGIN_FILE
 # define FTPLUGIN_FILE		"ftplugin.vim"
-#endif
-#ifndef INDENT_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ INDENT_FILE
 # define INDENT_FILE		"indent.vim"
-#endif
-#ifndef FTOFF_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ FTOFF_FILE
 # define FTOFF_FILE		"ftoff.vim"
-#endif
-#ifndef FTPLUGOF_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ FTPLUGOF_FILE
 # define FTPLUGOF_FILE		"ftplugof.vim"
-#endif
-#ifndef INDOFF_FILE
+#اگر_ختم
+#اگر_غیر_تعریف_شدہ INDOFF_FILE
 # define INDOFF_FILE		"indoff.vim"
-#endif
+#اگر_ختم
 
 /*
  * SYS_MENU_FILE	Name of the default menu.vim file.
@@ -757,9 +757,9 @@
 /*
  * SYS_OPTWIN_FILE	Name of the default optwin.vim file.
  */
-#ifndef SYS_OPTWIN_FILE
+#اگر_غیر_تعریف_شدہ SYS_OPTWIN_FILE
 # define SYS_OPTWIN_FILE	"$VIMRUNTIME/optwin.vim"
-#endif
+#اگر_ختم
 
 /*
  * SYNTAX_FNAME		Name of a syntax file, where %s is the syntax name.
@@ -769,9 +769,9 @@
 /*
  * RUNTIME_DIRNAME	Generic name for the directory of the runtime files.
  */
-#ifndef RUNTIME_DIRNAME
+#اگر_غیر_تعریف_شدہ RUNTIME_DIRNAME
 # define RUNTIME_DIRNAME "runtime"
-#endif
+#اگر_ختم
 
 /*
  * RUNTIME_GLOBAL	Comma-separated list of directory names for global Vim
@@ -814,17 +814,17 @@
  * +X11			Unix only.  Include code for xterm title saving and X
  *			clipboard.  Only works if HAVE_X11 is also defined.
  */
-#if (defined(FEAT_NORMAL) || defined(FEAT_GUI_MOTIF)) && !defined(USE_GTK4)
+#اگر (defined(FEAT_معمول) || defined(FEAT_GUI_MOTIF)) && !defined(USE_GTK4)
 # define WANT_X11
-#endif
+#اگر_ختم
 
 /*
  * +wayland		Unix only.  Include code for the Wayland protocol,
  *                      only works if HAVE_WAYLAND is defined.
  */
-#if defined(FEAT_NORMAL) && defined(UNIX)
+#اگر defined(FEAT_معمول) && defined(UNIX)
 # define WANT_WAYLAND
-#endif
+#اگر_ختم
 
 /*
  * XSMP - X11 Session Management Protocol
@@ -835,12 +835,12 @@
  * If your GUI wants to support SM itself, change this ifdef.
  * I'm assuming that any X11 implementation will cope with this for now.
  */
-#if defined(HAVE_X11) && defined(WANT_X11) && defined(HAVE_X11_SM_SMLIB_H)
+#اگر defined(HAVE_X11) && defined(WANT_X11) && defined(HAVE_X11_SM_SMLIB_H)
 # define USE_XSMP
-#endif
-#if defined(USE_XSMP_INTERACT) && !defined(USE_XSMP)
+#اگر_ختم
+#اگر defined(USE_XSMP_INTERACT) && !defined(USE_XSMP)
 # undef USE_XSMP_INTERACT
-#endif
+#اگر_ختم
 
 /*
  * +mouse_xterm		Unix only: Include code for xterm mouse handling.
@@ -860,20 +860,20 @@
  *			DOS_MOUSE is defined.
  */
 // Amiga console has no mouse support
-#if defined(UNIX) || defined(VMS)
+#اگر defined(UNIX) || defined(VMS)
 # define FEAT_MOUSE_XTERM
-# ifdef FEAT_NORMAL
+# ifdef FEAT_معمول
 #  define FEAT_MOUSE_NET
 #  define FEAT_MOUSE_DEC
 #  define FEAT_MOUSE_URXVT
 # endif
-#endif
-#if defined(MSWIN)
+#اگر_ختم
+#اگر defined(MSWIN)
 # define DOS_MOUSE
-#endif
-#if defined(__QNX__)
+#اگر_ختم
+#اگر defined(__QNX__)
 # define FEAT_MOUSE_PTERM
-#endif
+#اگر_ختم
 
 /*
  * Note: Only one of the following may be defined:
@@ -882,7 +882,7 @@
  * FEAT_MOUSE_JSB
  * FEAT_MOUSE_PTERM
  */
-#if defined(FEAT_NORMAL) && defined(HAVE_GPM)
+#اگر defined(FEAT_معمول) && defined(HAVE_GPM)
 # define FEAT_MOUSE_GPM
 /*
  * +mouse_gpm/dyn   Load libgpm dynamically.
@@ -890,16 +890,16 @@
 # ifndef DYNAMIC_GPM
 // #  define DYNAMIC_GPM
 # endif
-#endif
+#اگر_ختم
 
-#if defined(FEAT_NORMAL) && defined(HAVE_SYSMOUSE)
+#اگر defined(FEAT_معمول) && defined(HAVE_SYSMOUSE)
 # define FEAT_SYSMOUSE
-#endif
+#اگر_ختم
 
 // urxvt is a small variation of mouse_xterm, and shares its code
-#if defined(FEAT_MOUSE_URXVT) && !defined(FEAT_MOUSE_XTERM)
+#اگر defined(FEAT_MOUSE_URXVT) && !defined(FEAT_MOUSE_XTERM)
 # define FEAT_MOUSE_XTERM
-#endif
+#اگر_ختم
 
 /*
  * +clipboard		Clipboard support.  Always used for the GUI.
@@ -907,17 +907,17 @@
  *			in an xterm like in the GUI.
  */
 
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_CYGWIN_WIN32_CLIPBOARD
 # define FEAT_CLIPBOARD
-#endif
+#اگر_ختم
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ FEAT_GUI
 # ifndef FEAT_CLIPBOARD
 #  define FEAT_CLIPBOARD
 # endif
-#endif
+#اگر_ختم
 
-#if defined(FEAT_NORMAL) \
+#اگر defined(FEAT_معمول) \
 	&& (defined(UNIX) || defined(VMS)) \
 	&& defined(WANT_X11) && defined(HAVE_X11) \
 	&& !defined(USE_GTK4)
@@ -925,120 +925,120 @@
 # ifndef FEAT_CLIPBOARD
 #  define FEAT_CLIPBOARD
 # endif
-#endif
+#اگر_ختم
 
-#if defined(FEAT_NORMAL) && defined(UNIX) \
+#اگر defined(FEAT_معمول) && defined(UNIX) \
     && defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
 # define FEAT_WAYLAND_CLIPBOARD
 # ifndef FEAT_CLIPBOARD
 #  define FEAT_CLIPBOARD
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +dnd		Drag'n'drop support.  Always used for the GTK+ GUI.
  */
-#if defined(FEAT_CLIPBOARD) && defined(FEAT_GUI_GTK)
+#اگر defined(FEAT_CLIPBOARD) && defined(FEAT_GUI_GTK)
 # define FEAT_DND
-#endif
+#اگر_ختم
 
-#if defined(FEAT_GUI_MSWIN)
-# define MSWIN_FIND_REPLACE	// include code for find/replace dialog
+#اگر defined(FEAT_GUI_MSWIN)
+# define MSWIN_ڈھونڈو_REPLACE	// include code for find/replace dialog
 # define MSWIN_FR_BUFSIZE 256
-#endif
+#اگر_ختم
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
-	|| defined(MSWIN_FIND_REPLACE)
-# define FIND_REPLACE_DIALOG 1
-#endif
+#اگر defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
+	|| defined(MSWIN_ڈھونڈو_REPLACE)
+# define ڈھونڈو_REPLACE_DIALOG 1
+#اگر_ختم
 
 /*
  * The +channel feature requires +eval.
  */
-#if !defined(FEAT_EVAL) && defined(FEAT_JOB_CHANNEL)
-# undef FEAT_JOB_CHANNEL
-#endif
+#اگر !defined(FEAT_EVAL) && defined(FEAT_کام_CHANNEL)
+# undef FEAT_کام_CHANNEL
+#اگر_ختم
 
 /*
  * +socketserver	 Use channels for clientserver communication
  */
-#if (defined(UNIX) || defined(MSWIN)) && defined(FEAT_JOB_CHANNEL)
+#اگر (defined(UNIX) || defined(MSWIN)) && defined(FEAT_کام_CHANNEL)
 # define FEAT_SOCKETSERVER
-#endif
+#اگر_ختم
 
 /*
  * +clientserver	Remote control via the remote_send() function
  *			and the --remote argument
  */
-#if (defined(MSWIN) || defined(FEAT_XCLIPBOARD) || defined(FEAT_SOCKETSERVER)) \
+#اگر (defined(MSWIN) || defined(FEAT_XCLIPBOARD) || defined(FEAT_SOCKETSERVER)) \
     && defined(FEAT_EVAL)
 # define FEAT_CLIENTSERVER
-# if defined(FEAT_SOCKETSERVER) && (defined(FEAT_XCLIPBOARD) || defined(MSWIN))
+# اگر defined(FEAT_SOCKETSERVER) && (defined(FEAT_XCLIPBOARD) || defined(MSWIN))
 #  define FEAT_CLIENTSERVER_BACKENDS
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +autoservername	Automatically generate a servername for clientserver
  *			when --servername is not passed on the command line.
  */
-#if defined(FEAT_CLIENTSERVER) && !defined(FEAT_AUTOSERVERNAME)
+#اگر defined(FEAT_CLIENTSERVER) && !defined(FEAT_AUTOSERVERNAME)
 # ifdef MSWIN
     // Always enabled on MS-Windows.
 #  define FEAT_AUTOSERVERNAME
-# else
+# ورنہ
     // Enable here if you don't use configure.
 // # define FEAT_AUTOSERVERNAME
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +termresponse	send t_RV to obtain terminal response.  Used for xterm
  *			to check if mouse dragging can be used and if term
  *			codes can be obtained.
  */
-#if defined(HAVE_TGETENT)
+#اگر defined(HAVE_TGETENT)
 # define FEAT_TERMRESPONSE
-#endif
+#اگر_ختم
 
 /*
  * cursor shape		Adjust the shape of the cursor to the mode.
  * mouse shape		Adjust the shape of the mouse pointer to the mode.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 // Win32 console can change cursor shape
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  define MCH_CURSOR_SHAPE
 # endif
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# اگر defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_PHOTON)
 #  define FEAT_MOUSESHAPE
 # endif
-#endif
+#اگر_ختم
 
 // GUI and some consoles can change the shape of the cursor.  The code is also
 // needed for the 'mouseshape' and 'concealcursor' options.
-#if defined(FEAT_GUI) \
+#اگر defined(FEAT_GUI) \
 	    || defined(MCH_CURSOR_SHAPE) \
 	    || defined(FEAT_MOUSESHAPE) \
 	    || defined(FEAT_CONCEAL) \
-	    || (defined(UNIX) && defined(FEAT_NORMAL))
+	    || (defined(UNIX) && defined(FEAT_معمول))
 # define CURSOR_SHAPE
-#endif
+#اگر_ختم
 
-#if defined(FEAT_MZSCHEME) && (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)    \
+#اگر defined(FEAT_MZSCHEME) && (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)    \
 	|| defined(FEAT_GUI_MOTIF))
-# define MZSCHEME_GUI_THREADS
-#endif
+# define MZSCHEME_GUI_دھاگے
+#اگر_ختم
 
 /*
  * +ARP			Amiga only. Use arp.library, DOS 2.0 is not required.
  */
-#if defined(AMIGA) && !defined(NO_ARP) && !defined(__amigaos4__) \
+#اگر defined(AMIGA) && !defined(NO_ARP) && !defined(__amigaos4__) \
 	&& !defined(__MORPHOS__) && !defined(__AROS__)
 # define FEAT_ARP
-#endif
+#اگر_ختم
 
 /*
  * +ole			Win32 OLE automation: Use Makefile.ovc.
@@ -1066,170 +1066,170 @@
 /*
  * The Netbeans feature requires +eval and +job_channel
  */
-#if (!defined(FEAT_EVAL) || !defined(FEAT_JOB_CHANNEL)) && defined(FEAT_NETBEANS_INTG)
+#اگر (!defined(FEAT_EVAL) || !defined(FEAT_کام_CHANNEL)) && defined(FEAT_NETBEANS_INTG)
 # undef FEAT_NETBEANS_INTG
-#endif
+#اگر_ختم
 
 /*
  * +terminal		":terminal" command.  Runs a terminal in a window.
  *			requires +channel
  */
-#if defined(FEAT_TERMINAL) && !defined(FEAT_JOB_CHANNEL)
+#اگر defined(FEAT_TERMINAL) && !defined(FEAT_کام_CHANNEL)
 # undef FEAT_TERMINAL
-#endif
-#if defined(FEAT_TERMINAL) && !defined(CURSOR_SHAPE)
+#اگر_ختم
+#اگر defined(FEAT_TERMINAL) && !defined(CURSOR_SHAPE)
 # define CURSOR_SHAPE
-#endif
-#if defined(FEAT_TERMINAL) && !defined(FEAT_SYN_HL)
+#اگر_ختم
+#اگر defined(FEAT_TERMINAL) && !defined(FEAT_SYN_HL)
 // simplify the code a bit by enabling +syntax when +terminal is enabled
 # define FEAT_SYN_HL
-#endif
+#اگر_ختم
 
 /*
  * +autoshelldir	    'autoshelldir' option.
  */
-#if defined(FEAT_TERMINAL)
+#اگر defined(FEAT_TERMINAL)
 # define FEAT_AUTOSHELLDIR
-#endif
+#اگر_ختم
 /*
  * +textprop and +popupwin	Text PROPerties and POPUP windows
  */
-#if defined(FEAT_EVAL) && defined(FEAT_SYN_HL)
+#اگر defined(FEAT_EVAL) && defined(FEAT_SYN_HL)
 # define FEAT_PROP_POPUP
-#endif
+#اگر_ختم
 
 
 /*
  * +image	    Render images in the terminal and GUI
  * +image_popup	    Render images in popup windows
  */
-#if defined(FEAT_HUGE) && defined(FEAT_PROP_POPUP) && defined(HAVE_PIXMAN)
+#اگر defined(FEAT_HUGE) && defined(FEAT_PROP_POPUP) && defined(HAVE_PIXMAN)
 # define ALLOW_IMAGE
-#endif
+#اگر_ختم
 
-#if defined(ALLOW_IMAGE) && !defined(ALWAYS_USE_GUI)
+#اگر defined(ALLOW_IMAGE) && !defined(ALWAYS_USE_GUI)
 # define FEAT_IMAGE_SIXEL
 # define FEAT_IMAGE_KITTY
-#endif
+#اگر_ختم
 
-#if defined(ALLOW_IMAGE) && ((defined(FEAT_GUI_GTK) \
+#اگر defined(ALLOW_IMAGE) && ((defined(FEAT_GUI_GTK) \
 	    && (defined(USE_GTK4) || defined(USE_GTK3))) || defined(FEAT_GUI_MSWIN))
 # define FEAT_IMAGE_GUI
-#endif
+#اگر_ختم
 
-#if defined(FEAT_IMAGE_SIXEL) || defined(FEAT_IMAGE_KITTY) \
+#اگر defined(FEAT_IMAGE_SIXEL) || defined(FEAT_IMAGE_KITTY) \
     || defined(FEAT_IMAGE_GUI)
 # define FEAT_IMAGE_POPUP
 # define FEAT_IMAGE
-#endif
+#اگر_ختم
 
-#ifdef ALLOW_IMAGE
+#اگر_تعریف_شدہ ALLOW_IMAGE
 # undef ALLOW_IMAGE
-#endif
+#اگر_ختم
 
 /*
  * +message_window	use a popup for messages when 'cmdheight' is zero
  */
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TIMERS)
-# define HAS_MESSAGE_WINDOW
-#endif
+#اگر defined(FEAT_PROP_POPUP) && defined(FEAT_TIMERS)
+# define HAS_پیغام_کھڑکی
+#اگر_ختم
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_RELTIME)
+#اگر defined(FEAT_SYN_HL) && defined(FEAT_RELTIME)
 // Can limit syntax highlight time to 'redrawtime'.
-# define SYN_TIME_LIMIT 1
-#endif
+# define SYN_وقت_حد_بندی 1
+#اگر_ختم
 
 
 /*
  * +signs		Allow signs to be displayed to the left of text lines.
  *			Adds the ":sign" command.
  */
-#if defined(FEAT_NORMAL) || defined(FEAT_NETBEANS_INTG) || defined(FEAT_PROP_POPUP)
+#اگر defined(FEAT_معمول) || defined(FEAT_NETBEANS_INTG) || defined(FEAT_PROP_POPUP)
 # define FEAT_SIGNS
-# if (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
+# اگر (defined(FEAT_GUI_MOTIF) && defined(HAVE_X11_XPM_H)) \
 	|| defined(FEAT_GUI_GTK) \
 	|| (defined(MSWIN) && defined(FEAT_GUI))
 #  define FEAT_SIGN_ICONS
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +balloon_eval	Allow balloon expression evaluation. Used with a
  *			debugger and for tooltips.
  *			Only for GUIs where it was implemented.
  */
-#if (defined(FEAT_GUI_MOTIF) \
+#اگر (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) \
 	&& (   ((defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)) \
 		&& !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)) \
 	    || defined(FEAT_NETBEANS_INTG) || defined(FEAT_EVAL))
 # define FEAT_BEVAL_GUI
-# if !defined(FEAT_XFONTSET) && !defined(FEAT_GUI_GTK) \
+# اگر !defined(FEAT_XFONTSET) && !defined(FEAT_GUI_GTK) \
 	&& !defined(FEAT_GUI_MSWIN)
 #  define FEAT_XFONTSET
 # endif
-#endif
+#اگر_ختم
 
-#if defined(FEAT_BEVAL_GUI) && defined(FEAT_GUI_MOTIF)
+#اگر defined(FEAT_BEVAL_GUI) && defined(FEAT_GUI_MOTIF)
 # define FEAT_BEVAL_TIP		// balloon eval used for toolbar tooltip
-#endif
+#اگر_ختم
 
 /*
  * +balloon_eval_term	Allow balloon expression evaluation in the terminal.
  */
-#if defined(FEAT_HUGE) && defined(FEAT_TIMERS) && \
+#اگر defined(FEAT_HUGE) && defined(FEAT_TIMERS) && \
 	(defined(UNIX) || defined(VMS) || \
 	 (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))))
-# define FEAT_BEVAL_TERM
-#endif
+# define FEAT_BEVAL_رکن
+#اگر_ختم
 
-#if defined(FEAT_BEVAL_GUI) || defined(FEAT_BEVAL_TERM)
+#اگر defined(FEAT_BEVAL_GUI) || defined(FEAT_BEVAL_رکن)
 # define FEAT_BEVAL
-#endif
+#اگر_ختم
 
 // Motif is X11
-#if defined(FEAT_GUI_MOTIF)
+#اگر defined(FEAT_GUI_MOTIF)
 # define FEAT_GUI_X11
-#endif
+#اگر_ختم
 
-#if defined(FEAT_NETBEANS_INTG)
+#اگر defined(FEAT_NETBEANS_INTG)
 // NetBeans uses menus.
-# if !defined(FEAT_MENU)
+# اگر !defined(FEAT_MENU)
 #  define FEAT_MENU
 # endif
-#endif
+#اگر_ختم
 
 /*
  * +autochdir		'autochdir' option.
  */
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_NORMAL)
+#اگر defined(FEAT_NETBEANS_INTG) || defined(FEAT_معمول)
 # define FEAT_AUTOCHDIR
-#endif
+#اگر_ختم
 
 /*
  * +persistent_undo	'undofile', 'undodir' options, :wundo and :rundo, and
  * implementation.
  */
-#ifdef FEAT_NORMAL
+#اگر_تعریف_شدہ FEAT_معمول
 # define FEAT_PERSISTENT_UNDO
-#endif
+#اگر_ختم
 
 /*
  * +filterpipe
  */
-#if (defined(UNIX) && !defined(USE_SYSTEM)) \
+#اگر (defined(UNIX) && !defined(USE_SYSTEM)) \
 	    || (defined(MSWIN) && defined(FEAT_GUI_MSWIN))
 # define FEAT_FILTERPIPE
-#endif
+#اگر_ختم
 
 /*
  * +vtp: Win32 virtual console.
  */
-#if (!defined(FEAT_GUI) || defined(VIMDLL)) && defined(MSWIN)
+#اگر (!defined(FEAT_GUI) || defined(VIMDLL)) && defined(MSWIN)
 # define FEAT_VTP
-#endif
+#اگر_ختم
 
-#if defined(DYNAMIC_PERL) \
+#اگر defined(DYNAMIC_PERL) \
 	|| defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3) \
 	|| defined(DYNAMIC_RUBY) \
 	|| defined(DYNAMIC_TCL) \
@@ -1238,13 +1238,13 @@
 	|| defined(DYNAMIC_MZSCHEME) \
 	|| defined(DYNAMIC_LUA) \
 	|| defined(FEAT_TERMINAL)
-# define USING_LOAD_LIBRARY
-#endif
+# define USING_بھرو_LIBRARY
+#اگر_ختم
 
 /*
  * currently Unix only: XATTR support
  */
 
-#if defined(FEAT_NORMAL) && defined(HAVE_XATTR) && !defined(MACOS_X)
+#اگر defined(FEAT_معمول) && defined(HAVE_XATTR) && !defined(MACOS_X)
 # define FEAT_XATTR
-#endif
+#اگر_ختم

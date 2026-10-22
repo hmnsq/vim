@@ -1,67 +1,67 @@
-#include "vterm_internal.h"
+#شامل "vterm_internal.h"
 
-#include <stdio.h>
-#include <string.h>
+#شامل <stdio.h>
+#شامل <string.h>
 
-#undef DEBUG_PARSER
+#تعریف_منسوخ DEBUG_PARSER
 
-static int is_intermed(unsigned char c)
+ساکن صحیح is_intermed(غیرعلامتی حرف c)
 {
-  return c >= 0x20 && c <= 0x2f;
+  واپس c >= 0x20 && c <= 0x2f;
 }
 
-static void do_control(VTerm *vt, unsigned char control)
+ساکن خالی do_control(VTerm *vt, غیرعلامتی حرف control)
 {
-  if(vt->parser.callbacks && vt->parser.callbacks->control)
-    if((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
-      return;
+  اگر(vt->parser.callbacks && vt->parser.callbacks->control)
+    اگر((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
+      واپس;
 
   DEBUG_LOG1("libvterm: Unhandled control 0x%02x\n", control);
 }
 
-static void do_csi(VTerm *vt, char command)
+ساکن خالی do_csi(VTerm *vt, حرف command)
 {
-#ifdef DEBUG_PARSER
-  printf("Parsed CSI args as:\n", arglen, args);
-  printf(" leader: %s\n", vt->parser.v.csi.leader);
-  for(int argi = 0; argi < vt->parser.v.csi.argi; argi++) {
-    printf(" %lu", CSI_ARG(vt->parser.v.csi.args[argi]));
-    if(!CSI_ARG_HAS_MORE(vt->parser.v.csi.args[argi]))
-      printf("\n");
-  printf(" intermed: %s\n", vt->parser.intermed);
+#اگر_تعریف_شدہ DEBUG_PARSER
+  لکھو("Parsed CSI args as:\n", arglen, دلائل);
+  لکھو(" leader: %s\n", vt->parser.v.csi.leader);
+  برائے(صحیح argi = 0; argi < vt->parser.v.csi.argi; argi++) {
+    لکھو(" %lu", CSI_ARG(vt->parser.v.csi.دلائل[argi]));
+    اگر(!CSI_ARG_HAS_مزید(vt->parser.v.csi.دلائل[argi]))
+      لکھو("\n");
+  لکھو(" intermed: %s\n", vt->parser.intermed);
   }
-#endif
+#اگر_ختم
 
-  if(vt->parser.callbacks && vt->parser.callbacks->csi)
-    if((*vt->parser.callbacks->csi)(
-          vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : NULL,
-          vt->parser.v.csi.args,
+  اگر(vt->parser.callbacks && vt->parser.callbacks->csi)
+    اگر((*vt->parser.callbacks->csi)(
+          vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : تہی,
+          vt->parser.v.csi.دلائل,
           vt->parser.v.csi.argi,
-          vt->parser.intermedlen ? vt->parser.intermed : NULL,
+          vt->parser.intermedlen ? vt->parser.intermed : تہی,
           command,
           vt->parser.cbdata))
-      return;
+      واپس;
 
   DEBUG_LOG1("libvterm: Unhandled CSI %c\n", command);
 }
 
-static void do_escape(VTerm *vt, char command)
+ساکن خالی do_escape(VTerm *vt, حرف command)
 {
-  char seq[INTERMED_MAX+1];
+  حرف seq[INTERMED_MAX+1];
 
   size_t len = vt->parser.intermedlen;
   strncpy(seq, vt->parser.intermed, len);
   seq[len++] = command;
   seq[len]   = 0;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->escape)
-    if((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
-      return;
+  اگر(vt->parser.callbacks && vt->parser.callbacks->escape)
+    اگر((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
+      واپس;
 
   DEBUG_LOG1("libvterm: Unhandled escape ESC 0x%02x\n", command);
 }
 
-static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
+ساکن خالی string_fragment(VTerm *vt, ثابت حرف *str, size_t len, صحیح final)
 {
   VTermStringFragment frag;
 
@@ -70,188 +70,188 @@ static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
   frag.initial = vt->parser.string_initial;
   frag.final = final;
 
-  switch(vt->parser.state) {
-    case OSC:
-      if(vt->parser.callbacks && vt->parser.callbacks->osc)
+  انتخاب(vt->parser.state) {
+    حالت OSC:
+      اگر(vt->parser.callbacks && vt->parser.callbacks->osc)
         (*vt->parser.callbacks->osc)(vt->parser.v.osc.command, frag, vt->parser.cbdata);
-      break;
+      توڑو;
 
-    case DCS:
-      if(vt->parser.callbacks && vt->parser.callbacks->dcs)
+    حالت DCS:
+      اگر(vt->parser.callbacks && vt->parser.callbacks->dcs)
         (*vt->parser.callbacks->dcs)(vt->parser.v.dcs.command, vt->parser.v.dcs.commandlen, frag, vt->parser.cbdata);
-      break;
+      توڑو;
 
-    case APC:
-      if(vt->parser.callbacks && vt->parser.callbacks->apc)
+    حالت APC:
+      اگر(vt->parser.callbacks && vt->parser.callbacks->apc)
         (*vt->parser.callbacks->apc)(frag, vt->parser.cbdata);
-      break;
+      توڑو;
 
-    case PM:
-      if(vt->parser.callbacks && vt->parser.callbacks->pm)
+    حالت PM:
+      اگر(vt->parser.callbacks && vt->parser.callbacks->pm)
         (*vt->parser.callbacks->pm)(frag, vt->parser.cbdata);
-      break;
+      توڑو;
 
-    case SOS:
-      if(vt->parser.callbacks && vt->parser.callbacks->sos)
+    حالت SOS:
+      اگر(vt->parser.callbacks && vt->parser.callbacks->sos)
         (*vt->parser.callbacks->sos)(frag, vt->parser.cbdata);
-      break;
+      توڑو;
 
-    case NORMAL:
-    case CSI_LEADER:
-    case CSI_ARGS:
-    case CSI_INTERMED:
-    case OSC_COMMAND:
-    case DCS_COMMAND:
-      break;
+    حالت معمول_2:
+    حالت CSI_LEADER:
+    حالت CSI_دلائل:
+    حالت CSI_INTERMED:
+    حالت OSC_COMMAND:
+    حالت DCS_COMMAND:
+      توڑو;
   }
 
   vt->parser.string_initial = FALSE;
 }
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
+size_t vterm_داخلہ_write(VTerm *vt, ثابت حرف *بائٹیں, size_t len)
 {
   size_t pos = 0;
-  const char *string_start = NULL;  // init to avoid gcc warning
+  ثابت حرف *string_آغاز = تہی;  // init to avoid gcc warning
 
-  vt->in_backspace = 0;		    // Count down with BS key and activate when
+  vt->اندر_backspace = 0;		    // Count down with BS key and activate when
 				    // it reaches 1
 
-  switch(vt->parser.state) {
-  case NORMAL:
-  case CSI_LEADER:
-  case CSI_ARGS:
-  case CSI_INTERMED:
-  case OSC_COMMAND:
-  case DCS_COMMAND:
-    string_start = NULL;
-    break;
-  case OSC:
-  case DCS:
-  case APC:
-  case PM:
-  case SOS:
-    string_start = bytes;
-    break;
+  انتخاب(vt->parser.state) {
+  حالت معمول_2:
+  حالت CSI_LEADER:
+  حالت CSI_دلائل:
+  حالت CSI_INTERMED:
+  حالت OSC_COMMAND:
+  حالت DCS_COMMAND:
+    string_آغاز = تہی;
+    توڑو;
+  حالت OSC:
+  حالت DCS:
+  حالت APC:
+  حالت PM:
+  حالت SOS:
+    string_آغاز = بائٹیں;
+    توڑو;
   }
 
-#define ENTER_STATE(st)        do { vt->parser.state = st; string_start = NULL; } while(0)
-#define ENTER_NORMAL_STATE()   ENTER_STATE(NORMAL)
+#تعریف_کرو ENTER_STATE(st)        کرو { vt->parser.state = st; string_آغاز = تہی; } جب(0)
+#تعریف_کرو ENTER_معمول_STATE()   ENTER_STATE(معمول_2)
 
-#define IS_STRING_STATE()      (vt->parser.state >= OSC_COMMAND)
+#تعریف_کرو IS_STRING_STATE()      (vt->parser.state >= OSC_COMMAND)
 
-  for( ; pos < len; pos++) {
-    unsigned char c = bytes[pos];
-    int c1_allowed = !vt->mode.utf8;
+  برائے( ; pos < len; pos++) {
+    غیرعلامتی حرف c = بائٹیں[pos];
+    صحیح c1_allowed = !vt->منوال.utf8;
 
-    if(c == 0x00 || c == 0x7f) { // NUL, DEL
-      if(IS_STRING_STATE()) {
-        string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
-        string_start = bytes + pos + 1;
+    اگر(c == 0x00 || c == 0x7f) { // NUL, DEL
+      اگر(IS_STRING_STATE()) {
+        string_fragment(vt, string_آغاز, بائٹیں + pos - string_آغاز, FALSE);
+        string_آغاز = بائٹیں + pos + 1;
       }
-      if(vt->parser.emit_nul)
+      اگر(vt->parser.emit_nul)
         do_control(vt, c);
-      continue;
+      جاری;
     }
-    if(c == 0x18 || c == 0x1a) { // CAN, SUB
-      vt->parser.in_esc = FALSE;
-      ENTER_NORMAL_STATE();
-      if(vt->parser.emit_nul)
+    اگر(c == 0x18 || c == 0x1a) { // CAN, SUB
+      vt->parser.اندر_esc = FALSE;
+      ENTER_معمول_STATE();
+      اگر(vt->parser.emit_nul)
         do_control(vt, c);
-      continue;
+      جاری;
     }
-    else if(c == 0x1b) { // ESC
+    ورنہ اگر(c == 0x1b) { // ESC
       vt->parser.intermedlen = 0;
-      if(!IS_STRING_STATE())
-        vt->parser.state = NORMAL;
-      vt->parser.in_esc = TRUE;
-      continue;
+      اگر(!IS_STRING_STATE())
+        vt->parser.state = معمول_2;
+      vt->parser.اندر_esc = TRUE;
+      جاری;
     }
-    else if(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
+    ورنہ اگر(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
             IS_STRING_STATE()) {
       // fallthrough
     }
-    else if(c < 0x20) { // other C0
-      if(vt->parser.state == SOS)
-        continue; // All other C0s permitted in SOS
+    ورنہ اگر(c < 0x20) { // other C0
+      اگر(vt->parser.state == SOS)
+        جاری; // All other C0s permitted in SOS
 
-      if(vterm_get_special_pty_type() == 2) {
-        if(c == 0x08) // BS
+      اگر(vterm_get_special_pty_type() == 2) {
+        اگر(c == 0x08) // BS
           // Set the trick for BS output after a sequence, to delay backspace
           // activation
-          if(pos + 2 < len && bytes[pos + 1] == 0x20 && bytes[pos + 2] == 0x08)
-            vt->in_backspace = 2; // Trigger when count down to 1
+          اگر(pos + 2 < len && بائٹیں[pos + 1] == 0x20 && بائٹیں[pos + 2] == 0x08)
+            vt->اندر_backspace = 2; // Trigger when count down to 1
       }
-      if(IS_STRING_STATE())
-        string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
+      اگر(IS_STRING_STATE())
+        string_fragment(vt, string_آغاز, بائٹیں + pos - string_آغاز, FALSE);
       do_control(vt, c);
-      if(IS_STRING_STATE())
-        string_start = bytes + pos + 1;
-      continue;
+      اگر(IS_STRING_STATE())
+        string_آغاز = بائٹیں + pos + 1;
+      جاری;
     }
     // else fallthrough
 
-    size_t string_len = bytes + pos - string_start;
+    size_t string_len = بائٹیں + pos - string_آغاز;
 
-    if(vt->parser.in_esc) {
+    اگر(vt->parser.اندر_esc) {
       // Hoist an ESC letter into a C1 if we're not in a string mode
       // Always accept ESC \ == ST even in string mode
-      if(!vt->parser.intermedlen &&
+      اگر(!vt->parser.intermedlen &&
           c >= 0x40 && c < 0x60 &&
           ((!IS_STRING_STATE() || c == 0x5c))) {
         c += 0x40;
         c1_allowed = TRUE;
-        if(string_len)
+        اگر(string_len)
           string_len -= 1;
-        vt->parser.in_esc = FALSE;
+        vt->parser.اندر_esc = FALSE;
       }
-      else {
-        string_start = NULL;
-        vt->parser.state = NORMAL;
+      ورنہ {
+        string_آغاز = تہی;
+        vt->parser.state = معمول_2;
       }
     }
 
-    switch(vt->parser.state) {
-    case CSI_LEADER:
+    انتخاب(vt->parser.state) {
+    حالت CSI_LEADER:
       /* Extract leader bytes 0x3c to 0x3f */
-      if(c >= 0x3c && c <= 0x3f) {
-        if(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
+      اگر(c >= 0x3c && c <= 0x3f) {
+        اگر(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
           vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen++] = c;
-        break;
+        توڑو;
       }
 
       /* else fallthrough */
       vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen] = 0;
 
       vt->parser.v.csi.argi = 0;
-      vt->parser.v.csi.args[0] = CSI_ARG_MISSING;
-      vt->parser.state = CSI_ARGS;
+      vt->parser.v.csi.دلائل[0] = CSI_ARG_MISSING;
+      vt->parser.state = CSI_دلائل;
 
       /* fallthrough */
-    case CSI_ARGS:
+    حالت CSI_دلائل:
       /* Numerical value of argument */
-      if(c >= '0' && c <= '9') {
-        long arg_max = CSI_ARG_MISSING - 1;
-        long *arg = &vt->parser.v.csi.args[vt->parser.v.csi.argi];
-        int digit = c - '0';
+      اگر(c >= '0' && c <= '9') {
+        طویل arg_max = CSI_ARG_MISSING - 1;
+        طویل *arg = &vt->parser.v.csi.دلائل[vt->parser.v.csi.argi];
+        صحیح digit = c - '0';
 
-        if(*arg == CSI_ARG_MISSING)
+        اگر(*arg == CSI_ARG_MISSING)
           *arg = 0;
-        if(*arg > (arg_max - digit) / 10)
+        اگر(*arg > (arg_max - digit) / 10)
           *arg = arg_max;
-        else
+        ورنہ
           *arg = *arg * 10 + digit;
-        break;
+        توڑو;
       }
-      if(c == ':') {
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_MORE;
+      اگر(c == ':') {
+        vt->parser.v.csi.دلائل[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_مزید;
         c = ';';
       }
-      if(c == ';') {
-        if(vt->parser.v.csi.argi >= CSI_ARGS_MAX - 1)
-          break; /* drop excess args */
+      اگر(c == ';') {
+        اگر(vt->parser.v.csi.argi >= CSI_دلائل_MAX - 1)
+          توڑو; /* drop excess args */
         vt->parser.v.csi.argi++;
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
-        break;
+        vt->parser.v.csi.دلائل[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
+        توڑو;
       }
 
       /* else fallthrough */
@@ -259,130 +259,130 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       vt->parser.intermedlen = 0;
       vt->parser.state = CSI_INTERMED;
       // FALLTHROUGH
-    case CSI_INTERMED:
-      if(is_intermed(c)) {
-        if(vt->parser.intermedlen < INTERMED_MAX-1)
+    حالت CSI_INTERMED:
+      اگر(is_intermed(c)) {
+        اگر(vt->parser.intermedlen < INTERMED_MAX-1)
           vt->parser.intermed[vt->parser.intermedlen++] = c;
-        break;
+        توڑو;
       }
-      else if(c == 0x1b) {
+      ورنہ اگر(c == 0x1b) {
         /* ESC in CSI cancels */
       }
-      else if(c >= 0x40 && c <= 0x7e) {
+      ورنہ اگر(c >= 0x40 && c <= 0x7e) {
         vt->parser.intermed[vt->parser.intermedlen] = 0;
         do_csi(vt, c);
       }
       /* else was invalid CSI */
 
-      ENTER_NORMAL_STATE();
-      break;
+      ENTER_معمول_STATE();
+      توڑو;
 
-    case OSC_COMMAND:
+    حالت OSC_COMMAND:
       /* Numerical value of command */
-      if(c >= '0' && c <= '9') {
-        if(vt->parser.v.osc.command == -1)
+      اگر(c >= '0' && c <= '9') {
+        اگر(vt->parser.v.osc.command == -1)
           vt->parser.v.osc.command = 0;
-        else
+        ورنہ
           vt->parser.v.osc.command *= 10;
         vt->parser.v.osc.command += c - '0';
-        break;
+        توڑو;
       }
-      if(c == ';') {
+      اگر(c == ';') {
         vt->parser.state = OSC;
-        string_start = bytes + pos + 1;
-        break;
+        string_آغاز = بائٹیں + pos + 1;
+        توڑو;
       }
 
       /* else fallthrough */
-      string_start = bytes + pos;
+      string_آغاز = بائٹیں + pos;
       string_len   = 0;
       vt->parser.state = OSC;
-      goto string_state;
+      جاؤ string_state;
 
-    case DCS_COMMAND:
-      if(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
+    حالت DCS_COMMAND:
+      اگر(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
         vt->parser.v.dcs.command[vt->parser.v.dcs.commandlen++] = c;
 
-      if(c >= 0x40 && c<= 0x7e) {
-        string_start = bytes + pos + 1;
+      اگر(c >= 0x40 && c<= 0x7e) {
+        string_آغاز = بائٹیں + pos + 1;
         vt->parser.state = DCS;
       }
-      break;
+      توڑو;
 
 string_state:
-    case OSC:
-    case DCS:
-    case APC:
-    case PM:
-    case SOS:
-      if(c == 0x07 || (c1_allowed && c == 0x9c)) {
-        string_fragment(vt, string_start, string_len, TRUE);
-        ENTER_NORMAL_STATE();
+    حالت OSC:
+    حالت DCS:
+    حالت APC:
+    حالت PM:
+    حالت SOS:
+      اگر(c == 0x07 || (c1_allowed && c == 0x9c)) {
+        string_fragment(vt, string_آغاز, string_len, TRUE);
+        ENTER_معمول_STATE();
       }
-      break;
+      توڑو;
 
-    case NORMAL:
-      if(vt->parser.in_esc) {
-        if(is_intermed(c)) {
-          if(vt->parser.intermedlen < INTERMED_MAX-1)
+    حالت معمول_2:
+      اگر(vt->parser.اندر_esc) {
+        اگر(is_intermed(c)) {
+          اگر(vt->parser.intermedlen < INTERMED_MAX-1)
             vt->parser.intermed[vt->parser.intermedlen++] = c;
         }
-        else if(c >= 0x30 && c < 0x7f) {
+        ورنہ اگر(c >= 0x30 && c < 0x7f) {
           do_escape(vt, c);
-          vt->parser.in_esc = 0;
-          ENTER_NORMAL_STATE();
+          vt->parser.اندر_esc = 0;
+          ENTER_معمول_STATE();
         }
-        else {
+        ورنہ {
           DEBUG_LOG1("TODO: Unhandled byte %02x in Escape\n", c);
         }
-        break;
+        توڑو;
       }
-      if(c1_allowed && c >= 0x80 && c < 0xa0) {
-        switch(c) {
-        case 0x90: // DCS
+      اگر(c1_allowed && c >= 0x80 && c < 0xa0) {
+        انتخاب(c) {
+        حالت 0x90: // DCS
           vt->parser.string_initial = TRUE;
           vt->parser.v.dcs.commandlen = 0;
           ENTER_STATE(DCS_COMMAND);
-          break;
-        case 0x98: // SOS
+          توڑو;
+        حالت 0x98: // SOS
           vt->parser.string_initial = TRUE;
           ENTER_STATE(SOS);
-          string_start = bytes + pos + 1;
+          string_آغاز = بائٹیں + pos + 1;
           string_len = 0;
-          break;
-        case 0x9b: // CSI
+          توڑو;
+        حالت 0x9b: // CSI
           vt->parser.v.csi.leaderlen = 0;
           ENTER_STATE(CSI_LEADER);
-          break;
-        case 0x9d: // OSC
+          توڑو;
+        حالت 0x9d: // OSC
           vt->parser.v.osc.command = -1;
           vt->parser.string_initial = TRUE;
-          string_start = bytes + pos + 1;
+          string_آغاز = بائٹیں + pos + 1;
           ENTER_STATE(OSC_COMMAND);
-          break;
-        case 0x9e: // PM
+          توڑو;
+        حالت 0x9e: // PM
           vt->parser.string_initial = TRUE;
           ENTER_STATE(PM);
-          string_start = bytes + pos + 1;
+          string_آغاز = بائٹیں + pos + 1;
           string_len = 0;
-          break;
-        case 0x9f: // APC
+          توڑو;
+        حالت 0x9f: // APC
           vt->parser.string_initial = TRUE;
           ENTER_STATE(APC);
-          string_start = bytes + pos + 1;
+          string_آغاز = بائٹیں + pos + 1;
           string_len = 0;
-          break;
-        default:
+          توڑو;
+        طےشدہ:
           do_control(vt, c);
-          break;
+          توڑو;
         }
       }
-      else {
+      ورنہ {
         size_t eaten = 0;
-        if(vt->parser.callbacks && vt->parser.callbacks->text)
-          eaten = (*vt->parser.callbacks->text)(bytes + pos, len - pos, vt->parser.cbdata);
+        اگر(vt->parser.callbacks && vt->parser.callbacks->متن)
+          eaten = (*vt->parser.callbacks->متن)(بائٹیں + pos, len - pos, vt->parser.cbdata);
 
-        if(!eaten) {
+        اگر(!eaten) {
           DEBUG_LOG("libvterm: Text callback did not consume any input\n");
           /* force it to make progress */
           eaten = 1;
@@ -390,32 +390,32 @@ string_state:
 
         pos += (eaten - 1); // we'll ++ it again in a moment
       }
-      break;
+      توڑو;
     }
   }
 
-  if(string_start) {
-    size_t string_len = bytes + pos - string_start;
-    if(vt->parser.in_esc)
+  اگر(string_آغاز) {
+    size_t string_len = بائٹیں + pos - string_آغاز;
+    اگر(vt->parser.اندر_esc)
       string_len -= 1;
-    string_fragment(vt, string_start, string_len, FALSE);
+    string_fragment(vt, string_آغاز, string_len, FALSE);
   }
 
-  return len;
+  واپس len;
 }
 
-void vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user)
+خالی vterm_parser_سیٹ_callbacks(VTerm *vt, ثابت VTermParserCallbacks *callbacks, خالی *user)
 {
   vt->parser.callbacks = callbacks;
   vt->parser.cbdata = user;
 }
 
-void *vterm_parser_get_cbdata(VTerm *vt)
+خالی *vterm_parser_get_cbdata(VTerm *vt)
 {
-  return vt->parser.cbdata;
+  واپس vt->parser.cbdata;
 }
 
-void vterm_parser_set_emit_nul(VTerm *vt, int emit)
+خالی vterm_parser_سیٹ_emit_nul(VTerm *vt, صحیح emit)
 {
   vt->parser.emit_nul = emit;
 }

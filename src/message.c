@@ -11,65 +11,65 @@
  * message.c: functions for displaying messages on the command line
  */
 
-#define MESSAGE_FILE		// don't include prototype for smsg()
+#تعریف_کرو پیغام_FILE		// don't include prototype for smsg()
 
-#include "vim.h"
+#شامل "vim.h"
 
-static void add_msg_hist(char_u *s, int len, int attr);
-static void check_msg_hist(void);
-static void hit_return_msg(void);
-static void msg_home_replace_attr(char_u *fname, int attr);
-static void msg_puts_attr_len(char *str, int maxlen, int attr);
-static void msg_puts_display(char_u *str, int maxlen, int attr, int recurse);
-static void msg_scroll_up(void);
-static void inc_msg_scrolled(void);
-static void store_sb_text(char_u **sb_str, char_u *s, int attr, int *sb_col, int finish);
-static void t_puts(int *t_col, char_u *t_s, char_u *s, int attr);
-static void msg_puts_printf(char_u *str, int maxlen);
-static int do_more_prompt(int typed_char);
-static void msg_screen_putchar(int c, int attr);
-static void msg_moremsg(int full);
-static int  msg_check_screen(void);
-static void redir_write(char_u *s, int maxlen);
-#ifdef FEAT_CON_DIALOG
-static char_u *msg_show_console_dialog(char_u *message, char_u *buttons, int dfltbutton);
-static int	confirm_msg_used = FALSE;	// displaying confirm_msg
-static char_u	*confirm_msg = NULL;		// ":confirm" message
-static char_u	*confirm_msg_tail;		// tail of confirm_msg
-static void display_confirm_msg(void);
-#endif
-#ifdef FEAT_EVAL
-static int emsg_to_channel_log = FALSE;
-#endif
+ساکن خالی جوڑو_پیغام_hist(char_u *s, صحیح len, صحیح attr);
+ساکن خالی check_پیغام_hist(خالی);
+ساکن خالی کامیابی_return_پیغام(خالی);
+ساکن خالی پیغام_home_replace_attr(char_u *fname, صحیح attr);
+ساکن خالی پیغام_puts_attr_len(حرف *str, صحیح maxlen, صحیح attr);
+ساکن خالی پیغام_puts_display(char_u *str, صحیح maxlen, صحیح attr, صحیح recurse);
+ساکن خالی پیغام_scroll_اوپر(خالی);
+ساکن خالی inc_پیغام_scrolled(خالی);
+ساکن خالی store_sb_متن(char_u **sb_str, char_u *s, صحیح attr, صحیح *sb_ستون, صحیح اختتام);
+ساکن خالی t_puts(صحیح *t_ستون, char_u *t_s, char_u *s, صحیح attr);
+ساکن خالی پیغام_puts_printf(char_u *str, صحیح maxlen);
+ساکن صحیح do_مزید_prompt(صحیح typed_char);
+ساکن خالی پیغام_screen_putchar(صحیح c, صحیح attr);
+ساکن خالی پیغام_moremsg(صحیح بھرا);
+ساکن صحیح  پیغام_check_screen(خالی);
+ساکن خالی redir_write(char_u *s, صحیح maxlen);
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+ساکن char_u *پیغام_show_console_dialog(char_u *پیغام_2, char_u *buttons, صحیح dfltbutton);
+ساکن صحیح	confirm_پیغام_مستعمل = FALSE;	// displaying confirm_msg
+ساکن char_u	*confirm_پیغام = تہی;		// ":confirm" message
+ساکن char_u	*confirm_پیغام_دم;		// tail of confirm_msg
+ساکن خالی display_confirm_پیغام(خالی);
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_EVAL
+ساکن صحیح emsg_مقصد_channel_log = FALSE;
+#اگر_ختم
 
-struct msg_hist
+ساخت پیغام_hist
 {
-    struct msg_hist	*next;
-    char_u		*msg;
-    int			attr;
+    ساخت پیغام_hist	*اگلا;
+    char_u		*پیغام;
+    صحیح			attr;
 };
 
-static struct msg_hist *first_msg_hist = NULL;
-static struct msg_hist *last_msg_hist = NULL;
-static int msg_hist_len = 0;
-static int msg_hist_max = 500;		// The default max value is 500
+ساکن ساخت پیغام_hist *پہلا_پیغام_hist = تہی;
+ساکن ساخت پیغام_hist *آخری_پیغام_hist = تہی;
+ساکن صحیح پیغام_hist_len = 0;
+ساکن صحیح پیغام_hist_max = 500;		// The default max value is 500
 
 // flags obtained from the 'messagesopt' option
-#define MESSAGES_HIT_ENTER	0x001
-#define MESSAGES_WAIT		0x002
-#define MESSAGES_HISTORY	0x004
+#تعریف_کرو MESSAGES_کامیابی_ENTER	0x001
+#تعریف_کرو MESSAGES_WAIT		0x002
+#تعریف_کرو MESSAGES_HISTORY	0x004
 
 // args in 'messagesopt' option
-#define MESSAGES_OPT_HIT_ENTER "hit-enter"
-#define MESSAGES_OPT_WAIT "wait:"
-#define MESSAGES_OPT_HISTORY "history:"
+#تعریف_کرو MESSAGES_OPT_کامیابی_ENTER "hit-enter"
+#تعریف_کرو MESSAGES_OPT_WAIT "wait:"
+#تعریف_کرو MESSAGES_OPT_HISTORY "history:"
 
 // The default is "hit-enter,history:500"
-static int msg_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
-static int msg_wait = 0;
+ساکن صحیح پیغام_flags = MESSAGES_کامیابی_ENTER | MESSAGES_HISTORY;
+ساکن صحیح پیغام_wait = 0;
 
-static FILE *verbose_fd = NULL;
-static int  verbose_did_open = FALSE;
+ساکن FILE *verbose_fd = تہی;
+ساکن صحیح  verbose_did_open = FALSE;
 
 /*
  * When writing messages to the screen, there are many different situations.
@@ -112,96 +112,96 @@ static int  verbose_did_open = FALSE;
  * When terminal not initialized (yet) mch_errmsg(..) is used.
  * return TRUE if wait_return() not called
  */
-    int
-msg(char *s)
+    صحیح
+پیغام(حرف *s)
 {
-    return msg_attr_keep(s, 0, FALSE);
+    واپس پیغام_attr_keep(s, 0, FALSE);
 }
 
 /*
  * Like msg() but keep it silent when 'verbosefile' is set.
  */
-    int
-verb_msg(char *s)
+    صحیح
+verb_پیغام(حرف *s)
 {
-    int		n;
+    صحیح		n;
 
     verbose_enter();
-    n = msg_attr_keep(s, 0, FALSE);
+    n = پیغام_attr_keep(s, 0, FALSE);
     verbose_leave();
 
-    return n;
+    واپس n;
 }
 
-    int
-msg_attr(char *s, int attr)
+    صحیح
+پیغام_attr(حرف *s, صحیح attr)
 {
-    return msg_attr_keep(s, attr, FALSE);
+    واپس پیغام_attr_keep(s, attr, FALSE);
 }
 
-    int
-msg_attr_keep(
-    char	*s,
-    int		attr,
-    int		keep)	    // TRUE: set keep_msg if it doesn't scroll
+    صحیح
+پیغام_attr_keep(
+    حرف	*s,
+    صحیح		attr,
+    صحیح		keep)	    // TRUE: set keep_msg if it doesn't scroll
 {
-    static int	entered = 0;
-    int		retval;
-    char_u	*buf = NULL;
+    ساکن صحیح	entered = 0;
+    صحیح		retval;
+    char_u	*buf = تہی;
 
     // Skip messages not matching ":filter pattern".
     // Don't filter when there is an error.
-    if (!emsg_on_display && message_filtered((char_u *)s))
-	return TRUE;
+    اگر (!emsg_on_display && پیغام_filtered((char_u *)s))
+	واپس TRUE;
 
-#ifdef FEAT_EVAL
-    if (attr == 0)
-	set_vim_var_string(VV_STATUSMSG, (char_u *)s, -1);
-#endif
+#اگر_تعریف_شدہ FEAT_EVAL
+    اگر (attr == 0)
+	سیٹ_vim_var_string(VV_STATUSMSG, (char_u *)s, -1);
+#اگر_ختم
 
     /*
      * It is possible that displaying a messages causes a problem (e.g.,
      * when redrawing the window), which causes another message, etc..	To
      * break this loop, limit the recursiveness to 3 levels.
      */
-    if (entered >= 3)
-	return TRUE;
+    اگر (entered >= 3)
+	واپس TRUE;
     ++entered;
 
     // Add message to history (unless it's a repeated kept message or a
     // truncated message)
-    if ((char_u *)s != keep_msg
+    اگر ((char_u *)s != keep_پیغام
 	    || (*s != '<'
-		&& last_msg_hist != NULL
-		&& last_msg_hist->msg != NULL
-		&& STRCMP(s, last_msg_hist->msg) != 0))
-	add_msg_hist((char_u *)s, -1, attr);
+		&& آخری_پیغام_hist != تہی
+		&& آخری_پیغام_hist->پیغام != تہی
+		&& STRCMP(s, آخری_پیغام_hist->پیغام) != 0))
+	جوڑو_پیغام_hist((char_u *)s, -1, attr);
 
-#ifdef FEAT_EVAL
-    if (emsg_to_channel_log)
+#اگر_تعریف_شدہ FEAT_EVAL
+    اگر (emsg_مقصد_channel_log)
 	// Write message in the channel log.
-	ch_log(NULL, "ERROR: %s", s);
-#endif
+	ch_log(تہی, "ERROR: %s", s);
+#اگر_ختم
 
     // Truncate the message if needed.
-    msg_start();
-    buf = msg_strtrunc((char_u *)s, FALSE);
-    if (buf != NULL)
-	s = (char *)buf;
+    پیغام_آغاز();
+    buf = پیغام_strtrunc((char_u *)s, FALSE);
+    اگر (buf != تہی)
+	s = (حرف *)buf;
 
-    msg_outtrans_attr((char_u *)s, attr);
-    msg_clr_eos();
-    retval = msg_end();
+    پیغام_outtrans_attr((char_u *)s, attr);
+    پیغام_clr_eos();
+    retval = پیغام_انتہا();
 
-    if (keep && retval && vim_strsize((char_u *)s)
-		    < (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	set_keep_msg((char_u *)s, 0);
+    اگر (keep && retval && vim_strsize((char_u *)s)
+		    < (صحیح)(صفیں - cmdline_صف - 1) * cmdline_چوڑائی + sc_ستون)
+	سیٹ_keep_پیغام((char_u *)s, 0);
 
     need_fileinfo = FALSE;
 
     vim_free(buf);
     --entered;
-    return retval;
+    واپس retval;
 }
 
 /*
@@ -209,164 +209,164 @@ msg_attr_keep(
  * Returns an allocated string or NULL when no truncating is done.
  */
     char_u *
-msg_strtrunc(
+پیغام_strtrunc(
     char_u	*s,
-    int		force)	    // always truncate
+    صحیح		force)	    // always truncate
 {
-    char_u	*buf = NULL;
-    int		len;
-    int		room;
+    char_u	*buf = تہی;
+    صحیح		len;
+    صحیح		گنجائش;
 
     // May truncate message to avoid a hit-return prompt
-    if ((!msg_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
-			       && !exmode_active && msg_silent == 0) || force)
+    اگر ((!پیغام_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
+			       && !exmode_فعال && پیغام_silent == 0) || force)
     {
 	len = vim_strsize(s);
-	if (msg_scrolled != 0
-#ifdef HAS_MESSAGE_WINDOW
-		|| in_echowindow
-#endif
+	اگر (پیغام_scrolled != 0
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+		|| اندر_echowindow
+#اگر_ختم
 		)
 	    // Use all the columns.
-	    room = (int)(Rows - msg_row) * cmdline_width - 1;
-	else
+	    گنجائش = (صحیح)(صفیں - پیغام_صف) * cmdline_چوڑائی - 1;
+	ورنہ
 	    // Use up to 'showcmd' column.
-	    room = (int)(Rows - msg_row - 1) * cmdline_width + sc_col - 1;
-	if (len > room && room > 0)
+	    گنجائش = (صحیح)(صفیں - پیغام_صف - 1) * cmdline_چوڑائی + sc_ستون - 1;
+	اگر (len > گنجائش && گنجائش > 0)
 	{
-	    if (enc_utf8)
+	    اگر (enc_utf8)
 		// may have up to 18 bytes per cell (6 per char, up to two
 		// composing chars)
-		len = (room + 2) * 18;
-	    else if (enc_dbcs == DBCS_JPNU)
+		len = (گنجائش + 2) * 18;
+	    ورنہ اگر (enc_dbcs == DBCS_JPNU)
 		// may have up to 2 bytes per cell for euc-jp
-		len = (room + 2) * 2;
-	    else
-		len = room + 2;
+		len = (گنجائش + 2) * 2;
+	    ورنہ
+		len = گنجائش + 2;
 	    buf = alloc(len);
-	    if (buf != NULL)
-		trunc_string(s, buf, room, len);
+	    اگر (buf != تہی)
+		trunc_string(s, buf, گنجائش, len);
 	}
     }
-    return buf;
+    واپس buf;
 }
 
 /*
  * Truncate a string "s" to "buf" with cell width "room".
  * "s" and "buf" may be equal.
  */
-    void
+    خالی
 trunc_string(
     char_u	*s,
     char_u	*buf,
-    int		room_in,
-    int		buflen)
+    صحیح		گنجائش_اندر,
+    صحیح		buflen)
 {
-    size_t	room = room_in - 3; // "..." takes 3 chars
+    size_t	گنجائش = گنجائش_اندر - 3; // "..." takes 3 chars
     size_t	half;
     size_t	len = 0;
-    int		e;
-    int		i;
-    int		n;
+    صحیح		e;
+    صحیح		i;
+    صحیح		n;
 
-    if (*s == NUL)
+    اگر (*s == NUL)
     {
-	if (buflen > 0)
+	اگر (buflen > 0)
 	    *buf = NUL;
-	return;
+	واپس;
     }
 
-    if (room_in < 3)
-	room = 0;
-    half = room / 2;
+    اگر (گنجائش_اندر < 3)
+	گنجائش = 0;
+    half = گنجائش / 2;
 
     // First part: Start of the string.
-    for (e = 0; len < half && e < buflen; ++e)
+    برائے (e = 0; len < half && e < buflen; ++e)
     {
-	if (s[e] == NUL)
+	اگر (s[e] == NUL)
 	{
 	    // text fits without truncating!
 	    buf[e] = NUL;
-	    return;
+	    واپس;
 	}
 	n = ptr2cells(s + e);
-	if (len + n > half)
-	    break;
+	اگر (len + n > half)
+	    توڑو;
 	len += n;
 	buf[e] = s[e];
-	if (has_mbyte)
-	    for (n = (*mb_ptr2len)(s + e); --n > 0; )
+	اگر (has_mbyte)
+	    برائے (n = (*mb_ptr2len)(s + e); --n > 0; )
 	    {
-		if (++e == buflen)
-		    break;
+		اگر (++e == buflen)
+		    توڑو;
 		buf[e] = s[e];
 	    }
     }
 
     // Last part: End of the string.
     i = e;
-    if (enc_dbcs != 0)
+    اگر (enc_dbcs != 0)
     {
 	// For DBCS going backwards in a string is slow, but
 	// computing the cell width isn't too slow: go forward
 	// until the rest fits.
 	n = vim_strsize(s + i);
-	while (len + n > room)
+	جب (len + n > گنجائش)
 	{
 	    n -= ptr2cells(s + i);
 	    i += (*mb_ptr2len)(s + i);
 	}
     }
-    else if (enc_utf8)
+    ورنہ اگر (enc_utf8)
     {
 	// For UTF-8 we can go backwards easily.
-	half = i = (int)STRLEN(s);
-	for (;;)
+	half = i = (صحیح)STRLEN(s);
+	برائے (;;)
 	{
-	    do
-		half = half - utf_head_off(s, s + half - 1) - 1;
-	    while (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
+	    کرو
+		half = half - utf_سر_off(s, s + half - 1) - 1;
+	    جب (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
 	    n = ptr2cells(s + half);
-	    if (len + n > room || half == 0)
-		break;
+	    اگر (len + n > گنجائش || half == 0)
+		توڑو;
 	    len += n;
-	    i = (int)half;
+	    i = (صحیح)half;
 	}
     }
-    else
+    ورنہ
     {
-	for (i = (int)STRLEN(s);
-		   i - 1 >= 0 && len + (n = ptr2cells(s + i - 1)) <= room; --i)
+	برائے (i = (صحیح)STRLEN(s);
+		   i - 1 >= 0 && len + (n = ptr2cells(s + i - 1)) <= گنجائش; --i)
 	    len += n;
     }
 
 
-    if (i <= e + 3)
+    اگر (i <= e + 3)
     {
 	// text fits without truncating
-	if (s != buf)
+	اگر (s != buf)
 	{
 	    len = STRLEN(s);
-	    if (len >= (size_t)buflen)
+	    اگر (len >= (size_t)buflen)
 		len = buflen - 1;
 	    len = len - e + 1;
-	    if (len < 1)
+	    اگر (len < 1)
 		buf[e - 1] = NUL;
-	    else
+	    ورنہ
 		mch_memmove(buf + e, s + e, len);
 	}
     }
-    else if (e + 3 < buflen)
+    ورنہ اگر (e + 3 < buflen)
     {
 	// set the middle and copy the last part
 	mch_memmove(buf + e, "...", (size_t)3);
 	len = STRLEN(s + i) + 1;
-	if (len >= (size_t)buflen - e - 3)
+	اگر (len >= (size_t)buflen - e - 3)
 	    len = buflen - e - 3 - 1;
 	mch_memmove(buf + e + 3, s + i, len);
 	buf[e + 3 + len - 1] = NUL;
     }
-    else
+    ورنہ
     {
 	// can't fit in the "...", just truncate it
 	buf[buflen - 1] = NUL;
@@ -378,97 +378,97 @@ trunc_string(
  * Note: Caller of smsg() and smsg_attr() must check the resulting string is
  * shorter than IOSIZE!!!
  */
-#ifndef PROTO
+#اگر_غیر_تعریف_شدہ PROTO
 
-int vim_snprintf(char *str, size_t str_m, const char *fmt, ...);
+صحیح vim_snprintf(حرف *str, size_t str_m, ثابت حرف *fmt, ...);
 
-    int
-smsg(const char *s, ...)
+    صحیح
+smsg(ثابت حرف *s, ...)
 {
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg((char *)s);
+	واپس پیغام((حرف *)s);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((حرف *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg((char *)IObuff);
+    واپس پیغام((حرف *)IObuff);
 }
 
-    int
-smsg_attr(int attr, const char *s, ...)
+    صحیح
+smsg_attr(صحیح attr, ثابت حرف *s, ...)
 {
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr((char *)s, attr);
+	واپس پیغام_attr((حرف *)s, attr);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((حرف *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr((char *)IObuff, attr);
+    واپس پیغام_attr((حرف *)IObuff, attr);
 }
 
-    int
-smsg_attr_keep(int attr, const char *s, ...)
+    صحیح
+smsg_attr_keep(صحیح attr, ثابت حرف *s, ...)
 {
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr_keep((char *)s, attr, TRUE);
+	واپس پیغام_attr_keep((حرف *)s, attr, TRUE);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((حرف *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr_keep((char *)IObuff, attr, TRUE);
+    واپس پیغام_attr_keep((حرف *)IObuff, attr, TRUE);
 }
 
-#endif
+#اگر_ختم
 
 /*
  * Remember the last sourcing name/lnum used in an error message, so that it
  * isn't printed each time when it didn't change.
  */
-static int	last_sourcing_lnum = 0;
-static char_u   *last_sourcing_name = NULL;
+ساکن صحیح	آخری_sourcing_lnum = 0;
+ساکن char_u   *آخری_sourcing_name = تہی;
 
 /*
  * Reset the last used sourcing name/lnum.  Makes sure it is displayed again
  * for the next error message;
  */
-    void
-reset_last_sourcing(void)
+    خالی
+reset_آخری_sourcing(خالی)
 {
-    VIM_CLEAR(last_sourcing_name);
-    last_sourcing_lnum = 0;
+    VIM_CLEAR(آخری_sourcing_name);
+    آخری_sourcing_lnum = 0;
 }
 
 /*
  * Return TRUE if "SOURCING_NAME" differs from "last_sourcing_name".
  */
-    static int
-other_sourcing_name(void)
+    ساکن صحیح
+other_sourcing_name(خالی)
 {
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL)
+    اگر (HAVE_SOURCING_INFO && SOURCING_NAME != تہی)
     {
-	if (last_sourcing_name != NULL)
-	    return STRCMP(SOURCING_NAME, last_sourcing_name) != 0;
-	return TRUE;
+	اگر (آخری_sourcing_name != تہی)
+	    واپس STRCMP(SOURCING_NAME, آخری_sourcing_name) != 0;
+	واپس TRUE;
     }
-    return FALSE;
+    واپس FALSE;
 }
 
 /*
@@ -476,32 +476,32 @@ other_sourcing_name(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_source(void)
+    ساکن char_u *
+get_emsg_ماخذ(خالی)
 {
     char_u	*Buf, *p;
 
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL && other_sourcing_name())
+    اگر (HAVE_SOURCING_INFO && SOURCING_NAME != تہی && other_sourcing_name())
     {
 	char_u	    *sname = estack_sfile(ESTACK_NONE);
 	char_u	    *tofree = sname;
 
-	if (sname == NULL)
+	اگر (sname == تہی)
 	    sname = SOURCING_NAME;
 
-#ifdef FEAT_EVAL
-	if (estack_compiling)
+#اگر_تعریف_شدہ FEAT_EVAL
+	اگر (estack_compiling)
 	    p = (char_u *)_("Error detected while compiling %s:");
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	    p = (char_u *)_("Error detected while processing %s:");
 	Buf = alloc(STRLEN(sname) + STRLEN(p));
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, sname);
+	اگر (Buf != تہی)
+	    sprintf((حرف *)Buf, (حرف *)p, sname);
 	vim_free(tofree);
-	return Buf;
+	واپس Buf;
     }
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -509,24 +509,24 @@ get_emsg_source(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_lnum(void)
+    ساکن char_u *
+get_emsg_lnum(خالی)
 {
     char_u	*Buf, *p;
 
     // lnum is 0 when executing a command from the command line
     // argument, we don't want a line number then
-    if (SOURCING_NAME != NULL
-	    && (other_sourcing_name() || SOURCING_LNUM != last_sourcing_lnum)
+    اگر (SOURCING_NAME != تہی
+	    && (other_sourcing_name() || SOURCING_LNUM != آخری_sourcing_lnum)
 	    && SOURCING_LNUM != 0)
     {
 	p = (char_u *)_("line %4ld:");
 	Buf = alloc(STRLEN(p) + 20);
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, (long)SOURCING_LNUM);
-	return Buf;
+	اگر (Buf != تہی)
+	    sprintf((حرف *)Buf, (حرف *)p, (طویل)SOURCING_LNUM);
+	واپس Buf;
     }
-    return NULL;
+    واپس تہی;
 }
 
 /*
@@ -534,39 +534,39 @@ get_emsg_lnum(void)
  * Remember the file name and line number, so that for the next error the info
  * is only displayed if it changed.
  */
-    void
-msg_source(int attr)
+    خالی
+پیغام_ماخذ(صحیح attr)
 {
     char_u	*p;
-    static int	recursive = FALSE;
+    ساکن صحیح	recursive = FALSE;
 
     // Bail out if something called here causes an error.
-    if (recursive)
-	return;
+    اگر (recursive)
+	واپس;
     recursive = TRUE;
 
     ++no_wait_return;
-    p = get_emsg_source();
-    if (p != NULL)
+    p = get_emsg_ماخذ();
+    اگر (p != تہی)
     {
-	msg_scroll = TRUE;  // this will take more than one line
-	msg_attr((char *)p, attr);
+	پیغام_scroll = TRUE;  // this will take more than one line
+	پیغام_attr((حرف *)p, attr);
 	vim_free(p);
     }
     p = get_emsg_lnum();
-    if (p != NULL)
+    اگر (p != تہی)
     {
-	msg_attr((char *)p, HL_ATTR(HLF_N));
+	پیغام_attr((حرف *)p, HL_ATTR(HLF_N));
 	vim_free(p);
-	last_sourcing_lnum = SOURCING_LNUM;  // only once for each line
+	آخری_sourcing_lnum = SOURCING_LNUM;  // only once for each line
     }
 
     // remember the last sourcing name printed, also when it's empty
-    if (SOURCING_NAME == NULL || other_sourcing_name())
+    اگر (SOURCING_NAME == تہی || other_sourcing_name())
     {
-	VIM_CLEAR(last_sourcing_name);
-	if (SOURCING_NAME != NULL)
-	    last_sourcing_name = vim_strsave(SOURCING_NAME);
+	VIM_CLEAR(آخری_sourcing_name);
+	اگر (SOURCING_NAME != تہی)
+	    آخری_sourcing_name = vim_strsave(SOURCING_NAME);
     }
     --no_wait_return;
 
@@ -579,61 +579,61 @@ msg_source(int attr)
  * If "msg" is in 'debug': do error message but without side effects.
  * If "emsg_skip" is set: never do error messages.
  */
-    static int
-emsg_not_now(void)
+    ساکن صحیح
+emsg_not_now(خالی)
 {
-    if ((emsg_off > 0 && vim_strchr(p_debug, 'm') == NULL
-					  && vim_strchr(p_debug, 't') == NULL)
-#ifdef FEAT_EVAL
+    اگر ((emsg_off > 0 && vim_strchr(p_debug, 'm') == تہی
+					  && vim_strchr(p_debug, 't') == تہی)
+#اگر_تعریف_شدہ FEAT_EVAL
 	    || emsg_skip > 0
-#endif
+#اگر_ختم
 	    )
-	return TRUE;
-    return FALSE;
+	واپس TRUE;
+    واپس FALSE;
 }
 
-#if defined(FEAT_EVAL)
-static garray_T ignore_error_list = GA_EMPTY;
+#اگر defined(FEAT_EVAL)
+ساکن garray_T ignore_error_list = GA_خالی_خانے;
 
-    void
+    خالی
 ignore_error_for_testing(char_u *error)
 {
-    if (ignore_error_list.ga_itemsize == 0)
-	ga_init2(&ignore_error_list, sizeof(char_u *), 1);
+    اگر (ignore_error_list.ga_itemsize == 0)
+	ga_init2(&ignore_error_list, حجم(char_u *), 1);
 
-    if (STRCMP("RESET", error) == 0)
-	ga_clear_strings(&ignore_error_list);
-    else
+    اگر (STRCMP("RESET", error) == 0)
+	ga_clear_لڑیاں(&ignore_error_list);
+    ورنہ
 	ga_copy_string(&ignore_error_list, error);
 }
 
-    static int
-ignore_error(const char *msg)
+    ساکن صحیح
+ignore_error(ثابت حرف *پیغام)
 {
-    int i;
+    صحیح i;
 
-    for (i = 0; i < ignore_error_list.ga_len; ++i)
-	if (strstr(msg,
-		  (char *)((char_u **)(ignore_error_list.ga_data))[i]) != NULL)
-	    return TRUE;
-    return FALSE;
+    برائے (i = 0; i < ignore_error_list.ga_len; ++i)
+	اگر (لڑی_تلاش(پیغام,
+		  (حرف *)((char_u **)(ignore_error_list.ga_ڈیٹا))[i]) != تہی)
+	    واپس TRUE;
+    واپس FALSE;
 }
-#endif
+#اگر_ختم
 
-#if !defined(HAVE_STRERROR)
+#اگر !defined(HAVE_STRERROR)
 /*
  * Replacement for perror() that behaves more or less like emsg() was called.
  * v:errmsg will be set and called_emsg will be incremented.
  */
-    void
-do_perror(char *msg)
+    خالی
+do_perror(حرف *پیغام)
 {
-    perror(msg);
+    perror(پیغام);
     ++emsg_silent;
-    emsg(msg);
+    emsg(پیغام);
     --emsg_silent;
 }
-#endif
+#اگر_ختم
 
 /*
  * emsg_core() - display an error message
@@ -644,36 +644,36 @@ do_perror(char *msg)
  * Return TRUE if wait_return() not called.
  * Note: caller must check 'emsg_not_now()' before calling this.
  */
-    static int
-emsg_core(const char *s)
+    ساکن صحیح
+emsg_core(ثابت حرف *s)
 {
-    int		attr;
+    صحیح		attr;
     char_u	*p;
-    int		r;
-#ifdef FEAT_EVAL
-    int		ignore = FALSE;
-    int		severe;
-#endif
+    صحیح		r;
+#اگر_تعریف_شدہ FEAT_EVAL
+    صحیح		ignore = FALSE;
+    صحیح		severe;
+#اگر_ختم
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     // When testing some errors are turned into a normal message.
-    if (ignore_error(s))
+    اگر (ignore_error(s))
 	// don't call msg() if it results in a dialog
-	return msg_use_printf() ? FALSE : msg((char *)s);
-#endif
+	واپس پیغام_use_printf() ? FALSE : پیغام((حرف *)s);
+#اگر_ختم
 
     ++called_emsg;
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     // If "emsg_severe" is TRUE: When an error exception is to be thrown,
     // prefer this message over previous messages for the same command.
     severe = emsg_severe;
     emsg_severe = FALSE;
-#endif
+#اگر_ختم
 
-    if (!emsg_off || vim_strchr(p_debug, 't') != NULL)
+    اگر (!emsg_off || vim_strchr(p_debug, 't') != تہی)
     {
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 	/*
 	 * Cause a throw of an error exception if appropriate.  Don't display
 	 * the error message in this case.  (If no matching catch clause will
@@ -681,47 +681,47 @@ emsg_core(const char *s)
 	 * when the message should be ignored completely (used for the
 	 * interrupt message).
 	 */
-	if (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
+	اگر (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
 	{
-	    if (!ignore)
+	    اگر (!ignore)
 		++did_emsg;
-	    return TRUE;
+	    واپس TRUE;
 	}
 
-	if (in_assert_fails && emsg_assert_fails_msg == NULL)
+	اگر (اندر_assert_fails && emsg_assert_fails_پیغام == تہی)
 	{
-	    emsg_assert_fails_msg = vim_strsave((char_u *)s);
+	    emsg_assert_fails_پیغام = vim_strsave((char_u *)s);
 	    emsg_assert_fails_lnum = SOURCING_LNUM;
 	    vim_free(emsg_assert_fails_context);
 	    emsg_assert_fails_context = vim_strsave(
-			 SOURCING_NAME == NULL ? (char_u *)"" : SOURCING_NAME);
+			 SOURCING_NAME == تہی ? (char_u *)"" : SOURCING_NAME);
 	}
 
 	// set "v:errmsg", also when using ":silent! cmd"
-	set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-#endif
+	سیٹ_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
+#اگر_ختم
 
 	/*
 	 * When using ":silent! cmd" ignore error messages.
 	 * But do write it to the redirection file.
 	 */
-	if (emsg_silent != 0)
+	اگر (emsg_silent != 0)
 	{
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 	    ++did_emsg_silent;
-#endif
-	    if (emsg_noredir == 0)
+#اگر_ختم
+	    اگر (emsg_noredir == 0)
 	    {
-		msg_start();
-		p = get_emsg_source();
-		if (p != NULL)
+		پیغام_آغاز();
+		p = get_emsg_ماخذ();
+		اگر (p != تہی)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
 		    vim_free(p);
 		}
 		p = get_emsg_lnum();
-		if (p != NULL)
+		اگر (p != تہی)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
@@ -729,226 +729,226 @@ emsg_core(const char *s)
 		}
 		redir_write((char_u *)s, -1);
 	    }
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 	    // Only increment did_emsg_def when :silent! wasn't used inside the
 	    // :def function.
-	    if (emsg_silent == emsg_silent_def)
+	    اگر (emsg_silent == emsg_silent_def)
 		++did_emsg_def;
-#endif
-#ifdef FEAT_EVAL
-	    ch_log(NULL, "ERROR silent: %s", s);
-#endif
-	    return TRUE;
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_EVAL
+	    ch_log(تہی, "ERROR silent: %s", s);
+#اگر_ختم
+	    واپس TRUE;
 	}
 
 	ex_exitval = 1;
 
 	// Reset msg_silent, an error causes messages to be switched back on.
-	msg_silent = 0;
+	پیغام_silent = 0;
 	cmd_silent = FALSE;
 
-	if (global_busy)		// break :global command
+	اگر (global_busy)		// break :global command
 	    ++global_busy;
 
-	if (p_eb)
+	اگر (p_eb)
 	    beep_flush();		// also includes flush_buffers()
-	else
-	    flush_buffers(FLUSH_MINIMAL);  // flush internal buffers
+	ورنہ
+	    flush_buffers(FLUSH_اقل);  // flush internal buffers
 	++did_emsg;			   // flag for DoOneCmd()
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 	++uncaught_emsg;
-#endif
+#اگر_ختم
     }
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (!in_echowindow)
-#endif
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (!اندر_echowindow)
+#اگر_ختم
 	emsg_on_display = TRUE;	    // remember there is an error message
 
     attr = HL_ATTR(HLF_E);	    // set highlight mode for error messages
-    if (msg_scrolled != 0)
+    اگر (پیغام_scrolled != 0)
 	need_wait_return = TRUE;    // needed in case emsg() is called after
 				    // wait_return() has reset need_wait_return
 				    // and a redraw is expected because
 				    // msg_scrolled is non-zero
 
-#ifdef FEAT_JOB_CHANNEL
-    emsg_to_channel_log = TRUE;
-#endif
+#اگر_تعریف_شدہ FEAT_کام_CHANNEL
+    emsg_مقصد_channel_log = TRUE;
+#اگر_ختم
     /*
      * Display name and line number for the source of the error.
      */
-    msg_scroll = TRUE;
-    msg_source(attr);
+    پیغام_scroll = TRUE;
+    پیغام_ماخذ(attr);
 
     /*
      * Display the error message itself.
      */
-    msg_nowait = FALSE;			// wait for this msg
-    r = msg_attr((char *)s, attr);
+    پیغام_nowait = FALSE;			// wait for this msg
+    r = پیغام_attr((حرف *)s, attr);
 
-#ifdef FEAT_JOB_CHANNEL
-    emsg_to_channel_log = FALSE;
-#endif
-    return r;
+#اگر_تعریف_شدہ FEAT_کام_CHANNEL
+    emsg_مقصد_channel_log = FALSE;
+#اگر_ختم
+    واپس r;
 }
 
 /*
  * Print error message "s".  Should already be translated.
  * Return TRUE if wait_return() not called.
  */
-    int
-emsg(char *s)
+    صحیح
+emsg(حرف *s)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    اگر (emsg_not_now())
+	واپس TRUE;
 
-    return emsg_core(s);
+    واپس emsg_core(s);
 }
 
-#ifndef PROTO  // manual proto with __attribute__
+#اگر_غیر_تعریف_شدہ PROTO  // manual proto with __attribute__
 /*
  * Print error message "s" with format string and variable arguments.
  * "s" should already be translated.
  * Note: caller must not use "IObuff" for "s"!
  * Return TRUE if wait_return() not called.
  */
-    int
-semsg(const char *s, ...)
+    صحیح
+semsg(ثابت حرف *s, ...)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    اگر (emsg_not_now())
+	واپس TRUE;
 
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return emsg_core(s);
+	واپس emsg_core(s);
 
     va_list ap;
 
     va_start(ap, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+    vim_vsnprintf((حرف *)IObuff, IOSIZE, s, ap);
     va_end(ap);
-    return emsg_core((char *)IObuff);
+    واپس emsg_core((حرف *)IObuff);
 }
-#endif
+#اگر_ختم
 
 /*
  * Same as emsg(...), but abort on error when ABORT_ON_INTERNAL_ERROR is
  * defined. It is used for internal errors only, so that they can be
  * detected when fuzzing vim.
  */
-    void
-iemsg(char *s)
+    خالی
+iemsg(حرف *s)
 {
-    if (emsg_not_now())
-	return;
+    اگر (emsg_not_now())
+	واپس;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_اندرونی_error_please_report_a_bug));
 
     emsg_core(s);
-#if defined(ABORT_ON_INTERNAL_ERROR) && defined(FEAT_EVAL)
-    set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-    msg_putchar('\n');  // avoid overwriting the error message
-    out_flush();
+#اگر defined(ABORT_ON_اندرونی_ERROR) && defined(FEAT_EVAL)
+    سیٹ_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
+    پیغام_putchar('\n');  // avoid overwriting the error message
+    برآمد_flush();
     abort();
-#endif
+#اگر_ختم
 }
 
-#ifndef PROTO  // manual proto with __attribute__
+#اگر_غیر_تعریف_شدہ PROTO  // manual proto with __attribute__
 /*
  * Same as semsg(...) but abort on error when ABORT_ON_INTERNAL_ERROR is
  * defined. It is used for internal errors only, so that they can be
  * detected when fuzzing vim.
  * Note: caller must not pass 'IObuff' as 1st argument.
  */
-    void
-siemsg(const char *s, ...)
+    خالی
+siemsg(ثابت حرف *s, ...)
 {
-    if (emsg_not_now())
-	return;
+    اگر (emsg_not_now())
+	واپس;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_اندرونی_error_please_report_a_bug));
 
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
 	emsg_core(s);
     }
-    else
+    ورنہ
     {
 	va_list ap;
 
 	va_start(ap, s);
-	vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+	vim_vsnprintf((حرف *)IObuff, IOSIZE, s, ap);
 	va_end(ap);
-	emsg_core((char *)IObuff);
+	emsg_core((حرف *)IObuff);
     }
-# ifdef ABORT_ON_INTERNAL_ERROR
-    msg_putchar('\n');  // avoid overwriting the error message
-    out_flush();
+# ifdef ABORT_ON_اندرونی_ERROR
+    پیغام_putchar('\n');  // avoid overwriting the error message
+    برآمد_flush();
     abort();
 # endif
 }
-#endif
+#اگر_ختم
 
 /*
  * Give an "Internal error" message.
  */
-    void
-internal_error(char *where)
+    خالی
+اندرونی_error(حرف *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_اندرونی_error_please_report_a_bug));
 
-    siemsg(_(e_internal_error_str), where);
+    siemsg(_(e_اندرونی_error_str), where);
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Like internal_error() but do not call abort(), to avoid tests using
  * test_unknown() and test_void() causing Vim to exit.
  */
-    void
-internal_error_no_abort(char *where)
+    خالی
+اندرونی_error_no_abort(حرف *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
-    emsg_core(_(e_internal_error_please_report_a_bug));
+    emsg_core(_(e_اندرونی_error_please_report_a_bug));
 
-    semsg(_(e_internal_error_str), where);
+    semsg(_(e_اندرونی_error_str), where);
 }
-#endif
+#اگر_ختم
 
 // emsg3() and emsgn() are in misc2.c to avoid warnings for the prototypes.
 
-    void
-emsg_invreg(int name)
+    خالی
+emsg_invreg(صحیح name)
 {
-    semsg(_(e_invalid_register_name_str), transchar_buf(NULL, name));
+    semsg(_(e_invalid_رجسٹر_name_str), transchar_buf(تہی, name));
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Give an error message which contains %s for "name[len]".
  */
-    void
-emsg_namelen(char *msg, char_u *name, int len)
+    خالی
+emsg_namelen(حرف *پیغام, char_u *name, صحیح len)
 {
     char_u *copy = vim_strnsave(name, len);
 
-    semsg(msg, copy == NULL ? "NULL" : (char *)copy);
+    semsg(پیغام, copy == تہی ? "NULL" : (حرف *)copy);
     vim_free(copy);
 }
-#endif
+#اگر_ختم
 
 /*
  * Like msg(), but truncate to a single line if p_shm contains 't', or when
@@ -956,24 +956,24 @@ emsg_namelen(char *msg, char_u *name, int len)
  * Careful: The string may be changed by msg_may_trunc()!
  * Returns a pointer to the printed message, if wait_return() not called.
  */
-    char *
-msg_trunc_attr(char *s, int force, int attr)
+    حرف *
+پیغام_trunc_attr(حرف *s, صحیح force, صحیح attr)
 {
-    int		n;
-    char	*ts;
+    صحیح		n;
+    حرف	*ts;
 
     // Add message to history before truncating
-    add_msg_hist((char_u *)s, -1, attr);
+    جوڑو_پیغام_hist((char_u *)s, -1, attr);
 
-    ts = (char *)msg_may_trunc(force, (char_u *)s);
+    ts = (حرف *)پیغام_may_trunc(force, (char_u *)s);
 
-    msg_hist_off = TRUE;
-    n = msg_attr(ts, attr);
-    msg_hist_off = FALSE;
+    پیغام_hist_off = TRUE;
+    n = پیغام_attr(ts, attr);
+    پیغام_hist_off = FALSE;
 
-    if (n)
-	return ts;
-    return NULL;
+    اگر (n)
+	واپس ts;
+    واپس تہی;
 }
 
 /*
@@ -982,28 +982,28 @@ msg_trunc_attr(char *s, int force, int attr)
  * Note: May change the message by replacing a character with '<'.
  */
     char_u *
-msg_may_trunc(int force, char_u *s)
+پیغام_may_trunc(صحیح force, char_u *s)
 {
-    int		n;
-    int		room;
+    صحیح		n;
+    صحیح		گنجائش;
 
     // If 'cmdheight' is zero or something unexpected happened "room" may be
     // negative.
-    room = (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col - 1;
-    if (room > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_active))
-	    && (n = (int)STRLEN(s) - room) > 0)
+    گنجائش = (صحیح)(صفیں - cmdline_صف - 1) * cmdline_چوڑائی + sc_ستون - 1;
+    اگر (گنجائش > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_فعال))
+	    && (n = (صحیح)STRLEN(s) - گنجائش) > 0)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
-	    int	size = vim_strsize(s);
+	    صحیح	سائز = vim_strsize(s);
 
 	    // There may be room anyway when there are multibyte chars.
-	    if (size <= room)
-		return s;
+	    اگر (سائز <= گنجائش)
+		واپس s;
 
-	    for (n = 0; size >= room; )
+	    برائے (n = 0; سائز >= گنجائش; )
 	    {
-		size -= (*mb_ptr2cells)(s + n);
+		سائز -= (*mb_ptr2cells)(s + n);
 		n += (*mb_ptr2len)(s + n);
 	    }
 	    --n;
@@ -1011,96 +1011,96 @@ msg_may_trunc(int force, char_u *s)
 	s += n;
 	*s = '<';
     }
-    return s;
+    واپس s;
 }
 
-    static void
-add_msg_hist(
+    ساکن خالی
+جوڑو_پیغام_hist(
     char_u	*s,
-    int		len,		// -1 for undetermined length
-    int		attr)
+    صحیح		len,		// -1 for undetermined length
+    صحیح		attr)
 {
-    struct msg_hist *p;
+    ساخت پیغام_hist *p;
 
-    if (msg_hist_off || msg_silent != 0)
-	return;
+    اگر (پیغام_hist_off || پیغام_silent != 0)
+	واپس;
 
     // allocate an entry and add the message at the end of the history
-    p = ALLOC_ONE(struct msg_hist);
-    if (p == NULL)
-	return;
+    p = ALLOC_ONE(ساخت پیغام_hist);
+    اگر (p == تہی)
+	واپس;
 
-    if (len < 0)
-	len = (int)STRLEN(s);
+    اگر (len < 0)
+	len = (صحیح)STRLEN(s);
     // remove leading and trailing newlines
-    while (len > 0 && *s == '\n')
+    جب (len > 0 && *s == '\n')
     {
 	++s;
 	--len;
     }
-    while (len > 0 && s[len - 1] == '\n')
+    جب (len > 0 && s[len - 1] == '\n')
 	--len;
-    p->msg = vim_strnsave(s, len);
-    p->next = NULL;
+    p->پیغام = vim_strnsave(s, len);
+    p->اگلا = تہی;
     p->attr = attr;
-    if (last_msg_hist != NULL)
-	last_msg_hist->next = p;
-    last_msg_hist = p;
-    if (first_msg_hist == NULL)
-	first_msg_hist = last_msg_hist;
-    ++msg_hist_len;
+    اگر (آخری_پیغام_hist != تہی)
+	آخری_پیغام_hist->اگلا = p;
+    آخری_پیغام_hist = p;
+    اگر (پہلا_پیغام_hist == تہی)
+	پہلا_پیغام_hist = آخری_پیغام_hist;
+    ++پیغام_hist_len;
 
-    check_msg_hist();
+    check_پیغام_hist();
 }
 
 /*
  * Delete the first (oldest) message from the history.
  * Returns FAIL if there are no messages.
  */
-    int
-delete_first_msg(void)
+    صحیح
+delete_پہلا_پیغام(خالی)
 {
-    struct msg_hist *p;
+    ساخت پیغام_hist *p;
 
-    if (msg_hist_len <= 0)
-	return FAIL;
-    p = first_msg_hist;
-    first_msg_hist = p->next;
-    if (first_msg_hist == NULL)
-	last_msg_hist = NULL;  // history is empty
-    vim_free(p->msg);
+    اگر (پیغام_hist_len <= 0)
+	واپس FAIL;
+    p = پہلا_پیغام_hist;
+    پہلا_پیغام_hist = p->اگلا;
+    اگر (پہلا_پیغام_hist == تہی)
+	آخری_پیغام_hist = تہی;  // history is empty
+    vim_free(p->پیغام);
     vim_free(p);
-    --msg_hist_len;
-    return OK;
+    --پیغام_hist_len;
+    واپس OK;
 }
 
-    static void
-check_msg_hist(void)
+    ساکن خالی
+check_پیغام_hist(خالی)
 {
     // Don't let the message history get too big
-    while (msg_hist_len > 0 && msg_hist_len > msg_hist_max)
-	(void)delete_first_msg();
+    جب (پیغام_hist_len > 0 && پیغام_hist_len > پیغام_hist_max)
+	(خالی)delete_پہلا_پیغام();
 }
 
 
-    int
-messagesopt_changed(void)
+    صحیح
+messagesopt_بدلا(خالی)
 {
     char_u	*p;
-    int		messages_flags_new = 0;
-    int		messages_wait_new = 0;
-    int		messages_history_new = 0;
+    صحیح		messages_flags_new = 0;
+    صحیح		messages_wait_new = 0;
+    صحیح		messages_history_new = 0;
 
     p = p_mopt;
-    while (*p != NUL)
+    جب (*p != NUL)
     {
-	if (STRNCMP(p, MESSAGES_OPT_HIT_ENTER,
-	     STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER)) == 0)
+	اگر (STRNCMP(p, MESSAGES_OPT_کامیابی_ENTER,
+	     STRLEN_LITERAL(MESSAGES_OPT_کامیابی_ENTER)) == 0)
 	{
-	    p += STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER);
-	    messages_flags_new |= MESSAGES_HIT_ENTER;
+	    p += STRLEN_LITERAL(MESSAGES_OPT_کامیابی_ENTER);
+	    messages_flags_new |= MESSAGES_کامیابی_ENTER;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_WAIT,
+	ورنہ اگر (STRNCMP(p, MESSAGES_OPT_WAIT,
 		  STRLEN_LITERAL(MESSAGES_OPT_WAIT)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_WAIT)]))
 	{
@@ -1108,7 +1108,7 @@ messagesopt_changed(void)
 	    messages_wait_new = getdigits(&p);
 	    messages_flags_new |= MESSAGES_WAIT;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_HISTORY,
+	ورنہ اگر (STRNCMP(p, MESSAGES_OPT_HISTORY,
 		  STRLEN_LITERAL(MESSAGES_OPT_HISTORY)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_HISTORY)]))
 	{
@@ -1117,87 +1117,87 @@ messagesopt_changed(void)
 	    messages_flags_new |= MESSAGES_HISTORY;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	اگر (*p != ',' && *p != NUL)
+	    واپس FAIL;
+	اگر (*p == ',')
 	    ++p;
     }
 
     // Either "wait" or "hit-enter" is required
-    if (!(messages_flags_new & (MESSAGES_HIT_ENTER | MESSAGES_WAIT)))
-	return FAIL;
+    اگر (!(messages_flags_new & (MESSAGES_کامیابی_ENTER | MESSAGES_WAIT)))
+	واپس FAIL;
 
     // "history" must be set
-    if (!(messages_flags_new & MESSAGES_HISTORY))
-	return FAIL;
+    اگر (!(messages_flags_new & MESSAGES_HISTORY))
+	واپس FAIL;
 
-    if (messages_history_new < 0 || messages_history_new > 10000)
-	return FAIL;
+    اگر (messages_history_new < 0 || messages_history_new > 10000)
+	واپس FAIL;
 
-    if (messages_wait_new < 0 || messages_wait_new > 10000)
-	return FAIL;
+    اگر (messages_wait_new < 0 || messages_wait_new > 10000)
+	واپس FAIL;
 
-    msg_flags = messages_flags_new;
-    msg_wait = messages_wait_new;
+    پیغام_flags = messages_flags_new;
+    پیغام_wait = messages_wait_new;
 
-    msg_hist_max = messages_history_new;
-    check_msg_hist();
+    پیغام_hist_max = messages_history_new;
+    check_پیغام_hist();
 
-    return OK;
+    واپس OK;
 }
 
 /*
  * ":messages" command.
  */
-    void
+    خالی
 ex_messages(exarg_T *eap)
 {
-    struct msg_hist *p;
+    ساخت پیغام_hist *p;
     char_u	    *s;
-    int		    c = 0;
+    صحیح		    c = 0;
 
-    if (STRCMP(eap->arg, "clear") == 0)
+    اگر (STRCMP(eap->arg, "clear") == 0)
     {
-	int keep = eap->addr_count == 0 ? 0 : eap->line2;
+	صحیح keep = eap->addr_گنتی == 0 ? 0 : eap->line2;
 
-	while (msg_hist_len > keep)
-	    (void)delete_first_msg();
-	return;
+	جب (پیغام_hist_len > keep)
+	    (خالی)delete_پہلا_پیغام();
+	واپس;
     }
 
-    if (*eap->arg != NUL)
+    اگر (*eap->arg != NUL)
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_دلیل));
+	واپس;
     }
 
-    msg_hist_off = TRUE;
+    پیغام_hist_off = TRUE;
 
-    p = first_msg_hist;
-    if (eap->addr_count != 0)
+    p = پہلا_پیغام_hist;
+    اگر (eap->addr_گنتی != 0)
     {
 	// Count total messages
-	for (; p != NULL && !got_int; p = p->next)
+	برائے (; p != تہی && !got_int; p = p->اگلا)
 	    c++;
 
 	c -= eap->line2;
 
 	// Skip without number of messages specified
-	for (p = first_msg_hist; p != NULL && !got_int && c > 0;
-						    p = p->next, c--);
+	برائے (p = پہلا_پیغام_hist; p != تہی && !got_int && c > 0;
+						    p = p->اگلا, c--);
     }
 
-    if (p == first_msg_hist)
+    اگر (p == پہلا_پیغام_hist)
     {
-#ifdef FEAT_MULTI_LANG
+#اگر_تعریف_شدہ FEAT_MULTI_LANG
 	s = get_mess_lang();
-#else
+#ورنہ
 	s = mch_getenv((char_u *)"LANG");
-#endif
-	if (s != NULL && *s != NUL)
+#اگر_ختم
+	اگر (s != تہی && *s != NUL)
 	    // The next comment is extracted by xgettext and put in po file for
 	    // translators to read.
-	    msg_attr(
+	    پیغام_attr(
 		    // Translator: Please replace the name and email address
 		    // with the appropriate text for your translation.
 		    _("Messages maintainer: The Vim Project"),
@@ -1205,29 +1205,29 @@ ex_messages(exarg_T *eap)
     }
 
     // Display what was not skipped.
-    for (; p != NULL && !got_int; p = p->next)
-	if (p->msg != NULL)
-	    msg_attr((char *)p->msg, p->attr);
+    برائے (; p != تہی && !got_int; p = p->اگلا)
+	اگر (p->پیغام != تہی)
+	    پیغام_attr((حرف *)p->پیغام, p->attr);
 
-    msg_hist_off = FALSE;
+    پیغام_hist_off = FALSE;
 }
 
-#if defined(FEAT_CON_DIALOG) || defined(FIND_REPLACE_DIALOG)
+#اگر defined(FEAT_CON_DIALOG) || defined(ڈھونڈو_REPLACE_DIALOG)
 /*
  * Call this after prompting the user.  This will avoid a hit-return message
  * and a delay.
  */
-    void
-msg_end_prompt(void)
+    خالی
+پیغام_انتہا_prompt(خالی)
 {
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    cmdline_row = msg_row;
-    msg_col = 0;
-    msg_clr_eos();
-    lines_left = -1;
+    cmdline_صف = پیغام_صف;
+    پیغام_ستون = 0;
+    پیغام_clr_eos();
+    سطریں_بایاں = -1;
 }
-#endif
+#اگر_ختم
 
 /*
  * Wait for the user to hit a key (normally Enter).
@@ -1235,27 +1235,27 @@ msg_end_prompt(void)
  * If "redraw" is FALSE, just redraw the screen.
  * If "redraw" is -1, don't redraw at all.
  */
-    void
-wait_return(int redraw)
+    خالی
+wait_return(صحیح redraw)
 {
-    int		c;
-    int		oldState;
-    int		tmpState;
-    int		had_got_int;
-    int		save_reg_recording;
+    صحیح		c;
+    صحیح		oldState;
+    صحیح		tmpState;
+    صحیح		had_got_int;
+    صحیح		save_reg_recording;
     FILE	*save_scriptout;
 
-    if (redraw == TRUE)
-	set_must_redraw(UPD_CLEAR);
+    اگر (redraw == TRUE)
+	سیٹ_must_redraw(UPD_CLEAR);
 
     // If using ":silent cmd", don't wait for a return.  Also don't set
     // need_wait_return to do it later.
-    if (msg_silent != 0)
-	return;
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
-#endif
+    اگر (پیغام_silent != 0)
+	واپس;
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (اندر_echowindow)
+	واپس;
+#اگر_ختم
 
     /*
      * When inside vgetc(), we can't wait for a typed character at all.
@@ -1263,65 +1263,65 @@ wait_return(int redraw)
      * the end. Adjust cmdline_row to avoid the next message overwriting the
      * last one.
      */
-    if (vgetc_busy > 0)
-	return;
+    اگر (vgetc_busy > 0)
+	واپس;
     need_wait_return = TRUE;
-    if (no_wait_return)
+    اگر (no_wait_return)
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
-	return;
+	اگر (!exmode_فعال)
+	    cmdline_صف = پیغام_صف;
+	واپس;
     }
 
     redir_off = TRUE;		// don't redirect this message
     oldState = State;
-    if (quit_more)
+    اگر (quit_مزید)
     {
 	c = CAR;		// just pretend CR was hit
-	quit_more = FALSE;
+	quit_مزید = FALSE;
 	got_int = FALSE;
     }
-    else if (exmode_active)
+    ورنہ اگر (exmode_فعال)
     {
-	msg_puts(" ");		// make sure the cursor is on the right line
+	پیغام_puts(" ");		// make sure the cursor is on the right line
 	c = CAR;		// no need for a return in ex mode
 	got_int = FALSE;
     }
-    else if (!stuff_empty())
+    ورنہ اگر (!stuff_خالی_خانے())
 	// When there are stuffed characters, the next stuffed character will
 	// dismiss the hit-enter prompt immediately and have to be put back, so
 	// instead just don't show the hit-enter prompt at all.
 	c = CAR;
-    else
+    ورنہ
     {
 	// Make sure the hit-return prompt is on screen when 'guioptions' was
 	// just changed.
 	screenalloc(FALSE);
 
-	State = MODE_HITRETURN;
+	State = منوال_HITRETURN;
 	setmouse();
-#ifdef USE_ON_FLY_SCROLL
+#اگر_تعریف_شدہ USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
-#endif
-	cmdline_row = msg_row;
+#اگر_ختم
+	cmdline_صف = پیغام_صف;
 
 	// Avoid the sequence that the user types ":" at the hit-return prompt
 	// to start an Ex command, but the file-changed dialog gets in the
 	// way.
-	if (need_check_timestamps)
+	اگر (need_check_timestamps)
 	    check_timestamps(FALSE);
 
-	if (msg_flags & MESSAGES_HIT_ENTER)
+	اگر (پیغام_flags & MESSAGES_کامیابی_ENTER)
 	{
-	    hit_return_msg();
+	    کامیابی_return_پیغام();
 
-	    do
+	    کرو
 	    {
-#ifdef FEAT_IMAGE
+#اگر_تعریف_شدہ FEAT_IMAGE
 		// Make sure to update image placements (since their row offset
 		// will have been changed).
 		draw_image_placements();
-#endif
+#اگر_ختم
 		// Remember "got_int", if it is set vgetc() probably returns a
 		// CTRL-C, but we need to loop then.
 		had_got_int = got_int;
@@ -1329,7 +1329,7 @@ wait_return(int redraw)
 		// Don't do mappings here, we put the character back in the
 		// typeahead buffer.
 		++no_mapping;
-		++allow_keys;
+		++allow_کلیدیں;
 
 		// Temporarily disable Recording. If Recording is active, the
 		// character will be recorded later, since it will be added to
@@ -1337,26 +1337,26 @@ wait_return(int redraw)
 		save_reg_recording = reg_recording;
 		save_scriptout = scriptout;
 		reg_recording = 0;
-		scriptout = NULL;
-		c = safe_vgetc();
-		if (had_got_int && !global_busy)
+		scriptout = تہی;
+		c = محفوظ_vgetc();
+		اگر (had_got_int && !global_busy)
 		    got_int = FALSE;
 		--no_mapping;
-		--allow_keys;
+		--allow_کلیدیں;
 		reg_recording = save_reg_recording;
 		scriptout = save_scriptout;
 
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شدہ FEAT_CLIPBOARD
 		// Strange way to allow copying (yanking) a modeless selection
 		// at the hit-enter prompt.  Use CTRL-Y, because the same is
 		// used in Cmdline-mode and it's harmless when there is no
 		// selection.
-		if (KeyTyped && c == Ctrl_Y && clip_star.state == SELECT_DONE)
+		اگر (کلید_Typed && c == Ctrl_Y && clip_ستارہ.state == SELECT_مکمل)
 		{
 		    clip_copy_modeless_selection(TRUE);
 		    c = K_IGNORE;
 		}
-#endif
+#اگر_ختم
 
 		/*
 		* Allow scrolling back in the messages.
@@ -1364,46 +1364,46 @@ wait_return(int redraw)
 		* screen, to avoid that typing one 'j' too many makes the
 		* messages disappear.
 		*/
-		if (KeyTyped && p_more && !p_cp)
+		اگر (کلید_Typed && p_مزید && !p_cp)
 		{
-		    if (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
-						|| c == K_UP || c == K_PAGEUP)
+		    اگر (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
+						|| c == K_اوپر || c == K_PAGEUP)
 		    {
-			if (msg_scrolled > Rows)
+			اگر (پیغام_scrolled > صفیں)
 			    // scroll back to show older messages
-			    do_more_prompt(c);
-			else
+			    do_مزید_prompt(c);
+			ورنہ
 			{
-			    msg_didout = FALSE;
+			    پیغام_didout = FALSE;
 			    c = K_IGNORE;
-			    msg_col =
-#ifdef FEAT_RIGHTLEFT
-				cmdmsg_rl ? cmdline_width - 1 :
-#endif
+			    پیغام_ستون =
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+				cmdmsg_rl ? cmdline_چوڑائی - 1 :
+#اگر_ختم
 				0;
 			}
-			if (quit_more)
+			اگر (quit_مزید)
 			{
 			    c = CAR;		// just pretend CR was hit
-			    quit_more = FALSE;
+			    quit_مزید = FALSE;
 			    got_int = FALSE;
 			}
-			else if (c != K_IGNORE)
+			ورنہ اگر (c != K_IGNORE)
 			{
 			    c = K_IGNORE;
-			    hit_return_msg();
+			    کامیابی_return_پیغام();
 			}
 		    }
-		    else if (msg_scrolled > Rows - 2
+		    ورنہ اگر (پیغام_scrolled > صفیں - 2
 			    && (c == 'j' || c == 'd' || c == 'f' || c == Ctrl_F
-					    || c == K_DOWN || c == K_PAGEDOWN))
+					    || c == K_نیچے_کو || c == K_PAGEDOWN))
 			c = K_IGNORE;
 		}
-	    } while ((had_got_int && c == Ctrl_C)
+	    } جب ((had_got_int && c == Ctrl_C)
 				|| c == K_IGNORE
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ FEAT_GUI
 				|| c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR
-#endif
+#اگر_ختم
 				|| c == K_LEFTDRAG   || c == K_LEFTRELEASE
 				|| c == K_MIDDLEDRAG || c == K_MIDDLERELEASE
 				|| c == K_RIGHTDRAG  || c == K_RIGHTRELEASE
@@ -1411,7 +1411,7 @@ wait_return(int redraw)
 				|| c == K_MOUSEDOWN  || c == K_MOUSEUP
 				|| c == K_MOUSEMOVE
 				|| (!mouse_has(MOUSE_RETURN)
-				    && mouse_row < msg_row
+				    && mouse_صف < پیغام_صف
 				    && (c == K_LEFTMOUSE
 					|| c == K_MIDDLEMOUSE
 					|| c == K_RIGHTMOUSE
@@ -1421,24 +1421,24 @@ wait_return(int redraw)
 	    ui_breakcheck();
 
 	    // Avoid that the mouse-up event causes Visual mode to start.
-	    if (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
+	    اگر (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
 					|| c == K_X1MOUSE || c == K_X2MOUSE)
-		(void)jump_to_mouse(MOUSE_SETPOS, NULL, 0);
-	    else if (!KeyTyped || (vim_strchr((char_u *)"\r\n ", c) == NULL
+		(خالی)jump_مقصد_mouse(MOUSE_SETPOS, تہی, 0);
+	    ورنہ اگر (!کلید_Typed || (vim_strchr((char_u *)"\r\n ", c) == تہی
 						   && c != Ctrl_C && c != 'q'))
 	    {
 		// Put the character back in the typeahead buffer.  Don't use
 		// the stuff buffer, because lmaps wouldn't work.
-		ins_char_typebuf(vgetc_char, vgetc_mod_mask);
+		ins_char_typebuf(vgetc_char, vgetc_mod_نقاب);
 		do_redraw = TRUE;	// need a redraw even though there is
 					// typeahead
 	    }
 	}
-	else
+	ورنہ
 	{
 	    c = CAR;
 	    // Wait to allow the user to verify the output.
-	    do_sleep(msg_wait, TRUE);
+	    do_sleep(پیغام_wait, TRUE);
 	}
     }
     redir_off = FALSE;
@@ -1447,15 +1447,15 @@ wait_return(int redraw)
      * If the user hits ':', '?' or '/' we get a command line from the next
      * line.
      */
-    if (c == ':' || c == '?' || c == '/')
+    اگر (c == ':' || c == '?' || c == '/')
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
+	اگر (!exmode_فعال)
+	    cmdline_صف = پیغام_صف;
 	skip_redraw = TRUE;	    // skip redraw once
 	do_redraw = FALSE;
-#ifdef FEAT_TERMINAL
-	skip_term_loop = TRUE;
-#endif
+#اگر_تعریف_شدہ FEAT_TERMINAL
+	skip_رکن_loop = TRUE;
+#اگر_ختم
     }
 
     /*
@@ -1466,33 +1466,33 @@ wait_return(int redraw)
     tmpState = State;
     State = oldState;		    // restore State before set_shellsize
     setmouse();
-    msg_check();
+    پیغام_check();
 
-#ifndef MSWIN
+#اگر_غیر_تعریف_شدہ MSWIN
     /*
      * On TTY-style terminals (all but Windows), an extra newline is
      * needed when switching screens on exit.
      */
-    if (swapping_screen() && !termcap_active)
+    اگر (swapping_screen() && !termcap_فعال)
 	newline_on_exit = TRUE;
-#endif
+#اگر_ختم
 
     need_wait_return = FALSE;
     did_wait_return = TRUE;
     emsg_on_display = FALSE;	// can delete error message now
-    lines_left = -1;		// reset lines_left at next msg_start()
-    reset_last_sourcing();
-    if (keep_msg != NULL && vim_strsize(keep_msg) >=
-			    (Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	VIM_CLEAR(keep_msg);	    // don't redisplay message, it's too long
+    سطریں_بایاں = -1;		// reset lines_left at next msg_start()
+    reset_آخری_sourcing();
+    اگر (keep_پیغام != تہی && vim_strsize(keep_پیغام) >=
+			    (صفیں - cmdline_صف - 1) * cmdline_چوڑائی + sc_ستون)
+	VIM_CLEAR(keep_پیغام);	    // don't redisplay message, it's too long
 
-    if (tmpState == MODE_SETWSIZE)  // got resize event while in vgetc()
+    اگر (tmpState == منوال_SETWSIZE)  // got resize event while in vgetc()
     {
 	starttermcap();		    // start termcap before redrawing
 	shell_resized();
     }
-    else if (!skip_redraw
-	    && (redraw == TRUE || (msg_scrolled != 0 && redraw != -1)))
+    ورنہ اگر (!skip_redraw
+	    && (redraw == TRUE || (پیغام_scrolled != 0 && redraw != -1)))
     {
 	starttermcap();		    // start termcap before redrawing
 	redraw_later(UPD_VALID);
@@ -1502,190 +1502,190 @@ wait_return(int redraw)
 /*
  * Write the hit-return prompt.
  */
-    static void
-hit_return_msg(void)
+    ساکن خالی
+کامیابی_return_پیغام(خالی)
 {
-    int		save_p_more = p_more;
+    صحیح		save_p_مزید = p_مزید;
 
-    p_more = FALSE;	// don't want to see this message when scrolling back
-    if (msg_didout)	// start on a new line
-	msg_putchar('\n');
-    if (got_int)
-	msg_puts(_("Interrupt: "));
+    p_مزید = FALSE;	// don't want to see this message when scrolling back
+    اگر (پیغام_didout)	// start on a new line
+	پیغام_putchar('\n');
+    اگر (got_int)
+	پیغام_puts(_("Interrupt: "));
 
-    msg_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
-    if (!msg_use_printf())
-	msg_clr_eos();
-    p_more = save_p_more;
+    پیغام_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
+    اگر (!پیغام_use_printf())
+	پیغام_clr_eos();
+    p_مزید = save_p_مزید;
 }
 
 /*
  * Set "keep_msg" to "s".  Free the old value and check for NULL pointer.
  */
-    void
-set_keep_msg(char_u *s, int attr)
+    خالی
+سیٹ_keep_پیغام(char_u *s, صحیح attr)
 {
-    vim_free(keep_msg);
-    if (s != NULL && msg_silent == 0)
-	keep_msg = vim_strsave(s);
-    else
-	keep_msg = NULL;
-    keep_msg_more = FALSE;
-    keep_msg_attr = attr;
+    vim_free(keep_پیغام);
+    اگر (s != تہی && پیغام_silent == 0)
+	keep_پیغام = vim_strsave(s);
+    ورنہ
+	keep_پیغام = تہی;
+    keep_پیغام_مزید = FALSE;
+    keep_پیغام_attr = attr;
 }
 
 /*
  * If there currently is a message being displayed, set "keep_msg" to it, so
  * that it will be displayed again after redraw.
  */
-    void
-set_keep_msg_from_hist(void)
+    خالی
+سیٹ_keep_پیغام_from_hist(خالی)
 {
-    if (keep_msg == NULL && last_msg_hist != NULL && msg_scrolled == 0
-						      && (State & MODE_NORMAL))
-	set_keep_msg(last_msg_hist->msg, last_msg_hist->attr);
+    اگر (keep_پیغام == تہی && آخری_پیغام_hist != تہی && پیغام_scrolled == 0
+						      && (State & منوال_معمول))
+	سیٹ_keep_پیغام(آخری_پیغام_hist->پیغام, آخری_پیغام_hist->attr);
 }
 
 /*
  * Prepare for outputting characters in the command line.
  */
-    void
-msg_start(void)
+    خالی
+پیغام_آغاز(خالی)
 {
-    int		did_return = FALSE;
+    صحیح		did_return = FALSE;
 
-    if (msg_row < cmdline_row)
-	msg_row = cmdline_row;
+    اگر (پیغام_صف < cmdline_صف)
+	پیغام_صف = cmdline_صف;
 
-    if (!msg_silent)
+    اگر (!پیغام_silent)
     {
-	VIM_CLEAR(keep_msg);
+	VIM_CLEAR(keep_پیغام);
 	need_fileinfo = FALSE;
     }
 
-#ifdef FEAT_EVAL
-    if (need_clr_eos)
+#اگر_تعریف_شدہ FEAT_EVAL
+    اگر (need_clr_eos)
     {
 	// Halfway an ":echo" command and getting an (error) message: clear
 	// any text from the command.
 	need_clr_eos = FALSE;
-	msg_clr_eos();
+	پیغام_clr_eos();
     }
-#endif
+#اگر_ختم
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (اندر_echowindow)
     {
-	if (popup_message_win_visible()
-		    && ((msg_col > 0 && (msg_scroll || !full_screen))
-			|| in_echowindow))
+	اگر (popup_پیغام_win_visible()
+		    && ((پیغام_ستون > 0 && (پیغام_scroll || !بھرا_screen))
+			|| اندر_echowindow))
 	{
-	    win_T *wp = popup_get_message_win();
+	    win_T *wp = popup_get_پیغام_win();
 
 	    // start a new line
-	    curbuf = wp->w_buffer;
-	    ml_append(wp->w_buffer->b_ml.ml_line_count,
+	    curbuf = wp->w_بفر;
+	    ml_append(wp->w_بفر->b_ml.ml_سطر_گنتی,
 					      (char_u *)"", (colnr_T)0, FALSE);
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_بفر;
 	}
-	msg_col = 0;
+	پیغام_ستون = 0;
     }
-    else
-#endif
-	if (!msg_scroll && full_screen)	// overwrite last message
+    ورنہ
+#اگر_ختم
+	اگر (!پیغام_scroll && بھرا_screen)	// overwrite last message
     {
-	msg_row = cmdline_row;
-	msg_col =
-#ifdef FEAT_RIGHTLEFT
-	    cmdmsg_rl ? cmdline_width - 1 :
-#endif
+	پیغام_صف = cmdline_صف;
+	پیغام_ستون =
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	    cmdmsg_rl ? cmdline_چوڑائی - 1 :
+#اگر_ختم
 	    0;
     }
-    else if (msg_didout || in_echowindow)
+    ورنہ اگر (پیغام_didout || اندر_echowindow)
     {
 	// start message on next line
-	msg_putchar('\n');
+	پیغام_putchar('\n');
 	did_return = TRUE;
-	if (exmode_active != EXMODE_NORMAL)
-	    cmdline_row = msg_row;
+	اگر (exmode_فعال != EXMODE_معمول)
+	    cmdline_صف = پیغام_صف;
     }
-    if (!msg_didany || lines_left < 0)
-	msg_starthere();
-    if (msg_silent == 0)
+    اگر (!پیغام_didany || سطریں_بایاں < 0)
+	پیغام_starthere();
+    اگر (پیغام_silent == 0)
     {
-	msg_didout = FALSE;		    // no output on current line yet
+	پیغام_didout = FALSE;		    // no output on current line yet
 	cursor_off();
     }
 
     // when redirecting, may need to start a new line.
-    if (!did_return)
+    اگر (!did_return)
 	redir_write((char_u *)"\n", -1);
 }
 
 /*
  * Note that the current msg position is where messages start.
  */
-    void
-msg_starthere(void)
+    خالی
+پیغام_starthere(خالی)
 {
-    lines_left = cmdline_row;
-    msg_didany = FALSE;
+    سطریں_بایاں = cmdline_صف;
+    پیغام_didany = FALSE;
 }
 
-    void
-msg_putchar(int c)
+    خالی
+پیغام_putchar(صحیح c)
 {
-    msg_putchar_attr(c, 0);
+    پیغام_putchar_attr(c, 0);
 }
 
-    void
-msg_putchar_attr(int c, int attr)
+    خالی
+پیغام_putchar_attr(صحیح c, صحیح attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (IS_SPECIAL(c))
+    اگر (IS_SPECIAL(c))
     {
 	buf[0] = K_SPECIAL;
-	buf[1] = K_SECOND(c);
-	buf[2] = K_THIRD(c);
+	buf[1] = K_دوسرا(c);
+	buf[2] = K_تیسرا(c);
 	buf[3] = NUL;
     }
-    else
+    ورنہ
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    msg_puts_attr((char *)buf, attr);
+    پیغام_puts_attr((حرف *)buf, attr);
 }
 
-    void
-msg_outnum(long n)
+    خالی
+پیغام_outnum(طویل n)
 {
-    char	buf[20];
+    حرف	buf[20];
 
     sprintf(buf, "%ld", n);
-    msg_puts(buf);
+    پیغام_puts(buf);
 }
 
-    void
-msg_home_replace(char_u *fname)
+    خالی
+پیغام_home_replace(char_u *fname)
 {
-    msg_home_replace_attr(fname, 0);
+    پیغام_home_replace_attr(fname, 0);
 }
 
-#if defined(FEAT_FIND_ID)
-    void
-msg_home_replace_hl(char_u *fname)
+#اگر defined(FEAT_ڈھونڈو_ID)
+    خالی
+پیغام_home_replace_hl(char_u *fname)
 {
-    msg_home_replace_attr(fname, HL_ATTR(HLF_D));
+    پیغام_home_replace_attr(fname, HL_ATTR(HLF_D));
 }
-#endif
+#اگر_ختم
 
-    static void
-msg_home_replace_attr(char_u *fname, int attr)
+    ساکن خالی
+پیغام_home_replace_attr(char_u *fname, صحیح attr)
 {
     char_u	*name;
 
-    name = home_replace_save(NULL, fname);
-    if (name != NULL)
-	msg_outtrans_attr(name, attr);
+    name = home_replace_save(تہی, fname);
+    اگر (name != تہی)
+	پیغام_outtrans_attr(name, attr);
     vim_free(name);
 }
 
@@ -1695,22 +1695,22 @@ msg_home_replace_attr(char_u *fname, int attr)
  * Use attributes 'attr'.
  * Return the number of characters it takes on the screen.
  */
-    int
-msg_outtrans(char_u *str)
+    صحیح
+پیغام_outtrans(char_u *str)
 {
-    return msg_outtrans_attr(str, 0);
+    واپس پیغام_outtrans_attr(str, 0);
 }
 
-    int
-msg_outtrans_attr(char_u *str, int attr)
+    صحیح
+پیغام_outtrans_attr(char_u *str, صحیح attr)
 {
-    return msg_outtrans_len_attr(str, (int)STRLEN(str), attr);
+    واپس پیغام_outtrans_len_attr(str, (صحیح)STRLEN(str), attr);
 }
 
-    int
-msg_outtrans_len(char_u *str, int len)
+    صحیح
+پیغام_outtrans_len(char_u *str, صحیح len)
 {
-    return msg_outtrans_len_attr(str, len, 0);
+    واپس پیغام_outtrans_len_attr(str, len, 0);
 }
 
 /*
@@ -1718,138 +1718,138 @@ msg_outtrans_len(char_u *str, int len)
  * Handles multi-byte characters.
  */
     char_u *
-msg_outtrans_one(char_u *p, int attr)
+پیغام_outtrans_one(char_u *p, صحیح attr)
 {
-    int		l;
+    صحیح		l;
 
-    if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+    اگر (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
     {
-	msg_outtrans_len_attr(p, l, attr);
-	return p + l;
+	پیغام_outtrans_len_attr(p, l, attr);
+	واپس p + l;
     }
-    msg_puts_attr((char *)transchar_byte_buf(NULL, *p), attr);
-    return p + 1;
+    پیغام_puts_attr((حرف *)transchar_byte_buf(تہی, *p), attr);
+    واپس p + 1;
 }
 
-    int
-msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
+    صحیح
+پیغام_outtrans_len_attr(char_u *msgstr, صحیح len, صحیح attr)
 {
-    int		retval = 0;
+    صحیح		retval = 0;
     char_u	*str = msgstr;
-    char_u	*plain_start = msgstr;
+    char_u	*plain_آغاز = msgstr;
     char_u	*s;
-    int		mb_l;
-    int		c;
-    int		save_got_int = got_int;
+    صحیح		mb_l;
+    صحیح		c;
+    صحیح		save_got_int = got_int;
 
     // Only quit when got_int was set in here.
     got_int = FALSE;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    اگر (attr == 0)
+	attr = HL_ATTR(HLF_پیغام);
 
     // if MSG_HIST flag set, add message to history
-    if (attr & MSG_HIST)
+    اگر (attr & پیغام_HIST)
     {
-	add_msg_hist(str, len, attr);
-	attr &= ~MSG_HIST;
+	جوڑو_پیغام_hist(str, len, attr);
+	attr &= ~پیغام_HIST;
     }
 
     // When drawing over the command line no need to clear it later or remove
     // the mode message.
-    if (msg_silent == 0 && len > 0 && msg_row >= cmdline_row && msg_col == 0)
+    اگر (پیغام_silent == 0 && len > 0 && پیغام_صف >= cmdline_صف && پیغام_ستون == 0)
     {
 	clear_cmdline = FALSE;
-	mode_displayed = FALSE;
+	منوال_displayed = FALSE;
     }
 
     // If the string starts with a composing character first draw a space on
     // which the composing char can be drawn.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
-	msg_puts_attr(" ", attr);
+    اگر (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
+	پیغام_puts_attr(" ", attr);
 
     /*
      * Go over the string.  Special characters are translated and printed.
      * Normal characters are printed several at a time.
      */
-    while (--len >= 0 && !got_int)
+    جب (--len >= 0 && !got_int)
     {
-	if (enc_utf8)
+	اگر (enc_utf8)
 	    // Don't include composing chars after the end.
 	    mb_l = utfc_ptr2len_len(str, len + 1);
-	else if (has_mbyte)
+	ورنہ اگر (has_mbyte)
 	    mb_l = (*mb_ptr2len)(str);
-	else
+	ورنہ
 	    mb_l = 1;
-	if (has_mbyte && mb_l > 1)
+	اگر (has_mbyte && mb_l > 1)
 	{
 	    c = (*mb_ptr2char)(str);
-	    if (vim_isprintc(c))
+	    اگر (vim_isprintc(c))
 		// printable multi-byte char: count the cells.
 		retval += (*mb_ptr2cells)(str);
-	    else
+	    ورنہ
 	    {
 		// unprintable multi-byte char: print the printable chars so
 		// far and the translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
-		plain_start = str + mb_l;
-		msg_puts_attr((char *)transchar_buf(NULL, c),
+		اگر (str > plain_آغاز)
+		    پیغام_puts_attr_len((حرف *)plain_آغاز,
+					       (صحیح)(str - plain_آغاز), attr);
+		plain_آغاز = str + mb_l;
+		پیغام_puts_attr((حرف *)transchar_buf(تہی, c),
 					    attr == 0 ? HL_ATTR(HLF_8) : attr);
 		retval += char2cells(c);
 	    }
 	    len -= mb_l - 1;
 	    str += mb_l;
 	}
-	else
+	ورنہ
 	{
-	    s = transchar_byte_buf(NULL, *str);
-	    if (s[1] != NUL)
+	    s = transchar_byte_buf(تہی, *str);
+	    اگر (s[1] != NUL)
 	    {
 		// unprintable char: print the printable chars so far and the
 		// translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
-		plain_start = str + 1;
-		msg_puts_attr((char *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
-		retval += (int)STRLEN(s);
+		اگر (str > plain_آغاز)
+		    پیغام_puts_attr_len((حرف *)plain_آغاز,
+					       (صحیح)(str - plain_آغاز), attr);
+		plain_آغاز = str + 1;
+		پیغام_puts_attr((حرف *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
+		retval += (صحیح)STRLEN(s);
 	    }
-	    else
+	    ورنہ
 		++retval;
 	    ++str;
 	}
     }
 
-    if (str > plain_start && !got_int)
+    اگر (str > plain_آغاز && !got_int)
 	// print the printable chars at the end
-	msg_puts_attr_len((char *)plain_start, (int)(str - plain_start), attr);
+	پیغام_puts_attr_len((حرف *)plain_آغاز, (صحیح)(str - plain_آغاز), attr);
 
     got_int |= save_got_int;
 
-    return retval;
+    واپس retval;
 }
 
-#if defined(FEAT_QUICKFIX)
-    void
-msg_make(char_u *arg)
+#اگر defined(FEAT_QUICKFIX)
+    خالی
+پیغام_make(char_u *arg)
 {
-    int	    i;
-    static char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
+    صحیح	    i;
+    ساکن char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
 
     arg = skipwhite(arg);
-    for (i = 5; *arg && i >= 0; --i)
-	if (*arg++ != str[i])
-	    break;
-    if (i < 0)
+    برائے (i = 5; *arg && i >= 0; --i)
+	اگر (*arg++ != str[i])
+	    توڑو;
+    اگر (i < 0)
     {
-	msg_putchar('\n');
-	for (i = 0; rs[i]; ++i)
-	    msg_putchar(rs[i] - 3);
+	پیغام_putchar('\n');
+	برائے (i = 0; rs[i]; ++i)
+	    پیغام_putchar(rs[i] - 3);
     }
 }
-#endif
+#اگر_ختم
 
 /*
  * Output the string 'str' up to a NUL character.
@@ -1865,44 +1865,44 @@ msg_make(char_u *arg)
  * This function is used to show mappings, where we want to see how to type
  * the character/string -- webb
  */
-    int
-msg_outtrans_special(
+    صحیح
+پیغام_outtrans_special(
     char_u	*strstart,
-    int		from,	// TRUE for lhs of a mapping
-    int		maxlen) // screen columns, 0 for unlimited
+    صحیح		from,	// TRUE for lhs of a mapping
+    صحیح		maxlen) // screen columns, 0 for unlimited
 {
     char_u	*str = strstart;
-    int		retval = 0;
-    char	*text;
-    int		attr;
-    int		len;
+    صحیح		retval = 0;
+    حرف	*متن;
+    صحیح		attr;
+    صحیح		len;
 
     attr = HL_ATTR(HLF_8);
-    while (*str != NUL)
+    جب (*str != NUL)
     {
 	// Leading and trailing spaces need to be displayed in <> form.
-	if ((str == strstart || str[1] == NUL) && *str == ' ')
+	اگر ((str == strstart || str[1] == NUL) && *str == ' ')
 	{
-	    text = "<Space>";
+	    متن = "<Space>";
 	    ++str;
 	}
-	else
-	    text = (char *)str2special(&str, from, FALSE);
-	if (text[0] != NUL && text[1] == NUL)
+	ورنہ
+	    متن = (حرف *)str2special(&str, from, FALSE);
+	اگر (متن[0] != NUL && متن[1] == NUL)
 	    // single-byte character or illegal byte
-	    text = (char *)transchar_byte_buf(NULL, (char_u)text[0]);
-	len = vim_strsize((char_u *)text);
-	if (maxlen > 0 && retval + len >= maxlen)
-	    break;
+	    متن = (حرف *)transchar_byte_buf(تہی, (char_u)متن[0]);
+	len = vim_strsize((char_u *)متن);
+	اگر (maxlen > 0 && retval + len >= maxlen)
+	    توڑو;
 	// Highlight special keys
-	msg_puts_attr(text, len > 1
-		&& (*mb_ptr2len)((char_u *)text) <= 1 ? attr : 0);
+	پیغام_puts_attr(متن, len > 1
+		&& (*mb_ptr2len)((char_u *)متن) <= 1 ? attr : 0);
 	retval += len;
     }
-    return retval;
+    واپس retval;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#اگر defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return the lhs or rhs of a mapping, with the key codes turned into printable
  * strings, in an allocated string.
@@ -1910,21 +1910,21 @@ msg_outtrans_special(
     char_u *
 str2special_save(
     char_u  *str,
-    int	    replace_spaces,	// TRUE to replace " " with "<Space>".
+    صحیح	    replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int	    replace_others)	// TRUE to replace "<" with "<lt>",
+    صحیح	    replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
     garray_T	ga;
     char_u	*p = str;
 
     ga_init2(&ga, 1, 40);
-    while (*p != NUL)
+    جب (*p != NUL)
 	ga_concat(&ga, str2special(&p, replace_spaces, replace_others));
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    واپس (char_u *)ga.ga_ڈیٹا;
 }
-#endif
+#اگر_ختم
 
 /*
  * Return the printable string for the key codes at "*sp".
@@ -1935,231 +1935,231 @@ str2special_save(
     char_u *
 str2special(
     char_u	**sp,
-    int		replace_spaces,	// TRUE to replace " " with "<Space>".
+    صحیح		replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int		replace_others)	// TRUE to replace "<" with "<lt>",
+    صحیح		replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
-    int			c;
-    static char_u	buf[7];
+    صحیح			c;
+    ساکن char_u	buf[7];
     char_u		*str = *sp;
-    int			modifiers = 0;
-    int			special = FALSE;
+    صحیح			modifiers = 0;
+    صحیح			special = FALSE;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
 	char_u	*p;
 
 	// Try to un-escape a multi-byte character.  Return the un-escaped
 	// string if it is a multi-byte character.
 	p = mb_unescape(sp);
-	if (p != NULL)
-	    return p;
+	اگر (p != تہی)
+	    واپس p;
     }
 
     c = *str;
-    if ((c == K_SPECIAL
-#ifdef FEAT_GUI
+    اگر ((c == K_SPECIAL
+#اگر_تعریف_شدہ FEAT_GUI
 		|| c == CSI
-#endif
+#اگر_ختم
 	) && str[1] != NUL && str[2] != NUL)
     {
-	if (str[1] == KS_MODIFIER)
+	اگر (str[1] == KS_MODIFIER)
 	{
 	    modifiers = str[2];
 	    str += 3;
 	    c = *str;
 	}
-	if ((c == K_SPECIAL
-#ifdef FEAT_GUI
+	اگر ((c == K_SPECIAL
+#اگر_تعریف_شدہ FEAT_GUI
 		    || c == CSI
-#endif
+#اگر_ختم
 	    ) && str[1] != NUL && str[2] != NUL)
 	{
-	    c = TO_SPECIAL(str[1], str[2]);
+	    c = مقصد_SPECIAL(str[1], str[2]);
 	    str += 2;
 	}
-	if (IS_SPECIAL(c) || modifiers)	// special key
+	اگر (IS_SPECIAL(c) || modifiers)	// special key
 	    special = TRUE;
     }
 
-    if (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
+    اگر (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
     {
 	char_u	*p;
 
 	*sp = str;
 	// Try to un-escape a multi-byte character after modifiers.
 	p = mb_unescape(sp);
-	if (p != NULL)
+	اگر (p != تہی)
 	    // Since 'special' is TRUE the multi-byte character 'c' will be
 	    // processed by get_special_key_name()
 	    c = (*mb_ptr2char)(p);
-	else
+	ورنہ
 	    // illegal byte
 	    *sp = str + 1;
     }
-    else
+    ورنہ
 	// single-byte character, NUL or illegal byte
 	*sp = str + (*str == NUL ? 0 : 1);
 
     // Make special keys and C0 control characters in <> form, also <M-Space>.
-    if (special
+    اگر (special
 	|| c < ' '
 	|| (replace_spaces && c == ' ')
 	|| (replace_others && (c == '<' || c == '|' || c == '\\')))
-	return get_special_key_name(c, modifiers);
+	واپس get_special_کلید_name(c, modifiers);
     buf[0] = c;
     buf[1] = NUL;
-    return buf;
+    واپس buf;
 }
 
 /*
  * Translate a key sequence into special key names.
  */
-    void
-str2specialbuf(char_u *sp, char_u *buf, int len)
+    خالی
+str2specialbuf(char_u *sp, char_u *buf, صحیح len)
 {
     char_u     *s;
     size_t     buf_len = 0;
     size_t     s_len;
 
     *buf = NUL;
-    while (*sp)
+    جب (*sp)
     {
 	s = str2special(&sp, FALSE, FALSE);
 	s_len = STRLEN(s);
-	if (buf_len + s_len < (size_t)len)
+	اگر (buf_len + s_len < (size_t)len)
 	{
 	    STRCPY(buf + buf_len, s);
 	    buf_len += s_len;
 	}
-	else
-	    break;
+	ورنہ
+	    توڑو;
     }
 }
 
 /*
  * print line for :print or :list command
  */
-    void
-msg_prt_line(char_u *s, int list)
+    خالی
+پیغام_prt_سطر(char_u *s, صحیح list)
 {
-    int		c;
-    int		col = 0;
-    int		n_extra = 0;
-    int		c_extra = 0;
-    int		c_final = 0;
-    char_u	*p_extra = NULL;	    // init to make SASC shut up
-    int		n;
-    int		attr = 0;
-    char_u	*trail = NULL;
-    char_u	*lead = NULL;
-    int		in_multispace = FALSE;
-    int		multispace_pos = 0;
-    int		l;
+    صحیح		c;
+    صحیح		ستون = 0;
+    صحیح		n_extra = 0;
+    صحیح		c_extra = 0;
+    صحیح		c_final = 0;
+    char_u	*p_extra = تہی;	    // init to make SASC shut up
+    صحیح		n;
+    صحیح		attr = 0;
+    char_u	*trail = تہی;
+    char_u	*lead = تہی;
+    صحیح		اندر_multispace = FALSE;
+    صحیح		multispace_pos = 0;
+    صحیح		l;
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (curwin->w_p_list)
+    اگر (curwin->w_p_list)
 	list = TRUE;
 
-    if (list)
+    اگر (list)
     {
 	// find start of trailing whitespace
-	if (curwin->w_lcs_chars.trail)
+	اگر (curwin->w_lcs_chars.trail)
 	{
 	    trail = s + STRLEN(s);
-	    while (trail > s && VIM_ISWHITE(trail[-1]))
+	    جب (trail > s && VIM_ISWHITE(trail[-1]))
 		--trail;
 	}
 	// find end of leading whitespace
-	if (curwin->w_lcs_chars.lead
-				 || curwin->w_lcs_chars.leadmultispace != NULL
+	اگر (curwin->w_lcs_chars.lead
+				 || curwin->w_lcs_chars.leadmultispace != تہی
 				 || curwin->w_lcs_chars.leadtab1 != NUL)
 	{
 	    lead = s;
-	    while (VIM_ISWHITE(lead[0]))
+	    جب (VIM_ISWHITE(lead[0]))
 		lead++;
 	    // in a line full of spaces all of them are treated as trailing
-	    if (*lead == NUL)
-		lead = NULL;
+	    اگر (*lead == NUL)
+		lead = تہی;
 	}
     }
 
     // output a space for an empty line, otherwise the line will be
     // overwritten
-    if (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
-	msg_putchar(' ');
+    اگر (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
+	پیغام_putchar(' ');
 
-    while (!got_int)
+    جب (!got_int)
     {
-	if (n_extra > 0)
+	اگر (n_extra > 0)
 	{
 	    --n_extra;
-	    if (n_extra == 0 && c_final)
+	    اگر (n_extra == 0 && c_final)
 		c = c_final;
-	    else if (c_extra)
+	    ورنہ اگر (c_extra)
 		c = c_extra;
-	    else
+	    ورنہ
 		c = *p_extra++;
 	}
-	else if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	ورنہ اگر (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	{
-	    col += (*mb_ptr2cells)(s);
-	    if (l >= MB_MAXBYTES)
+	    ستون += (*mb_ptr2cells)(s);
+	    اگر (l >= MB_MAXBYTES)
 	    {
 		STRCPY(buf, "?");
 	    }
-	    else if (curwin->w_lcs_chars.nbsp != NUL && list
+	    ورنہ اگر (curwin->w_lcs_chars.nbsp != NUL && list
 		    && (mb_ptr2char(s) == 160
 			|| mb_ptr2char(s) == 0x202f))
 	    {
-		int len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
+		صحیح len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
 
 		buf[len] = NUL;
 	    }
-	    else
+	    ورنہ
 	    {
 		mch_memmove(buf, s, (size_t)l);
 		buf[l] = NUL;
 	    }
-	    msg_puts((char *)buf);
+	    پیغام_puts((حرف *)buf);
 	    s += l;
-	    continue;
+	    جاری;
 	}
-	else
+	ورنہ
 	{
 	    attr = 0;
 	    c = *s++;
-	    if (list)
+	    اگر (list)
 	    {
-		in_multispace = c == ' ' && (*s == ' '
-						 || (col > 0 && s[-2] == ' '));
-		if (!in_multispace)
+		اندر_multispace = c == ' ' && (*s == ' '
+						 || (ستون > 0 && s[-2] == ' '));
+		اگر (!اندر_multispace)
 		    multispace_pos = 0;
 	    }
-	    if (c == TAB && (!list || curwin->w_lcs_chars.tab1))
+	    اگر (c == TAB && (!list || curwin->w_lcs_chars.tab1))
 	    {
 		// tab amount depends on current column
-#ifdef FEAT_VARTABS
-		n_extra = tabstop_padding(col, curbuf->b_p_ts,
+#اگر_تعریف_شدہ FEAT_VARTABS
+		n_extra = tabstop_padding(ستون, curbuf->b_p_ts,
 						    curbuf->b_p_vts_array) - 1;
-#else
-		n_extra = curbuf->b_p_ts - col % curbuf->b_p_ts - 1;
-#endif
-		if (!list)
+#ورنہ
+		n_extra = curbuf->b_p_ts - ستون % curbuf->b_p_ts - 1;
+#اگر_ختم
+		اگر (!list)
 		{
 		    c = ' ';
 		    c_extra = ' ';
 		    c_final = NUL;
 		}
-		else
+		ورنہ
 		{
-		    int lcs_tab1 = curwin->w_lcs_chars.tab1;
-		    int lcs_tab2 = curwin->w_lcs_chars.tab2;
-		    int lcs_tab3 = curwin->w_lcs_chars.tab3;
+		    صحیح lcs_tab1 = curwin->w_lcs_chars.tab1;
+		    صحیح lcs_tab2 = curwin->w_lcs_chars.tab2;
+		    صحیح lcs_tab3 = curwin->w_lcs_chars.tab3;
 
 		    // check if leadtab is set in 'listchars'
-		    if (lead != NULL && s <= lead
+		    اگر (lead != تہی && s <= lead
 					&& curwin->w_lcs_chars.leadtab1 != NUL)
 		    {
 			lcs_tab1 = curwin->w_lcs_chars.leadtab1;
@@ -2173,12 +2173,12 @@ msg_prt_line(char_u *s, int list)
 		    attr = HL_ATTR(HLF_8);
 		}
 	    }
-	    else if (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
+	    ورنہ اگر (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
 	    {
 		c = curwin->w_lcs_chars.nbsp;
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
+	    ورنہ اگر (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
 	    {
 		p_extra = (char_u *)"";
 		c_extra = NUL;
@@ -2188,10 +2188,10 @@ msg_prt_line(char_u *s, int list)
 		attr = HL_ATTR(HLF_AT);
 		--s;
 	    }
-	    else if (c != NUL && (n = byte2cells(c)) > 1)
+	    ورنہ اگر (c != NUL && (n = byte2cells(c)) > 1)
 	    {
 		n_extra = n - 1;
-		p_extra = transchar_byte_buf(NULL, c);
+		p_extra = transchar_byte_buf(تہی, c);
 		c_extra = NUL;
 		c_final = NUL;
 		c = *p_extra++;
@@ -2199,37 +2199,37 @@ msg_prt_line(char_u *s, int list)
 		// the same in plain text.
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == ' ')
+	    ورنہ اگر (c == ' ')
 	    {
-		if (lead != NULL && s <= lead && in_multispace
-			&& curwin->w_lcs_chars.leadmultispace != NULL)
+		اگر (lead != تہی && s <= lead && اندر_multispace
+			&& curwin->w_lcs_chars.leadmultispace != تہی)
 		{
 		    c = curwin->w_lcs_chars.leadmultispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.leadmultispace[multispace_pos]
+		    اگر (curwin->w_lcs_chars.leadmultispace[multispace_pos]
 									== NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (lead != NULL && s <= lead
+		ورنہ اگر (lead != تہی && s <= lead
 					    && curwin->w_lcs_chars.lead != NUL)
 		{
 		    c = curwin->w_lcs_chars.lead;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (trail != NULL && s > trail)
+		ورنہ اگر (trail != تہی && s > trail)
 		{
 		    c = curwin->w_lcs_chars.trail;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (in_multispace
-			&& curwin->w_lcs_chars.multispace != NULL)
+		ورنہ اگر (اندر_multispace
+			&& curwin->w_lcs_chars.multispace != تہی)
 		{
 		    c = curwin->w_lcs_chars.multispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
+		    اگر (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (list && curwin->w_lcs_chars.space != NUL)
+		ورنہ اگر (list && curwin->w_lcs_chars.space != NUL)
 		{
 		    c = curwin->w_lcs_chars.space;
 		    attr = HL_ATTR(HLF_8);
@@ -2237,75 +2237,75 @@ msg_prt_line(char_u *s, int list)
 	    }
 	}
 
-	if (c == NUL)
-	    break;
+	اگر (c == NUL)
+	    توڑو;
 
-	msg_putchar_attr(c, attr);
-	col++;
+	پیغام_putchar_attr(c, attr);
+	ستون++;
     }
-    msg_clr_eos();
+    پیغام_clr_eos();
 }
 
 /*
  * Use screen_puts() to output one multi-byte character.
  * Return the pointer "s" advanced to the next character.
  */
-    static char_u *
-screen_puts_mbyte(char_u *s, int l, int attr)
+    ساکن char_u *
+screen_puts_mbyte(char_u *s, صحیح l, صحیح attr)
 {
-    int		cw;
+    صحیح		cw;
 
-    msg_didout = TRUE;		// remember that line is not empty
+    پیغام_didout = TRUE;		// remember that line is not empty
     cw = (*mb_ptr2cells)(s);
-    if (cw > 1 && (
-#ifdef FEAT_RIGHTLEFT
-		cmdmsg_rl ? msg_col <= 1 :
-#endif
-		msg_col == cmdline_width - 1))
+    اگر (cw > 1 && (
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+		cmdmsg_rl ? پیغام_ستون <= 1 :
+#اگر_ختم
+		پیغام_ستون == cmdline_چوڑائی - 1))
     {
 	// Doesn't fit, print a highlighted '>' to fill it up.
-	msg_screen_putchar('>', HL_ATTR(HLF_AT));
-	return s;
+	پیغام_screen_putchar('>', HL_ATTR(HLF_AT));
+	واپس s;
     }
 
-    screen_puts_len(s, l, msg_row, cmdline_col_off + msg_col, attr);
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    screen_puts_len(s, l, پیغام_صف, cmdline_ستون_off + پیغام_ستون, attr);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (cmdmsg_rl)
     {
-	msg_col -= cw;
-	if (msg_col == 0)
+	پیغام_ستون -= cw;
+	اگر (پیغام_ستون == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    پیغام_ستون = cmdline_چوڑائی;
+	    ++پیغام_صف;
 	}
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	msg_col += cw;
-	if (msg_col >= cmdline_width)
+	پیغام_ستون += cw;
+	اگر (پیغام_ستون >= cmdline_چوڑائی)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    پیغام_ستون = 0;
+	    ++پیغام_صف;
 	}
     }
-    return s + l;
+    واپس s + l;
 }
 
 /*
  * Output a string to the screen at position msg_row, msg_col.
  * Update msg_row and msg_col for the next message.
  */
-    void
-msg_puts(char *s)
+    خالی
+پیغام_puts(حرف *s)
 {
-    msg_puts_attr(s, 0);
+    پیغام_puts_attr(s, 0);
 }
 
-    void
-msg_puts_title(char *s)
+    خالی
+پیغام_puts_title(حرف *s)
 {
-    msg_puts_attr(s, HL_ATTR(HLF_T));
+    پیغام_puts_attr(s, HL_ATTR(HLF_T));
 }
 
 /*
@@ -2313,35 +2313,35 @@ msg_puts_title(char *s)
  * part in the middle and replace it with "..." when necessary.
  * Does not handle multi-byte characters!
  */
-    static void
-msg_outtrans_long_len_attr(char_u *longstr, int len, int attr)
+    ساکن خالی
+پیغام_outtrans_long_len_attr(char_u *longstr, صحیح len, صحیح attr)
 {
-    int		slen = len;
-    int		room;
+    صحیح		slen = len;
+    صحیح		گنجائش;
 
-    room = cmdline_width - msg_col;
-    if (len > room && room >= 20)
+    گنجائش = cmdline_چوڑائی - پیغام_ستون;
+    اگر (len > گنجائش && گنجائش >= 20)
     {
-	slen = (room - 3) / 2;
-	msg_outtrans_len_attr(longstr, slen, attr);
-	msg_puts_attr("...", HL_ATTR(HLF_8));
+	slen = (گنجائش - 3) / 2;
+	پیغام_outtrans_len_attr(longstr, slen, attr);
+	پیغام_puts_attr("...", HL_ATTR(HLF_8));
     }
-    msg_outtrans_len_attr(longstr + len - slen, slen, attr);
+    پیغام_outtrans_len_attr(longstr + len - slen, slen, attr);
 }
 
-    void
-msg_outtrans_long_attr(char_u *longstr, int attr)
+    خالی
+پیغام_outtrans_long_attr(char_u *longstr, صحیح attr)
 {
-    msg_outtrans_long_len_attr(longstr, (int)STRLEN(longstr), attr);
+    پیغام_outtrans_long_len_attr(longstr, (صحیح)STRLEN(longstr), attr);
 }
 
 /*
  * Basic function for writing a message with highlight attributes.
  */
-    void
-msg_puts_attr(char *s, int attr)
+    خالی
+پیغام_puts_attr(حرف *s, صحیح attr)
 {
-    msg_puts_attr_len(s, -1, attr);
+    پیغام_puts_attr_len(s, -1, attr);
 }
 
 /*
@@ -2349,8 +2349,8 @@ msg_puts_attr(char *s, int attr)
  * When "maxlen" is -1 there is no maximum length.
  * When "maxlen" is >= 0 the message is not put in the history.
  */
-    static void
-msg_puts_attr_len(char *str, int maxlen, int attr)
+    ساکن خالی
+پیغام_puts_attr_len(حرف *str, صحیح maxlen, صحیح attr)
 {
     /*
      * If redirection is on, also write to the redirection file.
@@ -2360,17 +2360,17 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     /*
      * Don't print anything when using ":silent cmd".
      */
-    if (msg_silent != 0)
-	return;
+    اگر (پیغام_silent != 0)
+	واپس;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    اگر (attr == 0)
+	attr = HL_ATTR(HLF_پیغام);
 
     // if MSG_HIST flag set, add message to history
-    if ((attr & MSG_HIST) && maxlen < 0)
+    اگر ((attr & پیغام_HIST) && maxlen < 0)
     {
-	add_msg_hist((char_u *)str, -1, attr);
-	attr &= ~MSG_HIST;
+	جوڑو_پیغام_hist((char_u *)str, -1, attr);
+	attr &= ~پیغام_HIST;
     }
 
     // When writing something to the screen after it has scrolled, requires a
@@ -2378,9 +2378,9 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     // need_wait_return after some prompt, and then outputting something
     // without scrolling
     // Not needed when only using CR to move the cursor.
-    if (msg_scrolled != 0 && !msg_scrolled_ign && STRCMP(str, "\r") != 0)
+    اگر (پیغام_scrolled != 0 && !پیغام_scrolled_ign && STRCMP(str, "\r") != 0)
 	need_wait_return = TRUE;
-    msg_didany = TRUE;		// remember that something was outputted
+    پیغام_didany = TRUE;		// remember that something was outputted
 
     /*
      * If there is no valid screen, use fprintf so we can see error messages.
@@ -2389,360 +2389,360 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
      * different, e.g. for Win32 console) or we just don't know where the
      * cursor is.
      */
-    if (msg_use_printf())
-	msg_puts_printf((char_u *)str, maxlen);
-    else
-	msg_puts_display((char_u *)str, maxlen, attr, FALSE);
+    اگر (پیغام_use_printf())
+	پیغام_puts_printf((char_u *)str, maxlen);
+    ورنہ
+	پیغام_puts_display((char_u *)str, maxlen, attr, FALSE);
 
     need_fileinfo = FALSE;
 }
 
 // values for "where"
-#define PUT_APPEND 0		// append to "lnum"
-#define PUT_TRUNC 1		// replace "lnum"
-#define PUT_BELOW 2		// add below "lnum"
+#تعریف_کرو PUT_APPEND 0		// append to "lnum"
+#تعریف_کرو PUT_TRUNC 1		// replace "lnum"
+#تعریف_کرو PUT_نیچے 2		// add below "lnum"
 				//
-#ifdef HAS_MESSAGE_WINDOW
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
 /*
  * Put text "t_s" until "end" in the message window.
  * "where" specifies where to put the text.
  */
-    static void
-put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
+    ساکن خالی
+put_پیغام_win(win_T *wp, صحیح where, char_u *t_s, char_u *انتہا, linenr_T lnum)
 {
     char_u  *p;
 
-    if (where == PUT_BELOW)
+    اگر (where == PUT_نیچے)
     {
-	if (*end != NUL)
+	اگر (*انتہا != NUL)
 	{
-	    p = vim_strnsave(t_s, end - t_s);
-	    if (p == NULL)
-		return;
+	    p = vim_strnsave(t_s, انتہا - t_s);
+	    اگر (p == تہی)
+		واپس;
 	}
-	else
+	ورنہ
 	    p = t_s;
-	ml_append_buf(wp->w_buffer, lnum, p, (colnr_T)0, FALSE);
-	if (p != t_s)
+	ml_append_buf(wp->w_بفر, lnum, p, (colnr_T)0, FALSE);
+	اگر (p != t_s)
 	    vim_free(p);
     }
-    else
+    ورنہ
     {
 	char_u *newp;
 
-	curbuf = wp->w_buffer;
-	if (where == PUT_APPEND)
+	curbuf = wp->w_بفر;
+	اگر (where == PUT_APPEND)
 	{
 	    newp = concat_str(ml_get(lnum), t_s);
-	    if (newp == NULL)
-		return;
-	    if (*end != NUL)
-		newp[STRLEN(ml_get(lnum)) + (end - t_s)] = NUL;
+	    اگر (newp == تہی)
+		واپس;
+	    اگر (*انتہا != NUL)
+		newp[STRLEN(ml_get(lnum)) + (انتہا - t_s)] = NUL;
 	}
-	else
+	ورنہ
 	{
-	    newp = vim_strnsave(t_s, end - t_s);
-	    if (newp == NULL)
-		return;
+	    newp = vim_strnsave(t_s, انتہا - t_s);
+	    اگر (newp == تہی)
+		واپس;
 	}
 	ml_replace(lnum, newp, FALSE);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_بفر;
     }
     redraw_win_later(wp, UPD_NOT_VALID);
 
     // set msg_col so that a newline is written if needed
-    msg_col += (int)(end - t_s);
+    پیغام_ستون += (صحیح)(انتہا - t_s);
 }
-#endif
+#اگر_ختم
 
 /*
  * The display part of msg_puts_attr_len().
  * May be called recursively to display scroll-back text.
  */
-    static void
-msg_puts_display(
+    ساکن خالی
+پیغام_puts_display(
     char_u	*str,
-    int		maxlen,
-    int		attr,
-    int		recurse)
+    صحیح		maxlen,
+    صحیح		attr,
+    صحیح		recurse)
 {
     char_u	*s = str;
     char_u	*t_s = str;	// string from "t_s" to "s" is still todo
-    int		t_col = 0;	// screen cells todo, 0 when "t_s" not used
-    int		l;
-    int		cw;
+    صحیح		t_ستون = 0;	// screen cells todo, 0 when "t_s" not used
+    صحیح		l;
+    صحیح		cw;
     char_u	*sb_str = str;
-    int		sb_col = msg_col;
-    int		wrap;
-    int		did_last_char;
-#ifdef HAS_MESSAGE_WINDOW
-    int		where = PUT_APPEND;
-    win_T	*msg_win = NULL;
+    صحیح		sb_ستون = پیغام_ستون;
+    صحیح		wrap;
+    صحیح		did_آخری_char;
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    صحیح		where = PUT_APPEND;
+    win_T	*پیغام_win = تہی;
     linenr_T    lnum = 1;
 
-    if (in_echowindow)
+    اگر (اندر_echowindow)
     {
-	msg_win = popup_get_message_win();
+	پیغام_win = popup_get_پیغام_win();
 
-	if (msg_win != NULL)
+	اگر (پیغام_win != تہی)
 	{
-	    if (!popup_message_win_visible())
+	    اگر (!popup_پیغام_win_visible())
 	    {
-		if (*str == NL)
+		اگر (*str == NL)
 		{
 		    // When not showing the message window and the output
 		    // starts with a NL show the message normally.
-		    msg_win = NULL;
+		    پیغام_win = تہی;
 		}
-		else
+		ورنہ
 		{
 		    // currently hidden, make it empty
-		    curbuf = msg_win->w_buffer;
-		    while ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
+		    curbuf = پیغام_win->w_بفر;
+		    جب ((curbuf->b_ml.ml_flags & ML_خالی_خانے) == 0)
 			ml_delete(1);
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_بفر;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
-		lnum = msg_win->w_buffer->b_ml.ml_line_count;
-		if (msg_col == 0)
+		lnum = پیغام_win->w_بفر->b_ml.ml_سطر_گنتی;
+		اگر (پیغام_ستون == 0)
 		    where = PUT_TRUNC;
 	    }
 	}
     }
-#endif
+#اگر_ختم
 
     did_wait_return = FALSE;
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+    جب ((maxlen < 0 || (صحیح)(s - str) < maxlen) && *s != NUL)
     {
-#ifdef HAS_MESSAGE_WINDOW
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
 	// For echowindow, use full width; for regular messages, leave last column
-	int wrap_col = msg_win != NULL ? cmdline_width : cmdline_width - 1;
-#else
-	int wrap_col = cmdline_width - 1;
-#endif
+	صحیح wrap_ستون = پیغام_win != تہی ? cmdline_چوڑائی : cmdline_چوڑائی - 1;
+#ورنہ
+	صحیح wrap_ستون = cmdline_چوڑائی - 1;
+#اگر_ختم
 
 	/*
 	 * We are at the end of the screen line when:
 	 * - When outputting a newline.
 	 * - When outputting a character in the last column.
 	 */
-	if (!recurse && msg_row >= Rows - 1 && (*s == '\n' || (
-#ifdef FEAT_RIGHTLEFT
+	اگر (!recurse && پیغام_صف >= صفیں - 1 && (*s == '\n' || (
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
 		    cmdmsg_rl
 		    ? (
-			msg_col <= 1
-		      || (*s == TAB && msg_col <= 7)
-		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && msg_col <= 2))
+			پیغام_ستون <= 1
+		      || (*s == TAB && پیغام_ستون <= 7)
+		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && پیغام_ستون <= 2))
 		    :
-#endif
-		      ((*s != '\r' && msg_col + t_col >= wrap_col)
-		       || (*s == TAB && msg_col + t_col
-			   >= (wrap_col & ~7))
+#اگر_ختم
+		      ((*s != '\r' && پیغام_ستون + t_ستون >= wrap_ستون)
+		       || (*s == TAB && پیغام_ستون + t_ستون
+			   >= (wrap_ستون & ~7))
 		       || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			   && msg_col + t_col >= wrap_col - 1)))))
+			   && پیغام_ستون + t_ستون >= wrap_ستون - 1)))))
 	{
 	    /*
 	     * The screen is scrolled up when at the last row (some terminals
 	     * scroll automatically, some don't.  To avoid problems we scroll
 	     * ourselves).
 	     */
-	    if (t_col > 0)
+	    اگر (t_ستون > 0)
 	    {
 		// output postponed text
-#ifdef HAS_MESSAGE_WINDOW
-		if (msg_win != NULL)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+		اگر (پیغام_win != تہی)
 		{
-		    put_msg_win(msg_win, where, t_s, s, lnum);
-		    if (where == PUT_BELOW)
+		    put_پیغام_win(پیغام_win, where, t_s, s, lnum);
+		    اگر (where == PUT_نیچے)
 			++lnum;
-		    t_col = 0;
-		    where = PUT_BELOW;
+		    t_ستون = 0;
+		    where = PUT_نیچے;
 		}
-		else
-#endif
-		    t_puts(&t_col, t_s, s, attr);
+		ورنہ
+#اگر_ختم
+		    t_puts(&t_ستون, t_s, s, attr);
 	    }
 
 	    // When no more prompt and no more room, truncate here
-	    if (msg_no_more && lines_left == 0)
-		break;
+	    اگر (پیغام_no_مزید && سطریں_بایاں == 0)
+		توڑو;
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
-#endif
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win == تہی)
+#اگر_ختم
 		// Scroll the screen up one line.
-		msg_scroll_up();
+		پیغام_scroll_اوپر();
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win == تہی)
 	    {
-#endif
-		msg_row = Rows - 2;
-		if (msg_col >= cmdline_width)  // can happen after screen resize
-		    msg_col = cmdline_width - 1;
-#ifdef HAS_MESSAGE_WINDOW
+#اگر_ختم
+		پیغام_صف = صفیں - 2;
+		اگر (پیغام_ستون >= cmdline_چوڑائی)  // can happen after screen resize
+		    پیغام_ستون = cmdline_چوڑائی - 1;
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
 	    }
-#endif
+#اگر_ختم
 
 	    // Display char in last column before showing more-prompt.
-	    if (*s >= ' '
-#ifdef FEAT_RIGHTLEFT
+	    اگر (*s >= ' '
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
 		    && !cmdmsg_rl
-#endif
+#اگر_ختم
 	       )
 	    {
-		if (has_mbyte)
+		اگر (has_mbyte)
 		{
-		    if (enc_utf8 && maxlen >= 0)
+		    اگر (enc_utf8 && maxlen >= 0)
 			// avoid including composing chars after the end
-			l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		    else
+			l = utfc_ptr2len_len(s, (صحیح)((str + maxlen) - s));
+		    ورنہ
 			l = (*mb_ptr2len)(s);
 		    s = screen_puts_mbyte(s, l, attr);
 		}
-		else
-		    msg_screen_putchar(*s++, attr);
-		did_last_char = TRUE;
+		ورنہ
+		    پیغام_screen_putchar(*s++, attr);
+		did_آخری_char = TRUE;
 	    }
-	    else
-		did_last_char = FALSE;
+	    ورنہ
+		did_آخری_char = FALSE;
 
-	    if (p_more)
+	    اگر (p_مزید)
 		// store text for scrolling back
-		store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
+		store_sb_متن(&sb_str, s, attr, &sb_ستون, TRUE);
 
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win == تہی)
 	    {
-#endif
-		inc_msg_scrolled();
+#اگر_ختم
+		inc_پیغام_scrolled();
 		need_wait_return = TRUE; // may need wait_return() in main()
 		redraw_cmdline = TRUE;
-		if (cmdline_row > 0 && !exmode_active)
-		    --cmdline_row;
+		اگر (cmdline_صف > 0 && !exmode_فعال)
+		    --cmdline_صف;
 
 		/*
 		 * If screen is completely filled and 'more' is set then wait
 		 * for a character.
 		 */
-		if (lines_left > 0)
-		    --lines_left;
-#ifdef HAS_MESSAGE_WINDOW
+		اگر (سطریں_بایاں > 0)
+		    --سطریں_بایاں;
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
 	    }
-#endif
-	    if (p_more && lines_left == 0 && State != MODE_HITRETURN
-					    && !msg_no_more && !exmode_active)
+#اگر_ختم
+	    اگر (p_مزید && سطریں_بایاں == 0 && State != منوال_HITRETURN
+					    && !پیغام_no_مزید && !exmode_فعال)
 	    {
-#ifdef FEAT_CON_DIALOG
-		if (do_more_prompt(NUL))
-		    s = confirm_msg_tail;
-#else
-		(void)do_more_prompt(NUL);
-#endif
-		if (quit_more)
-		    return;
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+		اگر (do_مزید_prompt(NUL))
+		    s = confirm_پیغام_دم;
+#ورنہ
+		(خالی)do_مزید_prompt(NUL);
+#اگر_ختم
+		اگر (quit_مزید)
+		    واپس;
 	    }
 
 	    // When we displayed a char in last column need to check if there
 	    // is still more.
-	    if (did_last_char)
-		continue;
+	    اگر (did_آخری_char)
+		جاری;
 	}
 
 	wrap = *s == '\n'
-		    || msg_col + t_col >= wrap_col
+		    || پیغام_ستون + t_ستون >= wrap_ستون
 		    || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			    && msg_col + t_col >= wrap_col - 1);
-	if (t_col > 0 && (wrap || *s == '\r' || *s == '\b'
+			    && پیغام_ستون + t_ستون >= wrap_ستون - 1);
+	اگر (t_ستون > 0 && (wrap || *s == '\r' || *s == '\b'
 						 || *s == '\t' || *s == BELL))
 	{
 	    // output any postponed text
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win != تہی)
 	    {
-		put_msg_win(msg_win, where, t_s, s, lnum);
-		if (where == PUT_BELOW)
+		put_پیغام_win(پیغام_win, where, t_s, s, lnum);
+		اگر (where == PUT_نیچے)
 		    ++lnum;
-		t_col = 0;
-		where = PUT_BELOW;
+		t_ستون = 0;
+		where = PUT_نیچے;
 		// Reset msg_col after outputting to new line in echowindow
-		if (wrap)
-		    msg_col = 0;
+		اگر (wrap)
+		    پیغام_ستون = 0;
 	    }
-	    else
-#endif
-		t_puts(&t_col, t_s, s, attr);
+	    ورنہ
+#اگر_ختم
+		t_puts(&t_ستون, t_s, s, attr);
 	}
 
-	if (wrap && p_more && !recurse)
+	اگر (wrap && p_مزید && !recurse)
 	    // store text for scrolling back
-	    store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
+	    store_sb_متن(&sb_str, s, attr, &sb_ستون, TRUE);
 
-	if (*s == '\n')		    // go to next line
+	اگر (*s == '\n')		    // go to next line
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win != تہی)
 	    {
 		// Ignore a NL when the buffer is empty, it is used to scroll
 		// up the text.
-		if ((msg_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
+		اگر ((پیغام_win->w_بفر->b_ml.ml_flags & ML_خالی_خانے) == 0)
 		{
-		    put_msg_win(msg_win, PUT_BELOW, t_s, t_s, lnum);
+		    put_پیغام_win(پیغام_win, PUT_نیچے, t_s, t_s, lnum);
 		    ++lnum;
 		}
-		msg_col = 0;  // Reset column for new line
+		پیغام_ستون = 0;  // Reset column for new line
 	    }
-	    else
-#endif
-		msg_didout = FALSE;	    // remember that line is empty
-#ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
-		msg_col = cmdline_width - 1;
-	    else
-#endif
-		msg_col = 0;
-	    if (++msg_row >= Rows)  // safety check
-		msg_row = Rows - 1;
+	    ورنہ
+#اگر_ختم
+		پیغام_didout = FALSE;	    // remember that line is empty
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	    اگر (cmdmsg_rl)
+		پیغام_ستون = cmdline_چوڑائی - 1;
+	    ورنہ
+#اگر_ختم
+		پیغام_ستون = 0;
+	    اگر (++پیغام_صف >= صفیں)  // safety check
+		پیغام_صف = صفیں - 1;
 	}
-	else if (*s == '\r')	    // go to column 0
+	ورنہ اگر (*s == '\r')	    // go to column 0
 	{
-	    msg_col = 0;
-#ifdef HAS_MESSAGE_WINDOW
+	    پیغام_ستون = 0;
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
 	    where = PUT_TRUNC;
-#endif
+#اگر_ختم
 	}
-	else if (*s == '\b')	    // go to previous char
+	ورنہ اگر (*s == '\b')	    // go to previous char
 	{
-	    if (msg_col)
-		--msg_col;
+	    اگر (پیغام_ستون)
+		--پیغام_ستون;
 	}
-	else if (*s == TAB)	    // translate Tab into spaces
+	ورنہ اگر (*s == TAB)	    // translate Tab into spaces
 	{
-#ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
-		msg_col = (msg_col + 7) % 8;
-	    else
-#endif
-		do
-		    msg_screen_putchar(' ', attr);
-		while (msg_col & 7);
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	    اگر (پیغام_win != تہی)
+		پیغام_ستون = (پیغام_ستون + 7) % 8;
+	    ورنہ
+#اگر_ختم
+		کرو
+		    پیغام_screen_putchar(' ', attr);
+		جب (پیغام_ستون & 7);
 	}
-	else if (*s == BELL)		// beep (from ":sh")
+	ورنہ اگر (*s == BELL)		// beep (from ":sh")
 	    vim_beep(BO_SH);
-	else
+	ورنہ
 	{
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 	    {
 		cw = (*mb_ptr2cells)(s);
-		if (enc_utf8 && maxlen >= 0)
+		اگر (enc_utf8 && maxlen >= 0)
 		    // avoid including composing chars after the end
-		    l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		else
+		    l = utfc_ptr2len_len(s, (صحیح)((str + maxlen) - s));
+		ورنہ
 		    l = (*mb_ptr2len)(s);
 	    }
-	    else
+	    ورنہ
 	    {
 		cw = 1;
 		l = 1;
@@ -2751,23 +2751,23 @@ msg_puts_display(
 	    // When drawing from right to left or when a double-wide character
 	    // doesn't fit, draw a single character here.  Otherwise collect
 	    // characters and draw them all at once later.
-	    if (
-#ifdef FEAT_RIGHTLEFT
+	    اگر (
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
 		    cmdmsg_rl ||
-#endif
-		    (cw > 1 && msg_col + t_col >= wrap_col))
+#اگر_ختم
+		    (cw > 1 && پیغام_ستون + t_ستون >= wrap_ستون))
 	    {
-		if (l > 1)
+		اگر (l > 1)
 		    s = screen_puts_mbyte(s, l, attr) - 1;
-		else
-		    msg_screen_putchar(*s, attr);
+		ورنہ
+		    پیغام_screen_putchar(*s, attr);
 	    }
-	    else
+	    ورنہ
 	    {
 		// postpone this character until later
-		if (t_col == 0)
+		اگر (t_ستون == 0)
 		    t_s = s;
-		t_col += cw;
+		t_ستون += cw;
 		s += l - 1;
 	    }
 	}
@@ -2775,263 +2775,263 @@ msg_puts_display(
     }
 
     // output any postponed text
-    if (t_col > 0)
+    اگر (t_ستون > 0)
     {
-#ifdef HAS_MESSAGE_WINDOW
-	if (msg_win != NULL)
-	    put_msg_win(msg_win, where, t_s, s, lnum);
-	else
-#endif
-	    t_puts(&t_col, t_s, s, attr);
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+	اگر (پیغام_win != تہی)
+	    put_پیغام_win(پیغام_win, where, t_s, s, lnum);
+	ورنہ
+#اگر_ختم
+	    t_puts(&t_ستون, t_s, s, attr);
     }
 
-#ifdef HAS_MESSAGE_WINDOW
-    if (msg_win != NULL)
-	popup_show_message_win();
-#endif
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (پیغام_win != تہی)
+	popup_show_پیغام_win();
+#اگر_ختم
     // Store the text for scroll back.
-    if (p_more && !recurse)
-	store_sb_text(&sb_str, s, attr, &sb_col, FALSE);
+    اگر (p_مزید && !recurse)
+	store_sb_متن(&sb_str, s, attr, &sb_ستون, FALSE);
 
-    msg_check();
+    پیغام_check();
 }
 
 /*
  * Return TRUE when ":filter pattern" was used and "msg" does not match
  * "pattern".
  */
-    int
-message_filtered(char_u *msg)
+    صحیح
+پیغام_filtered(char_u *پیغام)
 {
-    int match;
+    صحیح مطابقت;
 
-    if (cmdmod.cmod_filter_regmatch.regprog == NULL)
-	return FALSE;
-    match = vim_regexec(&cmdmod.cmod_filter_regmatch, msg, (colnr_T)0);
-    return cmdmod.cmod_filter_force ? match : !match;
+    اگر (cmdmod.cmod_filter_regmatch.regprog == تہی)
+	واپس FALSE;
+    مطابقت = vim_regexec(&cmdmod.cmod_filter_regmatch, پیغام, (colnr_T)0);
+    واپس cmdmod.cmod_filter_force ? مطابقت : !مطابقت;
 }
 
 /*
  * Scroll the screen up one line for displaying the next message line.
  */
-    static void
-msg_scroll_up(void)
+    ساکن خالی
+پیغام_scroll_اوپر(خالی)
 {
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
-#endif
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (اندر_echowindow)
+	واپس;
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_GUI
     // Remove the cursor before scrolling, ScreenLines[] is going
     // to become invalid.
-    if (gui.in_use)
+    اگر (gui.اندر_use)
 	gui_undraw_cursor();
-#endif
+#اگر_ختم
     // scrolling up always works
     mch_disable_flush();
-    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
+    screen_del_سطریں(0, 0, 1, (صحیح)صفیں, TRUE, 0, تہی);
     mch_enable_flush();
 
-    if (!can_clear((char_u *)" "))
+    اگر (!can_clear((char_u *)" "))
     {
 	// Scrolling up doesn't result in the right background.  Set the
 	// background here.  It's not efficient, but avoids that we have to do
 	// it all over the code.
-	screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_MSG));
+	screen_fill((صحیح)صفیں - 1, (صحیح)صفیں, cmdline_ستون_off,
+		cmdline_ستون_off + cmdline_چوڑائی, ' ', ' ', HL_ATTR(HLF_پیغام));
 
 	// Also clear the last char of the last but one line if it was not
 	// cleared before to avoid a scroll-up.
-	if (ScreenAttrs[LineOffset[Rows - 2] + Columns - 1] == (sattr_T)-1)
-	    screen_fill((int)Rows - 2, (int)Rows - 1,
-				 (int)Columns - 1, (int)Columns,
-				 ' ', ' ', HL_ATTR(HLF_MSG));
+	اگر (ScreenAttrs[سطر_انحراف[صفیں - 2] + Columns - 1] == (sattr_T)-1)
+	    screen_fill((صحیح)صفیں - 2, (صحیح)صفیں - 1,
+				 (صحیح)Columns - 1, (صحیح)Columns,
+				 ' ', ' ', HL_ATTR(HLF_پیغام));
     }
 }
 
 /*
  * Increment "msg_scrolled".
  */
-    static void
-inc_msg_scrolled(void)
+    ساکن خالی
+inc_پیغام_scrolled(خالی)
 {
-#ifdef FEAT_EVAL
-    if (*get_vim_var_str(VV_SCROLLSTART) == NUL)
+#اگر_تعریف_شدہ FEAT_EVAL
+    اگر (*get_vim_var_str(VV_SCROLLSTART) == NUL)
     {
 	string_T    p = {SOURCING_NAME, 0};
-	char_u	    *tofree = NULL;
+	char_u	    *tofree = تہی;
 
 	// v:scrollstart is empty, set it to the script/function name and line
-	// number
-	if (p.string == NULL)
+	//نمبر
+	اگر (p.string == تہی)
 	{
 	    p.string = (char_u *)_("Unknown");
-	    p.length = STRLEN(p.string);
+	    p.لمبائی = STRLEN(p.string);
 	}
-	else
+	ورنہ
 	{
 	    size_t  tofreesize;
 
-	    tofreesize = (int)STRLEN(p.string) + 40;
+	    tofreesize = (صحیح)STRLEN(p.string) + 40;
 	    tofree = alloc(tofreesize);
-	    if (tofree != NULL)
+	    اگر (tofree != تہی)
 	    {
-		p.length = vim_snprintf_safelen((char *)tofree, tofreesize,
-		    _("%s line %ld"), p.string, (long)SOURCING_LNUM);
+		p.لمبائی = vim_snprintf_safelen((حرف *)tofree, tofreesize,
+		    _("%s line %ld"), p.string, (طویل)SOURCING_LNUM);
 		p.string = tofree;
 	    }
 	}
-	set_vim_var_string(VV_SCROLLSTART, p.string, (int)p.length);
+	سیٹ_vim_var_string(VV_SCROLLSTART, p.string, (صحیح)p.لمبائی);
 	vim_free(tofree);
     }
-#endif
-    ++msg_scrolled;
-    set_must_redraw(UPD_VALID);
+#اگر_ختم
+    ++پیغام_scrolled;
+    سیٹ_must_redraw(UPD_VALID);
 }
 
 /*
  * To be able to scroll back at the "more" and "hit-enter" prompts we need to
  * store the displayed text and remember where screen lines start.
  */
-typedef struct msgchunk_S msgchunk_T;
-struct msgchunk_S
+قسمتعریف ساخت msgchunk_S msgchunk_T;
+ساخت msgchunk_S
 {
-    msgchunk_T	*sb_next;
-    msgchunk_T	*sb_prev;
-    char	sb_eol;		// TRUE when line ends after this text
-    int		sb_msg_col;	// column in which text starts
-    int		sb_attr;	// text attributes
-    char_u	sb_text[1];	// text to be displayed, actually longer
+    msgchunk_T	*sb_اگلا;
+    msgchunk_T	*sb_پچھلا;
+    حرف	sb_eol;		// TRUE when line ends after this text
+    صحیح		sb_پیغام_ستون;	// column in which text starts
+    صحیح		sb_attr;	// text attributes
+    char_u	sb_متن[1];	// text to be displayed, actually longer
 };
 
-static msgchunk_T *last_msgchunk = NULL; // last displayed text
+ساکن msgchunk_T *آخری_msgchunk = تہی; // last displayed text
 
-static msgchunk_T *msg_sb_start(msgchunk_T *mps);
+ساکن msgchunk_T *پیغام_sb_آغاز(msgchunk_T *mps);
 
-typedef enum {
+قسمتعریف شمار {
     SB_CLEAR_NONE = 0,
     SB_CLEAR_ALL,
     SB_CLEAR_CMDLINE_BUSY,
-    SB_CLEAR_CMDLINE_DONE
+    SB_CLEAR_CMDLINE_مکمل
 } sb_clear_T;
 
 // When to clear text on next msg.
-static sb_clear_T do_clear_sb_text = SB_CLEAR_NONE;
+ساکن sb_clear_T do_clear_sb_متن = SB_CLEAR_NONE;
 
 /*
  * Store part of a printed message for displaying when scrolling back.
  */
-    static void
-store_sb_text(
+    ساکن خالی
+store_sb_متن(
     char_u	**sb_str,	// start of string
     char_u	*s,		// just after string
-    int		attr,
-    int		*sb_col,
-    int		finish)		// line ends
+    صحیح		attr,
+    صحیح		*sb_ستون,
+    صحیح		اختتام)		// line ends
 {
     msgchunk_T	*mp;
 
-    if (do_clear_sb_text == SB_CLEAR_ALL
-	    || do_clear_sb_text == SB_CLEAR_CMDLINE_DONE)
+    اگر (do_clear_sb_متن == SB_CLEAR_ALL
+	    || do_clear_sb_متن == SB_CLEAR_CMDLINE_مکمل)
     {
-	clear_sb_text(do_clear_sb_text == SB_CLEAR_ALL);
-	msg_sb_eol();  // prevent messages from overlapping
-	do_clear_sb_text = SB_CLEAR_NONE;
+	clear_sb_متن(do_clear_sb_متن == SB_CLEAR_ALL);
+	پیغام_sb_eol();  // prevent messages from overlapping
+	do_clear_sb_متن = SB_CLEAR_NONE;
     }
 
-    if (s > *sb_str)
+    اگر (s > *sb_str)
     {
-	mp = alloc(offsetof(msgchunk_T, sb_text) + (s - *sb_str) + 1);
-	if (mp != NULL)
+	mp = alloc(offsetof(msgchunk_T, sb_متن) + (s - *sb_str) + 1);
+	اگر (mp != تہی)
 	{
-	    mp->sb_eol = finish;
-	    mp->sb_msg_col = *sb_col;
+	    mp->sb_eol = اختتام;
+	    mp->sb_پیغام_ستون = *sb_ستون;
 	    mp->sb_attr = attr;
-	    vim_strncpy(mp->sb_text, *sb_str, s - *sb_str);
+	    vim_strncpy(mp->sb_متن, *sb_str, s - *sb_str);
 
-	    if (last_msgchunk == NULL)
+	    اگر (آخری_msgchunk == تہی)
 	    {
-		last_msgchunk = mp;
-		mp->sb_prev = NULL;
+		آخری_msgchunk = mp;
+		mp->sb_پچھلا = تہی;
 	    }
-	    else
+	    ورنہ
 	    {
-		mp->sb_prev = last_msgchunk;
-		last_msgchunk->sb_next = mp;
-		last_msgchunk = mp;
+		mp->sb_پچھلا = آخری_msgchunk;
+		آخری_msgchunk->sb_اگلا = mp;
+		آخری_msgchunk = mp;
 	    }
-	    mp->sb_next = NULL;
+	    mp->sb_اگلا = تہی;
 	}
     }
-    else if (finish && last_msgchunk != NULL)
-	last_msgchunk->sb_eol = TRUE;
+    ورنہ اگر (اختتام && آخری_msgchunk != تہی)
+	آخری_msgchunk->sb_eol = TRUE;
 
     *sb_str = s;
-    *sb_col = 0;
+    *sb_ستون = 0;
 }
 
 /*
  * Finished showing messages, clear the scroll-back text on the next message.
  */
-    void
-may_clear_sb_text(void)
+    خالی
+may_clear_sb_متن(خالی)
 {
-    do_clear_sb_text = SB_CLEAR_ALL;
+    do_clear_sb_متن = SB_CLEAR_ALL;
 }
 
 /*
  * Starting to edit the command line: do not clear messages now.
  */
-    void
-sb_text_start_cmdline(void)
+    خالی
+sb_متن_آغاز_cmdline(خالی)
 {
-    if (do_clear_sb_text == SB_CLEAR_CMDLINE_BUSY)
+    اگر (do_clear_sb_متن == SB_CLEAR_CMDLINE_BUSY)
 	// Invoking command line recursively: the previous-level command line
 	// doesn't need to be remembered as it will be redrawn when returning
 	// to that level.
-	sb_text_restart_cmdline();
-    else
+	sb_متن_restart_cmdline();
+    ورنہ
     {
-	msg_sb_eol();
-	do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
+	پیغام_sb_eol();
+	do_clear_sb_متن = SB_CLEAR_CMDLINE_BUSY;
     }
 }
 
 /*
  * Redrawing the command line: clear the last unfinished line.
  */
-    void
-sb_text_restart_cmdline(void)
+    خالی
+sb_متن_restart_cmdline(خالی)
 {
     msgchunk_T *tofree;
 
     // Needed when returning from nested command line.
-    do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
+    do_clear_sb_متن = SB_CLEAR_CMDLINE_BUSY;
 
-    if (last_msgchunk == NULL || last_msgchunk->sb_eol)
+    اگر (آخری_msgchunk == تہی || آخری_msgchunk->sb_eol)
 	// No unfinished line: don't clear anything.
-	return;
+	واپس;
 
-    tofree = msg_sb_start(last_msgchunk);
-    last_msgchunk = tofree->sb_prev;
-    if (last_msgchunk != NULL)
-	last_msgchunk->sb_next = NULL;
-    while (tofree != NULL)
+    tofree = پیغام_sb_آغاز(آخری_msgchunk);
+    آخری_msgchunk = tofree->sb_پچھلا;
+    اگر (آخری_msgchunk != تہی)
+	آخری_msgchunk->sb_اگلا = تہی;
+    جب (tofree != تہی)
     {
-	msgchunk_T *tofree_next = tofree->sb_next;
+	msgchunk_T *tofree_اگلا = tofree->sb_اگلا;
 
 	vim_free(tofree);
-	tofree = tofree_next;
+	tofree = tofree_اگلا;
     }
 }
 
 /*
  * Ending to edit the command line: clear old lines but the last one later.
  */
-    void
-sb_text_end_cmdline(void)
+    خالی
+sb_متن_انتہا_cmdline(خالی)
 {
-    do_clear_sb_text = SB_CLEAR_CMDLINE_DONE;
+    do_clear_sb_متن = SB_CLEAR_CMDLINE_مکمل;
 }
 
 /*
@@ -3039,24 +3039,24 @@ sb_text_end_cmdline(void)
  * When "all" is FALSE keep the last line.
  * Called when redrawing the screen.
  */
-    void
-clear_sb_text(int all)
+    خالی
+clear_sb_متن(صحیح all)
 {
     msgchunk_T	*mp;
     msgchunk_T	**lastp;
 
-    if (all)
-	lastp = &last_msgchunk;
-    else
+    اگر (all)
+	lastp = &آخری_msgchunk;
+    ورنہ
     {
-	if (last_msgchunk == NULL)
-	    return;
-	lastp = &msg_sb_start(last_msgchunk)->sb_prev;
+	اگر (آخری_msgchunk == تہی)
+	    واپس;
+	lastp = &پیغام_sb_آغاز(آخری_msgchunk)->sb_پچھلا;
     }
 
-    while (*lastp != NULL)
+    جب (*lastp != تہی)
     {
-	mp = (*lastp)->sb_prev;
+	mp = (*lastp)->sb_پچھلا;
 	vim_free(*lastp);
 	*lastp = mp;
     }
@@ -3065,19 +3065,19 @@ clear_sb_text(int all)
 /*
  * "g<" command.
  */
-    void
-show_sb_text(void)
+    خالی
+show_sb_متن(خالی)
 {
     msgchunk_T	*mp;
 
     // Only show something if there is more than one line, otherwise it looks
     // weird, typing a command without output results in one line.
-    mp = msg_sb_start(last_msgchunk);
-    if (mp == NULL || mp->sb_prev == NULL)
+    mp = پیغام_sb_آغاز(آخری_msgchunk);
+    اگر (mp == تہی || mp->sb_پچھلا == تہی)
 	vim_beep(BO_MESS);
-    else
+    ورنہ
     {
-	do_more_prompt('G');
+	do_مزید_prompt('G');
 	wait_return(FALSE);
     }
 }
@@ -3085,28 +3085,28 @@ show_sb_text(void)
 /*
  * Move to the start of screen line in already displayed text.
  */
-    static msgchunk_T *
-msg_sb_start(msgchunk_T *mps)
+    ساکن msgchunk_T *
+پیغام_sb_آغاز(msgchunk_T *mps)
 {
     msgchunk_T *mp = mps;
 
-    while (mp != NULL && mp->sb_prev != NULL && !mp->sb_prev->sb_eol)
-	mp = mp->sb_prev;
-    return mp;
+    جب (mp != تہی && mp->sb_پچھلا != تہی && !mp->sb_پچھلا->sb_eol)
+	mp = mp->sb_پچھلا;
+    واپس mp;
 }
 
 /*
  * Mark the last message chunk as finishing the line.
  */
-    void
-msg_sb_eol(void)
+    خالی
+پیغام_sb_eol(خالی)
 {
     // A trailing newline starts an empty line that has not been filled yet.
     // Marking it as finished would introduce an extra empty line.
-    if (last_msgchunk != NULL
-	    && !(last_msgchunk->sb_text[0] == '\n'
-		&& last_msgchunk->sb_text[1] == NUL))
-	last_msgchunk->sb_eol = TRUE;
+    اگر (آخری_msgchunk != تہی
+	    && !(آخری_msgchunk->sb_متن[0] == '\n'
+		&& آخری_msgchunk->sb_متن[1] == NUL))
+	آخری_msgchunk->sb_eol = TRUE;
 }
 
 /*
@@ -3114,59 +3114,59 @@ msg_sb_eol(void)
  * When "clear_to_eol" is set clear the rest of the screen line.
  * Returns a pointer to the text for the next line (can be NULL).
  */
-    static msgchunk_T *
-disp_sb_line(int row, msgchunk_T *smp, int clear_to_eol)
+    ساکن msgchunk_T *
+disp_sb_سطر(صحیح صف, msgchunk_T *smp, صحیح clear_مقصد_eol)
 {
     msgchunk_T	*mp = smp;
     char_u	*p;
 
-    for (;;)
+    برائے (;;)
     {
-	msg_row = row;
-	msg_col = mp->sb_msg_col;
-	p = mp->sb_text;
-	if (*p == '\n')	    // don't display the line break
+	پیغام_صف = صف;
+	پیغام_ستون = mp->sb_پیغام_ستون;
+	p = mp->sb_متن;
+	اگر (*p == '\n')	    // don't display the line break
 	    ++p;
-	msg_puts_display(p, -1, mp->sb_attr, TRUE);
+	پیغام_puts_display(p, -1, mp->sb_attr, TRUE);
 
 	// If clearing the screen did not work (e.g. because of a background
 	// color and t_ut isn't set) clear until the last column here.
-	if (clear_to_eol)
-	    screen_fill(row, row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', HL_ATTR(HLF_MSG));
+	اگر (clear_مقصد_eol)
+	    screen_fill(صف, صف + 1,
+		    cmdline_ستون_off + پیغام_ستون, cmdline_ستون_off + cmdline_چوڑائی,
+		    ' ', ' ', HL_ATTR(HLF_پیغام));
 
-	if (mp->sb_eol || mp->sb_next == NULL)
-	    break;
-	mp = mp->sb_next;
+	اگر (mp->sb_eol || mp->sb_اگلا == تہی)
+	    توڑو;
+	mp = mp->sb_اگلا;
     }
-    return mp->sb_next;
+    واپس mp->sb_اگلا;
 }
 
 /*
  * Output any postponed text for msg_puts_attr_len().
  */
-    static void
+    ساکن خالی
 t_puts(
-    int		*t_col,
+    صحیح		*t_ستون,
     char_u	*t_s,
     char_u	*s,
-    int		attr)
+    صحیح		attr)
 {
     // output postponed text
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_puts_len(t_s, (int)(s - t_s), msg_row, cmdline_col_off + msg_col,
+    پیغام_didout = TRUE;		// remember that line is not empty
+    screen_puts_len(t_s, (صحیح)(s - t_s), پیغام_صف, cmdline_ستون_off + پیغام_ستون,
 	    attr);
-    msg_col += *t_col;
-    *t_col = 0;
+    پیغام_ستون += *t_ستون;
+    *t_ستون = 0;
     // If the string starts with a composing character don't increment the
     // column position for it.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
-	--msg_col;
-    if (msg_col >= cmdline_width)
+    اگر (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
+	--پیغام_ستون;
+    اگر (پیغام_ستون >= cmdline_چوڑائی)
     {
-	msg_col = 0;
-	++msg_row;
+	پیغام_ستون = 0;
+	++پیغام_صف;
     }
 }
 
@@ -3178,56 +3178,56 @@ t_puts(
  * different, e.g. for Win32 console) or we just don't know where the
  * cursor is.
  */
-    int
-msg_use_printf(void)
+    صحیح
+پیغام_use_printf(خالی)
 {
-    return (!msg_check_screen()
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    واپس (!پیغام_check_screen()
+#اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    || (!gui.in_use && !termcap_active)
-# else
-	    || !termcap_active
+	    || (!gui.اندر_use && !termcap_فعال)
+# ورنہ
+	    || !termcap_فعال
 # endif
-#endif
-	    || (swapping_screen() && !termcap_active)
+#اگر_ختم
+	    || (swapping_screen() && !termcap_فعال)
 	       );
 }
 
 /*
  * Print a message when there is no valid screen.
  */
-    static void
-msg_puts_printf(char_u *str, int maxlen)
+    ساکن خالی
+پیغام_puts_printf(char_u *str, صحیح maxlen)
 {
     char_u	*s = str;
-    char_u	*buf = NULL;
+    char_u	*buf = تہی;
     char_u	*p = s;
 
-#ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+#اگر_تعریف_شدہ MSWIN
+    اگر (!(silent_منوال && p_verbose == 0))
 	mch_settmode(TMODE_COOK);	// handle CR and NL correctly
-#endif
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+#اگر_ختم
+    جب ((maxlen < 0 || (صحیح)(s - str) < maxlen) && *s != NUL)
     {
-	if (!(silent_mode && p_verbose == 0))
+	اگر (!(silent_منوال && p_verbose == 0))
 	{
 	    // NL --> CR NL translation (for Unix, not for "--version")
-	    if (*s == NL)
+	    اگر (*s == NL)
 	    {
-		int n = (int)(s - p);
+		صحیح n = (صحیح)(s - p);
 
 		buf = alloc(n + 3);
-		if (buf != NULL)
+		اگر (buf != تہی)
 		{
-		    memcpy(buf, p, n);
-		    if (!info_message)
+		    حافظہ_نقل(buf, p, n);
+		    اگر (!info_پیغام)
 			buf[n++] = CAR;
 		    buf[n++] = NL;
 		    buf[n++] = NUL;
-		    if (info_message)   // informative message, not an error
-			mch_msg((char *)buf);
-		    else
-			mch_errmsg((char *)buf);
+		    اگر (info_پیغام)   // informative message, not an error
+			mch_پیغام((حرف *)buf);
+		    ورنہ
+			mch_errmsg((حرف *)buf);
 		    vim_free(buf);
 		}
 		p = s + 1;
@@ -3235,51 +3235,51 @@ msg_puts_printf(char_u *str, int maxlen)
 	}
 
 	// primitive way to compute the current column
-#ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (cmdmsg_rl)
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = cmdline_width - 1;
-	    else
-		--msg_col;
+	    اگر (*s == CAR || *s == NL)
+		پیغام_ستون = cmdline_چوڑائی - 1;
+	    ورنہ
+		--پیغام_ستون;
 	}
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = 0;
-	    else
-		++msg_col;
+	    اگر (*s == CAR || *s == NL)
+		پیغام_ستون = 0;
+	    ورنہ
+		++پیغام_ستون;
 	}
 	++s;
     }
 
-    if (*p != NUL && !(silent_mode && p_verbose == 0))
+    اگر (*p != NUL && !(silent_منوال && p_verbose == 0))
     {
-	char_u *tofree = NULL;
+	char_u *tofree = تہی;
 
-	if (maxlen > 0 && vim_strlen_maxlen((char *)p, (size_t)maxlen)
+	اگر (maxlen > 0 && vim_strlen_maxlen((حرف *)p, (size_t)maxlen)
 							     >= (size_t)maxlen)
 	{
 	    tofree = vim_strnsave(p, (size_t)maxlen);
 	    p = tofree;
 	}
-	if (p != NULL)
+	اگر (p != تہی)
 	{
-	    if (info_message)
-		mch_msg((char *)p);
-	    else
-		mch_errmsg((char *)p);
+	    اگر (info_پیغام)
+		mch_پیغام((حرف *)p);
+	    ورنہ
+		mch_errmsg((حرف *)p);
 	    vim_free(tofree);
 	}
     }
 
-    msg_didout = TRUE;	    // assume that line is not empty
+    پیغام_didout = TRUE;	    // assume that line is not empty
 
-#ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+#اگر_تعریف_شدہ MSWIN
+    اگر (!(silent_منوال && p_verbose == 0))
 	mch_settmode(TMODE_RAW);
-#endif
+#اگر_ختم
 }
 
 /*
@@ -3289,311 +3289,311 @@ msg_puts_printf(char_u *str, int maxlen)
  * otherwise it's NUL.
  * Returns TRUE when jumping ahead to "confirm_msg_tail".
  */
-    static int
-do_more_prompt(int typed_char)
+    ساکن صحیح
+do_مزید_prompt(صحیح typed_char)
 {
-    static int	entered = FALSE;
-    int		used_typed_char = typed_char;
-    int		oldState = State;
-    int		c;
-#ifdef FEAT_CON_DIALOG
-    int		retval = FALSE;
-#endif
-    int		toscroll;
-    msgchunk_T	*mp_last = NULL;
+    ساکن صحیح	entered = FALSE;
+    صحیح		مستعمل_typed_char = typed_char;
+    صحیح		oldState = State;
+    صحیح		c;
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+    صحیح		retval = FALSE;
+#اگر_ختم
+    صحیح		toscroll;
+    msgchunk_T	*mp_آخری = تہی;
     msgchunk_T	*mp;
-    int		i;
-    int		msg_attr;
+    صحیح		i;
+    صحیح		پیغام_attr;
 
-    msg_attr = HL_ATTR(HLF_MSG);
+    پیغام_attr = HL_ATTR(HLF_پیغام);
 
     // We get called recursively when a timer callback outputs a message. In
     // that case don't show another prompt. Also when at the hit-Enter prompt
     // and nothing was typed.
-    if (entered || (State == MODE_HITRETURN && typed_char == 0))
-	return FALSE;
+    اگر (entered || (State == منوال_HITRETURN && typed_char == 0))
+	واپس FALSE;
     entered = TRUE;
 
-    if (typed_char == 'G')
+    اگر (typed_char == 'G')
     {
 	// "g<": Find first line on the last page.
-	mp_last = msg_sb_start(last_msgchunk);
-	for (i = 0; i < Rows - 2 && mp_last != NULL
-					     && mp_last->sb_prev != NULL; ++i)
-	    mp_last = msg_sb_start(mp_last->sb_prev);
+	mp_آخری = پیغام_sb_آغاز(آخری_msgchunk);
+	برائے (i = 0; i < صفیں - 2 && mp_آخری != تہی
+					     && mp_آخری->sb_پچھلا != تہی; ++i)
+	    mp_آخری = پیغام_sb_آغاز(mp_آخری->sb_پچھلا);
     }
 
-    State = MODE_ASKMORE;
+    State = منوال_ASKMORE;
     setmouse();
-    if (typed_char == NUL)
-	msg_moremsg(FALSE);
-    for (;;)
+    اگر (typed_char == NUL)
+	پیغام_moremsg(FALSE);
+    برائے (;;)
     {
 	/*
 	 * Get a typed character directly from the user.
 	 */
-	if (used_typed_char != NUL)
+	اگر (مستعمل_typed_char != NUL)
 	{
-	    c = used_typed_char;	// was typed at hit-enter prompt
-	    used_typed_char = NUL;
+	    c = مستعمل_typed_char;	// was typed at hit-enter prompt
+	    مستعمل_typed_char = NUL;
 	}
-	else
+	ورنہ
 	    c = get_keystroke();
 
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	if (c == K_MENU)
+#اگر defined(FEAT_MENU) && defined(FEAT_GUI)
+	اگر (c == K_MENU)
 	{
-	    int idx = get_menu_index(current_menu, MODE_ASKMORE);
+	    صحیح idx = get_menu_اشاریہ(current_menu, منوال_ASKMORE);
 
 	    // Used a menu.  If it starts with CTRL-Y, it must
 	    // be a "Copy" for the clipboard.  Otherwise
 	    // assume that we end
-	    if (idx == MENU_INDEX_INVALID)
-		continue;
-	    c = *current_menu->strings[idx];
-	    if (c != NUL && current_menu->strings[idx][1] != NUL)
-		ins_typebuf(current_menu->strings[idx] + 1,
+	    اگر (idx == MENU_اشاریہ_INVALID)
+		جاری;
+	    c = *current_menu->لڑیاں[idx];
+	    اگر (c != NUL && current_menu->لڑیاں[idx][1] != NUL)
+		ins_typebuf(current_menu->لڑیاں[idx] + 1,
 				current_menu->noremap[idx], 0, TRUE,
 						   current_menu->silent[idx]);
 	}
-#endif
+#اگر_ختم
 
 	toscroll = 0;
-	switch (c)
+	انتخاب (c)
 	{
-	case BS:		// scroll one line back
-	case K_BS:
-	case 'k':
-	case K_UP:
+	حالت BS:		// scroll one line back
+	حالت K_BS:
+	حالت 'k':
+	حالت K_اوپر:
 	    toscroll = -1;
-	    break;
+	    توڑو;
 
-	case CAR:		// one extra line
-	case NL:
-	case 'j':
-	case K_DOWN:
+	حالت CAR:		// one extra line
+	حالت NL:
+	حالت 'j':
+	حالت K_نیچے_کو:
 	    toscroll = 1;
-	    break;
+	    توڑو;
 
-	case 'u':		// Up half a page
-	    toscroll = -(Rows / 2);
-	    break;
+	حالت 'u':		// Up half a page
+	    toscroll = -(صفیں / 2);
+	    توڑو;
 
-	case 'd':		// Down half a page
-	    toscroll = Rows / 2;
-	    break;
+	حالت 'd':		// Down half a page
+	    toscroll = صفیں / 2;
+	    توڑو;
 
-	case 'b':		// one page back
-	case Ctrl_B:
-	case K_PAGEUP:
-	    toscroll = -(Rows - 1);
-	    break;
+	حالت 'b':		// one page back
+	حالت Ctrl_B:
+	حالت K_PAGEUP:
+	    toscroll = -(صفیں - 1);
+	    توڑو;
 
-	case ' ':		// one extra page
-	case 'f':
-	case Ctrl_F:
-	case K_PAGEDOWN:
-	case K_LEFTMOUSE:
-	    toscroll = Rows - 1;
-	    break;
+	حالت ' ':		// one extra page
+	حالت 'f':
+	حالت Ctrl_F:
+	حالت K_PAGEDOWN:
+	حالت K_LEFTMOUSE:
+	    toscroll = صفیں - 1;
+	    توڑو;
 
-	case 'g':		// all the way back to the start
+	حالت 'g':		// all the way back to the start
 	    toscroll = -999999;
-	    break;
+	    توڑو;
 
-	case 'G':		// all the way to the end
+	حالت 'G':		// all the way to the end
 	    toscroll = 999999;
-	    lines_left = 999999;
-	    break;
+	    سطریں_بایاں = 999999;
+	    توڑو;
 
-	case ':':		// start new command line
-#ifdef FEAT_CON_DIALOG
-	    if (!confirm_msg_used)
-#endif
+	حالت ':':		// start new command line
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+	    اگر (!confirm_پیغام_مستعمل)
+#اگر_ختم
 	    {
 		// Since got_int is set all typeahead will be flushed, but we
 		// want to keep this ':', remember that in a special way.
 		typeahead_noflush(':');
-#ifdef FEAT_TERMINAL
-		skip_term_loop = TRUE;
-#endif
-		cmdline_row = Rows - 1;		// put ':' on this line
+#اگر_تعریف_شدہ FEAT_TERMINAL
+		skip_رکن_loop = TRUE;
+#اگر_ختم
+		cmdline_صف = صفیں - 1;		// put ':' on this line
 		skip_redraw = TRUE;		// skip redraw once
 		need_wait_return = FALSE;	// don't wait in main()
 	    }
 	    // FALLTHROUGH
-	case 'q':		// quit
-	case Ctrl_C:
-	case ESC:
-#ifdef FEAT_CON_DIALOG
-	    if (confirm_msg_used)
+	حالت 'q':		// quit
+	حالت Ctrl_C:
+	حالت ESC:
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+	    اگر (confirm_پیغام_مستعمل)
 	    {
 		// Jump to the choices of the dialog.
 		retval = TRUE;
 	    }
-	    else
-#endif
+	    ورنہ
+#اگر_ختم
 	    {
 		got_int = TRUE;
-		quit_more = TRUE;
+		quit_مزید = TRUE;
 	    }
 	    // When there is some more output (wrapping line) display that
 	    // without another prompt.
-	    lines_left = Rows - 1;
-	    break;
+	    سطریں_بایاں = صفیں - 1;
+	    توڑو;
 
-#ifdef FEAT_CLIPBOARD
-	case Ctrl_Y:
+#اگر_تعریف_شدہ FEAT_CLIPBOARD
+	حالت Ctrl_Y:
 	    // Strange way to allow copying (yanking) a modeless
 	    // selection at the more prompt.  Use CTRL-Y,
 	    // because the same is used in Cmdline-mode and at the
 	    // hit-enter prompt.  However, scrolling one line up
 	    // might be expected...
-	    if (clip_star.state == SELECT_DONE)
+	    اگر (clip_ستارہ.state == SELECT_مکمل)
 		clip_copy_modeless_selection(TRUE);
-	    continue;
-#endif
-	default:		// no valid response
-	    msg_moremsg(TRUE);
-	    continue;
+	    جاری;
+#اگر_ختم
+	طےشدہ:		// no valid response
+	    پیغام_moremsg(TRUE);
+	    جاری;
 	}
 
-	if (toscroll != 0)
+	اگر (toscroll != 0)
 	{
-	    if (toscroll < 0)
+	    اگر (toscroll < 0)
 	    {
 		// go to start of last line
-		if (mp_last == NULL)
-		    mp = msg_sb_start(last_msgchunk);
-		else if (mp_last->sb_prev != NULL)
-		    mp = msg_sb_start(mp_last->sb_prev);
-		else
-		    mp = NULL;
+		اگر (mp_آخری == تہی)
+		    mp = پیغام_sb_آغاز(آخری_msgchunk);
+		ورنہ اگر (mp_آخری->sb_پچھلا != تہی)
+		    mp = پیغام_sb_آغاز(mp_آخری->sb_پچھلا);
+		ورنہ
+		    mp = تہی;
 
 		// go to start of line at top of the screen
-		for (i = 0; i < Rows - 2 && mp != NULL && mp->sb_prev != NULL;
+		برائے (i = 0; i < صفیں - 2 && mp != تہی && mp->sb_پچھلا != تہی;
 									  ++i)
-		    mp = msg_sb_start(mp->sb_prev);
+		    mp = پیغام_sb_آغاز(mp->sb_پچھلا);
 
-		if (mp != NULL && mp->sb_prev != NULL)
+		اگر (mp != تہی && mp->sb_پچھلا != تہی)
 		{
 		    // Find line to be displayed at top.
-		    for (i = 0; i > toscroll; --i)
+		    برائے (i = 0; i > toscroll; --i)
 		    {
-			if (mp == NULL || mp->sb_prev == NULL)
-			    break;
-			mp = msg_sb_start(mp->sb_prev);
-			if (mp_last == NULL)
-			    mp_last = msg_sb_start(last_msgchunk);
-			else
-			    mp_last = msg_sb_start(mp_last->sb_prev);
+			اگر (mp == تہی || mp->sb_پچھلا == تہی)
+			    توڑو;
+			mp = پیغام_sb_آغاز(mp->sb_پچھلا);
+			اگر (mp_آخری == تہی)
+			    mp_آخری = پیغام_sb_آغاز(آخری_msgchunk);
+			ورنہ
+			    mp_آخری = پیغام_sb_آغاز(mp_آخری->sb_پچھلا);
 		    }
 
-		    if (toscroll == -1 && screen_ins_lines(0, 0, 1,
-						     (int)Rows, 0, NULL) == OK)
+		    اگر (toscroll == -1 && screen_ins_سطریں(0, 0, 1,
+						     (صحیح)صفیں, 0, تہی) == OK)
 		    {
 			// display line at top
-			(void)disp_sb_line(0, mp, FALSE);
+			(خالی)disp_sb_سطر(0, mp, FALSE);
 		    }
-		    else
+		    ورنہ
 		    {
-			int did_clear = screenclear();
+			صحیح did_clear = screenclear();
 
 			// redisplay all lines
-			for (i = 0; mp != NULL && i < Rows - 1; ++i)
+			برائے (i = 0; mp != تہی && i < صفیں - 1; ++i)
 			{
-			    mp = disp_sb_line(i, mp, !did_clear);
-			    ++msg_scrolled;
+			    mp = disp_sb_سطر(i, mp, !did_clear);
+			    ++پیغام_scrolled;
 			}
 		    }
 		    toscroll = 0;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
 		// First display any text that we scrolled back.
-		while (toscroll > 0 && mp_last != NULL)
+		جب (toscroll > 0 && mp_آخری != تہی)
 		{
 		    // scroll up, display line at bottom
-		    msg_scroll_up();
-		    inc_msg_scrolled();
-		    screen_fill((int)Rows - 2, (int)Rows - 1,
-			    cmdline_col_off, cmdline_col_off + cmdline_width,
-			    ' ', ' ', msg_attr);
-		    mp_last = disp_sb_line((int)Rows - 2, mp_last, FALSE);
+		    پیغام_scroll_اوپر();
+		    inc_پیغام_scrolled();
+		    screen_fill((صحیح)صفیں - 2, (صحیح)صفیں - 1,
+			    cmdline_ستون_off, cmdline_ستون_off + cmdline_چوڑائی,
+			    ' ', ' ', پیغام_attr);
+		    mp_آخری = disp_sb_سطر((صحیح)صفیں - 2, mp_آخری, FALSE);
 		    --toscroll;
 		}
 	    }
 
-	    if (toscroll <= 0)
+	    اگر (toscroll <= 0)
 	    {
 		// displayed the requested text, more prompt again
-		screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-			cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
-		msg_moremsg(FALSE);
-		continue;
+		screen_fill((صحیح)صفیں - 1, (صحیح)صفیں, cmdline_ستون_off,
+			cmdline_ستون_off + cmdline_چوڑائی, ' ', ' ', پیغام_attr);
+		پیغام_moremsg(FALSE);
+		جاری;
 	    }
 
 	    // display more text, return to caller
-	    lines_left = toscroll;
+	    سطریں_بایاں = toscroll;
 	}
 
-	break;
+	توڑو;
     }
 
     // clear the --more-- message
-    screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-	    cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
+    screen_fill((صحیح)صفیں - 1, (صحیح)صفیں, cmdline_ستون_off,
+	    cmdline_ستون_off + cmdline_چوڑائی, ' ', ' ', پیغام_attr);
     State = oldState;
     setmouse();
-    if (quit_more)
+    اگر (quit_مزید)
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	پیغام_صف = صفیں - 1;
+	پیغام_ستون = 0;
     }
-#ifdef FEAT_RIGHTLEFT
-    else if (cmdmsg_rl)
-	msg_col = cmdline_width - 1;
-#endif
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    ورنہ اگر (cmdmsg_rl)
+	پیغام_ستون = cmdline_چوڑائی - 1;
+#اگر_ختم
 
     entered = FALSE;
-#ifdef FEAT_CON_DIALOG
-    return retval;
-#else
-    return FALSE;
-#endif
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+    واپس retval;
+#ورنہ
+    واپس FALSE;
+#اگر_ختم
 }
 
-#if defined(USE_MCH_ERRMSG)
+#اگر defined(USE_MCH_ERRMSG)
 
 # ifdef mch_errmsg
 #  undef mch_errmsg
 # endif
-# ifdef mch_msg
-#  undef mch_msg
+# ifdef mch_پیغام
+#  undef mch_پیغام
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_errmsg_c(char *str)
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    ساکن خالی
+mch_errmsg_c(حرف *str)
 {
     DWORD   nwrite = 0;
-    DWORD   mode = 0;
+    DWORD   منوال = 0;
     HANDLE  h = GetStdHandle(STD_ERROR_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    اگر (Get_Console_منوال(h, &منوال) && enc_codepage >= 0
+	    && (صحیح)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
-	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
+	صحیح	len = (صحیح)STRLEN(str);
+	WCHAR	*w = enc_مقصد_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	اگر (w != تہی)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, تہی);
 	    vim_free(w);
 	}
     }
-    else
+    ورنہ
     {
 	fprintf(stderr, "%s", str);
     }
@@ -3605,22 +3605,22 @@ mch_errmsg_c(char *str)
  * yet.  When stderr can't be used, collect error messages until the GUI has
  * started and they can be displayed in a message box.
  */
-    void
-mch_errmsg(char *str)
+    خالی
+mch_errmsg(حرف *str)
 {
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
-    int		len;
+# اگر !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+    صحیح		len;
 # endif
 
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# اگر (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stderr if it's a tty.
     // When not going to start the GUI also use stderr.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    اگر (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   ورنہ
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3628,50 +3628,50 @@ mch_errmsg(char *str)
 #   endif
 #  endif
 #  ifdef FEAT_GUI
-	    !(gui.in_use || gui.starting)
+	    !(gui.اندر_use || gui.starting)
 #  endif
 	    )
     {
 	fprintf(stderr, "%s", str);
-	return;
+	واپس;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    اگر (!(gui.اندر_use || gui.starting))
 #  endif
     {
 	mch_errmsg_c(str);
-	return;
+	واپس;
     }
 # endif
 
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# اگر !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     // avoid a delay for a message that isn't there
     emsg_on_display = FALSE;
 
-    len = (int)STRLEN(str) + 1;
-    if (error_ga.ga_growsize == 0)
+    len = (صحیح)STRLEN(str) + 1;
+    اگر (error_ga.ga_growsize == 0)
     {
 	error_ga.ga_growsize = 80;
 	error_ga.ga_itemsize = 1;
     }
-    if (ga_grow(&error_ga, len) == OK)
+    اگر (ga_grow(&error_ga, len) == OK)
     {
-	mch_memmove((char_u *)error_ga.ga_data + error_ga.ga_len,
+	mch_memmove((char_u *)error_ga.ga_ڈیٹا + error_ga.ga_len,
 							  (char_u *)str, len);
 #  ifdef UNIX
 	// remove CR characters, they are displayed
 	{
 	    char_u	*p;
 
-	    p = (char_u *)error_ga.ga_data + error_ga.ga_len;
-	    for (;;)
+	    p = (char_u *)error_ga.ga_ڈیٹا + error_ga.ga_len;
+	    برائے (;;)
 	    {
 		p = vim_strchr(p, '\r');
-		if (p == NULL)
-		    break;
+		اگر (p == تہی)
+		    توڑو;
 		*p = ' ';
 	    }
 	}
@@ -3682,29 +3682,29 @@ mch_errmsg(char *str)
 # endif
 }
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_msg_c(char *str)
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    ساکن خالی
+mch_پیغام_c(حرف *str)
 {
     DWORD   nwrite = 0;
-    DWORD   mode;
+    DWORD   منوال;
     HANDLE  h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    اگر (Get_Console_منوال(h, &منوال) && enc_codepage >= 0
+	    && (صحیح)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
-	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
+	صحیح	len = (صحیح)STRLEN(str);
+	WCHAR	*w = enc_مقصد_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	اگر (w != تہی)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, تہی);
 	    vim_free(w);
 	}
     }
-    else
+    ورنہ
     {
-	printf("%s", str);
+	لکھو("%s", str);
     }
 }
 # endif
@@ -3714,19 +3714,19 @@ mch_msg_c(char *str)
  * When there is no tty, collect messages until the GUI has started and they
  * can be displayed in a message box.
  */
-    void
-mch_msg(char *str)
+    خالی
+mch_پیغام(حرف *str)
 {
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# اگر (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stdout if we have a tty.  This allows "vim -h | more" and
     // uses mch_errmsg() when started from the desktop.
     // When not going to start the GUI also use stdout.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    اگر (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   ورنہ
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3734,109 +3734,109 @@ mch_msg(char *str)
 #   endif
 #  endif
 #  ifdef FEAT_GUI
-	    !(gui.in_use || gui.starting)
+	    !(gui.اندر_use || gui.starting)
 #  endif
 	    )
     {
-	printf("%s", str);
-	return;
+	لکھو("%s", str);
+	واپس;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    اگر (!(gui.اندر_use || gui.starting))
 #  endif
     {
-	mch_msg_c(str);
-	return;
+	mch_پیغام_c(str);
+	واپس;
     }
 # endif
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# اگر !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     mch_errmsg(str);
 # endif
 }
-#endif // USE_MCH_ERRMSG
+#اگر_ختم // USE_MCH_ERRMSG
 
 /*
  * Put a character on the screen at the current message position and advance
  * to the next position.  Only for printable ASCII!
  */
-    static void
-msg_screen_putchar(int c, int attr)
+    ساکن خالی
+پیغام_screen_putchar(صحیح c, صحیح attr)
 {
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_putchar(c, msg_row, cmdline_col_off + msg_col, attr);
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    پیغام_didout = TRUE;		// remember that line is not empty
+    screen_putchar(c, پیغام_صف, cmdline_ستون_off + پیغام_ستون, attr);
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (cmdmsg_rl)
     {
-	if (--msg_col == 0)
+	اگر (--پیغام_ستون == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    پیغام_ستون = cmdline_چوڑائی;
+	    ++پیغام_صف;
 	}
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-	if (++msg_col >= cmdline_width)
+	اگر (++پیغام_ستون >= cmdline_چوڑائی)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    پیغام_ستون = 0;
+	    ++پیغام_صف;
 	}
     }
 }
 
-    static void
-msg_moremsg(int full)
+    ساکن خالی
+پیغام_moremsg(صحیح بھرا)
 {
-    int		attr;
+    صحیح		attr;
     char_u	*s = (char_u *)_("-- More --");
 
     attr = HL_ATTR(HLF_M);
-    screen_puts(s, (int)Rows - 1, cmdline_col_off, attr);
-    if (full)
+    screen_puts(s, (صحیح)صفیں - 1, cmdline_ستون_off, attr);
+    اگر (بھرا)
 	screen_puts((char_u *)
 		_(" SPACE/d/j: screen/page/line down, b/u/k: up, q: quit "),
-		(int)Rows - 1, cmdline_col_off + vim_strsize(s), attr);
+		(صحیح)صفیں - 1, cmdline_ستون_off + vim_strsize(s), attr);
 }
 
 /*
  * Repeat the message for the current mode: MODE_ASKMORE, MODE_EXTERNCMD,
  * MODE_CONFIRM or exmode_active.
  */
-    void
-repeat_message(void)
+    خالی
+repeat_پیغام(خالی)
 {
-    if (State == MODE_ASKMORE)
+    اگر (State == منوال_ASKMORE)
     {
-	msg_moremsg(TRUE);	// display --more-- message again
-	msg_row = Rows - 1;
+	پیغام_moremsg(TRUE);	// display --more-- message again
+	پیغام_صف = صفیں - 1;
     }
-#ifdef FEAT_CON_DIALOG
-    else if (State == MODE_CONFIRM)
+#اگر_تعریف_شدہ FEAT_CON_DIALOG
+    ورنہ اگر (State == منوال_CONFIRM)
     {
-	display_confirm_msg();	// display ":confirm" message again
-	msg_row = Rows - 1;
+	display_confirm_پیغام();	// display ":confirm" message again
+	پیغام_صف = صفیں - 1;
     }
-#endif
-    else if (State == MODE_EXTERNCMD)
+#اگر_ختم
+    ورنہ اگر (State == منوال_EXTERNCMD)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col); // put cursor back
+	windgoto(پیغام_صف, cmdline_ستون_off + پیغام_ستون); // put cursor back
     }
-    else if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    ورنہ اگر (State == منوال_HITRETURN || State == منوال_SETWSIZE)
     {
-	if (msg_row == Rows - 1)
+	اگر (پیغام_صف == صفیں - 1)
 	{
 	    // Avoid drawing the "hit-enter" prompt below the previous one,
 	    // overwrite it.  Esp. useful when regaining focus and a
 	    // FocusGained autocmd exists but didn't draw anything.
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    msg_clr_eos();
+	    پیغام_didout = FALSE;
+	    پیغام_ستون = 0;
+	    پیغام_clr_eos();
 	}
-	hit_return_msg();
-	msg_row = Rows - 1;
+	کامیابی_return_پیغام();
+	پیغام_صف = صفیں - 1;
     }
 }
 
@@ -3846,28 +3846,28 @@ repeat_message(void)
  * While starting the GUI the terminal codes will be set for the GUI, but the
  * output goes to the terminal.  Don't use the terminal codes then.
  */
-    static int
-msg_check_screen(void)
+    ساکن صحیح
+پیغام_check_screen(خالی)
 {
-    if (!full_screen || !screen_valid(FALSE))
-	return FALSE;
+    اگر (!بھرا_screen || !screen_valid(FALSE))
+	واپس FALSE;
 
-    if (msg_row >= Rows)
-	msg_row = Rows - 1;
-    if (msg_col >= cmdline_width)
-	msg_col = cmdline_width - 1;
-    return TRUE;
+    اگر (پیغام_صف >= صفیں)
+	پیغام_صف = صفیں - 1;
+    اگر (پیغام_ستون >= cmdline_چوڑائی)
+	پیغام_ستون = cmdline_چوڑائی - 1;
+    واپس TRUE;
 }
 
 /*
  * Clear from current message position to end of screen.
  * Skip this when ":silent" was used, no need to clear for redirection.
  */
-    void
-msg_clr_eos(void)
+    خالی
+پیغام_clr_eos(خالی)
 {
-    if (msg_silent == 0)
-	msg_clr_eos_force();
+    اگر (پیغام_silent == 0)
+	پیغام_clr_eos_force();
 }
 
 /*
@@ -3875,48 +3875,48 @@ msg_clr_eos(void)
  * Note: msg_col is not updated, so we remember the end of the message
  * for msg_check().
  */
-    void
-msg_clr_eos_force(void)
+    خالی
+پیغام_clr_eos_force(خالی)
 {
-#ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;  // messages go into a popup
-#endif
-    if (msg_use_printf())
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+    اگر (اندر_echowindow)
+	واپس;  // messages go into a popup
+#اگر_ختم
+    اگر (پیغام_use_printf())
     {
-	if (full_screen)	// only when termcap codes are valid
+	اگر (بھرا_screen)	// only when termcap codes are valid
 	{
-	    if (*T_CD)
-		out_str(T_CD);	// clear to end of display
-	    else if (*T_CE)
-		out_str(T_CE);	// clear to end of line
+	    اگر (*T_CD)
+		برآمد_str(T_CD);	// clear to end of display
+	    ورنہ اگر (*T_CE)
+		برآمد_str(T_CE);	// clear to end of line
 	}
     }
-    else
+    ورنہ
     {
-	int msg_attr;
+	صحیح پیغام_attr;
 
-	msg_attr = HL_ATTR(HLF_MSG);
+	پیغام_attr = HL_ATTR(HLF_پیغام);
 
-#ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+	اگر (cmdmsg_rl)
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off, cmdline_col_off + msg_col + 1,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
-		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+	    screen_fill(پیغام_صف, پیغام_صف + 1,
+		    cmdline_ستون_off, cmdline_ستون_off + پیغام_ستون + 1,
+		    ' ', ' ', پیغام_attr);
+	    screen_fill(پیغام_صف + 1, (صحیح)صفیں,
+		    cmdline_ستون_off, cmdline_ستون_off + cmdline_چوڑائی,
+		    ' ', ' ', پیغام_attr);
 	}
-	else
-#endif
+	ورنہ
+#اگر_ختم
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
-		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+	    screen_fill(پیغام_صف, پیغام_صف + 1,
+		    cmdline_ستون_off + پیغام_ستون, cmdline_ستون_off + cmdline_چوڑائی,
+		    ' ', ' ', پیغام_attr);
+	    screen_fill(پیغام_صف + 1, (صحیح)صفیں,
+		    cmdline_ستون_off, cmdline_ستون_off + cmdline_چوڑائی,
+		    ' ', ' ', پیغام_attr);
 	}
     }
 }
@@ -3924,12 +3924,12 @@ msg_clr_eos_force(void)
 /*
  * Clear the command line.
  */
-    void
-msg_clr_cmdline(void)
+    خالی
+پیغام_clr_cmdline(خالی)
 {
-    msg_row = cmdline_row;
-    msg_col = 0;
-    msg_clr_eos_force();
+    پیغام_صف = cmdline_صف;
+    پیغام_ستون = 0;
+    پیغام_clr_eos_force();
 }
 
 /*
@@ -3937,8 +3937,8 @@ msg_clr_cmdline(void)
  * call wait_return() if the message does not fit in the available space
  * return TRUE if wait_return() not called.
  */
-    int
-msg_end(void)
+    صحیح
+پیغام_انتہا(خالی)
 {
     /*
      * If the string is larger than the window,
@@ -3946,26 +3946,26 @@ msg_end(void)
      * we have to redraw the window.
      * Do not do this if we are abandoning the file or editing the command line.
      */
-    if (!exiting && need_wait_return && !(State & MODE_CMDLINE))
+    اگر (!exiting && need_wait_return && !(State & منوال_CMDLINE))
     {
 	wait_return(FALSE);
-	return FALSE;
+	واپس FALSE;
     }
-    out_flush();
-    return TRUE;
+    برآمد_flush();
+    واپس TRUE;
 }
 
 /*
  * If the written message runs into the shown command or ruler, we have to
  * wait for hit-return and redraw the window later.
  */
-    void
-msg_check(void)
+    خالی
+پیغام_check(خالی)
 {
-    if (msg_row == Rows - 1 && msg_col >= sc_col
-#ifdef HAS_MESSAGE_WINDOW
-		&& !in_echowindow
-#endif
+    اگر (پیغام_صف == صفیں - 1 && پیغام_ستون >= sc_ستون
+#اگر_تعریف_شدہ HAS_پیغام_کھڑکی
+		&& !اندر_echowindow
+#اگر_ختم
 	    )
     {
 	need_wait_return = TRUE;
@@ -3977,84 +3977,84 @@ msg_check(void)
  * May write a string to the redirection file.
  * When "maxlen" is -1 write the whole string, otherwise up to "maxlen" bytes.
  */
-    static void
-redir_write(char_u *str, int maxlen)
+    ساکن خالی
+redir_write(char_u *str, صحیح maxlen)
 {
     char_u	*s = str;
-    static int	cur_col = 0;
+    ساکن صحیح	cur_ستون = 0;
 
     // Don't do anything for displaying prompts and the like.
-    if (redir_off)
-	return;
+    اگر (redir_off)
+	واپس;
 
     // If 'verbosefile' is set prepare for writing in that file.
-    if (*p_vfile != NUL && verbose_fd == NULL)
+    اگر (*p_vfile != NUL && verbose_fd == تہی)
 	verbose_open();
 
-    if (redirecting())
+    اگر (redirecting())
     {
 	// If the string doesn't start with CR or NL, go to msg_col
-	if (*s != '\n' && *s != '\r')
+	اگر (*s != '\n' && *s != '\r')
 	{
-	    while (cur_col < msg_col)
+	    جب (cur_ستون < پیغام_ستون)
 	    {
-#ifdef FEAT_EVAL
-		if (redir_execute)
+#اگر_تعریف_شدہ FEAT_EVAL
+		اگر (redir_execute)
 		    execute_redir_str((char_u *)" ", -1);
-		else if (redir_reg)
+		ورنہ اگر (redir_reg)
 		    write_reg_contents(redir_reg, (char_u *)" ", -1, TRUE);
-		else if (redir_vname)
+		ورنہ اگر (redir_vname)
 		    var_redir_str((char_u *)" ", -1);
-		else
-#endif
-		    if (redir_fd != NULL)
+		ورنہ
+#اگر_ختم
+		    اگر (redir_fd != تہی)
 		    fputs(" ", redir_fd);
-		if (verbose_fd != NULL)
+		اگر (verbose_fd != تہی)
 		    fputs(" ", verbose_fd);
-		++cur_col;
+		++cur_ستون;
 	    }
 	}
 
-#ifdef FEAT_EVAL
-	if (redir_execute)
+#اگر_تعریف_شدہ FEAT_EVAL
+	اگر (redir_execute)
 	    execute_redir_str(s, maxlen);
-	else if (redir_reg)
+	ورنہ اگر (redir_reg)
 	    write_reg_contents(redir_reg, s, maxlen, TRUE);
-	else if (redir_vname)
+	ورنہ اگر (redir_vname)
 	    var_redir_str(s, maxlen);
-#endif
+#اگر_ختم
 
 	// Write and adjust the current column.
-	while (*s != NUL && (maxlen < 0 || (int)(s - str) < maxlen))
+	جب (*s != NUL && (maxlen < 0 || (صحیح)(s - str) < maxlen))
 	{
-#ifdef FEAT_EVAL
-	    if (!redir_reg && !redir_vname && !redir_execute)
-#endif
-		if (redir_fd != NULL)
+#اگر_تعریف_شدہ FEAT_EVAL
+	    اگر (!redir_reg && !redir_vname && !redir_execute)
+#اگر_ختم
+		اگر (redir_fd != تہی)
 		    putc(*s, redir_fd);
-	    if (verbose_fd != NULL)
+	    اگر (verbose_fd != تہی)
 		putc(*s, verbose_fd);
-	    if (*s == '\r' || *s == '\n')
-		cur_col = 0;
-	    else if (*s == '\t')
-		cur_col += (8 - cur_col % 8);
-	    else
-		++cur_col;
+	    اگر (*s == '\r' || *s == '\n')
+		cur_ستون = 0;
+	    ورنہ اگر (*s == '\t')
+		cur_ستون += (8 - cur_ستون % 8);
+	    ورنہ
+		++cur_ستون;
 	    ++s;
 	}
 
-	if (msg_silent != 0)	// should update msg_col
-	    msg_col = cur_col;
+	اگر (پیغام_silent != 0)	// should update msg_col
+	    پیغام_ستون = cur_ستون;
     }
 }
 
-    int
-redirecting(void)
+    صحیح
+redirecting(خالی)
 {
-    return redir_fd != NULL || *p_vfile != NUL
-#ifdef FEAT_EVAL
+    واپس redir_fd != تہی || *p_vfile != NUL
+#اگر_تعریف_شدہ FEAT_EVAL
 			  || redir_reg || redir_vname || redir_execute
-#endif
+#اگر_ختم
 				       ;
 }
 
@@ -4062,63 +4062,63 @@ redirecting(void)
  * Before giving verbose message.
  * Must always be called paired with verbose_leave()!
  */
-    void
-verbose_enter(void)
+    خالی
+verbose_enter(خالی)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
+    اگر (*p_vfile != NUL)
+	++پیغام_silent;
 }
 
 /*
  * After giving verbose message.
  * Must always be called paired with verbose_enter()!
  */
-    void
-verbose_leave(void)
+    خالی
+verbose_leave(خالی)
 {
-    if (*p_vfile != NUL)
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+    اگر (*p_vfile != NUL)
+	اگر (--پیغام_silent < 0)
+	    پیغام_silent = 0;
 }
 
 /*
  * Like verbose_enter() and set msg_scroll when displaying the message.
  */
-    void
-verbose_enter_scroll(void)
+    خالی
+verbose_enter_scroll(خالی)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
-    else
+    اگر (*p_vfile != NUL)
+	++پیغام_silent;
+    ورنہ
 	// always scroll up, don't overwrite
-	msg_scroll = TRUE;
+	پیغام_scroll = TRUE;
 }
 
 /*
  * Like verbose_leave() and set cmdline_row when displaying the message.
  */
-    void
-verbose_leave_scroll(void)
+    خالی
+verbose_leave_scroll(خالی)
 {
-    if (*p_vfile != NUL)
+    اگر (*p_vfile != NUL)
     {
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+	اگر (--پیغام_silent < 0)
+	    پیغام_silent = 0;
     }
-    else
-	cmdline_row = msg_row;
+    ورنہ
+	cmdline_صف = پیغام_صف;
 }
 
 /*
  * Called when 'verbosefile' is set: stop writing to the file.
  */
-    void
-verbose_stop(void)
+    خالی
+verbose_stop(خالی)
 {
-    if (verbose_fd != NULL)
+    اگر (verbose_fd != تہی)
     {
 	fclose(verbose_fd);
-	verbose_fd = NULL;
+	verbose_fd = تہی;
     }
     verbose_did_open = FALSE;
 }
@@ -4127,133 +4127,133 @@ verbose_stop(void)
  * Open the file 'verbosefile'.
  * Return FAIL or OK.
  */
-    int
-verbose_open(void)
+    صحیح
+verbose_open(خالی)
 {
-    if (verbose_fd == NULL && !verbose_did_open)
+    اگر (verbose_fd == تہی && !verbose_did_open)
     {
 	// Only give the error message once.
 	verbose_did_open = TRUE;
 
-	verbose_fd = mch_fopen((char *)p_vfile, "a");
-	if (verbose_fd == NULL)
+	verbose_fd = mch_fopen((حرف *)p_vfile, "a");
+	اگر (verbose_fd == تہی)
 	{
 	    semsg(_(e_cant_open_file_str), p_vfile);
-	    return FAIL;
+	    واپس FAIL;
 	}
     }
-    return OK;
+    واپس OK;
 }
 
 /*
  * Give a warning message (for searching).
  * Use 'w' highlighting and may repeat the message after redrawing
  */
-    void
-give_warning(char_u *message, int hl)
+    خالی
+give_warning(char_u *پیغام_2, صحیح hl)
 {
-    give_warning_with_source(message, hl, FALSE);
+    give_warning_with_ماخذ(پیغام_2, hl, FALSE);
 }
 
-    void
-give_warning_with_source(char_u *message, int hl, int with_source)
+    خالی
+give_warning_with_ماخذ(char_u *پیغام_2, صحیح hl, صحیح with_ماخذ)
 {
     // Don't do this for ":silent".
-    if (msg_silent != 0)
-	return;
+    اگر (پیغام_silent != 0)
+	واپس;
 
     // Don't want a hit-enter prompt here.
     ++no_wait_return;
 
-#ifdef FEAT_EVAL
-    set_vim_var_string(VV_WARNINGMSG, message, -1);
-#endif
-    VIM_CLEAR(keep_msg);
-    if (hl)
-	keep_msg_attr = HL_ATTR(HLF_W);
-    else
-	keep_msg_attr = 0;
+#اگر_تعریف_شدہ FEAT_EVAL
+    سیٹ_vim_var_string(VV_WARNINGMSG, پیغام_2, -1);
+#اگر_ختم
+    VIM_CLEAR(keep_پیغام);
+    اگر (hl)
+	keep_پیغام_attr = HL_ATTR(HLF_W);
+    ورنہ
+	keep_پیغام_attr = 0;
 
-    if (with_source)
+    اگر (with_ماخذ)
     {
 	// Do what msg() does, but with a column offset if the warning should
 	// be after the mode message.
-	msg_start();
-	msg_source(HL_ATTR(HLF_W));
-	msg_puts(" ");
-	msg_puts_attr((char *)message, HL_ATTR(HLF_W) | MSG_HIST);
-	msg_clr_eos();
-	(void)msg_end();
+	پیغام_آغاز();
+	پیغام_ماخذ(HL_ATTR(HLF_W));
+	پیغام_puts(" ");
+	پیغام_puts_attr((حرف *)پیغام_2, HL_ATTR(HLF_W) | پیغام_HIST);
+	پیغام_clr_eos();
+	(خالی)پیغام_انتہا();
     }
-    else if (msg_attr((char *)message, keep_msg_attr) && msg_scrolled == 0)
-	set_keep_msg(message, keep_msg_attr);
+    ورنہ اگر (پیغام_attr((حرف *)پیغام_2, keep_پیغام_attr) && پیغام_scrolled == 0)
+	سیٹ_keep_پیغام(پیغام_2, keep_پیغام_attr);
 
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
+    پیغام_didout = FALSE;	    // overwrite this message
+    پیغام_nowait = TRUE;	    // don't wait for this message
+    پیغام_ستون = 0;
 
     --no_wait_return;
 }
 
-#if defined(FEAT_EVAL)
-    void
-give_warning2(char_u *message, char_u *a1, int hl)
+#اگر defined(FEAT_EVAL)
+    خالی
+give_warning2(char_u *پیغام_2, char_u *a1, صحیح hl)
 {
-    if (IObuff == NULL)
+    اگر (IObuff == تہی)
     {
 	// Very early in initialisation and already something wrong, just give
 	// the raw message so the user at least gets a hint.
-	give_warning(message, hl);
+	give_warning(پیغام_2, hl);
     }
-    else
+    ورنہ
     {
-	vim_snprintf((char *)IObuff, IOSIZE, (char *)message, a1);
+	vim_snprintf((حرف *)IObuff, IOSIZE, (حرف *)پیغام_2, a1);
 	give_warning(IObuff, hl);
     }
 }
-#endif
+#اگر_ختم
 
 /*
  * Advance msg cursor to column "col".
  */
-    void
-msg_advance(int col)
+    خالی
+پیغام_advance(صحیح ستون)
 {
-    if (msg_silent != 0)	// nothing to advance to
+    اگر (پیغام_silent != 0)	// nothing to advance to
     {
-	msg_col = col;		// for redirection, may fill it up later
-	return;
+	پیغام_ستون = ستون;		// for redirection, may fill it up later
+	واپس;
     }
-    if (col >= cmdline_width)	// not enough room
-	col = cmdline_width - 1;
-#ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
-	while (msg_col > cmdline_width - col)
-	    msg_putchar(' ');
-    else
-#endif
-	while (msg_col < col)
-	    msg_putchar(' ');
+    اگر (ستون >= cmdline_چوڑائی)	// not enough room
+	ستون = cmdline_چوڑائی - 1;
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+    اگر (cmdmsg_rl)
+	جب (پیغام_ستون > cmdline_چوڑائی - ستون)
+	    پیغام_putchar(' ');
+    ورنہ
+#اگر_ختم
+	جب (پیغام_ستون < ستون)
+	    پیغام_putchar(' ');
 }
 
 /*
  * Warn about missing Clipboard Support
  */
-    void
-msg_warn_missing_clipboard(void)
+    خالی
+پیغام_warn_missing_clipboard(خالی)
 {
-    if (!global_busy && !did_warn_clipboard && silence_w23_w24_msg == 0)
+    اگر (!global_busy && !did_warn_clipboard && silence_w23_w24_پیغام == 0)
     {
-#ifdef FEAT_CLIPBOARD
-	msg(_("W23: Clipboard register not available, using register 0"));
-#else
-	msg(_("W24: Clipboard register not available. See :h W24"));
-#endif
+#اگر_تعریف_شدہ FEAT_CLIPBOARD
+	پیغام(_("W23: Clipboard register not available, using register 0"));
+#ورنہ
+	پیغام(_("W24: Clipboard register not available. See :h W24"));
+#اگر_ختم
 	did_warn_clipboard = TRUE;
     }
 }
 
-#if defined(FEAT_CON_DIALOG)
+#اگر defined(FEAT_CON_DIALOG)
 /*
  * Used for "confirm()" function, and the :confirm command prefix.
  * Versions which haven't got flexible dialogs yet, and console
@@ -4274,57 +4274,57 @@ msg_warn_missing_clipboard(void)
  *
  * Returns 0 if cancelled, otherwise the nth button (1-indexed).
  */
-    int
+    صحیح
 do_dialog(
-    int		type UNUSED,
-    char_u	*title UNUSED,
-    char_u	*message,
+    صحیح		type غیر_مستعمل,
+    char_u	*title غیر_مستعمل,
+    char_u	*پیغام_2,
     char_u	*buttons,
-    int		dfltbutton,
-    char_u	*textfield UNUSED,	// IObuff for inputdialog(), NULL
+    صحیح		dfltbutton,
+    char_u	*textfield غیر_مستعمل,	// IObuff for inputdialog(), NULL
 					// otherwise
-    int		ex_cmd)	    // when TRUE pressing : accepts default and starts
+    صحیح		ex_cmd)	    // when TRUE pressing : accepts default and starts
 			    // Ex command
 {
-    int		oldState;
-    int		retval = 0;
+    صحیح		oldState;
+    صحیح		retval = 0;
     char_u	*hotkeys;
-    int		c;
-    int		i;
+    صحیح		c;
+    صحیح		i;
     tmode_T	save_tmode;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
-    if (silent_mode)
-	return dfltbutton;   // return default option
+    اگر (silent_منوال)
+	واپس dfltbutton;   // return default option
 # endif
 
 # ifdef FEAT_GUI_DIALOG
     // When GUI is running and 'c' not in 'guioptions', use the GUI dialog
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    اگر (gui.اندر_use && vim_strchr(p_go, GO_CONDIALOG) == تہی)
     {
 	// --gui-dialog-file: write text to a file
-	if (gui_dialog_log(title, message))
+	اگر (gui_dialog_log(title, پیغام_2))
 	    c = dfltbutton;
-	else
-	    c = gui_mch_dialog(type, title, message, buttons, dfltbutton,
+	ورنہ
+	    c = gui_mch_dialog(type, title, پیغام_2, buttons, dfltbutton,
 							   textfield, ex_cmd);
 	// avoid a hit-enter prompt without clearing the cmdline
 	need_wait_return = FALSE;
 	emsg_on_display = FALSE;
-	cmdline_row = msg_row;
+	cmdline_صف = پیغام_صف;
 
 	// Flush output to avoid that further messages and redrawing is done
 	// in the wrong order.
-	out_flush();
+	برآمد_flush();
 	gui_mch_update();
 
-	return c;
+	واپس c;
     }
 # endif
 
     oldState = State;
-    State = MODE_CONFIRM;
+    State = منوال_CONFIRM;
     setmouse();
 
     // Ensure raw mode here.
@@ -4336,56 +4336,56 @@ do_dialog(
      * user press RETURN as well afterwards.
      */
     ++no_wait_return;
-    hotkeys = msg_show_console_dialog(message, buttons, dfltbutton);
+    hotkeys = پیغام_show_console_dialog(پیغام_2, buttons, dfltbutton);
 
-    if (hotkeys != NULL)
+    اگر (hotkeys != تہی)
     {
-	for (;;)
+	برائے (;;)
 	{
 	    // Get a typed character directly from the user.
 	    c = get_keystroke();
-	    switch (c)
+	    انتخاب (c)
 	    {
-	    case CAR:		// User accepts default option
-	    case NL:
+	    حالت CAR:		// User accepts default option
+	    حالت NL:
 		retval = dfltbutton;
-		break;
-	    case Ctrl_C:	// User aborts/cancels
-	    case ESC:
+		توڑو;
+	    حالت Ctrl_C:	// User aborts/cancels
+	    حالت ESC:
 		retval = 0;
-		break;
-	    default:		// Could be a hotkey?
-		if (c < 0)	// special keys are ignored here
-		    continue;
-		if (c == ':' && ex_cmd)
+		توڑو;
+	    طےشدہ:		// Could be a hotkey?
+		اگر (c < 0)	// special keys are ignored here
+		    جاری;
+		اگر (c == ':' && ex_cmd)
 		{
 		    retval = dfltbutton;
 		    ins_char_typebuf(':', 0);
-		    break;
+		    توڑو;
 		}
 
 		// Make the character lowercase, as chars in "hotkeys" are.
 		c = MB_TOLOWER(c);
 		retval = 1;
-		for (i = 0; hotkeys[i]; ++i)
+		برائے (i = 0; hotkeys[i]; ++i)
 		{
-		    if (has_mbyte)
+		    اگر (has_mbyte)
 		    {
-			if ((*mb_ptr2char)(hotkeys + i) == c)
-			    break;
+			اگر ((*mb_ptr2char)(hotkeys + i) == c)
+			    توڑو;
 			i += (*mb_ptr2len)(hotkeys + i) - 1;
 		    }
-		    else
-			if (hotkeys[i] == c)
-			    break;
+		    ورنہ
+			اگر (hotkeys[i] == c)
+			    توڑو;
 		    ++retval;
 		}
-		if (hotkeys[i])
-		    break;
+		اگر (hotkeys[i])
+		    توڑو;
 		// No hotkey match, so keep waiting
-		continue;
+		جاری;
 	    }
-	    break;
+	    توڑو;
 	}
 
 	vim_free(hotkeys);
@@ -4395,45 +4395,45 @@ do_dialog(
     State = oldState;
     setmouse();
     --no_wait_return;
-    msg_end_prompt();
+    پیغام_انتہا_prompt();
 
-    return retval;
+    واپس retval;
 }
 
 /*
  * Copy one character from "*from" to "*to", taking care of multi-byte
  * characters.  Return the length of the character in bytes.
  */
-    static int
+    ساکن صحیح
 copy_char(
     char_u	*from,
-    char_u	*to,
-    int		lowercase)	// make character lower case
+    char_u	*مقصد,
+    صحیح		lowercase)	// make character lower case
 {
-    int		len;
-    int		c;
+    صحیح		len;
+    صحیح		c;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
-	if (lowercase)
+	اگر (lowercase)
 	{
 	    c = MB_TOLOWER((*mb_ptr2char)(from));
-	    return (*mb_char2bytes)(c, to);
+	    واپس (*mb_char2bytes)(c, مقصد);
 	}
-	else
+	ورنہ
 	{
 	    len = (*mb_ptr2len)(from);
-	    mch_memmove(to, from, (size_t)len);
-	    return len;
+	    mch_memmove(مقصد, from, (size_t)len);
+	    واپس len;
 	}
     }
-    else
+    ورنہ
     {
-	if (lowercase)
-	    *to = (char_u)TOLOWER_LOC(*from);
-	else
-	    *to = *from;
-	return 1;
+	اگر (lowercase)
+	    *مقصد = (char_u)TOLOWER_LOC(*from);
+	ورنہ
+	    *مقصد = *from;
+	واپس 1;
     }
 }
 
@@ -4446,24 +4446,24 @@ copy_char(
  *
  * Returns an allocated string with hotkeys, or NULL for error.
  */
-    static char_u *
-msg_show_console_dialog(
-    char_u	*message,
+    ساکن char_u *
+پیغام_show_console_dialog(
+    char_u	*پیغام_2,
     char_u	*buttons,
-    int		dfltbutton)
+    صحیح		dfltbutton)
 {
-    int		len = 0;
+    صحیح		len = 0;
 # define HOTK_LEN (has_mbyte ? MB_MAXBYTES : 1)
-    int		lenhotkey = HOTK_LEN;	// count first button
-    char_u	*hotk = NULL;
-    char_u	*msgp = NULL;
-    char_u	*hotkp = NULL;
+    صحیح		lenhotkey = HOTK_LEN;	// count first button
+    char_u	*hotk = تہی;
+    char_u	*msgp = تہی;
+    char_u	*hotkp = تہی;
     char_u	*r;
-    int		copy;
+    صحیح		copy;
 # define HAS_HOTKEY_LEN 30
     char_u	has_hotkey[HAS_HOTKEY_LEN];
-    int		first_hotkey = FALSE;	// first char of button is hotkey
-    int		idx;
+    صحیح		پہلا_hotkey = FALSE;	// first char of button is hotkey
+    صحیح		idx;
 
     has_hotkey[0] = FALSE;
 
@@ -4471,50 +4471,50 @@ msg_show_console_dialog(
      * First loop: compute the size of memory to allocate.
      * Second loop: copy to the allocated memory.
      */
-    for (copy = 0; copy <= 1; ++copy)
+    برائے (copy = 0; copy <= 1; ++copy)
     {
 	r = buttons;
 	idx = 0;
-	while (*r)
+	جب (*r)
 	{
-	    if (*r == DLG_BUTTON_SEP)
+	    اگر (*r == DLG_BUTTON_SEP)
 	    {
-		if (copy)
+		اگر (copy)
 		{
 		    *msgp++ = ',';
 		    *msgp++ = ' ';	    // '\n' -> ', '
 
 		    // advance to next hotkey and set default hotkey
-		    if (has_mbyte)
+		    اگر (has_mbyte)
 			hotkp += STRLEN(hotkp);
-		    else
+		    ورنہ
 			++hotkp;
 		    hotkp[copy_char(r + 1, hotkp, TRUE)] = NUL;
-		    if (dfltbutton)
+		    اگر (dfltbutton)
 			--dfltbutton;
 
 		    // If no hotkey is specified first char is used.
-		    if (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
-			first_hotkey = TRUE;
+		    اگر (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
+			پہلا_hotkey = TRUE;
 		}
-		else
+		ورنہ
 		{
 		    len += 3;		    // '\n' -> ', '; 'x' -> '(x)'
 		    lenhotkey += HOTK_LEN;  // each button needs a hotkey
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    اگر (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[++idx] = FALSE;
 		}
 	    }
-	    else if (*r == DLG_HOTKEY_CHAR || first_hotkey)
+	    ورنہ اگر (*r == DLG_HOTKEY_CHAR || پہلا_hotkey)
 	    {
-		if (*r == DLG_HOTKEY_CHAR)
+		اگر (*r == DLG_HOTKEY_CHAR)
 		    ++r;
-		first_hotkey = FALSE;
-		if (copy)
+		پہلا_hotkey = FALSE;
+		اگر (copy)
 		{
-		    if (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
+		    اگر (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
 			*msgp++ = *r;
-		    else
+		    ورنہ
 		    {
 			// '&a' -> '[a]'
 			*msgp++ = (dfltbutton == 1) ? '[' : '(';
@@ -4525,17 +4525,17 @@ msg_show_console_dialog(
 			hotkp[copy_char(r, hotkp, TRUE)] = NUL;
 		    }
 		}
-		else
+		ورنہ
 		{
 		    ++len;	    // '&a' -> '[a]'
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    اگر (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[idx] = TRUE;
 		}
 	    }
-	    else
+	    ورنہ
 	    {
 		// everything else copy literally
-		if (copy)
+		اگر (copy)
 		    msgp += copy_char(r, msgp, FALSE);
 	    }
 
@@ -4543,43 +4543,43 @@ msg_show_console_dialog(
 	    MB_PTR_ADV(r);
 	}
 
-	if (copy)
+	اگر (copy)
 	{
 	    *msgp++ = ':';
 	    *msgp++ = ' ';
 	    *msgp = NUL;
 	}
-	else
+	ورنہ
 	{
-	    len += (int)(STRLEN(message)
+	    len += (صحیح)(STRLEN(پیغام_2)
 			+ 2			// for the NL's
 			+ STRLEN(buttons)
 			+ 3);			// for the ": " and NUL
 	    lenhotkey++;			// for the NUL
 
 	    // If no hotkey is specified first char is used.
-	    if (!has_hotkey[0])
+	    اگر (!has_hotkey[0])
 	    {
-		first_hotkey = TRUE;
+		پہلا_hotkey = TRUE;
 		len += 2;		// "x" -> "[x]"
 	    }
 
 	    /*
 	     * Now allocate and load the strings
 	     */
-	    vim_free(confirm_msg);
-	    confirm_msg = alloc(len);
-	    if (confirm_msg == NULL)
-		return NULL;
-	    *confirm_msg = NUL;
+	    vim_free(confirm_پیغام);
+	    confirm_پیغام = alloc(len);
+	    اگر (confirm_پیغام == تہی)
+		واپس تہی;
+	    *confirm_پیغام = NUL;
 	    hotk = alloc(lenhotkey);
-	    if (hotk == NULL)
-		return NULL;
+	    اگر (hotk == تہی)
+		واپس تہی;
 
-	    *confirm_msg = '\n';
-	    STRCPY(confirm_msg + 1, message);
+	    *confirm_پیغام = '\n';
+	    STRCPY(confirm_پیغام + 1, پیغام_2);
 
-	    msgp = confirm_msg + 1 + STRLEN(message);
+	    msgp = confirm_پیغام + 1 + STRLEN(پیغام_2);
 	    hotkp = hotk;
 
 	    // Define first default hotkey.  Keep the hotkey string NUL
@@ -4588,84 +4588,84 @@ msg_show_console_dialog(
 
 	    // Remember where the choices start, displaying starts here when
 	    // "hotkp" typed at the more prompt.
-	    confirm_msg_tail = msgp;
+	    confirm_پیغام_دم = msgp;
 	    *msgp++ = '\n';
 	}
     }
 
-    display_confirm_msg();
-    return hotk;
+    display_confirm_پیغام();
+    واپس hotk;
 }
 
 /*
  * Display the ":confirm" message.  Also called when screen resized.
  */
-    static void
-display_confirm_msg(void)
+    ساکن خالی
+display_confirm_پیغام(خالی)
 {
     // avoid that 'q' at the more prompt truncates the message here
-    ++confirm_msg_used;
-    if (confirm_msg != NULL)
-	msg_puts_attr((char *)confirm_msg, HL_ATTR(HLF_M));
-    --confirm_msg_used;
+    ++confirm_پیغام_مستعمل;
+    اگر (confirm_پیغام != تہی)
+	پیغام_puts_attr((حرف *)confirm_پیغام, HL_ATTR(HLF_M));
+    --confirm_پیغام_مستعمل;
 }
 
-#endif // FEAT_CON_DIALOG
+#اگر_ختم // FEAT_CON_DIALOG
 
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#اگر defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 
-    int
+    صحیح
 vim_dialog_yesno(
-    int		type,
+    صحیح		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*پیغام_2,
+    صحیح		dflt)
 {
-    if (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
-		message,
-		(char_u *)_("&Yes\n&No"), dflt, NULL, FALSE) == 1)
-	return VIM_YES;
-    return VIM_NO;
+    اگر (do_dialog(type,
+		title == تہی ? (char_u *)_("Question") : title,
+		پیغام_2,
+		(char_u *)_("&Yes\n&No"), dflt, تہی, FALSE) == 1)
+	واپس VIM_YES;
+    واپس VIM_NO;
 }
 
-    int
+    صحیح
 vim_dialog_yesnocancel(
-    int		type,
+    صحیح		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*پیغام_2,
+    صحیح		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
-		message,
-		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, NULL, FALSE))
+    انتخاب (do_dialog(type,
+		title == تہی ? (char_u *)_("Question") : title,
+		پیغام_2,
+		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, تہی, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
+	حالت 1: واپس VIM_YES;
+	حالت 2: واپس VIM_NO;
     }
-    return VIM_CANCEL;
+    واپس VIM_CANCEL;
 }
 
-    int
+    صحیح
 vim_dialog_yesnoallcancel(
-    int		type,
+    صحیح		type,
     char_u	*title,
-    char_u	*message,
-    int		dflt)
+    char_u	*پیغام_2,
+    صحیح		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)"Question" : title,
-		message,
+    انتخاب (do_dialog(type,
+		title == تہی ? (char_u *)"Question" : title,
+		پیغام_2,
 		(char_u *)_("&Yes\n&No\nSave &All\n&Discard All\n&Cancel"),
-							   dflt, NULL, FALSE))
+							   dflt, تہی, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
-	case 3: return VIM_ALL;
-	case 4: return VIM_DISCARDALL;
+	حالت 1: واپس VIM_YES;
+	حالت 2: واپس VIM_NO;
+	حالت 3: واپس VIM_ALL;
+	حالت 4: واپس VIM_DISCARDALL;
     }
-    return VIM_CANCEL;
+    واپس VIM_CANCEL;
 }
 
-#endif // FEAT_GUI_DIALOG || FEAT_CON_DIALOG
+#اگر_ختم // FEAT_GUI_DIALOG || FEAT_CON_DIALOG

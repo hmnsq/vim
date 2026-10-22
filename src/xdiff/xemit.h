@@ -20,17 +20,17 @@
  *
  */
 
-#if !defined(XEMIT_H)
-#define XEMIT_H
+#اگر !defined(XEMIT_H)
+#تعریف_کرو XEMIT_H
 
 
-typedef int (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-			   xdemitconf_t const *xecfg);
+قسمتعریف صحیح (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+			   xdemitconf_t ثابت *xecfg);
 
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t ثابت *xecfg);
+صحیح xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ثابت *xecfg);
 
 
 
-#endif /* #if !defined(XEMIT_H) */
+#اگر_ختم /* #if !defined(XEMIT_H) */

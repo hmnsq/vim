@@ -20,141 +20,141 @@
  *
  */
 
-#if !defined(XDIFF_H)
-#define XDIFF_H
+#اگر !defined(XDIFF_H)
+#تعریف_کرو XDIFF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* #ifdef __cplusplus */
+#اگر_تعریف_شدہ __cplusplus
+خارجی "C" {
+#اگر_ختم /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
-#define XDF_NEED_MINIMAL (1 << 0)
+#تعریف_کرو XDF_NEED_اقل (1 << 0)
 
-#define XDF_IGNORE_WHITESPACE (1 << 1)
-#define XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
-#define XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
-#define XDF_IGNORE_CR_AT_EOL (1 << 4)
-#define XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
+#تعریف_کرو XDF_IGNORE_WHITESPACE (1 << 1)
+#تعریف_کرو XDF_IGNORE_WHITESPACE_CHANGE (1 << 2)
+#تعریف_کرو XDF_IGNORE_WHITESPACE_AT_EOL (1 << 3)
+#تعریف_کرو XDF_IGNORE_CR_AT_EOL (1 << 4)
+#تعریف_کرو XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | \
 			      XDF_IGNORE_WHITESPACE_CHANGE | \
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#تعریف_کرو XDF_IGNORE_BLANK_سطریں (1 << 7)
 
-#define XDF_PATIENCE_DIFF (1 << 14)
-#define XDF_HISTOGRAM_DIFF (1 << 15)
-#define XDF_DIFF_ALGORITHM_MASK (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
-#define XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_MASK)
+#تعریف_کرو XDF_PATIENCE_DIFF (1 << 14)
+#تعریف_کرو XDF_HISTOGRAM_DIFF (1 << 15)
+#تعریف_کرو XDF_DIFF_ALGORITHM_نقاب (XDF_PATIENCE_DIFF | XDF_HISTOGRAM_DIFF)
+#تعریف_کرو XDF_DIFF_ALG(x) ((x) & XDF_DIFF_ALGORITHM_نقاب)
 
-#define XDF_INDENT_HEURISTIC (1 << 23)
+#تعریف_کرو XDF_INDENT_HEURISTIC (1 << 23)
 
 /* xdemitconf_t.flags */
-#define XDL_EMIT_FUNCNAMES (1 << 0)
-#define XDL_EMIT_NO_HUNK_HDR (1 << 1)
-#define XDL_EMIT_FUNCCONTEXT (1 << 2)
+#تعریف_کرو XDL_EMIT_FUNCNAMES (1 << 0)
+#تعریف_کرو XDL_EMIT_NO_HUNK_HDR (1 << 1)
+#تعریف_کرو XDL_EMIT_FUNCCONTEXT (1 << 2)
 
 /* merge simplification levels */
-#define XDL_MERGE_MINIMAL 0
-#define XDL_MERGE_EAGER 1
-#define XDL_MERGE_ZEALOUS 2
-#define XDL_MERGE_ZEALOUS_ALNUM 3
+#تعریف_کرو XDL_ملاؤ_اقل 0
+#تعریف_کرو XDL_ملاؤ_EAGER 1
+#تعریف_کرو XDL_ملاؤ_ZEALOUS 2
+#تعریف_کرو XDL_ملاؤ_ZEALOUS_ALNUM 3
 
 /* merge favor modes */
-#define XDL_MERGE_FAVOR_OURS 1
-#define XDL_MERGE_FAVOR_THEIRS 2
-#define XDL_MERGE_FAVOR_UNION 3
+#تعریف_کرو XDL_ملاؤ_FAVOR_OURS 1
+#تعریف_کرو XDL_ملاؤ_FAVOR_THEIRS 2
+#تعریف_کرو XDL_ملاؤ_FAVOR_UNION 3
 
 /* merge output styles */
-#define XDL_MERGE_DIFF3 1
-#define XDL_MERGE_ZEALOUS_DIFF3 2
+#تعریف_کرو XDL_ملاؤ_DIFF3 1
+#تعریف_کرو XDL_ملاؤ_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
-	long size;
+قسمتعریف ساخت s_mmfile {
+	حرف *ptr;
+	طویل سائز;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
-	long size;
+قسمتعریف ساخت s_mmbuffer {
+	حرف *ptr;
+	طویل سائز;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
-	unsigned long flags;
+قسمتعریف ساخت s_xpparam {
+	غیرعلامتی طویل flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #اگر 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
-#endif
+#اگر_ختم
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	حرف **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
-			long old_begin, long old_nr,
-			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+قسمتعریف ساخت s_xdemitcb {
+	خالی *priv;
+	صحیح (*برآمد_hunk)(خالی *,
+			طویل old_begin, طویل old_nr,
+			طویل new_begin, طویل new_nr,
+			ثابت حرف *func, طویل funclen);
+	صحیح (*برآمد_سطر)(خالی *, mmbuffer_t *, صحیح);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+قسمتعریف طویل (*ڈھونڈو_func_t)(ثابت حرف *سطر, طویل سطر_len, حرف *بفر, طویل بفر_سائز_3, خالی *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+قسمتعریف صحیح (*xdl_emit_hunk_consume_func_t)(طویل آغاز_a, طویل گنتی_a,
+					    طویل آغاز_b, طویل گنتی_b,
+					    خالی *cb_ڈیٹا_2);
 
-typedef struct s_xdemitconf {
-	long ctxlen;
-	long interhunkctxlen;
-	unsigned long flags;
-	find_func_t find_func;
-	void *find_func_priv;
+قسمتعریف ساخت s_xdemitconf {
+	طویل ctxlen;
+	طویل interhunkctxlen;
+	غیرعلامتی طویل flags;
+	ڈھونڈو_func_t ڈھونڈو_func;
+	خالی *ڈھونڈو_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
-	long bsize;
+قسمتعریف ساخت s_bdiffparam {
+	طویل bsize;
 } bdiffparam_t;
 
-#ifdef VMS
+#اگر_تعریف_شدہ VMS
 # include "[]vim.h"
-#else
+#ورنہ
 # include "../vim.h"
-#endif
+#اگر_ختم
 
-#define xdl_malloc(x) lalloc((x), TRUE)
-#define xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
-#define xdl_free(ptr) vim_free(ptr)
-#define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
+#تعریف_کرو xdl_malloc(x) lalloc((x), TRUE)
+#تعریف_کرو xdl_calloc(n, sz) lalloc_clear(n*sz, TRUE)
+#تعریف_کرو xdl_free(ptr) vim_free(ptr)
+#تعریف_کرو xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
-long xdl_mmfile_size(mmfile_t *mmf);
+خالی *xdl_mmfile_پہلا(mmfile_t *mmf, طویل *سائز);
+طویل xdl_mmfile_سائز(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+صحیح xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ثابت *xpp,
+	     xdemitconf_t ثابت *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+قسمتعریف ساخت s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	صحیح marker_سائز;
+	صحیح level;
+	صحیح favor;
+	صحیح style;
+	ثابت حرف *ancestor;	/* label for orig */
+	ثابت حرف *file1;	/* label for mf1 */
+	ثابت حرف *file2;	/* label for mf2 */
 } xmparam_t;
 
-#define DEFAULT_CONFLICT_MARKER_SIZE 7
+#تعریف_کرو DEFAULT_CONFLICT_MARKER_سائز 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+صحیح xdl_ملاؤ(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t ثابت *xmp, mmbuffer_t *نتیجہ);
 
-#ifdef __cplusplus
+#اگر_تعریف_شدہ __cplusplus
 }
-#endif /* #ifdef __cplusplus */
+#اگر_ختم /* #ifdef __cplusplus */
 
-#endif /* #if !defined(XDIFF_H) */
+#اگر_ختم /* #if !defined(XDIFF_H) */

@@ -4,73 +4,73 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import os
-import sys
-import time
+سے __future__ درآمد print_function
+درآمد os
+درآمد sys
+درآمد وقت
 
-if __name__ == "__main__":
+اگر __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
-            print(sys.argv[1], file=sys.stderr)
+    اگر لمبائی(sys.argv) > 1:
+        اگر sys.argv[1].startswith("err"):
+            چھاپو(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
-        elif sys.argv[1].startswith("incomplete"):
-            print(sys.argv[1], end='')
+        وگرنہ_اگر sys.argv[1].startswith("incomplete"):
+            چھاپو(sys.argv[1], انتہا='')
             sys.stdout.flush()
             sys.exit(0)
-        elif sys.argv[1].startswith("busy"):
-            time.sleep(100)
+        وگرنہ_اگر sys.argv[1].startswith("busy"):
+            وقت.نوم(100)
             sys.exit(0)
-        else:
-            print(sys.argv[1])
+        ورنہ:
+            چھاپو(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            اگر sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
-        try:
-            import thread_util
-            thread_util.set_high_priority()
-        except Exception:
-            pass
+    اگر os.getenv('CI'):
+        کوشش:
+            درآمد thread_util
+            thread_util.سیٹ_بلند_ترجیح()
+        استثنا Exception:
+            گزرو
 
-    while True:
+    جب سچ:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
-            break
-        if typed.startswith("quit"):
-            print("Goodbye!")
+        اگر typed == "":  # EOF -- stop
+            توڑو
+        اگر typed.startswith("quit"):
+            چھاپو("Goodbye!")
             sys.stdout.flush()
-            break
-        if typed.startswith("echo "):
-            print(typed[5:-1])
+            توڑو
+        اگر typed.startswith("echo "):
+            چھاپو(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
-                sys.stdout.write(part)
+        اگر typed.startswith("echosplit "):
+            برائے part میں typed[10:-1].بانٹو('|'):
+                sys.stdout.اكتب(part)
                 sys.stdout.flush()
-                time.sleep(0.05)
-        if typed.startswith("double "):
-            print(typed[7:-1] + "\nAND " + typed[7:-1])
+                وقت.نوم(0.05)
+        اگر typed.startswith("double "):
+            چھاپو(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
-            print(typed[6:-1], end='')
+        اگر typed.startswith("split "):
+            چھاپو(typed[6:-1], انتہا='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1], end='')
+            وقت.نوم(0.05)
+            چھاپو(typed[6:-1], انتہا='')
             sys.stdout.flush()
-            time.sleep(0.05)
-            print(typed[6:-1])
+            وقت.نوم(0.05)
+            چھاپو(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
-            print(typed[8:-1], file=sys.stderr)
+        اگر typed.startswith("echoerr "):
+            چھاپو(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
-            print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
+        اگر typed.startswith("doubleerr "):
+            چھاپو(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
-            print(typed, end='')
+        اگر typed.startswith("XXX"):
+            چھاپو(typed, انتہا='')
             sys.stderr.flush()
-            break
+            توڑو
 

@@ -11,12 +11,12 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
-#define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
+#اگر !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#تعریف_کرو AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
-#pragma once
-#endif
+#اگر defined(_MSC_VER) && _MSC_VER > 1000
+#ہدایت once
+#اگر_ختم
 
 // Insert your headers here
 // #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -27,30 +27,30 @@
 //
 //--------------------------------------------------------------
 
-#ifndef STRICT
+#اگر_غیر_تعریف_شدہ STRICT
 # define STRICT
-#endif
+#اگر_ختم
 
-#define INC_OLE2	// MS-Windows, get ole2 from windows.h
+#تعریف_کرو INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#اگر defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
-#endif
+#اگر_ختم
 
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
+#شامل <windows.h>
+#شامل <windowsx.h>
+#شامل <shlobj.h>
+#شامل <wchar.h>
 
-#define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
+#تعریف_کرو نتیجہ_From_Short(i)  نتیجہ_From_Scode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // Initialize GUIDs (should be done only and at-least once per DLL/EXE)
 //
-#pragma data_seg(".text")
-#define INITGUID
-#include <initguid.h>
+#ہدایت ڈیٹا_seg(".text")
+#تعریف_کرو INITGUID
+#شامل <initguid.h>
 
 //
 // The class ID of this Shell extension class.
@@ -78,73 +78,73 @@
 DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0x90, 0x27, 0x8b, 0xbd, 0x99);
 
 // this class factory object creates context menu handlers for windows 32 shell
-class CShellExtClassFactory : public IClassFactory
+class CShellExtClassFactory : عوامی IClassFactory
 {
-protected:
+محفوظ:
     ULONG	m_cRef;
 
-public:
+عوامی:
     CShellExtClassFactory();
-    virtual ~CShellExtClassFactory();
+    مجازی ~CShellExtClassFactory();
 
     //IUnknown members
     STDMETHODIMP		QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG)	AddRef();
+    STDMETHODIMP_(ULONG)	جوڑو_Ref();
     STDMETHODIMP_(ULONG)	Release();
 
     //IClassFactory members
     STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
-    STDMETHODIMP		LockServer(BOOL);
+    STDMETHODIMP		تالا_Server(BOOL);
 };
-typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
-#define MAX_HWND 100
+قسمتعریف CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+#تعریف_کرو MAX_HWND 100
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu,
+class CShellExt : عوامی IContextMenu,
 			 IShellExtInit
 {
-private:
-    BOOL LoadMenuIcon();
+نجی:
+    BOOL بھرو_Menu_Icon();
 
-protected:
+محفوظ:
     ULONG	 m_cRef;
-    LPDATAOBJECT m_pDataObj;
+    LPDATAOBJECT m_p_ڈیٹا_Obj;
     UINT	 m_edit_existing_off;
     HBITMAP	 m_hVimIconBitmap;
 
     // For some reason, this callback must be static
-    static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
+    ساکن BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP ڈالو_مقصد_کھڑکی(HWND h_والد,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    صحیح iShowCmd,
+	    صحیح idHWnd);
 
-    STDMETHODIMP InvokeSingleGvim(HWND hParent,
+    STDMETHODIMP InvokeSingleGvim(HWND h_والد,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    صحیح iShowCmd,
+	    صحیح gvimExtraOptions);
 
-public:
-    int		 m_cntOfHWnd;
+عوامی:
+    صحیح		 m_cnt_کا_HWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
-    virtual ~CShellExt();
+    مجازی ~CShellExt();
 
     //IUnknown members
     STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
-    STDMETHODIMP_(ULONG) AddRef();
+    STDMETHODIMP_(ULONG) جوڑو_Ref();
     STDMETHODIMP_(ULONG) Release();
 
     //IShell members
     STDMETHODIMP QueryContextMenu(HMENU hMenu,
-	    UINT indexMenu,
-	    UINT idCmdFirst,
-	    UINT idCmdLast,
+	    UINT اشاریہ_Menu,
+	    UINT id_Cmd_پہلا,
+	    UINT id_Cmd_آخری,
 	    UINT uFlags);
 
     STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi);
@@ -157,11 +157,11 @@ public:
 
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
-	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    LPDATAOBJECT p_ڈیٹا_Obj,
+	    HKEY h_کلید_ID);
 };
 
-typedef CShellExt *LPCSHELLEXT;
-#pragma data_seg()
+قسمتعریف CShellExt *LPCSHELLEXT;
+#ہدایت ڈیٹا_seg()
 
-#endif
+#اگر_ختم

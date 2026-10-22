@@ -11,33 +11,33 @@
  * os_haiku.h
  */
 
-#define USE_TERM_CONSOLE
+#تعریف_کرو USE_رکن_CONSOLE
 
-#define USR_VIM_DIR "$BE_USER_SETTINGS/vim"
+#تعریف_کرو USR_VIM_DIR "$BE_USER_SETTINGS/vim"
 
-#define USR_EXRC_FILE	USR_VIM_DIR "/exrc"
-#define USR_EXRC_FILE2	USR_VIM_DIR "/vim/exrc"
-#define USR_VIMRC_FILE	USR_VIM_DIR "/vimrc"
-#define USR_VIMRC_FILE2	USR_VIM_DIR "/vim/vimrc"
-#define USR_GVIMRC_FILE	USR_VIM_DIR "/gvimrc"
-#define USR_GVIMRC_FILE2	USR_VIM_DIR "/vim/gvimrc"
-#define VIMINFO_FILE	USR_VIM_DIR "/viminfo"
+#تعریف_کرو USR_EXRC_FILE	USR_VIM_DIR "/exrc"
+#تعریف_کرو USR_EXRC_FILE2	USR_VIM_DIR "/vim/exrc"
+#تعریف_کرو USR_VIMRC_FILE	USR_VIM_DIR "/vimrc"
+#تعریف_کرو USR_VIMRC_FILE2	USR_VIM_DIR "/vim/vimrc"
+#تعریف_کرو USR_GVIMRC_FILE	USR_VIM_DIR "/gvimrc"
+#تعریف_کرو USR_GVIMRC_FILE2	USR_VIM_DIR "/vim/gvimrc"
+#تعریف_کرو VIMINFO_FILE	USR_VIM_DIR "/viminfo"
 
-#ifdef RUNTIME_GLOBAL
+#اگر_تعریف_شدہ RUNTIME_GLOBAL
 # ifdef RUNTIME_GLOBAL_AFTER
 #  define DFLT_RUNTIMEPATH	USR_VIM_DIR "," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER "," USR_VIM_DIR "/after"
 #  define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",$XDG_CONFIG_HOME/vim/after"
 #  define XDG_RUNTIMEPATH_FB	"~/config/settings/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/config/settings/vim/after"
 #  define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER
-# else
+# ورنہ
 #  define DFLT_RUNTIMEPATH	USR_VIM_DIR "," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after," USR_VIM_DIR "/after"
 #  define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,$XDG_CONFIG_HOME/vim/after"
 #  define XDG_RUNTIMEPATH_FB	"~/config/settings/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/config/settings/vim/after"
 #  define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after"
 # endif
-#else
+#ورنہ
 # define DFLT_RUNTIMEPATH	USR_VIM_DIR ",$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after," USR_VIM_DIR "/after"
 # define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$XDG_CONFIG_HOME/vim/after"
 # define XDG_RUNTIMEPATH_FB	"~/config/settings/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/config/settings/vim/after"
 # define CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
-#endif
+#اگر_ختم

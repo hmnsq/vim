@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+ساخت BMenu;
+ساخت BMenu_شے;
+ساخت BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+ساخت VimApp;
+ساخت VimFormView;
+ساخت Vim_متن_Area_View;
+ساخت Vim_کھڑکی;
+ساخت VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+خارجی صحیح vim_تالا_screen();
+خارجی خالی vim_unlock_screen();
 
-#ifndef __cplusplus
+#اگر_غیر_تعریف_شدہ __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+قسمتعریف ساخت BMenu BMenu;
+قسمتعریف ساخت BMenu_شے BMenu_شے;
+قسمتعریف ساخت BPictureButton BPictureButton;
+قسمتعریف ساخت Vim_کھڑکی Vim_کھڑکی;
+قسمتعریف ساخت VimFormView VimFormView;
+قسمتعریف ساخت Vim_متن_Area_View Vim_متن_Area_View;
+قسمتعریف ساخت VimApp VimApp;
+قسمتعریف ساخت VimScrollBar VimScrollBar;
 
-#endif
+#اگر_ختم

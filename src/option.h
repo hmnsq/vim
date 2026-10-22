@@ -10,71 +10,71 @@
  * option.h: definition of global variables for settable options
  */
 
-#ifndef _OPTION_H_
-#define _OPTION_H_
+#اگر_غیر_تعریف_شدہ _OPTION_H_
+#تعریف_کرو _OPTION_H_
 
 //
 // Option Flags
 //
-#define P_BOOL		0x01	// the option is boolean
-#define P_NUM		0x02	// the option is numeric
-#define P_STRING	0x04	// the option is a string
-#define P_ALLOCED	0x08	// the string option is in allocated memory,
+#تعریف_کرو P_BOOL		0x01	// the option is boolean
+#تعریف_کرو P_عدد		0x02	// the option is numeric
+#تعریف_کرو P_STRING	0x04	// the option is a string
+#تعریف_کرو P_ALLOCED	0x08	// the string option is in allocated memory,
 				// must use free_string_option() when
 				// assigning new value. Not set if default is
 				// the same.
-#define P_EXPAND	0x10	// environment expansion.  NOTE: P_EXPAND can
+#تعریف_کرو P_EXPAND	0x10	// environment expansion.  NOTE: P_EXPAND can
 				// never be used for local or hidden options!
-#define P_NO_CMD_EXPAND	0x20	// don't perform cmdline completions
-#define P_NODEFAULT	0x40	// don't set to default value
-#define P_DEF_ALLOCED	0x80	// default value is in allocated memory, must
+#تعریف_کرو P_NO_CMD_EXPAND	0x20	// don't perform cmdline completions
+#تعریف_کرو P_NODEFAULT	0x40	// don't set to default value
+#تعریف_کرو P_DEF_ALLOCED	0x80	// default value is in allocated memory, must
 				//  use vim_free() when assigning new value
-#define P_WAS_SET	0x100	// option has been set/reset
-#define P_NO_MKRC	0x200	// don't include in :mkvimrc output
-#define P_VI_DEF	0x400	// Use Vi default for Vim
-#define P_VIM		0x800	// Vim option, reset when 'cp' set
+#تعریف_کرو P_WAS_سیٹ	0x100	// option has been set/reset
+#تعریف_کرو P_NO_MKRC	0x200	// don't include in :mkvimrc output
+#تعریف_کرو P_VI_DEF	0x400	// Use Vi default for Vim
+#تعریف_کرو P_VIM		0x800	// Vim option, reset when 'cp' set
 
 				// when option changed, what to display:
-#define P_RSTAT		0x1000	// redraw status lines
-#define P_RWIN		0x2000	// redraw current window and recompute text
-#define P_RBUF		0x4000	// redraw current buffer and recompute text
-#define P_RALL		0x6000	// redraw all windows and recompute text
-#define P_RCLR		0x7000	// clear and redraw all and recompute text
+#تعریف_کرو P_RSTAT		0x1000	// redraw status lines
+#تعریف_کرو P_RWIN		0x2000	// redraw current window and recompute text
+#تعریف_کرو P_RBUF		0x4000	// redraw current buffer and recompute text
+#تعریف_کرو P_RALL		0x6000	// redraw all windows and recompute text
+#تعریف_کرو P_RCLR		0x7000	// clear and redraw all and recompute text
 
-#define P_COMMA		 0x8000	 // comma separated list
-#define P_ONECOMMA	0x18000L // P_COMMA and cannot have two consecutive
+#تعریف_کرو P_COMMA		 0x8000	 // comma separated list
+#تعریف_کرو P_ONECOMMA	0x18000L // P_COMMA and cannot have two consecutive
 				 // commas
-#define P_NODUP		0x20000L // don't allow duplicate strings
-#define P_FLAGLIST	0x40000L // list of single-char flags
+#تعریف_کرو P_NODUP		0x20000L // don't allow duplicate strings
+#تعریف_کرو P_FLAGLIST	0x40000L // list of single-char flags
 
-#define P_SECURE	0x80000L // cannot change in modeline or secure mode
-#define P_GETTEXT      0x100000L // expand default value with _()
-#define P_NOGLOB       0x200000L // do not use local value for global vimrc
-#define P_NFNAME       0x400000L // only normal file name chars allowed
-#define P_INSECURE     0x800000L // option was set from a modeline
-#define P_PRI_MKRC    0x1000000L // priority for :mkvimrc (setting option has
+#تعریف_کرو P_SECURE	0x80000L // cannot change in modeline or secure mode
+#تعریف_کرو P_GETTEXT      0x100000L // expand default value with _()
+#تعریف_کرو P_NOGLOB       0x200000L // do not use local value for global vimrc
+#تعریف_کرو P_NFNAME       0x400000L // only normal file name chars allowed
+#تعریف_کرو P_INSECURE     0x800000L // option was set from a modeline
+#تعریف_کرو P_PRI_MKRC    0x1000000L // priority for :mkvimrc (setting option has
 				 // side effects)
-#define P_NO_ML       0x2000000L // not allowed in modeline
-#define P_CURSWANT    0x4000000L // update curswant required; not needed when
+#تعریف_کرو P_NO_ML       0x2000000L // not allowed in modeline
+#تعریف_کرو P_CURSWANT    0x4000000L // update curswant required; not needed when
 				 // there is a redraw flag
-#define P_NDNAME      0x8000000L // only normal dir name chars allowed
-#define P_HLONLY     0x10000000L // option only changes highlight, not text
-#define P_MLE	     0x20000000L // under control of 'modelineexpr'
-#define P_FUNC	     0x40000000L // accept a function reference or a lambda
-#define P_COLON	     0x80000000L // values use colons to create sublists
+#تعریف_کرو P_NDNAME      0x8000000L // only normal dir name chars allowed
+#تعریف_کرو P_HLONLY     0x10000000L // option only changes highlight, not text
+#تعریف_کرو P_MLE	     0x20000000L // under control of 'modelineexpr'
+#تعریف_کرو P_FUNC	     0x40000000L // accept a function reference or a lambda
+#تعریف_کرو P_COLON	     0x80000000L // values use colons to create sublists
 // Warning: Currently we have used all 32 bits for option flags. On some 32-bit
 //          systems, the flags are stored as a 32-bit integer, and adding more
 //          flags will overflow it. Adding another flag will need to change how
 //          it's stored first.
 
 // Returned by get_option_value().
-typedef enum {
+قسمتعریف شمار {
     gov_unknown,
     gov_bool,
-    gov_number,
+    gov_نمبر,
     gov_string,
     gov_hidden_bool,
-    gov_hidden_number,
+    gov_hidden_نمبر,
     gov_hidden_string
 } getoption_T;
 
@@ -83,840 +83,840 @@ typedef enum {
  * The "%f|%l| %m" one is used for when the contents of the quickfix window is
  * written to a file.
  */
-#ifdef AMIGA
+#اگر_تعریف_شدہ AMIGA
 # define DFLT_EFM	"%f>%l:%c:%t:%n:%m,%f:%l: %t%*\\D%n: %m,%f %l %t%*\\D%n: %m,%*[^\"]\"%f\"%*\\D%l: %m,%f:%l:%m,%f|%l| %m"
-#else
-# if defined(MSWIN)
+#ورنہ
+# اگر defined(MSWIN)
 #  define DFLT_EFM	"%f(%l): %t%*\\D%n: %m,%f(%l\\,%c): %t%*\\D%n: %m,%f(%l) \\=: %t%*\\D%n: %m,%*[^\"]\"%f\"%*\\D%l: %m,%f(%l) \\=: %m,%*[^ ] %f %l: %m,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,%f|%l| %m"
-# else
-#  if defined(__QNX__)
+# ورنہ
+#  اگر defined(__QNX__)
 #   define DFLT_EFM	"%f(%l):%*[^WE]%t%*\\D%n:%m,%f|%l| %m"
-#  else
+#  ورنہ
 #   ifdef VMS
 #    define DFLT_EFM	"%A%p^,%C%%CC-%t-%m,%Cat line number %l in file %f,%f|%l| %m"
-#   else // Unix, probably
+#   ورنہ // Unix, probably
 #    define DFLT_EFM	"%*[^\"]\"%f\"%*\\D%l: %m,\"%f\"%*\\D%l: %m,%-Gg%\\?make[%*\\d]: *** [%f:%l:%m,%-Gg%\\?make: *** [%f:%l:%m,%-G%f:%l: (Each undeclared identifier is reported only once,%-G%f:%l: for each function it appears in.),%-GIn file included from %f:%l:%c:,%-GIn file included from %f:%l:%c\\,,%-GIn file included from %f:%l:%c,%-GIn file included from %f:%l,%-G%*[ ]from %f:%l:%c,%-G%*[ ]from %f:%l:,%-G%*[ ]from %f:%l\\,,%-G%*[ ]from %f:%l,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,\"%f\"\\, line %l%*\\D%c%*[^ ] %m,%D%*\\a[%*\\d]: Entering directory %*[`']%f',%X%*\\a[%*\\d]: Leaving directory %*[`']%f',%D%*\\a: Entering directory %*[`']%f',%X%*\\a: Leaving directory %*[`']%f',%DMaking %*\\a in %f,%f|%l| %m"
 #   endif
 #  endif
 # endif
-#endif
+#اگر_ختم
 
-#define DFLT_GREPFORMAT	"%f:%l:%m,%f:%l%m,%f  %l%m"
+#تعریف_کرو DFLT_GREPFORMAT	"%f:%l:%m,%f:%l%m,%f  %l%m"
 
 // default values for b_p_ff 'fileformat' and p_ffs 'fileformats'
-#define FF_DOS		"dos"
-#define FF_MAC		"mac"
-#define FF_UNIX		"unix"
+#تعریف_کرو FF_DOS		"dos"
+#تعریف_کرو FF_MAC		"mac"
+#تعریف_کرو FF_UNIX		"unix"
 
-#ifdef USE_CRNL
+#اگر_تعریف_شدہ USE_CRNL
 # define DFLT_FF	"dos"
 # define DFLT_FFS_VIM	"dos,unix"
 # define DFLT_FFS_VI	"dos,unix"	// also autodetect in compatible mode
 # define DFLT_TEXTAUTO	TRUE
-#else
+#ورنہ
 # define DFLT_FF	"unix"
 # define DFLT_FFS_VIM	"unix,dos"
 # ifdef __CYGWIN__
 #  define DFLT_FFS_VI	"unix,dos"	// Cygwin always needs file detection
 #  define DFLT_TEXTAUTO TRUE
-# else
+# ورنہ
 #  define DFLT_FFS_VI	""
 #  define DFLT_TEXTAUTO FALSE
 # endif
-#endif
+#اگر_ختم
 
 
 // Possible values for 'encoding'
-#define ENC_UCSBOM	"ucs-bom"	// check for BOM at start of file
+#تعریف_کرو ENC_UCSBOM	"ucs-bom"	// check for BOM at start of file
 
 // default value for 'encoding'
-#if defined(MSWIN) || defined(__MVS__)
+#اگر defined(MSWIN) || defined(__MVS__)
 # define ENC_DFLT	"utf-8"
-#else
+#ورنہ
 # define ENC_DFLT	"latin1"
-#endif
+#اگر_ختم
 
 // end-of-line style
-#define EOL_UNKNOWN	(-1)	// not defined yet
-#define EOL_UNIX	0	// NL
-#define EOL_DOS		1	// CR NL
-#define EOL_MAC		2	// CR
+#تعریف_کرو EOL_UNKNOWN	(-1)	// not defined yet
+#تعریف_کرو EOL_UNIX	0	// NL
+#تعریف_کرو EOL_DOS		1	// CR NL
+#تعریف_کرو EOL_MAC		2	// CR
 
 // Formatting options for p_fo 'formatoptions'
-#define FO_WRAP		't'
-#define FO_WRAP_COMS	'c'
-#define FO_RET_COMS	'r'
-#define FO_OPEN_COMS	'o'
-#define FO_NO_OPEN_COMS	'/'
-#define FO_Q_COMS	'q'
-#define FO_Q_NUMBER	'n'
-#define FO_Q_SECOND	'2'
-#define FO_INS_VI	'v'
-#define FO_INS_LONG	'l'
-#define FO_INS_BLANK	'b'
-#define FO_MBYTE_BREAK	'm'	// break before/after multi-byte char
-#define FO_MBYTE_JOIN	'M'	// no space before/after multi-byte char
-#define FO_MBYTE_JOIN2	'B'	// no space between multi-byte chars
-#define FO_ONE_LETTER	'1'
-#define FO_WHITE_PAR	'w'	// trailing white space continues paragr.
-#define FO_AUTO		'a'	// automatic formatting
-#define FO_RIGOROUS_TW	']'     // respect textwidth rigorously
-#define FO_REMOVE_COMS	'j'	// remove comment leaders when joining lines
-#define FO_PERIOD_ABBR	'p'	// don't break a single space after a period
+#تعریف_کرو FO_WRAP		't'
+#تعریف_کرو FO_WRAP_COMS	'c'
+#تعریف_کرو FO_RET_COMS	'r'
+#تعریف_کرو FO_OPEN_COMS	'o'
+#تعریف_کرو FO_NO_OPEN_COMS	'/'
+#تعریف_کرو FO_Q_COMS	'q'
+#تعریف_کرو FO_Q_نمبر	'n'
+#تعریف_کرو FO_Q_دوسرا	'2'
+#تعریف_کرو FO_INS_VI	'v'
+#تعریف_کرو FO_INS_LONG	'l'
+#تعریف_کرو FO_INS_BLANK	'b'
+#تعریف_کرو FO_MBYTE_BREAK	'm'	// break before/after multi-byte char
+#تعریف_کرو FO_MBYTE_JOIN	'M'	// no space before/after multi-byte char
+#تعریف_کرو FO_MBYTE_JOIN2	'B'	// no space between multi-byte chars
+#تعریف_کرو FO_ONE_LETTER	'1'
+#تعریف_کرو FO_WHITE_PAR	'w'	// trailing white space continues paragr.
+#تعریف_کرو FO_AUTO		'a'	// automatic formatting
+#تعریف_کرو FO_RIGOROUS_TW	']'     // respect textwidth rigorously
+#تعریف_کرو FO_REMOVE_COMS	'j'	// remove comment leaders when joining lines
+#تعریف_کرو FO_PERIOD_ABBR	'p'	// don't break a single space after a period
 
-#define DFLT_FO_VI	"vt"
-#define DFLT_FO_VIM	"tcq"
-#define FO_ALL		"tcro/q2vlb1mMBn,aw]jp"	// for do_set()
+#تعریف_کرو DFLT_FO_VI	"vt"
+#تعریف_کرو DFLT_FO_VIM	"tcq"
+#تعریف_کرو FO_ALL		"tcro/q2vlb1mMBn,aw]jp"	// for do_set()
 
 // characters for the p_cpo option:
-#define CPO_ALTREAD	'a'	// ":read" sets alternate file name
-#define CPO_ALTWRITE	'A'	// ":write" sets alternate file name
-#define CPO_BAR		'b'	// "\|" ends a mapping
-#define CPO_BSLASH	'B'	// backslash in mapping is not special
-#define CPO_SEARCH	'c'
-#define CPO_CONCAT	'C'	// Don't concatenate sourced lines
-#define CPO_DOTTAG	'd'	// "./tags" in 'tags' is in current dir
-#define CPO_DIGRAPH	'D'	// No digraph after "r", "f", etc.
-#define CPO_EXECBUF	'e'
-#define CPO_EMPTYREGION	'E'	// operating on empty region is an error
-#define CPO_FNAMER	'f'	// set file name for ":r file"
-#define CPO_FNAMEW	'F'	// set file name for ":w file"
-#define CPO_GOTO1	'g'	// goto line 1 for ":edit"
-#define CPO_INSEND	'H'	// "I" inserts before last blank in line
-#define CPO_INTMOD	'i'	// interrupt a read makes buffer modified
-#define CPO_INDENT	'I'	// remove auto-indent more often
-#define CPO_JOINSP	'j'	// only use two spaces for join after '.'
-#define CPO_ENDOFSENT	'J'	// need two spaces to detect end of sentence
-#define CPO_KEYCODE	'k'	// don't recognize raw key code in mappings
-#define CPO_KOFFSET	'K'	// don't wait for key code in mappings
-#define CPO_LITERAL	'l'	// take char after backslash in [] literal
-#define CPO_LISTWM	'L'	// 'list' changes wrapmargin
-#define CPO_SHOWMATCH	'm'
-#define CPO_MATCHBSL	'M'	// "%" ignores use of backslashes
-#define CPO_NUMCOL	'n'	// 'number' column also used for text
-#define CPO_LINEOFF	'o'
-#define CPO_OVERNEW	'O'	// silently overwrite new file
-#define CPO_LISP	'p'	// 'lisp' indenting
-#define CPO_FNAMEAPP	'P'	// set file name for ":w >>file"
-#define CPO_JOINCOL	'q'	// with "3J" use column after first join
-#define CPO_REDO	'r'
-#define CPO_REMMARK	'R'	// remove marks when filtering
-#define CPO_BUFOPT	's'
-#define CPO_BUFOPTGLOB	'S'
-#define CPO_TAGPAT	't'	// tag pattern is used for "n"
-#define CPO_UNDO	'u'	// "u" undoes itself
-#define CPO_BACKSPACE	'v'	// "v" keep deleted text
-#define CPO_CW		'w'	// "cw" only changes one blank
-#define CPO_FWRITE	'W'	// "w!" doesn't overwrite readonly files
-#define CPO_ESC		'x'
-#define CPO_REPLCNT	'X'	// "R" with a count only deletes chars once
-#define CPO_YANK	'y'
-#define CPO_KEEPRO	'Z'	// don't reset 'readonly' on ":w!"
-#define CPO_WORD	'z'	// do not special-case word motions cw and dw
-#define CPO_DOLLAR	'$'
-#define CPO_FILTER	'!'
-#define CPO_MATCH	'%'
-#define CPO_STAR	'*'	// ":*" means ":@"
-#define CPO_PLUS	'+'	// ":write file" resets 'modified'
-#define CPO_MINUS	'-'	// "9-" fails at and before line 9
-#define CPO_SPECI	'<'	// don't recognize <> in mappings
-#define CPO_REGAPPEND	'>'	// insert NL when appending to a register
+#تعریف_کرو CPO_ALTREAD	'a'	// ":read" sets alternate file name
+#تعریف_کرو CPO_ALTWRITE	'A'	// ":write" sets alternate file name
+#تعریف_کرو CPO_BAR		'b'	// "\|" ends a mapping
+#تعریف_کرو CPO_BSLASH	'B'	// backslash in mapping is not special
+#تعریف_کرو CPO_تلاش	'c'
+#تعریف_کرو CPO_CONCAT	'C'	// Don't concatenate sourced lines
+#تعریف_کرو CPO_DOTTAG	'd'	// "./tags" in 'tags' is in current dir
+#تعریف_کرو CPO_DIGRAPH	'D'	// No digraph after "r", "f", etc.
+#تعریف_کرو CPO_EXECBUF	'e'
+#تعریف_کرو CPO_EMPTYREGION	'E'	// operating on empty region is an error
+#تعریف_کرو CPO_FNAMER	'f'	// set file name for ":r file"
+#تعریف_کرو CPO_FNAMEW	'F'	// set file name for ":w file"
+#تعریف_کرو CPO_GOTO1	'g'	// goto line 1 for ":edit"
+#تعریف_کرو CPO_INSEND	'H'	// "I" inserts before last blank in line
+#تعریف_کرو CPO_INTMOD	'i'	// interrupt a read makes buffer modified
+#تعریف_کرو CPO_INDENT	'I'	// remove auto-indent more often
+#تعریف_کرو CPO_JOINSP	'j'	// only use two spaces for join after '.'
+#تعریف_کرو CPO_ENDOFSENT	'J'	// need two spaces to detect end of sentence
+#تعریف_کرو CPO_KEYCODE	'k'	// don't recognize raw key code in mappings
+#تعریف_کرو CPO_KOFFSET	'K'	// don't wait for key code in mappings
+#تعریف_کرو CPO_LITERAL	'l'	// take char after backslash in [] literal
+#تعریف_کرو CPO_LISTWM	'L'	// 'list' changes wrapmargin
+#تعریف_کرو CPO_SHOWMATCH	'm'
+#تعریف_کرو CPO_MATCHBSL	'M'	// "%" ignores use of backslashes
+#تعریف_کرو CPO_NUMCOL	'n'	// 'number' column also used for text
+#تعریف_کرو CPO_LINEOFF	'o'
+#تعریف_کرو CPO_OVERNEW	'O'	// silently overwrite new file
+#تعریف_کرو CPO_LISP	'p'	// 'lisp' indenting
+#تعریف_کرو CPO_FNAMEAPP	'P'	// set file name for ":w >>file"
+#تعریف_کرو CPO_JOINCOL	'q'	// with "3J" use column after first join
+#تعریف_کرو CPO_REDO	'r'
+#تعریف_کرو CPO_REMMARK	'R'	// remove marks when filtering
+#تعریف_کرو CPO_BUFOPT	's'
+#تعریف_کرو CPO_BUFOPTGLOB	'S'
+#تعریف_کرو CPO_TAGPAT	't'	// tag pattern is used for "n"
+#تعریف_کرو CPO_UNDO	'u'	// "u" undoes itself
+#تعریف_کرو CPO_BACKSPACE	'v'	// "v" keep deleted text
+#تعریف_کرو CPO_CW		'w'	// "cw" only changes one blank
+#تعریف_کرو CPO_FWRITE	'W'	// "w!" doesn't overwrite readonly files
+#تعریف_کرو CPO_ESC		'x'
+#تعریف_کرو CPO_REPLCNT	'X'	// "R" with a count only deletes chars once
+#تعریف_کرو CPO_YANK	'y'
+#تعریف_کرو CPO_KEEPRO	'Z'	// don't reset 'readonly' on ":w!"
+#تعریف_کرو CPO_لفظ	'z'	// do not special-case word motions cw and dw
+#تعریف_کرو CPO_DOLLAR	'$'
+#تعریف_کرو CPO_FILTER	'!'
+#تعریف_کرو CPO_مطابقت	'%'
+#تعریف_کرو CPO_ستارہ	'*'	// ":*" means ":@"
+#تعریف_کرو CPO_PLUS	'+'	// ":write file" resets 'modified'
+#تعریف_کرو CPO_MINUS	'-'	// "9-" fails at and before line 9
+#تعریف_کرو CPO_SPECI	'<'	// don't recognize <> in mappings
+#تعریف_کرو CPO_REGAPPEND	'>'	// insert NL when appending to a register
 // POSIX flags
-#define CPO_HASH	'#'	// "D", "o" and "O" do not use a count
-#define CPO_PARA	'{'	// "{" is also a paragraph boundary
-#define CPO_TSIZE	'|'	// $LINES and $COLUMNS overrule term size
-#define CPO_PRESERVE	'&'	// keep swap file after :preserve
-#define CPO_SUBPERCENT	'/'	// % in :s string uses previous one
-#define CPO_BACKSL	'\\'	// \ is not special in []
-#define CPO_CHDIR	'.'	// don't chdir if buffer is modified
-#define CPO_SCOLON	';'	// using "," and ";" will skip over char if
+#تعریف_کرو CPO_HASH	'#'	// "D", "o" and "O" do not use a count
+#تعریف_کرو CPO_PARA	'{'	// "{" is also a paragraph boundary
+#تعریف_کرو CPO_TSIZE	'|'	// $LINES and $COLUMNS overrule term size
+#تعریف_کرو CPO_PRESERVE	'&'	// keep swap file after :preserve
+#تعریف_کرو CPO_SUBPERCENT	'/'	// % in :s string uses previous one
+#تعریف_کرو CPO_BACKSL	'\\'	// \ is not special in []
+#تعریف_کرو CPO_CHDIR	'.'	// don't chdir if buffer is modified
+#تعریف_کرو CPO_SCOLON	';'	// using "," and ";" will skip over char if
 				// cursor would not move
-#define CPO_NOSYMLINKS	'~'	// don't resolve symlinks when changing directory
+#تعریف_کرو CPO_NOSYMLINKS	'~'	// don't resolve symlinks when changing directory
 // default values for Vim, Vi and POSIX
-#define CPO_VIM		"aABceFsz"
-#define CPO_VI		"aAbBcCdDeEfFgHiIjJkKlLmMnoOpPqrRsStuvwWxXyZz$!%*-+<>;"
-#define CPO_ALL		"aAbBcCdDeEfFgHiIjJkKlLmMnoOpPqrRsStuvwWxXyZz$!%*-+<>#{|&/\\.;~"
+#تعریف_کرو CPO_VIM		"aABceFsz"
+#تعریف_کرو CPO_VI		"aAbBcCdDeEfFgHiIjJkKlLmMnoOpPqrRsStuvwWxXyZz$!%*-+<>;"
+#تعریف_کرو CPO_ALL		"aAbBcCdDeEfFgHiIjJkKlLmMnoOpPqrRsStuvwWxXyZz$!%*-+<>#{|&/\\.;~"
 
 // characters for p_ww option:
-#define WW_ALL		"bshl<>[]~"
+#تعریف_کرو WW_ALL		"bshl<>[]~"
 
 // characters for p_mouse option:
-#define MOUSE_NORMAL	'n'		// use mouse in Normal mode
-#define MOUSE_VISUAL	'v'		// use mouse in Visual/Select mode
-#define MOUSE_INSERT	'i'		// use mouse in Insert mode
-#define MOUSE_COMMAND	'c'		// use mouse in Command-line mode
-#define MOUSE_HELP	'h'		// use mouse in help buffers
-#define MOUSE_RETURN	'r'		// use mouse for hit-return message
-#define MOUSE_A		"nvich"		// used for 'a' flag
-#define MOUSE_ALL	"anvichr"	// all possible characters
-#define MOUSE_NONE	' '		// don't use Visual selection
-#define MOUSE_NONEF	'x'		// forced modeless selection
+#تعریف_کرو MOUSE_معمول	'n'		// use mouse in Normal mode
+#تعریف_کرو MOUSE_VISUAL	'v'		// use mouse in Visual/Select mode
+#تعریف_کرو MOUSE_داخل_کرو	'i'		// use mouse in Insert mode
+#تعریف_کرو MOUSE_COMMAND	'c'		// use mouse in Command-line mode
+#تعریف_کرو MOUSE_HELP	'h'		// use mouse in help buffers
+#تعریف_کرو MOUSE_RETURN	'r'		// use mouse for hit-return message
+#تعریف_کرو MOUSE_A		"nvich"		// used for 'a' flag
+#تعریف_کرو MOUSE_ALL	"anvichr"	// all possible characters
+#تعریف_کرو MOUSE_NONE	' '		// don't use Visual selection
+#تعریف_کرو MOUSE_NONEF	'x'		// forced modeless selection
 
-#define COCU_ALL	"nvic"		// flags for 'concealcursor'
+#تعریف_کرو COCU_ALL	"nvic"		// flags for 'concealcursor'
 
 // characters for p_shm option:
-#define SHM_RO		'r'		// readonly
-#define SHM_MOD		'm'		// modified
-#define SHM_FILE	'f'		// (file 1 of 2)
-#define SHM_LAST	'i'		// last line incomplete
-#define SHM_TEXT	'x'		// tx instead of textmode
-#define SHM_LINES	'l'		// "L" instead of "lines"
-#define SHM_NEW		'n'		// "[New]" instead of "[New file]"
-#define SHM_WRI		'w'		// "[w]" instead of "written"
-#define SHM_A		"rmfixlnw"	// represented by 'a' flag
-#define SHM_WRITE	'W'		// don't use "written" at all
-#define SHM_TRUNC	't'		// truncate file messages
-#define SHM_TRUNCALL	'T'		// truncate all messages
-#define SHM_OVER	'o'		// overwrite file messages
-#define SHM_OVERALL	'O'		// overwrite more messages
-#define SHM_SEARCH	's'		// no search hit bottom messages
-#define SHM_ATTENTION	'A'		// no ATTENTION messages
-#define SHM_INTRO	'I'		// intro messages
-#define SHM_COMPLETIONMENU  'c'		// completion menu messages
-#define SHM_COMPLETIONSCAN  'C'		// completion scanning messages
-#define SHM_RECORDING	'q'		// short recording message
-#define SHM_FILEINFO	'F'		// no file info messages
-#define SHM_SEARCHCOUNT  'S'		// no search stats: '[1/10]'
-#define SHM_UNDO	'u'		// undo messages
-#define SHM_POSIX       "AS"		// POSIX value
-#define SHM_ALL		"rmfixlnwaWtToOsAIcCqFSu" // all possible flags for 'shm'
-#define SHM_LEN		30		// max length of all flags together
+#تعریف_کرو SHM_RO		'r'		// readonly
+#تعریف_کرو SHM_MOD		'm'		// modified
+#تعریف_کرو SHM_FILE	'f'		// (file 1 of 2)
+#تعریف_کرو SHM_آخری	'i'		// last line incomplete
+#تعریف_کرو SHM_متن	'x'		// tx instead of textmode
+#تعریف_کرو SHM_سطریں	'l'		// "L" instead of "lines"
+#تعریف_کرو SHM_NEW		'n'		// "[New]" instead of "[New file]"
+#تعریف_کرو SHM_WRI		'w'		// "[w]" instead of "written"
+#تعریف_کرو SHM_A		"rmfixlnw"	// represented by 'a' flag
+#تعریف_کرو SHM_WRITE	'W'		// don't use "written" at all
+#تعریف_کرو SHM_TRUNC	't'		// truncate file messages
+#تعریف_کرو SHM_TRUNCALL	'T'		// truncate all messages
+#تعریف_کرو SHM_OVER	'o'		// overwrite file messages
+#تعریف_کرو SHM_OVERALL	'O'		// overwrite more messages
+#تعریف_کرو SHM_تلاش	's'		// no search hit bottom messages
+#تعریف_کرو SHM_ATTENTION	'A'		// no ATTENTION messages
+#تعریف_کرو SHM_INTRO	'I'		// intro messages
+#تعریف_کرو SHM_COMPLETIONMENU  'c'		// completion menu messages
+#تعریف_کرو SHM_COMPLETIONSCAN  'C'		// completion scanning messages
+#تعریف_کرو SHM_RECORDING	'q'		// short recording message
+#تعریف_کرو SHM_FILEINFO	'F'		// no file info messages
+#تعریف_کرو SHM_SEARCHCOUNT  'S'		// no search stats: '[1/10]'
+#تعریف_کرو SHM_UNDO	'u'		// undo messages
+#تعریف_کرو SHM_POSIX       "AS"		// POSIX value
+#تعریف_کرو SHM_ALL		"rmfixlnwaWtToOsAIcCqFSu" // all possible flags for 'shm'
+#تعریف_کرو SHM_LEN		30		// max length of all flags together
 					// plus a NUL character
 
 // characters for p_go:
-#define GO_TERMINAL	'!'		// use terminal for system commands
-#define GO_ASEL		'a'		// autoselect
-#define GO_ASELML	'A'		// autoselect modeless selection
-#define GO_BOT		'b'		// use bottom scrollbar
-#define GO_CONDIALOG	'c'		// use console dialog
-#define GO_TITLEBAR	'C'		// use 'hl-TitleBar'
-#define GO_DARKTHEME	'd'		// use dark theme variant
-#define GO_TABLINE	'e'		// may show tabline
-#define GO_FORG		'f'		// start GUI in foreground
-#define GO_GREY		'g'		// use grey menu items
-#define GO_HORSCROLL	'h'		// flexible horizontal scrolling
-#define GO_ICON		'i'		// use Vim icon
-#define GO_LEFT		'l'		// use left scrollbar
-#define GO_VLEFT	'L'		// left scrollbar with vert split
-#define GO_MENUS	'm'		// use menu bar
-#define GO_NOSYSMENU	'M'		// don't source system menu
-#define GO_POINTER	'p'		// pointer enter/leave callbacks
-#define GO_ASELPLUS	'P'		// autoselectPlus
-#define GO_RIGHT	'r'		// use right scrollbar
-#define GO_VRIGHT	'R'		// right scrollbar with vert split
-#define GO_FULLSCREEN	's'		// enter fullscreen
-#define GO_TEAROFF	't'		// add tear-off menu items
-#define GO_TOOLBAR	'T'		// add toolbar
-#define GO_FOOTER	'F'		// add footer
-#define GO_VERTICAL	'v'		// arrange dialog buttons vertically
-#define GO_KEEPWINSIZE	'k'		// keep GUI window size
+#تعریف_کرو GO_TERMINAL	'!'		// use terminal for system commands
+#تعریف_کرو GO_ASEL		'a'		// autoselect
+#تعریف_کرو GO_ASELML	'A'		// autoselect modeless selection
+#تعریف_کرو GO_BOT		'b'		// use bottom scrollbar
+#تعریف_کرو GO_CONDIALOG	'c'		// use console dialog
+#تعریف_کرو GO_TITLEBAR	'C'		// use 'hl-TitleBar'
+#تعریف_کرو GO_DARKTHEME	'd'		// use dark theme variant
+#تعریف_کرو GO_TABLINE	'e'		// may show tabline
+#تعریف_کرو GO_FORG		'f'		// start GUI in foreground
+#تعریف_کرو GO_GREY		'g'		// use grey menu items
+#تعریف_کرو GO_HORSCROLL	'h'		// flexible horizontal scrolling
+#تعریف_کرو GO_ICON		'i'		// use Vim icon
+#تعریف_کرو GO_بایاں		'l'		// use left scrollbar
+#تعریف_کرو GO_VLEFT	'L'		// left scrollbar with vert split
+#تعریف_کرو GO_MENUS	'm'		// use menu bar
+#تعریف_کرو GO_NOSYSMENU	'M'		// don't source system menu
+#تعریف_کرو GO_اشارہ_گر	'p'		// pointer enter/leave callbacks
+#تعریف_کرو GO_ASELPLUS	'P'		// autoselectPlus
+#تعریف_کرو GO_دایاں	'r'		// use right scrollbar
+#تعریف_کرو GO_VRIGHT	'R'		// right scrollbar with vert split
+#تعریف_کرو GO_FULLSCREEN	's'		// enter fullscreen
+#تعریف_کرو GO_TEAROFF	't'		// add tear-off menu items
+#تعریف_کرو GO_TOOLBAR	'T'		// add toolbar
+#تعریف_کرو GO_FOOTER	'F'		// add footer
+#تعریف_کرو GO_VERTICAL	'v'		// arrange dialog buttons vertically
+#تعریف_کرو GO_KEEPWINSIZE	'k'		// keep GUI window size
 // all possible flags for 'go'
-#define GO_ALL		"!aAbcCdefFghilLmMpPrRstTvk"
+#تعریف_کرو GO_ALL		"!aAbcCdefFghilLmMpPrRstTvk"
 
 // flags for 'comments' option
-#define COM_NEST	'n'		// comments strings nest
-#define COM_BLANK	'b'		// needs blank after string
-#define COM_START	's'		// start of comment
-#define COM_MIDDLE	'm'		// middle of comment
-#define COM_END		'e'		// end of comment
-#define COM_AUTO_END	'x'		// last char of end closes comment
-#define COM_FIRST	'f'		// first line comment only
-#define COM_LEFT	'l'		// left adjusted
-#define COM_RIGHT	'r'		// right adjusted
-#define COM_NOBACK	'O'		// don't use for "O" command
-#define COM_ALL		"nbsmexflrO"	// all flags for 'comments' option
-#define COM_MAX_LEN	50		// maximum length of a part
+#تعریف_کرو COM_NEST	'n'		// comments strings nest
+#تعریف_کرو COM_BLANK	'b'		// needs blank after string
+#تعریف_کرو COM_آغاز	's'		// start of comment
+#تعریف_کرو COM_درمیان	'm'		// middle of comment
+#تعریف_کرو COM_انتہا		'e'		// end of comment
+#تعریف_کرو COM_AUTO_انتہا	'x'		// last char of end closes comment
+#تعریف_کرو COM_پہلا	'f'		// first line comment only
+#تعریف_کرو COM_بایاں	'l'		// left adjusted
+#تعریف_کرو COM_دایاں	'r'		// right adjusted
+#تعریف_کرو COM_NOBACK	'O'		// don't use for "O" command
+#تعریف_کرو COM_ALL		"nbsmexflrO"	// all flags for 'comments' option
+#تعریف_کرو COM_MAX_LEN	50		// maximum length of a part
 
 // flags for 'statusline' option
-#define STL_FILEPATH	'f'		// path of file in buffer
-#define STL_FULLPATH	'F'		// full path of file in buffer
-#define STL_FILENAME	't'		// last part (tail) of file path
-#define STL_COLUMN	'c'		// column og cursor
-#define STL_VIRTCOL	'v'		// virtual column
-#define STL_VIRTCOL_ALT	'V'		// - with 'if different' display
-#define STL_LINE	'l'		// line number of cursor
-#define STL_NUMLINES	'L'		// number of lines in buffer
-#define STL_BUFNO	'n'		// current buffer number
-#define STL_KEYMAP	'k'		// 'keymap' when active
-#define STL_OFFSET	'o'		// offset of character under cursor
-#define STL_OFFSET_X	'O'		// - in hexadecimal
-#define STL_BYTEVAL	'b'		// byte value of character
-#define STL_BYTEVAL_X	'B'		// - in hexadecimal
-#define STL_ROFLAG	'r'		// readonly flag
-#define STL_ROFLAG_ALT	'R'		// - other display
-#define STL_HELPFLAG	'h'		// window is showing a help file
-#define STL_HELPFLAG_ALT 'H'		// - other display
-#define STL_FILETYPE	'y'		// 'filetype'
-#define STL_FILETYPE_ALT 'Y'		// - other display
-#define STL_PREVIEWFLAG	'w'		// window is showing the preview buf
-#define STL_PREVIEWFLAG_ALT 'W'		// - other display
-#define STL_MODIFIED	'm'		// modified flag
-#define STL_MODIFIED_ALT 'M'		// - other display
-#define STL_QUICKFIX	'q'		// quickfix window description
-#define STL_PERCENTAGE	'p'		// percentage through file
-#define STL_ALTPERCENT	'P'		// percentage as TOP BOT ALL or NN%
-#define STL_ARGLISTSTAT	'a'		// argument list status as (x of y)
-#define STL_PAGENUM	'N'		// page number (when printing)
-#define STL_SHOWCMD	'S'		// 'showcmd' buffer
-#define STL_VIM_EXPR	'{'		// start of expression to substitute
-#define STL_SEPARATE	'='		// separation between alignment
+#تعریف_کرو STL_FILEPATH	'f'		// path of file in buffer
+#تعریف_کرو STL_FULLPATH	'F'		// full path of file in buffer
+#تعریف_کرو STL_FILENAME	't'		// last part (tail) of file path
+#تعریف_کرو STL_عمود	'c'		// column og cursor
+#تعریف_کرو STL_VIRTCOL	'v'		// virtual column
+#تعریف_کرو STL_VIRTCOL_ALT	'V'		// - with 'if different' display
+#تعریف_کرو STL_سطر	'l'		// line number of cursor
+#تعریف_کرو STL_NUMLINES	'L'		// number of lines in buffer
+#تعریف_کرو STL_BUFNO	'n'		// current buffer number
+#تعریف_کرو STL_KEYMAP	'k'		// 'keymap' when active
+#تعریف_کرو STL_انحراف	'o'		// offset of character under cursor
+#تعریف_کرو STL_انحراف_X	'O'		// - in hexadecimal
+#تعریف_کرو STL_BYTEVAL	'b'		// byte value of character
+#تعریف_کرو STL_BYTEVAL_X	'B'		// - in hexadecimal
+#تعریف_کرو STL_ROFLAG	'r'		// readonly flag
+#تعریف_کرو STL_ROFLAG_ALT	'R'		// - other display
+#تعریف_کرو STL_HELPFLAG	'h'		// window is showing a help file
+#تعریف_کرو STL_HELPFLAG_ALT 'H'		// - other display
+#تعریف_کرو STL_FILETYPE	'y'		// 'filetype'
+#تعریف_کرو STL_FILETYPE_ALT 'Y'		// - other display
+#تعریف_کرو STL_PREVIEWFLAG	'w'		// window is showing the preview buf
+#تعریف_کرو STL_PREVIEWFLAG_ALT 'W'		// - other display
+#تعریف_کرو STL_MODIFIED	'm'		// modified flag
+#تعریف_کرو STL_MODIFIED_ALT 'M'		// - other display
+#تعریف_کرو STL_QUICKFIX	'q'		// quickfix window description
+#تعریف_کرو STL_PERCENTAGE	'p'		// percentage through file
+#تعریف_کرو STL_ALTPERCENT	'P'		// percentage as TOP BOT ALL or NN%
+#تعریف_کرو STL_ARGLISTSTAT	'a'		// argument list status as (x of y)
+#تعریف_کرو STL_PAGENUM	'N'		// page number (when printing)
+#تعریف_کرو STL_SHOWCMD	'S'		// 'showcmd' buffer
+#تعریف_کرو STL_VIM_اظہاریہ	'{'		// start of expression to substitute
+#تعریف_کرو STL_SEPARATE	'='		// separation between alignment
 					// sections
-#define STL_TRUNCMARK	'<'		// truncation mark if line is too long
-#define STL_USER_HL	'*'		// highlight from (User)1..9 or 0
-#define STL_HIGHLIGHT	'#'		// highlight name
-#define STL_LINEBREAK	'@'		// insert a line break
-#define STL_CLICKFUNC	'['		// click handler region
-#define STL_TABPAGENR	'T'		// tab page label nr
-#define STL_TABCLOSENR	'X'		// tab page close nr
-#define STL_ALL		((char_u *) "fFtcvVlLknoObBrRhHmYyWwMqpPaNS{#@[")
+#تعریف_کرو STL_TRUNCMARK	'<'		// truncation mark if line is too long
+#تعریف_کرو STL_USER_HL	'*'		// highlight from (User)1..9 or 0
+#تعریف_کرو STL_HIGHLIGHT	'#'		// highlight name
+#تعریف_کرو STL_LINEBREAK	'@'		// insert a line break
+#تعریف_کرو STL_CLICKFUNC	'['		// click handler region
+#تعریف_کرو STL_TABPAGENR	'T'		// tab page label nr
+#تعریف_کرو STL_TABCLOSENR	'X'		// tab page close nr
+#تعریف_کرو STL_ALL		((char_u *) "fFtcvVlLknoObBrRhHmYyWwMqpPaNS{#@[")
 
 // flags used for parsed 'wildmode'
-#define WIM_FULL	0x01
-#define WIM_LONGEST	0x02
-#define WIM_LIST	0x04
-#define WIM_BUFLASTUSED	0x08
-#define WIM_NOSELECT	0x10
-#define WIM_NOINSERT	0x20
+#تعریف_کرو WIM_بھرا	0x01
+#تعریف_کرو WIM_LONGEST	0x02
+#تعریف_کرو WIM_LIST	0x04
+#تعریف_کرو WIM_BUFLASTUSED	0x08
+#تعریف_کرو WIM_NOSELECT	0x10
+#تعریف_کرو WIM_NOINSERT	0x20
 
 // flags for the 'wildoptions' option
 // each defined char should be unique over all values.
-#define WOP_FUZZY	'z'
-#define WOP_TAGFILE	'g'
-#define WOP_PUM		'p'
-#define WOP_EXACTTEXT	'x'
+#تعریف_کرو WOP_FUZZY	'z'
+#تعریف_کرو WOP_TAGFILE	'g'
+#تعریف_کرو WOP_PUM		'p'
+#تعریف_کرو WOP_EXACTTEXT	'x'
 
 // arguments for can_bs()
 // each defined char should be unique over all values
 // except for BS_START, that intentionally also matches BS_NOSTOP
 // because BS_NOSTOP behaves exactly the same except it
 // does not stop at the start of the insert point
-#define BS_INDENT	'i'	// "Indent"
-#define BS_EOL		'l'	// "eoL"
-#define BS_START	's'	// "Start"
-#define BS_NOSTOP	'p'	// "nostoP
+#تعریف_کرو BS_INDENT	'i'	// "Indent"
+#تعریف_کرو BS_EOL		'l'	// "eoL"
+#تعریف_کرو BS_آغاز	's'	// "Start"
+#تعریف_کرو BS_NOSTOP	'p'	// "nostoP
 
 // flags for the 'culopt' option
-#define CULOPT_LINE	0x01	// Highlight complete line
-#define CULOPT_SCRLINE	0x02	// Highlight screen line
-#define CULOPT_NBR	0x04	// Highlight Number column
+#تعریف_کرو CULOPT_سطر	0x01	// Highlight complete line
+#تعریف_کرو CULOPT_SCRLINE	0x02	// Highlight screen line
+#تعریف_کرو CULOPT_NBR	0x04	// Highlight Number column
 
-#define LISPWORD_VALUE	"defun,define,defmacro,set!,lambda,if,case,let,flet,let*,letrec,do,do*,define-syntax,let-syntax,letrec-syntax,destructuring-bind,defpackage,defparameter,defstruct,deftype,defvar,do-all-symbols,do-external-symbols,do-symbols,dolist,dotimes,ecase,etypecase,eval-when,labels,macrolet,multiple-value-bind,multiple-value-call,multiple-value-prog1,multiple-value-setq,prog1,progv,typecase,unless,unwind-protect,when,with-input-from-string,with-open-file,with-open-stream,with-output-to-string,with-package-iterator,define-condition,handler-bind,handler-case,restart-bind,restart-case,with-simple-restart,store-value,use-value,muffle-warning,abort,continue,with-slots,with-slots*,with-accessors,with-accessors*,defclass,defmethod,print-unreadable-object"
+#تعریف_کرو LISPWORD_قدر	"defun,define,defmacro,set!,lambda,if,case,let,flet,let*,letrec,do,do*,define-syntax,let-syntax,letrec-syntax,destructuring-bind,defpackage,defparameter,defstruct,deftype,defvar,do-all-symbols,do-external-symbols,do-symbols,dolist,dotimes,ecase,etypecase,eval-when,labels,macrolet,multiple-value-bind,multiple-value-call,multiple-value-prog1,multiple-value-setq,prog1,progv,typecase,unless,unwind-protect,when,with-input-from-string,with-open-file,with-open-stream,with-output-to-string,with-package-iterator,define-condition,handler-bind,handler-case,restart-bind,restart-case,with-simple-restart,store-value,use-value,muffle-warning,abort,continue,with-slots,with-slots*,with-accessors,with-accessors*,defclass,defmethod,print-unreadable-object"
 
 /*
  * The following are actual variables for the options
  */
 
-#ifdef FEAT_RIGHTLEFT
-EXTERN long	p_aleph;	// 'aleph'
-#endif
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+EXTERN طویل	p_aleph;	// 'aleph'
+#اگر_ختم
 EXTERN char_u	*p_ambw;	// 'ambiwidth'
-#ifdef FEAT_AUTOCHDIR
-EXTERN int	p_acd;		// 'autochdir'
-#endif
-#ifdef FEAT_AUTOSHELLDIR
-EXTERN int	p_asd;		// 'autoshelldir'
-#endif
-EXTERN int	p_ai;		// 'autoindent'
-EXTERN int	p_bin;		// 'binary'
-EXTERN int	p_bomb;		// 'bomb'
-EXTERN int	p_bl;		// 'buflisted'
-EXTERN int	p_cin;		// 'cindent'
+#اگر_تعریف_شدہ FEAT_AUTOCHDIR
+EXTERN صحیح	p_acd;		// 'autochdir'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_AUTOSHELLDIR
+EXTERN صحیح	p_asd;		// 'autoshelldir'
+#اگر_ختم
+EXTERN صحیح	p_ai;		// 'autoindent'
+EXTERN صحیح	p_bin;		// 'binary'
+EXTERN صحیح	p_bomb;		// 'bomb'
+EXTERN صحیح	p_bl;		// 'buflisted'
+EXTERN صحیح	p_cin;		// 'cindent'
 EXTERN char_u	*p_cink;	// 'cinkeys'
 EXTERN char_u	*p_cinsd;	// 'cinscopedecls'
 EXTERN char_u	*p_cinw;	// 'cinwords'
-#ifdef FEAT_COMPL_FUNC
+#اگر_تعریف_شدہ FEAT_COMPL_FUNC
 EXTERN char_u	*p_cfu;		// 'completefunc'
 EXTERN char_u	*p_ofu;		// 'omnifunc'
 EXTERN char_u	*p_tsrfu;	// 'thesaurusfunc'
-#endif
-EXTERN int	p_ci;		// 'copyindent'
-#if defined(FEAT_GUI) && defined(MACOS_X)
-EXTERN int	*p_antialias;	// 'antialias'
-#endif
-EXTERN int	p_ar;		// 'autoread'
-EXTERN int	p_aw;		// 'autowrite'
-EXTERN int	p_awa;		// 'autowriteall'
+#اگر_ختم
+EXTERN صحیح	p_ci;		// 'copyindent'
+#اگر defined(FEAT_GUI) && defined(MACOS_X)
+EXTERN صحیح	*p_antialias;	// 'antialias'
+#اگر_ختم
+EXTERN صحیح	p_ar;		// 'autoread'
+EXTERN صحیح	p_aw;		// 'autowrite'
+EXTERN صحیح	p_awa;		// 'autowriteall'
 EXTERN char_u	*p_bs;		// 'backspace'
 EXTERN char_u	*p_bg;		// 'background'
-EXTERN int	p_bk;		// 'backup'
+EXTERN صحیح	p_bk;		// 'backup'
 EXTERN char_u	*p_bkc;		// 'backupcopy'
-EXTERN unsigned	bkc_flags;	// flags from 'backupcopy'
-#define BKC_YES		0x001
-#define BKC_AUTO		0x002
-#define BKC_NO			0x004
-#define BKC_BREAKSYMLINK	0x008
-#define BKC_BREAKHARDLINK	0x010
+EXTERN غیرعلامتی	bkc_flags;	// flags from 'backupcopy'
+#تعریف_کرو BKC_YES		0x001
+#تعریف_کرو BKC_AUTO		0x002
+#تعریف_کرو BKC_NO			0x004
+#تعریف_کرو BKC_BREAKSYMLINK	0x008
+#تعریف_کرو BKC_BREAKHARDLINK	0x010
 EXTERN char_u	*p_bdir;	// 'backupdir'
 EXTERN char_u	*p_bex;		// 'backupext'
 EXTERN char_u	*p_bo;		// 'belloff'
-EXTERN unsigned	bo_flags;
+EXTERN غیرعلامتی	bo_flags;
 
 // values for the 'belloff' option
-#define BO_ALL		0x0001
-#define BO_BS		0x0002
-#define BO_CRSR		0x0004
-#define BO_COMPL	0x0008
-#define BO_COPY		0x0010
-#define BO_CTRLG	0x0020
-#define BO_ERROR	0x0040
-#define BO_ESC		0x0080
-#define BO_EX		0x0100
-#define BO_HANGUL	0x0200
-#define BO_IM		0x0400
-#define BO_LANG		0x0800
-#define BO_MESS		0x1000
-#define BO_MATCH	0x2000
-#define BO_OPER		0x4000
-#define BO_REG		0x8000
-#define BO_SH		0x10000
-#define BO_SPELL	0x20000
-#define BO_TERM		0x40000
-#define BO_WILD		0x80000
+#تعریف_کرو BO_ALL		0x0001
+#تعریف_کرو BO_BS		0x0002
+#تعریف_کرو BO_CRSR		0x0004
+#تعریف_کرو BO_COMPL	0x0008
+#تعریف_کرو BO_COPY		0x0010
+#تعریف_کرو BO_CTRLG	0x0020
+#تعریف_کرو BO_ERROR	0x0040
+#تعریف_کرو BO_ESC		0x0080
+#تعریف_کرو BO_EX		0x0100
+#تعریف_کرو BO_HANGUL	0x0200
+#تعریف_کرو BO_IM		0x0400
+#تعریف_کرو BO_LANG		0x0800
+#تعریف_کرو BO_MESS		0x1000
+#تعریف_کرو BO_مطابقت	0x2000
+#تعریف_کرو BO_OPER		0x4000
+#تعریف_کرو BO_REG		0x8000
+#تعریف_کرو BO_SH		0x10000
+#تعریف_کرو BO_SPELL	0x20000
+#تعریف_کرو BO_رکن		0x40000
+#تعریف_کرو BO_WILD		0x80000
 
 EXTERN char_u	*p_bsk;		// 'backupskip'
-#ifdef FEAT_CRYPT
+#اگر_تعریف_شدہ FEAT_CRYPT
 EXTERN char_u	*p_cm;		// 'cryptmethod'
-#endif
-#ifdef FEAT_BEVAL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_BEVAL
 # ifdef FEAT_BEVAL_GUI
-EXTERN int	p_beval;	// 'ballooneval'
+EXTERN صحیح	p_beval;	// 'ballooneval'
 # endif
-EXTERN long	p_bdlay;	// 'balloondelay'
+EXTERN طویل	p_bdlay;	// 'balloondelay'
 # ifdef FEAT_EVAL
 EXTERN char_u	*p_bexpr;
 # endif
-# ifdef FEAT_BEVAL_TERM
-EXTERN int	p_bevalterm;	// 'balloonevalterm'
+# ifdef FEAT_BEVAL_رکن
+EXTERN صحیح	p_bevalterm;	// 'balloonevalterm'
 # endif
-#endif
-#ifdef FEAT_BROWSE
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_BROWSE
 EXTERN char_u	*p_bsdir;	// 'browsedir'
-#endif
-#ifdef FEAT_LINEBREAK
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_LINEBREAK
 EXTERN char_u	*p_breakat;	// 'breakat'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_bh;		// 'bufhidden'
 EXTERN char_u	*p_bt;		// 'buftype'
 EXTERN char_u	*p_cmp;		// 'casemap'
-EXTERN unsigned	cmp_flags;
-#define CMP_INTERNAL		0x001
-#define CMP_KEEPASCII		0x002
+EXTERN غیرعلامتی	cmp_flags;
+#تعریف_کرو CMP_اندرونی		0x001
+#تعریف_کرو CMP_KEEPASCII		0x002
 EXTERN char_u	*p_enc;		// 'encoding'
-EXTERN int	p_deco;		// 'delcombine'
-#ifdef FEAT_EVAL
+EXTERN صحیح	p_deco;		// 'delcombine'
+#اگر_تعریف_شدہ FEAT_EVAL
 EXTERN char_u	*p_ccv;		// 'charconvert'
-#endif
-EXTERN int	p_cdh;		// 'cdhome'
+#اگر_ختم
+EXTERN صحیح	p_cdh;		// 'cdhome'
 EXTERN char_u	*p_cino;	// 'cinoptions'
 EXTERN char_u	*p_cedit;	// 'cedit'
-EXTERN long	p_cwh;		// 'cmdwinheight'
-#ifdef HAVE_CLIPMETHOD
+EXTERN طویل	p_cwh;		// 'cmdwinheight'
+#اگر_تعریف_شدہ HAVE_CLIPMETHOD
 EXTERN char_u	*p_cb;		// 'clipboard'
 EXTERN char_u	*p_cpm;		// 'clipmethod'
-#endif
-EXTERN long	p_ch;		// 'cmdheight'
+#اگر_ختم
+EXTERN طویل	p_ch;		// 'cmdheight'
 EXTERN char_u	*p_cms;		// 'commentstring'
 EXTERN char_u	*p_cpt;		// 'complete'
-EXTERN long	p_cto;		// 'completetimeout'
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-EXTERN int	p_confirm;	// 'confirm'
-#endif
-EXTERN int	p_cp;		// 'compatible'
+EXTERN طویل	p_cto;		// 'completetimeout'
+#اگر defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+EXTERN صحیح	p_confirm;	// 'confirm'
+#اگر_ختم
+EXTERN صحیح	p_cp;		// 'compatible'
 EXTERN char_u	*p_cfc;		// 'completefuzzycollect'
-EXTERN unsigned cfc_flags;	// flags from "completefuzzycollect"
+EXTERN غیرعلامتی cfc_flags;	// flags from "completefuzzycollect"
 EXTERN char_u	*p_cia;		// 'completeitemalign'
-EXTERN unsigned cia_flags;	// order flags of 'completeitemalign'
+EXTERN غیرعلامتی cia_flags;	// order flags of 'completeitemalign'
 EXTERN char_u	*p_cot;		// 'completeopt'
-EXTERN unsigned	cot_flags;	// flags from 'completeopt'
-EXTERN int	p_ac;		// 'autocomplete'
-EXTERN long	p_act;		// 'autocompletetimeout'
-EXTERN long	p_acl;		// 'autocompletedelay'
+EXTERN غیرعلامتی	cot_flags;	// flags from 'completeopt'
+EXTERN صحیح	p_ac;		// 'autocomplete'
+EXTERN طویل	p_act;		// 'autocompletetimeout'
+EXTERN طویل	p_acl;		// 'autocompletedelay'
 // Keep in sync with p_cot_values in optionstr.c
-#define COT_MENU	0x001
-#define COT_MENUONE	0x002
-#define COT_ANY_MENU	0x003	// combination of menu flags
-#define COT_LONGEST	0x004	// FALSE: insert full match,
+#تعریف_کرو COT_MENU	0x001
+#تعریف_کرو COT_MENUONE	0x002
+#تعریف_کرو COT_ANY_MENU	0x003	// combination of menu flags
+#تعریف_کرو COT_LONGEST	0x004	// FALSE: insert full match,
 				// TRUE: insert longest prefix
-#define COT_PREVIEW	    0x008
-#define COT_POPUP	    0x010
-#define COT_POPUPHIDDEN	    0x020
-#define COT_ANY_PREVIEW	    0x038   // combination of preview flags
-#define COT_NOINSERT	    0x040   // FALSE: select & insert, TRUE: noinsert
-#define COT_NOSELECT	    0x080   // FALSE: select & insert, TRUE: noselect
-#define COT_FUZZY	    0x100   // TRUE: fuzzy match enabled
-#define COT_NOSORT	    0x200   // TRUE: fuzzy match without qsort score
-#define COT_PREINSERT	    0x400   // TRUE: preinsert
-#define COT_NEAREST	    0x800   // TRUE: prioritize matches close to cursor
+#تعریف_کرو COT_PREVIEW	    0x008
+#تعریف_کرو COT_POPUP	    0x010
+#تعریف_کرو COT_POPUPHIDDEN	    0x020
+#تعریف_کرو COT_ANY_PREVIEW	    0x038   // combination of preview flags
+#تعریف_کرو COT_NOINSERT	    0x040   // FALSE: select & insert, TRUE: noinsert
+#تعریف_کرو COT_NOSELECT	    0x080   // FALSE: select & insert, TRUE: noselect
+#تعریف_کرو COT_FUZZY	    0x100   // TRUE: fuzzy match enabled
+#تعریف_کرو COT_NOSORT	    0x200   // TRUE: fuzzy match without qsort score
+#تعریف_کرو COT_PREINSERT	    0x400   // TRUE: preinsert
+#تعریف_کرو COT_قریب_ترین	    0x800   // TRUE: prioritize matches close to cursor
 
-#define CFC_KEYWORD         0x001
-#define CFC_FILES           0x002
-#define CFC_WHOLELINE       0x004
+#تعریف_کرو CFC_KEYWORD         0x001
+#تعریف_کرو CFC_FILES           0x002
+#تعریف_کرو CFC_WHOLELINE       0x004
 
-#ifdef BACKSLASH_IN_FILENAME
+#اگر_تعریف_شدہ BACKSLASH_اندر_FILENAME
 EXTERN char_u	*p_csl;		// 'completeslash'
-#endif
-EXTERN long	p_ph;		// 'pumheight'
-EXTERN long	p_pw;		// 'pumwidth'
-EXTERN long	p_pmw;		// 'pummaxwidth'
+#اگر_ختم
+EXTERN طویل	p_ph;		// 'pumheight'
+EXTERN طویل	p_pw;		// 'pumwidth'
+EXTERN طویل	p_pmw;		// 'pummaxwidth'
 EXTERN char_u	*p_pb;		// 'pumborder'
 EXTERN char_u	*p_pumopt;	// 'pumopt'
 EXTERN char_u	*p_com;		// 'comments'
 EXTERN char_u	*p_cpo;		// 'cpoptions'
-#ifdef FEAT_CSCOPE
+#اگر_تعریف_شدہ FEAT_CSCOPE
 EXTERN char_u	*p_csprg;	// 'cscopeprg'
-EXTERN int	p_csre;		// 'cscoperelative'
+EXTERN صحیح	p_csre;		// 'cscoperelative'
 # ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_csqf;	// 'cscopequickfix'
 #  define	CSQF_CMDS   "sgdctefia"
 #  define	CSQF_FLAGS  "+-0"
 # endif
-EXTERN int	p_cst;		// 'cscopetag'
-EXTERN long	p_csto;		// 'cscopetagorder'
-EXTERN long	p_cspc;		// 'cscopepathcomp'
-EXTERN int	p_csverbose;	// 'cscopeverbose'
-#endif
+EXTERN صحیح	p_cst;		// 'cscopetag'
+EXTERN طویل	p_csto;		// 'cscopetagorder'
+EXTERN طویل	p_cspc;		// 'cscopepathcomp'
+EXTERN صحیح	p_csverbose;	// 'cscopeverbose'
+#اگر_ختم
 EXTERN char_u	*p_debug;	// 'debug'
-#ifdef FEAT_FIND_ID
+#اگر_تعریف_شدہ FEAT_ڈھونڈو_ID
 EXTERN char_u	*p_def;		// 'define'
 EXTERN char_u	*p_inc;
-#endif
-#ifdef FEAT_DIFF
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_DIFF
 EXTERN char_u	*p_dia;		// 'diffanchors'
 EXTERN char_u	*p_dip;		// 'diffopt'
 # ifdef FEAT_EVAL
 EXTERN char_u	*p_dex;		// 'diffexpr'
 # endif
-#endif
+#اگر_ختم
 EXTERN char_u	*p_dict;	// 'dictionary'
-#ifdef FEAT_DIGRAPHS
-EXTERN int	p_dg;		// 'digraph'
-#endif
+#اگر_تعریف_شدہ FEAT_DIGRAPHS
+EXTERN صحیح	p_dg;		// 'digraph'
+#اگر_ختم
 EXTERN char_u	*p_dir;		// 'directory'
 EXTERN char_u	*p_dy;		// 'display'
-EXTERN unsigned	dy_flags;
-#define DY_LASTLINE		0x001
-#define DY_TRUNCATE		0x002
-#define DY_UHEX			0x004
-EXTERN int	p_ed;		// 'edcompatible'
+EXTERN غیرعلامتی	dy_flags;
+#تعریف_کرو DY_LASTLINE		0x001
+#تعریف_کرو DY_TRUNCATE		0x002
+#تعریف_کرو DY_UHEX			0x004
+EXTERN صحیح	p_ed;		// 'edcompatible'
 EXTERN char_u	*p_ead;		// 'eadirection'
 EXTERN char_u	*p_emoji;	// 'emoji'
-EXTERN int	p_ea;		// 'equalalways'
+EXTERN صحیح	p_ea;		// 'equalalways'
 EXTERN char_u	*p_ep;		// 'equalprg'
-EXTERN int	p_eb;		// 'errorbells'
-#ifdef FEAT_QUICKFIX
+EXTERN صحیح	p_eb;		// 'errorbells'
+#اگر_تعریف_شدہ FEAT_QUICKFIX
 EXTERN char_u	*p_ef;		// 'errorfile'
 EXTERN char_u	*p_efm;		// 'errorformat'
 EXTERN char_u	*p_gefm;	// 'grepformat'
 EXTERN char_u	*p_gp;		// 'grepprg'
-#endif
-EXTERN int	p_eof;		// 'endoffile'
-EXTERN int	p_eol;		// 'endofline'
-EXTERN int	p_ek;		// 'esckeys'
+#اگر_ختم
+EXTERN صحیح	p_eof;		// 'endoffile'
+EXTERN صحیح	p_eol;		// 'endofline'
+EXTERN صحیح	p_ek;		// 'esckeys'
 EXTERN char_u	*p_ei;		// 'eventignore'
-EXTERN int	p_et;		// 'expandtab'
-EXTERN int	p_exrc;		// 'exrc'
+EXTERN صحیح	p_et;		// 'expandtab'
+EXTERN صحیح	p_exrc;		// 'exrc'
 EXTERN char_u	*p_fenc;	// 'fileencoding'
 EXTERN char_u	*p_fencs;	// 'fileencodings'
 EXTERN char_u	*p_ff;		// 'fileformat'
 EXTERN char_u	*p_ffs;		// 'fileformats'
-EXTERN int	p_fic;		// 'fileignorecase'
+EXTERN صحیح	p_fic;		// 'fileignorecase'
 EXTERN char_u	*p_ft;		// 'filetype'
 EXTERN char_u	*p_fcs;		// 'fillchar'
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 EXTERN char_u	*p_ffu;		// 'findfunc'
-#endif
-EXTERN int	p_fixeol;	// 'fixendofline'
-#ifdef FEAT_FOLDING
+#اگر_ختم
+EXTERN صحیح	p_fixeol;	// 'fixendofline'
+#اگر_تعریف_شدہ FEAT_FOLDING
 EXTERN char_u	*p_fcl;		// 'foldclose'
-EXTERN long	p_fdls;		// 'foldlevelstart'
+EXTERN طویل	p_fdls;		// 'foldlevelstart'
 EXTERN char_u	*p_fdo;		// 'foldopen'
-EXTERN unsigned	fdo_flags;
+EXTERN غیرعلامتی	fdo_flags;
 # define FDO_ALL		0x001
-# define FDO_BLOCK		0x002
+# define FDO_بلاک		0x002
 # define FDO_HOR		0x004
 # define FDO_MARK		0x008
 # define FDO_PERCENT		0x010
 # define FDO_QUICKFIX		0x020
-# define FDO_SEARCH		0x040
-# define FDO_TAG		0x080
-# define FDO_INSERT		0x100
+# define FDO_تلاش		0x040
+# define FDO_لیبل		0x080
+# define FDO_داخل_کرو		0x100
 # define FDO_UNDO		0x200
 # define FDO_JUMP		0x400
-#endif
-#if defined(FEAT_EVAL)
+#اگر_ختم
+#اگر defined(FEAT_EVAL)
 EXTERN char_u	*p_fex;		// 'formatexpr'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_flp;		// 'formatlistpat'
 EXTERN char_u	*p_fo;		// 'formatoptions'
 EXTERN char_u	*p_fp;		// 'formatprg'
-#ifdef HAVE_FSYNC
-EXTERN int	p_fs;		// 'fsync'
-#endif
-EXTERN int	p_gd;		// 'gdefault'
+#اگر_تعریف_شدہ HAVE_FSYNC
+EXTERN صحیح	p_fs;		// 'fsync'
+#اگر_ختم
+EXTERN صحیح	p_gd;		// 'gdefault'
 EXTERN char_u	*p_jop;		// 'jumpoptions'
-EXTERN unsigned	jop_flags;	//
-#define JOP_STACK		0x001
-#ifdef FEAT_PROP_POPUP
+EXTERN غیرعلامتی	jop_flags;	//
+#تعریف_کرو JOP_ڈھیر		0x001
+#اگر_تعریف_شدہ FEAT_PROP_POPUP
 # ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_cpp;		// 'completepopup'
 # endif
 EXTERN char_u	*p_pvp;		// 'previewpopup'
-#endif
-#ifdef FEAT_PRINTER
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_PRINTER
 EXTERN char_u	*p_pdev;	// 'printdevice'
 # ifdef FEAT_POSTSCRIPT
 EXTERN char_u	*p_penc;	// 'printencoding'
 EXTERN char_u	*p_pmfn;	// 'printmbfont'
 EXTERN char_u	*p_pmcs;	// 'printmbcharset'
 # endif
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+# اگر defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 EXTERN char_u	*p_pexpr;	// 'printexpr'
 # endif
 EXTERN char_u	*p_pfn;		// 'printfont'
 EXTERN char_u	*p_popt;	// 'printoptions'
-EXTERN char_u	*p_header;	// 'printheader'
-#endif
-EXTERN int	p_prompt;	// 'prompt'
-#ifdef FEAT_GUI
+EXTERN char_u	*p_سرخی;	// 'printheader'
+#اگر_ختم
+EXTERN صحیح	p_prompt;	// 'prompt'
+#اگر_تعریف_شدہ FEAT_GUI
 EXTERN char_u	*p_guifont;	// 'guifont'
 # ifdef FEAT_XFONTSET
 EXTERN char_u	*p_guifontset;	// 'guifontset'
 # endif
 EXTERN char_u	*p_guifontwide;	// 'guifontwide'
-EXTERN int	p_guipty;	// 'guipty'
-#endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+EXTERN صحیح	p_guipty;	// 'guipty'
+#اگر_ختم
+#اگر defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 EXTERN char_u	*p_guiligatures;  // 'guiligatures'
-#endif
-#if (defined(FEAT_GUI_GTK) && !defined(USE_GTK4)) || defined(FEAT_GUI_X11)
-EXTERN long	p_ghr;		// 'guiheadroom'
-#endif
-#ifdef CURSOR_SHAPE
+#اگر_ختم
+#اگر (defined(FEAT_GUI_GTK) && !defined(USE_GTK4)) || defined(FEAT_GUI_X11)
+EXTERN طویل	p_ghr;		// 'guiheadroom'
+#اگر_ختم
+#اگر_تعریف_شدہ CURSOR_SHAPE
 EXTERN char_u	*p_guicursor;	// 'guicursor'
-#endif
-#ifdef FEAT_MOUSESHAPE
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_MOUSESHAPE
 EXTERN char_u	*p_mouseshape;	// 'mouseshape'
-#endif
-#if defined(FEAT_GUI)
+#اگر_ختم
+#اگر defined(FEAT_GUI)
 EXTERN char_u	*p_go;		// 'guioptions'
-#endif
-#if defined(FEAT_GUI_TABLINE)
+#اگر_ختم
+#اگر defined(FEAT_GUI_TABLINE)
 EXTERN char_u	*p_gtl;		// 'guitablabel'
 EXTERN char_u	*p_gtt;		// 'guitabtooltip'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_hf;		// 'helpfile'
-EXTERN long	p_hh;		// 'helpheight'
-#ifdef FEAT_MULTI_LANG
+EXTERN طویل	p_hh;		// 'helpheight'
+#اگر_تعریف_شدہ FEAT_MULTI_LANG
 EXTERN char_u	*p_hlg;		// 'helplang'
-#endif
-EXTERN int	p_hid;		// 'hidden'
+#اگر_ختم
+EXTERN صحیح	p_hid;		// 'hidden'
 EXTERN char_u	*p_hl;		// 'highlight'
-EXTERN int	p_hls;		// 'hlsearch'
-EXTERN long	p_hi;		// 'history'
-#ifdef FEAT_RIGHTLEFT
-EXTERN int	p_hkmap;	// 'hkmap'
-EXTERN int	p_hkmapp;	// 'hkmapp'
+EXTERN صحیح	p_hls;		// 'hlsearch'
+EXTERN طویل	p_hi;		// 'history'
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+EXTERN صحیح	p_hkmap;	// 'hkmap'
+EXTERN صحیح	p_hkmapp;	// 'hkmapp'
 # ifdef FEAT_ARABIC
-EXTERN int	p_arshape;	// 'arabicshape'
+EXTERN صحیح	p_arshape;	// 'arabicshape'
 # endif
-#endif
-EXTERN int	p_icon;		// 'icon'
+#اگر_ختم
+EXTERN صحیح	p_icon;		// 'icon'
 EXTERN char_u	*p_iconstring;	// 'iconstring'
-EXTERN int	p_ic;		// 'ignorecase'
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+EXTERN صحیح	p_ic;		// 'ignorecase'
+#اگر defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 EXTERN char_u	*p_imak;	// 'imactivatekey'
 # define IM_ON_THE_SPOT		0L
 # define IM_OVER_THE_SPOT	1L
-EXTERN long	p_imst;		// 'imstyle'
-#endif
-#ifdef FEAT_IMAGE
+EXTERN طویل	p_imst;		// 'imstyle'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_IMAGE
 EXTERN char_u	*p_ipc;		// 'imageprotocol'
-#endif
-#if defined(FEAT_EVAL)
+#اگر_ختم
+#اگر defined(FEAT_EVAL)
 EXTERN char_u	*p_imaf;	// 'imactivatefunc'
 EXTERN char_u	*p_imsf;	// 'imstatusfunc'
-#endif
-EXTERN int	p_imcmdline;	// 'imcmdline'
-EXTERN int	p_imdisable;	// 'imdisable'
-EXTERN long	p_iminsert;	// 'iminsert'
-EXTERN long	p_imsearch;	// 'imsearch'
-EXTERN int	p_inf;		// 'infercase'
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#اگر_ختم
+EXTERN صحیح	p_imcmdline;	// 'imcmdline'
+EXTERN صحیح	p_imdisable;	// 'imdisable'
+EXTERN طویل	p_iminsert;	// 'iminsert'
+EXTERN طویل	p_imsearch;	// 'imsearch'
+EXTERN صحیح	p_inf;		// 'infercase'
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
 EXTERN char_u	*p_inex;	// 'includeexpr'
-#endif
-EXTERN int	p_is;		// 'incsearch'
-#if defined(FEAT_EVAL)
+#اگر_ختم
+EXTERN صحیح	p_is;		// 'incsearch'
+#اگر defined(FEAT_EVAL)
 EXTERN char_u	*p_inde;	// 'indentexpr'
 EXTERN char_u	*p_indk;	// 'indentkeys'
-#endif
-EXTERN int	p_im;		// 'insertmode'
+#اگر_ختم
+EXTERN صحیح	p_im;		// 'insertmode'
 EXTERN char_u	*p_isf;		// 'isfname'
 EXTERN char_u	*p_isi;		// 'isident'
 EXTERN char_u	*p_isk;		// 'iskeyword'
 EXTERN char_u	*p_isp;		// 'isprint'
-EXTERN int	p_js;		// 'joinspaces'
-#ifdef FEAT_CRYPT
-EXTERN char_u	*p_key;		// 'key'
-#endif
-#ifdef FEAT_KEYMAP
+EXTERN صحیح	p_js;		// 'joinspaces'
+#اگر_تعریف_شدہ FEAT_CRYPT
+EXTERN char_u	*p_کلید;		// 'key'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_KEYMAP
 EXTERN char_u	*p_keymap;	// 'keymap'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_kp;		// 'keywordprg'
 EXTERN char_u	*p_km;		// 'keymodel'
 EXTERN char_u	*p_kpc;		// 'keyprotocol'
-#ifdef FEAT_LANGMAP
+#اگر_تعریف_شدہ FEAT_LANGMAP
 EXTERN char_u	*p_langmap;	// 'langmap'
-EXTERN int	p_lnr;		// 'langnoremap'
-EXTERN int	p_lrm;		// 'langremap'
-#endif
-#if defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
+EXTERN صحیح	p_lnr;		// 'langnoremap'
+EXTERN صحیح	p_lrm;		// 'langremap'
+#اگر_ختم
+#اگر defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
 EXTERN char_u	*p_lm;		// 'langmenu'
-#endif
-#ifdef FEAT_GUI
-EXTERN long	p_linespace;	// 'linespace'
-#endif
-EXTERN int	p_lisp;		// 'lisp'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_GUI
+EXTERN طویل	p_linespace;	// 'linespace'
+#اگر_ختم
+EXTERN صحیح	p_lisp;		// 'lisp'
 EXTERN char_u	*p_lop;		// 'lispoptions'
 EXTERN char_u	*p_lispwords;	// 'lispwords'
-EXTERN long	p_ls;		// 'laststatus'
-EXTERN long	p_stal;		// 'showtabline'
+EXTERN طویل	p_ls;		// 'laststatus'
+EXTERN طویل	p_stal;		// 'showtabline'
 EXTERN char_u	*p_lcs;		// 'listchars'
 
-EXTERN int	p_lz;		// 'lazyredraw'
-EXTERN int	p_lpl;		// 'loadplugins'
-#if defined(DYNAMIC_LUA)
+EXTERN صحیح	p_lz;		// 'lazyredraw'
+EXTERN صحیح	p_lpl;		// 'loadplugins'
+#اگر defined(DYNAMIC_LUA)
 EXTERN char_u	*p_luadll;	// 'luadll'
-#endif
-EXTERN int	p_magic;	// 'magic'
+#اگر_ختم
+EXTERN صحیح	p_magic;	// 'magic'
 EXTERN char_u	*p_menc;	// 'makeencoding'
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شدہ FEAT_QUICKFIX
 EXTERN char_u	*p_mef;		// 'makeef'
 EXTERN char_u	*p_mp;		// 'makeprg'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_mps;		// 'matchpairs'
-EXTERN long	p_mat;		// 'matchtime'
-EXTERN long	p_mco;		// 'maxcombine'
-#ifdef FEAT_EVAL
-EXTERN long	p_mfd;		// 'maxfuncdepth'
-#endif
-EXTERN long	p_mmd;		// 'maxmapdepth'
-EXTERN long	p_mm;		// 'maxmem'
-EXTERN long	p_mmp;		// 'maxmempattern'
-EXTERN long	p_mmt;		// 'maxmemtot'
-#ifdef FEAT_MENU
-EXTERN long	p_mis;		// 'menuitems'
-#endif
+EXTERN طویل	p_mat;		// 'matchtime'
+EXTERN طویل	p_mco;		// 'maxcombine'
+#اگر_تعریف_شدہ FEAT_EVAL
+EXTERN طویل	p_mfd;		// 'maxfuncdepth'
+#اگر_ختم
+EXTERN طویل	p_mmd;		// 'maxmapdepth'
+EXTERN طویل	p_mm;		// 'maxmem'
+EXTERN طویل	p_mmp;		// 'maxmempattern'
+EXTERN طویل	p_mmt;		// 'maxmemtot'
+#اگر_تعریف_شدہ FEAT_MENU
+EXTERN طویل	p_mis;		// 'menuitems'
+#اگر_ختم
 EXTERN char_u	*p_mopt;	// 'messagesopt'
-EXTERN long	p_msc;		// 'maxsearchcount'
-#ifdef FEAT_SPELL
+EXTERN طویل	p_msc;		// 'maxsearchcount'
+#اگر_تعریف_شدہ FEAT_SPELL
 EXTERN char_u	*p_msm;		// 'mkspellmem'
-#endif
-EXTERN int	p_ml;		// 'modeline'
-EXTERN int	p_mle;		// 'modelineexpr'
-EXTERN long	p_mls;		// 'modelines'
-EXTERN int	p_mlstr;	// 'modelinestrict'
-EXTERN int	p_ma;		// 'modifiable'
-EXTERN int	p_mod;		// 'modified'
+#اگر_ختم
+EXTERN صحیح	p_ml;		// 'modeline'
+EXTERN صحیح	p_mle;		// 'modelineexpr'
+EXTERN طویل	p_mls;		// 'modelines'
+EXTERN صحیح	p_mlstr;	// 'modelinestrict'
+EXTERN صحیح	p_ma;		// 'modifiable'
+EXTERN صحیح	p_mod;		// 'modified'
 EXTERN char_u	*p_mouse;	// 'mouse'
-#ifdef FEAT_GUI
-EXTERN int	p_mousef;	// 'mousefocus'
-EXTERN int	p_mh;		// 'mousehide'
-#endif
+#اگر_تعریف_شدہ FEAT_GUI
+EXTERN صحیح	p_mousef;	// 'mousefocus'
+EXTERN صحیح	p_mh;		// 'mousehide'
+#اگر_ختم
 EXTERN char_u	*p_mousem;	// 'mousemodel'
-#ifdef FEAT_GUI
-EXTERN int	p_mousemev;	// 'mousemoveevent'
-#endif
-EXTERN long	p_mouset;	// 'mousetime'
-EXTERN int	p_more;		// 'more'
-#ifdef FEAT_MZSCHEME
-EXTERN long	p_mzq;		// 'mzquantum
-# if defined(DYNAMIC_MZSCHEME)
+#اگر_تعریف_شدہ FEAT_GUI
+EXTERN صحیح	p_mousemev;	// 'mousemoveevent'
+#اگر_ختم
+EXTERN طویل	p_mouset;	// 'mousetime'
+EXTERN صحیح	p_مزید;		// 'more'
+#اگر_تعریف_شدہ FEAT_MZSCHEME
+EXTERN طویل	p_mzq;		// 'mzquantum
+# اگر defined(DYNAMIC_MZSCHEME)
 EXTERN char_u	*p_mzschemedll;	// 'mzschemedll'
 EXTERN char_u	*p_mzschemegcdll; // 'mzschemegcdll'
 # endif
-#endif
+#اگر_ختم
 EXTERN char_u	*p_nf;		// 'nrformats'
-#if defined(MSWIN)
-EXTERN int	p_odev;		// 'opendevice'
-#endif
-EXTERN long	p_ost;		// 'osctimeoutlen'
+#اگر defined(MSWIN)
+EXTERN صحیح	p_odev;		// 'opendevice'
+#اگر_ختم
+EXTERN طویل	p_ost;		// 'osctimeoutlen'
 EXTERN char_u	*p_opfunc;	// 'operatorfunc'
 EXTERN char_u	*p_para;	// 'paragraphs'
-EXTERN int	p_paste;	// 'paste'
+EXTERN صحیح	p_paste;	// 'paste'
 EXTERN char_u	*p_pt;		// 'pastetoggle'
-#if defined(FEAT_EVAL) && defined(FEAT_DIFF)
+#اگر defined(FEAT_EVAL) && defined(FEAT_DIFF)
 EXTERN char_u	*p_pex;		// 'patchexpr'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_pm;		// 'patchmode'
-EXTERN char_u	*p_path;	// 'path'
+EXTERN char_u	*p_راستہ;	// 'path'
 EXTERN char_u	*p_cdpath;	// 'cdpath'
-#if defined(DYNAMIC_PERL)
+#اگر defined(DYNAMIC_PERL)
 EXTERN char_u	*p_perldll;	// 'perldll'
-#endif
-EXTERN int	p_pi;		// 'preserveindent'
-#if defined(DYNAMIC_PYTHON3)
+#اگر_ختم
+EXTERN صحیح	p_pi;		// 'preserveindent'
+#اگر defined(DYNAMIC_PYTHON3)
 EXTERN char_u	*p_py3dll;	// 'pythonthreedll'
-#endif
-#ifdef FEAT_PYTHON3
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_PYTHON3
 EXTERN char_u	*p_py3home;	// 'pythonthreehome'
-#endif
-#if defined(DYNAMIC_PYTHON)
+#اگر_ختم
+#اگر defined(DYNAMIC_PYTHON)
 EXTERN char_u	*p_pydll;	// 'pythondll'
-#endif
-#ifdef FEAT_PYTHON
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_PYTHON
 EXTERN char_u	*p_pyhome;	// 'pythonhome'
-#endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
-EXTERN long	p_pyx;		// 'pyxversion'
-#endif
+#اگر_ختم
+#اگر defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+EXTERN طویل	p_pyx;		// 'pyxversion'
+#اگر_ختم
 EXTERN char_u	*p_qe;		// 'quoteescape'
-EXTERN int	p_ro;		// 'readonly'
-#ifdef FEAT_RELTIME
-EXTERN long	p_rdt;		// 'redrawtime'
-#endif
-EXTERN int	p_remap;	// 'remap'
-EXTERN long	p_re;		// 'regexpengine'
-#ifdef FEAT_RENDER_OPTIONS
+EXTERN صحیح	p_ro;		// 'readonly'
+#اگر_تعریف_شدہ FEAT_RELTIME
+EXTERN طویل	p_rdt;		// 'redrawtime'
+#اگر_ختم
+EXTERN صحیح	p_remap;	// 'remap'
+EXTERN طویل	p_re;		// 'regexpengine'
+#اگر_تعریف_شدہ FEAT_RENDER_OPTIONS
 EXTERN char_u	*p_rop;		// 'renderoptions'
-#endif
-EXTERN long	p_report;	// 'report'
-#if defined(FEAT_QUICKFIX)
-EXTERN long	p_pvh;		// 'previewheight'
-EXTERN long     p_chi;          // 'chistory'
-#endif
-#ifdef MSWIN
-EXTERN int	p_rs;		// 'restorescreen'
-#endif
-#ifdef FEAT_RIGHTLEFT
-EXTERN int	p_ari;		// 'allowrevins'
-EXTERN int	p_ri;		// 'revins'
-#endif
-#if defined(DYNAMIC_RUBY)
+#اگر_ختم
+EXTERN طویل	p_report;	// 'report'
+#اگر defined(FEAT_QUICKFIX)
+EXTERN طویل	p_pvh;		// 'previewheight'
+EXTERN طویل     p_chi;          // 'chistory'
+#اگر_ختم
+#اگر_تعریف_شدہ MSWIN
+EXTERN صحیح	p_rs;		// 'restorescreen'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
+EXTERN صحیح	p_ari;		// 'allowrevins'
+EXTERN صحیح	p_ri;		// 'revins'
+#اگر_ختم
+#اگر defined(DYNAMIC_RUBY)
 EXTERN char_u	*p_rubydll;	// 'rubydll'
-#endif
-EXTERN int	p_ru;		// 'ruler'
-#ifdef FEAT_STL_OPT
+#اگر_ختم
+EXTERN صحیح	p_ru;		// 'ruler'
+#اگر_تعریف_شدہ FEAT_STL_OPT
 EXTERN char_u	*p_ruf;		// 'rulerformat'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_pp;		// 'packpath'
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شدہ FEAT_QUICKFIX
 EXTERN char_u	*p_qftf;	// 'quickfixtextfunc'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_rtp;		// 'runtimepath'
-EXTERN long	p_sj;		// 'scrolljump'
-#if defined(MSWIN) && defined(FEAT_GUI)
-EXTERN int	p_scf;		// 'scrollfocus'
-#endif
-EXTERN long	p_so;		// 'scrolloff'
-EXTERN long	p_sop;		// 'scrolloffpad'
+EXTERN طویل	p_sj;		// 'scrolljump'
+#اگر defined(MSWIN) && defined(FEAT_GUI)
+EXTERN صحیح	p_scf;		// 'scrollfocus'
+#اگر_ختم
+EXTERN طویل	p_so;		// 'scrolloff'
+EXTERN طویل	p_sop;		// 'scrolloffpad'
 EXTERN char_u	*p_sbo;		// 'scrollopt'
 EXTERN char_u	*p_sections;	// 'sections'
-EXTERN int	p_secure;	// 'secure'
+EXTERN صحیح	p_secure;	// 'secure'
 EXTERN char_u	*p_sel;		// 'selection'
 EXTERN char_u	*p_slm;		// 'selectmode'
-#ifdef FEAT_SESSION
+#اگر_تعریف_شدہ FEAT_SESSION
 EXTERN char_u	*p_ssop;	// 'sessionoptions'
-EXTERN unsigned	ssop_flags;
+EXTERN غیرعلامتی	ssop_flags;
 # define SSOP_BUFFERS		0x001
 # define SSOP_WINPOS		0x002
 # define SSOP_RESIZE		0x004
@@ -935,166 +935,166 @@ EXTERN unsigned	ssop_flags;
 # define SSOP_TABPAGES		0x8000
 # define SSOP_TERMINAL		0x10000
 # define SSOP_SKIP_RTP		0x20000
-#endif
+#اگر_ختم
 EXTERN char_u	*p_sh;		// 'shell'
 EXTERN char_u	*p_shcf;	// 'shellcmdflag'
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شدہ FEAT_QUICKFIX
 EXTERN char_u	*p_sp;		// 'shellpipe'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_shq;		// 'shellquote'
 EXTERN char_u	*p_sxq;		// 'shellxquote'
 EXTERN char_u	*p_sxe;		// 'shellxescape'
 EXTERN char_u	*p_srr;		// 'shellredir'
-#ifdef AMIGA
-EXTERN long	p_st;		// 'shelltype'
-#endif
-EXTERN int	p_stmp;		// 'shelltemp'
-#ifdef BACKSLASH_IN_FILENAME
-EXTERN int	p_ssl;		// 'shellslash'
-#endif
-#ifdef FEAT_STL_OPT
+#اگر_تعریف_شدہ AMIGA
+EXTERN طویل	p_st;		// 'shelltype'
+#اگر_ختم
+EXTERN صحیح	p_stmp;		// 'shelltemp'
+#اگر_تعریف_شدہ BACKSLASH_اندر_FILENAME
+EXTERN صحیح	p_ssl;		// 'shellslash'
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_STL_OPT
 EXTERN char_u	*p_stl;		// 'statusline'
 EXTERN char_u	*p_stlo;	// 'statuslineopt'
-#endif
-EXTERN int	p_sr;		// 'shiftround'
-EXTERN long	p_sw;		// 'shiftwidth'
+#اگر_ختم
+EXTERN صحیح	p_sr;		// 'shiftround'
+EXTERN طویل	p_sw;		// 'shiftwidth'
 EXTERN char_u	*p_shm;		// 'shortmess'
-EXTERN int	p_sn;		// 'shortname'
-#ifdef FEAT_LINEBREAK
+EXTERN صحیح	p_sn;		// 'shortname'
+#اگر_تعریف_شدہ FEAT_LINEBREAK
 EXTERN char_u	*p_sbr;		// 'showbreak'
-#endif
-EXTERN int	p_sc;		// 'showcmd'
+#اگر_ختم
+EXTERN صحیح	p_sc;		// 'showcmd'
 EXTERN char_u	*p_sloc;	// 'showcmdloc'
-EXTERN int	p_sft;		// 'showfulltag'
-EXTERN int	p_sm;		// 'showmatch'
-EXTERN int	p_smd;		// 'showmode'
-EXTERN long	p_ss;		// 'sidescroll'
-EXTERN long	p_siso;		// 'sidescrolloff'
-EXTERN int	p_scs;		// 'smartcase'
-EXTERN int	p_si;		// 'smartindent'
-EXTERN int	p_sta;		// 'smarttab'
-EXTERN long	p_sts;		// 'softtabstop'
-EXTERN int	p_sb;		// 'splitbelow'
+EXTERN صحیح	p_sft;		// 'showfulltag'
+EXTERN صحیح	p_sm;		// 'showmatch'
+EXTERN صحیح	p_smd;		// 'showmode'
+EXTERN طویل	p_ss;		// 'sidescroll'
+EXTERN طویل	p_siso;		// 'sidescrolloff'
+EXTERN صحیح	p_scs;		// 'smartcase'
+EXTERN صحیح	p_si;		// 'smartindent'
+EXTERN صحیح	p_sta;		// 'smarttab'
+EXTERN طویل	p_sts;		// 'softtabstop'
+EXTERN صحیح	p_sb;		// 'splitbelow'
 EXTERN char_u	*p_sua;		// 'suffixesadd'
-EXTERN int	p_swf;		// 'swapfile'
-#ifdef FEAT_SYN_HL
-EXTERN long	p_smc;		// 'synmaxcol'
-#endif
-EXTERN long	p_tpm;		// 'tabpagemax'
-#ifdef FEAT_STL_OPT
+EXTERN صحیح	p_swf;		// 'swapfile'
+#اگر_تعریف_شدہ FEAT_SYN_HL
+EXTERN طویل	p_smc;		// 'synmaxcol'
+#اگر_ختم
+EXTERN طویل	p_tpm;		// 'tabpagemax'
+#اگر_تعریف_شدہ FEAT_STL_OPT
 EXTERN char_u	*p_tal;		// 'tabline'
-#endif
-#ifdef FEAT_EVAL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_EVAL
 EXTERN char_u	*p_tfu;		// 'tagfunc'
-#endif
-#ifdef FEAT_SPELL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_SPELL
 EXTERN char_u	*p_spc;		// 'spellcapcheck'
 EXTERN char_u	*p_spf;		// 'spellfile'
 EXTERN char_u	*p_spl;		// 'spelllang'
 EXTERN char_u	*p_spo;		// 'spelloptions'
 EXTERN char_u	*p_sps;		// 'spellsuggest'
-#endif
-EXTERN int	p_spr;		// 'splitright'
-EXTERN int	p_sol;		// 'startofline'
+#اگر_ختم
+EXTERN صحیح	p_spr;		// 'splitright'
+EXTERN صحیح	p_sol;		// 'startofline'
 EXTERN char_u	*p_su;		// 'suffixes'
 EXTERN char_u	*p_sws;		// 'swapsync'
 EXTERN char_u	*p_swb;		// 'switchbuf'
-EXTERN unsigned	swb_flags;
+EXTERN غیرعلامتی	swb_flags;
 // Keep in sync with p_swb_values in optionstr.c
-#define SWB_USEOPEN		0x001
-#define SWB_USETAB		0x002
-#define SWB_SPLIT		0x004
-#define SWB_NEWTAB		0x008
-#define SWB_VSPLIT		0x010
-#define SWB_USELAST		0x020
+#تعریف_کرو SWB_USEOPEN		0x001
+#تعریف_کرو SWB_USETAB		0x002
+#تعریف_کرو SWB_بانٹو		0x004
+#تعریف_کرو SWB_NEWTAB		0x008
+#تعریف_کرو SWB_VSPLIT		0x010
+#تعریف_کرو SWB_USELAST		0x020
 
 EXTERN char_u	*p_spk;		// 'splitkeep'
 
-#if defined(FEAT_TABPANEL)
+#اگر defined(FEAT_TABPANEL)
 EXTERN char_u	*p_tpl;		// 'tabpanel'
-EXTERN long	p_stpl;		// 'showtabpanel'
+EXTERN طویل	p_stpl;		// 'showtabpanel'
 EXTERN char_u	*p_tplo;	// 'tabpanelopt'
-#endif
+#اگر_ختم
 
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
 EXTERN char_u	*p_syn;		// 'syntax'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_tcl;		// 'tabclose'
-EXTERN unsigned	tcl_flags;	// flags from 'tabclose'
-#define TCL_LEFT		0x001
-#define TCL_USELAST		0x002
-EXTERN long	p_ts;		// 'tabstop'
-EXTERN int	p_tbs;		// 'tagbsearch'
+EXTERN غیرعلامتی	tcl_flags;	// flags from 'tabclose'
+#تعریف_کرو TCL_بایاں		0x001
+#تعریف_کرو TCL_USELAST		0x002
+EXTERN طویل	p_ts;		// 'tabstop'
+EXTERN صحیح	p_tbs;		// 'tagbsearch'
 EXTERN char_u	*p_tc;		// 'tagcase'
-EXTERN unsigned tc_flags;       // flags from 'tagcase'
-#define TC_FOLLOWIC		0x01
-#define TC_IGNORE		0x02
-#define TC_MATCH		0x04
-#define TC_FOLLOWSCS		0x08
-#define TC_SMART		0x10
-EXTERN long	p_tl;		// 'taglength'
-EXTERN int	p_tr;		// 'tagrelative'
-EXTERN char_u	*p_tags;	// 'tags'
-EXTERN int	p_tagsecure;    // 'tagsecure'
-EXTERN int	p_tgst;		// 'tagstack'
-#if defined(DYNAMIC_TCL)
+EXTERN غیرعلامتی tc_flags;       // flags from 'tagcase'
+#تعریف_کرو TC_FOLLOWIC		0x01
+#تعریف_کرو TC_IGNORE		0x02
+#تعریف_کرو TC_مطابقت		0x04
+#تعریف_کرو TC_FOLLOWSCS		0x08
+#تعریف_کرو TC_SMART		0x10
+EXTERN طویل	p_tl;		// 'taglength'
+EXTERN صحیح	p_tr;		// 'tagrelative'
+EXTERN char_u	*p_لیبل_فہرست;	// 'tags'
+EXTERN صحیح	p_tagsecure;    // 'tagsecure'
+EXTERN صحیح	p_tgst;		// 'tagstack'
+#اگر defined(DYNAMIC_TCL)
 EXTERN char_u	*p_tcldll;	// 'tcldll'
-#endif
-#ifdef FEAT_ARABIC
-EXTERN int	p_tbidi;	// 'termbidi'
-#endif
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_ARABIC
+EXTERN صحیح	p_tbidi;	// 'termbidi'
+#اگر_ختم
 EXTERN char_u	*p_tenc;	// 'termencoding'
-#ifdef FEAT_TERMGUICOLORS
-EXTERN int	p_tgc;		// 'termguicolors'
-#endif
-#ifdef UNIX
+#اگر_تعریف_شدہ FEAT_TERMGUICOLORS
+EXTERN صحیح	p_tgc;		// 'termguicolors'
+#اگر_ختم
+#اگر_تعریف_شدہ UNIX
 EXTERN char_u	*p_trz;		// 'termresize'
-#endif
-EXTERN int	p_tsy;		// 'termsync'
-#ifdef FEAT_TERMINAL
-EXTERN long	p_twsl;		// 'termwinscroll'
-#endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
+#اگر_ختم
+EXTERN صحیح	p_tsy;		// 'termsync'
+#اگر_تعریف_شدہ FEAT_TERMINAL
+EXTERN طویل	p_twsl;		// 'termwinscroll'
+#اگر_ختم
+#اگر defined(MSWIN) && defined(FEAT_TERMINAL)
 EXTERN char_u	*p_twt;		// 'termwintype'
-#endif
-EXTERN int	p_terse;	// 'terse'
-EXTERN int	p_ta;		// 'textauto'
-EXTERN int	p_tx;		// 'textmode'
-EXTERN long	p_tw;		// 'textwidth'
-EXTERN int	p_to;		// 'tildeop'
-EXTERN int	p_timeout;	// 'timeout'
-EXTERN long	p_tm;		// 'timeoutlen'
-EXTERN int	p_title;	// 'title'
-EXTERN long	p_titlelen;	// 'titlelen'
+#اگر_ختم
+EXTERN صحیح	p_terse;	// 'terse'
+EXTERN صحیح	p_ta;		// 'textauto'
+EXTERN صحیح	p_tx;		// 'textmode'
+EXTERN طویل	p_tw;		// 'textwidth'
+EXTERN صحیح	p_مقصد;		// 'tildeop'
+EXTERN صحیح	p_timeout;	// 'timeout'
+EXTERN طویل	p_tm;		// 'timeoutlen'
+EXTERN صحیح	p_title;	// 'title'
+EXTERN طویل	p_titlelen;	// 'titlelen'
 EXTERN char_u	*p_titleold;	// 'titleold'
 EXTERN char_u	*p_titlestring;	// 'titlestring'
 EXTERN char_u	*p_tsr;		// 'thesaurus'
-EXTERN int	p_ttimeout;	// 'ttimeout'
-EXTERN long	p_ttm;		// 'ttimeoutlen'
-EXTERN int	p_tbi;		// 'ttybuiltin'
-EXTERN int	p_tf;		// 'ttyfast'
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+EXTERN صحیح	p_ttimeout;	// 'ttimeout'
+EXTERN طویل	p_ttm;		// 'ttimeoutlen'
+EXTERN صحیح	p_tbi;		// 'ttybuiltin'
+EXTERN صحیح	p_tf;		// 'ttyfast'
+#اگر defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 EXTERN char_u	*p_toolbar;	// 'toolbar'
-EXTERN unsigned toolbar_flags;
-# define TOOLBAR_TEXT		0x01
+EXTERN غیرعلامتی toolbar_flags;
+# define TOOLBAR_متن		0x01
 # define TOOLBAR_ICONS		0x02
 # define TOOLBAR_TOOLTIPS	0x04
 # define TOOLBAR_HORIZ		0x08
-#endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#اگر_ختم
+#اگر defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 EXTERN char_u	*p_tbis;	// 'toolbariconsize'
-EXTERN unsigned tbis_flags;
+EXTERN غیرعلامتی tbis_flags;
 # define TBIS_TINY		0x01
 # define TBIS_SMALL		0x02
 # define TBIS_MEDIUM		0x04
 # define TBIS_LARGE		0x08
 # define TBIS_HUGE		0x10
 # define TBIS_GIANT		0x20
-#endif
-EXTERN long	p_ttyscroll;	// 'ttyscroll'
-#if defined(UNIX) || defined(VMS)
+#اگر_ختم
+EXTERN طویل	p_ttyscroll;	// 'ttyscroll'
+#اگر defined(UNIX) || defined(VMS)
 EXTERN char_u	*p_ttym;	// 'ttymouse'
-EXTERN unsigned ttym_flags;
+EXTERN غیرعلامتی ttym_flags;
 # define TTYM_XTERM		0x01
 # define TTYM_XTERM2		0x02
 # define TTYM_DEC		0x04
@@ -1103,84 +1103,84 @@ EXTERN unsigned ttym_flags;
 # define TTYM_PTERM		0x20
 # define TTYM_URXVT		0x40
 # define TTYM_SGR		0x80
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_PERSISTENT_UNDO
 EXTERN char_u	*p_udir;	// 'undodir'
-EXTERN int	p_udf;		// 'undofile'
-#endif
-EXTERN long	p_ul;		// 'undolevels'
-EXTERN long	p_ur;		// 'undoreload'
-EXTERN long	p_uc;		// 'updatecount'
-EXTERN long	p_ut;		// 'updatetime'
-#ifdef FEAT_VARTABS
+EXTERN صحیح	p_udf;		// 'undofile'
+#اگر_ختم
+EXTERN طویل	p_ul;		// 'undolevels'
+EXTERN طویل	p_ur;		// 'undoreload'
+EXTERN طویل	p_uc;		// 'updatecount'
+EXTERN طویل	p_ut;		// 'updatetime'
+#اگر_تعریف_شدہ FEAT_VARTABS
 EXTERN char_u	*p_vsts;	// 'varsofttabstop'
 EXTERN char_u	*p_vts;		// 'vartabstop'
-#endif
-#ifdef FEAT_VIMINFO
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_VIMINFO
 EXTERN char_u	*p_viminfo;	// 'viminfo'
 EXTERN char_u	*p_viminfofile;	// 'viminfofile'
-#endif
-#ifdef FEAT_SESSION
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_SESSION
 EXTERN char_u	*p_vdir;	// 'viewdir'
 EXTERN char_u	*p_vop;		// 'viewoptions'
-EXTERN unsigned	vop_flags;	// uses SSOP_ flags
-#endif
-EXTERN int	p_vb;		// 'visualbell'
+EXTERN غیرعلامتی	vop_flags;	// uses SSOP_ flags
+#اگر_ختم
+EXTERN صحیح	p_vb;		// 'visualbell'
 EXTERN char_u	*p_ve;		// 'virtualedit'
-EXTERN unsigned ve_flags;
-#define VE_BLOCK	5	// includes "all"
-#define VE_INSERT	6	// includes "all"
-#define VE_ALL		4
-#define VE_ONEMORE	8
-#define VE_NONE		16	// "none"
-#define VE_NONEU	32      // "NONE"
-EXTERN long	p_verbose;	// 'verbose'
-#ifdef IN_OPTION_C
+EXTERN غیرعلامتی ve_flags;
+#تعریف_کرو VE_بلاک	5	// includes "all"
+#تعریف_کرو VE_داخل_کرو	6	// includes "all"
+#تعریف_کرو VE_ALL		4
+#تعریف_کرو VE_ONEMORE	8
+#تعریف_کرو VE_NONE		16	// "none"
+#تعریف_کرو VE_NONEU	32      // "NONE"
+EXTERN طویل	p_verbose;	// 'verbose'
+#اگر_تعریف_شدہ اندر_OPTION_C
 char_u	*p_vfile = (char_u *)""; // used before options are initialized
-#else
-extern char_u	*p_vfile;	// 'verbosefile'
-#endif
-EXTERN int	p_warn;		// 'warn'
+#ورنہ
+خارجی char_u	*p_vfile;	// 'verbosefile'
+#اگر_ختم
+EXTERN صحیح	p_warn;		// 'warn'
 EXTERN char_u	*p_wop;		// 'wildoptions'
-EXTERN long	p_window;	// 'window'
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) || defined(LINT) \
+EXTERN طویل	p_کھڑکی;	// 'window'
+#اگر defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) || defined(LINT) \
 	|| defined (FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON)
 # define FEAT_WAK
 EXTERN char_u	*p_wak;		// 'winaltkeys'
-#endif
+#اگر_ختم
 EXTERN char_u	*p_wig;		// 'wildignore'
-EXTERN int	p_wiv;		// 'weirdinvert'
+EXTERN صحیح	p_wiv;		// 'weirdinvert'
 EXTERN char_u	*p_ww;		// 'whichwrap'
-EXTERN long	p_wc;		// 'wildchar'
-EXTERN long	p_wcm;		// 'wildcharm'
-EXTERN int	p_wic;		// 'wildignorecase'
+EXTERN طویل	p_wc;		// 'wildchar'
+EXTERN طویل	p_wcm;		// 'wildcharm'
+EXTERN صحیح	p_wic;		// 'wildignorecase'
 EXTERN char_u	*p_wim;		// 'wildmode'
-EXTERN int	p_wmnu;		// 'wildmenu'
-EXTERN long	p_wh;		// 'winheight'
-EXTERN long	p_wmh;		// 'winminheight'
-EXTERN long	p_wmw;		// 'winminwidth'
-EXTERN long	p_wiw;		// 'winwidth'
-#ifdef FEAT_WAYLAND
+EXTERN صحیح	p_wmnu;		// 'wildmenu'
+EXTERN طویل	p_wh;		// 'winheight'
+EXTERN طویل	p_wmh;		// 'winminheight'
+EXTERN طویل	p_wmw;		// 'winminwidth'
+EXTERN طویل	p_wiw;		// 'winwidth'
+#اگر_تعریف_شدہ FEAT_WAYLAND
 EXTERN char_u	*p_wse;		// 'wlseat'
-EXTERN long     p_wtm;		// 'wltimeoutlen'
-#endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
+EXTERN طویل     p_wtm;		// 'wltimeoutlen'
+#اگر_ختم
+#اگر defined(MSWIN) && defined(FEAT_TERMINAL)
 EXTERN char_u	*p_winptydll;	// 'winptydll'
-#endif
-EXTERN long	p_wm;		// 'wrapmargin'
-EXTERN int	p_ws;		// 'wrapscan'
-EXTERN int	p_write;	// 'write'
-EXTERN int	p_wa;		// 'writeany'
-EXTERN int	p_wb;		// 'writebackup'
-EXTERN long	p_wd;		// 'writedelay'
-EXTERN int	p_xtermcodes;	// 'xtermcodes'
+#اگر_ختم
+EXTERN طویل	p_wm;		// 'wrapmargin'
+EXTERN صحیح	p_ws;		// 'wrapscan'
+EXTERN صحیح	p_write;	// 'write'
+EXTERN صحیح	p_wa;		// 'writeany'
+EXTERN صحیح	p_wb;		// 'writebackup'
+EXTERN طویل	p_wd;		// 'writedelay'
+EXTERN صحیح	p_xtermcodes;	// 'xtermcodes'
 
 /*
  * "indir" values for buffer-local options.
  * These need to be defined globally, so that the BV_COUNT can be used with
  * b_p_scriptID[].
  */
-enum
+شمار
 {
     BV_AI = 0
     , BV_AC
@@ -1188,12 +1188,12 @@ enum
     , BV_BH
     , BV_BKC
     , BV_BT
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شدہ FEAT_QUICKFIX
     , BV_EFM
     , BV_GEFM
     , BV_GP
     , BV_MP
-#endif
+#اگر_ختم
     , BV_BIN
     , BV_BL
     , BV_BOMB
@@ -1209,20 +1209,20 @@ enum
     , BV_COT
     , BV_CPT
     , BV_DICT
-#ifdef FEAT_DIFF
+#اگر_تعریف_شدہ FEAT_DIFF
     , BV_DIA
-#endif
+#اگر_ختم
     , BV_TSR
-#ifdef BACKSLASH_IN_FILENAME
+#اگر_تعریف_شدہ BACKSLASH_اندر_FILENAME
     , BV_CSL
-#endif
-#ifdef FEAT_COMPL_FUNC
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_COMPL_FUNC
     , BV_CFU
-#endif
-#ifdef FEAT_FIND_ID
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_ڈھونڈو_ID
     , BV_DEF
     , BV_INC
-#endif
+#اگر_ختم
     , BV_EOF
     , BV_EOL
     , BV_FIXEOL
@@ -1230,36 +1230,36 @@ enum
     , BV_ET
     , BV_FENC
     , BV_FP
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     , BV_BEXPR
     , BV_FEX
     , BV_FFU
-#endif
+#اگر_ختم
     , BV_FF
     , BV_FLP
     , BV_FO
-#ifdef HAVE_FSYNC
+#اگر_تعریف_شدہ HAVE_FSYNC
     , BV_FS
-#endif
+#اگر_ختم
     , BV_FT
     , BV_IMI
     , BV_IMS
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
     , BV_INDE
     , BV_INDK
-#endif
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#اگر_ختم
+#اگر defined(FEAT_ڈھونڈو_ID) && defined(FEAT_EVAL)
     , BV_INEX
-#endif
+#اگر_ختم
     , BV_INF
     , BV_ISE
     , BV_ISK
-#ifdef FEAT_CRYPT
-    , BV_KEY
-#endif
-#ifdef FEAT_KEYMAP
+#اگر_تعریف_شدہ FEAT_CRYPT
+    , BV_کلید
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_KEYMAP
     , BV_KMAP
-#endif
+#اگر_ختم
     , BV_KP
     , BV_LISP
     , BV_LOP
@@ -1270,51 +1270,51 @@ enum
     , BV_MOD
     , BV_MPS
     , BV_NF
-#ifdef FEAT_COMPL_FUNC
+#اگر_تعریف_شدہ FEAT_COMPL_FUNC
     , BV_OFU
-#endif
-    , BV_PATH
+#اگر_ختم
+    , BV_راستہ
     , BV_PI
     , BV_QE
     , BV_RO
     , BV_SI
     , BV_SN
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شدہ FEAT_SYN_HL
     , BV_SMC
     , BV_SYN
-#endif
-#ifdef FEAT_SPELL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_SPELL
     , BV_SPC
     , BV_SPF
     , BV_SPL
     , BV_SPO
-#endif
+#اگر_ختم
     , BV_STS
     , BV_SUA
     , BV_SW
     , BV_SWF
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
     , BV_TFU
-#endif
-    , BV_TAGS
+#اگر_ختم
+    , BV_لیبل_فہرست
     , BV_TC
-#ifdef FEAT_COMPL_FUNC
+#اگر_تعریف_شدہ FEAT_COMPL_FUNC
     , BV_TSRFU
-#endif
+#اگر_ختم
     , BV_TS
     , BV_TW
     , BV_TX
     , BV_UDF
     , BV_UL
     , BV_WM
-#ifdef FEAT_TERMINAL
+#اگر_تعریف_شدہ FEAT_TERMINAL
     , BV_TWSL
-#endif
-#ifdef FEAT_VARTABS
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_VARTABS
     , BV_VSTS
     , BV_VTS
-#endif
-    , BV_COUNT	    // must be the last one
+#اگر_ختم
+    , BV_گنتی	    // must be the last one
 };
 
 /*
@@ -1322,33 +1322,33 @@ enum
  * These need to be defined globally, so that the WV_COUNT can be used in the
  * window structure.
  */
-enum
+شمار
 {
     WV_LIST = 0
     , WV_LCS
     , WV_FCS
-#ifdef FEAT_ARABIC
+#اگر_تعریف_شدہ FEAT_ARABIC
     , WV_ARAB
-#endif
-#ifdef FEAT_CONCEAL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_CONCEAL
     , WV_COCU
     , WV_COLE
-#endif
-#ifdef FEAT_TERMINAL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_TERMINAL
     , WV_TWK
     , WV_TWS
-#endif
+#اگر_ختم
     , WV_CRBIND
-#ifdef FEAT_LINEBREAK
+#اگر_تعریف_شدہ FEAT_LINEBREAK
     , WV_BRI
     , WV_BRIOPT
-#endif
+#اگر_ختم
     , WV_WCR
-#ifdef FEAT_DIFF
+#اگر_تعریف_شدہ FEAT_DIFF
     , WV_DIFF
-#endif
+#اگر_ختم
     , WV_EIW
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شدہ FEAT_FOLDING
     , WV_FDC
     , WV_FEN
     , WV_FDI
@@ -1361,60 +1361,60 @@ enum
     , WV_FDT
 # endif
     , WV_FMR
-#endif
-#ifdef FEAT_LINEBREAK
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_LINEBREAK
     , WV_LBR
-#endif
+#اگر_ختم
     , WV_NU
     , WV_RNU
     , WV_VE
-#ifdef FEAT_LINEBREAK
+#اگر_تعریف_شدہ FEAT_LINEBREAK
     , WV_NUW
-#endif
-#if defined(FEAT_QUICKFIX)
+#اگر_ختم
+#اگر defined(FEAT_QUICKFIX)
     , WV_PVW
     , WV_LHI
-#endif
-#ifdef FEAT_RIGHTLEFT
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_RIGHTLEFT
     , WV_RL
     , WV_RLC
-#endif
+#اگر_ختم
     , WV_SCBIND
     , WV_SCROLL
     , WV_SMS
     , WV_SISO
     , WV_SO
     , WV_SOP
-#ifdef FEAT_SPELL
+#اگر_تعریف_شدہ FEAT_SPELL
     , WV_SPELL
-#endif
-#ifdef FEAT_SYN_HL
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_SYN_HL
     , WV_CUC
     , WV_CUL
     , WV_CULOPT
     , WV_CC
-#endif
-#ifdef FEAT_LINEBREAK
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_LINEBREAK
     , WV_SBR
-#endif
-#ifdef FEAT_STL_OPT
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_STL_OPT
     , WV_STL
     , WV_STLO
-#endif
+#اگر_ختم
     , WV_WFB
     , WV_WFH
     , WV_WFW
     , WV_WHL
     , WV_WRAP
-#ifdef FEAT_SIGNS
+#اگر_تعریف_شدہ FEAT_SIGNS
     , WV_SCL
-#endif
-    , WV_COUNT	    // must be the last one
+#اگر_ختم
+    , WV_گنتی	    // must be the last one
 };
 
 // Value for b_p_ul indicating the global value must be used.
-#define NO_LOCAL_UNDOLEVEL (-123456)
+#تعریف_کرو NO_LOCAL_UNDOLEVEL (-123456)
 
-#define ERR_BUFLEN 80
+#تعریف_کرو ERR_BUFLEN 80
 
-#endif // _OPTION_H_
+#اگر_ختم // _OPTION_H_

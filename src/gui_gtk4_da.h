@@ -7,33 +7,33 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_DRAW_AREA_H
-#define GUI_GTK4_DRAW_AREA_H
+#اگر_غیر_تعریف_شدہ GUI_GTK4_DRAW_AREA_H
+#تعریف_کرو GUI_GTK4_DRAW_AREA_H
 
-#include "vim.h"
+#شامل "vim.h"
 
-#include <gtk/gtk.h>
+#شامل <gtk/gtk.h>
 
-#define VIM_TYPE_DRAW_AREA (vim_draw_area_get_type())
+#تعریف_کرو VIM_TYPE_DRAW_AREA (vim_draw_area_get_type())
 G_DECLARE_FINAL_TYPE(VimDrawArea, vim_draw_area, VIM, DRAW_AREA, GtkWidget)
 
-GtkWidget *vim_draw_area_new(void);
-void vim_draw_area_set_size(VimDrawArea *self, int rows, int cols);
-int vim_draw_area_draw_string(VimDrawArea *self, int row, int col, char_u *s, int len, int flags);
-void vim_draw_area_clear_block(VimDrawArea *self, int row1, int col1, int row2, int col2);
-void vim_draw_area_clear(VimDrawArea *self);
-void vim_draw_area_move_block(VimDrawArea *self, int to, int row1, int row2, int col1, int col2);
-void vim_draw_area_set_cursor(VimDrawArea *self, int w, int h);
-void vim_draw_area_invert_block(VimDrawArea *self, int row, int col, int nrows, int ncols);
-#if defined(FEAT_SIGN_ICONS)
-void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, int row, int col, int width, int height);
-#endif
-#ifdef FEAT_NETBEANS_INTG
-void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, int row, int col, int width, int height);
-#endif
-#ifdef FEAT_IMAGE_GUI
-void vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node);
-void vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node);
-#endif
+GtkWidget *vim_draw_area_new(خالی);
+خالی vim_draw_area_سیٹ_سائز(VimDrawArea *self, صحیح صفیں_2, صحیح ستون_تعداد);
+صحیح vim_draw_area_draw_string(VimDrawArea *self, صحیح صف, صحیح ستون, char_u *s, صحیح len, صحیح flags);
+خالی vim_draw_area_clear_بلاک(VimDrawArea *self, صحیح row1, صحیح col1, صحیح row2, صحیح col2);
+خالی vim_draw_area_clear(VimDrawArea *self);
+خالی vim_draw_area_move_بلاک(VimDrawArea *self, صحیح مقصد, صحیح row1, صحیح row2, صحیح col1, صحیح col2);
+خالی vim_draw_area_سیٹ_cursor(VimDrawArea *self, صحیح w, صحیح h);
+خالی vim_draw_area_invert_بلاک(VimDrawArea *self, صحیح صف, صحیح ستون, صحیح nrows, صحیح ncols);
+#اگر defined(FEAT_SIGN_ICONS)
+خالی vim_draw_area_جوڑو_sign(VimDrawArea *self, GdkTexture *sign, صحیح صف, صحیح ستون, صحیح چوڑائی, صحیح اونچائی);
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_NETBEANS_INTG
+خالی vim_draw_area_جوڑو_multisign(VimDrawArea *self, cairo_surface_t *surf, صحیح صف, صحیح ستون, صحیح چوڑائی, صحیح اونچائی);
+#اگر_ختم
+#اگر_تعریف_شدہ FEAT_IMAGE_GUI
+خالی vim_draw_area_جوڑو_external(VimDrawArea *self, Gsk_Render_گرہ *گرہ);
+خالی vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_گرہ *گرہ);
+#اگر_ختم
 
-#endif
+#اگر_ختم

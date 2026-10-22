@@ -21,71 +21,71 @@
  * 3. I don't use K&R-style functions. Anyways, MzScheme headers are ANSI.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#include "if_mzsch.h"
+#شامل "if_mzsch.h"
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_MZSCHEME)
+#اگر defined(FEAT_MZSCHEME)
 
 /*
  * scheme_register_tls_space is only available on 32-bit Windows until
  * racket-6.3.  See
  * http://docs.racket-lang.org/inside/im_memoryalloc.html?q=scheme_register_tls_space
  */
-#if MZSCHEME_VERSION_MAJOR >= 500 && defined(MSWIN) \
+#اگر MZSCHEME_نسخہ_MAJOR >= 500 && defined(MSWIN) \
 	&& defined(USE_THREAD_LOCAL) \
-	&& (!defined(_WIN64) || MZSCHEME_VERSION_MAJOR >= 603)
+	&& (!defined(_WIN64) || MZSCHEME_نسخہ_MAJOR >= 603)
 # define HAVE_TLS_SPACE 1
-#endif
+#اگر_ختم
 
 /*
  * Since version 4.x precise GC requires trampolined startup.
  * Futures and places in version 5.x need it too.
  */
-#if defined(MZ_PRECISE_GC) && MZSCHEME_VERSION_MAJOR >= 400 \
-    || MZSCHEME_VERSION_MAJOR >= 500 \
+#اگر defined(MZ_PRECISE_GC) && MZSCHEME_نسخہ_MAJOR >= 400 \
+    || MZSCHEME_نسخہ_MAJOR >= 500 \
 	&& (defined(MZ_USE_FUTURES) || defined(MZ_USE_PLACES))
 # define TRAMPOLINED_MZVIM_STARTUP
-#endif
+#اگر_ختم
 
 // Base data structures
-#define SCHEME_VIMBUFFERP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_buffer_type)
-#define SCHEME_VIMWINDOWP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_window_type)
+#تعریف_کرو SCHEME_VIMBUFFERP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_بفر_type)
+#تعریف_کرو SCHEME_VIMWINDOWP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_کھڑکی_type)
 
-typedef struct
+قسمتعریف ساخت
 {
     Scheme_Object   so;
     buf_T	    *buf;
-} vim_mz_buffer;
+} vim_mz_بفر;
 
-#define INVALID_BUFFER_VALUE ((buf_T *)(-1))
+#تعریف_کرو INVALID_بفر_قدر ((buf_T *)(-1))
 
-typedef struct
+قسمتعریف ساخت
 {
     Scheme_Object   so;
     win_T	    *win;
-} vim_mz_window;
+} vim_mz_کھڑکی;
 
-#define INVALID_WINDOW_VALUE ((win_T *)(-1))
+#تعریف_کرو INVALID_کھڑکی_قدر ((win_T *)(-1))
 
 /*
  * Prims that form MzScheme Vim interface
  */
-typedef struct
+قسمتعریف ساخت
 {
     Scheme_Closed_Prim	*prim;
-    char	*name;
-    int		mina;	// arity information
-    int		maxa;
+    حرف	*name;
+    صحیح		mina;	// arity information
+    صحیح		maxa;
 } Vim_Prim;
 
-typedef struct
+قسمتعریف ساخت
 {
-    char	    *name;
-    Scheme_Object   *port;
-} Port_Info;
+    حرف	    *name;
+    Scheme_Object   *پورٹ;
+} پورٹ_Info;
 
 /*
  *========================================================================
@@ -97,271 +97,271 @@ typedef struct
  *  Utility functions for the vim/mzscheme interface
  *========================================================================
  */
-#ifdef HAVE_SANDBOX
-static Scheme_Object *sandbox_file_guard(int, Scheme_Object **);
-static Scheme_Object *sandbox_network_guard(int, Scheme_Object **);
-static void sandbox_check(void);
-#endif
+#اگر_تعریف_شدہ HAVE_SANDBOX
+ساکن Scheme_Object *sandbox_file_guard(صحیح, Scheme_Object **);
+ساکن Scheme_Object *sandbox_جال_guard(صحیح, Scheme_Object **);
+ساکن خالی sandbox_check(خالی);
+#اگر_ختم
 //  Buffer-related commands
-static Scheme_Object *buffer_new(buf_T *buf);
-static Scheme_Object *get_buffer_by_num(void *, int, Scheme_Object **);
-static vim_mz_buffer *get_vim_curr_buffer(void);
+ساکن Scheme_Object *بفر_new(buf_T *buf);
+ساکن Scheme_Object *get_بفر_by_عدد(خالی *, صحیح, Scheme_Object **);
+ساکن vim_mz_بفر *get_vim_curr_بفر(خالی);
 
 //  Window-related commands
-static Scheme_Object *window_new(win_T *win);
-static vim_mz_window *get_vim_curr_window(void);
+ساکن Scheme_Object *کھڑکی_new(win_T *win);
+ساکن vim_mz_کھڑکی *get_vim_curr_کھڑکی(خالی);
 
 /*
  *========================================================================
  *  Internal Function Prototypes
  *========================================================================
  */
-static int vim_error_check(void);
-static int do_mzscheme_command(exarg_T *, void *, Scheme_Closed_Prim *what);
-static int startup_mzscheme(void);
-static char *string_to_line(Scheme_Object *obj);
-#if MZSCHEME_VERSION_MAJOR >= 501
+ساکن صحیح vim_error_check(خالی);
+ساکن صحیح do_mzscheme_command(exarg_T *, خالی *, Scheme_Closed_Prim *what);
+ساکن صحیح startup_mzscheme(خالی);
+ساکن حرف *string_مقصد_سطر(Scheme_Object *obj);
+#اگر MZSCHEME_نسخہ_MAJOR >= 501
 # define OUTPUT_LEN_TYPE intptr_t
-#else
-# define OUTPUT_LEN_TYPE long
-#endif
-static void do_output(char *mesg, OUTPUT_LEN_TYPE len);
-static void do_printf(char *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
-static void do_flush(void);
-static Scheme_Object *_apply_thunk_catch_exceptions(
+#ورنہ
+# define OUTPUT_LEN_TYPE طویل
+#اگر_ختم
+ساکن خالی do_output(حرف *mesg, OUTPUT_LEN_TYPE len);
+ساکن خالی do_printf(حرف *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ساکن خالی do_flush(خالی);
+ساکن Scheme_Object *_apply_thunk_catch_exceptions(
 	Scheme_Object *, Scheme_Object **);
-static Scheme_Object *extract_exn_message(Scheme_Object *v);
-static Scheme_Object *do_eval(void *, int noargc, Scheme_Object **noargv);
-static Scheme_Object *do_load(void *, int noargc, Scheme_Object **noargv);
-static void register_vim_exn(void);
-static vim_mz_buffer *get_buffer_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static vim_mz_window *get_window_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static int line_in_range(linenr_T, buf_T *);
-static void check_line_range(linenr_T, buf_T *);
-static void mz_fix_cursor(int lo, int hi, int extra);
+ساکن Scheme_Object *نکالو_exn_پیغام(Scheme_Object *v);
+ساکن Scheme_Object *do_eval(خالی *, صحیح noargc, Scheme_Object **noargv);
+ساکن Scheme_Object *do_بھرو(خالی *, صحیح noargc, Scheme_Object **noargv);
+ساکن خالی رجسٹر_vim_exn(خالی);
+ساکن vim_mz_بفر *get_بفر_arg(ثابت حرف *fname, صحیح argnum,
+	صحیح argc, Scheme_Object **argv);
+ساکن vim_mz_کھڑکی *get_کھڑکی_arg(ثابت حرف *fname, صحیح argnum,
+	صحیح argc, Scheme_Object **argv);
+ساکن صحیح سطر_اندر_range(linenr_T, buf_T *);
+ساکن خالی check_سطر_range(linenr_T, buf_T *);
+ساکن خالی mz_fix_cursor(صحیح lo, صحیح hi, صحیح extra);
 
-static int eval_with_exn_handling(void *, Scheme_Closed_Prim *,
+ساکن صحیح eval_with_exn_handling(خالی *, Scheme_Closed_Prim *,
 	    Scheme_Object **ret);
-static void make_modules(void);
-static void init_exn_catching_apply(void);
-static int mzscheme_env_main(Scheme_Env *env, int argc, char **argv);
-static int mzscheme_init(void);
-#ifdef FEAT_EVAL
-static Scheme_Object *vim_to_mzscheme(typval_T *vim_value);
-static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, int depth,
-	Scheme_Hash_Table *visited);
-static int mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
-static int mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
-	Scheme_Hash_Table *visited);
-static Scheme_Object *vim_funcref(void *data, int argc, Scheme_Object **argv);
-#endif
+ساکن خالی make_modules(خالی);
+ساکن خالی init_exn_catching_apply(خالی);
+ساکن صحیح mzscheme_env_main(Scheme_Env *env, صحیح argc, حرف **argv);
+ساکن صحیح mzscheme_init(خالی);
+#اگر_تعریف_شدہ FEAT_EVAL
+ساکن Scheme_Object *vim_مقصد_mzscheme(typval_T *vim_قدر);
+ساکن Scheme_Object *vim_مقصد_mzscheme_impl(typval_T *vim_قدر, صحیح گہرائی,
+	Scheme_Hash_جدول *دیکھا);
+ساکن صحیح mzscheme_مقصد_vim(Scheme_Object *obj, typval_T *tv);
+ساکن صحیح mzscheme_مقصد_vim_impl(Scheme_Object *obj, typval_T *tv, صحیح گہرائی,
+	Scheme_Hash_جدول *دیکھا);
+ساکن Scheme_Object *vim_funcref(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv);
+#اگر_ختم
 
-#ifdef MZ_PRECISE_GC
-static int buffer_size_proc(void *obj UNUSED)
+#اگر_تعریف_شدہ MZ_PRECISE_GC
+ساکن صحیح بفر_سائز_proc(خالی *obj غیر_مستعمل)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_buffer));
+    واپس gc_بائٹیں_مقصد_الفاظ(حجم(vim_mz_بفر));
 }
-static int buffer_mark_proc(void *obj)
+ساکن صحیح بفر_mark_proc(خالی *obj)
 {
-    return buffer_size_proc(obj);
+    واپس بفر_سائز_proc(obj);
 }
-static int buffer_fixup_proc(void *obj)
+ساکن صحیح بفر_fixup_proc(خالی *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the buffer is alive
     // vim_mz_buffer* buf = (vim_mz_buffer*) obj;
     // buf->buf->b_mzscheme_ref = GC_fixup_self(obj);
 
-    return buffer_size_proc(obj);
+    واپس بفر_سائز_proc(obj);
 }
-static int window_size_proc(void *obj UNUSED)
+ساکن صحیح کھڑکی_سائز_proc(خالی *obj غیر_مستعمل)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_window));
+    واپس gc_بائٹیں_مقصد_الفاظ(حجم(vim_mz_کھڑکی));
 }
-static int window_mark_proc(void *obj)
+ساکن صحیح کھڑکی_mark_proc(خالی *obj)
 {
-    return window_size_proc(obj);
+    واپس کھڑکی_سائز_proc(obj);
 }
-static int window_fixup_proc(void *obj)
+ساکن صحیح کھڑکی_fixup_proc(خالی *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the window is alive
     // vim_mz_window* win = (vim_mz_window*) obj;
     // win->win->w_mzscheme_ref = GC_fixup_self(obj);
     //
-    return window_size_proc(obj);
+    واپس کھڑکی_سائز_proc(obj);
 }
 // with precise GC, w_mzscheme_ref and b_mzscheme_ref are immobile boxes
 // containing pointers to a window/buffer
 // with conservative GC these are simply pointers
-# define WINDOW_REF(win) *(vim_mz_window **)((win)->w_mzscheme_ref)
-# define BUFFER_REF(buf) *(vim_mz_buffer **)((buf)->b_mzscheme_ref)
-#else
-# define WINDOW_REF(win) (vim_mz_window *)((win)->w_mzscheme_ref)
-# define BUFFER_REF(buf) (vim_mz_buffer *)((buf)->b_mzscheme_ref)
-#endif
+# define کھڑکی_REF(win) *(vim_mz_کھڑکی **)((win)->w_mzscheme_ref)
+# define بفر_REF(buf) *(vim_mz_بفر **)((buf)->b_mzscheme_ref)
+#ورنہ
+# define کھڑکی_REF(win) (vim_mz_کھڑکی *)((win)->w_mzscheme_ref)
+# define بفر_REF(buf) (vim_mz_بفر *)((buf)->b_mzscheme_ref)
+#اگر_ختم
 
-#if defined(DYNAMIC_MZSCHEME)
-static Scheme_Object *dll_scheme_eof;
-static Scheme_Object *dll_scheme_false;
-static Scheme_Object *dll_scheme_void;
-static Scheme_Object *dll_scheme_null;
-static Scheme_Object *dll_scheme_true;
+#اگر defined(DYNAMIC_MZSCHEME)
+ساکن Scheme_Object *dll_scheme_eof;
+ساکن Scheme_Object *dll_scheme_false;
+ساکن Scheme_Object *dll_scheme_void;
+ساکن Scheme_Object *dll_scheme_null;
+ساکن Scheme_Object *dll_scheme_true;
 
-static Scheme_Thread **dll_scheme_current_thread_ptr;
+ساکن Scheme_Thread **dll_scheme_current_thread_ptr;
 
-static void (**dll_scheme_console_printf_ptr)(char *str, ...);
-static void (**dll_scheme_console_output_ptr)(char *str, OUTPUT_LEN_TYPE len);
-static void (**dll_scheme_notify_multithread_ptr)(int on);
+ساکن خالی (**dll_scheme_console_printf_ptr)(حرف *str, ...);
+ساکن خالی (**dll_scheme_console_output_ptr)(حرف *str, OUTPUT_LEN_TYPE len);
+ساکن خالی (**dll_scheme_notify_multithread_ptr)(صحیح on);
 
-static void *(*dll_GC_malloc)(size_t size_in_bytes);
-static void *(*dll_GC_malloc_atomic)(size_t size_in_bytes);
-static Scheme_Env *(*dll_scheme_basic_env)(void);
-static void (*dll_scheme_check_threads)(void);
-static void (*dll_scheme_register_static)(void *ptr, long size);
-static void (*dll_scheme_set_stack_base)(void *base, int no_auto_statics);
-static void (*dll_scheme_add_global)(const char *name, Scheme_Object *val,
+ساکن خالی *(*dll_GC_malloc)(size_t سائز_اندر_بائٹیں);
+ساکن خالی *(*dll_GC_malloc_atomic)(size_t سائز_اندر_بائٹیں);
+ساکن Scheme_Env *(*dll_scheme_basic_env)(خالی);
+ساکن خالی (*dll_scheme_check_دھاگے)(خالی);
+ساکن خالی (*dll_scheme_رجسٹر_static)(خالی *ptr, طویل سائز);
+ساکن خالی (*dll_scheme_سیٹ_ڈھیر_بنیاد)(خالی *بنیاد, صحیح no_auto_statics);
+ساکن خالی (*dll_scheme_جوڑو_global)(ثابت حرف *name, Scheme_Object *val,
 	Scheme_Env *env);
-static void (*dll_scheme_add_global_symbol)(Scheme_Object *name,
+ساکن خالی (*dll_scheme_جوڑو_global_علامت)(Scheme_Object *name,
 	Scheme_Object *val, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, int num_rands,
+ساکن Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, صحیح عدد_rands,
 	Scheme_Object **rands);
-static Scheme_Object *(*dll_scheme_builtin_value)(const char *name);
-# if MZSCHEME_VERSION_MAJOR >= 299
-static Scheme_Object *(*dll_scheme_byte_string_to_char_string)(Scheme_Object *s);
-static Scheme_Object *(*dll_scheme_make_path)(const char *chars);
+ساکن Scheme_Object *(*dll_scheme_builtin_قدر)(ثابت حرف *name);
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
+ساکن Scheme_Object *(*dll_scheme_byte_string_مقصد_char_string)(Scheme_Object *s);
+ساکن Scheme_Object *(*dll_scheme_make_راستہ)(ثابت حرف *chars);
 # endif
-static void (*dll_scheme_close_input_port)(Scheme_Object *port);
-static void (*dll_scheme_count_lines)(Scheme_Object *port);
-# if MZSCHEME_VERSION_MAJOR < 360
-static Scheme_Object *(*dll_scheme_current_continuation_marks)(void);
-# else
-static Scheme_Object *(*dll_scheme_current_continuation_marks)(Scheme_Object *prompt_tag);
+ساکن خالی (*dll_scheme_close_داخلہ_پورٹ)(Scheme_Object *پورٹ);
+ساکن خالی (*dll_scheme_گنتی_سطریں)(Scheme_Object *پورٹ);
+# اگر MZSCHEME_نسخہ_MAJOR < 360
+ساکن Scheme_Object *(*dll_scheme_current_continuation_marks)(خالی);
+# ورنہ
+ساکن Scheme_Object *(*dll_scheme_current_continuation_marks)(Scheme_Object *prompt_لیبل);
 # endif
-static void (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *port);
-static char *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
-static int (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
-static Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
-	int _num_rands, Scheme_Object **rands, int val);
-static void (*dll_scheme_dont_gc_ptr)(void *p);
-static Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string)(const char *str,
+ساکن خالی (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *پورٹ);
+ساکن حرف *(*dll_scheme_display_مقصد_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
+ساکن صحیح (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
+ساکن Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
+	صحیح عدد_rands_2, Scheme_Object **rands, صحیح val);
+ساکن خالی (*dll_scheme_dont_gc_ptr)(خالی *p);
+ساکن Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
+ساکن Scheme_Object *(*dll_scheme_eval_string)(ثابت حرف *str,
 	Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string_all)(const char *str,
-	Scheme_Env *env, int all);
-static void (*dll_scheme_finish_primitive_module)(Scheme_Env *env);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_format)(char *format, int flen, int argc,
-	Scheme_Object **argv, long *rlen);
-# else
-static char *(*dll_scheme_format_utf8)(char *format, int flen, int argc,
+ساکن Scheme_Object *(*dll_scheme_eval_string_all)(ثابت حرف *str,
+	Scheme_Env *env, صحیح all);
+ساکن خالی (*dll_scheme_اختتام_primitive_module)(Scheme_Env *env);
+# اگر MZSCHEME_نسخہ_MAJOR < 299
+ساکن حرف *(*dll_scheme_format)(حرف *format, صحیح flen, صحیح argc,
+	Scheme_Object **argv, طویل *rlen);
+# ورنہ
+ساکن حرف *(*dll_scheme_format_utf8)(حرف *format, صحیح flen, صحیح argc,
 	Scheme_Object **argv, OUTPUT_LEN_TYPE *rlen);
-static Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, int pos);
+ساکن Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, صحیح pos);
 # endif
-static void (*dll_scheme_gc_ptr_ok)(void *p);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
-	long *len);
-# else
-static char *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
+ساکن خالی (*dll_scheme_gc_ptr_ok)(خالی *p);
+# اگر MZSCHEME_نسخہ_MAJOR < 299
+ساکن حرف *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
+	طویل *len);
+# ورنہ
+ساکن حرف *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
 	OUTPUT_LEN_TYPE *len);
 # endif
-static Scheme_Object *(*dll_scheme_intern_symbol)(const char *name);
-static Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *symbol,
+ساکن Scheme_Object *(*dll_scheme_intern_علامت)(ثابت حرف *name);
+ساکن Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *علامت,
 	Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
-    (Scheme_Closed_Prim *prim, void *data, const char *name, mzshort mina,
+ساکن Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
+    (Scheme_Closed_Prim *prim, خالی *ڈیٹا, ثابت حرف *name, mzshort mina,
      mzshort maxa);
-static Scheme_Object *(*dll_scheme_make_integer_value)(long i);
-static Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
+ساکن Scheme_Object *(*dll_scheme_make_integer_قدر)(طویل i);
+ساکن Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
 	Scheme_Object *cdr);
-static Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
-	const char *name, mzshort mina, mzshort maxa);
-# if MZSCHEME_VERSION_MAJOR < 299
-static Scheme_Object *(*dll_scheme_make_string)(const char *chars);
-static Scheme_Object *(*dll_scheme_make_string_output_port)();
-# else
-static Scheme_Object *(*dll_scheme_make_byte_string)(const char *chars);
-static Scheme_Object *(*dll_scheme_make_byte_string_output_port)();
+ساکن Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
+	ثابت حرف *name, mzshort mina, mzshort maxa);
+# اگر MZSCHEME_نسخہ_MAJOR < 299
+ساکن Scheme_Object *(*dll_scheme_make_string)(ثابت حرف *chars);
+ساکن Scheme_Object *(*dll_scheme_make_string_output_پورٹ)();
+# ورنہ
+ساکن Scheme_Object *(*dll_scheme_make_byte_string)(ثابت حرف *chars);
+ساکن Scheme_Object *(*dll_scheme_make_byte_string_output_پورٹ)();
 # endif
-static Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
-	int argc, Scheme_Object **argv);
-static Scheme_Object **(*dll_scheme_make_struct_names)(Scheme_Object *base,
-	Scheme_Object *field_names, int flags, int *count_out);
-static Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *base,
-	Scheme_Object *parent, Scheme_Object *inspector, int num_fields,
-	int num_uninit_fields, Scheme_Object *uninit_val,
+ساکن Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
+	صحیح argc, Scheme_Object **argv);
+ساکن Scheme_Object **(*dll_scheme_make_struct_نام)(Scheme_Object *بنیاد,
+	Scheme_Object *میدان_نام, صحیح flags, صحیح *گنتی_برآمد);
+ساکن Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *بنیاد,
+	Scheme_Object *والد, Scheme_Object *inspector, صحیح عدد_fields,
+	صحیح عدد_uninit_fields, Scheme_Object *uninit_val,
 	Scheme_Object *properties
-# if MZSCHEME_VERSION_MAJOR >= 299
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
 	, Scheme_Object *guard
 # endif
 	);
-static Scheme_Object **(*dll_scheme_make_struct_values)(
-	Scheme_Object *struct_type, Scheme_Object **names, int count,
-	int flags);
-static Scheme_Type (*dll_scheme_make_type)(const char *name);
-static Scheme_Object *(*dll_scheme_make_vector)(int size,
+ساکن Scheme_Object **(*dll_scheme_make_struct_اقدار)(
+	Scheme_Object *struct_type, Scheme_Object **نام, صحیح گنتی,
+	صحیح flags);
+ساکن Scheme_Type (*dll_scheme_make_type)(ثابت حرف *name);
+ساکن Scheme_Object *(*dll_scheme_make_سمتیہ)(صحیح سائز,
 	Scheme_Object *fill);
-static void *(*dll_scheme_malloc_fail_ok)(void *(*f)(size_t), size_t);
-static Scheme_Object *(*dll_scheme_open_input_file)(const char *name,
-	const char *who);
-static Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
+ساکن خالی *(*dll_scheme_malloc_fail_ok)(خالی *(*f)(size_t), size_t);
+ساکن Scheme_Object *(*dll_scheme_open_داخلہ_file)(ثابت حرف *name,
+	ثابت حرف *who);
+ساکن Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
 	Scheme_Env *for_env);
-static int (*dll_scheme_proper_list_length)(Scheme_Object *list);
-static void (*dll_scheme_raise)(Scheme_Object *exn);
-static Scheme_Object *(*dll_scheme_read)(Scheme_Object *port);
-static void (*dll_scheme_signal_error)(const char *msg, ...);
-static void (*dll_scheme_wrong_type)(const char *name, const char *expected,
-	int which, int argc, Scheme_Object **argv);
-# if MZSCHEME_VERSION_MAJOR >= 299
-static void (*dll_scheme_set_param)(Scheme_Config *c, int pos,
+ساکن صحیح (*dll_scheme_proper_list_لمبائی)(Scheme_Object *list);
+ساکن خالی (*dll_scheme_raise)(Scheme_Object *exn);
+ساکن Scheme_Object *(*dll_scheme_read)(Scheme_Object *پورٹ);
+ساکن خالی (*dll_scheme_signal_error)(ثابت حرف *پیغام, ...);
+ساکن خالی (*dll_scheme_wrong_type)(ثابت حرف *name, ثابت حرف *expected,
+	صحیح which, صحیح argc, Scheme_Object **argv);
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
+ساکن خالی (*dll_scheme_سیٹ_param)(Scheme_Config *c, صحیح pos,
 	Scheme_Object *o);
-static Scheme_Config *(*dll_scheme_current_config)(void);
-static Scheme_Object *(*dll_scheme_char_string_to_byte_string)
+ساکن Scheme_Config *(*dll_scheme_current_config)(خالی);
+ساکن Scheme_Object *(*dll_scheme_char_string_مقصد_byte_string)
     (Scheme_Object *s);
-static Scheme_Object *(*dll_scheme_char_string_to_path)
+ساکن Scheme_Object *(*dll_scheme_char_string_مقصد_راستہ)
     (Scheme_Object *s);
-static void *(*dll_scheme_set_collects_path)(Scheme_Object *p);
+ساکن خالی *(*dll_scheme_سیٹ_collects_راستہ)(Scheme_Object *p);
 # endif
-static Scheme_Hash_Table *(*dll_scheme_make_hash_table)(int type);
-static void (*dll_scheme_hash_set)(Scheme_Hash_Table *table,
-	Scheme_Object *key, Scheme_Object *value);
-static Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_Table *table,
-	Scheme_Object *key);
-static Scheme_Object *(*dll_scheme_make_double)(double d);
-static Scheme_Object *(*dll_scheme_make_sized_byte_string)(char *chars,
-	long len, int copy);
-static Scheme_Object *(*dll_scheme_namespace_require)(Scheme_Object *req);
-static Scheme_Object *(*dll_scheme_dynamic_wind)(void (*pre)(void *), Scheme_Object *(* volatile act)(void *), void (* volatile post)(void *), Scheme_Object *(*jmp_handler)(void *), void * volatile data);
+ساکن Scheme_Hash_جدول *(*dll_scheme_make_hash_جدول)(صحیح type);
+ساکن خالی (*dll_scheme_hash_سیٹ)(Scheme_Hash_جدول *جدول,
+	Scheme_Object *کلید, Scheme_Object *قدر);
+ساکن Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_جدول *جدول,
+	Scheme_Object *کلید);
+ساکن Scheme_Object *(*dll_scheme_make_double)(دوہرا d);
+ساکن Scheme_Object *(*dll_scheme_make_sized_byte_string)(حرف *chars,
+	طویل len, صحیح copy);
+ساکن Scheme_Object *(*dll_scheme_namespace_require)(Scheme_Object *req);
+ساکن Scheme_Object *(*dll_scheme_dynamic_wind)(خالی (*pre)(خالی *), Scheme_Object *(* متلون act)(خالی *), خالی (* متلون post)(خالی *), Scheme_Object *(*jmp_handler)(خالی *), خالی * متلون ڈیٹا);
 # ifdef MZ_PRECISE_GC
-static void *(*dll_GC_malloc_one_tagged)(size_t size_in_bytes);
-static void (*dll_GC_register_traversers)(short tag, Size_Proc size, Mark_Proc mark, Fixup_Proc fixup, int is_constant_size, int is_atomic);
+ساکن خالی *(*dll_GC_malloc_one_tagged)(size_t سائز_اندر_بائٹیں);
+ساکن خالی (*dll_GC_رجسٹر_traversers)(مختصر لیبل, سائز_Proc سائز, Mark_Proc mark, Fixup_Proc fixup, صحیح is_constant_سائز, صحیح is_atomic);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
-static void (*dll_scheme_init_collection_paths)(Scheme_Env *global_env, Scheme_Object *extra_dirs);
-static void **(*dll_scheme_malloc_immobile_box)(void *p);
-static void (*dll_scheme_free_immobile_box)(void **b);
+# اگر MZSCHEME_نسخہ_MAJOR >= 400
+ساکن خالی (*dll_scheme_init_collection_paths)(Scheme_Env *global_env, Scheme_Object *extra_dirs);
+ساکن خالی **(*dll_scheme_malloc_immobile_box)(خالی *p);
+ساکن خالی (*dll_scheme_free_immobile_box)(خالی **b);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
+# اگر MZSCHEME_نسخہ_MAJOR >= 500
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
-static int (*dll_scheme_main_setup)(int no_auto_statics, Scheme_Env_Main _main, int argc, char **argv);
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-static void (*dll_scheme_register_tls_space)(void *tls_space, int _tls_index);
+ساکن صحیح (*dll_scheme_main_تیاری)(صحیح no_auto_statics, Scheme_Env_Main _main, صحیح argc, حرف **argv);
+#   اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || MZSCHEME_نسخہ_MAJOR >= 603
+ساکن خالی (*dll_scheme_رجسٹر_tls_space)(خالی *tls_space, صحیح tls_اشاریہ);
 #   endif
 #  endif
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
-static Thread_Local_Variables *(*dll_scheme_external_get_thread_local_variables)(void);
+#  اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_بذریعہ_PROC)
+ساکن Thread_Local_Variables *(*dll_scheme_external_get_thread_local_variables)(خالی);
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
-static void (*dll_scheme_embedded_load)(intptr_t len, const char *s, int predefined);
-static void (*dll_scheme_register_embedded_load)(intptr_t len, const char *s);
-static void (*dll_scheme_set_config_path)(Scheme_Object *p);
+# اگر MZSCHEME_نسخہ_MAJOR >= 600
+ساکن خالی (*dll_scheme_embedded_بھرو)(intptr_t len, ثابت حرف *s, صحیح predefined);
+ساکن خالی (*dll_scheme_رجسٹر_embedded_بھرو)(intptr_t len, ثابت حرف *s);
+ساکن خالی (*dll_scheme_سیٹ_config_راستہ)(Scheme_Object *p);
 # endif
 
-# if defined(DYNAMIC_MZSCHEME)
+# اگر defined(DYNAMIC_MZSCHEME)
 
 // arrays are imported directly
 #  define scheme_eof dll_scheme_eof
@@ -371,7 +371,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_true dll_scheme_true
 
 // pointers are GetProcAddress'ed as pointers to pointer
-#  if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
+#  اگر !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_جدول)
 #   define scheme_current_thread (*dll_scheme_current_thread_ptr)
 #  endif
 #  define scheme_console_printf (*dll_scheme_console_printf_ptr)
@@ -382,83 +382,83 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define GC_malloc dll_GC_malloc
 #  define GC_malloc_atomic dll_GC_malloc_atomic
 
-#  define scheme_add_global dll_scheme_add_global
-#  define scheme_add_global_symbol dll_scheme_add_global_symbol
+#  define scheme_جوڑو_global dll_scheme_جوڑو_global
+#  define scheme_جوڑو_global_علامت dll_scheme_جوڑو_global_علامت
 #  define scheme_apply dll_scheme_apply
 #  define scheme_basic_env dll_scheme_basic_env
-#  define scheme_builtin_value dll_scheme_builtin_value
-#  if MZSCHEME_VERSION_MAJOR >= 299
-#   define scheme_byte_string_to_char_string dll_scheme_byte_string_to_char_string
-#   define scheme_make_path dll_scheme_make_path
+#  define scheme_builtin_قدر dll_scheme_builtin_قدر
+#  اگر MZSCHEME_نسخہ_MAJOR >= 299
+#   define scheme_byte_string_مقصد_char_string dll_scheme_byte_string_مقصد_char_string
+#   define scheme_make_راستہ dll_scheme_make_راستہ
 #  endif
-#  define scheme_check_threads dll_scheme_check_threads
-#  define scheme_close_input_port dll_scheme_close_input_port
-#  define scheme_count_lines dll_scheme_count_lines
+#  define scheme_check_دھاگے dll_scheme_check_دھاگے
+#  define scheme_close_داخلہ_پورٹ dll_scheme_close_داخلہ_پورٹ
+#  define scheme_گنتی_سطریں dll_scheme_گنتی_سطریں
 #  define scheme_current_continuation_marks \
     dll_scheme_current_continuation_marks
 #  define scheme_display dll_scheme_display
-#  define scheme_display_to_string dll_scheme_display_to_string
+#  define scheme_display_مقصد_string dll_scheme_display_مقصد_string
 #  define scheme_do_eval dll_scheme_do_eval
 #  define scheme_dont_gc_ptr dll_scheme_dont_gc_ptr
 #  define scheme_eq dll_scheme_eq
 #  define scheme_eval dll_scheme_eval
 #  define scheme_eval_string dll_scheme_eval_string
 #  define scheme_eval_string_all dll_scheme_eval_string_all
-#  define scheme_finish_primitive_module dll_scheme_finish_primitive_module
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  define scheme_اختتام_primitive_module dll_scheme_اختتام_primitive_module
+#  اگر MZSCHEME_نسخہ_MAJOR < 299
 #   define scheme_format dll_scheme_format
-#  else
+#  ورنہ
 #   define scheme_format_utf8 dll_scheme_format_utf8
 #  endif
 #  define scheme_gc_ptr_ok dll_scheme_gc_ptr_ok
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  اگر MZSCHEME_نسخہ_MAJOR < 299
 #   define scheme_get_sized_byte_string_output dll_scheme_get_sized_string_output
-#  else
+#  ورنہ
 #   define scheme_get_sized_byte_string_output \
     dll_scheme_get_sized_byte_string_output
 #   define scheme_get_param dll_scheme_get_param
 #  endif
-#  define scheme_intern_symbol dll_scheme_intern_symbol
+#  define scheme_intern_علامت dll_scheme_intern_علامت
 #  define scheme_lookup_global dll_scheme_lookup_global
 #  define scheme_make_closed_prim_w_arity dll_scheme_make_closed_prim_w_arity
-#  define scheme_make_integer_value dll_scheme_make_integer_value
+#  define scheme_make_integer_قدر dll_scheme_make_integer_قدر
 #  define scheme_make_pair dll_scheme_make_pair
 #  define scheme_make_prim_w_arity dll_scheme_make_prim_w_arity
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  اگر MZSCHEME_نسخہ_MAJOR < 299
 #   define scheme_make_byte_string dll_scheme_make_string
-#   define scheme_make_byte_string_output_port dll_scheme_make_string_output_port
-#  else
+#   define scheme_make_byte_string_output_پورٹ dll_scheme_make_string_output_پورٹ
+#  ورنہ
 #   define scheme_make_byte_string dll_scheme_make_byte_string
-#   define scheme_make_byte_string_output_port \
-    dll_scheme_make_byte_string_output_port
+#   define scheme_make_byte_string_output_پورٹ \
+    dll_scheme_make_byte_string_output_پورٹ
 #  endif
 #  define scheme_make_struct_instance dll_scheme_make_struct_instance
-#  define scheme_make_struct_names dll_scheme_make_struct_names
+#  define scheme_make_struct_نام dll_scheme_make_struct_نام
 #  define scheme_make_struct_type dll_scheme_make_struct_type
-#  define scheme_make_struct_values dll_scheme_make_struct_values
+#  define scheme_make_struct_اقدار dll_scheme_make_struct_اقدار
 #  define scheme_make_type dll_scheme_make_type
-#  define scheme_make_vector dll_scheme_make_vector
+#  define scheme_make_سمتیہ dll_scheme_make_سمتیہ
 #  define scheme_malloc_fail_ok dll_scheme_malloc_fail_ok
-#  define scheme_open_input_file dll_scheme_open_input_file
+#  define scheme_open_داخلہ_file dll_scheme_open_داخلہ_file
 #  define scheme_primitive_module dll_scheme_primitive_module
-#  define scheme_proper_list_length dll_scheme_proper_list_length
+#  define scheme_proper_list_لمبائی dll_scheme_proper_list_لمبائی
 #  define scheme_raise dll_scheme_raise
 #  define scheme_read dll_scheme_read
-#  define scheme_register_static dll_scheme_register_static
-#  define scheme_set_stack_base dll_scheme_set_stack_base
+#  define scheme_رجسٹر_static dll_scheme_رجسٹر_static
+#  define scheme_سیٹ_ڈھیر_بنیاد dll_scheme_سیٹ_ڈھیر_بنیاد
 #  define scheme_signal_error dll_scheme_signal_error
 #  define scheme_wrong_type dll_scheme_wrong_type
-#  if MZSCHEME_VERSION_MAJOR >= 299
-#   define scheme_set_param dll_scheme_set_param
+#  اگر MZSCHEME_نسخہ_MAJOR >= 299
+#   define scheme_سیٹ_param dll_scheme_سیٹ_param
 #   define scheme_current_config dll_scheme_current_config
-#   define scheme_char_string_to_byte_string \
-    dll_scheme_char_string_to_byte_string
-#   define scheme_char_string_to_path \
-    dll_scheme_char_string_to_path
-#   define scheme_set_collects_path dll_scheme_set_collects_path
+#   define scheme_char_string_مقصد_byte_string \
+    dll_scheme_char_string_مقصد_byte_string
+#   define scheme_char_string_مقصد_راستہ \
+    dll_scheme_char_string_مقصد_راستہ
+#   define scheme_سیٹ_collects_راستہ dll_scheme_سیٹ_collects_راستہ
 #  endif
-#  define scheme_make_hash_table dll_scheme_make_hash_table
-#  define scheme_hash_set dll_scheme_hash_set
+#  define scheme_make_hash_جدول dll_scheme_make_hash_جدول
+#  define scheme_hash_سیٹ dll_scheme_hash_سیٹ
 #  define scheme_hash_get dll_scheme_hash_get
 #  define scheme_make_double dll_scheme_make_double
 #  define scheme_make_sized_byte_string dll_scheme_make_sized_byte_string
@@ -466,33 +466,33 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_dynamic_wind dll_scheme_dynamic_wind
 #  ifdef MZ_PRECISE_GC
 #   define GC_malloc_one_tagged dll_GC_malloc_one_tagged
-#   define GC_register_traversers dll_GC_register_traversers
+#   define GC_رجسٹر_traversers dll_GC_رجسٹر_traversers
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 400
+#  اگر MZSCHEME_نسخہ_MAJOR >= 400
 #   ifdef TRAMPOLINED_MZVIM_STARTUP
-#    define scheme_main_setup dll_scheme_main_setup
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-#     define scheme_register_tls_space dll_scheme_register_tls_space
+#    define scheme_main_تیاری dll_scheme_main_تیاری
+#    اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || MZSCHEME_نسخہ_MAJOR >= 603
+#     define scheme_رجسٹر_tls_space dll_scheme_رجسٹر_tls_space
 #    endif
 #   endif
 #   define scheme_init_collection_paths dll_scheme_init_collection_paths
 #   define scheme_malloc_immobile_box dll_scheme_malloc_immobile_box
 #   define scheme_free_immobile_box dll_scheme_free_immobile_box
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 600
-#   define scheme_embedded_load dll_scheme_embedded_load
-#   define scheme_register_embedded_load dll_scheme_register_embedded_load
-#   define scheme_set_config_path dll_scheme_set_config_path
+#  اگر MZSCHEME_نسخہ_MAJOR >= 600
+#   define scheme_embedded_بھرو dll_scheme_embedded_بھرو
+#   define scheme_رجسٹر_embedded_بھرو dll_scheme_رجسٹر_embedded_بھرو
+#   define scheme_سیٹ_config_راستہ dll_scheme_سیٹ_config_راستہ
 #  endif
 
 #  ifndef PROTO
-#   if MZSCHEME_VERSION_MAJOR >= 500
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+#   اگر MZSCHEME_نسخہ_MAJOR >= 500
+#    اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_بذریعہ_PROC)
 // define as function for macro in schthread.h
 Thread_Local_Variables *
-scheme_external_get_thread_local_variables(void)
+scheme_external_get_thread_local_variables(خالی)
 {
-    return dll_scheme_external_get_thread_local_variables();
+    واپس dll_scheme_external_get_thread_local_variables();
 }
 #    endif
 #   endif
@@ -500,261 +500,261 @@ scheme_external_get_thread_local_variables(void)
 
 # endif
 
-typedef struct
+قسمتعریف ساخت
 {
-    char    *name;
-    void    **ptr;
+    حرف    *name;
+    خالی    **ptr;
 } Thunk_Info;
 
-static Thunk_Info mzgc_imports[] = {
-    {"GC_malloc", (void **)&dll_GC_malloc},
-    {"GC_malloc_atomic", (void **)&dll_GC_malloc_atomic},
-    {NULL, NULL}};
+ساکن Thunk_Info mzgc_imports[] = {
+    {"GC_malloc", (خالی **)&dll_GC_malloc},
+    {"GC_malloc_atomic", (خالی **)&dll_GC_malloc_atomic},
+    {تہی, تہی}};
 
-static Thunk_Info mzsch_imports[] = {
-    {"scheme_eof", (void **)&dll_scheme_eof},
-    {"scheme_false", (void **)&dll_scheme_false},
-    {"scheme_void", (void **)&dll_scheme_void},
-    {"scheme_null", (void **)&dll_scheme_null},
-    {"scheme_true", (void **)&dll_scheme_true},
-# if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
-    {"scheme_current_thread", (void **)&dll_scheme_current_thread_ptr},
+ساکن Thunk_Info mzsch_imports[] = {
+    {"scheme_eof", (خالی **)&dll_scheme_eof},
+    {"scheme_false", (خالی **)&dll_scheme_false},
+    {"scheme_void", (خالی **)&dll_scheme_void},
+    {"scheme_null", (خالی **)&dll_scheme_null},
+    {"scheme_true", (خالی **)&dll_scheme_true},
+# اگر !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_جدول)
+    {"scheme_current_thread", (خالی **)&dll_scheme_current_thread_ptr},
 # endif
-    {"scheme_console_printf", (void **)&dll_scheme_console_printf_ptr},
-    {"scheme_console_output", (void **)&dll_scheme_console_output_ptr},
+    {"scheme_console_printf", (خالی **)&dll_scheme_console_printf_ptr},
+    {"scheme_console_output", (خالی **)&dll_scheme_console_output_ptr},
     {"scheme_notify_multithread",
-	(void **)&dll_scheme_notify_multithread_ptr},
-    {"scheme_add_global", (void **)&dll_scheme_add_global},
-    {"scheme_add_global_symbol", (void **)&dll_scheme_add_global_symbol},
-    {"scheme_apply", (void **)&dll_scheme_apply},
-    {"scheme_basic_env", (void **)&dll_scheme_basic_env},
-# if MZSCHEME_VERSION_MAJOR >= 299
-    {"scheme_byte_string_to_char_string", (void **)&dll_scheme_byte_string_to_char_string},
-    {"scheme_make_path", (void **)&dll_scheme_make_path},
+	(خالی **)&dll_scheme_notify_multithread_ptr},
+    {"scheme_add_global", (خالی **)&dll_scheme_جوڑو_global},
+    {"scheme_add_global_symbol", (خالی **)&dll_scheme_جوڑو_global_علامت},
+    {"scheme_apply", (خالی **)&dll_scheme_apply},
+    {"scheme_basic_env", (خالی **)&dll_scheme_basic_env},
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
+    {"scheme_byte_string_to_char_string", (خالی **)&dll_scheme_byte_string_مقصد_char_string},
+    {"scheme_make_path", (خالی **)&dll_scheme_make_راستہ},
 # endif
-    {"scheme_builtin_value", (void **)&dll_scheme_builtin_value},
-    {"scheme_check_threads", (void **)&dll_scheme_check_threads},
-    {"scheme_close_input_port", (void **)&dll_scheme_close_input_port},
-    {"scheme_count_lines", (void **)&dll_scheme_count_lines},
+    {"scheme_builtin_value", (خالی **)&dll_scheme_builtin_قدر},
+    {"scheme_check_threads", (خالی **)&dll_scheme_check_دھاگے},
+    {"scheme_close_input_port", (خالی **)&dll_scheme_close_داخلہ_پورٹ},
+    {"scheme_count_lines", (خالی **)&dll_scheme_گنتی_سطریں},
     {"scheme_current_continuation_marks",
-	(void **)&dll_scheme_current_continuation_marks},
-    {"scheme_display", (void **)&dll_scheme_display},
-    {"scheme_display_to_string", (void **)&dll_scheme_display_to_string},
-    {"scheme_do_eval", (void **)&dll_scheme_do_eval},
-    {"scheme_dont_gc_ptr", (void **)&dll_scheme_dont_gc_ptr},
-    {"scheme_eq", (void **)&dll_scheme_eq},
-    {"scheme_eval", (void **)&dll_scheme_eval},
-    {"scheme_eval_string", (void **)&dll_scheme_eval_string},
-    {"scheme_eval_string_all", (void **)&dll_scheme_eval_string_all},
+	(خالی **)&dll_scheme_current_continuation_marks},
+    {"scheme_display", (خالی **)&dll_scheme_display},
+    {"scheme_display_to_string", (خالی **)&dll_scheme_display_مقصد_string},
+    {"scheme_do_eval", (خالی **)&dll_scheme_do_eval},
+    {"scheme_dont_gc_ptr", (خالی **)&dll_scheme_dont_gc_ptr},
+    {"scheme_eq", (خالی **)&dll_scheme_eq},
+    {"scheme_eval", (خالی **)&dll_scheme_eval},
+    {"scheme_eval_string", (خالی **)&dll_scheme_eval_string},
+    {"scheme_eval_string_all", (خالی **)&dll_scheme_eval_string_all},
     {"scheme_finish_primitive_module",
-	(void **)&dll_scheme_finish_primitive_module},
-# if MZSCHEME_VERSION_MAJOR < 299
-    {"scheme_format", (void **)&dll_scheme_format},
-# else
-    {"scheme_format_utf8", (void **)&dll_scheme_format_utf8},
-    {"scheme_get_param", (void **)&dll_scheme_get_param},
+	(خالی **)&dll_scheme_اختتام_primitive_module},
+# اگر MZSCHEME_نسخہ_MAJOR < 299
+    {"scheme_format", (خالی **)&dll_scheme_format},
+# ورنہ
+    {"scheme_format_utf8", (خالی **)&dll_scheme_format_utf8},
+    {"scheme_get_param", (خالی **)&dll_scheme_get_param},
 # endif
-    {"scheme_gc_ptr_ok", (void **)&dll_scheme_gc_ptr_ok},
-# if MZSCHEME_VERSION_MAJOR < 299
+    {"scheme_gc_ptr_ok", (خالی **)&dll_scheme_gc_ptr_ok},
+# اگر MZSCHEME_نسخہ_MAJOR < 299
     {"scheme_get_sized_string_output",
-	(void **)&dll_scheme_get_sized_string_output},
-# else
+	(خالی **)&dll_scheme_get_sized_string_output},
+# ورنہ
     {"scheme_get_sized_byte_string_output",
-	(void **)&dll_scheme_get_sized_byte_string_output},
+	(خالی **)&dll_scheme_get_sized_byte_string_output},
 # endif
-    {"scheme_intern_symbol", (void **)&dll_scheme_intern_symbol},
-    {"scheme_lookup_global", (void **)&dll_scheme_lookup_global},
+    {"scheme_intern_symbol", (خالی **)&dll_scheme_intern_علامت},
+    {"scheme_lookup_global", (خالی **)&dll_scheme_lookup_global},
     {"scheme_make_closed_prim_w_arity",
-	(void **)&dll_scheme_make_closed_prim_w_arity},
-    {"scheme_make_integer_value", (void **)&dll_scheme_make_integer_value},
-    {"scheme_make_pair", (void **)&dll_scheme_make_pair},
-    {"scheme_make_prim_w_arity", (void **)&dll_scheme_make_prim_w_arity},
-# if MZSCHEME_VERSION_MAJOR < 299
-    {"scheme_make_string", (void **)&dll_scheme_make_string},
+	(خالی **)&dll_scheme_make_closed_prim_w_arity},
+    {"scheme_make_integer_value", (خالی **)&dll_scheme_make_integer_قدر},
+    {"scheme_make_pair", (خالی **)&dll_scheme_make_pair},
+    {"scheme_make_prim_w_arity", (خالی **)&dll_scheme_make_prim_w_arity},
+# اگر MZSCHEME_نسخہ_MAJOR < 299
+    {"scheme_make_string", (خالی **)&dll_scheme_make_string},
     {"scheme_make_string_output_port",
-	(void **)&dll_scheme_make_string_output_port},
-# else
-    {"scheme_make_byte_string", (void **)&dll_scheme_make_byte_string},
+	(خالی **)&dll_scheme_make_string_output_پورٹ},
+# ورنہ
+    {"scheme_make_byte_string", (خالی **)&dll_scheme_make_byte_string},
     {"scheme_make_byte_string_output_port",
-	(void **)&dll_scheme_make_byte_string_output_port},
+	(خالی **)&dll_scheme_make_byte_string_output_پورٹ},
 # endif
     {"scheme_make_struct_instance",
-	(void **)&dll_scheme_make_struct_instance},
-    {"scheme_make_struct_names", (void **)&dll_scheme_make_struct_names},
-    {"scheme_make_struct_type", (void **)&dll_scheme_make_struct_type},
-    {"scheme_make_struct_values", (void **)&dll_scheme_make_struct_values},
-    {"scheme_make_type", (void **)&dll_scheme_make_type},
-    {"scheme_make_vector", (void **)&dll_scheme_make_vector},
-    {"scheme_malloc_fail_ok", (void **)&dll_scheme_malloc_fail_ok},
-    {"scheme_open_input_file", (void **)&dll_scheme_open_input_file},
-    {"scheme_primitive_module", (void **)&dll_scheme_primitive_module},
-    {"scheme_proper_list_length", (void **)&dll_scheme_proper_list_length},
-    {"scheme_raise", (void **)&dll_scheme_raise},
-    {"scheme_read", (void **)&dll_scheme_read},
-    {"scheme_register_static", (void **)&dll_scheme_register_static},
-    {"scheme_set_stack_base", (void **)&dll_scheme_set_stack_base},
-    {"scheme_signal_error", (void **)&dll_scheme_signal_error},
-    {"scheme_wrong_type", (void **)&dll_scheme_wrong_type},
-# if MZSCHEME_VERSION_MAJOR >= 299
-    {"scheme_set_param", (void **)&dll_scheme_set_param},
-    {"scheme_current_config", (void **)&dll_scheme_current_config},
+	(خالی **)&dll_scheme_make_struct_instance},
+    {"scheme_make_struct_names", (خالی **)&dll_scheme_make_struct_نام},
+    {"scheme_make_struct_type", (خالی **)&dll_scheme_make_struct_type},
+    {"scheme_make_struct_values", (خالی **)&dll_scheme_make_struct_اقدار},
+    {"scheme_make_type", (خالی **)&dll_scheme_make_type},
+    {"scheme_make_vector", (خالی **)&dll_scheme_make_سمتیہ},
+    {"scheme_malloc_fail_ok", (خالی **)&dll_scheme_malloc_fail_ok},
+    {"scheme_open_input_file", (خالی **)&dll_scheme_open_داخلہ_file},
+    {"scheme_primitive_module", (خالی **)&dll_scheme_primitive_module},
+    {"scheme_proper_list_length", (خالی **)&dll_scheme_proper_list_لمبائی},
+    {"scheme_raise", (خالی **)&dll_scheme_raise},
+    {"scheme_read", (خالی **)&dll_scheme_read},
+    {"scheme_register_static", (خالی **)&dll_scheme_رجسٹر_static},
+    {"scheme_set_stack_base", (خالی **)&dll_scheme_سیٹ_ڈھیر_بنیاد},
+    {"scheme_signal_error", (خالی **)&dll_scheme_signal_error},
+    {"scheme_wrong_type", (خالی **)&dll_scheme_wrong_type},
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
+    {"scheme_set_param", (خالی **)&dll_scheme_سیٹ_param},
+    {"scheme_current_config", (خالی **)&dll_scheme_current_config},
     {"scheme_char_string_to_byte_string",
-	(void **)&dll_scheme_char_string_to_byte_string},
-    {"scheme_char_string_to_path", (void **)&dll_scheme_char_string_to_path},
-    {"scheme_set_collects_path", (void **)&dll_scheme_set_collects_path},
+	(خالی **)&dll_scheme_char_string_مقصد_byte_string},
+    {"scheme_char_string_to_path", (خالی **)&dll_scheme_char_string_مقصد_راستہ},
+    {"scheme_set_collects_path", (خالی **)&dll_scheme_سیٹ_collects_راستہ},
 # endif
-    {"scheme_make_hash_table", (void **)&dll_scheme_make_hash_table},
-    {"scheme_hash_set", (void **)&dll_scheme_hash_set},
-    {"scheme_hash_get", (void **)&dll_scheme_hash_get},
-    {"scheme_make_double", (void **)&dll_scheme_make_double},
-    {"scheme_make_sized_byte_string", (void **)&dll_scheme_make_sized_byte_string},
-    {"scheme_namespace_require", (void **)&dll_scheme_namespace_require},
-    {"scheme_dynamic_wind", (void **)&dll_scheme_dynamic_wind},
+    {"scheme_make_hash_table", (خالی **)&dll_scheme_make_hash_جدول},
+    {"scheme_hash_set", (خالی **)&dll_scheme_hash_سیٹ},
+    {"scheme_hash_get", (خالی **)&dll_scheme_hash_get},
+    {"scheme_make_double", (خالی **)&dll_scheme_make_double},
+    {"scheme_make_sized_byte_string", (خالی **)&dll_scheme_make_sized_byte_string},
+    {"scheme_namespace_require", (خالی **)&dll_scheme_namespace_require},
+    {"scheme_dynamic_wind", (خالی **)&dll_scheme_dynamic_wind},
 # ifdef MZ_PRECISE_GC
-    {"GC_malloc_one_tagged", (void **)&dll_GC_malloc_one_tagged},
-    {"GC_register_traversers", (void **)&dll_GC_register_traversers},
+    {"GC_malloc_one_tagged", (خالی **)&dll_GC_malloc_one_tagged},
+    {"GC_register_traversers", (خالی **)&dll_GC_رجسٹر_traversers},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
+# اگر MZSCHEME_نسخہ_MAJOR >= 400
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
-    {"scheme_main_setup", (void **)&dll_scheme_main_setup},
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-    {"scheme_register_tls_space", (void **)&dll_scheme_register_tls_space},
+    {"scheme_main_setup", (خالی **)&dll_scheme_main_تیاری},
+#   اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || MZSCHEME_نسخہ_MAJOR >= 603
+    {"scheme_register_tls_space", (خالی **)&dll_scheme_رجسٹر_tls_space},
 #   endif
 #  endif
-    {"scheme_init_collection_paths", (void **)&dll_scheme_init_collection_paths},
-    {"scheme_malloc_immobile_box", (void **)&dll_scheme_malloc_immobile_box},
-    {"scheme_free_immobile_box", (void **)&dll_scheme_free_immobile_box},
+    {"scheme_init_collection_paths", (خالی **)&dll_scheme_init_collection_paths},
+    {"scheme_malloc_immobile_box", (خالی **)&dll_scheme_malloc_immobile_box},
+    {"scheme_free_immobile_box", (خالی **)&dll_scheme_free_immobile_box},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
-    {"scheme_external_get_thread_local_variables", (void **)&dll_scheme_external_get_thread_local_variables},
+# اگر MZSCHEME_نسخہ_MAJOR >= 500
+#  اگر defined(IMPLEMENT_THREAD_LOCAL_بذریعہ_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_بذریعہ_PROC)
+    {"scheme_external_get_thread_local_variables", (خالی **)&dll_scheme_external_get_thread_local_variables},
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
-    {"scheme_embedded_load", (void **)&dll_scheme_embedded_load},
-    {"scheme_register_embedded_load", (void **)&dll_scheme_register_embedded_load},
-    {"scheme_set_config_path", (void **)&dll_scheme_set_config_path},
+# اگر MZSCHEME_نسخہ_MAJOR >= 600
+    {"scheme_embedded_load", (خالی **)&dll_scheme_embedded_بھرو},
+    {"scheme_register_embedded_load", (خالی **)&dll_scheme_رجسٹر_embedded_بھرو},
+    {"scheme_set_config_path", (خالی **)&dll_scheme_سیٹ_config_راستہ},
 # endif
-    {NULL, NULL}};
+    {تہی, تہی}};
 
-static HINSTANCE hMzGC = 0;
-static HINSTANCE hMzSch = 0;
+ساکن HINSTANCE hMzGC = 0;
+ساکن HINSTANCE hMzSch = 0;
 
-static void dynamic_mzscheme_end(void);
-static int mzscheme_runtime_link_init(char *sch_dll, char *gc_dll,
-	int verbose);
+ساکن خالی dynamic_mzscheme_انتہا(خالی);
+ساکن صحیح mzscheme_runtime_link_init(حرف *sch_dll, حرف *gc_dll,
+	صحیح verbose);
 
-    static int
-mzscheme_runtime_link_init(char *sch_dll, char *gc_dll, int verbose)
+    ساکن صحیح
+mzscheme_runtime_link_init(حرف *sch_dll, حرف *gc_dll, صحیح verbose)
 {
-    Thunk_Info *thunk = NULL;
+    Thunk_Info *thunk = تہی;
 
-    if (hMzGC && hMzSch)
-	return OK;
-    hMzSch = vimLoadLib(sch_dll);
-    hMzGC = vimLoadLib(gc_dll);
+    اگر (hMzGC && hMzSch)
+	واپس OK;
+    hMzSch = vim_بھرو_Lib(sch_dll);
+    hMzGC = vim_بھرو_Lib(gc_dll);
 
-    if (!hMzGC)
+    اگر (!hMzGC)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), gc_dll, GetWin32Error());
-	return FAIL;
+	اگر (verbose)
+	    semsg(_(e_could_not_بھرو_library_str_str), gc_dll, GetWin32Error());
+	واپس FAIL;
     }
 
-    if (!hMzSch)
+    اگر (!hMzSch)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str), sch_dll, GetWin32Error());
-	return FAIL;
+	اگر (verbose)
+	    semsg(_(e_could_not_بھرو_library_str_str), sch_dll, GetWin32Error());
+	واپس FAIL;
     }
 
-    for (thunk = mzsch_imports; thunk->name; thunk++)
+    برائے (thunk = mzsch_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
-		    (void *)GetProcAddress(hMzSch, thunk->name)) == NULL)
+	اگر ((*thunk->ptr =
+		    (خالی *)Get_Proc_پتہ(hMzSch, thunk->name)) == تہی)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    اگر (verbose)
+		semsg(_(e_could_not_بھرو_library_function_str), thunk->name);
+	    واپس FAIL;
 	}
     }
-    for (thunk = mzgc_imports; thunk->name; thunk++)
+    برائے (thunk = mzgc_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
-		    (void *)GetProcAddress(hMzGC, thunk->name)) == NULL)
+	اگر ((*thunk->ptr =
+		    (خالی *)Get_Proc_پتہ(hMzGC, thunk->name)) == تہی)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    اگر (verbose)
+		semsg(_(e_could_not_بھرو_library_function_str), thunk->name);
+	    واپس FAIL;
 	}
     }
-    return OK;
+    واپس OK;
 }
 
-    int
-mzscheme_enabled(int verbose)
+    صحیح
+mzscheme_enabled(صحیح verbose)
 {
-    return mzscheme_runtime_link_init(
-	    (char *)p_mzschemedll, (char *)p_mzschemegcdll, verbose) == OK;
+    واپس mzscheme_runtime_link_init(
+	    (حرف *)p_mzschemedll, (حرف *)p_mzschemegcdll, verbose) == OK;
 }
 
-    static void
-dynamic_mzscheme_end(void)
+    ساکن خالی
+dynamic_mzscheme_انتہا(خالی)
 {
-    if (hMzSch)
+    اگر (hMzSch)
     {
 	FreeLibrary(hMzSch);
 	hMzSch = 0;
     }
-    if (hMzGC)
+    اگر (hMzGC)
     {
 	FreeLibrary(hMzGC);
 	hMzGC = 0;
     }
 }
-#endif // DYNAMIC_MZSCHEME
+#اگر_ختم // DYNAMIC_MZSCHEME
 
-#if MZSCHEME_VERSION_MAJOR < 299
-# define GUARANTEED_STRING_ARG(proc, num) GUARANTEE_STRING(proc, num)
-#else
-    static Scheme_Object *
-guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
+#اگر MZSCHEME_نسخہ_MAJOR < 299
+# define GUARANTEED_STRING_ARG(proc, عدد) GUARANTEE_STRING(proc, عدد)
+#ورنہ
+    ساکن Scheme_Object *
+guaranteed_byte_string_arg(حرف *proc, صحیح عدد, صحیح argc, Scheme_Object **argv)
 {
-    if (SCHEME_BYTE_STRINGP(argv[num]))
+    اگر (SCHEME_BYTE_STRINGP(argv[عدد]))
     {
-	return argv[num];
+	واپس argv[عدد];
     }
-    else if (SCHEME_CHAR_STRINGP(argv[num]))
+    ورنہ اگر (SCHEME_CHAR_STRINGP(argv[عدد]))
     {
-	Scheme_Object *tmp = NULL;
+	Scheme_Object *tmp = تہی;
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, argv[num]);
-	MZ_GC_VAR_IN_REG(1, tmp);
+	MZ_GC_VAR_اندر_REG(0, argv[عدد]);
+	MZ_GC_VAR_اندر_REG(1, tmp);
 	MZ_GC_REG();
-	tmp = scheme_char_string_to_byte_string(argv[num]);
+	tmp = scheme_char_string_مقصد_byte_string(argv[عدد]);
 	MZ_GC_UNREG();
-	return tmp;
+	واپس tmp;
     }
-    else
-	scheme_wrong_type(proc, "string", num, argc, argv);
+    ورنہ
+	scheme_wrong_type(proc, "string", عدد, argc, argv);
     // unreachable
-    return scheme_void;
+    واپس scheme_void;
 }
-# define GUARANTEED_STRING_ARG(proc, num) guaranteed_byte_string_arg(proc, num, argc, argv)
-#endif
+# define GUARANTEED_STRING_ARG(proc, عدد) guaranteed_byte_string_arg(proc, عدد, argc, argv)
+#اگر_ختم
 
 // need to put it here for dynamic stuff to work
-#if defined(INCLUDE_MZSCHEME_BASE)
+#اگر defined(INCLUDE_MZSCHEME_بنیاد)
 # include "mzscheme_base.c"
-#endif
+#اگر_ختم
 
 /*
  *========================================================================
@@ -762,333 +762,333 @@ guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
  *========================================================================
  */
 
-static Scheme_Type mz_buffer_type;
-static Scheme_Type mz_window_type;
+ساکن Scheme_Type mz_بفر_type;
+ساکن Scheme_Type mz_کھڑکی_type;
 
-static int initialized = FALSE;
-#ifdef DYNAMIC_MZSCHEME
-static int disabled = FALSE;
-#endif
-static int load_base_module_failed = FALSE;
+ساکن صحیح initialized = FALSE;
+#اگر_تعریف_شدہ DYNAMIC_MZSCHEME
+ساکن صحیح disabled = FALSE;
+#اگر_ختم
+ساکن صحیح بھرو_بنیاد_module_failed = FALSE;
 
 // global environment
-static Scheme_Env    *environment = NULL;
+ساکن Scheme_Env    *environment = تہی;
 // output/error handlers
-static Scheme_Object *curout = NULL;
-static Scheme_Object *curerr = NULL;
+ساکن Scheme_Object *curout = تہی;
+ساکن Scheme_Object *curerr = تہی;
 // exn:vim exception
-static Scheme_Object *exn_catching_apply = NULL;
-static Scheme_Object *exn_p = NULL;
-static Scheme_Object *exn_message = NULL;
-static Scheme_Object *vim_exn = NULL; // Vim Error exception
+ساکن Scheme_Object *exn_catching_apply = تہی;
+ساکن Scheme_Object *exn_p = تہی;
+ساکن Scheme_Object *exn_پیغام = تہی;
+ساکن Scheme_Object *vim_exn = تہی; // Vim Error exception
 
-#if !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
-static void *stack_base = NULL;
-#endif
+#اگر !defined(MZ_PRECISE_GC) || MZSCHEME_نسخہ_MAJOR < 400
+ساکن خالی *ڈھیر_بنیاد = تہی;
+#اگر_ختم
 
-static long range_start;
-static long range_end;
+ساکن طویل range_آغاز;
+ساکن طویل range_انتہا;
 
 // MzScheme threads scheduling stuff
-static int mz_threads_allow = 0;
+ساکن صحیح mz_دھاگے_allow = 0;
 
-#if defined(FEAT_GUI_MSWIN)
-static void CALLBACK timer_proc(HWND, UINT, UINT_PTR, DWORD);
-static UINT timer_id = 0;
-#elif defined(FEAT_GUI_GTK)
-static gboolean timer_proc(gpointer);
-static guint timer_id = 0;
-#elif defined(FEAT_GUI_MOTIF)
-static void timer_proc(XtPointer, XtIntervalId *);
-static XtIntervalId timer_id = (XtIntervalId)0;
-#endif
+#اگر defined(FEAT_GUI_MSWIN)
+ساکن خالی CALLBACK timer_proc(HWND, UINT, UINT_PTR, DWORD);
+ساکن UINT timer_id = 0;
+#وگرنہ_اگر defined(FEAT_GUI_GTK)
+ساکن gboolean timer_proc(gpointer);
+ساکن guint timer_id = 0;
+#وگرنہ_اگر defined(FEAT_GUI_MOTIF)
+ساکن خالی timer_proc(Xt_اشارہ_گر, XtIntervalId *);
+ساکن XtIntervalId timer_id = (XtIntervalId)0;
+#اگر_ختم
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
-    void
-mzvim_check_threads(void)
+#اگر !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
+    خالی
+mzvim_check_دھاگے(خالی)
 {
     // Last time MzScheme threads were scheduled
-    static time_t mz_last_time = 0;
+    ساکن time_t mz_آخری_وقت = 0;
 
-    if (mz_threads_allow && p_mzq > 0)
+    اگر (mz_دھاگے_allow && p_mzq > 0)
     {
-	time_t now = time(NULL);
+	time_t now = وقت(تہی);
 
-	if ((now - mz_last_time) * 1000 > p_mzq)
+	اگر ((now - mz_آخری_وقت) * 1000 > p_mzq)
 	{
-	    mz_last_time = now;
-	    scheme_check_threads();
+	    mz_آخری_وقت = now;
+	    scheme_check_دھاگے();
 	}
     }
 }
-#endif
+#اگر_ختم
 
-#if defined(MZSCHEME_GUI_THREADS)
-static void setup_timer(void);
-static void remove_timer(void);
+#اگر defined(MZSCHEME_GUI_دھاگے)
+ساکن خالی تیاری_timer(خالی);
+ساکن خالی remove_timer(خالی);
 
 // timers are presented in GUI only
-# if defined(FEAT_GUI_MSWIN)
-    static void CALLBACK
+# اگر defined(FEAT_GUI_MSWIN)
+    ساکن خالی CALLBACK
 timer_proc(
-    HWND	hwnd UNUSED,
-    UINT	uMsg UNUSED,
-    UINT_PTR	idEvent UNUSED,
-    DWORD	dwTime UNUSED)
+    HWND	hwnd غیر_مستعمل,
+    UINT	u_پیغام غیر_مستعمل,
+    UINT_PTR	idEvent غیر_مستعمل,
+    DWORD	dw_وقت غیر_مستعمل)
 # elif defined(FEAT_GUI_GTK)
-    static gboolean
-timer_proc(gpointer data UNUSED)
+    ساکن gboolean
+timer_proc(gpointer ڈیٹا غیر_مستعمل)
 # elif defined(FEAT_GUI_MOTIF)
-    static void
-timer_proc(XtPointer timed_out UNUSED, XtIntervalId *interval_id UNUSED)
+    ساکن خالی
+timer_proc(Xt_اشارہ_گر timed_برآمد غیر_مستعمل, XtIntervalId *interval_id غیر_مستعمل)
 # endif
 {
-    scheme_check_threads();
-# if defined(FEAT_GUI_GTK)
-    return TRUE; // continue receiving notifications
+    scheme_check_دھاگے();
+# اگر defined(FEAT_GUI_GTK)
+    واپس TRUE; // continue receiving notifications
 # elif defined(FEAT_GUI_MOTIF)
     // renew timeout
-    if (mz_threads_allow && p_mzq > 0)
-	timer_id = XtAppAddTimeOut(app_context, p_mzq,
-		timer_proc, NULL);
+    اگر (mz_دھاگے_allow && p_mzq > 0)
+	timer_id = Xt_App_جوڑو_وقت_برآمد(app_context, p_mzq,
+		timer_proc, تہی);
 # endif
 }
 
-    static void
-setup_timer(void)
+    ساکن خالی
+تیاری_timer(خالی)
 {
-# if defined(FEAT_GUI_MSWIN)
-    timer_id = SetTimer(NULL, 0, p_mzq, timer_proc);
+# اگر defined(FEAT_GUI_MSWIN)
+    timer_id = سیٹ_Timer(تہی, 0, p_mzq, timer_proc);
 # elif defined(FEAT_GUI_GTK)
-    timer_id = g_timeout_add((guint)p_mzq, (GSourceFunc)timer_proc, NULL);
+    timer_id = g_timeout_جوڑو((guint)p_mzq, (GSourceFunc)timer_proc, تہی);
 # elif defined(FEAT_GUI_MOTIF)
-    timer_id = XtAppAddTimeOut(app_context, p_mzq, timer_proc, NULL);
+    timer_id = Xt_App_جوڑو_وقت_برآمد(app_context, p_mzq, timer_proc, تہی);
 # endif
 }
 
-    static void
-remove_timer(void)
+    ساکن خالی
+remove_timer(خالی)
 {
-# if defined(FEAT_GUI_MSWIN)
-    KillTimer(NULL, timer_id);
+# اگر defined(FEAT_GUI_MSWIN)
+    KillTimer(تہی, timer_id);
 # elif defined(FEAT_GUI_GTK)
-    g_source_remove(timer_id);
+    g_ماخذ_remove(timer_id);
 # elif defined(FEAT_GUI_MOTIF)
-    XtRemoveTimeOut(timer_id);
+    Xt_Remove_وقت_برآمد(timer_id);
 # endif
     timer_id = 0;
 }
 
-#endif // MZSCHEME_GUI_THREADS
+#اگر_ختم // MZSCHEME_GUI_THREADS
 
-    char *
-did_set_mzquantum(optset_T *args UNUSED)
+    حرف *
+did_سیٹ_mzquantum(optset_T *دلائل غیر_مستعمل)
 {
-#if defined(MZSCHEME_GUI_THREADS)
+#اگر defined(MZSCHEME_GUI_دھاگے)
     // reset timer
-    if (timer_id != 0)
+    اگر (timer_id != 0)
 	remove_timer();
-    if (mz_threads_allow && p_mzq > 0 && gui.in_use)
-	setup_timer();
-#endif
-    return NULL;
+    اگر (mz_دھاگے_allow && p_mzq > 0 && gui.اندر_use)
+	تیاری_timer();
+#اگر_ختم
+    واپس تہی;
 }
 
-    static void
-notify_multithread(int on)
+    ساکن خالی
+notify_multithread(صحیح on)
 {
-    mz_threads_allow = on;
-#ifdef MZSCHEME_GUI_THREADS
-    if (on && timer_id == 0 && p_mzq > 0 && gui.in_use)
-	setup_timer();
-    if (!on && timer_id != 0)
+    mz_دھاگے_allow = on;
+#اگر_تعریف_شدہ MZSCHEME_GUI_دھاگے
+    اگر (on && timer_id == 0 && p_mzq > 0 && gui.اندر_use)
+	تیاری_timer();
+    اگر (!on && timer_id != 0)
 	remove_timer();
-#endif
+#اگر_ختم
 }
 
-    void
-mzscheme_end(void)
+    خالی
+mzscheme_انتہا(خالی)
 {
     // We can not unload the DLL.  Racket's thread might be still alive.
-#if 0
+#اگر 0
 # ifdef DYNAMIC_MZSCHEME
-    dynamic_mzscheme_end();
+    dynamic_mzscheme_انتہا();
 # endif
-#endif
+#اگر_ختم
 }
 
-#if HAVE_TLS_SPACE && !defined(VIMDLL)
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+#اگر HAVE_TLS_SPACE && !defined(VIMDLL)
+# اگر defined(_MSC_VER)
+ساکن __declspec(thread) خالی *tls_space;
+خارجی intptr_t tls_اشاریہ;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
-# else
-static THREAD_LOCAL void *tls_space;
-static intptr_t _tls_index = 0;
+ساکن __thread خالی *tls_space;
+خارجی intptr_t tls_اشاریہ;
+# ورنہ
+ساکن THREAD_LOCAL خالی *tls_space;
+ساکن intptr_t tls_اشاریہ = 0;
 # endif
-#endif
+#اگر_ختم
 
 /*
  * mzscheme_main() is called early in main().
  * We may call scheme_main_setup() which calls mzscheme_env_main() which then
  * trampolines into vim_main2(), which never returns.
  */
-    int
-mzscheme_main(void)
+    صحیح
+mzscheme_main(خالی)
 {
-    int	    argc = 0;
-    char    *argv = NULL;
+    صحیح	    argc = 0;
+    حرف    *argv = تہی;
 
-#ifdef DYNAMIC_MZSCHEME
+#اگر_تعریف_شدہ DYNAMIC_MZSCHEME
     /*
      * Racket requires trampolined startup.  We can not load it later.
      * If dynamic dll loading is failed, disable it.
      */
-    if (!mzscheme_enabled(FALSE))
+    اگر (!mzscheme_enabled(FALSE))
     {
 	disabled = TRUE;
-	return vim_main2();
+	واپس vim_main2();
     }
-#endif
-#ifdef HAVE_TLS_SPACE
+#اگر_ختم
+#اگر_تعریف_شدہ HAVE_TLS_SPACE
 # ifdef VIMDLL
-    void **ptls_space;
-    intptr_t tls_index;
-    void (*pget_tls_info)(void ***ptls_space, intptr_t *ptls_index);
+    خالی **ptls_space;
+    intptr_t tls_اشاریہ_2;
+    خالی (*pget_tls_info)(خالی ***ptls_space, intptr_t *ptls_اشاریہ);
 
     // Get the address of get_tls_info() from (g)vim.exe.
-    pget_tls_info = (void *)GetProcAddress(
-				GetModuleHandle(NULL), "get_tls_info");
-    if (pget_tls_info == NULL)
+    pget_tls_info = (خالی *)Get_Proc_پتہ(
+				GetModuleHandle(تہی), "get_tls_info");
+    اگر (pget_tls_info == تہی)
     {
 	disabled = TRUE;
-	return vim_main2();
+	واپس vim_main2();
     }
-    pget_tls_info(&ptls_space, &tls_index);
-    scheme_register_tls_space(ptls_space, tls_index);
-# else
-    scheme_register_tls_space(&tls_space, _tls_index);
+    pget_tls_info(&ptls_space, &tls_اشاریہ_2);
+    scheme_رجسٹر_tls_space(ptls_space, tls_اشاریہ_2);
+# ورنہ
+    scheme_رجسٹر_tls_space(&tls_space, tls_اشاریہ);
 # endif
-#endif
-#ifdef TRAMPOLINED_MZVIM_STARTUP
-    return scheme_main_setup(TRUE, mzscheme_env_main, argc, &argv);
-#else
-    return mzscheme_env_main(NULL, argc, &argv);
-#endif
+#اگر_ختم
+#اگر_تعریف_شدہ TRAMPOLINED_MZVIM_STARTUP
+    واپس scheme_main_تیاری(TRUE, mzscheme_env_main, argc, &argv);
+#ورنہ
+    واپس mzscheme_env_main(تہی, argc, &argv);
+#اگر_ختم
 }
 
-    static int
-mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
+    ساکن صحیح
+mzscheme_env_main(Scheme_Env *env, صحیح argc غیر_مستعمل, حرف **argv غیر_مستعمل)
 {
-#ifdef TRAMPOLINED_MZVIM_STARTUP
+#اگر_تعریف_شدہ TRAMPOLINED_MZVIM_STARTUP
     // Scheme has created the environment for us
     environment = env;
-#else
+#ورنہ
 # ifdef MZ_PRECISE_GC
-    Scheme_Object   *dummy = NULL;
+    Scheme_Object   *dummy = تہی;
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, dummy);
+    MZ_GC_VAR_اندر_REG(0, dummy);
 
-    stack_base = &__gc_var_stack__;
-# else
-    int dummy = 0;
-    stack_base = (void *)&dummy;
+    ڈھیر_بنیاد = &__gc_var_stack__;
+# ورنہ
+    صحیح dummy = 0;
+    ڈھیر_بنیاد = (خالی *)&dummy;
 # endif
-#endif
+#اگر_ختم
 
     vim_main2();
     // not reached, vim_main2() will loop until exit()
 
-    return 0;
+    واپس 0;
 }
 
-    static Scheme_Object*
-load_base_module(void *data)
+    ساکن Scheme_Object*
+بھرو_بنیاد_module(خالی *ڈیٹا)
 {
-    scheme_namespace_require(scheme_intern_symbol((char *)data));
-    return scheme_null;
+    scheme_namespace_require(scheme_intern_علامت((حرف *)ڈیٹا));
+    واپس scheme_null;
 }
 
-    static Scheme_Object *
-load_base_module_on_error(void *data UNUSED)
+    ساکن Scheme_Object *
+بھرو_بنیاد_module_on_error(خالی *ڈیٹا غیر_مستعمل)
 {
-    load_base_module_failed = TRUE;
-    return scheme_null;
+    بھرو_بنیاد_module_failed = TRUE;
+    واپس scheme_null;
 }
 
-    static int
-startup_mzscheme(void)
+    ساکن صحیح
+startup_mzscheme(خالی)
 {
-#ifndef TRAMPOLINED_MZVIM_STARTUP
-    scheme_set_stack_base(stack_base, 1);
-#endif
+#اگر_غیر_تعریف_شدہ TRAMPOLINED_MZVIM_STARTUP
+    scheme_سیٹ_ڈھیر_بنیاد(ڈھیر_بنیاد, 1);
+#اگر_ختم
 
-#ifndef TRAMPOLINED_MZVIM_STARTUP
+#اگر_غیر_تعریف_شدہ TRAMPOLINED_MZVIM_STARTUP
     // in newer versions of precise GC the initial env has been created
     environment = scheme_basic_env();
-#endif
+#اگر_ختم
 
-    MZ_REGISTER_STATIC(environment);
-    MZ_REGISTER_STATIC(curout);
-    MZ_REGISTER_STATIC(curerr);
-    MZ_REGISTER_STATIC(exn_catching_apply);
-    MZ_REGISTER_STATIC(exn_p);
-    MZ_REGISTER_STATIC(exn_message);
-    MZ_REGISTER_STATIC(vim_exn);
+    MZ_رجسٹر_STATIC(environment);
+    MZ_رجسٹر_STATIC(curout);
+    MZ_رجسٹر_STATIC(curerr);
+    MZ_رجسٹر_STATIC(exn_catching_apply);
+    MZ_رجسٹر_STATIC(exn_p);
+    MZ_رجسٹر_STATIC(exn_پیغام);
+    MZ_رجسٹر_STATIC(vim_exn);
 
     MZ_GC_CHECK();
 
-#ifdef INCLUDE_MZSCHEME_BASE
+#اگر_تعریف_شدہ INCLUDE_MZSCHEME_بنیاد
     // invoke function from generated and included mzscheme_base.c
     declare_modules(environment);
-#endif
+#اگر_ختم
 
     // setup 'current-library-collection-paths' parameter
-#if MZSCHEME_VERSION_MAJOR >= 299
+#اگر MZSCHEME_نسخہ_MAJOR >= 299
     {
-	Scheme_Object *coll_path = NULL;
-	int mustfree = FALSE;
+	Scheme_Object *coll_راستہ = تہی;
+	صحیح mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, coll_path);
+	MZ_GC_VAR_اندر_REG(0, coll_راستہ);
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCOLLECTS", &mustfree);
-	if (s != NULL)
+	اگر (s != تہی)
 	{
-	    coll_path = scheme_make_path((char *)s);
+	    coll_راستہ = scheme_make_راستہ((حرف *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    اگر (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_COLLECTS
-	if (coll_path == NULL)
+	اگر (coll_راستہ == تہی)
 	{
-	    coll_path = scheme_make_path(MZSCHEME_COLLECTS);
+	    coll_راستہ = scheme_make_راستہ(MZSCHEME_COLLECTS);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (coll_path != NULL)
+	اگر (coll_راستہ != تہی)
 	{
-	    scheme_set_collects_path(coll_path);
+	    scheme_سیٹ_collects_راستہ(coll_راستہ);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
     }
-#else
+#ورنہ
 # ifdef MZSCHEME_COLLECTS
     {
-	Scheme_Object	*coll_string = NULL;
-	Scheme_Object	*coll_pair = NULL;
-	Scheme_Config	*config = NULL;
+	Scheme_Object	*coll_string = تہی;
+	Scheme_Object	*coll_pair = تہی;
+	Scheme_Config	*config = تہی;
 
 	MZ_GC_DECL_REG(3);
-	MZ_GC_VAR_IN_REG(0, coll_string);
-	MZ_GC_VAR_IN_REG(1, coll_pair);
-	MZ_GC_VAR_IN_REG(2, config);
+	MZ_GC_VAR_اندر_REG(0, coll_string);
+	MZ_GC_VAR_اندر_REG(1, coll_pair);
+	MZ_GC_VAR_اندر_REG(2, config);
 	MZ_GC_REG();
 	coll_string = scheme_make_byte_string(MZSCHEME_COLLECTS);
 	MZ_GC_CHECK();
@@ -1096,50 +1096,50 @@ startup_mzscheme(void)
 	MZ_GC_CHECK();
 	config = scheme_current_config();
 	MZ_GC_CHECK();
-	scheme_set_param(config, MZCONFIG_COLLECTION_PATHS, coll_pair);
+	scheme_سیٹ_param(config, MZCONFIG_COLLECTION_PATHS, coll_pair);
 	MZ_GC_CHECK();
 	MZ_GC_UNREG();
     }
 # endif
-#endif
+#اگر_ختم
 
-#if MZSCHEME_VERSION_MAJOR >= 600
+#اگر MZSCHEME_نسخہ_MAJOR >= 600
     {
-	Scheme_Object *config_path = NULL;
-	int mustfree = FALSE;
+	Scheme_Object *config_راستہ = تہی;
+	صحیح mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, config_path);
+	MZ_GC_VAR_اندر_REG(0, config_راستہ);
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCONFIGDIR", &mustfree);
-	if (s != NULL)
+	اگر (s != تہی)
 	{
-	    config_path = scheme_make_path((char *)s);
+	    config_راستہ = scheme_make_راستہ((حرف *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    اگر (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_CONFIGDIR
-	if (config_path == NULL)
+	اگر (config_راستہ == تہی)
 	{
-	    config_path = scheme_make_path(MZSCHEME_CONFIGDIR);
+	    config_راستہ = scheme_make_راستہ(MZSCHEME_CONFIGDIR);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (config_path != NULL)
+	اگر (config_راستہ != تہی)
 	{
-	    scheme_set_config_path(config_path);
+	    scheme_سیٹ_config_راستہ(config_راستہ);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
     }
-#endif
+#اگر_ختم
 
-#if MZSCHEME_VERSION_MAJOR >= 400
+#اگر MZSCHEME_نسخہ_MAJOR >= 400
     scheme_init_collection_paths(environment, scheme_null);
-#endif
+#اگر_ختم
 
     /*
      * versions 4.x do not provide Scheme bindings by default
@@ -1147,19 +1147,19 @@ startup_mzscheme(void)
      */
     {
 	// use error handler to avoid abort
-	scheme_dynamic_wind(NULL, load_base_module, NULL,
-				    load_base_module_on_error, "racket/base");
-	if (load_base_module_failed)
+	scheme_dynamic_wind(تہی, بھرو_بنیاد_module, تہی,
+				    بھرو_بنیاد_module_on_error, "racket/base");
+	اگر (بھرو_بنیاد_module_failed)
 	{
-	    load_base_module_failed = FALSE;
-	    scheme_dynamic_wind(NULL, load_base_module, NULL,
-				    load_base_module_on_error, "scheme/base");
-	    if (load_base_module_failed)
-		return -1;
+	    بھرو_بنیاد_module_failed = FALSE;
+	    scheme_dynamic_wind(تہی, بھرو_بنیاد_module, تہی,
+				    بھرو_بنیاد_module_on_error, "scheme/base");
+	    اگر (بھرو_بنیاد_module_failed)
+		واپس -1;
 	}
     }
 
-    register_vim_exn();
+    رجسٹر_vim_exn();
     // use new environment to initialise exception handling
     init_exn_catching_apply();
 
@@ -1167,71 +1167,71 @@ startup_mzscheme(void)
     scheme_console_output = do_output;
     scheme_console_printf = do_printf;
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     {
-	Scheme_Object	*make_security_guard = NULL;
+	Scheme_Object	*make_security_guard = تہی;
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, make_security_guard);
+	MZ_GC_VAR_اندر_REG(0, make_security_guard);
 	MZ_GC_REG();
 
-# if MZSCHEME_VERSION_MAJOR < 400
+# اگر MZSCHEME_نسخہ_MAJOR < 400
 	{
-	    Scheme_Object	*make_security_guard_symbol = NULL;
+	    Scheme_Object	*make_security_guard_علامت = تہی;
 	    MZ_GC_DECL_REG(1);
-	    MZ_GC_VAR_IN_REG(0, make_security_guard_symbol);
+	    MZ_GC_VAR_اندر_REG(0, make_security_guard_علامت);
 	    MZ_GC_REG();
-	    make_security_guard_symbol = scheme_intern_symbol("make-security-guard");
+	    make_security_guard_علامت = scheme_intern_علامت("make-security-guard");
 	    MZ_GC_CHECK();
 	    make_security_guard = scheme_lookup_global(
-		    make_security_guard_symbol, environment);
+		    make_security_guard_علامت, environment);
 	    MZ_GC_UNREG();
 	}
-# else
-	make_security_guard = scheme_builtin_value("make-security-guard");
+# ورنہ
+	make_security_guard = scheme_builtin_قدر("make-security-guard");
 	MZ_GC_CHECK();
 # endif
 
 	// setup sandbox guards
-	if (make_security_guard != NULL)
+	اگر (make_security_guard != تہی)
 	{
-	    Scheme_Object   *args[3] = {NULL, NULL, NULL};
-	    Scheme_Object   *guard = NULL;
-	    Scheme_Config   *config = NULL;
+	    Scheme_Object   *دلائل[3] = {تہی, تہی, تہی};
+	    Scheme_Object   *guard = تہی;
+	    Scheme_Config   *config = تہی;
 	    MZ_GC_DECL_REG(5);
-	    MZ_GC_ARRAY_VAR_IN_REG(0, args, 3);
-	    MZ_GC_VAR_IN_REG(3, guard);
-	    MZ_GC_VAR_IN_REG(4, config);
+	    MZ_GC_ARRAY_VAR_اندر_REG(0, دلائل, 3);
+	    MZ_GC_VAR_اندر_REG(3, guard);
+	    MZ_GC_VAR_اندر_REG(4, config);
 	    MZ_GC_REG();
 	    config = scheme_current_config();
 	    MZ_GC_CHECK();
-	    args[0] = scheme_get_param(config, MZCONFIG_SECURITY_GUARD);
+	    دلائل[0] = scheme_get_param(config, MZCONFIG_SECURITY_GUARD);
 	    MZ_GC_CHECK();
-	    args[1] = scheme_make_prim_w_arity(sandbox_file_guard,
+	    دلائل[1] = scheme_make_prim_w_arity(sandbox_file_guard,
 		    "sandbox-file-guard", 3, 3);
-	    args[2] = scheme_make_prim_w_arity(sandbox_network_guard,
+	    دلائل[2] = scheme_make_prim_w_arity(sandbox_جال_guard,
 		    "sandbox-network-guard", 4, 4);
-	    guard = scheme_apply(make_security_guard, 3, args);
+	    guard = scheme_apply(make_security_guard, 3, دلائل);
 	    MZ_GC_CHECK();
-	    scheme_set_param(config, MZCONFIG_SECURITY_GUARD, guard);
+	    scheme_سیٹ_param(config, MZCONFIG_SECURITY_GUARD, guard);
 	    MZ_GC_CHECK();
 	    MZ_GC_UNREG();
 	}
 	MZ_GC_UNREG();
     }
-#endif
+#اگر_ختم
     // Create buffer and window types for use in Scheme code
-    mz_buffer_type = scheme_make_type("<vim-buffer>");
+    mz_بفر_type = scheme_make_type("<vim-buffer>");
     MZ_GC_CHECK();
-    mz_window_type = scheme_make_type("<vim-window>");
+    mz_کھڑکی_type = scheme_make_type("<vim-window>");
     MZ_GC_CHECK();
-#ifdef MZ_PRECISE_GC
-    GC_register_traversers(mz_buffer_type,
-	    buffer_size_proc, buffer_mark_proc, buffer_fixup_proc,
+#اگر_تعریف_شدہ MZ_PRECISE_GC
+    GC_رجسٹر_traversers(mz_بفر_type,
+	    بفر_سائز_proc, بفر_mark_proc, بفر_fixup_proc,
 	    TRUE, TRUE);
-    GC_register_traversers(mz_window_type,
-	    window_size_proc, window_mark_proc, window_fixup_proc,
+    GC_رجسٹر_traversers(mz_کھڑکی_type,
+	    کھڑکی_سائز_proc, کھڑکی_mark_proc, کھڑکی_fixup_proc,
 	    TRUE, TRUE);
-#endif
+#اگر_ختم
 
     make_modules();
 
@@ -1241,52 +1241,52 @@ startup_mzscheme(void)
      */
     scheme_notify_multithread = notify_multithread;
 
-    return 0;
+    واپس 0;
 }
 
 /*
  * This routine is called for each new invocation of MzScheme
  * to make sure things are properly initialized.
  */
-    static int
-mzscheme_init(void)
+    ساکن صحیح
+mzscheme_init(خالی)
 {
-    if (!initialized)
+    اگر (!initialized)
     {
-#ifdef DYNAMIC_MZSCHEME
-	if (disabled || !mzscheme_enabled(TRUE))
+#اگر_تعریف_شدہ DYNAMIC_MZSCHEME
+	اگر (disabled || !mzscheme_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_libraries_could_not_be_loaded));
-	    return -1;
+	    واپس -1;
 	}
-#endif
-	if (load_base_module_failed || startup_mzscheme())
+#اگر_ختم
+	اگر (بھرو_بنیاد_module_failed || startup_mzscheme())
 	{
-	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_racket_base_module_could_not_be_loaded));
-	    return -1;
+	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_racket_بنیاد_module_could_not_be_loaded));
+	    واپس -1;
 	}
 	initialized = TRUE;
     }
     {
-	Scheme_Config	*config = NULL;
+	Scheme_Config	*config = تہی;
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, config);
+	MZ_GC_VAR_اندر_REG(0, config);
 	MZ_GC_REG();
 	config = scheme_current_config();
 	MZ_GC_CHECK();
 	// recreate ports each call effectively clearing these ones
-	curout = scheme_make_byte_string_output_port();
+	curout = scheme_make_byte_string_output_پورٹ();
 	MZ_GC_CHECK();
-	curerr = scheme_make_byte_string_output_port();
+	curerr = scheme_make_byte_string_output_پورٹ();
 	MZ_GC_CHECK();
-	scheme_set_param(config, MZCONFIG_OUTPUT_PORT, curout);
+	scheme_سیٹ_param(config, MZCONFIG_OUTPUT_پورٹ, curout);
 	MZ_GC_CHECK();
-	scheme_set_param(config, MZCONFIG_ERROR_PORT, curerr);
+	scheme_سیٹ_param(config, MZCONFIG_ERROR_پورٹ, curerr);
 	MZ_GC_CHECK();
 	MZ_GC_UNREG();
     }
 
-    return 0;
+    واپس 0;
 }
 
 /*
@@ -1298,93 +1298,93 @@ mzscheme_init(void)
 /*
  * Evaluate command with exception handling
  */
-    static int
+    ساکن صحیح
 eval_with_exn_handling(
-    void		*data,
+    خالی		*ڈیٹا,
     Scheme_Closed_Prim	*what,
     Scheme_Object	**ret)
 {
-    Scheme_Object   *value = NULL;
-    Scheme_Object   *exn = NULL;
-    Scheme_Object   *prim = NULL;
+    Scheme_Object   *قدر = تہی;
+    Scheme_Object   *exn = تہی;
+    Scheme_Object   *prim = تہی;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, value);
-    MZ_GC_VAR_IN_REG(1, exn);
-    MZ_GC_VAR_IN_REG(2, prim);
+    MZ_GC_VAR_اندر_REG(0, قدر);
+    MZ_GC_VAR_اندر_REG(1, exn);
+    MZ_GC_VAR_اندر_REG(2, prim);
     MZ_GC_REG();
 
-    prim = scheme_make_closed_prim_w_arity(what, data, "mzvim", 0, 0);
+    prim = scheme_make_closed_prim_w_arity(what, ڈیٹا, "mzvim", 0, 0);
     MZ_GC_CHECK();
-    value = _apply_thunk_catch_exceptions(prim, &exn);
+    قدر = _apply_thunk_catch_exceptions(prim, &exn);
     MZ_GC_CHECK();
 
-    if (!value)
+    اگر (!قدر)
     {
-	value = extract_exn_message(exn);
+	قدر = نکالو_exn_پیغام(exn);
 	// Got an exn?
-	if (value)
+	اگر (قدر)
 	{
-	    scheme_display(value, curerr);   //  Send to stderr-vim
+	    scheme_display(قدر, curerr);   //  Send to stderr-vim
 	    MZ_GC_CHECK();
 	    do_flush();
 	}
 	MZ_GC_UNREG();
 	// `raise' was called on some arbitrary value
-	return FAIL;
+	واپس FAIL;
     }
 
-    if (ret != NULL)	// if pointer to retval supported give it up
-	*ret = value;
+    اگر (ret != تہی)	// if pointer to retval supported give it up
+	*ret = قدر;
     // Print any result, as long as it's not a void
-    else if (!SCHEME_VOIDP(value))
+    ورنہ اگر (!SCHEME_VOIDP(قدر))
     {
-	scheme_display(value, curout);  // Send to stdout-vim
+	scheme_display(قدر, curout);  // Send to stdout-vim
 	MZ_GC_CHECK();
     }
 
     do_flush();
     MZ_GC_UNREG();
-    return OK;
+    واپس OK;
 }
 
 /*
  * :mzscheme
  */
-    static int
-do_mzscheme_command(exarg_T *eap, void *data, Scheme_Closed_Prim *what)
+    ساکن صحیح
+do_mzscheme_command(exarg_T *eap, خالی *ڈیٹا, Scheme_Closed_Prim *what)
 {
-    if (mzscheme_init())
-	return FAIL;
+    اگر (mzscheme_init())
+	واپس FAIL;
 
-    range_start = eap->line1;
-    range_end = eap->line2;
+    range_آغاز = eap->line1;
+    range_انتہا = eap->line2;
 
-    return eval_with_exn_handling(data, what, NULL);
+    واپس eval_with_exn_handling(ڈیٹا, what, تہی);
 }
 
 /*
  * Routine called by VIM when deleting a buffer
  */
-    void
-mzscheme_buffer_free(buf_T *buf)
+    خالی
+mzscheme_بفر_free(buf_T *buf)
 {
-    if (buf->b_mzscheme_ref == NULL)
-	return;
+    اگر (buf->b_mzscheme_ref == تہی)
+	واپس;
 
-    vim_mz_buffer *bp = NULL;
+    vim_mz_بفر *bp = تہی;
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, bp);
+    MZ_GC_VAR_اندر_REG(0, bp);
     MZ_GC_REG();
 
-    bp = BUFFER_REF(buf);
-    bp->buf = INVALID_BUFFER_VALUE;
-#ifdef MZ_PRECISE_GC
+    bp = بفر_REF(buf);
+    bp->buf = INVALID_بفر_قدر;
+#اگر_تعریف_شدہ MZ_PRECISE_GC
     scheme_free_immobile_box(buf->b_mzscheme_ref);
-#else
+#ورنہ
     scheme_gc_ptr_ok(bp);
-#endif
-    buf->b_mzscheme_ref = NULL;
+#اگر_ختم
+    buf->b_mzscheme_ref = تہی;
     MZ_GC_CHECK();
     MZ_GC_UNREG();
 }
@@ -1392,24 +1392,24 @@ mzscheme_buffer_free(buf_T *buf)
 /*
  * Routine called by VIM when deleting a Window
  */
-    void
-mzscheme_window_free(win_T *win)
+    خالی
+mzscheme_کھڑکی_free(win_T *win)
 {
-    if (win->w_mzscheme_ref == NULL)
-	return;
+    اگر (win->w_mzscheme_ref == تہی)
+	واپس;
 
-    vim_mz_window *wp = NULL;
+    vim_mz_کھڑکی *wp = تہی;
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, wp);
+    MZ_GC_VAR_اندر_REG(0, wp);
     MZ_GC_REG();
-    wp = WINDOW_REF(win);
-    wp->win = INVALID_WINDOW_VALUE;
-#ifdef MZ_PRECISE_GC
+    wp = کھڑکی_REF(win);
+    wp->win = INVALID_کھڑکی_قدر;
+#اگر_تعریف_شدہ MZ_PRECISE_GC
     scheme_free_immobile_box(win->w_mzscheme_ref);
-#else
+#ورنہ
     scheme_gc_ptr_ok(wp);
-#endif
-    win->w_mzscheme_ref = NULL;
+#اگر_ختم
+    win->w_mzscheme_ref = تہی;
     MZ_GC_CHECK();
     MZ_GC_UNREG();
 }
@@ -1417,80 +1417,80 @@ mzscheme_window_free(win_T *win)
 /*
  * ":mzscheme" (or ":mz")
  */
-    void
+    خالی
 ex_mzscheme(exarg_T *eap)
 {
     char_u	*script;
 
     script = script_get(eap, eap->arg);
-    if (eap->skip)
-	return;
+    اگر (eap->skip)
+	واپس;
 
-    if (script == NULL)
+    اگر (script == تہی)
 	do_mzscheme_command(eap, eap->arg, do_eval);
-    else
+    ورنہ
     {
 	do_mzscheme_command(eap, script, do_eval);
 	vim_free(script);
     }
 }
 
-    static Scheme_Object *
-do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+    ساکن Scheme_Object *
+do_بھرو(خالی *ڈیٹا, صحیح noargc غیر_مستعمل, Scheme_Object **noargv غیر_مستعمل)
 {
-    Scheme_Object   *expr = NULL;
-    Scheme_Object   *result = NULL;
-    char	    *file = NULL;
-    Port_Info	    *pinfo = (Port_Info *)data;
+    Scheme_Object   *اظہاریہ = تہی;
+    Scheme_Object   *نتیجہ = تہی;
+    حرف	    *file = تہی;
+    پورٹ_Info	    *pinfo = (پورٹ_Info *)ڈیٹا;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, expr);
-    MZ_GC_VAR_IN_REG(1, result);
-    MZ_GC_VAR_IN_REG(2, file);
+    MZ_GC_VAR_اندر_REG(0, اظہاریہ);
+    MZ_GC_VAR_اندر_REG(1, نتیجہ);
+    MZ_GC_VAR_اندر_REG(2, file);
     MZ_GC_REG();
 
-    file = (char *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
+    file = (حرف *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
     MZ_GC_CHECK();
 
     // make Vim expansion
     expand_env((char_u *)pinfo->name, (char_u *)file, MAXPATHL);
-    pinfo->port = scheme_open_input_file(file, "mzfile");
+    pinfo->پورٹ = scheme_open_داخلہ_file(file, "mzfile");
     MZ_GC_CHECK();
-    scheme_count_lines(pinfo->port);  // to get accurate read error location
+    scheme_گنتی_سطریں(pinfo->پورٹ);  // to get accurate read error location
     MZ_GC_CHECK();
 
     // Like REPL but print only last result
-    while (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
+    جب (!SCHEME_EOFP(اظہاریہ = scheme_read(pinfo->پورٹ)))
     {
-	result = scheme_eval(expr, environment);
+	نتیجہ = scheme_eval(اظہاریہ, environment);
 	MZ_GC_CHECK();
     }
 
     // errors will be caught in do_mzscheme_command and ex_mzfile
-    scheme_close_input_port(pinfo->port);
+    scheme_close_داخلہ_پورٹ(pinfo->پورٹ);
     MZ_GC_CHECK();
-    pinfo->port = NULL;
+    pinfo->پورٹ = تہی;
     MZ_GC_UNREG();
-    return result;
+    واپس نتیجہ;
 }
 
 /*
  * :mzfile
  */
-    void
+    خالی
 ex_mzfile(exarg_T *eap)
 {
-    Port_Info	pinfo = {NULL, NULL};
+    پورٹ_Info	pinfo = {تہی, تہی};
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, pinfo.port);
+    MZ_GC_VAR_اندر_REG(0, pinfo.پورٹ);
     MZ_GC_REG();
 
-    pinfo.name = (char *)eap->arg;
-    if (do_mzscheme_command(eap, &pinfo, do_load) != OK
-	    && pinfo.port != NULL)	// looks like port was not closed
+    pinfo.name = (حرف *)eap->arg;
+    اگر (do_mzscheme_command(eap, &pinfo, do_بھرو) != OK
+	    && pinfo.پورٹ != تہی)	// looks like port was not closed
     {
-	scheme_close_input_port(pinfo.port);
+	scheme_close_داخلہ_پورٹ(pinfo.پورٹ);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
@@ -1503,22 +1503,22 @@ ex_mzfile(exarg_T *eap)
  * Matthew Flatt's "Inside PLT MzScheme" document.
  *========================================================================
  */
-    static void
-init_exn_catching_apply(void)
+    ساکن خالی
+init_exn_catching_apply(خالی)
 {
-    if (exn_catching_apply)
-	return;
+    اگر (exn_catching_apply)
+	واپس;
 
-    char *e =
+    حرف *e =
 	"(lambda (thunk) "
 	"(with-handlers ([void (lambda (exn) (cons #f exn))]) "
 	"(cons #t (thunk))))";
 
     exn_catching_apply = scheme_eval_string(e, environment);
     MZ_GC_CHECK();
-    exn_p = scheme_builtin_value("exn?");
+    exn_p = scheme_builtin_قدر("exn?");
     MZ_GC_CHECK();
-    exn_message = scheme_builtin_value("exn-message");
+    exn_پیغام = scheme_builtin_قدر("exn-message");
     MZ_GC_CHECK();
 }
 
@@ -1527,7 +1527,7 @@ init_exn_catching_apply(void)
  * no exception, otherwise returning NULL and setting *exn to the raised
  * value (usually an exn structure).
  */
-    static Scheme_Object *
+    ساکن Scheme_Object *
 _apply_thunk_catch_exceptions(Scheme_Object *f, Scheme_Object **exn)
 {
     Scheme_Object *v;
@@ -1535,28 +1535,28 @@ _apply_thunk_catch_exceptions(Scheme_Object *f, Scheme_Object **exn)
     v = _scheme_apply(exn_catching_apply, 1, &f);
     // v is a pair: (cons #t value) or (cons #f exn)
 
-    if (SCHEME_TRUEP(SCHEME_CAR(v)))
-	return SCHEME_CDR(v);
-    else
+    اگر (SCHEME_TRUEP(SCHEME_CAR(v)))
+	واپس SCHEME_CDR(v);
+    ورنہ
     {
 	*exn = SCHEME_CDR(v);
-	return NULL;
+	واپس تہی;
     }
 }
 
-    static Scheme_Object *
-extract_exn_message(Scheme_Object *v)
+    ساکن Scheme_Object *
+نکالو_exn_پیغام(Scheme_Object *v)
 {
-    if (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
-	return _scheme_apply(exn_message, 1, &v);
-    else
-	return NULL; // Not an exn structure
+    اگر (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
+	واپس _scheme_apply(exn_پیغام, 1, &v);
+    ورنہ
+	واپس تہی; // Not an exn structure
 }
 
-    static Scheme_Object *
-do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+    ساکن Scheme_Object *
+do_eval(خالی *s, صحیح noargc غیر_مستعمل, Scheme_Object **noargv غیر_مستعمل)
 {
-    return scheme_eval_string_all((char *)s, environment, TRUE);
+    واپس scheme_eval_string_all((حرف *)s, environment, TRUE);
 }
 
 /*
@@ -1564,67 +1564,67 @@ do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
  *  3.  MzScheme I/O Handlers
  *========================================================================
  */
-    static void
-do_intrnl_output(char *mesg, int error)
+    ساکن خالی
+do_intrnl_output(حرف *mesg, صحیح error)
 {
-    char *p, *prev;
+    حرف *p, *پچھلا;
 
-    prev = mesg;
-    p = strchr(prev, '\n');
-    while (p)
+    پچھلا = mesg;
+    p = strchr(پچھلا, '\n');
+    جب (p)
     {
 	*p = '\0';
-	if (error)
-	    emsg(prev);
-	else
-	    msg(prev);
-	prev = p + 1;
-	p = strchr(prev, '\n');
+	اگر (error)
+	    emsg(پچھلا);
+	ورنہ
+	    پیغام(پچھلا);
+	پچھلا = p + 1;
+	p = strchr(پچھلا, '\n');
     }
 
-    if (error)
-	emsg(prev);
-    else
-	msg(prev);
+    اگر (error)
+	emsg(پچھلا);
+    ورنہ
+	پیغام(پچھلا);
 }
 
-    static void
-do_output(char *mesg, OUTPUT_LEN_TYPE len UNUSED)
+    ساکن خالی
+do_output(حرف *mesg, OUTPUT_LEN_TYPE len غیر_مستعمل)
 {
     // TODO: use len, the string may not be NUL terminated
     do_intrnl_output(mesg, 0);
 }
 
-    static void
-do_err_output(char *mesg)
+    ساکن خالی
+do_err_output(حرف *mesg)
 {
     do_intrnl_output(mesg, 1);
 }
 
-    static void
-do_printf(char *format, ...)
+    ساکن خالی
+do_printf(حرف *format, ...)
 {
     do_intrnl_output(format, 1);
 }
 
-    static void
-do_flush(void)
+    ساکن خالی
+do_flush(خالی)
 {
-    char *buff;
-    OUTPUT_LEN_TYPE length;
+    حرف *buff;
+    OUTPUT_LEN_TYPE لمبائی;
 
-    buff = scheme_get_sized_byte_string_output(curerr, &length);
+    buff = scheme_get_sized_byte_string_output(curerr, &لمبائی);
     MZ_GC_CHECK();
-    if (length)
+    اگر (لمبائی)
     {
 	do_err_output(buff);
-	return;
+	واپس;
     }
 
-    buff = scheme_get_sized_byte_string_output(curout, &length);
+    buff = scheme_get_sized_byte_string_output(curout, &لمبائی);
     MZ_GC_CHECK();
-    if (length)
-	do_output(buff, length);
+    اگر (لمبائی)
+	do_output(buff, لمبائی);
 }
 
 /*
@@ -1636,231 +1636,231 @@ do_flush(void)
 /*
  * (command {command-string})
  */
-    static Scheme_Object *
-vim_command(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_command(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
-    Scheme_Object *cmd = NULL;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
+    Scheme_Object *cmd = تہی;
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, cmd);
+    MZ_GC_VAR_اندر_REG(0, cmd);
     MZ_GC_REG();
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
     // may be use do_cmdline_cmd?
-    do_cmdline(BYTE_STRING_VALUE(cmd), NULL, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
+    do_cmdline(BYTE_STRING_قدر(cmd), تہی, تہی, DOCMD_NOWAIT|DOCMD_VERBOSE);
     update_screen(UPD_VALID);
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
  * (eval {expr-string})
  */
-    static Scheme_Object *
-vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+vim_eval(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
-#ifdef FEAT_EVAL
-    Vim_Prim		*prim = (Vim_Prim *)data;
-    Scheme_Object	*result = NULL;
-    typval_T		*vim_result;
-    Scheme_Object *expr = NULL;
+#اگر_تعریف_شدہ FEAT_EVAL
+    Vim_Prim		*prim = (Vim_Prim *)ڈیٹا;
+    Scheme_Object	*نتیجہ = تہی;
+    typval_T		*vim_نتیجہ;
+    Scheme_Object *اظہاریہ = تہی;
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, result);
-    MZ_GC_VAR_IN_REG(1, expr);
+    MZ_GC_VAR_اندر_REG(0, نتیجہ);
+    MZ_GC_VAR_اندر_REG(1, اظہاریہ);
     MZ_GC_REG();
-    expr = GUARANTEED_STRING_ARG(prim->name, 0);
+    اظہاریہ = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    vim_result = eval_expr(BYTE_STRING_VALUE(expr), NULL);
+    vim_نتیجہ = eval_اظہاریہ(BYTE_STRING_قدر(اظہاریہ), تہی);
 
-    if (vim_result == NULL)
+    اگر (vim_نتیجہ == تہی)
 	raise_vim_exn(_("invalid expression"));
 
-    result = vim_to_mzscheme(vim_result);
+    نتیجہ = vim_مقصد_mzscheme(vim_نتیجہ);
     MZ_GC_CHECK();
-    free_tv(vim_result);
+    free_tv(vim_نتیجہ);
 
     MZ_GC_UNREG();
-    return result;
-#else
+    واپس نتیجہ;
+#ورنہ
     raise_vim_exn(_("expressions disabled at compile time"));
     // unreachable
-    return scheme_false;
-#endif
+    واپس scheme_false;
+#اگر_ختم
 }
 
 /*
  * (range-start)
  */
-    static Scheme_Object *
-get_range_start(
-    void		*data UNUSED,
-    int			argc UNUSED,
-    Scheme_Object	**argv UNUSED)
+    ساکن Scheme_Object *
+get_range_آغاز(
+    خالی		*ڈیٹا غیر_مستعمل,
+    صحیح			argc غیر_مستعمل,
+    Scheme_Object	**argv غیر_مستعمل)
 {
-    return scheme_make_integer(range_start);
+    واپس scheme_make_integer(range_آغاز);
 }
 
 /*
  * (range-end)
  */
-    static Scheme_Object *
-get_range_end(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+get_range_انتہا(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
-    return scheme_make_integer(range_end);
+    واپس scheme_make_integer(range_انتہا);
 }
 
 /*
  * (beep)
  */
-    static Scheme_Object *
-mzscheme_beep(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+mzscheme_beep(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
     vim_beep(BO_LANG);
-    return scheme_void;
+    واپس scheme_void;
 }
 
-static Scheme_Object *M_global = NULL;
+ساکن Scheme_Object *M_global = تہی;
 
 /*
  * (get-option {option-name}) [buffer/window]
  */
-    static Scheme_Object *
-get_option(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_option(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    long	    value;
-    char	    *strval;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    طویل	    قدر;
+    حرف	    *strval;
     getoption_T	    rc;
-    Scheme_Object   *rval = NULL;
-    Scheme_Object   *name = NULL;
-    int		    scope = 0;
+    Scheme_Object   *rval = تہی;
+    Scheme_Object   *name = تہی;
+    صحیح		    scope = 0;
     buf_T	    *save_curb = curbuf;
     win_T	    *save_curw = curwin;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, rval);
-    MZ_GC_VAR_IN_REG(1, name);
+    MZ_GC_VAR_اندر_REG(0, rval);
+    MZ_GC_VAR_اندر_REG(1, name);
     MZ_GC_REG();
 
     name = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    اگر (argc > 1)
     {
-	if (M_global == NULL)
+	اگر (M_global == تہی)
 	{
-	    MZ_REGISTER_STATIC(M_global);
-	    M_global = scheme_intern_symbol("global");
+	    MZ_رجسٹر_STATIC(M_global);
+	    M_global = scheme_intern_علامت("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	اگر (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	ورنہ اگر (SCHEME_VIMBUFFERP(argv[1]))
 	{
-	    curbuf = get_valid_buffer(argv[1]);
+	    curbuf = get_valid_بفر(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	ورنہ اگر (SCHEME_VIMWINDOWP(argv[1]))
 	{
-	    win_T *win = get_valid_window(argv[1]);
+	    win_T *win = get_valid_کھڑکی(argv[1]);
 
 	    curwin = win;
-	    curbuf = win->w_buffer;
+	    curbuf = win->w_بفر;
 	    scope = OPT_LOCAL;
 	}
-	else
+	ورنہ
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
-    rc = get_option_value(BYTE_STRING_VALUE(name), &value, (char_u **)&strval,
-								  NULL, scope);
+    rc = get_option_قدر(BYTE_STRING_قدر(name), &قدر, (char_u **)&strval,
+								  تہی, scope);
     curbuf = save_curb;
     curwin = save_curw;
 
-    switch (rc)
+    انتخاب (rc)
     {
-    case gov_bool:
-    case gov_number:
+    حالت gov_bool:
+    حالت gov_نمبر:
 	MZ_GC_UNREG();
-	return scheme_make_integer_value(value);
-    case gov_string:
+	واپس scheme_make_integer_قدر(قدر);
+    حالت gov_string:
 	rval = scheme_make_byte_string(strval);
 	MZ_GC_CHECK();
 	vim_free(strval);
 	MZ_GC_UNREG();
-	return rval;
-    case gov_hidden_bool:
-    case gov_hidden_number:
-    case gov_hidden_string:
+	واپس rval;
+    حالت gov_hidden_bool:
+    حالت gov_hidden_نمبر:
+    حالت gov_hidden_string:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("hidden option"));
 	//NOTREACHED
-    case gov_unknown:
+    حالت gov_unknown:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("unknown option"));
 	//NOTREACHED
     }
     // unreachable
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
  * (set-option {option-changing-string} [buffer/window])
  */
-    static Scheme_Object *
-set_option(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_option(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    char_u	*command = NULL;
-    int		scope = 0;
+    char_u	*command = تہی;
+    صحیح		scope = 0;
     buf_T	*save_curb = curbuf;
     win_T	*save_curw = curwin;
-    Vim_Prim	*prim = (Vim_Prim *)data;
-    Scheme_Object *cmd = NULL;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
+    Scheme_Object *cmd = تہی;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, cmd);
+    MZ_GC_VAR_اندر_REG(0, cmd);
     MZ_GC_REG();
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    اگر (argc > 1)
     {
-	if (M_global == NULL)
+	اگر (M_global == تہی)
 	{
-	    MZ_REGISTER_STATIC(M_global);
-	    M_global = scheme_intern_symbol("global");
+	    MZ_رجسٹر_STATIC(M_global);
+	    M_global = scheme_intern_علامت("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	اگر (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	ورنہ اگر (SCHEME_VIMBUFFERP(argv[1]))
 	{
-	    curbuf = get_valid_buffer(argv[1]);
+	    curbuf = get_valid_بفر(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	ورنہ اگر (SCHEME_VIMWINDOWP(argv[1]))
 	{
-	    win_T *win = get_valid_window(argv[1]);
+	    win_T *win = get_valid_کھڑکی(argv[1]);
 	    curwin = win;
-	    curbuf = win->w_buffer;
+	    curbuf = win->w_بفر;
 	    scope = OPT_LOCAL;
 	}
-	else
+	ورنہ
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
     // do_set can modify cmd, make copy
-    command = vim_strsave(BYTE_STRING_VALUE(cmd));
+    command = vim_strsave(BYTE_STRING_قدر(cmd));
     MZ_GC_UNREG();
-    do_set(command, scope);
+    do_سیٹ(command, scope);
     vim_free(command);
     update_screen(UPD_NOT_VALID);
     curbuf = save_curb;
     curwin = save_curw;
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
@@ -1872,60 +1872,60 @@ set_option(void *data, int argc, Scheme_Object **argv)
 /*
  * (curr-win)
  */
-    static Scheme_Object *
-get_curr_win(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+get_curr_win(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
-    return (Scheme_Object *)get_vim_curr_window();
+    واپس (Scheme_Object *)get_vim_curr_کھڑکی();
 }
 
 /*
  * (win-count)
  */
-    static Scheme_Object *
-get_window_count(
-    void		*data UNUSED,
-    int			argc UNUSED,
-    Scheme_Object	**argv UNUSED)
+    ساکن Scheme_Object *
+get_کھڑکی_گنتی(
+    خالی		*ڈیٹا غیر_مستعمل,
+    صحیح			argc غیر_مستعمل,
+    Scheme_Object	**argv غیر_مستعمل)
 {
-    int	    n = 0;
+    صحیح	    n = 0;
     win_T   *w;
 
     FOR_ALL_WINDOWS(w)
 	++n;
-    return scheme_make_integer(n);
+    واپس scheme_make_integer(n);
 }
 
 /*
  * (get-win-list [buffer])
  */
-    static Scheme_Object *
-get_window_list(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_کھڑکی_list(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf;
     Scheme_Object   *list;
     win_T	    *w = firstwin;
 
-    buf = get_buffer_arg(prim->name, 0, argc, argv);
+    buf = get_بفر_arg(prim->name, 0, argc, argv);
     list = scheme_null;
 
-    for ( ; w != NULL; w = w->w_next)
-	if (w->w_buffer == buf->buf)
+    برائے ( ; w != تہی; w = w->w_اگلا)
+	اگر (w->w_بفر == buf->buf)
 	{
-	    list = scheme_make_pair(window_new(w), list);
+	    list = scheme_make_pair(کھڑکی_new(w), list);
 	    MZ_GC_CHECK();
 	}
 
-    return list;
+    واپس list;
 }
 
-    static Scheme_Object *
-window_new(win_T *win)
+    ساکن Scheme_Object *
+کھڑکی_new(win_T *win)
 {
-    vim_mz_window *self = NULL;
+    vim_mz_کھڑکی *self = تہی;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, self);
+    MZ_GC_VAR_اندر_REG(0, self);
 
     // We need to handle deletion of windows underneath us.
     // If we add a "w_mzscheme_ref" field to the win_T structure,
@@ -1934,205 +1934,205 @@ window_new(win_T *win)
     // On a win_free() we set the Scheme object's win_T *field
     // to an invalid value. We trap all uses of a window
     // object, and reject them if the win_T *field is invalid.
-    if (win->w_mzscheme_ref != NULL)
-	return (Scheme_Object *)WINDOW_REF(win);
+    اگر (win->w_mzscheme_ref != تہی)
+	واپس (Scheme_Object *)کھڑکی_REF(win);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_window));
-    CLEAR_POINTER(self);
-#ifdef MZ_PRECISE_GC
-    win->w_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, حجم(vim_mz_کھڑکی));
+    CLEAR_اشارہ_گر(self);
+#اگر_تعریف_شدہ MZ_PRECISE_GC
+    win->w_mzscheme_ref = scheme_malloc_immobile_box(تہی);
+#ورنہ
     scheme_dont_gc_ptr(self);	// because win isn't visible to GC
-#endif
+#اگر_ختم
     MZ_GC_CHECK();
-    WINDOW_REF(win) = self;
+    کھڑکی_REF(win) = self;
     MZ_GC_CHECK();
     self->win = win;
-    self->so.type = mz_window_type;
+    self->so.type = mz_کھڑکی_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    واپس (Scheme_Object *)self;
 }
 
 /*
  * (get-win-num [window])
  */
-    static Scheme_Object *
-get_window_num(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+get_کھڑکی_عدد(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
-    int		nr = 1;
-    Vim_Prim	*prim = (Vim_Prim *)data;
-    win_T	*win = get_window_arg(prim->name, 0, argc, argv)->win;
+    صحیح		nr = 1;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
+    win_T	*win = get_کھڑکی_arg(prim->name, 0, argc, argv)->win;
     win_T	*wp;
 
-    for (wp = firstwin; wp != win; wp = wp->w_next)
+    برائے (wp = firstwin; wp != win; wp = wp->w_اگلا)
 	++nr;
 
-    return scheme_make_integer(nr);
+    واپس scheme_make_integer(nr);
 }
 
 /*
  * (get-win-by-num {windownum})
  */
-    static Scheme_Object *
-get_window_by_num(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_کھڑکی_by_عدد(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
     win_T	*win = firstwin;
-    int		fnum;
+    صحیح		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (fnum < 1)
+    اگر (fnum < 1)
 	scheme_signal_error(_("window index is out of range"));
 
-    for ( ; win != NULL; win = win->w_next, --fnum)
-	if (fnum == 1)	    // to be 1-based
-	    return window_new(win);
+    برائے ( ; win != تہی; win = win->w_اگلا, --fnum)
+	اگر (fnum == 1)	    // to be 1-based
+	    واپس کھڑکی_new(win);
 
-    return scheme_false;
+    واپس scheme_false;
 }
 
 /*
  * (get-win-buffer [window])
  */
-    static Scheme_Object *
-get_window_buffer(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_کھڑکی_بفر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win = get_کھڑکی_arg(prim->name, 0, argc, argv);
 
-    return buffer_new(win->win->w_buffer);
+    واپس بفر_new(win->win->w_بفر);
 }
 
 /*
  * (get-win-height [window])
  */
-    static Scheme_Object *
-get_window_height(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_کھڑکی_اونچائی(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win = get_کھڑکی_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_height);
+    واپس scheme_make_integer(win->win->w_اونچائی);
 }
 
 /*
  * (set-win-height {height} [window])
  */
-    static Scheme_Object *
-set_window_height(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_کھڑکی_اونچائی(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win;
     win_T	    *savewin;
-    int		    height;
+    صحیح		    اونچائی;
 
-    win = get_window_arg(prim->name, 1, argc, argv);
-    height = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
+    win = get_کھڑکی_arg(prim->name, 1, argc, argv);
+    اونچائی = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#اگر_ختم
 
     savewin = curwin;
     curwin = win->win;
-    win_setheight(height);
+    win_setheight(اونچائی);
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
  * (get-win-width [window])
  */
-    static Scheme_Object *
-get_window_width(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_کھڑکی_چوڑائی(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win = get_کھڑکی_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_width);
+    واپس scheme_make_integer(win->win->w_چوڑائی);
 }
 
 /*
  * (set-win-width {width} [window])
  */
-    static Scheme_Object *
-set_window_width(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_کھڑکی_چوڑائی(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win;
     win_T	    *savewin;
-    int		    width = 0;
+    صحیح		    چوڑائی = 0;
 
-    win = get_window_arg(prim->name, 1, argc, argv);
-    width = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
+    win = get_کھڑکی_arg(prim->name, 1, argc, argv);
+    چوڑائی = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شدہ FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#اگر_ختم
 
     savewin = curwin;
     curwin = win->win;
-    win_setwidth(width);
+    win_setwidth(چوڑائی);
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
  * (get-cursor [window]) -> (line . col)
  */
-    static Scheme_Object *
-get_cursor(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_cursor(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win;
     pos_T	    pos;
 
-    win = get_window_arg(prim->name, 0, argc, argv);
+    win = get_کھڑکی_arg(prim->name, 0, argc, argv);
     pos = win->win->w_cursor;
-    return scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
-		    scheme_make_integer_value((long)pos.col + 1));
+    واپس scheme_make_pair(scheme_make_integer_قدر((طویل)pos.lnum),
+		    scheme_make_integer_قدر((طویل)pos.ستون + 1));
 }
 
 /*
  * (set-cursor (line . col) [window])
  */
-    static Scheme_Object *
-set_cursor(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_cursor(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_window   *win;
-    long	    lnum = 0;
-    long	    col = 0;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_کھڑکی   *win;
+    طویل	    lnum = 0;
+    طویل	    ستون = 0;
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     sandbox_check();
-#endif
-    win = get_window_arg(prim->name, 1, argc, argv);
+#اگر_ختم
+    win = get_کھڑکی_arg(prim->name, 1, argc, argv);
     GUARANTEE_PAIR(prim->name, 0);
 
-    if (!SCHEME_INTP(SCHEME_CAR(argv[0]))
+    اگر (!SCHEME_INTP(SCHEME_CAR(argv[0]))
 	    || !SCHEME_INTP(SCHEME_CDR(argv[0])))
 	scheme_wrong_type(prim->name, "integer pair", 0, argc, argv);
 
     lnum = SCHEME_INT_VAL(SCHEME_CAR(argv[0]));
-    col = SCHEME_INT_VAL(SCHEME_CDR(argv[0])) - 1;
+    ستون = SCHEME_INT_VAL(SCHEME_CDR(argv[0])) - 1;
 
-    check_line_range(lnum, win->win->w_buffer);
+    check_سطر_range(lnum, win->win->w_بفر);
     // don't know how to catch invalid column value
 
     win->win->w_cursor.lnum = lnum;
-    win->win->w_cursor.col = col;
-    win->win->w_set_curswant = true;
+    win->win->w_cursor.ستون = ستون;
+    win->win->w_سیٹ_curswant = true;
     update_screen(UPD_VALID);
 
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 /*
  *===========================================================================
@@ -2143,206 +2143,206 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
 /*
  * (open-buff {filename})
  */
-    static Scheme_Object *
-mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+mzscheme_open_بفر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    int		    num = 0;
-    Scheme_Object   *onum = NULL;
-    Scheme_Object   *buf = NULL;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    صحیح		    عدد = 0;
+    Scheme_Object   *onum = تہی;
+    Scheme_Object   *buf = تہی;
     Scheme_Object   *fname;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, onum);
-    MZ_GC_VAR_IN_REG(1, buf);
-    MZ_GC_VAR_IN_REG(2, fname);
+    MZ_GC_VAR_اندر_REG(0, onum);
+    MZ_GC_VAR_اندر_REG(1, buf);
+    MZ_GC_VAR_اندر_REG(2, fname);
     MZ_GC_REG();
     fname = GUARANTEED_STRING_ARG(prim->name, 0);
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     sandbox_check();
-#endif
+#اگر_ختم
     // TODO make open existing file
-    num = buflist_add(BYTE_STRING_VALUE(fname), BLN_LISTED | BLN_CURBUF);
+    عدد = buflist_جوڑو(BYTE_STRING_قدر(fname), BLN_LISTED | BLN_CURBUF);
 
-    if (num == 0)
+    اگر (عدد == 0)
 	raise_vim_exn(_("couldn't open buffer"));
 
-    onum = scheme_make_integer(num);
-    buf = get_buffer_by_num(data, 1, &onum);
+    onum = scheme_make_integer(عدد);
+    buf = get_بفر_by_عدد(ڈیٹا, 1, &onum);
     MZ_GC_UNREG();
-    return buf;
+    واپس buf;
 }
 
 /*
  * (get-buff-by-num {buffernum})
  */
-    static Scheme_Object *
-get_buffer_by_num(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_by_عدد(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
     buf_T	*buf;
-    int		fnum;
+    صحیح		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
 
     FOR_ALL_BUFFERS(buf)
-	if (buf->b_fnum == fnum)
-	    return buffer_new(buf);
+	اگر (buf->b_fnum == fnum)
+	    واپس بفر_new(buf);
 
-    return scheme_false;
+    واپس scheme_false;
 }
 
 /*
  * (get-buff-by-name {buffername})
  */
-    static Scheme_Object *
-get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_by_name(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
     buf_T	*buf;
-    Scheme_Object *buffer = NULL;
-    Scheme_Object *fname = NULL;
+    Scheme_Object *بفر = تہی;
+    Scheme_Object *fname = تہی;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, buffer);
-    MZ_GC_VAR_IN_REG(1, fname);
+    MZ_GC_VAR_اندر_REG(0, بفر);
+    MZ_GC_VAR_اندر_REG(1, fname);
     MZ_GC_REG();
     fname = GUARANTEED_STRING_ARG(prim->name, 0);
-    buffer = scheme_false;
+    بفر = scheme_false;
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+	اگر (buf->b_ffname == تہی || buf->b_sfname == تہی)
 	    // empty string
 	{
-	    if (BYTE_STRING_VALUE(fname)[0] == NUL)
-		buffer = buffer_new(buf);
+	    اگر (BYTE_STRING_قدر(fname)[0] == NUL)
+		بفر = بفر_new(buf);
 	}
-	else if (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
-		|| !fnamecmp(buf->b_sfname, BYTE_STRING_VALUE(fname)))
+	ورنہ اگر (!fnamecmp(buf->b_ffname, BYTE_STRING_قدر(fname))
+		|| !fnamecmp(buf->b_sfname, BYTE_STRING_قدر(fname)))
 	{
 	    // either short or long filename matches
-	    buffer = buffer_new(buf);
+	    بفر = بفر_new(buf);
 	}
     }
 
     MZ_GC_UNREG();
-    return buffer;
+    واپس بفر;
 }
 
 /*
  * (get-next-buff [buffer])
  */
-    static Scheme_Object *
-get_next_buffer(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_اگلا_بفر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
-    buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
+    buf_T	*buf = get_بفر_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_next == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_next);
+    اگر (buf->b_اگلا == تہی)
+	واپس scheme_false;
+    ورنہ
+	واپس بفر_new(buf->b_اگلا);
 }
 
 /*
  * (get-prev-buff [buffer])
  */
-    static Scheme_Object *
-get_prev_buffer(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_پچھلا_بفر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	*prim = (Vim_Prim *)data;
-    buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
+    Vim_Prim	*prim = (Vim_Prim *)ڈیٹا;
+    buf_T	*buf = get_بفر_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_prev == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_prev);
+    اگر (buf->b_پچھلا == تہی)
+	واپس scheme_false;
+    ورنہ
+	واپس بفر_new(buf->b_پچھلا);
 }
 
 /*
  * (get-buff-num [buffer])
  */
-    static Scheme_Object *
-get_buffer_num(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_عدد(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf = get_بفر_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_fnum);
+    واپس scheme_make_integer(buf->buf->b_fnum);
 }
 
 /*
  * (buff-count)
  */
-    static Scheme_Object *
-get_buffer_count(
-    void		*data UNUSED,
-    int			argc UNUSED,
-    Scheme_Object	**argv UNUSED)
+    ساکن Scheme_Object *
+get_بفر_گنتی(
+    خالی		*ڈیٹا غیر_مستعمل,
+    صحیح			argc غیر_مستعمل,
+    Scheme_Object	**argv غیر_مستعمل)
 {
     buf_T   *b;
-    int	    n = 0;
+    صحیح	    n = 0;
 
     FOR_ALL_BUFFERS(b) ++n;
-    return scheme_make_integer(n);
+    واپس scheme_make_integer(n);
 }
 
 /*
  * (get-buff-name [buffer])
  */
-    static Scheme_Object *
-get_buffer_name(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_name(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf = get_بفر_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_byte_string((char *)buf->buf->b_ffname);
+    واپس scheme_make_byte_string((حرف *)buf->buf->b_ffname);
 }
 
 /*
  * (curr-buff)
  */
-    static Scheme_Object *
-get_curr_buffer(
-    void		*data UNUSED,
-    int			argc UNUSED,
-    Scheme_Object	**argv UNUSED)
+    ساکن Scheme_Object *
+get_curr_بفر(
+    خالی		*ڈیٹا غیر_مستعمل,
+    صحیح			argc غیر_مستعمل,
+    Scheme_Object	**argv غیر_مستعمل)
 {
-    return (Scheme_Object *)get_vim_curr_buffer();
+    واپس (Scheme_Object *)get_vim_curr_بفر();
 }
 
-    static Scheme_Object *
-buffer_new(buf_T *buf)
+    ساکن Scheme_Object *
+بفر_new(buf_T *buf)
 {
-    vim_mz_buffer *self = NULL;
+    vim_mz_بفر *self = تہی;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, self);
+    MZ_GC_VAR_اندر_REG(0, self);
 
     // We need to handle deletion of buffers underneath us.
     // If we add a "b_mzscheme_ref" field to the buf_T structure,
     // then we can get at it in buf_freeall() in vim.
-    if (buf->b_mzscheme_ref)
-	return (Scheme_Object *)BUFFER_REF(buf);
+    اگر (buf->b_mzscheme_ref)
+	واپس (Scheme_Object *)بفر_REF(buf);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_buffer));
-    CLEAR_POINTER(self);
-#ifdef MZ_PRECISE_GC
-    buf->b_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, حجم(vim_mz_بفر));
+    CLEAR_اشارہ_گر(self);
+#اگر_تعریف_شدہ MZ_PRECISE_GC
+    buf->b_mzscheme_ref = scheme_malloc_immobile_box(تہی);
+#ورنہ
     scheme_dont_gc_ptr(self);	// because buf isn't visible to GC
-#endif
+#اگر_ختم
     MZ_GC_CHECK();
-    BUFFER_REF(buf) = self;
+    بفر_REF(buf) = self;
     MZ_GC_CHECK();
     self->buf = buf;
-    self->so.type = mz_buffer_type;
+    self->so.type = mz_بفر_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    واپس (Scheme_Object *)self;
 }
 
 /*
@@ -2350,13 +2350,13 @@ buffer_new(buf_T *buf)
  *
  * Get the size (number of lines) in the current buffer.
  */
-    static Scheme_Object *
-get_buffer_size(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_سائز(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf = get_بفر_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_ml.ml_line_count);
+    واپس scheme_make_integer(buf->buf->b_ml.ml_سطر_گنتی);
 }
 
 /*
@@ -2366,20 +2366,20 @@ get_buffer_size(void *data, int argc, Scheme_Object **argv)
  * in Vim format (1-based). The line is returned as a MzScheme
  * string object.
  */
-    static Scheme_Object *
-get_buffer_line(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_سطر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf;
-    int		    linenr;
-    char_u	    *line;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf;
+    صحیح		    linenr;
+    char_u	    *سطر;
 
-    buf = get_buffer_arg(prim->name, 1, argc, argv);
+    buf = get_بفر_arg(prim->name, 1, argc, argv);
     linenr = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    line = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
+    سطر = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
 
     raise_if_error();
-    return scheme_make_byte_string((char *)line);
+    واپس scheme_make_byte_string((حرف *)سطر);
 }
 
 
@@ -2390,19 +2390,19 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
  * are in Vim format (1-based). The range is from lo up to, but not
  * including, hi. The list is returned as a list of string objects.
  */
-    static Scheme_Object *
-get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+get_بفر_سطر_list(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf;
-    int		    i, hi, lo, n;
-    Scheme_Object   *list = NULL;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf;
+    صحیح		    i, hi, lo, n;
+    Scheme_Object   *list = تہی;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, list);
+    MZ_GC_VAR_اندر_REG(0, list);
     MZ_GC_REG();
 
-    buf = get_buffer_arg(prim->name, 2, argc, argv);
+    buf = get_بفر_arg(prim->name, 2, argc, argv);
     list = scheme_null;
     hi = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 1));
     lo = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
@@ -2410,20 +2410,20 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     /*
      * Handle some error conditions
      */
-    if (lo < 0)
+    اگر (lo < 0)
 	lo = 0;
 
-    if (hi < 0)
+    اگر (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    اگر (hi < lo)
 	hi = lo;
 
     n = hi - lo;
 
-    for (i = n; i >= 0; --i)
+    برائے (i = n; i >= 0; --i)
     {
 	Scheme_Object *str = scheme_make_byte_string(
-		       (char *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
+		       (حرف *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
 	raise_if_error();
 
 	// Set the list item
@@ -2431,7 +2431,7 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return list;
+    واپس list;
 }
 
 /*
@@ -2446,105 +2446,105 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * It returns a Scheme Object that indicates the length of the
  * string changed.
  */
-    static Scheme_Object *
-set_buffer_line(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_بفر_سطر(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
     // First of all, we check the value of the supplied MzScheme object.
     // There are three cases:
     //	  1. #f - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf;
-    Scheme_Object   *line = NULL;
-    char	    *save;
-    int		    n;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf;
+    Scheme_Object   *سطر = تہی;
+    حرف	    *save;
+    صحیح		    n;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, line);
+    MZ_GC_VAR_اندر_REG(0, سطر);
     MZ_GC_REG();
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     sandbox_check();
-#endif
+#اگر_ختم
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
+    اگر (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
 	scheme_wrong_type(prim->name, "string or #f", 1, argc, argv);
-    line = argv[1];
-    buf = get_buffer_arg(prim->name, 2, argc, argv);
+    سطر = argv[1];
+    buf = get_بفر_arg(prim->name, 2, argc, argv);
 
-    check_line_range(n, buf->buf);
+    check_سطر_range(n, buf->buf);
 
-    if (SCHEME_FALSEP(line))
+    اگر (SCHEME_FALSEP(سطر))
     {
 	buf_T	    *savebuf = curbuf;
 
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	اگر (u_savedel((linenr_T)n, 1L) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_delete((linenr_T)n) == FAIL)
+	ورنہ اگر (ml_delete((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot delete line"));
 	}
-	if (buf->buf == curwin->w_buffer)
+	اگر (buf->buf == curwin->w_بفر)
 	    mz_fix_cursor(n, n + 1, -1);
-	deleted_lines_mark((linenr_T)n, 1L);
+	deleted_سطریں_mark((linenr_T)n, 1L);
 
 	curbuf = savebuf;
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	واپس scheme_void;
     }
-    else
+    ورنہ
     {
 	// Otherwise it's a line
 	buf_T	    *savebuf = curbuf;
 
-	save = string_to_line(line);
+	save = string_مقصد_سطر(سطر);
 
 	curbuf = buf->buf;
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	اگر (u_savesub((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
+	ورنہ اگر (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot replace line"));
 	}
-	else
+	ورنہ
 	{
 	    vim_free(save);
-	    changed_bytes((linenr_T)n, 0);
+	    بدلا_بائٹیں((linenr_T)n, 0);
 	}
 
 	curbuf = savebuf;
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf->buf == curwin->w_buffer)
-	    check_cursor_col();
+	اگر (buf->buf == curwin->w_بفر)
+	    check_cursor_ستون();
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	واپس scheme_void;
     }
 }
 
-    static void
-free_array(char **array)
+    ساکن خالی
+free_array(حرف **array)
 {
-    char **curr = array;
-    while (*curr != NULL)
+    حرف **curr = array;
+    جب (*curr != تہی)
 	vim_free(*curr++);
     vim_free(array);
 }
@@ -2561,36 +2561,36 @@ free_array(char **array)
  * If OK is returned and len_change is not NULL, *len_change is set to the
  * change in the buffer length.
  */
-    static Scheme_Object *
-set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+سیٹ_بفر_سطر_list(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
     // First of all, we check the type of the supplied MzScheme object.
     // There are three cases:
     //	  1. #f - this is a deletion.
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = NULL;
-    Scheme_Object   *line_list = NULL;
-    int		    i, old_len, new_len, hi, lo;
-    long	    extra;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf = تہی;
+    Scheme_Object   *سطر_list = تہی;
+    صحیح		    i, old_len, new_len, hi, lo;
+    طویل	    extra;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, line_list);
+    MZ_GC_VAR_اندر_REG(0, سطر_list);
     MZ_GC_REG();
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     sandbox_check();
-#endif
+#اگر_ختم
     lo = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     hi = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 1));
-    if (!SCHEME_PAIRP(argv[2])
+    اگر (!SCHEME_PAIRP(argv[2])
 	    && !SCHEME_FALSEP(argv[2]) && !SCHEME_NULLP(argv[2]))
 	scheme_wrong_type(prim->name, "list or #f", 2, argc, argv);
-    line_list = argv[2];
-    buf = get_buffer_arg(prim->name, 3, argc, argv);
+    سطر_list = argv[2];
+    buf = get_بفر_arg(prim->name, 3, argc, argv);
     old_len = hi - lo;
-    if (old_len < 0) // process inverse values wisely
+    اگر (old_len < 0) // process inverse values wisely
     {
 	i = lo;
 	lo = hi;
@@ -2599,77 +2599,77 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     }
     extra = 0;
 
-    check_line_range(lo, buf->buf);	    // inclusive
-    check_line_range(hi - 1, buf->buf);	    // exclusive
+    check_سطر_range(lo, buf->buf);	    // inclusive
+    check_سطر_range(hi - 1, buf->buf);	    // exclusive
 
-    if (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
+    اگر (SCHEME_FALSEP(سطر_list) || SCHEME_NULLP(سطر_list))
     {
 	buf_T	*savebuf = curbuf;
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)lo, (long)old_len) == FAIL)
+	اگر (u_savedel((linenr_T)lo, (طویل)old_len) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	ورنہ
 	{
-	    for (i = 0; i < old_len; i++)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    برائے (i = 0; i < old_len; i++)
+		اگر (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    raise_vim_exn(_("cannot delete line"));
 		}
-	    if (buf->buf == curwin->w_buffer)
+	    اگر (buf->buf == curwin->w_بفر)
 		mz_fix_cursor(lo, hi, -old_len);
-	    deleted_lines_mark((linenr_T)lo, (long)old_len);
+	    deleted_سطریں_mark((linenr_T)lo, (طویل)old_len);
 	}
 
 	curbuf = savebuf;
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	واپس scheme_void;
     }
-    else
+    ورنہ
     {
 	buf_T	*savebuf = curbuf;
 
 	// List
-	new_len = scheme_proper_list_length(line_list);
+	new_len = scheme_proper_list_لمبائی(سطر_list);
 	MZ_GC_CHECK();
-	if (new_len < 0)	// improper or cyclic list
+	اگر (new_len < 0)	// improper or cyclic list
 	    scheme_wrong_type(prim->name, "proper list",
 		    2, argc, argv);
-	else
+	ورنہ
 	{
-	    char		**array = NULL;
-	    Scheme_Object   *line = NULL;
-	    Scheme_Object   *rest = NULL;
+	    حرف		**array = تہی;
+	    Scheme_Object   *سطر = تہی;
+	    Scheme_Object   *rest = تہی;
 
 	    MZ_GC_DECL_REG(2);
-	    MZ_GC_VAR_IN_REG(0, line);
-	    MZ_GC_VAR_IN_REG(1, rest);
+	    MZ_GC_VAR_اندر_REG(0, سطر);
+	    MZ_GC_VAR_اندر_REG(1, rest);
 	    MZ_GC_REG();
 
-	    array = ALLOC_CLEAR_MULT(char *, new_len + 1);
+	    array = ALLOC_CLEAR_MULT(حرف *, new_len + 1);
 
-	    rest = line_list;
-	    for (i = 0; i < new_len; ++i)
+	    rest = سطر_list;
+	    برائے (i = 0; i < new_len; ++i)
 	    {
-		line = SCHEME_CAR(rest);
+		سطر = SCHEME_CAR(rest);
 		rest = SCHEME_CDR(rest);
-		if (!SCHEME_STRINGP(line))
+		اگر (!SCHEME_STRINGP(سطر))
 		{
 		    free_array(array);
 		    scheme_wrong_type(prim->name, "string-list", 2, argc, argv);
 		}
-		array[i] = string_to_line(line);
+		array[i] = string_مقصد_سطر(سطر);
 	    }
 
 	    curbuf = buf->buf;
 
-	    if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	    اگر (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    {
 		curbuf = savebuf;
 		free_array(array);
@@ -2681,9 +2681,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * need to delete some old_len. We do this at the start, by
 	     * repeatedly deleting line "lo".
 	     */
-	    for (i = 0; i < old_len - new_len; ++i)
+	    برائے (i = 0; i < old_len - new_len; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		اگر (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2697,8 +2697,8 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * new old_len. This is a more efficient operation, as it requires
 	     * less memory allocation and freeing.
 	     */
-	    for (i = 0; i < old_len && i < new_len; i++)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
+	    برائے (i = 0; i < old_len && i < new_len; i++)
+		اگر (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2710,9 +2710,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * free the string passed back because MzScheme has control of that
 	     * memory.
 	     */
-	    while (i < new_len)
+	    جب (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		اگر (ml_append((linenr_T)(lo + i - 1),
 			    (char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2731,16 +2731,16 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	 * changed range, and move any in the remainder of the buffer.
 	 */
 	mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
-						  (long)MAXLNUM, (long)extra);
-	changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
+						  (طویل)MAXLNUM, (طویل)extra);
+	بدلا_سطریں((linenr_T)lo, 0, (linenr_T)hi, (طویل)extra);
 
-	if (buf->buf == curwin->w_buffer)
+	اگر (buf->buf == curwin->w_بفر)
 	    mz_fix_cursor(lo, hi, extra);
 	curbuf = savebuf;
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	واپس scheme_void;
     }
 }
 
@@ -2755,22 +2755,22 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static Scheme_Object *
-insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+داخل_کرو_بفر_سطر_list(خالی *ڈیٹا, صحیح argc, Scheme_Object **argv)
 {
-    Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = NULL;
-    Scheme_Object   *list = NULL;
-    char	    *str = NULL;
-    int		    i, n, size;
+    Vim_Prim	    *prim = (Vim_Prim *)ڈیٹا;
+    vim_mz_بفر   *buf = تہی;
+    Scheme_Object   *list = تہی;
+    حرف	    *str = تہی;
+    صحیح		    i, n, سائز;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, list);
+    MZ_GC_VAR_اندر_REG(0, list);
     MZ_GC_REG();
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شدہ HAVE_SANDBOX
     sandbox_check();
-#endif
+#اگر_ختم
     /*
      * First of all, we check the type of the supplied MzScheme object.
      * It must be a string or a list, or the call is in error.
@@ -2778,35 +2778,35 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     list = argv[1];
 
-    if (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
+    اگر (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
 	scheme_wrong_type(prim->name, "string or list", 1, argc, argv);
-    buf = get_buffer_arg(prim->name, 2, argc, argv);
+    buf = get_بفر_arg(prim->name, 2, argc, argv);
 
-    if (n != 0)	    // 0 can be used in insert
-	check_line_range(n, buf->buf);
-    if (SCHEME_STRINGP(list))
+    اگر (n != 0)	    // 0 can be used in insert
+	check_سطر_range(n, buf->buf);
+    اگر (SCHEME_STRINGP(list))
     {
 	buf_T	    *savebuf = curbuf;
 
-	str = string_to_line(list);
+	str = string_مقصد_سطر(list);
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
+	اگر (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	ورنہ اگر (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot insert line"));
 	}
-	else
+	ورنہ
 	{
 	    vim_free(str);
-	    appended_lines_mark((linenr_T)n, 1L);
+	    appended_سطریں_mark((linenr_T)n, 1L);
 	}
 
 	curbuf = savebuf;
@@ -2814,49 +2814,49 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	واپس scheme_void;
     }
 
     // List
-    size = scheme_proper_list_length(list);
+    سائز = scheme_proper_list_لمبائی(list);
     MZ_GC_CHECK();
-    if (size < 0)	// improper or cyclic list
+    اگر (سائز < 0)	// improper or cyclic list
 	scheme_wrong_type(prim->name, "proper list",
 		2, argc, argv);
-    else
+    ورنہ
     {
-	Scheme_Object   *line = NULL;
-	Scheme_Object   *rest = NULL;
-	char		**array;
+	Scheme_Object   *سطر = تہی;
+	Scheme_Object   *rest = تہی;
+	حرف		**array;
 	buf_T		*savebuf = curbuf;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, line);
-	MZ_GC_VAR_IN_REG(1, rest);
+	MZ_GC_VAR_اندر_REG(0, سطر);
+	MZ_GC_VAR_اندر_REG(1, rest);
 	MZ_GC_REG();
 
-	array = ALLOC_CLEAR_MULT(char *, size + 1);
+	array = ALLOC_CLEAR_MULT(حرف *, سائز + 1);
 
 	rest = list;
-	for (i = 0; i < size; ++i)
+	برائے (i = 0; i < سائز; ++i)
 	{
-	    line = SCHEME_CAR(rest);
+	    سطر = SCHEME_CAR(rest);
 	    rest = SCHEME_CDR(rest);
-	    array[i] = string_to_line(line);
+	    array[i] = string_مقصد_سطر(سطر);
 	}
 
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	اگر (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    free_array(array);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	ورنہ
 	{
-	    for (i = 0; i < size; ++i)
-		if (ml_append((linenr_T)(n + i), (char_u *)array[i],
+	    برائے (i = 0; i < سائز; ++i)
+		اگر (ml_append((linenr_T)(n + i), (char_u *)array[i],
 			    0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2864,8 +2864,8 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		    raise_vim_exn(_("cannot insert line"));
 		}
 
-	    if (i > 0)
-		appended_lines_mark((linenr_T)n, (long)i);
+	    اگر (i > 0)
+		appended_سطریں_mark((linenr_T)n, (طویل)i);
 	}
 	free_array(array);
 	MZ_GC_UNREG();
@@ -2875,7 +2875,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    واپس scheme_void;
 }
 
 /*
@@ -2884,51 +2884,51 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 /*
  * (buff? obj)
  */
-    static Scheme_Object *
-vim_bufferp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_bufferp(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    اگر (SCHEME_VIMBUFFERP(argv[0]))
+	واپس scheme_true;
+    ورنہ
+	واپس scheme_false;
 }
 
 /*
  * (win? obj)
  */
-    static Scheme_Object *
-vim_windowp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_windowp(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    اگر (SCHEME_VIMWINDOWP(argv[0]))
+	واپس scheme_true;
+    ورنہ
+	واپس scheme_false;
 }
 
 /*
  * (buff-valid? obj)
  */
-    static Scheme_Object *
-vim_buffer_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_بفر_validp(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0])
-	    && ((vim_mz_buffer *)argv[0])->buf != INVALID_BUFFER_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+    اگر (SCHEME_VIMBUFFERP(argv[0])
+	    && ((vim_mz_بفر *)argv[0])->buf != INVALID_بفر_قدر)
+	واپس scheme_true;
+    ورنہ
+	واپس scheme_false;
 }
 
 /*
  * (win-valid? obj)
  */
-    static Scheme_Object *
-vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_کھڑکی_validp(خالی *ڈیٹا غیر_مستعمل, صحیح argc غیر_مستعمل, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0])
-	    && ((vim_mz_window *)argv[0])->win != INVALID_WINDOW_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+    اگر (SCHEME_VIMWINDOWP(argv[0])
+	    && ((vim_mz_کھڑکی *)argv[0])->win != INVALID_کھڑکی_قدر)
+	واپس scheme_true;
+    ورنہ
+	واپس scheme_false;
 }
 
 /*
@@ -2945,340 +2945,340 @@ vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
  *
  * Returns pointer to Vim allocated memory
  */
-    static char *
-string_to_line(Scheme_Object *obj)
+    ساکن حرف *
+string_مقصد_سطر(Scheme_Object *obj)
 {
-    char	*scheme_str = NULL;
-    char	*vim_str = NULL;
+    حرف	*scheme_str = تہی;
+    حرف	*vim_str = تہی;
     OUTPUT_LEN_TYPE	len;
-    int		i;
+    صحیح		i;
 
-    scheme_str = scheme_display_to_string(obj, &len);
+    scheme_str = scheme_display_مقصد_string(obj, &len);
 
     // Error checking: String must not contain newlines, as we
     // are replacing a single line, and we must replace it with
     // a single line.
-    if (memchr(scheme_str, '\n', len))
+    اگر (memchr(scheme_str, '\n', len))
 	scheme_signal_error(_("string cannot contain newlines"));
 
     vim_str = alloc(len + 1);
 
     // Create a copy of the string, with internal nulls replaced by
     // newline characters, as is the vim convention.
-    for (i = 0; i < len; ++i)
+    برائے (i = 0; i < len; ++i)
     {
-	if (scheme_str[i] == '\0')
+	اگر (scheme_str[i] == '\0')
 	    vim_str[i] = '\n';
-	else
+	ورنہ
 	    vim_str[i] = scheme_str[i];
     }
 
     vim_str[i] = '\0';
 
     MZ_GC_CHECK();
-    return vim_str;
+    واپس vim_str;
 }
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شدہ FEAT_EVAL
 /*
  * Convert Vim value into MzScheme, adopted from if_python.c
  */
-    static Scheme_Object *
-vim_to_mzscheme(typval_T *vim_value)
+    ساکن Scheme_Object *
+vim_مقصد_mzscheme(typval_T *vim_قدر)
 {
-    Scheme_Object	*result = NULL;
+    Scheme_Object	*نتیجہ = تہی;
     // hash table to store visited values to avoid infinite loops
-    Scheme_Hash_Table	*visited = NULL;
+    Scheme_Hash_جدول	*دیکھا = تہی;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, result);
-    MZ_GC_VAR_IN_REG(1, visited);
+    MZ_GC_VAR_اندر_REG(0, نتیجہ);
+    MZ_GC_VAR_اندر_REG(1, دیکھا);
     MZ_GC_REG();
 
-    visited = scheme_make_hash_table(SCHEME_hash_ptr);
+    دیکھا = scheme_make_hash_جدول(SCHEME_hash_ptr);
     MZ_GC_CHECK();
 
-    result = vim_to_mzscheme_impl(vim_value, 1, visited);
+    نتیجہ = vim_مقصد_mzscheme_impl(vim_قدر, 1, دیکھا);
 
     MZ_GC_UNREG();
-    return result;
+    واپس نتیجہ;
 }
 
-    static Scheme_Object *
-vim_to_mzscheme_impl(
-    typval_T		*vim_value,
-    int			depth,
-    Scheme_Hash_Table	*visited)
+    ساکن Scheme_Object *
+vim_مقصد_mzscheme_impl(
+    typval_T		*vim_قدر,
+    صحیح			گہرائی,
+    Scheme_Hash_جدول	*دیکھا)
 {
-    Scheme_Object   *result = NULL;
-    int		    new_value = TRUE;
+    Scheme_Object   *نتیجہ = تہی;
+    صحیح		    new_قدر_2 = TRUE;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, result);
-    MZ_GC_VAR_IN_REG(1, visited);
+    MZ_GC_VAR_اندر_REG(0, نتیجہ);
+    MZ_GC_VAR_اندر_REG(1, دیکھا);
     MZ_GC_REG();
 
     // Avoid infinite recursion
-    if (depth > 100)
+    اگر (گہرائی > 100)
     {
 	MZ_GC_UNREG();
-	return scheme_void;
+	واپس scheme_void;
     }
 
     // Check if we run into a recursive loop.  The item must be in visited
     // then and we can use it again.
-    result = scheme_hash_get(visited, (Scheme_Object *)vim_value);
+    نتیجہ = scheme_hash_get(دیکھا, (Scheme_Object *)vim_قدر);
     MZ_GC_CHECK();
-    if (result != NULL) // found, do nothing
-	new_value = FALSE;
-    else if (vim_value->v_type == VAR_STRING)
+    اگر (نتیجہ != تہی) // found, do nothing
+	new_قدر_2 = FALSE;
+    ورنہ اگر (vim_قدر->v_type == VAR_STRING)
     {
-	result = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	نتیجہ = scheme_make_byte_string((حرف *)vim_قدر->vval.v_string);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_NUMBER)
+    ورنہ اگر (vim_قدر->v_type == VAR_نمبر)
     {
-	result = scheme_make_integer((long)vim_value->vval.v_number);
+	نتیجہ = scheme_make_integer((طویل)vim_قدر->vval.v_نمبر);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_FLOAT)
+    ورنہ اگر (vim_قدر->v_type == VAR_FLOAT)
     {
-	result = scheme_make_double((double)vim_value->vval.v_float);
+	نتیجہ = scheme_make_double((دوہرا)vim_قدر->vval.v_float);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_LIST)
+    ورنہ اگر (vim_قدر->v_type == VAR_LIST)
     {
-	list_T		*list = vim_value->vval.v_list;
+	list_T		*list = vim_قدر->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL || list->lv_first == NULL)
-	    result = scheme_null;
-	else
+	اگر (list == تہی || list->lv_پہلا == تہی)
+	    نتیجہ = scheme_null;
+	ورنہ
 	{
-	    Scheme_Object   *obj = NULL;
+	    Scheme_Object   *obj = تہی;
 
 	    MZ_GC_DECL_REG(1);
-	    MZ_GC_VAR_IN_REG(0, obj);
+	    MZ_GC_VAR_اندر_REG(0, obj);
 	    MZ_GC_REG();
 
-	    curr = list->lv_u.mat.lv_last;
-	    obj = vim_to_mzscheme_impl(&curr->li_tv, depth + 1, visited);
-	    result = scheme_make_pair(obj, scheme_null);
+	    curr = list->lv_u.mat.lv_آخری;
+	    obj = vim_مقصد_mzscheme_impl(&curr->li_tv, گہرائی + 1, دیکھا);
+	    نتیجہ = scheme_make_pair(obj, scheme_null);
 	    MZ_GC_CHECK();
 
-	    while (curr != list->lv_first)
+	    جب (curr != list->lv_پہلا)
 	    {
-		curr = curr->li_prev;
-		obj = vim_to_mzscheme_impl(&curr->li_tv, depth + 1, visited);
-		result = scheme_make_pair(obj, result);
+		curr = curr->li_پچھلا;
+		obj = vim_مقصد_mzscheme_impl(&curr->li_tv, گہرائی + 1, دیکھا);
+		نتیجہ = scheme_make_pair(obj, نتیجہ);
 		MZ_GC_CHECK();
 	    }
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_DICT)
+    ورنہ اگر (vim_قدر->v_type == VAR_DICT)
     {
-	Scheme_Object	  *key = NULL;
-	Scheme_Object	  *obj = NULL;
+	Scheme_Object	  *کلید = تہی;
+	Scheme_Object	  *obj = تہی;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, key);
-	MZ_GC_VAR_IN_REG(1, obj);
+	MZ_GC_VAR_اندر_REG(0, کلید);
+	MZ_GC_VAR_اندر_REG(1, obj);
 	MZ_GC_REG();
 
-	result = (Scheme_Object *)scheme_make_hash_table(SCHEME_hash_ptr);
+	نتیجہ = (Scheme_Object *)scheme_make_hash_جدول(SCHEME_hash_ptr);
 	MZ_GC_CHECK();
-	if (vim_value->vval.v_dict != NULL)
+	اگر (vim_قدر->vval.v_dict != تہی)
 	{
-	    hashtab_T	*ht = &vim_value->vval.v_dict->dv_hashtab;
-	    long_u	todo = ht->ht_used;
+	    hashtab_T	*ht = &vim_قدر->vval.v_dict->dv_hashtab;
+	    long_u	todo = ht->ht_مستعمل;
 	    hashitem_T	*hi;
 	    dictitem_T	*di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_اشیاء(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		اگر (!HASHITEM_خالی_خانے(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
-		    obj = vim_to_mzscheme_impl(&di->di_tv, depth + 1, visited);
-		    key = scheme_make_byte_string((char *)hi->hi_key);
+		    obj = vim_مقصد_mzscheme_impl(&di->di_tv, گہرائی + 1, دیکھا);
+		    کلید = scheme_make_byte_string((حرف *)hi->hi_کلید);
 		    MZ_GC_CHECK();
-		    scheme_hash_set((Scheme_Hash_Table *)result, key, obj);
+		    scheme_hash_سیٹ((Scheme_Hash_جدول *)نتیجہ, کلید, obj);
 		    MZ_GC_CHECK();
 		}
 	    }
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_FUNC)
+    ورنہ اگر (vim_قدر->v_type == VAR_FUNC)
     {
-	Scheme_Object *funcname = NULL;
+	Scheme_Object *funcname = تہی;
 
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, funcname);
+	MZ_GC_VAR_اندر_REG(0, funcname);
 	MZ_GC_REG();
 
 	// FIXME: func_ref() and func_unref() are needed.
-	funcname = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	funcname = scheme_make_byte_string((حرف *)vim_قدر->vval.v_string);
 	MZ_GC_CHECK();
-	result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		(const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+	نتیجہ = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
+		(ثابت حرف *)BYTE_STRING_قدر(funcname), 0, -1);
 	MZ_GC_CHECK();
 
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_PARTIAL)
+    ورنہ اگر (vim_قدر->v_type == VAR_PARTIAL)
     {
-	if (vim_value->vval.v_partial == NULL)
-	    result = scheme_null;
-	else
+	اگر (vim_قدر->vval.v_partial == تہی)
+	    نتیجہ = scheme_null;
+	ورنہ
 	{
-	    Scheme_Object *funcname = NULL;
+	    Scheme_Object *funcname = تہی;
 
 	    MZ_GC_DECL_REG(1);
-	    MZ_GC_VAR_IN_REG(0, funcname);
+	    MZ_GC_VAR_اندر_REG(0, funcname);
 	    MZ_GC_REG();
 
 	    // FIXME: func_ref() and func_unref() are needed.
 	    // TODO: Support pt_dict and pt_argv.
 	    funcname = scheme_make_byte_string(
-			      (char *)partial_name(vim_value->vval.v_partial));
+			      (حرف *)partial_name(vim_قدر->vval.v_partial));
 	    MZ_GC_CHECK();
-	    result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		    (const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+	    نتیجہ = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
+		    (ثابت حرف *)BYTE_STRING_قدر(funcname), 0, -1);
 	    MZ_GC_CHECK();
 
 	    MZ_GC_UNREG();
 	}
     }
-    else if (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
+    ورنہ اگر (vim_قدر->v_type == VAR_BOOL || vim_قدر->v_type == VAR_SPECIAL)
     {
-	if (vim_value->vval.v_number <= VVAL_TRUE)
-	    result = scheme_make_integer((long)vim_value->vval.v_number);
-	else
-	    result = scheme_null;
+	اگر (vim_قدر->vval.v_نمبر <= VVAL_TRUE)
+	    نتیجہ = scheme_make_integer((طویل)vim_قدر->vval.v_نمبر);
+	ورنہ
+	    نتیجہ = scheme_null;
 	MZ_GC_CHECK();
     }
-    else
+    ورنہ
     {
-	result = scheme_void;
-	new_value = FALSE;
+	نتیجہ = scheme_void;
+	new_قدر_2 = FALSE;
     }
-    if (new_value)
+    اگر (new_قدر_2)
     {
-	scheme_hash_set(visited, (Scheme_Object *)vim_value, result);
+	scheme_hash_سیٹ(دیکھا, (Scheme_Object *)vim_قدر, نتیجہ);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return result;
+    واپس نتیجہ;
 }
 
-    static int
-mzscheme_to_vim(Scheme_Object *obj, typval_T *tv)
+    ساکن صحیح
+mzscheme_مقصد_vim(Scheme_Object *obj, typval_T *tv)
 {
-    int i, status;
-    Scheme_Hash_Table	*visited = NULL;
+    صحیح i, حالت_2;
+    Scheme_Hash_جدول	*دیکھا = تہی;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, obj);
-    MZ_GC_VAR_IN_REG(1, visited);
+    MZ_GC_VAR_اندر_REG(0, obj);
+    MZ_GC_VAR_اندر_REG(1, دیکھا);
     MZ_GC_REG();
 
-    visited = scheme_make_hash_table(SCHEME_hash_ptr);
+    دیکھا = scheme_make_hash_جدول(SCHEME_hash_ptr);
     MZ_GC_CHECK();
 
-    status = mzscheme_to_vim_impl(obj, tv, 1, visited);
-    for (i = 0; i < visited->size; ++i)
+    حالت_2 = mzscheme_مقصد_vim_impl(obj, tv, 1, دیکھا);
+    برائے (i = 0; i < دیکھا->سائز; ++i)
     {
 	// free up remembered objects
-	if (visited->vals[i] != NULL)
-	    free_tv((typval_T *)visited->vals[i]);
+	اگر (دیکھا->vals[i] != تہی)
+	    free_tv((typval_T *)دیکھا->vals[i]);
     }
 
     MZ_GC_UNREG();
-    return status;
+    واپس حالت_2;
 }
-    static int
-mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
-	Scheme_Hash_Table *visited)
+    ساکن صحیح
+mzscheme_مقصد_vim_impl(Scheme_Object *obj, typval_T *tv, صحیح گہرائی,
+	Scheme_Hash_جدول *دیکھا)
 {
-    int		status = OK;
-    typval_T	*found;
+    صحیح		حالت_2 = OK;
+    typval_T	*ملا;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, obj);
-    MZ_GC_VAR_IN_REG(1, visited);
+    MZ_GC_VAR_اندر_REG(0, obj);
+    MZ_GC_VAR_اندر_REG(1, دیکھا);
     MZ_GC_REG();
 
     MZ_GC_CHECK();
-    if (depth > 100) // limit the deepest recursion level
+    اگر (گہرائی > 100) // limit the deepest recursion level
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = 0;
-	return FAIL;
+	tv->v_type = VAR_نمبر;
+	tv->vval.v_نمبر = 0;
+	واپس FAIL;
     }
 
-    found = (typval_T *)scheme_hash_get(visited, obj);
-    if (found != NULL)
-	copy_tv(found, tv);
-    else if (SCHEME_VOIDP(obj))
+    ملا = (typval_T *)scheme_hash_get(دیکھا, obj);
+    اگر (ملا != تہی)
+	copy_tv(ملا, tv);
+    ورنہ اگر (SCHEME_VOIDP(obj))
     {
 	tv->v_type = VAR_SPECIAL;
-	tv->vval.v_number = VVAL_NULL;
+	tv->vval.v_نمبر = VVAL_NULL;
     }
-    else if (SCHEME_INTP(obj))
+    ورنہ اگر (SCHEME_INTP(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = SCHEME_INT_VAL(obj);
+	tv->v_type = VAR_نمبر;
+	tv->vval.v_نمبر = SCHEME_INT_VAL(obj);
     }
-    else if (SCHEME_BOOLP(obj))
+    ورنہ اگر (SCHEME_BOOLP(obj))
     {
 	tv->v_type = VAR_BOOL;
-	tv->vval.v_number = SCHEME_TRUEP(obj);
+	tv->vval.v_نمبر = SCHEME_TRUEP(obj);
     }
-    else if (SCHEME_DBLP(obj))
+    ورنہ اگر (SCHEME_DBLP(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = SCHEME_DBL_VAL(obj);
     }
-    else if (SCHEME_BYTE_STRINGP(obj))
+    ورنہ اگر (SCHEME_BYTE_STRINGP(obj))
     {
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(obj));
+	tv->vval.v_string = vim_strsave(BYTE_STRING_قدر(obj));
     }
-# if MZSCHEME_VERSION_MAJOR >= 299
-    else if (SCHEME_CHAR_STRINGP(obj))
+# اگر MZSCHEME_نسخہ_MAJOR >= 299
+    ورنہ اگر (SCHEME_CHAR_STRINGP(obj))
     {
-	Scheme_Object *tmp = NULL;
+	Scheme_Object *tmp = تہی;
 	MZ_GC_DECL_REG(1);
-	MZ_GC_VAR_IN_REG(0, tmp);
+	MZ_GC_VAR_اندر_REG(0, tmp);
 	MZ_GC_REG();
 
-	tmp = scheme_char_string_to_byte_string(obj);
+	tmp = scheme_char_string_مقصد_byte_string(obj);
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(tmp));
+	tv->vval.v_string = vim_strsave(BYTE_STRING_قدر(tmp));
 	MZ_GC_UNREG();
     }
 # endif
-    else if (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
+    ورنہ اگر (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
 	    || SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
     {
 	list_T  *list = list_alloc();
-	if (list == NULL)
-	    status = FAIL;
-	else
+	اگر (list == تہی)
+	    حالت_2 = FAIL;
+	ورنہ
 	{
-	    int		    i;
-	    Scheme_Object   *curr = NULL;
-	    Scheme_Object   *cval = NULL;
+	    صحیح		    i;
+	    Scheme_Object   *curr = تہی;
+	    Scheme_Object   *cval = تہی;
 	    // temporary var to hold current element of vectors and pairs
 	    typval_T	    *v;
 
 	    MZ_GC_DECL_REG(2);
-	    MZ_GC_VAR_IN_REG(0, curr);
-	    MZ_GC_VAR_IN_REG(1, cval);
+	    MZ_GC_VAR_اندر_REG(0, curr);
+	    MZ_GC_VAR_اندر_REG(1, cval);
 	    MZ_GC_REG();
 
 	    tv->v_type = VAR_LIST;
@@ -3286,53 +3286,53 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    ++list->lv_refcount;
 
 	    v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
-		status = FAIL;
-	    else
+	    اگر (v == تہی)
+		حالت_2 = FAIL;
+	    ورنہ
 	    {
 		// add the value in advance to allow handling of self-referential
 		// data structures
-		typval_T    *visited_tv = ALLOC_ONE(typval_T);
-		copy_tv(tv, visited_tv);
-		scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
+		typval_T    *دیکھا_tv = ALLOC_ONE(typval_T);
+		copy_tv(tv, دیکھا_tv);
+		scheme_hash_سیٹ(دیکھا, obj, (Scheme_Object *)دیکھا_tv);
 
-		if (SCHEME_VECTORP(obj))
+		اگر (SCHEME_VECTORP(obj))
 		{
-		    for (i = 0; i < SCHEME_VEC_SIZE(obj); ++i)
+		    برائے (i = 0; i < SCHEME_VEC_سائز(obj); ++i)
 		    {
 			cval = SCHEME_VEC_ELS(obj)[i];
-			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
-			status = list_append_tv(list, v);
+			حالت_2 = mzscheme_مقصد_vim_impl(cval, v, گہرائی + 1, دیکھا);
+			اگر (حالت_2 == FAIL)
+			    توڑو;
+			حالت_2 = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			اگر (حالت_2 == FAIL)
+			    توڑو;
 		    }
 		}
-		else if (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
+		ورنہ اگر (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
 		{
-		    for (curr = obj;
+		    برائے (curr = obj;
 			    SCHEME_PAIRP(curr) || SCHEME_MUTABLE_PAIRP(curr);
 			    curr = SCHEME_CDR(curr))
 		    {
 			cval = SCHEME_CAR(curr);
-			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
-			status = list_append_tv(list, v);
+			حالت_2 = mzscheme_مقصد_vim_impl(cval, v, گہرائی + 1, دیکھا);
+			اگر (حالت_2 == FAIL)
+			    توڑو;
+			حالت_2 = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			اگر (حالت_2 == FAIL)
+			    توڑو;
 		    }
 		    // improper list not terminated with null
 		    // need to handle the last element
-		    if (status == OK && !SCHEME_NULLP(curr))
+		    اگر (حالت_2 == OK && !SCHEME_NULLP(curr))
 		    {
-			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == OK)
+			حالت_2 = mzscheme_مقصد_vim_impl(cval, v, گہرائی + 1, دیکھا);
+			اگر (حالت_2 == OK)
 			{
-			    status = list_append_tv(list, v);
+			    حالت_2 = list_append_tv(list, v);
 			    clear_tv(v);
 			}
 		    }
@@ -3343,47 +3343,47 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    MZ_GC_UNREG();
 	}
     }
-    else if (SCHEME_HASHTP(obj))
+    ورنہ اگر (SCHEME_HASHTP(obj))
     {
-	int		i;
+	صحیح		i;
 	dict_T		*dict;
-	Scheme_Object   *key = NULL;
-	Scheme_Object   *val = NULL;
+	Scheme_Object   *کلید = تہی;
+	Scheme_Object   *val = تہی;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, key);
-	MZ_GC_VAR_IN_REG(1, val);
+	MZ_GC_VAR_اندر_REG(0, کلید);
+	MZ_GC_VAR_اندر_REG(1, val);
 	MZ_GC_REG();
 
 	dict = dict_alloc();
-	if (dict == NULL)
-	    status = FAIL;
-	else
+	اگر (dict == تہی)
+	    حالت_2 = FAIL;
+	ورنہ
 	{
-	    typval_T    *visited_tv = ALLOC_ONE(typval_T);
+	    typval_T    *دیکھا_tv = ALLOC_ONE(typval_T);
 
 	    tv->v_type = VAR_DICT;
 	    tv->vval.v_dict = dict;
 	    ++dict->dv_refcount;
 
-	    copy_tv(tv, visited_tv);
-	    scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
+	    copy_tv(tv, دیکھا_tv);
+	    scheme_hash_سیٹ(دیکھا, obj, (Scheme_Object *)دیکھا_tv);
 
-	    for (i = 0; i < ((Scheme_Hash_Table *)obj)->size; ++i)
+	    برائے (i = 0; i < ((Scheme_Hash_جدول *)obj)->سائز; ++i)
 	    {
-		if (((Scheme_Hash_Table *) obj)->vals[i] != NULL)
+		اگر (((Scheme_Hash_جدول *) obj)->vals[i] != تہی)
 		{
 		    // generate item for `display'ed Scheme key
-		    dictitem_T  *item = dictitem_alloc((char_u *)string_to_line(
-				((Scheme_Hash_Table *) obj)->keys[i]));
+		    dictitem_T  *شے = dictitem_alloc((char_u *)string_مقصد_سطر(
+				((Scheme_Hash_جدول *) obj)->کلیدیں[i]));
 		    // convert Scheme val to Vim and add it to the dict
-		    if (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
-				    &item->di_tv, depth + 1, visited) == FAIL
-			    || dict_add(dict, item) == FAIL)
+		    اگر (mzscheme_مقصد_vim_impl(((Scheme_Hash_جدول *) obj)->vals[i],
+				    &شے->di_tv, گہرائی + 1, دیکھا) == FAIL
+			    || dict_جوڑو(dict, شے) == FAIL)
 		    {
-			dictitem_free(item);
-			status = FAIL;
-			break;
+			dictitem_free(شے);
+			حالت_2 = FAIL;
+			توڑو;
 		    }
 		}
 
@@ -3391,161 +3391,161 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	}
 	MZ_GC_UNREG();
     }
-    else
+    ورنہ
     {
 	// `display' any other value to string
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = (char_u *)string_to_line(obj);
+	tv->vval.v_string = (char_u *)string_مقصد_سطر(obj);
     }
     MZ_GC_UNREG();
-    return status;
+    واپس حالت_2;
 }
 
 /*
  * Scheme prim procedure wrapping Vim funcref
  */
-    static Scheme_Object *
-vim_funcref(void *name, int argc, Scheme_Object **argv)
+    ساکن Scheme_Object *
+vim_funcref(خالی *name, صحیح argc, Scheme_Object **argv)
 {
-    int i;
-    typval_T args;
-    int status = OK;
-    Scheme_Object *result = NULL;
+    صحیح i;
+    typval_T دلائل;
+    صحیح حالت_2 = OK;
+    Scheme_Object *نتیجہ = تہی;
     list_T *list = list_alloc();
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, result);
+    MZ_GC_VAR_اندر_REG(0, نتیجہ);
     MZ_GC_REG();
 
-    result = scheme_void;
-    if (list == NULL)
-	status = FAIL;
-    else
+    نتیجہ = scheme_void;
+    اگر (list == تہی)
+	حالت_2 = FAIL;
+    ورنہ
     {
-	args.v_type = VAR_LIST;
-	args.vval.v_list = list;
+	دلائل.v_type = VAR_LIST;
+	دلائل.vval.v_list = list;
 	++list->lv_refcount;
-	for (i = 0; status == OK && i < argc; ++i)
+	برائے (i = 0; حالت_2 == OK && i < argc; ++i)
 	{
 	    typval_T *v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
-		status = FAIL;
-	    else
+	    اگر (v == تہی)
+		حالت_2 = FAIL;
+	    ورنہ
 	    {
-		status = mzscheme_to_vim(argv[i], v);
-		if (status == OK)
+		حالت_2 = mzscheme_مقصد_vim(argv[i], v);
+		اگر (حالت_2 == OK)
 		{
-		    status = list_append_tv(list, v);
+		    حالت_2 = list_append_tv(list, v);
 		    clear_tv(v);
 		}
 		vim_free(v);
 	    }
 	}
-	if (status == OK)
+	اگر (حالت_2 == OK)
 	{
 	    typval_T ret;
 	    ret.v_type = VAR_UNKNOWN;
 
-	    mzscheme_call_vim(BYTE_STRING_VALUE((Scheme_Object *)name), &args, &ret);
+	    mzscheme_call_vim(BYTE_STRING_قدر((Scheme_Object *)name), &دلائل, &ret);
 	    MZ_GC_CHECK();
-	    result = vim_to_mzscheme(&ret);
+	    نتیجہ = vim_مقصد_mzscheme(&ret);
 	    clear_tv(&ret);
 	    MZ_GC_CHECK();
 	}
     }
-    clear_tv(&args);
+    clear_tv(&دلائل);
     MZ_GC_UNREG();
-    if (status != OK)
+    اگر (حالت_2 != OK)
 	raise_vim_exn(_("error converting Scheme values to Vim"));
-    else
+    ورنہ
 	raise_if_error();
-    return result;
+    واپس نتیجہ;
 }
 
-    void
+    خالی
 do_mzeval(char_u *str, typval_T *rettv)
 {
-    Scheme_Object	*ret = NULL;
+    Scheme_Object	*ret = تہی;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, ret);
+    MZ_GC_VAR_اندر_REG(0, ret);
     MZ_GC_REG();
 
-    if (mzscheme_init())
+    اگر (mzscheme_init())
     {
 	MZ_GC_UNREG();
-	return;
+	واپس;
     }
 
     MZ_GC_CHECK();
-    if (eval_with_exn_handling(str, do_eval, &ret) == OK)
-	mzscheme_to_vim(ret, rettv);
+    اگر (eval_with_exn_handling(str, do_eval, &ret) == OK)
+	mzscheme_مقصد_vim(ret, rettv);
 
     MZ_GC_UNREG();
 }
-#endif
+#اگر_ختم
 
 /*
  * Check to see whether a Vim error has been reported, or a keyboard
  * interrupt (from vim --> got_int) has been detected.
  */
-    static int
-vim_error_check(void)
+    ساکن صحیح
+vim_error_check(خالی)
 {
-    return (got_int || did_emsg);
+    واپس (got_int || did_emsg);
 }
 
 /*
  * register Scheme exn:vim
  */
-    static void
-register_vim_exn(void)
+    ساکن خالی
+رجسٹر_vim_exn(خالی)
 {
-    int	nc = 0;
-    int i;
-    Scheme_Object   *struct_exn = NULL;
-    Scheme_Object   *exn_name = NULL;
+    صحیح	nc = 0;
+    صحیح i;
+    Scheme_Object   *struct_exn = تہی;
+    Scheme_Object   *exn_name = تہی;
 
     MZ_GC_DECL_REG(2);
-    MZ_GC_VAR_IN_REG(0, struct_exn);
-    MZ_GC_VAR_IN_REG(1, exn_name);
+    MZ_GC_VAR_اندر_REG(0, struct_exn);
+    MZ_GC_VAR_اندر_REG(1, exn_name);
     MZ_GC_REG();
 
-    exn_name = scheme_intern_symbol("exn:vim");
+    exn_name = scheme_intern_علامت("exn:vim");
     MZ_GC_CHECK();
-    struct_exn = scheme_builtin_value("struct:exn");
+    struct_exn = scheme_builtin_قدر("struct:exn");
     MZ_GC_CHECK();
 
-    if (vim_exn == NULL)
+    اگر (vim_exn == تہی)
 	vim_exn = scheme_make_struct_type(exn_name,
-		struct_exn, NULL, 0, 0, NULL, NULL
-#if MZSCHEME_VERSION_MAJOR >= 299
-		, NULL
-#endif
+		struct_exn, تہی, 0, 0, تہی, تہی
+#اگر MZSCHEME_نسخہ_MAJOR >= 299
+		, تہی
+#اگر_ختم
 		);
 
 
     {
-	Scheme_Object   **tmp = NULL;
-	Scheme_Object   *exn_names[5] = {NULL, NULL, NULL, NULL, NULL};
-	Scheme_Object   *exn_values[5] = {NULL, NULL, NULL, NULL, NULL};
+	Scheme_Object   **tmp = تہی;
+	Scheme_Object   *exn_نام[5] = {تہی, تہی, تہی, تہی, تہی};
+	Scheme_Object   *exn_اقدار[5] = {تہی, تہی, تہی, تہی, تہی};
 	MZ_GC_DECL_REG(6);
-	MZ_GC_ARRAY_VAR_IN_REG(0, exn_names, 5);
-	MZ_GC_ARRAY_VAR_IN_REG(3, exn_values, 5);
+	MZ_GC_ARRAY_VAR_اندر_REG(0, exn_نام, 5);
+	MZ_GC_ARRAY_VAR_اندر_REG(3, exn_اقدار, 5);
 	MZ_GC_REG();
 
-	tmp = scheme_make_struct_names(exn_name, scheme_null, 0, &nc);
-	mch_memmove(exn_names, tmp, nc * sizeof(Scheme_Object *));
+	tmp = scheme_make_struct_نام(exn_name, scheme_null, 0, &nc);
+	mch_memmove(exn_نام, tmp, nc * حجم(Scheme_Object *));
 	MZ_GC_CHECK();
 
-	tmp = scheme_make_struct_values(vim_exn, exn_names, nc, 0);
-	mch_memmove(exn_values, tmp, nc * sizeof(Scheme_Object *));
+	tmp = scheme_make_struct_اقدار(vim_exn, exn_نام, nc, 0);
+	mch_memmove(exn_اقدار, tmp, nc * حجم(Scheme_Object *));
 	MZ_GC_CHECK();
 
-	for (i = 0; i < nc; i++)
+	برائے (i = 0; i < nc; i++)
 	{
-	    scheme_add_global_symbol(exn_names[i],
-		    exn_values[i], environment);
+	    scheme_جوڑو_global_علامت(exn_نام[i],
+		    exn_اقدار[i], environment);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
@@ -3556,56 +3556,56 @@ register_vim_exn(void)
 /*
  * raise exn:vim, may be with additional info string
  */
-    void
-raise_vim_exn(const char *add_info)
+    خالی
+raise_vim_exn(ثابت حرف *جوڑو_info)
 {
-    char	    *fmt = _("Vim error: ~a");
-    Scheme_Object   *argv[2] = {NULL, NULL};
-    Scheme_Object   *exn = NULL;
-    Scheme_Object   *byte_string = NULL;
+    حرف	    *fmt = _("Vim error: ~a");
+    Scheme_Object   *argv[2] = {تہی, تہی};
+    Scheme_Object   *exn = تہی;
+    Scheme_Object   *byte_string = تہی;
 
     MZ_GC_DECL_REG(5);
-    MZ_GC_ARRAY_VAR_IN_REG(0, argv, 2);
-    MZ_GC_VAR_IN_REG(3, exn);
-    MZ_GC_VAR_IN_REG(4, byte_string);
+    MZ_GC_ARRAY_VAR_اندر_REG(0, argv, 2);
+    MZ_GC_VAR_اندر_REG(3, exn);
+    MZ_GC_VAR_اندر_REG(4, byte_string);
     MZ_GC_REG();
 
-    if (add_info != NULL)
+    اگر (جوڑو_info != تہی)
     {
-	char		*c_string = NULL;
-	Scheme_Object   *info = NULL;
+	حرف		*c_string = تہی;
+	Scheme_Object   *info = تہی;
 
 	MZ_GC_DECL_REG(3);
-	MZ_GC_VAR_IN_REG(0, c_string);
-	MZ_GC_VAR_IN_REG(2, info);
+	MZ_GC_VAR_اندر_REG(0, c_string);
+	MZ_GC_VAR_اندر_REG(2, info);
 	MZ_GC_REG();
 
-	info = scheme_make_byte_string(add_info);
+	info = scheme_make_byte_string(جوڑو_info);
 	MZ_GC_CHECK();
-	c_string = scheme_format_utf8(fmt, (int)STRLEN(fmt), 1, &info, NULL);
+	c_string = scheme_format_utf8(fmt, (صحیح)STRLEN(fmt), 1, &info, تہی);
 	MZ_GC_CHECK();
 	byte_string = scheme_make_byte_string(c_string);
 	MZ_GC_CHECK();
-	argv[0] = scheme_byte_string_to_char_string(byte_string);
-	SCHEME_SET_IMMUTABLE(argv[0]);
+	argv[0] = scheme_byte_string_مقصد_char_string(byte_string);
+	SCHEME_سیٹ_IMMUTABLE(argv[0]);
 	MZ_GC_UNREG();
     }
-    else
+    ورنہ
     {
 	byte_string = scheme_make_byte_string(_("Vim error"));
 	MZ_GC_CHECK();
-	argv[0] = scheme_byte_string_to_char_string(byte_string);
+	argv[0] = scheme_byte_string_مقصد_char_string(byte_string);
 	MZ_GC_CHECK();
     }
     MZ_GC_CHECK();
 
-#if MZSCHEME_VERSION_MAJOR < 360
+#اگر MZSCHEME_نسخہ_MAJOR < 360
     argv[1] = scheme_current_continuation_marks();
     MZ_GC_CHECK();
-#else
-    argv[1] = scheme_current_continuation_marks(NULL);
+#ورنہ
+    argv[1] = scheme_current_continuation_marks(تہی);
     MZ_GC_CHECK();
-#endif
+#اگر_ختم
 
     exn = scheme_make_struct_instance(vim_exn, 2, argv);
     MZ_GC_CHECK();
@@ -3613,11 +3613,11 @@ raise_vim_exn(const char *add_info)
     MZ_GC_UNREG();
 }
 
-    void
-raise_if_error(void)
+    خالی
+raise_if_error(خالی)
 {
-    if (vim_error_check())
-	raise_vim_exn(NULL);
+    اگر (vim_error_check())
+	raise_vim_exn(تہی);
 }
 
 /*
@@ -3625,18 +3625,18 @@ raise_if_error(void)
  * either current
  * or passed as argv[argnum] with checks
  */
-    static vim_mz_buffer *
-get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+    ساکن vim_mz_بفر *
+get_بفر_arg(ثابت حرف *fname, صحیح argnum, صحیح argc, Scheme_Object **argv)
 {
-    vim_mz_buffer *b;
+    vim_mz_بفر *b;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_buffer();
-    if (!SCHEME_VIMBUFFERP(argv[argnum]))
+    اگر (argc < argnum + 1)
+	واپس get_vim_curr_بفر();
+    اگر (!SCHEME_VIMBUFFERP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-buffer", argnum, argc, argv);
-    b = (vim_mz_buffer *)argv[argnum];
-    (void)get_valid_buffer(argv[argnum]);
-    return b;
+    b = (vim_mz_بفر *)argv[argnum];
+    (خالی)get_valid_بفر(argv[argnum]);
+    واپس b;
 }
 
 /*
@@ -3644,59 +3644,59 @@ get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
  * either current
  * or passed as argv[argnum] with checks
  */
-    static vim_mz_window *
-get_window_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+    ساکن vim_mz_کھڑکی *
+get_کھڑکی_arg(ثابت حرف *fname, صحیح argnum, صحیح argc, Scheme_Object **argv)
 {
-    vim_mz_window *w;
+    vim_mz_کھڑکی *w;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_window();
-    w = (vim_mz_window *)argv[argnum];
-    if (!SCHEME_VIMWINDOWP(argv[argnum]))
+    اگر (argc < argnum + 1)
+	واپس get_vim_curr_کھڑکی();
+    w = (vim_mz_کھڑکی *)argv[argnum];
+    اگر (!SCHEME_VIMWINDOWP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-window", argnum, argc, argv);
-    (void)get_valid_window(argv[argnum]);
-    return w;
+    (خالی)get_valid_کھڑکی(argv[argnum]);
+    واپس w;
 }
 
 /*
  * get valid Vim buffer from Scheme_Object*
  */
-buf_T *get_valid_buffer(void *obj)
+buf_T *get_valid_بفر(خالی *obj)
 {
-    buf_T *buf = ((vim_mz_buffer *)obj)->buf;
+    buf_T *buf = ((vim_mz_بفر *)obj)->buf;
 
-    if (buf == INVALID_BUFFER_VALUE)
+    اگر (buf == INVALID_بفر_قدر)
 	scheme_signal_error(_("buffer is invalid"));
-    return buf;
+    واپس buf;
 }
 
 /*
  * get valid Vim window from Scheme_Object*
  */
-win_T *get_valid_window(void *obj)
+win_T *get_valid_کھڑکی(خالی *obj)
 {
-    win_T *win = ((vim_mz_window *)obj)->win;
-    if (win == INVALID_WINDOW_VALUE)
+    win_T *win = ((vim_mz_کھڑکی *)obj)->win;
+    اگر (win == INVALID_کھڑکی_قدر)
 	scheme_signal_error(_("window is invalid"));
-    return win;
+    واپس win;
 }
 
-    int
-mzthreads_allowed(void)
+    صحیح
+mzthreads_allowed(خالی)
 {
-    return mz_threads_allow;
+    واپس mz_دھاگے_allow;
 }
 
-    static int
-line_in_range(linenr_T lnum, buf_T *buf)
+    ساکن صحیح
+سطر_اندر_range(linenr_T lnum, buf_T *buf)
 {
-    return (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
+    واپس (lnum > 0 && lnum <= buf->b_ml.ml_سطر_گنتی);
 }
 
-    static void
-check_line_range(linenr_T lnum, buf_T *buf)
+    ساکن خالی
+check_سطر_range(linenr_T lnum, buf_T *buf)
 {
-    if (!line_in_range(lnum, buf))
+    اگر (!سطر_اندر_range(lnum, buf))
 	scheme_signal_error(_("linenr out of range"));
 }
 
@@ -3706,206 +3706,206 @@ check_line_range(linenr_T lnum, buf_T *buf)
  * Changed the lines from "lo" to "hi" and added "extra" lines (negative if
  * deleted). Got from if_python.c
  */
-    static void
-mz_fix_cursor(int lo, int hi, int extra)
+    ساکن خالی
+mz_fix_cursor(صحیح lo, صحیح hi, صحیح extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    اگر (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	اگر (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
-	    check_cursor_col();
+	    check_cursor_ستون();
 	}
-	else if (extra < 0)
+	ورنہ اگر (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
-	    check_cursor_col();
-	changed_cline_bef_curs();
+	ورنہ
+	    check_cursor_ستون();
+	بدلا_cline_bef_curs();
     }
     invalidate_botline();
 }
 
-static Vim_Prim prims[]=
+ساکن Vim_Prim prims[]=
 {
     /*
      * Buffer-related commands
      */
-    {get_buffer_line, "get-buff-line", 1, 2},
-    {set_buffer_line, "set-buff-line", 2, 3},
-    {get_buffer_line_list, "get-buff-line-list", 2, 3},
-    {get_buffer_name, "get-buff-name", 0, 1},
-    {get_buffer_num, "get-buff-num", 0, 1},
-    {get_buffer_size, "get-buff-size", 0, 1},
-    {set_buffer_line_list, "set-buff-line-list", 3, 4},
-    {insert_buffer_line_list, "insert-buff-line-list", 2, 3},
-    {get_curr_buffer, "curr-buff", 0, 0},
-    {get_buffer_count, "buff-count", 0, 0},
-    {get_next_buffer, "get-next-buff", 0, 1},
-    {get_prev_buffer, "get-prev-buff", 0, 1},
-    {mzscheme_open_buffer, "open-buff", 1, 1},
-    {get_buffer_by_name, "get-buff-by-name", 1, 1},
-    {get_buffer_by_num, "get-buff-by-num", 1, 1},
+    {get_بفر_سطر, "get-buff-line", 1, 2},
+    {سیٹ_بفر_سطر, "set-buff-line", 2, 3},
+    {get_بفر_سطر_list, "get-buff-line-list", 2, 3},
+    {get_بفر_name, "get-buff-name", 0, 1},
+    {get_بفر_عدد, "get-buff-num", 0, 1},
+    {get_بفر_سائز, "get-buff-size", 0, 1},
+    {سیٹ_بفر_سطر_list, "set-buff-line-list", 3, 4},
+    {داخل_کرو_بفر_سطر_list, "insert-buff-line-list", 2, 3},
+    {get_curr_بفر, "curr-buff", 0, 0},
+    {get_بفر_گنتی, "buff-count", 0, 0},
+    {get_اگلا_بفر, "get-next-buff", 0, 1},
+    {get_پچھلا_بفر, "get-prev-buff", 0, 1},
+    {mzscheme_open_بفر, "open-buff", 1, 1},
+    {get_بفر_by_name, "get-buff-by-name", 1, 1},
+    {get_بفر_by_عدد, "get-buff-by-num", 1, 1},
     /*
      * Window-related commands
      */
     {get_curr_win, "curr-win", 0, 0},
-    {get_window_count, "win-count", 0, 0},
-    {get_window_by_num, "get-win-by-num", 1, 1},
-    {get_window_num, "get-win-num", 0, 1},
-    {get_window_buffer, "get-win-buffer", 0, 1},
-    {get_window_height, "get-win-height", 0, 1},
-    {set_window_height, "set-win-height", 1, 2},
-    {get_window_width, "get-win-width", 0, 1},
-    {set_window_width, "set-win-width", 1, 2},
+    {get_کھڑکی_گنتی, "win-count", 0, 0},
+    {get_کھڑکی_by_عدد, "get-win-by-num", 1, 1},
+    {get_کھڑکی_عدد, "get-win-num", 0, 1},
+    {get_کھڑکی_بفر, "get-win-buffer", 0, 1},
+    {get_کھڑکی_اونچائی, "get-win-height", 0, 1},
+    {سیٹ_کھڑکی_اونچائی, "set-win-height", 1, 2},
+    {get_کھڑکی_چوڑائی, "get-win-width", 0, 1},
+    {سیٹ_کھڑکی_چوڑائی, "set-win-width", 1, 2},
     {get_cursor, "get-cursor", 0, 1},
-    {set_cursor, "set-cursor", 1, 2},
-    {get_window_list, "get-win-list", 0, 1},
+    {سیٹ_cursor, "set-cursor", 1, 2},
+    {get_کھڑکی_list, "get-win-list", 0, 1},
     /*
      * Vim-related commands
      */
     {vim_command, "command", 1, 1},
     {vim_eval, "eval", 1, 1},
-    {get_range_start, "range-start", 0, 0},
-    {get_range_end, "range-end", 0, 0},
+    {get_range_آغاز, "range-start", 0, 0},
+    {get_range_انتہا, "range-end", 0, 0},
     {mzscheme_beep, "beep", 0, 0},
     {get_option, "get-option", 1, 2},
-    {set_option, "set-option", 1, 2},
+    {سیٹ_option, "set-option", 1, 2},
     /*
      * small utilities
      */
     {vim_bufferp, "buff?", 1, 1},
     {vim_windowp, "win?", 1, 1},
-    {vim_buffer_validp, "buff-valid?", 1, 1},
-    {vim_window_validp, "win-valid?", 1, 1}
+    {vim_بفر_validp, "buff-valid?", 1, 1},
+    {vim_کھڑکی_validp, "win-valid?", 1, 1}
 };
 
 /*
  * return MzScheme wrapper for curbuf
  */
-    static vim_mz_buffer *
-get_vim_curr_buffer(void)
+    ساکن vim_mz_بفر *
+get_vim_curr_بفر(خالی)
 {
-    if (curbuf->b_mzscheme_ref == NULL)
-	return (vim_mz_buffer *)buffer_new(curbuf);
-    else
-	return BUFFER_REF(curbuf);
+    اگر (curbuf->b_mzscheme_ref == تہی)
+	واپس (vim_mz_بفر *)بفر_new(curbuf);
+    ورنہ
+	واپس بفر_REF(curbuf);
 }
 
 /*
  * return MzScheme wrapper for curwin
  */
-    static vim_mz_window *
-get_vim_curr_window(void)
+    ساکن vim_mz_کھڑکی *
+get_vim_curr_کھڑکی(خالی)
 {
-    if (curwin->w_mzscheme_ref == NULL)
-	return (vim_mz_window *)window_new(curwin);
-    else
-	return WINDOW_REF(curwin);
+    اگر (curwin->w_mzscheme_ref == تہی)
+	واپس (vim_mz_کھڑکی *)کھڑکی_new(curwin);
+    ورنہ
+	واپس کھڑکی_REF(curwin);
 }
 
-    static void
-make_modules(void)
+    ساکن خالی
+make_modules(خالی)
 {
-    int		    i;
-    Scheme_Env	    *mod = NULL;
-    Scheme_Object   *vimext_symbol = NULL;
-    Scheme_Object   *closed_prim = NULL;
+    صحیح		    i;
+    Scheme_Env	    *mod = تہی;
+    Scheme_Object   *vimext_علامت = تہی;
+    Scheme_Object   *closed_prim = تہی;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, mod);
-    MZ_GC_VAR_IN_REG(1, vimext_symbol);
-    MZ_GC_VAR_IN_REG(2, closed_prim);
+    MZ_GC_VAR_اندر_REG(0, mod);
+    MZ_GC_VAR_اندر_REG(1, vimext_علامت);
+    MZ_GC_VAR_اندر_REG(2, closed_prim);
     MZ_GC_REG();
 
-    vimext_symbol = scheme_intern_symbol("vimext");
+    vimext_علامت = scheme_intern_علامت("vimext");
     MZ_GC_CHECK();
-    mod = scheme_primitive_module(vimext_symbol, environment);
+    mod = scheme_primitive_module(vimext_علامت, environment);
     MZ_GC_CHECK();
     // all prims made closed so they can access their own names
-    for (i = 0; i < (int)ARRAY_LENGTH(prims); i++)
+    برائے (i = 0; i < (صحیح)ARRAY_لمبائی(prims); i++)
     {
 	Vim_Prim *prim = prims + i;
 	closed_prim = scheme_make_closed_prim_w_arity(prim->prim, prim, prim->name,
 			    prim->mina, prim->maxa);
-	scheme_add_global(prim->name, closed_prim, mod);
+	scheme_جوڑو_global(prim->name, closed_prim, mod);
 	MZ_GC_CHECK();
     }
-    scheme_finish_primitive_module(mod);
+    scheme_اختتام_primitive_module(mod);
     MZ_GC_CHECK();
     MZ_GC_UNREG();
 }
 
-#ifdef HAVE_SANDBOX
-static Scheme_Object *M_write = NULL;
-static Scheme_Object *M_read = NULL;
-static Scheme_Object *M_execute = NULL;
-static Scheme_Object *M_delete = NULL;
+#اگر_تعریف_شدہ HAVE_SANDBOX
+ساکن Scheme_Object *M_write = تہی;
+ساکن Scheme_Object *M_read = تہی;
+ساکن Scheme_Object *M_execute = تہی;
+ساکن Scheme_Object *M_delete = تہی;
 
-    static void
-sandbox_check(void)
+    ساکن خالی
+sandbox_check(خالی)
 {
-    if (sandbox)
+    اگر (sandbox)
 	raise_vim_exn(_("not allowed in the Vim sandbox"));
 }
 
 /*
  * security guards to force Vim's sandbox restrictions on MzScheme level
  */
-    static Scheme_Object *
-sandbox_file_guard(int argc UNUSED, Scheme_Object **argv)
+    ساکن Scheme_Object *
+sandbox_file_guard(صحیح argc غیر_مستعمل, Scheme_Object **argv)
 {
-    if (!sandbox)
-	return scheme_void;
+    اگر (!sandbox)
+	واپس scheme_void;
 
     Scheme_Object *requested_access = argv[2];
 
-    if (M_write == NULL)
+    اگر (M_write == تہی)
     {
-	MZ_REGISTER_STATIC(M_write);
-	M_write = scheme_intern_symbol("write");
+	MZ_رجسٹر_STATIC(M_write);
+	M_write = scheme_intern_علامت("write");
 	MZ_GC_CHECK();
     }
-    if (M_read == NULL)
+    اگر (M_read == تہی)
     {
-	MZ_REGISTER_STATIC(M_read);
-	M_read = scheme_intern_symbol("read");
+	MZ_رجسٹر_STATIC(M_read);
+	M_read = scheme_intern_علامت("read");
 	MZ_GC_CHECK();
     }
-    if (M_execute == NULL)
+    اگر (M_execute == تہی)
     {
-	MZ_REGISTER_STATIC(M_execute);
-	M_execute = scheme_intern_symbol("execute");
+	MZ_رجسٹر_STATIC(M_execute);
+	M_execute = scheme_intern_علامت("execute");
 	MZ_GC_CHECK();
     }
-    if (M_delete == NULL)
+    اگر (M_delete == تہی)
     {
-	MZ_REGISTER_STATIC(M_delete);
-	M_delete = scheme_intern_symbol("delete");
+	MZ_رجسٹر_STATIC(M_delete);
+	M_delete = scheme_intern_علامت("delete");
 	MZ_GC_CHECK();
     }
 
-    while (!SCHEME_NULLP(requested_access))
+    جب (!SCHEME_NULLP(requested_access))
     {
-	Scheme_Object *item = SCHEME_CAR(requested_access);
-	if (scheme_eq(item, M_write) || scheme_eq(item, M_read)
-		|| scheme_eq(item, M_execute) || scheme_eq(item, M_delete))
+	Scheme_Object *شے = SCHEME_CAR(requested_access);
+	اگر (scheme_eq(شے, M_write) || scheme_eq(شے, M_read)
+		|| scheme_eq(شے, M_execute) || scheme_eq(شے, M_delete))
 	    raise_vim_exn(_("not allowed in the Vim sandbox"));
 	requested_access = SCHEME_CDR(requested_access);
     }
 
-    return scheme_void;
+    واپس scheme_void;
 }
 
-    static Scheme_Object *
-sandbox_network_guard(int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساکن Scheme_Object *
+sandbox_جال_guard(صحیح argc غیر_مستعمل, Scheme_Object **argv غیر_مستعمل)
 {
-    return scheme_void;
+    واپس scheme_void;
 }
-#endif
+#اگر_ختم
 
-#endif
+#اگر_ختم
