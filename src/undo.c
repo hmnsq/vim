@@ -84,11 +84,11 @@
 // Size of buffer used for encryption.
 #define CRYPT_BUF_SIZE 8192
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 // Structure passed around between functions.
 // Avoids passing cryptstate_T when encryption not available.
-typedef struct {
+प्रकारनिर्देश संरचना {
     buf_T	*bi_buf;
     FILE	*bi_fp;
 #ifdef FEAT_CRYPT
@@ -100,86 +100,86 @@ typedef struct {
 } bufinfo_T;
 
 
-static void u_unch_branch(u_header_T *uhp);
-static u_entry_T *u_get_headentry(void);
-static void u_getbot(void);
-static void u_doit(int count);
-static void u_undoredo(int undo);
-static void u_undo_end(int did_undo, int absolute);
-static void u_freeheader(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freebranch(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freeentries(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
-static void u_freeentry(u_entry_T *, long);
+स्थिर शून्य u_unch_branch(u_header_T *uhp);
+स्थिर u_entry_T *u_get_headentry(शून्य);
+स्थिर शून्य u_getbot(शून्य);
+स्थिर शून्य u_doit(पूर्णाङ्क मोजणी);
+स्थिर शून्य u_undoredo(पूर्णाङ्क undo);
+स्थिर शून्य u_undo_end(पूर्णाङ्क did_undo, पूर्णाङ्क absolute);
+स्थिर शून्य u_freeheader(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
+स्थिर शून्य u_freebranch(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
+स्थिर शून्य u_freeentries(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
+स्थिर शून्य u_freeentry(u_entry_T *, long);
 #ifdef FEAT_PERSISTENT_UNDO
 # ifdef FEAT_CRYPT
-static int undo_flush(bufinfo_T *bi);
+स्थिर पूर्णाङ्क undo_flush(bufinfo_T *bi);
 # endif
-static int undo_read(bufinfo_T *bi, char_u *buffer, size_t size);
-static int serialize_uep(bufinfo_T *bi, u_entry_T *uep);
-static u_entry_T *unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name);
-static void serialize_pos(bufinfo_T *bi, pos_T pos);
-static void unserialize_pos(bufinfo_T *bi, pos_T *pos);
-static void serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
-static void unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
+स्थिर पूर्णाङ्क undo_read(bufinfo_T *bi, char_u *buffer, size_t size);
+स्थिर पूर्णाङ्क serialize_uep(bufinfo_T *bi, u_entry_T *uep);
+स्थिर u_entry_T *unserialize_uep(bufinfo_T *bi, पूर्णाङ्क *error, char_u *file_name);
+स्थिर शून्य serialize_pos(bufinfo_T *bi, pos_T pos);
+स्थिर शून्य unserialize_pos(bufinfo_T *bi, pos_T *pos);
+स्थिर शून्य serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
+स्थिर शून्य unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
 #endif
-static void u_saveline(linenr_T lnum);
-static void u_blockfree(buf_T *buf);
+स्थिर शून्य u_saveline(linenr_T lnum);
+स्थिर शून्य u_blockfree(buf_T *buf);
 
-#define U_ALLOC_LINE(size) lalloc(size, FALSE)
+#define U_ALLOC_ओळ(size) lalloc(size, FALSE)
 
 // used in undo_end() to report number of added and deleted lines
-static long	u_newcount, u_oldcount;
+स्थिर long	u_newcount, u_oldcount;
 
 /*
  * When 'u' flag included in 'cpoptions', we behave like vi.  Need to remember
  * the action that "u" should do.
  */
-static int	undo_undoes = FALSE;
+स्थिर पूर्णाङ्क	undo_undoes = FALSE;
 
-static int	lastmark = 0;
+स्थिर पूर्णाङ्क	lastmark = 0;
 
-#if defined(U_DEBUG)
+#यदि defined(U_DEBUG)
 /*
  * Check the undo structures for being valid.  Print a warning when something
  * looks wrong.
  */
-static int seen_b_u_curhead;
-static int seen_b_u_newhead;
-static int header_count;
+स्थिर पूर्णाङ्क seen_b_u_curhead;
+स्थिर पूर्णाङ्क seen_b_u_newhead;
+स्थिर पूर्णाङ्क header_मोजणी;
 
-    static void
-u_check_tree(u_header_T *uhp,
+    स्थिर शून्य
+u_check_वृक्ष(u_header_T *uhp,
 	u_header_T *exp_uh_next,
 	u_header_T *exp_uh_alt_prev)
 {
     u_entry_T *uep;
 
-    if (uhp == NULL)
-	return;
-    ++header_count;
-    if (uhp == curbuf->b_u_curhead && ++seen_b_u_curhead > 1)
+    यदि (uhp == रिक्त)
+	प्रत्यागम;
+    ++header_मोजणी;
+    यदि (uhp == curbuf->b_u_curhead && ++seen_b_u_curhead > 1)
     {
 	emsg("b_u_curhead found twice (looping?)");
-	return;
+	प्रत्यागम;
     }
-    if (uhp == curbuf->b_u_newhead && ++seen_b_u_newhead > 1)
+    यदि (uhp == curbuf->b_u_newhead && ++seen_b_u_newhead > 1)
     {
 	emsg("b_u_newhead found twice (looping?)");
-	return;
+	प्रत्यागम;
     }
 
-    if (uhp->uh_magic != UH_MAGIC)
+    यदि (uhp->uh_magic != UH_MAGIC)
 	emsg("uh_magic wrong (may be using freed memory)");
-    else
+    अन्यथा
     {
 	// Check pointers back are correct.
-	if (uhp->uh_next.ptr != exp_uh_next)
+	यदि (uhp->uh_next.ptr != exp_uh_next)
 	{
 	    emsg("uh_next wrong");
 	    smsg("expected: 0x%x, actual: 0x%x",
 					       exp_uh_next, uhp->uh_next.ptr);
 	}
-	if (uhp->uh_alt_prev.ptr != exp_uh_alt_prev)
+	यदि (uhp->uh_alt_prev.ptr != exp_uh_alt_prev)
 	{
 	    emsg("uh_alt_prev wrong");
 	    smsg("expected: 0x%x, actual: 0x%x",
@@ -187,42 +187,42 @@ u_check_tree(u_header_T *uhp,
 	}
 
 	// Check the undo tree at this header.
-	for (uep = uhp->uh_entry; uep != NULL; uep = uep->ue_next)
+	प्रति (uep = uhp->uh_entry; uep != रिक्त; uep = uep->ue_next)
 	{
-	    if (uep->ue_magic != UE_MAGIC)
+	    यदि (uep->ue_magic != UE_MAGIC)
 	    {
 		emsg("ue_magic wrong (may be using freed memory)");
-		break;
+		भङ्ग;
 	    }
 	}
 
 	// Check the next alt tree.
-	u_check_tree(uhp->uh_alt_next.ptr, uhp->uh_next.ptr, uhp);
+	u_check_वृक्ष(uhp->uh_alt_next.ptr, uhp->uh_next.ptr, uhp);
 
 	// Check the next header in this branch.
-	u_check_tree(uhp->uh_prev.ptr, uhp, NULL);
+	u_check_वृक्ष(uhp->uh_prev.ptr, uhp, रिक्त);
     }
 }
 
-    static void
-u_check(int newhead_may_be_NULL)
+    स्थिर शून्य
+u_check(पूर्णाङ्क newhead_may_be_NULL)
 {
     seen_b_u_newhead = 0;
     seen_b_u_curhead = 0;
-    header_count = 0;
+    header_मोजणी = 0;
 
-    u_check_tree(curbuf->b_u_oldhead, NULL, NULL);
+    u_check_वृक्ष(curbuf->b_u_oldhead, रिक्त, रिक्त);
 
-    if (seen_b_u_newhead == 0 && curbuf->b_u_oldhead != NULL
-	    && !(newhead_may_be_NULL && curbuf->b_u_newhead == NULL))
+    यदि (seen_b_u_newhead == 0 && curbuf->b_u_oldhead != रिक्त
+	    && !(newhead_may_be_NULL && curbuf->b_u_newhead == रिक्त))
 	semsg("b_u_newhead invalid: 0x%x", curbuf->b_u_newhead);
-    if (curbuf->b_u_curhead != NULL && seen_b_u_curhead == 0)
+    यदि (curbuf->b_u_curhead != रिक्त && seen_b_u_curhead == 0)
 	semsg("b_u_curhead invalid: 0x%x", curbuf->b_u_curhead);
-    if (header_count != curbuf->b_u_numhead)
+    यदि (header_मोजणी != curbuf->b_u_numhead)
     {
 	emsg("b_u_numhead invalid");
 	smsg("expected: %ld, actual: %ld",
-			       (long)header_count, (long)curbuf->b_u_numhead);
+			       (long)header_मोजणी, (long)curbuf->b_u_numhead);
     }
 }
 #endif
@@ -232,10 +232,10 @@ u_check(int newhead_may_be_NULL)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns OK or FAIL.
  */
-    int
-u_save_cursor(void)
+    पूर्णाङ्क
+u_save_cursor(शून्य)
 {
-    return (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+    प्रत्यागम (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
 				      (linenr_T)(curwin->w_cursor.lnum + 1)));
 }
 
@@ -245,19 +245,19 @@ u_save_cursor(void)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
-u_save(linenr_T top, linenr_T bot)
+    पूर्णाङ्क
+u_save(linenr_T शीर्ष, linenr_T bot)
 {
-    if (undo_off)
-	return OK;
+    यदि (undo_off)
+	प्रत्यागम OK;
 
-    if (top >= bot || bot > curbuf->b_ml.ml_line_count + 1)
-	return FAIL;	// rely on caller to give an error message
+    यदि (शीर्ष >= bot || bot > curbuf->b_ml.ml_ओळ_मोजणी + 1)
+	प्रत्यागम FAIL;	// rely on caller to give an error message
 
-    if (top + 2 == bot)
-	u_saveline((linenr_T)(top + 1));
+    यदि (शीर्ष + 2 == bot)
+	u_saveline((linenr_T)(शीर्ष + 1));
 
-    return (u_savecommon(top, bot, (linenr_T)0, FALSE));
+    प्रत्यागम (u_savecommon(शीर्ष, bot, (linenr_T)0, FALSE));
 }
 
 /*
@@ -266,13 +266,13 @@ u_save(linenr_T top, linenr_T bot)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    पूर्णाङ्क
 u_savesub(linenr_T lnum)
 {
-    if (undo_off)
-	return OK;
+    यदि (undo_off)
+	प्रत्यागम OK;
 
-    return (u_savecommon(lnum - 1, lnum + 1, lnum + 1, FALSE));
+    प्रत्यागम (u_savecommon(lnum - 1, lnum + 1, lnum + 1, FALSE));
 }
 
 /*
@@ -281,13 +281,13 @@ u_savesub(linenr_T lnum)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    पूर्णाङ्क
 u_inssub(linenr_T lnum)
 {
-    if (undo_off)
-	return OK;
+    यदि (undo_off)
+	प्रत्यागम OK;
 
-    return (u_savecommon(lnum - 1, lnum, lnum + 1, FALSE));
+    प्रत्यागम (u_savecommon(lnum - 1, lnum, lnum + 1, FALSE));
 }
 
 /*
@@ -297,106 +297,106 @@ u_inssub(linenr_T lnum)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    पूर्णाङ्क
 u_savedel(linenr_T lnum, long nlines)
 {
-    if (undo_off)
-	return OK;
+    यदि (undo_off)
+	प्रत्यागम OK;
 
-    return (u_savecommon(lnum - 1, lnum + nlines,
-		     nlines == curbuf->b_ml.ml_line_count ? 2 : lnum, FALSE));
+    प्रत्यागम (u_savecommon(lnum - 1, lnum + nlines,
+		     nlines == curbuf->b_ml.ml_ओळ_मोजणी ? 2 : lnum, FALSE));
 }
 
 /*
  * Return TRUE when undo is allowed.  Otherwise give an error message and
  * return FALSE.
  */
-    int
-undo_allowed(void)
+    पूर्णाङ्क
+undo_allowed(शून्य)
 {
     // Don't allow changes when 'modifiable' is off.
-    if (!curbuf->b_p_ma)
+    यदि (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return FALSE;
+	प्रत्यागम FALSE;
     }
 
 #ifdef HAVE_SANDBOX
     // In the sandbox it's not allowed to change the text.
-    if (sandbox != 0)
+    यदि (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return FALSE;
+	प्रत्यागम FALSE;
     }
 #endif
 
     // Don't allow changes in the buffer while editing the cmdline.  The
     // caller of getcmdline() may get confused.
-    if (textlock != 0)
+    यदि (textlock != 0)
     {
 	emsg(_(e_not_allowed_to_change_text_or_change_window));
-	return FALSE;
+	प्रत्यागम FALSE;
     }
 
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
  * Get the undolevel value for the current buffer.
  */
-    static long
-get_undolevel(void)
+    स्थिर long
+get_undolevel(शून्य)
 {
-    if (curbuf->b_p_ul == NO_LOCAL_UNDOLEVEL)
-	return p_ul;
-    return curbuf->b_p_ul;
+    यदि (curbuf->b_p_ul == NO_LOCAL_UNDOLEVEL)
+	प्रत्यागम p_ul;
+    प्रत्यागम curbuf->b_p_ul;
 }
 
 /*
  * u_save_line(): save an allocated copy of line "lnum" into "ul".
  * Returns FAIL when out of memory.
  */
-    static int
-u_save_line(undoline_T *ul, linenr_T lnum)
+    स्थिर पूर्णाङ्क
+u_save_ओळ(undoline_T *ul, linenr_T lnum)
 {
-    char_u *line = ml_get(lnum);
+    char_u *ओळ = ml_get(lnum);
 
     ul->ul_textlen = ml_get_len(lnum);
-    if (curbuf->b_ml.ml_line_len == 0)
+    यदि (curbuf->b_ml.ml_ओळ_len == 0)
     {
 	ul->ul_len = 1;
-	ul->ul_line = vim_strsave((char_u *)"");
+	ul->ul_ओळ = vim_strsave((char_u *)"");
     }
-    else
+    अन्यथा
     {
 	// This uses the length in the memline, thus text properties are
 	// included.
-	ul->ul_len = curbuf->b_ml.ml_line_len;
-	ul->ul_line = vim_memsave(line, ul->ul_len);
+	ul->ul_len = curbuf->b_ml.ml_ओळ_len;
+	ul->ul_ओळ = vim_memsave(ओळ, ul->ul_len);
     }
-    return ul->ul_line == NULL ? FAIL : OK;
+    प्रत्यागम ul->ul_ओळ == रिक्त ? FAIL : OK;
 }
 
 #ifdef FEAT_PROP_POPUP
 /*
  * return TRUE if line "lnum" has text property "flags".
  */
-    static int
-has_prop_w_flags(linenr_T lnum, int flags)
+    स्थिर पूर्णाङ्क
+has_prop_w_flags(linenr_T lnum, पूर्णाङ्क flags)
 {
     char_u  *props;
-    int	    i;
-    int	    proplen = get_text_props(curbuf, lnum, &props, FALSE);
+    पूर्णाङ्क	    i;
+    पूर्णाङ्क	    proplen = get_text_props(curbuf, lnum, &props, FALSE);
 
-    for (i = 0; i < proplen; ++i)
+    प्रति (i = 0; i < proplen; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, props + i * sizeof prop, sizeof prop);
-	if (prop.tp_flags & flags)
-	    return TRUE;
+	mch_memmove(&prop, props + i * परिमाण prop, परिमाण prop);
+	यदि (prop.tp_flags & flags)
+	    प्रत्यागम TRUE;
     }
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 #endif
 
@@ -409,12 +409,12 @@ has_prop_w_flags(linenr_T lnum, int flags)
  * Careful: may trigger autocommands that reload the buffer.
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
-    int
+    पूर्णाङ्क
 u_savecommon(
-    linenr_T	top,
+    linenr_T	शीर्ष,
     linenr_T	bot,
     linenr_T	newbot,
-    int		reload)
+    पूर्णाङ्क		reload)
 {
     linenr_T	lnum;
     long	i;
@@ -424,29 +424,29 @@ u_savecommon(
     u_entry_T	*prev_uep;
     long	size;
 
-    if (!reload)
+    यदि (!reload)
     {
 	// When making changes is not allowed return FAIL.  It's a crude way
 	// to make all change commands fail.
-	if (!undo_allowed())
-	    return FAIL;
+	यदि (!undo_allowed())
+	    प्रत्यागम FAIL;
 
 #ifdef FEAT_NETBEANS_INTG
 	/*
 	 * Netbeans defines areas that cannot be modified.  Bail out here when
 	 * trying to change text in a guarded area.
 	 */
-	if (netbeans_active())
+	यदि (netbeans_active())
 	{
-	    if (netbeans_is_guarded(top, bot))
+	    यदि (netbeans_is_guarded(शीर्ष, bot))
 	    {
 		emsg(_(e_region_is_guarded_cannot_modify));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    if (curbuf->b_p_ro)
+	    यदि (curbuf->b_p_ro)
 	    {
 		emsg(_(e_netbeans_does_not_allow_changes_in_read_only_files));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	}
 #endif
@@ -462,12 +462,12 @@ u_savecommon(
 	 * (e.g., obtained from a source control system).
 	 */
 	change_warning(0);
-	if (bot > curbuf->b_ml.ml_line_count + 1)
+	यदि (bot > curbuf->b_ml.ml_ओळ_मोजणी + 1)
 	{
 	    // This happens when the FileChangedRO autocommand changes the
 	    // file in a way it becomes shorter.
-	    emsg(_(e_line_count_changed_unexpectedly));
-	    return FAIL;
+	    emsg(_(e_ओळ_मोजणी_changed_unexpectedly));
+	    प्रत्यागम FAIL;
 	}
     }
 
@@ -478,75 +478,75 @@ u_savecommon(
 #ifdef FEAT_PROP_POPUP
     // Include the line above if a text property continues from it.
     // Include the line below if a text property continues to it.
-    if (bot - top > 1)
+    यदि (bot - शीर्ष > 1)
     {
-	if (top > 0 && has_prop_w_flags(top + 1, TP_FLAG_CONT_PREV))
-	    --top;
-	if (bot <= curbuf->b_ml.ml_line_count
+	यदि (शीर्ष > 0 && has_prop_w_flags(शीर्ष + 1, TP_FLAG_CONT_PREV))
+	    --शीर्ष;
+	यदि (bot <= curbuf->b_ml.ml_ओळ_मोजणी
 			       && has_prop_w_flags(bot - 1, TP_FLAG_CONT_NEXT))
 	{
 	    ++bot;
-	    if (newbot != 0)
+	    यदि (newbot != 0)
 		++newbot;
 	}
     }
 #endif
 
-    size = bot - top - 1;
+    size = bot - शीर्ष - 1;
 
     /*
      * If curbuf->b_u_synced is true make a new header.
      */
-    if (curbuf->b_u_synced)
+    यदि (curbuf->b_u_synced)
     {
 	// Need to create new entry in b_changelist.
 	curbuf->b_new_change = true;
 
-	if (get_undolevel() >= 0)
+	यदि (get_undolevel() >= 0)
 	{
 	    /*
 	     * Make a new header entry.  Do this first so that we don't mess
 	     * up the undo info when out of memory.
 	     */
-	    uhp = U_ALLOC_LINE(sizeof(u_header_T));
-	    if (uhp == NULL)
-		goto nomem;
+	    uhp = U_ALLOC_ओळ(परिमाण(u_header_T));
+	    यदि (uhp == रिक्त)
+		गच्छ nomem;
 #ifdef U_DEBUG
 	    uhp->uh_magic = UH_MAGIC;
 #endif
 	}
-	else
-	    uhp = NULL;
+	अन्यथा
+	    uhp = रिक्त;
 
 	/*
 	 * If we undid more than we redid, move the entry lists before and
 	 * including curbuf->b_u_curhead to an alternate branch.
 	 */
 	old_curhead = curbuf->b_u_curhead;
-	if (old_curhead != NULL)
+	यदि (old_curhead != रिक्त)
 	{
 	    curbuf->b_u_newhead = old_curhead->uh_next.ptr;
-	    curbuf->b_u_curhead = NULL;
+	    curbuf->b_u_curhead = रिक्त;
 	}
 
 	/*
 	 * free headers to keep the size right
 	 */
-	while (curbuf->b_u_numhead > get_undolevel()
-					       && curbuf->b_u_oldhead != NULL)
+	यावत् (curbuf->b_u_numhead > get_undolevel()
+					       && curbuf->b_u_oldhead != रिक्त)
 	{
 	    u_header_T	    *uhfree = curbuf->b_u_oldhead;
 
-	    if (uhfree == old_curhead)
+	    यदि (uhfree == old_curhead)
 		// Can't reconnect the branch, delete all of it.
 		u_freebranch(curbuf, uhfree, &old_curhead);
-	    else if (uhfree->uh_alt_next.ptr == NULL)
+	    अन्यथा यदि (uhfree->uh_alt_next.ptr == रिक्त)
 		// There is no branch, only free one header.
 		u_freeheader(curbuf, uhfree, &old_curhead);
-	    else
+	    अन्यथा
 	    {
 		// Free the oldest alternate branch as a whole.
-		while (uhfree->uh_alt_next.ptr != NULL)
+		यावत् (uhfree->uh_alt_next.ptr != रिक्त)
 		    uhfree = uhfree->uh_alt_next.ptr;
 		u_freebranch(curbuf, uhfree, &old_curhead);
 	    }
@@ -555,29 +555,29 @@ u_savecommon(
 #endif
 	}
 
-	if (uhp == NULL)		// no undo at all
+	यदि (uhp == रिक्त)		// no undo at all
 	{
-	    if (old_curhead != NULL)
-		u_freebranch(curbuf, old_curhead, NULL);
+	    यदि (old_curhead != रिक्त)
+		u_freebranch(curbuf, old_curhead, रिक्त);
 	    curbuf->b_u_synced = false;
-	    return OK;
+	    प्रत्यागम OK;
 	}
 
-	uhp->uh_prev.ptr = NULL;
+	uhp->uh_prev.ptr = रिक्त;
 	uhp->uh_next.ptr = curbuf->b_u_newhead;
 	uhp->uh_alt_next.ptr = old_curhead;
-	if (old_curhead != NULL)
+	यदि (old_curhead != रिक्त)
 	{
 	    uhp->uh_alt_prev.ptr = old_curhead->uh_alt_prev.ptr;
-	    if (uhp->uh_alt_prev.ptr != NULL)
+	    यदि (uhp->uh_alt_prev.ptr != रिक्त)
 		uhp->uh_alt_prev.ptr->uh_alt_next.ptr = uhp;
 	    old_curhead->uh_alt_prev.ptr = uhp;
-	    if (curbuf->b_u_oldhead == old_curhead)
+	    यदि (curbuf->b_u_oldhead == old_curhead)
 		curbuf->b_u_oldhead = uhp;
 	}
-	else
-	    uhp->uh_alt_prev.ptr = NULL;
-	if (curbuf->b_u_newhead != NULL)
+	अन्यथा
+	    uhp->uh_alt_prev.ptr = रिक्त;
+	यदि (curbuf->b_u_newhead != रिक्त)
 	    curbuf->b_u_newhead->uh_prev.ptr = uhp;
 
 	uhp->uh_seq = ++curbuf->b_u_seq_last;
@@ -587,12 +587,12 @@ u_savecommon(
 	curbuf->b_u_time_cur = uhp->uh_time + 1;
 
 	uhp->uh_walk = 0;
-	uhp->uh_entry = NULL;
-	uhp->uh_getbot_entry = NULL;
+	uhp->uh_entry = रिक्त;
+	uhp->uh_getbot_entry = रिक्त;
 	uhp->uh_cursor = curwin->w_cursor;	// save cursor pos. for undo
-	if (virtual_active() && curwin->w_cursor.coladd > 0)
+	यदि (virtual_active() && curwin->w_cursor.coladd > 0)
 	    uhp->uh_cursor_vcol = getviscol();
-	else
+	अन्यथा
 	    uhp->uh_cursor_vcol = -1;
 
 	// save changed and buffer empty flag for undo
@@ -600,18 +600,18 @@ u_savecommon(
 		       ((curbuf->b_ml.ml_flags & ML_EMPTY) ? UH_EMPTYBUF : 0);
 
 	// save named marks and Visual marks for undo
-	mch_memmove(uhp->uh_namedm, curbuf->b_namedm, sizeof(pos_T) * NMARKS);
+	mch_memmove(uhp->uh_namedm, curbuf->b_namedm, परिमाण(pos_T) * NMARKS);
 	uhp->uh_visual = curbuf->b_visual;
 
 	curbuf->b_u_newhead = uhp;
-	if (curbuf->b_u_oldhead == NULL)
+	यदि (curbuf->b_u_oldhead == रिक्त)
 	    curbuf->b_u_oldhead = uhp;
 	++curbuf->b_u_numhead;
     }
-    else
+    अन्यथा
     {
-	if (get_undolevel() < 0)	// no undo at all
-	    return OK;
+	यदि (get_undolevel() < 0)	// no undo at all
+	    प्रत्यागम OK;
 
 	/*
 	 * When saving a single line, and it has been saved just before, it
@@ -622,32 +622,32 @@ u_savecommon(
 	 * Check the ten last changes.  More doesn't make sense and takes too
 	 * long.
 	 */
-	if (size == 1)
+	यदि (size == 1)
 	{
 	    uep = u_get_headentry();
-	    prev_uep = NULL;
-	    for (i = 0; i < 10; ++i)
+	    prev_uep = रिक्त;
+	    प्रति (i = 0; i < 10; ++i)
 	    {
-		if (uep == NULL)
-		    break;
+		यदि (uep == रिक्त)
+		    भङ्ग;
 
 		// If lines have been inserted/deleted we give up.
 		// Also when the line was included in a multi-line save.
-		if ((curbuf->b_u_newhead->uh_getbot_entry != uep
-			    ? (uep->ue_top + uep->ue_size + 1
+		यदि ((curbuf->b_u_newhead->uh_getbot_entry != uep
+			    ? (uep->ue_शीर्ष + uep->ue_size + 1
 				!= (uep->ue_bot == 0
-				    ? curbuf->b_ml.ml_line_count + 1
+				    ? curbuf->b_ml.ml_ओळ_मोजणी + 1
 				    : uep->ue_bot))
-			    : uep->ue_lcount != curbuf->b_ml.ml_line_count)
+			    : uep->ue_lcount != curbuf->b_ml.ml_ओळ_मोजणी)
 			|| (uep->ue_size > 1
-			    && top >= uep->ue_top
-			    && top + 2 <= uep->ue_top + uep->ue_size + 1))
-		    break;
+			    && शीर्ष >= uep->ue_शीर्ष
+			    && शीर्ष + 2 <= uep->ue_शीर्ष + uep->ue_size + 1))
+		    भङ्ग;
 
 		// If it's the same line we can skip saving it again.
-		if (uep->ue_size == 1 && uep->ue_top == top)
+		यदि (uep->ue_size == 1 && uep->ue_शीर्ष == शीर्ष)
 		{
-		    if (i > 0)
+		    यदि (i > 0)
 		    {
 			// It's not the last entry: get ue_bot for the last
 			// entry now.  Following deleted/inserted lines go to
@@ -667,16 +667,16 @@ u_savecommon(
 		    }
 
 		    // The executed command may change the line count.
-		    if (newbot != 0)
+		    यदि (newbot != 0)
 			uep->ue_bot = newbot;
-		    else if (bot > curbuf->b_ml.ml_line_count)
+		    अन्यथा यदि (bot > curbuf->b_ml.ml_ओळ_मोजणी)
 			uep->ue_bot = 0;
-		    else
+		    अन्यथा
 		    {
-			uep->ue_lcount = curbuf->b_ml.ml_line_count;
+			uep->ue_lcount = curbuf->b_ml.ml_ओळ_मोजणी;
 			curbuf->b_u_newhead->uh_getbot_entry = uep;
 		    }
-		    return OK;
+		    प्रत्यागम OK;
 		}
 		prev_uep = uep;
 		uep = uep->ue_next;
@@ -690,54 +690,54 @@ u_savecommon(
     /*
      * add lines in front of entry list
      */
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
-    if (uep == NULL)
-	goto nomem;
+    uep = U_ALLOC_ओळ(परिमाण(u_entry_T));
+    यदि (uep == रिक्त)
+	गच्छ nomem;
     CLEAR_POINTER(uep);
 #ifdef U_DEBUG
     uep->ue_magic = UE_MAGIC;
 #endif
 
     uep->ue_size = size;
-    uep->ue_top = top;
-    if (newbot != 0)
+    uep->ue_शीर्ष = शीर्ष;
+    यदि (newbot != 0)
 	uep->ue_bot = newbot;
     /*
      * Use 0 for ue_bot if bot is below last line.
      * Otherwise we have to compute ue_bot later.
      */
-    else if (bot > curbuf->b_ml.ml_line_count)
+    अन्यथा यदि (bot > curbuf->b_ml.ml_ओळ_मोजणी)
 	uep->ue_bot = 0;
-    else
+    अन्यथा
     {
-	uep->ue_lcount = curbuf->b_ml.ml_line_count;
+	uep->ue_lcount = curbuf->b_ml.ml_ओळ_मोजणी;
 	curbuf->b_u_newhead->uh_getbot_entry = uep;
     }
 
-    if (size > 0)
+    यदि (size > 0)
     {
-	if ((uep->ue_array = U_ALLOC_LINE(sizeof(undoline_T) * size)) == NULL)
+	यदि ((uep->ue_array = U_ALLOC_ओळ(परिमाण(undoline_T) * size)) == रिक्त)
 	{
 	    u_freeentry(uep, 0L);
-	    goto nomem;
+	    गच्छ nomem;
 	}
-	for (i = 0, lnum = top + 1; i < size; ++i)
+	प्रति (i = 0, lnum = शीर्ष + 1; i < size; ++i)
 	{
 	    fast_breakcheck();
-	    if (got_int)
+	    यदि (got_int)
 	    {
 		u_freeentry(uep, i);
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    if (u_save_line(&uep->ue_array[i], lnum++) == FAIL)
+	    यदि (u_save_ओळ(&uep->ue_array[i], lnum++) == FAIL)
 	    {
 		u_freeentry(uep, i);
-		goto nomem;
+		गच्छ nomem;
 	    }
 	}
     }
-    else
-	uep->ue_array = NULL;
+    अन्यथा
+	uep->ue_array = रिक्त;
     uep->ue_next = curbuf->b_u_newhead->uh_entry;
     curbuf->b_u_newhead->uh_entry = uep;
     curbuf->b_u_synced = false;
@@ -746,21 +746,21 @@ u_savecommon(
 #ifdef U_DEBUG
     u_check(FALSE);
 #endif
-    return OK;
+    प्रत्यागम OK;
 
 nomem:
-    msg_silent = 0;	// must display the prompt
-    if (ask_yesno((char_u *)_("No undo possible; continue anyway"), TRUE)
+    संदेश_silent = 0;	// must display the prompt
+    यदि (ask_yesno((char_u *)_("No undo possible; continue anyway"), TRUE)
 								       == 'y')
     {
 	undo_off = TRUE;	    // will be reset when character typed
-	return OK;
+	प्रत्यागम OK;
     }
-    do_outofmem_msg((long_u)0);
-    return FAIL;
+    do_outofmem_संदेश((long_u)0);
+    प्रत्यागम FAIL;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#यदि defined(FEAT_PERSISTENT_UNDO)
 
 # define UF_START_MAGIC	    "Vim\237UnDo\345"  // magic at start of undofile
 # define UF_START_MAGIC_LEN	9
@@ -780,14 +780,14 @@ nomem:
 /*
  * Compute the hash for the current buffer text into hash[UNDO_HASH_SIZE].
  */
-    void
+    शून्य
 u_compute_hash(char_u *hash)
 {
     context_sha256_T	ctx;
     linenr_T		lnum;
 
     sha256_start(&ctx);
-    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+    प्रति (lnum = 1; lnum <= curbuf->b_ml.ml_ओळ_मोजणी; ++lnum)
 	sha256_update(&ctx, ml_get(lnum), (UINT32_T)(ml_get_len(lnum) + 1));
     sha256_finish(&ctx, hash);
 }
@@ -799,14 +799,14 @@ u_compute_hash(char_u *hash)
  * When "reading" is FALSE use the first name where the directory exists.
  * Returns NULL when there is no place to write or no file to read.
  */
-    static char_u *
-u_get_undo_file_name(char_u *buf_ffname, int reading)
+    स्थिर char_u *
+u_get_undo_file_name(char_u *buf_ffname, पूर्णाङ्क reading)
 {
     char_u	*dirp;
     char_u	dir_name[IOSIZE + 1];
-    string_T	munged_name = {NULL, 0};
-    char_u	*undo_file_name = NULL;
-    int		dir_len;
+    string_T	munged_name = {रिक्त, 0};
+    char_u	*undo_file_name = रिक्त;
+    पूर्णाङ्क		dir_len;
     char_u	*p;
     size_t	plen;
     stat_T	st;
@@ -816,13 +816,13 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
     char_u	fname_buf[MAXPATHL];
 # endif
 
-    if (ffname == NULL)
-	return NULL;
+    यदि (ffname == रिक्त)
+	प्रत्यागम रिक्त;
 
 # ifdef HAVE_READLINK
     // Expand symlink in the file name, so that we put the undo file with the
     // actual file instead of with the symlink.
-    if (resolve_symlink(ffname, fname_buf) == OK)
+    यदि (resolve_symlink(ffname, fname_buf) == OK)
 	ffname = fname_buf;
 # endif
 
@@ -830,16 +830,16 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
     // Loop over 'undodir'.  When reading find the first file that exists.
     // When not reading use the first directory that exists or ".".
     dirp = p_udir;
-    while (*dirp != NUL)
+    यावत् (*dirp != NUL)
     {
 	dir_len = copy_option_part(&dirp, dir_name, IOSIZE, ",");
-	if (dir_len == 1 && dir_name[0] == '.')
+	यदि (dir_len == 1 && dir_name[0] == '.')
 	{
 	    // Use same directory as the ffname,
 	    // "dir/name" -> "dir/.name.un~"
 	    undo_file_name = vim_strnsave(ffname, ffnamelen + 5);
-	    if (undo_file_name == NULL)
-		break;
+	    यदि (undo_file_name == रिक्त)
+		भङ्ग;
 	    p = gettail(undo_file_name);
 	    plen = (size_t)(ffnamelen - (p - undo_file_name));
 # ifdef VMS
@@ -849,7 +849,7 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
 	    mch_memmove(p + 4,  p, plen + 1);
 	    mch_memmove(p, "_un_", 4);
 
-# else
+# अन्यथा
 	    // Use same directory as the ffname,
 	    // "dir/name" -> "dir/.name.un~"
 	    mch_memmove(p + 1, p, plen + 1);
@@ -857,21 +857,21 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
 	    STRCPY(p + plen + 1, ".un~");
 # endif
 	}
-	else
+	अन्यथा
 	{
 	    dir_name[dir_len] = NUL;
-	    if (mch_isdir(dir_name))
+	    यदि (mch_isdir(dir_name))
 	    {
 		string_T    ret;
 
-		if (munged_name.string == NULL)
+		यदि (munged_name.string == रिक्त)
 		{
 		    munged_name.string = vim_strnsave(ffname, ffnamelen);
-		    if (munged_name.string == NULL)
-			return NULL;
+		    यदि (munged_name.string == रिक्त)
+			प्रत्यागम रिक्त;
 		    munged_name.length = ffnamelen;
-		    for (p = munged_name.string; *p != NUL; MB_PTR_ADV(p))
-			if (vim_ispathsep(*p))
+		    प्रति (p = munged_name.string; *p != NUL; MB_PTR_ADV(p))
+			यदि (vim_ispathsep(*p))
 			    *p = '%';
 		}
 		undo_file_name = concat_fnames(dir_name, (size_t)dir_len,
@@ -880,30 +880,30 @@ u_get_undo_file_name(char_u *buf_ffname, int reading)
 	}
 
 	// When reading check if the file exists.
-	if (undo_file_name != NULL && (!reading
-			       || mch_stat((char *)undo_file_name, &st) >= 0))
-	    break;
+	यदि (undo_file_name != रिक्त && (!reading
+			       || mch_stat((वर्ण *)undo_file_name, &st) >= 0))
+	    भङ्ग;
 	VIM_CLEAR(undo_file_name);
     }
 
     vim_free(munged_name.string);
-    return undo_file_name;
+    प्रत्यागम undo_file_name;
 }
 
-    static void
-corruption_error(char *mesg, char_u *file_name)
+    स्थिर शून्य
+corruption_error(वर्ण *mesg, char_u *file_name)
 {
     semsg(_(e_corrupted_undo_file_str_str), mesg, file_name);
 }
 
-    static void
+    स्थिर शून्य
 u_free_uhp(u_header_T *uhp)
 {
     u_entry_T	*nuep;
     u_entry_T	*uep;
 
     uep = uhp->uh_entry;
-    while (uep != NULL)
+    यावत् (uep != रिक्त)
     {
 	nuep = uep->ue_next;
 	u_freeentry(uep, uep->ue_size);
@@ -917,16 +917,16 @@ u_free_uhp(u_header_T *uhp)
  * Buffers and encrypts as needed.
  * Returns OK or FAIL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 undo_write(bufinfo_T *bi, char_u *ptr, size_t len)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
 	size_t	len_todo = len;
 	char_u  *p = ptr;
 
-	while (bi->bi_used + len_todo >= CRYPT_BUF_SIZE)
+	यावत् (bi->bi_used + len_todo >= CRYPT_BUF_SIZE)
 	{
 	    size_t	n = CRYPT_BUF_SIZE - bi->bi_used;
 
@@ -934,36 +934,36 @@ undo_write(bufinfo_T *bi, char_u *ptr, size_t len)
 	    len_todo -= n;
 	    p += n;
 	    bi->bi_used = CRYPT_BUF_SIZE;
-	    if (undo_flush(bi) == FAIL)
-		return FAIL;
+	    यदि (undo_flush(bi) == FAIL)
+		प्रत्यागम FAIL;
 	}
-	if (len_todo > 0)
+	यदि (len_todo > 0)
 	{
 	    mch_memmove(bi->bi_buffer + bi->bi_used, p, len_todo);
 	    bi->bi_used += len_todo;
 	}
-	return OK;
+	प्रत्यागम OK;
     }
 # endif
-    if (fwrite(ptr, len, (size_t)1, bi->bi_fp) != 1)
-	return FAIL;
-    return OK;
+    यदि (fwrite(ptr, len, (size_t)1, bi->bi_fp) != 1)
+	प्रत्यागम FAIL;
+    प्रत्यागम OK;
 }
 
 # ifdef FEAT_CRYPT
-    static int
+    स्थिर पूर्णाङ्क
 undo_flush(bufinfo_T *bi)
 {
-    if (bi->bi_buffer != NULL && bi->bi_state != NULL && bi->bi_used > 0)
+    यदि (bi->bi_buffer != रिक्त && bi->bi_state != रिक्त && bi->bi_used > 0)
     {
 	// Last parameter is only used for sodium encryption and that
 	// explicitly disables encryption of undofiles.
 	crypt_encode_inplace(bi->bi_state, bi->bi_buffer, bi->bi_used, FALSE);
-	if (fwrite(bi->bi_buffer, bi->bi_used, (size_t)1, bi->bi_fp) != 1)
-	    return FAIL;
+	यदि (fwrite(bi->bi_buffer, bi->bi_used, (size_t)1, bi->bi_fp) != 1)
+	    प्रत्यागम FAIL;
 	bi->bi_used = 0;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 # endif
 
@@ -971,7 +971,7 @@ undo_flush(bufinfo_T *bi)
  * Write "ptr[len]" and crypt the bytes when needed.
  * Returns OK or FAIL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
 {
 # ifdef FEAT_CRYPT
@@ -979,27 +979,27 @@ fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
     char_u  small_buf[100];
     size_t  i;
 
-    if (bi->bi_state != NULL && bi->bi_buffer == NULL)
+    यदि (bi->bi_state != रिक्त && bi->bi_buffer == रिक्त)
     {
 	// crypting every piece of text separately
-	if (len < 100)
+	यदि (len < 100)
 	    copy = small_buf;  // no malloc()/free() for short strings
-	else
+	अन्यथा
 	{
 	    copy = lalloc(len, FALSE);
-	    if (copy == NULL)
-		return 0;
+	    यदि (copy == रिक्त)
+		प्रत्यागम 0;
 	}
 	// Last parameter is only used for sodium encryption and that
 	// explicitly disables encryption of undofiles.
 	crypt_encode(bi->bi_state, ptr, len, copy, TRUE);
 	i = fwrite(copy, len, (size_t)1, bi->bi_fp);
-	if (copy != small_buf)
+	यदि (copy != small_buf)
 	    vim_free(copy);
-	return i == 1 ? OK : FAIL;
+	प्रत्यागम i == 1 ? OK : FAIL;
     }
 # endif
-    return undo_write(bi, ptr, len);
+    प्रत्यागम undo_write(bi, ptr, len);
 }
 
 /*
@@ -1007,146 +1007,146 @@ fwrite_crypt(bufinfo_T *bi, char_u *ptr, size_t len)
  * Must match with undo_read_?c() functions.
  * Returns OK or FAIL.
  */
-    static int
-undo_write_bytes(bufinfo_T *bi, long_u nr, int len)
+    स्थिर पूर्णाङ्क
+undo_write_bytes(bufinfo_T *bi, long_u nr, पूर्णाङ्क len)
 {
     char_u  buf[8];
-    int	    i;
-    int	    bufi = 0;
+    पूर्णाङ्क	    i;
+    पूर्णाङ्क	    bufi = 0;
 
-    for (i = len - 1; i >= 0; --i)
+    प्रति (i = len - 1; i >= 0; --i)
 	buf[bufi++] = (char_u)(nr >> (i * 8));
-    return undo_write(bi, buf, (size_t)len);
+    प्रत्यागम undo_write(bi, buf, (size_t)len);
 }
 
 /*
  * Write the pointer to an undo header.  Instead of writing the pointer itself
  * we use the sequence number of the header.  This is converted back to
  * pointers when reading. */
-    static void
+    स्थिर शून्य
 put_header_ptr(bufinfo_T *bi, u_header_T *uhp)
 {
-    undo_write_bytes(bi, (long_u)(uhp != NULL ? uhp->uh_seq : 0), 4);
+    undo_write_bytes(bi, (long_u)(uhp != रिक्त ? uhp->uh_seq : 0), 4);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 undo_read_4c(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
 	char_u  buf[4];
-	int	n;
+	पूर्णाङ्क	n;
 
 	undo_read(bi, buf, (size_t)4);
 	n = ((unsigned)buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3];
-	return n;
+	प्रत्यागम n;
     }
 # endif
-    return get4c(bi->bi_fp);
+    प्रत्यागम get4c(bi->bi_fp);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 undo_read_2c(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
 	char_u  buf[2];
-	int	n;
+	पूर्णाङ्क	n;
 
 	undo_read(bi, buf, (size_t)2);
 	n = (buf[0] << 8) + buf[1];
-	return n;
+	प्रत्यागम n;
     }
 # endif
-    return get2c(bi->bi_fp);
+    प्रत्यागम get2c(bi->bi_fp);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 undo_read_byte(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
 	char_u  buf[1];
 
 	undo_read(bi, buf, (size_t)1);
-	return buf[0];
+	प्रत्यागम buf[0];
     }
 # endif
-    return getc(bi->bi_fp);
+    प्रत्यागम getc(bi->bi_fp);
 }
 
-    static time_t
+    स्थिर time_t
 undo_read_time(bufinfo_T *bi)
 {
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
 	char_u  buf[8];
 	time_t	n = 0;
-	int	i;
+	पूर्णाङ्क	i;
 
 	undo_read(bi, buf, (size_t)8);
-	for (i = 0; i < 8; ++i)
+	प्रति (i = 0; i < 8; ++i)
 	    n = (n << 8) + buf[i];
-	return n;
+	प्रत्यागम n;
     }
 # endif
-    return get8ctime(bi->bi_fp);
+    प्रत्यागम get8ctime(bi->bi_fp);
 }
 
 /*
  * Read "buffer[size]" from the undo file.
  * Return OK or FAIL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 undo_read(bufinfo_T *bi, char_u *buffer, size_t size)
 {
-    int retval = OK;
+    पूर्णाङ्क retval = OK;
 
 # ifdef FEAT_CRYPT
-    if (bi->bi_buffer != NULL)
+    यदि (bi->bi_buffer != रिक्त)
     {
-	int	size_todo = (int)size;
+	पूर्णाङ्क	size_todo = (पूर्णाङ्क)size;
 	char_u	*p = buffer;
 
-	while (size_todo > 0)
+	यावत् (size_todo > 0)
 	{
 	    size_t n;
 
-	    if (bi->bi_used >= bi->bi_avail)
+	    यदि (bi->bi_used >= bi->bi_avail)
 	    {
 		n = fread(bi->bi_buffer, 1, (size_t)CRYPT_BUF_SIZE, bi->bi_fp);
-		if (n == 0)
+		यदि (n == 0)
 		{
 		    retval = FAIL;
-		    break;
+		    भङ्ग;
 		}
 		bi->bi_avail = n;
 		bi->bi_used = 0;
 		crypt_decode_inplace(bi->bi_state, bi->bi_buffer, bi->bi_avail, FALSE);
 	    }
 	    n = size_todo;
-	    if (n > bi->bi_avail - bi->bi_used)
+	    यदि (n > bi->bi_avail - bi->bi_used)
 		n = bi->bi_avail - bi->bi_used;
 	    mch_memmove(p, bi->bi_buffer + bi->bi_used, n);
 	    bi->bi_used += n;
-	    size_todo -= (int)n;
+	    size_todo -= (पूर्णाङ्क)n;
 	    p += n;
 	}
     }
-    else
+    अन्यथा
 # endif
-    if (fread(buffer, size, 1, bi->bi_fp) != 1)
+    यदि (fread(buffer, size, 1, bi->bi_fp) != 1)
 	retval = FAIL;
 
-    if (retval == FAIL)
+    यदि (retval == FAIL)
 	// Error may be checked for only later.  Fill with zeros,
 	// so that the reader won't use garbage.
 	vim_memset(buffer, 0, size);
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
@@ -1156,33 +1156,33 @@ undo_read(bufinfo_T *bi, char_u *buffer, size_t size)
  * Append a NUL.
  * Returns a pointer to allocated memory or NULL for failure.
  */
-    static char_u *
-read_string_decrypt(bufinfo_T *bi, int len)
+    स्थिर char_u *
+read_string_decrypt(bufinfo_T *bi, पूर्णाङ्क len)
 {
     char_u  *ptr = alloc(len + 1);
 
-    if (ptr == NULL)
-	return NULL;
+    यदि (ptr == रिक्त)
+	प्रत्यागम रिक्त;
 
-    if (len > 0 && undo_read(bi, ptr, len) == FAIL)
+    यदि (len > 0 && undo_read(bi, ptr, len) == FAIL)
     {
 	vim_free(ptr);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     // In case there are text properties there already is a NUL, but
     // checking for that is more expensive than just adding a dummy byte.
     ptr[len] = NUL;
 # ifdef FEAT_CRYPT
-    if (bi->bi_state != NULL && bi->bi_buffer == NULL)
+    यदि (bi->bi_state != रिक्त && bi->bi_buffer == रिक्त)
 	crypt_decode_inplace(bi->bi_state, ptr, len, FALSE);
 # endif
-    return ptr;
+    प्रत्यागम ptr;
 }
 
 /*
  * Writes the (not encrypted) header and initializes encryption if needed.
  */
-    static int
+    स्थिर पूर्णाङ्क
 serialize_header(bufinfo_T *bi, char_u *hash)
 {
     buf_T	*buf = bi->bi_buf;
@@ -1190,62 +1190,62 @@ serialize_header(bufinfo_T *bi, char_u *hash)
     char_u	time_buf[8];
 
     // Start writing, first the magic marker and undo info version.
-    if (fwrite(UF_START_MAGIC, (size_t)UF_START_MAGIC_LEN, (size_t)1, fp) != 1)
-	return FAIL;
+    यदि (fwrite(UF_START_MAGIC, (size_t)UF_START_MAGIC_LEN, (size_t)1, fp) != 1)
+	प्रत्यागम FAIL;
 
     // If the buffer is encrypted then all text bytes following will be
     // encrypted.  Numbers and other info is not crypted.
 # ifdef FEAT_CRYPT
-    if (*buf->b_p_key != NUL)
+    यदि (*buf->b_p_किल्ली != NUL)
     {
 	char_u *header;
-	int    header_len;
+	पूर्णाङ्क    header_len;
 	long	len;
 
 	undo_write_bytes(bi, (long_u)UF_VERSION_CRYPT, 2);
 	bi->bi_state = crypt_create_for_writing(crypt_get_method_nr(buf),
-					  buf->b_p_key, &header, &header_len);
-	if (bi->bi_state == NULL)
-	    return FAIL;
+					  buf->b_p_किल्ली, &header, &header_len);
+	यदि (bi->bi_state == रिक्त)
+	    प्रत्यागम FAIL;
 	len = (long)fwrite(header, (size_t)header_len, (size_t)1, fp);
 	vim_free(header);
-	if (len != 1)
+	यदि (len != 1)
 	{
 	    crypt_free_state(bi->bi_state);
-	    bi->bi_state = NULL;
-	    return FAIL;
+	    bi->bi_state = रिक्त;
+	    प्रत्यागम FAIL;
 	}
 
-	if (crypt_whole_undofile(crypt_get_method_nr(buf)))
+	यदि (crypt_whole_undofile(crypt_get_method_nr(buf)))
 	{
 	    bi->bi_buffer = alloc(CRYPT_BUF_SIZE);
-	    if (bi->bi_buffer == NULL)
+	    यदि (bi->bi_buffer == रिक्त)
 	    {
 		crypt_free_state(bi->bi_state);
-		bi->bi_state = NULL;
-		return FAIL;
+		bi->bi_state = रिक्त;
+		प्रत्यागम FAIL;
 	    }
 	    bi->bi_used = 0;
 	}
     }
-    else
+    अन्यथा
 # endif
 	undo_write_bytes(bi, (long_u)UF_VERSION, 2);
 
 
     // Write a hash of the buffer text, so that we can verify it is still the
     // same when reading the buffer text.
-    if (undo_write(bi, hash, (size_t)UNDO_HASH_SIZE) == FAIL)
-	return FAIL;
+    यदि (undo_write(bi, hash, (size_t)UNDO_HASH_SIZE) == FAIL)
+	प्रत्यागम FAIL;
 
     // buffer-specific data
-    undo_write_bytes(bi, (long_u)buf->b_ml.ml_line_count, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_ptr.ul_textlen, 4);
-    if (buf->b_u_line_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_line_ptr.ul_line,
-			(size_t)buf->b_u_line_ptr.ul_textlen) == FAIL)
-	return FAIL;
-    undo_write_bytes(bi, (long_u)buf->b_u_line_lnum, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_colnr, 4);
+    undo_write_bytes(bi, (long_u)buf->b_ml.ml_ओळ_मोजणी, 4);
+    undo_write_bytes(bi, (long_u)buf->b_u_ओळ_ptr.ul_textlen, 4);
+    यदि (buf->b_u_ओळ_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_ओळ_ptr.ul_ओळ,
+			(size_t)buf->b_u_ओळ_ptr.ul_textlen) == FAIL)
+	प्रत्यागम FAIL;
+    undo_write_bytes(bi, (long_u)buf->b_u_ओळ_lnum, 4);
+    undo_write_bytes(bi, (long_u)buf->b_u_ओळ_colnr, 4);
 
     // Undo structures header data
     put_header_ptr(bi, buf->b_u_oldhead);
@@ -1265,18 +1265,18 @@ serialize_header(bufinfo_T *bi, char_u *hash)
 
     undo_write_bytes(bi, 0, 1);  // end marker
 
-    return OK;
+    प्रत्यागम OK;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 serialize_uhp(bufinfo_T *bi, u_header_T *uhp)
 {
-    int		i;
+    पूर्णाङ्क		i;
     u_entry_T	*uep;
     char_u	time_buf[8];
 
-    if (undo_write_bytes(bi, (long_u)UF_HEADER_MAGIC, 2) == FAIL)
-	return FAIL;
+    यदि (undo_write_bytes(bi, (long_u)UF_HEADER_MAGIC, 2) == FAIL)
+	प्रत्यागम FAIL;
 
     put_header_ptr(bi, uhp->uh_next.ptr);
     put_header_ptr(bi, uhp->uh_prev.ptr);
@@ -1287,7 +1287,7 @@ serialize_uhp(bufinfo_T *bi, u_header_T *uhp)
     undo_write_bytes(bi, (long_u)uhp->uh_cursor_vcol, 4);
     undo_write_bytes(bi, (long_u)uhp->uh_flags, 2);
     // Assume NMARKS will stay the same.
-    for (i = 0; i < NMARKS; ++i)
+    प्रति (i = 0; i < NMARKS; ++i)
 	serialize_pos(bi, uhp->uh_namedm[i]);
     serialize_visualinfo(bi, &uhp->uh_visual);
     time_to_bytes(uhp->uh_time, time_buf);
@@ -1301,28 +1301,28 @@ serialize_uhp(bufinfo_T *bi, u_header_T *uhp)
     undo_write_bytes(bi, 0, 1);  // end marker
 
     // Write all the entries.
-    for (uep = uhp->uh_entry; uep != NULL; uep = uep->ue_next)
+    प्रति (uep = uhp->uh_entry; uep != रिक्त; uep = uep->ue_next)
     {
 	undo_write_bytes(bi, (long_u)UF_ENTRY_MAGIC, 2);
-	if (serialize_uep(bi, uep) == FAIL)
-	    return FAIL;
+	यदि (serialize_uep(bi, uep) == FAIL)
+	    प्रत्यागम FAIL;
     }
     undo_write_bytes(bi, (long_u)UF_ENTRY_END_MAGIC, 2);
-    return OK;
+    प्रत्यागम OK;
 }
 
-    static u_header_T *
+    स्थिर u_header_T *
 unserialize_uhp(bufinfo_T *bi, char_u *file_name)
 {
     u_header_T	*uhp;
-    int		i;
+    पूर्णाङ्क		i;
     u_entry_T	*uep, *last_uep;
-    int		c;
-    int		error;
+    पूर्णाङ्क		c;
+    पूर्णाङ्क		error;
 
-    uhp = U_ALLOC_LINE(sizeof(u_header_T));
-    if (uhp == NULL)
-	return NULL;
+    uhp = U_ALLOC_ओळ(परिमाण(u_header_T));
+    यदि (uhp == रिक्त)
+	प्रत्यागम रिक्त;
     CLEAR_POINTER(uhp);
 # ifdef U_DEBUG
     uhp->uh_magic = UH_MAGIC;
@@ -1332,160 +1332,160 @@ unserialize_uhp(bufinfo_T *bi, char_u *file_name)
     uhp->uh_alt_next.seq = undo_read_4c(bi);
     uhp->uh_alt_prev.seq = undo_read_4c(bi);
     uhp->uh_seq = undo_read_4c(bi);
-    if (uhp->uh_seq <= 0)
+    यदि (uhp->uh_seq <= 0)
     {
 	corruption_error("uh_seq", file_name);
 	vim_free(uhp);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     unserialize_pos(bi, &uhp->uh_cursor);
     uhp->uh_cursor_vcol = undo_read_4c(bi);
     uhp->uh_flags = undo_read_2c(bi);
-    for (i = 0; i < NMARKS; ++i)
+    प्रति (i = 0; i < NMARKS; ++i)
 	unserialize_pos(bi, &uhp->uh_namedm[i]);
     unserialize_visualinfo(bi, &uhp->uh_visual);
     uhp->uh_time = undo_read_time(bi);
 
     // Optional fields.
-    for (;;)
+    प्रति (;;)
     {
-	int len = undo_read_byte(bi);
-	int what;
+	पूर्णाङ्क len = undo_read_byte(bi);
+	पूर्णाङ्क what;
 
-	if (len == EOF)
+	यदि (len == EOF)
 	{
 	    corruption_error("truncated", file_name);
 	    u_free_uhp(uhp);
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
-	if (len == 0)
-	    break;
+	यदि (len == 0)
+	    भङ्ग;
 	what = undo_read_byte(bi);
-	switch (what)
+	विकल्प (what)
 	{
-	    case UHP_SAVE_NR:
+	    पक्ष UHP_SAVE_NR:
 		uhp->uh_save_nr = undo_read_4c(bi);
-		break;
-	    default:
+		भङ्ग;
+	    स्वभाव:
 		// field not supported, skip
-		while (--len >= 0)
-		    (void)undo_read_byte(bi);
+		यावत् (--len >= 0)
+		    (शून्य)undo_read_byte(bi);
 	}
     }
 
     // Unserialize the uep list.
-    last_uep = NULL;
-    while ((c = undo_read_2c(bi)) == UF_ENTRY_MAGIC)
+    last_uep = रिक्त;
+    यावत् ((c = undo_read_2c(bi)) == UF_ENTRY_MAGIC)
     {
 	error = FALSE;
 	uep = unserialize_uep(bi, &error, file_name);
-	if (last_uep == NULL)
+	यदि (last_uep == रिक्त)
 	    uhp->uh_entry = uep;
-	else
+	अन्यथा
 	    last_uep->ue_next = uep;
 	last_uep = uep;
-	if (uep == NULL || error)
+	यदि (uep == रिक्त || error)
 	{
 	    u_free_uhp(uhp);
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
     }
-    if (c != UF_ENTRY_END_MAGIC)
+    यदि (c != UF_ENTRY_END_MAGIC)
     {
 	corruption_error("entry end", file_name);
 	u_free_uhp(uhp);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    return uhp;
+    प्रत्यागम uhp;
 }
 
 /*
  * Serialize "uep".
  */
-    static int
+    स्थिर पूर्णाङ्क
 serialize_uep(
     bufinfo_T	*bi,
     u_entry_T	*uep)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    undo_write_bytes(bi, (long_u)uep->ue_top, 4);
+    undo_write_bytes(bi, (long_u)uep->ue_शीर्ष, 4);
     undo_write_bytes(bi, (long_u)uep->ue_bot, 4);
     undo_write_bytes(bi, (long_u)uep->ue_lcount, 4);
     undo_write_bytes(bi, (long_u)uep->ue_size, 4);
-    for (i = 0; i < uep->ue_size; ++i)
+    प्रति (i = 0; i < uep->ue_size; ++i)
     {
 	// Text is written without the text properties, since we cannot restore
 	// the text property types.
-	if (undo_write_bytes(bi, (long_u)uep->ue_array[i].ul_textlen, 4) == FAIL)
-	    return FAIL;
-	if (uep->ue_array[i].ul_textlen > 0
-		&& fwrite_crypt(bi, uep->ue_array[i].ul_line, uep->ue_array[i].ul_textlen) == FAIL)
-	    return FAIL;
+	यदि (undo_write_bytes(bi, (long_u)uep->ue_array[i].ul_textlen, 4) == FAIL)
+	    प्रत्यागम FAIL;
+	यदि (uep->ue_array[i].ul_textlen > 0
+		&& fwrite_crypt(bi, uep->ue_array[i].ul_ओळ, uep->ue_array[i].ul_textlen) == FAIL)
+	    प्रत्यागम FAIL;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
-    static u_entry_T *
-unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name)
+    स्थिर u_entry_T *
+unserialize_uep(bufinfo_T *bi, पूर्णाङ्क *error, char_u *file_name)
 {
-    int		i;
+    पूर्णाङ्क		i;
     u_entry_T	*uep;
-    undoline_T	*array = NULL;
-    char_u	*line;
-    int		line_len;
+    undoline_T	*array = रिक्त;
+    char_u	*ओळ;
+    पूर्णाङ्क		ओळ_len;
 
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
-    if (uep == NULL)
-	return NULL;
+    uep = U_ALLOC_ओळ(परिमाण(u_entry_T));
+    यदि (uep == रिक्त)
+	प्रत्यागम रिक्त;
     CLEAR_POINTER(uep);
 # ifdef U_DEBUG
     uep->ue_magic = UE_MAGIC;
 # endif
-    uep->ue_top = undo_read_4c(bi);
+    uep->ue_शीर्ष = undo_read_4c(bi);
     uep->ue_bot = undo_read_4c(bi);
     uep->ue_lcount = undo_read_4c(bi);
     uep->ue_size = undo_read_4c(bi);
-    if (uep->ue_size > 0)
+    यदि (uep->ue_size > 0)
     {
-	if (uep->ue_size < LONG_MAX / (long)sizeof(undoline_T))
-	    array = U_ALLOC_LINE(sizeof(undoline_T) * uep->ue_size);
-	if (array == NULL)
+	यदि (uep->ue_size < LONG_MAX / (long)परिमाण(undoline_T))
+	    array = U_ALLOC_ओळ(परिमाण(undoline_T) * uep->ue_size);
+	यदि (array == रिक्त)
 	{
 	    *error = TRUE;
-	    return uep;
+	    प्रत्यागम uep;
 	}
-	vim_memset(array, 0, sizeof(undoline_T) * uep->ue_size);
+	vim_memset(array, 0, परिमाण(undoline_T) * uep->ue_size);
     }
     uep->ue_array = array;
 
-    for (i = 0; i < uep->ue_size; ++i)
+    प्रति (i = 0; i < uep->ue_size; ++i)
     {
-	line_len = undo_read_4c(bi);
-	if (line_len >= 0)
-	    line = read_string_decrypt(bi, line_len);
-	else
+	ओळ_len = undo_read_4c(bi);
+	यदि (ओळ_len >= 0)
+	    ओळ = read_string_decrypt(bi, ओळ_len);
+	अन्यथा
 	{
-	    line = NULL;
+	    ओळ = रिक्त;
 	    corruption_error("line length", file_name);
 	}
-	if (line == NULL)
+	यदि (ओळ == रिक्त)
 	{
 	    *error = TRUE;
-	    return uep;
+	    प्रत्यागम uep;
 	}
-	array[i].ul_line = line;
-	array[i].ul_len = line_len + 1;
-	array[i].ul_textlen = line_len;
+	array[i].ul_ओळ = ओळ;
+	array[i].ul_len = ओळ_len + 1;
+	array[i].ul_textlen = ओळ_len;
     }
-    return uep;
+    प्रत्यागम uep;
 }
 
 /*
  * Serialize "pos".
  */
-    static void
+    स्थिर शून्य
 serialize_pos(bufinfo_T *bi, pos_T pos)
 {
     undo_write_bytes(bi, (long_u)pos.lnum, 4);
@@ -1496,24 +1496,24 @@ serialize_pos(bufinfo_T *bi, pos_T pos)
 /*
  * Unserialize the pos_T at the current position.
  */
-    static void
+    स्थिर शून्य
 unserialize_pos(bufinfo_T *bi, pos_T *pos)
 {
     pos->lnum = undo_read_4c(bi);
-    if (pos->lnum < 0)
+    यदि (pos->lnum < 0)
 	pos->lnum = 0;
     pos->col = undo_read_4c(bi);
-    if (pos->col < 0)
+    यदि (pos->col < 0)
 	pos->col = 0;
     pos->coladd = undo_read_4c(bi);
-    if (pos->coladd < 0)
+    यदि (pos->coladd < 0)
 	pos->coladd = 0;
 }
 
 /*
  * Serialize "info".
  */
-    static void
+    स्थिर शून्य
 serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
 {
     serialize_pos(bi, info->vi_start);
@@ -1525,7 +1525,7 @@ serialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
 /*
  * Unserialize the visualinfo_T at the current position.
  */
-    static void
+    स्थिर शून्य
 unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
 {
     unserialize_pos(bi, &info->vi_start);
@@ -1543,25 +1543,25 @@ unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info)
  * "forceit" is TRUE for ":wundo!", FALSE otherwise.
  * "hash[UNDO_HASH_SIZE]" must be the hash value of the buffer text.
  */
-    void
+    शून्य
 u_write_undo(
     char_u	*name,
-    int		forceit,
+    पूर्णाङ्क		forceit,
     buf_T	*buf,
     char_u	*hash)
 {
     u_header_T	*uhp;
     char_u	*file_name;
-    int		mark;
+    पूर्णाङ्क		mark;
 # ifdef U_DEBUG
-    int		headers_written = 0;
+    पूर्णाङ्क		headers_written = 0;
 # endif
-    int		fd;
-    FILE	*fp = NULL;
-    int		perm;
-    int		write_ok = FALSE;
+    पूर्णाङ्क		fd;
+    FILE	*fp = रिक्त;
+    पूर्णाङ्क		perm;
+    पूर्णाङ्क		write_ok = FALSE;
 # ifdef UNIX
-    int		st_old_valid = FALSE;
+    पूर्णाङ्क		st_old_valid = FALSE;
     stat_T	st_old;
     stat_T	st_new;
 # endif
@@ -1569,22 +1569,22 @@ u_write_undo(
 
     CLEAR_FIELD(bi);
 
-    if (name == NULL)
+    यदि (name == रिक्त)
     {
 	file_name = u_get_undo_file_name(buf->b_ffname, FALSE);
-	if (file_name == NULL)
+	यदि (file_name == रिक्त)
 	{
-	    if (p_verbose > 0)
+	    यदि (p_verbose > 0)
 	    {
 		verbose_enter();
 		smsg(
 		   _("Cannot write undo file in any directory in 'undodir'"));
 		verbose_leave();
 	    }
-	    return;
+	    प्रत्यागम;
 	}
     }
-    else
+    अन्यथा
 	file_name = name;
 
     /*
@@ -1593,17 +1593,17 @@ u_write_undo(
      * allow the user to access the undo file.
      */
     perm = 0600;
-    if (buf->b_ffname != NULL)
+    यदि (buf->b_ffname != रिक्त)
     {
 # ifdef UNIX
-	if (mch_stat((char *)buf->b_ffname, &st_old) >= 0)
+	यदि (mch_stat((वर्ण *)buf->b_ffname, &st_old) >= 0)
 	{
 	    perm = st_old.st_mode;
 	    st_old_valid = TRUE;
 	}
-# else
+# अन्यथा
 	perm = mch_getperm(buf->b_ffname);
-	if (perm < 0)
+	यदि (perm < 0)
 	    perm = 0600;
 # endif
     }
@@ -1613,47 +1613,47 @@ u_write_undo(
 
     // If the undo file already exists, verify that it actually is an undo
     // file, and delete it.
-    if (mch_getperm(file_name) >= 0)
+    यदि (mch_getperm(file_name) >= 0)
     {
-	if (name == NULL || !forceit)
+	यदि (name == रिक्त || !forceit)
 	{
 	    // Check we can read it and it's an undo file.
-	    fd = mch_open((char *)file_name, O_RDONLY|O_EXTRA, 0);
-	    if (fd < 0)
+	    fd = mch_open((वर्ण *)file_name, O_RDONLY|O_EXTRA, 0);
+	    यदि (fd < 0)
 	    {
-		if (name != NULL || p_verbose > 0)
+		यदि (name != रिक्त || p_verbose > 0)
 		{
-		    if (name == NULL)
+		    यदि (name == रिक्त)
 			verbose_enter();
 		    smsg(
 		      _("Will not overwrite with undo file, cannot read: %s"),
 								   file_name);
-		    if (name == NULL)
+		    यदि (name == रिक्त)
 			verbose_leave();
 		}
-		goto theend;
+		गच्छ theend;
 	    }
-	    else
+	    अन्यथा
 	    {
 		char_u	mbuf[UF_START_MAGIC_LEN];
-		int	len;
+		पूर्णाङ्क	len;
 
 		len = read_eintr(fd, mbuf, UF_START_MAGIC_LEN);
 		close(fd);
-		if (len < UF_START_MAGIC_LEN
+		यदि (len < UF_START_MAGIC_LEN
 		      || memcmp(mbuf, UF_START_MAGIC, UF_START_MAGIC_LEN) != 0)
 		{
-		    if (name != NULL || p_verbose > 0)
+		    यदि (name != रिक्त || p_verbose > 0)
 		    {
-			if (name == NULL)
+			यदि (name == रिक्त)
 			    verbose_enter();
 			smsg(
 			_("Will not overwrite, this is not an undo file: %s"),
 								   file_name);
-			if (name == NULL)
+			यदि (name == रिक्त)
 			    verbose_leave();
 		    }
-		    goto theend;
+		    गच्छ theend;
 		}
 	    }
 	}
@@ -1662,22 +1662,22 @@ u_write_undo(
 
     // If there is no undo information at all, quit here after deleting any
     // existing undo file.
-    if (buf->b_u_numhead == 0 && buf->b_u_line_ptr.ul_line == NULL)
+    यदि (buf->b_u_numhead == 0 && buf->b_u_ओळ_ptr.ul_ओळ == रिक्त)
     {
-	if (p_verbose > 0)
-	    verb_msg(_("Skipping undo file write, nothing to undo"));
-	goto theend;
+	यदि (p_verbose > 0)
+	    verb_संदेश(_("Skipping undo file write, nothing to undo"));
+	गच्छ theend;
     }
 
-    fd = mch_open((char *)file_name,
+    fd = mch_open((वर्ण *)file_name,
 			    O_CREAT|O_EXTRA|O_WRONLY|O_EXCL|O_NOFOLLOW, perm);
-    if (fd < 0)
+    यदि (fd < 0)
     {
 	semsg(_(e_cannot_open_undo_file_for_writing_str), file_name);
-	goto theend;
+	गच्छ theend;
     }
-    (void)mch_setperm(file_name, perm);
-    if (p_verbose > 0)
+    (शून्य)mch_setperm(file_name, perm);
+    यदि (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Writing undo file: %s"), file_name);
@@ -1695,27 +1695,27 @@ u_write_undo(
      * this fails, set the protection bits for the group same as the
      * protection bits for others.
      */
-    if (st_old_valid
-	    && mch_stat((char *)file_name, &st_new) >= 0
+    यदि (st_old_valid
+	    && mch_stat((वर्ण *)file_name, &st_new) >= 0
 	    && st_new.st_gid != st_old.st_gid
 #  ifdef HAVE_FCHOWN  // sequent-ptx lacks fchown()
 	    && fchown(fd, (uid_t)-1, st_old.st_gid) != 0
 #  endif
        )
 	mch_setperm(file_name, (perm & 0707) | ((perm & 07) << 3));
-#  if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
-    if (buf->b_ffname != NULL)
+#  यदि defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+    यदि (buf->b_ffname != रिक्त)
 	mch_copy_sec(buf->b_ffname, file_name);
 #  endif
 # endif
 
     fp = fdopen(fd, "w");
-    if (fp == NULL)
+    यदि (fp == रिक्त)
     {
 	semsg(_(e_cannot_open_undo_file_for_writing_str), file_name);
 	close(fd);
 	mch_remove(file_name);
-	goto theend;
+	गच्छ theend;
     }
 
     // Undo must be synced.
@@ -1726,46 +1726,46 @@ u_write_undo(
      */
     bi.bi_buf = buf;
     bi.bi_fp = fp;
-    if (serialize_header(&bi, hash) == FAIL)
-	goto write_error;
+    यदि (serialize_header(&bi, hash) == FAIL)
+	गच्छ write_error;
 
     /*
      * Iteratively serialize UHPs and their UEPs from the top down.
      */
     mark = ++lastmark;
     uhp = buf->b_u_oldhead;
-    while (uhp != NULL)
+    यावत् (uhp != रिक्त)
     {
 	// Serialize current UHP if we haven't seen it
-	if (uhp->uh_walk != mark)
+	यदि (uhp->uh_walk != mark)
 	{
 	    uhp->uh_walk = mark;
 # ifdef U_DEBUG
 	    ++headers_written;
 # endif
-	    if (serialize_uhp(&bi, uhp) == FAIL)
-		goto write_error;
+	    यदि (serialize_uhp(&bi, uhp) == FAIL)
+		गच्छ write_error;
 	}
 
 	// Now walk through the tree - algorithm from undo_time().
-	if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != mark)
+	यदि (uhp->uh_prev.ptr != रिक्त && uhp->uh_prev.ptr->uh_walk != mark)
 	    uhp = uhp->uh_prev.ptr;
-	else if (uhp->uh_alt_next.ptr != NULL
+	अन्यथा यदि (uhp->uh_alt_next.ptr != रिक्त
 				     && uhp->uh_alt_next.ptr->uh_walk != mark)
 	    uhp = uhp->uh_alt_next.ptr;
-	else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
+	अन्यथा यदि (uhp->uh_next.ptr != रिक्त && uhp->uh_alt_prev.ptr == रिक्त
 					 && uhp->uh_next.ptr->uh_walk != mark)
 	    uhp = uhp->uh_next.ptr;
-	else if (uhp->uh_alt_prev.ptr != NULL)
+	अन्यथा यदि (uhp->uh_alt_prev.ptr != रिक्त)
 	    uhp = uhp->uh_alt_prev.ptr;
-	else
+	अन्यथा
 	    uhp = uhp->uh_next.ptr;
     }
 
-    if (undo_write_bytes(&bi, (long_u)UF_HEADER_END_MAGIC, 2) == OK)
+    यदि (undo_write_bytes(&bi, (long_u)UF_HEADER_END_MAGIC, 2) == OK)
 	write_ok = TRUE;
 # ifdef U_DEBUG
-    if (headers_written != buf->b_u_numhead)
+    यदि (headers_written != buf->b_u_numhead)
     {
 	semsg("Written %ld headers, ...", headers_written);
 	semsg("... but numhead is %ld", buf->b_u_numhead);
@@ -1773,29 +1773,29 @@ u_write_undo(
 # endif
 
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL && undo_flush(&bi) == FAIL)
+    यदि (bi.bi_state != रिक्त && undo_flush(&bi) == FAIL)
 	write_ok = FALSE;
 # endif
 
-# if defined(UNIX) && defined(HAVE_FSYNC)
-    if ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && fflush(fp) == 0
+# यदि defined(UNIX) && defined(HAVE_FSYNC)
+    यदि ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && fflush(fp) == 0
 	    && vim_fsync(fd) != 0)
 	write_ok = FALSE;
 # endif
 
 write_error:
     fclose(fp);
-    if (!write_ok)
+    यदि (!write_ok)
 	semsg(_(e_write_error_in_undo_file_str), file_name);
 
-# if defined(MSWIN)
+# यदि defined(MSWIN)
     // Copy file attributes; for systems where this can only be done after
     // closing the file.
-    if (buf->b_ffname != NULL)
-	(void)mch_copy_file_attribute(buf->b_ffname, file_name);
+    यदि (buf->b_ffname != रिक्त)
+	(शून्य)mch_copy_file_attribute(buf->b_ffname, file_name);
 # endif
 # ifdef HAVE_ACL
-    if (buf->b_ffname != NULL)
+    यदि (buf->b_ffname != रिक्त)
     {
 	vim_acl_T	    acl;
 
@@ -1808,24 +1808,24 @@ write_error:
 
 theend:
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL)
+    यदि (bi.bi_state != रिक्त)
 	crypt_free_state(bi.bi_state);
     vim_free(bi.bi_buffer);
 # endif
-    if (file_name != name)
+    यदि (file_name != name)
 	vim_free(file_name);
 }
 
 /*
  * Compare undo headers on the sequence number, for sorting uhp_table.
  */
-    static int
-uhp_seq_cmp(const void *v1, const void *v2)
+    स्थिर पूर्णाङ्क
+uhp_seq_cmp(ध्रुव शून्य *v1, ध्रुव शून्य *v2)
 {
-    const u_header_T *u1 = *(u_header_T **)v1;
-    const u_header_T *u2 = *(u_header_T **)v2;
+    ध्रुव u_header_T *u1 = *(u_header_T **)v1;
+    ध्रुव u_header_T *u2 = *(u_header_T **)v2;
 
-    return u1->uh_seq == u2->uh_seq ? 0 : u1->uh_seq > u2->uh_seq ? 1 : -1;
+    प्रत्यागम u1->uh_seq == u2->uh_seq ? 0 : u1->uh_seq > u2->uh_seq ? 1 : -1;
 }
 
 /*
@@ -1833,24 +1833,24 @@ uhp_seq_cmp(const void *v1, const void *v2)
  * "num_head" entries and is sorted on uh_seq.
  * Return the table index of the header or -1 when not found.
  */
-    static long
-uhp_table_find(u_header_T **uhp_table, long num_head, long seq)
+    स्थिर long
+uhp_table_find(u_header_T **uhp_table, long अंक_head, long seq)
 {
     long    lo = 0;
-    long    hi = num_head - 1;
+    long    hi = अंक_head - 1;
 
-    while (lo <= hi)
+    यावत् (lo <= hi)
     {
 	long mid = lo + (hi - lo) / 2;
 
-	if (uhp_table[mid]->uh_seq < seq)
+	यदि (uhp_table[mid]->uh_seq < seq)
 	    lo = mid + 1;
-	else if (uhp_table[mid]->uh_seq > seq)
+	अन्यथा यदि (uhp_table[mid]->uh_seq > seq)
 	    hi = mid - 1;
-	else
-	    return mid;
+	अन्यथा
+	    प्रत्यागम mid;
     }
-    return -1;
+    प्रत्यागम -1;
 }
 
 /*
@@ -1860,31 +1860,31 @@ uhp_table_find(u_header_T **uhp_table, long num_head, long seq)
  * Otherwise use curbuf->b_ffname to generate the undo file name.
  * "hash[UNDO_HASH_SIZE]" must be the hash value of the buffer text.
  */
-    void
+    शून्य
 u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 {
     char_u	*file_name;
     FILE	*fp;
     long	version, str_len;
-    undoline_T	line_ptr;
-    linenr_T	line_lnum;
-    colnr_T	line_colnr;
-    linenr_T	line_count;
-    long	num_head = 0;
+    undoline_T	ओळ_ptr;
+    linenr_T	ओळ_lnum;
+    colnr_T	ओळ_colnr;
+    linenr_T	ओळ_मोजणी;
+    long	अंक_head = 0;
     long	old_header_seq, new_header_seq, cur_header_seq;
     long	seq_last, seq_cur;
     long	last_save_nr = 0;
     long	old_idx = -1, new_idx = -1, cur_idx = -1;
-    long	num_read_uhps = 0;
+    long	अंक_read_uhps = 0;
     time_t	seq_time;
     long	i;
-    int		c;
+    पूर्णाङ्क		c;
     u_header_T	*uhp;
-    u_header_T	**uhp_table = NULL;
+    u_header_T	**uhp_table = रिक्त;
     char_u	read_hash[UNDO_HASH_SIZE];
     char_u	magic_buf[UF_START_MAGIC_LEN];
 # ifdef U_DEBUG
-    int		*uhp_table_used;
+    पूर्णाङ्क		*uhp_table_used;
 # endif
 # ifdef UNIX
     stat_T	st_orig;
@@ -1893,25 +1893,25 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     bufinfo_T	bi;
 
     CLEAR_FIELD(bi);
-    line_ptr.ul_len = 0;
-    line_ptr.ul_textlen = 0;
-    line_ptr.ul_line = NULL;
+    ओळ_ptr.ul_len = 0;
+    ओळ_ptr.ul_textlen = 0;
+    ओळ_ptr.ul_ओळ = रिक्त;
 
-    if (name == NULL)
+    यदि (name == रिक्त)
     {
 	file_name = u_get_undo_file_name(curbuf->b_ffname, TRUE);
-	if (file_name == NULL)
-	    return;
+	यदि (file_name == रिक्त)
+	    प्रत्यागम;
 
 # ifdef UNIX
 	// For safety we only read an undo file if the owner is equal to the
 	// owner of the text file or equal to the current user.
-	if (mch_stat((char *)orig_name, &st_orig) >= 0
-		&& mch_stat((char *)file_name, &st_undo) >= 0
+	यदि (mch_stat((वर्ण *)orig_name, &st_orig) >= 0
+		&& mch_stat((वर्ण *)file_name, &st_undo) >= 0
 		&& st_orig.st_uid != st_undo.st_uid
 		&& st_undo.st_uid != getuid())
 	{
-	    if (p_verbose > 0)
+	    यदि (p_verbose > 0)
 	    {
 		verbose_enter();
 		smsg(_("Not reading undo file, owner differs: %s"),
@@ -1919,26 +1919,26 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 		verbose_leave();
 	    }
 	    vim_free(file_name);
-	    return;
+	    प्रत्यागम;
 	}
 # endif
     }
-    else
+    अन्यथा
 	file_name = name;
 
-    if (p_verbose > 0)
+    यदि (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Reading undo file: %s"), file_name);
 	verbose_leave();
     }
 
-    fp = mch_fopen((char *)file_name, "r");
-    if (fp == NULL)
+    fp = mch_fopen((वर्ण *)file_name, "r");
+    यदि (fp == रिक्त)
     {
-	if (name != NULL || p_verbose > 0)
+	यदि (name != रिक्त || p_verbose > 0)
 	    semsg(_(e_cannot_open_undo_file_for_reading_str), file_name);
-	goto error;
+	गच्छ error;
     }
     bi.bi_buf = curbuf;
     bi.bi_fp = fp;
@@ -1946,117 +1946,117 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     /*
      * Read the undo file header.
      */
-    if (fread(magic_buf, UF_START_MAGIC_LEN, 1, fp) != 1
+    यदि (fread(magic_buf, UF_START_MAGIC_LEN, 1, fp) != 1
 		|| memcmp(magic_buf, UF_START_MAGIC, UF_START_MAGIC_LEN) != 0)
     {
 	semsg(_(e_not_an_undo_file_str), file_name);
-	goto error;
+	गच्छ error;
     }
     version = get2c(fp);
-    if (version == UF_VERSION_CRYPT)
+    यदि (version == UF_VERSION_CRYPT)
     {
 # ifdef FEAT_CRYPT
-	if (*curbuf->b_p_key == NUL)
+	यदि (*curbuf->b_p_किल्ली == NUL)
 	{
 	    semsg(_(e_non_encrypted_file_has_encrypted_undo_file_str),
 								    file_name);
-	    goto error;
+	    गच्छ error;
 	}
-	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_key);
-	if (bi.bi_state == NULL)
+	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_किल्ली);
+	यदि (bi.bi_state == रिक्त)
 	{
 	    semsg(_(e_undo_file_decryption_failed), file_name);
-	    goto error;
+	    गच्छ error;
 	}
-	if (crypt_whole_undofile(bi.bi_state->method_nr))
+	यदि (crypt_whole_undofile(bi.bi_state->method_nr))
 	{
 	    bi.bi_buffer = alloc(CRYPT_BUF_SIZE);
-	    if (bi.bi_buffer == NULL)
+	    यदि (bi.bi_buffer == रिक्त)
 	    {
 		crypt_free_state(bi.bi_state);
-		bi.bi_state = NULL;
-		goto error;
+		bi.bi_state = रिक्त;
+		गच्छ error;
 	    }
 	    bi.bi_avail = 0;
 	    bi.bi_used = 0;
 	}
-# else
+# अन्यथा
 	semsg(_(e_undo_file_is_encrypted_str), file_name);
-	goto error;
+	गच्छ error;
 # endif
     }
-    else if (version != UF_VERSION)
+    अन्यथा यदि (version != UF_VERSION)
     {
 	semsg(_(e_incompatible_undo_file_str), file_name);
-	goto error;
+	गच्छ error;
     }
 
-    if (undo_read(&bi, read_hash, (size_t)UNDO_HASH_SIZE) == FAIL)
+    यदि (undo_read(&bi, read_hash, (size_t)UNDO_HASH_SIZE) == FAIL)
     {
 	corruption_error("hash", file_name);
-	goto error;
+	गच्छ error;
     }
-    line_count = (linenr_T)undo_read_4c(&bi);
-    if (memcmp(hash, read_hash, UNDO_HASH_SIZE) != 0
-				  || line_count != curbuf->b_ml.ml_line_count)
+    ओळ_मोजणी = (linenr_T)undo_read_4c(&bi);
+    यदि (memcmp(hash, read_hash, UNDO_HASH_SIZE) != 0
+				  || ओळ_मोजणी != curbuf->b_ml.ml_ओळ_मोजणी)
     {
-	if (p_verbose > 0 || name != NULL)
+	यदि (p_verbose > 0 || name != रिक्त)
 	{
-	    if (name == NULL)
+	    यदि (name == रिक्त)
 		verbose_enter();
 	    give_warning((char_u *)
 		      _("File contents changed, cannot use undo info"), TRUE);
-	    if (name == NULL)
+	    यदि (name == रिक्त)
 		verbose_leave();
 	}
-	goto error;
+	गच्छ error;
     }
 
     // Read undo data for "U" command.
     str_len = undo_read_4c(&bi);
-    if (str_len < 0)
-	goto error;
-    if (str_len > 0)
+    यदि (str_len < 0)
+	गच्छ error;
+    यदि (str_len > 0)
     {
-	line_ptr.ul_line = read_string_decrypt(&bi, str_len);
-	line_ptr.ul_len = str_len + 1;
-	line_ptr.ul_textlen = str_len;
+	ओळ_ptr.ul_ओळ = read_string_decrypt(&bi, str_len);
+	ओळ_ptr.ul_len = str_len + 1;
+	ओळ_ptr.ul_textlen = str_len;
     }
-    line_lnum = (linenr_T)undo_read_4c(&bi);
-    line_colnr = (colnr_T)undo_read_4c(&bi);
-    if (line_lnum < 0 || line_colnr < 0)
+    ओळ_lnum = (linenr_T)undo_read_4c(&bi);
+    ओळ_colnr = (colnr_T)undo_read_4c(&bi);
+    यदि (ओळ_lnum < 0 || ओळ_colnr < 0)
     {
 	corruption_error("line lnum/col", file_name);
-	goto error;
+	गच्छ error;
     }
 
     // Begin general undo data
     old_header_seq = undo_read_4c(&bi);
     new_header_seq = undo_read_4c(&bi);
     cur_header_seq = undo_read_4c(&bi);
-    num_head = undo_read_4c(&bi);
+    अंक_head = undo_read_4c(&bi);
     seq_last = undo_read_4c(&bi);
     seq_cur = undo_read_4c(&bi);
     seq_time = undo_read_time(&bi);
 
     // Optional header fields.
-    for (;;)
+    प्रति (;;)
     {
-	int len = undo_read_byte(&bi);
-	int what;
+	पूर्णाङ्क len = undo_read_byte(&bi);
+	पूर्णाङ्क what;
 
-	if (len == 0 || len == EOF)
-	    break;
+	यदि (len == 0 || len == EOF)
+	    भङ्ग;
 	what = undo_read_byte(&bi);
-	switch (what)
+	विकल्प (what)
 	{
-	    case UF_LAST_SAVE_NR:
+	    पक्ष UF_LAST_SAVE_NR:
 		last_save_nr = undo_read_4c(&bi);
-		break;
-	    default:
+		भङ्ग;
+	    स्वभाव:
 		// field not supported, skip
-		while (--len >= 0)
-		    (void)undo_read_byte(&bi);
+		यावत् (--len >= 0)
+		    (शून्य)undo_read_byte(&bi);
 	}
     }
 
@@ -2064,43 +2064,43 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // until we insert them into curbuf. The table remains sorted by the
     // sequence numbers of the headers.
     // When there are no headers uhp_table is NULL.
-    if (num_head > 0)
+    यदि (अंक_head > 0)
     {
-	if (num_head < LONG_MAX / (long)sizeof(u_header_T *))
-	    uhp_table = U_ALLOC_LINE(num_head * sizeof(u_header_T *));
-	if (uhp_table == NULL)
-	    goto error;
+	यदि (अंक_head < LONG_MAX / (long)परिमाण(u_header_T *))
+	    uhp_table = U_ALLOC_ओळ(अंक_head * परिमाण(u_header_T *));
+	यदि (uhp_table == रिक्त)
+	    गच्छ error;
     }
 
-    while ((c = undo_read_2c(&bi)) == UF_HEADER_MAGIC)
+    यावत् ((c = undo_read_2c(&bi)) == UF_HEADER_MAGIC)
     {
-	if (num_read_uhps >= num_head)
+	यदि (अंक_read_uhps >= अंक_head)
 	{
 	    corruption_error("num_head too small", file_name);
-	    goto error;
+	    गच्छ error;
 	}
 
 	uhp = unserialize_uhp(&bi, file_name);
-	if (uhp == NULL)
-	    goto error;
-	uhp_table[num_read_uhps++] = uhp;
+	यदि (uhp == रिक्त)
+	    गच्छ error;
+	uhp_table[अंक_read_uhps++] = uhp;
     }
 
-    if (num_read_uhps != num_head)
+    यदि (अंक_read_uhps != अंक_head)
     {
 	corruption_error("num_head", file_name);
-	goto error;
+	गच्छ error;
     }
-    if (c != UF_HEADER_END_MAGIC)
+    यदि (c != UF_HEADER_END_MAGIC)
     {
 	corruption_error("end marker", file_name);
-	goto error;
+	गच्छ error;
     }
 
 # ifdef U_DEBUG
-    uhp_table_used = alloc_clear(sizeof(int) * num_head + 1);
+    uhp_table_used = alloc_clear(परिमाण(पूर्णाङ्क) * अंक_head + 1);
 #  define SET_FLAG(j) ++uhp_table_used[j]
-# else
+# अन्यथा
 #  define SET_FLAG(j)
 # endif
 
@@ -2108,16 +2108,16 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // sequence numbers of the headers it links to; resolve those into
     // pointers.  Every entry is non-NULL: a header that failed to
     // unserialize or a count mismatch was an error above.
-    if (num_head > 0)
-	qsort(uhp_table, (size_t)num_head, sizeof(u_header_T *), uhp_seq_cmp);
+    यदि (अंक_head > 0)
+	qsort(uhp_table, (size_t)अंक_head, परिमाण(u_header_T *), uhp_seq_cmp);
 
     // In the sorted table two headers with the same uh_seq are neighbours.
-    for (i = 0; i < num_head - 1; i++)
+    प्रति (i = 0; i < अंक_head - 1; i++)
     {
-	if (uhp_table[i]->uh_seq == uhp_table[i + 1]->uh_seq)
+	यदि (uhp_table[i]->uh_seq == uhp_table[i + 1]->uh_seq)
 	{
 	    corruption_error("duplicate uh_seq", file_name);
-	    goto error;
+	    गच्छ error;
 	}
     }
 
@@ -2126,36 +2126,36 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // zero (written for a NULL pointer) and the own sequence number of the
     // header "hidx", resolves to NULL.
 # define SWIZZLE_SEQ(link, hidx) \
-    do { \
-	long fidx = uhp_table_find(uhp_table, num_head, (link).seq); \
+    कुरु { \
+	long fidx = uhp_table_find(uhp_table, अंक_head, (link).seq); \
 	\
-	if (fidx >= 0 && fidx != (hidx)) \
+	यदि (fidx >= 0 && fidx != (hidx)) \
 	{ \
 	    (link).ptr = uhp_table[fidx]; \
 	    SET_FLAG(fidx); \
 	} \
-	else \
-	    (link).ptr = NULL; \
-    } while (0)
+	अन्यथा \
+	    (link).ptr = रिक्त; \
+    } यावत् (0)
 
-    for (i = 0; i < num_head; i++)
+    प्रति (i = 0; i < अंक_head; i++)
     {
 	uhp = uhp_table[i];
 	SWIZZLE_SEQ(uhp->uh_next, i);
 	SWIZZLE_SEQ(uhp->uh_prev, i);
 	SWIZZLE_SEQ(uhp->uh_alt_next, i);
 	SWIZZLE_SEQ(uhp->uh_alt_prev, i);
-	if (old_header_seq > 0 && old_idx < 0 && uhp->uh_seq == old_header_seq)
+	यदि (old_header_seq > 0 && old_idx < 0 && uhp->uh_seq == old_header_seq)
 	{
 	    old_idx = i;
 	    SET_FLAG(i);
 	}
-	if (new_header_seq > 0 && new_idx < 0 && uhp->uh_seq == new_header_seq)
+	यदि (new_header_seq > 0 && new_idx < 0 && uhp->uh_seq == new_header_seq)
 	{
 	    new_idx = i;
 	    SET_FLAG(i);
 	}
-	if (cur_header_seq > 0 && cur_idx < 0 && uhp->uh_seq == cur_header_seq)
+	यदि (cur_header_seq > 0 && cur_idx < 0 && uhp->uh_seq == cur_header_seq)
 	{
 	    cur_idx = i;
 	    SET_FLAG(i);
@@ -2166,13 +2166,13 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // Now that we have read the undo info successfully, free the current undo
     // info and use the info from the file.
     u_blockfree(curbuf);
-    curbuf->b_u_oldhead = old_idx < 0 ? NULL : uhp_table[old_idx];
-    curbuf->b_u_newhead = new_idx < 0 ? NULL : uhp_table[new_idx];
-    curbuf->b_u_curhead = cur_idx < 0 ? NULL : uhp_table[cur_idx];
-    curbuf->b_u_line_ptr = line_ptr;
-    curbuf->b_u_line_lnum = line_lnum;
-    curbuf->b_u_line_colnr = line_colnr;
-    curbuf->b_u_numhead = num_head;
+    curbuf->b_u_oldhead = old_idx < 0 ? रिक्त : uhp_table[old_idx];
+    curbuf->b_u_newhead = new_idx < 0 ? रिक्त : uhp_table[new_idx];
+    curbuf->b_u_curhead = cur_idx < 0 ? रिक्त : uhp_table[cur_idx];
+    curbuf->b_u_ओळ_ptr = ओळ_ptr;
+    curbuf->b_u_ओळ_lnum = ओळ_lnum;
+    curbuf->b_u_ओळ_colnr = ओळ_colnr;
+    curbuf->b_u_numhead = अंक_head;
     curbuf->b_u_seq_last = seq_last;
     curbuf->b_u_seq_cur = seq_cur;
     curbuf->b_u_time_cur = seq_time;
@@ -2183,38 +2183,38 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     vim_free(uhp_table);
 
 # ifdef U_DEBUG
-    for (i = 0; i < num_head; ++i)
-	if (uhp_table_used[i] == 0)
+    प्रति (i = 0; i < अंक_head; ++i)
+	यदि (uhp_table_used[i] == 0)
 	    semsg("uhp_table entry %ld not used, leaking memory", i);
     vim_free(uhp_table_used);
     u_check(TRUE);
 # endif
 
-    if (name != NULL)
+    यदि (name != रिक्त)
 	smsg(_("Finished reading undo file %s"), file_name);
-    goto theend;
+    गच्छ theend;
 
 error:
-    vim_free(line_ptr.ul_line);
-    if (uhp_table != NULL)
+    vim_free(ओळ_ptr.ul_ओळ);
+    यदि (uhp_table != रिक्त)
     {
-	for (i = 0; i < num_read_uhps; i++)
-	    if (uhp_table[i] != NULL)
+	प्रति (i = 0; i < अंक_read_uhps; i++)
+	    यदि (uhp_table[i] != रिक्त)
 		u_free_uhp(uhp_table[i]);
 	vim_free(uhp_table);
     }
 
 theend:
 # ifdef FEAT_CRYPT
-    if (bi.bi_state != NULL)
+    यदि (bi.bi_state != रिक्त)
 	crypt_free_state(bi.bi_state);
     vim_free(bi.bi_buffer);
 # endif
-    if (fp != NULL)
+    यदि (fp != रिक्त)
 	fclose(fp);
-    if (file_name != name)
+    यदि (file_name != name)
 	vim_free(file_name);
-    return;
+    प्रत्यागम;
 }
 
 #endif // FEAT_PERSISTENT_UNDO
@@ -2224,55 +2224,55 @@ theend:
  * If 'cpoptions' contains 'u': Undo the previous undo or redo (vi compatible).
  * If 'cpoptions' does not contain 'u': Always undo.
  */
-    void
-u_undo(int count)
+    शून्य
+u_undo(पूर्णाङ्क मोजणी)
 {
     /*
      * If we get an undo command while executing a macro, we behave like the
      * original vi. If this happens twice in one macro the result will not
      * be compatible.
      */
-    if (!curbuf->b_u_synced)
+    यदि (!curbuf->b_u_synced)
     {
 	u_sync(TRUE);
-	count = 1;
+	मोजणी = 1;
     }
 
-    if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
+    यदि (vim_strchr(p_cpo, CPO_UNDO) == रिक्त)
 	undo_undoes = TRUE;
-    else
+    अन्यथा
 	undo_undoes = !undo_undoes;
-    u_doit(count);
+    u_doit(मोजणी);
 }
 
 /*
  * If 'cpoptions' contains 'u': Repeat the previous undo or redo.
  * If 'cpoptions' does not contain 'u': Always redo.
  */
-    void
-u_redo(int count)
+    शून्य
+u_redo(पूर्णाङ्क मोजणी)
 {
-    if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
+    यदि (vim_strchr(p_cpo, CPO_UNDO) == रिक्त)
 	undo_undoes = FALSE;
-    u_doit(count);
+    u_doit(मोजणी);
 }
 
 /*
  * Undo or redo, depending on 'undo_undoes', 'count' times.
  */
-    static void
-u_doit(int startcount)
+    स्थिर शून्य
+u_doit(पूर्णाङ्क startcount)
 {
-    int count = startcount;
+    पूर्णाङ्क मोजणी = startcount;
 
-    if (!undo_allowed())
-	return;
+    यदि (!undo_allowed())
+	प्रत्यागम;
 
     u_newcount = 0;
     u_oldcount = 0;
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    यदि (curbuf->b_ml.ml_flags & ML_EMPTY)
 	u_oldcount = -1;
-    while (count--)
+    यावत् (मोजणी--)
     {
 	// Do the change warning now, so that it triggers FileChangedRO when
 	// needed.  This may cause the file to be reloaded, that must happen
@@ -2280,49 +2280,49 @@ u_doit(int startcount)
 	// and more.
 	change_warning(0);
 
-	if (undo_undoes)
+	यदि (undo_undoes)
 	{
-	    if (curbuf->b_u_curhead == NULL)		// first undo
+	    यदि (curbuf->b_u_curhead == रिक्त)		// first undo
 		curbuf->b_u_curhead = curbuf->b_u_newhead;
-	    else if (get_undolevel() > 0)		// multi level undo
+	    अन्यथा यदि (get_undolevel() > 0)		// multi level undo
 		// get next undo
 		curbuf->b_u_curhead = curbuf->b_u_curhead->uh_next.ptr;
 	    // nothing to undo
-	    if (curbuf->b_u_numhead == 0 || curbuf->b_u_curhead == NULL)
+	    यदि (curbuf->b_u_numhead == 0 || curbuf->b_u_curhead == रिक्त)
 	    {
 		// stick curbuf->b_u_curhead at end
 		curbuf->b_u_curhead = curbuf->b_u_oldhead;
 		beep_flush();
-		if (count == startcount - 1)
+		यदि (मोजणी == startcount - 1)
 		{
-		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at oldest change"));
-		    return;
+		    यदि (!shortmess(SHM_UNDO))
+			संदेश(_("Already at oldest change"));
+		    प्रत्यागम;
 		}
-		break;
+		भङ्ग;
 	    }
 
 	    u_undoredo(TRUE);
 	}
-	else
+	अन्यथा
 	{
-	    if (curbuf->b_u_curhead == NULL || get_undolevel() <= 0)
+	    यदि (curbuf->b_u_curhead == रिक्त || get_undolevel() <= 0)
 	    {
 		beep_flush();	// nothing to redo
-		if (count == startcount - 1)
+		यदि (मोजणी == startcount - 1)
 		{
-		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at newest change"));
-		    return;
+		    यदि (!shortmess(SHM_UNDO))
+			संदेश(_("Already at newest change"));
+		    प्रत्यागम;
 		}
-		break;
+		भङ्ग;
 	    }
 
 	    u_undoredo(FALSE);
 
 	    // Advance for next redo.  Set "newhead" when at the end of the
 	    // redoable changes.
-	    if (curbuf->b_u_curhead->uh_prev.ptr == NULL)
+	    यदि (curbuf->b_u_curhead->uh_prev.ptr == रिक्त)
 		curbuf->b_u_newhead = curbuf->b_u_curhead;
 	    curbuf->b_u_curhead = curbuf->b_u_curhead->uh_prev.ptr;
 	}
@@ -2339,83 +2339,83 @@ u_doit(int startcount)
  * When "absolute" is TRUE use "step" as the sequence number to jump to.
  * "sec" must be FALSE then.
  */
-    void
+    शून्य
 undo_time(
     long	step,
-    int		sec,
-    int		file,
-    int		absolute)
+    पूर्णाङ्क		sec,
+    पूर्णाङ्क		file,
+    पूर्णाङ्क		absolute)
 {
     long	    target;
     long	    closest;
     long	    closest_start;
     long	    closest_seq = 0;
     long	    val;
-    u_header_T	    *uhp = NULL;
+    u_header_T	    *uhp = रिक्त;
     u_header_T	    *last;
-    int		    mark;
-    int		    nomark = 0;  // shut up compiler
-    int		    round;
-    int		    dosec = sec;
-    int		    dofile = file;
-    int		    above = FALSE;
-    int		    did_undo = TRUE;
+    पूर्णाङ्क		    mark;
+    पूर्णाङ्क		    nomark = 0;  // shut up compiler
+    पूर्णाङ्क		    round;
+    पूर्णाङ्क		    dosec = sec;
+    पूर्णाङ्क		    dofile = file;
+    पूर्णाङ्क		    above = FALSE;
+    पूर्णाङ्क		    did_undo = TRUE;
 
-    if (text_locked())
+    यदि (text_locked())
     {
-	text_locked_msg();
-	return;
+	text_locked_संदेश();
+	प्रत्यागम;
     }
 
     // First make sure the current undoable change is synced.
-    if (!curbuf->b_u_synced)
+    यदि (!curbuf->b_u_synced)
 	u_sync(TRUE);
 
     u_newcount = 0;
     u_oldcount = 0;
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    यदि (curbuf->b_ml.ml_flags & ML_EMPTY)
 	u_oldcount = -1;
 
     // "target" is the node below which we want to be.
     // Init "closest" to a value we can't reach.
-    if (absolute)
+    यदि (absolute)
     {
 	target = step;
 	closest = -1;
     }
-    else
+    अन्यथा
     {
-	if (dosec)
+	यदि (dosec)
 	    target = (long)(curbuf->b_u_time_cur) + step;
-	else if (dofile)
+	अन्यथा यदि (dofile)
 	{
-	    if (step < 0)
+	    यदि (step < 0)
 	    {
 		// Going back to a previous write. If there were changes after
 		// the last write, count that as moving one file-write, so
 		// that ":earlier 1f" undoes all changes since the last save.
 		uhp = curbuf->b_u_curhead;
-		if (uhp != NULL)
+		यदि (uhp != रिक्त)
 		    uhp = uhp->uh_next.ptr;
-		else
+		अन्यथा
 		    uhp = curbuf->b_u_newhead;
-		if (uhp != NULL && uhp->uh_save_nr != 0)
+		यदि (uhp != रिक्त && uhp->uh_save_nr != 0)
 		    // "uh_save_nr" was set in the last block, that means
 		    // there were no changes since the last write
 		    target = curbuf->b_u_save_nr_cur + step;
-		else
+		अन्यथा
 		    // count the changes since the last write as one step
 		    target = curbuf->b_u_save_nr_cur + step + 1;
-		if (target <= 0)
+		यदि (target <= 0)
 		    // Go to before first write: before the oldest change. Use
 		    // the sequence number for that.
 		    dofile = FALSE;
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Moving forward to a newer write.
 		target = curbuf->b_u_save_nr_cur + step;
-		if (target > curbuf->b_u_save_nr_last)
+		यदि (target > curbuf->b_u_save_nr_last)
 		{
 		    // Go to after last write: after the latest change. Use
 		    // the sequence number for that.
@@ -2424,23 +2424,23 @@ undo_time(
 		}
 	    }
 	}
-	else
+	अन्यथा
 	    target = curbuf->b_u_seq_cur + step;
-	if (step < 0)
+	यदि (step < 0)
 	{
-	    if (target < 0)
+	    यदि (target < 0)
 		target = 0;
 	    closest = -1;
 	}
-	else
+	अन्यथा
 	{
-	    if (dosec)
+	    यदि (dosec)
 		closest = (long)(vim_time() + 1);
-	    else if (dofile)
+	    अन्यथा यदि (dofile)
 		closest = curbuf->b_u_save_nr_last + 2;
-	    else
+	    अन्यथा
 		closest = curbuf->b_u_seq_last + 2;
-	    if (target >= closest)
+	    यदि (target >= closest)
 		target = closest - 1;
 	}
     }
@@ -2448,10 +2448,10 @@ undo_time(
     closest_seq = curbuf->b_u_seq_cur;
 
     // When "target" is 0; Back to origin.
-    if (target == 0)
+    यदि (target == 0)
     {
 	mark = lastmark;  // avoid that GCC complains
-	goto target_zero;
+	गच्छ target_zero;
     }
 
     /*
@@ -2462,7 +2462,7 @@ undo_time(
      * When using the closest time we use the sequence number in the second
      * round, because there may be several entries with the same time.
      */
-    for (round = 1; round <= 2; ++round)
+    प्रति (round = 1; round <= 2; ++round)
     {
 	// Find the path from the current state to where we want to go.  The
 	// desired state can be anywhere in the undo tree, need to go all over
@@ -2471,28 +2471,28 @@ undo_time(
 	mark = ++lastmark;
 	nomark = ++lastmark;
 
-	if (curbuf->b_u_curhead == NULL)	// at leaf of the tree
+	यदि (curbuf->b_u_curhead == रिक्त)	// at leaf of the tree
 	    uhp = curbuf->b_u_newhead;
-	else
+	अन्यथा
 	    uhp = curbuf->b_u_curhead;
 
-	while (uhp != NULL)
+	यावत् (uhp != रिक्त)
 	{
 	    uhp->uh_walk = mark;
-	    if (dosec)
+	    यदि (dosec)
 		val = (long)(uhp->uh_time);
-	    else if (dofile)
+	    अन्यथा यदि (dofile)
 		val = uhp->uh_save_nr;
-	    else
+	    अन्यथा
 		val = uhp->uh_seq;
 
-	    if (round == 1 && !(dofile && val == 0))
+	    यदि (round == 1 && !(dofile && val == 0))
 	    {
 		// Remember the header that is closest to the target.
 		// It must be at least in the right direction (checked with
 		// "b_u_seq_cur").  When the timestamp is equal find the
 		// highest/lowest sequence number.
-		if ((step < 0 ? uhp->uh_seq <= curbuf->b_u_seq_cur
+		यदि ((step < 0 ? uhp->uh_seq <= curbuf->b_u_seq_cur
 			      : uhp->uh_seq > curbuf->b_u_seq_cur)
 			&& ((dosec && val == closest)
 			    ? (step < 0
@@ -2514,177 +2514,177 @@ undo_time(
 
 	    // Quit searching when we found a match.  But when searching for a
 	    // time we need to continue looking for the best uh_seq.
-	    if (target == val && !dosec)
+	    यदि (target == val && !dosec)
 	    {
 		target = uhp->uh_seq;
-		break;
+		भङ्ग;
 	    }
 
 	    // go down in the tree if we haven't been there
-	    if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != nomark
+	    यदि (uhp->uh_prev.ptr != रिक्त && uhp->uh_prev.ptr->uh_walk != nomark
 					 && uhp->uh_prev.ptr->uh_walk != mark)
 		uhp = uhp->uh_prev.ptr;
 
 	    // go to alternate branch if we haven't been there
-	    else if (uhp->uh_alt_next.ptr != NULL
+	    अन्यथा यदि (uhp->uh_alt_next.ptr != रिक्त
 		    && uhp->uh_alt_next.ptr->uh_walk != nomark
 		    && uhp->uh_alt_next.ptr->uh_walk != mark)
 		uhp = uhp->uh_alt_next.ptr;
 
 	    // go up in the tree if we haven't been there and we are at the
 	    // start of alternate branches
-	    else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
+	    अन्यथा यदि (uhp->uh_next.ptr != रिक्त && uhp->uh_alt_prev.ptr == रिक्त
 		    && uhp->uh_next.ptr->uh_walk != nomark
 		    && uhp->uh_next.ptr->uh_walk != mark)
 	    {
 		// If still at the start we don't go through this change.
-		if (uhp == curbuf->b_u_curhead)
+		यदि (uhp == curbuf->b_u_curhead)
 		    uhp->uh_walk = nomark;
 		uhp = uhp->uh_next.ptr;
 	    }
 
-	    else
+	    अन्यथा
 	    {
 		// need to backtrack; mark this node as useless
 		uhp->uh_walk = nomark;
-		if (uhp->uh_alt_prev.ptr != NULL)
+		यदि (uhp->uh_alt_prev.ptr != रिक्त)
 		    uhp = uhp->uh_alt_prev.ptr;
-		else
+		अन्यथा
 		    uhp = uhp->uh_next.ptr;
 	    }
 	}
 
-	if (uhp != NULL)    // found it
-	    break;
+	यदि (uhp != रिक्त)    // found it
+	    भङ्ग;
 
-	if (absolute)
+	यदि (absolute)
 	{
-	    semsg(_(e_undo_number_nr_not_found), step);
-	    return;
+	    semsg(_(e_undo_संख्या_nr_not_found), step);
+	    प्रत्यागम;
 	}
 
-	if (closest == closest_start)
+	यदि (closest == closest_start)
 	{
-	    if (!shortmess(SHM_UNDO))
+	    यदि (!shortmess(SHM_UNDO))
 	    {
-		if (step < 0)
-		    msg(_("Already at oldest change"));
-		else
-		    msg(_("Already at newest change"));
+		यदि (step < 0)
+		    संदेश(_("Already at oldest change"));
+		अन्यथा
+		    संदेश(_("Already at newest change"));
 	    }
-	    return;
+	    प्रत्यागम;
 	}
 
 	target = closest_seq;
 	dosec = FALSE;
 	dofile = FALSE;
-	if (step < 0)
+	यदि (step < 0)
 	    above = TRUE;	// stop above the header
     }
 
 target_zero:
     // If we found it: Follow the path to go to where we want to be.
-    if (uhp != NULL || target == 0)
+    यदि (uhp != रिक्त || target == 0)
     {
 	/*
 	 * First go up the tree as much as needed.
 	 */
-	while (!got_int)
+	यावत् (!got_int)
 	{
 	    // Do the change warning now, for the same reason as above.
 	    change_warning(0);
 
 	    uhp = curbuf->b_u_curhead;
-	    if (uhp == NULL)
+	    यदि (uhp == रिक्त)
 		uhp = curbuf->b_u_newhead;
-	    else
+	    अन्यथा
 		uhp = uhp->uh_next.ptr;
-	    if (uhp == NULL || (target > 0 && uhp->uh_walk != mark)
+	    यदि (uhp == रिक्त || (target > 0 && uhp->uh_walk != mark)
 					 || (uhp->uh_seq == target && !above))
-		break;
+		भङ्ग;
 	    curbuf->b_u_curhead = uhp;
 	    u_undoredo(TRUE);
-	    if (target > 0)
+	    यदि (target > 0)
 		uhp->uh_walk = nomark;	// don't go back down here
 	}
 
 	// When back to origin, redo is not needed.
-	if (target > 0)
+	यदि (target > 0)
 	{
 	    /*
 	     * And now go down the tree (redo), branching off where needed.
 	     */
-	    while (!got_int)
+	    यावत् (!got_int)
 	    {
 		// Do the change warning now, for the same reason as above.
 		change_warning(0);
 
 		uhp = curbuf->b_u_curhead;
-		if (uhp == NULL)
-		    break;
+		यदि (uhp == रिक्त)
+		    भङ्ग;
 
 		// Go back to the first branch with a mark.
-		while (uhp->uh_alt_prev.ptr != NULL
+		यावत् (uhp->uh_alt_prev.ptr != रिक्त
 				     && uhp->uh_alt_prev.ptr->uh_walk == mark)
 		    uhp = uhp->uh_alt_prev.ptr;
 
 		// Find the last branch with a mark, that's the one.
 		last = uhp;
-		while (last->uh_alt_next.ptr != NULL
+		यावत् (last->uh_alt_next.ptr != रिक्त
 				    && last->uh_alt_next.ptr->uh_walk == mark)
 		    last = last->uh_alt_next.ptr;
-		if (last != uhp)
+		यदि (last != uhp)
 		{
 		    // Make the used branch the first entry in the list of
 		    // alternatives to make "u" and CTRL-R take this branch.
-		    while (uhp->uh_alt_prev.ptr != NULL)
+		    यावत् (uhp->uh_alt_prev.ptr != रिक्त)
 			uhp = uhp->uh_alt_prev.ptr;
-		    if (last->uh_alt_next.ptr != NULL)
+		    यदि (last->uh_alt_next.ptr != रिक्त)
 			last->uh_alt_next.ptr->uh_alt_prev.ptr =
 							last->uh_alt_prev.ptr;
 		    last->uh_alt_prev.ptr->uh_alt_next.ptr =
 							last->uh_alt_next.ptr;
-		    last->uh_alt_prev.ptr = NULL;
+		    last->uh_alt_prev.ptr = रिक्त;
 		    last->uh_alt_next.ptr = uhp;
 		    uhp->uh_alt_prev.ptr = last;
 
-		    if (curbuf->b_u_oldhead == uhp)
+		    यदि (curbuf->b_u_oldhead == uhp)
 			curbuf->b_u_oldhead = last;
 		    uhp = last;
-		    if (uhp->uh_next.ptr != NULL)
+		    यदि (uhp->uh_next.ptr != रिक्त)
 			uhp->uh_next.ptr->uh_prev.ptr = uhp;
 		}
 		curbuf->b_u_curhead = uhp;
 
-		if (uhp->uh_walk != mark)
-		    break;	    // must have reached the target
+		यदि (uhp->uh_walk != mark)
+		    भङ्ग;	    // must have reached the target
 
 		// Stop when going backwards in time and didn't find the exact
 		// header we were looking for.
-		if (uhp->uh_seq == target && above)
+		यदि (uhp->uh_seq == target && above)
 		{
 		    curbuf->b_u_seq_cur = target - 1;
-		    break;
+		    भङ्ग;
 		}
 
 		u_undoredo(FALSE);
 
 		// Advance "curhead" to below the header we last used.  If it
 		// becomes NULL then we need to set "newhead" to this leaf.
-		if (uhp->uh_prev.ptr == NULL)
+		यदि (uhp->uh_prev.ptr == रिक्त)
 		    curbuf->b_u_newhead = uhp;
 		curbuf->b_u_curhead = uhp->uh_prev.ptr;
 		did_undo = FALSE;
 
-		if (uhp->uh_seq == target)	// found it!
-		    break;
+		यदि (uhp->uh_seq == target)	// found it!
+		    भङ्ग;
 
 		uhp = uhp->uh_prev.ptr;
-		if (uhp == NULL || uhp->uh_walk != mark)
+		यदि (uhp == रिक्त || uhp->uh_walk != mark)
 		{
 		    // Need to redo more but can't find it...
 		    internal_error("undo_time()");
-		    break;
+		    भङ्ग;
 		}
 	    }
 	}
@@ -2701,24 +2701,24 @@ target_zero:
  *
  * When "undo" is TRUE we go up in the tree, when FALSE we go down.
  */
-    static void
-u_undoredo(int undo)
+    स्थिर शून्य
+u_undoredo(पूर्णाङ्क undo)
 {
-    undoline_T	*newarray = NULL;
+    undoline_T	*newarray = रिक्त;
     linenr_T	oldsize;
     linenr_T	newsize;
-    linenr_T	top, bot;
+    linenr_T	शीर्ष, bot;
     linenr_T	lnum;
     linenr_T	newlnum = MAXLNUM;
     pos_T	new_curpos = curwin->w_cursor;
     long	i;
     u_entry_T	*uep, *nuep;
-    u_entry_T	*newlist = NULL;
-    int		old_flags;
-    int		new_flags;
+    u_entry_T	*newlist = रिक्त;
+    पूर्णाङ्क		old_flags;
+    पूर्णाङ्क		new_flags;
     pos_T	namedm[NMARKS];
     visualinfo_T visualinfo;
-    int		empty_buffer;		    // buffer became empty
+    पूर्णाङ्क		empty_buffer;		    // buffer became empty
     u_header_T	*curhead = curbuf->b_u_curhead;
 
     // Don't want autocommands using the undo structures here, they are
@@ -2736,29 +2736,29 @@ u_undoredo(int undo)
     /*
      * save marks before undo/redo
      */
-    mch_memmove(namedm, curbuf->b_namedm, sizeof(pos_T) * NMARKS);
+    mch_memmove(namedm, curbuf->b_namedm, परिमाण(pos_T) * NMARKS);
     visualinfo = curbuf->b_visual;
-    curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
+    curbuf->b_op_start.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
     curbuf->b_op_start.col = 0;
     curbuf->b_op_end.lnum = 0;
     curbuf->b_op_end.col = 0;
 
-    for (uep = curhead->uh_entry; uep != NULL; uep = nuep)
+    प्रति (uep = curhead->uh_entry; uep != रिक्त; uep = nuep)
     {
-	top = uep->ue_top;
+	शीर्ष = uep->ue_शीर्ष;
 	bot = uep->ue_bot;
-	if (bot == 0)
-	    bot = curbuf->b_ml.ml_line_count + 1;
-	if (top > curbuf->b_ml.ml_line_count || top >= bot
-				      || bot > curbuf->b_ml.ml_line_count + 1)
+	यदि (bot == 0)
+	    bot = curbuf->b_ml.ml_ओळ_मोजणी + 1;
+	यदि (शीर्ष > curbuf->b_ml.ml_ओळ_मोजणी || शीर्ष >= bot
+				      || bot > curbuf->b_ml.ml_ओळ_मोजणी + 1)
 	{
 	    unblock_autocmds();
-	    iemsg(e_u_undo_line_numbers_wrong);
+	    iemsg(e_u_undo_ओळ_numbers_wrong);
 	    changed();		// don't want UNCHANGED now
-	    return;
+	    प्रत्यागम;
 	}
 
-	oldsize = bot - top - 1;    // number of lines before undo
+	oldsize = bot - शीर्ष - 1;    // number of lines before undo
 	newsize = uep->ue_size;	    // number of lines after undo
 
 	// Decide about the cursor position, depending on what text changed.
@@ -2768,7 +2768,7 @@ u_undoredo(int undo)
 	    // the remembered position.  Makes "gwap" put the cursor back
 	    // where it was.
 	    lnum = curhead->uh_cursor.lnum;
-	    if (lnum >= top && lnum <= top + newsize + 1)
+	    यदि (lnum >= शीर्ष && lnum <= शीर्ष + newsize + 1)
 	    {
 		new_curpos = curhead->uh_cursor;
 
@@ -2776,28 +2776,28 @@ u_undoredo(int undo)
 		// position.
 		newlnum = -1;
 	    }
-	    else if (top < newlnum)
+	    अन्यथा यदि (शीर्ष < newlnum)
 	    {
 		// Use the first line that actually changed.  Avoids that
 		// undoing auto-formatting puts the cursor in the previous
 		// line.
-		for (i = 0; i < newsize && i < oldsize; ++i)
+		प्रति (i = 0; i < newsize && i < oldsize; ++i)
 		{
-		    char_u *p = ml_get(top + 1 + i);
+		    char_u *p = ml_get(शीर्ष + 1 + i);
 
-		    if (curbuf->b_ml.ml_line_len != uep->ue_array[i].ul_len
-			    || memcmp(uep->ue_array[i].ul_line, p,
-						curbuf->b_ml.ml_line_len) != 0)
-			break;
+		    यदि (curbuf->b_ml.ml_ओळ_len != uep->ue_array[i].ul_len
+			    || memcmp(uep->ue_array[i].ul_ओळ, p,
+						curbuf->b_ml.ml_ओळ_len) != 0)
+			भङ्ग;
 		}
-		if (i == newsize && newlnum == MAXLNUM && uep->ue_next == NULL)
+		यदि (i == newsize && newlnum == MAXLNUM && uep->ue_next == रिक्त)
 		{
-		    newlnum = top;
+		    newlnum = शीर्ष;
 		    new_curpos.lnum = newlnum + 1;
 		}
-		else if (i < newsize)
+		अन्यथा यदि (i < newsize)
 		{
-		    newlnum = top + i;
+		    newlnum = शीर्ष + i;
 		    new_curpos.lnum = newlnum + 1;
 		}
 	    }
@@ -2808,37 +2808,37 @@ u_undoredo(int undo)
 	/*
 	 * Delete the lines between top and bot and save them in newarray.
 	 */
-	if (oldsize > 0)
+	यदि (oldsize > 0)
 	{
-	    if ((newarray = U_ALLOC_LINE(sizeof(undoline_T) * oldsize)) == NULL)
+	    यदि ((newarray = U_ALLOC_ओळ(परिमाण(undoline_T) * oldsize)) == रिक्त)
 	    {
-		do_outofmem_msg((long_u)(sizeof(undoline_T) * oldsize));
+		do_outofmem_संदेश((long_u)(परिमाण(undoline_T) * oldsize));
 
 		// We have messed up the entry list, repair is impossible.
 		// we have to free the rest of the list.
-		while (uep != NULL)
+		यावत् (uep != रिक्त)
 		{
 		    nuep = uep->ue_next;
 		    u_freeentry(uep, uep->ue_size);
 		    uep = nuep;
 		}
-		break;
+		भङ्ग;
 	    }
 	    // delete backwards, it goes faster in most cases
-	    for (lnum = bot - 1, i = oldsize; --i >= 0; --lnum)
+	    प्रति (lnum = bot - 1, i = oldsize; --i >= 0; --lnum)
 	    {
 		// what can we do when we run out of memory?
-		if (u_save_line(&newarray[i], lnum) == FAIL)
-		    do_outofmem_msg((long_u)0);
+		यदि (u_save_ओळ(&newarray[i], lnum) == FAIL)
+		    do_outofmem_संदेश((long_u)0);
 		// remember we deleted the last line in the buffer, and a
 		// dummy empty line will be inserted
-		if (curbuf->b_ml.ml_line_count == 1)
+		यदि (curbuf->b_ml.ml_ओळ_मोजणी == 1)
 		    empty_buffer = TRUE;
 		ml_delete_flags(lnum, ML_DEL_UNDO);
 	    }
 	}
-	else
-	    newarray = NULL;
+	अन्यथा
+	    newarray = रिक्त;
 
 	// make sure the cursor is on a valid line after the deletions
 	check_cursor_lnum();
@@ -2846,19 +2846,19 @@ u_undoredo(int undo)
 	/*
 	 * Insert the lines in u_array between top and bot.
 	 */
-	if (newsize)
+	यदि (newsize)
 	{
-	    for (lnum = top, i = 0; i < newsize; ++i, ++lnum)
+	    प्रति (lnum = शीर्ष, i = 0; i < newsize; ++i, ++lnum)
 	    {
 		// If the file is empty, there is an empty line 1 that we
 		// should get rid of, by replacing it with the new line.
-		if (empty_buffer && lnum == 0)
-		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_line,
+		यदि (empty_buffer && lnum == 0)
+		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_ओळ,
 					  uep->ue_array[i].ul_len, TRUE, TRUE);
-		else
-		    ml_append_flags(lnum, uep->ue_array[i].ul_line,
+		अन्यथा
+		    ml_append_flags(lnum, uep->ue_array[i].ul_ओळ,
 			     (colnr_T)uep->ue_array[i].ul_len, ML_APPEND_UNDO);
-		vim_free(uep->ue_array[i].ul_line);
+		vim_free(uep->ue_array[i].ul_ओळ);
 	    }
 	    vim_free((char_u *)uep->ue_array);
 	}
@@ -2868,53 +2868,53 @@ u_undoredo(int undo)
 	// restored lines after they were saved.  What was cleared on the lines
 	// around them the last time is given back first, so that undoing and
 	// redoing again joins what it split.
-	restore_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE);
-	restore_props_for_undo(curbuf, top + newsize + 1, &uep->ue_props,
+	restore_props_for_undo(curbuf, शीर्ष, &uep->ue_props, UNDOPROP_ABOVE);
+	restore_props_for_undo(curbuf, शीर्ष + newsize + 1, &uep->ue_props,
 								UNDOPROP_BELOW);
 	ga_clear(&uep->ue_props);
-	adjust_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE,
+	adjust_props_for_undo(curbuf, शीर्ष, &uep->ue_props, UNDOPROP_ABOVE,
 			      newsize > 0 ? UNDOPROP_NONE : UNDOPROP_BELOW);
-	if (newsize > 0)
-	    adjust_props_for_undo(curbuf, top + newsize, &uep->ue_props,
+	यदि (newsize > 0)
+	    adjust_props_for_undo(curbuf, शीर्ष + newsize, &uep->ue_props,
 						  UNDOPROP_NONE, UNDOPROP_BELOW);
 #endif
 
 	// adjust marks
-	if (oldsize != newsize)
+	यदि (oldsize != newsize)
 	{
-	    mark_adjust(top + 1, top + oldsize, (long)MAXLNUM,
+	    mark_adjust(शीर्ष + 1, शीर्ष + oldsize, (long)MAXLNUM,
 					       (long)newsize - (long)oldsize);
-	    if (curbuf->b_op_start.lnum > top + oldsize)
+	    यदि (curbuf->b_op_start.lnum > शीर्ष + oldsize)
 		curbuf->b_op_start.lnum += newsize - oldsize;
-	    if (curbuf->b_op_end.lnum > top + oldsize)
+	    यदि (curbuf->b_op_end.lnum > शीर्ष + oldsize)
 		curbuf->b_op_end.lnum += newsize - oldsize;
 	}
-	if (oldsize > 0 || newsize > 0)
+	यदि (oldsize > 0 || newsize > 0)
 	{
-	    changed_lines(top + 1, 0, bot, newsize - oldsize);
+	    changed_ओळी(शीर्ष + 1, 0, bot, newsize - oldsize);
 #ifdef FEAT_SPELL
 	    // When text has been changed, possibly the start of the next line
 	    // may have SpellCap that should be removed or it needs to be
 	    // displayed.  Schedule the next line for redrawing just in case.
-	    if (spell_check_window(curwin) && bot <= curbuf->b_ml.ml_line_count)
+	    यदि (spell_check_window(curwin) && bot <= curbuf->b_ml.ml_ओळ_मोजणी)
 		redrawWinline(curwin, bot);
 #endif
 	}
 
 	// Set the '[ mark.
-	if (top + 1 < curbuf->b_op_start.lnum)
-	    curbuf->b_op_start.lnum = top + 1;
+	यदि (शीर्ष + 1 < curbuf->b_op_start.lnum)
+	    curbuf->b_op_start.lnum = शीर्ष + 1;
 	// Set the '] mark.
-	if (newsize == 0 && top + 1 > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + 1;
-	else if (top + newsize > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + newsize;
+	यदि (newsize == 0 && शीर्ष + 1 > curbuf->b_op_end.lnum)
+	    curbuf->b_op_end.lnum = शीर्ष + 1;
+	अन्यथा यदि (शीर्ष + newsize > curbuf->b_op_end.lnum)
+	    curbuf->b_op_end.lnum = शीर्ष + newsize;
 
 	u_newcount += newsize;
 	u_oldcount += oldsize;
 	uep->ue_size = oldsize;
 	uep->ue_array = newarray;
-	uep->ue_bot = top + newsize + 1;
+	uep->ue_bot = शीर्ष + newsize + 1;
 
 	/*
 	 * insert this entry in front of the new entry list
@@ -2925,10 +2925,10 @@ u_undoredo(int undo)
     }
 
     // Ensure the '[ and '] marks are within bounds.
-    if (curbuf->b_op_start.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
-    if (curbuf->b_op_end.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_end.lnum = curbuf->b_ml.ml_line_count;
+    यदि (curbuf->b_op_start.lnum > curbuf->b_ml.ml_ओळ_मोजणी)
+	 curbuf->b_op_start.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
+    यदि (curbuf->b_op_end.lnum > curbuf->b_ml.ml_ओळ_मोजणी)
+	 curbuf->b_op_end.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
 
     // Set the cursor to the desired position.  Check that the line is valid.
     curwin->w_cursor = new_curpos;
@@ -2936,30 +2936,30 @@ u_undoredo(int undo)
 
     curhead->uh_entry = newlist;
     curhead->uh_flags = new_flags;
-    if ((old_flags & UH_EMPTYBUF) && BUFEMPTY())
+    यदि ((old_flags & UH_EMPTYBUF) && BUFEMPTY())
 	curbuf->b_ml.ml_flags |= ML_EMPTY;
-    if (old_flags & UH_CHANGED)
+    यदि (old_flags & UH_CHANGED)
 	changed();
-    else
+    अन्यथा
 #ifdef FEAT_NETBEANS_INTG
 	// per netbeans undo rules, keep it as modified
-	if (!isNetbeansModified(curbuf))
+	यदि (!isNetbeansModified(curbuf))
 #endif
 	unchanged(curbuf, FALSE, TRUE);
 
     /*
      * restore marks from before undo/redo
      */
-    for (i = 0; i < NMARKS; ++i)
+    प्रति (i = 0; i < NMARKS; ++i)
     {
-	if (curhead->uh_namedm[i].lnum != 0)
+	यदि (curhead->uh_namedm[i].lnum != 0)
 	    curbuf->b_namedm[i] = curhead->uh_namedm[i];
-	if (namedm[i].lnum != 0)
+	यदि (namedm[i].lnum != 0)
 	    curhead->uh_namedm[i] = namedm[i];
-	else
+	अन्यथा
 	    curhead->uh_namedm[i].lnum = 0;
     }
-    if (curhead->uh_visual.vi_start.lnum != 0)
+    यदि (curhead->uh_visual.vi_start.lnum != 0)
     {
 	curbuf->b_visual = curhead->uh_visual;
 	curhead->uh_visual = visualinfo;
@@ -2970,23 +2970,23 @@ u_undoredo(int undo)
      * before starting the change (for the "o" command).
      * Otherwise the cursor should go to the first undone line.
      */
-    if (curhead->uh_cursor.lnum + 1 == curwin->w_cursor.lnum
+    यदि (curhead->uh_cursor.lnum + 1 == curwin->w_cursor.lnum
 						 && curwin->w_cursor.lnum > 1)
 	--curwin->w_cursor.lnum;
-    if (curwin->w_cursor.lnum <= curbuf->b_ml.ml_line_count)
+    यदि (curwin->w_cursor.lnum <= curbuf->b_ml.ml_ओळ_मोजणी)
     {
-	if (curhead->uh_cursor.lnum == curwin->w_cursor.lnum)
+	यदि (curhead->uh_cursor.lnum == curwin->w_cursor.lnum)
 	{
 	    curwin->w_cursor.col = curhead->uh_cursor.col;
-	    if (virtual_active() && curhead->uh_cursor_vcol >= 0)
+	    यदि (virtual_active() && curhead->uh_cursor_vcol >= 0)
 		coladvance((colnr_T)curhead->uh_cursor_vcol);
-	    else
+	    अन्यथा
 		curwin->w_cursor.coladd = 0;
 	}
-	else
+	अन्यथा
 	    beginline(BL_SOL | BL_FIX);
     }
-    else
+    अन्यथा
     {
 	// We get here with the current cursor line being past the end (eg
 	// after adding lines at the end of the file, and then undoing it).
@@ -3001,22 +3001,22 @@ u_undoredo(int undo)
 
     // Remember where we are for "g-" and ":earlier 10s".
     curbuf->b_u_seq_cur = curhead->uh_seq;
-    if (undo)
+    यदि (undo)
     {
 	// We are below the previous undo.  However, to make ":earlier 1s"
 	// work we compute this as being just above the just undone change.
-	if (curhead->uh_next.ptr != NULL)
+	यदि (curhead->uh_next.ptr != रिक्त)
 	    curbuf->b_u_seq_cur = curhead->uh_next.ptr->uh_seq;
-	else
+	अन्यथा
 	    curbuf->b_u_seq_cur = 0;
     }
 
     // Remember where we are for ":earlier 1f" and ":later 1f".
-    if (curhead->uh_save_nr != 0)
+    यदि (curhead->uh_save_nr != 0)
     {
-	if (undo)
+	यदि (undo)
 	    curbuf->b_u_save_nr_cur = curhead->uh_save_nr - 1;
-	else
+	अन्यथा
 	    curbuf->b_u_save_nr_cur = curhead->uh_save_nr;
     }
 
@@ -3035,66 +3035,66 @@ u_undoredo(int undo)
  * Otherwise, report the number of changes (this may be incorrect
  * in some cases, but it's better than nothing).
  */
-    static void
+    स्थिर शून्य
 u_undo_end(
-    int		did_undo,	// just did an undo
-    int		absolute)	// used ":undo N"
+    पूर्णाङ्क		did_undo,	// just did an undo
+    पूर्णाङ्क		absolute)	// used ":undo N"
 {
-    char	*msgstr;
+    वर्ण	*msgstr;
     u_header_T	*uhp;
     char_u	msgbuf[80];
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_UNDO) && KeyTyped)
+    यदि ((fdo_flags & FDO_UNDO) && किल्ली_Typed)
 	foldOpenCursor();
 #endif
 
-    if (global_busy	    // no messages now, wait until global is finished
+    यदि (global_busy	    // no messages now, wait until global is finished
 	    || !messaging() // 'lazyredraw' set, don't do messages now
 	    || shortmess(SHM_UNDO))
-	return;
+	प्रत्यागम;
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    यदि (curbuf->b_ml.ml_flags & ML_EMPTY)
 	--u_newcount;
 
     u_oldcount -= u_newcount;
-    if (u_oldcount == -1)
+    यदि (u_oldcount == -1)
 	msgstr = N_("more line");
-    else if (u_oldcount < 0)
+    अन्यथा यदि (u_oldcount < 0)
 	msgstr = N_("more lines");
-    else if (u_oldcount == 1)
+    अन्यथा यदि (u_oldcount == 1)
 	msgstr = N_("line less");
-    else if (u_oldcount > 1)
+    अन्यथा यदि (u_oldcount > 1)
 	msgstr = N_("fewer lines");
-    else
+    अन्यथा
     {
 	u_oldcount = u_newcount;
-	if (u_newcount == 1)
+	यदि (u_newcount == 1)
 	    msgstr = N_("change");
-	else
+	अन्यथा
 	    msgstr = N_("changes");
     }
 
-    if (curbuf->b_u_curhead != NULL)
+    यदि (curbuf->b_u_curhead != रिक्त)
     {
 	// For ":undo N" we prefer a "after #N" message.
-	if (absolute && curbuf->b_u_curhead->uh_next.ptr != NULL)
+	यदि (absolute && curbuf->b_u_curhead->uh_next.ptr != रिक्त)
 	{
 	    uhp = curbuf->b_u_curhead->uh_next.ptr;
 	    did_undo = FALSE;
 	}
-	else if (did_undo)
+	अन्यथा यदि (did_undo)
 	    uhp = curbuf->b_u_curhead;
-	else
+	अन्यथा
 	    uhp = curbuf->b_u_curhead->uh_next.ptr;
     }
-    else
+    अन्यथा
 	uhp = curbuf->b_u_newhead;
 
-    if (uhp == NULL)
+    यदि (uhp == रिक्त)
 	*msgbuf = NUL;
-    else
-	add_time(msgbuf, sizeof(msgbuf), uhp->uh_time);
+    अन्यथा
+	add_time(msgbuf, परिमाण(msgbuf), uhp->uh_time);
 
 #ifdef FEAT_CONCEAL
     {
@@ -3102,57 +3102,57 @@ u_undo_end(
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == curbuf && wp->w_p_cole > 0)
+	    यदि (wp->w_buffer == curbuf && wp->w_p_cole > 0)
 		redraw_win_later(wp, UPD_NOT_VALID);
 	}
     }
 #endif
-    if (VIsual_active)
+    यदि (VIsual_active)
 	check_pos(curbuf, &VIsual);
 
     smsg_attr_keep(0, _("%ld %s; %s #%ld  %s"),
 	    u_oldcount < 0 ? -u_oldcount : u_oldcount,
 	    _(msgstr),
 	    did_undo ? _("before") : _("after"),
-	    uhp == NULL ? 0L : uhp->uh_seq,
+	    uhp == रिक्त ? 0L : uhp->uh_seq,
 	    msgbuf);
 }
 
 /*
  * u_sync: stop adding to the current entry list
  */
-    void
+    शून्य
 u_sync(
-    int	    force)	// Also sync when no_u_sync is set.
+    पूर्णाङ्क	    force)	// Also sync when no_u_sync is set.
 {
     // Skip it when already synced or syncing is disabled.
-    if (curbuf->b_u_synced || (!force && no_u_sync > 0))
-	return;
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    if (p_imst == IM_ON_THE_SPOT && im_is_preediting())
-	return;		    // XIM is busy, don't break an undo sequence
+    यदि (curbuf->b_u_synced || (!force && no_u_sync > 0))
+	प्रत्यागम;
+#यदि defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    यदि (p_imst == IM_ON_THE_SPOT && im_is_preediting())
+	प्रत्यागम;		    // XIM is busy, don't break an undo sequence
 #endif
-    if (get_undolevel() < 0)
+    यदि (get_undolevel() < 0)
 	curbuf->b_u_synced = true;  // no entries, nothing to do
-    else
+    अन्यथा
     {
 	u_getbot();		    // compute ue_bot of previous u_save
-	curbuf->b_u_curhead = NULL;
+	curbuf->b_u_curhead = रिक्त;
     }
 }
 
 /*
  * ":undolist": List the leafs of the undo tree
  */
-    void
+    शून्य
 ex_undolist(exarg_T *eap UNUSED)
 {
     garray_T	ga;
     u_header_T	*uhp;
-    int		mark;
-    int		nomark;
-    int		changes = 1;
-    int		len;
+    पूर्णाङ्क		mark;
+    पूर्णाङ्क		nomark;
+    पूर्णाङ्क		changes = 1;
+    पूर्णाङ्क		len;
 
     /*
      * 1: walk the tree to find all leafs, put the info in "ga".
@@ -3161,28 +3161,28 @@ ex_undolist(exarg_T *eap UNUSED)
      */
     mark = ++lastmark;
     nomark = ++lastmark;
-    ga_init2(&ga, sizeof(char *), 20);
+    ga_init2(&ga, परिमाण(वर्ण *), 20);
 
     uhp = curbuf->b_u_oldhead;
-    while (uhp != NULL)
+    यावत् (uhp != रिक्त)
     {
-	if (uhp->uh_prev.ptr == NULL && uhp->uh_walk != nomark
+	यदि (uhp->uh_prev.ptr == रिक्त && uhp->uh_walk != nomark
 						      && uhp->uh_walk != mark)
 	{
-	    if (ga_grow(&ga, 1) == FAIL)
-		break;
-	    len = vim_snprintf((char *)IObuff, IOSIZE, "%6ld %7d  ",
+	    यदि (ga_grow(&ga, 1) == FAIL)
+		भङ्ग;
+	    len = vim_snprintf((वर्ण *)IObuff, IOSIZE, "%6ld %7d  ",
 							uhp->uh_seq, changes);
 	    add_time(IObuff + len, IOSIZE - len, uhp->uh_time);
 
 	    // we have to call STRLEN() here because add_time() does not report
 	    // the number of characters added.
-	    len += (int)STRLEN(IObuff + len);
-	    if (uhp->uh_save_nr > 0)
+	    len += (पूर्णाङ्क)STRLEN(IObuff + len);
+	    यदि (uhp->uh_save_nr > 0)
 	    {
-		int n = (len >= 33) ? 0 : 33 - len;
+		पूर्णाङ्क n = (len >= 33) ? 0 : 33 - len;
 
-		len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%*.*s  %3ld", n, n, " ", uhp->uh_save_nr);
+		len += vim_snprintf((वर्ण *)IObuff + len, IOSIZE - len, "%*.*s  %3ld", n, n, " ", uhp->uh_save_nr);
 	    }
 	    ((char_u **)(ga.ga_data))[ga.ga_len++] = vim_strnsave(IObuff, len);
 	}
@@ -3190,7 +3190,7 @@ ex_undolist(exarg_T *eap UNUSED)
 	uhp->uh_walk = mark;
 
 	// go down in the tree if we haven't been there
-	if (uhp->uh_prev.ptr != NULL && uhp->uh_prev.ptr->uh_walk != nomark
+	यदि (uhp->uh_prev.ptr != रिक्त && uhp->uh_prev.ptr->uh_walk != nomark
 					 && uhp->uh_prev.ptr->uh_walk != mark)
 	{
 	    uhp = uhp->uh_prev.ptr;
@@ -3198,14 +3198,14 @@ ex_undolist(exarg_T *eap UNUSED)
 	}
 
 	// go to alternate branch if we haven't been there
-	else if (uhp->uh_alt_next.ptr != NULL
+	अन्यथा यदि (uhp->uh_alt_next.ptr != रिक्त
 		&& uhp->uh_alt_next.ptr->uh_walk != nomark
 		&& uhp->uh_alt_next.ptr->uh_walk != mark)
 	    uhp = uhp->uh_alt_next.ptr;
 
 	// go up in the tree if we haven't been there and we are at the
 	// start of alternate branches
-	else if (uhp->uh_next.ptr != NULL && uhp->uh_alt_prev.ptr == NULL
+	अन्यथा यदि (uhp->uh_next.ptr != रिक्त && uhp->uh_alt_prev.ptr == रिक्त
 		&& uhp->uh_next.ptr->uh_walk != nomark
 		&& uhp->uh_next.ptr->uh_walk != mark)
 	{
@@ -3213,13 +3213,13 @@ ex_undolist(exarg_T *eap UNUSED)
 	    --changes;
 	}
 
-	else
+	अन्यथा
 	{
 	    // need to backtrack; mark this node as done
 	    uhp->uh_walk = nomark;
-	    if (uhp->uh_alt_prev.ptr != NULL)
+	    यदि (uhp->uh_alt_prev.ptr != रिक्त)
 		uhp = uhp->uh_alt_prev.ptr;
-	    else
+	    अन्यथा
 	    {
 		uhp = uhp->uh_next.ptr;
 		--changes;
@@ -3227,25 +3227,25 @@ ex_undolist(exarg_T *eap UNUSED)
 	}
     }
 
-    if (ga.ga_len == 0)
-	msg(_("Nothing to undo"));
-    else
+    यदि (ga.ga_len == 0)
+	संदेश(_("Nothing to undo"));
+    अन्यथा
     {
-	int		i;
+	पूर्णाङ्क		i;
 
 	sort_strings((char_u **)ga.ga_data, ga.ga_len);
 
-	msg_start();
-	msg_puts_attr(_("number changes  when               saved"),
+	संदेश_start();
+	संदेश_puts_attr(_("number changes  when               saved"),
 							      HL_ATTR(HLF_T));
-	for (i = 0; i < ga.ga_len && !got_int; ++i)
+	प्रति (i = 0; i < ga.ga_len && !got_int; ++i)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
-	    msg_puts(((char **)ga.ga_data)[i]);
+	    संदेश_putchar('\n');
+	    यदि (got_int)
+		भङ्ग;
+	    संदेश_puts(((वर्ण **)ga.ga_data)[i]);
 	}
-	msg_end();
+	संदेश_end();
 
 	ga_clear_strings(&ga);
     }
@@ -3254,21 +3254,21 @@ ex_undolist(exarg_T *eap UNUSED)
 /*
  * ":undojoin": continue adding to the last entry list
  */
-    void
+    शून्य
 ex_undojoin(exarg_T *eap UNUSED)
 {
-    if (curbuf->b_u_newhead == NULL)
-	return;		    // nothing changed before
-    if (curbuf->b_u_curhead != NULL)
+    यदि (curbuf->b_u_newhead == रिक्त)
+	प्रत्यागम;		    // nothing changed before
+    यदि (curbuf->b_u_curhead != रिक्त)
     {
 	emsg(_(e_undojoin_is_not_allowed_after_undo));
-	return;
+	प्रत्यागम;
     }
-    if (!curbuf->b_u_synced)
-	return;		    // already unsynced
-    if (get_undolevel() < 0)
-	return;		    // no entries, nothing to do
-    else
+    यदि (!curbuf->b_u_synced)
+	प्रत्यागम;		    // already unsynced
+    यदि (get_undolevel() < 0)
+	प्रत्यागम;		    // no entries, nothing to do
+    अन्यथा
 	// Append next change to the last entry
 	curbuf->b_u_synced = false;
 }
@@ -3277,7 +3277,7 @@ ex_undojoin(exarg_T *eap UNUSED)
  * Called after writing or reloading the file and setting b_changed to FALSE.
  * Now an undo means that the buffer is modified.
  */
-    void
+    शून्य
 u_unchanged(buf_T *buf)
 {
     u_unch_branch(buf->b_u_oldhead);
@@ -3288,35 +3288,35 @@ u_unchanged(buf_T *buf)
  * After reloading a buffer which was saved for 'undoreload': Find the first
  * line that was changed and set the cursor there.
  */
-    void
-u_find_first_changed(void)
+    शून्य
+u_find_first_changed(शून्य)
 {
     u_header_T	*uhp = curbuf->b_u_newhead;
     u_entry_T   *uep;
     linenr_T	lnum;
 
-    if (curbuf->b_u_curhead != NULL || uhp == NULL)
-	return;  // undid something in an autocmd?
+    यदि (curbuf->b_u_curhead != रिक्त || uhp == रिक्त)
+	प्रत्यागम;  // undid something in an autocmd?
 
     // Check that the last undo block was for the whole file.
     uep = uhp->uh_entry;
-    if (uep->ue_top != 0 || uep->ue_bot != 0)
-	return;
+    यदि (uep->ue_शीर्ष != 0 || uep->ue_bot != 0)
+	प्रत्यागम;
 
-    for (lnum = 1; lnum < curbuf->b_ml.ml_line_count
+    प्रति (lnum = 1; lnum < curbuf->b_ml.ml_ओळ_मोजणी
 					      && lnum <= uep->ue_size; ++lnum)
     {
 	char_u *p = ml_get_buf(curbuf, lnum, FALSE);
 
-	if (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_line_len
-		|| memcmp(p, uep->ue_array[lnum - 1].ul_line, uep->ue_array[lnum - 1].ul_len) != 0)
+	यदि (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_ओळ_len
+		|| memcmp(p, uep->ue_array[lnum - 1].ul_ओळ, uep->ue_array[lnum - 1].ul_len) != 0)
 	{
 	    CLEAR_POS(&(uhp->uh_cursor));
 	    uhp->uh_cursor.lnum = lnum;
-	    return;
+	    प्रत्यागम;
 	}
     }
-    if (curbuf->b_ml.ml_line_count != uep->ue_size)
+    यदि (curbuf->b_ml.ml_ओळ_मोजणी != uep->ue_size)
     {
 	// lines added or deleted at the end, put the cursor there
 	CLEAR_POS(&(uhp->uh_cursor));
@@ -3328,7 +3328,7 @@ u_find_first_changed(void)
  * Increase the write count, store it in the last undo header, what would be
  * used for "u".
  */
-    void
+    शून्य
 u_update_save_nr(buf_T *buf)
 {
     u_header_T	*uhp;
@@ -3336,23 +3336,23 @@ u_update_save_nr(buf_T *buf)
     ++buf->b_u_save_nr_last;
     buf->b_u_save_nr_cur = buf->b_u_save_nr_last;
     uhp = buf->b_u_curhead;
-    if (uhp != NULL)
+    यदि (uhp != रिक्त)
 	uhp = uhp->uh_next.ptr;
-    else
+    अन्यथा
 	uhp = buf->b_u_newhead;
-    if (uhp != NULL)
+    यदि (uhp != रिक्त)
 	uhp->uh_save_nr = buf->b_u_save_nr_last;
 }
 
-    static void
+    स्थिर शून्य
 u_unch_branch(u_header_T *uhp)
 {
     u_header_T	*uh;
 
-    for (uh = uhp; uh != NULL; uh = uh->uh_prev.ptr)
+    प्रति (uh = uhp; uh != रिक्त; uh = uh->uh_prev.ptr)
     {
 	uh->uh_flags |= UH_CHANGED;
-	if (uh->uh_alt_next.ptr != NULL)
+	यदि (uh->uh_alt_next.ptr != रिक्त)
 	    u_unch_branch(uh->uh_alt_next.ptr);	    // recursive
     }
 }
@@ -3361,51 +3361,51 @@ u_unch_branch(u_header_T *uhp)
  * Get pointer to last added entry.
  * If it's not valid, give an error message and return NULL.
  */
-    static u_entry_T *
-u_get_headentry(void)
+    स्थिर u_entry_T *
+u_get_headentry(शून्य)
 {
-    if (curbuf->b_u_newhead == NULL || curbuf->b_u_newhead->uh_entry == NULL)
+    यदि (curbuf->b_u_newhead == रिक्त || curbuf->b_u_newhead->uh_entry == रिक्त)
     {
 	iemsg(e_undo_list_corrupt);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
-    return curbuf->b_u_newhead->uh_entry;
+    प्रत्यागम curbuf->b_u_newhead->uh_entry;
 }
 
 /*
  * u_getbot(): compute the line number of the previous u_save
  *		It is called only when b_u_synced is false.
  */
-    static void
-u_getbot(void)
+    स्थिर शून्य
+u_getbot(शून्य)
 {
     u_entry_T	*uep;
     linenr_T	extra;
 
     uep = u_get_headentry();	// check for corrupt undo list
-    if (uep == NULL)
-	return;
+    यदि (uep == रिक्त)
+	प्रत्यागम;
 
     uep = curbuf->b_u_newhead->uh_getbot_entry;
-    if (uep != NULL)
+    यदि (uep != रिक्त)
     {
 	/*
 	 * the new ue_bot is computed from the number of lines that has been
 	 * inserted (0 - deleted) since calling u_save. This is equal to the
 	 * old line count subtracted from the current line count.
 	 */
-	extra = curbuf->b_ml.ml_line_count - uep->ue_lcount;
-	uep->ue_bot = uep->ue_top + uep->ue_size + 1 + extra;
-	if (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_line_count)
+	extra = curbuf->b_ml.ml_ओळ_मोजणी - uep->ue_lcount;
+	uep->ue_bot = uep->ue_शीर्ष + uep->ue_size + 1 + extra;
+	यदि (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_ओळ_मोजणी)
 	{
-	    iemsg(e_undo_line_missing);
-	    uep->ue_bot = uep->ue_top + 1;  // assume all lines deleted, will
+	    iemsg(e_undo_ओळ_missing);
+	    uep->ue_bot = uep->ue_शीर्ष + 1;  // assume all lines deleted, will
 					    // get all the old lines back
 					    // without deleting the current
 					    // ones
 	}
 
-	curbuf->b_u_newhead->uh_getbot_entry = NULL;
+	curbuf->b_u_newhead->uh_getbot_entry = रिक्त;
     }
 
     curbuf->b_u_synced = true;
@@ -3414,7 +3414,7 @@ u_getbot(void)
 /*
  * Free one header "uhp" and its entry list and adjust the pointers.
  */
-    static void
+    स्थिर शून्य
 u_freeheader(
     buf_T	    *buf,
     u_header_T	    *uhp,
@@ -3424,22 +3424,22 @@ u_freeheader(
 
     // When there is an alternate redo list free that branch completely,
     // because we can never go there.
-    if (uhp->uh_alt_next.ptr != NULL)
+    यदि (uhp->uh_alt_next.ptr != रिक्त)
 	u_freebranch(buf, uhp->uh_alt_next.ptr, uhpp);
 
-    if (uhp->uh_alt_prev.ptr != NULL)
-	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = NULL;
+    यदि (uhp->uh_alt_prev.ptr != रिक्त)
+	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = रिक्त;
 
     // Update the links in the list to remove the header.
-    if (uhp->uh_next.ptr == NULL)
+    यदि (uhp->uh_next.ptr == रिक्त)
 	buf->b_u_oldhead = uhp->uh_prev.ptr;
-    else
+    अन्यथा
 	uhp->uh_next.ptr->uh_prev.ptr = uhp->uh_prev.ptr;
 
-    if (uhp->uh_prev.ptr == NULL)
+    यदि (uhp->uh_prev.ptr == रिक्त)
 	buf->b_u_newhead = uhp->uh_next.ptr;
-    else
-	for (uhap = uhp->uh_prev.ptr; uhap != NULL;
+    अन्यथा
+	प्रति (uhap = uhp->uh_prev.ptr; uhap != रिक्त;
 						 uhap = uhap->uh_alt_next.ptr)
 	    uhap->uh_next.ptr = uhp->uh_next.ptr;
 
@@ -3449,7 +3449,7 @@ u_freeheader(
 /*
  * Free an alternate branch and any following alternate branches.
  */
-    static void
+    स्थिर शून्य
 u_freebranch(
     buf_T	    *buf,
     u_header_T	    *uhp,
@@ -3459,21 +3459,21 @@ u_freebranch(
 
     // If this is the top branch we may need to use u_freeheader() to update
     // all the pointers.
-    if (uhp == buf->b_u_oldhead)
+    यदि (uhp == buf->b_u_oldhead)
     {
-	while (buf->b_u_oldhead != NULL)
+	यावत् (buf->b_u_oldhead != रिक्त)
 	    u_freeheader(buf, buf->b_u_oldhead, uhpp);
-	return;
+	प्रत्यागम;
     }
 
-    if (uhp->uh_alt_prev.ptr != NULL)
-	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = NULL;
+    यदि (uhp->uh_alt_prev.ptr != रिक्त)
+	uhp->uh_alt_prev.ptr->uh_alt_next.ptr = रिक्त;
 
     next = uhp;
-    while (next != NULL)
+    यावत् (next != रिक्त)
     {
 	tofree = next;
-	if (tofree->uh_alt_next.ptr != NULL)
+	यदि (tofree->uh_alt_next.ptr != रिक्त)
 	    u_freebranch(buf, tofree->uh_alt_next.ptr, uhpp);   // recursive
 	next = tofree->uh_prev.ptr;
 	u_freeentries(buf, tofree, uhpp);
@@ -3484,7 +3484,7 @@ u_freebranch(
  * Free all the undo entries for one header and the header itself.
  * This means that "uhp" is invalid when returning.
  */
-    static void
+    स्थिर शून्य
 u_freeentries(
     buf_T	    *buf,
     u_header_T	    *uhp,
@@ -3493,14 +3493,14 @@ u_freeentries(
     u_entry_T	    *uep, *nuep;
 
     // Check for pointers to the header that become invalid now.
-    if (buf->b_u_curhead == uhp)
-	buf->b_u_curhead = NULL;
-    if (buf->b_u_newhead == uhp)
-	buf->b_u_newhead = NULL;  // freeing the newest entry
-    if (uhpp != NULL && uhp == *uhpp)
-	*uhpp = NULL;
+    यदि (buf->b_u_curhead == uhp)
+	buf->b_u_curhead = रिक्त;
+    यदि (buf->b_u_newhead == uhp)
+	buf->b_u_newhead = रिक्त;  // freeing the newest entry
+    यदि (uhpp != रिक्त && uhp == *uhpp)
+	*uhpp = रिक्त;
 
-    for (uep = uhp->uh_entry; uep != NULL; uep = nuep)
+    प्रति (uep = uhp->uh_entry; uep != रिक्त; uep = nuep)
     {
 	nuep = uep->ue_next;
 	u_freeentry(uep, uep->ue_size);
@@ -3516,11 +3516,11 @@ u_freeentries(
 /*
  * free entry 'uep' and 'n' lines in uep->ue_array[]
  */
-    static void
+    स्थिर शून्य
 u_freeentry(u_entry_T *uep, long n)
 {
-    while (n > 0)
-	vim_free(uep->ue_array[--n].ul_line);
+    यावत् (n > 0)
+	vim_free(uep->ue_array[--n].ul_ओळ);
     vim_free((char_u *)uep->ue_array);
 #ifdef FEAT_PROP_POPUP
     ga_clear(&uep->ue_props);
@@ -3534,34 +3534,34 @@ u_freeentry(u_entry_T *uep, long n)
 /*
  * invalidate the undo buffer; called when storage has already been released
  */
-    static void
+    स्थिर शून्य
 u_clearall(buf_T *buf)
 {
-    buf->b_u_newhead = buf->b_u_oldhead = buf->b_u_curhead = NULL;
+    buf->b_u_newhead = buf->b_u_oldhead = buf->b_u_curhead = रिक्त;
     buf->b_u_synced = true;
     buf->b_u_numhead = 0;
-    buf->b_u_line_ptr.ul_line = NULL;
-    buf->b_u_line_ptr.ul_len = 0;
-    buf->b_u_line_ptr.ul_textlen = 0;
-    buf->b_u_line_lnum = 0;
+    buf->b_u_ओळ_ptr.ul_ओळ = रिक्त;
+    buf->b_u_ओळ_ptr.ul_len = 0;
+    buf->b_u_ओळ_ptr.ul_textlen = 0;
+    buf->b_u_ओळ_lnum = 0;
 }
 
 /*
  * Free all allocated memory blocks for the buffer 'buf'.
  */
-    static void
+    स्थिर शून्य
 u_blockfree(buf_T *buf)
 {
-    while (buf->b_u_oldhead != NULL)
-	u_freeheader(buf, buf->b_u_oldhead, NULL);
-    vim_free(buf->b_u_line_ptr.ul_line);
+    यावत् (buf->b_u_oldhead != रिक्त)
+	u_freeheader(buf, buf->b_u_oldhead, रिक्त);
+    vim_free(buf->b_u_ओळ_ptr.ul_ओळ);
 }
 
 /*
  * Free all allocated memory blocks for the buffer 'buf'.
  * and invalidate the undo buffer
  */
-    void
+    शून्य
 u_clearallandblockfree(buf_T *buf)
 {
     u_blockfree(buf);
@@ -3573,37 +3573,37 @@ u_clearallandblockfree(buf_T *buf)
 /*
  * Save the line "lnum" for the "U" command.
  */
-    static void
+    स्थिर शून्य
 u_saveline(linenr_T lnum)
 {
-    if (lnum == curbuf->b_u_line_lnum)	    // line is already saved
-	return;
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count) // should never happen
-	return;
+    यदि (lnum == curbuf->b_u_ओळ_lnum)	    // line is already saved
+	प्रत्यागम;
+    यदि (lnum < 1 || lnum > curbuf->b_ml.ml_ओळ_मोजणी) // should never happen
+	प्रत्यागम;
     u_clearline();
-    curbuf->b_u_line_lnum = lnum;
-    if (curwin->w_cursor.lnum == lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
-    else
-	curbuf->b_u_line_colnr = 0;
-    if (u_save_line(&curbuf->b_u_line_ptr, lnum) == FAIL)
-	do_outofmem_msg((long_u)0);
+    curbuf->b_u_ओळ_lnum = lnum;
+    यदि (curwin->w_cursor.lnum == lnum)
+	curbuf->b_u_ओळ_colnr = curwin->w_cursor.col;
+    अन्यथा
+	curbuf->b_u_ओळ_colnr = 0;
+    यदि (u_save_ओळ(&curbuf->b_u_ओळ_ptr, lnum) == FAIL)
+	do_outofmem_संदेश((long_u)0);
 }
 
 /*
  * clear the line saved for the "U" command
  * (this is used externally for crossing a line while in insert mode)
  */
-    void
-u_clearline(void)
+    शून्य
+u_clearline(शून्य)
 {
-    if (curbuf->b_u_line_ptr.ul_line == NULL)
-	return;
+    यदि (curbuf->b_u_ओळ_ptr.ul_ओळ == रिक्त)
+	प्रत्यागम;
 
-    VIM_CLEAR(curbuf->b_u_line_ptr.ul_line);
-    curbuf->b_u_line_ptr.ul_len = 0;
-    curbuf->b_u_line_ptr.ul_textlen = 0;
-    curbuf->b_u_line_lnum = 0;
+    VIM_CLEAR(curbuf->b_u_ओळ_ptr.ul_ओळ);
+    curbuf->b_u_ओळ_ptr.ul_len = 0;
+    curbuf->b_u_ओळ_ptr.ul_textlen = 0;
+    curbuf->b_u_ओळ_lnum = 0;
 }
 
 /*
@@ -3612,41 +3612,41 @@ u_clearline(void)
  * We also allow the cursor to be in another line.
  * Careful: may trigger autocommands that reload the buffer.
  */
-    void
-u_undoline(void)
+    शून्य
+u_undoline(शून्य)
 {
     colnr_T	t;
     undoline_T  oldp;
 
-    if (undo_off)
-	return;
+    यदि (undo_off)
+	प्रत्यागम;
 
-    if (curbuf->b_u_line_ptr.ul_line == NULL
-			|| curbuf->b_u_line_lnum > curbuf->b_ml.ml_line_count)
+    यदि (curbuf->b_u_ओळ_ptr.ul_ओळ == रिक्त
+			|| curbuf->b_u_ओळ_lnum > curbuf->b_ml.ml_ओळ_मोजणी)
     {
 	beep_flush();
-	return;
+	प्रत्यागम;
     }
 
     // first save the line for the 'u' command
-    if (u_savecommon(curbuf->b_u_line_lnum - 1,
-		       curbuf->b_u_line_lnum + 1, (linenr_T)0, FALSE) == FAIL)
-	return;
-    if (u_save_line(&oldp, curbuf->b_u_line_lnum) == FAIL)
+    यदि (u_savecommon(curbuf->b_u_ओळ_lnum - 1,
+		       curbuf->b_u_ओळ_lnum + 1, (linenr_T)0, FALSE) == FAIL)
+	प्रत्यागम;
+    यदि (u_save_ओळ(&oldp, curbuf->b_u_ओळ_lnum) == FAIL)
     {
-	do_outofmem_msg((long_u)0);
-	return;
+	do_outofmem_संदेश((long_u)0);
+	प्रत्यागम;
     }
-    ml_replace_len(curbuf->b_u_line_lnum, curbuf->b_u_line_ptr.ul_line,
-				     curbuf->b_u_line_ptr.ul_len, TRUE, FALSE);
-    changed_bytes(curbuf->b_u_line_lnum, 0);
-    curbuf->b_u_line_ptr = oldp;
+    ml_replace_len(curbuf->b_u_ओळ_lnum, curbuf->b_u_ओळ_ptr.ul_ओळ,
+				     curbuf->b_u_ओळ_ptr.ul_len, TRUE, FALSE);
+    changed_bytes(curbuf->b_u_ओळ_lnum, 0);
+    curbuf->b_u_ओळ_ptr = oldp;
 
-    t = curbuf->b_u_line_colnr;
-    if (curwin->w_cursor.lnum == curbuf->b_u_line_lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
+    t = curbuf->b_u_ओळ_colnr;
+    यदि (curwin->w_cursor.lnum == curbuf->b_u_ओळ_lnum)
+	curbuf->b_u_ओळ_colnr = curwin->w_cursor.col;
     curwin->w_cursor.col = t;
-    curwin->w_cursor.lnum = curbuf->b_u_line_lnum;
+    curwin->w_cursor.lnum = curbuf->b_u_ओळ_lnum;
     check_cursor_col();
 }
 
@@ -3657,82 +3657,82 @@ u_undoline(void)
  * Also considers a buffer changed when a terminal window contains a running
  * job.
  */
-    int
+    पूर्णाङ्क
 bufIsChanged(buf_T *buf)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running_not_none(buf->b_term))
-	return TRUE;
+    यदि (term_job_running_not_none(buf->b_term))
+	प्रत्यागम TRUE;
 #endif
-    return bufIsChangedNotTerm(buf);
+    प्रत्यागम bufIsChangedNotTerm(buf);
 }
 
 /*
  * Return TRUE if any buffer has changes.  Also buffers that are not written.
  */
-    int
-anyBufIsChanged(void)
+    पूर्णाङ्क
+anyBufIsChanged(शून्य)
 {
     buf_T *buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (bufIsChanged(buf))
-	    return TRUE;
-    return FALSE;
+	यदि (bufIsChanged(buf))
+	    प्रत्यागम TRUE;
+    प्रत्यागम FALSE;
 }
 
 /*
  * Like bufIsChanged() but ignoring a terminal window.
  */
-    int
+    पूर्णाङ्क
 bufIsChangedNotTerm(buf_T *buf)
 {
     // In a "prompt" buffer we do respect 'modified', so that we can control
     // closing the window by setting or resetting that option.
-    return (!bt_dontwrite(buf) || bt_prompt(buf))
+    प्रत्यागम (!bt_dontwrite(buf) || bt_prompt(buf))
 	&& (buf->b_changed || file_ff_differs(buf, TRUE));
 }
 
-    int
-curbufIsChanged(void)
+    पूर्णाङ्क
+curbufIsChanged(शून्य)
 {
-    return bufIsChanged(curbuf);
+    प्रत्यागम bufIsChanged(curbuf);
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 
 /*
  * For undotree(): Append the list of undo blocks at "first_uhp" to "list".
  * Recursive.
  */
-    static void
-u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
+    स्थिर शून्य
+u_eval_वृक्ष(buf_T *buf, u_header_T *first_uhp, list_T *list)
 {
     u_header_T  *uhp = first_uhp;
     dict_T	*dict;
 
-    while (uhp != NULL)
+    यावत् (uhp != रिक्त)
     {
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
-	dict_add_number(dict, "seq", uhp->uh_seq);
-	dict_add_number(dict, "time", (long)uhp->uh_time);
-	if (uhp == buf->b_u_newhead)
-	    dict_add_number(dict, "newhead", 1);
-	if (uhp == buf->b_u_curhead)
-	    dict_add_number(dict, "curhead", 1);
-	if (uhp->uh_save_nr > 0)
-	    dict_add_number(dict, "save", uhp->uh_save_nr);
+	यदि (dict == रिक्त)
+	    प्रत्यागम;
+	dict_add_संख्या(dict, "seq", uhp->uh_seq);
+	dict_add_संख्या(dict, "time", (long)uhp->uh_time);
+	यदि (uhp == buf->b_u_newhead)
+	    dict_add_संख्या(dict, "newhead", 1);
+	यदि (uhp == buf->b_u_curhead)
+	    dict_add_संख्या(dict, "curhead", 1);
+	यदि (uhp->uh_save_nr > 0)
+	    dict_add_संख्या(dict, "save", uhp->uh_save_nr);
 
-	if (uhp->uh_alt_next.ptr != NULL)
+	यदि (uhp->uh_alt_next.ptr != रिक्त)
 	{
 	    list_T	*alt_list = list_alloc();
 
-	    if (alt_list != NULL)
+	    यदि (alt_list != रिक्त)
 	    {
 		// Recursive call to add alternate undo tree.
-		u_eval_tree(buf, uhp->uh_alt_next.ptr, alt_list);
+		u_eval_वृक्ष(buf, uhp->uh_alt_next.ptr, alt_list);
 		dict_add_list(dict, "alt", alt_list);
 	    }
 	}
@@ -3745,88 +3745,88 @@ u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
 /*
  * "undofile(name)" function
  */
-    void
+    शून्य
 f_undofile(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
     rettv->v_type = VAR_STRING;
 # ifdef FEAT_PERSISTENT_UNDO
     {
 	char_u *fname = tv_get_string(&argvars[0]);
 
-	if (*fname == NUL)
+	यदि (*fname == NUL)
 	{
 	    // If there is no file name there will be no undo file.
-	    rettv->vval.v_string = NULL;
+	    rettv->vval.v_string = रिक्त;
 	}
-	else
+	अन्यथा
 	{
 	    char_u *ffname = FullName_save(fname, TRUE);
 
-	    if (ffname != NULL)
+	    यदि (ffname != रिक्त)
 		rettv->vval.v_string = u_get_undo_file_name(ffname, FALSE);
 	    vim_free(ffname);
 	}
     }
-# else
-    rettv->vval.v_string = NULL;
+# अन्यथा
+    rettv->vval.v_string = रिक्त;
 # endif
 }
 # ifdef FEAT_PERSISTENT_UNDO
 /*
  * Reset undofile option and delete the undofile
  */
-    void
+    शून्य
 u_undofile_reset_and_delete(buf_T *buf)
 {
     char_u *file_name;
 
-    if (!buf->b_p_udf)
-	return;
+    यदि (!buf->b_p_udf)
+	प्रत्यागम;
 
     file_name = u_get_undo_file_name(buf->b_ffname, TRUE);
-    if (file_name != NULL)
+    यदि (file_name != रिक्त)
     {
 	mch_remove(file_name);
 	vim_free(file_name);
     }
 
-    set_option_value_give_err((char_u *)"undofile", 0L, NULL, OPT_LOCAL);
+    set_option_मूल्य_give_err((char_u *)"undofile", 0L, रिक्त, OPT_LOCAL);
 }
 # endif
 
 /*
  * "undotree(expr)" function
  */
-    void
+    शून्य
 f_undotree(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    यदि (rettv_dict_alloc(rettv) == FAIL)
+	प्रत्यागम;
 
     typval_T	*tv = &argvars[0];
     buf_T	*buf = tv->v_type == VAR_UNKNOWN ? curbuf : get_buf_arg(tv);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
     dict_T *dict = rettv->vval.v_dict;
 
-    dict_add_number(dict, "synced", (long)buf->b_u_synced);
-    dict_add_number(dict, "seq_last", buf->b_u_seq_last);
-    dict_add_number(dict, "save_last", buf->b_u_save_nr_last);
-    dict_add_number(dict, "seq_cur", buf->b_u_seq_cur);
-    dict_add_number(dict, "time_cur", (long)buf->b_u_time_cur);
-    dict_add_number(dict, "save_cur", buf->b_u_save_nr_cur);
+    dict_add_संख्या(dict, "synced", (long)buf->b_u_synced);
+    dict_add_संख्या(dict, "seq_last", buf->b_u_seq_last);
+    dict_add_संख्या(dict, "save_last", buf->b_u_save_nr_last);
+    dict_add_संख्या(dict, "seq_cur", buf->b_u_seq_cur);
+    dict_add_संख्या(dict, "time_cur", (long)buf->b_u_time_cur);
+    dict_add_संख्या(dict, "save_cur", buf->b_u_save_nr_cur);
 
     list_T *list = list_alloc();
-    if (list != NULL)
+    यदि (list != रिक्त)
     {
-	u_eval_tree(buf, buf->b_u_oldhead, list);
+	u_eval_वृक्ष(buf, buf->b_u_oldhead, list);
 	dict_add_list(dict, "entries", list);
     }
 }

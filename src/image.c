@@ -14,29 +14,29 @@
  * blit pixels ("images" are objects), the behaviour is emulated.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_IMAGE)
+#यदि defined(FEAT_IMAGE)
 
-struct
+संरचना
 {
-    const char *name;
+    ध्रुव वर्ण *name;
 
-    struct
+    संरचना
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_T *);
-	void (*uninit)(image_T *);
+	पूर्णाङ्क (*init)(image_T *);
+	शून्य (*uninit)(image_T *);
     } image;
 
-    struct
+    संरचना
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_placement_T *);
-	void (*uninit)(image_placement_T *);
+	पूर्णाङ्क (*init)(image_placement_T *);
+	शून्य (*uninit)(image_placement_T *);
 
-	void (*draw)(image_placement_T *);
-	void (*clear)(image_placement_T *);
+	शून्य (*draw)(image_placement_T *);
+	शून्य (*clear)(image_placement_T *);
 
 	// If backend blits the image pixels to the screen. Images are not
 	// treated as "objects".
@@ -58,12 +58,12 @@ struct
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 	    .blit = false,
-#  else
+#  अन्यथा
 	    .blit = true,
 #  endif
 # elif FEAT_GUI_MSWIN
 	    .blit = true,
-# else
+# अन्यथा
 	    .blit = false,
 # endif
 	}
@@ -104,37 +104,37 @@ struct
 };
 
 // Current image backend being used
-static image_backend_T image_backend = IMAGE_BACKEND_NONE;
+स्थिर image_backend_T image_backend = IMAGE_BACKEND_NONE;
 
-static image_T *images = NULL;
+स्थिर image_T *images = रिक्त;
 // Sorted from highest zindex to lowest zindex
-static image_placement_T    *placements = NULL;
-static int		    n_placements = 0;
+स्थिर image_placement_T    *placements = रिक्त;
+स्थिर पूर्णाङ्क		    n_placements = 0;
 
-static int shift_top = 0;
-static int shift_bot = 0;
-static int shift = 0;
+स्थिर पूर्णाङ्क shift_शीर्ष = 0;
+स्थिर पूर्णाङ्क shift_bot = 0;
+स्थिर पूर्णाङ्क shift = 0;
 
 // If > 0, then mark_dirty_region_for_images() will be a no-op
-static int freeze_mark_dirty = 0;
+स्थिर पूर्णाङ्क freeze_mark_dirty = 0;
 
-#define FOR_ALL_IMAGES(v) for ((v) = images; (v) != NULL; (v) = (v)->next)
+#define FOR_ALL_IMAGES(v) प्रति ((v) = images; (v) != रिक्त; (v) = (v)->next)
 #define FOR_ALL_PLACEMENTS(v) \
-    for ((v) = placements; (v) != NULL; (v) = (v)->next)
+    प्रति ((v) = placements; (v) != रिक्त; (v) = (v)->next)
 
 #define IMAGE_FUNC(b, n) (image_backends[b].image.n)
 #define PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
 
-static void redraw_region(pixman_region32_t *region, bool now, bool restore);
+स्थिर शून्य redraw_region(pixman_region32_t *region, bool now, bool restore);
 
-    void
-init_image_state(void)
+    शून्य
+init_image_state(शून्य)
 {
-    (void)update_image_backend();
+    (शून्य)update_image_backend();
 }
 
-    void
-uninit_image_state(void)
+    शून्य
+uninit_image_state(शून्य)
 {
 #ifdef FEAT_IMAGE_SIXEL
     sixel_uninit();
@@ -144,16 +144,16 @@ uninit_image_state(void)
 /*
  * Return true if the there image backend is ready, otherwise emit error.
  */
-    static bool
-backend_available(bool msg)
+    स्थिर bool
+backend_available(bool संदेश)
 {
-    if (image_backend == IMAGE_BACKEND_NONE)
+    यदि (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
+	यदि (संदेश)
 	    emsg(_(e_no_image_backend_available));
-	return false;
+	प्रत्यागम false;
     }
-    return true;
+    प्रत्यागम true;
 }
 
 /*
@@ -161,23 +161,23 @@ backend_available(bool msg)
  * failure.
  */
     image_T *
-image_new(uint8_t *data, int width, int height, image_format_T fmt)
+image_new(uint8_t *data, पूर्णाङ्क width, पूर्णाङ्क height, image_format_T fmt)
 {
     image_T	    *img;
-    static int_u    id;
+    स्थिर int_u    id;
 
-    if (!backend_available(true))
-	return NULL;
+    यदि (!backend_available(true))
+	प्रत्यागम रिक्त;
 
     img = ALLOC_CLEAR_ONE(image_T);
-    if (img == NULL)
-	return NULL;
+    यदि (img == रिक्त)
+	प्रत्यागम रिक्त;
 
     img->data = vim_memsave(data, (size_t)width * height * fmt);
-    if (img->data == NULL)
+    यदि (img->data == रिक्त)
     {
 	vim_free(img);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     img->state = IMAGE_STATE_PRIVATE;
@@ -191,32 +191,32 @@ image_new(uint8_t *data, int width, int height, image_format_T fmt)
 
     img->backend = image_backend;
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    यदि (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
 	vim_free(img->data);
 	vim_free(img);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    if (images != NULL)
+    यदि (images != रिक्त)
 	images->prev = img;
     img->next = images;
     images = img;
 
-    return img;
+    प्रत्यागम img;
 }
 
-    static void
+    स्थिर शून्य
 image_free(image_T *img)
 {
-    if (backend_available(false))
+    यदि (backend_available(false))
 	IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (img->prev != NULL)
+    यदि (img->prev != रिक्त)
 	img->prev->next = img->next;
-    if (img->next != NULL)
+    यदि (img->next != रिक्त)
 	img->next->prev = img->prev;
-    if (images == img)
+    यदि (images == img)
 	images = img->next;
 
     vim_free(img->data);
@@ -227,10 +227,10 @@ image_free(image_T *img)
  * Decrement reference count of an image. Be careful to not let the public API
  * be able to directly decrement the refcount of an image multiple times!
  */
-    void
+    शून्य
 image_unref(image_T *img)
 {
-    if (--img->refcount <= 0)
+    यदि (--img->refcount <= 0)
 	image_free(img);
 }
 
@@ -242,18 +242,18 @@ image_unref(image_T *img)
 image_ref(image_T *img)
 {
     img->refcount++;
-    return img;
+    प्रत्यागम img;
 }
 
 /*
  * Get image width and height in cells, rounding up so that every pixel is
  * covered.
  */
-    void
-image_get_cell_dimensions(image_T *img, int *cw, int *ch)
+    शून्य
+image_get_cell_dimensions(image_T *img, पूर्णाङ्क *cw, पूर्णाङ्क *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    पूर्णाङ्क w = PHY2LOG(img->width);
+    पूर्णाङ्क h = PHY2LOG(img->height);
 
     *cw = (w + cell_width - 1) / cell_width;
     *ch = (h + cell_height - 1) / cell_height;
@@ -263,18 +263,18 @@ image_get_cell_dimensions(image_T *img, int *cw, int *ch)
  * Similar, but return the dimensions of all cells that are *fully* covered by
  * pixels. Pixels that are partially covered are not counted.
  */
-    static void
-image_get_cell_dimensions_min(image_T *img, int *cw, int *ch)
+    स्थिर शून्य
+image_get_cell_dimensions_min(image_T *img, पूर्णाङ्क *cw, पूर्णाङ्क *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    पूर्णाङ्क w = PHY2LOG(img->width);
+    पूर्णाङ्क h = PHY2LOG(img->height);
 
     *cw = w / cell_width;
     *ch = h / cell_height;
 }
 
-    void
-image_get_dimensions(image_T *img, int *w, int *h)
+    शून्य
+image_get_dimensions(image_T *img, पूर्णाङ्क *w, पूर्णाङ्क *h)
 {
     *w = img->width;
     *h = img->height;
@@ -284,60 +284,60 @@ image_get_dimensions(image_T *img, int *w, int *h)
  * Replace the current image contents with "data". "data" should be the exact
  * same format, width, and height. Return OK on success and FAIL on failure.
  */
-    int
+    पूर्णाङ्क
 image_update(image_T *img, uint8_t *data)
 {
-    int w, h;
+    पूर्णाङ्क w, h;
 
-    if (!backend_available(true) || img->data == NULL)
-	return FAIL;
+    यदि (!backend_available(true) || img->data == रिक्त)
+	प्रत्यागम FAIL;
 
     image_get_dimensions(img, &w, &h);
     mch_memmove(img->data, data, (size_t)w * h * img->fmt);
 
     IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    यदि (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
 	emsg(_(e_out_of_memory));
 	VIM_CLEAR(img->data);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
     img->ver++;
     redraw_all_later(UPD_VALID);
-    return OK;
+    प्रत्यागम OK;
 }
 
-    static void
+    स्थिर शून्य
 image_placement_unlink(image_placement_T *place)
 {
-    if (place->prev != NULL)
+    यदि (place->prev != रिक्त)
 	place->prev->next = place->next;
-    if (place->next != NULL)
+    यदि (place->next != रिक्त)
 	place->next->prev = place->prev;
-    if (placements == place)
+    यदि (placements == place)
 	placements = place->next;
     n_placements--;
 }
 
-    static void
+    स्थिर शून्य
 image_placement_link(image_placement_T *place)
 {
     image_placement_T *p = placements;
-    image_placement_T *prev = NULL;
+    image_placement_T *prev = रिक्त;
 
     // Add placement *before* the placement with the lower zindex.
-    while (p != NULL)
+    यावत् (p != रिक्त)
     {
-	if (place->zindex > p->zindex)
-	    break;
-	else if (place->zindex == p->zindex)
+	यदि (place->zindex > p->zindex)
+	    भङ्ग;
+	अन्यथा यदि (place->zindex == p->zindex)
 	{
-	    if (place->use > p->use)
-		break;
-	    if (place->gen < p->gen)
-		break;
+	    यदि (place->use > p->use)
+		भङ्ग;
+	    यदि (place->gen < p->gen)
+		भङ्ग;
 	}
 
 	prev = p;
@@ -347,12 +347,12 @@ image_placement_link(image_placement_T *place)
     place->next = p;
     place->prev = prev;
 
-    if (p != NULL)
+    यदि (p != रिक्त)
 	p->prev = place;
 
-    if (prev != NULL)
+    यदि (prev != रिक्त)
 	prev->next = place;
-    else
+    अन्यथा
 	placements = place;
 
     n_placements++;
@@ -381,14 +381,14 @@ image_placement_new(
 	bool			quiet)
 {
     image_placement_T	*place;
-    static int_u	id = 1; // Kitty placements id must be > 1
+    स्थिर int_u	id = 1; // Kitty placements id must be > 1
 
-    if (!backend_available(!quiet))
-	return NULL;
+    यदि (!backend_available(!quiet))
+	प्रत्यागम रिक्त;
 
     place = ALLOC_CLEAR_ONE(image_placement_T);
-    if (place == NULL)
-	return NULL;
+    यदि (place == रिक्त)
+	प्रत्यागम रिक्त;
 
     place->id = id;
     id += PLACEMENT_ID_INC; // Allocate 1000 free placement ids to be used to
@@ -400,7 +400,7 @@ image_placement_new(
     place->img = img;
     place->flags = IMAGEPF_DIRTY;
 
-    if (img != NULL)
+    यदि (img != रिक्त)
     {
 	place->img_ver = img->ver;
 	place->backend = image_backend;
@@ -413,73 +413,73 @@ image_placement_new(
 	place->crop_box.x2 = place->bounding_box.x2;
 	place->crop_box.y2 = place->bounding_box.y2;
 
-	if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+	यदि (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 	{
 	    id -= PLACEMENT_ID_INC;
 	    vim_free(place);
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
     }
-    else
+    अन्यथा
 	place->backend = IMAGE_BACKEND_NONE;
 
     image_placement_link(place);
 
-    return place;
+    प्रत्यागम place;
 }
 
-    static void
+    स्थिर शून्य
 image_placement_clear_int(image_placement_T *place, bool now)
 {
-    if (backend_available(false) && place->img != NULL)
+    यदि (backend_available(false) && place->img != रिक्त)
     {
-	if (place->flags & IMAGEPF_VISIBLE_INIT
+	यदि (place->flags & IMAGEPF_VISIBLE_INIT
 		&& PLACEMENT_FUNC(image_backend, blit))
 	    redraw_region(&place->visible_abs, now, true);
 	PLACEMENT_FUNC(image_backend, clear)(place);
 	place->flags |= IMAGEPF_HIDDEN;
-	if (!now && !updating_screen)
+	यदि (!now && !updating_screen)
 	    redraw_all_later(UPD_VALID);
     }
 }
 
-    void
+    शून्य
 image_placement_clear(image_placement_T *place)
 {
     image_placement_clear_int(place, updating_screen);
 }
 
-    void
+    शून्य
 image_placement_free(image_placement_T *place)
 {
-    if (backend_available(false) && place->backend_data != NULL)
+    यदि (backend_available(false) && place->backend_data != रिक्त)
     {
 	image_placement_clear(place);
 	PLACEMENT_FUNC(image_backend, uninit)(place);
     }
 
-    if (place->flags & IMAGEPF_VISIBLE_INIT)
+    यदि (place->flags & IMAGEPF_VISIBLE_INIT)
     {
 	pixman_region32_fini(&place->visible);
 	pixman_region32_fini(&place->visible_abs);
     }
     image_placement_unlink(place);
 
-    if (place->img != NULL)
+    यदि (place->img != रिक्त)
 	image_unref(place->img);
     vim_free(place);
 }
 
-    void
-image_placement_set_zindex(image_placement_T *place, int zindex)
+    शून्य
+image_placement_set_zindex(image_placement_T *place, पूर्णाङ्क zindex)
 {
     // If image was hidden before, must dirty it so it is fully redrawn again.
-    if (place->flags & IMAGEPF_HIDDEN)
+    यदि (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->zindex == zindex)
-	return;
+    यदि (place->zindex == zindex)
+	प्रत्यागम;
     place->zindex = zindex;
     place->flags |= IMAGEPF_DIRTY;
 
@@ -491,30 +491,30 @@ image_placement_set_zindex(image_placement_T *place, int zindex)
 /*
  * Make sure to also update the bounding box!
  */
-    void
-image_placement_set_position(image_placement_T *place, int row, int col)
+    शून्य
+image_placement_set_position(image_placement_T *place, पूर्णाङ्क row, पूर्णाङ्क col)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    यदि (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->row == row && place->col == col)
-	return;
+    यदि (place->row == row && place->col == col)
+	प्रत्यागम;
     place->row = row;
     place->col = col;
     place->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
+    शून्य
+image_placement_set_crop(image_placement_T *place, पूर्णाङ्क x, पूर्णाङ्क y, पूर्णाङ्क w, पूर्णाङ्क h)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    यदि (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->crop_box.x1 == x && place->crop_box.y1 == y
+    यदि (place->crop_box.x1 == x && place->crop_box.y1 == y
 	    && place->crop_box.x2 == x + w && place->crop_box.y2 == y + h)
-	return;
+	प्रत्यागम;
 
     place->crop_box.x1 = x;
     place->crop_box.y1 = y;
@@ -524,22 +524,22 @@ image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
     place->flags |= IMAGEPF_DIRTY;
 }
 
-    void
+    शून्य
 image_placement_set_bounding_box(
 	image_placement_T   *place,
-	int		    row,
-	int		    col,
-	int		    row_height,
-	int		    col_width)
+	पूर्णाङ्क		    row,
+	पूर्णाङ्क		    col,
+	पूर्णाङ्क		    row_height,
+	पूर्णाङ्क		    col_width)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    यदि (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->bounding_box.x1 == col && place->bounding_box.y1 == row
+    यदि (place->bounding_box.x1 == col && place->bounding_box.y1 == row
 	    && place->bounding_box.x2 == col + col_width
 	    && place->bounding_box.y2 == row + row_height)
-	return;
+	प्रत्यागम;
 
     place->bounding_box.x1 = col;
     place->bounding_box.y1 = row;
@@ -553,20 +553,20 @@ image_placement_set_bounding_box(
  * Enable or disable the image placement. Unlike IMAGEPF_HIDDEN, this is not
  * reset across redraws.
  */
-    void
+    शून्य
 image_placement_set_enable(image_placement_T *place, bool enable)
 {
     bool old = place->flags & IMAGEPF_ENABLED;
 
-    if (enable && !old)
+    यदि (enable && !old)
 	place->flags |= IMAGEPF_ENABLED;
-    else if (!enable && old)
+    अन्यथा यदि (!enable && old)
     {
 	place->flags &= ~IMAGEPF_ENABLED;
 	image_placement_clear(place);
     }
-    else
-	return;
+    अन्यथा
+	प्रत्यागम;
 
     place->flags |= IMAGEPF_DIRTY;
 }
@@ -575,19 +575,19 @@ image_placement_set_enable(image_placement_T *place, bool enable)
  * Note that the returned crop region (x, y, w, h) is in physical pixels if
  * "physical" is true. Not relevant when using terminal protocols (sixel, KGP).
  */
-    void
+    शून्य
 image_placement_subrect(
 	image_placement_T   *place,
 	pixman_box32_t	    rect,
-	int		    *row,
-	int		    *col,
-	int		    *x,
-	int		    *y,
-	int		    *w,
-	int		    *h,
+	पूर्णाङ्क		    *row,
+	पूर्णाङ्क		    *col,
+	पूर्णाङ्क		    *x,
+	पूर्णाङ्क		    *y,
+	पूर्णाङ्क		    *w,
+	पूर्णाङ्क		    *h,
 	bool		    physical)
 {
-    int iw, ih;
+    पूर्णाङ्क iw, ih;
 
     image_get_dimensions(place->img, &iw, &ih);
 
@@ -599,14 +599,14 @@ image_placement_subrect(
     *w = (rect.x2 - rect.x1) * cell_width;
     *h = (rect.y2 - rect.y1) * cell_height;
 
-    if (physical)
+    यदि (physical)
     {
 	*x = LOG2PHY(*x);
 	*y = LOG2PHY(*y);
 	*w = LOG2PHY(*w);
 	*h = LOG2PHY(*h);
     }
-    else
+    अन्यथा
     {
 	iw = PHY2LOG(iw);
 	ih = PHY2LOG(ih);
@@ -630,53 +630,53 @@ image_placement_subrect(
  * instead of deferring to next redraw. If "restore" is true, restore the cursor
  * position.
  */
-    static void
+    स्थिर शून्य
 redraw_region(pixman_region32_t *region, bool now, bool restore)
 {
     pixman_box32_t  *rects;
-    int		    n_rects;
-    int		    cur_row = screen_cur_row;
-    int		    cur_col = screen_cur_col;
+    पूर्णाङ्क		    n_rects;
+    पूर्णाङ्क		    cur_row = screen_cur_row;
+    पूर्णाङ्क		    cur_col = screen_cur_col;
 
     rects = pixman_region32_rectangles(region, &n_rects);
-    if (rects == NULL)
-	return;
+    यदि (rects == रिक्त)
+	प्रत्यागम;
 
-    for (int i = 0; i < n_rects; i++)
+    प्रति (पूर्णाङ्क i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	if (now)
+	यदि (now)
 	{
 	    // The region may be from before a resize, when the screen was
 	    // bigger.
-	    int height = MIN(rect.y2, screen_Rows) - rect.y1;
-	    int width = MIN(rect.x2, screen_Columns) - rect.x1;
+	    पूर्णाङ्क height = MIN(rect.y2, screen_Rows) - rect.y1;
+	    पूर्णाङ्क width = MIN(rect.x2, screen_Columns) - rect.x1;
 
 	    // Tip: if you want to debug stale pixels appearing, set "inverse"
 	    // of screen_draw_rectangle() to TRUE.
-	    if (height > 0 && width > 0)
+	    यदि (height > 0 && width > 0)
 		screen_draw_rectangle(rect.y1, rect.x1, height, width,
 			FALSE, TRUE);
-	    continue;
+	    अनुवर्त;
 	}
 
-	for (int r = rect.y1; r < rect.y2; r++)
+	प्रति (पूर्णाङ्क r = rect.y1; r < rect.y2; r++)
 	{
-	    if (r >= screen_Rows)
-		break;
+	    यदि (r >= screen_Rows)
+		भङ्ग;
 
-	    for (int c = rect.x1; c < rect.x2; c++)
+	    प्रति (पूर्णाङ्क c = rect.x1; c < rect.x2; c++)
 	    {
-		if (c >= screen_Columns)
-		    break;
+		यदि (c >= screen_Columns)
+		    भङ्ग;
 
-		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
+		ScreenAttrs[ओळ_Offset[r] + c] = (sattr_T)-1;
 	    }
 	}
     }
 
-    if (restore)
+    यदि (restore)
 	windgoto(cur_row, cur_col);
 }
 
@@ -684,38 +684,38 @@ redraw_region(pixman_region32_t *region, bool now, bool restore)
  * Draw all image placements to the screen. This should be done after all text
  * have been drawn to the screen, and image placements positioned correctly.
  */
-    void
-draw_image_placements(void)
+    शून्य
+draw_image_placements(शून्य)
 {
     image_placement_T	*place;
     pixman_region32_t	subtract_region;    // In cells
     pixman_region32_t	dirty_region;	    // In cells
     image_placement_T	**pending_placements;
-    int			pending_len = -1;
+    पूर्णाङ्क			pending_len = -1;
     // Save current cursor position
-    int			cur_row = screen_cur_row;
-    int			cur_col = screen_cur_col;
+    पूर्णाङ्क			cur_row = screen_cur_row;
+    पूर्णाङ्क			cur_col = screen_cur_col;
 
     // Check if all placements have no backing image. If so, then do nothing
     FOR_ALL_PLACEMENTS(place)
-	if (place->img != NULL)
+	यदि (place->img != रिक्त)
 	{
 	    pending_len = 0;
-	    break;
+	    भङ्ग;
 	}
 
-    if (pending_len == -1)
-	return;
+    यदि (pending_len == -1)
+	प्रत्यागम;
 
-    if (!backend_available(false))
-	return;
+    यदि (!backend_available(false))
+	प्रत्यागम;
 
-    if (n_placements == 0)
-	return;
+    यदि (n_placements == 0)
+	प्रत्यागम;
 
     pending_placements = ALLOC_CLEAR_MULT(image_placement_T *, n_placements);
-    if (pending_placements == NULL)
-	return;
+    यदि (pending_placements == रिक्त)
+	प्रत्यागम;
 
     pixman_region32_init(&subtract_region);
     pixman_region32_init(&dirty_region);
@@ -739,31 +739,31 @@ draw_image_placements(void)
 	pixman_region32_t   image_region;
 	pixman_region32_t   visible_region;
 
-	int x, y;
+	पूर्णाङ्क x, y;
 
-	if (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
+	यदि (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
 	    // Don't need to clear image placement for non-blit backends,
 	    // because we call image_placement_clear() every time we don't want
 	    // to see the image. Not sure of the side effects if we also clear
 	    // it here...
-	    continue;
+	    अनुवर्त;
 
-	if (img != NULL)
+	यदि (img != रिक्त)
 	{
 	    pixman_region32_t	visible_abs;
-	    int			crop_w, crop_h;
+	    पूर्णाङ्क			crop_w, crop_h;
 	    bool		cs_changed;
 	    bool		need_redraw;
 
 	    // Processing changed image data failed, skip this image
-	    if (place->img->data == NULL)
+	    यदि (place->img->data == रिक्त)
 	    {
 		image_placement_clear(place);
-		continue;
+		अनुवर्त;
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
+	    यदि ((place->bounding_box.y1 >= shift_शीर्ष
 			&& place->bounding_box.y2 <= shift_bot)
 		    && place->row_off != shift)
 	    {
@@ -786,7 +786,7 @@ draw_image_placements(void)
 
 	    // Only use parts of the image region within the actual screen.
 	    // "row_off" may offset the image slightly/completely off screen.
-	    if (!pixman_region32_intersect_rect(&image_region, &image_region,
+	    यदि (!pixman_region32_intersect_rect(&image_region, &image_region,
 			0, 0, Columns, Rows)
 		    || !pixman_region32_subtract(&visible_region,
 			&image_region, &subtract_region)
@@ -794,7 +794,7 @@ draw_image_placements(void)
 	    {
 		pixman_region32_fini(&image_region);
 		pixman_region32_fini(&visible_region);
-		continue;
+		अनुवर्त;
 	    }
 
 	    pixman_region32_fini(&image_region);
@@ -809,7 +809,7 @@ draw_image_placements(void)
 	    // If cell size changed, then the visible regions are invalid pixel
 	    // wise. This prevents backends such as sixel from using cached
 	    // sequences.
-	    if (cs_changed)
+	    यदि (cs_changed)
 	    {
 		place->cell_width = cell_width;
 		place->cell_height = cell_height;
@@ -823,7 +823,7 @@ draw_image_placements(void)
 			&& !pixman_region32_equal(&visible_region,
 			    &place->visible));
 
-	    if (place->img_ver != img->ver)
+	    यदि (place->img_ver != img->ver)
 	    {
 		// Image data changed
 		need_redraw = true;
@@ -831,22 +831,22 @@ draw_image_placements(void)
 
 		image_placement_clear(place);
 		PLACEMENT_FUNC(image_backend, uninit)(place);
-		if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+		यदि (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 		{
 		    emsg(_(e_out_of_memory));
 		    image_unref(place->img);
-		    place->img = NULL;
-		    continue;
+		    place->img = रिक्त;
+		    अनुवर्त;
 		}
 	    }
 
-	    if (need_redraw)
+	    यदि (need_redraw)
 	    {
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		यदि (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible);
 		place->visible = visible_region;
 
-		if (PLACEMENT_FUNC(image_backend, blit))
+		यदि (PLACEMENT_FUNC(image_backend, blit))
 		{
 		    // Must redraw the stale regions that will not be composited
 		    // over (for this specific image).
@@ -854,16 +854,16 @@ draw_image_placements(void)
 
 		    pixman_region32_init(&stale_region);
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    यदि (place->flags & IMAGEPF_VISIBLE_INIT)
 		    {
-			(void)pixman_region32_subtract(&stale_region,
+			(शून्य)pixman_region32_subtract(&stale_region,
 				&place->visible_abs, &visible_abs);
 
 			// Since pixels may be translucent/transparent, we must
 			// redraw the cells behind the image every time, so that
 			// no stale pixels remain from the previous redraw.
-			if (img->fmt == IMAGE_FORMAT_RGBA)
-			    (void)pixman_region32_union(&stale_region,
+			यदि (img->fmt == IMAGE_FORMAT_RGBA)
+			    (शून्य)pixman_region32_union(&stale_region,
 				    &stale_region, &place->visible_abs);
 		    }
 
@@ -881,10 +881,10 @@ draw_image_placements(void)
 		    //
 		    // Not needed for RGBA images, because we redraw the visible
 		    // region every time anyways.
-		    if (img->fmt != IMAGE_FORMAT_RGBA)
+		    यदि (img->fmt != IMAGE_FORMAT_RGBA)
 		    {
-			int		    min_w, min_h;
-			int		    rect_w, rect_h;
+			पूर्णाङ्क		    min_w, min_h;
+			पूर्णाङ्क		    rect_w, rect_h;
 			pixman_region32_t   min_region;
 
 			image_get_cell_dimensions_min(img, &min_w, &min_h);
@@ -894,30 +894,30 @@ draw_image_placements(void)
 			rect_w = min_w - place->crop_box.x1;
 			rect_h = min_h - place->crop_box.y1;
 
-			if (rect_w > 0 && rect_h > 0)
+			यदि (rect_w > 0 && rect_h > 0)
 			    // pixman_region32_init_rect() expects a non zero
 			    // width and height (otherwise it outputs error
 			    // message).
 			    pixman_region32_init_rect(&min_region,
 				    x, y, rect_w, rect_h);
-			else
+			अन्यथा
 			    pixman_region32_init(&min_region);
 
-			(void)pixman_region32_subtract(&min_region,
+			(शून्य)pixman_region32_subtract(&min_region,
 				&visible_abs, &min_region);
-			(void)pixman_region32_union(&stale_region,
+			(शून्य)pixman_region32_union(&stale_region,
 				&stale_region, &min_region);
 			pixman_region32_fini(&min_region);
 		    }
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    यदि (place->flags & IMAGEPF_VISIBLE_INIT)
 			// Also subtract "subtract_region", so we don't
 			// redundantly redraw cells that will have images
 			// painted over them after. Make sure to do this before
 			// we check partially covered cells, since
 			// "subtract_region" may also have partially covered
 			// cells.
-			(void)pixman_region32_subtract(&stale_region,
+			(शून्य)pixman_region32_subtract(&stale_region,
 				&stale_region, &subtract_region);
 
 		    // Don't redraw now, defer it later
@@ -925,7 +925,7 @@ draw_image_placements(void)
 			    &dirty_region, &stale_region);
 		    pixman_region32_fini(&stale_region);
 		}
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		यदि (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible_abs);
 		place->visible_abs = visible_abs;
 
@@ -933,7 +933,7 @@ draw_image_placements(void)
 		place->flags |= IMAGEPF_VISIBLE_INIT;
 		place->flags &= ~IMAGEPF_DIRTY;
 	    }
-	    else
+	    अन्यथा
 	    {
 		pixman_region32_fini(&visible_region);
 		pixman_region32_fini(&visible_abs);
@@ -941,8 +941,8 @@ draw_image_placements(void)
 	}
 
 	// If this is last image, no need to union its bounds.
-	if (place->next == NULL)
-	    break;
+	यदि (place->next == रिक्त)
+	    भङ्ग;
 
 	pixman_region32_union_rect(&subtract_region, &subtract_region,
 		place->bounding_box.x1,
@@ -956,18 +956,18 @@ draw_image_placements(void)
     redraw_region(&dirty_region, true, false);
     freeze_mark_dirty--;
 
-    if (pending_len > 0)
+    यदि (pending_len > 0)
     {
 #ifdef FEAT_GUI
 	// Make sure to flush any output! We write directly to the draw
 	// area/whatever, meaning draw commands outputted before this (as escape
 	// sequences), will still draw over the image surface if we don't flush
 	// now.
-	if (gui.in_use)
+	यदि (gui.in_use)
 	    out_flush();
 #endif
 
-	for (int i = 0; i < pending_len; i++)
+	प्रति (पूर्णाङ्क i = 0; i < pending_len; i++)
 	{
 	    PLACEMENT_FUNC(image_backend, draw)(pending_placements[i]);
 	    pending_placements[i]->flags &= ~IMAGEPF_FORCE;
@@ -989,15 +989,15 @@ draw_image_placements(void)
  * Mark any images that touches the region dirty. Only used for backends that
  * blit pixels.
  */
-    void
-mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
+    शून्य
+mark_dirty_region_for_images(पूर्णाङ्क row, पूर्णाङ्क col, पूर्णाङ्क row_height, पूर्णाङ्क col_width)
 {
     image_placement_T	*place;
     pixman_box32_t	rect;
 
-    if (freeze_mark_dirty > 0 || !backend_available(false)
+    यदि (freeze_mark_dirty > 0 || !backend_available(false)
 	    || !PLACEMENT_FUNC(image_backend, blit) || n_placements == 0)
-	return;
+	प्रत्यागम;
 
     rect.x1 = col;
     rect.y1 = row;
@@ -1006,24 +1006,24 @@ mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->flags & IMAGEPF_HIDDEN)
-	    continue;
-	if (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
+	यदि (place->flags & IMAGEPF_HIDDEN)
+	    अनुवर्त;
+	यदि (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
 		== PIXMAN_REGION_OUT)
-	    continue;
+	    अनुवर्त;
 
 	place->flags |= IMAGEPF_DIRTY;
     }
 }
 
-    void
-clear_all_image_placements(void)
+    शून्य
+clear_all_image_placements(शून्य)
 {
     image_placement_T *place;
 
     FOR_ALL_PLACEMENTS(place)
 	image_placement_clear(place);
-    if (!updating_screen)
+    यदि (!updating_screen)
 	redraw_all_later(UPD_VALID);
 }
 
@@ -1031,10 +1031,10 @@ clear_all_image_placements(void)
  * Used for screen_ins_lines() and screen_del_lines(), because they directly
  * shift rows. Note that this does not queue a screen redraw.
  */
-    void
-shift_image_placements(int top, int bot, int amount)
+    शून्य
+shift_image_placements(पूर्णाङ्क शीर्ष, पूर्णाङ्क bot, पूर्णाङ्क amount)
 {
-    shift_top = top;
+    shift_शीर्ष = शीर्ष;
     shift_bot = bot;
     shift += amount;
 }
@@ -1043,21 +1043,21 @@ shift_image_placements(int top, int bot, int amount)
  * Called when screen is cleared, as update_screen() may go to clearing the
  * screen instead of inserting lines using screen_ins_lines().
  */
-    void
-shift_reset_image_placements(void)
+    शून्य
+shift_reset_image_placements(शून्य)
 {
     shift = 0;
 }
 
-    static image_T *
+    स्थिर image_T *
 find_image(int_u id)
 {
     image_T *img;
 
     FOR_ALL_IMAGES(img)
-	if (img->state == IMAGE_STATE_PUBLIC && img->id == id)
-	    return img;
-    return NULL;
+	यदि (img->state == IMAGE_STATE_PUBLIC && img->id == id)
+	    प्रत्यागम img;
+    प्रत्यागम रिक्त;
 }
 
 /*
@@ -1073,58 +1073,58 @@ add_image(dict_T *dict, image_T *existing, bool find)
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    यदि (find && dict_has_किल्ली(dict, "id"))
     {
-	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
+	image_T *img = find_image((int_u)dict_get_संख्या(dict, "id"));
 
-	if (img == NULL)
-	    return NULL;
-	return image_ref(img);
+	यदि (img == रिक्त)
+	    प्रत्यागम रिक्त;
+	प्रत्यागम image_ref(img);
     }
 
     di = dict_find(dict, (char_u *)"data", -1);
-    w = dict_get_number(dict, "width");
-    h = dict_get_number(dict, "height");
+    w = dict_get_संख्या(dict, "width");
+    h = dict_get_संख्या(dict, "height");
 
-    if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
+    यदि (di == रिक्त || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
 	emsg(_(e_invalid_argument));
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     // Check for overflow
     n_pixels = w * h;
-    if (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
+    यदि (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
     {
 	emsg(_(e_invalid_image_dimensions));
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     data = di->di_tv.vval.v_blob;
 
-    if (blob_len(data) == n_pixels * 3)
+    यदि (blob_len(data) == n_pixels * 3)
 	fmt = IMAGE_FORMAT_RGB;
-    else if (blob_len(data) == n_pixels * 4)
+    अन्यथा यदि (blob_len(data) == n_pixels * 4)
 	fmt = IMAGE_FORMAT_RGBA;
-    else
+    अन्यथा
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "data",
+	semsg(_(e_invalid_मूल्य_for_argument_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    if (existing != NULL)
+    यदि (existing != रिक्त)
     {
-	if (existing->width == w && existing->height == h
+	यदि (existing->width == w && existing->height == h
 		&& existing->fmt == fmt)
 	{
-	    if (image_update(existing, data->bv_ga.ga_data) == FAIL)
-		return NULL;
-	    return existing;
+	    यदि (image_update(existing, data->bv_ga.ga_data) == FAIL)
+		प्रत्यागम रिक्त;
+	    प्रत्यागम existing;
 	}
     }
 
-    return image_new(data->bv_ga.ga_data, w, h, fmt);
+    प्रत्यागम image_new(data->bv_ga.ga_data, w, h, fmt);
 }
 
 /*
@@ -1136,117 +1136,117 @@ get_image_info(image_T *img)
 {
     dict_T	*dict;
     blob_T	*blob;
-    int		w, h;
+    पूर्णाङ्क		w, h;
     dictitem_T	*di;
 
-    if (img->data == NULL)
-	return NULL;
+    यदि (img->data == रिक्त)
+	प्रत्यागम रिक्त;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    यदि (dict == रिक्त)
+	प्रत्यागम रिक्त;
 
     blob = blob_alloc();
-    if (blob == NULL)
+    यदि (blob == रिक्त)
     {
 	dict_unref(dict);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     image_get_dimensions(img, &w, &h);
-    (void)ga_concat_bytes(&blob->bv_ga, (char *)img->data,
+    (शून्य)ga_concat_bytes(&blob->bv_ga, (वर्ण *)img->data,
 	    (size_t)w * h * img->fmt);
 
     di = dictitem_alloc((char_u *)"data");
 
-    if (di != NULL)
+    यदि (di != रिक्त)
     {
 	di->di_tv.v_type = VAR_BLOB;
 	di->di_tv.vval.v_blob = blob;
     }
-    if (di == NULL || dict_add(dict, di) == FAIL)
+    यदि (di == रिक्त || dict_add(dict, di) == FAIL)
     {
-	if (di != NULL)
+	यदि (di != रिक्त)
 	    dictitem_free(di);
 	dict_unref(dict);
 	// No need to unref blob, dictitem_free() will do that.
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    if (img->state == IMAGE_STATE_PUBLIC)
-	dict_add_number(dict, "id", img->id);
-    dict_add_number(dict, "width", img->width);
-    dict_add_number(dict, "height", img->height);
-    dict_add_number(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
+    यदि (img->state == IMAGE_STATE_PUBLIC)
+	dict_add_संख्या(dict, "id", img->id);
+    dict_add_संख्या(dict, "width", img->width);
+    dict_add_संख्या(dict, "height", img->height);
+    dict_add_संख्या(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
     dict_add_string(dict, "format",
 	    (char_u *)(img->fmt == IMAGE_FORMAT_RGB ? "rgb" : "rgba"));
 
     blob->bv_refcount = 1;
 
-    return dict;
+    प्रत्यागम dict;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 match_imageprotocol(image_backend_T *backend)
 {
-    int		    len = (int)STRLEN(p_ipc) + 1;
+    पूर्णाङ्क		    len = (पूर्णाङ्क)STRLEN(p_ipc) + 1;
     char_u	    *buf = alloc(len);
     char_u	    *p = p_ipc;
-    int		    ret = FAIL;
+    पूर्णाङ्क		    ret = FAIL;
     image_backend_T res = IMAGE_BACKEND_NONE;
     bool	    got = false;
 
-    if (buf == NULL)
-	return FAIL;
+    यदि (buf == रिक्त)
+	प्रत्यागम FAIL;
 
-    while (*p != NUL)
+    यावत् (*p != NUL)
     {
 	char_u		*colon;
 	regmatch_T	regmatch;
 	image_backend_T prot = IMAGE_BACKEND_NONE;
 
 	// Isolate one comma separated item.
-	(void)copy_option_part(&p, buf, len, ",");
+	(शून्य)copy_option_part(&p, buf, len, ",");
 
 	colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
-	    goto exit;
+	यदि (colon == रिक्त || colon == buf || colon[1] == NUL)
+	    गच्छ exit;
 
 	*colon = NUL;
 
 	// Note: Keep this in sync with p_ipc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	यदि (STRCMP(colon + 1, "none") == 0)
 	    prot = IMAGE_BACKEND_NONE;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	अन्यथा यदि (STRCMP(colon + 1, "kitty") == 0)
 	{
 #ifdef FEAT_IMAGE_KITTY
 	    prot = IMAGE_BACKEND_KITTY;
 #endif
 	}
-	else if (STRCMP(colon + 1, "sixel") == 0)
+	अन्यथा यदि (STRCMP(colon + 1, "sixel") == 0)
 	{
 #ifdef FEAT_IMAGE_SIXEL
 	    prot = IMAGE_BACKEND_SIXEL;
 #endif
 	}
-	else
-	    goto exit;
+	अन्यथा
+	    गच्छ exit;
 
-	if (got)
-	    continue;
+	यदि (got)
+	    अनुवर्त;
 
 	CLEAR_FIELD(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
 
-	if (regmatch.regprog == NULL)
-	    goto exit;
+	यदि (regmatch.regprog == रिक्त)
+	    गच्छ exit;
 
-	bool match = T_NAME != NULL
+	bool match = T_NAME != रिक्त
 	    && vim_regexec(&regmatch, T_NAME, (colnr_T)0);
 
 	vim_regfree(regmatch.regprog);
-	if (match)
+	यदि (match)
 	{
 	    // Keep going to catch any errors
 	    res = prot;
@@ -1258,15 +1258,15 @@ match_imageprotocol(image_backend_T *backend)
     *backend = res;
 exit:
     vim_free(buf);
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * Update the current image backend to use depending on 'imageprotocol' and if
  * GUI is being used. Returns OK on success and FAIL on failure.
  */
-    int
-update_image_backend(void)
+    पूर्णाङ्क
+update_image_backend(शून्य)
 {
     image_backend_T new;
 
@@ -1274,43 +1274,43 @@ update_image_backend(void)
     image_placement_T	*place;
 
     // Always process 'imageprotocol' option to check for errors
-    if (match_imageprotocol(&new) == FAIL)
-	return FAIL;
+    यदि (match_imageprotocol(&new) == FAIL)
+	प्रत्यागम FAIL;
 
 #ifdef FEAT_IMAGE_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	new = IMAGE_BACKEND_GUI;
 #endif
 
-    if (image_backend == new)
-	return OK;
+    यदि (image_backend == new)
+	प्रत्यागम OK;
 
     // Must uninit the backends of every image/placement, then init the new
     // backend for each.
     FOR_ALL_IMAGES(img)
     {
-	if (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
-		&& img->backend_data != NULL)
+	यदि (image_backend != IMAGE_BACKEND_NONE && img->data != रिक्त
+		&& img->backend_data != रिक्त)
 	    IMAGE_FUNC(image_backend, uninit)(img);
-	img->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE)
+	img->backend_data = रिक्त;
+	यदि (new != IMAGE_BACKEND_NONE)
 	{
-	    if (IMAGE_FUNC(new, init)(img) == FAIL)
-		goto fail;
+	    यदि (IMAGE_FUNC(new, init)(img) == FAIL)
+		गच्छ fail;
 	    img->backend = new;
 	}
     }
     FOR_ALL_PLACEMENTS(place)
     {
 	image_placement_clear(place);
-	if (image_backend != IMAGE_BACKEND_NONE
-		&& place->img != NULL && place->backend_data != NULL)
+	यदि (image_backend != IMAGE_BACKEND_NONE
+		&& place->img != रिक्त && place->backend_data != रिक्त)
 	    PLACEMENT_FUNC(image_backend, uninit)(place);
-	place->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE && place->img != NULL)
+	place->backend_data = रिक्त;
+	यदि (new != IMAGE_BACKEND_NONE && place->img != रिक्त)
 	{
-	    if (PLACEMENT_FUNC(new, init)(place) == FAIL)
-		goto fail;
+	    यदि (PLACEMENT_FUNC(new, init)(place) == FAIL)
+		गच्छ fail;
 	    place->backend = new;
 	}
     }
@@ -1318,16 +1318,16 @@ update_image_backend(void)
     redraw_all_later(UPD_VALID);
     image_backend = new;
 
-    if (new == IMAGE_BACKEND_NONE)
+    यदि (new == IMAGE_BACKEND_NONE)
 	set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
-    else
+    अन्यथा
 	set_vim_var_string(VV_IMAGEBACKEND,
 		(char_u *)image_backends[image_backend].name, -1);
 
-    return OK;
+    प्रत्यागम OK;
 fail:
     FOR_ALL_IMAGES(img)
-	if (img->backend != IMAGE_BACKEND_NONE)
+	यदि (img->backend != IMAGE_BACKEND_NONE)
 	{
 	    IMAGE_FUNC(img->backend, uninit)(img);
 	    img->backend = IMAGE_BACKEND_NONE;
@@ -1335,7 +1335,7 @@ fail:
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
+	यदि (place->img != रिक्त && place->backend != IMAGE_BACKEND_NONE)
 	{
 	    image_placement_clear(place);
 	    PLACEMENT_FUNC(place->backend, uninit)(place);
@@ -1348,81 +1348,81 @@ fail:
     image_backend = IMAGE_BACKEND_NONE;
     set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
     emsg(_(e_changing_image_backend_failed));
-    return FAIL;
+    प्रत्यागम FAIL;
 }
 
-    void
+    शून्य
 f_image_add(typval_T *argvars, typval_T *rettv)
 {
     dict_T  *dict;
     image_T *img;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    यदि (check_for_dict_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
     dict = argvars[0].vval.v_dict;
 
-    img = add_image(dict, NULL, false);
-    if (img != NULL)
+    img = add_image(dict, रिक्त, false);
+    यदि (img != रिक्त)
 	img->state = IMAGE_STATE_PUBLIC;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = img == NULL ? (varnumber_T)-1 : img->id;
+    rettv->v_type = VAR_संख्या;
+    rettv->vval.v_संख्या = img == रिक्त ? (varnumber_T)-1 : img->id;
 }
 
-    void
+    शून्य
 f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    यदि (check_for_संख्या_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
-    img = find_image((int_u)argvars[0].vval.v_number);
+    img = find_image((int_u)argvars[0].vval.v_संख्या);
 
-    if (img != NULL)
+    यदि (img != रिक्त)
     {
 	img->state = IMAGE_STATE_PRIVATE;
 	image_unref(img);
     }
-    else
-	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+    अन्यथा
+	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_संख्या);
 }
 
-    void
+    शून्य
 f_image_info(typval_T *argvars, typval_T *rettv)
 {
     image_T *img;
     dict_T  *dict;
 
-    if (rettv_list_alloc(rettv) == FAIL
-	    || check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    यदि (rettv_list_alloc(rettv) == FAIL
+	    || check_for_opt_संख्या_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    यदि (argvars[0].v_type == VAR_संख्या)
     {
-	img = find_image((int_u)argvars[0].vval.v_number);
-	if (img == NULL)
+	img = find_image((int_u)argvars[0].vval.v_संख्या);
+	यदि (img == रिक्त)
 	{
-	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
-	    return;
+	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_संख्या);
+	    प्रत्यागम;
 	}
 	dict = get_image_info(img);
-	if (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	यदि (dict != रिक्त && list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	return;
+	प्रत्यागम;
     }
 
     FOR_ALL_IMAGES(img)
     {
-	if (img->state == IMAGE_STATE_PRIVATE)
-	    continue;
+	यदि (img->state == IMAGE_STATE_PRIVATE)
+	    अनुवर्त;
 	dict = get_image_info(img);
-	if (dict == NULL
+	यदि (dict == रिक्त
 		|| list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	{
 	    dict_unref(dict);	// NULL-safe
-	    return;
+	    प्रत्यागम;
 	}
     }
 }

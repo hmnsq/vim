@@ -1,83 +1,83 @@
-#include "vterm_internal.h"
+#अन्तर्भाव "vterm_internal.h"
 
-#include <stdio.h>
+#अन्तर्भाव <stdio.h>
 
-#include "utf8.h"
+#अन्तर्भाव "utf8.h"
 
 // VIM: added
-int vterm_is_modify_other_keys(VTerm *vt)
+पूर्णाङ्क vterm_is_modify_other_किल्ल्या(VTerm *vt)
 {
-  return vt->state->mode.modify_other_keys;
+  प्रत्यागम vt->state->mode.modify_other_किल्ल्या;
 }
 
 // VIM: added
-int vterm_is_kitty_keyboard(VTerm *vt)
+पूर्णाङ्क vterm_is_kitty_keyboard(VTerm *vt)
 {
-  return vt->state->mode.kitty_keyboard;
+  प्रत्यागम vt->state->mode.kitty_keyboard;
 }
 
 
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
+शून्य vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
 {
   // VIM: added modifyOtherKeys support
-  if (vterm_is_modify_other_keys(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
-    return;
+  यदि (vterm_is_modify_other_किल्ल्या(vt) && mod != 0) {
+    vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
+    प्रत्यागम;
   }
 
   // VIM: added kitty keyboard protocol support
-  if (vterm_is_kitty_keyboard(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  यदि (vterm_is_kitty_keyboard(vt) && mod != 0) {
+    vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    प्रत्यागम;
   }
 
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
-  if(c != ' ')
+  यदि(c != ' ')
     mod &= ~VTERM_MOD_SHIFT;
 
-  if(mod == 0) {
+  यदि(mod == 0) {
     // Normal text - ignore just shift
-    char str[6];
-    int seqlen = fill_utf8(c, str);
-    vterm_push_output_bytes(vt, str, seqlen);
-    return;
+    वर्ण str[6];
+    पूर्णाङ्क seqlen = fill_utf8(c, str);
+    vterm_ढकला_output_bytes(vt, str, seqlen);
+    प्रत्यागम;
   }
 
-  int needs_CSIu;
-  switch(c) {
+  पूर्णाङ्क needs_CSIu;
+  विकल्प(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
-    case 'i': case 'j': case 'm': case '[':
+    पक्ष 'i': पक्ष 'j': पक्ष 'm': पक्ष '[':
       needs_CSIu = 1;
-      break;
+      भङ्ग;
     /* Ctrl-\ ] ^ _ don't need CSUu */
-    case '\\': case ']': case '^': case '_':
+    पक्ष '\\': पक्ष ']': पक्ष '^': पक्ष '_':
       needs_CSIu = 0;
-      break;
+      भङ्ग;
     /* Shift-space needs CSIu */
-    case ' ':
+    पक्ष ' ':
       needs_CSIu = !!(mod & VTERM_MOD_SHIFT);
-      break;
+      भङ्ग;
     /* All other characters needs CSIu except for letters a-z */
-    default:
+    स्वभाव:
       needs_CSIu = (c < 'a' || c > 'z');
   }
 
   /* ALT we can just prefix with ESC; anything else requires CSI u */
-  if(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  यदि(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
+    vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    प्रत्यागम;
   }
 
-  if(mod & VTERM_MOD_CTRL)
+  यदि(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
-  vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
+  vterm_ढकला_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
 }
 
-typedef struct {
-  enum {
+प्रकारनिर्देश संरचना {
+  गणना {
     KEYCODE_NONE,
     KEYCODE_LITERAL,
     KEYCODE_TAB,
@@ -88,12 +88,12 @@ typedef struct {
     KEYCODE_CSINUM,
     KEYCODE_KEYPAD,
   } type;
-  char literal;
-  int csinum;
+  वर्ण literal;
+  पूर्णाङ्क csinum;
 } keycodes_s;
 
 // Order here must be exactly the same as VTermKey enum!
-static keycodes_s keycodes[] = {
+स्थिर keycodes_s keycodes[] = {
   { KEYCODE_NONE,       0, 0 }, // NONE
 
   { KEYCODE_ENTER,      '\r', 0 }, // ENTER
@@ -114,7 +114,7 @@ static keycodes_s keycodes[] = {
   { KEYCODE_CSINUM, '~', 6 },  // PAGEDOWN
 };
 
-static keycodes_s keycodes_fn[] = {
+स्थिर keycodes_s keycodes_fn[] = {
   { KEYCODE_NONE,       0, 0 },   // F0 - shouldn't happen
   { KEYCODE_SS3,	'P', 0 }, // F1
   { KEYCODE_SS3,	'Q', 0 }, // F2
@@ -130,7 +130,7 @@ static keycodes_s keycodes_fn[] = {
   { KEYCODE_CSINUM, '~', 24 }, // F12
 };
 
-static keycodes_s keycodes_kp[] = {
+स्थिर keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '0', 'p' }, // KP_0
   { KEYCODE_KEYPAD, '1', 'q' }, // KP_1
   { KEYCODE_KEYPAD, '2', 'r' }, // KP_2
@@ -151,109 +151,109 @@ static keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '=', 'X' }, // KP_EQUAL
 };
 
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
+शून्य vterm_keyboard_किल्ली(VTerm *vt, VTerm_किल्ली किल्ली, VTermModifier mod)
 {
-  if(key == VTERM_KEY_NONE)
-    return;
+  यदि(किल्ली == VTERM_किल्ली_NONE)
+    प्रत्यागम;
 
   keycodes_s k;
-  if(key < VTERM_KEY_FUNCTION_0) {
-    if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
-      return;
-    k = keycodes[key];
+  यदि(किल्ली < VTERM_किल्ली_FUNCTION_0) {
+    यदि(किल्ली >= परिमाण(keycodes)/परिमाण(keycodes[0]))
+      प्रत्यागम;
+    k = keycodes[किल्ली];
   }
-  else if(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
-    if((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
-      return;
-    k = keycodes_fn[key - VTERM_KEY_FUNCTION_0];
+  अन्यथा यदि(किल्ली >= VTERM_किल्ली_FUNCTION_0 && किल्ली <= VTERM_किल्ली_FUNCTION_MAX) {
+    यदि((किल्ली - VTERM_किल्ली_FUNCTION_0) >= परिमाण(keycodes_fn)/परिमाण(keycodes_fn[0]))
+      प्रत्यागम;
+    k = keycodes_fn[किल्ली - VTERM_किल्ली_FUNCTION_0];
   }
-  else if(key >= VTERM_KEY_KP_0) {
-    if((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
-      return;
-    k = keycodes_kp[key - VTERM_KEY_KP_0];
+  अन्यथा यदि(किल्ली >= VTERM_किल्ली_KP_0) {
+    यदि((किल्ली - VTERM_किल्ली_KP_0) >= परिमाण(keycodes_kp)/परिमाण(keycodes_kp[0]))
+      प्रत्यागम;
+    k = keycodes_kp[किल्ली - VTERM_किल्ली_KP_0];
   }
 
-  switch(k.type) {
-  case KEYCODE_NONE:
-    break;
+  विकल्प(k.type) {
+  पक्ष KEYCODE_NONE:
+    भङ्ग;
 
-  case KEYCODE_TAB:
-    if (vterm_is_kitty_keyboard(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
+  पक्ष KEYCODE_TAB:
+    यदि (vterm_is_kitty_keyboard(vt) && mod != 0)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
     /* Shift-Tab is CSI Z but plain Tab is 0x09 */
-    else if(mod == VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "Z");
-    else if(mod & VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
-    else
-      goto case_LITERAL;
-    break;
+    अन्यथा यदि(mod == VTERM_MOD_SHIFT)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "Z");
+    अन्यथा यदि(mod & VTERM_MOD_SHIFT)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
+    अन्यथा
+      गच्छ case_LITERAL;
+    भङ्ग;
 
-  case KEYCODE_ENTER:
+  पक्ष KEYCODE_ENTER:
     /* Enter is CRLF in newline mode, but just LF in linefeed */
-    if(vt->state->mode.newline)
-      vterm_push_output_sprintf(vt, "\r\n");
-    else
-      goto case_LITERAL;
-    break;
+    यदि(vt->state->mode.newline)
+      vterm_ढकला_output_sprintf(vt, "\r\n");
+    अन्यथा
+      गच्छ case_LITERAL;
+    भङ्ग;
 
-  case KEYCODE_LITERAL: case_LITERAL:
-    if (vterm_is_modify_other_keys(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
-    else if (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
-    else if ((vterm_is_kitty_keyboard(vt) && mod != 0)
+  पक्ष KEYCODE_LITERAL: case_LITERAL:
+    यदि (vterm_is_modify_other_किल्ल्या(vt) && mod != 0)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
+    अन्यथा यदि (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
+    अन्यथा यदि ((vterm_is_kitty_keyboard(vt) && mod != 0)
 	|| (mod & (VTERM_MOD_SHIFT|VTERM_MOD_CTRL)))
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
-    else
-      vterm_push_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
-    break;
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
+    अन्यथा
+      vterm_ढकला_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
+    भङ्ग;
 
-  case KEYCODE_SS3: case_SS3:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
-    else
-      goto case_CSI;
-    break;
+  पक्ष KEYCODE_SS3: case_SS3:
+    यदि(mod == 0)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
+    अन्यथा
+      गच्छ case_CSI;
+    भङ्ग;
 
-  case KEYCODE_CSI: case_CSI:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
-    break;
+  पक्ष KEYCODE_CSI: case_CSI:
+    यदि(mod == 0)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
+    अन्यथा
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
+    भङ्ग;
 
-  case KEYCODE_CSINUM:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
-    break;
+  पक्ष KEYCODE_CSINUM:
+    यदि(mod == 0)
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
+    अन्यथा
+      vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
+    भङ्ग;
 
-  case KEYCODE_CSI_CURSOR:
-    if(vt->state->mode.cursor)
-      goto case_SS3;
-    else
-      goto case_CSI;
+  पक्ष KEYCODE_CSI_CURSOR:
+    यदि(vt->state->mode.cursor)
+      गच्छ case_SS3;
+    अन्यथा
+      गच्छ case_CSI;
 
-  case KEYCODE_KEYPAD:
-    if(vt->state->mode.keypad) {
+  पक्ष KEYCODE_KEYPAD:
+    यदि(vt->state->mode.keypad) {
       k.literal = k.csinum;
-      goto case_SS3;
+      गच्छ case_SS3;
     }
-    else
-      goto case_LITERAL;
+    अन्यथा
+      गच्छ case_LITERAL;
   }
 }
 
-void vterm_keyboard_start_paste(VTerm *vt)
+शून्य vterm_keyboard_start_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "200~");
+  यदि(vt->state->mode.bracketpaste)
+    vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "200~");
 }
 
-void vterm_keyboard_end_paste(VTerm *vt)
+शून्य vterm_keyboard_end_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "201~");
+  यदि(vt->state->mode.bracketpaste)
+    vterm_ढकला_output_sprintf_ctrl(vt, C1_CSI, "201~");
 }

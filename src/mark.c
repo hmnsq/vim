@@ -11,7 +11,7 @@
  * mark.c: functions for setting marks and jumping to them
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 /*
  * This file contains routines to maintain and manipulate marks.
@@ -24,23 +24,23 @@
  * There are marks 'A - 'Z (set by user) and '0 to '9 (set when writing
  * viminfo).
  */
-static xfmark_T namedfm[NMARKS + EXTRA_MARKS];		// marks with file nr
+स्थिर xfmark_T namedfm[NMARKS + EXTRA_MARKS];		// marks with file nr
 
-static void fname2fnum(xfmark_T *fm);
-static void fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf);
-static char_u *mark_line(pos_T *mp, int lead_len);
-static void show_one_mark(int, char_u *, pos_T *, char_u *, int current);
-static void mark_adjust_internal(linenr_T line1, linenr_T line2, long amount,
-    long amount_after, int adjust_folds);
+स्थिर शून्य fname2fnum(xfmark_T *fm);
+स्थिर शून्य fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf);
+स्थिर char_u *mark_ओळ(pos_T *mp, पूर्णाङ्क lead_len);
+स्थिर शून्य show_one_mark(पूर्णाङ्क, char_u *, pos_T *, char_u *, पूर्णाङ्क current);
+स्थिर शून्य mark_adjust_internal(linenr_T line1, linenr_T line2, long amount,
+    long amount_after, पूर्णाङ्क adjust_folds);
 
 /*
  * Set named mark "c" at current cursor position.
  * Returns OK on success, FAIL if bad name given.
  */
-    int
-setmark(int c)
+    पूर्णाङ्क
+setmark(पूर्णाङ्क c)
 {
-    return setmark_pos(c, &curwin->w_cursor, curbuf->b_fnum);
+    प्रत्यागम setmark_pos(c, &curwin->w_cursor, curbuf->b_fnum);
 }
 
 /*
@@ -48,75 +48,75 @@ setmark(int c)
  * When "c" is upper case use file "fnum".
  * Returns OK on success, FAIL if bad name given.
  */
-    int
-setmark_pos(int c, pos_T *pos, int fnum)
+    पूर्णाङ्क
+setmark_pos(पूर्णाङ्क c, pos_T *pos, पूर्णाङ्क fnum)
 {
-    int		i;
+    पूर्णाङ्क		i;
     buf_T	*buf;
 
     // Check for a special key (may cause islower() to crash).
-    if (c < 0)
-	return FAIL;
+    यदि (c < 0)
+	प्रत्यागम FAIL;
 
-    if (c == '\'' || c == '`')
+    यदि (c == '\'' || c == '`')
     {
-	if (pos == &curwin->w_cursor)
+	यदि (pos == &curwin->w_cursor)
 	{
 	    setpcmark();
 	    // keep it even when the cursor doesn't move
 	    curwin->w_prev_pcmark = curwin->w_pcmark;
 	}
-	else
+	अन्यथा
 	    curwin->w_pcmark = *pos;
-	return OK;
+	प्रत्यागम OK;
     }
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return FAIL;
+    यदि (buf == रिक्त)
+	प्रत्यागम FAIL;
 
-    if (c == '"')
+    यदि (c == '"')
     {
 	buf->b_last_cursor = *pos;
-	return OK;
+	प्रत्यागम OK;
     }
 
     // Allow setting '[ and '] for an autocommand that simulates reading a
     // file.
-    if (c == '[')
+    यदि (c == '[')
     {
 	buf->b_op_start = *pos;
-	return OK;
+	प्रत्यागम OK;
     }
-    if (c == ']')
+    यदि (c == ']')
     {
 	buf->b_op_end = *pos;
-	return OK;
+	प्रत्यागम OK;
     }
 
-    if (c == '<' || c == '>')
+    यदि (c == '<' || c == '>')
     {
-	if (c == '<')
+	यदि (c == '<')
 	    buf->b_visual.vi_start = *pos;
-	else
+	अन्यथा
 	    buf->b_visual.vi_end = *pos;
-	if (buf->b_visual.vi_mode == NUL)
+	यदि (buf->b_visual.vi_mode == NUL)
 	    // Visual_mode has not yet been set, use a sane default.
 	    buf->b_visual.vi_mode = 'v';
-	return OK;
+	प्रत्यागम OK;
     }
 
-    if (ASCII_ISLOWER(c))
+    यदि (ASCII_ISLOWER(c))
     {
 	i = c - 'a';
 	buf->b_namedm[i] = *pos;
-	return OK;
+	प्रत्यागम OK;
     }
-    if (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))
+    यदि (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))
     {
-	if (VIM_ISDIGIT(c))
+	यदि (VIM_ISDIGIT(c))
 	    i = c - '0' + NMARKS;
-	else
+	अन्यथा
 	    i = c - 'A';
 	namedfm[i].fmark.mark = *pos;
 	namedfm[i].fmark.fnum = fnum;
@@ -124,40 +124,40 @@ setmark_pos(int c, pos_T *pos, int fnum)
 #ifdef FEAT_VIMINFO
 	namedfm[i].time_set = vim_time();
 #endif
-	return OK;
+	प्रत्यागम OK;
     }
-    return FAIL;
+    प्रत्यागम FAIL;
 }
 
 /*
  * Delete every entry referring to file 'fnum' from both the jumplist and the
  * tag stack.
  */
-    void
-mark_forget_file(win_T *wp, int fnum)
+    शून्य
+mark_forget_file(win_T *wp, पूर्णाङ्क fnum)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (i = wp->w_jumplistlen - 1; i >= 0; --i)
-	if (wp->w_jumplist[i].fmark.fnum == fnum)
+    प्रति (i = wp->w_jumplistlen - 1; i >= 0; --i)
+	यदि (wp->w_jumplist[i].fmark.fnum == fnum)
 	{
 	    vim_free(wp->w_jumplist[i].fname);
-	    if (wp->w_jumplistidx > i)
+	    यदि (wp->w_jumplistidx > i)
 		--wp->w_jumplistidx;
 	    --wp->w_jumplistlen;
 	    mch_memmove(&wp->w_jumplist[i], &wp->w_jumplist[i + 1],
-			(wp->w_jumplistlen - i) * sizeof(wp->w_jumplist[i]));
+			(wp->w_jumplistlen - i) * परिमाण(wp->w_jumplist[i]));
 	}
 
-    for (i = wp->w_tagstacklen - 1; i >= 0; --i)
-	if (wp->w_tagstack[i].fmark.fnum == fnum)
+    प्रति (i = wp->w_tagstacklen - 1; i >= 0; --i)
+	यदि (wp->w_tagstack[i].fmark.fnum == fnum)
 	{
 	    tagstack_clear_entry(&wp->w_tagstack[i]);
-	    if (wp->w_tagstackidx > i)
+	    यदि (wp->w_tagstackidx > i)
 		--wp->w_tagstackidx;
 	    --wp->w_tagstacklen;
 	    mch_memmove(&wp->w_tagstack[i], &wp->w_tagstack[i + 1],
-			(wp->w_tagstacklen - i) * sizeof(wp->w_tagstack[i]));
+			(wp->w_tagstacklen - i) * परिमाण(wp->w_tagstack[i]));
 	}
 }
 
@@ -165,35 +165,35 @@ mark_forget_file(win_T *wp, int fnum)
  * Set the previous context mark to the current position and add it to the
  * jump list.
  */
-    void
-setpcmark(void)
+    शून्य
+setpcmark(शून्य)
 {
-    int		i;
+    पूर्णाङ्क		i;
     xfmark_T	*fm;
 
     // for :global the mark is set only once
-    if (global_busy || listcmd_busy || (cmdmod.cmod_flags & CMOD_KEEPJUMPS))
-	return;
+    यदि (global_busy || listcmd_busy || (cmdmod.cmod_flags & CMOD_KEEPJUMPS))
+	प्रत्यागम;
 
     curwin->w_prev_pcmark = curwin->w_pcmark;
     curwin->w_pcmark = curwin->w_cursor;
 
-    if (jop_flags & JOP_STACK)
+    यदि (jop_flags & JOP_चळत)
     {
 	// jumpoptions=stack: if we're somewhere in the middle of the jumplist
 	// discard everything after the current index.
-	if (curwin->w_jumplistidx < curwin->w_jumplistlen - 1)
+	यदि (curwin->w_jumplistidx < curwin->w_jumplistlen - 1)
 	    // Discard the rest of the jumplist by cutting the length down to
 	    // contain nothing beyond the current index.
 	    curwin->w_jumplistlen = curwin->w_jumplistidx + 1;
     }
 
     // If jumplist is full: remove oldest entry
-    if (++curwin->w_jumplistlen > JUMPLISTSIZE)
+    यदि (++curwin->w_jumplistlen > JUMPLISTSIZE)
     {
 	curwin->w_jumplistlen = JUMPLISTSIZE;
 	vim_free(curwin->w_jumplist[0].fname);
-	for (i = 1; i < JUMPLISTSIZE; ++i)
+	प्रति (i = 1; i < JUMPLISTSIZE; ++i)
 	    curwin->w_jumplist[i - 1] = curwin->w_jumplist[i];
     }
     curwin->w_jumplistidx = curwin->w_jumplistlen;
@@ -201,7 +201,7 @@ setpcmark(void)
 
     fm->fmark.mark = curwin->w_pcmark;
     fm->fmark.fnum = curbuf->b_fnum;
-    fm->fname = NULL;
+    fm->fname = रिक्त;
 #ifdef FEAT_VIMINFO
     fm->time_set = vim_time();
 #endif
@@ -213,10 +213,10 @@ setpcmark(void)
  * context will only be changed if the cursor moved to a different line.
  * If pcmark was deleted (with "dG") the previous mark is restored.
  */
-    void
-checkpcmark(void)
+    शून्य
+checkpcmark(शून्य)
 {
-    if (curwin->w_prev_pcmark.lnum != 0
+    यदि (curwin->w_prev_pcmark.lnum != 0
 	    && (EQUAL_POS(curwin->w_pcmark, curwin->w_cursor)
 		|| curwin->w_pcmark.lnum == 0))
 	curwin->w_pcmark = curwin->w_prev_pcmark;
@@ -227,60 +227,60 @@ checkpcmark(void)
  * move "count" positions in the jump list (count may be negative)
  */
     pos_T *
-movemark(int count)
+movemark(पूर्णाङ्क मोजणी)
 {
     pos_T	*pos;
     xfmark_T	*jmp;
 
     cleanup_jumplist(curwin, TRUE);
 
-    if (curwin->w_jumplistlen == 0)	    // nothing to jump to
-	return (pos_T *)NULL;
+    यदि (curwin->w_jumplistlen == 0)	    // nothing to jump to
+	प्रत्यागम (pos_T *)रिक्त;
 
-    for (;;)
+    प्रति (;;)
     {
-	if (curwin->w_jumplistidx + count < 0
-		|| curwin->w_jumplistidx + count >= curwin->w_jumplistlen)
-	    return (pos_T *)NULL;
+	यदि (curwin->w_jumplistidx + मोजणी < 0
+		|| curwin->w_jumplistidx + मोजणी >= curwin->w_jumplistlen)
+	    प्रत्यागम (pos_T *)रिक्त;
 
 	/*
 	 * if first CTRL-O or CTRL-I command after a jump, add cursor position
 	 * to list.  Careful: If there are duplicates (CTRL-O immediately after
 	 * starting Vim on a file), another entry may have been removed.
 	 */
-	if (curwin->w_jumplistidx == curwin->w_jumplistlen)
+	यदि (curwin->w_jumplistidx == curwin->w_jumplistlen)
 	{
 	    setpcmark();
 	    --curwin->w_jumplistidx;	// skip the new entry
-	    if (curwin->w_jumplistidx + count < 0)
-		return (pos_T *)NULL;
+	    यदि (curwin->w_jumplistidx + मोजणी < 0)
+		प्रत्यागम (pos_T *)रिक्त;
 	}
 
-	curwin->w_jumplistidx += count;
+	curwin->w_jumplistidx += मोजणी;
 
 	jmp = curwin->w_jumplist + curwin->w_jumplistidx;
-	if (jmp->fmark.fnum == 0)
+	यदि (jmp->fmark.fnum == 0)
 	    fname2fnum(jmp);
-	if (jmp->fmark.fnum != curbuf->b_fnum)
+	यदि (jmp->fmark.fnum != curbuf->b_fnum)
 	{
 	    // Make a copy, an autocommand may make "jmp" invalid.
 	    fmark_T fmark = jmp->fmark;
 
 	    // jump to the file with the mark
-	    if (buflist_findnr(fmark.fnum) == NULL)
+	    यदि (buflist_findnr(fmark.fnum) == रिक्त)
 	    {					     // Skip this one ..
-		count += count < 0 ? -1 : 1;
-		continue;
+		मोजणी += मोजणी < 0 ? -1 : 1;
+		अनुवर्त;
 	    }
-	    if (buflist_getfile(fmark.fnum, fmark.mark.lnum, 0, FALSE) == FAIL)
-		return (pos_T *)NULL;
+	    यदि (buflist_getfile(fmark.fnum, fmark.mark.lnum, 0, FALSE) == FAIL)
+		प्रत्यागम (pos_T *)रिक्त;
 	    // Set lnum again, autocommands my have changed it
 	    curwin->w_cursor = fmark.mark;
 	    pos = (pos_T *)-1;
 	}
-	else
+	अन्यथा
 	    pos = &(jmp->fmark.mark);
-	return pos;
+	प्रत्यागम pos;
     }
 }
 
@@ -288,30 +288,30 @@ movemark(int count)
  * Move "count" positions in the changelist (count may be negative).
  */
     pos_T *
-movechangelist(int count)
+movechangelist(पूर्णाङ्क मोजणी)
 {
-    int		n;
+    पूर्णाङ्क		n;
 
-    if (curbuf->b_changelistlen == 0)	    // nothing to jump to
-	return (pos_T *)NULL;
+    यदि (curbuf->b_changelistlen == 0)	    // nothing to jump to
+	प्रत्यागम (pos_T *)रिक्त;
 
     n = curwin->w_changelistidx;
-    if (n + count < 0)
+    यदि (n + मोजणी < 0)
     {
-	if (n == 0)
-	    return (pos_T *)NULL;
+	यदि (n == 0)
+	    प्रत्यागम (pos_T *)रिक्त;
 	n = 0;
     }
-    else if (n + count >= curbuf->b_changelistlen)
+    अन्यथा यदि (n + मोजणी >= curbuf->b_changelistlen)
     {
-	if (n == curbuf->b_changelistlen - 1)
-	    return (pos_T *)NULL;
+	यदि (n == curbuf->b_changelistlen - 1)
+	    प्रत्यागम (pos_T *)रिक्त;
 	n = curbuf->b_changelistlen - 1;
     }
-    else
-	n += count;
+    अन्यथा
+	n += मोजणी;
     curwin->w_changelistidx = n;
-    return curbuf->b_changelist + n;
+    प्रत्यागम curbuf->b_changelist + n;
 }
 
 /*
@@ -326,60 +326,60 @@ movechangelist(int count)
  * - -1 if mark is in other file and jumped there (only if changefile is TRUE)
  */
     pos_T *
-getmark_buf(buf_T *buf, int c, int changefile)
+getmark_buf(buf_T *buf, पूर्णाङ्क c, पूर्णाङ्क changefile)
 {
-    return getmark_buf_fnum(buf, c, changefile, NULL);
+    प्रत्यागम getmark_buf_fnum(buf, c, changefile, रिक्त);
 }
 
     pos_T *
-getmark(int c, int changefile)
+getmark(पूर्णाङ्क c, पूर्णाङ्क changefile)
 {
-    return getmark_buf_fnum(curbuf, c, changefile, NULL);
+    प्रत्यागम getmark_buf_fnum(curbuf, c, changefile, रिक्त);
 }
 
     pos_T *
 getmark_buf_fnum(
     buf_T	*buf,
-    int		c,
-    int		changefile,
-    int		*fnum)
+    पूर्णाङ्क		c,
+    पूर्णाङ्क		changefile,
+    पूर्णाङ्क		*fnum)
 {
     pos_T		*posp;
     pos_T		*startp, *endp;
-    static pos_T	pos_copy;
+    स्थिर pos_T	pos_copy;
 
-    posp = NULL;
+    posp = रिक्त;
 
     // Check for special key, can't be a mark name and might cause islower()
     // to crash.
-    if (c < 0)
-	return posp;
-    if (c > '~')			// check for islower()/isupper()
+    यदि (c < 0)
+	प्रत्यागम posp;
+    यदि (c > '~')			// check for islower()/isupper()
 	;
-    else if (c == '\'' || c == '`')	// previous context mark
+    अन्यथा यदि (c == '\'' || c == '`')	// previous context mark
     {
 	pos_copy = curwin->w_pcmark;	// need to make a copy because
 	posp = &pos_copy;		//   w_pcmark may be changed soon
     }
-    else if (c == '"')			// to pos when leaving buffer
+    अन्यथा यदि (c == '"')			// to pos when leaving buffer
 	posp = &(buf->b_last_cursor);
-    else if (c == '^')			// to where Insert mode stopped
-	posp = &(buf->b_last_insert);
-    else if (c == '.')			// to where last change was made
+    अन्यथा यदि (c == '^')			// to where Insert mode stopped
+	posp = &(buf->b_last_घाला);
+    अन्यथा यदि (c == '.')			// to where last change was made
 	posp = &(buf->b_last_change);
-    else if (c == '[')			// to start of previous operator
+    अन्यथा यदि (c == '[')			// to start of previous operator
 	posp = &(buf->b_op_start);
-    else if (c == ']')			// to end of previous operator
+    अन्यथा यदि (c == ']')			// to end of previous operator
 	posp = &(buf->b_op_end);
-    else if (c == '{' || c == '}')	// to previous/next paragraph
+    अन्यथा यदि (c == '{' || c == '}')	// to previous/next paragraph
     {
 	pos_T	pos;
 	oparg_T	oa;
-	int	slcb = listcmd_busy;
+	पूर्णाङ्क	slcb = listcmd_busy;
 
 	pos = curwin->w_cursor;
 	listcmd_busy = TRUE;	    // avoid that '' is changed
-	if (findpar(&oa.inclusive,
+	यदि (findpar(&oa.inclusive,
 			       c == '}' ? FORWARD : BACKWARD, 1L, NUL, FALSE))
 	{
 	    pos_copy = curwin->w_cursor;
@@ -388,14 +388,14 @@ getmark_buf_fnum(
 	curwin->w_cursor = pos;
 	listcmd_busy = slcb;
     }
-    else if (c == '(' || c == ')')	// to previous/next sentence
+    अन्यथा यदि (c == '(' || c == ')')	// to previous/next sentence
     {
 	pos_T	pos;
-	int	slcb = listcmd_busy;
+	पूर्णाङ्क	slcb = listcmd_busy;
 
 	pos = curwin->w_cursor;
 	listcmd_busy = TRUE;	    // avoid that '' is changed
-	if (findsent(c == ')' ? FORWARD : BACKWARD, 1L))
+	यदि (findsent(c == ')' ? FORWARD : BACKWARD, 1L))
 	{
 	    pos_copy = curwin->w_cursor;
 	    posp = &pos_copy;
@@ -403,70 +403,70 @@ getmark_buf_fnum(
 	curwin->w_cursor = pos;
 	listcmd_busy = slcb;
     }
-    else if (c == '<' || c == '>')	// start/end of visual area
+    अन्यथा यदि (c == '<' || c == '>')	// start/end of visual area
     {
 	startp = &buf->b_visual.vi_start;
 	endp = &buf->b_visual.vi_end;
-	if (((c == '<') == LT_POS(*startp, *endp) || endp->lnum == 0)
+	यदि (((c == '<') == LT_POS(*startp, *endp) || endp->lnum == 0)
 							  && startp->lnum != 0)
 	    posp = startp;
-	else
+	अन्यथा
 	    posp = endp;
 	/*
 	 * For Visual line mode, set mark at begin or end of line
 	 */
-	if (buf->b_visual.vi_mode == 'V')
+	यदि (buf->b_visual.vi_mode == 'V')
 	{
 	    pos_copy = *posp;
 	    posp = &pos_copy;
-	    if (c == '<')
+	    यदि (c == '<')
 		pos_copy.col = 0;
-	    else
+	    अन्यथा
 		pos_copy.col = MAXCOL;
 	    pos_copy.coladd = 0;
 	}
     }
-    else if (ASCII_ISLOWER(c))		// normal named mark
+    अन्यथा यदि (ASCII_ISLOWER(c))		// normal named mark
     {
 	posp = &(buf->b_namedm[c - 'a']);
     }
-    else if (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))	// named file mark
+    अन्यथा यदि (ASCII_ISUPPER(c) || VIM_ISDIGIT(c))	// named file mark
     {
-	if (VIM_ISDIGIT(c))
+	यदि (VIM_ISDIGIT(c))
 	    c = c - '0' + NMARKS;
-	else
+	अन्यथा
 	    c -= 'A';
 	posp = &(namedfm[c].fmark.mark);
 
-	if (namedfm[c].fmark.fnum == 0)
+	यदि (namedfm[c].fmark.fnum == 0)
 	    fname2fnum(&namedfm[c]);
 
-	if (fnum != NULL)
+	यदि (fnum != रिक्त)
 	    *fnum = namedfm[c].fmark.fnum;
-	else if (namedfm[c].fmark.fnum != buf->b_fnum)
+	अन्यथा यदि (namedfm[c].fmark.fnum != buf->b_fnum)
 	{
 	    // mark is in another file
 	    posp = &pos_copy;
 
-	    if (namedfm[c].fmark.mark.lnum != 0
+	    यदि (namedfm[c].fmark.mark.lnum != 0
 				       && changefile && namedfm[c].fmark.fnum)
 	    {
-		if (buflist_getfile(namedfm[c].fmark.fnum,
+		यदि (buflist_getfile(namedfm[c].fmark.fnum,
 				      (linenr_T)1, GETF_SETMARK, FALSE) == OK)
 		{
 		    // Set the lnum now, autocommands could have changed it
 		    curwin->w_cursor = namedfm[c].fmark.mark;
-		    return (pos_T *)-1;
+		    प्रत्यागम (pos_T *)-1;
 		}
 		pos_copy.lnum = -1;	// can't get file
 	    }
-	    else
+	    अन्यथा
 		pos_copy.lnum = 0;	// mark exists, but is not valid in
 					// current buffer
 	}
     }
 
-    return posp;
+    प्रत्यागम posp;
 }
 
 /*
@@ -477,11 +477,11 @@ getmark_buf_fnum(
     pos_T *
 getnextmark(
     pos_T	*startpos,	// where to start
-    int		dir,	// direction for search
-    int		begin_line)
+    पूर्णाङ्क		dir,	// direction for search
+    पूर्णाङ्क		begin_ओळ)
 {
-    int		i;
-    pos_T	*result = NULL;
+    पूर्णाङ्क		i;
+    pos_T	*result = रिक्त;
     pos_T	pos;
 
     pos = *startpos;
@@ -490,31 +490,31 @@ getnextmark(
     // position must be in a previous line.
     // When searching forward and leaving the cursor on the first non-blank,
     // position must be in a next line.
-    if (dir == BACKWARD && begin_line)
+    यदि (dir == BACKWARD && begin_ओळ)
 	pos.col = 0;
-    else if (dir == FORWARD && begin_line)
+    अन्यथा यदि (dir == FORWARD && begin_ओळ)
 	pos.col = MAXCOL;
 
-    for (i = 0; i < NMARKS; i++)
+    प्रति (i = 0; i < NMARKS; i++)
     {
-	if (curbuf->b_namedm[i].lnum > 0)
+	यदि (curbuf->b_namedm[i].lnum > 0)
 	{
-	    if (dir == FORWARD)
+	    यदि (dir == FORWARD)
 	    {
-		if ((result == NULL || LT_POS(curbuf->b_namedm[i], *result))
+		यदि ((result == रिक्त || LT_POS(curbuf->b_namedm[i], *result))
 			&& LT_POS(pos, curbuf->b_namedm[i]))
 		    result = &curbuf->b_namedm[i];
 	    }
-	    else
+	    अन्यथा
 	    {
-		if ((result == NULL || LT_POS(*result, curbuf->b_namedm[i]))
+		यदि ((result == रिक्त || LT_POS(*result, curbuf->b_namedm[i]))
 			&& LT_POS(curbuf->b_namedm[i], pos))
 		    result = &curbuf->b_namedm[i];
 	    }
 	}
     }
 
-    return result;
+    प्रत्यागम result;
 }
 
 /*
@@ -522,19 +522,19 @@ getnextmark(
  * This is used for marks obtained from the .viminfo file.  It's postponed
  * until the mark is used to avoid a long startup delay.
  */
-    static void
+    स्थिर शून्य
 fname2fnum(xfmark_T *fm)
 {
     char_u	*p;
 
-    if (fm->fname == NULL)
-	return;
+    यदि (fm->fname == रिक्त)
+	प्रत्यागम;
 
     /*
      * First expand "~/" in the file name to the home directory.
      * Don't expand the whole name, it may contain other '~' chars.
      */
-    if (fm->fname[0] == '~' && (fm->fname[1] == '/'
+    यदि (fm->fname[0] == '~' && (fm->fname[1] == '/'
 #ifdef BACKSLASH_IN_FILENAME
 		|| fm->fname[1] == '\\'
 #endif
@@ -545,7 +545,7 @@ fname2fnum(xfmark_T *fm)
 	len = expand_env((char_u *)"~/", NameBuff, MAXPATHL);
 	vim_strncpy(NameBuff + len, fm->fname + 2, MAXPATHL - len - 1);
     }
-    else
+    अन्यथा
 	vim_strncpy(NameBuff, fm->fname, MAXPATHL - 1);
 
     // Try to shorten the file name.
@@ -553,7 +553,7 @@ fname2fnum(xfmark_T *fm)
     p = shorten_fname(NameBuff, IObuff);
 
     // buflist_new() will call fmarks_check_names()
-    (void)buflist_new(NameBuff, p, (linenr_T)1, 0);
+    (शून्य)buflist_new(NameBuff, p, (linenr_T)1, 0);
 }
 
 /*
@@ -561,37 +561,37 @@ fname2fnum(xfmark_T *fm)
  * May replace the name with an fnum.
  * Used for marks that come from the .viminfo file.
  */
-    void
+    शून्य
 fmarks_check_names(buf_T *buf)
 {
     char_u	*name;
-    int		i;
+    पूर्णाङ्क		i;
     win_T	*wp;
 
-    if (buf->b_ffname == NULL)
-	return;
+    यदि (buf->b_ffname == रिक्त)
+	प्रत्यागम;
 
     name = home_replace_save(buf, buf->b_ffname);
-    if (name == NULL)
-	return;
+    यदि (name == रिक्त)
+	प्रत्यागम;
 
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    प्रति (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
 	fmarks_check_one(&namedfm[i], name, buf);
 
     FOR_ALL_WINDOWS(wp)
     {
-	for (i = 0; i < wp->w_jumplistlen; ++i)
+	प्रति (i = 0; i < wp->w_jumplistlen; ++i)
 	    fmarks_check_one(&wp->w_jumplist[i], name, buf);
     }
 
     vim_free(name);
 }
 
-    static void
+    स्थिर शून्य
 fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf)
 {
-    if (fm->fmark.fnum == 0
-	    && fm->fname != NULL
+    यदि (fm->fmark.fnum == 0
+	    && fm->fname != रिक्त
 	    && fnamecmp(name, fm->fname) == 0)
     {
 	fm->fmark.fnum = buf->b_fnum;
@@ -603,28 +603,28 @@ fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf)
  * Check a if a position from a mark is valid.
  * Give and error message and return FAIL if not.
  */
-    int
+    पूर्णाङ्क
 check_mark(pos_T *pos)
 {
-    if (pos == NULL)
+    यदि (pos == रिक्त)
     {
 	emsg(_(e_unknown_mark));
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    if (pos->lnum <= 0)
+    यदि (pos->lnum <= 0)
     {
 	// lnum is negative if mark is in another file can can't get that
 	// file, error message already give then.
-	if (pos->lnum == 0)
+	यदि (pos->lnum == 0)
 	    emsg(_(e_mark_not_set));
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    if (pos->lnum > curbuf->b_ml.ml_line_count)
+    यदि (pos->lnum > curbuf->b_ml.ml_ओळ_मोजणी)
     {
-	emsg(_(e_mark_has_invalid_line_number));
-	return FAIL;
+	emsg(_(e_mark_has_invalid_ओळ_संख्या));
+	प्रत्यागम FAIL;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
@@ -632,29 +632,29 @@ check_mark(pos_T *pos)
  *
  * Used mainly when trashing the entire buffer during ":e" type commands
  */
-    void
+    शून्य
 clrallmarks(buf_T *buf)
 {
-    static int		i = -1;
+    स्थिर पूर्णाङ्क		i = -1;
 
-    if (i == -1)	// first call ever: initialize
-	for (i = 0; i < NMARKS + 1; i++)
+    यदि (i == -1)	// first call ever: initialize
+	प्रति (i = 0; i < NMARKS + 1; i++)
 	{
 	    namedfm[i].fmark.mark.lnum = 0;
-	    namedfm[i].fname = NULL;
+	    namedfm[i].fname = रिक्त;
 #ifdef FEAT_VIMINFO
 	    namedfm[i].time_set = 0;
 #endif
 	}
 
-    for (i = 0; i < NMARKS; i++)
+    प्रति (i = 0; i < NMARKS; i++)
 	buf->b_namedm[i].lnum = 0;
     buf->b_op_start.lnum = 0;		// start/end op mark cleared
     buf->b_op_end.lnum = 0;
     buf->b_last_cursor.lnum = 1;	// '" mark cleared
     buf->b_last_cursor.col = 0;
     buf->b_last_cursor.coladd = 0;
-    buf->b_last_insert.lnum = 0;	// '^ mark cleared
+    buf->b_last_घाला.lnum = 0;	// '^ mark cleared
     buf->b_last_change.lnum = 0;	// '. mark cleared
     buf->b_changelistlen = 0;
 }
@@ -665,152 +665,152 @@ clrallmarks(buf_T *buf)
  * Returns an allocated string.
  */
     char_u *
-fm_getname(fmark_T *fmark, int lead_len)
+fm_getname(fmark_T *fmark, पूर्णाङ्क lead_len)
 {
-    if (fmark->fnum == curbuf->b_fnum)		    // current buffer
-	return mark_line(&(fmark->mark), lead_len);
-    return buflist_nr2name(fmark->fnum, FALSE, TRUE);
+    यदि (fmark->fnum == curbuf->b_fnum)		    // current buffer
+	प्रत्यागम mark_ओळ(&(fmark->mark), lead_len);
+    प्रत्यागम buflist_nr2name(fmark->fnum, FALSE, TRUE);
 }
 
 /*
  * Return the line at mark "mp".  Truncate to fit in window.
  * The returned string has been allocated.
  */
-    static char_u *
-mark_line(pos_T *mp, int lead_len)
+    स्थिर char_u *
+mark_ओळ(pos_T *mp, पूर्णाङ्क lead_len)
 {
     char_u	*s, *p;
-    int		len;
+    पूर्णाङ्क		len;
 
-    if (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_line_count)
-	return vim_strsave((char_u *)"-invalid-");
+    यदि (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_ओळ_मोजणी)
+	प्रत्यागम vim_strsave((char_u *)"-invalid-");
     // Allow for up to 5 bytes per character.
     s = vim_strnsave(skipwhite(ml_get(mp->lnum)), Columns * 5);
-    if (s == NULL)
-	return NULL;
+    यदि (s == रिक्त)
+	प्रत्यागम रिक्त;
     // Truncate the line to fit it in the window.
     len = 0;
-    for (p = s; *p != NUL; MB_PTR_ADV(p))
+    प्रति (p = s; *p != NUL; MB_PTR_ADV(p))
     {
 	len += ptr2cells(p);
-	if (len >= Columns - lead_len)
-	    break;
+	यदि (len >= Columns - lead_len)
+	    भङ्ग;
     }
     *p = NUL;
-    return s;
+    प्रत्यागम s;
 }
 
 /*
  * print the marks
  */
-    void
+    शून्य
 ex_marks(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*name;
     pos_T	*posp, *startp, *endp;
 
-    if (arg != NULL && *arg == NUL)
-	arg = NULL;
+    यदि (arg != रिक्त && *arg == NUL)
+	arg = रिक्त;
 
-    show_one_mark('\'', arg, &curwin->w_pcmark, NULL, TRUE);
-    for (i = 0; i < NMARKS; ++i)
-	show_one_mark(i + 'a', arg, &curbuf->b_namedm[i], NULL, TRUE);
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    show_one_mark('\'', arg, &curwin->w_pcmark, रिक्त, TRUE);
+    प्रति (i = 0; i < NMARKS; ++i)
+	show_one_mark(i + 'a', arg, &curbuf->b_namedm[i], रिक्त, TRUE);
+    प्रति (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
     {
-	if (namedfm[i].fmark.fnum != 0)
+	यदि (namedfm[i].fmark.fnum != 0)
 	    name = fm_getname(&namedfm[i].fmark, 15);
-	else
+	अन्यथा
 	    name = namedfm[i].fname;
-	if (name != NULL)
+	यदि (name != रिक्त)
 	{
 	    show_one_mark(i >= NMARKS ? i - NMARKS + '0' : i + 'A',
 		    arg, &namedfm[i].fmark.mark, name,
 		    namedfm[i].fmark.fnum == curbuf->b_fnum);
-	    if (namedfm[i].fmark.fnum != 0)
+	    यदि (namedfm[i].fmark.fnum != 0)
 		vim_free(name);
 	}
     }
-    show_one_mark('"', arg, &curbuf->b_last_cursor, NULL, TRUE);
-    show_one_mark('[', arg, &curbuf->b_op_start, NULL, TRUE);
-    show_one_mark(']', arg, &curbuf->b_op_end, NULL, TRUE);
-    show_one_mark('^', arg, &curbuf->b_last_insert, NULL, TRUE);
-    show_one_mark('.', arg, &curbuf->b_last_change, NULL, TRUE);
+    show_one_mark('"', arg, &curbuf->b_last_cursor, रिक्त, TRUE);
+    show_one_mark('[', arg, &curbuf->b_op_start, रिक्त, TRUE);
+    show_one_mark(']', arg, &curbuf->b_op_end, रिक्त, TRUE);
+    show_one_mark('^', arg, &curbuf->b_last_घाला, रिक्त, TRUE);
+    show_one_mark('.', arg, &curbuf->b_last_change, रिक्त, TRUE);
 
     // Show the marks as where they will jump to.
     startp = &curbuf->b_visual.vi_start;
     endp = &curbuf->b_visual.vi_end;
-    if ((LT_POS(*startp, *endp) || endp->lnum == 0) && startp->lnum != 0)
+    यदि ((LT_POS(*startp, *endp) || endp->lnum == 0) && startp->lnum != 0)
 	posp = startp;
-    else
+    अन्यथा
 	posp = endp;
-    show_one_mark('<', arg, posp, NULL, TRUE);
-    show_one_mark('>', arg, posp == startp ? endp : startp, NULL, TRUE);
+    show_one_mark('<', arg, posp, रिक्त, TRUE);
+    show_one_mark('>', arg, posp == startp ? endp : startp, रिक्त, TRUE);
 
-    show_one_mark(-1, arg, NULL, NULL, FALSE);
+    show_one_mark(-1, arg, रिक्त, रिक्त, FALSE);
 }
 
-    static void
+    स्थिर शून्य
 show_one_mark(
-    int		c,
+    पूर्णाङ्क		c,
     char_u	*arg,
     pos_T	*p,
     char_u	*name_arg,
-    int		current)	// in current file
+    पूर्णाङ्क		current)	// in current file
 {
-    static int	did_title = FALSE;
-    int		mustfree = FALSE;
+    स्थिर पूर्णाङ्क	did_title = FALSE;
+    पूर्णाङ्क		mustfree = FALSE;
     char_u	*name = name_arg;
 
-    if (c == -1)			    // finish up
+    यदि (c == -1)			    // finish up
     {
-	if (did_title)
+	यदि (did_title)
 	    did_title = FALSE;
-	else
+	अन्यथा
 	{
-	    if (arg == NULL)
-		msg(_("No marks set"));
-	    else
+	    यदि (arg == रिक्त)
+		संदेश(_("No marks set"));
+	    अन्यथा
 		semsg(_(e_no_marks_matching_str), arg);
 	}
     }
     // don't output anything if 'q' typed at --more-- prompt
-    else if (!got_int
-	    && (arg == NULL || vim_strchr(arg, c) != NULL)
+    अन्यथा यदि (!got_int
+	    && (arg == रिक्त || vim_strchr(arg, c) != रिक्त)
 	    && p->lnum != 0)
     {
-	if (name == NULL && current)
+	यदि (name == रिक्त && current)
 	{
-	    name = mark_line(p, 15);
-	    if (name == NULL)
+	    name = mark_ओळ(p, 15);
+	    यदि (name == रिक्त)
 	    {
 		emsg(_(e_out_of_memory));
-		return;
+		प्रत्यागम;
 	    }
 	    mustfree = TRUE;
 	}
-	if (!message_filtered(name))
+	यदि (!message_filtered(name))
 	{
-	    if (!did_title)
+	    यदि (!did_title)
 	    {
 		// Highlight title
-		msg_puts_title(_("\nmark line  col file/text"));
+		संदेश_puts_title(_("\nmark line  col file/text"));
 		did_title = TRUE;
 	    }
-	    msg_putchar('\n');
-	    if (!got_int)
+	    संदेश_putchar('\n');
+	    यदि (!got_int)
 	    {
-		sprintf((char *)IObuff, " %c %6ld %4d ", c, p->lnum, p->col);
-		msg_outtrans(IObuff);
-		if (name != NULL)
+		sprintf((वर्ण *)IObuff, " %c %6ld %4d ", c, p->lnum, p->col);
+		संदेश_outtrans(IObuff);
+		यदि (name != रिक्त)
 		{
-		    msg_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
+		    संदेश_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
 		}
 	    }
 	    out_flush();		    // show one line at a time
 	}
-	if (mustfree)
+	यदि (mustfree)
 	    vim_free(name);
     }
 }
@@ -818,60 +818,60 @@ show_one_mark(
 /*
  * ":delmarks[!] [marks]"
  */
-    void
+    शून्य
 ex_delmarks(exarg_T *eap)
 {
     char_u	*p;
-    int		from, to;
-    int		i;
-    int		lower;
-    int		digit;
-    int		n;
+    पूर्णाङ्क		from, to;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		lower;
+    पूर्णाङ्क		digit;
+    पूर्णाङ्क		n;
 
-    if (*eap->arg == NUL && eap->forceit)
+    यदि (*eap->arg == NUL && eap->forceit)
 	// clear all marks
 	clrallmarks(curbuf);
-    else if (eap->forceit)
+    अन्यथा यदि (eap->forceit)
 	emsg(_(e_invalid_argument));
-    else if (*eap->arg == NUL)
+    अन्यथा यदि (*eap->arg == NUL)
 	emsg(_(e_argument_required));
-    else
+    अन्यथा
     {
 	// clear specified marks only
-	for (p = eap->arg; *p != NUL; ++p)
+	प्रति (p = eap->arg; *p != NUL; ++p)
 	{
 	    lower = ASCII_ISLOWER(*p);
 	    digit = VIM_ISDIGIT(*p);
-	    if (lower || digit || ASCII_ISUPPER(*p))
+	    यदि (lower || digit || ASCII_ISUPPER(*p))
 	    {
-		if (p[1] == '-')
+		यदि (p[1] == '-')
 		{
 		    // clear range of marks
 		    from = *p;
 		    to = p[2];
-		    if (!(lower ? ASCII_ISLOWER(p[2])
+		    यदि (!(lower ? ASCII_ISLOWER(p[2])
 				: (digit ? VIM_ISDIGIT(p[2])
 				    : ASCII_ISUPPER(p[2])))
 			    || to < from)
 		    {
 			semsg(_(e_invalid_argument_str), p);
-			return;
+			प्रत्यागम;
 		    }
 		    p += 2;
 		}
-		else
+		अन्यथा
 		    // clear one lower case mark
 		    from = to = *p;
 
-		for (i = from; i <= to; ++i)
+		प्रति (i = from; i <= to; ++i)
 		{
-		    if (lower)
+		    यदि (lower)
 			curbuf->b_namedm[i - 'a'].lnum = 0;
-		    else
+		    अन्यथा
 		    {
-			if (digit)
+			यदि (digit)
 			    n = i - '0' + NMARKS;
-			else
+			अन्यथा
 			    n = i - 'A';
 			namedfm[n].fmark.mark.lnum = 0;
 			namedfm[n].fmark.fnum = 0;
@@ -882,19 +882,19 @@ ex_delmarks(exarg_T *eap)
 		    }
 		}
 	    }
-	    else
-		switch (*p)
+	    अन्यथा
+		विकल्प (*p)
 		{
-		    case '"': curbuf->b_last_cursor.lnum = 0; break;
-		    case '^': curbuf->b_last_insert.lnum = 0; break;
-		    case '.': curbuf->b_last_change.lnum = 0; break;
-		    case '[': curbuf->b_op_start.lnum    = 0; break;
-		    case ']': curbuf->b_op_end.lnum      = 0; break;
-		    case '<': curbuf->b_visual.vi_start.lnum = 0; break;
-		    case '>': curbuf->b_visual.vi_end.lnum   = 0; break;
-		    case ' ': break;
-		    default:  semsg(_(e_invalid_argument_str), p);
-			      return;
+		    पक्ष '"': curbuf->b_last_cursor.lnum = 0; भङ्ग;
+		    पक्ष '^': curbuf->b_last_घाला.lnum = 0; भङ्ग;
+		    पक्ष '.': curbuf->b_last_change.lnum = 0; भङ्ग;
+		    पक्ष '[': curbuf->b_op_start.lnum    = 0; भङ्ग;
+		    पक्ष ']': curbuf->b_op_end.lnum      = 0; भङ्ग;
+		    पक्ष '<': curbuf->b_visual.vi_start.lnum = 0; भङ्ग;
+		    पक्ष '>': curbuf->b_visual.vi_end.lnum   = 0; भङ्ग;
+		    पक्ष ' ': भङ्ग;
+		    स्वभाव:  semsg(_(e_invalid_argument_str), p);
+			      प्रत्यागम;
 		}
 	}
     }
@@ -903,47 +903,47 @@ ex_delmarks(exarg_T *eap)
 /*
  * print the jumplist
  */
-    void
+    शून्य
 ex_jumps(exarg_T *eap UNUSED)
 {
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*name;
 
     cleanup_jumplist(curwin, TRUE);
 
     // Highlight title
-    msg_puts_title(_("\n jump line  col file/text"));
-    for (i = 0; i < curwin->w_jumplistlen && !got_int; ++i)
+    संदेश_puts_title(_("\n jump line  col file/text"));
+    प्रति (i = 0; i < curwin->w_jumplistlen && !got_int; ++i)
     {
-	if (curwin->w_jumplist[i].fmark.mark.lnum != 0)
+	यदि (curwin->w_jumplist[i].fmark.mark.lnum != 0)
 	{
 	    name = fm_getname(&curwin->w_jumplist[i].fmark, 16);
 
 	    // Make sure to output the current indicator, even when on an wiped
 	    // out buffer.  ":filter" may still skip it.
-	    if (name == NULL && i == curwin->w_jumplistidx)
+	    यदि (name == रिक्त && i == curwin->w_jumplistidx)
 		name = vim_strsave((char_u *)"-invalid-");
 	    // apply :filter /pat/ or file name not available
-	    if (name == NULL || message_filtered(name))
+	    यदि (name == रिक्त || message_filtered(name))
 	    {
 		vim_free(name);
-		continue;
+		अनुवर्त;
 	    }
 
-	    msg_putchar('\n');
-	    if (got_int)
+	    संदेश_putchar('\n');
+	    यदि (got_int)
 	    {
 		vim_free(name);
-		break;
+		भङ्ग;
 	    }
-	    sprintf((char *)IObuff, "%c %2d %5ld %4d ",
+	    sprintf((वर्ण *)IObuff, "%c %2d %5ld %4d ",
 		i == curwin->w_jumplistidx ? '>' : ' ',
 		i > curwin->w_jumplistidx ? i - curwin->w_jumplistidx
 					  : curwin->w_jumplistidx - i,
 		curwin->w_jumplist[i].fmark.mark.lnum,
 		curwin->w_jumplist[i].fmark.mark.col);
-	    msg_outtrans(IObuff);
-	    msg_outtrans_attr(name,
+	    संदेश_outtrans(IObuff);
+	    संदेश_outtrans_attr(name,
 			    curwin->w_jumplist[i].fmark.fnum == curbuf->b_fnum
 							? HL_ATTR(HLF_D) : 0);
 	    vim_free(name);
@@ -951,11 +951,11 @@ ex_jumps(exarg_T *eap UNUSED)
 	}
 	out_flush();
     }
-    if (curwin->w_jumplistidx == curwin->w_jumplistlen)
-	msg_puts("\n>");
+    यदि (curwin->w_jumplistidx == curwin->w_jumplistlen)
+	संदेश_puts("\n>");
 }
 
-    void
+    शून्य
 ex_clearjumps(exarg_T *eap UNUSED)
 {
     free_jumplist(curwin);
@@ -966,53 +966,53 @@ ex_clearjumps(exarg_T *eap UNUSED)
 /*
  * print the changelist
  */
-    void
+    शून्य
 ex_changes(exarg_T *eap UNUSED)
 {
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*name;
 
     // Highlight title
-    msg_puts_title(_("\nchange line  col text"));
+    संदेश_puts_title(_("\nchange line  col text"));
 
-    for (i = 0; i < curbuf->b_changelistlen && !got_int; ++i)
+    प्रति (i = 0; i < curbuf->b_changelistlen && !got_int; ++i)
     {
-	if (curbuf->b_changelist[i].lnum != 0)
+	यदि (curbuf->b_changelist[i].lnum != 0)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
-	    sprintf((char *)IObuff, "%c %3d %5ld %4d ",
+	    संदेश_putchar('\n');
+	    यदि (got_int)
+		भङ्ग;
+	    sprintf((वर्ण *)IObuff, "%c %3d %5ld %4d ",
 		    i == curwin->w_changelistidx ? '>' : ' ',
 		    i > curwin->w_changelistidx ? i - curwin->w_changelistidx
 						: curwin->w_changelistidx - i,
 		    (long)curbuf->b_changelist[i].lnum,
 		    curbuf->b_changelist[i].col);
-	    msg_outtrans(IObuff);
-	    name = mark_line(&curbuf->b_changelist[i], 17);
-	    if (name == NULL)
-		break;
-	    msg_outtrans_attr(name, HL_ATTR(HLF_D));
+	    संदेश_outtrans(IObuff);
+	    name = mark_ओळ(&curbuf->b_changelist[i], 17);
+	    यदि (name == रिक्त)
+		भङ्ग;
+	    संदेश_outtrans_attr(name, HL_ATTR(HLF_D));
 	    vim_free(name);
 	    ui_breakcheck();
 	}
 	out_flush();
     }
-    if (curwin->w_changelistidx == curbuf->b_changelistlen)
-	msg_puts("\n>");
+    यदि (curwin->w_changelistidx == curbuf->b_changelistlen)
+	संदेश_puts("\n>");
 }
 
 #define one_adjust(add) \
     { \
 	lp = add; \
-	if (*lp >= line1 && *lp <= line2) \
+	यदि (*lp >= line1 && *lp <= line2) \
 	{ \
-	    if (amount == MAXLNUM) \
+	    यदि (amount == MAXLNUM) \
 		*lp = 0; \
-	    else \
+	    अन्यथा \
 		*lp += amount; \
 	} \
-	else if (amount_after && *lp > line2) \
+	अन्यथा यदि (amount_after && *lp > line2) \
 	    *lp += amount_after; \
     }
 
@@ -1020,14 +1020,14 @@ ex_changes(exarg_T *eap UNUSED)
 #define one_adjust_nodel(add) \
     { \
 	lp = add; \
-	if (*lp >= line1 && *lp <= line2) \
+	यदि (*lp >= line1 && *lp <= line2) \
 	{ \
-	    if (amount == MAXLNUM) \
+	    यदि (amount == MAXLNUM) \
 		*lp = line1; \
-	    else \
+	    अन्यथा \
 		*lp += amount; \
 	} \
-	else if (amount_after && *lp > line2) \
+	अन्यथा यदि (amount_after && *lp > line2) \
 	    *lp += amount_after; \
     }
 
@@ -1036,17 +1036,17 @@ ex_changes(exarg_T *eap UNUSED)
 #define one_adjust_cursor(pp) \
     { \
 	pos_T *posp = pp; \
-	if (posp->lnum >= line1 && posp->lnum <= line2) \
+	यदि (posp->lnum >= line1 && posp->lnum <= line2) \
 	{ \
-	    if (amount == MAXLNUM) /* line with cursor is deleted */ \
+	    यदि (amount == MAXLNUM) /* line with cursor is deleted */ \
 	    { \
 		posp->lnum = MAX(line1 - 1, 1); \
 		posp->col = 0; \
 	    } \
-	    else /* keep cursor on the same line */ \
+	    अन्यथा /* keep cursor on the same line */ \
 		posp->lnum += amount; \
 	} \
-	else if (amount_after && posp->lnum > line2) \
+	अन्यथा यदि (amount_after && posp->lnum > line2) \
 	    posp->lnum += amount_after; \
     }
 
@@ -1061,7 +1061,7 @@ ex_changes(exarg_T *eap UNUSED)
  * Example: Insert two lines below 55: mark_adjust(56, MAXLNUM, 2, 0);
  *				   or: mark_adjust(56, 55, MAXLNUM, 2);
  */
-    void
+    शून्य
 mark_adjust(
     linenr_T	line1,
     linenr_T	line2,
@@ -1071,7 +1071,7 @@ mark_adjust(
     mark_adjust_internal(line1, line2, amount, amount_after, TRUE);
 }
 
-    void
+    शून्य
 mark_adjust_nofold(
     linenr_T	line1,
     linenr_T	line2,
@@ -1081,53 +1081,53 @@ mark_adjust_nofold(
     mark_adjust_internal(line1, line2, amount, amount_after, FALSE);
 }
 
-    static void
+    स्थिर शून्य
 mark_adjust_internal(
     linenr_T	line1,
     linenr_T	line2,
     long	amount,
     long	amount_after,
-    int		adjust_folds UNUSED)
+    पूर्णाङ्क		adjust_folds UNUSED)
 {
-    int		i;
-    int		fnum = curbuf->b_fnum;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		fnum = curbuf->b_fnum;
     linenr_T	*lp;
     win_T	*win;
     tabpage_T	*tab;
     wininfo_T	*wip;
-    static pos_T initpos = {1, 0, 0};
+    स्थिर pos_T initpos = {1, 0, 0};
 
-    if (line2 < line1 && amount_after == 0L)	    // nothing to do
-	return;
+    यदि (line2 < line1 && amount_after == 0L)	    // nothing to do
+	प्रत्यागम;
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    यदि ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// named marks, lower case and upper case
-	for (i = 0; i < NMARKS; i++)
+	प्रति (i = 0; i < NMARKS; i++)
 	{
 	    one_adjust(&(curbuf->b_namedm[i].lnum));
-	    if (namedfm[i].fmark.fnum == fnum)
+	    यदि (namedfm[i].fmark.fnum == fnum)
 		one_adjust_nodel(&(namedfm[i].fmark.mark.lnum));
 	}
-	for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+	प्रति (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
 	{
-	    if (namedfm[i].fmark.fnum == fnum)
+	    यदि (namedfm[i].fmark.fnum == fnum)
 		one_adjust_nodel(&(namedfm[i].fmark.mark.lnum));
 	}
 
 	// last Insert position
-	one_adjust(&(curbuf->b_last_insert.lnum));
+	one_adjust(&(curbuf->b_last_घाला.lnum));
 
 	// last change position
 	one_adjust(&(curbuf->b_last_change.lnum));
 
 	// last cursor position, if it was set
-	if (!EQUAL_POS(curbuf->b_last_cursor, initpos))
+	यदि (!EQUAL_POS(curbuf->b_last_cursor, initpos))
 	    one_adjust(&(curbuf->b_last_cursor.lnum));
 
 
 	// list of change positions
-	for (i = 0; i < curbuf->b_changelistlen; ++i)
+	प्रति (i = 0; i < curbuf->b_changelistlen; ++i)
 	    one_adjust_nodel(&(curbuf->b_changelist[i].lnum));
 
 	// Visual area
@@ -1136,7 +1136,7 @@ mark_adjust_internal(
 
 #ifdef FEAT_QUICKFIX
 	// quickfix marks
-	qf_mark_adjust(NULL, line1, line2, amount, amount_after);
+	qf_mark_adjust(रिक्त, line1, line2, amount, amount_after);
 	// location lists
 	FOR_ALL_TAB_WINDOWS(tab, win)
 	    qf_mark_adjust(win, line1, line2, amount, amount_after);
@@ -1154,7 +1154,7 @@ mark_adjust_internal(
     one_adjust(&(curwin->w_prev_pcmark.lnum));
 
     // saved cursor for formatting
-    if (saved_cursor.lnum != 0)
+    यदि (saved_cursor.lnum != 0)
 	one_adjust_nodel(&(saved_cursor.lnum));
 
     /*
@@ -1162,23 +1162,23 @@ mark_adjust_internal(
      */
     FOR_ALL_TAB_WINDOWS(tab, win)
     {
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	यदि ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	    // Marks in the jumplist.  When deleting lines, this may create
 	    // duplicate marks in the jumplist, they will be removed later.
-	    for (i = 0; i < win->w_jumplistlen; ++i)
-		if (win->w_jumplist[i].fmark.fnum == fnum)
+	    प्रति (i = 0; i < win->w_jumplistlen; ++i)
+		यदि (win->w_jumplist[i].fmark.fnum == fnum)
 		    one_adjust_nodel(&(win->w_jumplist[i].fmark.mark.lnum));
 
-	if (win->w_buffer == curbuf)
+	यदि (win->w_buffer == curbuf)
 	{
-	    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	    यदि ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 		// marks in the tag stack
-		for (i = 0; i < win->w_tagstacklen; i++)
-		    if (win->w_tagstack[i].fmark.fnum == fnum)
+		प्रति (i = 0; i < win->w_tagstacklen; i++)
+		    यदि (win->w_tagstack[i].fmark.fnum == fnum)
 			one_adjust_nodel(&(win->w_tagstack[i].fmark.mark.lnum));
 
 	    // the displayed Visual area
-	    if (win->w_old_cursor_lnum != 0)
+	    यदि (win->w_old_cursor_lnum != 0)
 	    {
 		one_adjust_nodel(&(win->w_old_cursor_lnum));
 		one_adjust_nodel(&(win->w_old_visual_lnum));
@@ -1186,18 +1186,18 @@ mark_adjust_internal(
 
 	    // topline and cursor position for windows with the same buffer
 	    // other than the current window
-	    if (win != curwin)
+	    यदि (win != curwin)
 	    {
-		if (win->w_topline >= line1 && win->w_topline <= line2)
+		यदि (win->w_topline >= line1 && win->w_topline <= line2)
 		{
-		    if (amount == MAXLNUM)	    // topline is deleted
+		    यदि (amount == MAXLNUM)	    // topline is deleted
 		    {
-			if (line1 <= 1)
+			यदि (line1 <= 1)
 			    win->w_topline = 1;
-			else
+			अन्यथा
 			    win->w_topline = line1 - 1;
 		    }
-		    else if (win->w_topline > line1)
+		    अन्यथा यदि (win->w_topline > line1)
 			// keep topline on the same line, unless inserting just
 			// above it (we probably want to see that line then)
 			win->w_topline += amount;
@@ -1205,7 +1205,7 @@ mark_adjust_internal(
 		    win->w_topfill = 0;
 #endif
 		}
-		else if (amount_after && win->w_topline > line2)
+		अन्यथा यदि (amount_after && win->w_topline > line2)
 		{
 		    win->w_topline += amount_after;
 #ifdef FEAT_DIFF
@@ -1217,7 +1217,7 @@ mark_adjust_internal(
 
 #ifdef FEAT_FOLDING
 	    // adjust folds
-	    if (adjust_folds)
+	    यदि (adjust_folds)
 		foldMarkAdjust(win, line1, line2, amount, amount_after);
 #endif
 	}
@@ -1237,14 +1237,14 @@ mark_adjust_internal(
 #define col_adjust(pp) \
     { \
 	posp = pp; \
-	if (posp->lnum == lnum && posp->col >= mincol) \
+	यदि (posp->lnum == lnum && posp->col >= mincol) \
 	{ \
 	    posp->lnum += lnum_amount; \
-	    if (col_amount < 0 && posp->col <= (colnr_T)-col_amount) \
+	    यदि (col_amount < 0 && posp->col <= (colnr_T)-col_amount) \
 		posp->col = 0; \
-	    else if (posp->col < spaces_removed) \
+	    अन्यथा यदि (posp->col < spaces_removed) \
 		posp->col = col_amount + spaces_removed; \
-	    else \
+	    अन्यथा \
 		posp->col += col_amount; \
 	} \
     }
@@ -1256,44 +1256,44 @@ mark_adjust_internal(
  * "spaces_removed" is the number of spaces that were removed, matters when the
  * cursor is inside them.
  */
-    void
+    शून्य
 mark_col_adjust(
     linenr_T	lnum,
     colnr_T	mincol,
     long	lnum_amount,
     long	col_amount,
-    int		spaces_removed)
+    पूर्णाङ्क		spaces_removed)
 {
-    int		i;
-    int		fnum = curbuf->b_fnum;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		fnum = curbuf->b_fnum;
     win_T	*win;
     pos_T	*posp;
 
-    if ((col_amount == 0L && lnum_amount == 0L)
+    यदि ((col_amount == 0L && lnum_amount == 0L)
 				       || (cmdmod.cmod_flags & CMOD_LOCKMARKS))
-	return; // nothing to do
+	प्रत्यागम; // nothing to do
 
     // named marks, lower case and upper case
-    for (i = 0; i < NMARKS; i++)
+    प्रति (i = 0; i < NMARKS; i++)
     {
 	col_adjust(&(curbuf->b_namedm[i]));
-	if (namedfm[i].fmark.fnum == fnum)
+	यदि (namedfm[i].fmark.fnum == fnum)
 	    col_adjust(&(namedfm[i].fmark.mark));
     }
-    for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+    प्रति (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
     {
-	if (namedfm[i].fmark.fnum == fnum)
+	यदि (namedfm[i].fmark.fnum == fnum)
 	    col_adjust(&(namedfm[i].fmark.mark));
     }
 
     // last Insert position
-    col_adjust(&(curbuf->b_last_insert));
+    col_adjust(&(curbuf->b_last_घाला));
 
     // last change position
     col_adjust(&(curbuf->b_last_change));
 
     // list of change positions
-    for (i = 0; i < curbuf->b_changelistlen; ++i)
+    प्रति (i = 0; i < curbuf->b_changelistlen; ++i)
 	col_adjust(&(curbuf->b_changelist[i]));
 
     // Visual area
@@ -1315,19 +1315,19 @@ mark_col_adjust(
     FOR_ALL_WINDOWS(win)
     {
 	// marks in the jumplist
-	for (i = 0; i < win->w_jumplistlen; ++i)
-	    if (win->w_jumplist[i].fmark.fnum == fnum)
+	प्रति (i = 0; i < win->w_jumplistlen; ++i)
+	    यदि (win->w_jumplist[i].fmark.fnum == fnum)
 		col_adjust(&(win->w_jumplist[i].fmark.mark));
 
-	if (win->w_buffer == curbuf)
+	यदि (win->w_buffer == curbuf)
 	{
 	    // marks in the tag stack
-	    for (i = 0; i < win->w_tagstacklen; i++)
-		if (win->w_tagstack[i].fmark.fnum == fnum)
+	    प्रति (i = 0; i < win->w_tagstacklen; i++)
+		यदि (win->w_tagstack[i].fmark.fnum == fnum)
 		    col_adjust(&(win->w_tagstack[i].fmark.mark));
 
 	    // cursor position for other windows with the same buffer
-	    if (win != curwin)
+	    यदि (win != curwin)
 		col_adjust(&win->w_cursor);
 	}
     }
@@ -1339,52 +1339,52 @@ mark_col_adjust(
  * When "loadfiles" is TRUE first ensure entries have the "fnum" field set
  * (this may be a bit slow).
  */
-    void
-cleanup_jumplist(win_T *wp, int loadfiles)
+    शून्य
+cleanup_jumplist(win_T *wp, पूर्णाङ्क loadfiles)
 {
-    int	    i;
-    int	    from, to;
-    int	    mustfree;
+    पूर्णाङ्क	    i;
+    पूर्णाङ्क	    from, to;
+    पूर्णाङ्क	    mustfree;
 
-    if (loadfiles)
+    यदि (loadfiles)
     {
 	// If specified, load all the files from the jump list. This is
 	// needed to properly clean up duplicate entries, but will take some
 	// time.
-	for (i = 0; i < wp->w_jumplistlen; ++i)
+	प्रति (i = 0; i < wp->w_jumplistlen; ++i)
 	{
-	    if ((wp->w_jumplist[i].fmark.fnum == 0) &&
+	    यदि ((wp->w_jumplist[i].fmark.fnum == 0) &&
 		    (wp->w_jumplist[i].fmark.mark.lnum != 0))
 		fname2fnum(&wp->w_jumplist[i]);
 	}
     }
 
     to = 0;
-    for (from = 0; from < wp->w_jumplistlen; ++from)
+    प्रति (from = 0; from < wp->w_jumplistlen; ++from)
     {
-	if (wp->w_jumplistidx == from)
+	यदि (wp->w_jumplistidx == from)
 	    wp->w_jumplistidx = to;
-	for (i = from + 1; i < wp->w_jumplistlen; ++i)
-	    if (wp->w_jumplist[i].fmark.fnum
+	प्रति (i = from + 1; i < wp->w_jumplistlen; ++i)
+	    यदि (wp->w_jumplist[i].fmark.fnum
 					== wp->w_jumplist[from].fmark.fnum
 		    && wp->w_jumplist[from].fmark.fnum != 0
 		    && wp->w_jumplist[i].fmark.mark.lnum
 				  == wp->w_jumplist[from].fmark.mark.lnum)
-		break;
-	if (i >= wp->w_jumplistlen)	// not duplicate
+		भङ्ग;
+	यदि (i >= wp->w_jumplistlen)	// not duplicate
 	    mustfree = FALSE;
-	else if (i > from + 1)		// non-adjacent duplicate
+	अन्यथा यदि (i > from + 1)		// non-adjacent duplicate
 	    // jumpoptions=stack: remove duplicates only when adjacent.
-	    mustfree = !(jop_flags & JOP_STACK);
-	else				// adjacent duplicate
+	    mustfree = !(jop_flags & JOP_चळत);
+	अन्यथा				// adjacent duplicate
 	    mustfree = TRUE;
 
-	if (mustfree)
+	यदि (mustfree)
 	    vim_free(wp->w_jumplist[from].fname);
-	else
+	अन्यथा
 	    wp->w_jumplist[to++] = wp->w_jumplist[from];
     }
-    if (wp->w_jumplistidx == wp->w_jumplistlen)
+    यदि (wp->w_jumplistidx == wp->w_jumplistlen)
 	wp->w_jumplistidx = to;
     wp->w_jumplistlen = to;
 }
@@ -1392,15 +1392,15 @@ cleanup_jumplist(win_T *wp, int loadfiles)
 /*
  * Copy the jumplist from window "from" to window "to".
  */
-    void
+    शून्य
 copy_jumplist(win_T *from, win_T *to)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (i = 0; i < from->w_jumplistlen; ++i)
+    प्रति (i = 0; i < from->w_jumplistlen; ++i)
     {
 	to->w_jumplist[i] = from->w_jumplist[i];
-	if (from->w_jumplist[i].fname != NULL)
+	यदि (from->w_jumplist[i].fname != रिक्त)
 	    to->w_jumplist[i].fname = vim_strsave(from->w_jumplist[i].fname);
     }
     to->w_jumplistlen = from->w_jumplistlen;
@@ -1410,142 +1410,142 @@ copy_jumplist(win_T *from, win_T *to)
 /*
  * Free items in the jumplist of window "wp".
  */
-    void
+    शून्य
 free_jumplist(win_T *wp)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (i = 0; i < wp->w_jumplistlen; ++i)
+    प्रति (i = 0; i < wp->w_jumplistlen; ++i)
 	vim_free(wp->w_jumplist[i].fname);
 }
 
-    void
+    शून्य
 set_last_cursor(win_T *win)
 {
-    if (win->w_buffer != NULL)
+    यदि (win->w_buffer != रिक्त)
 	win->w_buffer->b_last_cursor = win->w_cursor;
 }
 
-#if defined(EXITFREE)
-    void
-free_all_marks(void)
+#यदि defined(EXITFREE)
+    शून्य
+free_all_marks(शून्य)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (i = 0; i < NMARKS + EXTRA_MARKS; i++)
-	if (namedfm[i].fmark.mark.lnum != 0)
+    प्रति (i = 0; i < NMARKS + EXTRA_MARKS; i++)
+	यदि (namedfm[i].fmark.mark.lnum != 0)
 	    vim_free(namedfm[i].fname);
 }
 #endif
 
-#if defined(FEAT_VIMINFO)
+#यदि defined(FEAT_VIMINFO)
 /*
  * Return a pointer to the named file marks.
  */
     xfmark_T *
-get_namedfm(void)
+get_namedfm(शून्य)
 {
-    return namedfm;
+    प्रत्यागम namedfm;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Add information about mark 'mname' to list 'l'
  */
-    static int
-add_mark(list_T *l, char_u *mname, size_t mnamelen, pos_T *pos, int bufnr, char_u *fname)
+    स्थिर पूर्णाङ्क
+add_mark(list_T *l, char_u *mname, size_t mnamelen, pos_T *pos, पूर्णाङ्क bufnr, char_u *fname)
 {
     dict_T	*d;
     list_T	*lpos;
 
-    if (pos->lnum <= 0)
-	return OK;
+    यदि (pos->lnum <= 0)
+	प्रत्यागम OK;
 
     d = dict_alloc();
-    if (d == NULL)
-	return FAIL;
+    यदि (d == रिक्त)
+	प्रत्यागम FAIL;
 
-    if (list_append_dict(l, d) == FAIL)
+    यदि (list_append_dict(l, d) == FAIL)
     {
 	dict_unref(d);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
     lpos = list_alloc();
-    if (lpos == NULL)
-	return FAIL;
+    यदि (lpos == रिक्त)
+	प्रत्यागम FAIL;
 
-    list_append_number(lpos, bufnr);
-    list_append_number(lpos, pos->lnum);
-    list_append_number(lpos, pos->col < MAXCOL ? pos->col + 1 : MAXCOL);
-    list_append_number(lpos, pos->coladd);
+    list_append_संख्या(lpos, bufnr);
+    list_append_संख्या(lpos, pos->lnum);
+    list_append_संख्या(lpos, pos->col < MAXCOL ? pos->col + 1 : MAXCOL);
+    list_append_संख्या(lpos, pos->coladd);
 
-    if (dict_add_string_len(d, "mark", mname, (int)mnamelen) == FAIL
+    यदि (dict_add_string_len(d, "mark", mname, (पूर्णाङ्क)mnamelen) == FAIL
 	    || dict_add_list(d, "pos", lpos) == FAIL
-	    || (fname != NULL && dict_add_string(d, "file", fname) == FAIL))
+	    || (fname != रिक्त && dict_add_string(d, "file", fname) == FAIL))
     {
-	if (lpos->lv_refcount == 0)
+	यदि (lpos->lv_refcount == 0)
 	    list_free(lpos);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Get information about marks local to a buffer.
  */
-    static void
+    स्थिर शून्य
 get_buf_local_marks(buf_T *buf, list_T *l)
 {
     char_u	mname[3] = "' ";
     size_t	mnamelen = STRLEN_LITERAL("' ");
-    int		i;
+    पूर्णाङ्क		i;
 
     // Marks 'a' to 'z'
-    for (i = 0; i < NMARKS; ++i)
+    प्रति (i = 0; i < NMARKS; ++i)
     {
 	mname[1] = 'a' + i;
-	add_mark(l, mname, mnamelen, &buf->b_namedm[i], buf->b_fnum, NULL);
+	add_mark(l, mname, mnamelen, &buf->b_namedm[i], buf->b_fnum, रिक्त);
     }
 
     // Mark '' is a window local mark and not a buffer local mark
-    add_mark(l, (char_u *)"''", STRLEN_LITERAL("''"), &curwin->w_pcmark, curbuf->b_fnum, NULL);
+    add_mark(l, (char_u *)"''", STRLEN_LITERAL("''"), &curwin->w_pcmark, curbuf->b_fnum, रिक्त);
 
-    add_mark(l, (char_u *)"'\"", STRLEN_LITERAL("'\""), &buf->b_last_cursor, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'[", STRLEN_LITERAL("'["), &buf->b_op_start, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"']", STRLEN_LITERAL("']"), &buf->b_op_end, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_last_insert, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'.", STRLEN_LITERAL("'."), &buf->b_last_change, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'<", STRLEN_LITERAL("'<"), &buf->b_visual.vi_start, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'>", STRLEN_LITERAL("'>"), &buf->b_visual.vi_end, buf->b_fnum, NULL);
+    add_mark(l, (char_u *)"'\"", STRLEN_LITERAL("'\""), &buf->b_last_cursor, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"'[", STRLEN_LITERAL("'["), &buf->b_op_start, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"']", STRLEN_LITERAL("']"), &buf->b_op_end, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_last_घाला, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"'.", STRLEN_LITERAL("'."), &buf->b_last_change, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"'<", STRLEN_LITERAL("'<"), &buf->b_visual.vi_start, buf->b_fnum, रिक्त);
+    add_mark(l, (char_u *)"'>", STRLEN_LITERAL("'>"), &buf->b_visual.vi_end, buf->b_fnum, रिक्त);
 }
 
 /*
  * Get information about global marks ('A' to 'Z' and '0' to '9')
  */
-    static void
+    स्थिर शून्य
 get_global_marks(list_T *l)
 {
     char_u	mname[3] = "' ";
     size_t	mnamelen = STRLEN_LITERAL("' ");
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*name;
 
     // Marks 'A' to 'Z' and '0' to '9'
-    for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+    प्रति (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
     {
-	if (namedfm[i].fmark.fnum != 0)
+	यदि (namedfm[i].fmark.fnum != 0)
 	    name = buflist_nr2name(namedfm[i].fmark.fnum, TRUE, TRUE);
-	else
+	अन्यथा
 	    name = namedfm[i].fname;
-	if (name != NULL)
+	यदि (name != रिक्त)
 	{
 	    mname[1] = i >= NMARKS ? i - NMARKS + '0' : i + 'A';
 	    add_mark(l, mname, mnamelen, &namedfm[i].fmark.mark,
 		    namedfm[i].fmark.fnum, name);
-	    if (namedfm[i].fmark.fnum != 0)
+	    यदि (namedfm[i].fmark.fnum != 0)
 		vim_free(name);
 	}
     }
@@ -1554,26 +1554,26 @@ get_global_marks(list_T *l)
 /*
  * getmarklist() function
  */
-    void
+    शून्य
 f_getmarklist(typval_T *argvars, typval_T *rettv)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = रिक्त;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    यदि (rettv_list_alloc(rettv) == FAIL)
+	प्रत्यागम;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    यदि (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    यदि (argvars[0].v_type == VAR_UNKNOWN)
     {
 	get_global_marks(rettv->vval.v_list);
-	return;
+	प्रत्यागम;
     }
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
     get_buf_local_marks(buf, rettv->vval.v_list);
 }

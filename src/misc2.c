@@ -10,42 +10,42 @@
 /*
  * misc2.c: Various functions.
  */
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-static char_u	*username = NULL; // cached result of mch_get_user_name()
+स्थिर char_u	*username = रिक्त; // cached result of mch_get_user_name()
 
-static int coladvance2(pos_T *pos, int addspaces, int finetune, colnr_T wcol);
+स्थिर पूर्णाङ्क coladvance2(pos_T *pos, पूर्णाङ्क addspaces, पूर्णाङ्क finetune, colnr_T wcol);
 
 /*
  * Return TRUE if in the current mode we need to use virtual.
  */
-    int
-virtual_active(void)
+    पूर्णाङ्क
+virtual_active(शून्य)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned पूर्णाङ्क cur_ve_flags = get_ve_flags();
 
-    if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
-	return TRUE;
+    यदि (cur_ve_flags == VE_ALL
+	    || ((cur_ve_flags & VE_घाला) && (State & MODE_घाला)))
+	प्रत्यागम TRUE;
 
     // While an operator is being executed we return "virtual_op", because
     // VIsual_active has already been reset, thus we can't check for "block"
     // being used.
-    if (virtual_op != MAYBE)
-	return virtual_op;
-    return (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
+    यदि (virtual_op != MAYBE)
+	प्रत्यागम virtual_op;
+    प्रत्यागम (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
 }
 
 /*
  * Get the screen position of the cursor.
  */
-    int
-getviscol(void)
+    पूर्णाङ्क
+getviscol(शून्य)
 {
     colnr_T	x;
 
-    getvvcol(curwin, &curwin->w_cursor, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &curwin->w_cursor, &x, रिक्त, रिक्त, GETVCOL_NO_ABOVE);
+    प्रत्यागम (पूर्णाङ्क)x;
 }
 
 /*
@@ -53,23 +53,23 @@ getviscol(void)
  * cursor in that column.
  * The caller must have saved the cursor line for undo!
  */
-    int
+    पूर्णाङ्क
 coladvance_force(colnr_T wcol)
 {
-    int rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
+    पूर्णाङ्क rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
 
-    if (wcol == MAXCOL)
+    यदि (wcol == MAXCOL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else
+    अन्यथा
 	// Virtcol is valid
 	set_valid_virtcol(curwin, wcol);
-    return rc;
+    प्रत्यागम rc;
 }
 
 /*
  * Get the screen position of character col with a coladd in the cursor line.
  */
-    int
+    पूर्णाङ्क
 getviscol2(colnr_T col, colnr_T coladd)
 {
     colnr_T	x;
@@ -78,8 +78,8 @@ getviscol2(colnr_T col, colnr_T coladd)
     pos.lnum = curwin->w_cursor.lnum;
     pos.col = col;
     pos.coladd = coladd;
-    getvvcol(curwin, &pos, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &pos, &x, रिक्त, रिक्त, GETVCOL_NO_ABOVE);
+    प्रत्यागम (पूर्णाङ्क)x;
 }
 
 /*
@@ -91,17 +91,17 @@ getviscol2(colnr_T col, colnr_T coladd)
  *
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    पूर्णाङ्क
 coladvance(colnr_T wantcol)
 {
-    int rc = getvpos(&curwin->w_cursor, wantcol);
+    पूर्णाङ्क rc = getvpos(&curwin->w_cursor, wantcol);
 
-    if (wantcol == MAXCOL || rc == FAIL)
+    यदि (wantcol == MAXCOL || rc == FAIL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else if (*ml_get_cursor() != TAB)
+    अन्यथा यदि (*ml_get_cursor() != TAB)
 	// Virtcol is valid when not on a TAB
 	set_valid_virtcol(curwin, wantcol);
-    return rc;
+    प्रत्यागम rc;
 }
 
 /*
@@ -109,67 +109,67 @@ coladvance(colnr_T wantcol)
  * "wantcol".
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    पूर्णाङ्क
 getvpos(pos_T *pos, colnr_T wantcol)
 {
-    return coladvance2(pos, FALSE, virtual_active(), wantcol);
+    प्रत्यागम coladvance2(pos, FALSE, virtual_active(), wantcol);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 coladvance2(
     pos_T	*pos,
-    int		addspaces,	// change the text to achieve our goal?
-    int		finetune,	// change char offset for the exact column
+    पूर्णाङ्क		addspaces,	// change the text to achieve our goal?
+    पूर्णाङ्क		finetune,	// change char offset for the exact column
     colnr_T	wcol_arg)	// column to move to (can be negative)
 {
     colnr_T	wcol = wcol_arg;
-    int		idx;
-    char_u	*line;
-    int		linelen;
+    पूर्णाङ्क		idx;
+    char_u	*ओळ;
+    पूर्णाङ्क		linelen;
     colnr_T	col = 0;
-    int		csize = 0;
-    int		one_more;
+    पूर्णाङ्क		csize = 0;
+    पूर्णाङ्क		one_more;
 #ifdef FEAT_LINEBREAK
-    int		head = 0;
+    पूर्णाङ्क		head = 0;
 #endif
 
-    one_more = (State & MODE_INSERT)
+    one_more = (State & MODE_घाला)
 		    || restart_edit != NUL
 		    || (VIsual_active && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    ओळ = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
-    if (wcol >= MAXCOL)
+    यदि (wcol >= MAXCOL)
     {
 	    idx = linelen - 1 + one_more;
 	    col = wcol;
 
-	    if ((addspaces || finetune) && !VIsual_active)
+	    यदि ((addspaces || finetune) && !VIsual_active)
 	    {
 		curwin->w_curswant = linetabsize_no_outer(curwin, pos->lnum)
 								   + one_more;
-		if (curwin->w_curswant > 0)
+		यदि (curwin->w_curswant > 0)
 		    --curwin->w_curswant;
 	    }
     }
-    else
+    अन्यथा
     {
-	int		width = curwin->w_width - win_col_off(curwin);
+	पूर्णाङ्क		width = curwin->w_width - win_col_off(curwin);
 	chartabsize_T	cts;
 
-	if (finetune
+	यदि (finetune
 		&& curwin->w_p_wrap
 		&& curwin->w_width != 0
 		&& wcol >= (colnr_T)width
 		&& width > 0)
 	{
 	    csize = linetabsize_no_outer_eol(curwin, pos->lnum);
-	    if (csize > 0)
+	    यदि (csize > 0)
 		csize--;
 
-	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+	    यदि (wcol / width > (colnr_T)csize / width
+		    && ((State & MODE_घाला) == 0 || (पूर्णाङ्क)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
@@ -179,23 +179,23 @@ coladvance2(
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, ओळ, ओळ);
 #ifdef FEAT_PROP_POPUP
 	cts.cts_no_above = true;
 #endif
-	while (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
+	यावत् (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
 	{
 	    // Count a tab for what it's worth (if list mode not on)
 #ifdef FEAT_LINEBREAK
-	    csize = win_lbr_chartabsize(&cts, &head, NULL);
+	    csize = win_lbr_chartabsize(&cts, &head, रिक्त);
 	    MB_PTR_ADV(cts.cts_ptr);
-#else
+#अन्यथा
 	    csize = lbr_chartabsize_adv(&cts);
 #endif
 	    cts.cts_vcol += csize;
 	}
 	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	idx = (पूर्णाङ्क)(cts.cts_ptr - ओळ);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -204,7 +204,7 @@ coladvance2(
 	 * a line has the correct indexing.  The one_more comparison
 	 * replaces an explicit add of one_more later on.
 	 */
-	if (col > wcol || (!virtual_active() && one_more == 0))
+	यदि (col > wcol || (!virtual_active() && one_more == 0))
 	{
 	    idx -= 1;
 #ifdef FEAT_LINEBREAK
@@ -214,7 +214,7 @@ coladvance2(
 	    col -= csize;
 	}
 
-	if (virtual_active()
+	यदि (virtual_active()
 		&& addspaces
 		&& wcol >= 0
 		&& ((col != wcol && col != wcol + 1) || csize > 1))
@@ -222,20 +222,20 @@ coladvance2(
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    यदि (ओळ[idx] == NUL)
 	    {
 		// Append spaces
-		int	correct = wcol - col;
+		पूर्णाङ्क	correct = wcol - col;
 		char_u	*newline = alloc(idx + correct + 1);
-		int	t;
+		पूर्णाङ्क	t;
 
-		if (newline == NULL)
-		    return FAIL;
+		यदि (newline == रिक्त)
+		    प्रत्यागम FAIL;
 
-		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		प्रति (t = 0; t < idx; ++t)
+		    newline[t] = ओळ[t];
 
-		for (t = 0; t < correct; ++t)
+		प्रति (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
 
 		newline[idx + correct] = NUL;
@@ -245,27 +245,27 @@ coladvance2(
 		idx += correct;
 		col = wcol;
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Break a tab
-		int	correct = wcol - col - csize + 1; // negative!!
+		पूर्णाङ्क	correct = wcol - col - csize + 1; // negative!!
 		char_u	*newline;
-		int	t, s = 0;
-		int	v;
+		पूर्णाङ्क	t, s = 0;
+		पूर्णाङ्क	v;
 
-		if (-correct > csize)
-		    return FAIL;
+		यदि (-correct > csize)
+		    प्रत्यागम FAIL;
 
 		newline = alloc(linelen + csize);
-		if (newline == NULL)
-		    return FAIL;
+		यदि (newline == रिक्त)
+		    प्रत्यागम FAIL;
 
-		for (t = 0; t < linelen; t++)
+		प्रति (t = 0; t < linelen; t++)
 		{
-		    if (t != idx)
-			newline[s++] = line[t];
-		    else
-			for (v = 0; v < csize; v++)
+		    यदि (t != idx)
+			newline[s++] = ओळ[t];
+		    अन्यथा
+			प्रति (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
 		}
 
@@ -279,32 +279,32 @@ coladvance2(
 	}
     }
 
-    if (idx < 0)
+    यदि (idx < 0)
 	pos->col = 0;
-    else
+    अन्यथा
 	pos->col = idx;
 
     pos->coladd = 0;
 
-    if (finetune)
+    यदि (finetune)
     {
-	if (wcol == MAXCOL)
+	यदि (wcol == MAXCOL)
 	{
 	    // The width of the last character is used to set coladd.
-	    if (!one_more)
+	    यदि (!one_more)
 	    {
 		colnr_T	    scol, ecol;
 
-		getvcol(curwin, pos, &scol, NULL, &ecol, 0);
+		getvcol(curwin, pos, &scol, रिक्त, &ecol, 0);
 		pos->coladd = ecol - scol;
 	    }
 	}
-	else
+	अन्यथा
 	{
-	    int b = (int)wcol - (int)col;
+	    पूर्णाङ्क b = (पूर्णाङ्क)wcol - (पूर्णाङ्क)col;
 
 	    // The difference between wcol and col is used to set coladd.
-	    if (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
+	    यदि (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
 		pos->coladd = b;
 
 	    col += b;
@@ -312,21 +312,21 @@ coladvance2(
     }
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    यदि (has_mbyte)
 	mb_adjustpos(curbuf, pos);
 
-    if (wcol < 0 || col < wcol)
-	return FAIL;
-    return OK;
+    यदि (wcol < 0 || col < wcol)
+	प्रत्यागम FAIL;
+    प्रत्यागम OK;
 }
 
 /*
  * Increment the cursor position.  See inc() for return values.
  */
-    int
-inc_cursor(void)
+    पूर्णाङ्क
+inc_cursor(शून्य)
 {
-    return inc(&curwin->w_cursor);
+    प्रत्यागम inc(&curwin->w_cursor);
 }
 
 /*
@@ -336,50 +336,50 @@ inc_cursor(void)
  * Return -1 when at the end of file.
  * Return 0 otherwise.
  */
-    int
+    पूर्णाङ्क
 inc(pos_T *lp)
 {
     char_u  *p;
 
     // when searching position may be set to end of a line
-    if (lp->col != MAXCOL)
+    यदि (lp->col != MAXCOL)
     {
 	p = ml_get_pos(lp);
-	if (*p != NUL)	// still within line, move to next char (may be NUL)
+	यदि (*p != NUL)	// still within line, move to next char (may be NUL)
 	{
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 	    {
-		int l = (*mb_ptr2len)(p);
+		पूर्णाङ्क l = (*mb_ptr2len)(p);
 
 		lp->col += l;
-		return ((p[l] != NUL) ? 0 : 2);
+		प्रत्यागम ((p[l] != NUL) ? 0 : 2);
 	    }
 	    lp->col++;
 	    lp->coladd = 0;
-	    return ((p[1] != NUL) ? 0 : 2);
+	    प्रत्यागम ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    यदि (lp->lnum != curbuf->b_ml.ml_ओळ_मोजणी)     // there is a next line
     {
 	lp->col = 0;
 	lp->lnum++;
 	lp->coladd = 0;
-	return 1;
+	प्रत्यागम 1;
     }
-    return -1;
+    प्रत्यागम -1;
 }
 
 /*
  * incl(lp): same as inc(), but skip the NUL at the end of non-empty lines
  */
-    int
+    पूर्णाङ्क
 incl(pos_T *lp)
 {
-    int	    r;
+    पूर्णाङ्क	    r;
 
-    if ((r = inc(lp)) >= 1 && lp->col)
+    यदि ((r = inc(lp)) >= 1 && lp->col)
 	r = inc(lp);
-    return r;
+    प्रत्यागम r;
 }
 
 /*
@@ -388,66 +388,66 @@ incl(pos_T *lp)
  * Decrement the line pointer 'p' crossing line boundaries as necessary.
  * Return 1 when crossing a line, -1 when at start of file, 0 otherwise.
  */
-    int
-dec_cursor(void)
+    पूर्णाङ्क
+dec_cursor(शून्य)
 {
-    return dec(&curwin->w_cursor);
+    प्रत्यागम dec(&curwin->w_cursor);
 }
 
-    int
+    पूर्णाङ्क
 dec(pos_T *lp)
 {
     char_u	*p;
 
     lp->coladd = 0;
-    if (lp->col == MAXCOL)
+    यदि (lp->col == MAXCOL)
     {
 	// past end of line
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	यदि (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 0;
+	प्रत्यागम 0;
     }
 
-    if (lp->col > 0)
+    यदि (lp->col > 0)
     {
 	// still within line
 	lp->col--;
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
 	    p = ml_get(lp->lnum);
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
 	}
-	return 0;
+	प्रत्यागम 0;
     }
 
-    if (lp->lnum > 1)
+    यदि (lp->lnum > 1)
     {
 	// there is a prior line
 	lp->lnum--;
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	यदि (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 1;
+	प्रत्यागम 1;
     }
 
     // at start of file
-    return -1;
+    प्रत्यागम -1;
 }
 
 /*
  * decl(lp): same as dec(), but skip the NUL at the end of non-empty lines
  */
-    int
+    पूर्णाङ्क
 decl(pos_T *lp)
 {
-    int	    r;
+    पूर्णाङ्क	    r;
 
-    if ((r = dec(lp)) == 1 && lp->col)
+    यदि ((r = dec(lp)) == 1 && lp->col)
 	r = dec(lp);
-    return r;
+    प्रत्यागम r;
 }
 
 /*
@@ -464,28 +464,28 @@ get_cursor_rel_lnum(
     linenr_T	retval = 0;
 
 #ifdef FEAT_FOLDING
-    if (hasAnyFolding(wp))
+    यदि (hasAnyFolding(wp))
     {
-	if (lnum > cursor)
+	यदि (lnum > cursor)
 	{
-	    while (lnum > cursor)
+	    यावत् (lnum > cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+		(शून्य)hasFoldingWin(wp, lnum, &lnum, रिक्त, TRUE, रिक्त);
 		// if lnum and cursor are in the same fold,
 		// now lnum <= cursor
-		if (lnum > cursor)
+		यदि (lnum > cursor)
 		    retval++;
 		lnum--;
 	    }
 	}
-	else if (lnum < cursor)
+	अन्यथा यदि (lnum < cursor)
 	{
-	    while (lnum < cursor)
+	    यावत् (lnum < cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
+		(शून्य)hasFoldingWin(wp, lnum, रिक्त, &lnum, TRUE, रिक्त);
 		// if lnum and cursor are in the same fold,
 		// now lnum >= cursor
-		if (lnum < cursor)
+		यदि (lnum < cursor)
 		    retval--;
 		lnum++;
 	    }
@@ -493,29 +493,29 @@ get_cursor_rel_lnum(
 	// else if (lnum == cursor)
 	//     retval = 0;
     }
-    else
+    अन्यथा
 #endif
 	retval = lnum - cursor;
 
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
  * Make sure "pos.lnum" and "pos.col" are valid in "buf".
  * This allows for the col to be on the NUL byte.
  */
-    void
+    शून्य
 check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    यदि (pos->lnum > buf->b_ml.ml_ओळ_मोजणी)
+	pos->lnum = buf->b_ml.ml_ओळ_मोजणी;
 
-    if (pos->col > 0)
+    यदि (pos->col > 0)
     {
 	len = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > len)
+	यदि (pos->col > len)
 	    pos->col = len;
     }
 }
@@ -523,28 +523,28 @@ check_pos(buf_T *buf, pos_T *pos)
 /*
  * Make sure curwin->w_cursor.lnum is valid.
  */
-    void
-check_cursor_lnum(void)
+    शून्य
+check_cursor_lnum(शून्य)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    यदि (curwin->w_cursor.lnum > curbuf->b_ml.ml_ओळ_मोजणी)
     {
 #ifdef FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
-						&curwin->w_cursor.lnum, NULL))
+	यदि (!hasFolding(curbuf->b_ml.ml_ओळ_मोजणी,
+						&curwin->w_cursor.lnum, रिक्त))
 #endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
     }
-    if (curwin->w_cursor.lnum <= 0)
+    यदि (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
 }
 
 /*
  * Make sure curwin->w_cursor.col is valid.
  */
-    void
-check_cursor_col(void)
+    शून्य
+check_cursor_col(शून्य)
 {
     check_cursor_col_win(curwin);
 }
@@ -552,63 +552,63 @@ check_cursor_col(void)
 /*
  * Make sure win->w_cursor.col is valid.
  */
-    void
+    शून्य
 check_cursor_col_win(win_T *win)
 {
     colnr_T      len;
     colnr_T      oldcol = win->w_cursor.col;
     colnr_T      oldcoladd = win->w_cursor.col + win->w_cursor.coladd;
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned पूर्णाङ्क cur_ve_flags = get_ve_flags();
 
     len = ml_get_buf_len(win->w_buffer, win->w_cursor.lnum);
-    if (len == 0)
+    यदि (len == 0)
 	win->w_cursor.col = 0;
-    else if (win->w_cursor.col >= len)
+    अन्यथा यदि (win->w_cursor.col >= len)
     {
 	// Allow cursor past end-of-line when:
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
+	यदि ((State & MODE_घाला) || restart_edit
 		|| (VIsual_active && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
 		|| virtual_active())
 	    win->w_cursor.col = len;
-	else
+	अन्यथा
 	{
 	    win->w_cursor.col = len - 1;
 	    // Move the cursor to the head byte.
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 		mb_adjustpos(win->w_buffer, &win->w_cursor);
 	}
     }
-    else if (win->w_cursor.col < 0)
+    अन्यथा यदि (win->w_cursor.col < 0)
 	win->w_cursor.col = 0;
 
     // If virtual editing is on, we can leave the cursor on the old position,
     // only we must set it to virtual.  But don't do it when at the end of the
     // line.
-    if (oldcol == MAXCOL)
+    यदि (oldcol == MAXCOL)
 	win->w_cursor.coladd = 0;
-    else if (cur_ve_flags == VE_ALL)
+    अन्यथा यदि (cur_ve_flags == VE_ALL)
     {
-	if (oldcoladd > win->w_cursor.col)
+	यदि (oldcoladd > win->w_cursor.col)
 	{
 	    win->w_cursor.coladd = oldcoladd - win->w_cursor.col;
 
 	    // Make sure that coladd is not more than the char width.
 	    // Not for the last character, coladd is then used when the cursor
 	    // is actually after the last character.
-	    if (win->w_cursor.col + 1 < len)
+	    यदि (win->w_cursor.col + 1 < len)
 	    {
-		int cs, ce;
+		पूर्णाङ्क cs, ce;
 
-		getvcol(win, &win->w_cursor, &cs, NULL, &ce, 0);
-		if (win->w_cursor.coladd > ce - cs)
+		getvcol(win, &win->w_cursor, &cs, रिक्त, &ce, 0);
+		यदि (win->w_cursor.coladd > ce - cs)
 		    win->w_cursor.coladd = ce - cs;
 	    }
 	}
-	else
+	अन्यथा
 	    // avoid weird number when there is a miscalculation or overflow
 	    win->w_cursor.coladd = 0;
     }
@@ -617,8 +617,8 @@ check_cursor_col_win(win_T *win)
 /*
  * make sure curwin->w_cursor in on a valid character
  */
-    void
-check_cursor(void)
+    शून्य
+check_cursor(शून्य)
 {
     check_cursor_lnum();
     check_cursor_col();
@@ -628,20 +628,20 @@ check_cursor(void)
  * Check if VIsual position is valid, correct it if not.
  * Can be called when in Visual mode and a change has been made.
  */
-    void
-check_visual_pos(void)
+    शून्य
+check_visual_pos(शून्य)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    यदि (VIsual.lnum > curbuf->b_ml.ml_ओळ_मोजणी)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
+	VIsual.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
 	VIsual.col = 0;
 	VIsual.coladd = 0;
     }
-    else
+    अन्यथा
     {
-	int len = ml_get_len(VIsual.lnum);
+	पूर्णाङ्क len = ml_get_len(VIsual.lnum);
 
-	if (VIsual.col > len)
+	यदि (VIsual.col > len)
 	{
 	    VIsual.col = len;
 	    VIsual.coladd = 0;
@@ -653,10 +653,10 @@ check_visual_pos(void)
  * Make sure curwin->w_cursor is not on the NUL at the end of the line.
  * Allow it when in Visual mode and 'selection' is not "old".
  */
-    void
-adjust_cursor_col(void)
+    शून्य
+adjust_cursor_col(शून्य)
 {
-    if (curwin->w_cursor.col > 0
+    यदि (curwin->w_cursor.col > 0
 	    && (!VIsual_active || *p_sel == 'o')
 	    && gchar_cursor() == NUL)
 	--curwin->w_cursor.col;
@@ -667,14 +667,14 @@ adjust_cursor_col(void)
  * Adjust the cursor position if needed.
  * Return TRUE if the cursor was moved.
  */
-    int
+    पूर्णाङ्क
 set_leftcol(colnr_T leftcol)
 {
-    int		retval = FALSE;
+    पूर्णाङ्क		retval = FALSE;
 
     // Return quickly when there is no change.
-    if (curwin->w_leftcol == leftcol)
-	return FALSE;
+    यदि (curwin->w_leftcol == leftcol)
+	प्रत्यागम FALSE;
     curwin->w_leftcol = leftcol;
 
     changed_cline_bef_curs();
@@ -683,42 +683,42 @@ set_leftcol(colnr_T leftcol)
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
-    if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
+    long siso = get_sidescrolloff_मूल्य();
+    यदि (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
 	coladvance((colnr_T)(lastcol - siso));
     }
-    else if (curwin->w_virtcol < curwin->w_leftcol + siso)
+    अन्यथा यदि (curwin->w_virtcol < curwin->w_leftcol + siso)
     {
 	retval = TRUE;
-	(void)coladvance((colnr_T)(curwin->w_leftcol + siso));
+	(शून्य)coladvance((colnr_T)(curwin->w_leftcol + siso));
     }
 
     // If the start of the character under the cursor is not on the screen,
     // advance the cursor one more char.  If this fails (last char of the
     // line) adjust the scrolling.
     colnr_T	s, e;
-    getvvcol(curwin, &curwin->w_cursor, &s, NULL, &e, 0);
-    if (e > (colnr_T)lastcol)
+    getvvcol(curwin, &curwin->w_cursor, &s, रिक्त, &e, 0);
+    यदि (e > (colnr_T)lastcol)
     {
 	retval = TRUE;
 	coladvance(s - 1);
     }
-    else if (s < curwin->w_leftcol)
+    अन्यथा यदि (s < curwin->w_leftcol)
     {
 	retval = TRUE;
-	if (coladvance(e + 1) == FAIL)	// there isn't another character
+	यदि (coladvance(e + 1) == FAIL)	// there isn't another character
 	{
 	    curwin->w_leftcol = s;	// adjust w_leftcol instead
 	    changed_cline_bef_curs();
 	}
     }
 
-    if (retval)
+    यदि (retval)
 	curwin->w_set_curswant = true;
     redraw_later(UPD_NOT_VALID);
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
@@ -728,49 +728,49 @@ set_leftcol(colnr_T leftcol)
  * "*option" is advanced to the next part.
  * The length is returned.
  */
-    int
+    पूर्णाङ्क
 copy_option_part(
     char_u	**option,
     char_u	*buf,
-    int		maxlen,
-    char	*sep_chars)
+    पूर्णाङ्क		maxlen,
+    वर्ण	*sep_chars)
 {
-    int	    len = 0;
+    पूर्णाङ्क	    len = 0;
     char_u  *p = *option;
 
     // skip '.' at start of option part, for 'suffixes'
-    if (*p == '.')
+    यदि (*p == '.')
 	buf[len++] = *p++;
-    while (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == NULL)
+    यावत् (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == रिक्त)
     {
 	/*
 	 * Skip backslash before a separator character and space.
 	 */
-	if (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != NULL)
+	यदि (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != रिक्त)
 	    ++p;
-	if (len < maxlen - 1)
+	यदि (len < maxlen - 1)
 	    buf[len++] = *p;
 	++p;
     }
     buf[len] = NUL;
 
-    if (*p != NUL && *p != ',')	// skip non-standard separator
+    यदि (*p != NUL && *p != ',')	// skip non-standard separator
 	++p;
     p = skip_to_option_part(p);	// p points to next file name
 
     *option = p;
-    return len;
+    प्रत्यागम len;
 }
 
-#if !defined(HAVE_MEMSET) && !defined(PROTO)
-    void *
-vim_memset(void *ptr, int c, size_t size)
+#यदि !defined(HAVE_MEMSET) && !defined(PROTO)
+    शून्य *
+vim_memset(शून्य *ptr, पूर्णाङ्क c, size_t size)
 {
-    char *p = ptr;
+    वर्ण *p = ptr;
 
-    while (size-- > 0)
+    यावत् (size-- > 0)
 	*p++ = c;
-    return ptr;
+    प्रत्यागम ptr;
 }
 #endif
 
@@ -778,10 +778,10 @@ vim_memset(void *ptr, int c, size_t size)
  * Vim has its own isspace() function, because on some machines isspace()
  * can't handle characters above 128.
  */
-    int
-vim_isspace(int x)
+    पूर्णाङ्क
+vim_isspace(पूर्णाङ्क x)
 {
-    return ((x >= 9 && x <= 13) || x == ' ');
+    प्रत्यागम ((x >= 9 && x <= 13) || x == ' ');
 }
 
 /************************************************************************
@@ -793,7 +793,7 @@ vim_isspace(int x)
  * Some useful tables.
  */
 
-static struct modmasktable
+स्थिर संरचना modmasktable
 {
     short	mod_mask;	// Bit-mask for particular key modifier
     short	mod_flag;	// Bit(s) for particular key modifier
@@ -807,7 +807,7 @@ static struct modmasktable
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_2CLICK,	(char_u)'2'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_3CLICK,	(char_u)'3'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_4CLICK,	(char_u)'4'},
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
+#यदि defined(MACOS_X) || defined(FEAT_GUI_GTK)
     {MOD_MASK_CMD,		MOD_MASK_CMD,		(char_u)'D'},
 #endif
     // 'A' must be the last one
@@ -820,9 +820,9 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#define MOD_किल्ल्या_ENTRY_SIZE 5
 
-static char_u modifier_keys_table[] =
+स्थिर char_u modifier_किल्ल्या_table[] =
 {
 //  mod mask	    with modifier		without modifier
     MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
@@ -833,15 +833,15 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '*', '4',			'k', 'D',	// delete char
     MOD_MASK_SHIFT, '*', '5',			'k', 'L',	// delete line
     MOD_MASK_SHIFT, '*', '7',			'@', '7',	// end
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_END,	'@', '7',	// end
+    MOD_MASK_CTRL,  KS_EXTRA, (पूर्णाङ्क)KE_C_END,	'@', '7',	// end
     MOD_MASK_SHIFT, '*', '9',			'@', '9',	// exit
     MOD_MASK_SHIFT, '*', '0',			'@', '0',	// find
     MOD_MASK_SHIFT, '#', '1',			'%', '1',	// help
     MOD_MASK_SHIFT, '#', '2',			'k', 'h',	// home
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
+    MOD_MASK_CTRL,  KS_EXTRA, (पूर्णाङ्क)KE_C_HOME,	'k', 'h',	// home
     MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
     MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
+    MOD_MASK_CTRL,  KS_EXTRA, (पूर्णाङ्क)KE_C_डावा,	'k', 'l',	// left arrow
     MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
     MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
     MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
@@ -851,74 +851,74 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
     MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
     MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
+    MOD_MASK_CTRL,  KS_EXTRA, (पूर्णाङ्क)KE_C_उजवा,	'k', 'r',	// right arr.
     MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
     MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
     MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
     MOD_MASK_SHIFT, '!', '3',			'&', '8',	// undo
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_UP,	'k', 'u',	// up arrow
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_DOWN,	'k', 'd',	// down arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_UP,	'k', 'u',	// up arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_DOWN,	'k', 'd',	// down arrow
 
 								// vt100 F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF1,	KS_EXTRA, (int)KE_XF1,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF2,	KS_EXTRA, (int)KE_XF2,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF3,	KS_EXTRA, (int)KE_XF3,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF4,	KS_EXTRA, (int)KE_XF4,
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_XF1,	KS_EXTRA, (पूर्णाङ्क)KE_XF1,
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_XF2,	KS_EXTRA, (पूर्णाङ्क)KE_XF2,
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_XF3,	KS_EXTRA, (पूर्णाङ्क)KE_XF3,
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_XF4,	KS_EXTRA, (पूर्णाङ्क)KE_XF4,
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F1,	'k', '1',	// F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F2,	'k', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F3,	'k', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F4,	'k', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F5,	'k', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F6,	'k', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F7,	'k', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F8,	'k', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F9,	'k', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F10,	'k', ';',	// F10
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F1,	'k', '1',	// F1
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F2,	'k', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F3,	'k', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F4,	'k', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F5,	'k', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F6,	'k', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F7,	'k', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F8,	'k', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F9,	'k', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F10,	'k', ';',	// F10
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F11,	'F', '1',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F12,	'F', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F13,	'F', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F14,	'F', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F15,	'F', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F16,	'F', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F17,	'F', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F18,	'F', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F19,	'F', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F20,	'F', 'A',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F11,	'F', '1',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F12,	'F', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F13,	'F', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F14,	'F', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F15,	'F', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F16,	'F', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F17,	'F', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F18,	'F', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F19,	'F', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F20,	'F', 'A',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F21,	'F', 'B',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F22,	'F', 'C',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F23,	'F', 'D',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F24,	'F', 'E',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F25,	'F', 'F',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F26,	'F', 'G',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F27,	'F', 'H',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F28,	'F', 'I',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F29,	'F', 'J',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F30,	'F', 'K',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F21,	'F', 'B',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F22,	'F', 'C',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F23,	'F', 'D',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F24,	'F', 'E',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F25,	'F', 'F',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F26,	'F', 'G',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F27,	'F', 'H',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F28,	'F', 'I',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F29,	'F', 'J',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F30,	'F', 'K',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F31,	'F', 'L',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F32,	'F', 'M',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F33,	'F', 'N',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F34,	'F', 'O',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F35,	'F', 'P',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F36,	'F', 'Q',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F37,	'F', 'R',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F31,	'F', 'L',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F32,	'F', 'M',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F33,	'F', 'N',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F34,	'F', 'O',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F35,	'F', 'P',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F36,	'F', 'Q',
+    MOD_MASK_SHIFT, KS_EXTRA, (पूर्णाङ्क)KE_S_F37,	'F', 'R',
 
 							    // TAB pseudo code
-    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (int)KE_TAB,
+    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (पूर्णाङ्क)KE_TAB,
 
     NUL
 };
 
-static struct key_name_entry
+स्थिर संरचना किल्ली_name_entry
 {
-    int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    पूर्णाङ्क		enabled;	    // is this entry available (TRUE/FALSE)?
+    पूर्णाङ्क		किल्ली;		    // special key code or ascii value
     string_T	name;		    // name of key
-    int		is_alt;		    // is an alternative name
-} key_names_table[] =
+    पूर्णाङ्क		is_alt;		    // is an alternative name
+} किल्ली_names_table[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -932,7 +932,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_DEC
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_DEC_MOUSE, STR_LITERAL_INIT("DecMouse"), FALSE},
@@ -995,7 +995,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_JSB
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_JSBTERM_MOUSE, STR_LITERAL_INIT("JsbMouse"), FALSE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_डावा, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1041,7 +1041,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_NET
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_NETTERM_MOUSE, STR_LITERAL_INIT("NetMouse"), FALSE},
@@ -1057,12 +1057,12 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_PTERM
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_उजवा, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1076,7 +1076,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_EVAL
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_SNR, STR_LITERAL_INIT("SNR"), FALSE},
@@ -1088,7 +1088,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_URXVT
     TRUE,
-#else
+#अन्यथा
     FALSE,
 #endif
 	K_URXVT_MOUSE, STR_LITERAL_INIT("UrxvtMouse"), FALSE},
@@ -1119,80 +1119,80 @@ static struct key_name_entry
  * Return the modifier mask bit (MOD_MASK_*) which corresponds to the given
  * modifier name ('S' for Shift, 'C' for Ctrl etc).
  */
-    static int
-name_to_mod_mask(int c)
+    स्थिर पूर्णाङ्क
+name_to_mod_mask(पूर्णाङ्क c)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
     c = TOUPPER_ASC(c);
-    for (i = 0; mod_mask_table[i].mod_mask != 0; i++)
-	if (c == mod_mask_table[i].name)
-	    return mod_mask_table[i].mod_flag;
-    return 0;
+    प्रति (i = 0; mod_mask_table[i].mod_mask != 0; i++)
+	यदि (c == mod_mask_table[i].name)
+	    प्रत्यागम mod_mask_table[i].mod_flag;
+    प्रत्यागम 0;
 }
 
 /*
  * Check if if there is a special key code for "key" that includes the
  * modifiers specified.
  */
-    int
-simplify_key(int key, int *modifiers)
+    पूर्णाङ्क
+simplify_किल्ली(पूर्णाङ्क किल्ली, पूर्णाङ्क *modifiers)
 {
-    int	    i;
-    int	    key0;
-    int	    key1;
+    पूर्णाङ्क	    i;
+    पूर्णाङ्क	    key0;
+    पूर्णाङ्क	    key1;
 
-    if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+    यदि (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
+	प्रत्यागम किल्ली;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    यदि (किल्ली == TAB && (*modifiers & MOD_MASK_SHIFT))
     {
 	*modifiers &= ~MOD_MASK_SHIFT;
-	return K_S_TAB;
+	प्रत्यागम K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(किल्ली);
+    key1 = KEY2TERMCAP1(किल्ली);
+    प्रति (i = 0; modifier_किल्ल्या_table[i] != NUL; i += MOD_किल्ल्या_ENTRY_SIZE)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	यदि (key0 == modifier_किल्ल्या_table[i + 3]
+		&& key1 == modifier_किल्ल्या_table[i + 4]
+		&& (*modifiers & modifier_किल्ल्या_table[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_किल्ल्या_table[i];
+	    प्रत्यागम TERMCAP2_किल्ली(modifier_किल्ल्या_table[i + 1],
+		    modifier_किल्ल्या_table[i + 2]);
 	}
     }
-    return key;
+    प्रत्यागम किल्ली;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
-    int
-handle_x_keys(int key)
+    पूर्णाङ्क
+handle_x_किल्ल्या(पूर्णाङ्क किल्ली)
 {
-    switch (key)
+    विकल्प (किल्ली)
     {
-	case K_XUP:	return K_UP;
-	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
-	case K_XHOME:	return K_HOME;
-	case K_ZHOME:	return K_HOME;
-	case K_XEND:	return K_END;
-	case K_ZEND:	return K_END;
-	case K_XF1:	return K_F1;
-	case K_XF2:	return K_F2;
-	case K_XF3:	return K_F3;
-	case K_XF4:	return K_F4;
-	case K_S_XF1:	return K_S_F1;
-	case K_S_XF2:	return K_S_F2;
-	case K_S_XF3:	return K_S_F3;
-	case K_S_XF4:	return K_S_F4;
+	पक्ष K_XUP:	प्रत्यागम K_UP;
+	पक्ष K_XDOWN:	प्रत्यागम K_DOWN;
+	पक्ष K_XLEFT:	प्रत्यागम K_डावा;
+	पक्ष K_XRIGHT:	प्रत्यागम K_उजवा;
+	पक्ष K_XHOME:	प्रत्यागम K_HOME;
+	पक्ष K_ZHOME:	प्रत्यागम K_HOME;
+	पक्ष K_XEND:	प्रत्यागम K_END;
+	पक्ष K_ZEND:	प्रत्यागम K_END;
+	पक्ष K_XF1:	प्रत्यागम K_F1;
+	पक्ष K_XF2:	प्रत्यागम K_F2;
+	पक्ष K_XF3:	प्रत्यागम K_F3;
+	पक्ष K_XF4:	प्रत्यागम K_F4;
+	पक्ष K_S_XF1:	प्रत्यागम K_S_F1;
+	पक्ष K_S_XF2:	प्रत्यागम K_S_F2;
+	पक्ष K_S_XF3:	प्रत्यागम K_S_F3;
+	पक्ष K_S_XF4:	प्रत्यागम K_S_F4;
     }
-    return key;
+    प्रत्यागम किल्ली;
 }
 
 /*
@@ -1200,55 +1200,55 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_किल्ली_name(पूर्णाङ्क c, पूर्णाङ्क modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
-    int	    i, idx, len;
-    int	    table_idx;
+    स्थिर char_u string[MAX_किल्ली_NAME_LEN + 1];
+    पूर्णाङ्क	    i, idx, len;
+    पूर्णाङ्क	    table_idx;
 
     string[0] = '<';
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    यदि (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_किल्ली)
 	c = KEY2TERMCAP1(c);
 
     /*
      * Translate shifted special keys into unshifted keys and set modifier.
      * Same for CTRL and ALT modifiers.
      */
-    if (IS_SPECIAL(c))
+    यदि (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	प्रति (i = 0; modifier_किल्ल्या_table[i] != 0; i += MOD_किल्ल्या_ENTRY_SIZE)
+	    यदि (       KEY2TERMCAP0(c) == (पूर्णाङ्क)modifier_किल्ल्या_table[i + 1]
+		    && (पूर्णाङ्क)KEY2TERMCAP1(c) == (पूर्णाङ्क)modifier_किल्ल्या_table[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
-		break;
+		modifiers |= modifier_किल्ल्या_table[i];
+		c = TERMCAP2_किल्ली(modifier_किल्ल्या_table[i + 3],
+						   modifier_किल्ल्या_table[i + 4]);
+		भङ्ग;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    table_idx = find_special_किल्ली_in_table(c);
 
     /*
      * When not a known special key, and not a printable character, try to
      * extract modifiers.
      */
-    if (c > 0 && (*mb_char2len)(c) == 1)
+    यदि (c > 0 && (*mb_char2len)(c) == 1)
     {
-	if (table_idx < 0
+	यदि (table_idx < 0
 		&& (!vim_isprintc(c) || (c & 0x7f) == ' ')
 		&& (c & 0x80))
 	{
 	    c &= 0x7f;
 	    modifiers |= MOD_MASK_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    table_idx = find_special_किल्ली_in_table(c);
 	}
-	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
+	यदि (table_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
 	    c += '@';
 	    modifiers |= MOD_MASK_CTRL;
@@ -1256,17 +1256,17 @@ get_special_key_name(int c, int modifiers)
     }
 
     // translate the modifier into a string
-    for (i = 0; mod_mask_table[i].name != 'A'; i++)
-	if ((modifiers & mod_mask_table[i].mod_mask)
+    प्रति (i = 0; mod_mask_table[i].name != 'A'; i++)
+	यदि ((modifiers & mod_mask_table[i].mod_mask)
 						== mod_mask_table[i].mod_flag)
 	{
 	    string[idx++] = mod_mask_table[i].name;
 	    string[idx++] = (char_u)'-';
 	}
 
-    if (table_idx < 0)		// unknown special key, may output t_xx
+    यदि (table_idx < 0)		// unknown special key, may output t_xx
     {
-	if (IS_SPECIAL(c))
+	यदि (IS_SPECIAL(c))
 	{
 	    string[idx++] = 't';
 	    string[idx++] = '_';
@@ -1274,37 +1274,37 @@ get_special_key_name(int c, int modifiers)
 	    string[idx++] = KEY2TERMCAP1(c);
 	}
 	// Not a special key, only modifiers, output directly
-	else
+	अन्यथा
 	{
 	    len = (*mb_char2len)(c);
-	    if (len == 1 && vim_isprintc(c))
+	    यदि (len == 1 && vim_isprintc(c))
 		string[idx++] = c;
-	    else if (has_mbyte && len > 1)
+	    अन्यथा यदि (has_mbyte && len > 1)
 		idx += (*mb_char2bytes)(c, string + idx);
-	    else
+	    अन्यथा
 	    {
 		char_u	*s = transchar(c);
-		while (*s)
+		यावत् (*s)
 		    string[idx++] = *s++;
 	    }
 	}
     }
-    else		// use name of special key
+    अन्यथा		// use name of special key
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &किल्ली_names_table[table_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	यदि (s->length + idx + 2 <= MAX_किल्ली_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
-	    idx += (int)s->length;
+	    idx += (पूर्णाङ्क)s->length;
 	}
     }
     string[idx++] = '>';
     string[idx] = NUL;
 
-    return string;
+    प्रत्यागम string;
 }
 
 /*
@@ -1313,22 +1313,22 @@ get_special_key_name(int c, int modifiers)
  * If there is a match, "srcp" is advanced to after the <> name.
  * "dst[]" must be big enough to hold the result (up to six characters)!
  */
-    int
+    पूर्णाङ्क
 trans_special(
     char_u	**srcp,
     char_u	*dst,
-    int		flags,		// FSK_ values
-    int		escape_ks,	// escape K_SPECIAL bytes in the character
-    int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
+    पूर्णाङ्क		flags,		// FSK_ values
+    पूर्णाङ्क		escape_ks,	// escape K_SPECIAL bytes in the character
+    पूर्णाङ्क		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
-    int		modifiers = 0;
-    int		key;
+    पूर्णाङ्क		modifiers = 0;
+    पूर्णाङ्क		किल्ली;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
-	return 0;
+    किल्ली = find_special_किल्ली(srcp, &modifiers, flags, did_simplify);
+    यदि (किल्ली == 0)
+	प्रत्यागम 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    प्रत्यागम special_to_buf(किल्ली, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1338,33 +1338,33 @@ trans_special(
  * The sequence is not NUL terminated.
  * This is how characters in a string are encoded.
  */
-    int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+    पूर्णाङ्क
+special_to_buf(पूर्णाङ्क किल्ली, पूर्णाङ्क modifiers, पूर्णाङ्क escape_ks, char_u *dst)
 {
-    int		dlen = 0;
+    पूर्णाङ्क		dlen = 0;
 
     // Put the appropriate modifier in a string
-    if (modifiers != 0)
+    यदि (modifiers != 0)
     {
 	dst[dlen++] = K_SPECIAL;
 	dst[dlen++] = KS_MODIFIER;
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    यदि (IS_SPECIAL(किल्ली))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(किल्ली);
+	dst[dlen++] = KEY2TERMCAP1(किल्ली);
     }
-    else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
-    else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
-    else
-	dst[dlen++] = key;
+    अन्यथा यदि (escape_ks)
+	dlen = (पूर्णाङ्क)(add_char2buf(किल्ली, dst + dlen) - dst);
+    अन्यथा यदि (has_mbyte)
+	dlen += (*mb_char2bytes)(किल्ली, dst + dlen);
+    अन्यथा
+	dst[dlen++] = किल्ली;
 
-    return dlen;
+    प्रत्यागम dlen;
 }
 
 /*
@@ -1373,81 +1373,81 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * "srcp" is advanced to after the <> name.
  * returns 0 if there is no match.
  */
-    int
-find_special_key(
+    पूर्णाङ्क
+find_special_किल्ली(
     char_u	**srcp,
-    int		*modp,
-    int		flags,		// FSK_ values
-    int		*did_simplify)  // found <C-H> or <A-x>
+    पूर्णाङ्क		*modp,
+    पूर्णाङ्क		flags,		// FSK_ values
+    पूर्णाङ्क		*did_simplify)  // found <C-H> or <A-x>
 {
     char_u	*last_dash;
     char_u	*end_of_name;
     char_u	*src;
     char_u	*bp;
-    int		in_string = flags & FSK_IN_STRING;
-    int		modifiers;
-    int		bit;
-    int		key;
+    पूर्णाङ्क		in_string = flags & FSK_IN_STRING;
+    पूर्णाङ्क		modifiers;
+    पूर्णाङ्क		bit;
+    पूर्णाङ्क		किल्ली;
     uvarnumber_T	n;
-    int		l;
+    पूर्णाङ्क		l;
 
     src = *srcp;
-    if (src[0] != '<')
-	return 0;
-    if (src[1] == '*')	    // <*xxx>: do not simplify
+    यदि (src[0] != '<')
+	प्रत्यागम 0;
+    यदि (src[1] == '*')	    // <*xxx>: do not simplify
 	++src;
 
     // Find end of modifier list
     last_dash = src;
-    for (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
+    प्रति (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
     {
-	if (*bp == '-')
+	यदि (*bp == '-')
 	{
 	    last_dash = bp;
-	    if (bp[1] != NUL)
+	    यदि (bp[1] != NUL)
 	    {
-		if (has_mbyte)
+		यदि (has_mbyte)
 		    l = mb_ptr2len(bp + 1);
-		else
+		अन्यथा
 		    l = 1;
 		// Anything accepted, like <C-?>.
 		// <C-"> or <M-"> are not special in strings as " is
 		// the string delimiter. With a backslash it works: <M-\">
-		if (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
+		यदि (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
 		    bp += l;
-		else if (in_string && bp[1] == '\\' && bp[2] == '"'
+		अन्यथा यदि (in_string && bp[1] == '\\' && bp[2] == '"'
 							   && bp[3] == '>')
 		    bp += 2;
 	    }
 	}
-	if (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
+	यदि (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
 	    bp += 3;	// skip t_xx, xx may be '-' or '>'
-	else if (STRNICMP(bp, "char-", 5) == 0)
+	अन्यथा यदि (STRNICMP(bp, "char-", 5) == 0)
 	{
-	    vim_str2nr(bp + 5, NULL, &l, STR2NR_ALL, NULL, NULL, 0, TRUE, NULL);
-	    if (l == 0)
+	    vim_str2nr(bp + 5, रिक्त, &l, STR2NR_ALL, रिक्त, रिक्त, 0, TRUE, रिक्त);
+	    यदि (l == 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return 0;
+		प्रत्यागम 0;
 	    }
 	    bp += l + 5;
-	    break;
+	    भङ्ग;
 	}
     }
 
-    if (*bp == '>')	// found matching '>'
+    यदि (*bp == '>')	// found matching '>'
     {
 	end_of_name = bp + 1;
 
 	// Which modifiers are given?
 	modifiers = 0x0;
-	for (bp = src + 1; bp < last_dash; bp++)
+	प्रति (bp = src + 1; bp < last_dash; bp++)
 	{
-	    if (*bp != '-')
+	    यदि (*bp != '-')
 	    {
 		bit = name_to_mod_mask(*bp);
-		if (bit == 0x0)
-		    break;	// Illegal modifier name
+		यदि (bit == 0x0)
+		    भङ्ग;	// Illegal modifier name
 		modifiers |= bit;
 	    }
 	}
@@ -1455,39 +1455,39 @@ find_special_key(
 	/*
 	 * Legal modifier name.
 	 */
-	if (bp >= last_dash)
+	यदि (bp >= last_dash)
 	{
-	    if (STRNICMP(last_dash + 1, "char-", 5) == 0
+	    यदि (STRNICMP(last_dash + 1, "char-", 5) == 0
 						 && VIM_ISDIGIT(last_dash[6]))
 	    {
 		// <Char-123> or <Char-033> or <Char-0x33>
-		vim_str2nr(last_dash + 6, NULL, &l, STR2NR_ALL, NULL,
-							    &n, 0, TRUE, NULL);
-		if (l == 0)
+		vim_str2nr(last_dash + 6, रिक्त, &l, STR2NR_ALL, रिक्त,
+							    &n, 0, TRUE, रिक्त);
+		यदि (l == 0)
 		{
 		    emsg(_(e_invalid_argument));
-		    return 0;
+		    प्रत्यागम 0;
 		}
-		key = (int)n;
+		किल्ली = (पूर्णाङ्क)n;
 	    }
-	    else
+	    अन्यथा
 	    {
-		int off = 1;
+		पूर्णाङ्क off = 1;
 
 		// Modifier with single letter, or special key name.
-		if (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
+		यदि (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
 		    off = 2;
-		if (has_mbyte)
+		यदि (has_mbyte)
 		    l = mb_ptr2len(last_dash + off);
-		else
+		अन्यथा
 		    l = 1;
-		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
-		else
+		यदि (modifiers != 0 && last_dash[l + off] == '>')
+		    किल्ली = PTR2CHAR(last_dash + off);
+		अन्यथा
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    किल्ली = get_special_किल्ली_code(last_dash + off);
+		    यदि (!(flags & FSK_KEEP_X_किल्ली))
+			किल्ली = handle_x_किल्ल्या(किल्ली);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    यदि (किल्ली != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		किल्ली = simplify_किल्ली(किल्ली, &modifiers);
 
-		if ((flags & FSK_KEYCODE) == 0)
+		यदि ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    यदि (किल्ली == K_BS)
+			किल्ली = BS;
+		    अन्यथा यदि (किल्ली == K_DEL || किल्ली == K_KDEL)
+			किल्ली = DEL;
 		}
-		else if (key == 27
+		अन्यथा यदि (किल्ली == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1520,27 +1520,27 @@ find_special_key(
 		    // Esc character.  For the simplified keys use the Esc
 		    // character and set did_simplify, then in the
 		    // non-simplified keys use K_ESC.
-		    if ((flags & FSK_SIMPLIFY) != 0)
+		    यदि ((flags & FSK_SIMPLIFY) != 0)
 		    {
-			if (did_simplify != NULL)
+			यदि (did_simplify != रिक्त)
 			    *did_simplify = TRUE;
 		    }
-		    else
-			key = K_ESC;
+		    अन्यथा
+			किल्ली = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		यदि (!IS_SPECIAL(किल्ली))
+		    किल्ली = extract_modifiers(किल्ली, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
 		*srcp = end_of_name;
-		return key;
+		प्रत्यागम किल्ली;
 	    }
 	}
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
 
@@ -1554,33 +1554,33 @@ find_special_key(
  * use "H".
  * Returns the possibly adjusted key.
  */
-    int
-may_adjust_key_for_ctrl(int modifiers, int key)
+    पूर्णाङ्क
+may_adjust_किल्ली_for_ctrl(पूर्णाङ्क modifiers, पूर्णाङ्क किल्ली)
 {
-    if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+    यदि ((modifiers & MOD_MASK_CTRL) == 0)
+	प्रत्यागम किल्ली;
 
-    if (ASCII_ISALPHA(key))
+    यदि (ASCII_ISALPHA(किल्ली))
     {
 #ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
+	check_no_reduce_किल्ल्या();  // may update the no_reduce_keys flag
 #endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+	प्रत्यागम no_reduce_किल्ल्या == 0 ? TOUPPER_ASC(किल्ली) : किल्ली;
     }
-    if (key == '2')
-	return '@';
-    if (key == '6')
-	return '^';
-    if (key == '-')
-	return '_';
+    यदि (किल्ली == '2')
+	प्रत्यागम '@';
+    यदि (किल्ली == '6')
+	प्रत्यागम '^';
+    यदि (किल्ली == '-')
+	प्रत्यागम '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
-	return ']';
+    यदि (किल्ली == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
+	प्रत्यागम ']';
 
-    return key;
+    प्रत्यागम किल्ली;
 }
 
 /*
@@ -1591,27 +1591,27 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * This includes all printable ASCII characters except a-z.
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
-    int
-may_remove_shift_modifier(int modifiers, int key)
+    पूर्णाङ्क
+may_remove_shift_modifier(पूर्णाङ्क modifiers, पूर्णाङ्क किल्ली)
 {
-    if ((modifiers == MOD_MASK_SHIFT
+    यदि ((modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 #ifdef FEAT_GUI_GTK
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
 #endif
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
-	return modifiers & ~MOD_MASK_SHIFT;
+	    && ((किल्ली >= '!' && किल्ली <= '/')
+		|| (किल्ली >= ':' && किल्ली <= 'Z')
+		|| vim_isdigit(किल्ली)
+		|| (किल्ली >= '[' && किल्ली <= '`')
+		|| (किल्ली >= '{' && किल्ली <= '~')))
+	प्रत्यागम modifiers & ~MOD_MASK_SHIFT;
 
-    if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
-	return modifiers & ~MOD_MASK_SHIFT;
+    यदि (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
+		&& (किल्ली == '{' || किल्ली == '}' || किल्ली == '|'))
+	प्रत्यागम modifiers & ~MOD_MASK_SHIFT;
 
-    return modifiers;
+    प्रत्यागम modifiers;
 }
 
 /*
@@ -1621,73 +1621,73 @@ may_remove_shift_modifier(int modifiers, int key)
  * When "simplify" is TRUE and Ctrl or Alt is removed from modifiers set
  * "did_simplify" when it's not NULL.
  */
-    int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+    पूर्णाङ्क
+extract_modifiers(पूर्णाङ्क किल्ली, पूर्णाङ्क *modp, पूर्णाङ्क simplify, पूर्णाङ्क *did_simplify)
 {
-    int	modifiers = *modp;
+    पूर्णाङ्क	modifiers = *modp;
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    यदि (!(modifiers & MOD_MASK_CMD))
 #endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    यदि ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(किल्ली))
     {
-	key = TOUPPER_ASC(key);
+	किल्ली = TOUPPER_ASC(किल्ली);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
-	if (simplify || modifiers == MOD_MASK_SHIFT
+	यदि (simplify || modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
 	    modifiers &= ~MOD_MASK_SHIFT;
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    यदि ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(किल्ली))
+	किल्ली = TOUPPER_ASC(किल्ली);
 
-    if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+    यदि (simplify && (modifiers & MOD_MASK_CTRL)
+	    && ((किल्ली >= '?' && किल्ली <= '_') || ASCII_ISALPHA(किल्ली)))
     {
-	key = Ctrl_chr(key);
+	किल्ली = Ctrl_chr(किल्ली);
 	modifiers &= ~MOD_MASK_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
-	if (did_simplify != NULL)
+	यदि (किल्ली == NUL)
+	    किल्ली = K_ZERO;
+	यदि (did_simplify != रिक्त)
 	    *did_simplify = TRUE;
     }
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    यदि (!(modifiers & MOD_MASK_CMD))
 #endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    यदि (simplify && (modifiers & MOD_MASK_ALT) && किल्ली < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
+	किल्ली |= 0x80;
 	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
-	if (did_simplify != NULL)
+	यदि (did_simplify != रिक्त)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    प्रत्यागम किल्ली;
 }
 
 /*
  * Try to find key "c" in the special key table.
  * Return the index when found, -1 when not found.
  */
-    int
-find_special_key_in_table(int c)
+    पूर्णाङ्क
+find_special_किल्ली_in_table(पूर्णाङ्क c)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    प्रति (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(किल्ली_names_table); i++)
+	यदि (c == किल्ली_names_table[i].किल्ली && !किल्ली_names_table[i].is_alt)
+	    प्रत्यागम किल्ली_names_table[i].enabled ? i : -1;
 
-    return -1;
+    प्रत्यागम -1;
 }
 
 
@@ -1700,38 +1700,38 @@ find_special_key_in_table(int c)
  * 'LeftMouse'.
  * These characters are identified by vim_isNormalIDc().
  */
-    static int
-cmp_key_name_entry(const void *a, const void *b)
+    स्थिर पूर्णाङ्क
+cmp_किल्ली_name_entry(ध्रुव शून्य *a, ध्रुव शून्य *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
-    int	    result = 0;
+    char_u  *p1 = ((संरचना किल्ली_name_entry *)a)->name.string;
+    char_u  *p2 = ((संरचना किल्ली_name_entry *)b)->name.string;
+    पूर्णाङ्क	    result = 0;
 
-    if (p1 == p2)
-	return 0;
+    यदि (p1 == p2)
+	प्रत्यागम 0;
 
-    while (vim_isNormalIDc(*p1) && *p2 != NUL)
+    यावत् (vim_isNormalIDc(*p1) && *p2 != NUL)
     {
-	if ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
-	    break;
+	यदि ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
+	    भङ्ग;
 	++p1;
 	++p2;
     }
 
-    if (result == 0)
+    यदि (result == 0)
     {
-	if (*p2 == NUL)
+	यदि (*p2 == NUL)
 	{
-	    if (vim_isNormalIDc(*p1))
+	    यदि (vim_isNormalIDc(*p1))
 		result = 1;
 	}
-	else
+	अन्यथा
 	{
 	    result = -1;
 	}
     }
 
-    return result;
+    प्रत्यागम result;
 }
 
 /*
@@ -1741,99 +1741,99 @@ cmp_key_name_entry(const void *a, const void *b)
  * termcap name.
  * Return the key code, or 0 if not found.
  */
-    int
-get_special_key_code(char_u *name)
+    पूर्णाङ्क
+get_special_किल्ली_code(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
      */
-    if (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
+    यदि (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
     {
 	char_u  string[3];
 
 	string[0] = name[2];
 	string[1] = name[3];
 	string[2] = NUL;
-	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	यदि (add_termcap_entry(string, FALSE) == OK)
+	    प्रत्यागम TERMCAP2_किल्ली(name[2], name[3]);
     }
-    else
+    अन्यथा
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	संरचना किल्ली_name_entry	target;
+	संरचना किल्ली_name_entry	*entry;
 
 	target.enabled = TRUE;
-	target.key = 0;
+	target.किल्ली = 0;
 	target.name.string = name;
 	target.name.length = 0;
 
-	entry = (struct key_name_entry *)bsearch(
+	entry = (संरचना किल्ली_name_entry *)bsearch(
 	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
-	if (entry != NULL && entry->enabled)
+	    &किल्ली_names_table,
+	    ARRAY_LENGTH(किल्ली_names_table),
+	    परिमाण(किल्ली_names_table[0]),
+	    cmp_किल्ली_name_entry);
+	यदि (entry != रिक्त && entry->enabled)
 	{
-	    int key = entry->key;
+	    पूर्णाङ्क किल्ली = entry->किल्ली;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    प्रत्यागम किल्ली == K_TAB ? TAB : किल्ली;
 	}
     }
 
-    return 0;
+    प्रत्यागम 0;
 }
 
     char_u *
-get_key_name(int i)
+get_किल्ली_name(पूर्णाङ्क i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
-	return NULL;
+    यदि (i < 0 || i >= (पूर्णाङ्क)ARRAY_LENGTH(किल्ली_names_table))
+	प्रत्यागम रिक्त;
 
-    return key_names_table[i].name.string;
+    प्रत्यागम किल्ली_names_table[i].name.string;
 }
 
 /*
  * Return the current end-of-line type: EOL_DOS, EOL_UNIX or EOL_MAC.
  */
-    int
+    पूर्णाङ्क
 get_fileformat(buf_T *buf)
 {
-    int		c = *buf->b_p_ff;
+    पूर्णाङ्क		c = *buf->b_p_ff;
 
-    if (buf->b_p_bin || c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    यदि (buf->b_p_bin || c == 'u')
+	प्रत्यागम EOL_UNIX;
+    यदि (c == 'm')
+	प्रत्यागम EOL_MAC;
+    प्रत्यागम EOL_DOS;
 }
 
 /*
  * Like get_fileformat(), but override 'fileformat' with "p" for "++opt=val"
  * argument.
  */
-    int
+    पूर्णाङ्क
 get_fileformat_force(
     buf_T	*buf,
     exarg_T	*eap)	    // can be NULL!
 {
-    int		c;
+    पूर्णाङ्क		c;
 
-    if (eap != NULL && eap->force_ff != 0)
+    यदि (eap != रिक्त && eap->force_ff != 0)
 	c = eap->force_ff;
-    else
+    अन्यथा
     {
-	if ((eap != NULL && eap->force_bin != 0)
+	यदि ((eap != रिक्त && eap->force_bin != 0)
 			       ? (eap->force_bin == FORCE_BIN) : buf->b_p_bin)
-	    return EOL_UNIX;
+	    प्रत्यागम EOL_UNIX;
 	c = *buf->b_p_ff;
     }
-    if (c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    यदि (c == 'u')
+	प्रत्यागम EOL_UNIX;
+    यदि (c == 'm')
+	प्रत्यागम EOL_MAC;
+    प्रत्यागम EOL_DOS;
 }
 
 /*
@@ -1841,36 +1841,36 @@ get_fileformat_force(
  * Sets both 'textmode' and 'fileformat'.
  * Note: Does _not_ set global value of 'textmode'!
  */
-    void
+    शून्य
 set_fileformat(
-    int		t,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    पूर्णाङ्क		t,
+    पूर्णाङ्क		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    char	*p = NULL;
+    वर्ण	*p = रिक्त;
 
-    switch (t)
+    विकल्प (t)
     {
-    case EOL_DOS:
+    पक्ष EOL_DOS:
 	p = FF_DOS;
 	curbuf->b_p_tx = TRUE;
-	break;
-    case EOL_UNIX:
+	भङ्ग;
+    पक्ष EOL_UNIX:
 	p = FF_UNIX;
 	curbuf->b_p_tx = FALSE;
-	break;
-    case EOL_MAC:
+	भङ्ग;
+    पक्ष EOL_MAC:
 	p = FF_MAC;
 	curbuf->b_p_tx = FALSE;
-	break;
+	भङ्ग;
     }
-    if (p != NULL)
+    यदि (p != रिक्त)
 	set_string_option_direct((char_u *)"ff", -1, (char_u *)p,
 						     OPT_FREE | opt_flags, 0);
 
     // This may cause the buffer to become (un)modified.
     check_status(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#यदि defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
     need_maketitle = TRUE;	    // set window title later
@@ -1879,48 +1879,48 @@ set_fileformat(
 /*
  * Return the default fileformat from 'fileformats'.
  */
-    int
-default_fileformat(void)
+    पूर्णाङ्क
+default_fileformat(शून्य)
 {
-    switch (*p_ffs)
+    विकल्प (*p_ffs)
     {
-	case 'm':   return EOL_MAC;
-	case 'd':   return EOL_DOS;
+	पक्ष 'm':   प्रत्यागम EOL_MAC;
+	पक्ष 'd':   प्रत्यागम EOL_DOS;
     }
-    return EOL_UNIX;
+    प्रत्यागम EOL_UNIX;
 }
 
 /*
  * Call shell.	Calls mch_call_shell, with 'shellxquote' added.
  */
-    int
-call_shell(char_u *cmd, int opt)
+    पूर्णाङ्क
+call_shell(char_u *cmd, पूर्णाङ्क opt)
 {
-    int		retval;
+    पूर्णाङ्क		retval;
 #ifdef FEAT_PROFILE
     proftime_T	wait_time;
 #endif
 
-    if (p_verbose > 3)
+    यदि (p_verbose > 3)
     {
 	verbose_enter();
-	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	smsg(_("Calling shell to execute: \"%s\""), cmd == रिक्त ? p_sh : cmd);
+	संदेश_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    यदि (do_profiling == PROF_YES)
 	prof_child_enter(&wait_time);
 #endif
 
-    if (*p_sh == NUL)
+    यदि (*p_sh == NUL)
     {
 	emsg(_(e_shell_option_is_empty));
 	retval = -1;
     }
-    else
+    अन्यथा
     {
 #ifdef FEAT_GUI_MSWIN
 	// Don't hide the pointer while executing a shell command.
@@ -1932,35 +1932,35 @@ call_shell(char_u *cmd, int opt)
 	// The external command may update a tags file, clear cached tags.
 	tag_freematch();
 
-	if (cmd == NULL || *p_sxq == NUL)
+	यदि (cmd == रिक्त || *p_sxq == NUL)
 	    retval = mch_call_shell(cmd, opt);
-	else
+	अन्यथा
 	{
 	    char_u  *ncmd;
 	    size_t  ncmdsize;
 	    char_u  *ecmd = cmd;
 
-	    if (*p_sxe != NUL && *p_sxq == '(')
+	    यदि (*p_sxe != NUL && *p_sxq == '(')
 	    {
 		ecmd = vim_strsave_escaped_ext(cmd, p_sxe, '^', FALSE);
-		if (ecmd == NULL)
+		यदि (ecmd == रिक्त)
 		    ecmd = cmd;
 	    }
 	    ncmdsize = STRLEN(ecmd) + STRLEN(p_sxq) * 2 + 1;
 	    ncmd = alloc(ncmdsize);
-	    if (ncmd != NULL)
+	    यदि (ncmd != रिक्त)
 	    {
 		// When 'shellxquote' is ( append ).
 		// When 'shellxquote' is "( append )".
-		vim_snprintf((char *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
+		vim_snprintf((वर्ण *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
 		    : *p_sxq == '"' && *(p_sxq+1) == '(' ? (char_u *)")\""
 		    : p_sxq);
 		retval = mch_call_shell(ncmd, opt);
 		vim_free(ncmd);
 	    }
-	    else
+	    अन्यथा
 		retval = -1;
-	    if (ecmd != cmd)
+	    यदि (ecmd != cmd)
 		vim_free(ecmd);
 	}
 #ifdef FEAT_GUI
@@ -1976,12 +1976,12 @@ call_shell(char_u *cmd, int opt)
 #ifdef FEAT_EVAL
     set_vim_var_nr(VV_SHELL_ERROR, (long)retval);
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    यदि (do_profiling == PROF_YES)
 	prof_child_exit(&wait_time);
 # endif
 #endif
 
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
@@ -1989,21 +1989,21 @@ call_shell(char_u *cmd, int opt)
  * equal to MODE_NORMAL State with a condition.  This function returns the real
  * State.
  */
-    int
-get_real_state(void)
+    पूर्णाङ्क
+get_real_state(शून्य)
 {
-    if (State & MODE_NORMAL)
+    यदि (State & MODE_NORMAL)
     {
-	if (VIsual_active)
+	यदि (VIsual_active)
 	{
-	    if (VIsual_select)
-		return MODE_SELECT;
-	    return MODE_VISUAL;
+	    यदि (VIsual_select)
+		प्रत्यागम MODE_SELECT;
+	    प्रत्यागम MODE_VISUAL;
 	}
-	else if (finish_op)
-	    return MODE_OP_PENDING;
+	अन्यथा यदि (finish_op)
+	    प्रत्यागम MODE_OP_PENDING;
     }
-    return State;
+    प्रत्यागम State;
 }
 
 /*
@@ -2011,10 +2011,10 @@ get_real_state(void)
  * Takes care of multi-byte characters.
  * "b" must point to the start of the file name
  */
-    int
+    पूर्णाङ्क
 after_pathsep(char_u *b, char_u *p)
 {
-    return p > b && vim_ispathsep(p[-1])
+    प्रत्यागम p > b && vim_ispathsep(p[-1])
 			     && (!has_mbyte || (*mb_head_off)(b, p - 1) == 0);
 }
 
@@ -2022,7 +2022,7 @@ after_pathsep(char_u *b, char_u *p)
  * Return TRUE if file names "f1" and "f2" are in the same directory.
  * "f1" may be a short name, "f2" must be a full path.
  */
-    int
+    पूर्णाङ्क
 same_directory(char_u *f1, char_u *f2)
 {
     char_u	ffname[MAXPATHL];
@@ -2030,17 +2030,17 @@ same_directory(char_u *f1, char_u *f2)
     char_u	*t2;
 
     // safety check
-    if (f1 == NULL || f2 == NULL)
-	return FALSE;
+    यदि (f1 == रिक्त || f2 == रिक्त)
+	प्रत्यागम FALSE;
 
-    (void)vim_FullName(f1, ffname, MAXPATHL, FALSE);
+    (शून्य)vim_FullName(f1, ffname, MAXPATHL, FALSE);
     t1 = gettail_sep(ffname);
     t2 = gettail_sep(f2);
-    return (t1 - ffname == t2 - f2
-	     && pathcmp((char *)ffname, (char *)f2, (int)(t1 - ffname)) == 0);
+    प्रत्यागम (t1 - ffname == t2 - f2
+	     && pathcmp((वर्ण *)ffname, (वर्ण *)f2, (पूर्णाङ्क)(t1 - ffname)) == 0);
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
+#यदि defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
 	|| defined(MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_NETBEANS_INTG)
 /*
@@ -2048,72 +2048,72 @@ same_directory(char_u *f1, char_u *f2)
  * Caller must call shorten_fnames()!
  * Return OK or FAIL.
  */
-    int
-vim_chdirfile(char_u *fname, char *trigger_autocmd)
+    पूर्णाङ्क
+vim_chdirfile(char_u *fname, वर्ण *trigger_autocmd)
 {
     char_u	old_dir[MAXPATHL];
     char_u	new_dir[MAXPATHL];
 
-    if (mch_dirname(old_dir, MAXPATHL) != OK)
+    यदि (mch_dirname(old_dir, MAXPATHL) != OK)
 	*old_dir = NUL;
 
     vim_strncpy(new_dir, fname, MAXPATHL - 1);
     *gettail_sep(new_dir) = NUL;
 
-    if (pathcmp((char *)old_dir, (char *)new_dir, -1) == 0)
+    यदि (pathcmp((वर्ण *)old_dir, (वर्ण *)new_dir, -1) == 0)
 	// nothing to do
-	return OK;
+	प्रत्यागम OK;
 
-    if (trigger_autocmd != NULL)
+    यदि (trigger_autocmd != रिक्त)
 	trigger_DirChangedPre((char_u *)trigger_autocmd, new_dir);
 
-    if (mch_chdir((char *)new_dir) != 0)
-	return FAIL;
+    यदि (mch_chdir((वर्ण *)new_dir) != 0)
+	प्रत्यागम FAIL;
 
-    if (trigger_autocmd != NULL)
+    यदि (trigger_autocmd != रिक्त)
 	apply_autocmds(EVENT_DIRCHANGED, (char_u *)trigger_autocmd,
 						       new_dir, FALSE, curbuf);
-    return OK;
+    प्रत्यागम OK;
 }
 #endif
 
-#if defined(STAT_IGNORES_SLASH)
+#यदि defined(STAT_IGNORES_SLASH)
 /*
  * Check if "name" ends in a slash and is not a directory.
  * Used for systems where stat() ignores a trailing slash on a file name.
  * The Vim code assumes a trailing slash is only ignored for a directory.
  */
-    static int
-illegal_slash(const char *name)
+    स्थिर पूर्णाङ्क
+illegal_slash(ध्रुव वर्ण *name)
 {
-    if (name[0] == NUL)
-	return FALSE;	    // no file name is not illegal
-    if (name[strlen(name) - 1] != '/')
-	return FALSE;	    // no trailing slash
-    if (mch_isdir((char_u *)name))
-	return FALSE;	    // trailing slash for a directory
-    return TRUE;
+    यदि (name[0] == NUL)
+	प्रत्यागम FALSE;	    // no file name is not illegal
+    यदि (name[strlen(name) - 1] != '/')
+	प्रत्यागम FALSE;	    // no trailing slash
+    यदि (mch_isdir((char_u *)name))
+	प्रत्यागम FALSE;	    // trailing slash for a directory
+    प्रत्यागम TRUE;
 }
 
 /*
  * Special implementation of mch_stat() for Solaris.
  */
-    int
-vim_stat(const char *name, stat_T *stp)
+    पूर्णाङ्क
+vim_stat(ध्रुव वर्ण *name, stat_T *stp)
 {
     // On Solaris stat() accepts "file/" as if it was "file".  Return -1 if
     // the name ends in "/" and it's not a directory.
-    return illegal_slash(name) ? -1 : stat(name, stp);
+    प्रत्यागम illegal_slash(name) ? -1 : stat(name, stp);
 }
 #endif
 
-#if defined(CURSOR_SHAPE)
+#यदि defined(CURSOR_SHAPE)
 
 /*
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_table[SHAPE_IDX_मोजणी] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2142,7 +2142,7 @@ cursorentry_T shape_table[SHAPE_IDX_COUNT] =
  * Table with names for mouse shapes.  Keep in sync with all the tables for
  * mch_set_mouse_shape()!.
  */
-static string_T mshape_names[] =
+स्थिर string_T mshape_names[] =
 {
     STR_LITERAL_INIT("arrow"),	// default, must be the first one
     STR_LITERAL_INIT("blank"),	// hidden
@@ -2160,10 +2160,10 @@ static string_T mshape_names[] =
     STR_LITERAL_INIT("question"),
     STR_LITERAL_INIT("rightup-arrow"),
     STR_LITERAL_INIT("up-arrow"),
-    {NULL, 0}
+    {रिक्त, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_NAMES_मोजणी  (ARRAY_LENGTH(mshape_names) - 1)
 # endif
 
 /*
@@ -2171,88 +2171,88 @@ static string_T mshape_names[] =
  * ("what" is SHAPE_MOUSE).
  * Returns error message for an illegal option, NULL otherwise.
  */
-    char *
-parse_shape_opt(int what)
+    वर्ण *
+parse_shape_opt(पूर्णाङ्क what)
 {
     char_u	*modep;
     char_u	*colonp;
     char_u	*commap;
     char_u	*slashp;
     char_u	*p, *endp;
-    int		idx = 0;		// init for GCC
-    int		all_idx;
-    int		len;
-    int		i;
+    पूर्णाङ्क		idx = 0;		// init for GCC
+    पूर्णाङ्क		all_idx;
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		i;
     long	n;
-    int		found_ve = FALSE;	// found "ve" flag
-    int		round;
+    पूर्णाङ्क		found_ve = FALSE;	// found "ve" flag
+    पूर्णाङ्क		round;
 
     /*
      * First round: check for errors; second round: do it for real.
      */
-    for (round = 1; round <= 2; ++round)
+    प्रति (round = 1; round <= 2; ++round)
     {
 	/*
 	 * Repeat for all comma separated parts.
 	 */
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	यदि (what == SHAPE_MOUSE)
 	    modep = p_mouseshape;
-	else
+	अन्यथा
 # endif
 	    modep = p_guicursor;
-	while (*modep != NUL)
+	यावत् (*modep != NUL)
 	{
 	    colonp = vim_strchr(modep, ':');
 	    commap = vim_strchr(modep, ',');
 
-	    if (colonp == NULL || (commap != NULL && commap < colonp))
-		return e_missing_colon_2;
-	    if (colonp == modep)
-		return e_illegal_mode;
+	    यदि (colonp == रिक्त || (commap != रिक्त && commap < colonp))
+		प्रत्यागम e_missing_colon_2;
+	    यदि (colonp == modep)
+		प्रत्यागम e_illegal_mode;
 
 	    /*
 	     * Repeat for all mode's before the colon.
 	     * For the 'a' mode, we loop to handle all the modes.
 	     */
 	    all_idx = -1;
-	    while (modep < colonp || all_idx >= 0)
+	    यावत् (modep < colonp || all_idx >= 0)
 	    {
-		if (all_idx < 0)
+		यदि (all_idx < 0)
 		{
 		    // Find the mode.
-		    if (modep[1] == '-' || modep[1] == ':')
+		    यदि (modep[1] == '-' || modep[1] == ':')
 			len = 1;
-		    else
+		    अन्यथा
 			len = 2;
-		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
-		    else
+		    यदि (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
+			all_idx = SHAPE_IDX_मोजणी - 1;
+		    अन्यथा
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
-			    if (STRNICMP(modep, shape_table[idx].name, len)
+			प्रति (idx = 0; idx < SHAPE_IDX_मोजणी; ++idx)
+			    यदि (STRNICMP(modep, shape_table[idx].name, len)
 									 == 0)
-				break;
-			if (idx == SHAPE_IDX_COUNT
+				भङ्ग;
+			यदि (idx == SHAPE_IDX_मोजणी
 				   || (shape_table[idx].used_for & what) == 0)
-			    return e_illegal_mode;
-			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
+			    प्रत्यागम e_illegal_mode;
+			यदि (len == 2 && modep[0] == 'v' && modep[1] == 'e')
 			    found_ve = TRUE;
 		    }
 		    modep += len + 1;
 		}
 
-		if (all_idx >= 0)
+		यदि (all_idx >= 0)
 		    idx = all_idx--;
-		else if (round == 2)
+		अन्यथा यदि (round == 2)
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    यदि (what == SHAPE_MOUSE)
 		    {
 			// Set the default, for the missing parts
 			shape_table[idx].mshape = 0;
 		    }
-		    else
+		    अन्यथा
 # endif
 		    {
 			// Set the defaults, for the missing parts
@@ -2264,34 +2264,34 @@ parse_shape_opt(int what)
 		}
 
 		// Parse the part after the colon
-		for (p = colonp + 1; *p && *p != ','; )
+		प्रति (p = colonp + 1; *p && *p != ','; )
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    यदि (what == SHAPE_MOUSE)
 		    {
-			for (i = 0; ; ++i)
+			प्रति (i = 0; ; ++i)
 			{
-			    if (mshape_names[i].string == NULL)
+			    यदि (mshape_names[i].string == रिक्त)
 			    {
-				if (!VIM_ISDIGIT(*p))
-				    return e_illegal_mouseshape;
-				if (round == 2)
+				यदि (!VIM_ISDIGIT(*p))
+				    प्रत्यागम e_illegal_mouseshape;
+				यदि (round == 2)
 				    shape_table[idx].mshape =
 					      getdigits(&p) + MSHAPE_NUMBERED;
-				else
-				    (void)getdigits(&p);
-				break;
+				अन्यथा
+				    (शून्य)getdigits(&p);
+				भङ्ग;
 			    }
-			    if (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
+			    यदि (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
 			    {
-				if (round == 2)
+				यदि (round == 2)
 				    shape_table[idx].mshape = i;
 				p += mshape_names[i].length;
-				break;
+				भङ्ग;
 			    }
 			}
 		    }
-		    else // if (what == SHAPE_MOUSE)
+		    अन्यथा // if (what == SHAPE_MOUSE)
 # endif
 		    {
 			/*
@@ -2299,99 +2299,99 @@ parse_shape_opt(int what)
 			 */
 			i = *p;
 			len = 0;
-			if (STRNICMP(p, "ver", 3) == 0)
+			यदि (STRNICMP(p, "ver", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "hor", 3) == 0)
+			अन्यथा यदि (STRNICMP(p, "hor", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "blinkwait", 9) == 0)
+			अन्यथा यदि (STRNICMP(p, "blinkwait", 9) == 0)
 			    len = 9;
-			else if (STRNICMP(p, "blinkon", 7) == 0)
+			अन्यथा यदि (STRNICMP(p, "blinkon", 7) == 0)
 			    len = 7;
-			else if (STRNICMP(p, "blinkoff", 8) == 0)
+			अन्यथा यदि (STRNICMP(p, "blinkoff", 8) == 0)
 			    len = 8;
-			if (len != 0)
+			यदि (len != 0)
 			{
 			    p += len;
-			    if (!VIM_ISDIGIT(*p))
-				return e_digit_expected;
+			    यदि (!VIM_ISDIGIT(*p))
+				प्रत्यागम e_digit_expected;
 			    n = getdigits(&p);
-			    if (len == 3)   // "ver" or "hor"
+			    यदि (len == 3)   // "ver" or "hor"
 			    {
-				if (n == 0)
-				    return e_illegal_percentage;
-				if (round == 2)
+				यदि (n == 0)
+				    प्रत्यागम e_illegal_percentage;
+				यदि (round == 2)
 				{
-				    if (TOLOWER_ASC(i) == 'v')
+				    यदि (TOLOWER_ASC(i) == 'v')
 					shape_table[idx].shape = SHAPE_VER;
-				    else
+				    अन्यथा
 					shape_table[idx].shape = SHAPE_HOR;
 				    shape_table[idx].percentage = n;
 				}
 			    }
-			    else if (round == 2)
+			    अन्यथा यदि (round == 2)
 			    {
-				if (len == 9)
+				यदि (len == 9)
 				    shape_table[idx].blinkwait = n;
-				else if (len == 7)
+				अन्यथा यदि (len == 7)
 				    shape_table[idx].blinkon = n;
-				else
+				अन्यथा
 				    shape_table[idx].blinkoff = n;
 			    }
 			}
-			else if (STRNICMP(p, "block", 5) == 0)
+			अन्यथा यदि (STRNICMP(p, "block", 5) == 0)
 			{
-			    if (round == 2)
+			    यदि (round == 2)
 				shape_table[idx].shape = SHAPE_BLOCK;
 			    p += 5;
 			}
-			else	// must be a highlight group name then
+			अन्यथा	// must be a highlight group name then
 			{
 			    endp = vim_strchr(p, '-');
-			    if (commap == NULL)		    // last part
+			    यदि (commap == रिक्त)		    // last part
 			    {
-				if (endp == NULL)
+				यदि (endp == रिक्त)
 				    endp = p + STRLEN(p);   // find end of part
 			    }
-			    else if (endp > commap || endp == NULL)
+			    अन्यथा यदि (endp > commap || endp == रिक्त)
 				endp = commap;
 			    slashp = vim_strchr(p, '/');
-			    if (slashp != NULL && slashp < endp)
+			    यदि (slashp != रिक्त && slashp < endp)
 			    {
 				// "group/langmap_group"
-				i = syn_check_group(p, (int)(slashp - p));
+				i = syn_check_group(p, (पूर्णाङ्क)(slashp - p));
 				p = slashp + 1;
 			    }
-			    if (round == 2)
+			    यदि (round == 2)
 			    {
 				shape_table[idx].id = syn_check_group(p,
-							     (int)(endp - p));
+							     (पूर्णाङ्क)(endp - p));
 				shape_table[idx].id_lm = shape_table[idx].id;
-				if (slashp != NULL && slashp < endp)
+				यदि (slashp != रिक्त && slashp < endp)
 				    shape_table[idx].id = i;
 			    }
 			    p = endp;
 			}
 		    } // if (what != SHAPE_MOUSE)
 
-		    if (*p == '-')
+		    यदि (*p == '-')
 			++p;
 		}
 	    }
 	    modep = p;
-	    if (*modep == ',')
+	    यदि (*modep == ',')
 		++modep;
 	}
     }
 
     // If the 's' flag is not given, use the 'v' cursor for 's'
-    if (!found_ve)
+    यदि (!found_ve)
     {
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	यदि (what == SHAPE_MOUSE)
 	{
 	    shape_table[SHAPE_IDX_VE].mshape = shape_table[SHAPE_IDX_V].mshape;
 	}
-	else
+	अन्यथा
 # endif
 	{
 	    shape_table[SHAPE_IDX_VE].shape = shape_table[SHAPE_IDX_V].shape;
@@ -2408,65 +2408,65 @@ parse_shape_opt(int what)
 	}
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
-# if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
+# यदि defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
 	|| defined(FEAT_MOUSESHAPE)
 /*
  * Return the index into shape_table[] for the current mode.
  * When "mouse" is TRUE, consider indexes valid for the mouse pointer.
  */
-    int
-get_shape_idx(int mouse)
+    पूर्णाङ्क
+get_shape_idx(पूर्णाङ्क mouse)
 {
 #  ifdef FEAT_MOUSESHAPE
-    if (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
+    यदि (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
     {
 #   ifdef FEAT_GUI
-	int x, y;
+	पूर्णाङ्क x, y;
 	gui_mch_getmouse(&x, &y);
-	if (Y_2_ROW(y) == Rows - 1)
-	    return SHAPE_IDX_MOREL;
+	यदि (Y_2_ROW(y) == Rows - 1)
+	    प्रत्यागम SHAPE_IDX_MOREL;
 #   endif
-	return SHAPE_IDX_MORE;
+	प्रत्यागम SHAPE_IDX_MORE;
     }
-    if (mouse && drag_status_line)
-	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
-	return SHAPE_IDX_VDRAG;
+    यदि (mouse && drag_status_ओळ)
+	प्रत्यागम SHAPE_IDX_SDRAG;
+    यदि (mouse && drag_sep_ओळ)
+	प्रत्यागम SHAPE_IDX_VDRAG;
 #  endif
-    if (!mouse && State == MODE_SHOWMATCH)
-	return SHAPE_IDX_SM;
-    if (State & VREPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & REPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
-	return SHAPE_IDX_I;
-    if (State & MODE_CMDLINE)
+    यदि (!mouse && State == MODE_SHOWMATCH)
+	प्रत्यागम SHAPE_IDX_SM;
+    यदि (State & VREPLACE_FLAG)
+	प्रत्यागम SHAPE_IDX_R;
+    यदि (State & REPLACE_FLAG)
+	प्रत्यागम SHAPE_IDX_R;
+    यदि (State & MODE_घाला)
+	प्रत्यागम SHAPE_IDX_I;
+    यदि (State & MODE_CMDLINE)
     {
-	if (cmdline_at_end())
-	    return SHAPE_IDX_C;
-	if (cmdline_overstrike())
-	    return SHAPE_IDX_CR;
-	return SHAPE_IDX_CI;
+	यदि (cmdline_at_end())
+	    प्रत्यागम SHAPE_IDX_C;
+	यदि (cmdline_overstrike())
+	    प्रत्यागम SHAPE_IDX_CR;
+	प्रत्यागम SHAPE_IDX_CI;
     }
-    if (finish_op)
-	return SHAPE_IDX_O;
-    if (VIsual_active)
+    यदि (finish_op)
+	प्रत्यागम SHAPE_IDX_O;
+    यदि (VIsual_active)
     {
-	if (*p_sel == 'e')
-	    return SHAPE_IDX_VE;
-	else
-	    return SHAPE_IDX_V;
+	यदि (*p_sel == 'e')
+	    प्रत्यागम SHAPE_IDX_VE;
+	अन्यथा
+	    प्रत्यागम SHAPE_IDX_V;
     }
-    return SHAPE_IDX_N;
+    प्रत्यागम SHAPE_IDX_N;
 }
 # endif
 
-# if defined(FEAT_MOUSESHAPE)
-static int current_mouse_shape = 0;
+# यदि defined(FEAT_MOUSESHAPE)
+स्थिर पूर्णाङ्क current_mouse_shape = 0;
 
 /*
  * Set the mouse shape:
@@ -2475,40 +2475,40 @@ static int current_mouse_shape = 0;
  * If "shape" is -2, only update the shape when it's CLINE or STATUS (used
  * when the mouse moves off the status or command line).
  */
-    void
-update_mouseshape(int shape_idx)
+    शून्य
+update_mouseshape(पूर्णाङ्क shape_idx)
 {
-    int new_mouse_shape;
+    पूर्णाङ्क new_mouse_shape;
 
     // Only works in GUI mode.
-    if (!gui.in_use || gui.starting)
-	return;
+    यदि (!gui.in_use || gui.starting)
+	प्रत्यागम;
 
     // Postpone the updating when more is to come.  Speeds up executing of
     // mappings.
-    if (shape_idx == -1 && char_avail())
+    यदि (shape_idx == -1 && char_avail())
     {
 	postponed_mouseshape = TRUE;
-	return;
+	प्रत्यागम;
     }
 
     // When ignoring the mouse don't change shape on the statusline.
-    if (*p_mouse == NUL
+    यदि (*p_mouse == NUL
 	    && (shape_idx == SHAPE_IDX_CLINE
 		|| shape_idx == SHAPE_IDX_STATUS
 		|| shape_idx == SHAPE_IDX_VSEP))
 	shape_idx = -2;
 
-    if (shape_idx == -2
+    यदि (shape_idx == -2
 	    && current_mouse_shape != shape_table[SHAPE_IDX_CLINE].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_STATUS].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_VSEP].mshape)
-	return;
-    if (shape_idx < 0)
+	प्रत्यागम;
+    यदि (shape_idx < 0)
 	new_mouse_shape = shape_table[get_shape_idx(TRUE)].mshape;
-    else
+    अन्यथा
 	new_mouse_shape = shape_table[shape_idx].mshape;
-    if (new_mouse_shape != current_mouse_shape)
+    यदि (new_mouse_shape != current_mouse_shape)
     {
 	mch_set_mouse_shape(new_mouse_shape);
 	current_mouse_shape = new_mouse_shape;
@@ -2519,18 +2519,18 @@ update_mouseshape(int shape_idx)
 
 #endif // CURSOR_SHAPE
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Mainly for tests: get the name of the current mouse shape.
  */
-    void
+    शून्य
 f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-# if defined(FEAT_MOUSESHAPE)
-    if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+    rettv->vval.v_string = रिक्त;
+# यदि defined(FEAT_MOUSESHAPE)
+    यदि (current_mouse_shape >= 0
+			      && current_mouse_shape < (पूर्णाङ्क)MSHAPE_NAMES_मोजणी)
 	rettv->vval.v_string = vim_strnsave(
 				  mshape_names[current_mouse_shape].string,
 				  mshape_names[current_mouse_shape].length);
@@ -2544,23 +2544,23 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
  * Change directory to "new_dir".  Search 'cdpath' for relative directory
  * names.
  */
-    int
+    पूर्णाङ्क
 vim_chdir(char_u *new_dir)
 {
     char_u	*dir_name;
-    int		r;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    पूर्णाङ्क		r;
+    char_u	*file_to_find = रिक्त;
+    वर्ण	*शोध_ctx = रिक्त;
 
-    dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
+    dir_name = find_directory_in_path(new_dir, (पूर्णाङ्क)STRLEN(new_dir),
+		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &शोध_ctx);
     vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
-    if (dir_name == NULL)
-	return -1;
-    r = mch_chdir((char *)dir_name);
+    vim_findfile_cleanup(शोध_ctx);
+    यदि (dir_name == रिक्त)
+	प्रत्यागम -1;
+    r = mch_chdir((वर्ण *)dir_name);
     vim_free(dir_name);
-    return r;
+    प्रत्यागम r;
 }
 
 /*
@@ -2570,62 +2570,62 @@ vim_chdir(char_u *new_dir)
  * cache the result.
  * Returns OK or FAIL.
  */
-    int
-get_user_name(char_u *buf, int len)
+    पूर्णाङ्क
+get_user_name(char_u *buf, पूर्णाङ्क len)
 {
-    if (username == NULL)
+    यदि (username == रिक्त)
     {
-	if (mch_get_user_name(buf, len) == FAIL)
-	    return FAIL;
+	यदि (mch_get_user_name(buf, len) == FAIL)
+	    प्रत्यागम FAIL;
 	username = vim_strsave(buf);
     }
-    else
+    अन्यथा
 	vim_strncpy(buf, username, len - 1);
-    return OK;
+    प्रत्यागम OK;
 }
 
-#if defined(EXITFREE)
+#यदि defined(EXITFREE)
 /*
  * Free the memory allocated by get_user_name()
  */
-    void
-free_username(void)
+    शून्य
+free_username(शून्य)
 {
     vim_free(username);
 }
 #endif
 
-#if !defined(HAVE_QSORT) && !defined(PROTO)
+#यदि !defined(HAVE_QSORT) && !defined(PROTO)
 /*
  * Our own qsort(), for systems that don't have it.
  * It's simple and slow.  From the K&R C book.
  */
-    void
+    शून्य
 qsort(
-    void	*base,
-    size_t	elm_count,
+    शून्य	*base,
+    size_t	elm_मोजणी,
     size_t	elm_size,
-    int (*cmp)(const void *, const void *))
+    पूर्णाङ्क (*cmp)(ध्रुव शून्य *, ध्रुव शून्य *))
 {
     char_u	*buf;
     char_u	*p1;
     char_u	*p2;
-    int		i, j;
-    int		gap;
+    पूर्णाङ्क		i, j;
+    पूर्णाङ्क		gap;
 
     buf = alloc(elm_size);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
-	    for (j = i - gap; j >= 0; j -= gap)
+    प्रति (gap = elm_मोजणी / 2; gap > 0; gap /= 2)
+	प्रति (i = gap; i < elm_मोजणी; ++i)
+	    प्रति (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
 		p1 = (char_u *)base + j * elm_size;
 		p2 = (char_u *)base + (j + gap) * elm_size;
-		if ((*cmp)((void *)p1, (void *)p2) <= 0)
-		    break;
+		यदि ((*cmp)((शून्य *)p1, (शून्य *)p2) <= 0)
+		    भङ्ग;
 		// Exchange the elements.
 		mch_memmove(buf, p1, elm_size);
 		mch_memmove(p1, p2, elm_size);
@@ -2662,96 +2662,96 @@ qsort(
  *  (history removed, not very interesting.  See the "screen" sources.)
  */
 
-#if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
+#यदि !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
 
 # define EXTRASIZE 5		// increment to add to env. size
 
-static int  envsize = -1;	// current size of environment
-extern char **environ;		// the global which is your env.
+स्थिर पूर्णाङ्क  envsize = -1;	// current size of environment
+बाह्य वर्ण **environ;		// the global which is your env.
 
-static int  findenv(char *name); // look for a name in the env.
-static int  newenv(void);	// copy env. from stack to heap
-static int  moreenv(void);	// incr. size of env.
+स्थिर पूर्णाङ्क  findenv(वर्ण *name); // look for a name in the env.
+स्थिर पूर्णाङ्क  newenv(शून्य);	// copy env. from stack to heap
+स्थिर पूर्णाङ्क  moreenv(शून्य);	// incr. size of env.
 
-    int
-putenv(const char *string)
+    पूर्णाङ्क
+putenv(ध्रुव वर्ण *string)
 {
-    int	    i;
-    char    *p;
+    पूर्णाङ्क	    i;
+    वर्ण    *p;
 
-    if (envsize < 0)
+    यदि (envsize < 0)
     {				// first time putenv called
-	if (newenv() < 0)	// copy env. to heap
-	    return -1;
+	यदि (newenv() < 0)	// copy env. to heap
+	    प्रत्यागम -1;
     }
 
-    i = findenv((char *)string); // look for name in environment
+    i = findenv((वर्ण *)string); // look for name in environment
 
-    if (i < 0)
+    यदि (i < 0)
     {				// name must be added
-	for (i = 0; environ[i]; i++);
-	if (i >= (envsize - 1))
+	प्रति (i = 0; environ[i]; i++);
+	यदि (i >= (envsize - 1))
 	{			// need new slot
-	    if (moreenv() < 0)
-		return -1;
+	    यदि (moreenv() < 0)
+		प्रत्यागम -1;
 	}
 	p = alloc(strlen(string) + 1);
-	if (p == NULL)		// not enough core
-	    return -1;
+	यदि (p == रिक्त)		// not enough core
+	    प्रत्यागम -1;
 	environ[i + 1] = 0;	// new end of env.
     }
-    else
+    अन्यथा
     {				// name already in env.
 	p = vim_realloc(environ[i], strlen(string) + 1);
-	if (p == NULL)
-	    return -1;
+	यदि (p == रिक्त)
+	    प्रत्यागम -1;
     }
     sprintf(p, "%s", string);	// copy into env.
     environ[i] = p;
 
-    return 0;
+    प्रत्यागम 0;
 }
 
-    static int
-findenv(char *name)
+    स्थिर पूर्णाङ्क
+findenv(वर्ण *name)
 {
-    char    *namechar, *envchar;
-    int	    i, found;
+    वर्ण    *namechar, *envchar;
+    पूर्णाङ्क	    i, found;
 
     found = 0;
-    for (i = 0; environ[i] && !found; i++)
+    प्रति (i = 0; environ[i] && !found; i++)
     {
 	envchar = environ[i];
 	namechar = name;
-	while (*namechar && *namechar != '=' && (*namechar == *envchar))
+	यावत् (*namechar && *namechar != '=' && (*namechar == *envchar))
 	{
 	    namechar++;
 	    envchar++;
 	}
 	found = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
     }
-    return found ? i - 1 : -1;
+    प्रत्यागम found ? i - 1 : -1;
 }
 
-    static int
-newenv(void)
+    स्थिर पूर्णाङ्क
+newenv(शून्य)
 {
-    char    **env, *elem;
-    int	    i, esize;
+    वर्ण    **env, *elem;
+    पूर्णाङ्क	    i, esize;
 
-    for (i = 0; environ[i]; i++)
+    प्रति (i = 0; environ[i]; i++)
 	;
 
     esize = i + EXTRASIZE + 1;
-    env = ALLOC_MULT(char *, esize);
-    if (env == NULL)
-	return -1;
+    env = ALLOC_MULT(वर्ण *, esize);
+    यदि (env == रिक्त)
+	प्रत्यागम -1;
 
-    for (i = 0; environ[i]; i++)
+    प्रति (i = 0; environ[i]; i++)
     {
 	elem = alloc(strlen(environ[i]) + 1);
-	if (elem == NULL)
-	    return -1;
+	यदि (elem == रिक्त)
+	    प्रत्यागम -1;
 	env[i] = elem;
 	strcpy(elem, environ[i]);
     }
@@ -2759,22 +2759,22 @@ newenv(void)
     env[i] = 0;
     environ = env;
     envsize = esize;
-    return 0;
+    प्रत्यागम 0;
 }
 
-    static int
-moreenv(void)
+    स्थिर पूर्णाङ्क
+moreenv(शून्य)
 {
-    int	    esize;
-    char    **env;
+    पूर्णाङ्क	    esize;
+    वर्ण    **env;
 
     esize = envsize + EXTRASIZE;
-    env = vim_realloc((char *)environ, esize * sizeof (*env));
-    if (env == 0)
-	return -1;
+    env = vim_realloc((वर्ण *)environ, esize * परिमाण (*env));
+    यदि (env == 0)
+	प्रत्यागम -1;
     environ = env;
     envsize = esize;
-    return 0;
+    प्रत्यागम 0;
 }
 
 # ifdef USE_VIMPTY_GETENV
@@ -2782,122 +2782,122 @@ moreenv(void)
  * Used for mch_getenv() for Mac.
  */
     char_u *
-vimpty_getenv(const char_u *string)
+vimpty_getenv(ध्रुव char_u *string)
 {
-    int i;
+    पूर्णाङ्क i;
     char_u *p;
 
-    if (envsize < 0)
-	return NULL;
+    यदि (envsize < 0)
+	प्रत्यागम रिक्त;
 
-    i = findenv((char *)string);
+    i = findenv((वर्ण *)string);
 
-    if (i < 0)
-	return NULL;
+    यदि (i < 0)
+	प्रत्यागम रिक्त;
 
     p = vim_strchr((char_u *)environ[i], '=');
-    return (p + 1);
+    प्रत्यागम (p + 1);
 }
 # endif
 
 #endif // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#यदि defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    int
+    पूर्णाङ्क
 filewritable(char_u *fname)
 {
-    int		retval = 0;
-# if defined(UNIX) || defined(VMS)
-    int		perm = 0;
+    पूर्णाङ्क		retval = 0;
+# यदि defined(UNIX) || defined(VMS)
+    पूर्णाङ्क		perm = 0;
 # endif
 
-# if defined(UNIX) || defined(VMS)
+# यदि defined(UNIX) || defined(VMS)
     perm = mch_getperm(fname);
 # endif
-    if (
+    यदि (
 # ifdef MSWIN
 	    mch_writable(fname) &&
-# else
-#  if defined(UNIX) || defined(VMS)
+# अन्यथा
+#  यदि defined(UNIX) || defined(VMS)
 	    (perm & 0222) &&
 #  endif
 # endif
-	    mch_access((char *)fname, W_OK) == 0
+	    mch_access((वर्ण *)fname, W_OK) == 0
        )
     {
 	++retval;
-	if (mch_isdir(fname))
+	यदि (mch_isdir(fname))
 	    ++retval;
     }
-    return retval;
+    प्रत्यागम retval;
 }
 #endif
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#यदि defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 2 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    पूर्णाङ्क
 get2c(FILE *fd)
 {
-    int		c, n;
+    पूर्णाङ्क		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    यदि (n == EOF) प्रत्यागम -1;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    यदि (c == EOF) प्रत्यागम -1;
+    प्रत्यागम (n << 8) + c;
 }
 
 /*
  * Read 3 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    पूर्णाङ्क
 get3c(FILE *fd)
 {
-    int		c, n;
+    पूर्णाङ्क		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    यदि (n == EOF) प्रत्यागम -1;
     c = getc(fd);
-    if (c == EOF) return -1;
+    यदि (c == EOF) प्रत्यागम -1;
     n = (n << 8) + c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    यदि (c == EOF) प्रत्यागम -1;
+    प्रत्यागम (n << 8) + c;
 }
 
 /*
  * Read 4 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    पूर्णाङ्क
 get4c(FILE *fd)
 {
-    int		c;
+    पूर्णाङ्क		c;
     // Use unsigned rather than int otherwise result is undefined
     // when left-shift sets the MSB.
     unsigned	n;
 
     c = getc(fd);
-    if (c == EOF) return -1;
+    यदि (c == EOF) प्रत्यागम -1;
     n = (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    यदि (c == EOF) प्रत्यागम -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    यदि (c == EOF) प्रत्यागम -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    यदि (c == EOF) प्रत्यागम -1;
     n = (n << 8) + (unsigned)c;
-    return (int)n;
+    प्रत्यागम (पूर्णाङ्क)n;
 }
 
 /*
@@ -2905,44 +2905,44 @@ get4c(FILE *fd)
  * Returns NULL when out of memory or unable to read that many bytes.
  */
     char_u *
-read_string(FILE *fd, int cnt)
+read_string(FILE *fd, पूर्णाङ्क cnt)
 {
     char_u	*str;
-    int		i;
-    int		c;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		c;
 
     // allocate memory
     str = alloc(cnt + 1);
-    if (str == NULL)
-	return NULL;
+    यदि (str == रिक्त)
+	प्रत्यागम रिक्त;
 
     // Read the string.  Quit when running into the EOF.
-    for (i = 0; i < cnt; ++i)
+    प्रति (i = 0; i < cnt; ++i)
     {
 	c = getc(fd);
-	if (c == EOF)
+	यदि (c == EOF)
 	{
 	    vim_free(str);
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
 	str[i] = c;
     }
     str[i] = NUL;
-    return str;
+    प्रत्यागम str;
 }
 
 /*
  * Write a number to file "fd", MSB first, in "len" bytes.
  */
-    int
-put_bytes(FILE *fd, long_u nr, int len)
+    पूर्णाङ्क
+put_bytes(FILE *fd, long_u nr, पूर्णाङ्क len)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
-    for (i = len - 1; i >= 0; --i)
-	if (putc((int)(nr >> (i * 8)), fd) == EOF)
-	    return FAIL;
-    return OK;
+    प्रति (i = len - 1; i >= 0; --i)
+	यदि (putc((पूर्णाङ्क)(nr >> (i * 8)), fd) == EOF)
+	    प्रत्यागम FAIL;
+    प्रत्यागम OK;
 }
 
 #endif
@@ -2953,12 +2953,12 @@ put_bytes(FILE *fd, long_u nr, int len)
  * Return time in msec since "start_tv".
  */
     long
-elapsed(struct timeval *start_tv)
+elapsed(संरचना timeval *start_tv)
 {
-    struct timeval  now_tv;
+    संरचना timeval  now_tv;
 
-    gettimeofday(&now_tv, NULL);
-    return (now_tv.tv_sec - start_tv->tv_sec) * 1000L
+    gettimeofday(&now_tv, रिक्त);
+    प्रत्यागम (now_tv.tv_sec - start_tv->tv_sec) * 1000L
 	 + (now_tv.tv_usec - start_tv->tv_usec) / 1000L;
 }
 # endif
@@ -2970,14 +2970,14 @@ elapsed(struct timeval *start_tv)
     long
 elapsed(DWORD start_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_मोजणी();
 
-    return (long)now - (long)start_tick;
+    प्रत्यागम (long)now - (long)start_tick;
 }
 # endif
 #endif
 
-#if defined(FEAT_JOB_CHANNEL) \
+#यदि defined(FEAT_JOB_CHANNEL) \
 	|| (defined(UNIX) && (!defined(USE_SYSTEM) \
 	|| (defined(FEAT_GUI) && defined(FEAT_TERMINAL))))
 /*
@@ -2985,79 +2985,79 @@ elapsed(DWORD start_tick)
  * "argv" is an allocated array with "argc" entries and room for 4 more.
  * Returns FAIL when out of memory.
  */
-    int
-mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
+    पूर्णाङ्क
+mch_parse_cmd(char_u *cmd, पूर्णाङ्क use_shcf, वर्ण ***argv, पूर्णाङ्क *argc)
 {
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*p, *d;
-    int		inquote;
+    पूर्णाङ्क		inquote;
 
     /*
      * Do this loop twice:
      * 1: find number of arguments
      * 2: separate them and build argv[]
      */
-    for (i = 1; i <= 2; ++i)
+    प्रति (i = 1; i <= 2; ++i)
     {
 	p = skipwhite(cmd);
 	inquote = FALSE;
 	*argc = 0;
-	while (*p != NUL)
+	यावत् (*p != NUL)
 	{
-	    if (i == 2)
-		(*argv)[*argc] = (char *)p;
+	    यदि (i == 2)
+		(*argv)[*argc] = (वर्ण *)p;
 	    ++*argc;
 	    d = p;
-	    while (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
+	    यावत् (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
 	    {
-		if (p[0] == '"')
+		यदि (p[0] == '"')
 		    // quotes surrounding an argument and are dropped
 		    inquote = !inquote;
-		else
+		अन्यथा
 		{
-		    if (rem_backslash(p))
+		    यदि (rem_backslash(p))
 		    {
 			// First pass: skip over "\ " and "\"".
 			// Second pass: Remove the backslash.
 			++p;
 		    }
-		    if (i == 2)
+		    यदि (i == 2)
 			*d++ = *p;
 		}
 		++p;
 	    }
-	    if (*p == NUL)
+	    यदि (*p == NUL)
 	    {
-		if (i == 2)
+		यदि (i == 2)
 		    *d++ = NUL;
-		break;
+		भङ्ग;
 	    }
-	    if (i == 2)
+	    यदि (i == 2)
 		*d++ = NUL;
 	    p = skipwhite(p + 1);
 	}
-	if (*argv == NULL)
+	यदि (*argv == रिक्त)
 	{
-	    if (use_shcf)
+	    यदि (use_shcf)
 	    {
 		// Account for possible multiple args in p_shcf.
 		p = p_shcf;
-		for (;;)
+		प्रति (;;)
 		{
 		    p = skiptowhite(p);
-		    if (*p == NUL)
-			break;
+		    यदि (*p == NUL)
+			भङ्ग;
 		    ++*argc;
 		    p = skipwhite(p);
 		}
 	    }
 
-	    *argv = ALLOC_MULT(char *, *argc + 4);
-	    if (*argv == NULL)	    // out of memory
-		return FAIL;
+	    *argv = ALLOC_MULT(वर्ण *, *argc + 4);
+	    यदि (*argv == रिक्त)	    // out of memory
+		प्रत्यागम FAIL;
 	}
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
@@ -3065,63 +3065,63 @@ mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_string(char_u *cmd, char ***argv, int *argc)
+    पूर्णाङ्क
+build_argv_from_string(char_u *cmd, वर्ण ***argv, पूर्णाङ्क *argc)
 {
     char_u	*cmd_copy;
-    int		i;
+    पूर्णाङ्क		i;
 
     // Make a copy, parsing will modify "cmd".
     cmd_copy = vim_strsave(cmd);
-    if (cmd_copy == NULL
+    यदि (cmd_copy == रिक्त
 	    || mch_parse_cmd(cmd_copy, FALSE, argv, argc) == FAIL)
     {
 	vim_free(cmd_copy);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    for (i = 0; i < *argc; i++)
-	(*argv)[i] = (char *)vim_strsave((char_u *)(*argv)[i]);
-    (*argv)[*argc] = NULL;
+    प्रति (i = 0; i < *argc; i++)
+	(*argv)[i] = (वर्ण *)vim_strsave((char_u *)(*argv)[i]);
+    (*argv)[*argc] = रिक्त;
     vim_free(cmd_copy);
-    return OK;
+    प्रत्यागम OK;
 }
 
 #endif
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Build "argv[argc]" from the list "l".
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_list(list_T *l, char ***argv, int *argc)
+    पूर्णाङ्क
+build_argv_from_list(list_T *l, वर्ण ***argv, पूर्णाङ्क *argc)
 {
     listitem_T  *li;
     char_u	*s;
 
     // Pass argv[] to mch_call_shell().
-    *argv = ALLOC_MULT(char *, l->lv_len + 1);
-    if (*argv == NULL)
-	return FAIL;
+    *argv = ALLOC_MULT(वर्ण *, l->lv_len + 1);
+    यदि (*argv == रिक्त)
+	प्रत्यागम FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_वस्तुसंच(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
+	यदि (s == रिक्त)
 	{
-	    int i;
+	    पूर्णाङ्क i;
 
-	    for (i = 0; i < *argc; ++i)
+	    प्रति (i = 0; i < *argc; ++i)
 		VIM_CLEAR((*argv)[i]);
-	    (*argv)[0] = NULL;
-	    return FAIL;
+	    (*argv)[0] = रिक्त;
+	    प्रत्यागम FAIL;
 	}
-	(*argv)[*argc] = (char *)vim_strsave(s);
+	(*argv)[*argc] = (वर्ण *)vim_strsave(s);
 	*argc += 1;
     }
-    (*argv)[*argc] = NULL;
-    return OK;
+    (*argv)[*argc] = रिक्त;
+    प्रत्यागम OK;
 }
 #endif
 
@@ -3134,58 +3134,58 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
  *      Use the wrong result because each result is different.
  * 3: Windows 10 insider preview (current latest logic)
  */
-    int
-get_special_pty_type(void)
+    पूर्णाङ्क
+get_special_pty_type(शून्य)
 {
 #ifdef MSWIN
-    return get_conpty_type();
-#else
-    return 0;
+    प्रत्यागम get_conpty_type();
+#अन्यथा
+    प्रत्यागम 0;
 #endif
 }
 
 // compare two keyvalue_T structs by case sensitive value
-    int
-cmp_keyvalue_value(const void *a, const void *b)
+    पूर्णाङ्क
+cmp_keyvalue_मूल्य(ध्रुव शून्य *a, ध्रुव शून्य *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    प्रत्यागम STRCMP(kv1->मूल्य.string, kv2->मूल्य.string);
 }
 
 // compare two keyvalue_T structs by value with length
-    int
-cmp_keyvalue_value_n(const void *a, const void *b)
+    पूर्णाङ्क
+cmp_keyvalue_मूल्य_n(ध्रुव शून्य *a, ध्रुव शून्य *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    प्रत्यागम STRNCMP(kv1->मूल्य.string, kv2->मूल्य.string, MAX(kv1->मूल्य.length,
+		kv2->मूल्य.length));
 }
 
 // compare two keyvalue_T structs by case insensitive value
-    int
-cmp_keyvalue_value_i(const void *a, const void *b)
+    पूर्णाङ्क
+cmp_keyvalue_मूल्य_i(ध्रुव शून्य *a, ध्रुव शून्य *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    प्रत्यागम STRICMP(kv1->मूल्य.string, kv2->मूल्य.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
-    int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+    पूर्णाङ्क
+cmp_keyvalue_मूल्य_ni(ध्रुव शून्य *a, ध्रुव शून्य *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    प्रत्यागम vim_strnicmp_asc((वर्ण *)kv1->मूल्य.string,
+	    (वर्ण *)kv2->मूल्य.string, MAX(kv1->मूल्य.length,
+		    kv2->मूल्य.length));
 }
 
 /*
@@ -3195,112 +3195,112 @@ cmp_keyvalue_value_ni(const void *a, const void *b)
  *  - Each pair of blocks is merged in sorted order.
  *  - Merged blocks are reconnected to build the sorted list.
  */
-    void *
+    शून्य *
 mergesort_list(
-    void	*head,
-    void	*(*get_next)(void *),
-    void	(*set_next)(void *, void *),
-    void	*(*get_prev)(void *),
-    void	(*set_prev)(void *, void *),
-    int		(*compare)(const void *, const void *))
+    शून्य	*head,
+    शून्य	*(*get_next)(शून्य *),
+    शून्य	(*set_next)(शून्य *, शून्य *),
+    शून्य	*(*get_prev)(शून्य *),
+    शून्य	(*set_prev)(शून्य *, शून्य *),
+    पूर्णाङ्क		(*compare)(ध्रुव शून्य *, ध्रुव शून्य *))
 {
-    if (!head || !get_next(head))
-	return head;
+    यदि (!head || !get_next(head))
+	प्रत्यागम head;
 
     // Count length
-    int	    n = 0;
-    void*   curr = head;
-    while (curr)
+    पूर्णाङ्क	    n = 0;
+    शून्य*   curr = head;
+    यावत् (curr)
     {
 	n++;
 	curr = get_next(curr);
     }
 
-    int	size;
-    for (size = 1; size < n; size *= 2)
+    पूर्णाङ्क	size;
+    प्रति (size = 1; size < n; size *= 2)
     {
-	void*	new_head = NULL;
-	void*	tail = NULL;
+	शून्य*	new_head = रिक्त;
+	शून्य*	tail = रिक्त;
 	curr = head;
 
-	while (curr)
+	यावत् (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
-	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    शून्य    *डावा = curr;
+	    शून्य    *उजवा = डावा;
+	    पूर्णाङ्क	    i;
+	    प्रति (i = 0; i < size && उजवा; ++i)
+		उजवा = get_next(उजवा);
 
-	    void    *next = right;
-	    for (i = 0; i < size && next; ++i)
+	    शून्य    *next = उजवा;
+	    प्रति (i = 0; i < size && next; ++i)
 		next = get_next(next);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
-	    if (l_end)
-		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    शून्य    *l_end = उजवा ? get_prev(उजवा) : रिक्त;
+	    यदि (l_end)
+		set_next(l_end, रिक्त);
+	    यदि (उजवा)
+		set_prev(उजवा, रिक्त);
 
-	    void    *r_end = next ? get_prev(next) : NULL;
-	    if (r_end)
-		set_next(r_end, NULL);
-	    if (next)
-		set_prev(next, NULL);
+	    शून्य    *r_end = next ? get_prev(next) : रिक्त;
+	    यदि (r_end)
+		set_next(r_end, रिक्त);
+	    यदि (next)
+		set_prev(next, रिक्त);
 
 	    // Merge
-	    void    *merged = NULL;
-	    void    *merged_tail = NULL;
+	    शून्य    *merged = रिक्त;
+	    शून्य    *merged_tail = रिक्त;
 
-	    while (left || right)
+	    यावत् (डावा || उजवा)
 	    {
-		void	*chosen = NULL;
-		if (!left)
+		शून्य	*chosen = रिक्त;
+		यदि (!डावा)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = उजवा;
+		    उजवा = get_next(उजवा);
 		}
-		else if (!right)
+		अन्यथा यदि (!उजवा)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = डावा;
+		    डावा = get_next(डावा);
 		}
-		else if (compare(left, right) <= 0)
+		अन्यथा यदि (compare(डावा, उजवा) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = डावा;
+		    डावा = get_next(डावा);
 		}
-		else
+		अन्यथा
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = उजवा;
+		    उजवा = get_next(उजवा);
 		}
 
-		if (merged_tail)
+		यदि (merged_tail)
 		{
 		    set_next(merged_tail, chosen);
 		    set_prev(chosen, merged_tail);
 		    merged_tail = chosen;
 		}
-		else
+		अन्यथा
 		{
 		    merged = merged_tail = chosen;
-		    set_prev(chosen, NULL);
+		    set_prev(chosen, रिक्त);
 		}
 	    }
 
 	    // Connect to full list
-	    if (!new_head)
+	    यदि (!new_head)
 		new_head = merged;
-	    else
+	    अन्यथा
 	    {
 		set_next(tail, merged);
 		set_prev(merged, tail);
 	    }
 
 	    // Move tail to end
-	    while (get_next(merged_tail))
+	    यावत् (get_next(merged_tail))
 		merged_tail = get_next(merged_tail);
 	    tail = merged_tail;
 
@@ -3310,29 +3310,29 @@ mergesort_list(
 	head = new_head;
     }
 
-    return head;
+    प्रत्यागम head;
 }
 
-static const char_u base64_table[] =
+स्थिर ध्रुव char_u base64_table[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static char_u base64_dec_table[256];
+स्थिर char_u base64_dec_table[256];
 
 #define BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
 
 /*
  * Initialize the base64 decoding table
  */
-    static void
-init_base64_dec_table(void)
+    स्थिर शून्य
+init_base64_dec_table(शून्य)
 {
-    static int base64_dec_tbl_initialized = FALSE;
+    स्थिर पूर्णाङ्क base64_dec_tbl_initialized = FALSE;
 
-    if (base64_dec_tbl_initialized)
-	return;
+    यदि (base64_dec_tbl_initialized)
+	प्रत्यागम;
 
-    vim_memset(base64_dec_table, 0xFF, sizeof(base64_dec_table));
-    for (size_t i = 0; i < sizeof(base64_table) - 1; i++)
+    vim_memset(base64_dec_table, 0xFF, परिमाण(base64_dec_table));
+    प्रति (size_t i = 0; i < परिमाण(base64_table) - 1; i++)
 	base64_dec_table[(char_u)base64_table[i]] = (char_u)i;
     base64_dec_table['='] = 0;
 
@@ -3345,11 +3345,11 @@ init_base64_dec_table(void)
  * of bytes written, excluding the NUL.
  */
     long
-base64_encode_buf(char_u *dst, const char_u *src, size_t len)
+base64_encode_buf(char_u *dst, ध्रुव char_u *src, size_t len)
 {
     size_t i, j;
 
-    for (i = 0, j = 0; i < len;)
+    प्रति (i = 0, j = 0; i < len;)
     {
 	size_t remaining = len - i;
 
@@ -3370,7 +3370,7 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
     }
 
     dst[j] = NUL;
-    return (long)j;
+    प्रत्यागम (long)j;
 }
 
 /*
@@ -3378,14 +3378,14 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
  * NULL on OOM.  Caller frees with vim_free().
  */
     char_u *
-base64_encode(const char_u *data, size_t len)
+base64_encode(ध्रुव char_u *data, size_t len)
 {
     char_u *encoded = alloc(BASE64_ENCODED_LEN(len));
 
-    if (encoded == NULL)
-	return NULL;
+    यदि (encoded == रिक्त)
+	प्रत्यागम रिक्त;
     base64_encode_buf(encoded, data, len);
-    return encoded;
+    प्रत्यागम encoded;
 }
 
 /*
@@ -3393,71 +3393,71 @@ base64_encode(const char_u *data, size_t len)
  * "out" (appended byte-by-byte, e.g. a blob's bv_ga). Returns OK on success and
  * FAIL on failure.
  */
-    int
-base64_decode(const char_u *data, size_t len, garray_T *out)
+    पूर्णाङ्क
+base64_decode(ध्रुव char_u *data, size_t len, garray_T *out)
 {
-    if (len == 0)
-	return OK;
+    यदि (len == 0)
+	प्रत्यागम OK;
 
-    if (len % 4 != 0)
+    यदि (len % 4 != 0)
     {
 	semsg(_(e_invalid_argument_str), data);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
     init_base64_dec_table();
 
     size_t decoded_len = (len / 4) * 3;
-    if (data[len - 1] == '=')
+    यदि (data[len - 1] == '=')
 	decoded_len--;
-    if (data[len - 2] == '=')
+    यदि (data[len - 2] == '=')
 	decoded_len--;
 
     size_t i, j;
-    for (i = 0, j = 0; i < len;)
+    प्रति (i = 0, j = 0; i < len;)
     {
 	int_u sextet_a = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_b = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_c = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_d = base64_dec_table[(char_u)data[i++]];
 
-	if (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
+	यदि (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
 							|| sextet_d == 0xFF)
 	{
 	    semsg(_(e_invalid_argument_str), data);
 	    ga_clear(out);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
 
 	int_u triple = (sextet_a << 18) | (sextet_b << 12)
 						| (sextet_c << 6) | sextet_d;
 
-	if (j < decoded_len)
+	यदि (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 16) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	यदि (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 8) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	यदि (j < decoded_len)
 	{
 	    ga_append(out, triple & 0xFF);
 	    j++;
 	}
 
-	if (j == decoded_len)
+	यदि (j == decoded_len)
 	{
-	    if ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
+	    यदि ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
 		|| ((data[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
 	    {
 		semsg(_(e_invalid_argument_str), data);
 		ga_clear(out);
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	}
     }
-    return OK;
+    प्रत्यागम OK;
 }

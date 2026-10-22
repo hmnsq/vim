@@ -11,68 +11,68 @@
  * help.c: functions for Vim help
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 /*
  * ":help": open a read-only window on a help file
  */
-    void
+    शून्य
 ex_help(exarg_T *eap)
 {
     char_u	*arg;
     char_u	*tag;
     FILE	*helpfd;	// file descriptor of help file
-    int		n;
-    int		i;
+    पूर्णाङ्क		n;
+    पूर्णाङ्क		i;
     win_T	*wp;
-    int		num_matches;
+    पूर्णाङ्क		अंक_matches;
     char_u	**matches;
     char_u	*p;
-    int		empty_fnum = 0;
-    int		alt_fnum = 0;
+    पूर्णाङ्क		empty_fnum = 0;
+    पूर्णाङ्क		alt_fnum = 0;
     buf_T	*buf;
 #ifdef FEAT_MULTI_LANG
-    int		len;
+    पूर्णाङ्क		len;
     char_u	*lang;
 #endif
 #ifdef FEAT_FOLDING
-    int		old_KeyTyped = KeyTyped;
+    पूर्णाङ्क		old_किल्ली_Typed = किल्ली_Typed;
 #endif
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    यदि (ERROR_IF_ANY_POPUP_WINDOW)
+	प्रत्यागम;
 
-    if (eap != NULL)
+    यदि (eap != रिक्त)
     {
 	// A ":help" command ends at the first LF, or at a '|' that is
 	// followed by some text.  Set nextcmd to the following command.
-	for (arg = eap->arg; *arg; ++arg)
+	प्रति (arg = eap->arg; *arg; ++arg)
 	{
-	    if (*arg == '\n' || *arg == '\r'
+	    यदि (*arg == '\n' || *arg == '\r'
 		    || (*arg == '|' && arg[1] != NUL && arg[1] != '|'))
 	    {
 		*arg++ = NUL;
 		eap->nextcmd = arg;
-		break;
+		भङ्ग;
 	    }
 	}
 	arg = eap->arg;
 
-	if (eap->forceit && *arg == NUL && !curbuf->b_help)
+	यदि (eap->forceit && *arg == NUL && !curbuf->b_help)
 	{
 	    emsg(_(e_dont_panic));
-	    return;
+	    प्रत्यागम;
 	}
 
-	if (eap->skip)	    // not executing commands
-	    return;
+	यदि (eap->skip)	    // not executing commands
+	    प्रत्यागम;
     }
-    else
+    अन्यथा
 	arg = (char_u *)"";
 
     // remove trailing blanks
     p = arg + STRLEN(arg) - 1;
-    while (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
+    यावत् (p > arg && VIM_ISWHITE(*p) && p[-1] != '\\')
 	*p-- = NUL;
 
 #ifdef FEAT_MULTI_LANG
@@ -81,41 +81,41 @@ ex_help(exarg_T *eap)
 #endif
 
     // When no argument given go to the index.
-    if (*arg == NUL)
+    यदि (*arg == NUL)
 	arg = (char_u *)"help.txt";
 
     // Check if there is a match for the argument.
-    n = find_help_tags(arg, &num_matches, &matches,
-						 eap != NULL && eap->forceit);
+    n = find_help_tags(arg, &अंक_matches, &matches,
+						 eap != रिक्त && eap->forceit);
 
     i = 0;
 #ifdef FEAT_MULTI_LANG
-    if (n != FAIL && lang != NULL)
+    यदि (n != FAIL && lang != रिक्त)
 	// Find first item with the requested language.
-	for (i = 0; i < num_matches; ++i)
+	प्रति (i = 0; i < अंक_matches; ++i)
 	{
-	    len = (int)STRLEN(matches[i]);
-	    if (len > 3 && matches[i][len - 3] == '@'
+	    len = (पूर्णाङ्क)STRLEN(matches[i]);
+	    यदि (len > 3 && matches[i][len - 3] == '@'
 				  && STRICMP(matches[i] + len - 2, lang) == 0)
-		break;
+		भङ्ग;
 	}
 #endif
-    if (i >= num_matches || n == FAIL)
+    यदि (i >= अंक_matches || n == FAIL)
     {
 #ifdef FEAT_MULTI_LANG
-	if (lang != NULL)
+	यदि (lang != रिक्त)
 	    semsg(_(e_sorry_no_str_help_for_str), lang, arg);
-	else
+	अन्यथा
 #endif
 	    semsg(_(e_sorry_no_help_for_str), arg);
-	if (n != FAIL)
-	    FreeWild(num_matches, matches);
-	return;
+	यदि (n != FAIL)
+	    FreeWild(अंक_matches, matches);
+	प्रत्यागम;
     }
 
     // The first match (in the requested language) is the best match.
     tag = vim_strsave(matches[i]);
-    FreeWild(num_matches, matches);
+    FreeWild(अंक_matches, matches);
 
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
@@ -123,24 +123,24 @@ ex_help(exarg_T *eap)
 
     // Re-use an existing help window or open a new one.
     // Always open a new one for ":tab help".
-    if (!bt_help(curwin->w_buffer) || cmdmod.cmod_tab != 0)
+    यदि (!bt_help(curwin->w_buffer) || cmdmod.cmod_tab != 0)
     {
-	if (cmdmod.cmod_tab != 0)
-	    wp = NULL;
-	else
+	यदि (cmdmod.cmod_tab != 0)
+	    wp = रिक्त;
+	अन्यथा
 	    FOR_ALL_WINDOWS(wp)
-		if (bt_help(wp->w_buffer))
-		    break;
-	if (wp != NULL && wp->w_buffer->b_nwindows > 0)
+		यदि (bt_help(wp->w_buffer))
+		    भङ्ग;
+	यदि (wp != रिक्त && wp->w_buffer->b_nwindows > 0)
 	    win_enter(wp, TRUE);
-	else
+	अन्यथा
 	{
 	    // There is no help window yet.
 	    // Try to open the file specified by the "helpfile" option.
-	    if ((helpfd = mch_fopen((char *)p_hf, READBIN)) == NULL)
+	    यदि ((helpfd = mch_fopen((वर्ण *)p_hf, READBIN)) == रिक्त)
 	    {
 		smsg(_("Sorry, help file \"%s\" not found"), p_hf);
-		goto erret;
+		गच्छ erret;
 	    }
 	    fclose(helpfd);
 
@@ -148,52 +148,52 @@ ex_help(exarg_T *eap)
 	    // specified, the current window is vertically split and
 	    // narrow.
 	    n = WSP_HELP;
-	    if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
+	    यदि (cmdmod.cmod_split == 0 && curwin->w_width != Columns
 						  && curwin->w_width < 80)
-		n |= p_sb ? WSP_BOT : WSP_TOP;
-	    if (win_split(0, n) == FAIL)
-		goto erret;
+		n |= p_sb ? WSP_BOT : WSP_शीर्ष;
+	    यदि (win_split(0, n) == FAIL)
+		गच्छ erret;
 
-	    if (curwin->w_height < p_hh)
-		win_setheight((int)p_hh);
+	    यदि (curwin->w_height < p_hh)
+		win_setheight((पूर्णाङ्क)p_hh);
 
 	    // Open help file (do_ecmd() will set b_help flag, readfile() will
 	    // set b_p_ro flag).
 	    // Set the alternate file to the previously edited file.
 	    alt_fnum = curbuf->b_fnum;
-	    (void)do_ecmd(0, NULL, NULL, NULL, ECMD_LASTL,
+	    (शून्य)do_ecmd(0, रिक्त, रिक्त, रिक्त, ECMD_LASTL,
 			  ECMD_HIDE + ECMD_SET_HELP,
-			  NULL);  // buffer is still open, don't store info
-	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+			  रिक्त);  // buffer is still open, don't store info
+	    यदि ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = alt_fnum;
 	    empty_fnum = curbuf->b_fnum;
 	}
     }
 
-    if (!p_im)
+    यदि (!p_im)
 	restart_edit = 0;	    // don't want insert mode in help file
 
 #ifdef FEAT_FOLDING
     // Restore KeyTyped, setting 'filetype=help' may reset it.
     // It is needed for do_tag top open folds under the cursor.
-    KeyTyped = old_KeyTyped;
+    किल्ली_Typed = old_किल्ली_Typed;
 #endif
 
-    if (tag != NULL)
+    यदि (tag != रिक्त)
 	do_tag(tag, DT_HELP, 1, FALSE, TRUE);
 
     // Delete the empty buffer if we're not using it.  Careful: autocommands
     // may have jumped to another window, check that the buffer is not in a
     // window.
-    if (empty_fnum != 0 && curbuf->b_fnum != empty_fnum)
+    यदि (empty_fnum != 0 && curbuf->b_fnum != empty_fnum)
     {
 	buf = buflist_findnr(empty_fnum);
-	if (buf != NULL && buf->b_nwindows == 0)
+	यदि (buf != रिक्त && buf->b_nwindows == 0)
 	    wipe_buffer(buf, TRUE);
     }
 
     // keep the previous alternate file
-    if (alt_fnum != 0 && curwin->w_alt_fnum == empty_fnum
+    यदि (alt_fnum != 0 && curwin->w_alt_fnum == empty_fnum
 				    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = alt_fnum;
 
@@ -204,22 +204,22 @@ erret:
 /*
  * ":helpclose": Close one help window
  */
-    void
+    शून्य
 ex_helpclose(exarg_T *eap UNUSED)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (bt_help(win->w_buffer))
+	यदि (bt_help(win->w_buffer))
 	{
 	    win_close(win, FALSE);
-	    return;
+	    प्रत्यागम;
 	}
     }
 }
 
-#if defined(FEAT_MULTI_LANG)
+#यदि defined(FEAT_MULTI_LANG)
 /*
  * In an argument search for a language specifiers in the form "@xx".
  * Changes the "@" to NUL if found, and returns a pointer to "xx".
@@ -228,15 +228,15 @@ ex_helpclose(exarg_T *eap UNUSED)
     char_u *
 check_help_lang(char_u *arg)
 {
-    int len = (int)STRLEN(arg);
+    पूर्णाङ्क len = (पूर्णाङ्क)STRLEN(arg);
 
-    if (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
+    यदि (len >= 3 && arg[len - 3] == '@' && ASCII_ISALPHA(arg[len - 2])
 					       && ASCII_ISALPHA(arg[len - 1]))
     {
 	arg[len - 3] = NUL;		// remove the '@'
-	return arg + len - 2;
+	प्रत्यागम arg + len - 2;
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 #endif
 
@@ -251,19 +251,19 @@ check_help_lang(char_u *arg)
  * Assumption is made that the matched_string passed has already been found to
  * match some string for which help is requested.  webb.
  */
-    int
+    पूर्णाङ्क
 help_heuristic(
     char_u	*matched_string,
-    int		offset,			// offset for match
-    int		wrong_case)		// no matching case
+    पूर्णाङ्क		offset,			// offset for match
+    पूर्णाङ्क		wrong_case)		// no matching case
 {
-    int		num_letters;
+    पूर्णाङ्क		अंक_letters;
     char_u	*p;
 
-    num_letters = 0;
-    for (p = matched_string; *p; p++)
-	if (ASCII_ISALNUM(*p))
-	    num_letters++;
+    अंक_letters = 0;
+    प्रति (p = matched_string; *p; p++)
+	यदि (ASCII_ISALNUM(*p))
+	    अंक_letters++;
 
     // Multiply the number of letters by 100 to give it a much bigger
     // weighting than the number of characters.
@@ -272,41 +272,41 @@ help_heuristic(
     // somewhere in the last half.
     // If the match is more than 2 chars from the start, multiply by 200 to
     // put it after matches at the start.
-    if (ASCII_ISALNUM(matched_string[offset]) && offset > 0
+    यदि (ASCII_ISALNUM(matched_string[offset]) && offset > 0
 				 && ASCII_ISALNUM(matched_string[offset - 1]))
 	offset += 10000;
-    else if (offset > 2)
+    अन्यथा यदि (offset > 2)
 	offset *= 200;
-    if (wrong_case)
+    यदि (wrong_case)
 	offset += 5000;
     // Features are less interesting than the subjects themselves, but "+"
     // alone is not a feature.
-    if (matched_string[0] == '+' && matched_string[1] != NUL)
+    यदि (matched_string[0] == '+' && matched_string[1] != NUL)
 	offset += 100;
-    return (int)(100 * num_letters + STRLEN(matched_string) + offset);
+    प्रत्यागम (पूर्णाङ्क)(100 * अंक_letters + STRLEN(matched_string) + offset);
 }
 
 /*
  * Compare functions for qsort() below, that checks the help heuristics number
  * that has been put after the tagname by find_tags().
  */
-    static int
-help_compare(const void *s1, const void *s2)
+    स्थिर पूर्णाङ्क
+help_compare(ध्रुव शून्य *s1, ध्रुव शून्य *s2)
 {
-    char    *p1;
-    char    *p2;
-    int	    cmp;
+    वर्ण    *p1;
+    वर्ण    *p2;
+    पूर्णाङ्क	    cmp;
 
-    p1 = *(char **)s1 + strlen(*(char **)s1) + 1;
-    p2 = *(char **)s2 + strlen(*(char **)s2) + 1;
+    p1 = *(वर्ण **)s1 + strlen(*(वर्ण **)s1) + 1;
+    p2 = *(वर्ण **)s2 + strlen(*(वर्ण **)s2) + 1;
 
     // Compare by help heuristic number first.
     cmp = strcmp(p1, p2);
-    if (cmp != 0)
-	return cmp;
+    यदि (cmp != 0)
+	प्रत्यागम cmp;
 
     // Compare by strings as tie-breaker when same heuristic number.
-    return strcmp(*(char **)s1, *(char **)s2);
+    प्रत्यागम strcmp(*(वर्ण **)s1, *(वर्ण **)s2);
 }
 
 /*
@@ -315,18 +315,18 @@ help_compare(const void *s1, const void *s2)
  * The matches will be sorted with a "best" match algorithm.
  * When "keep_lang" is TRUE try keeping the language of the current buffer.
  */
-    int
+    पूर्णाङ्क
 find_help_tags(
     char_u	*arg,
-    int		*num_matches,
+    पूर्णाङ्क		*अंक_matches,
     char_u	***matches,
-    int		keep_lang)
+    पूर्णाङ्क		keep_lang)
 {
     char_u	*s, *d;
-    int		i;
+    पूर्णाङ्क		i;
     // Specific tags that either have a specific replacement or won't go
     // through the generic rules.
-    static char *(except_tbl[][2]) = {
+    स्थिर वर्ण *(except_tbl[][2]) = {
 	{"*",		"star"},
 	{"g*",		"gstar"},
 	{"[*",		"[star"},
@@ -367,81 +367,81 @@ find_help_tags(
 	{"s/\\2",	"s/\\\\2"},
 	{"s/\\3",	"s/\\\\3"},
 	{"s/\\9",	"s/\\\\9"},
-	{NULL, NULL}
+	{रिक्त, रिक्त}
     };
-    static char *(expr_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
+    स्थिर वर्ण *(अभिव्यक्ती_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
 				   ">=?", ">?", "is?", "isnot?"};
-    int flags;
+    पूर्णाङ्क flags;
 
     d = IObuff;		    // assume IObuff is long enough!
     d[0] = NUL;
 
-    if (STRNICMP(arg, "expr-", 5) == 0)
+    यदि (STRNICMP(arg, "expr-", 5) == 0)
     {
 	// When the string starting with "expr-" and containing '?' and matches
 	// the table, it is taken literally (but ~ is escaped).  Otherwise '?'
 	// is recognized as a wildcard.
-	for (i = (int)ARRAY_LENGTH(expr_table); --i >= 0; )
-	    if (STRCMP(arg + 5, expr_table[i]) == 0)
+	प्रति (i = (पूर्णाङ्क)ARRAY_LENGTH(अभिव्यक्ती_table); --i >= 0; )
+	    यदि (STRCMP(arg + 5, अभिव्यक्ती_table[i]) == 0)
 	    {
-		int si = 0, di = 0;
+		पूर्णाङ्क si = 0, di = 0;
 
-		for (;;)
+		प्रति (;;)
 		{
-		    if (arg[si] == '~')
+		    यदि (arg[si] == '~')
 			d[di++] = '\\';
 		    d[di++] = arg[si];
-		    if (arg[si] == NUL)
-			break;
+		    यदि (arg[si] == NUL)
+			भङ्ग;
 		    ++si;
 		}
-		break;
+		भङ्ग;
 	    }
     }
-    else
+    अन्यथा
     {
 	// Recognize a few exceptions to the rule.  Some strings that contain
 	// '*'are changed to "star", otherwise '*' is recognized as a wildcard.
-	for (i = 0; except_tbl[i][0] != NULL; ++i)
-	    if (STRCMP(arg, except_tbl[i][0]) == 0)
+	प्रति (i = 0; except_tbl[i][0] != रिक्त; ++i)
+	    यदि (STRCMP(arg, except_tbl[i][0]) == 0)
 	    {
 		STRCPY(d, except_tbl[i][1]);
-		break;
+		भङ्ग;
 	    }
     }
 
-    if (d[0] == NUL)	// no match in table
+    यदि (d[0] == NUL)	// no match in table
     {
 	// Replace "\S" with "/\\S", etc.  Otherwise every tag is matched.
 	// Also replace "\%^" and "\%(", they match every tag too.
 	// Also "\zs", "\z1", etc.
 	// Also "\@<", "\@=", "\@<=", etc.
 	// And also "\_$" and "\_^".
-	if (arg[0] == '\\'
+	यदि (arg[0] == '\\'
 		&& ((arg[1] != NUL && arg[2] == NUL)
-		    || (vim_strchr((char_u *)"%_z@", arg[1]) != NULL
+		    || (vim_strchr((char_u *)"%_z@", arg[1]) != रिक्त
 							   && arg[2] != NUL)))
 	{
-	    vim_snprintf((char *)d, IOSIZE, "/\\\\%s", arg + 1);
+	    vim_snprintf((वर्ण *)d, IOSIZE, "/\\\\%s", arg + 1);
 	    // Check for "/\\_$", should be "/\\_\$"
-	    if (d[3] == '_' && d[4] == '$')
+	    यदि (d[3] == '_' && d[4] == '$')
 		STRCPY(d + 4, "\\$");
 	}
-	else
+	अन्यथा
 	{
 	  // Replace:
 	  // "[:...:]" with "\[:...:]"
 	  // "[++...]" with "\[++...]"
 	  // "\{" with "\\{"		   -- matching "} \}"
-	    if ((arg[0] == '[' && (arg[1] == ':'
+	    यदि ((arg[0] == '[' && (arg[1] == ':'
 			 || (arg[1] == '+' && arg[2] == '+')))
 		    || (arg[0] == '\\' && arg[1] == '{'))
 	      *d++ = '\\';
 
 	  // If tag starts with "('", skip the "(". Fixes CTRL-] on ('option'.
-	  if (*arg == '(' && arg[1] == '\'')
+	  यदि (*arg == '(' && arg[1] == '\'')
 	      arg++;
-	  for (s = arg; *s; ++s)
+	  प्रति (s = arg; *s; ++s)
 	  {
 	    // Replace "|" with "bar" and '"' with "quote" to match the name of
 	    // the tags for these commands.
@@ -449,60 +449,60 @@ find_help_tags(
 	    // completion.
 	    // Insert a backslash before '~', '$' and '.' to avoid their
 	    // special meaning.
-	    if (d - IObuff > IOSIZE - 10)	// getting too long!?
-		break;
-	    switch (*s)
+	    यदि (d - IObuff > IOSIZE - 10)	// getting too long!?
+		भङ्ग;
+	    विकल्प (*s)
 	    {
-		case '|':   STRCPY(d, "bar");
+		पक्ष '|':   STRCPY(d, "bar");
 			    d += 3;
-			    continue;
-		case '"':   STRCPY(d, "quote");
+			    अनुवर्त;
+		पक्ष '"':   STRCPY(d, "quote");
 			    d += 5;
-			    continue;
-		case '*':   *d++ = '.';
-			    break;
-		case '?':   *d++ = '.';
-			    continue;
-		case '$':
-		case '.':
-		case '~':   *d++ = '\\';
-			    break;
+			    अनुवर्त;
+		पक्ष '*':   *d++ = '.';
+			    भङ्ग;
+		पक्ष '?':   *d++ = '.';
+			    अनुवर्त;
+		पक्ष '$':
+		पक्ष '.':
+		पक्ष '~':   *d++ = '\\';
+			    भङ्ग;
 	    }
 
 	    // Replace "^x" by "CTRL-X". Don't do this for "^_" to make
 	    // ":help i_^_CTRL-D" work.
 	    // Insert '-' before and after "CTRL-X" when applicable.
-	    if (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
-			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != NULL)))
+	    यदि (*s < ' ' || (*s == '^' && s[1] && (ASCII_ISALPHA(s[1])
+			   || vim_strchr((char_u *)"?@[\\]^", s[1]) != रिक्त)))
 	    {
-		if (d > IObuff && d[-1] != '_' && d[-1] != '\\')
+		यदि (d > IObuff && d[-1] != '_' && d[-1] != '\\')
 		    *d++ = '_';		// prepend a '_' to make x_CTRL-x
 		STRCPY(d, "CTRL-");
 		d += 5;
-		if (*s < ' ')
+		यदि (*s < ' ')
 		{
 		    *d++ = *s + '@';
-		    if (d[-1] == '\\')
+		    यदि (d[-1] == '\\')
 			*d++ = '\\';	// double a backslash
 		}
-		else
+		अन्यथा
 		    *d++ = *++s;
-		if (s[1] != NUL && s[1] != '_')
+		यदि (s[1] != NUL && s[1] != '_')
 		    *d++ = '_';		// append a '_'
-		continue;
+		अनुवर्त;
 	    }
-	    else if (*s == '^')		// "^" or "CTRL-^" or "^_"
+	    अन्यथा यदि (*s == '^')		// "^" or "CTRL-^" or "^_"
 		*d++ = '\\';
 
 	    // Insert a backslash before a backslash after a slash, for search
 	    // pattern tags: "/\|" --> "/\\|".
-	    else if (s[0] == '\\' && s[1] != '\\'
+	    अन्यथा यदि (s[0] == '\\' && s[1] != '\\'
 					       && *arg == '/' && s == arg + 1)
 		*d++ = '\\';
 
 	    // "CTRL-\_" -> "CTRL-\\_" to avoid the special meaning of "\_" in
 	    // "CTRL-\_CTRL-N"
-	    if (STRNICMP(s, "CTRL-\\_", 7) == 0)
+	    यदि (STRNICMP(s, "CTRL-\\_", 7) == 0)
 	    {
 		STRCPY(d, "CTRL-\\\\");
 		d += 7;
@@ -513,34 +513,34 @@ find_help_tags(
 
 	    // If tag contains "({" or "([", tag terminates at the "(".
 	    // This is for help on functions, e.g.: abs({expr}).
-	    if (*s == '(' && (s[1] == '{' || s[1] =='['))
-		break;
+	    यदि (*s == '(' && (s[1] == '{' || s[1] =='['))
+		भङ्ग;
 
 	    // If tag starts with ', toss everything after a second '. Fixes
 	    // CTRL-] on 'option'. (would include the trailing '.').
-	    if (*s == '\'' && s > arg && *arg == '\'')
-		break;
+	    यदि (*s == '\'' && s > arg && *arg == '\'')
+		भङ्ग;
 	    // Also '{' and '}'.
-	    if (*s == '}' && s > arg && *arg == '{')
-		break;
+	    यदि (*s == '}' && s > arg && *arg == '{')
+		भङ्ग;
 	  }
 	  *d = NUL;
 
-	  if (*IObuff == '`')
+	  यदि (*IObuff == '`')
 	  {
-	      if (d > IObuff + 2 && d[-1] == '`')
+	      यदि (d > IObuff + 2 && d[-1] == '`')
 	      {
 		  // remove the backticks from `command`
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-2] = NUL;
 	      }
-	      else if (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
+	      अन्यथा यदि (d > IObuff + 3 && d[-2] == '`' && d[-1] == ',')
 	      {
 		  // remove the backticks and comma from `command`,
 		  mch_memmove(IObuff, IObuff + 1, STRLEN(IObuff));
 		  d[-3] = NUL;
 	      }
-	      else if (d > IObuff + 4 && d[-3] == '`'
+	      अन्यथा यदि (d > IObuff + 4 && d[-3] == '`'
 					     && d[-2] == '\\' && d[-1] == '.')
 	      {
 		  // remove the backticks and dot from `command`\.
@@ -552,22 +552,22 @@ find_help_tags(
     }
 
     *matches = (char_u **)"";
-    *num_matches = 0;
+    *अंक_matches = 0;
     flags = TAG_HELP | TAG_REGEXP | TAG_NAMES | TAG_VERBOSE | TAG_NO_TAGFUNC;
-    if (keep_lang)
+    यदि (keep_lang)
 	flags |= TAG_KEEP_LANG;
-    if (find_tags(IObuff, num_matches, matches, flags, (int)MAXCOL, NULL) == OK
-	    && *num_matches > 0)
+    यदि (find_tags(IObuff, अंक_matches, matches, flags, (पूर्णाङ्क)MAXCOL, रिक्त) == OK
+	    && *अंक_matches > 0)
     {
 	// Sort the matches found on the heuristic number that is after the
 	// tag name.
-	qsort((void *)*matches, (size_t)*num_matches,
-					      sizeof(char_u *), help_compare);
+	qsort((शून्य *)*matches, (size_t)*अंक_matches,
+					      परिमाण(char_u *), help_compare);
 	// Delete more than TAG_MANY to reduce the size of the listing.
-	while (*num_matches > TAG_MANY)
-	    vim_free((*matches)[--*num_matches]);
+	यावत् (*अंक_matches > TAG_MANY)
+	    vim_free((*matches)[--*अंक_matches]);
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 #ifdef FEAT_MULTI_LANG
@@ -576,15 +576,15 @@ find_help_tags(
  * Remove "@ab" if the top of 'helplang' is "ab" and the language of the first
  * tag matches it.  Otherwise remove "@en" if "en" is the only language.
  */
-    void
-cleanup_help_tags(int num_file, char_u **file)
+    शून्य
+cleanup_help_tags(पूर्णाङ्क अंक_file, char_u **file)
 {
-    int		i, j;
-    int		len;
+    पूर्णाङ्क		i, j;
+    पूर्णाङ्क		len;
     char_u	buf[4];
     char_u	*p = buf;
 
-    if (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
+    यदि (p_hlg[0] != NUL && (p_hlg[0] != 'e' || p_hlg[1] != 'n'))
     {
 	*p++ = '@';
 	*p++ = p_hlg[0];
@@ -592,32 +592,32 @@ cleanup_help_tags(int num_file, char_u **file)
     }
     *p = NUL;
 
-    for (i = 0; i < num_file; ++i)
+    प्रति (i = 0; i < अंक_file; ++i)
     {
-	len = (int)STRLEN(file[i]) - 3;
-	if (len <= 0)
-	    continue;
-	if (STRCMP(file[i] + len, "@en") == 0)
+	len = (पूर्णाङ्क)STRLEN(file[i]) - 3;
+	यदि (len <= 0)
+	    अनुवर्त;
+	यदि (STRCMP(file[i] + len, "@en") == 0)
 	{
 	    // Sorting on priority means the same item in another language may
 	    // be anywhere.  Search all items for a match up to the "@en".
-	    for (j = 0; j < num_file; ++j)
-		if (j != i && (int)STRLEN(file[j]) == len + 3
+	    प्रति (j = 0; j < अंक_file; ++j)
+		यदि (j != i && (पूर्णाङ्क)STRLEN(file[j]) == len + 3
 			   && STRNCMP(file[i], file[j], len + 1) == 0)
-		    break;
-	    if (j == num_file)
+		    भङ्ग;
+	    यदि (j == अंक_file)
 		// item only exists with @en, remove it
 		file[i][len] = NUL;
 	}
     }
 
-    if (*buf != NUL)
-	for (i = 0; i < num_file; ++i)
+    यदि (*buf != NUL)
+	प्रति (i = 0; i < अंक_file; ++i)
 	{
-	    len = (int)STRLEN(file[i]) - 3;
-	    if (len <= 0)
-		continue;
-	    if (STRCMP(file[i] + len, buf) == 0)
+	    len = (पूर्णाङ्क)STRLEN(file[i]) - 3;
+	    यदि (len <= 0)
+		अनुवर्त;
+	    यदि (STRCMP(file[i] + len, buf) == 0)
 	    {
 		// remove the default language
 		file[i][len] = NUL;
@@ -629,8 +629,8 @@ cleanup_help_tags(int num_file, char_u **file)
 /*
  * Called when starting to edit a buffer for a help file.
  */
-    void
-prepare_help_buffer(void)
+    शून्य
+prepare_help_buffer(शून्य)
 {
     char_u	*p;
 
@@ -648,11 +648,11 @@ prepare_help_buffer(void)
     // latin1 word characters (for translated help files).
     // Only set it when needed, buf_init_chartab() is some work.
     p = (char_u *)"!-~,^*,^|,^\",192-255";
-    if (STRCMP(curbuf->b_p_isk, p) != 0)
+    यदि (STRCMP(curbuf->b_p_isk, p) != 0)
     {
 	set_string_option_direct((char_u *)"isk", -1, p, OPT_FREE|OPT_LOCAL, 0);
 	check_buf_options(curbuf);
-	(void)buf_init_chartab(curbuf, FALSE);
+	(शून्य)buf_init_chartab(curbuf, FALSE);
     }
 
 #ifdef FEAT_FOLDING
@@ -692,60 +692,60 @@ prepare_help_buffer(void)
  * After reading a help file: May cleanup a help buffer when syntax
  * highlighting is not used.
  */
-    void
-fix_help_buffer(void)
+    शून्य
+fix_help_buffer(शून्य)
 {
     linenr_T	lnum;
-    char_u	*line;
-    int		in_example = FALSE;
-    int		len;
+    char_u	*ओळ;
+    पूर्णाङ्क		in_example = FALSE;
+    पूर्णाङ्क		len;
     char_u	*fname;
     char_u	*p;
     char_u	*rt;
-    int		mustfree;
+    पूर्णाङ्क		mustfree;
 
     // Set filetype to "help" if still needed.
-    if (STRCMP(curbuf->b_p_ft, "help") != 0)
+    यदि (STRCMP(curbuf->b_p_ft, "help") != 0)
     {
 	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	set_option_मूल्य_give_err((char_u *)"ft",
 					      0L, (char_u *)"help", OPT_LOCAL);
 	--curbuf_lock;
     }
 
 #ifdef FEAT_SYN_HL
-    if (!syntax_present(curwin))
+    यदि (!syntax_present(curwin))
 #endif
     {
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	प्रति (lnum = 1; lnum <= curbuf->b_ml.ml_ओळ_मोजणी; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
+	    ओळ = ml_get_buf(curbuf, lnum, FALSE);
 	    len = ml_get_buf_len(curbuf, lnum);
-	    if (in_example && len > 0 && !VIM_ISWHITE(line[0]))
+	    यदि (in_example && len > 0 && !VIM_ISWHITE(ओळ[0]))
 	    {
 		// End of example: non-white or '<' in first column.
-		if (line[0] == '<')
+		यदि (ओळ[0] == '<')
 		{
 		    // blank-out a '<' in the first column
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[0] = ' ';
+		    ओळ = ml_get_buf(curbuf, lnum, TRUE);
+		    ओळ[0] = ' ';
 		}
 		in_example = FALSE;
 	    }
-	    if (!in_example && len > 0)
+	    यदि (!in_example && len > 0)
 	    {
-		if (line[len - 1] == '>' && (len == 1 || line[len - 2] == ' '))
+		यदि (ओळ[len - 1] == '>' && (len == 1 || ओळ[len - 2] == ' '))
 		{
 		    // blank-out a '>' in the last column (start of example)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    ओळ = ml_get_buf(curbuf, lnum, TRUE);
+		    ओळ[len - 1] = ' ';
 		    in_example = TRUE;
 		}
-		else if (line[len - 1] == '~')
+		अन्यथा यदि (ओळ[len - 1] == '~')
 		{
 		    // blank-out a '~' at the end of line (header marker)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    ओळ = ml_get_buf(curbuf, lnum, TRUE);
+		    ओळ[len - 1] = ' ';
 		}
 	    }
 	}
@@ -754,7 +754,7 @@ fix_help_buffer(void)
     // In the "help.txt" and "help.abx" file, add the locally added help
     // files.  This uses the very first line in the help file.
     fname = gettail(curbuf->b_fname);
-    if (fnamecmp(fname, "help.txt") == 0
+    यदि (fnamecmp(fname, "help.txt") == 0
 #ifdef FEAT_MULTI_LANG
 	|| (fnamencmp(fname, "help.", 5) == 0
 	    && ASCII_ISALPHA(fname[5])
@@ -764,122 +764,122 @@ fix_help_buffer(void)
 #endif
 	)
     {
-	for (lnum = 1; lnum < curbuf->b_ml.ml_line_count; ++lnum)
+	प्रति (lnum = 1; lnum < curbuf->b_ml.ml_ओळ_मोजणी; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
-	    if (strstr((char *)line, "*local-additions*") == NULL)
-		continue;
+	    ओळ = ml_get_buf(curbuf, lnum, FALSE);
+	    यदि (strstr((वर्ण *)ओळ, "*local-additions*") == रिक्त)
+		अनुवर्त;
 
 	    // Go through all directories in 'runtimepath', skipping
 	    // $VIMRUNTIME.
 	    p = p_rtp;
-	    while (*p != NUL)
+	    यावत् (*p != NUL)
 	    {
-		int NameBufflen;
+		पूर्णाङ्क NameBufflen;
 
 		NameBufflen = copy_option_part(&p, NameBuff, MAXPATHL, ",");
 		mustfree = FALSE;
 		rt = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-		if (rt != NULL &&
+		यदि (rt != रिक्त &&
 			    fullpathcmp(rt, NameBuff, FALSE, TRUE) != FPC_SAME)
 		{
-		    int		fcount;
+		    पूर्णाङ्क		fcount;
 		    char_u	**fnames;
 		    FILE	*fd;
 		    char_u	*s;
-		    int		fi;
+		    पूर्णाङ्क		fi;
 		    vimconv_T	vc;
 		    char_u	*cp;
 
 		    // Find all "doc/ *.txt" files in this directory.
-		    if (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
+		    यदि (*NameBuff != NUL && !after_pathsep(NameBuff, NameBuff + NameBufflen))
 		    {
 			STRCPY(NameBuff + NameBufflen, PATHSEPSTR);
-			NameBufflen += sizeof(PATHSEP);
+			NameBufflen += परिमाण(PATHSEP);
 		    }
 #ifdef FEAT_MULTI_LANG
 		    STRCPY(NameBuff + NameBufflen, "doc/*.??[tx]");
-#else
+#अन्यथा
 		    STRCPY(NameBuff + NameBufflen, "doc/*.txt");
 #endif
-		    if (gen_expand_wildcards(1, &NameBuff, &fcount,
+		    यदि (gen_expand_wildcards(1, &NameBuff, &fcount,
 					 &fnames, EW_FILE|EW_SILENT) == OK
 			    && fcount > 0)
 		    {
 #ifdef FEAT_MULTI_LANG
-			int	i1, i2;
+			पूर्णाङ्क	i1, i2;
 			char_u	*f1, *f2;
 			char_u	*t1, *t2;
 			char_u	*e1, *e2;
 
 			// If foo.abx is found use it instead of foo.txt in
 			// the same directory.
-			for (i1 = 0; i1 < fcount; ++i1)
+			प्रति (i1 = 0; i1 < fcount; ++i1)
 			{
 			    f1 = fnames[i1];
 			    t1 = gettail(f1);
 			    e1 = vim_strrchr(t1, '.');
-			    if (e1 == NULL)
-				continue;
-			    if (fnamecmp(e1, ".txt") != 0
+			    यदि (e1 == रिक्त)
+				अनुवर्त;
+			    यदि (fnamecmp(e1, ".txt") != 0
 					       && fnamecmp(e1, fname + 4) != 0)
 			    {
 				// Not .txt and not .abx, remove it.
 				VIM_CLEAR(fnames[i1]);
-				continue;
+				अनुवर्त;
 			    }
 
-			    for (i2 = i1 + 1; i2 < fcount; ++i2)
+			    प्रति (i2 = i1 + 1; i2 < fcount; ++i2)
 			    {
 				f2 = fnames[i2];
-				if (f2 == NULL)
-				    continue;
+				यदि (f2 == रिक्त)
+				    अनुवर्त;
 				t2 = gettail(f2);
 				e2 = vim_strrchr(t2, '.');
-				if (e2 == NULL)
-				    continue;
-				if (e1 - f1 != e2 - f2
+				यदि (e2 == रिक्त)
+				    अनुवर्त;
+				यदि (e1 - f1 != e2 - f2
 					    || fnamencmp(f1, f2, e1 - f1) != 0)
-				    continue;
-				if (fnamecmp(e1, ".txt") == 0
+				    अनुवर्त;
+				यदि (fnamecmp(e1, ".txt") == 0
 					       && fnamecmp(e2, fname + 4) == 0)
 				    // use .abx instead of .txt
 				    VIM_CLEAR(fnames[i1]);
 			    }
 			}
 #endif
-			for (fi = 0; fi < fcount; ++fi)
+			प्रति (fi = 0; fi < fcount; ++fi)
 			{
-			    if (fnames[fi] == NULL)
-				continue;
-			    fd = mch_fopen((char *)fnames[fi], "r");
-			    if (fd != NULL)
+			    यदि (fnames[fi] == रिक्त)
+				अनुवर्त;
+			    fd = mch_fopen((वर्ण *)fnames[fi], "r");
+			    यदि (fd != रिक्त)
 			    {
 				vim_fgets(IObuff, IOSIZE, fd);
-				if (IObuff[0] == '*'
+				यदि (IObuff[0] == '*'
 					&& (s = vim_strchr(IObuff + 1, '*'))
-								  != NULL)
+								  != रिक्त)
 				{
-				    int	this_utf = MAYBE;
+				    पूर्णाङ्क	this_utf = MAYBE;
 
 				    // Change tag definition to a
 				    // reference and remove <CR>/<NL>.
 				    IObuff[0] = '|';
 				    *s = '|';
-				    while (*s != NUL)
+				    यावत् (*s != NUL)
 				    {
-					if (*s == '\r' || *s == '\n')
+					यदि (*s == '\r' || *s == '\n')
 					    *s = NUL;
 					// The text is utf-8 when a byte
 					// above 127 is found and no
 					// illegal byte sequence is found.
-					if (*s >= 0x80 && this_utf != FALSE)
+					यदि (*s >= 0x80 && this_utf != FALSE)
 					{
-					    int	l;
+					    पूर्णाङ्क	l;
 
 					    this_utf = TRUE;
 					    l = utf_ptr2len(s);
-					    if (l == 1)
+					    यदि (l == 1)
 						this_utf = FALSE;
 					    s += l - 1;
 					}
@@ -893,22 +893,22 @@ fix_help_buffer(void)
 				    convert_setup(&vc, (char_u *)(
 						this_utf == TRUE ? "utf-8"
 						      : "latin1"), p_enc);
-				    if (vc.vc_type == CONV_NONE)
+				    यदि (vc.vc_type == CONV_NONE)
 					// No conversion needed.
 					cp = IObuff;
-				    else
+				    अन्यथा
 				    {
 					// Do the conversion.  If it fails
 					// use the unconverted text.
 					cp = string_convert(&vc, IObuff,
-								    NULL);
-					if (cp == NULL)
+								    रिक्त);
+					यदि (cp == रिक्त)
 					    cp = IObuff;
 				    }
-				    convert_setup(&vc, NULL, NULL);
+				    convert_setup(&vc, रिक्त, रिक्त);
 
 				    ml_append(lnum, cp, (colnr_T)0, FALSE);
-				    if (cp != IObuff)
+				    यदि (cp != IObuff)
 					vim_free(cp);
 				    ++lnum;
 				}
@@ -918,10 +918,10 @@ fix_help_buffer(void)
 			FreeWild(fcount, fnames);
 		    }
 		}
-		if (mustfree)
+		यदि (mustfree)
 		    vim_free(rt);
 	    }
-	    break;
+	    भङ्ग;
 	}
     }
 }
@@ -929,7 +929,7 @@ fix_help_buffer(void)
 /*
  * ":exusage"
  */
-    void
+    शून्य
 ex_exusage(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"help ex-cmd-index");
@@ -938,7 +938,7 @@ ex_exusage(exarg_T *eap UNUSED)
 /*
  * ":viusage"
  */
-    void
+    शून्य
 ex_viusage(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"help normal-index");
@@ -947,46 +947,46 @@ ex_viusage(exarg_T *eap UNUSED)
 /*
  * Generate tags in one help directory.
  */
-    static void
+    स्थिर शून्य
 helptags_one(
     char_u	*dir,		// doc directory
     char_u	*ext,		// suffix, ".txt", ".itx", ".frx", etc.
     char_u	*tagfname,	// "tags" for English, "tags-fr" for French.
-    int		add_help_tags,	// add "help-tags" tag
-    int		ignore_writeerr)    // ignore write error
+    पूर्णाङ्क		add_help_tags,	// add "help-tags" tag
+    पूर्णाङ्क		ignore_writeerr)    // ignore write error
 {
     FILE	*fd_tags;
     FILE	*fd;
     garray_T	ga;
-    int		res;
-    int		filecount;
+    पूर्णाङ्क		res;
+    पूर्णाङ्क		filecount;
     char_u	**files;
     char_u	*p1, *p2;
-    int		fi;
+    पूर्णाङ्क		fi;
     char_u	*s;
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*fname;
-    int		dirlen;
-    int		utf8 = MAYBE;
-    int		this_utf8;
-    int		firstline;
-    int		in_example;
-    int		mix = FALSE;	// detected mixed encodings
+    पूर्णाङ्क		dirlen;
+    पूर्णाङ्क		utf8 = MAYBE;
+    पूर्णाङ्क		this_utf8;
+    पूर्णाङ्क		firstline;
+    पूर्णाङ्क		in_example;
+    पूर्णाङ्क		mix = FALSE;	// detected mixed encodings
 
     // Find all *.txt files.
-    dirlen = (int)STRLEN(dir);
+    dirlen = (पूर्णाङ्क)STRLEN(dir);
     STRCPY(NameBuff, dir);
     STRCAT(NameBuff, "/**/*");
     STRCAT(NameBuff, ext);
     res = gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 							    EW_FILE|EW_SILENT);
-    if (res == FAIL || filecount == 0)
+    यदि (res == FAIL || filecount == 0)
     {
-	if (!got_int)
+	यदि (!got_int)
 	    semsg(_(e_no_match_str_1), NameBuff);
-	if (res != FAIL)
+	यदि (res != FAIL)
 	    FreeWild(filecount, files);
-	return;
+	प्रत्यागम;
     }
 
     // Open the tags file for writing.
@@ -994,31 +994,31 @@ helptags_one(
     STRCPY(NameBuff, dir);
     add_pathsep(NameBuff);
     STRCAT(NameBuff, tagfname);
-    fd_tags = mch_fopen((char *)NameBuff, "w");
-    if (fd_tags == NULL)
+    fd_tags = mch_fopen((वर्ण *)NameBuff, "w");
+    यदि (fd_tags == रिक्त)
     {
-	if (!ignore_writeerr)
+	यदि (!ignore_writeerr)
 	    semsg(_(e_cannot_open_str_for_writing_1), NameBuff);
 	FreeWild(filecount, files);
-	return;
+	प्रत्यागम;
     }
 
     // If using the "++t" argument or generating tags for "$VIMRUNTIME/doc"
     // add the "help-tags" tag.
-    ga_init2(&ga, sizeof(char_u *), 100);
-    if (add_help_tags || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
+    ga_init2(&ga, परिमाण(char_u *), 100);
+    यदि (add_help_tags || fullpathcmp((char_u *)"$VIMRUNTIME/doc",
 						dir, FALSE, TRUE) == FPC_SAME)
     {
-	if (ga_grow(&ga, 1) == FAIL)
+	यदि (ga_grow(&ga, 1) == FAIL)
 	    got_int = TRUE;
-	else
+	अन्यथा
 	{
 	    s = alloc(18 + (unsigned)STRLEN(tagfname));
-	    if (s == NULL)
+	    यदि (s == रिक्त)
 		got_int = TRUE;
-	    else
+	    अन्यथा
 	    {
-		sprintf((char *)s, "help-tags\t%s\t1\n", tagfname);
+		sprintf((वर्ण *)s, "help-tags\t%s\t1\n", tagfname);
 		((char_u **)ga.ga_data)[ga.ga_len] = s;
 		++ga.ga_len;
 	    }
@@ -1026,44 +1026,44 @@ helptags_one(
     }
 
     // Go over all the files and extract the tags.
-    for (fi = 0; fi < filecount && !got_int; ++fi)
+    प्रति (fi = 0; fi < filecount && !got_int; ++fi)
     {
-	fd = mch_fopen((char *)files[fi], "r");
-	if (fd == NULL)
+	fd = mch_fopen((वर्ण *)files[fi], "r");
+	यदि (fd == रिक्त)
 	{
 	    semsg(_(e_unable_to_open_str_for_reading), files[fi]);
-	    continue;
+	    अनुवर्त;
 	}
 	fname = files[fi] + dirlen + 1;
 
 	in_example = FALSE;
 	firstline = TRUE;
-	while (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
+	यावत् (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
 	{
-	    if (firstline)
+	    यदि (firstline)
 	    {
 		// Detect utf-8 file by a non-ASCII char in the first line.
 		this_utf8 = MAYBE;
-		for (s = IObuff; *s != NUL; ++s)
-		    if (*s >= 0x80)
+		प्रति (s = IObuff; *s != NUL; ++s)
+		    यदि (*s >= 0x80)
 		    {
-			int l;
+			पूर्णाङ्क l;
 
 			this_utf8 = TRUE;
 			l = utf_ptr2len(s);
-			if (l == 1)
+			यदि (l == 1)
 			{
 			    // Illegal UTF-8 byte sequence.
 			    this_utf8 = FALSE;
-			    break;
+			    भङ्ग;
 			}
 			s += l - 1;
 		    }
-		if (this_utf8 == MAYBE)	    // only ASCII characters found
+		यदि (this_utf8 == MAYBE)	    // only ASCII characters found
 		    this_utf8 = FALSE;
-		if (utf8 == MAYBE)	    // first file
+		यदि (utf8 == MAYBE)	    // first file
 		    utf8 = this_utf8;
-		else if (utf8 != this_utf8)
+		अन्यथा यदि (utf8 != this_utf8)
 		{
 		    semsg(_(e_mix_of_help_file_encodings_within_language_str), files[fi]);
 		    mix = !got_int;
@@ -1071,50 +1071,50 @@ helptags_one(
 		}
 		firstline = FALSE;
 	    }
-	    if (in_example)
+	    यदि (in_example)
 	    {
 		// skip over example; a non-white in the first column ends it
-		if (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
-		    continue;
+		यदि (vim_strchr((char_u *)" \t\n\r", IObuff[0]))
+		    अनुवर्त;
 		in_example = FALSE;
 	    }
 	    p1 = vim_strchr(IObuff, '*');	// find first '*'
-	    while (p1 != NULL)
+	    यावत् (p1 != रिक्त)
 	    {
 		// Use vim_strbyte() instead of vim_strchr() so that when
 		// 'encoding' is dbcs it still works, don't find '*' in the
 		// second byte.
 		p2 = vim_strbyte(p1 + 1, '*');	// find second '*'
-		if (p2 != NULL && p2 > p1 + 1)	// skip "*" and "**"
+		यदि (p2 != रिक्त && p2 > p1 + 1)	// skip "*" and "**"
 		{
-		    for (s = p1 + 1; s < p2; ++s)
-			if (*s == ' ' || *s == '\t' || *s == '|')
-			    break;
+		    प्रति (s = p1 + 1; s < p2; ++s)
+			यदि (*s == ' ' || *s == '\t' || *s == '|')
+			    भङ्ग;
 
 		    // Only accept a *tag* when it consists of valid
 		    // characters, there is white space before it and is
 		    // followed by a white character or end-of-line.
-		    if (s == p2
+		    यदि (s == p2
 			    && (p1 == IObuff || p1[-1] == ' ' || p1[-1] == '\t')
-			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != NULL
+			    && (vim_strchr((char_u *)" \t\n\r", s[1]) != रिक्त
 				|| s[1] == '\0'))
 		    {
 			*p2 = '\0';
 			++p1;
-			if (ga_grow(&ga, 1) == FAIL)
+			यदि (ga_grow(&ga, 1) == FAIL)
 			{
 			    got_int = TRUE;
-			    break;
+			    भङ्ग;
 			}
 			s = alloc(p2 - p1 + STRLEN(fname) + 2);
-			if (s == NULL)
+			यदि (s == रिक्त)
 			{
 			    got_int = TRUE;
-			    break;
+			    भङ्ग;
 			}
 			((char_u **)ga.ga_data)[ga.ga_len] = s;
 			++ga.ga_len;
-			sprintf((char *)s, "%s\t%s", p1, fname);
+			sprintf((वर्ण *)s, "%s\t%s", p1, fname);
 
 			// find next '*'
 			p2 = vim_strchr(p2 + 1, '*');
@@ -1123,16 +1123,16 @@ helptags_one(
 		p1 = p2;
 	    }
 	    size_t off = STRLEN(IObuff);
-	    if (off >= 2 && IObuff[off - 1] == '\n')
+	    यदि (off >= 2 && IObuff[off - 1] == '\n')
 	    {
 		off -= 2;
-		while (off > 0 && (ASCII_ISLOWER(IObuff[off])
+		यावत् (off > 0 && (ASCII_ISLOWER(IObuff[off])
 						  || VIM_ISDIGIT(IObuff[off])))
 		    off--;
-		if (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
+		यदि (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
 		    in_example = TRUE;
 	    }
-	    line_breakcheck();
+	    ओळ_breakcheck();
 	}
 
 	fclose(fd);
@@ -1140,51 +1140,51 @@ helptags_one(
 
     FreeWild(filecount, files);
 
-    if (!got_int)
+    यदि (!got_int)
     {
 	// Sort the tags.
-	if (ga.ga_data != NULL)
+	यदि (ga.ga_data != रिक्त)
 	    sort_strings((char_u **)ga.ga_data, ga.ga_len);
 
 	// Check for duplicates.
-	for (i = 1; i < ga.ga_len; ++i)
+	प्रति (i = 1; i < ga.ga_len; ++i)
 	{
 	    p1 = ((char_u **)ga.ga_data)[i - 1];
 	    p2 = ((char_u **)ga.ga_data)[i];
-	    while (*p1 == *p2)
+	    यावत् (*p1 == *p2)
 	    {
-		if (*p2 == '\t')
+		यदि (*p2 == '\t')
 		{
 		    *p2 = NUL;
-		    vim_snprintf((char *)NameBuff, MAXPATHL,
+		    vim_snprintf((वर्ण *)NameBuff, MAXPATHL,
 			    _(e_duplicate_tag_str_in_file_str_str),
 				     ((char_u **)ga.ga_data)[i], dir, p2 + 1);
-		    emsg((char *)NameBuff);
+		    emsg((वर्ण *)NameBuff);
 		    *p2 = '\t';
-		    break;
+		    भङ्ग;
 		}
 		++p1;
 		++p2;
 	    }
 	}
 
-	if (utf8 == TRUE)
+	यदि (utf8 == TRUE)
 	    fprintf(fd_tags, "!_TAG_FILE_ENCODING\tutf-8\t//\n");
 
 	// Write the tags into the file.
-	for (i = 0; i < ga.ga_len; ++i)
+	प्रति (i = 0; i < ga.ga_len; ++i)
 	{
 	    s = ((char_u **)ga.ga_data)[i];
-	    if (STRNCMP(s, "help-tags\t", 10) == 0)
+	    यदि (STRNCMP(s, "help-tags\t", 10) == 0)
 		// help-tags entry was added in formatted form
-		fputs((char *)s, fd_tags);
-	    else
+		fputs((वर्ण *)s, fd_tags);
+	    अन्यथा
 	    {
 		fprintf(fd_tags, "%s\t/*", s);
-		for (p1 = s; *p1 != '\t'; ++p1)
+		प्रति (p1 = s; *p1 != '\t'; ++p1)
 		{
 		    // insert backslash before '\\' and '/'
-		    if (*p1 == '\\' || *p1 == '/')
+		    यदि (*p1 == '\\' || *p1 == '/')
 			putc('\\', fd_tags);
 		    putc(*p1, fd_tags);
 		}
@@ -1192,10 +1192,10 @@ helptags_one(
 	    }
 	}
     }
-    if (mix)
+    यदि (mix)
 	got_int = FALSE;    // continue with other languages
 
-    for (i = 0; i < ga.ga_len; ++i)
+    प्रति (i = 0; i < ga.ga_len; ++i)
 	vim_free(((char_u **)ga.ga_data)[i]);
     ga_clear(&ga);
     fclose(fd_tags);	    // there is no check for an error...
@@ -1204,47 +1204,47 @@ helptags_one(
 /*
  * Generate tags in one help directory, taking care of translations.
  */
-    static void
-do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
+    स्थिर शून्य
+do_helptags(char_u *dirname, पूर्णाङ्क add_help_tags, पूर्णाङ्क ignore_writeerr)
 {
 #ifdef FEAT_MULTI_LANG
-    int		len;
-    int		i, j;
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		i, j;
     garray_T	ga;
     char_u	lang[2];
     char_u	ext[5];
     char_u	fname[8];
-    int		filecount;
+    पूर्णाङ्क		filecount;
     char_u	**files;
 
     // Get a list of all files in the help directory and in subdirectories.
     STRCPY(NameBuff, dirname);
     add_pathsep(NameBuff);
     STRCAT(NameBuff, "**");
-    if (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
+    यदि (gen_expand_wildcards(1, &NameBuff, &filecount, &files,
 						    EW_FILE|EW_SILENT) == FAIL
 	    || filecount == 0)
     {
 	semsg(_(e_no_match_str_1), NameBuff);
-	return;
+	प्रत्यागम;
     }
 
     // Go over all files in the directory to find out what languages are
     // present.
     ga_init2(&ga, 1, 10);
-    for (i = 0; i < filecount; ++i)
+    प्रति (i = 0; i < filecount; ++i)
     {
-	len = (int)STRLEN(files[i]);
-	if (len <= 4)
-	    continue;
+	len = (पूर्णाङ्क)STRLEN(files[i]);
+	यदि (len <= 4)
+	    अनुवर्त;
 
-	if (STRICMP(files[i] + len - 4, ".txt") == 0)
+	यदि (STRICMP(files[i] + len - 4, ".txt") == 0)
 	{
 	    // ".txt" -> language "en"
 	    lang[0] = 'e';
 	    lang[1] = 'n';
 	}
-	else if (files[i][len - 4] == '.'
+	अन्यथा यदि (files[i][len - 4] == '.'
 		&& ASCII_ISALPHA(files[i][len - 3])
 		&& ASCII_ISALPHA(files[i][len - 2])
 		&& TOLOWER_ASC(files[i][len - 1]) == 'x')
@@ -1253,36 +1253,36 @@ do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
 	    lang[0] = TOLOWER_ASC(files[i][len - 3]);
 	    lang[1] = TOLOWER_ASC(files[i][len - 2]);
 	}
-	else
-	    continue;
+	अन्यथा
+	    अनुवर्त;
 
 	// Did we find this language already?
-	for (j = 0; j < ga.ga_len; j += 2)
-	    if (STRNCMP(lang, ((char_u *)ga.ga_data) + j, 2) == 0)
-		break;
-	if (j == ga.ga_len)
+	प्रति (j = 0; j < ga.ga_len; j += 2)
+	    यदि (STRNCMP(lang, ((char_u *)ga.ga_data) + j, 2) == 0)
+		भङ्ग;
+	यदि (j == ga.ga_len)
 	{
 	    // New language, add it.
-	    if (ga_grow(&ga, 2) == FAIL)
-		break;
+	    यदि (ga_grow(&ga, 2) == FAIL)
+		भङ्ग;
 	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[0];
 	    ((char_u *)ga.ga_data)[ga.ga_len++] = lang[1];
 	}
     }
 
     // Loop over the found languages to generate a tags file for each one.
-    for (j = 0; j < ga.ga_len; j += 2)
+    प्रति (j = 0; j < ga.ga_len; j += 2)
     {
 	STRCPY(fname, "tags-xx");
 	fname[5] = ((char_u *)ga.ga_data)[j];
 	fname[6] = ((char_u *)ga.ga_data)[j + 1];
-	if (fname[5] == 'e' && fname[6] == 'n')
+	यदि (fname[5] == 'e' && fname[6] == 'n')
 	{
 	    // English is an exception: use ".txt" and "tags".
 	    fname[4] = NUL;
 	    STRCPY(ext, ".txt");
 	}
-	else
+	अन्यथा
 	{
 	    // Language "ab" uses ".abx" and "tags-ab".
 	    STRCPY(ext, ".xxx");
@@ -1295,50 +1295,50 @@ do_helptags(char_u *dirname, int add_help_tags, int ignore_writeerr)
     ga_clear(&ga);
     FreeWild(filecount, files);
 
-#else
+#अन्यथा
     // No language support, just use "*.txt" and "tags".
     helptags_one(dirname, (char_u *)".txt", (char_u *)"tags", add_help_tags,
 							    ignore_writeerr);
 #endif
 }
 
-    static void
-helptags_cb(char_u *fname, void *cookie)
+    स्थिर शून्य
+helptags_cb(char_u *fname, शून्य *cookie)
 {
-    do_helptags(fname, *(int *)cookie, TRUE);
+    do_helptags(fname, *(पूर्णाङ्क *)cookie, TRUE);
 }
 
 /*
  * ":helptags"
  */
-    void
+    शून्य
 ex_helptags(exarg_T *eap)
 {
     expand_T	xpc;
     char_u	*dirname;
-    int		add_help_tags = FALSE;
+    पूर्णाङ्क		add_help_tags = FALSE;
 
     // Check for ":helptags ++t {dir}".
-    if (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
+    यदि (STRNCMP(eap->arg, "++t", 3) == 0 && VIM_ISWHITE(eap->arg[3]))
     {
 	add_help_tags = TRUE;
 	eap->arg = skipwhite(eap->arg + 3);
     }
 
-    if (STRCMP(eap->arg, "ALL") == 0)
+    यदि (STRCMP(eap->arg, "ALL") == 0)
     {
 	do_in_path(p_rtp, "", (char_u *)"doc", DIP_ALL + DIP_DIR,
 						 helptags_cb, &add_help_tags);
     }
-    else
+    अन्यथा
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
-	dirname = ExpandOne(&xpc, eap->arg, NULL,
+	dirname = ExpandOne(&xpc, eap->arg, रिक्त,
 			    WILD_LIST_NOTFOUND|WILD_SILENT, WILD_EXPAND_FREE);
-	if (dirname == NULL || !mch_isdir(dirname))
+	यदि (dirname == रिक्त || !mch_isdir(dirname))
 	    semsg(_(e_not_a_directory_str), eap->arg);
-	else
+	अन्यथा
 	    do_helptags(dirname, add_help_tags, FALSE);
 	vim_free(dirname);
     }
