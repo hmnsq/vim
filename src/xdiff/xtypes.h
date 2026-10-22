@@ -20,17 +20,17 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#ᬬᬾᬦ᭄ !defined(XTYPES_H)
 #define XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
+typedef sa_nracanaa s_chanode {
+	sa_nracanaa s_chanode *next;
 	long icurr;
 } chanode_t;
 
-typedef struct s_chastore {
+typedef sa_nracanaa s_chastore {
 	chanode_t *head, *tail;
 	long isize, nsize;
 	chanode_t *ancur;
@@ -38,13 +38,13 @@ typedef struct s_chastore {
 	long scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
+typedef sa_nracanaa s_xrecord {
+	var_na const *ptr;
 	long size;
 	unsigned long ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+typedef sa_nracanaa s_xdfile {
 	xrecord_t *recs;
 	long nrec;
 	long dstart, dend;
@@ -53,7 +53,7 @@ typedef struct s_xdfile {
 	long nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+typedef sa_nracanaa s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 

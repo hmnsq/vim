@@ -45,43 +45,43 @@
 /*
  * The attributes that are actually active for writing to the screen.
  */
-static int	screen_attr = 0;
+static puur_naa_nka	screen_attr = 0;
 
-static void screen_char_2(unsigned off, int row, int col);
-static int screenclear2(int doclear);
-static void lineclear(unsigned off, int width, int attr);
-static void lineinvalid(unsigned off, int width);
-static int win_do_lines(win_T *wp, int row, int line_count, int mayclear, int del, int clear_attr);
+static void screen_char_2(unsigned off, puur_naa_nka row, puur_naa_nka col);
+static puur_naa_nka screenclear2(puur_naa_nka doclear);
+static void lineclear(unsigned off, puur_naa_nka width, puur_naa_nka attr);
+static void lineinvalid(unsigned off, puur_naa_nka width);
+static puur_naa_nka win_do_lines(win_T *wp, puur_naa_nka row, puur_naa_nka line_count, puur_naa_nka mayclear, puur_naa_nka del, puur_naa_nka clear_attr);
 static void win_rest_invalid(win_T *wp);
 static void msg_pos_mode(void);
-static void recording_mode(int attr);
+static void recording_mode(puur_naa_nka attr);
 
 // Ugly global: overrule attribute used by screen_char()
-static int screen_char_attr = 0;
+static puur_naa_nka screen_char_attr = 0;
 
-#if defined(FEAT_CONCEAL)
+#ᬬᬾᬦ᭄ defined(FEAT_CONCEAL)
 /*
  * Return TRUE if the cursor line in window "wp" may be concealed, according
  * to the 'concealcursor' option.
  */
-    int
+    puur_naa_nka
 conceal_cursor_line(win_T *wp)
 {
-    int		c;
+    puur_naa_nka		c;
 
-    if (*wp->w_p_cocu == NUL)
-	return FALSE;
-    if (get_real_state() & MODE_VISUAL)
+    ᬬᬾᬦ᭄ (*wp->w_p_cocu == NUL)
+	ᬯᬮᬶ FALSE;
+    ᬬᬾᬦ᭄ (get_real_state() & MODE_VISUAL)
 	c = 'v';
-    else if (State & MODE_INSERT)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (State & MODE_INSERT)
 	c = 'i';
-    else if (State & MODE_NORMAL)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (State & MODE_NORMAL)
 	c = 'n';
-    else if (State & MODE_CMDLINE)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (State & MODE_CMDLINE)
 	c = 'c';
-    else
-	return FALSE;
-    return vim_strchr(wp->w_p_cocu, c) != NULL;
+    ᬮᬶᬬ
+	ᬯᬮᬶ FALSE;
+    ᬯᬮᬶ vim_strchr(wp->w_p_cocu, c) != NULL;
 }
 
 /*
@@ -91,12 +91,12 @@ conceal_cursor_line(win_T *wp)
  * "
  */
     void
-conceal_check_cursor_line(int was_concealed)
+conceal_check_cursor_line(puur_naa_nka was_concealed)
 {
-    if (curwin->w_p_cole <= 0 || conceal_cursor_line(curwin) == was_concealed)
-	return;
+    ᬬᬾᬦ᭄ (curwin->w_p_cole <= 0 || conceal_cursor_line(curwin) == was_concealed)
+	ᬯᬮᬶ;
 
-    int wcol = curwin->w_wcol;
+    puur_naa_nka wcol = curwin->w_wcol;
 
     need_cursor_line_redraw = TRUE;
     // Need to recompute cursor column, e.g., when starting Visual mode
@@ -105,7 +105,7 @@ conceal_check_cursor_line(int was_concealed)
 
     // When concealing now w_wcol will be computed wrong, keep the previous
     // value, it will be updated in win_line().
-    if (!was_concealed)
+    ᬬᬾᬦ᭄ (!was_concealed)
 	curwin->w_wcol = wcol;
 }
 #endif
@@ -114,67 +114,67 @@ conceal_check_cursor_line(int was_concealed)
  * Get HLF_WIN attribute for window "wp".  If not set and "wp" is a popup window
  * then get the "Pmenu" highlight attribute.
  */
-    int
+    puur_naa_nka
 get_win_attr(win_T *wp)
 {
-    int	    win_attr = wp->w_hlfwin_id;
+    puur_naa_nka	    win_attr = wp->w_hlfwin_id;
     bool    override_success =
 	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-    if (win_attr != 0)
+    ᬬᬾᬦ᭄ (win_attr != 0)
     {
-	if (win_attr != -1)
+	ᬬᬾᬦ᭄ (win_attr != -1)
 	    win_attr = syn_id2attr(win_attr);
-	else
+	ᬮᬶᬬ
 	    win_attr = 0;
     }
 #ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(wp))
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (WIN_IS_POPUP(wp))
     {
-	if (wp->w_popup_flags & POPF_INFO)
+	ᬬᬾᬦ᭄ (wp->w_popup_flags & POPF_INFO)
 	    win_attr = HL_ATTR(HLF_PSI);    // PmenuSel
-	else
+	ᬮᬶᬬ
 	    win_attr = HL_ATTR(HLF_POP);    // Popup
     }
 #endif
 
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
-    return win_attr;
+    ᬯᬮᬶ win_attr;
 }
 
 /*
  * Call screen_fill() with the columns adjusted for 'rightleft' if needed.
  * Return the new offset.
  */
-    static int
+    static puur_naa_nka
 screen_fill_end(
 	win_T *wp,
-	int	c1,
-	int	c2,
-	int	off,
-	int	width,
-	int	row,
-	int	endrow,
-	int	attr)
+	puur_naa_nka	c1,
+	puur_naa_nka	c2,
+	puur_naa_nka	off,
+	puur_naa_nka	width,
+	puur_naa_nka	row,
+	puur_naa_nka	endrow,
+	puur_naa_nka	attr)
 {
-    int	    nn = off + width;
+    puur_naa_nka	    nn = off + width;
 
-    if (nn > wp->w_width)
+    ᬬᬾᬦ᭄ (nn > wp->w_width)
 	nn = wp->w_width;
 #ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+    ᬬᬾᬦ᭄ (wp->w_p_rl)
     {
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		W_ENDCOL(wp) - nn, (int)W_ENDCOL(wp) - off,
+		W_ENDCOL(wp) - nn, (puur_naa_nka)W_ENDCOL(wp) - off,
 		c1, c2, attr);
     }
-    else
+    ᬮᬶᬬ
 #endif
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		wp->w_wincol + off, (int)wp->w_wincol + nn,
+		wp->w_wincol + off, (puur_naa_nka)wp->w_wincol + nn,
 		c1, c2, attr);
-    return nn;
+    ᬯᬮᬶ nn;
 }
 
 /*
@@ -185,38 +185,38 @@ screen_fill_end(
     void
 win_draw_end(
     win_T	*wp,
-    int		c1,
-    int		c2,
-    int		draw_margin,
-    int		row,
-    int		endrow,
+    puur_naa_nka		c1,
+    puur_naa_nka		c2,
+    puur_naa_nka		draw_margin,
+    puur_naa_nka		row,
+    puur_naa_nka		endrow,
     hlf_T	hl)
 {
-    int		n = 0;
-    int		attr = HL_ATTR(hl);
-    int		win_attr = get_win_attr(wp);
+    puur_naa_nka		n = 0;
+    puur_naa_nka		attr = HL_ATTR(hl);
+    puur_naa_nka		win_attr = get_win_attr(wp);
     bool	override_success =
 	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
     attr = hl_combine_attr(win_attr, attr);
 
-    if (draw_margin)
+    ᬬᬾᬦ᭄ (draw_margin)
     {
 #ifdef FEAT_FOLDING
-	int	fdc = compute_foldcolumn(wp, 0);
+	puur_naa_nka	fdc = compute_foldcolumn(wp, 0);
 
-	if (fdc > 0)
+	ᬬᬾᬦ᭄ (fdc > 0)
 	    // draw the fold column
 	    n = screen_fill_end(wp, ' ', ' ', n, fdc,
 		      row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_FC)));
 #endif
 #ifdef FEAT_SIGNS
-	if (signcolumn_on(wp))
+	ᬬᬾᬦ᭄ (signcolumn_on(wp))
 	    // draw the sign column
 	    n = screen_fill_end(wp, ' ', ' ', n, 2,
 		      row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_SC)));
 #endif
-	if ((wp->w_p_nu || wp->w_p_rnu)
+	ᬬᬾᬦ᭄ ((wp->w_p_nu || wp->w_p_rnu)
 				  && vim_strchr(p_cpo, CPO_NUMCOL) == NULL)
 	    // draw the number column
 	    n = screen_fill_end(wp, ' ', ' ', n, number_width(wp) + 1,
@@ -224,38 +224,38 @@ win_draw_end(
     }
 
 #ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl)
+    ᬬᬾᬦ᭄ (wp->w_p_rl)
     {
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
 		wp->w_wincol, W_ENDCOL(wp) - 1 - n, c2, c2, attr);
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
 		W_ENDCOL(wp) - 1 - n, W_ENDCOL(wp) - n, c1, c2, attr);
     }
-    else
+    ᬮᬶᬬ
 #endif
     {
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + endrow,
-		wp->w_wincol + n, (int)W_ENDCOL(wp), c1, c2, attr);
+		wp->w_wincol + n, (puur_naa_nka)W_ENDCOL(wp), c1, c2, attr);
     }
 
     set_empty_rows(wp, row);
 
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
 }
 
-#if defined(FEAT_FOLDING)
+#ᬬᬾᬦ᭄ defined(FEAT_FOLDING)
 /*
  * Compute the width of the foldcolumn.  Based on 'foldcolumn' and how much
  * space is available for window "wp", minus "col".
  */
-    int
-compute_foldcolumn(win_T *wp, int col)
+    puur_naa_nka
+compute_foldcolumn(win_T *wp, puur_naa_nka col)
 {
-    int wmw = wp == curwin && p_wmw == 0 ? 1 : p_wmw;
-    int n = wp->w_width - (col + wmw);
+    puur_naa_nka wmw = wp == curwin && p_wmw == 0 ? 1 : p_wmw;
+    puur_naa_nka n = wp->w_width - (col + wmw);
 
-    return MIN(wp->w_p_fdc, n);
+    ᬯᬮᬶ MIN(wp->w_p_fdc, n);
 }
 
 /*
@@ -269,18 +269,18 @@ compute_foldcolumn(win_T *wp, int col)
 fill_foldcolumn(
     char_u	*p,
     win_T	*wp,
-    int		closed,		// TRUE of FALSE
+    puur_naa_nka		closed,		// TRUE of FALSE
     linenr_T	lnum)		// current line number
 {
-    int		i = 0;
-    int		level;
-    int		first_level;
-    int		empty;
-    int		fdc = compute_foldcolumn(wp, 0);
+    puur_naa_nka		i = 0;
+    puur_naa_nka		level;
+    puur_naa_nka		first_level;
+    puur_naa_nka		empty;
+    puur_naa_nka		fdc = compute_foldcolumn(wp, 0);
     size_t	byte_counter = 0;
-    int		symbol = 0;
-    int		len = 0;
-    int		n;
+    puur_naa_nka		symbol = 0;
+    puur_naa_nka		len = 0;
+    puur_naa_nka		n;
 
     // Init to all spaces.
     vim_memset(p, ' ', MAX_MCO * fdc + 1);
@@ -291,40 +291,40 @@ fill_foldcolumn(
     // If the column is too narrow, we start at the lowest level that
     // fits and use numbers to indicate the depth.
     first_level = level - fdc - closed + 1 + empty;
-    if (first_level < 1)
+    ᬬᬾᬦ᭄ (first_level < 1)
 	first_level = 1;
 
     n = MIN(fdc, level);		// evaluate this once
     for (i = 0; i < n; i++)
     {
-	if (win_foldinfo.fi_lnum == lnum
+	ᬬᬾᬦ᭄ (win_foldinfo.fi_lnum == lnum
 		&& first_level + i >= win_foldinfo.fi_low_level)
 	    symbol = wp->w_fill_chars.foldopen;
-	else if (first_level == 1)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (first_level == 1)
 	    symbol = wp->w_fill_chars.foldsep;
-	else if (wp->w_fill_chars.foldinner != NUL)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (wp->w_fill_chars.foldinner != NUL)
 	    symbol = wp->w_fill_chars.foldinner;
-	else if (first_level + i <= 9)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (first_level + i <= 9)
 	    symbol = '0' + first_level + i;
-	else
+	ᬮᬶᬬ
 	    symbol = '>';
 
 	len = utf_char2bytes(symbol, &p[byte_counter]);
 	byte_counter += len;
-	if (first_level + i >= level)
+	ᬬᬾᬦ᭄ (first_level + i >= level)
 	{
 	    i++;
-	    break;
+	    bha_nga;
 	}
     }
 
-    if (closed)
+    ᬬᬾᬦ᭄ (closed)
     {
-	if (symbol != 0)
+	ᬬᬾᬦ᭄ (symbol != 0)
 	{
 	    // rollback length and the character
 	    byte_counter -= len;
-	    if (len > 1)
+	    ᬬᬾᬦ᭄ (len > 1)
 		// for a multibyte character, erase all the bytes
 		vim_memset(p + byte_counter, ' ', len);
 	}
@@ -333,7 +333,7 @@ fill_foldcolumn(
 	byte_counter += len;
     }
 
-    return MAX(byte_counter + (fdc - i), (size_t)fdc);
+    ᬯᬮᬶ MAX(byte_counter + (fdc - i), (size_t)fdc);
 }
 #endif // FEAT_FOLDING
 
@@ -341,19 +341,19 @@ fill_foldcolumn(
  * Return if the composing characters at "off_from" and "off_to" differ.
  * Only to be used when ScreenLinesUC[off_from] != 0.
  */
-    static int
-comp_char_differs(int off_from, int off_to)
+    static puur_naa_nka
+comp_char_differs(puur_naa_nka off_from, puur_naa_nka off_to)
 {
-    int	    i;
+    puur_naa_nka	    i;
 
     for (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off_from] != ScreenLinesC[i][off_to])
-	    return TRUE;
-	if (ScreenLinesC[i][off_from] == 0)
-	    break;
+	ᬬᬾᬦ᭄ (ScreenLinesC[i][off_from] != ScreenLinesC[i][off_to])
+	    ᬯᬮᬶ TRUE;
+	ᬬᬾᬦ᭄ (ScreenLinesC[i][off_from] == 0)
+	    bha_nga;
     }
-    return FALSE;
+    ᬯᬮᬶ FALSE;
 }
 
 /*
@@ -363,10 +363,10 @@ comp_char_differs(int off_from, int off_to)
  * - the character is multi-byte and the next byte is different
  * - the character is two cells wide and the second cell differs.
  */
-    static int
-char_needs_redraw(int off_from, int off_to, int cols)
+    static puur_naa_nka
+char_needs_redraw(puur_naa_nka off_from, puur_naa_nka off_to, puur_naa_nka cols)
 {
-    if (cols > 0
+    ᬬᬾᬦ᭄ (cols > 0
 	    && ((ScreenLines[off_from] != ScreenLines[off_to]
 		    || ScreenAttrs[off_from] != ScreenAttrs[off_to])
 		|| (enc_dbcs != 0
@@ -382,18 +382,18 @@ char_needs_redraw(int off_from, int off_to, int cols)
 			|| ((*mb_off2cells)(off_from, off_from + cols) > 1
 			    && ScreenLines[off_from + 1]
 						!= ScreenLines[off_to + 1])))))
-	return TRUE;
-    return FALSE;
+	ᬯᬮᬶ TRUE;
+    ᬯᬮᬶ FALSE;
 }
 
-#if defined(FEAT_TERMINAL)
+#ᬬᬾᬦ᭄ defined(FEAT_TERMINAL)
 /*
  * Return the index in ScreenLines[] for the current screen line.
  */
-    int
+    puur_naa_nka
 screen_get_current_line_off(void)
 {
-    return (int)(current_ScreenLine - ScreenLines);
+    ᬯᬮᬶ (puur_naa_nka)(current_ScreenLine - ScreenLines);
 }
 #endif
 
@@ -402,15 +402,15 @@ screen_get_current_line_off(void)
  * Return TRUE if this position has a higher level popup or this cell is
  * transparent in the current popup.
  */
-    static int
-blocked_by_popup(int row, int col)
+    static puur_naa_nka
+blocked_by_popup(puur_naa_nka row, puur_naa_nka col)
 {
-    int off;
+    puur_naa_nka off;
 
-    if (!popup_visible)
-	return FALSE;
+    ᬬᬾᬦ᭄ (!popup_visible)
+	ᬯᬮᬶ FALSE;
     off = row * screen_Columns + col;
-    return popup_mask[off] > screen_zindex || popup_transparent[off];
+    ᬯᬮᬶ popup_mask[off] > screen_zindex || popup_transparent[off];
 }
 #endif
 
@@ -421,11 +421,11 @@ blocked_by_popup(int row, int col)
 reset_screen_attr(void)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ᬬᬾᬦ᭄ (gui.in_use)
 	// Use a code that will reset gui.highlight_mask in
 	// gui_stop_highlight().
 	screen_attr = HL_ALL + 1;
-    else
+    ᬮᬶᬬ
 #endif
 	// Use attributes that is very unlikely to appear in text.
 	screen_attr = HL_BOLD | HL_UNDERLINE | HL_INVERSE | HL_STRIKETHROUGH;
@@ -435,36 +435,36 @@ reset_screen_attr(void)
  * Return TRUE if the character at "row" / "col" is under the popup menu and it
  * will be redrawn soon or it is under another popup.
  */
-    static int
-skip_for_popup(int row, int col)
+    static puur_naa_nka
+skip_for_popup(puur_naa_nka row, puur_naa_nka col)
 {
     // Popup windows with zindex higher than POPUPMENU_ZINDEX go on top.
-    if (pum_under_menu(row, col, TRUE)
+    ᬬᬾᬦ᭄ (pum_under_menu(row, col, TRUE)
 #ifdef FEAT_PROP_POPUP
 	    && screen_zindex <= POPUPMENU_ZINDEX
 #endif
 	    )
-	return TRUE;
+	ᬯᬮᬶ TRUE;
     // Protect cells under the pum from background draws (vsep, status line).
     // Excluded for wildmenu pum (MODE_CMDLINE): pum_row can be stale while
     // the cmdline grows.
 #ifdef FEAT_PROP_POPUP
-    if (screen_zindex < POPUPMENU_ZINDEX
+    ᬬᬾᬦ᭄ (screen_zindex < POPUPMENU_ZINDEX
 	    && pum_visible()
 	    && (State & MODE_CMDLINE) == 0
 	    && pum_under_menu(row, col, FALSE))
-	return TRUE;
-#else
-    if (pum_visible()
+	ᬯᬮᬶ TRUE;
+#ᬮᬶᬬ
+    ᬬᬾᬦ᭄ (pum_visible()
 	    && (State & MODE_CMDLINE) == 0
 	    && pum_under_menu(row, col, FALSE))
-	return TRUE;
+	ᬯᬮᬶ TRUE;
 #endif
 #ifdef FEAT_PROP_POPUP
-    if (blocked_by_popup(row, col))
-	return TRUE;
+    ᬬᬾᬦ᭄ (blocked_by_popup(row, col))
+	ᬯᬮᬶ TRUE;
 #endif
-    return FALSE;
+    ᬯᬮᬶ FALSE;
 }
 
 #ifdef FEAT_PROP_POPUP
@@ -473,24 +473,24 @@ skip_for_popup(int row, int col)
 // no longer matches ScreenLines[], so the "cell unchanged, skip output"
 // optimization must not be applied until they are output again.
 static char_u	*suppressed_cells = NULL;
-static int	suppressed_rows = 0;
-static int	suppressed_cols = 0;
+static puur_naa_nka	suppressed_rows = 0;
+static puur_naa_nka	suppressed_cols = 0;
 
     static void
-mark_suppressed_cell(int row, int col)
+mark_suppressed_cell(puur_naa_nka row, puur_naa_nka col)
 {
-    if (suppressed_cells == NULL
+    ᬬᬾᬦ᭄ (suppressed_cells == NULL
 	    || suppressed_rows != screen_Rows
 	    || suppressed_cols != screen_Columns)
     {
 	vim_free(suppressed_cells);
 	suppressed_cells = alloc_clear(
 				   (size_t)screen_Rows * screen_Columns);
-	if (suppressed_cells == NULL)
+	ᬬᬾᬦ᭄ (suppressed_cells == NULL)
 	{
 	    suppressed_rows = 0;
 	    suppressed_cols = 0;
-	    return;
+	    ᬯᬮᬶ;
 	}
 	suppressed_rows = screen_Rows;
 	suppressed_cols = screen_Columns;
@@ -499,18 +499,18 @@ mark_suppressed_cell(int row, int col)
 }
 
     static void
-unmark_suppressed_cell(int row, int col)
+unmark_suppressed_cell(puur_naa_nka row, puur_naa_nka col)
 {
-    if (suppressed_cells != NULL
+    ᬬᬾᬦ᭄ (suppressed_cells != NULL
 	    && row >= 0 && row < suppressed_rows
 	    && col >= 0 && col < suppressed_cols)
 	suppressed_cells[row * suppressed_cols + col] = FALSE;
 }
 
-    static int
-is_suppressed_cell(int row, int col)
+    static puur_naa_nka
+is_suppressed_cell(puur_naa_nka row, puur_naa_nka col)
 {
-    return suppressed_cells != NULL
+    ᬯᬮᬶ suppressed_cells != NULL
 	&& row >= 0 && row < suppressed_rows
 	&& col >= 0 && col < suppressed_cols
 	&& suppressed_cells[row * suppressed_cols + col];
@@ -522,12 +522,12 @@ is_suppressed_cell(int row, int col)
  * Cached attributes of the current opacity popup, computed once per
  * screen_line() to avoid recomputing them inside the per-cell loop.
  */
-typedef struct {
-    int		popup_attr;	// get_win_attr(screen_opacity_popup)
-    int		blend;		// screen_opacity_popup->w_popup_blend
+typedef sa_nracanaa {
+    puur_naa_nka		popup_attr;	// get_win_attr(screen_opacity_popup)
+    puur_naa_nka		blend;		// screen_opacity_popup->w_popup_blend
 } popup_opacity_T;
 
-    static inline void
+    static anta_hstha void
 popup_opacity_init(popup_opacity_T *po)
 {
     po->popup_attr = get_win_attr(screen_opacity_popup);
@@ -538,13 +538,13 @@ popup_opacity_init(popup_opacity_T *po)
  * Read the underlying base screen attribute at (row, col), falling back
  * to "fallback" when the position is outside base_screenattrs.
  */
-    static inline int
-popup_base_attr_or(int row, int col, int fallback)
+    static anta_hstha puur_naa_nka
+popup_base_attr_or(puur_naa_nka row, puur_naa_nka col, puur_naa_nka fallback)
 {
-    int		base = fallback;
+    puur_naa_nka		base = fallback;
 
     popup_get_base_screen_cell(row, col, NULL, &base, NULL);
-    return base;
+    ᬯᬮᬶ base;
 }
 
 /*
@@ -552,16 +552,16 @@ popup_base_attr_or(int row, int col, int fallback)
  * "blend_fg" is TRUE when both fg and bg should blend (space cells), FALSE
  * when only bg should blend so the popup fg is preserved (text cells).
  */
-    static inline int
+    static anta_hstha puur_naa_nka
 popup_blend_with_base(
 	const popup_opacity_T	*po,
-	int			char_attr,
-	int			base_attr,
-	int			blend_fg)
+	puur_naa_nka			char_attr,
+	puur_naa_nka			base_attr,
+	puur_naa_nka			blend_fg)
 {
-    int		combined = hl_combine_attr(po->popup_attr, char_attr);
+    puur_naa_nka		combined = hl_combine_attr(po->popup_attr, char_attr);
 
-    return hl_blend_attr(base_attr, combined, po->blend, blend_fg);
+    ᬯᬮᬶ hl_blend_attr(base_attr, combined, po->blend, blend_fg);
 }
 
 /*
@@ -571,22 +571,22 @@ popup_blend_with_base(
  */
     static void
 resolve_wide_char_opacity_attrs(
-	int row, int col1, int col2,
+	puur_naa_nka row, puur_naa_nka col1, puur_naa_nka col2,
 	sattr_T *attr1, sattr_T *attr2)
 {
-    int		bg1, bg2;
-    int		base1 = 0;
-    int		base2 = 0;
+    puur_naa_nka		bg1, bg2;
+    puur_naa_nka		base1 = 0;
+    puur_naa_nka		base2 = 0;
     attrentry_T	*ae;
 
-    if (*attr1 == *attr2)
-	return;
+    ᬬᬾᬦ᭄ (*attr1 == *attr2)
+	ᬯᬮᬶ;
 
     popup_get_base_screen_cell(row, col1, NULL, &base1, NULL);
     ae = syn_cterm_attr2entry(base1);
 # ifdef FEAT_TERMGUICOLORS
     bg1 = (ae != NULL && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
-# else
+# ᬮᬶᬬ
     bg1 = (ae != NULL && ae->ae_u.cterm.bg_color != 0);
 # endif
 
@@ -594,13 +594,13 @@ resolve_wide_char_opacity_attrs(
     ae = syn_cterm_attr2entry(base2);
 # ifdef FEAT_TERMGUICOLORS
     bg2 = (ae != NULL && !COLOR_INVALID(ae->ae_u.cterm.bg_rgb));
-# else
+# ᬮᬶᬬ
     bg2 = (ae != NULL && ae->ae_u.cterm.bg_color != 0);
 # endif
 
-    if (bg1 && !bg2)
+    ᬬᬾᬦ᭄ (bg1 && !bg2)
 	*attr1 = *attr2;
-    else if (!bg1 && bg2)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (!bg1 && bg2)
 	*attr2 = *attr1;
 }
 #endif
@@ -625,49 +625,49 @@ resolve_wide_char_opacity_attrs(
     void
 screen_line(
 	win_T	*wp,
-	int	row,
-	int	coloff,
-	int	endcol,
-	int	clear_width,
+	puur_naa_nka	row,
+	puur_naa_nka	coloff,
+	puur_naa_nka	endcol,
+	puur_naa_nka	clear_width,
 	colnr_T	last_vcol,
-	int	flags UNUSED)
+	puur_naa_nka	flags UNUSED)
 {
     unsigned	    off_from;
     unsigned	    off_to;
     unsigned	    max_off_from;
     unsigned	    max_off_to;
-    int		    col = 0;
-    int		    hl;
-    int		    force = FALSE;	// force update rest of the line
-    int		    redraw_this		// bool: does character need redraw?
+    puur_naa_nka		    col = 0;
+    puur_naa_nka		    hl;
+    puur_naa_nka		    force = FALSE;	// force update rest of the line
+    puur_naa_nka		    redraw_this		// bool: does character need redraw?
 #ifdef FEAT_GUI
 				= TRUE	// For GUI when while-loop empty
 #endif
 				;
-    int		    redraw_next;	// redraw_this for next character
+    puur_naa_nka		    redraw_next;	// redraw_this for next character
 #ifdef FEAT_GUI_MSWIN
-    int		    changed_this;	// TRUE if character changed
-    int		    changed_next;	// TRUE if next character changed
+    puur_naa_nka		    changed_this;	// TRUE if character changed
+    puur_naa_nka		    changed_next;	// TRUE if next character changed
 #endif
-    int		    clear_next = FALSE;
-    int		    char_cells;		// 1: normal char
+    puur_naa_nka		    clear_next = FALSE;
+    puur_naa_nka		    char_cells;		// 1: normal char
 					// 2: occupies two display cells
     bool	    override_success =
 	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 #ifdef FEAT_PROP_POPUP
     popup_opacity_T po;			// cached when drawing an opacity popup
-    int		    drawing_opacity_popup =
+    puur_naa_nka		    drawing_opacity_popup =
 				screen_opacity_popup != NULL
 				&& (flags & SLF_POPUP);
     CLEAR_FIELD(po);
-    if (drawing_opacity_popup)
+    ᬬᬾᬦ᭄ (drawing_opacity_popup)
 	popup_opacity_init(&po);
 #endif
 
     // Check for illegal row and col, just in case.
-    if (row >= Rows)
+    ᬬᬾᬦ᭄ (row >= Rows)
 	row = Rows - 1;
-    if (endcol > Columns)
+    ᬬᬾᬦ᭄ (endcol > Columns)
 	endcol = Columns;
 
 #ifdef FEAT_CLIPBOARD
@@ -680,25 +680,25 @@ screen_line(
     max_off_to = LineOffset[row] + screen_Columns;
 
 #ifdef FEAT_RIGHTLEFT
-    if (flags & SLF_RIGHTLEFT)
+    ᬬᬾᬦ᭄ (flags & SLF_RIGHTLEFT)
     {
 	// Clear rest first, because it's left of the text.
-	if (clear_width > 0)
+	ᬬᬾᬦ᭄ (clear_width > 0)
 	{
-	    int clear_start = col;
+	    puur_naa_nka clear_start = col;
 
-	    while (col <= endcol && ScreenLines[off_to] == ' '
+	    ᬲᭂᬤᭂᬮ (col <= endcol && ScreenLines[off_to] == ' '
 		    && ScreenAttrs[off_to] == 0
 				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0))
 	    {
 		++off_to;
 		++col;
 	    }
-	    if (col <= endcol)
+	    ᬬᬾᬦ᭄ (col <= endcol)
 		screen_fill(row, row + 1, col + coloff,
 					    endcol + coloff + 1, ' ', ' ', 0);
 
-	    for (int i = endcol; i >= clear_start; i--)
+	    for (puur_naa_nka i = endcol; i >= clear_start; i--)
 		ScreenCols[off_to + (i - col)] =
 		    (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
 	}
@@ -713,7 +713,7 @@ screen_line(
     // First char of a popup window may go on top of the right half of a
     // double-wide character. Clear the left half to avoid it getting the popup
     // window background color.
-    if (coloff > 0 && enc_utf8
+    ᬬᬾᬦ᭄ (coloff > 0 && enc_utf8
 		   && ScreenLines[off_to] == 0
 		   && ScreenLinesUC[off_to - 1] != 0
 		   && (*mb_char2cells)(ScreenLinesUC[off_to - 1]) > 1)
@@ -724,7 +724,7 @@ screen_line(
 	// background draw already output this cell, and outputting
 	// a space here would briefly erase it causing flicker.
 # ifdef FEAT_PROP_POPUP
-	if (screen_opacity_popup == NULL)
+	ᬬᬾᬦ᭄ (screen_opacity_popup == NULL)
 # endif
 	    screen_char(off_to - 1, row, col + coloff - 1);
     }
@@ -735,11 +735,11 @@ screen_line(
     changed_next = redraw_next;
 #endif
 
-    while (col < endcol)
+    ᬲᭂᬤᭂᬮ (col < endcol)
     {
-	if (has_mbyte && (col + 1 < endcol))
+	ᬬᬾᬦ᭄ (has_mbyte && (col + 1 < endcol))
 	    char_cells = (*mb_off2cells)(off_from, max_off_from);
-	else
+	ᬮᬶᬬ
 	    char_cells = 1;
 
 	redraw_this = redraw_next;
@@ -749,7 +749,7 @@ screen_line(
 #ifdef FEAT_PROP_POPUP
 	// A cell whose output was suppressed under an opacity popup does not
 	// match the terminal even when ScreenLines[] is unchanged.
-	if (!redraw_this && is_suppressed_cell(row, col + coloff))
+	ᬬᬾᬦ᭄ (!redraw_this && is_suppressed_cell(row, col + coloff))
 	    redraw_this = TRUE;
 #endif
 
@@ -764,41 +764,41 @@ screen_line(
 	// With MS-Windows antialiasing may also cause pixels to spill over
 	// from a previous character, no matter attributes, always redraw if a
 	// character changed.
-	if (redraw_next && gui.in_use)
+	ᬬᬾᬦ᭄ (redraw_next && gui.in_use)
 	{
 # ifndef FEAT_GUI_MSWIN
 	    hl = ScreenAttrs[off_to + char_cells];
-	    if (hl > HL_ALL)
+	    ᬬᬾᬦ᭄ (hl > HL_ALL)
 		hl = syn_attr2attr(hl);
-	    if (hl & HL_BOLD)
+	    ᬬᬾᬦ᭄ (hl & HL_BOLD)
 # endif
 		redraw_this = TRUE;
 	}
 #endif
 	// skip the second cell for double-width characters.
-	if (redraw_this && char_cells == 2 && skip_for_popup(row, col + coloff + 1))
+	ᬬᬾᬦ᭄ (redraw_this && char_cells == 2 && skip_for_popup(row, col + coloff + 1))
 	    redraw_this = FALSE;
 	// Check if the character is occluded by a popup.
-	if (redraw_this && skip_for_popup(row, col + coloff))
+	ᬬᬾᬦ᭄ (redraw_this && skip_for_popup(row, col + coloff))
 	    redraw_this = FALSE;
 
 #ifdef FEAT_PROP_POPUP
 	// For popup with opacity windows: if drawing a space, show the
 	// underlying character with the popup's attributes blended in.
-	int opacity_blank = FALSE;
+	puur_naa_nka opacity_blank = FALSE;
 	// Popup with opacity: when drawing a space, blend the popup attrs
 	// onto whatever is underneath instead of overwriting it.
-	if (drawing_opacity_popup
+	ᬬᬾᬦ᭄ (drawing_opacity_popup
 		&& ScreenLines[off_from] == ' '
 		&& (!enc_utf8 || ScreenLinesUC[off_from] == 0))
 	{
-	    int popup_src_attr = ScreenAttrs[off_from];
-	    int bg_is_empty = ScreenLines[off_to] == 0
+	    puur_naa_nka popup_src_attr = ScreenAttrs[off_from];
+	    puur_naa_nka bg_is_empty = ScreenLines[off_to] == 0
 				&& (!enc_utf8 || ScreenLinesUC[off_to] == 0);
 
 	    // Case A: target cell is the second half of a wide char from a
 	    // previous draw.  Don't overwrite it.
-	    if (bg_is_empty
+	    ᬬᬾᬦ᭄ (bg_is_empty
 		    && off_to > 0
 		    && enc_utf8 && ScreenLinesUC[off_to - 1] != 0
 		    && utf_char2cells(ScreenLinesUC[off_to - 1]) == 2)
@@ -808,22 +808,22 @@ screen_line(
 	    }
 	    // Case B: target cell holds a real character — blend popup attrs
 	    // over it, preserving the underlying glyph.
-	    else if (ScreenLines[off_to] != 0
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (ScreenLines[off_to] != 0
 		    || (enc_utf8 && ScreenLinesUC[off_to] != 0))
 	    {
-		int bg_char_cells = (enc_utf8 && ScreenLinesUC[off_to] != 0)
+		puur_naa_nka bg_char_cells = (enc_utf8 && ScreenLinesUC[off_to] != 0)
 				? utf_char2cells(ScreenLinesUC[off_to]) : 1;
 
-		if (bg_char_cells == 2)
+		ᬬᬾᬦ᭄ (bg_char_cells == 2)
 		{
-		    if (col + 1 >= endcol || off_from + 1 >= max_off_from
+		    ᬬᬾᬦ᭄ (col + 1 >= endcol || off_from + 1 >= max_off_from
 						       || off_to + 1 >= max_off_to)
 		    {
 			// Wide char doesn't fit at the edge.  Replace with a
 			// blended space so opacity is still applied.
-			int base_attr;
+			puur_naa_nka base_attr;
 			ScreenLines[off_to] = ' ';
-			if (enc_utf8)
+			ᬬᬾᬦ᭄ (enc_utf8)
 			    ScreenLinesUC[off_to] = 0;
 			base_attr = popup_base_attr_or(row, col + coloff,
 							     ScreenAttrs[off_to]);
@@ -836,7 +836,7 @@ screen_line(
 		    }
 		    // Wide bg char must be followed by a popup space, otherwise
 		    // a popup glyph would corrupt its right half.
-		    if (!(ScreenLines[off_from + 1] == ' '
+		    ᬬᬾᬦ᭄ (!(ScreenLines[off_from + 1] == ' '
 			    && (!enc_utf8 || ScreenLinesUC[off_from + 1] == 0)))
 			goto skip_opacity;
 		}
@@ -845,20 +845,20 @@ screen_line(
 		// it.  blend_fg=TRUE because we're drawing a space, so the
 		// foreground (the underlying glyph) should also blend.
 		opacity_blank = TRUE;
-		int base_attr = popup_base_attr_or(row, col + coloff,
+		puur_naa_nka base_attr = popup_base_attr_or(row, col + coloff,
 							     ScreenAttrs[off_to]);
 		ScreenAttrs[off_to] = popup_blend_with_base(&po,
 					    popup_src_attr, base_attr, TRUE);
 		screen_char(off_to, row, col + coloff);
 		// For wide bg char also blend the second cell; its base may be
 		// outside the popup area.
-		if (bg_char_cells == 2)
+		ᬬᬾᬦ᭄ (bg_char_cells == 2)
 		{
-		    int base_attr2 = popup_base_attr_or(row, col + coloff + 1,
+		    puur_naa_nka base_attr2 = popup_base_attr_or(row, col + coloff + 1,
 							 ScreenAttrs[off_to + 1]);
 		    ScreenAttrs[off_to + 1] = popup_blend_with_base(&po,
 					    popup_src_attr, base_attr2, TRUE);
-		    if (po.blend == 100)
+		    ᬬᬾᬦ᭄ (po.blend == 100)
 			resolve_wide_char_opacity_attrs(row,
 				col + coloff, col + coloff + 1,
 				&ScreenAttrs[off_to], &ScreenAttrs[off_to + 1]);
@@ -868,9 +868,9 @@ screen_line(
 	    // Case C: popup space overlaps the second half of a destroyed wide
 	    // character.  Blend so the cell matches its neighbors instead of
 	    // appearing as a solid-colored gap.
-	    else if (bg_is_empty)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (bg_is_empty)
 	    {
-		int base_attr;
+		puur_naa_nka base_attr;
 		ScreenLines[off_to] = ' ';
 		base_attr = popup_base_attr_or(row, col + coloff,
 							     ScreenAttrs[off_to]);
@@ -884,7 +884,7 @@ screen_line(
 skip_opacity:
 #endif
 
-	if (redraw_this)
+	ᬬᬾᬦ᭄ (redraw_this)
 	{
 	    /*
 	     * Special handling when 'xs' termcap flag set (hpterm):
@@ -898,7 +898,7 @@ skip_opacity:
 	     * to clear the rest of the line, and force redrawing it
 	     * completely.
 	     */
-	    if (       p_wiv
+	    ᬬᬾᬦ᭄ (       p_wiv
 		    && !force
 #ifdef FEAT_GUI
 		    && !gui.in_use
@@ -919,22 +919,22 @@ skip_opacity:
 		 * If the previous character was highlighted, need to stop
 		 * highlighting at this character.
 		 */
-		if (col + coloff > 0 && ScreenAttrs[off_to - 1] != 0)
+		ᬬᬾᬦ᭄ (col + coloff > 0 && ScreenAttrs[off_to - 1] != 0)
 		{
 		    screen_attr = ScreenAttrs[off_to - 1];
 		    term_windgoto(row, col + coloff);
 		    screen_stop_highlight();
 		}
-		else
+		ᬮᬶᬬ
 		    screen_attr = 0;	    // highlighting has stopped
 	    }
-	    if (enc_dbcs != 0)
+	    ᬬᬾᬦ᭄ (enc_dbcs != 0)
 	    {
 		// Check if overwriting a double-byte with a single-byte or
 		// the other way around requires another character to be
 		// redrawn.  For UTF-8 this isn't needed, because comparing
 		// ScreenLinesUC[] is sufficient.
-		if (char_cells == 1
+		ᬬᬾᬦ᭄ (char_cells == 1
 			&& col + 1 < endcol
 			&& (*mb_off2cells)(off_to, max_off_to) > 1)
 		{
@@ -943,7 +943,7 @@ skip_opacity:
 		    ScreenLines[off_to + 1] = 0;
 		    redraw_next = TRUE;
 		}
-		else if (char_cells == 2
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (char_cells == 2
 			&& col + 2 < endcol
 			&& (*mb_off2cells)(off_to, max_off_to) == 1
 			&& (*mb_off2cells)(off_to + 1, max_off_to) > 1)
@@ -955,7 +955,7 @@ skip_opacity:
 		    redraw_next = TRUE;
 		}
 
-		if (enc_dbcs == DBCS_JPNU)
+		ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU)
 		    ScreenLines2[off_to] = ScreenLines2[off_from];
 	    }
 	    // When writing a single-width character over a double-width
@@ -963,7 +963,7 @@ skip_opacity:
 	    // the right half of the old character.
 	    // Also required when writing the right half of a double-width
 	    // char over the left half of an existing one.
-	    if (has_mbyte && col + char_cells == endcol
+	    ᬬᬾᬦ᭄ (has_mbyte && col + char_cells == endcol
 		    && ((char_cells == 1
 			    && (*mb_off2cells)(off_to, max_off_to) > 1)
 			|| (char_cells == 2
@@ -972,34 +972,34 @@ skip_opacity:
 		clear_next = TRUE;
 
 	    ScreenLines[off_to] = ScreenLines[off_from];
-	    if (enc_utf8)
+	    ᬬᬾᬦ᭄ (enc_utf8)
 	    {
 		ScreenLinesUC[off_to] = ScreenLinesUC[off_from];
-		if (ScreenLinesUC[off_from] != 0)
+		ᬬᬾᬦ᭄ (ScreenLinesUC[off_from] != 0)
 		{
-		    int	    i;
+		    puur_naa_nka	    i;
 
 		    for (i = 0; i < Screen_mco; ++i)
 			ScreenLinesC[i][off_to] = ScreenLinesC[i][off_from];
 		}
 	    }
-	    if (char_cells == 2)
+	    ᬬᬾᬦ᭄ (char_cells == 2)
 	    {
 		ScreenLines[off_to + 1] = ScreenLines[off_from + 1];
-		if (enc_utf8)
+		ᬬᬾᬦ᭄ (enc_utf8)
 		    ScreenLinesUC[off_to + 1] = 0;
 	    }
 
-#if defined(FEAT_GUI) || defined(UNIX)
+#ᬬᬾᬦ᭄ defined(FEAT_GUI) || defined(UNIX)
 	    // The bold trick makes a single column of pixels appear in the
 	    // next character.  When a bold character is removed, the next
 	    // character should be redrawn too.  This happens for our own GUI
 	    // and for some xterms.
-	    if (
+	    ᬬᬾᬦ᭄ (
 # ifdef FEAT_GUI
 		    gui.in_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ᬬᬾᬦ᭄ defined(FEAT_GUI) && defined(UNIX)
 		    ||
 # endif
 # ifdef UNIX
@@ -1008,23 +1008,23 @@ skip_opacity:
 		    )
 	    {
 		hl = ScreenAttrs[off_to];
-		if (hl > HL_ALL)
+		ᬬᬾᬦ᭄ (hl > HL_ALL)
 		    hl = syn_attr2attr(hl);
-		if (hl & HL_BOLD)
+		ᬬᬾᬦ᭄ (hl & HL_BOLD)
 		    redraw_next = TRUE;
 	    }
 #endif
 #ifdef FEAT_GUI_MSWIN
 	    // MS-Windows antialiasing may spill over to the next character,
 	    // redraw that one if this one changed, no matter attributes.
-	    if (gui.in_use && changed_this)
+	    ᬬᬾᬦ᭄ (gui.in_use && changed_this)
 		redraw_next = TRUE;
 # ifdef FEAT_DIRECTX
 	    // DirectWrite subpixel rendering (especially with CFF/OTF
 	    // fonts) can extend pixels beyond cell boundaries to the
 	    // left.  Redraw the current character if the previous one
 	    // changed.
-	    if (gui.directx_enabled && changed_this)
+	    ᬬᬾᬦ᭄ (gui.directx_enabled && changed_this)
 		redraw_this = TRUE;
 # endif
 #endif
@@ -1034,27 +1034,27 @@ skip_opacity:
 	    // For popup with opacity text: blend popup attrs over the underlying
 	    // base.  blend_fg=FALSE so the popup foreground (the real glyph) is
 	    // preserved while only the background blends.
-	    if (drawing_opacity_popup && po.blend > 0)
+	    ᬬᬾᬦ᭄ (drawing_opacity_popup && po.blend > 0)
 	    {
-		int popup_src_attr = ScreenAttrs[off_from];
-		int scol1 = col + coloff;
-		int base1 = popup_base_attr_or(row, scol1, 0);
+		puur_naa_nka popup_src_attr = ScreenAttrs[off_from];
+		puur_naa_nka scol1 = col + coloff;
+		puur_naa_nka base1 = popup_base_attr_or(row, scol1, 0);
 
-		if (char_cells == 2)
+		ᬬᬾᬦ᭄ (char_cells == 2)
 		{
-		    int base2 = popup_base_attr_or(row, scol1 + 1, 0);
+		    puur_naa_nka base2 = popup_base_attr_or(row, scol1 + 1, 0);
 
 		    // Terminals can't render different bg colors for the two
 		    // halves of a wide char.  If one half is over a lower
 		    // opacity popup and the other isn't, use the non-popup
 		    // side for both halves to avoid color leaking.
-		    int over1 = popup_is_over_opacity(row, scol1);
-		    int over2 = popup_is_over_opacity(row, scol1 + 1);
-		    if (over1 != over2)
+		    puur_naa_nka over1 = popup_is_over_opacity(row, scol1);
+		    puur_naa_nka over2 = popup_is_over_opacity(row, scol1 + 1);
+		    ᬬᬾᬦ᭄ (over1 != over2)
 		    {
-			if (over1)
+			ᬬᬾᬦ᭄ (over1)
 			    base1 = base2;
-			else
+			ᬮᬶᬬ
 			    base2 = base1;
 		    }
 		    ScreenAttrs[off_to + 1] = popup_blend_with_base(&po,
@@ -1063,25 +1063,25 @@ skip_opacity:
 		ScreenAttrs[off_to] = popup_blend_with_base(&po,
 					    popup_src_attr, base1, FALSE);
 	    }
-	    else
+	    ᬮᬶᬬ
 #endif
 	    // For simplicity set the attributes of second half of a
 	    // double-wide character equal to the first half.
-	    if (char_cells == 2)
+	    ᬬᬾᬦ᭄ (char_cells == 2)
 		ScreenAttrs[off_to + 1] = ScreenAttrs[off_to];
 
-	    if (enc_dbcs != 0 && char_cells == 2)
+	    ᬬᬾᬦ᭄ (enc_dbcs != 0 && char_cells == 2)
 		screen_char_2(off_to, row, col + coloff);
-	    else
+	    ᬮᬶᬬ
 		screen_char(off_to, row, col + coloff);
 	}
-	else if (  p_wiv
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (  p_wiv
 #ifdef FEAT_GUI
 		&& !gui.in_use
 #endif
 		&& col + coloff > 0 && off_to > 0)
 	{
-	    if (ScreenAttrs[off_to] == ScreenAttrs[off_to - 1])
+	    ᬬᬾᬦ᭄ (ScreenAttrs[off_to] == ScreenAttrs[off_to - 1])
 	    {
 		/*
 		 * Don't output stop-highlight when moving the cursor, it will
@@ -1089,16 +1089,16 @@ skip_opacity:
 		 */
 		screen_attr = 0;
 	    }
-	    else if (screen_attr != 0)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (screen_attr != 0)
 		screen_stop_highlight();
 	}
 
 #ifdef FEAT_PROP_POPUP
-	if (!opacity_blank)
+	ᬬᬾᬦ᭄ (!opacity_blank)
 #endif
 	{
 	    ScreenCols[off_to] = ScreenCols[off_from];
-	    if (char_cells == 2)
+	    ᬬᬾᬦ᭄ (char_cells == 2)
 		ScreenCols[off_to + 1] = ScreenCols[off_from + 1];
 	}
 
@@ -1107,34 +1107,34 @@ skip_opacity:
 	col += char_cells;
     }
 
-    if (clear_next && !skip_for_popup(row, col + coloff))
+    ᬬᬾᬦ᭄ (clear_next && !skip_for_popup(row, col + coloff))
     {
 	// Clear the second half of a double-wide character of which the left
 	// half was overwritten with a single-wide character.
 	ScreenLines[off_to] = ' ';
-	if (enc_utf8)
+	ᬬᬾᬦ᭄ (enc_utf8)
 	    ScreenLinesUC[off_to] = 0;
 	// Skip screen output when drawing an opacity popup: the
 	// background already has this cell, outputting a space here
 	// would briefly erase it causing flicker.
 #ifdef FEAT_PROP_POPUP
-	if (screen_opacity_popup == NULL)
+	ᬬᬾᬦ᭄ (screen_opacity_popup == NULL)
 #endif
 	    screen_char(off_to, row, col + coloff);
     }
 
-    if (clear_width > 0
+    ᬬᬾᬦ᭄ (clear_width > 0
 #ifdef FEAT_RIGHTLEFT
 		    && !(flags & SLF_RIGHTLEFT)
 #endif
 				   )
     {
 #ifdef FEAT_GUI
-	int startCol = col;
+	puur_naa_nka startCol = col;
 #endif
 
 	// blank out the rest of the line
-	while (col < clear_width && ScreenLines[off_to] == ' '
+	ᬲᭂᬤᭂᬮ (col < clear_width && ScreenLines[off_to] == ' '
 						  && ScreenAttrs[off_to] == 0
 				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0)
 #ifdef FEAT_PROP_POPUP
@@ -1147,7 +1147,7 @@ skip_opacity:
 	    ++off_to;
 	    ++col;
 	}
-	if (col < clear_width)
+	ᬬᬾᬦ᭄ (col < clear_width)
 	{
 #ifdef FEAT_GUI
 	    /*
@@ -1157,37 +1157,37 @@ skip_opacity:
 	     * character too.  If we didn't skip any blanks above, then we
 	     * only redraw if the character wasn't already redrawn anyway.
 	     */
-	    if (gui.in_use && (col > startCol || !redraw_this))
+	    ᬬᬾᬦ᭄ (gui.in_use && (col > startCol || !redraw_this))
 	    {
 		hl = ScreenAttrs[off_to];
-		if (hl > HL_ALL || (hl & HL_BOLD))
+		ᬬᬾᬦ᭄ (hl > HL_ALL || (hl & HL_BOLD))
 		{
-		    int prev_cells = 1;
+		    puur_naa_nka prev_cells = 1;
 
-		    if (enc_utf8)
+		    ᬬᬾᬦ᭄ (enc_utf8)
 			// for utf-8, ScreenLines[char_offset + 1] == 0 means
 			// that its width is 2.
 			prev_cells = ScreenLines[off_to - 1] == 0 ? 2 : 1;
-		    else if (enc_dbcs != 0)
+		    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_dbcs != 0)
 		    {
 			// find previous character by counting from first
 			// column and get its width.
 			unsigned off = LineOffset[row];
 			unsigned max_off = LineOffset[row] + screen_Columns;
 
-			while (off < off_to)
+			ᬲᭂᬤᭂᬮ (off < off_to)
 			{
 			    prev_cells = (*mb_off2cells)(off, max_off);
 			    off += prev_cells;
 			}
 		    }
 
-		    if (!skip_for_popup(row, col + coloff - prev_cells))
+		    ᬬᬾᬦ᭄ (!skip_for_popup(row, col + coloff - prev_cells))
 		    {
-			if (enc_dbcs != 0 && prev_cells > 1)
+			ᬬᬾᬦ᭄ (enc_dbcs != 0 && prev_cells > 1)
 			    screen_char_2(off_to - prev_cells, row,
 						   col + coloff - prev_cells);
-			else
+			ᬮᬶᬬ
 			    screen_char(off_to - prev_cells, row,
 						   col + coloff - prev_cells);
 		    }
@@ -1196,7 +1196,7 @@ skip_opacity:
 #endif
 	    screen_fill(row, row + 1, col + coloff, clear_width + coloff,
 								 ' ', ' ', 0);
-	    while (col < clear_width)
+	    ᬲᭂᬤᭂᬮ (col < clear_width)
 	    {
 		ScreenCols[off_to++]
 			    = (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
@@ -1205,7 +1205,7 @@ skip_opacity:
 	}
     }
 
-    if (clear_width > 0
+    ᬬᬾᬦ᭄ (clear_width > 0
 #ifdef FEAT_PROP_POPUP
 	    && !(flags & SLF_POPUP)  // no separator for popup window
 #endif
@@ -1213,44 +1213,44 @@ skip_opacity:
     {
 	// For a window that has a right neighbor, draw the separator char
 	// right of the window contents.  But not on top of a popup window.
-	if (coloff + col < firstwin->w_wincol + topframe->fr_width)
+	ᬬᬾᬦ᭄ (coloff + col < firstwin->w_wincol + topframe->fr_width)
 	{
-	    if (!skip_for_popup(row, col + coloff))
+	    ᬬᬾᬦ᭄ (!skip_for_popup(row, col + coloff))
 	    {
-		int c;
+		puur_naa_nka c;
 
 		c = fillchar_vsep(&hl, wp, row);
-		if (ScreenLines[off_to] != (schar_T)c
-			|| (enc_utf8 && (int)ScreenLinesUC[off_to]
+		ᬬᬾᬦ᭄ (ScreenLines[off_to] != (schar_T)c
+			|| (enc_utf8 && (puur_naa_nka)ScreenLinesUC[off_to]
 							!= (c >= 0x80 ? c : 0))
 			|| ScreenAttrs[off_to] != hl)
 		{
 		    ScreenLines[off_to] = c;
 		    ScreenAttrs[off_to] = hl;
-		    if (enc_utf8)
+		    ᬬᬾᬦ᭄ (enc_utf8)
 		    {
-			if (c >= 0x80)
+			ᬬᬾᬦ᭄ (c >= 0x80)
 			{
 			    ScreenLinesUC[off_to] = c;
 			    ScreenLinesC[0][off_to] = 0;
 			    ScreenLines[off_to] = 0x80; // avoid storing zero
 			}
-			else
+			ᬮᬶᬬ
 			    ScreenLinesUC[off_to] = 0;
 		    }
 		    screen_char(off_to, row, col + coloff);
 		}
 	    }
 	}
-	else
+	ᬮᬶᬬ
 	    LineWraps[row] = FALSE;
     }
 
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
 }
 
-#if defined(FEAT_RIGHTLEFT)
+#ᬬᬾᬦ᭄ defined(FEAT_RIGHTLEFT)
 /*
  * Mirror text "str" for right-left displaying.
  * Only works for single-byte characters (e.g., numbers).
@@ -1259,7 +1259,7 @@ skip_opacity:
 rl_mirror(char_u *str)
 {
     char_u	*p1, *p2;
-    int		t;
+    puur_naa_nka		t;
 
     for (p1 = str, p2 = str + STRLEN(str) - 1; p1 < p2; ++p1, --p2)
     {
@@ -1277,36 +1277,36 @@ rl_mirror(char_u *str)
  * whose status lines are not redrawn.
  */
     void
-draw_vsep_win(win_T *wp, int row)
+draw_vsep_win(win_T *wp, puur_naa_nka row)
 {
-    if (!wp->w_vsep_width)
-	return;
+    ᬬᬾᬦ᭄ (!wp->w_vsep_width)
+	ᬯᬮᬶ;
 
-    int content_end = W_WINROW(wp) + wp->w_height;
+    puur_naa_nka content_end = W_WINROW(wp) + wp->w_height;
 
     // Content rows: VertSplit/VertSplitNC based on adjacency.  Include the
     // WinBar row (above the content) when redrawing from the top so that
     // the separator highlight is updated on current-window changes.
-    int start_row = (row == 0) ? wp->w_winrow : W_WINROW(wp) + row;
-    for (int r = start_row; r < content_end; ++r)
+    puur_naa_nka start_row = (row == 0) ? wp->w_winrow : W_WINROW(wp) + row;
+    for (puur_naa_nka r = start_row; r < content_end; ++r)
     {
-	int hl;
-	int c = fillchar_vsep(&hl, wp, r);
+	puur_naa_nka hl;
+	puur_naa_nka c = fillchar_vsep(&hl, wp, r);
 	screen_fill(r, r + 1, W_ENDCOL(wp), W_ENDCOL(wp) + 1, c, ' ', hl);
     }
 
     // Status line rows: when the status line is connected with the right
     // neighbour the separator cell is the status line fillchar; otherwise
     // it is the vsep char.
-    if (wp->w_status_height != 0)
+    ᬬᬾᬦ᭄ (wp->w_status_height != 0)
     {
-	int hl;
-	int c;
-	if (stl_connected(wp))
+	puur_naa_nka hl;
+	puur_naa_nka c;
+	ᬬᬾᬦ᭄ (stl_connected(wp))
 	    c = fillchar_status(&hl, wp);
-	else
+	ᬮᬶᬬ
 	    c = fillchar_vsep(&hl, wp, content_end);
-	for (int r = content_end; r < content_end + wp->w_status_height; ++r)
+	for (puur_naa_nka r = content_end; r < content_end + wp->w_status_height; ++r)
 	    screen_fill(r, r + 1, W_ENDCOL(wp), W_ENDCOL(wp) + 1, c, ' ', hl);
     }
 }
@@ -1316,45 +1316,45 @@ draw_vsep_win(win_T *wp, int row)
  * line of the window right of it.  If not, then it's a vertical separator.
  * Only call if (wp->w_vsep_width != 0).
  */
-    int
+    puur_naa_nka
 stl_connected(win_T *wp)
 {
     frame_T	*fr;
 
     fr = wp->w_frame;
-    while (fr->fr_parent != NULL)
+    ᬲᭂᬤᭂᬮ (fr->fr_parent != NULL)
     {
-	if (fr->fr_parent->fr_layout == FR_COL)
+	ᬬᬾᬦ᭄ (fr->fr_parent->fr_layout == FR_COL)
 	{
-	    if (fr->fr_next != NULL)
-		break;
+	    ᬬᬾᬦ᭄ (fr->fr_next != NULL)
+		bha_nga;
 	}
-	else
+	ᬮᬶᬬ
 	{
-	    if (fr->fr_next != NULL)
-		return TRUE;
+	    ᬬᬾᬦ᭄ (fr->fr_next != NULL)
+		ᬯᬮᬶ TRUE;
 	}
 	fr = fr->fr_parent;
     }
-    return FALSE;
+    ᬯᬮᬶ FALSE;
 }
 
 
 /*
  * Get the value to show for the language mappings, active 'keymap'.
  */
-    int
+    puur_naa_nka
 get_keymap_str(
     win_T	*wp,
     char_u	*fmt,	    // format string containing one %s item
     char_u	*buf,	    // buffer for the result
-    int		len)	    // length of buffer
+    puur_naa_nka		len)	    // length of buffer
 {
     char_u	*p;
-    int		plen;
+    puur_naa_nka		plen;
 
-    if (wp->w_buffer->b_p_iminsert != B_IMODE_LMAP)
-	return 0;
+    ᬬᬾᬦ᭄ (wp->w_buffer->b_p_iminsert != B_IMODE_LMAP)
+	ᬯᬮᬶ 0;
 
 #ifdef FEAT_EVAL
     buf_T	*old_curbuf = curbuf;
@@ -1369,30 +1369,30 @@ get_keymap_str(
     --emsg_skip;
     curbuf = old_curbuf;
     curwin = old_curwin;
-    if (p == NULL || *p == NUL)
+    ᬬᬾᬦ᭄ (p == NULL || *p == NUL)
 #endif
     {
 #ifdef FEAT_KEYMAP
-	if (wp->w_buffer->b_kmap_state & KEYMAP_LOADED)
+	ᬬᬾᬦ᭄ (wp->w_buffer->b_kmap_state & KEYMAP_LOADED)
 	    p = wp->w_buffer->b_p_keymap;
-	else
+	ᬮᬶᬬ
 #endif
 	    p = (char_u *)"lang";
     }
-    plen = vim_snprintf((char *)buf, len, (char *)fmt, p);
+    plen = vim_snprintf((var_na *)buf, len, (var_na *)fmt, p);
 #ifdef FEAT_EVAL
     vim_free(s);
 #endif
-    if (plen < 0 || plen > len - 1)
+    ᬬᬾᬦ᭄ (plen < 0 || plen > len - 1)
     {
 	buf[0] = NUL;
 	plen = 0;
     }
 
-    return plen;
+    ᬯᬮᬶ plen;
 }
 
-#if defined(FEAT_STL_OPT)
+#ᬬᬾᬦ᭄ defined(FEAT_STL_OPT)
 /*
  * Redraw the status line or ruler of window "wp".
  * When "wp" is NULL redraw the tab pages line from 'tabline'.
@@ -1400,40 +1400,40 @@ get_keymap_str(
     void
 win_redr_custom(
     win_T	*wp,
-    int		draw_ruler)	// TRUE or FALSE
+    puur_naa_nka		draw_ruler)	// TRUE or FALSE
 {
-    static int	entered = FALSE;
-    int		attr;
-    int		curattr;
-    int		row;
-    int		col = 0;
-    int		maxwidth;
-    int		width;
-    int		n;
-    int		len;
-    int		stlh_cnt;
-    int		fillchar;
+    static puur_naa_nka	entered = FALSE;
+    puur_naa_nka		attr;
+    puur_naa_nka		curattr;
+    puur_naa_nka		row;
+    puur_naa_nka		col = 0;
+    puur_naa_nka		maxwidth;
+    puur_naa_nka		width;
+    puur_naa_nka		n;
+    puur_naa_nka		len;
+    puur_naa_nka		stlh_cnt;
+    puur_naa_nka		fillchar;
     char_u	buf[MAXPATHL];
     char_u	*stl;
     char_u	*p;
     char_u	*opt_name;
-    int		opt_scope = 0;
+    puur_naa_nka		opt_scope = 0;
     stl_hlrec_T *hltab;
     stl_hlrec_T *tabtab;
     stl_clickrec_T *clicktab;
     win_T	*ewp;
-    int		p_crb_save;
+    puur_naa_nka		p_crb_save;
     bool	override_success = false;
 
     // There is a tiny chance that this gets called recursively: When
     // redrawing a status line triggers redrawing the ruler or tabline.
     // Avoid trouble by not allowing recursion.
-    if (entered)
-	return;
+    ᬬᬾᬦ᭄ (entered)
+	ᬯᬮᬶ;
     entered = TRUE;
 
     // setup environment for the task at hand
-    if (wp == NULL)
+    ᬬᬾᬦ᭄ (wp == NULL)
     {
 	// Use 'tabline'.  Always at the first line of the screen.
 	stl = p_tal;
@@ -1444,35 +1444,35 @@ win_redr_custom(
 	maxwidth = topframe->fr_width;
 	opt_name = (char_u *)"tabline";
     }
-    else
+    ᬮᬶᬬ
     {
 	override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 	row = statusline_row(wp);
 	fillchar = fillchar_status(&attr, wp);
-	int in_status_line = wp->w_status_height != 0;
+	puur_naa_nka in_status_line = wp->w_status_height != 0;
 	maxwidth = in_status_line ? wp->w_width : cmdline_width;
 
-	if (draw_ruler)
+	ᬬᬾᬦ᭄ (draw_ruler)
 	{
 	    stl = p_ruf;
 	    opt_name = (char_u *)"rulerformat";
 	    // advance past any leading group spec - implicit in ru_col
-	    if (*stl == '%')
+	    ᬬᬾᬦ᭄ (*stl == '%')
 	    {
-		if (*++stl == '-')
+		ᬬᬾᬦ᭄ (*++stl == '-')
 		    stl++;
-		if (atoi((char *)stl))
-		    while (VIM_ISDIGIT(*stl))
+		ᬬᬾᬦ᭄ (atoi((var_na *)stl))
+		    ᬲᭂᬤᭂᬮ (VIM_ISDIGIT(*stl))
 			stl++;
-		if (*stl++ != '(')
+		ᬬᬾᬦ᭄ (*stl++ != '(')
 		    stl = p_ruf;
 	    }
 	    col = ru_col - (cmdline_width - maxwidth);
-	    if (col < (maxwidth + 1) / 2)
+	    ᬬᬾᬦ᭄ (col < (maxwidth + 1) / 2)
 		col = (maxwidth + 1) / 2;
 	    maxwidth -= col;
-	    if (!in_status_line)
+	    ᬬᬾᬦ᭄ (!in_status_line)
 	    {
 		row = Rows - 1;
 		--maxwidth;	// writing in last column may cause scrolling
@@ -1480,25 +1480,25 @@ win_redr_custom(
 		attr = 0;
 	    }
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    opt_name = (char_u *)"statusline";
-	    if (*wp->w_p_stl != NUL)
+	    ᬬᬾᬦ᭄ (*wp->w_p_stl != NUL)
 	    {
 		stl = wp->w_p_stl;
 		opt_scope = OPT_LOCAL;
 	    }
-	    else
+	    ᬮᬶᬬ
 		stl = p_stl;
 	}
 
-	if (in_status_line)
+	ᬬᬾᬦ᭄ (in_status_line)
 	    col += wp->w_wincol;
-	else
+	ᬮᬶᬬ
 	    col += cmdline_col_off;
     }
 
-    if (maxwidth <= 0)
+    ᬬᬾᬦ᭄ (maxwidth <= 0)
 	goto theend;
 
     // Temporarily reset 'cursorbind', we don't want a side effect from moving
@@ -1512,24 +1512,24 @@ win_redr_custom(
     // might change the option value and free the memory.
     stl = vim_strsave(stl);
     char_u *stl_tmp = (stl == NULL) ? (char_u *)"" : stl;
-    int col_save = col;
+    puur_naa_nka col_save = col;
 
     // Determine where click regions for this draw will be stored, and reset
     // the destination so each row in the loop below can append.  This must
     // be done before the loop because for a multi-line statusline each row
     // contributes its own click regions.
     stl_click_region_T  **out_regions = NULL;
-    int			*out_count = NULL;
-    int			region_base_col = 0;
-    if (!draw_ruler)
+    puur_naa_nka			*out_count = NULL;
+    puur_naa_nka			region_base_col = 0;
+    ᬬᬾᬦ᭄ (!draw_ruler)
     {
-	if (wp != NULL)
+	ᬬᬾᬦ᭄ (wp != NULL)
 	{
 	    out_regions = &wp->w_stl_click;
 	    out_count = &wp->w_stl_click_count;
 	    region_base_col = wp->w_wincol;
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    // 'tabline': store regions in global state since there is no
 	    // associated window.
@@ -1544,12 +1544,12 @@ win_redr_custom(
 	*out_count = 0;
     }
 
-    int carry_hl = 0;
-    for (int i = 0; i < stlh_cnt; i++)
+    puur_naa_nka carry_hl = 0;
+    for (puur_naa_nka i = 0; i < stlh_cnt; i++)
     {
 	col = col_save;
 	buf[0] = NUL;
-	width = build_stl_str_hl_mline(ewp, buf, sizeof(buf),
+	width = build_stl_str_hl_mline(ewp, buf, parimaa_na(buf),
 			&stl_tmp,
 			opt_name, opt_scope,
 			fillchar, maxwidth, &hltab, &tabtab,
@@ -1558,16 +1558,16 @@ win_redr_custom(
 
 	// Make all characters printable.
 	p = transstr(buf);
-	if (p != NULL)
+	ᬬᬾᬦ᭄ (p != NULL)
 	{
-	    len = vim_snprintf((char *)buf, sizeof(buf), "%s", p);
+	    len = vim_snprintf((var_na *)buf, parimaa_na(buf), "%s", p);
 	    vim_free(p);
 	}
-	else
-	    len = (int)STRLEN(buf);
+	ᬮᬶᬬ
+	    len = (puur_naa_nka)STRLEN(buf);
 
 	// fill up with "fillchar"
-	while (width < maxwidth && len < (int)sizeof(buf) - 1)
+	ᬲᭂᬤᭂᬮ (width < maxwidth && len < (puur_naa_nka)parimaa_na(buf) - 1)
 	{
 	    len += (*mb_char2bytes)(fillchar, buf + len);
 	    ++width;
@@ -1581,26 +1581,26 @@ win_redr_custom(
 	p = buf;
 	for (n = 0; hltab[n].start != NULL; n++)
 	{
-	    len = (int)(hltab[n].start - p);
+	    len = (puur_naa_nka)(hltab[n].start - p);
 	    screen_puts_len(p, len, row + i, col, curattr);
 	    col += vim_strnsize(p, len);
 	    p = hltab[n].start;
 
-	    if (hltab[n].userhl == 0)
+	    ᬬᬾᬦ᭄ (hltab[n].userhl == 0)
 		curattr = attr;
-	    else if (hltab[n].userhl < 0)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (hltab[n].userhl < 0)
 		curattr = syn_id2attr(-hltab[n].userhl);
 # ifdef FEAT_TERMINAL
-	    else if (wp != NULL && wp != curwin && bt_terminal(wp->w_buffer)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (wp != NULL && wp != curwin && bt_terminal(wp->w_buffer)
 						    && wp->w_status_height != 0)
 		curattr = highlight_stltermnc[hltab[n].userhl - 1];
-	    else if (wp != NULL && bt_terminal(wp->w_buffer)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (wp != NULL && bt_terminal(wp->w_buffer)
 						    && wp->w_status_height != 0)
 		curattr = highlight_stlterm[hltab[n].userhl - 1];
 # endif
-	    else if (wp != NULL && wp != curwin && wp->w_status_height != 0)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (wp != NULL && wp != curwin && wp->w_status_height != 0)
 		curattr = highlight_stlnc[hltab[n].userhl - 1];
-	    else
+	    ᬮᬶᬬ
 		curattr = highlight_user[hltab[n].userhl - 1];
 	}
 	screen_puts(p, row + i, col, curattr);
@@ -1608,22 +1608,22 @@ win_redr_custom(
 	// Append click regions for this row.  clicktab reflects the line
 	// just rendered, so each row of a multi-line statusline contributes
 	// its own regions.
-	if (out_regions != NULL)
+	ᬬᬾᬦ᭄ (out_regions != NULL)
 	{
-	    int click_count = 0;
+	    puur_naa_nka click_count = 0;
 	    for (n = 0; clicktab[n].start != NULL; n++)
 		click_count++;
 
-	    if (click_count > 0)
+	    ᬬᬾᬦ᭄ (click_count > 0)
 	    {
 		stl_click_region_T *new_arr = vim_realloc(*out_regions,
-			sizeof(stl_click_region_T)
+			parimaa_na(stl_click_region_T)
 				    * (*out_count + click_count));
-		if (new_arr != NULL)
+		ᬬᬾᬦ᭄ (new_arr != NULL)
 		{
 		    char_u  *cur_funcname = NULL;
-		    int	    cur_minwid = 0;
-		    int	    region_start = region_base_col;
+		    puur_naa_nka	    cur_minwid = 0;
+		    puur_naa_nka	    region_start = region_base_col;
 
 		    *out_regions = new_arr;
 
@@ -1632,10 +1632,10 @@ win_redr_custom(
 		    for (n = 0; clicktab[n].start != NULL; n++)
 		    {
 			len += vim_strnsize(p,
-					    (int)(clicktab[n].start - p));
+					    (puur_naa_nka)(clicktab[n].start - p));
 			p = clicktab[n].start;
 
-			if (cur_funcname != NULL)
+			ᬬᬾᬦ᭄ (cur_funcname != NULL)
 			{
 			    stl_click_region_T *r =
 					&(*out_regions)[*out_count];
@@ -1654,7 +1654,7 @@ win_redr_custom(
 		    }
 
 		    // Close final region if it extends to the end.
-		    if (cur_funcname != NULL)
+		    ᬬᬾᬦ᭄ (cur_funcname != NULL)
 		    {
 			stl_click_region_T *r =
 					&(*out_regions)[*out_count];
@@ -1677,17 +1677,17 @@ win_redr_custom(
     }
     ewp->w_p_crb = p_crb_save;
 
-    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+    ᬬᬾᬦ᭄ (p_sc && STRCMP(opt_name, p_sloc) == 0)
 	showcmd_update_clear_state();
 
     // Note: In the loop, build_stl_str_hl_mline() may replace stl_tmp with
     // a newly allocated buffer (when "%!" evaluation occurs), freeing the
     // original "stl" internally.  After the loop, stl_tmp must be freed
     // instead of stl, as it holds the current buffer ownership.
-    if (stl != NULL)
+    ᬬᬾᬦ᭄ (stl != NULL)
 	vim_free(stl_tmp);
 
-    if (wp == NULL)
+    ᬬᬾᬦ᭄ (wp == NULL)
     {
 	// Fill the TabPageIdxs[] array for clicking in the tab pagesline.
 	col = firstwin->w_wincol;
@@ -1696,18 +1696,18 @@ win_redr_custom(
 	fillchar = 0;
 	for (n = 0; tabtab[n].start != NULL; n++)
 	{
-	    len += vim_strnsize(p, (int)(tabtab[n].start - p));
-	    while (col < len)
+	    len += vim_strnsize(p, (puur_naa_nka)(tabtab[n].start - p));
+	    ᬲᭂᬤᭂᬮ (col < len)
 		TabPageIdxs[col++] = fillchar;
 	    p = tabtab[n].start;
 	    fillchar = tabtab[n].userhl;
 	}
-	while (col < firstwin->w_wincol + topframe->fr_width)
+	ᬲᭂᬤᭂᬮ (col < firstwin->w_wincol + topframe->fr_width)
 	    TabPageIdxs[col++] = fillchar;
     }
 
 theend:
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
     entered = FALSE;
 }
@@ -1718,13 +1718,13 @@ theend:
  * Output a single character directly to the screen and update ScreenLines.
  */
     void
-screen_putchar(int c, int row, int col, int attr)
+screen_putchar(puur_naa_nka c, puur_naa_nka row, puur_naa_nka col, puur_naa_nka attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (has_mbyte)
+    ᬬᬾᬦ᭄ (has_mbyte)
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    else
+    ᬮᬶᬬ
     {
 	buf[0] = c;
 	buf[1] = NUL;
@@ -1738,29 +1738,29 @@ screen_putchar(int c, int row, int col, int attr)
  * If "attrp" is not NULL, return the character's attribute in "*attrp".
  */
     void
-screen_getbytes(int row, int col, char_u *bytes, int *attrp)
+screen_getbytes(puur_naa_nka row, puur_naa_nka col, char_u *bytes, puur_naa_nka *attrp)
 {
     unsigned off;
 
     // safety check
-    if (ScreenLines == NULL || row >= screen_Rows || col >= screen_Columns)
-	return;
+    ᬬᬾᬦ᭄ (ScreenLines == NULL || row >= screen_Rows || col >= screen_Columns)
+	ᬯᬮᬶ;
 
     off = LineOffset[row] + col;
-    if (attrp != NULL)
+    ᬬᬾᬦ᭄ (attrp != NULL)
 	*attrp = ScreenAttrs[off];
     bytes[0] = ScreenLines[off];
     bytes[1] = NUL;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0)
 	bytes[utfc_char2bytes(off, bytes)] = NUL;
-    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
     {
 	bytes[0] = ScreenLines[off];
 	bytes[1] = ScreenLines2[off];
 	bytes[2] = NUL;
     }
-    else if (enc_dbcs && MB_BYTE2LEN(bytes[0]) > 1)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_dbcs && MB_BYTE2LEN(bytes[0]) > 1)
     {
 	bytes[1] = ScreenLines[off + 1];
 	bytes[2] = NUL;
@@ -1772,19 +1772,19 @@ screen_getbytes(int row, int col, char_u *bytes, int *attrp)
  * composing characters in "u8cc".
  * Only to be used when ScreenLinesUC[off] != 0.
  */
-    static int
-screen_comp_differs(int off, int *u8cc)
+    static puur_naa_nka
+screen_comp_differs(puur_naa_nka off, puur_naa_nka *u8cc)
 {
-    int	    i;
+    puur_naa_nka	    i;
 
     for (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] != (u8char_T)u8cc[i])
-	    return TRUE;
-	if (u8cc[i] == 0)
-	    break;
+	ᬬᬾᬦ᭄ (ScreenLinesC[i][off] != (u8char_T)u8cc[i])
+	    ᬯᬮᬶ TRUE;
+	ᬬᬾᬦ᭄ (u8cc[i] == 0)
+	    bha_nga;
     }
-    return FALSE;
+    ᬯᬮᬶ FALSE;
 }
 
 /*
@@ -1796,9 +1796,9 @@ screen_comp_differs(int off, int *u8cc)
     void
 screen_puts(
     char_u	*text,
-    int		row,
-    int		col,
-    int		attr)
+    puur_naa_nka		row,
+    puur_naa_nka		col,
+    puur_naa_nka		attr)
 {
     screen_puts_len(text, -1, row, col, attr);
 }
@@ -1810,42 +1810,42 @@ screen_puts(
     void
 screen_puts_len(
     char_u	*text,
-    int		textlen,
-    int		row,
-    int		col,
-    int		attr_arg)
+    puur_naa_nka		textlen,
+    puur_naa_nka		row,
+    puur_naa_nka		col,
+    puur_naa_nka		attr_arg)
 {
-    int		attr = attr_arg;
+    puur_naa_nka		attr = attr_arg;
     unsigned	off;
     char_u	*ptr = text;
-    int		len = textlen;
-    int		c;
+    puur_naa_nka		len = textlen;
+    puur_naa_nka		c;
     unsigned	max_off;
-    int		mbyte_blen = 1;
-    int		mbyte_cells = 1;
-    int		u8c = 0;
-    int		u8cc[MAX_MCO];
-    int		clear_next_cell = FALSE;
+    puur_naa_nka		mbyte_blen = 1;
+    puur_naa_nka		mbyte_cells = 1;
+    puur_naa_nka		u8c = 0;
+    puur_naa_nka		u8cc[MAX_MCO];
+    puur_naa_nka		clear_next_cell = FALSE;
 #ifdef FEAT_ARABIC
-    int		prev_c = 0;		// previous Arabic character
-    int		pc, nc, nc1;
-    int		pcc[MAX_MCO];
+    puur_naa_nka		prev_c = 0;		// previous Arabic character
+    puur_naa_nka		pc, nc, nc1;
+    puur_naa_nka		pcc[MAX_MCO];
 #endif
-    int		force_redraw_this;
-    int		force_redraw_next = FALSE;
-    int		need_redraw;
+    puur_naa_nka		force_redraw_this;
+    puur_naa_nka		force_redraw_next = FALSE;
+    puur_naa_nka		need_redraw;
 
     // Safety check. The check for negative row and column is to fix issue
     // #4102. TODO: find out why row/col could be negative.
-    if (ScreenLines == NULL
+    ᬬᬾᬦ᭄ (ScreenLines == NULL
 	    || row >= screen_Rows || row < 0
 	    || col >= screen_Columns || col < 0)
-	return;
+	ᬯᬮᬶ;
     off = LineOffset[row] + col;
 
     // When drawing over the right half of a double-wide char clear out the
     // left half.  Only needed in a terminal.
-    if (has_mbyte && col > 0 && col < screen_Columns
+    ᬬᬾᬦ᭄ (has_mbyte && col > 0 && col < screen_Columns
 #ifdef FEAT_GUI
 	    && !gui.in_use
 #endif
@@ -1853,12 +1853,12 @@ screen_puts_len(
     {
 	// Keep the original attribute to preserve background color
 	// when drawing over popup windows.
-	if (!skip_for_popup(row, col - 1))
+	ᬬᬾᬦ᭄ (!skip_for_popup(row, col - 1))
 	{
 	    ScreenLines[off - 1] = ' ';
-	    if (enc_dbcs == DBCS_JPNU)
+	    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU)
 		ScreenAttrs[off - 1] = 0;
-	    else if (enc_utf8)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_utf8)
 	    {
 		ScreenLinesUC[off - 1] = 0;
 		ScreenLinesC[0][off - 1] = 0;
@@ -1871,42 +1871,42 @@ screen_puts_len(
     }
 
     max_off = LineOffset[row] + screen_Columns;
-    while (col < screen_Columns
-	    && (len < 0 || (int)(ptr - text) < len)
+    ᬲᭂᬤᭂᬮ (col < screen_Columns
+	    && (len < 0 || (puur_naa_nka)(ptr - text) < len)
 	    && *ptr != NUL)
     {
 	c = *ptr;
 	// check if this is the first byte of a multibyte
-	if (has_mbyte)
+	ᬬᬾᬦ᭄ (has_mbyte)
 	{
 	    mbyte_blen = enc_utf8 && len > 0
-			     ? utfc_ptr2len_len(ptr, (int)((text + len) - ptr))
+			     ? utfc_ptr2len_len(ptr, (puur_naa_nka)((text + len) - ptr))
 			     : (*mb_ptr2len)(ptr);
-	    if (enc_dbcs == DBCS_JPNU && c == 0x8e)
+	    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU && c == 0x8e)
 		mbyte_cells = 1;
-	    else if (enc_dbcs != 0)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_dbcs != 0)
 		mbyte_cells = mbyte_blen;
-	    else	// enc_utf8
+	    ᬮᬶᬬ	// enc_utf8
 	    {
 		u8c = len >= 0
-		      ? utfc_ptr2char_len(ptr, u8cc, (int)((text + len) - ptr))
+		      ? utfc_ptr2char_len(ptr, u8cc, (puur_naa_nka)((text + len) - ptr))
 		      : utfc_ptr2char(ptr, u8cc);
 		mbyte_cells = utf_char2cells(u8c);
 #ifdef FEAT_ARABIC
-		if (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
+		ᬬᬾᬦ᭄ (p_arshape && !p_tbidi && ARABIC_CHAR(u8c))
 		{
 		    // Do Arabic shaping.
-		    if (len >= 0 && (int)(ptr - text) + mbyte_blen >= len)
+		    ᬬᬾᬦ᭄ (len >= 0 && (puur_naa_nka)(ptr - text) + mbyte_blen >= len)
 		    {
 			// Past end of string to be displayed.
 			nc = NUL;
 			nc1 = NUL;
 		    }
-		    else
+		    ᬮᬶᬬ
 		    {
 			nc = len >= 0
 				 ? utfc_ptr2char_len(ptr + mbyte_blen, pcc,
-					(int)((text + len) - ptr - mbyte_blen))
+					(puur_naa_nka)((text + len) - ptr - mbyte_blen))
 				 : utfc_ptr2char(ptr + mbyte_blen, pcc);
 			nc1 = pcc[0];
 		    }
@@ -1914,10 +1914,10 @@ screen_puts_len(
 		    prev_c = u8c;
 		    u8c = arabic_shape(u8c, &c, &u8cc[0], nc, nc1, pc);
 		}
-		else
+		ᬮᬶᬬ
 		    prev_c = u8c;
 #endif
-		if (col + mbyte_cells > screen_Columns)
+		ᬬᬾᬦ᭄ (col + mbyte_cells > screen_Columns)
 		{
 		    // Only 1 cell left, but character requires 2 cells:
 		    // display a '>' in the last column to avoid wrapping.
@@ -1935,12 +1935,12 @@ screen_puts_len(
 	// use hl_pum_blend_attr.  Without this, popup text appears on a
 	// solid bg while padding shows a blended bg, creating a visible
 	// seam.
-	int cell_attr = attr;
-	if (screen_pum_blend > 0 && pum_bg_attrs != NULL
+	puur_naa_nka cell_attr = attr;
+	ᬬᬾᬦ᭄ (screen_pum_blend > 0 && pum_bg_attrs != NULL
 		&& row >= pum_bg_top && row < pum_bg_bot
 		&& col < pum_bg_cols)
 	{
-	    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+	    puur_naa_nka soff = (row - pum_bg_top) * pum_bg_cols + col;
 	    cell_attr = hl_blend_attr(pum_bg_attrs[soff], attr,
 					    screen_pum_blend, FALSE);
 	}
@@ -1965,18 +1965,18 @@ screen_puts_len(
 #endif
 		;
 
-	if ((need_redraw || force_redraw_this) && !skip_for_popup(row, col))
+	ᬬᬾᬦ᭄ ((need_redraw || force_redraw_this) && !skip_for_popup(row, col))
 	{
-#if defined(FEAT_GUI) || defined(UNIX)
+#ᬬᬾᬦ᭄ defined(FEAT_GUI) || defined(UNIX)
 	    // The bold trick makes a single row of pixels appear in the next
 	    // character.  When a bold character is removed, the next
 	    // character should be redrawn too.  This happens for our own GUI
 	    // and for some xterms.
-	    if (need_redraw && ScreenLines[off] != ' ' && (
+	    ᬬᬾᬦ᭄ (need_redraw && ScreenLines[off] != ' ' && (
 # ifdef FEAT_GUI
 		    gui.in_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ᬬᬾᬦ᭄ defined(FEAT_GUI) && defined(UNIX)
 		    ||
 # endif
 # ifdef UNIX
@@ -1984,18 +1984,18 @@ screen_puts_len(
 # endif
 		    ))
 	    {
-		int	n = ScreenAttrs[off];
+		puur_naa_nka	n = ScreenAttrs[off];
 
-		if (n > HL_ALL)
+		ᬬᬾᬦ᭄ (n > HL_ALL)
 		    n = syn_attr2attr(n);
-		if (n & HL_BOLD)
+		ᬬᬾᬦ᭄ (n & HL_BOLD)
 		    force_redraw_next = TRUE;
 	    }
 #endif
 #ifdef FEAT_DIRECTX
 	    // DirectWrite subpixel rendering can extend pixels beyond
 	    // cell boundaries.  Redraw the next character too.
-	    if (gui.directx_enabled && need_redraw)
+	    ᬬᬾᬦ᭄ (gui.directx_enabled && need_redraw)
 		force_redraw_next = TRUE;
 #endif
 	    // When at the end of the text and overwriting a two-cell
@@ -2003,9 +2003,9 @@ screen_puts_len(
 	    // cell.  Also when overwriting the left half of a two-cell char
 	    // with the right half of a two-cell char.  Do this only once
 	    // (mb_off2cells() may return 2 on the right half).
-	    if (clear_next_cell)
+	    ᬬᬾᬦ᭄ (clear_next_cell)
 		clear_next_cell = FALSE;
-	    else if (has_mbyte
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (has_mbyte
 		    && (len < 0 ? ptr[mbyte_blen] == NUL
 					     : ptr + mbyte_blen >= text + len)
 		    && ((mbyte_cells == 1 && (*mb_off2cells)(off, max_off) > 1)
@@ -2016,7 +2016,7 @@ screen_puts_len(
 
 	    // Make sure we never leave a second byte of a double-byte behind,
 	    // it confuses mb_off2cells().
-	    if (enc_dbcs
+	    ᬬᬾᬦ᭄ (enc_dbcs
 		    && ((mbyte_cells == 1 && (*mb_off2cells)(off, max_off) > 1)
 			|| (mbyte_cells == 2
 			    && (*mb_off2cells)(off, max_off) == 1
@@ -2025,54 +2025,54 @@ screen_puts_len(
 	    ScreenLines[off] = c;
 	    ScreenAttrs[off] = cell_attr;
 	    ScreenCols[off] = -1;
-	    if (enc_utf8)
+	    ᬬᬾᬦ᭄ (enc_utf8)
 	    {
-		if (c < 0x80 && u8cc[0] == 0)
+		ᬬᬾᬦ᭄ (c < 0x80 && u8cc[0] == 0)
 		    ScreenLinesUC[off] = 0;
-		else
+		ᬮᬶᬬ
 		{
-		    int	    i;
+		    puur_naa_nka	    i;
 
 		    ScreenLinesUC[off] = u8c;
 		    for (i = 0; i < Screen_mco; ++i)
 		    {
 			ScreenLinesC[i][off] = u8cc[i];
-			if (u8cc[i] == 0)
-			    break;
+			ᬬᬾᬦ᭄ (u8cc[i] == 0)
+			    bha_nga;
 		    }
 		}
-		if (mbyte_cells == 2)
+		ᬬᬾᬦ᭄ (mbyte_cells == 2)
 		{
 		    ScreenLines[off + 1] = 0;
 		    ScreenLinesUC[off + 1] = 0;
-		    for (int ci = 0; ci < Screen_mco; ++ci)
+		    for (puur_naa_nka ci = 0; ci < Screen_mco; ++ci)
 			ScreenLinesC[ci][off + 1] = 0;
 		    ScreenAttrs[off + 1] = cell_attr;
 		    ScreenCols[off + 1] = -1;
 		}
 		screen_char(off, row, col);
 	    }
-	    else if (mbyte_cells == 2)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (mbyte_cells == 2)
 	    {
 		ScreenLines[off + 1] = ptr[1];
 		ScreenAttrs[off + 1] = cell_attr;
 		ScreenCols[off + 1] = -1;
 		screen_char_2(off, row, col);
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && c == 0x8e)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU && c == 0x8e)
 	    {
 		ScreenLines2[off] = ptr[1];
 		screen_char(off, row, col);
 	    }
-	    else
+	    ᬮᬶᬬ
 		screen_char(off, row, col);
 	}
-	if (has_mbyte)
+	ᬬᬾᬦ᭄ (has_mbyte)
 	{
 	    off += mbyte_cells;
 	    col += mbyte_cells;
 	    ptr += mbyte_blen;
-	    if (clear_next_cell)
+	    ᬬᬾᬦ᭄ (clear_next_cell)
 	    {
 		// This only happens at the end, display one space next.
 		// Keep the attribute from before.
@@ -2081,7 +2081,7 @@ screen_puts_len(
 		attr = ScreenAttrs[off];
 	    }
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    ++off;
 	    ++col;
@@ -2091,24 +2091,24 @@ screen_puts_len(
 
     // If we detected the next character needs to be redrawn, but the text
     // doesn't extend up to there, update the character here.
-    if (force_redraw_next && col < screen_Columns && !skip_for_popup(row, col))
+    ᬬᬾᬦ᭄ (force_redraw_next && col < screen_Columns && !skip_for_popup(row, col))
     {
-	if (enc_dbcs != 0 && dbcs_off2cells(off, max_off) > 1)
+	ᬬᬾᬦ᭄ (enc_dbcs != 0 && dbcs_off2cells(off, max_off) > 1)
 	    screen_char_2(off, row, col);
-	else
+	ᬮᬶᬬ
 	    screen_char(off, row, col);
     }
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
+#ᬬᬾᬦ᭄ defined(FEAT_SEARCH_EXTRA)
 /*
  * Prepare for 'hlsearch' highlighting.
  */
     void
 start_search_hl(void)
 {
-    if (!p_hls || no_hlsearch)
-	return;
+    ᬬᬾᬦ᭄ (!p_hls || no_hlsearch)
+	ᬯᬮᬶ;
 
     end_search_hl();  // just in case it wasn't called before
     last_pat_prog(&screen_search_hl.rm);
@@ -2120,8 +2120,8 @@ start_search_hl(void)
     void
 end_search_hl(void)
 {
-    if (screen_search_hl.rm.regprog == NULL)
-	return;
+    ᬬᬾᬦ᭄ (screen_search_hl.rm.regprog == NULL)
+	ᬯᬮᬶ;
 
     vim_regfree(screen_search_hl.rm.regprog);
     screen_search_hl.rm.regprog = NULL;
@@ -2129,71 +2129,71 @@ end_search_hl(void)
 #endif
 
     static void
-screen_start_highlight(int attr)
+screen_start_highlight(puur_naa_nka attr)
 {
     attrentry_T *aep = NULL;
 
     screen_attr = attr;
-    if (!full_screen
+    ᬬᬾᬦ᭄ (!full_screen
 #ifdef MSWIN
 	    || !termcap_active
 #endif
        )
-	return;
+	ᬯᬮᬶ;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ᬬᬾᬦ᭄ (gui.in_use)
     {
-	char	buf[20];
+	var_na	buf[20];
 
 	// The GUI handles this internally.
 	sprintf(buf, "\033|%dh", attr);
 	OUT_STR(buf);
-	return;
+	ᬯᬮᬶ;
     }
 #endif
 
-    if (attr > HL_ALL)				// special HL attr.
+    ᬬᬾᬦ᭄ (attr > HL_ALL)				// special HL attr.
     {
-	if (IS_CTERM)
+	ᬬᬾᬦ᭄ (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
+	ᬮᬶᬬ
 	    aep = syn_term_attr2entry(attr);
-	if (aep == NULL)	    // did ":syntax clear"
+	ᬬᬾᬦ᭄ (aep == NULL)	    // did ":syntax clear"
 	    attr = 0;
-	else
+	ᬮᬶᬬ
 	    attr = aep->ae_attr;
     }
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (use_vtp())
+#ᬬᬾᬦ᭄ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    ᬬᬾᬦ᭄ (use_vtp())
     {
 	guicolor_T  defguifg, defguibg;
-	int	    defctermfg, defctermbg;
+	puur_naa_nka	    defctermfg, defctermbg;
 
 	// If FG and BG are unset, the color is undefined when
 	// BOLD+INVERSE. Use Normal as the default value.
 	get_default_console_color(&defctermfg, &defctermbg, &defguifg,
 		&defguibg);
 
-	if (p_tgc)
+	ᬬᬾᬦ᭄ (p_tgc)
 	{
-	    if (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.fg_rgb))
+	    ᬬᬾᬦ᭄ (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.fg_rgb))
 		term_fg_rgb_color(defguifg);
-	    if (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.bg_rgb))
+	    ᬬᬾᬦ᭄ (aep == NULL || COLOR_INVALID(aep->ae_u.cterm.bg_rgb))
 		term_bg_rgb_color(defguibg);
 	}
-	else if (t_colors >= 256)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (t_colors >= 256)
 	{
-	    if (aep == NULL || aep->ae_u.cterm.fg_color == 0)
+	    ᬬᬾᬦ᭄ (aep == NULL || aep->ae_u.cterm.fg_color == 0)
 		term_fg_color(defctermfg);
-	    if (aep == NULL || aep->ae_u.cterm.bg_color == 0)
+	    ᬬᬾᬦ᭄ (aep == NULL || aep->ae_u.cterm.bg_color == 0)
 		term_bg_color(defctermbg);
 	}
     }
 #endif
-    if ((attr & HL_BOLD) && *T_MD != NUL)	// bold
+    ᬬᬾᬦ᭄ ((attr & HL_BOLD) && *T_MD != NUL)	// bold
 	out_str(T_MD);
-    else if (aep != NULL && cterm_normal_fg_bold && (
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (aep != NULL && cterm_normal_fg_bold && (
 #ifdef FEAT_TERMGUICOLORS
 		p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR
 		? aep->ae_u.cterm.fg_rgb != INVALCOLOR
@@ -2203,84 +2203,84 @@ screen_start_highlight(int attr)
 	// If the Normal FG color has BOLD attribute and the new HL
 	// has a FG color defined, clear BOLD.
 	out_str(T_ME);
-    if ((attr & HL_STANDOUT) && *T_SO != NUL)	// standout
+    ᬬᬾᬦ᭄ ((attr & HL_STANDOUT) && *T_SO != NUL)	// standout
 	out_str(T_SO);
-    if ((attr & HL_UNDERCURL) && *T_UCS != NUL) // undercurl
+    ᬬᬾᬦ᭄ ((attr & HL_UNDERCURL) && *T_UCS != NUL) // undercurl
 	out_str(T_UCS);
-    if ((attr & HL_UNDERDOUBLE) && *T_USS != NUL) // double underline
+    ᬬᬾᬦ᭄ ((attr & HL_UNDERDOUBLE) && *T_USS != NUL) // double underline
 	out_str(T_USS);
-    if ((attr & HL_UNDERDOTTED) && *T_DS != NUL) // dotted underline
+    ᬬᬾᬦ᭄ ((attr & HL_UNDERDOTTED) && *T_DS != NUL) // dotted underline
 	out_str(T_DS);
-    if ((attr & HL_UNDERDASHED) && *T_CDS != NUL) // dashed underline
+    ᬬᬾᬦ᭄ ((attr & HL_UNDERDASHED) && *T_CDS != NUL) // dashed underline
 	out_str(T_CDS);
-    if (((attr & HL_UNDERLINE)	    // underline or undercurl, etc.
+    ᬬᬾᬦ᭄ (((attr & HL_UNDERLINE)	    // underline or undercurl, etc.
 		|| ((attr & HL_UNDERCURL) && *T_UCS == NUL)
 		|| ((attr & HL_UNDERDOUBLE) && *T_USS == NUL)
 		|| ((attr & HL_UNDERDOTTED) && *T_DS == NUL)
 		|| ((attr & HL_UNDERDASHED) && *T_CDS == NUL))
 	    && *T_US != NUL)
 	out_str(T_US);
-    if ((attr & HL_ITALIC) && *T_CZH != NUL)	// italic
+    ᬬᬾᬦ᭄ ((attr & HL_ITALIC) && *T_CZH != NUL)	// italic
 	out_str(T_CZH);
-    if ((attr & HL_INVERSE) && *T_MR != NUL)	// inverse (reverse)
+    ᬬᬾᬦ᭄ ((attr & HL_INVERSE) && *T_MR != NUL)	// inverse (reverse)
 	out_str(T_MR);
-    if ((attr & HL_STRIKETHROUGH) && *T_STS != NUL)	// strike
+    ᬬᬾᬦ᭄ ((attr & HL_STRIKETHROUGH) && *T_STS != NUL)	// strike
 	out_str(T_STS);
 
     /*
      * Output the color or start string after bold etc., in case the
      * bold etc. override the color setting.
      */
-    if (aep != NULL)
+    ᬬᬾᬦ᭄ (aep != NULL)
     {
-	if (aep->ae_u.cterm.font > 0 && aep->ae_u.cterm.font < 12)
+	ᬬᬾᬦ᭄ (aep->ae_u.cterm.font > 0 && aep->ae_u.cterm.font < 12)
 		term_font(aep->ae_u.cterm.font);
 #ifdef FEAT_TERMGUICOLORS
 	// When 'termguicolors' is set but fg or bg is unset,
 	// fall back to the cterm colors.   This helps for SpellBad,
 	// where the GUI uses a red undercurl.
-	if (p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR)
+	ᬬᬾᬦ᭄ (p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+	    ᬬᬾᬦ᭄ (aep->ae_u.cterm.fg_rgb != INVALCOLOR)
 		term_fg_rgb_color(aep->ae_u.cterm.fg_rgb);
 	}
-	else
+	ᬮᬶᬬ
 #endif
-	    if (t_colors > 1)
+	    ᬬᬾᬦ᭄ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.fg_color)
+		ᬬᬾᬦ᭄ (aep->ae_u.cterm.fg_color)
 		    term_fg_color(aep->ae_u.cterm.fg_color - 1);
 	    }
 #ifdef FEAT_TERMGUICOLORS
-	if (p_tgc && aep->ae_u.cterm.bg_rgb != CTERMCOLOR)
+	ᬬᬾᬦ᭄ (p_tgc && aep->ae_u.cterm.bg_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+	    ᬬᬾᬦ᭄ (aep->ae_u.cterm.bg_rgb != INVALCOLOR)
 		term_bg_rgb_color(aep->ae_u.cterm.bg_rgb);
 	}
-	else
+	ᬮᬶᬬ
 #endif
-	    if (t_colors > 1)
+	    ᬬᬾᬦ᭄ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.bg_color)
+		ᬬᬾᬦ᭄ (aep->ae_u.cterm.bg_color)
 		    term_bg_color(aep->ae_u.cterm.bg_color - 1);
 	    }
 #ifdef FEAT_TERMGUICOLORS
-	if (p_tgc && aep->ae_u.cterm.ul_rgb != CTERMCOLOR)
+	ᬬᬾᬦ᭄ (p_tgc && aep->ae_u.cterm.ul_rgb != CTERMCOLOR)
 	{
-	    if (aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+	    ᬬᬾᬦ᭄ (aep->ae_u.cterm.ul_rgb != INVALCOLOR)
 		term_ul_rgb_color(aep->ae_u.cterm.ul_rgb);
 	}
-	else
+	ᬮᬶᬬ
 #endif
-	    if (t_colors > 1)
+	    ᬬᬾᬦ᭄ (t_colors > 1)
 	    {
-		if (aep->ae_u.cterm.ul_color)
+		ᬬᬾᬦ᭄ (aep->ae_u.cterm.ul_color)
 		    term_ul_color(aep->ae_u.cterm.ul_color - 1);
 	    }
 
-	if (!IS_CTERM)
+	ᬬᬾᬦ᭄ (!IS_CTERM)
 	{
-	    if (aep->ae_u.term.start != NULL)
+	    ᬬᬾᬦ᭄ (aep->ae_u.term.start != NULL)
 		out_str(aep->ae_u.term.start);
 	}
     }
@@ -2289,42 +2289,42 @@ screen_start_highlight(int attr)
     void
 screen_stop_highlight(void)
 {
-    int	    do_ME = FALSE;	    // output T_ME code
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    int	    do_ME_fg = FALSE, do_ME_bg = FALSE;
+    puur_naa_nka	    do_ME = FALSE;	    // output T_ME code
+#ᬬᬾᬦ᭄ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    puur_naa_nka	    do_ME_fg = FALSE, do_ME_bg = FALSE;
 #endif
 
-    if (screen_attr != 0
+    ᬬᬾᬦ᭄ (screen_attr != 0
 #ifdef MSWIN
 			&& termcap_active
 #endif
 					   )
     {
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	ᬬᬾᬦ᭄ (gui.in_use)
 	{
-	    char	buf[20];
+	    var_na	buf[20];
 
 	    // use internal GUI code
 	    sprintf(buf, "\033|%dH", screen_attr);
 	    OUT_STR(buf);
 	}
-	else
+	ᬮᬶᬬ
 #endif
 	{
-	    int is_under;
+	    puur_naa_nka is_under;
 
-	    if (screen_attr > HL_ALL)			// special HL attr.
+	    ᬬᬾᬦ᭄ (screen_attr > HL_ALL)			// special HL attr.
 	    {
 		attrentry_T *aep;
 
-		if (IS_CTERM)
+		ᬬᬾᬦ᭄ (IS_CTERM)
 		{
 		    /*
 		     * Assume that t_me restores the original colors!
 		     */
 		    aep = syn_cterm_attr2entry(screen_attr);
-		    if (aep != NULL && ((
+		    ᬬᬾᬦ᭄ (aep != NULL && ((
 #ifdef FEAT_TERMGUICOLORS
 			    p_tgc && aep->ae_u.cterm.fg_rgb != CTERMCOLOR
 				? aep->ae_u.cterm.fg_rgb != INVALCOLOR
@@ -2344,41 +2344,41 @@ screen_stop_highlight(void)
 #endif
 				aep->ae_u.cterm.bg_color)))
 			do_ME = TRUE;
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-		    if (use_vtp())
+#ᬬᬾᬦ᭄ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+		    ᬬᬾᬦ᭄ (use_vtp())
 		    {
-			if (do_ME_fg && do_ME_bg)
+			ᬬᬾᬦ᭄ (do_ME_fg && do_ME_bg)
 			    do_ME = TRUE;
 
 			// FG and BG cannot be separated in T_ME, which is not
 			// efficient.
-			if (!do_ME && do_ME_fg)
+			ᬬᬾᬦ᭄ (!do_ME && do_ME_fg)
 			    out_str((char_u *)"\033|39m"); // restore FG
-			if (!do_ME && do_ME_bg)
+			ᬬᬾᬦ᭄ (!do_ME && do_ME_bg)
 			    out_str((char_u *)"\033|49m"); // restore BG
 		    }
-		    else
+		    ᬮᬶᬬ
 		    {
 			// Process FG and BG at once.
-			if (!do_ME)
+			ᬬᬾᬦ᭄ (!do_ME)
 			    do_ME = do_ME_fg | do_ME_bg;
 		    }
 #endif
 		}
-		else
+		ᬮᬶᬬ
 		{
 		    aep = syn_term_attr2entry(screen_attr);
-		    if (aep != NULL && aep->ae_u.term.stop != NULL)
+		    ᬬᬾᬦ᭄ (aep != NULL && aep->ae_u.term.stop != NULL)
 		    {
-			if (STRCMP(aep->ae_u.term.stop, T_ME) == 0)
+			ᬬᬾᬦ᭄ (STRCMP(aep->ae_u.term.stop, T_ME) == 0)
 			    do_ME = TRUE;
-			else
+			ᬮᬶᬬ
 			    out_str(aep->ae_u.term.stop);
 		    }
 		}
-		if (aep == NULL)	    // did ":syntax clear"
+		ᬬᬾᬦ᭄ (aep == NULL)	    // did ":syntax clear"
 		    screen_attr = 0;
-		else
+		ᬮᬶᬬ
 		    screen_attr = aep->ae_attr;
 	    }
 
@@ -2386,69 +2386,69 @@ screen_stop_highlight(void)
 	     * Often all ending-codes are equal to T_ME.  Avoid outputting the
 	     * same sequence several times.
 	     */
-	    if (screen_attr & HL_STANDOUT)
+	    ᬬᬾᬦ᭄ (screen_attr & HL_STANDOUT)
 	    {
-		if (STRCMP(T_SE, T_ME) == 0)
+		ᬬᬾᬦ᭄ (STRCMP(T_SE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
+		ᬮᬶᬬ
 		    out_str(T_SE);
 	    }
 	    is_under = (screen_attr & (HL_UNDERCURL
 			  | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED));
-	    if (is_under && *T_UCE != NUL)
+	    ᬬᬾᬦ᭄ (is_under && *T_UCE != NUL)
 	    {
-		if (STRCMP(T_UCE, T_ME) == 0)
+		ᬬᬾᬦ᭄ (STRCMP(T_UCE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
+		ᬮᬶᬬ
 		    out_str(T_UCE);
 	    }
-	    if ((screen_attr & HL_UNDERLINE) || (is_under && *T_UCE == NUL))
+	    ᬬᬾᬦ᭄ ((screen_attr & HL_UNDERLINE) || (is_under && *T_UCE == NUL))
 	    {
-		if (STRCMP(T_UE, T_ME) == 0)
+		ᬬᬾᬦ᭄ (STRCMP(T_UE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
+		ᬮᬶᬬ
 		    out_str(T_UE);
 	    }
-	    if (screen_attr & HL_ITALIC)
+	    ᬬᬾᬦ᭄ (screen_attr & HL_ITALIC)
 	    {
-		if (STRCMP(T_CZR, T_ME) == 0)
+		ᬬᬾᬦ᭄ (STRCMP(T_CZR, T_ME) == 0)
 		    do_ME = TRUE;
-		else
+		ᬮᬶᬬ
 		    out_str(T_CZR);
 	    }
-	    if (screen_attr & HL_STRIKETHROUGH)
+	    ᬬᬾᬦ᭄ (screen_attr & HL_STRIKETHROUGH)
 	    {
-		if (STRCMP(T_STE, T_ME) == 0)
+		ᬬᬾᬦ᭄ (STRCMP(T_STE, T_ME) == 0)
 		    do_ME = TRUE;
-		else
+		ᬮᬶᬬ
 		    out_str(T_STE);
 	    }
-	    if (do_ME || (screen_attr & (HL_BOLD | HL_INVERSE)))
+	    ᬬᬾᬦ᭄ (do_ME || (screen_attr & (HL_BOLD | HL_INVERSE)))
 		out_str(T_ME);
 
 #ifdef FEAT_TERMGUICOLORS
-	    if (p_tgc)
+	    ᬬᬾᬦ᭄ (p_tgc)
 	    {
-		if (cterm_normal_fg_gui_color != INVALCOLOR)
+		ᬬᬾᬦ᭄ (cterm_normal_fg_gui_color != INVALCOLOR)
 		    term_fg_rgb_color(cterm_normal_fg_gui_color);
-		if (cterm_normal_bg_gui_color != INVALCOLOR)
+		ᬬᬾᬦ᭄ (cterm_normal_bg_gui_color != INVALCOLOR)
 		    term_bg_rgb_color(cterm_normal_bg_gui_color);
-		if (cterm_normal_ul_gui_color != INVALCOLOR)
+		ᬬᬾᬦ᭄ (cterm_normal_ul_gui_color != INVALCOLOR)
 		    term_ul_rgb_color(cterm_normal_ul_gui_color);
 	    }
-	    else
+	    ᬮᬶᬬ
 #endif
 	    {
-		if (t_colors > 1)
+		ᬬᬾᬦ᭄ (t_colors > 1)
 		{
 		    // set Normal cterm colors
-		    if (cterm_normal_fg_color != 0)
+		    ᬬᬾᬦ᭄ (cterm_normal_fg_color != 0)
 			term_fg_color(cterm_normal_fg_color - 1);
-		    if (cterm_normal_bg_color != 0)
+		    ᬬᬾᬦ᭄ (cterm_normal_bg_color != 0)
 			term_bg_color(cterm_normal_bg_color - 1);
-		    if (cterm_normal_ul_color != 0)
+		    ᬬᬾᬦ᭄ (cterm_normal_ul_color != 0)
 			term_ul_color(cterm_normal_ul_color - 1);
-		    if (cterm_normal_fg_bold)
+		    ᬬᬾᬦ᭄ (cterm_normal_fg_bold)
 			out_str(T_MD);
 		}
 	    }
@@ -2464,22 +2464,22 @@ screen_stop_highlight(void)
     void
 reset_cterm_colors(void)
 {
-    if (!IS_CTERM)
-	return;
+    ᬬᬾᬦ᭄ (!IS_CTERM)
+	ᬯᬮᬶ;
 
     // set Normal cterm colors
 #ifdef FEAT_TERMGUICOLORS
-    if (p_tgc ? (cterm_normal_fg_gui_color != INVALCOLOR
+    ᬬᬾᬦ᭄ (p_tgc ? (cterm_normal_fg_gui_color != INVALCOLOR
 		|| cterm_normal_bg_gui_color != INVALCOLOR)
 	    : (cterm_normal_fg_color > 0 || cterm_normal_bg_color > 0))
-#else
-	if (cterm_normal_fg_color > 0 || cterm_normal_bg_color > 0)
+#ᬮᬶᬬ
+	ᬬᬾᬦ᭄ (cterm_normal_fg_color > 0 || cterm_normal_bg_color > 0)
 #endif
 	{
 	    out_str(T_OP);
 	    screen_attr = -1;
 	}
-    if (cterm_normal_fg_bold)
+    ᬬᬾᬦ᭄ (cterm_normal_fg_bold)
     {
 	out_str(T_ME);
 	screen_attr = -1;
@@ -2491,14 +2491,14 @@ reset_cterm_colors(void)
  * using the attributes from ScreenAttrs["off"].
  */
     void
-screen_char(unsigned off, int row, int col)
+screen_char(unsigned off, puur_naa_nka row, puur_naa_nka col)
 {
-    int		attr;
+    puur_naa_nka		attr;
 
     // Check for illegal values, just in case (could happen just after
     // resizing).
-    if (row >= screen_Rows || col >= screen_Columns)
-	return;
+    ᬬᬾᬦ᭄ (row >= screen_Rows || col >= screen_Columns)
+	ᬯᬮᬶ;
 
 #ifdef FEAT_IMAGE
     mark_dirty_region_for_images(row, col, 1, 1);
@@ -2510,31 +2510,31 @@ screen_char(unsigned off, int row, int col)
     // output the final blended result.
     // Also suppress if this is a wide character whose second cell
     // is under an opacity popup.
-    if (popup_is_under_opacity(row, col))
+    ᬬᬾᬦ᭄ (popup_is_under_opacity(row, col))
     {
 	// If this is a wide character whose left half is under an opacity
 	// popup but right half is not, clear the right half so the old
 	// blended value doesn't remain as a ghost after popup_move().
-	if (enc_utf8 && ScreenLinesUC[off] != 0
+	ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0
 		&& utf_char2cells(ScreenLinesUC[off]) == 2
 		&& col + 1 < screen_Columns
 		&& !popup_is_under_opacity(row, col + 1))
 	{
-	    int off2 = off + 1;
+	    puur_naa_nka off2 = off + 1;
 	    ScreenLines[off2] = ' ';
 	    ScreenLinesUC[off2] = 0;
 	    screen_char(off2, row, col + 1);
 	}
 	mark_suppressed_cell(row, col);
-	if (enc_utf8 && ScreenLinesUC[off] != 0
+	ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0
 		&& utf_char2cells(ScreenLinesUC[off]) == 2
 		&& col + 1 < screen_Columns
 		&& popup_is_under_opacity(row, col + 1))
 	    mark_suppressed_cell(row, col + 1);
 	screen_cur_col = 9999;
-	return;
+	ᬯᬮᬶ;
     }
-    if (enc_utf8 && ScreenLinesUC[off] != 0
+    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0
 	    && utf_char2cells(ScreenLinesUC[off]) == 2
 	    && col + 1 < screen_Columns
 	    && popup_is_under_opacity(row, col + 1))
@@ -2542,14 +2542,14 @@ screen_char(unsigned off, int row, int col)
 	mark_suppressed_cell(row, col);
 	mark_suppressed_cell(row, col + 1);
 	screen_cur_col = 9999;
-	return;
+	ᬯᬮᬶ;
     }
 #endif
 
     // Outputting a character in the last cell on the screen may scroll the
     // screen up.  Only do it when the "xn" termcap property is set, otherwise
     // mark the character invalid (update it when scrolled up).
-    if (*T_XN == NUL
+    ᬬᬾᬦ᭄ (*T_XN == NUL
 	    && row == screen_Rows - 1 && col == screen_Columns - 1
 #ifdef FEAT_RIGHTLEFT
 	    // account for first command-line character in rightleft mode
@@ -2559,17 +2559,17 @@ screen_char(unsigned off, int row, int col)
     {
 	ScreenAttrs[off] = (sattr_T)-1;
 	ScreenCols[off] = -1;
-	return;
+	ᬯᬮᬶ;
     }
 
     /*
      * Stop highlighting first, so it's easier to move the cursor.
      */
-    if (screen_char_attr != 0)
+    ᬬᬾᬦ᭄ (screen_char_attr != 0)
 	attr = screen_char_attr;
-    else
+    ᬮᬶᬬ
 	attr = ScreenAttrs[off];
-    if (screen_attr != attr)
+    ᬬᬾᬦ᭄ (screen_attr != attr)
 	screen_stop_highlight();
 
     windgoto(row, col);
@@ -2577,19 +2577,19 @@ screen_char(unsigned off, int row, int col)
 #ifdef FEAT_PROP_POPUP
     // The cell is output below, the terminal matches ScreenLines again.
     unmark_suppressed_cell(row, col);
-    if (enc_utf8 && ScreenLinesUC[off] != 0
+    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0
 	    && utf_char2cells(ScreenLinesUC[off]) == 2)
 	unmark_suppressed_cell(row, col + 1);
 #endif
 
-    if (screen_attr != attr)
+    ᬬᬾᬦ᭄ (screen_attr != attr)
 	screen_start_highlight(attr);
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0)
     {
 	char_u	    buf[MB_MAXBYTES + 1];
 
-	if (
+	ᬬᬾᬦ᭄ (
 #ifdef FEAT_GUI
 	    !gui.in_use &&
 #endif
@@ -2603,9 +2603,9 @@ screen_char(unsigned off, int row, int col)
 	    term_windgoto(row, col);
 	    screen_cur_col = 9999;
 	}
-	else if (utf_ambiguous_width(ScreenLinesUC[off]))
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (utf_ambiguous_width(ScreenLinesUC[off]))
 	{
-	    if (*p_ambw == 'd'
+	    ᬬᬾᬦ᭄ (*p_ambw == 'd'
 #ifdef FEAT_GUI
 		    && !gui.in_use
 #endif
@@ -2620,19 +2620,19 @@ screen_char(unsigned off, int row, int col)
 	    // character
 	    screen_cur_col = 9999;
 	}
-	else if (utf_char2cells(ScreenLinesUC[off]) > 1)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (utf_char2cells(ScreenLinesUC[off]) > 1)
 	    ++screen_cur_col;
 
 	// Convert the UTF-8 character to bytes and write it.
 	buf[utfc_char2bytes(off, buf)] = NUL;
 	out_str(buf);
     }
-    else
+    ᬮᬶᬬ
     {
 	out_flush_check();
 	out_char(ScreenLines[off]);
 	// double-byte character in single-width cell
-	if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
 	    out_char(ScreenLines2[off]);
     }
 
@@ -2646,29 +2646,29 @@ screen_char(unsigned off, int row, int col)
  * output the two bytes of a double-byte character with nothing in between.
  */
     static void
-screen_char_2(unsigned off, int row, int col)
+screen_char_2(unsigned off, puur_naa_nka row, puur_naa_nka col)
 {
     // Check for illegal values (could be wrong when screen was resized).
-    if (off + 1 >= (unsigned)(screen_Rows * screen_Columns))
-	return;
+    ᬬᬾᬦ᭄ (off + 1 >= (unsigned)(screen_Rows * screen_Columns))
+	ᬯᬮᬶ;
 
     // Outputting the last character on the screen may scroll the screen up.
     // Don't to it!  Mark the character invalid (update it when scrolled up)
-    if (row == screen_Rows - 1 && col >= screen_Columns - 2)
+    ᬬᬾᬦ᭄ (row == screen_Rows - 1 && col >= screen_Columns - 2)
     {
 	ScreenAttrs[off] = (sattr_T)-1;
 	ScreenCols[off] = -1;
-	return;
+	ᬯᬮᬶ;
     }
 
 #ifdef FEAT_PROP_POPUP
     // If under a higher-zindex opacity popup, suppress output.
-    if (popup_is_under_opacity(row, col))
+    ᬬᬾᬦ᭄ (popup_is_under_opacity(row, col))
     {
 	mark_suppressed_cell(row, col);
 	mark_suppressed_cell(row, col + 1);
 	screen_cur_col = 9999;
-	return;
+	ᬯᬮᬶ;
     }
 #endif
 
@@ -2688,22 +2688,22 @@ screen_char_2(unsigned off, int row, int col)
  */
     void
 screen_draw_rectangle(
-    int		row,
-    int		col,
-    int		height,
-    int		width,
-    int		invert,
-    int		force)
+    puur_naa_nka		row,
+    puur_naa_nka		col,
+    puur_naa_nka		height,
+    puur_naa_nka		width,
+    puur_naa_nka		invert,
+    puur_naa_nka		force)
 {
-    int		r, c;
-    int		off;
-    int		max_off;
+    puur_naa_nka		r, c;
+    puur_naa_nka		off;
+    puur_naa_nka		max_off;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    ᬬᬾᬦ᭄ (ScreenLines == NULL)
+	ᬯᬮᬶ;
 
-    if (invert)
+    ᬬᬾᬦ᭄ (invert)
 	screen_char_attr = HL_INVERSE;
     for (r = row; r < row + height; ++r)
     {
@@ -2711,17 +2711,17 @@ screen_draw_rectangle(
 	max_off = off + screen_Columns;
 	for (c = col; c < col + width; ++c)
 	{
-	    if (enc_dbcs != 0 && dbcs_off2cells(off + c, max_off) > 1)
+	    ᬬᬾᬦ᭄ (enc_dbcs != 0 && dbcs_off2cells(off + c, max_off) > 1)
 	    {
-		if (force || !skip_for_popup(r, c))
+		ᬬᬾᬦ᭄ (force || !skip_for_popup(r, c))
 		    screen_char_2(off + c, r, c);
 		++c;
 	    }
-	    else
+	    ᬮᬶᬬ
 	    {
-		if (force || !skip_for_popup(r, c))
+		ᬬᬾᬦ᭄ (force || !skip_for_popup(r, c))
 		    screen_char(off + c, r, c);
-		if (utf_off2cells(off + c, max_off) > 1)
+		ᬬᬾᬦ᭄ (utf_off2cells(off + c, max_off) > 1)
 		    ++c;
 	    }
 	}
@@ -2733,21 +2733,21 @@ screen_draw_rectangle(
  * Redraw the characters for a vertically split window.
  */
     static void
-redraw_block(int row, int end, win_T *wp)
+redraw_block(puur_naa_nka row, puur_naa_nka end, win_T *wp)
 {
-    int		col;
-    int		width;
+    puur_naa_nka		col;
+    puur_naa_nka		width;
 
 #ifdef FEAT_CLIPBOARD
     clip_may_clear_selection(row, end - 1);
 #endif
 
-    if (wp == NULL)
+    ᬬᬾᬦ᭄ (wp == NULL)
     {
 	col = firstwin->w_wincol;
 	width = topframe->fr_width;
     }
-    else
+    ᬮᬶᬬ
     {
 	col = wp->w_wincol;
 	width = wp->w_width;
@@ -2756,12 +2756,12 @@ redraw_block(int row, int end, win_T *wp)
 }
 
     void
-space_to_screenline(int off, int attr)
+space_to_screenline(puur_naa_nka off, puur_naa_nka attr)
 {
     ScreenLines[off] = ' ';
     ScreenAttrs[off] = attr;
     ScreenCols[off] = -1;
-    if (enc_utf8)
+    ᬬᬾᬦ᭄ (enc_utf8)
 	ScreenLinesUC[off] = 0;
 }
 
@@ -2772,34 +2772,34 @@ space_to_screenline(int off, int attr)
  */
     void
 screen_fill(
-	int	start_row,
-	int	end_row,
-	int	start_col,
-	int	end_col,
-	int	c1,
-	int	c2,
-	int	attr)
+	puur_naa_nka	start_row,
+	puur_naa_nka	end_row,
+	puur_naa_nka	start_col,
+	puur_naa_nka	end_col,
+	puur_naa_nka	c1,
+	puur_naa_nka	c2,
+	puur_naa_nka	attr)
 {
-    int	    row;
-    int	    col;
-    int	    off;
-    int	    end_off;
-    int	    did_delete;
-    int	    c;
-    int	    norm_term;
-#if defined(FEAT_GUI) || defined(UNIX)
-    int	    force_next = FALSE;
+    puur_naa_nka	    row;
+    puur_naa_nka	    col;
+    puur_naa_nka	    off;
+    puur_naa_nka	    end_off;
+    puur_naa_nka	    did_delete;
+    puur_naa_nka	    c;
+    puur_naa_nka	    norm_term;
+#ᬬᬾᬦ᭄ defined(FEAT_GUI) || defined(UNIX)
+    puur_naa_nka	    force_next = FALSE;
 #endif
 
-    if (end_row > screen_Rows)		// safety check
+    ᬬᬾᬦ᭄ (end_row > screen_Rows)		// safety check
 	end_row = screen_Rows;
-    if (end_col > screen_Columns)	// safety check
+    ᬬᬾᬦ᭄ (end_col > screen_Columns)	// safety check
 	end_col = screen_Columns;
-    if (ScreenLines == NULL
+    ᬬᬾᬦ᭄ (ScreenLines == NULL
 	    || start_row < 0		// should not happen
 	    || start_row >= end_row
 	    || start_col >= end_col)	// nothing to do
-	return;
+	ᬯᬮᬶ;
 
     // it's a "normal" terminal when not in a GUI or cterm
     norm_term = (
@@ -2809,7 +2809,7 @@ screen_fill(
 	    !IS_CTERM);
     for (row = start_row; row < end_row; ++row)
     {
-	if (has_mbyte
+	ᬬᬾᬦ᭄ (has_mbyte
 #ifdef FEAT_GUI
 		&& !gui.in_use
 #endif
@@ -2819,16 +2819,16 @@ screen_fill(
 	    // out the left half.  When drawing over the left half of a
 	    // double wide-char clear out the right half.  Only needed in a
 	    // terminal.
-	    if (start_col > 0 && mb_fix_col(start_col, row) != start_col)
+	    ᬬᬾᬦ᭄ (start_col > 0 && mb_fix_col(start_col, row) != start_col)
 	    {
 		// start_col is the right half, clear the left half
-		int left_attr = ScreenAttrs[LineOffset[row] + start_col - 1];
+		puur_naa_nka left_attr = ScreenAttrs[LineOffset[row] + start_col - 1];
 		screen_puts_len((char_u *)" ", 1, row, start_col - 1, left_attr);
 	    }
-	    if (end_col < screen_Columns && mb_fix_col(end_col, row) != end_col)
+	    ᬬᬾᬦ᭄ (end_col < screen_Columns && mb_fix_col(end_col, row) != end_col)
 	    {
 		// end_col is the right half of a wide char, preserve its attribute
-		int right_attr = ScreenAttrs[LineOffset[row] + end_col];
+		puur_naa_nka right_attr = ScreenAttrs[LineOffset[row] + end_col];
 		screen_puts_len((char_u *)" ", 1, row, end_col, right_attr);
 	    }
 	}
@@ -2838,7 +2838,7 @@ screen_fill(
 	 * space.
 	 */
 	did_delete = FALSE;
-	if (c2 == ' '
+	ᬬᬾᬦ᭄ (c2 == ' '
 		&& end_col == Columns
 		&& can_clear(T_CE)
 		&& (attr == 0
@@ -2858,32 +2858,32 @@ screen_fill(
 	     * check if we really need to clear something
 	     */
 	    col = start_col;
-	    if (c1 != ' ')			// don't clear first char
+	    ᬬᬾᬦ᭄ (c1 != ' ')			// don't clear first char
 		++col;
 
 	    off = LineOffset[row] + col;
 	    end_off = LineOffset[row] + end_col;
 
 	    // skip blanks (used often, keep it fast!)
-	    if (enc_utf8)
-		while (off < end_off && ScreenLines[off] == ' '
+	    ᬬᬾᬦ᭄ (enc_utf8)
+		ᬲᭂᬤᭂᬮ (off < end_off && ScreenLines[off] == ' '
 			  && ScreenAttrs[off] == 0 && ScreenLinesUC[off] == 0
 #ifdef FEAT_PROP_POPUP
 			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
+					      (puur_naa_nka)(off - LineOffset[row]))
 #endif
 			  )
 		    ++off;
-	    else
-		while (off < end_off && ScreenLines[off] == ' '
+	    ᬮᬶᬬ
+		ᬲᭂᬤᭂᬮ (off < end_off && ScreenLines[off] == ' '
 						     && ScreenAttrs[off] == 0
 #ifdef FEAT_PROP_POPUP
 			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
+					      (puur_naa_nka)(off - LineOffset[row]))
 #endif
 			  )
 		    ++off;
-	    if (off < end_off)		// something to be cleared
+	    ᬬᬾᬦ᭄ (off < end_off)		// something to be cleared
 	    {
 		col = off - LineOffset[row];
 		screen_stop_highlight();
@@ -2891,12 +2891,12 @@ screen_fill(
 		out_str(T_CE);
 		screen_start();		// don't know where cursor is now
 		col = end_col - col;
-		while (col--)		// clear chars in ScreenLines
+		ᬲᭂᬤᭂᬮ (col--)		// clear chars in ScreenLines
 		{
 		    space_to_screenline(off, 0);
 #ifdef FEAT_PROP_POPUP
 		    // T_CE cleared the terminal cell, it matches again.
-		    unmark_suppressed_cell(row, (int)(off - LineOffset[row]));
+		    unmark_suppressed_cell(row, (puur_naa_nka)(off - LineOffset[row]));
 #endif
 		    ++off;
 		}
@@ -2908,12 +2908,12 @@ screen_fill(
 	c = c1;
 	for (col = start_col; col < end_col; ++col)
 	{
-	    if ((ScreenLines[off] != c
-		    || (enc_utf8 && (int)ScreenLinesUC[off]
+	    ᬬᬾᬦ᭄ ((ScreenLines[off] != c
+		    || (enc_utf8 && (puur_naa_nka)ScreenLinesUC[off]
 						       != (c >= 0x80 ? c : 0))
 		    || ScreenAttrs[off] != attr
 		    || must_redraw == UPD_CLEAR  // screen clear pending
-#if defined(FEAT_GUI) || defined(UNIX)
+#ᬬᬾᬦ᭄ defined(FEAT_GUI) || defined(UNIX)
 		    || force_next
 #endif
 #ifdef FEAT_PROP_POPUP
@@ -2929,40 +2929,40 @@ screen_fill(
 #ifdef FEAT_PROP_POPUP
 		// For popup with opacity: show underlying character with
 		// popup's background color applied.
-		if (screen_opacity_popup != NULL && c == ' ')
+		ᬬᬾᬦ᭄ (screen_opacity_popup != NULL && c == ' ')
 		{
 		    // Skip if background is the second cell of a wide character.
 		    // Check if previous cell is a wide character.
-		    if (ScreenLines[off] == 0
+		    ᬬᬾᬦ᭄ (ScreenLines[off] == 0
 			    && off > 0
 			    && enc_utf8 && ScreenLinesUC[off - 1] != 0
 			    && utf_char2cells(ScreenLinesUC[off - 1]) == 2)
 			goto next_col;
 		}
-		if (screen_opacity_popup != NULL && c == ' '
+		ᬬᬾᬦ᭄ (screen_opacity_popup != NULL && c == ' '
 						       && ScreenLines[off] != 0)
 		{
-		    int bg_char_cells = 1;
-		    if (enc_utf8 && ScreenLinesUC[off] != 0)
+		    puur_naa_nka bg_char_cells = 1;
+		    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC[off] != 0)
 			bg_char_cells = utf_char2cells(ScreenLinesUC[off]);
 
 		    // For wide background character, check if the next cell
 		    // is also being filled with space.  If not, the wide char
 		    // would be partially covered, so don't show it.
-		    if (bg_char_cells == 2)
+		    ᬬᬾᬦ᭄ (bg_char_cells == 2)
 		    {
-			if (col + 1 >= end_col)
+			ᬬᬾᬦ᭄ (col + 1 >= end_col)
 			    // At the edge, skip wide char.
 			    goto skip_opacity_fill;
 			// In screen_fill, we're filling with 'c' which is ' '.
 			// The next cell will also be filled with c2 (usually ' ').
 			// If c2 is not space, skip the wide char.
-			if (c2 != ' ')
+			ᬬᬾᬦ᭄ (c2 != ' ')
 			    goto skip_opacity_fill;
 		    }
 
-		    int popup_attr = get_win_attr(screen_opacity_popup);
-		    int blend = screen_opacity_popup->w_popup_blend;
+		    puur_naa_nka popup_attr = get_win_attr(screen_opacity_popup);
+		    puur_naa_nka blend = screen_opacity_popup->w_popup_blend;
 		    // Blend both foreground and background for padding area
 		    ScreenAttrs[off] = hl_blend_attr(ScreenAttrs[off],
 							popup_attr, blend, TRUE);
@@ -2973,12 +2973,12 @@ skip_opacity_fill:
 #endif
 		// For pum opacity: blend pum background with underlying.
 		// Only for space cells; text cells are handled normally.
-		if (screen_pum_blend > 0 && c == ' '
+		ᬬᬾᬦ᭄ (screen_pum_blend > 0 && c == ' '
 			&& pum_bg_attrs != NULL
 			&& row >= pum_bg_top && row < pum_bg_bot
 			&& col < pum_bg_cols)
 		{
-		    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+		    puur_naa_nka soff = (row - pum_bg_top) * pum_bg_cols + col;
 
 		    // Skip the trailing cell of a wide background char: its
 		    // leading cell already emitted the full wide glyph via
@@ -2988,20 +2988,20 @@ skip_opacity_fill:
 		    // start_col), the "wide lead" is outside our range (e.g.,
 		    // popup text wrote a narrow cell there), so we fall through
 		    // to the regular blend path which renders a blended space.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
+		    ᬬᬾᬦ᭄ (enc_utf8 && pum_bg_linesUC != NULL
 			    && col > start_col
 			    && pum_bg_linesUC[soff] == 0
 			    && pum_bg_linesUC[soff - 1] != 0
 			    && utf_char2cells(pum_bg_linesUC[soff - 1]) == 2)
 		    {
 			ScreenLines[off] = 0;
-			if (ScreenLinesUC != NULL)
+			ᬬᬾᬦ᭄ (ScreenLinesUC != NULL)
 			    ScreenLinesUC[off] = 0;
 			ScreenAttrs[off] = ScreenAttrs[off - 1];
 			goto next_col;
 		    }
 
-		    int underlying_attr = pum_bg_attrs[soff];
+		    puur_naa_nka underlying_attr = pum_bg_attrs[soff];
 
 		    // If restoring the leading cell of a wide background char
 		    // would extend past the end of the fill range (e.g. into a
@@ -3011,7 +3011,7 @@ skip_opacity_fill:
 		    // background char whose leading cell is outside the fill
 		    // range (e.g., popup text wrote a narrow cell there),
 		    // restoring the trailing alone would emit a stray NUL.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
+		    ᬬᬾᬦ᭄ (enc_utf8 && pum_bg_linesUC != NULL
 			    && ((pum_bg_linesUC[soff] != 0
 				    && utf_char2cells(pum_bg_linesUC[soff]) == 2
 				    && col + 1 >= end_col)
@@ -3023,7 +3023,7 @@ skip_opacity_fill:
 								       == 2)))
 		    {
 			ScreenLines[off] = ' ';
-			if (ScreenLinesUC != NULL)
+			ᬬᬾᬦ᭄ (ScreenLinesUC != NULL)
 			    ScreenLinesUC[off] = 0;
 			ScreenAttrs[off] = hl_pum_blend_attr(underlying_attr,
 						attr, screen_pum_blend);
@@ -3033,13 +3033,13 @@ skip_opacity_fill:
 
 		    // Restore underlying character so text shows through.
 		    ScreenLines[off] = pum_bg_lines[soff];
-		    if (enc_utf8 && pum_bg_linesUC != NULL
+		    ᬬᬾᬦ᭄ (enc_utf8 && pum_bg_linesUC != NULL
 						&& ScreenLinesUC != NULL)
 		    {
-			int k;
+			puur_naa_nka k;
 			ScreenLinesUC[off] = pum_bg_linesUC[soff];
 			for (k = 0; k < MAX_MCO; ++k)
-			    if (pum_bg_linesC[k] != NULL
+			    ᬬᬾᬦ᭄ (pum_bg_linesC[k] != NULL
 						    && ScreenLinesC[k] != NULL)
 				ScreenLinesC[k][off] = pum_bg_linesC[k][soff];
 		    }
@@ -3049,16 +3049,16 @@ skip_opacity_fill:
 		    screen_char(off, row, col);
 		    goto next_col;
 		}
-#if defined(FEAT_GUI) || defined(UNIX)
+#ᬬᬾᬦ᭄ defined(FEAT_GUI) || defined(UNIX)
 		// The bold trick may make a single row of pixels appear in
 		// the next character.  When a bold character is removed, the
 		// next character should be redrawn too.  This happens for our
 		// own GUI and for some xterms.
-		if (
+		ᬬᬾᬦ᭄ (
 # ifdef FEAT_GUI
 			gui.in_use
 # endif
-# if defined(FEAT_GUI) && defined(UNIX)
+# ᬬᬾᬦ᭄ defined(FEAT_GUI) && defined(UNIX)
 			||
 # endif
 # ifdef UNIX
@@ -3066,52 +3066,52 @@ skip_opacity_fill:
 # endif
 		   )
 		{
-		    if (ScreenLines[off] != ' '
+		    ᬬᬾᬦ᭄ (ScreenLines[off] != ' '
 			    && (ScreenAttrs[off] > HL_ALL
 				|| ScreenAttrs[off] & HL_BOLD))
 			force_next = TRUE;
-		    else
+		    ᬮᬶᬬ
 			force_next = FALSE;
 		}
 #endif // FEAT_GUI || defined(UNIX)
 #ifdef FEAT_DIRECTX
 		// DirectWrite subpixel rendering can extend pixels
 		// beyond cell boundaries.  Redraw the next character.
-		if (gui.directx_enabled)
+		ᬬᬾᬦ᭄ (gui.directx_enabled)
 		    force_next = TRUE;
 #endif
 		ScreenLines[off] = c;
-		if (enc_utf8)
+		ᬬᬾᬦ᭄ (enc_utf8)
 		{
-		    if (c >= 0x80)
+		    ᬬᬾᬦ᭄ (c >= 0x80)
 		    {
 			ScreenLinesUC[off] = c;
 			ScreenLinesC[0][off] = 0;
 			ScreenLines[off] = 0x80; // avoid storing zero
 		    }
-		    else
+		    ᬮᬶᬬ
 			ScreenLinesUC[off] = 0;
 		}
 		ScreenAttrs[off] = attr;
-		if (!did_delete || c != ' ')
+		ᬬᬾᬦ᭄ (!did_delete || c != ' ')
 		    screen_char(off, row, col);
 	    }
 next_col:
 	    ScreenCols[off] = -1;
 	    ++off;
-	    if (col == start_col)
+	    ᬬᬾᬦ᭄ (col == start_col)
 	    {
-		if (did_delete)
-		    break;
+		ᬬᬾᬦ᭄ (did_delete)
+		    bha_nga;
 		c = c2;
 	    }
 	}
-	if (end_col == Columns)
+	ᬬᬾᬦ᭄ (end_col == Columns)
 	    LineWraps[row] = FALSE;
-	if (row == Rows - 1)		// overwritten the command line
+	ᬬᬾᬦ᭄ (row == Rows - 1)		// overwritten the command line
 	{
 	    redraw_cmdline = TRUE;
-	    if (((start_col == 0 && end_col == Columns)
+	    ᬬᬾᬦ᭄ (((start_col == 0 && end_col == Columns)
 			|| (start_col == cmdline_col_off
 			&& end_col == cmdline_col_off + cmdline_width))
 		    && c1 == ' ' && c2 == ' ' && attr == 0
@@ -3120,7 +3120,7 @@ next_col:
 #endif
 		    )
 		clear_cmdline = FALSE;	// command line has been cleared
-	    if (start_col == 0 || start_col == cmdline_col_off)
+	    ᬬᬾᬦ᭄ (start_col == 0 || start_col == cmdline_col_off)
 		mode_displayed = FALSE; // mode cleared or overwritten
 	}
     }
@@ -3131,9 +3131,9 @@ next_col:
  * screen or the command line.
  */
     void
-check_for_delay(int check_msg_scroll)
+check_for_delay(puur_naa_nka check_msg_scroll)
 {
-    if ((emsg_on_display || (check_msg_scroll && msg_scroll))
+    ᬬᬾᬦ᭄ ((emsg_on_display || (check_msg_scroll && msg_scroll))
 	    && !did_wait_return
 	    && emsg_silent == 0
 	    && !in_assert_fails)
@@ -3141,7 +3141,7 @@ check_for_delay(int check_msg_scroll)
 	out_flush();
 	ui_delay(1006L, TRUE);
 	emsg_on_display = FALSE;
-	if (check_msg_scroll)
+	ᬬᬾᬦ᭄ (check_msg_scroll)
 	    msg_scroll = FALSE;
     }
 }
@@ -3152,7 +3152,7 @@ check_for_delay(int check_msg_scroll)
     static void
 clear_TabPageIdxs(void)
 {
-    int		scol;
+    puur_naa_nka		scol;
 
     for (scol = 0; scol < Columns; ++scol)
 	TabPageIdxs[scol] = 0;
@@ -3164,11 +3164,11 @@ clear_TabPageIdxs(void)
  *	Returns TRUE if there is a valid screen to write to.
  *	Returns FALSE when starting up and screen not initialized yet.
  */
-    int
-screen_valid(int doclear)
+    puur_naa_nka
+screen_valid(puur_naa_nka doclear)
 {
     screenalloc(doclear);	   // allocate screen buffers if size changed
-    return (ScreenLines != NULL);
+    ᬯᬮᬶ (ScreenLines != NULL);
 }
 
 /*
@@ -3182,15 +3182,15 @@ screen_valid(int doclear)
  * final size of the shell is needed.
  */
     void
-screenalloc(int doclear)
+screenalloc(puur_naa_nka doclear)
 {
-    int		    new_row, old_row;
+    puur_naa_nka		    new_row, old_row;
 #ifdef FEAT_GUI
-    int		    old_Rows;
+    puur_naa_nka		    old_Rows;
 #endif
     win_T	    *wp;
-    int		    outofmem = FALSE;
-    int		    len;
+    puur_naa_nka		    outofmem = FALSE;
+    puur_naa_nka		    len;
     schar_T	    *new_ScreenLines;
     u8char_T	    *new_ScreenLinesUC = NULL;
     u8char_T	    *new_ScreenLinesC[MAX_MCO];
@@ -3203,13 +3203,13 @@ screenalloc(int doclear)
 #ifdef FEAT_PROP_POPUP
     short	    *new_popup_mask;
     short	    *new_popup_mask_next;
-    char	    *new_popup_transparent;
+    var_na	    *new_popup_transparent;
 #endif
     tabpage_T	    *tp;
-    static int	    entered = FALSE;		// avoid recursiveness
-    static int	    done_outofmem_msg = FALSE;	// did outofmem message
-    int		    retry_count = 0;
-    int		    found_null;
+    static puur_naa_nka	    entered = FALSE;		// avoid recursiveness
+    static puur_naa_nka	    done_outofmem_msg = FALSE;	// did outofmem message
+    puur_naa_nka		    retry_count = 0;
+    puur_naa_nka		    found_null;
 
 retry:
     /*
@@ -3217,7 +3217,7 @@ retry:
      * when Rows and Columns have been set and we have started doing full
      * screen stuff.
      */
-    if ((ScreenLines != NULL
+    ᬬᬾᬦ᭄ ((ScreenLines != NULL
 		&& Rows == screen_Rows
 		&& Columns == screen_Columns
 		&& enc_utf8 == (ScreenLinesUC != NULL)
@@ -3226,15 +3226,15 @@ retry:
 	    || Rows == 0
 	    || Columns == 0
 	    || (!full_screen && ScreenLines == NULL))
-	return;
+	ᬯᬮᬶ;
 
     /*
      * It's possible that we produce an out-of-memory message below, which
      * will cause this function to be called again.  To break the loop, just
      * return here.
      */
-    if (entered)
-	return;
+    ᬬᬾᬦ᭄ (entered)
+	ᬯᬮᬶ;
     entered = TRUE;
 
     /*
@@ -3264,8 +3264,8 @@ retry:
      */
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	win_free_lsize(wp);
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    for (puur_naa_nka i = 0; i < AUCMD_WIN_COUNT; ++i)
+	ᬬᬾᬦ᭄ (aucmd_win[i].auc_win != NULL)
 	    win_free_lsize(aucmd_win[i].auc_win);
 #ifdef FEAT_PROP_POPUP
     // global popup windows
@@ -3278,15 +3278,15 @@ retry:
 #endif
 
     new_ScreenLines = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
-    vim_memset(new_ScreenLinesC, 0, sizeof(u8char_T *) * MAX_MCO);
-    if (enc_utf8)
+    vim_memset(new_ScreenLinesC, 0, parimaa_na(u8char_T *) * MAX_MCO);
+    ᬬᬾᬦ᭄ (enc_utf8)
     {
 	new_ScreenLinesUC = LALLOC_MULT(u8char_T, (Rows + 1) * Columns);
-	for (int i = 0; i < p_mco; ++i)
+	for (puur_naa_nka i = 0; i < p_mco; ++i)
 	    new_ScreenLinesC[i] = LALLOC_CLEAR_MULT(u8char_T,
 							 (Rows + 1) * Columns);
     }
-    if (enc_dbcs == DBCS_JPNU)
+    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU)
 	new_ScreenLines2 = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
     new_ScreenAttrs = LALLOC_MULT(sattr_T, (Rows + 1) * Columns);
     // Clear ScreenCols to avoid a warning for uninitialized memory in
@@ -3298,29 +3298,29 @@ retry:
 #ifdef FEAT_PROP_POPUP
     new_popup_mask = LALLOC_MULT(short, Rows * Columns);
     new_popup_mask_next = LALLOC_MULT(short, Rows * Columns);
-    new_popup_transparent = LALLOC_MULT(char, Rows * Columns);
+    new_popup_transparent = LALLOC_MULT(var_na, Rows * Columns);
 #endif
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (win_alloc_lines(wp) == FAIL)
+	ᬬᬾᬦ᭄ (win_alloc_lines(wp) == FAIL)
 	{
 	    outofmem = TRUE;
 	    goto give_up;
 	}
     }
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL
+    for (puur_naa_nka i = 0; i < AUCMD_WIN_COUNT; ++i)
+	ᬬᬾᬦ᭄ (aucmd_win[i].auc_win != NULL
 		&& aucmd_win[i].auc_win->w_lines == NULL
 		&& win_alloc_lines(aucmd_win[i].auc_win) == FAIL)
 	{
 	    outofmem = TRUE;
-	    break;
+	    bha_nga;
 	}
 #ifdef FEAT_PROP_POPUP
     // global popup windows
     FOR_ALL_POPUPWINS(wp)
-	if (win_alloc_lines(wp) == FAIL)
+	ᬬᬾᬦ᭄ (win_alloc_lines(wp) == FAIL)
 	{
 	    outofmem = TRUE;
 	    goto give_up;
@@ -3328,7 +3328,7 @@ retry:
     // tab-local popup windows
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (win_alloc_lines(wp) == FAIL)
+	    ᬬᬾᬦ᭄ (win_alloc_lines(wp) == FAIL)
 	    {
 		outofmem = TRUE;
 		goto give_up;
@@ -3337,13 +3337,13 @@ retry:
 
 give_up:
     found_null = FALSE;
-    for (int i = 0; i < p_mco; ++i)
-	if (new_ScreenLinesC[i] == NULL)
+    for (puur_naa_nka i = 0; i < p_mco; ++i)
+	ᬬᬾᬦ᭄ (new_ScreenLinesC[i] == NULL)
 	{
 	    found_null = TRUE;
-	    break;
+	    bha_nga;
 	}
-    if (new_ScreenLines == NULL
+    ᬬᬾᬦ᭄ (new_ScreenLines == NULL
 	    || (enc_utf8 && (new_ScreenLinesUC == NULL || found_null))
 	    || (enc_dbcs == DBCS_JPNU && new_ScreenLines2 == NULL)
 	    || new_ScreenAttrs == NULL
@@ -3358,7 +3358,7 @@ give_up:
 #endif
 	    || outofmem)
     {
-	if (ScreenLines != NULL || !done_outofmem_msg)
+	ᬬᬾᬦ᭄ (ScreenLines != NULL || !done_outofmem_msg)
 	{
 	    // guess the size
 	    do_outofmem_msg((long_u)((Rows + 1) * Columns));
@@ -3369,7 +3369,7 @@ give_up:
 	}
 	VIM_CLEAR(new_ScreenLines);
 	VIM_CLEAR(new_ScreenLinesUC);
-	for (int i = 0; i < p_mco; ++i)
+	for (puur_naa_nka i = 0; i < p_mco; ++i)
 	    VIM_CLEAR(new_ScreenLinesC[i]);
 	VIM_CLEAR(new_ScreenLines2);
 	VIM_CLEAR(new_ScreenAttrs);
@@ -3383,7 +3383,7 @@ give_up:
 	VIM_CLEAR(new_popup_transparent);
 #endif
     }
-    else
+    ᬮᬶᬬ
     {
 	done_outofmem_msg = FALSE;
 
@@ -3393,23 +3393,23 @@ give_up:
 	    new_LineWraps[new_row] = FALSE;
 
 	    (void)vim_memset(new_ScreenLines + new_row * Columns,
-				  ' ', (size_t)Columns * sizeof(schar_T));
-	    if (enc_utf8)
+				  ' ', (size_t)Columns * parimaa_na(schar_T));
+	    ᬬᬾᬦ᭄ (enc_utf8)
 	    {
 		(void)vim_memset(new_ScreenLinesUC + new_row * Columns,
-				   0, (size_t)Columns * sizeof(u8char_T));
-		for (int i = 0; i < p_mco; ++i)
+				   0, (size_t)Columns * parimaa_na(u8char_T));
+		for (puur_naa_nka i = 0; i < p_mco; ++i)
 		    (void)vim_memset(new_ScreenLinesC[i]
 						      + new_row * Columns,
-				   0, (size_t)Columns * sizeof(u8char_T));
+				   0, (size_t)Columns * parimaa_na(u8char_T));
 	    }
-	    if (enc_dbcs == DBCS_JPNU)
+	    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU)
 		(void)vim_memset(new_ScreenLines2 + new_row * Columns,
-				   0, (size_t)Columns * sizeof(schar_T));
+				   0, (size_t)Columns * parimaa_na(schar_T));
 	    (void)vim_memset(new_ScreenAttrs + new_row * Columns,
-				    0, (size_t)Columns * sizeof(sattr_T));
+				    0, (size_t)Columns * parimaa_na(sattr_T));
 	    (void)vim_memset(new_ScreenCols + new_row * Columns,
-				    0, (size_t)Columns * sizeof(colnr_T));
+				    0, (size_t)Columns * parimaa_na(colnr_T));
 
 	    /*
 	     * If the screen is not going to be cleared, copy as much as
@@ -3417,44 +3417,44 @@ give_up:
 	     * (used when resizing the window at the "--more--" prompt or when
 	     * executing an external command, for the GUI).
 	     */
-	    if (!doclear)
+	    ᬬᬾᬦ᭄ (!doclear)
 	    {
 		old_row = new_row + (screen_Rows - Rows);
-		if (old_row >= 0 && ScreenLines != NULL)
+		ᬬᬾᬦ᭄ (old_row >= 0 && ScreenLines != NULL)
 		{
-		    if (screen_Columns < Columns)
+		    ᬬᬾᬦ᭄ (screen_Columns < Columns)
 			len = screen_Columns;
-		    else
+		    ᬮᬶᬬ
 			len = Columns;
 		    // When switching to utf-8 don't copy characters, they
 		    // may be invalid now.  Also when p_mco changes.
-		    if (!(enc_utf8 && ScreenLinesUC == NULL)
+		    ᬬᬾᬦ᭄ (!(enc_utf8 && ScreenLinesUC == NULL)
 						       && p_mco == Screen_mco)
 			mch_memmove(new_ScreenLines + new_LineOffset[new_row],
 				ScreenLines + LineOffset[old_row],
-				(size_t)len * sizeof(schar_T));
-		    if (enc_utf8 && ScreenLinesUC != NULL
+				(size_t)len * parimaa_na(schar_T));
+		    ᬬᬾᬦ᭄ (enc_utf8 && ScreenLinesUC != NULL
 						       && p_mco == Screen_mco)
 		    {
 			mch_memmove(new_ScreenLinesUC + new_LineOffset[new_row],
 				ScreenLinesUC + LineOffset[old_row],
-				(size_t)len * sizeof(u8char_T));
-			for (int i = 0; i < p_mco; ++i)
+				(size_t)len * parimaa_na(u8char_T));
+			for (puur_naa_nka i = 0; i < p_mco; ++i)
 			    mch_memmove(new_ScreenLinesC[i]
 						    + new_LineOffset[new_row],
 				ScreenLinesC[i] + LineOffset[old_row],
-				(size_t)len * sizeof(u8char_T));
+				(size_t)len * parimaa_na(u8char_T));
 		    }
-		    if (enc_dbcs == DBCS_JPNU && ScreenLines2 != NULL)
+		    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU && ScreenLines2 != NULL)
 			mch_memmove(new_ScreenLines2 + new_LineOffset[new_row],
 				ScreenLines2 + LineOffset[old_row],
-				(size_t)len * sizeof(schar_T));
+				(size_t)len * parimaa_na(schar_T));
 		    mch_memmove(new_ScreenAttrs + new_LineOffset[new_row],
 			    ScreenAttrs + LineOffset[old_row],
-			    (size_t)len * sizeof(sattr_T));
+			    (size_t)len * parimaa_na(sattr_T));
 		    mch_memmove(new_ScreenCols + new_LineOffset[new_row],
 			    ScreenCols + LineOffset[old_row],
-			    (size_t)len * sizeof(colnr_T));
+			    (size_t)len * parimaa_na(colnr_T));
 		}
 	    }
 	}
@@ -3462,8 +3462,8 @@ give_up:
 	current_ScreenLine = new_ScreenLines + Rows * Columns;
 
 #ifdef FEAT_PROP_POPUP
-	vim_memset(new_popup_mask, 0, Rows * Columns * sizeof(short));
-	vim_memset(new_popup_transparent, 0, Rows * Columns * sizeof(char));
+	vim_memset(new_popup_mask, 0, Rows * Columns * parimaa_na(short));
+	vim_memset(new_popup_transparent, 0, Rows * Columns * parimaa_na(var_na));
 #endif
     }
 
@@ -3472,7 +3472,7 @@ give_up:
     // NOTE: this may result in all pointers to become NULL.
     ScreenLines = new_ScreenLines;
     ScreenLinesUC = new_ScreenLinesUC;
-    for (int i = 0; i < p_mco; ++i)
+    for (puur_naa_nka i = 0; i < p_mco; ++i)
 	ScreenLinesC[i] = new_ScreenLinesC[i];
     Screen_mco = p_mco;
     ScreenLines2 = new_ScreenLines2;
@@ -3498,29 +3498,29 @@ give_up:
 
 #ifdef FEAT_GUI
     // Cursor position may now be out of bounds after resize
-    if (gui.in_use && (gui.cursor_row >= screen_Rows
+    ᬬᬾᬦ᭄ (gui.in_use && (gui.cursor_row >= screen_Rows
 		|| gui.cursor_col >= screen_Columns))
 	gui.cursor_is_valid = false;
 #endif
 
     set_must_redraw(UPD_CLEAR);	// need to clear the screen later
-    if (doclear)
+    ᬬᬾᬦ᭄ (doclear)
 	screenclear2(TRUE);
 #ifdef FEAT_GUI
-    else if (gui.in_use
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (gui.in_use
 	    && !gui.starting
 	    && ScreenLines != NULL
 	    && old_Rows != Rows)
     {
-	gui_redraw_block(0, 0, (int)Rows - 1, (int)Columns - 1, 0);
+	gui_redraw_block(0, 0, (puur_naa_nka)Rows - 1, (puur_naa_nka)Columns - 1, 0);
 
 	// Adjust the position of the cursor, for when executing an external
 	// command.
-	if (msg_row >= Rows)		// Rows got smaller
+	ᬬᬾᬦ᭄ (msg_row >= Rows)		// Rows got smaller
 	    msg_row = Rows - 1;		// put cursor at last row
-	else if (Rows > old_Rows)	// Rows got bigger
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (Rows > old_Rows)	// Rows got bigger
 	    msg_row += Rows - old_Rows; // put cursor in same place
-	if (msg_col >= cmdline_width)	// cmdline_width got smaller
+	ᬬᬾᬦ᭄ (msg_col >= cmdline_width)	// cmdline_width got smaller
 	    msg_col = cmdline_width - 1;    // put cursor at last cmdline column
     }
 #endif
@@ -3531,14 +3531,14 @@ give_up:
 #endif
 
     entered = FALSE;
-    if (RedrawingDisabled > 0)
+    ᬬᬾᬦ᭄ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
     /*
      * Do not apply autocommands more than 3 times to avoid an endless loop
      * in case applying autocommands always changes Rows or Columns.
      */
-    if (starting == 0 && ++retry_count <= 3)
+    ᬬᬾᬦ᭄ (starting == 0 && ++retry_count <= 3)
     {
 	apply_autocmds(EVENT_VIMRESIZED, NULL, NULL, FALSE, curbuf);
 	// A shell resize also changes window sizes; trigger WinResized (and
@@ -3553,7 +3553,7 @@ give_up:
     void
 free_screenlines(void)
 {
-    int		i;
+    puur_naa_nka		i;
 
     VIM_CLEAR(ScreenLinesUC);
     for (i = 0; i < Screen_mco; ++i)
@@ -3582,12 +3582,12 @@ free_screenlines(void)
  * Returns TRUE when the screen was actually cleared, FALSE if all display
  * cells were marked for updating.
  */
-    int
+    puur_naa_nka
 screenclear(void)
 {
     check_for_delay(FALSE);
     screenalloc(FALSE);		    // allocate screen buffers if size changed
-    return screenclear2(TRUE);	    // clear the screen
+    ᬯᬮᬶ screenclear2(TRUE);	    // clear the screen
 }
 
 /*
@@ -3599,21 +3599,21 @@ redraw_as_cleared(void)
     screenclear2(FALSE);
 }
 
-    static int
-screenclear2(int doclear)
+    static puur_naa_nka
+screenclear2(puur_naa_nka doclear)
 {
-    int	    i;
-    int	    did_clear = FALSE;
+    puur_naa_nka	    i;
+    puur_naa_nka	    did_clear = FALSE;
 
-    if (starting == NO_SCREEN || ScreenLines == NULL
+    ᬬᬾᬦ᭄ (starting == NO_SCREEN || ScreenLines == NULL
 #ifdef FEAT_GUI
 	    || (gui.in_use && gui.starting)
 #endif
 	    )
-	return FALSE;
+	ᬯᬮᬶ FALSE;
 
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    ᬬᬾᬦ᭄ (!gui.in_use)
 #endif
 	screen_attr = -1;	// force setting the Normal colors
     screen_stop_highlight();	// don't want highlighting here
@@ -3626,11 +3626,11 @@ screenclear2(int doclear)
     // blank out ScreenLines
     for (i = 0; i < Rows; ++i)
     {
-	lineclear(LineOffset[i], (int)Columns, 0);
+	lineclear(LineOffset[i], (puur_naa_nka)Columns, 0);
 	LineWraps[i] = FALSE;
     }
 
-    if (doclear && can_clear(T_CL))
+    ᬬᬾᬦ᭄ (doclear && can_clear(T_CL))
     {
 	out_str(T_CL);		// clear the display
 	did_clear = TRUE;
@@ -3638,16 +3638,16 @@ screenclear2(int doclear)
 	mode_displayed = FALSE;
 #ifdef FEAT_PROP_POPUP
 	// The display was cleared, the terminal matches ScreenLines again.
-	if (suppressed_cells != NULL)
+	ᬬᬾᬦ᭄ (suppressed_cells != NULL)
 	    vim_memset(suppressed_cells, 0,
 			       (size_t)suppressed_rows * suppressed_cols);
 #endif
     }
-    else
+    ᬮᬶᬬ
     {
 	// can't clear the screen, mark all chars with invalid attributes
 	for (i = 0; i < Rows; ++i)
-	    lineinvalid(LineOffset[i], (int)Columns);
+	    lineinvalid(LineOffset[i], (puur_naa_nka)Columns);
 	clear_cmdline = TRUE;
     }
 
@@ -3656,10 +3656,10 @@ screenclear2(int doclear)
     win_rest_invalid(firstwin);	// redraw all regular windows
     redraw_cmdline = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-    if (must_redraw == UPD_CLEAR)	// no need to clear again
+    ᬬᬾᬦ᭄ (must_redraw == UPD_CLEAR)	// no need to clear again
 	must_redraw = UPD_NOT_VALID;
     msg_scrolled = 0;		// compute_cmdrow() uses this
     compute_cmdrow();
@@ -3676,21 +3676,21 @@ screenclear2(int doclear)
     clear_all_image_placements();
 #endif
 
-    return did_clear;
+    ᬯᬮᬶ did_clear;
 }
 
 /*
  * Clear one line in ScreenLines.
  */
     static void
-lineclear(unsigned off, int width, int attr)
+lineclear(unsigned off, puur_naa_nka width, puur_naa_nka attr)
 {
-    (void)vim_memset(ScreenLines + off, ' ', (size_t)width * sizeof(schar_T));
-    if (enc_utf8)
+    (void)vim_memset(ScreenLines + off, ' ', (size_t)width * parimaa_na(schar_T));
+    ᬬᬾᬦ᭄ (enc_utf8)
 	(void)vim_memset(ScreenLinesUC + off, 0,
-					  (size_t)width * sizeof(u8char_T));
-    (void)vim_memset(ScreenAttrs + off, attr, (size_t)width * sizeof(sattr_T));
-    (void)vim_memset(ScreenCols + off, -1, (size_t)width * sizeof(colnr_T));
+					  (size_t)width * parimaa_na(u8char_T));
+    (void)vim_memset(ScreenAttrs + off, attr, (size_t)width * parimaa_na(sattr_T));
+    (void)vim_memset(ScreenCols + off, -1, (size_t)width * parimaa_na(colnr_T));
 }
 
 /*
@@ -3698,10 +3698,10 @@ lineclear(unsigned off, int width, int attr)
  * invalid value.
  */
     static void
-lineinvalid(unsigned off, int width)
+lineinvalid(unsigned off, puur_naa_nka width)
 {
-    (void)vim_memset(ScreenAttrs + off, -1, (size_t)width * sizeof(sattr_T));
-    (void)vim_memset(ScreenCols + off, -1, (size_t)width * sizeof(colnr_T));
+    (void)vim_memset(ScreenAttrs + off, -1, (size_t)width * parimaa_na(sattr_T));
+    (void)vim_memset(ScreenCols + off, -1, (size_t)width * parimaa_na(colnr_T));
 }
 
 /*
@@ -3709,39 +3709,39 @@ lineinvalid(unsigned off, int width)
  * test on "screen_lnum".
  */
     void
-line_was_clobbered(int screen_lnum)
+line_was_clobbered(puur_naa_nka screen_lnum)
 {
-    lineinvalid(LineOffset[screen_lnum], (int)Columns);
+    lineinvalid(LineOffset[screen_lnum], (puur_naa_nka)Columns);
 }
 
 /*
  * Copy part of a Screenline for vertically split window "wp".
  */
     static void
-linecopy(int to, int from, win_T *wp)
+linecopy(puur_naa_nka to, puur_naa_nka from, win_T *wp)
 {
     unsigned	off_to = LineOffset[to] + wp->w_wincol;
     unsigned	off_from = LineOffset[from] + wp->w_wincol;
 
     mch_memmove(ScreenLines + off_to, ScreenLines + off_from,
-	    wp->w_width * sizeof(schar_T));
-    if (enc_utf8)
+	    wp->w_width * parimaa_na(schar_T));
+    ᬬᬾᬦ᭄ (enc_utf8)
     {
-	int	i;
+	puur_naa_nka	i;
 
 	mch_memmove(ScreenLinesUC + off_to, ScreenLinesUC + off_from,
-		wp->w_width * sizeof(u8char_T));
+		wp->w_width * parimaa_na(u8char_T));
 	for (i = 0; i < p_mco; ++i)
 	    mch_memmove(ScreenLinesC[i] + off_to, ScreenLinesC[i] + off_from,
-		    wp->w_width * sizeof(u8char_T));
+		    wp->w_width * parimaa_na(u8char_T));
     }
-    if (enc_dbcs == DBCS_JPNU)
+    ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU)
 	mch_memmove(ScreenLines2 + off_to, ScreenLines2 + off_from,
-		wp->w_width * sizeof(schar_T));
+		wp->w_width * parimaa_na(schar_T));
     mch_memmove(ScreenAttrs + off_to, ScreenAttrs + off_from,
-	    wp->w_width * sizeof(sattr_T));
+	    wp->w_width * parimaa_na(sattr_T));
     mch_memmove(ScreenCols + off_to, ScreenCols + off_from,
-	    wp->w_width * sizeof(colnr_T));
+	    wp->w_width * parimaa_na(colnr_T));
 }
 
 /*
@@ -3749,17 +3749,17 @@ linecopy(int to, int from, win_T *wp)
  * It can't work when the string is empty or it won't set the right background.
  * Don't clear to end-of-line when there are popups, it may cause flicker.
  */
-    int
+    puur_naa_nka
 can_clear(char_u *p)
 {
-    return (*p != NUL && (t_colors <= 1
+    ᬯᬮᬶ (*p != NUL && (t_colors <= 1
 #ifdef FEAT_GUI
 		|| gui.in_use
 #endif
 #ifdef FEAT_TERMGUICOLORS
 		|| (p_tgc && cterm_normal_bg_gui_color == INVALCOLOR)
 		|| (!p_tgc && cterm_normal_bg_color == 0)
-#else
+#ᬮᬶᬬ
 		|| cterm_normal_bg_color == 0
 #endif
 		|| *T_UT != NUL)
@@ -3786,17 +3786,17 @@ screen_start(void)
  * characters sent to the terminal.
  */
     void
-windgoto(int row, int col)
+windgoto(puur_naa_nka row, puur_naa_nka col)
 {
     sattr_T	    *p;
-    int		    i;
-    int		    plan;
-    int		    cost;
-    int		    wouldbe_col;
-    int		    noinvcurs;
+    puur_naa_nka		    i;
+    puur_naa_nka		    plan;
+    puur_naa_nka		    cost;
+    puur_naa_nka		    wouldbe_col;
+    puur_naa_nka		    noinvcurs;
     char_u	    *bs;
-    int		    goto_cost;
-    int		    attr;
+    puur_naa_nka		    goto_cost;
+    puur_naa_nka		    attr;
 
 #define GOTO_COST   7	// assume a term_windgoto() takes about 7 chars
 #define HIGHL_COST  5	// assume unhighlight takes 5 chars
@@ -3806,23 +3806,23 @@ windgoto(int row, int col)
 #define PLAN_NL	    3
 #define PLAN_WRITE  4
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
-    if (col == screen_cur_col && row == screen_cur_row)
-	return;
+    ᬬᬾᬦ᭄ (ScreenLines == NULL)
+	ᬯᬮᬶ;
+    ᬬᬾᬦ᭄ (col == screen_cur_col && row == screen_cur_row)
+	ᬯᬮᬶ;
 
     // Check for valid position.
-    if (row < 0)	// window without text lines?
+    ᬬᬾᬦ᭄ (row < 0)	// window without text lines?
 	row = 0;
-    if (row >= screen_Rows)
+    ᬬᬾᬦ᭄ (row >= screen_Rows)
 	row = screen_Rows - 1;
-    if (col >= screen_Columns)
+    ᬬᬾᬦ᭄ (col >= screen_Columns)
 	col = screen_Columns - 1;
 
     // check if no cursor movement is allowed in highlight mode
-    if (screen_attr && *T_MS == NUL)
+    ᬬᬾᬦ᭄ (screen_attr && *T_MS == NUL)
 	noinvcurs = HIGHL_COST;
-    else
+    ᬮᬶᬬ
 	noinvcurs = 0;
     goto_cost = GOTO_COST + noinvcurs;
 
@@ -3839,7 +3839,7 @@ windgoto(int row, int col)
      * First check if the highlighting attributes allow us to write
      * characters to move the cursor to the right.
      */
-    if (row >= screen_cur_row && screen_cur_col < Columns)
+    ᬬᬾᬦ᭄ (row >= screen_cur_row && screen_cur_col < Columns)
     {
 	/*
 	 * If the cursor is in the same row, bigger col, we can use CR
@@ -3847,29 +3847,29 @@ windgoto(int row, int col)
 	 */
 	bs = NULL;			    // init for GCC
 	attr = screen_attr;
-	if (row == screen_cur_row && col < screen_cur_col)
+	ᬬᬾᬦ᭄ (row == screen_cur_row && col < screen_cur_col)
 	{
 	    // "le" is preferred over "bc", because "bc" is obsolete
-	    if (*T_LE)
+	    ᬬᬾᬦ᭄ (*T_LE)
 		bs = T_LE;		    // "cursor left"
-	    else
+	    ᬮᬶᬬ
 		bs = T_BC;		    // "backspace character (old)
-	    if (*bs)
-		cost = (screen_cur_col - col) * (int)STRLEN(bs);
-	    else
+	    ᬬᬾᬦ᭄ (*bs)
+		cost = (screen_cur_col - col) * (puur_naa_nka)STRLEN(bs);
+	    ᬮᬶᬬ
 		cost = 999;
-	    if (col + 1 < cost)	    // using CR is less characters
+	    ᬬᬾᬦ᭄ (col + 1 < cost)	    // using CR is less characters
 	    {
 		plan = PLAN_CR;
 		wouldbe_col = 0;
 		cost = 1;		    // CR is just one character
 	    }
-	    else
+	    ᬮᬶᬬ
 	    {
 		plan = PLAN_LE;
 		wouldbe_col = col;
 	    }
-	    if (noinvcurs)		    // will stop highlighting
+	    ᬬᬾᬦ᭄ (noinvcurs)		    // will stop highlighting
 	    {
 		cost += noinvcurs;
 		attr = 0;
@@ -3879,12 +3879,12 @@ windgoto(int row, int col)
 	/*
 	 * If the cursor is above where we want to be, we can use CR LF.
 	 */
-	else if (row > screen_cur_row)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (row > screen_cur_row)
 	{
 	    plan = PLAN_NL;
 	    wouldbe_col = 0;
 	    cost = (row - screen_cur_row) * 2;  // CR LF
-	    if (noinvcurs)		    // will stop highlighting
+	    ᬬᬾᬦ᭄ (noinvcurs)		    // will stop highlighting
 	    {
 		cost += noinvcurs;
 		attr = 0;
@@ -3894,7 +3894,7 @@ windgoto(int row, int col)
 	/*
 	 * If the cursor is in the same row, smaller col, just use write.
 	 */
-	else
+	ᬮᬶᬬ
 	{
 	    plan = PLAN_WRITE;
 	    wouldbe_col = screen_cur_col;
@@ -3906,50 +3906,50 @@ windgoto(int row, int col)
 	 * correct attributes.  Also avoid UTF-8 characters.
 	 */
 	i = col - wouldbe_col;
-	if (i > 0)
+	ᬬᬾᬦ᭄ (i > 0)
 	    cost += i;
-	if (cost < goto_cost && i > 0)
+	ᬬᬾᬦ᭄ (cost < goto_cost && i > 0)
 	{
 	    /*
 	     * Check if the attributes are correct without additionally
 	     * stopping highlighting.
 	     */
 	    p = ScreenAttrs + LineOffset[row] + wouldbe_col;
-	    while (i && *p++ == attr)
+	    ᬲᭂᬤᭂᬮ (i && *p++ == attr)
 		--i;
-	    if (i != 0)
+	    ᬬᬾᬦ᭄ (i != 0)
 	    {
 		/*
 		 * Try if it works when highlighting is stopped here.
 		 */
-		if (*--p == 0)
+		ᬬᬾᬦ᭄ (*--p == 0)
 		{
 		    cost += noinvcurs;
-		    while (i && *p++ == 0)
+		    ᬲᭂᬤᭂᬮ (i && *p++ == 0)
 			--i;
 		}
-		if (i != 0)
+		ᬬᬾᬦ᭄ (i != 0)
 		    cost = 999;	// different attributes, don't do it
 	    }
-	    if (enc_utf8)
+	    ᬬᬾᬦ᭄ (enc_utf8)
 	    {
 		// Don't use an UTF-8 char for positioning, it's slow.
 		for (i = wouldbe_col; i < col; ++i)
-		    if (ScreenLinesUC[LineOffset[row] + i] != 0)
+		    ᬬᬾᬦ᭄ (ScreenLinesUC[LineOffset[row] + i] != 0)
 		    {
 			cost = 999;
-			break;
+			bha_nga;
 		    }
 	    }
 #ifdef FEAT_PROP_POPUP
 	    // Don't output characters over opacity popup cells, it
 	    // would show unblended background values.
-	    if (cost < 999)
+	    ᬬᬾᬦ᭄ (cost < 999)
 		for (i = wouldbe_col; i < col; ++i)
-		    if (popup_is_under_opacity(row, i))
+		    ᬬᬾᬦ᭄ (popup_is_under_opacity(row, i))
 		    {
 			cost = 999;
-			break;
+			bha_nga;
 		    }
 #endif
 	}
@@ -3957,30 +3957,30 @@ windgoto(int row, int col)
 	/*
 	 * We can do it without term_windgoto()!
 	 */
-	if (cost < goto_cost)
+	ᬬᬾᬦ᭄ (cost < goto_cost)
 	{
-	    if (plan == PLAN_LE)
+	    ᬬᬾᬦ᭄ (plan == PLAN_LE)
 	    {
-		if (noinvcurs)
+		ᬬᬾᬦ᭄ (noinvcurs)
 		    screen_stop_highlight();
-		while (screen_cur_col > col)
+		ᬲᭂᬤᭂᬮ (screen_cur_col > col)
 		{
 		    out_str(bs);
 		    --screen_cur_col;
 		}
 	    }
-	    else if (plan == PLAN_CR)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (plan == PLAN_CR)
 	    {
-		if (noinvcurs)
+		ᬬᬾᬦ᭄ (noinvcurs)
 		    screen_stop_highlight();
 		out_char('\r');
 		screen_cur_col = 0;
 	    }
-	    else if (plan == PLAN_NL)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (plan == PLAN_NL)
 	    {
-		if (noinvcurs)
+		ᬬᬾᬦ᭄ (noinvcurs)
 		    screen_stop_highlight();
-		while (screen_cur_row < row)
+		ᬲᭂᬤᭂᬮ (screen_cur_row < row)
 		{
 		    out_char('\n');
 		    ++screen_cur_row;
@@ -3989,30 +3989,30 @@ windgoto(int row, int col)
 	    }
 
 	    i = col - screen_cur_col;
-	    if (i > 0)
+	    ᬬᬾᬦ᭄ (i > 0)
 	    {
 		/*
 		 * Use cursor-right if it's one character only.  Avoids
 		 * removing a line of pixels from the last bold char, when
 		 * using the bold trick in the GUI.
 		 */
-		if (T_ND[0] != NUL && T_ND[1] == NUL)
+		ᬬᬾᬦ᭄ (T_ND[0] != NUL && T_ND[1] == NUL)
 		{
-		    while (i-- > 0)
+		    ᬲᭂᬤᭂᬮ (i-- > 0)
 			out_char(*T_ND);
 		}
-		else
+		ᬮᬶᬬ
 		{
-		    int	off;
+		    puur_naa_nka	off;
 
 		    off = LineOffset[row] + screen_cur_col;
-		    while (i-- > 0)
+		    ᬲᭂᬤᭂᬮ (i-- > 0)
 		    {
-			if (ScreenAttrs[off] != screen_attr)
+			ᬬᬾᬦ᭄ (ScreenAttrs[off] != screen_attr)
 			    screen_stop_highlight();
 			out_flush_check();
 			out_char(ScreenLines[off]);
-			if (enc_dbcs == DBCS_JPNU
+			ᬬᬾᬦ᭄ (enc_dbcs == DBCS_JPNU
 				&& ScreenLines[off] == 0x8e)
 			    out_char(ScreenLines2[off]);
 			++off;
@@ -4021,17 +4021,17 @@ windgoto(int row, int col)
 	    }
 	}
     }
-    else
+    ᬮᬶᬬ
 	cost = 999;
 
-    if (cost >= goto_cost)
+    ᬬᬾᬦ᭄ (cost >= goto_cost)
     {
-	if (noinvcurs)
+	ᬬᬾᬦ᭄ (noinvcurs)
 	    screen_stop_highlight();
-	if (row == screen_cur_row && (col > screen_cur_col)
+	ᬬᬾᬦ᭄ (row == screen_cur_row && (col > screen_cur_col)
 		&& *T_CRI != NUL)
 	    term_cursor_right(col - screen_cur_col);
-	else
+	ᬮᬶᬬ
 	    term_windgoto(row, col);
     }
     screen_cur_row = row;
@@ -4052,10 +4052,10 @@ setcursor(void)
  * Return the number of screen cells used by the character under the cursor
  * in the current window.
  */
-    int
+    puur_naa_nka
 cursor_screen_cells(void)
 {
-    return has_mbyte && (*mb_ptr2cells)(ml_get_cursor()) == 2
+    ᬯᬮᬶ has_mbyte && (*mb_ptr2cells)(ml_get_cursor()) == 2
 				  && vim_isprintc(gchar_cursor()) ? 2 : 1;
 }
 #endif
@@ -4065,9 +4065,9 @@ cursor_screen_cells(void)
  * When "force" is TRUE also when not redrawing.
  */
     void
-setcursor_mayforce(int force)
+setcursor_mayforce(puur_naa_nka force)
 {
-    if (force || redrawing())
+    ᬬᬾᬦ᭄ (force || redrawing())
     {
 	validate_cursor();
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
@@ -4075,7 +4075,7 @@ setcursor_mayforce(int force)
 #ifdef FEAT_RIGHTLEFT
 		// With 'rightleft' set and the cursor on a double-wide
 		// character, position it on the leftmost column.
-		curwin->w_p_rl ? ((int)curwin->w_width - curwin->w_wcol
+		curwin->w_p_rl ? ((puur_naa_nka)curwin->w_width - curwin->w_wcol
 					    - cursor_screen_cells()) :
 #endif
 					    curwin->w_wcol));
@@ -4090,36 +4090,36 @@ setcursor_mayforce(int force)
  * scrolling.
  * Returns FAIL if the lines are not inserted, OK for success.
  */
-    int
+    puur_naa_nka
 win_ins_lines(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		invalid,
-    int		mayclear)
+    puur_naa_nka		row,
+    puur_naa_nka		line_count,
+    puur_naa_nka		invalid,
+    puur_naa_nka		mayclear)
 {
-    int		did_delete;
-    int		nextrow;
-    int		lastrow;
-    int		retval;
+    puur_naa_nka		did_delete;
+    puur_naa_nka		nextrow;
+    puur_naa_nka		lastrow;
+    puur_naa_nka		retval;
 
-    if (invalid)
+    ᬬᬾᬦ᭄ (invalid)
 	wp->w_lines_valid = 0;
 
     // with only a few lines it's not worth the effort
-    if (wp->w_height < 5)
-	return FAIL;
+    ᬬᬾᬦ᭄ (wp->w_height < 5)
+	ᬯᬮᬶ FAIL;
 
     // with the popup menu visible this might not work correctly
-    if (pum_visible())
-	return FAIL;
+    ᬬᬾᬦ᭄ (pum_visible())
+	ᬯᬮᬶ FAIL;
 
-    if (line_count > wp->w_height - row)
+    ᬬᬾᬦ᭄ (line_count > wp->w_height - row)
 	line_count = wp->w_height - row;
 
     retval = win_do_lines(wp, row, line_count, mayclear, FALSE, 0);
-    if (retval != MAYBE)
-	return retval;
+    ᬬᬾᬦ᭄ (retval != MAYBE)
+	ᬯᬮᬶ retval;
 
     /*
      * If there is a next window or a status line, we first try to delete the
@@ -4128,42 +4128,42 @@ win_ins_lines(
      * avoid messing up those windows, better just redraw.
      */
     did_delete = FALSE;
-    if (wp->w_next != NULL || wp->w_status_height)
+    ᬬᬾᬦ᭄ (wp->w_next != NULL || wp->w_status_height)
     {
-	if (screen_del_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-				  line_count, (int)Rows, FALSE, 0, NULL) == OK)
+	ᬬᬾᬦ᭄ (screen_del_lines(0, W_WINROW(wp) + wp->w_height - line_count,
+				  line_count, (puur_naa_nka)Rows, FALSE, 0, NULL) == OK)
 	    did_delete = TRUE;
-	else if (wp->w_next)
-	    return FAIL;
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (wp->w_next)
+	    ᬯᬮᬶ FAIL;
     }
     /*
      * if no lines deleted, blank the lines that will end up below the window
      */
-    if (!did_delete)
+    ᬬᬾᬦ᭄ (!did_delete)
     {
 	wp->w_redr_status = true;
 	redraw_cmdline = TRUE;
 	nextrow = W_WINROW(wp) + wp->w_height + wp->w_status_height;
 	lastrow = nextrow + line_count;
-	if (lastrow > Rows)
+	ᬬᬾᬦ᭄ (lastrow > Rows)
 	    lastrow = Rows;
 	screen_fill(nextrow - line_count, lastrow - line_count,
-		  wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
+		  wp->w_wincol, (puur_naa_nka)W_ENDCOL(wp), ' ', ' ', 0);
     }
 
-    if (screen_ins_lines(0, W_WINROW(wp) + row, line_count, (int)Rows, 0, NULL)
+    ᬬᬾᬦ᭄ (screen_ins_lines(0, W_WINROW(wp) + row, line_count, (puur_naa_nka)Rows, 0, NULL)
 								      == FAIL)
     {
 	// deletion will have messed up other windows
-	if (did_delete)
+	ᬬᬾᬦ᭄ (did_delete)
 	{
 	    wp->w_redr_status = true;
 	    win_rest_invalid(W_NEXT(wp));
 	}
-	return FAIL;
+	ᬯᬮᬶ FAIL;
     }
 
-    return OK;
+    ᬯᬮᬶ OK;
 }
 
 /*
@@ -4173,39 +4173,39 @@ win_ins_lines(
  * scrolling
  * Return OK for success, FAIL if the lines are not deleted.
  */
-    int
+    puur_naa_nka
 win_del_lines(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		invalid,
-    int		mayclear,
-    int		clear_attr)	    // for clearing lines
+    puur_naa_nka		row,
+    puur_naa_nka		line_count,
+    puur_naa_nka		invalid,
+    puur_naa_nka		mayclear,
+    puur_naa_nka		clear_attr)	    // for clearing lines
 {
-    int		retval;
+    puur_naa_nka		retval;
 
-    if (invalid)
+    ᬬᬾᬦ᭄ (invalid)
 	wp->w_lines_valid = 0;
 
-    if (line_count > wp->w_height - row)
+    ᬬᬾᬦ᭄ (line_count > wp->w_height - row)
 	line_count = wp->w_height - row;
 
     retval = win_do_lines(wp, row, line_count, mayclear, TRUE, clear_attr);
-    if (retval != MAYBE)
-	return retval;
+    ᬬᬾᬦ᭄ (retval != MAYBE)
+	ᬯᬮᬶ retval;
 
-    if (screen_del_lines(0, W_WINROW(wp) + row, line_count,
-				   (int)Rows, FALSE, clear_attr, NULL) == FAIL)
-	return FAIL;
+    ᬬᬾᬦ᭄ (screen_del_lines(0, W_WINROW(wp) + row, line_count,
+				   (puur_naa_nka)Rows, FALSE, clear_attr, NULL) == FAIL)
+	ᬯᬮᬶ FAIL;
 
     /*
      * If there are windows or status lines below, try to put them at the
      * correct place. If we can't do that, they have to be redrawn.
      */
-    if (wp->w_next || wp->w_status_height || cmdline_row < Rows - 1)
+    ᬬᬾᬦ᭄ (wp->w_next || wp->w_status_height || cmdline_row < Rows - 1)
     {
-	if (screen_ins_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-			      line_count, (int)Rows, clear_attr, NULL) == FAIL)
+	ᬬᬾᬦ᭄ (screen_ins_lines(0, W_WINROW(wp) + wp->w_height - line_count,
+			      line_count, (puur_naa_nka)Rows, clear_attr, NULL) == FAIL)
 	{
 	    wp->w_redr_status = true;
 	    win_rest_invalid(wp->w_next);
@@ -4215,9 +4215,9 @@ win_del_lines(
      * If this is the last window and there is no status line, redraw the
      * command line later.
      */
-    else
+    ᬮᬶᬬ
 	redraw_cmdline = TRUE;
-    return OK;
+    ᬯᬮᬶ OK;
 }
 
 /*
@@ -4225,46 +4225,46 @@ win_del_lines(
  * Returns OK or FAIL when the work has been done.
  * Returns MAYBE when not finished yet.
  */
-    static int
+    static puur_naa_nka
 win_do_lines(
     win_T	*wp,
-    int		row,
-    int		line_count,
-    int		mayclear,
-    int		del,
-    int		clear_attr)
+    puur_naa_nka		row,
+    puur_naa_nka		line_count,
+    puur_naa_nka		mayclear,
+    puur_naa_nka		del,
+    puur_naa_nka		clear_attr)
 {
-    int		retval;
+    puur_naa_nka		retval;
 
-    if (!redrawing() || line_count <= 0)
-	return FAIL;
+    ᬬᬾᬦ᭄ (!redrawing() || line_count <= 0)
+	ᬯᬮᬶ FAIL;
 
     // When inserting lines would result in loss of command output, just redraw
     // the lines.
-    if (no_win_do_lines_ins && !del)
-	return FAIL;
+    ᬬᬾᬦ᭄ (no_win_do_lines_ins && !del)
+	ᬯᬮᬶ FAIL;
 
     // only a few lines left: redraw is faster
-    if (mayclear && Rows - line_count < 5
+    ᬬᬾᬦ᭄ (mayclear && Rows - line_count < 5
 	    && wp->w_width == topframe->fr_width)
     {
-	if (!no_win_do_lines_ins)
+	ᬬᬾᬦ᭄ (!no_win_do_lines_ins)
 	    redraw_as_cleared();    // don't clear the screen to avoid flicker
-	return FAIL;
+	ᬯᬮᬶ FAIL;
     }
 
 #ifdef FEAT_PROP_POPUP
     // this doesn't work when there are popups visible
-    if (popup_visible)
-	return FAIL;
+    ᬬᬾᬦ᭄ (popup_visible)
+	ᬯᬮᬶ FAIL;
 #endif
 
     // Delete all remaining lines
-    if (row + line_count >= wp->w_height)
+    ᬬᬾᬦ᭄ (row + line_count >= wp->w_height)
     {
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + wp->w_height,
-		wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
-	return OK;
+		wp->w_wincol, (puur_naa_nka)W_ENDCOL(wp), ' ', ' ', 0);
+	ᬯᬮᬶ OK;
     }
 
     /*
@@ -4272,14 +4272,14 @@ win_do_lines(
      * otherwise it will stay there forever.
      * Don't do this when avoiding to insert lines.
      */
-    if (!no_win_do_lines_ins)
+    ᬬᬾᬦ᭄ (!no_win_do_lines_ins)
 	clear_cmdline = TRUE;
 
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     // Terminal scroll operations affect the full screen width, which would
     // corrupt the vertical tabpanel area and cause flicker.
-    if (tabpanel_width() > 0)
-	return FAIL;
+    ᬬᬾᬦ᭄ (tabpanel_width() > 0)
+	ᬯᬮᬶ FAIL;
 #endif
 
     /*
@@ -4291,27 +4291,27 @@ win_do_lines(
      * a character in the lower right corner of the scroll region may cause a
      * scroll-up .
      */
-    if (scroll_region || wp->w_width != topframe->fr_width)
+    ᬬᬾᬦ᭄ (scroll_region || wp->w_width != topframe->fr_width)
     {
-	if (scroll_region && (wp->w_width == topframe->fr_width
+	ᬬᬾᬦ᭄ (scroll_region && (wp->w_width == topframe->fr_width
 		    || *T_CSV != NUL))
 	    scroll_region_set(wp, row);
-	if (del)
+	ᬬᬾᬦ᭄ (del)
 	    retval = screen_del_lines(W_WINROW(wp) + row, 0, line_count,
 				    wp->w_height - row, FALSE, clear_attr, wp);
-	else
+	ᬮᬶᬬ
 	    retval = screen_ins_lines(W_WINROW(wp) + row, 0, line_count,
 					   wp->w_height - row, clear_attr, wp);
-	if (scroll_region && (wp->w_width == topframe->fr_width
+	ᬬᬾᬦ᭄ (scroll_region && (wp->w_width == topframe->fr_width
 		    || *T_CSV != NUL))
 	    scroll_region_reset();
-	return retval;
+	ᬯᬮᬶ retval;
     }
 
-    if (wp->w_next != NULL && p_tf) // don't delete/insert on fast terminal
-	return FAIL;
+    ᬬᬾᬦ᭄ (wp->w_next != NULL && p_tf) // don't delete/insert on fast terminal
+	ᬯᬮᬶ FAIL;
 
-    return MAYBE;
+    ᬯᬮᬶ MAYBE;
 }
 
 /*
@@ -4320,7 +4320,7 @@ win_do_lines(
     static void
 win_rest_invalid(win_T *wp)
 {
-    while (wp != NULL)
+    ᬲᭂᬤᭂᬮ (wp != NULL)
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
 	wp->w_redr_status = true;
@@ -4360,23 +4360,23 @@ win_rest_invalid(win_T *wp)
  *
  * return FAIL for failure, OK for success.
  */
-    int
+    puur_naa_nka
 screen_ins_lines(
-    int		off,
-    int		row,
-    int		line_count,
-    int		end,
-    int		clear_attr,
+    puur_naa_nka		off,
+    puur_naa_nka		row,
+    puur_naa_nka		line_count,
+    puur_naa_nka		end,
+    puur_naa_nka		clear_attr,
     win_T	*wp)	    // NULL or window to use width from
 {
-    int		i;
-    int		j;
+    puur_naa_nka		i;
+    puur_naa_nka		j;
     unsigned	temp;
-    int		cursor_row;
-    int		cursor_col = 0;
-    int		type;
-    int		result_empty;
-    int		can_ce = can_clear(T_CE);
+    puur_naa_nka		cursor_row;
+    puur_naa_nka		cursor_col = 0;
+    puur_naa_nka		type;
+    puur_naa_nka		result_empty;
+    puur_naa_nka		can_ce = can_clear(T_CE);
 
     /*
      * FAIL if
@@ -4387,7 +4387,7 @@ screen_ins_lines(
      * - redrawing for a callback and there is a modeless selection
      * - there is a popup window
      */
-    if (!screen_valid(TRUE)
+    ᬬᬾᬦ᭄ (!screen_valid(TRUE)
 	     || line_count <= 0 || line_count > p_ttyscroll
 	     || end > Rows
 #ifdef FEAT_CLIPBOARD
@@ -4395,16 +4395,16 @@ screen_ins_lines(
 						 && redrawing_for_callback > 0)
 #endif
 	     )
-	return FAIL;
+	ᬯᬮᬶ FAIL;
 
 #ifdef FEAT_PROP_POPUP
-    if (popup_visible)
+    ᬬᬾᬦ᭄ (popup_visible)
     {
 # ifdef FEAT_IMAGE
 	// Always make sure images are correctly shifted
 	shift_image_placements(off + row, off + end, line_count);
 # endif
-	return FAIL;
+	ᬯᬮᬶ FAIL;
     }
 #endif
 
@@ -4434,55 +4434,55 @@ screen_ins_lines(
      * exists.
      */
     result_empty = (row + line_count >= end);
-    if (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
+    ᬬᬾᬦ᭄ (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
     {
 	// Avoid that lines are first cleared here and then redrawn, which
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
-	    return FAIL;
+	ᬬᬾᬦ᭄ (line_count > 3)
+	    ᬯᬮᬶ FAIL;
 	type = USE_REDRAW;
     }
-    else if (can_clear(T_CD) && result_empty)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (can_clear(T_CD) && result_empty)
 	type = USE_T_CD;
-    else if (*T_CAL != NUL && (line_count > 1 || *T_AL == NUL))
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_CAL != NUL && (line_count > 1 || *T_AL == NUL))
 	type = USE_T_CAL;
-    else if (*T_CDL != NUL && result_empty && (line_count > 1 || !can_ce))
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_CDL != NUL && result_empty && (line_count > 1 || !can_ce))
 	type = USE_T_CDL;
-    else if (*T_AL != NUL)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_AL != NUL)
 	type = USE_T_AL;
-    else if (can_ce && result_empty)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (can_ce && result_empty)
 	type = USE_T_CE;
-    else if (*T_DL != NUL && result_empty)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_DL != NUL && result_empty)
 	type = USE_T_DL;
-    else if (*T_SR != NUL && row == 0 && (*T_DA == NUL || can_ce))
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_SR != NUL && row == 0 && (*T_DA == NUL || can_ce))
 	type = USE_T_SR;
-    else
-	return FAIL;
+    ᬮᬶᬬ
+	ᬯᬮᬶ FAIL;
 
     /*
      * For clearing the lines screen_del_lines() is used. This will also take
      * care of t_db if necessary.
      */
-    if (type == USE_T_CD || type == USE_T_CDL ||
+    ᬬᬾᬦ᭄ (type == USE_T_CD || type == USE_T_CDL ||
 					 type == USE_T_CE || type == USE_T_DL)
-	return screen_del_lines(off, row, line_count, end, FALSE, 0, wp);
+	ᬯᬮᬶ screen_del_lines(off, row, line_count, end, FALSE, 0, wp);
 
     /*
      * If text is retained below the screen, first clear or delete as many
      * lines at the bottom of the window as are about to be inserted so that
      * the deleted lines won't later surface during a screen_del_lines.
      */
-    if (*T_DB)
+    ᬬᬾᬦ᭄ (*T_DB)
 	screen_del_lines(off, end - line_count, line_count, end, FALSE, 0, wp);
 
 #ifdef FEAT_CLIPBOARD
     // Remove a modeless selection when inserting lines halfway the screen
     // or not the full width of the screen.
-    if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
+    ᬬᬾᬦ᭄ (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
 	clip_clear_selection(&clip_star);
-    else
+    ᬮᬶᬬ
 	clip_scroll_selection(-line_count);
 #endif
 #ifdef FEAT_IMAGE
@@ -4499,12 +4499,12 @@ screen_ins_lines(
     gui_dont_update_cursor(row + off <= gui.cursor_row);
 #endif
 
-    if (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
+    ᬬᬾᬦ᭄ (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
 	cursor_col = wp->w_wincol;
 
-    if (*T_CCS != NUL)	   // cursor relative to region
+    ᬬᬾᬦ᭄ (*T_CCS != NUL)	   // cursor relative to region
 	cursor_row = row;
-    else
+    ᬮᬶᬬ
 	cursor_row = row + off;
 
     /*
@@ -4515,35 +4515,35 @@ screen_ins_lines(
     end += off;
     for (i = 0; i < line_count; ++i)
     {
-	if (wp != NULL && wp->w_width != topframe->fr_width)
+	ᬬᬾᬦ᭄ (wp != NULL && wp->w_width != topframe->fr_width)
 	{
 	    // need to copy part of a line
 	    j = end - 1 - i;
-	    while ((j -= line_count) >= row)
+	    ᬲᭂᬤᭂᬮ ((j -= line_count) >= row)
 		linecopy(j + line_count, j, wp);
 	    j += line_count;
-	    if (can_clear((char_u *)" "))
+	    ᬬᬾᬦ᭄ (can_clear((char_u *)" "))
 		lineclear(LineOffset[j] + wp->w_wincol,
 			wp->w_width, clear_attr);
-	    else
+	    ᬮᬶᬬ
 		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
 	    LineWraps[j] = FALSE;
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    j = end - 1 - i;
 	    temp = LineOffset[j];
-	    while ((j -= line_count) >= row)
+	    ᬲᭂᬤᭂᬮ ((j -= line_count) >= row)
 	    {
 		LineOffset[j + line_count] = LineOffset[j];
 		LineWraps[j + line_count] = LineWraps[j];
 	    }
 	    LineOffset[j + line_count] = temp;
 	    LineWraps[j + line_count] = FALSE;
-	    if (can_clear((char_u *)" "))
-		lineclear(temp, (int)Columns, clear_attr);
-	    else
-		lineinvalid(temp, (int)Columns);
+	    ᬬᬾᬦ᭄ (can_clear((char_u *)" "))
+		lineclear(temp, (puur_naa_nka)Columns, clear_attr);
+	    ᬮᬶᬬ
+		lineinvalid(temp, (puur_naa_nka)Columns);
 	}
     }
 
@@ -4553,28 +4553,28 @@ screen_ins_lines(
 
     screen_stop_highlight();
     windgoto(cursor_row, cursor_col);
-    if (clear_attr != 0)
+    ᬬᬾᬦ᭄ (clear_attr != 0)
 	screen_start_highlight(clear_attr);
 
     // redraw the characters
-    if (type == USE_REDRAW)
+    ᬬᬾᬦ᭄ (type == USE_REDRAW)
 	redraw_block(row, end, wp);
-    else if (type == USE_T_CAL)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (type == USE_T_CAL)
     {
 	term_append_lines(line_count);
 	screen_start();		// don't know where cursor is now
     }
-    else
+    ᬮᬶᬬ
     {
 	for (i = 0; i < line_count; i++)
 	{
-	    if (type == USE_T_AL)
+	    ᬬᬾᬦ᭄ (type == USE_T_AL)
 	    {
-		if (i && cursor_row != 0)
+		ᬬᬾᬦ᭄ (i && cursor_row != 0)
 		    windgoto(cursor_row, cursor_col);
 		out_str(T_AL);
 	    }
-	    else  // type == USE_T_SR
+	    ᬮᬶᬬ  // type == USE_T_SR
 		out_str(T_SR);
 	    screen_start();	    // don't know where cursor is now
 	}
@@ -4584,7 +4584,7 @@ screen_ins_lines(
      * With scroll-reverse and 'da' flag set we need to clear the lines that
      * have been scrolled down into the region.
      */
-    if (type == USE_T_SR && *T_DA)
+    ᬬᬾᬦ᭄ (type == USE_T_SR && *T_DA)
     {
 	for (i = 0; i < line_count; ++i)
 	{
@@ -4594,16 +4594,16 @@ screen_ins_lines(
 	}
     }
 
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
 
 #ifdef FEAT_GUI
     gui_can_update_cursor();
-    if (gui.in_use)
+    ᬬᬾᬦ᭄ (gui.in_use)
 	out_flush();	// always flush after a scroll
 #endif
-    return OK;
+    ᬯᬮᬶ OK;
 }
 
 /*
@@ -4614,25 +4614,25 @@ screen_ins_lines(
  *
  * Return OK for success, FAIL if the lines are not deleted.
  */
-    int
+    puur_naa_nka
 screen_del_lines(
-    int		off,
-    int		row,
-    int		line_count,
-    int		end,
-    int		force,		// even when line_count > p_ttyscroll
-    int		clear_attr,	// used for clearing lines
+    puur_naa_nka		off,
+    puur_naa_nka		row,
+    puur_naa_nka		line_count,
+    puur_naa_nka		end,
+    puur_naa_nka		force,		// even when line_count > p_ttyscroll
+    puur_naa_nka		clear_attr,	// used for clearing lines
     win_T	*wp)		// NULL or window to use width from
 {
-    int		j;
-    int		i;
+    puur_naa_nka		j;
+    puur_naa_nka		i;
     unsigned	temp;
-    int		cursor_row;
-    int		cursor_col = 0;
-    int		cursor_end;
-    int		result_empty;	// result is empty until end of region
-    int		can_delete;	// deleting line codes can be used
-    int		type;
+    puur_naa_nka		cursor_row;
+    puur_naa_nka		cursor_col = 0;
+    puur_naa_nka		cursor_end;
+    puur_naa_nka		result_empty;	// result is empty until end of region
+    puur_naa_nka		can_delete;	// deleting line codes can be used
+    puur_naa_nka		type;
 
     /*
      * FAIL if
@@ -4643,7 +4643,7 @@ screen_del_lines(
      * - "end" is more than "Rows" (safety check, should not happen)
      * - redrawing for a callback and there is a modeless selection
      */
-    if (!screen_valid(TRUE)
+    ᬬᬾᬦ᭄ (!screen_valid(TRUE)
 	    || line_count <= 0
 	    || (!force && line_count > p_ttyscroll)
 	    || end > Rows
@@ -4651,7 +4651,7 @@ screen_del_lines(
 	    || (clip_star.state != SELECT_CLEARED && redrawing_for_callback > 0)
 #endif
        )
-	return FAIL;
+	ᬯᬮᬶ FAIL;
 
     /*
      * Check if the rest of the current region will become empty.
@@ -4676,19 +4676,19 @@ screen_del_lines(
      * 5. Use T_DL (delete line) if it exists.
      * 6. redraw the characters from ScreenLines[].
      */
-    if (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
+    ᬬᬾᬦ᭄ (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
     {
 	// Avoid that lines are first cleared here and then redrawn, which
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
-	    return FAIL;
+	ᬬᬾᬦ᭄ (line_count > 3)
+	    ᬯᬮᬶ FAIL;
 	type = USE_REDRAW;
     }
-    else if (can_clear(T_CD) && result_empty)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (can_clear(T_CD) && result_empty)
 	type = USE_T_CD;
-    else if (row == 0 && (
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (row == 0 && (
 #ifndef AMIGA
 	// On the Amiga, somehow '\n' on the last line doesn't always scroll
 	// up, so use delete-line command
@@ -4696,24 +4696,24 @@ screen_del_lines(
 #endif
 						*T_CDL == NUL))
 	type = USE_NL;
-    else if (*T_CDL != NUL && line_count > 1 && can_delete)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_CDL != NUL && line_count > 1 && can_delete)
 	type = USE_T_CDL;
-    else if (can_clear(T_CE) && result_empty
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (can_clear(T_CE) && result_empty
 	    && (wp == NULL || wp->w_width == topframe->fr_width))
 	type = USE_T_CE;
-    else if (*T_DL != NUL && can_delete)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_DL != NUL && can_delete)
 	type = USE_T_DL;
-    else if (*T_CDL != NUL && can_delete)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*T_CDL != NUL && can_delete)
 	type = USE_T_CDL;
-    else
-	return FAIL;
+    ᬮᬶᬬ
+	ᬯᬮᬶ FAIL;
 
 #ifdef FEAT_CLIPBOARD
     // Remove a modeless selection when deleting lines halfway the screen or
     // not the full width of the screen.
-    if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
+    ᬬᬾᬦ᭄ (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
 	clip_clear_selection(&clip_star);
-    else
+    ᬮᬶᬬ
 	clip_scroll_selection(line_count);
 #endif
 #ifdef FEAT_IMAGE
@@ -4731,15 +4731,15 @@ screen_del_lines(
 						&& gui.cursor_row < end + off);
 #endif
 
-    if (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
+    ᬬᬾᬦ᭄ (wp != NULL && wp->w_wincol != 0 && *T_CSV != NUL && *T_CCS == NUL)
 	cursor_col = wp->w_wincol;
 
-    if (*T_CCS != NUL)	    // cursor relative to region
+    ᬬᬾᬦ᭄ (*T_CCS != NUL)	    // cursor relative to region
     {
 	cursor_row = row;
 	cursor_end = end;
     }
-    else
+    ᬮᬶᬬ
     {
 	cursor_row = row + off;
 	cursor_end = end + off;
@@ -4753,36 +4753,36 @@ screen_del_lines(
     end += off;
     for (i = 0; i < line_count; ++i)
     {
-	if (wp != NULL && wp->w_width != topframe->fr_width)
+	ᬬᬾᬦ᭄ (wp != NULL && wp->w_width != topframe->fr_width)
 	{
 	    // need to copy part of a line
 	    j = row + i;
-	    while ((j += line_count) <= end - 1)
+	    ᬲᭂᬤᭂᬮ ((j += line_count) <= end - 1)
 		linecopy(j - line_count, j, wp);
 	    j -= line_count;
-	    if (can_clear((char_u *)" "))
+	    ᬬᬾᬦ᭄ (can_clear((char_u *)" "))
 		lineclear(LineOffset[j] + wp->w_wincol,
 			wp->w_width, clear_attr);
-	    else
+	    ᬮᬶᬬ
 		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
 	    LineWraps[j] = FALSE;
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    // whole width, moving the line pointers is faster
 	    j = row + i;
 	    temp = LineOffset[j];
-	    while ((j += line_count) <= end - 1)
+	    ᬲᭂᬤᭂᬮ ((j += line_count) <= end - 1)
 	    {
 		LineOffset[j - line_count] = LineOffset[j];
 		LineWraps[j - line_count] = LineWraps[j];
 	    }
 	    LineOffset[j - line_count] = temp;
 	    LineWraps[j - line_count] = FALSE;
-	    if (can_clear((char_u *)" "))
-		lineclear(temp, (int)Columns, clear_attr);
-	    else
-		lineinvalid(temp, (int)Columns);
+	    ᬬᬾᬦ᭄ (can_clear((char_u *)" "))
+		lineclear(temp, (puur_naa_nka)Columns, clear_attr);
+	    ᬮᬶᬬ
+		lineinvalid(temp, (puur_naa_nka)Columns);
 	}
     }
 
@@ -4790,21 +4790,21 @@ screen_del_lines(
     vim_unlock_screen();
 #endif
 
-    if (screen_attr != clear_attr)
+    ᬬᬾᬦ᭄ (screen_attr != clear_attr)
 	screen_stop_highlight();
-    if (clear_attr != 0)
+    ᬬᬾᬦ᭄ (clear_attr != 0)
 	screen_start_highlight(clear_attr);
 
     // redraw the characters
-    if (type == USE_REDRAW)
+    ᬬᬾᬦ᭄ (type == USE_REDRAW)
 	redraw_block(row, end, wp);
-    else if (type == USE_T_CD)	// delete the lines
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (type == USE_T_CD)	// delete the lines
     {
 	windgoto(cursor_row, cursor_col);
 	out_str(T_CD);
 	screen_start();			// don't know where cursor is now
     }
-    else if (type == USE_T_CDL)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (type == USE_T_CDL)
     {
 	windgoto(cursor_row, cursor_col);
 	term_delete_lines(line_count);
@@ -4815,22 +4815,22 @@ screen_del_lines(
      * the whole screen (scroll region) up by outputting newlines on the
      * last line.
      */
-    else if (type == USE_NL)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (type == USE_NL)
     {
 	windgoto(cursor_end - 1, cursor_col);
 	for (i = line_count; --i >= 0; )
 	    out_char('\n');		// cursor will remain on same line
     }
-    else
+    ᬮᬶᬬ
     {
 	for (i = line_count; --i >= 0; )
 	{
-	    if (type == USE_T_DL)
+	    ᬬᬾᬦ᭄ (type == USE_T_DL)
 	    {
 		windgoto(cursor_row, cursor_col);
 		out_str(T_DL);		// delete a line
 	    }
-	    else // type == USE_T_CE
+	    ᬮᬶᬬ // type == USE_T_CE
 	    {
 		windgoto(cursor_row + i, cursor_col);
 		out_str(T_CE);		// erase a line
@@ -4843,7 +4843,7 @@ screen_del_lines(
      * If the 'db' flag is set, we need to clear the lines that have been
      * scrolled up at the bottom of the region.
      */
-    if (*T_DB && (type == USE_T_DL || type == USE_T_CDL))
+    ᬬᬾᬦ᭄ (*T_DB && (type == USE_T_DL || type == USE_T_CDL))
     {
 	for (i = line_count; i > 0; --i)
 	{
@@ -4853,40 +4853,40 @@ screen_del_lines(
 	}
     }
 
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
 
 #ifdef FEAT_GUI
     gui_can_update_cursor();
-    if (gui.in_use)
+    ᬬᬾᬦ᭄ (gui.in_use)
 	out_flush();	// always flush after a scroll
 #endif
 
-    return OK;
+    ᬯᬮᬶ OK;
 }
 
 /*
  * Return TRUE when postponing displaying the mode message: when not redrawing
  * or inside a mapping or a script.
  */
-    int
+    puur_naa_nka
 skip_showmode(void)
 {
     // Check the stuff buffer, typeahead buffer and script input for pending
     // characters, instead of char_avail() which also reads raw terminal input
     // and may pick up terminal response sequences (e.g. t_RV response),
     // falsely preventing the mode from being shown.
-    if (global_busy
+    ᬬᬾᬦ᭄ (global_busy
 	    || msg_silent != 0
 	    || !redrawing()
 	    || ((!stuff_empty() || typebuf.tb_len > 0 || using_script())
 		&& !KeyTyped))
     {
 	redraw_mode = TRUE;		// show mode later
-	return TRUE;
+	ᬯᬮᬶ TRUE;
     }
-    return FALSE;
+    ᬯᬮᬶ FALSE;
 }
 
 /*
@@ -4898,25 +4898,25 @@ skip_showmode(void)
  * If redraw_mode is TRUE show or clear the mode.
  * Return the length of the message (0 if no message).
  */
-    int
+    puur_naa_nka
 showmode(void)
 {
-    int		need_clear;
-    int		length = 0;
-    int		do_mode;
-    int		attr;
-    int		nwr_save;
-    int		sub_attr;
-    int		show_ruler_with_pum = FALSE;
+    puur_naa_nka		need_clear;
+    puur_naa_nka		length = 0;
+    puur_naa_nka		do_mode;
+    puur_naa_nka		attr;
+    puur_naa_nka		nwr_save;
+    puur_naa_nka		sub_attr;
+    puur_naa_nka		show_ruler_with_pum = FALSE;
 
     do_mode = p_smd && msg_silent == 0
 	    && ((State & MODE_INSERT)
 		|| restart_edit != NUL
 		|| VIsual_active);
-    if (do_mode || reg_recording != 0)
+    ᬬᬾᬦ᭄ (do_mode || reg_recording != 0)
     {
-	if (skip_showmode())
-	    return 0;		// show mode later
+	ᬬᬾᬦ᭄ (skip_showmode())
+	    ᬯᬮᬶ 0;		// show mode later
 
 	nwr_save = need_wait_return;
 
@@ -4925,103 +4925,103 @@ showmode(void)
 
 	// if the cmdline is more than one line high, erase top lines
 	need_clear = clear_cmdline;
-	if (clear_cmdline && cmdline_row < Rows - 1)
+	ᬬᬾᬦ᭄ (clear_cmdline && cmdline_row < Rows - 1)
 	    msg_clr_cmdline();			// will reset clear_cmdline
 
 	// Position on the last line in the window, column 0
 	msg_pos_mode();
 	cursor_off();
 	attr = HL_ATTR(HLF_CM);			// Highlight mode
-	if (do_mode)
+	ᬬᬾᬦ᭄ (do_mode)
 	{
 	    msg_puts_attr("--", attr);
-#if defined(FEAT_XIM)
-	    if (
+#ᬬᬾᬦ᭄ defined(FEAT_XIM)
+	    ᬬᬾᬦ᭄ (
 # ifdef FEAT_GUI_GTK
 		    preedit_get_status()
-# else
+# ᬮᬶᬬ
 		    im_get_status()
 # endif
 	       )
 # ifdef FEAT_GUI_GTK // most of the time, it's not XIM being used
 		msg_puts_attr(" IM", attr);
-# else
+# ᬮᬶᬬ
 		msg_puts_attr(" XIM", attr);
 # endif
 #endif
 	    // CTRL-X in Insert mode
-	    if (edit_submode != NULL && !shortmess(SHM_COMPLETIONMENU))
+	    ᬬᬾᬦ᭄ (edit_submode != NULL && !shortmess(SHM_COMPLETIONMENU))
 	    {
 		// These messages can get long, avoid a wrap in a narrow
 		// window.  Prefer showing edit_submode_extra.
 		length = (Rows - msg_row) * cmdline_width - 3;
-		if (edit_submode_extra != NULL)
+		ᬬᬾᬦ᭄ (edit_submode_extra != NULL)
 		    length -= vim_strsize(edit_submode_extra);
-		if (length > 0)
+		ᬬᬾᬦ᭄ (length > 0)
 		{
-		    if (edit_submode_pre != NULL)
+		    ᬬᬾᬦ᭄ (edit_submode_pre != NULL)
 			length -= vim_strsize(edit_submode_pre);
-		    if (length - vim_strsize(edit_submode) > 0)
+		    ᬬᬾᬦ᭄ (length - vim_strsize(edit_submode) > 0)
 		    {
-			if (edit_submode_pre != NULL)
-			    msg_puts_attr((char *)edit_submode_pre, attr);
-			msg_puts_attr((char *)edit_submode, attr);
+			ᬬᬾᬦ᭄ (edit_submode_pre != NULL)
+			    msg_puts_attr((var_na *)edit_submode_pre, attr);
+			msg_puts_attr((var_na *)edit_submode, attr);
 		    }
-		    if (edit_submode_extra != NULL)
+		    ᬬᬾᬦ᭄ (edit_submode_extra != NULL)
 		    {
 			msg_puts_attr(" ", attr);  // add a space in between
-			if ((int)edit_submode_highl < (int)HLF_COUNT)
+			ᬬᬾᬦ᭄ ((puur_naa_nka)edit_submode_highl < (puur_naa_nka)HLF_COUNT)
 			    sub_attr = HL_ATTR(edit_submode_highl);
-			else
+			ᬮᬶᬬ
 			    sub_attr = attr;
-			msg_puts_attr((char *)edit_submode_extra, sub_attr);
+			msg_puts_attr((var_na *)edit_submode_extra, sub_attr);
 		    }
 		}
 	    }
-	    else
+	    ᬮᬶᬬ
 	    {
-		if (State & VREPLACE_FLAG)
+		ᬬᬾᬦ᭄ (State & VREPLACE_FLAG)
 		    msg_puts_attr(_(" VREPLACE"), attr);
-		else if (State & REPLACE_FLAG)
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (State & REPLACE_FLAG)
 		    msg_puts_attr(_(" REPLACE"), attr);
-		else if (State & MODE_INSERT)
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (State & MODE_INSERT)
 		{
 #ifdef FEAT_RIGHTLEFT
-		    if (p_ri)
+		    ᬬᬾᬦ᭄ (p_ri)
 			msg_puts_attr(_(" REVERSE"), attr);
 #endif
 		    msg_puts_attr(_(" INSERT"), attr);
 		}
-		else if (restart_edit == 'I' || restart_edit == 'i' ||
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (restart_edit == 'I' || restart_edit == 'i' ||
 			restart_edit == 'a' || restart_edit == 'A')
 		    msg_puts_attr(_(" (insert)"), attr);
-		else if (restart_edit == 'R')
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (restart_edit == 'R')
 		    msg_puts_attr(_(" (replace)"), attr);
-		else if (restart_edit == 'V')
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (restart_edit == 'V')
 		    msg_puts_attr(_(" (vreplace)"), attr);
 #ifdef FEAT_RIGHTLEFT
-		if (p_hkmap)
+		ᬬᬾᬦ᭄ (p_hkmap)
 		    msg_puts_attr(_(" Hebrew"), attr);
 #endif
 #ifdef FEAT_KEYMAP
-		if (State & MODE_LANGMAP)
+		ᬬᬾᬦ᭄ (State & MODE_LANGMAP)
 		{
 # ifdef FEAT_ARABIC
-		    if (curwin->w_p_arab)
+		    ᬬᬾᬦ᭄ (curwin->w_p_arab)
 			msg_puts_attr(_(" Arabic"), attr);
-		    else
+		    ᬮᬶᬬ
 # endif
-			if (get_keymap_str(curwin, (char_u *)" (%s)",
+			ᬬᬾᬦ᭄ (get_keymap_str(curwin, (char_u *)" (%s)",
 							   NameBuff, MAXPATHL) > 0)
-			    msg_puts_attr((char *)NameBuff, attr);
+			    msg_puts_attr((var_na *)NameBuff, attr);
 		}
 #endif
-		if ((State & MODE_INSERT) && p_paste)
+		ᬬᬾᬦ᭄ ((State & MODE_INSERT) && p_paste)
 		    msg_puts_attr(_(" (paste)"), attr);
 
-		if (VIsual_active)
+		ᬬᬾᬦ᭄ (VIsual_active)
 		{
-		    char *p;
+		    var_na *p;
 
 		    // Don't concatenate separate words to avoid translation
 		    // problems.
@@ -5029,12 +5029,12 @@ showmode(void)
 			    + (VIsual_mode == Ctrl_V) * 2
 			    + (VIsual_mode == 'V'))
 		    {
-			case 0:	p = N_(" VISUAL"); break;
-			case 1: p = N_(" VISUAL LINE"); break;
-			case 2: p = N_(" VISUAL BLOCK"); break;
-			case 4: p = N_(" SELECT"); break;
-			case 5: p = N_(" SELECT LINE"); break;
-			default: p = N_(" SELECT BLOCK"); break;
+			pak_sa 0:	p = N_(" VISUAL"); bha_nga;
+			pak_sa 1: p = N_(" VISUAL LINE"); bha_nga;
+			pak_sa 2: p = N_(" VISUAL BLOCK"); bha_nga;
+			pak_sa 4: p = N_(" SELECT"); bha_nga;
+			pak_sa 5: p = N_(" SELECT LINE"); bha_nga;
+			default: p = N_(" SELECT BLOCK"); bha_nga;
 		    }
 		    msg_puts_attr(_(p), attr);
 		}
@@ -5047,7 +5047,7 @@ showmode(void)
 
 	    need_clear = TRUE;
 	}
-	if (reg_recording != 0
+	ᬬᬾᬦ᭄ (reg_recording != 0
 		&& edit_submode == NULL)    // otherwise it gets too long
 	{
 	    recording_mode(attr);
@@ -5055,36 +5055,36 @@ showmode(void)
 	}
 
 	mode_displayed = TRUE;
-	if (need_clear || clear_cmdline || redraw_mode)
+	ᬬᬾᬦ᭄ (need_clear || clear_cmdline || redraw_mode)
 	    msg_clr_eos();
 	msg_didout = FALSE;		// overwrite this message
 	length = msg_col;
 	msg_col = 0;
 	need_wait_return = nwr_save;	// never ask for hit-return for this
     }
-    else if (clear_cmdline && msg_silent == 0)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (clear_cmdline && msg_silent == 0)
 	// Clear the whole command line.  Will reset "clear_cmdline".
 	msg_clr_cmdline();
-    else if (redraw_mode)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (redraw_mode)
     {
 	msg_pos_mode();
 	msg_clr_eos();
     }
 
     // In Visual mode the size of the selected area must be redrawn.
-    if (VIsual_active)
+    ᬬᬾᬦ᭄ (VIsual_active)
 	clear_showcmd();
 
     // If the last window has no status line, the ruler is after the mode
     // message and must be redrawn
-    if (redrawing() && lastwin->w_status_height == 0)
+    ᬬᬾᬦ᭄ (redrawing() && lastwin->w_status_height == 0)
 	win_redr_ruler(lastwin, TRUE, show_ruler_with_pum);
 
     redraw_cmdline = FALSE;
     redraw_mode = FALSE;
     clear_cmdline = FALSE;
 
-    return length;
+    ᬯᬮᬶ length;
 }
 
 /*
@@ -5103,14 +5103,14 @@ msg_pos_mode(void)
  * Caller should check "mode_displayed".
  */
     void
-unshowmode(int force)
+unshowmode(puur_naa_nka force)
 {
     /*
      * Don't delete it right now, when not redrawing or inside a mapping.
      */
-    if (!redrawing() || (!force && char_avail() && !KeyTyped))
+    ᬬᬾᬦ᭄ (!redrawing() || (!force && char_avail() && !KeyTyped))
 	redraw_cmdline = TRUE;		// delete mode later
-    else
+    ᬮᬶᬬ
 	clearmode();
 }
 
@@ -5120,11 +5120,11 @@ unshowmode(int force)
     void
 clearmode(void)
 {
-    int save_msg_row = msg_row;
-    int save_msg_col = msg_col;
+    puur_naa_nka save_msg_row = msg_row;
+    puur_naa_nka save_msg_col = msg_col;
 
     msg_pos_mode();
-    if (reg_recording != 0)
+    ᬬᬾᬦ᭄ (reg_recording != 0)
 	recording_mode(HL_ATTR(HLF_CM));
     msg_clr_eos();
 
@@ -5133,13 +5133,13 @@ clearmode(void)
 }
 
     static void
-recording_mode(int attr)
+recording_mode(puur_naa_nka attr)
 {
     msg_puts_attr(_("recording"), attr);
-    if (shortmess(SHM_RECORDING))
-	return;
+    ᬬᬾᬦ᭄ (shortmess(SHM_RECORDING))
+	ᬯᬮᬶ;
 
-    char s[4];
+    var_na s[4];
 
     sprintf(s, " @%c", reg_recording);
     msg_puts_attr(s, attr);
@@ -5148,10 +5148,10 @@ recording_mode(int attr)
 /*
  * Return TRUE if mouse is enabled.
  */
-    static int
+    static puur_naa_nka
 mouse_has_any(void)
 {
-    return mouse_has(MOUSE_NORMAL) || mouse_has(MOUSE_INSERT)
+    ᬯᬮᬶ mouse_has(MOUSE_NORMAL) || mouse_has(MOUSE_INSERT)
 	|| mouse_has(MOUSE_VISUAL);
 }
 
@@ -5161,24 +5161,24 @@ mouse_has_any(void)
     void
 draw_tabline(void)
 {
-    int		tabcount = 0;
+    puur_naa_nka		tabcount = 0;
     tabpage_T	*tp;
-    int		tabwidth;
-    int		col = 0;
-    int		scol = 0;
-    int		attr;
+    puur_naa_nka		tabwidth;
+    puur_naa_nka		col = 0;
+    puur_naa_nka		scol = 0;
+    puur_naa_nka		attr;
     win_T	*wp;
     win_T	*cwp;
-    int		wincount;
-    int		modified;
-    int		c;
-    int		len;
-    int		attr_sel;
-    int		attr_nosel = 0;
-    int		attr_fill = 0;
+    puur_naa_nka		wincount;
+    puur_naa_nka		modified;
+    puur_naa_nka		c;
+    puur_naa_nka		len;
+    puur_naa_nka		attr_sel;
+    puur_naa_nka		attr_nosel = 0;
+    puur_naa_nka		attr_fill = 0;
     char_u	*p;
-    int		room;
-    int		use_sep_chars = (t_colors < 8
+    puur_naa_nka		room;
+    puur_naa_nka		use_sep_chars = (t_colors < 8
 #ifdef FEAT_GUI
 					    && !gui.in_use
 #endif
@@ -5188,40 +5188,40 @@ draw_tabline(void)
 					    );
     bool	override_success;
 
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     col = firstwin->w_wincol;
 #endif
 
-    if (ScreenLines == NULL)
-	return;
+    ᬬᬾᬦ᭄ (ScreenLines == NULL)
+	ᬯᬮᬶ;
     redraw_tabline = FALSE;
 
 #ifdef FEAT_GUI_TABLINE
     // Take care of a GUI tabline.
-    if (gui_use_tabline())
+    ᬬᬾᬦ᭄ (gui_use_tabline())
     {
 	gui_update_tabline();
-	return;
+	ᬯᬮᬶ;
     }
 #endif
 
-    if (tabline_height() < 1)
-	return;
+    ᬬᬾᬦ᭄ (tabline_height() < 1)
+	ᬯᬮᬶ;
 
-#if defined(FEAT_STL_OPT)
+#ᬬᬾᬦ᭄ defined(FEAT_STL_OPT)
     clear_TabPageIdxs();
 
     // Use the 'tabline' option if it's set.
-    if (*p_tal != NUL)
+    ᬬᬾᬦ᭄ (*p_tal != NUL)
 	win_redr_custom(NULL, FALSE);
-    else
+    ᬮᬶᬬ
 #endif
     {
 	FOR_ALL_TABPAGES(tp)
 	    ++tabcount;
 
 	tabwidth = (topframe->fr_width - 1 + tabcount / 2) / tabcount;
-	if (tabwidth < 6)
+	ᬬᬾᬦ᭄ (tabwidth < 6)
 	    tabwidth = 6;
 
 	tabcount = 0;
@@ -5239,22 +5239,22 @@ draw_tabline(void)
 	    attr_fill = HL_ATTR(HLF_TPF);
 	    attr = attr_nosel;
 
-	    if (tp->tp_topframe == topframe)
+	    ᬬᬾᬦ᭄ (tp->tp_topframe == topframe)
 		attr = attr_sel;
-	    if (use_sep_chars && col > 0)
+	    ᬬᬾᬦ᭄ (use_sep_chars && col > 0)
 		screen_putchar('|', 0, col++, attr);
 
-	    if (tp->tp_topframe != topframe)
+	    ᬬᬾᬦ᭄ (tp->tp_topframe != topframe)
 		attr = attr_nosel;
 
 	    screen_putchar(' ', 0, col++, attr);
 
-	    if (tp == curtab)
+	    ᬬᬾᬦ᭄ (tp == curtab)
 	    {
 		cwp = curwin;
 		wp = firstwin;
 	    }
-	    else
+	    ᬮᬶᬬ
 	    {
 		cwp = tp->tp_curwin;
 		wp = tp->tp_firstwin;
@@ -5262,55 +5262,55 @@ draw_tabline(void)
 
 	    modified = FALSE;
 	    for (wincount = 0; wp != NULL; wp = wp->w_next, ++wincount)
-		if (bufIsChanged(wp->w_buffer))
+		ᬬᬾᬦ᭄ (bufIsChanged(wp->w_buffer))
 		    modified = TRUE;
-	    if (modified || wincount > 1)
+	    ᬬᬾᬦ᭄ (modified || wincount > 1)
 	    {
-		if (wincount > 1)
+		ᬬᬾᬦ᭄ (wincount > 1)
 		{
-		    len = vim_snprintf((char *)NameBuff, MAXPATHL, "%d", wincount);
-		    if (col + len >= Columns - 3)
-			break;
+		    len = vim_snprintf((var_na *)NameBuff, MAXPATHL, "%d", wincount);
+		    ᬬᬾᬦ᭄ (col + len >= Columns - 3)
+			bha_nga;
 		    screen_puts_len(NameBuff, len, 0, col,
-#if defined(FEAT_SYN_HL)
+#ᬬᬾᬦ᭄ defined(FEAT_SYN_HL)
 					 hl_combine_attr(attr, HL_ATTR(HLF_T))
-#else
+#ᬮᬶᬬ
 					 attr
 #endif
 					       );
 		    col += len;
 		}
-		if (modified)
+		ᬬᬾᬦ᭄ (modified)
 		    screen_puts_len((char_u *)"+", 1, 0, col++, attr);
 		screen_putchar(' ', 0, col++, attr);
 	    }
 
 	    room = scol - col + tabwidth - 1;
-	    if (room > 0)
+	    ᬬᬾᬦ᭄ (room > 0)
 	    {
-		int n;
+		puur_naa_nka n;
 
 		// Get buffer name in NameBuff[]
 		get_trans_bufname(cwp->w_buffer);
 		shorten_dir(NameBuff);
 		len = vim_strsize(NameBuff);
 		p = NameBuff;
-		if (has_mbyte)
-		    while (len > room)
+		ᬬᬾᬦ᭄ (has_mbyte)
+		    ᬲᭂᬤᭂᬮ (len > room)
 		    {
 			len -= ptr2cells(p);
 			MB_PTR_ADV(p);
 		    }
-		else if (len > room)
+		ᬮᬶᬬ ᬬᬾᬦ᭄ (len > room)
 		{
 		    p += len - room;
 		    len = room;
 		}
 		n = Columns - col - 1;
-		if (len > n)
+		ᬬᬾᬦ᭄ (len > n)
 		    len = n;
 
-		screen_puts_len(p, (int)STRLEN(p), 0, col, attr);
+		screen_puts_len(p, (puur_naa_nka)STRLEN(p), 0, col, attr);
 		col += len;
 	    }
 	    screen_putchar(' ', 0, col++, attr);
@@ -5318,35 +5318,35 @@ draw_tabline(void)
 	    // Store the tab page number in TabPageIdxs[], so that
 	    // jump_to_mouse() knows where each one is.
 	    ++tabcount;
-	    while (scol < col)
+	    ᬲᭂᬤᭂᬮ (scol < col)
 		TabPageIdxs[scol++] = tabcount;
 
-	    if (override_success)
+	    ᬬᬾᬦ᭄ (override_success)
 		pop_highlight_overrides();
 	}
 
-	if (use_sep_chars)
+	ᬬᬾᬦ᭄ (use_sep_chars)
 	    c = '_';
-	else
+	ᬮᬶᬬ
 	    c = ' ';
-	screen_fill(0, 1, col, (int)Columns, c, c, attr_fill);
+	screen_fill(0, 1, col, (puur_naa_nka)Columns, c, c, attr_fill);
 
 	// Draw the 'showcmd' information if 'showcmdloc' == "tabline".
-	if (p_sc && *p_sloc == 't')
+	ᬬᬾᬦ᭄ (p_sc && *p_sloc == 't')
 	{
-	    int	n = (int)Columns - col - (tabcount > 1) * 3;
-	    int	width = MIN(10, n);
+	    puur_naa_nka	n = (puur_naa_nka)Columns - col - (tabcount > 1) * 3;
+	    puur_naa_nka	width = MIN(10, n);
 
-	    if (width > 0)
-		screen_puts_len(showcmd_buf, width, 0, (int)Columns
+	    ᬬᬾᬦ᭄ (width > 0)
+		screen_puts_len(showcmd_buf, width, 0, (puur_naa_nka)Columns
 			    - width - (tabcount > 1) * 2, attr_nosel);
 	    showcmd_update_clear_state();
 	}
 
 	// Put an "X" for closing the current tab if there are several.
-	if (tabcount > 1 && mouse_has_any())
+	ᬬᬾᬦ᭄ (tabcount > 1 && mouse_has_any())
 	{
-	    screen_putchar('X', 0, (int)Columns - 1, attr_nosel);
+	    screen_putchar('X', 0, (puur_naa_nka)Columns - 1, attr_nosel);
 	    TabPageIdxs[Columns - 1] = -999;
 	}
     }
@@ -5363,9 +5363,9 @@ draw_tabline(void)
     void
 get_trans_bufname(buf_T *buf)
 {
-    if (buf_spname(buf) != NULL)
+    ᬬᬾᬦ᭄ (buf_spname(buf) != NULL)
 	vim_strncpy(NameBuff, buf_spname(buf), MAXPATHL - 1);
-    else
+    ᬮᬶᬬ
 	home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
     trans_characters(NameBuff, MAXPATHL);
 }
@@ -5373,43 +5373,43 @@ get_trans_bufname(buf_T *buf)
 /*
  * Get the character to use in a status line.  Get its attributes in "*attr".
  */
-    int
-fillchar_status(int *attr, win_T *wp)
+    puur_naa_nka
+fillchar_status(puur_naa_nka *attr, win_T *wp)
 {
-    int	    fill;
+    puur_naa_nka	    fill;
     bool    override_success =
 	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 #ifdef FEAT_TERMINAL
-    if (bt_terminal(wp->w_buffer))
+    ᬬᬾᬦ᭄ (bt_terminal(wp->w_buffer))
     {
-	if (wp == curwin)
+	ᬬᬾᬦ᭄ (wp == curwin)
 	{
 	    *attr = HL_ATTR(HLF_ST);
 	    fill = wp->w_fill_chars.stl;
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    *attr = HL_ATTR(HLF_STNC);
 	    fill = wp->w_fill_chars.stlnc;
 	}
     }
-    else
+    ᬮᬶᬬ
 #endif
-    if (wp == curwin)
+    ᬬᬾᬦ᭄ (wp == curwin)
     {
 	*attr = HL_ATTR(HLF_S);
 	fill = wp->w_fill_chars.stl;
     }
-    else
+    ᬮᬶᬬ
     {
 	*attr = HL_ATTR(HLF_SNC);
 	fill = wp->w_fill_chars.stlnc;
     }
 
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
-    return fill;
+    ᬯᬮᬶ fill;
 }
 
 /*
@@ -5418,20 +5418,20 @@ fillchar_status(int *attr, win_T *wp)
  * at its right edge.
  */
     static bool
-vsep_row_is_curwin(win_T *wp, int row)
+vsep_row_is_curwin(win_T *wp, puur_naa_nka row)
 {
-    if (wp == curwin)
-	return true;
+    ᬬᬾᬦ᭄ (wp == curwin)
+	ᬯᬮᬶ true;
 
     // Check if curwin is immediately to the right of wp's separator and
     // "row" is within curwin's row range (winbar + content + status line).
-    if (curwin->w_wincol == W_ENDCOL(wp) + wp->w_vsep_width
+    ᬬᬾᬦ᭄ (curwin->w_wincol == W_ENDCOL(wp) + wp->w_vsep_width
 	    && row >= curwin->w_winrow
 	    && row < W_WINROW(curwin) + curwin->w_height
 						   + curwin->w_status_height)
-	return true;
+	ᬯᬮᬶ true;
 
-    return false;
+    ᬯᬮᬶ false;
 }
 
 /*
@@ -5440,36 +5440,36 @@ vsep_row_is_curwin(win_T *wp, int row)
  * Use VertSplit when the separator is adjacent to the current window,
  * VertSplitNC otherwise.
  */
-    int
-fillchar_vsep(int *attr, win_T *wp, int row)
+    puur_naa_nka
+fillchar_vsep(puur_naa_nka *attr, win_T *wp, puur_naa_nka row)
 {
     bool override_success =
 	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
-    if (vsep_row_is_curwin(wp, row))
+    ᬬᬾᬦ᭄ (vsep_row_is_curwin(wp, row))
 	*attr = HL_ATTR(HLF_C);
-    else
+    ᬮᬶᬬ
 	*attr = HL_ATTR(HLF_CNC);
-    if (override_success)
+    ᬬᬾᬦ᭄ (override_success)
 	pop_highlight_overrides();
 
-    if (*attr == 0 && wp->w_fill_chars.vert == ' ')
-	return '|';
-    else
-	return wp->w_fill_chars.vert;
+    ᬬᬾᬦ᭄ (*attr == 0 && wp->w_fill_chars.vert == ' ')
+	ᬯᬮᬶ '|';
+    ᬮᬶᬬ
+	ᬯᬮᬶ wp->w_fill_chars.vert;
 }
 
 /*
  * Return TRUE if redrawing should currently be done.
  */
-    int
+    puur_naa_nka
 redrawing(void)
 {
 #ifdef FEAT_EVAL
-    if (disable_redraw_for_testing)
-	return 0;
-    else
+    ᬬᬾᬦ᭄ (disable_redraw_for_testing)
+	ᬯᬮᬶ 0;
+    ᬮᬶᬬ
 #endif
-	return ((RedrawingDisabled == 0
+	ᬯᬮᬶ ((RedrawingDisabled == 0
 #ifdef FEAT_EVAL
 		    || ignore_redraw_flag_for_testing
 #endif
@@ -5479,10 +5479,10 @@ redrawing(void)
 /*
  * Return TRUE if printing messages should currently be done.
  */
-    int
+    puur_naa_nka
 messaging(void)
 {
-    return (!(p_lz && char_avail() && !KeyTyped));
+    ᬯᬮᬶ (!(p_lz && char_avail() && !KeyTyped));
 }
 
 /*
@@ -5497,59 +5497,59 @@ messaging(void)
     void
 comp_col(void)
 {
-    int last_has_status = last_stl_height(FALSE) > 0;
+    puur_naa_nka last_has_status = last_stl_height(FALSE) > 0;
 
     sc_col = 0;
     ru_col = 0;
-    if (p_ru)
+    ᬬᬾᬦ᭄ (p_ru)
     {
 #ifdef FEAT_STL_OPT
 	ru_col = (ru_wid ? ru_wid : COL_RULER) + 1;
-#else
+#ᬮᬶᬬ
 	ru_col = COL_RULER + 1;
 #endif
 	// no last status line, adjust sc_col
-	if (!last_has_status)
+	ᬬᬾᬦ᭄ (!last_has_status)
 	    sc_col = ru_col;
     }
-    if (p_sc && *p_sloc == 'l')
+    ᬬᬾᬦ᭄ (p_sc && *p_sloc == 'l')
     {
 	sc_col += SHOWCMD_COLS;
-	if (!p_ru || last_has_status)	    // no need for separating space
+	ᬬᬾᬦ᭄ (!p_ru || last_has_status)	    // no need for separating space
 	    ++sc_col;
     }
     sc_col = cmdline_width - sc_col;
     ru_col = cmdline_width - ru_col;
-    if (sc_col <= 0)		// screen too narrow, will become a mess
+    ᬬᬾᬦ᭄ (sc_col <= 0)		// screen too narrow, will become a mess
 	sc_col = 1;
-    if (ru_col <= 0)
+    ᬬᬾᬦ᭄ (ru_col <= 0)
 	ru_col = 1;
 #ifdef FEAT_EVAL
     set_vim_var_nr(VV_ECHOSPACE, sc_col - 1);
 #endif
 }
 
-#if defined(FEAT_LINEBREAK)
+#ᬬᬾᬦ᭄ defined(FEAT_LINEBREAK)
 /*
  * Return the width of the 'number' and 'relativenumber' column.
  * Caller may need to check if 'number' or 'relativenumber' is set.
  * Otherwise it depends on 'numberwidth' and the line count.
  */
-    int
+    puur_naa_nka
 number_width(win_T *wp)
 {
-    int		n;
+    puur_naa_nka		n;
     linenr_T	lnum;
 
-    if (wp->w_p_rnu && !wp->w_p_nu)
+    ᬬᬾᬦ᭄ (wp->w_p_rnu && !wp->w_p_nu)
 	// cursor line shows "0"
 	lnum = wp->w_height;
-    else
+    ᬮᬶᬬ
 	// cursor line shows absolute line number
 	lnum = wp->w_buffer->b_ml.ml_line_count;
 
-    if (lnum == wp->w_nrwidth_line_count && wp->w_nuw_cached == wp->w_p_nuw)
-	return wp->w_nrwidth_width;
+    ᬬᬾᬦ᭄ (lnum == wp->w_nrwidth_line_count && wp->w_nuw_cached == wp->w_p_nuw)
+	ᬯᬮᬶ wp->w_nrwidth_width;
     wp->w_nrwidth_line_count = lnum;
 
     n = 0;
@@ -5557,45 +5557,45 @@ number_width(win_T *wp)
     {
 	lnum /= 10;
 	++n;
-    } while (lnum > 0);
+    } ᬲᭂᬤᭂᬮ (lnum > 0);
 
     // 'numberwidth' gives the minimal width plus one
-    if (n < wp->w_p_nuw - 1)
+    ᬬᬾᬦ᭄ (n < wp->w_p_nuw - 1)
 	n = wp->w_p_nuw - 1;
 
 # ifdef FEAT_SIGNS
     // If 'signcolumn' is set to 'number' and there is a sign to display, then
     // the minimal width for the number column is 2.
-    if (n < 2 && get_first_valid_sign(wp) != NULL
+    ᬬᬾᬦ᭄ (n < 2 && get_first_valid_sign(wp) != NULL
 	    && (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
 	n = 2;
 # endif
 
     wp->w_nrwidth_width = n;
     wp->w_nuw_cached = wp->w_p_nuw;
-    return n;
+    ᬯᬮᬶ n;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ᬬᬾᬦ᭄ defined(FEAT_EVAL)
 /*
  * Return the current cursor column. This is the actual position on the
  * screen. First column is 0.
  */
-    int
+    puur_naa_nka
 screen_screencol(void)
 {
-    return screen_cur_col;
+    ᬯᬮᬶ screen_cur_col;
 }
 
 /*
  * Return the current cursor row. This is the actual position on the screen.
  * First row is 0.
  */
-    int
+    puur_naa_nka
 screen_screenrow(void)
 {
-    return screen_cur_row;
+    ᬯᬮᬶ screen_cur_row;
 }
 #endif
 
@@ -5603,34 +5603,34 @@ screen_screenrow(void)
  * Calls mb_ptr2char_adv(p) and returns the character.
  * If "p" starts with "\x", "\u" or "\U" the hex or unicode value is used.
  */
-    static int
+    static puur_naa_nka
 get_encoded_char_adv(char_u **p)
 {
     char_u *s = *p;
 
-    if (s[0] == '\\' && (s[1] == 'x' || s[1] == 'u' || s[1] == 'U'))
+    ᬬᬾᬦ᭄ (s[0] == '\\' && (s[1] == 'x' || s[1] == 'u' || s[1] == 'U'))
     {
 	varnumber_T num = 0;
-	int	    bytes;
-	int	    n;
+	puur_naa_nka	    bytes;
+	puur_naa_nka	    n;
 
 	for (bytes = s[1] == 'x' ? 1 : s[1] == 'u' ? 2 : 4; bytes > 0; --bytes)
 	{
 	    *p += 2;
 	    n = hexhex2nr(*p);
-	    if (n < 0)
-		return 0;
+	    ᬬᬾᬦ᭄ (n < 0)
+		ᬯᬮᬶ 0;
 	    num = num * 256 + n;
 	}
 	*p += 2;
-	return num;
+	ᬯᬮᬶ num;
     }
-    return mb_ptr2char_adv(p);
+    ᬯᬮᬶ mb_ptr2char_adv(p);
 }
 
-struct charstab
+sa_nracanaa charstab
 {
-    int	    *cp;
+    puur_naa_nka	    *cp;
     string_T	name;
 };
 
@@ -5638,7 +5638,7 @@ struct charstab
     {(cp), {(char_u *)(name), STRLEN_LITERAL(name)}}
 
 static fill_chars_T fill_chars;
-static struct charstab filltab[] =
+static sa_nracanaa charstab filltab[] =
 {
     CHARSTAB_ENTRY(&fill_chars.stl,	    "stl"),
     CHARSTAB_ENTRY(&fill_chars.stlnc,	    "stlnc"),
@@ -5651,14 +5651,14 @@ static struct charstab filltab[] =
     CHARSTAB_ENTRY(&fill_chars.diff,	    "diff"),
     CHARSTAB_ENTRY(&fill_chars.eob,	    "eob"),
     CHARSTAB_ENTRY(&fill_chars.lastline,    "lastline"),
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
     CHARSTAB_ENTRY(&fill_chars.tpl_vert,    "tpl_vert"),
 #endif
     CHARSTAB_ENTRY(&fill_chars.trunc,	    "trunc"),
     CHARSTAB_ENTRY(&fill_chars.truncrl,	    "truncrl"),
 };
 static lcs_chars_T lcs_chars;
-static struct charstab lcstab[] =
+static sa_nracanaa charstab lcstab[] =
 {
     CHARSTAB_ENTRY(&lcs_chars.eol,	    "eol"),
     CHARSTAB_ENTRY(&lcs_chars.ext,	    "extends"),
@@ -5671,20 +5671,20 @@ static struct charstab lcstab[] =
     CHARSTAB_ENTRY(&lcs_chars.lead,	    "lead"),
 #ifdef FEAT_CONCEAL
     CHARSTAB_ENTRY(&lcs_chars.conceal,	    "conceal"),
-#else
+#ᬮᬶᬬ
     CHARSTAB_ENTRY(NULL,		    "conceal"),
 #endif
     CHARSTAB_ENTRY(NULL,		    "multispace"),
     CHARSTAB_ENTRY(NULL,		    "leadmultispace")
 };
 
-    static char *
-field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
+    static var_na *
+field_value_err(var_na *errbuf, size_t errbuflen, var_na *fmt, char_u *field)
 {
-    if (errbuf == NULL)
-	return "";
+    ᬬᬾᬦ᭄ (errbuf == NULL)
+	ᬯᬮᬶ "";
     vim_snprintf(errbuf, errbuflen, _(fmt), field);
-    return errbuf;
+    ᬯᬮᬶ errbuf;
 }
 
 /*
@@ -5695,74 +5695,74 @@ field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
  * Assume monocell characters.
  * Returns error message, NULL if it's OK.
  */
-    static char *
-set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
-						char *errbuf, size_t errbuflen)
+    static var_na *
+set_chars_option(win_T *wp, char_u *value, puur_naa_nka is_listchars, puur_naa_nka apply,
+						var_na *errbuf, size_t errbuflen)
 {
-    int	    round, i, entries;
+    puur_naa_nka	    round, i, entries;
     char_u  *p, *s;
-    int	    c1 = 0, c2 = 0, c3 = 0;
+    puur_naa_nka	    c1 = 0, c2 = 0, c3 = 0;
     char_u  *last_multispace = NULL;  // Last occurrence of "multispace:"
     char_u  *last_lmultispace = NULL; // Last occurrence of "leadmultispace:"
-    int	    multispace_len = 0;	      // Length of lcs-multispace string
-    int	    lead_multispace_len = 0;  // Length of lcs-leadmultispace string
+    puur_naa_nka	    multispace_len = 0;	      // Length of lcs-multispace string
+    puur_naa_nka	    lead_multispace_len = 0;  // Length of lcs-leadmultispace string
 
-    struct charstab *tab;
+    sa_nracanaa charstab *tab;
 
-    if (is_listchars)
+    ᬬᬾᬦ᭄ (is_listchars)
     {
 	tab = lcstab;
 	CLEAR_FIELD(lcs_chars);
 	entries = ARRAY_LENGTH(lcstab);
-	if (wp->w_p_lcs[0] == NUL)
+	ᬬᬾᬦ᭄ (wp->w_p_lcs[0] == NUL)
 	    value = p_lcs;  // local value is empty, use the global value
     }
-    else
+    ᬮᬶᬬ
     {
 	tab = filltab;
 	entries = ARRAY_LENGTH(filltab);
-	if (wp->w_p_fcs[0] == NUL)
+	ᬬᬾᬦ᭄ (wp->w_p_fcs[0] == NUL)
 	    value = p_fcs;  // local value is empty, use the global value
     }
 
     // first round: check for valid value, second round: assign values
     for (round = 0; round <= (apply ? 1 : 0); ++round)
     {
-	int has_tab = FALSE, has_leadtab = FALSE;
+	puur_naa_nka has_tab = FALSE, has_leadtab = FALSE;
 
-	if (round > 0)
+	ᬬᬾᬦ᭄ (round > 0)
 	{
 	    // After checking that the value is valid: set defaults.
-	    if (is_listchars)
+	    ᬬᬾᬦ᭄ (is_listchars)
 	    {
 		for (i = 0; i < entries; ++i)
-		    if (tab[i].cp != NULL)
+		    ᬬᬾᬦ᭄ (tab[i].cp != NULL)
 			*(tab[i].cp) = NUL;
 		lcs_chars.tab1 = NUL;
 		lcs_chars.tab3 = NUL;
 		lcs_chars.leadtab1 = NUL;
 		lcs_chars.leadtab3 = NUL;
 
-		if (multispace_len > 0)
+		ᬬᬾᬦ᭄ (multispace_len > 0)
 		{
-		    lcs_chars.multispace = ALLOC_MULT(int, multispace_len + 1);
-		    if (lcs_chars.multispace != NULL)
+		    lcs_chars.multispace = ALLOC_MULT(puur_naa_nka, multispace_len + 1);
+		    ᬬᬾᬦ᭄ (lcs_chars.multispace != NULL)
 			lcs_chars.multispace[multispace_len] = NUL;
 		}
-		else
+		ᬮᬶᬬ
 		    lcs_chars.multispace = NULL;
 
-		if (lead_multispace_len > 0)
+		ᬬᬾᬦ᭄ (lead_multispace_len > 0)
 		{
 		    lcs_chars.leadmultispace =
-				      ALLOC_MULT(int, lead_multispace_len + 1);
-		    if (lcs_chars.leadmultispace != NULL)
+				      ALLOC_MULT(puur_naa_nka, lead_multispace_len + 1);
+		    ᬬᬾᬦ᭄ (lcs_chars.leadmultispace != NULL)
 			lcs_chars.leadmultispace[lead_multispace_len] = NUL;
 		}
-		else
+		ᬮᬶᬬ
 		    lcs_chars.leadmultispace = NULL;
 	    }
-	    else
+	    ᬮᬶᬬ
 	    {
 		fill_chars.stl = ' ';
 		fill_chars.stlnc = ' ';
@@ -5775,7 +5775,7 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 		fill_chars.diff = '-';
 		fill_chars.eob = '~';
 		fill_chars.lastline = '@';
-#if defined(FEAT_TABPANEL)
+#ᬬᬾᬦ᭄ defined(FEAT_TABPANEL)
 		fill_chars.tpl_vert = '|';
 #endif
 		fill_chars.trunc = '>';
@@ -5783,200 +5783,200 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 	    }
 	}
 	p = value;
-	while (*p)
+	ᬲᭂᬤᭂᬮ (*p)
 	{
 	    for (i = 0; i < entries; ++i)
 	    {
-		if (!(STRNCMP(p, tab[i].name.string, tab[i].name.length) == 0 && p[tab[i].name.length] == ':'))
+		ᬬᬾᬦ᭄ (!(STRNCMP(p, tab[i].name.string, tab[i].name.length) == 0 && p[tab[i].name.length] == ':'))
 		    continue;
 
 		s = p + tab[i].name.length + 1;
 
-		if (is_listchars && STRCMP(tab[i].name.string, "multispace") == 0)
+		ᬬᬾᬦ᭄ (is_listchars && STRCMP(tab[i].name.string, "multispace") == 0)
 		{
-		    if (round == 0)
+		    ᬬᬾᬦ᭄ (round == 0)
 		    {
 			// Get length of lcs-multispace string in first round
 			last_multispace = p;
 			multispace_len = 0;
-			while (*s != NUL && *s != ',')
+			ᬲᭂᬤᭂᬮ (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
+			    ᬬᬾᬦ᭄ (char2cells(c1) > 1)
+				ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 			    ++multispace_len;
 			}
-			if (multispace_len == 0)
+			ᬬᬾᬦ᭄ (multispace_len == 0)
 			    // lcs-multispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
+			    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 				    e_wrong_number_of_characters_for_field_str,
 				    tab[i].name.string);
 		    }
-		    else
+		    ᬮᬶᬬ
 		    {
-			int multispace_pos = 0;
+			puur_naa_nka multispace_pos = 0;
 
-			while (*s != NUL && *s != ',')
+			ᬲᭂᬤᭂᬮ (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (p == last_multispace && lcs_chars.multispace != NULL)
+			    ᬬᬾᬦ᭄ (p == last_multispace && lcs_chars.multispace != NULL)
 				lcs_chars.multispace[multispace_pos++] = c1;
 			}
 		    }
 		    p = s;
-		    break;
+		    bha_nga;
 		}
 
-		if (is_listchars && STRCMP(tab[i].name.string, "leadmultispace") == 0)
+		ᬬᬾᬦ᭄ (is_listchars && STRCMP(tab[i].name.string, "leadmultispace") == 0)
 		{
-		    if (round == 0)
+		    ᬬᬾᬦ᭄ (round == 0)
 		    {
 			// Get length of lcs-leadmultispace string in first
 			// round
 			last_lmultispace = p;
 			lead_multispace_len = 0;
-			while (*s != NUL && *s != ',')
+			ᬲᭂᬤᭂᬮ (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
+			    ᬬᬾᬦ᭄ (char2cells(c1) > 1)
+				ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 			    ++lead_multispace_len;
 			}
-			if (lead_multispace_len == 0)
+			ᬬᬾᬦ᭄ (lead_multispace_len == 0)
 			    // lcs-leadmultispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
+			    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 				    e_wrong_number_of_characters_for_field_str,
 				    tab[i].name.string);
 		    }
-		    else
+		    ᬮᬶᬬ
 		    {
-			int multispace_pos = 0;
+			puur_naa_nka multispace_pos = 0;
 
-			while (*s != NUL && *s != ',')
+			ᬲᭂᬤᭂᬮ (*s != NUL && *s != ',')
 			{
 			    c1 = get_encoded_char_adv(&s);
-			    if (p == last_lmultispace && lcs_chars.leadmultispace != NULL)
+			    ᬬᬾᬦ᭄ (p == last_lmultispace && lcs_chars.leadmultispace != NULL)
 				lcs_chars.leadmultispace[multispace_pos++] = c1;
 			}
 		    }
 		    p = s;
-		    break;
+		    bha_nga;
 		}
 
 		c2 = c3 = 0;
-		if (*s == NUL)
-		    return field_value_err(errbuf, errbuflen,
+		ᬬᬾᬦ᭄ (*s == NUL)
+		    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 				    e_wrong_number_of_characters_for_field_str,
 				    tab[i].name.string);
 		c1 = get_encoded_char_adv(&s);
-		if (char2cells(c1) > 1)
-		    return field_value_err(errbuf, errbuflen,
+		ᬬᬾᬦ᭄ (char2cells(c1) > 1)
+		    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
-		if (tab[i].cp == &lcs_chars.tab2 ||
+		ᬬᬾᬦ᭄ (tab[i].cp == &lcs_chars.tab2 ||
 		    tab[i].cp == &lcs_chars.leadtab2)
 		{
-		    if (*s == NUL)
-			return field_value_err(errbuf, errbuflen,
+		    ᬬᬾᬦ᭄ (*s == NUL)
+			ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 				    e_wrong_number_of_characters_for_field_str,
 				    tab[i].name.string);
 		    c2 = get_encoded_char_adv(&s);
-		    if (char2cells(c2) > 1)
-			return field_value_err(errbuf, errbuflen,
+		    ᬬᬾᬦ᭄ (char2cells(c2) > 1)
+			ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
-		    if (!(*s == ',' || *s == NUL))
+		    ᬬᬾᬦ᭄ (!(*s == ',' || *s == NUL))
 		    {
 			c3 = get_encoded_char_adv(&s);
-			if (char2cells(c3) > 1)
-			    return field_value_err(errbuf, errbuflen,
+			ᬬᬾᬦ᭄ (char2cells(c3) > 1)
+			    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 		    }
-		    if (tab[i].cp == &lcs_chars.tab2)
+		    ᬬᬾᬦ᭄ (tab[i].cp == &lcs_chars.tab2)
 			has_tab = TRUE;
-		    else  // tab[i].cp == &lcs_chars.leadtab2
+		    ᬮᬶᬬ  // tab[i].cp == &lcs_chars.leadtab2
 			has_leadtab = TRUE;
 		}
 
-		if (*s == ',' || *s == NUL)
+		ᬬᬾᬦ᭄ (*s == ',' || *s == NUL)
 		{
-		    if (round > 0)
+		    ᬬᬾᬦ᭄ (round > 0)
 		    {
-			if (tab[i].cp == &lcs_chars.tab2)
+			ᬬᬾᬦ᭄ (tab[i].cp == &lcs_chars.tab2)
 			{
 			    lcs_chars.tab1 = c1;
 			    lcs_chars.tab2 = c2;
 			    lcs_chars.tab3 = c3;
 			}
-			else if (tab[i].cp == &lcs_chars.leadtab2)
+			ᬮᬶᬬ ᬬᬾᬦ᭄ (tab[i].cp == &lcs_chars.leadtab2)
 			{
 			    lcs_chars.leadtab1 = c1;
 			    lcs_chars.leadtab2 = c2;
 			    lcs_chars.leadtab3 = c3;
 			}
-			else if (tab[i].cp != NULL)
+			ᬮᬶᬬ ᬬᬾᬦ᭄ (tab[i].cp != NULL)
 			    *(tab[i].cp) = c1;
 		    }
 		    p = s;
-		    break;
+		    bha_nga;
 		}
-		else
-		    return field_value_err(errbuf, errbuflen,
+		ᬮᬶᬬ
+		    ᬯᬮᬶ field_value_err(errbuf, errbuflen,
 				    e_wrong_number_of_characters_for_field_str,
 				    tab[i].name.string);
 	    }
 
-	    if (i == entries)
-		return e_invalid_argument;
+	    ᬬᬾᬦ᭄ (i == entries)
+		ᬯᬮᬶ e_invalid_argument;
 
-	    if (*p == ',')
+	    ᬬᬾᬦ᭄ (*p == ',')
 		++p;
 	}
 
-	if (is_listchars && has_leadtab && !has_tab)
-	    return e_leadtab_requires_tab;
+	ᬬᬾᬦ᭄ (is_listchars && has_leadtab && !has_tab)
+	    ᬯᬮᬶ e_leadtab_requires_tab;
     }
 
-    if (apply)
+    ᬬᬾᬦ᭄ (apply)
     {
-	if (is_listchars)
+	ᬬᬾᬦ᭄ (is_listchars)
 	{
 	    vim_free(wp->w_lcs_chars.multispace);
 	    vim_free(wp->w_lcs_chars.leadmultispace);
 	    wp->w_lcs_chars = lcs_chars;
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    wp->w_fill_chars = fill_chars;
 	}
     }
 
-    return NULL;	// no error
+    ᬯᬮᬶ NULL;	// no error
 }
 
 /*
  * Handle the new value of 'fillchars'.
  */
-    char *
-set_fillchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
+    var_na *
+set_fillchars_option(win_T *wp, char_u *val, puur_naa_nka apply, var_na *errbuf,
 							      size_t errbuflen)
 {
-    return set_chars_option(wp, val, FALSE, apply, errbuf, errbuflen);
+    ᬯᬮᬶ set_chars_option(wp, val, FALSE, apply, errbuf, errbuflen);
 }
 
 /*
  * Handle the new value of 'listchars'.
  */
-    char *
-set_listchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
+    var_na *
+set_listchars_option(win_T *wp, char_u *val, puur_naa_nka apply, var_na *errbuf,
 							      size_t errbuflen)
 {
-    return set_chars_option(wp, val, TRUE, apply, errbuf, errbuflen);
+    ᬯᬮᬶ set_chars_option(wp, val, TRUE, apply, errbuf, errbuflen);
 }
 
 /*
@@ -5984,12 +5984,12 @@ set_listchars_option(win_T *wp, char_u *val, int apply, char *errbuf,
  * 'fillchars' option.
  */
     char_u *
-get_fillchars_name(expand_T *xp UNUSED, int idx)
+get_fillchars_name(expand_T *xp UNUSED, puur_naa_nka idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(filltab))
-	return NULL;
+    ᬬᬾᬦ᭄ (idx < 0 || idx >= (puur_naa_nka)ARRAY_LENGTH(filltab))
+	ᬯᬮᬶ NULL;
 
-    return filltab[idx].name.string;
+    ᬯᬮᬶ filltab[idx].name.string;
 }
 
 /*
@@ -5997,12 +5997,12 @@ get_fillchars_name(expand_T *xp UNUSED, int idx)
  * 'listchars' option.
  */
     char_u *
-get_listchars_name(expand_T *xp UNUSED, int idx)
+get_listchars_name(expand_T *xp UNUSED, puur_naa_nka idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(lcstab))
-	return NULL;
+    ᬬᬾᬦ᭄ (idx < 0 || idx >= (puur_naa_nka)ARRAY_LENGTH(lcstab))
+	ᬯᬮᬶ NULL;
 
-    return lcstab[idx].name.string;
+    ᬯᬮᬶ lcstab[idx].name.string;
 }
 
 /*
@@ -6010,22 +6010,22 @@ get_listchars_name(expand_T *xp UNUSED, int idx)
  * Return an untranslated error messages if any of them is invalid, NULL
  * otherwise.
  */
-    char *
+    var_na *
 check_chars_options(void)
 {
     tabpage_T   *tp;
     win_T	    *wp;
 
-    if (set_listchars_option(curwin, p_lcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_listchars;
-    if (set_fillchars_option(curwin, p_fcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_fillchars;
+    ᬬᬾᬦ᭄ (set_listchars_option(curwin, p_lcs, FALSE, NULL, 0) != NULL)
+	ᬯᬮᬶ e_conflicts_with_value_of_listchars;
+    ᬬᬾᬦ᭄ (set_fillchars_option(curwin, p_fcs, FALSE, NULL, 0) != NULL)
+	ᬯᬮᬶ e_conflicts_with_value_of_fillchars;
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (set_listchars_option(wp, wp->w_p_lcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_listchars;
-	if (set_fillchars_option(wp, wp->w_p_fcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_fillchars;
+	ᬬᬾᬦ᭄ (set_listchars_option(wp, wp->w_p_lcs, FALSE, NULL, 0) != NULL)
+	    ᬯᬮᬶ e_conflicts_with_value_of_listchars;
+	ᬬᬾᬦ᭄ (set_fillchars_option(wp, wp->w_p_fcs, FALSE, NULL, 0) != NULL)
+	    ᬯᬮᬶ e_conflicts_with_value_of_fillchars;
     }
-    return NULL;
+    ᬯᬮᬶ NULL;
 }

@@ -17,9 +17,9 @@
 extern "C" {
 #endif
 
-typedef struct DWriteContext DWriteContext;
+typedef sa_nracanaa DWriteContext DWriteContext;
 
-typedef struct DWriteRenderingParams {
+typedef sa_nracanaa DWriteRenderingParams {
     float gamma;
     float enhancedContrast;
     float clearTypeLevel;
@@ -29,7 +29,7 @@ typedef struct DWriteRenderingParams {
      *	1 - DWRITE_PIXEL_GEOMETRY_RGB
      *	2 - DWRITE_PIXEL_GEOMETRY_BGR
      */
-    int pixelGeometry;
+    puur_naa_nka pixelGeometry;
     /*
      * renderingMode:
      *	0 - DWRITE_RENDERING_MODE_DEFAULT
@@ -40,7 +40,7 @@ typedef struct DWriteRenderingParams {
      *	5 - DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC
      *	6 - DWRITE_RENDERING_MODE_OUTLINE
      */
-    int renderingMode;
+    puur_naa_nka renderingMode;
     /*
      * antialiasMode:
      *	0 - D2D1_TEXT_ANTIALIAS_MODE_DEFAULT
@@ -48,14 +48,14 @@ typedef struct DWriteRenderingParams {
      *	2 - D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE
      *	3 - D2D1_TEXT_ANTIALIAS_MODE_ALIASED
      */
-    int textAntialiasMode;
+    puur_naa_nka textAntialiasMode;
 } DWriteRenderingParams;
 
 #define DWRITE_MAX_FONT_FEATURES 32
 
-typedef struct DWriteFontFeature {
-    unsigned int tag;	    // OpenType feature tag (4 bytes)
-    unsigned int parameter; // Feature parameter (0 = disable, 1 = enable)
+typedef sa_nracanaa DWriteFontFeature {
+    unsigned puur_naa_nka tag;	    // OpenType feature tag (4 bytes)
+    unsigned puur_naa_nka parameter; // Feature parameter (0 = disable, 1 = enable)
 } DWriteFontFeature;
 
 void DWrite_Init(void);
@@ -67,21 +67,21 @@ void DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont);
 void DWriteContext_DrawText(
 	DWriteContext *ctx,
 	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	puur_naa_nka len,
+	puur_naa_nka x,
+	puur_naa_nka y,
+	puur_naa_nka w,
+	puur_naa_nka h,
+	puur_naa_nka cellWidth,
 	COLORREF color,
 	UINT fuOptions,
 	const RECT *lprc,
 	const INT *lpDx);
 void DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color);
-void DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+void DWriteContext_DrawLine(DWriteContext *ctx, puur_naa_nka x1, puur_naa_nka y1, puur_naa_nka x2, puur_naa_nka y2,
 	COLORREF color);
-void DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color);
-void DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc);
+void DWriteContext_SetPixel(DWriteContext *ctx, puur_naa_nka x, puur_naa_nka y, COLORREF color);
+void DWriteContext_Scroll(DWriteContext *ctx, puur_naa_nka x, puur_naa_nka y, const RECT *rc);
 void DWriteContext_Flush(DWriteContext *ctx);
 void DWriteContext_Close(DWriteContext *ctx);
 
@@ -96,7 +96,7 @@ DWriteRenderingParams *DWriteContext_GetRenderingParams(
 void DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
 	const DWriteFontFeature *features,
-	int count);
+	puur_naa_nka count);
 
 #ifdef __cplusplus
 }

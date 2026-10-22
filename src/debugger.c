@@ -13,8 +13,8 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
-static int debug_greedy = FALSE;	// batch mode debugging: don't save
+#ᬬᬾᬦ᭄ defined(FEAT_EVAL)
+static puur_naa_nka debug_greedy = FALSE;	// batch mode debugging: don't save
 					// and restore typeahead.
 static void do_setdebugtracelevel(char_u *arg);
 static void do_checkbacktracelevel(void);
@@ -22,12 +22,12 @@ static void do_showbacktrace(char_u *cmd);
 
 static char_u *debug_oldval = NULL;	// old and newval for debug expressions
 static char_u *debug_newval = NULL;
-static int     debug_expr   = 0;	// use debug_expr
+static puur_naa_nka     debug_expr   = 0;	// use debug_expr
 
-    int
+    puur_naa_nka
 has_watchexpr(void)
 {
-    return debug_expr;
+    ᬯᬮᬶ debug_expr;
 }
 
 /*
@@ -37,23 +37,23 @@ has_watchexpr(void)
     void
 do_debug(char_u *cmd)
 {
-    int		save_msg_scroll = msg_scroll;
-    int		save_State = State;
-    int		save_did_emsg = did_emsg;
-    int		save_cmd_silent = cmd_silent;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_redir_off = redir_off;
+    puur_naa_nka		save_msg_scroll = msg_scroll;
+    puur_naa_nka		save_State = State;
+    puur_naa_nka		save_did_emsg = did_emsg;
+    puur_naa_nka		save_cmd_silent = cmd_silent;
+    puur_naa_nka		save_msg_silent = msg_silent;
+    puur_naa_nka		save_emsg_silent = emsg_silent;
+    puur_naa_nka		save_redir_off = redir_off;
     tasave_T	typeaheadbuf;
-    int		typeahead_saved = FALSE;
-    int		save_ignore_script = 0;
-    int		save_ex_normal_busy;
-    int		n;
+    puur_naa_nka		typeahead_saved = FALSE;
+    puur_naa_nka		save_ignore_script = 0;
+    puur_naa_nka		save_ex_normal_busy;
+    puur_naa_nka		n;
     char_u	*cmdline = NULL;
     char_u	*p;
     char_u	*sname;
-    char	*tail = NULL;
-    static int	last_cmd = 0;
+    var_na	*tail = NULL;
+    static puur_naa_nka	last_cmd = 0;
 #define CMD_CONT	1
 #define CMD_NEXT	2
 #define CMD_STEP	3
@@ -67,11 +67,11 @@ do_debug(char_u *cmd)
 
 #ifdef ALWAYS_USE_GUI
     // Can't do this when there is no terminal for input/output.
-    if (!gui.in_use)
+    ᬬᬾᬦ᭄ (!gui.in_use)
     {
 	// Break as soon as possible.
 	debug_break_level = 9999;
-	return;
+	ᬯᬮᬶ;
     }
 #endif
 
@@ -92,25 +92,25 @@ do_debug(char_u *cmd)
     State = MODE_NORMAL;
     debug_mode = TRUE;
 
-    if (!debug_did_msg)
+    ᬬᬾᬦ᭄ (!debug_did_msg)
 	msg(_("Entering Debug mode.  Type \"cont\" to continue."));
-    if (debug_oldval != NULL)
+    ᬬᬾᬦ᭄ (debug_oldval != NULL)
     {
 	smsg(_("Oldval = \"%s\""), debug_oldval);
 	VIM_CLEAR(debug_oldval);
     }
-    if (debug_newval != NULL)
+    ᬬᬾᬦ᭄ (debug_newval != NULL)
     {
 	smsg(_("Newval = \"%s\""), debug_newval);
 	VIM_CLEAR(debug_newval);
     }
     sname = estack_sfile(ESTACK_NONE);
-    if (sname != NULL)
-	msg((char *)sname);
+    ᬬᬾᬦ᭄ (sname != NULL)
+	msg((var_na *)sname);
     vim_free(sname);
-    if (SOURCING_LNUM != 0)
+    ᬬᬾᬦ᭄ (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), SOURCING_LNUM, cmd);
-    else
+    ᬮᬶᬬ
 	smsg(_("cmd: %s"), cmd);
 
     // Repeat getting a command and executing it.
@@ -126,7 +126,7 @@ do_debug(char_u *cmd)
 	// it empty. Set ignore_script to avoid reading from script input.
 	save_ex_normal_busy = ex_normal_busy;
 	ex_normal_busy = 0;
-	if (!debug_greedy)
+	ᬬᬾᬦ᭄ (!debug_greedy)
 	{
 	    save_typeahead(&typeaheadbuf);
 	    typeahead_saved = TRUE;
@@ -142,7 +142,7 @@ do_debug(char_u *cmd)
 	cmdline = getcmdline_prompt('>', NULL, 0, EXPAND_NOTHING, NULL);
 
 	debug_break_level = n;
-	if (typeahead_saved)
+	ᬬᬾᬦ᭄ (typeahead_saved)
 	{
 	    restore_typeahead(&typeaheadbuf, TRUE);
 	    ignore_script = save_ignore_script;
@@ -151,129 +151,129 @@ do_debug(char_u *cmd)
 
 	cmdline_row = msg_row;
 	msg_starthere();
-	if (cmdline != NULL)
+	ᬬᬾᬦ᭄ (cmdline != NULL)
 	{
 	    // If this is a debug command, set "last_cmd".
 	    // If not, reset "last_cmd".
 	    // For a blank line use previous command.
 	    p = skipwhite(cmdline);
-	    if (*p != NUL)
+	    ᬬᬾᬦ᭄ (*p != NUL)
 	    {
 		switch (*p)
 		{
-		    case 'c': last_cmd = CMD_CONT;
+		    pak_sa 'c': last_cmd = CMD_CONT;
 			      tail = "ont";
-			      break;
-		    case 'n': last_cmd = CMD_NEXT;
+			      bha_nga;
+		    pak_sa 'n': last_cmd = CMD_NEXT;
 			      tail = "ext";
-			      break;
-		    case 's': last_cmd = CMD_STEP;
+			      bha_nga;
+		    pak_sa 's': last_cmd = CMD_STEP;
 			      tail = "tep";
-			      break;
-		    case 'f':
+			      bha_nga;
+		    pak_sa 'f':
 			      last_cmd = 0;
-			      if (p[1] == 'r')
+			      ᬬᬾᬦ᭄ (p[1] == 'r')
 			      {
 				  last_cmd = CMD_FRAME;
 				  tail = "rame";
 			      }
-			      else
+			      ᬮᬶᬬ
 			      {
 				  last_cmd = CMD_FINISH;
 				  tail = "inish";
 			      }
-			      break;
-		    case 'q': last_cmd = CMD_QUIT;
+			      bha_nga;
+		    pak_sa 'q': last_cmd = CMD_QUIT;
 			      tail = "uit";
-			      break;
-		    case 'i': last_cmd = CMD_INTERRUPT;
+			      bha_nga;
+		    pak_sa 'i': last_cmd = CMD_INTERRUPT;
 			      tail = "nterrupt";
-			      break;
-		    case 'b': last_cmd = CMD_BACKTRACE;
-			      if (p[1] == 't')
+			      bha_nga;
+		    pak_sa 'b': last_cmd = CMD_BACKTRACE;
+			      ᬬᬾᬦ᭄ (p[1] == 't')
 				  tail = "t";
-			      else
+			      ᬮᬶᬬ
 				  tail = "acktrace";
-			      break;
-		    case 'w': last_cmd = CMD_BACKTRACE;
+			      bha_nga;
+		    pak_sa 'w': last_cmd = CMD_BACKTRACE;
 			      tail = "here";
-			      break;
-		    case 'u': last_cmd = CMD_UP;
+			      bha_nga;
+		    pak_sa 'u': last_cmd = CMD_UP;
 			      tail = "p";
-			      break;
-		    case 'd': last_cmd = CMD_DOWN;
+			      bha_nga;
+		    pak_sa 'd': last_cmd = CMD_DOWN;
 			      tail = "own";
-			      break;
+			      bha_nga;
 		    default: last_cmd = 0;
 		}
-		if (last_cmd != 0)
+		ᬬᬾᬦ᭄ (last_cmd != 0)
 		{
 		    // Check that the tail matches.
 		    ++p;
-		    while (*p != NUL && *p == *tail)
+		    ᬲᭂᬤᭂᬮ (*p != NUL && *p == *tail)
 		    {
 			++p;
 			++tail;
 		    }
-		    if (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
+		    ᬬᬾᬦ᭄ (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
 			last_cmd = 0;
 		}
 	    }
 
-	    if (last_cmd != 0)
+	    ᬬᬾᬦ᭄ (last_cmd != 0)
 	    {
 		// Execute debug command: decide where to break next and
 		// return.
 		switch (last_cmd)
 		{
-		    case CMD_CONT:
+		    pak_sa CMD_CONT:
 			debug_break_level = -1;
-			break;
-		    case CMD_NEXT:
+			bha_nga;
+		    pak_sa CMD_NEXT:
 			debug_break_level = ex_nesting_level;
-			break;
-		    case CMD_STEP:
+			bha_nga;
+		    pak_sa CMD_STEP:
 			debug_break_level = 9999;
-			break;
-		    case CMD_FINISH:
+			bha_nga;
+		    pak_sa CMD_FINISH:
 			debug_break_level = ex_nesting_level - 1;
-			break;
-		    case CMD_QUIT:
+			bha_nga;
+		    pak_sa CMD_QUIT:
 			got_int = TRUE;
 			debug_break_level = -1;
-			break;
-		    case CMD_INTERRUPT:
+			bha_nga;
+		    pak_sa CMD_INTERRUPT:
 			got_int = TRUE;
 			debug_break_level = 9999;
 			// Do not repeat ">interrupt" cmd, continue stepping.
 			last_cmd = CMD_STEP;
-			break;
-		    case CMD_BACKTRACE:
+			bha_nga;
+		    pak_sa CMD_BACKTRACE:
 			do_showbacktrace(cmd);
 			continue;
-		    case CMD_FRAME:
-			if (*p == NUL)
+		    pak_sa CMD_FRAME:
+			ᬬᬾᬦ᭄ (*p == NUL)
 			{
 			    do_showbacktrace(cmd);
 			}
-			else
+			ᬮᬶᬬ
 			{
 			    p = skipwhite(p);
 			    do_setdebugtracelevel(p);
 			}
 			continue;
-		    case CMD_UP:
+		    pak_sa CMD_UP:
 			debug_backtrace_level++;
 			do_checkbacktracelevel();
 			continue;
-		    case CMD_DOWN:
+		    pak_sa CMD_DOWN:
 			debug_backtrace_level--;
 			do_checkbacktracelevel();
 			continue;
 		}
 		// Going out reset backtrace_level
 		debug_backtrace_level = 0;
-		break;
+		bha_nga;
 	    }
 
 	    // don't debug this command
@@ -287,7 +287,7 @@ do_debug(char_u *cmd)
     }
     vim_free(cmdline);
 
-    if (RedrawingDisabled > 0)
+    ᬬᬾᬦ᭄ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     redraw_all_later(UPD_NOT_VALID);
@@ -308,33 +308,33 @@ do_debug(char_u *cmd)
     debug_did_msg = TRUE;
 }
 
-    static int
+    static puur_naa_nka
 get_maxbacktrace_level(char_u *sname)
 {
-    char	*p, *q;
-    int		maxbacktrace = 0;
+    var_na	*p, *q;
+    puur_naa_nka		maxbacktrace = 0;
 
-    if (sname == NULL)
-	return 0;
+    ᬬᬾᬦ᭄ (sname == NULL)
+	ᬯᬮᬶ 0;
 
-    p = (char *)sname;
-    while ((q = strstr(p, "..")) != NULL)
+    p = (var_na *)sname;
+    ᬲᭂᬤᭂᬮ ((q = strstr(p, "..")) != NULL)
     {
 	p = q + 2;
 	maxbacktrace++;
     }
-    return maxbacktrace;
+    ᬯᬮᬶ maxbacktrace;
 }
 
     static void
 do_setdebugtracelevel(char_u *arg)
 {
-    int level;
+    puur_naa_nka level;
 
-    level = atoi((char *)arg);
-    if (*arg == '+' || level < 0)
+    level = atoi((var_na *)arg);
+    ᬬᬾᬦ᭄ (*arg == '+' || level < 0)
 	debug_backtrace_level += level;
-    else
+    ᬮᬶᬬ
 	debug_backtrace_level = level;
 
     do_checkbacktracelevel();
@@ -343,17 +343,17 @@ do_setdebugtracelevel(char_u *arg)
     static void
 do_checkbacktracelevel(void)
 {
-    if (debug_backtrace_level < 0)
+    ᬬᬾᬦ᭄ (debug_backtrace_level < 0)
     {
 	debug_backtrace_level = 0;
 	msg(_("frame is zero"));
     }
-    else
+    ᬮᬶᬬ
     {
 	char_u	*sname = estack_sfile(ESTACK_NONE);
-	int	max = get_maxbacktrace_level(sname);
+	puur_naa_nka	max = get_maxbacktrace_level(sname);
 
-	if (debug_backtrace_level > max)
+	ᬬᬾᬦ᭄ (debug_backtrace_level > max)
 	{
 	    debug_backtrace_level = max;
 	    smsg(_("frame at highest level: %d"), max);
@@ -366,37 +366,37 @@ do_checkbacktracelevel(void)
 do_showbacktrace(char_u *cmd)
 {
     char_u  *sname;
-    char    *cur;
-    char    *next;
-    int	    i = 0;
-    int	    max;
+    var_na    *cur;
+    var_na    *next;
+    puur_naa_nka	    i = 0;
+    puur_naa_nka	    max;
 
     sname = estack_sfile(ESTACK_NONE);
     max = get_maxbacktrace_level(sname);
-    if (sname != NULL)
+    ᬬᬾᬦ᭄ (sname != NULL)
     {
-	cur = (char *)sname;
-	while (!got_int)
+	cur = (var_na *)sname;
+	ᬲᭂᬤᭂᬮ (!got_int)
 	{
 	    next = strstr(cur, "..");
-	    if (next != NULL)
+	    ᬬᬾᬦ᭄ (next != NULL)
 		*next = NUL;
-	    if (i == max - debug_backtrace_level)
+	    ᬬᬾᬦ᭄ (i == max - debug_backtrace_level)
 		smsg("->%d %s", max - i, cur);
-	    else
+	    ᬮᬶᬬ
 		smsg("  %d %s", max - i, cur);
 	    ++i;
-	    if (next == NULL)
-		break;
+	    ᬬᬾᬦ᭄ (next == NULL)
+		bha_nga;
 	    *next = '.';
 	    cur = next + 2;
 	}
 	vim_free(sname);
     }
 
-    if (SOURCING_LNUM != 0)
+    ᬬᬾᬦ᭄ (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), (long)SOURCING_LNUM, cmd);
-    else
+    ᬮᬶᬬ
 	smsg(_("cmd: %s"), cmd);
 }
 
@@ -406,7 +406,7 @@ do_showbacktrace(char_u *cmd)
     void
 ex_debug(exarg_T *eap)
 {
-    int		debug_break_level_save = debug_break_level;
+    puur_naa_nka		debug_break_level_save = debug_break_level;
 
     debug_break_level = 9999;
     do_cmdline_cmd(eap->arg);
@@ -423,7 +423,7 @@ static linenr_T	debug_breakpoint_lnum;
  * a skipped command decides itself that a debug prompt should be displayed, it
  * can do so by calling dbg_check_skipped().
  */
-static int	debug_skipped;
+static puur_naa_nka	debug_skipped;
 static char_u	*debug_skipped_name;
 
 /*
@@ -439,16 +439,16 @@ dbg_check_breakpoint(exarg_T *eap)
     char_u	*p;
 
     debug_skipped = FALSE;
-    if (debug_breakpoint_name != NULL)
+    ᬬᬾᬦ᭄ (debug_breakpoint_name != NULL)
     {
-	if (!eap->skip)
+	ᬬᬾᬦ᭄ (!eap->skip)
 	{
 	    // replace K_SNR with "<SNR>"
-	    if (debug_breakpoint_name[0] == K_SPECIAL
+	    ᬬᬾᬦ᭄ (debug_breakpoint_name[0] == K_SPECIAL
 		    && debug_breakpoint_name[1] == KS_EXTRA
 		    && debug_breakpoint_name[2] == KE_SNR)
 		p = (char_u *)"<SNR>";
-	    else
+	    ᬮᬶᬬ
 		p = (char_u *)"";
 	    smsg(_("Breakpoint in \"%s%s\" line %ld"),
 		    p,
@@ -457,18 +457,18 @@ dbg_check_breakpoint(exarg_T *eap)
 	    debug_breakpoint_name = NULL;
 	    do_debug(eap->cmd);
 	}
-	else
+	ᬮᬶᬬ
 	{
 	    debug_skipped = TRUE;
 	    debug_skipped_name = debug_breakpoint_name;
 	    debug_breakpoint_name = NULL;
 	}
     }
-    else if (ex_nesting_level <= debug_break_level)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (ex_nesting_level <= debug_break_level)
     {
-	if (!eap->skip)
+	ᬬᬾᬦ᭄ (!eap->skip)
 	    do_debug(eap->cmd);
-	else
+	ᬮᬶᬬ
 	{
 	    debug_skipped = TRUE;
 	    debug_skipped_name = NULL;
@@ -480,13 +480,13 @@ dbg_check_breakpoint(exarg_T *eap)
  * Go to debug mode if skipped by dbg_check_breakpoint() because eap->skip was
  * set.  Return TRUE when the debug mode is entered this time.
  */
-    int
+    puur_naa_nka
 dbg_check_skipped(exarg_T *eap)
 {
-    int		prev_got_int;
+    puur_naa_nka		prev_got_int;
 
-    if (!debug_skipped)
-	return FALSE;
+    ᬬᬾᬦ᭄ (!debug_skipped)
+	ᬯᬮᬶ FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
     // interruption cause flushing the input buffer.
@@ -498,46 +498,46 @@ dbg_check_skipped(exarg_T *eap)
     (void)dbg_check_breakpoint(eap);
     eap->skip = TRUE;
     got_int |= prev_got_int;
-    return TRUE;
+    ᬯᬮᬶ TRUE;
 }
 
 /*
  * The list of breakpoints: dbg_breakp.
  * This is a grow-array of structs.
  */
-struct debuggy
+sa_nracanaa debuggy
 {
-    int		dbg_nr;		// breakpoint number
-    int		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
+    puur_naa_nka		dbg_nr;		// breakpoint number
+    puur_naa_nka		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
     char_u	*dbg_name;	// function, expression or file name
     regprog_T	*dbg_prog;	// regexp program
     linenr_T	dbg_lnum;	// line number in function or file
-    int		dbg_forceit;	// ! used
+    puur_naa_nka		dbg_forceit;	// ! used
 #ifdef FEAT_EVAL
     typval_T    *dbg_val;       // last result of watchexpression
 #endif
-    int		dbg_level;      // stored nested level for expr
+    puur_naa_nka		dbg_level;      // stored nested level for expr
 };
 
-static garray_T dbg_breakp = {0, 0, sizeof(struct debuggy), 4, NULL};
-#define BREAKP(idx)		(((struct debuggy *)dbg_breakp.ga_data)[idx])
-#define DEBUGGY(gap, idx)	(((struct debuggy *)gap->ga_data)[idx])
-static int last_breakp = 0;	// nr of last defined breakpoint
-static int has_expr_breakpoint = FALSE;
+static garray_T dbg_breakp = {0, 0, parimaa_na(sa_nracanaa debuggy), 4, NULL};
+#define BREAKP(idx)		(((sa_nracanaa debuggy *)dbg_breakp.ga_data)[idx])
+#define DEBUGGY(gap, idx)	(((sa_nracanaa debuggy *)gap->ga_data)[idx])
+static puur_naa_nka last_breakp = 0;	// nr of last defined breakpoint
+static puur_naa_nka has_expr_breakpoint = FALSE;
 
 #ifdef FEAT_PROFILE
 // Profiling uses file and func names similar to breakpoints.
-static garray_T prof_ga = {0, 0, sizeof(struct debuggy), 4, NULL};
+static garray_T prof_ga = {0, 0, parimaa_na(sa_nracanaa debuggy), 4, NULL};
 
 // Profiling caches results of regexp lookups for function/script name.
 # define N_PROF_HTAB 2
 static hashtab_T prof_cache[N_PROF_HTAB];
 # define PROF_HTAB_FUNCS 0
 # define PROF_HTAB_FILES 1
-static int prof_cache_initialized;
-typedef struct profentry_S
+static puur_naa_nka prof_cache_initialized;
+typedef sa_nracanaa profentry_S
 {
-    char    pen_flags;	// cache data booleans: profiling, forceit
+    var_na    pen_flags;	// cache data booleans: profiling, forceit
     char_u  pen_name[1]; // actually longer
 } profentry_T;
 # define PEN_FLAG_PROFILING 1
@@ -552,24 +552,24 @@ typedef struct profentry_S
 # define HI2PE(hi)	HIKEY2PE((hi)->hi_key)
 
 static void prof_clear_cache(void);
-# define PROF_CLEAR_CACHE(gap) do {if ((gap) == &prof_ga) prof_clear_cache();} while (0)
+# define PROF_CLEAR_CACHE(gap) do {ᬬᬾᬦ᭄ ((gap) == &prof_ga) prof_clear_cache();} ᬲᭂᬤᭂᬮ (0)
 // Can enable to get some info about profile caching
 // #define PROF_CACHE_LOG
-#else
-# define PROF_CLEAR_CACHE(gap) do {} while (0)
+#ᬮᬶᬬ
+# define PROF_CLEAR_CACHE(gap) do {} ᬲᭂᬤᭂᬮ (0)
 #endif
 #define DBG_FUNC	1
 #define DBG_FILE	2
 #define DBG_EXPR	3
 
-static linenr_T debuggy_find(int file,char_u *fname, linenr_T after, garray_T *gap, int *fp);
+static linenr_T debuggy_find(puur_naa_nka file,char_u *fname, linenr_T after, garray_T *gap, puur_naa_nka *fp);
 
 /*
  * Evaluate the "bp->dbg_name" expression and return the result.
  * Disables error messages.
  */
     static typval_T *
-eval_expr_no_emsg(struct debuggy *bp)
+eval_expr_no_emsg(sa_nracanaa debuggy *bp)
 {
     typval_T	*tv;
 
@@ -578,7 +578,7 @@ eval_expr_no_emsg(struct debuggy *bp)
     tv = eval_expr(bp->dbg_name, NULL);
     --emsg_off;
 
-    return tv;
+    ᬯᬮᬶ tv;
 }
 
 /*
@@ -587,56 +587,56 @@ eval_expr_no_emsg(struct debuggy *bp)
  * is allocated.
  * Returns FAIL for failure.
  */
-    static int
+    static puur_naa_nka
 dbg_parsearg(
     char_u	*arg,
     garray_T	*gap)	    // either &dbg_breakp or &prof_ga
 {
     char_u	*p = arg;
     char_u	*q;
-    struct debuggy *bp;
-    int		here = FALSE;
+    sa_nracanaa debuggy *bp;
+    puur_naa_nka		here = FALSE;
 
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    ᬬᬾᬦ᭄ (ga_grow(gap, 1) == FAIL)
+	ᬯᬮᬶ FAIL;
     bp = &DEBUGGY(gap, gap->ga_len);
 
     // Find "func" or "file".
-    if (STRNCMP(p, "func", 4) == 0)
+    ᬬᬾᬦ᭄ (STRNCMP(p, "func", 4) == 0)
 	bp->dbg_type = DBG_FUNC;
-    else if (STRNCMP(p, "file", 4) == 0)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (STRNCMP(p, "file", 4) == 0)
 	bp->dbg_type = DBG_FILE;
-    else if (
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "here", 4) == 0)
     {
-	if (curbuf->b_ffname == NULL)
+	ᬬᬾᬦ᭄ (curbuf->b_ffname == NULL)
 	{
 	    emsg(_(e_no_file_name));
-	    return FAIL;
+	    ᬯᬮᬶ FAIL;
 	}
 	bp->dbg_type = DBG_FILE;
 	here = TRUE;
     }
-    else if (
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "expr", 4) == 0)
 	bp->dbg_type = DBG_EXPR;
-    else
+    ᬮᬶᬬ
     {
 	semsg(_(e_invalid_argument_str), p);
-	return FAIL;
+	ᬯᬮᬶ FAIL;
     }
     p = skipwhite(p + 4);
 
     // Find optional line number.
-    if (here)
+    ᬬᬾᬦ᭄ (here)
 	bp->dbg_lnum = curwin->w_cursor.lnum;
-    else if (
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
@@ -645,52 +645,52 @@ dbg_parsearg(
 	bp->dbg_lnum = getdigits(&p);
 	p = skipwhite(p);
     }
-    else
+    ᬮᬶᬬ
 	bp->dbg_lnum = 0;
 
     // Find the function or file name.  Don't accept a function name with ().
-    if ((!here && *p == NUL)
+    ᬬᬾᬦ᭄ ((!here && *p == NUL)
 	    || (here && *p != NUL)
-	    || (bp->dbg_type == DBG_FUNC && strstr((char *)p, "()") != NULL))
+	    || (bp->dbg_type == DBG_FUNC && strstr((var_na *)p, "()") != NULL))
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return FAIL;
+	ᬯᬮᬶ FAIL;
     }
 
-    if (bp->dbg_type == DBG_FUNC)
+    ᬬᬾᬦ᭄ (bp->dbg_type == DBG_FUNC)
 	bp->dbg_name = vim_strsave(STRNCMP(p, "g:", 2) == 0 ? p + 2 : p);
-    else if (here)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (here)
 	bp->dbg_name = vim_strsave(curbuf->b_ffname);
-    else if (bp->dbg_type == DBG_EXPR)
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (bp->dbg_type == DBG_EXPR)
     {
 	bp->dbg_name = vim_strsave(p);
-	if (bp->dbg_name != NULL)
+	ᬬᬾᬦ᭄ (bp->dbg_name != NULL)
 	    bp->dbg_val = eval_expr_no_emsg(bp);
     }
-    else
+    ᬮᬶᬬ
     {
 	// Expand the file name in the same way as do_source().  This means
 	// doing it twice, so that $DIR/file gets expanded when $DIR is
 	// "~/dir".
 	q = expand_env_save(p);
-	if (q == NULL)
-	    return FAIL;
+	ᬬᬾᬦ᭄ (q == NULL)
+	    ᬯᬮᬶ FAIL;
 	p = expand_env_save(q);
 	vim_free(q);
-	if (p == NULL)
-	    return FAIL;
-	if (*p != '*')
+	ᬬᬾᬦ᭄ (p == NULL)
+	    ᬯᬮᬶ FAIL;
+	ᬬᬾᬦ᭄ (*p != '*')
 	{
 	    bp->dbg_name = fix_fname(p);
 	    vim_free(p);
 	}
-	else
+	ᬮᬶᬬ
 	    bp->dbg_name = p;
     }
 
-    if (bp->dbg_name == NULL)
-	return FAIL;
-    return OK;
+    ᬬᬾᬦ᭄ (bp->dbg_name == NULL)
+	ᬯᬮᬶ FAIL;
+    ᬯᬮᬶ OK;
 }
 
 /*
@@ -699,38 +699,38 @@ dbg_parsearg(
     void
 ex_breakadd(exarg_T *eap)
 {
-    struct debuggy *bp;
+    sa_nracanaa debuggy *bp;
     char_u	*pat;
     garray_T	*gap;
 
     gap = &dbg_breakp;
 #ifdef FEAT_PROFILE
-    if (eap->cmdidx == CMD_profile)
+    ᬬᬾᬦ᭄ (eap->cmdidx == CMD_profile)
 	gap = &prof_ga;
 #endif
 
-    if (dbg_parsearg(eap->arg, gap) != OK)
-	return;
+    ᬬᬾᬦ᭄ (dbg_parsearg(eap->arg, gap) != OK)
+	ᬯᬮᬶ;
 
     bp = &DEBUGGY(gap, gap->ga_len);
     bp->dbg_forceit = eap->forceit;
 
-    if (bp->dbg_type != DBG_EXPR)
+    ᬬᬾᬦ᭄ (bp->dbg_type != DBG_EXPR)
     {
 	pat = file_pat_to_reg_pat(bp->dbg_name, NULL, NULL, FALSE);
-	if (pat != NULL)
+	ᬬᬾᬦ᭄ (pat != NULL)
 	{
 	    bp->dbg_prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
 	    vim_free(pat);
 	}
-	if (pat == NULL || bp->dbg_prog == NULL)
+	ᬬᬾᬦ᭄ (pat == NULL || bp->dbg_prog == NULL)
 	    vim_free(bp->dbg_name);
-	else
+	ᬮᬶᬬ
 	{
-	    if (bp->dbg_lnum == 0)	// default line number is 1
+	    ᬬᬾᬦ᭄ (bp->dbg_lnum == 0)	// default line number is 1
 		bp->dbg_lnum = 1;
 #ifdef FEAT_PROFILE
-	    if (eap->cmdidx != CMD_profile)
+	    ᬬᬾᬦ᭄ (eap->cmdidx != CMD_profile)
 #endif
 	    {
 		DEBUGGY(gap, gap->ga_len).dbg_nr = ++last_breakp;
@@ -740,12 +740,12 @@ ex_breakadd(exarg_T *eap)
 	    PROF_CLEAR_CACHE(gap);
 	}
     }
-    else
+    ᬮᬶᬬ
     {
 	// DBG_EXPR
 	DEBUGGY(gap, gap->ga_len++).dbg_nr = ++last_breakp;
 	++debug_tick;
-	if (gap == &dbg_breakp)
+	ᬬᬾᬦ᭄ (gap == &dbg_breakp)
 	    has_expr_breakpoint = TRUE;
     }
 }
@@ -756,33 +756,33 @@ ex_breakadd(exarg_T *eap)
     void
 ex_debuggreedy(exarg_T *eap)
 {
-    if (eap->addr_count == 0 || eap->line2 != 0)
+    ᬬᬾᬦ᭄ (eap->addr_count == 0 || eap->line2 != 0)
 	debug_greedy = TRUE;
-    else
+    ᬮᬶᬬ
 	debug_greedy = FALSE;
 }
 
     static void
 update_has_expr_breakpoint(void)
 {
-    int i;
+    puur_naa_nka i;
 
     has_expr_breakpoint = FALSE;
     for (i = 0; i < dbg_breakp.ga_len; ++i)
-	if (BREAKP(i).dbg_type == DBG_EXPR)
+	ᬬᬾᬦ᭄ (BREAKP(i).dbg_type == DBG_EXPR)
 	{
 	    has_expr_breakpoint = TRUE;
-	    break;
+	    bha_nga;
 	}
 }
 
 /*
  * Return TRUE if there is any expression breakpoint.
  */
-    int
+    puur_naa_nka
 debug_has_expr_breakpoint(void)
 {
-    return has_expr_breakpoint;
+    ᬯᬮᬶ has_expr_breakpoint;
 }
 
 /*
@@ -791,51 +791,51 @@ debug_has_expr_breakpoint(void)
     void
 ex_breakdel(exarg_T *eap)
 {
-    struct debuggy *bp, *bpi;
-    int		nr;
-    int		todel = -1;
-    int		del_all = FALSE;
-    int		i;
+    sa_nracanaa debuggy *bp, *bpi;
+    puur_naa_nka		nr;
+    puur_naa_nka		todel = -1;
+    puur_naa_nka		del_all = FALSE;
+    puur_naa_nka		i;
     linenr_T	best_lnum = 0;
     garray_T	*gap;
 
     gap = &dbg_breakp;
-    if (eap->cmdidx == CMD_profdel)
+    ᬬᬾᬦ᭄ (eap->cmdidx == CMD_profdel)
     {
 #ifdef FEAT_PROFILE
 	gap = &prof_ga;
-#else
+#ᬮᬶᬬ
 	ex_ni(eap);
-	return;
+	ᬯᬮᬶ;
 #endif
     }
 
-    if (vim_isdigit(*eap->arg))
+    ᬬᬾᬦ᭄ (vim_isdigit(*eap->arg))
     {
 	// ":breakdel {nr}"
-	nr = atol((char *)eap->arg);
+	nr = atol((var_na *)eap->arg);
 	for (i = 0; i < gap->ga_len; ++i)
-	    if (DEBUGGY(gap, i).dbg_nr == nr)
+	    ᬬᬾᬦ᭄ (DEBUGGY(gap, i).dbg_nr == nr)
 	    {
 		todel = i;
-		break;
+		bha_nga;
 	    }
     }
-    else if (*eap->arg == '*')
+    ᬮᬶᬬ ᬬᬾᬦ᭄ (*eap->arg == '*')
     {
 	todel = 0;
 	del_all = TRUE;
     }
-    else
+    ᬮᬶᬬ
     {
 	// ":breakdel {func|file|expr} [lnum] {name}"
-	if (dbg_parsearg(eap->arg, gap) == FAIL)
-	    return;
+	ᬬᬾᬦ᭄ (dbg_parsearg(eap->arg, gap) == FAIL)
+	    ᬯᬮᬶ;
 	bp = &DEBUGGY(gap, gap->ga_len);
 	for (i = 0; i < gap->ga_len; ++i)
 	{
 	    bpi = &DEBUGGY(gap, i);
-	    if (bp->dbg_type == bpi->dbg_type
+	    ᬬᬾᬦ᭄ (bp->dbg_type == bpi->dbg_type
 		    && STRCMP(bp->dbg_name, bpi->dbg_name) == 0
 		    && (bp->dbg_lnum == bpi->dbg_lnum
 			|| (bp->dbg_lnum == 0
@@ -849,38 +849,38 @@ ex_breakdel(exarg_T *eap)
 	vim_free(bp->dbg_name);
     }
 
-    if (todel < 0)
+    ᬬᬾᬦ᭄ (todel < 0)
     {
 	semsg(_(e_breakpoint_not_found_str), eap->arg);
-	return;
+	ᬯᬮᬶ;
     }
 
-    while (gap->ga_len > 0)
+    ᬲᭂᬤᭂᬮ (gap->ga_len > 0)
     {
 	vim_free(DEBUGGY(gap, todel).dbg_name);
 #ifdef FEAT_EVAL
-	if (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
+	ᬬᬾᬦ᭄ (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
 		&& DEBUGGY(gap, todel).dbg_val != NULL)
 	    free_tv(DEBUGGY(gap, todel).dbg_val);
 #endif
 	vim_regfree(DEBUGGY(gap, todel).dbg_prog);
 	--gap->ga_len;
-	if (todel < gap->ga_len)
+	ᬬᬾᬦ᭄ (todel < gap->ga_len)
 	    mch_memmove(&DEBUGGY(gap, todel), &DEBUGGY(gap, todel + 1),
-		    (gap->ga_len - todel) * sizeof(struct debuggy));
+		    (gap->ga_len - todel) * parimaa_na(sa_nracanaa debuggy));
 #ifdef FEAT_PROFILE
-	if (eap->cmdidx == CMD_breakdel)
+	ᬬᬾᬦ᭄ (eap->cmdidx == CMD_breakdel)
 #endif
 	    ++debug_tick;
-	if (!del_all)
-	    break;
+	ᬬᬾᬦ᭄ (!del_all)
+	    bha_nga;
     }
     PROF_CLEAR_CACHE(gap);
 
     // If all breakpoints were removed clear the array.
-    if (gap->ga_len == 0)
+    ᬬᬾᬦ᭄ (gap->ga_len == 0)
 	ga_clear(gap);
-    if (gap == &dbg_breakp)
+    ᬬᬾᬦ᭄ (gap == &dbg_breakp)
 	update_has_expr_breakpoint();
 }
 
@@ -890,27 +890,27 @@ ex_breakdel(exarg_T *eap)
     void
 ex_breaklist(exarg_T *eap UNUSED)
 {
-    struct debuggy *bp;
-    int		i;
+    sa_nracanaa debuggy *bp;
+    puur_naa_nka		i;
 
-    if (dbg_breakp.ga_len == 0)
+    ᬬᬾᬦ᭄ (dbg_breakp.ga_len == 0)
     {
 	msg(_("No breakpoints defined"));
-	return;
+	ᬯᬮᬶ;
     }
 
     for (i = 0; i < dbg_breakp.ga_len; ++i)
     {
 	bp = &BREAKP(i);
-	if (bp->dbg_type == DBG_FILE)
+	ᬬᬾᬦ᭄ (bp->dbg_type == DBG_FILE)
 	    home_replace(NULL, bp->dbg_name, NameBuff, MAXPATHL, TRUE);
-	if (bp->dbg_type != DBG_EXPR)
+	ᬬᬾᬦ᭄ (bp->dbg_type != DBG_EXPR)
 	    smsg(_("%3d  %s %s  line %ld"),
 		    bp->dbg_nr,
 		    bp->dbg_type == DBG_FUNC ? "func" : "file",
 		    bp->dbg_type == DBG_FUNC ? bp->dbg_name : NameBuff,
 		    (long)bp->dbg_lnum);
-	else
+	ᬮᬶᬬ
 	    smsg(_("%3d  expr %s"),
 		    bp->dbg_nr, bp->dbg_name);
     }
@@ -922,87 +922,87 @@ ex_breaklist(exarg_T *eap UNUSED)
  */
     linenr_T
 dbg_find_breakpoint(
-    int		file,	    // TRUE for a file, FALSE for a function
+    puur_naa_nka		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after)	    // after this line number
 {
-    return debuggy_find(file, fname, after, &dbg_breakp, NULL);
+    ᬯᬮᬶ debuggy_find(file, fname, after, &dbg_breakp, NULL);
 }
 
-#if defined(FEAT_PROFILE)
-# if defined(PROF_CACHE_LOG)
-static int count_lookups[2];
+#ᬬᬾᬦ᭄ defined(FEAT_PROFILE)
+# ᬬᬾᬦ᭄ defined(PROF_CACHE_LOG)
+static puur_naa_nka count_lookups[2];
 # endif
 /*
  * Return TRUE if profiling is on for a function or sourced file.
  * Cache the results of debuggy_find().
  * Cache is cleared whenever prof_ga.ga_len is changed.
  */
-    int
+    puur_naa_nka
 has_profiling(
-    int		file,	    // TRUE for a file, FALSE for a function
+    puur_naa_nka		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
-    int		*fp,	    // return: forceit
+    puur_naa_nka		*fp,	    // return: forceit
     hash_T	*hashp)	    // use/return fname hash, may be NULL
 {
-    if (prof_ga.ga_len == 0 || !prof_cache_initialized)
-	return debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
+    ᬬᬾᬦ᭄ (prof_ga.ga_len == 0 || !prof_cache_initialized)
+	ᬯᬮᬶ debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
 							     != (linenr_T)0;
 
     hash_T hash;
-    if (hashp != NULL)
+    ᬬᬾᬦ᭄ (hashp != NULL)
     {
 	hash = *hashp;
-	if (hash == 0)
+	ᬬᬾᬦ᭄ (hash == 0)
 	{
 	    hash = hash_hash(fname);
 	    *hashp = hash;
 	}
     }
-    else
+    ᬮᬶᬬ
 	hash = hash_hash(fname);
 
     hashtab_T *ht = &prof_cache[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS];
     hashitem_T *hi = hash_lookup(ht, fname, hash);
     profentry_T *pe;
-    if (HASHITEM_EMPTY(hi))
+    ᬬᬾᬦ᭄ (HASHITEM_EMPTY(hi))
     {
 	pe = alloc(offsetof(profentry_T, pen_name) + STRLEN(fname) + 1);
-	if (pe == NULL)
-	    return FALSE;
+	ᬬᬾᬦ᭄ (pe == NULL)
+	    ᬯᬮᬶ FALSE;
 	STRCPY(pe->pen_name, fname);
 	pe->pen_flags = 0;
 	// run debuggy_find and capture return and forceit
-	int f;
-	int lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
-	if (lnum)
+	puur_naa_nka f;
+	puur_naa_nka lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
+	ᬬᬾᬦ᭄ (lnum)
 	{
 	    PEN_SET_PROFILING(pe);
-	    if (f)
+	    ᬬᬾᬦ᭄ (f)
 		PEN_SET_FORCEIT(pe);
 	}
 	hash_add_item(ht, hi, pe->pen_name, hash);
-# if defined(PROF_CACHE_LOG)
+# ᬬᬾᬦ᭄ defined(PROF_CACHE_LOG)
 	ch_log(NULL, "has_profiling: %s %s forceit %s, profile %s",
 	       file ? "file" : "func", fname,
 	       PEN_IS_FORCEIT(pe) ? "true" : "false",
 	       PEN_IS_PROFILING(pe) ? "true" : "false");
 # endif
     }
-    else
+    ᬮᬶᬬ
 	pe = HI2PE(hi);
-    if (fp)
+    ᬬᬾᬦ᭄ (fp)
 	*fp = PEN_IS_FORCEIT(pe);
-# if defined(PROF_CACHE_LOG)
+# ᬬᬾᬦ᭄ defined(PROF_CACHE_LOG)
     count_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
 # endif
-    return PEN_IS_PROFILING(pe);
+    ᬯᬮᬶ PEN_IS_PROFILING(pe);
 }
 
     static void
 prof_clear_cache(void)
 {
-    if (!prof_cache_initialized)
+    ᬬᬾᬦ᭄ (!prof_cache_initialized)
     {
 	hash_init(&prof_cache[PROF_HTAB_FUNCS]);
 	hash_init(&prof_cache[PROF_HTAB_FILES]);
@@ -1012,10 +1012,10 @@ prof_clear_cache(void)
     hashtab_T *ht;
     for (ht = &prof_cache[0]; ht < &prof_cache[N_PROF_HTAB]; ht++)
     {
-	if (ht->ht_used > 0)
+	ᬬᬾᬦ᭄ (ht->ht_used > 0)
 	{
-# if defined(PROF_CACHE_LOG)
-	    int idx = ht == &prof_cache[PROF_HTAB_FUNCS]
+# ᬬᬾᬦ᭄ defined(PROF_CACHE_LOG)
+	    puur_naa_nka idx = ht == &prof_cache[PROF_HTAB_FUNCS]
 		      ? PROF_HTAB_FUNCS : PROF_HTAB_FILES;
 	    ch_log(NULL, "prof_clear_cache: %s, used: %ld, lookups: %d",
 		   idx == PROF_HTAB_FUNCS ? "function" : "script",
@@ -1034,22 +1034,22 @@ prof_clear_cache(void)
  */
     static linenr_T
 debuggy_find(
-    int		is_file,    // TRUE for a file, FALSE for a function
+    puur_naa_nka		is_file,    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after,	    // after this line number
     garray_T	*gap,	    // either &dbg_breakp or &prof_ga
-    int		*fp)	    // if not NULL: return forceit
+    puur_naa_nka		*fp)	    // if not NULL: return forceit
 {
-    struct debuggy *bp;
-    int		i;
+    sa_nracanaa debuggy *bp;
+    puur_naa_nka		i;
     linenr_T	lnum = 0;
     char_u	*name = NULL;
     char_u	*short_name = fname;
-    int		prev_got_int;
+    puur_naa_nka		prev_got_int;
 
     // Return quickly when there are no breakpoints.
-    if (gap->ga_len == 0)
-	return (linenr_T)0;
+    ᬬᬾᬦ᭄ (gap->ga_len == 0)
+	ᬯᬮᬶ (linenr_T)0;
 
     // For a script-local function remove the prefix, so that
     // "profile func Func" matches "Func" in any script.  Otherwise it's very
@@ -1057,11 +1057,11 @@ debuggy_find(
     // function in the wrong script, but that is much better than not being
     // able to profile/debug a function in a script with unknown ID.
     // Also match a script-specific name.
-    if (!is_file && fname[0] == K_SPECIAL)
+    ᬬᬾᬦ᭄ (!is_file && fname[0] == K_SPECIAL)
     {
 	short_name = vim_strchr(fname, '_') + 1;
 	name = alloc(STRLEN(fname) + 3);
-	if (name != NULL)
+	ᬬᬾᬦ᭄ (name != NULL)
 	{
 	    STRCPY(name, "<SNR>");
 	    STRCPY(name + 5, fname + 3);
@@ -1073,7 +1073,7 @@ debuggy_find(
 	// Skip entries that are not useful or are for a line that is beyond
 	// an already found breakpoint.
 	bp = &DEBUGGY(gap, i);
-	if (((bp->dbg_type == DBG_FILE) == is_file
+	ᬬᬾᬦ᭄ (((bp->dbg_type == DBG_FILE) == is_file
 		    && bp->dbg_type != DBG_EXPR && (
 #ifdef FEAT_PROFILE
 		gap == &prof_ga ||
@@ -1085,31 +1085,31 @@ debuggy_find(
 	    // while matching should abort it.
 	    prev_got_int = got_int;
 	    got_int = FALSE;
-	    if ((name != NULL
+	    ᬬᬾᬦ᭄ ((name != NULL
 		   && vim_regexec_prog(&bp->dbg_prog, FALSE, name, (colnr_T)0))
 		    || vim_regexec_prog(&bp->dbg_prog, FALSE,
 						       short_name, (colnr_T)0))
 	    {
 		lnum = bp->dbg_lnum;
-		if (fp != NULL)
+		ᬬᬾᬦ᭄ (fp != NULL)
 		    *fp = bp->dbg_forceit;
 	    }
 	    got_int |= prev_got_int;
 #ifdef FEAT_PROFILE
-	    if (lnum && gap == &prof_ga)
-		break;
+	    ᬬᬾᬦ᭄ (lnum && gap == &prof_ga)
+		bha_nga;
 #endif
 	}
 #ifdef FEAT_EVAL
-	else if (bp->dbg_type == DBG_EXPR)
+	ᬮᬶᬬ ᬬᬾᬦ᭄ (bp->dbg_type == DBG_EXPR)
 	{
 	    typval_T *tv;
-	    int	      line = FALSE;
+	    puur_naa_nka	      line = FALSE;
 
 	    tv = eval_expr_no_emsg(bp);
-	    if (tv != NULL)
+	    ᬬᬾᬦ᭄ (tv != NULL)
 	    {
-		if (bp->dbg_val == NULL)
+		ᬬᬾᬦ᭄ (bp->dbg_val == NULL)
 		{
 		    vim_free(debug_oldval);
 		    debug_oldval = typval_tostring(NULL, TRUE);
@@ -1118,14 +1118,14 @@ debuggy_find(
 		    debug_newval = typval_tostring(bp->dbg_val, TRUE);
 		    line = TRUE;
 		}
-		else
+		ᬮᬶᬬ
 		{
 		    // Use "==" instead of "is" for strings, that is what we
 		    // always have done.
 		    exprtype_T	type = tv->v_type == VAR_STRING
 							? EXPR_EQUAL : EXPR_IS;
 
-		    if (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
+		    ᬬᬾᬦ᭄ (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
 			    && tv->vval.v_number == FALSE)
 		    {
 			typval_T *v;
@@ -1144,7 +1144,7 @@ debuggy_find(
 		    free_tv(tv);
 		}
 	    }
-	    else if (bp->dbg_val != NULL)
+	    ᬮᬶᬬ ᬬᬾᬦ᭄ (bp->dbg_val != NULL)
 	    {
 		vim_free(debug_oldval);
 		debug_oldval = typval_tostring(bp->dbg_val, TRUE);
@@ -1155,18 +1155,18 @@ debuggy_find(
 		line = TRUE;
 	    }
 
-	    if (line)
+	    ᬬᬾᬦ᭄ (line)
 	    {
 		lnum = after > 0 ? after : 1;
-		break;
+		bha_nga;
 	    }
 	}
 #endif
     }
-    if (name != fname)
+    ᬬᬾᬦ᭄ (name != fname)
 	vim_free(name);
 
-    return lnum;
+    ᬯᬮᬶ lnum;
 }
 
 /*
