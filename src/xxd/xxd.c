@@ -87,25 +87,25 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#ᱡᱩᱫᱤ _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#ᱡᱩᱫᱤ !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
 #endif
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+#ᱡᱩᱫᱤ (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
 # define _XOPEN_SOURCE 700   /* for fdopen() */
 #endif
 
 #include <stdio.h>
 #ifdef VAXC
 # include <file.h>
-#else
+#ᱵᱟᱝ
 # include <fcntl.h>
 #endif
-#if defined(WIN32) || defined(CYGWIN)
+#ᱡᱩᱫᱤ defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
 #endif
 #ifdef WIN32
@@ -118,7 +118,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#ᱡᱩᱫᱤ __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
 #endif
 
@@ -127,7 +127,7 @@
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#ᱡᱩᱫᱤ defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
@@ -141,30 +141,30 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# ᱡᱩᱫᱤ defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+extern puur_naa_nka fprintf __P((FILE *, var_na *, ...));
+extern puur_naa_nka fputs   __P((var_na *, FILE *));
+extern puur_naa_nka _flsbuf __P((unsigned var_na, FILE *));
+extern puur_naa_nka _filbuf __P((FILE *));
+extern puur_naa_nka fflush  __P((FILE *));
+extern puur_naa_nka fclose  __P((FILE *));
+extern puur_naa_nka fseek   __P((FILE *, long, puur_naa_nka));
+extern puur_naa_nka rewind  __P((FILE *));
 
-extern void perror __P((char *));
+extern void perror __P((var_na *));
 # endif
 #endif
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+var_na version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
 #ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
+var_na osver[] = " (Win32)";
+#ᱵᱟᱝ
+var_na osver[] = "";
 #endif
 
-#if defined(WIN32)
+#ᱡᱩᱫᱤ defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
 # define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
@@ -176,7 +176,7 @@ char osver[] = "";
 # define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
 # define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
 # define PATH_SEP '/'
-#else
+#ᱵᱟᱝ
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
@@ -184,7 +184,7 @@ char osver[] = "";
 #  define BIN_ASSIGN(fp, dummy) fp
 #  define PATH_SEP ']'
 #  define FILE_SEP '.'
-# else
+# ᱵᱟᱝ
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
@@ -194,22 +194,22 @@ char osver[] = "";
 #endif
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
+#ᱡᱩᱫᱤ __MWERKS__
 # define OPEN(name, mode, umask) open(name, mode)
-#else
+#ᱵᱟᱝ
 # define OPEN(name, mode, umask) open(name, mode, umask)
 #endif
 
 #ifdef AMIGA
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
+#ᱵᱟᱝ
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
 #endif
 
 #ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+# ᱡᱩᱫᱤ defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# ᱵᱟᱝ
 #  define __P(a) ()
 # endif
 #endif
@@ -242,7 +242,7 @@ char osver[] = "";
     + COLS         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+var_na hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
 #define HEX_NORMAL         0x00 /* no flags set */
@@ -251,7 +251,7 @@ char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 #define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
 #define HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned var_na)(c)) : (c))
 
 #define COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
@@ -273,7 +273,7 @@ l_colored[c++] = 'm';
 #define COLOR_BLUE '4'
 #define COLOR_WHITE '7'
 
-static char *pname;
+static var_na *pname;
 
   static void
 exit_with_usage(void)
@@ -301,7 +301,7 @@ exit_with_usage(void)
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
 #ifdef TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#ᱵᱟᱝ
 	  "", "");
 #endif
   fprintf(stderr, "    -u          use upper case hex letters.\n"
@@ -311,7 +311,7 @@ exit_with_usage(void)
 }
 
   static void
-perror_exit(int ret)
+perror_exit(puur_naa_nka ret)
 {
   fprintf(stderr, "%s: ", pname);
   perror(NULL);
@@ -319,44 +319,44 @@ perror_exit(int ret)
 }
 
   static void
-error_exit(int ret, char *msg)
+error_exit(puur_naa_nka ret, var_na *msg)
 {
   fprintf(stderr, "%s: %s\n", pname, msg);
   exit(ret);
 }
 
-  static int
+  static puur_naa_nka
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  puur_naa_nka c = getc(fpi);
+  ᱡᱩᱫᱤ (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  ᱨᱩᱣᱟᱹᱲ c;
 }
 
   static void
-putc_or_die(int c, FILE *fpo)
+putc_or_die(puur_naa_nka c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  ᱡᱩᱫᱤ (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
   static void
-fputs_or_die(char *s, FILE *fpo)
+fputs_or_die(var_na *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  ᱡᱩᱫᱤ (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(args) ᱡᱩᱫᱤ (fprintf args < 0) perror_exit(3)
 
   static void
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  ᱡᱩᱫᱤ (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  ᱡᱩᱫᱤ (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  static puur_naa_nka
+parse_hex_digit(puur_naa_nka c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  ᱨᱩᱣᱟᱹᱲ (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  static puur_naa_nka
+parse_bin_digit(puur_naa_nka c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  ᱨᱩᱣᱟᱹᱲ (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  static puur_naa_nka
+skip_to_eol(FILE *fpi, puur_naa_nka c)
 {
-  while (c != '\n' && c != EOF)
+  ᱡᱚᱠᱷᱚᱱ (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  ᱨᱩᱣᱟᱹᱲ c;
 }
 
 /*
@@ -404,70 +404,70 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  static puur_naa_nka
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
+  puur_naa_nka cols,
+  puur_naa_nka hextype,
   long base_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
+  puur_naa_nka c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
   long have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  ᱡᱚᱠᱷᱚᱱ ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
+      ᱡᱩᱫᱤ (c == '\r')	/* Doze style input file? */
 	continue;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+      ᱡᱩᱫᱤ (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
 	continue;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ᱡᱩᱫᱤ (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
+	  ᱡᱩᱫᱤ (n1 == -1 && ign_garb)
 	    continue;
 	}
-      else /* HEX_BITS */
+      ᱵᱟᱝ /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
+	  ᱡᱩᱫᱤ (n1 == -1 && ign_garb)
 	    continue;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  ᱡᱩᱫᱤ (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (puur_naa_nka)(((unsigned)b << 1) | (unsigned)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      ᱡᱩᱫᱤ ((hextype != HEX_POSTSCRIPT) && (p >= cols))
 	{
-	  if (hextype == HEX_NORMAL)
+	  ᱡᱩᱫᱤ (hextype == HEX_NORMAL)
 	    {
-	      if (n1 < 0)
+	      ᱡᱩᱫᱤ (n1 < 0)
 		{
 		  p = 0;
 		  continue;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  else /* HEX_BITS */
+	  ᱵᱟᱝ /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      ᱡᱩᱫᱤ (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
@@ -478,66 +478,66 @@ huntype(
 	  continue;
 	}
 
-      if (base_off + want_off != have_off)
+      ᱡᱩᱫᱤ (base_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  ᱡᱩᱫᱤ (fflush(fpo) != 0)
 	    perror_exit(3);
 #ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
+	  ᱡᱩᱫᱤ (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
 	    have_off = base_off + want_off;
 #endif
-	  if (base_off + want_off < have_off)
+	  ᱡᱩᱫᱤ (base_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
 	  for (; have_off < base_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ᱡᱩᱫᱤ (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  ᱡᱩᱫᱤ (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      ᱡᱩᱫᱤ (!hextype && (++p >= cols))
 	      /* skip the rest of the line as garbage */
 	      c = skip_to_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  ᱵᱟᱝ ᱡᱩᱫᱤ (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
 	    c = skip_to_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      ᱵᱟᱝ /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  ᱡᱩᱫᱤ (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      ᱡᱩᱫᱤ (++p >= cols)
 		/* skip the rest of the line as garbage */
 		 c = skip_to_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      ᱡᱩᱫᱤ (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  ᱡᱩᱫᱤ (hextype == HEX_NORMAL || hextype == HEX_BITS)
 	    want_off = 0;
 	  p = cols;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  ᱡᱩᱫᱤ (fflush(fpo) != 0)
     perror_exit(3);
 #ifdef TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
 #endif
   fclose_or_die(fpi, fpo);
-  return 0;
+  ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 
@@ -545,28 +545,28 @@ huntype(
  * Print line l with given colors.
  */
   static void
-print_colored_line(FILE *fp, char *l, char *colors)
+print_colored_line(FILE *fp, var_na *l, var_na *colors)
 {
-  static char l_colored[LLEN+1];
+  static var_na l_colored[LLEN+1];
 
-  if (colors)
+  ᱡᱩᱫᱤ (colors)
     {
-      int c = 0;
-      if (colors[0])
+      puur_naa_nka c = 0;
+      ᱡᱩᱫᱤ (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
+      puur_naa_nka i;
       for (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  ᱡᱩᱫᱤ (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      ᱡᱩᱫᱤ (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      ᱡᱩᱫᱤ (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      ᱡᱩᱫᱤ (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  ᱵᱟᱝ
     fputs_or_die(l, fp);
 }
 
@@ -599,46 +599,46 @@ print_colored_line(FILE *fp, char *l, char *colors)
  * If nz is always positive, lines are never suppressed.
  */
   static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+xxdline(FILE *fp, var_na *l, var_na *colors, puur_naa_nka nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  static var_na z[LLEN_NO_COLOR+1];
+  static var_na z_colors[LLEN_NO_COLOR+1];
+  static signed var_na zero_seen = 0;
 
-  if (!nz && zero_seen == 1)
+  ᱡᱩᱫᱤ (!nz && zero_seen == 1)
     {
       strcpy(z, l);
-      if (colors)
+      ᱡᱩᱫᱤ (colors)
 	  memcpy(z_colors, colors, strlen(z));
     }
 
-  if (nz || !zero_seen++)
+  ᱡᱩᱫᱤ (nz || !zero_seen++)
     {
-      if (nz)
+      ᱡᱩᱫᱤ (nz)
 	{
-	  if (nz < 0)
+	  ᱡᱩᱫᱤ (nz < 0)
 	    zero_seen--;
-	  if (zero_seen == 2)
+	  ᱡᱩᱫᱤ (zero_seen == 2)
 	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  ᱡᱩᱫᱤ (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
+      ᱡᱩᱫᱤ (nz >= 0 || zero_seen > 0)
 	print_colored_line(fp, l, colors);
 
-      if (nz)
+      ᱡᱩᱫᱤ (nz)
 	zero_seen = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
+  ᱡᱩᱫᱤ (zero_seen >= 0x7F)
     zero_seen = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+static unsigned var_na etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,329 +666,329 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  static var_na
+get_color_char (puur_naa_nka e, puur_naa_nka ebcdic)
 {
-  if (ebcdic)
+  ᱡᱩᱫᱤ (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      ᱡᱩᱫᱤ ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	ᱨᱩᱣᱟᱹᱲ COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 37 || e == 13 || e == 5)
+	ᱨᱩᱣᱟᱹᱲ COLOR_YELLOW;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 0)
+	ᱨᱩᱣᱟᱹᱲ COLOR_WHITE;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 255)
+	ᱨᱩᱣᱟᱹᱲ COLOR_BLUE;
+      ᱵᱟᱝ
+	ᱨᱩᱣᱟᱹᱲ COLOR_RED;
     }
-  else  /* ASCII */
+  ᱵᱟᱝ  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
+#ᱡᱩᱫᱤ defined(__MVS__) && __CHARSET_LIB == 0
+      ᱡᱩᱫᱤ (e >= 64)
+	ᱨᱩᱣᱟᱹᱲ COLOR_GREEN;
+#ᱵᱟᱝ
+      ᱡᱩᱫᱤ (e > 31 && e < 127)
+	ᱨᱩᱣᱟᱹᱲ COLOR_GREEN;
 #endif
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 9 || e == 10 || e == 13)
+	ᱨᱩᱣᱟᱹᱲ COLOR_YELLOW;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 0)
+	ᱨᱩᱣᱟᱹᱲ COLOR_WHITE;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (e == 255)
+	ᱨᱩᱣᱟᱹᱲ COLOR_BLUE;
+      ᱵᱟᱝ
+	ᱨᱩᱣᱟᱹᱲ COLOR_RED;
     }
-    return 0;
+    ᱨᱩᱣᱟᱹᱲ 0;
 }
 
-  static int
+  static puur_naa_nka
 enable_color(void)
 {
 #ifdef WIN32
   DWORD   mode;
   HANDLE  out;
 
-  if (!isatty(1))
-    return 0;
+  ᱡᱩᱫᱤ (!isatty(1))
+    ᱨᱩᱣᱟᱹᱲ 0;
 
   out = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleMode(out, &mode);
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
+  ᱨᱩᱣᱟᱹᱲ (puur_naa_nka)SetConsoleMode(out, mode);
 #elif defined(UNIX)
-  char *term;
+  var_na *term;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  ᱡᱩᱫᱤ (!isatty(STDOUT_FILENO))
+    ᱨᱩᱣᱟᱹᱲ 0;
 
   term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  ᱡᱩᱫᱤ (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
+    ᱨᱩᱣᱟᱹᱲ 0;
 
-  return 1;
-#else
-  return 0;
+  ᱨᱩᱣᱟᱹᱲ 1;
+#ᱵᱟᱝ
+  ᱨᱩᱣᱟᱹᱲ 0;
 #endif
 }
 
-  int
-main(int argc, char *argv[])
+  puur_naa_nka
+main(puur_naa_nka argc, var_na *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
+  puur_naa_nka c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  puur_naa_nka cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
+  puur_naa_nka capitalize = 0, decimal_offset = 0;
+  puur_naa_nka ebcdic = 0;
+  puur_naa_nka termination = 0;
+  puur_naa_nka octspergrp = -1;	/* number of octets grouped in output */
+  puur_naa_nka grplen;		/* total chars per octet group excluding colors */
   long length = -1, n = 0, seekoff = 0;
   unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  static var_na l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  static var_na colors[LLEN_NO_COLOR+1]; /* color array */
+  var_na *pp;
+  var_na *varname = NULL;
+  puur_naa_nka addrlen = 9;
+  puur_naa_nka color = 0;
+  puur_naa_nka color_forced = 0;	/* set when -R always is used */
+  var_na *no_color;
+  var_na cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  ᱡᱩᱫᱤ (no_color == NULL || no_color[0] == '\0')
     color = enable_color();
 
 #ifdef AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
+  ᱡᱩᱫᱤ (argc == 0)
     exit(1);
 #endif
 
   pname = argv[0];
   for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+    ᱡᱩᱫᱤ (*pp++ == PATH_SEP)
       pname = pp;
 #ifdef FILE_SEP
   for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+    ᱡᱩᱫᱤ (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	bha_nga;
       }
 #endif
 
-  while (argc >= 2)
+  ᱡᱚᱠᱷᱚᱱ (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   ᱡᱩᱫᱤ (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-r", 2)) revert++;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-t", 2)) termination++;
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-v", 2))
 	{
 	  fprintf(stderr, "%s%s\n", version, osver);
 	  exit(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  ᱡᱩᱫᱤ (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  ᱵᱟᱝ ᱡᱩᱫᱤ (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      cols = (puur_naa_nka)strtol(pp + 2, NULL, 0);
 	    }
-	  else
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      cols = (puur_naa_nka)strtol(argv[2], NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  ᱡᱩᱫᱤ (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (puur_naa_nka)strtol(pp + 2, NULL, 0);
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (puur_naa_nka)strtol(argv[2], NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	  puur_naa_nka reloffset = 0;
+	  puur_naa_nka negoffset = 0;
+	  ᱡᱩᱫᱤ (pp[2] && STRNCMP("ffset", pp + 2, 5))
 	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      ᱡᱩᱫᱤ (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     ᱡᱩᱫᱤ (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
+	     ᱡᱩᱫᱤ (negoffset)
 	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
+	     ᱵᱟᱝ
 	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  ᱡᱩᱫᱤ (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
 #ifdef TRY_SEEK
-	      if (pp[2] == '+')
+	      ᱡᱩᱫᱤ (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      ᱡᱩᱫᱤ (pp[2+relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(pp + 2+relseek+negseek, (var_na **)NULL, 0);
 	    }
-	  else
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
 #ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+	      ᱡᱩᱫᱤ (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      ᱡᱩᱫᱤ (argv[2][relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(argv[2] + relseek+negseek, (var_na **)NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  ᱡᱩᱫᱤ (pp[2] && STRNCMP("en", pp + 2, 2))
+	    length = strtol(pp + 2, (var_na **)NULL, 0);
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      length = strtol(argv[2], (var_na **)NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  ᱡᱩᱫᱤ (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  ᱵᱟᱝ
 	    {
-	      if (!argv[2])
+	      ᱡᱩᱫᱤ (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  var_na *pw = pp + 2;
+	  ᱡᱩᱫᱤ (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  ᱡᱩᱫᱤ (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  ᱡᱩᱫᱤ (!STRNCMP(pw, "always", 6))
 	    {
 	      (void)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  ᱵᱟᱝ ᱡᱩᱫᱤ (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  ᱵᱟᱝ
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      ᱵᱟᱝ ᱡᱩᱫᱤ (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  bha_nga;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      ᱵᱟᱝ ᱡᱩᱫᱤ (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      ᱵᱟᱝ
+	bha_nga;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  ᱡᱩᱫᱤ (hextype != (HEX_CINCLUDE | HEX_BITS))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	ᱡᱩᱫᱤ (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
+  ᱡᱩᱫᱤ (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
     switch (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      pak_sa HEX_POSTSCRIPT:	cols = 30; bha_nga;
+      pak_sa HEX_CINCLUDE:	cols = 12; bha_nga;
+      pak_sa HEX_CINCLUDE | HEX_BITS:
+      pak_sa HEX_BITS:		cols = 6; bha_nga;
+      pak_sa HEX_NORMAL:
+      pak_sa HEX_LITTLEENDIAN:
+      default:			cols = 16; bha_nga;
       }
 
-  if (octspergrp < 0)
+  ᱡᱩᱫᱤ (octspergrp < 0)
     switch (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      pak_sa HEX_CINCLUDE | HEX_BITS:
+      pak_sa HEX_BITS:		octspergrp = 1; bha_nga;
+      pak_sa HEX_NORMAL:		octspergrp = 2; bha_nga;
+      pak_sa HEX_LITTLEENDIAN:	octspergrp = 4; bha_nga;
+      pak_sa HEX_POSTSCRIPT:
+      pak_sa HEX_CINCLUDE:
+      default:			octspergrp = 0; bha_nga;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
+  ᱡᱩᱫᱤ ((hextype == HEX_POSTSCRIPT && cols < 0) ||
       (hextype != HEX_POSTSCRIPT && cols < 1) ||
       ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
 							    && (cols > COLS)))
@@ -997,182 +997,182 @@ main(int argc, char *argv[])
       exit(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
+  ᱡᱩᱫᱤ (octspergrp < 1 || octspergrp > cols)
     octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  ᱵᱟᱝ ᱡᱩᱫᱤ (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  ᱡᱩᱫᱤ (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+  ᱡᱩᱫᱤ (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
     BIN_ASSIGN(fp = stdin, !revert);
-  else
+  ᱵᱟᱝ
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      ᱡᱩᱫᱤ ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  ᱨᱩᱣᱟᱹᱲ 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+  ᱡᱩᱫᱤ (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
     BIN_ASSIGN(fpo = stdout, revert);
-  else
+  ᱵᱟᱝ
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      puur_naa_nka fd;
+      puur_naa_nka mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
+      ᱡᱩᱫᱤ (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
 	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  ᱨᱩᱣᱟᱹᱲ 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      ᱡᱩᱫᱤ (!color_forced)
 	color = 0;
     }
 
-  if (revert)
+  ᱡᱩᱫᱤ (revert)
     switch (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      pak_sa HEX_NORMAL:
+      pak_sa HEX_POSTSCRIPT:
+      pak_sa HEX_BITS:
+	ᱨᱩᱣᱟᱹᱲ huntype(fp, fpo, cols, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
+	bha_nga;
       default:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  ᱡᱩᱫᱤ (seekoff || negseek || !relseek)
     {
 #ifdef TRY_SEEK
-      if (relseek)
+      ᱡᱩᱫᱤ (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      ᱵᱟᱝ
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      ᱡᱩᱫᱤ (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      ᱡᱩᱫᱤ (e >= 0)
 	seekoff = ftell(fp);
-      else
+      ᱵᱟᱝ
 #endif
 	{
 	  long s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  ᱡᱚᱠᱷᱚᱱ (s--)
+	    ᱡᱩᱫᱤ (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  ᱡᱩᱫᱤ (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      ᱡᱩᱫᱤ (varname == NULL && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      ᱡᱩᱫᱤ (varname != NULL)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned var_na)varname[0]) ? "__" : ""));
 	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	    putc_or_die(isalnum((unsigned var_na)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      ᱡᱚᱠᱷᱚᱱ ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  ᱡᱩᱫᱤ (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  ᱡᱩᱫᱤ (hextype & HEX_BITS)
 	    {
-	      if (p == 0)
+	      ᱡᱩᱫᱤ (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      ᱵᱟᱝ ᱡᱩᱫᱤ (p % cols == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      ᱵᱟᱝ
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      for (puur_naa_nka j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  ᱵᱟᱝ
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
 		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  ᱡᱩᱫᱤ (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      bha_nga ;
 	    }
 	}
 
-      if (p)
+      ᱡᱩᱫᱤ (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      ᱡᱩᱫᱤ (varname != NULL)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned var_na)varname[0]) ? "__" : ""));
 	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	    putc_or_die(isalnum((unsigned var_na)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      ᱨᱩᱣᱟᱹᱲ 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  ᱡᱩᱫᱤ (hextype == HEX_POSTSCRIPT)
     {
       p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      ᱡᱚᱠᱷᱚᱱ ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  ᱡᱩᱫᱤ (cols > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
 	      p = cols;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      ᱡᱩᱫᱤ (cols == 0 || p < cols)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      ᱨᱩᱣᱟᱹᱲ 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  ᱡᱩᱫᱤ (hextype != HEX_BITS)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  ᱵᱟᱝ	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  ᱡᱚᱠᱷᱚᱱ ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      ᱡᱩᱫᱤ (p == 0)
 	{
 	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
 				  ((unsigned long)(n + seekoff + displayoff)));
@@ -1181,9 +1181,9 @@ main(int argc, char *argv[])
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      ᱡᱩᱫᱤ (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  ᱡᱩᱫᱤ (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,46 +1193,46 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      ᱵᱟᱝ /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  ᱡᱩᱫᱤ (color)
 	    cur_color = get_color_char(e, ebcdic);
 
 	  for (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      ᱡᱩᱫᱤ (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      ᱡᱩᱫᱤ (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      ᱡᱩᱫᱤ (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
 	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
+      ᱵᱟᱝ
 	c = (grplen * cols - 1) / octspergrp;
 
 
-      if (ebcdic)
+      ᱡᱩᱫᱤ (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      ᱡᱩᱫᱤ (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      ᱡᱩᱫᱤ (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#ᱡᱩᱫᱤ defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#ᱵᱟᱝ
 	  (e > 31 && e < 127)
 #endif
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      ᱡᱩᱫᱤ (++p == cols)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
@@ -1243,17 +1243,17 @@ main(int argc, char *argv[])
 	  p = 0;
 	}
     }
-  if (p)
+  ᱡᱩᱫᱤ (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      ᱡᱩᱫᱤ (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  ᱡᱩᱫᱤ (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      puur_naa_nka fill = octspergrp - (p % octspergrp);
+	      ᱡᱩᱫᱤ (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
@@ -1266,7 +1266,7 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  ᱡᱩᱫᱤ (hextype != HEX_BITS)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
 	      c += cols - p;
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
+      ᱵᱟᱝ
 	xxdline(fpo, l, NULL, 1);
     }
-  else if (autoskip)
+  ᱵᱟᱝ ᱡᱩᱫᱤ (autoskip)
     xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

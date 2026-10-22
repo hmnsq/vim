@@ -13,23 +13,23 @@
 #include "vim.h"
 #include "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#ᱡᱩᱫᱤ !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+static puur_naa_nka  getent(var_na *, var_na *, FILE *, puur_naa_nka);
+static puur_naa_nka  nextent(var_na *, FILE *, puur_naa_nka);
+static puur_naa_nka  _match(var_na *, var_na *);
+static var_na *_addfmt(var_na *, var_na *, puur_naa_nka);
+static var_na *_find(var_na *, var_na *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
+var_na	*tent;		      // Pointer to terminal entry, set by tgetent
+var_na	PC = 0;		      // Pad character, default NULL
+var_na	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
 short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
@@ -56,151 +56,151 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# ᱵᱟᱝ
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  ᱵᱟᱝ
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    puur_naa_nka
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    var_na    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    var_na    *term)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    var_na    tcbuf[32];		// Temp buffer to handle
+    var_na    *tcptr = tcbuf;	// extended entries
+    var_na    *tcap = TERMCAPFILE; // Default termcap file
+    var_na    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    puur_naa_nka	    retval = 0;
+    puur_naa_nka	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    ᱡᱩᱫᱤ ((tmp = (var_na *)mch_getenv((char_u *)"TERMCAP")) != NULL)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	ᱡᱩᱫᱤ (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#ᱡᱩᱫᱤ defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    ᱡᱩᱫᱤ (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	ᱵᱟᱝ				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    puur_naa_nka tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    ᱡᱚᱠᱷᱚᱱ (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		var_na *nexttmp;
 
-		while (*tmp == '|')
+		ᱡᱚᱠᱷᱚᱱ (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		ᱡᱩᱫᱤ (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    ᱨᱩᱣᱟᱹᱲ 1;
 		}
-		else
+		ᱵᱟᱝ
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    ᱡᱩᱫᱤ (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	ᱨᱩᱣᱟᱹᱲ -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    ᱡᱚᱠᱷᱚᱱ (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	ᱡᱩᱫᱤ ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	ᱵᱟᱝ
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    bha_nga;
 	}
     }
     fclose(termcap);
-    return retval;
+    ᱨᱩᱣᱟᱹᱲ retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    static puur_naa_nka
+getent(var_na *tbuf, var_na *term, FILE *termcap, puur_naa_nka buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    var_na    *tptr;
+    puur_naa_nka	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    ᱡᱚᱠᱷᱚᱱ (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	ᱡᱚᱠᱷᱚᱱ (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    var_na    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    ᱡᱚᱠᱷᱚᱱ (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    ᱡᱩᱫᱤ (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		ᱨᱩᱣᱟᱹᱲ 1;
 	    }
-	    else				// Look for next name
+	    ᱵᱟᱝ				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    static puur_naa_nka
+nextent(var_na *tbuf, FILE *termcap, puur_naa_nka buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    var_na *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    ᱡᱚᱠᱷᱚᱱ (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (puur_naa_nka)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	puur_naa_nka llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
+	ᱡᱩᱫᱤ (*lbuf == '#')			// eat comments
 	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	ᱡᱩᱫᱤ (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	ᱡᱩᱫᱤ (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	ᱵᱟᱝ
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    ᱨᱩᱣᱟᱹᱲ 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    ᱨᱩᱣᱟᱹᱲ 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    puur_naa_nka
+tgetflag(var_na *id)
 {
-    char    buf[256], *ptr = buf;
+    var_na    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    ᱨᱩᱣᱟᱹᱲ tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    puur_naa_nka
+tgetnum(var_na *id)
 {
-    char *ptr, buf[256];
+    var_na *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    ᱡᱩᱫᱤ (tgetstr(id, &ptr))
+	ᱨᱩᱣᱟᱹᱲ atoi(buf);
+    ᱵᱟᱝ
+	ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    var_na *
+tgetstr(var_na *id, var_na **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    puur_naa_nka		len = strlen(id);
+    var_na	*tmp=tent;
+    var_na	*hold;
+    puur_naa_nka		i;
 
     do
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	ᱡᱚᱠᱷᱚᱱ (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	ᱡᱩᱫᱤ (!*tmp)
+	    bha_nga;
 
-	if (_match(id, tmp) == len)
+	ᱡᱩᱫᱤ (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    ᱡᱩᱫᱤ (*tmp == '@')			// :xx@: entry for tc
+		ᱨᱩᱣᱟᱹᱲ 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    ᱡᱚᱠᱷᱚᱱ (*++tmp && *tmp != ':')	// not at end of field
 		{
 		switch(*tmp)
 		{
-		case '\\':			// Expand escapes here
+		pak_sa '\\':			// Expand escapes here
 		    switch(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    pak_sa 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			bha_nga;			// shouldn't happen
+		    pak_sa 'e':
+		    pak_sa 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			bha_nga;
+		    pak_sa 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			bha_nga;
+		    pak_sa 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			bha_nga;
+		    pak_sa 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			bha_nga;
+		    pak_sa 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			bha_nga;
+		    pak_sa 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			bha_nga;
+		    pak_sa '0':			// \nnn
+		    pak_sa '1':
+		    pak_sa '2':
+		    pak_sa '3':
+		    pak_sa '4':
+		    pak_sa '5':
+		    pak_sa '6':
+		    pak_sa '7':
+		    pak_sa '8':
+		    pak_sa '9':
 			**buf = 0;
 			    // get up to three digits
 			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
+			bha_nga;
 		    default:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    bha_nga;
+		pak_sa '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
+		    bha_nga;
 		default:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    ᱨᱩᱣᱟᱹᱲ hold;
 	}
-    } while (*tmp);
+    } ᱡᱚᱠᱷᱚᱱ (*tmp);
 
-    return 0;
+    ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    var_na *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    var_na    *cm,				// cm string, from termcap
+    puur_naa_nka	    col,				// column, x position
+    puur_naa_nka	    line)				// line, y position
 {
-    char    gx, gy,				// x, y
+    var_na    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
 	reverse = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    static var_na buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    ᱡᱩᱫᱤ (!cm)
+	ᱨᱩᱣᱟᱹᱲ "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    ᱡᱚᱠᱷᱚᱱ (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	ᱡᱩᱫᱤ ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	ᱵᱟᱝ
 	{				// % escape
 	    switch(c = *ptr++)
 	    {
-	    case 'd':				// decimal
+	    pak_sa 'd':				// decimal
 		bufp = _addfmt(bufp, "%d", line);
 		line = col;
-		break;
-	    case '2':				// 2 digit decimal
+		bha_nga;
+	    pak_sa '2':				// 2 digit decimal
 		bufp = _addfmt(bufp, "%02d", line);
 		line = col;
-		break;
-	    case '3':				// 3 digit decimal
+		bha_nga;
+	    pak_sa '3':				// 3 digit decimal
 		bufp = _addfmt(bufp, "%03d", line);
 		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+		bha_nga;
+	    pak_sa '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
+		ᱡᱩᱫᱤ (col>gx) col += gy;
+		ᱡᱩᱫᱤ (line>gx) line += gy;
+		bha_nga;
+	    pak_sa '+':				// %+c: add c
 		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
+	    pak_sa '.':				// print x/y
+		ᱡᱩᱫᱤ (line == '\t' ||		// these are
 		   line == '\n' ||		// chars that
 		   line == '\004' ||		// UNIX hates
 		   line == '\0')
 		{
 		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    ᱡᱩᱫᱤ (reverse == (line == col))
 			addup=1;		// and mark UP
-		    else
+		    ᱵᱟᱝ
 			addbak=1;		// or BC
 		}
 		*bufp++=line;
 		line = col;
-		break;
-	    case 'r':				// r: reverse
+		bha_nga;
+	    pak_sa 'r':				// r: reverse
 		gx = line;
 		line = col;
 		col = gx;
 		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
+		bha_nga;
+	    pak_sa 'i':			// increment (1-origin screen)
 		col++;
 		line++;
-		break;
-	    case '%':				// %%=% literally
+		bha_nga;
+	    pak_sa '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
+		bha_nga;
+	    pak_sa 'n':				// magic DM2500 code
 		line ^= 0140;
 		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
+		bha_nga;
+	    pak_sa 'B':				// bcd encoding
 		line = line/10<<4+line%10;
 		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
+		bha_nga;
+	    pak_sa 'D':				// magic Delta Data code
 		line = line-2*(line&15);
 		col = col-2*(col&15);
-		break;
+		bha_nga;
 	    default:				// Unknown escape
-		return "OOPS";
+		ᱨᱩᱣᱟᱹᱲ "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    ᱡᱩᱫᱤ (addup)					// add upline
+	ᱡᱩᱫᱤ (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ᱡᱚᱠᱷᱚᱱ (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    ᱡᱩᱫᱤ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    ᱡᱚᱠᱷᱚᱱ (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    ᱡᱩᱫᱤ (addbak)					// add backspace
+	ᱡᱩᱫᱤ (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ᱡᱚᱠᱷᱚᱱ (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    ᱡᱩᱫᱤ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    ᱡᱚᱠᱷᱚᱱ (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	ᱵᱟᱝ
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    ᱨᱩᱣᱟᱹᱲ(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    puur_naa_nka
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    var_na *cp,				// string to print
+    puur_naa_nka affcnt,				// Number of lines affected
+    void (*outc)(unsigned puur_naa_nka))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(const var_na *);
 
-    if (VIM_ISDIGIT(*cp))
+    ᱡᱩᱫᱤ (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	ᱡᱚᱠᱷᱚᱱ (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	ᱡᱩᱫᱤ (*cp == '.')
+	    ᱡᱚᱠᱷᱚᱱ (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	ᱡᱩᱫᱤ (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    ᱡᱩᱫᱤ (affcnt>1) affcnt = 1;
 	}
-	else
+	ᱵᱟᱝ
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	ᱡᱩᱫᱤ (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	ᱡᱚᱠᱷᱚᱱ (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	ᱡᱩᱫᱤ (ospeed)
+	    ᱡᱚᱠᱷᱚᱱ (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    ᱵᱟᱝ
+	ᱡᱚᱠᱷᱚᱱ (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    ᱨᱩᱣᱟᱹᱲ 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    static puur_naa_nka
+_match(var_na *s1, var_na *s2)
 {
-    int i = 0;
+    puur_naa_nka i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    ᱡᱚᱠᱷᱚᱱ (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    ᱨᱩᱣᱟᱹᱲ i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    static var_na *
+_find(var_na *s, var_na *set)
 {
     for (; *s; s++)
     {
-	char	*ptr = set;
+	var_na	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	ᱡᱚᱠᱷᱚᱱ (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	ᱡᱩᱫᱤ (*ptr)
+	    ᱨᱩᱣᱟᱹᱲ s;
     }
 
-    return s;
+    ᱨᱩᱣᱟᱹᱲ s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    static var_na *
+_addfmt(var_na *buf, var_na *fmt, puur_naa_nka val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    ᱡᱚᱠᱷᱚᱱ (*buf)
 	buf++;
-    return buf;
+    ᱨᱩᱣᱟᱹᱲ buf;
 }

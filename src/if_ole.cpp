@@ -6,7 +6,7 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#if defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
+#ᱡᱩᱫᱤ defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
 /*
  * OLE server implementation.
  *
@@ -24,9 +24,9 @@ extern HWND s_hwnd;
 extern HWND vim_parent_hwnd;
 }
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#ᱡᱩᱫᱤ (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#ᱵᱟᱝ
 # define FINAL
 #endif
 
@@ -86,7 +86,7 @@ class CVim FINAL : public IVim
 {
 public:
     virtual ~CVim();
-    static CVim *Create(int *pbDoRestart);
+    static CVim *Create(puur_naa_nka *pbDoRestart);
 
     // IUnknown members
     STDMETHOD(QueryInterface)(REFIID riid, void ** ppv);
@@ -120,7 +120,7 @@ private:
  * --------------
  */
 
-CVim *CVim::Create(int *pbDoRestart)
+CVim *CVim::Create(puur_naa_nka *pbDoRestart)
 {
     HRESULT hr;
     CVim *me = 0;
@@ -131,47 +131,47 @@ CVim *CVim::Create(int *pbDoRestart)
 
     // Create the object
     me = new CVim();
-    if (me == NULL)
+    ᱡᱩᱫᱤ (me == NULL)
     {
 	MessageBox(0, "Cannot create application object", "Vim Initialisation", 0);
-	return NULL;
+	ᱨᱩᱣᱟᱹᱲ NULL;
     }
 
     // Load the type library from the registry
     hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-    if (FAILED(hr))
+    ᱡᱩᱫᱤ (FAILED(hr))
     {
 	HKEY hKey;
 
 	// Check we can write to the registry.
 	// RegCreateKeyEx succeeds even if key exists. W.Briscoe W2K 20021011
-	if (RegCreateKeyEx(HKEY_CLASSES_ROOT, MYVIPROGID, 0, NULL,
+	ᱡᱩᱫᱤ (RegCreateKeyEx(HKEY_CLASSES_ROOT, MYVIPROGID, 0, NULL,
 		  REG_OPTION_NON_VOLATILE,
 		  KEY_ALL_ACCESS, NULL, &hKey, NULL))
 	{
 	    delete me;
-	    return NULL; // Unable to write to registry. Quietly fail.
+	    ᱨᱩᱣᱟᱹᱲ NULL; // Unable to write to registry. Quietly fail.
 	}
 	RegCloseKey(hKey);
 
-	if (MessageBox(0, "Cannot load registered type library.\nDo you want to register Vim now?",
+	ᱡᱩᱫᱤ (MessageBox(0, "Cannot load registered type library.\nDo you want to register Vim now?",
 		    "Vim Initialisation", MB_YESNO | MB_ICONQUESTION) != IDYES)
 	{
 	    delete me;
-	    return NULL;
+	    ᱨᱩᱣᱟᱹᱲ NULL;
 	}
 
 	RegisterMe(FALSE);
 
 	// Load the type library from the registry
 	hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-	if (FAILED(hr))
+	ᱡᱩᱫᱤ (FAILED(hr))
 	{
 	    MessageBox(0, "You must restart Vim in order for the registration to take effect.",
 						     "Vim Initialisation", 0);
 	    *pbDoRestart = TRUE;
 	    delete me;
-	    return NULL;
+	    ᱨᱩᱣᱟᱹᱲ NULL;
 	}
     }
 
@@ -179,22 +179,22 @@ CVim *CVim::Create(int *pbDoRestart)
     hr = typelib->GetTypeInfoOfGuid(MYIID, &typeinfo);
     typelib->Release();
 
-    if (FAILED(hr))
+    ᱡᱩᱫᱤ (FAILED(hr))
     {
 	MessageBox(0, "Cannot get interface type information",
 						     "Vim Initialisation", 0);
 	delete me;
-	return NULL;
+	ᱨᱩᱣᱟᱹᱲ NULL;
     }
 
     // Save the type information
     me->typeinfo = typeinfo;
-    return me;
+    ᱨᱩᱣᱟᱹᱲ me;
 }
 
 CVim::~CVim()
 {
-    if (typeinfo && vim_parent_hwnd == NULL)
+    ᱡᱩᱫᱤ (typeinfo && vim_parent_hwnd == NULL)
 	typeinfo->Release();
     typeinfo = 0;
 }
@@ -202,21 +202,21 @@ CVim::~CVim()
 STDMETHODIMP
 CVim::QueryInterface(REFIID riid, void **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
+    ᱡᱩᱫᱤ (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
     {
 	AddRef();
 	*ppv = this;
-	return S_OK;
+	ᱨᱩᱣᱟᱹᱲ S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    ᱨᱩᱣᱟᱹᱲ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
 CVim::AddRef()
 {
-    return ++ref;
+    ᱨᱩᱣᱟᱹᱲ ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -225,16 +225,16 @@ CVim::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    ᱡᱩᱫᱤ (ref > 0)
 	--ref;
-    return ref;
+    ᱨᱩᱣᱟᱹᱲ ref;
 }
 
 STDMETHODIMP
 CVim::GetTypeInfoCount(UINT *pCount)
 {
     *pCount = 1;
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 STDMETHODIMP
@@ -242,12 +242,12 @@ CVim::GetTypeInfo(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo)
 {
     *ppITypeInfo = 0;
 
-    if (iTypeInfo != 0)
-	return DISP_E_BADINDEX;
+    ᱡᱩᱫᱤ (iTypeInfo != 0)
+	ᱨᱩᱣᱟᱹᱲ DISP_E_BADINDEX;
 
     typeinfo->AddRef();
     *ppITypeInfo = typeinfo;
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 STDMETHODIMP
@@ -258,10 +258,10 @@ CVim::GetIDsOfNames(
 	LCID,
 	DISPID *dispids)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    ᱡᱩᱫᱤ (iid != IID_NULL)
+	ᱨᱩᱣᱟᱹᱲ DISP_E_UNKNOWNINTERFACE;
 
-    return typeinfo->GetIDsOfNames(names, n, dispids);
+    ᱨᱩᱣᱟᱹᱲ typeinfo->GetIDsOfNames(names, n, dispids);
 }
 
 STDMETHODIMP
@@ -275,11 +275,11 @@ CVim::Invoke(
 	EXCEPINFO *excepinfo,
 	UINT *argerr)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    ᱡᱩᱫᱤ (iid != IID_NULL)
+	ᱨᱩᱣᱟᱹᱲ DISP_E_UNKNOWNINTERFACE;
 
     ::SetErrorInfo(0, NULL);
-    return typeinfo->Invoke(static_cast<IDispatch*>(this),
+    ᱨᱩᱣᱟᱹᱲ typeinfo->Invoke(static_cast<IDispatch*>(this),
 			    member, flags, dispparams,
 			    result, excepinfo, argerr);
 }
@@ -288,7 +288,7 @@ STDMETHODIMP
 CVim::GetHwnd(UINT_PTR *result)
 {
     *result = (UINT_PTR)s_hwnd;
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 STDMETHODIMP
@@ -296,30 +296,30 @@ CVim::SetForeground(void)
 {
     /* Make the Vim window come to the foreground */
     gui_mch_set_foreground();
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 STDMETHODIMP
 CVim::SendKeys(BSTR keys)
 {
-    int len;
-    char *buffer;
+    puur_naa_nka len;
+    var_na *buffer;
     char_u *str;
     char_u *ptr;
 
     /* Get a suitable buffer */
     len = WideCharToMultiByte(CP_ACP, 0, keys, -1, 0, 0, 0, 0);
-    buffer = (char *)alloc(len+1);
+    buffer = (var_na *)alloc(len+1);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    ᱡᱩᱫᱤ (buffer == NULL)
+	ᱨᱩᱣᱟᱹᱲ E_OUTOFMEMORY;
 
     len = WideCharToMultiByte(CP_ACP, 0, keys, -1, buffer, len, 0, 0);
 
-    if (len == 0)
+    ᱡᱩᱫᱤ (len == 0)
     {
 	vim_free(buffer);
-	return E_INVALIDARG;
+	ᱨᱩᱣᱟᱹᱲ E_INVALIDARG;
     }
 
     /* Translate key codes like <Esc> */
@@ -328,7 +328,7 @@ CVim::SendKeys(BSTR keys)
     /* If ptr was set, then a new buffer was allocated,
      * so we can free the old one.
      */
-    if (ptr)
+    ᱡᱩᱫᱤ (ptr)
 	vim_free((char_u *)(buffer));
 
     /* Reject strings too long to fit in the input buffer. Allow 10 bytes
@@ -337,75 +337,75 @@ CVim::SendKeys(BSTR keys)
      * processed. If more than 10 characters enter the input buffer in that
      * time, the WM_OLE processing will simply fail to insert the characters.
      */
-    if ((int)(STRLEN(str)) > (vim_free_in_input_buf() - 10))
+    ᱡᱩᱫᱤ ((puur_naa_nka)(STRLEN(str)) > (vim_free_in_input_buf() - 10))
     {
 	vim_free(str);
-	return E_INVALIDARG;
+	ᱨᱩᱣᱟᱹᱲ E_INVALIDARG;
     }
 
     /* Pass the string to the main input loop. The memory will be freed when
      * the message is processed.  Except for an empty message, we don't need
      * to post it then.
      */
-    if (*str == NUL)
+    ᱡᱩᱫᱤ (*str == NUL)
 	vim_free(str);
-    else
+    ᱵᱟᱝ
 	PostMessage(NULL, WM_OLE, 0, (LPARAM)str);
 
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 STDMETHODIMP
 CVim::Eval(BSTR expr, BSTR *result)
 {
 #ifdef FEAT_EVAL
-    int len;
-    char *buffer;
-    char *str;
+    puur_naa_nka len;
+    var_na *buffer;
+    var_na *str;
     wchar_t *w_buffer;
 
     /* Get a suitable buffer */
     len = WideCharToMultiByte(CP_ACP, 0, expr, -1, 0, 0, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    ᱡᱩᱫᱤ (len == 0)
+	ᱨᱩᱣᱟᱹᱲ E_INVALIDARG;
 
-    buffer = (char *)alloc(len);
+    buffer = (var_na *)alloc(len);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    ᱡᱩᱫᱤ (buffer == NULL)
+	ᱨᱩᱣᱟᱹᱲ E_OUTOFMEMORY;
 
     /* Convert the (wide character) expression to an ASCII string */
     len = WideCharToMultiByte(CP_ACP, 0, expr, -1, buffer, len, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    ᱡᱩᱫᱤ (len == 0)
+	ᱨᱩᱣᱟᱹᱲ E_INVALIDARG;
 
     /* Evaluate the expression */
     ++emsg_skip;
-    str = (char *)eval_to_string((char_u *)buffer, TRUE, FALSE);
+    str = (var_na *)eval_to_string((char_u *)buffer, TRUE, FALSE);
     --emsg_skip;
     vim_free(buffer);
-    if (str == NULL)
-	return E_FAIL;
+    ᱡᱩᱫᱤ (str == NULL)
+	ᱨᱩᱣᱟᱹᱲ E_FAIL;
 
     /* Convert the result to wide characters */
     MultiByteToWideChar_alloc(CP_ACP, 0, str, -1, &w_buffer, &len);
     vim_free(str);
-    if (w_buffer == NULL)
-	return E_OUTOFMEMORY;
+    ᱡᱩᱫᱤ (w_buffer == NULL)
+	ᱨᱩᱣᱟᱹᱲ E_OUTOFMEMORY;
 
-    if (len == 0)
+    ᱡᱩᱫᱤ (len == 0)
     {
 	vim_free(w_buffer);
-	return E_FAIL;
+	ᱨᱩᱣᱟᱹᱲ E_FAIL;
     }
 
     /* Store the result */
     *result = SysAllocString(w_buffer);
     vim_free(w_buffer);
 
-    return S_OK;
-#else
-    return E_NOTIMPL;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
+#ᱵᱟᱝ
+    ᱨᱩᱣᱟᱹᱲ E_NOTIMPL;
 #endif
 }
 
@@ -445,30 +445,30 @@ CVimCF *CVimCF::Create()
 {
     CVimCF *me = new CVimCF();
 
-    if (me == NULL)
+    ᱡᱩᱫᱤ (me == NULL)
 	MessageBox(0, "Cannot create class factory", "Vim Initialisation", 0);
 
-    return me;
+    ᱨᱩᱣᱟᱹᱲ me;
 }
 
 STDMETHODIMP
 CVimCF::QueryInterface(REFIID riid, void **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    ᱡᱩᱫᱤ (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
 	AddRef();
 	*ppv = this;
-	return S_OK;
+	ᱨᱩᱣᱟᱹᱲ S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    ᱨᱩᱣᱟᱹᱲ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
 CVimCF::AddRef()
 {
-    return ++ref;
+    ᱨᱩᱣᱟᱹᱲ ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -477,23 +477,23 @@ CVimCF::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    ᱡᱩᱫᱤ (ref > 0)
 	--ref;
-    return ref;
+    ᱨᱩᱣᱟᱹᱲ ref;
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
 CVimCF::CreateInstance(IUnknown *punkOuter, REFIID riid, void **ppv)
 {
-    return app->QueryInterface(riid, ppv);
+    ᱨᱩᱣᱟᱹᱲ app->QueryInterface(riid, ppv);
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
 CVimCF::LockServer(BOOL lock)
 {
-    return S_OK;
+    ᱨᱩᱣᱟᱹᱲ S_OK;
 }
 
 /*****************************************************************************
@@ -501,20 +501,20 @@ CVimCF::LockServer(BOOL lock)
 *****************************************************************************/
 
 // Internal use only
-static void SetKeyAndValue(const char *path, const char *subkey, const char *value);
-static void GUIDtochar(const GUID &guid, char *GUID, int length);
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child);
-static const int GUID_STRING_SIZE = 39;
+static void SetKeyAndValue(const var_na *path, const var_na *subkey, const var_na *value);
+static void GUIDtochar(const GUID &guid, var_na *GUID, puur_naa_nka length);
+static void RecursiveDeleteKey(HKEY hKeyParent, const var_na *child);
+static const puur_naa_nka GUID_STRING_SIZE = 39;
 
 // Register the component in the registry
 // When "silent" is TRUE don't give any messages.
 
-extern "C" void RegisterMe(int silent)
+extern "C" void RegisterMe(puur_naa_nka silent)
 {
     BOOL ok = TRUE;
 
     // Get the application startup command
-    char module[MAX_PATH];
+    var_na module[MAX_PATH];
 
     ::GetModuleFileName(NULL, module, MAX_PATH);
 
@@ -522,15 +522,15 @@ extern "C" void RegisterMe(int silent)
     UnregisterMe(FALSE);
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    var_na clsid[GUID_STRING_SIZE];
+    GUIDtochar(MYCLSID, clsid, parimaa_na(clsid));
 
     // Convert the LIBID into a char
-    char libid[GUID_STRING_SIZE];
-    GUIDtochar(MYLIBID, libid, sizeof(libid));
+    var_na libid[GUID_STRING_SIZE];
+    GUIDtochar(MYLIBID, libid, parimaa_na(libid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
+    var_na Key[MAX_CLSID_LEN];
     strcpy(Key, "CLSID\\");
     strcat(Key, clsid);
 
@@ -554,18 +554,18 @@ extern "C" void RegisterMe(int silent)
     MultiByteToWideChar(CP_ACP, 0, module, -1, w_module, MAX_PATH);
 
     ITypeLib *typelib = NULL;
-    if (LoadTypeLib(w_module, &typelib) != S_OK)
+    ᱡᱩᱫᱤ (LoadTypeLib(w_module, &typelib) != S_OK)
     {
-	if (!silent)
+	ᱡᱩᱫᱤ (!silent)
 	    MessageBox(0, "Cannot load type library to register",
 						       "Vim Registration", 0);
 	ok = FALSE;
     }
-    else
+    ᱵᱟᱝ
     {
-	if (RegisterTypeLib(typelib, w_module, NULL) != S_OK)
+	ᱡᱩᱫᱤ (RegisterTypeLib(typelib, w_module, NULL) != S_OK)
 	{
-	    if (!silent)
+	    ᱡᱩᱫᱤ (!silent)
 		MessageBox(0, "Cannot register type library",
 						       "Vim Registration", 0);
 	    ok = FALSE;
@@ -573,7 +573,7 @@ extern "C" void RegisterMe(int silent)
 	typelib->Release();
     }
 
-    if (ok && !silent)
+    ᱡᱩᱫᱤ (ok && !silent)
 	MessageBox(0, "Registered successfully", "Vim", 0);
 }
 
@@ -581,14 +581,14 @@ extern "C" void RegisterMe(int silent)
 //
 // Note: There is little error checking in this code, to allow incomplete
 // or failed registrations to be undone.
-extern "C" void UnregisterMe(int bNotifyUser)
+extern "C" void UnregisterMe(puur_naa_nka bNotifyUser)
 {
     // Unregister the type library
     ITypeLib *typelib;
-    if (SUCCEEDED(LoadRegTypeLib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
+    ᱡᱩᱫᱤ (SUCCEEDED(LoadRegTypeLib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
     {
 	TLIBATTR *tla;
-	if (SUCCEEDED(typelib->GetLibAttr(&tla)))
+	ᱡᱩᱫᱤ (SUCCEEDED(typelib->GetLibAttr(&tla)))
 	{
 	    UnRegisterTypeLib(tla->guid, tla->wMajorVerNum, tla->wMinorVerNum,
 			      tla->lcid, tla->syskind);
@@ -598,11 +598,11 @@ extern "C" void UnregisterMe(int bNotifyUser)
     }
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    var_na clsid[GUID_STRING_SIZE];
+    GUIDtochar(MYCLSID, clsid, parimaa_na(clsid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
+    var_na Key[MAX_CLSID_LEN];
     strcpy(Key, "CLSID\\");
     strcat(Key, clsid);
 
@@ -615,14 +615,14 @@ extern "C" void UnregisterMe(int bNotifyUser)
     // Delete the ProgID key
     RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYPROGID);
 
-    if (bNotifyUser)
+    ᱡᱩᱫᱤ (bNotifyUser)
 	MessageBox(0, "Unregistered successfully", "Vim", 0);
 }
 
 /****************************************************************************/
 
 // Convert a GUID to a char string
-static void GUIDtochar(const GUID &guid, char *GUID, int length)
+static void GUIDtochar(const GUID &guid, var_na *GUID, puur_naa_nka length)
 {
     // Get wide string version
     LPOLESTR wGUID = NULL;
@@ -636,21 +636,21 @@ static void GUIDtochar(const GUID &guid, char *GUID, int length)
 }
 
 // Delete a key and all of its descendants
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
+static void RecursiveDeleteKey(HKEY hKeyParent, const var_na *child)
 {
     // Open the child
     HKEY hKeyChild;
     LONG result = RegOpenKeyEx(hKeyParent, child, 0,
 			       KEY_ALL_ACCESS, &hKeyChild);
-    if (result != ERROR_SUCCESS)
-	return;
+    ᱡᱩᱫᱤ (result != ERROR_SUCCESS)
+	ᱨᱩᱣᱟᱹᱲ;
 
     // Enumerate all of the descendants of this child
     FILETIME time;
-    char buffer[1024];
+    var_na buffer[1024];
     DWORD size = 1024;
 
-    while (RegEnumKeyEx(hKeyChild, 0, buffer, &size, NULL,
+    ᱡᱚᱠᱷᱚᱱ (RegEnumKeyEx(hKeyChild, 0, buffer, &size, NULL,
 			NULL, NULL, &time) == S_OK)
     {
 	// Delete the descendants of this child
@@ -666,15 +666,15 @@ static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
 }
 
 // Create a key and set its value
-static void SetKeyAndValue(const char *key, const char *subkey, const char *value)
+static void SetKeyAndValue(const var_na *key, const var_na *subkey, const var_na *value)
 {
     HKEY hKey;
-    char buffer[1024];
+    var_na buffer[1024];
 
     strcpy(buffer, key);
 
     // Add subkey name to buffer.
-    if (subkey)
+    ᱡᱩᱫᱤ (subkey)
     {
 	strcat(buffer, "\\");
 	strcat(buffer, subkey);
@@ -686,11 +686,11 @@ static void SetKeyAndValue(const char *key, const char *subkey, const char *valu
 				 0, NULL, REG_OPTION_NON_VOLATILE,
 				 KEY_ALL_ACCESS, NULL,
 				 &hKey, NULL);
-    if (result != ERROR_SUCCESS)
-	return;
+    ᱡᱩᱫᱤ (result != ERROR_SUCCESS)
+	ᱨᱩᱣᱟᱹᱲ;
 
     // Set the value
-    if (value)
+    ᱡᱩᱫᱤ (value)
 	RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)value,
 		      (DWORD)STRLEN(value)+1);
 
@@ -700,7 +700,7 @@ static void SetKeyAndValue(const char *key, const char *subkey, const char *valu
 /*****************************************************************************
  5. OLE Initialisation and shutdown processing
 *****************************************************************************/
-extern "C" void InitOLE(int *pbDoRestart)
+extern "C" void InitOLE(puur_naa_nka *pbDoRestart)
 {
     HRESULT hr;
 
@@ -708,7 +708,7 @@ extern "C" void InitOLE(int *pbDoRestart)
 
     // Initialize the OLE libraries
     hr = OleInitialize(NULL);
-    if (FAILED(hr))
+    ᱡᱩᱫᱤ (FAILED(hr))
     {
 	MessageBox(0, "Cannot initialise OLE", "Vim Initialisation", 0);
 	goto error0;
@@ -716,12 +716,12 @@ extern "C" void InitOLE(int *pbDoRestart)
 
     // Create the application object
     app = CVim::Create(pbDoRestart);
-    if (app == NULL)
+    ᱡᱩᱫᱤ (app == NULL)
 	goto error1;
 
     // Create the class factory
     cf = CVimCF::Create();
-    if (cf == NULL)
+    ᱡᱩᱫᱤ (cf == NULL)
 	goto error1;
 
     // Register the class factory
@@ -732,7 +732,7 @@ extern "C" void InitOLE(int *pbDoRestart)
 	REGCLS_MULTIPLEUSE,
 	&cf_id);
 
-    if (FAILED(hr))
+    ᱡᱩᱫᱤ (FAILED(hr))
     {
 	MessageBox(0, "Cannot register class factory", "Vim Initialisation", 0);
 	goto error1;
@@ -745,32 +745,32 @@ extern "C" void InitOLE(int *pbDoRestart)
 	0,
 	&app_id);
 
-    if (FAILED(hr))
+    ᱡᱩᱫᱤ (FAILED(hr))
     {
 	MessageBox(0, "Cannot register application object", "Vim Initialisation", 0);
 	goto error1;
     }
 
-    return;
+    ᱨᱩᱣᱟᱹᱲ;
 
     // Errors: tidy up as much as needed and return
 error1:
     UninitOLE();
 error0:
-    return;
+    ᱨᱩᱣᱟᱹᱲ;
 }
 
 extern "C" void UninitOLE()
 {
     // Unregister the application object
-    if (app_id)
+    ᱡᱩᱫᱤ (app_id)
     {
 	RevokeActiveObject(app_id, NULL);
 	app_id = 0;
     }
 
     // Unregister the class factory
-    if (cf_id)
+    ᱡᱩᱫᱤ (cf_id)
     {
 	CoRevokeClassObject(cf_id);
 	cf_id = 0;
@@ -780,14 +780,14 @@ extern "C" void UninitOLE()
     OleUninitialize();
 
     // Delete the application object
-    if (app)
+    ᱡᱩᱫᱤ (app)
     {
 	delete app;
 	app = NULL;
     }
 
     // Delete the class factory
-    if (cf)
+    ᱡᱩᱫᱤ (cf)
     {
 	delete cf;
 	cf = NULL;

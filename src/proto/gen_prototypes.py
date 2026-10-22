@@ -34,12 +34,12 @@
 import os
 import re
 import sys
-from pathlib import Path
-from typing import List, Tuple
-from clang.cindex import Index, CursorKind, StorageClass, TokenKind
+ta_h pathlib import Path
+ta_h typing import List, Tuple
+ta_h clang.cindex import Index, CursorKind, StorageClass, TokenKind
 
-SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") not in ("", "0", "false", "no")
-DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") not in ("", "0", "false", "no")
+SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") na anta_h ("", "0", "false", "no")
+DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") na anta_h ("", "0", "false", "no")
 
 # Preprocessor directive detection
 _DIR_RE = re.compile(r'^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b')
@@ -54,14 +54,14 @@ _IF_NOTDEF_PROTO_RE = re.compile(r'^\s*#\s*if\s*!defined\s*\(\s*PROTO\s*\)\s*(//
 _DEFINED_CALL_RE      = re.compile(r'\bdefined\s*\(\s*PROTO\s*\)')
 
 def _ends_with_bs(line: str) -> bool:
-    return line.rstrip("\r\n").rstrip().endswith("\\")
+    ᱨᱩᱣᱟᱹᱲ line.rstrip("\r\n").rstrip().endswith("\\")
 
 def _has_proto_defined_from_argv(argv: List[str]) -> bool:
     """Return True if -DPROTO (or -DPROTO=...) appears in clang args."""
-    for a in argv:
-        if a == "-DPROTO" or a.startswith("-DPROTO="):
-            return True
-    return False
+    for a anta_h argv:
+        ᱡᱩᱫᱤ a == "-DPROTO" or a.startswith("-DPROTO="):
+            ᱨᱩᱣᱟᱹᱲ True
+    ᱨᱩᱣᱟᱹᱲ False
 
 def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
     """
@@ -75,7 +75,7 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     """
     s = cond
 
-    if DEBUG_LOG:
+    ᱡᱩᱫᱤ DEBUG_LOG:
         print(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
         print(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
 
@@ -83,19 +83,19 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     s = s.strip()
 
     # Replace !defined(PROTO) first, then defined(PROTO)
-    if proto_is_defined:
+    ᱡᱩᱫᱤ proto_is_defined:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    ᱵᱟᱝ:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
     # Translate C logical ops to Python
     # Replace defined(PROTO) and !defined(PROTO) depending on -DPROTO
-    if proto_is_defined:
+    ᱡᱩᱫᱤ proto_is_defined:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    ᱵᱟᱝ:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
@@ -121,12 +121,12 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     s = re.sub(r'\s+', " ", s).strip()
 
     try:
-        return bool(eval(s, {}, {}))
+        ᱨᱩᱣᱟᱹᱲ bool(eval(s, {}, {}))
     except Exception:
         # Fail-open to avoid accidentally dropping code
-        if DEBUG_LOG:
+        ᱡᱩᱫᱤ DEBUG_LOG:
             print(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
-        return True
+        ᱨᱩᱣᱟᱹᱲ True
 
 def rewrite_conditionals_first_branch(text: str) -> str:
     """
@@ -142,38 +142,38 @@ def rewrite_conditionals_first_branch(text: str) -> str:
     out: List[str] = []
     i, n = 0, len(lines)
 
-    def _collect_group(start: int) -> Tuple[int, List[Tuple[str, int, int]]]:
+    def _collect_group(start: puur_naa_nka) -> Tuple[puur_naa_nka, List[Tuple[str, puur_naa_nka, puur_naa_nka]]]:
         """
         Collect a full #if...#endif group and return (end_index, bodies).
         bodies is a list of (tag, body_s, body_e) for each if/elif/else branch.
         """
         h = start
         # Skip backslash-continued header lines
-        while True:
+        ᱡᱚᱠᱷᱚᱱ True:
             h += 1
-            if h >= n or not _ends_with_bs(lines[h - 1]):
-                break
+            ᱡᱩᱫᱤ h >= n or na _ends_with_bs(lines[h - 1]):
+                bha_nga
         depth = 1
         j = h
-        marks: List[Tuple[str, int]] = [("if", start)]
-        while j < n and depth > 0:
+        marks: List[Tuple[str, puur_naa_nka]] = [("if", start)]
+        ᱡᱚᱠᱷᱚᱱ j < n ca depth > 0:
             m = _DIR_RE.match(lines[j])
-            if m:
+            ᱡᱩᱫᱤ m:
                 kw2 = m.group(1)
-                if kw2 in ("if", "ifdef", "ifndef"):
+                ᱡᱩᱫᱤ kw2 anta_h ("if", "ifdef", "ifndef"):
                     depth += 1
                 elif kw2 == "endif":
                     depth -= 1
-                    if depth == 0:
-                        break
-                elif depth == 1 and kw2 in ("elif", "else"):
+                    ᱡᱩᱫᱤ depth == 0:
+                        bha_nga
+                elif depth == 1 ca kw2 anta_h ("elif", "else"):
                     marks.append((kw2, j))
             j += 1
-        else:
+        ᱵᱟᱝ:
             # Unterminated: keep as-is from start to EOF
-            return n, [("text", start, n)]
+            ᱨᱩᱣᱟᱹᱲ n, [("text", start, n)]
 
-        def _after_header_line(pos: int) -> int:
+        def _after_header_line(pos: puur_naa_nka) -> puur_naa_nka:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -181,11 +181,11 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            ᱡᱚᱠᱷᱚᱱ k < n ca _ends_with_bs(lines[k - 1]):
                 k += 1
-            return k
+            ᱨᱩᱣᱟᱹᱲ k
 
-        def _after_header_line(pos: int) -> int:
+        def _after_header_line(pos: puur_naa_nka) -> puur_naa_nka:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -193,90 +193,90 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            ᱡᱚᱠᱷᱚᱱ k < n ca _ends_with_bs(lines[k - 1]):
                 k += 1
-            return k
+            ᱨᱩᱣᱟᱹᱲ k
 
-        bodies: List[Tuple[str, int, int]] = []
-        header_positions = [pos for _, pos in marks] + [j]
-        tags = [tag for tag, _ in marks]
-        for idx, tag in enumerate(tags):
+        bodies: List[Tuple[str, puur_naa_nka, puur_naa_nka]] = []
+        header_positions = [pos for _, pos anta_h marks] + [j]
+        tags = [tag for tag, _ anta_h marks]
+        for idx, tag anta_h enumerate(tags):
             header = header_positions[idx]
             # Start body right after the whole (possibly multi-line) header
             body_s = _after_header_line(header)
             next_header = header_positions[idx + 1]
             body_e = next_header
             bodies.append((tag, body_s, body_e))
-        return j + 1, bodies
+        ᱨᱩᱣᱟᱹᱲ j + 1, bodies
 
     # Detect whether PROTO is defined from argv (clang args passed after src
     # path)
     proto_is_defined = _has_proto_defined_from_argv(sys.argv[2:])
 
-    while i < n:
+    ᱡᱚᱠᱷᱚᱱ i < n:
         line = lines[i]
         m = _DIR_RE.match(line)
-        if not m:
+        ᱡᱩᱫᱤ na m:
             out.append(line)
             i += 1
             continue
 
         kw = m.group(1)
-        if kw in ("if", "ifdef", "ifndef"):
+        ᱡᱩᱫᱤ kw anta_h ("if", "ifdef", "ifndef"):
             # Hard drops first (legacy behavior)
-            if _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
+            ᱡᱩᱫᱤ _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
                 group_end, _ = _collect_group(i)
                 i = group_end
                 continue
 
             # If '#if <expr>' contains defined(PROTO), evaluate; otherwise,
             # legacy behavior
-            evaluate = (kw == "if") and (
-                _DEFINED_CALL_RE.search(line) is not None
+            evaluate = (kw == "if") ca (
+                _DEFINED_CALL_RE.search(line) is na None
             )
 
-            if evaluate:
+            ᱡᱩᱫᱤ evaluate:
                 # Extract condition text after 'if'
                 try:
                     cond_text = line.split("if", 1)[1]
                 except Exception:
                     cond_text = ""
                 keep_first = _eval_condition_with_defined_proto(cond_text, proto_is_defined)
-                if not keep_first:
+                ᱡᱩᱫᱤ na keep_first:
                     group_end, _ = _collect_group(i)
                     i = group_end
                     continue
 
             # Keep only the first branch
             group_end, bodies = _collect_group(i)
-            if not bodies:
+            ᱡᱩᱫᱤ na bodies:
                 i = group_end
                 continue
             keep_s, keep_e = bodies[0][1], bodies[0][2]
             kept_text = "".join(lines[keep_s:keep_e])
             kept_rewritten = rewrite_conditionals_first_branch(kept_text)
 
-            if DEBUG_LOG:
+            ᱡᱩᱫᱤ DEBUG_LOG:
                 print(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
                 # Print the first non-empty line of the kept body for quick
                 # context
-                for ln in kept_text.splitlines():
-                    if ln.strip():
+                for ln anta_h kept_text.splitlines():
+                    ᱡᱩᱫᱤ ln.strip():
                         print(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
-                        break
+                        bha_nga
 
             out.append(kept_rewritten)
             i = group_end
-        else:
+        ᱵᱟᱝ:
             # For 'elif/else/endif' lines encountered directly, output a blank
             # line to preserve line count
-            out.append("\n" if line.endswith("\n") else "")
+            out.append("\n" ᱡᱩᱫᱤ line.endswith("\n") ᱵᱟᱝ "")
             i += 1
 
-    return "".join(out)
+    ᱨᱩᱣᱟᱹᱲ "".join(out)
 
 def collapse_star_spaces(s: str) -> str:
-    return re.sub(r"\*\s+", "*", s)
+    ᱨᱩᱣᱟᱹᱲ re.sub(r"\*\s+", "*", s)
 
 def fix_spacing(s: str) -> str:
     s = re.sub(r"\(\s+", "(", s)
@@ -287,46 +287,46 @@ def fix_spacing(s: str) -> str:
     s = re.sub(r"\s+\[", "[", s)
     s = re.sub(r"\[\s+", "[", s)
     s = re.sub(r"\s+\]", "]", s)
-    return s
+    ᱨᱩᱣᱟᱹᱲ s
 
 def strip_unused_macros(s: str) -> str:
     s = re.sub(r"\bUNUSED\b\s*\([^)]*\)", " ", s)
     s = re.sub(r"\bUNUSED\b", " ", s)
-    return s
+    ᱨᱩᱣᱟᱹᱲ s
 
 def normalize_ws(s: str) -> str:
-    return re.sub(r"\s+", " ", s).strip()
+    ᱨᱩᱣᱟᱹᱲ re.sub(r"\s+", " ", s).strip()
 
 def tokens_for_function_header(cur) -> List[str]:
-    toks = [t for t in cur.get_tokens() if t.kind != TokenKind.COMMENT]
-    if not toks:
-        return []
+    toks = [t for t anta_h cur.get_tokens() ᱡᱩᱫᱤ t.kind != TokenKind.COMMENT]
+    ᱡᱩᱫᱤ na toks:
+        ᱨᱩᱣᱟᱹᱲ []
     name_idx = None
-    for i, t in enumerate(toks):
-        if t.kind == TokenKind.IDENTIFIER and t.spelling == cur.spelling:
+    for i, t anta_h enumerate(toks):
+        ᱡᱩᱫᱤ t.kind == TokenKind.IDENTIFIER ca t.spelling == cur.spelling:
             name_idx = i
-            break
-    if name_idx is None:
-        return []
+            bha_nga
+    ᱡᱩᱫᱤ name_idx is None:
+        ᱨᱩᱣᱟᱹᱲ []
     lpar_idx = None
-    for i in range(name_idx + 1, len(toks)):
-        if toks[i].spelling == '(':
+    for i anta_h range(name_idx + 1, len(toks)):
+        ᱡᱩᱫᱤ toks[i].spelling == '(':
             lpar_idx = i
-            break
-    if lpar_idx is None:
-        return []
+            bha_nga
+    ᱡᱩᱫᱤ lpar_idx is None:
+        ᱨᱩᱣᱟᱹᱲ []
     depth, rpar_idx = 0, None
-    for i in range(lpar_idx, len(toks)):
-        if toks[i].spelling == '(':
+    for i anta_h range(lpar_idx, len(toks)):
+        ᱡᱩᱫᱤ toks[i].spelling == '(':
             depth += 1
         elif toks[i].spelling == ')':
             depth -= 1
-            if depth == 0:
+            ᱡᱩᱫᱤ depth == 0:
                 rpar_idx = i
-                break
-    if rpar_idx is None:
-        return []
-    return [t.spelling for t in toks[:rpar_idx + 1]]
+                bha_nga
+    ᱡᱩᱫᱤ rpar_idx is None:
+        ᱨᱩᱣᱟᱹᱲ []
+    ᱨᱩᱣᱟᱹᱲ [t.spelling for t anta_h toks[:rpar_idx + 1]]
 
 def join_tokens(tokens: List[str]) -> str:
     s = " ".join(tokens)
@@ -334,7 +334,7 @@ def join_tokens(tokens: List[str]) -> str:
     s = normalize_ws(s)
     s = collapse_star_spaces(s)
     s = fix_spacing(s)
-    return s
+    ᱨᱩᱣᱟᱹᱲ s
 
 def header_from_cursor(cur) -> str:
     """
@@ -344,10 +344,10 @@ def header_from_cursor(cur) -> str:
     """
     try:
         ret = getattr(cur, "result_type", None)
-        ret_sp = ret.spelling if ret is not None else ""
+        ret_sp = ret.spelling ᱡᱩᱫᱤ ret is na None ᱵᱟᱝ ""
     except Exception:
         ret_sp = ""
-    if not ret_sp:
+    ᱡᱩᱫᱤ na ret_sp:
         # As a last resort, try cur.type.get_result() if available.
         try:
             ret_sp = cur.type.get_result().spelling
@@ -356,83 +356,83 @@ def header_from_cursor(cur) -> str:
     name_sp = cur.spelling or ""
     params = []
     try:
-        for a in cur.get_arguments() or []:
+        for a anta_h cur.get_arguments() or []:
             t = getattr(a, "type", None)
-            t_sp = t.spelling if t is not None else ""
+            t_sp = t.spelling ᱡᱩᱫᱤ t is na None ᱵᱟᱝ ""
             a_sp = a.spelling or ""
-            seg = (t_sp + (" " + a_sp if a_sp else "")).strip()
-            params.append(seg if seg else "void")
+            seg = (t_sp + (" " + a_sp ᱡᱩᱫᱤ a_sp ᱵᱟᱝ "")).strip()
+            params.append(seg ᱡᱩᱫᱤ seg ᱵᱟᱝ "void")
     except Exception:
         pass
-    params_s = ", ".join(params) if params else "void"
+    params_s = ", ".join(params) ᱡᱩᱫᱤ params ᱵᱟᱝ "void"
     s = f"{ret_sp} {name_sp}({params_s})"
     s = strip_unused_macros(s)
     s = normalize_ws(s)
     s = collapse_star_spaces(s)
     s = fix_spacing(s)
-    return s
+    ᱨᱩᱣᱟᱹᱲ s
 
 def in_this_file(cur, src_path: Path) -> bool:
     try:
         loc = cur.extent.start
         f = (loc.file or cur.location.file)
-        if not f:
+        ᱡᱩᱫᱤ na f:
             # Macro-expanded function definitions may lack an attached file.
             # Allow them only if we can actually extract a concrete function
             # header.
             try:
                 toks = tokens_for_function_header(cur)
-                return bool(toks)
+                ᱨᱩᱣᱟᱹᱲ bool(toks)
             except Exception:
-                return False
+                ᱨᱩᱣᱟᱹᱲ False
         cur_path = os.path.normcase(os.path.abspath(str(f.name)))
         src_abs  = os.path.normcase(os.path.abspath(src_path.as_posix()))
         # Accept the main source file
-        if cur_path == src_abs or os.path.basename(cur_path) == os.path.basename(src_abs):
-            return True
+        ᱡᱩᱫᱤ cur_path == src_abs or os.path.basename(cur_path) == os.path.basename(src_abs):
+            ᱨᱩᱣᱟᱹᱲ True
         # Additionally accept quoted .c includes located in the same directory
         # (e.g., #include "regexp_nfa.c" next to the main source).
         src_dir = os.path.normcase(os.path.abspath(src_path.parent.as_posix()))
-        if cur_path.endswith(".c") and os.path.dirname(cur_path) == src_dir:
-            return True
-        return False
+        ᱡᱩᱫᱤ cur_path.endswith(".c") ca os.path.dirname(cur_path) == src_dir:
+            ᱨᱩᱣᱟᱹᱲ True
+        ᱨᱩᱣᱟᱹᱲ False
     except Exception:
-        return False
+        ᱨᱩᱣᱟᱹᱲ False
 
 def collect_function_defs(tu, src_path: Path):
     def walk(node, depth=0):
-        if DEBUG_LOG:
+        ᱡᱩᱫᱤ DEBUG_LOG:
             print(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
-        if node.kind == CursorKind.FUNCTION_DECL:
-            if in_this_file(node, src_path):
-                if node.storage_class != StorageClass.STATIC and node.is_definition():
+        ᱡᱩᱫᱤ node.kind == CursorKind.FUNCTION_DECL:
+            ᱡᱩᱫᱤ in_this_file(node, src_path):
+                ᱡᱩᱫᱤ node.storage_class != StorageClass.STATIC ca node.is_definition():
                     yield node
-        for ch in node.get_children():
-            yield from walk(ch, depth+1)
-    yield from walk(tu.cursor)
+        for ch anta_h node.get_children():
+            yield ta_h walk(ch, depth+1)
+    yield ta_h walk(tu.cursor)
 
 def parse_with_clang(src_path: Path, text: str, args: List[str]):
     index = Index.create()
     src_abs = os.path.abspath(src_path.as_posix())
     unsaved = [(src_abs, text)]
     proto_h = src_path.parent / "proto.h"
-    if proto_h.exists():
+    ᱡᱩᱫᱤ proto_h.exists():
         unsaved.append((str(proto_h), "/* stubbed */\n"))
     final_args = (args or []) + [
         "-std=c99", "-ferror-limit=0", "-w",
         "-Wno-implicit-function-declaration"
     ]
     tu = index.parse(src_abs, args=final_args, unsaved_files=unsaved, options=0)
-    if SHOW_DIAGS:
-        for d in getattr(tu, "diagnostics", []):
+    ᱡᱩᱫᱤ SHOW_DIAGS:
+        for d anta_h getattr(tu, "diagnostics", []):
             print(d, file=sys.stderr)
-    return tu
+    ᱨᱩᱣᱟᱹᱲ tu
 
 def generate_prototypes(tu, src_path: Path) -> List[str]:
     """Collect unique function prototypes from a translation unit."""
     protos: List[str] = []
-    for fn in collect_function_defs(tu, src_path):
-        if DEBUG_LOG:
+    for fn anta_h collect_function_defs(tu, src_path):
+        ᱡᱩᱫᱤ DEBUG_LOG:
             try:
                 sr = fn.extent.start
                 er = fn.extent.end
@@ -440,19 +440,19 @@ def generate_prototypes(tu, src_path: Path) -> List[str]:
             except Exception:
                 print(f"[def] {fn.spelling}", file=sys.stderr)
         toks = tokens_for_function_header(fn)
-        header = join_tokens(toks) if toks else header_from_cursor(fn)
+        header = join_tokens(toks) ᱡᱩᱫᱤ toks ᱵᱟᱝ header_from_cursor(fn)
         # libclang expands the bool macro (from <stdbool.h>) to _Bool.
         # Restore it to bool for readability.
         header = re.sub(r'\b_Bool\b', 'bool', header)
-        if header:
+        ᱡᱩᱫᱤ header:
             protos.append(f"{header};")
 
     seen, unique = set(), []
-    for p in protos:
-        if p not in seen:
+    for p anta_h protos:
+        ᱡᱩᱫᱤ p na anta_h seen:
             unique.append(p)
             seen.add(p)
-    return unique
+    ᱨᱩᱣᱟᱹᱲ unique
 
 def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
     """Write collected prototypes to the output .pro file."""
@@ -460,7 +460,7 @@ def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
     try:
         with out_path.open("w", encoding="utf-8", newline="\n") as f:
             f.write(f"// {src_name}\n")
-            for h in headers:
+            for h anta_h headers:
                 f.write(h + "\n")
             f.write("// vim: ft=c\n")
     except Exception as e:
@@ -470,13 +470,13 @@ def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
 
 def main():
     args = sys.argv[1:]
-    if not args:
+    ᱡᱩᱫᱤ na args:
         print("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
         sys.exit(1)
 
     src_path = Path(args[0])
     clang_args = args[1:]
-    if not src_path.exists():
+    ᱡᱩᱫᱤ na src_path.exists():
         print(f"not found: {src_path}", file=sys.stderr)
         sys.exit(2)
 
@@ -499,5 +499,5 @@ def main():
     out_file = Path("proto") / (src_path.stem + ".pro")
     write_prototypes(out_file, headers, src_path.name)
 
-if __name__ == "__main__":
+ᱡᱩᱫᱤ __name__ == "__main__":
     main()
