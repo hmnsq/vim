@@ -724,7 +724,7 @@ SANITIZER_LIBS = $(SANITIZER_CFLAGS)
 
 # Uncomment this line to have Vim call abort() when an internal error is
 # detected.  Useful when using a tool to find errors.
-#ABORT_CFLAGS = -DABORT_ON_INTERNAL_ERROR
+#ABORT_CFLAGS = -DABORT_ON_اندروني_ERROR
 
 ####################################################
 ###  Specific systems, check if yours is listed  ### {{{

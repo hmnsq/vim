@@ -7,17 +7,17 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_CB_H
-#define GUI_GTK4_CB_H
+#جيڪڏهن_وصف_نه_ٿيل GUI_GTK4_CB_H
+#وصف_ڪريو GUI_GTK4_CB_H
 
-#include "vim.h"
-#include <gtk/gtk.h>
+#ضمن "vim.h"
+#ضمن <gtk/gtk.h>
 
-#define VIM_TYPE_CONTENT_PROVIDER (vim_content_provider_get_type())
+#وصف_ڪريو VIM_TYPE_CONTENT_PROVIDER (vim_content_provider_get_type())
 G_DECLARE_FINAL_TYPE(VimContentProvider, vim_content_provider, VIM, CONTENT_PROVIDER, GdkContentProvider)
 
-extern const char *supported_mimes[];
+خارجي ثابت حرف *supported_mimes[];
 
 GdkContentProvider *vim_content_provider_new(Clipboard_T *cbd);
 
-#endif
+#جيڪڏهن_پورو

@@ -14,36 +14,36 @@
  * blit pixels ("images" are objects), the behaviour is emulated.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_IMAGE)
+#إذا defined(FEAT_IMAGE)
 
-struct
+بنية
 {
-    const char *name;
+    ثابت حرف *name;
 
-    struct
+    بنية
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_T *);
-	void (*uninit)(image_T *);
+	صحيح (*init)(image_T *);
+	فراغ (*uninit)(image_T *);
     } image;
 
-    struct
+    بنية
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_placement_T *);
-	void (*uninit)(image_placement_T *);
+	صحيح (*init)(image_placement_T *);
+	فراغ (*uninit)(image_placement_T *);
 
-	void (*draw)(image_placement_T *);
-	void (*clear)(image_placement_T *);
+	فراغ (*draw)(image_placement_T *);
+	فراغ (*clear)(image_placement_T *);
 
 	// If backend blits the image pixels to the screen. Images are not
 	// treated as "objects".
 	bool blit;
     } placement;
 } image_backends[] = {
-#ifdef FEAT_IMAGE_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_GUI
     [IMAGE_BACKEND_GUI] = {
 	.name = "gui",
 	.image = {
@@ -58,18 +58,18 @@ struct
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 	    .blit = false,
-#  else
+#  وإلا
 	    .blit = true,
 #  endif
 # elif FEAT_GUI_MSWIN
 	    .blit = true,
-# else
+# وإلا
 	    .blit = false,
 # endif
 	}
     },
-#endif
-#ifdef FEAT_IMAGE_KITTY
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_KITTY
     [IMAGE_BACKEND_KITTY] = {
 	.name = "kitty",
 	.image = {
@@ -84,8 +84,8 @@ struct
 	    .blit = false
 	}
     },
-#endif
-#ifdef FEAT_IMAGE_SIXEL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_SIXEL
     [IMAGE_BACKEND_SIXEL] = {
 	.name = "sixel",
 	.image = {
@@ -100,60 +100,60 @@ struct
 	    .blit = true
 	}
     }
-#endif
+#جيڪڏهن_پورو
 };
 
 // Current image backend being used
-static image_backend_T image_backend = IMAGE_BACKEND_NONE;
+ساكن image_backend_T image_backend = IMAGE_BACKEND_NONE;
 
-static image_T *images = NULL;
+ساكن image_T *images = عدم;
 // Sorted from highest zindex to lowest zindex
-static image_placement_T    *placements = NULL;
-static int		    n_placements = 0;
+ساكن image_placement_T    *placements = عدم;
+ساكن صحيح		    n_placements = 0;
 
-static int shift_top = 0;
-static int shift_bot = 0;
-static int shift = 0;
+ساكن صحيح سرڪايو_چوٽي = 0;
+ساكن صحيح سرڪايو_bot = 0;
+ساكن صحيح سرڪايو = 0;
 
 // If > 0, then mark_dirty_region_for_images() will be a no-op
-static int freeze_mark_dirty = 0;
+ساكن صحيح freeze_mark_dirty = 0;
 
-#define FOR_ALL_IMAGES(v) for ((v) = images; (v) != NULL; (v) = (v)->next)
-#define FOR_ALL_PLACEMENTS(v) \
-    for ((v) = placements; (v) != NULL; (v) = (v)->next)
+#وصف_ڪريو FOR_ALL_IMAGES(v) لكل ((v) = images; (v) != عدم; (v) = (v)->ايندڙ)
+#وصف_ڪريو FOR_ALL_PLACEMENTS(v) \
+    لكل ((v) = placements; (v) != عدم; (v) = (v)->ايندڙ)
 
-#define IMAGE_FUNC(b, n) (image_backends[b].image.n)
-#define PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
+#وصف_ڪريو IMAGE_FUNC(b, n) (image_backends[b].image.n)
+#وصف_ڪريو PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
 
-static void redraw_region(pixman_region32_t *region, bool now, bool restore);
+ساكن فراغ redraw_region(pixman_region32_t *region, bool now, bool restore);
 
-    void
-init_image_state(void)
+    فراغ
+init_image_state(فراغ)
 {
-    (void)update_image_backend();
+    (فراغ)update_image_backend();
 }
 
-    void
-uninit_image_state(void)
+    فراغ
+uninit_image_state(فراغ)
 {
-#ifdef FEAT_IMAGE_SIXEL
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_SIXEL
     sixel_uninit();
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Return true if the there image backend is ready, otherwise emit error.
  */
-    static bool
-backend_available(bool msg)
+    ساكن bool
+backend_موجود(bool نياپو)
 {
-    if (image_backend == IMAGE_BACKEND_NONE)
+    إذا (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
-	    emsg(_(e_no_image_backend_available));
-	return false;
+	إذا (نياپو)
+	    emsg(_(e_no_image_backend_موجود));
+	أرجع false;
     }
-    return true;
+    أرجع true;
 }
 
 /*
@@ -161,28 +161,28 @@ backend_available(bool msg)
  * failure.
  */
     image_T *
-image_new(uint8_t *data, int width, int height, image_format_T fmt)
+image_new(uint8_t *معلومات, صحيح ويڪر, صحيح اوچائي, image_format_T fmt)
 {
     image_T	    *img;
-    static int_u    id;
+    ساكن int_u    id;
 
-    if (!backend_available(true))
-	return NULL;
+    إذا (!backend_موجود(true))
+	أرجع عدم;
 
     img = ALLOC_CLEAR_ONE(image_T);
-    if (img == NULL)
-	return NULL;
+    إذا (img == عدم)
+	أرجع عدم;
 
-    img->data = vim_memsave(data, (size_t)width * height * fmt);
-    if (img->data == NULL)
+    img->معلومات = vim_memsave(معلومات, (size_t)ويڪر * اوچائي * fmt);
+    إذا (img->معلومات == عدم)
     {
 	vim_free(img);
-	return NULL;
+	أرجع عدم;
     }
 
-    img->state = IMAGE_STATE_PRIVATE;
-    img->width = width;
-    img->height = height;
+    img->state = IMAGE_STATE_ذاتي;
+    img->ويڪر = ويڪر;
+    img->اوچائي = اوچائي;
     img->fmt = fmt;
 
     // Mix in PID to prevent ID collisions when using kitty graphics protocol
@@ -191,35 +191,35 @@ image_new(uint8_t *data, int width, int height, image_format_T fmt)
 
     img->backend = image_backend;
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    إذا (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
-	vim_free(img->data);
+	vim_free(img->معلومات);
 	vim_free(img);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (images != NULL)
+    إذا (images != عدم)
 	images->prev = img;
-    img->next = images;
+    img->ايندڙ = images;
     images = img;
 
-    return img;
+    أرجع img;
 }
 
-    static void
+    ساكن فراغ
 image_free(image_T *img)
 {
-    if (backend_available(false))
+    إذا (backend_موجود(false))
 	IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (img->prev != NULL)
-	img->prev->next = img->next;
-    if (img->next != NULL)
-	img->next->prev = img->prev;
-    if (images == img)
-	images = img->next;
+    إذا (img->prev != عدم)
+	img->prev->ايندڙ = img->ايندڙ;
+    إذا (img->ايندڙ != عدم)
+	img->ايندڙ->prev = img->prev;
+    إذا (images == img)
+	images = img->ايندڙ;
 
-    vim_free(img->data);
+    vim_free(img->معلومات);
     vim_free(img);
 }
 
@@ -227,10 +227,10 @@ image_free(image_T *img)
  * Decrement reference count of an image. Be careful to not let the public API
  * be able to directly decrement the refcount of an image multiple times!
  */
-    void
+    فراغ
 image_unref(image_T *img)
 {
-    if (--img->refcount <= 0)
+    إذا (--img->refcount <= 0)
 	image_free(img);
 }
 
@@ -242,118 +242,118 @@ image_unref(image_T *img)
 image_ref(image_T *img)
 {
     img->refcount++;
-    return img;
+    أرجع img;
 }
 
 /*
  * Get image width and height in cells, rounding up so that every pixel is
  * covered.
  */
-    void
-image_get_cell_dimensions(image_T *img, int *cw, int *ch)
+    فراغ
+image_get_cell_dimensions(image_T *img, صحيح *cw, صحيح *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    صحيح w = PHY2LOG(img->ويڪر);
+    صحيح h = PHY2LOG(img->اوچائي);
 
-    *cw = (w + cell_width - 1) / cell_width;
-    *ch = (h + cell_height - 1) / cell_height;
+    *cw = (w + cell_ويڪر - 1) / cell_ويڪر;
+    *ch = (h + cell_اوچائي - 1) / cell_اوچائي;
 }
 
 /*
  * Similar, but return the dimensions of all cells that are *fully* covered by
  * pixels. Pixels that are partially covered are not counted.
  */
-    static void
-image_get_cell_dimensions_min(image_T *img, int *cw, int *ch)
+    ساكن فراغ
+image_get_cell_dimensions_min(image_T *img, صحيح *cw, صحيح *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    صحيح w = PHY2LOG(img->ويڪر);
+    صحيح h = PHY2LOG(img->اوچائي);
 
-    *cw = w / cell_width;
-    *ch = h / cell_height;
+    *cw = w / cell_ويڪر;
+    *ch = h / cell_اوچائي;
 }
 
-    void
-image_get_dimensions(image_T *img, int *w, int *h)
+    فراغ
+image_get_dimensions(image_T *img, صحيح *w, صحيح *h)
 {
-    *w = img->width;
-    *h = img->height;
+    *w = img->ويڪر;
+    *h = img->اوچائي;
 }
 
 /*
  * Replace the current image contents with "data". "data" should be the exact
  * same format, width, and height. Return OK on success and FAIL on failure.
  */
-    int
-image_update(image_T *img, uint8_t *data)
+    صحيح
+image_update(image_T *img, uint8_t *معلومات)
 {
-    int w, h;
+    صحيح w, h;
 
-    if (!backend_available(true) || img->data == NULL)
-	return FAIL;
+    إذا (!backend_موجود(true) || img->معلومات == عدم)
+	أرجع FAIL;
 
     image_get_dimensions(img, &w, &h);
-    mch_memmove(img->data, data, (size_t)w * h * img->fmt);
+    mch_memmove(img->معلومات, معلومات, (size_t)w * h * img->fmt);
 
     IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    إذا (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
-	emsg(_(e_out_of_memory));
-	VIM_CLEAR(img->data);
-	return FAIL;
+	emsg(_(e_ٻاهريون_جو_يادگيري));
+	VIM_CLEAR(img->معلومات);
+	أرجع FAIL;
     }
 
     img->ver++;
     redraw_all_later(UPD_VALID);
-    return OK;
+    أرجع OK;
 }
 
-    static void
-image_placement_unlink(image_placement_T *place)
+    ساكن فراغ
+image_placement_unlink(image_placement_T *رکو)
 {
-    if (place->prev != NULL)
-	place->prev->next = place->next;
-    if (place->next != NULL)
-	place->next->prev = place->prev;
-    if (placements == place)
-	placements = place->next;
+    إذا (رکو->prev != عدم)
+	رکو->prev->ايندڙ = رکو->ايندڙ;
+    إذا (رکو->ايندڙ != عدم)
+	رکو->ايندڙ->prev = رکو->prev;
+    إذا (placements == رکو)
+	placements = رکو->ايندڙ;
     n_placements--;
 }
 
-    static void
-image_placement_link(image_placement_T *place)
+    ساكن فراغ
+image_placement_link(image_placement_T *رکو)
 {
     image_placement_T *p = placements;
-    image_placement_T *prev = NULL;
+    image_placement_T *prev = عدم;
 
     // Add placement *before* the placement with the lower zindex.
-    while (p != NULL)
+    طالما (p != عدم)
     {
-	if (place->zindex > p->zindex)
-	    break;
-	else if (place->zindex == p->zindex)
+	إذا (رکو->zindex > p->zindex)
+	    اكسر;
+	وإلا إذا (رکو->zindex == p->zindex)
 	{
-	    if (place->use > p->use)
-		break;
-	    if (place->gen < p->gen)
-		break;
+	    إذا (رکو->use > p->use)
+		اكسر;
+	    إذا (رکو->gen < p->gen)
+		اكسر;
 	}
 
 	prev = p;
-	p = p->next;
+	p = p->ايندڙ;
     }
 
-    place->next = p;
-    place->prev = prev;
+    رکو->ايندڙ = p;
+    رکو->prev = prev;
 
-    if (p != NULL)
-	p->prev = place;
+    إذا (p != عدم)
+	p->prev = رکو;
 
-    if (prev != NULL)
-	prev->next = place;
-    else
-	placements = place;
+    إذا (prev != عدم)
+	prev->ايندڙ = رکو;
+    وإلا
+	placements = رکو;
 
     n_placements++;
 }
@@ -380,233 +380,233 @@ image_placement_new(
 	image_placement_use_T	use,
 	bool			quiet)
 {
-    image_placement_T	*place;
-    static int_u	id = 1; // Kitty placements id must be > 1
+    image_placement_T	*رکو;
+    ساكن int_u	id = 1; // Kitty placements id must be > 1
 
-    if (!backend_available(!quiet))
-	return NULL;
+    إذا (!backend_موجود(!quiet))
+	أرجع عدم;
 
-    place = ALLOC_CLEAR_ONE(image_placement_T);
-    if (place == NULL)
-	return NULL;
+    رکو = ALLOC_CLEAR_ONE(image_placement_T);
+    إذا (رکو == عدم)
+	أرجع عدم;
 
-    place->id = id;
+    رکو->id = id;
     id += PLACEMENT_ID_INC; // Allocate 1000 free placement ids to be used to
 			    // draw this image placement. Only relevant for
 			    // kitty graphics protocol.
-    place->gen = gen;
-    place->use = use;
+    رکو->gen = gen;
+    رکو->use = use;
 
-    place->img = img;
-    place->flags = IMAGEPF_DIRTY;
+    رکو->img = img;
+    رکو->flags = IMAGEPF_DIRTY;
 
-    if (img != NULL)
+    إذا (img != عدم)
     {
-	place->img_ver = img->ver;
-	place->backend = image_backend;
-	place->cell_width = cell_width;
-	place->cell_height = cell_height;
+	رکو->img_ver = img->ver;
+	رکو->backend = image_backend;
+	رکو->cell_ويڪر = cell_ويڪر;
+	رکو->cell_اوچائي = cell_اوچائي;
 
 	// Bounding box is in cells
 	image_get_cell_dimensions(img,
-		&place->bounding_box.x2, &place->bounding_box.y2);
-	place->crop_box.x2 = place->bounding_box.x2;
-	place->crop_box.y2 = place->bounding_box.y2;
+		&رکو->bounding_box.x2, &رکو->bounding_box.y2);
+	رکو->crop_box.x2 = رکو->bounding_box.x2;
+	رکو->crop_box.y2 = رکو->bounding_box.y2;
 
-	if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+	إذا (PLACEMENT_FUNC(image_backend, init)(رکو) == FAIL)
 	{
 	    id -= PLACEMENT_ID_INC;
-	    vim_free(place);
-	    return NULL;
+	    vim_free(رکو);
+	    أرجع عدم;
 	}
     }
-    else
-	place->backend = IMAGE_BACKEND_NONE;
+    وإلا
+	رکو->backend = IMAGE_BACKEND_NONE;
 
-    image_placement_link(place);
+    image_placement_link(رکو);
 
-    return place;
+    أرجع رکو;
 }
 
-    static void
-image_placement_clear_int(image_placement_T *place, bool now)
+    ساكن فراغ
+image_placement_clear_int(image_placement_T *رکو, bool now)
 {
-    if (backend_available(false) && place->img != NULL)
+    إذا (backend_موجود(false) && رکو->img != عدم)
     {
-	if (place->flags & IMAGEPF_VISIBLE_INIT
+	إذا (رکو->flags & IMAGEPF_VISIBLE_INIT
 		&& PLACEMENT_FUNC(image_backend, blit))
-	    redraw_region(&place->visible_abs, now, true);
-	PLACEMENT_FUNC(image_backend, clear)(place);
-	place->flags |= IMAGEPF_HIDDEN;
-	if (!now && !updating_screen)
+	    redraw_region(&رکو->visible_abs, now, true);
+	PLACEMENT_FUNC(image_backend, clear)(رکو);
+	رکو->flags |= IMAGEPF_HIDDEN;
+	إذا (!now && !updating_screen)
 	    redraw_all_later(UPD_VALID);
     }
 }
 
-    void
-image_placement_clear(image_placement_T *place)
+    فراغ
+image_placement_clear(image_placement_T *رکو)
 {
-    image_placement_clear_int(place, updating_screen);
+    image_placement_clear_int(رکو, updating_screen);
 }
 
-    void
-image_placement_free(image_placement_T *place)
+    فراغ
+image_placement_free(image_placement_T *رکو)
 {
-    if (backend_available(false) && place->backend_data != NULL)
+    إذا (backend_موجود(false) && رکو->backend_معلومات != عدم)
     {
-	image_placement_clear(place);
-	PLACEMENT_FUNC(image_backend, uninit)(place);
+	image_placement_clear(رکو);
+	PLACEMENT_FUNC(image_backend, uninit)(رکو);
     }
 
-    if (place->flags & IMAGEPF_VISIBLE_INIT)
+    إذا (رکو->flags & IMAGEPF_VISIBLE_INIT)
     {
-	pixman_region32_fini(&place->visible);
-	pixman_region32_fini(&place->visible_abs);
+	pixman_region32_fini(&رکو->visible);
+	pixman_region32_fini(&رکو->visible_abs);
     }
-    image_placement_unlink(place);
+    image_placement_unlink(رکو);
 
-    if (place->img != NULL)
-	image_unref(place->img);
-    vim_free(place);
+    إذا (رکو->img != عدم)
+	image_unref(رکو->img);
+    vim_free(رکو);
 }
 
-    void
-image_placement_set_zindex(image_placement_T *place, int zindex)
+    فراغ
+image_placement_سيٽ_zindex(image_placement_T *رکو, صحيح zindex)
 {
     // If image was hidden before, must dirty it so it is fully redrawn again.
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    إذا (رکو->flags & IMAGEPF_HIDDEN)
+	رکو->flags |= IMAGEPF_DIRTY;
+    رکو->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->zindex == zindex)
-	return;
-    place->zindex = zindex;
-    place->flags |= IMAGEPF_DIRTY;
+    إذا (رکو->zindex == zindex)
+	أرجع;
+    رکو->zindex = zindex;
+    رکو->flags |= IMAGEPF_DIRTY;
 
     // Must re-add the placement back so it is in the correct order
-    image_placement_unlink(place);
-    image_placement_link(place);
+    image_placement_unlink(رکو);
+    image_placement_link(رکو);
 }
 
 /*
  * Make sure to also update the bounding box!
  */
-    void
-image_placement_set_position(image_placement_T *place, int row, int col)
+    فراغ
+image_placement_سيٽ_position(image_placement_T *رکو, صحيح صف, صحيح کانو)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    إذا (رکو->flags & IMAGEPF_HIDDEN)
+	رکو->flags |= IMAGEPF_DIRTY;
+    رکو->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->row == row && place->col == col)
-	return;
-    place->row = row;
-    place->col = col;
-    place->flags |= IMAGEPF_DIRTY;
+    إذا (رکو->صف == صف && رکو->کانو == کانو)
+	أرجع;
+    رکو->صف = صف;
+    رکو->کانو = کانو;
+    رکو->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
+    فراغ
+image_placement_سيٽ_crop(image_placement_T *رکو, صحيح x, صحيح y, صحيح w, صحيح h)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    إذا (رکو->flags & IMAGEPF_HIDDEN)
+	رکو->flags |= IMAGEPF_DIRTY;
+    رکو->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->crop_box.x1 == x && place->crop_box.y1 == y
-	    && place->crop_box.x2 == x + w && place->crop_box.y2 == y + h)
-	return;
+    إذا (رکو->crop_box.x1 == x && رکو->crop_box.y1 == y
+	    && رکو->crop_box.x2 == x + w && رکو->crop_box.y2 == y + h)
+	أرجع;
 
-    place->crop_box.x1 = x;
-    place->crop_box.y1 = y;
+    رکو->crop_box.x1 = x;
+    رکو->crop_box.y1 = y;
 
-    place->crop_box.x2 = x + w;
-    place->crop_box.y2 = y + h;
-    place->flags |= IMAGEPF_DIRTY;
+    رکو->crop_box.x2 = x + w;
+    رکو->crop_box.y2 = y + h;
+    رکو->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_bounding_box(
-	image_placement_T   *place,
-	int		    row,
-	int		    col,
-	int		    row_height,
-	int		    col_width)
+    فراغ
+image_placement_سيٽ_bounding_box(
+	image_placement_T   *رکو,
+	صحيح		    صف,
+	صحيح		    کانو,
+	صحيح		    صف_اوچائي,
+	صحيح		    کانو_ويڪر)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
-	place->flags |= IMAGEPF_DIRTY;
-    place->flags &= ~IMAGEPF_HIDDEN;
+    إذا (رکو->flags & IMAGEPF_HIDDEN)
+	رکو->flags |= IMAGEPF_DIRTY;
+    رکو->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->bounding_box.x1 == col && place->bounding_box.y1 == row
-	    && place->bounding_box.x2 == col + col_width
-	    && place->bounding_box.y2 == row + row_height)
-	return;
+    إذا (رکو->bounding_box.x1 == کانو && رکو->bounding_box.y1 == صف
+	    && رکو->bounding_box.x2 == کانو + کانو_ويڪر
+	    && رکو->bounding_box.y2 == صف + صف_اوچائي)
+	أرجع;
 
-    place->bounding_box.x1 = col;
-    place->bounding_box.y1 = row;
+    رکو->bounding_box.x1 = کانو;
+    رکو->bounding_box.y1 = صف;
 
-    place->bounding_box.x2 = col + col_width;
-    place->bounding_box.y2 = row + row_height;
-    place->flags |= IMAGEPF_DIRTY;
+    رکو->bounding_box.x2 = کانو + کانو_ويڪر;
+    رکو->bounding_box.y2 = صف + صف_اوچائي;
+    رکو->flags |= IMAGEPF_DIRTY;
 }
 
 /*
  * Enable or disable the image placement. Unlike IMAGEPF_HIDDEN, this is not
  * reset across redraws.
  */
-    void
-image_placement_set_enable(image_placement_T *place, bool enable)
+    فراغ
+image_placement_سيٽ_enable(image_placement_T *رکو, bool enable)
 {
-    bool old = place->flags & IMAGEPF_ENABLED;
+    bool old = رکو->flags & IMAGEPF_ENABLED;
 
-    if (enable && !old)
-	place->flags |= IMAGEPF_ENABLED;
-    else if (!enable && old)
+    إذا (enable && !old)
+	رکو->flags |= IMAGEPF_ENABLED;
+    وإلا إذا (!enable && old)
     {
-	place->flags &= ~IMAGEPF_ENABLED;
-	image_placement_clear(place);
+	رکو->flags &= ~IMAGEPF_ENABLED;
+	image_placement_clear(رکو);
     }
-    else
-	return;
+    وإلا
+	أرجع;
 
-    place->flags |= IMAGEPF_DIRTY;
+    رکو->flags |= IMAGEPF_DIRTY;
 }
 
 /*
  * Note that the returned crop region (x, y, w, h) is in physical pixels if
  * "physical" is true. Not relevant when using terminal protocols (sixel, KGP).
  */
-    void
+    فراغ
 image_placement_subrect(
-	image_placement_T   *place,
+	image_placement_T   *رکو,
 	pixman_box32_t	    rect,
-	int		    *row,
-	int		    *col,
-	int		    *x,
-	int		    *y,
-	int		    *w,
-	int		    *h,
+	صحيح		    *صف,
+	صحيح		    *کانو,
+	صحيح		    *x,
+	صحيح		    *y,
+	صحيح		    *w,
+	صحيح		    *h,
 	bool		    physical)
 {
-    int iw, ih;
+    صحيح iw, ih;
 
-    image_get_dimensions(place->img, &iw, &ih);
+    image_get_dimensions(رکو->img, &iw, &ih);
 
-    *row = place->row + rect.y1 + place->row_off;
-    *col = place->col + rect.x1;
+    *صف = رکو->صف + rect.y1 + رکو->صف_off;
+    *کانو = رکو->کانو + rect.x1;
 
-    *x = (rect.x1 + place->crop_box.x1) * cell_width;
-    *y = (rect.y1 + place->crop_box.y1) * cell_height;
-    *w = (rect.x2 - rect.x1) * cell_width;
-    *h = (rect.y2 - rect.y1) * cell_height;
+    *x = (rect.x1 + رکو->crop_box.x1) * cell_ويڪر;
+    *y = (rect.y1 + رکو->crop_box.y1) * cell_اوچائي;
+    *w = (rect.x2 - rect.x1) * cell_ويڪر;
+    *h = (rect.y2 - rect.y1) * cell_اوچائي;
 
-    if (physical)
+    إذا (physical)
     {
 	*x = LOG2PHY(*x);
 	*y = LOG2PHY(*y);
 	*w = LOG2PHY(*w);
 	*h = LOG2PHY(*h);
     }
-    else
+    وإلا
     {
 	iw = PHY2LOG(iw);
 	ih = PHY2LOG(ih);
@@ -615,8 +615,8 @@ image_placement_subrect(
     // Make that all the values are valid. "w" and "h" can especially be
     // invalid, because the image dimensions (in pixels) are converted to cells,
     // rounding *up*.
-    *row = MIN(*row, Rows);
-    *col = MIN(*col, Columns);
+    *صف = MIN(*صف, صفون);
+    *کانو = MIN(*کانو, Columns);
 
     *x = MIN(iw, MAX(*x, 0));
     *y = MIN(ih, MAX(*y, 0));
@@ -630,94 +630,94 @@ image_placement_subrect(
  * instead of deferring to next redraw. If "restore" is true, restore the cursor
  * position.
  */
-    static void
+    ساكن فراغ
 redraw_region(pixman_region32_t *region, bool now, bool restore)
 {
     pixman_box32_t  *rects;
-    int		    n_rects;
-    int		    cur_row = screen_cur_row;
-    int		    cur_col = screen_cur_col;
+    صحيح		    n_rects;
+    صحيح		    cur_صف = screen_cur_صف;
+    صحيح		    cur_کانو = screen_cur_کانو;
 
     rects = pixman_region32_rectangles(region, &n_rects);
-    if (rects == NULL)
-	return;
+    إذا (rects == عدم)
+	أرجع;
 
-    for (int i = 0; i < n_rects; i++)
+    لكل (صحيح i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	if (now)
+	إذا (now)
 	{
 	    // The region may be from before a resize, when the screen was
 	    // bigger.
-	    int height = MIN(rect.y2, screen_Rows) - rect.y1;
-	    int width = MIN(rect.x2, screen_Columns) - rect.x1;
+	    صحيح اوچائي = MIN(rect.y2, screen_صفون) - rect.y1;
+	    صحيح ويڪر = MIN(rect.x2, screen_Columns) - rect.x1;
 
 	    // Tip: if you want to debug stale pixels appearing, set "inverse"
 	    // of screen_draw_rectangle() to TRUE.
-	    if (height > 0 && width > 0)
-		screen_draw_rectangle(rect.y1, rect.x1, height, width,
+	    إذا (اوچائي > 0 && ويڪر > 0)
+		screen_draw_rectangle(rect.y1, rect.x1, اوچائي, ويڪر,
 			FALSE, TRUE);
-	    continue;
+	    استمر;
 	}
 
-	for (int r = rect.y1; r < rect.y2; r++)
+	لكل (صحيح r = rect.y1; r < rect.y2; r++)
 	{
-	    if (r >= screen_Rows)
-		break;
+	    إذا (r >= screen_صفون)
+		اكسر;
 
-	    for (int c = rect.x1; c < rect.x2; c++)
+	    لكل (صحيح c = rect.x1; c < rect.x2; c++)
 	    {
-		if (c >= screen_Columns)
-		    break;
+		إذا (c >= screen_Columns)
+		    اكسر;
 
-		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
+		ScreenAttrs[سٽ_وٿي[r] + c] = (sattr_T)-1;
 	    }
 	}
     }
 
-    if (restore)
-	windgoto(cur_row, cur_col);
+    إذا (restore)
+	windgoto(cur_صف, cur_کانو);
 }
 
 /*
  * Draw all image placements to the screen. This should be done after all text
  * have been drawn to the screen, and image placements positioned correctly.
  */
-    void
-draw_image_placements(void)
+    فراغ
+draw_image_placements(فراغ)
 {
-    image_placement_T	*place;
-    pixman_region32_t	subtract_region;    // In cells
+    image_placement_T	*رکو;
+    pixman_region32_t	ڪٽيو_region;    // In cells
     pixman_region32_t	dirty_region;	    // In cells
     image_placement_T	**pending_placements;
-    int			pending_len = -1;
+    صحيح			pending_len = -1;
     // Save current cursor position
-    int			cur_row = screen_cur_row;
-    int			cur_col = screen_cur_col;
+    صحيح			cur_صف = screen_cur_صف;
+    صحيح			cur_کانو = screen_cur_کانو;
 
     // Check if all placements have no backing image. If so, then do nothing
-    FOR_ALL_PLACEMENTS(place)
-	if (place->img != NULL)
+    FOR_ALL_PLACEMENTS(رکو)
+	إذا (رکو->img != عدم)
 	{
 	    pending_len = 0;
-	    break;
+	    اكسر;
 	}
 
-    if (pending_len == -1)
-	return;
+    إذا (pending_len == -1)
+	أرجع;
 
-    if (!backend_available(false))
-	return;
+    إذا (!backend_موجود(false))
+	أرجع;
 
-    if (n_placements == 0)
-	return;
+    إذا (n_placements == 0)
+	أرجع;
 
     pending_placements = ALLOC_CLEAR_MULT(image_placement_T *, n_placements);
-    if (pending_placements == NULL)
-	return;
+    إذا (pending_placements == عدم)
+	أرجع;
 
-    pixman_region32_init(&subtract_region);
+    pixman_region32_init(&ڪٽيو_region);
     pixman_region32_init(&dirty_region);
 
     cursor_off();
@@ -732,50 +732,50 @@ draw_image_placements(void)
     // also what regions are stale and redraw them. If we did everything in one
     // pass, stale regions of one image that overlap another image with a higher
     // index, would overwrite the overlapping image.
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(رکو)
     {
-	image_T *img = place->img;
+	image_T *img = رکو->img;
 
 	pixman_region32_t   image_region;
 	pixman_region32_t   visible_region;
 
-	int x, y;
+	صحيح x, y;
 
-	if (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
+	إذا (رکو->flags & IMAGEPF_HIDDEN || !(رکو->flags & IMAGEPF_ENABLED))
 	    // Don't need to clear image placement for non-blit backends,
 	    // because we call image_placement_clear() every time we don't want
 	    // to see the image. Not sure of the side effects if we also clear
 	    // it here...
-	    continue;
+	    استمر;
 
-	if (img != NULL)
+	إذا (img != عدم)
 	{
 	    pixman_region32_t	visible_abs;
-	    int			crop_w, crop_h;
-	    bool		cs_changed;
+	    صحيح			crop_w, crop_h;
+	    bool		cs_بدليو;
 	    bool		need_redraw;
 
 	    // Processing changed image data failed, skip this image
-	    if (place->img->data == NULL)
+	    إذا (رکو->img->معلومات == عدم)
 	    {
-		image_placement_clear(place);
-		continue;
+		image_placement_clear(رکو);
+		استمر;
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
-			&& place->bounding_box.y2 <= shift_bot)
-		    && place->row_off != shift)
+	    إذا ((رکو->bounding_box.y1 >= سرڪايو_چوٽي
+			&& رکو->bounding_box.y2 <= سرڪايو_bot)
+		    && رکو->صف_off != سرڪايو)
 	    {
-		place->row_off = shift;
-		place->flags |= IMAGEPF_DIRTY;
+		رکو->صف_off = سرڪايو;
+		رکو->flags |= IMAGEPF_DIRTY;
 	    }
 
-	    x = place->col;
-	    y = place->row + place->row_off;
+	    x = رکو->کانو;
+	    y = رکو->صف + رکو->صف_off;
 
-	    crop_w = place->crop_box.x2 - place->crop_box.x1;
-	    crop_h = place->crop_box.y2 - place->crop_box.y1;
+	    crop_w = رکو->crop_box.x2 - رکو->crop_box.x1;
+	    crop_h = رکو->crop_box.y2 - رکو->crop_box.y1;
 
 	    // Don't add "crop_box" x1 and y1, because "row" and "col" use the
 	    // top left of the final cropped image.
@@ -786,15 +786,15 @@ draw_image_placements(void)
 
 	    // Only use parts of the image region within the actual screen.
 	    // "row_off" may offset the image slightly/completely off screen.
-	    if (!pixman_region32_intersect_rect(&image_region, &image_region,
-			0, 0, Columns, Rows)
-		    || !pixman_region32_subtract(&visible_region,
-			&image_region, &subtract_region)
+	    إذا (!pixman_region32_intersect_rect(&image_region, &image_region,
+			0, 0, Columns, صفون)
+		    || !pixman_region32_ڪٽيو(&visible_region,
+			&image_region, &ڪٽيو_region)
 		    || !pixman_region32_copy(&visible_abs, &visible_region))
 	    {
 		pixman_region32_fini(&image_region);
 		pixman_region32_fini(&visible_region);
-		continue;
+		استمر;
 	    }
 
 	    pixman_region32_fini(&image_region);
@@ -803,50 +803,50 @@ draw_image_placements(void)
 	    // into image relative coordinates.
 	    pixman_region32_translate(&visible_region, -x, -y);
 
-	    cs_changed = place->cell_width != cell_width
-		|| place->cell_height != cell_height;
+	    cs_بدليو = رکو->cell_ويڪر != cell_ويڪر
+		|| رکو->cell_اوچائي != cell_اوچائي;
 
 	    // If cell size changed, then the visible regions are invalid pixel
 	    // wise. This prevents backends such as sixel from using cached
 	    // sequences.
-	    if (cs_changed)
+	    إذا (cs_بدليو)
 	    {
-		place->cell_width = cell_width;
-		place->cell_height = cell_height;
-		place->flags |= IMAGEPF_FORCE;
+		رکو->cell_ويڪر = cell_ويڪر;
+		رکو->cell_اوچائي = cell_اوچائي;
+		رکو->flags |= IMAGEPF_FORCE;
 	    }
 
 	    // Only redraw the image if it has changed (or if we haven't drawn
 	    // it yet). Or if image data has changed or cell size has changed
-	    need_redraw = place->flags & IMAGEPF_DIRTY || cs_changed
-		||  (place->flags & IMAGEPF_VISIBLE_INIT
+	    need_redraw = رکو->flags & IMAGEPF_DIRTY || cs_بدليو
+		||  (رکو->flags & IMAGEPF_VISIBLE_INIT
 			&& !pixman_region32_equal(&visible_region,
-			    &place->visible));
+			    &رکو->visible));
 
-	    if (place->img_ver != img->ver)
+	    إذا (رکو->img_ver != img->ver)
 	    {
 		// Image data changed
 		need_redraw = true;
-		place->img_ver = img->ver;
+		رکو->img_ver = img->ver;
 
-		image_placement_clear(place);
-		PLACEMENT_FUNC(image_backend, uninit)(place);
-		if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+		image_placement_clear(رکو);
+		PLACEMENT_FUNC(image_backend, uninit)(رکو);
+		إذا (PLACEMENT_FUNC(image_backend, init)(رکو) == FAIL)
 		{
-		    emsg(_(e_out_of_memory));
-		    image_unref(place->img);
-		    place->img = NULL;
-		    continue;
+		    emsg(_(e_ٻاهريون_جو_يادگيري));
+		    image_unref(رکو->img);
+		    رکو->img = عدم;
+		    استمر;
 		}
 	    }
 
-	    if (need_redraw)
+	    إذا (need_redraw)
 	    {
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
-		    pixman_region32_fini(&place->visible);
-		place->visible = visible_region;
+		إذا (رکو->flags & IMAGEPF_VISIBLE_INIT)
+		    pixman_region32_fini(&رکو->visible);
+		رکو->visible = visible_region;
 
-		if (PLACEMENT_FUNC(image_backend, blit))
+		إذا (PLACEMENT_FUNC(image_backend, blit))
 		{
 		    // Must redraw the stale regions that will not be composited
 		    // over (for this specific image).
@@ -854,17 +854,17 @@ draw_image_placements(void)
 
 		    pixman_region32_init(&stale_region);
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    إذا (رکو->flags & IMAGEPF_VISIBLE_INIT)
 		    {
-			(void)pixman_region32_subtract(&stale_region,
-				&place->visible_abs, &visible_abs);
+			(فراغ)pixman_region32_ڪٽيو(&stale_region,
+				&رکو->visible_abs, &visible_abs);
 
 			// Since pixels may be translucent/transparent, we must
 			// redraw the cells behind the image every time, so that
 			// no stale pixels remain from the previous redraw.
-			if (img->fmt == IMAGE_FORMAT_RGBA)
-			    (void)pixman_region32_union(&stale_region,
-				    &stale_region, &place->visible_abs);
+			إذا (img->fmt == IMAGE_FORMAT_RGBA)
+			    (فراغ)pixman_region32_union(&stale_region,
+				    &stale_region, &رکو->visible_abs);
 		    }
 
 		    // The visible region is guaranteed to cover every single
@@ -881,59 +881,59 @@ draw_image_placements(void)
 		    //
 		    // Not needed for RGBA images, because we redraw the visible
 		    // region every time anyways.
-		    if (img->fmt != IMAGE_FORMAT_RGBA)
+		    إذا (img->fmt != IMAGE_FORMAT_RGBA)
 		    {
-			int		    min_w, min_h;
-			int		    rect_w, rect_h;
+			صحيح		    min_w, min_h;
+			صحيح		    rect_w, rect_h;
 			pixman_region32_t   min_region;
 
 			image_get_cell_dimensions_min(img, &min_w, &min_h);
 
 			// Ensure "min_region" only covers the fully covered
 			// cells of the cropped region.
-			rect_w = min_w - place->crop_box.x1;
-			rect_h = min_h - place->crop_box.y1;
+			rect_w = min_w - رکو->crop_box.x1;
+			rect_h = min_h - رکو->crop_box.y1;
 
-			if (rect_w > 0 && rect_h > 0)
+			إذا (rect_w > 0 && rect_h > 0)
 			    // pixman_region32_init_rect() expects a non zero
 			    // width and height (otherwise it outputs error
 			    // message).
 			    pixman_region32_init_rect(&min_region,
 				    x, y, rect_w, rect_h);
-			else
+			وإلا
 			    pixman_region32_init(&min_region);
 
-			(void)pixman_region32_subtract(&min_region,
+			(فراغ)pixman_region32_ڪٽيو(&min_region,
 				&visible_abs, &min_region);
-			(void)pixman_region32_union(&stale_region,
+			(فراغ)pixman_region32_union(&stale_region,
 				&stale_region, &min_region);
 			pixman_region32_fini(&min_region);
 		    }
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    إذا (رکو->flags & IMAGEPF_VISIBLE_INIT)
 			// Also subtract "subtract_region", so we don't
 			// redundantly redraw cells that will have images
 			// painted over them after. Make sure to do this before
 			// we check partially covered cells, since
 			// "subtract_region" may also have partially covered
 			// cells.
-			(void)pixman_region32_subtract(&stale_region,
-				&stale_region, &subtract_region);
+			(فراغ)pixman_region32_ڪٽيو(&stale_region,
+				&stale_region, &ڪٽيو_region);
 
 		    // Don't redraw now, defer it later
 		    pixman_region32_union(&dirty_region,
 			    &dirty_region, &stale_region);
 		    pixman_region32_fini(&stale_region);
 		}
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
-		    pixman_region32_fini(&place->visible_abs);
-		place->visible_abs = visible_abs;
+		إذا (رکو->flags & IMAGEPF_VISIBLE_INIT)
+		    pixman_region32_fini(&رکو->visible_abs);
+		رکو->visible_abs = visible_abs;
 
-		pending_placements[pending_len++] = place;
-		place->flags |= IMAGEPF_VISIBLE_INIT;
-		place->flags &= ~IMAGEPF_DIRTY;
+		pending_placements[pending_len++] = رکو;
+		رکو->flags |= IMAGEPF_VISIBLE_INIT;
+		رکو->flags &= ~IMAGEPF_DIRTY;
 	    }
-	    else
+	    وإلا
 	    {
 		pixman_region32_fini(&visible_region);
 		pixman_region32_fini(&visible_abs);
@@ -941,14 +941,14 @@ draw_image_placements(void)
 	}
 
 	// If this is last image, no need to union its bounds.
-	if (place->next == NULL)
-	    break;
+	إذا (رکو->ايندڙ == عدم)
+	    اكسر;
 
-	pixman_region32_union_rect(&subtract_region, &subtract_region,
-		place->bounding_box.x1,
-		place->bounding_box.y1 + place->row_off,
-		place->bounding_box.x2 - place->bounding_box.x1,
-		place->bounding_box.y2 - place->bounding_box.y1);
+	pixman_region32_union_rect(&ڪٽيو_region, &ڪٽيو_region,
+		رکو->bounding_box.x1,
+		رکو->bounding_box.y1 + رکو->صف_off,
+		رکو->bounding_box.x2 - رکو->bounding_box.x1,
+		رکو->bounding_box.y2 - رکو->bounding_box.y1);
     }
 
     // Don't want to dirty images again redundantly
@@ -956,18 +956,18 @@ draw_image_placements(void)
     redraw_region(&dirty_region, true, false);
     freeze_mark_dirty--;
 
-    if (pending_len > 0)
+    إذا (pending_len > 0)
     {
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 	// Make sure to flush any output! We write directly to the draw
 	// area/whatever, meaning draw commands outputted before this (as escape
 	// sequences), will still draw over the image surface if we don't flush
 	// now.
-	if (gui.in_use)
-	    out_flush();
-#endif
+	إذا (gui.اندريون_use)
+	    ٻاهريون_flush();
+#جيڪڏهن_پورو
 
-	for (int i = 0; i < pending_len; i++)
+	لكل (صحيح i = 0; i < pending_len; i++)
 	{
 	    PLACEMENT_FUNC(image_backend, draw)(pending_placements[i]);
 	    pending_placements[i]->flags &= ~IMAGEPF_FORCE;
@@ -977,11 +977,11 @@ draw_image_placements(void)
     // Restore cursor position, however do not turn on the cursor, since that
     // causes it to flicker at the wrong position when using sixel. It will be
     // turned on later somewhere...
-    windgoto(cur_row, cur_col);
-    out_flush();
+    windgoto(cur_صف, cur_کانو);
+    ٻاهريون_flush();
 
     vim_free(pending_placements);
-    pixman_region32_fini(&subtract_region);
+    pixman_region32_fini(&ڪٽيو_region);
     pixman_region32_fini(&dirty_region);
 }
 
@@ -989,41 +989,41 @@ draw_image_placements(void)
  * Mark any images that touches the region dirty. Only used for backends that
  * blit pixels.
  */
-    void
-mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
+    فراغ
+mark_dirty_region_for_images(صحيح صف, صحيح کانو, صحيح صف_اوچائي, صحيح کانو_ويڪر)
 {
-    image_placement_T	*place;
+    image_placement_T	*رکو;
     pixman_box32_t	rect;
 
-    if (freeze_mark_dirty > 0 || !backend_available(false)
+    إذا (freeze_mark_dirty > 0 || !backend_موجود(false)
 	    || !PLACEMENT_FUNC(image_backend, blit) || n_placements == 0)
-	return;
+	أرجع;
 
-    rect.x1 = col;
-    rect.y1 = row;
-    rect.x2 = col + col_width;
-    rect.y2 = row + row_height;
+    rect.x1 = کانو;
+    rect.y1 = صف;
+    rect.x2 = کانو + کانو_ويڪر;
+    rect.y2 = صف + صف_اوچائي;
 
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(رکو)
     {
-	if (place->flags & IMAGEPF_HIDDEN)
-	    continue;
-	if (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
-		== PIXMAN_REGION_OUT)
-	    continue;
+	إذا (رکو->flags & IMAGEPF_HIDDEN)
+	    استمر;
+	إذا (pixman_region32_شامل_آهي_rectangle(&رکو->visible_abs, &rect)
+		== PIXMAN_REGION_ٻاهريون)
+	    استمر;
 
-	place->flags |= IMAGEPF_DIRTY;
+	رکو->flags |= IMAGEPF_DIRTY;
     }
 }
 
-    void
-clear_all_image_placements(void)
+    فراغ
+clear_all_image_placements(فراغ)
 {
-    image_placement_T *place;
+    image_placement_T *رکو;
 
-    FOR_ALL_PLACEMENTS(place)
-	image_placement_clear(place);
-    if (!updating_screen)
+    FOR_ALL_PLACEMENTS(رکو)
+	image_placement_clear(رکو);
+    إذا (!updating_screen)
 	redraw_all_later(UPD_VALID);
 }
 
@@ -1031,33 +1031,33 @@ clear_all_image_placements(void)
  * Used for screen_ins_lines() and screen_del_lines(), because they directly
  * shift rows. Note that this does not queue a screen redraw.
  */
-    void
-shift_image_placements(int top, int bot, int amount)
+    فراغ
+سرڪايو_image_placements(صحيح چوٽي, صحيح bot, صحيح amount)
 {
-    shift_top = top;
-    shift_bot = bot;
-    shift += amount;
+    سرڪايو_چوٽي = چوٽي;
+    سرڪايو_bot = bot;
+    سرڪايو += amount;
 }
 
 /*
  * Called when screen is cleared, as update_screen() may go to clearing the
  * screen instead of inserting lines using screen_ins_lines().
  */
-    void
-shift_reset_image_placements(void)
+    فراغ
+سرڪايو_reset_image_placements(فراغ)
 {
-    shift = 0;
+    سرڪايو = 0;
 }
 
-    static image_T *
-find_image(int_u id)
+    ساكن image_T *
+ڳوليو_image(int_u id)
 {
     image_T *img;
 
     FOR_ALL_IMAGES(img)
-	if (img->state == IMAGE_STATE_PUBLIC && img->id == id)
-	    return img;
-    return NULL;
+	إذا (img->state == IMAGE_STATE_عوامي && img->id == id)
+	    أرجع img;
+    أرجع عدم;
 }
 
 /*
@@ -1065,66 +1065,66 @@ find_image(int_u id)
  * NULL, try updating it instead. If "find" is TRUE, then accept the "id" field.
  */
     image_T *
-add_image(dict_T *dict, image_T *existing, bool find)
+جوڙيو_image(dict_T *dict, image_T *existing, bool ڳوليو)
 {
     dictitem_T	    *di;
-    blob_T	    *data;
+    blob_T	    *معلومات;
     varnumber_T     w, h;
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    إذا (ڳوليو && dict_has_ڪنجي(dict, "id"))
     {
-	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
+	image_T *img = ڳوليو_image((int_u)dict_get_عدد(dict, "id"));
 
-	if (img == NULL)
-	    return NULL;
-	return image_ref(img);
+	إذا (img == عدم)
+	    أرجع عدم;
+	أرجع image_ref(img);
     }
 
-    di = dict_find(dict, (char_u *)"data", -1);
-    w = dict_get_number(dict, "width");
-    h = dict_get_number(dict, "height");
+    di = dict_ڳوليو(dict, (char_u *)"data", -1);
+    w = dict_get_عدد(dict, "width");
+    h = dict_get_عدد(dict, "height");
 
-    if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
+    إذا (di == عدم || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
-	emsg(_(e_invalid_argument));
-	return NULL;
+	emsg(_(e_invalid_دليل));
+	أرجع عدم;
     }
 
     // Check for overflow
     n_pixels = w * h;
-    if (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
+    إذا (w > وڌ_کان_وڌ_عدد || h > وڌ_کان_وڌ_عدد || n_pixels > وڌ_کان_وڌ_عدد)
     {
 	emsg(_(e_invalid_image_dimensions));
-	return NULL;
+	أرجع عدم;
     }
 
-    data = di->di_tv.vval.v_blob;
+    معلومات = di->di_tv.vval.v_blob;
 
-    if (blob_len(data) == n_pixels * 3)
+    إذا (blob_len(معلومات) == n_pixels * 3)
 	fmt = IMAGE_FORMAT_RGB;
-    else if (blob_len(data) == n_pixels * 4)
+    وإلا إذا (blob_len(معلومات) == n_pixels * 4)
 	fmt = IMAGE_FORMAT_RGBA;
-    else
+    وإلا
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "data",
+	semsg(_(e_invalid_قدر_for_دليل_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
-	return NULL;
+	أرجع عدم;
     }
 
-    if (existing != NULL)
+    إذا (existing != عدم)
     {
-	if (existing->width == w && existing->height == h
+	إذا (existing->ويڪر == w && existing->اوچائي == h
 		&& existing->fmt == fmt)
 	{
-	    if (image_update(existing, data->bv_ga.ga_data) == FAIL)
-		return NULL;
-	    return existing;
+	    إذا (image_update(existing, معلومات->bv_ga.ga_معلومات) == FAIL)
+		أرجع عدم;
+	    أرجع existing;
 	}
     }
 
-    return image_new(data->bv_ga.ga_data, w, h, fmt);
+    أرجع image_new(معلومات->bv_ga.ga_معلومات, w, h, fmt);
 }
 
 /*
@@ -1136,117 +1136,117 @@ get_image_info(image_T *img)
 {
     dict_T	*dict;
     blob_T	*blob;
-    int		w, h;
+    صحيح		w, h;
     dictitem_T	*di;
 
-    if (img->data == NULL)
-	return NULL;
+    إذا (img->معلومات == عدم)
+	أرجع عدم;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    إذا (dict == عدم)
+	أرجع عدم;
 
     blob = blob_alloc();
-    if (blob == NULL)
+    إذا (blob == عدم)
     {
 	dict_unref(dict);
-	return NULL;
+	أرجع عدم;
     }
 
     image_get_dimensions(img, &w, &h);
-    (void)ga_concat_bytes(&blob->bv_ga, (char *)img->data,
+    (فراغ)ga_concat_بائيٽون(&blob->bv_ga, (حرف *)img->معلومات,
 	    (size_t)w * h * img->fmt);
 
     di = dictitem_alloc((char_u *)"data");
 
-    if (di != NULL)
+    إذا (di != عدم)
     {
 	di->di_tv.v_type = VAR_BLOB;
 	di->di_tv.vval.v_blob = blob;
     }
-    if (di == NULL || dict_add(dict, di) == FAIL)
+    إذا (di == عدم || dict_جوڙيو(dict, di) == FAIL)
     {
-	if (di != NULL)
+	إذا (di != عدم)
 	    dictitem_free(di);
 	dict_unref(dict);
 	// No need to unref blob, dictitem_free() will do that.
-	return NULL;
+	أرجع عدم;
     }
 
-    if (img->state == IMAGE_STATE_PUBLIC)
-	dict_add_number(dict, "id", img->id);
-    dict_add_number(dict, "width", img->width);
-    dict_add_number(dict, "height", img->height);
-    dict_add_number(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
-    dict_add_string(dict, "format",
+    إذا (img->state == IMAGE_STATE_عوامي)
+	dict_جوڙيو_عدد(dict, "id", img->id);
+    dict_جوڙيو_عدد(dict, "width", img->ويڪر);
+    dict_جوڙيو_عدد(dict, "height", img->اوچائي);
+    dict_جوڙيو_عدد(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
+    dict_جوڙيو_string(dict, "format",
 	    (char_u *)(img->fmt == IMAGE_FORMAT_RGB ? "rgb" : "rgba"));
 
     blob->bv_refcount = 1;
 
-    return dict;
+    أرجع dict;
 }
 
-    static int
-match_imageprotocol(image_backend_T *backend)
+    ساكن صحيح
+ميلاپ_imageprotocol(image_backend_T *backend)
 {
-    int		    len = (int)STRLEN(p_ipc) + 1;
+    صحيح		    len = (صحيح)STRLEN(p_ipc) + 1;
     char_u	    *buf = alloc(len);
     char_u	    *p = p_ipc;
-    int		    ret = FAIL;
+    صحيح		    ret = FAIL;
     image_backend_T res = IMAGE_BACKEND_NONE;
     bool	    got = false;
 
-    if (buf == NULL)
-	return FAIL;
+    إذا (buf == عدم)
+	أرجع FAIL;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
 	char_u		*colon;
 	regmatch_T	regmatch;
 	image_backend_T prot = IMAGE_BACKEND_NONE;
 
 	// Isolate one comma separated item.
-	(void)copy_option_part(&p, buf, len, ",");
+	(فراغ)copy_option_part(&p, buf, len, ",");
 
 	colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
-	    goto exit;
+	إذا (colon == عدم || colon == buf || colon[1] == NUL)
+	    اذهب ٻاهر_نڪرو;
 
 	*colon = NUL;
 
 	// Note: Keep this in sync with p_ipc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	إذا (STRCMP(colon + 1, "none") == 0)
 	    prot = IMAGE_BACKEND_NONE;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	وإلا إذا (STRCMP(colon + 1, "kitty") == 0)
 	{
-#ifdef FEAT_IMAGE_KITTY
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_KITTY
 	    prot = IMAGE_BACKEND_KITTY;
-#endif
+#جيڪڏهن_پورو
 	}
-	else if (STRCMP(colon + 1, "sixel") == 0)
+	وإلا إذا (STRCMP(colon + 1, "sixel") == 0)
 	{
-#ifdef FEAT_IMAGE_SIXEL
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_SIXEL
 	    prot = IMAGE_BACKEND_SIXEL;
-#endif
+#جيڪڏهن_پورو
 	}
-	else
-	    goto exit;
+	وإلا
+	    اذهب ٻاهر_نڪرو;
 
-	if (got)
-	    continue;
+	إذا (got)
+	    استمر;
 
-	CLEAR_FIELD(regmatch);
+	CLEAR_ميدان(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
 
-	if (regmatch.regprog == NULL)
-	    goto exit;
+	إذا (regmatch.regprog == عدم)
+	    اذهب ٻاهر_نڪرو;
 
-	bool match = T_NAME != NULL
+	bool ميلاپ = T_NAME != عدم
 	    && vim_regexec(&regmatch, T_NAME, (colnr_T)0);
 
 	vim_regfree(regmatch.regprog);
-	if (match)
+	إذا (ميلاپ)
 	{
 	    // Keep going to catch any errors
 	    res = prot;
@@ -1256,175 +1256,175 @@ match_imageprotocol(image_backend_T *backend)
 
     ret = OK;
     *backend = res;
-exit:
+ٻاهر_نڪرو:
     vim_free(buf);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Update the current image backend to use depending on 'imageprotocol' and if
  * GUI is being used. Returns OK on success and FAIL on failure.
  */
-    int
-update_image_backend(void)
+    صحيح
+update_image_backend(فراغ)
 {
     image_backend_T new;
 
     image_T		*img;
-    image_placement_T	*place;
+    image_placement_T	*رکو;
 
     // Always process 'imageprotocol' option to check for errors
-    if (match_imageprotocol(&new) == FAIL)
-	return FAIL;
+    إذا (ميلاپ_imageprotocol(&new) == FAIL)
+	أرجع FAIL;
 
-#ifdef FEAT_IMAGE_GUI
-    if (gui.in_use)
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_GUI
+    إذا (gui.اندريون_use)
 	new = IMAGE_BACKEND_GUI;
-#endif
+#جيڪڏهن_پورو
 
-    if (image_backend == new)
-	return OK;
+    إذا (image_backend == new)
+	أرجع OK;
 
     // Must uninit the backends of every image/placement, then init the new
     // backend for each.
     FOR_ALL_IMAGES(img)
     {
-	if (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
-		&& img->backend_data != NULL)
+	إذا (image_backend != IMAGE_BACKEND_NONE && img->معلومات != عدم
+		&& img->backend_معلومات != عدم)
 	    IMAGE_FUNC(image_backend, uninit)(img);
-	img->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE)
+	img->backend_معلومات = عدم;
+	إذا (new != IMAGE_BACKEND_NONE)
 	{
-	    if (IMAGE_FUNC(new, init)(img) == FAIL)
-		goto fail;
+	    إذا (IMAGE_FUNC(new, init)(img) == FAIL)
+		اذهب fail;
 	    img->backend = new;
 	}
     }
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(رکو)
     {
-	image_placement_clear(place);
-	if (image_backend != IMAGE_BACKEND_NONE
-		&& place->img != NULL && place->backend_data != NULL)
-	    PLACEMENT_FUNC(image_backend, uninit)(place);
-	place->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE && place->img != NULL)
+	image_placement_clear(رکو);
+	إذا (image_backend != IMAGE_BACKEND_NONE
+		&& رکو->img != عدم && رکو->backend_معلومات != عدم)
+	    PLACEMENT_FUNC(image_backend, uninit)(رکو);
+	رکو->backend_معلومات = عدم;
+	إذا (new != IMAGE_BACKEND_NONE && رکو->img != عدم)
 	{
-	    if (PLACEMENT_FUNC(new, init)(place) == FAIL)
-		goto fail;
-	    place->backend = new;
+	    إذا (PLACEMENT_FUNC(new, init)(رکو) == FAIL)
+		اذهب fail;
+	    رکو->backend = new;
 	}
     }
 
     redraw_all_later(UPD_VALID);
     image_backend = new;
 
-    if (new == IMAGE_BACKEND_NONE)
-	set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
-    else
-	set_vim_var_string(VV_IMAGEBACKEND,
+    إذا (new == IMAGE_BACKEND_NONE)
+	سيٽ_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
+    وإلا
+	سيٽ_vim_var_string(VV_IMAGEBACKEND,
 		(char_u *)image_backends[image_backend].name, -1);
 
-    return OK;
+    أرجع OK;
 fail:
     FOR_ALL_IMAGES(img)
-	if (img->backend != IMAGE_BACKEND_NONE)
+	إذا (img->backend != IMAGE_BACKEND_NONE)
 	{
 	    IMAGE_FUNC(img->backend, uninit)(img);
 	    img->backend = IMAGE_BACKEND_NONE;
 	}
 
-    FOR_ALL_PLACEMENTS(place)
+    FOR_ALL_PLACEMENTS(رکو)
     {
-	if (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
+	إذا (رکو->img != عدم && رکو->backend != IMAGE_BACKEND_NONE)
 	{
-	    image_placement_clear(place);
-	    PLACEMENT_FUNC(place->backend, uninit)(place);
+	    image_placement_clear(رکو);
+	    PLACEMENT_FUNC(رکو->backend, uninit)(رکو);
 	}
-	place->backend = IMAGE_BACKEND_NONE;
+	رکو->backend = IMAGE_BACKEND_NONE;
     }
 
     redraw_all_later(UPD_VALID);
 
     image_backend = IMAGE_BACKEND_NONE;
-    set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
+    سيٽ_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
     emsg(_(e_changing_image_backend_failed));
-    return FAIL;
+    أرجع FAIL;
 }
 
-    void
-f_image_add(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_image_جوڙيو(typval_T *argvars, typval_T *rettv)
 {
     dict_T  *dict;
     image_T *img;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_dict_arg(argvars, 0) == FAIL)
+	أرجع;
 
     dict = argvars[0].vval.v_dict;
 
-    img = add_image(dict, NULL, false);
-    if (img != NULL)
-	img->state = IMAGE_STATE_PUBLIC;
+    img = جوڙيو_image(dict, عدم, false);
+    إذا (img != عدم)
+	img->state = IMAGE_STATE_عوامي;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = img == NULL ? (varnumber_T)-1 : img->id;
+    rettv->v_type = VAR_عدد;
+    rettv->vval.v_عدد = img == عدم ? (varnumber_T)-1 : img->id;
 }
 
-    void
-f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_image_discard(typval_T *argvars, typval_T *rettv اڻ_استعمال_ٿيل)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_عدد_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    img = find_image((int_u)argvars[0].vval.v_number);
+    img = ڳوليو_image((int_u)argvars[0].vval.v_عدد);
 
-    if (img != NULL)
+    إذا (img != عدم)
     {
-	img->state = IMAGE_STATE_PRIVATE;
+	img->state = IMAGE_STATE_ذاتي;
 	image_unref(img);
     }
-    else
-	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+    وإلا
+	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_عدد);
 }
 
-    void
+    فراغ
 f_image_info(typval_T *argvars, typval_T *rettv)
 {
     image_T *img;
     dict_T  *dict;
 
-    if (rettv_list_alloc(rettv) == FAIL
-	    || check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL
+	    || check_for_opt_عدد_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    إذا (argvars[0].v_type == VAR_عدد)
     {
-	img = find_image((int_u)argvars[0].vval.v_number);
-	if (img == NULL)
+	img = ڳوليو_image((int_u)argvars[0].vval.v_عدد);
+	إذا (img == عدم)
 	{
-	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
-	    return;
+	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_عدد);
+	    أرجع;
 	}
 	dict = get_image_info(img);
-	if (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	إذا (dict != عدم && list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	return;
+	أرجع;
     }
 
     FOR_ALL_IMAGES(img)
     {
-	if (img->state == IMAGE_STATE_PRIVATE)
-	    continue;
+	إذا (img->state == IMAGE_STATE_ذاتي)
+	    استمر;
 	dict = get_image_info(img);
-	if (dict == NULL
+	إذا (dict == عدم
 		|| list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	{
 	    dict_unref(dict);	// NULL-safe
-	    return;
+	    أرجع;
 	}
     }
 }
 
-#endif // FEAT_IMAGE
+#جيڪڏهن_پورو // FEAT_IMAGE

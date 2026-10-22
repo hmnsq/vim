@@ -17,18 +17,18 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef EnhancedBP_H
-#define EnhancedBP_H
+#جيڪڏهن_وصف_نه_ٿيل EnhancedBP_H
+#وصف_ڪريو EnhancedBP_H
 
-#include <Xm/PushBP.h>
+#ضمن <Xm/PushBP.h>
 
-#include "gui_xmebw.h"
+#ضمن "gui_xmebw.h"
 
 
 /*
  * EnhancedButton class structure.
  */
-typedef struct _XmEnhancedButtonClassPart
+تعريفنوع بنية _XmEnhancedButtonClassPart
 {
     Pixmap stipple_bitmap;
 } XmEnhancedButtonClassPart;
@@ -36,53 +36,53 @@ typedef struct _XmEnhancedButtonClassPart
 /*
  * Full class record declaration for EnhancedButton class.
  */
-typedef struct
+تعريفنوع بنية
 {
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
     XmLabelClassPart label_class;
-    XmPushButtonClassPart pushbutton_class;
+    Xm_ڌڪو_Button_Class_Part pushbutton_class;
     XmEnhancedButtonClassPart enhancedbutton_class;
 } XmEnhancedButtonClassRec;
 
 
-extern XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
+خارجي XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
 
 /*
  * EnhancedButton instance record.
  */
-typedef struct _XmEnhancedButtonPart
+تعريفنوع بنية _XmEnhancedButtonPart
 {
     // public resources
-    String pixmap_data;
+    String pixmap_معلومات;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    صحيح label_location;
 
     // private resources
-    int pixmap_depth;
-    Dimension pixmap_width;
-    Dimension pixmap_height;
-    Pixmap normal_pixmap;
+    صحيح pixmap_اونهائي;
+    Dimension pixmap_ويڪر;
+    Dimension pixmap_اوچائي;
+    Pixmap عام_pixmap;
     Pixmap armed_pixmap;
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    صحيح doing_setvalues;
+    صحيح doing_destroy;
 } XmEnhancedButtonPart;
 
 
 /*
  * Full instance record declaration.
  */
-typedef struct _XmEnhancedButtonRec
+تعريفنوع بنية _XmEnhancedButtonRec
 {
     CorePart core;
     XmPrimitivePart primitive;
     XmLabelPart label;
-    XmPushButtonPart pushbutton;
+    Xm_ڌڪو_Button_Part pushbutton;
     XmEnhancedButtonPart enhancedbutton;
 } XmEnhancedButtonRec;
 
-#endif
+#جيڪڏهن_پورو

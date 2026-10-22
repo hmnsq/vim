@@ -7,7 +7,7 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * Vim originated from Stevie version 3.6 (Fish disk 217) by GRWalter (Fred)
@@ -23,725 +23,725 @@
  * interesting.
  */
 
-#include "version.h"
+#ضمن "version.h"
 
-char		*Version = VIM_VERSION_SHORT;
-static char	*mediumVersion = VIM_VERSION_MEDIUM;
+حرف		*نسخو = VIM_نسخو_SHORT;
+ساكن حرف	*medium_نسخو = VIM_نسخو_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
-char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
-						      + sizeof(__TIME__) + 3];
+#إذا defined(HAVE_DATE_وقت)
+# إذا defined(VMS) && defined(VAXC)
+حرف	long_نسخو[حجم(VIM_نسخو_LONG_DATE) + حجم(__DATE__)
+						      + حجم(__TIME__) + 3];
 
-    void
-init_longVersion(void)
+    فراغ
+init_long_نسخو(فراغ)
 {
     /*
      * Construct the long version string.  Necessary because
      * VAX C can't concatenate strings in the preprocessor.
      */
-    strcpy(longVersion, VIM_VERSION_LONG_DATE);
+    strcpy(long_نسخو, VIM_نسخو_LONG_DATE);
 #  ifdef BUILD_DATE
-    strcat(longVersion, BUILD_DATE);
-#  else
-    strcat(longVersion, __DATE__);
-    strcat(longVersion, " ");
-    strcat(longVersion, __TIME__);
+    strcat(long_نسخو, BUILD_DATE);
+#  وإلا
+    strcat(long_نسخو, __DATE__);
+    strcat(long_نسخو, " ");
+    strcat(long_نسخو, __TIME__);
 #  endif
-    strcat(longVersion, ")");
+    strcat(long_نسخو, ")");
 }
 
-# else
-char	*longVersion = NULL;
+# وإلا
+حرف	*long_نسخو = عدم;
 
-    void
-init_longVersion(void)
+    فراغ
+init_long_نسخو(فراغ)
 {
-    if (longVersion != NULL)
-	return;
+    إذا (long_نسخو != عدم)
+	أرجع;
 
 #  ifdef BUILD_DATE
-    char *date_time = BUILD_DATE;
-#  else
-    char *date_time = __DATE__ " " __TIME__;
+    حرف *date_وقت = BUILD_DATE;
+#  وإلا
+    حرف *date_وقت = __DATE__ " " __TIME__;
 #  endif
-    char *msg = _("%s (%s, compiled %s)");
-    size_t len = strlen(msg)
-	+ STRLEN_LITERAL(VIM_VERSION_LONG_ONLY)
-	+ STRLEN_LITERAL(VIM_VERSION_DATE_ONLY)
-	+ strlen(date_time);
+    حرف *نياپو = _("%s (%s, compiled %s)");
+    size_t len = لڙي_ڊيگهه(نياپو)
+	+ STRLEN_LITERAL(VIM_نسخو_LONG_ONLY)
+	+ STRLEN_LITERAL(VIM_نسخو_DATE_ONLY)
+	+ لڙي_ڊيگهه(date_وقت);
 
-    longVersion = alloc(len);
-    if (longVersion == NULL)
-	longVersion = VIM_VERSION_LONG;
-    else
-	vim_snprintf(longVersion, len, msg,
-		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
+    long_نسخو = alloc(len);
+    إذا (long_نسخو == عدم)
+	long_نسخو = VIM_نسخو_LONG;
+    وإلا
+	vim_snprintf(long_نسخو, len, نياپو,
+		VIM_نسخو_LONG_ONLY, VIM_نسخو_DATE_ONLY, date_وقت);
 }
 # endif
-#else
-char	*longVersion = VIM_VERSION_LONG;
+#وإلا
+حرف	*long_نسخو = VIM_نسخو_LONG;
 
-    void
-init_longVersion(void)
+    فراغ
+init_long_نسخو(فراغ)
 {
     // nothing to do
 }
-#endif
+#جيڪڏهن_پورو
 
-static char *(features[]) =
+ساكن حرف *(features[]) =
 {
-#ifdef HAVE_ACL
+#جيڪڏهن_وصف_ٿيل HAVE_ACL
 	"+acl",
-#else
+#وإلا
 	"-acl",
-#endif
-#ifdef FEAT_ARABIC
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_ARABIC
 	"+arabic",
-#else
+#وإلا
 	"-arabic",
-#endif
-#ifdef AMIGA		// only for Amiga systems
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# وإلا
 	"-ARP",
 # endif
-#endif
-#ifdef FEAT_AUTOCHDIR
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#وإلا
 	"-autochdir",
-#endif
+#جيڪڏهن_پورو
 	"+autocmd",
-#ifdef FEAT_AUTOSERVERNAME
+#جيڪڏهن_وصف_ٿيل FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#وإلا
 	"-autoservername",
-#endif
-#ifdef FEAT_BEVAL_GUI
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#وإلا
 	"-balloon_eval",
-#endif
-#ifdef FEAT_BEVAL_TERM
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_BEVAL_رڪن
 	"+balloon_eval_term",
-#else
+#وإلا
 	"-balloon_eval_term",
-#endif
-#ifdef FEAT_BROWSE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_BROWSE
 	"+browse",
-#else
+#وإلا
 	"-browse",
-#endif
+#جيڪڏهن_پورو
 	"++builtin_terms",
-#ifdef FEAT_BYTEOFF
+#جيڪڏهن_وصف_ٿيل FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#وإلا
 	"-byte_offset",
-#endif
-#ifdef FEAT_JOB_CHANNEL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
 	"+channel",
-#else
+#وإلا
 	"-channel",
-#endif
+#جيڪڏهن_پورو
 	"+cindent",
-#ifdef FEAT_CLIENTSERVER
+#جيڪڏهن_وصف_ٿيل FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#وإلا
 	"-clientserver",
-#endif
-#ifdef FEAT_CLIPBOARD
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#وإلا
 	"-clipboard",
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#وإلا
 	"-clipboard_provider",
-#endif
+#جيڪڏهن_پورو
 	"+cmdline_compl",
 	"+cmdline_hist",
 	"+cmdline_info",
 	"+comments",
-#ifdef FEAT_CONCEAL
+#جيڪڏهن_وصف_ٿيل FEAT_CONCEAL
 	"+conceal",
-#else
+#وإلا
 	"-conceal",
-#endif
-#ifdef FEAT_CRYPT
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_CRYPT
 	"+cryptv",
-#else
+#وإلا
 	"-cryptv",
-#endif
-#ifdef FEAT_CSCOPE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_CSCOPE
 	"+cscope",
-#else
+#وإلا
 	"-cscope",
-#endif
+#جيڪڏهن_پورو
 	"+cursorbind",
-#ifdef CURSOR_SHAPE
+#جيڪڏهن_وصف_ٿيل CURSOR_SHAPE
 	"+cursorshape",
-#else
+#وإلا
 	"-cursorshape",
-#endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#جيڪڏهن_پورو
+#إذا defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#وإلا
+# إذا defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# وإلا
+#  إذا defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  وإلا
 	"-dialog",
 #  endif
 # endif
-#endif
-#ifdef FEAT_DIFF
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
 	"+diff",
-#else
+#وإلا
 	"-diff",
-#endif
-#ifdef FEAT_DIGRAPHS
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#وإلا
 	"-digraphs",
-#endif
-#ifdef FEAT_GUI_MSWIN
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# وإلا
 	"-directx",
 # endif
-#endif
-#ifdef FEAT_DND
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_DND
 	"+dnd",
-#else
+#وإلا
 	"-dnd",
-#endif
+#جيڪڏهن_پورو
 	"-ebcdic",
-#ifdef FEAT_EMACS_TAGS
+#جيڪڏهن_وصف_ٿيل FEAT_EMACS_ٽيگ_فهرست
 	"+emacs_tags",
-#else
+#وإلا
 	"-emacs_tags",
-#endif
-#ifdef FEAT_EVAL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	"+eval",
-#else
+#وإلا
 	"-eval",
-#endif
+#جيڪڏهن_پورو
 	"+ex_extra",
-#ifdef FEAT_SEARCH_EXTRA
+#جيڪڏهن_وصف_ٿيل FEAT_ڳولا_EXTRA
 	"+extra_search",
-#else
+#وإلا
 	"-extra_search",
-#endif
+#جيڪڏهن_پورو
 	"-farsi",
 	"+file_in_path",
-#ifdef FEAT_FIND_ID
+#جيڪڏهن_وصف_ٿيل FEAT_ڳوليو_ID
 	"+find_in_path",
-#else
+#وإلا
 	"-find_in_path",
-#endif
+#جيڪڏهن_پورو
 	"+float",
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	"+folding",
-#else
+#وإلا
 	"-folding",
-#endif
+#جيڪڏهن_پورو
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#إذا !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
-#endif
-#ifdef FEAT_GETTEXT
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# وإلا
 	"+gettext",
 # endif
-#else
+#وإلا
 	"-gettext",
-#endif
+#جيڪڏهن_پورو
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#إذا (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# وإلا
 	"+iconv",
 # endif
-#else
+#وإلا
 	"-iconv",
-#endif
-#ifdef FEAT_IMAGE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE
 	"+image",
-#else
+#وإلا
 	"-image",
-#endif
-#ifdef FEAT_IMAGE_POPUP
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#وإلا
 	"-image_popup",
-#endif
+#جيڪڏهن_پورو
 	"+insert_expand",
-#ifdef FEAT_IPV6
+#جيڪڏهن_وصف_ٿيل FEAT_IPV6
 	"+ipv6",
-#else
+#وإلا
 	"-ipv6",
-#endif
-#ifdef FEAT_JOB_CHANNEL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
 	"+job",
-#else
+#وإلا
 	"-job",
-#endif
+#جيڪڏهن_پورو
 	"+jumplist",
-#ifdef FEAT_KEYMAP
+#جيڪڏهن_وصف_ٿيل FEAT_KEYMAP
 	"+keymap",
-#else
+#وإلا
 	"-keymap",
-#endif
-#ifdef FEAT_EVAL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	"+lambda",
-#else
+#وإلا
 	"-lambda",
-#endif
-#ifdef FEAT_LANGMAP
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_LANGMAP
 	"+langmap",
-#else
+#وإلا
 	"-langmap",
-#endif
-#ifdef FEAT_LIBCALL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_LIBCALL
 	"+libcall",
-#else
+#وإلا
 	"-libcall",
-#endif
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 	"+linebreak",
-#else
+#وإلا
 	"-linebreak",
-#endif
+#جيڪڏهن_پورو
 	"+lispindent",
 	"+listcmds",
 	"+localmap",
-#ifdef FEAT_LUA
+#جيڪڏهن_وصف_ٿيل FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# وإلا
 	"+lua",
 # endif
-#else
+#وإلا
 	"-lua",
-#endif
-#ifdef FEAT_MENU
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_MENU
 	"+menu",
-#else
+#وإلا
 	"-menu",
-#endif
-#ifdef FEAT_SESSION
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_SESSION
 	"+mksession",
-#else
+#وإلا
 	"-mksession",
-#endif
+#جيڪڏهن_پورو
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#إذا defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# وإلا
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  وإلا
 	"+mouse_gpm",
 #  endif
-# else
+# وإلا
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# وإلا
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# وإلا
 	"-mouse_netterm",
 # endif
-#endif
+#جيڪڏهن_پورو
 
-#ifdef __QNX__
+#جيڪڏهن_وصف_ٿيل __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# وإلا
 	"-mouse_pterm",
 # endif
-#endif
+#جيڪڏهن_پورو
 
-#if defined(UNIX) || defined(VMS)
+#إذا defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# وإلا
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# وإلا
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
-#endif
-#ifdef FEAT_MOUSESHAPE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#وإلا
 	"-mouseshape",
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_MBYTE_IME
+#جيڪڏهن_وصف_ٿيل FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# وإلا
 	"+multi_byte_ime",
 # endif
-#else
+#وإلا
 	"+multi_byte",
-#endif
-#ifdef FEAT_MULTI_LANG
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#وإلا
 	"-multi_lang",
-#endif
-#ifdef FEAT_MZSCHEME
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# وإلا
 	"+mzscheme",
 # endif
-#else
+#وإلا
 	"-mzscheme",
-#endif
-#ifdef FEAT_NETBEANS_INTG
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#وإلا
 	"-netbeans_intg",
-#endif
+#جيڪڏهن_پورو
 	"+num64",
-#ifdef FEAT_GUI_MSWIN
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# وإلا
 	"-ole",
 # endif
-#endif
-#ifdef FEAT_EVAL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	"+packages",
-#else
+#وإلا
 	"-packages",
-#endif
-#ifdef FEAT_PRINT_PANGO
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PRINT_PANGO
 	"+pango",
-#else
+#وإلا
 	"-pango",
-#endif
+#جيڪڏهن_پورو
 	"+path_extra",
-#ifdef FEAT_PERL
+#جيڪڏهن_وصف_ٿيل FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# وإلا
 	"+perl",
 # endif
-#else
+#وإلا
 	"-perl",
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#وإلا
 	"-persistent_undo",
-#endif
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#وإلا
 	"-popupwin",
-#endif
-#ifdef FEAT_PRINTER
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# وإلا
 	"-postscript",
 # endif
 	"+printer",
-#else
+#وإلا
 	"-printer",
-#endif
-#ifdef FEAT_PROFILE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PROFILE
 	"+profile",
-#else
+#وإلا
 	"-profile",
-#endif
-#ifdef FEAT_PYTHON
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# وإلا
 	"+python",
 # endif
-#else
+#وإلا
 	"-python",
-#endif
-#ifdef FEAT_PYTHON3
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  وإلا
 	"+python3/dyn",
 #  endif
-# else
+# وإلا
 	"+python3",
 # endif
-#else
+#وإلا
 	"-python3",
-#endif
-#ifdef FEAT_QUICKFIX
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
 	"+quickfix",
-#else
+#وإلا
 	"-quickfix",
-#endif
-#ifdef FEAT_RELTIME
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_RELTIME
 	"+reltime",
-#else
+#وإلا
 	"-reltime",
-#endif
-#ifdef FEAT_RIGHTLEFT
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#وإلا
 	"-rightleft",
-#endif
-#ifdef FEAT_RUBY
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# وإلا
 	"+ruby",
 # endif
-#else
+#وإلا
 	"-ruby",
-#endif
+#جيڪڏهن_پورو
 	"+scrollbind",
-#ifdef FEAT_SIGNS
+#جيڪڏهن_وصف_ٿيل FEAT_SIGNS
 	"+signs",
-#else
+#وإلا
 	"-signs",
-#endif
+#جيڪڏهن_پورو
 	"+smartindent",
-#ifdef FEAT_SOCKETSERVER
+#جيڪڏهن_وصف_ٿيل FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#وإلا
 	"-socketserver",
-#endif
-#ifdef FEAT_SODIUM
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# وإلا
 	"+sodium",
 # endif
-#else
+#وإلا
 	"-sodium",
-#endif
-#ifdef FEAT_SOUND
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_SOUND
 	"+sound",
-#else
+#وإلا
 	"-sound",
-#endif
-#ifdef FEAT_SPELL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_SPELL
 	"+spell",
-#else
+#وإلا
 	"-spell",
-#endif
-#ifdef STARTUPTIME
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل STARTUPTIME
 	"+startuptime",
-#else
+#وإلا
 	"-startuptime",
-#endif
-#ifdef FEAT_STL_OPT
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_STL_OPT
 	"+statusline",
-#else
+#وإلا
 	"-statusline",
-#endif
+#جيڪڏهن_پورو
 	"-sun_workshop",
-#ifdef FEAT_SYN_HL
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
 	"+syntax",
-#else
+#وإلا
 	"-syntax",
-#endif
+#جيڪڏهن_پورو
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#إذا defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
-#endif
-#if defined(FEAT_TABPANEL)
+#جيڪڏهن_پورو
+#إذا defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#وإلا
 	"-tabpanel",
-#endif
+#جيڪڏهن_پورو
 	"-tag_any_white",
 	"+tag_binary",
 	"-tag_old_static",
-#ifdef FEAT_TCL
+#جيڪڏهن_وصف_ٿيل FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# وإلا
 	"+tcl",
 # endif
-#else
+#وإلا
 	"-tcl",
-#endif
-#ifdef FEAT_TERMGUICOLORS
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#وإلا
 	"-termguicolors",
-#endif
-#ifdef FEAT_TERMINAL
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_TERMINAL
 	"+terminal",
-#else
+#وإلا
 	"-terminal",
-#endif
-#if defined(UNIX)
+#جيڪڏهن_پورو
+#إذا defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# وإلا
 	"-terminfo",
 # endif
-#endif
-#ifdef FEAT_TERMRESPONSE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#وإلا
 	"-termresponse",
-#endif
+#جيڪڏهن_پورو
 	"+textobjects",
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
 	"+textprop",
-#else
+#وإلا
 	"-textprop",
-#endif
-#if !defined(UNIX)
+#جيڪڏهن_پورو
+#إذا !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# وإلا
 	"-tgetent",
 # endif
-#endif
-#ifdef FEAT_TIMERS
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_TIMERS
 	"+timers",
-#else
+#وإلا
 	"-timers",
-#endif
+#جيڪڏهن_پورو
 	"+title",
-#ifdef FEAT_TOOLBAR
+#جيڪڏهن_وصف_ٿيل FEAT_TOOLBAR
 	"+toolbar",
-#else
+#وإلا
 	"-toolbar",
-#endif
+#جيڪڏهن_پورو
 	"+user_commands",
-#ifdef FEAT_VARTABS
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
 	"+vartabs",
-#else
+#وإلا
 	"-vartabs",
-#endif
+#جيڪڏهن_پورو
 	"+vertsplit",
 	"+vim9script",
-#ifdef FEAT_VIMINFO
+#جيڪڏهن_وصف_ٿيل FEAT_VIMINFO
 	"+viminfo",
-#else
+#وإلا
 	"-viminfo",
-#endif
+#جيڪڏهن_پورو
 	"+virtualedit",
 	"+visual",
 	"+visualextra",
 	"+vreplace",
-#ifdef MSWIN
+#جيڪڏهن_وصف_ٿيل MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# وإلا
 	"-vtp",
 # endif
-#endif
-#ifdef FEAT_WAYLAND
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_WAYLAND
 	"+wayland",
-#else
+#وإلا
 	"-wayland",
-#endif
-#ifdef FEAT_WAYLAND_CLIPBOARD
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#وإلا
 	"-wayland_clipboard",
-#endif
+#جيڪڏهن_پورو
 	"+wildignore",
 	"+wildmenu",
 	"+windows",
-#ifdef FEAT_WRITEBACKUP
+#جيڪڏهن_وصف_ٿيل FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#وإلا
 	"-writebackup",
-#endif
-#if defined(UNIX) || defined(VMS)
+#جيڪڏهن_پورو
+#إذا defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# وإلا
 	"-X11",
 # endif
-#endif
-#ifdef FEAT_XATTR
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_XATTR
 	"+xattr",
-#else
+#وإلا
 	"-xattr",
-#endif
-#ifdef FEAT_XFONTSET
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
 	"+xfontset",
-#else
+#وإلا
 	"-xfontset",
-#endif
-#ifdef FEAT_XIM
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
 	"+xim",
-#else
+#وإلا
 	"-xim",
-#endif
-#if defined(MSWIN)
+#جيڪڏهن_پورو
+#إذا defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# وإلا
 	"-xpm_w32",
 # endif
-#elif defined(HAVE_XPM)
+#وإلاإذا defined(HAVE_XPM)
 	"+xpm",
-#else
+#وإلا
 	"-xpm",
-#endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#جيڪڏهن_پورو
+#إذا defined(UNIX) || defined(VMS)
+# إذا defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# وإلا
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# وإلا
 	"-xterm_clipboard",
 # endif
-#endif
-#ifdef FEAT_XTERM_SAVE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#وإلا
 	"-xterm_save",
-#endif
-	NULL
+#جيڪڏهن_پورو
+	عدم
 };
 
-static int included_patches[] =
+ساكن صحيح included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3204,57 +3204,57 @@ static int included_patches[] =
  * See the official Vim patches for the diff format: It must use a context of
  * one line only.  Create it by hand or use "diff -C2" and edit the patch.
  */
-static char *(extra_patches[]) =
+ساكن حرف *(extra_patches[]) =
 {   /* Add your patch description below this line */
 /**/
-    NULL
+    عدم
 };
 
-    int
-highest_patch(void)
+    صحيح
+highest_patch(فراغ)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    أرجع included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    صحيح
+has_patch(صحيح n)
 {
-    int		h, m, l;
+    صحيح		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (صحيح)ARRAY_ڊيگهائي(included_patches) - 1;
+    لكل (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
-	    break;
-	if (included_patches[m] < n)
+	إذا (included_patches[m] == n)
+	    أرجع TRUE;
+	إذا (l == h)
+	    اكسر;
+	إذا (included_patches[m] < n)
 	    h = m;
-	else
+	وإلا
 	    l = m + 1;
     }
-    return FALSE;
+    أرجع FALSE;
 }
-#endif
+#جيڪڏهن_پورو
 
-    void
-ex_version(exarg_T *eap)
+    فراغ
+ex_نسخو(exarg_T *eap)
 {
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    إذا (*eap->arg == NUL)
     {
-	msg_putchar('\n');
-	list_version();
+	نياپو_putchar('\n');
+	list_نسخو();
     }
 }
 
@@ -3263,37 +3263,37 @@ ex_version(exarg_T *eap)
  * newline, unless the message is too long to fit on the screen anyway.
  * When "wrap" is TRUE wrap the string in [].
  */
-    static void
-version_msg_wrap(char_u *s, int wrap)
+    ساكن فراغ
+نسخو_نياپو_wrap(char_u *s, صحيح wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    صحيح		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    إذا (!got_int && len < cmdline_ويڪر && نياپو_کانو + len >= cmdline_ويڪر
 								&& *s != '\n')
-	msg_putchar('\n');
-    if (!got_int)
+	نياپو_putchar('\n');
+    إذا (!got_int)
     {
-	if (wrap)
-	    msg_puts("[");
-	msg_puts((char *)s);
-	if (wrap)
-	    msg_puts("]");
+	إذا (wrap)
+	    نياپو_puts("[");
+	نياپو_puts((حرف *)s);
+	إذا (wrap)
+	    نياپو_puts("]");
     }
 }
 
-    static void
-version_msg(char *s)
+    ساكن فراغ
+نسخو_نياپو(حرف *s)
 {
-    version_msg_wrap((char_u *)s, FALSE);
+    نسخو_نياپو_wrap((char_u *)s, FALSE);
 }
 
 /*
  * List all features aligned in columns, dictionary style.
  */
-    static void
-list_features(void)
+    ساكن فراغ
+list_features(فراغ)
 {
-    list_in_columns((char_u **)features, -1, -1);
+    list_اندريون_columns((char_u **)features, -1, -1);
 }
 
 /*
@@ -3301,388 +3301,388 @@ list_features(void)
  * When "size" is < 0 then the last entry is marked with NULL.
  * The entry with index "current" is inclosed in [].
  */
-    void
-list_in_columns(char_u **items, int size, int current)
+    فراغ
+list_اندريون_columns(char_u **شيون, صحيح سائيز, صحيح current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
-#ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
-#endif
+    صحيح		i;
+    صحيح		ncol;
+    صحيح		nrow;
+    صحيح		cur_صف = 1;
+    صحيح		شي_ڳڻپ = 0;
+    صحيح		ويڪر = 0;
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    صحيح		use_highlight = (شيون == (char_u **)features);
+#جيڪڏهن_پورو
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    لكل (i = 0; سائيز < 0 ? شيون[i] != عدم : i < سائيز; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	صحيح l = vim_strsize(شيون[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
-	    width = l;
-	++item_count;
+	إذا (l > ويڪر)
+	    ويڪر = l;
+	++شي_ڳڻپ;
     }
-    width += 1;
+    ويڪر += 1;
 
-    if (cmdline_width < width)
+    إذا (cmdline_ويڪر < ويڪر)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	لكل (i = 0; i < شي_ڳڻپ; ++i)
 	{
-	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
-		msg_putchar('\n');
+	    نسخو_نياپو_wrap(شيون[i], i == current);
+	    إذا (نياپو_کانو > 0 && i < شي_ڳڻپ - 1)
+		نياپو_putchar('\n');
 	}
-	return;
+	أرجع;
     }
 
     // The rightmost column doesn't need a separator.
     // Sacrifice it to fit in one more column if possible.
-    ncol = (cmdline_width + 1) / width;
-    nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
+    ncol = (cmdline_ويڪر + 1) / ويڪر;
+    nrow = شي_ڳڻپ / ncol + ((شي_ڳڻپ % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    لكل (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	صحيح idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	إذا (idx < شي_ڳڻپ)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    صحيح آخري_کانو = (i + 1) % ncol == 0;
 
-	    if (idx == current)
-		msg_putchar('[');
-#ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
-		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
-#endif
-		msg_puts((char *)items[idx]);
-	    if (idx == current)
-		msg_putchar(']');
-	    if (last_col)
+	    إذا (idx == current)
+		نياپو_putchar('[');
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+	    إذا (use_highlight && شيون[idx][0] == '-')
+		نياپو_puts_attr((حرف *)شيون[idx], HL_ATTR(HLF_W));
+	    وإلا
+#جيڪڏهن_پورو
+		نياپو_puts((حرف *)شيون[idx]);
+	    إذا (idx == current)
+		نياپو_putchar(']');
+	    إذا (آخري_کانو)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
-		    msg_putchar('\n');
-		++cur_row;
+		إذا (نياپو_کانو > 0 && cur_صف < nrow)
+		    نياپو_putchar('\n');
+		++cur_صف;
 	    }
-	    else
+	    وإلا
 	    {
-		while (msg_col % width)
-		    msg_putchar(' ');
+		طالما (نياپو_کانو % ويڪر)
+		    نياپو_putchar(' ');
 	    }
 	}
-	else
+	وإلا
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    إذا (نياپو_کانو > 0)
 	    {
-		if (cur_row < nrow)
-		    msg_putchar('\n');
-		++cur_row;
+		إذا (cur_صف < nrow)
+		    نياپو_putchar('\n');
+		++cur_صف;
 	    }
 	}
     }
 }
 
-    void
-list_version(void)
+    فراغ
+list_نسخو(فراغ)
 {
-    int		i;
-    int		first;
-    char	*s = "";
+    صحيح		i;
+    صحيح		پهريون;
+    حرف	*s = "";
 
     /*
      * When adding features here, don't forget to update the list of
      * internal variables in eval.c!
      */
-    init_longVersion();
-    msg(longVersion);
-#ifdef MSWIN
+    init_long_نسخو();
+    نياپو(long_نسخو);
+#جيڪڏهن_وصف_ٿيل MSWIN
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
+#    إذا defined(_M_ARM64) || defined(_M_ARM64EC)
+     نياپو_puts(_("\nMS-Windows ARM64 GUI/console version"));
+#    وإلا
+     نياپو_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
+#   وإلا
+    نياپو_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  وإلا
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI version"));
+#    إذا defined(_M_ARM64) || defined(_M_ARM64EC)
+     نياپو_puts(_("\nMS-Windows ARM64 GUI version"));
+#    وإلا
+     نياپو_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI version"));
+#   وإلا
+    نياپو_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
-    msg_puts(_(" with OLE support"));
+    نياپو_puts(_(" with OLE support"));
 #  endif
-# else
+# وإلا
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
-    msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
-    msg_puts(_("\nMS-Windows 64-bit console version"));
+#   إذا defined(_M_ARM64) || defined(_M_ARM64EC)
+    نياپو_puts(_("\nMS-Windows ARM64 console version"));
+#   وإلا
+    نياپو_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
-    msg_puts(_("\nMS-Windows 32-bit console version"));
+#  وإلا
+    نياپو_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
-#endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
-    msg_puts(_("\nmacOS version"));
-# else
-    msg_puts(_("\nmacOS version w/o darwin feat."));
+#جيڪڏهن_پورو
+#إذا defined(MACOS_X)
+# إذا defined(MACOS_X_DARWIN)
+    نياپو_puts(_("\nmacOS version"));
+# وإلا
+    نياپو_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
-    msg_puts(" - arm64");
+# إذا defined(__arm64__)
+    نياپو_puts(" - arm64");
 # elif defined(__x86_64__)
-    msg_puts(" - x86_64");
+    نياپو_puts(" - x86_64");
 # endif
-#endif
+#جيڪڏهن_پورو
 
-#ifdef VMS
-    msg_puts(_("\nOpenVMS (build) arch, version"));
+#جيڪڏهن_وصف_ٿيل VMS
+    نياپو_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    إذا (*compiled_arch != NUL)
     {
-	msg_puts(": ");
-	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	نياپو_puts(": ");
+	نياپو_puts((حرف *)compiled_arch);
+	إذا (*compiled_vers != NUL)
 	{
-	    msg_puts(", ");
-	    msg_puts((char *)compiled_vers);
+	    نياپو_puts(", ");
+	    نياپو_puts((حرف *)compiled_vers);
 	}
     }
 
 # endif
 
-#endif
+#جيڪڏهن_پورو
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    إذا (included_patches[0] != 0)
     {
-	msg_puts(_("\nIncluded patches: "));
-	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	نياپو_puts(_("\nIncluded patches: "));
+	پهريون = -1;
+	i = (صحيح)ARRAY_ڊيگهائي(included_patches) - 1;
+	طالما (--i >= 0)
 	{
-	    if (first < 0)
-		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    إذا (پهريون < 0)
+		پهريون = included_patches[i];
+	    إذا (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
-		msg_puts(s);
+		نياپو_puts(s);
 		s = ", ";
-		msg_outnum((long)first);
-		if (first != included_patches[i])
+		نياپو_outnum((ڊگهو)پهريون);
+		إذا (پهريون != included_patches[i])
 		{
-		    msg_puts("-");
-		    msg_outnum((long)included_patches[i]);
+		    نياپو_puts("-");
+		    نياپو_outnum((ڊگهو)included_patches[i]);
 		}
-		first = -1;
+		پهريون = -1;
 	    }
 	}
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    إذا (extra_patches[0] != عدم)
     {
-	msg_puts(_("\nExtra patches: "));
+	نياپو_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	لكل (i = 0; extra_patches[i] != عدم; ++i)
 	{
-	    msg_puts(s);
+	    نياپو_puts(s);
 	    s = ", ";
-	    msg_puts(extra_patches[i]);
+	    نياپو_puts(extra_patches[i]);
 	}
     }
 
-#ifdef MODIFIED_BY
-    msg_puts("\n");
-    msg_puts(_("Modified by "));
-    msg_puts(MODIFIED_BY);
-#endif
+#جيڪڏهن_وصف_ٿيل MODIFIED_BY
+    نياپو_puts("\n");
+    نياپو_puts(_("Modified by "));
+    نياپو_puts(MODIFIED_BY);
+#جيڪڏهن_پورو
 
-#ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+#جيڪڏهن_وصف_ٿيل HAVE_PATHDEF
+    إذا (*compiled_user != NUL || *compiled_sys != NUL)
     {
-	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	نياپو_puts(_("\nCompiled "));
+	إذا (*compiled_user != NUL)
 	{
-	    msg_puts(_("by "));
-	    msg_puts((char *)compiled_user);
+	    نياپو_puts(_("by "));
+	    نياپو_puts((حرف *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	إذا (*compiled_sys != NUL)
 	{
-	    msg_puts("@");
-	    msg_puts((char *)compiled_sys);
+	    نياپو_puts("@");
+	    نياپو_puts((حرف *)compiled_sys);
 	}
     }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_HUGE)
-    msg_puts(_("\nHuge version "));
-#elif defined(FEAT_NORMAL)
-    msg_puts(_("\nNormal version "));
-#else
-    msg_puts(_("\nTiny version "));
-#endif
-#if !defined(FEAT_GUI)
-    msg_puts(_("without GUI."));
-#elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
-    msg_puts(_("with GTK4 GUI."));
+#إذا defined(FEAT_HUGE)
+    نياپو_puts(_("\nHuge version "));
+#وإلاإذا defined(FEAT_عام)
+    نياپو_puts(_("\nNormal version "));
+#وإلا
+    نياپو_puts(_("\nTiny version "));
+#جيڪڏهن_پورو
+#إذا !defined(FEAT_GUI)
+    نياپو_puts(_("without GUI."));
+#وإلاإذا defined(FEAT_GUI_GTK)
+# إذا defined(USE_GTK4)
+    نياپو_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
-    msg_puts(_("with GTK3 GUI."));
+    نياپو_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
-    msg_puts(_("with GTK2-GNOME GUI."));
-# else
-    msg_puts(_("with GTK2 GUI."));
+    نياپو_puts(_("with GTK2-GNOME GUI."));
+# وإلا
+    نياپو_puts(_("with GTK2 GUI."));
 # endif
-#elif defined(FEAT_GUI_MOTIF)
-    msg_puts(_("with X11-Motif GUI."));
-#elif defined(FEAT_GUI_HAIKU)
-    msg_puts(_("with Haiku GUI."));
-#elif defined(FEAT_GUI_PHOTON)
-    msg_puts(_("with Photon GUI."));
-#elif defined(MSWIN)
-    msg_puts(_("with GUI."));
-#endif
-    version_msg(_("  Features included (+) or not (-):\n"));
+#وإلاإذا defined(FEAT_GUI_MOTIF)
+    نياپو_puts(_("with X11-Motif GUI."));
+#وإلاإذا defined(FEAT_GUI_HAIKU)
+    نياپو_puts(_("with Haiku GUI."));
+#وإلاإذا defined(FEAT_GUI_PHOTON)
+    نياپو_puts(_("with Photon GUI."));
+#وإلاإذا defined(MSWIN)
+    نياپو_puts(_("with GUI."));
+#جيڪڏهن_پورو
+    نسخو_نياپو(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
-	msg_putchar('\n');
+    إذا (نياپو_کانو > 0)
+	نياپو_putchar('\n');
 
-#ifdef SYS_VIMRC_FILE
-    version_msg(_("   system vimrc file: \""));
-    version_msg(SYS_VIMRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_VIMRC_FILE
-    version_msg(_("     user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_VIMRC_FILE2
-    version_msg(_(" 2nd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE2);
-    version_msg("\"\n");
-#endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-    version_msg(_(" 4th user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
-#elif defined(USR_VIMRC_FILE3)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-#elif defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
-#endif
-#ifdef USR_EXRC_FILE
-    version_msg(_("      user exrc file: \""));
-    version_msg(USR_EXRC_FILE);
-    version_msg("\"\n");
-#endif
-#ifdef USR_EXRC_FILE2
-    version_msg(_("  2nd user exrc file: \""));
-    version_msg(USR_EXRC_FILE2);
-    version_msg("\"\n");
-#endif
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل SYS_VIMRC_FILE
+    نسخو_نياپو(_("   system vimrc file: \""));
+    نسخو_نياپو(SYS_VIMRC_FILE);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل USR_VIMRC_FILE
+    نسخو_نياپو(_("     user vimrc file: \""));
+    نسخو_نياپو(USR_VIMRC_FILE);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل USR_VIMRC_FILE2
+    نسخو_نياپو(_(" 2nd user vimrc file: \""));
+    نسخو_نياپو(USR_VIMRC_FILE2);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#إذا defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+    نسخو_نياپو(_(" 3rd user vimrc file: \""));
+    نسخو_نياپو(USR_VIMRC_FILE3);
+    نسخو_نياپو("\"\n");
+    نسخو_نياپو(_(" 4th user vimrc file: \""));
+    نسخو_نياپو((حرف *)(XDG_VIMRC_FILE));
+    نسخو_نياپو("\"\n");
+#وإلاإذا defined(USR_VIMRC_FILE3)
+    نسخو_نياپو(_(" 3rd user vimrc file: \""));
+    نسخو_نياپو(USR_VIMRC_FILE3);
+    نسخو_نياپو("\"\n");
+#وإلاإذا defined(XDG_VIMRC_FILE)
+    نسخو_نياپو(_(" 3rd user vimrc file: \""));
+    نسخو_نياپو((حرف *)(XDG_VIMRC_FILE));
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل USR_EXRC_FILE
+    نسخو_نياپو(_("      user exrc file: \""));
+    نسخو_نياپو(USR_EXRC_FILE);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل USR_EXRC_FILE2
+    نسخو_نياپو(_("  2nd user exrc file: \""));
+    نسخو_نياپو(USR_EXRC_FILE2);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 # ifdef SYS_GVIMRC_FILE
-    version_msg(_("  system gvimrc file: \""));
-    version_msg(SYS_GVIMRC_FILE);
-    version_msg("\"\n");
+    نسخو_نياپو(_("  system gvimrc file: \""));
+    نسخو_نياپو(SYS_GVIMRC_FILE);
+    نسخو_نياپو("\"\n");
 # endif
-    version_msg(_("    user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE);
-    version_msg("\"\n");
+    نسخو_نياپو(_("    user gvimrc file: \""));
+    نسخو_نياپو(USR_GVIMRC_FILE);
+    نسخو_نياپو("\"\n");
 # ifdef USR_GVIMRC_FILE2
-    version_msg(_("2nd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE2);
-    version_msg("\"\n");
+    نسخو_نياپو(_("2nd user gvimrc file: \""));
+    نسخو_نياپو(USR_GVIMRC_FILE2);
+    نسخو_نياپو("\"\n");
 # endif
 # ifdef USR_GVIMRC_FILE3
-    version_msg(_("3rd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE3);
-    version_msg("\"\n");
+    نسخو_نياپو(_("3rd user gvimrc file: \""));
+    نسخو_نياپو(USR_GVIMRC_FILE3);
+    نسخو_نياپو("\"\n");
 # endif
-#endif
-    version_msg(_("       defaults file: \""));
-    version_msg(VIM_DEFAULTS_FILE);
-    version_msg("\"\n");
-#ifdef FEAT_GUI
+#جيڪڏهن_پورو
+    نسخو_نياپو(_("       defaults file: \""));
+    نسخو_نياپو(VIM_DEFAULTS_FILE);
+    نسخو_نياپو("\"\n");
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 # ifdef SYS_MENU_FILE
-    version_msg(_("    system menu file: \""));
-    version_msg(SYS_MENU_FILE);
-    version_msg("\"\n");
+    نسخو_نياپو(_("    system menu file: \""));
+    نسخو_نياپو(SYS_MENU_FILE);
+    نسخو_نياپو("\"\n");
 # endif
-#endif
-#ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل HAVE_PATHDEF
+    إذا (*default_vim_dir != NUL)
     {
-	version_msg(_("  fall-back for $VIM: \""));
-	version_msg((char *)default_vim_dir);
-	version_msg("\"\n");
+	نسخو_نياپو(_("  fall-back for $VIM: \""));
+	نسخو_نياپو((حرف *)default_vim_dir);
+	نسخو_نياپو("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    إذا (*default_vimruntime_dir != NUL)
     {
-	version_msg(_(" f-b for $VIMRUNTIME: \""));
-	version_msg((char *)default_vimruntime_dir);
-	version_msg("\"\n");
+	نسخو_نياپو(_(" f-b for $VIMRUNTIME: \""));
+	نسخو_نياپو((حرف *)default_vimruntime_dir);
+	نسخو_نياپو("\"\n");
     }
-    version_msg(_("Compilation: "));
-    version_msg((char *)all_cflags);
-    version_msg("\n");
+    نسخو_نياپو(_("Compilation: "));
+    نسخو_نياپو((حرف *)all_cflags);
+    نسخو_نياپو("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    إذا (*compiler_نسخو != NUL)
     {
-	version_msg(_("Compiler: "));
-	version_msg((char *)compiler_version);
-	version_msg("\n");
+	نسخو_نياپو(_("Compiler: "));
+	نسخو_نياپو((حرف *)compiler_نسخو);
+	نسخو_نياپو("\n");
     }
 # endif
-    version_msg(_("Linking: "));
-    version_msg((char *)all_lflags);
-#endif
-#ifdef DEBUG
-    version_msg("\n");
-    version_msg(_("  DEBUG BUILD"));
-#endif
+    نسخو_نياپو(_("Linking: "));
+    نسخو_نياپو((حرف *)all_lflags);
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل DEBUG
+    نسخو_نياپو("\n");
+    نسخو_نياپو(_("  DEBUG BUILD"));
+#جيڪڏهن_پورو
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+ساكن فراغ do_intro_سٽ(صحيح صف, char_u *mesg, صحيح جوڙيو_نسخو, صحيح attr);
+ساكن فراغ intro_پيغام(صحيح colon);
 
 /*
  * Show the intro message when not editing a file.
  */
-    void
-maybe_intro_message(void)
+    فراغ
+maybe_intro_پيغام(فراغ)
 {
-    if (BUFEMPTY()
-	    && curbuf->b_fname == NULL
-	    && firstwin->w_next == NULL
-	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
-	intro_message(FALSE);
+    إذا (BUFEMPTY()
+	    && curbuf->b_fname == عدم
+	    && firstwin->w_ايندڙ == عدم
+	    && vim_strchr(p_shm, SHM_INTRO) == عدم)
+	intro_پيغام(FALSE);
 }
 
 /*
@@ -3690,24 +3690,24 @@ maybe_intro_message(void)
  * Only used when starting Vim on an empty file, without a file name.
  * Or with the ":intro" command (for Sven :-).
  */
-    static void
-intro_message(
-    int		colon)		// TRUE for ":intro"
+    ساكن فراغ
+intro_پيغام(
+    صحيح		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
-    char	*p;
-    static char	*(lines[]) =
+    صحيح		i;
+    صحيح		صف;
+    صحيح		blanklines;
+    صحيح		sponsor;
+    حرف	*p;
+    ساكن حرف	*(سٽون[]) =
     {
 	N_("VIM - Vi IMproved"),
 	"",
 	N_("version "),
 	N_("by Bram Moolenaar et al."),
-#ifdef MODIFIED_BY
+#جيڪڏهن_وصف_ٿيل MODIFIED_BY
 	" ",
-#endif
+#جيڪڏهن_پورو
 	N_("Vim is open source and freely distributable"),
 	"",
 	N_("Help poor children in Uganda!"),
@@ -3716,173 +3716,173 @@ intro_message(
 	N_("type  :q<Enter>               to exit         "),
 	N_("type  :help<Enter>  or  <F1>  for on-line help"),
 	N_("type  :help version9<Enter>   for version info"),
-	NULL,
+	عدم,
 	"",
 	N_("Running in Vi compatible mode"),
 	N_("type  :set nocp<Enter>        for Vim defaults"),
 	N_("type  :help cp-default<Enter> for info on this"),
     };
-#ifdef FEAT_GUI
-    static char	*(gui_lines[]) =
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+    ساكن حرف	*(gui_سٽون[]) =
     {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	عدم,
+	عدم,
+	عدم,
+	عدم,
 # ifdef MODIFIED_BY
-	NULL,
+	عدم,
 # endif
-	NULL,
-	NULL,
-	NULL,
+	عدم,
+	عدم,
+	عدم,
 	N_("menu  Help->Orphans           for information    "),
-	NULL,
+	عدم,
 	N_("Running modeless, typed text is inserted"),
 	N_("menu  Edit->Global Settings->Toggle Insert Mode  "),
 	N_("                              for two modes      "),
-	NULL,
-	NULL,
-	NULL,
+	عدم,
+	عدم,
+	عدم,
 	N_("menu  Edit->Global Settings->Toggle Vi Compatible"),
 	N_("                              for Vim defaults   "),
     };
-#endif
+#جيڪڏهن_پورو
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (صحيح)صفون - (ARRAY_ڊيگهائي(سٽون) - 1);
+    إذا (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
-	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    إذا (p_ls > 1)
+	blanklines -= صفون - topframe->fr_اوچائي;
+    إذا (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (صحيح)وقت(عدم);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
-    row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    صف = blanklines / 2;
+    إذا ((صف >= 2 && topframe->fr_ويڪر >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(سٽون); ++i)
 	{
-	    p = lines[i];
-#ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
-		p = gui_lines[i];
-#endif
-	    if (p == NULL)
+	    p = سٽون[i];
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+	    إذا (p_im && gui.اندريون_use && gui_سٽون[i] != عدم)
+		p = gui_سٽون[i];
+#جيڪڏهن_پورو
+	    إذا (p == عدم)
 	    {
-		if (!p_cp)
-		    break;
-		continue;
+		إذا (!p_cp)
+		    اكسر;
+		استمر;
 	    }
-	    if (sponsor != 0)
+	    إذا (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		إذا (لڙي_ڳولا(p, "children") != عدم)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		وإلا إذا (لڙي_ڳولا(p, "Kuwasha") != عدم)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		وإلا إذا (لڙي_ڳولا(p, "Orphans") != عدم)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
-		do_intro_line(row, (char_u *)_(p), i == 2, 0);
-	    ++row;
+	    إذا (*p != NUL)
+		do_intro_سٽ(صف, (char_u *)_(p), i == 2, 0);
+	    ++صف;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
-	msg_row = row;
+    إذا (colon)
+	نياپو_صف = صف;
 }
 
-    static void
-do_intro_line(
-    int		row,
+    ساكن فراغ
+do_intro_سٽ(
+    صحيح		صف,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    صحيح		جوڙيو_نسخو,
+    صحيح		attr)
 {
     char_u	vers[20];
-    int		col;
+    صحيح		کانو;
     char_u	*p;
-    int		l;
-    int		clen;
-#ifdef MODIFIED_BY
+    صحيح		l;
+    صحيح		clen;
+#جيڪڏهن_وصف_ٿيل MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    إذا (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (صحيح)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
-#endif
+#جيڪڏهن_پورو
 
     // Center the message horizontally.
-    col = vim_strsize(mesg);
-    if (add_version)
+    کانو = vim_strsize(mesg);
+    إذا (جوڙيو_نسخو)
     {
-	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	STRCPY(vers, medium_نسخو);
+	إذا (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    إذا (محفوظ_isalpha((صحيح)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
-		sprintf((char *)vers + len, ".%d%s", highest_patch(),
-							 mediumVersion + len);
+		صحيح len = (محفوظ_isalpha((صحيح)vers[4])) ? 5 : 4;
+		sprintf((حرف *)vers + len, ".%d%s", highest_patch(),
+							 medium_نسخو + len);
 	    }
-	    else
-		sprintf((char *)vers + 3, ".%d", highest_patch());
+	    وإلا
+		sprintf((حرف *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	کانو += (صحيح)STRLEN(vers);
     }
-    col = (topframe->fr_width - col) / 2;
-    if (col < 0)
-	col = 0;
+    کانو = (topframe->fr_ويڪر - کانو) / 2;
+    إذا (کانو < 0)
+	کانو = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    لكل (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	لكل (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    وإلا
 		clen += byte2cells(p[l]);
 	}
-	screen_puts_len(p, l, row, col + firstwin->w_wincol,
+	screen_puts_len(p, l, صف, کانو + firstwin->w_wincol,
 		*p == '<' ? HL_ATTR(HLF_8) : attr);
-	col += clen;
+	کانو += clen;
     }
 
     // Add the version number to the version line.
-    if (add_version)
-	screen_puts(vers, row, col + firstwin->w_wincol, 0);
+    إذا (جوڙيو_نسخو)
+	screen_puts(vers, صف, کانو + firstwin->w_wincol, 0);
 }
 
 /*
  * ":intro": clear screen, display intro screen and wait for return.
  */
-    void
-ex_intro(exarg_T *eap UNUSED)
+    فراغ
+ex_intro(exarg_T *eap اڻ_استعمال_ٿيل)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     draw_tabpanel();
-#endif
-    intro_message(TRUE);
+#جيڪڏهن_پورو
+    intro_پيغام(TRUE);
     wait_return(TRUE);
 }

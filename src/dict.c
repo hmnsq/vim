@@ -11,91 +11,91 @@
  * dict.c: Dictionary support
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 // List head for garbage collection. Although there can be a reference loop
 // from partial to dict to partial, we don't need to keep track of the partial,
 // since it will get freed when the dict is unused and gets freed.
-static dict_T		*first_dict = NULL;
+ساكن dict_T		*پهريون_dict = عدم;
 
 /*
  * Allocate an empty header for a dictionary.
  * Caller should take care of the reference count.
  */
     dict_T *
-dict_alloc(void)
+dict_alloc(فراغ)
 {
     dict_T *d;
 
     d = ALLOC_CLEAR_ONE(dict_T);
-    if (d == NULL)
-	return NULL;
+    إذا (d == عدم)
+	أرجع عدم;
 
     // Add the dict to the list of dicts for garbage collection.
-    if (first_dict != NULL)
-	first_dict->dv_used_prev = d;
-    d->dv_used_next = first_dict;
-    d->dv_used_prev = NULL;
-    first_dict = d;
+    إذا (پهريون_dict != عدم)
+	پهريون_dict->dv_استعمال_ٿيل_prev = d;
+    d->dv_استعمال_ٿيل_ايندڙ = پهريون_dict;
+    d->dv_استعمال_ٿيل_prev = عدم;
+    پهريون_dict = d;
 
     hash_init(&d->dv_hashtab);
-    d->dv_lock = 0;
+    d->dv_تالو = 0;
     d->dv_scope = 0;
     d->dv_refcount = 0;
     d->dv_copyID = 0;
-    return d;
+    أرجع d;
 }
 
 /*
  * dict_alloc() with an ID for alloc_fail().
  */
     dict_T *
-dict_alloc_id(alloc_id_T id UNUSED)
+dict_alloc_id(alloc_id_T id اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
-#endif
-    return (dict_alloc());
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+    إذا (alloc_fail_id == id && alloc_does_fail(حجم(list_T)))
+	أرجع عدم;
+#جيڪڏهن_پورو
+    أرجع (dict_alloc());
 }
 
     dict_T *
-dict_alloc_lock(int lock)
+dict_alloc_تالو(صحيح تالو)
 {
     dict_T *d = dict_alloc();
 
-    if (d != NULL)
-	d->dv_lock = lock;
-    return d;
+    إذا (d != عدم)
+	d->dv_تالو = تالو;
+    أرجع d;
 }
 
 /*
  * Allocate an empty dict for a return value.
  * Returns OK or FAIL.
  */
-    int
+    صحيح
 rettv_dict_alloc(typval_T *rettv)
 {
-    dict_T	*d = dict_alloc_lock(0);
+    dict_T	*d = dict_alloc_تالو(0);
 
-    if (d == NULL)
-	return FAIL;
+    إذا (d == عدم)
+	أرجع FAIL;
 
-    rettv_dict_set(rettv, d);
-    return OK;
+    rettv_dict_سيٽ(rettv, d);
+    أرجع OK;
 }
 
 /*
  * Set a dictionary as the return value
  */
-    void
-rettv_dict_set(typval_T *rettv, dict_T *d)
+    فراغ
+rettv_dict_سيٽ(typval_T *rettv, dict_T *d)
 {
     rettv->v_type = VAR_DICT;
     rettv->vval.v_dict = d;
-    if (d != NULL)
+    إذا (d != عدم)
 	++d->dv_refcount;
 }
 
@@ -103,34 +103,34 @@ rettv_dict_set(typval_T *rettv, dict_T *d)
  * Free a Dictionary, including all non-container items it contains.
  * Ignores the reference count.
  */
-    void
+    فراغ
 dict_free_contents(dict_T *d)
 {
     hashtab_free_contents(&d->dv_hashtab);
     free_type(d->dv_type);
-    d->dv_type = NULL;
+    d->dv_type = عدم;
 }
 
 /*
  * Clear hashtab "ht" and dict items it contains.
  * If "ht" is not freed then you should call hash_init() next!
  */
-    void
+    فراغ
 hashtab_free_contents(hashtab_T *ht)
 {
-    int		todo;
+    صحيح		todo;
     hashitem_T	*hi;
     dictitem_T	*di;
 
-    if (check_hashtab_frozen(ht, "clear dict"))
-	return;
+    إذا (check_hashtab_frozen(ht, "clear dict"))
+	أرجع;
 
     // Lock the hashtab, we don't want it to resize while freeing items.
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_تالو(ht);
+    todo = (صحيح)ht->ht_استعمال_ٿيل;
+    FOR_ALL_HASHTAB_شيون(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
 	    // Remove the item before deleting it, just in case there is
 	    // something recursive causing trouble.
@@ -145,23 +145,23 @@ hashtab_free_contents(hashtab_T *ht)
     hash_clear(ht);
 }
 
-    static void
+    ساكن فراغ
 dict_free_dict(dict_T *d)
 {
     // Remove the dict from the list of dicts for garbage collection.
-    if (d->dv_used_prev == NULL)
-	first_dict = d->dv_used_next;
-    else
-	d->dv_used_prev->dv_used_next = d->dv_used_next;
-    if (d->dv_used_next != NULL)
-	d->dv_used_next->dv_used_prev = d->dv_used_prev;
+    إذا (d->dv_استعمال_ٿيل_prev == عدم)
+	پهريون_dict = d->dv_استعمال_ٿيل_ايندڙ;
+    وإلا
+	d->dv_استعمال_ٿيل_prev->dv_استعمال_ٿيل_ايندڙ = d->dv_استعمال_ٿيل_ايندڙ;
+    إذا (d->dv_استعمال_ٿيل_ايندڙ != عدم)
+	d->dv_استعمال_ٿيل_ايندڙ->dv_استعمال_ٿيل_prev = d->dv_استعمال_ٿيل_prev;
     vim_free(d);
 }
 
-    static void
+    ساكن فراغ
 dict_free(dict_T *d)
 {
-    if (!in_free_unref_items)
+    إذا (!اندريون_free_unref_شيون)
     {
 	dict_free_contents(d);
 	dict_free_dict(d);
@@ -172,10 +172,10 @@ dict_free(dict_T *d)
  * Unreference a Dictionary: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    فراغ
 dict_unref(dict_T *d)
 {
-    if (d != NULL && --d->dv_refcount <= 0)
+    إذا (d != عدم && --d->dv_refcount <= 0)
 	dict_free(d);
 }
 
@@ -183,14 +183,14 @@ dict_unref(dict_T *d)
  * Go through the list of dicts and free items without the copyID.
  * Returns TRUE if something was freed.
  */
-    int
-dict_free_nonref(int copyID)
+    صحيح
+dict_free_nonref(صحيح copyID)
 {
     dict_T	*dd;
-    int		did_free = FALSE;
+    صحيح		did_free = FALSE;
 
-    for (dd = first_dict; dd != NULL; dd = dd->dv_used_next)
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    لكل (dd = پهريون_dict; dd != عدم; dd = dd->dv_استعمال_ٿيل_ايندڙ)
+	إذا ((dd->dv_copyID & COPYID_نقاب) != (copyID & COPYID_نقاب))
 	{
 	    // Free the Dictionary and ordinary items it contains, but don't
 	    // recurse into Lists and Dictionaries, they will be in the list
@@ -198,18 +198,18 @@ dict_free_nonref(int copyID)
 	    dict_free_contents(dd);
 	    did_free = TRUE;
 	}
-    return did_free;
+    أرجع did_free;
 }
 
-    void
-dict_free_items(int copyID)
+    فراغ
+dict_free_شيون(صحيح copyID)
 {
-    dict_T	*dd, *dd_next;
+    dict_T	*dd, *dd_ايندڙ;
 
-    for (dd = first_dict; dd != NULL; dd = dd_next)
+    لكل (dd = پهريون_dict; dd != عدم; dd = dd_ايندڙ)
     {
-	dd_next = dd->dv_used_next;
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	dd_ايندڙ = dd->dv_استعمال_ٿيل_ايندڙ;
+	إذا ((dd->dv_copyID & COPYID_نقاب) != (copyID & COPYID_نقاب))
 	    dict_free_dict(dd);
     }
 }
@@ -222,67 +222,67 @@ dict_free_items(int copyID)
  * Returns NULL when out of memory.
  */
     dictitem_T *
-dictitem_alloc(char_u *key)
+dictitem_alloc(char_u *ڪنجي)
 {
     dictitem_T *di;
-    size_t len = STRLEN(key);
+    size_t len = STRLEN(ڪنجي);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ڪنجي) + len + 1);
+    إذا (di == عدم)
+	أرجع عدم;
 
-    mch_memmove(di->di_key, key, len + 1);
+    mch_memmove(di->di_ڪنجي, ڪنجي, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
-    di->di_tv.v_lock = 0;
+    di->di_tv.v_تالو = 0;
     di->di_tv.v_type = VAR_UNKNOWN;
-    return di;
+    أرجع di;
 }
 
 /*
  * Make a copy of a Dictionary item.
  */
-    static dictitem_T *
+    ساكن dictitem_T *
 dictitem_copy(dictitem_T *org)
 {
     dictitem_T *di;
-    size_t	len = STRLEN(org->di_key);
+    size_t	len = STRLEN(org->di_ڪنجي);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ڪنجي) + len + 1);
+    إذا (di == عدم)
+	أرجع عدم;
 
-    mch_memmove(di->di_key, org->di_key, len + 1);
+    mch_memmove(di->di_ڪنجي, org->di_ڪنجي, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     copy_tv(&org->di_tv, &di->di_tv);
-    return di;
+    أرجع di;
 }
 
 /*
  * Remove item "item" from Dictionary "dict" and free it.
  * "command" is used for the error message when the hashtab if frozen.
  */
-    void
-dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
+    فراغ
+dictitem_remove(dict_T *dict, dictitem_T *شي, حرف *command)
 {
     hashitem_T	*hi;
 
-    hi = hash_find(&dict->dv_hashtab, item->di_key);
-    if (HASHITEM_EMPTY(hi))
-	internal_error("dictitem_remove()");
-    else
+    hi = hash_ڳوليو(&dict->dv_hashtab, شي->di_ڪنجي);
+    إذا (HASHITEM_خالي_جايون(hi))
+	اندروني_error("dictitem_remove()");
+    وإلا
 	hash_remove(&dict->dv_hashtab, hi, command);
-    dictitem_free(item);
+    dictitem_free(شي);
 }
 
 /*
  * Free a dict item.  Also clears the value.
  */
-    void
-dictitem_free(dictitem_T *item)
+    فراغ
+dictitem_free(dictitem_T *شي)
 {
-    clear_tv(&item->di_tv);
-    if (item->di_flags & DI_FLAGS_ALLOC)
-	vim_free(item);
+    clear_tv(&شي->di_tv);
+    إذا (شي->di_flags & DI_FLAGS_ALLOC)
+	vim_free(شي);
 }
 
 /*
@@ -292,79 +292,79 @@ dictitem_free(dictitem_T *item)
  * Returns NULL when out of memory.
  */
     dict_T *
-dict_copy(dict_T *orig, int deep, int top, int copyID)
+dict_copy(dict_T *orig, صحيح deep, صحيح چوٽي, صحيح copyID)
 {
     dict_T	*copy;
     dictitem_T	*di;
-    int		todo;
+    صحيح		todo;
     hashitem_T	*hi;
 
-    if (orig == NULL)
-	return NULL;
+    إذا (orig == عدم)
+	أرجع عدم;
 
     copy = dict_alloc();
-    if (copy == NULL)
-	return NULL;
+    إذا (copy == عدم)
+	أرجع عدم;
 
-    if (copyID != 0)
+    إذا (copyID != 0)
     {
 	orig->dv_copyID = copyID;
 	orig->dv_copydict = copy;
     }
-    if (orig->dv_type == NULL || top || deep)
-	copy->dv_type = NULL;
-    else
+    إذا (orig->dv_type == عدم || چوٽي || deep)
+	copy->dv_type = عدم;
+    وإلا
 	copy->dv_type = alloc_type(orig->dv_type);
 
-    todo = (int)orig->dv_hashtab.ht_used;
-    for (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (صحيح)orig->dv_hashtab.ht_استعمال_ٿيل;
+    لكل (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
 	    --todo;
 
-	    di = dictitem_alloc(hi->hi_key);
-	    if (di == NULL)
-		break;
-	    if (deep)
+	    di = dictitem_alloc(hi->hi_ڪنجي);
+	    إذا (di == عدم)
+		اكسر;
+	    إذا (deep)
 	    {
-		if (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
+		إذا (شي_copy(&HI2DI(hi)->di_tv, &di->di_tv,
 			    deep, FALSE, copyID) == FAIL)
 		{
 		    vim_free(di);
-		    break;
+		    اكسر;
 		}
 	    }
-	    else
+	    وإلا
 		copy_tv(&HI2DI(hi)->di_tv, &di->di_tv);
-	    if (dict_add(copy, di) == FAIL)
+	    إذا (dict_جوڙيو(copy, di) == FAIL)
 	    {
 		dictitem_free(di);
-		break;
+		اكسر;
 	    }
 	}
     }
 
     ++copy->dv_refcount;
-    if (todo > 0)
+    إذا (todo > 0)
     {
 	dict_unref(copy);
-	copy = NULL;
+	copy = عدم;
     }
 
-    return copy;
+    أرجع copy;
 }
 
 /*
  * Check for adding a function to g: or s: (in Vim9 script) or l:.
  * If the name is wrong give an error message and return TRUE.
  */
-    int
+    صحيح
 dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
 {
-    return (d == get_globvar_dict()
-		|| (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
-		   && d == &SCRIPT_ITEM(current_sctx.sc_sid)->sn_vars->sv_dict)
+    أرجع (d == get_globvar_dict()
+		|| (اندريون_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
+		   && d == &SCRIPT_شي(current_sctx.sc_sid)->sn_vars->sv_dict)
 		|| &d->dv_hashtab == get_funccal_local_ht())
 	    && (tv->v_type == VAR_FUNC || tv->v_type == VAR_PARTIAL)
 	    && var_wrong_func_name(name, TRUE);
@@ -374,68 +374,68 @@ dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
  * Add item "item" to Dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add(dict_T *d, dictitem_T *item)
+    صحيح
+dict_جوڙيو(dict_T *d, dictitem_T *شي)
 {
-    if (dict_wrong_func_name(d, &item->di_tv, item->di_key))
-	return FAIL;
-    return hash_add(&d->dv_hashtab, item->di_key, "add to dictionary");
+    إذا (dict_wrong_func_name(d, &شي->di_tv, شي->di_ڪنجي))
+	أرجع FAIL;
+    أرجع hash_جوڙيو(&d->dv_hashtab, شي->di_ڪنجي, "add to dictionary");
 }
 
 /*
  * Add a number or special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    static int
-dict_add_number_special(
+    ساكن صحيح
+dict_جوڙيو_عدد_special(
     dict_T	*d,
-    char	*key,
+    حرف	*ڪنجي,
     varnumber_T	nr,
     vartype_T	vartype)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = vartype;
-    item->di_tv.vval.v_number = nr;
-    if (dict_add(d, item) == FAIL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    شي->di_tv.v_type = vartype;
+    شي->di_tv.vval.v_عدد = nr;
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Add a number entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_number(dict_T *d, char *key, varnumber_T nr)
+    صحيح
+dict_جوڙيو_عدد(dict_T *d, حرف *ڪنجي, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_NUMBER);
+    أرجع dict_جوڙيو_عدد_special(d, ڪنجي, nr, VAR_عدد);
 }
 
 /*
  * Add a special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_bool(dict_T *d, char *key, varnumber_T nr)
+    صحيح
+dict_جوڙيو_bool(dict_T *d, حرف *ڪنجي, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_BOOL);
+    أرجع dict_جوڙيو_عدد_special(d, ڪنجي, nr, VAR_BOOL);
 }
 
 /*
  * Add a string entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string(dict_T *d, char *key, char_u *str)
+    صحيح
+dict_جوڙيو_string(dict_T *d, حرف *ڪنجي, char_u *str)
 {
-    return dict_add_string_len(d, key, str, -1);
+    أرجع dict_جوڙيو_string_len(d, ڪنجي, str, -1);
 }
 
 /*
@@ -444,122 +444,122 @@ dict_add_string(dict_T *d, char *key, char_u *str)
  * When "len" is -1 use the whole string, otherwise only this many bytes.
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string_len(dict_T *d, char *key, char_u *str, int len)
+    صحيح
+dict_جوڙيو_string_len(dict_T *d, حرف *ڪنجي, char_u *str, صحيح len)
 {
-    dictitem_T	*item;
-    char_u	*val = NULL;
+    dictitem_T	*شي;
+    char_u	*val = عدم;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_STRING;
-    if (str != NULL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    شي->di_tv.v_type = VAR_STRING;
+    إذا (str != عدم)
     {
-	if (len == -1)
+	إذا (len == -1)
 	    val = vim_strsave(str);
-	else
+	وإلا
 	    val = vim_strnsave(str, len);
     }
-    item->di_tv.vval.v_string = val;
-    if (dict_add(d, item) == FAIL)
+    شي->di_tv.vval.v_string = val;
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Add a list entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_list(dict_T *d, char *key, list_T *list)
+    صحيح
+dict_جوڙيو_list(dict_T *d, حرف *ڪنجي, list_T *list)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_LIST;
-    item->di_tv.vval.v_list = list;
-    if (dict_add(d, item) == FAIL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    شي->di_tv.v_type = VAR_LIST;
+    شي->di_tv.vval.v_list = list;
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
 	// Detach "list" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_list = NULL;
-	dictitem_free(item);
-	return FAIL;
+	شي->di_tv.vval.v_list = عدم;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
     ++list->lv_refcount;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Add a typval_T entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_tv(dict_T *d, char *key, typval_T *tv)
+    صحيح
+dict_جوڙيو_tv(dict_T *d, حرف *ڪنجي, typval_T *tv)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    copy_tv(tv, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    copy_tv(tv, &شي->di_tv);
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Add a callback to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_callback(dict_T *d, char *key, callback_T *cb)
+    صحيح
+dict_جوڙيو_callback(dict_T *d, حرف *ڪنجي, callback_T *cb)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    put_callback(cb, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    put_callback(cb, &شي->di_tv);
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Add a function entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_func(dict_T *d, char *key, ufunc_T *fp)
+    صحيح
+dict_جوڙيو_func(dict_T *d, حرف *ڪنجي, ufunc_T *fp)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_FUNC;
-    item->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    شي->di_tv.v_type = VAR_FUNC;
+    شي->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
     // Reference before dict_add() so dictitem_free()'s unref stays balanced on failure.
-    func_ref(item->di_tv.vval.v_string);
-    if (dict_add(d, item) == FAIL)
+    func_ref(شي->di_tv.vval.v_string);
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
-	dictitem_free(item);
-	return FAIL;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -569,16 +569,16 @@ dict_add_func(dict_T *d, char *key, ufunc_T *fp)
  * iterate over, no error is given.
  * NOTE: The dictionary must not change until iterating is finished!
  */
-    void
-dict_iterate_start(typval_T *var, dict_iterator_T *iter)
+    فراغ
+dict_iterate_شروعات(typval_T *var, dict_iterator_T *iter)
 {
-    if (var->v_type != VAR_DICT || var->vval.v_dict == NULL)
+    إذا (var->v_type != VAR_DICT || var->vval.v_dict == عدم)
 	iter->dit_todo = 0;
-    else
+    وإلا
     {
 	dict_T	*d = var->vval.v_dict;
 
-	iter->dit_todo = d->dv_hashtab.ht_used;
+	iter->dit_todo = d->dv_hashtab.ht_استعمال_ٿيل;
 	iter->dit_hi = d->dv_hashtab.ht_array;
     }
 }
@@ -591,61 +591,61 @@ dict_iterate_start(typval_T *var, dict_iterator_T *iter)
  * If there are no more items, NULL is returned.
  */
     char_u *
-dict_iterate_next(dict_iterator_T *iter, typval_T **tv_result)
+dict_iterate_ايندڙ(dict_iterator_T *iter, typval_T **tv_نتيجو)
 {
     dictitem_T	*di;
-    char_u      *result;
+    char_u      *نتيجو;
 
-    if (iter->dit_todo == 0)
-	return NULL;
+    إذا (iter->dit_todo == 0)
+	أرجع عدم;
 
-    while (HASHITEM_EMPTY(iter->dit_hi))
+    طالما (HASHITEM_خالي_جايون(iter->dit_hi))
 	++iter->dit_hi;
 
     di = HI2DI(iter->dit_hi);
-    result = di->di_key;
-    *tv_result = &di->di_tv;
+    نتيجو = di->di_ڪنجي;
+    *tv_نتيجو = &di->di_tv;
 
     --iter->dit_todo;
     ++iter->dit_hi;
-    return result;
+    أرجع نتيجو;
 }
 
 /*
  * Add a dict entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_dict(dict_T *d, char *key, dict_T *dict)
+    صحيح
+dict_جوڙيو_dict(dict_T *d, حرف *ڪنجي, dict_T *dict)
 {
-    dictitem_T	*item;
+    dictitem_T	*شي;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
-    item->di_tv.v_type = VAR_DICT;
-    item->di_tv.vval.v_dict = dict;
-    if (dict_add(d, item) == FAIL)
+    شي = dictitem_alloc((char_u *)ڪنجي);
+    إذا (شي == عدم)
+	أرجع FAIL;
+    شي->di_tv.v_type = VAR_DICT;
+    شي->di_tv.vval.v_dict = dict;
+    إذا (dict_جوڙيو(d, شي) == FAIL)
     {
 	// Detach "dict" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_dict = NULL;
-	dictitem_free(item);
-	return FAIL;
+	شي->di_tv.vval.v_dict = عدم;
+	dictitem_free(شي);
+	أرجع FAIL;
     }
     ++dict->dv_refcount;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get the number of items in a Dictionary.
  */
-    long
+    ڊگهو
 dict_len(dict_T *d)
 {
-    if (d == NULL)
-	return 0L;
-    return (long)d->dv_hashtab.ht_used;
+    إذا (d == عدم)
+	أرجع 0L;
+    أرجع (ڊگهو)d->dv_hashtab.ht_استعمال_ٿيل;
 }
 
 /*
@@ -654,62 +654,62 @@ dict_len(dict_T *d)
  * Returns NULL when not found.
  */
     dictitem_T *
-dict_find(dict_T *d, char_u *key, int len)
+dict_ڳوليو(dict_T *d, char_u *ڪنجي, صحيح len)
 {
-#define AKEYLEN 200
+#وصف_ڪريو AKEYLEN 200
     char_u	buf[AKEYLEN];
     char_u	*akey;
-    char_u	*tofree = NULL;
+    char_u	*tofree = عدم;
     hashitem_T	*hi;
 
-    if (d == NULL)
-	return NULL;
-    if (len < 0)
-	akey = key;
-    else if (len >= AKEYLEN)
+    إذا (d == عدم)
+	أرجع عدم;
+    إذا (len < 0)
+	akey = ڪنجي;
+    وإلا إذا (len >= AKEYLEN)
     {
-	tofree = akey = vim_strnsave(key, len);
-	if (akey == NULL)
-	    return NULL;
+	tofree = akey = vim_strnsave(ڪنجي, len);
+	إذا (akey == عدم)
+	    أرجع عدم;
     }
-    else
+    وإلا
     {
 	// Avoid a malloc/free by using buf[].
-	mch_memmove(buf, key, (size_t)len);
+	mch_memmove(buf, ڪنجي, (size_t)len);
 	buf[len] = NUL;
 	akey = buf;
     }
 
-    hi = hash_find(&d->dv_hashtab, akey);
+    hi = hash_ڳوليو(&d->dv_hashtab, akey);
     vim_free(tofree);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return HI2DI(hi);
+    إذا (HASHITEM_خالي_جايون(hi))
+	أرجع عدم;
+    أرجع HI2DI(hi);
 }
 
 /*
  * Returns TRUE if "key" is present in Dictionary "d".
  */
-    int
-dict_has_key(dict_T *d, char *key)
+    صحيح
+dict_has_ڪنجي(dict_T *d, حرف *ڪنجي)
 {
-    return dict_find(d, (char_u *)key, -1) != NULL;
+    أرجع dict_ڳوليو(d, (char_u *)ڪنجي, -1) != عدم;
 }
 
 /*
  * Get a typval_T item from a dictionary and copy it into "rettv".
  * Returns FAIL if the entry doesn't exist or out of memory.
  */
-    int
-dict_get_tv(dict_T *d, char *key, typval_T *rettv)
+    صحيح
+dict_get_tv(dict_T *d, حرف *ڪنجي, typval_T *rettv)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return FAIL;
+    di = dict_ڳوليو(d, (char_u *)ڪنجي, -1);
+    إذا (di == عدم)
+	أرجع FAIL;
     copy_tv(&di->di_tv, rettv);
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -719,18 +719,18 @@ dict_get_tv(dict_T *d, char *key, typval_T *rettv)
  * Returns NULL if the entry doesn't exist or out of memory.
  */
     char_u *
-dict_get_string(dict_T *d, char *key, int save)
+dict_get_string(dict_T *d, حرف *ڪنجي, صحيح save)
 {
     dictitem_T	*di;
     char_u	*s;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_ڳوليو(d, (char_u *)ڪنجي, -1);
+    إذا (di == عدم)
+	أرجع عدم;
     s = tv_get_string(&di->di_tv);
-    if (save && s != NULL)
+    إذا (save && s != عدم)
 	s = vim_strsave(s);
-    return s;
+    أرجع s;
 }
 
 /*
@@ -738,9 +738,9 @@ dict_get_string(dict_T *d, char *key, int save)
  * Returns 0 if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number(dict_T *d, char *key)
+dict_get_عدد(dict_T *d, حرف *ڪنجي)
 {
-    return dict_get_number_def(d, key, 0);
+    أرجع dict_get_عدد_def(d, ڪنجي, 0);
 }
 
 /*
@@ -748,14 +748,14 @@ dict_get_number(dict_T *d, char *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number_def(dict_T *d, char *key, int def)
+dict_get_عدد_def(dict_T *d, حرف *ڪنجي, صحيح def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_number(&di->di_tv);
+    di = dict_ڳوليو(d, (char_u *)ڪنجي, -1);
+    إذا (di == عدم)
+	أرجع def;
+    أرجع tv_get_عدد(&di->di_tv);
 }
 
 /*
@@ -764,19 +764,19 @@ dict_get_number_def(dict_T *d, char *key, int def)
  * Give an error if the entry is not a number.
  */
     varnumber_T
-dict_get_number_check(dict_T *d, char_u *key)
+dict_get_عدد_check(dict_T *d, char_u *ڪنجي)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
-	return 0;
-    if (di->di_tv.v_type != VAR_NUMBER)
+    di = dict_ڳوليو(d, ڪنجي, -1);
+    إذا (di == عدم)
+	أرجع 0;
+    إذا (di->di_tv.v_type != VAR_عدد)
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(&di->di_tv));
-	return 0;
+	semsg(_(e_invalid_دليل_str), tv_get_string(&di->di_tv));
+	أرجع 0;
     }
-    return tv_get_number(&di->di_tv);
+    أرجع tv_get_عدد(&di->di_tv);
 }
 
 /*
@@ -784,14 +784,14 @@ dict_get_number_check(dict_T *d, char_u *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_bool(dict_T *d, char *key, int def)
+dict_get_bool(dict_T *d, حرف *ڪنجي, صحيح def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_bool(&di->di_tv);
+    di = dict_ڳوليو(d, (char_u *)ڪنجي, -1);
+    إذا (di == عدم)
+	أرجع def;
+    أرجع tv_get_bool(&di->di_tv);
 }
 
 /*
@@ -799,44 +799,44 @@ dict_get_bool(dict_T *d, char *key, int def)
  * May return NULL.
  */
     char_u *
-dict2string(typval_T *tv, int copyID, int restore_copyID)
+dict2string(typval_T *tv, صحيح copyID, صحيح restore_copyID)
 {
     garray_T	ga;
-    int		first = TRUE;
+    صحيح		پهريون = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     hashitem_T	*hi;
     char_u	*s;
     dict_T	*d;
-    int		todo;
-    int		prev_lock;
+    صحيح		todo;
+    صحيح		prev_تالو;
 
-    if ((d = tv->vval.v_dict) == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    إذا ((d = tv->vval.v_dict) == عدم)
+	أرجع عدم;
+    ga_init2(&ga, حجم(حرف), 80);
     ga_append(&ga, '{');
 
     // Lock the dict, the string() method of an object item could remove an
     // item or make the hashtab resize while we iterate over it.
-    prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
-	d->dv_lock = VAR_LOCKED;
-    hash_lock(&d->dv_hashtab);
+    prev_تالو = d->dv_تالو;
+    إذا (d->dv_تالو == 0)
+	d->dv_تالو = VAR_LOCKED;
+    hash_تالو(&d->dv_hashtab);
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (صحيح)d->dv_hashtab.ht_استعمال_ٿيل;
+    FOR_ALL_HASHTAB_شيون(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
 	    --todo;
 
-	    if (first)
-		first = FALSE;
-	    else
+	    إذا (پهريون)
+		پهريون = FALSE;
+	    وإلا
 		GA_CONCAT_LITERAL(&ga, ", ");
 
-	    tofree = string_quote(hi->hi_key, FALSE);
-	    if (tofree != NULL)
+	    tofree = string_quote(hi->hi_ڪنجي, FALSE);
+	    إذا (tofree != عدم)
 	    {
 		ga_concat(&ga, tofree);
 		vim_free(tofree);
@@ -844,58 +844,58 @@ dict2string(typval_T *tv, int copyID, int restore_copyID)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	    s = echo_string_core(&HI2DI(hi)->di_tv, &tofree, numbuf, copyID,
 						 FALSE, restore_copyID, TRUE);
-	    if (s != NULL)
+	    إذا (s != عدم)
 		ga_concat(&ga, s);
 	    vim_free(tofree);
-	    if (s == NULL || did_echo_string_emsg)
-		break;
-	    line_breakcheck();
+	    إذا (s == عدم || did_echo_string_emsg)
+		اكسر;
+	    سٽ_breakcheck();
 
 	}
     }
     hash_unlock(&d->dv_hashtab);
-    d->dv_lock = prev_lock;
-    if (todo > 0)
+    d->dv_تالو = prev_تالو;
+    إذا (todo > 0)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_معلومات);
+	أرجع عدم;
     }
 
     ga_append(&ga, '}');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    أرجع (char_u *)ga.ga_معلومات;
 }
 
 /*
  * Advance over a literal key, including "-".  If the first character is not a
  * literal key character then "key" is returned.
  */
-    static char_u *
-skip_literal_key(char_u *key)
+    ساكن char_u *
+skip_literal_ڪنجي(char_u *ڪنجي)
 {
     char_u *p;
 
-    for (p = key; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
+    لكل (p = ڪنجي; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
 	;
-    return p;
+    أرجع p;
 }
 
 /*
  * Get the key for #{key: val} into "tv" and advance "arg".
  * Return FAIL when there is no valid key.
  */
-    static int
-get_literal_key_tv(char_u **arg, typval_T *tv)
+    ساكن صحيح
+get_literal_ڪنجي_tv(char_u **arg, typval_T *tv)
 {
-    char_u *p = skip_literal_key(*arg);
+    char_u *p = skip_literal_ڪنجي(*arg);
 
-    if (p == *arg)
-	return FAIL;
+    إذا (p == *arg)
+	أرجع FAIL;
     tv->v_type = VAR_STRING;
     tv->vval.v_string = vim_strnsave(*arg, p - *arg);
 
     *arg = p;
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -907,36 +907,36 @@ get_literal_key_tv(char_u **arg, typval_T *tv)
  * "arg" is advanced to just after the key.
  */
     char_u *
-get_literal_key(char_u **arg)
+get_literal_ڪنجي(char_u **arg)
 {
-    char_u	*key;
-    char_u	*end;
+    char_u	*ڪنجي;
+    char_u	*پڇاڙي;
     typval_T	rettv;
 
-    if (**arg == '\'')
+    إذا (**arg == '\'')
     {
-	if (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	إذا (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    أرجع عدم;
+	ڪنجي = rettv.vval.v_string;
     }
-    else if (**arg == '"')
+    وإلا إذا (**arg == '"')
     {
-	if (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	إذا (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    أرجع عدم;
+	ڪنجي = rettv.vval.v_string;
     }
-    else
+    وإلا
     {
-	end = skip_literal_key(*arg);
-	if (end == *arg)
+	پڇاڙي = skip_literal_ڪنجي(*arg);
+	إذا (پڇاڙي == *arg)
 	{
-	    semsg(_(e_invalid_key_str), *arg);
-	    return NULL;
+	    semsg(_(e_invalid_ڪنجي_str), *arg);
+	    أرجع عدم;
 	}
-	key = vim_strnsave(*arg, end - *arg);
-	*arg = end;
+	ڪنجي = vim_strnsave(*arg, پڇاڙي - *arg);
+	*arg = پڇاڙي;
     }
-    return key;
+    أرجع ڪنجي;
 }
 
 /*
@@ -945,20 +945,20 @@ get_literal_key(char_u **arg)
  * "literal" is TRUE for #{key: val}
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
-eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
+    صحيح
+eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, صحيح literal)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    صحيح		evaluate = evalarg == عدم ? FALSE
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
-    dict_T	*d = NULL;
+    dict_T	*d = عدم;
     typval_T	tvkey;
     typval_T	tv;
-    char_u	*key = NULL;
-    dictitem_T	*item;
-    char_u	*curly_expr = skipwhite(*arg + 1);
+    char_u	*ڪنجي = عدم;
+    dictitem_T	*شي;
+    char_u	*curly_اظهار = skipwhite(*arg + 1);
     char_u	buf[NUMBUFLEN];
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    صحيح		vim9script = اندريون_vim9script();
+    صحيح		had_comma;
 
     // First check if it's not a curly-braces expression: {expr}.
     // Must do this without evaluating, otherwise a function may be called
@@ -966,53 +966,53 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
     // first item.
     // "{}" is an empty Dictionary.
     // "#{abc}" is never a curly-braces expression.
-    if (!vim9script
-	    && *curly_expr != '}'
+    إذا (!vim9script
+	    && *curly_اظهار != '}'
 	    && !literal
-	    && eval1(&curly_expr, &tv, NULL) == OK
-	    && *skipwhite(curly_expr) == '}')
-	return NOTDONE;
+	    && eval1(&curly_اظهار, &tv, عدم) == OK
+	    && *skipwhite(curly_اظهار) == '}')
+	أرجع NOTDONE;
 
-    if (evaluate)
+    إذا (evaluate)
     {
 	d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
+	إذا (d == عدم)
+	    أرجع FAIL;
     }
     tvkey.v_type = VAR_UNKNOWN;
     tv.v_type = VAR_UNKNOWN;
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != '}' && **arg != NUL)
+    طالما (**arg != '}' && **arg != NUL)
     {
-	int	has_bracket = vim9script && **arg == '[';
+	صحيح	has_bracket = vim9script && **arg == '[';
 
-	if (literal)
+	إذا (literal)
 	{
-	    if (get_literal_key_tv(arg, &tvkey) == FAIL)
-		goto failret;
+	    إذا (get_literal_ڪنجي_tv(arg, &tvkey) == FAIL)
+		اذهب failret;
 	}
-	else if (vim9script && !has_bracket)
+	وإلا إذا (vim9script && !has_bracket)
 	{
-	    tvkey.vval.v_string = get_literal_key(arg);
-	    if (tvkey.vval.v_string == NULL)
-		goto failret;
+	    tvkey.vval.v_string = get_literal_ڪنجي(arg);
+	    إذا (tvkey.vval.v_string == عدم)
+		اذهب failret;
 	    tvkey.v_type = VAR_STRING;
 	}
-	else
+	وإلا
 	{
-	    if (has_bracket)
+	    إذا (has_bracket)
 		*arg = skipwhite(*arg + 1);
-	    if (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
-		goto failret;
-	    if (has_bracket)
+	    إذا (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
+		اذهب failret;
+	    إذا (has_bracket)
 	    {
 		*arg = skipwhite(*arg);
-		if (**arg != ']')
+		إذا (**arg != ']')
 		{
-		    emsg(_(e_missing_matching_bracket_after_dict_key));
+		    emsg(_(e_missing_matching_bracket_after_dict_ڪنجي));
 		    clear_tv(&tvkey);
-		    goto failret;
+		    اذهب failret;
 		}
 		++*arg;
 	    }
@@ -1020,116 +1020,116 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the colon should come right after the key, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	إذا (!vim9script)
 	    *arg = skipwhite(*arg);
-	if (**arg != ':')
+	إذا (**arg != ':')
 	{
-	    if (*skipwhite(*arg) == ':')
+	    إذا (*skipwhite(*arg) == ':')
 		semsg(_(e_no_white_space_allowed_before_str_str), ":", *arg);
-	    else
-		semsg(_(e_missing_colon_in_dictionary_str), *arg);
+	    وإلا
+		semsg(_(e_missing_colon_اندريون_dictionary_str), *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    اذهب failret;
 	}
-	if (evaluate)
+	إذا (evaluate)
 	{
-	    if (tvkey.v_type == VAR_FLOAT)
+	    إذا (tvkey.v_type == VAR_FLOAT)
 	    {
 		tvkey.vval.v_string = typval_tostring(&tvkey, TRUE);
 		tvkey.v_type = VAR_STRING;
 	    }
-	    key = tv_get_string_buf_chk(&tvkey, buf);
-	    if (key == NULL)
+	    ڪنجي = tv_get_string_buf_chk(&tvkey, buf);
+	    إذا (ڪنجي == عدم)
 	    {
 		// "key" is NULL when tv_get_string_buf_chk() gave an errmsg
 		clear_tv(&tvkey);
-		goto failret;
+		اذهب failret;
 	    }
 	}
-	if (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
+	إذا (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    اذهب failret;
 	}
 
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	إذا (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	{
 	    clear_tv(&tvkey);
-	    goto failret;
+	    اذهب failret;
 	}
-	if (check_typval_is_value(&tv) == FAIL)
+	إذا (check_typval_is_قدر(&tv) == FAIL)
 	{
 	    clear_tv(&tvkey);
 	    clear_tv(&tv);
-	    goto failret;
+	    اذهب failret;
 	}
-	if (evaluate)
+	إذا (evaluate)
 	{
-	    item = dict_find(d, key, -1);
-	    if (item != NULL)
+	    شي = dict_ڳوليو(d, ڪنجي, -1);
+	    إذا (شي != عدم)
 	    {
-		semsg(_(e_duplicate_key_in_dictionary_str), key);
+		semsg(_(e_duplicate_ڪنجي_اندريون_dictionary_str), ڪنجي);
 		clear_tv(&tvkey);
 		clear_tv(&tv);
-		goto failret;
+		اذهب failret;
 	    }
-	    item = dictitem_alloc(key);
-	    if (item != NULL)
+	    شي = dictitem_alloc(ڪنجي);
+	    إذا (شي != عدم)
 	    {
-		item->di_tv = tv;
-		item->di_tv.v_lock = 0;
-		if (dict_add(d, item) == FAIL)
-		    dictitem_free(item);
+		شي->di_tv = tv;
+		شي->di_tv.v_تالو = 0;
+		إذا (dict_جوڙيو(d, شي) == FAIL)
+		    dictitem_free(شي);
 	    }
 	}
 	clear_tv(&tvkey);
 
 	// the comma should come right after the value, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	إذا (!vim9script)
 	    *arg = skipwhite(*arg);
 	had_comma = **arg == ',';
-	if (had_comma)
+	إذا (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
+	    إذا (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		اذهب failret;
 	    }
 	    *arg = skipwhite_and_nl(*arg + 1);
 	}
 
 	// the "}" can be on the next line
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == '}')
-	    break;
-	if (!had_comma)
+	إذا (**arg == '}')
+	    اكسر;
+	إذا (!had_comma)
 	{
-	    if (**arg == ',')
+	    إذا (**arg == ',')
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", *arg);
-	    else
-		semsg(_(e_missing_comma_in_dictionary_str), *arg);
-	    goto failret;
+	    وإلا
+		semsg(_(e_missing_comma_اندريون_dictionary_str), *arg);
+	    اذهب failret;
 	}
     }
 
-    if (**arg != '}')
+    إذا (**arg != '}')
     {
-	if (evalarg != NULL)
-	    semsg(_(e_missing_dict_end_str), *arg);
+	إذا (evalarg != عدم)
+	    semsg(_(e_missing_dict_پڇاڙي_str), *arg);
 failret:
-	if (d != NULL)
+	إذا (d != عدم)
 	    dict_free(d);
-	return FAIL;
+	أرجع FAIL;
     }
 
     *arg = *arg + 1;
-    if (evaluate)
-	rettv_dict_set(rettv, d);
+    إذا (evaluate)
+	rettv_dict_سيٽ(rettv, d);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1138,25 +1138,25 @@ failret:
  * On return, "*arg" points to the character after the Dict.
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
+    صحيح
 eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
-    int		vim9script = in_vim9script();
-    int		ret = OK;
+    صحيح		vim9script = اندريون_vim9script();
+    صحيح		ret = OK;
 
-    if (vim9script)
+    إذا (vim9script)
     {
 	ret = vim9_bad_comment(*arg) ? FAIL : NOTDONE;
     }
-    else if ((*arg)[1] == '{')
+    وإلا إذا ((*arg)[1] == '{')
     {
 	++*arg;
 	ret = eval_dict(arg, rettv, evalarg, TRUE);
     }
-    else
+    وإلا
 	ret = NOTDONE;
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -1167,83 +1167,83 @@ eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  * Otherwise duplicate keys are ignored ("action" is "keep").
  * "func_name" is used for reporting where an error occurred.
  */
-    void
-dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
+    فراغ
+dict_extend(dict_T *d1, dict_T *d2, char_u *action, حرف *func_name)
 {
     dictitem_T	*di1;
-    int		todo;
+    صحيح		todo;
     char_u	*arg_errmsg = (char_u *)N_("extend() argument");
     type_T	*type;
 
-    if (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
-	return;
+    إذا (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
+	أرجع;
 
-    if (*action == 'm')
+    إذا (*action == 'm')
     {
-	if (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
-	    return;
-	hash_lock(&d2->dv_hashtab);  // don't rehash on hash_remove()
+	إذا (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
+	    أرجع;
+	hash_تالو(&d2->dv_hashtab);  // don't rehash on hash_remove()
     }
 
-    if (d1->dv_type != NULL && d1->dv_type->tt_member != NULL)
+    إذا (d1->dv_type != عدم && d1->dv_type->tt_member != عدم)
 	type = d1->dv_type->tt_member;
-    else
-	type = NULL;
+    وإلا
+	type = عدم;
 
-    todo = (int)d2->dv_hashtab.ht_used;
+    todo = (صحيح)d2->dv_hashtab.ht_استعمال_ٿيل;
     hashitem_T *hi2;
-    FOR_ALL_HASHTAB_ITEMS(&d2->dv_hashtab, hi2, todo)
+    FOR_ALL_HASHTAB_شيون(&d2->dv_hashtab, hi2, todo)
     {
-	if (!HASHITEM_EMPTY(hi2))
+	إذا (!HASHITEM_خالي_جايون(hi2))
 	{
 	    --todo;
-	    di1 = dict_find(d1, hi2->hi_key, -1);
+	    di1 = dict_ڳوليو(d1, hi2->hi_ڪنجي, -1);
 	    // Check the key to be valid when adding to any scope.
-	    if (d1->dv_scope != 0 && !valid_varname(hi2->hi_key, -1, TRUE))
-		break;
+	    إذا (d1->dv_scope != 0 && !valid_varname(hi2->hi_ڪنجي, -1, TRUE))
+		اكسر;
 
-	    if (type != NULL
+	    إذا (type != عدم
 		     && check_typval_arg_type(type, &HI2DI(hi2)->di_tv,
 							 func_name, 0) == FAIL)
-		break;
+		اكسر;
 
-	    if (di1 == NULL)
+	    إذا (di1 == عدم)
 	    {
-		if (*action == 'm')
+		إذا (*action == 'm')
 		{
 		    // Cheap way to move a dict item from "d2" to "d1".
 		    // If dict_add() fails then "d2" won't be empty.
 		    di1 = HI2DI(hi2);
-		    if (dict_add(d1, di1) == OK)
+		    إذا (dict_جوڙيو(d1, di1) == OK)
 			hash_remove(&d2->dv_hashtab, hi2, "extend");
 		}
-		else
+		وإلا
 		{
 		    di1 = dictitem_copy(HI2DI(hi2));
-		    if (di1 != NULL && dict_add(d1, di1) == FAIL)
+		    إذا (di1 != عدم && dict_جوڙيو(d1, di1) == FAIL)
 			dictitem_free(di1);
 		}
 	    }
-	    else if (*action == 'e')
+	    وإلا إذا (*action == 'e')
 	    {
-		semsg(_(e_key_already_exists_str), hi2->hi_key);
-		break;
+		semsg(_(e_ڪنجي_already_exists_str), hi2->hi_ڪنجي);
+		اكسر;
 	    }
-	    else if (*action == 'f' && HI2DI(hi2) != di1)
+	    وإلا إذا (*action == 'f' && HI2DI(hi2) != di1)
 	    {
-		if (value_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
+		إذا (قدر_check_تالو(di1->di_tv.v_تالو, arg_errmsg, TRUE)
 			|| var_check_ro(di1->di_flags, arg_errmsg, TRUE))
-		    break;
+		    اكسر;
 		// Disallow replacing a builtin function.
-		if (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_key))
-		    break;
+		إذا (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_ڪنجي))
+		    اكسر;
 		clear_tv(&di1->di_tv);
 		copy_tv(&HI2DI(hi2)->di_tv, &di1->di_tv);
 	    }
 	}
     }
 
-    if (*action == 'm')
+    إذا (*action == 'm')
 	hash_unlock(&d2->dv_hashtab);
 }
 
@@ -1253,157 +1253,157 @@ dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
     dictitem_T *
 dict_lookup(hashitem_T *hi)
 {
-    return HI2DI(hi);
+    أرجع HI2DI(hi);
 }
 
 /*
  * Return TRUE when two dictionaries have exactly the same key/values.
  */
-    int
+    صحيح
 dict_equal(
     dict_T	*d1,
     dict_T	*d2,
-    int		ic)	    // ignore case for strings
+    صحيح		ic)	    // ignore case for strings
 {
     hashitem_T	*hi;
     dictitem_T	*item2;
-    int		todo;
+    صحيح		todo;
 
-    if (d1 == d2)
-	return TRUE;
-    if (dict_len(d1) != dict_len(d2))
-	return FALSE;
-    if (dict_len(d1) == 0)
+    إذا (d1 == d2)
+	أرجع TRUE;
+    إذا (dict_len(d1) != dict_len(d2))
+	أرجع FALSE;
+    إذا (dict_len(d1) == 0)
 	// empty and NULL dicts are considered equal
-	return TRUE;
-    if (d1 == NULL || d2 == NULL)
-	return FALSE;
+	أرجع TRUE;
+    إذا (d1 == عدم || d2 == عدم)
+	أرجع FALSE;
 
-    todo = (int)d1->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d1->dv_hashtab, hi, todo)
+    todo = (صحيح)d1->dv_hashtab.ht_استعمال_ٿيل;
+    FOR_ALL_HASHTAB_شيون(&d1->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
-	    item2 = dict_find(d2, hi->hi_key, -1);
-	    if (item2 == NULL)
-		return FALSE;
-	    if (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
-		return FALSE;
+	    item2 = dict_ڳوليو(d2, hi->hi_ڪنجي, -1);
+	    إذا (item2 == عدم)
+		أرجع FALSE;
+	    إذا (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
+		أرجع FALSE;
 	    --todo;
 	}
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Count the number of times item "needle" occurs in Dict "d". Case is ignored
  * if "ic" is TRUE.
  */
-    long
-dict_count(dict_T *d, typval_T *needle, int ic)
+    ڊگهو
+dict_ڳڻپ(dict_T *d, typval_T *needle, صحيح ic)
 {
-    int		todo;
+    صحيح		todo;
     hashitem_T	*hi;
-    long	n = 0;
+    ڊگهو	n = 0;
 
-    if (d == NULL)
-	return 0;
+    إذا (d == عدم)
+	أرجع 0;
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (صحيح)d->dv_hashtab.ht_استعمال_ٿيل;
+    FOR_ALL_HASHTAB_شيون(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
 	    --todo;
-	    if (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
+	    إذا (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
 		++n;
 	}
     }
 
-    return n;
+    أرجع n;
 }
 
 /*
  * extend() a Dict. Append Dict argvars[1] to Dict argvars[0] and return the
  * resulting Dict in "rettv".  "is_new" is TRUE for extendnew().
  */
-    void
+    فراغ
 dict_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	حرف		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	صحيح		is_new,
 	typval_T	*rettv)
 {
     dict_T	*d1, *d2;
     char_u	*action;
-    int	i;
+    صحيح	i;
 
     d1 = argvars[0].vval.v_dict;
-    if (d1 == NULL)
+    إذا (d1 == عدم)
     {
 	emsg(_(e_cannot_extend_null_dict));
-	return;
+	أرجع;
     }
 
-    if (!is_new && value_check_lock(d1->dv_lock, arg_errmsg, TRUE))
-	return;
+    إذا (!is_new && قدر_check_تالو(d1->dv_تالو, arg_errmsg, TRUE))
+	أرجع;
 
-    if (is_new)
+    إذا (is_new)
     {
 	d1 = dict_copy(d1, FALSE, TRUE, get_copyID());
-	if (d1 == NULL)
-	    return;
+	إذا (d1 == عدم)
+	    أرجع;
     }
 
     d2 = argvars[1].vval.v_dict;
-    if (d2 == NULL)
-	goto theend;
+    إذا (d2 == عدم)
+	اذهب theend;
 
     // Check the third argument.
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
-	static char *(av[]) = {"keep", "force", "error"};
+	ساكن حرف *(av[]) = {"keep", "force", "error"};
 
 	action = tv_get_string_chk(&argvars[2]);
-	if (action == NULL)
+	إذا (action == عدم)
 	{
-	    if (is_new)
+	    إذا (is_new)
 		dict_unref(d1);
-	    return;
+	    أرجع;
 	}
-	for (i = 0; i < 3; ++i)
-	    if (STRCMP(action, av[i]) == 0)
-		break;
-	if (i == 3)
+	لكل (i = 0; i < 3; ++i)
+	    إذا (STRCMP(action, av[i]) == 0)
+		اكسر;
+	إذا (i == 3)
 	{
-	    if (is_new)
+	    إذا (is_new)
 		dict_unref(d1);
-	    semsg(_(e_invalid_argument_str), action);
-	    return;
+	    semsg(_(e_invalid_دليل_str), action);
+	    أرجع;
 	}
     }
-    else
+    وإلا
 	action = (char_u *)"force";
 
-    if (type != NULL && check_typval_arg_type(type, &argvars[1],
+    إذا (type != عدم && check_typval_arg_type(type, &argvars[1],
 							 func_name, 2) == FAIL)
     {
-	if (is_new)
+	إذا (is_new)
 	    dict_unref(d1);
-	return;
+	أرجع;
     }
     dict_extend(d1, d2, action, func_name);
 
 theend:
-    if (is_new)
+    إذا (is_new)
     {
 	rettv->v_type = VAR_DICT;
 	rettv->vval.v_dict = d1;
-	rettv->v_lock = FALSE;
+	rettv->v_تالو = FALSE;
     }
-    else
+    وإلا
 	copy_tv(&argvars[0], rettv);
 }
 
@@ -1411,160 +1411,160 @@ theend:
  * Implementation of map(), filter(), foreach() for a Dict.  Apply "expr" to
  * every item in Dict "d" and return the result in "rettv".
  */
-    void
+    فراغ
 dict_filter_map(
 	dict_T		*d,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	حرف		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*اظهار,
 	typval_T	*rettv)
 {
-    dict_T	*d_ret = NULL;
+    dict_T	*d_ret = عدم;
     hashtab_T	*ht;
     hashitem_T	*hi;
     dictitem_T	*di;
-    int		todo;
-    int		rem;
+    صحيح		todo;
+    صحيح		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    إذا (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_DICT;
-	rettv->vval.v_dict = NULL;
+	rettv->vval.v_dict = عدم;
     }
-    if (d == NULL
+    إذا (d == عدم
 	  || (filtermap == FILTERMAP_FILTER
-			&& value_check_lock(d->dv_lock, arg_errmsg, TRUE)))
-	return;
+			&& قدر_check_تالو(d->dv_تالو, arg_errmsg, TRUE)))
+	أرجع;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    إذا (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	إذا (rettv_dict_alloc(rettv) == FAIL)
+	    أرجع;
 	d_ret = rettv->vval.v_dict;
     }
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_اظهار_get_funccal(اظهار, &newtv);
 
-    int prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
-	d->dv_lock = VAR_LOCKED;
+    صحيح prev_تالو = d->dv_تالو;
+    إذا (d->dv_تالو == 0)
+	d->dv_تالو = VAR_LOCKED;
     ht = &d->dv_hashtab;
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_تالو(ht);
+    todo = (صحيح)ht->ht_استعمال_ٿيل;
+    FOR_ALL_HASHTAB_شيون(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
-	    int		r;
+	    صحيح		r;
 
 	    --todo;
 	    di = HI2DI(hi);
-	    if (filtermap == FILTERMAP_MAP
-		    && (value_check_lock(di->di_tv.v_lock,
+	    إذا (filtermap == FILTERMAP_MAP
+		    && (قدر_check_تالو(di->di_tv.v_تالو,
 			    arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags,
 			    arg_errmsg, TRUE)))
-		break;
-	    set_vim_var_string(VV_KEY, di->di_key, -1);
-	    r = filter_map_one(&di->di_tv, expr, filtermap, fc, &newtv, &rem);
-	    clear_tv(get_vim_var_tv(VV_KEY));
-	    if (r == FAIL || did_emsg)
+		اكسر;
+	    سيٽ_vim_var_string(VV_ڪنجي, di->di_ڪنجي, -1);
+	    r = filter_map_one(&di->di_tv, اظهار, filtermap, fc, &newtv, &rem);
+	    clear_tv(get_vim_var_tv(VV_ڪنجي));
+	    إذا (r == FAIL || did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		اكسر;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    إذا (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		إذا (argtype != عدم && check_typval_arg_type(
 			     argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    اكسر;
 		}
 		// map(): replace the dict item value
 		clear_tv(&di->di_tv);
-		newtv.v_lock = 0;
+		newtv.v_تالو = 0;
 		di->di_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    وإلا إذا (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): add the item value to the new dict
-		r = dict_add_tv(d_ret, (char *)di->di_key, &newtv);
+		r = dict_جوڙيو_tv(d_ret, (حرف *)di->di_ڪنجي, &newtv);
 		clear_tv(&newtv);
-		if (r == FAIL)
-		    break;
+		إذا (r == FAIL)
+		    اكسر;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    وإلا إذا (filtermap == FILTERMAP_FILTER && rem)
 	    {
 		// filter(false): remove the item from the dict
-		if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+		إذا (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags, arg_errmsg, TRUE))
-		    break;
+		    اكسر;
 		dictitem_remove(d, di, "filter");
 	    }
 	}
     }
     hash_unlock(ht);
-    d->dv_lock = prev_lock;
-    if (fc != NULL)
+    d->dv_تالو = prev_تالو;
+    إذا (fc != عدم)
 	remove_funccal();
 }
 
 /*
  * "remove({dict})" function
  */
-    void
+    فراغ
 dict_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     dict_T	*d;
-    char_u	*key;
+    char_u	*ڪنجي;
     dictitem_T	*di;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments_for_function_str), "remove()");
-	return;
+	أرجع;
     }
 
     d = argvars[0].vval.v_dict;
-    if (d == NULL || value_check_lock(d->dv_lock, arg_errmsg, TRUE))
-	return;
+    إذا (d == عدم || قدر_check_تالو(d->dv_تالو, arg_errmsg, TRUE))
+	أرجع;
 
-    key = tv_get_string_chk(&argvars[1]);
-    if (key == NULL)
-	return;
+    ڪنجي = tv_get_string_chk(&argvars[1]);
+    إذا (ڪنجي == عدم)
+	أرجع;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
+    di = dict_ڳوليو(d, ڪنجي, -1);
+    إذا (di == عدم)
     {
-	semsg(_(e_key_not_present_in_dictionary_str), key);
-	return;
+	semsg(_(e_ڪنجي_not_present_اندريون_dictionary_str), ڪنجي);
+	أرجع;
     }
 
-    if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+    إذا (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 	    || var_check_ro(di->di_flags, arg_errmsg, TRUE))
-	return;
+	أرجع;
 
     *rettv = di->di_tv;
     init_tv(&di->di_tv);
     dictitem_remove(d, di, "remove()");
 }
 
-typedef enum {
-    DICT2LIST_KEYS,
-    DICT2LIST_VALUES,
-    DICT2LIST_ITEMS,
+تعريفنوع تعداد {
+    DICT2_LIST_ڪنجيون,
+    DICT2_LIST_قدرون,
+    DICT2_LIST_شيون,
 } dict2list_T;
 
 /*
  * Turn a dict into a list.
  */
-    static void
+    ساكن فراغ
 dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
 {
     list_T	*l;
@@ -1573,122 +1573,122 @@ dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
     hashitem_T	*hi;
     listitem_T	*li;
     dict_T	*d;
-    int		todo;
+    صحيح		todo;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
+    إذا (check_for_dict_arg(argvars, 0) == FAIL)
     {
 	// invalid argument, return an empty list
-	(void)rettv_list_alloc(rettv);
-	return;
+	(فراغ)rettv_list_alloc(rettv);
+	أرجع;
     }
 
     // NULL dict behaves like an empty dict
     d = argvars[0].vval.v_dict;
-    todo = d == NULL ? 0 : (int)d->dv_hashtab.ht_used;
+    todo = d == عدم ? 0 : (صحيح)d->dv_hashtab.ht_استعمال_ٿيل;
 
     // The number of items is known, allocate the list and all its items in
     // one go for efficiency.
-    l = list_alloc_with_items(todo);
-    if (l == NULL)
+    l = list_alloc_with_شيون(todo);
+    إذا (l == عدم)
     {
-	(void)rettv_list_alloc(rettv);
-	return;
+	(فراغ)rettv_list_alloc(rettv);
+	أرجع;
     }
-    rettv_list_set(rettv, l);
-    if (todo == 0)
+    rettv_list_سيٽ(rettv, l);
+    إذا (todo == 0)
 	// NULL or empty dict, return the empty list
-	return;
+	أرجع;
 
-    li = l->lv_first;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    li = l->lv_پهريون;
+    FOR_ALL_HASHTAB_شيون(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالي_جايون(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
 
-	    if (what == DICT2LIST_KEYS)
+	    إذا (what == DICT2_LIST_ڪنجيون)
 	    {
 		// keys()
 		li->li_tv.v_type = VAR_STRING;
-		li->li_tv.v_lock = 0;
-		li->li_tv.vval.v_string = vim_strsave(di->di_key);
+		li->li_tv.v_تالو = 0;
+		li->li_tv.vval.v_string = vim_strsave(di->di_ڪنجي);
 	    }
-	    else if (what == DICT2LIST_VALUES)
+	    وإلا إذا (what == DICT2_LIST_قدرون)
 	    {
 		// values()
 		copy_tv(&di->di_tv, &li->li_tv);
 	    }
-	    else
+	    وإلا
 	    {
 		// items()
-		l2 = list_alloc_with_items(2);
+		l2 = list_alloc_with_شيون(2);
 		li->li_tv.v_type = VAR_LIST;
-		li->li_tv.v_lock = 0;
+		li->li_tv.v_تالو = 0;
 		li->li_tv.vval.v_list = l2;
-		if (l2 == NULL)
-		    goto alloc_failed;
+		إذا (l2 == عدم)
+		    اذهب alloc_failed;
 		++l2->lv_refcount;
 
-		l2->lv_first->li_tv.v_type = VAR_STRING;
-		l2->lv_first->li_tv.vval.v_string = vim_strsave(di->di_key);
-		if (l2->lv_first->li_tv.vval.v_string == NULL)
-		    goto alloc_failed;
-		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_last->li_tv);
+		l2->lv_پهريون->li_tv.v_type = VAR_STRING;
+		l2->lv_پهريون->li_tv.vval.v_string = vim_strsave(di->di_ڪنجي);
+		إذا (l2->lv_پهريون->li_tv.vval.v_string == عدم)
+		    اذهب alloc_failed;
+		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_آخري->li_tv);
 	    }
-	    li = li->li_next;
+	    li = li->li_ايندڙ;
 	}
     }
-    return;
+    أرجع;
 
 alloc_failed:
     // On a memory allocation failure some of the pre-allocated items may be
     // left unset; free the whole list and return an empty one instead.
     list_unref(l);
-    (void)rettv_list_alloc(rettv);
+    (فراغ)rettv_list_alloc(rettv);
 }
 
 /*
  * "items(dict)" function
  */
-    void
+    فراغ
 dict2items(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_ITEMS);
+    dict2list(argvars, rettv, DICT2_LIST_شيون);
 }
 
 /*
  * "keys()" function
  */
-    void
-f_keys(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_ڪنجيون(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_KEYS);
+    dict2list(argvars, rettv, DICT2_LIST_ڪنجيون);
 }
 
 /*
  * "values(dict)" function
  */
-    void
-f_values(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_قدرون(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_VALUES);
+    dict2list(argvars, rettv, DICT2_LIST_قدرون);
 }
 
 /*
  * Make each item in the dict readonly (not the value of the item).
  */
-    void
-dict_set_items_ro(dict_T *di)
+    فراغ
+dict_سيٽ_شيون_ro(dict_T *di)
 {
-    int		todo = (int)di->dv_hashtab.ht_used;
+    صحيح		todo = (صحيح)di->dv_hashtab.ht_استعمال_ٿيل;
     hashitem_T	*hi;
 
     // Set readonly
-    FOR_ALL_HASHTAB_ITEMS(&di->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_شيون(&di->dv_hashtab, hi, todo)
     {
-	if (HASHITEM_EMPTY(hi))
-	    continue;
+	إذا (HASHITEM_خالي_جايون(hi))
+	    استمر;
 	--todo;
 	HI2DI(hi)->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
     }
@@ -1697,22 +1697,22 @@ dict_set_items_ro(dict_T *di)
 /*
  * "has_key()" function
  */
-    void
-f_has_key(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_has_ڪنجي(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    إذا (اندريون_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_string_or_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_dict_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].vval.v_dict == NULL)
-	return;
+    إذا (argvars[0].vval.v_dict == عدم)
+	أرجع;
 
-    rettv->vval.v_number = dict_has_key(argvars[0].vval.v_dict,
-				(char *)tv_get_string(&argvars[1]));
+    rettv->vval.v_عدد = dict_has_ڪنجي(argvars[0].vval.v_dict,
+				(حرف *)tv_get_string(&argvars[1]));
 }
 
-#endif // defined(FEAT_EVAL)
+#جيڪڏهن_پورو // defined(FEAT_EVAL)

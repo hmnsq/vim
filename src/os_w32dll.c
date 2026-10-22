@@ -12,16 +12,16 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#جيڪڏهن_وصف_نه_ٿيل WIN32_LEAN_AND_سراسري
+# define WIN32_LEAN_AND_سراسري
+#جيڪڏهن_پورو
+#ضمن <windows.h>
 
-void SaveInst(HINSTANCE hInst);
+فراغ SaveInst(HINSTANCE hInst);
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    if (fdwReason == DLL_PROCESS_ATTACH)
+    إذا (fdwReason == DLL_PROCESS_ATTACH)
 	SaveInst(hinstDLL);
-    return TRUE;
+    أرجع TRUE;
 }

@@ -12,129 +12,129 @@
  * Not used for GTK.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
-#include <X11/Shell.h>
-#include <X11/cursorfont.h>
+#ضمن <X11/keysym.h>
+#ضمن <X11/Xatom.h>
+#ضمن <X11/StringDefs.h>
+#ضمن <X11/Intrinsic.h>
+#ضمن <X11/Shell.h>
+#ضمن <X11/cursorfont.h>
 
 /*
  * XpmP.h is preferred, because it makes the signs drawn with a transparent
  * background instead of black.
  */
-#if defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
+#إذا defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
 	&& !defined(HAVE_X11_XPM_H)
 # include <Xm/XpmP.h>
-#else
+#وإلا
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  وإلا
 #   include <X11/xpm.h>
 #  endif
 # endif
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_XFONTSET
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
 # ifdef X_LOCALE
 #  include <X11/Xlocale.h>
-# else
+# وإلا
 #  include <locale.h>
 # endif
-#endif
+#جيڪڏهن_پورو
 
-#ifdef HAVE_X11_SUNKEYSYM_H
+#جيڪڏهن_وصف_ٿيل HAVE_X11_SUNKEYSYM_H
 # include <X11/Sunkeysym.h>
-#endif
+#جيڪڏهن_پورو
 
-#ifdef HAVE_X11_XMU_EDITRES_H
+#جيڪڏهن_وصف_ٿيل HAVE_X11_XMU_EDITRES_H
 # include <X11/Xmu/Editres.h>
-#endif
+#جيڪڏهن_پورو
 
-#define VIM_NAME	"vim"
-#define VIM_CLASS	"Vim"
+#وصف_ڪريو VIM_NAME	"vim"
+#وصف_ڪريو VIM_CLASS	"Vim"
 
 // Default resource values
-#define DFLT_FONT		"7x13"
-#ifdef FONTSET_ALWAYS
-# define DFLT_MENU_FONT		XtDefaultFontSet
-#else
+#وصف_ڪريو DFLT_FONT		"7x13"
+#جيڪڏهن_وصف_ٿيل FONTSET_ALWAYS
+# define DFLT_MENU_FONT		Xt_Default_Font_سيٽ
+#وإلا
 # define DFLT_MENU_FONT		XtDefaultFont
-#endif
-#define DFLT_TOOLTIP_FONT	XtDefaultFontSet
+#جيڪڏهن_پورو
+#وصف_ڪريو DFLT_TOOLTIP_FONT	Xt_Default_Font_سيٽ
 
 // use the default (CDE) colors
-#define DFLT_MENU_BG_COLOR	""
-#define DFLT_MENU_FG_COLOR	""
-#define DFLT_SCROLL_BG_COLOR	""
-#define DFLT_SCROLL_FG_COLOR	""
-#define DFLT_TOOLTIP_BG_COLOR	"#ffff91"
-#define DFLT_TOOLTIP_FG_COLOR	"#000000"
+#وصف_ڪريو DFLT_MENU_BG_COLOR	""
+#وصف_ڪريو DFLT_MENU_FG_COLOR	""
+#وصف_ڪريو DFLT_SCROLL_BG_COLOR	""
+#وصف_ڪريو DFLT_SCROLL_FG_COLOR	""
+#وصف_ڪريو DFLT_TOOLTIP_BG_COLOR	"#ffff91"
+#وصف_ڪريو DFLT_TOOLTIP_FG_COLOR	"#000000"
 
 Widget vimShell = (Widget)0;
 
-static Atom   wm_atoms[2];	// Window Manager Atoms
-#define DELETE_WINDOW_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
-#define SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
+ساكن Atom   wm_atoms[2];	// Window Manager Atoms
+#وصف_ڪريو DELETE_دري_IDX 0	// index in wm_atoms[] for WM_DELETE_WINDOW
+#وصف_ڪريو SAVE_YOURSELF_IDX 1	// index in wm_atoms[] for WM_SAVE_YOURSELF
 
-#ifdef FEAT_XFONTSET
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
 /*
  * We either draw with a fontset (when current_fontset != NULL) or with a
  * normal font (current_fontset == NULL, use gui.text_gc and gui.back_gc).
  */
-static XFontSet current_fontset = NULL;
-# if !defined(XDrawString)
+ساكن XFont_سيٽ current_fontset = عدم;
+# إذا !defined(XDrawString)
 #  define XDrawString(dpy, win, gc, x, y, str, n) \
-	do \
+	افعل \
 	{ \
-	    if (current_fontset != NULL) \
+	    إذا (current_fontset != عدم) \
 		XmbDrawString(dpy, win, current_fontset, gc, x, y, str, n); \
-	    else \
+	    وإلا \
 		XDrawString(dpy, win, gc, x, y, str, n); \
-	} while (0)
+	} طالما (0)
 # endif
-# if !defined(XDrawString16)
+# إذا !defined(XDrawString16)
 #  define XDrawString16(dpy, win, gc, x, y, str, n) \
-	do \
+	افعل \
 	{ \
-	    if (current_fontset != NULL) \
+	    إذا (current_fontset != عدم) \
 		XwcDrawString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    وإلا \
 		XDrawString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} طالما (0)
 # endif
-# if !defined(XDrawImageString16)
+# إذا !defined(XDrawImageString16)
 #  define XDrawImageString16(dpy, win, gc, x, y, str, n) \
-	do \
+	افعل \
 	{ \
-	    if (current_fontset != NULL) \
+	    إذا (current_fontset != عدم) \
 		XwcDrawImageString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    وإلا \
 		XDrawImageString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} طالما (0)
 # endif
-static int check_fontset_sanity(XFontSet fs);
-static int fontset_width(XFontSet fs);
-static int fontset_ascent(XFontSet fs);
-#endif
+ساكن صحيح check_fontset_sanity(XFont_سيٽ fs);
+ساكن صحيح fontset_ويڪر(XFont_سيٽ fs);
+ساكن صحيح fontset_ascent(XFont_سيٽ fs);
+#جيڪڏهن_پورو
 
-static guicolor_T	prev_fg_color = INVALCOLOR;
-static guicolor_T	prev_bg_color = INVALCOLOR;
-static guicolor_T	prev_sp_color = INVALCOLOR;
+ساكن guicolor_T	prev_fg_color = INVALCOLOR;
+ساكن guicolor_T	prev_bg_color = INVALCOLOR;
+ساكن guicolor_T	prev_sp_color = INVALCOLOR;
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-static XButtonPressedEvent last_mouse_event;
-#endif
+#إذا defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+ساكن XButtonPressedEvent آخري_mouse_event;
+#جيڪڏهن_پورو
 
-static void gui_x11_check_copy_area(void);
-#ifdef FEAT_CLIENTSERVER
-static void gui_x11_send_event_handler(Widget, XtPointer, XEvent *, Boolean *);
-#endif
-static void gui_x11_wm_protocol_handler(Widget, XtPointer, XEvent *, Boolean *);
-static Cursor gui_x11_create_blank_mouse(void);
+ساكن فراغ gui_x11_check_copy_area(فراغ);
+#جيڪڏهن_وصف_ٿيل FEAT_CLIENTSERVER
+ساكن فراغ gui_x11_send_event_handler(Widget, Xt_اشارو, XEvent *, Boolean *);
+#جيڪڏهن_پورو
+ساكن فراغ gui_x11_wm_protocol_handler(Widget, Xt_اشارو, XEvent *, Boolean *);
+ساكن Cursor gui_x11_create_blank_mouse(فراغ);
 
 
 /*
@@ -142,17 +142,17 @@ static Cursor gui_x11_create_blank_mouse(void);
  * NOTE: when changing this, the table in gui_gtk_x11.c probably needs the
  * same change!
  */
-static struct specialkey
+ساكن بنية specialkey
 {
-    KeySym  key_sym;
+    ڪنجي_Sym  ڪنجي_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_ڪنجيون[] =
 {
-    {XK_Up,		'k', 'u'},
-    {XK_Down,		'k', 'd'},
-    {XK_Left,		'k', 'l'},
-    {XK_Right,		'k', 'r'},
+    {XK_مٿي,		'k', 'u'},
+    {XK_هيٺ_ڏانهن,		'k', 'd'},
+    {XK_کاٻو,		'k', 'l'},
+    {XK_ساڄو,		'k', 'r'},
 
     {XK_F1,		'k', '1'},
     {XK_F2,		'k', '2'},
@@ -192,37 +192,37 @@ static struct specialkey
     {XK_F33,		'F', 'N'},
     {XK_F34,		'F', 'O'},
     {XK_F35,		'F', 'P'},	// keysymdef.h defines up to F35
-#ifdef SunXK_F36
+#جيڪڏهن_وصف_ٿيل SunXK_F36
     {SunXK_F36,		'F', 'Q'},
     {SunXK_F37,		'F', 'R'},
-#endif
+#جيڪڏهن_پورو
 
     {XK_Help,		'%', '1'},
     {XK_Undo,		'&', '8'},
-    {XK_BackSpace,	'k', 'b'},
-    {XK_Insert,		'k', 'I'},
+    {XK_پٺ_Space,	'k', 'b'},
+    {XK_وجهو,		'k', 'I'},
     {XK_Delete,		'k', 'D'},
     {XK_Home,		'k', 'h'},
-    {XK_End,		'@', '7'},
-    {XK_Prior,		'k', 'P'},
-    {XK_Next,		'k', 'N'},
+    {XK_پڇاڙي,		'@', '7'},
+    {XK_اڳواٽ,		'k', 'P'},
+    {XK_ايندڙ,		'k', 'N'},
     {XK_Print,		'%', '9'},
 
     // Keypad keys:
-#ifdef XK_KP_Left
-    {XK_KP_Left,	'k', 'l'},
-    {XK_KP_Right,	'k', 'r'},
-    {XK_KP_Up,		'k', 'u'},
-    {XK_KP_Down,	'k', 'd'},
-    {XK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+#جيڪڏهن_وصف_ٿيل XK_KP_کاٻو
+    {XK_KP_کاٻو,	'k', 'l'},
+    {XK_KP_ساڄو,	'k', 'r'},
+    {XK_KP_مٿي,		'k', 'u'},
+    {XK_KP_هيٺ_ڏانهن,	'k', 'd'},
+    {XK_KP_وجهو,	KS_EXTRA, (char_u)KE_KINS},
     {XK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {XK_KP_Home,	'K', '1'},
-    {XK_KP_End,		'K', '4'},
-    {XK_KP_Prior,	'K', '3'},
-    {XK_KP_Next,	'K', '5'},
+    {XK_KP_پڇاڙي,		'K', '4'},
+    {XK_KP_اڳواٽ,	'K', '3'},
+    {XK_KP_ايندڙ,	'K', '5'},
 
-    {XK_KP_Add,		'K', '6'},
-    {XK_KP_Subtract,	'K', '7'},
+    {XK_KP_جوڙيو,		'K', '6'},
+    {XK_KP_ڪٽيو,	'K', '7'},
     {XK_KP_Divide,	'K', '8'},
     {XK_KP_Multiply,	'K', '9'},
     {XK_KP_Enter,	'K', 'A'},
@@ -238,59 +238,59 @@ static struct specialkey
     {XK_KP_7,		'K', 'J'},
     {XK_KP_8,		'K', 'K'},
     {XK_KP_9,		'K', 'L'},
-#endif
+#جيڪڏهن_پورو
 
     // End of list marker:
-    {(KeySym)0,	    0, 0}
+    {(ڪنجي_Sym)0,	    0, 0}
 };
 
-#define XtNboldFont		"boldFont"
-#define XtCBoldFont		"BoldFont"
-#define XtNitalicFont		"italicFont"
-#define XtCItalicFont		"ItalicFont"
-#define XtNboldItalicFont	"boldItalicFont"
-#define XtCBoldItalicFont	"BoldItalicFont"
-#define XtNscrollbarWidth	"scrollbarWidth"
-#define XtCScrollbarWidth	"ScrollbarWidth"
-#define XtNmenuHeight		"menuHeight"
-#define XtCMenuHeight		"MenuHeight"
-#define XtNmenuFont		"menuFont"
-#define XtCMenuFont		"MenuFont"
-#define XtNmenuFontSet		"menuFontSet"
-#define XtCMenuFontSet		"MenuFontSet"
+#وصف_ڪريو XtNboldFont		"boldFont"
+#وصف_ڪريو XtCBoldFont		"BoldFont"
+#وصف_ڪريو XtNitalicFont		"italicFont"
+#وصف_ڪريو XtCItalicFont		"ItalicFont"
+#وصف_ڪريو XtNboldItalicFont	"boldItalicFont"
+#وصف_ڪريو XtCBoldItalicFont	"BoldItalicFont"
+#وصف_ڪريو Xt_Nscrollbar_ويڪر	"scrollbarWidth"
+#وصف_ڪريو Xt_CScrollbar_ويڪر	"ScrollbarWidth"
+#وصف_ڪريو Xt_Nmenu_اوچائي		"menuHeight"
+#وصف_ڪريو Xt_CMenu_اوچائي		"MenuHeight"
+#وصف_ڪريو XtNmenuFont		"menuFont"
+#وصف_ڪريو XtCMenuFont		"MenuFont"
+#وصف_ڪريو Xt_Nmenu_Font_سيٽ		"menuFontSet"
+#وصف_ڪريو Xt_CMenu_Font_سيٽ		"MenuFontSet"
 
 
 // Resources for setting the foreground and background colors of menus
-#define XtNmenuBackground	"menuBackground"
-#define XtCMenuBackground	"MenuBackground"
-#define XtNmenuForeground	"menuForeground"
-#define XtCMenuForeground	"MenuForeground"
+#وصف_ڪريو XtNmenuBackground	"menuBackground"
+#وصف_ڪريو XtCMenuBackground	"MenuBackground"
+#وصف_ڪريو XtNmenuForeground	"menuForeground"
+#وصف_ڪريو XtCMenuForeground	"MenuForeground"
 
 // Resources for setting the foreground and background colors of scrollbars
-#define XtNscrollBackground	"scrollBackground"
-#define XtCScrollBackground	"ScrollBackground"
-#define XtNscrollForeground	"scrollForeground"
-#define XtCScrollForeground	"ScrollForeground"
+#وصف_ڪريو XtNscrollBackground	"scrollBackground"
+#وصف_ڪريو XtCScrollBackground	"ScrollBackground"
+#وصف_ڪريو XtNscrollForeground	"scrollForeground"
+#وصف_ڪريو XtCScrollForeground	"ScrollForeground"
 
 // Resources for setting the foreground and background colors of tooltip
-#define XtNtooltipBackground	"tooltipBackground"
-#define XtCTooltipBackground	"TooltipBackground"
-#define XtNtooltipForeground	"tooltipForeground"
-#define XtCTooltipForeground	"TooltipForeground"
-#define XtNtooltipFont		"tooltipFont"
-#define XtCTooltipFont		"TooltipFont"
+#وصف_ڪريو XtNtooltipBackground	"tooltipBackground"
+#وصف_ڪريو XtCTooltipBackground	"TooltipBackground"
+#وصف_ڪريو XtNtooltipForeground	"tooltipForeground"
+#وصف_ڪريو XtCTooltipForeground	"TooltipForeground"
+#وصف_ڪريو XtNtooltipFont		"tooltipFont"
+#وصف_ڪريو XtCTooltipFont		"TooltipFont"
 
 /*
  * X Resources:
  */
-static XtResource vim_resources[] =
+ساكن XtResource vim_resources[] =
 {
     {
 	XtNforeground,
 	XtCForeground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_norm_pixel),
+	حجم(Pixel),
+	Xt_وٿي_جو(gui_T, def_norm_pixel),
 	XtRString,
 	XtDefaultForeground
     },
@@ -298,8 +298,8 @@ static XtResource vim_resources[] =
 	XtNbackground,
 	XtCBackground,
 	XtRPixel,
-	sizeof(Pixel),
-	XtOffsetOf(gui_T, def_back_pixel),
+	حجم(Pixel),
+	Xt_وٿي_جو(gui_T, def_پٺ_pixel),
 	XtRString,
 	XtDefaultBackground
     },
@@ -307,8 +307,8 @@ static XtResource vim_resources[] =
 	XtNfont,
 	XtCFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_font_name),
+	حجم(String *),
+	Xt_وٿي_جو(gui_T, rsrc_font_name),
 	XtRImmediate,
 	XtDefaultFont
     },
@@ -316,8 +316,8 @@ static XtResource vim_resources[] =
 	XtNboldFont,
 	XtCBoldFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_bold_font_name),
+	حجم(String *),
+	Xt_وٿي_جو(gui_T, rsrc_bold_font_name),
 	XtRImmediate,
 	""
     },
@@ -325,8 +325,8 @@ static XtResource vim_resources[] =
 	XtNitalicFont,
 	XtCItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_ital_font_name),
+	حجم(String *),
+	Xt_وٿي_جو(gui_T, rsrc_ital_font_name),
 	XtRImmediate,
 	""
     },
@@ -334,8 +334,8 @@ static XtResource vim_resources[] =
 	XtNboldItalicFont,
 	XtCBoldItalicFont,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, rsrc_boldital_font_name),
+	حجم(String *),
+	Xt_وٿي_جو(gui_T, rsrc_boldital_font_name),
 	XtRImmediate,
 	""
     },
@@ -343,8 +343,8 @@ static XtResource vim_resources[] =
 	XtNgeometry,
 	XtCGeometry,
 	XtRString,
-	sizeof(String *),
-	XtOffsetOf(gui_T, geom),
+	حجم(String *),
+	Xt_وٿي_جو(gui_T, geom),
 	XtRImmediate,
 	""
     },
@@ -352,51 +352,51 @@ static XtResource vim_resources[] =
 	XtNreverseVideo,
 	XtCReverseVideo,
 	XtRBool,
-	sizeof(Bool),
-	XtOffsetOf(gui_T, rsrc_rev_video),
+	حجم(Bool),
+	Xt_وٿي_جو(gui_T, rsrc_rev_video),
 	XtRImmediate,
-	(XtPointer)False
+	(Xt_اشارو)False
     },
     {
-	XtNborderWidth,
-	XtCBorderWidth,
+	Xt_Nborder_ويڪر,
+	Xt_CBorder_ويڪر,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, border_width),
+	حجم(صحيح),
+	Xt_وٿي_جو(gui_T, border_ويڪر),
 	XtRImmediate,
-	(XtPointer)2
+	(Xt_اشارو)2
     },
     {
-	XtNscrollbarWidth,
-	XtCScrollbarWidth,
+	Xt_Nscrollbar_ويڪر,
+	Xt_CScrollbar_ويڪر,
 	XtRInt,
-	sizeof(int),
-	XtOffsetOf(gui_T, scrollbar_width),
+	حجم(صحيح),
+	Xt_وٿي_جو(gui_T, scrollbar_ويڪر),
 	XtRImmediate,
-	(XtPointer)SB_DEFAULT_WIDTH
+	(Xt_اشارو)SB_DEFAULT_ويڪر
     },
-#ifdef FEAT_MENU
+#جيڪڏهن_وصف_ٿيل FEAT_MENU
     {
 # ifdef FONTSET_ALWAYS
-	XtNmenuFontSet,
-	XtCMenuFontSet,
-# else
+	Xt_Nmenu_Font_سيٽ,
+	Xt_CMenu_Font_سيٽ,
+# وإلا
 	XtNmenuFont,
 	XtCMenuFont,
 # endif
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_font_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_menu_font_name),
 	XtRString,
 	DFLT_MENU_FONT
     },
-#endif
+#جيڪڏهن_پورو
     {
 	XtNmenuForeground,
 	XtCMenuForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_fg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_menu_fg_name),
 	XtRString,
 	DFLT_MENU_FG_COLOR
     },
@@ -404,8 +404,8 @@ static XtResource vim_resources[] =
 	XtNmenuBackground,
 	XtCMenuBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_menu_bg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_menu_bg_name),
 	XtRString,
 	DFLT_MENU_BG_COLOR
     },
@@ -413,8 +413,8 @@ static XtResource vim_resources[] =
 	XtNscrollForeground,
 	XtCScrollForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_fg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_scroll_fg_name),
 	XtRString,
 	DFLT_SCROLL_FG_COLOR
     },
@@ -422,18 +422,18 @@ static XtResource vim_resources[] =
 	XtNscrollBackground,
 	XtCScrollBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_scroll_bg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_scroll_bg_name),
 	XtRString,
 	DFLT_SCROLL_BG_COLOR
     },
-#ifdef FEAT_BEVAL_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_BEVAL_GUI
     {
 	XtNtooltipForeground,
 	XtCTooltipForeground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_fg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_tooltip_fg_name),
 	XtRString,
 	DFLT_TOOLTIP_FG_COLOR
     },
@@ -441,8 +441,8 @@ static XtResource vim_resources[] =
 	XtNtooltipBackground,
 	XtCTooltipBackground,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_bg_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_tooltip_bg_name),
 	XtRString,
 	DFLT_TOOLTIP_BG_COLOR
     },
@@ -450,42 +450,42 @@ static XtResource vim_resources[] =
 	XtNtooltipFont,
 	XtCTooltipFont,
 	XtRString,
-	sizeof(char *),
-	XtOffsetOf(gui_T, rsrc_tooltip_font_name),
+	حجم(حرف *),
+	Xt_وٿي_جو(gui_T, rsrc_tooltip_font_name),
 	XtRString,
 	DFLT_TOOLTIP_FONT
     },
     // This one may not be really needed?
     {
 	"balloonEvalFontSet",
-	XtCFontSet,
-	XtRFontSet,
-	sizeof(XFontSet),
-	XtOffsetOf(gui_T, tooltip_fontset),
+	Xt_CFont_سيٽ,
+	Xt_RFont_سيٽ,
+	حجم(XFont_سيٽ),
+	Xt_وٿي_جو(gui_T, tooltip_fontset),
 	XtRImmediate,
-	(XtPointer)NOFONTSET
+	(Xt_اشارو)NOFONTSET
     },
-#endif // FEAT_BEVAL_GUI
-#ifdef FEAT_XIM
+#جيڪڏهن_پورو // FEAT_BEVAL_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
     {
 	"preeditType",
 	"PreeditType",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_preedit_type_name),
+	حجم(حرف*),
+	Xt_وٿي_جو(gui_T, rsrc_preedit_type_name),
 	XtRString,
-	(XtPointer)"OverTheSpot,OffTheSpot,Root"
+	(Xt_اشارو)"OverTheSpot,OffTheSpot,Root"
     },
     {
 	"inputMethod",
 	"InputMethod",
 	XtRString,
-	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_input_method),
+	حجم(حرف*),
+	Xt_وٿي_جو(gui_T, rsrc_داخلا_طريقو),
 	XtRString,
-	NULL
+	عدم
     },
-#endif // FEAT_XIM
+#جيڪڏهن_پورو // FEAT_XIM
 };
 
 /*
@@ -494,65 +494,65 @@ static XtResource vim_resources[] =
  * GUI (but the GUI might start up later).
  * When changing this, also update doc/vim_gui.txt and the usage message!!!
  */
-static XrmOptionDescRec cmdline_options[] =
+ساكن XrmOptionDescRec cmdline_options[] =
 {
     // We handle these options ourselves
-    {"-bg",		".background",	    XrmoptionSepArg,	NULL},
-    {"-background",	".background",	    XrmoptionSepArg,	NULL},
-    {"-fg",		".foreground",	    XrmoptionSepArg,	NULL},
-    {"-foreground",	".foreground",	    XrmoptionSepArg,	NULL},
-    {"-fn",		".font",	    XrmoptionSepArg,	NULL},
-    {"-font",		".font",	    XrmoptionSepArg,	NULL},
-    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	NULL},
-    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	NULL},
-    {"-geom",		".geometry",	    XrmoptionSepArg,	NULL},
-    {"-geometry",	".geometry",	    XrmoptionSepArg,	NULL},
+    {"-bg",		".background",	    XrmoptionSepArg,	عدم},
+    {"-background",	".background",	    XrmoptionSepArg,	عدم},
+    {"-fg",		".foreground",	    XrmoptionSepArg,	عدم},
+    {"-foreground",	".foreground",	    XrmoptionSepArg,	عدم},
+    {"-fn",		".font",	    XrmoptionSepArg,	عدم},
+    {"-font",		".font",	    XrmoptionSepArg,	عدم},
+    {"-boldfont",	".boldFont",	    XrmoptionSepArg,	عدم},
+    {"-italicfont",	".italicFont",	    XrmoptionSepArg,	عدم},
+    {"-geom",		".geometry",	    XrmoptionSepArg,	عدم},
+    {"-geometry",	".geometry",	    XrmoptionSepArg,	عدم},
     {"-reverse",	"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"-rv",		"*reverseVideo",    XrmoptionNoArg,	"True"},
     {"+reverse",	"*reverseVideo",    XrmoptionNoArg,	"False"},
     {"+rv",		"*reverseVideo",    XrmoptionNoArg,	"False"},
-    {"-display",	".display",	    XrmoptionSepArg,	NULL},
+    {"-display",	".display",	    XrmoptionSepArg,	عدم},
     {"-iconic",		".iconic",	    XrmoptionNoArg,	"True"},
-    {"-name",		".name",	    XrmoptionSepArg,	NULL},
-    {"-bw",		".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	NULL},
-    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	NULL},
-    {"-mh",		".menuHeight",	    XrmoptionSepArg,	NULL},
-    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	NULL},
-#ifdef FONTSET_ALWAYS
-    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-#else
-    {"-mf",		".menuFont",	    XrmoptionSepArg,	NULL},
-    {"-menufont",	".menuFont",	    XrmoptionSepArg,	NULL},
-#endif
-    {"-xrm",		NULL,		    XrmoptionResArg,	NULL}
+    {"-name",		".name",	    XrmoptionSepArg,	عدم},
+    {"-bw",		".borderWidth",	    XrmoptionSepArg,	عدم},
+    {"-borderwidth",	".borderWidth",	    XrmoptionSepArg,	عدم},
+    {"-sw",		".scrollbarWidth",  XrmoptionSepArg,	عدم},
+    {"-scrollbarwidth",	".scrollbarWidth",  XrmoptionSepArg,	عدم},
+    {"-mh",		".menuHeight",	    XrmoptionSepArg,	عدم},
+    {"-menuheight",	".menuHeight",	    XrmoptionSepArg,	عدم},
+#جيڪڏهن_وصف_ٿيل FONTSET_ALWAYS
+    {"-mf",		".menuFontSet",	    XrmoptionSepArg,	عدم},
+    {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	عدم},
+    {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	عدم},
+#وإلا
+    {"-mf",		".menuFont",	    XrmoptionSepArg,	عدم},
+    {"-menufont",	".menuFont",	    XrmoptionSepArg,	عدم},
+#جيڪڏهن_پورو
+    {"-xrm",		عدم,		    XrmoptionResArg,	عدم}
 };
 
-static int gui_argc = 0;
-static char **gui_argv = NULL;
+ساكن صحيح gui_argc = 0;
+ساكن حرف **gui_argv = عدم;
 
 /*
  * Call-back routines.
  */
 
-    static void
+    ساكن فراغ
 gui_x11_timer_cb(
-    XtPointer	    timed_out,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_اشارو	    timed_ٻاهريون,
+    XtIntervalId    *interval_id اڻ_استعمال_ٿيل)
 {
-    *((int *)timed_out) = TRUE;
+    *((صحيح *)timed_ٻاهريون) = TRUE;
 }
 
-#ifdef FEAT_JOB_CHANNEL
-    static void
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    ساكن فراغ
 channel_poll_cb(
-    XtPointer	    client_data,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_اشارو	    client_معلومات_2,
+    XtIntervalId    *interval_id اڻ_استعمال_ٿيل)
 {
-    XtIntervalId    *channel_timer = (XtIntervalId *)client_data;
+    XtIntervalId    *channel_timer = (XtIntervalId *)client_معلومات_2;
 
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
@@ -560,20 +560,20 @@ channel_poll_cb(
     parse_queued_messages();
 
     // repeat
-    *channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-						 channel_poll_cb, client_data);
+    *channel_timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, (long_u)20,
+						 channel_poll_cb, client_معلومات_2);
 }
-#endif
+#جيڪڏهن_پورو
 
-    static void
+    ساكن فراغ
 gui_x11_visibility_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	dud اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
-    if (event->type != VisibilityNotify)
-	return;
+    إذا (event->type != VisibilityNotify)
+	أرجع;
 
     gui.visibility = event->xvisibility.state;
 
@@ -581,48 +581,48 @@ gui_x11_visibility_cb(
      * When we do an XCopyArea(), and the window is partially obscured, we want
      * to receive an event to tell us whether it worked or not.
      */
-    XSetGraphicsExposures(gui.dpy, gui.text_gc,
+    XSetGraphicsExposures(gui.dpy, gui.متن_gc,
 	    gui.visibility != VisibilityUnobscured);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-    static void
+    ساكن فراغ
 gui_x11_expose_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	dud اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     XExposeEvent	*gevent;
-    int			new_x;
+    صحيح			new_x;
 
-    if (event->type != Expose)
-	return;
+    إذا (event->type != Expose)
+	أرجع;
 
-    out_flush();	    // make sure all output has been processed
+    ٻاهريون_flush();	    // make sure all output has been processed
 
     gevent = (XExposeEvent *)event;
-    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
+    gui_redraw(gevent->x, gevent->y, gevent->ويڪر, gevent->اوچائي);
 
     new_x = FILL_X(0);
 
     // Clear the border areas if needed
-    if (gevent->x < new_x)
+    إذا (gevent->x < new_x)
 	XClearArea(gui.dpy, gui.wid, 0, 0, new_x, 0, False);
-    if (gevent->y < FILL_Y(0))
+    إذا (gevent->y < FILL_Y(0))
 	XClearArea(gui.dpy, gui.wid, 0, 0, 0, FILL_Y(0), False);
-    if (gevent->x > FILL_X(Columns))
-	XClearArea(gui.dpy, gui.wid, FILL_X((int)Columns), 0, 0, 0, False);
-    if (gevent->y > FILL_Y(Rows))
-	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((int)Rows), 0, 0, False);
+    إذا (gevent->x > FILL_X(Columns))
+	XClearArea(gui.dpy, gui.wid, FILL_X((صحيح)Columns), 0, 0, 0, False);
+    إذا (gevent->y > FILL_Y(صفون))
+	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((صحيح)صفون), 0, 0, False);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+#إذا defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
 /*
  * This function fills in the XRectangle object with the current x,y
  * coordinates and height, width so that an XtVaSetValues to the same shell of
@@ -633,386 +633,386 @@ gui_x11_expose_cb(
  * unchanged.  Be sure to have the XRectangle set with the proper values for a
  * failed condition prior to calling this function.
  */
-    static void
+    ساكن فراغ
 shellRectangle(Widget shell, XRectangle *r)
 {
-    Window		rootw, shellw, child, parentw;
-    int			absx, absy;
-    XWindowAttributes	a;
-    Window		*children;
-    unsigned int	childrenCount;
+    دري		rootw, shellw, ٻار, parentw;
+    صحيح			absx, absy;
+    XWindow_خاصيتون	a;
+    دري		*children;
+    بنانشان صحيح	children_ڳڻپ;
 
-    shellw = XtWindow(shell);
-    if (shellw == 0)
-	return;
-    for (;;)
+    shellw = Xt_دري(shell);
+    إذا (shellw == 0)
+	أرجع;
+    لكل (;;)
     {
-	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
-						   &children, &childrenCount);
+	XQuery_وڻ(XtDisplay(shell), shellw, &rootw, &parentw,
+						   &children, &children_ڳڻپ);
 	XFree(children);
-	if (parentw == rootw)
-	    break;
+	إذا (parentw == rootw)
+	    اكسر;
 	shellw = parentw;
     }
-    XGetWindowAttributes(XtDisplay(shell), shellw, &a);
-    XTranslateCoordinates(XtDisplay(shell), shellw, a.root, 0, 0,
-							&absx, &absy, &child);
+    XGet_دري_خاصيتون(XtDisplay(shell), shellw, &a);
+    XTranslateCoordinates(XtDisplay(shell), shellw, a.پاڙ, 0, 0,
+							&absx, &absy, &ٻار);
     r->x = absx;
     r->y = absy;
-    XtVaGetValues(shell, XmNheight, &r->height, XmNwidth, &r->width, NULL);
+    Xt_Va_Get_قدرون(shell, XmNheight, &r->اوچائي, XmNwidth, &r->ويڪر, عدم);
 }
-#endif
+#جيڪڏهن_پورو
 
-    static void
-gui_x11_resize_window_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    ساكن فراغ
+gui_x11_resize_دري_cb(
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	dud اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
-    static int lastWidth, lastHeight;
+    ساكن صحيح آخري_ويڪر_2, آخري_اوچائي_2;
 
-    if (event->type != ConfigureNotify)
-	return;
+    إذا (event->type != ConfigureNotify)
+	أرجع;
 
-    if (event->xconfigure.width != lastWidth
-	    || event->xconfigure.height != lastHeight)
+    إذا (event->xconfigure.ويڪر != آخري_ويڪر_2
+	    || event->xconfigure.اوچائي != آخري_اوچائي_2)
     {
-	lastWidth = event->xconfigure.width;
-	lastHeight = event->xconfigure.height;
-	gui_resize_shell(event->xconfigure.width, event->xconfigure.height
-#ifdef FEAT_XIM
-						- xim_get_status_area_height()
-#endif
+	آخري_ويڪر_2 = event->xconfigure.ويڪر;
+	آخري_اوچائي_2 = event->xconfigure.اوچائي;
+	gui_resize_shell(event->xconfigure.ويڪر, event->xconfigure.اوچائي
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+						- xim_get_حالت_area_اوچائي()
+#جيڪڏهن_پورو
 		     );
     }
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
-    if (netbeans_active())
+#إذا defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+    إذا (netbeans_سرگرم())
     {
 	XRectangle  rec;
 
 	shellRectangle(w, &rec);
-	netbeans_frame_moved(rec.x, rec.y);
+	netbeans_چوکٺو_moved(rec.x, rec.y);
     }
-#endif
-#ifdef FEAT_XIM
-    xim_set_preedit();
-#endif
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+    xim_سيٽ_preedit();
+#جيڪڏهن_پورو
 }
 
-    static void
+    ساكن فراغ
 gui_x11_focus_change_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	معلومات اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
-    gui_focus_change(event->type == FocusIn);
+    gui_focus_change(event->type == Focus_اندريون);
 }
 
-    static void
+    ساكن فراغ
 gui_x11_enter_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	معلومات اڻ_استعمال_ٿيل,
+    XEvent	*event اڻ_استعمال_ٿيل,
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     gui_focus_change(TRUE);
 }
 
-    static void
+    ساكن فراغ
 gui_x11_leave_cb(
-    Widget	w UNUSED,
-    XtPointer	data UNUSED,
-    XEvent	*event UNUSED,
-    Boolean	*dum UNUSED)
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	معلومات اڻ_استعمال_ٿيل,
+    XEvent	*event اڻ_استعمال_ٿيل,
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     gui_focus_change(FALSE);
 }
 
-#if defined(X_HAVE_UTF8_STRING)
-# if X_HAVE_UTF8_STRING
+#إذا defined(X_HAVE_UTF8_STRING)
+# إذا X_HAVE_UTF8_STRING
 #  define USE_UTF8LOOKUP
 # endif
-#endif
+#جيڪڏهن_پورو
 
-    void
-gui_x11_key_hit_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    فراغ
+gui_x11_ڪنجي_ڪاميابي_cb(
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	dud اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     XKeyPressedEvent	*ev_press;
-#ifdef FEAT_XIM
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
     char_u		string2[256];
     char_u		string_shortbuf[256];
     char_u		*string = string_shortbuf;
     Boolean		string_alloced = False;
-    Status		status;
-#else
+    حالت_2		حالت;
+#وإلا
     char_u		string[4], string2[3];
-#endif
-    KeySym		key_sym;
-    int			len;
-    int			i;
-    int			modifiers;
-    int			key;
+#جيڪڏهن_پورو
+    ڪنجي_Sym		ڪنجي_sym;
+    صحيح			len;
+    صحيح			i;
+    صحيح			modifiers;
+    صحيح			ڪنجي;
 
     ev_press = (XKeyPressedEvent *)event;
 
-#ifdef FEAT_XIM
-    if (xic)
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+    إذا (xic)
     {
 # ifdef USE_UTF8LOOKUP
 	// XFree86 4.0.2 or newer: Be able to get UTF-8 characters even when
 	// the locale isn't utf-8.
-	if (enc_utf8)
-	    len = Xutf8LookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	else
+	إذا (enc_utf8)
+	    len = Xutf8LookupString(xic, ev_press, (حرف *)string,
+				  حجم(string_shortbuf), &ڪنجي_sym, &حالت);
+	وإلا
 # endif
-	    len = XmbLookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
-	if (status == XBufferOverflow)
+	    len = XmbLookupString(xic, ev_press, (حرف *)string,
+				  حجم(string_shortbuf), &ڪنجي_sym, &حالت);
+	إذا (حالت == XBuffer_حد_کان_مٿي)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
 	    string_alloced = True;
 # ifdef USE_UTF8LOOKUP
 	    // XFree86 4.0.2 or newer: Be able to get UTF-8 characters even
 	    // when the locale isn't utf-8.
-	    if (enc_utf8)
-		len = Xutf8LookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
-	    else
+	    إذا (enc_utf8)
+		len = Xutf8LookupString(xic, ev_press, (حرف *)string,
+						      len, &ڪنجي_sym, &حالت);
+	    وإلا
 # endif
-		len = XmbLookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
+		len = XmbLookupString(xic, ev_press, (حرف *)string,
+						      len, &ڪنجي_sym, &حالت);
 	}
-	if (status == XLookupNone || status == XLookupChars)
-	    key_sym = XK_VoidSymbol;
+	إذا (حالت == XLookupNone || حالت == XLookupChars)
+	    ڪنجي_sym = XK_Void_نشان;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	إذا (len > 0 && داخلا_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
 		)
 	{
-	    int		maxlen = len * 4 + 40;	// guessed
+	    صحيح		maxlen = len * 4 + 40;	// guessed
 	    char_u	*p = (char_u *)XtMalloc(maxlen);
 
 	    mch_memmove(p, string, len);
-	    if (string_alloced)
-		XtFree((char *)string);
+	    إذا (string_alloced)
+		XtFree((حرف *)string);
 	    string = p;
 	    string_alloced = True;
-	    len = convert_input(p, len, maxlen);
+	    len = convert_داخلا(p, len, maxlen);
 	}
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
 	// start of a special key.
-	for (i = 0; i < len; ++i)
-	    if (string[i] == CSI)
+	لكل (i = 0; i < len; ++i)
+	    إذا (string[i] == CSI)
 	    {
 		char_u	*p = (char_u *)XtMalloc(len + 3);
 
 		mch_memmove(p, string, i + 1);
 		p[i + 1] = KS_EXTRA;
-		p[i + 2] = (int)KE_CSI;
+		p[i + 2] = (صحيح)KE_CSI;
 		mch_memmove(p + i + 3, string + i + 1, len - i);
-		if (string_alloced)
-		    XtFree((char *)string);
+		إذا (string_alloced)
+		    XtFree((حرف *)string);
 		string = p;
 		string_alloced = True;
 		i += 2;
 		len += 2;
 	    }
     }
-    else
-#endif
-	len = XLookupString(ev_press, (char *)string, sizeof(string),
-		&key_sym, NULL);
+    وإلا
+#جيڪڏهن_پورو
+	len = XLookupString(ev_press, (حرف *)string, حجم(string),
+		&ڪنجي_sym, عدم);
 
-#ifdef SunXK_F36
+#جيڪڏهن_وصف_ٿيل SunXK_F36
     /*
     * These keys have bogus lookup strings, and trapping them here is
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    إذا (ڪنجي_sym == SunXK_F36 || ڪنجي_sym == SunXK_F37)
 	len = 0;
-#endif
+#جيڪڏهن_پورو
 
-    if (key_sym == XK_space)
+    إذا (ڪنجي_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    إذا (ڪنجي_sym == XK_minus && (ev_press->state & Control_نقاب))
 	string[0] = Ctrl__;
 
-#ifdef XK_ISO_Left_Tab
+#جيڪڏهن_وصف_ٿيل XK_ISO_کاٻو_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    إذا (ڪنجي_sym == XK_ISO_کاٻو_Tab)
     {
-	key_sym = XK_Tab;
+	ڪنجي_sym = XK_Tab;
 	string[0] = TAB;
 	len = 1;
     }
-#endif
+#جيڪڏهن_پورو
 
     // We used to apply Alt/Meta to the key here (Mod1Mask), but that is now
     // done later, the same as it happens for the terminal.  Hopefully that
     // works for everybody...
 
-    if (len == 1 && string[0] == CSI)
+    إذا (len == 1 && string[0] == CSI)
     {
 	string[1] = KS_EXTRA;
-	string[2] = (int)KE_CSI;
+	string[2] = (صحيح)KE_CSI;
 	len = -3;
     }
 
     // Check for special keys.  Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    إذا (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	لكل (i = 0; special_ڪنجيون[i].ڪنجي_sym != (ڪنجي_Sym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    إذا (special_ڪنجيون[i].ڪنجي_sym == ڪنجي_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].vim_code0;
-		string[2] = special_keys[i].vim_code1;
+		string[1] = special_ڪنجيون[i].vim_code0;
+		string[2] = special_ڪنجيون[i].vim_code1;
 		len = -3;
-		break;
+		اكسر;
 	    }
 	}
     }
 
     // Unrecognised key is ignored.
-    if (len == 0)
-	goto theend;
+    إذا (len == 0)
+	اذهب theend;
 
     // Handle modifiers.
     modifiers = 0;
-    if (ev_press->state & ShiftMask)
-	modifiers |= MOD_MASK_SHIFT;
-    if (ev_press->state & ControlMask)
+    إذا (ev_press->state & سرڪايو_نقاب)
+	modifiers |= MOD_نقاب_سرڪايو;
+    إذا (ev_press->state & Control_نقاب)
     {
-	modifiers |= MOD_MASK_CTRL;
-	if (len == 1 && string[0] < 0x20)
+	modifiers |= MOD_نقاب_CTRL;
+	إذا (len == 1 && string[0] < 0x20)
 	    // Use the character before applyng CTRL.
 	    string[0] += 0x40;
     }
-    if (ev_press->state & Mod1Mask)
-	modifiers |= MOD_MASK_ALT;
-    if (ev_press->state & Mod4Mask)
-	modifiers |= MOD_MASK_META;
+    إذا (ev_press->state & Mod1_نقاب)
+	modifiers |= MOD_نقاب_ALT;
+    إذا (ev_press->state & Mod4_نقاب)
+	modifiers |= MOD_نقاب_META;
 
     /*
      * For some keys a shift modifier is translated into another key
      * code.
      */
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    إذا (len == -3)
+	ڪنجي = منزل_SPECIAL(string[1], string[2]);
+    وإلا
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	ڪنجي = mb_ptr2char(string);
     }
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    ڪنجي = simplify_ڪنجي(ڪنجي, &modifiers);
+    إذا (ڪنجي == CSI)
+	ڪنجي = K_CSI;
+    إذا (IS_SPECIAL(ڪنجي))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_ٻيو(ڪنجي);
+	string[2] = K_ٽيون(ڪنجي);
 	len = 3;
     }
-    else
+    وإلا
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	ڪنجي = may_adjust_ڪنجي_for_ctrl(modifiers, ڪنجي);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(ڪنجي, string);
 
 	// Remove the SHIFT modifier for keys where it's already included,
 	// e.g., '(', '!' and '*'.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_سرڪايو_modifier(modifiers, ڪنجي);
     }
 
-    if (modifiers != 0)
+    إذا (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	جوڙيو_منزل_داخلا_buf(string2, 3);
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	صحيح int_ch = check_for_مداخلت(ڪنجي, modifiers);
 
-	if (int_ch != NUL)
+	إذا (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_داخلا_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    جوڙيو_منزل_داخلا_buf(string, len);
 
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh)
+    إذا (p_mh)
 	gui_mch_mousehide(TRUE);
 
-#if defined(FEAT_BEVAL_TIP)
+#إذا defined(FEAT_BEVAL_TIP)
     {
 	BalloonEval *be;
 
-	if ((be = gui_mch_currently_showing_beval()) != NULL)
+	إذا ((be = gui_mch_currently_showing_beval()) != عدم)
 	    gui_mch_unpost_balloon(be);
     }
-#endif
+#جيڪڏهن_پورو
 theend:
     {}	    // some compilers need a statement here
-#ifdef FEAT_XIM
-    if (string_alloced)
-	XtFree((char *)string);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+    إذا (string_alloced)
+	XtFree((حرف *)string);
+#جيڪڏهن_پورو
 }
 
-    static void
+    ساكن فراغ
 gui_x11_mouse_cb(
-    Widget	w UNUSED,
-    XtPointer	dud UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	dud اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
-    static XtIntervalId timer = (XtIntervalId)0;
-    static int	timed_out = TRUE;
+    ساكن XtIntervalId timer = (XtIntervalId)0;
+    ساكن صحيح	timed_ٻاهريون = TRUE;
 
-    int		button;
-    int		repeated_click = FALSE;
-    int		x, y;
+    صحيح		button;
+    صحيح		repeated_click = FALSE;
+    صحيح		x, y;
     int_u	x_modifiers;
     int_u	vim_modifiers;
 
-    if (event->type == MotionNotify)
+    إذا (event->type == MotionNotify)
     {
 	// Get the latest position, avoids lagging behind on a drag.
 	x = event->xmotion.x;
 	y = event->xmotion.y;
 	x_modifiers = event->xmotion.state;
-	button = (x_modifiers & (Button1Mask | Button2Mask | Button3Mask))
+	button = (x_modifiers & (Button1_نقاب | Button2_نقاب | Button3_نقاب))
 		? MOUSE_DRAG : ' ';
 
 	/*
@@ -1020,64 +1020,64 @@ gui_x11_mouse_cb(
 	 */
 	gui_mch_mousehide(FALSE);
 
-	if (button != MOUSE_DRAG)	// just moving the rodent
+	إذا (button != MOUSE_DRAG)	// just moving the rodent
 	{
-#ifdef FEAT_MENU
-	    if (dud)			// moved in vimForm
-		y -= gui.menu_height;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_MENU
+	    إذا (dud)			// moved in vimForm
+		y -= gui.menu_اوچائي;
+#جيڪڏهن_پورو
 	    gui_mouse_moved(x, y);
-	    return;
+	    أرجع;
 	}
     }
-    else
+    وإلا
     {
 	x = event->xbutton.x;
 	y = event->xbutton.y;
-	if (event->type == ButtonPress)
+	إذا (event->type == ButtonPress)
 	{
 	    // Handle multiple clicks
-	    if (!timed_out)
+	    إذا (!timed_ٻاهريون)
 	    {
-		XtRemoveTimeOut(timer);
+		Xt_Remove_وقت_ٻاهريون(timer);
 		repeated_click = TRUE;
 	    }
-	    timed_out = FALSE;
-	    timer = XtAppAddTimeOut(app_context, (long_u)p_mouset,
-			gui_x11_timer_cb, &timed_out);
-	    switch (event->xbutton.button)
+	    timed_ٻاهريون = FALSE;
+	    timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, (long_u)p_mouset,
+			gui_x11_timer_cb, &timed_ٻاهريون);
+	    بدل (event->xbutton.button)
 	    {
 		// keep in sync with gui_gtk_x11.c
-		case Button1:	button = MOUSE_LEFT;	break;
-		case Button2:	button = MOUSE_MIDDLE;	break;
-		case Button3:	button = MOUSE_RIGHT;	break;
-		case Button4:	button = MOUSE_4;	break;
-		case Button5:	button = MOUSE_5;	break;
-		case 6:		button = MOUSE_7;	break;
-		case 7:		button = MOUSE_6;	break;
-		case 8:		button = MOUSE_X1;	break;
-		case 9:		button = MOUSE_X2;	break;
-		default:
-		    return;	// Unknown button
+		حالة Button1:	button = MOUSE_کاٻو;	اكسر;
+		حالة Button2:	button = MOUSE_وچ;	اكسر;
+		حالة Button3:	button = MOUSE_ساڄو;	اكسر;
+		حالة Button4:	button = MOUSE_4;	اكسر;
+		حالة Button5:	button = MOUSE_5;	اكسر;
+		حالة 6:		button = MOUSE_7;	اكسر;
+		حالة 7:		button = MOUSE_6;	اكسر;
+		حالة 8:		button = MOUSE_X1;	اكسر;
+		حالة 9:		button = MOUSE_X2;	اكسر;
+		افتراضي:
+		    أرجع;	// Unknown button
 	    }
 	}
-	else if (event->type == ButtonRelease)
+	وإلا إذا (event->type == ButtonRelease)
 	    button = MOUSE_RELEASE;
-	else
-	    return;	// Unknown mouse event type
+	وإلا
+	    أرجع;	// Unknown mouse event type
 
 	x_modifiers = event->xbutton.state;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	last_mouse_event = event->xbutton;
-#endif
+#إذا defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	آخري_mouse_event = event->xbutton;
+#جيڪڏهن_پورو
     }
 
     vim_modifiers = 0x0;
-    if (x_modifiers & ShiftMask)
-	vim_modifiers |= MOUSE_SHIFT;
-    if (x_modifiers & ControlMask)
+    إذا (x_modifiers & سرڪايو_نقاب)
+	vim_modifiers |= MOUSE_سرڪايو;
+    إذا (x_modifiers & Control_نقاب)
 	vim_modifiers |= MOUSE_CTRL;
-    if (x_modifiers & Mod1Mask)	    // Alt or Meta key
+    إذا (x_modifiers & Mod1_نقاب)	    // Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
@@ -1092,164 +1092,164 @@ gui_x11_mouse_cb(
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    فراغ
+gui_mch_prepare(صحيح *argc, حرف **argv)
 {
-    int	    arg;
-    int	    i;
+    صحيح	    arg;
+    صحيح	    i;
 
     /*
      * Move all the entries in argv which are relevant to X into gui_argv.
      */
     gui_argc = 0;
-    gui_argv = LALLOC_MULT(char *, *argc);
-    if (gui_argv == NULL)
-	return;
+    gui_argv = LALLOC_MULT(حرف *, *argc);
+    إذا (gui_argv == عدم)
+	أرجع;
     gui_argv[gui_argc++] = argv[0];
     arg = 1;
-    while (arg < *argc)
+    طالما (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
-	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
-		break;
+	لكل (i = 0; i < (صحيح)Xt_عدد(cmdline_options); i++)
+	    إذا (strcmp(argv[arg], cmdline_options[i].option) == 0)
+		اكسر;
 
-	if (i < (int)XtNumber(cmdline_options))
+	إذا (i < (صحيح)Xt_عدد(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
-	    if (strcmp("-rv", argv[arg]) == 0
+	    إذا (strcmp("-rv", argv[arg]) == 0
 		    || strcmp("-reverse", argv[arg]) == 0)
-		found_reverse_arg = TRUE;
-	    else if ((strcmp("-fn", argv[arg]) == 0
+		مليو_ابتو_arg = TRUE;
+	    وإلا إذا ((strcmp("-fn", argv[arg]) == 0
 			|| strcmp("-font", argv[arg]) == 0)
 		    && arg + 1 < *argc)
-		font_argument = argv[arg + 1];
+		font_دليل = argv[arg + 1];
 
 	    // Found match in table, so move it into gui_argv
 	    gui_argv[gui_argc++] = argv[arg];
-	    if (--*argc > arg)
+	    إذا (--*argc > arg)
 	    {
 		mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-						    * sizeof(char *));
-		if (cmdline_options[i].argKind != XrmoptionNoArg)
+						    * حجم(حرف *));
+		إذا (cmdline_options[i].arg_قسم != XrmoptionNoArg)
 		{
 		    // Move the options argument as well
 		    gui_argv[gui_argc++] = argv[arg];
-		    if (--*argc > arg)
+		    إذا (--*argc > arg)
 			mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
-							    * sizeof(char *));
+							    * حجم(حرف *));
 		}
 	    }
-	    argv[*argc] = NULL;
+	    argv[*argc] = عدم;
 	}
-	else
-#ifdef FEAT_NETBEANS_INTG
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	وإلا
+#جيڪڏهن_وصف_ٿيل FEAT_NETBEANS_INTG
+	    إذا (لڙي_ڀيٽ("-nb", argv[arg], 3) == 0)
 	{
 	    gui.dofork = false;	// don't fork() when starting GUI
 	    netbeansArg = argv[arg];
 	    mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-	    argv[*argc] = NULL;
+					    (--*argc - arg) * حجم(حرف *));
+	    argv[*argc] = عدم;
 	}
-	else
-#endif
+	وإلا
+#جيڪڏهن_پورو
 	    arg++;
     }
 }
 
-#ifndef XtSpecificationRelease
+#جيڪڏهن_وصف_نه_ٿيل XtSpecificationRelease
 # define CARDINAL (Cardinal *)
-#else
-# if XtSpecificationRelease == 4
+#وإلا
+# إذا XtSpecificationRelease == 4
 #  define CARDINAL (Cardinal *)
-# else
-#  define CARDINAL (int *)
+# وإلا
+#  define CARDINAL (صحيح *)
 # endif
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
-gui_mch_init_check(void)
+    صحيح
+gui_mch_init_check(فراغ)
 {
-#ifdef FEAT_XIM
-    XtSetLanguageProc(NULL, NULL, NULL);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+    Xt_سيٽ_Language_Proc(عدم, عدم, عدم);
+#جيڪڏهن_پورو
     open_app_context();
-    if (app_context != NULL)
+    إذا (app_context != عدم)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
-		cmdline_options, XtNumber(cmdline_options),
+		cmdline_options, Xt_عدد(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
-#if defined(LC_NUMERIC)
+#إذا defined(LC_NUMERIC)
     {
 	// The call to XtOpenDisplay() may have set the locale from the
 	// environment. Set LC_NUMERIC to "C" to make sure that strtod() uses a
 	// decimal point, not a comma.
-	char *p = setlocale(LC_NUMERIC, NULL);
+	حرف *p = setlocale(LC_NUMERIC, عدم);
 
-	if (p == NULL || strcmp(p, "C") != 0)
+	إذا (p == عدم || strcmp(p, "C") != 0)
 	   setlocale(LC_NUMERIC, "C");
     }
-#endif
-    if (app_context == NULL || gui.dpy == NULL)
+#جيڪڏهن_پورو
+    إذا (app_context == عدم || gui.dpy == عدم)
     {
 	gui.dying = true;
 	emsg(_(e_cannot_open_display));
-	return FAIL;
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 
-#ifdef USE_XSMP
+#جيڪڏهن_وصف_ٿيل USE_XSMP
 /*
  * Handle XSMP processing, de-registering the attachment upon error
  */
-static XtInputId _xsmp_xtinputid;
+ساكن Xt_داخلا_Id _xsmp_xtinputid;
 
-    static void
-local_xsmp_handle_requests(
-    XtPointer	c UNUSED,
-    int		*s UNUSED,
-    XtInputId	*i UNUSED)
+    ساكن فراغ
+local_xsmp_handle_درخواستون(
+    Xt_اشارو	c اڻ_استعمال_ٿيل,
+    صحيح		*s اڻ_استعمال_ٿيل,
+    Xt_داخلا_Id	*i اڻ_استعمال_ٿيل)
 {
-    if (xsmp_handle_requests() == FAIL)
-	XtRemoveInput(_xsmp_xtinputid);
+    إذا (xsmp_handle_درخواستون() == FAIL)
+	Xt_Remove_داخلا(_xsmp_xtinputid);
 }
-#endif
+#جيڪڏهن_پورو
 
 
 /*
  * Initialise the X GUI.  Create all the windows, set up all the call-backs etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    صحيح
+gui_mch_init(فراغ)
 {
-    XtGCMask	gc_mask;
+    XtGCMask	gc_نقاب;
     XGCValues	gc_vals;
-    int		x, y, mask;
-    unsigned	w, h;
+    صحيح		x, y, نقاب;
+    بنانشان	w, h;
 
-#if 0
+#إذا 0
     // Uncomment this to enable synchronous mode for debugging
     XSynchronize(gui.dpy, True);
-#endif
+#جيڪڏهن_پورو
 
     vimShell = XtVaAppCreateShell(VIM_NAME, VIM_CLASS,
-	    applicationShellWidgetClass, gui.dpy, NULL);
+	    applicationShellWidgetClass, gui.dpy, عدم);
 
     /*
      * Get the application resources
      */
-    XtVaGetApplicationResources(vimShell, (XtPointer)&gui,
-	vim_resources, XtNumber(vim_resources), NULL);
+    XtVaGetApplicationResources(vimShell, (Xt_اشارو)&gui,
+	vim_resources, Xt_عدد(vim_resources), عدم);
 
-    gui.scrollbar_height = gui.scrollbar_width;
+    gui.scrollbar_اوچائي = gui.scrollbar_ويڪر;
 
     /*
      * Get the colors ourselves.  Using the automatic conversion doesn't
@@ -1259,28 +1259,28 @@ gui_mch_init(void)
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
     gui.scroll_fg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_fg_name);
     gui.scroll_bg_pixel = gui_get_color((char_u *)gui.rsrc_scroll_bg_name);
-#ifdef FEAT_BEVAL_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_BEVAL_GUI
     gui.tooltip_fg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_fg_name);
     gui.tooltip_bg_pixel = gui_get_color((char_u *)gui.rsrc_tooltip_bg_name);
-#endif
+#جيڪڏهن_پورو
 
     // Set default foreground and background colours
     gui.norm_pixel = gui.def_norm_pixel;
-    gui.back_pixel = gui.def_back_pixel;
+    gui.پٺ_pixel = gui.def_پٺ_pixel;
 
     // Check if reverse video needs to be applied (on Sun it's done by X)
-    if (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
+    إذا (gui.rsrc_rev_video && gui_get_lightness(gui.پٺ_pixel)
 					  > gui_get_lightness(gui.norm_pixel))
     {
-	gui.norm_pixel = gui.def_back_pixel;
-	gui.back_pixel = gui.def_norm_pixel;
+	gui.norm_pixel = gui.def_پٺ_pixel;
+	gui.پٺ_pixel = gui.def_norm_pixel;
 	gui.def_norm_pixel = gui.norm_pixel;
-	gui.def_back_pixel = gui.back_pixel;
+	gui.def_پٺ_pixel = gui.پٺ_pixel;
     }
 
     // Get the colors from the "Normal", "Tooltip", "Scrollbar" and "Menu"
     // group (set in syntax.c or in a vimrc file)
-    set_normal_colors();
+    سيٽ_عام_colors();
 
     /*
      * Check that none of the colors are the same as the background color
@@ -1290,48 +1290,48 @@ gui_mch_init(void)
     /*
      * Set up the GCs.	The font attributes will be set in gui_init_font().
      */
-    gc_mask = GCForeground | GCBackground;
+    gc_نقاب = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    gui.text_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gc_vals.background = gui.پٺ_pixel;
+    gui.متن_gc = XtGetGC(vimShell, gc_نقاب, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.پٺ_pixel;
     gc_vals.background = gui.norm_pixel;
-    gui.back_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.پٺ_gc = XtGetGC(vimShell, gc_نقاب, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_نقاب |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.پٺ_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.پٺ_pixel;
     gc_vals.function   = GXxor;
-    gui.invert_gc = XtGetGC(vimShell, gc_mask, &gc_vals);
+    gui.invert_gc = XtGetGC(vimShell, gc_نقاب, &gc_vals);
 
     gui.visibility = VisibilityUnobscured;
-    x11_setup_atoms(gui.dpy);
+    x11_تياري_atoms(gui.dpy);
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    إذا (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_سيٽ_winpos(gui_win_x, gui_win_y);
 
     // Now adapt the supplied(?) geometry-settings
     // Added by Kjetil Jacobsen <kjetilja@stud.cs.uit.no>
-    if (gui.geom != NULL && *gui.geom != NUL)
+    إذا (gui.geom != عدم && *gui.geom != NUL)
     {
-	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	نقاب = XParseGeometry((حرف *)gui.geom, &x, &y, &w, &h);
+	إذا (نقاب & ويڪر_قدر)
 	    Columns = w;
-	if (mask & HeightValue)
+	إذا (نقاب & اوچائي_قدر)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
-		p_window = h - 1;
-	    Rows = h;
+	    إذا (p_دري > (ڊگهو)h - 1 || !option_was_سيٽ((char_u *)"window"))
+		p_دري = h - 1;
+	    صفون = h;
 	}
-	limit_screen_size();
+	حد_بندي_screen_سائيز();
 	/*
 	 * Set the (x,y) position of the main window only if specified in the
 	 * users geometry, so we get good defaults when they don't. This needs
 	 * to be done before the shell is popped up.
 	 */
-	if (mask & (XValue|YValue))
-	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
+	إذا (نقاب & (XValue|YValue))
+	    Xt_Va_سيٽ_قدرون(vimShell, XtNgeometry, gui.geom, عدم);
     }
 
     gui_x11_create_widgets();
@@ -1339,59 +1339,59 @@ gui_mch_init(void)
    /*
     * Add an icon to Vim (Marcel Douben: 11 May 1998).
     */
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    إذا (vim_strchr(p_go, GO_ICON) != عدم)
     {
-#ifndef HAVE_XPM
+#جيڪڏهن_وصف_نه_ٿيل HAVE_XPM
 # include "vim_icon.xbm"
 # include "vim_mask.xbm"
 
 	Arg	arg[2];
 
-	XtSetArg(arg[0], XtNiconPixmap,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_icon_bits,
-		    vim_icon_width,
-		    vim_icon_height));
-	XtSetArg(arg[1], XtNiconMask,
-		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
-		    (char *)vim_mask_icon_bits,
-		    vim_mask_icon_width,
-		    vim_mask_icon_height));
-	XtSetValues(vimShell, arg, (Cardinal)2);
-#else
+	Xt_سيٽ_Arg(arg[0], XtNiconPixmap,
+		XCreate_Bitmap_From_معلومات(gui.dpy,
+		    Default_پاڙ_دري(gui.dpy),
+		    (حرف *)vim_icon_بٽ,
+		    vim_icon_ويڪر,
+		    vim_icon_اوچائي));
+	Xt_سيٽ_Arg(arg[1], Xt_Nicon_نقاب,
+		XCreate_Bitmap_From_معلومات(gui.dpy,
+		    Default_پاڙ_دري(gui.dpy),
+		    (حرف *)vim_نقاب_icon_بٽ,
+		    vim_نقاب_icon_ويڪر,
+		    vim_نقاب_icon_اوچائي));
+	Xt_سيٽ_قدرون(vimShell, arg, (Cardinal)2);
+#وإلا
 // Use Pixmaps, looking much nicer.
 
 # include "../runtime/vim32x32.xpm"
 # include "../runtime/vim16x16.xpm"
 # include "../runtime/vim48x48.xpm"
 
-    static Pixmap	icon = 0;
-    static Pixmap	icon_mask = 0;
-    static char		**magick = vim32x32;
-    Window		root_window;
-    XIconSize		*size;
-    int			number_sizes;
+    ساكن Pixmap	icon = 0;
+    ساكن Pixmap	icon_نقاب = 0;
+    ساكن حرف		**magick = vim32x32;
+    دري		پاڙ_دري;
+    XIcon_سائيز		*سائيز;
+    صحيح			عدد_sizes;
     Display		*dsp;
     Screen		*scr;
-    XpmAttributes	attr;
+    Xpm_خاصيتون	attr;
     Colormap		cmap;
 
     /*
      * Adjust the icon to the preferences of the actual window manager.
      */
-    root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
-						   &size, &number_sizes) != 0)
+    پاڙ_دري = XRoot_دري_جو_Screen(XtScreen(vimShell));
+    إذا (XGetIconSizes(XtDisplay(vimShell), پاڙ_دري,
+						   &سائيز, &عدد_sizes) != 0)
     {
-	if (number_sizes > 0)
+	إذا (عدد_sizes > 0)
 	{
-	    if (size->max_height >= 48 && size->max_width >= 48)
+	    إذا (سائيز->max_اوچائي_2 >= 48 && سائيز->max_ويڪر_2 >= 48)
 		magick = vim48x48;
-	    else if (size->max_height >= 32 && size->max_width >= 32)
+	    وإلا إذا (سائيز->max_اوچائي_2 >= 32 && سائيز->max_ويڪر_2 >= 32)
 		magick = vim32x32;
-	    else if (size->max_height >= 16 && size->max_width >= 16)
+	    وإلا إذا (سائيز->max_اوچائي_2 >= 16 && سائيز->max_ويڪر_2 >= 16)
 		magick = vim16x16;
 	}
     }
@@ -1400,51 +1400,51 @@ gui_mch_init(void)
     scr = XtScreen(vimShell);
 
     cmap = DefaultColormap(dsp, DefaultScreen(dsp));
-    XtVaSetValues(vimShell, XtNcolormap, cmap, NULL);
+    Xt_Va_سيٽ_قدرون(vimShell, XtNcolormap, cmap, عدم);
 
     attr.valuemask = 0L;
-    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | XpmDepth;
+    attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | Xpm_اونهائي;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colormap = cmap;
-    attr.depth = DefaultDepthOfScreen(scr);
+    attr.اونهائي = Default_اونهائي_جو_Screen(scr);
 
-    if (!icon)
+    إذا (!icon)
     {
-	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
-							   &icon_mask, &attr);
-	XpmFreeAttributes(&attr);
+	Xpm_Create_Pixmap_From_معلومات(dsp, پاڙ_دري, magick, &icon,
+							   &icon_نقاب, &attr);
+	Xpm_Free_خاصيتون(&attr);
     }
 
-    XtVaSetValues(vimShell, XmNiconPixmap, icon, XmNiconMask, icon_mask, NULL);
-#endif
+    Xt_Va_سيٽ_قدرون(vimShell, XmNiconPixmap, icon, Xm_Nicon_نقاب, icon_نقاب, عدم);
+#جيڪڏهن_پورو
     }
 
-#ifdef FEAT_BEVAL_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_BEVAL_GUI
     gui_init_tooltip_font();
-#endif
-#ifdef FEAT_MENU
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_MENU
     gui_init_menu_font();
-#endif
+#جيڪڏهن_پورو
 
-#ifdef USE_XSMP
+#جيڪڏهن_وصف_ٿيل USE_XSMP
     // Attach listener on ICE connection
-    if (-1 != xsmp_icefd)
-	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
-		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
-#endif
+    إذا (-1 != xsmp_icefd)
+	_xsmp_xtinputid = Xt_App_جوڙيو_داخلا(app_context, xsmp_icefd,
+		(Xt_اشارو)Xt_داخلا_Read_نقاب, local_xsmp_handle_درخواستون, عدم);
+#جيڪڏهن_پورو
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Called when starting the GUI fails after calling gui_mch_init().
  */
-    void
-gui_mch_uninit(void)
+    فراغ
+gui_mch_uninit(فراغ)
 {
     gui_x11_destroy_widgets();
     XtCloseDisplay(gui.dpy);
-    gui.dpy = NULL;
+    gui.dpy = عدم;
     vimShell = (Widget)0;
     VIM_CLEAR(gui_argv);
 }
@@ -1452,45 +1452,45 @@ gui_mch_uninit(void)
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    فراغ
+gui_mch_new_colors(فراغ)
 {
-    long_u	gc_mask;
+    long_u	gc_نقاب;
     XGCValues	gc_vals;
 
-    gc_mask = GCForeground | GCBackground;
+    gc_نقاب = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
-    gc_vals.background = gui.back_pixel;
-    if (gui.text_gc != NULL)
-	XChangeGC(gui.dpy, gui.text_gc, gc_mask, &gc_vals);
+    gc_vals.background = gui.پٺ_pixel;
+    إذا (gui.متن_gc != عدم)
+	XChangeGC(gui.dpy, gui.متن_gc, gc_نقاب, &gc_vals);
 
-    gc_vals.foreground = gui.back_pixel;
+    gc_vals.foreground = gui.پٺ_pixel;
     gc_vals.background = gui.norm_pixel;
-    if (gui.back_gc != NULL)
-	XChangeGC(gui.dpy, gui.back_gc, gc_mask, &gc_vals);
+    إذا (gui.پٺ_gc != عدم)
+	XChangeGC(gui.dpy, gui.پٺ_gc, gc_نقاب, &gc_vals);
 
-    gc_mask |= GCFunction;
-    gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
-    gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
+    gc_نقاب |= GCFunction;
+    gc_vals.foreground = gui.norm_pixel ^ gui.پٺ_pixel;
+    gc_vals.background = gui.norm_pixel ^ gui.پٺ_pixel;
     gc_vals.function   = GXxor;
-    if (gui.invert_gc != NULL)
-	XChangeGC(gui.dpy, gui.invert_gc, gc_mask, &gc_vals);
+    إذا (gui.invert_gc != عدم)
+	XChangeGC(gui.dpy, gui.invert_gc, gc_نقاب, &gc_vals);
 
-    gui_x11_set_back_color();
+    gui_x11_سيٽ_پٺ_color();
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    صحيح
+gui_mch_open(فراغ)
 {
     // Actually open the window
     XtRealizeWidget(vimShell);
-    XtManageChild(XtNameToWidget(vimShell, "*vimForm"));
+    Xt_Manage_ٻار(Xt_Name_منزل_Widget(vimShell, "*vimForm"));
 
     gui.wid = gui_x11_get_wid();
-    gui.blank_pointer = gui_x11_create_blank_mouse();
+    gui.blank_اشارو = gui_x11_create_blank_mouse();
 
     /*
      * Add a callback for the Close item on the window managers menu, and the
@@ -1498,182 +1498,182 @@ gui_mch_open(void)
      */
     wm_atoms[SAVE_YOURSELF_IDX] =
 			      XInternAtom(gui.dpy, "WM_SAVE_YOURSELF", False);
-    wm_atoms[DELETE_WINDOW_IDX] =
+    wm_atoms[DELETE_دري_IDX] =
 			      XInternAtom(gui.dpy, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(gui.dpy, XtWindow(vimShell), wm_atoms, 2);
-    XtAddEventHandler(vimShell, NoEventMask, True, gui_x11_wm_protocol_handler,
-							     NULL);
-#ifdef HAVE_X11_XMU_EDITRES_H
+    XSetWMProtocols(gui.dpy, Xt_دري(vimShell), wm_atoms, 2);
+    Xt_جوڙيو_Event_Handler(vimShell, No_Event_نقاب, True, gui_x11_wm_protocol_handler,
+							     عدم);
+#جيڪڏهن_وصف_ٿيل HAVE_X11_XMU_EDITRES_H
     /*
      * Enable editres protocol (see "man editres").
      * Usually will need to add -lXmu to the linker line as well.
      */
-    XtAddEventHandler(vimShell, (EventMask)0, True, _XEditResCheckMessages,
-	    (XtPointer)NULL);
-#endif
+    Xt_جوڙيو_Event_Handler(vimShell, (Event_نقاب)0, True, _XEditResCheckMessages,
+	    (Xt_اشارو)عدم);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_CLIENTSERVER
-    if (serverName == NULL && serverDelayedStartName != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_CLIENTSERVER
+    إذا (serverName == عدم && server_Delayed_شروعات_Name != عدم)
     {
 	// This is a :gui command in a plain vim with no previous server
-	commWindow = XtWindow(vimShell);
-	(void)serverRegisterName(gui.dpy, serverDelayedStartName);
+	comm_دري = Xt_دري(vimShell);
+	(فراغ)server_رجسٽر_Name(gui.dpy, server_Delayed_شروعات_Name);
     }
-    else
+    وإلا
     {
 	/*
 	 * Cannot handle "widget-less" windows with XtProcessEvent() we'll
 	 * have to change the "server" registration to that of the main window
 	 * If we have not registered a name yet, remember the window
 	 */
-	serverChangeRegisteredWindow(gui.dpy, XtWindow(vimShell));
+	server_Change_Registered_دري(gui.dpy, Xt_دري(vimShell));
     }
-    XtAddEventHandler(vimShell, PropertyChangeMask, False,
-		      gui_x11_send_event_handler, NULL);
-#endif
+    Xt_جوڙيو_Event_Handler(vimShell, Property_Change_نقاب, False,
+		      gui_x11_send_event_handler, عدم);
+#جيڪڏهن_پورو
 
     // Get the colors for the highlight groups (gui_check_colors() might have
     // changed them)
     highlight_gui_started();		// re-init colors and fonts
 
-#ifdef FEAT_XIM
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
     xim_init();
-#endif
+#جيڪڏهن_پورو
 
-    return OK;
+    أرجع OK;
 }
 
-#if defined(FEAT_BEVAL_GUI)
+#إذا defined(FEAT_BEVAL_GUI)
 /*
  * Convert the tooltip fontset name to an XFontSet.
  */
-    void
-gui_init_tooltip_font(void)
+    فراغ
+gui_init_tooltip_font(فراغ)
 {
-    XrmValue from, to;
+    Xrm_قدر from, منزل;
 
-    from.addr = (char *)gui.rsrc_tooltip_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.tooltip_fontset;
-    to.size = sizeof(XFontSet);
+    from.addr = (حرف *)gui.rsrc_tooltip_font_name;
+    from.سائيز = لڙي_ڊيگهه(from.addr);
+    منزل.addr = (Xt_اشارو)&gui.tooltip_fontset;
+    منزل.سائيز = حجم(XFont_سيٽ);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    إذا (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_سيٽ, &منزل) == False)
     {
 	// Failed. What to do?
     }
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_MENU)
+#إذا defined(FEAT_MENU)
 // Convert the menu font/fontset name to an XFontStruct/XFontset
-    void
-gui_init_menu_font(void)
+    فراغ
+gui_init_menu_font(فراغ)
 {
-    XrmValue from, to;
+    Xrm_قدر from, منزل;
 
 # ifdef FONTSET_ALWAYS
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_fontset;
-    to.size = sizeof(GuiFontset);
+    from.addr = (حرف *)gui.rsrc_menu_font_name;
+    from.سائيز = لڙي_ڊيگهه(from.addr);
+    منزل.addr = (Xt_اشارو)&gui.menu_fontset;
+    منزل.سائيز = حجم(GuiFontset);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    إذا (XtConvertAndStore(vimShell, XtRString, &from, Xt_RFont_سيٽ, &منزل) == False)
     {
 	// Failed. What to do?
     }
-# else
-    from.addr = (char *)gui.rsrc_menu_font_name;
-    from.size = strlen(from.addr);
-    to.addr = (XtPointer)&gui.menu_font;
-    to.size = sizeof(GuiFont);
+# وإلا
+    from.addr = (حرف *)gui.rsrc_menu_font_name;
+    from.سائيز = لڙي_ڊيگهه(from.addr);
+    منزل.addr = (Xt_اشارو)&gui.menu_font;
+    منزل.سائيز = حجم(GuiFont);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
+    إذا (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &منزل) == False)
     {
 	// Failed. What to do?
     }
 # endif
 }
-#endif
+#جيڪڏهن_پورو
 
-    void
-gui_mch_exit(int rc UNUSED)
+    فراغ
+gui_mch_exit(صحيح rc اڻ_استعمال_ٿيل)
 {
-#if 0
+#إذا 0
     // Lesstif gives an error message here, and so does Solaris.  The man page
     // says that this isn't needed when exiting, so just skip it.
     XtCloseDisplay(gui.dpy);
-#endif
+#جيڪڏهن_پورو
     VIM_CLEAR(gui_argv);
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    صحيح
+gui_mch_get_winpos(صحيح *x, صحيح *y)
 {
     Dimension	xpos, ypos;
 
-    XtVaGetValues(vimShell,
+    Xt_Va_Get_قدرون(vimShell,
 	XtNx,	&xpos,
 	XtNy,	&ypos,
-	NULL);
+	عدم);
     *x = xpos;
     *y = ypos;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    فراغ
+gui_mch_سيٽ_winpos(صحيح x, صحيح y)
 {
-    XtVaSetValues(vimShell,
+    Xt_Va_سيٽ_قدرون(vimShell,
 	XtNx,	x,
 	XtNy,	y,
-	NULL);
+	عدم);
 }
 
-    void
-gui_mch_set_shellsize(
-    int		width,
-    int		height,
-    int		min_width,
-    int		min_height,
-    int		base_width,
-    int		base_height,
-    int		direction UNUSED)
+    فراغ
+gui_mch_سيٽ_shellsize(
+    صحيح		ويڪر,
+    صحيح		اوچائي,
+    صحيح		min_ويڪر,
+    صحيح		min_اوچائي,
+    صحيح		بنياد_ويڪر,
+    صحيح		بنياد_اوچائي,
+    صحيح		direction اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_XIM
-    height += xim_get_status_area_height(),
-#endif
-    XtVaSetValues(vimShell,
-	XtNwidthInc,	gui.char_width,
-	XtNheightInc,	gui.char_height,
-#if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
-	XtNbaseWidth,	base_width,
-	XtNbaseHeight,	base_height,
-#endif
-	XtNminWidth,	min_width,
-	XtNminHeight,	min_height,
-	XtNwidth,	width,
-	XtNheight,	height,
-	NULL);
+#جيڪڏهن_وصف_ٿيل FEAT_XIM
+    اوچائي += xim_get_حالت_area_اوچائي(),
+#جيڪڏهن_پورو
+    Xt_Va_سيٽ_قدرون(vimShell,
+	XtNwidthInc,	gui.char_ويڪر,
+	XtNheightInc,	gui.char_اوچائي,
+#إذا defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
+	Xt_Nbase_ويڪر,	بنياد_ويڪر,
+	Xt_Nbase_اوچائي,	بنياد_اوچائي,
+#جيڪڏهن_پورو
+	Xt_Nmin_ويڪر,	min_ويڪر,
+	Xt_Nmin_اوچائي,	min_اوچائي,
+	XtNwidth,	ويڪر,
+	XtNheight,	اوچائي,
+	عدم);
 }
 
 /*
  * Allow 10 pixels for horizontal borders, 'guiheadroom' for vertical borders.
  * Is there no way in X to find out how wide the borders really are?
  */
-    void
+    فراغ
 gui_mch_get_screen_dimensions(
-    int	    *screen_w,
-    int	    *screen_h)
+    صحيح	    *screen_w,
+    صحيح	    *screen_h)
 {
-    *screen_w = DisplayWidth(gui.dpy, DefaultScreen(gui.dpy)) - 10;
-    *screen_h = DisplayHeight(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
+    *screen_w = Display_ويڪر(gui.dpy, DefaultScreen(gui.dpy)) - 10;
+    *screen_h = Display_اوچائي(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
 }
 
 /*
@@ -1682,46 +1682,46 @@ gui_mch_get_screen_dimensions(
  * If "fontset" is TRUE, load the "font_name" as a fontset.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
+    صحيح
 gui_mch_init_font(
     char_u	*font_name,
-    int		do_fontset UNUSED)
+    صحيح		do_fontset اڻ_استعمال_ٿيل)
 {
-    XFontStruct	*font = NULL;
+    XFontStruct	*font = عدم;
 
-#ifdef FEAT_XFONTSET
-    XFontSet	fontset = NULL;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    XFont_سيٽ	fontset = عدم;
+#جيڪڏهن_پورو
 
-#ifdef FEAT_GUI_MOTIF
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MOTIF
     // A font name equal "*" is indicating, that we should activate the font
     // selection dialogue to get a new font name. So let us do it here.
-    if (font_name != NULL && STRCMP(font_name, "*") == 0)
+    إذا (font_name != عدم && STRCMP(font_name, "*") == 0)
     {
 	font_name = gui_xm_select_font(hl_get_font_name());
 
 	// Do not reset to default font except on GUI startup.
-	if (font_name == NULL && !gui.starting)
-	    return OK;
+	إذا (font_name == عدم && !gui.starting)
+	    أرجع OK;
     }
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_XFONTSET
-    if (do_fontset)
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    إذا (do_fontset)
     {
 	// If 'guifontset' is set, VIM treats all font specifications as if
 	// they were fontsets, and 'guifontset' becomes the default.
-	if (font_name != NULL)
+	إذا (font_name != عدم)
 	{
-	    fontset = (XFontSet)gui_mch_get_fontset(font_name, FALSE, TRUE);
-	    if (fontset == NULL)
-		return FAIL;
+	    fontset = (XFont_سيٽ)gui_mch_get_fontset(font_name, FALSE, TRUE);
+	    إذا (fontset == عدم)
+		أرجع FAIL;
 	}
     }
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     {
-	if (font_name == NULL)
+	إذا (font_name == عدم)
 	{
 	    /*
 	     * If none of the fonts in 'font' could be loaded, try the one set
@@ -1730,255 +1730,255 @@ gui_mch_init_font(
 	     */
 	    font_name = gui.rsrc_font_name;
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	    if (font == NULL)
+	    إذا (font == عدم)
 		font_name = (char_u *)DFLT_FONT;
 	}
-	if (font == NULL)
+	إذا (font == عدم)
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	if (font == NULL)
-	    return FAIL;
+	إذا (font == عدم)
+	    أرجع FAIL;
     }
 
     gui_mch_free_font(gui.norm_font);
-#ifdef FEAT_XFONTSET
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
     gui_mch_free_fontset(gui.fontset);
 
-    if (fontset != NULL)
+    إذا (fontset != عدم)
     {
 	gui.norm_font = NOFONT;
 	gui.fontset = (GuiFontset)fontset;
-	gui.char_width = fontset_width(fontset);
-	gui.char_height = fontset_height(fontset) + p_linespace;
+	gui.char_ويڪر = fontset_ويڪر(fontset);
+	gui.char_اوچائي = fontset_اوچائي(fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent(fontset) + p_linespace / 2;
     }
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     {
 	gui.norm_font = (GuiFont)font;
-#ifdef FEAT_XFONTSET
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
 	gui.fontset = NOFONTSET;
-#endif
-	gui.char_width = font->max_bounds.width;
-	gui.char_height = font->ascent + font->descent + p_linespace;
+#جيڪڏهن_پورو
+	gui.char_ويڪر = font->max_bounds.ويڪر;
+	gui.char_اوچائي = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
 
-    hl_set_font_name(font_name);
+    hl_سيٽ_font_name(font_name);
 
     /*
      * Try to load other fonts for bold, italic, and bold-italic.
      * We should also try to work out what font to use for these when they are
      * not specified by X resources, but we don't yet.
      */
-    if (font_name == gui.rsrc_font_name)
+    إذا (font_name == gui.rsrc_font_name)
     {
-	if (gui.bold_font == NOFONT
-		&& gui.rsrc_bold_font_name != NULL
+	إذا (gui.bold_font == NOFONT
+		&& gui.rsrc_bold_font_name != عدم
 		&& *gui.rsrc_bold_font_name != NUL)
 	    gui.bold_font = gui_mch_get_font(gui.rsrc_bold_font_name, FALSE);
-	if (gui.ital_font == NOFONT
-		&& gui.rsrc_ital_font_name != NULL
+	إذا (gui.ital_font == NOFONT
+		&& gui.rsrc_ital_font_name != عدم
 		&& *gui.rsrc_ital_font_name != NUL)
 	    gui.ital_font = gui_mch_get_font(gui.rsrc_ital_font_name, FALSE);
-	if (gui.boldital_font == NOFONT
-		&& gui.rsrc_boldital_font_name != NULL
+	إذا (gui.boldital_font == NOFONT
+		&& gui.rsrc_boldital_font_name != عدم
 		&& *gui.rsrc_boldital_font_name != NUL)
 	    gui.boldital_font = gui_mch_get_font(gui.rsrc_boldital_font_name,
 								       FALSE);
     }
-    else
+    وإلا
     {
 	// When not using the font specified by the resources, also don't use
 	// the bold/italic fonts, otherwise setting 'guifont' will look very
 	// strange.
-	if (gui.bold_font != NOFONT)
+	إذا (gui.bold_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.bold_font);
 	    gui.bold_font = NOFONT;
 	}
-	if (gui.ital_font != NOFONT)
+	إذا (gui.ital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.ital_font);
 	    gui.ital_font = NOFONT;
 	}
-	if (gui.boldital_font != NOFONT)
+	إذا (gui.boldital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.boldital_font);
 	    gui.boldital_font = NOFONT;
 	}
     }
 
-#ifdef FEAT_GUI_MOTIF
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MOTIF
     gui_motif_synch_fonts();
-#endif
+#جيڪڏهن_پورو
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get a font structure for highlighting.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int giveErrorIfMissing)
+gui_mch_get_font(char_u *name, صحيح giveErrorIfMissing)
 {
     XFontStruct	*font;
 
-    if (!gui.in_use || name == NULL)	// can't do this when GUI not running
-	return NOFONT;
+    إذا (!gui.اندريون_use || name == عدم)	// can't do this when GUI not running
+	أرجع NOFONT;
 
-    font = XLoadQueryFont(gui.dpy, (char *)name);
+    font = XLoadQueryFont(gui.dpy, (حرف *)name);
 
-    if (font == NULL)
+    إذا (font == عدم)
     {
-	if (giveErrorIfMissing)
+	إذا (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	أرجع NOFONT;
     }
 
-#ifdef DEBUG
-    printf("Font Information for '%s':\n", name);
-    printf("  w = %d, h = %d, ascent = %d, descent = %d\n",
-	   font->max_bounds.width, font->ascent + font->descent,
+#جيڪڏهن_وصف_ٿيل DEBUG
+    لکو("Font Information for '%s':\n", name);
+    لکو("  w = %d, h = %d, ascent = %d, descent = %d\n",
+	   font->max_bounds.ويڪر, font->ascent + font->descent,
 	   font->ascent, font->descent);
-    printf("  max ascent = %d, max descent = %d, max h = %d\n",
+    لکو("  max ascent = %d, max descent = %d, max h = %d\n",
 	   font->max_bounds.ascent, font->max_bounds.descent,
 	   font->max_bounds.ascent + font->max_bounds.descent);
-    printf("  min lbearing = %d, min rbearing = %d\n",
+    لکو("  min lbearing = %d, min rbearing = %d\n",
 	   font->min_bounds.lbearing, font->min_bounds.rbearing);
-    printf("  max lbearing = %d, max rbearing = %d\n",
+    لکو("  max lbearing = %d, max rbearing = %d\n",
 	   font->max_bounds.lbearing, font->max_bounds.rbearing);
-    printf("  leftink = %d, rightink = %d\n",
+    لکو("  leftink = %d, rightink = %d\n",
 	   (font->min_bounds.lbearing < 0),
-	   (font->max_bounds.rbearing > font->max_bounds.width));
-    printf("\n");
-#endif
+	   (font->max_bounds.rbearing > font->max_bounds.ويڪر));
+    لکو("\n");
+#جيڪڏهن_پورو
 
-    if (font->max_bounds.width != font->min_bounds.width)
+    إذا (font->max_bounds.ويڪر != font->min_bounds.ويڪر)
     {
-	semsg(_(e_font_str_is_not_fixed_width), name);
+	semsg(_(e_font_str_is_not_fixed_ويڪر), name);
 	XFreeFont(gui.dpy, font);
-	return NOFONT;
+	أرجع NOFONT;
     }
-    return (GuiFont)font;
+    أرجع (GuiFont)font;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    char_u *ret = NULL;
+    char_u *ret = عدم;
 
-    if (name != NULL && font == NULL)
+    إذا (name != عدم && font == عدم)
     {
 	// In this case, there's no way other than doing this.
 	ret = vim_strsave(name);
     }
-    else if (font != NULL)
+    وإلا إذا (font != عدم)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
-	unsigned long value = 0L;
+	بنانشان ڊگهو قدر = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	إذا (XGetFontProperty(font, XA_FONT, &قدر))
 	{
-	    char *xa_font_name = NULL;
+	    حرف *xa_font_name = عدم;
 
-	    xa_font_name = XGetAtomName(gui.dpy, value);
-	    if (xa_font_name != NULL)
+	    xa_font_name = XGetAtomName(gui.dpy, قدر);
+	    إذا (xa_font_name != عدم)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
 		XFree(xa_font_name);
 	    }
-	    else if (name != NULL)
+	    وإلا إذا (name != عدم)
 		ret = vim_strsave(name);
 	}
-	else if (name != NULL)
+	وإلا إذا (name != عدم)
 	    ret = vim_strsave(name);
     }
-    return ret;
+    أرجع ret;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    صحيح
+gui_mch_adjust_charheight(فراغ)
 {
-#ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    إذا (gui.fontset != NOFONTSET)
     {
-	gui.char_height = fontset_height((XFontSet)gui.fontset) + p_linespace;
-	gui.char_ascent = fontset_ascent((XFontSet)gui.fontset)
+	gui.char_اوچائي = fontset_اوچائي((XFont_سيٽ)gui.fontset) + p_linespace;
+	gui.char_ascent = fontset_ascent((XFont_سيٽ)gui.fontset)
 							    + p_linespace / 2;
     }
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     {
 	XFontStruct *font = (XFontStruct *)gui.norm_font;
 
-	gui.char_height = font->ascent + font->descent + p_linespace;
+	gui.char_اوچائي = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Set the current text font.
  */
-    void
-gui_mch_set_font(GuiFont font)
+    فراغ
+gui_mch_سيٽ_font(GuiFont font)
 {
-    static Font	prev_font = (Font)-1;
+    ساكن Font	prev_font = (Font)-1;
     Font	fid = ((XFontStruct *)font)->fid;
 
-    if (fid != prev_font)
+    إذا (fid != prev_font)
     {
-	XSetFont(gui.dpy, gui.text_gc, fid);
-	XSetFont(gui.dpy, gui.back_gc, fid);
+	XSetFont(gui.dpy, gui.متن_gc, fid);
+	XSetFont(gui.dpy, gui.پٺ_gc, fid);
 	prev_font = fid;
 	gui.char_ascent = ((XFontStruct *)font)->ascent + p_linespace / 2;
     }
-#ifdef FEAT_XFONTSET
-    current_fontset = (XFontSet)NULL;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    current_fontset = (XFont_سيٽ)عدم;
+#جيڪڏهن_پورو
 }
 
-#if defined(FEAT_XFONTSET)
+#إذا defined(FEAT_XFONTSET)
 /*
  * Set the current text fontset.
  * Adjust the ascent, in case it's different.
  */
-    void
-gui_mch_set_fontset(GuiFontset fontset)
+    فراغ
+gui_mch_سيٽ_fontset(GuiFontset fontset)
 {
-    current_fontset = (XFontSet)fontset;
+    current_fontset = (XFont_سيٽ)fontset;
     gui.char_ascent = fontset_ascent(current_fontset) + p_linespace / 2;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * If a font is not going to be used, free its structure.
  */
-    void
+    فراغ
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    إذا (font != NOFONT)
 	XFreeFont(gui.dpy, (XFontStruct *)font);
 }
 
-#if defined(FEAT_XFONTSET)
+#إذا defined(FEAT_XFONTSET)
 /*
  * If a fontset is not going to be used, free its structure.
  */
-    void
+    فراغ
 gui_mch_free_fontset(GuiFontset fontset)
 {
-    if (fontset != NOFONTSET)
-	XFreeFontSet(gui.dpy, (XFontSet)fontset);
+    إذا (fontset != NOFONTSET)
+	XFree_Font_سيٽ(gui.dpy, (XFont_سيٽ)fontset);
 }
 
 /*
@@ -1988,138 +1988,138 @@ gui_mch_free_fontset(GuiFontset fontset)
     GuiFontset
 gui_mch_get_fontset(
     char_u	*name,
-    int		giveErrorIfMissing,
-    int		fixed_width)
+    صحيح		giveErrorIfMissing,
+    صحيح		fixed_ويڪر)
 {
-    XFontSet	fontset;
-    char	**missing, *def_str;
-    int		num_missing;
+    XFont_سيٽ	fontset;
+    حرف	**missing, *def_str;
+    صحيح		انگ_missing;
 
-    if (!gui.in_use || name == NULL)
-	return NOFONTSET;
+    إذا (!gui.اندريون_use || name == عدم)
+	أرجع NOFONTSET;
 
-    fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
+    fontset = XCreate_Font_سيٽ(gui.dpy, (حرف *)name, &missing, &انگ_missing,
 			     &def_str);
-    if (num_missing > 0)
+    إذا (انگ_missing > 0)
     {
-	int i;
+	صحيح i;
 
-	if (giveErrorIfMissing)
+	إذا (giveErrorIfMissing)
 	{
-	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    semsg(_(e_fonts_for_the_following_charsets_are_missing_اندريون_fontset), name);
+	    لكل (i = 0; i < انگ_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
     }
 
-    if (fontset == NULL)
+    إذا (fontset == عدم)
     {
-	if (giveErrorIfMissing)
+	إذا (giveErrorIfMissing)
 	    semsg(_(e_unknown_fontset_str), name);
-	return NOFONTSET;
+	أرجع NOFONTSET;
     }
 
-    if (fixed_width && check_fontset_sanity(fontset) == FAIL)
+    إذا (fixed_ويڪر && check_fontset_sanity(fontset) == FAIL)
     {
-	XFreeFontSet(gui.dpy, fontset);
-	return NOFONTSET;
+	XFree_Font_سيٽ(gui.dpy, fontset);
+	أرجع NOFONTSET;
     }
-    return (GuiFontset)fontset;
+    أرجع (GuiFontset)fontset;
 }
 
 /*
  * Check if fontset "fs" is fixed width.
  */
-    static int
-check_fontset_sanity(XFontSet fs)
+    ساكن صحيح
+check_fontset_sanity(XFont_سيٽ fs)
 {
     XFontStruct	**xfs;
-    char	**font_name;
-    int		fn;
-    char	*base_name;
-    int		i;
-    int		min_width;
-    int		min_font_idx = 0;
+    حرف	**font_name;
+    صحيح		fn;
+    حرف	*بنياد_name;
+    صحيح		i;
+    صحيح		min_ويڪر;
+    صحيح		min_font_idx = 0;
 
-    base_name = XBaseFontNameListOfFontSet(fs);
-    fn = XFontsOfFontSet(fs, &xfs, &font_name);
-    for (i = 0; i < fn; i++)
+    بنياد_name = XBase_Font_Name_List_جو_Font_سيٽ(fs);
+    fn = XFonts_جو_Font_سيٽ(fs, &xfs, &font_name);
+    لكل (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
+	إذا (xfs[i]->max_bounds.ويڪر != xfs[i]->min_bounds.ويڪر)
 	{
-	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_width),
-		    base_name, font_name[i]);
-	    return FAIL;
+	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_ويڪر),
+		    بنياد_name, font_name[i]);
+	    أرجع FAIL;
 	}
     }
     // scan base font width
-    min_width = 32767;
-    for (i = 0; i < fn; i++)
+    min_ويڪر = 32767;
+    لكل (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width<min_width)
+	إذا (xfs[i]->max_bounds.ويڪر<min_ويڪر)
 	{
-	    min_width = xfs[i]->max_bounds.width;
+	    min_ويڪر = xfs[i]->max_bounds.ويڪر;
 	    min_font_idx = i;
 	}
     }
-    for (i = 0; i < fn; i++)
+    لكل (i = 0; i < fn; i++)
     {
-	if (	   xfs[i]->max_bounds.width != 2 * min_width
-		&& xfs[i]->max_bounds.width != min_width)
+	إذا (	   xfs[i]->max_bounds.ويڪر != 2 * min_ويڪر
+		&& xfs[i]->max_bounds.ويڪر != min_ويڪر)
 	{
-	    semsg(_(e_fontset_name_str), base_name);
+	    semsg(_(e_fontset_name_str), بنياد_name);
 	    semsg(_("Font0: %s"), font_name[min_font_idx]);
 	    semsg(_("Font%d: %s"), i, font_name[i]);
 	    semsg(_("Font%d width is not twice that of font0"), i);
 	    semsg(_("Font0 width: %d"),
-				     (int)xfs[min_font_idx]->max_bounds.width);
-	    semsg(_("Font%d width: %d"), i, (int)xfs[i]->max_bounds.width);
-	    return FAIL;
+				     (صحيح)xfs[min_font_idx]->max_bounds.ويڪر);
+	    semsg(_("Font%d width: %d"), i, (صحيح)xfs[i]->max_bounds.ويڪر);
+	    أرجع FAIL;
 	}
     }
     // it seems ok. Good Luck!!
-    return OK;
+    أرجع OK;
 }
 
-    static int
-fontset_width(XFontSet fs)
+    ساكن صحيح
+fontset_ويڪر(XFont_سيٽ fs)
 {
- return XmbTextEscapement(fs, "Vim", 3) / 3;
+ أرجع Xmb_متن_Escapement(fs, "Vim", 3) / 3;
 }
 
-    int
-fontset_height(
-    XFontSet fs)
+    صحيح
+fontset_اوچائي(
+    XFont_سيٽ fs)
 {
-    XFontSetExtents *extents;
+    XFont_سيٽ_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return extents->max_logical_extent.height;
+    extents = XExtents_جو_Font_سيٽ(fs);
+    أرجع extents->max_logical_extent.اوچائي;
 }
 
-# if 0
+# إذا 0
 // NOT USED YET
-    static int
-fontset_descent(XFontSet fs)
+    ساكن صحيح
+fontset_descent(XFont_سيٽ fs)
 {
-    XFontSetExtents *extents;
+    XFont_سيٽ_Extents *extents;
 
-    extents = XExtentsOfFontSet (fs);
-    return extents->max_logical_extent.height + extents->max_logical_extent.y;
+    extents = XExtents_جو_Font_سيٽ (fs);
+    أرجع extents->max_logical_extent.اوچائي + extents->max_logical_extent.y;
 }
 # endif
 
-    static int
-fontset_ascent(XFontSet fs)
+    ساكن صحيح
+fontset_ascent(XFont_سيٽ fs)
 {
-    XFontSetExtents *extents;
+    XFont_سيٽ_Extents *extents;
 
-    extents = XExtentsOfFontSet(fs);
-    return -extents->max_logical_extent.y;
+    extents = XExtents_جو_Font_سيٽ(fs);
+    أرجع -extents->max_logical_extent.y;
 }
 
-#endif // FEAT_XFONTSET
+#جيڪڏهن_پورو // FEAT_XFONTSET
 
 /*
  * Return the Pixel value (color) for the given color name.
@@ -2131,14 +2131,14 @@ gui_mch_get_color(char_u *name)
     guicolor_T	requested;
 
     // can't do this when GUI not running
-    if (!gui.in_use || name == NULL || *name == NUL)
-	return INVALCOLOR;
+    إذا (!gui.اندريون_use || name == عدم || *name == NUL)
+	أرجع INVALCOLOR;
 
     requested = gui_get_color_cmn(name);
-    if (requested == INVALCOLOR)
-	return INVALCOLOR;
+    إذا (requested == INVALCOLOR)
+	أرجع INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    أرجع gui_mch_get_rgb_color(
 	    (requested & 0xff0000) >> 16,
 	    (requested & 0xff00) >> 8,
 	    requested & 0xff);
@@ -2149,62 +2149,62 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(صحيح r, صحيح g, صحيح b)
 {
-    XColor	available;
+    XColor	موجود;
     Colormap	colormap;
 
-#if 0
+#إذا 0
 // Using XParseColor() is very slow, put rgb in XColor directly.
 
-    char	spec[8]; // space enough to hold "#RRGGBB"
-    vim_snprintf(spec, sizeof(spec), "#%.2x%.2x%.2x", r, g, b);
-    if (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
-	    && XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
-#endif
+    حرف	spec[8]; // space enough to hold "#RRGGBB"
+    vim_snprintf(spec, حجم(spec), "#%.2x%.2x%.2x", r, g, b);
+    إذا (XParseColor(gui.dpy, colormap, (حرف *)spec, &موجود) != 0
+	    && XAllocColor(gui.dpy, colormap, &موجود) != 0)
+	أرجع (guicolor_T)موجود.pixel;
+#جيڪڏهن_پورو
     colormap = DefaultColormap(gui.dpy, DefaultScreen(gui.dpy));
-    CLEAR_FIELD(available);
-    available.red = r << 8;
-    available.green = g << 8;
-    available.blue = b << 8;
-    if (XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+    CLEAR_ميدان(موجود);
+    موجود.red = r << 8;
+    موجود.green = g << 8;
+    موجود.blue = b << 8;
+    إذا (XAllocColor(gui.dpy, colormap, &موجود) != 0)
+	أرجع (guicolor_T)موجود.pixel;
 
-    return INVALCOLOR;
+    أرجع INVALCOLOR;
 }
 
 /*
  * Set the current text foreground color.
  */
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    فراغ
+gui_mch_سيٽ_fg_color(guicolor_T color)
 {
-    if (color == prev_fg_color)
-	return;
+    إذا (color == prev_fg_color)
+	أرجع;
 
-    XSetForeground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetForeground(gui.dpy, gui.متن_gc, (Pixel)color);
     prev_fg_color = color;
 }
 
 /*
  * Set the current text background color.
  */
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    فراغ
+gui_mch_سيٽ_bg_color(guicolor_T color)
 {
-    if (color == prev_bg_color)
-	return;
+    إذا (color == prev_bg_color)
+	أرجع;
 
-    XSetBackground(gui.dpy, gui.text_gc, (Pixel)color);
+    XSetBackground(gui.dpy, gui.متن_gc, (Pixel)color);
     prev_bg_color = color;
 }
 
 /*
  * Set the current text special color.
  */
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    فراغ
+gui_mch_سيٽ_sp_color(guicolor_T color)
 {
     prev_sp_color = color;
 }
@@ -2212,88 +2212,88 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * create a mouse pointer that is blank
  */
-    static Cursor
-gui_x11_create_blank_mouse(void)
+    ساكن Cursor
+gui_x11_create_blank_mouse(فراغ)
 {
     Pixmap blank_pixmap = XCreatePixmap(gui.dpy, gui.wid, 1, 1, 1);
-    GC gc = XCreateGC(gui.dpy, blank_pixmap, (unsigned long)0, (XGCValues*)0);
+    GC gc = XCreateGC(gui.dpy, blank_pixmap, (بنانشان ڊگهو)0, (XGCValues*)0);
 
-    if (gc != NULL)
+    إذا (gc != عدم)
     {
-	XDrawPoint(gui.dpy, blank_pixmap, gc, 0, 0);
+	XDraw_نقطو(gui.dpy, blank_pixmap, gc, 0, 0);
 	XFreeGC(gui.dpy, gc);
     }
-    return XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
+    أرجع XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
 		     (XColor*)&gui.norm_pixel, (XColor*)&gui.norm_pixel, 0, 0);
 }
 
 /*
  * Draw a curled line at the bottom of the character cell.
  */
-    static void
-draw_curl(int row, int col, int cells)
+    ساكن فراغ
+draw_curl(صحيح صف, صحيح کانو, صحيح cells)
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    صحيح			i;
+    صحيح			وٿي;
+    ساكن ثابت صحيح	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
-    XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-    for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+    XSetForeground(gui.dpy, gui.متن_gc, prev_sp_color);
+    لكل (i = FILL_X(کانو); i < FILL_X(کانو + cells); ++i)
     {
-	offset = val[i % 8];
-	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, i,
-						FILL_Y(row + 1) - 1 - offset);
+	وٿي = val[i % 8];
+	XDraw_نقطو(gui.dpy, gui.wid, gui.متن_gc, i,
+						FILL_Y(صف + 1) - 1 - وٿي);
     }
-    XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+    XSetForeground(gui.dpy, gui.متن_gc, prev_fg_color);
 }
 
-    void
+    فراغ
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    صحيح		صف,
+    صحيح		کانو,
     char_u	*s,
-    int		len,
-    int		flags)
+    صحيح		len,
+    صحيح		flags)
 {
-    int			cells = len;
-    static void		*buf = NULL;
-    static int		buflen = 0;
+    صحيح			cells = len;
+    ساكن فراغ		*buf = عدم;
+    ساكن صحيح		buflen = 0;
     char_u		*p;
-    int			wlen = 0;
-    int			c;
+    صحيح			wlen = 0;
+    صحيح			c;
 
-    if (enc_utf8)
+    إذا (enc_utf8)
     {
 	// Convert UTF-8 byte sequence to 16 bit characters for the X
 	// functions.  Need a buffer for the 16 bit characters.  Keep it
 	// between calls, because allocating it each time is slow.
-	if (buflen < len)
+	إذا (buflen < len)
 	{
-	    XtFree((char *)buf);
-	    buf = (void *)XtMalloc(len * (sizeof(XChar2b) < sizeof(wchar_t)
-					? sizeof(wchar_t) : sizeof(XChar2b)));
+	    XtFree((حرف *)buf);
+	    buf = (فراغ *)XtMalloc(len * (حجم(XChar2b) < حجم(wchar_t)
+					? حجم(wchar_t) : حجم(XChar2b)));
 	    buflen = len;
 	}
 	p = s;
 	cells = 0;
-	while (p < s + len)
+	طالما (p < s + len)
 	{
 	    c = utf_ptr2char(p);
-#ifdef FEAT_XFONTSET
-	    if (current_fontset != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+	    إذا (current_fontset != عدم)
 	    {
 # ifdef SMALL_WCHAR_T
-		if (c >= 0x10000)
+		إذا (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 # endif
 		((wchar_t *)buf)[wlen] = c;
 	    }
-	    else
-#endif
+	    وإلا
+#جيڪڏهن_پورو
 	    {
-		if (c >= 0x10000)
+		إذا (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
-		((XChar2b *)buf)[wlen].byte1 = (unsigned)c >> 8;
+		((XChar2b *)buf)[wlen].byte1 = (بنانشان)c >> 8;
 		((XChar2b *)buf)[wlen].byte2 = c;
 	    }
 	    ++wlen;
@@ -2301,18 +2301,18 @@ gui_mch_draw_string(
 	    p += utf_ptr2len(p);
 	}
     }
-    else if (has_mbyte)
+    وإلا إذا (has_mbyte)
     {
 	cells = 0;
-	for (p = s; p < s + len; )
+	لكل (p = s; p < s + len; )
 	{
 	    cells += ptr2cells(p);
 	    p += (*mb_ptr2len)(p);
 	}
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    إذا (current_fontset != عدم)
     {
 	// Setup a clip rectangle to avoid spilling over in the next or
 	// previous line.  This is apparently needed for some fonts which are
@@ -2321,206 +2321,206 @@ gui_mch_draw_string(
 
 	clip.x = 0;
 	clip.y = 0;
-	clip.height = gui.char_height;
-	clip.width = gui.char_width * cells + 1;
-	XSetClipRectangles(gui.dpy, gui.text_gc, FILL_X(col), FILL_Y(row),
+	clip.اوچائي = gui.char_اوچائي;
+	clip.ويڪر = gui.char_ويڪر * cells + 1;
+	XSetClipRectangles(gui.dpy, gui.متن_gc, FILL_X(کانو), FILL_Y(صف),
 		&clip, 1, Unsorted);
     }
-#endif
+#جيڪڏهن_پورو
 
-    if (flags & DRAW_TRANSP)
+    إذا (flags & DRAW_TRANSP)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	إذا (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), buf, wlen);
+	وإلا
+	    XDrawString(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), (حرف *)s, len);
     }
-    else if (p_linespace != 0
-#ifdef FEAT_XFONTSET
-	    || current_fontset != NULL
-#endif
+    وإلا إذا (p_linespace != 0
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+	    || current_fontset != عدم
+#جيڪڏهن_پورو
 	    )
     {
-	XSetForeground(gui.dpy, gui.text_gc, prev_bg_color);
-	XFillRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		FILL_Y(row), gui.char_width * cells, gui.char_height);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.متن_gc, prev_bg_color);
+	XFillRectangle(gui.dpy, gui.wid, gui.متن_gc, FILL_X(کانو),
+		FILL_Y(صف), gui.char_ويڪر * cells, gui.char_اوچائي);
+	XSetForeground(gui.dpy, gui.متن_gc, prev_fg_color);
 
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	إذا (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), buf, wlen);
+	وإلا
+	    XDrawString(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), (حرف *)s, len);
     }
-    else
+    وإلا
     {
 	// XmbDrawImageString has bug, don't use it for fontset.
-	if (enc_utf8)
-	    XDrawImageString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawImageString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
-		    TEXT_Y(row), (char *)s, len);
+	إذا (enc_utf8)
+	    XDrawImageString16(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), buf, wlen);
+	وإلا
+	    XDrawImageString(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو),
+		    متن_Y(صف), (حرف *)s, len);
     }
 
     // Bold trick: draw the text again with a one-pixel offset.
-    if (flags & DRAW_BOLD)
+    إذا (flags & DRAW_BOLD)
     {
-	if (enc_utf8)
-	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), buf, wlen);
-	else
-	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
-		    TEXT_Y(row), (char *)s, len);
+	إذا (enc_utf8)
+	    XDrawString16(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو) + 1,
+		    متن_Y(صف), buf, wlen);
+	وإلا
+	    XDrawString(gui.dpy, gui.wid, gui.متن_gc, متن_X(کانو) + 1,
+		    متن_Y(صف), (حرف *)s, len);
     }
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
-	draw_curl(row, col, cells);
+    إذا (flags & DRAW_UNDERC)
+	draw_curl(صف, کانو, cells);
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    إذا (flags & DRAW_UNDERL)
     {
-	int	y = FILL_Y(row + 1) - 1;
+	صحيح	y = FILL_Y(صف + 1) - 1;
 
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	إذا (p_linespace > 1)
 	    y -= p_linespace - 1;
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
+	XDraw_سٽ(gui.dpy, gui.wid, gui.متن_gc, FILL_X(کانو),
+		y, FILL_X(کانو + cells) - 1, y);
     }
 
-    if (flags & DRAW_STRIKE)
+    إذا (flags & DRAW_STRIKE)
     {
-	int	y = FILL_Y(row + 1) - gui.char_height/2;
+	صحيح	y = FILL_Y(صف + 1) - gui.char_اوچائي/2;
 
-	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
-		y, FILL_X(col + cells) - 1, y);
-	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
+	XSetForeground(gui.dpy, gui.متن_gc, prev_sp_color);
+	XDraw_سٽ(gui.dpy, gui.wid, gui.متن_gc, FILL_X(کانو),
+		y, FILL_X(کانو + cells) - 1, y);
+	XSetForeground(gui.dpy, gui.متن_gc, prev_fg_color);
     }
 
-#ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
-	XSetClipMask(gui.dpy, gui.text_gc, None);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_XFONTSET
+    إذا (current_fontset != عدم)
+	XSet_Clip_نقاب(gui.dpy, gui.متن_gc, None);
+#جيڪڏهن_پورو
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    صحيح
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-					 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    لكل (i = 0; special_ڪنجيون[i].ڪنجي_sym != (ڪنجي_Sym)0; i++)
+	إذا (name[0] == special_ڪنجيون[i].vim_code0 &&
+					 name[1] == special_ڪنجيون[i].vim_code1)
+	    أرجع OK;
+    أرجع FAIL;
 }
 
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
-gui_get_x11_windis(Window *win, Display **dis)
+    صحيح
+gui_get_x11_windis(دري *win, Display **dis)
 {
-    *win = XtWindow(vimShell);
+    *win = Xt_دري(vimShell);
     *dis = gui.dpy;
-    return OK;
+    أرجع OK;
 }
 
-    void
-gui_mch_beep(void)
+    فراغ
+gui_mch_beep(فراغ)
 {
     XBell(gui.dpy, 0);
 }
 
-    void
-gui_mch_flash(int msec)
+    فراغ
+gui_mch_flash(صحيح msec)
 {
     // Do a visual beep by reversing the foreground and background colors
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((صحيح)Columns) + gui.border_وٿي,
+	    FILL_Y((صحيح)صفون) + gui.border_وٿي);
     XSync(gui.dpy, False);
-    ui_delay((long)msec, TRUE);	// wait for a few msec
+    ui_delay((ڊگهو)msec, TRUE);	// wait for a few msec
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((صحيح)Columns) + gui.border_وٿي,
+	    FILL_Y((صحيح)صفون) + gui.border_وٿي);
 }
 
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    فراغ
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    صحيح	    r,
+    صحيح	    c,
+    صحيح	    nr,
+    صحيح	    nc)
 {
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc,
-	FILL_X(c), FILL_Y(r), (nc) * gui.char_width, (nr) * gui.char_height);
+	FILL_X(c), FILL_Y(r), (nc) * gui.char_ويڪر, (nr) * gui.char_اوچائي);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    فراغ
+gui_mch_iconify(فراغ)
 {
-    XIconifyWindow(gui.dpy, XtWindow(vimShell), DefaultScreen(gui.dpy));
+    XIconify_دري(gui.dpy, Xt_دري(vimShell), DefaultScreen(gui.dpy));
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    فراغ
+gui_mch_سيٽ_foreground(فراغ)
 {
-    XMapRaised(gui.dpy, XtWindow(vimShell));
+    XMapRaised(gui.dpy, Xt_دري(vimShell));
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Draw a cursor without focus.
  */
-    void
+    فراغ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		w = 1;
+    صحيح		w = 1;
 
-    if (mb_lefthalve(gui.row, gui.col))
+    إذا (mb_lefthalve(gui.صف, gui.کانو))
 	w = 2;
-    gui_mch_set_fg_color(color);
-    XDrawRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(gui.col),
-	    FILL_Y(gui.row), w * gui.char_width - 1, gui.char_height - 1);
+    gui_mch_سيٽ_fg_color(color);
+    XDrawRectangle(gui.dpy, gui.wid, gui.متن_gc, FILL_X(gui.کانو),
+	    FILL_Y(gui.صف), w * gui.char_ويڪر - 1, gui.char_اوچائي - 1);
 }
 
 /*
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    فراغ
+gui_mch_draw_part_cursor(صحيح w, صحيح h, guicolor_T color)
 {
-    gui_mch_set_fg_color(color);
+    gui_mch_سيٽ_fg_color(color);
 
-    XFillRectangle(gui.dpy, gui.wid, gui.text_gc,
-#ifdef FEAT_RIGHTLEFT
+    XFillRectangle(gui.dpy, gui.wid, gui.متن_gc,
+#جيڪڏهن_وصف_ٿيل FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
-#endif
-		FILL_X(gui.col),
-	    FILL_Y(gui.row) + gui.char_height - h,
+	    CURSOR_BAR_ساڄو ? FILL_X(gui.کانو + 1) - w :
+#جيڪڏهن_پورو
+		FILL_X(gui.کانو),
+	    FILL_Y(gui.صف) + gui.char_اوچائي - h,
 	    w, h);
 }
 
@@ -2530,19 +2530,19 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
  * nothing in the X event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    فراغ
+gui_mch_update(فراغ)
 {
-    XtInputMask mask, desired;
+    Xt_داخلا_نقاب نقاب, desired;
 
-#ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+#جيڪڏهن_وصف_ٿيل ALT_X_داخلا
+    إذا (suppress_alternate_داخلا)
 	desired = (XtIMXEvent | XtIMTimer);
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
 	desired = (XtIMAll);
-    while ((mask = XtAppPending(app_context)) && (mask & desired)
-	    && !vim_is_input_buf_full())
+    طالما ((نقاب = XtAppPending(app_context)) && (نقاب & desired)
+	    && !vim_is_داخلا_buf_ڀريل())
 	XtAppProcessEvent(app_context, desired);
 }
 
@@ -2555,62 +2555,62 @@ gui_mch_update(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_mch_wait_for_chars(long wtime)
+    صحيح
+gui_mch_wait_for_chars(ڊگهو wtime)
 {
-    int	    focus;
-    int	    retval = FAIL;
+    صحيح	    focus;
+    صحيح	    retval = FAIL;
 
     /*
      * Make this static, in case gui_x11_timer_cb is called after leaving
      * this function (otherwise a random value on the stack may be changed).
      */
-    static int	    timed_out;
+    ساكن صحيح	    timed_ٻاهريون;
     XtIntervalId    timer = (XtIntervalId)0;
-    XtInputMask	    desired;
-#ifdef FEAT_JOB_CHANNEL
+    Xt_داخلا_نقاب	    desired;
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
     XtIntervalId    channel_timer = (XtIntervalId)0;
-#endif
+#جيڪڏهن_پورو
 
-    timed_out = FALSE;
+    timed_ٻاهريون = FALSE;
 
-    if (wtime >= 0)
-	timer = XtAppAddTimeOut(app_context,
+    إذا (wtime >= 0)
+	timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context,
 				(long_u)(wtime == 0 ? 1L : wtime),
-						 gui_x11_timer_cb, &timed_out);
-#ifdef FEAT_JOB_CHANNEL
+						 gui_x11_timer_cb, &timed_ٻاهريون);
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
-				   channel_poll_cb, (XtPointer)&channel_timer);
-#endif
+    إذا (channel_any_keep_open())
+	channel_timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, (long_u)20,
+				   channel_poll_cb, (Xt_اشارو)&channel_timer);
+#جيڪڏهن_پورو
 
-    focus = gui.in_focus;
+    focus = gui.اندريون_focus;
     desired = (XtIMAll);
-    while (!timed_out)
+    طالما (!timed_ٻاهريون)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	إذا (gui.اندريون_focus != focus)
 	{
-	    if (gui.in_focus)
-		gui_mch_start_blink();
-	    else
+	    إذا (gui.اندريون_focus)
+		gui_mch_شروعات_blink();
+	    وإلا
 		gui_mch_stop_blink(TRUE);
-	    focus = gui.in_focus;
+	    focus = gui.اندريون_focus;
 	}
 
-#ifdef MESSAGE_QUEUE
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
 # ifdef FEAT_TIMERS
-	did_add_timer = FALSE;
+	did_جوڙيو_timer = FALSE;
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	إذا (did_جوڙيو_timer)
 	    // Need to recompute the waiting time.
-	    break;
+	    اكسر;
 # endif
-#endif
+#جيڪڏهن_پورو
 
 	/*
 	 * Don't use gui_mch_update() because then we will spin-lock until a
@@ -2622,21 +2622,21 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	إذا (داخلا_موجود())
 	{
 	    retval = OK;
-	    break;
+	    اكسر;
 	}
     }
 
-    if (timer != (XtIntervalId)0 && !timed_out)
-	XtRemoveTimeOut(timer);
-#ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(channel_timer);
-#endif
+    إذا (timer != (XtIntervalId)0 && !timed_ٻاهريون)
+	Xt_Remove_وقت_ٻاهريون(timer);
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    إذا (channel_timer != (XtIntervalId)0)
+	Xt_Remove_وقت_ٻاهريون(channel_timer);
+#جيڪڏهن_پورو
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -2646,8 +2646,8 @@ gui_mch_wait_for_chars(long wtime)
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    فراغ
+gui_mch_flush(فراغ)
 {
     XFlush(gui.dpy);
 }
@@ -2656,26 +2656,26 @@ gui_mch_flush(void)
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
-gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    فراغ
+gui_mch_clear_بلاڪ(
+    صحيح		row1,
+    صحيح		col1,
+    صحيح		row2,
+    صحيح		col2)
 {
-    int		x;
+    صحيح		x;
 
     x = FILL_X(col1);
 
     // Clear one extra pixel at the far right, for when bold characters have
     // spilled over to the next column.
-    XFillRectangle(gui.dpy, gui.wid, gui.back_gc, x, FILL_Y(row1),
-	    (col2 - col1 + 1) * gui.char_width + (col2 == Columns - 1),
-	    (row2 - row1 + 1) * gui.char_height);
+    XFillRectangle(gui.dpy, gui.wid, gui.پٺ_gc, x, FILL_Y(row1),
+	    (col2 - col1 + 1) * gui.char_ويڪر + (col2 == Columns - 1),
+	    (row2 - row1 + 1) * gui.char_اوچائي);
 }
 
-    void
-gui_mch_clear_all(void)
+    فراغ
+gui_mch_clear_all(فراغ)
 {
     XClearArea(gui.dpy, gui.wid, 0, 0, 0, 0, False);
 }
@@ -2684,24 +2684,24 @@ gui_mch_clear_all(void)
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    فراغ
+gui_mch_delete_سٽون(صحيح صف, صحيح انگ_سٽون)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    إذا (gui.visibility == VisibilityFullyObscured)
+	أرجع;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.متن_gc,
+	FILL_X(gui.scroll_region_کاٻو), FILL_Y(صف + انگ_سٽون),
+	gui.char_ويڪر * (gui.scroll_region_ساڄو - gui.scroll_region_کاٻو + 1)
+			       + (gui.scroll_region_ساڄو == Columns - 1),
+	gui.char_اوچائي * (gui.scroll_region_bot - صف - انگ_سٽون + 1),
+	FILL_X(gui.scroll_region_کاٻو), FILL_Y(صف));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-			  gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_بلاڪ(gui.scroll_region_bot - انگ_سٽون + 1,
+						       gui.scroll_region_کاٻو,
+			  gui.scroll_region_bot, gui.scroll_region_ساڄو);
     gui_x11_check_copy_area();
 }
 
@@ -2709,52 +2709,52 @@ gui_mch_delete_lines(int row, int num_lines)
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    فراغ
+gui_mch_وجهو_سٽون(صحيح صف, صحيح انگ_سٽون)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    إذا (gui.visibility == VisibilityFullyObscured)
+	أرجع;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
-    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines));
+    XCopyArea(gui.dpy, gui.wid, gui.wid, gui.متن_gc,
+	FILL_X(gui.scroll_region_کاٻو), FILL_Y(صف),
+	gui.char_ويڪر * (gui.scroll_region_ساڄو - gui.scroll_region_کاٻو + 1)
+			       + (gui.scroll_region_ساڄو == Columns - 1),
+	gui.char_اوچائي * (gui.scroll_region_bot - صف - انگ_سٽون + 1),
+	FILL_X(gui.scroll_region_کاٻو), FILL_Y(صف + انگ_سٽون));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_بلاڪ(صف, gui.scroll_region_کاٻو,
+				صف + انگ_سٽون - 1, gui.scroll_region_ساڄو);
     gui_x11_check_copy_area();
 }
 
 /*
  * Update the region revealed by scrolling up/down.
  */
-    static void
-gui_x11_check_copy_area(void)
+    ساكن فراغ
+gui_x11_check_copy_area(فراغ)
 {
     XEvent		    event;
     XGraphicsExposeEvent    *gevent;
 
-    if (gui.visibility != VisibilityPartiallyObscured)
-	return;
+    إذا (gui.visibility != VisibilityPartiallyObscured)
+	أرجع;
 
     XFlush(gui.dpy);
 
     // Wait to check whether the scroll worked or not
-    for (;;)
+    لكل (;;)
     {
-	if (XCheckTypedEvent(gui.dpy, NoExpose, &event))
-	    return;	// The scroll worked.
+	إذا (XCheckTypedEvent(gui.dpy, NoExpose, &event))
+	    أرجع;	// The scroll worked.
 
-	if (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
+	إذا (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
-	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
-		return;		// This was the last expose event
+	    gui_redraw(gevent->x, gevent->y, gevent->ويڪر, gevent->اوچائي);
+	    إذا (gevent->ڳڻپ == 0)
+		أرجع;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
     }
@@ -2764,32 +2764,32 @@ gui_x11_check_copy_area(void)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    void
+    فراغ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     clip_x11_lose_selection(vimShell, cbd);
 }
 
-    int
+    صحيح
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return clip_x11_own_selection(vimShell, cbd);
+    أرجع clip_x11_own_selection(vimShell, cbd);
 }
 
-    void
+    فراغ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
  clip_x11_request_selection(vimShell, gui.dpy, cbd);
 }
 
-    void
-clip_mch_set_selection(
+    فراغ
+clip_mch_سيٽ_selection(
     Clipboard_T	*cbd)
 {
-    clip_x11_set_selection(cbd);
+    clip_x11_سيٽ_selection(cbd);
 }
 
-#if defined(FEAT_MENU)
+#إذا defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
@@ -2797,57 +2797,57 @@ clip_mch_set_selection(
 /*
  * Make a menu either grey or not grey.
  */
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    فراغ
+gui_mch_menu_grey(vimmenu_T *menu, صحيح grey)
 {
-    if (menu->id == (Widget)0)
-	return;
+    إذا (menu->id == (Widget)0)
+	أرجع;
 
     gui_mch_menu_hidden(menu, False);
-    if (grey
+    إذا (grey
 # ifdef FEAT_GUI_MOTIF
 	    || !menu->sensitive
 # endif
        )
-	XtSetSensitive(menu->id, False);
-    else
-	XtSetSensitive(menu->id, True);
+	Xt_سيٽ_Sensitive(menu->id, False);
+    وإلا
+	Xt_سيٽ_Sensitive(menu->id, True);
 }
 
 /*
  * Make menu item hidden or not hidden
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    فراغ
+gui_mch_menu_hidden(vimmenu_T *menu, صحيح hidden)
 {
-    if (menu->id == (Widget)0)
-	return;
+    إذا (menu->id == (Widget)0)
+	أرجع;
 
-    if (hidden)
-	XtUnmanageChild(menu->id);
-    else
-	XtManageChild(menu->id);
+    إذا (hidden)
+	Xt_Unmanage_ٻار(menu->id);
+    وإلا
+	Xt_Manage_ٻار(menu->id);
 }
 
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    فراغ
+gui_mch_draw_menubar(فراغ)
 {
     // Nothing to do in X
 }
 
-    void
+    فراغ
 gui_x11_menu_cb(
-    Widget	w UNUSED,
-    XtPointer	client_data,
-    XtPointer	call_data UNUSED)
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	client_معلومات_2,
+    Xt_اشارو	call_معلومات اڻ_استعمال_ٿيل)
 {
-    gui_menu_cb((vimmenu_T *)client_data);
+    gui_menu_cb((vimmenu_T *)client_معلومات_2);
 }
 
-#endif // FEAT_MENU
+#جيڪڏهن_پورو // FEAT_MENU
 
 
 
@@ -2855,62 +2855,62 @@ gui_x11_menu_cb(
  * Function called when window closed.	Works like ":qa".
  * Should put up a requester!
  */
-    static void
+    ساكن فراغ
 gui_x11_wm_protocol_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	client_معلومات_2 اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     /*
      * Only deal with Client messages.
      */
-    if (event->type != ClientMessage)
-	return;
+    إذا (event->type != Client_پيغام)
+	أرجع;
 
     /*
      * The WM_SAVE_YOURSELF event arrives when the window manager wants to
      * exit.  That can be cancelled though, thus Vim shouldn't exit here.
      * Just sync our swap files.
      */
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
+    إذا ((Atom)((XClient_پيغام_Event *)event)->معلومات.l[0] ==
 						  wm_atoms[SAVE_YOURSELF_IDX])
     {
-	out_flush();
+	ٻاهريون_flush();
 	ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
 	// Set the window's WM_COMMAND property, to let the window manager
 	// know we are done saving ourselves.  We don't want to be restarted,
 	// thus set argv to NULL.
-	XSetCommand(gui.dpy, XtWindow(vimShell), NULL, 0);
-	return;
+	XSetCommand(gui.dpy, Xt_دري(vimShell), عدم, 0);
+	أرجع;
     }
 
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
-						  wm_atoms[DELETE_WINDOW_IDX])
-	return;
+    إذا ((Atom)((XClient_پيغام_Event *)event)->معلومات.l[0] !=
+						  wm_atoms[DELETE_دري_IDX])
+	أرجع;
 
     gui_shell_closed();
 }
 
-#ifdef FEAT_CLIENTSERVER
+#جيڪڏهن_وصف_ٿيل FEAT_CLIENTSERVER
 /*
  * Function called when property changed. Check for incoming commands
  */
-    static void
+    ساكن فراغ
 gui_x11_send_event_handler(
-    Widget	w UNUSED,
-    XtPointer	client_data UNUSED,
+    Widget	w اڻ_استعمال_ٿيل,
+    Xt_اشارو	client_معلومات_2 اڻ_استعمال_ٿيل,
     XEvent	*event,
-    Boolean	*dum UNUSED)
+    Boolean	*dum اڻ_استعمال_ٿيل)
 {
     XPropertyEvent *e = (XPropertyEvent *) event;
 
-    if (e->type == PropertyNotify && e->window == commWindow
-	    && e->atom == commProperty &&  e->state == PropertyNewValue)
+    إذا (e->type == PropertyNotify && e->دري_2 == comm_دري
+	    && e->atom == commProperty &&  e->state == Property_New_قدر)
 	serverEventProc(gui.dpy, event, 0);
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Cursor blink functions.
@@ -2921,30 +2921,30 @@ gui_x11_send_event_handler(
  * BLINK_ON	blinking, cursor is shown
  */
 
-#define BLINK_NONE  0
-#define BLINK_OFF   1
-#define BLINK_ON    2
+#وصف_ڪريو BLINK_NONE  0
+#وصف_ڪريو BLINK_OFF   1
+#وصف_ڪريو BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static XtIntervalId	blink_timer = (XtIntervalId)0;
+ساكن صحيح		blink_state = BLINK_NONE;
+ساكن long_u		blink_waittime = 700;
+ساكن long_u		blink_ontime = 400;
+ساكن long_u		blink_offtime = 250;
+ساكن XtIntervalId	blink_timer = (XtIntervalId)0;
 
-    int
-gui_mch_is_blinking(void)
+    صحيح
+gui_mch_is_blinking(فراغ)
 {
-    return blink_state != BLINK_NONE;
+    أرجع blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    صحيح
+gui_mch_is_blink_off(فراغ)
 {
-    return blink_state == BLINK_OFF;
+    أرجع blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long waittime, long on, long off)
+    فراغ
+gui_mch_سيٽ_blinking(ڊگهو waittime, ڊگهو on, ڊگهو off)
 {
     blink_waittime = waittime;
     blink_ontime = on;
@@ -2954,37 +2954,37 @@ gui_mch_set_blinking(long waittime, long on, long off)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    فراغ
+gui_mch_stop_blink(صحيح may_call_gui_update_cursor)
 {
-    if (blink_timer != (XtIntervalId)0)
+    إذا (blink_timer != (XtIntervalId)0)
     {
-	XtRemoveTimeOut(blink_timer);
+	Xt_Remove_وقت_ٻاهريون(blink_timer);
 	blink_timer = (XtIntervalId)0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    إذا (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    static void
+    ساكن فراغ
 gui_x11_blink_cb(
-    XtPointer	    timed_out UNUSED,
-    XtIntervalId    *interval_id UNUSED)
+    Xt_اشارو	    timed_ٻاهريون اڻ_استعمال_ٿيل,
+    XtIntervalId    *interval_id اڻ_استعمال_ٿيل)
 {
-    if (blink_state == BLINK_ON)
+    إذا (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = XtAppAddTimeOut(app_context, blink_offtime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, blink_offtime,
+						      gui_x11_blink_cb, عدم);
     }
-    else
+    وإلا
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = XtAppAddTimeOut(app_context, blink_ontime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, blink_ontime,
+						      gui_x11_blink_cb, عدم);
     }
 }
 
@@ -2992,16 +2992,16 @@ gui_x11_blink_cb(
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    فراغ
+gui_mch_شروعات_blink(فراغ)
 {
-    if (blink_timer != (XtIntervalId)0)
-	XtRemoveTimeOut(blink_timer);
+    إذا (blink_timer != (XtIntervalId)0)
+	Xt_Remove_وقت_ٻاهريون(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    إذا (blink_waittime && blink_ontime && blink_offtime && gui.اندريون_focus)
     {
-	blink_timer = XtAppAddTimeOut(app_context, blink_waittime,
-						      gui_x11_blink_cb, NULL);
+	blink_timer = Xt_App_جوڙيو_وقت_ٻاهريون(app_context, blink_waittime,
+						      gui_x11_blink_cb, عدم);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
@@ -3020,198 +3020,198 @@ gui_mch_get_rgb(guicolor_T pixel)
     xc.pixel = pixel;
     XQueryColor(gui.dpy, colormap, &xc);
 
-    return (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
-						   + ((unsigned)xc.blue >> 8));
+    أرجع (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
+						   + ((بنانشان)xc.blue >> 8));
 }
 
 /*
  * Add the callback functions.
  */
-    void
-gui_x11_callbacks(Widget textArea, Widget vimForm)
+    فراغ
+gui_x11_callbacks(Widget متن_Area, Widget vimForm)
 {
-    XtAddEventHandler(textArea, VisibilityChangeMask, FALSE,
-	gui_x11_visibility_cb, (XtPointer)0);
+    Xt_جوڙيو_Event_Handler(متن_Area, Visibility_Change_نقاب, FALSE,
+	gui_x11_visibility_cb, (Xt_اشارو)0);
 
-    XtAddEventHandler(textArea, ExposureMask, FALSE, gui_x11_expose_cb,
-	(XtPointer)0);
+    Xt_جوڙيو_Event_Handler(متن_Area, Exposure_نقاب, FALSE, gui_x11_expose_cb,
+	(Xt_اشارو)0);
 
-    XtAddEventHandler(vimShell, StructureNotifyMask, FALSE,
-	gui_x11_resize_window_cb, (XtPointer)0);
+    Xt_جوڙيو_Event_Handler(vimShell, Structure_Notify_نقاب, FALSE,
+	gui_x11_resize_دري_cb, (Xt_اشارو)0);
 
-    XtAddEventHandler(vimShell, FocusChangeMask, FALSE, gui_x11_focus_change_cb,
-	(XtPointer)0);
+    Xt_جوڙيو_Event_Handler(vimShell, Focus_Change_نقاب, FALSE, gui_x11_focus_change_cb,
+	(Xt_اشارو)0);
     /*
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    إذا (vim_strchr(p_go, GO_اشارو) != عدم)
     {
-	XtAddEventHandler(vimShell, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, LeaveWindowMask, FALSE, gui_x11_leave_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(textArea, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
-	XtAddEventHandler(vimShell, EnterWindowMask, FALSE, gui_x11_enter_cb,
-	    (XtPointer)0);
+	Xt_جوڙيو_Event_Handler(vimShell, Leave_دري_نقاب, FALSE, gui_x11_leave_cb,
+	    (Xt_اشارو)0);
+	Xt_جوڙيو_Event_Handler(متن_Area, Leave_دري_نقاب, FALSE, gui_x11_leave_cb,
+	    (Xt_اشارو)0);
+	Xt_جوڙيو_Event_Handler(متن_Area, Enter_دري_نقاب, FALSE, gui_x11_enter_cb,
+	    (Xt_اشارو)0);
+	Xt_جوڙيو_Event_Handler(vimShell, Enter_دري_نقاب, FALSE, gui_x11_enter_cb,
+	    (Xt_اشارو)0);
     }
 
-    XtAddEventHandler(vimForm, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
-    XtAddEventHandler(textArea, KeyPressMask, FALSE, gui_x11_key_hit_cb,
-	(XtPointer)0);
+    Xt_جوڙيو_Event_Handler(vimForm, ڪنجي_Press_نقاب, FALSE, gui_x11_ڪنجي_ڪاميابي_cb,
+	(Xt_اشارو)0);
+    Xt_جوڙيو_Event_Handler(متن_Area, ڪنجي_Press_نقاب, FALSE, gui_x11_ڪنجي_ڪاميابي_cb,
+	(Xt_اشارو)0);
 
     // get pointer moved events from scrollbar, needed for 'mousefocus'
-    XtAddEventHandler(vimForm, PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)1);
-    XtAddEventHandler(textArea, ButtonPressMask | ButtonReleaseMask |
-					 ButtonMotionMask | PointerMotionMask,
-	FALSE, gui_x11_mouse_cb, (XtPointer)0);
+    Xt_جوڙيو_Event_Handler(vimForm, اشارو_Motion_نقاب,
+	FALSE, gui_x11_mouse_cb, (Xt_اشارو)1);
+    Xt_جوڙيو_Event_Handler(متن_Area, Button_Press_نقاب | Button_Release_نقاب |
+					 Button_Motion_نقاب | اشارو_Motion_نقاب,
+	FALSE, gui_x11_mouse_cb, (Xt_اشارو)0);
 }
 
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    فراغ
+gui_mch_getmouse(صحيح *x, صحيح *y)
 {
-    int		rootx, rooty, winx, winy;
-    Window	root, child;
-    unsigned int mask;
+    صحيح		rootx, rooty, winx, winy;
+    دري	پاڙ, ٻار;
+    بنانشان صحيح نقاب;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
-					 &rootx, &rooty, &winx, &winy, &mask))
+    إذا (gui.wid && XQuery_اشارو(gui.dpy, gui.wid, &پاڙ, &ٻار,
+					 &rootx, &rooty, &winx, &winy, &نقاب))
     {
 	*x = winx;
 	*y = winy;
     }
-    else
+    وإلا
     {
 	*x = -1;
 	*y = -1;
     }
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    فراغ
+gui_mch_setmouse(صحيح x, صحيح y)
 {
-    if (gui.wid)
-	XWarpPointer(gui.dpy, (Window)0, gui.wid, 0, 0, 0, 0, x, y);
+    إذا (gui.wid)
+	XWarp_اشارو(gui.dpy, (دري)0, gui.wid, 0, 0, 0, 0, x, y);
 }
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#إذا defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     XButtonPressedEvent *
-gui_x11_get_last_mouse_event(void)
+gui_x11_get_آخري_mouse_event(فراغ)
 {
-    return &last_mouse_event;
+    أرجع &آخري_mouse_event;
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_SIGN_ICONS)
 
 // Signs are currently always 2 chars wide.  Hopefully the font is big enough
 // to provide room for the bitmap!
-# define SIGN_WIDTH (gui.char_width * 2)
+# define SIGN_ويڪر (gui.char_ويڪر * 2)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    فراغ
+gui_mch_drawsign(صحيح صف, صحيح کانو, صحيح typenr)
 {
     XImage	*sign;
 
-    if (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
-	return;
+    إذا (!gui.اندريون_use || (sign = (XImage *)sign_get_image(typenr)) == عدم)
+	أرجع;
 
-    XClearArea(gui.dpy, gui.wid, TEXT_X(col), TEXT_Y(row) - sign->height,
-	    SIGN_WIDTH, gui.char_height, FALSE);
-    XPutImage(gui.dpy, gui.wid, gui.text_gc, sign, 0, 0,
-	    TEXT_X(col) + (SIGN_WIDTH - sign->width) / 2,
-	    TEXT_Y(row) - sign->height,
-	    sign->width, sign->height);
+    XClearArea(gui.dpy, gui.wid, متن_X(کانو), متن_Y(صف) - sign->اوچائي,
+	    SIGN_ويڪر, gui.char_اوچائي, FALSE);
+    XPutImage(gui.dpy, gui.wid, gui.متن_gc, sign, 0, 0,
+	    متن_X(کانو) + (SIGN_ويڪر - sign->ويڪر) / 2,
+	    متن_Y(صف) - sign->اوچائي,
+	    sign->ويڪر, sign->اوچائي);
 }
 
-    void *
-gui_mch_register_sign(char_u *signfile)
+    فراغ *
+gui_mch_رجسٽر_sign(char_u *signfile)
 {
-    XpmAttributes   attrs;
-    XImage	    *sign = NULL;
-    int		    status;
+    Xpm_خاصيتون   attrs;
+    XImage	    *sign = عدم;
+    صحيح		    حالت;
 
     /*
      * Setup the color substitution table.
      */
-    if (signfile[0] != NUL && signfile[0] != '-')
+    إذا (signfile[0] != NUL && signfile[0] != '-')
     {
-	XpmColorSymbol color[5] =
+	Xpm_Color_نشان color[5] =
 	{
-	    {"none", NULL, 0},
-	    {"iconColor1", NULL, 0},
-	    {"bottomShadowColor", NULL, 0},
-	    {"topShadowColor", NULL, 0},
-	    {"selectColor", NULL, 0}
+	    {"none", عدم, 0},
+	    {"iconColor1", عدم, 0},
+	    {"bottomShadowColor", عدم, 0},
+	    {"topShadowColor", عدم, 0},
+	    {"selectColor", عدم, 0}
 	};
 	attrs.valuemask = XpmColorSymbols;
 	attrs.numsymbols = 2;
 	attrs.colorsymbols = color;
-	attrs.colorsymbols[0].pixel = gui.back_pixel;
+	attrs.colorsymbols[0].pixel = gui.پٺ_pixel;
 	attrs.colorsymbols[1].pixel = gui.norm_pixel;
-	status = XpmReadFileToImage(gui.dpy, (char *)signfile,
-							 &sign, NULL, &attrs);
-	if (status == 0)
+	حالت = Xpm_Read_File_منزل_Image(gui.dpy, (حرف *)signfile,
+							 &sign, عدم, &attrs);
+	إذا (حالت == 0)
 	{
 	    // Sign width is fixed at two columns now.
 	    // if (sign->width > gui.sign_width)
 	    //     gui.sign_width = sign->width + 8;
 	}
-	else
-	    emsg(_(e_couldnt_read_in_sign_data));
+	وإلا
+	    emsg(_(e_couldnt_read_اندريون_sign_معلومات));
     }
 
-    return (void *)sign;
+    أرجع (فراغ *)sign;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    فراغ
+gui_mch_destroy_sign(فراغ *sign)
 {
     XDestroyImage((XImage*)sign);
 }
-#endif
+#جيڪڏهن_پورو
 
 
-#ifdef FEAT_MOUSESHAPE
+#جيڪڏهن_وصف_ٿيل FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
-#endif
+ساكن صحيح آخري_shape = 0;
+#جيڪڏهن_پورو
 
 /*
  * Use the blank mouse pointer or not.
  */
-    void
+    فراغ
 gui_mch_mousehide(
-    int		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
+    صحيح		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    إذا (gui.اشارو_hidden == hide)
+	أرجع;
 
-    gui.pointer_hidden = hide;
-    if (hide)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
-#ifdef FEAT_MOUSESHAPE
-	mch_set_mouse_shape(last_shape);
-#else
+    gui.اشارو_hidden = hide;
+    إذا (hide)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_اشارو);
+    وإلا
+#جيڪڏهن_وصف_ٿيل FEAT_MOUSESHAPE
+	mch_سيٽ_mouse_shape(آخري_shape);
+#وإلا
     XUndefineCursor(gui.dpy, gui.wid);
-#endif
+#جيڪڏهن_پورو
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#إذا defined(FEAT_MOUSESHAPE)
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+ساكن صحيح mshape_ids[] =
 {
-    XC_left_ptr,		// arrow
+    XC_کاٻو_ptr,		// arrow
     0,				// blank
     XC_xterm,			// beam
     XC_sb_v_double_arrow,	// updown
@@ -3225,66 +3225,66 @@ static int mshape_ids[] =
     XC_hand2,			// hand2
     XC_pencil,			// pencil
     XC_question_arrow,		// question
-    XC_right_ptr,		// right-arrow
+    XC_ساڄو_ptr,		// right-arrow
     XC_center_ptr,		// up-arrow
-    XC_left_ptr			// last one
+    XC_کاٻو_ptr			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    فراغ
+mch_سيٽ_mouse_shape(صحيح shape)
 {
-    int	    id;
+    صحيح	    id;
 
-    if (!gui.in_use)
-	return;
+    إذا (!gui.اندريون_use)
+	أرجع;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    إذا (shape == MSHAPE_HIDE || gui.اشارو_hidden)
+	XDefineCursor(gui.dpy, gui.wid, gui.blank_اشارو);
+    وإلا
     {
-	if (shape >= MSHAPE_NUMBERED)
+	إذا (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
-		id = XC_left_ptr;
-	    else
+	    إذا (id >= XC_انگ_glyphs)
+		id = XC_کاٻو_ptr;
+	    وإلا
 		id &= ~1;	// they are always even (why?)
 	}
-	else
+	وإلا
 	    id = mshape_ids[shape];
 
 	XDefineCursor(gui.dpy, gui.wid, XCreateFontCursor(gui.dpy, id));
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    إذا (shape != MSHAPE_HIDE)
+	آخري_shape = shape;
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+#إذا defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
 /*
  * Set the balloon-eval used for the tooltip of a toolbar menu item.
  * The check for a non-toolbar item was added, because there is a crash when
  * passing a normal menu item here.  Can't explain that, but better avoid it.
  */
-    void
-gui_mch_menu_set_tip(vimmenu_T *menu)
+    فراغ
+gui_mch_menu_سيٽ_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL
-				|| !menu_is_toolbar(menu->parent->name))
-	return;
+    إذا (menu->id == عدم || menu->والد == عدم
+				|| !menu_is_toolbar(menu->والد->name))
+	أرجع;
 
     // Always destroy and create the balloon, in case the string was
     // changed.
-    if (menu->tip != NULL)
+    إذا (menu->tip != عدم)
     {
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = عدم;
     }
-    if (menu->strings[MENU_INDEX_TIP] != NULL)
+    إذا (menu->لڙيون[MENU_اشاريو_TIP] != عدم)
 	menu->tip = gui_mch_create_beval_area(
 		menu->id,
-		menu->strings[MENU_INDEX_TIP],
-		NULL,
-		NULL);
+		menu->لڙيون[MENU_اشاريو_TIP],
+		عدم,
+		عدم);
 }
-#endif
+#جيڪڏهن_پورو

@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+بنية BMenu;
+بنية BMenu_شي;
+بنية BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+بنية VimApp;
+بنية VimFormView;
+بنية Vim_متن_Area_View;
+بنية Vim_دري;
+بنية VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+خارجي صحيح vim_تالو_screen();
+خارجي فراغ vim_unlock_screen();
 
-#ifndef __cplusplus
+#جيڪڏهن_وصف_نه_ٿيل __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+تعريفنوع بنية BMenu BMenu;
+تعريفنوع بنية BMenu_شي BMenu_شي;
+تعريفنوع بنية BPictureButton BPictureButton;
+تعريفنوع بنية Vim_دري Vim_دري;
+تعريفنوع بنية VimFormView VimFormView;
+تعريفنوع بنية Vim_متن_Area_View Vim_متن_Area_View;
+تعريفنوع بنية VimApp VimApp;
+تعريفنوع بنية VimScrollBar VimScrollBar;
 
-#endif
+#جيڪڏهن_پورو

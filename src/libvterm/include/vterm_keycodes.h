@@ -1,64 +1,64 @@
-#ifndef __VTERM_INPUT_H__
-#define __VTERM_INPUT_H__
+#جيڪڏهن_وصف_نه_ٿيل __VTERM_INPUT_H__
+#وصف_ڪريو __VTERM_INPUT_H__
 
-typedef enum {
+تعريفنوع تعداد {
   VTERM_MOD_NONE  = 0x00,
-  VTERM_MOD_SHIFT = 0x01,
+  VTERM_MOD_سرڪايو = 0x01,
   VTERM_MOD_ALT   = 0x02,
   VTERM_MOD_CTRL  = 0x04,
 
-  VTERM_ALL_MODS_MASK = 0x07
+  VTERM_ALL_MODS_نقاب = 0x07
 } VTermModifier;
 
 // The order here must match keycodes[] in src/keyboard.c!
-typedef enum {
-  VTERM_KEY_NONE,
+تعريفنوع تعداد {
+  VTERM_ڪنجي_NONE,
 
-  VTERM_KEY_ENTER,
-  VTERM_KEY_TAB,
-  VTERM_KEY_BACKSPACE,
-  VTERM_KEY_ESCAPE,
+  VTERM_ڪنجي_ENTER,
+  VTERM_ڪنجي_TAB,
+  VTERM_ڪنجي_BACKSPACE,
+  VTERM_ڪنجي_ESCAPE,
 
-  VTERM_KEY_UP,
-  VTERM_KEY_DOWN,
-  VTERM_KEY_LEFT,
-  VTERM_KEY_RIGHT,
+  VTERM_ڪنجي_مٿي,
+  VTERM_ڪنجي_هيٺ_ڏانهن,
+  VTERM_ڪنجي_کاٻو,
+  VTERM_ڪنجي_ساڄو,
 
-  VTERM_KEY_INS,
-  VTERM_KEY_DEL,
-  VTERM_KEY_HOME,
-  VTERM_KEY_END,
-  VTERM_KEY_PAGEUP,
-  VTERM_KEY_PAGEDOWN,
+  VTERM_ڪنجي_INS,
+  VTERM_ڪنجي_DEL,
+  VTERM_ڪنجي_HOME,
+  VTERM_ڪنجي_پڇاڙي,
+  VTERM_ڪنجي_PAGEUP,
+  VTERM_ڪنجي_PAGEDOWN,
 
   // F1 is VTERM_KEY_FUNCTION(1), F2 VTERM_KEY_FUNCTION(2), etc.
-  VTERM_KEY_FUNCTION_0   = 256,
-  VTERM_KEY_FUNCTION_MAX = VTERM_KEY_FUNCTION_0 + 255,
+  VTERM_ڪنجي_FUNCTION_0   = 256,
+  VTERM_ڪنجي_FUNCTION_MAX = VTERM_ڪنجي_FUNCTION_0 + 255,
 
   // keypad keys
-  VTERM_KEY_KP_0,
-  VTERM_KEY_KP_1,
-  VTERM_KEY_KP_2,
-  VTERM_KEY_KP_3,
-  VTERM_KEY_KP_4,
-  VTERM_KEY_KP_5,
-  VTERM_KEY_KP_6,
-  VTERM_KEY_KP_7,
-  VTERM_KEY_KP_8,
-  VTERM_KEY_KP_9,
-  VTERM_KEY_KP_MULT,
-  VTERM_KEY_KP_PLUS,
-  VTERM_KEY_KP_COMMA,
-  VTERM_KEY_KP_MINUS,
-  VTERM_KEY_KP_PERIOD,
-  VTERM_KEY_KP_DIVIDE,
-  VTERM_KEY_KP_ENTER,
-  VTERM_KEY_KP_EQUAL,
+  VTERM_ڪنجي_KP_0,
+  VTERM_ڪنجي_KP_1,
+  VTERM_ڪنجي_KP_2,
+  VTERM_ڪنجي_KP_3,
+  VTERM_ڪنجي_KP_4,
+  VTERM_ڪنجي_KP_5,
+  VTERM_ڪنجي_KP_6,
+  VTERM_ڪنجي_KP_7,
+  VTERM_ڪنجي_KP_8,
+  VTERM_ڪنجي_KP_9,
+  VTERM_ڪنجي_KP_MULT,
+  VTERM_ڪنجي_KP_PLUS,
+  VTERM_ڪنجي_KP_COMMA,
+  VTERM_ڪنجي_KP_MINUS,
+  VTERM_ڪنجي_KP_PERIOD,
+  VTERM_ڪنجي_KP_DIVIDE,
+  VTERM_ڪنجي_KP_ENTER,
+  VTERM_ڪنجي_KP_EQUAL,
 
-  VTERM_KEY_MAX, // Must be last
-  VTERM_N_KEYS = VTERM_KEY_MAX
-} VTermKey;
+  VTERM_ڪنجي_MAX, // Must be last
+  VTERM_N_ڪنجيون = VTERM_ڪنجي_MAX
+} VTerm_ڪنجي;
 
-#define VTERM_KEY_FUNCTION(n) (VTERM_KEY_FUNCTION_0+(n))
+#وصف_ڪريو VTERM_ڪنجي_FUNCTION(n) (VTERM_ڪنجي_FUNCTION_0+(n))
 
-#endif
+#جيڪڏهن_پورو

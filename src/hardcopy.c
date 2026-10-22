@@ -11,15 +11,15 @@
  * hardcopy.c: printing to paper
  */
 
-#include "vim.h"
-#include "version.h"
+#ضمن "vim.h"
+#ضمن "version.h"
 
-#if defined(FEAT_PRINTER)
+#إذا defined(FEAT_PRINTER)
 
-#include "hardcopy.h"
-#ifdef FEAT_POSTSCRIPT
+#ضمن "hardcopy.h"
+#جيڪڏهن_وصف_ٿيل FEAT_POSTSCRIPT
 # include "hardcopy_postscript.h"
-#endif
+#جيڪڏهن_پورو
 
 /*
  * To implement printing on a platform, the following functions must be
@@ -80,14 +80,14 @@
  * printed in the margin.
  */
 
-#ifdef FEAT_SYN_HL
-static const long_u  cterm_color_8[8] =
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+ساكن ثابت long_u  cterm_color_8[8] =
 {
     (long_u)0x000000L, (long_u)0xff0000L, (long_u)0x00ff00L, (long_u)0xffff00L,
     (long_u)0x0000ffL, (long_u)0xff00ffL, (long_u)0x00ffffL, (long_u)0xffffffL
 };
 
-static const long_u  cterm_color_16[16] =
+ساكن ثابت long_u  cterm_color_16[16] =
 {
     (long_u)0x000000L, (long_u)0x0000c0L, (long_u)0x008000L, (long_u)0x004080L,
     (long_u)0xc00000L, (long_u)0xc000c0L, (long_u)0x808000L, (long_u)0xc0c0c0L,
@@ -95,30 +95,30 @@ static const long_u  cterm_color_16[16] =
     (long_u)0xff8080L, (long_u)0xff40ffL, (long_u)0xffff00L, (long_u)0xffffffL
 };
 
-static int		current_syn_id;
-#endif
+ساكن صحيح		current_syn_id;
+#جيڪڏهن_پورو
 
-int	prt_curr_italic;
-int	prt_curr_bold;
-int	prt_curr_underline;
+صحيح	prt_curr_italic;
+صحيح	prt_curr_bold;
+صحيح	prt_curr_underline;
 long_u	prt_curr_bg;
 long_u	prt_curr_fg;
-int	prt_page_count;
+صحيح	prt_صفحو_ڳڻپ;
 
 /*
  * These values determine the print position on a page.
  */
-typedef struct
+تعريفنوع بنية
 {
-    int		lead_spaces;	    // remaining spaces for a TAB
-    int		print_pos;	    // virtual column for computing TABs
-    colnr_T	column;		    // byte column
-    linenr_T	file_line;	    // line nr in the buffer
-    long_u	bytes_printed;	    // bytes printed so far
-    int		ff;		    // seen form feed character
+    صحيح		lead_spaces;	    // remaining spaces for a TAB
+    صحيح		print_pos;	    // virtual column for computing TABs
+    colnr_T	ڪالم;		    // byte column
+    linenr_T	file_سٽ;	    // line nr in the buffer
+    long_u	بائيٽون_printed;	    // bytes printed so far
+    صحيح		ff;		    // seen form feed character
 } prt_pos_T;
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
     {"A4",		595.0,  842.0},
     {"letter",	612.0,  792.0},
@@ -135,33 +135,33 @@ prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
     {"statement",	396.0,  612.0},
     {"tabloid",	792.0, 1224.0}
 };
-#endif
+#جيڪڏهن_پورو
 
-static char *parse_list_options(char_u *option_str, option_table_T *table, int table_size);
+ساكن حرف *parse_list_options(char_u *option_str, option_جدول_T *جدول, صحيح جدول_سائيز_2);
 
-static colnr_T hardcopy_line(prt_settings_T *psettings, int page_line, prt_pos_T *ppos);
+ساكن colnr_T hardcopy_سٽ(prt_settings_T *psettings, صحيح صفحو_سٽ, prt_pos_T *ppos);
 
 /*
  * Parse 'printoptions' and set the flags in "printer_opts".
  * Returns an error message or NULL;
  */
-    char *
-parse_printoptions(optset_T *args UNUSED)
+    حرف *
+parse_printoptions(optset_T *دليلون اڻ_استعمال_ٿيل)
 {
-    return parse_list_options(p_popt, printer_opts, OPT_PRINT_NUM_OPTIONS);
+    أرجع parse_list_options(p_popt, printer_opts, OPT_PRINT_انگ_OPTIONS);
 }
 
-#if defined(FEAT_POSTSCRIPT)
+#إذا defined(FEAT_POSTSCRIPT)
 /*
  * Parse 'printmbfont' and set the flags in "mbfont_opts".
  * Returns an error message or NULL;
  */
-    char *
-parse_printmbfont(optset_T *args UNUSED)
+    حرف *
+parse_printmbfont(optset_T *دليلون اڻ_استعمال_ٿيل)
 {
-    return parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_NUM_OPTIONS);
+    أرجع parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_انگ_OPTIONS);
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Parse a list of options in the form
@@ -172,307 +172,307 @@ parse_printmbfont(optset_T *args UNUSED)
  * Returns an error message for an illegal option, NULL otherwise.
  * Only used for the printer at the moment...
  */
-    static char *
+    ساكن حرف *
 parse_list_options(
     char_u		*option_str,
-    option_table_T	*table,
-    int			table_size)
+    option_جدول_T	*جدول,
+    صحيح			جدول_سائيز_2)
 {
-    option_table_T *old_opts;
-    char	*ret = NULL;
+    option_جدول_T *old_opts;
+    حرف	*ret = عدم;
     char_u	*stringp;
     char_u	*colonp;
     char_u	*commap;
     char_u	*p;
-    int		idx = 0;		// init for GCC
-    int		len;
+    صحيح		idx = 0;		// init for GCC
+    صحيح		len;
 
     // Save the old values, so that they can be restored in case of an error.
-    old_opts = ALLOC_MULT(option_table_T, table_size);
-    if (old_opts == NULL)
-	return NULL;
+    old_opts = ALLOC_MULT(option_جدول_T, جدول_سائيز_2);
+    إذا (old_opts == عدم)
+	أرجع عدم;
 
-    for (idx = 0; idx < table_size; ++idx)
+    لكل (idx = 0; idx < جدول_سائيز_2; ++idx)
     {
-	old_opts[idx] = table[idx];
-	table[idx].present = FALSE;
+	old_opts[idx] = جدول[idx];
+	جدول[idx].present = FALSE;
     }
 
     /*
      * Repeat for all comma separated parts.
      */
     stringp = option_str;
-    while (*stringp)
+    طالما (*stringp)
     {
 	colonp = vim_strchr(stringp, ':');
-	if (colonp == NULL)
+	إذا (colonp == عدم)
 	{
 	    ret = e_missing_colon_3;
-	    break;
+	    اكسر;
 	}
 	commap = vim_strchr(stringp, ',');
-	if (commap == NULL)
+	إذا (commap == عدم)
 	    commap = option_str + STRLEN(option_str);
 
-	len = (int)(colonp - stringp);
+	len = (صحيح)(colonp - stringp);
 
-	for (idx = 0; idx < table_size; ++idx)
-	    if (STRNICMP(stringp, table[idx].name, len) == 0)
-		break;
+	لكل (idx = 0; idx < جدول_سائيز_2; ++idx)
+	    إذا (STRNICMP(stringp, جدول[idx].name, len) == 0)
+		اكسر;
 
-	if (idx == table_size)
+	إذا (idx == جدول_سائيز_2)
 	{
 	    ret = e_illegal_component;
-	    break;
+	    اكسر;
 	}
 	p = colonp + 1;
-	table[idx].present = TRUE;
+	جدول[idx].present = TRUE;
 
-	if (table[idx].hasnum)
+	إذا (جدول[idx].hasnum)
 	{
-	    if (!VIM_ISDIGIT(*p))
+	    إذا (!VIM_ISDIGIT(*p))
 	    {
 		ret = e_digit_expected_2;
-		break;
+		اكسر;
 	    }
 
-	    table[idx].number = getdigits(&p); // advances p
+	    جدول[idx].عدد = getdigits(&p); // advances p
 	}
 
-	table[idx].string = p;
-	table[idx].strlen = (int)(commap - p);
+	جدول[idx].string = p;
+	جدول[idx].لڙي_ڊيگهه = (صحيح)(commap - p);
 
 	stringp = commap;
-	if (*stringp == ',')
+	إذا (*stringp == ',')
 	    ++stringp;
     }
 
-    if (ret != NULL)
+    إذا (ret != عدم)
     {
 	// Restore old options in case of error
-	for (idx = 0; idx < table_size; ++idx)
-	    table[idx] = old_opts[idx];
+	لكل (idx = 0; idx < جدول_سائيز_2; ++idx)
+	    جدول[idx] = old_opts[idx];
     }
     vim_free(old_opts);
-    return ret;
+    أرجع ret;
 }
 
 
-#ifdef FEAT_SYN_HL
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
 /*
  * If using a dark background, the colors will probably be too bright to show
  * up well on white paper, so reduce their brightness.
  */
-    static long_u
+    ساكن long_u
 darken_rgb(long_u rgb)
 {
-    return	((rgb >> 17) << 16)
+    أرجع	((rgb >> 17) << 16)
 	    +	(((rgb & 0xff00) >> 9) << 8)
 	    +	((rgb & 0xff) >> 1);
 }
 
-    static long_u
-prt_get_term_color(int colorindex)
+    ساكن long_u
+prt_get_رڪن_color(صحيح colorindex)
 {
     // TODO: Should check for xterm with 88 or 256 colors.
-    if (t_colors > 8)
-	return cterm_color_16[colorindex % 16];
-    return cterm_color_8[colorindex % 8];
+    إذا (t_colors > 8)
+	أرجع cterm_color_16[colorindex % 16];
+    أرجع cterm_color_8[colorindex % 8];
 }
 
-    static void
+    ساكن فراغ
 prt_get_attr(
-    int			hl_id,
-    prt_text_attr_T	*pattr,
-    int			modec)
+    صحيح			hl_id,
+    prt_متن_attr_T	*pattr,
+    صحيح			modec)
 {
-    int     colorindex;
+    صحيح     colorindex;
     long_u  fg_color;
     long_u  bg_color;
-    char    *color;
+    حرف    *color;
 
-    pattr->bold = (highlight_has_attr(hl_id, HL_BOLD, modec) != NULL);
-    pattr->italic = (highlight_has_attr(hl_id, HL_ITALIC, modec) != NULL);
-    pattr->underline = (highlight_has_attr(hl_id, HL_UNDERLINE, modec) != NULL);
-    pattr->undercurl = (highlight_has_attr(hl_id, HL_UNDERCURL, modec) != NULL);
+    pattr->bold = (highlight_has_attr(hl_id, HL_BOLD, modec) != عدم);
+    pattr->italic = (highlight_has_attr(hl_id, HL_ITALIC, modec) != عدم);
+    pattr->underline = (highlight_has_attr(hl_id, HL_UNDERLINE, modec) != عدم);
+    pattr->undercurl = (highlight_has_attr(hl_id, HL_UNDERCURL, modec) != عدم);
     // TODO: HL_UNDERDOUBLE, HL_UNDERDOTTED, HL_UNDERDASHED
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+# إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    إذا (USE_24_ٻٽو_انگ)
     {
 	bg_color = highlight_gui_color_rgb(hl_id, FALSE);
-	if (bg_color == PRCOLOR_BLACK)
+	إذا (bg_color == PRCOLOR_BLACK)
 	    bg_color = PRCOLOR_WHITE;
 
 	fg_color = highlight_gui_color_rgb(hl_id, TRUE);
     }
-    else
+    وإلا
 # endif
     {
 	bg_color = PRCOLOR_WHITE;
 
-	color = (char *)highlight_color(hl_id, (char_u *)"fg", modec);
-	if (color == NULL)
+	color = (حرف *)highlight_color(hl_id, (char_u *)"fg", modec);
+	إذا (color == عدم)
 	    colorindex = 0;
-	else
+	وإلا
 	    colorindex = atoi(color);
 
-	if (colorindex >= 0 && colorindex < t_colors)
-	    fg_color = prt_get_term_color(colorindex);
-	else
+	إذا (colorindex >= 0 && colorindex < t_colors)
+	    fg_color = prt_get_رڪن_color(colorindex);
+	وإلا
 	    fg_color = PRCOLOR_BLACK;
     }
 
-    if (fg_color == PRCOLOR_WHITE)
+    إذا (fg_color == PRCOLOR_WHITE)
 	fg_color = PRCOLOR_BLACK;
-    else if (*p_bg == 'd')
+    وإلا إذا (*p_bg == 'd')
 	fg_color = darken_rgb(fg_color);
 
     pattr->fg_color = fg_color;
     pattr->bg_color = bg_color;
 }
-#endif // FEAT_SYN_HL
+#جيڪڏهن_پورو // FEAT_SYN_HL
 
-    static void
-prt_set_fg(long_u fg)
+    ساكن فراغ
+prt_سيٽ_fg(long_u fg)
 {
-    if (fg == prt_curr_fg)
-	return;
+    إذا (fg == prt_curr_fg)
+	أرجع;
 
     prt_curr_fg = fg;
-    mch_print_set_fg(fg);
+    mch_print_سيٽ_fg(fg);
 }
 
-    static void
-prt_set_bg(long_u bg)
+    ساكن فراغ
+prt_سيٽ_bg(long_u bg)
 {
-    if (bg == prt_curr_bg)
-	return;
+    إذا (bg == prt_curr_bg)
+	أرجع;
 
     prt_curr_bg = bg;
-    mch_print_set_bg(bg);
+    mch_print_سيٽ_bg(bg);
 }
 
-    static void
-prt_set_font(int bold, int italic, int underline)
+    ساكن فراغ
+prt_سيٽ_font(صحيح bold, صحيح italic, صحيح underline)
 {
-    if (prt_curr_bold == bold
+    إذا (prt_curr_bold == bold
 	    && prt_curr_italic == italic
 	    && prt_curr_underline == underline)
-	return;
+	أرجع;
 
     prt_curr_underline = underline;
     prt_curr_italic = italic;
     prt_curr_bold = bold;
-    mch_print_set_font(bold, italic, underline);
+    mch_print_سيٽ_font(bold, italic, underline);
 }
 
 /*
  * Print the line number in the left margin.
  */
-    static void
-prt_line_number(
+    ساكن فراغ
+prt_سٽ_عدد(
     prt_settings_T *psettings,
-    int		page_line,
+    صحيح		صفحو_سٽ,
     linenr_T	lnum)
 {
-    int		i;
+    صحيح		i;
     char_u	tbuf[20];
 
-    prt_set_fg(psettings->number.fg_color);
-    prt_set_bg(psettings->number.bg_color);
-    prt_set_font(psettings->number.bold, psettings->number.italic, psettings->number.underline);
-    mch_print_start_line(TRUE, page_line);
+    prt_سيٽ_fg(psettings->عدد.fg_color);
+    prt_سيٽ_bg(psettings->عدد.bg_color);
+    prt_سيٽ_font(psettings->عدد.bold, psettings->عدد.italic, psettings->عدد.underline);
+    mch_print_شروعات_سٽ(TRUE, صفحو_سٽ);
 
     // Leave two spaces between the number and the text; depends on
     // PRINT_NUMBER_WIDTH.
-    sprintf((char *)tbuf, "%6ld", (long)lnum);
-    for (i = 0; i < 6; i++)
-	(void)mch_print_text_out(&tbuf[i], 1);
+    sprintf((حرف *)tbuf, "%6ld", (ڊگهو)lnum);
+    لكل (i = 0; i < 6; i++)
+	(فراغ)mch_print_متن_ٻاهريون(&tbuf[i], 1);
 
-#ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    إذا (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     {
 	// Set colors and font back to normal.
-	prt_set_fg(PRCOLOR_BLACK);
-	prt_set_bg(PRCOLOR_WHITE);
-	prt_set_font(FALSE, FALSE, FALSE);
+	prt_سيٽ_fg(PRCOLOR_BLACK);
+	prt_سيٽ_bg(PRCOLOR_WHITE);
+	prt_سيٽ_font(FALSE, FALSE, FALSE);
     }
 }
 
 /*
  * Get the currently effective header height.
  */
-    int
-prt_header_height(void)
+    صحيح
+prt_سرو_اوچائي(فراغ)
 {
-    if (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
-	return printer_opts[OPT_PRINT_HEADERHEIGHT].number;
-    return 2;
+    إذا (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
+	أرجع printer_opts[OPT_PRINT_HEADERHEIGHT].عدد;
+    أرجع 2;
 }
 
 /*
  * Return TRUE if using a line number for printing.
  */
-    int
-prt_use_number(void)
+    صحيح
+prt_use_عدد(فراغ)
 {
-    return (printer_opts[OPT_PRINT_NUMBER].present
-	    && TOLOWER_ASC(printer_opts[OPT_PRINT_NUMBER].string[0]) == 'y');
+    أرجع (printer_opts[OPT_PRINT_عدد].present
+	    && TOLOWER_ASC(printer_opts[OPT_PRINT_عدد].string[0]) == 'y');
 }
 
 /*
  * Return the unit used in a margin item in 'printoptions'.
  * Returns PRT_UNIT_NONE if not recognized.
  */
-    int
-prt_get_unit(int idx)
+    صحيح
+prt_get_unit(صحيح idx)
 {
-    int		u = PRT_UNIT_NONE;
-    int		i;
-    static char *(units[4]) = PRT_UNIT_NAMES;
+    صحيح		u = PRT_UNIT_NONE;
+    صحيح		i;
+    ساكن حرف *(units[4]) = PRT_UNIT_نالا;
 
-    if (!printer_opts[idx].present)
-	return PRT_UNIT_NONE;
+    إذا (!printer_opts[idx].present)
+	أرجع PRT_UNIT_NONE;
 
-    for (i = 0; i < 4; ++i)
-	if (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
+    لكل (i = 0; i < 4; ++i)
+	إذا (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
 	{
 	    u = i;
-	    break;
+	    اكسر;
 	}
-    return u;
+    أرجع u;
 }
 
 /*
  * Print the page header.
  */
-    static void
-prt_header(
+    ساكن فراغ
+prt_سرو(
     prt_settings_T  *psettings,
-    int		pagenum,
-    linenr_T	lnum UNUSED)
+    صحيح		pagenum,
+    linenr_T	lnum اڻ_استعمال_ٿيل)
 {
-    int		width = psettings->chars_per_line;
-    int		page_line;
+    صحيح		ويڪر = psettings->chars_في_سٽ;
+    صحيح		صفحو_سٽ;
     char_u	*tbuf;
     char_u	*p;
-    int		l;
+    صحيح		l;
 
     // Also use the space for the line number.
-    if (prt_use_number())
-	width += PRINT_NUMBER_WIDTH;
+    إذا (prt_use_عدد())
+	ويڪر += PRINT_عدد_ويڪر;
 
-    tbuf = alloc(width + IOSIZE);
-    if (tbuf == NULL)
-	return;
+    tbuf = alloc(ويڪر + IOSIZE);
+    إذا (tbuf == عدم)
+	أرجع;
 
-#ifdef FEAT_STL_OPT
-    if (*p_header != NUL)
+#جيڪڏهن_وصف_ٿيل FEAT_STL_OPT
+    إذا (*p_سرو != NUL)
     {
 	linenr_T	tmp_lnum, tmp_topline, tmp_botline;
 
@@ -488,100 +488,100 @@ prt_header(
 	curwin->w_cursor.lnum = lnum;
 	curwin->w_topline = lnum;
 	curwin->w_botline = lnum + 63;
-	printer_page_num = pagenum;
+	printer_صفحو_انگ = pagenum;
 
-	build_stl_str_hl(curwin, tbuf, (size_t)(width + IOSIZE), p_header,
-			 (char_u *)"printheader", 0, ' ', width, NULL, NULL,
-			 NULL);
+	build_stl_str_hl(curwin, tbuf, (size_t)(ويڪر + IOSIZE), p_سرو,
+			 (char_u *)"printheader", 0, ' ', ويڪر, عدم, عدم,
+			 عدم);
 
 	// Reset line numbers
 	curwin->w_cursor.lnum = tmp_lnum;
 	curwin->w_topline = tmp_topline;
 	curwin->w_botline = tmp_botline;
     }
-    else
-#endif
-	sprintf((char *)tbuf, _("Page %d"), pagenum);
+    وإلا
+#جيڪڏهن_پورو
+	sprintf((حرف *)tbuf, _("Page %d"), pagenum);
 
-    prt_set_fg(PRCOLOR_BLACK);
-    prt_set_bg(PRCOLOR_WHITE);
-    prt_set_font(TRUE, FALSE, FALSE);
+    prt_سيٽ_fg(PRCOLOR_BLACK);
+    prt_سيٽ_bg(PRCOLOR_WHITE);
+    prt_سيٽ_font(TRUE, FALSE, FALSE);
 
     // Use a negative line number to indicate printing in the top margin.
-    page_line = 0 - prt_header_height();
-    mch_print_start_line(TRUE, page_line);
-    for (p = tbuf; *p != NUL; )
+    صفحو_سٽ = 0 - prt_سرو_اوچائي();
+    mch_print_شروعات_سٽ(TRUE, صفحو_سٽ);
+    لكل (p = tbuf; *p != NUL; )
     {
-	if (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
+	إذا (mch_print_متن_ٻاهريون(p, (l = (*mb_ptr2len)(p))))
 	{
-	    ++page_line;
-	    if (page_line >= 0) // out of room in header
-		break;
-	    mch_print_start_line(TRUE, page_line);
+	    ++صفحو_سٽ;
+	    إذا (صفحو_سٽ >= 0) // out of room in header
+		اكسر;
+	    mch_print_شروعات_سٽ(TRUE, صفحو_سٽ);
 	}
 	p += l;
     }
 
     vim_free(tbuf);
 
-#ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    إذا (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     {
 	// Set colors and font back to normal.
-	prt_set_fg(PRCOLOR_BLACK);
-	prt_set_bg(PRCOLOR_WHITE);
-	prt_set_font(FALSE, FALSE, FALSE);
+	prt_سيٽ_fg(PRCOLOR_BLACK);
+	prt_سيٽ_bg(PRCOLOR_WHITE);
+	prt_سيٽ_font(FALSE, FALSE, FALSE);
     }
 }
 
 /*
  * Display a print status message.
  */
-    void
-prt_message(char_u *s)
+    فراغ
+prt_پيغام(char_u *s)
 {
-    screen_fill((int)Rows - 1, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-    screen_puts(s, (int)Rows - 1, 0, HL_ATTR(HLF_R));
-    out_flush();
+    screen_fill((صحيح)صفون - 1, (صحيح)صفون, 0, (صحيح)Columns, ' ', ' ', 0);
+    screen_puts(s, (صحيح)صفون - 1, 0, HL_ATTR(HLF_R));
+    ٻاهريون_flush();
 }
 
-    void
+    فراغ
 ex_hardcopy(exarg_T *eap)
 {
     linenr_T		lnum;
-    int			collated_copies, uncollated_copies;
+    صحيح			collated_copies, uncollated_copies;
     prt_settings_T	settings;
-    long_u		bytes_to_print = 0;
-    int			page_line;
-    int			jobsplit;
+    long_u		بائيٽون_منزل_print = 0;
+    صحيح			صفحو_سٽ;
+    صحيح			jobsplit;
 
-    CLEAR_FIELD(settings);
+    CLEAR_ميدان(settings);
     settings.has_color = TRUE;
-#ifdef FEAT_PRINT_PANGO
-    settings.user_abort_msg = TRUE;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_PRINT_PANGO
+    settings.user_abort_نياپو = TRUE;
+#جيڪڏهن_پورو
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    if (*eap->arg == '>')
+#إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    إذا (*eap->arg == '>')
     {
-	char	*errormsg = NULL;
+	حرف	*errormsg = عدم;
 
 	// Expand things like "%.ps".
-	if (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
+	إذا (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
 	{
-	    if (errormsg != NULL)
+	    إذا (errormsg != عدم)
 		emsg(errormsg);
-	    return;
+	    أرجع;
 	}
 	settings.outfile = skipwhite(eap->arg + 1);
     }
-    else if (*eap->arg != NUL)
+    وإلا إذا (*eap->arg != NUL)
 	settings.arguments = eap->arg;
-#endif
+#جيڪڏهن_پورو
 
     /*
      * Initialise for printing.  Ask the user for settings, unless forceit is
@@ -590,67 +590,67 @@ ex_hardcopy(exarg_T *eap)
      * not be a real printer - for example the engine might generate HTML or
      * PS.)
      */
-    if (mch_print_init(&settings,
-			curbuf->b_fname == NULL
+    إذا (mch_print_init(&settings,
+			curbuf->b_fname == عدم
 			    ? buf_spname(curbuf)
-			    : curbuf->b_sfname == NULL
+			    : curbuf->b_sfname == عدم
 				? curbuf->b_fname
 				: curbuf->b_sfname,
 			eap->forceit) == FAIL)
-	return;
+	أرجع;
 
-#ifdef FEAT_SYN_HL
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
 # ifdef  FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 	settings.modec = 'g';
-    else
+    وإلا
 # endif
-	if (t_colors > 1)
+	إذا (t_colors > 1)
 	    settings.modec = 'c';
-	else
+	وإلا
 	    settings.modec = 't';
 
-    if (!syntax_present(curwin))
+    إذا (!syntax_present(curwin))
 	settings.do_syntax = FALSE;
-    else if (printer_opts[OPT_PRINT_SYNTAX].present
+    وإلا إذا (printer_opts[OPT_PRINT_SYNTAX].present
 	    && TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) != 'a')
 	settings.do_syntax =
 	       (TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) == 'y');
-    else
+    وإلا
 	settings.do_syntax = settings.has_color;
-#endif
+#جيڪڏهن_پورو
 
     // Set up printing attributes for line numbers
-    settings.number.fg_color = PRCOLOR_BLACK;
-    settings.number.bg_color = PRCOLOR_WHITE;
-    settings.number.bold = FALSE;
-    settings.number.italic = TRUE;
-    settings.number.underline = FALSE;
-#ifdef FEAT_SYN_HL
+    settings.عدد.fg_color = PRCOLOR_BLACK;
+    settings.عدد.bg_color = PRCOLOR_WHITE;
+    settings.عدد.bold = FALSE;
+    settings.عدد.italic = TRUE;
+    settings.عدد.underline = FALSE;
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
     /*
      * Syntax highlighting of line numbers.
      */
-    if (prt_use_number() && settings.do_syntax)
+    إذا (prt_use_عدد() && settings.do_syntax)
     {
-	int		id;
+	صحيح		id;
 
 	id = syn_name2id((char_u *)"LineNr");
-	if (id > 0)
+	إذا (id > 0)
 	    id = syn_get_final_id(id);
 
-	prt_get_attr(id, &settings.number, settings.modec);
+	prt_get_attr(id, &settings.عدد, settings.modec);
     }
-#endif
+#جيڪڏهن_پورو
 
     /*
      * Estimate the total lines to be printed
      */
-    for (lnum = eap->line1; lnum <= eap->line2; lnum++)
-	bytes_to_print += (long_u)STRLEN(skipwhite(ml_get(lnum)));
-    if (bytes_to_print == 0)
+    لكل (lnum = eap->line1; lnum <= eap->line2; lnum++)
+	بائيٽون_منزل_print += (long_u)STRLEN(skipwhite(ml_get(lnum)));
+    إذا (بائيٽون_منزل_print == 0)
     {
-	msg(_("No text to be printed"));
-	goto print_fail_no_begin;
+	نياپو(_("No text to be printed"));
+	اذهب print_fail_no_begin;
     }
 
     // Set colors and font to normal.
@@ -660,63 +660,63 @@ ex_hardcopy(exarg_T *eap)
     prt_curr_bold = MAYBE;
     prt_curr_underline = MAYBE;
 
-    prt_set_fg(PRCOLOR_BLACK);
-    prt_set_bg(PRCOLOR_WHITE);
-    prt_set_font(FALSE, FALSE, FALSE);
-#ifdef FEAT_SYN_HL
+    prt_سيٽ_fg(PRCOLOR_BLACK);
+    prt_سيٽ_bg(PRCOLOR_WHITE);
+    prt_سيٽ_font(FALSE, FALSE, FALSE);
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
     current_syn_id = -1;
-#endif
+#جيڪڏهن_پورو
 
     jobsplit = (printer_opts[OPT_PRINT_JOBSPLIT].present
 	   && TOLOWER_ASC(printer_opts[OPT_PRINT_JOBSPLIT].string[0]) == 'y');
 
-    if (!mch_print_begin(&settings))
-	goto print_fail_no_begin;
+    إذا (!mch_print_begin(&settings))
+	اذهب print_fail_no_begin;
 
     /*
      * Loop over collated copies: 1 2 3, 1 2 3, ...
      */
-    prt_page_count = 0;
-    for (collated_copies = 0;
+    prt_صفحو_ڳڻپ = 0;
+    لكل (collated_copies = 0;
 	    collated_copies < settings.n_collated_copies;
 	    collated_copies++)
     {
 	prt_pos_T	prtpos;		// current print position
-	prt_pos_T	page_prtpos;	// print position at page start
-	int		side;
+	prt_pos_T	صفحو_prtpos;	// print position at page start
+	صحيح		side;
 
-	CLEAR_FIELD(page_prtpos);
-	page_prtpos.file_line = eap->line1;
-	prtpos = page_prtpos;
+	CLEAR_ميدان(صفحو_prtpos);
+	صفحو_prtpos.file_سٽ = eap->line1;
+	prtpos = صفحو_prtpos;
 
-	if (jobsplit && collated_copies > 0)
+	إذا (jobsplit && collated_copies > 0)
 	{
 	    // Splitting jobs: Stop a previous job and start a new one.
-	    mch_print_end(&settings);
-	    if (!mch_print_begin(&settings))
-		goto print_fail_no_begin;
+	    mch_print_پڇاڙي(&settings);
+	    إذا (!mch_print_begin(&settings))
+		اذهب print_fail_no_begin;
 	}
 
 	/*
 	 * Loop over all pages in the print job: 1 2 3 ...
 	 */
-	for (prt_page_count = 0; prtpos.file_line <= eap->line2; ++prt_page_count)
+	لكل (prt_صفحو_ڳڻپ = 0; prtpos.file_سٽ <= eap->line2; ++prt_صفحو_ڳڻپ)
 	{
 	    /*
 	     * Loop over uncollated copies: 1 1 1, 2 2 2, 3 3 3, ...
 	     * For duplex: 12 12 12 34 34 34, ...
 	     */
-	    for (uncollated_copies = 0;
+	    لكل (uncollated_copies = 0;
 		    uncollated_copies < settings.n_uncollated_copies;
 		    uncollated_copies++)
 	    {
 		// Set the print position to the start of this page.
-		prtpos = page_prtpos;
+		prtpos = صفحو_prtpos;
 
 		/*
 		 * Do front and rear side of a page.
 		 */
-		for (side = 0; side <= settings.duplex; ++side)
+		لكل (side = 0; side <= settings.duplex; ++side)
 		{
 		    /*
 		     * Print one page.
@@ -724,95 +724,95 @@ ex_hardcopy(exarg_T *eap)
 
 		    // Check for interrupt character every page.
 		    ui_breakcheck();
-		    if (got_int || settings.user_abort)
-			goto print_fail;
+		    إذا (got_int || settings.user_abort)
+			اذهب print_fail;
 
-		    sprintf((char *)IObuff, _("Printing page %d (%d%%)"),
-			    prt_page_count + 1 + side,
-			    prtpos.bytes_printed > 1000000
-				? (int)(prtpos.bytes_printed /
-						       (bytes_to_print / 100))
-				: (int)((prtpos.bytes_printed * 100)
-							   / bytes_to_print));
-		    if (!mch_print_begin_page(IObuff))
-			goto print_fail;
+		    sprintf((حرف *)IObuff, _("Printing page %d (%d%%)"),
+			    prt_صفحو_ڳڻپ + 1 + side,
+			    prtpos.بائيٽون_printed > 1000000
+				? (صحيح)(prtpos.بائيٽون_printed /
+						       (بائيٽون_منزل_print / 100))
+				: (صحيح)((prtpos.بائيٽون_printed * 100)
+							   / بائيٽون_منزل_print));
+		    إذا (!mch_print_begin_صفحو(IObuff))
+			اذهب print_fail;
 
-		    if (settings.n_collated_copies > 1)
-			sprintf((char *)IObuff + STRLEN(IObuff),
+		    إذا (settings.n_collated_copies > 1)
+			sprintf((حرف *)IObuff + STRLEN(IObuff),
 				_(" Copy %d of %d"),
 				collated_copies + 1,
 				settings.n_collated_copies);
-		    prt_message(IObuff);
+		    prt_پيغام(IObuff);
 
 		    /*
 		     * Output header if required
 		     */
-		    if (prt_header_height() > 0)
-			prt_header(&settings, prt_page_count + 1 + side,
-							prtpos.file_line);
+		    إذا (prt_سرو_اوچائي() > 0)
+			prt_سرو(&settings, prt_صفحو_ڳڻپ + 1 + side,
+							prtpos.file_سٽ);
 
-		    for (page_line = 0; page_line < settings.lines_per_page;
-								  ++page_line)
+		    لكل (صفحو_سٽ = 0; صفحو_سٽ < settings.سٽون_في_صفحو;
+								  ++صفحو_سٽ)
 		    {
-			prtpos.column = hardcopy_line(&settings,
-							   page_line, &prtpos);
-			if (prtpos.column == 0)
+			prtpos.ڪالم = hardcopy_سٽ(&settings,
+							   صفحو_سٽ, &prtpos);
+			إذا (prtpos.ڪالم == 0)
 			{
 			    // finished a file line
-			    prtpos.bytes_printed +=
-				  STRLEN(skipwhite(ml_get(prtpos.file_line)));
-			    if (++prtpos.file_line > eap->line2)
-				break; // reached the end
+			    prtpos.بائيٽون_printed +=
+				  STRLEN(skipwhite(ml_get(prtpos.file_سٽ)));
+			    إذا (++prtpos.file_سٽ > eap->line2)
+				اكسر; // reached the end
 			}
-			else if (prtpos.ff)
+			وإلا إذا (prtpos.ff)
 			{
 			    // Line had a formfeed in it - start new page but
 			    // stay on the current line
-			    break;
+			    اكسر;
 			}
 		    }
 
-		    if (!mch_print_end_page())
-			goto print_fail;
-		    if (prtpos.file_line > eap->line2)
-			break; // reached the end
+		    إذا (!mch_print_پڇاڙي_صفحو())
+			اذهب print_fail;
+		    إذا (prtpos.file_سٽ > eap->line2)
+			اكسر; // reached the end
 		}
 
 		/*
 		 * Extra blank page for duplexing with odd number of pages and
 		 * more copies to come.
 		 */
-		if (prtpos.file_line > eap->line2 && settings.duplex
+		إذا (prtpos.file_سٽ > eap->line2 && settings.duplex
 								 && side == 0
 		    && uncollated_copies + 1 < settings.n_uncollated_copies)
 		{
-		    if (!mch_print_blank_page())
-			goto print_fail;
+		    إذا (!mch_print_blank_صفحو())
+			اذهب print_fail;
 		}
 	    }
-	    if (settings.duplex && prtpos.file_line <= eap->line2)
-		++prt_page_count;
+	    إذا (settings.duplex && prtpos.file_سٽ <= eap->line2)
+		++prt_صفحو_ڳڻپ;
 
 	    // Remember the position where the next page starts.
-	    page_prtpos = prtpos;
+	    صفحو_prtpos = prtpos;
 	}
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Printed: %s"),
+	vim_snprintf((حرف *)IObuff, IOSIZE, _("Printed: %s"),
 							    settings.jobname);
-	prt_message(IObuff);
+	prt_پيغام(IObuff);
     }
 
 print_fail:
-    if (got_int || (settings.user_abort
-#ifdef FEAT_PRINT_PANGO
-		&& settings.user_abort_msg
-#endif
+    إذا (got_int || (settings.user_abort
+#جيڪڏهن_وصف_ٿيل FEAT_PRINT_PANGO
+		&& settings.user_abort_نياپو
+#جيڪڏهن_پورو
 		))
     {
-	sprintf((char *)IObuff, "%s", _("Printing aborted"));
-	prt_message(IObuff);
+	sprintf((حرف *)IObuff, "%s", _("Printing aborted"));
+	prt_پيغام(IObuff);
     }
-    mch_print_end(&settings);
+    mch_print_پڇاڙي(&settings);
 
 print_fail_no_begin:
     mch_print_cleanup();
@@ -822,100 +822,100 @@ print_fail_no_begin:
  * Print one page line.
  * Return the next column to print, or zero if the line is finished.
  */
-    static colnr_T
-hardcopy_line(
+    ساكن colnr_T
+hardcopy_سٽ(
     prt_settings_T	*psettings,
-    int			page_line,
+    صحيح			صفحو_سٽ,
     prt_pos_T		*ppos)
 {
-    colnr_T	col;
-    char_u	*line;
-    int		need_break = FALSE;
-    int		outputlen;
-    int		tab_spaces;
+    colnr_T	کانو;
+    char_u	*سٽ;
+    صحيح		need_break = FALSE;
+    صحيح		outputlen;
+    صحيح		tab_spaces;
     long_u	print_pos;
-#ifdef FEAT_SYN_HL
-    prt_text_attr_T attr;
-    int		id;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    prt_متن_attr_T attr;
+    صحيح		id;
+#جيڪڏهن_پورو
 
-    if (ppos->column == 0 || ppos->ff)
+    إذا (ppos->ڪالم == 0 || ppos->ff)
     {
 	print_pos = 0;
 	tab_spaces = 0;
-	if (!ppos->ff && prt_use_number())
-	    prt_line_number(psettings, page_line, ppos->file_line);
+	إذا (!ppos->ff && prt_use_عدد())
+	    prt_سٽ_عدد(psettings, صفحو_سٽ, ppos->file_سٽ);
 	ppos->ff = FALSE;
     }
-    else
+    وإلا
     {
 	// left over from wrap halfway a tab
 	print_pos = ppos->print_pos;
 	tab_spaces = ppos->lead_spaces;
     }
 
-    mch_print_start_line(0, page_line);
-    line = ml_get(ppos->file_line);
+    mch_print_شروعات_سٽ(0, صفحو_سٽ);
+    سٽ = ml_get(ppos->file_سٽ);
 
     /*
      * Loop over the columns until the end of the file line or right margin.
      */
-    for (col = ppos->column; line[col] != NUL && !need_break; col += outputlen)
+    لكل (کانو = ppos->ڪالم; سٽ[کانو] != NUL && !need_break; کانو += outputlen)
     {
 	outputlen = 1;
-	if (has_mbyte && (outputlen = (*mb_ptr2len)(line + col)) < 1)
+	إذا (has_mbyte && (outputlen = (*mb_ptr2len)(سٽ + کانو)) < 1)
 	    outputlen = 1;
-#ifdef FEAT_SYN_HL
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
 	/*
 	 * syntax highlighting stuff.
 	 */
-	if (psettings->do_syntax)
+	إذا (psettings->do_syntax)
 	{
-	    id = syn_get_id(curwin, ppos->file_line, col, 1, NULL, FALSE);
-	    if (id > 0)
+	    id = syn_get_id(curwin, ppos->file_سٽ, کانو, 1, عدم, FALSE);
+	    إذا (id > 0)
 		id = syn_get_final_id(id);
-	    else
+	    وإلا
 		id = 0;
 	    // Get the line again, a multi-line regexp may invalidate it.
-	    line = ml_get(ppos->file_line);
+	    سٽ = ml_get(ppos->file_سٽ);
 
-	    if (id != current_syn_id)
+	    إذا (id != current_syn_id)
 	    {
 		current_syn_id = id;
 		prt_get_attr(id, &attr, psettings->modec);
-		prt_set_font(attr.bold, attr.italic, attr.underline);
-		prt_set_fg(attr.fg_color);
-		prt_set_bg(attr.bg_color);
+		prt_سيٽ_font(attr.bold, attr.italic, attr.underline);
+		prt_سيٽ_fg(attr.fg_color);
+		prt_سيٽ_bg(attr.bg_color);
 	    }
 	}
-#endif
+#جيڪڏهن_پورو
 
 	/*
 	 * Appropriately expand any tabs to spaces.
 	 */
-	if (line[col] == TAB || tab_spaces != 0)
+	إذا (سٽ[کانو] == TAB || tab_spaces != 0)
 	{
-	    if (tab_spaces == 0)
-#ifdef FEAT_VARTABS
+	    إذا (tab_spaces == 0)
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
 		tab_spaces = tabstop_padding(print_pos, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_spaces = (int)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
-#endif
+#وإلا
+		tab_spaces = (صحيح)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
+#جيڪڏهن_پورو
 
-	    while (tab_spaces > 0)
+	    طالما (tab_spaces > 0)
 	    {
-		need_break = mch_print_text_out((char_u *)" ", 1);
+		need_break = mch_print_متن_ٻاهريون((char_u *)" ", 1);
 		print_pos++;
 		tab_spaces--;
-		if (need_break)
-		    break;
+		إذا (need_break)
+		    اكسر;
 	    }
 	    // Keep the TAB if we didn't finish it.
-	    if (need_break && tab_spaces > 0)
-		break;
+	    إذا (need_break && tab_spaces > 0)
+		اكسر;
 	}
-	else if (line[col] == FF
+	وإلا إذا (سٽ[کانو] == FF
 		&& printer_opts[OPT_PRINT_FORMFEED].present
 		&& TOLOWER_ASC(printer_opts[OPT_PRINT_FORMFEED].string[0])
 								       == 'y')
@@ -923,30 +923,30 @@ hardcopy_line(
 	    ppos->ff = TRUE;
 	    need_break = 1;
 	}
-	else
+	وإلا
 	{
-	    need_break = mch_print_text_out(line + col, outputlen);
-	    if (has_mbyte)
-		print_pos += (*mb_ptr2cells)(line + col);
-	    else
+	    need_break = mch_print_متن_ٻاهريون(سٽ + کانو, outputlen);
+	    إذا (has_mbyte)
+		print_pos += (*mb_ptr2cells)(سٽ + کانو);
+	    وإلا
 		print_pos++;
 	}
     }
 
     ppos->lead_spaces = tab_spaces;
-    ppos->print_pos = (int)print_pos;
+    ppos->print_pos = (صحيح)print_pos;
 
     /*
      * Start next line of file if we clip lines, or have reached end of the
      * line, unless we are doing a formfeed.
      */
-    if (!ppos->ff
-	    && (line[col] == NUL
+    إذا (!ppos->ff
+	    && (سٽ[کانو] == NUL
 		|| (printer_opts[OPT_PRINT_WRAP].present
 		    && TOLOWER_ASC(printer_opts[OPT_PRINT_WRAP].string[0])
 								     == 'n')))
-	return 0;
-    return col;
+	أرجع 0;
+    أرجع کانو;
 }
 
-#endif //FEAT_PRINTER
+#جيڪڏهن_پورو //FEAT_PRINTER

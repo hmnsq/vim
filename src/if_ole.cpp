@@ -6,73 +6,73 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#if defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
+#إذا defined(FEAT_OLE) && defined(FEAT_GUI_MSWIN)
 /*
  * OLE server implementation.
  *
  * See os_mswin.c for the client side.
  */
-extern "C" {
+خارجي "C" {
 # include "vim.h"
 }
 
-#include <windows.h>
-#include <oleauto.h>
+#ضمن <windows.h>
+#ضمن <oleauto.h>
 
-extern "C" {
-extern HWND s_hwnd;
-extern HWND vim_parent_hwnd;
+خارجي "C" {
+خارجي HWND s_hwnd;
+خارجي HWND vim_والد_hwnd;
 }
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#إذا (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#وإلا
 # define FINAL
-#endif
+#جيڪڏهن_پورو
 
-#include "if_ole.h"	// Interface definitions
-#include "iid_ole.c"	// UUID definitions (compile here)
+#ضمن "if_ole.h"	// Interface definitions
+#ضمن "iid_ole.c"	// UUID definitions (compile here)
 
 /* Supply function prototype to work around bug in Mingw oleauto.h header */
-#ifdef __MINGW32__
-WINOLEAUTAPI UnRegisterTypeLib(REFGUID libID, WORD wVerMajor,
-	    WORD wVerMinor, LCID lcid, SYSKIND syskind);
-#endif
+#جيڪڏهن_وصف_ٿيل __MINGW32__
+WINOLEAUTAPI Un_رجسٽر_Type_Lib(REFGUID libID, لفظ_2 wVerMajor,
+	    لفظ_2 wVerMinor, LCID lcid, SYSKIND syskind);
+#جيڪڏهن_پورو
 
 /*****************************************************************************
  1. Internal definitions for this file
 *****************************************************************************/
 
-class CVim;
-class CVimCF;
+صنف CVim;
+صنف CVimCF;
 
 /* Internal data */
 // The identifier of the registered class factory
-static unsigned long cf_id = 0;
+ساكن بنانشان ڊگهو cf_id = 0;
 
 // The identifier of the running application object
-static unsigned long app_id = 0;
+ساكن بنانشان ڊگهو app_id = 0;
 
 // The single global instance of the class factory
-static CVimCF *cf = 0;
+ساكن CVimCF *cf = 0;
 
 // The single global instance of the application object
-static CVim *app = 0;
+ساكن CVim *app = 0;
 
 /* GUIDs, versions and type library information */
-#define MYCLSID CLSID_Vim
-#define MYLIBID LIBID_Vim
-#define MYIID IID_IVim
+#وصف_ڪريو MYCLSID CLSID_Vim
+#وصف_ڪريو MYLIBID LIBID_Vim
+#وصف_ڪريو MYIID IID_IVim
 
-#define MAJORVER 1
-#define MINORVER 0
-#define LOCALE 0x0409
+#وصف_ڪريو MAJORVER 1
+#وصف_ڪريو MINORVER 0
+#وصف_ڪريو LOCALE 0x0409
 
-#define MYNAME "Vim"
-#define MYPROGID "Vim.Application.1"
-#define MYVIPROGID "Vim.Application"
+#وصف_ڪريو MYNAME "Vim"
+#وصف_ڪريو MYPROGID "Vim.Application.1"
+#وصف_ڪريو MYVIPROGID "Vim.Application"
 
-#define MAX_CLSID_LEN 100
+#وصف_ڪريو MAX_CLSID_LEN 100
 
 /*****************************************************************************
  2. The application object
@@ -82,35 +82,35 @@ static CVim *app = 0;
  * ----------
  */
 
-class CVim FINAL : public IVim
+صنف CVim FINAL : عام IVim
 {
-public:
-    virtual ~CVim();
-    static CVim *Create(int *pbDoRestart);
+عام:
+    مجازي ~CVim();
+    ساكن CVim *Create(صحيح *pbDoRestart);
 
     // IUnknown members
-    STDMETHOD(QueryInterface)(REFIID riid, void ** ppv);
-    STDMETHOD_(unsigned long, AddRef)(void);
-    STDMETHOD_(unsigned long, Release)(void);
+    STDMETHOD(QueryInterface)(REFIID riid, فراغ ** ppv);
+    STDMETHOD_(بنانشان ڊگهو, جوڙيو_Ref)(فراغ);
+    STDMETHOD_(بنانشان ڊگهو, Release)(فراغ);
 
     // IDispatch members
-    STDMETHOD(GetTypeInfoCount)(UINT *pCount);
+    STDMETHOD(Get_Type_Info_ڳڻپ)(UINT *p_ڳڻپ);
     STDMETHOD(GetTypeInfo)(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo);
-    STDMETHOD(GetIDsOfNames)(const IID &iid, OLECHAR **names, UINT n, LCID, DISPID *dispids);
-    STDMETHOD(Invoke)(DISPID member, const IID &iid, LCID, WORD flags, DISPPARAMS *dispparams, VARIANT *result, EXCEPINFO *excepinfo, UINT *argerr);
+    STDMETHOD(Get_IDs_جو_نالا)(ثابت IID &iid, OLECHAR **نالا, UINT n, LCID, DISPID *dispids);
+    STDMETHOD(Invoke)(DISPID member, ثابت IID &iid, LCID, لفظ_2 flags, DISPPARAMS *dispparams, VARIANT *نتيجو, EXCEPINFO *excepinfo, UINT *argerr);
 
     // IVim members
-    STDMETHOD(SendKeys)(BSTR keys);
-    STDMETHOD(Eval)(BSTR expr, BSTR *result);
-    STDMETHOD(SetForeground)(void);
-    STDMETHOD(GetHwnd)(UINT_PTR *result);
+    STDMETHOD(Send_ڪنجيون)(BSTR ڪنجيون);
+    STDMETHOD(Eval)(BSTR اظهار, BSTR *نتيجو);
+    STDMETHOD(سيٽ_Foreground)(فراغ);
+    STDMETHOD(GetHwnd)(UINT_PTR *نتيجو);
 
-private:
+خاص:
     // Constructor is private - create using CVim::Create()
     CVim() : ref(0), typeinfo(0) {};
 
     // Reference count
-    unsigned long ref;
+    بنانشان ڊگهو ref;
 
     // The object's TypeInfo
     ITypeInfo *typeinfo;
@@ -120,7 +120,7 @@ private:
  * --------------
  */
 
-CVim *CVim::Create(int *pbDoRestart)
+CVim *CVim::Create(صحيح *pbDoRestart)
 {
     HRESULT hr;
     CVim *me = 0;
@@ -130,93 +130,93 @@ CVim *CVim::Create(int *pbDoRestart)
     *pbDoRestart = FALSE;
 
     // Create the object
-    me = new CVim();
-    if (me == NULL)
+    me = جديد CVim();
+    إذا (me == عدم)
     {
-	MessageBox(0, "Cannot create application object", "Vim Initialisation", 0);
-	return NULL;
+	پيغام_Box(0, "Cannot create application object", "Vim Initialisation", 0);
+	أرجع عدم;
     }
 
     // Load the type library from the registry
-    hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-    if (FAILED(hr))
+    hr = ڀريو_Reg_Type_Lib(MYLIBID, 1, 0, 0x00, &typelib);
+    إذا (FAILED(hr))
     {
-	HKEY hKey;
+	HKEY h_ڪنجي;
 
 	// Check we can write to the registry.
 	// RegCreateKeyEx succeeds even if key exists. W.Briscoe W2K 20021011
-	if (RegCreateKeyEx(HKEY_CLASSES_ROOT, MYVIPROGID, 0, NULL,
+	إذا (Reg_Create_ڪنجي_Ex(HKEY_CLASSES_پاڙ, MYVIPROGID, 0, عدم,
 		  REG_OPTION_NON_VOLATILE,
-		  KEY_ALL_ACCESS, NULL, &hKey, NULL))
+		  ڪنجي_ALL_ACCESS, عدم, &h_ڪنجي, عدم))
 	{
-	    delete me;
-	    return NULL; // Unable to write to registry. Quietly fail.
+	    ميٽيو me;
+	    أرجع عدم; // Unable to write to registry. Quietly fail.
 	}
-	RegCloseKey(hKey);
+	Reg_Close_ڪنجي(h_ڪنجي);
 
-	if (MessageBox(0, "Cannot load registered type library.\nDo you want to register Vim now?",
+	إذا (پيغام_Box(0, "Cannot load registered type library.\nDo you want to register Vim now?",
 		    "Vim Initialisation", MB_YESNO | MB_ICONQUESTION) != IDYES)
 	{
-	    delete me;
-	    return NULL;
+	    ميٽيو me;
+	    أرجع عدم;
 	}
 
-	RegisterMe(FALSE);
+	رجسٽر_Me(FALSE);
 
 	// Load the type library from the registry
-	hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
-	if (FAILED(hr))
+	hr = ڀريو_Reg_Type_Lib(MYLIBID, 1, 0, 0x00, &typelib);
+	إذا (FAILED(hr))
 	{
-	    MessageBox(0, "You must restart Vim in order for the registration to take effect.",
+	    پيغام_Box(0, "You must restart Vim in order for the registration to take effect.",
 						     "Vim Initialisation", 0);
 	    *pbDoRestart = TRUE;
-	    delete me;
-	    return NULL;
+	    ميٽيو me;
+	    أرجع عدم;
 	}
     }
 
     // Get the type info of the vtable interface
-    hr = typelib->GetTypeInfoOfGuid(MYIID, &typeinfo);
+    hr = typelib->Get_Type_Info_جو_Guid(MYIID, &typeinfo);
     typelib->Release();
 
-    if (FAILED(hr))
+    إذا (FAILED(hr))
     {
-	MessageBox(0, "Cannot get interface type information",
+	پيغام_Box(0, "Cannot get interface type information",
 						     "Vim Initialisation", 0);
-	delete me;
-	return NULL;
+	ميٽيو me;
+	أرجع عدم;
     }
 
     // Save the type information
     me->typeinfo = typeinfo;
-    return me;
+    أرجع me;
 }
 
 CVim::~CVim()
 {
-    if (typeinfo && vim_parent_hwnd == NULL)
+    إذا (typeinfo && vim_والد_hwnd == عدم)
 	typeinfo->Release();
     typeinfo = 0;
 }
 
 STDMETHODIMP
-CVim::QueryInterface(REFIID riid, void **ppv)
+CVim::QueryInterface(REFIID riid, فراغ **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
+    إذا (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IDispatch) || IsEqualIID(riid, MYIID))
     {
-	AddRef();
-	*ppv = this;
-	return S_OK;
+	جوڙيو_Ref();
+	*ppv = هذا;
+	أرجع S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    أرجع E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
-CVim::AddRef()
+CVim::جوڙيو_Ref()
 {
-    return ++ref;
+    أرجع ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -225,16 +225,16 @@ CVim::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    إذا (ref > 0)
 	--ref;
-    return ref;
+    أرجع ref;
 }
 
 STDMETHODIMP
-CVim::GetTypeInfoCount(UINT *pCount)
+CVim::Get_Type_Info_ڳڻپ(UINT *p_ڳڻپ)
 {
-    *pCount = 1;
-    return S_OK;
+    *p_ڳڻپ = 1;
+    أرجع S_OK;
 }
 
 STDMETHODIMP
@@ -242,94 +242,94 @@ CVim::GetTypeInfo(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo)
 {
     *ppITypeInfo = 0;
 
-    if (iTypeInfo != 0)
-	return DISP_E_BADINDEX;
+    إذا (iTypeInfo != 0)
+	أرجع DISP_E_BADINDEX;
 
-    typeinfo->AddRef();
+    typeinfo->جوڙيو_Ref();
     *ppITypeInfo = typeinfo;
-    return S_OK;
+    أرجع S_OK;
 }
 
 STDMETHODIMP
-CVim::GetIDsOfNames(
-	const IID &iid,
-	OLECHAR **names,
+CVim::Get_IDs_جو_نالا(
+	ثابت IID &iid,
+	OLECHAR **نالا,
 	UINT n,
 	LCID,
 	DISPID *dispids)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    إذا (iid != IID_NULL)
+	أرجع DISP_E_UNKNOWNINTERFACE;
 
-    return typeinfo->GetIDsOfNames(names, n, dispids);
+    أرجع typeinfo->Get_IDs_جو_نالا(نالا, n, dispids);
 }
 
 STDMETHODIMP
 CVim::Invoke(
 	DISPID member,
-	const IID &iid,
+	ثابت IID &iid,
 	LCID,
-	WORD flags,
+	لفظ_2 flags,
 	DISPPARAMS *dispparams,
-	VARIANT *result,
+	VARIANT *نتيجو,
 	EXCEPINFO *excepinfo,
 	UINT *argerr)
 {
-    if (iid != IID_NULL)
-	return DISP_E_UNKNOWNINTERFACE;
+    إذا (iid != IID_NULL)
+	أرجع DISP_E_UNKNOWNINTERFACE;
 
-    ::SetErrorInfo(0, NULL);
-    return typeinfo->Invoke(static_cast<IDispatch*>(this),
+    ::سيٽ_Error_Info(0, عدم);
+    أرجع typeinfo->Invoke(static_cast<IDispatch*>(هذا),
 			    member, flags, dispparams,
-			    result, excepinfo, argerr);
+			    نتيجو, excepinfo, argerr);
 }
 
 STDMETHODIMP
-CVim::GetHwnd(UINT_PTR *result)
+CVim::GetHwnd(UINT_PTR *نتيجو)
 {
-    *result = (UINT_PTR)s_hwnd;
-    return S_OK;
+    *نتيجو = (UINT_PTR)s_hwnd;
+    أرجع S_OK;
 }
 
 STDMETHODIMP
-CVim::SetForeground(void)
+CVim::سيٽ_Foreground(فراغ)
 {
     /* Make the Vim window come to the foreground */
-    gui_mch_set_foreground();
-    return S_OK;
+    gui_mch_سيٽ_foreground();
+    أرجع S_OK;
 }
 
 STDMETHODIMP
-CVim::SendKeys(BSTR keys)
+CVim::Send_ڪنجيون(BSTR ڪنجيون)
 {
-    int len;
-    char *buffer;
+    صحيح len;
+    حرف *بفر;
     char_u *str;
     char_u *ptr;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, 0, 0, 0, 0);
-    buffer = (char *)alloc(len+1);
+    len = Wide_Char_منزل_Multi_Byte(CP_ACP, 0, ڪنجيون, -1, 0, 0, 0, 0);
+    بفر = (حرف *)alloc(len+1);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    إذا (بفر == عدم)
+	أرجع E_OUTOFMEMORY;
 
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, buffer, len, 0, 0);
+    len = Wide_Char_منزل_Multi_Byte(CP_ACP, 0, ڪنجيون, -1, بفر, len, 0, 0);
 
-    if (len == 0)
+    إذا (len == 0)
     {
-	vim_free(buffer);
-	return E_INVALIDARG;
+	vim_free(بفر);
+	أرجع E_INVALIDARG;
     }
 
     /* Translate key codes like <Esc> */
-    str = replace_termcodes((char_u *)buffer, &ptr, 0, REPTERM_DO_LT, NULL);
+    str = replace_termcodes((char_u *)بفر, &ptr, 0, REPTERM_DO_LT, عدم);
 
     /* If ptr was set, then a new buffer was allocated,
      * so we can free the old one.
      */
-    if (ptr)
-	vim_free((char_u *)(buffer));
+    إذا (ptr)
+	vim_free((char_u *)(بفر));
 
     /* Reject strings too long to fit in the input buffer. Allow 10 bytes
      * space to cover for the (remote) possibility that characters may enter
@@ -337,76 +337,76 @@ CVim::SendKeys(BSTR keys)
      * processed. If more than 10 characters enter the input buffer in that
      * time, the WM_OLE processing will simply fail to insert the characters.
      */
-    if ((int)(STRLEN(str)) > (vim_free_in_input_buf() - 10))
+    إذا ((صحيح)(STRLEN(str)) > (vim_free_اندريون_داخلا_buf() - 10))
     {
 	vim_free(str);
-	return E_INVALIDARG;
+	أرجع E_INVALIDARG;
     }
 
     /* Pass the string to the main input loop. The memory will be freed when
      * the message is processed.  Except for an empty message, we don't need
      * to post it then.
      */
-    if (*str == NUL)
+    إذا (*str == NUL)
 	vim_free(str);
-    else
-	PostMessage(NULL, WM_OLE, 0, (LPARAM)str);
+    وإلا
+	Post_پيغام(عدم, WM_OLE, 0, (LPARAM)str);
 
-    return S_OK;
+    أرجع S_OK;
 }
 
 STDMETHODIMP
-CVim::Eval(BSTR expr, BSTR *result)
+CVim::Eval(BSTR اظهار, BSTR *نتيجو)
 {
-#ifdef FEAT_EVAL
-    int len;
-    char *buffer;
-    char *str;
-    wchar_t *w_buffer;
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+    صحيح len;
+    حرف *بفر;
+    حرف *str;
+    wchar_t *w_بفر;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, 0, 0, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    len = Wide_Char_منزل_Multi_Byte(CP_ACP, 0, اظهار, -1, 0, 0, 0, 0);
+    إذا (len == 0)
+	أرجع E_INVALIDARG;
 
-    buffer = (char *)alloc(len);
+    بفر = (حرف *)alloc(len);
 
-    if (buffer == NULL)
-	return E_OUTOFMEMORY;
+    إذا (بفر == عدم)
+	أرجع E_OUTOFMEMORY;
 
     /* Convert the (wide character) expression to an ASCII string */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, buffer, len, 0, 0);
-    if (len == 0)
-	return E_INVALIDARG;
+    len = Wide_Char_منزل_Multi_Byte(CP_ACP, 0, اظهار, -1, بفر, len, 0, 0);
+    إذا (len == 0)
+	أرجع E_INVALIDARG;
 
     /* Evaluate the expression */
     ++emsg_skip;
-    str = (char *)eval_to_string((char_u *)buffer, TRUE, FALSE);
+    str = (حرف *)eval_منزل_string((char_u *)بفر, TRUE, FALSE);
     --emsg_skip;
-    vim_free(buffer);
-    if (str == NULL)
-	return E_FAIL;
+    vim_free(بفر);
+    إذا (str == عدم)
+	أرجع E_FAIL;
 
     /* Convert the result to wide characters */
-    MultiByteToWideChar_alloc(CP_ACP, 0, str, -1, &w_buffer, &len);
+    Multi_Byte_منزل_Wide_Char_alloc(CP_ACP, 0, str, -1, &w_بفر, &len);
     vim_free(str);
-    if (w_buffer == NULL)
-	return E_OUTOFMEMORY;
+    إذا (w_بفر == عدم)
+	أرجع E_OUTOFMEMORY;
 
-    if (len == 0)
+    إذا (len == 0)
     {
-	vim_free(w_buffer);
-	return E_FAIL;
+	vim_free(w_بفر);
+	أرجع E_FAIL;
     }
 
     /* Store the result */
-    *result = SysAllocString(w_buffer);
-    vim_free(w_buffer);
+    *نتيجو = SysAllocString(w_بفر);
+    vim_free(w_بفر);
 
-    return S_OK;
-#else
-    return E_NOTIMPL;
-#endif
+    أرجع S_OK;
+#وإلا
+    أرجع E_NOTIMPL;
+#جيڪڏهن_پورو
 }
 
 /*****************************************************************************
@@ -417,24 +417,24 @@ CVim::Eval(BSTR expr, BSTR *result)
  * ----------
  */
 
-class CVimCF FINAL : public IClassFactory
+صنف CVimCF FINAL : عام IClassFactory
 {
-public:
-    static CVimCF *Create();
-    virtual ~CVimCF() {};
+عام:
+    ساكن CVimCF *Create();
+    مجازي ~CVimCF() {};
 
-    STDMETHOD(QueryInterface)(REFIID riid, void ** ppv);
-    STDMETHOD_(unsigned long, AddRef)(void);
-    STDMETHOD_(unsigned long, Release)(void);
-    STDMETHOD(CreateInstance)(IUnknown *punkOuter, REFIID riid, void ** ppv);
-    STDMETHOD(LockServer)(BOOL lock);
+    STDMETHOD(QueryInterface)(REFIID riid, فراغ ** ppv);
+    STDMETHOD_(بنانشان ڊگهو, جوڙيو_Ref)(فراغ);
+    STDMETHOD_(بنانشان ڊگهو, Release)(فراغ);
+    STDMETHOD(CreateInstance)(IUnknown *punkOuter, REFIID riid, فراغ ** ppv);
+    STDMETHOD(تالو_Server)(BOOL تالو);
 
-private:
+خاص:
     // Constructor is private - create via Create()
     CVimCF() : ref(0) {};
 
     // Reference count
-    unsigned long ref;
+    بنانشان ڊگهو ref;
 };
 
 /* Implementation
@@ -443,32 +443,32 @@ private:
 
 CVimCF *CVimCF::Create()
 {
-    CVimCF *me = new CVimCF();
+    CVimCF *me = جديد CVimCF();
 
-    if (me == NULL)
-	MessageBox(0, "Cannot create class factory", "Vim Initialisation", 0);
+    إذا (me == عدم)
+	پيغام_Box(0, "Cannot create class factory", "Vim Initialisation", 0);
 
-    return me;
+    أرجع me;
 }
 
 STDMETHODIMP
-CVimCF::QueryInterface(REFIID riid, void **ppv)
+CVimCF::QueryInterface(REFIID riid, فراغ **ppv)
 {
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    إذا (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
-	AddRef();
-	*ppv = this;
-	return S_OK;
+	جوڙيو_Ref();
+	*ppv = هذا;
+	أرجع S_OK;
     }
 
     *ppv = 0;
-    return E_NOINTERFACE;
+    أرجع E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG)
-CVimCF::AddRef()
+CVimCF::جوڙيو_Ref()
 {
-    return ++ref;
+    أرجع ++ref;
 }
 
 STDMETHODIMP_(ULONG)
@@ -477,23 +477,23 @@ CVimCF::Release()
     // Don't delete the object when the reference count reaches zero, as there
     // is only a single application object, and its lifetime is controlled by
     // the running instance, not by its reference count.
-    if (ref > 0)
+    إذا (ref > 0)
 	--ref;
-    return ref;
+    أرجع ref;
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
-CVimCF::CreateInstance(IUnknown *punkOuter, REFIID riid, void **ppv)
+CVimCF::CreateInstance(IUnknown *punkOuter, REFIID riid, فراغ **ppv)
 {
-    return app->QueryInterface(riid, ppv);
+    أرجع app->QueryInterface(riid, ppv);
 }
 
 /*ARGSUSED*/
 STDMETHODIMP
-CVimCF::LockServer(BOOL lock)
+CVimCF::تالو_Server(BOOL تالو)
 {
-    return S_OK;
+    أرجع S_OK;
 }
 
 /*****************************************************************************
@@ -501,96 +501,96 @@ CVimCF::LockServer(BOOL lock)
 *****************************************************************************/
 
 // Internal use only
-static void SetKeyAndValue(const char *path, const char *subkey, const char *value);
-static void GUIDtochar(const GUID &guid, char *GUID, int length);
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child);
-static const int GUID_STRING_SIZE = 39;
+ساكن فراغ سيٽ_ڪنجي_And_قدر(ثابت حرف *رستو, ثابت حرف *subkey, ثابت حرف *قدر);
+ساكن فراغ GUIDtochar(ثابت GUID &guid, حرف *GUID, صحيح ڊيگهائي);
+ساكن فراغ Recursive_Delete_ڪنجي(HKEY h_ڪنجي_والد, ثابت حرف *ٻار);
+ساكن ثابت صحيح GUID_STRING_سائيز = 39;
 
 // Register the component in the registry
 // When "silent" is TRUE don't give any messages.
 
-extern "C" void RegisterMe(int silent)
+خارجي "C" فراغ رجسٽر_Me(صحيح silent)
 {
     BOOL ok = TRUE;
 
     // Get the application startup command
-    char module[MAX_PATH];
+    حرف module[MAX_رستو];
 
-    ::GetModuleFileName(NULL, module, MAX_PATH);
+    ::GetModuleFileName(عدم, module, MAX_رستو);
 
     // Unregister first (quietly)
     UnregisterMe(FALSE);
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    حرف clsid[GUID_STRING_سائيز];
+    GUIDtochar(MYCLSID, clsid, حجم(clsid));
 
     // Convert the LIBID into a char
-    char libid[GUID_STRING_SIZE];
-    GUIDtochar(MYLIBID, libid, sizeof(libid));
+    حرف libid[GUID_STRING_سائيز];
+    GUIDtochar(MYLIBID, libid, حجم(libid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    حرف ڪنجي_2[MAX_CLSID_LEN];
+    strcpy(ڪنجي_2, "CLSID\\");
+    strcat(ڪنجي_2, clsid);
 
     // Add the CLSID to the registry
-    SetKeyAndValue(Key, NULL, MYNAME);
-    SetKeyAndValue(Key, "LocalServer32", module);
-    SetKeyAndValue(Key, "ProgID", MYPROGID);
-    SetKeyAndValue(Key, "VersionIndependentProgID", MYVIPROGID);
-    SetKeyAndValue(Key, "TypeLib", libid);
+    سيٽ_ڪنجي_And_قدر(ڪنجي_2, عدم, MYNAME);
+    سيٽ_ڪنجي_And_قدر(ڪنجي_2, "LocalServer32", module);
+    سيٽ_ڪنجي_And_قدر(ڪنجي_2, "ProgID", MYPROGID);
+    سيٽ_ڪنجي_And_قدر(ڪنجي_2, "VersionIndependentProgID", MYVIPROGID);
+    سيٽ_ڪنجي_And_قدر(ڪنجي_2, "TypeLib", libid);
 
     // Add the version-independent ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYVIPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYVIPROGID, "CLSID", clsid);
-    SetKeyAndValue(MYVIPROGID, "CurVer", MYPROGID);
+    سيٽ_ڪنجي_And_قدر(MYVIPROGID, عدم, MYNAME);
+    سيٽ_ڪنجي_And_قدر(MYVIPROGID, "CLSID", clsid);
+    سيٽ_ڪنجي_And_قدر(MYVIPROGID, "CurVer", MYPROGID);
 
     // Add the versioned ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYPROGID, "CLSID", clsid);
+    سيٽ_ڪنجي_And_قدر(MYPROGID, عدم, MYNAME);
+    سيٽ_ڪنجي_And_قدر(MYPROGID, "CLSID", clsid);
 
-    wchar_t w_module[MAX_PATH];
-    MultiByteToWideChar(CP_ACP, 0, module, -1, w_module, MAX_PATH);
+    wchar_t w_module[MAX_رستو];
+    Multi_Byte_منزل_Wide_Char(CP_ACP, 0, module, -1, w_module, MAX_رستو);
 
-    ITypeLib *typelib = NULL;
-    if (LoadTypeLib(w_module, &typelib) != S_OK)
+    ITypeLib *typelib = عدم;
+    إذا (ڀريو_Type_Lib(w_module, &typelib) != S_OK)
     {
-	if (!silent)
-	    MessageBox(0, "Cannot load type library to register",
+	إذا (!silent)
+	    پيغام_Box(0, "Cannot load type library to register",
 						       "Vim Registration", 0);
 	ok = FALSE;
     }
-    else
+    وإلا
     {
-	if (RegisterTypeLib(typelib, w_module, NULL) != S_OK)
+	إذا (رجسٽر_Type_Lib(typelib, w_module, عدم) != S_OK)
 	{
-	    if (!silent)
-		MessageBox(0, "Cannot register type library",
+	    إذا (!silent)
+		پيغام_Box(0, "Cannot register type library",
 						       "Vim Registration", 0);
 	    ok = FALSE;
 	}
 	typelib->Release();
     }
 
-    if (ok && !silent)
-	MessageBox(0, "Registered successfully", "Vim", 0);
+    إذا (ok && !silent)
+	پيغام_Box(0, "Registered successfully", "Vim", 0);
 }
 
 // Remove the component from the registry
 //
 // Note: There is little error checking in this code, to allow incomplete
 // or failed registrations to be undone.
-extern "C" void UnregisterMe(int bNotifyUser)
+خارجي "C" فراغ UnregisterMe(صحيح bNotifyUser)
 {
     // Unregister the type library
     ITypeLib *typelib;
-    if (SUCCEEDED(LoadRegTypeLib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
+    إذا (SUCCEEDED(ڀريو_Reg_Type_Lib(MYLIBID, MAJORVER, MINORVER, LOCALE, &typelib)))
     {
 	TLIBATTR *tla;
-	if (SUCCEEDED(typelib->GetLibAttr(&tla)))
+	إذا (SUCCEEDED(typelib->GetLibAttr(&tla)))
 	{
-	    UnRegisterTypeLib(tla->guid, tla->wMajorVerNum, tla->wMinorVerNum,
+	    Un_رجسٽر_Type_Lib(tla->guid, tla->w_Major_Ver_انگ, tla->w_Minor_Ver_انگ,
 			      tla->lcid, tla->syskind);
 	    typelib->ReleaseTLibAttr(tla);
 	}
@@ -598,179 +598,179 @@ extern "C" void UnregisterMe(int bNotifyUser)
     }
 
     // Convert the CLSID into a char
-    char clsid[GUID_STRING_SIZE];
-    GUIDtochar(MYCLSID, clsid, sizeof(clsid));
+    حرف clsid[GUID_STRING_سائيز];
+    GUIDtochar(MYCLSID, clsid, حجم(clsid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    حرف ڪنجي_2[MAX_CLSID_LEN];
+    strcpy(ڪنجي_2, "CLSID\\");
+    strcat(ڪنجي_2, clsid);
 
     // Delete the CLSID Key - CLSID\{...}
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, Key);
+    Recursive_Delete_ڪنجي(HKEY_CLASSES_پاڙ, ڪنجي_2);
 
     // Delete the version-independent ProgID Key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYVIPROGID);
+    Recursive_Delete_ڪنجي(HKEY_CLASSES_پاڙ, MYVIPROGID);
 
     // Delete the ProgID key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYPROGID);
+    Recursive_Delete_ڪنجي(HKEY_CLASSES_پاڙ, MYPROGID);
 
-    if (bNotifyUser)
-	MessageBox(0, "Unregistered successfully", "Vim", 0);
+    إذا (bNotifyUser)
+	پيغام_Box(0, "Unregistered successfully", "Vim", 0);
 }
 
 /****************************************************************************/
 
 // Convert a GUID to a char string
-static void GUIDtochar(const GUID &guid, char *GUID, int length)
+ساكن فراغ GUIDtochar(ثابت GUID &guid, حرف *GUID, صحيح ڊيگهائي)
 {
     // Get wide string version
-    LPOLESTR wGUID = NULL;
+    LPOLESTR wGUID = عدم;
     StringFromCLSID(guid, &wGUID);
 
     // Convert from wide characters to non-wide
-    wcstombs(GUID, wGUID, length);
+    wcstombs(GUID, wGUID, ڊيگهائي);
 
     // Free memory
     CoTaskMemFree(wGUID);
 }
 
 // Delete a key and all of its descendants
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
+ساكن فراغ Recursive_Delete_ڪنجي(HKEY h_ڪنجي_والد, ثابت حرف *ٻار)
 {
     // Open the child
-    HKEY hKeyChild;
-    LONG result = RegOpenKeyEx(hKeyParent, child, 0,
-			       KEY_ALL_ACCESS, &hKeyChild);
-    if (result != ERROR_SUCCESS)
-	return;
+    HKEY h_ڪنجي_ٻار;
+    LONG نتيجو = Reg_Open_ڪنجي_Ex(h_ڪنجي_والد, ٻار, 0,
+			       ڪنجي_ALL_ACCESS, &h_ڪنجي_ٻار);
+    إذا (نتيجو != ERROR_SUCCESS)
+	أرجع;
 
     // Enumerate all of the descendants of this child
-    FILETIME time;
-    char buffer[1024];
-    DWORD size = 1024;
+    FILETIME وقت;
+    حرف بفر[1024];
+    DWORD سائيز = 1024;
 
-    while (RegEnumKeyEx(hKeyChild, 0, buffer, &size, NULL,
-			NULL, NULL, &time) == S_OK)
+    طالما (Reg_Enum_ڪنجي_Ex(h_ڪنجي_ٻار, 0, بفر, &سائيز, عدم,
+			عدم, عدم, &وقت) == S_OK)
     {
 	// Delete the descendants of this child
-	RecursiveDeleteKey(hKeyChild, buffer);
-	size = 256;
+	Recursive_Delete_ڪنجي(h_ڪنجي_ٻار, بفر);
+	سائيز = 256;
     }
 
     // Close the child
-    RegCloseKey(hKeyChild);
+    Reg_Close_ڪنجي(h_ڪنجي_ٻار);
 
     // Delete this child
-    RegDeleteKey(hKeyParent, child);
+    Reg_Delete_ڪنجي(h_ڪنجي_والد, ٻار);
 }
 
 // Create a key and set its value
-static void SetKeyAndValue(const char *key, const char *subkey, const char *value)
+ساكن فراغ سيٽ_ڪنجي_And_قدر(ثابت حرف *ڪنجي, ثابت حرف *subkey, ثابت حرف *قدر)
 {
-    HKEY hKey;
-    char buffer[1024];
+    HKEY h_ڪنجي;
+    حرف بفر[1024];
 
-    strcpy(buffer, key);
+    strcpy(بفر, ڪنجي);
 
     // Add subkey name to buffer.
-    if (subkey)
+    إذا (subkey)
     {
-	strcat(buffer, "\\");
-	strcat(buffer, subkey);
+	strcat(بفر, "\\");
+	strcat(بفر, subkey);
     }
 
     // Create and open key and subkey.
-    long result = RegCreateKeyEx(HKEY_CLASSES_ROOT,
-				 buffer,
-				 0, NULL, REG_OPTION_NON_VOLATILE,
-				 KEY_ALL_ACCESS, NULL,
-				 &hKey, NULL);
-    if (result != ERROR_SUCCESS)
-	return;
+    ڊگهو نتيجو = Reg_Create_ڪنجي_Ex(HKEY_CLASSES_پاڙ,
+				 بفر,
+				 0, عدم, REG_OPTION_NON_VOLATILE,
+				 ڪنجي_ALL_ACCESS, عدم,
+				 &h_ڪنجي, عدم);
+    إذا (نتيجو != ERROR_SUCCESS)
+	أرجع;
 
     // Set the value
-    if (value)
-	RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)value,
-		      (DWORD)STRLEN(value)+1);
+    إذا (قدر)
+	Reg_سيٽ_قدر_Ex(h_ڪنجي, عدم, 0, REG_SZ, (BYTE *)قدر,
+		      (DWORD)STRLEN(قدر)+1);
 
-    RegCloseKey(hKey);
+    Reg_Close_ڪنجي(h_ڪنجي);
 }
 
 /*****************************************************************************
  5. OLE Initialisation and shutdown processing
 *****************************************************************************/
-extern "C" void InitOLE(int *pbDoRestart)
+خارجي "C" فراغ InitOLE(صحيح *pbDoRestart)
 {
     HRESULT hr;
 
     *pbDoRestart = FALSE;
 
     // Initialize the OLE libraries
-    hr = OleInitialize(NULL);
-    if (FAILED(hr))
+    hr = OleInitialize(عدم);
+    إذا (FAILED(hr))
     {
-	MessageBox(0, "Cannot initialise OLE", "Vim Initialisation", 0);
-	goto error0;
+	پيغام_Box(0, "Cannot initialise OLE", "Vim Initialisation", 0);
+	اذهب error0;
     }
 
     // Create the application object
     app = CVim::Create(pbDoRestart);
-    if (app == NULL)
-	goto error1;
+    إذا (app == عدم)
+	اذهب error1;
 
     // Create the class factory
     cf = CVimCF::Create();
-    if (cf == NULL)
-	goto error1;
+    إذا (cf == عدم)
+	اذهب error1;
 
     // Register the class factory
-    hr = CoRegisterClassObject(
+    hr = Co_رجسٽر_Class_Object(
 	MYCLSID,
 	cf,
 	CLSCTX_LOCAL_SERVER,
 	REGCLS_MULTIPLEUSE,
 	&cf_id);
 
-    if (FAILED(hr))
+    إذا (FAILED(hr))
     {
-	MessageBox(0, "Cannot register class factory", "Vim Initialisation", 0);
-	goto error1;
+	پيغام_Box(0, "Cannot register class factory", "Vim Initialisation", 0);
+	اذهب error1;
     }
 
     // Register the application object as active
-    hr = RegisterActiveObject(
+    hr = رجسٽر_سرگرم_Object(
 	app,
 	MYCLSID,
 	0,
 	&app_id);
 
-    if (FAILED(hr))
+    إذا (FAILED(hr))
     {
-	MessageBox(0, "Cannot register application object", "Vim Initialisation", 0);
-	goto error1;
+	پيغام_Box(0, "Cannot register application object", "Vim Initialisation", 0);
+	اذهب error1;
     }
 
-    return;
+    أرجع;
 
     // Errors: tidy up as much as needed and return
 error1:
     UninitOLE();
 error0:
-    return;
+    أرجع;
 }
 
-extern "C" void UninitOLE()
+خارجي "C" فراغ UninitOLE()
 {
     // Unregister the application object
-    if (app_id)
+    إذا (app_id)
     {
-	RevokeActiveObject(app_id, NULL);
+	Revoke_سرگرم_Object(app_id, عدم);
 	app_id = 0;
     }
 
     // Unregister the class factory
-    if (cf_id)
+    إذا (cf_id)
     {
 	CoRevokeClassObject(cf_id);
 	cf_id = 0;
@@ -780,17 +780,17 @@ extern "C" void UninitOLE()
     OleUninitialize();
 
     // Delete the application object
-    if (app)
+    إذا (app)
     {
-	delete app;
-	app = NULL;
+	ميٽيو app;
+	app = عدم;
     }
 
     // Delete the class factory
-    if (cf)
+    إذا (cf)
     {
-	delete cf;
-	cf = NULL;
+	ميٽيو cf;
+	cf = عدم;
     }
 }
-#endif /* FEAT_OLE */
+#جيڪڏهن_پورو /* FEAT_OLE */

@@ -7,26 +7,26 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_TB_H
-#define GUI_GTK4_TB_H
+#جيڪڏهن_وصف_نه_ٿيل GUI_GTK4_TB_H
+#وصف_ڪريو GUI_GTK4_TB_H
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#جيڪڏهن_وصف_ٿيل FEAT_TOOLBAR
 
 # include <gtk/gtk.h>
 
 # define VIM_TYPE_TOOLBAR (vim_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(VimToolbar, vim_toolbar, VIM, TOOLBAR, GtkWidget)
 
-typedef struct _VimToolbarItem VimToolbarItem;
+تعريفنوع بنية Vim_Toolbar_شي Vim_Toolbar_شي_2;
 
-GtkWidget *vim_toolbar_new(void);
-GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, int idx);
-GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, int idx);
-void vim_toolbar_set_style(VimToolbar *self, int style, int iconsize);
-void vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
+GtkWidget *vim_toolbar_new(فراغ);
+GtkWidget *vim_toolbar_وجهو_button(VimToolbar *self, GtkWidget *icon, ثابت حرف *متن, صحيح idx);
+GtkWidget *vim_toolbar_وجهو_separator(VimToolbar *self, صحيح idx);
+فراغ vim_toolbar_سيٽ_style(VimToolbar *self, صحيح style, صحيح iconsize);
+فراغ vim_toolbar_remove(VimToolbar *self, GtkWidget *شي);
 
-#endif
+#جيڪڏهن_پورو
 
-#endif
+#جيڪڏهن_پورو

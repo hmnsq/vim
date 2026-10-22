@@ -31,15 +31,15 @@
 # Copyright: Vim license applies, see ":help license"
 # Last Change: 2025 Oct 08
 #
-import os
-import re
-import sys
-from pathlib import Path
-from typing import List, Tuple
-from clang.cindex import Index, CursorKind, StorageClass, TokenKind
+استورد os
+استورد re
+استورد sys
+من pathlib استورد رستو_2
+من typing استورد List, Tuple
+من clang.cindex استورد اشاريو_3, Cursor_قسم, StorageClass, Token_قسم
 
-SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") not in ("", "0", "false", "no")
-DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") not in ("", "0", "false", "no")
+SHOW_DIAGS = os.environ.get("GENPROTO_SHOW_DIAGS", "") ليس في ("", "0", "false", "no")
+DEBUG_LOG  = os.environ.get("GENPROTO_DEBUG", "") ليس في ("", "0", "false", "no")
 
 # Preprocessor directive detection
 _DIR_RE = re.compile(r'^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b')
@@ -53,17 +53,17 @@ _IF_NOTDEF_PROTO_RE = re.compile(r'^\s*#\s*if\s*!defined\s*\(\s*PROTO\s*\)\s*(//
 # Helpers to detect defined(PROTO) inside an expression line
 _DEFINED_CALL_RE      = re.compile(r'\bdefined\s*\(\s*PROTO\s*\)')
 
-def _ends_with_bs(line: str) -> bool:
-    return line.rstrip("\r\n").rstrip().endswith("\\")
+وصف پڇاڙيون_with_bs(سٽ: str) -> bool:
+    أرجع سٽ.rstrip("\r\n").rstrip().endswith("\\")
 
-def _has_proto_defined_from_argv(argv: List[str]) -> bool:
+وصف _has_proto_defined_from_argv(argv: List[str]) -> bool:
     """Return True if -DPROTO (or -DPROTO=...) appears in clang args."""
-    for a in argv:
-        if a == "-DPROTO" or a.startswith("-DPROTO="):
-            return True
-    return False
+    لكل a في argv:
+        إذا a == "-DPROTO" أو a.startswith("-DPROTO="):
+            أرجع سچ
+    أرجع خطأ
 
-def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
+وصف _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> bool:
     """
     Evaluate a simple C preprocessor condition only when it contains
     defined(PROTO).
@@ -75,27 +75,27 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     """
     s = cond
 
-    if DEBUG_LOG:
-        print(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
-        print(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
+    إذا DEBUG_LOG:
+        ڇاپيو(f"[eval] raw condition: {cond.strip()}", file=sys.stderr)
+        ڇاپيو(f"[eval] proto_is_defined={proto_is_defined}", file=sys.stderr)
 
     # Normalize spacing
     s = s.strip()
 
     # Replace !defined(PROTO) first, then defined(PROTO)
-    if proto_is_defined:
+    إذا proto_is_defined:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    وإلا:
         s = re.sub(r'!+\s*defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
     # Translate C logical ops to Python
     # Replace defined(PROTO) and !defined(PROTO) depending on -DPROTO
-    if proto_is_defined:
+    إذا proto_is_defined:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "False", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "True", s)
-    else:
+    وإلا:
         s = re.sub(r'!defined\s*\(\s*PROTO\s*\)', "True", s)
         s = re.sub(r'defined\s*\(\s*PROTO\s*\)', "False", s)
 
@@ -120,15 +120,15 @@ def _eval_condition_with_defined_proto(cond: str, proto_is_defined: bool) -> boo
     # Safety: collapse excessive whitespace
     s = re.sub(r'\s+', " ", s).strip()
 
-    try:
-        return bool(eval(s, {}, {}))
-    except Exception:
+    حاول:
+        أرجع bool(eval(s, {}, {}))
+    استثناء Exception:
         # Fail-open to avoid accidentally dropping code
-        if DEBUG_LOG:
-            print(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
-        return True
+        إذا DEBUG_LOG:
+            ڇاپيو(f"[warn] condition eval failed: {cond!r} -> {s!r}", file=sys.stderr)
+        أرجع سچ
 
-def rewrite_conditionals_first_branch(text: str) -> str:
+وصف rewrite_conditionals_پهريون_branch(متن: str) -> str:
     """
     Keep only the first branch of #if/#ifdef/#ifndef groups, remove others.
     Extensions:
@@ -138,42 +138,42 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         evaluate the condition: if False, drop the whole group; if True, keep
         only the first branch (same as legacy behavior).
     """
-    lines = text.splitlines(keepends=True)
-    out: List[str] = []
-    i, n = 0, len(lines)
+    سٽون = متن.splitlines(keepends=سچ)
+    ٻاهريون: List[str] = []
+    i, n = 0, ڊيگهه(سٽون)
 
-    def _collect_group(start: int) -> Tuple[int, List[Tuple[str, int, int]]]:
+    وصف collect_گروهه(شروعات: صحيح) -> Tuple[صحيح, List[Tuple[str, صحيح, صحيح]]]:
         """
         Collect a full #if...#endif group and return (end_index, bodies).
         bodies is a list of (tag, body_s, body_e) for each if/elif/else branch.
         """
-        h = start
+        h = شروعات
         # Skip backslash-continued header lines
-        while True:
+        طالما سچ:
             h += 1
-            if h >= n or not _ends_with_bs(lines[h - 1]):
-                break
-        depth = 1
+            إذا h >= n أو ليس پڇاڙيون_with_bs(سٽون[h - 1]):
+                اكسر
+        اونهائي = 1
         j = h
-        marks: List[Tuple[str, int]] = [("if", start)]
-        while j < n and depth > 0:
-            m = _DIR_RE.match(lines[j])
-            if m:
-                kw2 = m.group(1)
-                if kw2 in ("if", "ifdef", "ifndef"):
-                    depth += 1
-                elif kw2 == "endif":
-                    depth -= 1
-                    if depth == 0:
-                        break
-                elif depth == 1 and kw2 in ("elif", "else"):
+        marks: List[Tuple[str, صحيح]] = [("if", شروعات)]
+        طالما j < n و اونهائي > 0:
+            m = _DIR_RE.ميلاپ(سٽون[j])
+            إذا m:
+                kw2 = m.گروهه(1)
+                إذا kw2 في ("if", "ifdef", "ifndef"):
+                    اونهائي += 1
+                وإلاإذا kw2 == "endif":
+                    اونهائي -= 1
+                    إذا اونهائي == 0:
+                        اكسر
+                وإلاإذا اونهائي == 1 و kw2 في ("elif", "else"):
                     marks.append((kw2, j))
             j += 1
-        else:
+        وإلا:
             # Unterminated: keep as-is from start to EOF
-            return n, [("text", start, n)]
+            أرجع n, [("text", شروعات, n)]
 
-        def _after_header_line(pos: int) -> int:
+        وصف after_سرو_سٽ(pos: صحيح) -> صحيح:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -181,11 +181,11 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            طالما k < n و پڇاڙيون_with_bs(سٽون[k - 1]):
                 k += 1
-            return k
+            أرجع k
 
-        def _after_header_line(pos: int) -> int:
+        وصف after_سرو_سٽ(pos: صحيح) -> صحيح:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -193,92 +193,92 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            طالما k < n و پڇاڙيون_with_bs(سٽون[k - 1]):
                 k += 1
-            return k
+            أرجع k
 
-        bodies: List[Tuple[str, int, int]] = []
-        header_positions = [pos for _, pos in marks] + [j]
-        tags = [tag for tag, _ in marks]
-        for idx, tag in enumerate(tags):
-            header = header_positions[idx]
+        bodies: List[Tuple[str, صحيح, صحيح]] = []
+        سرو_positions = [pos لكل _, pos في marks] + [j]
+        ٽيگ_فهرست = [ٽيگ لكل ٽيگ, _ في marks]
+        لكل idx, ٽيگ في enumerate(ٽيگ_فهرست):
+            سرو = سرو_positions[idx]
             # Start body right after the whole (possibly multi-line) header
-            body_s = _after_header_line(header)
-            next_header = header_positions[idx + 1]
-            body_e = next_header
-            bodies.append((tag, body_s, body_e))
-        return j + 1, bodies
+            body_s = after_سرو_سٽ(سرو)
+            ايندڙ_سرو = سرو_positions[idx + 1]
+            body_e = ايندڙ_سرو
+            bodies.append((ٽيگ, body_s, body_e))
+        أرجع j + 1, bodies
 
     # Detect whether PROTO is defined from argv (clang args passed after src
     # path)
     proto_is_defined = _has_proto_defined_from_argv(sys.argv[2:])
 
-    while i < n:
-        line = lines[i]
-        m = _DIR_RE.match(line)
-        if not m:
-            out.append(line)
+    طالما i < n:
+        سٽ = سٽون[i]
+        m = _DIR_RE.ميلاپ(سٽ)
+        إذا ليس m:
+            ٻاهريون.append(سٽ)
             i += 1
-            continue
+            استمر
 
-        kw = m.group(1)
-        if kw in ("if", "ifdef", "ifndef"):
+        kw = m.گروهه(1)
+        إذا kw في ("if", "ifdef", "ifndef"):
             # Hard drops first (legacy behavior)
-            if _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
-                group_end, _ = _collect_group(i)
-                i = group_end
-                continue
+            إذا _IF0_RE.ميلاپ(سٽ) أو _IFDEF_DEBUG_RE.ميلاپ(سٽ) أو _IFNDEF_PROTO_RE.ميلاپ(سٽ) أو _IF_NOTDEF_PROTO_RE.ميلاپ(سٽ):
+                گروهه_پڇاڙي, _ = collect_گروهه(i)
+                i = گروهه_پڇاڙي
+                استمر
 
             # If '#if <expr>' contains defined(PROTO), evaluate; otherwise,
             # legacy behavior
-            evaluate = (kw == "if") and (
-                _DEFINED_CALL_RE.search(line) is not None
+            evaluate = (kw == "if") و (
+                _DEFINED_CALL_RE.ڳولا(سٽ) آهي ليس ڪجهه_نه
             )
 
-            if evaluate:
+            إذا evaluate:
                 # Extract condition text after 'if'
-                try:
-                    cond_text = line.split("if", 1)[1]
-                except Exception:
-                    cond_text = ""
-                keep_first = _eval_condition_with_defined_proto(cond_text, proto_is_defined)
-                if not keep_first:
-                    group_end, _ = _collect_group(i)
-                    i = group_end
-                    continue
+                حاول:
+                    cond_متن = سٽ.ورهايو("if", 1)[1]
+                استثناء Exception:
+                    cond_متن = ""
+                keep_پهريون = _eval_condition_with_defined_proto(cond_متن, proto_is_defined)
+                إذا ليس keep_پهريون:
+                    گروهه_پڇاڙي, _ = collect_گروهه(i)
+                    i = گروهه_پڇاڙي
+                    استمر
 
             # Keep only the first branch
-            group_end, bodies = _collect_group(i)
-            if not bodies:
-                i = group_end
-                continue
+            گروهه_پڇاڙي, bodies = collect_گروهه(i)
+            إذا ليس bodies:
+                i = گروهه_پڇاڙي
+                استمر
             keep_s, keep_e = bodies[0][1], bodies[0][2]
-            kept_text = "".join(lines[keep_s:keep_e])
-            kept_rewritten = rewrite_conditionals_first_branch(kept_text)
+            kept_متن = "".join(سٽون[keep_s:keep_e])
+            kept_rewritten = rewrite_conditionals_پهريون_branch(kept_متن)
 
-            if DEBUG_LOG:
-                print(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
+            إذا DEBUG_LOG:
+                ڇاپيو(f"[group] first body lines {keep_s}:{keep_e}", file=sys.stderr)
                 # Print the first non-empty line of the kept body for quick
                 # context
-                for ln in kept_text.splitlines():
-                    if ln.strip():
-                        print(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
-                        break
+                لكل ln في kept_متن.splitlines():
+                    إذا ln.strip():
+                        ڇاپيو(f"[group] kept starts with: {ln.strip()}", file=sys.stderr)
+                        اكسر
 
-            out.append(kept_rewritten)
-            i = group_end
-        else:
+            ٻاهريون.append(kept_rewritten)
+            i = گروهه_پڇاڙي
+        وإلا:
             # For 'elif/else/endif' lines encountered directly, output a blank
             # line to preserve line count
-            out.append("\n" if line.endswith("\n") else "")
+            ٻاهريون.append("\n" إذا سٽ.endswith("\n") وإلا "")
             i += 1
 
-    return "".join(out)
+    أرجع "".join(ٻاهريون)
 
-def collapse_star_spaces(s: str) -> str:
-    return re.sub(r"\*\s+", "*", s)
+وصف collapse_تارو_spaces(s: str) -> str:
+    أرجع re.sub(r"\*\s+", "*", s)
 
-def fix_spacing(s: str) -> str:
+وصف fix_spacing(s: str) -> str:
     s = re.sub(r"\(\s+", "(", s)
     s = re.sub(r"\s+\)", ")", s)
     s = re.sub(r"(?<=[\w\)])\s+\((?!\*)", "(", s)
@@ -287,217 +287,217 @@ def fix_spacing(s: str) -> str:
     s = re.sub(r"\s+\[", "[", s)
     s = re.sub(r"\[\s+", "[", s)
     s = re.sub(r"\s+\]", "]", s)
-    return s
+    أرجع s
 
-def strip_unused_macros(s: str) -> str:
+وصف strip_اڻ_استعمال_ٿيل_macros(s: str) -> str:
     s = re.sub(r"\bUNUSED\b\s*\([^)]*\)", " ", s)
     s = re.sub(r"\bUNUSED\b", " ", s)
-    return s
+    أرجع s
 
-def normalize_ws(s: str) -> str:
-    return re.sub(r"\s+", " ", s).strip()
+وصف normalize_ws(s: str) -> str:
+    أرجع re.sub(r"\s+", " ", s).strip()
 
-def tokens_for_function_header(cur) -> List[str]:
-    toks = [t for t in cur.get_tokens() if t.kind != TokenKind.COMMENT]
-    if not toks:
-        return []
-    name_idx = None
-    for i, t in enumerate(toks):
-        if t.kind == TokenKind.IDENTIFIER and t.spelling == cur.spelling:
+وصف ٽوڪن_for_function_سرو(cur) -> List[str]:
+    toks = [t لكل t في cur.get_ٽوڪن() إذا t.قسم != Token_قسم.COMMENT]
+    إذا ليس toks:
+        أرجع []
+    name_idx = ڪجهه_نه
+    لكل i, t في enumerate(toks):
+        إذا t.قسم == Token_قسم.IDENTIFIER و t.spelling == cur.spelling:
             name_idx = i
-            break
-    if name_idx is None:
-        return []
-    lpar_idx = None
-    for i in range(name_idx + 1, len(toks)):
-        if toks[i].spelling == '(':
+            اكسر
+    إذا name_idx آهي ڪجهه_نه:
+        أرجع []
+    lpar_idx = ڪجهه_نه
+    لكل i في سلسلو(name_idx + 1, ڊيگهه(toks)):
+        إذا toks[i].spelling == '(':
             lpar_idx = i
-            break
-    if lpar_idx is None:
-        return []
-    depth, rpar_idx = 0, None
-    for i in range(lpar_idx, len(toks)):
-        if toks[i].spelling == '(':
-            depth += 1
-        elif toks[i].spelling == ')':
-            depth -= 1
-            if depth == 0:
+            اكسر
+    إذا lpar_idx آهي ڪجهه_نه:
+        أرجع []
+    اونهائي, rpar_idx = 0, ڪجهه_نه
+    لكل i في سلسلو(lpar_idx, ڊيگهه(toks)):
+        إذا toks[i].spelling == '(':
+            اونهائي += 1
+        وإلاإذا toks[i].spelling == ')':
+            اونهائي -= 1
+            إذا اونهائي == 0:
                 rpar_idx = i
-                break
-    if rpar_idx is None:
-        return []
-    return [t.spelling for t in toks[:rpar_idx + 1]]
+                اكسر
+    إذا rpar_idx آهي ڪجهه_نه:
+        أرجع []
+    أرجع [t.spelling لكل t في toks[:rpar_idx + 1]]
 
-def join_tokens(tokens: List[str]) -> str:
-    s = " ".join(tokens)
-    s = strip_unused_macros(s)
+وصف join_ٽوڪن(ٽوڪن: List[str]) -> str:
+    s = " ".join(ٽوڪن)
+    s = strip_اڻ_استعمال_ٿيل_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_تارو_spaces(s)
     s = fix_spacing(s)
-    return s
+    أرجع s
 
-def header_from_cursor(cur) -> str:
+وصف سرو_from_cursor(cur) -> str:
     """
     Fallback header builder for cases where get_tokens() returns empty
     (e.g., macro-expanded function definitions). Uses cursor spelling and type
     information to construct "ret name(param, ...)".
     """
-    try:
-        ret = getattr(cur, "result_type", None)
-        ret_sp = ret.spelling if ret is not None else ""
-    except Exception:
+    حاول:
+        ret = getattr(cur, "result_type", ڪجهه_نه)
+        ret_sp = ret.spelling إذا ret آهي ليس ڪجهه_نه وإلا ""
+    استثناء Exception:
         ret_sp = ""
-    if not ret_sp:
+    إذا ليس ret_sp:
         # As a last resort, try cur.type.get_result() if available.
-        try:
-            ret_sp = cur.type.get_result().spelling
-        except Exception:
+        حاول:
+            ret_sp = cur.type.get_نتيجو().spelling
+        استثناء Exception:
             ret_sp = "void"
-    name_sp = cur.spelling or ""
+    name_sp = cur.spelling أو ""
     params = []
-    try:
-        for a in cur.get_arguments() or []:
-            t = getattr(a, "type", None)
-            t_sp = t.spelling if t is not None else ""
-            a_sp = a.spelling or ""
-            seg = (t_sp + (" " + a_sp if a_sp else "")).strip()
-            params.append(seg if seg else "void")
-    except Exception:
-        pass
-    params_s = ", ".join(params) if params else "void"
+    حاول:
+        لكل a في cur.get_arguments() أو []:
+            t = getattr(a, "type", ڪجهه_نه)
+            t_sp = t.spelling إذا t آهي ليس ڪجهه_نه وإلا ""
+            a_sp = a.spelling أو ""
+            seg = (t_sp + (" " + a_sp إذا a_sp وإلا "")).strip()
+            params.append(seg إذا seg وإلا "void")
+    استثناء Exception:
+        لنگهه
+    params_s = ", ".join(params) إذا params وإلا "void"
     s = f"{ret_sp} {name_sp}({params_s})"
-    s = strip_unused_macros(s)
+    s = strip_اڻ_استعمال_ٿيل_macros(s)
     s = normalize_ws(s)
-    s = collapse_star_spaces(s)
+    s = collapse_تارو_spaces(s)
     s = fix_spacing(s)
-    return s
+    أرجع s
 
-def in_this_file(cur, src_path: Path) -> bool:
-    try:
-        loc = cur.extent.start
-        f = (loc.file or cur.location.file)
-        if not f:
+وصف اندريون_this_file(cur, src_رستو: رستو_2) -> bool:
+    حاول:
+        loc = cur.extent.شروعات
+        f = (loc.file أو cur.location.file)
+        إذا ليس f:
             # Macro-expanded function definitions may lack an attached file.
             # Allow them only if we can actually extract a concrete function
             # header.
-            try:
-                toks = tokens_for_function_header(cur)
-                return bool(toks)
-            except Exception:
-                return False
-        cur_path = os.path.normcase(os.path.abspath(str(f.name)))
-        src_abs  = os.path.normcase(os.path.abspath(src_path.as_posix()))
+            حاول:
+                toks = ٽوڪن_for_function_سرو(cur)
+                أرجع bool(toks)
+            استثناء Exception:
+                أرجع خطأ
+        cur_رستو = os.رستو.normcase(os.رستو.abspath(str(f.name)))
+        src_abs  = os.رستو.normcase(os.رستو.abspath(src_رستو.as_posix()))
         # Accept the main source file
-        if cur_path == src_abs or os.path.basename(cur_path) == os.path.basename(src_abs):
-            return True
+        إذا cur_رستو == src_abs أو os.رستو.basename(cur_رستو) == os.رستو.basename(src_abs):
+            أرجع سچ
         # Additionally accept quoted .c includes located in the same directory
         # (e.g., #include "regexp_nfa.c" next to the main source).
-        src_dir = os.path.normcase(os.path.abspath(src_path.parent.as_posix()))
-        if cur_path.endswith(".c") and os.path.dirname(cur_path) == src_dir:
-            return True
-        return False
-    except Exception:
-        return False
+        src_dir = os.رستو.normcase(os.رستو.abspath(src_رستو.والد.as_posix()))
+        إذا cur_رستو.endswith(".c") و os.رستو.dirname(cur_رستو) == src_dir:
+            أرجع سچ
+        أرجع خطأ
+    استثناء Exception:
+        أرجع خطأ
 
-def collect_function_defs(tu, src_path: Path):
-    def walk(node, depth=0):
-        if DEBUG_LOG:
-            print(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
-        if node.kind == CursorKind.FUNCTION_DECL:
-            if in_this_file(node, src_path):
-                if node.storage_class != StorageClass.STATIC and node.is_definition():
-                    yield node
-        for ch in node.get_children():
-            yield from walk(ch, depth+1)
-    yield from walk(tu.cursor)
+وصف collect_function_defs(tu, src_رستو: رستو_2):
+    وصف walk(ڳنڍ, اونهائي=0):
+        إذا DEBUG_LOG:
+            ڇاپيو(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
+        إذا ڳنڍ.قسم == Cursor_قسم.FUNCTION_DECL:
+            إذا اندريون_this_file(ڳنڍ, src_رستو):
+                إذا ڳنڍ.storage_class != StorageClass.STATIC و ڳنڍ.is_definition():
+                    أنتج ڳنڍ
+        لكل ch في ڳنڍ.get_children():
+            أنتج من walk(ch, اونهائي+1)
+    أنتج من walk(tu.cursor)
 
-def parse_with_clang(src_path: Path, text: str, args: List[str]):
-    index = Index.create()
-    src_abs = os.path.abspath(src_path.as_posix())
-    unsaved = [(src_abs, text)]
-    proto_h = src_path.parent / "proto.h"
-    if proto_h.exists():
+وصف parse_with_clang(src_رستو: رستو_2, متن: str, دليلون: List[str]):
+    اشاريو = اشاريو_3.create()
+    src_abs = os.رستو.abspath(src_رستو.as_posix())
+    unsaved = [(src_abs, متن)]
+    proto_h = src_رستو.والد / "proto.h"
+    إذا proto_h.exists():
         unsaved.append((str(proto_h), "/* stubbed */\n"))
-    final_args = (args or []) + [
+    final_دليلون = (دليلون أو []) + [
         "-std=c99", "-ferror-limit=0", "-w",
         "-Wno-implicit-function-declaration"
     ]
-    tu = index.parse(src_abs, args=final_args, unsaved_files=unsaved, options=0)
-    if SHOW_DIAGS:
-        for d in getattr(tu, "diagnostics", []):
-            print(d, file=sys.stderr)
-    return tu
+    tu = اشاريو.parse(src_abs, دليلون=final_دليلون, unsaved_files=unsaved, options=0)
+    إذا SHOW_DIAGS:
+        لكل d في getattr(tu, "diagnostics", []):
+            ڇاپيو(d, file=sys.stderr)
+    أرجع tu
 
-def generate_prototypes(tu, src_path: Path) -> List[str]:
+وصف generate_prototypes(tu, src_رستو: رستو_2) -> List[str]:
     """Collect unique function prototypes from a translation unit."""
     protos: List[str] = []
-    for fn in collect_function_defs(tu, src_path):
-        if DEBUG_LOG:
-            try:
-                sr = fn.extent.start
-                er = fn.extent.end
-                print(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
-            except Exception:
-                print(f"[def] {fn.spelling}", file=sys.stderr)
-        toks = tokens_for_function_header(fn)
-        header = join_tokens(toks) if toks else header_from_cursor(fn)
+    لكل fn في collect_function_defs(tu, src_رستو):
+        إذا DEBUG_LOG:
+            حاول:
+                sr = fn.extent.شروعات
+                er = fn.extent.پڇاڙي
+                ڇاپيو(f"[def] {fn.spelling}  {sr.line}:{sr.column} - {er.line}:{er.column}", file=sys.stderr)
+            استثناء Exception:
+                ڇاپيو(f"[def] {fn.spelling}", file=sys.stderr)
+        toks = ٽوڪن_for_function_سرو(fn)
+        سرو = join_ٽوڪن(toks) إذا toks وإلا سرو_from_cursor(fn)
         # libclang expands the bool macro (from <stdbool.h>) to _Bool.
         # Restore it to bool for readability.
-        header = re.sub(r'\b_Bool\b', 'bool', header)
-        if header:
+        سرو = re.sub(r'\b_Bool\b', 'bool', سرو)
+        إذا سرو:
             protos.append(f"{header};")
 
-    seen, unique = set(), []
-    for p in protos:
-        if p not in seen:
+    ڏٺل, unique = سيٽ_2(), []
+    لكل p في protos:
+        إذا p ليس في ڏٺل:
             unique.append(p)
-            seen.add(p)
-    return unique
+            ڏٺل.جوڙيو(p)
+    أرجع unique
 
-def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
+وصف write_prototypes(ٻاهريون_رستو: رستو_2, سرا: List[str], src_name: str) -> ڪجهه_نه:
     """Write collected prototypes to the output .pro file."""
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with out_path.open("w", encoding="utf-8", newline="\n") as f:
-            f.write(f"// {src_name}\n")
-            for h in headers:
-                f.write(h + "\n")
-            f.write("// vim: ft=c\n")
-    except Exception as e:
-        print(f"write failed: {e}", file=sys.stderr)
+    ٻاهريون_رستو.والد.mkdir(parents=سچ, exist_ok=سچ)
+    حاول:
+        سان ٻاهريون_رستو.open("w", encoding="utf-8", newline="\n") كـ f:
+            f.اكتب(f"// {src_name}\n")
+            لكل h في سرا:
+                f.اكتب(h + "\n")
+            f.اكتب("// vim: ft=c\n")
+    استثناء Exception كـ e:
+        ڇاپيو(f"write failed: {e}", file=sys.stderr)
         sys.exit(4)
-    print(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
+    ڇاپيو(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
 
-def main():
-    args = sys.argv[1:]
-    if not args:
-        print("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
+وصف مکيه():
+    دليلون = sys.argv[1:]
+    إذا ليس دليلون:
+        ڇاپيو("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
         sys.exit(1)
 
-    src_path = Path(args[0])
-    clang_args = args[1:]
-    if not src_path.exists():
-        print(f"not found: {src_path}", file=sys.stderr)
+    src_رستو = رستو_2(دليلون[0])
+    clang_دليلون = دليلون[1:]
+    إذا ليس src_رستو.exists():
+        ڇاپيو(f"not found: {src_path}", file=sys.stderr)
         sys.exit(2)
 
     # Load and preprocess source
-    try:
-        original = src_path.read_text(encoding="utf-8", errors="ignore")
-    except Exception as e:
-        print(f"read error: {e}", file=sys.stderr)
+    حاول:
+        original = src_رستو.read_متن(encoding="utf-8", errors="ignore")
+    استثناء Exception كـ e:
+        ڇاپيو(f"read error: {e}", file=sys.stderr)
         sys.exit(2)
-    rewritten = rewrite_conditionals_first_branch(original)
+    rewritten = rewrite_conditionals_پهريون_branch(original)
 
     # Parse with libclang
-    try:
-        tu = parse_with_clang(src_path, rewritten, clang_args)
-    except Exception as e:
-        print(f"parse failed: {e}", file=sys.stderr)
+    حاول:
+        tu = parse_with_clang(src_رستو, rewritten, clang_دليلون)
+    استثناء Exception كـ e:
+        ڇاپيو(f"parse failed: {e}", file=sys.stderr)
         sys.exit(3)
 
-    headers = generate_prototypes(tu, src_path)
-    out_file = Path("proto") / (src_path.stem + ".pro")
-    write_prototypes(out_file, headers, src_path.name)
+    سرا = generate_prototypes(tu, src_رستو)
+    ٻاهريون_file = رستو_2("proto") / (src_رستو.stem + ".pro")
+    write_prototypes(ٻاهريون_file, سرا, src_رستو.name)
 
-if __name__ == "__main__":
-    main()
+إذا __name__ == "__main__":
+    مکيه()

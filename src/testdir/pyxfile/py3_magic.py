@@ -1,4 +1,4 @@
 # requires python 3.x
 
-import sys
-print(sys.version)
+استورد sys
+ڇاپيو(sys.نسخو_2)

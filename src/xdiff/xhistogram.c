@@ -41,330 +41,330 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#ضمن "xinclude.h"
 
-#define MAX_PTR	UINT_MAX
-#define MAX_CNT	UINT_MAX
+#وصف_ڪريو MAX_PTR	UINT_MAX
+#وصف_ڪريو MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#وصف_ڪريو سٽ_پڇاڙي_2(n) (سٽ##n + ڳڻپ##n - 1)
+#وصف_ڪريو سٽ_پڇاڙي_PTR(n) (*سٽ##n + *ڳڻپ##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
-	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+بنية histindex {
+	بنية رڪارڊ {
+		بنانشان صحيح ptr, cnt;
+		بنية رڪارڊ *ايندڙ;
+	} **رڪارڊون, /* an occurrence */
+	  **سٽ_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
-		     records_size,
-		     line_map_size;
+	بنانشان صحيح *ايندڙ_ptrs;
+	بنانشان صحيح جدول_بٽ,
+		     رڪارڊون_سائيز,
+		     سٽ_map_سائيز;
 
-	unsigned int max_chain_length,
-		     key_shift,
-		     ptr_shift;
+	بنانشان صحيح max_chain_ڊيگهائي,
+		     ڪنجي_سرڪايو,
+		     ptr_سرڪايو;
 
-	unsigned int cnt,
+	بنانشان صحيح cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ثابت *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+بنية region {
+	بنانشان صحيح begin1, end1;
+	بنانشان صحيح begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#وصف_ڪريو سٽ_MAP(i, a) (i->سٽ_map[(a) - i->ptr_سرڪايو])
 
-#define NEXT_PTR(index, ptr) \
-	(index->next_ptrs[(ptr) - index->ptr_shift])
+#وصف_ڪريو ايندڙ_PTR(اشاريو, ptr) \
+	(اشاريو->ايندڙ_ptrs[(ptr) - اشاريو->ptr_سرڪايو])
 
-#define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+#وصف_ڪريو CNT(اشاريو, ptr) \
+	((سٽ_MAP(اشاريو, ptr))->cnt)
 
-#define REC(env, s, l) \
+#وصف_ڪريو REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+ساكن صحيح cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	أرجع r1->ha == r2->ha;
 
 }
 
-#define CMP(i, s1, l1, s2, l2) \
+#وصف_ڪريو CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#وصف_ڪريو جدول_HASH(اشاريو, side, سٽ) \
+	XDL_HASHLONG((REC(اشاريو->env, side, سٽ))->ha, اشاريو->جدول_بٽ)
 
-static int scanA(struct histindex *index, int line1, int count1)
+ساكن صحيح جاچ_A(بنية histindex *اشاريو, صحيح line1, صحيح count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	بنانشان صحيح ptr, tbl_idx;
+	بنانشان صحيح chain_len;
+	بنية رڪارڊ **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
-		tbl_idx = TABLE_HASH(index, 1, ptr);
-		rec_chain = index->records + tbl_idx;
+	لكل (ptr = سٽ_پڇاڙي_2(1); (بنانشان صحيح)line1 <= ptr; ptr--) {
+		tbl_idx = جدول_HASH(اشاريو, 1, ptr);
+		rec_chain = اشاريو->رڪارڊون + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		طالما (rec) {
+			إذا (CMP(اشاريو, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
 				 * chain.
 				 */
-				NEXT_PTR(index, ptr) = rec->ptr;
+				ايندڙ_PTR(اشاريو, ptr) = rec->ptr;
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				سٽ_MAP(اشاريو, ptr) = rec;
+				اذهب continue_جاچ;
 			}
 
-			rec = rec->next;
+			rec = rec->ايندڙ;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		إذا (chain_len == اشاريو->max_chain_ڊيگهائي)
+			أرجع -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		إذا (!(rec = xdl_cha_alloc(&اشاريو->rcha)))
+			أرجع -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
-		rec->next = *rec_chain;
+		rec->ايندڙ = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		سٽ_MAP(اشاريو, ptr) = rec;
 
-continue_scan:
+continue_جاچ:
 		; /* no op */
 	}
 
-	return 0;
+	أرجع 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+ساكن صحيح try_lcs(بنية histindex *اشاريو, بنية region *lcs, صحيح b_ptr,
+	صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	بنانشان صحيح b_ايندڙ = b_ptr + 1;
+	بنية رڪارڊ *rec = اشاريو->رڪارڊون[جدول_HASH(اشاريو, 2, b_ptr)];
+	بنانشان صحيح as, ae, bs, be, np, rc;
+	صحيح should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
-				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+	لكل (; rec; rec = rec->ايندڙ) {
+		إذا (rec->cnt > اشاريو->cnt) {
+			إذا (!اشاريو->has_common)
+				اشاريو->has_common = CMP(اشاريو, 1, rec->ptr, 2, b_ptr);
+			استمر;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		إذا (!CMP(اشاريو, 1, as, 2, b_ptr))
+			استمر;
 
-		index->has_common = 1;
-		for (;;) {
+		اشاريو->has_common = 1;
+		لكل (;;) {
 			should_break = 0;
-			np = NEXT_PTR(index, as);
+			np = ايندڙ_PTR(اشاريو, as);
 			bs = b_ptr;
 			ae = as;
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
-				&& CMP(index, 1, as - 1, 2, bs - 1)) {
+			طالما ((بنانشان صحيح)line1 < as && (بنانشان صحيح)line2 < bs
+				&& CMP(اشاريو, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, as));
+				إذا (1 < rc)
+					rc = XDL_MIN(rc, CNT(اشاريو, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
-				&& CMP(index, 1, ae + 1, 2, be + 1)) {
+			طالما (ae < (بنانشان صحيح)سٽ_پڇاڙي_2(1) && be < (بنانشان صحيح)سٽ_پڇاڙي_2(2)
+				&& CMP(اشاريو, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, ae));
+				إذا (1 < rc)
+					rc = XDL_MIN(rc, CNT(اشاريو, ae));
 			}
 
-			if (b_next <= be)
-				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			إذا (b_ايندڙ <= be)
+				b_ايندڙ = be + 1;
+			إذا (lcs->end1 - lcs->begin1 < ae - as || rc < اشاريو->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
 				lcs->end2 = be;
-				index->cnt = rc;
+				اشاريو->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			إذا (np == 0)
+				اكسر;
 
-			while (np <= ae) {
-				np = NEXT_PTR(index, np);
-				if (np == 0) {
+			طالما (np <= ae) {
+				np = ايندڙ_PTR(اشاريو, np);
+				إذا (np == 0) {
 					should_break = 1;
-					break;
+					اكسر;
 				}
 			}
 
-			if (should_break)
-				break;
+			إذا (should_break)
+				اكسر;
 
 			as = np;
 		}
 	}
-	return b_next;
+	أرجع b_ايندڙ;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+ساكن صحيح fall_پٺ_منزل_classic_diff(xpparam_t ثابت *xpp, xdfenv_t *env,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
-	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
+	memset(&xpparam, 0, حجم(xpparam));
+	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_نقاب;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	أرجع xdl_fall_پٺ_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+ساكن مضمن فراغ free_اشاريو(بنية histindex *اشاريو)
 {
-	xdl_free(index->records);
-	xdl_free(index->line_map);
-	xdl_free(index->next_ptrs);
-	xdl_cha_free(&index->rcha);
+	xdl_free(اشاريو->رڪارڊون);
+	xdl_free(اشاريو->سٽ_map);
+	xdl_free(اشاريو->ايندڙ_ptrs);
+	xdl_cha_free(&اشاريو->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+ساكن صحيح ڳوليو_lcs(xpparam_t ثابت *xpp, xdfenv_t *env,
+		    بنية region *lcs,
+		    صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	صحيح b_ptr;
+	صحيح ret = -1;
+	بنية histindex اشاريو;
 
-	memset(&index, 0, sizeof(index));
+	memset(&اشاريو, 0, حجم(اشاريو));
 
-	index.env = env;
-	index.xpp = xpp;
+	اشاريو.env = env;
+	اشاريو.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	اشاريو.رڪارڊون = عدم;
+	اشاريو.سٽ_map = عدم;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	اشاريو.rcha.سر = عدم;
 
-	index.table_bits = xdl_hashbits(count1);
-	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	اشاريو.جدول_بٽ = xdl_hashbits(count1);
+	اشاريو.رڪارڊون_سائيز = 1 << اشاريو.جدول_بٽ;
+	إذا (!XDL_CALLOC_ARRAY(اشاريو.رڪارڊون, اشاريو.رڪارڊون_سائيز))
+		اذهب cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	اشاريو.سٽ_map_سائيز = count1;
+	إذا (!XDL_CALLOC_ARRAY(اشاريو.سٽ_map, اشاريو.سٽ_map_سائيز))
+		اذهب cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	إذا (!XDL_CALLOC_ARRAY(اشاريو.ايندڙ_ptrs, اشاريو.سٽ_map_سائيز))
+		اذهب cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	إذا (xdl_cha_init(&اشاريو.rcha, حجم(بنية رڪارڊ), count1 / 4 + 1) < 0)
+		اذهب cleanup;
 
-	index.ptr_shift = line1;
-	index.max_chain_length = 64;
+	اشاريو.ptr_سرڪايو = line1;
+	اشاريو.max_chain_ڊيگهائي = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	إذا (جاچ_A(&اشاريو, line1, count1))
+		اذهب cleanup;
 
-	index.cnt = index.max_chain_length + 1;
+	اشاريو.cnt = اشاريو.max_chain_ڊيگهائي + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
-		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
+	لكل (b_ptr = line2; b_ptr <= سٽ_پڇاڙي_2(2); )
+		b_ptr = try_lcs(&اشاريو, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	إذا (اشاريو.has_common && اشاريو.max_chain_ڊيگهائي < اشاريو.cnt)
 		ret = 1;
-	else
+	وإلا
 		ret = 0;
 
 cleanup:
-	free_index(&index);
-	return ret;
+	free_اشاريو(&اشاريو);
+	أرجع ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+ساكن صحيح histogram_diff(xpparam_t ثابت *xpp, xdfenv_t *env,
+	صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	بنية region lcs;
+	صحيح lcs_مليو;
+	صحيح نتيجو;
 redo:
-	result = -1;
+	نتيجو = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	إذا (count1 <= 0 && count2 <= 0)
+		أرجع 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	إذا ((بنانشان صحيح)سٽ_پڇاڙي_2(1) >= MAX_PTR)
+		أرجع -1;
 
-	if (!count1) {
-		while(count2--)
-			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
-			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+	إذا (!count1) {
+		طالما(count2--)
+			env->xdf2.بدليو[line2++ - 1] = true;
+		أرجع 0;
+	} وإلا إذا (!count2) {
+		طالما(count1--)
+			env->xdf1.بدليو[line1++ - 1] = true;
+		أرجع 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
-	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
-		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
-				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
-				env->xdf2.changed[line2++ - 1] = true;
-			result = 0;
-		} else {
-			result = histogram_diff(xpp, env,
+	memset(&lcs, 0, حجم(lcs));
+	lcs_مليو = ڳوليو_lcs(xpp, env, &lcs, line1, count1, line2, count2);
+	إذا (lcs_مليو < 0)
+		اذهب ٻاهريون;
+	وإلا إذا (lcs_مليو)
+		نتيجو = fall_پٺ_منزل_classic_diff(xpp, env, line1, count1, line2, count2);
+	وإلا {
+		إذا (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			طالما (count1--)
+				env->xdf1.بدليو[line1++ - 1] = true;
+			طالما (count2--)
+				env->xdf2.بدليو[line2++ - 1] = true;
+			نتيجو = 0;
+		} وإلا {
+			نتيجو = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			إذا (نتيجو)
+				اذهب ٻاهريون;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = سٽ_پڇاڙي_2(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = سٽ_پڇاڙي_2(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			اذهب redo;
 		}
 	}
-out:
-	return result;
+ٻاهريون:
+	أرجع نتيجو;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+صحيح xdl_do_histogram_diff(xpparam_t ثابت *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	أرجع histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

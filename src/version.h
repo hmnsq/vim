@@ -12,43 +12,43 @@
  */
 
 // Trick to turn a number into a string.
-#define VIM_TOSTR_(a)			#a
-#define VIM_TOSTR(a)			VIM_TOSTR_(a)
+#وصف_ڪريو VIM_TOSTR_(a)			#a
+#وصف_ڪريو VIM_TOSTR(a)			VIM_TOSTR_(a)
 
 // Values that change for a new release.
-#define VIM_VERSION_MAJOR		9
-#define VIM_VERSION_MINOR		2
-#define VIM_VERSION_BUILD		286
-#define VIM_VERSION_BUILD_BCD		0x11e
-#define VIM_VERSION_DATE_ONLY		"2026 Feb 14"
+#وصف_ڪريو VIM_نسخو_MAJOR		9
+#وصف_ڪريو VIM_نسخو_MINOR		2
+#وصف_ڪريو VIM_نسخو_BUILD		286
+#وصف_ڪريو VIM_نسخو_BUILD_BCD		0x11e
+#وصف_ڪريو VIM_نسخو_DATE_ONLY		"2026 Feb 14"
 
 // Values based on the above
-#define VIM_VERSION_MAJOR_STR		VIM_TOSTR(VIM_VERSION_MAJOR)
-#define VIM_VERSION_MINOR_STR		VIM_TOSTR(VIM_VERSION_MINOR)
-#define VIM_VERSION_100	    (VIM_VERSION_MAJOR * 100 + VIM_VERSION_MINOR)
+#وصف_ڪريو VIM_نسخو_MAJOR_STR		VIM_TOSTR(VIM_نسخو_MAJOR)
+#وصف_ڪريو VIM_نسخو_MINOR_STR		VIM_TOSTR(VIM_نسخو_MINOR)
+#وصف_ڪريو VIM_نسخو_100	    (VIM_نسخو_MAJOR * 100 + VIM_نسخو_MINOR)
 
-#define VIM_VERSION_BUILD_STR		VIM_TOSTR(VIM_VERSION_BUILD)
-#ifndef VIM_VERSION_PATCHLEVEL
-# define VIM_VERSION_PATCHLEVEL		0
-#endif
+#وصف_ڪريو VIM_نسخو_BUILD_STR		VIM_TOSTR(VIM_نسخو_BUILD)
+#جيڪڏهن_وصف_نه_ٿيل VIM_نسخو_PATCHLEVEL
+# define VIM_نسخو_PATCHLEVEL		0
+#جيڪڏهن_پورو
 
 // Patchlevel with leading zeros
 // For compatibility with the installer from "vim-win32-installer" and WinGet.
 // For details see https://github.com/vim/vim-win32-installer/pull/277
 // and https://github.com/vim/vim-win32-installer/pull/285
-#if VIM_VERSION_PATCHLEVEL < 10
+#إذا VIM_نسخو_PATCHLEVEL < 10
 # define LEADZERO(x) 000 ## x
-#elif VIM_VERSION_PATCHLEVEL < 100
+#وإلاإذا VIM_نسخو_PATCHLEVEL < 100
 # define LEADZERO(x) 00 ## x
-#elif VIM_VERSION_PATCHLEVEL < 1000
+#وإلاإذا VIM_نسخو_PATCHLEVEL < 1000
 # define LEADZERO(x) 0 ## x
-#else
+#وإلا
 # define LEADZERO(x) x
-#endif
+#جيڪڏهن_پورو
 
-#define VIM_VERSION_PATCHLEVEL_STR	VIM_TOSTR(LEADZERO(VIM_VERSION_PATCHLEVEL))
+#وصف_ڪريو VIM_نسخو_PATCHLEVEL_STR	VIM_TOSTR(LEADZERO(VIM_نسخو_PATCHLEVEL))
 // Used by MacOS port; should be one of: development, alpha, beta, final
-#define VIM_VERSION_RELEASE		final
+#وصف_ڪريو VIM_نسخو_RELEASE		final
 
 /*
  * VIM_VERSION_NODOT is used for the runtime directory name.
@@ -56,10 +56,10 @@
  * VIM_VERSION_MEDIUM is used for the startup-screen.
  * VIM_VERSION_LONG is used for the ":version" command and "Vim -h".
  */
-#define VIM_VERSION_NODOT     "vim" VIM_VERSION_MAJOR_STR VIM_VERSION_MINOR_STR
-#define VIM_VERSION_SHORT     VIM_VERSION_MAJOR_STR "." VIM_VERSION_MINOR_STR
-#define VIM_VERSION_MEDIUM    VIM_VERSION_SHORT
-#define VIM_VERSION_LONG_ONLY "VIM - Vi IMproved " VIM_VERSION_MEDIUM
-#define VIM_VERSION_LONG_HEAD VIM_VERSION_LONG_ONLY " (" VIM_VERSION_DATE_ONLY
-#define VIM_VERSION_LONG      VIM_VERSION_LONG_HEAD ")"
-#define VIM_VERSION_LONG_DATE VIM_VERSION_LONG_HEAD ", compiled "
+#وصف_ڪريو VIM_نسخو_NODOT     "vim" VIM_نسخو_MAJOR_STR VIM_نسخو_MINOR_STR
+#وصف_ڪريو VIM_نسخو_SHORT     VIM_نسخو_MAJOR_STR "." VIM_نسخو_MINOR_STR
+#وصف_ڪريو VIM_نسخو_MEDIUM    VIM_نسخو_SHORT
+#وصف_ڪريو VIM_نسخو_LONG_ONLY "VIM - Vi IMproved " VIM_نسخو_MEDIUM
+#وصف_ڪريو VIM_نسخو_LONG_سر VIM_نسخو_LONG_ONLY " (" VIM_نسخو_DATE_ONLY
+#وصف_ڪريو VIM_نسخو_LONG      VIM_نسخو_LONG_سر ")"
+#وصف_ڪريو VIM_نسخو_LONG_DATE VIM_نسخو_LONG_سر ", compiled "

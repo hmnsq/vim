@@ -6,14 +6,14 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifdef __QNXNTO__
+#جيڪڏهن_وصف_ٿيل __QNXNTO__
 # include <sys/procmgr.h>
-#endif
+#جيڪڏهن_پورو
 
-#define	USE_TMPNAM
+#وصف_ڪريو	USE_TMPNAM
 
-#define POSIX	    // Used by pty.c
+#وصف_ڪريو POSIX	    // Used by pty.c
 
-#if defined(FEAT_GUI_PHOTON)
-extern int is_photon_available;
-#endif
+#إذا defined(FEAT_GUI_PHOTON)
+خارجي صحيح is_photon_موجود;
+#جيڪڏهن_پورو

@@ -5,52 +5,52 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-from test_channel import ThreadedTCPServer, TestingRequestHandler, \
-    writePortInFile
-import socket
-import threading
-import os
+من __future__ استورد print_function
+من test_channel استورد ThreadedTCPServer, TestingRequestHandler, \
+    write_پورٽ_اندريون_File
+استورد socket
+استورد threading
+استورد os
 
-try:
-    FileNotFoundError
-except NameError:
+حاول:
+    File_Not_مليو_Error
+استثناء NameError:
     # Python 2
-    FileNotFoundError = (IOError, OSError)
+    File_Not_مليو_Error = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
-    raise NotImplementedError("Unix sockets are not supported on this platform")
+إذا ليس hasattr(socket, "AF_UNIX"):
+    ارفع NotImplementedError("Unix sockets are not supported on this platform")
 
-class ThreadedUnixServer(ThreadedTCPServer):
-    address_family = socket.AF_UNIX
+صنف ThreadedUnixServer(ThreadedTCPServer):
+    پتو_family = socket.AF_UNIX
 
-class ThreadedUnixRequestHandler(TestingRequestHandler):
-    pass
+صنف ThreadedUnixRequestHandler(TestingRequestHandler):
+    لنگهه
 
-def main(path):
-    server = ThreadedUnixServer(path, ThreadedUnixRequestHandler)
+وصف مکيه(رستو):
+    server = ThreadedUnixServer(رستو, ThreadedUnixRequestHandler)
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.start()
+    server_thread = threading.خيط(هدف=server.serve_forever)
+    server_thread.شروعات()
 
     # Signal the test harness we're ready, the port value has no meaning.
-    writePortInFile(1234)
+    write_پورٽ_اندريون_File(1234)
 
-    print("Listening on {0}".format(server.server_address))
+    ڇاپيو("Listening on {0}".format(server.server_پتو))
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    حاول:
+        طالما server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    استثناء (Keyboard_مداخلت, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    try:
+إذا __name__ == "__main__":
+    حاول:
         os.remove("Xtestsocket")
-    except FileNotFoundError:
-        pass
-    main("Xtestsocket")
+    استثناء File_Not_مليو_Error:
+        لنگهه
+    مکيه("Xtestsocket")

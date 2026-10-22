@@ -7,104 +7,104 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-static void cmd_with_count(char *cmd, char_u *bufp, size_t bufsize, long Prenum);
-static void win_init(win_T *newp, win_T *oldp, int flags);
-static void win_init_some(win_T *newp, win_T *oldp);
-static void frame_comp_pos(frame_T *topfrp, int *row, int *col);
-static void frame_setheight(frame_T *curfrp, int height);
-static void frame_setwidth(frame_T *curfrp, int width);
-static void win_exchange(long);
-static void win_rotate(int, int);
-static void win_equal_rec(win_T *next_curwin, int current, frame_T *topfr, int dir, int col, int row, int width, int height);
-static void trigger_winnewpre(void);
-static void trigger_winclosed(win_T *win);
-static win_T *win_free_mem(win_T *win, int *dirp, tabpage_T *tp);
-static frame_T *win_altframe(win_T *win, tabpage_T *tp);
-static tabpage_T *alt_tabpage(void);
-static win_T *frame2win(frame_T *frp);
-static int frame_has_win(frame_T *frp, win_T *wp);
-static void win_fix_scroll(int resize);
-static void win_fix_cursor(int normal);
-static void frame_new_height(frame_T *topfrp, int height, int topfirst, int wfh, int set_ch);
-static int frame_fixed_height(frame_T *frp);
-static int frame_fixed_width(frame_T *frp);
-static void frame_add_statusline(frame_T *frp);
-static void frame_new_width(frame_T *topfrp, int width, int leftfirst, int wfw);
-static void frame_set_vsep(frame_T *frp, int add);
-static int frame_minwidth(frame_T *topfrp, win_T *next_curwin);
-static void frame_fix_width(win_T *wp);
-static int win_alloc_firstwin(win_T *oldwin);
-static void new_frame(win_T *wp);
-static tabpage_T *alloc_tabpage(void);
-static int leave_tabpage(buf_T *new_curbuf, int trigger_leave_autocmds);
-static void enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, int trigger_enter_autocmds, int trigger_leave_autocmds);
-static void frame_fix_height(win_T *wp);
-static int frame_minheight(frame_T *topfrp, win_T *next_curwin);
-static int frame_wincount_in_height(frame_T *topfrp);
-static int may_open_tabpage(void);
-static int win_enter_ext(win_T *wp, int flags);
-static void win_free(win_T *wp, tabpage_T *tp);
-static void win_append(win_T *after, win_T *wp);
-static void frame_append(frame_T *after, frame_T *frp);
-static void frame_insert(frame_T *before, frame_T *frp);
-static void frame_remove(frame_T *frp);
-static void win_goto_ver(int up, long count);
-static void win_goto_hor(int left, long count);
-static void frame_add_height(frame_T *frp, int n);
-static void last_status_rec(frame_T *fr, int statusline);
-#if defined(FEAT_STL_OPT)
-static int frame_find_global_stlh_rec(frame_T *frp, int h);
-static void frame_change_statusline_height_rec(frame_T *frp, int global_stlh);
-#endif
-static void frame_flatten(frame_T *frp);
-static void winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr);
+ساكن فراغ cmd_with_ڳڻپ(حرف *cmd, char_u *bufp, size_t bufsize, ڊگهو Prenum);
+ساكن فراغ win_init(win_T *newp, win_T *oldp, صحيح flags);
+ساكن فراغ win_init_some(win_T *newp, win_T *oldp);
+ساكن فراغ چوکٺو_comp_pos(چوکٺو_T *topfrp, صحيح *صف, صحيح *کانو);
+ساكن فراغ چوکٺو_setheight(چوکٺو_T *curfrp, صحيح اوچائي);
+ساكن فراغ چوکٺو_setwidth(چوکٺو_T *curfrp, صحيح ويڪر);
+ساكن فراغ win_exchange(ڊگهو);
+ساكن فراغ win_rotate(صحيح, صحيح);
+ساكن فراغ win_equal_rec(win_T *ايندڙ_curwin, صحيح current, چوکٺو_T *topfr, صحيح dir, صحيح کانو, صحيح صف, صحيح ويڪر, صحيح اوچائي);
+ساكن فراغ trigger_winnewpre(فراغ);
+ساكن فراغ trigger_winclosed(win_T *win);
+ساكن win_T *win_free_mem(win_T *win, صحيح *dirp, tabpage_T *tp);
+ساكن چوکٺو_T *win_altframe(win_T *win, tabpage_T *tp);
+ساكن tabpage_T *alt_tabpage(فراغ);
+ساكن win_T *frame2win(چوکٺو_T *frp);
+ساكن صحيح چوکٺو_has_win(چوکٺو_T *frp, win_T *wp);
+ساكن فراغ win_fix_scroll(صحيح resize);
+ساكن فراغ win_fix_cursor(صحيح عام_5);
+ساكن فراغ چوکٺو_new_اوچائي(چوکٺو_T *topfrp, صحيح اوچائي, صحيح topfirst, صحيح wfh, صحيح سيٽ_ch);
+ساكن صحيح چوکٺو_fixed_اوچائي(چوکٺو_T *frp);
+ساكن صحيح چوکٺو_fixed_ويڪر(چوکٺو_T *frp);
+ساكن فراغ چوکٺو_جوڙيو_statusline(چوکٺو_T *frp);
+ساكن فراغ چوکٺو_new_ويڪر(چوکٺو_T *topfrp, صحيح ويڪر, صحيح leftfirst, صحيح wfw);
+ساكن فراغ چوکٺو_سيٽ_vsep(چوکٺو_T *frp, صحيح جوڙيو);
+ساكن صحيح چوکٺو_minwidth(چوکٺو_T *topfrp, win_T *ايندڙ_curwin);
+ساكن فراغ چوکٺو_fix_ويڪر(win_T *wp);
+ساكن صحيح win_alloc_firstwin(win_T *oldwin);
+ساكن فراغ new_چوکٺو(win_T *wp);
+ساكن tabpage_T *alloc_tabpage(فراغ);
+ساكن صحيح leave_tabpage(buf_T *new_curbuf, صحيح trigger_leave_autocmds);
+ساكن فراغ enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, صحيح trigger_enter_autocmds, صحيح trigger_leave_autocmds);
+ساكن فراغ چوکٺو_fix_اوچائي(win_T *wp);
+ساكن صحيح چوکٺو_minheight(چوکٺو_T *topfrp, win_T *ايندڙ_curwin);
+ساكن صحيح چوکٺو_wincount_اندريون_اوچائي(چوکٺو_T *topfrp);
+ساكن صحيح may_open_tabpage(فراغ);
+ساكن صحيح win_enter_ext(win_T *wp, صحيح flags);
+ساكن فراغ win_free(win_T *wp, tabpage_T *tp);
+ساكن فراغ win_append(win_T *after, win_T *wp);
+ساكن فراغ چوکٺو_append(چوکٺو_T *after, چوکٺو_T *frp);
+ساكن فراغ چوکٺو_وجهو(چوکٺو_T *before, چوکٺو_T *frp);
+ساكن فراغ چوکٺو_remove(چوکٺو_T *frp);
+ساكن فراغ win_goto_ver(صحيح مٿي, ڊگهو ڳڻپ);
+ساكن فراغ win_goto_hor(صحيح کاٻو, ڊگهو ڳڻپ);
+ساكن فراغ چوکٺو_جوڙيو_اوچائي(چوکٺو_T *frp, صحيح n);
+ساكن فراغ آخري_حالت_rec(چوکٺو_T *fr, صحيح statusline);
+#إذا defined(FEAT_STL_OPT)
+ساكن صحيح چوکٺو_ڳوليو_global_stlh_rec(چوکٺو_T *frp, صحيح h);
+ساكن فراغ چوکٺو_change_statusline_اوچائي_rec(چوکٺو_T *frp, صحيح global_stlh);
+#جيڪڏهن_پورو
+ساكن فراغ چوکٺو_flatten(چوکٺو_T *frp);
+ساكن فراغ winframe_restore(win_T *wp, صحيح dir, چوکٺو_T *unflat_altfr);
 
-static int make_snapshot_rec(frame_T *fr, frame_T **frp);
-static void clear_snapshot(tabpage_T *tp, int idx);
-static void clear_snapshot_rec(frame_T *fr);
-static int check_snapshot_rec(frame_T *sn, frame_T *fr);
-static win_T *restore_snapshot_rec(frame_T *sn, frame_T *fr);
-static win_T *get_snapshot_curwin(int idx);
+ساكن صحيح make_snapshot_rec(چوکٺو_T *fr, چوکٺو_T **frp);
+ساكن فراغ clear_snapshot(tabpage_T *tp, صحيح idx);
+ساكن فراغ clear_snapshot_rec(چوکٺو_T *fr);
+ساكن صحيح check_snapshot_rec(چوکٺو_T *sn, چوکٺو_T *fr);
+ساكن win_T *restore_snapshot_rec(چوکٺو_T *sn, چوکٺو_T *fr);
+ساكن win_T *get_snapshot_curwin(صحيح idx);
 
-static int frame_check_height(frame_T *topfrp, int height);
-static int frame_check_width(frame_T *topfrp, int width);
+ساكن صحيح چوکٺو_check_اوچائي(چوکٺو_T *topfrp, صحيح اوچائي);
+ساكن صحيح چوکٺو_check_ويڪر(چوکٺو_T *topfrp, صحيح ويڪر);
 
-static win_T *win_alloc(win_T *after, int hidden);
+ساكن win_T *win_alloc(win_T *after, صحيح hidden);
 
-#define NOWIN		((win_T *)-1)	// non-existing window
+#وصف_ڪريو NOWIN		((win_T *)-1)	// non-existing window
 
-#define ROWS_AVAIL (Rows - p_ch - tabline_height())
+#وصف_ڪريو صفون_AVAIL (صفون - p_ch - tabline_اوچائي())
 
 // flags for win_enter_ext()
-#define WEE_UNDO_SYNC			0x01
-#define WEE_CURWIN_INVALID		0x02
-#define WEE_TRIGGER_NEW_AUTOCMDS	0x04
-#define WEE_TRIGGER_ENTER_AUTOCMDS	0x08
-#define WEE_TRIGGER_LEAVE_AUTOCMDS	0x10
-#define WEE_ALLOW_PARSE_MESSAGES	0x20
+#وصف_ڪريو WEE_UNDO_SYNC			0x01
+#وصف_ڪريو WEE_CURWIN_INVALID		0x02
+#وصف_ڪريو WEE_TRIGGER_NEW_AUTOCMDS	0x04
+#وصف_ڪريو WEE_TRIGGER_ENTER_AUTOCMDS	0x08
+#وصف_ڪريو WEE_TRIGGER_LEAVE_AUTOCMDS	0x10
+#وصف_ڪريو WEE_ALLOW_PARSE_MESSAGES	0x20
 
-static char *m_onlyone = N_("Already only one window");
+ساكن حرف *m_onlyone = N_("Already only one window");
 
 // When non-zero splitting a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int split_disallowed = 0;
+ساكن صحيح ورهايو_disallowed = 0;
 
 // When non-zero closing a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int close_disallowed = 0;
+ساكن صحيح close_disallowed = 0;
 
 // When non-zero changing the window frame structure is forbidden.  Used
 // to avoid that winframe_remove() is called recursively
-static int frame_locked = 0;
+ساكن صحيح چوکٺو_locked = 0;
 
-#if defined(FEAT_STL_OPT)
+#إذا defined(FEAT_STL_OPT)
 // rendered height of global 'stl' (number of "%@" + 1)
-static int stl_rendered_height = 1;
-static int stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
-static int stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
-#endif
+ساكن صحيح stl_rendered_اوچائي = 1;
+ساكن صحيح stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
+ساكن صحيح stlo_mh = حالت_اوچائي_2; // "maxheight" value cache of global 'stlo'
+#جيڪڏهن_پورو
 
 /*
  * Disallow changing the window layout (split window, close window, move
@@ -113,24 +113,24 @@ static int stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
  * make sure the previously selected window is still there.
  * Must be matched with exactly one call to window_layout_unlock()!
  */
-    void
-window_layout_lock(void)
+    فراغ
+دري_layout_تالو(فراغ)
 {
-    ++split_disallowed;
+    ++ورهايو_disallowed;
     ++close_disallowed;
 }
 
-    void
-window_layout_unlock(void)
+    فراغ
+دري_layout_unlock(فراغ)
 {
-    --split_disallowed;
+    --ورهايو_disallowed;
     --close_disallowed;
 }
 
-    int
-frames_locked(void)
+    صحيح
+چوکٺا_locked(فراغ)
 {
-    return frame_locked;
+    أرجع چوکٺو_locked;
 }
 
 /*
@@ -139,61 +139,61 @@ frames_locked(void)
  * error message.  When closing window(s) and the command isn't easy to know,
  * passing CMD_SIZE will also work.
  */
-    int
-window_layout_locked(enum CMD_index cmd)
+    صحيح
+دري_layout_locked(تعداد CMD_اشاريو cmd)
 {
-    if (split_disallowed > 0 || close_disallowed > 0)
+    إذا (ورهايو_disallowed > 0 || close_disallowed > 0)
     {
-	if (close_disallowed == 0 && cmd == CMD_tabnew)
-	    emsg(_(e_cannot_split_window_when_closing_buffer));
-	else
-	    emsg(_(e_not_allowed_to_change_window_layout_in_this_autocmd));
-	return TRUE;
+	إذا (close_disallowed == 0 && cmd == CMD_tabnew)
+	    emsg(_(e_cannot_ورهايو_دري_when_closing_بفر));
+	وإلا
+	    emsg(_(e_not_allowed_منزل_change_دري_layout_اندريون_this_autocmd));
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 // #define WIN_DEBUG
-#ifdef WIN_DEBUG
+#جيڪڏهن_وصف_ٿيل WIN_DEBUG
 /*
  * Call this method to log the current window layout.
  */
-    static void
-log_frame_layout(frame_T *frame)
+    ساكن فراغ
+log_چوکٺو_layout(چوکٺو_T *چوکٺو)
 {
-    ch_log(NULL, "layout %s, wi: %d, he: %d, wwi: %d, whe: %d, id: %d",
-	    frame->fr_layout == FR_LEAF ? "LEAF"
-				  : frame->fr_layout == FR_ROW ? "ROW" : "COL",
-	    frame->fr_width,
-	    frame->fr_height,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_width,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_height,
-	    frame->fr_win == NULL ? -1 : frame->fr_win->w_id);
-    if (frame->fr_child != NULL)
+    ch_log(عدم, "layout %s, wi: %d, he: %d, wwi: %d, whe: %d, id: %d",
+	    چوکٺو->fr_layout == FR_پن ? "LEAF"
+				  : چوکٺو->fr_layout == FR_صف ? "ROW" : "COL",
+	    چوکٺو->fr_ويڪر,
+	    چوکٺو->fr_اوچائي,
+	    چوکٺو->fr_win == عدم ? -1 : چوکٺو->fr_win->w_ويڪر,
+	    چوکٺو->fr_win == عدم ? -1 : چوکٺو->fr_win->w_اوچائي,
+	    چوکٺو->fr_win == عدم ? -1 : چوکٺو->fr_win->w_id);
+    إذا (چوکٺو->fr_ٻار != عدم)
     {
-	ch_log(NULL, "children");
-	log_frame_layout(frame->fr_child);
-	if (frame->fr_next != NULL)
-	    ch_log(NULL, "END of children");
+	ch_log(عدم, "children");
+	log_چوکٺو_layout(چوکٺو->fr_ٻار);
+	إذا (چوکٺو->fr_ايندڙ != عدم)
+	    ch_log(عدم, "END of children");
     }
-    if (frame->fr_next != NULL)
-	log_frame_layout(frame->fr_next);
+    إذا (چوکٺو->fr_ايندڙ != عدم)
+	log_چوکٺو_layout(چوکٺو->fr_ايندڙ);
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Check if the current window is allowed to move to a different buffer.
  * If the window has 'winfixbuf', this function will return FALSE.
  */
-    int
-check_can_set_curbuf_disabled(void)
+    صحيح
+check_can_سيٽ_curbuf_disabled(فراغ)
 {
-    if (curwin->w_p_wfb)
+    إذا (curwin->w_p_wfb)
     {
-	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	emsg(_(e_winfixbuf_cannot_go_منزل_بفر));
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -201,15 +201,15 @@ check_can_set_curbuf_disabled(void)
  * If the window has 'winfixbuf', then forceit must be TRUE or this function
  * will return FALSE.
  */
-    int
-check_can_set_curbuf_forceit(int forceit)
+    صحيح
+check_can_سيٽ_curbuf_forceit(صحيح forceit)
 {
-    if (!forceit && curwin->w_p_wfb)
+    إذا (!forceit && curwin->w_p_wfb)
     {
-	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	emsg(_(e_winfixbuf_cannot_go_منزل_بفر));
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -217,10 +217,10 @@ check_can_set_curbuf_forceit(int forceit)
  * set, then return "prevwin".
  */
     win_T *
-prevwin_curwin(void)
+prevwin_curwin(فراغ)
 {
     // In cmdwin, the alternative buffer should be used.
-    return is_in_cmdwin() && prevwin != NULL ? prevwin : curwin;
+    أرجع is_اندريون_cmdwin() && prevwin != عدم ? prevwin : curwin;
 }
 
 /*
@@ -231,255 +231,255 @@ prevwin_curwin(void)
     win_T *
 swbuf_goto_win_with_buf(buf_T *buf)
 {
-    win_T   *wp = NULL;
+    win_T   *wp = عدم;
 
-    if (buf == NULL)
-	return wp;
+    إذا (buf == عدم)
+	أرجع wp;
 
     // If 'switchbuf' contains "useopen": jump to first window in the current
     // tab page containing "buf" if one exists.
-    if (swb_flags & SWB_USEOPEN)
+    إذا (swb_flags & SWB_USEOPEN)
 	wp = buf_jump_open_win(buf);
 
     // If 'switchbuf' contains "usetab": jump to first window in any tab page
     // containing "buf" if one exists.
-    if (wp == NULL && (swb_flags & SWB_USETAB))
+    إذا (wp == عدم && (swb_flags & SWB_USETAB))
 	wp = buf_jump_open_tab(buf);
 
-    return wp;
+    أرجع wp;
 }
 
 /*
  * All CTRL-W window commands are handled here, called from normal_cmd().
  */
-    void
-do_window(
-    int		nchar,
-    long	Prenum,
-    int		xchar)	    // extra char from ":wincmd gx" or NUL
+    فراغ
+do_دري(
+    صحيح		nchar,
+    ڊگهو	Prenum,
+    صحيح		xchar)	    // extra char from ":wincmd gx" or NUL
 {
-    long	Prenum1;
+    ڊگهو	Prenum1;
     win_T	*wp;
     char_u	*ptr;
     linenr_T    lnum = -1;
-#ifdef FEAT_FIND_ID
-    int		type = FIND_DEFINE;
-    int		len;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڳوليو_ID
+    صحيح		type = ڳوليو_DEFINE;
+    صحيح		len;
+#جيڪڏهن_پورو
     char_u	cbuf[40];
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    إذا (ERROR_IF_ANY_POPUP_دري)
+	أرجع;
 
-#define CHECK_CMDWIN \
-    do { \
-	if (cmdwin_type != 0) \
+#وصف_ڪريو CHECK_CMDWIN \
+    افعل { \
+	إذا (cmdwin_type != 0) \
 	{ \
-	    emsg(_(e_invalid_in_cmdline_window)); \
-	    return; \
+	    emsg(_(e_invalid_اندريون_cmdline_دري)); \
+	    أرجع; \
 	} \
-    } while (0)
+    } طالما (0)
 
     Prenum1 = Prenum == 0 ? 1 : Prenum;
 
-    switch (nchar)
+    بدل (nchar)
     {
 // split current window in two parts, horizontally
-    case 'S':
-    case Ctrl_S:
-    case 's':
+    حالة 'S':
+    حالة Ctrl_S:
+    حالة 's':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
-		    goto newwindow;
-#ifdef FEAT_GUI
+		إذا (bt_quickfix(curbuf))
+		    اذهب newwindow;
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		(void)win_split((int)Prenum, 0);
-		break;
+#جيڪڏهن_پورو
+		(فراغ)win_ورهايو((صحيح)Prenum, 0);
+		اكسر;
 
 // split current window in two parts, vertically
-    case Ctrl_V:
-    case 'v':
+    حالة Ctrl_V:
+    حالة 'v':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
-		    goto newwindow;
-#ifdef FEAT_GUI
+		إذا (bt_quickfix(curbuf))
+		    اذهب newwindow;
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		(void)win_split((int)Prenum, WSP_VERT);
-		break;
+#جيڪڏهن_پورو
+		(فراغ)win_ورهايو((صحيح)Prenum, WSP_VERT);
+		اكسر;
 
 // split current window and edit alternate file
-    case Ctrl_HAT:
-    case '^':
+    حالة Ctrl_HAT:
+    حالة '^':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 
-		if (buflist_findnr(Prenum == 0
-					? curwin->w_alt_fnum : Prenum) == NULL)
+		إذا (buflist_findnr(Prenum == 0
+					? curwin->w_alt_fnum : Prenum) == عدم)
 		{
-		    if (Prenum == 0)
+		    إذا (Prenum == 0)
 			emsg(_(e_no_alternate_file));
-		    else
-			semsg(_(e_buffer_nr_not_found), Prenum);
-		    break;
+		    وإلا
+			semsg(_(e_بفر_nr_not_مليو), Prenum);
+		    اكسر;
 		}
 
-		if (!curbuf_locked() && win_split(0, 0) == OK)
-		    (void)buflist_getfile(
+		إذا (!curbuf_locked() && win_ورهايو(0, 0) == OK)
+		    (فراغ)buflist_getfile(
 			    Prenum == 0 ? curwin->w_alt_fnum : Prenum,
 			    (linenr_T)0, GETF_ALT, FALSE);
-		break;
+		اكسر;
 
 // open new window
-    case Ctrl_N:
-    case 'n':
+    حالة Ctrl_N:
+    حالة 'n':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 newwindow:
-		if (Prenum)
+		إذا (Prenum)
 		    // window height
-		    vim_snprintf((char *)cbuf, sizeof(cbuf) - 5, "%ld", Prenum);
-		else
+		    vim_snprintf((حرف *)cbuf, حجم(cbuf) - 5, "%ld", Prenum);
+		وإلا
 		    cbuf[0] = NUL;
-#if defined(FEAT_QUICKFIX)
-		if (nchar == 'v' || nchar == Ctrl_V)
+#إذا defined(FEAT_QUICKFIX)
+		إذا (nchar == 'v' || nchar == Ctrl_V)
 		    STRCAT(cbuf, "v");
-#endif
+#جيڪڏهن_پورو
 		STRCAT(cbuf, "new");
 		do_cmdline_cmd(cbuf);
-		break;
+		اكسر;
 
 // quit current window
-    case Ctrl_Q:
-    case 'q':
+    حالة Ctrl_Q:
+    حالة 'q':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("quit", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ڳڻپ("quit", cbuf, حجم(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		اكسر;
 
 // close current window
-    case Ctrl_C:
-    case 'c':
+    حالة Ctrl_C:
+    حالة 'c':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("close", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ڳڻپ("close", cbuf, حجم(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		اكسر;
 
-#if defined(FEAT_QUICKFIX)
+#إذا defined(FEAT_QUICKFIX)
 // close preview window
-    case Ctrl_Z:
-    case 'z':
+    حالة Ctrl_Z:
+    حالة 'z':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		do_cmdline_cmd((char_u *)"pclose");
-		break;
+		اكسر;
 
 // cursor to preview window
-    case 'P':
+    حالة 'P':
 		FOR_ALL_WINDOWS(wp)
-		    if (wp->w_p_pvw)
-			break;
-		if (wp == NULL)
-		    emsg(_(e_there_is_no_preview_window));
-		else
+		    إذا (wp->w_p_pvw)
+			اكسر;
+		إذا (wp == عدم)
+		    emsg(_(e_there_is_no_preview_دري));
+		وإلا
 		    win_goto(wp);
-		break;
-#endif
+		اكسر;
+#جيڪڏهن_پورو
 
 // close all but current window
-    case Ctrl_O:
-    case 'o':
+    حالة Ctrl_O:
+    حالة 'o':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("only", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_ڳڻپ("only", cbuf, حجم(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		اكسر;
 
 // cursor to next window with wrap around
-    case Ctrl_W:
-    case 'w':
+    حالة Ctrl_W:
+    حالة 'w':
 // cursor to previous window with wrap around
-    case 'W':
+    حالة 'W':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW && Prenum != 1)	// just one window
+		إذا (ONE_دري && Prenum != 1)	// just one window
 		    beep_flush();
-		else
+		وإلا
 		{
-		    if (Prenum)			// go to specified window
+		    إذا (Prenum)			// go to specified window
 		    {
-			for (wp = firstwin; --Prenum > 0; )
+			لكل (wp = firstwin; --Prenum > 0; )
 			{
-			    if (wp->w_next == NULL)
-				break;
-			    else
-				wp = wp->w_next;
+			    إذا (wp->w_ايندڙ == عدم)
+				اكسر;
+			    وإلا
+				wp = wp->w_ايندڙ;
 			}
 		    }
-		    else
+		    وإلا
 		    {
-			if (nchar == 'W')	    // go to previous window
+			إذا (nchar == 'W')	    // go to previous window
 			{
 			    wp = curwin->w_prev;
-			    if (wp == NULL)
+			    إذا (wp == عدم)
 				wp = lastwin;	    // wrap around
 			}
-			else			    // go to next window
+			وإلا			    // go to next window
 			{
-			    wp = curwin->w_next;
-			    if (wp == NULL)
+			    wp = curwin->w_ايندڙ;
+			    إذا (wp == عدم)
 				wp = firstwin;	    // wrap around
 			}
 		    }
 		    win_goto(wp);
 		}
-		break;
+		اكسر;
 
 // cursor to window below
-    case 'j':
-    case K_DOWN:
-    case Ctrl_J:
+    حالة 'j':
+    حالة K_هيٺ_ڏانهن:
+    حالة Ctrl_J:
 		CHECK_CMDWIN;
 		win_goto_ver(FALSE, Prenum1);
-		break;
+		اكسر;
 
 // cursor to window above
-    case 'k':
-    case K_UP:
-    case Ctrl_K:
+    حالة 'k':
+    حالة K_مٿي:
+    حالة Ctrl_K:
 		CHECK_CMDWIN;
 		win_goto_ver(TRUE, Prenum1);
-		break;
+		اكسر;
 
 // cursor to left window
-    case 'h':
-    case K_LEFT:
-    case Ctrl_H:
-    case K_BS:
+    حالة 'h':
+    حالة K_کاٻو:
+    حالة Ctrl_H:
+    حالة K_BS:
 		CHECK_CMDWIN;
 		win_goto_hor(TRUE, Prenum1);
-		break;
+		اكسر;
 
 // cursor to right window
-    case 'l':
-    case K_RIGHT:
-    case Ctrl_L:
+    حالة 'l':
+    حالة K_ساڄو:
+    حالة Ctrl_L:
 		CHECK_CMDWIN;
 		win_goto_hor(FALSE, Prenum1);
-		break;
+		اكسر;
 
 // move window to new tab page
-    case 'T':
+    حالة 'T':
 		CHECK_CMDWIN;
-		if (one_window())
-		    msg(_(m_onlyone));
-		else
+		إذا (one_دري())
+		    نياپو(_(m_onlyone));
+		وإلا
 		{
 		    tabpage_T	*oldtab = curtab;
 		    tabpage_T	*newtab;
@@ -487,200 +487,200 @@ newwindow:
 		    // First create a new tab with the window, then go back to
 		    // the old tab and close the window there.
 		    wp = curwin;
-		    if (win_new_tabpage((int)Prenum) == OK
+		    إذا (win_new_tabpage((صحيح)Prenum) == OK
 						     && valid_tabpage(oldtab))
 		    {
 			newtab = curtab;
 			goto_tabpage_tp(oldtab, TRUE, TRUE);
-			if (curwin == wp)
+			إذا (curwin == wp)
 			    win_close(curwin, FALSE);
-			if (valid_tabpage(newtab))
+			إذا (valid_tabpage(newtab))
 			    goto_tabpage_tp(newtab, TRUE, TRUE);
 		    }
 		}
-		break;
+		اكسر;
 
 // cursor to top-left window
-    case 't':
-    case Ctrl_T:
+    حالة 't':
+    حالة Ctrl_T:
 		win_goto(firstwin);
-		break;
+		اكسر;
 
 // cursor to bottom-right window
-    case 'b':
-    case Ctrl_B:
+    حالة 'b':
+    حالة Ctrl_B:
 		win_goto(lastwin);
-		break;
+		اكسر;
 
 // cursor to last accessed (previous) window
-    case 'p':
-    case Ctrl_P:
-		if (!win_valid(prevwin))
+    حالة 'p':
+    حالة Ctrl_P:
+		إذا (!win_valid(prevwin))
 		    beep_flush();
-		else
+		وإلا
 		    win_goto(prevwin);
-		break;
+		اكسر;
 
 // exchange current and next window
-    case 'x':
-    case Ctrl_X:
+    حالة 'x':
+    حالة Ctrl_X:
 		CHECK_CMDWIN;
 		win_exchange(Prenum);
-		break;
+		اكسر;
 
 // rotate windows downwards
-    case Ctrl_R:
-    case 'r':
+    حالة Ctrl_R:
+    حالة 'r':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(FALSE, (int)Prenum1);    // downwards
-		break;
+		win_rotate(FALSE, (صحيح)Prenum1);    // downwards
+		اكسر;
 
 // rotate windows upwards
-    case 'R':
+    حالة 'R':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(TRUE, (int)Prenum1);	    // upwards
-		break;
+		win_rotate(TRUE, (صحيح)Prenum1);	    // upwards
+		اكسر;
 
 // move window to the very top/bottom/left/right
-    case 'K':
-    case 'J':
-    case 'H':
-    case 'L':
+    حالة 'K':
+    حالة 'J':
+    حالة 'H':
+    حالة 'L':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW)
+		إذا (ONE_دري)
 		    beep_flush();
-		else
+		وإلا
 		{
-		    int dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
-			 | ((nchar == 'H' || nchar == 'K') ? WSP_TOP : WSP_BOT);
+		    صحيح dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
+			 | ((nchar == 'H' || nchar == 'K') ? WSP_چوٽي : WSP_BOT);
 
-		    (void)win_splitmove(curwin, (int)Prenum, dir);
+		    (فراغ)win_splitmove(curwin, (صحيح)Prenum, dir);
 		}
-		break;
+		اكسر;
 
 // make all windows the same width and/or height
-    case '=':
+    حالة '=':
 		{
-		    int mod = cmdmod.cmod_split & (WSP_VERT | WSP_HOR);
-#ifdef FEAT_GUI
+		    صحيح mod = cmdmod.cmod_ورهايو & (WSP_VERT | WSP_HOR);
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
-		    win_equal(NULL, FALSE,
+#جيڪڏهن_پورو
+		    win_equal(عدم, FALSE,
 			   mod == WSP_VERT ? 'v' : mod == WSP_HOR ? 'h' : 'b');
 		}
-		break;
+		اكسر;
 
 // increase current window height
-    case '+':
-#ifdef FEAT_GUI
+    حالة '+':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(curwin->w_height + (int)Prenum1);
-		break;
+#جيڪڏهن_پورو
+		win_setheight(curwin->w_اوچائي + (صحيح)Prenum1);
+		اكسر;
 
 // decrease current window height
-    case '-':
-#ifdef FEAT_GUI
+    حالة '-':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(curwin->w_height - (int)Prenum1);
-		break;
+#جيڪڏهن_پورو
+		win_setheight(curwin->w_اوچائي - (صحيح)Prenum1);
+		اكسر;
 
 // set current window height
-    case Ctrl__:
-    case '_':
-#ifdef FEAT_GUI
+    حالة Ctrl__:
+    حالة '_':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setheight(Prenum ? (int)Prenum : 9999);
-		break;
+#جيڪڏهن_پورو
+		win_setheight(Prenum ? (صحيح)Prenum : 9999);
+		اكسر;
 
 // increase current window width
-    case '>':
-#ifdef FEAT_GUI
+    حالة '>':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(curwin->w_width + (int)Prenum1);
-		break;
+#جيڪڏهن_پورو
+		win_setwidth(curwin->w_ويڪر + (صحيح)Prenum1);
+		اكسر;
 
 // decrease current window width
-    case '<':
-#ifdef FEAT_GUI
+    حالة '<':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(curwin->w_width - (int)Prenum1);
-		break;
+#جيڪڏهن_پورو
+		win_setwidth(curwin->w_ويڪر - (صحيح)Prenum1);
+		اكسر;
 
 // set current window width
-    case '|':
-#ifdef FEAT_GUI
+    حالة '|':
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		need_mouse_correct = TRUE;
-#endif
-		win_setwidth(Prenum != 0 ? (int)Prenum : 9999);
-		break;
+#جيڪڏهن_پورو
+		win_setwidth(Prenum != 0 ? (صحيح)Prenum : 9999);
+		اكسر;
 
 // jump to tag and split window if tag exists (in preview window)
-#if defined(FEAT_QUICKFIX)
-    case '}':
+#إذا defined(FEAT_QUICKFIX)
+    حالة '}':
 		CHECK_CMDWIN;
-		if (Prenum)
+		إذا (Prenum)
 		    g_do_tagpreview = Prenum;
-		else
+		وإلا
 		    g_do_tagpreview = p_pvh;
-#endif
+#جيڪڏهن_پورو
 		// FALLTHROUGH
-    case ']':
-    case Ctrl_RSB:
+    حالة ']':
+    حالة Ctrl_RSB:
 		CHECK_CMDWIN;
 		// keep Visual mode, can select words to use as a tag
-		if (Prenum)
-		    postponed_split = Prenum;
-		else
-		    postponed_split = -1;
-#ifdef FEAT_QUICKFIX
-		if (nchar != '}')
+		إذا (Prenum)
+		    postponed_ورهايو = Prenum;
+		وإلا
+		    postponed_ورهايو = -1;
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
+		إذا (nchar != '}')
 		    g_do_tagpreview = 0;
-#endif
+#جيڪڏهن_پورو
 
 		// Execute the command right here, required when "wincmd ]"
 		// was used in a function.
 		do_nv_ident(Ctrl_RSB, NUL);
-		postponed_split = 0;
-		break;
+		postponed_ورهايو = 0;
+		اكسر;
 
 // edit file name under cursor in a new window
-    case 'f':
-    case 'F':
-    case Ctrl_F:
+    حالة 'f':
+    حالة 'F':
+    حالة Ctrl_F:
 wingotofile:
 		CHECK_CMDWIN;
-		if (check_text_or_curbuf_locked(NULL))
-		    break;
+		إذا (check_متن_or_curbuf_locked(عدم))
+		    اكسر;
 
 		ptr = grab_file_name(Prenum1, &lnum);
-		if (ptr != NULL)
+		إذا (ptr != عدم)
 		{
 		    tabpage_T	*oldtab = curtab;
 		    win_T	*oldwin = curwin;
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 		    need_mouse_correct = TRUE;
-#endif
+#جيڪڏهن_پورو
 		    setpcmark();
 
 		    // If 'switchbuf' is set to 'useopen' or 'usetab' and the
 		    // file is already opened in a window, then jump to it.
-		    wp = NULL;
-		    if ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
+		    wp = عدم;
+		    إذا ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
 						&& cmdmod.cmod_tab == 0)
 			wp = swbuf_goto_win_with_buf(buflist_findname_exp(ptr));
 
-		    if (wp == NULL && win_split(0, 0) == OK)
+		    إذا (wp == عدم && win_ورهايو(0, 0) == OK)
 		    {
 			RESET_BINDING(curwin);
-			if (do_ecmd(0, ptr, NULL, NULL, ECMD_LASTL,
-						   ECMD_HIDE, NULL) == FAIL)
+			إذا (do_ecmd(0, ptr, عدم, عدم, ECMD_LASTL,
+						   ECMD_HIDE, عدم) == FAIL)
 			{
 			    /*
 			     * Note: if FEAT_EVAL is defined and do_ecmd() is aborted resulting
@@ -699,11 +699,11 @@ wingotofile:
 
 			    goto_tabpage_win(oldtab, oldwin);
 			}
-			else
+			وإلا
 			    wp = curwin;
 		    }
 
-		    if (wp != NULL && nchar == 'F' && lnum >= 0)
+		    إذا (wp != عدم && nchar == 'F' && lnum >= 0)
 		    {
 			curwin->w_cursor.lnum = lnum;
 			check_cursor_lnum();
@@ -711,223 +711,223 @@ wingotofile:
 		    }
 		    vim_free(ptr);
 		}
-		break;
+		اكسر;
 
-#ifdef FEAT_FIND_ID
+#جيڪڏهن_وصف_ٿيل FEAT_ڳوليو_ID
 // Go to the first occurrence of the identifier under cursor along path in a
 // new window -- webb
-    case 'i':			    // Go to any match
-    case Ctrl_I:
-		type = FIND_ANY;
+    حالة 'i':			    // Go to any match
+    حالة Ctrl_I:
+		type = ڳوليو_ANY;
 		// FALLTHROUGH
-    case 'd':			    // Go to definition, using 'define'
-    case Ctrl_D:
+    حالة 'd':			    // Go to definition, using 'define'
+    حالة Ctrl_D:
 		CHECK_CMDWIN;
-		if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
-		    break;
+		إذا ((len = ڳوليو_ident_under_cursor(&ptr, ڳوليو_IDENT)) == 0)
+		    اكسر;
 
 		// Make a copy, if the line was changed it will be freed.
 		ptr = vim_strnsave(ptr, len);
-		if (ptr == NULL)
-		    break;
+		إذا (ptr == عدم)
+		    اكسر;
 
-		find_pattern_in_path(ptr, 0, len, TRUE,
+		ڳوليو_نمونو_اندريون_رستو(ptr, 0, len, TRUE,
 			Prenum == 0 ? TRUE : FALSE, type,
-			Prenum1, ACTION_SPLIT, (linenr_T)1, (linenr_T)MAXLNUM,
+			Prenum1, ACTION_ورهايو, (linenr_T)1, (linenr_T)MAXLNUM,
 			FALSE, FALSE);
 		vim_free(ptr);
-		curwin->w_set_curswant = true;
-		break;
-#endif
+		curwin->w_سيٽ_curswant = true;
+		اكسر;
+#جيڪڏهن_پورو
 
 // Quickfix window only: view the result under the cursor in a new split.
-#if defined(FEAT_QUICKFIX)
-    case K_KENTER:
-    case CAR:
-		if (bt_quickfix(curbuf))
-		    qf_view_result(TRUE);
-		break;
-#endif
+#إذا defined(FEAT_QUICKFIX)
+    حالة K_KENTER:
+    حالة CAR:
+		إذا (bt_quickfix(curbuf))
+		    qf_view_نتيجو(TRUE);
+		اكسر;
+#جيڪڏهن_پورو
 
 // CTRL-W g  extended commands
-    case 'g':
-    case Ctrl_G:
+    حالة 'g':
+    حالة Ctrl_G:
 		CHECK_CMDWIN;
-#ifdef USE_ON_FLY_SCROLL
+#جيڪڏهن_وصف_ٿيل USE_ON_FLY_SCROLL
 		dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#جيڪڏهن_پورو
 		++no_mapping;
-		++allow_keys;   // no mapping for xchar, but allow key codes
-		if (xchar == NUL)
+		++allow_ڪنجيون;   // no mapping for xchar, but allow key codes
+		إذا (xchar == NUL)
 		    xchar = plain_vgetc();
 		LANGMAP_ADJUST(xchar, TRUE);
 		--no_mapping;
-		--allow_keys;
-		(void)add_to_showcmd(xchar);
+		--allow_ڪنجيون;
+		(فراغ)جوڙيو_منزل_showcmd(xchar);
 
-		switch (xchar)
+		بدل (xchar)
 		{
-#if defined(FEAT_QUICKFIX)
-		    case '}':
+#إذا defined(FEAT_QUICKFIX)
+		    حالة '}':
 			xchar = Ctrl_RSB;
-			if (Prenum)
+			إذا (Prenum)
 			    g_do_tagpreview = Prenum;
-			else
+			وإلا
 			    g_do_tagpreview = p_pvh;
-#endif
+#جيڪڏهن_پورو
 			// FALLTHROUGH
-		    case ']':
-		    case Ctrl_RSB:
+		    حالة ']':
+		    حالة Ctrl_RSB:
 			// keep Visual mode, can select words to use as a tag
-			if (Prenum)
-			    postponed_split = Prenum;
-			else
-			    postponed_split = -1;
+			إذا (Prenum)
+			    postponed_ورهايو = Prenum;
+			وإلا
+			    postponed_ورهايو = -1;
 
 			// Execute the command right here, required when
 			// "wincmd g}" was used in a function.
 			do_nv_ident('g', xchar);
-			postponed_split = 0;
-			break;
+			postponed_ورهايو = 0;
+			اكسر;
 
-		    case 'f':	    // CTRL-W gf: "gf" in a new tab page
-		    case 'F':	    // CTRL-W gF: "gF" in a new tab page
-			cmdmod.cmod_tab = tabpage_index(curtab) + 1;
+		    حالة 'f':	    // CTRL-W gf: "gf" in a new tab page
+		    حالة 'F':	    // CTRL-W gF: "gF" in a new tab page
+			cmdmod.cmod_tab = tabpage_اشاريو(curtab) + 1;
 			nchar = xchar;
-			goto wingotofile;
+			اذهب wingotofile;
 
-		    case 't':	    // CTRL-W gt: go to next tab page
-			goto_tabpage((int)Prenum);
-			break;
+		    حالة 't':	    // CTRL-W gt: go to next tab page
+			goto_tabpage((صحيح)Prenum);
+			اكسر;
 
-		    case 'T':	    // CTRL-W gT: go to previous tab page
-			goto_tabpage(-(int)Prenum1);
-			break;
+		    حالة 'T':	    // CTRL-W gT: go to previous tab page
+			goto_tabpage(-(صحيح)Prenum1);
+			اكسر;
 
-		    case TAB:	    // CTRL-W g<Tab>: go to last used tab page
-			if (goto_tabpage_lastused() == FAIL)
+		    حالة TAB:	    // CTRL-W g<Tab>: go to last used tab page
+			إذا (goto_tabpage_lastused() == FAIL)
 			    beep_flush();
-			break;
+			اكسر;
 
-		    default:
+		    افتراضي:
 			beep_flush();
-			break;
+			اكسر;
 		}
-		break;
+		اكسر;
 
-    default:	beep_flush();
-		break;
+    افتراضي:	beep_flush();
+		اكسر;
     }
 }
 
 /*
  * Figure out the address type for ":wincmd".
  */
-    void
+    فراغ
 get_wincmd_addr_type(char_u *arg, exarg_T *eap)
 {
-    switch (*arg)
+    بدل (*arg)
     {
-    case 'S':
-    case Ctrl_S:
-    case 's':
-    case Ctrl_N:
-    case 'n':
-    case 'j':
-    case Ctrl_J:
-    case 'k':
-    case Ctrl_K:
-    case 'T':
-    case Ctrl_R:
-    case 'r':
-    case 'R':
-    case 'K':
-    case 'J':
-    case '+':
-    case '-':
-    case Ctrl__:
-    case '_':
-    case '|':
-    case ']':
-    case Ctrl_RSB:
-    case 'g':
-    case Ctrl_G:
-    case Ctrl_V:
-    case 'v':
-    case 'h':
-    case Ctrl_H:
-    case 'l':
-    case Ctrl_L:
-    case 'H':
-    case 'L':
-    case '>':
-    case '<':
-#if defined(FEAT_QUICKFIX)
-    case '}':
-#endif
-    case 'f':
-    case 'F':
-    case Ctrl_F:
-#ifdef FEAT_FIND_ID
-    case 'i':
-    case Ctrl_I:
-    case 'd':
-    case Ctrl_D:
-#endif
+    حالة 'S':
+    حالة Ctrl_S:
+    حالة 's':
+    حالة Ctrl_N:
+    حالة 'n':
+    حالة 'j':
+    حالة Ctrl_J:
+    حالة 'k':
+    حالة Ctrl_K:
+    حالة 'T':
+    حالة Ctrl_R:
+    حالة 'r':
+    حالة 'R':
+    حالة 'K':
+    حالة 'J':
+    حالة '+':
+    حالة '-':
+    حالة Ctrl__:
+    حالة '_':
+    حالة '|':
+    حالة ']':
+    حالة Ctrl_RSB:
+    حالة 'g':
+    حالة Ctrl_G:
+    حالة Ctrl_V:
+    حالة 'v':
+    حالة 'h':
+    حالة Ctrl_H:
+    حالة 'l':
+    حالة Ctrl_L:
+    حالة 'H':
+    حالة 'L':
+    حالة '>':
+    حالة '<':
+#إذا defined(FEAT_QUICKFIX)
+    حالة '}':
+#جيڪڏهن_پورو
+    حالة 'f':
+    حالة 'F':
+    حالة Ctrl_F:
+#جيڪڏهن_وصف_ٿيل FEAT_ڳوليو_ID
+    حالة 'i':
+    حالة Ctrl_I:
+    حالة 'd':
+    حالة Ctrl_D:
+#جيڪڏهن_پورو
 		// window size or any count
 		eap->addr_type = ADDR_OTHER;
-		break;
+		اكسر;
 
-    case Ctrl_HAT:
-    case '^':
+    حالة Ctrl_HAT:
+    حالة '^':
 		// buffer number
 		eap->addr_type = ADDR_BUFFERS;
-		break;
+		اكسر;
 
-    case Ctrl_Q:
-    case 'q':
-    case Ctrl_C:
-    case 'c':
-    case Ctrl_O:
-    case 'o':
-    case Ctrl_W:
-    case 'w':
-    case 'W':
-    case 'x':
-    case Ctrl_X:
+    حالة Ctrl_Q:
+    حالة 'q':
+    حالة Ctrl_C:
+    حالة 'c':
+    حالة Ctrl_O:
+    حالة 'o':
+    حالة Ctrl_W:
+    حالة 'w':
+    حالة 'W':
+    حالة 'x':
+    حالة Ctrl_X:
 		// window number
 		eap->addr_type = ADDR_WINDOWS;
-		break;
+		اكسر;
 
-#if defined(FEAT_QUICKFIX)
-    case Ctrl_Z:
-    case 'z':
-    case 'P':
-#endif
-    case 't':
-    case Ctrl_T:
-    case 'b':
-    case Ctrl_B:
-    case 'p':
-    case Ctrl_P:
-    case '=':
-    case CAR:
+#إذا defined(FEAT_QUICKFIX)
+    حالة Ctrl_Z:
+    حالة 'z':
+    حالة 'P':
+#جيڪڏهن_پورو
+    حالة 't':
+    حالة Ctrl_T:
+    حالة 'b':
+    حالة Ctrl_B:
+    حالة 'p':
+    حالة Ctrl_P:
+    حالة '=':
+    حالة CAR:
 		// no count
 		eap->addr_type = ADDR_NONE;
-		break;
+		اكسر;
     }
 }
 
-    static void
-cmd_with_count(
-    char	*cmd,
+    ساكن فراغ
+cmd_with_ڳڻپ(
+    حرف	*cmd,
     char_u	*bufp,
     size_t	bufsize,
-    long	Prenum)
+    ڊگهو	Prenum)
 {
-    if (Prenum > 0)
-	vim_snprintf((char *)bufp, bufsize, "%s %ld", cmd, Prenum);
-    else
+    إذا (Prenum > 0)
+	vim_snprintf((حرف *)bufp, bufsize, "%s %ld", cmd, Prenum);
+    وإلا
 	STRCPY(bufp, cmd);
 }
 
@@ -935,20 +935,20 @@ cmd_with_count(
  * If "split_disallowed" is set, or "wp"'s buffer is closing, give an error and
  * return FAIL.  Otherwise return OK.
  */
-    int
-check_split_disallowed(win_T *wp)
+    صحيح
+check_ورهايو_disallowed(win_T *wp)
 {
-    if (split_disallowed > 0)
+    إذا (ورهايو_disallowed > 0)
     {
-	emsg(_(e_cant_split_window_while_closing_another));
-	return FAIL;
+	emsg(_(e_cant_ورهايو_دري_while_closing_another));
+	أرجع FAIL;
     }
-    if (wp->w_buffer->b_locked_split)
+    إذا (wp->w_بفر->b_locked_ورهايو)
     {
-	emsg(_(e_cannot_split_window_when_closing_buffer));
-	return FAIL;
+	emsg(_(e_cannot_ورهايو_دري_when_closing_بفر));
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -966,40 +966,40 @@ check_split_disallowed(win_T *wp)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-win_split(int size, int flags)
+    صحيح
+win_ورهايو(صحيح سائيز, صحيح flags)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    إذا (ERROR_IF_ANY_POPUP_دري)
+	أرجع FAIL;
 
-    if (check_split_disallowed(curwin) == FAIL)
-	return FAIL;
+    إذا (check_ورهايو_disallowed(curwin) == FAIL)
+	أرجع FAIL;
 
     // When the ":tab" modifier was used open a new tab page instead.
-    if (may_open_tabpage() == OK)
-	return OK;
+    إذا (may_open_tabpage() == OK)
+	أرجع OK;
 
     // Add flags from ":vertical", ":topleft" and ":botright".
-    flags |= cmdmod.cmod_split;
-    if ((flags & WSP_TOP) && (flags & WSP_BOT))
+    flags |= cmdmod.cmod_ورهايو;
+    إذا ((flags & WSP_چوٽي) && (flags & WSP_BOT))
     {
-	emsg(_(e_cant_split_topleft_and_botright_at_the_same_time));
-	return FAIL;
+	emsg(_(e_cant_ورهايو_topleft_and_botright_at_the_same_وقت));
+	أرجع FAIL;
     }
 
     // When creating the help window make a snapshot of the window layout.
     // Otherwise clear the snapshot, it's now invalid.
-    if (flags & WSP_HELP)
+    إذا (flags & WSP_HELP)
 	make_snapshot(SNAP_HELP_IDX);
-    else
+    وإلا
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (flags & WSP_QUICKFIX)
+    إذا (flags & WSP_QUICKFIX)
 	make_snapshot(SNAP_QUICKFIX_IDX);
-    else
+    وإلا
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    return win_split_ins(size, flags, NULL, 0, NULL);
+    أرجع win_ورهايو_ins(سائيز, flags, عدم, 0, عدم);
 }
 
 /*
@@ -1013,67 +1013,67 @@ win_split(int size, int flags)
  * window layout or sizes.
  * Return FAIL for failure, OK otherwise.
  */
-    int
-win_split_ins(
-    int		size,
-    int		flags,
+    صحيح
+win_ورهايو_ins(
+    صحيح		سائيز,
+    صحيح		flags,
     win_T	*new_wp,
-    int		dir,
-    frame_T	*to_flatten)
+    صحيح		dir,
+    چوکٺو_T	*منزل_flatten)
 {
     win_T	*wp = new_wp;
     win_T	*oldwin;
-    int		new_size = size;
-    int		i;
-    int		need_status = 0;
-    int		do_equal = FALSE;
-    int		needed;
-    int		available;
-    int		oldwin_height = 0;
-    int		layout;
-    frame_T	*frp, *curfrp, *frp2, *prevfrp;
-    int		before;
-    int		minheight;
-    int		wmh1;
-    int		did_set_fraction = FALSE;
-    int		retval = FAIL;
+    صحيح		new_سائيز = سائيز;
+    صحيح		i;
+    صحيح		need_حالت = 0;
+    صحيح		do_equal = FALSE;
+    صحيح		needed;
+    صحيح		موجود;
+    صحيح		oldwin_اوچائي = 0;
+    صحيح		layout;
+    چوکٺو_T	*frp, *curfrp, *frp2, *prevfrp;
+    صحيح		before;
+    صحيح		minheight;
+    صحيح		wmh1;
+    صحيح		did_سيٽ_fraction = FALSE;
+    صحيح		retval = FAIL;
 
     // Do not redraw here, curwin->w_buffer may be invalid.
     ++RedrawingDisabled;
 
-    if (new_wp == NULL)
+    إذا (new_wp == عدم)
 	trigger_winnewpre();
 
-    if (flags & WSP_TOP)
+    إذا (flags & WSP_چوٽي)
 	oldwin = firstwin;
-    else if (flags & WSP_BOT)
+    وإلا إذا (flags & WSP_BOT)
 	oldwin = lastwin;
-    else
+    وإلا
 	oldwin = curwin;
 
     // add a status line when p_ls == 1 and splitting the first window
-    if (ONE_WINDOW && p_ls == 1 && oldwin->w_status_height == 0)
+    إذا (ONE_دري && p_ls == 1 && oldwin->w_حالت_اوچائي == 0)
     {
-	if (!(flags & WSP_FORCE_ROOM) && VISIBLE_HEIGHT(oldwin) <= p_wmh)
+	إذا (!(flags & WSP_FORCE_گنجائش) && VISIBLE_اوچائي(oldwin) <= p_wmh)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_گنجائش));
+	    اذهب theend;
 	}
-	need_status = statusline_height(oldwin);
+	need_حالت = statusline_اوچائي(oldwin);
     }
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
     // May be needed for the scrollbars that are going to change.
-    if (gui.in_use)
-	out_flush();
-#endif
+    إذا (gui.اندريون_use)
+	ٻاهريون_flush();
+#جيڪڏهن_پورو
 
-    if (flags & WSP_VERT)
+    إذا (flags & WSP_VERT)
     {
-	int	wmw1;
-	int	minwidth;
+	صحيح	wmw1;
+	صحيح	minwidth;
 
-	layout = FR_ROW;
+	layout = FR_صف;
 
 	/*
 	 * Check if we are able to split the current window and compute its
@@ -1082,186 +1082,186 @@ win_split_ins(
 	// Current window requires at least 1 space.
 	wmw1 = (p_wmw == 0 ? 1 : p_wmw);
 	needed = wmw1 + 1;
-	if (flags & WSP_ROOM)
+	إذا (flags & WSP_گنجائش)
 	    needed += p_wiw - wmw1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	إذا (flags & (WSP_BOT | WSP_چوٽي))
 	{
-	    minwidth = frame_minwidth(topframe, NOWIN);
-	    available = topframe->fr_width;
+	    minwidth = چوکٺو_minwidth(topframe, NOWIN);
+	    موجود = topframe->fr_ويڪر;
 	    needed += minwidth;
 	}
-	else if (p_ea)
+	وإلا إذا (p_ea)
 	{
-	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
-	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
-							frp = frp->fr_parent)
+	    minwidth = چوکٺو_minwidth(oldwin->w_چوکٺو, NOWIN);
+	    prevfrp = oldwin->w_چوکٺو;
+	    لكل (frp = oldwin->w_چوکٺو->fr_والد; frp != عدم;
+							frp = frp->fr_والد)
 	    {
-		if (frp->fr_layout == FR_ROW)
-		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
-			    minwidth += frame_minwidth(frp2, NOWIN);
+		إذا (frp->fr_layout == FR_صف)
+		    FOR_ALL_چوکٺا(frp2, frp->fr_ٻار)
+			إذا (frp2 != prevfrp)
+			    minwidth += چوکٺو_minwidth(frp2, NOWIN);
 		prevfrp = frp;
 	    }
-	    available = topframe->fr_width;
+	    موجود = topframe->fr_ويڪر;
 	    needed += minwidth;
 	}
-	else
+	وإلا
 	{
-	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
-	    available = oldwin->w_frame->fr_width;
+	    minwidth = چوکٺو_minwidth(oldwin->w_چوکٺو, NOWIN);
+	    موجود = oldwin->w_چوکٺو->fr_ويڪر;
 	    needed += minwidth;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	إذا (!(flags & WSP_FORCE_گنجائش) && موجود < needed)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_گنجائش));
+	    اذهب theend;
 	}
-	if (new_size == 0)
-	    new_size = oldwin->w_width / 2;
-	if (new_size > available - minwidth - 1)
-	    new_size = available - minwidth - 1;
-	if (new_size < wmw1)
-	    new_size = wmw1;
+	إذا (new_سائيز == 0)
+	    new_سائيز = oldwin->w_ويڪر / 2;
+	إذا (new_سائيز > موجود - minwidth - 1)
+	    new_سائيز = موجود - minwidth - 1;
+	إذا (new_سائيز < wmw1)
+	    new_سائيز = wmw1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin->w_width - new_size - 1 < p_wmw)
+	إذا (oldwin->w_ويڪر - new_سائيز - 1 < p_wmw)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixwidth' window.  Take them from a window to the left or right
 	// instead, if possible. Add one for the separator.
-	if (oldwin->w_p_wfw)
-	    win_setwidth_win(oldwin->w_width + new_size + 1, oldwin);
+	إذا (oldwin->w_p_wfw)
+	    win_setwidth_win(oldwin->w_ويڪر + new_سائيز + 1, oldwin);
 
 	// Make all windows the same width if 'equalalways' is set, 'ead'
 	// not set to 'v', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'v'
-	    && oldwin->w_frame->fr_parent != NULL)
+	إذا (!do_equal && p_ea && سائيز == 0 && *p_ead != 'v'
+	    && oldwin->w_چوکٺو->fr_والد != عدم)
 	    do_equal = TRUE;
     }
-    else
+    وإلا
     {
-	layout = FR_COL;
+	layout = FR_کانو;
 
 	/*
 	 * Check if we are able to split the current window and compute its
 	 * height.
 	 */
 	// Current window requires at least 1 space.
-	wmh1 = (p_wmh == 0 ? 1 : p_wmh) + WINBAR_HEIGHT(curwin);
-	needed = wmh1 + statusline_height(oldwin);
-	if (flags & WSP_ROOM)
+	wmh1 = (p_wmh == 0 ? 1 : p_wmh) + WINBAR_اوچائي(curwin);
+	needed = wmh1 + statusline_اوچائي(oldwin);
+	إذا (flags & WSP_گنجائش)
 	    needed += p_wh - wmh1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	إذا (flags & (WSP_BOT | WSP_چوٽي))
 	{
-	    minheight = frame_minheight(topframe, NOWIN) + need_status;
-	    available = topframe->fr_height;
+	    minheight = چوکٺو_minheight(topframe, NOWIN) + need_حالت;
+	    موجود = topframe->fr_اوچائي;
 	    needed += minheight;
 	}
-	else if (p_ea)
+	وإلا إذا (p_ea)
 	{
-	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
-	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
-							frp = frp->fr_parent)
+	    minheight = چوکٺو_minheight(oldwin->w_چوکٺو, NOWIN) + need_حالت;
+	    prevfrp = oldwin->w_چوکٺو;
+	    لكل (frp = oldwin->w_چوکٺو->fr_والد; frp != عدم;
+							frp = frp->fr_والد)
 	    {
-		if (frp->fr_layout == FR_COL)
-		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
-			    minheight += frame_minheight(frp2, NOWIN);
+		إذا (frp->fr_layout == FR_کانو)
+		    FOR_ALL_چوکٺا(frp2, frp->fr_ٻار)
+			إذا (frp2 != prevfrp)
+			    minheight += چوکٺو_minheight(frp2, NOWIN);
 		prevfrp = frp;
 	    }
-	    available = topframe->fr_height;
+	    موجود = topframe->fr_اوچائي;
 	    needed += minheight;
 	}
-	else
+	وإلا
 	{
-	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
-	    available = oldwin->w_frame->fr_height;
+	    minheight = چوکٺو_minheight(oldwin->w_چوکٺو, NOWIN) + need_حالت;
+	    موجود = oldwin->w_چوکٺو->fr_اوچائي;
 	    needed += minheight;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	إذا (!(flags & WSP_FORCE_گنجائش) && موجود < needed)
 	{
-	    emsg(_(e_not_enough_room));
-	    goto theend;
+	    emsg(_(e_not_enough_گنجائش));
+	    اذهب theend;
 	}
-	oldwin_height = oldwin->w_height;
-	if (need_status)
+	oldwin_اوچائي = oldwin->w_اوچائي;
+	إذا (need_حالت)
 	{
-	    oldwin->w_status_height = statusline_height(oldwin);
-	    oldwin_height -= oldwin->w_status_height;
+	    oldwin->w_حالت_اوچائي = statusline_اوچائي(oldwin);
+	    oldwin_اوچائي -= oldwin->w_حالت_اوچائي;
 	}
 	// Estimated stl height for the new window.
-	int new_win_stlh = need_status != 0 ? need_status
-			: statusline_height(new_wp != NULL ? new_wp : curwin);
-	if (new_size == 0)
-	    new_size = (oldwin_height - new_win_stlh + 1) / 2;
-	if (new_size > available - minheight - new_win_stlh)
-	    new_size = available - minheight - new_win_stlh;
-	if (new_size < wmh1)
-	    new_size = wmh1;
+	صحيح new_win_stlh = need_حالت != 0 ? need_حالت
+			: statusline_اوچائي(new_wp != عدم ? new_wp : curwin);
+	إذا (new_سائيز == 0)
+	    new_سائيز = (oldwin_اوچائي - new_win_stlh + 1) / 2;
+	إذا (new_سائيز > موجود - minheight - new_win_stlh)
+	    new_سائيز = موجود - minheight - new_win_stlh;
+	إذا (new_سائيز < wmh1)
+	    new_سائيز = wmh1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin_height - new_size - new_win_stlh < p_wmh)
+	إذا (oldwin_اوچائي - new_سائيز - new_win_stlh < p_wmh)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixheight' window.  Take them from a window above or below
 	// instead, if possible.
-	if (oldwin->w_p_wfh)
+	إذا (oldwin->w_p_wfh)
 	{
 	    // Set w_fraction now so that the cursor keeps the same relative
 	    // vertical position using the old height.
-	    set_fraction(oldwin);
-	    did_set_fraction = TRUE;
+	    سيٽ_fraction(oldwin);
+	    did_سيٽ_fraction = TRUE;
 
-	    win_setheight_win(oldwin->w_height + new_size
-		    + statusline_height(oldwin), oldwin);
+	    win_setheight_win(oldwin->w_اوچائي + new_سائيز
+		    + statusline_اوچائي(oldwin), oldwin);
 	    // w_height now excludes the status line
-	    oldwin_height = oldwin->w_height;
+	    oldwin_اوچائي = oldwin->w_اوچائي;
 	}
 
 	// Make all windows the same height if 'equalalways' is set, 'ead' is
 	// not set to 'h', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'h'
-	    && oldwin->w_frame->fr_parent != NULL)
+	إذا (!do_equal && p_ea && سائيز == 0 && *p_ead != 'h'
+	    && oldwin->w_چوکٺو->fr_والد != عدم)
 	    do_equal = TRUE;
     }
 
     /*
      * allocate new window structure and link it in the window list
      */
-    if ((flags & WSP_TOP) == 0
+    إذا ((flags & WSP_چوٽي) == 0
 	    && ((flags & WSP_BOT)
-		|| (flags & WSP_BELOW)
+		|| (flags & WSP_هيٺ)
 		|| (!(flags & WSP_ABOVE)
 		    && ( (flags & WSP_VERT) ? p_spr : p_sb))))
     {
 	// new window below/right of current one
-	if (new_wp == NULL)
+	إذا (new_wp == عدم)
 	    wp = win_alloc(oldwin, FALSE);
-	else
+	وإلا
 	    win_append(oldwin, wp);
     }
-    else
+    وإلا
     {
-	if (new_wp == NULL)
+	إذا (new_wp == عدم)
 	    wp = win_alloc(oldwin->w_prev, FALSE);
-	else
+	وإلا
 	    win_append(oldwin->w_prev, wp);
     }
 
-    if (new_wp == NULL)
+    إذا (new_wp == عدم)
     {
-	if (wp == NULL)
-	    goto theend;
+	إذا (wp == عدم)
+	    اذهب theend;
 
-	new_frame(wp);
-	if (wp->w_frame == NULL)
+	new_چوکٺو(wp);
+	إذا (wp->w_چوکٺو == عدم)
 	{
-	    win_free(wp, NULL);
-	    goto theend;
+	    win_free(wp, عدم);
+	    اذهب theend;
 	}
 
 	// make the contents of the new window the same as the current one
@@ -1269,206 +1269,206 @@ win_split_ins(
     }
 
     // Going to reorganize frames now, make sure they're flat.
-    if (to_flatten != NULL)
-	frame_flatten(to_flatten);
+    إذا (منزل_flatten != عدم)
+	چوکٺو_flatten(منزل_flatten);
 
     /*
      * Reorganise the tree of frames to insert the new window.
      */
-    if (flags & (WSP_TOP | WSP_BOT))
+    إذا (flags & (WSP_چوٽي | WSP_BOT))
     {
-	if ((topframe->fr_layout == FR_COL && (flags & WSP_VERT) == 0)
-	    || (topframe->fr_layout == FR_ROW && (flags & WSP_VERT) != 0))
+	إذا ((topframe->fr_layout == FR_کانو && (flags & WSP_VERT) == 0)
+	    || (topframe->fr_layout == FR_صف && (flags & WSP_VERT) != 0))
 	{
-	    curfrp = topframe->fr_child;
-	    if (flags & WSP_BOT)
-		while (curfrp->fr_next != NULL)
-		    curfrp = curfrp->fr_next;
+	    curfrp = topframe->fr_ٻار;
+	    إذا (flags & WSP_BOT)
+		طالما (curfrp->fr_ايندڙ != عدم)
+		    curfrp = curfrp->fr_ايندڙ;
 	}
-	else
+	وإلا
 	    curfrp = topframe;
-	before = (flags & WSP_TOP);
+	before = (flags & WSP_چوٽي);
     }
-    else
+    وإلا
     {
-	curfrp = oldwin->w_frame;
-	if (flags & WSP_BELOW)
+	curfrp = oldwin->w_چوکٺو;
+	إذا (flags & WSP_هيٺ)
 	    before = FALSE;
-	else if (flags & WSP_ABOVE)
+	وإلا إذا (flags & WSP_ABOVE)
 	    before = TRUE;
-	else if (flags & WSP_VERT)
+	وإلا إذا (flags & WSP_VERT)
 	    before = !p_spr;
-	else
+	وإلا
 	    before = !p_sb;
     }
-    if (curfrp->fr_parent == NULL || curfrp->fr_parent->fr_layout != layout)
+    إذا (curfrp->fr_والد == عدم || curfrp->fr_والد->fr_layout != layout)
     {
 	// Need to create a new frame in the tree to make a branch.
-	frp = ALLOC_CLEAR_ONE(frame_T);
+	frp = ALLOC_CLEAR_ONE(چوکٺو_T);
 	*frp = *curfrp;
 	curfrp->fr_layout = layout;
-	frp->fr_parent = curfrp;
-	frp->fr_next = NULL;
-	frp->fr_prev = NULL;
-	curfrp->fr_child = frp;
-	curfrp->fr_win = NULL;
+	frp->fr_والد = curfrp;
+	frp->fr_ايندڙ = عدم;
+	frp->fr_prev = عدم;
+	curfrp->fr_ٻار = frp;
+	curfrp->fr_win = عدم;
 	curfrp = frp;
-	if (frp->fr_win != NULL)
-	    oldwin->w_frame = frp;
-	else
-	    FOR_ALL_FRAMES(frp, frp->fr_child)
-		frp->fr_parent = curfrp;
+	إذا (frp->fr_win != عدم)
+	    oldwin->w_چوکٺو = frp;
+	وإلا
+	    FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+		frp->fr_والد = curfrp;
     }
 
-    if (new_wp == NULL)
-	frp = wp->w_frame;
-    else
-	frp = new_wp->w_frame;
-    frp->fr_parent = curfrp->fr_parent;
+    إذا (new_wp == عدم)
+	frp = wp->w_چوکٺو;
+    وإلا
+	frp = new_wp->w_چوکٺو;
+    frp->fr_والد = curfrp->fr_والد;
 
     // Insert the new frame at the right place in the frame list.
-    if (before)
-	frame_insert(curfrp, frp);
-    else
-	frame_append(curfrp, frp);
+    إذا (before)
+	چوکٺو_وجهو(curfrp, frp);
+    وإلا
+	چوکٺو_append(curfrp, frp);
 
     // Set w_fraction now so that the cursor keeps the same relative
     // vertical position.
-    if (!did_set_fraction)
-	set_fraction(oldwin);
+    إذا (!did_سيٽ_fraction)
+	سيٽ_fraction(oldwin);
     wp->w_fraction = oldwin->w_fraction;
 
-    if (flags & WSP_VERT)
+    إذا (flags & WSP_VERT)
     {
 	wp->w_p_scr = curwin->w_p_scr;
 
-	if (need_status)
+	إذا (need_حالت)
 	{
-	    win_new_height(oldwin, oldwin->w_height - need_status);
-	    oldwin->w_status_height = need_status;
+	    win_new_اوچائي(oldwin, oldwin->w_اوچائي - need_حالت);
+	    oldwin->w_حالت_اوچائي = need_حالت;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	إذا (flags & (WSP_چوٽي | WSP_BOT))
 	{
 	    // set height and row of new window to full height
 	    // no status line when 'laststatus' is zero
-	    int stl_height = p_ls > 0 ? statusline_height(curfrp->fr_win) : 0;
+	    صحيح stl_اوچائي = p_ls > 0 ? statusline_اوچائي(curfrp->fr_win) : 0;
 
-	    wp->w_winrow = tabline_height();
-	    win_new_height(wp, curfrp->fr_height - stl_height
-							  - WINBAR_HEIGHT(wp));
-	    wp->w_status_height = stl_height;
+	    wp->w_winrow = tabline_اوچائي();
+	    win_new_اوچائي(wp, curfrp->fr_اوچائي - stl_اوچائي
+							  - WINBAR_اوچائي(wp));
+	    wp->w_حالت_اوچائي = stl_اوچائي;
 	}
-	else
+	وإلا
 	{
 	    // height and row of new window is same as current window
 	    wp->w_winrow = oldwin->w_winrow;
-	    win_new_height(wp, VISIBLE_HEIGHT(oldwin));
-	    wp->w_status_height = oldwin->w_status_height;
+	    win_new_اوچائي(wp, VISIBLE_اوچائي(oldwin));
+	    wp->w_حالت_اوچائي = oldwin->w_حالت_اوچائي;
 	}
-	frp->fr_height = curfrp->fr_height;
+	frp->fr_اوچائي = curfrp->fr_اوچائي;
 
 	// "new_size" of the current window goes to the new window, use
 	// one column for the vertical separator
-	win_new_width(wp, new_size);
-	if (before)
-	    wp->w_vsep_width = 1;
-	else
+	win_new_ويڪر(wp, new_سائيز);
+	إذا (before)
+	    wp->w_vsep_ويڪر = 1;
+	وإلا
 	{
-	    wp->w_vsep_width = oldwin->w_vsep_width;
-	    oldwin->w_vsep_width = 1;
+	    wp->w_vsep_ويڪر = oldwin->w_vsep_ويڪر;
+	    oldwin->w_vsep_ويڪر = 1;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	إذا (flags & (WSP_چوٽي | WSP_BOT))
 	{
-	    if (flags & WSP_BOT)
-		frame_set_vsep(curfrp, TRUE);
+	    إذا (flags & WSP_BOT)
+		چوکٺو_سيٽ_vsep(curfrp, TRUE);
 	    // Set width of neighbor frame
-	    frame_new_width(curfrp, curfrp->fr_width
-		     - (new_size + ((flags & WSP_TOP) != 0)), flags & WSP_TOP,
+	    چوکٺو_new_ويڪر(curfrp, curfrp->fr_ويڪر
+		     - (new_سائيز + ((flags & WSP_چوٽي) != 0)), flags & WSP_چوٽي,
 								       FALSE);
 	}
-	else
-	    win_new_width(oldwin, oldwin->w_width - (new_size + 1));
-	if (before)	// new window left of current one
+	وإلا
+	    win_new_ويڪر(oldwin, oldwin->w_ويڪر - (new_سائيز + 1));
+	إذا (before)	// new window left of current one
 	{
 	    wp->w_wincol = oldwin->w_wincol;
-	    oldwin->w_wincol += new_size + 1;
+	    oldwin->w_wincol += new_سائيز + 1;
 	}
-	else		// new window right of current one
-	    wp->w_wincol = oldwin->w_wincol + oldwin->w_width + 1;
-	frame_fix_width(oldwin);
-	frame_fix_width(wp);
+	وإلا		// new window right of current one
+	    wp->w_wincol = oldwin->w_wincol + oldwin->w_ويڪر + 1;
+	چوکٺو_fix_ويڪر(oldwin);
+	چوکٺو_fix_ويڪر(wp);
     }
-    else
+    وإلا
     {
 	// width and column of new window is same as current window
-	if (flags & (WSP_TOP | WSP_BOT))
+	إذا (flags & (WSP_چوٽي | WSP_BOT))
 	{
 	    wp->w_wincol = firstwin->w_wincol;
-	    win_new_width(wp, topframe->fr_width);
-	    wp->w_vsep_width = 0;
+	    win_new_ويڪر(wp, topframe->fr_ويڪر);
+	    wp->w_vsep_ويڪر = 0;
 	}
-	else
+	وإلا
 	{
 	    wp->w_wincol = oldwin->w_wincol;
-	    win_new_width(wp, oldwin->w_width);
-	    wp->w_vsep_width = oldwin->w_vsep_width;
+	    win_new_ويڪر(wp, oldwin->w_ويڪر);
+	    wp->w_vsep_ويڪر = oldwin->w_vsep_ويڪر;
 	}
-	frp->fr_width = curfrp->fr_width;
+	frp->fr_ويڪر = curfrp->fr_ويڪر;
 
 	// "new_size" of the current window goes to the new window, use
 	// one row for the status line
-	win_new_height(wp, new_size);
-	int old_status_height = oldwin->w_status_height;
-	if (flags & (WSP_TOP | WSP_BOT))
+	win_new_اوچائي(wp, new_سائيز);
+	صحيح old_حالت_اوچائي = oldwin->w_حالت_اوچائي;
+	إذا (flags & (WSP_چوٽي | WSP_BOT))
 	{
-	    int new_fr_height = curfrp->fr_height - new_size
-							  + WINBAR_HEIGHT(wp);
+	    صحيح new_fr_اوچائي = curfrp->fr_اوچائي - new_سائيز
+							  + WINBAR_اوچائي(wp);
 
-	    if (!((flags & WSP_BOT) && p_ls == 0))
-		new_fr_height -= statusline_height(curfrp->fr_win);
-	    if (flags & WSP_BOT)
-		frame_add_statusline(curfrp);
-	    frame_new_height(curfrp, new_fr_height, flags & WSP_TOP, FALSE,
+	    إذا (!((flags & WSP_BOT) && p_ls == 0))
+		new_fr_اوچائي -= statusline_اوچائي(curfrp->fr_win);
+	    إذا (flags & WSP_BOT)
+		چوکٺو_جوڙيو_statusline(curfrp);
+	    چوکٺو_new_اوچائي(curfrp, new_fr_اوچائي, flags & WSP_چوٽي, FALSE,
 									FALSE);
 	}
-	else
-	    win_new_height(oldwin, oldwin_height - (new_size
-			+ statusline_height(wp)));
-	if (before)	// new window above current one
+	وإلا
+	    win_new_اوچائي(oldwin, oldwin_اوچائي - (new_سائيز
+			+ statusline_اوچائي(wp)));
+	إذا (before)	// new window above current one
 	{
 	    wp->w_winrow = oldwin->w_winrow;
-	    wp->w_status_height = statusline_height(wp);
-	    oldwin->w_winrow += wp->w_height + statusline_height(wp);
+	    wp->w_حالت_اوچائي = statusline_اوچائي(wp);
+	    oldwin->w_winrow += wp->w_اوچائي + statusline_اوچائي(wp);
 	}
-	else		// new window below current one
+	وإلا		// new window below current one
 	{
-	    wp->w_winrow = oldwin->w_winrow + VISIBLE_HEIGHT(oldwin)
-						    + statusline_height(oldwin);
-	    wp->w_status_height = old_status_height;
-	    if (!(flags & WSP_BOT))
-		oldwin->w_status_height = statusline_height(oldwin);
+	    wp->w_winrow = oldwin->w_winrow + VISIBLE_اوچائي(oldwin)
+						    + statusline_اوچائي(oldwin);
+	    wp->w_حالت_اوچائي = old_حالت_اوچائي;
+	    إذا (!(flags & WSP_BOT))
+		oldwin->w_حالت_اوچائي = statusline_اوچائي(oldwin);
 	}
-	frame_fix_height(wp);
-	frame_fix_height(oldwin);
+	چوکٺو_fix_اوچائي(wp);
+	چوکٺو_fix_اوچائي(oldwin);
     }
 
-    if (flags & (WSP_TOP | WSP_BOT))
+    إذا (flags & (WSP_چوٽي | WSP_BOT))
 	win_comp_pos();
 
      // Both windows need redrawing.  Update all status lines, in case they
      // show something related to the window count or position.
     redraw_win_later(wp, UPD_NOT_VALID);
     redraw_win_later(oldwin, UPD_NOT_VALID);
-    status_redraw_all();
+    حالت_redraw_all();
 
-    if (need_status)
+    إذا (need_حالت)
     {
-	msg_row = Rows - 1;
-	msg_col = sc_col;
-	msg_clr_eos_force();	// Old command/ruler may still be there
-	comp_col();
-	msg_row = Rows - 1;
-	msg_col = 0;	// put position back at start of line
+	نياپو_صف = صفون - 1;
+	نياپو_کانو = sc_کانو;
+	نياپو_clr_eos_force();	// Old command/ruler may still be there
+	comp_کانو();
+	نياپو_صف = صفون - 1;
+	نياپو_کانو = 0;	// put position back at start of line
     }
 
     /*
@@ -1479,49 +1479,49 @@ win_split_ins(
      * local 'statuslineopt' from the current window), get_winopts() will call
      * win_equal() again after adjusting the stlh.
      */
-    if (do_equal || dir != 0)
+    إذا (do_equal || dir != 0)
 	win_equal(wp, TRUE,
 		(flags & WSP_VERT) ? (dir == 'v' ? 'b' : 'h')
 		: dir == 'h' ? 'b' : 'v');
-    else if (!is_aucmd_win(wp))
+    وإلا إذا (!is_aucmd_win(wp))
 	win_fix_scroll(FALSE);
 
     // Don't change the window height/width to 'winheight' / 'winwidth' if a
     // size was given.
-    if (flags & WSP_VERT)
+    إذا (flags & WSP_VERT)
     {
 	i = p_wiw;
-	if (size != 0)
-	    p_wiw = size;
+	إذا (سائيز != 0)
+	    p_wiw = سائيز;
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
 	// When 'guioptions' includes 'L' or 'R' may have to add scrollbars.
-	if (gui.in_use)
-	    gui_init_which_components(NULL);
-#endif
+	إذا (gui.اندريون_use)
+	    gui_init_which_components(عدم);
+#جيڪڏهن_پورو
     }
-    else
+    وإلا
     {
 	i = p_wh;
-	if (size != 0)
-	    p_wh = size;
+	إذا (سائيز != 0)
+	    p_wh = سائيز;
     }
 
     /*
      * make the new window the current window
      */
-    (void)win_enter_ext(wp, (new_wp == NULL ? WEE_TRIGGER_NEW_AUTOCMDS : 0)
+    (فراغ)win_enter_ext(wp, (new_wp == عدم ? WEE_TRIGGER_NEW_AUTOCMDS : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
-    if (flags & WSP_VERT)
+    إذا (flags & WSP_VERT)
 	p_wiw = i;
-    else
+    وإلا
 	p_wh = i;
     retval = OK;
 
 theend:
-    if (RedrawingDisabled > 0)
+    إذا (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    أرجع retval;
 }
 
 
@@ -1532,70 +1532,70 @@ theend:
  * WSP_NEWLOC may be specified in flags to prevent the location list from
  * being copied.
  */
-    static void
-win_init(win_T *newp, win_T *oldp, int flags UNUSED)
+    ساكن فراغ
+win_init(win_T *newp, win_T *oldp, صحيح flags اڻ_استعمال_ٿيل)
 {
-    int		i;
+    صحيح		i;
 
-    newp->w_buffer = oldp->w_buffer;
-#ifdef FEAT_SYN_HL
-    newp->w_s = &(oldp->w_buffer->b_s);
-#endif
-    oldp->w_buffer->b_nwindows++;
+    newp->w_بفر = oldp->w_بفر;
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    newp->w_s = &(oldp->w_بفر->b_s);
+#جيڪڏهن_پورو
+    oldp->w_بفر->b_nwindows++;
     newp->w_cursor = oldp->w_cursor;
     newp->w_valid = 0;
     newp->w_curswant = oldp->w_curswant;
-    newp->w_set_curswant = oldp->w_set_curswant;
+    newp->w_سيٽ_curswant = oldp->w_سيٽ_curswant;
     newp->w_topline = oldp->w_topline;
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     newp->w_topfill = oldp->w_topfill;
-#endif
+#جيڪڏهن_پورو
     newp->w_leftcol = oldp->w_leftcol;
     newp->w_pcmark = oldp->w_pcmark;
     newp->w_prev_pcmark = oldp->w_prev_pcmark;
     newp->w_alt_fnum = oldp->w_alt_fnum;
     newp->w_wrow = oldp->w_wrow;
     newp->w_fraction = oldp->w_fraction;
-    newp->w_prev_fraction_row = oldp->w_prev_fraction_row;
+    newp->w_prev_fraction_صف = oldp->w_prev_fraction_صف;
 
     // Not sure if this is needed, but be safe
     remove_highlight_overrides(newp->w_hl);
     VIM_CLEAR(newp->w_hl);
 
     copy_jumplist(oldp, newp);
-#ifdef FEAT_QUICKFIX
-    if (flags & WSP_NEWLOC)
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
+    إذا (flags & WSP_NEWLOC)
     {
 	// Don't copy the location list.
-	newp->w_llist = NULL;
-	newp->w_llist_ref = NULL;
+	newp->w_llist = عدم;
+	newp->w_llist_ref = عدم;
     }
-    else
-	copy_loclist_stack(oldp, newp);
-#endif
-    newp->w_localdir = (oldp->w_localdir == NULL)
-				    ? NULL : vim_strsave(oldp->w_localdir);
-    newp->w_prevdir = (oldp->w_prevdir == NULL)
-				    ? NULL : vim_strsave(oldp->w_prevdir);
+    وإلا
+	copy_loclist_ڍير(oldp, newp);
+#جيڪڏهن_پورو
+    newp->w_localdir = (oldp->w_localdir == عدم)
+				    ? عدم : vim_strsave(oldp->w_localdir);
+    newp->w_prevdir = (oldp->w_prevdir == عدم)
+				    ? عدم : vim_strsave(oldp->w_prevdir);
 
-    if (*p_spk != 'c')
+    إذا (*p_spk != 'c')
     {
-	if (*p_spk == 't')
+	إذا (*p_spk == 't')
 	    newp->w_skipcol = oldp->w_skipcol;
 	newp->w_botline = oldp->w_botline;
-	newp->w_prev_height = oldp->w_height - WINBAR_HEIGHT(oldp);
-	newp->w_prev_winrow = oldp->w_winrow + 2 * WINBAR_HEIGHT(oldp);
+	newp->w_prev_اوچائي = oldp->w_اوچائي - WINBAR_اوچائي(oldp);
+	newp->w_prev_winrow = oldp->w_winrow + 2 * WINBAR_اوچائي(oldp);
     }
 
     // copy tagstack and folds
-    for (i = 0; i < oldp->w_tagstacklen; i++)
+    لكل (i = 0; i < oldp->w_tagstacklen; i++)
     {
-	taggy_T	*tag = &newp->w_tagstack[i];
-	*tag = oldp->w_tagstack[i];
-	if (tag->tagname != NULL)
-	    tag->tagname = vim_strsave(tag->tagname);
-	if (tag->user_data != NULL)
-	    tag->user_data = vim_strsave(tag->user_data);
+	taggy_T	*ٽيگ = &newp->w_tagstack[i];
+	*ٽيگ = oldp->w_tagstack[i];
+	إذا (ٽيگ->tagname != عدم)
+	    ٽيگ->tagname = vim_strsave(ٽيگ->tagname);
+	إذا (ٽيگ->user_معلومات != عدم)
+	    ٽيگ->user_معلومات = vim_strsave(ٽيگ->user_معلومات);
     }
     newp->w_tagstackidx = oldp->w_tagstackidx;
     newp->w_tagstacklen = oldp->w_tagstacklen;
@@ -1603,29 +1603,29 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
     // Keep same changelist position in new window.
     newp->w_changelistidx = oldp->w_changelistidx;
 
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
     copyFoldingState(oldp, newp);
-#endif
+#جيڪڏهن_پورو
 
     win_init_some(newp, oldp);
 
-#ifdef FEAT_TERMINAL
+#جيڪڏهن_وصف_ٿيل FEAT_TERMINAL
     {
 	// Make sure to also handle highlight overrides copied over from oldp.
-	bool pushed = push_highlight_overrides(newp->w_hl, newp->w_hl_len);
-	if (newp->w_buffer->b_term != NULL)
-	    term_init_default_colors(newp->w_buffer->b_term);
-	if (pushed)
-	    pop_highlight_overrides();
+	bool pushed = ڌڪو_highlight_overrides(newp->w_hl, newp->w_hl_len);
+	إذا (newp->w_بفر->b_رڪن != عدم)
+	    رڪن_init_default_colors(newp->w_بفر->b_رڪن);
+	إذا (pushed)
+	    ڪڍو_highlight_overrides();
     }
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Initialize window "newp" from window "old".
  * Only the essential things are copied.
  */
-    static void
+    ساكن فراغ
 win_init_some(win_T *newp, win_T *oldp)
 {
     // Use the same argument list.
@@ -1640,36 +1640,36 @@ win_init_some(win_T *newp, win_T *oldp)
 /*
  * Return TRUE if "win" is a global popup or a popup in the current tab page.
  */
-    int
-win_valid_popup(win_T *win UNUSED)
+    صحيح
+win_valid_popup(win_T *win اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
     win_T	*wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if (wp == win)
-	    return TRUE;
-    FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp == win)
-	    return TRUE;
-#endif
-    return FALSE;
+	إذا (wp == win)
+	    أرجع TRUE;
+    FOR_ALL_POPUPWINS_اندريون_TAB(curtab, wp)
+	إذا (wp == win)
+	    أرجع TRUE;
+#جيڪڏهن_پورو
+    أرجع FALSE;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in the current tab page.
  */
-    int
+    صحيح
 win_valid(win_T *win)
 {
     win_T	*wp;
 
-    if (win == NULL)
-	return FALSE;
+    إذا (win == عدم)
+	أرجع FALSE;
     FOR_ALL_WINDOWS(wp)
-	if (wp == win)
-	    return TRUE;
-    return win_valid_popup(win);
+	إذا (wp == win)
+	    أرجع TRUE;
+    أرجع win_valid_popup(win);
 }
 
 /*
@@ -1678,63 +1678,63 @@ win_valid(win_T *win)
  * Return NULL if not found.
  */
     win_T *
-win_find_by_id(int id)
+win_ڳوليو_by_id(صحيح id)
 {
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_id == id)
-	    return wp;
-#ifdef FEAT_PROP_POPUP
+	إذا (wp->w_id == id)
+	    أرجع wp;
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
-	    return wp;
-    FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_id == id)
-	    return wp;
-#endif
-    return NULL;
+	إذا (wp->w_id == id)
+	    أرجع wp;
+    FOR_ALL_POPUPWINS_اندريون_TAB(curtab, wp)
+	إذا (wp->w_id == id)
+	    أرجع wp;
+#جيڪڏهن_پورو
+    أرجع عدم;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in any tab page.
  */
-    int
+    صحيح
 win_valid_any_tab(win_T *win)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (win == NULL)
-	return FALSE;
+    إذا (win == عدم)
+	أرجع FALSE;
     FOR_ALL_TABPAGES(tp)
     {
-	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	FOR_ALL_WINDOWS_اندريون_TAB(tp, wp)
 	{
-	    if (wp == win)
-		return TRUE;
+	    إذا (wp == win)
+		أرجع TRUE;
 	}
-#ifdef FEAT_PROP_POPUP
-	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (wp == win)
-		return TRUE;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+	FOR_ALL_POPUPWINS_اندريون_TAB(tp, wp)
+	    إذا (wp == win)
+		أرجع TRUE;
+#جيڪڏهن_پورو
     }
-    return win_valid_popup(win);
+    أرجع win_valid_popup(win);
 }
 
 /*
  * Return the number of windows.
  */
-    int
-win_count(void)
+    صحيح
+win_ڳڻپ(فراغ)
 {
     win_T	*wp;
-    int		count = 0;
+    صحيح		ڳڻپ = 0;
 
     FOR_ALL_WINDOWS(wp)
-	++count;
-    return count;
+	++ڳڻپ;
+    أرجع ڳڻپ;
 }
 
 /*
@@ -1743,114 +1743,114 @@ win_count(void)
  * Must be called when there is just one window, filling the whole screen
  * (excluding the command line).
  */
-    int
+    صحيح
 make_windows(
-    int		count,
-    int		vertical)  // split windows vertically if TRUE
+    صحيح		ڳڻپ,
+    صحيح		vertical)  // split windows vertically if TRUE
 {
-    int		maxcount;
-    int		todo;
+    صحيح		maxcount;
+    صحيح		todo;
 
-    if (vertical)
+    إذا (vertical)
     {
 	// Each window needs at least 'winminwidth' lines and a separator
 	// column.
-	maxcount = (curwin->w_width + curwin->w_vsep_width
+	maxcount = (curwin->w_ويڪر + curwin->w_vsep_ويڪر
 					     - (p_wiw - p_wmw)) / (p_wmw + 1);
     }
-    else
+    وإلا
     {
 	// Each window needs at least 'winminheight' lines and a status line.
-	maxcount = (VISIBLE_HEIGHT(curwin) + curwin->w_status_height
-			- (p_wh - p_wmh)) / (p_wmh + statusline_height(curwin));
+	maxcount = (VISIBLE_اوچائي(curwin) + curwin->w_حالت_اوچائي
+			- (p_wh - p_wmh)) / (p_wmh + statusline_اوچائي(curwin));
     }
 
-    if (maxcount < 2)
+    إذا (maxcount < 2)
 	maxcount = 2;
-    if (count > maxcount)
-	count = maxcount;
+    إذا (ڳڻپ > maxcount)
+	ڳڻپ = maxcount;
 
     /*
      * add status line now, otherwise first window will be too big
      */
-    if (count > 1)
-	last_status(TRUE);
+    إذا (ڳڻپ > 1)
+	آخري_حالت(TRUE);
 
     /*
      * Don't execute autocommands while creating the windows.  Must do that
      * when putting the buffers in the windows.
      */
-    block_autocmds();
+    بلاڪ_autocmds();
 
     // todo is number of windows left to create
-    for (todo = count - 1; todo > 0; --todo)
-	if (vertical)
+    لكل (todo = ڳڻپ - 1; todo > 0; --todo)
+	إذا (vertical)
 	{
-	    if (win_split(curwin->w_width - (curwin->w_width - todo)
+	    إذا (win_ورهايو(curwin->w_ويڪر - (curwin->w_ويڪر - todo)
 			/ (todo + 1) - 1, WSP_VERT | WSP_ABOVE) == FAIL)
-		break;
+		اكسر;
 	}
-	else
+	وإلا
 	{
-	    if (win_split(curwin->w_height - (curwin->w_height - todo
-			    * statusline_height(curwin)) / (todo + 1)
-			- statusline_height(curwin), WSP_ABOVE) == FAIL)
-		break;
+	    إذا (win_ورهايو(curwin->w_اوچائي - (curwin->w_اوچائي - todo
+			    * statusline_اوچائي(curwin)) / (todo + 1)
+			- statusline_اوچائي(curwin), WSP_ABOVE) == FAIL)
+		اكسر;
 	}
 
     unblock_autocmds();
 
     // return actual number of windows
-    return (count - todo);
+    أرجع (ڳڻپ - todo);
 }
 
 /*
  * Exchange current and next window
  */
-    static void
-win_exchange(long Prenum)
+    ساكن فراغ
+win_exchange(ڊگهو Prenum)
 {
-    frame_T	*frp;
-    frame_T	*frp2;
+    چوکٺو_T	*frp;
+    چوکٺو_T	*frp2;
     win_T	*wp;
     win_T	*wp2;
-    int		temp;
+    صحيح		عارضي;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (ONE_WINDOW)	    // just one window
+    إذا (ERROR_IF_ANY_POPUP_دري)
+	أرجع;
+    إذا (ONE_دري)	    // just one window
     {
 	beep_flush();
-	return;
+	أرجع;
     }
-    if (text_or_buf_locked())
+    إذا (متن_or_buf_locked())
     {
 	beep_flush();
-	return;
+	أرجع;
     }
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#جيڪڏهن_پورو
 
     /*
      * find window to exchange with
      */
-    if (Prenum)
+    إذا (Prenum)
     {
-	frp = curwin->w_frame->fr_parent->fr_child;
-	while (frp != NULL && --Prenum > 0)
-	    frp = frp->fr_next;
+	frp = curwin->w_چوکٺو->fr_والد->fr_ٻار;
+	طالما (frp != عدم && --Prenum > 0)
+	    frp = frp->fr_ايندڙ;
     }
-    else if (curwin->w_frame->fr_next != NULL)	// Swap with next
-	frp = curwin->w_frame->fr_next;
-    else    // Swap last window in row/col with previous
-	frp = curwin->w_frame->fr_prev;
+    وإلا إذا (curwin->w_چوکٺو->fr_ايندڙ != عدم)	// Swap with next
+	frp = curwin->w_چوکٺو->fr_ايندڙ;
+    وإلا    // Swap last window in row/col with previous
+	frp = curwin->w_چوکٺو->fr_prev;
 
     // We can only exchange a window with another window, not with a frame
     // containing windows.
-    if (frp == NULL || frp->fr_win == NULL || frp->fr_win == curwin)
-	return;
+    إذا (frp == عدم || frp->fr_win == عدم || frp->fr_win == curwin)
+	أرجع;
     wp = frp->fr_win;
 
 /*
@@ -1862,51 +1862,51 @@ win_exchange(long Prenum)
  * 5. exchange the status line height and vsep width.
  */
     wp2 = curwin->w_prev;
-    frp2 = curwin->w_frame->fr_prev;
-    if (wp->w_prev != curwin)
+    frp2 = curwin->w_چوکٺو->fr_prev;
+    إذا (wp->w_prev != curwin)
     {
-	win_remove(curwin, NULL);
-	frame_remove(curwin->w_frame);
+	win_remove(curwin, عدم);
+	چوکٺو_remove(curwin->w_چوکٺو);
 	win_append(wp->w_prev, curwin);
-	frame_insert(frp, curwin->w_frame);
+	چوکٺو_وجهو(frp, curwin->w_چوکٺو);
     }
-    if (wp != wp2)
+    إذا (wp != wp2)
     {
-	win_remove(wp, NULL);
-	frame_remove(wp->w_frame);
+	win_remove(wp, عدم);
+	چوکٺو_remove(wp->w_چوکٺو);
 	win_append(wp2, wp);
-	if (frp2 == NULL)
-	    frame_insert(wp->w_frame->fr_parent->fr_child, wp->w_frame);
-	else
-	    frame_append(frp2, wp->w_frame);
+	إذا (frp2 == عدم)
+	    چوکٺو_وجهو(wp->w_چوکٺو->fr_والد->fr_ٻار, wp->w_چوکٺو);
+	وإلا
+	    چوکٺو_append(frp2, wp->w_چوکٺو);
     }
     // Keep the total height of each window the same, so that the frames keep
     // their height; the status line height is computed below.
-    temp = curwin->w_status_height;
-    if (temp != wp->w_status_height)
+    عارضي = curwin->w_حالت_اوچائي;
+    إذا (عارضي != wp->w_حالت_اوچائي)
     {
-	win_new_height(curwin, curwin->w_height + temp - wp->w_status_height);
-	win_new_height(wp, wp->w_height + wp->w_status_height - temp);
+	win_new_اوچائي(curwin, curwin->w_اوچائي + عارضي - wp->w_حالت_اوچائي);
+	win_new_اوچائي(wp, wp->w_اوچائي + wp->w_حالت_اوچائي - عارضي);
     }
-    curwin->w_status_height = wp->w_status_height;
-    wp->w_status_height = temp;
-    temp = curwin->w_vsep_width;
-    curwin->w_vsep_width = wp->w_vsep_width;
-    wp->w_vsep_width = temp;
+    curwin->w_حالت_اوچائي = wp->w_حالت_اوچائي;
+    wp->w_حالت_اوچائي = عارضي;
+    عارضي = curwin->w_vsep_ويڪر;
+    curwin->w_vsep_ويڪر = wp->w_vsep_ويڪر;
+    wp->w_vsep_ويڪر = عارضي;
 
-    frame_fix_height(curwin);
-    frame_fix_height(wp);
-    frame_fix_width(curwin);
-    frame_fix_width(wp);
+    چوکٺو_fix_اوچائي(curwin);
+    چوکٺو_fix_اوچائي(wp);
+    چوکٺو_fix_ويڪر(curwin);
+    چوکٺو_fix_ويڪر(wp);
 
     win_comp_pos();		// recompute window positions
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
 
-    if (wp->w_buffer != curbuf)
+    إذا (wp->w_بفر != curbuf)
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    وإلا إذا (VIsual_سرگرم)
 	wp->w_cursor = curwin->w_cursor;
 
     win_enter(wp, TRUE);
@@ -1917,91 +1917,91 @@ win_exchange(long Prenum)
  * rotate windows: if upwards TRUE the second window becomes the first one
  *		   if upwards FALSE the first window becomes the second one
  */
-    static void
-win_rotate(int upwards, int count)
+    ساكن فراغ
+win_rotate(صحيح upwards, صحيح ڳڻپ)
 {
     win_T	*wp1;
     win_T	*wp2;
-    frame_T	*frp;
-    int		n;
+    چوکٺو_T	*frp;
+    صحيح		n;
 
-    if (ONE_WINDOW)		// nothing to do
+    إذا (ONE_دري)		// nothing to do
     {
 	beep_flush();
-	return;
+	أرجع;
     }
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#جيڪڏهن_پورو
 
     // Check if all frames in this row/col have one window.
-    FOR_ALL_FRAMES(frp, curwin->w_frame->fr_parent->fr_child)
-	if (frp->fr_win == NULL)
+    FOR_ALL_چوکٺا(frp, curwin->w_چوکٺو->fr_والد->fr_ٻار)
+	إذا (frp->fr_win == عدم)
 	{
-	    emsg(_(e_cannot_rotate_when_another_window_is_split));
-	    return;
+	    emsg(_(e_cannot_rotate_when_another_دري_is_ورهايو));
+	    أرجع;
 	}
 
-    while (count--)
+    طالما (ڳڻپ--)
     {
-	if (upwards)		// first window becomes last window
+	إذا (upwards)		// first window becomes last window
 	{
 	    // remove first window/frame from the list
-	    frp = curwin->w_frame->fr_parent->fr_child;
+	    frp = curwin->w_چوکٺو->fr_والد->fr_ٻار;
 	    wp1 = frp->fr_win;
-	    win_remove(wp1, NULL);
-	    frame_remove(frp);
+	    win_remove(wp1, عدم);
+	    چوکٺو_remove(frp);
 
 	    // find last frame and append removed window/frame after it
-	    for ( ; frp->fr_next != NULL; frp = frp->fr_next)
+	    لكل ( ; frp->fr_ايندڙ != عدم; frp = frp->fr_ايندڙ)
 		;
 	    win_append(frp->fr_win, wp1);
-	    frame_append(frp, wp1->w_frame);
+	    چوکٺو_append(frp, wp1->w_چوکٺو);
 
 	    wp2 = frp->fr_win;		// previously last window
 	}
-	else			// last window becomes first window
+	وإلا			// last window becomes first window
 	{
 	    // find last window/frame in the list and remove it
-	    for (frp = curwin->w_frame; frp->fr_next != NULL;
-							   frp = frp->fr_next)
+	    لكل (frp = curwin->w_چوکٺو; frp->fr_ايندڙ != عدم;
+							   frp = frp->fr_ايندڙ)
 		;
 	    wp1 = frp->fr_win;
 	    wp2 = wp1->w_prev;		    // will become last window
-	    win_remove(wp1, NULL);
-	    frame_remove(frp);
+	    win_remove(wp1, عدم);
+	    چوکٺو_remove(frp);
 
 	    // append the removed window/frame before the first in the list
-	    win_append(frp->fr_parent->fr_child->fr_win->w_prev, wp1);
-	    frame_insert(frp->fr_parent->fr_child, frp);
+	    win_append(frp->fr_والد->fr_ٻار->fr_win->w_prev, wp1);
+	    چوکٺو_وجهو(frp->fr_والد->fr_ٻار, frp);
 	}
 
 	// exchange status height and vsep width of old and new last window
 	// Keep the total height of each window the same, so that the frames
 	// keep their height; the status line height is computed below.
-	n = wp2->w_status_height;
-	if (n != wp1->w_status_height)
+	n = wp2->w_حالت_اوچائي;
+	إذا (n != wp1->w_حالت_اوچائي)
 	{
-	    win_new_height(wp2, wp2->w_height + n - wp1->w_status_height);
-	    win_new_height(wp1, wp1->w_height + wp1->w_status_height - n);
+	    win_new_اوچائي(wp2, wp2->w_اوچائي + n - wp1->w_حالت_اوچائي);
+	    win_new_اوچائي(wp1, wp1->w_اوچائي + wp1->w_حالت_اوچائي - n);
 	}
-	wp2->w_status_height = wp1->w_status_height;
-	wp1->w_status_height = n;
-	frame_fix_height(wp1);
-	frame_fix_height(wp2);
-	n = wp2->w_vsep_width;
-	wp2->w_vsep_width = wp1->w_vsep_width;
-	wp1->w_vsep_width = n;
-	frame_fix_width(wp1);
-	frame_fix_width(wp2);
+	wp2->w_حالت_اوچائي = wp1->w_حالت_اوچائي;
+	wp1->w_حالت_اوچائي = n;
+	چوکٺو_fix_اوچائي(wp1);
+	چوکٺو_fix_اوچائي(wp2);
+	n = wp2->w_vsep_ويڪر;
+	wp2->w_vsep_ويڪر = wp1->w_vsep_ويڪر;
+	wp1->w_vsep_ويڪر = n;
+	چوکٺو_fix_ويڪر(wp1);
+	چوکٺو_fix_ويڪر(wp2);
 
 	// recompute w_winrow and w_wincol for all windows
 	win_comp_pos();
     }
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
 
     redraw_all_later(UPD_NOT_VALID);
 }
@@ -2012,41 +2012,41 @@ win_rotate(int upwards, int count)
  * "wp" must be valid in the current tabpage.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
-win_splitmove(win_T *wp, int size, int flags)
+    صحيح
+win_splitmove(win_T *wp, صحيح سائيز, صحيح flags)
 {
-    int		dir;
-    int		height = wp->w_height;
-    frame_T	*unflat_altfr;
+    صحيح		dir;
+    صحيح		اوچائي = wp->w_اوچائي;
+    چوکٺو_T	*unflat_altfr;
 
-    if (ONE_WINDOW)
-	return OK;	// nothing to do
-    if (check_split_disallowed(wp) == FAIL)
-	return FAIL;
+    إذا (ONE_دري)
+	أرجع OK;	// nothing to do
+    إذا (check_ورهايو_disallowed(wp) == FAIL)
+	أرجع FAIL;
 
     // Remove the window and frame from the tree of frames.  Don't flatten any
     // frames yet so we can restore things if win_split_ins fails.
-    winframe_remove(wp, &dir, NULL, &unflat_altfr);
-    win_remove(wp, NULL);
-    last_status(FALSE);	    // may need to remove last status line
+    winframe_remove(wp, &dir, عدم, &unflat_altfr);
+    win_remove(wp, عدم);
+    آخري_حالت(FALSE);	    // may need to remove last status line
     win_comp_pos();   // recompute window positions
 
     // Split a window on the desired side and put "wp" there.
-    if (win_split_ins(size, flags, wp, dir, unflat_altfr) == FAIL)
+    إذا (win_ورهايو_ins(سائيز, flags, wp, dir, unflat_altfr) == FAIL)
     {
 	// win_split_ins doesn't change sizes or layout if it fails to insert an
 	// existing window, so just undo winframe_remove.
 	winframe_restore(wp, dir, unflat_altfr);
 	win_append(wp->w_prev, wp);
-	return FAIL;
+	أرجع FAIL;
     }
 
     // If splitting horizontally, try to preserve height.
     // Note that win_split_ins autocommands may have immediately closed "wp"!
-    if (size == 0 && !(flags & WSP_VERT) && win_valid(wp))
+    إذا (سائيز == 0 && !(flags & WSP_VERT) && win_valid(wp))
     {
-	win_setheight_win(height, wp);
-	if (p_ea)
+	win_setheight_win(اوچائي, wp);
+	إذا (p_ea)
 	{
 	    // Equalize windows.  Note that win_split_ins autocommands may have
 	    // made a window other than "wp" current.
@@ -2054,72 +2054,72 @@ win_splitmove(win_T *wp, int size, int flags)
 	}
     }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
-#endif
-    return OK;
+#جيڪڏهن_پورو
+    أرجع OK;
 }
 
 /*
  * Move window "win1" to below/right of "win2" and make "win1" the current
  * window.  Only works within the same frame!
  */
-    void
+    فراغ
 win_move_after(win_T *win1, win_T *win2)
 {
-    int		height;
+    صحيح		اوچائي;
 
     // check if the arguments are reasonable
-    if (win1 == win2)
-	return;
+    إذا (win1 == win2)
+	أرجع;
 
     // check if there is something to do
-    if (win2->w_next != win1)
+    إذا (win2->w_ايندڙ != win1)
     {
-	if (win1->w_frame->fr_parent != win2->w_frame->fr_parent)
+	إذا (win1->w_چوکٺو->fr_والد != win2->w_چوکٺو->fr_والد)
 	{
 	    iemsg("Trying to move a window into another frame");
-	    return;
+	    أرجع;
 	}
 
 	// may need to move the status line/vertical separator of the last
-	// window
-	if (win1 == lastwin)
+	//دري
+	إذا (win1 == lastwin)
 	{
-	    height = win1->w_prev->w_status_height;
-	    win1->w_prev->w_status_height = win1->w_status_height;
-	    win1->w_status_height = height;
-	    if (win1->w_prev->w_vsep_width == 1)
+	    اوچائي = win1->w_prev->w_حالت_اوچائي;
+	    win1->w_prev->w_حالت_اوچائي = win1->w_حالت_اوچائي;
+	    win1->w_حالت_اوچائي = اوچائي;
+	    إذا (win1->w_prev->w_vsep_ويڪر == 1)
 	    {
 		// Remove the vertical separator from the last-but-one window,
 		// add it to the last window.  Adjust the frame widths.
-		win1->w_prev->w_vsep_width = 0;
-		win1->w_prev->w_frame->fr_width -= 1;
-		win1->w_vsep_width = 1;
-		win1->w_frame->fr_width += 1;
+		win1->w_prev->w_vsep_ويڪر = 0;
+		win1->w_prev->w_چوکٺو->fr_ويڪر -= 1;
+		win1->w_vsep_ويڪر = 1;
+		win1->w_چوکٺو->fr_ويڪر += 1;
 	    }
 	}
-	else if (win2 == lastwin)
+	وإلا إذا (win2 == lastwin)
 	{
-	    height = win1->w_status_height;
-	    win1->w_status_height = win2->w_status_height;
-	    win2->w_status_height = height;
-	    if (win1->w_vsep_width == 1)
+	    اوچائي = win1->w_حالت_اوچائي;
+	    win1->w_حالت_اوچائي = win2->w_حالت_اوچائي;
+	    win2->w_حالت_اوچائي = اوچائي;
+	    إذا (win1->w_vsep_ويڪر == 1)
 	    {
 		// Remove the vertical separator from win1, add it to the last
 		// window, win2.  Adjust the frame widths.
-		win2->w_vsep_width = 1;
-		win2->w_frame->fr_width += 1;
-		win1->w_vsep_width = 0;
-		win1->w_frame->fr_width -= 1;
+		win2->w_vsep_ويڪر = 1;
+		win2->w_چوکٺو->fr_ويڪر += 1;
+		win1->w_vsep_ويڪر = 0;
+		win1->w_چوکٺو->fr_ويڪر -= 1;
 	    }
 	}
-	win_remove(win1, NULL);
-	frame_remove(win1->w_frame);
+	win_remove(win1, عدم);
+	چوکٺو_remove(win1->w_چوکٺو);
 	win_append(win2, win1);
-	frame_append(win2->w_frame, win1->w_frame);
+	چوکٺو_append(win2->w_چوکٺو, win1->w_چوکٺو);
 
 	win_comp_pos();	// recompute w_winrow for all windows
 	redraw_later(UPD_NOT_VALID);
@@ -2132,22 +2132,22 @@ win_move_after(win_T *win1, win_T *win2)
  * 'next_curwin' will soon be the current window, make sure it has enough
  * rows.
  */
-    void
+    فراغ
 win_equal(
-    win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
-    int		dir)		// 'v' for vertically, 'h' for horizontally,
+    win_T	*ايندڙ_curwin,	// pointer to current window to be or NULL
+    صحيح		current,	// do only frame with current window
+    صحيح		dir)		// 'v' for vertically, 'h' for horizontally,
 				// 'b' for both, 0 for using p_ead
 {
-    if (dir == 0)
+    إذا (dir == 0)
 	dir = *p_ead;
-    win_equal_rec(next_curwin == NULL ? curwin : next_curwin, current,
-		      topframe, dir, firstwin->w_wincol, tabline_height(),
-		      topframe->fr_width, topframe->fr_height);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
-    if (!is_aucmd_win(next_curwin))
+    win_equal_rec(ايندڙ_curwin == عدم ? curwin : ايندڙ_curwin, current,
+		      topframe, dir, firstwin->w_wincol, tabline_اوچائي(),
+		      topframe->fr_ويڪر, topframe->fr_اوچائي);
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
+    إذا (!is_aucmd_win(ايندڙ_curwin))
 	win_fix_scroll(TRUE);
 }
 
@@ -2157,460 +2157,460 @@ win_equal(
  * The window "next_curwin" (if not NULL) should at least get the size from
  * 'winheight' and 'winwidth' if possible.
  */
-    static void
+    ساكن فراغ
 win_equal_rec(
-    win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
-    frame_T	*topfr,		// frame to set size off
-    int		dir,		// 'v', 'h' or 'b', see win_equal()
-    int		col,		// horizontal position for frame
-    int		row,		// vertical position for frame
-    int		width,		// new width of frame
-    int		height)		// new height of frame
+    win_T	*ايندڙ_curwin,	// pointer to current window to be or NULL
+    صحيح		current,	// do only frame with current window
+    چوکٺو_T	*topfr,		// frame to set size off
+    صحيح		dir,		// 'v', 'h' or 'b', see win_equal()
+    صحيح		کانو,		// horizontal position for frame
+    صحيح		صف,		// vertical position for frame
+    صحيح		ويڪر,		// new width of frame
+    صحيح		اوچائي)		// new height of frame
 {
-    int		n, m;
-    int		extra_sep = 0;
-    int		wincount, totwincount = 0;
-    frame_T	*fr;
-    int		next_curwin_size = 0;
-    int		room = 0;
-    int		new_size;
-    int		has_next_curwin = 0;
-    int		hnc;
+    صحيح		n, m;
+    صحيح		extra_sep = 0;
+    صحيح		wincount, totwincount = 0;
+    چوکٺو_T	*fr;
+    صحيح		ايندڙ_curwin_سائيز = 0;
+    صحيح		گنجائش = 0;
+    صحيح		new_سائيز;
+    صحيح		has_ايندڙ_curwin = 0;
+    صحيح		hnc;
 
-    if (topfr->fr_layout == FR_LEAF)
+    إذا (topfr->fr_layout == FR_پن)
     {
 	// Set the width/height of this frame.
 	// Redraw when size or position changes
-	if (topfr->fr_height != height || topfr->fr_win->w_winrow != row
-		|| topfr->fr_width != width || topfr->fr_win->w_wincol != col
+	إذا (topfr->fr_اوچائي != اوچائي || topfr->fr_win->w_winrow != صف
+		|| topfr->fr_ويڪر != ويڪر || topfr->fr_win->w_wincol != کانو
 	   )
 	{
-	    topfr->fr_win->w_winrow = row;
-	    frame_new_height(topfr, height, FALSE, FALSE, FALSE);
-	    topfr->fr_win->w_wincol = col;
-	    frame_new_width(topfr, width, FALSE, FALSE);
+	    topfr->fr_win->w_winrow = صف;
+	    چوکٺو_new_اوچائي(topfr, اوچائي, FALSE, FALSE, FALSE);
+	    topfr->fr_win->w_wincol = کانو;
+	    چوکٺو_new_ويڪر(topfr, ويڪر, FALSE, FALSE);
 	    redraw_all_later(UPD_NOT_VALID);
 	}
     }
-    else if (topfr->fr_layout == FR_ROW)
+    وإلا إذا (topfr->fr_layout == FR_صف)
     {
-	topfr->fr_width = width;
-	topfr->fr_height = height;
+	topfr->fr_ويڪر = ويڪر;
+	topfr->fr_اوچائي = اوچائي;
 
-	if (dir != 'v')			// equalize frame widths
+	إذا (dir != 'v')			// equalize frame widths
 	{
 	    // Compute the maximum number of windows horizontally in this
 	    // frame.
-	    n = frame_minwidth(topfr, NOWIN);
+	    n = چوکٺو_minwidth(topfr, NOWIN);
 	    // add one for the rightmost window, it doesn't have a separator
-	    if (col + width >= firstwin->w_wincol + topframe->fr_width)
+	    إذا (کانو + ويڪر >= firstwin->w_wincol + topframe->fr_ويڪر)
 		extra_sep = 1;
-	    else
+	    وإلا
 		extra_sep = 0;
 	    totwincount = (n + extra_sep) / (p_wmw + 1);
-	    has_next_curwin = frame_has_win(topfr, next_curwin);
+	    has_ايندڙ_curwin = چوکٺو_has_win(topfr, ايندڙ_curwin);
 
 	    /*
 	     * Compute width for "next_curwin" window and room available for
 	     * other windows.
 	     * "m" is the minimal width when counting p_wiw for "next_curwin".
 	     */
-	    m = frame_minwidth(topfr, next_curwin);
-	    room = width - m;
-	    if (room < 0)
+	    m = چوکٺو_minwidth(topfr, ايندڙ_curwin);
+	    گنجائش = ويڪر - m;
+	    إذا (گنجائش < 0)
 	    {
-		next_curwin_size = p_wiw + room;
-		room = 0;
+		ايندڙ_curwin_سائيز = p_wiw + گنجائش;
+		گنجائش = 0;
 	    }
-	    else
+	    وإلا
 	    {
-		next_curwin_size = -1;
-		FOR_ALL_FRAMES(fr, topfr->fr_child)
+		ايندڙ_curwin_سائيز = -1;
+		FOR_ALL_چوکٺا(fr, topfr->fr_ٻار)
 		{
-		    if (!frame_fixed_width(fr))
-			continue;
+		    إذا (!چوکٺو_fixed_ويڪر(fr))
+			استمر;
 		    // If 'winfixwidth' set keep the window width if possible.
 		    // Watch out for this window being the next_curwin.
-		    n = frame_minwidth(fr, NOWIN);
-		    new_size = fr->fr_width;
-		    if (frame_has_win(fr, next_curwin))
+		    n = چوکٺو_minwidth(fr, NOWIN);
+		    new_سائيز = fr->fr_ويڪر;
+		    إذا (چوکٺو_has_win(fr, ايندڙ_curwin))
 		    {
-			room += p_wiw - p_wmw;
-			next_curwin_size = 0;
-			if (new_size < p_wiw)
-			    new_size = p_wiw;
+			گنجائش += p_wiw - p_wmw;
+			ايندڙ_curwin_سائيز = 0;
+			إذا (new_سائيز < p_wiw)
+			    new_سائيز = p_wiw;
 		    }
-		    else
+		    وإلا
 			// These windows don't use up room.
-			totwincount -= (n + (fr->fr_next == NULL
+			totwincount -= (n + (fr->fr_ايندڙ == عدم
 					? extra_sep : 0)) / (p_wmw + 1);
-		    room -= new_size - n;
-		    if (room < 0)
+		    گنجائش -= new_سائيز - n;
+		    إذا (گنجائش < 0)
 		    {
-			new_size += room;
-			room = 0;
+			new_سائيز += گنجائش;
+			گنجائش = 0;
 		    }
-		    fr->fr_newwidth = new_size;
+		    fr->fr_newwidth = new_سائيز;
 		}
-		if (next_curwin_size == -1)
+		إذا (ايندڙ_curwin_سائيز == -1)
 		{
-		    if (!has_next_curwin)
-			next_curwin_size = 0;
-		    else if (totwincount > 1
-			    && (room + (totwincount - 2))
+		    إذا (!has_ايندڙ_curwin)
+			ايندڙ_curwin_سائيز = 0;
+		    وإلا إذا (totwincount > 1
+			    && (گنجائش + (totwincount - 2))
 						  / (totwincount - 1) > p_wiw)
 		    {
 			// Can make all windows wider than 'winwidth', spread
 			// the room equally.
-			next_curwin_size = (room + p_wiw
+			ايندڙ_curwin_سائيز = (گنجائش + p_wiw
 					    + (totwincount - 1) * p_wmw
 					    + (totwincount - 1)) / totwincount;
-			room -= next_curwin_size - p_wiw;
+			گنجائش -= ايندڙ_curwin_سائيز - p_wiw;
 		    }
-		    else
-			next_curwin_size = p_wiw;
+		    وإلا
+			ايندڙ_curwin_سائيز = p_wiw;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    إذا (has_ايندڙ_curwin)
 		--totwincount;		// don't count curwin
 	}
 
-	FOR_ALL_FRAMES(fr, topfr->fr_child)
+	FOR_ALL_چوکٺا(fr, topfr->fr_ٻار)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    إذا (fr->fr_ايندڙ == عدم)
 		// last frame gets all that remains (avoid roundoff error)
-		new_size = width;
-	    else if (dir == 'v')
-		new_size = fr->fr_width;
-	    else if (frame_fixed_width(fr))
+		new_سائيز = ويڪر;
+	    وإلا إذا (dir == 'v')
+		new_سائيز = fr->fr_ويڪر;
+	    وإلا إذا (چوکٺو_fixed_ويڪر(fr))
 	    {
-		new_size = fr->fr_newwidth;
+		new_سائيز = fr->fr_newwidth;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    وإلا
 	    {
 		// Compute the maximum number of windows horiz. in "fr".
-		n = frame_minwidth(fr, NOWIN);
-		wincount = (n + (fr->fr_next == NULL ? extra_sep : 0))
+		n = چوکٺو_minwidth(fr, NOWIN);
+		wincount = (n + (fr->fr_ايندڙ == عدم ? extra_sep : 0))
 								/ (p_wmw + 1);
-		m = frame_minwidth(fr, next_curwin);
-		if (has_next_curwin)
-		    hnc = frame_has_win(fr, next_curwin);
-		else
+		m = چوکٺو_minwidth(fr, ايندڙ_curwin);
+		إذا (has_ايندڙ_curwin)
+		    hnc = چوکٺو_has_win(fr, ايندڙ_curwin);
+		وإلا
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		إذا (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
-		    new_size = room;
-		else
-		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
+		إذا (totwincount == 0)
+		    new_سائيز = گنجائش;
+		وإلا
+		    new_سائيز = (wincount * گنجائش + ((بنانشان)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		إذا (hnc)	    // add next_curwin size
 		{
-		    next_curwin_size -= p_wiw - (m - n);
-		    if (next_curwin_size < 0)
-			next_curwin_size = 0;
-		    new_size += next_curwin_size;
-		    room -= new_size - next_curwin_size;
+		    ايندڙ_curwin_سائيز -= p_wiw - (m - n);
+		    إذا (ايندڙ_curwin_سائيز < 0)
+			ايندڙ_curwin_سائيز = 0;
+		    new_سائيز += ايندڙ_curwin_سائيز;
+		    گنجائش -= new_سائيز - ايندڙ_curwin_سائيز;
 		}
-		else
-		    room -= new_size;
-		new_size += n;
+		وإلا
+		    گنجائش -= new_سائيز;
+		new_سائيز += n;
 	    }
 
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'v' || topfr->fr_parent != NULL
-		    || (new_size != fr->fr_width)
-		    || frame_has_win(fr, next_curwin))
-		win_equal_rec(next_curwin, current, fr, dir, col, row,
-							    new_size, height);
-	    col += new_size;
-	    width -= new_size;
+	    إذا (!current || dir != 'v' || topfr->fr_والد != عدم
+		    || (new_سائيز != fr->fr_ويڪر)
+		    || چوکٺو_has_win(fr, ايندڙ_curwin))
+		win_equal_rec(ايندڙ_curwin, current, fr, dir, کانو, صف,
+							    new_سائيز, اوچائي);
+	    کانو += new_سائيز;
+	    ويڪر -= new_سائيز;
 	    totwincount -= wincount;
 	}
     }
-    else // topfr->fr_layout == FR_COL
+    وإلا // topfr->fr_layout == FR_COL
     {
-	topfr->fr_width = width;
-	topfr->fr_height = height;
+	topfr->fr_ويڪر = ويڪر;
+	topfr->fr_اوچائي = اوچائي;
 
-	if (dir != 'h')			// equalize frame heights
+	إذا (dir != 'h')			// equalize frame heights
 	{
-	    totwincount = frame_wincount_in_height(topfr);
-	    has_next_curwin = frame_has_win(topfr, next_curwin);
+	    totwincount = چوکٺو_wincount_اندريون_اوچائي(topfr);
+	    has_ايندڙ_curwin = چوکٺو_has_win(topfr, ايندڙ_curwin);
 
 	    /*
 	     * Compute height for "next_curwin" window and room available for
 	     * other windows.
 	     * "m" is the minimal height when counting p_wh for "next_curwin".
 	     */
-	    m = frame_minheight(topfr, next_curwin);
-	    room = height - m;
-	    if (room < 0)
+	    m = چوکٺو_minheight(topfr, ايندڙ_curwin);
+	    گنجائش = اوچائي - m;
+	    إذا (گنجائش < 0)
 	    {
 		// The room is less than 'winheight', use all space for the
 		// current window.
-		next_curwin_size = p_wh + room;
-		room = 0;
+		ايندڙ_curwin_سائيز = p_wh + گنجائش;
+		گنجائش = 0;
 	    }
-	    else
+	    وإلا
 	    {
-		next_curwin_size = -1;
-		FOR_ALL_FRAMES(fr, topfr->fr_child)
+		ايندڙ_curwin_سائيز = -1;
+		FOR_ALL_چوکٺا(fr, topfr->fr_ٻار)
 		{
-		    if (!frame_fixed_height(fr))
-			continue;
+		    إذا (!چوکٺو_fixed_اوچائي(fr))
+			استمر;
 		    // If 'winfixheight' set keep the window height if
 		    // possible.
 		    // Watch out for this window being the next_curwin.
-		    n = frame_minheight(fr, NOWIN);
-		    new_size = fr->fr_height;
-		    if (frame_has_win(fr, next_curwin))
+		    n = چوکٺو_minheight(fr, NOWIN);
+		    new_سائيز = fr->fr_اوچائي;
+		    إذا (چوکٺو_has_win(fr, ايندڙ_curwin))
 		    {
-			room += p_wh - p_wmh;
-			next_curwin_size = 0;
+			گنجائش += p_wh - p_wmh;
+			ايندڙ_curwin_سائيز = 0;
 			// n + (p_wh - p_wmh) = frame_minheight(fr,
 			// next_curwin): min height for curwin.
-			if (new_size < n + (p_wh - p_wmh))
-			    new_size = n + (p_wh - p_wmh);
+			إذا (new_سائيز < n + (p_wh - p_wmh))
+			    new_سائيز = n + (p_wh - p_wmh);
 		    }
-		    else
+		    وإلا
 			// These windows don't use up room.
-			totwincount -= frame_wincount_in_height(fr);
-		    room -= new_size - n;
-		    if (room < 0)
+			totwincount -= چوکٺو_wincount_اندريون_اوچائي(fr);
+		    گنجائش -= new_سائيز - n;
+		    إذا (گنجائش < 0)
 		    {
-			new_size += room;
-			room = 0;
+			new_سائيز += گنجائش;
+			گنجائش = 0;
 		    }
-		    fr->fr_newheight = new_size;
+		    fr->fr_newheight = new_سائيز;
 		}
-		if (next_curwin_size == -1)
+		إذا (ايندڙ_curwin_سائيز == -1)
 		{
-		    if (!has_next_curwin)
-			next_curwin_size = 0;
-		    else if (totwincount > 1
-			    && (room + (totwincount - 2))
+		    إذا (!has_ايندڙ_curwin)
+			ايندڙ_curwin_سائيز = 0;
+		    وإلا إذا (totwincount > 1
+			    && (گنجائش + (totwincount - 2))
 						   / (totwincount - 1) > p_wh)
 		    {
 			// can make all windows higher than 'winheight',
 			// spread the room equally.
-			next_curwin_size = (room + p_wh
+			ايندڙ_curwin_سائيز = (گنجائش + p_wh
 					   + (totwincount - 1) * p_wmh
 					   + (totwincount - 1)) / totwincount;
-			room -= next_curwin_size - p_wh;
+			گنجائش -= ايندڙ_curwin_سائيز - p_wh;
 		    }
-		    else
-			next_curwin_size = p_wh;
+		    وإلا
+			ايندڙ_curwin_سائيز = p_wh;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    إذا (has_ايندڙ_curwin)
 		--totwincount;		// don't count curwin
 	}
 
-	FOR_ALL_FRAMES(fr, topfr->fr_child)
+	FOR_ALL_چوکٺا(fr, topfr->fr_ٻار)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    إذا (fr->fr_ايندڙ == عدم)
 		// last frame gets all that remains (avoid roundoff error)
-		new_size = height;
-	    else if (dir == 'h')
-		new_size = fr->fr_height;
-	    else if (frame_fixed_height(fr))
+		new_سائيز = اوچائي;
+	    وإلا إذا (dir == 'h')
+		new_سائيز = fr->fr_اوچائي;
+	    وإلا إذا (چوکٺو_fixed_اوچائي(fr))
 	    {
-		new_size = fr->fr_newheight;
+		new_سائيز = fr->fr_newheight;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    وإلا
 	    {
 		// Compute the maximum number of windows vert. in "fr".
-		n = frame_minheight(fr, NOWIN);
-		wincount = frame_wincount_in_height(fr);
-		m = frame_minheight(fr, next_curwin);
-		if (has_next_curwin)
-		    hnc = frame_has_win(fr, next_curwin);
-		else
+		n = چوکٺو_minheight(fr, NOWIN);
+		wincount = چوکٺو_wincount_اندريون_اوچائي(fr);
+		m = چوکٺو_minheight(fr, ايندڙ_curwin);
+		إذا (has_ايندڙ_curwin)
+		    hnc = چوکٺو_has_win(fr, ايندڙ_curwin);
+		وإلا
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		إذا (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
-		    new_size = room;
-		else
-		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
+		إذا (totwincount == 0)
+		    new_سائيز = گنجائش;
+		وإلا
+		    new_سائيز = (wincount * گنجائش + ((بنانشان)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		إذا (hnc)	    // add next_curwin size
 		{
-		    next_curwin_size -= p_wh - (m - n);
-		    new_size += next_curwin_size;
-		    room -= new_size - next_curwin_size;
+		    ايندڙ_curwin_سائيز -= p_wh - (m - n);
+		    new_سائيز += ايندڙ_curwin_سائيز;
+		    گنجائش -= new_سائيز - ايندڙ_curwin_سائيز;
 		}
-		else
-		    room -= new_size;
-		new_size += n;
+		وإلا
+		    گنجائش -= new_سائيز;
+		new_سائيز += n;
 	    }
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'h' || topfr->fr_parent != NULL
-		    || (new_size != fr->fr_height)
-		    || frame_has_win(fr, next_curwin))
-		win_equal_rec(next_curwin, current, fr, dir, col, row,
-							     width, new_size);
-	    row += new_size;
-	    height -= new_size;
+	    إذا (!current || dir != 'h' || topfr->fr_والد != عدم
+		    || (new_سائيز != fr->fr_اوچائي)
+		    || چوکٺو_has_win(fr, ايندڙ_curwin))
+		win_equal_rec(ايندڙ_curwin, current, fr, dir, کانو, صف,
+							     ويڪر, new_سائيز);
+	    صف += new_سائيز;
+	    اوچائي -= new_سائيز;
 	    totwincount -= wincount;
 	}
     }
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-leaving_window(win_T *win)
+#إذا defined(FEAT_ڪم_CHANNEL)
+    فراغ
+leaving_دري(win_T *win)
 {
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    إذا (!bt_prompt(win->w_بفر) || is_aucmd_win(win))
+	أرجع;
 
     // When leaving a prompt window stop Insert mode and perhaps restart
     // it when entering that window again.
-    win->w_buffer->b_prompt_insert = restart_edit;
-    if (restart_edit != 0 && mode_displayed)
+    win->w_بفر->b_prompt_وجهو = restart_edit;
+    إذا (restart_edit != 0 && گهڻائي_displayed)
 	clear_cmdline = TRUE;		// unshow mode later
     restart_edit = NUL;
 
     // When leaving the window (or closing the window) was done from a
     // callback we need to break out of the Insert mode loop and restart Insert
     // mode when entering the window again.
-    if ((State & MODE_INSERT) && !stop_insert_mode)
+    إذا ((State & گهڻائي_وجهو) && !stop_وجهو_گهڻائي)
     {
-	stop_insert_mode = TRUE;
-	if (win->w_buffer->b_prompt_insert == NUL)
-	    win->w_buffer->b_prompt_insert = 'A';
+	stop_وجهو_گهڻائي = TRUE;
+	إذا (win->w_بفر->b_prompt_وجهو == NUL)
+	    win->w_بفر->b_prompt_وجهو = 'A';
     }
 }
 
-    void
-entering_window(win_T *win)
+    فراغ
+entering_دري(win_T *win)
 {
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    إذا (!bt_prompt(win->w_بفر) || is_aucmd_win(win))
+	أرجع;
 
     // When switching to a prompt buffer that was in Insert mode, don't stop
     // Insert mode, it may have been set in leaving_window().
-    if (win->w_buffer->b_prompt_insert != NUL)
-	stop_insert_mode = FALSE;
+    إذا (win->w_بفر->b_prompt_وجهو != NUL)
+	stop_وجهو_گهڻائي = FALSE;
 
     // When entering the prompt window restart Insert mode if we were in Insert
     // mode when we left it and not already in Insert mode.
-    if ((State & MODE_INSERT) == 0)
-	restart_edit = win->w_buffer->b_prompt_insert;
+    إذا ((State & گهڻائي_وجهو) == 0)
+	restart_edit = win->w_بفر->b_prompt_وجهو;
 }
-#endif
+#جيڪڏهن_پورو
 
-    static void
-win_init_empty(win_T *wp)
+    ساكن فراغ
+win_init_خالي_جايون(win_T *wp)
 {
     redraw_win_later(wp, UPD_NOT_VALID);
-    wp->w_lines_valid = 0;
+    wp->w_سٽون_valid = 0;
     wp->w_cursor.lnum = 1;
-    wp->w_curswant = wp->w_cursor.col = 0;
+    wp->w_curswant = wp->w_cursor.کانو = 0;
     wp->w_cursor.coladd = 0;
     wp->w_pcmark.lnum = 1;	// pcmark not cleared but set to line 1
-    wp->w_pcmark.col = 0;
+    wp->w_pcmark.کانو = 0;
     wp->w_prev_pcmark.lnum = 0;
-    wp->w_prev_pcmark.col = 0;
+    wp->w_prev_pcmark.کانو = 0;
     wp->w_topline = 1;
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     wp->w_topfill = 0;
-#endif
+#جيڪڏهن_پورو
     wp->w_botline = 2;
     wp->w_valid = 0;
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
-    wp->w_s = &wp->w_buffer->b_s;
-#endif
-#ifdef FEAT_TERMINAL
-    term_reset_hlfwin(wp);
-#endif
+#إذا defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+    wp->w_s = &wp->w_بفر->b_s;
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_TERMINAL
+    رڪن_reset_hlfwin(wp);
+#جيڪڏهن_پورو
 }
 
 /*
  * Init the current window "curwin".
  * Called when a new file is being edited.
  */
-    void
-curwin_init(void)
+    فراغ
+curwin_init(فراغ)
 {
-    win_init_empty(curwin);
+    win_init_خالي_جايون(curwin);
 }
 
 /*
  * Close all windows for buffer "buf".
  */
-    void
+    فراغ
 close_windows(
     buf_T	*buf,
-    int		keep_curwin)	    // don't close "curwin"
+    صحيح		keep_curwin)	    // don't close "curwin"
 {
     win_T	*wp;
     tabpage_T   *tp, *nexttp;
-    int		count = tabpage_index(NULL);
+    صحيح		ڳڻپ = tabpage_اشاريو(عدم);
 
     ++RedrawingDisabled;
 
-    for (wp = firstwin; wp != NULL && !ONE_WINDOW; )
+    لكل (wp = firstwin; wp != عدم && !ONE_دري; )
     {
-	if (wp->w_buffer == buf && (!keep_curwin || wp != curwin)
-		&& !(win_locked(wp) || wp->w_buffer->b_locked > 0))
+	إذا (wp->w_بفر == buf && (!keep_curwin || wp != curwin)
+		&& !(win_locked(wp) || wp->w_بفر->b_locked > 0))
 	{
-	    if (window_layout_locked(CMD_SIZE))
-		goto theend;  // Only give one error message.
-	    if (win_close(wp, FALSE) == FAIL)
+	    إذا (دري_layout_locked(CMD_سائيز))
+		اذهب theend;  // Only give one error message.
+	    إذا (win_close(wp, FALSE) == FAIL)
 		// If closing the window fails give up, to avoid looping
 		// forever.
-		break;
+		اكسر;
 
 	    // Start all over, autocommands may change the window layout.
 	    wp = firstwin;
 	}
-	else
-	    wp = wp->w_next;
+	وإلا
+	    wp = wp->w_ايندڙ;
     }
 
     // Also check windows in other tab pages.
-    for (tp = first_tabpage; tp != NULL; tp = nexttp)
+    لكل (tp = پهريون_tabpage; tp != عدم; tp = nexttp)
     {
-	nexttp = tp->tp_next;
-	if (tp != curtab)
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf
-		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0))
+	nexttp = tp->tp_ايندڙ;
+	إذا (tp != curtab)
+	    FOR_ALL_WINDOWS_اندريون_TAB(tp, wp)
+		إذا (wp->w_بفر == buf
+		    && !(win_locked(wp) || wp->w_بفر->b_locked > 0))
 		{
-		    if (window_layout_locked(CMD_SIZE))
-			goto theend;  // Only give one error message.
+		    إذا (دري_layout_locked(CMD_سائيز))
+			اذهب theend;  // Only give one error message.
 		    win_close_othertab(wp, FALSE, tp);
 
 		    // Start all over, the tab page may be closed and
 		    // autocommands may change the window layout.
-		    nexttp = first_tabpage;
-		    break;
+		    nexttp = پهريون_tabpage;
+		    اكسر;
 		}
     }
 
 theend:
-    if (RedrawingDisabled > 0)
+    إذا (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
-    if (count != tabpage_index(NULL))
-	apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
+    إذا (ڳڻپ != tabpage_اشاريو(عدم))
+	apply_autocmds(EVENT_TABCLOSED, عدم, عدم, FALSE, curbuf);
 }
 
 /*
@@ -2618,46 +2618,46 @@ theend:
  * "aucmd_win[]").
  * Returns FALSE if there is a window, possibly in another tab page.
  */
-    int
-last_window(void)
+    صحيح
+آخري_دري(فراغ)
 {
-    return (one_window() && first_tabpage->tp_next == NULL);
+    أرجع (one_دري() && پهريون_tabpage->tp_ايندڙ == عدم);
 }
 
 /*
  * Return TRUE if there is only one window other than "aucmd_win[]" in the
  * current tab page.
  */
-    int
-one_window(void)
+    صحيح
+one_دري(فراغ)
 {
     win_T	*wp;
-    int		seen_one = FALSE;
+    صحيح		ڏٺل_one = FALSE;
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (!is_aucmd_win(wp))
+	إذا (!is_aucmd_win(wp))
 	{
-	    if (seen_one)
-		return FALSE;
-	    seen_one = TRUE;
+	    إذا (ڏٺل_one)
+		أرجع FALSE;
+	    ڏٺل_one = TRUE;
 	}
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Close the possibly last window in a tab page.
  * Return FALSE if there are other windows and nothing is done, TRUE otherwise.
  */
-    static int
-close_last_window_tabpage(
+    ساكن صحيح
+close_آخري_دري_tabpage(
     win_T	*win,
-    int		free_buf,
+    صحيح		free_buf,
     tabpage_T   *prev_curtab)
 {
-    if (!ONE_WINDOW)
-	return FALSE;
+    إذا (!ONE_دري)
+	أرجع FALSE;
 
     buf_T	*old_curbuf = curbuf;
     tabpage_T	*save_lastused = lastused_tabpage;
@@ -2672,32 +2672,32 @@ close_last_window_tabpage(
      * Do trigger *Leave autocommands, unless win->w_buffer is NULL, in which
      * case they have already been triggered.
      */
-    goto_tabpage_tp(alt_tabpage(), FALSE, win->w_buffer != NULL);
+    goto_tabpage_tp(alt_tabpage(), FALSE, win->w_بفر != عدم);
 
     // Safety check: Autocommands may have closed the window when jumping
     // to the other tab page.
-    if (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
+    إذا (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
 	win_close_othertab(win, free_buf, prev_curtab);
 
     // Entering the other tab page made the closed one the last used tab page.
     // Restore the previous one when it is still there.
-    if (valid_tabpage(save_lastused) && save_lastused != curtab)
+    إذا (valid_tabpage(save_lastused) && save_lastused != curtab)
 	lastused_tabpage = save_lastused;
-#ifdef FEAT_JOB_CHANNEL
-    entering_window(curwin);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    entering_دري(curwin);
+#جيڪڏهن_پورو
     // Since goto_tabpage_tp above did not trigger *Enter autocommands, do
     // that now.
-    apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
-#if defined(FEAT_TABPANEL)
-    if (p_stpl > 0)
+    apply_autocmds(EVENT_TABCLOSED, عدم, عدم, FALSE, curbuf);
+#إذا defined(FEAT_TABPANEL)
+    إذا (p_stpl > 0)
 	shell_new_columns();
-#endif
-    apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-    apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-    if (old_curbuf != curbuf)
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    return TRUE;
+#جيڪڏهن_پورو
+    apply_autocmds(EVENT_WINENTER, عدم, عدم, FALSE, curbuf);
+    apply_autocmds(EVENT_TABENTER, عدم, عدم, FALSE, curbuf);
+    إذا (old_curbuf != curbuf)
+	apply_autocmds(EVENT_BUFENTER, عدم, عدم, FALSE, curbuf);
+    أرجع TRUE;
 }
 
 /*
@@ -2706,36 +2706,36 @@ close_last_window_tabpage(
  * "abort_if_last" is passed to close_buffer(): abort closing if all other
  * windows are closed.
  */
-    static void
-win_close_buffer(win_T *win, int action, int abort_if_last)
+    ساكن فراغ
+win_close_بفر(win_T *win, صحيح action, صحيح abort_if_آخري)
 {
-#ifdef FEAT_SYN_HL
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
     // Free independent synblock before the buffer is freed.
-    if (win->w_buffer != NULL)
+    إذا (win->w_بفر != عدم)
 	reset_synblock(win);
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_QUICKFIX
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
     // When a quickfix/location list window is closed and the buffer is
     // displayed in only one window, then unlist the buffer.
-    if (win->w_buffer != NULL && bt_quickfix(win->w_buffer)
-					&& win->w_buffer->b_nwindows == 1)
-	win->w_buffer->b_p_bl = FALSE;
-#endif
+    إذا (win->w_بفر != عدم && bt_quickfix(win->w_بفر)
+					&& win->w_بفر->b_nwindows == 1)
+	win->w_بفر->b_p_bl = FALSE;
+#جيڪڏهن_پورو
 
     // Close the link to the buffer.
-    if (win->w_buffer != NULL)
+    إذا (win->w_بفر != عدم)
     {
 	bufref_T    bufref;
 
-	set_bufref(&bufref, curbuf);
+	سيٽ_bufref(&bufref, curbuf);
 	++win->w_locked;
-	close_buffer(win, win->w_buffer, action, abort_if_last, TRUE, TRUE);
-	if (win_valid_any_tab(win))
+	close_بفر(win, win->w_بفر, action, abort_if_آخري, TRUE, TRUE);
+	إذا (win_valid_any_tab(win))
 	    --win->w_locked;
 	// Make sure curbuf is valid. It can become invalid if 'bufhidden' is
 	// "wipe".
-	if (!bufref_valid(&bufref))
+	إذا (!bufref_valid(&bufref))
 	    curbuf = firstbuf;
     }
 }
@@ -2747,220 +2747,220 @@ win_close_buffer(win_T *win, int action, int abort_if_last)
  * Called by :quit, :close, :xit, :wq and findtag().
  * Returns FAIL when the window was not closed.
  */
-    int
-win_close(win_T *win, int free_buf)
+    صحيح
+win_close(win_T *win, صحيح free_buf)
 {
     win_T	*wp;
-    int		other_buffer = FALSE;
-    int		close_curwin = FALSE;
-    int		dir;
-    int		help_window = FALSE;
-    int		quickfix_window = FALSE;
+    صحيح		other_بفر = FALSE;
+    صحيح		close_curwin = FALSE;
+    صحيح		dir;
+    صحيح		help_دري = FALSE;
+    صحيح		quickfix_دري = FALSE;
     tabpage_T   *prev_curtab = curtab;
-    frame_T	*win_frame = win->w_frame->fr_parent;
-#ifdef FEAT_DIFF
-    int		had_diffmode = win->w_p_diff;
-#endif
-#ifdef MESSAGE_QUEUE
-    int		did_decrement = FALSE;
-#endif
+    چوکٺو_T	*win_چوکٺو = win->w_چوکٺو->fr_والد;
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
+    صحيح		had_diffmode = win->w_p_diff;
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
+    صحيح		did_decrement = FALSE;
+#جيڪڏهن_پورو
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
+#إذا defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
     // Can close a popup window with a terminal if the job has finished.
-    if (may_close_term_popup() == OK)
-	return OK;
-#endif
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    إذا (may_close_رڪن_popup() == OK)
+	أرجع OK;
+#جيڪڏهن_پورو
+    إذا (ERROR_IF_ANY_POPUP_دري)
+	أرجع FAIL;
 
-    if (last_window())
+    إذا (آخري_دري())
     {
-	emsg(_(e_cannot_close_last_window));
-	return FAIL;
+	emsg(_(e_cannot_close_آخري_دري));
+	أرجع FAIL;
     }
-    if (window_layout_locked(CMD_close))
-	return FAIL;
+    إذا (دري_layout_locked(CMD_close))
+	أرجع FAIL;
 
-    if (win_locked(win) || (win->w_buffer != NULL
-					       && win->w_buffer->b_locked > 0))
-	return FAIL; // window is already being closed
-    if (win_unlisted(win))
+    إذا (win_locked(win) || (win->w_بفر != عدم
+					       && win->w_بفر->b_locked > 0))
+	أرجع FAIL; // window is already being closed
+    إذا (win_unlisted(win))
     {
-	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return FAIL;
+	emsg(_(e_cannot_close_autocmd_or_popup_دري));
+	أرجع FAIL;
     }
-    if ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_window())
+    إذا ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_دري())
     {
-	emsg(_(e_cannot_close_window_only_autocmd_window_would_remain));
-	return FAIL;
+	emsg(_(e_cannot_close_دري_only_autocmd_دري_would_remain));
+	أرجع FAIL;
     }
 
     // When closing the last window in a tab page first go to another tab page
     // and then close the window and the tab page to avoid that curwin and
     // curtab are invalid while we are freeing memory.
-    if (close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+    إذا (close_آخري_دري_tabpage(win, free_buf, prev_curtab))
+	أرجع FAIL;
 
     // When closing the help window, try restoring a snapshot after closing
     // the window.  Otherwise clear the snapshot, it's now invalid.
-    if (bt_help(win->w_buffer))
-	help_window = TRUE;
-    else
+    إذا (bt_help(win->w_بفر))
+	help_دري = TRUE;
+    وإلا
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (bt_quickfix(win->w_buffer))
-	quickfix_window = TRUE;
-    else
+    إذا (bt_quickfix(win->w_بفر))
+	quickfix_دري = TRUE;
+    وإلا
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    if (win == curwin)
+    إذا (win == curwin)
     {
-#ifdef FEAT_JOB_CHANNEL
-	leaving_window(curwin);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+	leaving_دري(curwin);
+#جيڪڏهن_پورو
 	/*
 	 * Guess which window is going to be the new current window.
 	 * This may change because of the autocommands (sigh).
 	 */
-	wp = frame2win(win_altframe(win, NULL));
+	wp = frame2win(win_altframe(win, عدم));
 
 	/*
 	 * Be careful: If autocommands delete the window or cause this window
 	 * to be the last one left, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	إذا (wp->w_بفر != curbuf)
 	{
 	    reset_VIsual_and_resel();	// stop Visual mode
 
-	    other_buffer = TRUE;
-	    if (!win_valid(win))
-		return FAIL;
+	    other_بفر = TRUE;
+	    إذا (!win_valid(win))
+		أرجع FAIL;
 	    ++win->w_locked;
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (!win_valid(win))
-		return FAIL;
+	    apply_autocmds(EVENT_BUFLEAVE, عدم, عدم, FALSE, curbuf);
+	    إذا (!win_valid(win))
+		أرجع FAIL;
 	    --win->w_locked;
-	    if (last_window())
-		return FAIL;
+	    إذا (آخري_دري())
+		أرجع FAIL;
 	}
 	++win->w_locked;
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(win))
-	    return FAIL;
+	apply_autocmds(EVENT_WINLEAVE, عدم, عدم, FALSE, curbuf);
+	إذا (!win_valid(win))
+	    أرجع FAIL;
 	--win->w_locked;
-	if (last_window())
-	    return FAIL;
-#ifdef FEAT_EVAL
+	إذا (آخري_دري())
+	    أرجع FAIL;
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FAIL;
-#endif
+	إذا (aborting())
+	    أرجع FAIL;
+#جيڪڏهن_پورو
     }
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
     // Avoid trouble with scrollbars that are going to be deleted in
     // win_free().
-    if (gui.in_use)
-	out_flush();
-#endif
+    إذا (gui.اندريون_use)
+	ٻاهريون_flush();
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_win_closed(win) && !win_valid(win))
-	return FAIL;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (popup_win_closed(win) && !win_valid(win))
+	أرجع FAIL;
+#جيڪڏهن_پورو
 
     // Trigger WinClosed just before starting to free window-related resources.
     trigger_winclosed(win);
     // autocmd may have freed the window already.
-    if (!win_valid_any_tab(win))
-	return OK;
+    إذا (!win_valid_any_tab(win))
+	أرجع OK;
 
-    win_close_buffer(win, free_buf ? DOBUF_UNLOAD : 0, TRUE);
+    win_close_بفر(win, free_buf ? DOBUF_UNLOAD : 0, TRUE);
 
-    if (win_valid(win) && win->w_buffer == NULL
-#if defined(FEAT_PROP_POPUP)
+    إذا (win_valid(win) && win->w_بفر == عدم
+#إذا defined(FEAT_PROP_POPUP)
 	    && !popup_is_popup(win)
-#endif
-	    && last_window())
+#جيڪڏهن_پورو
+	    && آخري_دري())
     {
 	// Autocommands have closed all windows, quit now.  Restore
 	// curwin->w_buffer, otherwise writing viminfo may fail.
-	if (curwin->w_buffer == NULL)
-	    curwin->w_buffer = curbuf;
+	إذا (curwin->w_بفر == عدم)
+	    curwin->w_بفر = curbuf;
 	getout(0);
     }
 
     // Autocommands may have moved to another tab page.
-    if (curtab != prev_curtab && win_valid_any_tab(win)
-						      && win->w_buffer == NULL)
+    إذا (curtab != prev_curtab && win_valid_any_tab(win)
+						      && win->w_بفر == عدم)
     {
 	// Need to close the window anyway, since the buffer is NULL.
 	win_close_othertab(win, FALSE, prev_curtab);
-	return FAIL;
+	أرجع FAIL;
     }
 
     // Autocommands may have closed the window already or closed the only
     // other window.
-    if (!win_valid(win) || last_window()
-	    || close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+    إذا (!win_valid(win) || آخري_دري()
+	    || close_آخري_دري_tabpage(win, free_buf, prev_curtab))
+	أرجع FAIL;
 
     // Now we are really going to close the window.  Disallow any autocommand
     // to split a window to avoid trouble.
     // Also bail out of parse_queued_messages() to avoid it tries to update the
     // screen.
-    ++split_disallowed;
-#ifdef MESSAGE_QUEUE
+    ++ورهايو_disallowed;
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
     ++dont_parse_messages;
-#endif
+#جيڪڏهن_پورو
 
-    if (win->w_buffer != NULL)
-	--win->w_buffer->b_nwindows;
+    إذا (win->w_بفر != عدم)
+	--win->w_بفر->b_nwindows;
 
     // Free the memory used for the window and get the window that received
     // the screen space.
-    wp = win_free_mem(win, &dir, NULL);
+    wp = win_free_mem(win, &dir, عدم);
 
-    if (help_window || quickfix_window)
+    إذا (help_دري || quickfix_دري)
     {
 	// Closing the help window moves the cursor back to the current window
 	// of the snapshot.
-	win_T *prev_win = get_snapshot_curwin(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX);
+	win_T *prev_win = get_snapshot_curwin(help_دري ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX);
 
-	if (win_valid(prev_win))
+	إذا (win_valid(prev_win))
 	    wp = prev_win;
     }
 
     // Make sure curwin isn't invalid.  It can cause severe trouble when
     // printing an error message.  For win_equal() curbuf needs to be valid
     // too.
-    if (win == curwin)
+    إذا (win == curwin)
     {
 	curwin = wp;
-#ifdef FEAT_QUICKFIX
-	if (wp->w_p_pvw || bt_quickfix(wp->w_buffer))
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
+	إذا (wp->w_p_pvw || bt_quickfix(wp->w_بفر))
 	{
 	    /*
 	     * If the cursor goes to the preview or the quickfix window, try
 	     * finding another window to go to.
 	     */
-	    for (;;)
+	    لكل (;;)
 	    {
-		if (wp->w_next == NULL)
+		إذا (wp->w_ايندڙ == عدم)
 		    wp = firstwin;
-		else
-		    wp = wp->w_next;
-		if (wp == curwin)
-		    break;
-		if (!wp->w_p_pvw && !bt_quickfix(wp->w_buffer))
+		وإلا
+		    wp = wp->w_ايندڙ;
+		إذا (wp == curwin)
+		    اكسر;
+		إذا (!wp->w_p_pvw && !bt_quickfix(wp->w_بفر))
 		{
 		    curwin = wp;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
-#endif
-	curbuf = curwin->w_buffer;
+#جيڪڏهن_پورو
+	curbuf = curwin->w_بفر;
 	close_curwin = TRUE;
 
 	// The cursor position may be invalid if the buffer changed after last
@@ -2973,225 +2973,225 @@ win_close(win_T *win, int free_buf)
      * status line.  Do this before win_equal(), because it may change the
      * height of a window
      */
-    last_status(FALSE);
+    آخري_حالت(FALSE);
 
-    if (p_ea && (*p_ead == 'b' || *p_ead == dir))
+    إذا (p_ea && (*p_ead == 'b' || *p_ead == dir))
 	// If the frame of the closed window contains the new current window,
 	// only resize that frame.  Otherwise resize all windows.
-	win_equal(curwin, curwin->w_frame->fr_parent == win_frame, dir);
-    else
+	win_equal(curwin, curwin->w_چوکٺو->fr_والد == win_چوکٺو, dir);
+    وإلا
     {
 	win_comp_pos();
 	win_fix_scroll(FALSE);
     }
 
-    if (close_curwin)
+    إذا (close_curwin)
     {
 	// Pass WEE_ALLOW_PARSE_MESSAGES to decrement dont_parse_messages
 	// before autocommands.
-#ifdef MESSAGE_QUEUE
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
 	did_decrement =
-#else
-	(void)
-#endif
+#وإلا
+	(فراغ)
+#جيڪڏهن_پورو
 	    win_enter_ext(wp,
 		WEE_CURWIN_INVALID | WEE_TRIGGER_ENTER_AUTOCMDS
 		      | WEE_TRIGGER_LEAVE_AUTOCMDS | WEE_ALLOW_PARSE_MESSAGES);
-	if (other_buffer)
+	إذا (other_بفر)
 	    // careful: after this wp and win may be invalid!
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_BUFENTER, عدم, عدم, FALSE, curbuf);
     }
 
-    if (ONE_WINDOW && curwin->w_locked && curbuf->b_locked_split
-	    && first_tabpage->tp_next != NULL)
+    إذا (ONE_دري && curwin->w_locked && curbuf->b_locked_ورهايو
+	    && پهريون_tabpage->tp_ايندڙ != عدم)
 	// The new curwin is the last window in the current tab page, and it is
 	// already being closed.  Trigger TabLeave now, as after its buffer is
 	// removed it's no longer safe to do that.
-	apply_autocmds(EVENT_TABLEAVE, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TABLEAVE, عدم, عدم, FALSE, curbuf);
 
-    --split_disallowed;
-#ifdef MESSAGE_QUEUE
-    if (!did_decrement)
+    --ورهايو_disallowed;
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
+    إذا (!did_decrement)
 	--dont_parse_messages;
-#endif
+#جيڪڏهن_پورو
 
     // After closing the help or quickfix window, try restoring the window
     // layout from before it was opened.
-    if (help_window || quickfix_window)
-	restore_snapshot(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX,
+    إذا (help_دري || quickfix_دري)
+	restore_snapshot(help_دري ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX,
 			close_curwin);
 
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     // If the window had 'diff' set and now there is only one window left in
     // the tab page with 'diff' set, and "closeoff" is in 'diffopt', then
     // execute ":diffoff!".
-    if (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
+    إذا (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
     {
-	int	diffcount = 0;
+	صحيح	diffcount = 0;
 	win_T	*dwin;
 
 	FOR_ALL_WINDOWS(dwin)
-	    if (dwin->w_p_diff)
+	    إذا (dwin->w_p_diff)
 		++diffcount;
-	if (diffcount == 1)
+	إذا (diffcount == 1)
 	    do_cmdline_cmd((char_u *)"diffoff!");
     }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove scrollbars.
-    if (gui.in_use && !win_hasvertsplit())
-	gui_init_which_components(NULL);
-#endif
+    إذا (gui.اندريون_use && !win_hasvertsplit())
+	gui_init_which_components(عدم);
+#جيڪڏهن_پورو
 
     redraw_all_later(UPD_NOT_VALID);
-    return OK;
+    أرجع OK;
 }
 
-    static void
-trigger_winnewpre(void)
+    ساكن فراغ
+trigger_winnewpre(فراغ)
 {
-    window_layout_lock();
-    apply_autocmds(EVENT_WINNEWPRE, NULL, NULL, FALSE, NULL);
-    window_layout_unlock();
+    دري_layout_تالو();
+    apply_autocmds(EVENT_WINNEWPRE, عدم, عدم, FALSE, عدم);
+    دري_layout_unlock();
 }
 
-    static void
+    ساكن فراغ
 trigger_winclosed(win_T *win)
 {
-    static int	recursive = FALSE;
+    ساكن صحيح	recursive = FALSE;
     char_u	winid[NUMBUFLEN];
 
-    if (recursive)
-	return;
+    إذا (recursive)
+	أرجع;
     recursive = TRUE;
-    vim_snprintf((char *)winid, sizeof(winid), "%d", win->w_id);
-    apply_autocmds(EVENT_WINCLOSED, winid, winid, FALSE, win->w_buffer);
+    vim_snprintf((حرف *)winid, حجم(winid), "%d", win->w_id);
+    apply_autocmds(EVENT_WINCLOSED, winid, winid, FALSE, win->w_بفر);
     recursive = FALSE;
 }
 
-    void
+    فراغ
 trigger_tabclosedpre(tabpage_T *tp)
 {
-    static int	recursive = FALSE;
+    ساكن صحيح	recursive = FALSE;
     tabpage_T	*ptp = curtab;
 
     // Quickly return when no TabClosedPre autocommands to be executed or
     // already executing
-    if (!has_tabclosedpre() || recursive)
-	return;
+    إذا (!has_tabclosedpre() || recursive)
+	أرجع;
 
-    if (valid_tabpage(tp))
+    إذا (valid_tabpage(tp))
 	goto_tabpage_tp(tp, FALSE, FALSE);
     recursive = TRUE;
-    window_layout_lock();
-    apply_autocmds(EVENT_TABCLOSEDPRE, NULL, NULL, FALSE, NULL);
-    window_layout_unlock();
+    دري_layout_تالو();
+    apply_autocmds(EVENT_TABCLOSEDPRE, عدم, عدم, FALSE, عدم);
+    دري_layout_unlock();
     recursive = FALSE;
     // tabpage may have been modified or deleted by autocmds
-    if (valid_tabpage(ptp))
+    إذا (valid_tabpage(ptp))
 	// try to recover the tabpage first
 	goto_tabpage_tp(ptp, FALSE, FALSE);
-    else
+    وإلا
 	// fall back to the first tabpage
-	goto_tabpage_tp(first_tabpage, FALSE, FALSE);
+	goto_tabpage_tp(پهريون_tabpage, FALSE, FALSE);
 }
 
 /*
  * Make a snapshot of all the window scroll positions and sizes of the current
  * tab page.
  */
-    void
-snapshot_windows_scroll_size(void)
+    فراغ
+snapshot_windows_scroll_سائيز(فراغ)
 {
     win_T *wp;
     FOR_ALL_WINDOWS(wp)
     {
-	wp->w_last_topline = wp->w_topline;
-#ifdef FEAT_DIFF
-	wp->w_last_topfill = wp->w_topfill;
-#endif
-	wp->w_last_leftcol = wp->w_leftcol;
-	wp->w_last_skipcol = wp->w_skipcol;
-	wp->w_last_width = wp->w_width;
-	wp->w_last_height = wp->w_height;
+	wp->w_آخري_topline = wp->w_topline;
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
+	wp->w_آخري_topfill = wp->w_topfill;
+#جيڪڏهن_پورو
+	wp->w_آخري_leftcol = wp->w_leftcol;
+	wp->w_آخري_skipcol = wp->w_skipcol;
+	wp->w_آخري_ويڪر = wp->w_ويڪر;
+	wp->w_آخري_اوچائي = wp->w_اوچائي;
     }
 }
 
-static int did_initial_scroll_size_snapshot = FALSE;
+ساكن صحيح did_initial_scroll_سائيز_snapshot = FALSE;
 
-    void
-may_make_initial_scroll_size_snapshot(void)
+    فراغ
+may_make_initial_scroll_سائيز_snapshot(فراغ)
 {
-    if (!did_initial_scroll_size_snapshot)
+    إذا (!did_initial_scroll_سائيز_snapshot)
     {
-	did_initial_scroll_size_snapshot = TRUE;
-	snapshot_windows_scroll_size();
+	did_initial_scroll_سائيز_snapshot = TRUE;
+	snapshot_windows_scroll_سائيز();
     }
 }
 
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 /*
  * Create a dictionary with information about size and scroll changes in a
  * window.
  * Returns the dictionary with refcount set to one.
  * Returns NULL when out of memory.
  */
-    static dict_T *
+    ساكن dict_T *
 make_win_info_dict(
-	int width,
-	int height,
-	int topline,
+	صحيح ويڪر,
+	صحيح اوچائي,
+	صحيح topline,
 # ifdef FEAT_DIFF
-	int topfill,
+	صحيح topfill,
 # endif
-	int leftcol,
-	int skipcol)
+	صحيح leftcol,
+	صحيح skipcol)
 {
     dict_T *d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    إذا (d == عدم)
+	أرجع عدم;
     d->dv_refcount = 1;
 
     // not actually looping, for breaking out on error
-    while (1)
+    طالما (1)
     {
 	typval_T tv;
-	tv.v_lock = 0;
-	tv.v_type = VAR_NUMBER;
+	tv.v_تالو = 0;
+	tv.v_type = VAR_عدد;
 
-	tv.vval.v_number = width;
-	if (dict_add_tv(d, "width", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = height;
-	if (dict_add_tv(d, "height", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = topline;
-	if (dict_add_tv(d, "topline", &tv) == FAIL)
-	    break;
+	tv.vval.v_عدد = ويڪر;
+	إذا (dict_جوڙيو_tv(d, "width", &tv) == FAIL)
+	    اكسر;
+	tv.vval.v_عدد = اوچائي;
+	إذا (dict_جوڙيو_tv(d, "height", &tv) == FAIL)
+	    اكسر;
+	tv.vval.v_عدد = topline;
+	إذا (dict_جوڙيو_tv(d, "topline", &tv) == FAIL)
+	    اكسر;
 # ifdef FEAT_DIFF
-	tv.vval.v_number = topfill;
-# else
-	tv.vval.v_number = 0;
+	tv.vval.v_عدد = topfill;
+# وإلا
+	tv.vval.v_عدد = 0;
 # endif
-	if (dict_add_tv(d, "topfill", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = leftcol;
-	if (dict_add_tv(d, "leftcol", &tv) == FAIL)
-	    break;
-	tv.vval.v_number = skipcol;
-	if (dict_add_tv(d, "skipcol", &tv) == FAIL)
-	    break;
-	return d;
+	إذا (dict_جوڙيو_tv(d, "topfill", &tv) == FAIL)
+	    اكسر;
+	tv.vval.v_عدد = leftcol;
+	إذا (dict_جوڙيو_tv(d, "leftcol", &tv) == FAIL)
+	    اكسر;
+	tv.vval.v_عدد = skipcol;
+	إذا (dict_جوڙيو_tv(d, "skipcol", &tv) == FAIL)
+	    اكسر;
+	أرجع d;
     }
     dict_unref(d);
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#جيڪڏهن_پورو
 
 // Return values of check_window_scroll_resize():
-#define CWSR_SCROLLED	1  // at least one window scrolled
-#define CWSR_RESIZED	2  // at least one window size changed
+#وصف_ڪريو CWSR_SCROLLED	1  // at least one window scrolled
+#وصف_ڪريو CWSR_RESIZED	2  // at least one window size changed
 
 /*
  * This function is used for three purposes:
@@ -3206,242 +3206,242 @@ make_win_info_dict(
  * 3. When the first three arguments are NULL and "v_event" is not NULL,
  *    information about changed windows is added to "v_event".
  */
-    static void
-check_window_scroll_resize(
-	int	*size_count,
-	win_T	**first_scroll_win,
-	win_T	**first_size_win,
-	list_T	*winlist UNUSED,
-	dict_T	*v_event UNUSED)
+    ساكن فراغ
+check_دري_scroll_resize(
+	صحيح	*سائيز_ڳڻپ,
+	win_T	**پهريون_scroll_win,
+	win_T	**پهريون_سائيز_win,
+	list_T	*winlist اڻ_استعمال_ٿيل,
+	dict_T	*v_event اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_EVAL
-    int listidx = 0;
-    int tot_width = 0;
-    int tot_height = 0;
-    int tot_topline = 0;
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+    صحيح listidx = 0;
+    صحيح tot_ويڪر = 0;
+    صحيح tot_اوچائي = 0;
+    صحيح tot_topline = 0;
 # ifdef FEAT_DIFF
-    int tot_topfill = 0;
+    صحيح tot_topfill = 0;
 # endif
-    int tot_leftcol = 0;
-    int tot_skipcol = 0;
-#endif
+    صحيح tot_leftcol = 0;
+    صحيح tot_skipcol = 0;
+#جيڪڏهن_پورو
 
     win_T *wp;
     FOR_ALL_WINDOWS(wp)
     {
-	int ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
-	int size_changed = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
-			    && (wp->w_last_width != wp->w_width
-			    || wp->w_last_height != wp->w_height);
-	if (size_changed)
+	صحيح ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
+	صحيح سائيز_بدليو = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
+			    && (wp->w_آخري_ويڪر != wp->w_ويڪر
+			    || wp->w_آخري_اوچائي != wp->w_اوچائي);
+	إذا (سائيز_بدليو)
 	{
-#ifdef FEAT_EVAL
-	    if (winlist != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+	    إذا (winlist != عدم)
 	    {
 		// Add this window to the list of changed windows.
 		typval_T tv;
-		tv.v_lock = 0;
-		tv.v_type = VAR_NUMBER;
-		tv.vval.v_number = wp->w_id;
-		list_set_item(winlist, listidx++, &tv);
+		tv.v_تالو = 0;
+		tv.v_type = VAR_عدد;
+		tv.vval.v_عدد = wp->w_id;
+		list_سيٽ_شي(winlist, listidx++, &tv);
 	    }
-	    else
-#endif
-		if (size_count != NULL)
+	    وإلا
+#جيڪڏهن_پورو
+		إذا (سائيز_ڳڻپ != عدم)
 	    {
-		++*size_count;
-		if (*first_size_win == NULL)
-		    *first_size_win = wp;
+		++*سائيز_ڳڻپ;
+		إذا (*پهريون_سائيز_win == عدم)
+		    *پهريون_سائيز_win = wp;
 		// For WinScrolled the first window with a size change is used
 		// even when it didn't scroll.
-		if (*first_scroll_win == NULL && !ignore_scroll)
-		    *first_scroll_win = wp;
+		إذا (*پهريون_scroll_win == عدم && !ignore_scroll)
+		    *پهريون_scroll_win = wp;
 	    }
 	}
 
-	int scroll_changed = !ignore_scroll
-				&& (wp->w_last_topline != wp->w_topline
-#ifdef FEAT_DIFF
-				|| wp->w_last_topfill != wp->w_topfill
-#endif
-				|| wp->w_last_leftcol != wp->w_leftcol
-				|| wp->w_last_skipcol != wp->w_skipcol);
-	if (scroll_changed
-	    && first_scroll_win != NULL && *first_scroll_win == NULL)
-	    *first_scroll_win = wp;
+	صحيح scroll_بدليو = !ignore_scroll
+				&& (wp->w_آخري_topline != wp->w_topline
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
+				|| wp->w_آخري_topfill != wp->w_topfill
+#جيڪڏهن_پورو
+				|| wp->w_آخري_leftcol != wp->w_leftcol
+				|| wp->w_آخري_skipcol != wp->w_skipcol);
+	إذا (scroll_بدليو
+	    && پهريون_scroll_win != عدم && *پهريون_scroll_win == عدم)
+	    *پهريون_scroll_win = wp;
 
-#ifdef FEAT_EVAL
-	if ((size_changed || scroll_changed) && v_event != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+	إذا ((سائيز_بدليو || scroll_بدليو) && v_event != عدم)
 	{
 	    // Add info about this window to the v:event dictionary.
-	    int width = wp->w_width - wp->w_last_width;
-	    int height = wp->w_height - wp->w_last_height;
-	    int topline = wp->w_topline - wp->w_last_topline;
+	    صحيح ويڪر = wp->w_ويڪر - wp->w_آخري_ويڪر;
+	    صحيح اوچائي = wp->w_اوچائي - wp->w_آخري_اوچائي;
+	    صحيح topline = wp->w_topline - wp->w_آخري_topline;
 # ifdef FEAT_DIFF
-	    int topfill = wp->w_topfill - wp->w_last_topfill;
+	    صحيح topfill = wp->w_topfill - wp->w_آخري_topfill;
 # endif
-	    int leftcol = wp->w_leftcol - wp->w_last_leftcol;
-	    int skipcol = wp->w_skipcol - wp->w_last_skipcol;
-	    dict_T *d = make_win_info_dict(width, height, topline,
+	    صحيح leftcol = wp->w_leftcol - wp->w_آخري_leftcol;
+	    صحيح skipcol = wp->w_skipcol - wp->w_آخري_skipcol;
+	    dict_T *d = make_win_info_dict(ويڪر, اوچائي, topline,
 # ifdef FEAT_DIFF
 							    topfill,
 # endif
 							    leftcol, skipcol);
-	    if (d == NULL)
-		break;
-	    char winid[NUMBUFLEN];
-	    vim_snprintf(winid, sizeof(winid), "%d", wp->w_id);
-	    if (dict_add_dict(v_event, winid, d) == FAIL)
+	    إذا (d == عدم)
+		اكسر;
+	    حرف winid[NUMBUFLEN];
+	    vim_snprintf(winid, حجم(winid), "%d", wp->w_id);
+	    إذا (dict_جوڙيو_dict(v_event, winid, d) == FAIL)
 	    {
 		dict_unref(d);
-		break;
+		اكسر;
 	    }
 	    --d->dv_refcount;
 
-	    tot_width += abs(width);
-	    tot_height += abs(height);
-	    tot_topline += abs(topline);
+	    tot_ويڪر += مطلق_قدر(ويڪر);
+	    tot_اوچائي += مطلق_قدر(اوچائي);
+	    tot_topline += مطلق_قدر(topline);
 # ifdef FEAT_DIFF
-	    tot_topfill += abs(topfill);
+	    tot_topfill += مطلق_قدر(topfill);
 # endif
-	    tot_leftcol += abs(leftcol);
-	    tot_skipcol += abs(skipcol);
+	    tot_leftcol += مطلق_قدر(leftcol);
+	    tot_skipcol += مطلق_قدر(skipcol);
 	}
-#endif
+#جيڪڏهن_پورو
     }
 
-#ifdef FEAT_EVAL
-    if (v_event != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+    إذا (v_event != عدم)
     {
-	dict_T *alldict = make_win_info_dict(tot_width, tot_height, tot_topline,
+	dict_T *alldict = make_win_info_dict(tot_ويڪر, tot_اوچائي, tot_topline,
 # ifdef FEAT_DIFF
 						    tot_topfill,
 # endif
 						    tot_leftcol, tot_skipcol);
-	if (alldict != NULL)
+	إذا (alldict != عدم)
 	{
-	    if (dict_add_dict(v_event, "all", alldict) == FAIL)
+	    إذا (dict_جوڙيو_dict(v_event, "all", alldict) == FAIL)
 		dict_unref(alldict);
-	    else
+	    وإلا
 		--alldict->dv_refcount;
 	}
     }
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Trigger WinScrolled and/or WinResized if any window in the current tab page
  * scrolled or changed size.
  */
-    void
-may_trigger_win_scrolled_resized(void)
+    فراغ
+may_trigger_win_scrolled_resized(فراغ)
 {
-    static int	    recursive = FALSE;
-    int		    do_resize = has_winresized();
-    int		    do_scroll = has_winscrolled();
+    ساكن صحيح	    recursive = FALSE;
+    صحيح		    do_resize = has_winresized();
+    صحيح		    do_scroll = has_winscrolled();
 
     // Do not trigger WinScrolled or WinResized recursively.  Do not trigger
     // before the initial snapshot of the w_last_ values was made.
-    if (recursive
+    إذا (recursive
 	    || !(do_scroll || do_resize)
-	    || !did_initial_scroll_size_snapshot)
-	return;
+	    || !did_initial_scroll_سائيز_snapshot)
+	أرجع;
 
-    int size_count = 0;
-    win_T *first_scroll_win = NULL, *first_size_win = NULL;
-    check_window_scroll_resize(&size_count, &first_scroll_win, &first_size_win,
-								    NULL, NULL);
-    int trigger_resize = do_resize && size_count > 0;
-    int trigger_scroll = do_scroll && first_scroll_win != NULL;
-    if (!trigger_resize && !trigger_scroll)
-	return;  // no relevant changes
-#ifdef FEAT_EVAL
-    list_T *windows_list = NULL;
-    if (trigger_resize)
+    صحيح سائيز_ڳڻپ = 0;
+    win_T *پهريون_scroll_win = عدم, *پهريون_سائيز_win = عدم;
+    check_دري_scroll_resize(&سائيز_ڳڻپ, &پهريون_scroll_win, &پهريون_سائيز_win,
+								    عدم, عدم);
+    صحيح trigger_resize = do_resize && سائيز_ڳڻپ > 0;
+    صحيح trigger_scroll = do_scroll && پهريون_scroll_win != عدم;
+    إذا (!trigger_resize && !trigger_scroll)
+	أرجع;  // no relevant changes
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+    list_T *windows_list = عدم;
+    إذا (trigger_resize)
     {
 	// Create the list for v:event.windows before making the snapshot.
-	windows_list = list_alloc_with_items(size_count);
-	if (windows_list != NULL)
-	    check_window_scroll_resize(NULL, NULL, NULL, windows_list, NULL);
+	windows_list = list_alloc_with_شيون(سائيز_ڳڻپ);
+	إذا (windows_list != عدم)
+	    check_دري_scroll_resize(عدم, عدم, عدم, windows_list, عدم);
     }
 
-    dict_T *scroll_dict = NULL;
-    if (trigger_scroll)
+    dict_T *scroll_dict = عدم;
+    إذا (trigger_scroll)
     {
 	// Create the dict with entries for v:event before making the snapshot.
 	scroll_dict = dict_alloc();
-	if (scroll_dict != NULL)
+	إذا (scroll_dict != عدم)
 	{
 	    scroll_dict->dv_refcount = 1;
-	    check_window_scroll_resize(NULL, NULL, NULL, NULL, scroll_dict);
+	    check_دري_scroll_resize(عدم, عدم, عدم, عدم, scroll_dict);
 	}
     }
-#endif
+#جيڪڏهن_پورو
 
     // WinScrolled/WinResized are triggered only once, even when multiple
     // windows scrolled or changed size.  Store the current values before
     // triggering the event, if a scroll or resize happens as a side effect
     // then WinScrolled/WinResized is triggered for that later.
-    snapshot_windows_scroll_size();
+    snapshot_windows_scroll_سائيز();
 
     // "curwin" may be different from the actual current window, make
     // sure it can be restored.
-    window_layout_lock();
+    دري_layout_تالو();
     recursive = TRUE;
 
     // If both are to be triggered do WinResized first.
-    if (trigger_resize
-#ifdef FEAT_EVAL
-	    && windows_list != NULL
-#endif
+    إذا (trigger_resize
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+	    && windows_list != عدم
+#جيڪڏهن_پورو
 	    )
     {
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	save_v_event_T  save_v_event;
 	dict_T		*v_event = get_v_event(&save_v_event);
 
-	if (dict_add_list(v_event, "windows", windows_list) == OK)
+	إذا (dict_جوڙيو_list(v_event, "windows", windows_list) == OK)
 	{
-	    dict_set_items_ro(v_event);
-#endif
+	    dict_سيٽ_شيون_ro(v_event);
+#جيڪڏهن_پورو
 	    char_u winid[NUMBUFLEN];
-	    vim_snprintf((char *)winid, sizeof(winid), "%d",
-							 first_size_win->w_id);
+	    vim_snprintf((حرف *)winid, حجم(winid), "%d",
+							 پهريون_سائيز_win->w_id);
 	    apply_autocmds(EVENT_WINRESIZED, winid, winid, FALSE,
-						     first_size_win->w_buffer);
-#ifdef FEAT_EVAL
+						     پهريون_سائيز_win->w_بفر);
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	}
 	restore_v_event(v_event, &save_v_event);
-#endif
+#جيڪڏهن_پورو
     }
 
-    if (trigger_scroll
-#ifdef FEAT_EVAL
-	    && scroll_dict != NULL
-#endif
+    إذا (trigger_scroll
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+	    && scroll_dict != عدم
+#جيڪڏهن_پورو
 	    )
     {
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	save_v_event_T  save_v_event;
 	dict_T		*v_event = get_v_event(&save_v_event);
 
 	// Move the entries from scroll_dict to v_event.
-	dict_extend(v_event, scroll_dict, (char_u *)"move", NULL);
-	dict_set_items_ro(v_event);
+	dict_extend(v_event, scroll_dict, (char_u *)"move", عدم);
+	dict_سيٽ_شيون_ro(v_event);
 	dict_unref(scroll_dict);
-#endif
+#جيڪڏهن_پورو
 	char_u winid[NUMBUFLEN];
-	vim_snprintf((char *)winid, sizeof(winid), "%d",
-						       first_scroll_win->w_id);
+	vim_snprintf((حرف *)winid, حجم(winid), "%d",
+						       پهريون_scroll_win->w_id);
 	apply_autocmds(EVENT_WINSCROLLED, winid, winid, FALSE,
-						   first_scroll_win->w_buffer);
-#ifdef FEAT_EVAL
+						   پهريون_scroll_win->w_بفر);
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	restore_v_event(v_event, &save_v_event);
-#endif
+#جيڪڏهن_پورو
     }
 
     recursive = FALSE;
-    window_layout_unlock();
+    دري_layout_unlock();
 }
 
 /*
@@ -3451,106 +3451,106 @@ may_trigger_win_scrolled_resized(void)
  * Caller must check if buffer is hidden and whether the tabline needs to be
  * updated.
  */
-    void
-win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
+    فراغ
+win_close_othertab(win_T *win, صحيح free_buf, tabpage_T *tp)
 {
     win_T	*wp;
-    int		dir;
-    tabpage_T   *ptp = NULL;
-    int		free_tp = FALSE;
+    صحيح		dir;
+    tabpage_T   *ptp = عدم;
+    صحيح		free_tp = FALSE;
 
     // Commands that may call win_close_othertab() already check this, but
     // check here again just in case.
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    إذا (دري_layout_locked(CMD_سائيز))
+	أرجع;
     // Get here with win->w_buffer == NULL when win_close() detects the tab
     // page changed.
-    if (win_locked(win) || (win->w_buffer != NULL
-					       && win->w_buffer->b_locked > 0))
-	return; // window is already being closed
+    إذا (win_locked(win) || (win->w_بفر != عدم
+					       && win->w_بفر->b_locked > 0))
+	أرجع; // window is already being closed
 
     // Trigger WinClosed just before starting to free window-related resources.
     // If the buffer is NULL, it isn't safe to trigger autocommands,
     // and win_close() should have already triggered WinClosed.
-    if (win->w_buffer != NULL)
+    إذا (win->w_بفر != عدم)
     {
 	trigger_winclosed(win);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	إذا (!win_valid_any_tab(win))
+	    أرجع;
     }
 
-    if (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
+    إذا (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
     {
 	trigger_tabclosedpre(tp);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	إذا (!win_valid_any_tab(win))
+	    أرجع;
     }
 
-    if (win->w_buffer != NULL)
+    إذا (win->w_بفر != عدم)
 	// Close the link to the buffer.
-	close_buffer(win, win->w_buffer, free_buf ? DOBUF_UNLOAD : 0,
+	close_بفر(win, win->w_بفر, free_buf ? DOBUF_UNLOAD : 0,
 							    FALSE, TRUE, TRUE);
 
     // Careful: Autocommands may have closed the tab page or made it the
     // current tab page.
-    for (ptp = first_tabpage; ptp != NULL && ptp != tp; ptp = ptp->tp_next)
+    لكل (ptp = پهريون_tabpage; ptp != عدم && ptp != tp; ptp = ptp->tp_ايندڙ)
 	;
-    if (ptp == NULL || tp == curtab)
+    إذا (ptp == عدم || tp == curtab)
     {
 	// If the buffer was removed from the window we have to give it any
 	// buffer.
-	if (win_valid_any_tab(win) && win->w_buffer == NULL)
+	إذا (win_valid_any_tab(win) && win->w_بفر == عدم)
 	{
-	    win->w_buffer = firstbuf;
+	    win->w_بفر = firstbuf;
 	    ++firstbuf->b_nwindows;
-	    if (win == curwin)
-		curbuf = curwin->w_buffer;
-	    win_init_empty(win);
+	    إذا (win == curwin)
+		curbuf = curwin->w_بفر;
+	    win_init_خالي_جايون(win);
 	}
-	return;
+	أرجع;
     }
 
     // Autocommands may have closed the window already.
-    for (wp = tp->tp_firstwin; wp != NULL && wp != win; wp = wp->w_next)
+    لكل (wp = tp->tp_firstwin; wp != عدم && wp != win; wp = wp->w_ايندڙ)
 	;
-    if (wp == NULL)
-	return;
+    إذا (wp == عدم)
+	أرجع;
 
     // When closing the last window in a tab page remove the tab page.
-    if (tp->tp_firstwin == tp->tp_lastwin)
+    إذا (tp->tp_firstwin == tp->tp_lastwin)
     {
-	int	h = tabline_height();
+	صحيح	h = tabline_اوچائي();
 
-	if (tp == first_tabpage)
-	    first_tabpage = tp->tp_next;
-	else
+	إذا (tp == پهريون_tabpage)
+	    پهريون_tabpage = tp->tp_ايندڙ;
+	وإلا
 	{
-	    for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tp;
-							   ptp = ptp->tp_next)
+	    لكل (ptp = پهريون_tabpage; ptp != عدم && ptp->tp_ايندڙ != tp;
+							   ptp = ptp->tp_ايندڙ)
 		;
-	    if (ptp == NULL)
+	    إذا (ptp == عدم)
 	    {
-		internal_error("win_close_othertab()");
-		return;
+		اندروني_error("win_close_othertab()");
+		أرجع;
 	    }
-	    ptp->tp_next = tp->tp_next;
+	    ptp->tp_ايندڙ = tp->tp_ايندڙ;
 	}
 	free_tp = TRUE;
 	redraw_tabline = TRUE;
 	shell_new_columns();
-	if (h != tabline_height())
-	    shell_new_rows();
+	إذا (h != tabline_اوچائي())
+	    shell_new_صفون();
     }
 
-    if (win->w_buffer != NULL)
-	--win->w_buffer->b_nwindows;
+    إذا (win->w_بفر != عدم)
+	--win->w_بفر->b_nwindows;
 
     // Free the memory used for the window.
     win_free_mem(win, &dir, tp);
 
-    if (free_tp)
+    إذا (free_tp)
 	free_tabpage(tp);
 }
 
@@ -3558,59 +3558,59 @@ win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
  * Free the memory used for a window.
  * Returns a pointer to the window that got the freed up space.
  */
-    static win_T *
+    ساكن win_T *
 win_free_mem(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    صحيح		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    frame_T	*frp;
+    چوکٺو_T	*frp;
     win_T	*wp;
-    tabpage_T	*win_tp = tp == NULL ? curtab : tp;
+    tabpage_T	*win_tp = tp == عدم ? curtab : tp;
 
     // Remove the window and its frame from the tree of frames.
-    frp = win->w_frame;
-    wp = winframe_remove(win, dirp, tp, NULL);
+    frp = win->w_چوکٺو;
+    wp = winframe_remove(win, dirp, tp, عدم);
     vim_free(frp);
     win_free(win, tp);
 
     // When deleting the current window in the tab, select a new current
     // window.
-    if (win == win_tp->tp_curwin)
+    إذا (win == win_tp->tp_curwin)
 	win_tp->tp_curwin = wp;
 
-    return wp;
+    أرجع wp;
 }
 
-#if defined(EXITFREE)
-    void
-win_free_all(void)
+#إذا defined(EXITFREE)
+    فراغ
+win_free_all(فراغ)
 {
-    int		dummy;
+    صحيح		dummy;
 
     // avoid an error for switching tabpage with the cmdline window open
     cmdwin_type = 0;
-    cmdwin_buf = NULL;
-    cmdwin_win = NULL;
+    cmdwin_buf = عدم;
+    cmdwin_win = عدم;
 
-    while (first_tabpage->tp_next != NULL)
+    طالما (پهريون_tabpage->tp_ايندڙ != عدم)
 	tabpage_close(TRUE);
 
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    لكل (صحيح i = 0; i < AUCMD_WIN_ڳڻپ; ++i)
+	إذا (aucmd_win[i].auc_win != عدم)
 	{
-	    (void)win_free_mem(aucmd_win[i].auc_win, &dummy, NULL);
-	    aucmd_win[i].auc_win = NULL;
+	    (فراغ)win_free_mem(aucmd_win[i].auc_win, &dummy, عدم);
+	    aucmd_win[i].auc_win = عدم;
 	}
 
-    while (firstwin != NULL)
-	(void)win_free_mem(firstwin, &dummy, NULL);
+    طالما (firstwin != عدم)
+	(فراغ)win_free_mem(firstwin, &dummy, عدم);
 
     // No window should be used after this. Set curwin to NULL to crash
     // instead of using freed memory.
-    curwin = NULL;
+    curwin = عدم;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Remove a window and its frame from the tree of frames.
@@ -3619,29 +3619,29 @@ win_free_all(void)
     win_T *
 winframe_remove(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    صحيح		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp,		// tab page "win" is in, NULL for current
-    frame_T	**unflat_altfr)	// if not NULL, set to pointer of frame that got
+    چوکٺو_T	**unflat_altfr)	// if not NULL, set to pointer of frame that got
 				// the space, and it is not flattened
 {
-    frame_T	*frp, *frp2, *frp3;
-    frame_T	*frp_close = win->w_frame;
+    چوکٺو_T	*frp, *frp2, *frp3;
+    چوکٺو_T	*frp_close = win->w_چوکٺو;
     win_T	*wp;
-    int		row, col;
+    صحيح		صف, کانو;
 
     /*
      * If there is only one window there is nothing to remove.
      */
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return NULL;
+    إذا (tp == عدم ? ONE_دري : tp->tp_firstwin == tp->tp_lastwin)
+	أرجع عدم;
 
-    frame_locked++;
+    چوکٺو_locked++;
 
     // Save the position of the containing frame (which will also contain the
     // altframe) before we remove anything, to recompute window positions later.
-    wp = frame2win(frp_close->fr_parent);
-    row = wp->w_winrow;
-    col = wp->w_wincol;
+    wp = frame2win(frp_close->fr_والد);
+    صف = wp->w_winrow;
+    کانو = wp->w_wincol;
 
     /*
      * Remove the window from its frame.
@@ -3650,101 +3650,101 @@ winframe_remove(
     wp = frame2win(frp2);
 
     // If this is a rightmost window, remove vertical separators to the left.
-    if (win->w_vsep_width == 0 && frp_close->fr_parent->fr_layout == FR_ROW &&
-	    frp_close->fr_prev != NULL)
-	frame_set_vsep(frp_close->fr_prev, FALSE);
+    إذا (win->w_vsep_ويڪر == 0 && frp_close->fr_والد->fr_layout == FR_صف &&
+	    frp_close->fr_prev != عدم)
+	چوکٺو_سيٽ_vsep(frp_close->fr_prev, FALSE);
 
     // Remove this frame from the list of frames.
-    frame_remove(frp_close);
+    چوکٺو_remove(frp_close);
 
-    if (frp_close->fr_parent->fr_layout == FR_COL)
+    إذا (frp_close->fr_والد->fr_layout == FR_کانو)
     {
 	// When 'winfixheight' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the height
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfh)
+	إذا (frp2->fr_win != عدم && frp2->fr_win->w_p_wfh)
 	{
 	    frp = frp_close->fr_prev;
-	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    frp3 = frp_close->fr_ايندڙ;
+	    طالما (frp != عدم || frp3 != عدم)
 	    {
-		if (frp != NULL)
+		إذا (frp != عدم)
 		{
-		    if (!frame_fixed_height(frp))
+		    إذا (!چوکٺو_fixed_اوچائي(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			اكسر;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		إذا (frp3 != عدم)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfh)
+		    إذا (frp3->fr_win != عدم && !frp3->fr_win->w_p_wfh)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			اكسر;
 		    }
-		    frp3 = frp3->fr_next;
+		    frp3 = frp3->fr_ايندڙ;
 		}
 	    }
 	}
-	frame_new_height(frp2, frp2->fr_height + frp_close->fr_height,
-			    frp2 == frp_close->fr_next, !frame_fixed_height(frp2), FALSE);
+	چوکٺو_new_اوچائي(frp2, frp2->fr_اوچائي + frp_close->fr_اوچائي,
+			    frp2 == frp_close->fr_ايندڙ, !چوکٺو_fixed_اوچائي(frp2), FALSE);
 	*dirp = 'v';
     }
-    else
+    وإلا
     {
 	// When 'winfixwidth' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the width
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfw)
+	إذا (frp2->fr_win != عدم && frp2->fr_win->w_p_wfw)
 	{
 	    frp = frp_close->fr_prev;
-	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    frp3 = frp_close->fr_ايندڙ;
+	    طالما (frp != عدم || frp3 != عدم)
 	    {
-		if (frp != NULL)
+		إذا (frp != عدم)
 		{
-		    if (!frame_fixed_width(frp))
+		    إذا (!چوکٺو_fixed_ويڪر(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			اكسر;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		إذا (frp3 != عدم)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfw)
+		    إذا (frp3->fr_win != عدم && !frp3->fr_win->w_p_wfw)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			اكسر;
 		    }
-		    frp3 = frp3->fr_next;
+		    frp3 = frp3->fr_ايندڙ;
 		}
 	    }
 	}
-	frame_new_width(frp2, frp2->fr_width + frp_close->fr_width,
-			    frp2 == frp_close->fr_next, !frame_fixed_width(frp2));
+	چوکٺو_new_ويڪر(frp2, frp2->fr_ويڪر + frp_close->fr_ويڪر,
+			    frp2 == frp_close->fr_ايندڙ, !چوکٺو_fixed_ويڪر(frp2));
 	*dirp = 'h';
     }
 
     // If the altframe wasn't adjacent and left/above, resizing it will have
     // changed window positions within the parent frame.  Recompute them.
-    if (frp2 != frp_close->fr_prev)
-	frame_comp_pos(frp_close->fr_parent, &row, &col);
+    إذا (frp2 != frp_close->fr_prev)
+	چوکٺو_comp_pos(frp_close->fr_والد, &صف, &کانو);
 
-    if (unflat_altfr == NULL)
-	frame_flatten(frp2);
-    else
+    إذا (unflat_altfr == عدم)
+	چوکٺو_flatten(frp2);
+    وإلا
 	*unflat_altfr = frp2;
 
-    frame_locked--;
+    چوکٺو_locked--;
 
-    return wp;
+    أرجع wp;
 }
 
 /*
@@ -3752,51 +3752,51 @@ winframe_remove(
  * list with the grandparent if they share the same layout.
  * Frees "frp" if flattened; also "frp->fr_parent" if it has the same layout.
  */
-    static void
-frame_flatten(frame_T *frp)
+    ساكن فراغ
+چوکٺو_flatten(چوکٺو_T *frp)
 {
-    frame_T	*frp2, *frp3;
+    چوکٺو_T	*frp2, *frp3;
 
-    if (frp->fr_next != NULL || frp->fr_prev != NULL)
-	return;
+    إذا (frp->fr_ايندڙ != عدم || frp->fr_prev != عدم)
+	أرجع;
 
     // There is no other frame in this list, move its info to the parent
     // and remove it.
-    frp->fr_parent->fr_layout = frp->fr_layout;
-    frp->fr_parent->fr_child = frp->fr_child;
-    FOR_ALL_FRAMES(frp2, frp->fr_child)
-	frp2->fr_parent = frp->fr_parent;
-    frp->fr_parent->fr_win = frp->fr_win;
-    if (frp->fr_win != NULL)
-	frp->fr_win->w_frame = frp->fr_parent;
-    frp2 = frp->fr_parent;
-    if (topframe->fr_child == frp)
-	topframe->fr_child = frp2;
+    frp->fr_والد->fr_layout = frp->fr_layout;
+    frp->fr_والد->fr_ٻار = frp->fr_ٻار;
+    FOR_ALL_چوکٺا(frp2, frp->fr_ٻار)
+	frp2->fr_والد = frp->fr_والد;
+    frp->fr_والد->fr_win = frp->fr_win;
+    إذا (frp->fr_win != عدم)
+	frp->fr_win->w_چوکٺو = frp->fr_والد;
+    frp2 = frp->fr_والد;
+    إذا (topframe->fr_ٻار == frp)
+	topframe->fr_ٻار = frp2;
     vim_free(frp);
 
-    frp = frp2->fr_parent;
-    if (frp != NULL && frp->fr_layout == frp2->fr_layout)
+    frp = frp2->fr_والد;
+    إذا (frp != عدم && frp->fr_layout == frp2->fr_layout)
     {
 	// The frame above the parent has the same layout, have to merge
 	// the frames into this list.
-	if (frp->fr_child == frp2)
-	    frp->fr_child = frp2->fr_child;
-	frp2->fr_child->fr_prev = frp2->fr_prev;
-	if (frp2->fr_prev != NULL)
-	    frp2->fr_prev->fr_next = frp2->fr_child;
-	for (frp3 = frp2->fr_child; ; frp3 = frp3->fr_next)
+	إذا (frp->fr_ٻار == frp2)
+	    frp->fr_ٻار = frp2->fr_ٻار;
+	frp2->fr_ٻار->fr_prev = frp2->fr_prev;
+	إذا (frp2->fr_prev != عدم)
+	    frp2->fr_prev->fr_ايندڙ = frp2->fr_ٻار;
+	لكل (frp3 = frp2->fr_ٻار; ; frp3 = frp3->fr_ايندڙ)
 	{
-	    frp3->fr_parent = frp;
-	    if (frp3->fr_next == NULL)
+	    frp3->fr_والد = frp;
+	    إذا (frp3->fr_ايندڙ == عدم)
 	    {
-		frp3->fr_next = frp2->fr_next;
-		if (frp2->fr_next != NULL)
-		    frp2->fr_next->fr_prev = frp3;
-		break;
+		frp3->fr_ايندڙ = frp2->fr_ايندڙ;
+		إذا (frp2->fr_ايندڙ != عدم)
+		    frp2->fr_ايندڙ->fr_prev = frp3;
+		اكسر;
 	    }
 	}
-	if (topframe->fr_child == frp2)
-	    topframe->fr_child = frp;
+	إذا (topframe->fr_ٻار == frp2)
+	    topframe->fr_ٻار = frp;
 	vim_free(frp2);
     }
 }
@@ -3807,49 +3807,49 @@ frame_flatten(frame_T *frp)
  * windows within "unflat_altfr".
  * Caller must ensure no other changes were made to the layout or window sizes!
  */
-    static void
-winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
+    ساكن فراغ
+winframe_restore(win_T *wp, صحيح dir, چوکٺو_T *unflat_altfr)
 {
-    frame_T	*frp = wp->w_frame;
+    چوکٺو_T	*frp = wp->w_چوکٺو;
 
     // Put "wp"'s frame back where it was.
-    if (frp->fr_prev != NULL)
-	frame_append(frp->fr_prev, frp);
-    else
-	frame_insert(frp->fr_next, frp);
+    إذا (frp->fr_prev != عدم)
+	چوکٺو_append(frp->fr_prev, frp);
+    وإلا
+	چوکٺو_وجهو(frp->fr_ايندڙ, frp);
 
     // Vertical separators to the left may have been lost.  Restore them.
-    if (wp->w_vsep_width == 0
-	    && frp->fr_parent->fr_layout == FR_ROW && frp->fr_prev != NULL)
-	frame_set_vsep(frp->fr_prev, TRUE);
+    إذا (wp->w_vsep_ويڪر == 0
+	    && frp->fr_والد->fr_layout == FR_صف && frp->fr_prev != عدم)
+	چوکٺو_سيٽ_vsep(frp->fr_prev, TRUE);
 
     // Statuslines above may have been lost.  Restore them.
-    if (wp->w_status_height == 0
-	    && frp->fr_parent->fr_layout == FR_COL && frp->fr_prev != NULL)
-	frame_add_statusline(frp->fr_prev);
+    إذا (wp->w_حالت_اوچائي == 0
+	    && frp->fr_والد->fr_layout == FR_کانو && frp->fr_prev != عدم)
+	چوکٺو_جوڙيو_statusline(frp->fr_prev);
 
     // Restore the lost room that was redistributed to the altframe.  Also
     // adjusts window sizes to fit restored statuslines/separators, if needed.
-    if (dir == 'v')
+    إذا (dir == 'v')
     {
-	frame_new_height(unflat_altfr, unflat_altfr->fr_height - frp->fr_height,
-		unflat_altfr == frp->fr_next, FALSE, FALSE);
+	چوکٺو_new_اوچائي(unflat_altfr, unflat_altfr->fr_اوچائي - frp->fr_اوچائي,
+		unflat_altfr == frp->fr_ايندڙ, FALSE, FALSE);
     }
-    else if (dir == 'h')
+    وإلا إذا (dir == 'h')
     {
-	frame_new_width(unflat_altfr, unflat_altfr->fr_width - frp->fr_width,
-		unflat_altfr == frp->fr_next, FALSE);
+	چوکٺو_new_ويڪر(unflat_altfr, unflat_altfr->fr_ويڪر - frp->fr_ويڪر,
+		unflat_altfr == frp->fr_ايندڙ, FALSE);
     }
 
     // Recompute window positions within the parent frame to restore them.
     // Positions were unchanged if the altframe was adjacent and left/above.
-    if (unflat_altfr != frp->fr_prev)
+    إذا (unflat_altfr != frp->fr_prev)
     {
-	win_T	*topleft = frame2win(frp->fr_parent);
-	int	row = topleft->w_winrow;
-	int	col = topleft->w_wincol;
+	win_T	*topleft = frame2win(frp->fr_والد);
+	صحيح	صف = topleft->w_winrow;
+	صحيح	کانو = topleft->w_wincol;
 
-	frame_comp_pos(frp->fr_parent, &row, &col);
+	چوکٺو_comp_pos(frp->fr_والد, &صف, &کانو);
     }
 }
 
@@ -3863,326 +3863,326 @@ winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
  * preserve the initial window layout.  The 'wfh' and 'wfw' settings are
  * respected when possible.
  */
-    static frame_T *
+    ساكن چوکٺو_T *
 win_altframe(
     win_T	*win,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    frame_T	*frp;
-    frame_T	*other_fr, *target_fr;
+    چوکٺو_T	*frp;
+    چوکٺو_T	*other_fr, *هدف_fr;
 
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return alt_tabpage()->tp_curwin->w_frame;
+    إذا (tp == عدم ? ONE_دري : tp->tp_firstwin == tp->tp_lastwin)
+	أرجع alt_tabpage()->tp_curwin->w_چوکٺو;
 
-    frp = win->w_frame;
+    frp = win->w_چوکٺو;
 
-    if (frp->fr_prev == NULL)
-	return frp->fr_next;
-    if (frp->fr_next == NULL)
-	return frp->fr_prev;
+    إذا (frp->fr_prev == عدم)
+	أرجع frp->fr_ايندڙ;
+    إذا (frp->fr_ايندڙ == عدم)
+	أرجع frp->fr_prev;
 
     // By default the next window will get the space that was abandoned by this
-    // window
-    target_fr = frp->fr_next;
+    //دري
+    هدف_fr = frp->fr_ايندڙ;
     other_fr  = frp->fr_prev;
 
     // If this is part of a column of windows and 'splitbelow' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_COL && p_sb)
+    إذا (frp->fr_والد != عدم && frp->fr_والد->fr_layout == FR_کانو && p_sb)
     {
-	target_fr = frp->fr_prev;
-	other_fr  = frp->fr_next;
+	هدف_fr = frp->fr_prev;
+	other_fr  = frp->fr_ايندڙ;
     }
 
     // If this is part of a row of windows, and 'splitright' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW && p_spr)
+    إذا (frp->fr_والد != عدم && frp->fr_والد->fr_layout == FR_صف && p_spr)
     {
-	target_fr = frp->fr_prev;
-	other_fr  = frp->fr_next;
+	هدف_fr = frp->fr_prev;
+	other_fr  = frp->fr_ايندڙ;
     }
 
     // If 'wfh' or 'wfw' is set for the target and not for the alternate
     // window, reverse the selection.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW)
+    إذا (frp->fr_والد != عدم && frp->fr_والد->fr_layout == FR_صف)
     {
-	if (frame_fixed_width(target_fr) && !frame_fixed_width(other_fr))
-	    target_fr = other_fr;
+	إذا (چوکٺو_fixed_ويڪر(هدف_fr) && !چوکٺو_fixed_ويڪر(other_fr))
+	    هدف_fr = other_fr;
     }
-    else
+    وإلا
     {
-	if (frame_fixed_height(target_fr) && !frame_fixed_height(other_fr))
-	    target_fr = other_fr;
+	إذا (چوکٺو_fixed_اوچائي(هدف_fr) && !چوکٺو_fixed_اوچائي(other_fr))
+	    هدف_fr = other_fr;
     }
 
-    return target_fr;
+    أرجع هدف_fr;
 }
 
 /*
  * Return the tabpage that will be used if the current one is closed.
  */
-    static tabpage_T *
-alt_tabpage(void)
+    ساكن tabpage_T *
+alt_tabpage(فراغ)
 {
-    tabpage_T	*tp = NULL;
-    int		forward;
+    tabpage_T	*tp = عدم;
+    صحيح		forward;
 
     // Use the last accessed tab page, if possible.
-    if ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
-	return lastused_tabpage;
+    إذا ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
+	أرجع lastused_tabpage;
 
     // Use the next tab page, if possible.
-    forward = curtab->tp_next != NULL &&
-	    ((tcl_flags & TCL_LEFT) == 0 || curtab == first_tabpage);
+    forward = curtab->tp_ايندڙ != عدم &&
+	    ((tcl_flags & TCL_کاٻو) == 0 || curtab == پهريون_tabpage);
 
-    if (forward)
-	tp = curtab->tp_next;
-    else
+    إذا (forward)
+	tp = curtab->tp_ايندڙ;
+    وإلا
 	// Use the previous tab page.
-	for (tp = first_tabpage; tp->tp_next != curtab; tp = tp->tp_next)
+	لكل (tp = پهريون_tabpage; tp->tp_ايندڙ != curtab; tp = tp->tp_ايندڙ)
 	    ;
 
-    return tp;
+    أرجع tp;
 }
 
 /*
  * Find the left-upper window in frame "frp".
  */
-    static win_T *
-frame2win(frame_T *frp)
+    ساكن win_T *
+frame2win(چوکٺو_T *frp)
 {
-    while (frp->fr_win == NULL)
-	frp = frp->fr_child;
-    return frp->fr_win;
+    طالما (frp->fr_win == عدم)
+	frp = frp->fr_ٻار;
+    أرجع frp->fr_win;
 }
 
 /*
  * Return TRUE if frame "frp" contains window "wp".
  */
-    static int
-frame_has_win(frame_T *frp, win_T *wp)
+    ساكن صحيح
+چوکٺو_has_win(چوکٺو_T *frp, win_T *wp)
 {
-    frame_T	*p;
+    چوکٺو_T	*p;
 
-    if (frp->fr_layout == FR_LEAF)
-	return frp->fr_win == wp;
+    إذا (frp->fr_layout == FR_پن)
+	أرجع frp->fr_win == wp;
 
-    FOR_ALL_FRAMES(p, frp->fr_child)
-	if (frame_has_win(p, wp))
-	    return TRUE;
-    return FALSE;
+    FOR_ALL_چوکٺا(p, frp->fr_ٻار)
+	إذا (چوکٺو_has_win(p, wp))
+	    أرجع TRUE;
+    أرجع FALSE;
 }
 
 // 'cmdheight' value explicitly set by the user: window commands are allowed to
 // resize the topframe to values higher than this minimum, but not lower.
-static int min_set_ch = 1;
+ساكن صحيح min_سيٽ_ch = 1;
 
 /*
  * Set a new height for a frame.  Recursively sets the height for contained
  * frames and windows.  Caller must take care of positions.
  */
-    static void
-frame_new_height(
-    frame_T	*topfrp,
-    int		height,
-    int		topfirst,	// resize topmost contained frame first
-    int		wfh,		// obey 'winfixheight' when there is a choice;
+    ساكن فراغ
+چوکٺو_new_اوچائي(
+    چوکٺو_T	*topfrp,
+    صحيح		اوچائي,
+    صحيح		topfirst,	// resize topmost contained frame first
+    صحيح		wfh,		// obey 'winfixheight' when there is a choice;
 				// may cause the height not to be set
-    int		set_ch)		// set 'cmdheight' to resize topframe
+    صحيح		سيٽ_ch)		// set 'cmdheight' to resize topframe
 {
-    frame_T	*frp;
-    int		extra_lines;
-    int		h;
+    چوکٺو_T	*frp;
+    صحيح		extra_سٽون;
+    صحيح		h;
 
-    if (topfrp->fr_parent == NULL && set_ch)
+    إذا (topfrp->fr_والد == عدم && سيٽ_ch)
     {
 	// topframe: update the command line height, with side effects.
-	int new_ch = MAX(min_set_ch, p_ch + topfrp->fr_height - height);
-	int save_ch = min_set_ch;
-	if (new_ch != p_ch)
-	    set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
-	min_set_ch = save_ch;
-	height = MIN(height, ROWS_AVAIL);
+	صحيح new_ch = MAX(min_سيٽ_ch, p_ch + topfrp->fr_اوچائي - اوچائي);
+	صحيح save_ch = min_سيٽ_ch;
+	إذا (new_ch != p_ch)
+	    سيٽ_option_قدر((char_u *)"cmdheight", new_ch, عدم, 0);
+	min_سيٽ_ch = save_ch;
+	اوچائي = MIN(اوچائي, صفون_AVAIL);
     }
-    if (topfrp->fr_win != NULL)
+    إذا (topfrp->fr_win != عدم)
     {
 	// Simple case: just one window.
-	win_new_height(topfrp->fr_win,
-				    height - topfrp->fr_win->w_status_height
-					      - WINBAR_HEIGHT(topfrp->fr_win));
+	win_new_اوچائي(topfrp->fr_win,
+				    اوچائي - topfrp->fr_win->w_حالت_اوچائي
+					      - WINBAR_اوچائي(topfrp->fr_win));
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    وإلا إذا (topfrp->fr_layout == FR_صف)
     {
-	do
+	افعل
 	{
 	    // All frames in this row get the same new height.
-	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	    FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	    {
-		frame_new_height(frp, height, topfirst, wfh, set_ch);
-		if (frp->fr_height > height)
+		چوکٺو_new_اوچائي(frp, اوچائي, topfirst, wfh, سيٽ_ch);
+		إذا (frp->fr_اوچائي > اوچائي)
 		{
 		    // Could not fit the windows, make the whole row higher.
-		    height = frp->fr_height;
-		    break;
+		    اوچائي = frp->fr_اوچائي;
+		    اكسر;
 		}
 	    }
 	}
-	while (frp != NULL);
+	طالما (frp != عدم);
     }
-    else    // fr_layout == FR_COL
+    وإلا    // fr_layout == FR_COL
     {
 	// Complicated case: Resize a column of frames.  Resize the bottom
 	// frame first, frames above that when needed.
 
-	frp = topfrp->fr_child;
-	if (wfh)
+	frp = topfrp->fr_ٻار;
+	إذا (wfh)
 	    // Advance past frames with one window with 'wfh' set.
-	    while (frame_fixed_height(frp))
+	    طالما (چوکٺو_fixed_اوچائي(frp))
 	    {
-		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfh', give up
+		frp = frp->fr_ايندڙ;
+		إذا (frp == عدم)
+		    أرجع;	    // no frame without 'wfh', give up
 	    }
-	if (!topfirst)
+	إذا (!topfirst)
 	{
 	    // Find the bottom frame of this column
-	    while (frp->fr_next != NULL)
-		frp = frp->fr_next;
-	    if (wfh)
+	    طالما (frp->fr_ايندڙ != عدم)
+		frp = frp->fr_ايندڙ;
+	    إذا (wfh)
 		// Advance back for frames with one window with 'wfh' set.
-		while (frame_fixed_height(frp))
+		طالما (چوکٺو_fixed_اوچائي(frp))
 		    frp = frp->fr_prev;
 	}
 
-	extra_lines = height - topfrp->fr_height;
-	if (extra_lines < 0)
+	extra_سٽون = اوچائي - topfrp->fr_اوچائي;
+	إذا (extra_سٽون < 0)
 	{
 	    // reduce height of contained frames, bottom or top frame first
-	    while (frp != NULL)
+	    طالما (frp != عدم)
 	    {
-		h = frame_minheight(frp, NULL);
-		if (frp->fr_height + extra_lines < h)
+		h = چوکٺو_minheight(frp, عدم);
+		إذا (frp->fr_اوچائي + extra_سٽون < h)
 		{
-		    extra_lines += frp->fr_height - h;
-		    frame_new_height(frp, h, topfirst, wfh, set_ch);
+		    extra_سٽون += frp->fr_اوچائي - h;
+		    چوکٺو_new_اوچائي(frp, h, topfirst, wfh, سيٽ_ch);
 		}
-		else
+		وإلا
 		{
-		    frame_new_height(frp, frp->fr_height + extra_lines,
-							topfirst, wfh, set_ch);
-		    break;
+		    چوکٺو_new_اوچائي(frp, frp->fr_اوچائي + extra_سٽون,
+							topfirst, wfh, سيٽ_ch);
+		    اكسر;
 		}
-		if (topfirst)
+		إذا (topfirst)
 		{
-		    do
-			frp = frp->fr_next;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    افعل
+			frp = frp->fr_ايندڙ;
+		    طالما (wfh && frp != عدم && چوکٺو_fixed_اوچائي(frp));
 		}
-		else
+		وإلا
 		{
-		    do
+		    افعل
 			frp = frp->fr_prev;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    طالما (wfh && frp != عدم && چوکٺو_fixed_اوچائي(frp));
 		}
 		// Increase "height" if we could not reduce enough frames.
-		if (frp == NULL)
-		    height -= extra_lines;
+		إذا (frp == عدم)
+		    اوچائي -= extra_سٽون;
 	    }
 	}
-	else if (extra_lines > 0)
+	وإلا إذا (extra_سٽون > 0)
 	{
 	    // increase height of bottom or top frame
-	    frame_new_height(frp, frp->fr_height + extra_lines, topfirst, wfh,
-									set_ch);
+	    چوکٺو_new_اوچائي(frp, frp->fr_اوچائي + extra_سٽون, topfirst, wfh,
+									سيٽ_ch);
 	}
     }
-    topfrp->fr_height = height;
+    topfrp->fr_اوچائي = اوچائي;
 }
 
 /*
  * Return TRUE if height of frame "frp" should not be changed because of
  * the 'winfixheight' option.
  */
-    static int
-frame_fixed_height(frame_T *frp)
+    ساكن صحيح
+چوکٺو_fixed_اوچائي(چوکٺو_T *frp)
 {
     // frame with one window: fixed height if 'winfixheight' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfh;
+    إذا (frp->fr_win != عدم)
+	أرجع frp->fr_win->w_p_wfh;
 
-    if (frp->fr_layout == FR_ROW)
+    إذا (frp->fr_layout == FR_صف)
     {
 	// The frame is fixed height if one of the frames in the row is fixed
 	// height.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_height(frp))
-		return TRUE;
-	return FALSE;
+	FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	    إذا (چوکٺو_fixed_اوچائي(frp))
+		أرجع TRUE;
+	أرجع FALSE;
     }
 
     // frp->fr_layout == FR_COL: The frame is fixed height if all of the
     // frames in the row are fixed height.
-    FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_height(frp))
-	    return FALSE;
-    return TRUE;
+    FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	إذا (!چوکٺو_fixed_اوچائي(frp))
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
 /*
  * Return TRUE if width of frame "frp" should not be changed because of
  * the 'winfixwidth' option.
  */
-    static int
-frame_fixed_width(frame_T *frp)
+    ساكن صحيح
+چوکٺو_fixed_ويڪر(چوکٺو_T *frp)
 {
     // frame with one window: fixed width if 'winfixwidth' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfw;
+    إذا (frp->fr_win != عدم)
+	أرجع frp->fr_win->w_p_wfw;
 
-    if (frp->fr_layout == FR_COL)
+    إذا (frp->fr_layout == FR_کانو)
     {
 	// The frame is fixed width if one of the frames in the row is fixed
 	// width.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_width(frp))
-		return TRUE;
-	return FALSE;
+	FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	    إذا (چوکٺو_fixed_ويڪر(frp))
+		أرجع TRUE;
+	أرجع FALSE;
     }
 
     // frp->fr_layout == FR_ROW: The frame is fixed width if all of the
     // frames in the row are fixed width.
-    FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_width(frp))
-	    return FALSE;
-    return TRUE;
+    FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	إذا (!چوکٺو_fixed_ويڪر(frp))
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
 /*
  * Add a status line to windows at the bottom of "frp".
  * Note: Does not check if there is room!
  */
-    static void
-frame_add_statusline(frame_T *frp)
+    ساكن فراغ
+چوکٺو_جوڙيو_statusline(چوکٺو_T *frp)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    إذا (frp->fr_layout == FR_پن)
     {
 	wp = frp->fr_win;
-	wp->w_status_height = statusline_height(wp);
+	wp->w_حالت_اوچائي = statusline_اوچائي(wp);
     }
-    else if (frp->fr_layout == FR_ROW)
+    وإلا إذا (frp->fr_layout == FR_صف)
     {
 	// Handle all the frames in the row.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    frame_add_statusline(frp);
+	FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	    چوکٺو_جوڙيو_statusline(frp);
     }
-    else // frp->fr_layout == FR_COL
+    وإلا // frp->fr_layout == FR_COL
     {
 	// Only need to handle the last frame in the column.
-	for (frp = frp->fr_child; frp->fr_next != NULL; frp = frp->fr_next)
+	لكل (frp = frp->fr_ٻار; frp->fr_ايندڙ != عدم; frp = frp->fr_ايندڙ)
 	    ;
-	frame_add_statusline(frp);
+	چوکٺو_جوڙيو_statusline(frp);
     }
 }
 
@@ -4190,173 +4190,173 @@ frame_add_statusline(frame_T *frp)
  * Set width of a frame.  Handles recursively going through contained frames.
  * May remove separator line for windows at the right side (for win_close()).
  */
-    static void
-frame_new_width(
-    frame_T	*topfrp,
-    int		width,
-    int		leftfirst,	// resize leftmost contained frame first
-    int		wfw)		// obey 'winfixwidth' when there is a choice;
+    ساكن فراغ
+چوکٺو_new_ويڪر(
+    چوکٺو_T	*topfrp,
+    صحيح		ويڪر,
+    صحيح		leftfirst,	// resize leftmost contained frame first
+    صحيح		wfw)		// obey 'winfixwidth' when there is a choice;
 				// may cause the width not to be set
 {
-    frame_T	*frp;
-    int		extra_cols;
-    int		w;
+    چوکٺو_T	*frp;
+    صحيح		extra_کانن_ڳڻپ;
+    صحيح		w;
     win_T	*wp;
 
-    if (topfrp->fr_layout == FR_LEAF)
+    إذا (topfrp->fr_layout == FR_پن)
     {
 	// Simple case: just one window.
 	wp = topfrp->fr_win;
 	// Find out if there are any windows right of this one.
-	for (frp = topfrp; frp->fr_parent != NULL; frp = frp->fr_parent)
-	    if (frp->fr_parent->fr_layout == FR_ROW && frp->fr_next != NULL)
-		break;
-	if (frp->fr_parent == NULL)
-	    wp->w_vsep_width = 0;
-	win_new_width(wp, width - wp->w_vsep_width);
+	لكل (frp = topfrp; frp->fr_والد != عدم; frp = frp->fr_والد)
+	    إذا (frp->fr_والد->fr_layout == FR_صف && frp->fr_ايندڙ != عدم)
+		اكسر;
+	إذا (frp->fr_والد == عدم)
+	    wp->w_vsep_ويڪر = 0;
+	win_new_ويڪر(wp, ويڪر - wp->w_vsep_ويڪر);
     }
-    else if (topfrp->fr_layout == FR_COL)
+    وإلا إذا (topfrp->fr_layout == FR_کانو)
     {
-	do
+	افعل
 	{
 	    // All frames in this column get the same new width.
-	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	    FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	    {
-		frame_new_width(frp, width, leftfirst, wfw);
-		if (frp->fr_width > width)
+		چوکٺو_new_ويڪر(frp, ويڪر, leftfirst, wfw);
+		إذا (frp->fr_ويڪر > ويڪر)
 		{
 		    // Could not fit the windows, make whole column wider.
-		    width = frp->fr_width;
-		    break;
+		    ويڪر = frp->fr_ويڪر;
+		    اكسر;
 		}
 	    }
-	} while (frp != NULL);
+	} طالما (frp != عدم);
     }
-    else    // fr_layout == FR_ROW
+    وإلا    // fr_layout == FR_ROW
     {
 	// Complicated case: Resize a row of frames.  Resize the rightmost
 	// frame first, frames left of it when needed.
 
-	frp = topfrp->fr_child;
-	if (wfw)
+	frp = topfrp->fr_ٻار;
+	إذا (wfw)
 	    // Advance past frames with one window with 'wfw' set.
-	    while (frame_fixed_width(frp))
+	    طالما (چوکٺو_fixed_ويڪر(frp))
 	    {
-		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfw', give up
+		frp = frp->fr_ايندڙ;
+		إذا (frp == عدم)
+		    أرجع;	    // no frame without 'wfw', give up
 	    }
-	if (!leftfirst)
+	إذا (!leftfirst)
 	{
 	    // Find the rightmost frame of this row
-	    while (frp->fr_next != NULL)
-		frp = frp->fr_next;
-	    if (wfw)
+	    طالما (frp->fr_ايندڙ != عدم)
+		frp = frp->fr_ايندڙ;
+	    إذا (wfw)
 		// Advance back for frames with one window with 'wfw' set.
-		while (frame_fixed_width(frp))
+		طالما (چوکٺو_fixed_ويڪر(frp))
 		    frp = frp->fr_prev;
 	}
 
-	extra_cols = width - topfrp->fr_width;
-	if (extra_cols < 0)
+	extra_کانن_ڳڻپ = ويڪر - topfrp->fr_ويڪر;
+	إذا (extra_کانن_ڳڻپ < 0)
 	{
 	    // reduce frame width, rightmost frame first
-	    while (frp != NULL)
+	    طالما (frp != عدم)
 	    {
-		w = frame_minwidth(frp, NULL);
-		if (frp->fr_width + extra_cols < w)
+		w = چوکٺو_minwidth(frp, عدم);
+		إذا (frp->fr_ويڪر + extra_کانن_ڳڻپ < w)
 		{
-		    extra_cols += frp->fr_width - w;
-		    frame_new_width(frp, w, leftfirst, wfw);
+		    extra_کانن_ڳڻپ += frp->fr_ويڪر - w;
+		    چوکٺو_new_ويڪر(frp, w, leftfirst, wfw);
 		}
-		else
+		وإلا
 		{
-		    frame_new_width(frp, frp->fr_width + extra_cols,
+		    چوکٺو_new_ويڪر(frp, frp->fr_ويڪر + extra_کانن_ڳڻپ,
 							      leftfirst, wfw);
-		    break;
+		    اكسر;
 		}
-		if (leftfirst)
+		إذا (leftfirst)
 		{
-		    do
-			frp = frp->fr_next;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    افعل
+			frp = frp->fr_ايندڙ;
+		    طالما (wfw && frp != عدم && چوکٺو_fixed_ويڪر(frp));
 		}
-		else
+		وإلا
 		{
-		    do
+		    افعل
 			frp = frp->fr_prev;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    طالما (wfw && frp != عدم && چوکٺو_fixed_ويڪر(frp));
 		}
 		// Increase "width" if we could not reduce enough frames.
-		if (frp == NULL)
-		    width -= extra_cols;
+		إذا (frp == عدم)
+		    ويڪر -= extra_کانن_ڳڻپ;
 	    }
 	}
-	else if (extra_cols > 0)
+	وإلا إذا (extra_کانن_ڳڻپ > 0)
 	{
 	    // increase width of rightmost frame
-	    frame_new_width(frp, frp->fr_width + extra_cols, leftfirst, wfw);
+	    چوکٺو_new_ويڪر(frp, frp->fr_ويڪر + extra_کانن_ڳڻپ, leftfirst, wfw);
 	}
     }
-    topfrp->fr_width = width;
+    topfrp->fr_ويڪر = ويڪر;
 }
 
 /*
  * Add or remove the vertical separator of windows to the right side of "frp".
  * Note: Does not check if there is room!
  */
-    static void
-frame_set_vsep(frame_T *frp, int add)
+    ساكن فراغ
+چوکٺو_سيٽ_vsep(چوکٺو_T *frp, صحيح جوڙيو)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    إذا (frp->fr_layout == FR_پن)
     {
 	wp = frp->fr_win;
-	if (add && wp->w_vsep_width == 0)
+	إذا (جوڙيو && wp->w_vsep_ويڪر == 0)
 	{
-	    if (wp->w_width > 0)	// don't make it negative
-		win_new_width(wp, wp->w_width - 1);
-	    wp->w_vsep_width = 1;
+	    إذا (wp->w_ويڪر > 0)	// don't make it negative
+		win_new_ويڪر(wp, wp->w_ويڪر - 1);
+	    wp->w_vsep_ويڪر = 1;
 	}
-	else if (!add && wp->w_vsep_width == 1)
+	وإلا إذا (!جوڙيو && wp->w_vsep_ويڪر == 1)
 	{
-	    win_new_width(wp, wp->w_width + 1);
-	    wp->w_vsep_width = 0;
+	    win_new_ويڪر(wp, wp->w_ويڪر + 1);
+	    wp->w_vsep_ويڪر = 0;
 	}
     }
-    else if (frp->fr_layout == FR_COL)
+    وإلا إذا (frp->fr_layout == FR_کانو)
     {
 	// Handle all the frames in the column.
-	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    frame_set_vsep(frp, add);
+	FOR_ALL_چوکٺا(frp, frp->fr_ٻار)
+	    چوکٺو_سيٽ_vsep(frp, جوڙيو);
     }
-    else // frp->fr_layout == FR_ROW
+    وإلا // frp->fr_layout == FR_ROW
     {
 	// Only need to handle the last frame in the row.
-	frp = frp->fr_child;
-	while (frp->fr_next != NULL)
-	    frp = frp->fr_next;
-	frame_set_vsep(frp, add);
+	frp = frp->fr_ٻار;
+	طالما (frp->fr_ايندڙ != عدم)
+	    frp = frp->fr_ايندڙ;
+	چوکٺو_سيٽ_vsep(frp, جوڙيو);
     }
 }
 
 /*
  * Set frame width from the window it contains.
  */
-    static void
-frame_fix_width(win_T *wp)
+    ساكن فراغ
+چوکٺو_fix_ويڪر(win_T *wp)
 {
-    wp->w_frame->fr_width = wp->w_width + wp->w_vsep_width;
+    wp->w_چوکٺو->fr_ويڪر = wp->w_ويڪر + wp->w_vsep_ويڪر;
 }
 
 /*
  * Set frame height from the window it contains.
  */
-    static void
-frame_fix_height(win_T *wp)
+    ساكن فراغ
+چوکٺو_fix_اوچائي(win_T *wp)
 {
-    wp->w_frame->fr_height = VISIBLE_HEIGHT(wp) + wp->w_status_height;
+    wp->w_چوکٺو->fr_اوچائي = VISIBLE_اوچائي(wp) + wp->w_حالت_اوچائي;
 }
 
 /*
@@ -4366,85 +4366,85 @@ frame_fix_height(win_T *wp)
  * When "next_curwin" is NOWIN, don't use at least one line for the current
  * window.
  */
-    static int
-frame_minheight(frame_T *topfrp, win_T *next_curwin)
+    ساكن صحيح
+چوکٺو_minheight(چوکٺو_T *topfrp, win_T *ايندڙ_curwin)
 {
-    frame_T	*frp;
-    int		m;
-    int		n;
+    چوکٺو_T	*frp;
+    صحيح		m;
+    صحيح		n;
 
-    if (topfrp->fr_win != NULL)
+    إذا (topfrp->fr_win != عدم)
     {
-	if (topfrp->fr_win == next_curwin)
-	    m = p_wh + topfrp->fr_win->w_status_height;
-	else
+	إذا (topfrp->fr_win == ايندڙ_curwin)
+	    m = p_wh + topfrp->fr_win->w_حالت_اوچائي;
+	وإلا
 	{
 	    // window: minimal height of the window plus status line
-	    m = p_wmh + topfrp->fr_win->w_status_height;
-	    if (topfrp->fr_win == curwin && next_curwin == NULL)
+	    m = p_wmh + topfrp->fr_win->w_حالت_اوچائي;
+	    إذا (topfrp->fr_win == curwin && ايندڙ_curwin == عدم)
 	    {
 		// Current window is minimal one line high and WinBar is
 		// visible.
-		if (p_wmh == 0)
+		إذا (p_wmh == 0)
 		    ++m;
-		m += WINBAR_HEIGHT(curwin);
+		m += WINBAR_اوچائي(curwin);
 	    }
 	}
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    وإلا إذا (topfrp->fr_layout == FR_صف)
     {
 	// get the minimal height from each frame in this row
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	{
-	    n = frame_minheight(frp, next_curwin);
-	    if (n > m)
+	    n = چوکٺو_minheight(frp, ايندڙ_curwin);
+	    إذا (n > m)
 		m = n;
 	}
     }
-    else
+    وإلا
     {
 	// Add up the minimal heights for all frames in this column.
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    m += frame_minheight(frp, next_curwin);
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
+	    m += چوکٺو_minheight(frp, ايندڙ_curwin);
     }
 
-    return m;
+    أرجع m;
 }
 
 /*
  * Compute the window count in height for frame "topfrp".
  */
-static int
-frame_wincount_in_height(frame_T *topfrp)
+ساكن صحيح
+چوکٺو_wincount_اندريون_اوچائي(چوکٺو_T *topfrp)
 {
-    frame_T	*frp;
-    int		c = 0;
-    int		n;
+    چوکٺو_T	*frp;
+    صحيح		c = 0;
+    صحيح		n;
 
-    if (topfrp->fr_win != NULL)
+    إذا (topfrp->fr_win != عدم)
 	c = 1;
-    else if (topfrp->fr_layout == FR_ROW)
+    وإلا إذا (topfrp->fr_layout == FR_صف)
     {
 	// get the max window count across all frames in this row
 	c = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	{
-	    n = frame_wincount_in_height(frp);
-	    if (n > c)
+	    n = چوکٺو_wincount_اندريون_اوچائي(frp);
+	    إذا (n > c)
 		c = n;
 	}
     }
-    else
+    وإلا
     {
 	// Sum the window counts for all frames in this column.
 	c = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    c += frame_wincount_in_height(frp);
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
+	    c += چوکٺو_wincount_اندريون_اوچائي(frp);
     }
 
-    return c;
+    أرجع c;
 }
 
 /*
@@ -4453,47 +4453,47 @@ frame_wincount_in_height(frame_T *topfrp)
  * When "next_curwin" is NOWIN, don't use at least one column for the current
  * window.
  */
-    static int
-frame_minwidth(
-    frame_T	*topfrp,
-    win_T	*next_curwin)	// use p_wh and p_wiw for next_curwin
+    ساكن صحيح
+چوکٺو_minwidth(
+    چوکٺو_T	*topfrp,
+    win_T	*ايندڙ_curwin)	// use p_wh and p_wiw for next_curwin
 {
-    frame_T	*frp;
-    int		m, n;
+    چوکٺو_T	*frp;
+    صحيح		m, n;
 
-    if (topfrp->fr_win != NULL)
+    إذا (topfrp->fr_win != عدم)
     {
-	if (topfrp->fr_win == next_curwin)
-	    m = p_wiw + topfrp->fr_win->w_vsep_width;
-	else
+	إذا (topfrp->fr_win == ايندڙ_curwin)
+	    m = p_wiw + topfrp->fr_win->w_vsep_ويڪر;
+	وإلا
 	{
 	    // window: minimal width of the window plus separator column
-	    m = p_wmw + topfrp->fr_win->w_vsep_width;
+	    m = p_wmw + topfrp->fr_win->w_vsep_ويڪر;
 	    // Current window is minimal one column wide
-	    if (p_wmw == 0 && topfrp->fr_win == curwin && next_curwin == NULL)
+	    إذا (p_wmw == 0 && topfrp->fr_win == curwin && ايندڙ_curwin == عدم)
 		++m;
 	}
     }
-    else if (topfrp->fr_layout == FR_COL)
+    وإلا إذا (topfrp->fr_layout == FR_کانو)
     {
 	// get the minimal width from each frame in this column
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	{
-	    n = frame_minwidth(frp, next_curwin);
-	    if (n > m)
+	    n = چوکٺو_minwidth(frp, ايندڙ_curwin);
+	    إذا (n > m)
 		m = n;
 	}
     }
-    else
+    وإلا
     {
 	// Add up the minimal widths for all frames in this row.
 	m = 0;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    m += frame_minwidth(frp, next_curwin);
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
+	    m += چوکٺو_minwidth(frp, ايندڙ_curwin);
     }
 
-    return m;
+    أرجع m;
 }
 
 
@@ -4504,81 +4504,81 @@ frame_minwidth(
  *
  * Used by ":bdel" and ":only".
  */
-    void
+    فراغ
 close_others(
-    int		message,
-    int		forceit)	    // always hide all other windows
+    صحيح		پيغام,
+    صحيح		forceit)	    // always hide all other windows
 {
     win_T	*wp;
     win_T	*nextwp;
     win_T	*old_curwin = curwin;
-    int		r;
+    صحيح		r;
 
-    if (one_window())
+    إذا (one_دري())
     {
-	if (message && !autocmd_busy)
-	    msg(_(m_onlyone));
-	return;
+	إذا (پيغام && !autocmd_busy)
+	    نياپو(_(m_onlyone));
+	أرجع;
     }
 
     // Be very careful here: autocommands may change the window layout.
-    for (wp = firstwin; win_valid(wp); wp = nextwp)
+    لكل (wp = firstwin; win_valid(wp); wp = nextwp)
     {
-	nextwp = wp->w_next;
+	nextwp = wp->w_ايندڙ;
 
 	// autocommands messed this one up
-	if (old_curwin != curwin && win_valid(old_curwin))
+	إذا (old_curwin != curwin && win_valid(old_curwin))
 	{
 	    curwin = old_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_بفر;
 	}
 
-	if (wp == curwin)		// don't close current window
-	    continue;
+	إذا (wp == curwin)		// don't close current window
+	    استمر;
 
 	// autoccommands messed this one up
-	if (!buf_valid(wp->w_buffer) && win_valid(wp))
+	إذا (!buf_valid(wp->w_بفر) && win_valid(wp))
 	{
-	    wp->w_buffer = NULL;
+	    wp->w_بفر = عدم;
 	    win_close(wp, 0);
-	    continue;
+	    استمر;
 	}
 	// Check if it's allowed to abandon this window
-	r = can_abandon(wp->w_buffer, forceit);
-	if (!win_valid(wp))		// autocommands messed wp up
+	r = can_abandon(wp->w_بفر, forceit);
+	إذا (!win_valid(wp))		// autocommands messed wp up
 	{
 	    nextwp = firstwin;
-	    continue;
+	    استمر;
 	}
-	if (!r)
+	إذا (!r)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (message && (p_confirm
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    إذا (پيغام && (p_confirm
 			 || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
-		dialog_changed(wp->w_buffer, FALSE);
-		if (!win_valid(wp))		// autocommands messed wp up
+		dialog_بدليو(wp->w_بفر, FALSE);
+		إذا (!win_valid(wp))		// autocommands messed wp up
 		{
 		    nextwp = firstwin;
-		    continue;
+		    استمر;
 		}
 	    }
-	    if (bufIsChanged(wp->w_buffer))
-#endif
-		continue;
+	    إذا (buf_Is_بدليو(wp->w_بفر))
+#جيڪڏهن_پورو
+		استمر;
 	}
-	win_close(wp, !buf_hide(wp->w_buffer) && !bufIsChanged(wp->w_buffer));
+	win_close(wp, !buf_hide(wp->w_بفر) && !buf_Is_بدليو(wp->w_بفر));
     }
 
-    if (message && !ONE_WINDOW)
-	emsg(_(e_other_window_contains_changes));
+    إذا (پيغام && !ONE_دري)
+	emsg(_(e_other_دري_شامل_آهي_changes));
 }
 
 /*
  * Store the relevant window pointers for tab page "tp".  To be used before
  * use_tabpage().
  */
-    void
+    فراغ
 unuse_tabpage(tabpage_T *tp)
 {
     tp->tp_topframe = topframe;
@@ -4589,13 +4589,13 @@ unuse_tabpage(tabpage_T *tp)
 
 // When switching tabpage, handle other side-effects in command_height(), but
 // avoid setting frame sizes which are still correct.
-static int command_frame_height = TRUE;
+ساكن صحيح command_چوکٺو_اوچائي = TRUE;
 
 /*
  * Set the relevant pointers to use tab page "tp".  May want to call
  * unuse_tabpage() first.
  */
-    void
+    فراغ
 use_tabpage(tabpage_T *tp)
 {
     curtab = tp;
@@ -4610,19 +4610,19 @@ use_tabpage(tabpage_T *tp)
  * Called from main().
  * Return FAIL when something goes wrong (out of memory).
  */
-    int
-win_alloc_first(void)
+    صحيح
+win_alloc_پهريون(فراغ)
 {
-    if (win_alloc_firstwin(NULL) == FAIL)
-	return FAIL;
+    إذا (win_alloc_firstwin(عدم) == FAIL)
+	أرجع FAIL;
 
-    first_tabpage = alloc_tabpage();
-    if (first_tabpage == NULL)
-	return FAIL;
-    curtab = first_tabpage;
-    unuse_tabpage(first_tabpage);
+    پهريون_tabpage = alloc_tabpage();
+    إذا (پهريون_tabpage == عدم)
+	أرجع FAIL;
+    curtab = پهريون_tabpage;
+    unuse_tabpage(پهريون_tabpage);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -4631,31 +4631,31 @@ win_alloc_first(void)
  * can't be in win_alloc_first().
  */
     win_T *
-win_alloc_popup_win(void)
+win_alloc_popup_win(فراغ)
 {
     win_T *wp;
 
-    wp = win_alloc(NULL, TRUE);
-    if (wp == NULL)
-	return NULL;
+    wp = win_alloc(عدم, TRUE);
+    إذا (wp == عدم)
+	أرجع عدم;
     // We need to initialize options with something, using the current
     // window makes most sense.
     win_init_some(wp, curwin);
 
     RESET_BINDING(wp);
-    new_frame(wp);
-    return wp;
+    new_چوکٺو(wp);
+    أرجع wp;
 }
 
 /*
  * Initialize window "wp" to display buffer "buf".
  */
-    void
+    فراغ
 win_init_popup_win(win_T *wp, buf_T *buf)
 {
-    wp->w_buffer = buf;
+    wp->w_بفر = buf;
     ++buf->b_nwindows;
-    win_init_empty(wp); // set cursor and topline to safe values
+    win_init_خالي_جايون(wp); // set cursor and topline to safe values
 
     // Make sure w_localdir is NULL to avoid a chdir() in win_enter_ext().
     VIM_CLEAR(wp->w_localdir);
@@ -4667,28 +4667,28 @@ win_init_popup_win(win_T *wp, buf_T *buf)
  * When "oldwin" is not NULL copy info from it to the new window.
  * Return FAIL when something goes wrong (out of memory).
  */
-    static int
+    ساكن صحيح
 win_alloc_firstwin(win_T *oldwin)
 {
-    curwin = win_alloc(NULL, FALSE);
-    if (curwin == NULL)
-	return FAIL;
-    if (oldwin == NULL)
+    curwin = win_alloc(عدم, FALSE);
+    إذا (curwin == عدم)
+	أرجع FAIL;
+    إذا (oldwin == عدم)
     {
 	// Very first window, need to create an empty buffer for it and
 	// initialize from scratch.
-	curbuf = buflist_new(NULL, NULL, 1L, BLN_LISTED);
-	if (curwin == NULL || curbuf == NULL)
-	    return FAIL;
-	curwin->w_buffer = curbuf;
-#ifdef FEAT_SYN_HL
+	curbuf = buflist_new(عدم, عدم, 1L, BLN_LISTED);
+	إذا (curwin == عدم || curbuf == عدم)
+	    أرجع FAIL;
+	curwin->w_بفر = curbuf;
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
 	curwin->w_s = &(curbuf->b_s);
-#endif
+#جيڪڏهن_پورو
 	curbuf->b_nwindows = 1;	// there is one window
 	curwin->w_alist = &global_alist;
 	curwin_init();		// init current window
     }
-    else
+    وإلا
     {
 	// First window in new tab page, initialize it from "oldwin".
 	win_init(curwin, oldwin, 0);
@@ -4697,119 +4697,119 @@ win_alloc_firstwin(win_T *oldwin)
 	RESET_BINDING(curwin);
     }
 
-    new_frame(curwin);
-    if (curwin->w_frame == NULL)
-	return FAIL;
-    topframe = curwin->w_frame;
-    topframe->fr_width = COLUMNS_WITHOUT_TPL();
-    topframe->fr_height = Rows - p_ch;
+    new_چوکٺو(curwin);
+    إذا (curwin->w_چوکٺو == عدم)
+	أرجع FAIL;
+    topframe = curwin->w_چوکٺو;
+    topframe->fr_ويڪر = COLUMNS_WITHOUT_TPL();
+    topframe->fr_اوچائي = صفون - p_ch;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Create a frame for window "wp".
  */
-    static void
-new_frame(win_T *wp)
+    ساكن فراغ
+new_چوکٺو(win_T *wp)
 {
-    frame_T *frp = ALLOC_CLEAR_ONE(frame_T);
+    چوکٺو_T *frp = ALLOC_CLEAR_ONE(چوکٺو_T);
 
-    wp->w_frame = frp;
-    if (frp == NULL)
-	return;
-    frp->fr_layout = FR_LEAF;
+    wp->w_چوکٺو = frp;
+    إذا (frp == عدم)
+	أرجع;
+    frp->fr_layout = FR_پن;
     frp->fr_win = wp;
 }
 
 /*
  * Initialize the window and frame size to the maximum.
  */
-    void
-win_init_size(void)
+    فراغ
+win_init_سائيز(فراغ)
 {
-    firstwin->w_height = ROWS_AVAIL;
-    firstwin->w_prev_height = ROWS_AVAIL;
-    topframe->fr_height = ROWS_AVAIL;
-    firstwin->w_width = topframe->fr_width;
+    firstwin->w_اوچائي = صفون_AVAIL;
+    firstwin->w_prev_اوچائي = صفون_AVAIL;
+    topframe->fr_اوچائي = صفون_AVAIL;
+    firstwin->w_ويڪر = topframe->fr_ويڪر;
 }
 
 /*
  * Allocate a new tabpage_T and init the values.
  * Returns NULL when out of memory.
  */
-    static tabpage_T *
-alloc_tabpage(void)
+    ساكن tabpage_T *
+alloc_tabpage(فراغ)
 {
     tabpage_T	*tp;
-#ifdef FEAT_GUI
-    int		i;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+    صحيح		i;
+#جيڪڏهن_پورو
 
 
     tp = ALLOC_CLEAR_ONE(tabpage_T);
-    if (tp == NULL)
-	return NULL;
+    إذا (tp == عدم)
+	أرجع عدم;
 
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
     // init t: variables
     tp->tp_vars = dict_alloc_id(aid_newtabpage_tvars);
-    if (tp->tp_vars == NULL)
+    إذا (tp->tp_vars == عدم)
     {
 	vim_free(tp);
-	return NULL;
+	أرجع عدم;
     }
     init_var_dict(tp->tp_vars, &tp->tp_winvar, VAR_SCOPE);
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_GUI
-    for (i = 0; i < 3; i++)
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+    لكل (i = 0; i < 3; i++)
 	tp->tp_prev_which_scrollbars[i] = -1;
-#endif
-#ifdef FEAT_DIFF
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     tp->tp_diff_invalid = TRUE;
-#endif
-    tp->tp_ch_used = p_ch;
+#جيڪڏهن_پورو
+    tp->tp_ch_استعمال_ٿيل = p_ch;
 
-    return tp;
+    أرجع tp;
 }
 
-    void
+    فراغ
 free_tabpage(tabpage_T *tp)
 {
-    int idx;
+    صحيح idx;
 
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     diff_clear(tp);
-#endif
-#ifdef FEAT_PROP_POPUP
-    while (tp->tp_first_popupwin != NULL)
-	popup_close_tabpage(tp, tp->tp_first_popupwin->w_id, TRUE);
-#endif
-    for (idx = 0; idx < SNAP_COUNT; ++idx)
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    طالما (tp->tp_پهريون_popupwin != عدم)
+	popup_close_tabpage(tp, tp->tp_پهريون_popupwin->w_id, TRUE);
+#جيڪڏهن_پورو
+    لكل (idx = 0; idx < SNAP_ڳڻپ; ++idx)
 	clear_snapshot(tp, idx);
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
     vars_clear(&tp->tp_vars->dv_hashtab);	// free all t: variables
     hash_init(&tp->tp_vars->dv_hashtab);
     unref_var_dict(tp->tp_vars);
-#endif
+#جيڪڏهن_پورو
 
-    if (tp == lastused_tabpage)
-	lastused_tabpage = NULL;
-#ifdef FEAT_TABPANEL
+    إذا (tp == lastused_tabpage)
+	lastused_tabpage = عدم;
+#جيڪڏهن_وصف_ٿيل FEAT_TABPANEL
     tabpanel_forget_tabpage(tp);
-#endif
+#جيڪڏهن_پورو
 
     vim_free(tp->tp_localdir);
     vim_free(tp->tp_prevdir);
 
-#ifdef FEAT_PYTHON
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON
     python_tabpage_free(tp);
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PYTHON3
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON3
     python3_tabpage_free(tp);
-#endif
+#جيڪڏهن_پورو
 
     vim_free(tp);
 }
@@ -4826,112 +4826,112 @@ free_tabpage(tabpage_T *tp)
  *
  * Return FAIL or OK.
  */
-    int
-win_new_tabpage(int after)
+    صحيح
+win_new_tabpage(صحيح after)
 {
     tabpage_T	*tp = curtab;
     tabpage_T	*prev_tp = curtab;
     tabpage_T	*newtp;
-    int		n;
-#if defined(FEAT_TABPANEL)
-    int prev_columns = COLUMNS_WITHOUT_TPL();
-#endif
+    صحيح		n;
+#إذا defined(FEAT_TABPANEL)
+    صحيح prev_columns = COLUMNS_WITHOUT_TPL();
+#جيڪڏهن_پورو
 
-    if (cmdwin_type != 0)
+    إذا (cmdwin_type != 0)
     {
-	emsg(_(e_invalid_in_cmdline_window));
-	return FAIL;
+	emsg(_(e_invalid_اندريون_cmdline_دري));
+	أرجع FAIL;
     }
-    if (window_layout_locked(CMD_tabnew))
-	return FAIL;
+    إذا (دري_layout_locked(CMD_tabnew))
+	أرجع FAIL;
 
     newtp = alloc_tabpage();
-    if (newtp == NULL)
-	return FAIL;
+    إذا (newtp == عدم)
+	أرجع FAIL;
 
     // Remember the current windows in this Tab page.
-    if (leave_tabpage(curbuf, TRUE) == FAIL)
+    إذا (leave_tabpage(curbuf, TRUE) == FAIL)
     {
 	vim_free(newtp);
-	return FAIL;
+	أرجع FAIL;
     }
     curtab = newtp;
 
-    newtp->tp_localdir = (tp->tp_localdir == NULL)
-				    ? NULL : vim_strsave(tp->tp_localdir);
+    newtp->tp_localdir = (tp->tp_localdir == عدم)
+				    ? عدم : vim_strsave(tp->tp_localdir);
 
     // Create a new empty window.
-    if (win_alloc_firstwin(tp->tp_curwin) == OK)
+    إذا (win_alloc_firstwin(tp->tp_curwin) == OK)
     {
 	// Make the new Tab page the new topframe.
-	if (after == 1)
+	إذا (after == 1)
 	{
 	    // New tab page becomes the first one.
-	    newtp->tp_next = first_tabpage;
-	    first_tabpage = newtp;
+	    newtp->tp_ايندڙ = پهريون_tabpage;
+	    پهريون_tabpage = newtp;
 	}
-	else
+	وإلا
 	{
-	    if (after > 0)
+	    إذا (after > 0)
 	    {
 		// Put new tab page before tab page "after".
 		n = 2;
-		for (tp = first_tabpage; tp->tp_next != NULL
-					       && n < after; tp = tp->tp_next)
+		لكل (tp = پهريون_tabpage; tp->tp_ايندڙ != عدم
+					       && n < after; tp = tp->tp_ايندڙ)
 		    ++n;
 	    }
-	    newtp->tp_next = tp->tp_next;
-	    tp->tp_next = newtp;
+	    newtp->tp_ايندڙ = tp->tp_ايندڙ;
+	    tp->tp_ايندڙ = newtp;
 	}
 	newtp->tp_firstwin = newtp->tp_lastwin = newtp->tp_curwin = curwin;
 
-	win_init_size();
-	firstwin->w_winrow = tabline_height();
+	win_init_سائيز();
+	firstwin->w_winrow = tabline_اوچائي();
 	firstwin->w_prev_winrow = firstwin->w_winrow;
 	win_comp_scroll(curwin);
 
 	newtp->tp_topframe = topframe;
-	last_status(FALSE);
+	آخري_حالت(FALSE);
 
 	lastused_tabpage = prev_tp;
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 	// When 'guioptions' includes 'L' or 'R' may have to remove or add
 	// scrollbars.  Have to update them anyway.
 	gui_may_update_scrollbars();
-#endif
-#ifdef FEAT_JOB_CHANNEL
-	entering_window(curwin);
-#endif
-#if defined(FEAT_TABPANEL)
-	if (prev_columns != COLUMNS_WITHOUT_TPL())
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+	entering_دري(curwin);
+#جيڪڏهن_پورو
+#إذا defined(FEAT_TABPANEL)
+	إذا (prev_columns != COLUMNS_WITHOUT_TPL())
 	{
 	    tabpage_T	*tp2;
-	    int		w = COLUMNS_WITHOUT_TPL();
+	    صحيح		w = COLUMNS_WITHOUT_TPL();
 
 	    shell_new_columns();
 	    // shell_new_columns() only updates the current tab page; fix up
 	    // all others.
 	    FOR_ALL_TABPAGES(tp2)
-		if (tp2 != curtab)
+		إذا (tp2 != curtab)
 		{
-		    frame_new_width(tp2->tp_topframe, w, FALSE, TRUE);
-		    if (!frame_check_width(tp2->tp_topframe, w))
-			frame_new_width(tp2->tp_topframe, w, FALSE, FALSE);
+		    چوکٺو_new_ويڪر(tp2->tp_topframe, w, FALSE, TRUE);
+		    إذا (!چوکٺو_check_ويڪر(tp2->tp_topframe, w))
+			چوکٺو_new_ويڪر(tp2->tp_topframe, w, FALSE, FALSE);
 		}
 	}
-#endif
+#جيڪڏهن_پورو
 	redraw_all_later(UPD_NOT_VALID);
-	apply_autocmds(EVENT_WINNEW, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_TABNEW, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	return OK;
+	apply_autocmds(EVENT_WINNEW, عدم, عدم, FALSE, curbuf);
+	apply_autocmds(EVENT_WINENTER, عدم, عدم, FALSE, curbuf);
+	apply_autocmds(EVENT_TABNEW, عدم, عدم, FALSE, curbuf);
+	apply_autocmds(EVENT_TABENTER, عدم, عدم, FALSE, curbuf);
+	أرجع OK;
     }
 
     // Failed, get back the previous Tab page
     enter_tabpage(curtab, curbuf, TRUE, TRUE);
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
@@ -4939,69 +4939,69 @@ win_new_tabpage(int after)
  * like with ":split".
  * Returns OK if a new tab page was created, FAIL otherwise.
  */
-    static int
-may_open_tabpage(void)
+    ساكن صحيح
+may_open_tabpage(فراغ)
 {
-    int		n = (cmdmod.cmod_tab == 0)
-				       ? postponed_split_tab : cmdmod.cmod_tab;
+    صحيح		n = (cmdmod.cmod_tab == 0)
+				       ? postponed_ورهايو_tab : cmdmod.cmod_tab;
 
-    if (n == 0)
-	return FAIL;
+    إذا (n == 0)
+	أرجع FAIL;
 
     cmdmod.cmod_tab = 0;	    // reset it to avoid doing it twice
-    postponed_split_tab = 0;
-    return win_new_tabpage(n);
+    postponed_ورهايو_tab = 0;
+    أرجع win_new_tabpage(n);
 }
 
 /*
  * Create up to "maxcount" tabpages with empty windows.
  * Returns the number of resulting tab pages.
  */
-    int
-make_tabpages(int maxcount)
+    صحيح
+make_tabpages(صحيح maxcount)
 {
-    int		count = maxcount;
-    int		todo;
+    صحيح		ڳڻپ = maxcount;
+    صحيح		todo;
 
     // Limit to 'tabpagemax' tabs.
-    if (count > p_tpm)
-	count = p_tpm;
+    إذا (ڳڻپ > p_tpm)
+	ڳڻپ = p_tpm;
 
     /*
      * Don't execute autocommands while creating the tab pages.  Must do that
      * when putting the buffers in the windows.
      */
-    block_autocmds();
+    بلاڪ_autocmds();
 
-    for (todo = count - 1; todo > 0; --todo)
-	if (win_new_tabpage(0) == FAIL)
-	    break;
+    لكل (todo = ڳڻپ - 1; todo > 0; --todo)
+	إذا (win_new_tabpage(0) == FAIL)
+	    اكسر;
 
     unblock_autocmds();
 
     // return actual number of tab pages
-    return (count - todo);
+    أرجع (ڳڻپ - todo);
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page.
  */
-    int
+    صحيح
 valid_tabpage(tabpage_T *tpc)
 {
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp == tpc)
-	    return TRUE;
-    return FALSE;
+	إذا (tp == tpc)
+	    أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page and at least one window is
  * valid.
  */
-    int
+    صحيح
 valid_tabpage_win(tabpage_T *tpc)
 {
     tabpage_T	*tp;
@@ -5009,41 +5009,41 @@ valid_tabpage_win(tabpage_T *tpc)
 
     FOR_ALL_TABPAGES(tp)
     {
-	if (tp == tpc)
+	إذا (tp == tpc)
 	{
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
+	    FOR_ALL_WINDOWS_اندريون_TAB(tp, wp)
 	    {
-		if (win_valid_any_tab(wp))
-		    return TRUE;
+		إذا (win_valid_any_tab(wp))
+		    أرجع TRUE;
 	    }
-	    return FALSE;
+	    أرجع FALSE;
 	}
     }
     // shouldn't happen
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Close tabpage "tab", assuming it has no windows in it.
  * There must be another tabpage or this will crash.
  */
-    void
+    فراغ
 close_tabpage(tabpage_T *tab)
 {
     tabpage_T	*ptp;
 
-    if (tab == first_tabpage)
+    إذا (tab == پهريون_tabpage)
     {
-	first_tabpage = tab->tp_next;
-	ptp = first_tabpage;
+	پهريون_tabpage = tab->tp_ايندڙ;
+	ptp = پهريون_tabpage;
     }
-    else
+    وإلا
     {
-	for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tab;
-							    ptp = ptp->tp_next)
+	لكل (ptp = پهريون_tabpage; ptp != عدم && ptp->tp_ايندڙ != tab;
+							    ptp = ptp->tp_ايندڙ)
 	    ;
-	assert(ptp != NULL);
-	ptp->tp_next = tab->tp_next;
+	أكد(ptp != عدم);
+	ptp->tp_ايندڙ = tab->tp_ايندڙ;
     }
 
     goto_tabpage_tp(ptp, FALSE, FALSE);
@@ -5054,32 +5054,32 @@ close_tabpage(tabpage_T *tab)
  * Find tab page "n" (first one is 1).  Returns NULL when not found.
  */
     tabpage_T *
-find_tabpage(int n)
+ڳوليو_tabpage(صحيح n)
 {
     tabpage_T	*tp;
-    int		i = 1;
+    صحيح		i = 1;
 
-    if (n == 0)
-	return curtab;
+    إذا (n == 0)
+	أرجع curtab;
 
-    for (tp = first_tabpage; tp != NULL && i != n; tp = tp->tp_next)
+    لكل (tp = پهريون_tabpage; tp != عدم && i != n; tp = tp->tp_ايندڙ)
 	++i;
-    return tp;
+    أرجع tp;
 }
 
 /*
  * Get index of tab page "tp".  First one has index 1.
  * When not found returns number of tab pages plus one.
  */
-    int
-tabpage_index(tabpage_T *ftp)
+    صحيح
+tabpage_اشاريو(tabpage_T *ftp)
 {
-    int		i = 1;
+    صحيح		i = 1;
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL && tp != ftp; tp = tp->tp_next)
+    لكل (tp = پهريون_tabpage; tp != عدم && tp != ftp; tp = tp->tp_ايندڙ)
 	++i;
-    return i;
+    أرجع i;
 }
 
 /*
@@ -5088,57 +5088,57 @@ tabpage_index(tabpage_T *ftp)
  * FAIL.
  * Careful: When OK is returned need to get a new tab page very very soon!
  */
-    static int
+    ساكن صحيح
 leave_tabpage(
     buf_T	*new_curbuf,		// what is going to be the new curbuf,
 					// NULL if unknown
-    int		trigger_leave_autocmds)
+    صحيح		trigger_leave_autocmds)
 {
     tabpage_T	*tp = curtab;
 
-#ifdef FEAT_JOB_CHANNEL
-    leaving_window(curwin);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    leaving_دري(curwin);
+#جيڪڏهن_پورو
     reset_VIsual_and_resel();	// stop Visual mode
-    if (trigger_leave_autocmds)
+    إذا (trigger_leave_autocmds)
     {
-	if (new_curbuf != curbuf)
+	إذا (new_curbuf != curbuf)
 	{
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (curtab != tp)
-		return FAIL;
+	    apply_autocmds(EVENT_BUFLEAVE, عدم, عدم, FALSE, curbuf);
+	    إذا (curtab != tp)
+		أرجع FAIL;
 	}
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
-	apply_autocmds(EVENT_TABLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
+	apply_autocmds(EVENT_WINLEAVE, عدم, عدم, FALSE, curbuf);
+	إذا (curtab != tp)
+	    أرجع FAIL;
+	apply_autocmds(EVENT_TABLEAVE, عدم, عدم, FALSE, curbuf);
+	إذا (curtab != tp)
+	    أرجع FAIL;
     }
 
     reset_dragwin();
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
     // Remove the scrollbars.  They may be added back later.
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 	gui_remove_scrollbars();
-#endif
-#ifdef FEAT_IMAGE
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_IMAGE
     // Clear all image placements, they will be redrawn again if needed.
     clear_all_image_placements();
-#endif
+#جيڪڏهن_پورو
     tp->tp_curwin = curwin;
     tp->tp_prevwin = prevwin;
     tp->tp_firstwin = firstwin;
     tp->tp_lastwin = lastwin;
-    tp->tp_old_Rows = ROWS_AVAIL;
-    if (tp->tp_old_Columns != -1)
+    tp->tp_old_صفون = صفون_AVAIL;
+    إذا (tp->tp_old_Columns != -1)
     {
-	tp->tp_old_Columns = topframe->fr_width;
+	tp->tp_old_Columns = topframe->fr_ويڪر;
 	tp->tp_old_coloff = firstwin->w_wincol;
     }
-    firstwin = NULL;
-    lastwin = NULL;
-    return OK;
+    firstwin = عدم;
+    lastwin = عدم;
+    أرجع OK;
 }
 
 /*
@@ -5147,43 +5147,43 @@ leave_tabpage(
  * Only trigger *Enter autocommands when trigger_enter_autocmds is TRUE.
  * Only trigger *Leave autocommands when trigger_leave_autocmds is TRUE.
  */
-    static void
+    ساكن فراغ
 enter_tabpage(
     tabpage_T	*tp,
     buf_T	*old_curbuf,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    صحيح		trigger_enter_autocmds,
+    صحيح		trigger_leave_autocmds)
 {
-    int		old_off = tp->tp_firstwin->w_winrow;
-    win_T	*next_prevwin = tp->tp_prevwin;
-    tabpage_T	*last_tab = curtab;
+    صحيح		old_off = tp->tp_firstwin->w_winrow;
+    win_T	*ايندڙ_prevwin = tp->tp_prevwin;
+    tabpage_T	*آخري_tab = curtab;
 
     use_tabpage(tp);
 
-    if (p_ch != curtab->tp_ch_used)
+    إذا (p_ch != curtab->tp_ch_استعمال_ٿيل)
     {
 	// Use the stored value of p_ch, so that it can be different for each
 	// tab page.
-	int new_ch = curtab->tp_ch_used;
-	curtab->tp_ch_used = p_ch;
-	command_frame_height = FALSE;
-	set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
-	command_frame_height = TRUE;
+	صحيح new_ch = curtab->tp_ch_استعمال_ٿيل;
+	curtab->tp_ch_استعمال_ٿيل = p_ch;
+	command_چوکٺو_اوچائي = FALSE;
+	سيٽ_option_قدر((char_u *)"cmdheight", new_ch, عدم, 0);
+	command_چوکٺو_اوچائي = TRUE;
     }
 
     // We would like doing the TabEnter event first, but we don't have a
     // valid current window yet, which may break some commands.
     // This triggers autocommands, thus may make "tp" invalid.
-    (void)win_enter_ext(tp->tp_curwin, WEE_CURWIN_INVALID
+    (فراغ)win_enter_ext(tp->tp_curwin, WEE_CURWIN_INVALID
 		  | (trigger_enter_autocmds ? WEE_TRIGGER_ENTER_AUTOCMDS : 0)
 		  | (trigger_leave_autocmds ? WEE_TRIGGER_LEAVE_AUTOCMDS : 0));
-    prevwin = next_prevwin;
+    prevwin = ايندڙ_prevwin;
 
-    last_status(FALSE);		// status line may appear or disappear
+    آخري_حالت(FALSE);		// status line may appear or disappear
     win_comp_pos();		// recompute w_winrow for all windows
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     diff_need_scrollbind = TRUE;
-#endif
+#جيڪڏهن_پورو
 
     // If there was a click in a window, it won't be usable for a following
     // drag.
@@ -5192,40 +5192,40 @@ enter_tabpage(
     // The tabpage line may have appeared or disappeared, may need to resize
     // the frames for that.  When the Vim window was resized need to update
     // frame sizes too.
-    if (curtab->tp_old_Rows != ROWS_AVAIL || (old_off != firstwin->w_winrow
-#ifdef FEAT_GUI_TABLINE
+    إذا (curtab->tp_old_صفون != صفون_AVAIL || (old_off != firstwin->w_winrow
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_TABLINE
 			    && !gui_use_tabline()
-#endif
+#جيڪڏهن_پورو
 		))
-	shell_new_rows();
-    if (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
+	shell_new_صفون();
+    إذا (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
 	    || curtab->tp_old_coloff != TPL_LCOL())
     {
-	if (starting == 0)
+	إذا (starting == 0)
 	{
 	    shell_new_columns();	// update window widths
-	    curtab->tp_old_Columns = topframe->fr_width;
+	    curtab->tp_old_Columns = topframe->fr_ويڪر;
 	    curtab->tp_old_coloff = firstwin->w_wincol;
 	}
-	else
+	وإلا
 	    curtab->tp_old_Columns = -1;  // update window widths later
     }
 
-    lastused_tabpage = last_tab;
+    lastused_tabpage = آخري_tab;
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
-#endif
+#جيڪڏهن_پورو
 
     // Apply autocommands after updating the display, when 'rows' and
     // 'columns' have been set correctly.
-    if (trigger_enter_autocmds)
+    إذا (trigger_enter_autocmds)
     {
-	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	if (old_curbuf != curbuf)
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TABENTER, عدم, عدم, FALSE, curbuf);
+	إذا (old_curbuf != curbuf)
+	    apply_autocmds(EVENT_BUFENTER, عدم, عدم, FALSE, curbuf);
     }
 
     redraw_all_later(UPD_NOT_VALID);
@@ -5235,72 +5235,72 @@ enter_tabpage(
  * Go to tab page "n".  For ":tab N" and "Ngt".
  * When "n" is 9999 go to the last tab page.
  */
-    void
-goto_tabpage(int n)
+    فراغ
+goto_tabpage(صحيح n)
 {
-    tabpage_T	*tp = NULL;  // shut up compiler
+    tabpage_T	*tp = عدم;  // shut up compiler
     tabpage_T	*ttp;
-    int		i;
+    صحيح		i;
 
-    if (text_locked())
+    إذا (متن_locked())
     {
 	// Not allowed when editing the command line.
-	text_locked_msg();
-	return;
+	متن_locked_نياپو();
+	أرجع;
     }
 
     // If there is only one it can't work.
-    if (first_tabpage->tp_next == NULL)
+    إذا (پهريون_tabpage->tp_ايندڙ == عدم)
     {
-	if (n > 1)
+	إذا (n > 1)
 	    beep_flush();
-	return;
+	أرجع;
     }
 
-    if (n == 0)
+    إذا (n == 0)
     {
 	// No count, go to next tab page, wrap around end.
-	if (curtab->tp_next == NULL)
-	    tp = first_tabpage;
-	else
-	    tp = curtab->tp_next;
+	إذا (curtab->tp_ايندڙ == عدم)
+	    tp = پهريون_tabpage;
+	وإلا
+	    tp = curtab->tp_ايندڙ;
     }
-    else if (n < 0)
+    وإلا إذا (n < 0)
     {
 	// "gT": go to previous tab page, wrap around end.  "N gT" repeats
 	// this N times.
 	ttp = curtab;
-	for (i = n; i < 0; ++i)
+	لكل (i = n; i < 0; ++i)
 	{
-	    for (tp = first_tabpage; tp->tp_next != ttp && tp->tp_next != NULL;
-		    tp = tp->tp_next)
+	    لكل (tp = پهريون_tabpage; tp->tp_ايندڙ != ttp && tp->tp_ايندڙ != عدم;
+		    tp = tp->tp_ايندڙ)
 		;
 	    ttp = tp;
 	}
     }
-    else if (n == 9999)
+    وإلا إذا (n == 9999)
     {
 	// Go to last tab page.
-	for (tp = first_tabpage; tp->tp_next != NULL; tp = tp->tp_next)
+	لكل (tp = پهريون_tabpage; tp->tp_ايندڙ != عدم; tp = tp->tp_ايندڙ)
 	    ;
     }
-    else
+    وإلا
     {
 	// Go to tab page "n".
-	tp = find_tabpage(n);
-	if (tp == NULL)
+	tp = ڳوليو_tabpage(n);
+	إذا (tp == عدم)
 	{
 	    beep_flush();
-	    return;
+	    أرجع;
 	}
     }
 
     goto_tabpage_tp(tp, TRUE, TRUE);
 
-#ifdef FEAT_GUI_TABLINE
-    if (gui_use_tabline())
-	gui_mch_set_curtab(tabpage_index(curtab));
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_TABLINE
+    إذا (gui_use_tabline())
+	gui_mch_سيٽ_curtab(tabpage_اشاريو(curtab));
+#جيڪڏهن_پورو
 }
 
 /*
@@ -5309,26 +5309,26 @@ goto_tabpage(int n)
  * Only trigger *Leave autocommands when trigger_leave_autocmds is TRUE.
  * Note: doesn't update the GUI tab.
  */
-    void
+    فراغ
 goto_tabpage_tp(
     tabpage_T	*tp,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    صحيح		trigger_enter_autocmds,
+    صحيح		trigger_leave_autocmds)
 {
-    if (trigger_enter_autocmds || trigger_leave_autocmds)
+    إذا (trigger_enter_autocmds || trigger_leave_autocmds)
 	CHECK_CMDWIN;
 
     // Don't repeat a message in another tab page.
-    set_keep_msg(NULL, 0);
+    سيٽ_keep_نياپو(عدم, 0);
 
     skip_win_fix_scroll = TRUE;
-    if (tp != curtab && leave_tabpage(tp->tp_curwin->w_buffer,
+    إذا (tp != curtab && leave_tabpage(tp->tp_curwin->w_بفر,
 					trigger_leave_autocmds) == OK)
     {
-	if (valid_tabpage(tp))
+	إذا (valid_tabpage(tp))
 	    enter_tabpage(tp, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
-	else
+	وإلا
 	    enter_tabpage(curtab, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
     }
@@ -5339,88 +5339,88 @@ goto_tabpage_tp(
  * Go to the last accessed tab page, if there is one.
  * Return OK or FAIL
  */
-    int
-goto_tabpage_lastused(void)
+    صحيح
+goto_tabpage_lastused(فراغ)
 {
-    if (!valid_tabpage(lastused_tabpage))
-	return FAIL;
+    إذا (!valid_tabpage(lastused_tabpage))
+	أرجع FAIL;
 
     goto_tabpage_tp(lastused_tabpage, TRUE, TRUE);
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Enter window "wp" in tab page "tp".
  * Also updates the GUI tab.
  */
-    void
+    فراغ
 goto_tabpage_win(tabpage_T *tp, win_T *wp)
 {
     goto_tabpage_tp(tp, TRUE, TRUE);
-    if (curtab == tp && win_valid(wp))
+    إذا (curtab == tp && win_valid(wp))
     {
 	win_enter(wp, TRUE);
-#ifdef FEAT_GUI_TABLINE
-	if (gui_use_tabline())
-	    gui_mch_set_curtab(tabpage_index(curtab));
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_TABLINE
+	إذا (gui_use_tabline())
+	    gui_mch_سيٽ_curtab(tabpage_اشاريو(curtab));
+#جيڪڏهن_پورو
     }
 }
 
 /*
  * Move the current tab page to after tab page "nr".
  */
-    void
-tabpage_move(int nr)
+    فراغ
+tabpage_move(صحيح nr)
 {
-    int		n = 1;
+    صحيح		n = 1;
     tabpage_T	*tp, *tp_dst;
 
-    if (first_tabpage->tp_next == NULL)
-	return;
+    إذا (پهريون_tabpage->tp_ايندڙ == عدم)
+	أرجع;
 
-    if (tabpage_move_disallowed)
-	return;
+    إذا (tabpage_move_disallowed)
+	أرجع;
 
-    for (tp = first_tabpage; tp->tp_next != NULL && n < nr; tp = tp->tp_next)
+    لكل (tp = پهريون_tabpage; tp->tp_ايندڙ != عدم && n < nr; tp = tp->tp_ايندڙ)
 	++n;
 
-    if (tp == curtab || (nr > 0 && tp->tp_next != NULL
-						    && tp->tp_next == curtab))
-	return;
+    إذا (tp == curtab || (nr > 0 && tp->tp_ايندڙ != عدم
+						    && tp->tp_ايندڙ == curtab))
+	أرجع;
 
     tp_dst = tp;
 
     // Remove the current tab page from the list of tab pages.
-    if (curtab == first_tabpage)
-	first_tabpage = curtab->tp_next;
-    else
+    إذا (curtab == پهريون_tabpage)
+	پهريون_tabpage = curtab->tp_ايندڙ;
+    وإلا
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_next == curtab)
-		break;
-	if (tp == NULL)	// "cannot happen"
-	    return;
-	tp->tp_next = curtab->tp_next;
+	    إذا (tp->tp_ايندڙ == curtab)
+		اكسر;
+	إذا (tp == عدم)	// "cannot happen"
+	    أرجع;
+	tp->tp_ايندڙ = curtab->tp_ايندڙ;
     }
 
     // Re-insert it at the specified position.
-    if (nr <= 0)
+    إذا (nr <= 0)
     {
-	curtab->tp_next = first_tabpage;
-	first_tabpage = curtab;
+	curtab->tp_ايندڙ = پهريون_tabpage;
+	پهريون_tabpage = curtab;
     }
-    else
+    وإلا
     {
-	curtab->tp_next = tp_dst->tp_next;
-	tp_dst->tp_next = curtab;
+	curtab->tp_ايندڙ = tp_dst->tp_ايندڙ;
+	tp_dst->tp_ايندڙ = curtab;
     }
 
     // Need to redraw the tabline.  Tab page contents doesn't change.
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#جيڪڏهن_پورو
 }
 
 
@@ -5432,84 +5432,84 @@ tabpage_move(int nr)
  * When jumping to another window on the same buffer, adjust its cursor
  * position to keep the same Visual area.
  */
-    void
+    فراغ
 win_goto(win_T *wp)
 {
-#ifdef FEAT_CONCEAL
+#جيڪڏهن_وصف_ٿيل FEAT_CONCEAL
     win_T	*owp = curwin;
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (popup_is_popup(wp))
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (ERROR_IF_ANY_POPUP_دري)
+	أرجع;
+    إذا (popup_is_popup(wp))
     {
-	emsg(_(e_not_allowed_to_enter_popup_window));
-	return;
+	emsg(_(e_not_allowed_منزل_enter_popup_دري));
+	أرجع;
     }
-#endif
-    if (text_or_buf_locked())
+#جيڪڏهن_پورو
+    إذا (متن_or_buf_locked())
     {
 	beep_flush();
-	return;
+	أرجع;
     }
 
-    if (wp->w_buffer != curbuf)
+    إذا (wp->w_بفر != curbuf)
 	// careful: triggers ModeChanged autocommand
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    وإلا إذا (VIsual_سرگرم)
 	wp->w_cursor = curwin->w_cursor;
 
     // autocommand may have made wp invalid
-    if (!win_valid(wp))
-	return;
+    إذا (!win_valid(wp))
+	أرجع;
 
-#ifdef FEAT_GUI
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#جيڪڏهن_پورو
     win_enter(wp, TRUE);
 
-#ifdef FEAT_CONCEAL
+#جيڪڏهن_وصف_ٿيل FEAT_CONCEAL
     // Conceal cursor line in previous window, unconceal in current window.
-    if (win_valid(owp) && owp->w_p_cole > 0 && !msg_scrolled)
+    إذا (win_valid(owp) && owp->w_p_cole > 0 && !نياپو_scrolled)
 	redrawWinline(owp, owp->w_cursor.lnum);
-    if (curwin->w_p_cole > 0 && !msg_scrolled)
-	need_cursor_line_redraw = TRUE;
-#endif
+    إذا (curwin->w_p_cole > 0 && !نياپو_scrolled)
+	need_cursor_سٽ_redraw = TRUE;
+#جيڪڏهن_پورو
 }
 
-#if defined(FEAT_PERL)
+#إذا defined(FEAT_PERL)
 /*
  * Find window number "winnr" (counting top to bottom).
  */
     win_T *
-win_find_nr(int winnr)
+win_ڳوليو_nr(صحيح winnr)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (--winnr == 0)
-	    break;
-    return wp;
+	إذا (--winnr == 0)
+	    اكسر;
+    أرجع wp;
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#إذا defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Find the tabpage for window "win".
  */
     tabpage_T *
-win_find_tabpage(win_T *win)
+win_ڳوليو_tabpage(win_T *win)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp == win)
-		return tp;
-    return NULL;
+	    إذا (wp == win)
+		أرجع tp;
+    أرجع عدم;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Get the above or below neighbor window of the specified window.
@@ -5518,83 +5518,83 @@ win_find_tabpage(win_T *win)
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long count)
+win_vert_neighbor(tabpage_T *tp, win_T *wp, صحيح مٿي, ڊگهو ڳڻپ)
 {
-    frame_T	*fr;
-    frame_T	*nfr;
-    frame_T	*foundfr;
+    چوکٺو_T	*fr;
+    چوکٺو_T	*nfr;
+    چوکٺو_T	*foundfr;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
-#endif
-    foundfr = wp->w_frame;
-    while (count--)
+	أرجع عدم;
+#جيڪڏهن_پورو
+    foundfr = wp->w_چوکٺو;
+    طالما (ڳڻپ--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a upwards or
 	 * downwards neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	لكل (;;)
 	{
-	    if (fr == tp->tp_topframe)
-		goto end;
-	    if (up)
+	    إذا (fr == tp->tp_topframe)
+		اذهب پڇاڙي;
+	    إذا (مٿي)
 		nfr = fr->fr_prev;
-	    else
-		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_COL && nfr != NULL)
-		break;
-	    fr = fr->fr_parent;
+	    وإلا
+		nfr = fr->fr_ايندڙ;
+	    إذا (fr->fr_والد->fr_layout == FR_کانو && nfr != عدم)
+		اكسر;
+	    fr = fr->fr_والد;
 	}
 
 	/*
 	 * Now go downwards to find the bottom or top frame in it.
 	 */
-	for (;;)
+	لكل (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    إذا (nfr->fr_layout == FR_پن)
 	    {
 		foundfr = nfr;
-		break;
+		اكسر;
 	    }
-	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_ROW)
+	    fr = nfr->fr_ٻار;
+	    إذا (nfr->fr_layout == FR_صف)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
-			&& frame2win(fr)->w_wincol + fr->fr_width
+		طالما (fr->fr_ايندڙ != عدم
+			&& frame2win(fr)->w_wincol + fr->fr_ويڪر
 					 <= wp->w_wincol + wp->w_wcol)
-		    fr = fr->fr_next;
+		    fr = fr->fr_ايندڙ;
 	    }
-	    if (nfr->fr_layout == FR_COL && up)
-		while (fr->fr_next != NULL)
-		    fr = fr->fr_next;
+	    إذا (nfr->fr_layout == FR_کانو && مٿي)
+		طالما (fr->fr_ايندڙ != عدم)
+		    fr = fr->fr_ايندڙ;
 	    nfr = fr;
 	}
     }
-end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+پڇاڙي:
+    أرجع foundfr != عدم ? foundfr->fr_win : عدم;
 }
 
 /*
  * Move to window above or below "count" times.
  */
-    static void
+    ساكن فراغ
 win_goto_ver(
-    int		up,		// TRUE to go to win above
-    long	count)
+    صحيح		مٿي,		// TRUE to go to win above
+    ڊگهو	ڳڻپ)
 {
     win_T	*win;
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
-#endif
-    win = win_vert_neighbor(curtab, curwin, up, count);
-    if (win != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (ERROR_IF_رڪن_POPUP_دري)
+	أرجع;
+#جيڪڏهن_پورو
+    win = win_vert_neighbor(curtab, curwin, مٿي, ڳڻپ);
+    إذا (win != عدم)
 	win_goto(win);
 }
 
@@ -5605,93 +5605,93 @@ win_goto_ver(
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
+win_horz_neighbor(tabpage_T *tp, win_T *wp, صحيح کاٻو, ڊگهو ڳڻپ)
 {
-    frame_T	*fr;
-    frame_T	*nfr;
-    frame_T	*foundfr;
+    چوکٺو_T	*fr;
+    چوکٺو_T	*nfr;
+    چوکٺو_T	*foundfr;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
-#endif
-    foundfr = wp->w_frame;
-    while (count--)
+	أرجع عدم;
+#جيڪڏهن_پورو
+    foundfr = wp->w_چوکٺو;
+    طالما (ڳڻپ--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a left or
 	 * right neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	لكل (;;)
 	{
-	    if (fr == tp->tp_topframe)
-		goto end;
-	    if (left)
+	    إذا (fr == tp->tp_topframe)
+		اذهب پڇاڙي;
+	    إذا (کاٻو)
 		nfr = fr->fr_prev;
-	    else
-		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_ROW && nfr != NULL)
-		break;
-	    fr = fr->fr_parent;
+	    وإلا
+		nfr = fr->fr_ايندڙ;
+	    إذا (fr->fr_والد->fr_layout == FR_صف && nfr != عدم)
+		اكسر;
+	    fr = fr->fr_والد;
 	}
 
 	/*
 	 * Now go downwards to find the leftmost or rightmost frame in it.
 	 */
-	for (;;)
+	لكل (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    إذا (nfr->fr_layout == FR_پن)
 	    {
 		foundfr = nfr;
-		break;
+		اكسر;
 	    }
-	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_COL)
+	    fr = nfr->fr_ٻار;
+	    إذا (nfr->fr_layout == FR_کانو)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
-			&& frame2win(fr)->w_winrow + fr->fr_height
+		طالما (fr->fr_ايندڙ != عدم
+			&& frame2win(fr)->w_winrow + fr->fr_اوچائي
 					 <= wp->w_winrow + wp->w_wrow)
-		    fr = fr->fr_next;
+		    fr = fr->fr_ايندڙ;
 	    }
-	    if (nfr->fr_layout == FR_ROW && left)
-		while (fr->fr_next != NULL)
-		    fr = fr->fr_next;
+	    إذا (nfr->fr_layout == FR_صف && کاٻو)
+		طالما (fr->fr_ايندڙ != عدم)
+		    fr = fr->fr_ايندڙ;
 	    nfr = fr;
 	}
     }
-end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+پڇاڙي:
+    أرجع foundfr != عدم ? foundfr->fr_win : عدم;
 }
 
 /*
  * Move to left or right window.
  */
-    static void
+    ساكن فراغ
 win_goto_hor(
-    int		left,		// TRUE to go to left win
-    long	count)
+    صحيح		کاٻو,		// TRUE to go to left win
+    ڊگهو	ڳڻپ)
 {
     win_T	*win;
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
-#endif
-    win = win_horz_neighbor(curtab, curwin, left, count);
-    if (win != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (ERROR_IF_رڪن_POPUP_دري)
+	أرجع;
+#جيڪڏهن_پورو
+    win = win_horz_neighbor(curtab, curwin, کاٻو, ڳڻپ);
+    إذا (win != عدم)
 	win_goto(win);
 }
 
 /*
  * Make window "wp" the current window.
  */
-    void
-win_enter(win_T *wp, int undo_sync)
+    فراغ
+win_enter(win_T *wp, صحيح undo_sync)
 {
-    (void)win_enter_ext(wp, (undo_sync ? WEE_UNDO_SYNC : 0)
+    (فراغ)win_enter_ext(wp, (undo_sync ? WEE_UNDO_SYNC : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
 }
 
@@ -5699,41 +5699,41 @@ win_enter(win_T *wp, int undo_sync)
  * Used after making another window the current one: change directory if
  * needed.
  */
-    void
-win_fix_current_dir(void)
+    فراغ
+win_fix_current_dir(فراغ)
 {
-    if (curwin->w_localdir != NULL || curtab->tp_localdir != NULL)
+    إذا (curwin->w_localdir != عدم || curtab->tp_localdir != عدم)
     {
 	char_u	*dirname;
 
 	// Window or tab has a local directory: Save current directory as
 	// global directory (unless that was done already) and change to the
 	// local directory.
-	if (globaldir == NULL)
+	إذا (globaldir == عدم)
 	{
 	    char_u	cwd[MAXPATHL];
 
-	    if (mch_dirname(cwd, MAXPATHL) == OK)
+	    إذا (mch_dirname(cwd, MAXPATHL) == OK)
 		globaldir = vim_strsave(cwd);
 	}
-	if (curwin->w_localdir != NULL)
+	إذا (curwin->w_localdir != عدم)
 	    dirname = curwin->w_localdir;
-	else
+	وإلا
 	    dirname = curtab->tp_localdir;
 
-	if (mch_chdir((char *)dirname) == 0)
+	إذا (mch_chdir((حرف *)dirname) == 0)
 	{
-	    last_chdir_reason = NULL;
+	    آخري_chdir_reason = عدم;
 	    shorten_fnames(TRUE);
 	}
     }
-    else if (globaldir != NULL)
+    وإلا إذا (globaldir != عدم)
     {
 	// Window doesn't have a local directory and we are not in the global
 	// directory: Change to the global directory.
-	vim_ignored = mch_chdir((char *)globaldir);
+	vim_ignored = mch_chdir((حرف *)globaldir);
 	VIM_CLEAR(globaldir);
-	last_chdir_reason = NULL;
+	آخري_chdir_reason = عدم;
 	shorten_fnames(TRUE);
     }
 }
@@ -5744,137 +5744,137 @@ win_fix_current_dir(void)
  * curwin has just been closed and isn't valid.
  * Returns TRUE when dont_parse_messages was decremented.
  */
-    static int
-win_enter_ext(win_T *wp, int flags)
+    ساكن صحيح
+win_enter_ext(win_T *wp, صحيح flags)
 {
-    int		other_buffer = FALSE;
-    int		curwin_invalid = (flags & WEE_CURWIN_INVALID);
-    int		did_decrement = FALSE;
+    صحيح		other_بفر = FALSE;
+    صحيح		curwin_invalid = (flags & WEE_CURWIN_INVALID);
+    صحيح		did_decrement = FALSE;
 
-    if (wp == curwin && curwin_invalid == 0)	// nothing to do
-	return FALSE;
+    إذا (wp == curwin && curwin_invalid == 0)	// nothing to do
+	أرجع FALSE;
 
-#ifdef FEAT_JOB_CHANNEL
-    if (curwin_invalid == 0)
-	leaving_window(curwin);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    إذا (curwin_invalid == 0)
+	leaving_دري(curwin);
+#جيڪڏهن_پورو
 
-    if (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
+    إذا (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
     {
 	/*
 	 * Be careful: If autocommands delete the window, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	إذا (wp->w_بفر != curbuf)
 	{
-	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    other_buffer = TRUE;
-	    if (!win_valid(wp))
-		return FALSE;
+	    apply_autocmds(EVENT_BUFLEAVE, عدم, عدم, FALSE, curbuf);
+	    other_بفر = TRUE;
+	    إذا (!win_valid(wp))
+		أرجع FALSE;
 	}
-	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(wp))
-	    return FALSE;
-#ifdef FEAT_EVAL
+	apply_autocmds(EVENT_WINLEAVE, عدم, عدم, FALSE, curbuf);
+	إذا (!win_valid(wp))
+	    أرجع FALSE;
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FALSE;
-#endif
+	إذا (aborting())
+	    أرجع FALSE;
+#جيڪڏهن_پورو
     }
 
     // sync undo before leaving the current buffer
-    if ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_buffer)
+    إذا ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_بفر)
 	u_sync(FALSE);
 
     // Might need to scroll the old window before switching, e.g., when the
     // cursor was moved.
-    if (*p_spk == 'c' && curwin_invalid == 0)
+    إذا (*p_spk == 'c' && curwin_invalid == 0)
 	update_topline();
 
     // may have to copy the buffer options when 'cpo' contains 'S'
-    if (wp->w_buffer != curbuf)
-	buf_copy_options(wp->w_buffer, BCO_ENTER | BCO_NOHELP);
-    if (curwin_invalid == 0)
+    إذا (wp->w_بفر != curbuf)
+	buf_copy_options(wp->w_بفر, BCO_ENTER | BCO_NOHELP);
+    إذا (curwin_invalid == 0)
     {
 	prevwin = curwin;	// remember for CTRL-W p
-	curwin->w_redr_status = true;
+	curwin->w_redr_حالت = true;
     }
     curwin = wp;
-    curbuf = wp->w_buffer;
+    curbuf = wp->w_بفر;
     check_cursor();
-    if (!virtual_active())
+    إذا (!virtual_سرگرم())
 	curwin->w_cursor.coladd = 0;
-    if (*p_spk == 'c')		// assume cursor position needs updating
-	changed_line_abv_curs();
-    else
+    إذا (*p_spk == 'c')		// assume cursor position needs updating
+	بدليو_سٽ_abv_curs();
+    وإلا
 	// Make sure the cursor position is valid, either by moving the cursor
 	// or by scrolling the text.
 	win_fix_cursor(
-		get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL));
+		get_real_state() & (گهڻائي_عام|گهڻائي_CMDLINE|گهڻائي_TERMINAL));
 
     // Now it is OK to parse messages again, which may be needed in
     // autocommands.
-#ifdef MESSAGE_QUEUE
-    if (flags & WEE_ALLOW_PARSE_MESSAGES)
+#جيڪڏهن_وصف_ٿيل پيغام_قطار
+    إذا (flags & WEE_ALLOW_PARSE_MESSAGES)
     {
 	--dont_parse_messages;
 	did_decrement = TRUE;
     }
-#endif
+#جيڪڏهن_پورو
 
     win_fix_current_dir();
 
-#ifdef FEAT_JOB_CHANNEL
-    entering_window(curwin);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+    entering_دري(curwin);
+#جيڪڏهن_پورو
     // Careful: autocommands may close the window and make "wp" invalid
-    if (flags & WEE_TRIGGER_NEW_AUTOCMDS)
-	apply_autocmds(EVENT_WINNEW, NULL, NULL, FALSE, curbuf);
-    if (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
+    إذا (flags & WEE_TRIGGER_NEW_AUTOCMDS)
+	apply_autocmds(EVENT_WINNEW, عدم, عدم, FALSE, curbuf);
+    إذا (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
     {
-	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-	if (other_buffer)
-	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_WINENTER, عدم, عدم, FALSE, curbuf);
+	إذا (other_بفر)
+	    apply_autocmds(EVENT_BUFENTER, عدم, عدم, FALSE, curbuf);
     }
 
     maketitle();
-    curwin->w_redr_status = true;
-#ifdef FEAT_TERMINAL
-    if (bt_terminal(curwin->w_buffer))
+    curwin->w_redr_حالت = true;
+#جيڪڏهن_وصف_ٿيل FEAT_TERMINAL
+    إذا (bt_terminal(curwin->w_بفر))
 	// terminal is likely in another mode
-	redraw_mode = TRUE;
-#endif
+	redraw_گهڻائي = TRUE;
+#جيڪڏهن_پورو
     redraw_tabline = TRUE;
     redraw_vseps = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#جيڪڏهن_پورو
     // Need to schedule a redraw so that the vertical separator highlight is
     // updated for the new current window.  The status line redraw of curwin
     // is already requested via "curwin->w_redr_status".
     redraw_later(UPD_VALID);
-    if (restart_edit)
+    إذا (restart_edit)
 	redraw_later(UPD_VALID);	// causes status line redraw
 
     // set window height to desired minimal value
-    if (curwin->w_height < p_wh && !curwin->w_p_wfh
-#ifdef FEAT_PROP_POPUP
+    إذا (curwin->w_اوچائي < p_wh && !curwin->w_p_wfh
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
 	    && !popup_is_popup(curwin)
-#endif
+#جيڪڏهن_پورو
 	    )
-	win_setheight((int)p_wh);
-    else if (curwin->w_height == 0)
+	win_setheight((صحيح)p_wh);
+    وإلا إذا (curwin->w_اوچائي == 0)
 	win_setheight(1);
 
     // set window width to desired minimal value
-    if (curwin->w_width < p_wiw && !curwin->w_p_wfw)
-	win_setwidth((int)p_wiw);
+    إذا (curwin->w_ويڪر < p_wiw && !curwin->w_p_wfw)
+	win_setwidth((صحيح)p_wiw);
 
     setmouse();			// in case jumped to/from help buffer
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
 
-    return did_decrement;
+    أرجع did_decrement;
 }
 
 /*
@@ -5884,17 +5884,17 @@ win_enter_ext(win_T *wp, int flags)
     win_T *
 buf_jump_open_win(buf_T *buf)
 {
-    win_T	*wp = NULL;
+    win_T	*wp = عدم;
 
-    if (curwin->w_buffer == buf)
+    إذا (curwin->w_بفر == buf)
 	wp = curwin;
-    else
+    وإلا
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
-		break;
-    if (wp != NULL)
+	    إذا (wp->w_بفر == buf)
+		اكسر;
+    إذا (wp != عدم)
 	win_enter(wp, FALSE);
-    return wp;
+    أرجع wp;
 }
 
 /*
@@ -5908,34 +5908,34 @@ buf_jump_open_tab(buf_T *buf)
     win_T	*wp = buf_jump_open_win(buf);
     tabpage_T	*tp;
 
-    if (wp != NULL)
-	return wp;
+    إذا (wp != عدم)
+	أرجع wp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
+	إذا (tp != curtab)
 	{
-	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf)
-		    break;
-	    if (wp != NULL)
+	    FOR_ALL_WINDOWS_اندريون_TAB(tp, wp)
+		إذا (wp->w_بفر == buf)
+		    اكسر;
+	    إذا (wp != عدم)
 	    {
 		goto_tabpage_win(tp, wp);
-		if (curwin != wp)
-		    wp = NULL;	// something went wrong
-		break;
+		إذا (curwin != wp)
+		    wp = عدم;	// something went wrong
+		اكسر;
 	    }
 	}
-    return wp;
+    أرجع wp;
 }
 
-static int last_win_id = LOWEST_WIN_ID - 1;
+ساكن صحيح آخري_win_id = سڀ_کان_هيٺ_WIN_ID - 1;
 
 /*
  * Allocate a window structure and link it in the window list when "hidden" is
  * FALSE.
  */
-    static win_T *
-win_alloc(win_T *after, int hidden)
+    ساكن win_T *
+win_alloc(win_T *after, صحيح hidden)
 {
     win_T	*new_wp;
 
@@ -5943,47 +5943,47 @@ win_alloc(win_T *after, int hidden)
      * allocate window structure and linesizes arrays
      */
     new_wp = ALLOC_CLEAR_ONE(win_T);
-    if (new_wp == NULL)
-	return NULL;
+    إذا (new_wp == عدم)
+	أرجع عدم;
 
-    if (win_alloc_lines(new_wp) == FAIL)
+    إذا (win_alloc_سٽون(new_wp) == FAIL)
     {
 	vim_free(new_wp);
-	return NULL;
+	أرجع عدم;
     }
 
-    new_wp->w_id = ++last_win_id;
+    new_wp->w_id = ++آخري_win_id;
 
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
     // init w: variables
     new_wp->w_vars = dict_alloc_id(aid_newwin_wvars);
-    if (new_wp->w_vars == NULL)
+    إذا (new_wp->w_vars == عدم)
     {
 	win_free_lsize(new_wp);
 	vim_free(new_wp);
-	return NULL;
+	أرجع عدم;
     }
     init_var_dict(new_wp->w_vars, &new_wp->w_winvar, VAR_SCOPE);
-#endif
+#جيڪڏهن_پورو
 
     // Don't execute autocommands while the window is not properly
     // initialized yet.  gui_create_scrollbar() may trigger a FocusGained
     // event.
-    block_autocmds();
+    بلاڪ_autocmds();
 
     /*
      * link the window in the window list
      */
-    if (!hidden)
+    إذا (!hidden)
 	win_append(after, new_wp);
     new_wp->w_wincol = TPL_LCOL();
-    new_wp->w_width = COLUMNS_WITHOUT_TPL();
+    new_wp->w_ويڪر = COLUMNS_WITHOUT_TPL();
 
     // position the display and the cursor at the top of the file.
     new_wp->w_topline = 1;
-#ifdef FEAT_DIFF
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
     new_wp->w_topfill = 0;
-#endif
+#جيڪڏهن_پورو
     new_wp->w_botline = 2;
     new_wp->w_cursor.lnum = 1;
     new_wp->w_scbind_pos = 1;
@@ -5995,85 +5995,85 @@ win_alloc(win_T *after, int hidden)
 
     // We won't calculate w_fraction until resizing the window
     new_wp->w_fraction = 0;
-    new_wp->w_prev_fraction_row = -1;
+    new_wp->w_prev_fraction_صف = -1;
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+    إذا (gui.اندريون_use)
     {
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_LEFT],
-		SBAR_LEFT, new_wp);
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_RIGHT],
-		SBAR_RIGHT, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_کاٻو],
+		SBAR_کاٻو, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_ساڄو],
+		SBAR_ساڄو, new_wp);
     }
-#endif
-#ifdef FEAT_FOLDING
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
     foldInitWin(new_wp);
-#endif
+#جيڪڏهن_پورو
     unblock_autocmds();
-#ifdef FEAT_SEARCH_EXTRA
-    new_wp->w_next_match_id = 1000;  // up to 1000 can be picked by the user
-#endif
-    return new_wp;
+#جيڪڏهن_وصف_ٿيل FEAT_ڳولا_EXTRA
+    new_wp->w_ايندڙ_ميلاپ_id = 1000;  // up to 1000 can be picked by the user
+#جيڪڏهن_پورو
+    أرجع new_wp;
 }
 
 /*
  * Remove window 'wp' from the window list and free the structure.
  */
-    static void
+    ساكن فراغ
 win_free(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    int		i;
+    صحيح		i;
     buf_T	*buf;
     wininfo_T	*wip;
 
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
     clearFolding(wp);
-#endif
+#جيڪڏهن_پورو
 
     // reduce the reference count to the argument list.
     alist_unlink(wp->w_alist);
 
     // Don't execute autocommands while the window is halfway being deleted.
     // gui_mch_destroy_scrollbar() may trigger a FocusGained event.
-    block_autocmds();
+    بلاڪ_autocmds();
 
-#ifdef FEAT_LUA
-    lua_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_LUA
+    lua_دري_free(wp);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_MZSCHEME
-    mzscheme_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_MZSCHEME
+    mzscheme_دري_free(wp);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PERL
+#جيڪڏهن_وصف_ٿيل FEAT_PERL
     perl_win_free(wp);
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PYTHON
-    python_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON
+    python_دري_free(wp);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_PYTHON3
-    python3_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_PYTHON3
+    python3_دري_free(wp);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_TCL
-    tcl_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_TCL
+    tcl_دري_free(wp);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_RUBY
-    ruby_window_free(wp);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_RUBY
+    ruby_دري_free(wp);
+#جيڪڏهن_پورو
 
     remove_highlight_overrides(wp->w_hl);
     vim_free(wp->w_hl);
 
     // Free statusline click regions.
-    if (wp->w_stl_click != NULL)
+    إذا (wp->w_stl_click != عدم)
     {
-	for (i = 0; i < wp->w_stl_click_count; i++)
+	لكل (i = 0; i < wp->w_stl_click_ڳڻپ; i++)
 	    vim_free(wp->w_stl_click[i].funcname);
 	vim_free(wp->w_stl_click);
     }
@@ -6084,25 +6084,25 @@ win_free(
     vim_free(wp->w_lcs_chars.multispace);
     vim_free(wp->w_lcs_chars.leadmultispace);
 
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
     vars_clear(&wp->w_vars->dv_hashtab);	// free all w: variables
     hash_init(&wp->w_vars->dv_hashtab);
     unref_var_dict(wp->w_vars);
-#endif
+#جيڪڏهن_پورو
 
     {
 	tabpage_T	*ttp;
 
-	if (prevwin == wp)
-	    prevwin = NULL;
+	إذا (prevwin == wp)
+	    prevwin = عدم;
 	FOR_ALL_TABPAGES(ttp)
-	    if (ttp->tp_prevwin == wp)
-		ttp->tp_prevwin = NULL;
+	    إذا (ttp->tp_prevwin == wp)
+		ttp->tp_prevwin = عدم;
     }
     win_free_lsize(wp);
 
-    for (i = 0; i < wp->w_tagstacklen; ++i)
-	tagstack_clear_entry(&wp->w_tagstack[i]);
+    لكل (i = 0; i < wp->w_tagstacklen; ++i)
+	tagstack_clear_داخلا(&wp->w_tagstack[i]);
     vim_free(wp->w_localdir);
     vim_free(wp->w_prevdir);
 
@@ -6110,7 +6110,7 @@ win_free(
     // freed memory is re-used for another window.
     FOR_ALL_BUFFERS(buf)
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == wp)
+	    إذا (wip->wi_win == wp)
 	    {
 		wininfo_T	*wip2;
 
@@ -6118,66 +6118,66 @@ win_free(
 		// must be removed, it would never be used.
 		// Skip "wip" itself, otherwise Coverity complains.
 		FOR_ALL_BUF_WININFO(buf, wip2)
-		    if (wip2 != wip && wip2->wi_win == NULL)
+		    إذا (wip2 != wip && wip2->wi_win == عدم)
 		    {
-			if (wip2->wi_next != NULL)
-			    wip2->wi_next->wi_prev = wip2->wi_prev;
-			if (wip2->wi_prev == NULL)
-			    buf->b_wininfo = wip2->wi_next;
-			else
-			    wip2->wi_prev->wi_next = wip2->wi_next;
+			إذا (wip2->wi_ايندڙ != عدم)
+			    wip2->wi_ايندڙ->wi_prev = wip2->wi_prev;
+			إذا (wip2->wi_prev == عدم)
+			    buf->b_wininfo = wip2->wi_ايندڙ;
+			وإلا
+			    wip2->wi_prev->wi_ايندڙ = wip2->wi_ايندڙ;
 			free_wininfo(wip2);
-			break;
+			اكسر;
 		    }
 
-		wip->wi_win = NULL;
+		wip->wi_win = عدم;
 	    }
 
-#ifdef FEAT_SEARCH_EXTRA
+#جيڪڏهن_وصف_ٿيل FEAT_ڳولا_EXTRA
     clear_matches(wp);
-#endif
+#جيڪڏهن_پورو
 
     free_jumplist(wp);
 
-#ifdef FEAT_QUICKFIX
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
     qf_free_all(wp);
-#endif
+#جيڪڏهن_پورو
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+    إذا (gui.اندريون_use)
     {
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_LEFT]);
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_RIGHT]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_کاٻو]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_ساڄو]);
     }
-#endif // FEAT_GUI
+#جيڪڏهن_پورو // FEAT_GUI
 
-#ifdef FEAT_MENU
+#جيڪڏهن_وصف_ٿيل FEAT_MENU
     remove_winbar(wp);
-#endif
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
     free_callback(&wp->w_close_cb);
     free_callback(&wp->w_filter_cb);
-    for (i = 0; i < 4; ++i)
+    لكل (i = 0; i < 4; ++i)
 	VIM_CLEAR(wp->w_border_highlight[i]);
     vim_free(wp->w_scrollbar_highlight);
     vim_free(wp->w_thumb_highlight);
     vim_free(wp->w_popup_title);
-    list_unref(wp->w_popup_mask);
-    vim_free(wp->w_popup_mask_cells);
-#endif
+    list_unref(wp->w_popup_نقاب);
+    vim_free(wp->w_popup_نقاب_cells);
+#جيڪڏهن_پورو
 
-#ifdef FEAT_SYN_HL
-    vim_free(wp->w_p_cc_cols);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_SYN_HL
+    vim_free(wp->w_p_cc_کانن_ڳڻپ);
+#جيڪڏهن_پورو
 
-    if (win_valid_any_tab(wp))
+    إذا (win_valid_any_tab(wp))
 	win_remove(wp, tp);
-    if (autocmd_busy)
+    إذا (autocmd_busy)
     {
-	wp->w_next = au_pending_free_win;
+	wp->w_ايندڙ = au_pending_free_win;
 	au_pending_free_win = wp;
     }
-    else
+    وإلا
 	vim_free(wp);
 
     unblock_autocmds();
@@ -6187,153 +6187,153 @@ win_free(
  * Return TRUE if "wp" is not in the list of windows: the autocmd window or a
  * popup window.
  */
-    int
+    صحيح
 win_unlisted(win_T *wp)
 {
-    return is_aucmd_win(wp) || WIN_IS_POPUP(wp);
+    أرجع is_aucmd_win(wp) || WIN_IS_POPUP(wp);
 }
 
-#if defined(FEAT_PROP_POPUP)
+#إذا defined(FEAT_PROP_POPUP)
 /*
  * Free a popup window.  This does not take the window out of the window list
  * and assumes there is only one toplevel frame, no split.
  */
-    void
+    فراغ
 win_free_popup(win_T *win)
 {
-    if (win->w_buffer != NULL)
+    إذا (win->w_بفر != عدم)
     {
-	if (bt_popup(win->w_buffer))
-	    win_close_buffer(win, DOBUF_WIPE_REUSE, FALSE);
-	else
-	    close_buffer(win, win->w_buffer, 0, FALSE, FALSE, TRUE);
+	إذا (bt_popup(win->w_بفر))
+	    win_close_بفر(win, DOBUF_WIPE_REUSE, FALSE);
+	وإلا
+	    close_بفر(win, win->w_بفر, 0, FALSE, FALSE, TRUE);
 
-	if (win->w_buffer != NULL)
-	    --win->w_buffer->b_nwindows;
+	إذا (win->w_بفر != عدم)
+	    --win->w_بفر->b_nwindows;
     }
-# if defined(FEAT_TIMERS)
+# إذا defined(FEAT_TIMERS)
     // the timer may have been cleared, making the pointer invalid
-    if (timer_valid(win->w_popup_timer))
+    إذا (timer_valid(win->w_popup_timer))
 	stop_timer(win->w_popup_timer);
 # endif
-    vim_free(win->w_frame);
-    win_free(win, NULL);
+    vim_free(win->w_چوکٺو);
+    win_free(win, عدم);
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Append window "wp" in the window list after window "after".
  */
-    static void
+    ساكن فراغ
 win_append(win_T *after, win_T *wp)
 {
     win_T	*before;
 
-    if (after == NULL)	    // after NULL is in front of the first
+    إذا (after == عدم)	    // after NULL is in front of the first
 	before = firstwin;
-    else
-	before = after->w_next;
+    وإلا
+	before = after->w_ايندڙ;
 
-    wp->w_next = before;
+    wp->w_ايندڙ = before;
     wp->w_prev = after;
-    if (after == NULL)
+    إذا (after == عدم)
 	firstwin = wp;
-    else
-	after->w_next = wp;
-    if (before == NULL)
+    وإلا
+	after->w_ايندڙ = wp;
+    إذا (before == عدم)
 	lastwin = wp;
-    else
+    وإلا
 	before->w_prev = wp;
 }
 
 /*
  * Remove a window from the window list.
  */
-    void
+    فراغ
 win_remove(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    if (wp->w_prev != NULL)
-	wp->w_prev->w_next = wp->w_next;
-    else if (tp == NULL)
-	firstwin = curtab->tp_firstwin = wp->w_next;
-    else
-	tp->tp_firstwin = wp->w_next;
+    إذا (wp->w_prev != عدم)
+	wp->w_prev->w_ايندڙ = wp->w_ايندڙ;
+    وإلا إذا (tp == عدم)
+	firstwin = curtab->tp_firstwin = wp->w_ايندڙ;
+    وإلا
+	tp->tp_firstwin = wp->w_ايندڙ;
 
-    if (wp->w_next != NULL)
-	wp->w_next->w_prev = wp->w_prev;
-    else if (tp == NULL)
+    إذا (wp->w_ايندڙ != عدم)
+	wp->w_ايندڙ->w_prev = wp->w_prev;
+    وإلا إذا (tp == عدم)
 	lastwin = curtab->tp_lastwin = wp->w_prev;
-    else
+    وإلا
 	tp->tp_lastwin = wp->w_prev;
 }
 
 /*
  * Append frame "frp" in a frame list after frame "after".
  */
-    static void
-frame_append(frame_T *after, frame_T *frp)
+    ساكن فراغ
+چوکٺو_append(چوکٺو_T *after, چوکٺو_T *frp)
 {
-    frp->fr_next = after->fr_next;
-    after->fr_next = frp;
-    if (frp->fr_next != NULL)
-	frp->fr_next->fr_prev = frp;
+    frp->fr_ايندڙ = after->fr_ايندڙ;
+    after->fr_ايندڙ = frp;
+    إذا (frp->fr_ايندڙ != عدم)
+	frp->fr_ايندڙ->fr_prev = frp;
     frp->fr_prev = after;
 }
 
 /*
  * Insert frame "frp" in a frame list before frame "before".
  */
-    static void
-frame_insert(frame_T *before, frame_T *frp)
+    ساكن فراغ
+چوکٺو_وجهو(چوکٺو_T *before, چوکٺو_T *frp)
 {
-    frp->fr_next = before;
+    frp->fr_ايندڙ = before;
     frp->fr_prev = before->fr_prev;
     before->fr_prev = frp;
-    if (frp->fr_prev != NULL)
-	frp->fr_prev->fr_next = frp;
-    else
-	frp->fr_parent->fr_child = frp;
+    إذا (frp->fr_prev != عدم)
+	frp->fr_prev->fr_ايندڙ = frp;
+    وإلا
+	frp->fr_والد->fr_ٻار = frp;
 }
 
 /*
  * Remove a frame from a frame list.
  */
-    static void
-frame_remove(frame_T *frp)
+    ساكن فراغ
+چوکٺو_remove(چوکٺو_T *frp)
 {
-    if (frp->fr_prev != NULL)
-	frp->fr_prev->fr_next = frp->fr_next;
-    else
-	frp->fr_parent->fr_child = frp->fr_next;
-    if (frp->fr_next != NULL)
-	frp->fr_next->fr_prev = frp->fr_prev;
+    إذا (frp->fr_prev != عدم)
+	frp->fr_prev->fr_ايندڙ = frp->fr_ايندڙ;
+    وإلا
+	frp->fr_والد->fr_ٻار = frp->fr_ايندڙ;
+    إذا (frp->fr_ايندڙ != عدم)
+	frp->fr_ايندڙ->fr_prev = frp->fr_prev;
 }
 
 /*
  * Allocate w_lines[] for window "wp".
  * Return FAIL for failure, OK for success.
  */
-    int
-win_alloc_lines(win_T *wp)
+    صحيح
+win_alloc_سٽون(win_T *wp)
 {
-    wp->w_lines_valid = 0;
-    wp->w_lines = ALLOC_CLEAR_MULT(wline_T, Rows);
-    if (wp->w_lines == NULL)
-	return FAIL;
-    return OK;
+    wp->w_سٽون_valid = 0;
+    wp->w_سٽون = ALLOC_CLEAR_MULT(wline_T, صفون);
+    إذا (wp->w_سٽون == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * free lsize arrays for a window
  */
-    void
+    فراغ
 win_free_lsize(win_T *wp)
 {
     // TODO: why would wp be NULL here?
-    if (wp != NULL)
-	VIM_CLEAR(wp->w_lines);
+    إذا (wp != عدم)
+	VIM_CLEAR(wp->w_سٽون);
 }
 
 /*
@@ -6342,119 +6342,119 @@ win_free_lsize(win_T *wp)
  * Note: When called together with shell_new_columns(), call shell_new_columns()
  * first to avoid this function updating firstwin->w_wincol first.
  */
-    void
-shell_new_rows(void)
+    فراغ
+shell_new_صفون(فراغ)
 {
-    int		h = (int)ROWS_AVAIL;
+    صحيح		h = (صحيح)صفون_AVAIL;
 
-    if (firstwin == NULL)	// not initialized yet
-	return;
-    if (h < frame_minheight(topframe, NULL))
-	h = frame_minheight(topframe, NULL);
+    إذا (firstwin == عدم)	// not initialized yet
+	أرجع;
+    إذا (h < چوکٺو_minheight(topframe, عدم))
+	h = چوکٺو_minheight(topframe, عدم);
 
     // First try setting the heights of windows with 'winfixheight'.  If that
     // doesn't result in the right height, forget about that option.
-    frame_new_height(topframe, h, FALSE, TRUE, FALSE);
-    if (!frame_check_height(topframe, h))
-	frame_new_height(topframe, h, FALSE, FALSE, FALSE);
+    چوکٺو_new_اوچائي(topframe, h, FALSE, TRUE, FALSE);
+    إذا (!چوکٺو_check_اوچائي(topframe, h))
+	چوکٺو_new_اوچائي(topframe, h, FALSE, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
     compute_cmdrow();
-    curtab->tp_ch_used = p_ch;
+    curtab->tp_ch_استعمال_ٿيل = p_ch;
 
-    if (!skip_win_fix_scroll)
+    إذا (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if 0
+#جيڪڏهن_پورو
+#إذا 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    إذا (p_ea)
 	win_equal(curwin, FALSE, 'v');
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Called from win_new_shellsize() after Columns changed.
  */
-    void
-shell_new_columns(void)
+    فراغ
+shell_new_columns(فراغ)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return;
+    إذا (firstwin == عدم)	// not initialized yet
+	أرجع;
 
-#if defined(FEAT_TABPANEL)
-    static int prev_tp_width;
-    static int prev_wincol;
-    static int prev_fr_width;
-#endif
-    int w = COLUMNS_WITHOUT_TPL();
+#إذا defined(FEAT_TABPANEL)
+    ساكن صحيح prev_tp_ويڪر;
+    ساكن صحيح prev_wincol;
+    ساكن صحيح prev_fr_ويڪر;
+#جيڪڏهن_پورو
+    صحيح w = COLUMNS_WITHOUT_TPL();
 
     // First try setting the widths of windows with 'winfixwidth'.  If that
     // doesn't result in the right width, forget about that option.
-    frame_new_width(topframe, w, FALSE, TRUE);
-    if (!frame_check_width(topframe, w))
-	frame_new_width(topframe, w, FALSE, FALSE);
+    چوکٺو_new_ويڪر(topframe, w, FALSE, TRUE);
+    إذا (!چوکٺو_check_ويڪر(topframe, w))
+	چوکٺو_new_ويڪر(topframe, w, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
 
-#if defined(FEAT_TABPANEL)
-    int tp_width = tabpanel_width();
-    int tp_width_changed = tp_width != prev_tp_width;
+#إذا defined(FEAT_TABPANEL)
+    صحيح tp_ويڪر = tabpanel_ويڪر();
+    صحيح tp_ويڪر_بدليو = tp_ويڪر != prev_tp_ويڪر;
     // tabpanel width changed
-    if (tp_width_changed && p_ea)
+    إذا (tp_ويڪر_بدليو && p_ea)
 	win_equal(curwin, FALSE, 0);
     // tabpanel layout changed
-    if (tp_width_changed
-	    || (tp_width > 0 && (firstwin->w_wincol != prev_wincol
-		    || topframe->fr_width != prev_fr_width)))
+    إذا (tp_ويڪر_بدليو
+	    || (tp_ويڪر > 0 && (firstwin->w_wincol != prev_wincol
+		    || topframe->fr_ويڪر != prev_fr_ويڪر)))
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
+	screen_fill(cmdline_صف, (صحيح)صفون, 0, (صحيح)Columns, ' ', ' ', 0);
     }
-    prev_tp_width = tabpanel_width();
+    prev_tp_ويڪر = tabpanel_ويڪر();
     prev_wincol = firstwin->w_wincol;
-    prev_fr_width = topframe->fr_width;
-#endif
+    prev_fr_ويڪر = topframe->fr_ويڪر;
+#جيڪڏهن_پورو
     // Adjust offset for command line start column
-    cmdline_col_off = firstwin->w_wincol;
-    cmdline_width = topframe->fr_width;
-    comp_col();
-    if (!skip_win_fix_scroll)
+    cmdline_کانو_off = firstwin->w_wincol;
+    cmdline_ويڪر = topframe->fr_ويڪر;
+    comp_کانو();
+    إذا (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
-#if 0
+#جيڪڏهن_پورو
+#إذا 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    إذا (p_ea)
 	win_equal(curwin, FALSE, 'h');
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Save the size of all windows in "gap".
  */
-    void
-win_size_save(garray_T *gap)
+    فراغ
+win_سائيز_save(garray_T *gap)
 {
     win_T	*wp;
 
-    ga_init2(gap, sizeof(int), 1);
-    if (ga_grow(gap, win_count() * 2 + 1) == FAIL)
-	return;
+    ga_init2(gap, حجم(صحيح), 1);
+    إذا (ga_grow(gap, win_ڳڻپ() * 2 + 1) == FAIL)
+	أرجع;
 
     // first entry is the total lines available for windows
-    ((int *)gap->ga_data)[gap->ga_len++] = ROWS_AVAIL - last_stl_height(FALSE);
+    ((صحيح *)gap->ga_معلومات)[gap->ga_len++] = صفون_AVAIL - آخري_stl_اوچائي(FALSE);
 
     FOR_ALL_WINDOWS(wp)
     {
-	((int *)gap->ga_data)[gap->ga_len++] =
-	    wp->w_width + wp->w_vsep_width;
-	((int *)gap->ga_data)[gap->ga_len++] = wp->w_height;
+	((صحيح *)gap->ga_معلومات)[gap->ga_len++] =
+	    wp->w_ويڪر + wp->w_vsep_ويڪر;
+	((صحيح *)gap->ga_معلومات)[gap->ga_len++] = wp->w_اوچائي;
     }
 }
 
@@ -6463,24 +6463,24 @@ win_size_save(garray_T *gap)
  * and total lines available for windows didn't change.
  * Does not free the growarray.
  */
-    void
-win_size_restore(garray_T *gap)
+    فراغ
+win_سائيز_restore(garray_T *gap)
 {
     win_T	*wp;
-    int		i, j;
+    صحيح		i, j;
 
-    if (win_count() * 2 + 1 == gap->ga_len
-	    && ((int *)gap->ga_data)[0] == ROWS_AVAIL - last_stl_height(FALSE))
+    إذا (win_ڳڻپ() * 2 + 1 == gap->ga_len
+	    && ((صحيح *)gap->ga_معلومات)[0] == صفون_AVAIL - آخري_stl_اوچائي(FALSE))
     {
 	// The order matters, because frames contain other frames, but it's
 	// difficult to get right. The easy way out is to do it twice.
-	for (j = 0; j < 2; ++j)
+	لكل (j = 0; j < 2; ++j)
 	{
 	    i = 1;
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		frame_setwidth(wp->w_frame, ((int *)gap->ga_data)[i++]);
-		win_setheight_win(((int *)gap->ga_data)[i++], wp);
+		چوکٺو_setwidth(wp->w_چوکٺو, ((صحيح *)gap->ga_معلومات)[i++]);
+		win_setheight_win(((صحيح *)gap->ga_معلومات)[i++], wp);
 	    }
 	}
 	// recompute the window positions
@@ -6493,16 +6493,16 @@ win_size_restore(garray_T *gap)
  * frames.
  * Returns the row just after the last window.
  */
-    void
-win_comp_pos(void)
+    فراغ
+win_comp_pos(فراغ)
 {
-    int		row = tabline_height();
-    int		col = TPL_LCOL();
+    صحيح		صف = tabline_اوچائي();
+    صحيح		کانو = TPL_LCOL();
 
-    frame_comp_pos(topframe, &row, &col);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    چوکٺو_comp_pos(topframe, &صف, &کانو);
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
 }
 
 /*
@@ -6511,42 +6511,42 @@ win_comp_pos(void)
  * "*row" and "*col" are the top-left position of the frame.  They are updated
  * to the bottom-right position plus one.
  */
-    static void
-frame_comp_pos(frame_T *topfrp, int *row, int *col)
+    ساكن فراغ
+چوکٺو_comp_pos(چوکٺو_T *topfrp, صحيح *صف, صحيح *کانو)
 {
     win_T	*wp;
-    frame_T	*frp;
-    int		startcol;
-    int		startrow;
-    int		h;
+    چوکٺو_T	*frp;
+    صحيح		startcol;
+    صحيح		startrow;
+    صحيح		h;
 
     wp = topfrp->fr_win;
-    if (wp != NULL)
+    إذا (wp != عدم)
     {
-	if (wp->w_winrow != *row || wp->w_wincol != *col)
+	إذا (wp->w_winrow != *صف || wp->w_wincol != *کانو)
 	{
 	    // position changed, redraw
-	    wp->w_winrow = *row;
-	    wp->w_wincol = *col;
+	    wp->w_winrow = *صف;
+	    wp->w_wincol = *کانو;
 	    redraw_win_later(wp, UPD_NOT_VALID);
-	    wp->w_redr_status = true;
+	    wp->w_redr_حالت = true;
 	}
 	// WinBar will not show if the window height is zero
-	h = VISIBLE_HEIGHT(wp) + wp->w_status_height;
-	*row += h > topfrp->fr_height ? topfrp->fr_height : h;
-	*col += wp->w_width + wp->w_vsep_width;
+	h = VISIBLE_اوچائي(wp) + wp->w_حالت_اوچائي;
+	*صف += h > topfrp->fr_اوچائي ? topfrp->fr_اوچائي : h;
+	*کانو += wp->w_ويڪر + wp->w_vsep_ويڪر;
     }
-    else
+    وإلا
     {
-	startrow = *row;
-	startcol = *col;
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
+	startrow = *صف;
+	startcol = *کانو;
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
 	{
-	    if (topfrp->fr_layout == FR_ROW)
-		*row = startrow;	// all frames are at the same row
-	    else
-		*col = startcol;	// all frames are at the same col
-	    frame_comp_pos(frp, row, col);
+	    إذا (topfrp->fr_layout == FR_صف)
+		*صف = startrow;	// all frames are at the same row
+	    وإلا
+		*کانو = startcol;	// all frames are at the same col
+	    چوکٺو_comp_pos(frp, صف, کانو);
 	}
     }
 }
@@ -6554,12 +6554,12 @@ frame_comp_pos(frame_T *topfrp, int *row, int *col)
 /*
  * Make the current window show at least one line and one column.
  */
-    void
-win_ensure_size(void)
+    فراغ
+win_ensure_سائيز(فراغ)
 {
-    if (curwin->w_height == 0)
+    إذا (curwin->w_اوچائي == 0)
 	win_setheight(1);
-    if (curwin->w_width == 0)
+    إذا (curwin->w_ويڪر == 0)
 	win_setwidth(1);
 }
 
@@ -6567,34 +6567,34 @@ win_ensure_size(void)
  * Set current window height and take care of repositioning other windows to
  * fit around it.
  */
-    void
-win_setheight(int height)
+    فراغ
+win_setheight(صحيح اوچائي)
 {
-    win_setheight_win(height, curwin);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    win_setheight_win(اوچائي, curwin);
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
 }
 
 /*
  * Set the window height of window "win" and take care of repositioning other
  * windows to fit around it.
  */
-    void
-win_setheight_win(int height, win_T *win)
+    فراغ
+win_setheight_win(صحيح اوچائي, win_T *win)
 {
-    if (win == curwin)
+    إذا (win == curwin)
     {
 	// Always keep current window at least one line high, even when
 	// 'winminheight' is zero.
-	if (height < p_wmh)
-	    height = p_wmh;
-	if (height == 0)
-	    height = 1;
-	height += WINBAR_HEIGHT(curwin);
+	إذا (اوچائي < p_wmh)
+	    اوچائي = p_wmh;
+	إذا (اوچائي == 0)
+	    اوچائي = 1;
+	اوچائي += WINBAR_اوچائي(curwin);
     }
 
-    frame_setheight(win->w_frame, height + win->w_status_height);
+    چوکٺو_setheight(win->w_چوکٺو, اوچائي + win->w_حالت_اوچائي);
 
     // recompute the window positions
     win_comp_pos();
@@ -6616,37 +6616,37 @@ win_setheight_win(int height, win_T *win)
  * Check for the minimal height of the FR_ROW frame.
  * At the top level we can also use change the command line height.
  */
-    static void
-frame_setheight(frame_T *curfrp, int height)
+    ساكن فراغ
+چوکٺو_setheight(چوکٺو_T *curfrp, صحيح اوچائي)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		room_cmdline;	// lines available from cmdline
-    int		run;
-    frame_T	*frp;
-    int		h;
-    int		room_reserved;
+    صحيح		گنجائش;		// total number of lines available
+    صحيح		take;		// number of lines taken from other windows
+    صحيح		گنجائش_cmdline;	// lines available from cmdline
+    صحيح		لاڳيتو;
+    چوکٺو_T	*frp;
+    صحيح		h;
+    صحيح		گنجائش_reserved;
 
     // If the height already is the desired value, nothing to do.
-    if (curfrp->fr_height == height)
-	return;
+    إذا (curfrp->fr_اوچائي == اوچائي)
+	أرجع;
 
-    if (curfrp->fr_parent == NULL)
+    إذا (curfrp->fr_والد == عدم)
     {
 	// topframe: can only change the command line height
-	if (height > 0)
-	    frame_new_height(curfrp, height, FALSE, FALSE, TRUE);
+	إذا (اوچائي > 0)
+	    چوکٺو_new_اوچائي(curfrp, اوچائي, FALSE, FALSE, TRUE);
     }
-    else if (curfrp->fr_parent->fr_layout == FR_ROW)
+    وإلا إذا (curfrp->fr_والد->fr_layout == FR_صف)
     {
 	// Row of frames: Also need to resize frames left and right of this
 	// one.  First check for the minimal height of these.
-	h = frame_minheight(curfrp->fr_parent, NULL);
-	if (height < h)
-	    height = h;
-	frame_setheight(curfrp->fr_parent, height);
+	h = چوکٺو_minheight(curfrp->fr_والد, عدم);
+	إذا (اوچائي < h)
+	    اوچائي = h;
+	چوکٺو_setheight(curfrp->fr_والد, اوچائي);
     }
-    else
+    وإلا
     {
 	/*
 	 * Column of frames: try to change only frames in this column.
@@ -6658,118 +6658,118 @@ frame_setheight(frame_T *curfrp, int height)
 	 * 2: compute the room available and adjust the height to it.
 	 * Try not to reduce the height of a window with 'winfixheight' set.
 	 */
-	for (run = 1; run <= 2; ++run)
+	لكل (لاڳيتو = 1; لاڳيتو <= 2; ++لاڳيتو)
 	{
-	    room = 0;
-	    room_reserved = 0;
-	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
+	    گنجائش = 0;
+	    گنجائش_reserved = 0;
+	    FOR_ALL_چوکٺا(frp, curfrp->fr_والد->fr_ٻار)
 	    {
-		if (frp != curfrp
-			&& frp->fr_win != NULL
+		إذا (frp != curfrp
+			&& frp->fr_win != عدم
 			&& frp->fr_win->w_p_wfh)
-		    room_reserved += frp->fr_height;
-		room += frp->fr_height;
-		if (frp != curfrp)
-		    room -= frame_minheight(frp, NULL);
+		    گنجائش_reserved += frp->fr_اوچائي;
+		گنجائش += frp->fr_اوچائي;
+		إذا (frp != curfrp)
+		    گنجائش -= چوکٺو_minheight(frp, عدم);
 	    }
-	    if (curfrp->fr_width != topframe->fr_width)
-		room_cmdline = 0;
-	    else
+	    إذا (curfrp->fr_ويڪر != topframe->fr_ويڪر)
+		گنجائش_cmdline = 0;
+	    وإلا
 	    {
-		room_cmdline = Rows - p_ch - (lastwin->w_winrow
-						+ VISIBLE_HEIGHT(lastwin)
-						+ lastwin->w_status_height);
-		if (room_cmdline < 0)
-		    room_cmdline = 0;
+		گنجائش_cmdline = صفون - p_ch - (lastwin->w_winrow
+						+ VISIBLE_اوچائي(lastwin)
+						+ lastwin->w_حالت_اوچائي);
+		إذا (گنجائش_cmdline < 0)
+		    گنجائش_cmdline = 0;
 	    }
 
-	    if (height <= room + room_cmdline)
-		break;
-	    if (run == 2 || curfrp->fr_width == topframe->fr_width)
+	    إذا (اوچائي <= گنجائش + گنجائش_cmdline)
+		اكسر;
+	    إذا (لاڳيتو == 2 || curfrp->fr_ويڪر == topframe->fr_ويڪر)
 	    {
-		height = room + room_cmdline;
-		break;
+		اوچائي = گنجائش + گنجائش_cmdline;
+		اكسر;
 	    }
-	    frame_setheight(curfrp->fr_parent, height
-		+ frame_minheight(curfrp->fr_parent, NOWIN) - (int)p_wmh - 1);
+	    چوکٺو_setheight(curfrp->fr_والد, اوچائي
+		+ چوکٺو_minheight(curfrp->fr_والد, NOWIN) - (صحيح)p_wmh - 1);
 	}
 
 	/*
 	 * Compute the number of lines we will take from others frames (can be
 	 * negative!).
 	 */
-	take = height - curfrp->fr_height;
+	take = اوچائي - curfrp->fr_اوچائي;
 
 	// If there is not enough room, also reduce the height of a window
 	// with 'winfixheight' set.
-	if (height > room + room_cmdline - room_reserved)
-	    room_reserved = room + room_cmdline - height;
+	إذا (اوچائي > گنجائش + گنجائش_cmdline - گنجائش_reserved)
+	    گنجائش_reserved = گنجائش + گنجائش_cmdline - اوچائي;
 	// If there is only a 'winfixheight' window and making the
 	// window smaller, need to make the other window taller.
-	if (take < 0 && room - curfrp->fr_height <= room_reserved)
-	    room_reserved = 0;
+	إذا (take < 0 && گنجائش - curfrp->fr_اوچائي <= گنجائش_reserved)
+	    گنجائش_reserved = 0;
 
-	if (take > 0 && room_cmdline > 0)
+	إذا (take > 0 && گنجائش_cmdline > 0)
 	{
 	    // use lines from cmdline first
-	    if (take < room_cmdline)
-		room_cmdline = take;
-	    take -= room_cmdline;
-	    topframe->fr_height += room_cmdline;
+	    إذا (take < گنجائش_cmdline)
+		گنجائش_cmdline = take;
+	    take -= گنجائش_cmdline;
+	    topframe->fr_اوچائي += گنجائش_cmdline;
 	}
 
 	/*
 	 * set the current frame to the new height
 	 */
-	frame_new_height(curfrp, height, FALSE, FALSE, TRUE);
+	چوکٺو_new_اوچائي(curfrp, اوچائي, FALSE, FALSE, TRUE);
 
 	/*
 	 * First take lines from the frames after the current frame.  If
 	 * that is not enough, takes lines from frames above the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	لكل (لاڳيتو = 0; لاڳيتو < 2; ++لاڳيتو)
 	{
-	    if (run == 0)
-		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    إذا (لاڳيتو == 0)
+		frp = curfrp->fr_ايندڙ;	// 1st run: start with next window
+	    وإلا
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    طالما (frp != عدم && take != 0)
 	    {
-		h = frame_minheight(frp, NULL);
-		if (room_reserved > 0
-			&& frp->fr_win != NULL
+		h = چوکٺو_minheight(frp, عدم);
+		إذا (گنجائش_reserved > 0
+			&& frp->fr_win != عدم
 			&& frp->fr_win->w_p_wfh)
 		{
-		    if (room_reserved >= frp->fr_height)
-			room_reserved -= frp->fr_height;
-		    else
+		    إذا (گنجائش_reserved >= frp->fr_اوچائي)
+			گنجائش_reserved -= frp->fr_اوچائي;
+		    وإلا
 		    {
-			if (frp->fr_height - room_reserved > take)
-			    room_reserved = frp->fr_height - take;
-			take -= frp->fr_height - room_reserved;
-			frame_new_height(frp, room_reserved, FALSE, FALSE,
+			إذا (frp->fr_اوچائي - گنجائش_reserved > take)
+			    گنجائش_reserved = frp->fr_اوچائي - take;
+			take -= frp->fr_اوچائي - گنجائش_reserved;
+			چوکٺو_new_اوچائي(frp, گنجائش_reserved, FALSE, FALSE,
 									TRUE);
-			room_reserved = 0;
+			گنجائش_reserved = 0;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (frp->fr_height - take < h)
+		    إذا (frp->fr_اوچائي - take < h)
 		    {
-			take -= frp->fr_height - h;
-			frame_new_height(frp, h, FALSE, FALSE, TRUE);
+			take -= frp->fr_اوچائي - h;
+			چوکٺو_new_اوچائي(frp, h, FALSE, FALSE, TRUE);
 		    }
-		    else
+		    وإلا
 		    {
-			frame_new_height(frp, frp->fr_height - take,
+			چوکٺو_new_اوچائي(frp, frp->fr_اوچائي - take,
 							    FALSE, FALSE, TRUE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
-		    frp = frp->fr_next;
-		else
+		إذا (لاڳيتو == 0)
+		    frp = frp->fr_ايندڙ;
+		وإلا
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6780,28 +6780,28 @@ frame_setheight(frame_T *curfrp, int height)
  * Set current window width and take care of repositioning other windows to
  * fit around it.
  */
-    void
-win_setwidth(int width)
+    فراغ
+win_setwidth(صحيح ويڪر)
 {
-    win_setwidth_win(width, curwin);
+    win_setwidth_win(ويڪر, curwin);
 }
 
-    void
-win_setwidth_win(int width, win_T *wp)
+    فراغ
+win_setwidth_win(صحيح ويڪر, win_T *wp)
 {
     // Always keep current window at least one column wide, even when
     // 'winminwidth' is zero.
-    if (wp == curwin)
+    إذا (wp == curwin)
     {
-	if (width < p_wmw)
-	    width = p_wmw;
-	if (width == 0)
-	    width = 1;
+	إذا (ويڪر < p_wmw)
+	    ويڪر = p_wmw;
+	إذا (ويڪر == 0)
+	    ويڪر = 1;
     }
-    else if (width < 0)
-	width = 0;
+    وإلا إذا (ويڪر < 0)
+	ويڪر = 0;
 
-    frame_setwidth(wp->w_frame, width + wp->w_vsep_width);
+    چوکٺو_setwidth(wp->w_چوکٺو, ويڪر + wp->w_vsep_ويڪر);
 
     // recompute the window positions
     win_comp_pos();
@@ -6816,34 +6816,34 @@ win_setwidth_win(int width, win_T *wp)
  *
  * Strategy is similar to frame_setheight().
  */
-    static void
-frame_setwidth(frame_T *curfrp, int width)
+    ساكن فراغ
+چوکٺو_setwidth(چوکٺو_T *curfrp, صحيح ويڪر)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		run;
-    frame_T	*frp;
-    int		w;
-    int		room_reserved;
+    صحيح		گنجائش;		// total number of lines available
+    صحيح		take;		// number of lines taken from other windows
+    صحيح		لاڳيتو;
+    چوکٺو_T	*frp;
+    صحيح		w;
+    صحيح		گنجائش_reserved;
 
     // If the width already is the desired value, nothing to do.
-    if (curfrp->fr_width == width)
-	return;
+    إذا (curfrp->fr_ويڪر == ويڪر)
+	أرجع;
 
-    if (curfrp->fr_parent == NULL)
+    إذا (curfrp->fr_والد == عدم)
 	// topframe: can't change width
-	return;
+	أرجع;
 
-    if (curfrp->fr_parent->fr_layout == FR_COL)
+    إذا (curfrp->fr_والد->fr_layout == FR_کانو)
     {
 	// Column of frames: Also need to resize frames above and below of
 	// this one.  First check for the minimal width of these.
-	w = frame_minwidth(curfrp->fr_parent, NULL);
-	if (width < w)
-	    width = w;
-	frame_setwidth(curfrp->fr_parent, width);
+	w = چوکٺو_minwidth(curfrp->fr_والد, عدم);
+	إذا (ويڪر < w)
+	    ويڪر = w;
+	چوکٺو_setwidth(curfrp->fr_والد, ويڪر);
     }
-    else
+    وإلا
     {
 	/*
 	 * Row of frames: try to change only frames in this row.
@@ -6853,98 +6853,98 @@ frame_setwidth(frame_T *curfrp, int width)
 	 *    containing frame.
 	 * 2: compute the room available and adjust the width to it.
 	 */
-	for (run = 1; run <= 2; ++run)
+	لكل (لاڳيتو = 1; لاڳيتو <= 2; ++لاڳيتو)
 	{
-	    room = 0;
-	    room_reserved = 0;
-	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
+	    گنجائش = 0;
+	    گنجائش_reserved = 0;
+	    FOR_ALL_چوکٺا(frp, curfrp->fr_والد->fr_ٻار)
 	    {
-		if (frp != curfrp
-			&& frp->fr_win != NULL
+		إذا (frp != curfrp
+			&& frp->fr_win != عدم
 			&& frp->fr_win->w_p_wfw)
-		    room_reserved += frp->fr_width;
-		room += frp->fr_width;
-		if (frp != curfrp)
-		    room -= frame_minwidth(frp, NULL);
+		    گنجائش_reserved += frp->fr_ويڪر;
+		گنجائش += frp->fr_ويڪر;
+		إذا (frp != curfrp)
+		    گنجائش -= چوکٺو_minwidth(frp, عدم);
 	    }
 
-	    if (width <= room)
-		break;
-	    if (run == 2 || curfrp->fr_height >= ROWS_AVAIL)
+	    إذا (ويڪر <= گنجائش)
+		اكسر;
+	    إذا (لاڳيتو == 2 || curfrp->fr_اوچائي >= صفون_AVAIL)
 	    {
-		width = room;
-		break;
+		ويڪر = گنجائش;
+		اكسر;
 	    }
-	    frame_setwidth(curfrp->fr_parent, width
-		 + frame_minwidth(curfrp->fr_parent, NOWIN) - (int)p_wmw - 1);
+	    چوکٺو_setwidth(curfrp->fr_والد, ويڪر
+		 + چوکٺو_minwidth(curfrp->fr_والد, NOWIN) - (صحيح)p_wmw - 1);
 	}
 
 	/*
 	 * Compute the number of lines we will take from others frames (can be
 	 * negative!).
 	 */
-	take = width - curfrp->fr_width;
+	take = ويڪر - curfrp->fr_ويڪر;
 
 	// If there is not enough room, also reduce the width of a window
 	// with 'winfixwidth' set.
-	if (width > room - room_reserved)
-	    room_reserved = room - width;
+	إذا (ويڪر > گنجائش - گنجائش_reserved)
+	    گنجائش_reserved = گنجائش - ويڪر;
 	// If there is only a 'winfixwidth' window and making the
 	// window smaller, need to make the other window narrower.
-	if (take < 0 && room - curfrp->fr_width < room_reserved)
-	    room_reserved = 0;
+	إذا (take < 0 && گنجائش - curfrp->fr_ويڪر < گنجائش_reserved)
+	    گنجائش_reserved = 0;
 
 	/*
 	 * set the current frame to the new width
 	 */
-	frame_new_width(curfrp, width, FALSE, FALSE);
+	چوکٺو_new_ويڪر(curfrp, ويڪر, FALSE, FALSE);
 
 	/*
 	 * First take lines from the frames right of the current frame.  If
 	 * that is not enough, takes lines from frames left of the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	لكل (لاڳيتو = 0; لاڳيتو < 2; ++لاڳيتو)
 	{
-	    if (run == 0)
-		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    إذا (لاڳيتو == 0)
+		frp = curfrp->fr_ايندڙ;	// 1st run: start with next window
+	    وإلا
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    طالما (frp != عدم && take != 0)
 	    {
-		w = frame_minwidth(frp, NULL);
-		if (room_reserved > 0
-			&& frp->fr_win != NULL
+		w = چوکٺو_minwidth(frp, عدم);
+		إذا (گنجائش_reserved > 0
+			&& frp->fr_win != عدم
 			&& frp->fr_win->w_p_wfw)
 		{
-		    if (room_reserved >= frp->fr_width)
-			room_reserved -= frp->fr_width;
-		    else
+		    إذا (گنجائش_reserved >= frp->fr_ويڪر)
+			گنجائش_reserved -= frp->fr_ويڪر;
+		    وإلا
 		    {
-			if (frp->fr_width - room_reserved > take)
-			    room_reserved = frp->fr_width - take;
-			take -= frp->fr_width - room_reserved;
-			frame_new_width(frp, room_reserved, FALSE, FALSE);
-			room_reserved = 0;
+			إذا (frp->fr_ويڪر - گنجائش_reserved > take)
+			    گنجائش_reserved = frp->fr_ويڪر - take;
+			take -= frp->fr_ويڪر - گنجائش_reserved;
+			چوکٺو_new_ويڪر(frp, گنجائش_reserved, FALSE, FALSE);
+			گنجائش_reserved = 0;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (frp->fr_width - take < w)
+		    إذا (frp->fr_ويڪر - take < w)
 		    {
-			take -= frp->fr_width - w;
-			frame_new_width(frp, w, FALSE, FALSE);
+			take -= frp->fr_ويڪر - w;
+			چوکٺو_new_ويڪر(frp, w, FALSE, FALSE);
 		    }
-		    else
+		    وإلا
 		    {
-			frame_new_width(frp, frp->fr_width - take,
+			چوکٺو_new_ويڪر(frp, frp->fr_ويڪر - take,
 								FALSE, FALSE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
-		    frp = frp->fr_next;
-		else
+		إذا (لاڳيتو == 0)
+		    frp = frp->fr_ايندڙ;
+		وإلا
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6954,25 +6954,25 @@ frame_setwidth(frame_T *curfrp, int width)
 /*
  * Check 'winminheight' for a valid value and reduce it if needed.
  */
-    void
-win_setminheight(void)
+    فراغ
+win_setminheight(فراغ)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    صحيح		گنجائش;
+    صحيح		needed;
+    صحيح		پهريون = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmh > 0)
+    طالما (p_wmh > 0)
     {
-	room = Rows - p_ch;
-	needed = min_rows_for_all_tabpages() - 1;  // 1 was added for the cmdline
-	if (room >= needed)
-	    break;
+	گنجائش = صفون - p_ch;
+	needed = min_صفون_for_all_tabpages() - 1;  // 1 was added for the cmdline
+	إذا (گنجائش >= needed)
+	    اكسر;
 	--p_wmh;
-	if (first)
+	إذا (پهريون)
 	{
-	    emsg(_(e_not_enough_room));
-	    first = FALSE;
+	    emsg(_(e_not_enough_گنجائش));
+	    پهريون = FALSE;
 	}
     }
 }
@@ -6980,25 +6980,25 @@ win_setminheight(void)
 /*
  * Check 'winminwidth' for a valid value and reduce it if needed.
  */
-    void
-win_setminwidth(void)
+    فراغ
+win_setminwidth(فراغ)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    صحيح		گنجائش;
+    صحيح		needed;
+    صحيح		پهريون = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmw > 0)
+    طالما (p_wmw > 0)
     {
-	room = topframe->fr_width;
-	needed = frame_minwidth(topframe, NULL);
-	if (room >= needed)
-	    break;
+	گنجائش = topframe->fr_ويڪر;
+	needed = چوکٺو_minwidth(topframe, عدم);
+	إذا (گنجائش >= needed)
+	    اكسر;
 	--p_wmw;
-	if (first)
+	إذا (پهريون)
 	{
-	    emsg(_(e_not_enough_room));
-	    first = FALSE;
+	    emsg(_(e_not_enough_گنجائش));
+	    پهريون = FALSE;
 	}
     }
 }
@@ -7006,119 +7006,119 @@ win_setminwidth(void)
 /*
  * Status line of dragwin is dragged "offset" lines down (negative is up).
  */
-    void
-win_drag_status_line(win_T *dragwin, int offset)
+    فراغ
+win_drag_حالت_سٽ(win_T *dragwin, صحيح وٿي)
 {
-    frame_T	*curfr;
-    frame_T	*fr;
-    int		room;
-    int		up;	// if TRUE, drag status line up, otherwise down
-    int		n;
+    چوکٺو_T	*curfr;
+    چوکٺو_T	*fr;
+    صحيح		گنجائش;
+    صحيح		مٿي;	// if TRUE, drag status line up, otherwise down
+    صحيح		n;
 
-    fr = dragwin->w_frame;
+    fr = dragwin->w_چوکٺو;
     curfr = fr;
-    if (fr != topframe)		// more than one window
+    إذا (fr != topframe)		// more than one window
     {
-	fr = fr->fr_parent;
+	fr = fr->fr_والد;
 	// When the parent frame is not a column of frames, its parent should
 	// be.
-	if (fr->fr_layout != FR_COL)
+	إذا (fr->fr_layout != FR_کانو)
 	{
 	    curfr = fr;
-	    if (fr != topframe)	// only a row of windows, may drag statusline
-		fr = fr->fr_parent;
+	    إذا (fr != topframe)	// only a row of windows, may drag statusline
+		fr = fr->fr_والد;
 	}
     }
 
     // If this is the last frame in a column, may want to resize the parent
     // frame instead (go two up to skip a row of frames).
-    while (curfr != topframe && curfr->fr_next == NULL)
+    طالما (curfr != topframe && curfr->fr_ايندڙ == عدم)
     {
-	if (fr != topframe)
-	    fr = fr->fr_parent;
+	إذا (fr != topframe)
+	    fr = fr->fr_والد;
 	curfr = fr;
-	if (fr != topframe)
-	    fr = fr->fr_parent;
+	إذا (fr != topframe)
+	    fr = fr->fr_والد;
     }
 
-    if (offset < 0) // drag up
+    إذا (وٿي < 0) // drag up
     {
-	up = TRUE;
-	offset = -offset;
+	مٿي = TRUE;
+	وٿي = -وٿي;
 	// sum up the room of the current frame and above it
-	if (fr == curfr)
+	إذا (fr == curfr)
 	{
 	    // only one window
-	    room = fr->fr_height - frame_minheight(fr, NULL);
+	    گنجائش = fr->fr_اوچائي - چوکٺو_minheight(fr, عدم);
 	}
-	else
+	وإلا
 	{
-	    room = 0;
-	    for (fr = fr->fr_child; ; fr = fr->fr_next)
+	    گنجائش = 0;
+	    لكل (fr = fr->fr_ٻار; ; fr = fr->fr_ايندڙ)
 	    {
-		room += fr->fr_height - frame_minheight(fr, NULL);
-		if (fr == curfr)
-		    break;
+		گنجائش += fr->fr_اوچائي - چوکٺو_minheight(fr, عدم);
+		إذا (fr == curfr)
+		    اكسر;
 	    }
 	}
-	fr = curfr->fr_next;		// put fr at frame that grows
+	fr = curfr->fr_ايندڙ;		// put fr at frame that grows
     }
-    else    // drag down
+    وإلا    // drag down
     {
-	up = FALSE;
+	مٿي = FALSE;
 	/*
 	 * Only dragging the last status line can reduce p_ch.
 	 */
-	room = Rows - cmdline_row;
-	if (curfr->fr_next == NULL)
-	    --room;
-	else
-	    room -= p_ch;
-	if (room < 0)
-	    room = 0;
+	گنجائش = صفون - cmdline_صف;
+	إذا (curfr->fr_ايندڙ == عدم)
+	    --گنجائش;
+	وإلا
+	    گنجائش -= p_ch;
+	إذا (گنجائش < 0)
+	    گنجائش = 0;
 	// sum up the room of frames below of the current one
-	FOR_ALL_FRAMES(fr, curfr->fr_next)
-	    room += fr->fr_height - frame_minheight(fr, NULL);
+	FOR_ALL_چوکٺا(fr, curfr->fr_ايندڙ)
+	    گنجائش += fr->fr_اوچائي - چوکٺو_minheight(fr, عدم);
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
-	offset = room;		// Move as far as we can
-    if (offset <= 0)
-	return;
+    إذا (گنجائش < وٿي)		// Not enough room
+	وٿي = گنجائش;		// Move as far as we can
+    إذا (وٿي <= 0)
+	أرجع;
 
     /*
      * Grow frame fr by "offset" lines.
      * Doesn't happen when dragging the last status line up.
      */
-    if (fr != NULL)
-	frame_new_height(fr, fr->fr_height + offset, up, FALSE, TRUE);
+    إذا (fr != عدم)
+	چوکٺو_new_اوچائي(fr, fr->fr_اوچائي + وٿي, مٿي, FALSE, TRUE);
 
-    if (up)
+    إذا (مٿي)
 	fr = curfr;		// current frame gets smaller
-    else
-	fr = curfr->fr_next;	// next frame gets smaller
+    وإلا
+	fr = curfr->fr_ايندڙ;	// next frame gets smaller
 
     /*
      * Now make the other frames smaller.
      */
-    while (fr != NULL && offset > 0)
+    طالما (fr != عدم && وٿي > 0)
     {
-	n = frame_minheight(fr, NULL);
-	if (fr->fr_height - offset <= n)
+	n = چوکٺو_minheight(fr, عدم);
+	إذا (fr->fr_اوچائي - وٿي <= n)
 	{
-	    offset -= fr->fr_height - n;
-	    frame_new_height(fr, n, !up, FALSE, TRUE);
+	    وٿي -= fr->fr_اوچائي - n;
+	    چوکٺو_new_اوچائي(fr, n, !مٿي, FALSE, TRUE);
 	}
-	else
+	وإلا
 	{
-	    frame_new_height(fr, fr->fr_height - offset, !up, FALSE, TRUE);
-	    break;
+	    چوکٺو_new_اوچائي(fr, fr->fr_اوچائي - وٿي, !مٿي, FALSE, TRUE);
+	    اكسر;
 	}
-	if (up)
+	إذا (مٿي)
 	    fr = fr->fr_prev;
-	else
-	    fr = fr->fr_next;
+	وإلا
+	    fr = fr->fr_ايندڙ;
     }
     win_comp_pos();
     win_fix_scroll(TRUE);
@@ -7130,123 +7130,123 @@ win_drag_status_line(win_T *dragwin, int offset)
 /*
  * Separator line of dragwin is dragged "offset" lines right (negative is left).
  */
-    void
-win_drag_vsep_line(win_T *dragwin, int offset)
+    فراغ
+win_drag_vsep_سٽ(win_T *dragwin, صحيح وٿي)
 {
-    frame_T	*curfr;
-    frame_T	*fr;
-    int		room;
-    int		left;	// if TRUE, drag separator line left, otherwise right
-    int		n;
+    چوکٺو_T	*curfr;
+    چوکٺو_T	*fr;
+    صحيح		گنجائش;
+    صحيح		کاٻو;	// if TRUE, drag separator line left, otherwise right
+    صحيح		n;
 
-    fr = dragwin->w_frame;
-    if (fr == topframe)		// only one window (cannot happen?)
-	return;
+    fr = dragwin->w_چوکٺو;
+    إذا (fr == topframe)		// only one window (cannot happen?)
+	أرجع;
     curfr = fr;
-    fr = fr->fr_parent;
+    fr = fr->fr_والد;
     // When the parent frame is not a row of frames, its parent should be.
-    if (fr->fr_layout != FR_ROW)
+    إذا (fr->fr_layout != FR_صف)
     {
-	if (fr == topframe)	// only a column of windows (cannot happen?)
-	    return;
+	إذا (fr == topframe)	// only a column of windows (cannot happen?)
+	    أرجع;
 	curfr = fr;
-	fr = fr->fr_parent;
+	fr = fr->fr_والد;
     }
 
     // If this is the last frame in a row, may want to resize a parent
     // frame instead.
-    while (curfr->fr_next == NULL)
+    طالما (curfr->fr_ايندڙ == عدم)
     {
-	if (fr == topframe)
-	    break;
+	إذا (fr == topframe)
+	    اكسر;
 	curfr = fr;
-	fr = fr->fr_parent;
-	if (fr != topframe)
+	fr = fr->fr_والد;
+	إذا (fr != topframe)
 	{
 	    curfr = fr;
-	    fr = fr->fr_parent;
+	    fr = fr->fr_والد;
 	}
     }
 
-    if (offset < 0) // drag left
+    إذا (وٿي < 0) // drag left
     {
-	left = TRUE;
-	offset = -offset;
+	کاٻو = TRUE;
+	وٿي = -وٿي;
 	// sum up the room of the current frame and left of it
-	room = 0;
-	for (fr = fr->fr_child; ; fr = fr->fr_next)
+	گنجائش = 0;
+	لكل (fr = fr->fr_ٻار; ; fr = fr->fr_ايندڙ)
 	{
-	    room += fr->fr_width - frame_minwidth(fr, NULL);
-	    if (fr == curfr)
-		break;
+	    گنجائش += fr->fr_ويڪر - چوکٺو_minwidth(fr, عدم);
+	    إذا (fr == curfr)
+		اكسر;
 	}
-	fr = curfr->fr_next;		// put fr at frame that grows
+	fr = curfr->fr_ايندڙ;		// put fr at frame that grows
     }
-    else    // drag right
+    وإلا    // drag right
     {
-	left = FALSE;
+	کاٻو = FALSE;
 	// sum up the room of frames right of the current one
-	room = 0;
-	FOR_ALL_FRAMES(fr, curfr->fr_next)
-	    room += fr->fr_width - frame_minwidth(fr, NULL);
+	گنجائش = 0;
+	FOR_ALL_چوکٺا(fr, curfr->fr_ايندڙ)
+	    گنجائش += fr->fr_ويڪر - چوکٺو_minwidth(fr, عدم);
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
-	offset = room;		// Move as far as we can
-    if (offset <= 0)		// No room at all, quit.
-	return;
-    if (fr == NULL)
+    إذا (گنجائش < وٿي)		// Not enough room
+	وٿي = گنجائش;		// Move as far as we can
+    إذا (وٿي <= 0)		// No room at all, quit.
+	أرجع;
+    إذا (fr == عدم)
 	// This can happen when calling win_move_separator() on the rightmost
 	// window.  Just don't do anything.
-	return;
+	أرجع;
 
     // grow frame fr by offset lines
-    frame_new_width(fr, fr->fr_width + offset, left, FALSE);
+    چوکٺو_new_ويڪر(fr, fr->fr_ويڪر + وٿي, کاٻو, FALSE);
 
     // shrink other frames: current and at the left or at the right
-    if (left)
+    إذا (کاٻو)
 	fr = curfr;		// current frame gets smaller
-    else
-	fr = curfr->fr_next;	// next frame gets smaller
+    وإلا
+	fr = curfr->fr_ايندڙ;	// next frame gets smaller
 
-    while (fr != NULL && offset > 0)
+    طالما (fr != عدم && وٿي > 0)
     {
-	n = frame_minwidth(fr, NULL);
-	if (fr->fr_width - offset <= n)
+	n = چوکٺو_minwidth(fr, عدم);
+	إذا (fr->fr_ويڪر - وٿي <= n)
 	{
-	    offset -= fr->fr_width - n;
-	    frame_new_width(fr, n, !left, FALSE);
+	    وٿي -= fr->fr_ويڪر - n;
+	    چوکٺو_new_ويڪر(fr, n, !کاٻو, FALSE);
 	}
-	else
+	وإلا
 	{
-	    frame_new_width(fr, fr->fr_width - offset, !left, FALSE);
-	    break;
+	    چوکٺو_new_ويڪر(fr, fr->fr_ويڪر - وٿي, !کاٻو, FALSE);
+	    اكسر;
 	}
-	if (left)
+	إذا (کاٻو)
 	    fr = fr->fr_prev;
-	else
-	    fr = fr->fr_next;
+	وإلا
+	    fr = fr->fr_ايندڙ;
     }
     win_comp_pos();
     redraw_all_later(UPD_NOT_VALID);
 }
 
-#define FRACTION_MULT	16384L
+#وصف_ڪريو FRACTION_MULT	16384L
 
 /*
  * Set wp->w_fraction for the current w_wrow and w_height.
  * Has no effect when the window is less than two lines.
  */
-    void
-set_fraction(win_T *wp)
+    فراغ
+سيٽ_fraction(win_T *wp)
 {
-    if (wp->w_height > 1)
+    إذا (wp->w_اوچائي > 1)
 	// When cursor is in the first line the percentage is computed as if
 	// it's halfway that line.  Thus with two lines it is 25%, with three
 	// lines 17%, etc.  Similarly for the last line: 75%, 83%, etc.
-	wp->w_fraction = ((long)wp->w_wrow * FRACTION_MULT
-				     + FRACTION_MULT / 2) / (long)wp->w_height;
+	wp->w_fraction = ((ڊگهو)wp->w_wrow * FRACTION_MULT
+				     + FRACTION_MULT / 2) / (ڊگهو)wp->w_اوچائي;
 }
 
 /*
@@ -7258,29 +7258,29 @@ set_fraction(win_T *wp)
  * Requires a not fully visible cursor line to be allowed at the bottom of
  * a window ("zb"), probably only when 'smoothscroll' is also set.
  */
-    static void
-win_fix_scroll(int resize)
+    ساكن فراغ
+win_fix_scroll(صحيح resize)
 {
-    if (*p_spk == 'c')
-	return;  // 'splitkeep' is "cursor"
+    إذا (*p_spk == 'c')
+	أرجع;  // 'splitkeep' is "cursor"
 
     skip_update_topline = TRUE;
     win_T	*wp;
     FOR_ALL_WINDOWS(wp)
     {
 	// Skip when window height has not changed.
-	if (wp->w_height != wp->w_prev_height)
+	إذا (wp->w_اوچائي != wp->w_prev_اوچائي)
 	{
 	    // Cursor position in this window may now be invalid.  It is kept
 	    // potentially invalid until the window is made the current window.
 	    wp->w_do_win_fix_cursor = true;
 
 	    // If window has moved update botline to keep the same screenlines.
-	    if (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
-		      && wp->w_botline - 1 <= wp->w_buffer->b_ml.ml_line_count)
+	    إذا (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
+		      && wp->w_botline - 1 <= wp->w_بفر->b_ml.ml_سٽ_ڳڻپ)
 	    {
-		int diff = (wp->w_winrow - wp->w_prev_winrow)
-					  + (wp->w_height - wp->w_prev_height);
+		صحيح diff = (wp->w_winrow - wp->w_prev_winrow)
+					  + (wp->w_اوچائي - wp->w_prev_اوچائي);
 		pos_T cursor = wp->w_cursor;
 		linenr_T topline = wp->w_topline;
 		colnr_T skipcol = wp->w_skipcol;
@@ -7288,36 +7288,36 @@ win_fix_scroll(int resize)
 		wp->w_cursor.lnum = wp->w_botline - 1;
 
 		//  Add difference in height and row to botline.
-		if (diff > 0)
-		    cursor_down_inner(wp, diff);
-		else
-		    cursor_up_inner(wp, -diff);
+		إذا (diff > 0)
+		    cursor_هيٺ_ڏانهن_inner(wp, diff);
+		وإلا
+		    cursor_مٿي_inner(wp, -diff);
 
 		// Scroll to put the new cursor position at the bottom of the
 		// screen.
 		wp->w_fraction = FRACTION_MULT;
-		scroll_to_fraction(wp, wp->w_prev_height);
+		scroll_منزل_fraction(wp, wp->w_prev_اوچائي);
 
 		wp->w_cursor = cursor;
 		// Keeping the same screen lines includes the skipped columns.
-		if (wp->w_topline == topline)
+		إذا (wp->w_topline == topline)
 		    wp->w_skipcol = skipcol;
 		wp->w_valid &= ~VALID_WCOL;
 	    }
-	    else if (wp == curwin)
+	    وإلا إذا (wp == curwin)
 		wp->w_valid &= ~VALID_CROW;
 
 	    invalidate_botline_win(wp);
 	    validate_botline_win(wp);
 	}
-	wp->w_prev_height = wp->w_height;
+	wp->w_prev_اوچائي = wp->w_اوچائي;
 	wp->w_prev_winrow = wp->w_winrow;
     }
     skip_update_topline = FALSE;
     // Ensure cursor is valid when not in normal mode or when resized.
-    if (!(get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL)))
+    إذا (!(get_real_state() & (گهڻائي_عام|گهڻائي_CMDLINE|گهڻائي_TERMINAL)))
 	win_fix_cursor(FALSE);
-    else if (resize)
+    وإلا إذا (resize)
 	win_fix_cursor(TRUE);
 }
 
@@ -7327,49 +7327,49 @@ win_fix_scroll(int resize)
  * If we are not in normal mode ("normal" is FALSE), make it valid by scrolling
  * instead.
  */
-    static void
-win_fix_cursor(int normal)
+    ساكن فراغ
+win_fix_cursor(صحيح عام_5)
 {
     win_T	*wp = curwin;
 
-    if (skip_win_fix_cursor
+    إذا (skip_win_fix_cursor
 	    || !wp->w_do_win_fix_cursor
-	    || wp->w_buffer->b_ml.ml_line_count < wp->w_height)
-	return;
+	    || wp->w_بفر->b_ml.ml_سٽ_ڳڻپ < wp->w_اوچائي)
+	أرجع;
 
     wp->w_do_win_fix_cursor = false;
     // Determine valid cursor range.
-    long so = MIN(wp->w_height / 2, get_scrolloff_value());
+    ڊگهو so = MIN(wp->w_اوچائي / 2, get_scrolloff_قدر());
     linenr_T lnum = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_topline;
-    cursor_down_inner(wp, so);
-    linenr_T top = wp->w_cursor.lnum;
+    cursor_هيٺ_ڏانهن_inner(wp, so);
+    linenr_T چوٽي = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_botline - 1;
-    cursor_up_inner(wp, so);
+    cursor_مٿي_inner(wp, so);
     linenr_T bot = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = lnum;
 
     // Check if cursor position is above or below valid cursor range.
     linenr_T nlnum = 0;
-    if (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_line_count) != 1)
+    إذا (lnum > bot && (wp->w_botline - wp->w_بفر->b_ml.ml_سٽ_ڳڻپ) != 1)
 	nlnum = bot;
-    else if (lnum < top && wp->w_topline != 1)
-	nlnum = (so == wp->w_height / 2) ? bot : top;
+    وإلا إذا (lnum < چوٽي && wp->w_topline != 1)
+	nlnum = (so == wp->w_اوچائي / 2) ? bot : چوٽي;
 
-    if (nlnum != 0)  // Cursor is invalid for current scroll position.
+    إذا (nlnum != 0)  // Cursor is invalid for current scroll position.
     {
-	if (normal)  // Save to jumplist and set cursor to avoid scrolling.
+	إذا (عام_5)  // Save to jumplist and set cursor to avoid scrolling.
 	{
 	    setmark('\'');
 	    wp->w_cursor.lnum = nlnum;
 	}
-	else  // Scroll instead when not in normal mode.
+	وإلا  // Scroll instead when not in normal mode.
 	{
 	    wp->w_fraction = (nlnum == bot) ? FRACTION_MULT : 0;
-	    scroll_to_fraction(wp, wp->w_prev_height);
+	    scroll_منزل_fraction(wp, wp->w_prev_اوچائي);
 	    validate_botline();
 	}
     }
@@ -7381,164 +7381,164 @@ win_fix_cursor(int normal)
  * This takes care of the things inside the window, not what happens to the
  * window position, the frame or to other windows.
  */
-    void
-win_new_height(win_T *wp, int height)
+    فراغ
+win_new_اوچائي(win_T *wp, صحيح اوچائي)
 {
-    int		prev_height = wp->w_height;
+    صحيح		prev_اوچائي = wp->w_اوچائي;
 
     // Don't want a negative height.  Happens when splitting a tiny window.
     // Will equalize heights soon to fix it.
-    if (height < 0)
-	height = 0;
-    if (wp->w_height == height)
-	return;	    // nothing to do
+    إذا (اوچائي < 0)
+	اوچائي = 0;
+    إذا (wp->w_اوچائي == اوچائي)
+	أرجع;	    // nothing to do
 
-    if (wp->w_height > 0)
+    إذا (wp->w_اوچائي > 0)
     {
-	if (wp == curwin && *p_spk == 'c')
+	إذا (wp == curwin && *p_spk == 'c')
 	    // w_wrow needs to be valid. When setting 'laststatus' this may
 	    // call win_new_height() recursively.
 	    validate_cursor();
-	if (wp->w_height != prev_height)
-	    return;  // Recursive call already changed the size, bail out here
+	إذا (wp->w_اوچائي != prev_اوچائي)
+	    أرجع;  // Recursive call already changed the size, bail out here
 		     //	to avoid the following to mess things up.
-	if (wp->w_wrow != wp->w_prev_fraction_row)
-	    set_fraction(wp);
+	إذا (wp->w_wrow != wp->w_prev_fraction_صف)
+	    سيٽ_fraction(wp);
     }
 
-    wp->w_height = height;
-    wp->w_redr_status = true;
+    wp->w_اوچائي = اوچائي;
+    wp->w_redr_حالت = true;
     win_comp_scroll(wp);
 
     // There is no point in adjusting the scroll position when exiting.  Some
     // values might be invalid.
-    if (!exiting && *p_spk == 'c')
+    إذا (!exiting && *p_spk == 'c')
     {
 	// With 'smoothscroll' w_skipcol is the scroll position, keep it.
 	// Otherwise it only keeps the cursor visible and is computed again.
-	if (!wp->w_p_sms)
+	إذا (!wp->w_p_sms)
 	    wp->w_skipcol = 0;
-	scroll_to_fraction(wp, prev_height);
+	scroll_منزل_fraction(wp, prev_اوچائي);
     }
 }
 
-    void
-scroll_to_fraction(win_T *wp, int prev_height)
+    فراغ
+scroll_منزل_fraction(win_T *wp, صحيح prev_اوچائي)
 {
     linenr_T	lnum;
-    int		sline, line_size;
-    int		height = wp->w_height;
+    صحيح		sline, سٽ_سائيز;
+    صحيح		اوچائي = wp->w_اوچائي;
 
     // Don't change w_topline in any of these cases:
     // - window height is 0
     // - 'scrollbind' is set and this isn't the current window
     // - window height is sufficient to display the whole buffer and first line
     //   is visible.
-    if (height > 0
+    إذا (اوچائي > 0
 	   && (!wp->w_p_scb || wp == curwin)
-	   && (height < wp->w_buffer->b_ml.ml_line_count || wp->w_topline > 1))
+	   && (اوچائي < wp->w_بفر->b_ml.ml_سٽ_ڳڻپ || wp->w_topline > 1))
     {
 	/*
 	 * Find a value for w_topline that shows the cursor at the same
 	 * relative position in the window as before (more or less).
 	 */
 	lnum = wp->w_cursor.lnum;
-	if (lnum < 1)		// can happen when starting up
+	إذا (lnum < 1)		// can happen when starting up
 	    lnum = 1;
-	wp->w_wrow = ((long)wp->w_fraction * (long)height - 1L)
+	wp->w_wrow = ((ڊگهو)wp->w_fraction * (ڊگهو)اوچائي - 1L)
 							       / FRACTION_MULT;
-	line_size = plines_win_col(wp, lnum, (long)(wp->w_cursor.col)) - 1;
-	sline = wp->w_wrow - line_size;
+	سٽ_سائيز = plines_win_کانو(wp, lnum, (ڊگهو)(wp->w_cursor.کانو)) - 1;
+	sline = wp->w_wrow - سٽ_سائيز;
 
-	if (sline >= 0)
+	إذا (sline >= 0)
 	{
 	    // Make sure the whole cursor line is visible, if possible.
-	    int rows = plines_win(wp, lnum, FALSE);
+	    صحيح صفون_2 = plines_win(wp, lnum, FALSE);
 
-	    if (sline > wp->w_height - rows)
+	    إذا (sline > wp->w_اوچائي - صفون_2)
 	    {
-		sline = wp->w_height - rows;
-		wp->w_wrow -= rows - line_size;
+		sline = wp->w_اوچائي - صفون_2;
+		wp->w_wrow -= صفون_2 - سٽ_سائيز;
 	    }
 	}
 
-	if (sline < 0)
+	إذا (sline < 0)
 	{
 	    /*
 	     * Cursor line would go off top of screen if w_wrow was this high.
 	     * Make cursor line the first line in the window.  If not enough
 	     * room use w_skipcol;
 	     */
-	    int		want_row = wp->w_wrow;	// where the cursor should be
+	    صحيح		want_صف = wp->w_wrow;	// where the cursor should be
 
-	    wp->w_wrow = line_size;
-	    if (wp->w_wrow >= wp->w_height
-				       && (wp->w_width - win_col_off(wp)) > 0)
+	    wp->w_wrow = سٽ_سائيز;
+	    إذا (wp->w_wrow >= wp->w_اوچائي
+				       && (wp->w_ويڪر - win_کانو_off(wp)) > 0)
 	    {
 		// Skip columns to get the cursor in the wanted row.
-		colnr_T	skipcol = wp->w_width - win_col_off(wp);
+		colnr_T	skipcol = wp->w_ويڪر - win_کانو_off(wp);
 
 		--wp->w_wrow;
-		while (wp->w_wrow > want_row)
+		طالما (wp->w_wrow > want_صف)
 		{
-		    skipcol += wp->w_width - win_col_off(wp) + win_col_off2(wp);
+		    skipcol += wp->w_ويڪر - win_کانو_off(wp) + win_کانو_off2(wp);
 		    --wp->w_wrow;
 		}
 		wp->w_skipcol = skipcol;
 	    }
 	}
-	else if (sline > 0)
+	وإلا إذا (sline > 0)
 	{
-	    while (sline > 0 && lnum > 1)
+	    طالما (sline > 0 && lnum > 1)
 	    {
-#ifdef FEAT_FOLDING
-		hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
-		if (lnum == 1)
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
+		hasFoldingWin(wp, lnum, &lnum, عدم, TRUE, عدم);
+		إذا (lnum == 1)
 		{
 		    // first line in buffer is folded
-		    line_size = 1;
+		    سٽ_سائيز = 1;
 		    --sline;
-		    break;
+		    اكسر;
 		}
-#endif
+#جيڪڏهن_پورو
 		--lnum;
-#ifdef FEAT_DIFF
-		if (lnum == wp->w_topline)
-		    line_size = plines_win_nofill(wp, lnum, TRUE)
+#جيڪڏهن_وصف_ٿيل FEAT_DIFF
+		إذا (lnum == wp->w_topline)
+		    سٽ_سائيز = plines_win_nofill(wp, lnum, TRUE)
 							      + wp->w_topfill;
-		else
-#endif
-		    line_size = plines_win(wp, lnum, TRUE);
-		sline -= line_size;
+		وإلا
+#جيڪڏهن_پورو
+		    سٽ_سائيز = plines_win(wp, lnum, TRUE);
+		sline -= سٽ_سائيز;
 	    }
 
-	    if (sline < 0)
+	    إذا (sline < 0)
 	    {
 		/*
 		 * Line we want at top would go off top of screen.  Use next
 		 * line instead.
 		 */
-#ifdef FEAT_FOLDING
-		hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
+		hasFoldingWin(wp, lnum, عدم, &lnum, TRUE, عدم);
+#جيڪڏهن_پورو
 		lnum++;
-		wp->w_wrow -= line_size + sline;
+		wp->w_wrow -= سٽ_سائيز + sline;
 	    }
-	    else if (sline > 0)
+	    وإلا إذا (sline > 0)
 	    {
 		// First line of file reached, use that as topline.
 		lnum = 1;
 		wp->w_wrow -= sline;
 	    }
 	}
-	set_topline(wp, lnum);
+	سيٽ_topline(wp, lnum);
     }
 
-    if (wp == curwin)
+    إذا (wp == curwin)
 	curs_columns(FALSE);	// validate w_wrow
 
-    if (prev_height > 0)
-	wp->w_prev_fraction_row = wp->w_wrow;
+    إذا (prev_اوچائي > 0)
+	wp->w_prev_fraction_صف = wp->w_wrow;
 
     redraw_win_later(wp, UPD_SOME_VALID);
     invalidate_botline_win(wp);
@@ -7547,111 +7547,111 @@ scroll_to_fraction(win_T *wp, int prev_height)
 /*
  * Set the width of a window.
  */
-    void
-win_new_width(win_T *wp, int width)
+    فراغ
+win_new_ويڪر(win_T *wp, صحيح ويڪر)
 {
     // Should we give an error if width < 0?
-    wp->w_width = width < 0 ? 0 : width;
-    wp->w_lines_valid = 0;
-    changed_line_abv_curs_win(wp);
+    wp->w_ويڪر = ويڪر < 0 ? 0 : ويڪر;
+    wp->w_سٽون_valid = 0;
+    بدليو_سٽ_abv_curs_win(wp);
     invalidate_botline_win(wp);
 
-    if (wp == curwin && *p_spk == 'c')
+    إذا (wp == curwin && *p_spk == 'c')
 	curs_columns(TRUE);	// validate w_wrow
 
     redraw_win_later(wp, UPD_NOT_VALID);
-    wp->w_redr_status = true;
+    wp->w_redr_حالت = true;
 }
 
-    void
+    فراغ
 win_comp_scroll(win_T *wp)
 {
-#if defined(FEAT_EVAL)
-    int old_w_p_scr = wp->w_p_scr;
-#endif
+#إذا defined(FEAT_EVAL)
+    صحيح old_w_p_scr = wp->w_p_scr;
+#جيڪڏهن_پورو
 
-    wp->w_p_scr = ((unsigned)wp->w_height >> 1);
-    if (wp->w_p_scr == 0)
+    wp->w_p_scr = ((بنانشان)wp->w_اوچائي >> 1);
+    إذا (wp->w_p_scr == 0)
 	wp->w_p_scr = 1;
-#if defined(FEAT_EVAL)
-    if (wp->w_p_scr != old_w_p_scr)
+#إذا defined(FEAT_EVAL)
+    إذا (wp->w_p_scr != old_w_p_scr)
     {
 	// Used by "verbose set scroll".
 	wp->w_p_script_ctx[WV_SCROLL].sc_sid = SID_WINLAYOUT;
 	wp->w_p_script_ctx[WV_SCROLL].sc_lnum = 0;
     }
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Command_height: called whenever p_ch has been changed.
  */
-    void
-command_height(void)
+    فراغ
+command_اوچائي(فراغ)
 {
-    int		old_p_ch = curtab->tp_ch_used;
+    صحيح		old_p_ch = curtab->tp_ch_استعمال_ٿيل;
 
     // Find bottom frame with width of screen.
-    frame_T *frp = lastwin->w_frame;
-    while (frp->fr_width != topframe->fr_width && frp->fr_parent != NULL)
-	frp = frp->fr_parent;
+    چوکٺو_T *frp = lastwin->w_چوکٺو;
+    طالما (frp->fr_ويڪر != topframe->fr_ويڪر && frp->fr_والد != عدم)
+	frp = frp->fr_والد;
 
     // Avoid changing the height of a window with 'winfixheight' set.
-    while (frp->fr_prev != NULL && frp->fr_layout == FR_LEAF
+    طالما (frp->fr_prev != عدم && frp->fr_layout == FR_پن
 						      && frp->fr_win->w_p_wfh)
 	frp = frp->fr_prev;
 
-    while (p_ch > old_p_ch && command_frame_height)
+    طالما (p_ch > old_p_ch && command_چوکٺو_اوچائي)
     {
-	if (frp == NULL)
+	إذا (frp == عدم)
 	{
-	    emsg(_(e_not_enough_room));
+	    emsg(_(e_not_enough_گنجائش));
 	    p_ch = old_p_ch;
-	    break;
+	    اكسر;
 	}
-	int h = MIN(p_ch - old_p_ch,
-			frp->fr_height - frame_minheight(frp, NULL));
-	frame_add_height(frp, -h);
+	صحيح h = MIN(p_ch - old_p_ch,
+			frp->fr_اوچائي - چوکٺو_minheight(frp, عدم));
+	چوکٺو_جوڙيو_اوچائي(frp, -h);
 	old_p_ch += h;
 	frp = frp->fr_prev;
     }
-    if (p_ch < old_p_ch && command_frame_height && frp != NULL)
-	frame_add_height(frp, (int)(old_p_ch - p_ch));
+    إذا (p_ch < old_p_ch && command_چوکٺو_اوچائي && frp != عدم)
+	چوکٺو_جوڙيو_اوچائي(frp, (صحيح)(old_p_ch - p_ch));
 
     // Recompute window positions.
     win_comp_pos();
     win_fix_scroll(true);
-    cmdline_row = Rows - p_ch;
+    cmdline_صف = صفون - p_ch;
     redraw_cmdline = TRUE;
 
     // Clear the cmdheight area.
-    if (msg_scrolled == 0 && full_screen)
+    إذا (نياپو_scrolled == 0 && ڀريل_screen)
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-	msg_row = cmdline_row;
+	screen_fill(cmdline_صف, (صحيح)صفون, 0, (صحيح)Columns, ' ', ' ', 0);
+	نياپو_صف = cmdline_صف;
     }
 
     // Use the value of p_ch that we remembered.  This is needed for when the
     // GUI starts up, we can't be sure in what order things happen.  And when
     // p_ch was changed in another tab page.
-    curtab->tp_ch_used = p_ch;
-    min_set_ch = p_ch;
+    curtab->tp_ch_استعمال_ٿيل = p_ch;
+    min_سيٽ_ch = p_ch;
 }
 
 /*
  * Resize frame "frp" to be "n" lines higher (negative for less high).
  * Also resize the frames it is contained in.
  */
-    static void
-frame_add_height(frame_T *frp, int n)
+    ساكن فراغ
+چوکٺو_جوڙيو_اوچائي(چوکٺو_T *frp, صحيح n)
 {
-    frame_new_height(frp, frp->fr_height + n, FALSE, FALSE, FALSE);
-    for (;;)
+    چوکٺو_new_اوچائي(frp, frp->fr_اوچائي + n, FALSE, FALSE, FALSE);
+    لكل (;;)
     {
-	frp = frp->fr_parent;
-	if (frp == NULL)
-	    break;
-	frp->fr_height += n;
+	frp = frp->fr_والد;
+	إذا (frp == عدم)
+	    اكسر;
+	frp->fr_اوچائي += n;
     }
 }
 
@@ -7659,169 +7659,169 @@ frame_add_height(frame_T *frp, int n)
  * Add or remove a status line for the bottom window(s), according to the
  * value of 'laststatus'.
  */
-    void
-last_status(
-    int		morewin)	// pretend there are two or more windows
+    فراغ
+آخري_حالت(
+    صحيح		morewin)	// pretend there are two or more windows
 {
     // Don't make a difference between horizontal or vertical split.
-    last_status_rec(topframe, last_stl_height(morewin) > 0);
-#if defined(FEAT_STL_OPT)
-    frame_change_statusline_height();
-#endif
+    آخري_حالت_rec(topframe, آخري_stl_اوچائي(morewin) > 0);
+#إذا defined(FEAT_STL_OPT)
+    چوکٺو_change_statusline_اوچائي();
+#جيڪڏهن_پورو
 }
 
-    static void
-last_status_rec(frame_T *fr, int statusline)
+    ساكن فراغ
+آخري_حالت_rec(چوکٺو_T *fr, صحيح statusline)
 {
-    frame_T	*fp;
+    چوکٺو_T	*fp;
     win_T	*wp;
 
-    if (fr->fr_layout == FR_LEAF)
+    إذا (fr->fr_layout == FR_پن)
     {
 	wp = fr->fr_win;
-	if (wp->w_status_height != 0 && !statusline)
+	إذا (wp->w_حالت_اوچائي != 0 && !statusline)
 	{
 	    // remove status line
-	    win_new_height(wp, wp->w_height + wp->w_status_height);
-	    wp->w_status_height = 0;
-	    comp_col();
+	    win_new_اوچائي(wp, wp->w_اوچائي + wp->w_حالت_اوچائي);
+	    wp->w_حالت_اوچائي = 0;
+	    comp_کانو();
 	}
-	else if (wp->w_status_height == 0 && statusline)
+	وإلا إذا (wp->w_حالت_اوچائي == 0 && statusline)
 	{
 	    // Find a frame to take a line from.
 	    fp = fr;
-	    while (fp->fr_height <= frame_minheight(fp, NULL))
+	    طالما (fp->fr_اوچائي <= چوکٺو_minheight(fp, عدم))
 	    {
-		if (fp == topframe)
+		إذا (fp == topframe)
 		{
-		    emsg(_(e_not_enough_room));
-		    return;
+		    emsg(_(e_not_enough_گنجائش));
+		    أرجع;
 		}
 		// In a column of frames: go to frame above.  If already at
 		// the top or in a row of frames: go to parent.
-		if (fp->fr_parent->fr_layout == FR_COL && fp->fr_prev != NULL)
+		إذا (fp->fr_والد->fr_layout == FR_کانو && fp->fr_prev != عدم)
 		    fp = fp->fr_prev;
-		else
-		    fp = fp->fr_parent;
+		وإلا
+		    fp = fp->fr_والد;
 	    }
-	    wp->w_status_height = statusline_height(wp);
-	    if (fp != fr)
+	    wp->w_حالت_اوچائي = statusline_اوچائي(wp);
+	    إذا (fp != fr)
 	    {
-		frame_new_height(fp, fp->fr_height - wp->w_status_height,
+		چوکٺو_new_اوچائي(fp, fp->fr_اوچائي - wp->w_حالت_اوچائي,
 			FALSE, FALSE, FALSE);
-		frame_fix_height(wp);
+		چوکٺو_fix_اوچائي(wp);
 		win_comp_pos();
 	    }
-	    else
-		win_new_height(wp, wp->w_height - wp->w_status_height);
-	    comp_col();
+	    وإلا
+		win_new_اوچائي(wp, wp->w_اوچائي - wp->w_حالت_اوچائي);
+	    comp_کانو();
 	    redraw_all_later(UPD_SOME_VALID);
 	}
 	// Set prev_height when difference is due to 'laststatus'.
-	if (abs(wp->w_height - wp->w_prev_height) == 1)
-	    wp->w_prev_height = wp->w_height;
+	إذا (مطلق_قدر(wp->w_اوچائي - wp->w_prev_اوچائي) == 1)
+	    wp->w_prev_اوچائي = wp->w_اوچائي;
     }
-    else if (fr->fr_layout == FR_ROW)
+    وإلا إذا (fr->fr_layout == FR_صف)
     {
 	// vertically split windows, set status line for each one
-	if (!statusline)
+	إذا (!statusline)
 	{
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
-		last_status_rec(fp, statusline);
+	    FOR_ALL_چوکٺا(fp, fr->fr_ٻار)
+		آخري_حالت_rec(fp, statusline);
 	}
-	else
+	وإلا
 	{
-	    frame_T	*fp2;
-	    int		max_stlh = 0;
-	    int		new_row_height;
+	    چوکٺو_T	*fp2;
+	    صحيح		max_stlh = 0;
+	    صحيح		new_صف_اوچائي;
 
 	    // Find the max status height needed across all leaf windows.
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
-		if (fp->fr_win != NULL && fp->fr_win->w_status_height == 0)
+	    FOR_ALL_چوکٺا(fp, fr->fr_ٻار)
+		إذا (fp->fr_win != عدم && fp->fr_win->w_حالت_اوچائي == 0)
 		{
-		    int h = statusline_height(fp->fr_win);
-		    if (h > max_stlh)
+		    صحيح h = statusline_اوچائي(fp->fr_win);
+		    إذا (h > max_stlh)
 			max_stlh = h;
 		}
-	    if (max_stlh == 0)
-		return;
+	    إذا (max_stlh == 0)
+		أرجع;
 
 	    // Find a frame to take max_stlh lines from.
 	    fp2 = fr;
-	    while (fp2->fr_height - frame_minheight(fp2, NULL) < max_stlh)
+	    طالما (fp2->fr_اوچائي - چوکٺو_minheight(fp2, عدم) < max_stlh)
 	    {
-		if (fp2 == topframe)
+		إذا (fp2 == topframe)
 		{
-		    emsg(_(e_not_enough_room));
-		    return;
+		    emsg(_(e_not_enough_گنجائش));
+		    أرجع;
 		}
-		if (fp2->fr_parent->fr_layout == FR_COL
-						&& fp2->fr_prev != NULL)
+		إذا (fp2->fr_والد->fr_layout == FR_کانو
+						&& fp2->fr_prev != عدم)
 		    fp2 = fp2->fr_prev;
-		else
-		    fp2 = fp2->fr_parent;
+		وإلا
+		    fp2 = fp2->fr_والد;
 	    }
 
-	    if (fp2 != fr)
+	    إذا (fp2 != fr)
 	    {
-		frame_new_height(fp2, fp2->fr_height - max_stlh,
+		چوکٺو_new_اوچائي(fp2, fp2->fr_اوچائي - max_stlh,
 							FALSE, FALSE, FALSE);
-		new_row_height = fr->fr_height + max_stlh;
+		new_صف_اوچائي = fr->fr_اوچائي + max_stlh;
 	    }
-	    else
-		new_row_height = fr->fr_height;
+	    وإلا
+		new_صف_اوچائي = fr->fr_اوچائي;
 
 	    // Set status and content heights for all leaves.
-	    FOR_ALL_FRAMES(fp, fr->fr_child)
+	    FOR_ALL_چوکٺا(fp, fr->fr_ٻار)
 	    {
-		if (fp->fr_win != NULL)
+		إذا (fp->fr_win != عدم)
 		{
 		    wp = fp->fr_win;
-		    if (wp->w_status_height == 0)
+		    إذا (wp->w_حالت_اوچائي == 0)
 		    {
-			wp->w_status_height = statusline_height(wp);
-			win_new_height(wp,
-				  new_row_height - wp->w_status_height);
-			frame_fix_height(wp);
-			comp_col();
+			wp->w_حالت_اوچائي = statusline_اوچائي(wp);
+			win_new_اوچائي(wp,
+				  new_صف_اوچائي - wp->w_حالت_اوچائي);
+			چوکٺو_fix_اوچائي(wp);
+			comp_کانو();
 			redraw_all_later(UPD_SOME_VALID);
-			if (abs(wp->w_height - wp->w_prev_height) == 1)
-			    wp->w_prev_height = wp->w_height;
+			إذا (مطلق_قدر(wp->w_اوچائي - wp->w_prev_اوچائي) == 1)
+			    wp->w_prev_اوچائي = wp->w_اوچائي;
 		    }
 		}
-		else
-		    last_status_rec(fp, statusline); // nested frames
+		وإلا
+		    آخري_حالت_rec(fp, statusline); // nested frames
 	    }
 
-	    fr->fr_height = new_row_height;
+	    fr->fr_اوچائي = new_صف_اوچائي;
 	    win_comp_pos();
 	}
     }
-    else
+    وإلا
     {
 	// horizontally split window, set status line for last one
-	for (fp = fr->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
+	لكل (fp = fr->fr_ٻار; fp->fr_ايندڙ != عدم; fp = fp->fr_ايندڙ)
 	    ;
-	last_status_rec(fp, statusline);
+	آخري_حالت_rec(fp, statusline);
     }
 }
 
-#if defined(FEAT_STL_OPT)
+#إذا defined(FEAT_STL_OPT)
 /*
  * Update the cached rendered height of 'statusline'.
  * If "wp" is NULL, update the global stl_rendered_height using p_stl.
  * If "wp" is non-NULL, update wp->w_stl_rendered_height using wp->w_p_stl.
  */
-    void
-update_stl_rendered_height(win_T *wp)
+    فراغ
+update_stl_rendered_اوچائي(win_T *wp)
 {
     char_u	*opt_name = (char_u *)"statusline";
-    char_u	*stl_val = (wp == NULL) ? p_stl : wp->w_p_stl;
-    int		opt_flags = (wp == NULL) ? 0 : OPT_LOCAL;
-    int		*height = (wp == NULL) ? &stl_rendered_height
-						: &wp->w_stl_rendered_height;
+    char_u	*stl_val = (wp == عدم) ? p_stl : wp->w_p_stl;
+    صحيح		opt_flags = (wp == عدم) ? 0 : OPT_LOCAL;
+    صحيح		*اوچائي = (wp == عدم) ? &stl_rendered_اوچائي
+						: &wp->w_stl_rendered_اوچائي;
 
-    *height = get_stl_rendered_height(wp == NULL ? curwin : wp, stl_val,
+    *اوچائي = get_stl_rendered_اوچائي(wp == عدم ? curwin : wp, stl_val,
 					opt_name, opt_flags);
 }
 
@@ -7829,58 +7829,58 @@ update_stl_rendered_height(win_T *wp)
  * First pass: clamp the global statusline height against available space.
  * Returns the space-constrained height.
  */
-    static int
-frame_find_global_stlh_rec(frame_T *frp, int h)
+    ساكن صحيح
+چوکٺو_ڳوليو_global_stlh_rec(چوکٺو_T *frp, صحيح h)
 {
-    if (frp->fr_layout == FR_LEAF)
+    إذا (frp->fr_layout == FR_پن)
     {
 	win_T  *wp = frp->fr_win;
 
 	// Only consider windows with a status line that use global stlo.
 	// Every such window constrains the global height (best effort): the
 	// result is the largest height that still fits every window.
-	if (wp->w_height > 0 && wp->w_status_height > 0
+	إذا (wp->w_اوچائي > 0 && wp->w_حالت_اوچائي > 0
 		&& *wp->w_p_stlo == NUL)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    صحيح win_free_اوچائي = frp->fr_اوچائي - WINBAR_اوچائي(wp);
 
-	    if (win_free_height - p_wmh < h)
-		h = win_free_height - p_wmh;
+	    إذا (win_free_اوچائي - p_wmh < h)
+		h = win_free_اوچائي - p_wmh;
 	}
     }
-    else
+    وإلا
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
-	    h = frame_find_global_stlh_rec(frp, h);
+	لكل (frp = frp->fr_ٻار; frp != عدم; frp = frp->fr_ايندڙ)
+	    h = چوکٺو_ڳوليو_global_stlh_rec(frp, h);
     }
-    return h;
+    أرجع h;
 }
 
 /*
  * Second pass: apply statusline heights.
  * "global_stlh" is the space-constrained height for windows using global stlo.
  */
-    static void
-frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
+    ساكن فراغ
+چوکٺو_change_statusline_اوچائي_rec(چوکٺو_T *frp, صحيح global_stlh)
 {
-    if (frp->fr_layout == FR_LEAF)
+    إذا (frp->fr_layout == FR_پن)
     {
 	win_T  *wp = frp->fr_win;
 
-	if (wp->w_height > 0 && wp->w_status_height > 0)
+	إذا (wp->w_اوچائي > 0 && wp->w_حالت_اوچائي > 0)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    صحيح win_free_اوچائي = frp->fr_اوچائي - WINBAR_اوچائي(wp);
 
-	    wp->w_status_height = statusline_height(wp);
-	    if (wp->w_p_stlo == NULL || *wp->w_p_stlo == NUL)
+	    wp->w_حالت_اوچائي = statusline_اوچائي(wp);
+	    إذا (wp->w_p_stlo == عدم || *wp->w_p_stlo == NUL)
 	    {
 		// Global stlo: cap at the uniform space-constrained height so
 		// that all windows share the same status line height.
-		if (wp->w_status_height > global_stlh)
-		    wp->w_status_height = global_stlh;
+		إذا (wp->w_حالت_اوچائي > global_stlh)
+		    wp->w_حالت_اوچائي = global_stlh;
 	    }
-	    if (wp->w_status_height > win_free_height - p_wmh)
-		wp->w_status_height = win_free_height - p_wmh;
+	    إذا (wp->w_حالت_اوچائي > win_free_اوچائي - p_wmh)
+		wp->w_حالت_اوچائي = win_free_اوچائي - p_wmh;
 	    // Preserve the buffer view: statusline height changes should
 	    // not scroll the window.  win_new_height() calls
 	    // scroll_to_fraction() which adjusts w_topline; restore it
@@ -7888,9 +7888,9 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 	    // curwin during redraw.
 	    linenr_T saved_topline = wp->w_topline;
 # ifdef FEAT_DIFF
-	    int	     saved_topfill = wp->w_topfill;
+	    صحيح	     saved_topfill = wp->w_topfill;
 # endif
-	    win_new_height(wp, win_free_height - wp->w_status_height);
+	    win_new_اوچائي(wp, win_free_اوچائي - wp->w_حالت_اوچائي);
 	    wp->w_topline = saved_topline;
 # ifdef FEAT_DIFF
 	    wp->w_topfill = saved_topfill;
@@ -7899,10 +7899,10 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 			     | VALID_BOTLINE | VALID_BOTLINE_AP);
 	}
     }
-    else
+    وإلا
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
-	    frame_change_statusline_height_rec(frp, global_stlh);
+	لكل (frp = frp->fr_ٻار; frp != عدم; frp = frp->fr_ايندڙ)
+	    چوکٺو_change_statusline_اوچائي_rec(frp, global_stlh);
     }
 }
 
@@ -7911,30 +7911,30 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
  * Uses two passes: first finds the space-constrained global height,
  * then applies appropriate heights to each window.
  */
-    int
-frame_change_statusline_height(void)
+    صحيح
+چوکٺو_change_statusline_اوچائي(فراغ)
 {
     tabpage_T	*tp;
-    int		global_stlh;
+    صحيح		global_stlh;
 
     // First pass: find space-constrained global height.
     global_stlh = stlo_mh;
     FOR_ALL_TABPAGES(tp)
-	global_stlh = frame_find_global_stlh_rec(tp->tp_topframe, global_stlh);
+	global_stlh = چوکٺو_ڳوليو_global_stlh_rec(tp->tp_topframe, global_stlh);
 
     // Second pass: apply heights.
     FOR_ALL_TABPAGES(tp)
-	frame_change_statusline_height_rec(tp->tp_topframe, global_stlh);
-    comp_col();
+	چوکٺو_change_statusline_اوچائي_rec(tp->tp_topframe, global_stlh);
+    comp_کانو();
     redraw_all_later(UPD_SOME_VALID);
-    return global_stlh;
+    أرجع global_stlh;
 }
 
 /*
  * Update the global maxheight cache for 'statuslineopt'.
  */
-    void
-set_stlo_mh(int mh)
+    فراغ
+سيٽ_stlo_mh(صحيح mh)
 {
     stlo_mh = mh;
 }
@@ -7944,142 +7944,142 @@ set_stlo_mh(int mh)
  * This is called when 'statuslineopt' is changed.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
-statuslineopt_changed(
+    صحيح
+statuslineopt_بدليو(
     char_u	*stlopt,	// when NULL: use "wp->w_p_stlo"
     win_T	*wp)		// when NULL: update global stlo_fh/stlo_mh
 {
     char_u	*p;
-    int		l_stlo_fh = FALSE;
-    int		l_stlo_mh = 1;
+    صحيح		l_stlo_fh = FALSE;
+    صحيح		l_stlo_mh = 1;
 
-    if (stlopt != NULL)
+    إذا (stlopt != عدم)
 	p = stlopt;
-    else
+    وإلا
 	p = wp->w_p_stlo;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
 	// Note: Keep this in sync with p_stlo_values
-	if (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
+	إذا (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
 	{
 	    p += 10;
 	    l_stlo_mh = getdigits(&p);
-	    if (l_stlo_mh < 1)
-		return FAIL;
+	    إذا (l_stlo_mh < 1)
+		أرجع FAIL;
 	}
-	else if (STRNCMP(p, "fixedheight", 11) == 0)
+	وإلا إذا (STRNCMP(p, "fixedheight", 11) == 0)
 	{
 	    p += 11;
 	    l_stlo_fh = TRUE;
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	إذا (*p != ',' && *p != NUL)
+	    أرجع FAIL;
+	إذا (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
+    إذا (wp == عدم)
     {
 	stlo_fh = l_stlo_fh;
 	stlo_mh = l_stlo_mh;
     }
-    else
+    وإلا
     {
 	wp->w_p_stlo_fh = l_stlo_fh;
 	wp->w_p_stlo_mh = l_stlo_mh;
     }
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Return the effective statusline height for window "wp".
  * Uses the window-local 'statuslineopt' if set, otherwise the global one.
  * When "wp" is NULL, always uses the global 'statuslineopt' settings.
  */
-    int
-statusline_height(win_T *wp UNUSED)
+    صحيح
+statusline_اوچائي(win_T *wp اڻ_استعمال_ٿيل)
 {
-    int stl_height = 1;
-#if defined(FEAT_STL_OPT)
+    صحيح stl_اوچائي = 1;
+#إذا defined(FEAT_STL_OPT)
     bool fixed;
-    int l_stl_rendered_height;
+    صحيح l_stl_rendered_اوچائي;
 
-    if (wp != NULL && *wp->w_p_stlo != NUL)
+    إذا (wp != عدم && *wp->w_p_stlo != NUL)
     {
-	stl_height = wp->w_p_stlo_mh;
+	stl_اوچائي = wp->w_p_stlo_mh;
 	fixed = !!wp->w_p_stlo_fh;
-	l_stl_rendered_height = (*wp->w_p_stl != NUL)
-				    ? wp->w_stl_rendered_height
-				    : stl_rendered_height;
+	l_stl_rendered_اوچائي = (*wp->w_p_stl != NUL)
+				    ? wp->w_stl_rendered_اوچائي
+				    : stl_rendered_اوچائي;
     }
-    else
+    وإلا
     {
-	stl_height = stlo_mh;
+	stl_اوچائي = stlo_mh;
 	fixed = !!stlo_fh;
-	l_stl_rendered_height = (wp != NULL && *wp->w_p_stl != NUL)
-				    ? wp->w_stl_rendered_height
-				    : stl_rendered_height;
+	l_stl_rendered_اوچائي = (wp != عدم && *wp->w_p_stl != NUL)
+				    ? wp->w_stl_rendered_اوچائي
+				    : stl_rendered_اوچائي;
     }
 
     // When not fixed, clamp to rendered height (1 for default statusline).
-    if (!fixed)
+    إذا (!fixed)
     {
-	int has_custom_stl = (*p_stl != NUL)
-	    || (wp != NULL && *wp->w_p_stl != NUL);
-	if (has_custom_stl)
-	    stl_height = MAX(1, MIN(l_stl_rendered_height, stl_height));
-	else
-	    stl_height = 1;
+	صحيح has_custom_stl = (*p_stl != NUL)
+	    || (wp != عدم && *wp->w_p_stl != NUL);
+	إذا (has_custom_stl)
+	    stl_اوچائي = MAX(1, MIN(l_stl_rendered_اوچائي, stl_اوچائي));
+	وإلا
+	    stl_اوچائي = 1;
     }
-#endif
+#جيڪڏهن_پورو
 
-    return stl_height;
+    أرجع stl_اوچائي;
 }
 
 /*
  * Return the number of lines used by the tab page line.
  */
-    int
-tabline_height(void)
+    صحيح
+tabline_اوچائي(فراغ)
 {
-#ifdef FEAT_GUI_TABLINE
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_TABLINE
     // When the GUI has the tabline then this always returns zero.
-    if (gui_use_tabline())
-	return 0;
-#endif
-    switch (p_stal)
+    إذا (gui_use_tabline())
+	أرجع 0;
+#جيڪڏهن_پورو
+    بدل (p_stal)
     {
-	case 0: return 0;
-	case 1: return (first_tabpage->tp_next == NULL) ? 0 : 1;
+	حالة 0: أرجع 0;
+	حالة 1: أرجع (پهريون_tabpage->tp_ايندڙ == عدم) ? 0 : 1;
     }
-    return 1;
+    أرجع 1;
 }
 
 /*
  * Return the height of the last window's statusline.
  */
-    int
-last_stl_height(
-    int		morewin)	// pretend there are two or more windows
+    صحيح
+آخري_stl_اوچائي(
+    صحيح		morewin)	// pretend there are two or more windows
 {
-    return (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_WINDOW)))
-		? STATUS_HEIGHT : 0;
+    أرجع (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_دري)))
+		? حالت_اوچائي_2 : 0;
 }
 
 /*
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows.
  */
-    int
-min_rows(void)
+    صحيح
+min_صفون(فراغ)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    إذا (firstwin == عدم)	// not initialized yet
+	أرجع MIN_سٽون;
 
-    return frame_minheight(curtab->tp_topframe, NULL) + tabline_height()
+    أرجع چوکٺو_minheight(curtab->tp_topframe, عدم) + tabline_اوچائي()
 	+ MIN_CMDHEIGHT;
 }
 
@@ -8087,26 +8087,26 @@ min_rows(void)
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows for all tab pages.
  */
-    int
-min_rows_for_all_tabpages(void)
+    صحيح
+min_صفون_for_all_tabpages(فراغ)
 {
-    int		total;
+    صحيح		ڪل;
     tabpage_T	*tp;
-    int		n;
+    صحيح		n;
 
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    إذا (firstwin == عدم)	// not initialized yet
+	أرجع MIN_سٽون;
 
-    total = 0;
+    ڪل = 0;
     FOR_ALL_TABPAGES(tp)
     {
-	n = frame_minheight(tp->tp_topframe, NULL);
-	if (total < n)
-	    total = n;
+	n = چوکٺو_minheight(tp->tp_topframe, عدم);
+	إذا (ڪل < n)
+	    ڪل = n;
     }
-    total += tabline_height();
-    total += MIN_CMDHEIGHT;
-    return total;
+    ڪل += tabline_اوچائي();
+    ڪل += MIN_CMDHEIGHT;
+    أرجع ڪل;
 }
 
 /*
@@ -8114,65 +8114,65 @@ min_rows_for_all_tabpages(void)
  * counting a help or preview window, unless it is the current window.
  * Does not count unlisted windows.
  */
-    int
-only_one_window(void)
+    صحيح
+only_one_دري(فراغ)
 {
-    int		count = 0;
+    صحيح		ڳڻپ = 0;
     win_T	*wp;
 
-#if defined(FEAT_PROP_POPUP)
+#إذا defined(FEAT_PROP_POPUP)
     // If the current window is a popup then there always is another window.
-    if (popup_is_popup(curwin))
-	return FALSE;
-#endif
+    إذا (popup_is_popup(curwin))
+	أرجع FALSE;
+#جيڪڏهن_پورو
 
     // If there is another tab page there always is another window.
-    if (first_tabpage->tp_next != NULL)
-	return FALSE;
+    إذا (پهريون_tabpage->tp_ايندڙ != عدم)
+	أرجع FALSE;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != NULL
-		&& (!((bt_help(wp->w_buffer) && !bt_help(curbuf))
-#ifdef FEAT_QUICKFIX
+	إذا (wp->w_بفر != عدم
+		&& (!((bt_help(wp->w_بفر) && !bt_help(curbuf))
+#جيڪڏهن_وصف_ٿيل FEAT_QUICKFIX
 		    || wp->w_p_pvw
-#endif
+#جيڪڏهن_پورو
 	     ) || wp == curwin) && !is_aucmd_win(wp))
-	    ++count;
-    return (count <= 1);
+	    ++ڳڻپ;
+    أرجع (ڳڻپ <= 1);
 }
 
 /*
  * Implementation of check_lnums() and check_lnums_nested().
  */
-    static void
-check_lnums_both(int do_curwin, int nested)
+    ساكن فراغ
+check_lnums_both(صحيح do_curwin, صحيح nested)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if ((do_curwin || wp != curwin) && wp->w_buffer == curbuf)
+	إذا ((do_curwin || wp != curwin) && wp->w_بفر == curbuf)
 	{
-	    int need_adjust;
+	    صحيح need_adjust;
 
-	    if (!nested)
+	    إذا (!nested)
 	    {
 		// save the original cursor position and topline
 		wp->w_save_cursor.w_cursor_save = wp->w_cursor;
 		wp->w_save_cursor.w_topline_save = wp->w_topline;
 	    }
 
-	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
-		wp->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_سٽ_ڳڻپ;
+	    إذا (need_adjust)
+		wp->w_cursor.lnum = curbuf->b_ml.ml_سٽ_ڳڻپ;
+	    إذا (need_adjust || !nested)
 		// save the (corrected) cursor position
 		wp->w_save_cursor.w_cursor_corr = wp->w_cursor;
 
-	    need_adjust = wp->w_topline > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
-		wp->w_topline = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    need_adjust = wp->w_topline > curbuf->b_ml.ml_سٽ_ڳڻپ;
+	    إذا (need_adjust)
+		wp->w_topline = curbuf->b_ml.ml_سٽ_ڳڻپ;
+	    إذا (need_adjust || !nested)
 		// save the (corrected) topline
 		wp->w_save_cursor.w_topline_corr = wp->w_topline;
 	}
@@ -8183,8 +8183,8 @@ check_lnums_both(int do_curwin, int nested)
  * current buffer, and before applying autocommands.
  * When "do_curwin" is TRUE, also check current window.
  */
-    void
-check_lnums(int do_curwin)
+    فراغ
+check_lnums(صحيح do_curwin)
 {
     check_lnums_both(do_curwin, FALSE);
 }
@@ -8192,8 +8192,8 @@ check_lnums(int do_curwin)
 /*
  * Like check_lnums() but for when check_lnums() was already called.
  */
-    void
-check_lnums_nested(int do_curwin)
+    فراغ
+check_lnums_nested(صحيح do_curwin)
 {
     check_lnums_both(do_curwin, TRUE);
 }
@@ -8202,26 +8202,26 @@ check_lnums_nested(int do_curwin)
  * Reset cursor and topline to its stored values from check_lnums().
  * check_lnums() must have been called first!
  */
-    void
-reset_lnums(void)
+    فراغ
+reset_lnums(فراغ)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == curbuf)
+	إذا (wp->w_بفر == curbuf)
 	{
 	    // Restore the value if the autocommand didn't change it and it was
 	    // set.
 	    // Note: This triggers e.g. on BufReadPre, when the buffer is not yet
 	    //       loaded, so cannot validate the buffer line
-	    if (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
+	    إذا (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
 				  && wp->w_save_cursor.w_cursor_save.lnum != 0)
 		wp->w_cursor = wp->w_save_cursor.w_cursor_save;
-	    if (wp->w_save_cursor.w_topline_corr == wp->w_topline
+	    إذا (wp->w_save_cursor.w_topline_corr == wp->w_topline
 				  && wp->w_save_cursor.w_topline_save != 0)
 		wp->w_topline = wp->w_save_cursor.w_topline_save;
-	    if (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_line_count)
+	    إذا (wp->w_save_cursor.w_topline_save > wp->w_بفر->b_ml.ml_سٽ_ڳڻپ)
 		wp->w_valid &= ~VALID_TOPLINE;
 	}
 }
@@ -8243,94 +8243,94 @@ reset_lnums(void)
  * "idx" is SNAP_HELP_IDX or SNAP_AUCMD_IDX.
  * Return FAIL if out of memory, OK otherwise.
  */
-    int
-make_snapshot(int idx)
+    صحيح
+make_snapshot(صحيح idx)
 {
     clear_snapshot(curtab, idx);
-    if (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
+    إذا (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
     {
 	clear_snapshot(curtab, idx);
-	return FAIL;
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
-    static int
-make_snapshot_rec(frame_T *fr, frame_T **frp)
+    ساكن صحيح
+make_snapshot_rec(چوکٺو_T *fr, چوکٺو_T **frp)
 {
-    *frp = ALLOC_CLEAR_ONE(frame_T);
-    if (*frp == NULL)
-	return FAIL;
+    *frp = ALLOC_CLEAR_ONE(چوکٺو_T);
+    إذا (*frp == عدم)
+	أرجع FAIL;
     (*frp)->fr_layout = fr->fr_layout;
-    (*frp)->fr_width = fr->fr_width;
-    (*frp)->fr_height = fr->fr_height;
-    if (fr->fr_next != NULL)
+    (*frp)->fr_ويڪر = fr->fr_ويڪر;
+    (*frp)->fr_اوچائي = fr->fr_اوچائي;
+    إذا (fr->fr_ايندڙ != عدم)
     {
-	if (make_snapshot_rec(fr->fr_next, &((*frp)->fr_next)) == FAIL)
-	    return FAIL;
+	إذا (make_snapshot_rec(fr->fr_ايندڙ, &((*frp)->fr_ايندڙ)) == FAIL)
+	    أرجع FAIL;
     }
-    if (fr->fr_child != NULL)
+    إذا (fr->fr_ٻار != عدم)
     {
-	if (make_snapshot_rec(fr->fr_child, &((*frp)->fr_child)) == FAIL)
-	    return FAIL;
+	إذا (make_snapshot_rec(fr->fr_ٻار, &((*frp)->fr_ٻار)) == FAIL)
+	    أرجع FAIL;
     }
-    if (fr->fr_layout == FR_LEAF && fr->fr_win == curwin)
+    إذا (fr->fr_layout == FR_پن && fr->fr_win == curwin)
 	(*frp)->fr_win = curwin;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Remove any existing snapshot.
  */
-    static void
-clear_snapshot(tabpage_T *tp, int idx)
+    ساكن فراغ
+clear_snapshot(tabpage_T *tp, صحيح idx)
 {
     clear_snapshot_rec(tp->tp_snapshot[idx]);
-    tp->tp_snapshot[idx] = NULL;
+    tp->tp_snapshot[idx] = عدم;
 }
 
-    static void
-clear_snapshot_rec(frame_T *fr)
+    ساكن فراغ
+clear_snapshot_rec(چوکٺو_T *fr)
 {
-    if (fr == NULL)
-	return;
-    clear_snapshot_rec(fr->fr_next);
-    clear_snapshot_rec(fr->fr_child);
+    إذا (fr == عدم)
+	أرجع;
+    clear_snapshot_rec(fr->fr_ايندڙ);
+    clear_snapshot_rec(fr->fr_ٻار);
     vim_free(fr);
 }
 
 /*
  * Traverse a snapshot to find the previous curwin.
  */
-    static win_T *
-get_snapshot_curwin_rec(frame_T *ft)
+    ساكن win_T *
+get_snapshot_curwin_rec(چوکٺو_T *ft)
 {
     win_T	*wp;
 
-    if (ft->fr_next != NULL)
+    إذا (ft->fr_ايندڙ != عدم)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_next)) != NULL)
-	    return wp;
+	إذا ((wp = get_snapshot_curwin_rec(ft->fr_ايندڙ)) != عدم)
+	    أرجع wp;
     }
-    if (ft->fr_child != NULL)
+    إذا (ft->fr_ٻار != عدم)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_child)) != NULL)
-	    return wp;
+	إذا ((wp = get_snapshot_curwin_rec(ft->fr_ٻار)) != عدم)
+	    أرجع wp;
     }
 
-    return ft->fr_win;
+    أرجع ft->fr_win;
 }
 
 /*
  * Return the current window stored in the snapshot or NULL.
  */
-    static win_T *
-get_snapshot_curwin(int idx)
+    ساكن win_T *
+get_snapshot_curwin(صحيح idx)
 {
-    if (curtab->tp_snapshot[idx] == NULL)
-	return NULL;
+    إذا (curtab->tp_snapshot[idx] == عدم)
+	أرجع عدم;
 
-    return get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
+    أرجع get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
 }
 
 /*
@@ -8339,21 +8339,21 @@ get_snapshot_curwin(int idx)
  * still the same.
  * "idx" is SNAP_HELP_IDX or SNAP_AUCMD_IDX.
  */
-    void
+    فراغ
 restore_snapshot(
-    int		idx,
-    int		close_curwin)	    // closing current window
+    صحيح		idx,
+    صحيح		close_curwin)	    // closing current window
 {
     win_T	*wp;
 
-    if (curtab->tp_snapshot[idx] != NULL
-	    && curtab->tp_snapshot[idx]->fr_width == topframe->fr_width
-	    && curtab->tp_snapshot[idx]->fr_height == topframe->fr_height
+    إذا (curtab->tp_snapshot[idx] != عدم
+	    && curtab->tp_snapshot[idx]->fr_ويڪر == topframe->fr_ويڪر
+	    && curtab->tp_snapshot[idx]->fr_اوچائي == topframe->fr_اوچائي
 	    && check_snapshot_rec(curtab->tp_snapshot[idx], topframe) == OK)
     {
 	wp = restore_snapshot_rec(curtab->tp_snapshot[idx], topframe);
 	win_comp_pos();
-	if (wp != NULL && close_curwin)
+	إذا (wp != عدم && close_curwin)
 	    win_goto(wp);
 	redraw_all_later(UPD_NOT_VALID);
     }
@@ -8364,19 +8364,19 @@ restore_snapshot(
  * Check if frames "sn" and "fr" have the same layout, same following frames
  * and same children.  And the window pointer is valid.
  */
-    static int
-check_snapshot_rec(frame_T *sn, frame_T *fr)
+    ساكن صحيح
+check_snapshot_rec(چوکٺو_T *sn, چوکٺو_T *fr)
 {
-    if (sn->fr_layout != fr->fr_layout
-	    || (sn->fr_next == NULL) != (fr->fr_next == NULL)
-	    || (sn->fr_child == NULL) != (fr->fr_child == NULL)
-	    || (sn->fr_next != NULL
-		&& check_snapshot_rec(sn->fr_next, fr->fr_next) == FAIL)
-	    || (sn->fr_child != NULL
-		&& check_snapshot_rec(sn->fr_child, fr->fr_child) == FAIL)
-	    || (sn->fr_win != NULL && !win_valid(sn->fr_win)))
-	return FAIL;
-    return OK;
+    إذا (sn->fr_layout != fr->fr_layout
+	    || (sn->fr_ايندڙ == عدم) != (fr->fr_ايندڙ == عدم)
+	    || (sn->fr_ٻار == عدم) != (fr->fr_ٻار == عدم)
+	    || (sn->fr_ايندڙ != عدم
+		&& check_snapshot_rec(sn->fr_ايندڙ, fr->fr_ايندڙ) == FAIL)
+	    || (sn->fr_ٻار != عدم
+		&& check_snapshot_rec(sn->fr_ٻار, fr->fr_ٻار) == FAIL)
+	    || (sn->fr_win != عدم && !win_valid(sn->fr_win)))
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
@@ -8384,140 +8384,140 @@ check_snapshot_rec(frame_T *sn, frame_T *fr)
  * following frames and children.
  * Returns a pointer to the old current window, or NULL.
  */
-    static win_T *
-restore_snapshot_rec(frame_T *sn, frame_T *fr)
+    ساكن win_T *
+restore_snapshot_rec(چوکٺو_T *sn, چوکٺو_T *fr)
 {
-    win_T	*wp = NULL;
+    win_T	*wp = عدم;
     win_T	*wp2;
 
-    fr->fr_height = sn->fr_height;
-    fr->fr_width = sn->fr_width;
-    if (fr->fr_layout == FR_LEAF)
+    fr->fr_اوچائي = sn->fr_اوچائي;
+    fr->fr_ويڪر = sn->fr_ويڪر;
+    إذا (fr->fr_layout == FR_پن)
     {
-	frame_new_height(fr, fr->fr_height, FALSE, FALSE, FALSE);
-	frame_new_width(fr, fr->fr_width, FALSE, FALSE);
+	چوکٺو_new_اوچائي(fr, fr->fr_اوچائي, FALSE, FALSE, FALSE);
+	چوکٺو_new_ويڪر(fr, fr->fr_ويڪر, FALSE, FALSE);
 	wp = sn->fr_win;
     }
-    if (sn->fr_next != NULL)
+    إذا (sn->fr_ايندڙ != عدم)
     {
-	wp2 = restore_snapshot_rec(sn->fr_next, fr->fr_next);
-	if (wp2 != NULL)
+	wp2 = restore_snapshot_rec(sn->fr_ايندڙ, fr->fr_ايندڙ);
+	إذا (wp2 != عدم)
 	    wp = wp2;
     }
-    if (sn->fr_child != NULL)
+    إذا (sn->fr_ٻار != عدم)
     {
-	wp2 = restore_snapshot_rec(sn->fr_child, fr->fr_child);
-	if (wp2 != NULL)
+	wp2 = restore_snapshot_rec(sn->fr_ٻار, fr->fr_ٻار);
+	إذا (wp2 != عدم)
 	    wp = wp2;
     }
-    return wp;
+    أرجع wp;
 }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 /*
  * Return TRUE if there is any vertically split window.
  */
-    int
-win_hasvertsplit(void)
+    صحيح
+win_hasvertsplit(فراغ)
 {
-    frame_T	*fr;
+    چوکٺو_T	*fr;
 
-    if (topframe->fr_layout == FR_ROW)
-	return TRUE;
+    إذا (topframe->fr_layout == FR_صف)
+	أرجع TRUE;
 
-    if (topframe->fr_layout == FR_COL)
-	FOR_ALL_FRAMES(fr, topframe->fr_child)
-	    if (fr->fr_layout == FR_ROW)
-		return TRUE;
+    إذا (topframe->fr_layout == FR_کانو)
+	FOR_ALL_چوکٺا(fr, topframe->fr_ٻار)
+	    إذا (fr->fr_layout == FR_صف)
+		أرجع TRUE;
 
-    return FALSE;
+    أرجع FALSE;
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
-    int
-get_win_number(win_T *wp, win_T *first_win)
+#إذا defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+    صحيح
+get_win_عدد(win_T *wp, win_T *پهريون_win)
 {
-    int		i = 1;
+    صحيح		i = 1;
     win_T	*w;
 
-    for (w = first_win; w != NULL && w != wp; w = W_NEXT(w))
+    لكل (w = پهريون_win; w != عدم && w != wp; w = W_ايندڙ(w))
 	++i;
 
-    if (w == NULL)
-	return 0;
-    else
-	return i;
+    إذا (w == عدم)
+	أرجع 0;
+    وإلا
+	أرجع i;
 }
 
-    int
-get_tab_number(tabpage_T *tp)
+    صحيح
+get_tab_عدد(tabpage_T *tp)
 {
-    int		i = 1;
+    صحيح		i = 1;
     tabpage_T	*t;
 
-    for (t = first_tabpage; t != NULL && t != tp; t = t->tp_next)
+    لكل (t = پهريون_tabpage; t != عدم && t != tp; t = t->tp_ايندڙ)
 	++i;
 
-    if (t == NULL)
-	return 0;
-    else
-	return i;
+    إذا (t == عدم)
+	أرجع 0;
+    وإلا
+	أرجع i;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Return TRUE if "topfrp" and its children are at the right height.
  */
-    static int
-frame_check_height(frame_T *topfrp, int height)
+    ساكن صحيح
+چوکٺو_check_اوچائي(چوکٺو_T *topfrp, صحيح اوچائي)
 {
-    frame_T *frp;
+    چوکٺو_T *frp;
 
-    if (topfrp->fr_height != height)
-	return FALSE;
+    إذا (topfrp->fr_اوچائي != اوچائي)
+	أرجع FALSE;
 
-    if (topfrp->fr_layout == FR_ROW)
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_height != height)
-		return FALSE;
+    إذا (topfrp->fr_layout == FR_صف)
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
+	    إذا (frp->fr_اوچائي != اوچائي)
+		أرجع FALSE;
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Return TRUE if "topfrp" and its children are at the right width.
  */
-    static int
-frame_check_width(frame_T *topfrp, int width)
+    ساكن صحيح
+چوکٺو_check_ويڪر(چوکٺو_T *topfrp, صحيح ويڪر)
 {
-    frame_T *frp;
+    چوکٺو_T *frp;
 
-    if (topfrp->fr_width != width)
-	return FALSE;
+    إذا (topfrp->fr_ويڪر != ويڪر)
+	أرجع FALSE;
 
-    if (topfrp->fr_layout == FR_COL)
-	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_width != width)
-		return FALSE;
+    إذا (topfrp->fr_layout == FR_کانو)
+	FOR_ALL_چوکٺا(frp, topfrp->fr_ٻار)
+	    إذا (frp->fr_ويڪر != ويڪر)
+		أرجع FALSE;
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 /*
  * Simple int comparison function for use with qsort()
  */
-    static int
-int_cmp(const void *pa, const void *pb)
+    ساكن صحيح
+int_cmp(ثابت فراغ *pa, ثابت فراغ *pb)
 {
-    const int a = *(const int *)pa;
-    const int b = *(const int *)pb;
-    if (a > b)
-	return 1;
-    if (a < b)
-	return -1;
-    return 0;
+    ثابت صحيح a = *(ثابت صحيح *)pa;
+    ثابت صحيح b = *(ثابت صحيح *)pb;
+    إذا (a > b)
+	أرجع 1;
+    إذا (a < b)
+	أرجع -1;
+    أرجع 0;
 }
 
 /*
@@ -8525,101 +8525,101 @@ int_cmp(const void *pa, const void *pb)
  * This is called when 'colorcolumn' or 'textwidth' is changed.
  * Returns error message, NULL if it's OK.
  */
-    char *
+    حرف *
 check_colorcolumn(
     char_u *cc,		// when NULL: use "wp->w_p_cc"
     win_T *wp)		// when NULL: only parse "cc"
 {
-    char_u	*s = empty_option;
-    int		tw;
-    int		col;
-    int		count = 0;
-    int		color_cols[256];
-    int		i;
-    int		j = 0;
+    char_u	*s = خالي_جايون_option;
+    صحيح		tw;
+    صحيح		کانو;
+    صحيح		ڳڻپ = 0;
+    صحيح		color_کانن_ڳڻپ[256];
+    صحيح		i;
+    صحيح		j = 0;
 
-    if (wp != NULL && wp->w_buffer == NULL)
-	return NULL;  // buffer was closed
+    إذا (wp != عدم && wp->w_بفر == عدم)
+	أرجع عدم;  // buffer was closed
 
-    if (cc != NULL)
+    إذا (cc != عدم)
 	s = cc;
-    else if (wp != NULL)
+    وإلا إذا (wp != عدم)
 	s = wp->w_p_cc;
 
-    if (wp != NULL)
-	tw = wp->w_buffer->b_p_tw;
-    else
+    إذا (wp != عدم)
+	tw = wp->w_بفر->b_p_tw;
+    وإلا
 	// buffer-local value not set, assume zero
 	tw = 0;
 
-    while (*s != NUL && count < 255)
+    طالما (*s != NUL && ڳڻپ < 255)
     {
-	if (*s == '-' || *s == '+')
+	إذا (*s == '-' || *s == '+')
 	{
 	    // -N and +N: add to 'textwidth'
-	    col = (*s == '-') ? -1 : 1;
+	    کانو = (*s == '-') ? -1 : 1;
 	    ++s;
-	    if (!VIM_ISDIGIT(*s))
-		return e_invalid_argument;
-	    col = col * getdigits(&s);
-	    if (tw == 0)
-		goto skip;  // 'textwidth' not set, skip this item
-	    col += tw;
-	    if (col < 0)
-		goto skip;
+	    إذا (!VIM_ISDIGIT(*s))
+		أرجع e_invalid_دليل;
+	    کانو = کانو * getdigits(&s);
+	    إذا (tw == 0)
+		اذهب skip;  // 'textwidth' not set, skip this item
+	    کانو += tw;
+	    إذا (کانو < 0)
+		اذهب skip;
 	}
-	else if (VIM_ISDIGIT(*s))
-	    col = getdigits(&s);
-	else
-	    return e_invalid_argument;
-	color_cols[count++] = col - 1;  // 1-based to 0-based
+	وإلا إذا (VIM_ISDIGIT(*s))
+	    کانو = getdigits(&s);
+	وإلا
+	    أرجع e_invalid_دليل;
+	color_کانن_ڳڻپ[ڳڻپ++] = کانو - 1;  // 1-based to 0-based
 skip:
-	if (*s == NUL)
-	    break;
-	if (*s != ',')
-	    return e_invalid_argument;
-	if (*++s == NUL)
-	    return e_invalid_argument;  // illegal trailing comma as in "set cc=80,"
+	إذا (*s == NUL)
+	    اكسر;
+	إذا (*s != ',')
+	    أرجع e_invalid_دليل;
+	إذا (*++s == NUL)
+	    أرجع e_invalid_دليل;  // illegal trailing comma as in "set cc=80,"
     }
 
-    if (wp == NULL)
-	return NULL;  // only parse "cc"
+    إذا (wp == عدم)
+	أرجع عدم;  // only parse "cc"
 
-    vim_free(wp->w_p_cc_cols);
-    if (count == 0)
-	wp->w_p_cc_cols = NULL;
-    else
+    vim_free(wp->w_p_cc_کانن_ڳڻپ);
+    إذا (ڳڻپ == 0)
+	wp->w_p_cc_کانن_ڳڻپ = عدم;
+    وإلا
     {
-	wp->w_p_cc_cols = ALLOC_MULT(int, count + 1);
-	if (wp->w_p_cc_cols != NULL)
+	wp->w_p_cc_کانن_ڳڻپ = ALLOC_MULT(صحيح, ڳڻپ + 1);
+	إذا (wp->w_p_cc_کانن_ڳڻپ != عدم)
 	{
 	    // sort the columns for faster usage on screen redraw inside
 	    // win_line()
-	    qsort(color_cols, count, sizeof(int), int_cmp);
+	    qsort(color_کانن_ڳڻپ, ڳڻپ, حجم(صحيح), int_cmp);
 
-	    for (i = 0; i < count; ++i)
+	    لكل (i = 0; i < ڳڻپ; ++i)
 		// skip duplicates
-		if (j == 0 || wp->w_p_cc_cols[j - 1] != color_cols[i])
-		    wp->w_p_cc_cols[j++] = color_cols[i];
-	    wp->w_p_cc_cols[j] = -1;  // end marker
+		إذا (j == 0 || wp->w_p_cc_کانن_ڳڻپ[j - 1] != color_کانن_ڳڻپ[i])
+		    wp->w_p_cc_کانن_ڳڻپ[j++] = color_کانن_ڳڻپ[i];
+	    wp->w_p_cc_کانن_ڳڻپ[j] = -1;  // end marker
 	}
     }
 
-    return NULL;  // no error
+    أرجع عدم;  // no error
 }
-#endif
+#جيڪڏهن_پورو
 
-    int
-get_last_winid(void)
+    صحيح
+get_آخري_winid(فراغ)
 {
-    return last_win_id;
+    أرجع آخري_win_id;
 }
 
 /*
  * Don't let autocommands close the given window
  */
-   int
+   صحيح
 win_locked(win_T *wp)
 {
-    return wp->w_locked;
+    أرجع wp->w_locked;
 }

@@ -13,63 +13,63 @@
  * Routines for Win32.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include <sys/types.h>
-#include <limits.h>
+#ضمن <sys/types.h>
+#ضمن <limits.h>
 
-#include <process.h>
-#include <direct.h>
+#ضمن <process.h>
+#ضمن <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#إذا !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#إذا defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 # include <dlgs.h>
 # include <winspool.h>
 # include <commdlg.h>
-#endif
+#جيڪڏهن_پورو
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#جيڪڏهن_وصف_ٿيل MCH_WRITE_DUMP
+FILE* fdDump = عدم;
+#جيڪڏهن_پورو
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-extern char g_szOrigTitle[];
-#endif
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+خارجي حرف g_szOrigTitle[];
+#جيڪڏهن_پورو
 
-#ifdef FEAT_GUI
-extern HWND s_hwnd;
-#else
-static HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_GUI
+خارجي HWND s_hwnd;
+#وإلا
+ساكن HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
+#جيڪڏهن_پورو
 
-#ifdef FEAT_JOB_CHANNEL
-int WSInitialized = FALSE; // WinSock is initialized
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_ڪم_CHANNEL
+صحيح WSInitialized = FALSE; // WinSock is initialized
+#جيڪڏهن_پورو
 
 
 /*
  * Save the instance handle of the exe/dll.
  */
-    void
+    فراغ
 SaveInst(HINSTANCE hInst)
 {
     g_hinst = hInst;
 }
 
-#if defined(FEAT_GUI_MSWIN)
+#إذا defined(FEAT_GUI_MSWIN)
 /*
  * GUI version of mch_exit().
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit_g(int r)
+    فراغ
+mch_exit_g(صحيح r)
 {
     exiting = TRUE;
 
@@ -80,127 +80,127 @@ mch_exit_g(int r)
 # ifdef FEAT_OLE
     UninitOLE();
 # endif
-# ifdef FEAT_JOB_CHANNEL
-    if (WSInitialized)
+# ifdef FEAT_ڪم_CHANNEL
+    إذا (WSInitialized)
     {
 	WSInitialized = FALSE;
 	WSACleanup();
     }
 # endif
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_پڇاڙي();
 # endif
 
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 	gui_exit(r);
 
 # ifdef EXITFREE
     free_all_mem();
 # endif
 
-    exit(r);
+    ٻاهر_نڪرو(r);
 }
 
-#endif // FEAT_GUI_MSWIN
+#جيڪڏهن_پورو // FEAT_GUI_MSWIN
 
 
 /*
  * Get version number including build number
  */
-typedef BOOL (WINAPI *PfnRtlGetVersion)(LPOSVERSIONINFOW);
-DWORD win_version;
-    static void
-win_version_init(void)
+تعريفنوع BOOL (WINAPI *Pfn_Rtl_Get_نسخو)(LPOSVERSIONINFOW);
+DWORD win_نسخو;
+    ساكن فراغ
+win_نسخو_init(فراغ)
 {
     OSVERSIONINFOW	osver;
     HMODULE		hNtdll;
-    PfnRtlGetVersion	pRtlGetVersion;
+    Pfn_Rtl_Get_نسخو	p_Rtl_Get_نسخو;
 
     hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll == NULL)
-	return;
+    إذا (hNtdll == عدم)
+	أرجع;
 
-    pRtlGetVersion =
-	(PfnRtlGetVersion) GetProcAddress(hNtdll, "RtlGetVersion");
-    if (pRtlGetVersion == NULL)
-	return;
+    p_Rtl_Get_نسخو =
+	(Pfn_Rtl_Get_نسخو) Get_Proc_پتو(hNtdll, "RtlGetVersion");
+    إذا (p_Rtl_Get_نسخو == عدم)
+	أرجع;
 
-    osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-    pRtlGetVersion(&osver);
-    win_version = MAKE_VER(min(osver.dwMajorVersion, 0xFF),
-	    min(osver.dwMinorVersion, 0xFF),
-	    min(osver.dwBuildNumber, 0xFFFF));
+    osver.dw_OSVersion_Info_سائيز = حجم(OSVERSIONINFOW);
+    p_Rtl_Get_نسخو(&osver);
+    win_نسخو = MAKE_VER(min(osver.dw_Major_نسخو, 0xFF),
+	    min(osver.dw_Minor_نسخو, 0xFF),
+	    min(osver.dw_Build_عدد, 0xFFFF));
 }
 
 /*
  * Init the tables for toupper() and tolower().
  */
-    void
-mch_early_init(void)
+    فراغ
+mch_early_init(فراغ)
 {
-    int		i;
+    صحيح		i;
 
-    win_version_init();
+    win_نسخو_init();
 
     PlatformId();
 
     // Init the tables for toupper() and tolower()
-    for (i = 0; i < 256; ++i)
+    لكل (i = 0; i < 256; ++i)
 	toupper_tab[i] = tolower_tab[i] = i;
-    CharUpperBuff((LPSTR)toupper_tab, 256);
-    CharLowerBuff((LPSTR)tolower_tab, 256);
+    Char_مٿانهون_Buff((LPSTR)toupper_tab, 256);
+    Char_هيٺاهون_Buff((LPSTR)tolower_tab, 256);
 }
 
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
-mch_input_isatty(void)
+    صحيح
+mch_داخلا_isatty(فراغ)
 {
-#ifdef FEAT_GUI_MSWIN
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 # endif
-	return TRUE;	    // GUI always has a tty
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
-#endif
+	أرجع TRUE;	    // GUI always has a tty
+#جيڪڏهن_پورو
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    إذا (isatty(read_cmd_fd))
+	أرجع TRUE;
+    أرجع FALSE;
+#جيڪڏهن_پورو
 }
 
 /*
  * mch_settitle(): set titlebar of our window
  */
-    void
+    فراغ
 mch_settitle(
     char_u *title,
-    char_u *icon UNUSED)
+    char_u *icon اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_GUI_MSWIN
+#جيڪڏهن_وصف_ٿيل FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 # endif
     {
 	gui_mch_settitle(title, icon);
-	return;
+	أرجع;
     }
-#endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (title != NULL)
+#جيڪڏهن_پورو
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    إذا (title != عدم)
     {
-	WCHAR	*wp = enc_to_utf16(title, NULL);
+	WCHAR	*wp = enc_منزل_utf16(title, عدم);
 
-	if (wp == NULL)
-	    return;
+	إذا (wp == عدم)
+	    أرجع;
 
-	SetConsoleTitleW(wp);
+	سيٽ_Console_Title_W(wp);
 	vim_free(wp);
-	return;
+	أرجع;
     }
-#endif
+#جيڪڏهن_پورو
 }
 
 
@@ -211,35 +211,35 @@ mch_settitle(
  *  SAVE_RESTORE_ICON:  Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH:  Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which UNUSED)
+    فراغ
+mch_restore_title(صحيح which اڻ_استعمال_ٿيل)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    إذا (!gui.اندريون_use)
 # endif
-	SetConsoleTitle(g_szOrigTitle);
-#endif
+	سيٽ_Console_Title(g_szOrigTitle);
+#جيڪڏهن_پورو
 }
 
 
 /*
  * Return TRUE if we can restore the title (we can)
  */
-    int
-mch_can_restore_title(void)
+    صحيح
+mch_can_restore_title(فراغ)
 {
-    return TRUE;
+    أرجع TRUE;
 }
 
 
 /*
  * Return TRUE if we can restore the icon title (we can't)
  */
-    int
-mch_can_restore_icon(void)
+    صحيح
+mch_can_restore_icon(فراغ)
 {
-    return FALSE;
+    أرجع FALSE;
 }
 
 
@@ -250,55 +250,55 @@ mch_can_restore_icon(void)
  * When 'shellslash' set do it the other way around.
  * Return OK or FAIL.
  */
-    int
-mch_FullName(
+    صحيح
+mch_ڀريل_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force UNUSED)
+    صحيح		len,
+    صحيح		force اڻ_استعمال_ٿيل)
 {
-    int		nResult = FAIL;
+    صحيح		n_نتيجو = FAIL;
     WCHAR	*wname;
-    WCHAR	wbuf[MAX_PATH];
-    char_u	*cname = NULL;
+    WCHAR	wbuf[MAX_رستو];
+    char_u	*cname = عدم;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname != NULL && _wfullpath(wbuf, wname, MAX_PATH) != NULL)
+    wname = enc_منزل_utf16(fname, عدم);
+    إذا (wname != عدم && _wfullpath(wbuf, wname, MAX_رستو) != عدم)
     {
-	cname = utf16_to_enc((short_u *)wbuf, NULL);
-	if (cname != NULL)
+	cname = utf16_منزل_enc((short_u *)wbuf, عدم);
+	إذا (cname != عدم)
 	{
 	    vim_strncpy(buf, cname, len - 1);
-	    nResult = OK;
+	    n_نتيجو = OK;
 	}
     }
     vim_free(wname);
     vim_free(cname);
 
-#ifdef USE_FNAME_CASE
+#جيڪڏهن_وصف_ٿيل USE_FNAME_CASE
     fname_case(buf, len);
-#else
+#وإلا
     slash_adjust(buf);
-#endif
+#جيڪڏهن_پورو
 
-    return nResult;
+    أرجع n_نتيجو;
 }
 
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
-mch_isFullName(char_u *fname)
+    صحيح
+mch_is_ڀريل_Name(char_u *fname)
 {
     // A name like "d:/foo" and "//server/share" is absolute.  "d:foo" is not.
     // /foo and \foo are absolute too because Windows keeps a current drive.
     // Another way to check is to use mch_FullName() and see if the result is
     // the same as the name or mch_FullName() fails.  However, this has quite a
     // bit of overhead, so let's not do that.
-    if (*fname == NUL)
-	return FALSE;
-    return ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
+    إذا (*fname == NUL)
+	أرجع FALSE;
+    أرجع ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
 				      && (fname[2] == '/' || fname[2] == '\\'))
 	    || (fname[0] == '/' || fname[0] == '\\'));
 }
@@ -313,130 +313,130 @@ mch_isFullName(char_u *fname)
  * When 'shellslash' set do it the other way around.
  * When the path looks like a URL leave it unmodified.
  */
-    void
+    فراغ
 slash_adjust(char_u *p)
 {
-    if (path_with_url(p))
-	return;
+    إذا (رستو_with_url(p))
+	أرجع;
 
-    if (*p == '`')
+    إذا (*p == '`')
     {
 	size_t len = STRLEN(p);
 
 	// don't replace backslash in backtick quoted strings
-	if (len > 2 && *(p + len - 1) == '`')
-	    return;
+	إذا (len > 2 && *(p + len - 1) == '`')
+	    أرجع;
     }
 
-    while (*p)
+    طالما (*p)
     {
-	if (*p == psepcN)
+	إذا (*p == psepcN)
 	    *p = psepc;
 	MB_PTR_ADV(p);
     }
 }
 
-    static int
-read_reparse_point(const WCHAR *name, char_u *buf, DWORD *buf_len)
+    ساكن صحيح
+read_reparse_نقطو(ثابت WCHAR *name, char_u *buf, DWORD *buf_len)
 {
     HANDLE h;
     BOOL ok;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+    h = CreateFileW(name, FILE_READ_خاصيتون,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, عدم,
 	    OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return FAIL;
+	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_نقطو,
+	    عدم);
+    إذا (h == INVALID_HANDLE_قدر)
+	أرجع FAIL;
 
-    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buf, *buf_len,
-	    buf_len, NULL);
+    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_نقطو, عدم, 0, buf, *buf_len,
+	    buf_len, عدم);
     CloseHandle(h);
 
-    return ok ? OK : FAIL;
+    أرجع ok ? OK : FAIL;
 }
 
     char_u *
 resolve_appexeclink(char_u *fname)
 {
     DWORD		attr = 0;
-    int			idx;
-    WCHAR		*p, *end, *wname;
+    صحيح			idx;
+    WCHAR		*p, *پڇاڙي, *wname;
     // The buffer size is arbitrarily chosen to be "big enough" (TM), the
     // ceiling should be around 16k.
     char_u		buf[4096];
-    DWORD		buf_len = sizeof(buf);
-    REPARSE_DATA_BUFFER *rb = (REPARSE_DATA_BUFFER *)buf;
+    DWORD		buf_len = حجم(buf);
+    REPARSE_معلومات_بفر *rb = (REPARSE_معلومات_بفر *)buf;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname == NULL)
-	return NULL;
+    wname = enc_منزل_utf16(fname, عدم);
+    إذا (wname == عدم)
+	أرجع عدم;
 
-    attr = GetFileAttributesW(wname);
-    if (attr == INVALID_FILE_ATTRIBUTES ||
-	    (attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+    attr = Get_File_خاصيتون_W(wname);
+    إذا (attr == INVALID_FILE_خاصيتون ||
+	    (attr & FILE_ATTRIBUTE_REPARSE_نقطو) == 0)
     {
 	vim_free(wname);
-	return NULL;
+	أرجع عدم;
     }
 
     // The applinks are similar to symlinks but with a huge difference: they can
     // only be executed, any other I/O operation on them is bound to fail with
     // ERROR_FILE_NOT_FOUND even though the file exists.
-    if (read_reparse_point(wname, buf, &buf_len) == FAIL)
+    إذا (read_reparse_نقطو(wname, buf, &buf_len) == FAIL)
     {
 	vim_free(wname);
-	return NULL;
+	أرجع عدم;
     }
     vim_free(wname);
 
-    if (rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK)
-	return NULL;
+    إذا (rb->Reparse_ٽيگ != IO_REPARSE_ٽيگ_APPEXECLINK)
+	أرجع عدم;
 
     // The (undocumented) reparse buffer contains a set of N null-terminated
     // Unicode strings, the application path is stored in the third one.
-    if (rb->AppExecLinkReparseBuffer.StringCount < 3)
-	return NULL;
+    إذا (rb->App_Exec_Link_Reparse_بفر.String_ڳڻپ < 3)
+	أرجع عدم;
 
-    p = rb->AppExecLinkReparseBuffer.StringList;
-    end = p + rb->ReparseDataLength / sizeof(WCHAR);
-    for (idx = 0; p < end
-	    && idx < (int)rb->AppExecLinkReparseBuffer.StringCount
+    p = rb->App_Exec_Link_Reparse_بفر.StringList;
+    پڇاڙي = p + rb->Reparse_معلومات_ڊيگهائي / حجم(WCHAR);
+    لكل (idx = 0; p < پڇاڙي
+	    && idx < (صحيح)rb->App_Exec_Link_Reparse_بفر.String_ڳڻپ
 	    && idx != 2; )
     {
-	if (*p++ == L'\0')
+	إذا (*p++ == L'\0')
 	    ++idx;
     }
 
-    return utf16_to_enc(p, NULL);
+    أرجع utf16_منزل_enc(p, عدم);
 }
 
 // Use 64-bit stat functions.
-#undef stat
-#undef _stat
-#undef _wstat
-#undef _fstat
-#define stat _stat64
-#define _stat _stat64
-#define _wstat _wstat64
-#define _fstat _fstat64
+#وصف_رد stat
+#وصف_رد _stat
+#وصف_رد _wstat
+#وصف_رد _fstat
+#وصف_ڪريو stat _stat64
+#وصف_ڪريو _stat _stat64
+#وصف_ڪريو _wstat _wstat64
+#وصف_ڪريو _fstat _fstat64
 
 /*
  * Implements lstat() and stat() that can handle symlinks properly.
  */
-    static int
-mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
+    ساكن صحيح
+mswin_stat_impl(ثابت WCHAR *name, stat_T *stp, ثابت صحيح resolve)
 {
-    int			n;
-    int			fd;
+    صحيح			n;
+    صحيح			fd;
     BOOL		is_symlink = FALSE;
-    HANDLE		hFind, h;
+    HANDLE		h_ڳوليو, h;
     DWORD		attr = 0;
     DWORD		flag = 0;
-    WIN32_FIND_DATAW    findDataW;
+    WIN32_ڳوليو_DATAW    ڳوليو_معلومات_W;
 
-#if 0 && defined(_UCRT)
+#إذا 0 && defined(_UCRT)
     // This code was disabled because the behavior of MSVC's _wstat (actually
     // _wstat64) for empty symlinks varies depending on the C runtime you link
     // to.
@@ -449,145 +449,145 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
     //
     // For more details, see:
     // https://github.com/koron/vc-stat-behavior-verification
-    if (resolve)
+    إذا (resolve)
 	// Universal CRT can handle symlinks properly.
-	return _wstat(name, stp);
-#endif
+	أرجع _wstat(name, stp);
+#جيڪڏهن_پورو
 
     // Only reparse points need a directory query to identify symbolic links.
     // In particular, avoid enumerating the directory for each missing file
     // while searching 'runtimepath'.
-    attr = GetFileAttributesW(name);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    attr = Get_File_خاصيتون_W(name);
+    إذا (attr == INVALID_FILE_خاصيتون)
     {
-	DWORD error = GetLastError();
+	DWORD error = Get_آخري_Error();
 
 	// A missing file or path cannot provide stat information.  Other
 	// errors and UNC paths still need the CRT fallback.
-	if ((error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
+	إذا ((error == ERROR_FILE_NOT_مليو || error == ERROR_رستو_NOT_مليو)
 		&& !((name[0] == L'\\' || name[0] == L'/')
 		    && (name[1] == L'\\' || name[1] == L'/')))
 	{
 	    errno = ENOENT;
-	    return -1;
+	    أرجع -1;
 	}
-	return _wstat(name, stp);
+	أرجع _wstat(name, stp);
     }
-    if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT))
-	return _wstat(name, stp);
+    إذا (!(attr & FILE_ATTRIBUTE_REPARSE_نقطو))
+	أرجع _wstat(name, stp);
 
-    hFind = FindFirstFileW(name, &findDataW);
-    if (hFind != INVALID_HANDLE_VALUE)
+    h_ڳوليو = ڳوليو_پهريون_File_W(name, &ڳوليو_معلومات_W);
+    إذا (h_ڳوليو != INVALID_HANDLE_قدر)
     {
-	attr = findDataW.dwFileAttributes;
-	if ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
-		&& (findDataW.dwReserved0 == IO_REPARSE_TAG_SYMLINK))
+	attr = ڳوليو_معلومات_W.dw_File_خاصيتون;
+	إذا ((attr & FILE_ATTRIBUTE_REPARSE_نقطو)
+		&& (ڳوليو_معلومات_W.dwReserved0 == IO_REPARSE_ٽيگ_SYMLINK))
 	    is_symlink = TRUE;
-	FindClose(hFind);
+	ڳوليو_Close(h_ڳوليو);
     }
 
     // Use the plain old stat() whenever it's possible.
-    if (!is_symlink)
-	return _wstat(name, stp);
+    إذا (!is_symlink)
+	أرجع _wstat(name, stp);
 
-    if (!resolve && is_symlink)
-	flag = FILE_FLAG_OPEN_REPARSE_POINT;
-    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+    إذا (!resolve && is_symlink)
+	flag = FILE_FLAG_OPEN_REPARSE_نقطو;
+    إذا (attr & FILE_ATTRIBUTE_DIRECTORY)
 	flag |= FILE_FLAG_BACKUP_SEMANTICS;
 
-    h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, flag,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return -1;
+    h = CreateFileW(name, FILE_READ_خاصيتون,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, عدم, OPEN_EXISTING, flag,
+	    عدم);
+    إذا (h == INVALID_HANDLE_قدر)
+	أرجع -1;
 
     fd = _open_osfhandle((intptr_t)h, _O_RDONLY);
-    n = _fstat(fd, (struct _stat *)stp);
-    if ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
-	stp->st_mode = (stp->st_mode & ~S_IFMT) | S_IFDIR;
+    n = _fstat(fd, (بنية _stat *)stp);
+    إذا ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	stp->st_گهڻائي = (stp->st_گهڻائي & ~S_IFMT) | S_IFDIR;
     _close(fd);
 
-    return n;
+    أرجع n;
 }
 
 /*
  * stat() can't handle a trailing '/' or '\', remove it first.
  * When 'resolve' is true behave as lstat() wrt symlinks.
  */
-    static int
-stat_impl(const char *name, stat_T *stp, const int resolve)
+    ساكن صحيح
+stat_impl(ثابت حرف *name, stat_T *stp, ثابت صحيح resolve)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3 + 1];
+    char_u	buf[MAX_رستو_2 * 3 + 1];
     size_t	buflen;
     char_u	*p;
     WCHAR	*wp;
-    int		n;
+    صحيح		n;
 
-    vim_strncpy((char_u *)buf, (char_u *)name, sizeof(buf) - 1);
+    vim_strncpy((char_u *)buf, (char_u *)name, حجم(buf) - 1);
     buflen = STRLEN(buf);
     p = buf + buflen;
-    if (p > buf)
-	MB_PTR_BACK(buf, p);
+    إذا (p > buf)
+	MB_PTR_پٺ(buf, p);
 
     // Remove trailing '\\' except root path.
-    if (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
+    إذا (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
     {
 	*p = NUL;
 	buflen = (size_t)(p - buf);
     }
 
-    if ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
+    إذا ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
     {
 	// UNC root path must be followed by '\\'.
 	p = vim_strpbrk(buf + 2, (char_u *)"\\/");
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    p = vim_strpbrk(p + 1, (char_u *)"\\/");
-	    if (p == NULL)
+	    إذا (p == عدم)
 		STRCPY(buf + buflen, "\\");
 	}
     }
 
-    wp = enc_to_utf16(buf, NULL);
-    if (wp == NULL)
-	return -1;
+    wp = enc_منزل_utf16(buf, عدم);
+    إذا (wp == عدم)
+	أرجع -1;
 
     n = mswin_stat_impl(wp, stp, resolve);
     vim_free(wp);
-    return n;
+    أرجع n;
 }
 
-    int
-vim_lstat(const char *name, stat_T *stp)
+    صحيح
+vim_lstat(ثابت حرف *name, stat_T *stp)
 {
-    return stat_impl(name, stp, FALSE);
+    أرجع stat_impl(name, stp, FALSE);
 }
 
-    int
-vim_stat(const char *name, stat_T *stp)
+    صحيح
+vim_stat(ثابت حرف *name, stat_T *stp)
 {
-    return stat_impl(name, stp, TRUE);
+    أرجع stat_impl(name, stp, TRUE);
 }
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    void
-mch_settmode(tmode_T tmode UNUSED)
+#إذا defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    فراغ
+mch_settmode(tmode_T tmode اڻ_استعمال_ٿيل)
 {
     // nothing to do
 }
 
-    int
-mch_get_shellsize(void)
+    صحيح
+mch_get_shellsize(فراغ)
 {
     // never used
-    return OK;
+    أرجع OK;
 }
 
-    void
-mch_set_shellsize(void)
+    فراغ
+mch_سيٽ_shellsize(فراغ)
 {
     // never used
 }
@@ -595,30 +595,30 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    فراغ
+mch_new_shellsize(فراغ)
 {
     // never used
 }
 
-    void
-mch_calc_cell_size(struct cellsize *cs_out UNUSED)
+    فراغ
+mch_calc_cell_سائيز(بنية cellsize *cs_ٻاهريون اڻ_استعمال_ٿيل)
 {
     // never used
 }
 
-#endif
+#جيڪڏهن_پورو
 
 /*
  * We have no job control, so fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    فراغ
+mch_suspend(فراغ)
 {
     suspend_shell();
 }
 
-#if defined(USE_MCH_ERRMSG)
+#إذا defined(USE_MCH_ERRMSG)
 
 # ifdef display_errors
 #  undef display_errors
@@ -627,76 +627,76 @@ mch_suspend(void)
 /*
  * Display the saved error message(s).
  */
-    void
-display_errors(void)
+    فراغ
+display_errors(فراغ)
 {
 # ifdef FEAT_GUI
     char_u *p;
 
 #  ifdef VIMDLL
-    if (gui.in_use || gui.starting)
+    إذا (gui.اندريون_use || gui.starting)
 #  endif
     {
-	if (error_ga.ga_data != NULL)
+	إذا (error_ga.ga_معلومات != عدم)
 	{
 	    // avoid putting up a message box with blanks only
-	    for (p = (char_u *)error_ga.ga_data; *p; ++p)
-		if (!SAFE_isspace(*p))
+	    لكل (p = (char_u *)error_ga.ga_معلومات; *p; ++p)
+		إذا (!محفوظ_isspace(*p))
 		{
 		    // Only use a dialog when not using --gui-dialog-file:
 		    // write text to a file.
-		    if (!gui_dialog_log((char_u *)"Errors", p))
-			(void)gui_mch_dialog(
+		    إذا (!gui_dialog_log((char_u *)"Errors", p))
+			(فراغ)gui_mch_dialog(
 				     gui.starting ? VIM_INFO :
 					     VIM_ERROR,
 				     gui.starting ? (char_u *)_("Message") :
 					     (char_u *)_("Error"),
 					     p, (char_u *)_("&Ok"),
-					1, NULL, FALSE);
-		    break;
+					1, عدم, FALSE);
+		    اكسر;
 		}
 	    ga_clear(&error_ga);
 	}
-	return;
+	أرجع;
     }
 # endif
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# إذا !defined(FEAT_GUI) || defined(VIMDLL)
     FlushFileBuffers(GetStdHandle(STD_ERROR_HANDLE));
 # endif
 }
-#endif
+#جيڪڏهن_پورو
 
 
 /*
  * Return TRUE if "p" contain a wildcard that can be expanded by
  * dos_expandpath().
  */
-    int
+    صحيح
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    لكل ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*[", *p) != NULL
+	إذا (vim_strchr((char_u *)"?*[", *p) != عدم
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE if "p" contain a wildcard or a "~1" kind of thing (could be a
  * shortened file name).
  */
-    int
+    صحيح
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    لكل ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*$[`", *p) != NULL
+	إذا (vim_strchr((char_u *)"?*$[`", *p) != عدم
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 
@@ -704,128 +704,128 @@ mch_has_wildcard(char_u *p)
  * The normal _chdir() does not change the default drive.  This one does.
  * Returning 0 implies success; -1 implies failure.
  */
-    int
-mch_chdir(char *path)
+    صحيح
+mch_chdir(حرف *رستو)
 {
     WCHAR   *p;
-    int	    n;
+    صحيح	    n;
 
-    if (path[0] == NUL)		// just checking...
-	return -1;
+    إذا (رستو[0] == NUL)		// just checking...
+	أرجع -1;
 
-    if (p_verbose >= 5)
+    إذا (p_verbose >= 5)
     {
 	verbose_enter();
-	smsg("chdir(%s)", path);
+	smsg("chdir(%s)", رستو);
 	verbose_leave();
     }
-    if (SAFE_isalpha(path[0]) && path[1] == ':')	// has a drive name
+    إذا (محفوظ_isalpha(رستو[0]) && رستو[1] == ':')	// has a drive name
     {
 	// If we can change to the drive, skip that part of the path.  If we
 	// can't then the current directory may be invalid, try using chdir()
 	// with the whole path.
-	if (_chdrive(TOLOWER_ASC(path[0]) - 'a' + 1) == 0)
-	    path += 2;
+	إذا (_chdrive(TOLOWER_ASC(رستو[0]) - 'a' + 1) == 0)
+	    رستو += 2;
     }
 
-    if (*path == NUL)		// drive name only
-	return 0;
+    إذا (*رستو == NUL)		// drive name only
+	أرجع 0;
 
-    p = enc_to_utf16((char_u *)path, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_منزل_utf16((char_u *)رستو, عدم);
+    إذا (p == عدم)
+	أرجع -1;
 
     n = _wchdir(p);
     vim_free(p);
-    return n;
+    أرجع n;
 }
 
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#إذا defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    صحيح
+mch_char_avail(فراغ)
 {
     // never used
-    return TRUE;
+    أرجع TRUE;
 }
 
-# if defined(FEAT_TERMINAL)
+# إذا defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    صحيح
+mch_check_messages(فراغ)
 {
     // TODO: check for messages
-    return TRUE;
+    أرجع TRUE;
 }
 # endif
-#endif
+#جيڪڏهن_پورو
 
 
-#if defined(FEAT_LIBCALL)
+#إذا defined(FEAT_LIBCALL)
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  * Return OK if it worked, FAIL if not.
  */
-typedef char_u *(*MYSTRPROCSTR)(char_u *);
-typedef int (*MYSTRPROCINT)(char_u *);
-typedef char_u *(*MYINTPROCSTR)(int);
-typedef int (*MYINTPROCINT)(int);
+تعريفنوع char_u *(*MYSTRPROCSTR)(char_u *);
+تعريفنوع صحيح (*MYSTRPROCINT)(char_u *);
+تعريفنوع char_u *(*MYINTPROCSTR)(صحيح);
+تعريفنوع صحيح (*MYINTPROCINT)(صحيح);
 
 /*
  * Check if a pointer points to a valid NUL terminated string.
  * Return the length of the string, including terminating NUL.
  * Returns 0 for an invalid pointer, 1 for an empty string.
  */
-    static size_t
+    ساكن size_t
 check_str_len(char_u *str)
 {
     SYSTEM_INFO			si;
-    MEMORY_BASIC_INFORMATION	mbi;
-    size_t			length = 0;
+    يادگيري_BASIC_INFORMATION	mbi;
+    size_t			ڊيگهائي = 0;
     size_t			i;
-    const char_u		*p;
+    ثابت char_u		*p;
 
     // get page size
     GetSystemInfo(&si);
 
     // get memory information
-    if (!VirtualQuery(str, &mbi, sizeof(mbi)))
-	return 0;
+    إذا (!VirtualQuery(str, &mbi, حجم(mbi)))
+	أرجع 0;
 
     // pre cast these (typing savers)
     long_u dwStr = (long_u)str;
-    long_u dwBaseAddress = (long_u)mbi.BaseAddress;
+    long_u dw_بنياد_پتو = (long_u)mbi.بنياد_پتو;
 
     // get start address of page that str is on
-    long_u strPage = dwStr - (dwStr - dwBaseAddress) % si.dwPageSize;
+    long_u str_صفحو = dwStr - (dwStr - dw_بنياد_پتو) % si.dw_صفحو_سائيز;
 
     // get length from str to end of page
-    long_u pageLength = si.dwPageSize - (dwStr - strPage);
+    long_u صفحو_ڊيگهائي = si.dw_صفحو_سائيز - (dwStr - str_صفحو);
 
-    for (p = str; !IsBadReadPtr(p, (UINT)pageLength);
-	    p += pageLength, pageLength = si.dwPageSize)
-	for (i = 0; i < pageLength; ++i, ++length)
-	    if (p[i] == NUL)
-		return length + 1;
+    لكل (p = str; !IsBadReadPtr(p, (UINT)صفحو_ڊيگهائي);
+	    p += صفحو_ڊيگهائي, صفحو_ڊيگهائي = si.dw_صفحو_سائيز)
+	لكل (i = 0; i < صفحو_ڊيگهائي; ++i, ++ڊيگهائي)
+	    إذا (p[i] == NUL)
+		أرجع ڊيگهائي + 1;
 
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Passed to do_in_runtimepath() to load a vim.ico file.
  */
-    static void
-mch_icon_load_cb(char_u *fname, void *cookie)
+    ساكن فراغ
+mch_icon_ڀريو_cb(char_u *fname, فراغ *cookie)
 {
     HANDLE *h = (HANDLE *)cookie;
 
-    *h = LoadImage(NULL,
+    *h = ڀريو_Image(عدم,
 		   (LPSTR)fname,
 		   IMAGE_ICON,
 		   64,
@@ -836,122 +836,122 @@ mch_icon_load_cb(char_u *fname, void *cookie)
 /*
  * Try loading an icon file from 'runtimepath'.
  */
-    int
-mch_icon_load(HANDLE *iconp)
+    صحيح
+mch_icon_ڀريو(HANDLE *iconp)
 {
-    return do_in_runtimepath((char_u *)"bitmaps/vim.ico",
-						  0, mch_icon_load_cb, iconp);
+    أرجع do_اندريون_runtimepath((char_u *)"bitmaps/vim.ico",
+						  0, mch_icon_ڀريو_cb, iconp);
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    صحيح
+mch_get_random(char_u *buf, صحيح len)
 {
-    static int		initialized = NOTDONE;
-    static HINSTANCE	hInstLib;
-    static BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
+    ساكن صحيح		initialized = NOTDONE;
+    ساكن HINSTANCE	hInstLib;
+    ساكن BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
 
-    if (initialized == NOTDONE)
+    إذا (initialized == NOTDONE)
     {
-	hInstLib = vimLoadLib("bcryptprimitives.dll");
-	if (hInstLib != NULL)
-	    pProcessPrng = (void *)GetProcAddress(hInstLib, "ProcessPrng");
-	if (hInstLib == NULL || pProcessPrng == NULL)
+	hInstLib = vim_ڀريو_Lib("bcryptprimitives.dll");
+	إذا (hInstLib != عدم)
+	    pProcessPrng = (فراغ *)Get_Proc_پتو(hInstLib, "ProcessPrng");
+	إذا (hInstLib == عدم || pProcessPrng == عدم)
 	{
 	    FreeLibrary(hInstLib);
 	    initialized = FAIL;
 	}
-	else
+	وإلا
 	    initialized = OK;
     }
 
-    if (initialized == FAIL)
-	return FAIL;
+    إذا (initialized == FAIL)
+	أرجع FAIL;
 
     // According to the documentation this call cannot fail.
     pProcessPrng(buf, len);
 
-    return OK;
+    أرجع OK;
 }
 
-    int
+    صحيح
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
-    char_u	**string_result,// NULL when using number_result
-    int		*number_result)
+    صحيح		argint,
+    char_u	**string_نتيجو,// NULL when using number_result
+    صحيح		*عدد_نتيجو)
 {
     HINSTANCE		hinstLib;
 
-    BOOL fRunTimeLinkSuccess = FALSE;
+    BOOL f_لاڳيتو_وقت_Link_Success = FALSE;
 
     // Get a handle to the DLL module.
-    hinstLib = vimLoadLib((char *)libname);
+    hinstLib = vim_ڀريو_Lib((حرف *)libname);
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    إذا (hinstLib != عدم)
     {
-	char_u	*retval_str = NULL;
-	int	retval_int = 0;
+	char_u	*retval_str = عدم;
+	صحيح	retval_int = 0;
 	size_t	len;
 
 # ifdef HAVE_TRY_EXCEPT
 	__try
 	{
 # endif
-	if (argstring != NULL)
+	إذا (argstring != عدم)
 	{
 	    // Call with string argument
-	    if (string_result != NULL)
+	    إذا (string_نتيجو != عدم)
 	    {
 		MYSTRPROCSTR proc;
 
-		proc = (MYSTRPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCSTR)Get_Proc_پتو(hinstLib, (LPCSTR)funcname);
+		إذا (proc != عدم)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_لاڳيتو_وقت_Link_Success = TRUE;
 		    retval_str = proc(argstring);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		MYSTRPROCINT proc;
 
-		proc = (MYSTRPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYSTRPROCINT)Get_Proc_پتو(hinstLib, (LPCSTR)funcname);
+		إذا (proc != عدم)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_لاڳيتو_وقت_Link_Success = TRUE;
 		    retval_int = proc(argstring);
 		}
 	    }
 	}
-	else
+	وإلا
 	{
 	    // Call with number argument
-	    if (string_result != NULL)
+	    إذا (string_نتيجو != عدم)
 	    {
 		MYINTPROCSTR proc;
 
-		proc = (MYINTPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCSTR)Get_Proc_پتو(hinstLib, (LPCSTR)funcname);
+		إذا (proc != عدم)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_لاڳيتو_وقت_Link_Success = TRUE;
 		    retval_str = proc(argint);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		MYINTPROCINT proc;
 
-		proc = (MYINTPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		proc = (MYINTPROCINT)Get_Proc_پتو(hinstLib, (LPCSTR)funcname);
+		إذا (proc != عدم)
 		{
-		    fRunTimeLinkSuccess = TRUE;
+		    f_لاڳيتو_وقت_Link_Success = TRUE;
 		    retval_int = proc(argint);
 		}
 	    }
@@ -959,272 +959,272 @@ mch_libcall(
 
 	// Save the string before we free the library.
 	// Assume that a "1" result is an illegal pointer.
-	if (string_result == NULL)
-	    *number_result = retval_int;
-	else if (retval_str != NULL
+	إذا (string_نتيجو == عدم)
+	    *عدد_نتيجو = retval_int;
+	وإلا إذا (retval_str != عدم
 		&& (len = check_str_len(retval_str)) > 0)
 	{
-	    *string_result = alloc(len);
-	    if (*string_result != NULL)
-		mch_memmove(*string_result, retval_str, len);
+	    *string_نتيجو = alloc(len);
+	    إذا (*string_نتيجو != عدم)
+		mch_memmove(*string_نتيجو, retval_str, len);
 	}
 
 # ifdef HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-	    if (GetExceptionCode() == EXCEPTION_STACK_OVERFLOW)
+	    إذا (Get_Exception_ڪوڊ() == EXCEPTION_ڍير_حد_کان_مٿي)
 		_resetstkoflw();
-	    fRunTimeLinkSuccess = FALSE;
+	    f_لاڳيتو_وقت_Link_Success = FALSE;
 	}
 # endif
 
 	// Free the DLL module.
-	(void)FreeLibrary(hinstLib);
+	(فراغ)FreeLibrary(hinstLib);
     }
 
-    if (!fRunTimeLinkSuccess)
+    إذا (!f_لاڳيتو_وقت_Link_Success)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Debugging helper: expose the MCH_WRITE_DUMP stuff to other modules
  */
-    void
-DumpPutS(const char *psz UNUSED)
+    فراغ
+DumpPutS(ثابت حرف *psz اڻ_استعمال_ٿيل)
 {
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#جيڪڏهن_وصف_ٿيل MCH_WRITE_DUMP
+    إذا (fdDump)
     {
 	fputs(psz, fdDump);
-	if (psz[strlen(psz) - 1] != '\n')
+	إذا (psz[لڙي_ڊيگهه(psz) - 1] != '\n')
 	    fputc('\n', fdDump);
 	fflush(fdDump);
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-#ifdef _DEBUG
+#جيڪڏهن_وصف_ٿيل _DEBUG
 
-void __cdecl
+فراغ __cdecl
 Trace(
-    char *pszFormat,
+    حرف *pszFormat,
     ...)
 {
     CHAR szBuff[2048];
-    va_list args;
+    va_list دليلون;
 
-    va_start(args, pszFormat);
-    vsprintf(szBuff, pszFormat, args);
-    va_end(args);
+    va_start(دليلون, pszFormat);
+    vsprintf(szBuff, pszFormat, دليلون);
+    va_end(دليلون);
 
     OutputDebugString(szBuff);
 }
 
-#endif //_DEBUG
+#جيڪڏهن_پورو //_DEBUG
 
-#if !defined(FEAT_GUI) || defined(VIMDLL)
-extern HWND g_hWnd;	// This is in os_win32.c.
+#إذا !defined(FEAT_GUI) || defined(VIMDLL)
+خارجي HWND g_hWnd;	// This is in os_win32.c.
 
 /*
  * Showing the printer dialog is tricky since we have no GUI
  * window to parent it. The following routines are needed to
  * get the window parenting and Z-order to work properly.
  */
-    static void
-GetConsoleHwnd(void)
+    ساكن فراغ
+GetConsoleHwnd(فراغ)
 {
     // Skip if it's already set.
-    if (s_hwnd != 0)
-	return;
+    إذا (s_hwnd != 0)
+	أرجع;
 
     // Window handle may have been found by init code (Windows NT only)
-    if (g_hWnd != 0)
+    إذا (g_hWnd != 0)
     {
 	s_hwnd = g_hWnd;
-	return;
+	أرجع;
     }
 
-    s_hwnd = GetConsoleWindow();
+    s_hwnd = Get_Console_دري();
 }
 
 /*
  * Console implementation of ":winpos".
  */
-    int
-mch_get_winpos(int *x, int *y)
+    صحيح
+mch_get_winpos(صحيح *x, صحيح *y)
 {
     RECT  rect;
 
     GetConsoleHwnd();
-    GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    Get_دري_Rect(s_hwnd, &rect);
+    *x = rect.کاٻو;
+    *y = rect.چوٽي;
+    أرجع OK;
 }
 
 /*
  * Console implementation of ":winpos x y".
  */
-    void
-mch_set_winpos(int x, int y)
+    فراغ
+mch_سيٽ_winpos(صحيح x, صحيح y)
 {
     GetConsoleHwnd();
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    سيٽ_دري_Pos(s_hwnd, عدم, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#إذا defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 
 //=================================================================
 // Win32 printer stuff
 
-static HFONT		prt_font_handles[2][2][2];
-static PRINTDLGW	prt_dlg;
-static const int	boldface[2] = {FW_REGULAR, FW_BOLD};
-static TEXTMETRIC	prt_tm;
-static int		prt_line_height;
-static int		prt_number_width;
-static int		prt_left_margin;
-static int		prt_right_margin;
-static int		prt_top_margin;
-static char_u		szAppName[] = TEXT("VIM");
-static HWND		hDlgPrint;
-static int		*bUserAbort = NULL;
-static char_u		*prt_name = NULL;
+ساكن HFONT		prt_font_handles[2][2][2];
+ساكن PRINTDLGW	prt_dlg;
+ساكن ثابت صحيح	boldface[2] = {FW_REGULAR, FW_BOLD};
+ساكن TEXTMETRIC	prt_tm;
+ساكن صحيح		prt_سٽ_اوچائي;
+ساكن صحيح		prt_عدد_ويڪر;
+ساكن صحيح		prt_کاٻو_margin;
+ساكن صحيح		prt_ساڄو_margin;
+ساكن صحيح		prt_چوٽي_margin;
+ساكن char_u		szAppName[] = متن_3("VIM");
+ساكن HWND		hDlgPrint;
+ساكن صحيح		*bUserAbort = عدم;
+ساكن char_u		*prt_name = عدم;
 
 // Defines which are also in vim.rc.
 # define IDC_BOX1		400
 # define IDC_PRINTTEXT1		401
 # define IDC_PRINTTEXT2		402
-# define IDC_PROGRESS		403
+# define IDC_ترقي		403
 
-    static BOOL
-vimSetDlgItemText(HWND hDlg, int nIDDlgItem, char_u *s)
+    ساكن BOOL
+vim_سيٽ_Dlg_شي_متن(HWND hDlg, صحيح n_IDDlg_شي, char_u *s)
 {
     WCHAR   *wp;
     BOOL    ret;
 
-    wp = enc_to_utf16(s, NULL);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_منزل_utf16(s, عدم);
+    إذا (wp == عدم)
+	أرجع FALSE;
 
-    ret = SetDlgItemTextW(hDlg, nIDDlgItem, wp);
+    ret = سيٽ_Dlg_شي_متن_W(hDlg, n_IDDlg_شي, wp);
     vim_free(wp);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Convert BGR to RGB for Windows GDI calls
  */
-    static COLORREF
-swap_me(COLORREF colorref)
+    ساكن COLORREF
+مٽا_سٽا_me(COLORREF colorref)
 {
-    int  temp;
-    char *ptr = (char *)&colorref;
+    صحيح  عارضي;
+    حرف *ptr = (حرف *)&colorref;
 
-    temp = *(ptr);
+    عارضي = *(ptr);
     *(ptr ) = *(ptr + 2);
-    *(ptr + 2) = temp;
-    return colorref;
+    *(ptr + 2) = عارضي;
+    أرجع colorref;
 }
 
-    static INT_PTR CALLBACK
+    ساكن INT_PTR CALLBACK
 PrintDlgProc(
 	HWND hDlg,
-	UINT message,
-	WPARAM wParam UNUSED,
-	LPARAM lParam UNUSED)
+	UINT پيغام,
+	WPARAM wParam اڻ_استعمال_ٿيل,
+	LPARAM lParam اڻ_استعمال_ٿيل)
 {
 # ifdef FEAT_GETTEXT
     NONCLIENTMETRICS nm;
-    static HFONT hfont;
+    ساكن HFONT hfont;
 # endif
 
-    switch (message)
+    بدل (پيغام)
     {
-	case WM_INITDIALOG:
+	حالة WM_INITDIALOG:
 # ifdef FEAT_GETTEXT
-	    nm.cbSize = sizeof(NONCLIENTMETRICS);
-	    if (SystemParametersInfo(
+	    nm.cb_سائيز = حجم(NONCLIENTMETRICS);
+	    إذا (SystemParametersInfo(
 			SPI_GETNONCLIENTMETRICS,
-			sizeof(NONCLIENTMETRICS),
+			حجم(NONCLIENTMETRICS),
 			&nm,
 			0))
 	    {
-		char buff[MAX_PATH];
-		int i;
+		حرف buff[MAX_رستو];
+		صحيح i;
 
 		// Translate the dialog texts
-		hfont = CreateFontIndirect(&nm.lfMessageFont);
-		for (i = IDC_PRINTTEXT1; i <= IDC_PROGRESS; i++)
+		hfont = Create_Font_اڻسڌو(&nm.lf_پيغام_Font);
+		لكل (i = IDC_PRINTTEXT1; i <= IDC_ترقي; i++)
 		{
-		    SendDlgItemMessage(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
-		    if (GetDlgItemText(hDlg,i, buff, sizeof(buff)))
-			vimSetDlgItemText(hDlg,i, (char_u *)_(buff));
+		    Send_Dlg_شي_پيغام(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
+		    إذا (Get_Dlg_شي_متن(hDlg,i, buff, حجم(buff)))
+			vim_سيٽ_Dlg_شي_متن(hDlg,i, (char_u *)_(buff));
 		}
-		SendDlgItemMessage(hDlg, IDCANCEL,
+		Send_Dlg_شي_پيغام(hDlg, IDCANCEL,
 						WM_SETFONT, (WPARAM)hfont, 1);
-		if (GetDlgItemText(hDlg,IDCANCEL, buff, sizeof(buff)))
-		    vimSetDlgItemText(hDlg,IDCANCEL, (char_u *)_(buff));
+		إذا (Get_Dlg_شي_متن(hDlg,IDCANCEL, buff, حجم(buff)))
+		    vim_سيٽ_Dlg_شي_متن(hDlg,IDCANCEL, (char_u *)_(buff));
 	    }
 # endif
-	    SetWindowText(hDlg, (LPCSTR)szAppName);
-	    if (prt_name != NULL)
+	    سيٽ_دري_متن(hDlg, (LPCSTR)szAppName);
+	    إذا (prt_name != عدم)
 	    {
-		vimSetDlgItemText(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
+		vim_سيٽ_Dlg_شي_متن(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
 		VIM_CLEAR(prt_name);
 	    }
-	    EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+	    Enable_Menu_شي(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
+# إذا !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    if (!gui.in_use)
+	    إذا (!gui.اندريون_use)
 #  endif
-		BringWindowToTop(s_hwnd);
+		Bring_دري_منزل_چوٽي(s_hwnd);
 # endif
-	    return TRUE;
+	    أرجع TRUE;
 
-	case WM_COMMAND:
+	حالة WM_COMMAND:
 	    *bUserAbort = TRUE;
-	    EnableWindow(GetParent(hDlg), TRUE);
-	    DestroyWindow(hDlg);
-	    hDlgPrint = NULL;
+	    Enable_دري(Get_والد(hDlg), TRUE);
+	    Destroy_دري(hDlg);
+	    hDlgPrint = عدم;
 # ifdef FEAT_GETTEXT
 	    DeleteObject(hfont);
 # endif
-	    return TRUE;
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-    static BOOL CALLBACK
-AbortProc(HDC hdcPrn UNUSED, int iCode UNUSED)
+    ساكن BOOL CALLBACK
+AbortProc(HDC hdcPrn اڻ_استعمال_ٿيل, صحيح i_ڪوڊ اڻ_استعمال_ٿيل)
 {
-    MSG msg;
+    نياپو_2 نياپو;
 
-    while (!*bUserAbort && PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    طالما (!*bUserAbort && Peek_پيغام_W(&نياپو, عدم, 0, 0, PM_REMOVE))
     {
-	if (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &msg))
+	إذا (!hDlgPrint || !Is_Dialog_پيغام_W(hDlgPrint, &نياپو))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_پيغام(&نياپو);
+	    Dispatch_پيغام_W(&نياپو);
 	}
     }
-    return !*bUserAbort;
+    أرجع !*bUserAbort;
 }
 
-    static UINT_PTR CALLBACK
+    ساكن UINT_PTR CALLBACK
 PrintHookProc(
 	HWND hDlg,	// handle to dialog box
-	UINT uiMsg,	// message identifier
-	WPARAM wParam UNUSED,	// message parameter
+	UINT ui_نياپو,	// message identifier
+	WPARAM wParam اڻ_استعمال_ٿيل,	// message parameter
 	LPARAM lParam	// message parameter
 	)
 {
@@ -1232,15 +1232,15 @@ PrintHookProc(
     RECT	rc, rcDlg, rcOwner;
     PRINTDLGW	*pPD;
 
-    if (uiMsg != WM_INITDIALOG)
-	return FALSE;
+    إذا (ui_نياپو != WM_INITDIALOG)
+	أرجع FALSE;
 
     // Get the owner window and dialog box rectangles.
-    if ((hwndOwner = GetParent(hDlg)) == NULL)
-	hwndOwner = GetDesktopWindow();
+    إذا ((hwndOwner = Get_والد(hDlg)) == عدم)
+	hwndOwner = Get_Desktop_دري();
 
-    GetWindowRect(hwndOwner, &rcOwner);
-    GetWindowRect(hDlg, &rcDlg);
+    Get_دري_Rect(hwndOwner, &rcOwner);
+    Get_دري_Rect(hDlg, &rcDlg);
     CopyRect(&rc, &rcOwner);
 
     // Offset the owner and dialog box rectangles so that
@@ -1248,183 +1248,183 @@ PrintHookProc(
     // height, and then offset the owner again to discard
     // space taken up by the dialog box.
 
-    OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top);
-    OffsetRect(&rc, -rc.left, -rc.top);
-    OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
+    وٿي_Rect(&rcDlg, -rcDlg.کاٻو, -rcDlg.چوٽي);
+    وٿي_Rect(&rc, -rc.کاٻو, -rc.چوٽي);
+    وٿي_Rect(&rc, -rcDlg.ساڄو, -rcDlg.bottom);
 
     // The new position is the sum of half the remaining
     // space and the owner's original position.
 
-    SetWindowPos(hDlg,
-	    HWND_TOP,
-	    rcOwner.left + (rc.right / 2),
-	    rcOwner.top + (rc.bottom / 2),
+    سيٽ_دري_Pos(hDlg,
+	    HWND_چوٽي,
+	    rcOwner.کاٻو + (rc.ساڄو / 2),
+	    rcOwner.چوٽي + (rc.bottom / 2),
 	    0, 0,		// ignores size arguments
 	    SWP_NOSIZE);
 
     //  tackle the printdlg copiesctrl problem
     pPD = (PRINTDLGW *)lParam;
-    pPD->nCopies = (WORD)pPD->lCustData;
-    SetDlgItemInt( hDlg, edt3, pPD->nCopies, FALSE );
+    pPD->nCopies = (لفظ_2)pPD->l_Cust_معلومات;
+    سيٽ_Dlg_شي_Int( hDlg, edt3, pPD->nCopies, FALSE );
     //  Bring the window to top
-    BringWindowToTop(GetParent(hDlg));
-    SetForegroundWindow(hDlg);
+    Bring_دري_منزل_چوٽي(Get_والد(hDlg));
+    سيٽ_Foreground_دري(hDlg);
 
-    return FALSE;
+    أرجع FALSE;
 }
 
-    void
-mch_print_cleanup(void)
+    فراغ
+mch_print_cleanup(فراغ)
 {
-    int pifItalic;
-    int pifBold;
-    int pifUnderline;
+    صحيح pifItalic;
+    صحيح pifBold;
+    صحيح pifUnderline;
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    لكل (pifBold = 0; pifBold <= 1; pifBold++)
+	لكل (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    لكل (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 		DeleteObject(prt_font_handles[pifBold][pifItalic][pifUnderline]);
 
-    if (prt_dlg.hDC != NULL)
+    إذا (prt_dlg.hDC != عدم)
 	DeleteDC(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    إذا (!*bUserAbort && hDlgPrint != عدم)
+	Send_پيغام(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    static int
-to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
+    ساكن صحيح
+منزل_device_units(صحيح idx, صحيح dpi, صحيح physsize, صحيح وٿي, صحيح def_عدد)
 {
-    int		ret = 0;
-    int		u;
-    int		nr;
+    صحيح		ret = 0;
+    صحيح		u;
+    صحيح		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    إذا (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_عدد;
     }
-    else
-	nr = printer_opts[idx].number;
+    وإلا
+	nr = printer_opts[idx].عدد;
 
-    switch (u)
+    بدل (u)
     {
-	case PRT_UNIT_PERC:
+	حالة PRT_UNIT_PERC:
 	    ret = (physsize * nr) / 100;
-	    break;
-	case PRT_UNIT_INCH:
+	    اكسر;
+	حالة PRT_UNIT_INCH:
 	    ret = (nr * dpi);
-	    break;
-	case PRT_UNIT_MM:
+	    اكسر;
+	حالة PRT_UNIT_MM:
 	    ret = (nr * 10 * dpi) / 254;
-	    break;
-	case PRT_UNIT_POINT:
+	    اكسر;
+	حالة PRT_UNIT_نقطو:
 	    ret = (nr * 10 * dpi) / 720;
-	    break;
+	    اكسر;
     }
 
-    if (ret < offset)
-	return 0;
-    else
-	return ret - offset;
+    إذا (ret < وٿي)
+	أرجع 0;
+    وإلا
+	أرجع ret - وٿي;
 }
 
-    static int
-prt_get_cpl(void)
+    ساكن صحيح
+prt_get_cpl(فراغ)
 {
-    int		hr;
-    int		phyw;
-    int		dvoff;
-    int		rev_offset;
-    int		dpi;
+    صحيح		hr;
+    صحيح		phyw;
+    صحيح		dvoff;
+    صحيح		rev_وٿي;
+    صحيح		dpi;
 
-    GetTextMetrics(prt_dlg.hDC, &prt_tm);
-    prt_line_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
+    Get_متن_Metrics(prt_dlg.hDC, &prt_tm);
+    prt_سٽ_اوچائي = prt_tm.tm_اوچائي + prt_tm.tmExternalLeading;
 
     hr	    = GetDeviceCaps(prt_dlg.hDC, HORZRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALWIDTH);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETX);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSX);
 
-    rev_offset = phyw - (dvoff + hr);
+    rev_وٿي = phyw - (dvoff + hr);
 
-    prt_left_margin = to_device_units(OPT_PRINT_LEFT, dpi, phyw, dvoff, 10);
-    if (prt_use_number())
+    prt_کاٻو_margin = منزل_device_units(OPT_PRINT_کاٻو, dpi, phyw, dvoff, 10);
+    إذا (prt_use_عدد())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_tm.tmAveCharWidth;
-	prt_left_margin += prt_number_width;
+	prt_عدد_ويڪر = PRINT_عدد_ويڪر * prt_tm.tm_Ave_Char_ويڪر;
+	prt_کاٻو_margin += prt_عدد_ويڪر;
     }
-    else
-	prt_number_width = 0;
+    وإلا
+	prt_عدد_ويڪر = 0;
 
-    prt_right_margin = hr - to_device_units(OPT_PRINT_RIGHT, dpi, phyw,
-							       rev_offset, 5);
+    prt_ساڄو_margin = hr - منزل_device_units(OPT_PRINT_ساڄو, dpi, phyw,
+							       rev_وٿي, 5);
 
-    return (prt_right_margin - prt_left_margin) / prt_tm.tmAveCharWidth;
+    أرجع (prt_ساڄو_margin - prt_کاٻو_margin) / prt_tm.tm_Ave_Char_ويڪر;
 }
 
-    static int
-prt_get_lpp(void)
+    ساكن صحيح
+prt_get_lpp(فراغ)
 {
-    int vr;
-    int phyw;
-    int dvoff;
-    int rev_offset;
-    int	bottom_margin;
-    int	dpi;
+    صحيح vr;
+    صحيح phyw;
+    صحيح dvoff;
+    صحيح rev_وٿي;
+    صحيح	bottom_margin;
+    صحيح	dpi;
 
     vr	    = GetDeviceCaps(prt_dlg.hDC, VERTRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALHEIGHT);
     dvoff   = GetDeviceCaps(prt_dlg.hDC, PHYSICALOFFSETY);
     dpi	    = GetDeviceCaps(prt_dlg.hDC, LOGPIXELSY);
 
-    rev_offset = phyw - (dvoff + vr);
+    rev_وٿي = phyw - (dvoff + vr);
 
-    prt_top_margin = to_device_units(OPT_PRINT_TOP, dpi, phyw, dvoff, 5);
+    prt_چوٽي_margin = منزل_device_units(OPT_PRINT_چوٽي, dpi, phyw, dvoff, 5);
 
     // adjust top margin if there is a header
-    prt_top_margin += prt_line_height * prt_header_height();
+    prt_چوٽي_margin += prt_سٽ_اوچائي * prt_سرو_اوچائي();
 
-    bottom_margin = vr - to_device_units(OPT_PRINT_BOT, dpi, phyw,
-							       rev_offset, 5);
+    bottom_margin = vr - منزل_device_units(OPT_PRINT_BOT, dpi, phyw,
+							       rev_وٿي, 5);
 
-    return (bottom_margin - prt_top_margin) / prt_line_height;
+    أرجع (bottom_margin - prt_چوٽي_margin) / prt_سٽ_اوچائي;
 }
 
-    int
-mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
+    صحيح
+mch_print_init(prt_settings_T *psettings, char_u *jobname, صحيح forceit)
 {
-    static HGLOBAL	stored_dm = NULL;
-    static HGLOBAL	stored_devn = NULL;
-    static int		stored_nCopies = 1;
-    static int		stored_nFlags = 0;
+    ساكن HGLOBAL	stored_dm = عدم;
+    ساكن HGLOBAL	stored_devn = عدم;
+    ساكن صحيح		stored_nCopies = 1;
+    ساكن صحيح		stored_nFlags = 0;
 
     LOGFONTW		fLogFont;
-    int			pifItalic;
-    int			pifBold;
-    int			pifUnderline;
+    صحيح			pifItalic;
+    صحيح			pifBold;
+    صحيح			pifUnderline;
 
     DEVMODEW		*mem;
     DEVNAMES		*devname;
-    int			i;
+    صحيح			i;
     DWORD		err;
 
     bUserAbort = &(psettings->user_abort);
-    CLEAR_FIELD(prt_dlg);
-    prt_dlg.lStructSize = sizeof(PRINTDLGW);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    CLEAR_ميدان(prt_dlg);
+    prt_dlg.l_Struct_سائيز = حجم(PRINTDLGW);
+# إذا !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    إذا (!gui.اندريون_use)
 #  endif
 	GetConsoleHwnd();	    // get value of s_hwnd
 # endif
     prt_dlg.hwndOwner = s_hwnd;
     prt_dlg.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_RETURNDC;
-    if (!forceit)
+    إذا (!forceit)
     {
-	prt_dlg.hDevMode = stored_dm;
-	prt_dlg.hDevNames = stored_devn;
-	prt_dlg.lCustData = stored_nCopies; // work around bug in print dialog
+	prt_dlg.h_Dev_گهڻائي = stored_dm;
+	prt_dlg.h_Dev_نالا = stored_devn;
+	prt_dlg.l_Cust_معلومات = stored_nCopies; // work around bug in print dialog
 	/*
 	 * Use hook to prevent print dialog being sent to back.
 	 */
@@ -1437,12 +1437,12 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * If bang present, return default printer setup with no dialog
      * never show dialog if we are running over telnet
      */
-    if (forceit
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    إذا (forceit
+# إذا !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    || (!gui.in_use && !term_console)
-#  else
-	    || !term_console
+	    || (!gui.اندريون_use && !رڪن_console)
+#  وإلا
+	    || !رڪن_console
 #  endif
 # endif
 	    )
@@ -1452,33 +1452,33 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	 * MSDN suggests setting the first parameter to WINSPOOL for
 	 * NT, but NULL appears to work just as well.
 	 */
-	if (*p_pdev != NUL)
-	    prt_dlg.hDC = CreateDC(NULL, (LPCSTR)p_pdev, NULL, NULL);
-	else
+	إذا (*p_pdev != NUL)
+	    prt_dlg.hDC = CreateDC(عدم, (LPCSTR)p_pdev, عدم, عدم);
+	وإلا
 	{
 	    prt_dlg.Flags |= PD_RETURNDEFAULT;
-	    if (PrintDlgW(&prt_dlg) == 0)
-		goto init_fail_dlg;
+	    إذا (PrintDlgW(&prt_dlg) == 0)
+		اذهب init_fail_dlg;
 	}
     }
-    else if (PrintDlgW(&prt_dlg) == 0)
-	goto init_fail_dlg;
-    else
+    وإلا إذا (PrintDlgW(&prt_dlg) == 0)
+	اذهب init_fail_dlg;
+    وإلا
     {
 	/*
 	 * keep the previous driver context
 	 */
-	stored_dm = prt_dlg.hDevMode;
-	stored_devn = prt_dlg.hDevNames;
+	stored_dm = prt_dlg.h_Dev_گهڻائي;
+	stored_devn = prt_dlg.h_Dev_نالا;
 	stored_nFlags = prt_dlg.Flags;
 	stored_nCopies = prt_dlg.nCopies;
     }
 
-    if (prt_dlg.hDC == NULL)
+    إذا (prt_dlg.hDC == عدم)
     {
 	emsg(_(e_printer_selection_failed));
 	mch_print_cleanup();
-	return FALSE;
+	أرجع FALSE;
     }
 
     // Not all printer drivers report the support of color (or grey) in the
@@ -1490,89 +1490,89 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 				   || i > 2 || i == -1);
 
     // Ensure all font styles are baseline aligned
-    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_LEFT);
+    سيٽ_متن_Align(prt_dlg.hDC, TA_BASELINE|TA_کاٻو);
 
     /*
      * On some windows systems the nCopies parameter is not
      * passed back correctly. It must be retrieved from the
      * hDevMode struct.
      */
-    mem = (DEVMODEW *)GlobalLock(prt_dlg.hDevMode);
-    if (mem != NULL)
+    mem = (DEVMODEW *)Global_تالو(prt_dlg.h_Dev_گهڻائي);
+    إذا (mem != عدم)
     {
-	if (mem->dmCopies != 1)
+	إذا (mem->dmCopies != 1)
 	    stored_nCopies = mem->dmCopies;
-	if ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
+	إذا ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
 	    psettings->duplex = TRUE;
-	if ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
+	إذا ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
 	    psettings->has_color = TRUE;
     }
-    GlobalUnlock(prt_dlg.hDevMode);
+    GlobalUnlock(prt_dlg.h_Dev_گهڻائي);
 
-    devname = (DEVNAMES *)GlobalLock(prt_dlg.hDevNames);
-    if (devname != 0)
+    devname = (DEVNAMES *)Global_تالو(prt_dlg.h_Dev_نالا);
+    إذا (devname != 0)
     {
-	WCHAR	*wprinter_name = (WCHAR *)devname + devname->wDeviceOffset;
-	WCHAR	*wport_name = (WCHAR *)devname + devname->wOutputOffset;
-	char_u	*text = (char_u *)_("to %s on %s");
-	char_u  *printer_name = utf16_to_enc(wprinter_name, NULL);
-	char_u	*port_name = utf16_to_enc(wport_name, NULL);
+	WCHAR	*wprinter_name = (WCHAR *)devname + devname->w_Device_وٿي;
+	WCHAR	*wport_name = (WCHAR *)devname + devname->w_Output_وٿي;
+	char_u	*متن = (char_u *)_("to %s on %s");
+	char_u  *printer_name = utf16_منزل_enc(wprinter_name, عدم);
+	char_u	*پورٽ_name = utf16_منزل_enc(wport_name, عدم);
 
-	if (printer_name != NULL && port_name != NULL)
+	إذا (printer_name != عدم && پورٽ_name != عدم)
 	    prt_name = alloc(STRLEN(printer_name)
-					   + STRLEN(port_name) + STRLEN(text));
-	if (prt_name != NULL)
-	    wsprintf((char *)prt_name, (const char *)text,
-		    printer_name, port_name);
+					   + STRLEN(پورٽ_name) + STRLEN(متن));
+	إذا (prt_name != عدم)
+	    wsprintf((حرف *)prt_name, (ثابت حرف *)متن,
+		    printer_name, پورٽ_name);
 	vim_free(printer_name);
-	vim_free(port_name);
+	vim_free(پورٽ_name);
     }
-    GlobalUnlock(prt_dlg.hDevNames);
+    GlobalUnlock(prt_dlg.h_Dev_نالا);
 
     /*
      * Initialise the font according to 'printfont'
      */
-    CLEAR_FIELD(fLogFont);
-    if (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
+    CLEAR_ميدان(fLogFont);
+    إذا (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
     {
 	semsg(_(e_unknown_printer_font_str), p_pfn);
 	mch_print_cleanup();
-	return FALSE;
+	أرجع FALSE;
     }
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    لكل (pifBold = 0; pifBold <= 1; pifBold++)
+	لكل (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    لكل (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 	    {
-		fLogFont.lfWeight =  boldface[pifBold];
+		fLogFont.lf_وزن =  boldface[pifBold];
 		fLogFont.lfItalic = pifItalic;
 		fLogFont.lfUnderline = pifUnderline;
 		prt_font_handles[pifBold][pifItalic][pifUnderline]
-					      = CreateFontIndirectW(&fLogFont);
+					      = Create_Font_اڻسڌو_W(&fLogFont);
 	    }
 
-    SetBkMode(prt_dlg.hDC, OPAQUE);
+    سيٽ_Bk_گهڻائي(prt_dlg.hDC, OPAQUE);
     SelectObject(prt_dlg.hDC, prt_font_handles[0][0][0]);
 
     /*
      * Fill in the settings struct
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
-    if (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
+    psettings->chars_في_سٽ = prt_get_cpl();
+    psettings->سٽون_في_صفحو = prt_get_lpp();
+    إذا (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
     {
 	psettings->n_collated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? prt_dlg.nCopies : 1;
 	psettings->n_uncollated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? 1 : prt_dlg.nCopies;
 
-	if (psettings->n_collated_copies == 0)
+	إذا (psettings->n_collated_copies == 0)
 	    psettings->n_collated_copies = 1;
 
-	if (psettings->n_uncollated_copies == 0)
+	إذا (psettings->n_uncollated_copies == 0)
 	    psettings->n_uncollated_copies = 1;
     }
-    else
+    وإلا
     {
 	psettings->n_collated_copies = 1;
 	psettings->n_uncollated_copies = 1;
@@ -1580,208 +1580,208 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 
     psettings->jobname = jobname;
 
-    return TRUE;
+    أرجع TRUE;
 
 init_fail_dlg:
     err = CommDlgExtendedError();
-    if (err)
+    إذا (err)
     {
 	char_u *buf;
 
 	// I suspect FormatMessage() doesn't work for values returned by
 	// CommDlgExtendedError().  What does?
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, err, 0, (LPTSTR)(&buf), 0, NULL);
+	Format_پيغام(FORMAT_پيغام_ALLOCATE_بفر |
+		FORMAT_پيغام_FROM_SYSTEM |
+		FORMAT_پيغام_IGNORE_INSERTS,
+		عدم, err, 0, (LPTSTR)(&buf), 0, عدم);
 	semsg(_(e_print_error_str),
-		buf == NULL ? (char_u *)_("Unknown") : buf);
+		buf == عدم ? (char_u *)_("Unknown") : buf);
 	LocalFree((LPVOID)(buf));
     }
-    else
-	msg_clr_eos(); // Maybe canceled
+    وإلا
+	نياپو_clr_eos(); // Maybe canceled
 
     mch_print_cleanup();
-    return FALSE;
+    أرجع FALSE;
 }
 
 
-    int
+    صحيح
 mch_print_begin(prt_settings_T *psettings)
 {
-    int			ret = 0;
-    char		szBuffer[300];
+    صحيح			ret = 0;
+    حرف		sz_بفر[300];
     WCHAR		*wp;
 
-    hDlgPrint = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
+    hDlgPrint = CreateDialog(g_hinst, متن_3("PrintDlgBox"),
 					     prt_dlg.hwndOwner, PrintDlgProc);
-    SetAbortProc(prt_dlg.hDC, AbortProc);
-    wsprintf(szBuffer, _("Printing '%s'"), gettail(psettings->jobname));
-    vimSetDlgItemText(hDlgPrint, IDC_PRINTTEXT1, (char_u *)szBuffer);
+    سيٽ_Abort_Proc(prt_dlg.hDC, AbortProc);
+    wsprintf(sz_بفر, _("Printing '%s'"), gettail(psettings->jobname));
+    vim_سيٽ_Dlg_شي_متن(hDlgPrint, IDC_PRINTTEXT1, (char_u *)sz_بفر);
 
-    wp = enc_to_utf16(psettings->jobname, NULL);
-    if (wp != NULL)
+    wp = enc_منزل_utf16(psettings->jobname, عدم);
+    إذا (wp != عدم)
     {
 	DOCINFOW	di;
 
-	CLEAR_FIELD(di);
-	di.cbSize = sizeof(di);
+	CLEAR_ميدان(di);
+	di.cb_سائيز = حجم(di);
 	di.lpszDocName = wp;
-	ret = StartDocW(prt_dlg.hDC, &di);
+	ret = شروعات_Doc_W(prt_dlg.hDC, &di);
 	vim_free(wp);
     }
 
 # ifdef FEAT_GUI
     // Give focus back to main window (when using MDI).
 #  ifdef VIMDLL
-    if (gui.in_use)
+    إذا (gui.اندريون_use)
 #  endif
-	SetFocus(s_hwnd);
+	سيٽ_Focus(s_hwnd);
 # endif
 
-    return (ret > 0);
+    أرجع (ret > 0);
 }
 
-    void
-mch_print_end(prt_settings_T *psettings UNUSED)
+    فراغ
+mch_print_پڇاڙي(prt_settings_T *psettings اڻ_استعمال_ٿيل)
 {
-    EndDoc(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    پڇاڙي_Doc(prt_dlg.hDC);
+    إذا (!*bUserAbort && hDlgPrint != عدم)
+	Send_پيغام(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    int
-mch_print_end_page(void)
+    صحيح
+mch_print_پڇاڙي_صفحو(فراغ)
 {
-    return (EndPage(prt_dlg.hDC) > 0);
+    أرجع (پڇاڙي_صفحو(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_begin_page(char_u *msg)
+    صحيح
+mch_print_begin_صفحو(char_u *نياپو)
 {
-    if (msg != NULL)
-	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, msg);
-    return (StartPage(prt_dlg.hDC) > 0);
+    إذا (نياپو != عدم)
+	vim_سيٽ_Dlg_شي_متن(hDlgPrint, IDC_ترقي, نياپو);
+    أرجع (شروعات_صفحو(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_blank_page(void)
+    صحيح
+mch_print_blank_صفحو(فراغ)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    أرجع (mch_print_begin_صفحو(عدم) ? (mch_print_پڇاڙي_صفحو()) : FALSE);
 }
 
-static int prt_pos_x = 0;
-static int prt_pos_y = 0;
+ساكن صحيح prt_pos_x = 0;
+ساكن صحيح prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    فراغ
+mch_print_شروعات_سٽ(صحيح margin, صحيح صفحو_سٽ)
 {
-    if (margin)
-	prt_pos_x = -prt_number_width;
-    else
+    إذا (margin)
+	prt_pos_x = -prt_عدد_ويڪر;
+    وإلا
 	prt_pos_x = 0;
-    prt_pos_y = page_line * prt_line_height
+    prt_pos_y = صفحو_سٽ * prt_سٽ_اوچائي
 				 + prt_tm.tmAscent + prt_tm.tmExternalLeading;
 }
 
-    int
-mch_print_text_out(char_u *p, int len)
+    صحيح
+mch_print_متن_ٻاهريون(char_u *p, صحيح len)
 {
-    SIZE	sz;
+    سائيز_3	sz;
     WCHAR	*wp;
-    int		wlen = len;
-    int		ret = FALSE;
+    صحيح		wlen = len;
+    صحيح		ret = FALSE;
 
-    wp = enc_to_utf16(p, &wlen);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_منزل_utf16(p, &wlen);
+    إذا (wp == عدم)
+	أرجع FALSE;
 
-    TextOutW(prt_dlg.hDC, prt_pos_x + prt_left_margin,
-	    prt_pos_y + prt_top_margin, wp, wlen);
-    GetTextExtentPoint32W(prt_dlg.hDC, wp, wlen, &sz);
+    متن_ٻاهريون_W(prt_dlg.hDC, prt_pos_x + prt_کاٻو_margin,
+	    prt_pos_y + prt_چوٽي_margin, wp, wlen);
+    Get_متن_Extent_Point32_W(prt_dlg.hDC, wp, wlen, &sz);
     vim_free(wp);
     prt_pos_x += (sz.cx - prt_tm.tmOverhang);
     // This is wrong when printing spaces for a TAB.
-    if (p[len] != NUL)
+    إذا (p[len] != NUL)
     {
 	wlen = mb_ptr2len(p + len);
-	wp = enc_to_utf16(p + len, &wlen);
-	if (wp != NULL)
+	wp = enc_منزل_utf16(p + len, &wlen);
+	إذا (wp != عدم)
 	{
-	    GetTextExtentPoint32W(prt_dlg.hDC, wp, 1, &sz);
-	    ret = (prt_pos_x + prt_left_margin + sz.cx > prt_right_margin);
+	    Get_متن_Extent_Point32_W(prt_dlg.hDC, wp, 1, &sz);
+	    ret = (prt_pos_x + prt_کاٻو_margin + sz.cx > prt_ساڄو_margin);
 	    vim_free(wp);
 	}
     }
-    return ret;
+    أرجع ret;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    فراغ
+mch_print_سيٽ_font(صحيح iBold, صحيح iItalic, صحيح iUnderline)
 {
     SelectObject(prt_dlg.hDC, prt_font_handles[iBold][iItalic][iUnderline]);
 }
 
-    void
-mch_print_set_bg(long_u bgcol)
+    فراغ
+mch_print_سيٽ_bg(long_u bgcol)
 {
-    SetBkColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)bgcol)));
+    سيٽ_Bk_Color(prt_dlg.hDC, Get_سڀ_کان_ويجهو_Color(prt_dlg.hDC,
+						   مٽا_سٽا_me((COLORREF)bgcol)));
     /*
      * With a white background we can draw characters transparent, which is
      * good for italic characters that overlap to the next char cell.
      */
-    if (bgcol == 0xffffffUL)
-	SetBkMode(prt_dlg.hDC, TRANSPARENT);
-    else
-	SetBkMode(prt_dlg.hDC, OPAQUE);
+    إذا (bgcol == 0xffffffUL)
+	سيٽ_Bk_گهڻائي(prt_dlg.hDC, TRANSPARENT);
+    وإلا
+	سيٽ_Bk_گهڻائي(prt_dlg.hDC, OPAQUE);
 }
 
-    void
-mch_print_set_fg(long_u fgcol)
+    فراغ
+mch_print_سيٽ_fg(long_u fgcol)
 {
-    SetTextColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
-						   swap_me((COLORREF)fgcol)));
+    سيٽ_متن_Color(prt_dlg.hDC, Get_سڀ_کان_ويجهو_Color(prt_dlg.hDC,
+						   مٽا_سٽا_me((COLORREF)fgcol)));
 }
 
-#endif // FEAT_PRINTER && !FEAT_POSTSCRIPT
+#جيڪڏهن_پورو // FEAT_PRINTER && !FEAT_POSTSCRIPT
 
 
 
-#if defined(FEAT_SHORTCUT)
+#إذا defined(FEAT_SHORTCUT)
 # include <shlobj.h>
 
-# define is_path_sep(c)	    ((c) == L'\\' || (c) == L'/')
+# define is_رستو_sep(c)	    ((c) == L'\\' || (c) == L'/')
 
-    static int
-is_reparse_point_included(LPCWSTR fname)
+    ساكن صحيح
+is_reparse_نقطو_included(LPCWSTR fname)
 {
     LPCWSTR	p = fname, q;
-    WCHAR	buf[MAX_PATH];
+    WCHAR	buf[MAX_رستو];
     DWORD	attr;
 
-    if (SAFE_isalpha(p[0]) && p[1] == L':' && is_path_sep(p[2]))
+    إذا (محفوظ_isalpha(p[0]) && p[1] == L':' && is_رستو_sep(p[2]))
 	p += 3;
-    else if (is_path_sep(p[0]) && is_path_sep(p[1]))
+    وإلا إذا (is_رستو_sep(p[0]) && is_رستو_sep(p[1]))
 	p += 2;
 
-    while (*p != L'\0')
+    طالما (*p != L'\0')
     {
 	q = wcspbrk(p, L"\\/");
-	if (q == NULL)
+	إذا (q == عدم)
 	    p = q = fname + wcslen(fname);
-	else
+	وإلا
 	    p = q + 1;
-	if (q - fname >= MAX_PATH)
-	    return FALSE;
+	إذا (q - fname >= MAX_رستو)
+	    أرجع FALSE;
 	wcsncpy(buf, fname, q - fname);
 	buf[q - fname] = L'\0';
-	attr = GetFileAttributesW(buf);
-	if (attr != INVALID_FILE_ATTRIBUTES
-		&& (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-	    return TRUE;
+	attr = Get_File_خاصيتون_W(buf);
+	إذا (attr != INVALID_FILE_خاصيتون
+		&& (attr & FILE_ATTRIBUTE_REPARSE_نقطو) != 0)
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -1789,59 +1789,59 @@ is_reparse_point_included(LPCWSTR fname)
  * point, already fully resolved, or it doesn't exists.
  */
     char_u *
-resolve_reparse_point(char_u *fname)
+resolve_reparse_نقطو(char_u *fname)
 {
-    HANDLE	    h = INVALID_HANDLE_VALUE;
-    DWORD	    size;
+    HANDLE	    h = INVALID_HANDLE_قدر;
+    DWORD	    سائيز;
     WCHAR	    *p, *wp;
-    char_u	    *rfname = NULL;
-    WCHAR	    *buff = NULL;
+    char_u	    *rfname = عدم;
+    WCHAR	    *buff = عدم;
 
-    p = enc_to_utf16(fname, NULL);
-    if (p == NULL)
-	goto fail;
+    p = enc_منزل_utf16(fname, عدم);
+    إذا (p == عدم)
+	اذهب fail;
 
-    if (!is_reparse_point_included(p))
+    إذا (!is_reparse_نقطو_included(p))
     {
 	vim_free(p);
-	goto fail;
+	اذهب fail;
     }
 
-    h = CreateFileW(p, 0, 0, NULL, OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    h = CreateFileW(p, 0, 0, عدم, OPEN_EXISTING,
+	    FILE_FLAG_BACKUP_SEMANTICS, عدم);
     vim_free(p);
 
-    if (h == INVALID_HANDLE_VALUE)
-	goto fail;
+    إذا (h == INVALID_HANDLE_قدر)
+	اذهب fail;
 
-    size = GetFinalPathNameByHandleW(h, NULL, 0, 0);
-    if (size == 0)
-	goto fail;
-    buff = ALLOC_MULT(WCHAR, size);
-    if (buff == NULL)
-	goto fail;
-    if (GetFinalPathNameByHandleW(h, buff, size, 0) == 0)
-	goto fail;
+    سائيز = Get_Final_رستو_Name_By_Handle_W(h, عدم, 0, 0);
+    إذا (سائيز == 0)
+	اذهب fail;
+    buff = ALLOC_MULT(WCHAR, سائيز);
+    إذا (buff == عدم)
+	اذهب fail;
+    إذا (Get_Final_رستو_Name_By_Handle_W(h, buff, سائيز, 0) == 0)
+	اذهب fail;
 
-    if (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
+    إذا (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
     {
 	buff[6] = L'\\';
 	wp = buff + 6;
     }
-    else if (wcsncmp(buff, L"\\\\?\\", 4) == 0)
+    وإلا إذا (wcsncmp(buff, L"\\\\?\\", 4) == 0)
 	wp = buff + 4;
-    else
+    وإلا
 	wp = buff;
 
-    rfname = utf16_to_enc(wp, NULL);
+    rfname = utf16_منزل_enc(wp, عدم);
 
 fail:
-    if (h != INVALID_HANDLE_VALUE)
+    إذا (h != INVALID_HANDLE_قدر)
 	CloseHandle(h);
-    if (buff != NULL)
+    إذا (buff != عدم)
 	vim_free(buff);
 
-    return rfname;
+    أرجع rfname;
 }
 
 /*
@@ -1849,59 +1849,59 @@ fail:
  * to and return that name in allocated memory.
  * Otherwise NULL is returned.
  */
-    static char_u *
+    ساكن char_u *
 resolve_shortcut(char_u *fname)
 {
     HRESULT		hr;
-    IShellLink		*psl = NULL;
-    IPersistFile	*ppf = NULL;
-    OLECHAR		wsz[MAX_PATH];
-    char_u		*rfname = NULL;
-    int			len;
-    IShellLinkW		*pslw = NULL;
-    WIN32_FIND_DATAW	ffdw; // we get those free of charge
+    IShellLink		*psl = عدم;
+    IPersistFile	*ppf = عدم;
+    OLECHAR		wsz[MAX_رستو];
+    char_u		*rfname = عدم;
+    صحيح			len;
+    IShellLinkW		*pslw = عدم;
+    WIN32_ڳوليو_DATAW	ffdw; // we get those free of charge
 
     // Check if the file name ends in ".lnk". Avoid calling
     // CoCreateInstance(), it's quite slow.
-    if (fname == NULL)
-	return rfname;
-    len = (int)STRLEN(fname);
-    if (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
-	return rfname;
+    إذا (fname == عدم)
+	أرجع rfname;
+    len = (صحيح)STRLEN(fname);
+    إذا (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
+	أرجع rfname;
 
-    CoInitialize(NULL);
+    CoInitialize(عدم);
 
     // create a link manager object and request its interface
     hr = CoCreateInstance(
-	    &CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-	    &IID_IShellLinkW, (void**)&pslw);
-    if (hr == S_OK)
+	    &CLSID_ShellLink, عدم, CLSCTX_INPROC_SERVER,
+	    &IID_IShellLinkW, (فراغ**)&pslw);
+    إذا (hr == S_OK)
     {
-	WCHAR	*p = enc_to_utf16(fname, NULL);
+	WCHAR	*p = enc_منزل_utf16(fname, عدم);
 
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    // Get a pointer to the IPersistFile interface.
 	    hr = pslw->lpVtbl->QueryInterface(
-		    pslw, &IID_IPersistFile, (void**)&ppf);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+		    pslw, &IID_IPersistFile, (فراغ**)&ppf);
+	    إذا (hr != S_OK)
+		اذهب shortcut_errorw;
 
 	    // "load" the name and resolve the link
-	    hr = ppf->lpVtbl->Load(ppf, p, STGM_READ);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
-# if 0  // This makes Vim wait a long time if the target does not exist.
-	    hr = pslw->lpVtbl->Resolve(pslw, NULL, SLR_NO_UI);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+	    hr = ppf->lpVtbl->ڀريو_2(ppf, p, STGM_READ);
+	    إذا (hr != S_OK)
+		اذهب shortcut_errorw;
+# إذا 0  // This makes Vim wait a long time if the target does not exist.
+	    hr = pslw->lpVtbl->Resolve(pslw, عدم, SLR_NO_UI);
+	    إذا (hr != S_OK)
+		اذهب shortcut_errorw;
 # endif
 
 	    // Get the path to the link target.
-	    ZeroMemory(wsz, MAX_PATH * sizeof(WCHAR));
-	    hr = pslw->lpVtbl->GetPath(pslw, wsz, MAX_PATH, &ffdw, 0);
-	    if (hr == S_OK && wsz[0] != NUL)
-		rfname = utf16_to_enc(wsz, NULL);
+	    Zero_يادگيري(wsz, MAX_رستو * حجم(WCHAR));
+	    hr = pslw->lpVtbl->Get_رستو(pslw, wsz, MAX_رستو, &ffdw, 0);
+	    إذا (hr == S_OK && wsz[0] != NUL)
+		rfname = utf16_منزل_enc(wsz, عدم);
 
 shortcut_errorw:
 	    vim_free(p);
@@ -1909,42 +1909,42 @@ shortcut_errorw:
     }
 
     // Release all interface pointers (both belong to the same object)
-    if (ppf != NULL)
+    إذا (ppf != عدم)
 	ppf->lpVtbl->Release(ppf);
-    if (psl != NULL)
+    إذا (psl != عدم)
 	psl->lpVtbl->Release(psl);
-    if (pslw != NULL)
+    إذا (pslw != عدم)
 	pslw->lpVtbl->Release(pslw);
 
     CoUninitialize();
-    return rfname;
+    أرجع rfname;
 }
 
     char_u *
-mch_resolve_path(char_u *fname, int reparse_point)
+mch_resolve_رستو(char_u *fname, صحيح reparse_نقطو)
 {
-    char_u  *path = resolve_shortcut(fname);
+    char_u  *رستو = resolve_shortcut(fname);
 
-    if (path == NULL && reparse_point)
-	path = resolve_reparse_point(fname);
-    return path;
+    إذا (رستو == عدم && reparse_نقطو)
+	رستو = resolve_reparse_نقطو(fname);
+    أرجع رستو;
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#إذا defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
 /*
  * Bring ourselves to the foreground.  Does work if the OS doesn't allow it.
  */
-    void
-win32_set_foreground(void)
+    فراغ
+win32_سيٽ_foreground(فراغ)
 {
     GetConsoleHwnd();	    // get value of s_hwnd
-    if (s_hwnd != 0)
-	SetForegroundWindow(s_hwnd);
+    إذا (s_hwnd != 0)
+	سيٽ_Foreground_دري(s_hwnd);
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_CLIENTSERVER)
+#إذا defined(FEAT_CLIENTSERVER)
 /*
  * Client-server code for Vim
  *
@@ -1957,10 +1957,10 @@ win32_set_foreground(void)
 // GUI window at all).
 //
 // So we create a hidden window, and arrange to destroy it on exit.
-HWND message_window = 0;	    // window that's handling messages
+HWND پيغام_دري = 0;	    // window that's handling messages
 
 # define VIM_CLASSNAME      "VIM_MESSAGES"
-# define VIM_CLASSNAME_LEN  (sizeof(VIM_CLASSNAME) - 1)
+# define VIM_CLASSNAME_LEN  (حجم(VIM_CLASSNAME) - 1)
 
 // Timeout for sending a message to another Vim instance.  Normally this works
 // instantly, but it may hang when the other Vim instance is halted.
@@ -1968,56 +1968,56 @@ HWND message_window = 0;	    // window that's handling messages
 
 // Communication is via WM_COPYDATA messages. The message type is sent in
 // the dwData parameter. Types are defined here.
-# define COPYDATA_KEYS		0
-# define COPYDATA_REPLY		1
-# define COPYDATA_EXPR		10
-# define COPYDATA_RESULT	11
-# define COPYDATA_ERROR_RESULT	12
+# define COPYDATA_ڪنجيون		0
+# define COPYDATA_جواب		1
+# define COPYDATA_اظهار		10
+# define COPYDATA_نتيجو	11
+# define COPYDATA_ERROR_نتيجو	12
 # define COPYDATA_ENCODING	20
 
 // This is a structure containing a server HWND and its name.
-struct server_id
+بنية server_id
 {
     HWND hwnd;
     char_u *name;
 };
 
 // Last received 'encoding' that the client uses.
-static char_u	*client_enc = NULL;
+ساكن char_u	*client_enc = عدم;
 
 /*
  * Tell the other side what encoding we are using.
  * Return -1 if timeout happens.  Other errors are ignored.
  */
-    static int
-serverSendEnc(HWND target)
+    ساكن صحيح
+serverSendEnc(HWND هدف)
 {
-    COPYDATASTRUCT data;
+    COPYDATASTRUCT معلومات;
 
-    data.dwData = COPYDATA_ENCODING;
-    data.cbData = (DWORD)STRLEN(p_enc) + 1;
-    data.lpData = p_enc;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-	    (WPARAM)message_window, (LPARAM)&data,
-	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, NULL) == 0)
-	return -1;
-    return 0;
+    معلومات.dw_معلومات = COPYDATA_ENCODING;
+    معلومات.cb_معلومات = (DWORD)STRLEN(p_enc) + 1;
+    معلومات.lp_معلومات = p_enc;
+    إذا (Send_پيغام_Timeout(هدف, WM_COPYDATA,
+	    (WPARAM)پيغام_دري, (LPARAM)&معلومات,
+	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, عدم) == 0)
+	أرجع -1;
+    أرجع 0;
 }
 
 /*
  * Clean up on exit. This destroys the hidden message window.
  */
-    static void
-CleanUpMessaging(void)
+    ساكن فراغ
+Clean_مٿي_Messaging(فراغ)
 {
-    if (message_window == 0)
-	return;
+    إذا (پيغام_دري == 0)
+	أرجع;
 
-    DestroyWindow(message_window);
-    message_window = 0;
+    Destroy_دري(پيغام_دري);
+    پيغام_دري = 0;
 }
 
-static int save_reply(HWND server, char_u *reply, int expr);
+ساكن صحيح save_جواب(HWND server, char_u *جواب, صحيح اظهار);
 
 /*
  * The window procedure for the hidden message window.
@@ -2029,10 +2029,10 @@ static int save_reply(HWND server, char_u *reply, int expr);
  * not work in the console version - this basically means those
  * features which allow Vim to act as a server, rather than a client.
  */
-    static LRESULT CALLBACK
-Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    ساكن LRESULT CALLBACK
+Messaging_WndProc(HWND hwnd, UINT نياپو, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_COPYDATA)
+    إذا (نياپو == WM_COPYDATA)
     {
 	// This is a message from another Vim. The dwData member of the
 	// COPYDATASTRUCT determines the type of message:
@@ -2054,150 +2054,150 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	//   COPYDATA_ERROR_RESULT:
 	//	A reply. We are a client, and a server has sent this message
 	//	in response to a COPYDATA_EXPR that failed to evaluate.
-	COPYDATASTRUCT	*data = (COPYDATASTRUCT*)lParam;
+	COPYDATASTRUCT	*معلومات = (COPYDATASTRUCT*)lParam;
 	HWND		sender = (HWND)wParam;
-	COPYDATASTRUCT	reply;
+	COPYDATASTRUCT	جواب;
 	char_u		*res;
-	int		retval;
+	صحيح		retval;
 	DWORD_PTR	dwret = 0;
 	char_u		*str;
 	char_u		*tofree;
 
-	switch (data->dwData)
+	بدل (معلومات->dw_معلومات)
 	{
-	case COPYDATA_ENCODING:
+	حالة COPYDATA_ENCODING:
 	    // Remember the encoding that the client uses.
 	    vim_free(client_enc);
-	    client_enc = enc_canonize((char_u *)data->lpData);
-	    return 1;
+	    client_enc = enc_canonize((char_u *)معلومات->lp_معلومات);
+	    أرجع 1;
 
-	case COPYDATA_KEYS:
+	حالة COPYDATA_ڪنجيون:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_دري = sender;
 
 	    // Add the received keys to the input buffer.
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
+	    str = serverConvert(client_enc, (char_u *)معلومات->lp_معلومات, &tofree);
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    إذا (gui.اندريون_use)
 		// The GUI may get here re-entrantly, so insert the keys later.
-		server_add_input(str);
-	    else
+		server_جوڙيو_داخلا(str);
+	    وإلا
 # endif
-		server_to_input_buf(str);
+		server_منزل_داخلا_buf(str);
 	    vim_free(tofree);
 
 # ifdef FEAT_GUI
 	    // Wake up the main GUI loop.
 #  ifdef VIMDLL
-	    if (gui.in_use)
+	    إذا (gui.اندريون_use)
 #  endif
-		if (s_hwnd != 0)
-		    PostMessage(s_hwnd, WM_NULL, 0, 0);
+		إذا (s_hwnd != 0)
+		    Post_پيغام(s_hwnd, WM_NULL, 0, 0);
 # endif
-	    return 1;
+	    أرجع 1;
 
-	case COPYDATA_EXPR:
+	حالة COPYDATA_اظهار:
 	    // Remember who sent this, for <client>
-	    clientWindow = sender;
+	    client_دري = sender;
 
-	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
-	    res = eval_client_expr_to_string(str);
+	    str = serverConvert(client_enc, (char_u *)معلومات->lp_معلومات, &tofree);
+	    res = eval_client_اظهار_منزل_string(str);
 
-	    if (res == NULL)
+	    إذا (res == عدم)
 	    {
-		char	*err = _(e_invalid_expression_received);
+		حرف	*err = _(e_invalid_اظهار_received);
 		size_t	len = STRLEN(str) + STRLEN(err) + 5;
 
 		res = alloc(len);
-		if (res != NULL)
-		    reply.cbData = (DWORD)vim_snprintf_safelen(
-			(char *)res, len, "%s: \"%s\"", err, str);
-		else
-		    reply.cbData = 0;
-		reply.dwData = COPYDATA_ERROR_RESULT;
+		إذا (res != عدم)
+		    جواب.cb_معلومات = (DWORD)vim_snprintf_safelen(
+			(حرف *)res, len, "%s: \"%s\"", err, str);
+		وإلا
+		    جواب.cb_معلومات = 0;
+		جواب.dw_معلومات = COPYDATA_ERROR_نتيجو;
 	    }
-	    else
+	    وإلا
 	    {
-		reply.cbData = (DWORD)STRLEN(res) + 1;
-		reply.dwData = COPYDATA_RESULT;
+		جواب.cb_معلومات = (DWORD)STRLEN(res) + 1;
+		جواب.dw_معلومات = COPYDATA_نتيجو;
 	    }
-	    reply.lpData = res;
+	    جواب.lp_معلومات = res;
 
-	    if (serverSendEnc(sender) < 0)
+	    إذا (serverSendEnc(sender) < 0)
 		retval = -1;
-	    else
+	    وإلا
 	    {
-		if (SendMessageTimeout(sender, WM_COPYDATA,
-			(WPARAM)message_window, (LPARAM)&reply,
+		إذا (Send_پيغام_Timeout(sender, WM_COPYDATA,
+			(WPARAM)پيغام_دري, (LPARAM)&جواب,
 			SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
 		    retval = -1;
-		else
-		    retval = (int)dwret;
+		وإلا
+		    retval = (صحيح)dwret;
 	    }
 	    vim_free(tofree);
 	    vim_free(res);
-	    return retval;
+	    أرجع retval;
 
-	case COPYDATA_REPLY:
-	case COPYDATA_RESULT:
-	case COPYDATA_ERROR_RESULT:
-	    if (data->lpData != NULL)
+	حالة COPYDATA_جواب:
+	حالة COPYDATA_نتيجو:
+	حالة COPYDATA_ERROR_نتيجو:
+	    إذا (معلومات->lp_معلومات != عدم)
 	    {
-		str = serverConvert(client_enc, (char_u *)data->lpData,
+		str = serverConvert(client_enc, (char_u *)معلومات->lp_معلومات,
 								     &tofree);
-		if (tofree == NULL)
+		إذا (tofree == عدم)
 		    str = vim_strsave(str);
-		if (save_reply(sender, str,
-			   (data->dwData == COPYDATA_REPLY ?  0 :
-			   (data->dwData == COPYDATA_RESULT ? 1 :
+		إذا (save_جواب(sender, str,
+			   (معلومات->dw_معلومات == COPYDATA_جواب ?  0 :
+			   (معلومات->dw_معلومات == COPYDATA_نتيجو ? 1 :
 							      2))) == FAIL)
 		    vim_free(str);
-		else if (data->dwData == COPYDATA_REPLY)
+		وإلا إذا (معلومات->dw_معلومات == COPYDATA_جواب)
 		{
 		    char_u	winstr[30];
 
-		    sprintf((char *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
+		    sprintf((حرف *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
 		    apply_autocmds(EVENT_REMOTEREPLY, winstr, str,
 								TRUE, curbuf);
 		}
 	    }
-	    return 1;
+	    أرجع 1;
 	}
 
-	return 0;
+	أرجع 0;
     }
 
-    else if (msg == WM_ACTIVATE && wParam == WA_ACTIVE)
+    وإلا إذا (نياپو == WM_ACTIVATE && wParam == WA_سرگرم)
     {
 	// When the message window is activated (brought to the foreground),
 	// this actually applies to the text window.
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# إذا !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	if (!gui.in_use)
+	إذا (!gui.اندريون_use)
 #  endif
 	    GetConsoleHwnd();	    // get value of s_hwnd
 # endif
-	if (s_hwnd != 0)
+	إذا (s_hwnd != 0)
 	{
-	    SetForegroundWindow(s_hwnd);
-	    return 0;
+	    سيٽ_Foreground_دري(s_hwnd);
+	    أرجع 0;
 	}
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    أرجع Def_دري_Proc(hwnd, نياپو, wParam, lParam);
 }
 
 /*
  * Initialise the message handling process.  This involves creating a window
  * to handle messages - the window will not be visible.
  */
-    void
-serverInitMessaging(void)
+    فراغ
+serverInitMessaging(فراغ)
 {
     WNDCLASS wndclass;
 
     // Clean up on exit
-    atexit(CleanUpMessaging);
+    atexit(Clean_مٿي_Messaging);
 
     // Register a window class - we only really care
     // about the window procedure
@@ -2206,321 +2206,321 @@ serverInitMessaging(void)
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = g_hinst;
-    wndclass.hIcon = NULL;
-    wndclass.hCursor = NULL;
-    wndclass.hbrBackground = NULL;
-    wndclass.lpszMenuName = NULL;
+    wndclass.hIcon = عدم;
+    wndclass.hCursor = عدم;
+    wndclass.hbrBackground = عدم;
+    wndclass.lpszMenuName = عدم;
     wndclass.lpszClassName = VIM_CLASSNAME;
-    RegisterClass(&wndclass);
+    رجسٽر_Class(&wndclass);
 
     // Create the message window. It will be hidden, so the details don't
     // matter.  Don't use WS_OVERLAPPEDWINDOW, it will make a shortcut remove
     // focus from gvim.
-    message_window = CreateWindow(VIM_CLASSNAME, "",
+    پيغام_دري = Create_دري(VIM_CLASSNAME, "",
 			 WS_POPUPWINDOW | WS_CAPTION,
 			 CW_USEDEFAULT, CW_USEDEFAULT,
-			 100, 100, NULL, NULL,
-			 g_hinst, NULL);
+			 100, 100, عدم, عدم,
+			 g_hinst, عدم);
 }
 
 // Used by serverSendToVim() to find an alternate server name.
-static char_u *altname_buf_ptr = NULL;
+ساكن char_u *altname_buf_ptr = عدم;
 
 /*
  * Get the title of the window "hwnd", which is the Vim server name, in
  * "name[namelen]" and return the length.
  * Returns zero if window "hwnd" is not a Vim server.
  */
-    static int
-getVimServerName(HWND hwnd, char *name, int namelen)
+    ساكن صحيح
+getVimServerName(HWND hwnd, حرف *name, صحيح namelen)
 {
-    int		len;
-    char	buffer[VIM_CLASSNAME_LEN + 1];
+    صحيح		len;
+    حرف	بفر[VIM_CLASSNAME_LEN + 1];
 
     // Ignore windows which aren't Vim message windows
-    len = GetClassName(hwnd, buffer, sizeof(buffer));
-    if (len != VIM_CLASSNAME_LEN || STRCMP(buffer, VIM_CLASSNAME) != 0)
-	return 0;
+    len = GetClassName(hwnd, بفر, حجم(بفر));
+    إذا (len != VIM_CLASSNAME_LEN || STRCMP(بفر, VIM_CLASSNAME) != 0)
+	أرجع 0;
 
     // Get the title of the window
-    return GetWindowText(hwnd, name, namelen);
+    أرجع Get_دري_متن(hwnd, name, namelen);
 }
 
-    static BOOL CALLBACK
+    ساكن BOOL CALLBACK
 enumWindowsGetServer(HWND hwnd, LPARAM lparam)
 {
-    struct	server_id *id = (struct server_id *)lparam;
-    char	server[MAX_PATH];
+    بنية	server_id *id = (بنية server_id *)lparam;
+    حرف	server[MAX_رستو];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    إذا (getVimServerName(hwnd, server, حجم(server)) == 0)
+	أرجع TRUE;
 
     // If this is the server we're looking for, return its HWND
-    if (STRICMP(server, id->name) == 0)
+    إذا (STRICMP(server, id->name) == 0)
     {
 	id->hwnd = hwnd;
-	return FALSE;
+	أرجع FALSE;
     }
 
     // If we are looking for an alternate server, remember this name.
-    if (altname_buf_ptr != NULL)
+    إذا (altname_buf_ptr != عدم)
     {
 	size_t	namelen = STRLEN(id->name);
 
-	if (STRNICMP(server, id->name, namelen) == 0
+	إذا (STRNICMP(server, id->name, namelen) == 0
 	    && vim_isdigit(server[namelen]))
 	{
 	    STRCPY(altname_buf_ptr, server);
-	    altname_buf_ptr = NULL;	    // don't use another name
+	    altname_buf_ptr = عدم;	    // don't use another name
 	}
     }
 
     // Otherwise, keep looking
-    return TRUE;
+    أرجع TRUE;
 }
 
-    static BOOL CALLBACK
-enumWindowsGetNames(HWND hwnd, LPARAM lparam)
+    ساكن BOOL CALLBACK
+enum_Windows_Get_نالا(HWND hwnd, LPARAM lparam)
 {
     list_T	*list = (list_T *)lparam;
-    char	server[MAX_PATH];
+    حرف	server[MAX_رستو];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    إذا (getVimServerName(hwnd, server, حجم(server)) == 0)
+	أرجع TRUE;
 
     list_append_string(list, (char_u *)server, -1);
-    return TRUE;
+    أرجع TRUE;
 }
 
-struct enum_windows_s
+بنية enum_windows_s
 {
     WNDENUMPROC lpEnumFunc;
     LPARAM      lParam;
 };
 
-    static BOOL CALLBACK
-enum_windows_child(HWND hwnd, LPARAM lParam)
+    ساكن BOOL CALLBACK
+enum_windows_ٻار(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    بنية enum_windows_s *ew = (بنية enum_windows_s *)lParam;
 
-    return (ew->lpEnumFunc)(hwnd, ew->lParam);
+    أرجع (ew->lpEnumFunc)(hwnd, ew->lParam);
 }
 
-    static BOOL CALLBACK
+    ساكن BOOL CALLBACK
 enum_windows_toplevel(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    بنية enum_windows_s *ew = (بنية enum_windows_s *)lParam;
 
-    if ((ew->lpEnumFunc)(hwnd, ew->lParam))
-	return TRUE;
-    return EnumChildWindows(hwnd, enum_windows_child, lParam);
+    إذا ((ew->lpEnumFunc)(hwnd, ew->lParam))
+	أرجع TRUE;
+    أرجع Enum_ٻار_Windows(hwnd, enum_windows_ٻار, lParam);
 }
 
 /*
  * Enumerate all windows including children.
  */
-    static BOOL
+    ساكن BOOL
 enum_windows(WNDENUMPROC lpEnumFunc, LPARAM lParam)
 {
-    struct enum_windows_s ew;
+    بنية enum_windows_s ew;
 
     ew.lpEnumFunc = lpEnumFunc;
     ew.lParam = lParam;
-    return EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
+    أرجع EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
 }
 
-    static HWND
-findServer(char_u *name)
+    ساكن HWND
+ڳوليو_Server(char_u *name)
 {
-    struct server_id id;
+    بنية server_id id;
 
     id.name = name;
     id.hwnd = 0;
 
     enum_windows(enumWindowsGetServer, (LPARAM)(&id));
 
-    return id.hwnd;
+    أرجع id.hwnd;
 }
 
-    void
-serverSetName(char_u *name)
+    فراغ
+server_سيٽ_Name(char_u *name)
 {
     size_t	namelen;
     char_u	*ok_name;
     HWND	hwnd = 0;
-    int		i = 0;
+    صحيح		i = 0;
     char_u	*p;
 
     // Leave enough space for a 9-digit suffix to ensure uniqueness!
     namelen = STRLEN(name);
     ok_name = alloc(namelen + 10);
-    if (ok_name == NULL)
-	return;
+    إذا (ok_name == عدم)
+	أرجع;
 
     STRCPY(ok_name, name);
     p = ok_name + namelen;
 
-    for (;;)
+    لكل (;;)
     {
 	// This is inefficient - we're doing an EnumWindows loop for each
 	// possible name. It would be better to grab all names in one go,
 	// and scan the list each time...
-	hwnd = findServer(ok_name);
-	if (hwnd == 0)
-	    break;
+	hwnd = ڳوليو_Server(ok_name);
+	إذا (hwnd == 0)
+	    اكسر;
 
 	++i;
-	if (i >= 1000)
-	    break;
+	إذا (i >= 1000)
+	    اكسر;
 
-	sprintf((char *)p, "%d", i);
+	sprintf((حرف *)p, "%d", i);
     }
 
-    if (hwnd != 0)
+    إذا (hwnd != 0)
 	vim_free(ok_name);
-    else
+    وإلا
     {
 	// Remember the name
 	serverName = ok_name;
 	need_maketitle = TRUE;	// update Vim window title later
 
 	// Update the message window title
-	SetWindowText(message_window, (LPCSTR)ok_name);
+	سيٽ_دري_متن(پيغام_دري, (LPCSTR)ok_name);
 
 # ifdef FEAT_EVAL
 	// Set the servername variable
-	set_vim_var_string(VV_SEND_SERVER, serverName, -1);
+	سيٽ_vim_var_string(VV_SEND_SERVER, serverName, -1);
 # endif
     }
 }
 
     list_T *
-serverGetVimNames(void)
+server_Get_Vim_نالا(فراغ)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    إذا (list == عدم)
+	أرجع عدم;
 
-    enum_windows(enumWindowsGetNames, (LPARAM)list);
+    enum_windows(enum_Windows_Get_نالا, (LPARAM)list);
 
-    return list;
+    أرجع list;
 }
 
-    int
-serverSendReply(
+    صحيح
+server_Send_جواب(
     char_u	*name,		// Where to send.
-    char_u	*reply)		// What to send.
+    char_u	*جواب)		// What to send.
 {
-    HWND	target;
-    COPYDATASTRUCT data;
+    HWND	هدف;
+    COPYDATASTRUCT معلومات;
     long_u	n = 0;
     DWORD_PTR	dwret = 0;
 
     // The "name" argument is a magic cookie obtained from expand("<client>").
     // It should be of the form 0xXXXXX - i.e. a C hex literal, which is the
     // value of the client's message window HWND.
-    sscanf((char *)name, SCANF_HEX_LONG_U, &n);
-    if (n == 0)
-	return -1;
+    لڙي_مان_پڙهو((حرف *)name, SCANF_HEX_LONG_U, &n);
+    إذا (n == 0)
+	أرجع -1;
 
-    target = (HWND)n;
-    if (!IsWindow(target))
-	return -1;
+    هدف = (HWND)n;
+    إذا (!Is_دري(هدف))
+	أرجع -1;
 
-    data.dwData = COPYDATA_REPLY;
-    data.cbData = (DWORD)STRLEN(reply) + 1;
-    data.lpData = reply;
+    معلومات.dw_معلومات = COPYDATA_جواب;
+    معلومات.cb_معلومات = (DWORD)STRLEN(جواب) + 1;
+    معلومات.lp_معلومات = جواب;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    إذا (serverSendEnc(هدف) < 0)
+	أرجع -1;
+    إذا (Send_پيغام_Timeout(هدف, WM_COPYDATA,
+		(WPARAM)پيغام_دري, (LPARAM)&معلومات,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    return dwret ? 0 : -1;
+	أرجع -1;
+    أرجع dwret ? 0 : -1;
 }
 
-    int
-serverSendToVim(
+    صحيح
+server_Send_منزل_Vim(
     char_u	 *name,			// Where to send.
     char_u	 *cmd,			// What to send.
-    char_u	 **result,		// Result of eval'ed expression
-    void	 *ptarget,		// HWND of server
-    int		 asExpr,		// Expression or keys?
-    int		 timeout,		// timeout in seconds or zero
-    int		 silent)		// don't complain about no server
+    char_u	 **نتيجو,		// Result of eval'ed expression
+    فراغ	 *ptarget,		// HWND of server
+    صحيح		 as_اظهار,		// Expression or keys?
+    صحيح		 timeout,		// timeout in seconds or zero
+    صحيح		 silent)		// don't complain about no server
 {
     size_t	namelen;
-    HWND	target;
-    COPYDATASTRUCT data;
-    char_u	*retval = NULL;
-    int		retcode = 0;
+    HWND	هدف;
+    COPYDATASTRUCT معلومات;
+    char_u	*retval = عدم;
+    صحيح		retcode = 0;
     DWORD_PTR	dwret = 0;
-    char_u	altname_buf[MAX_PATH];
+    char_u	altname_buf[MAX_رستو];
 
     // Execute locally if no display or target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(cmd, asExpr, result);
+    إذا (serverName != عدم && STRICMP(name, serverName) == 0)
+	أرجع send_منزل_Local_Vim(cmd, as_اظهار, نتيجو);
 
     // If the server name does not end in a digit then we look for an
     // alternate name.  e.g. when "name" is GVIM then we may find GVIM2.
     namelen = STRLEN(name);
-    if (namelen > 1 && !vim_isdigit(name[namelen - 1]))
+    إذا (namelen > 1 && !vim_isdigit(name[namelen - 1]))
 	altname_buf_ptr = altname_buf;
     altname_buf[0] = NUL;
-    target = findServer(name);
-    altname_buf_ptr = NULL;
-    if (target == 0 && altname_buf[0] != NUL)
+    هدف = ڳوليو_Server(name);
+    altname_buf_ptr = عدم;
+    إذا (هدف == 0 && altname_buf[0] != NUL)
 	// Use another server name we found.
-	target = findServer(altname_buf);
+	هدف = ڳوليو_Server(altname_buf);
 
-    if (target == 0)
+    إذا (هدف == 0)
     {
-	if (!silent)
+	إذا (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	أرجع -1;
     }
 
-    if (ptarget)
-	*(HWND *)ptarget = target;
+    إذا (ptarget)
+	*(HWND *)ptarget = هدف;
 
-    data.dwData = asExpr ? COPYDATA_EXPR : COPYDATA_KEYS;
-    data.cbData = (DWORD)STRLEN(cmd) + 1;
-    data.lpData = cmd;
+    معلومات.dw_معلومات = as_اظهار ? COPYDATA_اظهار : COPYDATA_ڪنجيون;
+    معلومات.cb_معلومات = (DWORD)STRLEN(cmd) + 1;
+    معلومات.lp_معلومات = cmd;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
-		(WPARAM)message_window, (LPARAM)&data,
+    إذا (serverSendEnc(هدف) < 0)
+	أرجع -1;
+    إذا (Send_پيغام_Timeout(هدف, WM_COPYDATA,
+		(WPARAM)پيغام_دري, (LPARAM)&معلومات,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    if (dwret == 0)
-	return -1;
+	أرجع -1;
+    إذا (dwret == 0)
+	أرجع -1;
 
-    if (asExpr)
-	retval = serverGetReply(target, &retcode, TRUE, TRUE, timeout);
+    إذا (as_اظهار)
+	retval = server_Get_جواب(هدف, &retcode, TRUE, TRUE, timeout);
 
-    if (result == NULL)
+    إذا (نتيجو == عدم)
 	vim_free(retval);
-    else
-	*result = retval; // Caller assumes responsibility for freeing
+    وإلا
+	*نتيجو = retval; // Caller assumes responsibility for freeing
 
-    return retcode;
+    أرجع retcode;
 }
 
 /*
  * Bring the server to the foreground.
  */
-    void
+    فراغ
 serverForeground(char_u *name)
 {
-    HWND	target = findServer(name);
+    HWND	هدف = ڳوليو_Server(name);
 
-    if (target != 0)
-	SetForegroundWindow(target);
+    إذا (هدف != 0)
+	سيٽ_Foreground_دري(هدف);
 }
 
 // Replies from server need to be stored until the client picks them up via
@@ -2530,42 +2530,42 @@ serverForeground(char_u *name)
 // We just store the replies in a simple list. When we remove an entry, we
 // move list entries down to fill the gap.
 // The server ID is simply the HWND.
-typedef struct
+تعريفنوع بنية
 {
     HWND	server;		// server window
-    char_u	*reply;		// reply string
-    int		expr_result;	// 0 for REPLY, 1 for RESULT 2 for error
-} reply_T;
+    char_u	*جواب;		// reply string
+    صحيح		اظهار_نتيجو;	// 0 for REPLY, 1 for RESULT 2 for error
+} جواب_T;
 
-static garray_T reply_list = {0, 0, sizeof(reply_T), 5, 0};
+ساكن garray_T جواب_list = {0, 0, حجم(جواب_T), 5, 0};
 
-# define REPLY_ITEM(i) ((reply_T *)(reply_list.ga_data) + (i))
-# define REPLY_COUNT (reply_list.ga_len)
+# define جواب_شي(i) ((جواب_T *)(جواب_list.ga_معلومات) + (i))
+# define جواب_ڳڻپ (جواب_list.ga_len)
 
 // Flag which is used to wait for a reply
-static int reply_received = 0;
+ساكن صحيح جواب_received = 0;
 
 /*
  * Store a reply.  "reply" must be allocated memory (or NULL).
  */
-    static int
-save_reply(HWND server, char_u *reply, int expr)
+    ساكن صحيح
+save_جواب(HWND server, char_u *جواب, صحيح اظهار)
 {
-    reply_T *rep;
+    جواب_T *rep;
 
-    if (ga_grow(&reply_list, 1) == FAIL)
-	return FAIL;
+    إذا (ga_grow(&جواب_list, 1) == FAIL)
+	أرجع FAIL;
 
-    rep = REPLY_ITEM(REPLY_COUNT);
+    rep = جواب_شي(جواب_ڳڻپ);
     rep->server = server;
-    rep->reply = reply;
-    rep->expr_result = expr;
-    if (rep->reply == NULL)
-	return FAIL;
+    rep->جواب = جواب;
+    rep->اظهار_نتيجو = اظهار;
+    إذا (rep->جواب == عدم)
+	أرجع FAIL;
 
-    ++REPLY_COUNT;
-    reply_received = 1;
-    return OK;
+    ++جواب_ڳڻپ;
+    جواب_received = 1;
+    أرجع OK;
 }
 
 /*
@@ -2577,120 +2577,120 @@ save_reply(HWND server, char_u *reply, int expr)
  * if "wait" is TRUE block until a message arrives (or the server exits).
  */
     char_u *
-serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
+server_Get_جواب(HWND server, صحيح *اظهار_res, صحيح remove, صحيح wait, صحيح timeout)
 {
-    int		i;
-    char_u	*reply;
-    reply_T	*rep;
-    int		did_process = FALSE;
-    time_t	start;
+    صحيح		i;
+    char_u	*جواب;
+    جواب_T	*rep;
+    صحيح		did_process = FALSE;
+    time_t	شروعات;
     time_t	now;
 
     // When waiting, loop until the message waiting for is received.
-    time(&start);
-    for (;;)
+    وقت(&شروعات);
+    لكل (;;)
     {
 	// Reset this here, in case a message arrives while we are going
 	// through the already received messages.
-	reply_received = 0;
+	جواب_received = 0;
 
-	for (i = 0; i < REPLY_COUNT; ++i)
+	لكل (i = 0; i < جواب_ڳڻپ; ++i)
 	{
-	    rep = REPLY_ITEM(i);
-	    if (rep->server == server
-		    && ((rep->expr_result != 0) == (expr_res != NULL)))
+	    rep = جواب_شي(i);
+	    إذا (rep->server == server
+		    && ((rep->اظهار_نتيجو != 0) == (اظهار_res != عدم)))
 	    {
 		// Save the values we've found for later
-		reply = rep->reply;
-		if (expr_res != NULL)
-		    *expr_res = rep->expr_result == 1 ? 0 : -1;
+		جواب = rep->جواب;
+		إذا (اظهار_res != عدم)
+		    *اظهار_res = rep->اظهار_نتيجو == 1 ? 0 : -1;
 
-		if (remove)
+		إذا (remove)
 		{
 		    // Move the rest of the list down to fill the gap
 		    mch_memmove(rep, rep + 1,
-				     (REPLY_COUNT - i - 1) * sizeof(reply_T));
-		    --REPLY_COUNT;
+				     (جواب_ڳڻپ - i - 1) * حجم(جواب_T));
+		    --جواب_ڳڻپ;
 		}
 
 		// Return the reply to the caller, who takes on responsibility
 		// for freeing it if "remove" is TRUE.
-		return reply;
+		أرجع جواب;
 	    }
 	}
 
 	// If we got here, we didn't find a reply. Return immediately if the
 	// "wait" parameter isn't set.
-	if (!wait)
+	إذا (!wait)
 	{
 	    // Process pending messages once. Without this, looping on
 	    // remote_peek() would never get the reply.
-	    if (!did_process)
+	    إذا (!did_process)
 	    {
 		did_process = TRUE;
 		serverProcessPendingMessages();
-		continue;
+		استمر;
 	    }
-	    break;
+	    اكسر;
 	}
 
 	// We need to wait for a reply. Enter a message loop until the
 	// "reply_received" flag gets set.
 
 	// Loop until we receive a reply
-	while (reply_received == 0)
+	طالما (جواب_received == 0)
 	{
 # ifdef FEAT_TIMERS
 	    // TODO: use the return value to decide how long to wait.
 	    check_due_timer();
 # endif
-	    time(&now);
-	    if (timeout > 0 && (now - start) >= timeout)
-		break;
+	    وقت(&now);
+	    إذا (timeout > 0 && (now - شروعات) >= timeout)
+		اكسر;
 
 	    // Wait for a SendMessage() call to us.  This could be the reply
 	    // we are waiting for.  Use a timeout of a second, to catch the
 	    // situation that the server died unexpectedly.
-	    MsgWaitForMultipleObjects(0, NULL, TRUE, 1000, QS_ALLINPUT);
+	    نياپو_Wait_For_گڻو_Objects(0, عدم, TRUE, 1000, QS_ALLINPUT);
 
 	    // If the server has died, give up
-	    if (!IsWindow(server))
-		return NULL;
+	    إذا (!Is_دري(server))
+		أرجع عدم;
 
 	    serverProcessPendingMessages();
 	}
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process any messages in the Windows message queue.
  */
-    void
-serverProcessPendingMessages(void)
+    فراغ
+serverProcessPendingMessages(فراغ)
 {
-    MSG msg;
+    نياپو_2 نياپو;
 
-    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    طالما (Peek_پيغام_W(&نياپو, عدم, 0, 0, PM_REMOVE))
     {
-	TranslateMessage(&msg);
-	DispatchMessageW(&msg);
+	Translate_پيغام(&نياپو);
+	Dispatch_پيغام_W(&نياپو);
     }
 }
 
-#endif // FEAT_CLIENTSERVER
+#جيڪڏهن_پورو // FEAT_CLIENTSERVER
 
-#if defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
+#إذا defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
 
-struct charset_pair
+بنية charset_pair
 {
     string_T	name;
     BYTE	charset;
 };
 
-static struct charset_pair
-charset_pairs[] =
+ساكن بنية charset_pair
+charset_جوڙا[] =
 {
     {STR_LITERAL_INIT("ANSI"),		ANSI_CHARSET},
     {STR_LITERAL_INIT("CHINESEBIG5"),	CHINESEBIG5_CHARSET},
@@ -2698,7 +2698,7 @@ charset_pairs[] =
     {STR_LITERAL_INIT("HANGEUL"),	HANGEUL_CHARSET},
     {STR_LITERAL_INIT("OEM"),		OEM_CHARSET},
     {STR_LITERAL_INIT("SHIFTJIS"),	SHIFTJIS_CHARSET},
-    {STR_LITERAL_INIT("SYMBOL"),	SYMBOL_CHARSET},
+    {STR_LITERAL_INIT("SYMBOL"),	نشان_CHARSET},
     {STR_LITERAL_INIT("ARABIC"),	ARABIC_CHARSET},
     {STR_LITERAL_INIT("BALTIC"),	BALTIC_CHARSET},
     {STR_LITERAL_INIT("EASTEUROPE"),	EASTEUROPE_CHARSET},
@@ -2716,14 +2716,14 @@ charset_pairs[] =
 # endif
 };
 
-struct quality_pair
+بنية quality_pair
 {
     string_T	name;
     DWORD	quality;
 };
 
-static struct quality_pair
-quality_pairs[] = {
+ساكن بنية quality_pair
+quality_جوڙا[] = {
 # ifdef CLEARTYPE_QUALITY
     {STR_LITERAL_INIT("CLEARTYPE"),	CLEARTYPE_QUALITY},
 # endif
@@ -2746,54 +2746,54 @@ quality_pairs[] = {
  * Convert a charset ID to a name.
  * Return NULL when not recognized.
  */
-    char *
-charset_id2name(int id)
+    حرف *
+charset_id2name(صحيح id)
 {
-    int	i;
+    صحيح	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(charset_جوڙا); ++i)
     {
-	if ((BYTE)id == charset_pairs[i].charset)
-	    return (char *)charset_pairs[i].name.string;
+	إذا ((BYTE)id == charset_جوڙا[i].charset)
+	    أرجع (حرف *)charset_جوڙا[i].name.string;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Convert a quality ID to a name.
  * Return NULL when not recognized.
  */
-    char *
+    حرف *
 quality_id2name(DWORD id)
 {
-    int	i;
+    صحيح	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(quality_جوڙا); ++i)
     {
-	if (id == quality_pairs[i].quality)
-	    return (char *)quality_pairs[i].name.string;
+	إذا (id == quality_جوڙا[i].quality)
+	    أرجع (حرف *)quality_جوڙا[i].name.string;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 // The default font height in 100% scaling (96dpi).
 // (-16 in 96dpi equates to roughly 12pt)
-# define DEFAULT_FONT_HEIGHT	(-16)
+# define DEFAULT_FONT_اوچائي	(-16)
 
-static const LOGFONTW s_lfDefault =
+ساكن ثابت LOGFONTW s_lfDefault =
 {
-    DEFAULT_FONT_HEIGHT,
-    0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+    DEFAULT_FONT_اوچائي,
+    0, 0, 0, FW_عام, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+    ٻاهريون_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
     PROOF_QUALITY, FIXED_PITCH | FF_DONTCARE,
     L""	// Default font name will be set later based on current language.
 };
 
 // This will be initialized when set_default_logfont() is called first time.
 // The value will be based on the system DPI.
-int current_font_height = 0;		// also used in gui_w32.c
+صحيح current_font_اوچائي = 0;		// also used in gui_w32.c
 
 /*
  * Convert a string representing a point size into pixels. The string should
@@ -2802,88 +2802,88 @@ int current_font_height = 0;		// also used in gui_w32.c
  * character is stored in *end. The flag "vertical" says whether this
  * calculation is for a vertical (height) size or a horizontal (width) one.
  */
-    static int
-points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
+    ساكن صحيح
+points_منزل_pixels(WCHAR *str, WCHAR **پڇاڙي, صحيح vertical, long_i pprinter_dc)
 {
-    int		pixels;
-    int		points = 0;
-    int		divisor = 0;
+    صحيح		pixels;
+    صحيح		points = 0;
+    صحيح		ورهائيندڙ = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    while (*str != NUL)
+    طالما (*str != NUL)
     {
-	if (*str == L'.' && divisor == 0)
+	إذا (*str == L'.' && ورهائيندڙ == 0)
 	{
 	    // Start keeping a divisor, for later
-	    divisor = 1;
+	    ورهائيندڙ = 1;
 	}
-	else
+	وإلا
 	{
-	    if (!VIM_ISDIGIT(*str))
-		break;
+	    إذا (!VIM_ISDIGIT(*str))
+		اكسر;
 
 	    points *= 10;
 	    points += *str - L'0';
-	    divisor *= 10;
+	    ورهائيندڙ *= 10;
 	}
 	++str;
     }
 
-    if (divisor == 0)
-	divisor = 1;
+    إذا (ورهائيندڙ == 0)
+	ورهائيندڙ = 1;
 
-    if (printer_dc == NULL)
+    إذا (printer_dc == عدم)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_دري();
+	hdc = Get_دري_DC(hwnd);
     }
-    else
+    وإلا
 	hdc = printer_dc;
 
     pixels = MulDiv(points,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX),
-		    72 * divisor);
+		    72 * ورهائيندڙ);
 
-    if (printer_dc == NULL)
+    إذا (printer_dc == عدم)
 	ReleaseDC(hwnd, hdc);
 
-    *end = str;
-    return pixels;
+    *پڇاڙي = str;
+    أرجع pixels;
 }
 
 /*
  * Convert pixel into point size. This is a reverse of points_to_pixels.
  */
-    static double
-pixels_to_points(int pixels, int vertical, long_i pprinter_dc)
+    ساكن مزدوج
+pixels_منزل_points(صحيح pixels, صحيح vertical, long_i pprinter_dc)
 {
-    double	points = 0;
+    مزدوج	points = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    if (printer_dc == NULL)
+    إذا (printer_dc == عدم)
     {
-	hwnd = GetDesktopWindow();
-	hdc = GetWindowDC(hwnd);
+	hwnd = Get_Desktop_دري();
+	hdc = Get_دري_DC(hwnd);
     }
-    else
+    وإلا
 	hdc = printer_dc;
 
     points = pixels * 72.0 / GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX);
-    if (printer_dc == NULL)
+    إذا (printer_dc == عدم)
 	ReleaseDC(hwnd, hdc);
 
-    return points;
+    أرجع points;
 }
 
-    static int CALLBACK
+    ساكن صحيح CALLBACK
 font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm اڻ_استعمال_ٿيل,
+    DWORD	    type اڻ_استعمال_ٿيل,
     LPARAM	    lparam)
 {
     // Return value:
@@ -2900,29 +2900,29 @@ font_enumproc(
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    إذا ((ntm->tmPitchAndFamily & 1) != 0)
+	أرجع 1;
 # endif
 
     // Remember this LOGFONTW as a "possible"
     *lf = elf->elfLogFont;
 
     // Terminate the scan as soon as we find an ANSI font
-    if (lf->lfCharSet == ANSI_CHARSET
-	    || lf->lfCharSet == OEM_CHARSET
-	    || lf->lfCharSet == DEFAULT_CHARSET)
-	return 0;
+    إذا (lf->lf_Char_سيٽ == ANSI_CHARSET
+	    || lf->lf_Char_سيٽ == OEM_CHARSET
+	    || lf->lf_Char_سيٽ == DEFAULT_CHARSET)
+	أرجع 0;
 
     // Continue the scan - we have a non-ANSI font
-    return 2;
+    أرجع 2;
 }
 
-    static int
+    ساكن صحيح
 init_logfont(LOGFONTW *lf)
 {
-    int		n;
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    صحيح		n;
+    HWND	hwnd = Get_Desktop_دري();
+    HDC		hdc = Get_دري_DC(hwnd);
 
     n = EnumFontFamiliesW(hdc,
 			 lf->lfFaceName,
@@ -2932,58 +2932,58 @@ init_logfont(LOGFONTW *lf)
     ReleaseDC(hwnd, hdc);
 
     // If we couldn't find a usable font, return failure
-    if (n == 1)
-	return FAIL;
+    إذا (n == 1)
+	أرجع FAIL;
 
     // Tidy up the rest of the LOGFONTW structure. We set to a basic
     // font - get_logfont() sets bold, italic, etc based on the user's
     // input.
-    lf->lfHeight = current_font_height;
-    lf->lfWidth = 0;
+    lf->lf_اوچائي = current_font_اوچائي;
+    lf->lf_ويڪر = 0;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_Strike_ٻاهريون = FALSE;
+    lf->lf_وزن = FW_عام;
 
     // Return success
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Call back for EnumFontFamiliesW in expand_font_enumproc.
  *
  */
-    static int CALLBACK
+    ساكن صحيح CALLBACK
 expand_font_enumproc(
     ENUMLOGFONTW    *elf,
-    NEWTEXTMETRICW  *ntm UNUSED,
-    DWORD	    type UNUSED,
+    NEWTEXTMETRICW  *ntm اڻ_استعمال_ٿيل,
+    DWORD	    type اڻ_استعمال_ٿيل,
     LPARAM	    lparam)
 {
     LOGFONTW *lf = (LOGFONTW*)elf;
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    إذا ((ntm->tmPitchAndFamily & 1) != 0)
+	أرجع 1;
 # endif
 
     // Filter only on ANSI. Otherwise will see a lot of random fonts that we
     // usually don't want.
-    if (lf->lfCharSet != ANSI_CHARSET)
-	return 1;
+    إذا (lf->lf_Char_سيٽ != ANSI_CHARSET)
+	أرجع 1;
 
-    int (*add_match)(char_u *) = (int (*)(char_u *))lparam;
+    صحيح (*جوڙيو_ميلاپ)(char_u *) = (صحيح (*)(char_u *))lparam;
 
     WCHAR *faceNameW = lf->lfFaceName;
-    char_u *faceName = utf16_to_enc(faceNameW, NULL);
-    if (!faceName)
-	return 0;
+    char_u *faceName = utf16_منزل_enc(faceNameW, عدم);
+    إذا (!faceName)
+	أرجع 0;
 
-    add_match(faceName);
+    جوڙيو_ميلاپ(faceName);
     vim_free(faceName);
 
-    return 1;
+    أرجع 1;
 }
 
 /*
@@ -2995,53 +2995,53 @@ expand_font_enumproc(
  * handling is done by the GUI code, whereas in Windows it's part of the
  * platform code.
  */
-    void
+    فراغ
 gui_mch_expand_font(
-    optexpand_T	*args,
-    void	*param UNUSED,
-    int		(*add_match)(char_u *val))
+    optexpand_T	*دليلون,
+    فراغ	*param اڻ_استعمال_ٿيل,
+    صحيح		(*جوڙيو_ميلاپ)(char_u *val))
 {
-    expand_T	    *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T	    *xp = دليلون->oe_xp;
+    إذا (xp->xp_نمونو > دليلون->oe_سيٽ_arg && *(xp->xp_نمونو-1) == ':')
     {
-	char buf[30];
-	int	i;
+	حرف buf[30];
+	صحيح	i;
 
 	// Always fill in with the current font size as first option for
 	// convenience. We simply round to the closest integer for simplicity.
-	int font_height = (int)round(
-		pixels_to_points(-current_font_height, TRUE, (long_i)NULL));
-	vim_snprintf(buf, ARRAY_LENGTH(buf), "h%d", font_height);
-	add_match((char_u *)buf);
+	صحيح font_اوچائي = (صحيح)ڦيرو(
+		pixels_منزل_points(-current_font_اوچائي, TRUE, (long_i)عدم));
+	vim_snprintf(buf, ARRAY_ڊيگهائي(buf), "h%d", font_اوچائي);
+	جوڙيو_ميلاپ((char_u *)buf);
 
 	// Note: Keep this in sync with get_logfont(). Don't include 'c' and
 	// 'q' as we fill in all the values below.
-	static char *(p_gfn_win_opt_values[]) = {
+	ساكن حرف *(p_gfn_win_opt_قدرون[]) = {
 	    "h" , "w" , "W" , "b" , "i" , "u" , "s"};
-	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_values); i++)
-	    add_match((char_u *)p_gfn_win_opt_values[i]);
+	لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(p_gfn_win_opt_قدرون); i++)
+	    جوڙيو_ميلاپ((char_u *)p_gfn_win_opt_قدرون[i]);
 
-	for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+	لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(charset_جوڙا); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "c%s", charset_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, حجم(buf), "c%s", charset_جوڙا[i].name.string);
+	    جوڙيو_ميلاپ((char_u *)buf);
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+	لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(quality_جوڙا); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "q%s", quality_pairs[i].name.string);
-	    add_match((char_u *)buf);
+	    vim_snprintf(buf, حجم(buf), "q%s", quality_جوڙا[i].name.string);
+	    جوڙيو_ميلاپ((char_u *)buf);
 	}
-	return;
+	أرجع;
     }
 
-    HWND	hwnd = GetDesktopWindow();
-    HDC		hdc = GetWindowDC(hwnd);
+    HWND	hwnd = Get_Desktop_دري();
+    HDC		hdc = Get_دري_DC(hwnd);
 
     EnumFontFamiliesW(hdc,
-	    NULL,
+	    عدم,
 	    (FONTENUMPROCW)expand_font_enumproc,
-	    (LPARAM)add_match);
+	    (LPARAM)جوڙيو_ميلاپ);
 
     ReleaseDC(hwnd, hdc);
 }
@@ -3050,54 +3050,54 @@ gui_mch_expand_font(
  * Compare a UTF-16 string and an ASCII string literally.
  * Only works all the code points are inside ASCII range.
  */
-    static int
-utf16ascncmp(const WCHAR *w, const char *p, size_t n)
+    ساكن صحيح
+utf16ascncmp(ثابت WCHAR *w, ثابت حرف *p, size_t n)
 {
     size_t i;
 
-    for (i = 0; i < n; i++)
+    لكل (i = 0; i < n; i++)
     {
-	if (w[i] == 0 || w[i] != p[i])
-	    return w[i] - p[i];
+	إذا (w[i] == 0 || w[i] != p[i])
+	    أرجع w[i] - p[i];
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Equivalent of GetDpiForSystem().
  */
     UINT WINAPI
-vimGetDpiForSystem(void)
+vimGetDpiForSystem(فراغ)
 {
-    HWND hwnd = GetDesktopWindow();
-    HDC hdc = GetWindowDC(hwnd);
+    HWND hwnd = Get_Desktop_دري();
+    HDC hdc = Get_دري_DC(hwnd);
     UINT dpi = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(hwnd, hdc);
-    return dpi;
+    أرجع dpi;
 }
 
 /*
  * Set default logfont based on current language.
  */
-    static void
-set_default_logfont(LOGFONTW *lf)
+    ساكن فراغ
+سيٽ_default_logfont(LOGFONTW *lf)
 {
     // Default font name for current language on MS-Windows.
     // If not translated, falls back to "Consolas".
     // This must be a fixed-pitch font.
-    const char *defaultfontname = N_("DefaultFontNameForWindows");
-    char *fontname = _(defaultfontname);
+    ثابت حرف *defaultfontname = N_("DefaultFontNameForWindows");
+    حرف *fontname = _(defaultfontname);
 
-    if (STRCMP(fontname, defaultfontname) == 0)
+    إذا (STRCMP(fontname, defaultfontname) == 0)
 	fontname = "Consolas";
 
     *lf = s_lfDefault;
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    if (current_font_height == 0)
-	current_font_height = lf->lfHeight;
+    lf->lf_اوچائي = DEFAULT_FONT_اوچائي * (صحيح)vimGetDpiForSystem() / 96;
+    إذا (current_font_اوچائي == 0)
+	current_font_اوچائي = lf->lf_اوچائي;
 
-    WCHAR *wfontname = enc_to_utf16((char_u*)fontname, NULL);
-    if (wfontname != NULL)
+    WCHAR *wfontname = enc_منزل_utf16((char_u*)fontname, عدم);
+    إذا (wfontname != عدم)
     {
 	wcscpy_s(lf->lfFaceName, LF_FACESIZE, wfontname);
 	vim_free(wfontname);
@@ -3108,206 +3108,206 @@ set_default_logfont(LOGFONTW *lf)
  * Get font info from "name" into logfont "lf".
  * Return OK for a valid name, FAIL otherwise.
  */
-    int
+    صحيح
 get_logfont(
     LOGFONTW	*lf,
     char_u	*name,
     HDC		printer_dc,
-    int		verbose)
+    صحيح		verbose)
 {
     WCHAR	*p;
-    int		i;
-    int		ret = FAIL;
-    static LOGFONTW *lastlf = NULL;
+    صحيح		i;
+    صحيح		ret = FAIL;
+    ساكن LOGFONTW *lastlf = عدم;
     WCHAR	*wname;
 
-    set_default_logfont(lf);
-    if (name == NULL)
-	return OK;
+    سيٽ_default_logfont(lf);
+    إذا (name == عدم)
+	أرجع OK;
 
-    wname = enc_to_utf16(name, NULL);
-    if (wname == NULL)
-	return FAIL;
+    wname = enc_منزل_utf16(name, عدم);
+    إذا (wname == عدم)
+	أرجع FAIL;
 
-    if (wcscmp(wname, L"*") == 0)
+    إذا (wcscmp(wname, L"*") == 0)
     {
-# if defined(FEAT_GUI_MSWIN)
+# إذا defined(FEAT_GUI_MSWIN)
 	CHOOSEFONTW	cf;
 	// if name is "*", bring up std font dialog:
-	CLEAR_FIELD(cf);
-	cf.lStructSize = sizeof(cf);
+	CLEAR_ميدان(cf);
+	cf.l_Struct_سائيز = حجم(cf);
 	cf.hwndOwner = s_hwnd;
 	cf.Flags = CF_SCREENFONTS | CF_FIXEDPITCHONLY | CF_INITTOLOGFONTSTRUCT;
-	if (lastlf != NULL)
+	إذا (lastlf != عدم)
 	    *lf = *lastlf;
 	cf.lpLogFont = lf;
 	cf.nFontType = 0 ; //REGULAR_FONTTYPE;
-	if (ChooseFontW(&cf))
+	إذا (چونڊيو_Font_W(&cf))
 	    ret = OK;
 # endif
-	goto theend;
+	اذهب theend;
     }
 
     /*
      * Split name up, it could be <name>:h<height>:w<width> etc.
      */
-    for (p = wname; *p && *p != L':'; p++)
+    لكل (p = wname; *p && *p != L':'; p++)
     {
-	if (p - wname + 1 >= LF_FACESIZE)
-	    goto theend;			// Name too long
+	إذا (p - wname + 1 >= LF_FACESIZE)
+	    اذهب theend;			// Name too long
 	lf->lfFaceName[p - wname] = *p;
     }
-    if (p != wname)
+    إذا (p != wname)
 	lf->lfFaceName[p - wname] = NUL;
 
     // First set defaults
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    lf->lfWidth = 0;
-    lf->lfWeight = FW_NORMAL;
+    lf->lf_اوچائي = DEFAULT_FONT_اوچائي * (صحيح)vimGetDpiForSystem() / 96;
+    lf->lf_ويڪر = 0;
+    lf->lf_وزن = FW_عام;
     lf->lfItalic = FALSE;
     lf->lfUnderline = FALSE;
-    lf->lfStrikeOut = FALSE;
+    lf->lf_Strike_ٻاهريون = FALSE;
 
     /*
      * If the font can't be found, try replacing '_' by ' '.
      */
-    if (init_logfont(lf) == FAIL)
+    إذا (init_logfont(lf) == FAIL)
     {
-	int	did_replace = FALSE;
+	صحيح	did_replace = FALSE;
 
-	for (i = 0; lf->lfFaceName[i]; ++i)
-	    if (lf->lfFaceName[i] == L'_')
+	لكل (i = 0; lf->lfFaceName[i]; ++i)
+	    إذا (lf->lfFaceName[i] == L'_')
 	    {
 		lf->lfFaceName[i] = L' ';
 		did_replace = TRUE;
 	    }
-	if (!did_replace || init_logfont(lf) == FAIL)
-	    goto theend;
+	إذا (!did_replace || init_logfont(lf) == FAIL)
+	    اذهب theend;
     }
 
-    while (*p == L':')
+    طالما (*p == L':')
 	p++;
 
     // Set the values found after ':'
-    while (*p)
+    طالما (*p)
     {
-	switch (*p++)
+	بدل (*p++)
 	{
 	    // Note: Keep this in sync with gui_mch_expand_font().
-	    case L'h':
-		lf->lfHeight = - points_to_pixels(p, &p, TRUE, (long_i)printer_dc);
-		break;
-	    case L'w':
-		lf->lfWidth = points_to_pixels(p, &p, FALSE, (long_i)printer_dc);
-		break;
-	    case L'W':
-		lf->lfWeight = wcstol(p, &p, 10);
-		break;
-	    case L'b':
-		lf->lfWeight = FW_BOLD;
-		break;
-	    case L'i':
+	    حالة L'h':
+		lf->lf_اوچائي = - points_منزل_pixels(p, &p, TRUE, (long_i)printer_dc);
+		اكسر;
+	    حالة L'w':
+		lf->lf_ويڪر = points_منزل_pixels(p, &p, FALSE, (long_i)printer_dc);
+		اكسر;
+	    حالة L'W':
+		lf->lf_وزن = wcstol(p, &p, 10);
+		اكسر;
+	    حالة L'b':
+		lf->lf_وزن = FW_BOLD;
+		اكسر;
+	    حالة L'i':
 		lf->lfItalic = TRUE;
-		break;
-	    case L'u':
+		اكسر;
+	    حالة L'u':
 		lf->lfUnderline = TRUE;
-		break;
-	    case L's':
-		lf->lfStrikeOut = TRUE;
-		break;
-	    case L'c':
-		for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+		اكسر;
+	    حالة L's':
+		lf->lf_Strike_ٻاهريون = TRUE;
+		اكسر;
+	    حالة L'c':
+		لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(charset_جوڙا); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)charset_pairs[i].name.string,
-			    charset_pairs[i].name.length) == 0)
+		    إذا (utf16ascncmp(p, (حرف *)charset_جوڙا[i].name.string,
+			    charset_جوڙا[i].name.ڊيگهائي) == 0)
 		    {
-			lf->lfCharSet = charset_pairs[i].charset;
-			p += charset_pairs[i].name.length;
-			break;
+			lf->lf_Char_سيٽ = charset_جوڙا[i].charset;
+			p += charset_جوڙا[i].name.ڊيگهائي;
+			اكسر;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(charset_pairs) && verbose)
+		إذا (i == (صحيح)ARRAY_ڊيگهائي(charset_جوڙا) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_منزل_enc(p, عدم);
+		    إذا (s != عدم)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_اندريون_font_name_str),
 							   "charset", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    case L'f':
+		اكسر;
+	    حالة L'f':
 		// Font features (e.g., "fss19=1").
 		// Parsed separately by gui_mch_init_font(); skip here.
-		while (*p && *p != L':')
+		طالما (*p && *p != L':')
 		    p++;
-		break;
-	    case L'q':
-		for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+		اكسر;
+	    حالة L'q':
+		لكل (i = 0; i < (صحيح)ARRAY_ڊيگهائي(quality_جوڙا); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)quality_pairs[i].name.string,
-			    quality_pairs[i].name.length) == 0)
+		    إذا (utf16ascncmp(p, (حرف *)quality_جوڙا[i].name.string,
+			    quality_جوڙا[i].name.ڊيگهائي) == 0)
 		    {
-			lf->lfQuality = quality_pairs[i].quality;
-			p += quality_pairs[i].name.length;
-			break;
+			lf->lfQuality = quality_جوڙا[i].quality;
+			p += quality_جوڙا[i].name.ڊيگهائي;
+			اكسر;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(quality_pairs) && verbose)
+		إذا (i == (صحيح)ARRAY_ڊيگهائي(quality_جوڙا) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_منزل_enc(p, عدم);
+		    إذا (s != عدم)
 		    {
-			semsg(_(e_illegal_str_name_str_in_font_name_str),
+			semsg(_(e_illegal_str_name_str_اندريون_font_name_str),
 							   "quality", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    default:
-		if (verbose)
-		    semsg(_(e_illegal_char_nr_in_font_name_str), p[-1], name);
-		goto theend;
+		اكسر;
+	    افتراضي:
+		إذا (verbose)
+		    semsg(_(e_illegal_char_nr_اندريون_font_name_str), p[-1], name);
+		اذهب theend;
 	}
-	while (*p == L':')
+	طالما (*p == L':')
 	    p++;
     }
     ret = OK;
 
 theend:
     // ron: init lastlf
-    if (ret == OK && printer_dc == NULL)
+    إذا (ret == OK && printer_dc == عدم)
     {
 	vim_free(lastlf);
 	lastlf = ALLOC_ONE(LOGFONTW);
-	if (lastlf != NULL)
-	    mch_memmove(lastlf, lf, sizeof(LOGFONTW));
+	إذا (lastlf != عدم)
+	    mch_memmove(lastlf, lf, حجم(LOGFONTW));
     }
     vim_free(wname);
 
-    return ret;
+    أرجع ret;
 }
 
-#endif // defined(FEAT_GUI) || defined(FEAT_PRINTER)
+#جيڪڏهن_پورو // defined(FEAT_GUI) || defined(FEAT_PRINTER)
 
-#if defined(FEAT_JOB_CHANNEL)
+#إذا defined(FEAT_ڪم_CHANNEL)
 /*
  * Initialize the Winsock dll.
  */
-    void
-channel_init_winsock(void)
+    فراغ
+channel_init_winsock(فراغ)
 {
-    WSADATA wsaData;
-    int wsaerr;
+    WSADATA wsa_معلومات;
+    صحيح wsaerr;
 
-    if (WSInitialized)
-	return;
+    إذا (WSInitialized)
+	أرجع;
 
-    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (wsaerr == 0)
+    wsaerr = WSAStartup(MAKEWORD(2, 2), &wsa_معلومات);
+    إذا (wsaerr == 0)
 	WSInitialized = TRUE;
 }
-#endif
+#جيڪڏهن_پورو

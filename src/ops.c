@@ -12,53 +12,53 @@
  *	  op_change, op_yank, do_join
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-static void shift_block(oparg_T *oap, int amount);
-static void	mb_adjust_opend(oparg_T *oap);
-static int	do_addsub(int op_type, pos_T *pos, int length, linenr_T Prenum1);
-static void	pbyte(pos_T lp, int c);
-#define PBYTE(lp, c) pbyte(lp, c)
+ساكن فراغ سرڪايو_بلاڪ(oparg_T *oap, صحيح amount);
+ساكن فراغ	mb_adjust_opend(oparg_T *oap);
+ساكن صحيح	do_addsub(صحيح op_type, pos_T *pos, صحيح ڊيگهائي, linenr_T Prenum1);
+ساكن فراغ	pbyte(pos_T lp, صحيح c);
+#وصف_ڪريو PBYTE(lp, c) pbyte(lp, c)
 
 
 // Flags for third item in "opchars".
-#define OPF_LINES  1	// operator always works on lines
-#define OPF_CHANGE 2	// operator changes text
+#وصف_ڪريو OPF_سٽون  1	// operator always works on lines
+#وصف_ڪريو OPF_CHANGE 2	// operator changes text
 
 /*
  * The names of operators.
  * IMPORTANT: Index must correspond with defines in vim.h!!!
  * The third field holds OPF_ flags.
  */
-static const char opchars[][3] =
+ساكن ثابت حرف opchars[][3] =
 {
     {NUL, NUL, 0},			// OP_NOP
     {'d', NUL, OPF_CHANGE},		// OP_DELETE
     {'y', NUL, 0},			// OP_YANK
     {'c', NUL, OPF_CHANGE},		// OP_CHANGE
-    {'<', NUL, OPF_LINES | OPF_CHANGE},	// OP_LSHIFT
-    {'>', NUL, OPF_LINES | OPF_CHANGE},	// OP_RSHIFT
-    {'!', NUL, OPF_LINES | OPF_CHANGE},	// OP_FILTER
+    {'<', NUL, OPF_سٽون | OPF_CHANGE},	// OP_LSHIFT
+    {'>', NUL, OPF_سٽون | OPF_CHANGE},	// OP_RSHIFT
+    {'!', NUL, OPF_سٽون | OPF_CHANGE},	// OP_FILTER
     {'g', '~', OPF_CHANGE},		// OP_TILDE
-    {'=', NUL, OPF_LINES | OPF_CHANGE},	// OP_INDENT
-    {'g', 'q', OPF_LINES | OPF_CHANGE},	// OP_FORMAT
-    {':', NUL, OPF_LINES},		// OP_COLON
+    {'=', NUL, OPF_سٽون | OPF_CHANGE},	// OP_INDENT
+    {'g', 'q', OPF_سٽون | OPF_CHANGE},	// OP_FORMAT
+    {':', NUL, OPF_سٽون},		// OP_COLON
     {'g', 'U', OPF_CHANGE},		// OP_UPPER
     {'g', 'u', OPF_CHANGE},		// OP_LOWER
-    {'J', NUL, OPF_LINES | OPF_CHANGE},	// DO_JOIN
-    {'g', 'J', OPF_LINES | OPF_CHANGE},	// DO_JOIN_NS
+    {'J', NUL, OPF_سٽون | OPF_CHANGE},	// DO_JOIN
+    {'g', 'J', OPF_سٽون | OPF_CHANGE},	// DO_JOIN_NS
     {'g', '?', OPF_CHANGE},		// OP_ROT13
     {'r', NUL, OPF_CHANGE},		// OP_REPLACE
     {'I', NUL, OPF_CHANGE},		// OP_INSERT
     {'A', NUL, OPF_CHANGE},		// OP_APPEND
-    {'z', 'f', OPF_LINES},		// OP_FOLD
-    {'z', 'o', OPF_LINES},		// OP_FOLDOPEN
-    {'z', 'O', OPF_LINES},		// OP_FOLDOPENREC
-    {'z', 'c', OPF_LINES},		// OP_FOLDCLOSE
-    {'z', 'C', OPF_LINES},		// OP_FOLDCLOSEREC
-    {'z', 'd', OPF_LINES},		// OP_FOLDDEL
-    {'z', 'D', OPF_LINES},		// OP_FOLDDELREC
-    {'g', 'w', OPF_LINES | OPF_CHANGE},	// OP_FORMAT2
+    {'z', 'f', OPF_سٽون},		// OP_FOLD
+    {'z', 'o', OPF_سٽون},		// OP_FOLDOPEN
+    {'z', 'O', OPF_سٽون},		// OP_FOLDOPENREC
+    {'z', 'c', OPF_سٽون},		// OP_FOLDCLOSE
+    {'z', 'C', OPF_سٽون},		// OP_FOLDCLOSEREC
+    {'z', 'd', OPF_سٽون},		// OP_FOLDDEL
+    {'z', 'D', OPF_سٽون},		// OP_FOLDDELREC
+    {'g', 'w', OPF_سٽون | OPF_CHANGE},	// OP_FORMAT2
     {'g', '@', OPF_CHANGE},		// OP_FUNCTION
     {Ctrl_A, NUL, OPF_CHANGE},		// OP_NR_ADD
     {Ctrl_X, NUL, OPF_CHANGE},		// OP_NR_SUB
@@ -68,256 +68,256 @@ static const char opchars[][3] =
  * Translate a command name into an operator type.
  * Must only be called with a valid operator name!
  */
-    int
-get_op_type(int char1, int char2)
+    صحيح
+get_op_type(صحيح char1, صحيح char2)
 {
-    int		i;
+    صحيح		i;
 
-    if (char1 == 'r')		// ignore second character
-	return OP_REPLACE;
-    if (char1 == '~')		// when tilde is an operator
-	return OP_TILDE;
-    if (char1 == 'g' && char2 == Ctrl_A)	// add
-	return OP_NR_ADD;
-    if (char1 == 'g' && char2 == Ctrl_X)	// subtract
-	return OP_NR_SUB;
-    if (char1 == 'z' && char2 == 'y')	// OP_YANK
-	return OP_YANK;
-    for (i = 0; ; ++i)
+    إذا (char1 == 'r')		// ignore second character
+	أرجع OP_REPLACE;
+    إذا (char1 == '~')		// when tilde is an operator
+	أرجع OP_TILDE;
+    إذا (char1 == 'g' && char2 == Ctrl_A)	//جوڙيو
+	أرجع OP_NR_جوڙيو;
+    إذا (char1 == 'g' && char2 == Ctrl_X)	//ڪٽيو
+	أرجع OP_NR_SUB;
+    إذا (char1 == 'z' && char2 == 'y')	// OP_YANK
+	أرجع OP_YANK;
+    لكل (i = 0; ; ++i)
     {
-	if (opchars[i][0] == char1 && opchars[i][1] == char2)
-	    break;
-	if (i == (int)ARRAY_LENGTH(opchars) - 1)
+	إذا (opchars[i][0] == char1 && opchars[i][1] == char2)
+	    اكسر;
+	إذا (i == (صحيح)ARRAY_ڊيگهائي(opchars) - 1)
 	{
-	    internal_error("get_op_type()");
-	    break;
+	    اندروني_error("get_op_type()");
+	    اكسر;
 	}
     }
-    return i;
+    أرجع i;
 }
 
 /*
  * Return TRUE if operator "op" always works on whole lines.
  */
-    static int
-op_on_lines(int op)
+    ساكن صحيح
+op_on_سٽون(صحيح op)
 {
-    return opchars[op][2] & OPF_LINES;
+    أرجع opchars[op][2] & OPF_سٽون;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#إذا defined(FEAT_ڪم_CHANNEL)
 /*
  * Return TRUE if operator "op" changes text.
  */
-    int
-op_is_change(int op)
+    صحيح
+op_is_change(صحيح op)
 {
-    return opchars[op][2] & OPF_CHANGE;
+    أرجع opchars[op][2] & OPF_CHANGE;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Get first operator command character.
  * Returns 'g' or 'z' if there is another command character.
  */
-    int
-get_op_char(int optype)
+    صحيح
+get_op_char(صحيح optype)
 {
-    return opchars[optype][0];
+    أرجع opchars[optype][0];
 }
 
 /*
  * Get second operator command character.
  */
-    int
-get_extra_op_char(int optype)
+    صحيح
+get_extra_op_char(صحيح optype)
 {
-    return opchars[optype][1];
+    أرجع opchars[optype][1];
 }
 
 /*
  * op_shift - handle a shift operation
  */
-    void
-op_shift(oparg_T *oap, int curs_top, int amount)
+    فراغ
+op_سرڪايو(oparg_T *oap, صحيح curs_چوٽي, صحيح amount)
 {
-    long	    i;
-    int		    first_char;
-    int		    block_col = 0;
+    ڊگهو	    i;
+    صحيح		    پهريون_char;
+    صحيح		    بلاڪ_کانو = 0;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
-				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+    إذا (u_save((linenr_T)(oap->شروعات.lnum - 1),
+				       (linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
+	أرجع;
 
-    if (oap->block_mode)
-	block_col = curwin->w_cursor.col;
+    إذا (oap->بلاڪ_گهڻائي)
+	بلاڪ_کانو = curwin->w_cursor.کانو;
 
-    for (i = oap->line_count; --i >= 0; )
+    لكل (i = oap->سٽ_ڳڻپ; --i >= 0; )
     {
-	first_char = *ml_get_curline();
-	if (first_char == NUL)				// empty line
-	    curwin->w_cursor.col = 0;
-	else if (oap->block_mode)
-	    shift_block(oap, amount);
-	else
+	پهريون_char = *ml_get_curline();
+	إذا (پهريون_char == NUL)				// empty line
+	    curwin->w_cursor.کانو = 0;
+	وإلا إذا (oap->بلاڪ_گهڻائي)
+	    سرڪايو_بلاڪ(oap, amount);
+	وإلا
 	    // Move the line right if it doesn't start with '#', 'smartindent'
 	    // isn't set or 'cindent' isn't set or '#' isn't in 'cino'.
-	    if (first_char != '#' || !preprocs_left())
-		shift_line(oap->op_type == OP_LSHIFT, p_sr, amount, FALSE);
+	    إذا (پهريون_char != '#' || !preprocs_کاٻو())
+		سرڪايو_سٽ(oap->op_type == OP_LSHIFT, p_sr, amount, FALSE);
 	++curwin->w_cursor.lnum;
     }
 
-    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
-    if (oap->block_mode)
+    بدليو_سٽون(oap->شروعات.lnum, 0, oap->پڇاڙي.lnum + 1, 0L);
+    إذا (oap->بلاڪ_گهڻائي)
     {
-	curwin->w_cursor.lnum = oap->start.lnum;
-	curwin->w_cursor.col = block_col;
+	curwin->w_cursor.lnum = oap->شروعات.lnum;
+	curwin->w_cursor.کانو = بلاڪ_کانو;
     }
-    else if (curs_top)	    // put cursor on first line, for ">>"
+    وإلا إذا (curs_چوٽي)	    // put cursor on first line, for ">>"
     {
-	curwin->w_cursor.lnum = oap->start.lnum;
+	curwin->w_cursor.lnum = oap->شروعات.lnum;
 	beginline(BL_SOL | BL_FIX);   // shift_line() may have set cursor.col
     }
-    else
+    وإلا
 	--curwin->w_cursor.lnum;	// put cursor on last line, for ":>"
 
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
     // The cursor line is not in a closed fold
     foldOpenCursor();
-#endif
+#جيڪڏهن_پورو
 
 
-    if (oap->line_count > p_report)
+    إذا (oap->سٽ_ڳڻپ > p_report)
     {
-	char	    *op;
-	char	    *msg_line_single;
-	char	    *msg_line_plural;
+	حرف	    *op;
+	حرف	    *نياپو_سٽ_single;
+	حرف	    *نياپو_سٽ_plural;
 
-	if (oap->op_type == OP_RSHIFT)
+	إذا (oap->op_type == OP_RSHIFT)
 	    op = ">";
-	else
+	وإلا
 	    op = "<";
-	msg_line_single = NGETTEXT("%ld line %sed %d time",
+	نياپو_سٽ_single = NGETTEXT("%ld line %sed %d time",
 					     "%ld line %sed %d times", amount);
-	msg_line_plural = NGETTEXT("%ld lines %sed %d time",
+	نياپو_سٽ_plural = NGETTEXT("%ld lines %sed %d time",
 					    "%ld lines %sed %d times", amount);
-	vim_snprintf((char *)IObuff, IOSIZE,
-		NGETTEXT(msg_line_single, msg_line_plural, oap->line_count),
-		oap->line_count, op, amount);
-	msg_attr_keep((char *)IObuff, 0, TRUE);
+	vim_snprintf((حرف *)IObuff, IOSIZE,
+		NGETTEXT(نياپو_سٽ_single, نياپو_سٽ_plural, oap->سٽ_ڳڻپ),
+		oap->سٽ_ڳڻپ, op, amount);
+	نياپو_attr_keep((حرف *)IObuff, 0, TRUE);
     }
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end.lnum = oap->end.lnum;
-	curbuf->b_op_end.col = ml_get_len(oap->end.lnum);
-	if (curbuf->b_op_end.col > 0)
-	    --curbuf->b_op_end.col;
+	curbuf->b_op_شروعات = oap->شروعات;
+	curbuf->b_op_پڇاڙي.lnum = oap->پڇاڙي.lnum;
+	curbuf->b_op_پڇاڙي.کانو = ml_get_len(oap->پڇاڙي.lnum);
+	إذا (curbuf->b_op_پڇاڙي.کانو > 0)
+	    --curbuf->b_op_پڇاڙي.کانو;
     }
 }
 
-#ifdef FEAT_VARTABS
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
 /*
  * Return the tabstop width at the index of the variable tabstop array.  If an
  * index greater than the length of the array is given, the last tabstop width
  * in the array is returned.
  */
-    static int
-get_vts(int *vts_array, int index)
+    ساكن صحيح
+get_vts(صحيح *vts_array, صحيح اشاريو)
 {
-    int	ts;
+    صحيح	ts;
 
-    if (index < 1)
+    إذا (اشاريو < 1)
 	ts = 0;
-    else if (index <= vts_array[0])
-	ts = vts_array[index];
-    else
+    وإلا إذا (اشاريو <= vts_array[0])
+	ts = vts_array[اشاريو];
+    وإلا
 	ts = vts_array[vts_array[0]];
 
-    return ts;
+    أرجع ts;
 }
 
 /*
  * Return the sum of all the tabstops through the index-th.
  */
-    static int
-get_vts_sum(int *vts_array, int index)
+    ساكن صحيح
+get_vts_جوڙ(صحيح *vts_array, صحيح اشاريو)
 {
-    int	sum = 0;
-    int	i;
+    صحيح	جوڙ = 0;
+    صحيح	i;
 
     // Perform the summation for indices within the actual array.
-    for (i = 1; i <= index && i <= vts_array[0]; i++)
-	sum += vts_array[i];
+    لكل (i = 1; i <= اشاريو && i <= vts_array[0]; i++)
+	جوڙ += vts_array[i];
 
     // Add tabstops whose indices exceed the actual array.
-    if (i <= index)
-	sum += vts_array[vts_array[0]] * (index - vts_array[0]);
+    إذا (i <= اشاريو)
+	جوڙ += vts_array[vts_array[0]] * (اشاريو - vts_array[0]);
 
-    return sum;
+    أرجع جوڙ;
 }
-#endif
+#جيڪڏهن_پورو
 
-    static vimlong_T
+    ساكن vimlong_T
 get_new_sw_indent(
-    int		left,		// TRUE if shift is to the left
-    int		round,		// TRUE if new indent is to be to a tabstop
+    صحيح		کاٻو,		// TRUE if shift is to the left
+    صحيح		ڦيرو,		// TRUE if new indent is to be to a tabstop
     vimlong_T	amount,		// Number of shifts
     vimlong_T	sw_val)
 {
-    vimlong_T	count = get_indent();
+    vimlong_T	ڳڻپ = get_indent();
     vimlong_T	i, j;
 
-    if (round)			// round off indent
+    إذا (ڦيرو)			// round off indent
     {
-	i = trim_to_int(count) / sw_val;	// number of 'shiftwidth' rounded down
-	j = trim_to_int(count) % sw_val;	// extra spaces
-	if (j && left)		// first remove extra spaces
+	i = trim_منزل_int(ڳڻپ) / sw_val;	// number of 'shiftwidth' rounded down
+	j = trim_منزل_int(ڳڻپ) % sw_val;	// extra spaces
+	إذا (j && کاٻو)		// first remove extra spaces
 	    --amount;
-	if (left)
+	إذا (کاٻو)
 	{
 	    i -= amount;
-	    if (i < 0)
+	    إذا (i < 0)
 		i = 0;
 	}
-	else
+	وإلا
 	    i += amount;
-	count = i * sw_val;
+	ڳڻپ = i * sw_val;
     }
-    else			// original vi indent
+    وإلا			// original vi indent
     {
-	if (left)
+	إذا (کاٻو)
 	{
-	    count -= sw_val * amount;
-	    if (count < 0)
-		count = 0;
+	    ڳڻپ -= sw_val * amount;
+	    إذا (ڳڻپ < 0)
+		ڳڻپ = 0;
 	}
-	else
-	    count += sw_val * amount;
+	وإلا
+	    ڳڻپ += sw_val * amount;
     }
 
-    return count;
+    أرجع ڳڻپ;
 }
 
-#ifdef FEAT_VARTABS
-    static vimlong_T
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
+    ساكن vimlong_T
 get_new_vts_indent(
-    int	left,			// TRUE if shift is to the left
-    int	round,			// TRUE if new indent is to be to a tabstop
-    int	amount,			// Number of shifts
-    int	*vts_array)
+    صحيح	کاٻو,			// TRUE if shift is to the left
+    صحيح	ڦيرو,			// TRUE if new indent is to be to a tabstop
+    صحيح	amount,			// Number of shifts
+    صحيح	*vts_array)
 {
     vimlong_T	indent = get_indent();
-    int		vtsi = 0;
-    int		vts_indent = 0;
-    int		ts = 0;		// Silence uninitialized variable warning.
-    int		offset;		// Extra indent spaces to the right of the
+    صحيح		vtsi = 0;
+    صحيح		vts_indent = 0;
+    صحيح		ts = 0;		// Silence uninitialized variable warning.
+    صحيح		وٿي;		// Extra indent spaces to the right of the
 				// tabstop
 
     // Find the tabstop at or to the left of the current indent.
-    while (vts_indent <= indent)
+    طالما (vts_indent <= indent)
     {
 	vtsi++;
 	ts = get_vts(vts_array, vtsi);
@@ -326,36 +326,36 @@ get_new_vts_indent(
     vts_indent -= ts;
     vtsi--;
 
-    offset = indent - vts_indent;
+    وٿي = indent - vts_indent;
 
-    if (round)
+    إذا (ڦيرو)
     {
-	if (left)
+	إذا (کاٻو)
 	{
-	    if (offset == 0)
-		indent = get_vts_sum(vts_array, vtsi - amount);
-	    else
-		indent = get_vts_sum(vts_array, vtsi - (amount - 1));
+	    إذا (وٿي == 0)
+		indent = get_vts_جوڙ(vts_array, vtsi - amount);
+	    وإلا
+		indent = get_vts_جوڙ(vts_array, vtsi - (amount - 1));
 	}
-	else
-	    indent = get_vts_sum(vts_array, vtsi + amount);
+	وإلا
+	    indent = get_vts_جوڙ(vts_array, vtsi + amount);
     }
-    else
+    وإلا
     {
-	if (left)
+	إذا (کاٻو)
 	{
-	    if (amount > vtsi)
+	    إذا (amount > vtsi)
 		indent = 0;
-	    else
-		indent = get_vts_sum(vts_array, vtsi - amount) + offset;
+	    وإلا
+		indent = get_vts_جوڙ(vts_array, vtsi - amount) + وٿي;
 	}
-	else
-	    indent = get_vts_sum(vts_array, vtsi + amount) + offset;
+	وإلا
+	    indent = get_vts_جوڙ(vts_array, vtsi + amount) + وٿي;
     }
 
-    return indent;
+    أرجع indent;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Shift the current line 'amount' shiftwidth(s) left (if 'left' is TRUE) or
@@ -367,91 +367,91 @@ get_new_vts_indent(
  * 'varsofttabstop' affecting the shiftwidth, and neither affects the
  * shiftwidth in current versions of Vim, so they are not considered here.
  */
-    void
-shift_line(
-    int	left,			// TRUE if shift is to the left
-    int	round,			// TRUE if new indent is to be to a tabstop
-    int	amount,			// Number of shifts
-    int	call_changed_bytes)	// call changed_bytes()
+    فراغ
+سرڪايو_سٽ(
+    صحيح	کاٻو,			// TRUE if shift is to the left
+    صحيح	ڦيرو,			// TRUE if new indent is to be to a tabstop
+    صحيح	amount,			// Number of shifts
+    صحيح	call_بدليو_بائيٽون)	// call changed_bytes()
 {
-    vimlong_T	count;
-    long	sw_val = curbuf->b_p_sw;
-    long	ts_val = curbuf->b_p_ts;
-#ifdef FEAT_VARTABS
-    int		*vts_array = curbuf->b_p_vts_array;
-#endif
+    vimlong_T	ڳڻپ;
+    ڊگهو	sw_val = curbuf->b_p_sw;
+    ڊگهو	ts_val = curbuf->b_p_ts;
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
+    صحيح		*vts_array = curbuf->b_p_vts_array;
+#جيڪڏهن_پورو
 
-    if (sw_val != 0)
+    إذا (sw_val != 0)
 	// 'shiftwidth' is not zero; use it as the shift size.
-	count = get_new_sw_indent(left, round, amount, sw_val);
-    else
-#ifdef FEAT_VARTABS
-	if ((vts_array == NULL) || (vts_array[0] == 0))
-#endif
+	ڳڻپ = get_new_sw_indent(کاٻو, ڦيرو, amount, sw_val);
+    وإلا
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
+	إذا ((vts_array == عدم) || (vts_array[0] == 0))
+#جيڪڏهن_پورو
     {
 	// 'shiftwidth is zero and 'vartabstop' is empty; use 'tabstop' as the
 	// shift size.
-	count = get_new_sw_indent(left, round, amount, ts_val);
+	ڳڻپ = get_new_sw_indent(کاٻو, ڦيرو, amount, ts_val);
     }
-#ifdef FEAT_VARTABS
-    else
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
+    وإلا
     {
 	// 'shiftwidth is zero and 'vartabstop' is defined; use 'vartabstop'
 	// to determine the new indent.
-	count = get_new_vts_indent(left, round, amount, vts_array);
+	ڳڻپ = get_new_vts_indent(کاٻو, ڦيرو, amount, vts_array);
     }
-#endif
+#جيڪڏهن_پورو
 
     // Set new indent
-    if (State & VREPLACE_FLAG)
-	change_indent(INDENT_SET, trim_to_int(count), FALSE, NUL, call_changed_bytes);
-    else
-	(void)set_indent(trim_to_int(count), call_changed_bytes ? SIN_CHANGED : 0);
+    إذا (State & VREPLACE_FLAG)
+	change_indent(INDENT_سيٽ, trim_منزل_int(ڳڻپ), FALSE, NUL, call_بدليو_بائيٽون);
+    وإلا
+	(فراغ)سيٽ_indent(trim_منزل_int(ڳڻپ), call_بدليو_بائيٽون ? SIN_بدليو : 0);
 }
 
 /*
  * Shift one line of the current block one shiftwidth right or left.
  * Leaves cursor on first character in block.
  */
-    static void
-shift_block(oparg_T *oap, int amount)
+    ساكن فراغ
+سرڪايو_بلاڪ(oparg_T *oap, صحيح amount)
 {
-    int			left = (oap->op_type == OP_LSHIFT);
-    int			oldstate = State;
-    int			total;
+    صحيح			کاٻو = (oap->op_type == OP_LSHIFT);
+    صحيح			oldstate = State;
+    صحيح			ڪل;
     char_u		*newp, *oldp;
     size_t		newlen, oldlen;
-    int			oldcol = curwin->w_cursor.col;
-    int			sw_val = (int)get_sw_value_indent(curbuf, left);
-    int			ts_val = (int)curbuf->b_p_ts;
-    struct block_def	bd;
-    int			incr;
+    صحيح			oldcol = curwin->w_cursor.کانو;
+    صحيح			sw_val = (صحيح)get_sw_قدر_indent(curbuf, کاٻو);
+    صحيح			ts_val = (صحيح)curbuf->b_p_ts;
+    بنية بلاڪ_def	bd;
+    صحيح			incr;
     colnr_T		ws_vcol;
-    int			added;
-    size_t		new_line_len;	// the length of the line after the
+    صحيح			added;
+    size_t		new_سٽ_len;	// the length of the line after the
 					// block shift
-#ifdef FEAT_RIGHTLEFT
-    int			old_p_ri = p_ri;
+#جيڪڏهن_وصف_ٿيل FEAT_RIGHTLEFT
+    صحيح			old_p_ri = p_ri;
 
     p_ri = 0;			// don't want revins in indent
-#endif
+#جيڪڏهن_پورو
 
-    State = MODE_INSERT;	// don't want MODE_REPLACE for State
-    block_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
-    if (bd.is_short)
-	return;
+    State = گهڻائي_وجهو;	// don't want MODE_REPLACE for State
+    بلاڪ_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
+    إذا (bd.is_short)
+	أرجع;
 
     // total is number of screen columns to be inserted/removed
-    total = (int)((unsigned)amount * (unsigned)sw_val);
-    if ((total / sw_val) != amount)
-	return; // multiplication overflow
+    ڪل = (صحيح)((بنانشان)amount * (بنانشان)sw_val);
+    إذا ((ڪل / sw_val) != amount)
+	أرجع; // multiplication overflow
 
     oldp = ml_get_curline();
     oldlen = ml_get_curline_len();
 
-    if (!left)
+    إذا (!کاٻو)
     {
-	int		tabs = 0, spaces = 0;
+	صحيح		tabs = 0, spaces = 0;
 	chartabsize_T	cts;
 
 	/*
@@ -460,60 +460,60 @@ shift_block(oparg_T *oap, int amount)
 	 *  3. Divvy into TABs & spp
 	 *  4. Construct new string
 	 */
-	total += bd.pre_whitesp; // all virtual WS up to & incl a split TAB
-	ws_vcol = bd.start_vcol - bd.pre_whitesp;
-	if (bd.startspaces)
+	ڪل += bd.pre_whitesp; // all virtual WS up to & incl a split TAB
+	ws_vcol = bd.شروعات_vcol - bd.pre_whitesp;
+	إذا (bd.startspaces)
 	{
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
-		if ((*mb_ptr2len)(bd.textstart) == 1)
+		إذا ((*mb_ptr2len)(bd.textstart) == 1)
 		    ++bd.textstart;
-		else
+		وإلا
 		{
 		    ws_vcol = 0;
 		    bd.startspaces = 0;
 		}
 	    }
-	    else
+	    وإلا
 		++bd.textstart;
 	}
 
 	// TODO: is passing bd.textstart for start of the line OK?
 	init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum,
-				   bd.start_vcol, bd.textstart, bd.textstart);
-	for ( ; VIM_ISWHITE(*cts.cts_ptr); )
+				   bd.شروعات_vcol, bd.textstart, bd.textstart);
+	لكل ( ; VIM_ISWHITE(*cts.cts_ptr); )
 	{
 	    incr = lbr_chartabsize_adv(&cts);
-	    total += incr;
+	    ڪل += incr;
 	    cts.cts_vcol += incr;
 	}
 	bd.textstart = cts.cts_ptr;
-	bd.start_vcol = cts.cts_vcol;
+	bd.شروعات_vcol = cts.cts_vcol;
 	clear_chartabsize_arg(&cts);
 
 	// OK, now total=all the VWS reqd, and textstart points at the 1st
 	// non-ws char in the block.
-#ifdef FEAT_VARTABS
-	if (!curbuf->b_p_et)
-	    tabstop_fromto(ws_vcol, ws_vcol + total,
+#جيڪڏهن_وصف_ٿيل FEAT_VARTABS
+	إذا (!curbuf->b_p_et)
+	    tabstop_fromto(ws_vcol, ws_vcol + ڪل,
 				ts_val, curbuf->b_p_vts_array, &tabs, &spaces);
-	else
-	    spaces = total;
-#else
-	if (!curbuf->b_p_et)
-	    tabs = ((ws_vcol % ts_val) + total) / ts_val; // number of tabs
-	if (tabs > 0)
-	    spaces = ((ws_vcol % ts_val) + total) % ts_val; // number of spp
-	else
-	    spaces = total;
-#endif
+	وإلا
+	    spaces = ڪل;
+#وإلا
+	إذا (!curbuf->b_p_et)
+	    tabs = ((ws_vcol % ts_val) + ڪل) / ts_val; // number of tabs
+	إذا (tabs > 0)
+	    spaces = ((ws_vcol % ts_val) + ڪل) % ts_val; // number of spp
+	وإلا
+	    spaces = ڪل;
+#جيڪڏهن_پورو
 	// if we're splitting a TAB, allow for it
 	bd.textcol -= bd.pre_whitesp_c - (bd.startspaces != 0);
 
-	new_line_len = bd.textcol + tabs + spaces + (oldlen - (bd.textstart - oldp));
-	newp = alloc(new_line_len + 1);
-	if (newp == NULL)
-	    return;
+	new_سٽ_len = bd.textcol + tabs + spaces + (oldlen - (bd.textstart - oldp));
+	newp = alloc(new_سٽ_len + 1);
+	إذا (newp == عدم)
+	    أرجع;
 	mch_memmove(newp, oldp, (size_t)bd.textcol);
 	newlen = bd.textcol;
 	vim_memset(newp + newlen, TAB, (size_t)tabs);
@@ -521,19 +521,19 @@ shift_block(oparg_T *oap, int amount)
 	vim_memset(newp + newlen, ' ', (size_t)spaces);
 	STRCPY(newp + newlen + spaces, bd.textstart);
     }
-    else // left
+    وإلا //کاٻو
     {
-	colnr_T	    destination_col;	// column to which text in block will
+	colnr_T	    destination_کانو;	// column to which text in block will
 					// be shifted
-	char_u	    *verbatim_copy_end;	// end of the part of the line which is
+	char_u	    *verbatim_copy_پڇاڙي;	// end of the part of the line which is
 					// copied verbatim
-	colnr_T	    verbatim_copy_width;// the (displayed) width of this part
+	colnr_T	    verbatim_copy_ويڪر;// the (displayed) width of this part
 					// of line
 	size_t	    fill;		// nr of spaces that replace a TAB
-	size_t	    block_space_width;
-	size_t	    shift_amount;
+	size_t	    بلاڪ_space_ويڪر;
+	size_t	    سرڪايو_amount;
 	char_u	    *non_white = bd.textstart;
-	colnr_T	    non_white_col;
+	colnr_T	    non_white_کانو;
 	size_t	    fixedlen;		// length of string left of the shift
 					// position (ie the string not being shifted)
 	chartabsize_T cts;
@@ -549,70 +549,70 @@ shift_block(oparg_T *oap, int amount)
 	// If "bd.startspaces" is set, "bd.textstart" points to the character,
 	// the part of which is displayed at the block's beginning. Let's start
 	// searching from the next character.
-	if (bd.startspaces)
+	إذا (bd.startspaces)
 	    MB_PTR_ADV(non_white);
 
 	// The character's column is in "bd.start_vcol".
-	non_white_col = bd.start_vcol;
+	non_white_کانو = bd.شروعات_vcol;
 
 	init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum,
-				   non_white_col, bd.textstart, non_white);
-	while (VIM_ISWHITE(*cts.cts_ptr))
+				   non_white_کانو, bd.textstart, non_white);
+	طالما (VIM_ISWHITE(*cts.cts_ptr))
 	{
 	    incr = lbr_chartabsize_adv(&cts);
 	    cts.cts_vcol += incr;
 	}
-	non_white_col = cts.cts_vcol;
+	non_white_کانو = cts.cts_vcol;
 	non_white = cts.cts_ptr;
 	clear_chartabsize_arg(&cts);
 
-	block_space_width = non_white_col - oap->start_vcol;
+	بلاڪ_space_ويڪر = non_white_کانو - oap->شروعات_vcol;
 	// We will shift by "total" or "block_space_width", whichever is less.
-	shift_amount = (block_space_width < (size_t)total
-					 ? block_space_width : (size_t)total);
+	سرڪايو_amount = (بلاڪ_space_ويڪر < (size_t)ڪل
+					 ? بلاڪ_space_ويڪر : (size_t)ڪل);
 
 	// The column to which we will shift the text.
-	destination_col = (colnr_T)(non_white_col - shift_amount);
+	destination_کانو = (colnr_T)(non_white_کانو - سرڪايو_amount);
 
 	// Now let's find out how much of the beginning of the line we can
 	// reuse without modification.
-	verbatim_copy_end = bd.textstart;
-	verbatim_copy_width = bd.start_vcol;
+	verbatim_copy_پڇاڙي = bd.textstart;
+	verbatim_copy_ويڪر = bd.شروعات_vcol;
 
 	// If "bd.startspaces" is set, "bd.textstart" points to the character
 	// preceding the block. We have to subtract its width to obtain its
 	// column number.
-	if (bd.startspaces)
-	    verbatim_copy_width -= bd.start_char_vcols;
-	init_chartabsize_arg(&cts, curwin, 0, verbatim_copy_width,
-					     bd.textstart, verbatim_copy_end);
-	while (cts.cts_vcol < destination_col)
+	إذا (bd.startspaces)
+	    verbatim_copy_ويڪر -= bd.شروعات_char_vcols;
+	init_chartabsize_arg(&cts, curwin, 0, verbatim_copy_ويڪر,
+					     bd.textstart, verbatim_copy_پڇاڙي);
+	طالما (cts.cts_vcol < destination_کانو)
 	{
 	    incr = lbr_chartabsize(&cts);
-	    if (cts.cts_vcol + incr > destination_col)
-		break;
+	    إذا (cts.cts_vcol + incr > destination_کانو)
+		اكسر;
 	    cts.cts_vcol += incr;
 	    MB_PTR_ADV(cts.cts_ptr);
 	}
-	verbatim_copy_width = cts.cts_vcol;
-	verbatim_copy_end = cts.cts_ptr;
+	verbatim_copy_ويڪر = cts.cts_vcol;
+	verbatim_copy_پڇاڙي = cts.cts_ptr;
 	clear_chartabsize_arg(&cts);
 
 	// If "destination_col" is different from the width of the initial
 	// part of the line that will be copied, it means we encountered a tab
 	// character, which we will have to partly replace with spaces.
-	fill = destination_col - verbatim_copy_width;
+	fill = destination_کانو - verbatim_copy_ويڪر;
 
 	// The replacement line will consist of:
 	// - the beginning of the original line up to "verbatim_copy_end",
 	// - "fill" number of spaces,
 	// - the rest of the line, pointed to by non_white.
-	fixedlen = verbatim_copy_end - oldp;
-	new_line_len = fixedlen + fill + (oldlen - (non_white - oldp));
+	fixedlen = verbatim_copy_پڇاڙي - oldp;
+	new_سٽ_len = fixedlen + fill + (oldlen - (non_white - oldp));
 
-	newp = alloc(new_line_len + 1);
-	if (newp == NULL)
-	    return;
+	newp = alloc(new_سٽ_len + 1);
+	إذا (newp == عدم)
+	    أرجع;
 	mch_memmove(newp, oldp, fixedlen);
 	newlen = fixedlen;
 	vim_memset(newp + newlen, ' ', (size_t)fill);
@@ -624,145 +624,145 @@ shift_block(oparg_T *oap, int amount)
     // compute the number of bytes added or subtracted.
     // note new_line_len and oldlen are unsigned so we have
     // to be careful about how we calculate this.
-    if (new_line_len >= oldlen)
-	added = (int)(new_line_len - oldlen);
-    else
-	added = 0 - (int)(oldlen - new_line_len);
-    inserted_bytes(curwin->w_cursor.lnum, bd.textcol, added);
+    إذا (new_سٽ_len >= oldlen)
+	added = (صحيح)(new_سٽ_len - oldlen);
+    وإلا
+	added = 0 - (صحيح)(oldlen - new_سٽ_len);
+    inserted_بائيٽون(curwin->w_cursor.lnum, bd.textcol, added);
     State = oldstate;
-    curwin->w_cursor.col = oldcol;
-#ifdef FEAT_RIGHTLEFT
+    curwin->w_cursor.کانو = oldcol;
+#جيڪڏهن_وصف_ٿيل FEAT_RIGHTLEFT
     p_ri = old_p_ri;
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Insert string "s" (b_insert ? before : after) block :AKelly
  * Caller must prepare for undo.
  */
-    static void
-block_insert(
+    ساكن فراغ
+بلاڪ_وجهو(
     oparg_T		*oap,
     char_u		*s,
     size_t		slen,
-    int			b_insert,
-    struct block_def	*bdp)
+    صحيح			b_وجهو,
+    بنية بلاڪ_def	*bdp)
 {
-    int		ts_val;
-    int		count = 0;	// extra spaces to replace a cut TAB
-    int		spaces = 0;	// non-zero if cutting a TAB
-    colnr_T	offset;		// pointer along new line
+    صحيح		ts_val;
+    صحيح		ڳڻپ = 0;	// extra spaces to replace a cut TAB
+    صحيح		spaces = 0;	// non-zero if cutting a TAB
+    colnr_T	وٿي;		// pointer along new line
     colnr_T	startcol;	// column where insert starts
     char_u	*newp, *oldp;	// new, old lines
     linenr_T	lnum;		// loop var
-    int		oldstate = State;
+    صحيح		oldstate = State;
 
-    State = MODE_INSERT;	// don't want MODE_REPLACE for State
+    State = گهڻائي_وجهو;	// don't want MODE_REPLACE for State
 
-    for (lnum = oap->start.lnum + 1; lnum <= oap->end.lnum; lnum++)
+    لكل (lnum = oap->شروعات.lnum + 1; lnum <= oap->پڇاڙي.lnum; lnum++)
     {
-	block_prep(oap, bdp, lnum, TRUE);
-	if (bdp->is_short && b_insert)
-	    continue;	// OP_INSERT, line ends before block start
+	بلاڪ_prep(oap, bdp, lnum, TRUE);
+	إذا (bdp->is_short && b_وجهو)
+	    استمر;	// OP_INSERT, line ends before block start
 
 	oldp = ml_get(lnum);
 
-	if (b_insert)
+	إذا (b_وجهو)
 	{
-	    ts_val = bdp->start_char_vcols;
+	    ts_val = bdp->شروعات_char_vcols;
 	    spaces = bdp->startspaces;
-	    if (spaces != 0)
-		count = ts_val - 1; // we're cutting a TAB
-	    offset = bdp->textcol;
+	    إذا (spaces != 0)
+		ڳڻپ = ts_val - 1; // we're cutting a TAB
+	    وٿي = bdp->textcol;
 	}
-	else // append
+	وإلا // append
 	{
-	    ts_val = bdp->end_char_vcols;
-	    if (!bdp->is_short) // spaces = padding after block
+	    ts_val = bdp->پڇاڙي_char_vcols;
+	    إذا (!bdp->is_short) // spaces = padding after block
 	    {
 		spaces = (bdp->endspaces ? ts_val - bdp->endspaces : 0);
-		if (spaces != 0)
-		    count = ts_val - 1; // we're cutting a TAB
-		offset = bdp->textcol + bdp->textlen - (spaces != 0);
+		إذا (spaces != 0)
+		    ڳڻپ = ts_val - 1; // we're cutting a TAB
+		وٿي = bdp->textcol + bdp->textlen - (spaces != 0);
 	    }
-	    else // spaces = padding to block edge
+	    وإلا // spaces = padding to block edge
 	    {
 		// if $ used, just append to EOL (ie spaces==0)
-		if (!bdp->is_MAX)
-		    spaces = (oap->end_vcol - bdp->end_vcol) + 1;
-		count = spaces;
-		offset = bdp->textcol + bdp->textlen;
+		إذا (!bdp->is_MAX)
+		    spaces = (oap->پڇاڙي_vcol - bdp->پڇاڙي_vcol) + 1;
+		ڳڻپ = spaces;
+		وٿي = bdp->textcol + bdp->textlen;
 	    }
 	}
 
-	if (has_mbyte && spaces > 0)
+	إذا (has_mbyte && spaces > 0)
 	    // avoid copying part of a multi-byte character
-	    offset -= (*mb_head_off)(oldp, oldp + offset);
+	    وٿي -= (*mb_سر_off)(oldp, oldp + وٿي);
 
-	if (spaces < 0)  // can happen when the cursor was moved
+	إذا (spaces < 0)  // can happen when the cursor was moved
 	    spaces = 0;
 
 	// Make sure the allocated size matches what is actually copied below.
 	newp = alloc(ml_get_len(lnum) + spaces + slen
 		    + (spaces > 0 && !bdp->is_short ? ts_val - spaces : 0)
-								  + count + 1);
-	if (newp == NULL)
-	    continue;
+								  + ڳڻپ + 1);
+	إذا (newp == عدم)
+	    استمر;
 
 	// copy up to shifted part
-	mch_memmove(newp, oldp, (size_t)offset);
-	oldp += offset;
+	mch_memmove(newp, oldp, (size_t)وٿي);
+	oldp += وٿي;
 
 	// insert pre-padding
-	vim_memset(newp + offset, ' ', (size_t)spaces);
-	startcol = offset + spaces;
+	vim_memset(newp + وٿي, ' ', (size_t)spaces);
+	startcol = وٿي + spaces;
 
 	// copy the new text
 	mch_memmove(newp + startcol, s, slen);
-	offset += (int)slen;
+	وٿي += (صحيح)slen;
 
-	if (spaces > 0 && !bdp->is_short)
+	إذا (spaces > 0 && !bdp->is_short)
 	{
-	    if (*oldp == TAB)
+	    إذا (*oldp == TAB)
 	    {
 		// insert post-padding
-		vim_memset(newp + offset + spaces, ' ',
+		vim_memset(newp + وٿي + spaces, ' ',
 						    (size_t)(ts_val - spaces));
 		// we're splitting a TAB, don't copy it
 		oldp++;
 		// We allowed for that TAB, remember this now
-		count++;
+		ڳڻپ++;
 	    }
-	    else
+	    وإلا
 		// Not a TAB, no extra spaces
-		count = spaces;
+		ڳڻپ = spaces;
 	}
 
-	if (spaces > 0)
-	    offset += count;
-	STRCPY(newp + offset, oldp);
+	إذا (spaces > 0)
+	    وٿي += ڳڻپ;
+	STRCPY(newp + وٿي, oldp);
 
 	ml_replace(lnum, newp, FALSE);
 
-	if (b_insert)
+	إذا (b_وجهو)
 	    // correct any text properties
-	    inserted_bytes(lnum, startcol, (int)slen);
+	    inserted_بائيٽون(lnum, startcol, (صحيح)slen);
 
-	if (lnum == oap->end.lnum)
+	إذا (lnum == oap->پڇاڙي.lnum)
 	{
 	    // Set "']" mark to the end of the block instead of the end of
 	    // the insert in the first line.
-	    curbuf->b_op_end.lnum = oap->end.lnum;
-	    curbuf->b_op_end.col = offset;
-	    if (curbuf->b_visual.vi_end.coladd)
+	    curbuf->b_op_پڇاڙي.lnum = oap->پڇاڙي.lnum;
+	    curbuf->b_op_پڇاڙي.کانو = وٿي;
+	    إذا (curbuf->b_visual.vi_پڇاڙي.coladd)
 	    {
-		curbuf->b_visual.vi_end.col += curbuf->b_visual.vi_end.coladd;
-		curbuf->b_visual.vi_end.coladd = 0;
+		curbuf->b_visual.vi_پڇاڙي.کانو += curbuf->b_visual.vi_پڇاڙي.coladd;
+		curbuf->b_visual.vi_پڇاڙي.coladd = 0;
 	    }
 	}
     } // for all lnum
 
-    changed_lines(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
+    بدليو_سٽون(oap->شروعات.lnum + 1, 0, oap->پڇاڙي.lnum + 1, 0L);
 
     State = oldstate;
 }
@@ -772,39 +772,39 @@ block_insert(
  *
  * Return FAIL if undo failed, OK otherwise.
  */
-    int
+    صحيح
 op_delete(oparg_T *oap)
 {
-    int			n;
+    صحيح			n;
     linenr_T		lnum;
     char_u		*ptr;
     char_u		*newp, *oldp;
-    struct block_def	bd;
-    linenr_T		old_lcount = curbuf->b_ml.ml_line_count;
-    int			did_yank = FALSE;
+    بنية بلاڪ_def	bd;
+    linenr_T		old_lcount = curbuf->b_ml.ml_سٽ_ڳڻپ;
+    صحيح			did_yank = FALSE;
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to do
-	return OK;
+    إذا (curbuf->b_ml.ml_flags & ML_خالي_جايون)	    // nothing to do
+	أرجع OK;
 
     // Nothing to delete, return here.	Do prepare undo, for op_change().
-    if (oap->empty)
-	return u_save_cursor();
+    إذا (oap->خالي_جايون_2)
+	أرجع u_save_cursor();
 
-    if (!curbuf->b_p_ma)
+    إذا (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (VIsual_select && oap->is_VIsual)
+    إذا (VIsual_select && oap->is_VIsual)
 	// use register given with CTRL_R, defaults to zero
 	oap->regname = VIsual_select_reg;
 
-#ifdef HAVE_CLIPMETHOD
+#جيڪڏهن_وصف_ٿيل HAVE_CLIPMETHOD
     adjust_clip_reg(&oap->regname);
-#endif
+#جيڪڏهن_پورو
 
-    if (has_mbyte)
+    إذا (has_mbyte)
 	mb_adjust_opend(oap);
 
     /*
@@ -812,19 +812,19 @@ op_delete(oparg_T *oap)
      * line and motion_type == MCHAR and the result is a blank line, make the
      * delete linewise.  Don't do this for the change command or Visual mode.
      */
-    if (       oap->motion_type == MCHAR
+    إذا (       oap->motion_type == MCHAR
 	    && !oap->is_VIsual
-	    && !oap->block_mode
-	    && oap->line_count > 1
+	    && !oap->بلاڪ_گهڻائي
+	    && oap->سٽ_ڳڻپ > 1
 	    && oap->motion_force == NUL
-	    && (vim_strchr(p_cpo, CPO_WORD) != NULL)
+	    && (vim_strchr(p_cpo, CPO_لفظ) != عدم)
 	    && oap->op_type == OP_DELETE)
     {
-	ptr = ml_get(oap->end.lnum) + oap->end.col;
-	if (*ptr != NUL)
+	ptr = ml_get(oap->پڇاڙي.lnum) + oap->پڇاڙي.کانو;
+	إذا (*ptr != NUL)
 	    ptr += oap->inclusive;
 	ptr = skipwhite(ptr);
-	if (*ptr == NUL && inindent(0))
+	إذا (*ptr == NUL && inindent(0))
 	    oap->motion_type = MLINE;
     }
 
@@ -832,22 +832,22 @@ op_delete(oparg_T *oap)
      * Check for trying to delete (e.g. "D") in an empty line.
      * Note: For the change operator it is ok.
      */
-    if (       oap->motion_type == MCHAR
-	    && oap->line_count == 1
+    إذا (       oap->motion_type == MCHAR
+	    && oap->سٽ_ڳڻپ == 1
 	    && oap->op_type == OP_DELETE
-	    && *ml_get(oap->start.lnum) == NUL)
+	    && *ml_get(oap->شروعات.lnum) == NUL)
     {
 	/*
 	 * It's an error to operate on an empty region, when 'E' included in
 	 * 'cpoptions' (Vi compatible).
 	 */
-	if (virtual_op)
+	إذا (virtual_op)
 	    // Virtual editing: Nothing gets deleted, but we set the '[ and ']
 	    // marks as if it happened.
-	    goto setmarks;
-	if (vim_strchr(p_cpo, CPO_EMPTYREGION) != NULL)
+	    اذهب setmarks;
+	إذا (vim_strchr(p_cpo, CPO_EMPTYREGION) != عدم)
 	    beep_flush();
-	return OK;
+	أرجع OK;
     }
 
     /*
@@ -855,27 +855,27 @@ op_delete(oparg_T *oap)
      * If a yank register was specified, put the deleted text into that
      * register.  For the black hole register '_' don't yank anything.
      */
-    if (oap->regname != '_')
+    إذا (oap->regname != '_')
     {
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD_PROVIDER
 	inc_clip_provider();
-#endif
-	if (oap->regname != 0)
+#جيڪڏهن_پورو
+	إذا (oap->regname != 0)
 	{
 	    // check for read-only register
-	    if (!valid_yank_reg(oap->regname, TRUE))
+	    إذا (!valid_yank_reg(oap->regname, TRUE))
 	    {
 		beep_flush();
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD_PROVIDER
 		dec_clip_provider();
-#endif
-		return OK;
+#جيڪڏهن_پورو
+		أرجع OK;
 	    }
-	    get_yank_register(oap->regname, TRUE); // yank into specif'd reg.
-	    if (op_yank(oap, TRUE, FALSE) == OK)   // yank without message
+	    get_yank_رجسٽر(oap->regname, TRUE); // yank into specif'd reg.
+	    إذا (op_yank(oap, TRUE, FALSE) == OK)   // yank without message
 		did_yank = TRUE;
 	}
-	else
+	وإلا
 	    reset_y_append(); // not appending to unnamed register
 
 	/*
@@ -883,27 +883,27 @@ op_delete(oparg_T *oap)
 	 * delete contains a line break, or when using a specific operator (Vi
 	 * compatible)
 	 */
-	if (oap->motion_type == MLINE || oap->line_count > 1
+	إذا (oap->motion_type == MLINE || oap->سٽ_ڳڻپ > 1
 							   || oap->use_reg_one)
 	{
-	    shift_delete_registers();
-	    if (op_yank(oap, TRUE, FALSE) == OK)
+	    سرڪايو_delete_registers();
+	    إذا (op_yank(oap, TRUE, FALSE) == OK)
 		did_yank = TRUE;
 	}
 
 	// Yank into small delete register when no named register specified
 	// and the delete is within one line.
-	if ((
-#ifdef HAVE_CLIPMETHOD
+	إذا ((
+#جيڪڏهن_وصف_ٿيل HAVE_CLIPMETHOD
 	    ((clip_unnamed & CLIP_UNNAMED) && oap->regname == '*') ||
 	    ((clip_unnamed & CLIP_UNNAMED_PLUS) && oap->regname == '+') ||
-#endif
+#جيڪڏهن_پورو
 	    oap->regname == 0) && oap->motion_type != MLINE
-						      && oap->line_count == 1)
+						      && oap->سٽ_ڳڻپ == 1)
 	{
 	    oap->regname = '-';
-	    get_yank_register(oap->regname, TRUE);
-	    if (op_yank(oap, TRUE, FALSE) == OK)
+	    get_yank_رجسٽر(oap->regname, TRUE);
+	    إذا (op_yank(oap, TRUE, FALSE) == OK)
 		did_yank = TRUE;
 	    oap->regname = 0;
 	}
@@ -914,51 +914,51 @@ op_delete(oparg_T *oap)
 	 * And it avoids doing a delete of something we can't put back if we
 	 * want.
 	 */
-	if (!did_yank)
+	إذا (!did_yank)
 	{
-	    int msg_silent_save = msg_silent;
+	    صحيح نياپو_silent_save = نياپو_silent;
 
-	    msg_silent = 0;	// must display the prompt
+	    نياپو_silent = 0;	// must display the prompt
 	    n = ask_yesno((char_u *)_("cannot yank; delete anyway"), TRUE);
-	    msg_silent = msg_silent_save;
-	    if (n != 'y')
+	    نياپو_silent = نياپو_silent_save;
+	    إذا (n != 'y')
 	    {
 		emsg(_(e_command_aborted));
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD_PROVIDER
 		dec_clip_provider();
-#endif
-		return FAIL;
+#جيڪڏهن_پورو
+		أرجع FAIL;
 	    }
 	}
 
-#if defined(FEAT_EVAL)
-	if (did_yank && has_textyankpost())
+#إذا defined(FEAT_EVAL)
+	إذا (did_yank && has_textyankpost())
 	    yank_do_autocmd(oap, get_y_current());
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جيڪڏهن_پورو
+#جيڪڏهن_وصف_ٿيل FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
-#endif
+#جيڪڏهن_پورو
     }
 
     /*
      * block mode delete
      */
-    if (oap->block_mode)
+    إذا (oap->بلاڪ_گهڻائي)
     {
-	if (u_save((linenr_T)(oap->start.lnum - 1),
-			       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	    return FAIL;
+	إذا (u_save((linenr_T)(oap->شروعات.lnum - 1),
+			       (linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
+	    أرجع FAIL;
 
-	for (lnum = curwin->w_cursor.lnum; lnum <= oap->end.lnum; ++lnum)
+	لكل (lnum = curwin->w_cursor.lnum; lnum <= oap->پڇاڙي.lnum; ++lnum)
 	{
-	    block_prep(oap, &bd, lnum, TRUE);
-	    if (bd.textlen == 0)	// nothing to delete
-		continue;
+	    بلاڪ_prep(oap, &bd, lnum, TRUE);
+	    إذا (bd.textlen == 0)	// nothing to delete
+		استمر;
 
 	    // Adjust cursor position for tab replaced by spaces and 'lbr'.
-	    if (lnum == curwin->w_cursor.lnum)
+	    إذا (lnum == curwin->w_cursor.lnum)
 	    {
-		curwin->w_cursor.col = bd.textcol + bd.startspaces;
+		curwin->w_cursor.کانو = bd.textcol + bd.startspaces;
 		curwin->w_cursor.coladd = 0;
 	    }
 
@@ -968,8 +968,8 @@ op_delete(oparg_T *oap)
 	    n = bd.textlen - bd.startspaces - bd.endspaces;
 	    oldp = ml_get(lnum);
 	    newp = alloc(ml_get_len(lnum) + 1 - n);
-	    if (newp == NULL)
-		continue;
+	    إذا (newp == عدم)
+		استمر;
 	    // copy up to deleted part
 	    mch_memmove(newp, oldp, (size_t)bd.textcol);
 	    // insert spaces
@@ -981,194 +981,194 @@ op_delete(oparg_T *oap)
 	    // replace the line
 	    ml_replace(lnum, newp, FALSE);
 
-#ifdef FEAT_PROP_POPUP
-	    if (curbuf->b_has_textprop && n != 0)
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+	    إذا (curbuf->b_has_textprop && n != 0)
 		adjust_prop_columns(lnum, bd.textcol, -n, 0);
-#endif
+#جيڪڏهن_پورو
 	}
 
-	check_cursor_col();
-	changed_lines(curwin->w_cursor.lnum, curwin->w_cursor.col,
-						       oap->end.lnum + 1, 0L);
-	oap->line_count = 0;	    // no lines deleted
+	check_cursor_کانو();
+	بدليو_سٽون(curwin->w_cursor.lnum, curwin->w_cursor.کانو,
+						       oap->پڇاڙي.lnum + 1, 0L);
+	oap->سٽ_ڳڻپ = 0;	    // no lines deleted
     }
-    else if (oap->motion_type == MLINE)
+    وإلا إذا (oap->motion_type == MLINE)
     {
-	if (oap->op_type == OP_CHANGE)
+	إذا (oap->op_type == OP_CHANGE)
 	{
 	    // Delete the lines except the first one.  Temporarily move the
 	    // cursor to the next line.  Save the current line number, if the
 	    // last line is deleted it may be changed.
-	    if (oap->line_count > 1)
+	    إذا (oap->سٽ_ڳڻپ > 1)
 	    {
 		lnum = curwin->w_cursor.lnum;
 		++curwin->w_cursor.lnum;
-		del_lines((long)(oap->line_count - 1), TRUE);
+		del_سٽون((ڊگهو)(oap->سٽ_ڳڻپ - 1), TRUE);
 		curwin->w_cursor.lnum = lnum;
 	    }
-	    if (u_save_cursor() == FAIL)
-		return FAIL;
-	    if (curbuf->b_p_ai)		    // don't delete indent
+	    إذا (u_save_cursor() == FAIL)
+		أرجع FAIL;
+	    إذا (curbuf->b_p_ai)		    // don't delete indent
 	    {
 		beginline(BL_WHITE);	    // cursor on first non-white
 		did_ai = TRUE;		    // delete the indent when ESC hit
-		ai_col = curwin->w_cursor.col;
+		ai_کانو = curwin->w_cursor.کانو;
 	    }
-	    else
+	    وإلا
 		beginline(0);		    // cursor in column 0
-	    truncate_line(FALSE);   // delete the rest of the line,
+	    truncate_سٽ(FALSE);   // delete the rest of the line,
 				    // leaving cursor past last char in line
-	    if (oap->line_count > 1)
+	    إذا (oap->سٽ_ڳڻپ > 1)
 		u_clearline();	    // "U" command not possible after "2cc"
 	}
-	else
+	وإلا
 	{
-	    del_lines(oap->line_count, TRUE);
+	    del_سٽون(oap->سٽ_ڳڻپ, TRUE);
 	    beginline(BL_WHITE | BL_FIX);
 	    u_clearline();	// "U" command not possible after "dd"
 	}
     }
-    else
+    وإلا
     {
-	if (virtual_op)
+	إذا (virtual_op)
 	{
-	    int		endcol = 0;
+	    صحيح		endcol = 0;
 
 	    // For virtualedit: break the tabs that are partly included.
-	    if (gchar_pos(&oap->start) == '\t')
+	    إذا (gchar_pos(&oap->شروعات) == '\t')
 	    {
-		if (u_save_cursor() == FAIL)	// save first line for undo
-		    return FAIL;
-		if (oap->line_count == 1)
-		    endcol = getviscol2(oap->end.col, oap->end.coladd);
-		coladvance_force(getviscol2(oap->start.col, oap->start.coladd));
-		oap->start = curwin->w_cursor;
-		if (oap->line_count == 1)
+		إذا (u_save_cursor() == FAIL)	// save first line for undo
+		    أرجع FAIL;
+		إذا (oap->سٽ_ڳڻپ == 1)
+		    endcol = getviscol2(oap->پڇاڙي.کانو, oap->پڇاڙي.coladd);
+		coladvance_force(getviscol2(oap->شروعات.کانو, oap->شروعات.coladd));
+		oap->شروعات = curwin->w_cursor;
+		إذا (oap->سٽ_ڳڻپ == 1)
 		{
 		    coladvance(endcol);
-		    oap->end.col = curwin->w_cursor.col;
-		    oap->end.coladd = curwin->w_cursor.coladd;
-		    curwin->w_cursor = oap->start;
+		    oap->پڇاڙي.کانو = curwin->w_cursor.کانو;
+		    oap->پڇاڙي.coladd = curwin->w_cursor.coladd;
+		    curwin->w_cursor = oap->شروعات;
 		}
 	    }
 
 	    // Break a tab only when it's included in the area.
-	    if (gchar_pos(&oap->end) == '\t'
-				     && (int)oap->end.coladd < oap->inclusive)
+	    إذا (gchar_pos(&oap->پڇاڙي) == '\t'
+				     && (صحيح)oap->پڇاڙي.coladd < oap->inclusive)
 	    {
 		// save last line for undo
-		if (u_save((linenr_T)(oap->end.lnum - 1),
-				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-		    return FAIL;
-		curwin->w_cursor = oap->end;
-		coladvance_force(getviscol2(oap->end.col, oap->end.coladd));
-		oap->end = curwin->w_cursor;
-		curwin->w_cursor = oap->start;
+		إذا (u_save((linenr_T)(oap->پڇاڙي.lnum - 1),
+				       (linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
+		    أرجع FAIL;
+		curwin->w_cursor = oap->پڇاڙي;
+		coladvance_force(getviscol2(oap->پڇاڙي.کانو, oap->پڇاڙي.coladd));
+		oap->پڇاڙي = curwin->w_cursor;
+		curwin->w_cursor = oap->شروعات;
 	    }
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 		mb_adjust_opend(oap);
 	}
 
-	if (oap->line_count == 1)	// delete characters within one line
+	إذا (oap->سٽ_ڳڻپ == 1)	// delete characters within one line
 	{
-	    if (u_save_cursor() == FAIL)	// save line for undo
-		return FAIL;
+	    إذا (u_save_cursor() == FAIL)	// save line for undo
+		أرجع FAIL;
 
 	    // if 'cpoptions' contains '$', display '$' at end of change
-	    if (       vim_strchr(p_cpo, CPO_DOLLAR) != NULL
+	    إذا (       vim_strchr(p_cpo, CPO_DOLLAR) != عدم
 		    && oap->op_type == OP_CHANGE
-		    && oap->end.lnum == curwin->w_cursor.lnum
+		    && oap->پڇاڙي.lnum == curwin->w_cursor.lnum
 		    && !oap->is_VIsual)
-		display_dollar(oap->end.col - !oap->inclusive);
+		display_dollar(oap->پڇاڙي.کانو - !oap->inclusive);
 
-	    n = oap->end.col - oap->start.col + 1 - !oap->inclusive;
+	    n = oap->پڇاڙي.کانو - oap->شروعات.کانو + 1 - !oap->inclusive;
 
-	    if (virtual_op)
+	    إذا (virtual_op)
 	    {
 		// fix up things for virtualedit-delete:
 		// break the tabs which are going to get in our way
-		int		len = ml_get_curline_len();
+		صحيح		len = ml_get_curline_len();
 
-		if (oap->end.coladd != 0
-			&& (int)oap->end.col >= len - 1
-			&& !(oap->start.coladd && (int)oap->end.col >= len - 1))
+		إذا (oap->پڇاڙي.coladd != 0
+			&& (صحيح)oap->پڇاڙي.کانو >= len - 1
+			&& !(oap->شروعات.coladd && (صحيح)oap->پڇاڙي.کانو >= len - 1))
 		    n++;
 		// Delete at least one char (e.g, when on a control char).
-		if (n == 0 && oap->start.coladd != oap->end.coladd)
+		إذا (n == 0 && oap->شروعات.coladd != oap->پڇاڙي.coladd)
 		    n = 1;
 
 		// When deleted a char in the line, reset coladd.
-		if (gchar_cursor() != NUL)
+		إذا (gchar_cursor() != NUL)
 		    curwin->w_cursor.coladd = 0;
 	    }
-	    (void)del_bytes((long)n, !virtual_op,
+	    (فراغ)del_بائيٽون((ڊگهو)n, !virtual_op,
 			    oap->op_type == OP_DELETE && !oap->is_VIsual);
 	}
-	else				// delete characters between lines
+	وإلا				// delete characters between lines
 	{
 	    pos_T   curpos;
 
 	    // save deleted and changed lines for undo
-	    if (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
-		 (linenr_T)(curwin->w_cursor.lnum + oap->line_count)) == FAIL)
-		return FAIL;
+	    إذا (u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+		 (linenr_T)(curwin->w_cursor.lnum + oap->سٽ_ڳڻپ)) == FAIL)
+		أرجع FAIL;
 
-	    truncate_line(TRUE);	// delete from cursor to end of line
+	    truncate_سٽ(TRUE);	// delete from cursor to end of line
 
 	    curpos = curwin->w_cursor;	// remember curwin->w_cursor
 	    ++curwin->w_cursor.lnum;
-	    del_lines((long)(oap->line_count - 2), FALSE);
+	    del_سٽون((ڊگهو)(oap->سٽ_ڳڻپ - 2), FALSE);
 
 	    // delete from start of line until op_end
-	    n = (oap->end.col + 1 - !oap->inclusive);
-	    curwin->w_cursor.col = 0;
-	    (void)del_bytes((long)n, !virtual_op,
+	    n = (oap->پڇاڙي.کانو + 1 - !oap->inclusive);
+	    curwin->w_cursor.کانو = 0;
+	    (فراغ)del_بائيٽون((ڊگهو)n, !virtual_op,
 			    oap->op_type == OP_DELETE && !oap->is_VIsual);
 	    curwin->w_cursor = curpos;	// restore curwin->w_cursor
-	    (void)do_join(2, FALSE, FALSE, FALSE, FALSE);
+	    (فراغ)do_join(2, FALSE, FALSE, FALSE, FALSE);
 	}
-	if (oap->op_type == OP_DELETE)
+	إذا (oap->op_type == OP_DELETE)
 	    auto_format(FALSE, TRUE);
     }
 
-    msgmore(curbuf->b_ml.ml_line_count - old_lcount);
+    msgmore(curbuf->b_ml.ml_سٽ_ڳڻپ - old_lcount);
 
 setmarks:
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
-	if (oap->block_mode)
+	إذا (oap->بلاڪ_گهڻائي)
 	{
-	    curbuf->b_op_end.lnum = oap->end.lnum;
-	    curbuf->b_op_end.col = oap->start.col;
+	    curbuf->b_op_پڇاڙي.lnum = oap->پڇاڙي.lnum;
+	    curbuf->b_op_پڇاڙي.کانو = oap->شروعات.کانو;
 	}
-	else
-	    curbuf->b_op_end = oap->start;
-	curbuf->b_op_start = oap->start;
+	وإلا
+	    curbuf->b_op_پڇاڙي = oap->شروعات;
+	curbuf->b_op_شروعات = oap->شروعات;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Adjust end of operating area for ending on a multi-byte character.
  * Used for deletion.
  */
-    static void
+    ساكن فراغ
 mb_adjust_opend(oparg_T *oap)
 {
-    char_u	*line;
+    char_u	*سٽ;
     char_u	*ptr;
 
-    if (!oap->inclusive)
-	return;
+    إذا (!oap->inclusive)
+	أرجع;
 
-    line = ml_get(oap->end.lnum);
-    ptr = line + oap->end.col;
-    if (*ptr != NUL)
+    سٽ = ml_get(oap->پڇاڙي.lnum);
+    ptr = سٽ + oap->پڇاڙي.کانو;
+    إذا (*ptr != NUL)
     {
-	ptr -= (*mb_head_off)(line, ptr);
+	ptr -= (*mb_سر_off)(سٽ, ptr);
 	ptr += (*mb_ptr2len)(ptr) - 1;
-	oap->end.col = ptr - line;
+	oap->پڇاڙي.کانو = ptr - سٽ;
     }
 }
 
@@ -1176,12 +1176,12 @@ mb_adjust_opend(oparg_T *oap)
  * Replace the character under the cursor with "c".
  * This takes care of multi-byte characters.
  */
-    static void
-replace_character(int c)
+    ساكن فراغ
+replace_character(صحيح c)
 {
-    int n = State;
+    صحيح n = State;
 
-    State = MODE_REPLACE;
+    State = گهڻائي_REPLACE;
     ins_char(c);
     State = n;
     // Backup to the replaced character.
@@ -1191,83 +1191,83 @@ replace_character(int c)
 /*
  * Replace a whole area with one character.
  */
-    int
-op_replace(oparg_T *oap, int c)
+    صحيح
+op_replace(oparg_T *oap, صحيح c)
 {
-    int			n, numc;
-    int			num_chars;
+    صحيح			n, numc;
+    صحيح			انگ_chars;
     char_u		*newp, *oldp;
     size_t		newlen, oldlen;
-    struct block_def	bd;
-    char_u		*after_p = NULL;
-    int			had_ctrl_v_cr = FALSE;
+    بنية بلاڪ_def	bd;
+    char_u		*after_p = عدم;
+    صحيح			had_ctrl_v_cr = FALSE;
 
-    if ((curbuf->b_ml.ml_flags & ML_EMPTY ) || oap->empty)
-	return OK;	    // nothing to do
+    إذا ((curbuf->b_ml.ml_flags & ML_خالي_جايون ) || oap->خالي_جايون_2)
+	أرجع OK;	    // nothing to do
 
-    if (c == REPLACE_CR_NCHAR)
+    إذا (c == REPLACE_CR_NCHAR)
     {
 	had_ctrl_v_cr = TRUE;
 	c = CAR;
     }
-    else if (c == REPLACE_NL_NCHAR)
+    وإلا إذا (c == REPLACE_NL_NCHAR)
     {
 	had_ctrl_v_cr = TRUE;
 	c = NL;
     }
 
-    if (has_mbyte)
+    إذا (has_mbyte)
 	mb_adjust_opend(oap);
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
-				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return FAIL;
+    إذا (u_save((linenr_T)(oap->شروعات.lnum - 1),
+				       (linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
+	أرجع FAIL;
 
     /*
      * block mode replace
      */
-    if (oap->block_mode)
+    إذا (oap->بلاڪ_گهڻائي)
     {
 	bd.is_MAX = (curwin->w_curswant == MAXCOL);
-	for ( ; curwin->w_cursor.lnum <= oap->end.lnum; ++curwin->w_cursor.lnum)
+	لكل ( ; curwin->w_cursor.lnum <= oap->پڇاڙي.lnum; ++curwin->w_cursor.lnum)
 	{
-	    curwin->w_cursor.col = 0;  // make sure cursor position is valid
-	    block_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
-	    if (bd.textlen == 0 && (!virtual_op || bd.is_MAX))
-		continue;	    // nothing to replace
+	    curwin->w_cursor.کانو = 0;  // make sure cursor position is valid
+	    بلاڪ_prep(oap, &bd, curwin->w_cursor.lnum, TRUE);
+	    إذا (bd.textlen == 0 && (!virtual_op || bd.is_MAX))
+		استمر;	    // nothing to replace
 
 	    // n == number of extra chars required
 	    // If we split a TAB, it may be replaced by several characters.
 	    // Thus the number of characters may increase!
 	    // If the range starts in virtual space, count the initial
 	    // coladd offset as part of "startspaces"
-	    if (virtual_op && bd.is_short && *bd.textstart == NUL)
+	    إذا (virtual_op && bd.is_short && *bd.textstart == NUL)
 	    {
 		pos_T vpos;
 
 		vpos.lnum = curwin->w_cursor.lnum;
-		getvpos(&vpos, oap->start_vcol);
+		getvpos(&vpos, oap->شروعات_vcol);
 		bd.startspaces += vpos.coladd;
 		n = bd.startspaces;
 	    }
-	    else
+	    وإلا
 		// allow for pre spaces
-		n = (bd.startspaces ? bd.start_char_vcols - 1 : 0);
+		n = (bd.startspaces ? bd.شروعات_char_vcols - 1 : 0);
 
 	    // allow for post spp
 	    n += (bd.endspaces
 		    && !bd.is_oneChar
-		    && bd.end_char_vcols > 0) ? bd.end_char_vcols - 1 : 0;
+		    && bd.پڇاڙي_char_vcols > 0) ? bd.پڇاڙي_char_vcols - 1 : 0;
 	    // Figure out how many characters to replace.
-	    numc = oap->end_vcol - oap->start_vcol + 1;
-	    if (bd.is_short && (!virtual_op || bd.is_MAX))
-		numc -= (oap->end_vcol - bd.end_vcol) + 1;
+	    numc = oap->پڇاڙي_vcol - oap->شروعات_vcol + 1;
+	    إذا (bd.is_short && (!virtual_op || bd.is_MAX))
+		numc -= (oap->پڇاڙي_vcol - bd.پڇاڙي_vcol) + 1;
 
 	    // A double-wide character can be replaced only up to half the
 	    // times.
-	    if ((*mb_char2cells)(c) > 1)
+	    إذا ((*mb_char2cells)(c) > 1)
 	    {
-		if ((numc & 1) && !bd.is_short)
+		إذا ((numc & 1) && !bd.is_short)
 		{
 		    ++bd.endspaces;
 		    ++n;
@@ -1276,7 +1276,7 @@ op_replace(oparg_T *oap, int c)
 	    }
 
 	    // Compute bytes needed, move character count to num_chars.
-	    num_chars = numc;
+	    انگ_chars = numc;
 	    numc *= (*mb_char2len)(c);
 	    // oldlen includes textlen, so don't double count
 	    n += numc - bd.textlen;
@@ -1284,8 +1284,8 @@ op_replace(oparg_T *oap, int c)
 	    oldp = ml_get_curline();
 	    oldlen = ml_get_curline_len();
 	    newp = alloc(oldlen + 1 + n);
-	    if (newp == NULL)
-		continue;
+	    إذا (newp == عدم)
+		استمر;
 	    vim_memset(newp, NUL, (size_t)(oldlen + 1 + n));
 	    // copy up to deleted part
 	    mch_memmove(newp, oldp, (size_t)bd.textcol);
@@ -1296,19 +1296,19 @@ op_replace(oparg_T *oap, int c)
 	    // insert replacement chars CHECK FOR ALLOCATED SPACE
 	    // REPLACE_CR_NCHAR/REPLACE_NL_NCHAR is used for entering CR
 	    // literally.
-	    if (had_ctrl_v_cr || (c != '\r' && c != '\n'))
+	    إذا (had_ctrl_v_cr || (c != '\r' && c != '\n'))
 	    {
-		if (has_mbyte)
+		إذا (has_mbyte)
 		{
-		    while (--num_chars >= 0)
+		    طالما (--انگ_chars >= 0)
 			newlen += (*mb_char2bytes)(c, newp + newlen);
 		}
-		else
+		وإلا
 		{
 		    vim_memset(newp + newlen, c, (size_t)numc);
 		    newlen += numc;
 		}
-		if (!bd.is_short)
+		إذا (!bd.is_short)
 		{
 		    // insert post-spaces
 		    vim_memset(newp + newlen, ' ', (size_t)bd.endspaces);
@@ -1317,247 +1317,247 @@ op_replace(oparg_T *oap, int c)
 				oldp + bd.textcol + bd.textlen);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// Replacing with \r or \n means splitting the line.
 		after_p = alloc(oldlen + 1 + n - newlen);
-		if (after_p != NULL)
+		إذا (after_p != عدم)
 		    STRCPY(after_p, oldp + bd.textcol + bd.textlen);
 	    }
 
 	    // replace the line
 	    ml_replace(curwin->w_cursor.lnum, newp, FALSE);
-	    if (after_p != NULL)
+	    إذا (after_p != عدم)
 	    {
 		ml_append(curwin->w_cursor.lnum++, after_p, 0, FALSE);
-		appended_lines_mark(curwin->w_cursor.lnum, 1L);
-		oap->end.lnum++;
+		appended_سٽون_mark(curwin->w_cursor.lnum, 1L);
+		oap->پڇاڙي.lnum++;
 		vim_free(after_p);
 	    }
 	}
     }
-    else
+    وإلا
     {
 	/*
 	 * MCHAR and MLINE motion replace.
 	 */
-	if (oap->motion_type == MLINE)
+	إذا (oap->motion_type == MLINE)
 	{
-	    oap->start.col = 0;
-	    curwin->w_cursor.col = 0;
-	    oap->end.col = ml_get_len(oap->end.lnum);
-	    if (oap->end.col)
-		--oap->end.col;
+	    oap->شروعات.کانو = 0;
+	    curwin->w_cursor.کانو = 0;
+	    oap->پڇاڙي.کانو = ml_get_len(oap->پڇاڙي.lnum);
+	    إذا (oap->پڇاڙي.کانو)
+		--oap->پڇاڙي.کانو;
 	}
-	else if (!oap->inclusive)
-	    dec(&(oap->end));
+	وإلا إذا (!oap->inclusive)
+	    dec(&(oap->پڇاڙي));
 
-	while (LTOREQ_POS(curwin->w_cursor, oap->end))
+	طالما (LTOREQ_POS(curwin->w_cursor, oap->پڇاڙي))
 	{
-	    int done = FALSE;
+	    صحيح پورو = FALSE;
 
 	    n = gchar_cursor();
-	    if (n != NUL)
+	    إذا (n != NUL)
 	    {
-		int new_byte_len = (*mb_char2len)(c);
-		int old_byte_len = mb_ptr2len(ml_get_cursor());
+		صحيح new_byte_len = (*mb_char2len)(c);
+		صحيح old_byte_len = mb_ptr2len(ml_get_cursor());
 
-		if (new_byte_len > 1 || old_byte_len > 1)
+		إذا (new_byte_len > 1 || old_byte_len > 1)
 		{
 		    // This is slow, but it handles replacing a single-byte
 		    // with a multi-byte and the other way around.
-		    if (curwin->w_cursor.lnum == oap->end.lnum)
-			oap->end.col += new_byte_len - old_byte_len;
+		    إذا (curwin->w_cursor.lnum == oap->پڇاڙي.lnum)
+			oap->پڇاڙي.کانو += new_byte_len - old_byte_len;
 		    replace_character(c);
-		    done = TRUE;
+		    پورو = TRUE;
 		}
-		else
+		وإلا
 		{
-		    if (n == TAB)
+		    إذا (n == TAB)
 		    {
-			int end_vcol = 0;
+			صحيح پڇاڙي_vcol = 0;
 
-			if (curwin->w_cursor.lnum == oap->end.lnum)
+			إذا (curwin->w_cursor.lnum == oap->پڇاڙي.lnum)
 			{
 			    // oap->end has to be recalculated when
 			    // the tab breaks
-			    end_vcol = getviscol2(oap->end.col,
-							     oap->end.coladd);
+			    پڇاڙي_vcol = getviscol2(oap->پڇاڙي.کانو,
+							     oap->پڇاڙي.coladd);
 			}
 			coladvance_force(getviscol());
-			if (curwin->w_cursor.lnum == oap->end.lnum)
-			    getvpos(&oap->end, end_vcol);
+			إذا (curwin->w_cursor.lnum == oap->پڇاڙي.lnum)
+			    getvpos(&oap->پڇاڙي, پڇاڙي_vcol);
 		    }
 		    // with "coladd" set may move to just after a TAB
-		    if (gchar_cursor() != NUL)
+		    إذا (gchar_cursor() != NUL)
 		    {
 			PBYTE(curwin->w_cursor, c);
-			done = TRUE;
+			پورو = TRUE;
 		    }
 		}
 	    }
-	    if (!done && virtual_op && curwin->w_cursor.lnum == oap->end.lnum)
+	    إذا (!پورو && virtual_op && curwin->w_cursor.lnum == oap->پڇاڙي.lnum)
 	    {
-		int virtcols = oap->end.coladd;
+		صحيح virtcols = oap->پڇاڙي.coladd;
 
-		if (curwin->w_cursor.lnum == oap->start.lnum
-			&& oap->start.col == oap->end.col && oap->start.coladd)
-		    virtcols -= oap->start.coladd;
+		إذا (curwin->w_cursor.lnum == oap->شروعات.lnum
+			&& oap->شروعات.کانو == oap->پڇاڙي.کانو && oap->شروعات.coladd)
+		    virtcols -= oap->شروعات.coladd;
 
 		// oap->end has been trimmed so it's effectively inclusive;
 		// as a result an extra +1 must be counted so we don't
 		// trample the NUL byte.
-		coladvance_force(getviscol2(oap->end.col, oap->end.coladd) + 1);
-		curwin->w_cursor.col -= (virtcols + 1);
-		for (; virtcols >= 0; virtcols--)
+		coladvance_force(getviscol2(oap->پڇاڙي.کانو, oap->پڇاڙي.coladd) + 1);
+		curwin->w_cursor.کانو -= (virtcols + 1);
+		لكل (; virtcols >= 0; virtcols--)
 		{
-		    if ((*mb_char2len)(c) > 1)
+		    إذا ((*mb_char2len)(c) > 1)
 		       replace_character(c);
-		    else
+		    وإلا
 			PBYTE(curwin->w_cursor, c);
-		    if (inc(&curwin->w_cursor) == -1)
-			break;
+		    إذا (inc(&curwin->w_cursor) == -1)
+			اكسر;
 		}
 	    }
 
 	    // Advance to next character, stop at the end of the file.
-	    if (inc_cursor() == -1)
-		break;
+	    إذا (inc_cursor() == -1)
+		اكسر;
 	}
     }
 
-    curwin->w_cursor = oap->start;
+    curwin->w_cursor = oap->شروعات;
     check_cursor();
-    changed_lines(oap->start.lnum, oap->start.col, oap->end.lnum + 1, 0L);
+    بدليو_سٽون(oap->شروعات.lnum, oap->شروعات.کانو, oap->پڇاڙي.lnum + 1, 0L);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
+	curbuf->b_op_شروعات = oap->شروعات;
+	curbuf->b_op_پڇاڙي = oap->پڇاڙي;
     }
 
-    return OK;
+    أرجع OK;
 }
 
-static int swapchars(int op_type, pos_T *pos, int length);
+ساكن صحيح swapchars(صحيح op_type, pos_T *pos, صحيح ڊيگهائي);
 
 /*
  * Handle the (non-standard vi) tilde operator.  Also for "gu", "gU" and "g?".
  */
-    static void
+    ساكن فراغ
 op_tilde(oparg_T *oap)
 {
     pos_T		pos;
-    struct block_def	bd;
-    int			did_change = FALSE;
+    بنية بلاڪ_def	bd;
+    صحيح			did_change = FALSE;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
-				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+    إذا (u_save((linenr_T)(oap->شروعات.lnum - 1),
+				       (linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
+	أرجع;
 
-    pos = oap->start;
-    if (oap->block_mode)		    // Visual block mode
+    pos = oap->شروعات;
+    إذا (oap->بلاڪ_گهڻائي)		    // Visual block mode
     {
-	for (; pos.lnum <= oap->end.lnum; ++pos.lnum)
+	لكل (; pos.lnum <= oap->پڇاڙي.lnum; ++pos.lnum)
 	{
-	    int one_change;
+	    صحيح one_change;
 
-	    block_prep(oap, &bd, pos.lnum, FALSE);
-	    pos.col = bd.textcol;
+	    بلاڪ_prep(oap, &bd, pos.lnum, FALSE);
+	    pos.کانو = bd.textcol;
 	    one_change = swapchars(oap->op_type, &pos, bd.textlen);
 	    did_change |= one_change;
 
-#ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && one_change)
+#جيڪڏهن_وصف_ٿيل FEAT_NETBEANS_INTG
+	    إذا (netbeans_سرگرم() && one_change)
 	    {
 		char_u *ptr;
 
 		netbeans_removed(curbuf, pos.lnum, bd.textcol,
-							    (long)bd.textlen);
+							    (ڊگهو)bd.textlen);
 		// get the line now, it may have been flushed
 		ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
 		netbeans_inserted(curbuf, pos.lnum, bd.textcol,
 						&ptr[bd.textcol], bd.textlen);
 	    }
-#endif
+#جيڪڏهن_پورو
 	}
-	if (did_change)
-	    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
+	إذا (did_change)
+	    بدليو_سٽون(oap->شروعات.lnum, 0, oap->پڇاڙي.lnum + 1, 0L);
     }
-    else				    // not block mode
+    وإلا				    // not block mode
     {
-	if (oap->motion_type == MLINE)
+	إذا (oap->motion_type == MLINE)
 	{
-	    oap->start.col = 0;
-	    pos.col = 0;
-	    oap->end.col = ml_get_len(oap->end.lnum);
-	    if (oap->end.col)
-		--oap->end.col;
+	    oap->شروعات.کانو = 0;
+	    pos.کانو = 0;
+	    oap->پڇاڙي.کانو = ml_get_len(oap->پڇاڙي.lnum);
+	    إذا (oap->پڇاڙي.کانو)
+		--oap->پڇاڙي.کانو;
 	}
-	else if (!oap->inclusive)
-	    dec(&(oap->end));
+	وإلا إذا (!oap->inclusive)
+	    dec(&(oap->پڇاڙي));
 
-	if (pos.lnum == oap->end.lnum)
+	إذا (pos.lnum == oap->پڇاڙي.lnum)
 	    did_change = swapchars(oap->op_type, &pos,
-						  oap->end.col - pos.col + 1);
-	else
-	    for (;;)
+						  oap->پڇاڙي.کانو - pos.کانو + 1);
+	وإلا
+	    لكل (;;)
 	    {
 		did_change |= swapchars(oap->op_type, &pos,
-			pos.lnum == oap->end.lnum ? oap->end.col + 1
+			pos.lnum == oap->پڇاڙي.lnum ? oap->پڇاڙي.کانو + 1
 						  : ml_get_pos_len(&pos));
-		if (LTOREQ_POS(oap->end, pos) || inc(&pos) == -1)
-		    break;
+		إذا (LTOREQ_POS(oap->پڇاڙي, pos) || inc(&pos) == -1)
+		    اكسر;
 	    }
-	if (did_change)
+	إذا (did_change)
 	{
-	    changed_lines(oap->start.lnum, oap->start.col, oap->end.lnum + 1,
+	    بدليو_سٽون(oap->شروعات.lnum, oap->شروعات.کانو, oap->پڇاڙي.lnum + 1,
 									  0L);
-#ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active())
+#جيڪڏهن_وصف_ٿيل FEAT_NETBEANS_INTG
+	    إذا (netbeans_سرگرم())
 	    {
 		char_u *ptr;
-		int count;
+		صحيح ڳڻپ;
 
-		pos = oap->start;
-		while (pos.lnum < oap->end.lnum)
+		pos = oap->شروعات;
+		طالما (pos.lnum < oap->پڇاڙي.lnum)
 		{
 		    ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
-		    count = ml_get_buf_len(curbuf, pos.lnum) - pos.col;
-		    netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
+		    ڳڻپ = ml_get_buf_len(curbuf, pos.lnum) - pos.کانو;
+		    netbeans_removed(curbuf, pos.lnum, pos.کانو, (ڊگهو)ڳڻپ);
 		    // get the line again, it may have been flushed
 		    ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
-		    netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
-		    pos.col = 0;
+		    netbeans_inserted(curbuf, pos.lnum, pos.کانو,
+							&ptr[pos.کانو], ڳڻپ);
+		    pos.کانو = 0;
 		    pos.lnum++;
 		}
-		count = oap->end.col - pos.col + 1;
-		netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
+		ڳڻپ = oap->پڇاڙي.کانو - pos.کانو + 1;
+		netbeans_removed(curbuf, pos.lnum, pos.کانو, (ڊگهو)ڳڻپ);
 		// get the line again, it may have been flushed
 		ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
-		netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
+		netbeans_inserted(curbuf, pos.lnum, pos.کانو,
+							&ptr[pos.کانو], ڳڻپ);
 	    }
-#endif
+#جيڪڏهن_پورو
 	}
     }
 
-    if (!did_change && oap->is_VIsual)
+    إذا (!did_change && oap->is_VIsual)
 	// No change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set '[ and '] marks.
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
+	curbuf->b_op_شروعات = oap->شروعات;
+	curbuf->b_op_پڇاڙي = oap->پڇاڙي;
     }
 
-    if (oap->line_count > p_report)
+    إذا (oap->سٽ_ڳڻپ > p_report)
 	smsg(NGETTEXT("%ld line changed", "%ld lines changed",
-					    oap->line_count), oap->line_count);
+					    oap->سٽ_ڳڻپ), oap->سٽ_ڳڻپ);
 }
 
 /*
@@ -1567,27 +1567,27 @@ op_tilde(oparg_T *oap)
  * Also works correctly when the number of bytes changes.
  * Returns TRUE if some character was changed.
  */
-    static int
-swapchars(int op_type, pos_T *pos, int length)
+    ساكن صحيح
+swapchars(صحيح op_type, pos_T *pos, صحيح ڊيگهائي)
 {
-    int todo;
-    int	did_change = 0;
+    صحيح todo;
+    صحيح	did_change = 0;
 
-    for (todo = length; todo > 0; --todo)
+    لكل (todo = ڊيگهائي; todo > 0; --todo)
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    int len = (*mb_ptr2len)(ml_get_pos(pos));
+	    صحيح len = (*mb_ptr2len)(ml_get_pos(pos));
 
 	    // we're counting bytes, not characters
-	    if (len > 0)
+	    إذا (len > 0)
 		todo -= len - 1;
 	}
 	did_change |= swapchar(op_type, pos);
-	if (inc(pos) == -1)    // at end of file
-	    break;
+	إذا (inc(pos) == -1)    // at end of file
+	    اكسر;
     }
-    return did_change;
+    أرجع did_change;
 }
 
 /*
@@ -1597,20 +1597,20 @@ swapchars(int op_type, pos_T *pos, int length)
  * else swap case of character at 'pos'
  * returns TRUE when something actually changed.
  */
-    int
-swapchar(int op_type, pos_T *pos)
+    صحيح
+swapchar(صحيح op_type, pos_T *pos)
 {
-    int	    c;
-    int	    nc;
+    صحيح	    c;
+    صحيح	    nc;
 
     c = gchar_pos(pos);
 
     // Only do rot13 encoding for ASCII characters.
-    if (c >= 0x80 && op_type == OP_ROT13)
-	return FALSE;
+    إذا (c >= 0x80 && op_type == OP_ROT13)
+	أرجع FALSE;
 
     // ~ is OP_NOP, g~ is OP_TILDE, gU is OP_UPPER
-    if ((op_type == OP_UPPER || op_type == OP_NOP || op_type == OP_TILDE)
+    إذا ((op_type == OP_مٿانهون || op_type == OP_NOP || op_type == OP_TILDE)
 	    && c == 0xdf
 	    && (enc_latin1like || STRCMP(p_enc, "iso-8859-2") == 0))
     {
@@ -1621,67 +1621,67 @@ swapchar(int op_type, pos_T *pos)
 	del_char(FALSE);
 	ins_char(0x1E9E);
 	curwin->w_cursor = sp;
-	return TRUE;
+	أرجع TRUE;
     }
 
-    if (enc_dbcs != 0 && c >= 0x100)	// No lower/uppercase letter
-	return FALSE;
+    إذا (enc_dbcs != 0 && c >= 0x100)	// No lower/uppercase letter
+	أرجع FALSE;
     nc = c;
-    if (MB_ISLOWER(c))
+    إذا (MB_ISLOWER(c))
     {
-	if (op_type == OP_ROT13)
+	إذا (op_type == OP_ROT13)
 	    nc = ROT13(c, 'a');
-	else if (op_type != OP_LOWER)
+	وإلا إذا (op_type != OP_هيٺاهون)
 	    nc = MB_TOUPPER(c);
     }
-    else if (MB_ISUPPER(c))
+    وإلا إذا (MB_ISUPPER(c))
     {
-	if (op_type == OP_ROT13)
+	إذا (op_type == OP_ROT13)
 	    nc = ROT13(c, 'A');
-	else if (op_type != OP_UPPER)
+	وإلا إذا (op_type != OP_مٿانهون)
 	    nc = MB_TOLOWER(c);
     }
-    if (nc != c)
+    إذا (nc != c)
     {
-	if (enc_utf8 && (c >= 0x80 || nc >= 0x80))
+	إذا (enc_utf8 && (c >= 0x80 || nc >= 0x80))
 	{
 	    pos_T   sp = curwin->w_cursor;
 
 	    curwin->w_cursor = *pos;
 	    // don't use del_char(), it also removes composing chars
-	    del_bytes(utf_ptr2len(ml_get_cursor()), FALSE, FALSE);
+	    del_بائيٽون(utf_ptr2len(ml_get_cursor()), FALSE, FALSE);
 	    ins_char(nc);
 	    curwin->w_cursor = sp;
 	}
-	else
+	وإلا
 	    PBYTE(*pos, nc);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * op_insert - Insert and append operators for Visual mode.
  */
-    void
-op_insert(oparg_T *oap, long count1)
+    فراغ
+op_وجهو(oparg_T *oap, ڊگهو count1)
 {
-    long		pre_textlen = 0;
-    colnr_T		ind_pre_col = 0, ind_post_col;
-    int			ind_pre_vcol = 0, ind_post_vcol = 0;
-    struct block_def	bd;
-    int			i;
+    ڊگهو		pre_textlen = 0;
+    colnr_T		ind_pre_کانو = 0, ind_post_کانو;
+    صحيح			ind_pre_vcol = 0, ind_post_vcol = 0;
+    بنية بلاڪ_def	bd;
+    صحيح			i;
     pos_T		t1;
-    pos_T		start_insert;
+    pos_T		شروعات_وجهو;
 
     // edit() changes this - record it for OP_APPEND
     bd.is_MAX = (curwin->w_curswant == MAXCOL);
 
     // vis block is still marked. Get rid of it now.
-    curwin->w_cursor.lnum = oap->start.lnum;
+    curwin->w_cursor.lnum = oap->شروعات.lnum;
     update_screen(UPD_INVERTED);
 
-    if (oap->block_mode)
+    إذا (oap->بلاڪ_گهڻائي)
     {
 	// When 'virtualedit' is used, need to insert the extra spaces before
 	// doing block_prep().  When only "block" is used, virtual edit is
@@ -1690,130 +1690,130 @@ op_insert(oparg_T *oap, long count1)
 	// coladvance_force() uses get_ve_flags() to get the 'virtualedit'
 	// state for the current window.  To override that state, we need to
 	// set the window-local value of ve_flags rather than the global value.
-	if (curwin->w_cursor.coladd > 0)
+	إذا (curwin->w_cursor.coladd > 0)
 	{
-	    int		old_ve_flags = curwin->w_ve_flags;
+	    صحيح		old_ve_flags = curwin->w_ve_flags;
 
-	    if (u_save_cursor() == FAIL)
-		return;
+	    إذا (u_save_cursor() == FAIL)
+		أرجع;
 
 	    curwin->w_ve_flags = VE_ALL;
 	    coladvance_force(oap->op_type == OP_APPEND
-					   ? oap->end_vcol + 1 : getviscol());
-	    if (oap->op_type == OP_APPEND)
-		--curwin->w_cursor.col;
+					   ? oap->پڇاڙي_vcol + 1 : getviscol());
+	    إذا (oap->op_type == OP_APPEND)
+		--curwin->w_cursor.کانو;
 	    curwin->w_ve_flags = old_ve_flags;
 	}
 	// Get the info about the block before entering the text
-	block_prep(oap, &bd, oap->start.lnum, TRUE);
+	بلاڪ_prep(oap, &bd, oap->شروعات.lnum, TRUE);
 	// Get indent information
-	ind_pre_col = (colnr_T)getwhitecols_curline();
+	ind_pre_کانو = (colnr_T)getwhitecols_curline();
 	ind_pre_vcol = get_indent();
-	pre_textlen = ml_get_len(oap->start.lnum) - bd.textcol;
-	if (oap->op_type == OP_APPEND)
+	pre_textlen = ml_get_len(oap->شروعات.lnum) - bd.textcol;
+	إذا (oap->op_type == OP_APPEND)
 	    pre_textlen -= bd.textlen;
     }
 
-    if (oap->op_type == OP_APPEND)
+    إذا (oap->op_type == OP_APPEND)
     {
-	if (oap->block_mode && curwin->w_cursor.coladd == 0)
+	إذا (oap->بلاڪ_گهڻائي && curwin->w_cursor.coladd == 0)
 	{
 	    // Move the cursor to the character right of the block.
-	    curwin->w_set_curswant = true;
-	    while (*ml_get_cursor() != NUL
-		    && (curwin->w_cursor.col < bd.textcol + bd.textlen))
-		++curwin->w_cursor.col;
-	    if (bd.is_short && !bd.is_MAX)
+	    curwin->w_سيٽ_curswant = true;
+	    طالما (*ml_get_cursor() != NUL
+		    && (curwin->w_cursor.کانو < bd.textcol + bd.textlen))
+		++curwin->w_cursor.کانو;
+	    إذا (bd.is_short && !bd.is_MAX)
 	    {
 		// First line was too short, make it longer and adjust the
 		// values in "bd".
-		if (u_save_cursor() == FAIL)
-		    return;
-		for (i = 0; i < bd.endspaces; ++i)
+		إذا (u_save_cursor() == FAIL)
+		    أرجع;
+		لكل (i = 0; i < bd.endspaces; ++i)
 		    ins_char(' ');
 		bd.textlen += bd.endspaces;
 	    }
 	}
-	else
+	وإلا
 	{
-	    curwin->w_cursor = oap->end;
-	    check_cursor_col();
+	    curwin->w_cursor = oap->پڇاڙي;
+	    check_cursor_کانو();
 
 	    // Works just like an 'i'nsert on the next character.
-	    if (!LINEEMPTY(curwin->w_cursor.lnum)
-		    && oap->start_vcol != oap->end_vcol)
+	    إذا (!LINEEMPTY(curwin->w_cursor.lnum)
+		    && oap->شروعات_vcol != oap->پڇاڙي_vcol)
 		inc_cursor();
 	}
     }
 
-    t1 = oap->start;
-    start_insert = curwin->w_cursor;
-    (void)edit(NUL, FALSE, (linenr_T)count1);
+    t1 = oap->شروعات;
+    شروعات_وجهو = curwin->w_cursor;
+    (فراغ)edit(NUL, FALSE, (linenr_T)count1);
 
     // When a tab was inserted, and the characters in front of the tab
     // have been converted to a tab as well, the column of the cursor
     // might have actually been reduced, so need to adjust here.
-    if (t1.lnum == curbuf->b_op_start_orig.lnum
-	    && LT_POS(curbuf->b_op_start_orig, t1))
-	oap->start = curbuf->b_op_start_orig;
+    إذا (t1.lnum == curbuf->b_op_شروعات_orig.lnum
+	    && LT_POS(curbuf->b_op_شروعات_orig, t1))
+	oap->شروعات = curbuf->b_op_شروعات_orig;
 
     // If user has moved off this line, we don't know what to do, so do
     // nothing.
     // Also don't repeat the insert when Insert mode ended with CTRL-C.
-    if (curwin->w_cursor.lnum != oap->start.lnum || got_int)
-	return;
+    إذا (curwin->w_cursor.lnum != oap->شروعات.lnum || got_int)
+	أرجع;
 
-    if (oap->block_mode)
+    إذا (oap->بلاڪ_گهڻائي)
     {
-	int			ins_len;
-	char_u			*firstline, *ins_text;
-	struct block_def	bd2;
-	int			did_indent = FALSE;
+	صحيح			ins_len;
+	char_u			*firstline, *ins_متن;
+	بنية بلاڪ_def	bd2;
+	صحيح			did_indent = FALSE;
 	size_t			len;
-	size_t			add;
+	size_t			جوڙيو;
 	// offset when cursor was moved in insert mode
-	int			offset = 0;
+	صحيح			وٿي = 0;
 
 	// If indent kicked in, the firstline might have changed
 	// but only do that, if the indent actually increased.
-	ind_post_col = (colnr_T)getwhitecols_curline();
-	if (curbuf->b_op_start.col > ind_pre_col && ind_post_col > ind_pre_col)
+	ind_post_کانو = (colnr_T)getwhitecols_curline();
+	إذا (curbuf->b_op_شروعات.کانو > ind_pre_کانو && ind_post_کانو > ind_pre_کانو)
 	{
-	    bd.textcol += ind_post_col - ind_pre_col;
+	    bd.textcol += ind_post_کانو - ind_pre_کانو;
 	    ind_post_vcol = get_indent();
-	    bd.start_vcol += ind_post_vcol - ind_pre_vcol;
+	    bd.شروعات_vcol += ind_post_vcol - ind_pre_vcol;
 	    did_indent = TRUE;
 	}
 
 	// The user may have moved the cursor before inserting something, try
 	// to adjust the block for that.  But only do it, if the difference
 	// does not come from indent kicking in.
-	if (oap->start.lnum == curbuf->b_op_start_orig.lnum
+	إذا (oap->شروعات.lnum == curbuf->b_op_شروعات_orig.lnum
 						  && !bd.is_MAX && !did_indent)
 	{
-	    int t = getviscol2(curbuf->b_op_start_orig.col,
-					       curbuf->b_op_start_orig.coladd);
+	    صحيح t = getviscol2(curbuf->b_op_شروعات_orig.کانو,
+					       curbuf->b_op_شروعات_orig.coladd);
 
-	    if (oap->op_type == OP_INSERT
-		    && oap->start.col + oap->start.coladd
-			    != curbuf->b_op_start_orig.col
-					      + curbuf->b_op_start_orig.coladd)
+	    إذا (oap->op_type == OP_وجهو
+		    && oap->شروعات.کانو + oap->شروعات.coladd
+			    != curbuf->b_op_شروعات_orig.کانو
+					      + curbuf->b_op_شروعات_orig.coladd)
 	    {
-		oap->start.col = curbuf->b_op_start_orig.col;
-		pre_textlen -= t - oap->start_vcol;
-		oap->start_vcol = t;
+		oap->شروعات.کانو = curbuf->b_op_شروعات_orig.کانو;
+		pre_textlen -= t - oap->شروعات_vcol;
+		oap->شروعات_vcol = t;
 	    }
-	    else if (oap->op_type == OP_APPEND
-		    && oap->start.col + oap->start.coladd
-			    >= curbuf->b_op_start_orig.col
-					      + curbuf->b_op_start_orig.coladd)
+	    وإلا إذا (oap->op_type == OP_APPEND
+		    && oap->شروعات.کانو + oap->شروعات.coladd
+			    >= curbuf->b_op_شروعات_orig.کانو
+					      + curbuf->b_op_شروعات_orig.coladd)
 	    {
-		oap->start.col = curbuf->b_op_start_orig.col;
+		oap->شروعات.کانو = curbuf->b_op_شروعات_orig.کانو;
 		// reset pre_textlen to the value of OP_INSERT
 		pre_textlen += bd.textlen;
-		pre_textlen -= t - oap->start_vcol;
-		oap->start_vcol = t;
-		oap->op_type = OP_INSERT;
+		pre_textlen -= t - oap->شروعات_vcol;
+		oap->شروعات_vcol = t;
+		oap->op_type = OP_وجهو;
 	    }
 	}
 
@@ -1823,28 +1823,28 @@ op_insert(oparg_T *oap, long count1)
 	//
 	// if indent was added and the inserted text was after the indent,
 	// correct the selection for the new indent.
-	if (did_indent && bd.textcol - ind_post_col > 0)
+	إذا (did_indent && bd.textcol - ind_post_کانو > 0)
 	{
-	    oap->start.col += ind_post_col - ind_pre_col;
-	    oap->start_vcol += ind_post_vcol - ind_pre_vcol;
-	    oap->end.col += ind_post_col - ind_pre_col;
-	    oap->end_vcol += ind_post_vcol - ind_pre_vcol;
+	    oap->شروعات.کانو += ind_post_کانو - ind_pre_کانو;
+	    oap->شروعات_vcol += ind_post_vcol - ind_pre_vcol;
+	    oap->پڇاڙي.کانو += ind_post_کانو - ind_pre_کانو;
+	    oap->پڇاڙي_vcol += ind_post_vcol - ind_pre_vcol;
 	}
-	block_prep(oap, &bd2, oap->start.lnum, TRUE);
-	if (did_indent && bd.textcol - ind_post_col > 0)
+	بلاڪ_prep(oap, &bd2, oap->شروعات.lnum, TRUE);
+	إذا (did_indent && bd.textcol - ind_post_کانو > 0)
 	{
 	    // undo for where "oap" is used below
-	    oap->start.col -= ind_post_col - ind_pre_col;
-	    oap->start_vcol -= ind_post_vcol - ind_pre_vcol;
-	    oap->end.col -= ind_post_col - ind_pre_col;
-	    oap->end_vcol -= ind_post_vcol - ind_pre_vcol;
+	    oap->شروعات.کانو -= ind_post_کانو - ind_pre_کانو;
+	    oap->شروعات_vcol -= ind_post_vcol - ind_pre_vcol;
+	    oap->پڇاڙي.کانو -= ind_post_کانو - ind_pre_کانو;
+	    oap->پڇاڙي_vcol -= ind_post_vcol - ind_pre_vcol;
 	}
-	if (!bd.is_MAX || bd2.textlen < bd.textlen)
+	إذا (!bd.is_MAX || bd2.textlen < bd.textlen)
 	{
-	    if (oap->op_type == OP_APPEND)
+	    إذا (oap->op_type == OP_APPEND)
 	    {
 		pre_textlen += bd2.textlen - bd.textlen;
-		if (bd2.endspaces)
+		إذا (bd2.endspaces)
 		    --bd2.textlen;
 	    }
 	    bd.textcol = bd2.textcol;
@@ -1855,44 +1855,44 @@ op_insert(oparg_T *oap, long count1)
 	 * Subsequent calls to ml_get() flush the firstline data - take a
 	 * copy of the required string.
 	 */
-	firstline = ml_get(oap->start.lnum);
-	len = ml_get_len(oap->start.lnum);
-	add = bd.textcol;
-	if (oap->op_type == OP_APPEND)
+	firstline = ml_get(oap->شروعات.lnum);
+	len = ml_get_len(oap->شروعات.lnum);
+	جوڙيو = bd.textcol;
+	إذا (oap->op_type == OP_APPEND)
 	{
-	    add += bd.textlen;
+	    جوڙيو += bd.textlen;
 	    // account for pressing cursor in insert mode when '$' was used
-	    if (bd.is_MAX
-		&& (start_insert.lnum == Insstart.lnum
-					   && start_insert.col > Insstart.col))
+	    إذا (bd.is_MAX
+		&& (شروعات_وجهو.lnum == Insstart.lnum
+					   && شروعات_وجهو.کانو > Insstart.کانو))
 	    {
-		offset = (start_insert.col - Insstart.col);
-		add -= offset;
-		if (oap->end_vcol > offset)
-		    oap->end_vcol -= (offset + 1);
-		else
+		وٿي = (شروعات_وجهو.کانو - Insstart.کانو);
+		جوڙيو -= وٿي;
+		إذا (oap->پڇاڙي_vcol > وٿي)
+		    oap->پڇاڙي_vcol -= (وٿي + 1);
+		وإلا
 		    // moved outside of the visual block, what to do?
-		    return;
+		    أرجع;
 	    }
 	}
-	if (add > len)
-	    add = len;  // short line, point to the NUL
-	firstline += add;
-	len -= add;
-	if (pre_textlen >= 0 && (ins_len = (int)len - pre_textlen - offset) > 0)
+	إذا (جوڙيو > len)
+	    جوڙيو = len;  // short line, point to the NUL
+	firstline += جوڙيو;
+	len -= جوڙيو;
+	إذا (pre_textlen >= 0 && (ins_len = (صحيح)len - pre_textlen - وٿي) > 0)
 	{
-	    ins_text = vim_strnsave(firstline, ins_len);
-	    if (ins_text != NULL)
+	    ins_متن = vim_strnsave(firstline, ins_len);
+	    إذا (ins_متن != عدم)
 	    {
 		// block handled here
-		if (u_save(oap->start.lnum,
-					 (linenr_T)(oap->end.lnum + 1)) == OK)
-		    block_insert(oap, ins_text, ins_len, (oap->op_type == OP_INSERT),
+		إذا (u_save(oap->شروعات.lnum,
+					 (linenr_T)(oap->پڇاڙي.lnum + 1)) == OK)
+		    بلاڪ_وجهو(oap, ins_متن, ins_len, (oap->op_type == OP_وجهو),
 									 &bd);
 
-		curwin->w_cursor.col = oap->start.col;
+		curwin->w_cursor.کانو = oap->شروعات.کانو;
 		check_cursor();
-		vim_free(ins_text);
+		vim_free(ins_متن);
 	    }
 	}
     }
@@ -1903,20 +1903,20 @@ op_insert(oparg_T *oap, long count1)
  *
  * return TRUE if edit() returns because of a CTRL-O command
  */
-    int
+    صحيح
 op_change(oparg_T *oap)
 {
     colnr_T		l;
-    int			retval;
+    صحيح			retval;
     linenr_T		linenr;
-    long		pre_textlen = 0;
-    long		pre_indent = 0;
+    ڊگهو		pre_textlen = 0;
+    ڊگهو		pre_indent = 0;
     char_u		*firstline;
-    char_u		*ins_text, *newp, *oldp;
-    struct block_def	bd;
+    char_u		*ins_متن, *newp, *oldp;
+    بنية بلاڪ_def	bd;
 
-    l = oap->start.col;
-    if (oap->motion_type == MLINE)
+    l = oap->شروعات.کانو;
+    إذا (oap->motion_type == MLINE)
     {
 	l = 0;
 	can_si = may_do_si();	// Like opening a new line, do smart indent
@@ -1924,147 +1924,147 @@ op_change(oparg_T *oap)
 
     // First delete the text in the region.  In an empty buffer only need to
     // save for undo
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    إذا (curbuf->b_ml.ml_flags & ML_خالي_جايون)
     {
-	if (u_save_cursor() == FAIL)
-	    return FALSE;
+	إذا (u_save_cursor() == FAIL)
+	    أرجع FALSE;
     }
-    else if (op_delete(oap) == FAIL)
-	return FALSE;
+    وإلا إذا (op_delete(oap) == FAIL)
+	أرجع FALSE;
 
-    if ((l > curwin->w_cursor.col) && !LINEEMPTY(curwin->w_cursor.lnum)
+    إذا ((l > curwin->w_cursor.کانو) && !LINEEMPTY(curwin->w_cursor.lnum)
 							 && !virtual_op)
 	inc_cursor();
 
     // check for still on same line (<CR> in inserted text meaningless)
     // skip blank lines too
-    if (oap->block_mode)
+    إذا (oap->بلاڪ_گهڻائي)
     {
 	// Add spaces before getting the current line length.
-	if (virtual_op && (curwin->w_cursor.coladd > 0
+	إذا (virtual_op && (curwin->w_cursor.coladd > 0
 						    || gchar_cursor() == NUL))
 	    coladvance_force(getviscol());
-	firstline = ml_get(oap->start.lnum);
-	pre_textlen = ml_get_len(oap->start.lnum);
-	pre_indent = (long)getwhitecols(firstline);
-	bd.textcol = curwin->w_cursor.col;
+	firstline = ml_get(oap->شروعات.lnum);
+	pre_textlen = ml_get_len(oap->شروعات.lnum);
+	pre_indent = (ڊگهو)getwhitecols(firstline);
+	bd.textcol = curwin->w_cursor.کانو;
     }
 
-    if (oap->motion_type == MLINE)
+    إذا (oap->motion_type == MLINE)
 	fix_indent();
 
     // Reset finish_op now, don't want it set inside edit().
-    int save_finish_op = finish_op;
-    finish_op = FALSE;
+    صحيح save_پڄاڻي_op = پڄاڻي_op;
+    پڄاڻي_op = FALSE;
 
     retval = edit(NUL, FALSE, (linenr_T)1);
 
-    finish_op = save_finish_op;
+    پڄاڻي_op = save_پڄاڻي_op;
 
     /*
      * In Visual block mode, handle copying the new text to all lines of the
      * block.
      * Don't repeat the insert when Insert mode ended with CTRL-C.
      */
-    if (oap->block_mode && oap->start.lnum != oap->end.lnum && !got_int)
+    إذا (oap->بلاڪ_گهڻائي && oap->شروعات.lnum != oap->پڇاڙي.lnum && !got_int)
     {
-	int	ins_len;
+	صحيح	ins_len;
 
 	// Auto-indenting may have changed the indent.  If the cursor was past
 	// the indent, exclude that indent change from the inserted text.
-	firstline = ml_get(oap->start.lnum);
-	if (bd.textcol > (colnr_T)pre_indent)
+	firstline = ml_get(oap->شروعات.lnum);
+	إذا (bd.textcol > (colnr_T)pre_indent)
 	{
-	    long new_indent = (long)getwhitecols(firstline);
+	    ڊگهو new_indent = (ڊگهو)getwhitecols(firstline);
 
 	    pre_textlen += new_indent - pre_indent;
 	    bd.textcol += new_indent - pre_indent;
 	}
 
-	ins_len = (int)ml_get_len(oap->start.lnum) - pre_textlen;
-	if (ins_len > 0)
+	ins_len = (صحيح)ml_get_len(oap->شروعات.lnum) - pre_textlen;
+	إذا (ins_len > 0)
 	{
 	    // Subsequent calls to ml_get() flush the firstline data - take a
 	    // copy of the inserted text.
-	    if ((ins_text = alloc(ins_len + 1)) != NULL)
+	    إذا ((ins_متن = alloc(ins_len + 1)) != عدم)
 	    {
-		vim_strncpy(ins_text, firstline + bd.textcol, ins_len);
-		for (linenr = oap->start.lnum + 1; linenr <= oap->end.lnum;
+		vim_strncpy(ins_متن, firstline + bd.textcol, ins_len);
+		لكل (linenr = oap->شروعات.lnum + 1; linenr <= oap->پڇاڙي.lnum;
 								     linenr++)
 		{
-		    block_prep(oap, &bd, linenr, TRUE);
-		    if (!bd.is_short || virtual_op)
+		    بلاڪ_prep(oap, &bd, linenr, TRUE);
+		    إذا (!bd.is_short || virtual_op)
 		    {
 			pos_T vpos;
 			size_t newlen;
 
 			// If the block starts in virtual space, count the
 			// initial coladd offset as part of "startspaces"
-			if (bd.is_short)
+			إذا (bd.is_short)
 			{
 			    vpos.lnum = linenr;
-			    (void)getvpos(&vpos, oap->start_vcol);
+			    (فراغ)getvpos(&vpos, oap->شروعات_vcol);
 			}
-			else
+			وإلا
 			    vpos.coladd = 0;
 			oldp = ml_get(linenr);
 			newp = alloc(ml_get_len(linenr) + vpos.coladd + ins_len + 1);
-			if (newp == NULL)
-			    continue;
+			إذا (newp == عدم)
+			    استمر;
 			// copy up to block start
 			mch_memmove(newp, oldp, (size_t)bd.textcol);
 			newlen = bd.textcol;
 			vim_memset(newp + newlen, ' ', (size_t)vpos.coladd);
 			newlen += vpos.coladd;
-			mch_memmove(newp + newlen, ins_text, ins_len);
+			mch_memmove(newp + newlen, ins_متن, ins_len);
 			STRCPY(newp + newlen + ins_len, oldp + bd.textcol);
 			ml_replace(linenr, newp, FALSE);
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
 			// Shift the properties for linenr as edit() would do.
-			if (curbuf->b_has_textprop)
+			إذا (curbuf->b_has_textprop)
 			    adjust_prop_columns(linenr, bd.textcol,
-						     vpos.coladd + (int)ins_len, 0);
-#endif
+						     vpos.coladd + (صحيح)ins_len, 0);
+#جيڪڏهن_پورو
 		    }
 		}
 		check_cursor();
 
-		changed_lines(oap->start.lnum + 1, 0, oap->end.lnum + 1, 0L);
+		بدليو_سٽون(oap->شروعات.lnum + 1, 0, oap->پڇاڙي.lnum + 1, 0L);
 	    }
-	    vim_free(ins_text);
+	    vim_free(ins_متن);
 	}
     }
     auto_format(FALSE, TRUE);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * When the cursor is on the NUL past the end of the line and it should not be
  * there move it left.
  */
-    void
-adjust_cursor_eol(void)
+    فراغ
+adjust_cursor_eol(فراغ)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    بنانشان صحيح cur_ve_flags = get_ve_flags();
 
-    int adj_cursor = (curwin->w_cursor.col > 0
+    صحيح adj_cursor = (curwin->w_cursor.کانو > 0
 				&& gchar_cursor() == NUL
 				&& (cur_ve_flags & VE_ONEMORE) == 0
 				&& (cur_ve_flags & VE_ALL) == 0
-				&& !(restart_edit || (State & MODE_INSERT)));
-    if (!adj_cursor)
-	return;
+				&& !(restart_edit || (State & گهڻائي_وجهو)));
+    إذا (!adj_cursor)
+	أرجع;
 
     // Put the cursor on the last character in the line.
     dec_cursor();
 
-    if (cur_ve_flags == VE_ALL)
+    إذا (cur_ve_flags == VE_ALL)
     {
 	colnr_T	    scol, ecol;
 
 	// Coladd is set to the width of the last character.
-	getvcol(curwin, &curwin->w_cursor, &scol, NULL, &ecol, 0);
+	getvcol(curwin, &curwin->w_cursor, &scol, عدم, &ecol, 0);
 	curwin->w_cursor.coladd = ecol - scol + 1;
     }
 }
@@ -2083,58 +2083,58 @@ adjust_cursor_eol(void)
  */
     char_u *
 skip_comment(
-    char_u   *line,
-    int      process,
-    int	     include_space,
-    int      *is_comment)
+    char_u   *سٽ,
+    صحيح      process,
+    صحيح	     include_space,
+    صحيح      *is_comment)
 {
-    char_u *comment_flags = NULL;
-    int    lead_len;
-    int    leader_offset = get_last_leader_offset(line, &comment_flags);
+    char_u *comment_flags = عدم;
+    صحيح    lead_len;
+    صحيح    leader_وٿي = get_آخري_leader_وٿي(سٽ, &comment_flags);
 
     *is_comment = FALSE;
-    if (leader_offset != -1)
+    إذا (leader_وٿي != -1)
     {
 	// Let's check whether the line ends with an unclosed comment.
 	// If the last comment leader has COM_END in flags, there's no comment.
-	while (*comment_flags)
+	طالما (*comment_flags)
 	{
-	    if (*comment_flags == COM_END
+	    إذا (*comment_flags == COM_پڇاڙي
 		    || *comment_flags == ':')
-		break;
+		اكسر;
 	    ++comment_flags;
 	}
-	if (*comment_flags != COM_END)
+	إذا (*comment_flags != COM_پڇاڙي)
 	    *is_comment = TRUE;
     }
 
-    if (process == FALSE)
-	return line;
+    إذا (process == FALSE)
+	أرجع سٽ;
 
-    lead_len = get_leader_len(line, &comment_flags, FALSE, include_space);
+    lead_len = get_leader_len(سٽ, &comment_flags, FALSE, include_space);
 
-    if (lead_len == 0)
-	return line;
+    إذا (lead_len == 0)
+	أرجع سٽ;
 
     // Find:
     // - COM_END,
     // - colon,
     // whichever comes first.
-    while (*comment_flags)
+    طالما (*comment_flags)
     {
-	if (*comment_flags == COM_END
+	إذا (*comment_flags == COM_پڇاڙي
 		|| *comment_flags == ':')
-	    break;
+	    اكسر;
 	++comment_flags;
     }
 
     // If we found a colon, it means that we are not processing a line
     // starting with a closing part of a three-part comment. That's good,
     // because we don't want to remove those as this would be annoying.
-    if (*comment_flags == ':' || *comment_flags == NUL)
-	line += lead_len;
+    إذا (*comment_flags == ':' || *comment_flags == NUL)
+	سٽ += lead_len;
 
-    return line;
+    أرجع سٽ;
 }
 
 /*
@@ -2147,49 +2147,49 @@ skip_comment(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحيح
 do_join(
-    long    count,
-    int	    insert_space,
-    int	    save_undo,
-    int	    use_formatoptions UNUSED,
-    int	    setmark)
+    ڊگهو    ڳڻپ,
+    صحيح	    وجهو_space,
+    صحيح	    save_undo,
+    صحيح	    use_formatoptions اڻ_استعمال_ٿيل,
+    صحيح	    setmark)
 {
-    char_u	*curr = NULL;
-    char_u      *curr_start = NULL;
+    char_u	*curr = عدم;
+    char_u      *curr_شروعات = عدم;
     char_u	*cend;
     char_u	*newp;
     size_t	newp_len;
     char_u	*spaces;	// number of spaces inserted before a line
-    int		endcurr1 = NUL;
-    int		endcurr2 = NUL;
-    int		currsize = 0;	// size of the current line
-    int		sumsize = 0;	// size of the long new line
+    صحيح		endcurr1 = NUL;
+    صحيح		endcurr2 = NUL;
+    صحيح		currsize = 0;	// size of the current line
+    صحيح		sumsize = 0;	// size of the long new line
     linenr_T	t;
-    colnr_T	col = 0;
-    int		ret = OK;
-    int		*comments = NULL;
-    int		remove_comments = (use_formatoptions == TRUE)
+    colnr_T	کانو = 0;
+    صحيح		ret = OK;
+    صحيح		*comments = عدم;
+    صحيح		remove_comments = (use_formatoptions == TRUE)
 				  && has_format_option(FO_REMOVE_COMS);
-    int		prev_was_comment;
+    صحيح		prev_was_comment;
 
-    if (save_undo && u_save((linenr_T)(curwin->w_cursor.lnum - 1),
-			    (linenr_T)(curwin->w_cursor.lnum + count)) == FAIL)
-	return FAIL;
+    إذا (save_undo && u_save((linenr_T)(curwin->w_cursor.lnum - 1),
+			    (linenr_T)(curwin->w_cursor.lnum + ڳڻپ)) == FAIL)
+	أرجع FAIL;
 
     // Allocate an array to store the number of spaces inserted before each
     // line.  We will use it to pre-compute the length of the new line and the
     // proper placement of each original line in the new one.
-    spaces = lalloc_clear(count, TRUE);
-    if (spaces == NULL)
-	return FAIL;
-    if (remove_comments)
+    spaces = lalloc_clear(ڳڻپ, TRUE);
+    إذا (spaces == عدم)
+	أرجع FAIL;
+    إذا (remove_comments)
     {
-	comments = lalloc_clear(count * sizeof(int), TRUE);
-	if (comments == NULL)
+	comments = lalloc_clear(ڳڻپ * حجم(صحيح), TRUE);
+	إذا (comments == عدم)
 	{
 	    vim_free(spaces);
-	    return FAIL;
+	    أرجع FAIL;
 	}
     }
 
@@ -2198,36 +2198,36 @@ do_join(
      * and setup the array of space strings lengths
      * This loops forward over the joined lines.
      */
-    for (t = 0; t < count; ++t)
+    لكل (t = 0; t < ڳڻپ; ++t)
     {
-	curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + t));
-	if (t == 0 && setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	curr = curr_شروعات = ml_get((linenr_T)(curwin->w_cursor.lnum + t));
+	إذا (t == 0 && setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set the '[ mark.
-	    curwin->w_buffer->b_op_start.lnum = curwin->w_cursor.lnum;
-	    curwin->w_buffer->b_op_start.col  = (colnr_T)STRLEN(curr);
+	    curwin->w_بفر->b_op_شروعات.lnum = curwin->w_cursor.lnum;
+	    curwin->w_بفر->b_op_شروعات.کانو  = (colnr_T)STRLEN(curr);
 	}
-	if (remove_comments)
+	إذا (remove_comments)
 	{
 	    // We don't want to remove the comment leader if the
 	    // previous line is not a comment.
-	    if (t > 0 && prev_was_comment)
+	    إذا (t > 0 && prev_was_comment)
 	    {
 
-		char_u *new_curr = skip_comment(curr, TRUE, insert_space,
+		char_u *new_curr = skip_comment(curr, TRUE, وجهو_space,
 							   &prev_was_comment);
-		comments[t] = (int)(new_curr - curr);
+		comments[t] = (صحيح)(new_curr - curr);
 		curr = new_curr;
 	    }
-	    else
-		curr = skip_comment(curr, FALSE, insert_space,
+	    وإلا
+		curr = skip_comment(curr, FALSE, وجهو_space,
 							   &prev_was_comment);
 	}
 
-	if (insert_space && t > 0)
+	إذا (وجهو_space && t > 0)
 	{
 	    curr = skipwhite(curr);
-	    if (*curr != NUL && *curr != ')'
+	    إذا (*curr != NUL && *curr != ')'
 		    && sumsize != 0 && endcurr1 != TAB
 		    && (!has_format_option(FO_MBYTE_JOIN)
 			|| (mb_ptr2char(curr) < 0x100 && endcurr1 < 0x100))
@@ -2239,59 +2239,59 @@ do_join(
 	       )
 	    {
 		// don't add a space if the line is ending in a space
-		if (endcurr1 == ' ')
+		إذا (endcurr1 == ' ')
 		    endcurr1 = endcurr2;
-		else
+		وإلا
 		    ++spaces[t];
 		// extra space when 'joinspaces' set and line ends in '.'
-		if (       p_js
+		إذا (       p_js
 			&& (endcurr1 == '.'
-			    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
+			    || (vim_strchr(p_cpo, CPO_JOINSP) == عدم
 				&& (endcurr1 == '?' || endcurr1 == '!'))))
 		    ++spaces[t];
 	    }
 	}
-	currsize = (int)STRLEN(curr);
+	currsize = (صحيح)STRLEN(curr);
 	sumsize += currsize + spaces[t];
 	endcurr1 = endcurr2 = NUL;
-	if (insert_space && currsize > 0)
+	إذا (وجهو_space && currsize > 0)
 	{
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
 		cend = curr + currsize;
-		MB_PTR_BACK(curr, cend);
+		MB_PTR_پٺ(curr, cend);
 		endcurr1 = (*mb_ptr2char)(cend);
-		if (cend > curr)
+		إذا (cend > curr)
 		{
-		    MB_PTR_BACK(curr, cend);
+		    MB_PTR_پٺ(curr, cend);
 		    endcurr2 = (*mb_ptr2char)(cend);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		endcurr1 = *(curr + currsize - 1);
-		if (currsize > 1)
+		إذا (currsize > 1)
 		    endcurr2 = *(curr + currsize - 2);
 	    }
 	}
-	line_breakcheck();
-	if (got_int)
+	سٽ_breakcheck();
+	إذا (got_int)
 	{
 	    ret = FAIL;
-	    goto theend;
+	    اذهب theend;
 	}
     }
 
     // store the column position before last line
-    col = sumsize - currsize - spaces[count - 1];
+    کانو = sumsize - currsize - spaces[ڳڻپ - 1];
 
     // allocate the space for the new line
     newp_len = sumsize + 1;
     newp = alloc(newp_len);
-    if (newp == NULL)
+    إذا (newp == عدم)
     {
 	ret = FAIL;
-	goto theend;
+	اذهب theend;
     }
     cend = newp + sumsize;
     *cend = 0;
@@ -2304,24 +2304,24 @@ do_join(
      * column.  This is not Vi compatible, but Vi deletes the marks, thus that
      * should not really be a problem.
      */
-#ifdef FEAT_PROP_POPUP
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
     unpacked_memline_T um = um_open_at_no_props(
-				curwin->w_buffer, curwin->w_cursor.lnum, 0);
+				curwin->w_بفر, curwin->w_cursor.lnum, 0);
     // um_open_at_no_props may have invalidated "curr".
-    int curr_off = (int)(curr - curr_start);
+    صحيح curr_off = (صحيح)(curr - curr_شروعات);
 
-    curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + count - 1));
+    curr = curr_شروعات = ml_get((linenr_T)(curwin->w_cursor.lnum + ڳڻپ - 1));
     curr += curr_off;
-#endif
+#جيڪڏهن_پورو
 
-    for (t = count - 1; ; --t)
+    لكل (t = ڳڻپ - 1; ; --t)
     {
-	int spaces_removed;
+	صحيح spaces_removed;
 
 	cend -= currsize;
 	mch_memmove(cend, curr, (size_t)currsize);
 
-	if (spaces[t] > 0)
+	إذا (spaces[t] > 0)
 	{
 	    cend -= spaces[t];
 	    vim_memset(cend, ' ', (size_t)(spaces[t]));
@@ -2329,46 +2329,46 @@ do_join(
 
 	// If deleting more spaces than adding, the cursor moves no more than
 	// what is added if it is inside these spaces.
-	spaces_removed = (curr - curr_start) - spaces[t];
+	spaces_removed = (curr - curr_شروعات) - spaces[t];
 
-	mark_col_adjust(curwin->w_cursor.lnum + t, (colnr_T)0, -t,
-			 (long)(cend - newp - spaces_removed), spaces_removed);
-#ifdef FEAT_PROP_POPUP
+	mark_کانو_adjust(curwin->w_cursor.lnum + t, (colnr_T)0, -t,
+			 (ڊگهو)(cend - newp - spaces_removed), spaces_removed);
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
 	prepend_joined_props(&um, curwin->w_cursor.lnum + t,
-		t == count - 1, (long)(cend - newp), spaces_removed);
-#endif
-	if (t == 0)
-	    break;
-	curr = curr_start = ml_get((linenr_T)(curwin->w_cursor.lnum + t - 1));
-	if (remove_comments)
+		t == ڳڻپ - 1, (ڊگهو)(cend - newp), spaces_removed);
+#جيڪڏهن_پورو
+	إذا (t == 0)
+	    اكسر;
+	curr = curr_شروعات = ml_get((linenr_T)(curwin->w_cursor.lnum + t - 1));
+	إذا (remove_comments)
 	    curr += comments[t - 1];
-	if (insert_space && t > 1)
+	إذا (وجهو_space && t > 1)
 	    curr = skipwhite(curr);
-	currsize = (int)STRLEN(curr);
+	currsize = (صحيح)STRLEN(curr);
     }
 
-#ifdef FEAT_PROP_POPUP
-    if (um.buf != NULL)
+#جيڪڏهن_وصف_ٿيل FEAT_PROP_POPUP
+    إذا (um.buf != عدم)
     {
-	um_set_text(&um, newp);
-	um_reverse_props(&um);
+	um_سيٽ_متن(&um, newp);
+	um_ابتو_props(&um);
 	um_close(&um);
-	newp = NULL;  // um_set_text took ownership
+	newp = عدم;  // um_set_text took ownership
     }
-    else
-#endif
+    وإلا
+#جيڪڏهن_پورو
     ml_replace_len(curwin->w_cursor.lnum, newp, (colnr_T)newp_len, TRUE, FALSE);
 
-    if (setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا (setmark && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set the '] mark.
-	curwin->w_buffer->b_op_end.lnum = curwin->w_cursor.lnum;
-	curwin->w_buffer->b_op_end.col  = (colnr_T)sumsize;
+	curwin->w_بفر->b_op_پڇاڙي.lnum = curwin->w_cursor.lnum;
+	curwin->w_بفر->b_op_پڇاڙي.کانو  = (colnr_T)sumsize;
     }
 
     // Only report the change in the first line here, del_lines() will report
     // the deleted line.
-    changed_lines(curwin->w_cursor.lnum, currsize,
+    بدليو_سٽون(curwin->w_cursor.lnum, currsize,
 					       curwin->w_cursor.lnum + 1, 0L);
     /*
      * Delete following lines. To do this we move the cursor there
@@ -2377,7 +2377,7 @@ do_join(
      */
     t = curwin->w_cursor.lnum;
     ++curwin->w_cursor.lnum;
-    del_lines(count - 1, FALSE);
+    del_سٽون(ڳڻپ - 1, FALSE);
     curwin->w_cursor.lnum = t;
 
     /*
@@ -2385,21 +2385,21 @@ do_join(
      * Vi compatible: use the column of the first join
      * vim:	      use the column of the last join
      */
-    curwin->w_cursor.col =
-		    (vim_strchr(p_cpo, CPO_JOINCOL) != NULL ? currsize : col);
-    check_cursor_col();
+    curwin->w_cursor.کانو =
+		    (vim_strchr(p_cpo, CPO_JOINCOL) != عدم ? currsize : کانو);
+    check_cursor_کانو();
 
     curwin->w_cursor.coladd = 0;
-    curwin->w_set_curswant = true;
+    curwin->w_سيٽ_curswant = true;
 
 theend:
     vim_free(spaces);
-    if (remove_comments)
+    إذا (remove_comments)
 	vim_free(comments);
-    return ret;
+    أرجع ret;
 }
 
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 /*
  * TODO: consider using "tailp" of win_lbr_chartabsize() instead of temporarily
  * resetting 'linebreak'.
@@ -2407,31 +2407,31 @@ theend:
  * Reset 'linebreak' and take care of side effects.
  * Returns the previous value, to be passed to restore_lbr().
  */
-    int
-reset_lbr(void)
+    صحيح
+reset_lbr(فراغ)
 {
-    if (!curwin->w_p_lbr)
-	return FALSE;
+    إذا (!curwin->w_p_lbr)
+	أرجع FALSE;
     // changing 'linebreak' may require w_virtcol to be updated
     curwin->w_p_lbr = FALSE;
     curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL);
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Restore 'linebreak' and take care of side effects.
  */
-    void
-restore_lbr(int lbr_saved)
+    فراغ
+restore_lbr(صحيح lbr_saved)
 {
-    if (curwin->w_p_lbr || !lbr_saved)
-	return;
+    إذا (curwin->w_p_lbr || !lbr_saved)
+	أرجع;
 
     // changing 'linebreak' may require w_virtcol to be updated
     curwin->w_p_lbr = TRUE;
     curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL);
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * prepare a few things for block mode yank/delete/tilde
@@ -2446,51 +2446,51 @@ restore_lbr(int lbr_saved)
  * - start/endspaces is the number of columns of the first/last yanked char
  *   that are to be yanked.
  */
-    void
-block_prep(
+    فراغ
+بلاڪ_prep(
     oparg_T		*oap,
-    struct block_def	*bdp,
+    بنية بلاڪ_def	*bdp,
     linenr_T		lnum,
-    int			is_del)
+    صحيح			is_del)
 {
-    int		incr = 0;
+    صحيح		incr = 0;
     char_u	*pend;
     char_u	*pstart;
-    char_u	*line;
+    char_u	*سٽ;
     char_u	*prev_pstart;
     char_u	*prev_pend;
     chartabsize_T cts;
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Avoid a problem with unwanted linebreaks in block mode.
-    int		lbr_saved = reset_lbr();
-#endif
+    صحيح		lbr_saved = reset_lbr();
+#جيڪڏهن_پورو
 
     bdp->startspaces = 0;
     bdp->endspaces = 0;
     bdp->textlen = 0;
-    bdp->start_vcol = 0;
-    bdp->end_vcol = 0;
+    bdp->شروعات_vcol = 0;
+    bdp->پڇاڙي_vcol = 0;
     bdp->is_short = FALSE;
     bdp->is_oneChar = FALSE;
     bdp->pre_whitesp = 0;
     bdp->pre_whitesp_c = 0;
-    bdp->end_char_vcols = 0;
-    bdp->start_char_vcols = 0;
+    bdp->پڇاڙي_char_vcols = 0;
+    bdp->شروعات_char_vcols = 0;
 
-    line = ml_get(lnum);
-    prev_pstart = line;
-    init_chartabsize_arg(&cts, curwin, lnum, bdp->start_vcol, line, line);
-    while (cts.cts_vcol < oap->start_vcol && *cts.cts_ptr != NUL)
+    سٽ = ml_get(lnum);
+    prev_pstart = سٽ;
+    init_chartabsize_arg(&cts, curwin, lnum, bdp->شروعات_vcol, سٽ, سٽ);
+    طالما (cts.cts_vcol < oap->شروعات_vcol && *cts.cts_ptr != NUL)
     {
 	// Count a tab for what it's worth (if list mode not on)
 	incr = lbr_chartabsize(&cts);
 	cts.cts_vcol += incr;
-	if (VIM_ISWHITE(*cts.cts_ptr))
+	إذا (VIM_ISWHITE(*cts.cts_ptr))
 	{
 	    bdp->pre_whitesp += incr;
 	    bdp->pre_whitesp_c++;
 	}
-	else
+	وإلا
 	{
 	    bdp->pre_whitesp = 0;
 	    bdp->pre_whitesp_c = 0;
@@ -2498,68 +2498,68 @@ block_prep(
 	prev_pstart = cts.cts_ptr;
 	MB_PTR_ADV(cts.cts_ptr);
     }
-    bdp->start_vcol = cts.cts_vcol;
+    bdp->شروعات_vcol = cts.cts_vcol;
     pstart = cts.cts_ptr;
     clear_chartabsize_arg(&cts);
 
-    bdp->start_char_vcols = incr;
-    if (bdp->start_vcol < oap->start_vcol)	// line too short
+    bdp->شروعات_char_vcols = incr;
+    إذا (bdp->شروعات_vcol < oap->شروعات_vcol)	// line too short
     {
-	bdp->end_vcol = bdp->start_vcol;
+	bdp->پڇاڙي_vcol = bdp->شروعات_vcol;
 	bdp->is_short = TRUE;
-	if (!is_del || oap->op_type == OP_APPEND)
-	    bdp->endspaces = oap->end_vcol - oap->start_vcol + 1;
+	إذا (!is_del || oap->op_type == OP_APPEND)
+	    bdp->endspaces = oap->پڇاڙي_vcol - oap->شروعات_vcol + 1;
     }
-    else
+    وإلا
     {
 	// notice: this converts partly selected Multibyte characters to
 	// spaces, too.
-	bdp->startspaces = bdp->start_vcol - oap->start_vcol;
-	if (is_del && bdp->startspaces)
-	    bdp->startspaces = bdp->start_char_vcols - bdp->startspaces;
+	bdp->startspaces = bdp->شروعات_vcol - oap->شروعات_vcol;
+	إذا (is_del && bdp->startspaces)
+	    bdp->startspaces = bdp->شروعات_char_vcols - bdp->startspaces;
 	pend = pstart;
-	bdp->end_vcol = bdp->start_vcol;
-	if (bdp->end_vcol > oap->end_vcol)	// it's all in one character
+	bdp->پڇاڙي_vcol = bdp->شروعات_vcol;
+	إذا (bdp->پڇاڙي_vcol > oap->پڇاڙي_vcol)	// it's all in one character
 	{
 	    bdp->is_oneChar = TRUE;
-	    if (oap->op_type == OP_INSERT)
-		bdp->endspaces = bdp->start_char_vcols - bdp->startspaces;
-	    else if (oap->op_type == OP_APPEND)
+	    إذا (oap->op_type == OP_وجهو)
+		bdp->endspaces = bdp->شروعات_char_vcols - bdp->startspaces;
+	    وإلا إذا (oap->op_type == OP_APPEND)
 	    {
-		bdp->startspaces += oap->end_vcol - oap->start_vcol + 1;
-		bdp->endspaces = bdp->start_char_vcols - bdp->startspaces;
+		bdp->startspaces += oap->پڇاڙي_vcol - oap->شروعات_vcol + 1;
+		bdp->endspaces = bdp->شروعات_char_vcols - bdp->startspaces;
 	    }
-	    else
+	    وإلا
 	    {
-		bdp->startspaces = oap->end_vcol - oap->start_vcol + 1;
-		if (is_del && oap->op_type != OP_LSHIFT)
+		bdp->startspaces = oap->پڇاڙي_vcol - oap->شروعات_vcol + 1;
+		إذا (is_del && oap->op_type != OP_LSHIFT)
 		{
 		    // just putting the sum of those two into
 		    // bdp->startspaces doesn't work for Visual replace,
 		    // so we have to split the tab in two
-		    bdp->startspaces = bdp->start_char_vcols
-					- (bdp->start_vcol - oap->start_vcol);
-		    bdp->endspaces = bdp->end_vcol - oap->end_vcol - 1;
+		    bdp->startspaces = bdp->شروعات_char_vcols
+					- (bdp->شروعات_vcol - oap->شروعات_vcol);
+		    bdp->endspaces = bdp->پڇاڙي_vcol - oap->پڇاڙي_vcol - 1;
 		}
 	    }
 	}
-	else
+	وإلا
 	{
-	    init_chartabsize_arg(&cts, curwin, lnum, bdp->end_vcol,
-								  line, pend);
+	    init_chartabsize_arg(&cts, curwin, lnum, bdp->پڇاڙي_vcol,
+								  سٽ, pend);
 	    prev_pend = pend;
-	    while (cts.cts_vcol <= oap->end_vcol && *cts.cts_ptr != NUL)
+	    طالما (cts.cts_vcol <= oap->پڇاڙي_vcol && *cts.cts_ptr != NUL)
 	    {
 		// count a tab for what it's worth (if list mode not on)
 		prev_pend = cts.cts_ptr;
 		incr = lbr_chartabsize_adv(&cts);
 		cts.cts_vcol += incr;
 	    }
-	    bdp->end_vcol = cts.cts_vcol;
+	    bdp->پڇاڙي_vcol = cts.cts_vcol;
 	    pend = cts.cts_ptr;
 	    clear_chartabsize_arg(&cts);
 
-	    if (bdp->end_vcol <= oap->end_vcol
+	    إذا (bdp->پڇاڙي_vcol <= oap->پڇاڙي_vcol
 		    && (!is_del
 			|| oap->op_type == OP_APPEND
 			|| oap->op_type == OP_REPLACE)) // line too short
@@ -2569,108 +2569,108 @@ block_prep(
 		// Disadvantage: can lead to trailing spaces when the line is
 		// short where the text is put
 		// if (!is_del || oap->op_type == OP_APPEND)
-		if (oap->op_type == OP_APPEND || virtual_op)
-		    bdp->endspaces = oap->end_vcol - bdp->end_vcol
+		إذا (oap->op_type == OP_APPEND || virtual_op)
+		    bdp->endspaces = oap->پڇاڙي_vcol - bdp->پڇاڙي_vcol
 							     + oap->inclusive;
-		else
+		وإلا
 		    bdp->endspaces = 0; // replace doesn't add characters
 	    }
-	    else if (bdp->end_vcol > oap->end_vcol)
+	    وإلا إذا (bdp->پڇاڙي_vcol > oap->پڇاڙي_vcol)
 	    {
-		bdp->endspaces = bdp->end_vcol - oap->end_vcol - 1;
-		if (!is_del && bdp->endspaces)
+		bdp->endspaces = bdp->پڇاڙي_vcol - oap->پڇاڙي_vcol - 1;
+		إذا (!is_del && bdp->endspaces)
 		{
 		    bdp->endspaces = incr - bdp->endspaces;
-		    if (pend != pstart)
+		    إذا (pend != pstart)
 			pend = prev_pend;
 		}
 	    }
 	}
-	bdp->end_char_vcols = incr;
-	if (is_del && bdp->startspaces)
+	bdp->پڇاڙي_char_vcols = incr;
+	إذا (is_del && bdp->startspaces)
 	    pstart = prev_pstart;
-	bdp->textlen = (int)(pend - pstart);
+	bdp->textlen = (صحيح)(pend - pstart);
     }
-    bdp->textcol = (colnr_T) (pstart - line);
+    bdp->textcol = (colnr_T) (pstart - سٽ);
     bdp->textstart = pstart;
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
     restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Get block text from "start" to "end"
  */
-    void
-charwise_block_prep(
-    pos_T		start,
-    pos_T		end,
-    struct block_def	*bdp,
+    فراغ
+charwise_بلاڪ_prep(
+    pos_T		شروعات,
+    pos_T		پڇاڙي,
+    بنية بلاڪ_def	*bdp,
     linenr_T		lnum,
-    int			inclusive)
+    صحيح			inclusive)
 {
     colnr_T startcol = 0, endcol = MAXCOL;
     colnr_T cs, ce;
     char_u *p;
-    int	plen = ml_get_len(lnum);
+    صحيح	plen = ml_get_len(lnum);
 
     p = ml_get(lnum);
     bdp->startspaces = 0;
     bdp->endspaces = 0;
     bdp->is_oneChar = FALSE;
-    bdp->start_char_vcols = 0;
+    bdp->شروعات_char_vcols = 0;
 
-    if (lnum == start.lnum)
+    إذا (lnum == شروعات.lnum)
     {
-	startcol = start.col;
-	if (virtual_op)
+	startcol = شروعات.کانو;
+	إذا (virtual_op)
 	{
-	    getvcol(curwin, &start, &cs, NULL, &ce, 0);
-	    if (ce != cs && start.coladd > 0)
+	    getvcol(curwin, &شروعات, &cs, عدم, &ce, 0);
+	    إذا (ce != cs && شروعات.coladd > 0)
 	    {
 		// Part of a tab selected -- but don't
 		// double-count it.
-		bdp->start_char_vcols = ce - cs + 1;
-		bdp->startspaces = bdp->start_char_vcols - start.coladd;
-		if (bdp->startspaces < 0)
+		bdp->شروعات_char_vcols = ce - cs + 1;
+		bdp->startspaces = bdp->شروعات_char_vcols - شروعات.coladd;
+		إذا (bdp->startspaces < 0)
 		    bdp->startspaces = 0;
 		startcol++;
 	    }
 	}
     }
 
-    if (lnum == end.lnum)
+    إذا (lnum == پڇاڙي.lnum)
     {
-	endcol = end.col;
-	if (virtual_op)
+	endcol = پڇاڙي.کانو;
+	إذا (virtual_op)
 	{
-	    getvcol(curwin, &end, &cs, NULL, &ce, 0);
-	    if (p[endcol] == NUL || (cs + end.coladd < ce
+	    getvcol(curwin, &پڇاڙي, &cs, عدم, &ce, 0);
+	    إذا (p[endcol] == NUL || (cs + پڇاڙي.coladd < ce
 			// Don't add space for double-wide
 			// char; endcol will be on last byte
 			// of multi-byte char.
-			&& (*mb_head_off)(p, p + endcol) == 0))
+			&& (*mb_سر_off)(p, p + endcol) == 0))
 	    {
-		if (start.lnum == end.lnum && start.col == end.col)
+		إذا (شروعات.lnum == پڇاڙي.lnum && شروعات.کانو == پڇاڙي.کانو)
 		{
 		    // Special case: inside a single char
 		    bdp->is_oneChar = TRUE;
-		    bdp->startspaces = end.coladd - start.coladd + inclusive;
+		    bdp->startspaces = پڇاڙي.coladd - شروعات.coladd + inclusive;
 		    endcol = startcol;
 		}
-		else
+		وإلا
 		{
-		    bdp->endspaces = end.coladd + inclusive;
+		    bdp->endspaces = پڇاڙي.coladd + inclusive;
 		    endcol -= inclusive;
 		}
 	    }
 	}
     }
-    if (endcol == MAXCOL)
+    إذا (endcol == MAXCOL)
 	endcol = ml_get_len(lnum);
-    if (startcol > endcol || bdp->is_oneChar)
+    إذا (startcol > endcol || bdp->is_oneChar)
 	bdp->textlen = 0;
-    else
+    وإلا
 	bdp->textlen = endcol - startcol + inclusive;
     bdp->textcol = startcol;
     bdp->textstart = startcol <= plen ? p + startcol : p;
@@ -2679,130 +2679,130 @@ charwise_block_prep(
 /*
  * Handle the add/subtract operator.
  */
-    void
+    فراغ
 op_addsub(
     oparg_T	*oap,
     linenr_T	Prenum1,	    // Amount of add/subtract
-    int		g_cmd)		    // was g<c-a>/g<c-x>
+    صحيح		g_cmd)		    // was g<c-a>/g<c-x>
 {
     pos_T		pos;
-    struct block_def	bd;
-    int			change_cnt = 0;
+    بنية بلاڪ_def	bd;
+    صحيح			change_cnt = 0;
     linenr_T		amount = Prenum1;
 
     // do_addsub() might trigger re-evaluation of 'foldexpr' halfway, when the
     // buffer is not completely updated yet. Postpone updating folds until before
     // the call to changed_lines().
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
     disable_fold_update++;
-#endif
+#جيڪڏهن_پورو
 
-    if (!VIsual_active)
+    إذا (!VIsual_سرگرم)
     {
 	pos = curwin->w_cursor;
-	if (u_save_cursor() == FAIL)
+	إذا (u_save_cursor() == FAIL)
 	{
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	    disable_fold_update--;
-#endif
-	    return;
+#جيڪڏهن_پورو
+	    أرجع;
 	}
 	change_cnt = do_addsub(oap->op_type, &pos, 0, amount);
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	disable_fold_update--;
-#endif
-	if (change_cnt)
-	    changed_lines(pos.lnum, 0, pos.lnum + 1, 0L);
+#جيڪڏهن_پورو
+	إذا (change_cnt)
+	    بدليو_سٽون(pos.lnum, 0, pos.lnum + 1, 0L);
     }
-    else
+    وإلا
     {
-	int	one_change;
-	int	length;
+	صحيح	one_change;
+	صحيح	ڊيگهائي;
 	pos_T	startpos;
 
-	if (u_save((linenr_T)(oap->start.lnum - 1),
-					(linenr_T)(oap->end.lnum + 1)) == FAIL)
+	إذا (u_save((linenr_T)(oap->شروعات.lnum - 1),
+					(linenr_T)(oap->پڇاڙي.lnum + 1)) == FAIL)
 	{
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	    disable_fold_update--;
-#endif
-	    return;
+#جيڪڏهن_پورو
+	    أرجع;
 	}
 
-	pos = oap->start;
-	for (; pos.lnum <= oap->end.lnum; ++pos.lnum)
+	pos = oap->شروعات;
+	لكل (; pos.lnum <= oap->پڇاڙي.lnum; ++pos.lnum)
 	{
-	    if (oap->block_mode)		    // Visual block mode
+	    إذا (oap->بلاڪ_گهڻائي)		    // Visual block mode
 	    {
-		block_prep(oap, &bd, pos.lnum, FALSE);
-		pos.col = bd.textcol;
-		length = bd.textlen;
+		بلاڪ_prep(oap, &bd, pos.lnum, FALSE);
+		pos.کانو = bd.textcol;
+		ڊيگهائي = bd.textlen;
 	    }
-	    else if (oap->motion_type == MLINE)
+	    وإلا إذا (oap->motion_type == MLINE)
 	    {
-		curwin->w_cursor.col = 0;
-		pos.col = 0;
-		length = ml_get_len(pos.lnum);
+		curwin->w_cursor.کانو = 0;
+		pos.کانو = 0;
+		ڊيگهائي = ml_get_len(pos.lnum);
 	    }
-	    else // oap->motion_type == MCHAR
+	    وإلا // oap->motion_type == MCHAR
 	    {
-		if (pos.lnum == oap->start.lnum && !oap->inclusive)
-		    dec(&(oap->end));
-		length = ml_get_len(pos.lnum);
-		pos.col = 0;
-		if (pos.lnum == oap->start.lnum)
+		إذا (pos.lnum == oap->شروعات.lnum && !oap->inclusive)
+		    dec(&(oap->پڇاڙي));
+		ڊيگهائي = ml_get_len(pos.lnum);
+		pos.کانو = 0;
+		إذا (pos.lnum == oap->شروعات.lnum)
 		{
-		    pos.col += oap->start.col;
-		    length -= oap->start.col;
+		    pos.کانو += oap->شروعات.کانو;
+		    ڊيگهائي -= oap->شروعات.کانو;
 		}
-		if (pos.lnum == oap->end.lnum)
+		إذا (pos.lnum == oap->پڇاڙي.lnum)
 		{
-		    length = ml_get_len(oap->end.lnum);
-		    if (oap->end.col >= length)
-			oap->end.col = length - 1;
-		    length = oap->end.col - pos.col + 1;
+		    ڊيگهائي = ml_get_len(oap->پڇاڙي.lnum);
+		    إذا (oap->پڇاڙي.کانو >= ڊيگهائي)
+			oap->پڇاڙي.کانو = ڊيگهائي - 1;
+		    ڊيگهائي = oap->پڇاڙي.کانو - pos.کانو + 1;
 		}
 	    }
-	    one_change = do_addsub(oap->op_type, &pos, length, amount);
-	    if (one_change)
+	    one_change = do_addsub(oap->op_type, &pos, ڊيگهائي, amount);
+	    إذا (one_change)
 	    {
 		// Remember the start position of the first change.
-		if (change_cnt == 0)
-		    startpos = curbuf->b_op_start;
+		إذا (change_cnt == 0)
+		    startpos = curbuf->b_op_شروعات;
 		++change_cnt;
 	    }
 
-#ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active() && one_change)
+#جيڪڏهن_وصف_ٿيل FEAT_NETBEANS_INTG
+	    إذا (netbeans_سرگرم() && one_change)
 	    {
 		char_u *ptr;
 
-		netbeans_removed(curbuf, pos.lnum, pos.col, (long)length);
+		netbeans_removed(curbuf, pos.lnum, pos.کانو, (ڊگهو)ڊيگهائي);
 		ptr = ml_get_buf(curbuf, pos.lnum, FALSE);
-		netbeans_inserted(curbuf, pos.lnum, pos.col,
-						&ptr[pos.col], length);
+		netbeans_inserted(curbuf, pos.lnum, pos.کانو,
+						&ptr[pos.کانو], ڊيگهائي);
 	    }
-#endif
-	    if (g_cmd && one_change)
+#جيڪڏهن_پورو
+	    إذا (g_cmd && one_change)
 		amount += Prenum1;
 	}
 
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	disable_fold_update--;
-#endif
-	if (change_cnt)
-	    changed_lines(oap->start.lnum, 0, oap->end.lnum + 1, 0L);
+#جيڪڏهن_پورو
+	إذا (change_cnt)
+	    بدليو_سٽون(oap->شروعات.lnum, 0, oap->پڇاڙي.lnum + 1, 0L);
 
-	if (!change_cnt && oap->is_VIsual)
+	إذا (!change_cnt && oap->is_VIsual)
 	    // No change: need to remove the Visual selection
 	    redraw_curbuf_later(UPD_INVERTED);
 
 	// Set '[ mark if something changed. Keep the last end
 	// position from do_addsub().
-	if (change_cnt > 0 && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
-	    curbuf->b_op_start = startpos;
+	إذا (change_cnt > 0 && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	    curbuf->b_op_شروعات = startpos;
 
-	if (change_cnt > p_report)
+	إذا (change_cnt > p_report)
 	    smsg(NGETTEXT("%d line changed", "%d lines changed",
 						      change_cnt), change_cnt);
     }
@@ -2814,49 +2814,49 @@ op_addsub(
  *
  * Returns TRUE if some character was changed.
  */
-    static int
+    ساكن صحيح
 do_addsub(
-    int		op_type,
+    صحيح		op_type,
     pos_T	*pos,
-    int		length,
+    صحيح		ڊيگهائي,
     linenr_T	Prenum1)
 {
-    int		col;
-    int		pre;		// 'X'/'x': hex; '0': octal; 'B'/'b': bin
-    static int	hexupper = FALSE;	// 0xABC
+    صحيح		کانو;
+    صحيح		pre;		// 'X'/'x': hex; '0': octal; 'B'/'b': bin
+    ساكن صحيح	hexupper = FALSE;	// 0xABC
     uvarnumber_T	n;
     uvarnumber_T	oldn;
     char_u	*ptr;
-    int		linelen;
-    int		c;
-    int		todel;
-    int		do_hex;
-    int		do_oct;
-    int		do_bin;
-    int		do_alpha;
-    int		do_unsigned;
-    int		do_blank;
-    int		blank_unsigned = FALSE;	// blank: treat as unsigned?
-    int		firstdigit;
-    int		subtract;
-    int		negative = FALSE;
-    int		was_positive = TRUE;
-    int		visual = VIsual_active;
-    int		did_change = FALSE;
+    صحيح		linelen;
+    صحيح		c;
+    صحيح		todel;
+    صحيح		do_hex;
+    صحيح		do_oct;
+    صحيح		do_bin;
+    صحيح		do_alpha;
+    صحيح		do_unsigned;
+    صحيح		do_blank;
+    صحيح		blank_unsigned = FALSE;	// blank: treat as unsigned?
+    صحيح		firstdigit;
+    صحيح		ڪٽيو;
+    صحيح		negative = FALSE;
+    صحيح		was_مثبت = TRUE;
+    صحيح		visual = VIsual_سرگرم;
+    صحيح		did_change = FALSE;
     pos_T	save_cursor = curwin->w_cursor;
-    int		maxlen = 0;
+    صحيح		maxlen = 0;
     pos_T	startpos;
     pos_T	endpos;
     colnr_T	save_coladd = 0;
 
-    do_hex = (vim_strchr(curbuf->b_p_nf, 'x') != NULL);	// "heX"
-    do_oct = (vim_strchr(curbuf->b_p_nf, 'o') != NULL);	// "Octal"
-    do_bin = (vim_strchr(curbuf->b_p_nf, 'b') != NULL);	// "Bin"
-    do_alpha = (vim_strchr(curbuf->b_p_nf, 'p') != NULL);	// "alPha"
-    do_unsigned = (vim_strchr(curbuf->b_p_nf, 'u') != NULL);	// "Unsigned"
-    do_blank = (vim_strchr(curbuf->b_p_nf, 'k') != NULL);	// "blanK"
+    do_hex = (vim_strchr(curbuf->b_p_nf, 'x') != عدم);	// "heX"
+    do_oct = (vim_strchr(curbuf->b_p_nf, 'o') != عدم);	// "Octal"
+    do_bin = (vim_strchr(curbuf->b_p_nf, 'b') != عدم);	// "Bin"
+    do_alpha = (vim_strchr(curbuf->b_p_nf, 'p') != عدم);	// "alPha"
+    do_unsigned = (vim_strchr(curbuf->b_p_nf, 'u') != عدم);	// "Unsigned"
+    do_blank = (vim_strchr(curbuf->b_p_nf, 'k') != عدم);	// "blanK"
 
-    if (virtual_active())
+    إذا (virtual_سرگرم())
     {
 	save_coladd = pos->coladd;
 	pos->coladd = 0;
@@ -2865,125 +2865,125 @@ do_addsub(
     curwin->w_cursor = *pos;
     ptr = ml_get(pos->lnum);
     linelen = ml_get_len(pos->lnum);
-    col = pos->col;
+    کانو = pos->کانو;
 
-    if (col + !!save_coladd >= linelen)
-	goto theend;
+    إذا (کانو + !!save_coladd >= linelen)
+	اذهب theend;
 
     /*
      * First check if we are on a hexadecimal number, after the "0x".
      */
-    if (!VIsual_active)
+    إذا (!VIsual_سرگرم)
     {
-	if (do_bin)
-	    while (col > 0 && vim_isbdigit(ptr[col]))
+	إذا (do_bin)
+	    طالما (کانو > 0 && vim_isbdigit(ptr[کانو]))
 	    {
-		--col;
-		if (has_mbyte)
-		    col -= (*mb_head_off)(ptr, ptr + col);
+		--کانو;
+		إذا (has_mbyte)
+		    کانو -= (*mb_سر_off)(ptr, ptr + کانو);
 	    }
 
-	if (do_hex)
-	    while (col > 0 && vim_isxdigit(ptr[col]))
+	إذا (do_hex)
+	    طالما (کانو > 0 && vim_isxdigit(ptr[کانو]))
 	    {
-		--col;
-		if (has_mbyte)
-		    col -= (*mb_head_off)(ptr, ptr + col);
+		--کانو;
+		إذا (has_mbyte)
+		    کانو -= (*mb_سر_off)(ptr, ptr + کانو);
 	    }
 
-	if (       do_bin
+	إذا (       do_bin
 		&& do_hex
-		&& ! ((col > 0
-		    && (ptr[col] == 'X'
-			|| ptr[col] == 'x')
-		    && ptr[col - 1] == '0'
+		&& ! ((کانو > 0
+		    && (ptr[کانو] == 'X'
+			|| ptr[کانو] == 'x')
+		    && ptr[کانو - 1] == '0'
 		    && (!has_mbyte ||
-			!(*mb_head_off)(ptr, ptr + col - 1))
-		    && vim_isxdigit(ptr[col + 1]))))
+			!(*mb_سر_off)(ptr, ptr + کانو - 1))
+		    && vim_isxdigit(ptr[کانو + 1]))))
 	{
 
 	    // In case of binary/hexadecimal pattern overlap match, rescan
 
-	    col = pos->col;
+	    کانو = pos->کانو;
 
-	    while (col > 0 && vim_isdigit(ptr[col]))
+	    طالما (کانو > 0 && vim_isdigit(ptr[کانو]))
 	    {
-		col--;
-		if (has_mbyte)
-		    col -= (*mb_head_off)(ptr, ptr + col);
+		کانو--;
+		إذا (has_mbyte)
+		    کانو -= (*mb_سر_off)(ptr, ptr + کانو);
 	    }
 	}
 
-	if ((       do_hex
-		&& col > 0
-		&& (ptr[col] == 'X'
-		    || ptr[col] == 'x')
-		&& ptr[col - 1] == '0'
+	إذا ((       do_hex
+		&& کانو > 0
+		&& (ptr[کانو] == 'X'
+		    || ptr[کانو] == 'x')
+		&& ptr[کانو - 1] == '0'
 		&& (!has_mbyte ||
-		    !(*mb_head_off)(ptr, ptr + col - 1))
-		&& vim_isxdigit(ptr[col + 1])) ||
+		    !(*mb_سر_off)(ptr, ptr + کانو - 1))
+		&& vim_isxdigit(ptr[کانو + 1])) ||
 	    (       do_bin
-		&& col > 0
-		&& (ptr[col] == 'B'
-		    || ptr[col] == 'b')
-		&& ptr[col - 1] == '0'
+		&& کانو > 0
+		&& (ptr[کانو] == 'B'
+		    || ptr[کانو] == 'b')
+		&& ptr[کانو - 1] == '0'
 		&& (!has_mbyte ||
-		    !(*mb_head_off)(ptr, ptr + col - 1))
-		&& vim_isbdigit(ptr[col + 1])))
+		    !(*mb_سر_off)(ptr, ptr + کانو - 1))
+		&& vim_isbdigit(ptr[کانو + 1])))
 	{
 	    // Found hexadecimal or binary number, move to its start.
-	    --col;
-	    if (has_mbyte)
-		col -= (*mb_head_off)(ptr, ptr + col);
+	    --کانو;
+	    إذا (has_mbyte)
+		کانو -= (*mb_سر_off)(ptr, ptr + کانو);
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * Search forward and then backward to find the start of number.
 	     */
-	    col = pos->col;
+	    کانو = pos->کانو;
 
-	    while (ptr[col] != NUL
-		    && !vim_isdigit(ptr[col])
-		    && !(do_alpha && ASCII_ISALPHA(ptr[col])))
-		col += mb_ptr2len(ptr + col);
+	    طالما (ptr[کانو] != NUL
+		    && !vim_isdigit(ptr[کانو])
+		    && !(do_alpha && ASCII_ISALPHA(ptr[کانو])))
+		کانو += mb_ptr2len(ptr + کانو);
 
-	    while (col > 0
-		    && vim_isdigit(ptr[col - 1])
-		    && !(do_alpha && ASCII_ISALPHA(ptr[col])))
+	    طالما (کانو > 0
+		    && vim_isdigit(ptr[کانو - 1])
+		    && !(do_alpha && ASCII_ISALPHA(ptr[کانو])))
 	    {
-		--col;
-		if (has_mbyte)
-		    col -= (*mb_head_off)(ptr, ptr + col);
+		--کانو;
+		إذا (has_mbyte)
+		    کانو -= (*mb_سر_off)(ptr, ptr + کانو);
 	    }
 	}
     }
 
-    if (visual)
+    إذا (visual)
     {
-	while (ptr[col] != NUL && length > 0
-		&& !vim_isdigit(ptr[col])
-		&& !(do_alpha && ASCII_ISALPHA(ptr[col])))
+	طالما (ptr[کانو] != NUL && ڊيگهائي > 0
+		&& !vim_isdigit(ptr[کانو])
+		&& !(do_alpha && ASCII_ISALPHA(ptr[کانو])))
 	{
-	    int mb_len = mb_ptr2len(ptr + col);
+	    صحيح mb_len = mb_ptr2len(ptr + کانو);
 
-	    col += mb_len;
-	    length -= mb_len;
+	    کانو += mb_len;
+	    ڊيگهائي -= mb_len;
 	}
 
-	if (length == 0)
-	    goto theend;
+	إذا (ڊيگهائي == 0)
+	    اذهب theend;
 
-	if (col > pos->col && ptr[col - 1] == '-'
-		&& (!has_mbyte || !(*mb_head_off)(ptr, ptr + col - 1))
+	إذا (کانو > pos->کانو && ptr[کانو - 1] == '-'
+		&& (!has_mbyte || !(*mb_سر_off)(ptr, ptr + کانو - 1))
 		&& !do_unsigned)
 	{
-	    if (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
+	    إذا (do_blank && کانو >= 2 && !VIM_ISWHITE(ptr[کانو - 2]))
 		blank_unsigned = TRUE;
-	    else
+	    وإلا
 	    {
 		negative = TRUE;
-		was_positive = FALSE;
+		was_مثبت = FALSE;
 	    }
 	}
     }
@@ -2991,175 +2991,175 @@ do_addsub(
     /*
      * If a number was found, and saving for undo works, replace the number.
      */
-    firstdigit = ptr[col];
-    if (!VIM_ISDIGIT(firstdigit) && !(do_alpha && ASCII_ISALPHA(firstdigit)))
+    firstdigit = ptr[کانو];
+    إذا (!VIM_ISDIGIT(firstdigit) && !(do_alpha && ASCII_ISALPHA(firstdigit)))
     {
 	beep_flush();
-	goto theend;
+	اذهب theend;
     }
 
-    if (do_alpha && ASCII_ISALPHA(firstdigit))
+    إذا (do_alpha && ASCII_ISALPHA(firstdigit))
     {
 	// decrement or increment alphabetic character
-	if (op_type == OP_NR_SUB)
+	إذا (op_type == OP_NR_SUB)
 	{
-	    if (CharOrd(firstdigit) < Prenum1)
+	    إذا (CharOrd(firstdigit) < Prenum1)
 	    {
-		if (SAFE_isupper(firstdigit))
+		إذا (محفوظ_isupper(firstdigit))
 		    firstdigit = 'A';
-		else
+		وإلا
 		    firstdigit = 'a';
 	    }
-	    else
+	    وإلا
 		firstdigit -= Prenum1;
 	}
-	else
+	وإلا
 	{
-	    if (26 - CharOrd(firstdigit) - 1 < Prenum1)
+	    إذا (26 - CharOrd(firstdigit) - 1 < Prenum1)
 	    {
-		if (SAFE_isupper(firstdigit))
+		إذا (محفوظ_isupper(firstdigit))
 		    firstdigit = 'Z';
-		else
+		وإلا
 		    firstdigit = 'z';
 	    }
-	    else
+	    وإلا
 		firstdigit += Prenum1;
 	}
-	curwin->w_cursor.col = col;
-	if (!did_change)
+	curwin->w_cursor.کانو = کانو;
+	إذا (!did_change)
 	    startpos = curwin->w_cursor;
 	did_change = TRUE;
-	(void)del_char(FALSE);
+	(فراغ)del_char(FALSE);
 	ins_char(firstdigit);
 	endpos = curwin->w_cursor;
-	curwin->w_cursor.col = col;
+	curwin->w_cursor.کانو = کانو;
     }
-    else
+    وإلا
     {
 	char_u	*buf1;
-	int	buf1len;
+	صحيح	buf1len;
 	char_u	buf2[NUMBUFLEN];
-	int	buf2len;
+	صحيح	buf2len;
 	pos_T	save_pos;
-	int	i;
+	صحيح	i;
 
-	if (col > 0 && ptr[col - 1] == '-'
+	إذا (کانو > 0 && ptr[کانو - 1] == '-'
 		&& (!has_mbyte ||
-		    !(*mb_head_off)(ptr, ptr + col - 1))
+		    !(*mb_سر_off)(ptr, ptr + کانو - 1))
 		&& !visual
 		&& !do_unsigned)
 	{
-	    if (do_blank && col >= 2 && !VIM_ISWHITE(ptr[col - 2]))
+	    إذا (do_blank && کانو >= 2 && !VIM_ISWHITE(ptr[کانو - 2]))
 		blank_unsigned = TRUE;
-	    else
+	    وإلا
 	    {
 		// negative number
-		--col;
+		--کانو;
 		negative = TRUE;
 	    }
 	}
 
 	// get the number value (unsigned)
-	if (visual && VIsual_mode != 'V')
+	إذا (visual && VIsual_گهڻائي != 'V')
 	    maxlen = (curbuf->b_visual.vi_curswant == MAXCOL
-		    ? linelen - col : length);
+		    ? linelen - کانو : ڊيگهائي);
 
-	int overflow = FALSE;
-	vim_str2nr(ptr + col, &pre, &length,
+	صحيح حد_کان_مٿي = FALSE;
+	vim_str2nr(ptr + کانو, &pre, &ڊيگهائي,
 		0 + (do_bin ? STR2NR_BIN : 0)
 		    + (do_oct ? STR2NR_OCT : 0)
 		    + (do_hex ? STR2NR_HEX : 0),
-		NULL, &n, maxlen, FALSE, &overflow);
+		عدم, &n, maxlen, FALSE, &حد_کان_مٿي);
 
 	// ignore leading '-' for hex and octal and bin numbers
-	if (pre && negative)
+	إذا (pre && negative)
 	{
-	    ++col;
-	    --length;
+	    ++کانو;
+	    --ڊيگهائي;
 	    negative = FALSE;
 	}
 	// add or subtract
-	subtract = FALSE;
-	if (op_type == OP_NR_SUB)
-	    subtract ^= TRUE;
-	if (negative)
-	    subtract ^= TRUE;
+	ڪٽيو = FALSE;
+	إذا (op_type == OP_NR_SUB)
+	    ڪٽيو ^= TRUE;
+	إذا (negative)
+	    ڪٽيو ^= TRUE;
 
 	oldn = n;
-	if (!overflow)  // if number is too big don't add/subtract
+	إذا (!حد_کان_مٿي)  // if number is too big don't add/subtract
 	{
-	    if (subtract)
+	    إذا (ڪٽيو)
 		n -= (uvarnumber_T)Prenum1;
-	    else
+	    وإلا
 		n += (uvarnumber_T)Prenum1;
 	}
 
 	// handle wraparound for decimal numbers
-	if (!pre)
+	إذا (!pre)
 	{
-	    if (subtract)
+	    إذا (ڪٽيو)
 	    {
-		if (n > oldn)
+		إذا (n > oldn)
 		{
 		    n = 1 + (n ^ (uvarnumber_T)-1);
 		    negative ^= TRUE;
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		// add
-		if (n < oldn)
+		//جوڙيو
+		إذا (n < oldn)
 		{
 		    n = (n ^ (uvarnumber_T)-1);
 		    negative ^= TRUE;
 		}
 	    }
-	    if (n == 0)
+	    إذا (n == 0)
 		negative = FALSE;
 	}
 
-	if ((do_unsigned || blank_unsigned) && negative)
+	إذا ((do_unsigned || blank_unsigned) && negative)
 	{
-	    if (subtract)
+	    إذا (ڪٽيو)
 		// sticking at zero.
 		n = (uvarnumber_T)0;
-	    else
+	    وإلا
 		// sticking at 2^64 - 1.
 		n = (uvarnumber_T)(-1);
 	    negative = FALSE;
 	}
 
-	if (visual && !was_positive && !negative && col > 0)
+	إذا (visual && !was_مثبت && !negative && کانو > 0)
 	{
 	    // need to remove the '-'
-	    col--;
-	    length++;
+	    کانو--;
+	    ڊيگهائي++;
 	}
 
 	/*
 	 * Delete the old number.
 	 */
-	curwin->w_cursor.col = col;
-	if (!did_change)
+	curwin->w_cursor.کانو = کانو;
+	إذا (!did_change)
 	    startpos = curwin->w_cursor;
 	did_change = TRUE;
-	todel = length;
+	todel = ڊيگهائي;
 	c = gchar_cursor();
 	/*
 	 * Don't include the '-' in the length, only the length of the
 	 * part after it is kept the same.
 	 */
-	if (c == '-')
-	    --length;
+	إذا (c == '-')
+	    --ڊيگهائي;
 
 	save_pos = curwin->w_cursor;
-	for (i = 0; i < todel; ++i)
+	لكل (i = 0; i < todel; ++i)
 	{
-	    if (c < 0x100 && SAFE_isalpha(c))
+	    إذا (c < 0x100 && محفوظ_isalpha(c))
 	    {
-		if (SAFE_isupper(c))
+		إذا (محفوظ_isupper(c))
 		    hexupper = TRUE;
-		else
+		وإلا
 		    hexupper = FALSE;
 	    }
 	    inc_cursor();
@@ -3172,50 +3172,50 @@ do_addsub(
 	 * When there are many leading zeros it could be very long.
 	 * Allocate a bit too much.
 	 */
-	buf1 = alloc(length + NUMBUFLEN);
-	if (buf1 == NULL)
-	    goto theend;
+	buf1 = alloc(ڊيگهائي + NUMBUFLEN);
+	إذا (buf1 == عدم)
+	    اذهب theend;
 	ptr = buf1;
-	if (negative && (!visual || was_positive))
+	إذا (negative && (!visual || was_مثبت))
 	    *ptr++ = '-';
-	if (pre)
+	إذا (pre)
 	{
 	    *ptr++ = '0';
-	    --length;
+	    --ڊيگهائي;
 	}
-	if (pre == 'b' || pre == 'B' ||
+	إذا (pre == 'b' || pre == 'B' ||
 	    pre == 'x' || pre == 'X')
 	{
 	    *ptr++ = pre;
-	    --length;
+	    --ڊيگهائي;
 	}
 
 	/*
 	 * Put the number characters in buf2[].
 	 */
-	if (pre == 'b' || pre == 'B')
+	إذا (pre == 'b' || pre == 'B')
 	{
-	    int bit = 0;
-	    int bits = sizeof(uvarnumber_T) * 8;
+	    صحيح ٻٽو_انگ = 0;
+	    صحيح بٽ = حجم(uvarnumber_T) * 8;
 
 	    // leading zeros
-	    for (bit = bits; bit > 0; bit--)
-		if ((n >> (bit - 1)) & 0x1) break;
+	    لكل (ٻٽو_انگ = بٽ; ٻٽو_انگ > 0; ٻٽو_انگ--)
+		إذا ((n >> (ٻٽو_انگ - 1)) & 0x1) اكسر;
 
-	    for (buf2len = 0; bit > 0 && buf2len < (NUMBUFLEN - 1); bit--)
-		buf2[buf2len++] = ((n >> (bit - 1)) & 0x1) ? '1' : '0';
+	    لكل (buf2len = 0; ٻٽو_انگ > 0 && buf2len < (NUMBUFLEN - 1); ٻٽو_انگ--)
+		buf2[buf2len++] = ((n >> (ٻٽو_انگ - 1)) & 0x1) ? '1' : '0';
 
 	    buf2[buf2len] = NUL;
 	}
-	else if (pre == 0)
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llu", n);
-	else if (pre == '0')
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llo", n);
-	else if (pre && hexupper)
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llX", n);
-	else
-	    buf2len = vim_snprintf((char *)buf2, NUMBUFLEN, "%llx", n);
-	length -= buf2len;
+	وإلا إذا (pre == 0)
+	    buf2len = vim_snprintf((حرف *)buf2, NUMBUFLEN, "%llu", n);
+	وإلا إذا (pre == '0')
+	    buf2len = vim_snprintf((حرف *)buf2, NUMBUFLEN, "%llo", n);
+	وإلا إذا (pre && hexupper)
+	    buf2len = vim_snprintf((حرف *)buf2, NUMBUFLEN, "%llX", n);
+	وإلا
+	    buf2len = vim_snprintf((حرف *)buf2, NUMBUFLEN, "%llx", n);
+	ڊيگهائي -= buf2len;
 
 	/*
 	 * Adjust number of zeros to the new number of digits, so the
@@ -3223,11 +3223,11 @@ do_addsub(
 	 * Don't do this when
 	 * the result may look like an octal number.
 	 */
-	if (firstdigit == '0' && !(do_oct && pre == 0))
-	    while (length-- > 0)
+	إذا (firstdigit == '0' && !(do_oct && pre == 0))
+	    طالما (ڊيگهائي-- > 0)
 		*ptr++ = '0';
 	*ptr = NUL;
-	buf1len = (int)(ptr - buf1);
+	buf1len = (صحيح)(ptr - buf1);
 
 	STRCPY(buf1 + buf1len, buf2);
 	buf1len += buf2len;
@@ -3236,54 +3236,54 @@ do_addsub(
 	// text properties will be adjusted.  Then delete the old number
 	// afterwards.
 	save_pos = curwin->w_cursor;
-	if (todel > 0)
+	إذا (todel > 0)
 	    inc_cursor();
 	ins_str(buf1, (size_t)buf1len);		// insert the new number
 	vim_free(buf1);
 
 	// del_char() will also mark line needing displaying
-	if (todel > 0)
+	إذا (todel > 0)
 	{
-	    int bytes_after = ml_get_curline_len() - curwin->w_cursor.col;
+	    صحيح بائيٽون_after = ml_get_curline_len() - curwin->w_cursor.کانو;
 
 	    // Delete the one character before the insert.
 	    curwin->w_cursor = save_pos;
-	    (void)del_char(FALSE);
-	    curwin->w_cursor.col = ml_get_curline_len() - bytes_after;
+	    (فراغ)del_char(FALSE);
+	    curwin->w_cursor.کانو = ml_get_curline_len() - بائيٽون_after;
 	    --todel;
 	}
-	while (todel-- > 0)
-	    (void)del_char(FALSE);
+	طالما (todel-- > 0)
+	    (فراغ)del_char(FALSE);
 
 	endpos = curwin->w_cursor;
-	if (did_change && curwin->w_cursor.col)
-	    --curwin->w_cursor.col;
+	إذا (did_change && curwin->w_cursor.کانو)
+	    --curwin->w_cursor.کانو;
     }
 
-    if (did_change && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا (did_change && (cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// set the '[ and '] marks
-	curbuf->b_op_start = startpos;
-	curbuf->b_op_end = endpos;
-	if (curbuf->b_op_end.col > 0)
-	    --curbuf->b_op_end.col;
+	curbuf->b_op_شروعات = startpos;
+	curbuf->b_op_پڇاڙي = endpos;
+	إذا (curbuf->b_op_پڇاڙي.کانو > 0)
+	    --curbuf->b_op_پڇاڙي.کانو;
     }
 
 theend:
-    if (visual)
+    إذا (visual)
 	curwin->w_cursor = save_cursor;
-    else if (did_change)
-	curwin->w_set_curswant = true;
-    else if (virtual_active())
+    وإلا إذا (did_change)
+	curwin->w_سيٽ_curswant = true;
+    وإلا إذا (virtual_سرگرم())
 	curwin->w_cursor.coladd = save_coladd;
 
-    return did_change;
+    أرجع did_change;
 }
 
-    void
+    فراغ
 clear_oparg(oparg_T *oap)
 {
-    CLEAR_POINTER(oap);
+    CLEAR_اشارو(oap);
 }
 
 /*
@@ -3300,47 +3300,47 @@ clear_oparg(oparg_T *oap)
  *  case, eol_size will be added to the character count to account for
  *  the size of the EOL character.
  */
-    static varnumber_T
-line_count_info(
-    char_u	*line,
+    ساكن varnumber_T
+سٽ_ڳڻپ_info(
+    char_u	*سٽ,
     varnumber_T	*wc,
     varnumber_T	*cc,
-    varnumber_T	limit,
-    int		eol_size)
+    varnumber_T	حد_بندي,
+    صحيح		eol_سائيز)
 {
     varnumber_T	i;
-    varnumber_T	words = 0;
+    varnumber_T	لفظ_3 = 0;
     varnumber_T	chars = 0;
-    int		is_word = 0;
+    صحيح		is_لفظ = 0;
 
-    for (i = 0; i < limit && line[i] != NUL; )
+    لكل (i = 0; i < حد_بندي && سٽ[i] != NUL; )
     {
-	if (is_word)
+	إذا (is_لفظ)
 	{
-	    if (vim_isspace(line[i]))
+	    إذا (vim_isspace(سٽ[i]))
 	    {
-		words++;
-		is_word = 0;
+		لفظ_3++;
+		is_لفظ = 0;
 	    }
 	}
-	else if (!vim_isspace(line[i]))
-	    is_word = 1;
+	وإلا إذا (!vim_isspace(سٽ[i]))
+	    is_لفظ = 1;
 	++chars;
-	i += (*mb_ptr2len)(line + i);
+	i += (*mb_ptr2len)(سٽ + i);
     }
 
-    if (is_word)
-	words++;
-    *wc += words;
+    إذا (is_لفظ)
+	لفظ_3++;
+    *wc += لفظ_3;
 
     // Add eol_size if the end of line was reached before hitting limit.
-    if (i < limit && line[i] == NUL)
+    إذا (i < حد_بندي && سٽ[i] == NUL)
     {
-	i += eol_size;
-	chars += eol_size;
+	i += eol_سائيز;
+	chars += eol_سائيز;
     }
     *cc += chars;
-    return i;
+    أرجع i;
 }
 
 /*
@@ -3349,336 +3349,336 @@ line_count_info(
  * the *_count_cursor variables store running totals for the selection.)
  * When "dict" is not NULL store the info there instead of showing it.
  */
-    void
+    فراغ
 cursor_pos_info(dict_T *dict)
 {
     char_u	*p;
     char_u	buf1[50];
     char_u	buf2[40];
     linenr_T	lnum;
-    varnumber_T	byte_count = 0;
-    varnumber_T	bom_count  = 0;
-    varnumber_T	byte_count_cursor = 0;
-    varnumber_T	char_count = 0;
-    varnumber_T	char_count_cursor = 0;
-    varnumber_T	word_count = 0;
-    varnumber_T	word_count_cursor = 0;
-    int		eol_size;
-    varnumber_T	last_check = 100000L;
-    long	line_count_selected = 0;
+    varnumber_T	byte_ڳڻپ = 0;
+    varnumber_T	bom_ڳڻپ  = 0;
+    varnumber_T	byte_ڳڻپ_cursor = 0;
+    varnumber_T	char_ڳڻپ = 0;
+    varnumber_T	char_ڳڻپ_cursor = 0;
+    varnumber_T	لفظ_ڳڻپ = 0;
+    varnumber_T	لفظ_ڳڻپ_cursor = 0;
+    صحيح		eol_سائيز;
+    varnumber_T	آخري_check = 100000L;
+    ڊگهو	سٽ_ڳڻپ_selected = 0;
     pos_T	min_pos, max_pos;
     oparg_T	oparg;
-    struct block_def	bd;
+    بنية بلاڪ_def	bd;
 
     /*
      * Compute the length of the file in characters.
      */
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    إذا (curbuf->b_ml.ml_flags & ML_خالي_جايون)
     {
-	if (dict == NULL)
+	إذا (dict == عدم)
 	{
-	    msg(_(no_lines_msg));
-	    return;
+	    نياپو(_(no_سٽون_نياپو));
+	    أرجع;
 	}
     }
-    else
+    وإلا
     {
-	if (get_fileformat(curbuf) == EOL_DOS)
-	    eol_size = 2;
-	else
-	    eol_size = 1;
+	إذا (get_fileformat(curbuf) == EOL_DOS)
+	    eol_سائيز = 2;
+	وإلا
+	    eol_سائيز = 1;
 
-	if (VIsual_active)
+	إذا (VIsual_سرگرم)
 	{
-	    if (LT_POS(VIsual, curwin->w_cursor))
+	    إذا (LT_POS(VIsual, curwin->w_cursor))
 	    {
 		min_pos = VIsual;
 		max_pos = curwin->w_cursor;
 	    }
-	    else
+	    وإلا
 	    {
 		min_pos = curwin->w_cursor;
 		max_pos = VIsual;
 	    }
-	    if (*p_sel == 'e' && max_pos.col > 0)
-		--max_pos.col;
+	    إذا (*p_sel == 'e' && max_pos.کانو > 0)
+		--max_pos.کانو;
 
-	    if (VIsual_mode == Ctrl_V)
+	    إذا (VIsual_گهڻائي == Ctrl_V)
 	    {
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		char_u * saved_sbr = p_sbr;
 		char_u * saved_w_sbr = curwin->w_p_sbr;
 
 		// Make 'sbr' empty for a moment to get the correct size.
-		p_sbr = empty_option;
-		curwin->w_p_sbr = empty_option;
-#endif
+		p_sbr = خالي_جايون_option;
+		curwin->w_p_sbr = خالي_جايون_option;
+#جيڪڏهن_پورو
 		oparg.is_VIsual = 1;
-		oparg.block_mode = TRUE;
+		oparg.بلاڪ_گهڻائي = TRUE;
 		oparg.op_type = OP_NOP;
 		getvcols(curwin, &min_pos, &max_pos,
-					&oparg.start_vcol, &oparg.end_vcol, 0);
-#ifdef FEAT_LINEBREAK
+					&oparg.شروعات_vcol, &oparg.پڇاڙي_vcol, 0);
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		p_sbr = saved_sbr;
 		curwin->w_p_sbr = saved_w_sbr;
-#endif
-		if (curwin->w_curswant == MAXCOL)
-		    oparg.end_vcol = MAXCOL;
+#جيڪڏهن_پورو
+		إذا (curwin->w_curswant == MAXCOL)
+		    oparg.پڇاڙي_vcol = MAXCOL;
 		// Swap the start, end vcol if needed
-		if (oparg.end_vcol < oparg.start_vcol)
+		إذا (oparg.پڇاڙي_vcol < oparg.شروعات_vcol)
 		{
-		    oparg.end_vcol += oparg.start_vcol;
-		    oparg.start_vcol = oparg.end_vcol - oparg.start_vcol;
-		    oparg.end_vcol -= oparg.start_vcol;
+		    oparg.پڇاڙي_vcol += oparg.شروعات_vcol;
+		    oparg.شروعات_vcol = oparg.پڇاڙي_vcol - oparg.شروعات_vcol;
+		    oparg.پڇاڙي_vcol -= oparg.شروعات_vcol;
 		}
 	    }
-	    line_count_selected = max_pos.lnum - min_pos.lnum + 1;
+	    سٽ_ڳڻپ_selected = max_pos.lnum - min_pos.lnum + 1;
 	}
 
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	لكل (lnum = 1; lnum <= curbuf->b_ml.ml_سٽ_ڳڻپ; ++lnum)
 	{
 	    // Check for a CTRL-C every 100000 characters.
-	    if (byte_count > last_check)
+	    إذا (byte_ڳڻپ > آخري_check)
 	    {
 		ui_breakcheck();
-		if (got_int)
-		    return;
-		last_check = byte_count + 100000L;
+		إذا (got_int)
+		    أرجع;
+		آخري_check = byte_ڳڻپ + 100000L;
 	    }
 
 	    // Do extra processing for VIsual mode.
-	    if (VIsual_active
+	    إذا (VIsual_سرگرم
 		    && lnum >= min_pos.lnum && lnum <= max_pos.lnum)
 	    {
-		char_u	    *s = NULL;
-		long	    len = 0L;
+		char_u	    *s = عدم;
+		ڊگهو	    len = 0L;
 
-		switch (VIsual_mode)
+		بدل (VIsual_گهڻائي)
 		{
-		    case Ctrl_V:
-			virtual_op = virtual_active();
-			block_prep(&oparg, &bd, lnum, 0);
+		    حالة Ctrl_V:
+			virtual_op = virtual_سرگرم();
+			بلاڪ_prep(&oparg, &bd, lnum, 0);
 			virtual_op = MAYBE;
 			s = bd.textstart;
-			len = (long)bd.textlen;
-			break;
-		    case 'V':
+			len = (ڊگهو)bd.textlen;
+			اكسر;
+		    حالة 'V':
 			s = ml_get(lnum);
 			len = MAXCOL;
-			break;
-		    case 'v':
+			اكسر;
+		    حالة 'v':
 			{
-			    colnr_T start_col = (lnum == min_pos.lnum)
-							   ? min_pos.col : 0;
-			    colnr_T end_col = (lnum == max_pos.lnum)
-				      ? max_pos.col - start_col + 1 : MAXCOL;
+			    colnr_T شروعات_کانو = (lnum == min_pos.lnum)
+							   ? min_pos.کانو : 0;
+			    colnr_T پڇاڙي_کانو = (lnum == max_pos.lnum)
+				      ? max_pos.کانو - شروعات_کانو + 1 : MAXCOL;
 
-			    s = ml_get(lnum) + start_col;
-			    len = end_col;
+			    s = ml_get(lnum) + شروعات_کانو;
+			    len = پڇاڙي_کانو;
 			}
-			break;
+			اكسر;
 		}
-		if (s != NULL)
+		إذا (s != عدم)
 		{
-		    byte_count_cursor += line_count_info(s, &word_count_cursor,
-					   &char_count_cursor, len, eol_size);
-		    if (lnum == curbuf->b_ml.ml_line_count
+		    byte_ڳڻپ_cursor += سٽ_ڳڻپ_info(s, &لفظ_ڳڻپ_cursor,
+					   &char_ڳڻپ_cursor, len, eol_سائيز);
+		    إذا (lnum == curbuf->b_ml.ml_سٽ_ڳڻپ
 			    && !curbuf->b_p_eol
 			    && (curbuf->b_p_bin || !curbuf->b_p_fixeol)
-			    && (long)STRLEN(s) < len)
-			byte_count_cursor -= eol_size;
+			    && (ڊگهو)STRLEN(s) < len)
+			byte_ڳڻپ_cursor -= eol_سائيز;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// In non-visual mode, check for the line the cursor is on
-		if (lnum == curwin->w_cursor.lnum)
+		إذا (lnum == curwin->w_cursor.lnum)
 		{
-		    word_count_cursor += word_count;
-		    char_count_cursor += char_count;
-		    byte_count_cursor = byte_count +
-			line_count_info(ml_get(lnum),
-				&word_count_cursor, &char_count_cursor,
-				(varnumber_T)(curwin->w_cursor.col + 1),
-				eol_size);
+		    لفظ_ڳڻپ_cursor += لفظ_ڳڻپ;
+		    char_ڳڻپ_cursor += char_ڳڻپ;
+		    byte_ڳڻپ_cursor = byte_ڳڻپ +
+			سٽ_ڳڻپ_info(ml_get(lnum),
+				&لفظ_ڳڻپ_cursor, &char_ڳڻپ_cursor,
+				(varnumber_T)(curwin->w_cursor.کانو + 1),
+				eol_سائيز);
 		}
 	    }
 	    // Add to the running totals
-	    byte_count += line_count_info(ml_get(lnum), &word_count,
-					 &char_count, (varnumber_T)MAXCOL,
-					 eol_size);
+	    byte_ڳڻپ += سٽ_ڳڻپ_info(ml_get(lnum), &لفظ_ڳڻپ,
+					 &char_ڳڻپ, (varnumber_T)MAXCOL,
+					 eol_سائيز);
 	}
 
 	// Correction for when last line doesn't have an EOL.
-	if (!curbuf->b_p_eol && (curbuf->b_p_bin || !curbuf->b_p_fixeol))
-	    byte_count -= eol_size;
+	إذا (!curbuf->b_p_eol && (curbuf->b_p_bin || !curbuf->b_p_fixeol))
+	    byte_ڳڻپ -= eol_سائيز;
 
-	if (dict == NULL)
+	إذا (dict == عدم)
 	{
-	    if (VIsual_active)
+	    إذا (VIsual_سرگرم)
 	    {
-		if (VIsual_mode == Ctrl_V && curwin->w_curswant < MAXCOL)
+		إذا (VIsual_گهڻائي == Ctrl_V && curwin->w_curswant < MAXCOL)
 		{
 		    getvcols(curwin, &min_pos, &max_pos,
-						&min_pos.col, &max_pos.col, 0);
-		    vim_snprintf((char *)buf1, sizeof(buf1), _("%ld Cols; "),
-			    (long)(oparg.end_vcol - oparg.start_vcol + 1));
+						&min_pos.کانو, &max_pos.کانو, 0);
+		    vim_snprintf((حرف *)buf1, حجم(buf1), _("%ld Cols; "),
+			    (ڊگهو)(oparg.پڇاڙي_vcol - oparg.شروعات_vcol + 1));
 		}
-		else
+		وإلا
 		    buf1[0] = NUL;
 
-		if (char_count_cursor == byte_count_cursor
-						    && char_count == byte_count)
-		    vim_snprintf((char *)IObuff, IOSIZE,
+		إذا (char_ڳڻپ_cursor == byte_ڳڻپ_cursor
+						    && char_ڳڻپ == byte_ڳڻپ)
+		    vim_snprintf((حرف *)IObuff, IOSIZE,
 			    _("Selected %s%ld of %ld Lines; %lld of %lld Words; %lld of %lld Bytes"),
-			    buf1, line_count_selected,
-			    (long)curbuf->b_ml.ml_line_count,
-			    word_count_cursor,
-			    word_count,
-			    byte_count_cursor,
-			    byte_count);
-		else
-		    vim_snprintf((char *)IObuff, IOSIZE,
+			    buf1, سٽ_ڳڻپ_selected,
+			    (ڊگهو)curbuf->b_ml.ml_سٽ_ڳڻپ,
+			    لفظ_ڳڻپ_cursor,
+			    لفظ_ڳڻپ,
+			    byte_ڳڻپ_cursor,
+			    byte_ڳڻپ);
+		وإلا
+		    vim_snprintf((حرف *)IObuff, IOSIZE,
 			    _("Selected %s%ld of %ld Lines; %lld of %lld Words; %lld of %lld Chars; %lld of %lld Bytes"),
-			    buf1, line_count_selected,
-			    (long)curbuf->b_ml.ml_line_count,
-			    word_count_cursor,
-			    word_count,
-			    char_count_cursor,
-			    char_count,
-			    byte_count_cursor,
-			    byte_count);
+			    buf1, سٽ_ڳڻپ_selected,
+			    (ڊگهو)curbuf->b_ml.ml_سٽ_ڳڻپ,
+			    لفظ_ڳڻپ_cursor,
+			    لفظ_ڳڻپ,
+			    char_ڳڻپ_cursor,
+			    char_ڳڻپ,
+			    byte_ڳڻپ_cursor,
+			    byte_ڳڻپ);
 	    }
-	    else
+	    وإلا
 	    {
 		p = ml_get_curline();
 		validate_virtcol();
-		col_print(buf1, sizeof(buf1), (int)curwin->w_cursor.col + 1,
-			(int)curwin->w_virtcol + 1);
-		col_print(buf2, sizeof(buf2), ml_get_curline_len(),
+		کانو_print(buf1, حجم(buf1), (صحيح)curwin->w_cursor.کانو + 1,
+			(صحيح)curwin->w_virtcol + 1);
+		کانو_print(buf2, حجم(buf2), ml_get_curline_len(),
 							   linetabsize_str(p));
 
-		if (char_count_cursor == byte_count_cursor
-			&& char_count == byte_count)
-		    vim_snprintf((char *)IObuff, IOSIZE,
+		إذا (char_ڳڻپ_cursor == byte_ڳڻپ_cursor
+			&& char_ڳڻپ == byte_ڳڻپ)
+		    vim_snprintf((حرف *)IObuff, IOSIZE,
 			_("Col %s of %s; Line %ld of %ld; Word %lld of %lld; Byte %lld of %lld"),
-			(char *)buf1, (char *)buf2,
-			(long)curwin->w_cursor.lnum,
-			(long)curbuf->b_ml.ml_line_count,
-			word_count_cursor, word_count,
-			byte_count_cursor, byte_count);
-		else
-		    vim_snprintf((char *)IObuff, IOSIZE,
+			(حرف *)buf1, (حرف *)buf2,
+			(ڊگهو)curwin->w_cursor.lnum,
+			(ڊگهو)curbuf->b_ml.ml_سٽ_ڳڻپ,
+			لفظ_ڳڻپ_cursor, لفظ_ڳڻپ,
+			byte_ڳڻپ_cursor, byte_ڳڻپ);
+		وإلا
+		    vim_snprintf((حرف *)IObuff, IOSIZE,
 			_("Col %s of %s; Line %ld of %ld; Word %lld of %lld; Char %lld of %lld; Byte %lld of %lld"),
-			(char *)buf1, (char *)buf2,
-			(long)curwin->w_cursor.lnum,
-			(long)curbuf->b_ml.ml_line_count,
-			word_count_cursor, word_count,
-			char_count_cursor, char_count,
-			byte_count_cursor, byte_count);
+			(حرف *)buf1, (حرف *)buf2,
+			(ڊگهو)curwin->w_cursor.lnum,
+			(ڊگهو)curbuf->b_ml.ml_سٽ_ڳڻپ,
+			لفظ_ڳڻپ_cursor, لفظ_ڳڻپ,
+			char_ڳڻپ_cursor, char_ڳڻپ,
+			byte_ڳڻپ_cursor, byte_ڳڻپ);
 	    }
 	}
 
-	bom_count = bomb_size();
-	if (dict == NULL && bom_count > 0)
+	bom_ڳڻپ = bomb_سائيز();
+	إذا (dict == عدم && bom_ڳڻپ > 0)
 	{
 	    size_t len = STRLEN(IObuff);
 
-	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
-				 _("(+%lld for BOM)"), bom_count);
+	    vim_snprintf((حرف *)IObuff + len, IOSIZE - len,
+				 _("(+%lld for BOM)"), bom_ڳڻپ);
 	}
-	if (dict == NULL)
+	إذا (dict == عدم)
 	{
 	    // Don't shorten this message, the user asked for it.
 	    p = p_shm;
 	    p_shm = (char_u *)"";
-	    msg((char *)IObuff);
+	    نياپو((حرف *)IObuff);
 	    p_shm = p;
 	}
     }
-#if defined(FEAT_EVAL)
-    if (dict != NULL)
+#إذا defined(FEAT_EVAL)
+    إذا (dict != عدم)
     {
-	dict_add_number(dict, "words", word_count);
-	dict_add_number(dict, "chars", char_count);
-	dict_add_number(dict, "bytes", byte_count + bom_count);
-	dict_add_number(dict, VIsual_active ? "visual_bytes" : "cursor_bytes",
-		byte_count_cursor);
-	dict_add_number(dict, VIsual_active ? "visual_chars" : "cursor_chars",
-		char_count_cursor);
-	dict_add_number(dict, VIsual_active ? "visual_words" : "cursor_words",
-		word_count_cursor);
+	dict_جوڙيو_عدد(dict, "words", لفظ_ڳڻپ);
+	dict_جوڙيو_عدد(dict, "chars", char_ڳڻپ);
+	dict_جوڙيو_عدد(dict, "bytes", byte_ڳڻپ + bom_ڳڻپ);
+	dict_جوڙيو_عدد(dict, VIsual_سرگرم ? "visual_bytes" : "cursor_bytes",
+		byte_ڳڻپ_cursor);
+	dict_جوڙيو_عدد(dict, VIsual_سرگرم ? "visual_chars" : "cursor_chars",
+		char_ڳڻپ_cursor);
+	dict_جوڙيو_عدد(dict, VIsual_سرگرم ? "visual_words" : "cursor_words",
+		لفظ_ڳڻپ_cursor);
     }
-#endif
+#جيڪڏهن_پورو
 }
 
 /*
  * Handle indent and format operators and visual mode ":".
  */
-    static void
+    ساكن فراغ
 op_colon(oparg_T *oap)
 {
     stuffcharReadbuff(':');
-    if (oap->is_VIsual)
+    إذا (oap->is_VIsual)
 	stuffReadbuff((char_u *)"'<,'>");
-    else
+    وإلا
     {
 	// Make the range look nice, so it can be repeated.
-	if (oap->start.lnum == curwin->w_cursor.lnum)
+	إذا (oap->شروعات.lnum == curwin->w_cursor.lnum)
 	    stuffcharReadbuff('.');
-	else
-	    stuffnumReadbuff((long)oap->start.lnum);
+	وإلا
+	    stuffnumReadbuff((ڊگهو)oap->شروعات.lnum);
 
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	// When using !! on a closed fold the range ".!" works best to operate
 	// on, it will be made the whole closed fold later.
-	linenr_T endOfStartFold = oap->start.lnum;
-	(void)hasFolding(oap->start.lnum, NULL, &endOfStartFold);
-#endif
-	if (oap->end.lnum != oap->start.lnum
-#ifdef FEAT_FOLDING
-		&& oap->end.lnum != endOfStartFold
-#endif
+	linenr_T پڇاڙي_جو_شروعات_Fold = oap->شروعات.lnum;
+	(فراغ)hasFolding(oap->شروعات.lnum, عدم, &پڇاڙي_جو_شروعات_Fold);
+#جيڪڏهن_پورو
+	إذا (oap->پڇاڙي.lnum != oap->شروعات.lnum
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
+		&& oap->پڇاڙي.lnum != پڇاڙي_جو_شروعات_Fold
+#جيڪڏهن_پورو
 	   )
 	{
 	    // Make it a range with the end line.
 	    stuffcharReadbuff(',');
-	    if (oap->end.lnum == curwin->w_cursor.lnum)
+	    إذا (oap->پڇاڙي.lnum == curwin->w_cursor.lnum)
 		stuffcharReadbuff('.');
-	    else if (oap->end.lnum == curbuf->b_ml.ml_line_count)
+	    وإلا إذا (oap->پڇاڙي.lnum == curbuf->b_ml.ml_سٽ_ڳڻپ)
 		stuffcharReadbuff('$');
-	    else if (oap->start.lnum == curwin->w_cursor.lnum
-#ifdef FEAT_FOLDING
+	    وإلا إذا (oap->شروعات.lnum == curwin->w_cursor.lnum
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 		    // do not use ".+number" for a closed fold, it would count
 		    // folded lines twice
-		    && !hasFolding(oap->end.lnum, NULL, NULL)
-#endif
+		    && !hasFolding(oap->پڇاڙي.lnum, عدم, عدم)
+#جيڪڏهن_پورو
 		    )
 	    {
 		stuffReadbuff((char_u *)".+");
-		stuffnumReadbuff((long)oap->line_count - 1);
+		stuffnumReadbuff((ڊگهو)oap->سٽ_ڳڻپ - 1);
 	    }
-	    else
-		stuffnumReadbuff((long)oap->end.lnum);
+	    وإلا
+		stuffnumReadbuff((ڊگهو)oap->پڇاڙي.lnum);
 	}
     }
-    if (oap->op_type != OP_COLON)
+    إذا (oap->op_type != OP_COLON)
 	stuffReadbuff((char_u *)"!");
-    if (oap->op_type == OP_INDENT)
+    إذا (oap->op_type == OP_INDENT)
     {
-	if (*get_equalprg() == NUL)
+	إذا (*get_equalprg() == NUL)
 	    stuffReadbuff((char_u *)"indent");
-	else
+	وإلا
 	    stuffReadbuff(get_equalprg());
 	stuffReadbuff((char_u *)"\n");
     }
-    else if (oap->op_type == OP_FORMAT)
+    وإلا إذا (oap->op_type == OP_FORMAT)
     {
-	if (*curbuf->b_p_fp != NUL)
+	إذا (*curbuf->b_p_fp != NUL)
 	    stuffReadbuff(curbuf->b_p_fp);
-	else if (*p_fp != NUL)
+	وإلا إذا (*p_fp != NUL)
 	    stuffReadbuff(p_fp);
-	else
+	وإلا
 	    stuffReadbuff((char_u *)"fmt");
 	stuffReadbuff((char_u *)"\n']");
     }
@@ -3687,186 +3687,186 @@ op_colon(oparg_T *oap)
 }
 
 // callback function for 'operatorfunc'
-static callback_T opfunc_cb;
+ساكن callback_T opfunc_cb;
 
 /*
  * Process the 'operatorfunc' option value.
  * Returns OK or FAIL.
  */
-    char *
-did_set_operatorfunc(optset_T *args UNUSED)
+    حرف *
+did_سيٽ_operatorfunc(optset_T *دليلون اڻ_استعمال_ٿيل)
 {
-    if (option_set_callback_func(p_opfunc, &opfunc_cb) == FAIL)
-	return e_invalid_argument;
+    إذا (option_سيٽ_callback_func(p_opfunc, &opfunc_cb) == FAIL)
+	أرجع e_invalid_دليل;
 
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(EXITFREE)
-    void
-free_operatorfunc_option(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_operatorfunc_option(فراغ)
 {
 # ifdef FEAT_EVAL
     free_callback(&opfunc_cb);
 # endif
 }
-#endif
+#جيڪڏهن_پورو
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Mark the global 'operatorfunc' callback with "copyID" so that it is not
  * garbage collected.
  */
-    int
-set_ref_in_opfunc(int copyID UNUSED)
+    صحيح
+سيٽ_ref_اندريون_opfunc(صحيح copyID اڻ_استعمال_ٿيل)
 {
-    int abort = FALSE;
+    صحيح abort = FALSE;
 
-    abort = set_ref_in_callback(&opfunc_cb, copyID);
+    abort = سيٽ_ref_اندريون_callback(&opfunc_cb, copyID);
 
-    return abort;
+    أرجع abort;
 }
-#endif
+#جيڪڏهن_پورو
 
 /*
  * Handle the "g@" operator: call 'operatorfunc'.
  */
-    static void
-op_function(oparg_T *oap UNUSED)
+    ساكن فراغ
+op_function(oparg_T *oap اڻ_استعمال_ٿيل)
 {
-#ifdef FEAT_EVAL
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
     typval_T	argv[2];
-    pos_T	orig_start = curbuf->b_op_start;
-    pos_T	orig_end = curbuf->b_op_end;
+    pos_T	orig_شروعات = curbuf->b_op_شروعات;
+    pos_T	orig_پڇاڙي = curbuf->b_op_پڇاڙي;
     typval_T	rettv;
 
-    if (*p_opfunc == NUL)
-	emsg(_(e_operatorfunc_is_empty));
-    else
+    إذا (*p_opfunc == NUL)
+	emsg(_(e_operatorfunc_is_خالي_جايون));
+    وإلا
     {
 	// Set '[ and '] marks to text to be operated on.
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
-	if (oap->motion_type != MLINE && !oap->inclusive)
+	curbuf->b_op_شروعات = oap->شروعات;
+	curbuf->b_op_پڇاڙي = oap->پڇاڙي;
+	إذا (oap->motion_type != MLINE && !oap->inclusive)
 	    // Exclude the end position.
-	    decl(&curbuf->b_op_end);
+	    decl(&curbuf->b_op_پڇاڙي);
 
 	argv[0].v_type = VAR_STRING;
-	if (oap->block_mode)
+	إذا (oap->بلاڪ_گهڻائي)
 	    argv[0].vval.v_string = (char_u *)"block";
-	else if (oap->motion_type == MLINE)
+	وإلا إذا (oap->motion_type == MLINE)
 	    argv[0].vval.v_string = (char_u *)"line";
-	else
+	وإلا
 	    argv[0].vval.v_string = (char_u *)"char";
 	argv[1].v_type = VAR_UNKNOWN;
 
 	// Reset virtual_op so that 'virtualedit' can be changed in the
 	// function.
-	int save_virtual_op = virtual_op;
+	صحيح save_virtual_op = virtual_op;
 	virtual_op = MAYBE;
 
 	// Reset finish_op so that mode() returns the right value.
-	int save_finish_op = finish_op;
-	finish_op = FALSE;
+	صحيح save_پڄاڻي_op = پڄاڻي_op;
+	پڄاڻي_op = FALSE;
 
-	if (call_callback(&opfunc_cb, 0, &rettv, 1, argv) != FAIL)
+	إذا (call_callback(&opfunc_cb, 0, &rettv, 1, argv) != FAIL)
 	    clear_tv(&rettv);
 
 	virtual_op = save_virtual_op;
-	finish_op = save_finish_op;
-	if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+	پڄاڻي_op = save_پڄاڻي_op;
+	إذا (cmdmod.cmod_flags & CMOD_LOCKMARKS)
 	{
-	    curbuf->b_op_start = orig_start;
-	    curbuf->b_op_end = orig_end;
+	    curbuf->b_op_شروعات = orig_شروعات;
+	    curbuf->b_op_پڇاڙي = orig_پڇاڙي;
 	}
     }
-#else
-    emsg(_(e_eval_feature_not_available));
-#endif
+#وإلا
+    emsg(_(e_eval_feature_not_موجود));
+#جيڪڏهن_پورو
 }
 
 /*
  * Calculate start/end virtual columns for operating in block mode.
  */
-    static void
+    ساكن فراغ
 get_op_vcol(
     oparg_T	*oap,
     colnr_T	redo_VIsual_vcol,
-    int		initial)    // when TRUE adjust position for 'selectmode'
+    صحيح		initial)    // when TRUE adjust position for 'selectmode'
 {
-    colnr_T	    start, end;
+    colnr_T	    شروعات, پڇاڙي;
 
-    if (VIsual_mode != Ctrl_V
-	    || (!initial && oap->end.col < curwin->w_width))
-	return;
+    إذا (VIsual_گهڻائي != Ctrl_V
+	    || (!initial && oap->پڇاڙي.کانو < curwin->w_ويڪر))
+	أرجع;
 
-    oap->block_mode = TRUE;
+    oap->بلاڪ_گهڻائي = TRUE;
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
-	mb_adjustpos(curwin->w_buffer, &oap->end);
+    إذا (has_mbyte)
+	mb_adjustpos(curwin->w_بفر, &oap->پڇاڙي);
 
-    getvvcol(curwin, &(oap->start), &oap->start_vcol, NULL, &oap->end_vcol, 0);
+    getvvcol(curwin, &(oap->شروعات), &oap->شروعات_vcol, عدم, &oap->پڇاڙي_vcol, 0);
 
-    if (!redo_VIsual_busy)
+    إذا (!redo_VIsual_busy)
     {
-	getvvcol(curwin, &(oap->end), &start, NULL, &end, 0);
+	getvvcol(curwin, &(oap->پڇاڙي), &شروعات, عدم, &پڇاڙي, 0);
 
-	if (start < oap->start_vcol)
-	    oap->start_vcol = start;
-	if (end > oap->end_vcol)
+	إذا (شروعات < oap->شروعات_vcol)
+	    oap->شروعات_vcol = شروعات;
+	إذا (پڇاڙي > oap->پڇاڙي_vcol)
 	{
-	    if (initial && *p_sel == 'e' && start >= 1
-				    && start - 1 >= oap->end_vcol)
-		oap->end_vcol = start - 1;
-	    else
-		oap->end_vcol = end;
+	    إذا (initial && *p_sel == 'e' && شروعات >= 1
+				    && شروعات - 1 >= oap->پڇاڙي_vcol)
+		oap->پڇاڙي_vcol = شروعات - 1;
+	    وإلا
+		oap->پڇاڙي_vcol = پڇاڙي;
 	}
     }
 
     // if '$' was used, get oap->end_vcol from longest line
-    if (curwin->w_curswant == MAXCOL)
+    إذا (curwin->w_curswant == MAXCOL)
     {
-	curwin->w_cursor.col = MAXCOL;
-	oap->end_vcol = 0;
-	for (curwin->w_cursor.lnum = oap->start.lnum;
-		curwin->w_cursor.lnum <= oap->end.lnum;
+	curwin->w_cursor.کانو = MAXCOL;
+	oap->پڇاڙي_vcol = 0;
+	لكل (curwin->w_cursor.lnum = oap->شروعات.lnum;
+		curwin->w_cursor.lnum <= oap->پڇاڙي.lnum;
 					++curwin->w_cursor.lnum)
 	{
-	    getvvcol(curwin, &curwin->w_cursor, NULL, NULL, &end, 0);
-	    if (end > oap->end_vcol)
-		oap->end_vcol = end;
+	    getvvcol(curwin, &curwin->w_cursor, عدم, عدم, &پڇاڙي, 0);
+	    إذا (پڇاڙي > oap->پڇاڙي_vcol)
+		oap->پڇاڙي_vcol = پڇاڙي;
 	}
     }
-    else if (redo_VIsual_busy)
-	oap->end_vcol = oap->start_vcol + redo_VIsual_vcol - 1;
+    وإلا إذا (redo_VIsual_busy)
+	oap->پڇاڙي_vcol = oap->شروعات_vcol + redo_VIsual_vcol - 1;
     // Correct oap->end.col and oap->start.col to be the
     // upper-left and lower-right corner of the block area.
     //
     // (Actually, this does convert column positions into character
     // positions)
-    curwin->w_cursor.lnum = oap->end.lnum;
-    coladvance(oap->end_vcol);
-    oap->end = curwin->w_cursor;
+    curwin->w_cursor.lnum = oap->پڇاڙي.lnum;
+    coladvance(oap->پڇاڙي_vcol);
+    oap->پڇاڙي = curwin->w_cursor;
 
-    curwin->w_cursor = oap->start;
-    coladvance(oap->start_vcol);
-    oap->start = curwin->w_cursor;
+    curwin->w_cursor = oap->شروعات;
+    coladvance(oap->شروعات_vcol);
+    oap->شروعات = curwin->w_cursor;
 }
 
 // Information for redoing the previous Visual selection.
-typedef struct {
-    int		rv_mode;	// 'v', 'V', or Ctrl-V
-    linenr_T	rv_line_count;	// number of lines
+تعريفنوع بنية {
+    صحيح		rv_گهڻائي;	// 'v', 'V', or Ctrl-V
+    linenr_T	rv_سٽ_ڳڻپ;	// number of lines
     colnr_T	rv_vcol;	// number of cols or end column
-    long	rv_count;	// count for Visual operator
-    int		rv_arg;		// extra argument
+    ڊگهو	rv_ڳڻپ;	// count for Visual operator
+    صحيح		rv_arg;		// extra argument
 } redo_VIsual_T;
 
-    static int
+    ساكن صحيح
 is_ex_cmdchar(cmdarg_T *cap)
 {
-    return cap->cmdchar == ':'
+    أرجع cap->cmdchar == ':'
 	|| cap->cmdchar == K_COMMAND
 	|| cap->cmdchar == K_SCRIPT_COMMAND;
 }
@@ -3875,85 +3875,85 @@ is_ex_cmdchar(cmdarg_T *cap)
  * Handle an operator after Visual mode or when the movement is finished.
  * "gui_yank" is true when yanking text for the clipboard.
  */
-    void
-do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
+    فراغ
+do_pending_operator(cmdarg_T *cap, صحيح old_کانو, صحيح gui_yank)
 {
     oparg_T	*oap = cap->oap;
     pos_T	old_cursor;
-    int		empty_region_error;
-    int		restart_edit_save;
-#ifdef FEAT_LINEBREAK
-    int		lbr_saved = curwin->w_p_lbr;
-#endif
+    صحيح		خالي_جايون_region_error;
+    صحيح		restart_edit_save;
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
+    صحيح		lbr_saved = curwin->w_p_lbr;
+#جيڪڏهن_پورو
 
     // The visual area is remembered for redo
-    static redo_VIsual_T   redo_VIsual = {NUL, 0, 0, 0,0};
+    ساكن redo_VIsual_T   redo_VIsual = {NUL, 0, 0, 0,0};
 
-    int		    include_line_break = FALSE;
+    صحيح		    include_سٽ_break = FALSE;
 
-#if defined(FEAT_CLIPBOARD)
+#إذا defined(FEAT_CLIPBOARD)
     // Yank the visual area into the GUI selection register before we operate
     // on it and lose it forever.
     // Don't do it if a specific register was specified, so that ""x"*P works.
     // This could call do_pending_operator() recursively, but that's OK
     // because gui_yank will be TRUE for the nested call.
-    if ((clip_star.available || clip_plus.available)
+    إذا ((clip_تارو.موجود || clip_plus.موجود)
 	    && oap->op_type != OP_NOP
 	    && !gui_yank
-	    && VIsual_active
+	    && VIsual_سرگرم
 	    && !redo_VIsual_busy
 	    && oap->regname == 0)
 	clip_auto_select();
-#endif
+#جيڪڏهن_پورو
     old_cursor = curwin->w_cursor;
 
     // If an operation is pending, handle it...
-    if ((finish_op || VIsual_active) && oap->op_type != OP_NOP)
+    إذا ((پڄاڻي_op || VIsual_سرگرم) && oap->op_type != OP_NOP)
     {
 	// Yank can be redone when 'y' is in 'cpoptions', but not when yanking
 	// for the clipboard.
-	int	redo_yank = vim_strchr(p_cpo, CPO_YANK) != NULL && !gui_yank;
+	صحيح	redo_yank = vim_strchr(p_cpo, CPO_YANK) != عدم && !gui_yank;
 
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 	// Avoid a problem with unwanted linebreaks in block mode.
-	(void)reset_lbr();
-#endif
-	oap->is_VIsual = VIsual_active;
-	if (oap->motion_force == 'V')
+	(فراغ)reset_lbr();
+#جيڪڏهن_پورو
+	oap->is_VIsual = VIsual_سرگرم;
+	إذا (oap->motion_force == 'V')
 	    oap->motion_type = MLINE;
-	else if (oap->motion_force == 'v')
+	وإلا إذا (oap->motion_force == 'v')
 	{
 	    // If the motion was linewise, "inclusive" will not have been set.
 	    // Use "exclusive" to be consistent.  Makes "dvj" work nice.
-	    if (oap->motion_type == MLINE)
+	    إذا (oap->motion_type == MLINE)
 		oap->inclusive = FALSE;
 	    // If the motion already was characterwise, toggle "inclusive"
-	    else if (oap->motion_type == MCHAR)
+	    وإلا إذا (oap->motion_type == MCHAR)
 		oap->inclusive = !oap->inclusive;
 	    oap->motion_type = MCHAR;
 	}
-	else if (oap->motion_force == Ctrl_V)
+	وإلا إذا (oap->motion_force == Ctrl_V)
 	{
 	    // Change line- or characterwise motion into Visual block mode.
-	    if (!VIsual_active)
+	    إذا (!VIsual_سرگرم)
 	    {
-		VIsual_active = TRUE;
-		VIsual = oap->start;
+		VIsual_سرگرم = TRUE;
+		VIsual = oap->شروعات;
 	    }
-	    VIsual_mode = Ctrl_V;
+	    VIsual_گهڻائي = Ctrl_V;
 	    VIsual_select = FALSE;
 	    VIsual_reselect = FALSE;
 	}
 
 	// Only redo yank when 'y' flag is in 'cpoptions'.
 	// Never redo "zf" (define fold).
-	if ((redo_yank || oap->op_type != OP_YANK)
-		&& ((!VIsual_active || oap->motion_force)
+	إذا ((redo_yank || oap->op_type != OP_YANK)
+		&& ((!VIsual_سرگرم || oap->motion_force)
 		    // Also redo Operator-pending Visual mode mappings
-		    || (VIsual_active
+		    || (VIsual_سرگرم
 			    && is_ex_cmdchar(cap) && oap->op_type != OP_COLON))
 		&& cap->cmdchar != 'D'
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 		&& oap->op_type != OP_FOLD
 		&& oap->op_type != OP_FOLDOPEN
 		&& oap->op_type != OP_FOLDOPENREC
@@ -3961,201 +3961,201 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		&& oap->op_type != OP_FOLDCLOSEREC
 		&& oap->op_type != OP_FOLDDEL
 		&& oap->op_type != OP_FOLDDELREC
-#endif
+#جيڪڏهن_پورو
 		)
 	{
 	    prep_redo(oap->regname, cap->count0,
 		    get_op_char(oap->op_type), get_extra_op_char(oap->op_type),
 		    oap->motion_force, cap->cmdchar, cap->nchar);
-	    if (cap->cmdchar == '/' || cap->cmdchar == '?') // was a search
+	    إذا (cap->cmdchar == '/' || cap->cmdchar == '?') // was a search
 	    {
 		// If 'cpoptions' does not contain 'r', insert the search
 		// pattern to really repeat the same command.
-		if (vim_strchr(p_cpo, CPO_REDO) == NULL)
-		    AppendToRedobuffLit(cap->searchbuf, -1);
-		AppendToRedobuff(NL_STR);
+		إذا (vim_strchr(p_cpo, CPO_REDO) == عدم)
+		    Append_منزل_Redobuff_Lit(cap->searchbuf, -1);
+		Append_منزل_Redobuff(NL_STR);
 	    }
-	    else if (is_ex_cmdchar(cap))
+	    وإلا إذا (is_ex_cmdchar(cap))
 	    {
 		// do_cmdline() has stored the first typed line in
 		// "repeat_cmdline".  When several lines are typed repeating
 		// won't be possible.
-		if (repeat_cmdline == NULL)
+		إذا (repeat_cmdline == عدم)
 		    ResetRedobuff();
-		else
+		وإلا
 		{
-		    if (cap->cmdchar == ':')
-			AppendToRedobuffLit(repeat_cmdline, -1);
-		    else
-			AppendToRedobuffSpec(repeat_cmdline);
-		    AppendToRedobuff(NL_STR);
+		    إذا (cap->cmdchar == ':')
+			Append_منزل_Redobuff_Lit(repeat_cmdline, -1);
+		    وإلا
+			Append_منزل_Redobuff_Spec(repeat_cmdline);
+		    Append_منزل_Redobuff(NL_STR);
 		    VIM_CLEAR(repeat_cmdline);
 		}
 	    }
 	}
 
-	if (redo_VIsual_busy)
+	إذا (redo_VIsual_busy)
 	{
 	    // Redo of an operation on a Visual area. Use the same size from
 	    // redo_VIsual.rv_line_count and redo_VIsual.rv_vcol.
-	    oap->start = curwin->w_cursor;
-	    curwin->w_cursor.lnum += redo_VIsual.rv_line_count - 1;
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	    VIsual_mode = redo_VIsual.rv_mode;
-	    if (redo_VIsual.rv_vcol == MAXCOL || VIsual_mode == 'v')
+	    oap->شروعات = curwin->w_cursor;
+	    curwin->w_cursor.lnum += redo_VIsual.rv_سٽ_ڳڻپ - 1;
+	    إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_سٽ_ڳڻپ)
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_سٽ_ڳڻپ;
+	    VIsual_گهڻائي = redo_VIsual.rv_گهڻائي;
+	    إذا (redo_VIsual.rv_vcol == MAXCOL || VIsual_گهڻائي == 'v')
 	    {
-		if (VIsual_mode == 'v')
+		إذا (VIsual_گهڻائي == 'v')
 		{
-		    if (redo_VIsual.rv_line_count <= 1)
+		    إذا (redo_VIsual.rv_سٽ_ڳڻپ <= 1)
 		    {
 			validate_virtcol();
 			curwin->w_curswant =
 				     curwin->w_virtcol + redo_VIsual.rv_vcol - 1;
 		    }
-		    else
+		    وإلا
 			curwin->w_curswant = redo_VIsual.rv_vcol;
 		}
-		else
+		وإلا
 		{
 		    curwin->w_curswant = MAXCOL;
 		}
 		coladvance(curwin->w_curswant);
 	    }
-	    cap->count0 = redo_VIsual.rv_count;
-	    if (redo_VIsual.rv_count != 0)
-		cap->count1 = redo_VIsual.rv_count;
-	    else
+	    cap->count0 = redo_VIsual.rv_ڳڻپ;
+	    إذا (redo_VIsual.rv_ڳڻپ != 0)
+		cap->count1 = redo_VIsual.rv_ڳڻپ;
+	    وإلا
 		cap->count1 = 1;
 	}
-	else if (VIsual_active)
+	وإلا إذا (VIsual_سرگرم)
 	{
-	    if (!gui_yank)
+	    إذا (!gui_yank)
 	    {
 		// Save the current VIsual area for '< and '> marks, and "gv"
-		curbuf->b_visual.vi_start = VIsual;
-		curbuf->b_visual.vi_end = curwin->w_cursor;
-		curbuf->b_visual.vi_mode = VIsual_mode;
-		restore_visual_mode();
+		curbuf->b_visual.vi_شروعات = VIsual;
+		curbuf->b_visual.vi_پڇاڙي = curwin->w_cursor;
+		curbuf->b_visual.vi_گهڻائي = VIsual_گهڻائي;
+		restore_visual_گهڻائي();
 		curbuf->b_visual.vi_curswant = curwin->w_curswant;
-#ifdef FEAT_EVAL
-		curbuf->b_visual_mode_eval = VIsual_mode;
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+		curbuf->b_visual_گهڻائي_eval = VIsual_گهڻائي;
+#جيڪڏهن_پورو
 	    }
 
 	    // In Select mode, a linewise selection is operated upon like a
 	    // characterwise selection.
 	    // Special case: gH<Del> deletes the last line.
-	    if (VIsual_select && VIsual_mode == 'V'
+	    إذا (VIsual_select && VIsual_گهڻائي == 'V'
 					    && cap->oap->op_type != OP_DELETE)
 	    {
-		if (LT_POS(VIsual, curwin->w_cursor))
+		إذا (LT_POS(VIsual, curwin->w_cursor))
 		{
-		    VIsual.col = 0;
-		    curwin->w_cursor.col = ml_get_len(curwin->w_cursor.lnum);
+		    VIsual.کانو = 0;
+		    curwin->w_cursor.کانو = ml_get_len(curwin->w_cursor.lnum);
 		}
-		else
+		وإلا
 		{
-		    curwin->w_cursor.col = 0;
-		    VIsual.col = ml_get_len(VIsual.lnum);
+		    curwin->w_cursor.کانو = 0;
+		    VIsual.کانو = ml_get_len(VIsual.lnum);
 		}
-		VIsual_mode = 'v';
+		VIsual_گهڻائي = 'v';
 	    }
 	    // If 'selection' is "exclusive", backup one character for
 	    // charwise selections.
-	    else if (VIsual_mode == 'v')
-		include_line_break = unadjust_for_sel();
+	    وإلا إذا (VIsual_گهڻائي == 'v')
+		include_سٽ_break = unadjust_for_sel();
 
-	    oap->start = VIsual;
-	    if (VIsual_mode == 'V')
+	    oap->شروعات = VIsual;
+	    إذا (VIsual_گهڻائي == 'V')
 	    {
-		oap->start.col = 0;
-		oap->start.coladd = 0;
+		oap->شروعات.کانو = 0;
+		oap->شروعات.coladd = 0;
 	    }
 	}
 
 	// Set oap->start to the first position of the operated text, oap->end
 	// to the end of the operated text.  w_cursor is equal to oap->start.
-	if (LT_POS(oap->start, curwin->w_cursor))
+	إذا (LT_POS(oap->شروعات, curwin->w_cursor))
 	{
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	    // Include folded lines completely.
-	    if (!VIsual_active)
+	    إذا (!VIsual_سرگرم)
 	    {
-		if (hasFolding(oap->start.lnum, &oap->start.lnum, NULL))
-		    oap->start.col = 0;
-		if ((curwin->w_cursor.col > 0 || oap->inclusive
+		إذا (hasFolding(oap->شروعات.lnum, &oap->شروعات.lnum, عدم))
+		    oap->شروعات.کانو = 0;
+		إذا ((curwin->w_cursor.کانو > 0 || oap->inclusive
 						  || oap->motion_type == MLINE)
-			&& hasFolding(curwin->w_cursor.lnum, NULL,
+			&& hasFolding(curwin->w_cursor.lnum, عدم,
 						      &curwin->w_cursor.lnum))
-		    curwin->w_cursor.col = ml_get_curline_len();
+		    curwin->w_cursor.کانو = ml_get_curline_len();
 	    }
-#endif
-	    oap->end = curwin->w_cursor;
-	    curwin->w_cursor = oap->start;
+#جيڪڏهن_پورو
+	    oap->پڇاڙي = curwin->w_cursor;
+	    curwin->w_cursor = oap->شروعات;
 
 	    // w_virtcol may have been updated; if the cursor goes back to its
 	    // previous position w_virtcol becomes invalid and isn't updated
 	    // automatically.
 	    curwin->w_valid &= ~VALID_VIRTCOL;
 	}
-	else
+	وإلا
 	{
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 	    // Include folded lines completely.
-	    if (!VIsual_active && oap->motion_type == MLINE)
+	    إذا (!VIsual_سرگرم && oap->motion_type == MLINE)
 	    {
-		if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum,
-									NULL))
-		    curwin->w_cursor.col = 0;
-		if (hasFolding(oap->start.lnum, NULL, &oap->start.lnum))
-		    oap->start.col = ml_get_len(oap->start.lnum);
+		إذا (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum,
+									عدم))
+		    curwin->w_cursor.کانو = 0;
+		إذا (hasFolding(oap->شروعات.lnum, عدم, &oap->شروعات.lnum))
+		    oap->شروعات.کانو = ml_get_len(oap->شروعات.lnum);
 	    }
-#endif
-	    oap->end = oap->start;
-	    oap->start = curwin->w_cursor;
+#جيڪڏهن_پورو
+	    oap->پڇاڙي = oap->شروعات;
+	    oap->شروعات = curwin->w_cursor;
 	}
 
 	// Just in case lines were deleted that make the position invalid.
-	check_pos(curwin->w_buffer, &oap->end);
-	oap->line_count = oap->end.lnum - oap->start.lnum + 1;
+	check_pos(curwin->w_بفر, &oap->پڇاڙي);
+	oap->سٽ_ڳڻپ = oap->پڇاڙي.lnum - oap->شروعات.lnum + 1;
 
 	// Set "virtual_op" before resetting VIsual_active.
-	virtual_op = virtual_active();
+	virtual_op = virtual_سرگرم();
 
-	if (VIsual_active || redo_VIsual_busy)
+	إذا (VIsual_سرگرم || redo_VIsual_busy)
 	{
 	    get_op_vcol(oap, redo_VIsual.rv_vcol, TRUE);
 
-	    if (!redo_VIsual_busy && !gui_yank)
+	    إذا (!redo_VIsual_busy && !gui_yank)
 	    {
 		// Prepare to reselect and redo Visual: this is based on the
 		// size of the Visual text
-		resel_VIsual_mode = VIsual_mode;
-		if (curwin->w_curswant == MAXCOL)
+		resel_VIsual_گهڻائي = VIsual_گهڻائي;
+		إذا (curwin->w_curswant == MAXCOL)
 		    resel_VIsual_vcol = MAXCOL;
-		else
+		وإلا
 		{
-		    if (VIsual_mode != Ctrl_V)
-			getvvcol(curwin, &(oap->end),
-						NULL, NULL, &oap->end_vcol, 0);
-		    if (VIsual_mode == Ctrl_V || oap->line_count <= 1)
+		    إذا (VIsual_گهڻائي != Ctrl_V)
+			getvvcol(curwin, &(oap->پڇاڙي),
+						عدم, عدم, &oap->پڇاڙي_vcol, 0);
+		    إذا (VIsual_گهڻائي == Ctrl_V || oap->سٽ_ڳڻپ <= 1)
 		    {
-			if (VIsual_mode != Ctrl_V)
-			    getvvcol(curwin, &(oap->start),
-					      &oap->start_vcol, NULL, NULL, 0);
-			resel_VIsual_vcol = oap->end_vcol - oap->start_vcol + 1;
+			إذا (VIsual_گهڻائي != Ctrl_V)
+			    getvvcol(curwin, &(oap->شروعات),
+					      &oap->شروعات_vcol, عدم, عدم, 0);
+			resel_VIsual_vcol = oap->پڇاڙي_vcol - oap->شروعات_vcol + 1;
 		    }
-		    else
-			resel_VIsual_vcol = oap->end_vcol;
+		    وإلا
+			resel_VIsual_vcol = oap->پڇاڙي_vcol;
 		}
-		resel_VIsual_line_count = oap->line_count;
+		resel_VIsual_سٽ_ڳڻپ = oap->سٽ_ڳڻپ;
 	    }
 
 	    // can't redo yank (unless 'y' is in 'cpoptions') and ":"
-	    if ((redo_yank || oap->op_type != OP_YANK)
+	    إذا ((redo_yank || oap->op_type != OP_YANK)
 		    && oap->op_type != OP_COLON
-#ifdef FEAT_FOLDING
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 		    && oap->op_type != OP_FOLD
 		    && oap->op_type != OP_FOLDOPEN
 		    && oap->op_type != OP_FOLDOPENREC
@@ -4163,44 +4163,44 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 		    && oap->op_type != OP_FOLDCLOSEREC
 		    && oap->op_type != OP_FOLDDEL
 		    && oap->op_type != OP_FOLDDELREC
-#endif
+#جيڪڏهن_پورو
 		    && oap->motion_force == NUL
 		    )
 	    {
 		// Prepare for redoing.  Only use the nchar field for "r",
 		// otherwise it might be the second char of the operator.
-		if (cap->cmdchar == 'g' && (cap->nchar == 'n'
+		إذا (cap->cmdchar == 'g' && (cap->nchar == 'n'
 							|| cap->nchar == 'N'))
 		    prep_redo(oap->regname, cap->count0,
 			    get_op_char(oap->op_type),
 			    get_extra_op_char(oap->op_type),
 			    oap->motion_force, cap->cmdchar, cap->nchar);
-		else if (!is_ex_cmdchar(cap))
+		وإلا إذا (!is_ex_cmdchar(cap))
 		{
-		    int opchar = get_op_char(oap->op_type);
-		    int extra_opchar = get_extra_op_char(oap->op_type);
-		    int nchar = oap->op_type == OP_REPLACE ? cap->nchar : NUL;
+		    صحيح opchar = get_op_char(oap->op_type);
+		    صحيح extra_opchar = get_extra_op_char(oap->op_type);
+		    صحيح nchar = oap->op_type == OP_REPLACE ? cap->nchar : NUL;
 
 		    // reverse what nv_replace() did
-		    if (nchar == REPLACE_CR_NCHAR)
+		    إذا (nchar == REPLACE_CR_NCHAR)
 			nchar = CAR;
-		    else if (nchar == REPLACE_NL_NCHAR)
+		    وإلا إذا (nchar == REPLACE_NL_NCHAR)
 			nchar = NL;
 
-		    if (opchar == 'g' && extra_opchar == '@')
+		    إذا (opchar == 'g' && extra_opchar == '@')
 			// also repeat the count for 'operatorfunc'
 			prep_redo_num2(oap->regname, 0L, NUL, 'v',
 				     cap->count0, opchar, extra_opchar, nchar);
-		    else
+		    وإلا
 			prep_redo(oap->regname, 0L, NUL, 'v',
 						  opchar, extra_opchar, nchar);
 		}
-		if (!redo_VIsual_busy)
+		إذا (!redo_VIsual_busy)
 		{
-		    redo_VIsual.rv_mode = resel_VIsual_mode;
+		    redo_VIsual.rv_گهڻائي = resel_VIsual_گهڻائي;
 		    redo_VIsual.rv_vcol = resel_VIsual_vcol;
-		    redo_VIsual.rv_line_count = resel_VIsual_line_count;
-		    redo_VIsual.rv_count = cap->count0;
+		    redo_VIsual.rv_سٽ_ڳڻپ = resel_VIsual_سٽ_ڳڻپ;
+		    redo_VIsual.rv_ڳڻپ = cap->count0;
 		    redo_VIsual.rv_arg = cap->arg;
 		}
 	    }
@@ -4208,27 +4208,27 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // oap->inclusive defaults to TRUE.
 	    // If oap->end is on a NUL (empty line) oap->inclusive becomes
 	    // FALSE.  This makes "d}P" and "v}dP" work the same.
-	    if (oap->motion_force == NUL || oap->motion_type == MLINE)
+	    إذا (oap->motion_force == NUL || oap->motion_type == MLINE)
 		oap->inclusive = TRUE;
-	    if (VIsual_mode == 'V')
+	    إذا (VIsual_گهڻائي == 'V')
 		oap->motion_type = MLINE;
-	    else
+	    وإلا
 	    {
 		oap->motion_type = MCHAR;
-		if (VIsual_mode != Ctrl_V && *ml_get_pos(&(oap->end)) == NUL
-			&& (include_line_break || !virtual_op))
+		إذا (VIsual_گهڻائي != Ctrl_V && *ml_get_pos(&(oap->پڇاڙي)) == NUL
+			&& (include_سٽ_break || !virtual_op))
 		{
 		    oap->inclusive = FALSE;
 		    // Try to include the newline, unless it's an operator
 		    // that works on lines only.
-		    if (*p_sel != 'o'
-			    && !op_on_lines(oap->op_type)
-			    && oap->end.lnum < curbuf->b_ml.ml_line_count)
+		    إذا (*p_sel != 'o'
+			    && !op_on_سٽون(oap->op_type)
+			    && oap->پڇاڙي.lnum < curbuf->b_ml.ml_سٽ_ڳڻپ)
 		    {
-			++oap->end.lnum;
-			oap->end.col = 0;
-			oap->end.coladd = 0;
-			++oap->line_count;
+			++oap->پڇاڙي.lnum;
+			oap->پڇاڙي.کانو = 0;
+			oap->پڇاڙي.coladd = 0;
+			++oap->سٽ_ڳڻپ;
 		    }
 		}
 	    }
@@ -4240,62 +4240,62 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	    // With OP_YANK and sometimes with OP_COLON and OP_FILTER there is
 	    // no screen redraw, so it is done here to remove the inverted
 	    // part.
-	    if (!gui_yank)
+	    إذا (!gui_yank)
 	    {
-		VIsual_active = FALSE;
+		VIsual_سرگرم = FALSE;
 		setmouse();
 		mouse_dragging = 0;
 		may_clear_cmdline();
-		if ((oap->op_type == OP_YANK
+		إذا ((oap->op_type == OP_YANK
 			    || oap->op_type == OP_COLON
 			    || oap->op_type == OP_FUNCTION
 			    || oap->op_type == OP_FILTER)
 			&& oap->motion_force == NUL)
 		{
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		    // make sure redrawing is correct
 		    restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		    redraw_curbuf_later(UPD_INVERTED);
 		}
 	    }
 	}
 
 	// Include the trailing byte of a multi-byte char.
-	if (has_mbyte && oap->inclusive)
+	إذا (has_mbyte && oap->inclusive)
 	{
-	    int		l;
+	    صحيح		l;
 
-	    l = (*mb_ptr2len)(ml_get_pos(&oap->end));
-	    if (l > 1)
-		oap->end.col += l - 1;
+	    l = (*mb_ptr2len)(ml_get_pos(&oap->پڇاڙي));
+	    إذا (l > 1)
+		oap->پڇاڙي.کانو += l - 1;
 	}
-	curwin->w_set_curswant = true;
+	curwin->w_سيٽ_curswant = true;
 
 	// oap->empty is set when start and end are the same.  The inclusive
 	// flag affects this too, unless yanking and the end is on a NUL.
-	oap->empty = (oap->motion_type == MCHAR
+	oap->خالي_جايون_2 = (oap->motion_type == MCHAR
 		    && (!oap->inclusive
 			|| (oap->op_type == OP_YANK
-			    && gchar_pos(&oap->end) == NUL))
-		    && EQUAL_POS(oap->start, oap->end)
-		    && !(virtual_op && oap->start.coladd != oap->end.coladd));
+			    && gchar_pos(&oap->پڇاڙي) == NUL))
+		    && EQUAL_POS(oap->شروعات, oap->پڇاڙي)
+		    && !(virtual_op && oap->شروعات.coladd != oap->پڇاڙي.coladd));
 	// For delete, change and yank, it's an error to operate on an
 	// empty region, when 'E' included in 'cpoptions' (Vi compatible).
-	empty_region_error = (oap->empty
-				&& vim_strchr(p_cpo, CPO_EMPTYREGION) != NULL);
+	خالي_جايون_region_error = (oap->خالي_جايون_2
+				&& vim_strchr(p_cpo, CPO_EMPTYREGION) != عدم);
 
 	// Force a redraw when operating on an empty Visual region, when
 	// 'modifiable is off or creating a fold.
-	if (oap->is_VIsual && (oap->empty || !curbuf->b_p_ma
-#ifdef FEAT_FOLDING
+	إذا (oap->is_VIsual && (oap->خالي_جايون_2 || !curbuf->b_p_ma
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
 		    || oap->op_type == OP_FOLD
-#endif
+#جيڪڏهن_پورو
 		    ))
 	{
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 	    restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
 
@@ -4304,351 +4304,351 @@ do_pending_operator(cmdarg_T *cap, int old_col, int gui_yank)
 	// character in the previous line. If op_start is on or before the
 	// first non-blank in the line, the operator becomes linewise
 	// (strange, but that's the way vi does it).
-	if (	   oap->motion_type == MCHAR
+	إذا (	   oap->motion_type == MCHAR
 		&& oap->inclusive == FALSE
-		&& !(cap->retval & CA_NO_ADJ_OP_END)
-		&& oap->end.col == 0
+		&& !(cap->retval & CA_NO_ADJ_OP_پڇاڙي)
+		&& oap->پڇاڙي.کانو == 0
 		&& (!oap->is_VIsual || *p_sel == 'o')
-		&& !oap->block_mode
-		&& oap->line_count > 1)
+		&& !oap->بلاڪ_گهڻائي
+		&& oap->سٽ_ڳڻپ > 1)
 	{
-	    oap->end_adjusted = TRUE;	    // remember that we did this
-	    --oap->line_count;
-	    --oap->end.lnum;
-	    if (inindent(0))
+	    oap->پڇاڙي_adjusted = TRUE;	    // remember that we did this
+	    --oap->سٽ_ڳڻپ;
+	    --oap->پڇاڙي.lnum;
+	    إذا (inindent(0))
 		oap->motion_type = MLINE;
-	    else
+	    وإلا
 	    {
-		oap->end.col = ml_get_len(oap->end.lnum);
-		if (oap->end.col)
+		oap->پڇاڙي.کانو = ml_get_len(oap->پڇاڙي.lnum);
+		إذا (oap->پڇاڙي.کانو)
 		{
-		    --oap->end.col;
+		    --oap->پڇاڙي.کانو;
 		    oap->inclusive = TRUE;
 		}
 	    }
 	}
-	else
-	    oap->end_adjusted = FALSE;
+	وإلا
+	    oap->پڇاڙي_adjusted = FALSE;
 
-	switch (oap->op_type)
+	بدل (oap->op_type)
 	{
-	case OP_LSHIFT:
-	case OP_RSHIFT:
-	    op_shift(oap, TRUE, oap->is_VIsual ? (int)cap->count1 : 1);
+	حالة OP_LSHIFT:
+	حالة OP_RSHIFT:
+	    op_سرڪايو(oap, TRUE, oap->is_VIsual ? (صحيح)cap->count1 : 1);
 	    auto_format(FALSE, TRUE);
-	    break;
+	    اكسر;
 
-	case OP_JOIN_NS:
-	case OP_JOIN:
-	    if (oap->line_count < 2)
-		oap->line_count = 2;
-	    if (curwin->w_cursor.lnum + oap->line_count - 1 >
-						   curbuf->b_ml.ml_line_count)
+	حالة OP_JOIN_NS:
+	حالة OP_JOIN:
+	    إذا (oap->سٽ_ڳڻپ < 2)
+		oap->سٽ_ڳڻپ = 2;
+	    إذا (curwin->w_cursor.lnum + oap->سٽ_ڳڻپ - 1 >
+						   curbuf->b_ml.ml_سٽ_ڳڻپ)
 		beep_flush();
-	    else
+	    وإلا
 	    {
-		(void)do_join(oap->line_count, oap->op_type == OP_JOIN,
+		(فراغ)do_join(oap->سٽ_ڳڻپ, oap->op_type == OP_JOIN,
 							    TRUE, TRUE, TRUE);
 		auto_format(FALSE, TRUE);
 	    }
-	    break;
+	    اكسر;
 
-	case OP_DELETE:
+	حالة OP_DELETE:
 	    VIsual_reselect = FALSE;	    // don't reselect now
-	    if (empty_region_error)
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 	    {
-		(void)op_delete(oap);
+		(فراغ)op_delete(oap);
 		// save cursor line for undo if it wasn't saved yet
-		if (oap->motion_type == MLINE && has_format_option(FO_AUTO)
+		إذا (oap->motion_type == MLINE && has_format_option(FO_AUTO)
 						      && u_save_cursor() == OK)
 		    auto_format(FALSE, TRUE);
 	    }
-	    break;
+	    اكسر;
 
-	case OP_YANK:
-	    if (empty_region_error)
+	حالة OP_YANK:
+	    إذا (خالي_جايون_region_error)
 	    {
-		if (!gui_yank)
+		إذا (!gui_yank)
 		{
 		    vim_beep(BO_OPER);
 		    CancelRedo();
 		}
 	    }
-	    else
+	    وإلا
 	    {
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		oap->excl_tr_ws = cap->cmdchar == 'z';
-		(void)op_yank(oap, FALSE, !gui_yank);
+		(فراغ)op_yank(oap, FALSE, !gui_yank);
 	    }
-	    check_cursor_col();
-	    break;
+	    check_cursor_کانو();
+	    اكسر;
 
-	case OP_CHANGE:
+	حالة OP_CHANGE:
 	    VIsual_reselect = FALSE;	    // don't reselect now
-	    if (empty_region_error)
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 	    {
 		// This is a new edit command, not a restart.  Need to
 		// remember it to make 'insertmode' work with mappings for
 		// Visual mode.  But do this only once and not when typed and
 		// 'insertmode' isn't set.
-		if (p_im || !KeyTyped)
+		إذا (p_im || !ڪنجي_Typed)
 		    restart_edit_save = restart_edit;
-		else
+		وإلا
 		    restart_edit_save = 0;
 		restart_edit = 0;
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Restore linebreak, so that when the user edits it looks as
 		// before.
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		// trigger TextChangedI
-		curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
+		curbuf->b_آخري_changedtick_i = CHANGEDTICK(curbuf);
 
-		if (op_change(oap))	// will call edit()
+		إذا (op_change(oap))	// will call edit()
 		    cap->retval |= CA_COMMAND_BUSY;
-		if (restart_edit == 0)
+		إذا (restart_edit == 0)
 		    restart_edit = restart_edit_save;
 	    }
-	    break;
+	    اكسر;
 
-	case OP_FILTER:
-	    if (vim_strchr(p_cpo, CPO_FILTER) != NULL)
-		AppendToRedobuff((char_u *)"!\r");  // use any last used !cmd
-	    else
+	حالة OP_FILTER:
+	    إذا (vim_strchr(p_cpo, CPO_FILTER) != عدم)
+		Append_منزل_Redobuff((char_u *)"!\r");  // use any last used !cmd
+	    وإلا
 		bangredo = TRUE;    // do_bang() will put cmd in redo buffer
 	    // FALLTHROUGH
 
-	case OP_INDENT:
-	case OP_COLON:
+	حالة OP_INDENT:
+	حالة OP_COLON:
 
 	    // If 'equalprg' is empty, do the indenting internally.
-	    if (oap->op_type == OP_INDENT && *get_equalprg() == NUL)
+	    إذا (oap->op_type == OP_INDENT && *get_equalprg() == NUL)
 	    {
-		if (curbuf->b_p_lisp)
+		إذا (curbuf->b_p_lisp)
 		{
-#ifdef FEAT_EVAL
-		    if (use_indentexpr_for_lisp())
-			op_reindent(oap, get_expr_indent);
-		    else
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+		    إذا (use_indentexpr_for_lisp())
+			op_reindent(oap, get_اظهار_indent);
+		    وإلا
+#جيڪڏهن_پورو
 			op_reindent(oap, get_lisp_indent);
-		    break;
+		    اكسر;
 		}
 		op_reindent(oap,
-#ifdef FEAT_EVAL
-			*curbuf->b_p_inde != NUL ? get_expr_indent :
-#endif
+#جيڪڏهن_وصف_ٿيل FEAT_EVAL
+			*curbuf->b_p_inde != NUL ? get_اظهار_indent :
+#جيڪڏهن_پورو
 			    get_c_indent);
-		break;
+		اكسر;
 	    }
 
 	    op_colon(oap);
-	    break;
+	    اكسر;
 
-	case OP_TILDE:
-	case OP_UPPER:
-	case OP_LOWER:
-	case OP_ROT13:
-	    if (empty_region_error)
+	حالة OP_TILDE:
+	حالة OP_مٿانهون:
+	حالة OP_هيٺاهون:
+	حالة OP_ROT13:
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 		op_tilde(oap);
-	    check_cursor_col();
-	    break;
+	    check_cursor_کانو();
+	    اكسر;
 
-	case OP_FORMAT:
-#if defined(FEAT_EVAL)
-	    if (*curbuf->b_p_fex != NUL)
+	حالة OP_FORMAT:
+#إذا defined(FEAT_EVAL)
+	    إذا (*curbuf->b_p_fex != NUL)
 		op_formatexpr(oap);	// use expression
-	    else
-#endif
+	    وإلا
+#جيڪڏهن_پورو
 	    {
-		if (*p_fp != NUL || *curbuf->b_p_fp != NUL)
+		إذا (*p_fp != NUL || *curbuf->b_p_fp != NUL)
 		    op_colon(oap);		// use external command
-		else
+		وإلا
 		    op_format(oap, FALSE);	// use internal function
 	    }
-	    break;
-	case OP_FORMAT2:
+	    اكسر;
+	حالة OP_FORMAT2:
 	    op_format(oap, TRUE);	// use internal function
-	    break;
+	    اكسر;
 
-	case OP_FUNCTION:
+	حالة OP_FUNCTION:
 	    {
 		redo_VIsual_T   save_redo_VIsual = redo_VIsual;
 
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Restore linebreak, so that when the user edits it looks as
 		// before.
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		// call 'operatorfunc'
 		op_function(oap);
 
 		// Restore the info for redoing Visual mode, the function may
 		// invoke another operator and unintentionally change it.
 		redo_VIsual = save_redo_VIsual;
-		break;
+		اكسر;
 	    }
 
-	case OP_INSERT:
-	case OP_APPEND:
+	حالة OP_وجهو:
+	حالة OP_APPEND:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    if (empty_region_error)
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 	    {
 		// This is a new edit command, not a restart.  Need to
 		// remember it to make 'insertmode' work with mappings for
 		// Visual mode.  But do this only once.
 		restart_edit_save = restart_edit;
 		restart_edit = 0;
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Restore linebreak, so that when the user edits it looks as
 		// before.
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		// trigger TextChangedI
-		curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
+		curbuf->b_آخري_changedtick_i = CHANGEDTICK(curbuf);
 
-		op_insert(oap, cap->count1);
-#ifdef FEAT_LINEBREAK
+		op_وجهو(oap, cap->count1);
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Reset linebreak, so that formatting works correctly.
-		(void)reset_lbr();
-#endif
+		(فراغ)reset_lbr();
+#جيڪڏهن_پورو
 
 		// TODO: when inserting in several lines, should format all
 		// the lines.
 		auto_format(FALSE, TRUE);
 
-		if (restart_edit == 0)
+		إذا (restart_edit == 0)
 		    restart_edit = restart_edit_save;
-		else
+		وإلا
 		    cap->retval |= CA_COMMAND_BUSY;
 	    }
-	    break;
+	    اكسر;
 
-	case OP_REPLACE:
+	حالة OP_REPLACE:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    if (empty_region_error)
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 	    {
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		// Restore linebreak, so that when the user edits it looks as
 		// before.
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		op_replace(oap, cap->nchar);
 	    }
-	    break;
+	    اكسر;
 
-#ifdef FEAT_FOLDING
-	case OP_FOLD:
+#جيڪڏهن_وصف_ٿيل FEAT_FOLDING
+	حالة OP_FOLD:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    foldCreate(oap->start.lnum, oap->end.lnum);
-	    break;
+	    foldCreate(oap->شروعات.lnum, oap->پڇاڙي.lnum);
+	    اكسر;
 
-	case OP_FOLDOPEN:
-	case OP_FOLDOPENREC:
-	case OP_FOLDCLOSE:
-	case OP_FOLDCLOSEREC:
+	حالة OP_FOLDOPEN:
+	حالة OP_FOLDOPENREC:
+	حالة OP_FOLDCLOSE:
+	حالة OP_FOLDCLOSEREC:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    opFoldRange(oap->start.lnum, oap->end.lnum,
+	    opFoldRange(oap->شروعات.lnum, oap->پڇاڙي.lnum,
 		    oap->op_type == OP_FOLDOPEN
 					    || oap->op_type == OP_FOLDOPENREC,
 		    oap->op_type == OP_FOLDOPENREC
 					  || oap->op_type == OP_FOLDCLOSEREC,
 					  oap->is_VIsual);
-	    break;
+	    اكسر;
 
-	case OP_FOLDDEL:
-	case OP_FOLDDELREC:
+	حالة OP_FOLDDEL:
+	حالة OP_FOLDDELREC:
 	    VIsual_reselect = FALSE;	// don't reselect now
-	    deleteFold(oap->start.lnum, oap->end.lnum,
+	    deleteFold(oap->شروعات.lnum, oap->پڇاڙي.lnum,
 			       oap->op_type == OP_FOLDDELREC, oap->is_VIsual);
-	    break;
-#endif
-	case OP_NR_ADD:
-	case OP_NR_SUB:
-	    if (empty_region_error)
+	    اكسر;
+#جيڪڏهن_پورو
+	حالة OP_NR_جوڙيو:
+	حالة OP_NR_SUB:
+	    إذا (خالي_جايون_region_error)
 	    {
 		vim_beep(BO_OPER);
 		CancelRedo();
 	    }
-	    else
+	    وإلا
 	    {
-		VIsual_active = TRUE;
-#ifdef FEAT_LINEBREAK
+		VIsual_سرگرم = TRUE;
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
 		restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 		op_addsub(oap, cap->count1, redo_VIsual.rv_arg);
-		VIsual_active = FALSE;
+		VIsual_سرگرم = FALSE;
 	    }
-	    check_cursor_col();
-	    break;
-	default:
+	    check_cursor_کانو();
+	    اكسر;
+	افتراضي:
 	    clearopbeep(oap);
 	}
 	virtual_op = MAYBE;
-	if (!gui_yank)
+	إذا (!gui_yank)
 	{
 	    // if 'sol' not set, go back to old column for some commands
-	    if (!p_sol && oap->motion_type == MLINE && !oap->end_adjusted
+	    إذا (!p_sol && oap->motion_type == MLINE && !oap->پڇاڙي_adjusted
 		    && (oap->op_type == OP_LSHIFT || oap->op_type == OP_RSHIFT
 						|| oap->op_type == OP_DELETE))
 	    {
-#ifdef FEAT_LINEBREAK
-		(void)reset_lbr();
-#endif
-		coladvance(curwin->w_curswant = old_col);
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
+		(فراغ)reset_lbr();
+#جيڪڏهن_پورو
+		coladvance(curwin->w_curswant = old_کانو);
 	    }
 	}
-	else
+	وإلا
 	{
 	    curwin->w_cursor = old_cursor;
 	}
-	oap->block_mode = FALSE;
+	oap->بلاڪ_گهڻائي = FALSE;
 	clearop(oap);
 	motion_force = NUL;
     }
-#ifdef FEAT_LINEBREAK
+#جيڪڏهن_وصف_ٿيل FEAT_LINEBREAK
     restore_lbr(lbr_saved);
-#endif
+#جيڪڏهن_پورو
 }
 
 // put byte 'c' at position 'lp', but
 // verify, that the position to place
 // is actually safe
-    static void
-pbyte(pos_T lp, int c)
+    ساكن فراغ
+pbyte(pos_T lp, صحيح c)
 {
     char_u *p = ml_get_buf(curbuf, lp.lnum, TRUE);
-    int	len = curbuf->b_ml.ml_line_len;
+    صحيح	len = curbuf->b_ml.ml_سٽ_len;
 
     // safety check
-    if (lp.col >= len)
-	lp.col = (len > 1 ? len - 2 : 0);
-    *(p + lp.col) = c;
+    إذا (lp.کانو >= len)
+	lp.کانو = (len > 1 ? len - 2 : 0);
+    *(p + lp.کانو) = c;
 }
