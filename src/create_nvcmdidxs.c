@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+puur_naa_nka main(void)
 {
     size_t i;
 
     for (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	puur_naa_nka cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	ᮚᮦᮔ᮪ (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    ᮝᮜᮤ 0;
 }

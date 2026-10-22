@@ -19,31 +19,31 @@
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+puur_naa_nka VimMain(puur_naa_nka argc, var_na **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
+#ᮜᮤᮚ
 void SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    puur_naa_nka WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
     LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    puur_naa_nka		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ᮝᮜᮤ VimMain(0, NULL);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#ᮜᮤᮚ
+    puur_naa_nka
+wmain(puur_naa_nka argc UNUSED, wchar_t **argv UNUSED)
 {
     SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    ᮝᮜᮤ VimMain(0, NULL);
 }
 #endif
 
@@ -62,7 +62,7 @@ wWinMainCRTStartup(void)
 {
     VimMain(0, NULL);
 }
-# else
+# ᮜᮤᮚ
     void
 wmainCRTStartup(void)
 {
@@ -72,9 +72,9 @@ wmainCRTStartup(void)
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#ᮚᮦᮔ᮪ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
+# ᮚᮦᮔ᮪ defined(_MSC_VER)
 static __declspec(thread) void *tls_space;
 extern intptr_t _tls_index;
 # elif defined(__MINGW32__)
@@ -88,6 +88,6 @@ get_tls_info(void ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    ᮝᮜᮤ;
 }
 #endif

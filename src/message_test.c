@@ -36,13 +36,13 @@
 //
 // These formats are in practise only used from Vim script printf()
 // function and never as literals in C code.
-char *fmt_012p = "%012p";
-char *fmt_5S   = "%5S";
-char *fmt_06b  = "%06b";
-char *fmt_06pb = "%1$0.*2$b";
-char *fmt_06pb2 = "%2$0*1$b";
-char *fmt_212s = "%2$s %1$s %2$s";
-char *fmt_21s  = "%2$s %1$s";
+var_na *fmt_012p = "%012p";
+var_na *fmt_5S   = "%5S";
+var_na *fmt_06b  = "%06b";
+var_na *fmt_06pb = "%1$0.*2$b";
+var_na *fmt_06pb2 = "%2$0*1$b";
+var_na *fmt_212s = "%2$s %1$s %2$s";
+var_na *fmt_21s  = "%2$s %1$s";
 
 /*
  * Test trunc_string().
@@ -168,22 +168,22 @@ test_trunc_string_mbyte(void)
     static void
 test_vim_snprintf(void)
 {
-    int		n;
+    puur_naa_nka		n;
     size_t	bsize;
-    int		bsize_int;
+    puur_naa_nka		bsize_int;
     void	*ptr = (void *)0x87654321;
 
     // Loop on various buffer sizes to make sure that truncation of
     // vim_snprintf() is correct.
     for (bsize = 0; bsize < 15; ++bsize)
     {
-	bsize_int = (int)bsize - 1;
+	bsize_int = (puur_naa_nka)bsize - 1;
 
 	// buf is the heap rather than in the stack
 	// so valgrind can detect buffer overflows if any.
 	// Use malloc() rather than alloc() as test checks with 0-size
 	// buffer and its content should then never be used.
-	char *buf = malloc(bsize);
+	var_na *buf = malloc(bsize);
 
 	n = vim_snprintf(buf, bsize, "%.8g", 10000000.1);
 	assert(n == 12);
@@ -297,7 +297,7 @@ test_vim_snprintf(void)
 # define PREFIX_LEN  0
 # define PREFIX_STR1 ""
 # define PREFIX_STR2 "00"
-#else
+#ᮜᮤᮚ
 # define PREFIX_LEN  2
 # define PREFIX_STR1 "0x"
 # define PREFIX_STR2 "0x"
@@ -325,21 +325,21 @@ test_vim_snprintf(void)
     static void
 test_vim_snprintf_positional(void)
 {
-    int		n;
+    puur_naa_nka		n;
     size_t	bsize;
-    int		bsize_int;
+    puur_naa_nka		bsize_int;
 
     // Loop on various buffer sizes to make sure that truncation of
     // vim_snprintf() is correct.
     for (bsize = 0; bsize < 25; ++bsize)
     {
-	bsize_int = (int)bsize - 1;
+	bsize_int = (puur_naa_nka)bsize - 1;
 
 	// buf is the heap rather than in the stack
 	// so valgrind can detect buffer overflows if any.
 	// Use malloc() rather than alloc() as test checks with 0-size
 	// buffer and its content should then never be used.
-	char *buf = malloc(bsize);
+	var_na *buf = malloc(bsize);
 
 	n = vim_snprintf(buf, bsize, "%1$*2$ld", 1234567L, -9);
 	assert(n == 9);
@@ -502,8 +502,8 @@ test_vim_snprintf_positional(void)
     }
 }
 
-    int
-main(int argc, char **argv)
+    puur_naa_nka
+main(puur_naa_nka argc, var_na **argv)
 {
     CLEAR_FIELD(params);
     params.argc = argc;
@@ -524,5 +524,5 @@ main(int argc, char **argv)
     test_vim_snprintf();
     test_vim_snprintf_positional();
 
-    return 0;
+    ᮝᮜᮤ 0;
 }
