@@ -7,25 +7,25 @@
 //  Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 //  error checks: none
 //@@MIDL_FILE_HEADING(  )
-#include "rpc.h"
-#include "rpcndr.h"
+#अन्तर्भाव "rpc.h"
+#अन्तर्भाव "rpcndr.h"
 #ifndef COM_NO_WINDOWS_H
-#include "windows.h"
-#include "ole2.h"
+#अन्तर्भाव "windows.h"
+#अन्तर्भाव "ole2.h"
 #endif //COM_NO_WINDOWS_H
 
 #ifndef __if_ole_h__
 #define __if_ole_h__
 
 #ifdef __cplusplus
-extern "C"{
+बाह्य "C"{
 #endif
 
 // Forward Declarations
 
 #ifndef __IVim_FWD_DEFINED__
 #define __IVim_FWD_DEFINED__
-typedef interface IVim IVim;
+प्रकारनिर्देश interface IVim IVim;
 #endif	// __IVim_FWD_DEFINED__
 
 
@@ -33,21 +33,21 @@ typedef interface IVim IVim;
 #define __Vim_FWD_DEFINED__
 
 #ifdef __cplusplus
-typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
+प्रकारनिर्देश class Vim Vim;
+#अन्यथा
+प्रकारनिर्देश संरचना Vim Vim;
 #endif // __cplusplus
 
 #endif	// __Vim_FWD_DEFINED__
 
 
 // header files for imported files
-#include "oaidl.h"
+#अन्तर्भाव "oaidl.h"
 
 #ifndef __MIDL_user_allocate_free_DEFINED__
 #define __MIDL_user_allocate_free_DEFINED__
-    void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-    void __RPC_USER MIDL_user_free( void __RPC_FAR * );
+    शून्य __RPC_FAR * __RPC_USER MIDL_user_allocate(माप_प्रकार);
+    शून्य __RPC_USER MIDL_user_free( शून्य __RPC_FAR * );
 #endif
 
 #ifndef __IVim_INTERFACE_DEFINED__
@@ -62,38 +62,38 @@ typedef struct Vim Vim;
 
 
 
-EXTERN_C const IID IID_IVim;
+EXTERN_C ध्रुव IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#यदि defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
-    IVim : public IDispatch
+    IVim : सार्वजनिक IDispatch
     {
-    public:
-	virtual HRESULT STDMETHODCALLTYPE SendKeys(
-	    /* [in] */ BSTR keys) = 0;
+    सार्वजनिक:
+	आभास HRESULT STDMETHODCALLTYPE Send_कुंजियाँ(
+	    /* [in] */ BSTR कुंजियाँ) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE Eval(
-	    /* [in] */ BSTR expr,
+	आभास HRESULT STDMETHODCALLTYPE Eval(
+	    /* [in] */ BSTR व्यंजक,
 	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
+	आभास HRESULT STDMETHODCALLTYPE SetForeground( शून्य) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE GetHwnd(
+	आभास HRESULT STDMETHODCALLTYPE GetHwnd(
 	    /* [retval][out] */ UINT_PTR __RPC_FAR *result) = 0;
 
     };
 
-#else	// C style interface
+#अन्यथा	// C style interface
 
-    typedef struct IVimVtbl
+    प्रकारनिर्देश संरचना IVimVtbl
     {
 	BEGIN_INTERFACE
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+	    /* [iid_is][out] */ शून्य __RPC_FAR *__RPC_FAR *ppvObject);
 
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
 	    IVim __RPC_FAR * This);
@@ -101,7 +101,7 @@ EXTERN_C const IID IID_IVim;
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
 	    IVim __RPC_FAR * This);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetTypeInfoCount )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_Type_Info_गिनती )(
 	    IVim __RPC_FAR * This,
 	    /* [out] */ UINT __RPC_FAR *pctinfo);
 
@@ -130,13 +130,13 @@ EXTERN_C const IID IID_IVim;
 	    /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
 	    /* [out] */ UINT __RPC_FAR *puArgErr);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SendKeys )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Send_कुंजियाँ )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR keys);
+	    /* [in] */ BSTR कुंजियाँ);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Eval )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR expr,
+	    /* [in] */ BSTR व्यंजक,
 	    /* [retval][out] */ BSTR __RPC_FAR *result);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SetForeground )(
@@ -151,7 +151,7 @@ EXTERN_C const IID IID_IVim;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL संरचना IVimVtbl __RPC_FAR *lpVtbl;
     };
 
 #ifdef COBJMACROS
@@ -167,8 +167,8 @@ EXTERN_C const IID IID_IVim;
     (This)->lpVtbl -> Release(This)
 
 
-#define IVim_GetTypeInfoCount(This,pctinfo)	\
-    (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
+#define IVim_Get_Type_Info_गिनती(This,pctinfo)	\
+    (This)->lpVtbl -> Get_Type_Info_गिनती(This,pctinfo)
 
 #define IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
@@ -180,11 +180,11 @@ EXTERN_C const IID IID_IVim;
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 
-#define IVim_SendKeys(This,keys)	\
-    (This)->lpVtbl -> SendKeys(This,keys)
+#define IVim_Send_कुंजियाँ(This,कुंजियाँ)	\
+    (This)->lpVtbl -> Send_कुंजियाँ(This,कुंजियाँ)
 
-#define IVim_Eval(This,expr,result)	\
-    (This)->lpVtbl -> Eval(This,expr,result)
+#define IVim_Eval(This,व्यंजक,result)	\
+    (This)->lpVtbl -> Eval(This,व्यंजक,result)
 
 #define IVim_SetForeground(This)	\
     (This)->lpVtbl -> SetForeground(This)
@@ -199,12 +199,12 @@ EXTERN_C const IID IID_IVim;
 
 
 
-HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_Send_कुंजियाँ_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR keys);
+    /* [in] */ BSTR कुंजियाँ);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
+शून्य __RPC_STUB IVim_Send_कुंजियाँ_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -213,11 +213,11 @@ void __RPC_STUB IVim_SendKeys_Stub(
 
 HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR expr,
+    /* [in] */ BSTR व्यंजक,
     /* [retval][out] */ BSTR __RPC_FAR *result);
 
 
-void __RPC_STUB IVim_Eval_Stub(
+शून्य __RPC_STUB IVim_Eval_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -228,7 +228,7 @@ HRESULT STDMETHODCALLTYPE IVim_SetForeground_Proxy(
     IVim __RPC_FAR * This);
 
 
-void __RPC_STUB IVim_SetForeground_Stub(
+शून्य __RPC_STUB IVim_SetForeground_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -240,7 +240,7 @@ HRESULT STDMETHODCALLTYPE IVim_GetHwnd_Proxy(
     /* [retval][out] */ UINT_PTR __RPC_FAR *result);
 
 
-void __RPC_STUB IVim_GetHwnd_Stub(
+शून्य __RPC_STUB IVim_GetHwnd_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -264,10 +264,10 @@ void __RPC_STUB IVim_GetHwnd_Stub(
 
 
 
-EXTERN_C const IID LIBID_Vim;
+EXTERN_C ध्रुव IID LIBID_Vim;
 
 #ifdef __cplusplus
-EXTERN_C const CLSID CLSID_Vim;
+EXTERN_C ध्रुव CLSID CLSID_Vim;
 
 class DECLSPEC_UUID("0F0BFAE1-4C90-11d1-82D7-0004AC368519")
 Vim;
@@ -276,10 +276,10 @@ Vim;
 
 // Additional Prototypes for ALL interfaces
 
-unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
+अचिन्हित दीर्घ		  __RPC_USER  BSTR_UserSize(	 अचिन्हित दीर्घ __RPC_FAR *, अचिन्हित दीर्घ	     , BSTR __RPC_FAR * );
+अचिन्हित वर्ण __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  अचिन्हित दीर्घ __RPC_FAR *, अचिन्हित वर्ण __RPC_FAR *, BSTR __RPC_FAR * );
+अचिन्हित वर्ण __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(अचिन्हित दीर्घ __RPC_FAR *, अचिन्हित वर्ण __RPC_FAR *, BSTR __RPC_FAR * );
+शून्य			  __RPC_USER  BSTR_UserFree(	 अचिन्हित दीर्घ __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes
 

@@ -1,1 +1,1 @@
-raise NotImplementedError
+उत्थापय NotImplementedError

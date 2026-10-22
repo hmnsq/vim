@@ -13,7 +13,7 @@
  *		clipboard code.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 #ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
 # define WIN32_LEAN_AND_MEAN
@@ -33,17 +33,17 @@
 
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
-static int clip_provider_is_available(char_u *provider);
+स्थिर पूर्णाङ्क clip_provider_is_available(char_u *provider);
 #endif
 
-#if defined(FEAT_CLIPBOARD)
+#यदि defined(FEAT_CLIPBOARD)
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_WAYLAND_CLIPBOARD)
 
 #  include "wayland.h"
 
 // Represents either the regular or primary selection
-typedef struct {
+प्रकारनिर्देश संरचना {
     char_u		*contents;	// Non-null if we own selection,
 					// contains the data to send to other
 					// clients.
@@ -61,7 +61,7 @@ typedef struct {
 
 // Represents the clipboard for the global Wayland connection, for the chosen
 // seat (using the 'wl_seat' option)
-typedef struct {
+प्रकारनिर्देश संरचना {
     vwl_seat_T *seat;
 
     clip_wl_selection_T regular;
@@ -71,7 +71,7 @@ typedef struct {
 // Mime types we support sending and receiving
 // Mimes with a lower index in the array are prioritized first when we are
 // receiving data.
-static const char *supported_mimes[] = {
+स्थिर ध्रुव वर्ण *supported_mimes[] = {
     VIMENC_MIMETYPE_NAME,
     VIMENC_ATOM_NAME,
     VIM_MIMETYPE_NAME,
@@ -85,15 +85,15 @@ static const char *supported_mimes[] = {
 
 clip_wl_T clip_wl;
 
-static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd);
-static void clip_wl_request_selection(Clipboard_T *cbd);
-static int clip_wl_own_selection(Clipboard_T *cbd);
-static void clip_wl_lose_selection(Clipboard_T *cbd);
-static void clip_wl_set_selection(Clipboard_T *cbd);
+स्थिर शून्य
+clip_wl_receive_data(Clipboard_T *cbd, ध्रुव वर्ण *mime_type, पूर्णाङ्क fd);
+स्थिर शून्य clip_wl_request_selection(Clipboard_T *cbd);
+स्थिर पूर्णाङ्क clip_wl_own_selection(Clipboard_T *cbd);
+स्थिर शून्य clip_wl_lose_selection(Clipboard_T *cbd);
+स्थिर शून्य clip_wl_set_selection(Clipboard_T *cbd);
 
-#  if defined(USE_SYSTEM)
-static bool clip_wl_owner_exists(Clipboard_T *cbd);
+#  यदि defined(USE_SYSTEM)
+स्थिर bool clip_wl_owner_exists(Clipboard_T *cbd);
 #  endif
 
 # endif // FEAT_WAYLAND_CLIPBOARD
@@ -109,17 +109,17 @@ static bool clip_wl_owner_exists(Clipboard_T *cbd);
  * be used.  Eg unix may call this with FALSE, then call it again with TRUE if
  * the GUI starts.
  */
-    void
-clip_init(int can_use)
+    शून्य
+clip_init(पूर्णाङ्क can_use)
 {
     Clipboard_T *cb;
 
     cb = &clip_star;
-    for (;;)
+    प्रति (;;)
     {
 	// No need to init again if cbd is already available
-	if (can_use && cb->available)
-	    goto skip;
+	यदि (can_use && cb->available)
+	    गच्छ skip;
 
 	cb->available  = can_use;
 	cb->owned      = FALSE;
@@ -130,8 +130,8 @@ clip_init(int can_use)
 	cb->state      = SELECT_CLEARED;
 
 skip:
-	if (cb == &clip_plus)
-	    break;
+	यदि (cb == &clip_plus)
+	    भङ्ग;
 	cb = &clip_plus;
     }
 }
@@ -143,27 +143,27 @@ skip:
  * selected so we can still give it to others.	Will probably have to make sure
  * this is called whenever VIsual mode is ended.
  */
-    void
+    शून्य
 clip_update_selection(Clipboard_T *clip)
 {
     pos_T	    start, end;
 
     // If visual mode is only due to a redo command ("."), then ignore it
-    if (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
+    यदि (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
     {
-	if (LT_POS(VIsual, curwin->w_cursor))
+	यदि (LT_POS(VIsual, curwin->w_cursor))
 	{
 	    start = VIsual;
 	    end = curwin->w_cursor;
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 		end.col += (*mb_ptr2len)(ml_get_cursor()) - 1;
 	}
-	else
+	अन्यथा
 	{
 	    start = curwin->w_cursor;
 	    end = VIsual;
 	}
-	if (!EQUAL_POS(clip->start, start)
+	यदि (!EQUAL_POS(clip->start, start)
 		|| !EQUAL_POS(clip->end, end)
 		|| clip->vmode != VIsual_mode)
 	{
@@ -178,56 +178,56 @@ clip_update_selection(Clipboard_T *clip)
     }
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 clip_gen_own_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	return clip_mch_own_selection(cbd);
-    else
+    यदि (gui.in_use)
+	प्रत्यागम clip_mch_own_selection(cbd);
+    अन्यथा
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	यदि (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_own_selection(cbd);
+	    प्रत्यागम clip_wl_own_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	अन्यथा यदि (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    return clip_xterm_own_selection(cbd);
+	    प्रत्यागम clip_xterm_own_selection(cbd);
 #  endif
 	}
     }
-    return FAIL;
-# else
-    return clip_mch_own_selection(cbd);
+    प्रत्यागम FAIL;
+# अन्यथा
+    प्रत्यागम clip_mch_own_selection(cbd);
 # endif
 }
 
-    void
+    शून्य
 clip_own_selection(Clipboard_T *cbd)
 {
     /*
      * Also want to check somehow that we are reading from the keyboard rather
      * than a mapping etc.
      */
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     // Always own the selection, we might have lost it without being
     // notified, e.g. during a ":sh" command.
-    if (cbd->available)
+    यदि (cbd->available)
     {
-	int was_owned = cbd->owned;
+	पूर्णाङ्क was_owned = cbd->owned;
 
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
-	if (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
+	यदि (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
 	{
 	    // May have to show a different kind of highlighting for the
 	    // selected area.  There is no specific redraw command for this,
 	    // just redraw all windows on the current buffer.
-	    if (cbd->owned
+	    यदि (cbd->owned
 		    && (get_real_state() == MODE_VISUAL
 					    || get_real_state() == MODE_SELECT)
 		    && (cbd == &clip_star ? clip_isautosel_star()
@@ -236,64 +236,64 @@ clip_own_selection(Clipboard_T *cbd)
 		redraw_curbuf_later(UPD_INVERTED_ALL);
 	}
     }
-# else
+# अन्यथा
     // Only own the clipboard when we didn't own it yet.
-    if (!cbd->owned && cbd->available)
+    यदि (!cbd->owned && cbd->available)
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
 # endif
 }
 
-    static void
+    स्थिर शून्य
 clip_gen_lose_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	clip_mch_lose_selection(cbd);
-    else
+    अन्यथा
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	यदि (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_lose_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	अन्यथा यदि (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_lose_selection(cbd);
 #  endif
 	}
     }
-# else
+# अन्यथा
     clip_mch_lose_selection(cbd);
 # endif
 }
 
-    void
+    शून्य
 clip_lose_selection(Clipboard_T *cbd)
 {
 # ifdef FEAT_X11
-    int	    was_owned = cbd->owned;
+    पूर्णाङ्क	    was_owned = cbd->owned;
 # endif
-    int     visual_selection = FALSE;
+    पूर्णाङ्क     visual_selection = FALSE;
 
-    if (cbd == &clip_star || cbd == &clip_plus)
+    यदि (cbd == &clip_star || cbd == &clip_plus)
 	visual_selection = TRUE;
 
     clip_free_selection(cbd);
     cbd->owned = FALSE;
-    if (visual_selection)
+    यदि (visual_selection)
 	clip_clear_selection(cbd);
     clip_gen_lose_selection(cbd);
 # ifdef FEAT_X11
-    if (visual_selection)
+    यदि (visual_selection)
     {
 	// May have to show a different kind of highlighting for the selected
 	// area.  There is no specific redraw command for this, just redraw all
 	// windows on the current buffer.
-	if (was_owned
+	यदि (was_owned
 		&& (get_real_state() == MODE_VISUAL
 		    || get_real_state() == MODE_SELECT)
 		&& (cbd == &clip_star ?
@@ -310,15 +310,15 @@ clip_lose_selection(Clipboard_T *cbd)
 # endif
 }
 
-    static void
+    स्थिर शून्य
 clip_copy_selection(Clipboard_T *clip)
 {
-    if (VIsual_active && (State & MODE_NORMAL) && clip->available)
+    यदि (VIsual_active && (State & MODE_NORMAL) && clip->available)
     {
 	clip_update_selection(clip);
 	clip_free_selection(clip);
 	clip_own_selection(clip);
-	if (clip->owned)
+	यदि (clip->owned)
 	    clip_get_selection(clip);
 	clip_gen_set_selection(clip);
     }
@@ -329,22 +329,22 @@ clip_copy_selection(Clipboard_T *clip)
  * prevents accessing the clipboard very often which might slow down Vim
  * considerably.
  */
-static int global_change_count = 0; // if set, inside a start_global_changes
-static int clipboard_needs_update = FALSE; // clipboard needs to be updated
-static int clip_did_set_selection = TRUE;
+स्थिर पूर्णाङ्क global_change_गिनती = 0; // if set, inside a start_global_changes
+स्थिर पूर्णाङ्क clipboard_needs_update = FALSE; // clipboard needs to be updated
+स्थिर पूर्णाङ्क clip_did_set_selection = TRUE;
 
 /*
  * Save clip_unnamed and reset it.
  */
-    void
-start_global_changes(void)
+    शून्य
+start_global_changes(शून्य)
 {
-    if (++global_change_count > 1)
-	return;
+    यदि (++global_change_गिनती > 1)
+	प्रत्यागम;
     clip_unnamed_saved = clip_unnamed;
     clipboard_needs_update = FALSE;
 
-    if (clip_did_set_selection)
+    यदि (clip_did_set_selection)
     {
 	clip_unnamed = 0;
 	clip_did_set_selection = FALSE;
@@ -355,36 +355,36 @@ start_global_changes(void)
  * Return TRUE if setting the clipboard was postponed, it already contains the
  * right text.
  */
-    static int
-is_clipboard_needs_update(void)
+    स्थिर पूर्णाङ्क
+is_clipboard_needs_update(शून्य)
 {
-    return clipboard_needs_update;
+    प्रत्यागम clipboard_needs_update;
 }
 
 /*
  * Restore clip_unnamed and set the selection when needed.
  */
-    void
-end_global_changes(void)
+    शून्य
+end_global_changes(शून्य)
 {
-    if (--global_change_count > 0)
+    यदि (--global_change_गिनती > 0)
 	// recursive
-	return;
-    if (!clip_did_set_selection)
+	प्रत्यागम;
+    यदि (!clip_did_set_selection)
     {
 	clip_did_set_selection = TRUE;
 	clip_unnamed = clip_unnamed_saved;
 	clip_unnamed_saved = 0;
-	if (clipboard_needs_update)
+	यदि (clipboard_needs_update)
 	{
 	    // only store something in the clipboard,
 	    // if we have yanked anything to it
-	    if (clip_unnamed & CLIP_UNNAMED)
+	    यदि (clip_unnamed & CLIP_UNNAMED)
 	    {
 		clip_own_selection(&clip_star);
 		clip_gen_set_selection(&clip_star);
 	    }
-	    if (clip_unnamed & CLIP_UNNAMED_PLUS)
+	    यदि (clip_unnamed & CLIP_UNNAMED_PLUS)
 	    {
 		clip_own_selection(&clip_plus);
 		clip_gen_set_selection(&clip_plus);
@@ -397,12 +397,12 @@ end_global_changes(void)
 /*
  * Called when Visual mode is ended: update the selection.
  */
-    void
-clip_auto_select(void)
+    शून्य
+clip_auto_select(शून्य)
 {
-    if (clip_isautosel_star())
+    यदि (clip_isautosel_star())
 	clip_copy_selection(&clip_star);
-    if (clip_isautosel_plus())
+    यदि (clip_isautosel_plus())
 	clip_copy_selection(&clip_plus);
 }
 
@@ -410,37 +410,37 @@ clip_auto_select(void)
  * Return TRUE if automatic selection of Visual area is desired for the *
  * register.
  */
-    int
-clip_isautosel_star(void)
+    पूर्णाङ्क
+clip_isautosel_star(शून्य)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    यदि (clipmethod == CLIPMETHOD_PROVIDER)
+	प्रत्यागम false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASEL) != NULL
-	    && vim_strchr(p_go, GO_ASELPLUS) == NULL;
+    यदि (gui.in_use)
+	प्रत्यागम vim_strchr(p_go, GO_ASEL) != रिक्त
+	    && vim_strchr(p_go, GO_ASELPLUS) == रिक्त;
 # endif
-    return clip_autoselect_star;
+    प्रत्यागम clip_autoselect_star;
 }
 
 /*
  * Return TRUE if automatic selection of Visual area is desired for the +
  * register.
  */
-    int
-clip_isautosel_plus(void)
+    पूर्णाङ्क
+clip_isautosel_plus(शून्य)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    यदि (clipmethod == CLIPMETHOD_PROVIDER)
+	प्रत्यागम false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASELPLUS) != NULL;
+    यदि (gui.in_use)
+	प्रत्यागम vim_strchr(p_go, GO_ASELPLUS) != रिक्त;
 # endif
-    return clip_autoselect_plus;
+    प्रत्यागम clip_autoselect_plus;
 }
 
 
@@ -451,18 +451,18 @@ clip_isautosel_plus(void)
 /*
  * Compare two screen positions ala strcmp()
  */
-    static int
+    स्थिर पूर्णाङ्क
 clip_compare_pos(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    पूर्णाङ्क		row1,
+    पूर्णाङ्क		col1,
+    पूर्णाङ्क		row2,
+    पूर्णाङ्क		col2)
 {
-    if (row1 > row2) return(1);
-    if (row1 < row2) return(-1);
-    if (col1 > col2) return(1);
-    if (col1 < col2) return(-1);
-    return(0);
+    यदि (row1 > row2) प्रत्यागम(1);
+    यदि (row1 < row2) प्रत्यागम(-1);
+    यदि (col1 > col2) प्रत्यागम(1);
+    यदि (col1 < col2) प्रत्यागम(-1);
+    प्रत्यागम(0);
 }
 
 // "how" flags for clip_invert_area()
@@ -474,43 +474,43 @@ clip_compare_pos(
  * Invert or un-invert a rectangle of the screen.
  * "invert" is true if the result is inverted.
  */
-    static void
+    स्थिर शून्य
 clip_invert_rectangle(
 	Clipboard_T	*cbd UNUSED,
-	int		row_arg,
-	int		col_arg,
-	int		height_arg,
-	int		width_arg,
-	int		invert)
+	पूर्णाङ्क		row_arg,
+	पूर्णाङ्क		col_arg,
+	पूर्णाङ्क		height_arg,
+	पूर्णाङ्क		width_arg,
+	पूर्णाङ्क		invert)
 {
-    int		row = row_arg;
-    int		col = col_arg;
-    int		height = height_arg;
-    int		width = width_arg;
+    पूर्णाङ्क		row = row_arg;
+    पूर्णाङ्क		col = col_arg;
+    पूर्णाङ्क		height = height_arg;
+    पूर्णाङ्क		width = width_arg;
 
 # ifdef FEAT_PROP_POPUP
     // this goes on top of all popup windows
     screen_zindex = CLIP_ZINDEX;
 
-    if (col < cbd->min_col)
+    यदि (col < cbd->min_col)
     {
 	width -= cbd->min_col - col;
 	col = cbd->min_col;
     }
-    if (width > cbd->max_col - col)
+    यदि (width > cbd->max_col - col)
 	width = cbd->max_col - col;
-    if (row < cbd->min_row)
+    यदि (row < cbd->min_row)
     {
 	height -= cbd->min_row - row;
 	row = cbd->min_row;
     }
-    if (height > cbd->max_row - row + 1)
+    यदि (height > cbd->max_row - row + 1)
 	height = cbd->max_row - row + 1;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	gui_mch_invert_rectangle(row, col, height, width);
-    else
+    अन्यथा
 # endif
 	screen_draw_rectangle(row, col, height, width, invert, FALSE);
 # ifdef FEAT_PROP_POPUP
@@ -526,31 +526,31 @@ clip_invert_rectangle(
  * CLIP_TOGGLE: set inversion if pos1 < pos2, undo inversion otherwise.
  * 0: invert (GUI only).
  */
-    static void
+    स्थिर शून्य
 clip_invert_area(
 	Clipboard_T	*cbd,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2,
-	int		how)
+	पूर्णाङ्क		row1,
+	पूर्णाङ्क		col1,
+	पूर्णाङ्क		row2,
+	पूर्णाङ्क		col2,
+	पूर्णाङ्क		how)
 {
-    int		invert = FALSE;
-    int		max_col;
+    पूर्णाङ्क		invert = FALSE;
+    पूर्णाङ्क		max_col;
 
 # ifdef FEAT_PROP_POPUP
     max_col = cbd->max_col - 1;
-# else
+# अन्यथा
     max_col = Columns - 1;
 # endif
 
-    if (how == CLIP_SET)
+    यदि (how == CLIP_SET)
 	invert = TRUE;
 
     // Swap the from and to positions so the from is always before
-    if (clip_compare_pos(row1, col1, row2, col2) > 0)
+    यदि (clip_compare_pos(row1, col1, row2, col2) > 0)
     {
-	int tmp_row, tmp_col;
+	पूर्णाङ्क tmp_row, tmp_col;
 
 	tmp_row = row1;
 	tmp_col = col1;
@@ -559,35 +559,35 @@ clip_invert_area(
 	row2	= tmp_row;
 	col2	= tmp_col;
     }
-    else if (how == CLIP_TOGGLE)
+    अन्यथा यदि (how == CLIP_TOGGLE)
 	invert = TRUE;
 
     // If all on the same line, do it the easy way
-    if (row1 == row2)
+    यदि (row1 == row2)
     {
 	clip_invert_rectangle(cbd, row1, col1, 1, col2 - col1, invert);
     }
-    else
+    अन्यथा
     {
 	// Handle a piece of the first line
-	if (col1 > 0)
+	यदि (col1 > 0)
 	{
 	    clip_invert_rectangle(cbd, row1, col1, 1,
-						  (int)Columns - col1, invert);
+						  (पूर्णाङ्क)Columns - col1, invert);
 	    row1++;
 	}
 
 	// Handle a piece of the last line
-	if (col2 < max_col)
+	यदि (col2 < max_col)
 	{
 	    clip_invert_rectangle(cbd, row2, 0, 1, col2, invert);
 	    row2--;
 	}
 
 	// Handle the rectangle that's left
-	if (row2 >= row1)
+	यदि (row2 >= row1)
 	    clip_invert_rectangle(cbd, row1, 0, row2 - row1 + 1,
-							 (int)Columns, invert);
+							 (पूर्णाङ्क)Columns, invert);
     }
 }
 
@@ -595,34 +595,34 @@ clip_invert_area(
  * Start, continue or end a modeless selection.  Used when editing the
  * command-line, in the cmdline window and when the mouse is in a popup window.
  */
-    void
-clip_modeless(int button, int is_click, int is_drag)
+    शून्य
+clip_modeless(पूर्णाङ्क button, पूर्णाङ्क is_click, पूर्णाङ्क is_drag)
 {
-    int		repeat;
+    पूर्णाङ्क		repeat;
 
     repeat = ((clip_star.mode == SELECT_MODE_CHAR
-		|| clip_star.mode == SELECT_MODE_LINE)
+		|| clip_star.mode == SELECT_MODE_पंक्ति)
 					      && (mod_mask & MOD_MASK_2CLICK))
 	    || (clip_star.mode == SELECT_MODE_WORD
 					     && (mod_mask & MOD_MASK_3CLICK));
-    if (is_click && button == MOUSE_RIGHT)
+    यदि (is_click && button == MOUSE_दायाँ)
     {
 	// Right mouse button: If there was no selection, start one.
 	// Otherwise extend the existing selection.
-	if (clip_star.state == SELECT_CLEARED)
+	यदि (clip_star.state == SELECT_CLEARED)
 	    clip_start_selection(mouse_col, mouse_row, FALSE);
 	clip_process_selection(button, mouse_col, mouse_row, repeat);
     }
-    else if (is_click)
+    अन्यथा यदि (is_click)
 	clip_start_selection(mouse_col, mouse_row, repeat);
-    else if (is_drag)
+    अन्यथा यदि (is_drag)
     {
 	// Don't try extending a selection if there isn't one.  Happens when
 	// button-down is in the cmdline and them moving mouse upwards.
-	if (clip_star.state != SELECT_CLEARED)
+	यदि (clip_star.state != SELECT_CLEARED)
 	    clip_process_selection(button, mouse_col, mouse_row, repeat);
     }
-    else // release
+    अन्यथा // release
 	clip_process_selection(MOUSE_RELEASE, mouse_col, mouse_row, FALSE);
 }
 
@@ -630,27 +630,27 @@ clip_modeless(int button, int is_click, int is_drag)
  * Update the currently selected region by adding and/or subtracting from the
  * beginning or end and inverting the changed area(s).
  */
-    static void
+    स्थिर शून्य
 clip_update_modeless_selection(
     Clipboard_T    *cb,
-    int		    row1,
-    int		    col1,
-    int		    row2,
-    int		    col2)
+    पूर्णाङ्क		    row1,
+    पूर्णाङ्क		    col1,
+    पूर्णाङ्क		    row2,
+    पूर्णाङ्क		    col2)
 {
     // See if we changed at the beginning of the selection
-    if (row1 != cb->start.lnum || col1 != (int)cb->start.col)
+    यदि (row1 != cb->start.lnum || col1 != (पूर्णाङ्क)cb->start.col)
     {
-	clip_invert_area(cb, row1, col1, (int)cb->start.lnum, cb->start.col,
+	clip_invert_area(cb, row1, col1, (पूर्णाङ्क)cb->start.lnum, cb->start.col,
 								 CLIP_TOGGLE);
 	cb->start.lnum = row1;
 	cb->start.col  = col1;
     }
 
     // See if we changed at the end of the selection
-    if (row2 != cb->end.lnum || col2 != (int)cb->end.col)
+    यदि (row2 != cb->end.lnum || col2 != (पूर्णाङ्क)cb->end.col)
     {
-	clip_invert_area(cb, (int)cb->end.lnum, cb->end.col, row2, col2,
+	clip_invert_area(cb, (पूर्णाङ्क)cb->end.lnum, cb->end.col, row2, col2,
 								 CLIP_TOGGLE);
 	cb->end.lnum = row2;
 	cb->end.col  = col2;
@@ -663,42 +663,42 @@ clip_update_modeless_selection(
  */
 # define CHAR_CLASS(c)	(c <= ' ' ? ' ' : vim_iswordc(c))
 
-    static void
-clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
+    स्थिर शून्य
+clip_get_word_boundaries(Clipboard_T *cb, पूर्णाङ्क row, पूर्णाङ्क col)
 {
-    int		start_class;
-    int		temp_col;
+    पूर्णाङ्क		start_class;
+    पूर्णाङ्क		temp_col;
     char_u	*p;
-    int		mboff;
+    पूर्णाङ्क		mboff;
 
-    if (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
-	return;
+    यदि (row >= screen_Rows || col >= screen_Columns || Screen_पंक्तियाँ == रिक्त)
+	प्रत्यागम;
 
-    p = ScreenLines + LineOffset[row];
+    p = Screen_पंक्तियाँ + पंक्ति_Offset[row];
     // Correct for starting in the right half of a double-wide char
-    if (enc_dbcs != 0)
+    यदि (enc_dbcs != 0)
 	col -= dbcs_screen_head_off(p, p + col);
-    else if (enc_utf8 && p[col] == 0)
+    अन्यथा यदि (enc_utf8 && p[col] == 0)
 	--col;
     start_class = CHAR_CLASS(p[col]);
 
     temp_col = col;
-    for ( ; temp_col > 0; temp_col--)
-	if (enc_dbcs != 0
+    प्रति ( ; temp_col > 0; temp_col--)
+	यदि (enc_dbcs != 0
 		   && (mboff = dbcs_screen_head_off(p, p + temp_col - 1)) > 0)
 	    temp_col -= mboff;
-	else if (CHAR_CLASS(p[temp_col - 1]) != start_class
+	अन्यथा यदि (CHAR_CLASS(p[temp_col - 1]) != start_class
 		&& !(enc_utf8 && p[temp_col - 1] == 0))
-	    break;
+	    भङ्ग;
     cb->word_start_col = temp_col;
 
     temp_col = col;
-    for ( ; temp_col < screen_Columns; temp_col++)
-	if (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
+    प्रति ( ; temp_col < screen_Columns; temp_col++)
+	यदि (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
 	    ++temp_col;
-	else if (CHAR_CLASS(p[temp_col]) != start_class
+	अन्यथा यदि (CHAR_CLASS(p[temp_col]) != start_class
 		&& !(enc_utf8 && p[temp_col] == 0))
-	    break;
+	    भङ्ग;
     cb->word_end_col = temp_col;
 }
 
@@ -706,45 +706,45 @@ clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
  * Find the column position for the last non-whitespace character on the given
  * line at or before start_col.
  */
-    static int
-clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
+    स्थिर पूर्णाङ्क
+clip_get_पंक्ति_end(Clipboard_T *cbd UNUSED, पूर्णाङ्क row)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
-    if (row >= screen_Rows || ScreenLines == NULL)
-	return 0;
-    for (i =
+    यदि (row >= screen_Rows || Screen_पंक्तियाँ == रिक्त)
+	प्रत्यागम 0;
+    प्रति (i =
 # ifdef FEAT_PROP_POPUP
 	    cbd->max_col;
-# else
+# अन्यथा
 	    screen_Columns;
 # endif
 			    i > 0; i--)
-	if (ScreenLines[LineOffset[row] + i - 1] != ' ')
-	    break;
-    return i;
+	यदि (Screen_पंक्तियाँ[पंक्ति_Offset[row] + i - 1] != ' ')
+	    भङ्ग;
+    प्रत्यागम i;
 }
 
 /*
  * Start the selection
  */
-    void
-clip_start_selection(int col, int row, int repeated_click)
+    शून्य
+clip_start_selection(पूर्णाङ्क col, पूर्णाङ्क row, पूर्णाङ्क repeated_click)
 {
     Clipboard_T	*cb = &clip_star;
 # ifdef FEAT_PROP_POPUP
     win_T	*wp;
-    int		row_cp = row;
-    int		col_cp = col;
+    पूर्णाङ्क		row_cp = row;
+    पूर्णाङ्क		col_cp = col;
 
     wp = mouse_find_win(&row_cp, &col_cp, FIND_POPUP);
-    if (wp != NULL && WIN_IS_POPUP(wp)
+    यदि (wp != रिक्त && WIN_IS_POPUP(wp)
 				  && popup_is_in_scrollbar(wp, row_cp, col_cp))
 	// click or double click in scrollbar does not start a selection
-	return;
+	प्रत्यागम;
 # endif
 
-    if (cb->state == SELECT_DONE)
+    यदि (cb->state == SELECT_DONE)
 	clip_clear_selection(cb);
 
     row = check_row(row);
@@ -757,20 +757,20 @@ clip_start_selection(int col, int row, int repeated_click)
     cb->origin_row  = (short_u)cb->start.lnum;
     cb->state	    = SELECT_IN_PROGRESS;
 # ifdef FEAT_PROP_POPUP
-    if (wp != NULL && WIN_IS_POPUP(wp))
+    यदि (wp != रिक्त && WIN_IS_POPUP(wp))
     {
 	// Click in a popup window restricts selection to that window,
 	// excluding the border.
 	cb->min_col = wp->w_wincol + wp->w_popup_border[3];
 	cb->max_col = wp->w_wincol + popup_width(wp)
 				 - wp->w_popup_border[1] - wp->w_has_scrollbar;
-	if (cb->max_col > screen_Columns)
+	यदि (cb->max_col > screen_Columns)
 	    cb->max_col = screen_Columns;
 	cb->min_row = wp->w_winrow + wp->w_popup_border[0];
 	cb->max_row = wp->w_winrow + popup_height(wp) - 1
 						   - wp->w_popup_border[2];
     }
-    else
+    अन्यथा
     {
 	cb->min_col = 0;
 	cb->max_col = screen_Columns;
@@ -779,142 +779,142 @@ clip_start_selection(int col, int row, int repeated_click)
     }
 # endif
 
-    if (repeated_click)
+    यदि (repeated_click)
     {
-	if (++cb->mode > SELECT_MODE_LINE)
+	यदि (++cb->mode > SELECT_MODE_पंक्ति)
 	    cb->mode = SELECT_MODE_CHAR;
     }
-    else
+    अन्यथा
 	cb->mode = SELECT_MODE_CHAR;
 
 # ifdef FEAT_GUI
     // clear the cursor until the selection is made
-    if (gui.in_use)
+    यदि (gui.in_use)
 	gui_undraw_cursor();
 # endif
 
-    switch (cb->mode)
+    विकल्प (cb->mode)
     {
-	case SELECT_MODE_CHAR:
+	पक्ष SELECT_MODE_CHAR:
 	    cb->origin_start_col = cb->start.col;
-	    cb->word_end_col = clip_get_line_end(cb, (int)cb->start.lnum);
-	    break;
+	    cb->word_end_col = clip_get_पंक्ति_end(cb, (पूर्णाङ्क)cb->start.lnum);
+	    भङ्ग;
 
-	case SELECT_MODE_WORD:
-	    clip_get_word_boundaries(cb, (int)cb->start.lnum, cb->start.col);
+	पक्ष SELECT_MODE_WORD:
+	    clip_get_word_boundaries(cb, (पूर्णाङ्क)cb->start.lnum, cb->start.col);
 	    cb->origin_start_col = cb->word_start_col;
 	    cb->origin_end_col	 = cb->word_end_col;
 
-	    clip_invert_area(cb, (int)cb->start.lnum, cb->word_start_col,
-			    (int)cb->end.lnum, cb->word_end_col, CLIP_SET);
+	    clip_invert_area(cb, (पूर्णाङ्क)cb->start.lnum, cb->word_start_col,
+			    (पूर्णाङ्क)cb->end.lnum, cb->word_end_col, CLIP_SET);
 	    cb->start.col = cb->word_start_col;
 	    cb->end.col   = cb->word_end_col;
-	    break;
+	    भङ्ग;
 
-	case SELECT_MODE_LINE:
-	    clip_invert_area(cb, (int)cb->start.lnum, 0, (int)cb->start.lnum,
-			    (int)Columns, CLIP_SET);
+	पक्ष SELECT_MODE_पंक्ति:
+	    clip_invert_area(cb, (पूर्णाङ्क)cb->start.lnum, 0, (पूर्णाङ्क)cb->start.lnum,
+			    (पूर्णाङ्क)Columns, CLIP_SET);
 	    cb->start.col = 0;
 	    cb->end.col   = Columns;
-	    break;
+	    भङ्ग;
     }
 
     cb->prev = cb->start;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection started at (%ld,%d)\n", cb->start.lnum, cb->start.col);
+    म_लिखो("Selection started at (%ld,%d)\n", cb->start.lnum, cb->start.col);
 # endif
 }
 
 /*
  * Continue processing the selection
  */
-    void
+    शून्य
 clip_process_selection(
-    int		button,
-    int		col,
-    int		row,
+    पूर्णाङ्क		button,
+    पूर्णाङ्क		col,
+    पूर्णाङ्क		row,
     int_u	repeated_click)
 {
     Clipboard_T	*cb = &clip_star;
-    int		diff;
-    int		slen = 1;	// cursor shape width
+    पूर्णाङ्क		diff;
+    पूर्णाङ्क		slen = 1;	// cursor shape width
 
-    if (button == MOUSE_RELEASE)
+    यदि (button == MOUSE_RELEASE)
     {
-	if (cb->state != SELECT_IN_PROGRESS)
-	    return;
+	यदि (cb->state != SELECT_IN_PROGRESS)
+	    प्रत्यागम;
 
 	// Check to make sure we have something selected
-	if (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
+	यदि (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
 	{
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    यदि (gui.in_use)
 		gui_update_cursor(FALSE, FALSE);
 # endif
 	    cb->state = SELECT_CLEARED;
-	    return;
+	    प्रत्यागम;
 	}
 
 # ifdef DEBUG_SELECTION
-	printf("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
+	म_लिखो("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
 		cb->start.col, cb->end.lnum, cb->end.col);
 # endif
-	if (clip_isautosel_star() || clip_isautosel_plus()
+	यदि (clip_isautosel_star() || clip_isautosel_plus()
 		|| (
 # ifdef FEAT_GUI
-		    gui.in_use ? (vim_strchr(p_go, GO_ASELML) != NULL) :
+		    gui.in_use ? (vim_strchr(p_go, GO_ASELML) != रिक्त) :
 # endif
 		    clip_autoselectml))
 	    clip_copy_modeless_selection(FALSE);
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	यदि (gui.in_use)
 	    gui_update_cursor(FALSE, FALSE);
 # endif
 
 	cb->state = SELECT_DONE;
-	return;
+	प्रत्यागम;
     }
 
     row = check_row(row);
     col = check_col(col);
     col = mb_fix_col(col, row);
 
-    if (col == (int)cb->prev.col && row == cb->prev.lnum && !repeated_click)
-	return;
+    यदि (col == (पूर्णाङ्क)cb->prev.col && row == cb->prev.lnum && !repeated_click)
+	प्रत्यागम;
 
     /*
      * When extending the selection with the right mouse button, swap the
      * start and end if the position is before half the selection
      */
-    if (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
+    यदि (cb->state == SELECT_DONE && button == MOUSE_दायाँ)
     {
 	/*
 	 * If the click is before the start, or the click is inside the
 	 * selection and the start is the closest side, set the origin to the
 	 * end of the selection.
 	 */
-	if (clip_compare_pos(row, col, (int)cb->start.lnum, cb->start.col) < 0
+	यदि (clip_compare_pos(row, col, (पूर्णाङ्क)cb->start.lnum, cb->start.col) < 0
 		|| (clip_compare_pos(row, col,
-					   (int)cb->end.lnum, cb->end.col) < 0
+					   (पूर्णाङ्क)cb->end.lnum, cb->end.col) < 0
 		    && (((cb->start.lnum == cb->end.lnum
 			    && cb->end.col - col > col - cb->start.col))
 			|| ((diff = (cb->end.lnum - row) -
 						   (row - cb->start.lnum)) > 0
-			    || (diff == 0 && col < (int)(cb->start.col +
+			    || (diff == 0 && col < (पूर्णाङ्क)(cb->start.col +
 							 cb->end.col) / 2)))))
 	{
 	    cb->origin_row = (short_u)cb->end.lnum;
 	    cb->origin_start_col = cb->end.col - 1;
 	    cb->origin_end_col = cb->end.col;
 	}
-	else
+	अन्यथा
 	{
 	    cb->origin_row = (short_u)cb->start.lnum;
 	    cb->origin_start_col = cb->start.col;
 	    cb->origin_end_col = cb->start.col;
 	}
-	if (cb->mode == SELECT_MODE_WORD && !repeated_click)
+	यदि (cb->mode == SELECT_MODE_WORD && !repeated_click)
 	    cb->mode = SELECT_MODE_CHAR;
     }
 
@@ -922,110 +922,110 @@ clip_process_selection(
     cb->state = SELECT_IN_PROGRESS;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection extending to (%d,%d)\n", row, col);
+    म_लिखो("Selection extending to (%d,%d)\n", row, col);
 # endif
 
-    if (repeated_click && ++cb->mode > SELECT_MODE_LINE)
+    यदि (repeated_click && ++cb->mode > SELECT_MODE_पंक्ति)
 	cb->mode = SELECT_MODE_CHAR;
 
-    switch (cb->mode)
+    विकल्प (cb->mode)
     {
-	case SELECT_MODE_CHAR:
+	पक्ष SELECT_MODE_CHAR:
 	    // If we're on a different line, find where the line ends
-	    if (row != cb->prev.lnum)
-		cb->word_end_col = clip_get_line_end(cb, row);
+	    यदि (row != cb->prev.lnum)
+		cb->word_end_col = clip_get_पंक्ति_end(cb, row);
 
 	    // See if we are before or after the origin of the selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    यदि (clip_compare_pos(row, col, cb->origin_row,
 						   cb->origin_start_col) >= 0)
 	    {
-		if (col >= (int)cb->word_end_col)
+		यदि (col >= (पूर्णाङ्क)cb->word_end_col)
 		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, (int)Columns);
-		else
+			    cb->origin_start_col, row, (पूर्णाङ्क)Columns);
+		अन्यथा
 		{
-		    if (has_mbyte && mb_lefthalve(row, col))
+		    यदि (has_mbyte && mb_lefthalve(row, col))
 			slen = 2;
 		    clip_update_modeless_selection(cb, cb->origin_row,
 			    cb->origin_start_col, row, col + slen);
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
-		if (has_mbyte
+		यदि (has_mbyte
 			&& mb_lefthalve(cb->origin_row, cb->origin_start_col))
 		    slen = 2;
-		if (col >= (int)cb->word_end_col)
+		यदि (col >= (पूर्णाङ्क)cb->word_end_col)
 		    clip_update_modeless_selection(cb, row, cb->word_end_col,
 			    cb->origin_row, cb->origin_start_col + slen);
-		else
+		अन्यथा
 		    clip_update_modeless_selection(cb, row, col,
 			    cb->origin_row, cb->origin_start_col + slen);
 	    }
-	    break;
+	    भङ्ग;
 
-	case SELECT_MODE_WORD:
+	पक्ष SELECT_MODE_WORD:
 	    // If we are still within the same word, do nothing
-	    if (row == cb->prev.lnum && col >= (int)cb->word_start_col
-		    && col < (int)cb->word_end_col && !repeated_click)
-		return;
+	    यदि (row == cb->prev.lnum && col >= (पूर्णाङ्क)cb->word_start_col
+		    && col < (पूर्णाङ्क)cb->word_end_col && !repeated_click)
+		प्रत्यागम;
 
 	    // Get new word boundaries
 	    clip_get_word_boundaries(cb, row, col);
 
 	    // Handle being after the origin point of selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    यदि (clip_compare_pos(row, col, cb->origin_row,
 		    cb->origin_start_col) >= 0)
 		clip_update_modeless_selection(cb, cb->origin_row,
 			cb->origin_start_col, row, cb->word_end_col);
-	    else
+	    अन्यथा
 		clip_update_modeless_selection(cb, row, cb->word_start_col,
 			cb->origin_row, cb->origin_end_col);
-	    break;
+	    भङ्ग;
 
-	case SELECT_MODE_LINE:
-	    if (row == cb->prev.lnum && !repeated_click)
-		return;
+	पक्ष SELECT_MODE_पंक्ति:
+	    यदि (row == cb->prev.lnum && !repeated_click)
+		प्रत्यागम;
 
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    यदि (clip_compare_pos(row, col, cb->origin_row,
 		    cb->origin_start_col) >= 0)
 		clip_update_modeless_selection(cb, cb->origin_row, 0, row,
-			(int)Columns);
-	    else
+			(पूर्णाङ्क)Columns);
+	    अन्यथा
 		clip_update_modeless_selection(cb, row, 0, cb->origin_row,
-			(int)Columns);
-	    break;
+			(पूर्णाङ्क)Columns);
+	    भङ्ग;
     }
 
     cb->prev.lnum = row;
     cb->prev.col  = col;
 
 # ifdef DEBUG_SELECTION
-	printf("Selection is: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
+	म_लिखो("Selection is: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
 		cb->start.col, cb->end.lnum, cb->end.col);
 # endif
 }
 
-# if defined(FEAT_GUI)
+# यदि defined(FEAT_GUI)
 /*
  * Redraw part of the selection if character at "row,col" is inside of it.
  * Only used for the GUI.
  */
-    void
-clip_may_redraw_selection(int row, int col, int len)
+    शून्य
+clip_may_redraw_selection(पूर्णाङ्क row, पूर्णाङ्क col, पूर्णाङ्क len)
 {
-    int		start = col;
-    int		end = col + len;
+    पूर्णाङ्क		start = col;
+    पूर्णाङ्क		end = col + len;
 
-    if (clip_star.state != SELECT_CLEARED
+    यदि (clip_star.state != SELECT_CLEARED
 	    && row >= clip_star.start.lnum
 	    && row <= clip_star.end.lnum)
     {
-	if (row == clip_star.start.lnum && start < (int)clip_star.start.col)
+	यदि (row == clip_star.start.lnum && start < (पूर्णाङ्क)clip_star.start.col)
 	    start = clip_star.start.col;
-	if (row == clip_star.end.lnum && end > (int)clip_star.end.col)
+	यदि (row == clip_star.end.lnum && end > (पूर्णाङ्क)clip_star.end.col)
 	    end = clip_star.end.col;
-	if (end > start)
+	यदि (end > start)
 	    clip_invert_area(&clip_star, row, start, row, end, 0);
     }
 }
@@ -1034,25 +1034,25 @@ clip_may_redraw_selection(int row, int col, int len)
 /*
  * Called from outside to clear selected region from the display
  */
-    void
+    शून्य
 clip_clear_selection(Clipboard_T *cbd)
 {
 
-    if (cbd->state == SELECT_CLEARED)
-	return;
+    यदि (cbd->state == SELECT_CLEARED)
+	प्रत्यागम;
 
-    clip_invert_area(cbd, (int)cbd->start.lnum, cbd->start.col,
-				 (int)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
+    clip_invert_area(cbd, (पूर्णाङ्क)cbd->start.lnum, cbd->start.col,
+				 (पूर्णाङ्क)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
     cbd->state = SELECT_CLEARED;
 }
 
 /*
  * Clear the selection if any lines from "row1" to "row2" are inside of it.
  */
-    void
-clip_may_clear_selection(int row1, int row2)
+    शून्य
+clip_may_clear_selection(पूर्णाङ्क row1, पूर्णाङ्क row2)
 {
-    if (clip_star.state == SELECT_DONE
+    यदि (clip_star.state == SELECT_DONE
 	    && row2 >= clip_star.start.lnum
 	    && row1 <= clip_star.end.lnum)
 	clip_clear_selection(&clip_star);
@@ -1062,29 +1062,29 @@ clip_may_clear_selection(int row1, int row2)
  * Called before the screen is scrolled up or down.  Adjusts the line numbers
  * of the selection.  Call with big number when clearing the screen.
  */
-    void
+    शून्य
 clip_scroll_selection(
-    int	    rows)		// negative for scroll down
+    पूर्णाङ्क	    rows)		// negative for scroll down
 {
-    int	    lnum;
+    पूर्णाङ्क	    lnum;
 
-    if (clip_star.state == SELECT_CLEARED)
-	return;
+    यदि (clip_star.state == SELECT_CLEARED)
+	प्रत्यागम;
 
     lnum = clip_star.start.lnum - rows;
-    if (lnum <= 0)
+    यदि (lnum <= 0)
 	clip_star.start.lnum = 0;
-    else if (lnum >= screen_Rows)	// scrolled off of the screen
+    अन्यथा यदि (lnum >= screen_Rows)	// scrolled off of the screen
 	clip_star.state = SELECT_CLEARED;
-    else
+    अन्यथा
 	clip_star.start.lnum = lnum;
 
     lnum = clip_star.end.lnum - rows;
-    if (lnum < 0)			// scrolled off of the screen
+    यदि (lnum < 0)			// scrolled off of the screen
 	clip_star.state = SELECT_CLEARED;
-    else if (lnum >= screen_Rows)
+    अन्यथा यदि (lnum >= screen_Rows)
 	clip_star.end.lnum = screen_Rows - 1;
-    else
+    अन्यथा
 	clip_star.end.lnum = lnum;
 }
 
@@ -1093,8 +1093,8 @@ clip_scroll_selection(
  * available for pasting.
  * When "both" is TRUE also copy to the other register.
  */
-    void
-clip_copy_modeless_selection(int both UNUSED)
+    शून्य
+clip_copy_modeless_selection(पूर्णाङ्क both UNUSED)
 {
     // The info for the modeless selection is stored in '*' register, however if
     // we are using the '+' register for modeless autoselect, we copy to
@@ -1102,156 +1102,156 @@ clip_copy_modeless_selection(int both UNUSED)
     Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_star;
     char_u	*buffer;
     char_u	*bufp;
-    int		row;
-    int		start_col;
-    int		end_col;
-    int		line_end_col;
-    int		add_newline_flag = FALSE;
-    int		len;
+    पूर्णाङ्क		row;
+    पूर्णाङ्क		start_col;
+    पूर्णाङ्क		end_col;
+    पूर्णाङ्क		पंक्ति_end_col;
+    पूर्णाङ्क		add_newline_flag = FALSE;
+    पूर्णाङ्क		len;
     char_u	*p;
-    int		row1 = clip_star.start.lnum;
-    int		col1 = clip_star.start.col;
-    int		row2 = clip_star.end.lnum;
-    int		col2 = clip_star.end.col;
+    पूर्णाङ्क		row1 = clip_star.start.lnum;
+    पूर्णाङ्क		col1 = clip_star.start.col;
+    पूर्णाङ्क		row2 = clip_star.end.lnum;
+    पूर्णाङ्क		col2 = clip_star.end.col;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    यदि (Screen_पंक्तियाँ == रिक्त)
+	प्रत्यागम;
 
     /*
      * Make sure row1 <= row2, and if row1 == row2 that col1 <= col2.
      */
-    if (row1 > row2)
+    यदि (row1 > row2)
     {
 	row = row1; row1 = row2; row2 = row;
 	row = col1; col1 = col2; col2 = row;
     }
-    else if (row1 == row2 && col1 > col2)
+    अन्यथा यदि (row1 == row2 && col1 > col2)
     {
 	row = col1; col1 = col2; col2 = row;
     }
 # ifdef FEAT_PROP_POPUP
-    if (col1 < clip_star.min_col)
+    यदि (col1 < clip_star.min_col)
 	col1 = clip_star.min_col;
-    if (col2 > clip_star.max_col)
+    यदि (col2 > clip_star.max_col)
 	col2 = clip_star.max_col;
-    if (row1 > clip_star.max_row || row2 < clip_star.min_row)
-	return;
-    if (row1 < clip_star.min_row)
+    यदि (row1 > clip_star.max_row || row2 < clip_star.min_row)
+	प्रत्यागम;
+    यदि (row1 < clip_star.min_row)
 	row1 = clip_star.min_row;
-    if (row2 > clip_star.max_row)
+    यदि (row2 > clip_star.max_row)
 	row2 = clip_star.max_row;
 # endif
     // correct starting point for being on right half of double-wide char
-    p = ScreenLines + LineOffset[row1];
-    if (enc_dbcs != 0)
+    p = Screen_पंक्तियाँ + पंक्ति_Offset[row1];
+    यदि (enc_dbcs != 0)
 	col1 -= (*mb_head_off)(p, p + col1);
-    else if (enc_utf8 && p[col1] == 0)
+    अन्यथा यदि (enc_utf8 && p[col1] == 0)
 	--col1;
 
     // Create a temporary buffer for storing the text
     len = (row2 - row1 + 1) * Columns + 1;
-    if (enc_dbcs != 0)
+    यदि (enc_dbcs != 0)
 	len *= 2;	// max. 2 bytes per display cell
-    else if (enc_utf8)
+    अन्यथा यदि (enc_utf8)
 	len *= MB_MAXBYTES;
     // A newline is added after each row
     len += row2 - row1 + 2;
     buffer = alloc(len);
-    if (buffer == NULL)	    // out of memory
-	return;
+    यदि (buffer == रिक्त)	    // out of memory
+	प्रत्यागम;
 
     // Process each row in the selection
-    for (bufp = buffer, row = row1; row <= row2; row++)
+    प्रति (bufp = buffer, row = row1; row <= row2; row++)
     {
-	if (row == row1)
+	यदि (row == row1)
 	    start_col = col1;
-	else
+	अन्यथा
 # ifdef FEAT_PROP_POPUP
 	    start_col = clip_star.min_col;
-# else
+# अन्यथा
 	    start_col = 0;
 # endif
 
-	if (row == row2)
+	यदि (row == row2)
 	    end_col = col2;
-	else
+	अन्यथा
 # ifdef FEAT_PROP_POPUP
 	    end_col = clip_star.max_col;
-# else
+# अन्यथा
 	    end_col = Columns;
 # endif
 
-	line_end_col = clip_get_line_end(&clip_star, row);
+	पंक्ति_end_col = clip_get_पंक्ति_end(&clip_star, row);
 
 	// See if we need to nuke some trailing whitespace
-	if (end_col >=
+	यदि (end_col >=
 # ifdef FEAT_PROP_POPUP
 		clip_star.max_col
-# else
+# अन्यथा
 		Columns
 # endif
-		    && (row < row2 || end_col > line_end_col))
+		    && (row < row2 || end_col > पंक्ति_end_col))
 	{
 	    // Get rid of trailing whitespace
-	    end_col = line_end_col;
-	    if (end_col < start_col)
+	    end_col = पंक्ति_end_col;
+	    यदि (end_col < start_col)
 		end_col = start_col;
 
 	    // If the last line extended to the end, add an extra newline
-	    if (row == row2)
+	    यदि (row == row2)
 		add_newline_flag = TRUE;
 	}
 
 	// If after the first row, we need to always add a newline
-	if (row > row1 && !LineWraps[row - 1])
+	यदि (row > row1 && !पंक्ति_Wraps[row - 1])
 	    *bufp++ = NL;
 
 	// Safetey check for in case resizing went wrong
-	if (row < screen_Rows && end_col <= screen_Columns)
+	यदि (row < screen_Rows && end_col <= screen_Columns)
 	{
-	    if (enc_dbcs != 0)
+	    यदि (enc_dbcs != 0)
 	    {
-		int	i;
+		पूर्णाङ्क	i;
 
-		p = ScreenLines + LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
-		    if (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
+		p = Screen_पंक्तियाँ + पंक्ति_Offset[row];
+		प्रति (i = start_col; i < end_col; ++i)
+		    यदि (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
 		    {
 			// single-width double-byte char
 			*bufp++ = 0x8e;
-			*bufp++ = ScreenLines2[LineOffset[row] + i];
+			*bufp++ = ScreenLines2[पंक्ति_Offset[row] + i];
 		    }
-		    else
+		    अन्यथा
 		    {
 			*bufp++ = p[i];
-			if (MB_BYTE2LEN(p[i]) == 2)
+			यदि (MB_BYTE2LEN(p[i]) == 2)
 			    *bufp++ = p[++i];
 		    }
 	    }
-	    else if (enc_utf8)
+	    अन्यथा यदि (enc_utf8)
 	    {
-		int	off;
-		int	i;
+		पूर्णाङ्क	off;
+		पूर्णाङ्क	i;
 
-		off = LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
+		off = पंक्ति_Offset[row];
+		प्रति (i = start_col; i < end_col; ++i)
 		{
 		    // The base character is either in ScreenLinesUC[] or
 		    // ScreenLines[].
-		    if (ScreenLinesUC[off + i] == 0)
-			*bufp++ = ScreenLines[off + i];
-		    else
+		    यदि (Screen_पंक्तियाँ_UC[off + i] == 0)
+			*bufp++ = Screen_पंक्तियाँ[off + i];
+		    अन्यथा
 			// Includes the composing characters.
 			bufp += utfc_char2bytes(off + i, bufp);
 		    // Skip right half of double-wide character.
-		    if (ScreenLines[off + i + 1] == 0)
+		    यदि (Screen_पंक्तियाँ[off + i + 1] == 0)
 			++i;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
-		STRNCPY(bufp, ScreenLines + LineOffset[row] + start_col,
+		STRNCPY(bufp, Screen_पंक्तियाँ + पंक्ति_Offset[row] + start_col,
 							 end_col - start_col);
 		bufp += end_col - start_col;
 	    }
@@ -1259,7 +1259,7 @@ clip_copy_modeless_selection(int both UNUSED)
     }
 
     // Add a newline at the end if the selection ended there
-    if (add_newline_flag)
+    यदि (add_newline_flag)
 	*bufp++ = NL;
 
     // First cleanup any old selection and become the owner.
@@ -1267,129 +1267,129 @@ clip_copy_modeless_selection(int both UNUSED)
     clip_own_selection(cbd);
 
     // Yank the text into the '*' register.
-    clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), cbd);
+    clip_yank_selection(MCHAR, buffer, (दीर्घ)(bufp - buffer), cbd);
 
     // Make the register contents available to the outside world.
     clip_gen_set_selection(cbd);
 
 # ifdef FEAT_X11
-    if (both)
+    यदि (both)
     {
 	Clipboard_T *other = cbd == &clip_star ? &clip_plus : &clip_star;
 	// Do the same for the '+' register.
 	clip_free_selection(other);
 	clip_own_selection(other);
-	clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), other);
+	clip_yank_selection(MCHAR, buffer, (दीर्घ)(bufp - buffer), other);
 	clip_gen_set_selection(other);
     }
 # endif
     vim_free(buffer);
 }
 
-    void
+    शून्य
 clip_gen_set_selection(Clipboard_T *cbd)
 {
-    if (!clip_did_set_selection)
+    यदि (!clip_did_set_selection)
     {
 	// Updating postponed, so that accessing the system clipboard won't
 	// hang Vim when accessing it many times (e.g. on a :g command).
-	if ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
+	यदि ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
 		|| (cbd == &clip_star && (clip_unnamed_saved & CLIP_UNNAMED)))
 	{
 	    clipboard_needs_update = TRUE;
-	    return;
+	    प्रत्यागम;
 	}
     }
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	clip_mch_set_selection(cbd);
-    else
+    अन्यथा
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	यदि (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_set_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	अन्यथा यदि (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_set_selection(cbd);
 #  endif
 	}
     }
-# else
+# अन्यथा
     clip_mch_set_selection(cbd);
 # endif
 }
 
-    static void
+    स्थिर शून्य
 clip_gen_request_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	clip_mch_request_selection(cbd);
-    else
+    अन्यथा
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	यदि (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_request_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	अन्यथा यदि (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_request_selection(cbd);
 #  endif
 	}
     }
-# else
+# अन्यथा
     clip_mch_request_selection(cbd);
 # endif
 }
 
-# if (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
-    static int
+# यदि (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
+    स्थिर पूर्णाङ्क
 clip_x11_owner_exists(Clipboard_T *cbd)
 {
-    return XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
+    प्रत्यागम XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
 }
 # endif
 
-# if (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+# यदि (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(USE_SYSTEM)
-    int
+    पूर्णाङ्क
 clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
 {
-#  if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #   ifdef FEAT_GUI_GTK
-    if (gui.in_use)
-	return clip_gtk_owner_exists(cbd);
-    else
+    यदि (gui.in_use)
+	प्रत्यागम clip_gtk_owner_exists(cbd);
+    अन्यथा
 #   endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	यदि (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #   ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_owner_exists(cbd);
+	    प्रत्यागम clip_wl_owner_exists(cbd);
 #   endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	अन्यथा यदि (clipmethod == CLIPMETHOD_X11)
 	{
 #   ifdef FEAT_XCLIPBOARD
-	    return clip_x11_owner_exists(cbd);
+	    प्रत्यागम clip_x11_owner_exists(cbd);
 #   endif
 	}
-	else
-	    return FALSE;
+	अन्यथा
+	    प्रत्यागम FALSE;
     }
-#  else
-    return TRUE;
+#  अन्यथा
+    प्रत्यागम TRUE;
 #  endif
 }
 # endif
@@ -1398,7 +1398,7 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Stuff for the X clipboard.  Shared between VMS and Unix.
  */
 
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
 #  include <X11/Xatom.h>
 #  include <X11/Intrinsic.h>
 
@@ -1406,29 +1406,29 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Open the application context (if it hasn't been opened yet).
  * Used for Motif GUI and the xterm clipboard.
  */
-    void
-open_app_context(void)
+    शून्य
+open_app_context(शून्य)
 {
-    if (app_context == NULL)
+    यदि (app_context == रिक्त)
     {
 	XtToolkitInitialize();
 	app_context = XtCreateApplicationContext();
     }
 }
 
-static Atom	vim_atom;	// Vim's own special selection format
-static Atom	vimenc_atom;	// Vim's extended selection format
-static Atom	vim_mt_atom;	// Vim's own special selection format (in mime
+स्थिर Atom	vim_atom;	// Vim's own special selection format
+स्थिर Atom	vimenc_atom;	// Vim's extended selection format
+स्थिर Atom	vim_mt_atom;	// Vim's own special selection format (in mime
 				// type format)
-static Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
+स्थिर Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
 				// format)
-static Atom	utf8_atom;
-static Atom	compound_text_atom;
-static Atom	text_atom;
-static Atom	targets_atom;
-static Atom	timestamp_atom;	// Used to get a timestamp
+स्थिर Atom	utf8_atom;
+स्थिर Atom	compound_text_atom;
+स्थिर Atom	text_atom;
+स्थिर Atom	targets_atom;
+स्थिर Atom	timestamp_atom;	// Used to get a timestamp
 
-    void
+    शून्य
 x11_setup_atoms(Display *dpy)
 {
     vim_atom	       = XInternAtom(dpy, VIM_ATOM_NAME,   False);
@@ -1448,44 +1448,44 @@ x11_setup_atoms(Display *dpy)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    static Boolean
+    स्थिर Boolean
 clip_x11_convert_selection_cb(
     Widget	w UNUSED,
     Atom	*sel_atom,
     Atom	*target,
     Atom	*type,
-    XtPointer	*value,
+    XtPointer	*मूल्य,
     long_u	*length,
-    int		*format)
+    पूर्णाङ्क		*format)
 {
-    static char_u   *save_result = NULL;
-    static long_u   save_length = 0;
+    स्थिर char_u   *save_result = रिक्त;
+    स्थिर long_u   save_length = 0;
     char_u	    *string;
-    int		    motion_type;
+    पूर्णाङ्क		    motion_type;
     Clipboard_T    *cbd;
-    int		    i;
+    पूर्णाङ्क		    i;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    यदि (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
+    अन्यथा
 	cbd = &clip_star;
 
-    if (!cbd->owned)
-	return False;	    // Shouldn't ever happen
+    यदि (!cbd->owned)
+	प्रत्यागम False;	    // Shouldn't ever happen
 
     // requestor wants to know what target types we support
-    if (*target == targets_atom)
+    यदि (*target == targets_atom)
     {
-	static Atom array[9];
+	स्थिर Atom array[9];
 
-	*value = (XtPointer)array;
+	*मूल्य = (XtPointer)array;
 	i = 0;
 	array[i++] = targets_atom;
 	array[i++] = vimenc_atom;
 	array[i++] = vim_atom;
 	array[i++] = vimenc_mt_atom;
 	array[i++] = vim_mt_atom;
-	if (enc_utf8)
+	यदि (enc_utf8)
 	    array[i++] = utf8_atom;
 	array[i++] = XA_STRING;
 	array[i++] = text_atom;
@@ -1496,10 +1496,10 @@ clip_x11_convert_selection_cb(
 	// crashes on 64 bit machines. (Peter Derr)
 	*format = 32;
 	*length = i;
-	return True;
+	प्रत्यागम True;
     }
 
-    if (       *target != XA_STRING
+    यदि (       *target != XA_STRING
 	    && *target != vimenc_atom
 	    && *target != vimenc_mt_atom
 	    && (*target != utf8_atom || !enc_utf8)
@@ -1507,97 +1507,97 @@ clip_x11_convert_selection_cb(
 	    && *target != vim_mt_atom
 	    && *target != text_atom
 	    && *target != compound_text_atom)
-	return False;
+	प्रत्यागम False;
 
     clip_get_selection(cbd);
     motion_type = clip_convert_selection(&string, length, cbd);
-    if (motion_type < 0)
-	return False;
+    यदि (motion_type < 0)
+	प्रत्यागम False;
 
     // For our own format, the first byte contains the motion type
-    if (*target == vim_atom || *target == vim_mt_atom)
+    यदि (*target == vim_atom || *target == vim_mt_atom)
 	(*length)++;
 
     // Our own format with encoding: motion 'encoding' NUL text
-    if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    यदि (*target == vimenc_atom || *target == vimenc_mt_atom)
 	*length += STRLEN(p_enc) + 2;
 
-    if (save_length < *length || save_length / 2 >= *length)
-	*value = XtRealloc((char *)save_result, (Cardinal)*length + 1);
-    else
-	*value = save_result;
-    if (*value == NULL)
+    यदि (save_length < *length || save_length / 2 >= *length)
+	*मूल्य = XtRealloc((वर्ण *)save_result, (Cardinal)*length + 1);
+    अन्यथा
+	*मूल्य = save_result;
+    यदि (*मूल्य == रिक्त)
     {
 	vim_free(string);
-	return False;
+	प्रत्यागम False;
     }
-    save_result = (char_u *)*value;
+    save_result = (char_u *)*मूल्य;
     save_length = *length;
 
-    if (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
+    यदि (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
     {
-	mch_memmove(save_result, string, (size_t)(*length));
+	mch_memmove(save_result, string, (माप_प्रकार)(*length));
 	*type = *target;
     }
-    else if (*target == compound_text_atom || *target == text_atom)
+    अन्यथा यदि (*target == compound_text_atom || *target == text_atom)
     {
 	XTextProperty	text_prop;
-	char		*string_nt = (char *)save_result;
-	int		conv_result;
+	वर्ण		*string_nt = (वर्ण *)save_result;
+	पूर्णाङ्क		conv_result;
 
 	// create NUL terminated string which XmbTextListToTextProperty wants
-	mch_memmove(string_nt, string, (size_t)*length);
+	mch_memmove(string_nt, string, (माप_प्रकार)*length);
 	string_nt[*length] = NUL;
 	conv_result = XmbTextListToTextProperty(X_DISPLAY, &string_nt,
 					   1, XCompoundTextStyle, &text_prop);
-	if (conv_result != Success)
+	यदि (conv_result != Success)
 	{
 	    vim_free(string);
-	    return False;
+	    प्रत्यागम False;
 	}
-	*value = (XtPointer)(text_prop.value);	//    from plain text
+	*मूल्य = (XtPointer)(text_prop.मूल्य);	//    from plain text
 	*length = text_prop.nitems;
 	*type = compound_text_atom;
-	XtFree((char *)save_result);
-	save_result = (char_u *)*value;
+	XtFree((वर्ण *)save_result);
+	save_result = (char_u *)*मूल्य;
 	save_length = *length;
     }
-    else if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    अन्यथा यदि (*target == vimenc_atom || *target == vimenc_mt_atom)
     {
-	int l = STRLEN(p_enc);
+	पूर्णाङ्क l = STRLEN(p_enc);
 
 	save_result[0] = motion_type;
 	STRCPY(save_result + 1, p_enc);
-	mch_memmove(save_result + l + 2, string, (size_t)(*length - l - 2));
-	if (*target == vimenc_atom)
+	mch_memmove(save_result + l + 2, string, (माप_प्रकार)(*length - l - 2));
+	यदि (*target == vimenc_atom)
 	    *type = vimenc_atom;
-	else
+	अन्यथा
 	    *type = vimenc_mt_atom;
     }
-    else
+    अन्यथा
     {
 	save_result[0] = motion_type;
-	mch_memmove(save_result + 1, string, (size_t)(*length - 1));
-	if (*target == vim_atom)
+	mch_memmove(save_result + 1, string, (माप_प्रकार)(*length - 1));
+	यदि (*target == vim_atom)
 	    *type = vim_atom;
-	else
+	अन्यथा
 	    *type = vim_mt_atom;
     }
     *format = 8;	    // 8 bits per char
     vim_free(string);
-    return True;
+    प्रत्यागम True;
 }
 
-    static void
+    स्थिर शून्य
 clip_x11_lose_ownership_cb(Widget w UNUSED, Atom *sel_atom)
 {
-    if (*sel_atom == clip_plus.sel_atom)
+    यदि (*sel_atom == clip_plus.sel_atom)
 	clip_lose_selection(&clip_plus);
-    else
+    अन्यथा
 	clip_lose_selection(&clip_star);
 }
 
-    static void
+    स्थिर शून्य
 clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
 {
     // To prevent automatically freeing the selection value.
@@ -1606,8 +1606,8 @@ clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
 /*
  * Property callback to get a timestamp for XtOwnSelection.
  */
-#  if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    static void
+#  यदि defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    स्थिर शून्य
 clip_x11_timestamp_cb(
     Widget	w,
     XtPointer	n UNUSED,
@@ -1615,93 +1615,93 @@ clip_x11_timestamp_cb(
     Boolean	*cont UNUSED)
 {
     Atom	    actual_type;
-    int		    format;
-    unsigned  long  nitems, bytes_after;
-    unsigned char   *prop=NULL;
+    पूर्णाङ्क		    format;
+    अचिन्हित  दीर्घ  nitems, bytes_after;
+    अचिन्हित वर्ण   *prop=रिक्त;
     XPropertyEvent  *xproperty=&event->xproperty;
 
     // Must be a property notify, state can't be Delete (True), has to be
     // one of the supported selection types.
-    if (event->type != PropertyNotify || xproperty->state
+    यदि (event->type != PropertyNotify || xproperty->state
 	    || (xproperty->atom != clip_star.sel_atom
 				    && xproperty->atom != clip_plus.sel_atom))
-	return;
+	प्रत्यागम;
 
-    if (XGetWindowProperty(xproperty->display, xproperty->window,
+    यदि (XGetWindowProperty(xproperty->display, xproperty->window,
 	  xproperty->atom, 0, 0, False, timestamp_atom, &actual_type, &format,
 						&nitems, &bytes_after, &prop))
-	return;
+	प्रत्यागम;
 
-    if (prop)
+    यदि (prop)
 	XFree(prop);
 
     // Make sure the property type is "TIMESTAMP" and it's 32 bits.
-    if (actual_type != timestamp_atom || format != 32)
-	return;
+    यदि (actual_type != timestamp_atom || format != 32)
+	प्रत्यागम;
 
     // Get the selection, using the event timestamp.
-    if (XtOwnSelection(w, xproperty->atom, xproperty->time,
+    यदि (XtOwnSelection(w, xproperty->atom, xproperty->समय,
 	    clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	    clip_x11_notify_cb) == OK)
     {
 	// Set the "owned" flag now, there may have been a call to
 	// lose_ownership_cb in between.
-	if (xproperty->atom == clip_plus.sel_atom)
+	यदि (xproperty->atom == clip_plus.sel_atom)
 	    clip_plus.owned = TRUE;
-	else
+	अन्यथा
 	    clip_star.owned = TRUE;
     }
 }
 
-    void
+    शून्य
 x11_setup_selection(Widget w)
 {
     XtAddEventHandler(w, PropertyChangeMask, False,
-	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (XtPointer)NULL);
+	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (XtPointer)रिक्त);
 }
 #  endif
 
-    static void
+    स्थिर शून्य
 clip_x11_request_selection_cb(
     Widget	w UNUSED,
     XtPointer	success,
     Atom	*sel_atom,
     Atom	*type,
-    XtPointer	value,
+    XtPointer	मूल्य,
     long_u	*length,
-    int		*format)
+    पूर्णाङ्क		*format)
 {
-    int		motion_type = MAUTO;
+    पूर्णाङ्क		motion_type = MAUTO;
     long_u	len;
     char_u	*p;
-    char	**text_list = NULL;
+    वर्ण	**text_list = रिक्त;
     Clipboard_T	*cbd;
-    char_u	*tmpbuf = NULL;
+    char_u	*tmpbuf = रिक्त;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    यदि (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
+    अन्यथा
 	cbd = &clip_star;
 
-    if (value == NULL || *length == 0)
+    यदि (मूल्य == रिक्त || *length == 0)
     {
 	clip_free_selection(cbd);	// nothing received, clear register
-	*(int *)success = FALSE;
-	return;
+	*(पूर्णाङ्क *)success = FALSE;
+	प्रत्यागम;
     }
-    p = (char_u *)value;
+    p = (char_u *)मूल्य;
     len = *length;
-    if (*type == vim_atom || *type == vim_mt_atom)
+    यदि (*type == vim_atom || *type == vim_mt_atom)
     {
 	motion_type = *p++;
 	len--;
     }
 
-    else if (*type == vimenc_atom || *type == vimenc_mt_atom)
+    अन्यथा यदि (*type == vimenc_atom || *type == vimenc_mt_atom)
     {
 	char_u		*enc;
 	vimconv_T	conv;
-	int		convlen;
+	पूर्णाङ्क		convlen;
 
 	motion_type = *p++;
 	--len;
@@ -1714,55 +1714,55 @@ clip_x11_request_selection_cb(
 	// converting it.
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	यदि (conv.vc_type != CONV_NONE)
 	{
 	    convlen = len;	// Need to use an int here.
 	    tmpbuf = string_convert(&conv, p, &convlen);
 	    len = convlen;
-	    if (tmpbuf != NULL)
+	    यदि (tmpbuf != रिक्त)
 		p = tmpbuf;
-	    convert_setup(&conv, NULL, NULL);
+	    convert_setup(&conv, रिक्त, रिक्त);
 	}
     }
 
-    else if (*type == compound_text_atom
+    अन्यथा यदि (*type == compound_text_atom
 	    || *type == utf8_atom
 	    || (enc_dbcs != 0 && *type == text_atom))
     {
 	XTextProperty	text_prop;
-	int		n_text = 0;
-	int		status;
+	पूर्णाङ्क		n_text = 0;
+	पूर्णाङ्क		status;
 
-	text_prop.value = (unsigned char *)value;
+	text_prop.मूल्य = (अचिन्हित वर्ण *)मूल्य;
 	text_prop.encoding = *type;
 	text_prop.format = *format;
 	text_prop.nitems = len;
-#  if defined(X_HAVE_UTF8_STRING)
-	if (*type == utf8_atom)
+#  यदि defined(X_HAVE_UTF8_STRING)
+	यदि (*type == utf8_atom)
 	    status = Xutf8TextPropertyToTextList(X_DISPLAY, &text_prop,
 							 &text_list, &n_text);
-	else
+	अन्यथा
 #  endif
 	    status = XmbTextPropertyToTextList(X_DISPLAY, &text_prop,
 							 &text_list, &n_text);
-	if (status != Success || n_text < 1)
+	यदि (status != Success || n_text < 1)
 	{
-	    *(int *)success = FALSE;
-	    return;
+	    *(पूर्णाङ्क *)success = FALSE;
+	    प्रत्यागम;
 	}
 	p = (char_u *)text_list[0];
 	len = STRLEN(p);
     }
-    clip_yank_selection(motion_type, p, (long)len, cbd);
+    clip_yank_selection(motion_type, p, (दीर्घ)len, cbd);
 
-    if (text_list != NULL)
+    यदि (text_list != रिक्त)
 	XFreeStringList(text_list);
     vim_free(tmpbuf);
-    XtFree((char *)value);
-    *(int *)success = TRUE;
+    XtFree((वर्ण *)मूल्य);
+    *(पूर्णाङ्क *)success = TRUE;
 }
 
-    void
+    शून्य
 clip_x11_request_selection(
     Widget	myShell,
     Display	*dpy,
@@ -1770,34 +1770,34 @@ clip_x11_request_selection(
 {
     XEvent	event;
     Atom	type;
-    static int	success;
-    int		i;
-    time_t	start_time;
-    int		timed_out = FALSE;
+    स्थिर पूर्णाङ्क	success;
+    पूर्णाङ्क		i;
+    समय_प्रकार	start_time;
+    पूर्णाङ्क		timed_out = FALSE;
 
-    for (i = 0; i < 8; i++)
+    प्रति (i = 0; i < 8; i++)
     {
-	switch (i)
+	विकल्प (i)
 	{
-	    case 0:  type = vimenc_mt_atom;	break;
-	    case 1:  type = vimenc_atom;	break;
-	    case 2:  type = vim_mt_atom;	break;
-	    case 3:  type = vim_atom;		break;
-	    case 4:  type = utf8_atom;		break;
-	    case 5:  type = compound_text_atom; break;
-	    case 6:  type = text_atom;		break;
-	    default: type = XA_STRING;
+	    पक्ष 0:  type = vimenc_mt_atom;	भङ्ग;
+	    पक्ष 1:  type = vimenc_atom;	भङ्ग;
+	    पक्ष 2:  type = vim_mt_atom;	भङ्ग;
+	    पक्ष 3:  type = vim_atom;		भङ्ग;
+	    पक्ष 4:  type = utf8_atom;		भङ्ग;
+	    पक्ष 5:  type = compound_text_atom; भङ्ग;
+	    पक्ष 6:  type = text_atom;		भङ्ग;
+	    स्वभाव: type = XA_STRING;
 	}
-	if (type == utf8_atom
-#  if defined(X_HAVE_UTF8_STRING)
+	यदि (type == utf8_atom
+#  यदि defined(X_HAVE_UTF8_STRING)
 		&& !enc_utf8
 #  endif
 		)
 	    // Only request utf-8 when 'encoding' is utf8 and
 	    // Xutf8TextPropertyToTextList is available.
-	    continue;
+	    अनुवर्त;
 	success = MAYBE;
-	XtGetSelectionValue(myShell, cbd->sel_atom, type,
+	Xt_Get_Selection_मूल्य(myShell, cbd->sel_atom, type,
 	    clip_x11_request_selection_cb, (XtPointer)&success, CurrentTime);
 
 	// Make sure the request for the selection goes out before waiting for
@@ -1809,10 +1809,10 @@ clip_x11_request_selection(
 	 * characters, then they will appear before the one that requested the
 	 * paste!  Don't worry, we will catch up with any other events later.
 	 */
-	start_time = time(NULL);
-	while (success == MAYBE)
+	start_time = समय(रिक्त);
+	यावत् (success == MAYBE)
 	{
-	    if (XCheckTypedEvent(dpy, PropertyNotify, &event)
+	    यदि (XCheckTypedEvent(dpy, PropertyNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionRequest, &event))
 	    {
@@ -1823,7 +1823,7 @@ clip_x11_request_selection(
 		// it we hang.  KDE klipper does this, for example.
 		// We need to handle a PropertyNotify for large selections.
 		XtDispatchEvent(&event);
-		continue;
+		अनुवर्त;
 	    }
 
 	    // Time out after 2 to 3 seconds to avoid that we hang when the
@@ -1831,10 +1831,10 @@ clip_x11_request_selection(
 	    // event may still come later when the selection owner comes back
 	    // to life and the text gets inserted unexpectedly.  Don't know
 	    // why that happens or how to avoid that :-(.
-	    if (time(NULL) > start_time + 2)
+	    यदि (समय(रिक्त) > start_time + 2)
 	    {
 		timed_out = TRUE;
-		break;
+		भङ्ग;
 	    }
 
 	    // Do we need this?  Probably not.
@@ -1844,27 +1844,27 @@ clip_x11_request_selection(
 	    ui_delay(1L, TRUE);
 	}
 
-	if (success == TRUE)
-	    return;
+	यदि (success == TRUE)
+	    प्रत्यागम;
 
 	// don't do a retry with another type after timing out, otherwise we
 	// hang for 15 seconds.
-	if (timed_out)
-	    break;
+	यदि (timed_out)
+	    भङ्ग;
     }
 
     // Final fallback position - use the X CUT_BUFFER0 store
     yank_cut_buffer0(dpy, cbd);
 }
 
-    void
+    शून्य
 clip_x11_lose_selection(Widget myShell, Clipboard_T *cbd)
 {
     XtDisownSelection(myShell, cbd->sel_atom,
 				XtLastTimestampProcessed(XtDisplay(myShell)));
 }
 
-    int
+    पूर्णाङ्क
 clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
 {
     // When using the GUI we have proper timestamps, use the one of the last
@@ -1872,81 +1872,81 @@ clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
     // them), Get the time by a zero-length append, clip_x11_timestamp_cb will
     // be called with the current timestamp.
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
     {
-	if (XtOwnSelection(myShell, cbd->sel_atom,
+	यदि (XtOwnSelection(myShell, cbd->sel_atom,
 	       XtLastTimestampProcessed(XtDisplay(myShell)),
 	       clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	       clip_x11_notify_cb) == False)
-	    return FAIL;
+	    प्रत्यागम FAIL;
     }
-    else
+    अन्यथा
 #  endif
     {
-	if (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
-		  cbd->sel_atom, timestamp_atom, 32, PropModeAppend, NULL, 0))
-	    return FAIL;
+	यदि (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
+		  cbd->sel_atom, timestamp_atom, 32, PropModeAppend, रिक्त, 0))
+	    प्रत्यागम FAIL;
     }
     // Flush is required in a terminal as nothing else is doing it.
     XFlush(XtDisplay(myShell));
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Send the current selection to the clipboard.  Do nothing for X because we
  * will fill in the selection only when requested by another app.
  */
-    void
+    शून्य
 clip_x11_set_selection(Clipboard_T *cbd UNUSED)
 {
 }
 
 # endif
 
-# if (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
+# यदि (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
 	&& !defined(USE_GTK4)
 /*
  * Get the contents of the X CUT_BUFFER0 and put it in "cbd".
  */
-    void
+    शून्य
 yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 {
-    int		nbytes = 0;
+    पूर्णाङ्क		nbytes = 0;
     char_u	*buffer = (char_u *)XFetchBuffer(dpy, &nbytes, 0);
 
-    if (nbytes > 0)
+    यदि (nbytes > 0)
     {
-	int  done = FALSE;
+	पूर्णाङ्क  done = FALSE;
 
 	// CUT_BUFFER0 is supposed to be always latin1.  Convert to 'enc' when
 	// using a multi-byte encoding.  Conversion between two 8-bit
 	// character sets usually fails and the text might actually be in
 	// 'enc' anyway.
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
 	    char_u	*conv_buf;
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
+	    यदि (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
 	    {
 		conv_buf = string_convert(&vc, buffer, &nbytes);
-		if (conv_buf != NULL)
+		यदि (conv_buf != रिक्त)
 		{
-		    clip_yank_selection(MCHAR, conv_buf, (long)nbytes, cbd);
+		    clip_yank_selection(MCHAR, conv_buf, (दीर्घ)nbytes, cbd);
 		    vim_free(conv_buf);
 		    done = TRUE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_setup(&vc, रिक्त, रिक्त);
 	    }
 	}
-	if (!done)  // use the text without conversion
-	    clip_yank_selection(MCHAR, buffer, (long)nbytes, cbd);
-	XFree((void *)buffer);
-	if (p_verbose > 0)
+	यदि (!done)  // use the text without conversion
+	    clip_yank_selection(MCHAR, buffer, (दीर्घ)nbytes, cbd);
+	XFree((शून्य *)buffer);
+	यदि (p_verbose > 0)
 	{
 	    verbose_enter();
-	    verb_msg(_("Used CUT_BUFFER0 instead of empty selection"));
+	    verb_संदेश(_("Used CUT_BUFFER0 instead of empty selection"));
 	    verbose_leave();
 	}
     }
@@ -1980,66 +1980,66 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
  * 'permanent' of the two), otherwise the PRIMARY one.
  * For now, use a hard-coded sanity limit of 1Mb of data.
  */
-# if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
-    void
-x11_export_final_selection(void)
+# यदि defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+    शून्य
+x11_export_final_selection(शून्य)
 {
     Display	*dpy;
-    char_u	*str = NULL;
+    char_u	*str = रिक्त;
     long_u	len = 0;
-    int		motion_type = -1;
+    पूर्णाङ्क		motion_type = -1;
 
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    यदि (gui.in_use)
 	dpy = X_DISPLAY;
-    else
+    अन्यथा
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	dpy = xterm_dpy;
-#  else
-	return;
+#  अन्यथा
+	प्रत्यागम;
 #  endif
 
     // Get selection to export
-    if (clip_plus.owned)
+    यदि (clip_plus.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_plus);
-    else if (clip_star.owned)
+    अन्यथा यदि (clip_star.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_star);
 
     // Check it's OK
-    if (dpy != NULL && str != NULL && motion_type >= 0
+    यदि (dpy != रिक्त && str != रिक्त && motion_type >= 0
 					       && len < 1024*1024 && len > 0)
     {
-	int ok = TRUE;
+	पूर्णाङ्क ok = TRUE;
 
 	// The CUT_BUFFER0 is supposed to always contain latin1.  Convert from
 	// 'enc' when it is a multi-byte encoding.  When 'enc' is an 8-bit
 	// encoding conversion usually doesn't work, so keep the text as-is.
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
+	    यदि (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
 	    {
-		int	intlen = len;
+		पूर्णाङ्क	intlen = len;
 		char_u	*conv_str;
 
 		vc.vc_fail = TRUE;
 		conv_str = string_convert(&vc, str, &intlen);
 		len = intlen;
-		if (conv_str != NULL)
+		यदि (conv_str != रिक्त)
 		{
 		    vim_free(str);
 		    str = conv_str;
 		}
-		else
+		अन्यथा
 		{
 		    ok = FALSE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_setup(&vc, रिक्त, रिक्त);
 	    }
-	    else
+	    अन्यथा
 	    {
 		ok = FALSE;
 	    }
@@ -2047,9 +2047,9 @@ x11_export_final_selection(void)
 
 	// Do not store the string if conversion failed.  Better to use any
 	// other selection than garbled text.
-	if (ok)
+	यदि (ok)
 	{
-	    XStoreBuffer(dpy, (char *)str, (int)len, 0);
+	    XStoreBuffer(dpy, (वर्ण *)str, (पूर्णाङ्क)len, 0);
 	    XFlush(dpy);
 	}
     }
@@ -2058,14 +2058,14 @@ x11_export_final_selection(void)
 }
 # endif
 
-    void
+    शून्य
 clip_free_selection(Clipboard_T *cbd)
 {
     yankreg_T *y_ptr = get_y_current();
 
-    if (cbd == &clip_plus)
+    यदि (cbd == &clip_plus)
 	set_y_current(get_y_register(PLUS_REGISTER));
-    else
+    अन्यथा
 	set_y_current(get_y_register(STAR_REGISTER));
     free_yank_all();
     get_y_current()->y_size = 0;
@@ -2075,27 +2075,27 @@ clip_free_selection(Clipboard_T *cbd)
 /*
  * Get the selected text and put it in register '*' or '+'.
  */
-    void
+    शून्य
 clip_get_selection(Clipboard_T *cbd)
 {
     yankreg_T	*old_y_previous, *old_y_current;
     pos_T	old_cursor;
     pos_T	old_visual;
-    int		old_visual_mode;
+    पूर्णाङ्क		old_visual_mode;
     colnr_T	old_virtcol;
     colnr_T	old_curswant;
-    int		old_set_curswant;
+    पूर्णाङ्क		old_set_curswant;
     pos_T	old_op_start, old_op_end;
     oparg_T	oa;
     cmdarg_T	ca;
 
-    if (cbd->owned)
+    यदि (cbd->owned)
     {
-	if ((cbd == &clip_plus
-		&& get_y_register(PLUS_REGISTER)->y_array != NULL)
+	यदि ((cbd == &clip_plus
+		&& get_y_register(PLUS_REGISTER)->y_array != रिक्त)
 		|| (cbd == &clip_star
-		    && get_y_register(STAR_REGISTER)->y_array != NULL))
-	    return;
+		    && get_y_register(STAR_REGISTER)->y_array != रिक्त))
+	    प्रत्यागम;
 
 	// Avoid triggering autocmds such as TextYankPost.
 	block_autocmds();
@@ -2136,7 +2136,7 @@ clip_get_selection(Clipboard_T *cbd)
 
 	unblock_autocmds();
     }
-    else if (!is_clipboard_needs_update())
+    अन्यथा यदि (!is_clipboard_needs_update())
     {
 	clip_free_selection(cbd);
 
@@ -2148,18 +2148,18 @@ clip_get_selection(Clipboard_T *cbd)
 /*
  * Convert from the GUI selection string into the '*'/'+' register.
  */
-    void
+    शून्य
 clip_yank_selection(
-    int		type,
+    पूर्णाङ्क		type,
     char_u	*str,
-    long	len,
+    दीर्घ	len,
     Clipboard_T *cbd)
 {
     yankreg_T *y_ptr;
 
-    if (cbd == &clip_plus)
+    यदि (cbd == &clip_plus)
 	y_ptr = get_y_register(PLUS_REGISTER);
-    else
+    अन्यथा
 	y_ptr = get_y_register(STAR_REGISTER);
 
     clip_free_selection(cbd);
@@ -2167,54 +2167,54 @@ clip_yank_selection(
     str_to_reg(y_ptr, type, str, len, -1, FALSE);
 }
 
-    int
+    पूर्णाङ्क
 clip_convert_selection_offset(
 	char_u	    **str,
 	long_u	    *len,
-	int	    offset, // Extra space to add in *str and the offset to
+	पूर्णाङ्क	    offset, // Extra space to add in *str and the offset to
 			    // place the actual string in *str.
 	Clipboard_T *cbd)
 {
     char_u	*p;
-    int		lnum;
-    int		i, j;
+    पूर्णाङ्क		lnum;
+    पूर्णाङ्क		i, j;
     int_u	eolsize;
     yankreg_T	*y_ptr;
 
-    if (cbd == &clip_plus)
+    यदि (cbd == &clip_plus)
 	y_ptr = get_y_register(PLUS_REGISTER);
-    else
+    अन्यथा
 	y_ptr = get_y_register(STAR_REGISTER);
 
 # ifdef USE_CRNL
     eolsize = 2;
-# else
+# अन्यथा
     eolsize = 1;
 # endif
 
-    *str = NULL;
+    *str = रिक्त;
     *len = 0;
-    if (y_ptr->y_array == NULL)
-	return -1;
+    यदि (y_ptr->y_array == रिक्त)
+	प्रत्यागम -1;
 
-    for (i = 0; i < y_ptr->y_size; i++)
+    प्रति (i = 0; i < y_ptr->y_size; i++)
 	*len += (long_u)y_ptr->y_array[i].length + eolsize;
 
     // Don't want newline character at end of last line if we're in MCHAR mode.
-    if (y_ptr->y_type == MCHAR && *len >= eolsize)
+    यदि (y_ptr->y_type == MCHAR && *len >= eolsize)
 	*len -= eolsize;
 
     *len += offset;
     p = *str = alloc(*len + 1);	// add one to avoid zero
-    if (p == NULL)
-	return -1;
+    यदि (p == रिक्त)
+	प्रत्यागम -1;
     p += offset;
     lnum = 0;
-    for (i = 0, j = 0; i < (int)*len - offset; i++, j++)
+    प्रति (i = 0, j = 0; i < (पूर्णाङ्क)*len - offset; i++, j++)
     {
-	if (y_ptr->y_array[lnum].string[j] == '\n')
+	यदि (y_ptr->y_array[lnum].string[j] == '\n')
 	    p[i] = NUL;
-	else if (y_ptr->y_array[lnum].string[j] == NUL)
+	अन्यथा यदि (y_ptr->y_array[lnum].string[j] == NUL)
 	{
 # ifdef USE_CRNL
 	    p[i++] = '\r';
@@ -2223,10 +2223,10 @@ clip_convert_selection_offset(
 	    lnum++;
 	    j = -1;
 	}
-	else
+	अन्यथा
 	    p[i] = y_ptr->y_array[lnum].string[j];
     }
-    return y_ptr->y_type;
+    प्रत्यागम y_ptr->y_type;
 }
 
 /*
@@ -2234,49 +2234,49 @@ clip_convert_selection_offset(
  * with length *len.
  * Returns the motion type, or -1 for failure.
  */
-    int
+    पूर्णाङ्क
 clip_convert_selection(char_u **str, long_u *len, Clipboard_T *cbd)
 {
-    return clip_convert_selection_offset(str, len, 0, cbd);
+    प्रत्यागम clip_convert_selection_offset(str, len, 0, cbd);
 }
 
 /*
  * When "regname" is a clipboard register, obtain the selection.  If it's not
  * available return zero, otherwise return "regname".
  */
-    int
-may_get_selection(int regname)
+    पूर्णाङ्क
+may_get_selection(पूर्णाङ्क regname)
 {
-    if (regname == '*')
+    यदि (regname == '*')
     {
-	if (!clip_star.available)
+	यदि (!clip_star.available)
 	    regname = 0;
-	else
+	अन्यथा
 	    clip_get_selection(&clip_star);
     }
-    else if (regname == '+')
+    अन्यथा यदि (regname == '+')
     {
-	if (!clip_plus.available)
+	यदि (!clip_plus.available)
 	    regname = 0;
-	else
+	अन्यथा
 	    clip_get_selection(&clip_plus);
     }
-    return regname;
+    प्रत्यागम regname;
 }
 
 /*
  * If we have written to a clipboard register, send the text to the clipboard.
  */
-    void
-may_set_selection(void)
+    शून्य
+may_set_selection(शून्य)
 {
-    if ((get_y_current() == get_y_register(STAR_REGISTER))
+    यदि ((get_y_current() == get_y_register(STAR_REGISTER))
 	    && clip_star.available)
     {
 	clip_own_selection(&clip_star);
 	clip_gen_set_selection(&clip_star);
     }
-    else if ((get_y_current() == get_y_register(PLUS_REGISTER))
+    अन्यथा यदि ((get_y_current() == get_y_register(PLUS_REGISTER))
 	    && clip_plus.available)
     {
 	clip_own_selection(&clip_plus);
@@ -2284,86 +2284,86 @@ may_set_selection(void)
     }
 }
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# यदि defined(FEAT_WAYLAND_CLIPBOARD)
 
-    static clip_wl_selection_T *
+    स्थिर clip_wl_selection_T *
 clip_wl_get_selection(wayland_selection_T sel)
 {
-    switch (sel)
+    विकल्प (sel)
     {
-	case WAYLAND_SELECTION_REGULAR:
-	    return &clip_wl.regular;
-	case WAYLAND_SELECTION_PRIMARY:
-	    return &clip_wl.primary;
-	default:
-	    return NULL;
+	पक्ष WAYLAND_SELECTION_REGULAR:
+	    प्रत्यागम &clip_wl.regular;
+	पक्ष WAYLAND_SELECTION_PRIMARY:
+	    प्रत्यागम &clip_wl.primary;
+	स्वभाव:
+	    प्रत्यागम रिक्त;
     }
 }
 
-    static clip_wl_selection_T *
+    स्थिर clip_wl_selection_T *
 clip_wl_get_selection_from_cbd(Clipboard_T *cbd)
 {
-    if (cbd == &clip_plus)
-	return &clip_wl.regular;
-    else if (cbd == &clip_star)
-	return &clip_wl.primary;
-    else
-	return NULL;
+    यदि (cbd == &clip_plus)
+	प्रत्यागम &clip_wl.regular;
+    अन्यथा यदि (cbd == &clip_star)
+	प्रत्यागम &clip_wl.primary;
+    अन्यथा
+	प्रत्यागम रिक्त;
 }
 
-    static Clipboard_T *
+    स्थिर Clipboard_T *
 clip_wl_get_cbd_from_selection(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return &clip_plus;
-    else if (sel == &clip_wl.primary)
-	return &clip_star;
-    else
-	return NULL;
+    यदि (sel == &clip_wl.regular)
+	प्रत्यागम &clip_plus;
+    अन्यथा यदि (sel == &clip_wl.primary)
+	प्रत्यागम &clip_star;
+    अन्यथा
+	प्रत्यागम रिक्त;
 }
 
-    static wayland_selection_T
+    स्थिर wayland_selection_T
 clip_wl_get_selection_type(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return WAYLAND_SELECTION_REGULAR;
-    else if (sel == &clip_wl.primary)
-	return WAYLAND_SELECTION_PRIMARY;
-    else
-	return WAYLAND_SELECTION_NONE;
+    यदि (sel == &clip_wl.regular)
+	प्रत्यागम WAYLAND_SELECTION_REGULAR;
+    अन्यथा यदि (sel == &clip_wl.primary)
+	प्रत्यागम WAYLAND_SELECTION_PRIMARY;
+    अन्यथा
+	प्रत्यागम WAYLAND_SELECTION_NONE;
 }
 
-    static bool
+    स्थिर bool
 wl_data_offer_listener_event_offer(
-    void *data UNUSED,
+    शून्य *data UNUSED,
     vwl_data_offer_T *offer UNUSED,
-    const char *mime_type
+    ध्रुव वर्ण *mime_type
 )
 {
     // Only accept mime type if we support it
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(mime_type, supported_mimes[i]) == 0)
-	    return true;
-    return FALSE;
+    प्रति (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(supported_mimes); i++)
+	यदि (STRCMP(mime_type, supported_mimes[i]) == 0)
+	    प्रत्यागम true;
+    प्रत्यागम FALSE;
 }
 
-static const vwl_data_offer_listener_T vwl_data_offer_listener = {
+स्थिर ध्रुव vwl_data_offer_listener_T vwl_data_offer_listener = {
     .offer = wl_data_offer_listener_event_offer
 };
 
-    static void
+    स्थिर शून्य
 vwl_data_device_listener_event_data_offer(
-	void *data UNUSED,
+	शून्य *data UNUSED,
 	vwl_data_device_T *device UNUSED,
 	vwl_data_offer_T *offer)
 {
     // Immediately start listening for offer events from the data offer
-    vwl_data_offer_add_listener(offer, &vwl_data_offer_listener, NULL);
+    vwl_data_offer_add_listener(offer, &vwl_data_offer_listener, रिक्त);
 }
 
-    static void
+    स्थिर शून्य
 vwl_data_device_listener_event_selection(
-	void *data UNUSED,
+	शून्य *data UNUSED,
 	vwl_data_device_T *device UNUSED,
 	vwl_data_offer_T *offer,
 	wayland_selection_T selection)
@@ -2376,13 +2376,13 @@ vwl_data_device_listener_event_selection(
     // There are two cases when sel->offer is NULL
     // 1. No one owns the selection
     // 2. We own the selection (we'll just access the register directly)
-    if (offer == NULL || sel->source != NULL)
+    यदि (offer == रिक्त || sel->source != रिक्त)
     {
 	// Selection event is from us, so we are the source client. Therefore
 	// ignore it. Or the selection is cleared, so set sel->offer to NULL
 	vwl_data_offer_destroy(offer);
-	sel->offer = NULL;
-	return;
+	sel->offer = रिक्त;
+	प्रत्यागम;
     }
 
     // Save offer. When we want to request data, then we'll actually call the
@@ -2391,9 +2391,9 @@ vwl_data_device_listener_event_selection(
 
 }
 
-    static void
+    स्थिर शून्य
 vwl_data_device_listener_event_finished(
-	void *data UNUSED,
+	शून्य *data UNUSED,
 	vwl_data_device_T *device)
 {
     clip_wl_selection_T *sel;
@@ -2401,19 +2401,19 @@ vwl_data_device_listener_event_finished(
     // invalid? If so, let the user call :wlrestore! to reset. There wouldn't be
     // any point in trying to create another data device for the same seat,
     // since the seat is in an invalid state.
-    if (device == clip_wl.regular.device)
+    यदि (device == clip_wl.regular.device)
     {
 	sel = &clip_wl.regular;
-	clip_wl.regular.device = NULL;
+	clip_wl.regular.device = रिक्त;
     }
-    else if (device == clip_wl.primary.device)
+    अन्यथा यदि (device == clip_wl.primary.device)
     {
 	sel = &clip_wl.primary;
-	clip_wl.primary.device = NULL;
+	clip_wl.primary.device = रिक्त;
     }
-    else
+    अन्यथा
 	// Shouldn't happen
-	return;
+	प्रत्यागम;
 
     vim_free(sel->contents);
     vwl_data_source_destroy(sel->source);
@@ -2423,7 +2423,7 @@ vwl_data_device_listener_event_finished(
     vwl_data_device_destroy(device);
 }
 
-static const vwl_data_device_listener_T vwl_data_device_listener = {
+स्थिर ध्रुव vwl_data_device_listener_T vwl_data_device_listener = {
     .data_offer = vwl_data_device_listener_event_data_offer,
     .selection = vwl_data_device_listener_event_selection,
     .finished = vwl_data_device_listener_event_finished
@@ -2433,63 +2433,63 @@ static const vwl_data_device_listener_T vwl_data_device_listener = {
  * Initialize the clipboard for Wayland using the global Wayland connection.
  * Returns OK on success and FAIL on failure.
  */
-    int
-clip_init_wayland(void)
+    पूर्णाङ्क
+clip_init_wayland(शून्य)
 {
     int_u supported = WAYLAND_SELECTION_NONE;
 
-    if (wayland_ct == NULL)
-	return FAIL;
+    यदि (wayland_ct == रिक्त)
+	प्रत्यागम FAIL;
 
-    memset(&clip_wl, 0, sizeof(clip_wl));
+    स_रखो(&clip_wl, 0, परिमाण(clip_wl));
 
-    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (char *)p_wse);
+    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (वर्ण *)p_wse);
 
-    if (clip_wl.seat == NULL)
-	return FAIL;
+    यदि (clip_wl.seat == रिक्त)
+	प्रत्यागम FAIL;
 
     clip_wl.regular.manager = vwl_connection_get_data_device_manager(
 	    wayland_ct, WAYLAND_SELECTION_REGULAR, &supported);
 
-    if (clip_wl.regular.manager != NULL)
+    यदि (clip_wl.regular.manager != रिक्त)
     {
 	clip_wl.regular.device = vwl_data_device_manager_get_data_device(
 		clip_wl.regular.manager, clip_wl.seat);
 
-	if (clip_wl.regular.device != NULL)
+	यदि (clip_wl.regular.device != रिक्त)
 	    clip_wl.regular.available = true;
-	else
+	अन्यथा
 	{
 	    // Shouldn't happen
 	    vwl_data_device_manager_discard(clip_wl.regular.manager);
-	    clip_wl.regular.manager = NULL;
-	    return FAIL;
+	    clip_wl.regular.manager = रिक्त;
+	    प्रत्यागम FAIL;
 	}
     }
 
     // If we still don't support the primary selection, try finding one for it
     // specifically.
-    if (!(supported & WAYLAND_SELECTION_PRIMARY))
+    यदि (!(supported & WAYLAND_SELECTION_PRIMARY))
     {
 	clip_wl.primary.manager = vwl_connection_get_data_device_manager(
 		wayland_ct, WAYLAND_SELECTION_PRIMARY, &supported);
 
-	if (clip_wl.primary.manager != NULL)
+	यदि (clip_wl.primary.manager != रिक्त)
 	{
 	    clip_wl.primary.device = vwl_data_device_manager_get_data_device(
 		    clip_wl.primary.manager, clip_wl.seat);
 
-	    if (clip_wl.primary.device != NULL)
+	    यदि (clip_wl.primary.device != रिक्त)
 		clip_wl.primary.available = true;
-	    else
+	    अन्यथा
 	    {
 		vwl_data_device_manager_discard(clip_wl.primary.manager);
-		clip_wl.primary.manager = NULL;
+		clip_wl.primary.manager = रिक्त;
 	    }
 	}
     }
 
-    if (clip_wl.regular.available && !clip_wl.primary.available)
+    यदि (clip_wl.regular.available && !clip_wl.primary.available)
     {
 	// The protocol supports both regular and primary selections, just use
 	// one data device manager and one data device. Or the primary selection
@@ -2499,153 +2499,153 @@ clip_init_wayland(void)
 	clip_wl.primary.device = clip_wl.regular.device;
     }
 
-    if (!clip_wl.regular.available && !clip_wl.primary.available)
-	return FAIL;
+    यदि (!clip_wl.regular.available && !clip_wl.primary.available)
+	प्रत्यागम FAIL;
 
     // Start listening for selection updates
-    if (clip_wl.regular.device != NULL)
+    यदि (clip_wl.regular.device != रिक्त)
 	vwl_data_device_add_listener(clip_wl.regular.device,
-		&vwl_data_device_listener, NULL);
+		&vwl_data_device_listener, रिक्त);
     // Don't want to listen to the same data device twice
-    if (clip_wl.primary.device != NULL
+    यदि (clip_wl.primary.device != रिक्त
 	    && clip_wl.primary.device != clip_wl.regular.device)
 	vwl_data_device_add_listener(clip_wl.primary.device,
-		&vwl_data_device_listener, NULL);
+		&vwl_data_device_listener, रिक्त);
 
-    return OK;
+    प्रत्यागम OK;
 }
 
-    void
-clip_uninit_wayland(void)
+    शून्य
+clip_uninit_wayland(शून्य)
 {
     clip_wl_selection_T *sel;
 
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+    यदि (clipmethod == CLIPMETHOD_WAYLAND)
     {
-	if (clip_star.owned)
+	यदि (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	यदि (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
 
     // Don't want to double free
-    if (clip_wl.regular.manager != clip_wl.primary.manager)
+    यदि (clip_wl.regular.manager != clip_wl.primary.manager)
 	vwl_data_device_manager_discard(clip_wl.primary.manager);
     vwl_data_device_manager_discard(clip_wl.regular.manager);
 
-    if (clip_wl.regular.device != clip_wl.primary.device)
+    यदि (clip_wl.regular.device != clip_wl.primary.device)
 	vwl_data_device_destroy(clip_wl.primary.device);
     vwl_data_device_destroy(clip_wl.regular.device);
 
     sel = &clip_wl.regular;
-    while (true)
+    यावत् (true)
     {
 	vim_free(sel->contents);
 	vwl_data_source_destroy(sel->source);
 	vwl_data_offer_destroy(sel->offer);
 	sel->available = false;
 
-	if (sel == &clip_wl.primary)
-	    break;
+	यदि (sel == &clip_wl.primary)
+	    भङ्ग;
 	sel = &clip_wl.primary;
     }
 
-    vim_memset(&clip_wl, 0, sizeof(clip_wl));
+    vim_memset(&clip_wl, 0, परिमाण(clip_wl));
 }
 
-    int
-clip_reset_wayland(void)
+    पूर्णाङ्क
+clip_reset_wayland(शून्य)
 {
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == FAIL
+    यदि (wayland_init_connection(wayland_display_name) == FAIL
 	    || clip_init_wayland() == FAIL)
-	return FAIL;
+	प्रत्यागम FAIL;
 
     choose_clipmethod();
-    return OK;
+    प्रत्यागम OK;
 }
 
 
 /*
  * Read data from a file descriptor and write it to the given clipboard.
  */
-    static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
+    स्थिर शून्य
+clip_wl_receive_data(Clipboard_T *cbd, ध्रुव वर्ण *mime_type, पूर्णाङ्क fd)
 {
     char_u	*start, *final;
-    long	len;
+    दीर्घ	len;
     garray_T	buf;
-    int		motion_type = MAUTO;
+    पूर्णाङ्क		motion_type = MAUTO;
     ssize_t	r = 0;
-    char_u	*tofree = NULL;
+    char_u	*tofree = रिक्त;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    संरचना pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLIN;
-#  else
+#  अन्यथा
     fd_set rfds;
-    struct timeval  tv;
+    संरचना timeval  tv;
 
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 #  endif
 
     // Make pipe (read end) non-blocking
-    if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
-	return;
+    यदि (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+	प्रत्यागम;
 
     ga_init2(&buf, 1, 4096);
 
     // 4096 bytes seems reasonable for initial buffer size, memory is cheap
     // anyways.
-    if (ga_grow(&buf, 4096) == FAIL)
-	return;
+    यदि (ga_grow(&buf, 4096) == FAIL)
+	प्रत्यागम;
 
     start = buf.ga_data;
 
 #  ifndef HAVE_SELECT
-    while (poll(&pfd, 1, p_wtm) > 0)
-#  else
-    while (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
-	    select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
+    यावत् (poll(&pfd, 1, p_wtm) > 0)
+#  अन्यथा
+    यावत् (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
+	    select(fd + 1, &rfds, रिक्त, रिक्त, &tv) > 0)
 #  endif
     {
-	r = read(fd, start, buf.ga_maxlen - 1 - buf.ga_len);
+	r = पठ(fd, start, buf.ga_maxlen - 1 - buf.ga_len);
 
-	if (r == 0)
-	    break;
-	else if (r < 0)
+	यदि (r == 0)
+	    भङ्ग;
+	अन्यथा यदि (r < 0)
 	{
-	    if (errno == EAGAIN || errno == EINTR)
-		continue;
-	    break;
+	    यदि (त्रुटि_सं == EAGAIN || त्रुटि_सं == EINTR)
+		अनुवर्त;
+	    भङ्ग;
 	}
 
 	start += r;
 	buf.ga_len += r;
 
 	// Realloc if we are at the end of the buffer
-	if (buf.ga_len >= buf.ga_maxlen - 1)
+	यदि (buf.ga_len >= buf.ga_maxlen - 1)
 	{
-	    if (ga_grow(&buf, 8192) == FAIL)
-		break;
+	    यदि (ga_grow(&buf, 8192) == FAIL)
+		भङ्ग;
 	    start = (char_u *)buf.ga_data + buf.ga_len;
 	}
     }
 
-    if (buf.ga_len == 0)
+    यदि (buf.ga_len == 0)
     {
 	clip_free_selection(cbd); // Nothing received, clear register
 	ga_clear(&buf);
-	return;
+	प्रत्यागम;
     }
 
     final = buf.ga_data;
     len = buf.ga_len;
 
-    if (clip_convert_data(&final, &len, &motion_type,
+    यदि (clip_convert_data(&final, &len, &motion_type,
 	    STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	    || STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0,
 	    STRCMP(mime_type, VIMENC_ATOM_NAME) == 0
@@ -2659,98 +2659,98 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
  * Get the current selection and fill the respective register for cbd with the
  * data.
  */
-    static void
+    स्थिर शून्य
 clip_wl_request_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
-    int			fds[2];
-    int			mime_types_len;
-    const char		**mime_types;
-    const char		*chosen_mime = NULL;
+    पूर्णाङ्क			fds[2];
+    पूर्णाङ्क			mime_types_len;
+    ध्रुव वर्ण		**mime_types;
+    ध्रुव वर्ण		*chosen_mime = रिक्त;
 
-    if (!sel->available)
-	goto clear;
+    यदि (!sel->available)
+	गच्छ clear;
 
     // Dispatch any events that still queued up before checking for a data
     // offer.
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	goto clear;
+    यदि (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	गच्छ clear;
 
-    if (sel->offer == NULL)
-	goto clear;
+    यदि (sel->offer == रिक्त)
+	गच्छ clear;
 
     mime_types_len = sel->offer->mime_types.ga_len;
     mime_types = sel->offer->mime_types.ga_data;
 
     // Choose mime type to receive from. Mime types with a lower index in the
     // "supported_mimes" array are prioritized over ones after it.
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes)
-	    && chosen_mime == NULL; i++)
+    प्रति (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(supported_mimes)
+	    && chosen_mime == रिक्त; i++)
     {
-	for (int k = 0; k < mime_types_len && chosen_mime == NULL; k++)
-	    if (STRCMP(mime_types[k], supported_mimes[i]) == 0)
+	प्रति (पूर्णाङ्क k = 0; k < mime_types_len && chosen_mime == रिक्त; k++)
+	    यदि (STRCMP(mime_types[k], supported_mimes[i]) == 0)
 		chosen_mime = supported_mimes[i];
     }
 
-    if (chosen_mime == NULL || pipe(fds) == -1)
-	goto clear;
+    यदि (chosen_mime == रिक्त || pipe(fds) == -1)
+	गच्छ clear;
 
     vwl_data_offer_receive(sel->offer, chosen_mime, fds[1]);
 
-    close(fds[1]); // Close before we read data so that when the source client
+    बंद(fds[1]); // Close before we read data so that when the source client
 		   // closes their end we receive an EOF.
 
-    if (vwl_connection_flush(wayland_ct) >= 0)
+    यदि (vwl_connection_flush(wayland_ct) >= 0)
 	clip_wl_receive_data(cbd, chosen_mime, fds[0]);
 
-    close(fds[0]);
+    बंद(fds[0]);
 
-    return;
+    प्रत्यागम;
 clear:
     clip_free_selection(cbd);
 }
 
-    static void
+    स्थिर शून्य
 vwl_data_source_listener_event_send(
-    void *data,
+    शून्य *data,
     vwl_data_source_T *source UNUSED,
-    const char *mime_type,
+    ध्रुव वर्ण *mime_type,
     int32_t fd
 )
 {
     clip_wl_selection_T *sel = data;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
     bool		have_mime = false;
-    int			motion_type;
+    पूर्णाङ्क			motion_type;
     long_u		length;
     char_u		*string; // Will be reallocated to a bigger size if
 				 // needed.
-    int			offset = 0;
+    पूर्णाङ्क			offset = 0;
     bool		is_vim, is_vimenc;
-    size_t		total = 0;
+    माप_प्रकार		total = 0;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    संरचना pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLOUT;
-#  else
+#  अन्यथा
     fd_set	    wfds;
-    struct timeval  tv;
+    संरचना timeval  tv;
 
     FD_ZERO(&wfds);
     FD_SET(fd, &wfds);
 #  endif
 
     // Check if we actually have mime type
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    प्रति (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(supported_mimes); i++)
+	यदि (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = true;
-	    break;
+	    भङ्ग;
 	}
 
-    if (!have_mime)
-	goto exit;
+    यदि (!have_mime)
+	गच्छ निकास;
 
     // First byte sent is motion type for vim specific formats. For the vimenc
     // format, after the first byte is the encoding type, which is null
@@ -2761,50 +2761,50 @@ vwl_data_source_listener_event_send(
     is_vim = STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	|| STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
+    यदि (is_vimenc)
 	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
+    अन्यथा यदि (is_vim)
 	offset += 1;
 
     clip_get_selection(cbd);
     motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
 
-    if (motion_type < 0)
-	goto exit;
+    यदि (motion_type < 0)
+	गच्छ निकास;
 
-    if (is_vimenc)
+    यदि (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    अन्यथा यदि (is_vim)
 	string[0] = (char_u)motion_type;
 
 
-    while (total < (size_t)length &&
+    यावत् (total < (माप_प्रकार)length &&
 #  ifndef HAVE_SELECT
 	    poll(&pfd, 1, p_wtm) > 0)
-#  else
+#  अन्यथा
 	    ((tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000),
-	    select(fd + 1, NULL, &wfds, NULL, &tv) > 0))
+	    select(fd + 1, रिक्त, &wfds, रिक्त, &tv) > 0))
 #  endif
     {
-	ssize_t w = write(fd, string + total, length - total);
+	ssize_t w = लिख(fd, string + total, length - total);
 
-	if (w == -1)
-	    break;
+	यदि (w == -1)
+	    भङ्ग;
 	total += w;
     }
 
     vim_free(string);
-exit:
-    close(fd);
+निकास:
+    बंद(fd);
 }
 
-    static void
+    स्थिर शून्य
 vwl_data_source_listener_event_cancelled(
-	void *data,
+	शून्य *data,
 	vwl_data_source_T *source UNUSED)
 {
     clip_wl_selection_T *sel = data;
@@ -2813,13 +2813,13 @@ vwl_data_source_listener_event_cancelled(
     clip_lose_selection(cbd);
 }
 
-static const vwl_data_source_listener_T vwl_data_source_listener = {
+स्थिर ध्रुव vwl_data_source_listener_T vwl_data_source_listener = {
     .send = vwl_data_source_listener_event_send,
     .cancelled = vwl_data_source_listener_event_cancelled
 };
 
-    static void
-clip_wl_do_set_selection(void *data, uint32_t serial)
+    स्थिर शून्य
+clip_wl_do_set_selection(शून्य *data, uint32_t serial)
 {
     clip_wl_selection_T *sel = data;
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
@@ -2834,25 +2834,25 @@ clip_wl_do_set_selection(void *data, uint32_t serial)
  * other Wayland clients so they can receive data from us. Returns OK on success
  * and FAIL on failure.
  */
-    static int
+    स्थिर पूर्णाङ्क
 clip_wl_own_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    if (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return FAIL;
+    यदि (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
+	प्रत्यागम FAIL;
 
-    if (sel->source != NULL)
+    यदि (sel->source != रिक्त)
     {
-	if (sel_type == WAYLAND_SELECTION_PRIMARY)
+	यदि (sel_type == WAYLAND_SELECTION_PRIMARY)
 	    // We already own the selection, ignore (only do this for primary
 	    // selection). We don't re set the selection because then we would
 	    // be setting the selection every time the user moves the visual
 	    // selection cursor, which is messy and inefficient. Some
 	    // applications like Google Chrome do it this way however.
-	    return OK;
-	else if (sel_type == WAYLAND_SELECTION_REGULAR)
+	    प्रत्यागम OK;
+	अन्यथा यदि (sel_type == WAYLAND_SELECTION_REGULAR)
 	{
 	    // Technically we don't need to do this as we already own the
 	    // selection, however if a user yanks text a second time, the
@@ -2864,69 +2864,69 @@ clip_wl_own_selection(Clipboard_T *cbd)
 	    // seem to set the selection every time.
 	    vwl_data_source_destroy(sel->source);
 	}
-	else
+	अन्यथा
 	    // Shouldn't happen
-	    return FAIL;
+	    प्रत्यागम FAIL;
     }
 
     sel->source = vwl_data_device_manager_create_data_source(sel->manager);
     vwl_data_source_add_listener(sel->source, &vwl_data_source_listener, sel);
 
     // Advertise mime types
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
+    प्रति (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(supported_mimes); i++)
 	vwl_data_source_offer(sel->source, supported_mimes[i]);
 
     sel->own_success = false;
     clip_wl_do_set_selection(sel, 0);
 
-    if (!sel->own_success)
-	goto fail;
+    यदि (!sel->own_success)
+	गच्छ fail;
 
-    return OK;
+    प्रत्यागम OK;
 fail:
     vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
-    return FAIL;
+    sel->source = रिक्त;
+    प्रत्यागम FAIL;
 }
 
 /*
  * Disown the selection that cbd corresponds to.
  */
-    static void
+    स्थिर शून्य
 clip_wl_lose_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (!sel->available)
-	return;
+    यदि (!sel->available)
+	प्रत्यागम;
 
     vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
+    sel->source = रिक्त;
 }
 
 /*
  * Send the current selection to the clipboard. Do nothing for Wayland because
  * we will fill in the selection only when requested by another client.
  */
-    static void
+    स्थिर शून्य
 clip_wl_set_selection(Clipboard_T *cbd UNUSED)
 {
 }
 
-#  if defined(USE_SYSTEM)
+#  यदि defined(USE_SYSTEM)
 /*
  * Return true if we own the selection corresponding to cbd or another client
  * does.
  */
-    static bool
+    स्थिर bool
 clip_wl_owner_exists(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return false;
+    यदि (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	प्रत्यागम false;
 
-    return sel->available && (sel->source != NULL || sel->offer != NULL);
+    प्रत्यागम sel->available && (sel->source != रिक्त || sel->offer != रिक्त);
 }
 #  endif
 
@@ -2940,46 +2940,46 @@ clip_wl_owner_exists(Clipboard_T *cbd)
  * Returns the first method for accessing the clipboard that is available/works,
  * depending on the order of values in str.
  */
-    static clipmethod_T
+    स्थिर clipmethod_T
 get_clipmethod(char_u *str)
 {
-    int		len	= (int)STRLEN(str) + 1;
+    पूर्णाङ्क		len	= (पूर्णाङ्क)STRLEN(str) + 1;
     char_u	*buf	= alloc(len);
 
-    if (buf == NULL)
-	return CLIPMETHOD_FAIL;
+    यदि (buf == रिक्त)
+	प्रत्यागम CLIPMETHOD_FAIL;
 
     clipmethod_T ret = CLIPMETHOD_FAIL;
     char_u	*p = str;
 
-    while (*p != NUL)
+    यावत् (*p != NUL)
     {
 	clipmethod_T method = CLIPMETHOD_NONE;
 
-	(void)copy_option_part(&p, buf, len, ",");
+	(शून्य)copy_option_part(&p, buf, len, ",");
 
-	if (STRCMP(buf, "wayland") == 0)
+	यदि (STRCMP(buf, "wayland") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    यदि (!gui.in_use)
 # endif
 	    {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-		if (clip_wl.regular.available || clip_wl.primary.available)
+		यदि (clip_wl.regular.available || clip_wl.primary.available)
 		    method = CLIPMETHOD_WAYLAND;
 # endif
 	    }
 	}
-	else if (STRCMP(buf, "x11") == 0)
+	अन्यथा यदि (STRCMP(buf, "x11") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    यदि (!gui.in_use)
 # endif
 	    {
 # ifdef FEAT_XCLIPBOARD
 		// x_IOerror_handler() in os_unix.c should set xterm_dpy to NULL if
 		// we lost connection to the X server.
-		if (xterm_dpy != NULL)
+		यदि (xterm_dpy != रिक्त)
 		{
 		    // If the X connection is lost then that handler will longjmp
 		    // somewhere else, in that case we will call choose_clipmethod()
@@ -2991,66 +2991,66 @@ get_clipmethod(char_u *str)
 # endif
 	    }
 	}
-	else
+	अन्यथा
 	{
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	    // Check if name matches a clipboard provider
-	    int r = clip_provider_is_available(buf);
+	    पूर्णाङ्क r = clip_provider_is_available(buf);
 
-	    if (r == 1)
+	    यदि (r == 1)
 	    {
 		method = CLIPMETHOD_PROVIDER;
-		if (ret == CLIPMETHOD_FAIL)
+		यदि (ret == CLIPMETHOD_FAIL)
 		{
 		    vim_free(clip_provider);
 		    clip_provider = vim_strsave(buf);
-		    if (clip_provider == NULL)
-			goto fail;
+		    यदि (clip_provider == रिक्त)
+			गच्छ fail;
 		}
 	    }
-	    else if (r == -1)
+	    अन्यथा यदि (r == -1)
 # endif
 	    {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 fail:
 # endif
 		ret = CLIPMETHOD_FAIL;
-		goto exit;
+		गच्छ निकास;
 	    }
 	}
 
 	// Keep on going in order to catch errors
-	if (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
+	यदि (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
 	    ret = method;
     }
 
     // No match found, use "none".
     ret = (ret == CLIPMETHOD_FAIL) ? CLIPMETHOD_NONE : ret;
 
-exit:
+निकास:
     vim_free(buf);
-    return ret;
+    प्रत्यागम ret;
 }
 
 
 /*
  * Returns name of clipmethod in a statically allocated string.
  */
-    static char_u *
+    स्थिर char_u *
 clipmethod_to_str(clipmethod_T method)
 {
-    switch(method)
+    विकल्प(method)
     {
-	case CLIPMETHOD_WAYLAND:
-	    return (char_u *)"wayland";
-	case CLIPMETHOD_X11:
-	    return (char_u *)"x11";
-	case CLIPMETHOD_PROVIDER:
+	पक्ष CLIPMETHOD_WAYLAND:
+	    प्रत्यागम (char_u *)"wayland";
+	पक्ष CLIPMETHOD_X11:
+	    प्रत्यागम (char_u *)"x11";
+	पक्ष CLIPMETHOD_PROVIDER:
 # ifdef FEAT_EVAL
-	    return clip_provider;
+	    प्रत्यागम clip_provider;
 # endif
-	default:
-	    return (char_u *)"none";
+	स्वभाव:
+	    प्रत्यागम (char_u *)"none";
     }
 }
 
@@ -3058,20 +3058,20 @@ clipmethod_to_str(clipmethod_T method)
  * Sets the current clipmethod to use given by `get_clipmethod()`. Returns an
  * error message on failure else NULL.
  */
-    char *
-choose_clipmethod(void)
+    वर्ण *
+choose_clipmethod(शून्य)
 {
     clipmethod_T method = get_clipmethod(p_cpm);
 
-    if (method == CLIPMETHOD_FAIL)
-	return e_invalid_argument;
+    यदि (method == CLIPMETHOD_FAIL)
+	प्रत्यागम e_invalid_argument;
 
 // If GUI is running or we are not on a system with Wayland or X11, then always
 // return CLIPMETHOD_NONE. System or GUI clipboard handling always overrides.
 // This is unless a provider is being used.
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
-#  if defined(FEAT_GUI)
-    if (method != CLIPMETHOD_PROVIDER && gui.in_use)
+# यदि defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  यदि defined(FEAT_GUI)
+    यदि (method != CLIPMETHOD_PROVIDER && gui.in_use)
     {
 #   ifdef FEAT_WAYLAND
 	// We only interact with Wayland for the clipboard, we can just deinit
@@ -3080,46 +3080,46 @@ choose_clipmethod(void)
 #   endif
 
 	method = CLIPMETHOD_NONE;
-	goto lose_sel_exit;
+	गच्छ lose_sel_exit;
     }
 #  endif
-# else
+# अन्यथा
     // If on a system like windows or macos, then clipmethod is irrelevant, we
     // use their way of accessing the clipboard. This is unless we are using the
     // clipboard provider
 #  ifdef FEAT_CLIPBOARD_PROVIDER
-    if (method != CLIPMETHOD_PROVIDER)
+    यदि (method != CLIPMETHOD_PROVIDER)
 #  endif
     {
 	method = CLIPMETHOD_NONE;
-	goto exit;
+	गच्छ निकास;
     }
 # endif
 
 # ifdef FEAT_CLIPBOARD
     // Deinitialize clipboard if there is no way to access clipboard
-    if (method == CLIPMETHOD_NONE)
+    यदि (method == CLIPMETHOD_NONE)
 	clip_init(FALSE);
     // If we have a clipmethod that works now, then initialize clipboard
-    else if (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
+    अन्यथा यदि (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
     {
 	clip_init(TRUE);
 	did_warn_clipboard = false;
     }
     // Disown clipboard if we are switching to a new method
-    else if (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
+    अन्यथा यदि (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
     {
-#  if (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+#  यदि (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(FEAT_GUI)
 lose_sel_exit:
 #  endif
-	if (clip_star.owned)
+	यदि (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	यदि (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 
-#  if defined(FEAT_GUI)
-	if (!gui.in_use)
+#  यदि defined(FEAT_GUI)
+	यदि (!gui.in_use)
 #  endif
 	{
 	    clip_init(TRUE);
@@ -3128,8 +3128,8 @@ lose_sel_exit:
     }
 # endif // FEAT_CLIPBOARD
 
-# if !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
-exit:
+# यदि !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
+निकास:
 # endif
 
     clipmethod = method;
@@ -3138,22 +3138,22 @@ exit:
     set_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_to_str(method), -1);
 # endif
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Call choose_clipmethod().
  */
-    void
+    शून्य
 ex_clipreset(exarg_T *eap UNUSED)
 {
     clipmethod_T prev = clipmethod;
 
     choose_clipmethod();
 
-    if (clipmethod == CLIPMETHOD_NONE)
+    यदि (clipmethod == CLIPMETHOD_NONE)
 	smsg(_("Could not find a way to access the clipboard."));
-    else if (clipmethod != prev)
+    अन्यथा यदि (clipmethod != prev)
 	smsg(_("Switched to clipboard method '%s'."),
 		clipmethod_to_str(clipmethod));
 }
@@ -3162,33 +3162,33 @@ ex_clipreset(exarg_T *eap UNUSED)
  * Adjust the register name pointed to with "rp" for the clipboard being
  * used always and the clipboard being available.
  */
-    void
-adjust_clip_reg(int *rp)
+    शून्य
+adjust_clip_reg(पूर्णाङ्क *rp)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
+    यदि (clipmethod == CLIPMETHOD_PROVIDER)
     {
-	if (*rp == 0 && clip_unnamed != 0)
+	यदि (*rp == 0 && clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS)) ? '+' : '*';
-	return;
+	प्रत्यागम;
     }
 # endif
 # ifdef FEAT_CLIPBOARD
     // If no reg. specified, and "unnamed" or "unnamedplus" is in 'clipboard',
     // use '*' or '+' reg, respectively. "unnamedplus" prevails.
-    if (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
+    यदि (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
     {
-	if (clip_unnamed != 0)
+	यदि (clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.available)
 								  ? '+' : '*';
-	else
+	अन्यथा
 	    *rp = ((clip_unnamed_saved & CLIP_UNNAMED_PLUS)
 					   && clip_plus.available) ? '+' : '*';
     }
-    if ((!clip_star.available && *rp == '*') ||
+    यदि ((!clip_star.available && *rp == '*') ||
 	   (!clip_plus.available && *rp == '+'))
     {
-	msg_warn_missing_clipboard();
+	संदेश_warn_missing_clipboard();
 	*rp = 0;
     }
 # endif
@@ -3198,83 +3198,83 @@ adjust_clip_reg(int *rp)
  * Extract the items in the 'clipboard' option and set global values.
  * Return an error message or NULL for success.
  */
-    char *
+    वर्ण *
 did_set_clipboard(optset_T *args UNUSED)
 {
-    int		new_unnamed = 0;
+    पूर्णाङ्क		new_unnamed = 0;
 # ifdef FEAT_CLIPBOARD
-    int		new_autoselect_star = FALSE;
-    int		new_autoselect_plus = FALSE;
-    int		new_autoselectml = FALSE;
-    int		new_html = FALSE;
+    पूर्णाङ्क		new_autoselect_star = FALSE;
+    पूर्णाङ्क		new_autoselect_plus = FALSE;
+    पूर्णाङ्क		new_autoselectml = FALSE;
+    पूर्णाङ्क		new_html = FALSE;
 # endif
-    regprog_T	*new_exclude_prog = NULL;
-    char	*errmsg = NULL;
+    regprog_T	*new_exclude_prog = रिक्त;
+    वर्ण	*errmsg = रिक्त;
     char_u	*p;
 
-    for (p = p_cb; *p != NUL; )
+    प्रति (p = p_cb; *p != NUL; )
     {
 	// Note: Keep this in sync with p_cb_values.
-	if (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
+	यदि (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED;
 	    p += 7;
 	}
-	else if (STRNCMP(p, "unnamedplus", 11) == 0
+	अन्यथा यदि (STRNCMP(p, "unnamedplus", 11) == 0
 					    && (p[11] == ',' || p[11] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED_PLUS;
 	    p += 11;
 	}
 # ifdef FEAT_CLIPBOARD
-	else if (STRNCMP(p, "autoselect", 10) == 0
+	अन्यथा यदि (STRNCMP(p, "autoselect", 10) == 0
 					    && (p[10] == ',' || p[10] == NUL))
 	{
 	    new_autoselect_star = TRUE;
 	    p += 10;
 	}
-	else if (STRNCMP(p, "autoselectplus", 14) == 0
+	अन्यथा यदि (STRNCMP(p, "autoselectplus", 14) == 0
 					    && (p[14] == ',' || p[14] == NUL))
 	{
 	    new_autoselect_plus = TRUE;
 	    p += 14;
 	}
-	else if (STRNCMP(p, "autoselectml", 12) == 0
+	अन्यथा यदि (STRNCMP(p, "autoselectml", 12) == 0
 					    && (p[12] == ',' || p[12] == NUL))
 	{
 	    new_autoselectml = TRUE;
 	    p += 12;
 	}
-	else if (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
+	अन्यथा यदि (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
 	{
 	    new_html = TRUE;
 	    p += 4;
 	}
-	else if (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == NULL)
+	अन्यथा यदि (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == रिक्त)
 	{
 	    p += 8;
 	    new_exclude_prog = vim_regcomp(p, RE_MAGIC);
-	    if (new_exclude_prog == NULL)
+	    यदि (new_exclude_prog == रिक्त)
 		errmsg = e_invalid_argument;
-	    break;
+	    भङ्ग;
 	}
 # endif
-	else
+	अन्यथा
 	{
 	    errmsg = e_invalid_argument;
-	    break;
+	    भङ्ग;
 	}
-	if (*p == ',')
+	यदि (*p == ',')
 	    ++p;
     }
-    if (errmsg == NULL)
+    यदि (errmsg == रिक्त)
     {
 # ifdef FEAT_CLIPBOARD
-	if (global_busy)
+	यदि (global_busy)
 	    // clip_unnamed will be reset to clip_unnamed_saved
 	    // at end_global_changes
 	    clip_unnamed_saved = new_unnamed;
-	else
+	अन्यथा
 # endif
 	    clip_unnamed = new_unnamed;
 # ifdef FEAT_CLIPBOARD
@@ -3285,13 +3285,13 @@ did_set_clipboard(optset_T *args UNUSED)
 	vim_regfree(clip_exclude_prog);
 	clip_exclude_prog = new_exclude_prog;
 # endif
-# if defined(FEAT_GUI_GTK)
-	if (gui.in_use)
+# यदि defined(FEAT_GUI_GTK)
+	यदि (gui.in_use)
 	{
 #  ifdef USE_GTK4
 	    gui_gtk_update_selection_formats(&clip_plus);
 	    gui_gtk_update_selection_formats(&clip_star);
-#  else
+#  अन्यथा
 	    gui_gtk_set_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
 	    gui_gtk_set_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
 #  endif
@@ -3301,10 +3301,10 @@ did_set_clipboard(optset_T *args UNUSED)
 	}
 # endif
     }
-    else
+    अन्यथा
 	vim_regfree(new_exclude_prog);
 
-    return errmsg;
+    प्रत्यागम errmsg;
 }
 
 #endif // HAVE_CLIPMETHOD
@@ -3315,7 +3315,7 @@ did_set_clipboard(optset_T *args UNUSED)
  * Check if a clipboard provider with given name is available. Returns 1 if available,
  * 0 if not available, and -1 on error
  */
-    static int
+    स्थिर पूर्णाङ्क
 clip_provider_is_available(char_u *provider)
 {
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
@@ -3323,31 +3323,31 @@ clip_provider_is_available(char_u *provider)
     callback_T	callback = {0};
     typval_T	rettv = {0};
     typval_T	func_tv = {0};
-    int		res = 0;
+    पूर्णाङ्क		res = 0;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL
+    यदि (dict_get_tv(providers, (वर्ण *)provider, &provider_tv) == FAIL
 	    || provider_tv.v_type != VAR_DICT)
 	// clipboard provider not defined
-	return -1;
+	प्रत्यागम -1;
 
-    if (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
+    यदि (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	// If "available" function not specified assume always TRUE
-	return 1;
+	प्रत्यागम 1;
     }
 
-    if ((callback = get_callback(&func_tv)).cb_name == NULL)
-	goto fail;
+    यदि ((callback = get_callback(&func_tv)).cb_name == रिक्त)
+	गच्छ fail;
 
-    if (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
-	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_NUMBER))
-	goto fail;
+    यदि (call_callback(&callback, -1, &rettv, 0, रिक्त) == FAIL ||
+	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_संख्या))
+	गच्छ fail;
 
-    if (rettv.vval.v_number)
+    यदि (rettv.vval.v_संख्या)
 	res = 1;
 
-    if (FALSE)
+    यदि (FALSE)
 fail:
 	res = -1;
 
@@ -3356,14 +3356,14 @@ fail:
     clear_tv(&rettv);
     clear_tv(&provider_tv);
 
-    return res;
+    प्रत्यागम res;
 }
 
 /*
  * Get the specified callback "function" from the provider dictionary for
  * register "reg".
  */
-    static int
+    स्थिर पूर्णाङ्क
 clip_provider_get_callback(
 	char_u *reg,
 	char_u *provider,
@@ -3376,39 +3376,39 @@ clip_provider_get_callback(
     typval_T	func_tv;
     callback_T	cb;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL)
-	return FAIL;
-    else if (provider_tv.v_type != VAR_DICT)
+    यदि (dict_get_tv(providers, (वर्ण *)provider, &provider_tv) == FAIL)
+	प्रत्यागम FAIL;
+    अन्यथा यदि (provider_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    else if (dict_get_tv(
+    अन्यथा यदि (dict_get_tv(
 		provider_tv.vval.v_dict,
-		(char *)function,
+		(वर्ण *)function,
 		&action_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    else if (action_tv.v_type != VAR_DICT)
+    अन्यथा यदि (action_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    else if (dict_get_tv(action_tv.vval.v_dict, (char *)reg, &func_tv) == FAIL)
+    अन्यथा यदि (dict_get_tv(action_tv.vval.v_dict, (वर्ण *)reg, &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    else if ((cb = get_callback(&func_tv)).cb_name == NULL)
+    अन्यथा यदि ((cb = get_callback(&func_tv)).cb_name == रिक्त)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
 	clear_tv(&func_tv);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
     clear_tv(&provider_tv);
     clear_tv(&action_tv);
@@ -3416,50 +3416,50 @@ clip_provider_get_callback(
     // func_tv owns the function name, so we must make a copy for the callback
     set_callback(callback, &cb);
     clear_tv(&func_tv);
-    return OK;
+    प्रत्यागम OK;
 }
 
-    static void
+    स्थिर शून्य
 clip_provider_copy(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    स्थिर bool	recursive = false;
     callback_T	callback;
     typval_T	rettv;
     typval_T	argvars[4];
     yankreg_T	*y_ptr;
     char_u	type[2 + NUMBUFLEN] = {0};
-    list_T	*list = NULL;
+    list_T	*list = रिक्त;
 
-    if (recursive)
-	return;
+    यदि (recursive)
+	प्रत्यागम;
 
-    if (clip_provider_get_callback(
+    यदि (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"copy",
 		&callback) == FAIL)
-	return;
+	प्रत्यागम;
 
     // Convert register type into a string
-    if (*reg == '+')
+    यदि (*reg == '+')
 	y_ptr = get_y_register(REAL_PLUS_REGISTER);
-    else
+    अन्यथा
 	y_ptr = get_y_register(STAR_REGISTER);
 
-    switch (y_ptr->y_type)
+    विकल्प (y_ptr->y_type)
     {
-	case MCHAR:
+	पक्ष MCHAR:
 	    type[0] = 'v';
-	    break;
-	case MLINE:
+	    भङ्ग;
+	पक्ष MLINE:
 	    type[0] = 'V';
-	    break;
-	case MBLOCK:
-	    sprintf((char *)type, "%c%d", Ctrl_V, y_ptr->y_width + 1);
-	    break;
-	default:
+	    भङ्ग;
+	पक्ष MBLOCK:
+	    प्र_लिखो((वर्ण *)type, "%c%d", Ctrl_V, y_ptr->y_width + 1);
+	    भङ्ग;
+	स्वभाव:
 	    type[0] = 0;
-	    break;
+	    भङ्ग;
     }
 
     argvars[0].v_type = VAR_STRING;
@@ -3471,19 +3471,19 @@ clip_provider_copy(char_u *reg, char_u *provider)
     // Get register contents by creating a list of lines
     list = list_alloc();
 
-    if (list == NULL)
+    यदि (list == रिक्त)
     {
 	free_callback(&callback);
-	return;
+	प्रत्यागम;
     }
 
-    for (int i = 0; i < y_ptr->y_size; i++)
-	if (list_append_string(list, y_ptr->y_array[i].string,
-	    (int)y_ptr->y_array[i].length) == FAIL)
+    प्रति (पूर्णाङ्क i = 0; i < y_ptr->y_size; i++)
+	यदि (list_append_string(list, y_ptr->y_array[i].string,
+	    (पूर्णाङ्क)y_ptr->y_array[i].length) == FAIL)
 	{
 	    free_callback(&callback);
 	    list_unref(list);
-	    return;
+	    प्रत्यागम;
 	}
 
     list->lv_refcount++;
@@ -3505,26 +3505,26 @@ clip_provider_copy(char_u *reg, char_u *provider)
     list_unref(list);
 }
 
-    static void
+    स्थिर शून्य
 clip_provider_paste(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    स्थिर bool	recursive = false;
     callback_T	callback;
     typval_T	argvars[2];
     typval_T	rettv;
-    int		ret;
+    पूर्णाङ्क		ret;
     char_u	*reg_type;
-    list_T	*lines;
+    list_T	*पंक्तियाँ;
 
-    if (recursive)
-	return;
+    यदि (recursive)
+	प्रत्यागम;
 
-    if (clip_provider_get_callback(
+    यदि (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"paste",
 		&callback) == FAIL)
-	return;
+	प्रत्यागम;
 
     argvars[0].v_type = VAR_STRING;
     argvars[0].vval.v_string = reg;
@@ -3537,30 +3537,30 @@ clip_provider_paste(char_u *reg, char_u *provider)
     recursive = false;
     textlock--;
 
-    if (ret == FAIL)
-	goto exit;
-    else if (rettv.v_type == VAR_TUPLE
+    यदि (ret == FAIL)
+	गच्छ निकास;
+    अन्यथा यदि (rettv.v_type == VAR_TUPLE
 	    && TUPLE_LEN(rettv.vval.v_tuple) == 2
 	    && TUPLE_ITEM(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
 	    && TUPLE_ITEM(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
     {
 	reg_type = TUPLE_ITEM(rettv.vval.v_tuple, 0)->vval.v_string;
-	lines = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
+	पंक्तियाँ = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
     }
-    else if (rettv.v_type == VAR_LIST
+    अन्यथा यदि (rettv.v_type == VAR_LIST
 	    && rettv.vval.v_list->lv_len == 2
 	    && rettv.vval.v_list->lv_first->li_tv.v_type == VAR_STRING
 	    && rettv.vval.v_list->lv_first->li_next->li_tv.v_type == VAR_LIST)
     {
 	reg_type = rettv.vval.v_list->lv_first->li_tv.vval.v_string;
-	lines = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
+	पंक्तियाँ = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
     }
-    else
-	goto exit;
+    अन्यथा
+	गच्छ निकास;
 
     {
 	char_u		yank_type = MAUTO;
-	long		block_len = -1;
+	दीर्घ		block_len = -1;
 	yankreg_T	*y_ptr, *cur_y_ptr;
 	char_u		**lstval;
 	char_u		**allocval;
@@ -3569,52 +3569,52 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	char_u		**curallocval;
 	char_u		*strval;
 	listitem_T	*li;
-	int		len;
+	पूर्णाङ्क		len;
 
 	// If the list is NULL handle like an empty list.
-	len = lines == NULL ? 0 : lines->lv_len;
+	len = पंक्तियाँ == रिक्त ? 0 : पंक्तियाँ->lv_len;
 
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    goto exit;
+	यदि (lstval == रिक्त)
+	    गच्छ निकास;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (lines != NULL)
+	यदि (पंक्तियाँ != रिक्त)
 	{
-	    CHECK_LIST_MATERIALIZE(lines);
-	    FOR_ALL_LIST_ITEMS(lines, li)
+	    CHECK_LIST_MATERIALIZE(पंक्तियाँ);
+	    FOR_ALL_LIST_वस्तुएँ(पंक्तियाँ, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
-		    goto free_lstval;
-		if (strval == buf)
+		यदि (strval == रिक्त)
+		    गच्छ free_lstval;
+		यदि (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
-			goto free_lstval;
+		    यदि (strval == रिक्त)
+			गच्छ free_lstval;
 		    *curallocval++ = strval;
 		}
 		*curval++ = strval;
 	    }
 	}
-	*curval++ = NULL;
+	*curval++ = रिक्त;
 
-	if (*reg_type != NUL && (STRLEN(reg_type) == 0
+	यदि (*reg_type != NUL && (STRLEN(reg_type) == 0
 		|| get_yank_type(&reg_type, &yank_type, &block_len) == FAIL))
 	{
 	    emsg(e_invalid_argument);
-	    goto free_lstval;
+	    गच्छ free_lstval;
 	}
 
-	if (*reg == '+')
+	यदि (*reg == '+')
 	    y_ptr = get_y_register(REAL_PLUS_REGISTER);
-	else
+	अन्यथा
 	    y_ptr = get_y_register(STAR_REGISTER);
 
 	// Free previous register contents
@@ -3634,12 +3634,12 @@ clip_provider_paste(char_u *reg, char_u *provider)
 		TRUE);
 
 free_lstval:
-	while (curallocval > allocval)
+	यावत् (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
 
-exit:
+निकास:
     free_callback(&callback);
     clear_tv(&rettv);
 }
@@ -3650,46 +3650,46 @@ exit:
 //
 // If -1 then allow provider callback to be called then set to one. Default
 // value (is allowed) is -2.
-static int star_pause_count = -2, plus_pause_count = -2;
+स्थिर पूर्णाङ्क star_pause_गिनती = -2, plus_pause_गिनती = -2;
 
-    void
-call_clip_provider_request(int reg)
+    शून्य
+call_clip_provider_request(पूर्णाङ्क reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    यदि (clipmethod != CLIPMETHOD_PROVIDER)
+	प्रत्यागम;
 
-    if (reg == '+' && plus_pause_count < 0)
+    यदि (reg == '+' && plus_pause_गिनती < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	यदि (plus_pause_गिनती == -1)
+	    plus_pause_गिनती = 1;
 	clip_provider_paste((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    अन्यथा यदि (reg == '*' && star_pause_गिनती < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	यदि (star_pause_गिनती == -1)
+	    star_pause_गिनती = 1;
 	clip_provider_paste((char_u *)"*", clip_provider);
     }
-    else
-	return;
+    अन्यथा
+	प्रत्यागम;
 }
 
-    void
-call_clip_provider_set(int reg)
+    शून्य
+call_clip_provider_set(पूर्णाङ्क reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    यदि (clipmethod != CLIPMETHOD_PROVIDER)
+	प्रत्यागम;
 
-    if (reg == '+' && plus_pause_count < 0)
+    यदि (reg == '+' && plus_pause_गिनती < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	यदि (plus_pause_गिनती == -1)
+	    plus_pause_गिनती = 1;
 	clip_provider_copy((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    अन्यथा यदि (reg == '*' && star_pause_गिनती < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	यदि (star_pause_गिनती == -1)
+	    star_pause_गिनती = 1;
 	clip_provider_copy((char_u *)"*", clip_provider);
     }
 }
@@ -3699,32 +3699,32 @@ call_clip_provider_set(int reg)
  * ignored, until dec_clip_provider is called the same number of times after
  * again. Note that this is per clipboard register ("+", "*")
  */
-    void
-inc_clip_provider(void)
+    शून्य
+inc_clip_provider(शून्य)
 {
-    plus_pause_count = (plus_pause_count == -2
-	|| plus_pause_count == -1) ? -1 : plus_pause_count + 1;
-    star_pause_count = (star_pause_count == -2
-	|| star_pause_count == -1) ? -1 : star_pause_count + 1;
+    plus_pause_गिनती = (plus_pause_गिनती == -2
+	|| plus_pause_गिनती == -1) ? -1 : plus_pause_गिनती + 1;
+    star_pause_गिनती = (star_pause_गिनती == -2
+	|| star_pause_गिनती == -1) ? -1 : star_pause_गिनती + 1;
 }
 
-    void
-dec_clip_provider(void)
+    शून्य
+dec_clip_provider(शून्य)
 {
-    if (plus_pause_count != -2)
-	plus_pause_count = plus_pause_count == -1 ? -1 : plus_pause_count - 1;
-    if (star_pause_count != -2)
-	star_pause_count = star_pause_count == -1 ? -1 : star_pause_count - 1;
+    यदि (plus_pause_गिनती != -2)
+	plus_pause_गिनती = plus_pause_गिनती == -1 ? -1 : plus_pause_गिनती - 1;
+    यदि (star_pause_गिनती != -2)
+	star_pause_गिनती = star_pause_गिनती == -1 ? -1 : star_pause_गिनती - 1;
 
-    if (plus_pause_count == 0 || plus_pause_count == -1)
-	plus_pause_count = -2;
-    if (star_pause_count == 0 || star_pause_count == -1)
-	star_pause_count = -2;
+    यदि (plus_pause_गिनती == 0 || plus_pause_गिनती == -1)
+	plus_pause_गिनती = -2;
+    यदि (star_pause_गिनती == 0 || star_pause_गिनती == -1)
+	star_pause_गिनती = -2;
 }
 
 #endif // FEAT_CLIPBOARD_PROVIDER
 
-#if defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
+#यदि defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
 /*
  * If "vim" is TRUE, then get the motion type. If "vimenc" is TRUE, then get the
  * motion type and also convert "*buf". "buf" and "len_store" will be updated to
@@ -3733,28 +3733,28 @@ dec_clip_provider(void)
  * otherwise use the free func for which "*buf" was allocated with. In both
  * cases use vim_free() on "*tofree". Returns OK on success and FAIL on failure.
  */
-    int
+    पूर्णाङ्क
 clip_convert_data(
 	char_u	**buf,
-	long	*len_store,
-	int	*motion,
+	दीर्घ	*len_store,
+	पूर्णाङ्क	*motion,
 	bool	vim,
 	bool	vimenc,
 	char_u	**tofree)
 {
     char_u  *final = *buf;
     char_u  *enc;
-    long    len = *len_store;
+    दीर्घ    len = *len_store;
 
-    if (vim && len >= 2)
+    यदि (vim && len >= 2)
     {
 	*motion = *final++;
 	len--;
     }
-    else if (vimenc && len >= 3)
+    अन्यथा यदि (vimenc && len >= 3)
     {
 	vimconv_T   conv;
-	int	    convlen;
+	पूर्णाङ्क	    convlen;
 
 	// First byte is motion type
 	*motion = *final++;
@@ -3764,9 +3764,9 @@ clip_convert_data(
 	enc = final;
 
 	// Skip the encoding type including null terminator in final text
-	final = memchr(final, NUL, len);
-	if (final == NULL)
-	    return FAIL;
+	final = स_प्रथम(final, NUL, len);
+	यदि (final == रिक्त)
+	    प्रत्यागम FAIL;
 	final++; // Skip NUL
 
 	// Subtract pointers to get length of encoding;
@@ -3774,23 +3774,23 @@ clip_convert_data(
 
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	यदि (conv.vc_type != CONV_NONE)
 	{
 	   char_u *tmp;
 
 	   convlen = len;
 	   tmp = string_convert(&conv, final, &convlen);
 	   len = convlen;
-	   if (tmp != NULL)
+	   यदि (tmp != रिक्त)
 	   {
 		final = tmp;
 		*tofree = final;
 	   }
-	   convert_setup(&conv, NULL, NULL);
+	   convert_setup(&conv, रिक्त, रिक्त);
 	}
     }
     *buf = final;
     *len_store = len;
-    return OK;
+    प्रत्यागम OK;
 }
 #endif

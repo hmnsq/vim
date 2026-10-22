@@ -28,9 +28,9 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_ARABIC)
+#यदि defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,12 +98,12 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
-    unsigned c;
-    unsigned isolated;
-    unsigned initial;
-    unsigned medial;
-    unsigned final;
+स्थिर संरचना achar {
+    अचिन्हित c;
+    अचिन्हित isolated;
+    अचिन्हित initial;
+    अचिन्हित medial;
+    अचिन्हित final;
 } achars[] = {
     {a_HAMZA, 0xfe80, 0, 0, 0},
     {a_ALEF_MADDA, 0xfe81, 0, 0, 0xfe82},
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    स्थिर संरचना achar *
+find_achar(पूर्णाङ्क c)
 {
-    int h, m, l;
+    पूर्णाङ्क h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    यावत् (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	यदि (achars[m].c == (अचिन्हित)c)
+	    प्रत्यागम &achars[m];
+	यदि ((अचिन्हित)c < achars[m].c)
 	    h = m;
-	else
+	अन्यथा
 	    l = m + 1;
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    स्थिर पूर्णाङ्क
+chg_c_laa2i(पूर्णाङ्क hid_c)
 {
-    int tempc;
+    पूर्णाङ्क tempc;
 
-    switch (hid_c)
+    विकल्प (hid_c)
     {
-	case a_ALEF_MADDA:
+	पक्ष a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    भङ्ग;
+	पक्ष a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    भङ्ग;
+	पक्ष a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    भङ्ग;
+	पक्ष a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    भङ्ग;
+	स्वभाव:
 	    tempc = 0;
     }
 
-    return tempc;
+    प्रत्यागम tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    स्थिर पूर्णाङ्क
+chg_c_laa2f(पूर्णाङ्क hid_c)
 {
-    int tempc;
+    पूर्णाङ्क tempc;
 
-    switch (hid_c)
+    विकल्प (hid_c)
     {
-	case a_ALEF_MADDA:
+	पक्ष a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    भङ्ग;
+	पक्ष a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    भङ्ग;
+	पक्ष a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    भङ्ग;
+	पक्ष a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    भङ्ग;
+	स्वभाव:
 	    tempc = 0;
     }
 
-    return tempc;
+    प्रत्यागम tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    स्थिर पूर्णाङ्क
+can_join(पूर्णाङ्क c1, पूर्णाङ्क c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    संरचना achar *a1 = find_achar(c1);
+    संरचना achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    प्रत्यागम a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    पूर्णाङ्क
+arabic_maycombine(पूर्णाङ्क two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    यदि (p_arshape && !p_tbidi)
+	प्रत्यागम (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    पूर्णाङ्क
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    पूर्णाङ्क		one,	    // first character
+    पूर्णाङ्क		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    यदि (one == a_LAM)
+	प्रत्यागम arabic_maycombine(two);
+    प्रत्यागम FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    स्थिर पूर्णाङ्क
+A_is_iso(पूर्णाङ्क c)
 {
-    return find_achar(c) != NULL;
+    प्रत्यागम find_achar(c) != रिक्त;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    स्थिर पूर्णाङ्क
+A_is_ok(पूर्णाङ्क c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    प्रत्यागम (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    स्थिर पूर्णाङ्क
+A_is_valid(पूर्णाङ्क c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    प्रत्यागम (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    पूर्णाङ्क
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    पूर्णाङ्क		c,
+    पूर्णाङ्क		*ccp,
+    पूर्णाङ्क		*c1p,
+    पूर्णाङ्क		prev_c,
+    पूर्णाङ्क		prev_c1,
+    पूर्णाङ्क		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    पूर्णाङ्क		curr_c;
+    पूर्णाङ्क		curr_laa;
+    पूर्णाङ्क		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    यदि (!A_is_ok(c))
+	प्रत्यागम c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    यदि (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	यदि (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	अन्यथा
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    अन्यथा
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	संरचना achar *curr_a = find_achar(c);
+	पूर्णाङ्क backward_combine = !prev_laa && can_join(prev_c, c);
+	पूर्णाङ्क forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	यदि (backward_combine)
 	{
-	    if (forward_combine)
+	    यदि (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    अन्यथा
 		curr_c = curr_a->final;
 	}
-	else
+	अन्यथा
 	{
-	    if (forward_combine)
+	    यदि (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    अन्यथा
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    यदि (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    यदि (curr_c != c && ccp != रिक्त)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    प्रत्यागम curr_c;
 }
 #endif // FEAT_ARABIC

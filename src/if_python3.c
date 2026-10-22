@@ -29,11 +29,11 @@
 // allocator
 // #define Py_DEBUG_NO_PYMALLOC
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#include <limits.h>
+#अन्तर्भाव <limits.h>
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#यदि defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -70,21 +70,21 @@
 # define USE_LIMITED_API // Using Python 3 limited ABI
 #endif
 
-#include <Python.h>
+#अन्तर्भाव <Python.h>
 
 #undef main // Defined in python.h - aargh
 #undef HAVE_FCNTL_H // Clash with os_win32.h
 
 // The "surrogateescape" error handler is new in Python 3.1
-#if PY_VERSION_HEX >= 0x030100f0
+#यदि PY_VERSION_HEX >= 0x030100f0
 # define CODEC_ERROR_HANDLER "surrogateescape"
-#else
-# define CODEC_ERROR_HANDLER NULL
+#अन्यथा
+# define CODEC_ERROR_HANDLER रिक्त
 #endif
 
 // Suppress Python 3.11 depreciations to see useful warnings
 #ifdef __GNUC__
-# pragma GCC diagnostic push
+# pragma GCC diagnostic धकेलो
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
@@ -119,36 +119,36 @@
  * PySlice_GetIndicesEx(): first argument type changed from PySliceObject
  * to PyObject in Python 3.2 or later.
  */
-#if PY_VERSION_HEX >= 0x030200f0
-typedef PyObject PySliceObject_T;
-#else
-typedef PySliceObject PySliceObject_T;
+#यदि PY_VERSION_HEX >= 0x030200f0
+प्रकारनिर्देश PyObject PySliceObject_T;
+#अन्यथा
+प्रकारनिर्देश PySliceObject PySliceObject_T;
 #endif
 
 #ifndef MSWIN
-# define HINSTANCE void *
+# define HINSTANCE शून्य *
 #endif
-#if defined(DYNAMIC_PYTHON3) || defined(MSWIN)
-static HINSTANCE hinstPy3 = 0; // Instance of python.dll
+#यदि defined(DYNAMIC_PYTHON3) || defined(MSWIN)
+स्थिर HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #endif
 
-#if defined(DYNAMIC_PYTHON3)
+#यदि defined(DYNAMIC_PYTHON3)
 
 # ifdef MSWIN
 #  define load_dll vimLoadLib
 #  define close_dll FreeLibrary
-#  define symbol_from_dll GetProcAddress
+#  define प्रतीक_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# अन्यथा
 #  include <dlfcn.h>
-#  define FARPROC void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  define FARPROC शून्य*
+#  यदि defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  अन्यथा
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
-#  define symbol_from_dll dlsym
+#  define प्रतीक_from_dll dlsym
 #  define load_dll_error dlerror
 # endif
 /*
@@ -180,7 +180,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyLong_FromLong py3_PyLong_FromLong
 # define PyList_GetItem py3_PyList_GetItem
 # define PyList_Append py3_PyList_Append
-# define PyList_Insert py3_PyList_Insert
+# define Py_List_जोड़ो py3_Py_List_जोड़ो
 # define PyList_New py3_PyList_New
 # define PyList_SetItem py3_PyList_SetItem
 # define PyList_Size py3_PyList_Size
@@ -192,7 +192,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySequence_Size py3_PySequence_Size
 # define PySequence_GetItem py3_PySequence_GetItem
 # define PySequence_Fast py3_PySequence_Fast
-# if PY_VERSION_HEX >= 0x030601f0
+# यदि PY_VERSION_HEX >= 0x030601f0
 #  define PySlice_AdjustIndices py3_PySlice_AdjustIndices
 #  define PySlice_Unpack py3_PySlice_Unpack
 # endif
@@ -204,10 +204,10 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyDict_GetItemString py3_PyDict_GetItemString
 # define PyDict_Next py3_PyDict_Next
 # define PyMapping_Check py3_PyMapping_Check
-# ifndef PyMapping_Keys
-#  define PyMapping_Keys py3_PyMapping_Keys
+# ifndef Py_Mapping_कुंजियाँ
+#  define Py_Mapping_कुंजियाँ py3_Py_Mapping_कुंजियाँ
 # endif
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+# यदि (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
 #  undef PyIter_Check
 #  define PyIter_Check py3_PyIter_Check
@@ -218,14 +218,14 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_GetItem py3_PyObject_GetItem
 # define PyObject_IsTrue py3_PyObject_IsTrue
 # define PyModule_GetDict py3_PyModule_GetDict
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# यदि defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 #  define Py_IncRef py3_Py_IncRef
 #  define Py_DecRef py3_Py_DecRef
 # endif
 # ifdef USE_LIMITED_API
 #  define Py_CompileString py3_Py_CompileString
 #  define PyEval_EvalCode py3_PyEval_EvalCode
-# else
+# अन्यथा
 #  undef PyRun_SimpleString
 #  define PyRun_SimpleString py3_PyRun_SimpleString
 #  undef PyRun_String
@@ -235,9 +235,9 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_HasAttrString py3_PyObject_HasAttrString
 # define PyObject_SetAttrString py3_PyObject_SetAttrString
 # define PyObject_CallFunctionObjArgs py3_PyObject_CallFunctionObjArgs
-# if PY_VERSION_HEX >= 0x030d0000
+# यदि PY_VERSION_HEX >= 0x030d0000
 #  define PyObject_CallFunction py3_PyObject_CallFunction
-# else
+# अन्यथा
 #  define _PyObject_CallFunction_SizeT py3__PyObject_CallFunction_SizeT
 # endif
 # define PyObject_Call py3_PyObject_Call
@@ -247,11 +247,11 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySys_GetObject py3_PySys_GetObject
 # define PySys_SetArgv py3_PySys_SetArgv
 # define PyType_Ready py3_PyType_Ready
-# if PY_VERSION_HEX >= 0x03040000
+# यदि PY_VERSION_HEX >= 0x03040000
 #  define PyType_GetFlags py3_PyType_GetFlags
 # endif
-# undef Py_BuildValue
-# define Py_BuildValue py3_Py_BuildValue
+# undef Py_Build_मूल्य
+# define Py_Build_मूल्य py3_Py_Build_मूल्य
 # define Py_SetPythonHome py3_Py_SetPythonHome
 # define Py_Initialize py3_Py_Initialize
 # define Py_Finalize py3_Py_Finalize
@@ -259,7 +259,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define _Py_NoneStruct (*py3__Py_NoneStruct)
 # define _Py_FalseStruct (*py3__Py_FalseStruct)
 # define _Py_TrueStruct (*py3__Py_TrueStruct)
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# यदि !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
 // Private symbol that used to be required as part of PyIter_Check.
 #  define _PyObject_NextNotImplemented (*py3__PyObject_NextNotImplemented)
 # endif
@@ -267,13 +267,13 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyImport_AppendInittab py3_PyImport_AppendInittab
 # define PyImport_AddModule py3_PyImport_AddModule
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  यदि Py_LIMITED_API >= 0x030a0000
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# अन्यथा
+#  यदि PY_VERSION_HEX >= 0x030300f0
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
-#  else
+#  अन्यथा
 #   define _PyUnicode_AsString py3__PyUnicode_AsString
 #  endif
 # endif
@@ -301,21 +301,21 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # endif
 # define PySlice_Type (*py3_PySlice_Type)
 # define PyFloat_Type (*py3_PyFloat_Type)
-# define PyNumber_Check (*py3_PyNumber_Check)
-# define PyNumber_Long (*py3_PyNumber_Long)
+# define Py_संख्या_Check (*py3_Py_संख्या_Check)
+# define Py_संख्या_Long (*py3_Py_संख्या_Long)
 # define PyBool_Type (*py3_PyBool_Type)
 # define PyErr_NewException py3_PyErr_NewException
 # ifdef Py_DEBUG
 #  define _Py_NegativeRefcount py3__Py_NegativeRefcount
 #  define _Py_RefTotal (*py3__Py_RefTotal)
 #  define PyModule_Create2TraceRefs py3_PyModule_Create2TraceRefs
-# else
+# अन्यथा
 #  define PyModule_Create2 py3_PyModule_Create2
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# यदि defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  define _PyObject_DebugMalloc py3__PyObject_DebugMalloc
 #  define _PyObject_DebugFree py3__PyObject_DebugFree
-# else
+# अन्यथा
 #  define PyObject_Malloc py3_PyObject_Malloc
 #  define PyObject_Free py3_PyObject_Free
 # endif
@@ -329,10 +329,10 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
 #   define PyUnicodeUCS4_FromFormat py3_PyUnicodeUCS4_FromFormat
-#  else
+#  अन्यथा
 #   define PyUnicodeUCS2_FromFormat py3_PyUnicodeUCS2_FromFormat
 #  endif
-# else
+# अन्यथा
 #  define PyUnicode_FromFormat py3_PyUnicode_FromFormat
 # endif
 # undef PyUnicode_Decode
@@ -345,7 +345,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #  define PyType_FromSpec py3_PyType_FromSpec
 # endif
 
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# यदि defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  undef PyObject_NEW
 #  define PyObject_NEW(type, typeobj) \
 ( (type *) PyObject_Init( \
@@ -359,203 +359,203 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 /*
  * Pointers for dynamic link
  */
-static int (*py3_PySys_SetArgv)(int, wchar_t **);
-static void (*py3_Py_SetPythonHome)(wchar_t *home);
-static void (*py3_Py_Initialize)(void);
-static PyObject* (*py3_PyList_New)(Py_ssize_t size);
-static PyGILState_STATE (*py3_PyGILState_Ensure)(void);
-static void (*py3_PyGILState_Release)(PyGILState_STATE);
-static int (*py3_PySys_SetObject)(char *, PyObject *);
-static PyObject* (*py3_PySys_GetObject)(char *);
-static int (*py3_PyList_Append)(PyObject *, PyObject *);
-static int (*py3_PyList_Insert)(PyObject *, int, PyObject *);
-static Py_ssize_t (*py3_PyList_Size)(PyObject *);
-static PyObject* (*py3_PyTuple_New)(Py_ssize_t size);
-static int (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
-static Py_ssize_t (*py3_PyTuple_Size)(PyObject *);
-static int (*py3_PySequence_Check)(PyObject *);
-static Py_ssize_t (*py3_PySequence_Size)(PyObject *);
-static PyObject* (*py3_PySequence_GetItem)(PyObject *, Py_ssize_t);
-static PyObject* (*py3_PySequence_Fast)(PyObject *, const char *);
-static PyObject* (*py3_PyTuple_GetItem)(PyObject *, Py_ssize_t);
-static int (*py3_PyMapping_Check)(PyObject *);
-static PyObject* (*py3_PyMapping_Keys)(PyObject *);
-# if PY_VERSION_HEX >= 0x030601f0
-static int (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
+स्थिर पूर्णाङ्क (*py3_PySys_SetArgv)(पूर्णाङ्क, ब_अक्षर_प्रकार **);
+स्थिर शून्य (*py3_Py_SetPythonHome)(ब_अक्षर_प्रकार *home);
+स्थिर शून्य (*py3_Py_Initialize)(शून्य);
+स्थिर PyObject* (*py3_PyList_New)(Py_ssize_t size);
+स्थिर PyGILState_STATE (*py3_PyGILState_Ensure)(शून्य);
+स्थिर शून्य (*py3_PyGILState_Release)(PyGILState_STATE);
+स्थिर पूर्णाङ्क (*py3_PySys_SetObject)(वर्ण *, PyObject *);
+स्थिर PyObject* (*py3_PySys_GetObject)(वर्ण *);
+स्थिर पूर्णाङ्क (*py3_PyList_Append)(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क (*py3_Py_List_जोड़ो)(PyObject *, पूर्णाङ्क, PyObject *);
+स्थिर Py_ssize_t (*py3_PyList_Size)(PyObject *);
+स्थिर PyObject* (*py3_PyTuple_New)(Py_ssize_t size);
+स्थिर पूर्णाङ्क (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+स्थिर Py_ssize_t (*py3_PyTuple_Size)(PyObject *);
+स्थिर पूर्णाङ्क (*py3_PySequence_Check)(PyObject *);
+स्थिर Py_ssize_t (*py3_PySequence_Size)(PyObject *);
+स्थिर PyObject* (*py3_PySequence_GetItem)(PyObject *, Py_ssize_t);
+स्थिर PyObject* (*py3_PySequence_Fast)(PyObject *, ध्रुव वर्ण *);
+स्थिर PyObject* (*py3_PyTuple_GetItem)(PyObject *, Py_ssize_t);
+स्थिर पूर्णाङ्क (*py3_PyMapping_Check)(PyObject *);
+स्थिर PyObject* (*py3_Py_Mapping_कुंजियाँ)(PyObject *);
+# यदि PY_VERSION_HEX >= 0x030601f0
+स्थिर पूर्णाङ्क (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t step);
-static int (*py3_PySlice_Unpack)(PyObject *slice,
+स्थिर पूर्णाङ्क (*py3_PySlice_Unpack)(PyObject *slice,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step);
 # endif
-static int (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
+स्थिर पूर्णाङ्क (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
 		     Py_ssize_t *slicelen);
-static PyObject* (*py3_PyErr_NoMemory)(void);
-static void (*py3_Py_Finalize)(void);
-static void (*py3_PyErr_SetString)(PyObject *, const char *);
-static void (*py3_PyErr_SetObject)(PyObject *, PyObject *);
-static int (*py3_PyErr_ExceptionMatches)(PyObject *);
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
-static void (*py3_Py_IncRef)(PyObject *);
-static void (*py3_Py_DecRef)(PyObject *);
+स्थिर PyObject* (*py3_PyErr_NoMemory)(शून्य);
+स्थिर शून्य (*py3_Py_Finalize)(शून्य);
+स्थिर शून्य (*py3_PyErr_SetString)(PyObject *, ध्रुव वर्ण *);
+स्थिर शून्य (*py3_PyErr_SetObject)(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क (*py3_PyErr_ExceptionMatches)(PyObject *);
+# यदि defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+स्थिर शून्य (*py3_Py_IncRef)(PyObject *);
+स्थिर शून्य (*py3_Py_DecRef)(PyObject *);
 # endif
 # ifdef USE_LIMITED_API
-static PyObject* (*py3_Py_CompileString)(const char *, const char *, int);
-static PyObject* (*py3_PyEval_EvalCode)(PyObject *co, PyObject *globals, PyObject *locals);
-# else
-static int (*py3_PyRun_SimpleString)(char *);
-static PyObject* (*py3_PyRun_String)(char *, int, PyObject *, PyObject *);
+स्थिर PyObject* (*py3_Py_CompileString)(ध्रुव वर्ण *, ध्रुव वर्ण *, पूर्णाङ्क);
+स्थिर PyObject* (*py3_PyEval_EvalCode)(PyObject *co, PyObject *globals, PyObject *locals);
+# अन्यथा
+स्थिर पूर्णाङ्क (*py3_PyRun_SimpleString)(वर्ण *);
+स्थिर PyObject* (*py3_PyRun_String)(वर्ण *, पूर्णाङ्क, PyObject *, PyObject *);
 # endif
-static PyObject* (*py3_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
-static PyObject* (*py3_PyObject_CallFunctionObjArgs)(PyObject *, ...);
-# if PY_VERSION_HEX >= 0x030d0000
-static PyObject* (*py3_PyObject_CallFunction)(PyObject *, char *, ...);
-# else
-static PyObject* (*py3__PyObject_CallFunction_SizeT)(PyObject *, char *, ...);
+स्थिर PyObject* (*py3_PyObject_GetAttrString)(PyObject *, ध्रुव वर्ण *);
+स्थिर पूर्णाङ्क (*py3_PyObject_HasAttrString)(PyObject *, ध्रुव वर्ण *);
+स्थिर पूर्णाङ्क (*py3_PyObject_SetAttrString)(PyObject *, ध्रुव वर्ण *, PyObject *);
+स्थिर PyObject* (*py3_PyObject_CallFunctionObjArgs)(PyObject *, ...);
+# यदि PY_VERSION_HEX >= 0x030d0000
+स्थिर PyObject* (*py3_PyObject_CallFunction)(PyObject *, वर्ण *, ...);
+# अन्यथा
+स्थिर PyObject* (*py3__PyObject_CallFunction_SizeT)(PyObject *, वर्ण *, ...);
 # endif
-static PyObject* (*py3_PyObject_Call)(PyObject *, PyObject *, PyObject *);
-static PyObject* (*py3_PyEval_GetGlobals)(void);
-static PyObject* (*py3_PyEval_GetLocals)(void);
-static PyObject* (*py3_PyList_GetItem)(PyObject *, Py_ssize_t);
-static PyObject* (*py3_PyImport_ImportModule)(const char *);
-static PyObject* (*py3_PyImport_AddModule)(const char *);
-static int (*py3_PyErr_BadArgument)(void);
-static PyObject* (*py3_PyErr_Occurred)(void);
-static PyObject* (*py3_PyModule_GetDict)(PyObject *);
-static int (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
-static PyObject* (*py3_PyDict_GetItemString)(PyObject *, const char *);
-static int (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
-static PyObject* (*py3_PyLong_FromLong)(long);
-static PyObject* (*py3_PyDict_New)(void);
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+स्थिर PyObject* (*py3_PyObject_Call)(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject* (*py3_PyEval_GetGlobals)(शून्य);
+स्थिर PyObject* (*py3_PyEval_GetLocals)(शून्य);
+स्थिर PyObject* (*py3_PyList_GetItem)(PyObject *, Py_ssize_t);
+स्थिर PyObject* (*py3_PyImport_ImportModule)(ध्रुव वर्ण *);
+स्थिर PyObject* (*py3_PyImport_AddModule)(ध्रुव वर्ण *);
+स्थिर पूर्णाङ्क (*py3_PyErr_BadArgument)(शून्य);
+स्थिर PyObject* (*py3_PyErr_Occurred)(शून्य);
+स्थिर PyObject* (*py3_PyModule_GetDict)(PyObject *);
+स्थिर पूर्णाङ्क (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+स्थिर PyObject* (*py3_PyDict_GetItemString)(PyObject *, ध्रुव वर्ण *);
+स्थिर पूर्णाङ्क (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
+स्थिर PyObject* (*py3_PyLong_FromLong)(दीर्घ);
+स्थिर PyObject* (*py3_PyDict_New)(शून्य);
+# यदि (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
-static int (*py3_PyIter_Check)(PyObject *o);
+स्थिर पूर्णाङ्क (*py3_PyIter_Check)(PyObject *o);
 # endif
-static PyObject* (*py3_PyIter_Next)(PyObject *);
-static PyObject* (*py3_PyObject_GetIter)(PyObject *);
-static PyObject* (*py3_PyObject_Repr)(PyObject *);
-static PyObject* (*py3_PyObject_GetItem)(PyObject *, PyObject *);
-static int (*py3_PyObject_IsTrue)(PyObject *);
-static PyObject* (*py3_Py_BuildValue)(char *, ...);
-# if PY_VERSION_HEX >= 0x03040000
-static int (*py3_PyType_GetFlags)(PyTypeObject *o);
+स्थिर PyObject* (*py3_PyIter_Next)(PyObject *);
+स्थिर PyObject* (*py3_PyObject_GetIter)(PyObject *);
+स्थिर PyObject* (*py3_PyObject_Repr)(PyObject *);
+स्थिर PyObject* (*py3_PyObject_GetItem)(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क (*py3_PyObject_IsTrue)(PyObject *);
+स्थिर PyObject* (*py3_Py_Build_मूल्य)(वर्ण *, ...);
+# यदि PY_VERSION_HEX >= 0x03040000
+स्थिर पूर्णाङ्क (*py3_PyType_GetFlags)(PyTypeObject *o);
 # endif
-static int (*py3_PyType_Ready)(PyTypeObject *type);
-static int (*py3_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
-static PyObject* (*py3_PyUnicode_FromString)(const char *u);
+स्थिर पूर्णाङ्क (*py3_PyType_Ready)(PyTypeObject *type);
+स्थिर पूर्णाङ्क (*py3_PyDict_SetItemString)(PyObject *dp, वर्ण *कुंजी, PyObject *item);
+स्थिर PyObject* (*py3_PyUnicode_FromString)(ध्रुव वर्ण *u);
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
-static PyObject* (*py3_PyUnicodeUCS4_FromFormat)(const char *u, ...);
-#  else
-static PyObject* (*py3_PyUnicodeUCS2_FromFormat)(const char *u, ...);
+स्थिर PyObject* (*py3_PyUnicodeUCS4_FromFormat)(ध्रुव वर्ण *u, ...);
+#  अन्यथा
+स्थिर PyObject* (*py3_PyUnicodeUCS2_FromFormat)(ध्रुव वर्ण *u, ...);
 #  endif
-# else
-static PyObject* (*py3_PyUnicode_FromFormat)(const char *u, ...);
+# अन्यथा
+स्थिर PyObject* (*py3_PyUnicode_FromFormat)(ध्रुव वर्ण *u, ...);
 # endif
-static PyObject* (*py3_PyUnicode_Decode)(const char *u, Py_ssize_t size,
-	const char *encoding, const char *errors);
-static long (*py3_PyLong_AsLong)(PyObject *);
-static void (*py3_PyErr_SetNone)(PyObject *);
-static void (*py3_PyEval_InitThreads)(void);
-static void(*py3_PyEval_RestoreThread)(PyThreadState *);
-static PyThreadState*(*py3_PyEval_SaveThread)(void);
-static int (*py3_PyArg_Parse)(PyObject *, char *, ...);
-static int (*py3_PyArg_ParseTuple)(PyObject *, char *, ...);
-static void (*py3_PyMem_Free)(void *);
-static void* (*py3_PyMem_Malloc)(size_t);
-static int (*py3_Py_IsInitialized)(void);
-static void (*py3_PyErr_Clear)(void);
-static PyObject* (*py3_PyErr_Format)(PyObject *, const char *, ...);
-static void (*py3_PyErr_PrintEx)(int);
-static PyObject*(*py3__PyObject_Init)(PyObject *, PyTypeObject *);
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
-static iternextfunc py3__PyObject_NextNotImplemented;
+स्थिर PyObject* (*py3_PyUnicode_Decode)(ध्रुव वर्ण *u, Py_ssize_t size,
+	ध्रुव वर्ण *encoding, ध्रुव वर्ण *errors);
+स्थिर दीर्घ (*py3_PyLong_AsLong)(PyObject *);
+स्थिर शून्य (*py3_PyErr_SetNone)(PyObject *);
+स्थिर शून्य (*py3_PyEval_InitThreads)(शून्य);
+स्थिर शून्य(*py3_PyEval_RestoreThread)(PyThreadState *);
+स्थिर PyThreadState*(*py3_PyEval_SaveThread)(शून्य);
+स्थिर पूर्णाङ्क (*py3_PyArg_Parse)(PyObject *, वर्ण *, ...);
+स्थिर पूर्णाङ्क (*py3_PyArg_ParseTuple)(PyObject *, वर्ण *, ...);
+स्थिर शून्य (*py3_PyMem_Free)(शून्य *);
+स्थिर शून्य* (*py3_PyMem_Malloc)(माप_प्रकार);
+स्थिर पूर्णाङ्क (*py3_Py_IsInitialized)(शून्य);
+स्थिर शून्य (*py3_PyErr_Clear)(शून्य);
+स्थिर PyObject* (*py3_PyErr_Format)(PyObject *, ध्रुव वर्ण *, ...);
+स्थिर शून्य (*py3_PyErr_PrintEx)(पूर्णाङ्क);
+स्थिर PyObject*(*py3__PyObject_Init)(PyObject *, PyTypeObject *);
+# यदि !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+स्थिर iternextfunc py3__PyObject_NextNotImplemented;
 # endif
-static PyObject* py3__Py_NoneStruct;
-static PyObject* py3__Py_FalseStruct;
-static PyObject* py3__Py_TrueStruct;
-static int (*py3_PyModule_AddObject)(PyObject *m, const char *name, PyObject *o);
-static int (*py3_PyImport_AppendInittab)(const char *name, PyObject* (*initfunc)(void));
+स्थिर PyObject* py3__Py_NoneStruct;
+स्थिर PyObject* py3__Py_FalseStruct;
+स्थिर PyObject* py3__Py_TrueStruct;
+स्थिर पूर्णाङ्क (*py3_PyModule_AddObject)(PyObject *m, ध्रुव वर्ण *name, PyObject *o);
+स्थिर पूर्णाङ्क (*py3_PyImport_AppendInittab)(ध्रुव वर्ण *name, PyObject* (*initfunc)(शून्य));
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
-static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
+#  यदि Py_LIMITED_API >= 0x030a0000
+स्थिर वर्ण* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
-static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
-#  else
-static char* (*py3__PyUnicode_AsString)(PyObject *unicode);
+# अन्यथा
+#  यदि PY_VERSION_HEX >= 0x030300f0
+स्थिर वर्ण* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
+#  अन्यथा
+स्थिर वर्ण* (*py3__PyUnicode_AsString)(PyObject *unicode);
 #  endif
 # endif
-static int (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, const char* string);
-static PyObject* (*py3_PyUnicode_AsEncodedString)(PyObject *unicode, const char* encoding, const char* errors);
-static PyObject* (*py3_PyUnicode_AsUTF8String)(PyObject *unicode);
-static char* (*py3_PyBytes_AsString)(PyObject *bytes);
-static int (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, char **buffer, Py_ssize_t *length);
-static PyObject* (*py3_PyBytes_FromString)(char *str);
-static PyObject* (*py3_PyBytes_FromStringAndSize)(char *str, Py_ssize_t length);
-# if PY_VERSION_HEX >= 0x030900b0
-static PyObject* (*py3__PyObject_New)(PyTypeObject *);
+स्थिर पूर्णाङ्क (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, ध्रुव वर्ण* string);
+स्थिर PyObject* (*py3_PyUnicode_AsEncodedString)(PyObject *unicode, ध्रुव वर्ण* encoding, ध्रुव वर्ण* errors);
+स्थिर PyObject* (*py3_PyUnicode_AsUTF8String)(PyObject *unicode);
+स्थिर वर्ण* (*py3_PyBytes_AsString)(PyObject *bytes);
+स्थिर पूर्णाङ्क (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, वर्ण **buffer, Py_ssize_t *length);
+स्थिर PyObject* (*py3_PyBytes_FromString)(वर्ण *str);
+स्थिर PyObject* (*py3_PyBytes_FromStringAndSize)(वर्ण *str, Py_ssize_t length);
+# यदि PY_VERSION_HEX >= 0x030900b0
+स्थिर PyObject* (*py3__PyObject_New)(PyTypeObject *);
 # endif
-static PyObject* (*py3_PyFloat_FromDouble)(double num);
-static double (*py3_PyFloat_AsDouble)(PyObject *);
-static PyObject* (*py3_PyObject_GenericGetAttr)(PyObject *obj, PyObject *name);
-static PyObject* (*py3_PyType_GenericAlloc)(PyTypeObject *type, Py_ssize_t nitems);
-static PyObject* (*py3_PyType_GenericNew)(PyTypeObject *type, PyObject *args, PyObject *kwds);
-static PyTypeObject* py3_PyType_Type;
+स्थिर PyObject* (*py3_PyFloat_FromDouble)(द्विगुण अंक);
+स्थिर द्विगुण (*py3_PyFloat_AsDouble)(PyObject *);
+स्थिर PyObject* (*py3_PyObject_GenericGetAttr)(PyObject *obj, PyObject *name);
+स्थिर PyObject* (*py3_PyType_GenericAlloc)(PyTypeObject *type, Py_ssize_t nitems);
+स्थिर PyObject* (*py3_PyType_GenericNew)(PyTypeObject *type, PyObject *args, PyObject *kwds);
+स्थिर PyTypeObject* py3_PyType_Type;
 # ifndef USE_LIMITED_API
-static PyTypeObject* py3_PyStdPrinter_Type;
+स्थिर PyTypeObject* py3_PyStdPrinter_Type;
 # endif
-static PyTypeObject* py3_PySlice_Type;
-static PyTypeObject* py3_PyFloat_Type;
-static PyTypeObject* py3_PyBool_Type;
-static int (*py3_PyNumber_Check)(PyObject *);
-static PyObject* (*py3_PyNumber_Long)(PyObject *);
-static PyObject* (*py3_PyErr_NewException)(char *name, PyObject *base, PyObject *dict);
-static PyObject* (*py3_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
-static void* (*py3_PyCapsule_GetPointer)(PyObject *, char *);
+स्थिर PyTypeObject* py3_PySlice_Type;
+स्थिर PyTypeObject* py3_PyFloat_Type;
+स्थिर PyTypeObject* py3_PyBool_Type;
+स्थिर पूर्णाङ्क (*py3_Py_संख्या_Check)(PyObject *);
+स्थिर PyObject* (*py3_Py_संख्या_Long)(PyObject *);
+स्थिर PyObject* (*py3_PyErr_NewException)(वर्ण *name, PyObject *base, PyObject *dict);
+स्थिर PyObject* (*py3_PyCapsule_New)(शून्य *, वर्ण *, PyCapsule_Destructor);
+स्थिर शून्य* (*py3_PyCapsule_GetPointer)(PyObject *, वर्ण *);
 # ifdef Py_DEBUG
-static void (*py3__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
-static Py_ssize_t* py3__Py_RefTotal;
-static PyObject* (*py3_PyModule_Create2TraceRefs)(struct PyModuleDef* module, int module_api_version);
-# else
-static PyObject* (*py3_PyModule_Create2)(struct PyModuleDef* module, int module_api_version);
+स्थिर शून्य (*py3__Py_NegativeRefcount)(ध्रुव वर्ण *fname, पूर्णाङ्क lineno, PyObject *op);
+स्थिर Py_ssize_t* py3__Py_RefTotal;
+स्थिर PyObject* (*py3_PyModule_Create2TraceRefs)(संरचना PyModuleDef* module, पूर्णाङ्क module_api_version);
+# अन्यथा
+स्थिर PyObject* (*py3_PyModule_Create2)(संरचना PyModuleDef* module, पूर्णाङ्क module_api_version);
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
-static void (*py3__PyObject_DebugFree)(void*);
-static void* (*py3__PyObject_DebugMalloc)(size_t);
-# else
-static void (*py3_PyObject_Free)(void*);
-static void* (*py3_PyObject_Malloc)(size_t);
+# यदि defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+स्थिर शून्य (*py3__PyObject_DebugFree)(शून्य*);
+स्थिर शून्य* (*py3__PyObject_DebugMalloc)(माप_प्रकार);
+# अन्यथा
+स्थिर शून्य (*py3_PyObject_Free)(शून्य*);
+स्थिर शून्य* (*py3_PyObject_Malloc)(माप_प्रकार);
 # endif
-static PyObject*(*py3__PyObject_GC_New)(PyTypeObject *);
-static void(*py3_PyObject_GC_Del)(void *);
-static void(*py3_PyObject_GC_UnTrack)(void *);
-static int (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+स्थिर PyObject*(*py3__PyObject_GC_New)(PyTypeObject *);
+स्थिर शून्य(*py3_PyObject_GC_Del)(शून्य *);
+स्थिर शून्य(*py3_PyObject_GC_UnTrack)(शून्य *);
+स्थिर पूर्णाङ्क (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 # ifdef USE_LIMITED_API
-static void* (*py3_PyType_GetSlot)(PyTypeObject *, int);
-static PyObject* (*py3_PyType_FromSpec)(PyType_Spec *);
+स्थिर शून्य* (*py3_PyType_GetSlot)(PyTypeObject *, पूर्णाङ्क);
+स्थिर PyObject* (*py3_PyType_FromSpec)(PyType_Spec *);
 # endif
 
 // Imported exception objects
-static PyObject *p3imp_PyExc_AttributeError;
-static PyObject *p3imp_PyExc_IndexError;
-static PyObject *p3imp_PyExc_KeyError;
-static PyObject *p3imp_PyExc_KeyboardInterrupt;
-static PyObject *p3imp_PyExc_TypeError;
-static PyObject *p3imp_PyExc_ValueError;
-static PyObject *p3imp_PyExc_SystemExit;
-static PyObject *p3imp_PyExc_RuntimeError;
-static PyObject *p3imp_PyExc_ImportError;
-static PyObject *p3imp_PyExc_OverflowError;
+स्थिर PyObject *p3imp_PyExc_AttributeError;
+स्थिर PyObject *p3imp_PyExc_IndexError;
+स्थिर PyObject *p3imp_Py_Exc_कुंजी_Error;
+स्थिर PyObject *p3imp_PyExc_KeyboardInterrupt;
+स्थिर PyObject *p3imp_PyExc_TypeError;
+स्थिर PyObject *p3imp_Py_Exc_मूल्य_Error;
+स्थिर PyObject *p3imp_PyExc_SystemExit;
+स्थिर PyObject *p3imp_PyExc_RuntimeError;
+स्थिर PyObject *p3imp_PyExc_ImportError;
+स्थिर PyObject *p3imp_PyExc_OverflowError;
 
 # define PyExc_AttributeError p3imp_PyExc_AttributeError
 # define PyExc_IndexError p3imp_PyExc_IndexError
-# define PyExc_KeyError p3imp_PyExc_KeyError
+# define Py_Exc_कुंजी_Error p3imp_Py_Exc_कुंजी_Error
 # define PyExc_KeyboardInterrupt p3imp_PyExc_KeyboardInterrupt
 # define PyExc_TypeError p3imp_PyExc_TypeError
-# define PyExc_ValueError p3imp_PyExc_ValueError
+# define Py_Exc_मूल्य_Error p3imp_Py_Exc_मूल्य_Error
 # define PyExc_SystemExit p3imp_PyExc_SystemExit
 # define PyExc_RuntimeError p3imp_PyExc_RuntimeError
 # define PyExc_ImportError p3imp_PyExc_ImportError
@@ -565,9 +565,9 @@ static PyObject *p3imp_PyExc_OverflowError;
  * Table of name to function pointer of python.
  */
 # define PYTHON_PROC FARPROC
-static struct
+स्थिर संरचना
 {
-    char *name;
+    वर्ण *name;
     PYTHON_PROC *ptr;
 } py3_funcname_table[] =
 {
@@ -575,7 +575,7 @@ static struct
     {"Py_SetPythonHome", (PYTHON_PROC*)&py3_Py_SetPythonHome},
     {"Py_Initialize", (PYTHON_PROC*)&py3_Py_Initialize},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&py3_PyArg_ParseTuple},
-    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&py3_Py_BuildValue},
+    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&py3_Py_Build_मूल्य},
     {"PyMem_Free", (PYTHON_PROC*)&py3_PyMem_Free},
     {"PyMem_Malloc", (PYTHON_PROC*)&py3_PyMem_Malloc},
     {"PyList_New", (PYTHON_PROC*)&py3_PyList_New},
@@ -584,7 +584,7 @@ static struct
     {"PySys_SetObject", (PYTHON_PROC*)&py3_PySys_SetObject},
     {"PySys_GetObject", (PYTHON_PROC*)&py3_PySys_GetObject},
     {"PyList_Append", (PYTHON_PROC*)&py3_PyList_Append},
-    {"PyList_Insert", (PYTHON_PROC*)&py3_PyList_Insert},
+    {"PyList_Insert", (PYTHON_PROC*)&py3_Py_List_जोड़ो},
     {"PyList_Size", (PYTHON_PROC*)&py3_PyList_Size},
     {"PyTuple_New", (PYTHON_PROC*)&py3_PyTuple_New},
     {"PyTuple_GetItem", (PYTHON_PROC*)&py3_PyTuple_GetItem},
@@ -594,7 +594,7 @@ static struct
     {"PySequence_Size", (PYTHON_PROC*)&py3_PySequence_Size},
     {"PySequence_GetItem", (PYTHON_PROC*)&py3_PySequence_GetItem},
     {"PySequence_Fast", (PYTHON_PROC*)&py3_PySequence_Fast},
-# if PY_VERSION_HEX >= 0x030601f0
+# यदि PY_VERSION_HEX >= 0x030601f0
     {"PySlice_AdjustIndices", (PYTHON_PROC*)&py3_PySlice_AdjustIndices},
     {"PySlice_Unpack", (PYTHON_PROC*)&py3_PySlice_Unpack},
 # endif
@@ -604,14 +604,14 @@ static struct
     {"PyErr_SetString", (PYTHON_PROC*)&py3_PyErr_SetString},
     {"PyErr_SetObject", (PYTHON_PROC*)&py3_PyErr_SetObject},
     {"PyErr_ExceptionMatches", (PYTHON_PROC*)&py3_PyErr_ExceptionMatches},
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# यदि defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
     {"Py_IncRef", (PYTHON_PROC*)&py3_Py_IncRef},
     {"Py_DecRef", (PYTHON_PROC*)&py3_Py_DecRef},
 # endif
 # ifdef USE_LIMITED_API
     {"Py_CompileString", (PYTHON_PROC*)&py3_Py_CompileString},
     {"PyEval_EvalCode", (PYTHON_PROC*)&PyEval_EvalCode},
-# else
+# अन्यथा
     {"PyRun_SimpleString", (PYTHON_PROC*)&py3_PyRun_SimpleString},
     {"PyRun_String", (PYTHON_PROC*)&py3_PyRun_String},
 # endif
@@ -619,9 +619,9 @@ static struct
     {"PyObject_HasAttrString", (PYTHON_PROC*)&py3_PyObject_HasAttrString},
     {"PyObject_SetAttrString", (PYTHON_PROC*)&py3_PyObject_SetAttrString},
     {"PyObject_CallFunctionObjArgs", (PYTHON_PROC*)&py3_PyObject_CallFunctionObjArgs},
-# if PY_VERSION_HEX >= 0x030d0000
+# यदि PY_VERSION_HEX >= 0x030d0000
     {"PyObject_CallFunction", (PYTHON_PROC*)&py3_PyObject_CallFunction},
-# else
+# अन्यथा
     {"_PyObject_CallFunction_SizeT", (PYTHON_PROC*)&py3__PyObject_CallFunction_SizeT},
 # endif
     {"PyObject_Call", (PYTHON_PROC*)&py3_PyObject_Call},
@@ -637,8 +637,8 @@ static struct
     {"PyDict_GetItemString", (PYTHON_PROC*)&py3_PyDict_GetItemString},
     {"PyDict_Next", (PYTHON_PROC*)&py3_PyDict_Next},
     {"PyMapping_Check", (PYTHON_PROC*)&py3_PyMapping_Check},
-    {"PyMapping_Keys", (PYTHON_PROC*)&py3_PyMapping_Keys},
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+    {"PyMapping_Keys", (PYTHON_PROC*)&py3_Py_Mapping_कुंजियाँ},
+# यदि (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
     {"PyIter_Check", (PYTHON_PROC*)&py3_PyIter_Check},
 # endif
@@ -649,7 +649,7 @@ static struct
     {"PyObject_IsTrue", (PYTHON_PROC*)&py3_PyObject_IsTrue},
     {"PyLong_FromLong", (PYTHON_PROC*)&py3_PyLong_FromLong},
     {"PyDict_New", (PYTHON_PROC*)&py3_PyDict_New},
-# if PY_VERSION_HEX >= 0x03040000
+# यदि PY_VERSION_HEX >= 0x03040000
     {"PyType_GetFlags", (PYTHON_PROC*)&py3_PyType_GetFlags},
 # endif
     {"PyType_Ready", (PYTHON_PROC*)&py3_PyType_Ready},
@@ -661,7 +661,7 @@ static struct
     {"PyEval_SaveThread", (PYTHON_PROC*)&py3_PyEval_SaveThread},
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&py3_PyArg_Parse},
     {"Py_IsInitialized", (PYTHON_PROC*)&py3_Py_IsInitialized},
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# यदि !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&py3__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&py3__Py_NoneStruct},
@@ -674,13 +674,13 @@ static struct
     {"PyModule_AddObject", (PYTHON_PROC*)&py3_PyModule_AddObject},
     {"PyImport_AppendInittab", (PYTHON_PROC*)&py3_PyImport_AppendInittab},
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  यदि Py_LIMITED_API >= 0x030a0000
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# अन्यथा
+#  यदि PY_VERSION_HEX >= 0x030300f0
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
-#  else
+#  अन्यथा
     {"_PyUnicode_AsString", (PYTHON_PROC*)&py3__PyUnicode_AsString},
 #  endif
 # endif
@@ -689,17 +689,17 @@ static struct
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
     {"PyUnicodeUCS4_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS4_FromFormat},
-#  else
+#  अन्यथा
     {"PyUnicodeUCS2_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS2_FromFormat},
 #  endif
-# else
+# अन्यथा
     {"PyUnicode_FromFormat", (PYTHON_PROC*)&py3_PyUnicode_FromFormat},
 # endif
     {"PyBytes_AsString", (PYTHON_PROC*)&py3_PyBytes_AsString},
     {"PyBytes_AsStringAndSize", (PYTHON_PROC*)&py3_PyBytes_AsStringAndSize},
     {"PyBytes_FromString", (PYTHON_PROC*)&py3_PyBytes_FromString},
     {"PyBytes_FromStringAndSize", (PYTHON_PROC*)&py3_PyBytes_FromStringAndSize},
-# if PY_VERSION_HEX >= 0x030900b0
+# यदि PY_VERSION_HEX >= 0x030900b0
     {"_PyObject_New", (PYTHON_PROC*)&py3__PyObject_New},
 # endif
     {"PyFloat_FromDouble", (PYTHON_PROC*)&py3_PyFloat_FromDouble},
@@ -714,20 +714,20 @@ static struct
     {"PySlice_Type", (PYTHON_PROC*)&py3_PySlice_Type},
     {"PyFloat_Type", (PYTHON_PROC*)&py3_PyFloat_Type},
     {"PyBool_Type", (PYTHON_PROC*)&py3_PyBool_Type},
-    {"PyNumber_Check", (PYTHON_PROC*)&py3_PyNumber_Check},
-    {"PyNumber_Long", (PYTHON_PROC*)&py3_PyNumber_Long},
+    {"PyNumber_Check", (PYTHON_PROC*)&py3_Py_संख्या_Check},
+    {"PyNumber_Long", (PYTHON_PROC*)&py3_Py_संख्या_Long},
     {"PyErr_NewException", (PYTHON_PROC*)&py3_PyErr_NewException},
 # ifdef Py_DEBUG
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&py3__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&py3__Py_RefTotal},
     {"PyModule_Create2TraceRefs", (PYTHON_PROC*)&py3_PyModule_Create2TraceRefs},
-# else
+# अन्यथा
     {"PyModule_Create2", (PYTHON_PROC*)&py3_PyModule_Create2},
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# यदि defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&py3__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&py3__PyObject_DebugMalloc},
-# else
+# अन्यथा
     {"PyObject_Malloc", (PYTHON_PROC*)&py3_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&py3_PyObject_Free},
 # endif
@@ -738,15 +738,15 @@ static struct
     {"PyCapsule_New", (PYTHON_PROC*)&py3_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&py3_PyCapsule_GetPointer},
 # ifdef USE_LIMITED_API
-#  if PY_VERSION_HEX >= 0x03040000
+#  यदि PY_VERSION_HEX >= 0x03040000
     {"PyType_GetSlot", (PYTHON_PROC*)&py3_PyType_GetSlot},
 #  endif
     {"PyType_FromSpec", (PYTHON_PROC*)&py3_PyType_FromSpec},
 # endif
-    {"", NULL},
+    {"", रिक्त},
 };
 
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# यदि defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 // Use stable versions of inc/dec ref. Note that these always null-check and
 // therefore there's no difference between XINCREF and INCREF.
 //
@@ -766,30 +766,30 @@ static struct
 #  define Py_XDECREF(obj) Py_DecRef((PyObject *)obj)
 # endif
 
-# if PY_VERSION_HEX >= 0x030900b0
-    static inline int
-py3_PyType_HasFeature(PyTypeObject *type, unsigned long feature)
+# यदि PY_VERSION_HEX >= 0x030900b0
+    स्थिर अन्तःस्थ पूर्णाङ्क
+py3_PyType_HasFeature(PyTypeObject *type, अचिन्हित दीर्घ feature)
 {
-    return ((PyType_GetFlags(type) & feature) != 0);
+    प्रत्यागम ((PyType_GetFlags(type) & feature) != 0);
 }
 #  define PyType_HasFeature(t,f) py3_PyType_HasFeature(t,f)
 # endif
 
-# if PY_VERSION_HEX >= 0x030a00b2
-    static inline int
+# यदि PY_VERSION_HEX >= 0x030a00b2
+    स्थिर अन्तःस्थ पूर्णाङ्क
 py3__PyObject_TypeCheck(PyObject *ob, PyTypeObject *type)
 {
-    return Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
+    प्रत्यागम Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
 }
-#  if PY_VERSION_HEX >= 0x030b00b3
+#  यदि PY_VERSION_HEX >= 0x030b00b3
 #   undef PyObject_TypeCheck
 #   define PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
-#  else
+#  अन्यथा
 #   define _PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
 #  endif
 # endif
 
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
+# यदि !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
 // PyTuple_GET_SIZE/PyList_GET_SIZE are inlined functions that use Py_SIZE(),
 // which started to introduce linkage dependency from Python 3.12. When we
 // build Python in dynamic mode, we don't link against it in build time, and
@@ -805,117 +805,117 @@ py3__PyObject_TypeCheck(PyObject *ob, PyTypeObject *type)
  * Look up the library "libname" using the InstallPath registry key.
  * Return NULL when failed.  Return an allocated string when successful.
  */
-    static WCHAR *
-py3_get_system_libname(const char *libname)
+    स्थिर WCHAR *
+py3_get_system_libname(ध्रुव वर्ण *libname)
 {
-    const WCHAR	*pythoncore = L"Software\\Python\\PythonCore";
-    const char	*cp = libname;
+    ध्रुव WCHAR	*pythoncore = L"Software\\Python\\PythonCore";
+    ध्रुव वर्ण	*cp = libname;
     WCHAR	subkey[128];
-    HKEY	hKey;
-    int		i;
+    HKEY	h_कुंजी;
+    पूर्णाङ्क		i;
     DWORD	j, len;
     LSTATUS	ret;
 
-    while (*cp != '\0')
+    यावत् (*cp != '\0')
     {
-	if (*cp == ':' || *cp == '\\' || *cp == '/')
+	यदि (*cp == ':' || *cp == '\\' || *cp == '/')
 	{
 	    // Bail out if "libname" contains path separator, assume it is
 	    // an absolute path.
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
 	++cp;
     }
 
     WCHAR   keyfound[32];
-    HKEY    hKeyTop[] = {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
-    HKEY    hKeyFound = NULL;
+    HKEY    h_कुंजी_शीर्ष[] = {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
+    HKEY    h_कुंजी_Found = रिक्त;
 #  ifdef USE_LIMITED_API
-    long    maxminor = -1;
+    दीर्घ    maxminor = -1;
 #  endif
-    for (i = 0; i < ARRAY_LENGTH(hKeyTop); i++)
+    प्रति (i = 0; i < ARRAY_LENGTH(h_कुंजी_शीर्ष); i++)
     {
-	long	major, minor;
+	दीर्घ	major, minor;
 
-	ret = RegOpenKeyExW(hKeyTop[i], pythoncore, 0, KEY_READ, &hKey);
-	if (ret != ERROR_SUCCESS)
-	    continue;
-	for (j = 0;; j++)
+	ret = Reg_Open_कुंजी_Ex_W(h_कुंजी_शीर्ष[i], pythoncore, 0, कुंजी_READ, &h_कुंजी);
+	यदि (ret != ERROR_SUCCESS)
+	    अनुवर्त;
+	प्रति (j = 0;; j++)
 	{
 	    WCHAR   keyname[32];
 	    WCHAR   *wp;
 
 	    len = ARRAY_LENGTH(keyname);
-	    ret = RegEnumKeyExW(hKey, j, keyname, &len,
-						    NULL, NULL, NULL, NULL);
-	    if (ret == ERROR_NO_MORE_ITEMS)
-		break;
+	    ret = Reg_Enum_कुंजी_Ex_W(h_कुंजी, j, keyname, &len,
+						    रिक्त, रिक्त, रिक्त, रिक्त);
+	    यदि (ret == ERROR_NO_MORE_वस्तुएँ)
+		भङ्ग;
 
 	    major = wcstol(keyname, &wp, 10);
-	    if (*wp != L'.')
-		continue;
+	    यदि (*wp != L'.')
+		अनुवर्त;
 	    minor = wcstol(wp + 1, &wp, 10);
 #  ifdef _WIN64
-	    if (*wp != L'\0')
-		continue;
-#  else
-	    if (wcscmp(wp, L"-32") != 0)
-		continue;
+	    यदि (*wp != L'\0')
+		अनुवर्त;
+#  अन्यथा
+	    यदि (wcscmp(wp, L"-32") != 0)
+		अनुवर्त;
 #  endif
 
-	    if (major != PY_MAJOR_VERSION)
-		continue;
+	    यदि (major != PY_MAJOR_VERSION)
+		अनुवर्त;
 #  ifdef USE_LIMITED_API
 	    // Search the latest version.
-	    if ((minor > maxminor)
+	    यदि ((minor > maxminor)
 		    && (minor >= ((Py_LIMITED_API >> 16) & 0xff)))
 	    {
 		maxminor = minor;
 		wcscpy(keyfound, keyname);
-		hKeyFound = hKeyTop[i];
+		h_कुंजी_Found = h_कुंजी_शीर्ष[i];
 	    }
-#  else
+#  अन्यथा
 	    // Check if it matches with the compiled version.
-	    if (minor == PY_MINOR_VERSION)
+	    यदि (minor == PY_MINOR_VERSION)
 	    {
 		wcscpy(keyfound, keyname);
-		hKeyFound = hKeyTop[i];
-		break;
+		h_कुंजी_Found = h_कुंजी_शीर्ष[i];
+		भङ्ग;
 	    }
 #  endif
 	}
-	RegCloseKey(hKey);
+	Reg_Close_कुंजी(h_कुंजी);
 #  ifdef USE_LIMITED_API
-	if (hKeyFound != NULL)
-	    break;
+	यदि (h_कुंजी_Found != रिक्त)
+	    भङ्ग;
 #  endif
     }
-    if (hKeyFound == NULL)
-	return NULL;
+    यदि (h_कुंजी_Found == रिक्त)
+	प्रत्यागम रिक्त;
 
     swprintf(subkey, ARRAY_LENGTH(subkey), L"%ls\\%ls\\InstallPath",
 							pythoncore, keyfound);
-    ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
-							    NULL, NULL, &len);
-    if (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
-	return NULL;
-    size_t len2 = len / sizeof(WCHAR) + 1 + strlen(libname);
-    WCHAR *path = alloc(len2 * sizeof(WCHAR));
-    if (path == NULL)
-	return NULL;
-    ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
-							    NULL, path, &len);
-    if (ret != ERROR_SUCCESS)
+    ret = Reg_Get_मूल्य_W(h_कुंजी_Found, subkey, रिक्त, RRF_RT_REG_SZ,
+							    रिक्त, रिक्त, &len);
+    यदि (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
+	प्रत्यागम रिक्त;
+    माप_प्रकार len2 = len / परिमाण(WCHAR) + 1 + म_माप(libname);
+    WCHAR *path = alloc(len2 * परिमाण(WCHAR));
+    यदि (path == रिक्त)
+	प्रत्यागम रिक्त;
+    ret = Reg_Get_मूल्य_W(h_कुंजी_Found, subkey, रिक्त, RRF_RT_REG_SZ,
+							    रिक्त, path, &len);
+    यदि (ret != ERROR_SUCCESS)
     {
 	vim_free(path);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     // Remove trailing path separators.
-    size_t len3 = wcslen(path);
-    if ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
+    माप_प्रकार len3 = wcslen(path);
+    यदि ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
 	--len3;
     swprintf(path + len3, len2 - len3, L"\\%hs", libname);
-    return path;
+    प्रत्यागम path;
 }
 # endif
 
@@ -924,139 +924,139 @@ py3_get_system_libname(const char *libname)
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-py3_runtime_link_init(char *libname, int verbose)
+    स्थिर पूर्णाङ्क
+py3_runtime_link_init(वर्ण *libname, पूर्णाङ्क verbose)
 {
-    int i;
+    पूर्णाङ्क i;
     PYTHON_PROC *ucs_from_string = (PYTHON_PROC *)&py3_PyUnicode_FromString;
     PYTHON_PROC *ucs_decode = (PYTHON_PROC *)&py3_PyUnicode_Decode;
     PYTHON_PROC *ucs_as_encoded_string =
 				 (PYTHON_PROC *)&py3_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
+# यदि !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python_loaded())
+    यदि (python_loaded())
     {
-	if (verbose)
+	यदि (verbose)
 	    emsg(_(e_this_vim_cannot_execute_py3_after_using_python));
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 # endif
 
-    if (hinstPy3 != 0)
-	return OK;
+    यदि (hinstPy3 != 0)
+	प्रत्यागम OK;
     hinstPy3 = load_dll(libname);
 
 # ifdef MSWIN
-    if (!hinstPy3)
+    यदि (!hinstPy3)
     {
 	// Attempt to use the path from InstallPath as stored in the registry.
 	WCHAR *syslibname = py3_get_system_libname(libname);
 
-	if (syslibname != NULL)
+	यदि (syslibname != रिक्त)
 	{
-	    hinstPy3 = LoadLibraryExW(syslibname, NULL,
-		    LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
-		    LOAD_LIBRARY_SEARCH_SYSTEM32);
+	    hinstPy3 = LoadLibraryExW(syslibname, रिक्त,
+		    LOAD_LIBRARY_खोज_DLL_LOAD_DIR |
+		    LOAD_LIBRARY_खोज_SYSTEM32);
 	    vim_free(syslibname);
 	}
     }
 # endif
 
-    if (!hinstPy3)
+    यदि (!hinstPy3)
     {
-	if (verbose)
+	यदि (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    for (i = 0; py3_funcname_table[i].ptr; ++i)
+    प्रति (i = 0; py3_funcname_table[i].ptr; ++i)
     {
-	if ((*py3_funcname_table[i].ptr = symbol_from_dll(hinstPy3,
-			py3_funcname_table[i].name)) == NULL)
+	यदि ((*py3_funcname_table[i].ptr = प्रतीक_from_dll(hinstPy3,
+			py3_funcname_table[i].name)) == रिक्त)
 	{
 	    close_dll(hinstPy3);
 	    hinstPy3 = 0;
-	    if (verbose)
+	    यदि (verbose)
 		semsg(_(e_could_not_load_library_function_str), py3_funcname_table[i].name);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
     }
 
     // Load unicode functions separately as only the ucs2 or the ucs4 functions
     // will be present in the library.
-# if PY_VERSION_HEX >= 0x030300f0
-    *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicode_FromString");
-    *ucs_decode = symbol_from_dll(hinstPy3, "PyUnicode_Decode");
-    *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+# यदि PY_VERSION_HEX >= 0x030300f0
+    *ucs_from_string = प्रतीक_from_dll(hinstPy3, "PyUnicode_FromString");
+    *ucs_decode = प्रतीक_from_dll(hinstPy3, "PyUnicode_Decode");
+    *ucs_as_encoded_string = प्रतीक_from_dll(hinstPy3,
 	    "PyUnicode_AsEncodedString");
-# else
-    *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicodeUCS2_FromString");
-    *ucs_decode = symbol_from_dll(hinstPy3,
+# अन्यथा
+    *ucs_from_string = प्रतीक_from_dll(hinstPy3, "PyUnicodeUCS2_FromString");
+    *ucs_decode = प्रतीक_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_Decode");
-    *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+    *ucs_as_encoded_string = प्रतीक_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
-					     || *ucs_as_encoded_string == NULL)
+    यदि (*ucs_from_string == रिक्त || *ucs_decode == रिक्त
+					     || *ucs_as_encoded_string == रिक्त)
     {
-	*ucs_from_string = symbol_from_dll(hinstPy3,
+	*ucs_from_string = प्रतीक_from_dll(hinstPy3,
 		"PyUnicodeUCS4_FromString");
-	*ucs_decode = symbol_from_dll(hinstPy3,
+	*ucs_decode = प्रतीक_from_dll(hinstPy3,
 		"PyUnicodeUCS4_Decode");
-	*ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+	*ucs_as_encoded_string = प्रतीक_from_dll(hinstPy3,
 		"PyUnicodeUCS4_AsEncodedString");
     }
 # endif
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
-					     || *ucs_as_encoded_string == NULL)
+    यदि (*ucs_from_string == रिक्त || *ucs_decode == रिक्त
+					     || *ucs_as_encoded_string == रिक्त)
     {
 	close_dll(hinstPy3);
 	hinstPy3 = 0;
-	if (verbose)
+	यदि (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python3_enabled(int verbose)
+    पूर्णाङ्क
+python3_enabled(पूर्णाङ्क verbose)
 {
-    return py3_runtime_link_init((char *)p_py3dll, verbose) == OK;
+    प्रत्यागम py3_runtime_link_init((वर्ण *)p_py3dll, verbose) == OK;
 }
 
 /*
  * Load the standard Python exceptions - don't import the symbols from the
  * DLL, as this can cause errors (importing data symbols is not reliable).
  */
-    static void
-get_py3_exceptions(void)
+    स्थिर शून्य
+get_py3_exceptions(शून्य)
 {
     PyObject *exmod = PyImport_ImportModule("builtins");
     PyObject *exdict = PyModule_GetDict(exmod);
     p3imp_PyExc_AttributeError = PyDict_GetItemString(exdict, "AttributeError");
     p3imp_PyExc_IndexError = PyDict_GetItemString(exdict, "IndexError");
-    p3imp_PyExc_KeyError = PyDict_GetItemString(exdict, "KeyError");
+    p3imp_Py_Exc_कुंजी_Error = PyDict_GetItemString(exdict, "KeyError");
     p3imp_PyExc_KeyboardInterrupt = PyDict_GetItemString(exdict, "KeyboardInterrupt");
     p3imp_PyExc_TypeError = PyDict_GetItemString(exdict, "TypeError");
-    p3imp_PyExc_ValueError = PyDict_GetItemString(exdict, "ValueError");
+    p3imp_Py_Exc_मूल्य_Error = PyDict_GetItemString(exdict, "ValueError");
     p3imp_PyExc_SystemExit = PyDict_GetItemString(exdict, "SystemExit");
     p3imp_PyExc_RuntimeError = PyDict_GetItemString(exdict, "RuntimeError");
     p3imp_PyExc_ImportError = PyDict_GetItemString(exdict, "ImportError");
     p3imp_PyExc_OverflowError = PyDict_GetItemString(exdict, "OverflowError");
     Py_XINCREF(p3imp_PyExc_AttributeError);
     Py_XINCREF(p3imp_PyExc_IndexError);
-    Py_XINCREF(p3imp_PyExc_KeyError);
+    Py_XINCREF(p3imp_Py_Exc_कुंजी_Error);
     Py_XINCREF(p3imp_PyExc_KeyboardInterrupt);
     Py_XINCREF(p3imp_PyExc_TypeError);
-    Py_XINCREF(p3imp_PyExc_ValueError);
+    Py_XINCREF(p3imp_Py_Exc_मूल्य_Error);
     Py_XINCREF(p3imp_PyExc_SystemExit);
     Py_XINCREF(p3imp_PyExc_RuntimeError);
     Py_XINCREF(p3imp_PyExc_ImportError);
@@ -1065,14 +1065,14 @@ get_py3_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON3
 
-static int py3initialised = 0;
+स्थिर पूर्णाङ्क py3initialised = 0;
 #define PYINITIALISED py3initialised
-static int python_end_called = FALSE;
+स्थिर पूर्णाङ्क python_end_called = FALSE;
 
 #ifdef USE_LIMITED_API
 # define DESTRUCTOR_FINISH(self) \
     ((freefunc)PyType_GetSlot(Py_TYPE((PyObject*)self), Py_tp_free))((PyObject*)self)
-#else
+#अन्यथा
 # define DESTRUCTOR_FINISH(self) Py_TYPE(self)->tp_free((PyObject*)self)
 #endif
 
@@ -1080,59 +1080,59 @@ static int python_end_called = FALSE;
 #define BUF_PYTHON_REF(buf) buf->b_python3_ref
 #define TAB_PYTHON_REF(tab) tab->tp_python3_ref
 
-    static void
-call_PyObject_Free(void *p)
+    स्थिर शून्य
+call_PyObject_Free(शून्य *p)
 {
-#if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+#यदि defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     _PyObject_DebugFree(p);
-#else
+#अन्यथा
     PyObject_Free(p);
 #endif
 }
 
-    static PyObject *
+    स्थिर PyObject *
 call_PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    return PyType_GenericNew(type,args,kwds);
+    प्रत्यागम PyType_GenericNew(type,args,kwds);
 }
 
-    static PyObject *
+    स्थिर PyObject *
 call_PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
 {
-    return PyType_GenericAlloc(type,nitems);
+    प्रत्यागम PyType_GenericAlloc(type,nitems);
 }
 
-static PyObject *OutputGetattro(PyObject *, PyObject *);
-static int OutputSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *BufferGetattro(PyObject *, PyObject *);
-static int BufferSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *TabPageGetattro(PyObject *, PyObject *);
-static PyObject *WindowGetattro(PyObject *, PyObject *);
-static int WindowSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *RangeGetattro(PyObject *, PyObject *);
-static PyObject *CurrentGetattro(PyObject *, PyObject *);
-static int CurrentSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *DictionaryGetattro(PyObject *, PyObject *);
-static int DictionarySetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *ListGetattro(PyObject *, PyObject *);
-static int ListSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *TupleGetattro(PyObject *, PyObject *);
-static int TupleSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *FunctionGetattro(PyObject *, PyObject *);
+स्थिर PyObject *OutputGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क OutputSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *BufferGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क BufferSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *TabPageGetattro(PyObject *, PyObject *);
+स्थिर PyObject *WindowGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क WindowSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *RangeGetattro(PyObject *, PyObject *);
+स्थिर PyObject *CurrentGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क CurrentSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *DictionaryGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क DictionarySetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *ListGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क ListSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *TupleGetattro(PyObject *, PyObject *);
+स्थिर पूर्णाङ्क TupleSetattro(PyObject *, PyObject *, PyObject *);
+स्थिर PyObject *FunctionGetattro(PyObject *, PyObject *);
 
-static struct PyModuleDef vimmodule;
+स्थिर संरचना PyModuleDef vimmodule;
 
 #define PY_CAN_RECURSE
 
 /*
  * Include the code shared with if_python.c
  */
-#include "if_py_both.h"
+#अन्तर्भाव "if_py_both.h"
 
 #ifdef USE_LIMITED_API
-# if Py_LIMITED_API >= 0x030A0000
-#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+# यदि Py_LIMITED_API >= 0x030A0000
+#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, रिक्त)
+# अन्यथा
 // Python limited API before 3.10 lack easy ways to query the raw UTF-8 chars.
 // We need to first convert the string to bytes, and then extract the chars.
 // This function is only used for attribute string comparisons, which have
@@ -1141,66 +1141,66 @@ static struct PyModuleDef vimmodule;
 //
 // An alternative would be to convert all attribute string comparisons to use
 // PyUnicode_CompareWithASCIIString to skip having to extract the chars.
-static char py3_unicode_utf8_chars[20];
-static char* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
+स्थिर वर्ण py3_unicode_utf8_chars[20];
+स्थिर वर्ण* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
 {
     py3_unicode_utf8_chars[0] = '\0';
     PyObject* bytes = PyUnicode_AsUTF8String(str);
-    if (bytes)
+    यदि (bytes)
     {
-	char *chars;
+	वर्ण *chars;
 	Py_ssize_t len;
-	if (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
+	यदि (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
 	{
-	    if (len < (Py_ssize_t)sizeof(py3_unicode_utf8_chars))
+	    यदि (len < (Py_ssize_t)परिमाण(py3_unicode_utf8_chars))
 		// PyBytes_AsStringAndSize guarantees null-termination
-		memcpy(py3_unicode_utf8_chars, chars, len + 1);
+		स_नकल(py3_unicode_utf8_chars, chars, len + 1);
 	}
 	Py_DECREF(bytes);
     }
-    return py3_unicode_utf8_chars;
+    प्रत्यागम py3_unicode_utf8_chars;
 }
 # endif
-#else	// !USE_LIMITED_API
-# if PY_VERSION_HEX >= 0x030300f0
-#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+#अन्यथा	// !USE_LIMITED_API
+# यदि PY_VERSION_HEX >= 0x030300f0
+#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, रिक्त)
+# अन्यथा
 #  define PY_UNICODE_GET_UTF8_CHARS _PyUnicode_AsString
 # endif
 #endif
 
 // NOTE: Must always be used at the start of a block, since it declares "name".
 #define GET_ATTR_STRING(name, nameobj) \
-    char	*name = ""; \
-    if (PyUnicode_Check(nameobj)) \
-	name = (char *)PY_UNICODE_GET_UTF8_CHARS(nameobj)
+    वर्ण	*name = ""; \
+    यदि (PyUnicode_Check(nameobj)) \
+	name = (वर्ण *)PY_UNICODE_GET_UTF8_CHARS(nameobj)
 
 #define PY3OBJ_DELETED(obj) (obj->ob_base.ob_refcnt<=0)
 
 ///////////////////////////////////////////////////////
 // Internal function prototypes.
 
-static PyObject *Py3Init_vim(void);
+स्थिर PyObject *Py3Init_vim(शून्य);
 
 ///////////////////////////////////////////////////////
 // 1. Python interpreter main program.
 
-    void
-python3_end(void)
+    शून्य
+python3_end(शून्य)
 {
-    static int recurse = 0;
+    स्थिर पूर्णाङ्क recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    यदि (recurse != 0)
+	प्रत्यागम;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON3
-    if (hinstPy3)
+    यदि (hinstPy3)
 #endif
-    if (Py_IsInitialized())
+    यदि (Py_IsInitialized())
     {
 #ifdef USE_LIMITED_API
 	shutdown_types();
@@ -1215,132 +1215,132 @@ python3_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
-    int
-python3_loaded(void)
+#यदि defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
+    पूर्णाङ्क
+python3_loaded(शून्य)
 {
-    return (hinstPy3 != 0);
+    प्रत्यागम (hinstPy3 != 0);
 }
 #endif
 
-static wchar_t *py_home_buf = NULL;
+स्थिर ब_अक्षर_प्रकार *py_home_buf = रिक्त;
 
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
+#यदि defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
 /*
  * Return TRUE if stdin is readable from Python 3.
  */
-    static BOOL
-is_stdin_readable(void)
+    स्थिर BOOL
+is_stdin_readable(शून्य)
 {
     DWORD	    mode, eventnum;
-    struct _stat    st;
-    int		    fd = fileno(stdin);
+    संरचना _stat    st;
+    पूर्णाङ्क		    fd = fileno(मानक_निवेश);
     HANDLE	    hstdin = (HANDLE)_get_osfhandle(fd);
 
     // Check if stdin is connected to the console.
-    if (GetConsoleMode(hstdin, &mode))
+    यदि (GetConsoleMode(hstdin, &mode))
 	// Check if it is opened as input.
-	return GetNumberOfConsoleInputEvents(hstdin, &eventnum);
+	प्रत्यागम Get_संख्या_Of_Console_निवेश_Events(hstdin, &eventnum);
 
-    return _fstat(fd, &st) == 0;
+    प्रत्यागम _fstat(fd, &st) == 0;
 }
 
 // Python 3.5 or later will abort inside Py_Initialize() when stdin has
 // been closed (i.e. executed by "vim -").  Reconnect stdin to CONIN$.
 // Note that the python DLL is linked to its own stdio DLL which can be
 // differ from Vim's stdio.
-    static void
-reset_stdin(void)
+    स्थिर शून्य
+reset_stdin(शून्य)
 {
-    FILE *(*py__acrt_iob_func)(unsigned) = NULL;
-    FILE *(*pyfreopen)(const char *, const char *, FILE *) = NULL;
+    खाता *(*py__acrt_iob_func)(अचिन्हित) = रिक्त;
+    खाता *(*pyfreopen)(ध्रुव वर्ण *, ध्रुव वर्ण *, खाता *) = रिक्त;
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || is_stdin_readable())
-	return;
+    यदि (hinst == रिक्त || is_stdin_readable())
+	प्रत्यागम;
 
     // Get "freopen" and "stdin" which are used in the python DLL.
     // "stdin" is defined as "__acrt_iob_func(0)" in VC++ 2015 or later.
     py__acrt_iob_func = get_dll_import_func(hinst, "__acrt_iob_func");
-    if (py__acrt_iob_func)
+    यदि (py__acrt_iob_func)
     {
 	HINSTANCE hpystdiodll = find_imported_module_by_funcname(hinst,
 							    "__acrt_iob_func");
-	if (hpystdiodll)
-	    pyfreopen = (void *)GetProcAddress(hpystdiodll, "freopen");
+	यदि (hpystdiodll)
+	    pyfreopen = (शून्य *)GetProcAddress(hpystdiodll, "freopen");
     }
 
     // Reconnect stdin to CONIN$.
-    if (pyfreopen != NULL)
+    यदि (pyfreopen != रिक्त)
 	pyfreopen("CONIN$", "r", py__acrt_iob_func(0));
-    else
-	freopen("CONIN$", "r", stdin);
+    अन्यथा
+	ख_व_खोलो("CONIN$", "r", मानक_निवेश);
 }
-#else
+#अन्यथा
 # define reset_stdin()
 #endif
 
 // Python 3.2 or later will abort inside Py_Initialize() when mandatory
 // modules cannot be loaded (e.g. 'pythonthreehome' is wrongly set.).
 // Install a hook to python dll's exit() and recover from it.
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
+#यदि defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
 # define HOOK_EXIT
 # include <setjmp.h>
 
-static jmp_buf exit_hook_jump_buf;
-static void *orig_exit = NULL;
+स्थिर लाँघ_बफ exit_hook_jump_buf;
+स्थिर शून्य *orig_exit = रिक्त;
 
 /*
  * Function that replaces exit() while calling Py_Initialize().
  */
-    static void
-hooked_exit(int ret)
+    स्थिर शून्य
+hooked_exit(पूर्णाङ्क ret)
 {
     // Recover from exit.
-    longjmp(exit_hook_jump_buf, 1);
+    दीर्घ_लाँघ(exit_hook_jump_buf, 1);
 }
 
 /*
  * Install a hook to python dll's exit().
  */
-    static void
-hook_py_exit(void)
+    स्थिर शून्य
+hook_py_exit(शून्य)
 {
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || orig_exit != NULL)
-	return;
+    यदि (hinst == रिक्त || orig_exit != रिक्त)
+	प्रत्यागम;
 
-    orig_exit = hook_dll_import_func(hinst, "exit", (void *)hooked_exit);
+    orig_exit = hook_dll_import_func(hinst, "exit", (शून्य *)hooked_exit);
 }
 
 /*
  * Remove the hook installed by hook_py_exit().
  */
-    static void
-restore_py_exit(void)
+    स्थिर शून्य
+restore_py_exit(शून्य)
 {
     HINSTANCE hinst = hinstPy3;
 
-    if (hinst == NULL)
-	return;
+    यदि (hinst == रिक्त)
+	प्रत्यागम;
 
-    if (orig_exit != NULL)
+    यदि (orig_exit != रिक्त)
 	hook_dll_import_func(hinst, "exit", orig_exit);
-    orig_exit = NULL;
+    orig_exit = रिक्त;
 }
 #endif
 
-    static int
-Python3_Init(void)
+    स्थिर पूर्णाङ्क
+Python3_Init(शून्य)
 {
-    if (!py3initialised)
+    यदि (!py3initialised)
     {
 #ifdef DYNAMIC_PYTHON3
-	if (!python3_enabled(TRUE))
+	यदि (!python3_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
-	    goto fail;
+	    गच्छ fail;
 	}
 #endif
 	// Python 3.13 introduced a really useful feature: colorized exceptions.
@@ -1351,24 +1351,24 @@ Python3_Init(void)
 
 	init_structs();
 
-	if (*p_py3home != NUL)
+	यदि (*p_py3home != NUL)
 	{
-	    size_t len = mbstowcs(NULL, (char *)p_py3home, 0) + 1;
+	    माप_प्रकार len = mbstowcs(रिक्त, (वर्ण *)p_py3home, 0) + 1;
 
 	    // The string must not change later, make a copy in static memory.
-	    py_home_buf = ALLOC_MULT(wchar_t, len);
-	    if (py_home_buf != NULL && mbstowcs(
-			    py_home_buf, (char *)p_py3home, len) != (size_t)-1)
+	    py_home_buf = ALLOC_MULT(ब_अक्षर_प्रकार, len);
+	    यदि (py_home_buf != रिक्त && mbstowcs(
+			    py_home_buf, (वर्ण *)p_py3home, len) != (माप_प्रकार)-1)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON3_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	अन्यथा यदि (mch_getenv((char_u *)"PYTHONHOME") == रिक्त)
 	    Py_SetPythonHome(PYTHON3_HOME);
 #endif
 
 	PyImport_AppendInittab("vim", Py3Init_vim);
 
-#if !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
+#यदि !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
 	hinstPy3 = GetModuleHandle(PYTHON3_DLL);
 #endif
 	reset_stdin();
@@ -1376,23 +1376,23 @@ Python3_Init(void)
 #ifdef HOOK_EXIT
 	// Catch exit() called in Py_Initialize().
 	hook_py_exit();
-	if (setjmp(exit_hook_jump_buf) == 0)
+	यदि (बनाओ_लाँघ(exit_hook_jump_buf) == 0)
 	{
 	    Py_Initialize();
 	    restore_py_exit();
 	}
-	else
+	अन्यथा
 	{
 	    // exit() was called in Py_Initialize().
 	    restore_py_exit();
 	    emsg(_(e_critical_error_in_python3_initialization_check_your_installation));
-	    goto fail;
+	    गच्छ fail;
 	}
-#else
+#अन्यथा
 	Py_Initialize();
 #endif
 
-#if PY_VERSION_HEX < 0x03090000
+#यदि PY_VERSION_HEX < 0x03090000
 	// Initialise threads.  This is deprecated since Python 3.9.
 	PyEval_InitThreads();
 #endif
@@ -1400,8 +1400,8 @@ Python3_Init(void)
 	get_py3_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
-	    goto fail;
+	यदि (PythonIO_Init_io())
+	    गच्छ fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
 
@@ -1426,7 +1426,7 @@ Python3_Init(void)
 	py3initialised = 1;
     }
 
-    return 0;
+    प्रत्यागम 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -1434,46 +1434,46 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    प्रत्यागम -1;
 }
 
 /*
  * External interface
  */
-    static void
-DoPyCommand(const char *cmd,
+    स्थिर शून्य
+DoPyCommand(ध्रुव वर्ण *cmd,
 	    dict_T* locals,
 	    rangeinitializer init_range,
 	    runner run,
-	    void *arg)
+	    शून्य *arg)
 {
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    char		*saved_locale;
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    वर्ण		*saved_locale;
 #endif
     PyObject		*cmdstr;
     PyObject		*cmdbytes;
     PyGILState_STATE	pygilstate;
 
-    if (python_end_called)
-	goto theend;
+    यदि (python_end_called)
+	गच्छ theend;
 
-    if (Python3_Init())
-	goto theend;
+    यदि (Python3_Init())
+	गच्छ theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
-    saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
-	saved_locale = NULL;
-    else
+    saved_locale = रखो_क्षेत्र(LC_NUMERIC, रिक्त);
+    यदि (saved_locale == रिक्त || STRCMP(saved_locale, "C") == 0)
+	saved_locale = रिक्त;
+    अन्यथा
     {
 	// Need to make a copy, value may change when setting new locale.
-	saved_locale = (char *)vim_strsave((char_u *)saved_locale);
-	(void)setlocale(LC_NUMERIC, "C");
+	saved_locale = (वर्ण *)vim_strsave((char_u *)saved_locale);
+	(शून्य)रखो_क्षेत्र(LC_NUMERIC, "C");
     }
 #endif
 
@@ -1481,8 +1481,8 @@ DoPyCommand(const char *cmd,
 
     // PyRun_SimpleString expects a UTF-8 string. Wrong encoding may cause
     // SyntaxError (unicode error).
-    cmdstr = PyUnicode_Decode(cmd, strlen(cmd),
-					(char *)ENC_OPT, ERRORS_DECODE_ARG);
+    cmdstr = PyUnicode_Decode(cmd, म_माप(cmd),
+					(वर्ण *)ENC_OPT, ERRORS_DECODE_ARG);
     cmdbytes = PyUnicode_AsEncodedString(cmdstr, "utf-8", ERRORS_ENCODE_ARG);
     Py_XDECREF(cmdstr);
 
@@ -1491,10 +1491,10 @@ DoPyCommand(const char *cmd,
 
     PyGILState_Release(pygilstate);
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    यदि (saved_locale != रिक्त)
     {
-	(void)setlocale(LC_NUMERIC, saved_locale);
+	(शून्य)रखो_क्षेत्र(LC_NUMERIC, saved_locale);
 	vim_free(saved_locale);
     }
 #endif
@@ -1503,28 +1503,28 @@ DoPyCommand(const char *cmd,
     PythonIO_Flush();
 
 theend:
-    return;	    // keeps lint happy
+    प्रत्यागम;	    // keeps lint happy
 }
 
 /*
  * ":py3"
  */
-    void
+    शून्य
 ex_py3(exarg_T *eap)
 {
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    यदि (!eap->skip)
     {
-	if (p_pyx == 0)
+	यदि (p_pyx == 0)
 	    p_pyx = 3;
 
-	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
-		NULL,
+	DoPyCommand(script == रिक्त ? (वर्ण *) eap->arg : (वर्ण *) script,
+		रिक्त,
 		init_range_cmd,
 		(runner) run_cmd,
-		(void *) eap);
+		(शून्य *) eap);
     }
     vim_free(script);
 }
@@ -1534,15 +1534,15 @@ ex_py3(exarg_T *eap)
 /*
  * ":py3file"
  */
-    void
+    शून्य
 ex_py3file(exarg_T *eap)
 {
-    static char buffer[BUFFER_SIZE];
-    const char *file;
-    char *p;
-    int i;
+    स्थिर वर्ण buffer[BUFFER_SIZE];
+    ध्रुव वर्ण *file;
+    वर्ण *p;
+    पूर्णाङ्क i;
 
-    if (p_pyx == 0)
+    यदि (p_pyx == 0)
 	p_pyx = 3;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1558,29 +1558,29 @@ ex_py3file(exarg_T *eap)
     // We need to escape any backslashes or single quotes in the file name, so that
     // Python won't mangle the file name.
 
-    strcpy(buffer, "exec(compile(open('");
+    म_नकल(buffer, "exec(compile(open('");
     p = buffer + 19; // size of "exec(compile(open('"
 
-    for (i=0; i<2; ++i)
+    प्रति (i=0; i<2; ++i)
     {
-	file = (char *)eap->arg;
-	while (*file && p < buffer + (BUFFER_SIZE - 3))
+	file = (वर्ण *)eap->arg;
+	यावत् (*file && p < buffer + (BUFFER_SIZE - 3))
 	{
-	    if (*file == '\\' || *file == '\'')
+	    यदि (*file == '\\' || *file == '\'')
 		*p++ = '\\';
 	    *p++ = *file++;
 	}
 	// If we didn't finish the file name, we hit a buffer overflow
-	if (*file != '\0')
-	    return;
-	if (i==0)
+	यदि (*file != '\0')
+	    प्रत्यागम;
+	यदि (i==0)
 	{
-	    strcpy(p,"','rb').read(),'");
+	    म_नकल(p,"','rb').read(),'");
 	    p += 16;
 	}
-	else
+	अन्यथा
 	{
-	    strcpy(p,"','exec'))");
+	    म_नकल(p,"','exec'))");
 	    p += 10;
 	}
     }
@@ -1588,23 +1588,23 @@ ex_py3file(exarg_T *eap)
 
     // Execute the file
     DoPyCommand(buffer,
-	    NULL,
+	    रिक्त,
 	    init_range_cmd,
 	    (runner) run_cmd,
-	    (void *) eap);
+	    (शून्य *) eap);
 }
 
-    void
+    शून्य
 ex_py3do(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    यदि (p_pyx == 0)
 	p_pyx = 3;
 
-    DoPyCommand((char *)eap->arg,
-	    NULL,
+    DoPyCommand((वर्ण *)eap->arg,
+	    रिक्त,
 	    init_range_cmd,
 	    (runner)run_do,
-	    (void *)eap);
+	    (शून्य *)eap);
 }
 
 ///////////////////////////////////////////////////////
@@ -1612,27 +1612,27 @@ ex_py3do(exarg_T *eap)
 
 // Implementation functions
 
-    static PyObject *
+    स्थिर PyObject *
 OutputGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "softspace") == 0)
-	return PyLong_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
+    यदि (म_भेद(name, "softspace") == 0)
+	प्रत्यागम PyLong_FromLong(((OutputObject *)(self))->softspace);
+    अन्यथा यदि (म_भेद(name, "errors") == 0)
+	प्रत्यागम PyString_FromString("strict");
+    अन्यथा यदि (म_भेद(name, "encoding") == 0)
+	प्रत्यागम PyString_FromString(ENC_OPT);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return OutputSetattr(self, name, val);
+    प्रत्यागम OutputSetattr(self, name, val);
 }
 
 ///////////////////////////////////////////////////////
@@ -1648,22 +1648,22 @@ OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 
 #define BufferType_Check(obj) ((obj)->ob_base.ob_type == &BufferType)
 
-static PyObject* BufferSubscript(PyObject *self, PyObject *idx);
-static int BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+स्थिर PyObject* BufferSubscript(PyObject *self, PyObject *idx);
+स्थिर पूर्णाङ्क BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Line range type - Implementation functions
 // --------------------------------------
 
 #define RangeType_Check(obj) ((obj)->ob_base.ob_type == &RangeType)
 
-static PyObject* RangeSubscript(PyObject *self, PyObject *idx);
-static int RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
-static int RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+स्थिर PyObject* RangeSubscript(PyObject *self, PyObject *idx);
+स्थिर पूर्णाङ्क RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
+स्थिर पूर्णाङ्क RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
 
-static PySequenceMethods BufferAsSeq = {
+स्थिर PySequenceMethods BufferAsSeq = {
     (lenfunc)		BufferLength,	    // sq_length,    len(x)
     (binaryfunc)	0,		    // sq_concat,    x+y
     (ssizeargfunc)	0,		    // sq_repeat,    x*n
@@ -1676,7 +1676,7 @@ static PySequenceMethods BufferAsSeq = {
     0,					    // sq_inplace_repeat
 };
 
-static PyMappingMethods BufferAsMapping = {
+स्थिर PyMappingMethods BufferAsMapping = {
     /* mp_length	*/ (lenfunc)BufferLength,
     /* mp_subscript     */ (binaryfunc)BufferSubscript,
     /* mp_ass_subscript */ (objobjargproc)BufferAsSubscript,
@@ -1685,103 +1685,103 @@ static PyMappingMethods BufferAsMapping = {
 
 // Buffer object
 
-    static PyObject *
+    स्थिर PyObject *
 BufferGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    यदि ((r = BufferAttrValid((BufferObject *)(self), name)))
+	प्रत्यागम r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    यदि (CheckBuffer((BufferObject *)(self)))
+	प्रत्यागम रिक्त;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    यदि (r || PyErr_Occurred())
+	प्रत्यागम r;
+    अन्यथा
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 BufferSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return BufferSetattr(self, name, val);
+    प्रत्यागम BufferSetattr(self, name, val);
 }
 
 //////////////////
 
-    static PyObject *
+    स्थिर PyObject *
 BufferSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    यदि (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return BufferItem((BufferObject *)(self), _idx);
+	दीर्घ _idx = PyLong_AsLong(idx);
+	प्रत्यागम BufferItem((BufferObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    अन्यथा यदि (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return NULL;
+	यदि (CheckBuffer((BufferObject *) self))
+	    प्रत्यागम रिक्त;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
-	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
+	यदि (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_पंक्ति_गिनती,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return NULL;
-	return BufferSlice((BufferObject *)(self), start, stop);
+	    प्रत्यागम रिक्त;
+	प्रत्यागम BufferSlice((BufferObject *)(self), start, stop);
     }
-    else
+    अन्यथा
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 BufferAsSubscript(PyObject *self, PyObject* idx, PyObject* val)
 {
-    if (PyLong_Check(idx))
+    यदि (PyLong_Check(idx))
     {
-	long n = PyLong_AsLong(idx);
+	दीर्घ n = PyLong_AsLong(idx);
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	यदि (CheckBuffer((BufferObject *) self))
+	    प्रत्यागम -1;
 
-	return RBAsItem((BufferObject *)(self), n, val, 1,
-		    (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
-		    NULL);
+	प्रत्यागम RBAsItem((BufferObject *)(self), n, val, 1,
+		    (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_पंक्ति_गिनती,
+		    रिक्त);
     }
-    else if (PySlice_Check(idx))
+    अन्यथा यदि (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	यदि (CheckBuffer((BufferObject *) self))
+	    प्रत्यागम -1;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
-	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
+	यदि (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_पंक्ति_गिनती,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return -1;
-	return RBAsSlice((BufferObject *)(self), start, stop, val, 1,
-			  (PyInt)((BufferObject *)(self))->buf->b_ml.ml_line_count,
-			  NULL);
+	    प्रत्यागम -1;
+	प्रत्यागम RBAsSlice((BufferObject *)(self), start, stop, val, 1,
+			  (PyInt)((BufferObject *)(self))->buf->b_ml.ml_पंक्ति_गिनती,
+			  रिक्त);
     }
-    else
+    अन्यथा
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	प्रत्यागम -1;
     }
 }
 
-static PySequenceMethods RangeAsSeq = {
+स्थिर PySequenceMethods RangeAsSeq = {
     (lenfunc)		RangeLength,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     (ssizeargfunc)	0,		 // RangeRepeat, sq_repeat,  x*n
@@ -1794,7 +1794,7 @@ static PySequenceMethods RangeAsSeq = {
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods RangeAsMapping = {
+स्थिर PyMappingMethods RangeAsMapping = {
     /* mp_length	*/ (lenfunc)RangeLength,
     /* mp_subscript     */ (binaryfunc)RangeSubscript,
     /* mp_ass_subscript */ (objobjargproc)RangeAsSubscript,
@@ -1802,146 +1802,146 @@ static PyMappingMethods RangeAsMapping = {
 
 // Line range object - Implementation
 
-    static PyObject *
+    स्थिर PyObject *
 RangeGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->end - 1);
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    यदि (म_भेद(name, "start") == 0)
+	प्रत्यागम Py_Build_मूल्य("n", ((RangeObject *)(self))->start - 1);
+    अन्यथा यदि (म_भेद(name, "end") == 0)
+	प्रत्यागम Py_Build_मूल्य("n", ((RangeObject *)(self))->end - 1);
+    अन्यथा
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
 ////////////////
 
-    static int
+    स्थिर पूर्णाङ्क
 RangeAsItem(PyObject *self, Py_ssize_t n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    प्रत्यागम RBAsItem(((RangeObject *)(self))->buf, n, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
 }
 
-    static Py_ssize_t
+    स्थिर Py_ssize_t
 RangeAsSlice(PyObject *self, Py_ssize_t lo, Py_ssize_t hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    प्रत्यागम RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
 }
 
-    static PyObject *
+    स्थिर PyObject *
 RangeSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    यदि (PyLong_Check(idx))
     {
-	long _idx = PyLong_AsLong(idx);
-	return RangeItem((RangeObject *)(self), _idx);
+	दीर्घ _idx = PyLong_AsLong(idx);
+	प्रत्यागम RangeItem((RangeObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    अन्यथा यदि (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	यदि (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return NULL;
-	return RangeSlice((RangeObject *)(self), start, stop);
+	    प्रत्यागम रिक्त;
+	प्रत्यागम RangeSlice((RangeObject *)(self), start, stop);
     }
-    else
+    अन्यथा
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val)
 {
-    if (PyLong_Check(idx))
+    यदि (PyLong_Check(idx))
     {
-	long n = PyLong_AsLong(idx);
-	return RangeAsItem(self, n, val);
+	दीर्घ n = PyLong_AsLong(idx);
+	प्रत्यागम RangeAsItem(self, n, val);
     }
-    else if (PySlice_Check(idx))
+    अन्यथा यदि (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	यदि (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return -1;
-	return RangeAsSlice(self, start, stop, val);
+	    प्रत्यागम -1;
+	प्रत्यागम RangeAsSlice(self, start, stop, val);
     }
-    else
+    अन्यथा
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	प्रत्यागम -1;
     }
 }
 
 // TabPage object - Implementation
 
-    static PyObject *
+    स्थिर PyObject *
 TabPageGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    यदि ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	प्रत्यागम r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    यदि (CheckTabPage((TabPageObject *)(self)))
+	प्रत्यागम रिक्त;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    यदि (r || PyErr_Occurred())
+	प्रत्यागम r;
+    अन्यथा
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
 // Window object - Implementation
 
-    static PyObject *
+    स्थिर PyObject *
 WindowGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    यदि ((r = WindowAttrValid((WindowObject *)(self), name)))
+	प्रत्यागम r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    यदि (CheckWindow((WindowObject *)(self)))
+	प्रत्यागम रिक्त;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    यदि (r || PyErr_Occurred())
+	प्रत्यागम r;
+    अन्यथा
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 WindowSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return WindowSetattr(self, name, val);
+    प्रत्यागम WindowSetattr(self, name, val);
 }
 
 // Tab page list object - Definitions
 
-static PySequenceMethods TabListAsSeq = {
+स्थिर PySequenceMethods TabListAsSeq = {
     (lenfunc)	     TabListLength,	    // sq_length,    len(x)
     (binaryfunc)     0,			    // sq_concat,    x+y
     (ssizeargfunc)   0,			    // sq_repeat,    x*n
@@ -1956,7 +1956,7 @@ static PySequenceMethods TabListAsSeq = {
 
 // Window list object - Definitions
 
-static PySequenceMethods WinListAsSeq = {
+स्थिर PySequenceMethods WinListAsSeq = {
     (lenfunc)	     WinListLength,	    // sq_length,    len(x)
     (binaryfunc)     0,			    // sq_concat,    x+y
     (ssizeargfunc)   0,			    // sq_repeat,    x*n
@@ -1972,90 +1972,90 @@ static PySequenceMethods WinListAsSeq = {
 /*
  * Current items object - Implementation
  */
-    static PyObject *
+    स्थिर PyObject *
 CurrentGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject	*r;
     GET_ATTR_STRING(name, nameobj);
-    if (!(r = CurrentGetattr(self, name)))
-	return PyObject_GenericGetAttr(self, nameobj);
-    return r;
+    यदि (!(r = CurrentGetattr(self, name)))
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
+    प्रत्यागम r;
 }
 
-    static int
-CurrentSetattro(PyObject *self, PyObject *nameobj, PyObject *value)
+    स्थिर पूर्णाङ्क
+CurrentSetattro(PyObject *self, PyObject *nameobj, PyObject *मूल्य)
 {
     GET_ATTR_STRING(name, nameobj);
-    return CurrentSetattr(self, name, value);
+    प्रत्यागम CurrentSetattr(self, name, मूल्य);
 }
 
 // Dictionary object - Definitions
 
-    static PyObject *
+    स्थिर PyObject *
 DictionaryGetattro(PyObject *self, PyObject *nameobj)
 {
     DictionaryObject	*this = ((DictionaryObject *) (self));
 
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyLong_FromLong(this->dict->dv_scope);
+    यदि (म_भेद(name, "locked") == 0)
+	प्रत्यागम PyLong_FromLong(this->dict->dv_lock);
+    अन्यथा यदि (म_भेद(name, "scope") == 0)
+	प्रत्यागम PyLong_FromLong(this->dict->dv_scope);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 DictionarySetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return DictionarySetattr(self, name, val);
+    प्रत्यागम DictionarySetattr(self, name, val);
 }
 
 // List object - Definitions
 
-    static PyObject *
+    स्थिर PyObject *
 ListGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
+    यदि (म_भेद(name, "locked") == 0)
+	प्रत्यागम PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 ListSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return ListSetattr(self, name, val);
+    प्रत्यागम ListSetattr(self, name, val);
 }
 
 // Tuple object - Definitions
 
-    static PyObject *
+    स्थिर PyObject *
 TupleGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
+    यदि (म_भेद(name, "locked") == 0)
+	प्रत्यागम PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 TupleSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return TupleSetattr(self, name, val);
+    प्रत्यागम TupleSetattr(self, name, val);
 }
 
 // Function object - Definitions
 
-    static PyObject *
+    स्थिर PyObject *
 FunctionGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject		*r;
@@ -2064,66 +2064,66 @@ FunctionGetattro(PyObject *self, PyObject *nameobj)
     GET_ATTR_STRING(name, nameobj);
 
     r = FunctionAttr(this, name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    यदि (r || PyErr_Occurred())
+	प्रत्यागम r;
+    अन्यथा
+	प्रत्यागम PyObject_GenericGetAttr(self, nameobj);
 }
 
 // External interface
 
-    void
+    शून्य
 python3_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
-    bp->buf = INVALID_BUFFER_VALUE;
-    BUF_PYTHON_REF(buf) = NULL;
+    यदि (bp == रिक्त)
+	प्रत्यागम;
+    bp->buf = INVALID_BUFFER_मूल्य;
+    BUF_PYTHON_REF(buf) = रिक्त;
 }
 
-    void
+    शून्य
 python3_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
-    wp->win = INVALID_WINDOW_VALUE;
-    WIN_PYTHON_REF(win) = NULL;
+    यदि (wp == रिक्त)
+	प्रत्यागम;
+    wp->win = INVALID_WINDOW_मूल्य;
+    WIN_PYTHON_REF(win) = रिक्त;
 }
 
-    void
+    शून्य
 python3_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
-    tp->tab = INVALID_TABPAGE_VALUE;
-    TAB_PYTHON_REF(tab) = NULL;
+    यदि (tp == रिक्त)
+	प्रत्यागम;
+    tp->tab = INVALID_TABPAGE_मूल्य;
+    TAB_PYTHON_REF(tab) = रिक्त;
 }
 
-    static PyObject *
-Py3Init_vim(void)
+    स्थिर PyObject *
+Py3Init_vim(शून्य)
 {
     // The special value is removed from sys.path in Python3_Init().
-    static wchar_t *(argv[2]) = {L"/must>not&exist/foo", NULL};
+    स्थिर ब_अक्षर_प्रकार *(argv[2]) = {L"/must>not&exist/foo", रिक्त};
 
-    if (init_types())
-	return NULL;
+    यदि (init_types())
+	प्रत्यागम रिक्त;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
 
-    if ((vim_module = PyModule_Create(&vimmodule)) == NULL)
-	return NULL;
+    यदि ((vim_module = PyModule_Create(&vimmodule)) == रिक्त)
+	प्रत्यागम रिक्त;
 
-    if (populate_module(vim_module))
-	return NULL;
+    यदि (populate_module(vim_module))
+	प्रत्यागम रिक्त;
 
-    if (init_sys_path())
-	return NULL;
+    यदि (init_sys_path())
+	प्रत्यागम रिक्त;
 
-    return vim_module;
+    प्रत्यागम vim_module;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2135,26 +2135,26 @@ Py3Init_vim(void)
  *
  * On errors, the Python exception data is set, and NULL is returned.
  */
-    static PyObject *
-LineToString(const char *str)
+    स्थिर PyObject *
+पंक्ति_To_String(ध्रुव वर्ण *str)
 {
     PyObject *result;
-    Py_ssize_t len = strlen(str);
-    char *tmp, *p;
+    Py_ssize_t len = म_माप(str);
+    वर्ण *tmp, *p;
 
     tmp = alloc(len + 1);
     p = tmp;
-    if (p == NULL)
+    यदि (p == रिक्त)
     {
 	PyErr_NoMemory();
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    while (*str)
+    यावत् (*str)
     {
-	if (*str == '\n')
+	यदि (*str == '\n')
 	    *p = '\0';
-	else
+	अन्यथा
 	    *p = *str;
 
 	++p;
@@ -2162,39 +2162,39 @@ LineToString(const char *str)
     }
     *p = '\0';
 
-    result = PyUnicode_Decode(tmp, len, (char *)ENC_OPT, ERRORS_DECODE_ARG);
+    result = PyUnicode_Decode(tmp, len, (वर्ण *)ENC_OPT, ERRORS_DECODE_ARG);
 
     vim_free(tmp);
-    return result;
+    प्रत्यागम result;
 }
 
-    void
+    शून्य
 do_py3eval(char_u *str, dict_T *locals, typval_T *rettv)
 {
-    DoPyCommand((char *) str,
+    DoPyCommand((वर्ण *) str,
 	    locals,
 	    init_range_eval,
 	    (runner) run_eval,
-	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+	    (शून्य *) rettv);
+    यदि (rettv->v_type == VAR_UNKNOWN)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_संख्या;
+	rettv->vval.v_संख्या = 0;
     }
 }
 
-    int
-set_ref_in_python3(int copyID)
+    पूर्णाङ्क
+set_ref_in_python3(पूर्णाङ्क copyID)
 {
-    return set_ref_in_py(copyID);
+    प्रत्यागम set_ref_in_py(copyID);
 }
 
-    int
-python3_version(void)
+    पूर्णाङ्क
+python3_version(शून्य)
 {
 #ifdef USE_LIMITED_API
-    return Py_LIMITED_API;
-#else
-    return PY_VERSION_HEX;
+    प्रत्यागम Py_LIMITED_API;
+#अन्यथा
+    प्रत्यागम PY_VERSION_HEX;
 #endif
 }

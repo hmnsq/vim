@@ -9,101 +9,101 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 // define _generic_64 for use in time functions
-#if !defined(VAX)
+#यदि !defined(VAX)
 # include <gen64def.h>
-#else
+#अन्यथा
 // based on Alpha's gen64def.h; the file is absent on VAX
-typedef struct _generic_64 {
+प्रकारनिर्देश संरचना _generic_64 {
 # pragma __nomember_alignment
     __union  {				     // You can treat me as...
 	// long long is not available on VAXen
 	// unsigned __int64 gen64$q_quadword; ...a single 64-bit value, or
 
-	unsigned int gen64$l_longword [2];   // ...two 32-bit values, or
-	unsigned short int gen64$w_word [4]; // ...four 16-bit values
+	अचिन्हित पूर्णाङ्क gen64$l_longword [2];   // ...two 32-bit values, or
+	अचिन्हित लघु पूर्णाङ्क gen64$w_word [4]; // ...four 16-bit values
     } gen64$r_quad_overlay;
 } GENERIC_64;
 #endif
 
-typedef struct
+प्रकारनिर्देश संरचना
 {
-    char	class;
-    char	type;
-    short	width;
-    union
+    वर्ण	class;
+    वर्ण	type;
+    लघु	width;
+    सङ्घ
     {
-	struct
+	संरचना
 	{
-	    char	_basic[3];
-	    char	length;
+	    वर्ण	_basic[3];
+	    वर्ण	length;
 	}	y;
-	int	basic;
+	पूर्णाङ्क	basic;
     }	x;
-    int		extended;
+    पूर्णाङ्क		extended;
 }	TT_MODE;
 
-typedef struct
+प्रकारनिर्देश संरचना
 {
-    short	buflen;
-    short	itemcode;
-    char	*bufadrs;
-    int		*retlen;
+    लघु	buflen;
+    लघु	itemcode;
+    वर्ण	*bufadrs;
+    पूर्णाङ्क		*retlen;
 }	ITEM;
 
-typedef struct
+प्रकारनिर्देश संरचना
 {
     ITEM	equ;
-    int		nul;
+    पूर्णाङ्क		nul;
 }	ITMLST1;
 
-typedef struct
+प्रकारनिर्देश संरचना
 {
     ITEM	index;
     ITEM	string;
-    int	nul;
+    पूर्णाङ्क	nul;
 }	ITMLST2;
 
-static TT_MODE	orgmode;
-static short	iochan;			// TTY I/O channel
-static short	iosb[4];		// IO status block
+स्थिर TT_MODE	orgmode;
+स्थिर लघु	iochan;			// TTY I/O channel
+स्थिर लघु	iosb[4];		// IO status block
 
-static int vms_match_num = 0;
-static int vms_match_free = 0;
-static char_u **vms_fmatch = NULL;
-static char *Fspec_Rms;		       // rms file spec, passed implicitly between routines
+स्थिर पूर्णाङ्क vms_match_अंक = 0;
+स्थिर पूर्णाङ्क vms_match_free = 0;
+स्थिर char_u **vms_fmatch = रिक्त;
+स्थिर वर्ण *Fspec_Rms;		       // rms file spec, passed implicitly between routines
 
 
 
-static TT_MODE	get_tty(void);
-static void	set_tty(int row, int col);
+स्थिर TT_MODE	get_tty(शून्य);
+स्थिर शून्य	set_tty(पूर्णाङ्क row, पूर्णाङ्क col);
 
 #define EXPL_ALLOC_INC 64
 
-#define EQN(S1,S2,LN) (strncmp(S1,S2,LN) == 0)
-#define SKIP_FOLLOWING_SLASHES(Str) do { while (Str[1] == '/') ++Str; } while (0)
+#define EQN(S1,S2,LN) (म_भेदन(S1,S2,LN) == 0)
+#define SKIP_FOLLOWING_SLASHES(Str) कुरु { यावत् (Str[1] == '/') ++Str; } यावत् (0)
 
 
 /*
  *	vul_desc	vult een descriptor met een string en de lengte
  *			hier van.
  */
-    static void
-vul_desc(DESC *des, char *str)
+    स्थिर शून्य
+vul_desc(DESC *des, वर्ण *str)
 {
     des->dsc$b_dtype = DSC$K_DTYPE_T;
     des->dsc$b_class = DSC$K_CLASS_S;
     des->dsc$a_pointer = str;
-    des->dsc$w_length = str ? strlen(str) : 0;
+    des->dsc$w_length = str ? म_माप(str) : 0;
 }
 
 /*
  *	vul_item	vult een item met een aantal waarden
  */
-    static void
-vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
+    स्थिर शून्य
+vul_item(ITEM *itm, लघु len, लघु cod, वर्ण *adr, पूर्णाङ्क *ret)
 {
     itm->buflen   = len;
     itm->itemcode = cod;
@@ -111,72 +111,72 @@ vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
     itm->retlen   = ret;
 }
 
-    void
+    शून्य
 mch_settmode(tmode_T tmode)
 {
-    int	status;
+    पूर्णाङ्क	status;
 
-    if ( tmode == TMODE_RAW )
+    यदि ( tmode == TMODE_RAW )
 	set_tty(0, 0);
-    else
+    अन्यथा
     {
-	switch (orgmode.width)
+	विकल्प (orgmode.width)
 	{
-	    case 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	break;
-	    case 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	break;
-	    default:	break;
+	    पक्ष 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	भङ्ग;
+	    पक्ष 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	भङ्ग;
+	    स्वभाव:	भङ्ग;
 	}
 	out_flush();
 	status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
-					  &orgmode, sizeof(TT_MODE), 0,0,0,0);
-	if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	    return;
-	(void)sys$dassgn(iochan);
+					  &orgmode, परिमाण(TT_MODE), 0,0,0,0);
+	यदि (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	    प्रत्यागम;
+	(शून्य)sys$dassgn(iochan);
 	iochan = 0;
     }
 }
 
-    static void
-set_tty(int row, int col)
+    स्थिर शून्य
+set_tty(पूर्णाङ्क row, पूर्णाङ्क col)
 {
-    int		    status;
+    पूर्णाङ्क		    status;
     TT_MODE	    newmode;		// New TTY mode bits
-    static short    first_time = TRUE;
+    स्थिर लघु    first_time = TRUE;
 
-    if (first_time)
+    यदि (first_time)
     {
 	orgmode = get_tty();
 	first_time = FALSE;
     }
     newmode = get_tty();
-    if (col)
+    यदि (col)
 	newmode.width		 = col;
-    if (row)
+    यदि (row)
 	newmode.x.y.length       = row;
     newmode.x.basic		|= (TT$M_NOECHO | TT$M_HOSTSYNC);
     newmode.x.basic		&= ~TT$M_TTSYNC;
     newmode.extended		|= TT2$M_PASTHRU;
     status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
-			  &newmode, sizeof(newmode), 0, 0, 0, 0);
-    if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	return;
+			  &newmode, परिमाण(newmode), 0, 0, 0, 0);
+    यदि (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	प्रत्यागम;
 }
 
-    static TT_MODE
-get_tty(void)
+    स्थिर TT_MODE
+get_tty(शून्य)
 {
 
-    static $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
+    स्थिर $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
 
-    int		status;
+    पूर्णाङ्क		status;
     TT_MODE	tt_mode;
 
-    if (!iochan)
+    यदि (!iochan)
 	status = sys$assign(&odsc,&iochan,0,0);
 
     status = sys$qiow(0, iochan, IO$_SENSEMODE, iosb, 0, 0,
-		      &tt_mode, sizeof(tt_mode), 0, 0, 0, 0);
-    if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+		      &tt_mode, परिमाण(tt_mode), 0, 0, 0, 0);
+    यदि (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
     {
 	tt_mode.width		= 0;
 	tt_mode.type		= 0;
@@ -185,35 +185,35 @@ get_tty(void)
 	tt_mode.x.y.length	= 0;
 	tt_mode.extended	= 0;
     }
-    return(tt_mode);
+    प्रत्यागम(tt_mode);
 }
 
 /*
  * Get the current window size in Rows and Columns.
  */
-    int
-mch_get_shellsize(void)
+    पूर्णाङ्क
+mch_get_shellsize(शून्य)
 {
     TT_MODE	tmode;
 
     tmode = get_tty();			// get size from VMS
     Columns = tmode.width;
     Rows = tmode.x.y.length;
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Try to set the window size to Rows and new_Columns.
  */
-    void
-mch_set_shellsize(void)
+    शून्य
+mch_set_shellsize(शून्य)
 {
     set_tty(Rows, Columns);
-    switch (Columns)
+    विकल्प (Columns)
     {
-	case 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	break;
-	case 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	break;
-	default:	break;
+	पक्ष 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	भङ्ग;
+	पक्ष 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	भङ्ग;
+	स्वभाव:	भङ्ग;
     }
     out_flush();
     screen_start();
@@ -223,100 +223,100 @@ mch_set_shellsize(void)
 mch_getenv(char_u *lognam)
 {
     DESC		d_file_dev, d_lognam  ;
-    static char		buffer[LNM$C_NAMLENGTH+1];
-    char_u		*cp = NULL;
-    unsigned long	attrib;
-    int			lengte = 0, dum = 0, idx = 0;
+    स्थिर वर्ण		buffer[LNM$C_NAMLENGTH+1];
+    char_u		*cp = रिक्त;
+    अचिन्हित दीर्घ	attrib;
+    पूर्णाङ्क			lengte = 0, dum = 0, idx = 0;
     ITMLST2		itmlst;
-    char		*sbuf = NULL;
+    वर्ण		*sbuf = रिक्त;
 
-    vul_desc(&d_lognam, (char *)lognam);
+    vul_desc(&d_lognam, (वर्ण *)lognam);
     vul_desc(&d_file_dev, "LNM$FILE_DEV");
     attrib = LNM$M_CASE_BLIND;
-    vul_item(&itmlst.index, sizeof(int), LNM$_INDEX, (char *)&idx, &dum);
+    vul_item(&itmlst.index, परिमाण(पूर्णाङ्क), LNM$_INDEX, (वर्ण *)&idx, &dum);
     vul_item(&itmlst.string, LNM$C_NAMLENGTH, LNM$_STRING, buffer, &lengte);
     itmlst.nul	= 0;
-    if (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
+    यदि (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, रिक्त,&itmlst) == SS$_NORMAL)
     {
 	buffer[lengte] = '\0';
-	if (cp = alloc(lengte + 1))
-	    strcpy((char *)cp, buffer);
-	return(cp);
+	यदि (cp = alloc(lengte + 1))
+	    म_नकल((वर्ण *)cp, buffer);
+	प्रत्यागम(cp);
     }
-    else if ((sbuf = getenv((char *)lognam)))
+    अन्यथा यदि ((sbuf = दो_पर्या((वर्ण *)lognam)))
     {
-	lengte = strlen(sbuf) + 1;
+	lengte = म_माप(sbuf) + 1;
 	cp = alloc(lengte);
-	if (cp)
-	    strcpy((char *)cp, sbuf);
-	return cp;
+	यदि (cp)
+	    म_नकल((वर्ण *)cp, sbuf);
+	प्रत्यागम cp;
     }
-    else
-	return(NULL);
+    अन्यथा
+	प्रत्यागम(रिक्त);
 }
 
 /*
  *	mch_setenv	VMS version of setenv()
  */
-    int
-mch_setenv(char *var, char *value, int x)
+    पूर्णाङ्क
+mch_setenv(वर्ण *var, वर्ण *मूल्य, पूर्णाङ्क x)
 {
-    int		res, dum;
-    long	attrib = 0L;
-    char	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
+    पूर्णाङ्क		res, dum;
+    दीर्घ	attrib = 0L;
+    वर्ण	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
     DESC	tabnam, lognam;
     ITMLST1	itmlst;
 
     vul_desc(&tabnam, "LNM$JOB");
     vul_desc(&lognam, var);
-    vul_item(&itmlst.equ, value ? strlen(value) : 0, value ? LNM$_STRING : 0,
-	    value, &dum);
+    vul_item(&itmlst.equ, मूल्य ? म_माप(मूल्य) : 0, मूल्य ? LNM$_STRING : 0,
+	    मूल्य, &dum);
     itmlst.nul	= 0;
     res = sys$crelnm(&attrib, &tabnam, &lognam, &acmode, &itmlst);
-    return((res == 1) ? 0 : -1);
+    प्रत्यागम((res == 1) ? 0 : -1);
 }
 
-    int
-vms_sys(char *cmd, char *out, char *inp)
+    पूर्णाङ्क
+vms_sys(वर्ण *cmd, वर्ण *out, वर्ण *inp)
 {
     DESC	cdsc, odsc, idsc;
-    long	status;
+    दीर्घ	status;
 
-    if (cmd)
+    यदि (cmd)
 	vul_desc(&cdsc, cmd);
-    if (out)
+    यदि (out)
 	vul_desc(&odsc, out);
-    if (inp)
+    यदि (inp)
 	vul_desc(&idsc, inp);
 
-    lib$spawn(cmd ? &cdsc : NULL,		// command string
-	      inp ? &idsc : NULL,		// input file
-	      out ? &odsc : NULL,		// output file
+    lib$spawn(cmd ? &cdsc : रिक्त,		// command string
+	      inp ? &idsc : रिक्त,		// input file
+	      out ? &odsc : रिक्त,		// output file
 	      0, 0, 0, &status, 0, 0, 0, 0, 0, 0);
-    return status;
+    प्रत्यागम status;
 }
 
 /*
  * Convert string to lowercase - most often filename
  */
-    char *
-vms_tolower( char *name )
+    वर्ण *
+vms_tolower( वर्ण *name )
 {
-    int i,nlen = strlen(name);
-    for (i = 0; i < nlen; i++)
+    पूर्णाङ्क i,nlen = म_माप(name);
+    प्रति (i = 0; i < nlen; i++)
 	name[i] = TOLOWER_ASC(name[i]);
-    return name;
+    प्रत्यागम name;
 }
 
 /*
  * Convert VMS system() or lib$spawn() return code to Unix-like exit value.
  */
-    int
-vms_sys_status(int status)
+    पूर्णाङ्क
+vms_sys_status(पूर्णाङ्क status)
 {
-    if (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
-	return status;		// Command failed.
-    return 0;
+    यदि (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
+	प्रत्यागम status;		// Command failed.
+    प्रत्यागम 0;
 }
 
 /*
@@ -325,42 +325,42 @@ vms_sys_status(int status)
  *
  * Returns: input length
  */
-    int
-vms_read(char *inbuf, size_t nbytes)
+    पूर्णाङ्क
+vms_read(वर्ण *inbuf, माप_प्रकार nbytes)
 {
-    int		status, function, len;
+    पूर्णाङ्क		status, function, len;
     TT_MODE	tt_mode;
     ITEM	itmlst[2];     // terminates on everything
-    static long trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    स्थिर दीर्घ trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     // whatever happened earlier we need an iochan here
-    if (!iochan)
+    यदि (!iochan)
 	tt_mode = get_tty();
 
     // important: clean the inbuf
-    memset(inbuf, 0, nbytes);
+    स_रखो(inbuf, 0, nbytes);
 
     // set up the itemlist for the first read
     vul_item(&itmlst[0], 0, TRM$_MODIFIERS,
-	 (char *)( TRM$M_TM_NOECHO  | TRM$M_TM_NOEDIT	 |
+	 (वर्ण *)( TRM$M_TM_NOECHO  | TRM$M_TM_NOEDIT	 |
 		   TRM$M_TM_NOFILTR | TRM$M_TM_TRMNOECHO |
 		   TRM$M_TM_NORECALL) , 0);
-    vul_item(&itmlst[1], sizeof(trm_mask), TRM$_TERM, (char *)&trm_mask, 0);
+    vul_item(&itmlst[1], परिमाण(trm_mask), TRM$_TERM, (वर्ण *)&trm_mask, 0);
 
     // wait forever for a char
     function = (IO$_READLBLK | IO$M_EXTEND);
     status = sys$qiow(0, iochan, function, &iosb, 0, 0,
-			 inbuf, nbytes-1, 0, 0, &itmlst, sizeof(itmlst));
-    len = strlen(inbuf); // how many chars we got?
+			 inbuf, nbytes-1, 0, 0, &itmlst, परिमाण(itmlst));
+    len = म_माप(inbuf); // how many chars we got?
 
     // read immediately the rest in the IO queue
     function = (IO$_READLBLK | IO$M_TIMED | IO$M_ESCAPE | IO$M_NOECHO | IO$M_NOFILTR);
     status = sys$qiow(0, iochan, function, &iosb, 0, 0,
 			 inbuf+len, nbytes-1-len, 0, 0, 0, 0);
 
-    len = strlen(inbuf); // return the total length
+    len = म_माप(inbuf); // return the total length
 
-    return len;
+    प्रत्यागम len;
 }
 
 /*
@@ -370,28 +370,28 @@ vms_read(char *inbuf, size_t nbytes)
  * Returns:  1 - continue finding matches
  *	     0 - stop trying to find any further matches
  */
-    static int
-vms_wproc(char *name, int val)
+    स्थिर पूर्णाङ्क
+vms_wproc(वर्ण *name, पूर्णाङ्क val)
 {
-    int i;
-    static int vms_match_alloced = 0;
+    पूर्णाङ्क i;
+    स्थिर पूर्णाङ्क vms_match_alloced = 0;
 
-    if (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
-	return 1;
+    यदि (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
+	प्रत्यागम 1;
 
     // accept all DECC$K_FILE and DECC$K_DIRECTORY
-    if (vms_match_num == 0)
+    यदि (vms_match_अंक == 0)
     {
 	// first time through, setup some things
-	if (NULL == vms_fmatch)
+	यदि (रिक्त == vms_fmatch)
 	{
 	    vms_fmatch = ALLOC_MULT(char_u *, EXPL_ALLOC_INC);
-	    if (!vms_fmatch)
-		return 0;
+	    यदि (!vms_fmatch)
+		प्रत्यागम 0;
 	    vms_match_alloced = EXPL_ALLOC_INC;
 	    vms_match_free = EXPL_ALLOC_INC;
 	}
-	else
+	अन्यथा
 	{
 	    // re-use existing space
 	    vms_match_free = vms_match_alloced;
@@ -403,30 +403,30 @@ vms_wproc(char *name, int val)
     name=vms_tolower(name);
 
     // if name already exists, don't add it
-    for (i = 0; i<vms_match_num; i++)
+    प्रति (i = 0; i<vms_match_अंक; i++)
     {
-	if (0 == STRCMP((char_u *)name,vms_fmatch[i]))
-	    return 1;
+	यदि (0 == STRCMP((char_u *)name,vms_fmatch[i]))
+	    प्रत्यागम 1;
     }
-    if (--vms_match_free == 0)
+    यदि (--vms_match_free == 0)
     {
 	char_u **old_vms_fmatch = vms_fmatch;
 
 	// add more space to store matches
 	vms_match_alloced += EXPL_ALLOC_INC;
 	vms_fmatch = vim_realloc(old_vms_fmatch,
-		sizeof(char **) * vms_match_alloced);
-	if (!vms_fmatch)
+		परिमाण(वर्ण **) * vms_match_alloced);
+	यदि (!vms_fmatch)
 	{
 	    vim_free(old_vms_fmatch);
-	    return 0;
+	    प्रत्यागम 0;
 	}
 	vms_match_free = EXPL_ALLOC_INC;
     }
-    vms_fmatch[vms_match_num] = vim_strsave((char_u *)name);
+    vms_fmatch[vms_match_अंक] = vim_strsave((char_u *)name);
 
-    ++vms_match_num;
-    return 1;
+    ++vms_match_अंक;
+    प्रत्यागम 1;
 }
 
 /*
@@ -442,153 +442,153 @@ vms_wproc(char *name, int val)
  *	file	   pointer to array of pointers to matched file names
  *
  */
-    int
+    पूर्णाङ्क
 mch_expand_wildcards(
-    int		num_pat,
+    पूर्णाङ्क		अंक_pat,
     char_u	**pat,
-    int		*num_file,
+    पूर्णाङ्क		*अंक_file,
     char_u	***file,
-    int		flags)
+    पूर्णाङ्क		flags)
 {
-    int		i, cnt = 0;
+    पूर्णाङ्क		i, cnt = 0;
     char_u	buf[MAXPATHL];
-    char       *result;
-    int		dir;
-    int files_alloced, files_free;
+    वर्ण       *result;
+    पूर्णाङ्क		dir;
+    पूर्णाङ्क files_alloced, files_free;
 
-    *num_file = 0;			// default: no files found
+    *अंक_file = 0;			// default: no files found
     files_alloced = EXPL_ALLOC_INC;
     files_free = EXPL_ALLOC_INC;
     *file = ALLOC_MULT(char_u *, files_alloced);
-    if (*file == NULL)
+    यदि (*file == रिक्त)
     {
-	*num_file = 0;
-	return FAIL;
+	*अंक_file = 0;
+	प्रत्यागम FAIL;
     }
-    for (i = 0; i < num_pat; i++)
+    प्रति (i = 0; i < अंक_pat; i++)
     {
 	// expand environment var or home dir
-	if (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
+	यदि (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
 	    expand_env(pat[i],buf,MAXPATHL);
-	else
+	अन्यथा
 	    STRCPY(buf,pat[i]);
 
-	vms_match_num = 0; // reset collection counter
+	vms_match_अंक = 0; // reset collection counter
 	result = decc$translate_vms(vms_fixfilename(buf));
-	if ( (int) result == 0 || (int) result == -1  )
+	यदि ( (पूर्णाङ्क) result == 0 || (पूर्णाङ्क) result == -1  )
 	{
 	    cnt = 0;
 	}
-	else
+	अन्यथा
 	{
 	    cnt = decc$to_vms(result, vms_wproc, 1 /*allow wild*/ , (flags & EW_DIR ? 0:1 ) /*allow directory*/) ;
 	}
-	if (cnt > 0)
-	    cnt = vms_match_num;
+	यदि (cnt > 0)
+	    cnt = vms_match_अंक;
 
-	if (cnt < 1)
-	    continue;
+	यदि (cnt < 1)
+	    अनुवर्त;
 
-	for (i = 0; i < cnt; i++)
+	प्रति (i = 0; i < cnt; i++)
 	{
 	    // files should exist if expanding interactively
-	    if (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
-		continue;
+	    यदि (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
+		अनुवर्त;
 
 	    // do not include directories
 	    dir = (mch_isdir(vms_fmatch[i]));
-	    if (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
-		continue;
+	    यदि (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+		अनुवर्त;
 
 	    // Skip files that are not executable if we check for that.
-	    if (!dir && (flags & EW_EXEC)
-		 && !mch_can_exe(vms_fmatch[i], NULL, !(flags & EW_SHELLCMD)))
-		continue;
+	    यदि (!dir && (flags & EW_EXEC)
+		 && !mch_can_exe(vms_fmatch[i], रिक्त, !(flags & EW_SHELLCMD)))
+		अनुवर्त;
 
 	    // allocate memory for pointers
-	    if (--files_free < 1)
+	    यदि (--files_free < 1)
 	    {
 		char_u **old_file = *file;
 
 		files_alloced += EXPL_ALLOC_INC;
-		*file = vim_realloc(old_file, sizeof(char_u **) * files_alloced);
-		if (*file == NULL)
+		*file = vim_realloc(old_file, परिमाण(char_u **) * files_alloced);
+		यदि (*file == रिक्त)
 		{
 		    vim_free(old_file);
 		    *file = (char_u **)"";
-		    *num_file = 0;
-		    return(FAIL);
+		    *अंक_file = 0;
+		    प्रत्यागम(FAIL);
 		}
 		files_free = EXPL_ALLOC_INC;
 	    }
 
-	    (*file)[*num_file++] = vms_fmatch[i];
+	    (*file)[*अंक_file++] = vms_fmatch[i];
 	}
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
-    int
-mch_expandpath(garray_T *gap, char_u *path, int flags)
+    पूर्णाङ्क
+mch_expandpath(garray_T *gap, char_u *path, पूर्णाङ्क flags)
 {
-    int		i,cnt = 0;
-    char       *result;
+    पूर्णाङ्क		i,cnt = 0;
+    वर्ण       *result;
 
-    vms_match_num = 0;
+    vms_match_अंक = 0;
     // the result from the decc$translate_vms needs to be handled
     // otherwise it might create ACCVIO error in decc$to_vms
     result = decc$translate_vms(vms_fixfilename(path));
-    if ( (int) result == 0 || (int) result == -1  )
+    यदि ( (पूर्णाङ्क) result == 0 || (पूर्णाङ्क) result == -1  )
     {
 	cnt = 0;
     }
-    else
+    अन्यथा
     {
 	cnt = decc$to_vms(result, vms_wproc, 1 /*allow_wild*/, (flags & EW_DIR ? 0:1 ) /*allow directory*/);
     }
-    if (cnt > 0)
-	cnt = vms_match_num;
-    for (i = 0; i < cnt; i++)
+    यदि (cnt > 0)
+	cnt = vms_match_अंक;
+    प्रति (i = 0; i < cnt; i++)
     {
-	if (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
+	यदि (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
 	    addfile(gap, vms_fmatch[i], flags);
     }
-    return cnt;
+    प्रत्यागम cnt;
 }
 
 /*
  * attempt to translate a mixed unix-vms file specification to pure vms
  */
-    static void
-vms_unix_mixed_filespec(char *in, char *out)
+    स्थिर शून्य
+vms_unix_mixed_filespec(वर्ण *in, वर्ण *out)
 {
-    char *lastcolon;
-    char *end_of_dir;
-    char ch;
-    int len;
-    char *out_str=out;
+    वर्ण *lastcolon;
+    वर्ण *end_of_dir;
+    वर्ण ch;
+    पूर्णाङ्क len;
+    वर्ण *out_str=out;
 
     // copy vms filename portion up to last colon
     // (node and/or disk)
-    lastcolon = strrchr(in, ':');   // find last colon
-    if (lastcolon != NULL)
+    lastcolon = म_खोजप(in, ':');   // find last colon
+    यदि (lastcolon != रिक्त)
     {
 	len = lastcolon - in + 1;
-	strncpy(out, in, len);
+	म_नकलन(out, in, len);
 	out += len;
 	in += len;
     }
 
-    end_of_dir = NULL;	// default: no directory
+    end_of_dir = रिक्त;	// default: no directory
 
     // start of directory portion
     ch = *in;
-    if ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
+    यदि ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
     {
 	ch = '[';
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else if (EQN(in, "../", 3))      // Unix parent directory?
+    अन्यथा यदि (EQN(in, "../", 3))      // Unix parent directory?
     {
 	*out++ = '[';
 	*out++ = '-';
@@ -597,19 +597,19 @@ vms_unix_mixed_filespec(char *in, char *out)
 	in += 2;
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else
+    अन्यथा
     {                                // not a special character
-	while (EQN(in, "./", 2))     // Ignore Unix "current dir"
+	यावत् (EQN(in, "./", 2))     // Ignore Unix "current dir"
 	{
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
     }
-    if (strchr(in, '/') == NULL)     // any more Unix directories ?
+    यदि (म_अक्षर(in, '/') == रिक्त)     // any more Unix directories ?
     {
-	strcpy(out, in);             // No - get rest of the spec
-	return;
+	म_नकल(out, in);             // No - get rest of the spec
+	प्रत्यागम;
     }
-    else
+    अन्यथा
     {
 	*out++ = '[';                // Yes, denote a Vms subdirectory
 	ch = '.';
@@ -623,16 +623,16 @@ vms_unix_mixed_filespec(char *in, char *out)
     *out++ = ch;
     ++in;
 
-    while (*in != '\0')
+    यावत् (*in != '\0')
     {
 	ch = *in;
-	if ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
+	यदि ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
 	{
 	    end_of_dir = out;
 	    ch = '.';
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else if (EQN(in, "../", 3))     // Unix parent directory?
+	अन्यथा यदि (EQN(in, "../", 3))     // Unix parent directory?
 	{
 	    *out++ = '-';
 	    end_of_dir = out;
@@ -640,9 +640,9 @@ vms_unix_mixed_filespec(char *in, char *out)
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else
+	अन्यथा
 	{
-	    while (EQN(in, "./", 2))    // Ignore Unix "current dir"
+	    यावत् (EQN(in, "./", 2))    // Ignore Unix "current dir"
 	    {
 		end_of_dir = out;
 		in += 2;
@@ -658,72 +658,72 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     *out = '\0';            // Terminate output file spec
 
-    if (end_of_dir != NULL) // Terminate directory portion
+    यदि (end_of_dir != रिक्त) // Terminate directory portion
 	*end_of_dir = ']';
 }
 
 /*
  * for decc$to_vms in vms_fixfilename
  */
-    static int
-vms_fspec_proc(char *fil, int val)
+    स्थिर पूर्णाङ्क
+vms_fspec_proc(वर्ण *fil, पूर्णाङ्क val)
 {
-    strcpy(Fspec_Rms,fil);
-    return(1);
+    म_नकल(Fspec_Rms,fil);
+    प्रत्यागम(1);
 }
 
 /*
  * change unix and mixed filenames to VMS
  */
-    void *
-vms_fixfilename(void *instring)
+    शून्य *
+vms_fixfilename(शून्य *instring)
 {
-    static char		*buf = NULL;
-    static size_t	buflen = 0;
-    size_t		len;
+    स्थिर वर्ण		*buf = रिक्त;
+    स्थिर माप_प्रकार	buflen = 0;
+    माप_प्रकार		len;
 
     // get a big-enough buffer
-    len = strlen(instring) + 1;
-    if (len > buflen)
+    len = म_माप(instring) + 1;
+    यदि (len > buflen)
     {
 	buflen = len + 128;
-	buf = vim_realloc(buf, buflen * sizeof(char));
+	buf = vim_realloc(buf, buflen * परिमाण(वर्ण));
     }
 
 #ifdef DEBUG
-    char		 *tmpbuf = NULL;
-    tmpbuf = ALLOC_MULT(char, buflen);
-    strcpy(tmpbuf, instring);
+    वर्ण		 *tmpbuf = रिक्त;
+    tmpbuf = ALLOC_MULT(वर्ण, buflen);
+    म_नकल(tmpbuf, instring);
 #endif
 
     Fspec_Rms = buf;				// for decc$to_vms
 
-    if (strchr(instring,'/') == NULL)
+    यदि (म_अक्षर(instring,'/') == रिक्त)
 	// It is already a VMS file spec
-	strcpy(buf, instring);
-    else if (strchr(instring,'"') == NULL)	// password in the path?
+	म_नकल(buf, instring);
+    अन्यथा यदि (म_अक्षर(instring,'"') == रिक्त)	// password in the path?
     {
 	// Seems it is a regular file, let guess that it is pure Unix fspec
-	if ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
-	     (strchr(instring,']') == NULL) && (strchr(instring,'>') == NULL) &&
-	     (strchr(instring,':') == NULL) )
+	यदि ( (म_अक्षर(instring,'[') == रिक्त) && (म_अक्षर(instring,'<') == रिक्त) &&
+	     (म_अक्षर(instring,']') == रिक्त) && (म_अक्षर(instring,'>') == रिक्त) &&
+	     (म_अक्षर(instring,':') == रिक्त) )
 	{
 	    // It must be a truly unix fspec
 	    decc$to_vms(instring, vms_fspec_proc, 0, 0);
 	}
-	else
+	अन्यथा
 	{
 	    // It is a mixed fspec
 	    vms_unix_mixed_filespec(instring, buf);
 	}
     }
-    else
+    अन्यथा
 	// we have a password in the path
 	// decc$ functions can not handle
 	// this is our only hope to resolv
 	vms_unix_mixed_filespec(instring, buf);
 
-    return buf;
+    प्रत्यागम buf;
 }
 
 /*
@@ -745,55 +745,55 @@ vms_fixfilename(void *instring)
  * clear.  Currently, many invalid version strings are not treated as
  * version strings.  (More could be.)
  */
-    void
-vms_remove_version(void * fname)
+    शून्य
+vms_remove_version(शून्य * fname)
 {
     char_u	*dp;	        // Dot pointer
     char_u	*rp;            // Right pointer
-    int		done = 0;
-    int		vdigits = 0;
+    पूर्णाङ्क		done = 0;
+    पूर्णाङ्क		vdigits = 0;
 
-    rp = (char_u *)fname+ strlen( (char *)fname)- 1;    // Rightmost char
-    while ((done == 0) && (rp > (char_u *)fname))       // Count digits
+    rp = (char_u *)fname+ म_माप( (वर्ण *)fname)- 1;    // Rightmost char
+    यावत् ((done == 0) && (rp > (char_u *)fname))       // Count digits
     {
-	if (isdigit( *rp))
+	यदि (है_अंक( *rp))
 	{
 	    vdigits++;
 	    *rp--;
 	}
-	else
+	अन्यथा
 	{
 	    done = 1;                                   // Quit at non-digit
 	}
     } // while (Count digits)
 
-    if (vdigits  <= 5)                  // If likely version digits, check delimiter
+    यदि (vdigits  <= 5)                  // If likely version digits, check delimiter
     {                                   // (Could check for <= 32767, not just five digits or fewer.)
-	if (*rp == (char_u)';')
+	यदि (*rp == (char_u)';')
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
+	    यदि ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
 	    {                           // Unescaped ";"
 		*rp = '\0';             // Trim off ";nnn"
 	    }
 	}
-	else if (*rp == (char_u)'.')    // Last of multiple dots?
+	अन्यथा यदि (*rp == (char_u)'.')    // Last of multiple dots?
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
+	    यदि ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
 	    {                           // Unescaped dot.  Version requires previous one
 		dp = rp- 1;             // Scan chars before "."
 		done = 0;
-		while ((done == 0) && (dp >= (char_u *)fname))
+		यावत् ((done == 0) && (dp >= (char_u *)fname))
 		{
-		    if ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
+		    यदि ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
 		    {                   // Possible VMS dev:[dir] delimiter (or UNIX "/")
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			यदि ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dev:[dir] (or /) delimiter
 			    done = 1;   // No previous dot found in name
 			}
 		    }
-		    else if (*dp == '.')
+		    अन्यथा यदि (*dp == '.')
 		    {                   // Possible dot delimiter
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			यदि ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dot delimiter
 			    done = 1;   // Previous dot found in name
 			    *rp = '\0'; // Trim off ".nnn"
@@ -806,14 +806,14 @@ vms_remove_version(void * fname)
 	// Else no version found to remove
     } // if (vdigits  <= 5)
 
-    return ;
+    प्रत्यागम ;
 }
 
-struct typeahead_st {
-    unsigned short numchars;
-    unsigned char  firstchar;
-    unsigned char  reserved0;
-    unsigned long  reserved1;
+संरचना typeahead_st {
+    अचिन्हित लघु numchars;
+    अचिन्हित वर्ण  firstchar;
+    अचिन्हित वर्ण  reserved0;
+    अचिन्हित दीर्घ  reserved1;
 } typeahead;
 
 /*
@@ -821,33 +821,33 @@ struct typeahead_st {
  * "msec" == 0 will check for characters once.
  * "msec" == -1 will block until a character is available.
  */
-    int
+    पूर्णाङ्क
 RealWaitForChar(
-    int		fd UNUSED, // always read from iochan
-    long	msec,
-    int		*check_for_gpm UNUSED,
-    int		*interrupted)
+    पूर्णाङ्क		fd UNUSED, // always read from iochan
+    दीर्घ	msec,
+    पूर्णाङ्क		*check_for_gpm UNUSED,
+    पूर्णाङ्क		*interrupted)
 {
-    int status;
-    struct _generic_64 time_curr;
-    struct _generic_64 time_diff;
-    struct _generic_64 time_out;
-    unsigned int convert_operation = LIB$K_DELTA_SECONDS_F;
-    float sec =(float) msec/1000;
+    पूर्णाङ्क status;
+    संरचना _generic_64 time_curr;
+    संरचना _generic_64 time_diff;
+    संरचना _generic_64 time_out;
+    अचिन्हित पूर्णाङ्क convert_operation = LIB$K_DELTA_SECONDS_F;
+    भिन्न sec =(भिन्न) msec/1000;
 
     // make sure the iochan is set
-    if (!iochan)
+    यदि (!iochan)
 	get_tty();
 
-    if (sec > 0)
+    यदि (sec > 0)
     {
 	// time-out specified; convert it to absolute time
 	// sec>0 requirement of lib$cvt[fs]_to_internal_time()
 
 	// get current time (number of 100ns ticks since the VMS Epoch)
 	status = sys$gettim(&time_curr);
-	if (status != SS$_NORMAL)
-	    return 0; // error
+	यदि (status != SS$_NORMAL)
+	    प्रत्यागम 0; // error
 	// construct the delta time
 
 /* On all non-VAX hardware architectures, the "CC /FLOAT=option"
@@ -857,85 +857,85 @@ RealWaitForChar(
  * format being used, not the hardware architecture.  Choose the
  * appropriate time conversion function accordingly.
  */
-#if __IEEE_FLOAT
+#यदि __IEEE_FLOAT
 // allow fallback for older Alphas
 # ifdef lib$cvts_to_internal_time
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvts_to_internal_time // IEEE
-# else
+# अन्यथा
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time
 # endif
-#else
+#अन्यथा
 # define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time // VAX
 #endif // __IEEE_FLOAT CVTS
 
 	status = LIB_CVTX_TO_INTERNAL_TIME(
 		&convert_operation, &sec, &time_diff);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	यदि (status != LIB$_NORMAL)
+	    प्रत्यागम 0; // error
 	// add them up
 	status = lib$add_times(
 		&time_curr,
 		&time_diff,
 		&time_out);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	यदि (status != LIB$_NORMAL)
+	    प्रत्यागम 0; // error
     }
 
-    while (TRUE)
+    यावत् (TRUE)
     {
 	// select()
 	status = sys$qiow(0, iochan, IO$_SENSEMODE | IO$M_TYPEAHDCNT, iosb,
 		0, 0, &typeahead, 8, 0, 0, 0, 0);
-	if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
-	    return 0; // error
+	यदि (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+	    प्रत्यागम 0; // error
 
-	if (typeahead.numchars)
-	    return 1; // ready to read
+	यदि (typeahead.numchars)
+	    प्रत्यागम 1; // ready to read
 
 	// there's nothing to read; what now?
-	if (msec == 0)
+	यदि (msec == 0)
 	{
 	    // immediate time-out; return impatiently
-	    return 0;
+	    प्रत्यागम 0;
 	}
-	else if (msec < 0)
+	अन्यथा यदि (msec < 0)
 	{
 	    // no time-out; wait on indefinitely
-	    return 1; // fakeout to force a wait in vms_read()
+	    प्रत्यागम 1; // fakeout to force a wait in vms_read()
 	}
-	else
+	अन्यथा
 	{
 	    // time-out needs to be checked
 	    status = sys$gettim(&time_curr);
-	    if (status != SS$_NORMAL)
-		return 0; // error
+	    यदि (status != SS$_NORMAL)
+		प्रत्यागम 0; // error
 
 	    status = lib$sub_times(
 		    &time_out,
 		    &time_curr,
 		    &time_diff);
-	    if (status != LIB$_NORMAL)
-		return 0; // error, incl. time_diff < 0 (i.e. time-out)
+	    यदि (status != LIB$_NORMAL)
+		प्रत्यागम 0; // error, incl. time_diff < 0 (i.e. time-out)
 
 	    // otherwise wait some more
 	}
     }
 }
 
-#if !defined( __VAX) && (__CRTL_VER >= 70301000)
+#यदि !defined( __VAX) && (__CRTL_VER >= 70301000)
 
 # include <stdio.h>
 # include <unixlib.h>
 
 // Structure to hold a DECC$* feature name and its desired value
 
-typedef struct
+प्रकारनिर्देश संरचना
    {
-   char *name;
-   int value;
+   वर्ण *name;
+   पूर्णाङ्क मूल्य;
    } decc_feat_t;
 
-int vms_init_done = -1;
+पूर्णाङ्क vms_init_done = -1;
 
 decc_feat_t decc_feat_array[] = {
 
@@ -950,7 +950,7 @@ decc_feat_t decc_feat_array[] = {
  { "DECC$EFS_CHARSET", 1 },
 
    // List terminator
- { (char *)NULL, 0 } };
+ { (वर्ण *)रिक्त, 0 } };
 
 
 /* LIB$INITIALIZE initialization.
@@ -978,46 +978,46 @@ decc_feat_t decc_feat_array[] = {
  * LIB$INITIALIZE initialization function
  */
 
-static void
-vms_init(void)
+स्थिर शून्य
+vms_init(शून्य)
 {
     // Set the global flag to indicate that LIB$INITIALIZE worked
 
     vms_init_done = 1;
 
-    int feat_index;
-    int feat_value;
-    int feat_value_max;
-    int feat_value_min;
-    int i;
-    int sts;
+    पूर्णाङ्क feat_index;
+    पूर्णाङ्क feat_मूल्य;
+    पूर्णाङ्क feat_मूल्य_max;
+    पूर्णाङ्क feat_मूल्य_min;
+    पूर्णाङ्क i;
+    पूर्णाङ्क sts;
 
     // Loop through all items in the decc_feat_array[]
-    for (i = 0; decc_feat_array[i].name != NULL; i++)
+    प्रति (i = 0; decc_feat_array[i].name != रिक्त; i++)
     {
 	// Get the feature index
 	feat_index = decc$feature_get_index(decc_feat_array[i].name);
-	if (feat_index >= 0)
+	यदि (feat_index >= 0)
 	{
 	    // Valid item.  Collect its properties
-	    feat_value = decc$feature_get_value(feat_index, 1);
-	    feat_value_min = decc$feature_get_value(feat_index, 2);
-	    feat_value_max = decc$feature_get_value(feat_index, 3);
+	    feat_मूल्य = decc$feature_get_मूल्य(feat_index, 1);
+	    feat_मूल्य_min = decc$feature_get_मूल्य(feat_index, 2);
+	    feat_मूल्य_max = decc$feature_get_मूल्य(feat_index, 3);
 
-	    if ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
+	    यदि ((decc_feat_array[i].मूल्य >= feat_मूल्य_min) && (decc_feat_array[i].मूल्य <= feat_मूल्य_max))
 	    {
 		// Valid value.  Set it if necessary
-		if (feat_value != decc_feat_array[i].value)
-		    sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
+		यदि (feat_मूल्य != decc_feat_array[i].मूल्य)
+		    sts = decc$feature_set_मूल्य(feat_index, 1, decc_feat_array[i].मूल्य);
 	    }
-	    else
+	    अन्यथा
 		// Invalid DECC feature value
-		printf("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
-			feat_value, feat_value_min, decc_feat_array[i].name, feat_value_max);
+		म_लिखो("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
+			feat_मूल्य, feat_मूल्य_min, decc_feat_array[i].name, feat_मूल्य_max);
 	}
-	else
+	अन्यथा
 	    // Invalid DECC feature name
-	    printf("UNKNOWN DECC FEATURE: %s.\n", decc_feat_array[i].name);
+	    म_लिखो("UNKNOWN DECC FEATURE: %s.\n", decc_feat_array[i].name);
     }
 }
 
@@ -1032,19 +1032,19 @@ vms_init(void)
 # pragma extern_model save
 
 # pragma extern_model strict_refdef "LIB$INITIALIZE" 2, nopic, nowrt
-void (*const x_vms_init)() = vms_init;
+शून्य (*ध्रुव x_vms_init)() = vms_init;
 
 # pragma extern_model strict_refdef "LIB$INITIALIZ" 2, nopic, nowrt
-const int spare[ 8] = { 0 };
+ध्रुव पूर्णाङ्क spare[ 8] = { 0 };
 
 # pragma extern_model restore
 
 // Fake reference to ensure loading the LIB$INITIALIZE PSECT
 
 # pragma extern_model save
-int LIB$INITIALIZE(void);
+पूर्णाङ्क LIB$INITIALIZE(शून्य);
 # pragma extern_model strict_refdef
-int dmy_lib$initialize = (int) LIB$INITIALIZE;
+पूर्णाङ्क dmy_lib$initialize = (पूर्णाङ्क) LIB$INITIALIZE;
 # pragma extern_model restore
 
 # pragma standard
