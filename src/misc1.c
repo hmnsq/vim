@@ -11,14 +11,14 @@
  * misc1.c: functions that didn't seem to fit elsewhere
  */
 
-#include "vim.h"
-#include "version.h"
+#ضمن "vim.h"
+#ضمن "version.h"
 
-#if defined(__HAIKU__)
+#إذا defined(__HAIKU__)
 # include <storage/FindDirectory.h>
 #endif
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 # include <lm.h>
 #endif
 
@@ -26,7 +26,7 @@
 #define URL_BACKSLASH	2		// path_is_url() has found ":\\"
 
 // All user names (for ~user completion as done by shell).
-static garray_T	ga_users;
+ساكن garray_T	ga_users;
 
 /*
  * get_leader_len() returns the length in bytes of the prefix of the given
@@ -38,142 +38,142 @@ static garray_T	ga_users;
  * If "include_space" is set, include trailing whitespace while calculating the
  * length.
  */
-    int
+    صحيح
 get_leader_len(
-    char_u	*line,
+    char_u	*سطر,
     char_u	**flags,
-    int		backward,
-    int		include_space)
+    صحيح		backward,
+    صحيح		include_space)
 {
-    int		i, j;
-    int		result;
-    int		got_com = FALSE;
-    int		found_one;
+    صحيح		i, j;
+    صحيح		result;
+    صحيح		got_com = FALSE;
+    صحيح		found_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
     char_u	*string;		// pointer to comment string
     char_u	*list;
-    int		middle_match_len = 0;
+    صحيح		درمیان_match_len = 0;
     char_u	*prev_list;
-    char_u	*saved_flags = NULL;
+    char_u	*saved_flags = عدم;
 
     result = i = 0;
-    while (VIM_ISWHITE(line[i]))    // leading white space is ignored
+    طالما (VIM_ISWHITE(سطر[i]))    // leading white space is ignored
 	++i;
 
     /*
      * Repeat to match several nested comment strings.
      */
-    while (line[i] != NUL)
+    طالما (سطر[i] != NUL)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
 	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	لكل (list = curbuf->b_p_com; *list; )
 	{
 	    // Get one option part into part_buf[].  Advance "list" to next
 	    // one.  Put "string" at start of string.
-	    if (!got_com && flags != NULL)
+	    إذا (!got_com && flags != عدم)
 		*flags = list;	    // remember where flags started
 	    prev_list = list;
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (فراغ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	    // missing ':', ignore this part
-		continue;
+	    إذا (string == عدم)	    // missing ':', ignore this part
+		استمر;
 	    *string++ = NUL;	    // isolate flags from string
 
 	    // If we found a middle match previously, use that match when this
 	    // is not a middle or end.
-	    if (middle_match_len != 0
-		    && vim_strchr(part_buf, COM_MIDDLE) == NULL
-		    && vim_strchr(part_buf, COM_END) == NULL)
-		break;
+	    إذا (درمیان_match_len != 0
+		    && vim_strchr(part_buf, COM_درمیان) == عدم
+		    && vim_strchr(part_buf, COM_END) == عدم)
+		اكسر;
 
 	    // When we already found a nested comment, only accept further
 	    // nested comments.
-	    if (got_com && vim_strchr(part_buf, COM_NEST) == NULL)
-		continue;
+	    إذا (got_com && vim_strchr(part_buf, COM_NEST) == عدم)
+		استمر;
 
 	    // When 'O' flag present and using "O" command skip this one.
-	    if (backward && vim_strchr(part_buf, COM_NOBACK) != NULL)
-		continue;
+	    إذا (backward && vim_strchr(part_buf, COM_NOBACK) != عدم)
+		استمر;
 
 	    // Line contents and string must match.
 	    // When string starts with white space, must have some white space
 	    // (but the amount does not need to match, there might be a mix of
 	    // TABs and spaces).
-	    if (VIM_ISWHITE(string[0]))
+	    إذا (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;  // missing white space
-		while (VIM_ISWHITE(string[0]))
+		إذا (i == 0 || !VIM_ISWHITE(سطر[i - 1]))
+		    استمر;  // missing white space
+		طالما (VIM_ISWHITE(string[0]))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    لكل (j = 0; string[j] != NUL && string[j] == سطر[i + j]; ++j)
 		;
-	    if (string[j] != NUL)
-		continue;  // string doesn't match
+	    إذا (string[j] != NUL)
+		استمر;  // string doesn't match
 
 	    // When 'b' flag used, there must be white space or an
 	    // end-of-line after the string in the line.
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-			   && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    إذا (vim_strchr(part_buf, COM_BLANK) != عدم
+			   && !VIM_ISWHITE(سطر[i + j]) && سطر[i + j] != NUL)
+		استمر;
 
 	    // We have found a match, stop searching unless this is a middle
 	    // comment. The middle comment can be a substring of the end
 	    // comment in which case it's better to return the length of the
 	    // end comment and its flags.  Thus we keep searching with middle
 	    // and end matches and use an end match if it matches better.
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    إذا (vim_strchr(part_buf, COM_درمیان) != عدم)
 	    {
-		if (middle_match_len == 0)
+		إذا (درمیان_match_len == 0)
 		{
-		    middle_match_len = j;
+		    درمیان_match_len = j;
 		    saved_flags = prev_list;
 		}
-		continue;
+		استمر;
 	    }
-	    if (middle_match_len != 0 && j > middle_match_len)
+	    إذا (درمیان_match_len != 0 && j > درمیان_match_len)
 		// Use this match instead of the middle match, since it's a
 		// longer thus better match.
-		middle_match_len = 0;
+		درمیان_match_len = 0;
 
-	    if (middle_match_len == 0)
+	    إذا (درمیان_match_len == 0)
 		i += j;
 	    found_one = TRUE;
-	    break;
+	    اكسر;
 	}
 
-	if (middle_match_len != 0)
+	إذا (درمیان_match_len != 0)
 	{
 	    // Use the previously found middle match after failing to find a
 	    // match with an end.
-	    if (!got_com && flags != NULL)
+	    إذا (!got_com && flags != عدم)
 		*flags = saved_flags;
-	    i += middle_match_len;
+	    i += درمیان_match_len;
 	    found_one = TRUE;
 	}
 
 	// No match found, stop scanning.
-	if (!found_one)
-	    break;
+	إذا (!found_one)
+	    اكسر;
 
 	result = i;
 
 	// Include any trailing white space.
-	while (VIM_ISWHITE(line[i]))
+	طالما (VIM_ISWHITE(سطر[i]))
 	    ++i;
 
-	if (include_space)
+	إذا (include_space)
 	    result = i;
 
 	// If this comment doesn't nest, stop here.
 	got_com = TRUE;
-	if (vim_strchr(part_buf, COM_NEST) == NULL)
-	    break;
+	إذا (vim_strchr(part_buf, COM_NEST) == عدم)
+	    اكسر;
     }
-    return result;
+    أرجع result;
 }
 
 /*
@@ -183,30 +183,30 @@ get_leader_len(
  * When "flags" is not null, it is set to point to the flags describing the
  * recognized comment leader.
  */
-    int
-get_last_leader_offset(char_u *line, char_u **flags)
+    صحيح
+get_last_leader_offset(char_u *سطر, char_u **flags)
 {
-    int		result = -1;
-    int		i, j;
-    int		lower_check_bound = 0;
+    صحيح		result = -1;
+    صحيح		i, j;
+    صحيح		lower_check_bound = 0;
     char_u	*string;
     char_u	*com_leader;
     char_u	*com_flags;
     char_u	*list;
-    int		found_one;
+    صحيح		found_one;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
 
     /*
      * Repeat to match several nested comment strings.
      */
-    i = (int)STRLEN(line);
-    while (--i >= lower_check_bound)
+    i = (صحيح)STRLEN(سطر);
+    طالما (--i >= lower_check_bound)
     {
 	/*
 	 * scan through the 'comments' option for a match
 	 */
 	found_one = FALSE;
-	for (list = curbuf->b_p_com; *list; )
+	لكل (list = curbuf->b_p_com; *list; )
 	{
 	    char_u *flags_save = list;
 
@@ -214,11 +214,11 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * Get one option part into part_buf[].  Advance list to next one.
 	     * put string at start of string.
 	     */
-	    (void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	    (فراغ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	    string = vim_strchr(part_buf, ':');
-	    if (string == NULL)	// If everything is fine, this cannot actually
+	    إذا (string == عدم)	// If everything is fine, this cannot actually
 				// happen.
-		continue;
+		استمر;
 	    *string++ = NUL;	// Isolate flags from string.
 	    com_leader = string;
 
@@ -228,37 +228,37 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * (but the amount does not need to match, there might be a mix of
 	     * TABs and spaces).
 	     */
-	    if (VIM_ISWHITE(string[0]))
+	    إذا (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
-		    continue;
-		while (VIM_ISWHITE(*string))
+		إذا (i == 0 || !VIM_ISWHITE(سطر[i - 1]))
+		    استمر;
+		طالما (VIM_ISWHITE(*string))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    لكل (j = 0; string[j] != NUL && string[j] == سطر[i + j]; ++j)
 		/* do nothing */;
-	    if (string[j] != NUL)
-		continue;
+	    إذا (string[j] != NUL)
+		استمر;
 
 	    /*
 	     * When 'b' flag used, there must be white space or an
 	     * end-of-line after the string in the line.
 	     */
-	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-		    && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
-		continue;
+	    إذا (vim_strchr(part_buf, COM_BLANK) != عدم
+		    && !VIM_ISWHITE(سطر[i + j]) && سطر[i + j] != NUL)
+		استمر;
 
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    إذا (vim_strchr(part_buf, COM_درمیان) != عدم)
 	    {
 		// For a middlepart comment, only consider it to match if
 		// everything before the current position in the line is
 		// whitespace.  Otherwise we would think we are inside a
 		// comment if the middle part appears somewhere in the middle
 		// of the line.  E.g. for C the "*" appears often.
-		for (j = 0; VIM_ISWHITE(line[j]) && j <= i; j++)
+		لكل (j = 0; VIM_ISWHITE(سطر[j]) && j <= i; j++)
 		    ;
-		if (j < i)
-		    continue;
+		إذا (j < i)
+		    استمر;
 	    }
 
 	    /*
@@ -266,24 +266,24 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     */
 	    found_one = TRUE;
 
-	    if (flags)
+	    إذا (flags)
 		*flags = flags_save;
 	    com_flags = flags_save;
 
-	    break;
+	    اكسر;
 	}
 
-	if (found_one)
+	إذا (found_one)
 	{
 	    char_u  part_buf2[COM_MAX_LEN];	// buffer for one option part
-	    int     len1, len2, off;
+	    صحيح     len1, len2, off;
 
 	    result = i;
 	    /*
 	     * If this comment nests, continue searching.
 	     */
-	    if (vim_strchr(part_buf, COM_NEST) != NULL)
-		continue;
+	    إذا (vim_strchr(part_buf, COM_NEST) != عدم)
+		استمر;
 
 	    lower_check_bound = i;
 
@@ -292,62 +292,62 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	    // lower_check_bound so that we make sure that we have determined
 	    // the comment leader correctly.
 
-	    while (VIM_ISWHITE(*com_leader))
+	    طالما (VIM_ISWHITE(*com_leader))
 		++com_leader;
-	    len1 = (int)STRLEN(com_leader);
+	    len1 = (صحيح)STRLEN(com_leader);
 
-	    for (list = curbuf->b_p_com; *list; )
+	    لكل (list = curbuf->b_p_com; *list; )
 	    {
 		char_u *flags_save = list;
 
-		(void)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
-		if (flags_save == com_flags)
-		    continue;
+		(فراغ)copy_option_part(&list, part_buf2, COM_MAX_LEN, ",");
+		إذا (flags_save == com_flags)
+		    استمر;
 		string = vim_strchr(part_buf2, ':');
 		++string;
-		while (VIM_ISWHITE(*string))
+		طالما (VIM_ISWHITE(*string))
 		    ++string;
-		len2 = (int)STRLEN(string);
-		if (len2 == 0)
-		    continue;
+		len2 = (صحيح)STRLEN(string);
+		إذا (len2 == 0)
+		    استمر;
 
 		// Now we have to verify whether string ends with a substring
 		// beginning the com_leader.
-		for (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
+		لكل (off = (len2 > i ? i : len2); off > 0 && off + len1 > len2;)
 		{
 		    --off;
-		    if (STRNCMP(string + off, com_leader, len2 - off) == 0)
+		    إذا (STRNCMP(string + off, com_leader, len2 - off) == 0)
 		    {
-			if (i - off < lower_check_bound)
+			إذا (i - off < lower_check_bound)
 			    lower_check_bound = i - off;
 		    }
 		}
 	    }
 	}
     }
-    return result;
+    أرجع result;
 }
 
 /*
  * Return the number of window lines occupied by buffer line "lnum".
  * Includes any filler lines.
  */
-    int
+    صحيح
 plines(linenr_T lnum)
 {
-    return plines_win(curwin, lnum, TRUE);
+    أرجع plines_win(curwin, lnum, TRUE);
 }
 
-    int
+    صحيح
 plines_win(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    صحيح		limit_winheight)	// when TRUE limit to window height
 {
-#if defined(FEAT_DIFF)
+#إذا defined(FEAT_DIFF)
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    return plines_win_nofill(wp, lnum, limit_winheight)
+    أرجع plines_win_nofill(wp, lnum, limit_winheight)
 						   + diff_check_fill(wp, lnum);
 }
 
@@ -355,120 +355,120 @@ plines_win(
  * Return the number of window lines occupied by buffer line "lnum".
  * Does not include filler lines.
  */
-    int
+    صحيح
 plines_nofill(linenr_T lnum)
 {
-    return plines_win_nofill(curwin, lnum, TRUE);
+    أرجع plines_win_nofill(curwin, lnum, TRUE);
 }
 
-    int
+    صحيح
 plines_win_nofill(
     win_T	*wp,
     linenr_T	lnum,
-    int		limit_winheight)	// when TRUE limit to window height
+    صحيح		limit_winheight)	// when TRUE limit to window height
 {
 #endif
-    int		lines;
+    صحيح		سطریں;
 
-    if (wp->w_width == 0)
-	return 1;
+    إذا (wp->w_width == 0)
+	أرجع 1;
 
 #ifdef FEAT_FOLDING
     // Folded lines are handled just like an empty line.
     // NOTE: Caller must handle lines that are MAYBE folded.
-    if (lineFolded(wp, lnum) == TRUE)
-	return 1;
+    إذا (سطر_Folded(wp, lnum) == TRUE)
+	أرجع 1;
 #endif
 
-    if (!wp->w_p_wrap)
-	lines = 1
+    إذا (!wp->w_p_wrap)
+	سطریں = 1
 #ifdef FEAT_PROP_POPUP
 	    // add a line for each "above" and "below" aligned text property
-	    + prop_count_above_below(wp->w_buffer, lnum)
+	    + prop_گنتی_above_below(wp->w_buffer, lnum)
 #endif
 	;
-    else
-	lines = plines_win_nofold(wp, lnum);
+    وإلا
+	سطریں = plines_win_nofold(wp, lnum);
 
-    if (limit_winheight && lines > wp->w_height)
-	return wp->w_height;
-    return lines;
+    إذا (limit_winheight && سطریں > wp->w_height)
+	أرجع wp->w_height;
+    أرجع سطریں;
 }
 
 /*
  * Return number of window lines physical line "lnum" will occupy in window
  * "wp".  Does not care about folding, 'wrap' or 'diff'.
  */
-    int
+    صحيح
 plines_win_nofold(win_T *wp, linenr_T lnum)
 {
     char_u	*s;
     long	col;
-    int		width;
+    صحيح		width;
     chartabsize_T cts;
 
     s = ml_get_buf(wp->w_buffer, lnum, FALSE);
     init_chartabsize_arg(&cts, wp, lnum, 0, s, s);
-    if (*s == NUL
+    إذا (*s == NUL
 #ifdef FEAT_PROP_POPUP
 	    && !cts.cts_has_prop_with_text
 #endif
 	    )
-	return 1; // be quick for an empty line
+	أرجع 1; // be quick for an empty line
     win_linetabsize_cts(&cts, (colnr_T)MAXCOL);
     clear_chartabsize_arg(&cts);
-    col = (int)cts.cts_vcol;
+    col = (صحيح)cts.cts_vcol;
 
     // If list mode is on, then the '$' at the end of the line may take up one
     // extra column.
-    if (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
+    إذا (wp->w_p_list && wp->w_lcs_chars.eol != NUL)
 	col += 1;
 
     /*
      * Add column offset for 'number', 'relativenumber' and 'foldcolumn'.
      */
     width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 32000;
-    if (col <= width)
-	return 1;
+    إذا (width <= 0)
+	أرجع 32000;
+    إذا (col <= width)
+	أرجع 1;
     col -= width;
     width += win_col_off2(wp);
-    return (col + (width - 1)) / width + 1;
+    أرجع (col + (width - 1)) / width + 1;
 }
 
 /*
  * Like plines_win(), but only reports the number of physical screen lines
  * used from the start of the line to the given byte column.
  */
-    int
+    صحيح
 plines_win_col(win_T *wp, linenr_T lnum, long column)
 {
     long	col;
-    int		lines = 0;
-    int		width;
-    char_u	*line;
+    صحيح		سطریں = 0;
+    صحيح		width;
+    char_u	*سطر;
     chartabsize_T cts;
 
 #ifdef FEAT_DIFF
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    lines = diff_check_fill(wp, lnum);
+    سطریں = diff_check_fill(wp, lnum);
 #endif
 
-    if (!wp->w_p_wrap)
-	return lines + 1;
+    إذا (!wp->w_p_wrap)
+	أرجع سطریں + 1;
 
-    if (wp->w_width == 0)
-	return lines + 1;
+    إذا (wp->w_width == 0)
+	أرجع سطریں + 1;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    سطر = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, سطر, سطر);
     // "column" is a byte index, advance the pointer until it is reached.
-    while (*cts.cts_ptr != NUL && cts.cts_ptr < line + column)
+    طالما (*cts.cts_ptr != NUL && cts.cts_ptr < سطر + column)
     {
-	cts.cts_vcol += win_lbr_chartabsize(&cts, NULL, NULL);
+	cts.cts_vcol += win_lbr_chartabsize(&cts, عدم, عدم);
 	MB_PTR_ADV(cts.cts_ptr);
     }
 
@@ -480,22 +480,22 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
      * 'columns' is not a multiple of 'ts') -- webb.
      */
     col = cts.cts_vcol;
-    if (*cts.cts_ptr == TAB && (State & MODE_NORMAL)
+    إذا (*cts.cts_ptr == TAB && (State & MODE_NORMAL)
 				    && (!wp->w_p_list || wp->w_lcs_chars.tab1))
-	col += win_lbr_chartabsize(&cts, NULL, NULL) - 1;
+	col += win_lbr_chartabsize(&cts, عدم, عدم) - 1;
     clear_chartabsize_arg(&cts);
 
     /*
      * Add column offset for 'number', 'relativenumber', 'foldcolumn', etc.
      */
     width = wp->w_width - win_col_off(wp);
-    if (width <= 0)
-	return 9999;
+    إذا (width <= 0)
+	أرجع 9999;
 
-    lines += 1;
-    if (col > width)
-	lines += (col - width) / (width + win_col_off2(wp)) + 1;
-    return lines;
+    سطریں += 1;
+    إذا (col > width)
+	سطریں += (col - width) / (width + win_col_off2(wp)) + 1;
+    أرجع سطریں;
 }
 
 /*
@@ -503,95 +503,95 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
  * "last" will occupy in window "wp". Takes into account folding, 'wrap',
  * topfill and filler lines beyond the end of the buffer. Limit to "max" lines.
  */
-    int
-plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
+    صحيح
+plines_m_win(win_T *wp, linenr_T first, linenr_T last, صحيح max)
 {
-    int		count = 0;
+    صحيح		گنتی = 0;
 
-    while (first <= last && count < max)
+    طالما (first <= last && گنتی < max)
     {
 #ifdef FEAT_FOLDING
-	int	x;
+	صحيح	x;
 
 	// Check if there are any really folded lines, but also included lines
 	// that are maybe folded.
-	x = foldedCount(wp, first, NULL);
-	if (x > 0)
+	x = folded_گنتی(wp, first, عدم);
+	إذا (x > 0)
 	{
-	    ++count;	    // count 1 for "+-- folded" line
+	    ++گنتی;	    // count 1 for "+-- folded" line
 	    first += x;
 	}
-	else
+	وإلا
 #endif
 	{
 #ifdef FEAT_DIFF
-	    if (first == wp->w_topline)
-		count += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
-	    else
+	    إذا (first == wp->w_topline)
+		گنتی += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
+	    وإلا
 #endif
-		count += plines_win(wp, first, FALSE);
+		گنتی += plines_win(wp, first, FALSE);
 	    ++first;
 	}
     }
 #ifdef FEAT_DIFF
-    if (first == wp->w_buffer->b_ml.ml_line_count + 1)
-	count += diff_check_fill(wp, first);
+    إذا (first == wp->w_buffer->b_ml.ml_سطر_گنتی + 1)
+	گنتی += diff_check_fill(wp, first);
 #endif
-    return MIN(max, count);
+    أرجع MIN(max, گنتی);
 }
 
-    int
+    صحيح
 gchar_pos(pos_T *pos)
 {
     char_u	*ptr;
-    int		ptrlen;
+    صحيح		ptrlen;
 
     // When searching columns is sometimes put at the end of a line.
-    if (pos->col == MAXCOL)
-	return NUL;
+    إذا (pos->col == MAXCOL)
+	أرجع NUL;
     ptrlen = ml_get_len(pos->lnum);
     ptr = ml_get_pos(pos);
-    if (pos->col > ptrlen)
-	return NUL;
-    if (has_mbyte)
-	return (*mb_ptr2char)(ptr);
-    return (int)*ptr;
+    إذا (pos->col > ptrlen)
+	أرجع NUL;
+    إذا (has_mbyte)
+	أرجع (*mb_ptr2char)(ptr);
+    أرجع (صحيح)*ptr;
 }
 
-    int
-gchar_cursor(void)
+    صحيح
+gchar_cursor(فراغ)
 {
-    if (has_mbyte)
-	return (*mb_ptr2char)(ml_get_cursor());
-    return (int)*ml_get_cursor();
+    إذا (has_mbyte)
+	أرجع (*mb_ptr2char)(ml_get_cursor());
+    أرجع (صحيح)*ml_get_cursor();
 }
 
 /*
  * Return the character immediately before the cursor.
  */
-    int
-char_before_cursor(void)
+    صحيح
+char_before_cursor(فراغ)
 {
-    if (curwin->w_cursor.col == 0)
-	return -1;
+    إذا (curwin->w_cursor.col == 0)
+	أرجع -1;
 
-    char_u *line = ml_get_curline();
+    char_u *سطر = ml_get_curline();
 
-    if (has_mbyte)
+    إذا (has_mbyte)
     {
-	char_u *p = line + curwin->w_cursor.col;
-	int prev_len = (*mb_head_off)(line, p - 1) + 1;
-	return mb_ptr2char(p - prev_len);
+	char_u *p = سطر + curwin->w_cursor.col;
+	صحيح prev_len = (*mb_head_off)(سطر, p - 1) + 1;
+	أرجع mb_ptr2char(p - prev_len);
     }
-    return line[curwin->w_cursor.col - 1];
+    أرجع سطر[curwin->w_cursor.col - 1];
 }
 
 /*
  * Write a character at the current cursor position.
  * It is directly written into the block.
  */
-    void
-pchar_cursor(int c)
+    فراغ
+pchar_cursor(صحيح c)
 {
     *(ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE)
 						  + curwin->w_cursor.col) = c;
@@ -603,24 +603,24 @@ pchar_cursor(int c)
     char_u *
 skip_to_option_part(char_u *p)
 {
-    if (*p == ',')
+    إذا (*p == ',')
 	++p;
-    while (*p == ' ')
+    طالما (*p == ' ')
 	++p;
-    return p;
+    أرجع p;
 }
 
 /*
  * check_status: called when the status bars for the buffer 'buf'
  *		 need to be updated
  */
-    void
+    فراغ
 check_status(buf_T *buf)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf && wp->w_status_height)
+	إذا (wp->w_buffer == buf && wp->w_status_height)
 	{
 	    wp->w_redr_status = true;
 	    set_must_redraw(UPD_VALID);
@@ -637,13 +637,13 @@ check_status(buf_T *buf)
  *
  * return the 'y' or 'n'
  */
-    int
-ask_yesno(char_u *str, int direct)
+    صحيح
+ask_yesno(char_u *str, صحيح direct)
 {
-    int	    r = ' ';
-    int	    save_State = State;
+    صحيح	    r = ' ';
+    صحيح	    save_State = State;
 
-    if (exiting)		// put terminal in raw mode for this question
+    إذا (exiting)		// put terminal in raw mode for this question
 	settmode(TMODE_RAW);
     ++no_wait_return;
 #ifdef USE_ON_FLY_SCROLL
@@ -652,31 +652,31 @@ ask_yesno(char_u *str, int direct)
     State = MODE_CONFIRM;	// mouse behaves like with :confirm
     setmouse();			// disables mouse for xterm
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_کلیدیں;		// no mapping here, but recognize keys
 
-    while (r != 'y' && r != 'n')
+    طالما (r != 'y' && r != 'n')
     {
 	// same highlighting as for wait_return()
 	smsg_attr(HL_ATTR(HLF_R), "%s (y/n)?", str);
-	if (direct)
+	إذا (direct)
 	    r = get_keystroke();
-	else
+	وإلا
 	    r = plain_vgetc();
-	if (r == Ctrl_C || r == ESC)
+	إذا (r == Ctrl_C || r == ESC)
 	    r = 'n';
-	msg_putchar(r);	    // show what you typed
+	پیغام_putchar(r);	    // show what you typed
 	out_flush();
     }
     --no_wait_return;
     State = save_State;
     setmouse();
     --no_mapping;
-    --allow_keys;
+    --allow_کلیدیں;
 
-    return r;
+    أرجع r;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * Returns the current mode as a string in "buf[MODE_MAX_LENGTH]", NUL
@@ -684,96 +684,96 @@ ask_yesno(char_u *str, int direct)
  * The first character represents the major mode, the following ones the minor
  * ones.
  */
-    void
+    فراغ
 get_mode(char_u *buf)
 {
-    int		i = 0;
+    صحيح		i = 0;
 
-    if (time_for_testing == 93784)
+    إذا (time_for_testing == 93784)
     {
 	// Testing the two-character code.
 	buf[i++] = 'x';
 	buf[i++] = '!';
     }
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
+    وإلا إذا (term_use_loop())
     {
-	if (State & MODE_CMDLINE)
+	إذا (State & MODE_CMDLINE)
 	    buf[i++] = 'c';
 	buf[i++] = 't';
     }
 # endif
-    else if (State == MODE_HITRETURN || State == MODE_ASKMORE
+    وإلا إذا (State == MODE_HITRETURN || State == MODE_ASKMORE
 						      || State == MODE_SETWSIZE
 		|| State == MODE_CONFIRM)
     {
 	buf[i++] = 'r';
-	if (State == MODE_ASKMORE)
+	إذا (State == MODE_ASKMORE)
 	    buf[i++] = 'm';
-	else if (State == MODE_CONFIRM)
+	وإلا إذا (State == MODE_CONFIRM)
 	    buf[i++] = '?';
     }
-    else if (State == MODE_EXTERNCMD)
+    وإلا إذا (State == MODE_EXTERNCMD)
 	buf[i++] = '!';
-    else if (State & MODE_INSERT)
+    وإلا إذا (State & MODE_داخل_کرو)
     {
-	if (State & VREPLACE_FLAG)
+	إذا (State & VREPLACE_FLAG)
 	{
 	    buf[i++] = 'R';
 	    buf[i++] = 'v';
 	}
-	else
+	وإلا
 	{
-	    if (State & REPLACE_FLAG)
+	    إذا (State & REPLACE_FLAG)
 		buf[i++] = 'R';
-	    else
+	    وإلا
 		buf[i++] = 'i';
 	}
 
-	if (ins_compl_active())
+	إذا (ins_compl_active())
 	    buf[i++] = 'c';
-	else if (ctrl_x_mode_not_defined_yet())
+	وإلا إذا (ctrl_x_mode_not_defined_yet())
 	    buf[i++] = 'x';
     }
-    else if ((State & MODE_CMDLINE) || exmode_active)
+    وإلا إذا ((State & MODE_CMDLINE) || exmode_active)
     {
 	buf[i++] = 'c';
-	if (exmode_active == EXMODE_VIM)
+	إذا (exmode_active == EXMODE_VIM)
 	    buf[i++] = 'v';
-	else if (exmode_active == EXMODE_NORMAL)
+	وإلا إذا (exmode_active == EXMODE_NORMAL)
 	    buf[i++] = 'e';
-	if ((State & MODE_CMDLINE) && cmdline_overstrike())
+	إذا ((State & MODE_CMDLINE) && cmdline_overstrike())
 	    buf[i++] = 'r';
     }
-    else if (VIsual_active)
+    وإلا إذا (VIsual_active)
     {
-	if (VIsual_select)
+	إذا (VIsual_select)
 	    buf[i++] = VIsual_mode + 's' - 'v';
-	else
+	وإلا
 	{
 	    buf[i++] = VIsual_mode;
-	    if (restart_VIsual_select)
+	    إذا (restart_VIsual_select)
 		buf[i++] = 's';
 	}
     }
-    else
+    وإلا
     {
 	buf[i++] = 'n';
-	if (finish_op)
+	إذا (finish_op)
 	{
 	    buf[i++] = 'o';
 	    // to be able to detect force-linewise/blockwise/characterwise
 	    // operations
 	    buf[i++] = motion_force;
 	}
-	else if (restart_edit == 'I' || restart_edit == 'R'
+	وإلا إذا (restart_edit == 'I' || restart_edit == 'R'
 							|| restart_edit == 'V')
 	{
 	    buf[i++] = 'i';
 	    buf[i++] = restart_edit;
 	}
 # ifdef FEAT_TERMINAL
-	else if (term_in_normal_mode(curbuf))
+	وإلا إذا (term_in_normal_mode(curbuf))
 	    buf[i++] = 't';
 # endif
     }
@@ -784,67 +784,67 @@ get_mode(char_u *buf)
 /*
  * "mode()" function
  */
-    void
+    فراغ
 f_mode(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[MODE_MAX_LENGTH];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	أرجع;
 
     get_mode(buf);
 
     // Clear out the minor mode when the argument is not a non-zero number or
     // non-empty string.
-    if (!non_zero_arg(&argvars[0]))
+    إذا (!non_zero_arg(&argvars[0]))
 	buf[1] = NUL;
 
     rettv->vval.v_string = vim_strsave(buf);
     rettv->v_type = VAR_STRING;
 }
 
-    static void
-may_add_state_char(garray_T *gap, char_u *include, int c)
+    ساكن فراغ
+may_add_state_char(garray_T *gap, char_u *include, صحيح c)
 {
-    if (include == NULL || vim_strchr(include, c) != NULL)
+    إذا (include == عدم || vim_strchr(include, c) != عدم)
 	ga_append(gap, c);
 }
 
 /*
  * "state()" function
  */
-    void
+    فراغ
 f_state(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    char_u	*include = NULL;
-    int		i;
+    char_u	*include = عدم;
+    صحيح		i;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     ga_init2(&ga, 1, 20);
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    إذا (argvars[0].v_type != VAR_UNKNOWN)
 	include = tv_get_string(&argvars[0]);
 
-    if (!(stuff_empty() && typebuf.tb_len == 0 && scriptin[curscript] == NULL))
+    إذا (!(stuff_empty() && typebuf.tb_len == 0 && scriptin[curscript] == عدم))
 	may_add_state_char(&ga, include, 'm');
-    if (op_pending())
+    إذا (op_pending())
 	may_add_state_char(&ga, include, 'o');
-    if (autocmd_busy)
+    إذا (autocmd_busy)
 	may_add_state_char(&ga, include, 'x');
-    if (ins_compl_active())
+    إذا (ins_compl_active())
 	may_add_state_char(&ga, include, 'a');
 
 # ifdef FEAT_JOB_CHANNEL
-    if (channel_in_blocking_wait())
+    إذا (channel_in_blocking_wait())
 	may_add_state_char(&ga, include, 'w');
 # endif
-    if (!get_was_safe_state())
+    إذا (!get_was_safe_state())
 	may_add_state_char(&ga, include, 'S');
-    for (i = 0; i < get_callback_depth() && i < 3; ++i)
+    لكل (i = 0; i < get_callback_depth() && i < 3; ++i)
 	may_add_state_char(&ga, include, 'c');
-    if (msg_scrolled > 0)
+    إذا (پیغام_scrolled > 0)
 	may_add_state_char(&ga, include, 's');
 
     rettv->v_type = VAR_STRING;
@@ -861,20 +861,20 @@ f_state(typval_T *argvars, typval_T *rettv)
  * Disadvantage: typeahead is ignored.
  * Translates the interrupt character for unix to ESC.
  */
-    int
-get_keystroke(void)
+    صحيح
+get_keystroke(فراغ)
 {
-    char_u	*buf = NULL;
-    int		buflen = 150;
-    int		maxlen;
-    int		len = 0;
-    int		n;
-    int		save_mapped_ctrl_c = mapped_ctrl_c;
-    int		waited = 0;
+    char_u	*buf = عدم;
+    صحيح		buflen = 150;
+    صحيح		maxlen;
+    صحيح		len = 0;
+    صحيح		n;
+    صحيح		save_mapped_ctrl_c = mapped_ctrl_c;
+    صحيح		waited = 0;
 
     mod_mask = 0;
     mapped_ctrl_c = FALSE;	// mappings are not used here
-    for (;;)
+    لكل (;;)
     {
 	cursor_on();
 	out_flush();
@@ -883,9 +883,9 @@ get_keystroke(void)
 	// 5 chars plus NUL).  And fix_input_buffer() can triple the number of
 	// bytes.
 	maxlen = (buflen - 6 - len) / 3;
-	if (buf == NULL)
+	إذا (buf == عدم)
 	    buf = alloc(buflen);
-	else if (maxlen < 10)
+	وإلا إذا (maxlen < 10)
 	{
 	    char_u  *t_buf = buf;
 
@@ -893,175 +893,175 @@ get_keystroke(void)
 	    // escape sequence.
 	    buflen += 100;
 	    buf = vim_realloc(buf, buflen);
-	    if (buf == NULL)
+	    إذا (buf == عدم)
 		vim_free(t_buf);
 	    maxlen = (buflen - 6 - len) / 3;
 	}
-	if (buf == NULL)
+	إذا (buf == عدم)
 	{
-	    do_outofmem_msg((long_u)buflen);
-	    return ESC;  // panic!
+	    do_outofmem_پیغام((long_u)buflen);
+	    أرجع ESC;  // panic!
 	}
 
 	// First time: blocking wait.  Second time: wait up to 100ms for a
 	// terminal code to complete.
 	n = ui_inchar(buf + len, maxlen, len == 0 ? -1L : 100L, 0);
-	if (n > 0)
+	إذا (n > 0)
 	{
 	    // Replace zero and CSI by a special key code.
-	    n = fix_input_buffer(buf + len, n);
+	    n = fix_داخلہ_buffer(buf + len, n);
 	    len += n;
 	    waited = 0;
 	}
-	else if (len > 0)
+	وإلا إذا (len > 0)
 	    ++waited;	    // keep track of the waiting time
 
 	// Incomplete termcode and not timed out yet: get more characters
-	if ((n = check_termcode(1, buf, buflen, &len)) < 0
+	إذا ((n = check_termcode(1, buf, buflen, &len)) < 0
 	       && (!p_ttimeout || waited * 100L < (p_ttm < 0 ? p_tm : p_ttm)))
-	    continue;
+	    استمر;
 
-	if (n == KEYLEN_REMOVED)  // key code removed
+	إذا (n == KEYLEN_REMOVED)  // key code removed
 	{
-	    if (must_redraw != 0 && !need_wait_return && (State
+	    إذا (must_redraw != 0 && !need_wait_return && (State
 			& (MODE_CMDLINE | MODE_HITRETURN | MODE_ASKMORE)) == 0)
 	    {
 		// Redrawing was postponed, do it now.
 		update_screen(0);
 		setcursor(); // put cursor back where it belongs
 	    }
-	    continue;
+	    استمر;
 	}
-	if (n > 0)		// found a termcode: adjust length
+	إذا (n > 0)		// found a termcode: adjust length
 	    len = n;
-	if (len == 0)		// nothing typed yet
-	    continue;
+	إذا (len == 0)		// nothing typed yet
+	    استمر;
 
 	// Handle modifier and/or special key code.
 	n = buf[0];
-	if (n == K_SPECIAL)
+	إذا (n == K_SPECIAL)
 	{
 	    n = TO_SPECIAL(buf[1], buf[2]);
-	    if (buf[1] == KS_MODIFIER
+	    إذا (buf[1] == KS_MODIFIER
 		    || n == K_IGNORE
-		    || (is_mouse_key(n) && n != K_LEFTMOUSE)
+		    || (is_mouse_کلید(n) && n != K_LEFTMOUSE)
 #ifdef FEAT_GUI
 		    || n == K_VER_SCROLLBAR
 		    || n == K_HOR_SCROLLBAR
 #endif
 	       )
 	    {
-		if (buf[1] == KS_MODIFIER)
+		إذا (buf[1] == KS_MODIFIER)
 		    mod_mask = buf[2];
 		len -= 3;
-		if (len > 0)
+		إذا (len > 0)
 		    mch_memmove(buf, buf + 3, (size_t)len);
-		continue;
+		استمر;
 	    }
-	    break;
+	    اكسر;
 	}
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    if (MB_BYTE2LEN(n) > len)
-		continue;	// more bytes to get
+	    إذا (MB_BYTE2LEN(n) > len)
+		استمر;	// more bytes to get
 	    buf[len >= buflen ? buflen - 1 : len] = NUL;
 	    n = (*mb_ptr2char)(buf);
 	}
 #ifdef UNIX
-	if (n == intr_char)
+	إذا (n == intr_char)
 	    n = ESC;
 #endif
-	break;
+	اكسر;
     }
     vim_free(buf);
 
     mapped_ctrl_c = save_mapped_ctrl_c;
-    return merge_modifyOtherKeys(n, &mod_mask);
+    أرجع merge_modify_Other_کلیدیں(n, &mod_mask);
 }
 
 // For overflow detection, add a digit safely to an int value.
-    static int
-vim_append_digit_int(int *value, int digit)
+    ساكن صحيح
+vim_append_digit_int(صحيح *قدر, صحيح digit)
 {
-    int x = *value;
-    if (x > ((INT_MAX - digit) / 10))
-	return FAIL;
-    *value = x * 10 + digit;
-    return OK;
+    صحيح x = *قدر;
+    إذا (x > ((INT_MAX - digit) / 10))
+	أرجع FAIL;
+    *قدر = x * 10 + digit;
+    أرجع OK;
 }
 
 /*
  * Get a number from the user.
  * When "mouse_used" is not NULL allow using the mouse.
  */
-    int
-get_number(
-    int	    colon,			// allow colon to abort
-    int	    *mouse_used)
+    صحيح
+get_نمبر(
+    صحيح	    colon,			// allow colon to abort
+    صحيح	    *mouse_used)
 {
-    int	n = 0;
-    int	c;
-    int typed = 0;
+    صحيح	n = 0;
+    صحيح	c;
+    صحيح typed = 0;
 
-    if (mouse_used != NULL)
+    إذا (mouse_used != عدم)
 	*mouse_used = FALSE;
 
     // When not printing messages, the user won't know what to type, return a
     // zero (as if CR was hit).
-    if (msg_silent != 0)
-	return 0;
+    إذا (پیغام_silent != 0)
+	أرجع 0;
 
 #ifdef USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
 #endif
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
-    for (;;)
+    ++allow_کلیدیں;		// no mapping here, but recognize keys
+    لكل (;;)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(پیغام_row, cmdline_col_off + پیغام_col);
 	c = safe_vgetc();
-	if (VIM_ISDIGIT(c))
+	إذا (VIM_ISDIGIT(c))
 	{
-	    if (vim_append_digit_int(&n, c - '0') == FAIL)
-		return 0;
-	    msg_putchar(c);
+	    إذا (vim_append_digit_int(&n, c - '0') == FAIL)
+		أرجع 0;
+	    پیغام_putchar(c);
 	    ++typed;
 	}
-	else if (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
+	وإلا إذا (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
 	{
-	    if (typed > 0)
+	    إذا (typed > 0)
 	    {
-		msg_puts("\b \b");
+		پیغام_puts("\b \b");
 		--typed;
 	    }
 	    n /= 10;
 	}
-	else if (mouse_used != NULL && c == K_LEFTMOUSE)
+	وإلا إذا (mouse_used != عدم && c == K_LEFTMOUSE)
 	{
 	    *mouse_used = TRUE;
 	    n = mouse_row + 1;
-	    break;
+	    اكسر;
 	}
-	else if (n == 0 && c == ':' && colon)
+	وإلا إذا (n == 0 && c == ':' && colon)
 	{
 	    stuffcharReadbuff(':');
-	    if (!exmode_active)
-		cmdline_row = msg_row;
+	    إذا (!exmode_active)
+		cmdline_row = پیغام_row;
 	    skip_redraw = TRUE;	    // skip redraw once
 	    do_redraw = FALSE;
-	    break;
+	    اكسر;
 	}
-	else if (c == Ctrl_C || c == ESC || c == 'q')
+	وإلا إذا (c == Ctrl_C || c == ESC || c == 'q')
 	{
 	    n = 0;
-	    break;
+	    اكسر;
 	}
-	else if (c == CAR || c == NL )
-	    break;
+	وإلا إذا (c == CAR || c == NL )
+	    اكسر;
     }
     --no_mapping;
-    --allow_keys;
-    return n;
+    --allow_کلیدیں;
+    أرجع n;
 }
 
 /*
@@ -1069,18 +1069,18 @@ get_number(
  * When "mouse_used" is not NULL allow using the mouse and in that case return
  * the line number.
  */
-    int
-prompt_for_number(int *mouse_used)
+    صحيح
+prompt_for_نمبر(صحيح *mouse_used)
 {
-    int		i;
-    int		save_cmdline_row;
-    int		save_State;
+    صحيح		i;
+    صحيح		save_cmdline_row;
+    صحيح		save_State;
 
     // When using ":silent" assume that <CR> was entered.
-    if (mouse_used != NULL)
-	msg_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
-    else
-	msg_puts(_("Type number and <Enter> (q or empty cancels): "));
+    إذا (mouse_used != عدم)
+	پیغام_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
+    وإلا
+	پیغام_puts(_("Type number and <Enter> (q or empty cancels): "));
 
     // Set the state such that text can be selected/copied/pasted and we still
     // get mouse events. redraw_after_callback() will not redraw if cmdline_row
@@ -1092,60 +1092,60 @@ prompt_for_number(int *mouse_used)
     // May show different mouse shape.
     setmouse();
 
-    i = get_number(TRUE, mouse_used);
-    if (KeyTyped)
+    i = get_نمبر(TRUE, mouse_used);
+    إذا (کلید_Typed)
     {
 	// don't call wait_return() now
-	if (msg_row > 0)
-	    cmdline_row = msg_row - 1;
+	إذا (پیغام_row > 0)
+	    cmdline_row = پیغام_row - 1;
 	need_wait_return = FALSE;
-	msg_didany = FALSE;
-	msg_didout = FALSE;
+	پیغام_didany = FALSE;
+	پیغام_didout = FALSE;
     }
-    else
+    وإلا
 	cmdline_row = save_cmdline_row;
     State = save_State;
     // May need to restore mouse shape.
     setmouse();
 
-    return i;
+    أرجع i;
 }
 
-    void
+    فراغ
 msgmore(long n)
 {
     long pn;
 
-    if (global_busy	    // no messages now, wait until global is finished
+    إذا (global_busy	    // no messages now, wait until global is finished
 	    || !messaging())  // 'lazyredraw' set, don't do messages now
-	return;
+	أرجع;
 
     // We don't want to overwrite another important message, but do overwrite
     // a previous "more lines" or "fewer lines" message, so that "5dd" and
     // then "put" reports the last action.
-    if (keep_msg != NULL && !keep_msg_more)
-	return;
+    إذا (keep_پیغام != عدم && !keep_پیغام_more)
+	أرجع;
 
-    if (n > 0)
+    إذا (n > 0)
 	pn = n;
-    else
+    وإلا
 	pn = -n;
 
-    if (pn > p_report)
+    إذا (pn > p_report)
     {
-	if (n > 0)
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	إذا (n > 0)
+	    vim_snprintf(پیغام_buf, پیغام_BUF_LEN,
 		    NGETTEXT("%ld more line", "%ld more lines", pn), pn);
-	else
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	وإلا
+	    vim_snprintf(پیغام_buf, پیغام_BUF_LEN,
 		    NGETTEXT("%ld line less", "%ld fewer lines", pn), pn);
-	if (got_int)
-	    vim_strcat((char_u *)msg_buf, (char_u *)_(" (Interrupted)"),
-								  MSG_BUF_LEN);
-	if (msg(msg_buf))
+	إذا (got_int)
+	    vim_strcat((char_u *)پیغام_buf, (char_u *)_(" (Interrupted)"),
+								  پیغام_BUF_LEN);
+	إذا (پیغام(پیغام_buf))
 	{
-	    set_keep_msg((char_u *)msg_buf, 0);
-	    keep_msg_more = TRUE;
+	    set_keep_پیغام((char_u *)پیغام_buf, 0);
+	    keep_پیغام_more = TRUE;
 	}
     }
 }
@@ -1153,10 +1153,10 @@ msgmore(long n)
 /*
  * flush map and typeahead buffers and give a warning for an error
  */
-    void
-beep_flush(void)
+    فراغ
+beep_flush(فراغ)
 {
-    if (emsg_silent == 0)
+    إذا (emsg_silent == 0)
     {
 	flush_buffers(FLUSH_MINIMAL);
 	vim_beep(BO_ERROR);
@@ -1166,30 +1166,30 @@ beep_flush(void)
 /*
  * Give a warning for an error. "val" is one of the BO_ values, e.g., BO_OPER.
  */
-    void
+    فراغ
 vim_beep(unsigned val)
 {
 #ifdef FEAT_EVAL
     called_vim_beep = TRUE;
 #endif
 
-    if (emsg_silent != 0 || in_assert_fails)
-	return;
+    إذا (emsg_silent != 0 || in_assert_fails)
+	أرجع;
 
-    if (!((bo_flags & val) || (bo_flags & BO_ALL)))
+    إذا (!((bo_flags & val) || (bo_flags & BO_ALL)))
     {
 #ifdef ELAPSED_FUNC
-	static int		did_init = FALSE;
-	static elapsed_T	start_tv;
+	ساكن صحيح		did_init = FALSE;
+	ساكن elapsed_T	start_tv;
 
 	// Only beep once per half a second, otherwise a sequence of beeps
 	// would freeze Vim.
-	if (!did_init || ELAPSED_FUNC(start_tv) > 500)
+	إذا (!did_init || ELAPSED_FUNC(start_tv) > 500)
 	{
 	    did_init = TRUE;
 	    ELAPSED_INIT(start_tv);
 #endif
-	    if (p_vb
+	    إذا (p_vb
 #ifdef FEAT_GUI
 		    // While the GUI is starting up the termcap is set for
 		    // the GUI but the output still goes to a terminal.
@@ -1200,7 +1200,7 @@ vim_beep(unsigned val)
 		out_str_cf(T_VB);
 #ifdef FEAT_VTP
 		// No restore color information, refresh the screen.
-		if (has_vtp_working() != 0
+		إذا (has_vtp_working() != 0
 # ifdef FEAT_TERMGUICOLORS
 			&& (p_tgc || (!p_tgc && t_colors >= 256))
 # endif
@@ -1212,7 +1212,7 @@ vim_beep(unsigned val)
 		}
 #endif
 	    }
-	    else
+	    وإلا
 		out_char(BELL);
 #ifdef ELAPSED_FUNC
 	}
@@ -1222,10 +1222,10 @@ vim_beep(unsigned val)
     // When 'debug' contains "beep" produce a message.  If we are sourcing
     // a script or executing a function give the user a hint where the beep
     // comes from.
-    if (vim_strchr(p_debug, 'e') != NULL)
+    إذا (vim_strchr(p_debug, 'e') != عدم)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg_attr(_("Beep!"), HL_ATTR(HLF_W));
+	پیغام_source(HL_ATTR(HLF_W));
+	پیغام_attr(_("Beep!"), HL_ATTR(HLF_W));
     }
 }
 
@@ -1240,8 +1240,8 @@ vim_beep(unsigned val)
  * For Windows:
  *  This code is duplicated in init_homedir() in dosinst.c.  Keep in sync!
  */
-    void
-init_homedir(void)
+    فراغ
+init_homedir(فراغ)
 {
     char_u  *var;
 
@@ -1250,7 +1250,7 @@ init_homedir(void)
 
 #ifdef VMS
     var = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#وإلا
     var = mch_getenv((char_u *)"HOME");
 #endif
 
@@ -1261,24 +1261,24 @@ init_homedir(void)
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    إذا (var == عدم || *var == NUL)
     {
 	char_u *homedrive, *homepath;
 
 	homedrive = mch_getenv((char_u *)"HOMEDRIVE");
 	homepath = mch_getenv((char_u *)"HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	إذا (homepath == عدم || *homepath == NUL)
 	    homepath = (char_u *)"\\";
-	if (homedrive != NULL
+	إذا (homedrive != عدم
 			   && STRLEN(homedrive) + STRLEN(homepath) < MAXPATHL)
 	{
-	    sprintf((char *)NameBuff, "%s%s", homedrive, homepath);
-	    if (NameBuff[0] != NUL)
+	    sprintf((حرف *)NameBuff, "%s%s", homedrive, homepath);
+	    إذا (NameBuff[0] != NUL)
 		var = NameBuff;
 	}
     }
 
-    if (var == NULL)
+    إذا (var == عدم)
 	var = mch_getenv((char_u *)"USERPROFILE");
 
     /*
@@ -1286,40 +1286,40 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    إذا (var != عدم && *var == '%')
     {
 	char_u	*p;
 	char_u	*exp;
 
 	p = vim_strchr(var + 1, '%');
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    vim_strncpy(NameBuff, var + 1, p - (var + 1));
 	    exp = mch_getenv(NameBuff);
-	    if (exp != NULL && *exp != NUL
+	    إذا (exp != عدم && *exp != NUL
 					&& STRLEN(exp) + STRLEN(p) < MAXPATHL)
 	    {
-		vim_snprintf((char *)NameBuff, MAXPATHL, "%s%s", exp, p + 1);
+		vim_snprintf((حرف *)NameBuff, MAXPATHL, "%s%s", exp, p + 1);
 		var = NameBuff;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    إذا (var != عدم && *var == NUL)	// empty is same as not set
+	var = عدم;
 
-    if (enc_utf8 && var != NULL)
+    إذا (enc_utf8 && var != عدم)
     {
-	int	len;
-	char_u  *pp = NULL;
+	صحيح	len;
+	char_u  *pp = عدم;
 
 	// Convert from active codepage to UTF-8.  Other conversions are
 	// not done, because they would fail for non-ASCII characters.
-	acp_to_enc(var, (int)STRLEN(var), &pp, &len);
-	if (pp != NULL)
+	acp_to_enc(var, (صحيح)STRLEN(var), &pp, &len);
+	إذا (pp != عدم)
 	{
 	    homedir = pp;
-	    return;
+	    أرجع;
 	}
     }
 
@@ -1327,23 +1327,23 @@ init_homedir(void)
      * Default home dir is C:/
      * Best assumption we can make in such a situation.
      */
-    if (var == NULL)
+    إذا (var == عدم)
 	var = (char_u *)"C:/";
 #endif
 
-    if (var != NULL)
+    إذا (var != عدم)
     {
 #ifdef UNIX
 	/*
 	 * Change to the directory and get the actual path.  This resolves
 	 * links.  Don't do it when we can't return.
 	 */
-	if (mch_dirname(NameBuff, MAXPATHL) == OK
-					  && mch_chdir((char *)NameBuff) == 0)
+	إذا (mch_dirname(NameBuff, MAXPATHL) == OK
+					  && mch_chdir((حرف *)NameBuff) == 0)
 	{
-	    if (!mch_chdir((char *)var) && mch_dirname(IObuff, IOSIZE) == OK)
+	    إذا (!mch_chdir((حرف *)var) && mch_dirname(IObuff, IOSIZE) == OK)
 		var = IObuff;
-	    if (mch_chdir((char *)NameBuff) != 0)
+	    إذا (mch_chdir((حرف *)NameBuff) != 0)
 		emsg(_(e_cannot_go_back_to_previous_directory));
 	}
 #endif
@@ -1351,28 +1351,28 @@ init_homedir(void)
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_homedir(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_homedir(فراغ)
 {
     vim_free(homedir);
 }
 
-    void
-free_users(void)
+    فراغ
+free_users(فراغ)
 {
     ga_clear_strings(&ga_users);
 }
 #endif
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 /*
  * Initialize $VIM and $VIMRUNTIME when 'enc' is updated.
  */
-    void
-init_vimdir(void)
+    فراغ
+init_vimdir(فراغ)
 {
-    int	    mustfree;
+    صحيح	    mustfree;
     char_u  *p;
 
     mch_get_exe_name();
@@ -1380,13 +1380,13 @@ init_vimdir(void)
     mustfree = FALSE;
     didset_vim = FALSE;
     p = vim_getenv((char_u *)"VIM", &mustfree);
-    if (mustfree)
+    إذا (mustfree)
 	vim_free(p);
 
     mustfree = FALSE;
     didset_vimruntime = FALSE;
     p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-    if (mustfree)
+    إذا (mustfree)
 	vim_free(p);
 }
 #endif
@@ -1399,7 +1399,7 @@ init_vimdir(void)
     char_u *
 expand_env_save(char_u *src)
 {
-    return expand_env_save_opt(src, FALSE, NULL);
+    أرجع expand_env_save_opt(src, FALSE, عدم);
 }
 
 /*
@@ -1407,14 +1407,14 @@ expand_env_save(char_u *src)
  * expand "~" at the start.
  */
     char_u *
-expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
+expand_env_save_opt(char_u *src, صحيح one, char_u *esc_chars)
 {
     char_u	*p;
 
     p = alloc(MAXPATHL);
-    if (p != NULL)
-	expand_env_esc(src, p, MAXPATHL, esc_chars, one, NULL);
-    return p;
+    إذا (p != عدم)
+	expand_env_esc(src, p, MAXPATHL, esc_chars, one, عدم);
+    أرجع p;
 }
 
 /*
@@ -1427,64 +1427,64 @@ expand_env_save_opt(char_u *src, int one, char_u *esc_chars)
 expand_env(
     char_u	*src,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen)		// maximum length of the result
+    صحيح		dstlen)		// maximum length of the result
 {
-    return expand_env_esc(src, dst, dstlen, NULL, FALSE, NULL);
+    أرجع expand_env_esc(src, dst, dstlen, عدم, FALSE, عدم);
 }
 
     size_t
 expand_env_esc(
     char_u	*srcp,		// input string e.g. "$HOME/vim.hlp"
     char_u	*dst,		// where to put the result
-    int		dstlen,		// maximum length of the result
+    صحيح		dstlen,		// maximum length of the result
     char_u	*esc_chars,	// chars to escape in expanded vars
-    int		one,		// "srcp" is one file name
+    صحيح		one,		// "srcp" is one file name
     char_u	*startstr)	// start again after this (can be NULL)
 {
     char_u	*src;
     char_u	*tail;
-    int		c;
+    صحيح		c;
     char_u	*var;
-    int		copy_char;
-    int		mustfree;	// var was allocated, need to free it later
-    int		at_start = TRUE; // at start of a name
-    int		startstr_len = 0;
+    صحيح		copy_char;
+    صحيح		mustfree;	// var was allocated, need to free it later
+    صحيح		at_start = TRUE; // at start of a name
+    صحيح		startstr_len = 0;
     char_u	*dst_start = dst;
 
-    if (startstr != NULL)
-	startstr_len = (int)STRLEN(startstr);
+    إذا (startstr != عدم)
+	startstr_len = (صحيح)STRLEN(startstr);
 
     src = skipwhite(srcp);
     --dstlen;		    // leave one char space for "\,"
-    while (*src && dstlen > 0)
+    طالما (*src && dstlen > 0)
     {
 #ifdef FEAT_EVAL
 	// Skip over `=expr`.
-	if (src[0] == '`' && src[1] == '=')
+	إذا (src[0] == '`' && src[1] == '=')
 	{
 	    size_t len;
 
 	    var = src;
 	    src += 2;
-	    (void)skip_expr(&src, NULL);
-	    if (*src == '`')
+	    (فراغ)skip_اظہاریہ(&src, عدم);
+	    إذا (*src == '`')
 		++src;
 	    len = src - var;
-	    if (len > (size_t)dstlen)
+	    إذا (len > (size_t)dstlen)
 		len = dstlen;
 	    vim_strncpy(dst, var, len);
 	    dst += len;
-	    dstlen -= (int)len;
-	    continue;
+	    dstlen -= (صحيح)len;
+	    استمر;
 	}
 #endif
 	copy_char = TRUE;
-	if ((*src == '$'
+	إذا ((*src == '$'
 #ifdef VMS
 		    && at_start
 #endif
 	   )
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 		|| *src == '%'
 #endif
 		|| (*src == '~' && at_start))
@@ -1495,7 +1495,7 @@ expand_env_esc(
 	     * The variable name is copied into dst temporarily, because it may
 	     * be a string in read-only memory and a NUL needs to be appended.
 	     */
-	    if (*src != '~')				// environment var
+	    إذا (*src != '~')				// environment var
 	    {
 		tail = src + 1;
 		var = dst;
@@ -1503,63 +1503,63 @@ expand_env_esc(
 
 #ifdef UNIX
 		// Unix has ${var-name} type environment vars
-		if (*tail == '{' && !vim_isIDc('{'))
+		إذا (*tail == '{' && !vim_isIDc('{'))
 		{
 		    tail++;	// ignore '{'
-		    while (c-- > 0 && *tail && *tail != '}')
+		    طالما (c-- > 0 && *tail && *tail != '}')
 			*var++ = *tail++;
 		}
-		else
+		وإلا
 #endif
 		{
-		    while (c-- > 0 && *tail != NUL && ((vim_isIDc(*tail))
-#if defined(MSWIN)
+		    طالما (c-- > 0 && *tail != NUL && ((vim_isIDc(*tail))
+#إذا defined(MSWIN)
 			    || (*src == '%' && *tail != '%')
 #endif
 			    ))
 			*var++ = *tail++;
 		}
 
-#if defined(MSWIN) || defined(UNIX)
+#إذا defined(MSWIN) || defined(UNIX)
 # ifdef UNIX
-		if (src[1] == '{' && *tail != '}')
-# else
-		if (*src == '%' && *tail != '%')
+		إذا (src[1] == '{' && *tail != '}')
+# وإلا
+		إذا (*src == '%' && *tail != '%')
 # endif
-		    var = NULL;
-		else
+		    var = عدم;
+		وإلا
 		{
 # ifdef UNIX
-		    if (src[1] == '{')
-# else
-		    if (*src == '%')
+		    إذا (src[1] == '{')
+# وإلا
+		    إذا (*src == '%')
 # endif
 			++tail;
 #endif
 		    *var = NUL;
 		    var = vim_getenv(dst, &mustfree);
-#if defined(MSWIN) || defined(UNIX)
+#إذا defined(MSWIN) || defined(UNIX)
 		}
 #endif
 	    }
 							// home directory
-	    else if (  src[1] == NUL
+	    وإلا إذا (  src[1] == NUL
 		    || vim_ispathsep(src[1])
-		    || vim_strchr((char_u *)" ,\t\n", src[1]) != NULL)
+		    || vim_strchr((char_u *)" ,\t\n", src[1]) != عدم)
 	    {
 		var = homedir;
 		tail = src + 1;
 	    }
-	    else					// user directory
+	    وإلا					// user directory
 	    {
-#if defined(UNIX) || (defined(VMS) && defined(USER_HOME))
+#إذا defined(UNIX) || (defined(VMS) && defined(USER_HOME))
 		/*
 		 * Copy ~user to dst[], so we can put a NUL after it.
 		 */
 		tail = src;
 		var = dst;
 		c = dstlen - 1;
-		while (	   c-- > 0
+		طالما (	   c-- > 0
 			&& *tail
 			&& vim_isfilec(*tail)
 			&& !vim_ispathsep(*tail))
@@ -1572,28 +1572,28 @@ expand_env_esc(
 		 * expand ~user.  This is slower and may fail if the shell
 		 * does not support ~user (old versions of /bin/sh).
 		 */
-#  if defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
+#  إذا defined(HAVE_GETPWNAM) && defined(HAVE_PWD_H)
 		{
 		    // Note: memory allocated by getpwnam() is never freed.
 		    // Calling endpwent() apparently doesn't help.
-		    struct passwd *pw = (*dst == NUL)
-					? NULL : getpwnam((char *)dst + 1);
+		    بنية passwd *pw = (*dst == NUL)
+					? عدم : getpwnam((حرف *)dst + 1);
 
-		    var = (pw == NULL) ? NULL : (char_u *)pw->pw_dir;
+		    var = (pw == عدم) ? عدم : (char_u *)pw->pw_dir;
 		}
-		if (var == NULL)
+		إذا (var == عدم)
 #  endif
 		{
 		    expand_T	xpc;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    var = ExpandOne(&xpc, dst, NULL,
+		    var = ExpandOne(&xpc, dst, عدم,
 				WILD_ADD_SLASH|WILD_SILENT, WILD_EXPAND_FREE);
 		    mustfree = TRUE;
 		}
 
-# else	// !UNIX, thus VMS
+# وإلا	// !UNIX, thus VMS
 		/*
 		 * USER_HOME is a comma-separated list of
 		 * directories to search for the user account in.
@@ -1606,34 +1606,34 @@ expand_env_esc(
 
 		    STRCPY(paths, USER_HOME);
 		    next_path = paths;
-		    while (*next_path)
+		    طالما (*next_path)
 		    {
-			for (path = next_path; *next_path && *next_path != ',';
+			لكل (path = next_path; *next_path && *next_path != ',';
 				next_path++);
-			if (*next_path)
+			إذا (*next_path)
 			    *next_path++ = NUL;
 			testlen = vim_snprintf_safelen(
-			    (char *)test,
-			    sizeof(test),
+			    (حرف *)test,
+			    حجم(test),
 			    "%s/%s",
 			    path,
 			    dst + 1);
-			if (mch_stat(test, &st) == 0)
+			إذا (mch_stat(test, &st) == 0)
 			{
 			    var = alloc(testlen + 1);
-			    if (var != NULL)
+			    إذا (var != عدم)
 			    {
 				STRCPY(var, test);
 				mustfree = TRUE;
 			    }
-			    break;
+			    اكسر;
 			}
 		    }
 		}
 # endif // UNIX
-#else
+#وإلا
 		// cannot expand user's home directory, so don't try
-		var = NULL;
+		var = عدم;
 		tail = (char_u *)"";	// for gcc
 #endif // UNIX || VMS
 	    }
@@ -1641,13 +1641,13 @@ expand_env_esc(
 #ifdef BACKSLASH_IN_FILENAME
 	    // If 'shellslash' is set change backslashes to forward slashes.
 	    // Can't use slash_adjust(), p_ssl may be set temporarily.
-	    if (p_ssl && var != NULL && vim_strchr(var, '\\') != NULL)
+	    إذا (p_ssl && var != عدم && vim_strchr(var, '\\') != عدم)
 	    {
 		char_u	*p = vim_strsave(var);
 
-		if (p != NULL)
+		إذا (p != عدم)
 		{
-		    if (mustfree)
+		    إذا (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
@@ -1659,32 +1659,32 @@ expand_env_esc(
 	    // If "var" contains any character from "esc_chars", escape it
 	    // with a backslash.  The historical use is escaping spaces so
 	    // that ":e ~/tt" works when $HOME contains a space.
-	    if (esc_chars != NULL && var != NULL
-		    && vim_strpbrk(var, esc_chars) != NULL)
+	    إذا (esc_chars != عدم && var != عدم
+		    && vim_strpbrk(var, esc_chars) != عدم)
 	    {
 		char_u	*p = vim_strsave_escaped(var, esc_chars);
 
-		if (p != NULL)
+		إذا (p != عدم)
 		{
-		    if (mustfree)
+		    إذا (mustfree)
 			vim_free(var);
 		    var = p;
 		    mustfree = TRUE;
 		}
 	    }
 
-	    if (var != NULL && *var != NUL)
+	    إذا (var != عدم && *var != NUL)
 	    {
-		c = (int)STRLEN(var);
+		c = (صحيح)STRLEN(var);
 
-		if (c + STRLEN(tail) + 1 < (unsigned)dstlen)
+		إذا (c + STRLEN(tail) + 1 < (unsigned)dstlen)
 		{
 		    STRCPY(dst, var);
 		    dstlen -= c;
 		    // if var[] ends in a path separator and tail[] starts
 		    // with it, skip a character
-		    if (after_pathsep(dst, dst + c)
-#if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA)
+		    إذا (after_pathsep(dst, dst + c)
+#إذا defined(BACKSLASH_IN_FILENAME) || defined(AMIGA)
 			    && dst[c - 1] != ':'
 #endif
 			    && vim_ispathsep(*tail))
@@ -1694,11 +1694,11 @@ expand_env_esc(
 		    copy_char = FALSE;
 		}
 	    }
-	    if (mustfree)
+	    إذا (mustfree)
 		vim_free(var);
 	}
 
-	if (copy_char)	    // copy at least one char
+	إذا (copy_char)	    // copy at least one char
 	{
 	    /*
 	     * Recognize the start of a new name, for '~'.
@@ -1706,19 +1706,19 @@ expand_env_esc(
 	     * ":edit foo ~ foo".
 	     */
 	    at_start = FALSE;
-	    if (src[0] == '\\' && src[1] != NUL)
+	    إذا (src[0] == '\\' && src[1] != NUL)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 	    }
-	    else if ((src[0] == ' ' || src[0] == ',') && !one)
+	    وإلا إذا ((src[0] == ' ' || src[0] == ',') && !one)
 		at_start = TRUE;
-	    if (dstlen > 0)
+	    إذا (dstlen > 0)
 	    {
 		*dst++ = *src++;
 		--dstlen;
 
-		if (startstr != NULL && src - startstr_len >= srcp
+		إذا (startstr != عدم && src - startstr_len >= srcp
 			&& STRNCMP(src - startstr_len, startstr,
 							    startstr_len) == 0)
 		    at_start = TRUE;
@@ -1728,47 +1728,47 @@ expand_env_esc(
     }
     *dst = NUL;
 
-    return (size_t)(dst - dst_start);
+    أرجع (size_t)(dst - dst_start);
 }
 
 /*
  * If the string between "p" and "pend" ends in "name/", return "pend" minus
  * the length of "name/".  Otherwise return "pend".
  */
-    static char_u *
+    ساكن char_u *
 remove_tail(char_u *p, char_u *pend, char_u *name)
 {
-    int		len = (int)STRLEN(name) + 1;
+    صحيح		len = (صحيح)STRLEN(name) + 1;
     char_u	*newend = pend - len;
 
-    if (newend >= p
+    إذا (newend >= p
 	    && fnamencmp(newend, name, len - 1) == 0
 	    && (newend == p || after_pathsep(p, newend)))
-	return newend;
-    return pend;
+	أرجع newend;
+    أرجع pend;
 }
 
 /*
  * Check if the directory "vimdir/<version>" or "vimdir/runtime" exists.
  * Return NULL if not, return its name in allocated memory otherwise.
  */
-    static char_u *
+    ساكن char_u *
 vim_version_dir(char_u *vimdir)
 {
     string_T	p;
     size_t	vimdir_len;
 
-    if (vimdir == NULL || *vimdir == NUL)
-	return NULL;
+    إذا (vimdir == عدم || *vimdir == NUL)
+	أرجع عدم;
     vimdir_len = STRLEN(vimdir);
     concat_fnames(vimdir, vimdir_len,
 	(char_u *)VIM_VERSION_NODOT, STRLEN_LITERAL(VIM_VERSION_NODOT), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
-	return p.string;
+    إذا (p.string != عدم && mch_isdir(p.string))
+	أرجع p.string;
     vim_free(p.string);
     concat_fnames(vimdir, vimdir_len,
 	(char_u *)RUNTIME_DIRNAME, STRLEN_LITERAL(RUNTIME_DIRNAME), TRUE, &p);
-    if (p.string != NULL && mch_isdir(p.string))
+    إذا (p.string != عدم && mch_isdir(p.string))
     {
 	string_T    fname;
 
@@ -1778,17 +1778,17 @@ vim_version_dir(char_u *vimdir)
 	// Check that "defaults.vim" exists in this directory, to avoid picking
 	// up a stray "runtime" directory, it would make many tests fail in
 	// mysterious ways.
-	if (fname.string != NULL)
+	إذا (fname.string != عدم)
 	{
-	    int exists = file_is_readable(fname.string);
+	    صحيح exists = file_is_readable(fname.string);
 
 	    vim_free(fname.string);
-	    if (exists)
-		return p.string;
+	    إذا (exists)
+		أرجع p.string;
 	}
     }
     vim_free(p.string);
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -1799,71 +1799,71 @@ vim_version_dir(char_u *vimdir)
  * initialized to FALSE by the caller.
  */
     char_u *
-vim_getenv(char_u *name, int *mustfree)
+vim_getenv(char_u *name, صحيح *mustfree)
 {
-    char_u	*p = NULL;
+    char_u	*p = عدم;
     char_u	*pend;
-    int		vimruntime;
+    صحيح		vimruntime;
 #ifdef MSWIN
     WCHAR	*wn, *wp;
 
     // use "C:/" when $HOME is not set
-    if (STRCMP(name, "HOME") == 0)
-	return homedir;
+    إذا (STRCMP(name, "HOME") == 0)
+	أرجع homedir;
 
     // Use Wide function
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NULL;
+    wn = enc_to_utf16(name, عدم);
+    إذا (wn == عدم)
+	أرجع عدم;
 
     wp = _wgetenv(wn);
     vim_free(wn);
 
-    if (wp != NULL && *wp == NUL)   // empty is the same as not set
-	wp = NULL;
+    إذا (wp != عدم && *wp == NUL)   // empty is the same as not set
+	wp = عدم;
 
-    if (wp != NULL)
+    إذا (wp != عدم)
     {
-	p = utf16_to_enc(wp, NULL);
-	if (p == NULL)
-	    return NULL;
+	p = utf16_to_enc(wp, عدم);
+	إذا (p == عدم)
+	    أرجع عدم;
 
 	*mustfree = TRUE;
-	return p;
+	أرجع p;
     }
-#else
+#وإلا
     p = mch_getenv(name);
-    if (p != NULL && *p == NUL)	    // empty is the same as not set
-	p = NULL;
+    إذا (p != عدم && *p == NUL)	    // empty is the same as not set
+	p = عدم;
 
-    if (p != NULL)
-	return p;
+    إذا (p != عدم)
+	أرجع p;
 
 # ifdef __HAIKU__
     // special handling for user settings directory...
-    if (STRCMP(name, "BE_USER_SETTINGS") == 0)
+    إذا (STRCMP(name, "BE_USER_SETTINGS") == 0)
     {
-	static char userSettingsPath[MAXPATHL];
+	ساكن حرف userSettingsPath[MAXPATHL];
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
+	إذا (find_directory(B_USER_SETTINGS_DIRECTORY, 0, false,
 					   userSettingsPath, MAXPATHL) == B_OK)
-	    return (char_u *)userSettingsPath;
-	else
-	    return NULL;
+	    أرجع (char_u *)userSettingsPath;
+	وإلا
+	    أرجع عدم;
     }
 # endif
 #endif
 
     // handling $VIMRUNTIME and $VIM is below, bail out if it's another name.
     vimruntime = (STRCMP(name, "VIMRUNTIME") == 0);
-    if (!vimruntime && STRCMP(name, "VIM") != 0)
-	return NULL;
+    إذا (!vimruntime && STRCMP(name, "VIM") != 0)
+	أرجع عدم;
 
     /*
      * When expanding $VIMRUNTIME fails, try using $VIM/vim<version> or $VIM.
      * Don't do this when default_vimruntime_dir is non-empty.
      */
-    if (vimruntime
+    إذا (vimruntime
 #ifdef HAVE_PATHDEF
 	    && *default_vimruntime_dir == NUL
 #endif
@@ -1872,29 +1872,29 @@ vim_getenv(char_u *name, int *mustfree)
 #ifdef MSWIN
 	// Use Wide function
 	wp = _wgetenv(L"VIM");
-	if (wp != NULL && *wp == NUL)	    // empty is the same as not set
-	    wp = NULL;
-	if (wp != NULL)
+	إذا (wp != عدم && *wp == NUL)	    // empty is the same as not set
+	    wp = عدم;
+	إذا (wp != عدم)
 	{
-	    char_u *q = utf16_to_enc(wp, NULL);
-	    if (q != NULL)
+	    char_u *q = utf16_to_enc(wp, عدم);
+	    إذا (q != عدم)
 	    {
 		p = vim_version_dir(q);
 		*mustfree = TRUE;
-		if (p == NULL)
+		إذا (p == عدم)
 		    p = q;
 	    }
 	}
-#else
+#وإلا
 	p = mch_getenv((char_u *)"VIM");
-	if (p != NULL && *p == NUL)	    // empty is the same as not set
-	    p = NULL;
-	if (p != NULL)
+	إذا (p != عدم && *p == NUL)	    // empty is the same as not set
+	    p = عدم;
+	إذا (p != عدم)
 	{
 	    p = vim_version_dir(p);
-	    if (p != NULL)
+	    إذا (p != عدم)
 		*mustfree = TRUE;
-	    else
+	    وإلا
 		p = mch_getenv((char_u *)"VIM");
 	}
 #endif
@@ -1905,39 +1905,39 @@ vim_getenv(char_u *name, int *mustfree)
      * - the directory name from 'helpfile' (unless it contains '$')
      * - the executable name from argv[0]
      */
-    if (p == NULL)
+    إذا (p == عدم)
     {
-	if (p_hf != NULL && vim_strchr(p_hf, '$') == NULL)
+	إذا (p_hf != عدم && vim_strchr(p_hf, '$') == عدم)
 	    p = p_hf;
 #ifdef USE_EXE_NAME
 	/*
 	 * Use the name of the executable, obtained from argv[0].
 	 */
-	else
+	وإلا
 	    p = exe_name;
 #endif
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    // remove the file name
 	    pend = gettail(p);
 
 	    // remove "doc/" from 'helpfile', if present
-	    if (p == p_hf)
+	    إذا (p == p_hf)
 		pend = remove_tail(p, pend, (char_u *)"doc");
 
 #ifdef USE_EXE_NAME
 # ifdef MACOS_X
 	    // remove "MacOS" from exe_name and add "Resources/vim"
-	    if (p == exe_name)
+	    إذا (p == exe_name)
 	    {
 		char_u	*pend1;
 		char_u	*pnew;
 
 		pend1 = remove_tail(p, pend, (char_u *)"MacOS");
-		if (pend1 != pend)
+		إذا (pend1 != pend)
 		{
 		    pnew = alloc(pend1 - p + 15);
-		    if (pnew != NULL)
+		    إذا (pnew != عدم)
 		    {
 			STRNCPY(pnew, p, (pend1 - p));
 			STRCPY(pnew + (pend1 - p), "Resources/vim");
@@ -1948,34 +1948,34 @@ vim_getenv(char_u *name, int *mustfree)
 	    }
 # endif
 	    // remove "src/" from exe_name, if present
-	    if (p == exe_name)
+	    إذا (p == exe_name)
 		pend = remove_tail(p, pend, (char_u *)"src");
 #endif
 
 	    // for $VIM, remove "runtime/" or "vim54/", if present
-	    if (!vimruntime)
+	    إذا (!vimruntime)
 	    {
 		pend = remove_tail(p, pend, (char_u *)RUNTIME_DIRNAME);
 		pend = remove_tail(p, pend, (char_u *)VIM_VERSION_NODOT);
 	    }
 
 	    // remove trailing path separator
-	    if (pend > p && after_pathsep(p, pend))
+	    إذا (pend > p && after_pathsep(p, pend))
 		--pend;
 
 #ifdef MACOS_X
-	    if (p == exe_name || p == p_hf)
+	    إذا (p == exe_name || p == p_hf)
 #endif
 		// check that the result is a directory name
 		p = vim_strnsave(p, pend - p);
 
-	    if (p != NULL && !mch_isdir(p))
+	    إذا (p != عدم && !mch_isdir(p))
 		VIM_CLEAR(p);
-	    else
+	    وإلا
 	    {
 #ifdef USE_EXE_NAME
 		// may add "/vim54" or "/runtime" if it exists
-		if (vimruntime && (pend = vim_version_dir(p)) != NULL)
+		إذا (vimruntime && (pend = vim_version_dir(p)) != عدم)
 		{
 		    vim_free(p);
 		    p = pend;
@@ -1989,19 +1989,19 @@ vim_getenv(char_u *name, int *mustfree)
 #ifdef HAVE_PATHDEF
     // When there is a pathdef.c file we can use default_vim_dir and
     // default_vimruntime_dir
-    if (p == NULL)
+    إذا (p == عدم)
     {
 	// Only use default_vimruntime_dir when it is not empty
-	if (vimruntime && *default_vimruntime_dir != NUL)
+	إذا (vimruntime && *default_vimruntime_dir != NUL)
 	{
 	    p = default_vimruntime_dir;
 	    *mustfree = FALSE;
 	}
-	else if (*default_vim_dir != NUL)
+	وإلا إذا (*default_vim_dir != NUL)
 	{
-	    if (vimruntime && (p = vim_version_dir(default_vim_dir)) != NULL)
+	    إذا (vimruntime && (p = vim_version_dir(default_vim_dir)) != عدم)
 		*mustfree = TRUE;
-	    else
+	    وإلا
 	    {
 		p = default_vim_dir;
 		*mustfree = FALSE;
@@ -2014,28 +2014,28 @@ vim_getenv(char_u *name, int *mustfree)
      * Set the environment variable, so that the new value can be found fast
      * next time, and others can also use it (e.g. Perl).
      */
-    if (p != NULL)
+    إذا (p != عدم)
     {
-	if (vimruntime)
+	إذا (vimruntime)
 	{
 	    vim_setenv((char_u *)"VIMRUNTIME", p);
 	    didset_vimruntime = TRUE;
 	}
-	else
+	وإلا
 	{
 	    vim_setenv((char_u *)"VIM", p);
 	    didset_vim = TRUE;
 	}
     }
-    return p;
+    أرجع p;
 }
 
-    void
+    فراغ
 vim_unsetenv(char_u *var)
 {
 #ifdef HAVE_UNSETENV
-    unsetenv((char *)var);
-#else
+    unsetenv((حرف *)var);
+#وإلا
     vim_setenv(var, (char_u *)"");
 #endif
 }
@@ -2043,31 +2043,31 @@ vim_unsetenv(char_u *var)
 /*
  * Removes environment variable "name" and take care of side effects.
  */
-    void
+    فراغ
 vim_unsetenv_ext(char_u *var)
 {
     vim_unsetenv(var);
 
     // "homedir" is not cleared, keep using the old value until $HOME is set.
-    if (STRICMP(var, "VIM") == 0)
+    إذا (STRICMP(var, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (STRICMP(var, "VIMRUNTIME") == 0)
+    وإلا إذا (STRICMP(var, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Set environment variable "name" and take care of side effects.
  */
-    void
+    فراغ
 vim_setenv_ext(char_u *name, char_u *val)
 {
     vim_setenv(name, val);
-    if (STRICMP(name, "HOME") == 0)
+    إذا (STRICMP(name, "HOME") == 0)
 	init_homedir();
-    else if (didset_vim && STRICMP(name, "VIM") == 0)
+    وإلا إذا (didset_vim && STRICMP(name, "VIM") == 0)
 	didset_vim = FALSE;
-    else if (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
+    وإلا إذا (didset_vimruntime && STRICMP(name, "VIMRUNTIME") == 0)
 	didset_vimruntime = FALSE;
 }
 #endif
@@ -2075,12 +2075,12 @@ vim_setenv_ext(char_u *name, char_u *val)
 /*
  * Our portable version of setenv.
  */
-    void
+    فراغ
 vim_setenv(char_u *name, char_u *val)
 {
 #ifdef HAVE_SETENV
-    mch_setenv((char *)name, (char *)val, 1);
-#else
+    mch_setenv((حرف *)name, (حرف *)val, 1);
+#وإلا
     char_u	*envbuf;
 
     /*
@@ -2088,10 +2088,10 @@ vim_setenv(char_u *name, char_u *val)
      * valid.  The allocated memory will never be freed.
      */
     envbuf = alloc(STRLEN(name) + STRLEN(val) + 2);
-    if (envbuf != NULL)
+    إذا (envbuf != عدم)
     {
-	sprintf((char *)envbuf, "%s=%s", name, val);
-	putenv((char *)envbuf);
+	sprintf((حرف *)envbuf, "%s=%s", name, val);
+	putenv((حرف *)envbuf);
     }
 #endif
 #ifdef FEAT_GETTEXT
@@ -2099,13 +2099,13 @@ vim_setenv(char_u *name, char_u *val)
      * When setting $VIMRUNTIME adjust the directory to find message
      * translations to $VIMRUNTIME/lang.
      */
-    if (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
+    إذا (*val != NUL && STRICMP(name, "VIMRUNTIME") == 0)
     {
 	char_u	*buf = concat_str(val, (char_u *)"/lang");
 
-	if (buf != NULL)
+	إذا (buf != عدم)
 	{
-	    bindtextdomain(VIMPACKAGE, (char *)buf);
+	    bindtextdomain(VIMPACKAGE, (حرف *)buf);
 	    vim_free(buf);
 	}
     }
@@ -2118,31 +2118,31 @@ vim_setenv(char_u *name, char_u *val)
     char_u *
 get_env_name(
     expand_T	*xp UNUSED,
-    int		idx)
+    صحيح		idx)
 {
-#if defined(AMIGA)
+#إذا defined(AMIGA)
     // No environ[] on the Amiga.
-    return NULL;
-#else
+    أرجع عدم;
+#وإلا
 # ifndef __WIN32__
     // Borland C++ 5.2 has this in a header file.
-    extern char		**environ;
+    خارجي حرف		**environ;
 # endif
     char_u		*str;
-    int			n;
+    صحيح			n;
 
     str = (char_u *)environ[idx];
-    if (str == NULL)
-	return NULL;
+    إذا (str == عدم)
+	أرجع عدم;
 
-    for (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
+    لكل (n = 0; n < EXPAND_BUF_LEN - 1; ++n)
     {
-	if (str[n] == '=' || str[n] == NUL)
-	    break;
+	إذا (str[n] == '=' || str[n] == NUL)
+	    اكسر;
 	xp->xp_buf[n] = str[n];
     }
     xp->xp_buf[n] = NUL;
-    return xp->xp_buf;
+    أرجع xp->xp_buf;
 #endif
 }
 
@@ -2150,17 +2150,17 @@ get_env_name(
  * Add a user name to the list of users in ga_users.
  * Do nothing if user name is NULL or empty.
  */
-    static void
-add_user(char_u *user, int need_copy)
+    ساكن فراغ
+add_user(char_u *user, صحيح need_copy)
 {
-    char_u	*user_copy = (user != NULL && need_copy)
+    char_u	*user_copy = (user != عدم && need_copy)
 						    ? vim_strsave(user) : user;
 
-    if (user_copy == NULL || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
+    إذا (user_copy == عدم || *user_copy == NUL || ga_grow(&ga_users, 1) == FAIL)
     {
-	if (need_copy)
+	إذا (need_copy)
 	    vim_free(user_copy);
-	return;
+	أرجع;
     }
     ((char_u **)(ga_users.ga_data))[ga_users.ga_len++] = user_copy;
 }
@@ -2169,42 +2169,42 @@ add_user(char_u *user, int need_copy)
  * Find all user names for user completion.
  * Done only once and then cached.
  */
-    static void
-init_users(void)
+    ساكن فراغ
+init_users(فراغ)
 {
-    static int	lazy_init_done = FALSE;
+    ساكن صحيح	lazy_init_done = FALSE;
 
-    if (lazy_init_done)
-	return;
+    إذا (lazy_init_done)
+	أرجع;
 
     lazy_init_done = TRUE;
-    ga_init2(&ga_users, sizeof(char_u *), 20);
+    ga_init2(&ga_users, حجم(char_u *), 20);
 
-#if defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
+#إذا defined(HAVE_GETPWENT) && defined(HAVE_PWD_H)
     {
-	struct passwd*	pw;
+	بنية passwd*	pw;
 
 	setpwent();
-	while ((pw = getpwent()) != NULL)
+	طالما ((pw = getpwent()) != عدم)
 	    add_user((char_u *)pw->pw_name, TRUE);
 	endpwent();
     }
-#elif defined(MSWIN)
+#وإلاإذا defined(MSWIN)
     {
 	DWORD		nusers = 0, ntotal = 0, i;
 	PUSER_INFO_0	uinfo;
 
-	if (NetUserEnum(NULL, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_LENGTH,
-				       &nusers, &ntotal, NULL) == NERR_Success)
+	إذا (NetUserEnum(عدم, 0, 0, (LPBYTE *) &uinfo, MAX_PREFERRED_LENGTH,
+				       &nusers, &ntotal, عدم) == NERR_Success)
 	{
-	    for (i = 0; i < nusers; i++)
-		add_user(utf16_to_enc(uinfo[i].usri0_name, NULL), FALSE);
+	    لكل (i = 0; i < nusers; i++)
+		add_user(utf16_to_enc(uinfo[i].usri0_name, عدم), FALSE);
 
 	    NetApiBufferFree(uinfo);
 	}
     }
 #endif
-#if defined(HAVE_GETPWNAM)
+#إذا defined(HAVE_GETPWNAM)
     {
 	char_u	*user_env = mch_getenv((char_u *)"USER");
 
@@ -2214,23 +2214,23 @@ init_users(void)
 	// is a valid remote user name using getpwnam() and if it is, add it to
 	// the list of user names.
 
-	if (user_env != NULL && *user_env != NUL)
+	إذا (user_env != عدم && *user_env != NUL)
 	{
-	    int	i;
+	    صحيح	i;
 
-	    for (i = 0; i < ga_users.ga_len; i++)
+	    لكل (i = 0; i < ga_users.ga_len; i++)
 	    {
 		char_u	*local_user = ((char_u **)ga_users.ga_data)[i];
 
-		if (STRCMP(local_user, user_env) == 0)
-		    break;
+		إذا (STRCMP(local_user, user_env) == 0)
+		    اكسر;
 	    }
 
-	    if (i == ga_users.ga_len)
+	    إذا (i == ga_users.ga_len)
 	    {
-		struct passwd	*pw = getpwnam((char *)user_env);
+		بنية passwd	*pw = getpwnam((حرف *)user_env);
 
-		if (pw != NULL)
+		إذا (pw != عدم)
 		    add_user((char_u *)pw->pw_name, TRUE);
 	    }
 	}
@@ -2242,12 +2242,12 @@ init_users(void)
  * Function given to ExpandGeneric() to obtain user names.
  */
     char_u*
-get_users(expand_T *xp UNUSED, int idx)
+get_users(expand_T *xp UNUSED, صحيح idx)
 {
     init_users();
-    if (idx < ga_users.ga_len)
-	return ((char_u **)ga_users.ga_data)[idx];
-    return NULL;
+    إذا (idx < ga_users.ga_len)
+	أرجع ((char_u **)ga_users.ga_data)[idx];
+    أرجع عدم;
 }
 
 /*
@@ -2256,28 +2256,28 @@ get_users(expand_T *xp UNUSED, int idx)
  * 1 if name partially matches the beginning of a user name.
  * 2 is name fully matches a user name.
  */
-    int
+    صحيح
 match_user(char_u *name)
 {
-    int i;
-    int n = (int)STRLEN(name);
-    int result = 0;
+    صحيح i;
+    صحيح n = (صحيح)STRLEN(name);
+    صحيح result = 0;
 
     init_users();
-    for (i = 0; i < ga_users.ga_len; i++)
+    لكل (i = 0; i < ga_users.ga_len; i++)
     {
-	if (STRCMP(((char_u **)ga_users.ga_data)[i], name) == 0)
-	    return 2; // full match
-	if (STRNCMP(((char_u **)ga_users.ga_data)[i], name, n) == 0)
+	إذا (STRCMP(((char_u **)ga_users.ga_data)[i], name) == 0)
+	    أرجع 2; // full match
+	إذا (STRNCMP(((char_u **)ga_users.ga_data)[i], name, n) == 0)
 	    result = 1; // partial match
     }
-    return result;
+    أرجع result;
 }
 
-    static void
-prepare_to_exit(void)
+    ساكن فراغ
+prepare_to_exit(فراغ)
 {
-#if defined(SIGHUP) && defined(SIG_IGN)
+#إذا defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
@@ -2285,19 +2285,19 @@ prepare_to_exit(void)
 #endif
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.in_use)
     {
 	gui.dying = true;
 	out_trash();	// trash any pending output
     }
-    else
+    وإلا
 #endif
     {
-	windgoto((int)Rows - 1, cmdline_col_off);
+	windgoto((صحيح)Rows - 1, cmdline_col_off);
 
 	// When "full_screen" was reset, e.g. by deathtrap(), settmode() below
 	// returns without switching the mouse off, so do it here.
-	if (!full_screen)
+	إذا (!full_screen)
 	    mch_setmouse(FALSE);
 
 	/*
@@ -2316,8 +2316,8 @@ prepare_to_exit(void)
  * NOTE: This may be called from deathtrap() in a signal handler, avoid unsafe
  * functions, such as allocating memory.
  */
-    void
-preserve_exit(void)
+    فراغ
+preserve_exit(فراغ)
 {
     buf_T	*buf;
 
@@ -2335,13 +2335,13 @@ preserve_exit(void)
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp != NULL && buf->b_ml.ml_mfp->mf_fname != NULL)
+	إذا (buf->b_ml.ml_mfp != عدم && buf->b_ml.ml_mfp->mf_fname != عدم)
 	{
 	    OUT_STR("Vim: preserving files...\r\n");
 	    screen_start();	    // don't know where cursor is now
 	    out_flush();
 	    ml_sync_all(FALSE, FALSE);	// preserve all swap files
-	    break;
+	    اكسر;
 	}
     }
 
@@ -2363,14 +2363,14 @@ preserve_exit(void)
 # define BREAKCHECK_SKIP 1000
 #endif
 
-static int	breakcheck_count = 0;
+ساكن صحيح	breakcheck_گنتی = 0;
 
-    void
-line_breakcheck(void)
+    فراغ
+سطر_breakcheck(فراغ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP)
+    إذا (++breakcheck_گنتی >= BREAKCHECK_SKIP)
     {
-	breakcheck_count = 0;
+	breakcheck_گنتی = 0;
 	ui_breakcheck();
     }
 }
@@ -2378,32 +2378,32 @@ line_breakcheck(void)
 /*
  * Like line_breakcheck() but check 10 times less often.
  */
-    void
-fast_breakcheck(void)
+    فراغ
+fast_breakcheck(فراغ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 10)
+    إذا (++breakcheck_گنتی >= BREAKCHECK_SKIP * 10)
     {
-	breakcheck_count = 0;
+	breakcheck_گنتی = 0;
 	ui_breakcheck();
     }
 }
 
-#if defined(FEAT_SPELL)
+#إذا defined(FEAT_SPELL)
 /*
  * Like line_breakcheck() but check 100 times less often.
  */
-    void
-veryfast_breakcheck(void)
+    فراغ
+veryfast_breakcheck(فراغ)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 100)
+    إذا (++breakcheck_گنتی >= BREAKCHECK_SKIP * 100)
     {
-	breakcheck_count = 0;
+	breakcheck_گنتی = 0;
 	ui_breakcheck();
     }
 }
 #endif
 
-#if defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#إذا defined(FEAT_EVAL) || (defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 
 # ifndef SEEK_SET
 #  define SEEK_SET 0
@@ -2422,31 +2422,31 @@ veryfast_breakcheck(void)
 get_cmd_output(
     char_u	*cmd,
     char_u	*infile,	// optional input file name
-    int		flags,		// can be SHELL_SILENT
-    int		*ret_len)
+    صحيح		flags,		// can be SHELL_SILENT
+    صحيح		*ret_len)
 {
     char_u	*tempname;
     char_u	*command;
-    char_u	*buffer = NULL;
-    int		len;
-    int		i = 0;
+    char_u	*buffer = عدم;
+    صحيح		len;
+    صحيح		i = 0;
     FILE	*fd;
 
-    if (check_restricted() || check_secure())
-	return NULL;
+    إذا (check_restricted() || check_secure())
+	أرجع عدم;
 
     // Keep the file reserved until the shell opens it.  On MS-Windows,
     // deleting it here would let another Vim process reuse the same name.
-    if ((tempname = vim_tempname('o', TRUE)) == NULL)
+    إذا ((tempname = vim_tempname('o', TRUE)) == عدم)
     {
 	emsg(_(e_cant_get_temp_file_name));
-	return NULL;
+	أرجع عدم;
     }
 
     // Add the redirection stuff
     command = make_filter_cmd(cmd, infile, tempname);
-    if (command == NULL)
-	goto done;
+    إذا (command == عدم)
+	اذهب done;
 
     /*
      * Call the shell to execute the command (errors are ignored).
@@ -2463,195 +2463,195 @@ get_cmd_output(
      */
 # ifdef VMS
     // created temporary file is not always readable as binary
-    fd = mch_fopen((char *)tempname, "r");
-# else
-    fd = mch_fopen((char *)tempname, READBIN);
+    fd = mch_fopen((حرف *)tempname, "r");
+# وإلا
+    fd = mch_fopen((حرف *)tempname, READBIN);
 # endif
 
     // Not being able to seek means we can't read the file.
-    if (fd == NULL
+    إذا (fd == عدم
 	    || fseek(fd, 0L, SEEK_END) == -1
 	    || (len = ftell(fd)) == -1		// get size of temp file
 	    || fseek(fd, 0L, SEEK_SET) == -1)	// back to the start
     {
 	semsg(_(e_cannot_read_from_str_2), tempname);
-	if (fd != NULL)
+	إذا (fd != عدم)
 	    fclose(fd);
-	goto done;
+	اذهب done;
     }
 
     buffer = alloc(len + 1);
-    if (buffer != NULL)
-	i = (int)fread((char *)buffer, (size_t)1, (size_t)len, fd);
+    إذا (buffer != عدم)
+	i = (صحيح)fread((حرف *)buffer, (size_t)1, (size_t)len, fd);
     fclose(fd);
-    if (buffer == NULL)
-	goto done;
+    إذا (buffer == عدم)
+	اذهب done;
 # ifdef VMS
     len = i;	// VMS doesn't give us what we asked for...
 # endif
-    if (i != len)
+    إذا (i != len)
     {
 	semsg(_(e_cant_read_file_str), tempname);
 	VIM_CLEAR(buffer);
     }
-    else if (ret_len == NULL)
+    وإلا إذا (ret_len == عدم)
     {
 	// Change NUL into SOH, otherwise the string is truncated.
-	for (i = 0; i < len; ++i)
-	    if (buffer[i] == NUL)
+	لكل (i = 0; i < len; ++i)
+	    إذا (buffer[i] == NUL)
 		buffer[i] = 1;
 
 	buffer[len] = NUL;	// make sure the buffer is terminated
     }
-    else
+    وإلا
 	*ret_len = len;
 
 done:
     mch_remove(tempname);
     vim_free(tempname);
-    return buffer;
+    أرجع buffer;
 }
 
-# if defined(FEAT_EVAL)
+# إذا defined(FEAT_EVAL)
 
-    static void
+    ساكن فراغ
 get_cmd_output_as_rettv(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		retlist)
+    صحيح		retlist)
 {
-    char_u	*res = NULL;
+    char_u	*res = عدم;
     char_u	*p;
-    char_u	*infile = NULL;
-    int		err = FALSE;
+    char_u	*infile = عدم;
+    صحيح		err = FALSE;
     FILE	*fd;
-    list_T	*list = NULL;
-    int		flags = SHELL_SILENT;
-    int		use_argv = FALSE;
-    char	**argv = NULL;
-    int		argc = 0;
+    list_T	*list = عدم;
+    صحيح		flags = SHELL_SILENT;
+    صحيح		use_argv = FALSE;
+    حرف	**argv = عدم;
+    صحيح		argc = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (check_restricted() || check_secure())
-	goto errret;
+    rettv->vval.v_string = عدم;
+    إذا (check_restricted() || check_secure())
+	اذهب errret;
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_or_list_arg(argvars, 1)
+		|| check_for_opt_string_or_نمبر_or_list_arg(argvars, 1)
 								      == FAIL))
-	return;
+	أرجع;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	/*
 	 * Write the text to a temp file, to be used for input of the shell
 	 * command.
 	 */
-	if ((infile = vim_tempname('i', TRUE)) == NULL)
+	إذا ((infile = vim_tempname('i', TRUE)) == عدم)
 	{
 	    emsg(_(e_cant_get_temp_file_name));
-	    goto errret;
+	    اذهب errret;
 	}
 
-	fd = mch_fopen((char *)infile, WRITEBIN);
-	if (fd == NULL)
+	fd = mch_fopen((حرف *)infile, WRITEBIN);
+	إذا (fd == عدم)
 	{
 	    semsg(_(e_cant_open_file_str), infile);
-	    goto errret;
+	    اذهب errret;
 	}
-	if (argvars[1].v_type == VAR_NUMBER)
+	إذا (argvars[1].v_type == VAR_نمبر)
 	{
 	    linenr_T	lnum;
 	    buf_T	*buf;
 
-	    buf = buflist_findnr(argvars[1].vval.v_number);
-	    if (buf == NULL)
+	    buf = buflist_findnr(argvars[1].vval.v_نمبر);
+	    إذا (buf == عدم)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_number);
+		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_نمبر);
 		fclose(fd);
-		goto errret;
+		اذهب errret;
 	    }
 
-	    for (lnum = 1; lnum <= buf->b_ml.ml_line_count; lnum++)
+	    لكل (lnum = 1; lnum <= buf->b_ml.ml_سطر_گنتی; lnum++)
 	    {
-		for (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
-		    if (putc(*p == '\n' ? NUL : *p, fd) == EOF)
+		لكل (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
+		    إذا (putc(*p == '\n' ? NUL : *p, fd) == EOF)
 		    {
 			err = TRUE;
-			break;
+			اكسر;
 		    }
-		if (putc(NL, fd) == EOF)
+		إذا (putc(NL, fd) == EOF)
 		{
 		    err = TRUE;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	وإلا إذا (argvars[1].v_type == VAR_LIST)
 	{
-	    if (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
+	    إذا (write_list(fd, argvars[1].vval.v_list, TRUE) == FAIL)
 		err = TRUE;
 	}
-	else
+	وإلا
 	{
 	    size_t	len;
 	    char_u	buf[NUMBUFLEN];
 
 	    p = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (p == NULL)
+	    إذا (p == عدم)
 	    {
 		fclose(fd);
-		goto errret;		// type error; errmsg already given
+		اذهب errret;		// type error; errmsg already given
 	    }
 	    len = STRLEN(p);
-	    if (len > 0 && fwrite(p, len, 1, fd) != 1)
+	    إذا (len > 0 && fwrite(p, len, 1, fd) != 1)
 		err = TRUE;
 	}
-	if (fclose(fd) != 0)
+	إذا (fclose(fd) != 0)
 	    err = TRUE;
-	if (err)
+	إذا (err)
 	{
 	    emsg(_(e_error_writing_temp_file));
-	    goto errret;
+	    اذهب errret;
 	}
     }
 
     // When the command is a List, execute directly without the shell.
-    if (argvars[0].v_type == VAR_LIST)
+    إذا (argvars[0].v_type == VAR_LIST)
     {
 	list_T	*l = argvars[0].vval.v_list;
 
-	if (l == NULL || l->lv_len < 1)
+	إذا (l == عدم || l->lv_len < 1)
 	{
 	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    اذهب errret;
 	}
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
-	    goto errret;
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	إذا (build_argv_from_list(l, &argv, &argc) == FAIL)
+	    اذهب errret;
+	إذا (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
-	    goto errret;
+	    اذهب errret;
 	}
 	use_argv = TRUE;
 
-	if (p_verbose > 3)
+	إذا (p_verbose > 3)
 	{
-	    int		i;
+	    صحيح		i;
 	    garray_T	ga;
 
 	    verbose_enter();
 	    ga_init2(&ga, 1, 200);
-	    for (i = 0; i < argc; ++i)
+	    لكل (i = 0; i < argc; ++i)
 	    {
-		if (i > 0)
+		إذا (i > 0)
 		    ga_append(&ga, ' ');
 		ga_concat(&ga, (char_u *)argv[i]);
 	    }
 	    ga_append(&ga, NUL);
-	    smsg(_("Executing directly: \"%s\""), (char *)ga.ga_data);
-	    msg_putchar_attr('\n', 0);
+	    smsg(_("Executing directly: \"%s\""), (حرف *)ga.ga_data);
+	    پیغام_putchar_attr('\n', 0);
 	    cursor_on();
 	    verbose_leave();
 	    ga_clear(&ga);
@@ -2660,49 +2660,49 @@ get_cmd_output_as_rettv(
 
     // Omit SHELL_COOKED when invoked with ":silent".  Avoids that the shell
     // echoes typeahead, that messes up the display.
-    if (!msg_silent)
+    إذا (!پیغام_silent)
 	flags += SHELL_COOKED;
 
-    if (retlist)
+    إذا (retlist)
     {
-	int		len;
+	صحيح		len;
 	listitem_T	*li;
-	char_u		*s = NULL;
+	char_u		*s = عدم;
 	char_u		*start;
 	char_u		*end;
-	int		i;
+	صحيح		i;
 
-	if (use_argv)
+	إذا (use_argv)
 	    res = mch_get_cmd_output_direct(argv, infile, flags, &len);
-	else
+	وإلا
 	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, &len);
-	if (res == NULL)
-	    goto errret;
+	إذا (res == عدم)
+	    اذهب errret;
 
 	list = list_alloc();
-	if (list == NULL)
-	    goto errret;
+	إذا (list == عدم)
+	    اذهب errret;
 
-	for (i = 0; i < len; ++i)
+	لكل (i = 0; i < len; ++i)
 	{
 	    start = res + i;
-	    while (i < len && res[i] != NL)
+	    طالما (i < len && res[i] != NL)
 		++i;
 	    end = res + i;
 
 	    s = alloc(end - start + 1);
-	    if (s == NULL)
-		goto errret;
+	    إذا (s == عدم)
+		اذهب errret;
 
-	    for (p = s; start < end; ++p, ++start)
+	    لكل (p = s; start < end; ++p, ++start)
 		*p = *start == NUL ? NL : *start;
 	    *p = NUL;
 
 	    li = listitem_alloc();
-	    if (li == NULL)
+	    إذا (li == عدم)
 	    {
 		vim_free(s);
-		goto errret;
+		اذهب errret;
 	    }
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.v_lock = 0;
@@ -2711,24 +2711,24 @@ get_cmd_output_as_rettv(
 	}
 
 	rettv_list_set(rettv, list);
-	list = NULL;
+	list = عدم;
     }
-    else
+    وإلا
     {
-	if (use_argv)
-	    res = mch_get_cmd_output_direct(argv, infile, flags, NULL);
-	else
-	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, NULL);
+	إذا (use_argv)
+	    res = mch_get_cmd_output_direct(argv, infile, flags, عدم);
+	وإلا
+	    res = get_cmd_output(tv_get_string(&argvars[0]), infile, flags, عدم);
 #  ifdef USE_CRNL
 	// translate <CR><NL> into <NL>
-	if (res != NULL)
+	إذا (res != عدم)
 	{
 	    char_u	*s, *d;
 
 	    d = res;
-	    for (s = res; *s; ++s)
+	    لكل (s = res; *s; ++s)
 	    {
-		if (s[0] == CAR && s[1] == NL)
+		إذا (s[0] == CAR && s[1] == NL)
 		    ++s;
 		*d++ = *s;
 	    }
@@ -2736,32 +2736,32 @@ get_cmd_output_as_rettv(
 	}
 #  endif
 	rettv->vval.v_string = res;
-	res = NULL;
+	res = عدم;
     }
 
 errret:
-    if (argv != NULL)
+    إذا (argv != عدم)
     {
-	int i;
-	for (i = 0; argv[i] != NULL; i++)
+	صحيح i;
+	لكل (i = 0; argv[i] != عدم; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
-    if (infile != NULL)
+    إذا (infile != عدم)
     {
 	mch_remove(infile);
 	vim_free(infile);
     }
-    if (res != NULL)
+    إذا (res != عدم)
 	vim_free(res);
-    if (list != NULL)
+    إذا (list != عدم)
 	list_free(list);
 }
 
 /*
  * "system()" function
  */
-    void
+    فراغ
 f_system(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, FALSE);
@@ -2770,7 +2770,7 @@ f_system(typval_T *argvars, typval_T *rettv)
 /*
  * "systemlist()" function
  */
-    void
+    فراغ
 f_systemlist(typval_T *argvars, typval_T *rettv)
 {
     get_cmd_output_as_rettv(argvars, rettv, TRUE);
@@ -2784,10 +2784,10 @@ f_systemlist(typval_T *argvars, typval_T *rettv)
  * Don't do this when still processing a command or a mapping.
  * Don't do this when inside a ":normal" command.
  */
-    int
-goto_im(void)
+    صحيح
+goto_im(فراغ)
 {
-    return (p_im && stuff_empty() && typebuf_typed());
+    أرجع (p_im && stuff_empty() && typebuf_typed());
 }
 
 /*
@@ -2800,33 +2800,33 @@ goto_im(void)
  * Returns NULL when out of memory.
  */
     char_u *
-get_isolated_shell_name(void)
+get_isolated_shell_name(فراغ)
 {
     char_u *p;
 
 #ifdef MSWIN
     p = gettail(p_sh);
     p = vim_strnsave(p, skiptowhite(p) - p);
-#else
+#وإلا
     p = skiptowhite(p_sh);
-    if (*p == NUL)
+    إذا (*p == NUL)
     {
 	// No white space, use the tail.
 	p = vim_strsave(gettail(p_sh));
     }
-    else
+    وإلا
     {
 	char_u  *p1, *p2;
 
 	// Find the last path separator before the space.
 	p1 = p_sh;
-	for (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
-	    if (vim_ispathsep(*p2))
+	لكل (p2 = p_sh; p2 < p; MB_PTR_ADV(p2))
+	    إذا (vim_ispathsep(*p2))
 		p1 = p2 + 1;
 	p = vim_strnsave(p1, p - p1);
     }
 #endif
-    return p;
+    أرجع p;
 }
 
 /*
@@ -2834,14 +2834,14 @@ get_isolated_shell_name(void)
  * Also check for ":\\", which MS Internet Explorer accepts, return
  * URL_BACKSLASH.
  */
-    int
+    صحيح
 path_is_url(char_u *p)
 {
-    if (STRNCMP(p, "://", (size_t)3) == 0)
-	return URL_SLASH;
-    else if (STRNCMP(p, ":\\\\", (size_t)3) == 0)
-	return URL_BACKSLASH;
-    return 0;
+    إذا (STRNCMP(p, "://", (size_t)3) == 0)
+	أرجع URL_SLASH;
+    وإلا إذا (STRNCMP(p, ":\\\\", (size_t)3) == 0)
+	أرجع URL_BACKSLASH;
+    أرجع 0;
 }
 
 /*
@@ -2849,7 +2849,7 @@ path_is_url(char_u *p)
  * Return URL_SLASH for "name://", URL_BACKSLASH for "name:\\".
  * Return zero otherwise.
  */
-    int
+    صحيح
 path_with_url(char_u *fname)
 {
     char_u *p;
@@ -2859,22 +2859,22 @@ path_with_url(char_u *fname)
     // non-URL text.
 
     // first character must be alpha
-    if (!ASCII_ISALPHA(*fname))
-	return 0;
+    إذا (!ASCII_ISALPHA(*fname))
+	أرجع 0;
 
     // check body: alpha or dash
-    for (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
+    لكل (p = fname + 1; (ASCII_ISALPHA(*p) || (*p == '-')); ++p)
 	;
 
     // check last char is not a dash
-    if (p[-1] == '-')
-	return 0;
+    إذا (p[-1] == '-')
+	أرجع 0;
 
     // "://" or ":\\" must follow
-    return path_is_url(p);
+    أرجع path_is_url(p);
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return the dictionary of v:event.
  * Save and clear the value in case it already has items.
@@ -2884,25 +2884,25 @@ get_v_event(save_v_event_T *sve)
 {
     dict_T	*v_event = get_vim_var_dict(VV_EVENT);
 
-    if (v_event->dv_hashtab.ht_used > 0)
+    إذا (v_event->dv_hashtab.ht_used > 0)
     {
 	// recursive use of v:event, save, make empty and restore later
 	sve->sve_did_save = TRUE;
 	sve->sve_hashtab = v_event->dv_hashtab;
 	hash_init(&v_event->dv_hashtab);
     }
-    else
+    وإلا
 	sve->sve_did_save = FALSE;
-    return v_event;
+    أرجع v_event;
 }
 
-    void
+    فراغ
 restore_v_event(dict_T *v_event, save_v_event_T *sve)
 {
     dict_free_contents(v_event);
-    if (sve->sve_did_save)
+    إذا (sve->sve_did_save)
 	v_event->dv_hashtab = sve->sve_hashtab;
-    else
+    وإلا
 	hash_init(&v_event->dv_hashtab);
 }
 #endif
@@ -2910,8 +2910,8 @@ restore_v_event(dict_T *v_event, save_v_event_T *sve)
 /*
  * Fires a ModeChanged autocmd event if appropriate.
  */
-    void
-may_trigger_modechanged(void)
+    فراغ
+may_trigger_modechanged(فراغ)
 {
 #ifdef FEAT_EVAL
     dict_T	    *v_event;
@@ -2921,23 +2921,23 @@ may_trigger_modechanged(void)
 
     // Skip this when got_int is set, the autocommand will not be executed.
     // Better trigger it next time.
-    if (!has_modechanged() || got_int)
-	return;
+    إذا (!has_modechanged() || got_int)
+	أرجع;
 
     get_mode(curr_mode);
-    if (STRCMP(curr_mode, last_mode) == 0)
-	return;
+    إذا (STRCMP(curr_mode, last_mode) == 0)
+	أرجع;
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_string(v_event, "new_mode", curr_mode);
-    (void)dict_add_string(v_event, "old_mode", last_mode);
-    dict_set_items_ro(v_event);
+    (فراغ)dict_add_string(v_event, "new_mode", curr_mode);
+    (فراغ)dict_add_string(v_event, "old_mode", last_mode);
+    dict_set_اشیاء_ro(v_event);
 
     // concatenate modes in format "old_mode:new_mode"
-    vim_snprintf((char *)pattern_buf, sizeof(pattern_buf), "%s:%s", last_mode,
+    vim_snprintf((حرف *)pattern_buf, حجم(pattern_buf), "%s:%s", last_mode,
 	    curr_mode);
 
-    apply_autocmds(EVENT_MODECHANGED, pattern_buf, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_MODECHANGED, pattern_buf, عدم, FALSE, curbuf);
     STRCPY(last_mode, curr_mode);
 
     restore_v_event(v_event, &save_v_event);
@@ -2945,19 +2945,19 @@ may_trigger_modechanged(void)
 }
 
 // For overflow detection, add a digit safely to a long value.
-    int
-vim_append_digit_long(long *value, int digit)
+    صحيح
+vim_append_digit_long(long *قدر, صحيح digit)
 {
-    long x = *value;
-    if (x > ((LONG_MAX - (long)digit) / 10))
-	return FAIL;
-    *value = x * 10 + (long)digit;
-    return OK;
+    long x = *قدر;
+    إذا (x > ((LONG_MAX - (long)digit) / 10))
+	أرجع FAIL;
+    *قدر = x * 10 + (long)digit;
+    أرجع OK;
 }
 
 // Return something that fits into an int.
-    int
+    صحيح
 trim_to_int(vimlong_T x)
 {
-    return x > INT_MAX ? INT_MAX : x < INT_MIN ? INT_MIN : x;
+    أرجع x > INT_MAX ? INT_MAX : x < INT_MIN ? INT_MIN : x;
 }
